@@ -257,7 +257,15 @@ export function buildDocument(config: DocBuildConfig): string {
     }
   }
   body += footer(config.org);
-  return htmlWrap(body);
+  let result = htmlWrap(body);
+  // Auto-apply gender based on first stagiaire if available
+  if (config.stagiaires && config.stagiaires.length > 0) {
+    result = applyGender(result, config.stagiaires[0]);
+  } else {
+    // Default: remove (e) with masculine form
+    result = applyGender(result, null);
+  }
+  return result;
 }
 
 /**
