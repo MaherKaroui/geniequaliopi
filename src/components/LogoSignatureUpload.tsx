@@ -90,8 +90,8 @@ const LogoSignatureUpload = ({ logoUrl, signatureUrl, tamponUrl, onLogoChange, o
       {/* Tampon */}
       {onTamponChange && (
         <div>
-          <Label className="mb-2 block font-semibold flex items-center gap-2">
-            <Stamp className="w-4 h-4 text-primary" /> Tampon de l'organisme
+          <Label className="mb-2 block font-semibold">
+            Tampon de l'organisme
           </Label>
           <div className="flex items-center gap-3">
             {tamponUrl ? (
