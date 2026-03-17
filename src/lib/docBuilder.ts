@@ -133,7 +133,12 @@ export function getStagiaireDateFin(s: StagiaireInfo, f: FormationInfo): string 
   return s.dateFinFormation || f.dateFin || "";
 }
 
-/** Format a formation info block for a specific stagiaire (uses their individual dates if available) */
+/** Get per-stagiaire tarif (falls back to formation tarif) */
+export function getStagiaireTarif(s: StagiaireInfo, f: FormationInfo): string {
+  return s.tarifFormation || f.tarif || "";
+}
+
+/** Format a formation info block for a specific stagiaire (uses their individual dates/tarif if available) */
 export function formationInfoBlockStagiaire(f: FormationInfo, s: StagiaireInfo): string {
   return infoGrid({
     "Formation": f.intitule,
@@ -143,7 +148,7 @@ export function formationInfoBlockStagiaire(f: FormationInfo, s: StagiaireInfo):
     "Lieu": f.lieu,
     "Modalités": f.modalites,
     "Formateur": f.formateur,
-    "Tarif": f.tarif,
+    "Tarif": getStagiaireTarif(s, f),
   });
 }
 
