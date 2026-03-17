@@ -323,20 +323,15 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
     <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-accent flex items-center justify-center">
-            <Package className="w-5 h-5 text-accent-foreground" />
-          </div>
-          <div>
-            <h2 className="text-xl font-bold">Dossier Qualiopi Complet</h2>
-            <p className="text-sm text-muted-foreground">
-              {catalog.length} documents • 7 critères • 32 indicateurs
-            </p>
-          </div>
+        <div>
+          <h2 className="text-xl font-bold">Dossier Qualiopi Complet</h2>
+          <p className="text-sm text-muted-foreground">
+            {catalog.length} documents • 7 critères • 32 indicateurs
+          </p>
         </div>
         <div className="flex items-center gap-2">
           <Button onClick={handleDownloadAll} disabled={generating} className="gap-2 bg-gradient-hero text-primary-foreground border-0">
-            {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+            {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
             {generating ? "Génération..." : "Télécharger tout (ZIP)"}
           </Button>
         </div>
