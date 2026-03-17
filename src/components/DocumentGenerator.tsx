@@ -369,7 +369,6 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
 
       {/* Stagiaire Selector */}
       <div className="p-3 bg-primary/5 rounded-xl border border-primary/20 flex items-center gap-3 flex-wrap">
-        <User className="w-5 h-5 text-primary shrink-0" />
         <span className="text-sm font-semibold text-primary">Stagiaire sélectionné :</span>
         <Select value={selectedStagiaire === -1 ? "all" : String(selectedStagiaire)} onValueChange={handleStagiaireChange}>
           <SelectTrigger className="w-[280px]">
