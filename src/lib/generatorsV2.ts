@@ -304,7 +304,7 @@ export function genContratFormationProStagiaire(o: OrganismeInfo, f: FormationIn
       <p><strong>Référent handicap :</strong> ${o.referentHandicap}<br>${o.email}</p>
     </div>
     <h3>Article 8 – Dispositions financières</h3>
-    <p><strong>Coût total de la formation :</strong> ${f.tarif}</p>
+    <p><strong>Coût total de la formation :</strong> ${getStagiaireTarif(s, f)}</p>
     <p>Les modalités de paiement sont définies dans les Conditions Générales de Vente.</p>
     <h3>Article 9 – Délai de rétractation</h3>
     <p>Conformément à l'article L.6353-5 du Code du travail, le stagiaire dispose d'un délai de rétractation de 10 jours à compter de la signature du présent contrat.</p>
