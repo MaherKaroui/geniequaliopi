@@ -82,12 +82,10 @@ const FormationForm = ({ data, onChange, onImportStagiaires }: FormationFormProp
       {/* EDOF Import */}
       <div className="p-4 bg-accent/30 border-2 border-accent rounded-xl">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <FileSpreadsheet className="w-5 h-5 text-primary" />
-            <div>
-              <Label className="font-semibold text-primary">Importer un fichier EDOF</Label>
-              <p className="text-xs text-muted-foreground">Import automatique des stagiaires, dates, tarifs depuis votre export EDOF (.xlsx)</p>
-            </div>
+          <div>
+            <Label className="font-semibold text-primary">Importer un fichier EDOF</Label>
+            <p className="text-xs text-muted-foreground">Import automatique des stagiaires, dates, tarifs depuis votre export EDOF (.xlsx)</p>
+          </div>
           </div>
           <div>
             <input
