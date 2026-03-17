@@ -18,74 +18,66 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Extract SIREN/SIRET from Pappers URL (e.g. /entreprise/nom-123456789)
+    // Extract SIREN from Pappers URL
     const sirenMatch = url.match(/(\d{9,14})/);
     if (!sirenMatch) {
       return new Response(
-        JSON.stringify({ success: false, error: 'Impossible de trouver le SIREN/SIRET dans l\'URL' }),
+        JSON.stringify({ success: false, error: 'Impossible de trouver le SIREN dans l\'URL' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    const siren = sirenMatch[1].slice(0, 9); // Take first 9 digits = SIREN
-    console.log('Fetching Pappers API for SIREN:', siren);
+    const siren = sirenMatch[1].slice(0, 9);
+    console.log('Looking up SIREN:', siren);
 
-    // Use Pappers public search page as JSON source
-    const apiUrl = `https://recherche.pappers.fr/v2/entreprise?siren=${siren}`;
-    
-    const response = await fetch(apiUrl, {
+    // Use suggestions.pappers.fr (public, no API key needed)
+    const suggestUrl = `https://suggestions.pappers.fr/v2?q=${siren}&cibles=nom_entreprise,siren,siret`;
+    const suggestResp = await fetch(suggestUrl, {
       headers: {
         'Accept': 'application/json',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Origin': 'https://www.pappers.fr',
         'Referer': 'https://www.pappers.fr/',
       },
     });
 
-    if (!response.ok) {
-      // Fallback: try the suggestions API
-      const searchUrl = `https://suggestions.pappers.fr/v2?q=${siren}&cibles=nom_entreprise,siren,siret`;
-      const searchResp = await fetch(searchUrl, {
-        headers: {
-          'Accept': 'application/json',
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-        },
-      });
-      
-      if (!searchResp.ok) {
-        const body = await searchResp.text();
-        console.error('Search API error:', searchResp.status, body);
-        return new Response(
-          JSON.stringify({ success: false, error: `Erreur API Pappers: ${searchResp.status}` }),
-          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-      
-      const searchData = await searchResp.json();
-      console.log('Search results:', JSON.stringify(searchData).slice(0, 500));
-      
-      const company = searchData?.resultats_siren?.[0] || searchData?.resultats_nom_entreprise?.[0] || searchData?.[0];
-      
-      if (!company) {
-        return new Response(
-          JSON.stringify({ success: false, error: 'Entreprise non trouvée' }),
-          { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-      
-      const result = extractCompanyData(company);
-      console.log('Parsed from search:', JSON.stringify(result));
-      
+    if (!suggestResp.ok) {
+      const errBody = await suggestResp.text();
+      console.error('Suggestions API error:', suggestResp.status, errBody);
       return new Response(
-        JSON.stringify({ success: true, data: result }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ success: false, error: `Erreur API: ${suggestResp.status}` }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    const data = await response.json();
-    console.log('API response keys:', Object.keys(data));
-    
-    const result = extractCompanyData(data);
-    console.log('Parsed data:', JSON.stringify(result));
+    const suggestData = await suggestResp.json();
+    console.log('Suggestions response:', JSON.stringify(suggestData).slice(0, 1000));
+
+    // Find matching company
+    const results = suggestData?.resultats_siren || suggestData?.resultats_nom_entreprise || suggestData || [];
+    const company = Array.isArray(results) ? results[0] : results;
+
+    if (!company) {
+      return new Response(
+        JSON.stringify({ success: false, error: 'Entreprise non trouvée pour ce SIREN' }),
+        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const result = {
+      nom: company.nom_complet || company.denomination || company.nom_entreprise || '',
+      siret: company.siege?.siret || company.siret || '',
+      siren: company.siren || siren,
+      adresse: company.siege?.adresse_ligne_1 || company.siege?.adresse || '',
+      codePostal: company.siege?.code_postal || '',
+      ville: company.siege?.ville || company.siege?.libelle_commune || '',
+      dirigeant: extractDirigeant(company),
+      domainesFormation: company.libelle_activite_principale || company.siege?.libelle_activite_principale || '',
+      nda: '',
+      siteWeb: '',
+    };
+
+    console.log('Parsed:', JSON.stringify(result));
 
     return new Response(
       JSON.stringify({ success: true, data: result }),
@@ -100,43 +92,11 @@ Deno.serve(async (req) => {
   }
 });
 
-function extractCompanyData(data: any) {
-  // Handle various Pappers API response formats
-  const nom = data.nom_complet || data.nom_entreprise || data.denomination || '';
-  const siret = data.siege?.siret || data.siret || '';
-  const siren = data.siren || '';
-  
-  // Address
-  const siege = data.siege || data;
-  const adresse = siege.adresse_ligne_1 || siege.adresse || '';
-  const codePostal = siege.code_postal || '';
-  const ville = siege.ville || siege.libelle_commune || '';
-  
-  // Dirigeant
-  let dirigeant = '';
-  if (data.representants && data.representants.length > 0) {
-    const rep = data.representants[0];
-    dirigeant = `${rep.prenom || ''} ${rep.nom || ''}`.trim();
-  } else if (data.dirigeants && data.dirigeants.length > 0) {
-    const dir = data.dirigeants[0];
-    dirigeant = `${dir.prenom || ''} ${dir.nom || ''}`.trim();
+function extractDirigeant(data: any): string {
+  const reps = data.representants || data.dirigeants || [];
+  if (reps.length > 0) {
+    const r = reps[0];
+    return `${r.prenom || ''} ${r.nom || ''}`.trim();
   }
-  
-  // Activity
-  const domainesFormation = data.libelle_activite_principale || 
-                             siege.libelle_activite_principale ||
-                             data.activite_principale || '';
-
-  return {
-    nom,
-    siret: siret || (siren ? siren : ''),
-    siren,
-    adresse,
-    codePostal,
-    ville,
-    dirigeant,
-    domainesFormation,
-    nda: '',
-    siteWeb: '',
-  };
+  return data.dirigeant || '';
 }
