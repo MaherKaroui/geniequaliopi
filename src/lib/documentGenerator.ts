@@ -3808,7 +3808,7 @@ function genBailSousLocation(o: OrganismeInfo) {
   const dateSignature = formatDate(bailDateStr);
   const dateDebut = dateSignature; // le bail commence à la signature
   const dateFin = (() => {
-    const d = new Date(bailDate);
+    const d = new Date(bailDateStr);
     d.setFullYear(d.getFullYear() + 2);
     return formatDate(d.toISOString());
   })();
