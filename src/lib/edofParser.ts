@@ -132,6 +132,7 @@ export function parseEdofXlsx(data: ArrayBuffer): EdofSession[] {
       const montant = getCol(row, "MONTANT_FORMATION", "MONTANT FORMATION", "MONTANT", "Tarif", "Prix", "COUT", "Coût");
       const tarifStr = montant ? `${parseFloat(String(montant)).toLocaleString("fr-FR")} € HT` : "";
       return {
+        civilite: "" as "" | "M." | "Mme",
         nom: String(getCol(row, "NOM", "Nom") || "").toUpperCase(),
         prenom: String(getCol(row, "PRENOM", "Prénom", "Prenom") || "").charAt(0).toUpperCase() + String(getCol(row, "PRENOM", "Prénom", "Prenom") || "").slice(1).toLowerCase(),
         email: String(getCol(row, "COURRIEL", "EMAIL", "Mail", "E-mail", "Courriel") || "").replace(/\\/g, ""),
