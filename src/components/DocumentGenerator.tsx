@@ -466,18 +466,16 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
                               const isPerStagiaire = PER_STAGIAIRE_TEMPLATES.has(doc.template);
                               return (
                                 <div key={doc.id} className={`flex items-center gap-2 p-1.5 rounded-md text-xs hover:bg-secondary/30 transition-colors ${generated.has(doc.id) ? "bg-accent/5" : ""}`}>
-                                  {generated.has(doc.id) ? (
-                                    <CheckCircle2 className="w-3 h-3 text-accent shrink-0" />
-                                  ) : (
-                                    <FileText className="w-3 h-3 text-muted-foreground shrink-0" />
-                                  )}
+                                  <span className={`shrink-0 ${generated.has(doc.id) ? "text-accent font-bold" : "text-muted-foreground"}`}>
+                                    {generated.has(doc.id) ? "✓" : "•"}
+                                  </span>
                                   <span className="flex-1 truncate">{doc.nom}</span>
-                                  {isPerStagiaire && <span title="1 fichier par stagiaire"><User className="w-3 h-3 text-primary shrink-0" /></span>}
-                                  <button onClick={() => handlePreview(doc)} className="p-1 hover:bg-secondary rounded" title="Aperçu">
-                                    <Eye className="w-3 h-3 text-muted-foreground" />
+                                  {isPerStagiaire && <span title="1 fichier par stagiaire" className="text-xs text-primary shrink-0">👤</span>}
+                                  <button onClick={() => handlePreview(doc)} className="p-1 hover:bg-secondary rounded text-muted-foreground hover:text-foreground" title="Aperçu">
+                                    Voir
                                   </button>
-                                  <button onClick={() => handleDownload(doc)} className="p-1 hover:bg-secondary rounded" title="Télécharger">
-                                    <Download className="w-3 h-3 text-muted-foreground" />
+                                  <button onClick={() => handleDownload(doc)} className="p-1 hover:bg-secondary rounded text-muted-foreground hover:text-foreground" title="Télécharger">
+                                    DL
                                   </button>
                                 </div>
                               );
