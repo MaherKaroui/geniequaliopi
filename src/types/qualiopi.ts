@@ -51,6 +51,7 @@ export interface StagiaireInfo {
   dateNaissance: string;
   dateDebutFormation?: string;
   dateFinFormation?: string;
+  tarifFormation?: string;
   signatureUrl?: string;
 }
 
