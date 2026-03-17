@@ -391,23 +391,18 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
       {/* Style Customizer */}
       <DocStyleConfigPanel style={docStyle} onChange={handleStyleChange} />
       <div className="p-4 bg-gradient-to-r from-primary/5 to-accent/5 rounded-xl border-2 border-primary/20 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-xl bg-gradient-hero flex items-center justify-center">
-            <BookOpen className="w-6 h-6 text-primary-foreground" />
-          </div>
-          <div>
-            <h3 className="font-bold text-primary">📕 BOOK QUALIOPI</h3>
-            <p className="text-xs text-muted-foreground">
-              Dossier complet : couverture, présentation, organigramme, sommaire, 32 indicateurs avec niveaux attendus et preuves
-            </p>
-          </div>
+        <div>
+          <h3 className="font-bold text-primary">BOOK QUALIOPI</h3>
+          <p className="text-xs text-muted-foreground">
+            Dossier complet : couverture, présentation, organigramme, sommaire, 32 indicateurs avec niveaux attendus et preuves
+          </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={handlePreviewBook} className="gap-1">
-            <Eye className="w-3 h-3" /> Aperçu
+          <Button variant="outline" size="sm" onClick={handlePreviewBook}>
+            Aperçu
           </Button>
-          <Button size="sm" onClick={handleDownloadBook} className="gap-1 bg-gradient-hero text-primary-foreground border-0">
-            <Download className="w-3 h-3" /> Télécharger
+          <Button size="sm" onClick={handleDownloadBook} className="bg-gradient-hero text-primary-foreground border-0">
+            Télécharger
           </Button>
         </div>
       </div>
