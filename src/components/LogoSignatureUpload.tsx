@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Image, PenTool, Stamp, X } from "lucide-react";
+import { X } from "lucide-react";
 
 interface LogoSignatureUploadProps {
   logoUrl?: string;
@@ -27,8 +27,8 @@ const LogoSignatureUpload = ({ logoUrl, signatureUrl, tamponUrl, onLogoChange, o
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-4 bg-secondary/50 rounded-xl border">
       {/* Logo */}
       <div>
-        <Label className="mb-2 block font-semibold flex items-center gap-2">
-          <Image className="w-4 h-4 text-primary" /> Logo de l'organisme
+        <Label className="mb-2 block font-semibold">
+          Logo de l'organisme
         </Label>
         <div className="flex items-center gap-3">
           {logoUrl ? (
@@ -50,16 +50,16 @@ const LogoSignatureUpload = ({ logoUrl, signatureUrl, tamponUrl, onLogoChange, o
             const file = e.target.files?.[0];
             if (file) handleFile(file, onLogoChange);
           }} />
-          <Button variant="outline" size="sm" onClick={() => logoRef.current?.click()} className="gap-1">
-            <Image className="w-3 h-3" /> {logoUrl ? "Changer" : "Charger"}
+          <Button variant="outline" size="sm" onClick={() => logoRef.current?.click()}>
+            {logoUrl ? "Changer" : "Charger"}
           </Button>
         </div>
       </div>
 
       {/* Signature */}
       <div>
-        <Label className="mb-2 block font-semibold flex items-center gap-2">
-          <PenTool className="w-4 h-4 text-primary" /> Signature du dirigeant
+        <Label className="mb-2 block font-semibold">
+          Signature du dirigeant
         </Label>
         <div className="flex items-center gap-3">
           {signatureUrl ? (
@@ -81,8 +81,8 @@ const LogoSignatureUpload = ({ logoUrl, signatureUrl, tamponUrl, onLogoChange, o
             const file = e.target.files?.[0];
             if (file) handleFile(file, onSignatureChange);
           }} />
-          <Button variant="outline" size="sm" onClick={() => sigRef.current?.click()} className="gap-1">
-            <PenTool className="w-3 h-3" /> {signatureUrl ? "Changer" : "Charger"}
+          <Button variant="outline" size="sm" onClick={() => sigRef.current?.click()}>
+            {signatureUrl ? "Changer" : "Charger"}
           </Button>
         </div>
       </div>
@@ -90,8 +90,8 @@ const LogoSignatureUpload = ({ logoUrl, signatureUrl, tamponUrl, onLogoChange, o
       {/* Tampon */}
       {onTamponChange && (
         <div>
-          <Label className="mb-2 block font-semibold flex items-center gap-2">
-            <Stamp className="w-4 h-4 text-primary" /> Tampon de l'organisme
+          <Label className="mb-2 block font-semibold">
+            Tampon de l'organisme
           </Label>
           <div className="flex items-center gap-3">
             {tamponUrl ? (
@@ -113,8 +113,8 @@ const LogoSignatureUpload = ({ logoUrl, signatureUrl, tamponUrl, onLogoChange, o
               const file = e.target.files?.[0];
               if (file) handleFile(file, onTamponChange);
             }} />
-            <Button variant="outline" size="sm" onClick={() => tamponRef.current?.click()} className="gap-1">
-              <Stamp className="w-3 h-3" /> {tamponUrl ? "Changer" : "Charger"}
+            <Button variant="outline" size="sm" onClick={() => tamponRef.current?.click()}>
+              {tamponUrl ? "Changer" : "Charger"}
             </Button>
           </div>
         </div>

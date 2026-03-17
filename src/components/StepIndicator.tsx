@@ -1,4 +1,4 @@
-import { Check } from "lucide-react";
+
 
 interface Step {
   id: number;
@@ -33,7 +33,7 @@ const StepIndicator = ({ steps, currentStep, onStepClick }: StepIndicatorProps) 
                   ? "bg-qualiopi-green text-primary-foreground"
                   : "bg-muted"
               }`}>
-              {currentStep > step.id ? <Check className="w-3.5 h-3.5" /> : step.id}
+              {currentStep > step.id ? "✓" : step.id}
             </span>
             <span className="hidden md:inline">{step.label}</span>
           </button>

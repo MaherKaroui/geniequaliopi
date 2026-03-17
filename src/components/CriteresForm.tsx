@@ -2,7 +2,7 @@ import { CritereData } from "@/types/qualiopi";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { ClipboardCheck, Info } from "lucide-react";
+
 
 interface CriteresFormProps {
   data: CritereData[];
@@ -28,14 +28,9 @@ const CriteresForm = ({ data, onChange }: CriteresFormProps) => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-3 mb-6">
-        <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-          <ClipboardCheck className="w-5 h-5 text-primary" />
-        </div>
-        <div>
-          <h2 className="text-xl font-bold">Critères & Indicateurs Qualiopi</h2>
-          <p className="text-sm text-muted-foreground">Répondez aux 32 indicateurs des 7 critères</p>
-        </div>
+      <div className="mb-6">
+        <h2 className="text-xl font-bold">Critères & Indicateurs Qualiopi</h2>
+        <p className="text-sm text-muted-foreground">Répondez aux 32 indicateurs des 7 critères</p>
       </div>
 
       <Accordion type="single" collapsible className="space-y-3">
@@ -70,19 +65,13 @@ const CriteresForm = ({ data, onChange }: CriteresFormProps) => {
                       <p className="text-sm font-medium">{indicateur.titre}</p>
                     </div>
                     <div className="ml-8 space-y-2">
-                      <div className="flex items-start gap-2 p-2 bg-qualiopi-blue-light rounded-md">
-                        <Info className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                        <div>
-                          <p className="text-xs font-semibold text-primary">Niveau attendu</p>
-                          <p className="text-xs text-foreground/80">{indicateur.niveauAttendu}</p>
-                        </div>
+                      <div className="p-2 bg-qualiopi-blue-light rounded-md">
+                        <p className="text-xs font-semibold text-primary">Niveau attendu</p>
+                        <p className="text-xs text-foreground/80">{indicateur.niveauAttendu}</p>
                       </div>
-                      <div className="flex items-start gap-2 p-2 bg-qualiopi-green-light rounded-md">
-                        <ClipboardCheck className="w-4 h-4 text-qualiopi-green shrink-0 mt-0.5" />
-                        <div>
-                          <p className="text-xs font-semibold text-qualiopi-green">Preuves attendues</p>
-                          <p className="text-xs text-foreground/80">{indicateur.preuves}</p>
-                        </div>
+                      <div className="p-2 bg-qualiopi-green-light rounded-md">
+                        <p className="text-xs font-semibold text-qualiopi-green">Preuves attendues</p>
+                        <p className="text-xs text-foreground/80">{indicateur.preuves}</p>
                       </div>
                       <div>
                         <Label className="text-xs">Votre réponse / preuves apportées</Label>

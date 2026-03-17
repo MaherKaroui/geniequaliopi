@@ -6,7 +6,7 @@ import { setDocStyle } from "@/lib/docBuilder";
 import { SAMPLE_FORMATIONS, SAMPLE_FORMATEURS, mergeStagiaires, mergeOrganisme } from "@/lib/sampleData";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FileText, Download, Eye, ChevronDown, ChevronRight, FolderOpen, Folder, Package, X, CheckCircle2, Loader2, BookOpen, Edit3, Save, User, FileDown } from "lucide-react";
+import { ChevronDown, ChevronRight, X, Loader2 } from "lucide-react";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import DocStyleConfigPanel from "./DocStyleConfigPanel";
@@ -323,20 +323,15 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
     <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-accent flex items-center justify-center">
-            <Package className="w-5 h-5 text-accent-foreground" />
-          </div>
-          <div>
-            <h2 className="text-xl font-bold">Dossier Qualiopi Complet</h2>
-            <p className="text-sm text-muted-foreground">
-              {catalog.length} documents • 7 critères • 32 indicateurs
-            </p>
-          </div>
+        <div>
+          <h2 className="text-xl font-bold">Dossier Qualiopi Complet</h2>
+          <p className="text-sm text-muted-foreground">
+            {catalog.length} documents • 7 critères • 32 indicateurs
+          </p>
         </div>
         <div className="flex items-center gap-2">
           <Button onClick={handleDownloadAll} disabled={generating} className="gap-2 bg-gradient-hero text-primary-foreground border-0">
-            {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+            {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
             {generating ? "Génération..." : "Télécharger tout (ZIP)"}
           </Button>
         </div>
@@ -344,7 +339,6 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
 
       {/* Format Selector */}
       <div className="p-3 bg-accent/10 rounded-xl border border-accent/30 flex items-center gap-3 flex-wrap">
-        <FileDown className="w-5 h-5 text-accent shrink-0" />
         <span className="text-sm font-semibold text-accent">Format d'export :</span>
         <div className="flex gap-2">
           <button
@@ -375,7 +369,6 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
 
       {/* Stagiaire Selector */}
       <div className="p-3 bg-primary/5 rounded-xl border border-primary/20 flex items-center gap-3 flex-wrap">
-        <User className="w-5 h-5 text-primary shrink-0" />
         <span className="text-sm font-semibold text-primary">Stagiaire sélectionné :</span>
         <Select value={selectedStagiaire === -1 ? "all" : String(selectedStagiaire)} onValueChange={handleStagiaireChange}>
           <SelectTrigger className="w-[280px]">
@@ -398,30 +391,24 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
       {/* Style Customizer */}
       <DocStyleConfigPanel style={docStyle} onChange={handleStyleChange} />
       <div className="p-4 bg-gradient-to-r from-primary/5 to-accent/5 rounded-xl border-2 border-primary/20 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-xl bg-gradient-hero flex items-center justify-center">
-            <BookOpen className="w-6 h-6 text-primary-foreground" />
-          </div>
-          <div>
-            <h3 className="font-bold text-primary">📕 BOOK QUALIOPI</h3>
-            <p className="text-xs text-muted-foreground">
-              Dossier complet : couverture, présentation, organigramme, sommaire, 32 indicateurs avec niveaux attendus et preuves
-            </p>
-          </div>
+        <div>
+          <h3 className="font-bold text-primary">BOOK QUALIOPI</h3>
+          <p className="text-xs text-muted-foreground">
+            Dossier complet : couverture, présentation, organigramme, sommaire, 32 indicateurs avec niveaux attendus et preuves
+          </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={handlePreviewBook} className="gap-1">
-            <Eye className="w-3 h-3" /> Aperçu
+          <Button variant="outline" size="sm" onClick={handlePreviewBook}>
+            Aperçu
           </Button>
-          <Button size="sm" onClick={handleDownloadBook} className="gap-1 bg-gradient-hero text-primary-foreground border-0">
-            <Download className="w-3 h-3" /> Télécharger
+          <Button size="sm" onClick={handleDownloadBook} className="bg-gradient-hero text-primary-foreground border-0">
+            Télécharger
           </Button>
         </div>
       </div>
 
       {/* Progress */}
       <div className="p-3 bg-secondary rounded-xl flex items-center gap-3">
-        <CheckCircle2 className="w-5 h-5 text-accent" />
         <div className="flex-1">
           <div className="flex justify-between text-sm">
             <span>{generated.size} / {catalog.length} documents générés</span>
@@ -447,13 +434,10 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
                 className="w-full p-3 flex items-center gap-3 hover:bg-secondary/50 transition-colors text-left"
               >
                 {isExpanded ? <ChevronDown className="w-4 h-4 text-primary shrink-0" /> : <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />}
-                {isExpanded ? <FolderOpen className="w-5 h-5 text-primary shrink-0" /> : <Folder className="w-5 h-5 text-muted-foreground shrink-0" />}
-                <div className="flex-1 min-w-0">
-                  <span className="text-sm font-semibold">Critère {critere.numero} – {critere.titre}</span>
-                  <span className="text-xs text-muted-foreground ml-2">
-                    ({critereDocs.length} docs, {critereGenerated} générés)
-                  </span>
-                </div>
+                <span className="text-sm font-semibold">Critère {critere.numero} – {critere.titre}</span>
+                <span className="text-xs text-muted-foreground ml-2">
+                  ({critereDocs.length} docs, {critereGenerated} générés)
+                </span>
               </button>
 
               {isExpanded && (
@@ -473,7 +457,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
                           <span className="text-xs font-semibold text-primary">I{ind.numero}</span>
                           <span className="text-xs truncate flex-1">{ind.titre}</span>
                           <span className="text-xs text-muted-foreground shrink-0">{indDocs.length} docs</span>
-                          {indGenerated === indDocs.length && indDocs.length > 0 && <CheckCircle2 className="w-3 h-3 text-accent shrink-0" />}
+                          {indGenerated === indDocs.length && indDocs.length > 0 && <span className="text-xs text-accent font-bold shrink-0">✓</span>}
                         </button>
 
                         {isIndExpanded && (
@@ -482,18 +466,16 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
                               const isPerStagiaire = PER_STAGIAIRE_TEMPLATES.has(doc.template);
                               return (
                                 <div key={doc.id} className={`flex items-center gap-2 p-1.5 rounded-md text-xs hover:bg-secondary/30 transition-colors ${generated.has(doc.id) ? "bg-accent/5" : ""}`}>
-                                  {generated.has(doc.id) ? (
-                                    <CheckCircle2 className="w-3 h-3 text-accent shrink-0" />
-                                  ) : (
-                                    <FileText className="w-3 h-3 text-muted-foreground shrink-0" />
-                                  )}
+                                  <span className={`shrink-0 ${generated.has(doc.id) ? "text-accent font-bold" : "text-muted-foreground"}`}>
+                                    {generated.has(doc.id) ? "✓" : "•"}
+                                  </span>
                                   <span className="flex-1 truncate">{doc.nom}</span>
-                                  {isPerStagiaire && <span title="1 fichier par stagiaire"><User className="w-3 h-3 text-primary shrink-0" /></span>}
-                                  <button onClick={() => handlePreview(doc)} className="p-1 hover:bg-secondary rounded" title="Aperçu">
-                                    <Eye className="w-3 h-3 text-muted-foreground" />
+                                  {isPerStagiaire && <span title="1 fichier par stagiaire" className="text-xs text-primary shrink-0">👤</span>}
+                                  <button onClick={() => handlePreview(doc)} className="p-1 hover:bg-secondary rounded text-muted-foreground hover:text-foreground" title="Aperçu">
+                                    Voir
                                   </button>
-                                  <button onClick={() => handleDownload(doc)} className="p-1 hover:bg-secondary rounded" title="Télécharger">
-                                    <Download className="w-3 h-3 text-muted-foreground" />
+                                  <button onClick={() => handleDownload(doc)} className="p-1 hover:bg-secondary rounded text-muted-foreground hover:text-foreground" title="Télécharger">
+                                    DL
                                   </button>
                                 </div>
                               );
@@ -520,9 +502,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
                 variant={editing ? "default" : "outline"}
                 size="sm"
                 onClick={handleToggleEdit}
-                className="gap-1"
               >
-                {editing ? <Save className="w-4 h-4" /> : <Edit3 className="w-4 h-4" />}
                 {editing ? "Enregistrer" : "Modifier"}
               </Button>
               <Button variant="ghost" size="sm" onClick={() => { setPreviewContent(null); setEditing(false); }}>
@@ -531,8 +511,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
             </div>
           </div>
           {editing && (
-            <div className="mb-2 p-2 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg text-xs text-amber-700 dark:text-amber-400 flex items-center gap-2">
-              <Edit3 className="w-4 h-4 shrink-0" />
+            <div className="mb-2 p-2 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg text-xs text-amber-700 dark:text-amber-400">
               Mode édition activé : cliquez directement dans le document pour le modifier. Les changements seront sauvegardés.
             </div>
           )}

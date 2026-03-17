@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { BookOpen, Upload, FileSpreadsheet, CheckCircle2, ChevronDown } from "lucide-react";
+import { Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SAMPLE_FORMATIONS } from "@/lib/sampleData";
 import { parseEdofXlsx, EdofSession } from "@/lib/edofParser";
@@ -74,25 +74,17 @@ const FormationForm = ({ data, onChange, onImportStagiaires }: FormationFormProp
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-3 mb-6">
-        <div className="w-10 h-10 rounded-xl bg-qualiopi-green/10 flex items-center justify-center">
-          <BookOpen className="w-5 h-5 text-qualiopi-green" />
-        </div>
-        <div>
-          <h2 className="text-xl font-bold">Informations de la formation</h2>
-          <p className="text-sm text-muted-foreground">Choisissez une formation exemple, importez un fichier EDOF ou remplissez manuellement</p>
-        </div>
+      <div className="mb-6">
+        <h2 className="text-xl font-bold">Informations de la formation</h2>
+        <p className="text-sm text-muted-foreground">Choisissez une formation exemple, importez un fichier EDOF ou remplissez manuellement</p>
       </div>
 
       {/* EDOF Import */}
       <div className="p-4 bg-accent/30 border-2 border-accent rounded-xl">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <FileSpreadsheet className="w-5 h-5 text-primary" />
-            <div>
-              <Label className="font-semibold text-primary">Importer un fichier EDOF</Label>
-              <p className="text-xs text-muted-foreground">Import automatique des stagiaires, dates, tarifs depuis votre export EDOF (.xlsx)</p>
-            </div>
+          <div>
+            <Label className="font-semibold text-primary">Importer un fichier EDOF</Label>
+            <p className="text-xs text-muted-foreground">Import automatique des stagiaires, dates, tarifs depuis votre export EDOF (.xlsx)</p>
           </div>
           <div>
             <input
@@ -131,7 +123,7 @@ const FormationForm = ({ data, onChange, onImportStagiaires }: FormationFormProp
                     ({session.stagiaires.length} stagiaires • {session.formation.dateDebut} → {session.formation.dateFin} • {session.formation.tarif})
                   </span>
                 </div>
-                <CheckCircle2 className="w-4 h-4 text-primary opacity-0 group-hover:opacity-100 transition-opacity" />
+                <span className="text-primary opacity-0 group-hover:opacity-100 transition-opacity text-xs font-semibold">✓</span>
               </button>
             ))}
           </div>

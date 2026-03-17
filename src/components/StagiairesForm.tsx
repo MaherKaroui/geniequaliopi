@@ -3,7 +3,7 @@ import { StagiaireInfo } from "@/types/qualiopi";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Users, Plus, Trash2, PenTool, X } from "lucide-react";
+import { X } from "lucide-react";
 
 interface StagiairesFormProps {
   data: StagiaireInfo[];
@@ -32,26 +32,20 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-qualiopi-orange/10 flex items-center justify-center">
-            <Users className="w-5 h-5 text-qualiopi-orange" />
-          </div>
-          <div>
-            <h2 className="text-xl font-bold">Stagiaires</h2>
-            <p className="text-sm text-muted-foreground">{data.length} stagiaire(s) ajouté(s)</p>
-          </div>
+        <div>
+          <h2 className="text-xl font-bold">Stagiaires</h2>
+          <p className="text-sm text-muted-foreground">{data.length} stagiaire(s) ajouté(s)</p>
         </div>
-        <Button onClick={addStagiaire} size="sm" className="gap-2">
-          <Plus className="w-4 h-4" /> Ajouter
+        <Button onClick={addStagiaire} size="sm">
+          + Ajouter
         </Button>
       </div>
 
       {data.length === 0 && (
         <div className="text-center py-12 bg-secondary/50 rounded-xl border border-dashed border-border">
-          <Users className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
           <p className="text-muted-foreground">Aucun stagiaire ajouté</p>
-          <Button onClick={addStagiaire} variant="outline" size="sm" className="mt-3 gap-2">
-            <Plus className="w-4 h-4" /> Ajouter un stagiaire
+          <Button onClick={addStagiaire} variant="outline" size="sm" className="mt-3">
+            + Ajouter un stagiaire
           </Button>
         </div>
       )}
@@ -60,8 +54,8 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
         <div key={index} className="p-4 bg-card rounded-xl border shadow-card space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-sm font-semibold text-primary">Stagiaire {index + 1}</span>
-            <Button variant="ghost" size="sm" onClick={() => removeStagiaire(index)} className="text-destructive hover:text-destructive">
-              <Trash2 className="w-4 h-4" />
+            <Button variant="ghost" size="sm" onClick={() => removeStagiaire(index)} className="text-destructive hover:text-destructive text-xs">
+              Supprimer
             </Button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -92,9 +86,7 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
           </div>
           {/* Signature stagiaire */}
           <div className="flex items-center gap-3 mt-2 pt-2 border-t border-border/50">
-            <Label className="text-xs font-semibold flex items-center gap-1">
-              <PenTool className="w-3 h-3 text-primary" /> Signature
-            </Label>
+            <Label className="text-xs font-semibold">Signature</Label>
             {stagiaire.signatureUrl ? (
               <div className="relative group">
                 <img src={stagiaire.signatureUrl} alt="Signature" className="h-10 w-auto max-w-[120px] object-contain rounded border bg-white p-0.5" />
@@ -113,8 +105,8 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
               type="file" accept="image/*" className="hidden"
               onChange={e => { const f = e.target.files?.[0]; if (f) handleSigFile(index, f); }}
             />
-            <Button variant="outline" size="sm" className="h-7 text-xs gap-1" onClick={() => sigRefs.current[index]?.click()}>
-              <PenTool className="w-3 h-3" /> {stagiaire.signatureUrl ? "Changer" : "Charger"}
+            <Button variant="outline" size="sm" className="h-7 text-xs" onClick={() => sigRefs.current[index]?.click()}>
+              {stagiaire.signatureUrl ? "Changer" : "Charger"}
             </Button>
           </div>
         </div>

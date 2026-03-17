@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
-import { Palette, Type, RotateCcw, ChevronDown, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronRight } from "lucide-react";
 
 interface DocStyleConfigPanelProps {
   style: DocStyleConfig;
@@ -55,7 +55,6 @@ const DocStyleConfigPanel = ({ style, onChange }: DocStyleConfigPanelProps) => {
         className="w-full p-3 flex items-center gap-3 hover:bg-secondary/50 transition-colors text-left"
       >
         {expanded ? <ChevronDown className="w-4 h-4 text-primary" /> : <ChevronRight className="w-4 h-4 text-muted-foreground" />}
-        <Palette className="w-5 h-5 text-primary" />
         <div className="flex-1">
           <span className="text-sm font-semibold">Personnaliser le design des documents</span>
           <span className="text-xs text-muted-foreground ml-2">Couleurs, polices, taille</span>
@@ -63,10 +62,10 @@ const DocStyleConfigPanel = ({ style, onChange }: DocStyleConfigPanelProps) => {
         <Button
           variant="ghost"
           size="sm"
-          className="text-xs gap-1"
+          className="text-xs"
           onClick={(e) => { e.stopPropagation(); onChange({ ...DEFAULT_DOC_STYLE }); }}
         >
-          <RotateCcw className="w-3 h-3" /> Réinitialiser
+          Réinitialiser
         </Button>
       </button>
 
@@ -133,9 +132,7 @@ const DocStyleConfigPanel = ({ style, onChange }: DocStyleConfigPanelProps) => {
           {/* Fonts */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label className="text-xs mb-1 flex items-center gap-1">
-                <Type className="w-3 h-3" /> Police du corps
-              </Label>
+              <Label className="text-xs mb-1 block">Police du corps</Label>
               <Select value={style.fontFamily} onValueChange={v => update("fontFamily", v)}>
                 <SelectTrigger className="h-8 text-xs">
                   <SelectValue />
@@ -150,9 +147,7 @@ const DocStyleConfigPanel = ({ style, onChange }: DocStyleConfigPanelProps) => {
               </Select>
             </div>
             <div>
-              <Label className="text-xs mb-1 flex items-center gap-1">
-                <Type className="w-3 h-3" /> Police des titres
-              </Label>
+              <Label className="text-xs mb-1 block">Police des titres</Label>
               <Select value={style.headingFont} onValueChange={v => update("headingFont", v)}>
                 <SelectTrigger className="h-8 text-xs">
                   <SelectValue />
