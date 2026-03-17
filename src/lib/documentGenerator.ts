@@ -19,6 +19,15 @@ export function getFullCatalog(org: OrganismeInfo, userFormation: FormationInfo,
 }
 
 export function generateDocumentById(docId: string, template: string, params: Record<string, any> | undefined, org: OrganismeInfo, userFormation: FormationInfo, userStagiaires: StagiaireInfo[]): string {
+  const result = _generateDocumentByIdInner(docId, template, params, org, userFormation, userStagiaires);
+  // Apply gender adaptation based on the relevant stagiaire
+  const stagiaires = mergeStagiaires(userStagiaires);
+  const si = params?.stagiaireIdx ?? 0;
+  const targetStagiaire = stagiaires[si] || stagiaires[0] || null;
+  return applyGender(result, targetStagiaire);
+}
+
+function _generateDocumentByIdInner(docId: string, template: string, params: Record<string, any> | undefined, org: OrganismeInfo, userFormation: FormationInfo, userStagiaires: StagiaireInfo[]): string {
   const o = mergeOrganisme(org);
   const selectedFormation = userFormation.intitule
     ? { ...SAMPLE_FORMATIONS[0], ...Object.fromEntries(Object.entries(userFormation).filter(([, v]) => v && String(v).trim())) }
