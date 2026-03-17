@@ -259,3 +259,63 @@ export function buildDocument(config: DocBuildConfig): string {
   body += footer(config.org);
   return htmlWrap(body);
 }
+
+/**
+ * Gender helper: returns the correct gendered form based on stagiaire civilité.
+ * Usage: g(s, "inscrit", "inscrite") or g(s, "soussigné", "soussignée")
+ * If civilité is empty/unknown, defaults to masculine.
+ */
+export function g(s: { civilite?: string } | undefined | null, masc: string, fem: string): string {
+  if (!s) return masc;
+  return s.civilite === "Mme" ? fem : masc;
+}
+
+/**
+ * Applies gendered text replacements on an HTML string for a given stagiaire.
+ * Replaces all common (e) parenthetical patterns with the correct gender form.
+ */
+export function applyGender(html: string, s: { civilite?: string } | undefined | null): string {
+  const isFem = s?.civilite === "Mme";
+  const replacements: [RegExp, string, string][] = [
+    [/soussigné\(e\)/gi, "soussigné", "soussignée"],
+    [/inscrit\(e\)/gi, "inscrit", "inscrite"],
+    [/muni\(e\)/gi, "muni", "munie"],
+    [/convoqué\(e\)/gi, "convoqué", "convoquée"],
+    [/admis\(e\)/gi, "admis", "admise"],
+    [/formé\(e\)/gi, "formé", "formée"],
+    [/accueilli\(e\)/gi, "accueilli", "accueillie"],
+    [/apprenti\(e\)/gi, "apprenti", "apprentie"],
+    [/engagé\(e\)/gi, "engagé", "engagée"],
+    [/employé\(e\)/gi, "employé", "employée"],
+    [/salarié\(e\)/gi, "salarié", "salariée"],
+    [/accompagné\(e\)/gi, "accompagné", "accompagnée"],
+    [/informé\(e\)/gi, "informé", "informée"],
+    [/examiné\(e\)/gi, "examiné", "examinée"],
+    [/lancé\(e\)/gi, "lancé", "lancée"],
+    [/présenté\(e\)/gi, "présenté", "présentée"],
+    [/orienté\(e\)/gi, "orienté", "orientée"],
+    [/évalué\(e\)/gi, "évalué", "évaluée"],
+    [/certifié\(e\)/gi, "certifié", "certifiée"],
+    [/diplômé\(e\)/gi, "diplômé", "diplômée"],
+    [/intéressé\(e\)/gi, "intéressé", "intéressée"],
+    [/concerné\(e\)/gi, "concerné", "concernée"],
+    [/invité\(e\)/gi, "invité", "invitée"],
+    [/autorisé\(e\)/gi, "autorisé", "autorisée"],
+    [/tenu\(e\)/gi, "tenu", "tenue"],
+    [/retenu\(e\)/gi, "retenu", "retenue"],
+    [/entendu\(e\)/gi, "entendu", "entendue"],
+    [/il\/elle/gi, "il", "elle"],
+    [/le\/la stagiaire/gi, "le stagiaire", "la stagiaire"],
+    [/l'apprenti\(e\)/gi, "l'apprenti", "l'apprentie"],
+    [/L'Apprenti\(e\)/gi, "L'Apprenti", "L'Apprentie"],
+  ];
+  // Generic catch-all for any remaining (e) on past participles: word ending in é(e), i(e), u(e)
+  let result = html;
+  for (const [regex, masc, fem] of replacements) {
+    result = result.replace(regex, isFem ? fem : masc);
+  }
+  // Catch remaining patterns like "xxxé(e)" not in our list
+  result = result.replace(/([éi])\(e\)/g, isFem ? "$1e" : "$1");
+  result = result.replace(/([u])\(e\)/g, isFem ? "$1e" : "$1");
+  return result;
+}
