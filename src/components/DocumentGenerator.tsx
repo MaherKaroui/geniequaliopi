@@ -434,7 +434,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
                 className="w-full p-3 flex items-center gap-3 hover:bg-secondary/50 transition-colors text-left"
               >
                 {isExpanded ? <ChevronDown className="w-4 h-4 text-primary shrink-0" /> : <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />}
-                {isExpanded ? <FolderOpen className="w-5 h-5 text-primary shrink-0" /> : <Folder className="w-5 h-5 text-muted-foreground shrink-0" />}
+                <span className="text-sm font-semibold">Critère {critere.numero} – {critere.titre}</span>
                 <div className="flex-1 min-w-0">
                   <span className="text-sm font-semibold">Critère {critere.numero} – {critere.titre}</span>
                   <span className="text-xs text-muted-foreground ml-2">
