@@ -124,7 +124,7 @@ const FormationForm = ({ data, onChange, onImportStagiaires }: FormationFormProp
                     ({session.stagiaires.length} stagiaires • {session.formation.dateDebut} → {session.formation.dateFin} • {session.formation.tarif})
                   </span>
                 </div>
-                <CheckCircle2 className="w-4 h-4 text-primary opacity-0 group-hover:opacity-100 transition-opacity" />
+                <span className="text-primary opacity-0 group-hover:opacity-100 transition-opacity text-xs font-semibold">✓</span>
               </button>
             ))}
           </div>

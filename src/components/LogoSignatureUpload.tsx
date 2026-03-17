@@ -113,8 +113,8 @@ const LogoSignatureUpload = ({ logoUrl, signatureUrl, tamponUrl, onLogoChange, o
               const file = e.target.files?.[0];
               if (file) handleFile(file, onTamponChange);
             }} />
-            <Button variant="outline" size="sm" onClick={() => tamponRef.current?.click()} className="gap-1">
-              <Stamp className="w-3 h-3" /> {tamponUrl ? "Changer" : "Charger"}
+            <Button variant="outline" size="sm" onClick={() => tamponRef.current?.click()}>
+              {tamponUrl ? "Changer" : "Charger"}
             </Button>
           </div>
         </div>

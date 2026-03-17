@@ -98,9 +98,6 @@ const Index = () => {
       <header className="border-b bg-card/80 backdrop-blur-sm sticky top-0 z-10">
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-hero flex items-center justify-center">
-              <Shield className="w-4 h-4 text-primary-foreground" />
-            </div>
             <span className="font-bold text-lg">Qualiopi Generator</span>
           </div>
           <Button variant="ghost" size="sm" onClick={() => updateStarted(false)}>Accueil</Button>

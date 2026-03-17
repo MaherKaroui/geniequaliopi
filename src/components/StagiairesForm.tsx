@@ -105,8 +105,8 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
               type="file" accept="image/*" className="hidden"
               onChange={e => { const f = e.target.files?.[0]; if (f) handleSigFile(index, f); }}
             />
-            <Button variant="outline" size="sm" className="h-7 text-xs gap-1" onClick={() => sigRefs.current[index]?.click()}>
-              <PenTool className="w-3 h-3" /> {stagiaire.signatureUrl ? "Changer" : "Charger"}
+            <Button variant="outline" size="sm" className="h-7 text-xs" onClick={() => sigRefs.current[index]?.click()}>
+              {stagiaire.signatureUrl ? "Changer" : "Charger"}
             </Button>
           </div>
         </div>

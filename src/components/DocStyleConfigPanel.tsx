@@ -147,9 +147,7 @@ const DocStyleConfigPanel = ({ style, onChange }: DocStyleConfigPanelProps) => {
               </Select>
             </div>
             <div>
-              <Label className="text-xs mb-1 flex items-center gap-1">
-                <Type className="w-3 h-3" /> Police des titres
-              </Label>
+              <Label className="text-xs mb-1 block">Police des titres</Label>
               <Select value={style.headingFont} onValueChange={v => update("headingFont", v)}>
                 <SelectTrigger className="h-8 text-xs">
                   <SelectValue />
