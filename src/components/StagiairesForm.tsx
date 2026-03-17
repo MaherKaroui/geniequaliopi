@@ -86,9 +86,7 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
           </div>
           {/* Signature stagiaire */}
           <div className="flex items-center gap-3 mt-2 pt-2 border-t border-border/50">
-            <Label className="text-xs font-semibold flex items-center gap-1">
-              <PenTool className="w-3 h-3 text-primary" /> Signature
-            </Label>
+            <Label className="text-xs font-semibold">Signature</Label>
             {stagiaire.signatureUrl ? (
               <div className="relative group">
                 <img src={stagiaire.signatureUrl} alt="Signature" className="h-10 w-auto max-w-[120px] object-contain rounded border bg-white p-0.5" />
