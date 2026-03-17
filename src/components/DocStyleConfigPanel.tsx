@@ -55,7 +55,6 @@ const DocStyleConfigPanel = ({ style, onChange }: DocStyleConfigPanelProps) => {
         className="w-full p-3 flex items-center gap-3 hover:bg-secondary/50 transition-colors text-left"
       >
         {expanded ? <ChevronDown className="w-4 h-4 text-primary" /> : <ChevronRight className="w-4 h-4 text-muted-foreground" />}
-        <Palette className="w-5 h-5 text-primary" />
         <div className="flex-1">
           <span className="text-sm font-semibold">Personnaliser le design des documents</span>
           <span className="text-xs text-muted-foreground ml-2">Couleurs, polices, taille</span>
@@ -63,10 +62,10 @@ const DocStyleConfigPanel = ({ style, onChange }: DocStyleConfigPanelProps) => {
         <Button
           variant="ghost"
           size="sm"
-          className="text-xs gap-1"
+          className="text-xs"
           onClick={(e) => { e.stopPropagation(); onChange({ ...DEFAULT_DOC_STYLE }); }}
         >
-          <RotateCcw className="w-3 h-3" /> Réinitialiser
+          Réinitialiser
         </Button>
       </button>
 
