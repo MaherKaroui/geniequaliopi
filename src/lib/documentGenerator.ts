@@ -2892,185 +2892,474 @@ function generateEvalBesoinsAnswers(s: StagiaireInfo, f: FormationInfo, o: Organ
   const isInfo = t.includes("informatique") || t.includes("systèmes") || t.includes("réseaux");
   const isBureautique = t.includes("bureautique") || t.includes("pack office");
 
-  // Formation-specific diplomas
+  // === DIPLÔMES (10+ options par type) ===
   let diplomes: string[];
   if (isFLE) {
-    diplomes = ["Diplôme étranger équivalent Bac", "Attestation de niveau A2 en français", "Certificat de formation professionnelle", "CAP/BEP dans le secteur sanitaire et social", "Diplôme d'aide-soignant(e)", "DEAVS (Diplôme d'État d'Auxiliaire de Vie Sociale)", "Titre professionnel Assistant de vie"];
+    diplomes = [
+      "Diplôme étranger équivalent Bac",
+      "Attestation de niveau A2 en français",
+      "Certificat de formation professionnelle – secteur aide à la personne",
+      "CAP Agent de Prévention et de Médiation",
+      "Diplôme d'aide-soignant(e) obtenu à l'étranger",
+      "DEAVS (Diplôme d'État d'Auxiliaire de Vie Sociale)",
+      "Titre professionnel Assistant de vie aux familles",
+      "BEP Carrières sanitaires et sociales",
+      "Brevet des collèges (obtenu en France)",
+      "DELF A2 – Diplôme d'études en langue française",
+    ];
   } else if (isIA) {
-    diplomes = ["Baccalauréat", "BTS Communication", "Licence Marketing", "DUT Information-Communication", "Master Communication digitale", "Licence professionnelle Métiers du numérique", "BTS NDRC"];
+    diplomes = [
+      "Baccalauréat général",
+      "BTS Communication",
+      "Licence Marketing et Communication",
+      "DUT Information-Communication",
+      "Master Communication digitale",
+      "Licence professionnelle Métiers du numérique",
+      "BTS NDRC (Négociation et Digitalisation de la Relation Client)",
+      "Licence Arts, Lettres, Langues",
+      "Master Journalisme et Médias numériques",
+      "Bachelor Chef de projet digital",
+    ];
   } else if (isEsthetique) {
-    diplomes = ["Brevet des collèges", "Baccalauréat", "CAP coiffure", "Attestation de formation en soins"];
+    diplomes = [
+      "Brevet des collèges",
+      "Baccalauréat professionnel Commerce",
+      "CAP Coiffure",
+      "Attestation de formation en soins du visage",
+      "Baccalauréat général",
+      "BEP Vente action marchande",
+      "Titre professionnel Vendeur-conseil en magasin",
+      "CAP Employé de vente spécialisé",
+      "Bac professionnel Esthétique Cosmétique Parfumerie (en cours)",
+      "Certificat de qualification professionnelle Spa praticien",
+    ];
   } else if (isManagement) {
-    diplomes = ["Licence Management", "BTS Gestion", "Master RH", "Diplôme d'ingénieur", "MBA", "Licence AES"];
+    diplomes = [
+      "Licence Management des organisations",
+      "BTS Gestion de la PME",
+      "Master Ressources Humaines",
+      "Diplôme d'ingénieur généraliste",
+      "MBA Management stratégique",
+      "Licence AES (Administration Économique et Sociale)",
+      "Master Management et Stratégie d'Entreprise",
+      "DUT Gestion des Entreprises et des Administrations",
+      "Licence professionnelle Management des équipes commerciales",
+      "Master 2 Droit social et RH",
+    ];
+  } else if (isExcel) {
+    diplomes = [
+      "Baccalauréat ES",
+      "BTS Comptabilité et Gestion",
+      "DUT GEA",
+      "Licence Économie-Gestion",
+      "BTS Assistant de manager",
+      "Master Finance d'entreprise",
+      "CAP Employé de commerce",
+      "Bac professionnel Gestion-Administration",
+      "Licence professionnelle Métiers de la comptabilité",
+      "BTS Support à l'Action Managériale",
+    ];
+  } else if (isAnglais) {
+    diplomes = [
+      "Baccalauréat général",
+      "BTS Commerce International",
+      "Licence LEA (Langues Étrangères Appliquées)",
+      "DUT Techniques de Commercialisation",
+      "Master Commerce international",
+      "Licence professionnelle Import-Export",
+      "BTS Assistant de manager",
+      "Master Marketing international",
+      "Diplôme d'école de commerce",
+      "Licence Gestion des organisations",
+    ];
+  } else if (isDigital) {
+    diplomes = [
+      "Baccalauréat",
+      "BTS Communication",
+      "Licence Marketing",
+      "DUT Métiers du multimédia et de l'internet",
+      "Master Marketing digital",
+      "Licence professionnelle E-commerce",
+      "BTS Management Commercial Opérationnel",
+      "Bachelor Webmarketing",
+      "Master Entrepreneuriat et Innovation",
+      "Licence Information-Communication",
+    ];
+  } else if (isInfo) {
+    diplomes = [
+      "Baccalauréat scientifique",
+      "BTS SIO (Services Informatiques aux Organisations)",
+      "DUT Informatique",
+      "Licence Informatique",
+      "BTS Systèmes Numériques",
+      "Titre professionnel Technicien d'assistance en informatique",
+      "Licence professionnelle Administration de systèmes",
+      "Master MIAGE",
+      "Bac professionnel Systèmes Numériques",
+      "Certificat de qualification CISCO CCNA",
+    ];
   } else {
-    diplomes = ["Baccalauréat", "BTS", "Licence professionnelle", "CAP", "DUT", "Master", "Bac professionnel"];
+    diplomes = [
+      "Baccalauréat",
+      "BTS tertiaire",
+      "Licence professionnelle",
+      "CAP/BEP",
+      "DUT",
+      "Master",
+      "Bac professionnel",
+      "Titre professionnel de niveau 4",
+      "Certificat de compétences professionnelles",
+      "Diplôme universitaire (DU)",
+    ];
   }
   const diplome = diplomes[h(2) % diplomes.length];
   
-  const financements = hasEntreprise
-    ? ["OPCO – prise en charge employeur", "Plan de développement des compétences de l'entreprise", "CPF co-financé par l'employeur"]
-    : ["CPF (Compte Personnel de Formation)", "Pôle emploi (AIF)", "Financement personnel", "CPF (Compte Personnel de Formation)"];
-  const budget = financements[h(3) % financements.length];
+  // === FINANCEMENTS (10 options variées) ===
+  const financementsEntreprise = [
+    "OPCO – prise en charge employeur à 100%",
+    "Plan de développement des compétences de l'entreprise",
+    "CPF co-financé par l'employeur (50/50)",
+    "OPCO – prise en charge partielle + complément entreprise",
+    "Plan de formation annuel – budget RH",
+    "CPF mobilisé par le salarié avec accord de l'employeur",
+    "OPCO – fonds mutualisés TPE/PME",
+    "Plan de développement des compétences – dispositif Pro-A",
+    "FNE-Formation (aide exceptionnelle de l'État)",
+    "CPF de transition professionnelle (ex-CIF)",
+  ];
+  const financementsIndividuel = [
+    "CPF (Compte Personnel de Formation) – solde suffisant",
+    "Pôle emploi – AIF (Aide Individuelle à la Formation)",
+    "Financement personnel – paiement en 3 fois",
+    "CPF complété par un financement personnel",
+    "Conseil Régional – aide à la formation des demandeurs d'emploi",
+    "Pôle emploi – POEI (Préparation Opérationnelle à l'Emploi)",
+    "Financement personnel intégral",
+    "CPF – utilisation de la totalité du solde disponible",
+    "AGEFIPH – aide à la formation des travailleurs handicapés",
+    "Financement mixte : CPF + Pôle emploi (abondement)",
+  ];
+  const budget = hasEntreprise
+    ? financementsEntreprise[h(3) % financementsEntreprise.length]
+    : financementsIndividuel[h(3) % financementsIndividuel.length];
   
-  // Formation-specific attentes (expectations)
+  // === ATTENTES (10 options par type, personnalisées) ===
   let attentesOptions: string[];
   if (isFLE) {
     attentesOptions = [
-      "Améliorer mon niveau de français pour mieux communiquer avec les usagers, les familles et l'équipe soignante dans mon travail quotidien au sein du secteur médico-social.",
-      "Acquérir les compétences linguistiques nécessaires pour rédiger correctement les transmissions écrites, les comptes rendus et les cahiers de liaison dans mon établissement.",
-      "Développer ma capacité à comprendre et à utiliser le vocabulaire spécifique du secteur médico-social (soins, accompagnement, protocoles) afin d'exercer mon métier en toute sécurité.",
-      "Renforcer ma maîtrise du français professionnel pour participer activement aux réunions d'équipe, aux transmissions orales et à la communication avec les familles des résidents.",
-      "Me sentir plus à l'aise dans la compréhension des documents institutionnels (projets personnalisés, chartes, protocoles d'hygiène) et dans les échanges professionnels au quotidien.",
+      `Améliorer le niveau de français de ${s.prenom} pour qu'il/elle puisse communiquer efficacement avec les usagers, les familles et l'équipe pluridisciplinaire dans le cadre de son poste au sein de ${s.entreprise}.`,
+      `Permettre à ${s.prenom} de rédiger correctement les transmissions écrites et les comptes rendus dans le cahier de liaison, compétence indispensable pour son poste de ${s.poste} au sein de notre structure.`,
+      `Développer les compétences linguistiques de ${s.prenom} en français professionnel médico-social pour sécuriser la qualité de l'accompagnement des usagers et réduire les risques liés aux erreurs de communication.`,
+      `Renforcer la maîtrise du français de ${s.prenom} pour lui permettre de participer activement aux réunions d'équipe, aux transmissions orales et de contribuer pleinement à la vie de l'établissement.`,
+      `Accompagner ${s.prenom} vers le niveau B1 en français pour qu'il/elle puisse comprendre les documents institutionnels (protocoles, chartes, projets personnalisés) nécessaires à l'exercice de ses fonctions.`,
+      `Former ${s.prenom} aux écrits professionnels du secteur médico-social afin d'améliorer la traçabilité des soins et la qualité des transmissions au sein de notre équipe.`,
+      `Permettre à ${s.prenom} d'acquérir le vocabulaire spécifique du secteur sanitaire et social pour une meilleure communication avec les équipes médicales et paramédicales.`,
+      `Aider ${s.prenom} à surmonter la barrière linguistique qui limite actuellement ses possibilités d'évolution professionnelle au sein de ${s.entreprise}.`,
+      `Développer chez ${s.prenom} la capacité à communiquer de manière professionnelle et adaptée avec les familles des résidents, en respectant le secret professionnel et les règles de bienveillance.`,
+      `Offrir à ${s.prenom} les outils linguistiques pour exercer son métier de ${s.poste} en toute confiance et sécurité, tant dans les gestes professionnels que dans la communication orale et écrite.`,
     ];
   } else if (isIA) {
     attentesOptions = [
-      "Apprendre à utiliser les outils d'IA générative (ChatGPT, Midjourney, DALL-E) pour créer des contenus rédactionnels et visuels professionnels de qualité pour mon activité.",
-      "Maîtriser le prompt engineering pour produire des textes marketing, des posts réseaux sociaux et des newsletters efficaces grâce à l'intelligence artificielle.",
-      "Comprendre le cadre juridique et éthique de l'utilisation de l'IA (droit d'auteur, RGPD, AI Act) pour une utilisation responsable dans ma production de contenus.",
-      "Développer mes compétences en création visuelle assistée par IA (Midjourney, Canva IA) pour produire des visuels cohérents avec ma charte graphique professionnelle.",
-      "Acquérir un workflow complet intégrant rédaction et création visuelle par IA pour concevoir des campagnes de communication professionnelles de A à Z.",
+      `Permettre à ${s.prenom} de maîtriser les outils d'IA générative (ChatGPT, Midjourney, DALL-E) pour créer des contenus rédactionnels et visuels professionnels de qualité pour les besoins de communication de ${s.entreprise}.`,
+      `Former ${s.prenom} au prompt engineering avancé pour optimiser la production de contenus marketing (articles, posts, newsletters) et réduire notre dépendance aux prestataires externes.`,
+      `Accompagner ${s.prenom} dans la compréhension du cadre juridique et éthique de l'IA (RGPD, droit d'auteur, AI Act) pour une utilisation responsable et conforme dans notre activité.`,
+      `Développer les compétences de ${s.prenom} en création visuelle assistée par IA pour produire des visuels cohérents avec notre charte graphique, sans recourir systématiquement à un graphiste.`,
+      `Donner à ${s.prenom} un workflow complet texte + visuel par IA pour qu'il/elle puisse concevoir des campagnes de communication complètes de manière autonome.`,
+      `Permettre à ${s.prenom} d'intégrer les outils d'IA dans ses missions de ${s.poste} chez ${s.entreprise}, afin d'accélérer la production de contenus tout en maintenant un haut niveau de qualité.`,
+      `Outiller ${s.prenom} pour qu'il/elle puisse former à son tour ses collègues à l'utilisation de l'IA générative, dans le cadre de notre plan de transformation digitale.`,
+      `Former ${s.prenom} à l'utilisation de Canva IA, Midjourney et ChatGPT pour renouveler nos supports de communication et moderniser notre image de marque.`,
+      `Donner à ${s.prenom} les moyens de fact-checker et de vérifier systématiquement les contenus générés par IA, afin de garantir la fiabilité de nos publications.`,
+      `Permettre à ${s.prenom} de créer un workflow de production de contenus intégrant l'IA, mesurable et documenté, pour en faire un processus reproductible au sein de notre équipe.`,
     ];
   } else if (isExcel) {
     attentesOptions = [
-      "Maîtriser les fonctions avancées d'Excel (RECHERCHEV, INDEX/EQUIV, SI imbriqués) pour automatiser le traitement de mes données professionnelles.",
-      "Apprendre à créer des tableaux croisés dynamiques et des tableaux de bord pour améliorer le reporting dans mon service.",
-      "Développer mes compétences en macros VBA pour automatiser les tâches répétitives et gagner en productivité au quotidien.",
+      `Former ${s.prenom} aux fonctions avancées d'Excel (RECHERCHEV, INDEX/EQUIV, SI imbriqués) pour automatiser le traitement des données et améliorer la fiabilité des reportings de ${s.entreprise}.`,
+      `Permettre à ${s.prenom} de créer des tableaux croisés dynamiques et des tableaux de bord pour fournir des analyses synthétiques à la direction de ${s.entreprise}.`,
+      `Développer les compétences de ${s.prenom} en macros VBA pour automatiser les tâches répétitives du service ${s.poste ? 'de ' + s.poste : ''} et gagner en productivité.`,
+      `Accompagner ${s.prenom} vers l'autonomie complète sur Excel avancé pour qu'il/elle puisse prendre en charge l'ensemble du reporting mensuel de son service.`,
+      `Former ${s.prenom} à la gestion de bases de données sur Excel et aux outils d'analyse (TCD, filtres avancés, Power Query) pour améliorer le pilotage d'activité.`,
+      `Donner à ${s.prenom} les compétences nécessaires pour créer des modèles de calcul financier et des simulations budgétaires fiables et automatisés.`,
+      `Permettre à ${s.prenom} de maîtriser la mise en forme conditionnelle et les graphiques avancés pour produire des documents visuels et professionnels.`,
+      `Former ${s.prenom} aux fonctions matricielles et aux formules complexes pour résoudre des problématiques d'analyse de données avancées dans son poste de ${s.poste}.`,
+      `Accompagner ${s.prenom} dans la création de tableaux de bord interactifs avec segments et chronologies pour le suivi en temps réel de l'activité commerciale.`,
+      `Développer chez ${s.prenom} la capacité à auditer et corriger les fichiers Excel existants de ${s.entreprise}, souvent sources d'erreurs dans les processus actuels.`,
     ];
   } else if (isAnglais) {
     attentesOptions = [
-      "Améliorer mon niveau d'anglais professionnel pour communiquer efficacement lors de réunions internationales et de négociations avec des partenaires étrangers.",
-      "Préparer le TOEIC avec un score visé supérieur à 785 pour valider officiellement mon niveau d'anglais et renforcer mon employabilité.",
-      "Développer mes compétences en rédaction professionnelle en anglais (emails, rapports, présentations) pour être autonome dans mes échanges internationaux.",
+      `Améliorer le niveau d'anglais professionnel de ${s.prenom} pour qu'il/elle puisse communiquer efficacement lors de réunions internationales avec nos partenaires anglophones.`,
+      `Préparer ${s.prenom} au TOEIC avec un score visé supérieur à 785 pour valider son niveau et répondre aux exigences de nos clients internationaux.`,
+      `Développer les compétences de ${s.prenom} en rédaction professionnelle en anglais (emails, rapports, présentations) pour assurer l'autonomie dans les échanges avec nos filiales étrangères.`,
+      `Renforcer la confiance de ${s.prenom} à l'oral en anglais pour mener des négociations commerciales et des présentations devant des interlocuteurs internationaux.`,
+      `Former ${s.prenom} à la communication interculturelle en anglais pour faciliter les collaborations avec nos équipes multiculturelles.`,
+      `Permettre à ${s.prenom} de rédiger des comptes rendus de réunion et des rapports d'activité en anglais, compétence de plus en plus demandée dans son poste de ${s.poste}.`,
+      `Accompagner ${s.prenom} dans la maîtrise de l'anglais des affaires pour qu'il/elle puisse représenter ${s.entreprise} lors de salons et conférences internationaux.`,
+      `Développer chez ${s.prenom} les compétences en anglais téléphonique et en visioconférence, essentielles pour ses échanges quotidiens avec nos partenaires étrangers.`,
+      `Former ${s.prenom} aux techniques de présentation en anglais (structure, transition, gestion du Q&A) pour valoriser les projets de ${s.entreprise} à l'international.`,
+      `Renforcer le vocabulaire technique en anglais de ${s.prenom} dans son domaine d'expertise pour qu'il/elle puisse consulter la documentation internationale de référence.`,
     ];
   } else if (isManagement) {
     attentesOptions = [
-      "Développer mon style de leadership pour motiver et fédérer mon équipe autour d'objectifs communs et améliorer la performance collective.",
-      "Acquérir les techniques de gestion des conflits et de communication managériale pour mieux accompagner mes collaborateurs au quotidien.",
-      "Maîtriser les outils de la conduite du changement pour accompagner les transformations en cours dans mon organisation.",
+      `Développer le style de leadership de ${s.prenom} pour motiver et fédérer son équipe autour d'objectifs communs et améliorer la performance collective chez ${s.entreprise}.`,
+      `Former ${s.prenom} aux techniques de gestion des conflits et de communication managériale pour accompagner efficacement ses collaborateurs au quotidien.`,
+      `Outiller ${s.prenom} pour conduire le changement dans son service, dans le contexte de transformation que connaît actuellement ${s.entreprise}.`,
+      `Renforcer les compétences de ${s.prenom} en délégation et en gestion des priorités pour optimiser l'organisation de son équipe de ${s.poste}.`,
+      `Permettre à ${s.prenom} de maîtriser les entretiens professionnels (annuels, recadrage, félicitations) et de développer une posture managériale bienveillante et exigeante.`,
+      `Accompagner ${s.prenom} dans le passage d'expert métier à manager opérationnel, en développant les soft skills indispensables à l'encadrement d'équipe.`,
+      `Former ${s.prenom} au management à distance et hybride, devenu incontournable dans l'organisation du travail chez ${s.entreprise}.`,
+      `Donner à ${s.prenom} les clés pour créer une dynamique d'équipe positive, gérer les personnalités difficiles et maintenir la motivation dans un contexte de changement.`,
+      `Développer chez ${s.prenom} la capacité à animer des réunions efficaces, à prendre des décisions en équipe et à communiquer une vision claire à ses collaborateurs.`,
+      `Permettre à ${s.prenom} de construire son propre plan de développement managérial et de mettre en place des rituels de management adaptés à son équipe.`,
     ];
   } else if (isDigital) {
     attentesOptions = [
-      "Maîtriser les fondamentaux du SEO/SEA et Google Analytics pour optimiser la visibilité en ligne de mon entreprise et mesurer les performances.",
-      "Développer une stratégie de réseaux sociaux et de content marketing efficace pour accroître la notoriété de ma marque.",
-      "Acquérir les compétences en email marketing et publicité en ligne pour générer des leads qualifiés et augmenter le chiffre d'affaires.",
+      `Former ${s.prenom} aux fondamentaux du SEO/SEA et Google Analytics pour optimiser la visibilité en ligne de ${s.entreprise} et mesurer les performances de nos actions digitales.`,
+      `Permettre à ${s.prenom} de développer une stratégie de réseaux sociaux et de content marketing efficace pour accroître la notoriété de ${s.entreprise}.`,
+      `Donner à ${s.prenom} les compétences en email marketing et publicité en ligne pour générer des leads qualifiés et augmenter notre chiffre d'affaires en ligne.`,
+      `Former ${s.prenom} à la création de campagnes Google Ads et Facebook Ads pour que ${s.entreprise} puisse gérer ses campagnes en interne.`,
+      `Développer les compétences de ${s.prenom} en analyse de données web pour piloter nos actions marketing par la donnée et optimiser notre ROI digital.`,
+      `Outiller ${s.prenom} pour mettre en place une stratégie de contenus cohérente sur l'ensemble de nos canaux digitaux (site, blog, réseaux sociaux, newsletter).`,
+      `Accompagner ${s.prenom} dans la maîtrise des outils de community management et de planification éditoriale pour professionnaliser notre présence en ligne.`,
+      `Former ${s.prenom} au marketing automation et au CRM pour structurer le parcours client digital de ${s.entreprise}.`,
+      `Permettre à ${s.prenom} de maîtriser les indicateurs clés de performance (KPI) du marketing digital pour produire des reportings pertinents à la direction.`,
+      `Donner à ${s.prenom} une vision 360° du marketing digital pour qu'il/elle puisse coordonner les prestataires (agence web, graphiste, rédacteurs) et piloter notre stratégie en interne.`,
     ];
   } else {
     attentesOptions = [
-      `Acquérir les compétences nécessaires en ${formation} pour être autonome dans mes tâches quotidiennes et améliorer ma productivité au travail.`,
-      `Monter en compétences sur ${formation} afin de pouvoir prendre en charge de nouvelles responsabilités au sein de mon service.`,
-      `Me perfectionner en ${formation} pour répondre aux exigences actuelles de mon poste et anticiper les évolutions de mon métier.`,
+      `Former ${s.prenom} aux compétences nécessaires en ${formation} pour qu'il/elle soit autonome dans ses tâches quotidiennes de ${s.poste} et améliorer sa productivité au sein de ${s.entreprise}.`,
+      `Permettre à ${s.prenom} de monter en compétences sur ${formation} afin de prendre en charge de nouvelles responsabilités au sein de son service.`,
+      `Accompagner ${s.prenom} dans sa progression en ${formation} pour répondre aux exigences actuelles de son poste de ${s.poste} et anticiper les évolutions du métier.`,
+      `Développer chez ${s.prenom} les compétences clés de ${formation} pour améliorer la qualité des livrables produits par notre service.`,
+      `Former ${s.prenom} pour qu'il/elle puisse assurer la continuité du service en cas d'absence de ses collègues sur les missions liées à ${formation}.`,
+      `Donner à ${s.prenom} les bases solides de ${formation} dans le cadre de son intégration récente à l'équipe de ${s.entreprise}.`,
+      `Permettre à ${s.prenom} de se perfectionner en ${formation} pour être force de proposition auprès de sa hiérarchie et contribuer activement à l'amélioration des processus.`,
+      `Former ${s.prenom} aux outils et méthodes de ${formation} les plus récents pour maintenir la compétitivité de ${s.entreprise} dans son secteur.`,
+      `Accompagner la montée en compétences de ${s.prenom} en ${formation} dans le cadre du plan de développement des compétences annuel de notre structure.`,
+      `Donner à ${s.prenom} les moyens de transmettre les bonnes pratiques de ${formation} à ses collègues après la formation, en favorisant le partage de connaissances.`,
     ];
   }
 
-  // Formation-specific missions entreprise
+  // === MISSIONS (10 options par type) ===
   let missionsEntreprise: string[];
   if (isFLE) {
     missionsEntreprise = [
-      "Accompagnement quotidien des résidents/usagers : aide à la toilette, aux repas, à la mobilité. Transmission orale et écrite des observations auprès de l'équipe pluridisciplinaire.",
-      "Accueil des usagers et de leurs familles, rédaction des transmissions dans le cahier de liaison, participation aux réunions d'équipe et application des protocoles de soins.",
-      "Aide à domicile auprès de personnes âgées ou en situation de handicap : soins d'hygiène, préparation des repas, accompagnement social et administratif.",
-      "Intervention en structure d'hébergement (EHPAD, foyer de vie) : accompagnement des résidents, suivi des projets personnalisés, communication avec les familles.",
+      `${s.prenom} assure l'accompagnement quotidien des résidents : aide à la toilette, aux repas et à la mobilité. Il/elle participe aux transmissions orales et écrites auprès de l'équipe pluridisciplinaire de ${s.entreprise}.`,
+      `En tant que ${s.poste}, ${s.prenom} est chargé(e) de l'accueil des usagers et de leurs familles, de la rédaction des transmissions dans le cahier de liaison et de l'application des protocoles de soins.`,
+      `${s.prenom} intervient à domicile auprès de personnes âgées ou en situation de handicap : soins d'hygiène, préparation des repas, accompagnement aux rendez-vous médicaux et soutien administratif.`,
+      `Au sein de ${s.entreprise}, ${s.prenom} accompagne les résidents dans les actes de la vie quotidienne, participe aux projets personnalisés et communique avec les familles et les partenaires extérieurs.`,
+      `${s.prenom} est en charge de l'animation d'activités collectives pour les résidents, de la surveillance de leur état de santé et de la transmission des informations à l'équipe soignante.`,
+      `En tant que ${s.poste} chez ${s.entreprise}, ${s.prenom} assure la coordination entre les intervenants (médecins, infirmiers, aides-soignants) et les familles des personnes accompagnées.`,
+      `${s.prenom} participe aux réunions d'équipe hebdomadaires, à l'élaboration des projets personnalisés et à la mise à jour des dossiers des résidents au sein de ${s.entreprise}.`,
+      `Les missions de ${s.prenom} incluent l'aide aux repas, l'accompagnement aux activités, la surveillance nocturne et la rédaction des rapports d'observation dans le cahier de liaison.`,
+      `${s.prenom} est amené(e) à accueillir les nouveaux résidents, à leur présenter la structure et à les accompagner dans leur phase d'intégration au sein de l'établissement.`,
+      `En plus des soins quotidiens, ${s.prenom} participe à la prévention des risques (chutes, dénutrition) et alerte l'équipe médicale en cas de changement d'état de santé des résidents.`,
     ];
   } else if (isIA) {
     missionsEntreprise = [
-      "Création de contenus marketing (articles de blog, newsletters, posts réseaux sociaux) et de visuels pour les campagnes de communication de l'entreprise.",
-      "Gestion de la communication digitale : production de contenus rédactionnels, création de visuels pour le site web et les réseaux sociaux, veille concurrentielle.",
-      "Développement de supports de communication (brochures, présentations, flyers) et production de contenus multimédias pour les canaux de diffusion de l'entreprise.",
-      "Animation des réseaux sociaux, rédaction de fiches produit, création de visuels promotionnels et gestion de l'image de marque en ligne.",
+      `${s.prenom} est en charge de la création de contenus marketing pour ${s.entreprise} : articles de blog, newsletters mensuelles, posts réseaux sociaux et visuels pour les campagnes de communication.`,
+      `En tant que ${s.poste}, ${s.prenom} gère la communication digitale de ${s.entreprise} : production de contenus rédactionnels, création de visuels pour le site web et animation des réseaux sociaux.`,
+      `${s.prenom} développe les supports de communication de ${s.entreprise} (brochures, présentations, flyers) et produit des contenus multimédias pour les différents canaux de diffusion.`,
+      `Au sein de ${s.entreprise}, ${s.prenom} anime les réseaux sociaux, rédige les fiches produit, crée les visuels promotionnels et assure la veille concurrentielle sur les contenus.`,
+      `${s.prenom} est responsable de la ligne éditoriale de ${s.entreprise} et doit produire régulièrement des contenus engageants pour développer l'audience et la notoriété de la marque.`,
+      `Les missions de ${s.prenom} incluent la rédaction de dossiers de presse, la création de supports événementiels et la production de contenus pour les partenaires de ${s.entreprise}.`,
+      `En tant que ${s.poste}, ${s.prenom} pilote les campagnes d'emailing de ${s.entreprise}, crée les landing pages et optimise les parcours de conversion digitaux.`,
+      `${s.prenom} conçoit les programmes de formation interne de ${s.entreprise} et produit les supports pédagogiques (présentations, vidéos, quiz) pour les sessions de formation.`,
+      `Au sein de l'équipe communication, ${s.prenom} coordonne la production de contenus multicanaux et assure la cohérence de l'image de marque de ${s.entreprise} sur tous les supports.`,
+      `${s.prenom} est chargé(e) de la production éditoriale de ${s.entreprise} : rédaction, relecture, mise en page et diffusion des contenus sur les différents canaux de communication.`,
     ];
   } else {
     missionsEntreprise = [
-      `Rédaction de documents, préparation de rapports et gestion de fichiers dans le cadre de mes missions professionnelles liées à ${formation}.`,
-      `Utilisation quotidienne des outils liés à ${formation} pour la gestion administrative et le suivi des dossiers.`,
-      `Prise en charge de projets nécessitant une maîtrise de ${formation}, incluant la production de livrables professionnels.`,
+      `En tant que ${s.poste} chez ${s.entreprise}, ${s.prenom} est en charge de la rédaction de documents, la préparation de rapports et la gestion de fichiers liés à ${formation}.`,
+      `${s.prenom} utilise quotidiennement les outils liés à ${formation} pour la gestion administrative, le suivi des dossiers et la production de livrables pour son service.`,
+      `Au sein de ${s.entreprise}, ${s.prenom} prend en charge des projets nécessitant une maîtrise de ${formation}, incluant la coordination avec les autres services.`,
+      `${s.prenom} assure le suivi budgétaire et le reporting de son service en utilisant les outils liés à ${formation}, compétences essentielles dans son poste de ${s.poste}.`,
+      `Les missions de ${s.prenom} incluent l'analyse de données, la production de tableaux de bord et la présentation de résultats à la direction de ${s.entreprise}.`,
+      `${s.prenom} est responsable de la formation des nouveaux collaborateurs sur les outils liés à ${formation} et de la mise à jour des procédures internes.`,
+      `En tant que ${s.poste}, ${s.prenom} participe à l'amélioration continue des processus de ${s.entreprise} en utilisant les compétences de ${formation}.`,
+      `${s.prenom} gère les relations avec les fournisseurs/clients et produit la documentation associée, nécessitant des compétences solides en ${formation}.`,
+      `Au quotidien, ${s.prenom} analyse les performances de son service et propose des améliorations basées sur les données, en s'appuyant sur les outils de ${formation}.`,
+      `${s.prenom} assure la veille technique sur ${formation} et partage les bonnes pratiques avec son équipe pour maintenir le niveau de compétence du service.`,
     ];
   }
 
-  // Formation-specific contribution entreprise
+  // === CONTRIBUTION ENTREPRISE (10 options) ===
   let contributionEntreprise: string[];
   if (isFLE) {
     contributionEntreprise = [
-      "Cette formation permettra d'améliorer la qualité des transmissions écrites et orales, de renforcer la sécurité des soins et de fluidifier la communication au sein de l'équipe pluridisciplinaire.",
-      "Elle contribuera à l'autonomie du salarié dans la compréhension des protocoles et à une meilleure communication avec les usagers et leurs familles, améliorant ainsi la qualité de l'accompagnement.",
-      "L'amélioration des compétences linguistiques du salarié renforcera la qualité de la prise en charge des usagers et réduira les risques liés aux incompréhensions dans les transmissions.",
+      `Cette formation permettra d'améliorer la qualité des transmissions écrites et orales de ${s.prenom}, de renforcer la sécurité des soins et de fluidifier la communication au sein de l'équipe de ${s.entreprise}.`,
+      `Elle contribuera à l'autonomie de ${s.prenom} dans la compréhension des protocoles et à une meilleure communication avec les usagers et leurs familles, améliorant la qualité globale de l'accompagnement.`,
+      `L'amélioration des compétences linguistiques de ${s.prenom} renforcera la qualité de la prise en charge et réduira les risques liés aux incompréhensions dans les transmissions d'informations.`,
+      `Cette formation s'inscrit dans notre politique d'intégration et de valorisation des compétences de nos salariés d'origine étrangère. Elle permettra à ${s.prenom} de s'épanouir professionnellement.`,
+      `En développant le français professionnel de ${s.prenom}, nous améliorerons la traçabilité des soins et la conformité de nos pratiques avec les exigences réglementaires du secteur médico-social.`,
     ];
   } else if (isIA) {
     contributionEntreprise = [
-      "Cette formation permettra de multiplier par 3 la production de contenus de qualité tout en réduisant les coûts de sous-traitance graphique et rédactionnelle.",
-      "La maîtrise des outils d'IA générative accélérera la création de campagnes marketing et renforcera la réactivité de notre communication sur les réseaux sociaux.",
-      "L'intégration de l'IA dans nos processus de création de contenus améliorera notre compétitivité et notre capacité à produire des supports professionnels de manière autonome.",
+      `Cette formation permettra à ${s.entreprise} de multiplier par 3 la production de contenus de qualité tout en réduisant les coûts de sous-traitance graphique et rédactionnelle.`,
+      `La maîtrise des outils d'IA par ${s.prenom} accélérera la création de campagnes marketing et renforcera la réactivité de la communication de ${s.entreprise} sur les réseaux sociaux.`,
+      `L'intégration de l'IA dans nos processus de création de contenus améliorera la compétitivité de ${s.entreprise} et notre capacité à produire des supports professionnels de manière autonome.`,
+      `Cette formation permettra à ${s.entreprise} de se positionner à la pointe de l'innovation en matière de communication digitale et de tirer parti des technologies d'IA de manière responsable.`,
+      `En formant ${s.prenom}, nous internalisons des compétences stratégiques en création de contenus qui réduiront nos délais de production et renforceront notre agilité marketing.`,
     ];
   } else {
     contributionEntreprise = [
-      `Cette formation permettra d'améliorer la qualité des productions liées à ${formation} et de réduire les délais de traitement au sein de notre structure.`,
-      `Elle contribuera à l'autonomie du salarié et réduira le besoin de sous-traitance pour les tâches liées à ${formation}.`,
-      `L'acquisition de ces compétences en ${formation} s'inscrit dans notre plan de développement des compétences et renforce notre compétitivité.`,
+      `Cette formation permettra d'améliorer la qualité et la rapidité des productions de ${s.prenom} liées à ${formation}, bénéficiant directement à l'efficacité du service au sein de ${s.entreprise}.`,
+      `Elle contribuera à l'autonomie de ${s.prenom} et réduira le besoin de sous-traitance pour les tâches liées à ${formation}, générant des économies pour ${s.entreprise}.`,
+      `L'acquisition de ces compétences par ${s.prenom} s'inscrit dans notre plan de développement des compétences et renforce la compétitivité de ${s.entreprise} dans son secteur.`,
+      `En formant ${s.prenom}, ${s.entreprise} investit dans le capital humain et garantit la continuité des compétences clés nécessaires à son activité.`,
+      `Cette formation répond à un besoin identifié lors de l'entretien professionnel de ${s.prenom} et s'inscrit dans les objectifs stratégiques de développement de ${s.entreprise}.`,
     ];
   }
 
-  // Formation-specific objectifs personnels
+  // === OBJECTIFS PERSONNELS (10 options par type) ===
   let objectifOptions: string[];
   if (isFLE) {
     objectifOptions = [
-      "Je souhaite atteindre le niveau B1 en français pour mieux communiquer dans mon environnement professionnel médico-social et me sentir plus légitime dans mon poste.",
-      "Mon objectif est de maîtriser le français professionnel du secteur sanitaire et social pour pouvoir rédiger les transmissions de manière autonome et participer activement aux réunions d'équipe.",
-      "Je veux améliorer ma compréhension du français écrit pour mieux comprendre les protocoles, les chartes et les documents institutionnels de mon établissement.",
-      "Cette formation me permettra de renforcer mes compétences en communication orale pour l'accueil des usagers et les échanges avec les familles dans le cadre de mon travail.",
-      "J'ai besoin de progresser en français pour pouvoir évoluer professionnellement dans le secteur médico-social et accéder à des postes à responsabilités.",
+      "Je souhaite atteindre le niveau B1 en français pour mieux communiquer dans mon environnement professionnel médico-social et me sentir plus légitime et confiant(e) dans mon poste au quotidien.",
+      "Mon objectif est de maîtriser le français professionnel du secteur sanitaire et social pour rédiger les transmissions de manière autonome et participer activement aux réunions d'équipe sans appréhension.",
+      "Je veux améliorer ma compréhension du français écrit pour mieux comprendre les protocoles, les chartes et les documents institutionnels de mon établissement, et ainsi mieux protéger les usagers.",
+      "Cette formation me permettra de renforcer mes compétences en communication orale pour l'accueil des usagers et les échanges avec les familles, une partie essentielle de mon travail quotidien.",
+      "J'ai besoin de progresser en français professionnel pour pouvoir évoluer vers un poste à responsabilités dans le secteur médico-social et accéder à une VAE DEAS.",
+      "Mon objectif est de me sentir à l'aise lors des transmissions orales du matin et du soir, pour communiquer les informations importantes sur les résidents de manière claire et précise.",
+      "Je souhaite développer mon vocabulaire médico-social spécifique pour mieux comprendre les diagnostics, les protocoles de soins et les prescriptions médicales dans mon travail.",
+      "Mon but est de pouvoir remplir correctement les documents administratifs (fiches d'incident, projets personnalisés, comptes rendus) sans avoir besoin d'aide de mes collègues.",
+      "Je veux gagner en confiance dans ma communication écrite et orale en français pour être pleinement intégré(e) à l'équipe et reconnu(e) pour mes compétences professionnelles.",
+      "Cette formation est une étape clé pour mon intégration professionnelle durable dans le secteur sanitaire et social en France, secteur dans lequel j'exerce depuis plusieurs années.",
     ];
   } else if (isIA) {
     objectifOptions = [
-      "Je souhaite maîtriser les outils d'IA générative pour créer des contenus professionnels (textes et visuels) de manière autonome et gagner en productivité dans ma création de contenus.",
-      "Mon objectif est d'intégrer l'IA dans mon workflow de création de contenus pour produire des campagnes de communication complètes (rédactionnel + visuel) de manière efficace.",
-      "Je veux comprendre les bonnes pratiques et le cadre juridique de l'IA générative pour utiliser ces outils de manière responsable et conforme au RGPD dans mon activité professionnelle.",
-      "Cette formation me permettra de développer des compétences en prompt engineering pour optimiser la qualité des contenus générés par IA et les adapter à mes besoins spécifiques.",
-      "J'ai pour objectif de maîtriser la création visuelle par IA (Midjourney, DALL-E, Canva IA) pour produire des visuels professionnels sans dépendre d'un graphiste externe.",
+      "Je souhaite maîtriser les outils d'IA générative (ChatGPT, Midjourney, DALL-E) pour créer des contenus professionnels de qualité et gagner significativement en productivité dans ma production de contenus.",
+      "Mon objectif est d'intégrer l'IA dans mon workflow quotidien de création de contenus pour produire des campagnes complètes (texte + visuel) de manière rapide, efficace et cohérente.",
+      "Je veux comprendre les bonnes pratiques et le cadre juridique de l'IA générative (RGPD, droit d'auteur, AI Act) pour utiliser ces outils de manière responsable et conforme dans mon activité.",
+      "Cette formation me permettra de développer mes compétences en prompt engineering pour obtenir des résultats de qualité professionnelle dès les premières itérations avec les outils d'IA.",
+      "J'ai pour objectif de maîtriser la création visuelle par IA (Midjourney, DALL-E, Canva IA) pour produire des visuels professionnels cohérents avec ma charte graphique sans dépendre d'un graphiste.",
+      "Mon but est de pouvoir créer une campagne de communication complète (article, post LinkedIn, email, visuel) en une journée au lieu d'une semaine, grâce à l'IA.",
+      "Je souhaite apprendre à vérifier et enrichir les contenus générés par IA pour garantir leur fiabilité, leur originalité et leur pertinence pour mon audience cible.",
+      "Mon objectif est de devenir la personne référente en IA au sein de mon équipe et de pouvoir former mes collègues aux bonnes pratiques du prompting.",
+      "Je veux explorer les possibilités de l'IA pour la création de contenus pédagogiques (supports de formation, quiz, tutoriels) dans le cadre de mes fonctions.",
+      "Cette formation me permettra de diversifier mes compétences et de rester compétitif(ve) sur le marché du travail en maîtrisant les outils d'IA les plus demandés.",
     ];
   } else if (isExcel) {
     objectifOptions = [
-      "Je souhaite maîtriser les formules avancées d'Excel et les tableaux croisés dynamiques pour automatiser mes reportings et améliorer mon efficacité professionnelle.",
-      "Mon objectif est de créer des tableaux de bord professionnels et d'automatiser mes tâches répétitives grâce aux macros VBA.",
-      "Je veux développer mes compétences en analyse de données avec Excel pour prendre de meilleures décisions dans mon travail quotidien.",
+      "Je souhaite maîtriser les formules avancées d'Excel (RECHERCHEV, INDEX/EQUIV, SI imbriqués) pour automatiser mes reportings mensuels et gagner plusieurs heures de travail par semaine.",
+      "Mon objectif est de créer des tableaux de bord professionnels avec TCD et graphiques dynamiques pour présenter des analyses claires et percutantes à ma direction.",
+      "Je veux développer mes compétences en macros VBA pour automatiser les tâches répétitives qui monopolisent actuellement une grande partie de mon temps de travail.",
+      "Cette formation me permettra de maîtriser la mise en forme conditionnelle avancée et les graphiques sparkline pour produire des fichiers visuels et impactants.",
+      "Mon but est de devenir autonome sur la création de modèles financiers sous Excel, compétence indispensable pour mon évolution vers un poste de contrôleur de gestion.",
+      "Je souhaite apprendre à utiliser Power Query et les fonctions de nettoyage de données pour traiter efficacement les fichiers volumineux que je reçois chaque mois.",
+      "Mon objectif est de consolider mes bases sur les fonctions de recherche et les références absolues/relatives, que j'utilise au quotidien sans toujours les maîtriser.",
+      "Je veux être capable de créer des fichiers Excel robustes avec des validations de données et des protections de feuilles pour fiabiliser les outils de mon service.",
+      "Cette formation doit me permettre de remplacer mes fichiers manuels actuels par des tableaux automatisés fiables, gagnant ainsi en qualité et en rapidité.",
+      "Mon objectif est de passer d'un niveau utilisateur intermédiaire à un niveau avancé pour pouvoir répondre aux demandes croissantes d'analyse de données de ma hiérarchie.",
     ];
   } else if (isAnglais) {
     objectifOptions = [
-      "Je souhaite obtenir un score TOEIC supérieur à 785 pour valider mon niveau d'anglais professionnel et accéder à des postes nécessitant des compétences linguistiques.",
-      "Mon objectif est de gagner en aisance à l'oral en anglais pour mener des réunions et des négociations avec des interlocuteurs internationaux.",
-      "Je veux renforcer mes compétences en rédaction professionnelle en anglais pour être autonome dans ma correspondance internationale.",
+      "Je souhaite obtenir un score TOEIC supérieur à 785 pour valider officiellement mon niveau d'anglais et accéder à des postes nécessitant des compétences linguistiques certifiées.",
+      "Mon objectif est de gagner en aisance à l'oral en anglais professionnel pour mener des réunions et des négociations avec des interlocuteurs internationaux sans stress.",
+      "Je veux renforcer mes compétences en rédaction professionnelle en anglais pour être totalement autonome dans ma correspondance avec nos partenaires étrangers.",
+      "Cette formation me permettra de maîtriser l'anglais des réunions (animer, participer, rédiger les minutes) compétence de plus en plus demandée dans mon poste.",
+      "Mon but est de pouvoir faire des présentations commerciales en anglais de manière fluide et convaincante devant des audiences internationales.",
+      "Je souhaite développer mon vocabulaire technique en anglais dans mon domaine pour pouvoir consulter directement la documentation internationale sans traduction.",
+      "Mon objectif est de me sentir à l'aise au téléphone et en visioconférence en anglais, situations que j'appréhende actuellement par manque de pratique.",
+      "Cette formation doit me permettre de rédiger des emails professionnels en anglais (demande, réclamation, négociation) avec un ton adapté et sans erreur embarrassante.",
+      "Je veux comprendre les nuances culturelles de la communication en anglais des affaires pour éviter les malentendus avec nos partenaires anglo-saxons.",
+      "Mon objectif est d'atteindre le niveau B2/C1 en anglais pour pouvoir envisager une mobilité internationale au sein de mon groupe.",
+    ];
+  } else if (isManagement) {
+    objectifOptions = [
+      "Je souhaite développer mon style de leadership pour motiver mon équipe, fédérer autour d'objectifs communs et améliorer durablement la performance collective.",
+      "Mon objectif est de maîtriser les techniques de gestion des conflits pour désamorcer les tensions au sein de mon équipe et maintenir un climat de travail positif.",
+      "Je veux acquérir les outils de la conduite du changement car mon entreprise traverse une période de transformation importante qui impacte mon équipe.",
+      "Cette formation me permettra de passer d'un management intuitif à un management structuré, avec des outils concrets pour le suivi de performance et la délégation.",
+      "Mon but est de gagner en légitimité en tant que manager récemment nommé(e) et de construire une relation de confiance avec mon équipe.",
+      "Je souhaite développer mes compétences en feedback constructif et en entretien professionnel pour accompagner la progression de chacun de mes collaborateurs.",
+      "Mon objectif est de mieux gérer mon temps et mes priorités en tant que manager pour consacrer plus de temps à l'accompagnement de mon équipe.",
+      "Cette formation doit m'aider à prendre du recul sur mes pratiques managériales et à identifier mes axes de progression grâce aux mises en situation filmées.",
+      "Je veux apprendre à animer des réunions d'équipe efficaces et à communiquer une vision claire pour donner du sens au travail de chacun.",
+      "Mon objectif est de développer mon intelligence émotionnelle et ma capacité d'écoute pour mieux comprendre les besoins et les motivations de mes collaborateurs.",
+    ];
+  } else if (isDigital) {
+    objectifOptions = [
+      "Je souhaite maîtriser les fondamentaux du SEO technique et éditorial pour améliorer significativement le référencement naturel de mon entreprise sur Google.",
+      "Mon objectif est de développer une stratégie de contenu efficace sur les réseaux sociaux pour accroître la notoriété de ma marque et générer de l'engagement.",
+      "Je veux acquérir les compétences en Google Ads et Facebook Ads pour lancer et piloter des campagnes publicitaires en ligne de manière autonome et rentable.",
+      "Cette formation me permettra de maîtriser Google Analytics 4 pour analyser le trafic web, comprendre le comportement des visiteurs et optimiser nos conversions.",
+      "Mon but est de pouvoir créer et gérer une stratégie d'email marketing professionnelle (segmentation, automatisation, A/B testing) pour notre base de contacts.",
+      "Je souhaite développer mes compétences en création de contenu vidéo et en storytelling digital pour diversifier les formats de communication de mon entreprise.",
+      "Mon objectif est de comprendre les mécanismes des algorithmes des réseaux sociaux pour maximiser la portée organique de nos publications.",
+      "Cette formation doit me permettre de construire un tableau de bord marketing complet avec les KPI pertinents pour piloter notre stratégie digitale.",
+      "Je veux maîtriser les techniques de growth hacking et d'inbound marketing pour générer des leads qualifiés à moindre coût pour mon entreprise.",
+      "Mon objectif est de devenir autonome dans la conception et le déploiement de campagnes marketing multicanales (SEO, SEA, social, email) pour mon activité.",
     ];
   } else {
     objectifOptions = [
-      `Je souhaite acquérir les bases de ${formation} afin de créer et gérer des documents professionnels de manière autonome.`,
-      `Mon objectif est de me perfectionner en ${formation} pour évoluer vers un poste à responsabilités dans mon domaine.`,
-      `Je souhaite maîtriser ${formation} pour être plus efficace dans mon travail quotidien et gagner en confiance.`,
+      `Je souhaite acquérir les compétences de base de ${formation} pour gagner en autonomie dans mes tâches quotidiennes et ne plus dépendre de mes collègues pour ces aspects.`,
+      `Mon objectif est de me perfectionner en ${formation} pour évoluer vers un poste à responsabilités dans mon domaine et enrichir mon profil professionnel.`,
+      `Je souhaite maîtriser ${formation} pour être plus efficace dans mon travail quotidien, gagner en confiance et pouvoir prendre en charge des missions plus complexes.`,
+      `Cette formation doit me permettre de combler un manque identifié dans mes compétences en ${formation}, frein actuel à mon évolution professionnelle.`,
+      `Mon but est d'atteindre un niveau d'expertise en ${formation} qui me permette de former à mon tour mes collègues et de devenir référent(e) sur ce sujet.`,
+      `Je veux consolider mes connaissances en ${formation} par une approche structurée et professionnelle, au-delà de l'apprentissage autodidacte que j'ai fait jusqu'ici.`,
+      `Mon objectif est de valider mes compétences en ${formation} par cette formation certifiante pour renforcer mon employabilité et mon parcours professionnel.`,
+      `Cette formation s'inscrit dans mon projet de reconversion professionnelle et me permettra d'acquérir les bases indispensables en ${formation} pour mon futur métier.`,
+      `Je souhaite gagner en productivité et en qualité dans l'utilisation de ${formation} pour répondre aux exigences croissantes de mon poste de ${s.poste}.`,
+      `Mon objectif est de maîtriser les dernières évolutions de ${formation} pour rester à jour et continuer à apporter de la valeur ajoutée à mon entreprise.`,
     ];
   }
 
-  // Formation-specific projet professionnel
+  // === PROJET PRO (10 options par type) ===
   let projetProOptions: string[];
   if (isFLE) {
     projetProOptions = [
-      "Cette formation me permettra de mieux m'intégrer professionnellement dans le secteur médico-social en France, de communiquer efficacement avec les équipes et les usagers, et d'accéder à terme à une qualification reconnue (DEAS, DEAES).",
-      "En atteignant le niveau B1 en français, je pourrai exercer mon métier d'aide-soignant(e)/auxiliaire de vie avec plus d'autonomie et envisager une évolution vers un poste de coordinateur(trice) au sein de ma structure.",
-      "La maîtrise du français professionnel médico-social me permettra de sécuriser mon emploi actuel, d'améliorer la qualité de mon accompagnement auprès des usagers et de préparer une VAE pour obtenir un diplôme du secteur.",
-      "Grâce à cette formation, je serai en mesure de comprendre et rédiger les documents professionnels de mon secteur, ce qui me permettra d'évoluer vers des fonctions d'encadrement ou de coordination.",
-      "Cette formation est une étape clé dans mon parcours d'insertion professionnelle dans le secteur sanitaire et social en France. Elle me permettra de valider mes compétences linguistiques et d'accéder à des formations qualifiantes.",
+      `Cette formation me permettra de mieux m'intégrer professionnellement dans le secteur médico-social, de communiquer efficacement avec les équipes et les usagers, et d'accéder à terme à une qualification reconnue (DEAS, DEAES).`,
+      `En atteignant le niveau B1, je pourrai exercer mon métier avec plus d'autonomie et envisager une évolution vers un poste de coordinateur(trice) ou de référent(e) au sein de ma structure.`,
+      `La maîtrise du français professionnel me permettra de sécuriser mon emploi, d'améliorer la qualité de mon accompagnement et de préparer une VAE pour obtenir un diplôme du secteur.`,
+      `Grâce à cette formation, je serai en mesure de comprendre et rédiger les documents professionnels, ce qui me permettra d'évoluer vers des fonctions d'encadrement dans le médico-social.`,
+      `Cette formation est une étape clé dans mon parcours d'insertion professionnelle dans le secteur sanitaire et social en France, pays dans lequel je souhaite construire toute ma carrière.`,
+      `Mon projet est de devenir aide-soignant(e) diplômé(e) d'État, et la maîtrise du français est un prérequis indispensable pour réussir les épreuves du DEAS.`,
+      `Je souhaite évoluer vers un poste de maître(sse) de maison ou de gouvernant(e), ce qui nécessite de bonnes compétences rédactionnelles en français.`,
+      `Cette formation me rapprochera de mon objectif d'obtenir la nationalité française, pour laquelle un niveau B1 en français est exigé.`,
+      `Mon projet est de pouvoir aider les nouvelles recrues étrangères de mon établissement en devenant un relais linguistique au sein de l'équipe.`,
+      `À terme, je souhaite créer une petite structure d'aide à domicile, et la maîtrise du français professionnel est indispensable pour les démarches administratives et la relation avec les bénéficiaires.`,
     ];
   } else if (isIA) {
     projetProOptions = [
-      "Grâce à la maîtrise de l'IA générative, je pourrai proposer des prestations de création de contenus à haute valeur ajoutée, développer mon activité de freelance et me positionner sur un marché en forte croissance.",
-      "Cette formation me permettra d'intégrer l'IA dans ma pratique professionnelle de communicant/marketeur, de multiplier ma productivité et de me démarquer par des compétences innovantes très recherchées sur le marché.",
-      "En maîtrisant les outils d'IA générative, je pourrai créer de manière autonome l'ensemble des supports de communication de mon entreprise (textes, visuels, campagnes) et réduire significativement les coûts de production.",
-      "Cette formation s'inscrit dans mon projet de reconversion vers les métiers du marketing digital et de la création de contenus, en m'appuyant sur les technologies d'IA les plus récentes.",
-      "La maîtrise du workflow IA rédactionnel + visuel me permettra de lancer mon activité de consultant en stratégie de contenu et d'accompagner les entreprises dans l'intégration responsable de l'IA.",
+      `Grâce à la maîtrise de l'IA générative, je pourrai proposer des prestations de création de contenus à haute valeur ajoutée et me positionner sur un marché en forte croissance.`,
+      `Cette formation me permettra d'intégrer l'IA dans ma pratique professionnelle de ${s.poste} chez ${s.entreprise}, de multiplier ma productivité et de me démarquer par des compétences innovantes.`,
+      `En maîtrisant les outils d'IA, je pourrai créer de manière autonome l'ensemble des supports de communication de ${s.entreprise} et réduire significativement les coûts de production.`,
+      `Cette formation s'inscrit dans mon projet d'évolution vers un poste de responsable de la stratégie de contenu, combinant expertise éditoriale et maîtrise des outils d'IA.`,
+      `La maîtrise du workflow IA texte + visuel me permettra de développer une activité de consultant(e) indépendant(e) en stratégie de contenu augmentée par l'IA.`,
+      `Mon projet est de créer une offre de formation à l'IA générative pour les professionnels de la communication, en m'appuyant sur les compétences acquises lors de cette formation.`,
+      `Cette formation me permettra de piloter la transformation digitale de ${s.entreprise} en intégrant l'IA dans les processus de production de contenus de manière structurée et éthique.`,
+      `Mon objectif est de devenir expert(e) en prompt engineering et en IA appliquée à la communication pour accompagner les entreprises dans cette transition technologique majeure.`,
+      `Grâce à cette formation, je pourrai proposer à ${s.entreprise} un plan de productivité basé sur l'IA, démontrant un ROI concret et mesurable sur la production de contenus.`,
+      `Cette formation est un investissement dans ma carrière qui me permettra de rester pertinent(e) et compétitif/ve sur le marché du travail face à l'essor de l'IA.`,
     ];
   } else {
     projetProOptions = [
-      `Cette formation me permettra de gagner en autonomie dans l'utilisation de ${formation}, d'améliorer la qualité de mes documents et d'être plus à l'aise dans un contexte professionnel nécessitant ces compétences.`,
-      `En maîtrisant ${formation}, je pourrai prétendre à des postes nécessitant cette compétence et ainsi faire évoluer ma carrière professionnelle.`,
-      `La maîtrise de ${formation} est essentielle pour mon projet de reconversion et me permettra d'accéder à de nouvelles opportunités professionnelles.`,
+      `Cette formation me permettra de gagner en autonomie dans l'utilisation de ${formation} et d'être plus performant(e) dans mon poste de ${s.poste} au sein de ${s.entreprise}.`,
+      `En maîtrisant ${formation}, je pourrai prétendre à des postes nécessitant cette compétence et faire évoluer ma carrière professionnelle vers plus de responsabilités.`,
+      `La maîtrise de ${formation} est essentielle pour mon projet de reconversion et me permettra d'accéder à de nouvelles opportunités professionnelles dans ce domaine.`,
+      `Cette formation s'inscrit dans un parcours de montée en compétences qui me permettra d'obtenir une certification reconnue et de valoriser mon profil sur le marché de l'emploi.`,
+      `Mon projet est de devenir référent(e) ${formation} au sein de ${s.entreprise} et de contribuer à l'amélioration des processus de mon service grâce aux compétences acquises.`,
+      `Grâce à cette formation, je pourrai proposer des solutions innovantes à ${s.entreprise} et participer activement aux projets stratégiques nécessitant des compétences en ${formation}.`,
+      `Cette formation me donnera les outils nécessaires pour être plus efficace au quotidien et consacrer plus de temps à des missions à plus forte valeur ajoutée.`,
+      `Mon projet est de combiner cette formation avec d'autres compétences pour développer une expertise transversale unique, valorisable dans mon secteur d'activité.`,
+      `En me formant à ${formation}, je sécurise mon employabilité à long terme et j'anticipe les évolutions de mon métier qui nécessiteront de plus en plus ces compétences.`,
+      `Cette formation me permettra de concrétiser un projet professionnel mûrement réfléchi et d'accéder à un poste en adéquation avec mes aspirations et mes talents.`,
     ];
   }
+
+  // === HANDICAP (variété des réponses) ===
+  const handicapResponses = [
+    "Non, je ne suis pas en situation de handicap et je n'ai pas besoin d'aménagement particulier pour suivre cette formation.",
+    "Non. Aucune adaptation nécessaire.",
+    "Non, pas de situation de handicap déclarée. Je n'ai pas de besoin spécifique.",
+    "Non. Je suis en bonne santé et je peux suivre la formation dans les conditions standard proposées.",
+    "Non, je ne suis pas en situation de handicap. Je n'ai besoin d'aucun aménagement spécifique.",
+    "Non. Toutefois, je porte des lunettes de correction et apprécierais un écran de taille suffisante pour le confort visuel.",
+    "Non, je n'ai pas de reconnaissance de handicap. Cependant, je signale un léger problème d'audition qui ne nécessite pas d'aménagement particulier.",
+    "Non, aucune situation de handicap. Je suis disponible aux horaires proposés sans contrainte spécifique.",
+    "Non. J'ai pris connaissance de la possibilité de contacter le référent handicap de l'organisme en cas de besoin.",
+    "Non, pas de handicap. Je n'ai aucune contrainte particulière pour suivre cette formation.",
+  ];
 
   return {
     civilite,
@@ -3082,7 +3371,7 @@ function generateEvalBesoinsAnswers(s: StagiaireInfo, f: FormationInfo, o: Organ
     objectif: objectifOptions[h(7) % objectifOptions.length],
     budget,
     projetPro: projetProOptions[h(8) % projetProOptions.length],
-    handicap: "Non",
+    handicap: handicapResponses[h(9) % handicapResponses.length],
   };
 }
 
