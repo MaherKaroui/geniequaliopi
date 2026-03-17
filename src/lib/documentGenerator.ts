@@ -2758,7 +2758,7 @@ function genFicheEvalBesoinsPSH(o: OrganismeInfo) {
 }
 
 function genTrameEvalBesoins(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
-  const s = stagiaires[0] || { prenom: "___", nom: "___", email: "", telephone: "", entreprise: "", poste: "", dateNaissance: "" };
+  const s = stagiaires[0] || { civilite: "" as const, prenom: "___", nom: "___", email: "", telephone: "", entreprise: "", poste: "", dateNaissance: "" };
   
   // Generate realistic auto-filled answers based on stagiaire profile and formation
   const answers = generateEvalBesoinsAnswers(s, f, o, stagiaires.indexOf(s));
