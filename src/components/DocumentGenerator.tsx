@@ -502,9 +502,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
                 variant={editing ? "default" : "outline"}
                 size="sm"
                 onClick={handleToggleEdit}
-                className="gap-1"
               >
-                {editing ? <Save className="w-4 h-4" /> : <Edit3 className="w-4 h-4" />}
                 {editing ? "Enregistrer" : "Modifier"}
               </Button>
               <Button variant="ghost" size="sm" onClick={() => { setPreviewContent(null); setEditing(false); }}>
@@ -513,8 +511,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
             </div>
           </div>
           {editing && (
-            <div className="mb-2 p-2 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg text-xs text-amber-700 dark:text-amber-400 flex items-center gap-2">
-              <Edit3 className="w-4 h-4 shrink-0" />
+            <div className="mb-2 p-2 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg text-xs text-amber-700 dark:text-amber-400">
               Mode édition activé : cliquez directement dans le document pour le modifier. Les changements seront sauvegardés.
             </div>
           )}
