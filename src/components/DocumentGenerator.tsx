@@ -339,7 +339,6 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
 
       {/* Format Selector */}
       <div className="p-3 bg-accent/10 rounded-xl border border-accent/30 flex items-center gap-3 flex-wrap">
-        <FileDown className="w-5 h-5 text-accent shrink-0" />
         <span className="text-sm font-semibold text-accent">Format d'export :</span>
         <div className="flex gap-2">
           <button
