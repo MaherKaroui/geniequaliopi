@@ -206,7 +206,7 @@ export function generateDocumentById(docId: string, template: string, params: Re
     case "grille_niveaux_positionnement": return genGrilleNiveauxPositionnement(o, f, stagiaires);
     // === Templates AF (Drive SELECT FORMATION) ===
     case "lien_site_internet": return genLienSiteInternet(o);
-    case "procedure_indicateurs_performance": return genProcedureIndicateursPerformance(o);
+    case "procedure_indicateurs_performance": return genProcedureIndicateursPerformance(o, stagiaires);
     case "procedure_eval_besoins": return genProcedureEvalBesoins(o);
     case "fiche_eval_besoins_psh": return genFicheEvalBesoinsPSH(o);
     case "trame_eval_besoins": return genTrameEvalBesoins(o, f, stagiaires);
