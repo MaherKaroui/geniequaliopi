@@ -870,14 +870,16 @@ function generateWrongAnswer(expected: string, seed: number, stagiaireIndex: num
   const vaguePool = [
     "Je pense que c'est lié au sujet mais je ne suis pas sûr(e) de la procédure exacte.",
     "C'est quelque chose que j'ai déjà vu mais je ne me souviens plus des détails.",
-    "Il faut utiliser un des outils mais je ne sais plus lequel exactement.",
-    "Je crois qu'il faut suivre une procédure spécifique.",
-    "C'est dans les paramètres ou les réglages je pense.",
-    "Je ne connais pas la réponse précise mais je pense que c'est important.",
-    "J'ai une vague idée mais je ne pourrais pas l'expliquer clairement.",
-    "Il me semble que c'est lié à ce qu'on a vu mais je confonds avec autre chose.",
-    "Je dirais que c'est une question de configuration mais je ne suis pas certain(e).",
-    "C'est un sujet que je ne maîtrise pas encore suffisamment.",
+    "Il faut suivre un protocole mais je ne me souviens plus des étapes.",
+    "Je crois qu'il faut suivre une procédure spécifique mais je ne saurais pas la décrire.",
+    "Je pense qu'il faut en parler à l'infirmière mais je ne suis pas certain(e) de la suite.",
+    "Je ne connais pas la réponse précise mais je pense que c'est important dans notre métier.",
+    "J'ai une vague idée mais je ne pourrais pas l'expliquer clairement en français.",
+    "Il me semble que c'est lié à ce qu'on a vu en cours mais je confonds les termes.",
+    "Je dirais que c'est quelque chose en rapport avec l'accompagnement mais je ne suis pas certain(e).",
+    "C'est un sujet que je ne maîtrise pas encore suffisamment, j'ai besoin de plus de pratique.",
+    "Je connais un peu le sujet mais je n'arrive pas bien à formuler ma réponse.",
+    "C'est difficile pour moi d'expliquer, je comprends à l'oral mais pas à l'écrit.",
   ];
   return vaguePool[(seed + stagiaireIndex * 3 + questionIndex * 5) % vaguePool.length];
 }
