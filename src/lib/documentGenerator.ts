@@ -1316,7 +1316,7 @@ function genTestPositionnementIndividuel(o: OrganismeInfo, f: FormationInfo, s: 
   const labelCap = type === "debut" ? "Début" : "Fin";
   const isDebut = type === "debut";
 
-  const answers = generateStagiaireOpenAnswers(questions, si, isDebut);
+  const answers = generateStagiaireOpenAnswers(questions, si, isDebut, { nom: s.nom, prenom: s.prenom, entreprise: s.entreprise, poste: s.poste });
   const totalScore = answers.reduce((sum, a) => sum + a.score, 0);
   const dateTest = isDebut ? formatDate(f.dateDebut) : formatDate(f.dateFin);
 
