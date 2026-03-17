@@ -123,6 +123,8 @@ export function parseEdofXlsx(data: ArrayBuffer): EdofSession[] {
       entreprise: "",
       poste: "",
       dateNaissance: parseEdofDate(row["DATE_DE_NAISSANCE"]),
+      dateDebutFormation: parseEdofDate(row["DATE_DEBUT_SESSION"]),
+      dateFinFormation: parseEdofDate(row["DATE_FIN_SESSION"]),
       signatureUrl: "",
     }));
 

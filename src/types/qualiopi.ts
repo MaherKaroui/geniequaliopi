@@ -49,6 +49,8 @@ export interface StagiaireInfo {
   entreprise: string;
   poste: string;
   dateNaissance: string;
+  dateDebutFormation?: string;
+  dateFinFormation?: string;
   signatureUrl?: string;
 }
 
