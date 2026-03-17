@@ -1,6 +1,6 @@
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 };
 
 Deno.serve(async (req) => {
@@ -18,97 +18,69 @@ Deno.serve(async (req) => {
       );
     }
 
-    console.log('Fetching Pappers URL:', url);
+    // Extract SIREN from Pappers URL
+    const sirenMatch = url.match(/(\d{9,14})/);
+    if (!sirenMatch) {
+      return new Response(
+        JSON.stringify({ success: false, error: 'Impossible de trouver le SIREN dans l\'URL' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
-    const response = await fetch(url, {
+    const siren = sirenMatch[1].slice(0, 9);
+    console.log('Looking up SIREN:', siren);
+
+    // Use suggestions.pappers.fr (public, no API key needed)
+    const suggestUrl = `https://suggestions.pappers.fr/v2?q=${siren}&cibles=nom_entreprise,siren,siret`;
+    const suggestResp = await fetch(suggestUrl, {
       headers: {
+        'Accept': 'application/json',
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml',
-        'Accept-Language': 'fr-FR,fr;q=0.9',
+        'Origin': 'https://www.pappers.fr',
+        'Referer': 'https://www.pappers.fr/',
       },
     });
 
-    if (!response.ok) {
+    if (!suggestResp.ok) {
+      const errBody = await suggestResp.text();
+      console.error('Suggestions API error:', suggestResp.status, errBody);
       return new Response(
-        JSON.stringify({ success: false, error: `Erreur HTTP ${response.status}` }),
+        JSON.stringify({ success: false, error: `Erreur API: ${suggestResp.status}` }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    const html = await response.text();
+    const suggestData = await suggestResp.json();
+    console.log('Suggestions response:', JSON.stringify(suggestData).slice(0, 1000));
 
-    // Extract company name from <h1> or <title>
-    const nomMatch = html.match(/<h1[^>]*>([^<]+)</) || html.match(/<title>([^<|]+)/);
-    const nom = nomMatch ? nomMatch[1].trim().replace(/\s*\(.*?\)\s*$/, '') : '';
+    // Find matching company
+    const results = suggestData?.resultats_siren || suggestData?.resultats_nom_entreprise || suggestData || [];
+    const company = Array.isArray(results) ? results[0] : results;
 
-    // Extract SIREN from URL or page content
-    const sirenFromUrl = url.match(/(\d{9,14})/);
-    let siret = '';
-    let siren = sirenFromUrl ? sirenFromUrl[1] : '';
-    
-    // Try to find SIRET (14 digits) in page
-    const siretMatch = html.match(/SIRET[^0-9]*(\d{3}\s?\d{3}\s?\d{3}\s?\d{5})/i) || 
-                        html.match(/(\d{14})/);
-    if (siretMatch) {
-      siret = siretMatch[1].replace(/\s/g, '');
-    } else if (siren.length === 9) {
-      siret = siren; // We'll just use SIREN
+    if (!company) {
+      return new Response(
+        JSON.stringify({ success: false, error: 'Entreprise non trouvée pour ce SIREN' }),
+        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
-
-    // Extract address
-    const adresseMatch = html.match(/Adresse[^:]*:\s*<\/[^>]+>\s*<[^>]+>([^<]+)/i) ||
-                          html.match(/Siège social[^:]*:\s*([^<]+)/i) ||
-                          html.match(/(?:adresse|siege)[^"]*"[^"]*"[^>]*>([^<]+)/i);
-    let adresse = '', codePostal = '', ville = '';
-    if (adresseMatch) {
-      const fullAddr = adresseMatch[1].trim();
-      const cpVilleMatch = fullAddr.match(/,?\s*(\d{5})\s+(.+)$/);
-      if (cpVilleMatch) {
-        codePostal = cpVilleMatch[1];
-        ville = cpVilleMatch[2].trim();
-        adresse = fullAddr.replace(/,?\s*\d{5}\s+.+$/, '').trim();
-      } else {
-        adresse = fullAddr;
-      }
-    }
-
-    // Extract dirigeant
-    const dirigeantMatch = html.match(/Dirigeants?[^:]*:\s*<\/[^>]+>\s*<[^>]+>[^>]*>([^<]+)/i) ||
-                           html.match(/dirigeant[^"]*"[^"]*"[^>]*>[^>]*>([^<]+)/i);
-    const dirigeant = dirigeantMatch ? dirigeantMatch[1].trim() : '';
-
-    // Extract activity / domaine
-    const activiteMatch = html.match(/Activit[ée][^:]*:\s*<\/[^>]+>\s*<[^>]+>([^<]+)/i);
-    const domainesFormation = activiteMatch ? activiteMatch[1].trim() : '';
-
-    // Try to extract NDA (Numéro de Déclaration d'Activité) - unlikely on Pappers
-    const ndaMatch = html.match(/(?:NDA|déclaration d'activité)[^0-9]*(\d{11})/i);
-    const nda = ndaMatch ? ndaMatch[1] : '';
-
-    // Try site web
-    const siteMatch = html.match(/site[^:]*:\s*<\/[^>]+>\s*<[^>]+href="([^"]+)"/i);
-    const siteWeb = siteMatch ? siteMatch[1] : '';
 
     const result = {
-      success: true,
-      data: {
-        nom,
-        siret,
-        siren,
-        adresse,
-        codePostal,
-        ville,
-        dirigeant,
-        domainesFormation,
-        nda,
-        siteWeb,
-      }
+      nom: company.nom_complet || company.denomination || company.nom_entreprise || '',
+      siret: company.siege?.siret || company.siret || '',
+      siren: company.siren || siren,
+      adresse: company.siege?.adresse_ligne_1 || company.siege?.adresse || '',
+      codePostal: company.siege?.code_postal || '',
+      ville: company.siege?.ville || company.siege?.libelle_commune || '',
+      dirigeant: extractDirigeant(company),
+      domainesFormation: company.libelle_activite_principale || company.siege?.libelle_activite_principale || '',
+      nda: '',
+      siteWeb: '',
     };
 
-    console.log('Parsed data:', JSON.stringify(result.data));
+    console.log('Parsed:', JSON.stringify(result));
 
     return new Response(
-      JSON.stringify(result),
+      JSON.stringify({ success: true, data: result }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {
@@ -119,3 +91,12 @@ Deno.serve(async (req) => {
     );
   }
 });
+
+function extractDirigeant(data: any): string {
+  const reps = data.representants || data.dirigeants || [];
+  if (reps.length > 0) {
+    const r = reps[0];
+    return `${r.prenom || ''} ${r.nom || ''}`.trim();
+  }
+  return data.dirigeant || '';
+}
