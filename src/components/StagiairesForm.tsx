@@ -54,8 +54,8 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
         <div key={index} className="p-4 bg-card rounded-xl border shadow-card space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-sm font-semibold text-primary">Stagiaire {index + 1}</span>
-            <Button variant="ghost" size="sm" onClick={() => removeStagiaire(index)} className="text-destructive hover:text-destructive">
-              <Trash2 className="w-4 h-4" />
+            <Button variant="ghost" size="sm" onClick={() => removeStagiaire(index)} className="text-destructive hover:text-destructive text-xs">
+              Supprimer
             </Button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
