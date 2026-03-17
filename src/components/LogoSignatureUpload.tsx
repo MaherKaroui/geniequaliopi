@@ -58,8 +58,8 @@ const LogoSignatureUpload = ({ logoUrl, signatureUrl, tamponUrl, onLogoChange, o
 
       {/* Signature */}
       <div>
-        <Label className="mb-2 block font-semibold flex items-center gap-2">
-          <PenTool className="w-4 h-4 text-primary" /> Signature du dirigeant
+        <Label className="mb-2 block font-semibold">
+          Signature du dirigeant
         </Label>
         <div className="flex items-center gap-3">
           {signatureUrl ? (
