@@ -690,11 +690,30 @@ export function genExercicesStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
     extra += `<p><strong>Travail réalisé par ${s.prenom} ${s.nom} :</strong></p>`;
 
     const repBase = ex.reponseAttendue;
-    // Replace any brackets with realistic values
-    const repClean = repBase
-      .replace(/\[Name\]/gi, 'Mme Dupont')
-      .replace(/\[company\]/gi, s.entreprise || 'notre entreprise')
-      .replace(/\[position\]/gi, s.poste || 'collaborateur')
+    // Transform third-person meta-descriptions into first-person student writing
+    const repFirstPerson = repBase
+      .replace(/Le stagiaire doit /gi, 'J\'ai ')
+      .replace(/Le stagiaire /gi, 'J\'ai ')
+      .replace(/L['']apprenant doit /gi, 'J\'ai ')
+      .replace(/Il faut que le stagiaire /gi, 'J\'ai ')
+      .replace(/doit créer/gi, 'ai créé')
+      .replace(/doit utiliser/gi, 'ai utilisé')
+      .replace(/doit rédiger/gi, 'ai rédigé')
+      .replace(/doit appliquer/gi, 'ai appliqué')
+      .replace(/doit identifier/gi, 'ai identifié')
+      .replace(/doit mettre en place/gi, 'ai mis en place')
+      .replace(/doit réaliser/gi, 'ai réalisé')
+      .replace(/doit présenter/gi, 'ai présenté')
+      .replace(/doit analyser/gi, 'ai analysé')
+      .replace(/doit proposer/gi, 'ai proposé');
+    // Replace any brackets with realistic values from actual stagiaire data
+    const repClean = repFirstPerson
+      .replace(/\[Name\]/gi, `${s.prenom} ${s.nom}`)
+      .replace(/\[Nom[^\]]*\]/gi, `${s.prenom} ${s.nom}`)
+      .replace(/Mme Dupont/gi, `Mme ${s.nom}`)
+      .replace(/M\. Dupont/gi, `M. ${s.nom}`)
+      .replace(/\[company\]/gi, s.entreprise || 'mon entreprise')
+      .replace(/\[position\]/gi, s.poste || 'mon poste')
       .replace(/\[tasks?\]/gi, 'la gestion des projets et le suivi des équipes')
       .replace(/\[date\]/gi, 'le 15 du mois prochain')
       .replace(/\[.*?\]/g, '');

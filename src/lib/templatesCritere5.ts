@@ -159,6 +159,7 @@ export function genPlanDevCompetencesExcel(o: OrganismeInfo, f: FormationInfo, f
   const rawDate = f.dateDebut || f.dateFin || "";
   const parsedDate = rawDate ? new Date(rawDate + "T00:00:00") : null;
   const year = parsedDate && !isNaN(parsedDate.getTime()) ? parsedDate.getFullYear() : new Date().getFullYear();
+  const nextYear = year + 1;
   const formateurName = f.formateur || (formateurs[0] ? formateurs[0].prenom + " " + formateurs[0].nom : "");
   const stagiaireNames = stagiaires && stagiaires.length > 0
     ? stagiaires.filter(s => s.nom || s.prenom).map(s => `${s.prenom} ${s.nom}`.trim()).join(", ")
@@ -166,7 +167,7 @@ export function genPlanDevCompetencesExcel(o: OrganismeInfo, f: FormationInfo, f
   const nbStagiaires = stagiaires ? stagiaires.filter(s => s.nom || s.prenom).length : 1;
 
   let html = `<tr><th colspan="9">${o.nom} – PLAN DE DÉVELOPPEMENT DES COMPÉTENCES</th></tr>`;
-  html += `<tr><td><strong>Année :</strong></td><td colspan="8">${year}</td></tr>`;
+  html += `<tr><td><strong>Année :</strong></td><td colspan="8">${year} – ${nextYear}</td></tr>`;
   html += `<tr><td></td></tr>`;
   html += `<tr>
     <th>Origine</th>
@@ -180,7 +181,23 @@ export function genPlanDevCompetencesExcel(o: OrganismeInfo, f: FormationInfo, f
     <th>Année</th>
   </tr>`;
 
-  // Row 1: Based on real example - gérer son centre
+  // ========== FORMATIONS RÉALISÉES (année en cours) ==========
+  html += `<tr><th colspan="9" style="background:#2d8659;text-align:left;padding:10px">✅ FORMATIONS RÉALISÉES – ${year}</th></tr>`;
+
+  // Row 1: Formation based on current formation — Interne, with stagiaire names
+  html += `<tr>
+    <td>Besoin identifié lors de l'entretien annuel</td>
+    <td>${f.intitule}</td>
+    <td>${f.objectifs || "Maîtriser les fonctionnalités et développer les compétences pratiques"}</td>
+    <td>Interne</td>
+    <td>${formateurName}</td>
+    <td>${nbStagiaires}</td>
+    <td>${stagiaireNames}</td>
+    <td>${f.duree || "21 heures"}</td>
+    <td>${year}</td>
+  </tr>`;
+
+  // Row 2: Real example - gérer son centre
   html += `<tr>
     <td>Prise de contact avec le cabinet Mbusiness pour suivre la formation gérer son centre</td>
     <td>Gérer mon centre de formation</td>
@@ -193,37 +210,71 @@ export function genPlanDevCompetencesExcel(o: OrganismeInfo, f: FormationInfo, f
     <td>${year}</td>
   </tr>`;
 
-  // Row 2: Formation based on current formation — Interne, with stagiaire names
+  // Row 3: Qualiopi done this year
   html += `<tr>
-    <td>Prise de contact avec le centre D conseils</td>
-    <td>${f.intitule}</td>
-    <td>${f.objectifs || "Maîtriser les fonctionnalités du logiciel et développer les compétences pratiques"}</td>
-    <td>Interne</td>
+    <td>Veille réglementaire et obligation Qualiopi</td>
+    <td>Formation Qualiopi – Référentiel National Qualité V9</td>
+    <td>Maîtriser les 32 indicateurs du RNQ et préparer l'audit initial</td>
+    <td>Externe</td>
+    <td>Consultant Qualiopi</td>
+    <td>1</td>
     <td>${formateurName}</td>
-    <td>${nbStagiaires}</td>
-    <td>${stagiaireNames}</td>
-    <td>${f.duree || "21 heures"}</td>
+    <td>3 jours</td>
     <td>${year}</td>
   </tr>`;
 
-  // Additional training entries
-  const additionalTrainings = [
-    { origine: "Veille réglementaire et obligation Qualiopi", nom: "Formation Qualiopi – Référentiel National Qualité V9", objectif: "Maîtriser les 32 indicateurs du RNQ et préparer l'audit initial", type: "Externe", formateur: "Consultant Qualiopi", duree: "3 jours" },
-    { origine: "Besoin identifié en veille technologique", nom: "Formation IA et outils numériques pour la formation", objectif: "Intégrer les outils IA dans les pratiques pédagogiques et administratives", type: "Externe", formateur: "Expert EdTech", duree: "2 jours" },
-    { origine: "Montée en compétences pédagogiques", nom: "Techniques d'animation de formation pour adultes", objectif: "Renforcer les techniques d'animation, de gestion de groupe et d'évaluation", type: "Externe", formateur: "Formateur certifié", duree: "2 jours" },
-  ];
+  // ========== FORMATIONS PRÉVUES (année suivante) ==========
+  html += `<tr><th colspan="9" style="background:#e8870e;text-align:left;padding:10px">📅 FORMATIONS PRÉVUES – ${nextYear}</th></tr>`;
 
-  additionalTrainings.forEach(t => {
+  // Determine improvement trainings based on the current formation domain
+  const intituleLower = (f.intitule || '').toLowerCase();
+  const futureTrainings: Array<{ origine: string; nom: string; objectif: string; type: string; formateur: string; nb: string; noms: string; duree: string }> = [];
+
+  if (intituleLower.includes('excel') || intituleLower.includes('bureautique') || intituleLower.includes('word') || intituleLower.includes('powerpoint')) {
+    futureTrainings.push(
+      { origine: "Montée en compétences suite à la formation " + f.intitule, nom: "Excel Avancé – Power Query et Power Pivot", objectif: "Maîtriser l'automatisation du traitement de données et la modélisation avancée dans Excel", type: "Externe", formateur: "Expert Data Analytics", nb: String(nbStagiaires), noms: stagiaireNames, duree: "3 jours" },
+      { origine: "Besoin identifié en outils collaboratifs", nom: "Microsoft 365 – Travail collaboratif (Teams, SharePoint, OneDrive)", objectif: "Optimiser le travail en équipe avec les outils cloud Microsoft 365", type: "Externe", formateur: "Formateur certifié Microsoft", nb: String(nbStagiaires), noms: stagiaireNames, duree: "2 jours" },
+    );
+  } else if (intituleLower.includes('anglais') || intituleLower.includes('english')) {
+    futureTrainings.push(
+      { origine: "Perfectionnement linguistique suite à la formation " + f.intitule, nom: "Anglais professionnel – Niveau avancé (B2/C1)", objectif: "Renforcer la fluidité orale et la rédaction professionnelle en anglais pour les présentations et négociations", type: "Externe", formateur: "Formateur natif certifié TESOL", nb: String(nbStagiaires), noms: stagiaireNames, duree: "30 heures" },
+      { origine: "Préparation certification internationale", nom: "Préparation au TOEIC / Linguaskill", objectif: "Obtenir une certification reconnue attestant du niveau d'anglais professionnel", type: "Externe", formateur: "Centre d'examen agréé", nb: String(nbStagiaires), noms: stagiaireNames, duree: "20 heures" },
+    );
+  } else if (intituleLower.includes('management') || intituleLower.includes('leader')) {
+    futureTrainings.push(
+      { origine: "Approfondissement suite à la formation " + f.intitule, nom: "Leadership et management agile", objectif: "Développer un style de management agile et adaptatif pour accompagner le changement", type: "Externe", formateur: "Coach certifié en management", nb: String(nbStagiaires), noms: stagiaireNames, duree: "3 jours" },
+      { origine: "Besoin identifié en gestion des conflits", nom: "Gestion des conflits et communication assertive", objectif: "Savoir prévenir et gérer les conflits au sein d'une équipe avec des techniques de communication assertive", type: "Externe", formateur: "Médiateur professionnel", nb: String(nbStagiaires), noms: stagiaireNames, duree: "2 jours" },
+    );
+  } else if (intituleLower.includes('aide') || intituleLower.includes('soignant') || intituleLower.includes('accompagn') || intituleLower.includes('sanitaire') || intituleLower.includes('social') || intituleLower.includes('médico')) {
+    futureTrainings.push(
+      { origine: "Perfectionnement professionnel suite à la formation " + f.intitule, nom: "Bientraitance et accompagnement des personnes vulnérables", objectif: "Renforcer les pratiques de bientraitance et prévenir les risques de maltraitance", type: "Externe", formateur: "Formateur spécialisé médico-social", nb: String(nbStagiaires), noms: stagiaireNames, duree: "2 jours" },
+      { origine: "Obligation réglementaire et montée en compétences", nom: "Gestes et postures – Prévention des TMS", objectif: "Maîtriser les techniques de manutention pour prévenir les troubles musculo-squelettiques", type: "Externe", formateur: "Ergonome certifié", nb: String(nbStagiaires), noms: stagiaireNames, duree: "1 jour" },
+    );
+  } else {
+    // Generic future trainings
+    futureTrainings.push(
+      { origine: "Approfondissement suite à la formation " + f.intitule, nom: f.intitule + " – Niveau avancé", objectif: "Approfondir les compétences acquises et maîtriser les aspects avancés du domaine", type: "Externe", formateur: "Expert du domaine", nb: String(nbStagiaires), noms: stagiaireNames, duree: "3 jours" },
+      { origine: "Besoin identifié en digitalisation", nom: "Transformation digitale et outils numériques", objectif: "Intégrer les outils numériques dans ses pratiques professionnelles pour gagner en efficacité", type: "Externe", formateur: "Consultant digital", nb: String(nbStagiaires), noms: stagiaireNames, duree: "2 jours" },
+    );
+  }
+
+  // Always add IA + pédagogie for next year
+  futureTrainings.push(
+    { origine: "Veille technologique et innovation pédagogique", nom: "Intelligence Artificielle appliquée à la formation", objectif: "Intégrer les outils IA (ChatGPT, Gemini, etc.) dans les pratiques pédagogiques et administratives", type: "Externe", formateur: "Expert EdTech", nb: "1", noms: formateurName, duree: "2 jours" },
+    { origine: "Montée en compétences pédagogiques", nom: "Techniques d'animation de formation pour adultes", objectif: "Renforcer les techniques d'animation, de gestion de groupe et d'évaluation des acquis", type: "Externe", formateur: "Formateur certifié andragogie", nb: "1", noms: formateurName, duree: "2 jours" },
+  );
+
+  futureTrainings.forEach(t => {
     html += `<tr>
       <td>${t.origine}</td>
       <td>${t.nom}</td>
       <td>${t.objectif}</td>
       <td>${t.type}</td>
       <td>${t.formateur}</td>
-      <td>1</td>
-      <td>${formateurName}</td>
+      <td>${t.nb}</td>
+      <td>${t.noms}</td>
       <td>${t.duree}</td>
-      <td>${year}</td>
+      <td>${nextYear}</td>
     </tr>`;
   });
 

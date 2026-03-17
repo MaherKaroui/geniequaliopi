@@ -678,7 +678,8 @@ interface StagiaireOpenAnswer {
 export function generateStagiaireOpenAnswers(
   questions: QuestionOuverte[],
   stagiaireIndex: number,
-  isDebut: boolean
+  isDebut: boolean,
+  stagiaireInfo?: { nom?: string; prenom?: string; entreprise?: string; poste?: string }
 ): StagiaireOpenAnswer[] {
   const profile = getStagiaireTestProfile(stagiaireIndex);
   
@@ -774,12 +775,12 @@ export function generateStagiaireOpenAnswers(
     
     switch (quality) {
       case 'full':
-        reponse = generateFullAnswer(expected, stagiaireIndex, raw.qi);
+        reponse = generateFullAnswer(expected, stagiaireIndex, raw.qi, stagiaireInfo);
         score = 1;
         feedback = "Bonne réponse";
         break;
       case 'partial':
-        reponse = generatePartialAnswer(expected, raw.seed, stagiaireIndex, raw.qi);
+        reponse = generatePartialAnswer(expected, raw.seed, stagiaireIndex, raw.qi, stagiaireInfo);
         score = 0.5;
         const partialFeedbacks = ["Réponse partielle", "Réponse incomplète", "Réponse acceptable", "Réponse partiellement correcte"];
         feedback = partialFeedbacks[(raw.seed + stagiaireIndex) % partialFeedbacks.length];
@@ -811,24 +812,38 @@ export function generateStagiaireOpenAnswers(
 }
 
 // Clean brackets from expected answers and replace with realistic values
-function cleanBrackets(text: string): string {
+function cleanBrackets(text: string, stagiaireNom?: string, stagiairePrenom?: string, entreprise?: string, poste?: string): string {
+  const nom = stagiaireNom || 'Martin';
+  const prenom = stagiairePrenom || 'Sophie';
   return text
-    .replace(/\[Name\]/gi, 'Mme Dupont')
-    .replace(/\[company\]/gi, 'notre entreprise')
-    .replace(/\[position\]/gi, 'responsable de projet')
+    .replace(/\[Name\]/gi, `${prenom} ${nom}`)
+    .replace(/\[Nom[^\]]*\]/gi, `${prenom} ${nom}`)
+    .replace(/Mme Dupont/gi, `Mme ${nom}`)
+    .replace(/M\. Dupont/gi, `M. ${nom}`)
+    .replace(/\[company\]/gi, entreprise || 'mon entreprise')
+    .replace(/\[position\]/gi, poste || 'mon poste actuel')
     .replace(/\[tasks?\]/gi, 'la gestion des projets et le suivi des équipes')
     .replace(/\[date\]/gi, 'le 15 du mois prochain')
     .replace(/\[X\]/gi, '3')
     .replace(/\[Area\]/gi, 'la gestion de projet')
     .replace(/\[Department\]/gi, 'le service commercial')
     .replace(/\[Responsibility\]/gi, 'la coordination des équipes')
-    .replace(/\[Job Title\]/gi, 'responsable de projet')
+    .replace(/\[Job Title\]/gi, poste || 'responsable de projet')
+    .replace(/Le stagiaire doit /gi, 'J\'ai ')
+    .replace(/Le stagiaire /gi, 'J\'ai ')
+    .replace(/L['']apprenant doit /gi, 'J\'ai ')
+    .replace(/doit créer/gi, 'ai créé')
+    .replace(/doit utiliser/gi, 'ai utilisé')
+    .replace(/doit rédiger/gi, 'ai rédigé')
+    .replace(/doit appliquer/gi, 'ai appliqué')
+    .replace(/doit identifier/gi, 'ai identifié')
+    .replace(/doit réaliser/gi, 'ai réalisé')
     .replace(/\[.*?\]/g, '');
 }
 
 // Generate a "correct" answer that's unique per stagiaire (rephrased) — LONG and realistic
-function generateFullAnswer(expected: string, stagiaireIndex: number, questionIndex: number): string {
-  const cleaned = cleanBrackets(expected);
+function generateFullAnswer(expected: string, stagiaireIndex: number, questionIndex: number, stagiaireInfo?: { nom?: string; prenom?: string; entreprise?: string; poste?: string }): string {
+  const cleaned = cleanBrackets(expected, stagiaireInfo?.nom, stagiaireInfo?.prenom, stagiaireInfo?.entreprise, stagiaireInfo?.poste);
   const sentences = cleaned.split(/(?<=[.!])\s+/).filter(s => s.trim());
   const seed = (stagiaireIndex * 13 + questionIndex * 7) % 8;
   
@@ -884,8 +899,8 @@ function generateFullAnswer(expected: string, stagiaireIndex: number, questionIn
   return intro + varied.join(' ') + expansions[seed] + closings[seed];
 }
 
-function generatePartialAnswer(expected: string, seed: number, stagiaireIndex: number, questionIndex: number): string {
-  const cleaned = cleanBrackets(expected);
+function generatePartialAnswer(expected: string, seed: number, stagiaireIndex: number, questionIndex: number, stagiaireInfo?: { nom?: string; prenom?: string; entreprise?: string; poste?: string }): string {
+  const cleaned = cleanBrackets(expected, stagiaireInfo?.nom, stagiaireInfo?.prenom, stagiaireInfo?.entreprise, stagiaireInfo?.poste);
   const sentences = cleaned.split(/(?<=[.!])\s+/).filter(s => s.trim());
   const variation = (stagiaireIndex * 11 + questionIndex * 3) % 3;
   
