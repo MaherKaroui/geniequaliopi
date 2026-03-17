@@ -123,6 +123,30 @@ export function orgHeader(org: OrganismeInfo, subtitle?: string): string {
   </div>`;
 }
 
+/** Get the formation start date for a specific stagiaire (uses stagiaire-specific date if available, otherwise formation-level) */
+export function getStagiaireDateDebut(s: StagiaireInfo, f: FormationInfo): string {
+  return s.dateDebutFormation || f.dateDebut || "";
+}
+
+/** Get the formation end date for a specific stagiaire */
+export function getStagiaireDateFin(s: StagiaireInfo, f: FormationInfo): string {
+  return s.dateFinFormation || f.dateFin || "";
+}
+
+/** Format a formation info block for a specific stagiaire (uses their individual dates if available) */
+export function formationInfoBlockStagiaire(f: FormationInfo, s: StagiaireInfo): string {
+  return infoGrid({
+    "Formation": f.intitule,
+    "Durée": f.duree,
+    "Du": formatDate(getStagiaireDateDebut(s, f)),
+    "Au": formatDate(getStagiaireDateFin(s, f)),
+    "Lieu": f.lieu,
+    "Modalités": f.modalites,
+    "Formateur": f.formateur,
+    "Tarif": f.tarif,
+  });
+}
+
 export function infoGrid(items: Record<string, string>): string {
   return `<div class="info-grid">${Object.entries(items).map(([k, v]) => `<div class="info-item"><strong>${k} :</strong> ${v || "___"}</div>`).join("")}</div>`;
 }
