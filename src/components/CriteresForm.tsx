@@ -2,7 +2,7 @@ import { CritereData } from "@/types/qualiopi";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { ClipboardCheck, Info } from "lucide-react";
+
 
 interface CriteresFormProps {
   data: CritereData[];
