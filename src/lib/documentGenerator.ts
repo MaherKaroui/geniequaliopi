@@ -1,5 +1,5 @@
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
-import { buildDocument, htmlWrap, orgHeader, formationInfoBlock, formationInfoBlockStagiaire, tableHTML, signatureBlock3, signatureBlock2, footer, section, formatDate, infoGrid, getDocStyle, subtractBusinessDays, getStagiaireDateDebut, getStagiaireDateFin } from "./docBuilder";
+import { buildDocument, htmlWrap, orgHeader, formationInfoBlock, formationInfoBlockStagiaire, tableHTML, signatureBlock3, signatureBlock2, footer, section, formatDate, infoGrid, getDocStyle, subtractBusinessDays, getStagiaireDateDebut, getStagiaireDateFin, applyGender } from "./docBuilder";
 import { FormateurInfo, SAMPLE_FORMATIONS, SAMPLE_STAGIAIRES, SAMPLE_FORMATEURS, SAMPLE_ORGANISME, EVAL_SCORES, SATISFACTION_SCORES, CONNECTION_TIMES, getFormationDays, mergeOrganisme, mergeStagiaires } from "./sampleData";
 import { buildFullCatalog } from "./docCatalog";
 import { generateBookQualiopi } from "./bookQualiopi";
@@ -19,6 +19,15 @@ export function getFullCatalog(org: OrganismeInfo, userFormation: FormationInfo,
 }
 
 export function generateDocumentById(docId: string, template: string, params: Record<string, any> | undefined, org: OrganismeInfo, userFormation: FormationInfo, userStagiaires: StagiaireInfo[]): string {
+  const result = _generateDocumentByIdInner(docId, template, params, org, userFormation, userStagiaires);
+  // Apply gender adaptation based on the relevant stagiaire
+  const stagiaires = mergeStagiaires(userStagiaires);
+  const si = params?.stagiaireIdx ?? 0;
+  const targetStagiaire = stagiaires[si] || stagiaires[0] || null;
+  return applyGender(result, targetStagiaire);
+}
+
+function _generateDocumentByIdInner(docId: string, template: string, params: Record<string, any> | undefined, org: OrganismeInfo, userFormation: FormationInfo, userStagiaires: StagiaireInfo[]): string {
   const o = mergeOrganisme(org);
   const selectedFormation = userFormation.intitule
     ? { ...SAMPLE_FORMATIONS[0], ...Object.fromEntries(Object.entries(userFormation).filter(([, v]) => v && String(v).trim())) }
@@ -2758,7 +2767,7 @@ function genFicheEvalBesoinsPSH(o: OrganismeInfo) {
 }
 
 function genTrameEvalBesoins(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
-  const s = stagiaires[0] || { prenom: "___", nom: "___", email: "", telephone: "", entreprise: "", poste: "", dateNaissance: "" };
+  const s = stagiaires[0] || { civilite: "" as const, prenom: "___", nom: "___", email: "", telephone: "", entreprise: "", poste: "", dateNaissance: "" };
   
   // Generate realistic auto-filled answers based on stagiaire profile and formation
   const answers = generateEvalBesoinsAnswers(s, f, o, stagiaires.indexOf(s));

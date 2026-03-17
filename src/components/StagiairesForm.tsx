@@ -11,7 +11,7 @@ interface StagiairesFormProps {
 }
 
 const emptyStagiaire: StagiaireInfo = {
-  nom: "", prenom: "", email: "", telephone: "", entreprise: "", poste: "", dateNaissance: "", dateDebutFormation: "", dateFinFormation: "", tarifFormation: "", signatureUrl: ""
+  civilite: "", nom: "", prenom: "", email: "", telephone: "", entreprise: "", poste: "", dateNaissance: "", dateDebutFormation: "", dateFinFormation: "", tarifFormation: "", signatureUrl: ""
 };
 
 const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
@@ -58,7 +58,19 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
               Supprimer
             </Button>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+            <div>
+              <Label>Civilité</Label>
+              <select
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                value={stagiaire.civilite}
+                onChange={e => updateStagiaire(index, 'civilite', e.target.value)}
+              >
+                <option value="">—</option>
+                <option value="M.">M.</option>
+                <option value="Mme">Mme</option>
+              </select>
+            </div>
             <div>
               <Label>Nom *</Label>
               <Input value={stagiaire.nom} onChange={e => updateStagiaire(index, 'nom', e.target.value)} placeholder="Nom" />
