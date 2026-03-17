@@ -435,12 +435,9 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
               >
                 {isExpanded ? <ChevronDown className="w-4 h-4 text-primary shrink-0" /> : <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />}
                 <span className="text-sm font-semibold">Critère {critere.numero} – {critere.titre}</span>
-                <div className="flex-1 min-w-0">
-                  <span className="text-sm font-semibold">Critère {critere.numero} – {critere.titre}</span>
-                  <span className="text-xs text-muted-foreground ml-2">
-                    ({critereDocs.length} docs, {critereGenerated} générés)
-                  </span>
-                </div>
+                <span className="text-xs text-muted-foreground ml-2">
+                  ({critereDocs.length} docs, {critereGenerated} générés)
+                </span>
               </button>
 
               {isExpanded && (
