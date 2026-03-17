@@ -3802,10 +3802,14 @@ function genMoyensMateriels(o: OrganismeInfo) {
 }
 
 function genBailSousLocation(o: OrganismeInfo) {
-  const dateSignature = formatDate(subtractBusinessDays(new Date().toISOString(), 60));
-  const dateDebut = formatDate(subtractBusinessDays(new Date().toISOString(), 45));
+  // Date du bail = dateMaj - 15 jours calendaires
+  const refDate = o.dateMaj || new Date().toISOString().slice(0, 10);
+  const bailDate = new Date(refDate);
+  bailDate.setDate(bailDate.getDate() - 15);
+  const dateSignature = formatDate(bailDate.toISOString());
+  const dateDebut = dateSignature; // le bail commence à la signature
   const dateFin = (() => {
-    const d = new Date();
+    const d = new Date(bailDate);
     d.setFullYear(d.getFullYear() + 2);
     return formatDate(d.toISOString());
   })();
