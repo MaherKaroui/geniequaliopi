@@ -232,36 +232,48 @@ export function genPlanDevCompetencesExcel(o: OrganismeInfo, f: FormationInfo, f
 
   if (intituleLower.includes('excel') || intituleLower.includes('bureautique') || intituleLower.includes('word') || intituleLower.includes('powerpoint')) {
     futureTrainings.push(
-      { origine: "Montée en compétences suite à la formation " + f.intitule, nom: "Excel Avancé – Power Query et Power Pivot", objectif: "Maîtriser l'automatisation du traitement de données et la modélisation avancée dans Excel", type: "Externe", formateur: "Expert Data Analytics", nb: String(nbStagiaires), noms: stagiaireNames, duree: "3 jours" },
-      { origine: "Besoin identifié en outils collaboratifs", nom: "Microsoft 365 – Travail collaboratif (Teams, SharePoint, OneDrive)", objectif: "Optimiser le travail en équipe avec les outils cloud Microsoft 365", type: "Externe", formateur: "Formateur certifié Microsoft", nb: String(nbStagiaires), noms: stagiaireNames, duree: "2 jours" },
+      { origine: "Montée en compétences suite à la formation " + f.intitule, nom: "Excel Avancé – Power Query et Power Pivot", objectif: "Maîtriser l'automatisation du traitement de données et la modélisation avancée dans Excel", type: "Externe", formateur: "Cegos – Département Bureautique", nb: String(nbStagiaires), noms: stagiaireNames, duree: "3 jours" },
+      { origine: "Besoin identifié en outils collaboratifs", nom: "Microsoft 365 – Travail collaboratif (Teams, SharePoint, OneDrive)", objectif: "Optimiser le travail en équipe avec les outils cloud Microsoft 365", type: "Externe", formateur: "Orsys Formation", nb: String(nbStagiaires), noms: stagiaireNames, duree: "2 jours" },
     );
   } else if (intituleLower.includes('anglais') || intituleLower.includes('english')) {
     futureTrainings.push(
-      { origine: "Perfectionnement linguistique suite à la formation " + f.intitule, nom: "Anglais professionnel – Niveau avancé (B2/C1)", objectif: "Renforcer la fluidité orale et la rédaction professionnelle en anglais pour les présentations et négociations", type: "Externe", formateur: "Formateur natif certifié TESOL", nb: String(nbStagiaires), noms: stagiaireNames, duree: "30 heures" },
-      { origine: "Préparation certification internationale", nom: "Préparation au TOEIC / Linguaskill", objectif: "Obtenir une certification reconnue attestant du niveau d'anglais professionnel", type: "Externe", formateur: "Centre d'examen agréé", nb: String(nbStagiaires), noms: stagiaireNames, duree: "20 heures" },
+      { origine: "Perfectionnement linguistique suite à la formation " + f.intitule, nom: "Anglais professionnel – Niveau avancé (B2/C1)", objectif: "Renforcer la fluidité orale et la rédaction professionnelle en anglais pour les présentations et négociations", type: "Externe", formateur: "Wall Street English", nb: String(nbStagiaires), noms: stagiaireNames, duree: "30 heures" },
+      { origine: "Préparation certification internationale", nom: "Préparation au TOEIC / Linguaskill", objectif: "Obtenir une certification reconnue attestant du niveau d'anglais professionnel", type: "Externe", formateur: "British Council France", nb: String(nbStagiaires), noms: stagiaireNames, duree: "20 heures" },
     );
   } else if (intituleLower.includes('management') || intituleLower.includes('leader')) {
     futureTrainings.push(
-      { origine: "Approfondissement suite à la formation " + f.intitule, nom: "Leadership et management agile", objectif: "Développer un style de management agile et adaptatif pour accompagner le changement", type: "Externe", formateur: "Coach certifié en management", nb: String(nbStagiaires), noms: stagiaireNames, duree: "3 jours" },
-      { origine: "Besoin identifié en gestion des conflits", nom: "Gestion des conflits et communication assertive", objectif: "Savoir prévenir et gérer les conflits au sein d'une équipe avec des techniques de communication assertive", type: "Externe", formateur: "Médiateur professionnel", nb: String(nbStagiaires), noms: stagiaireNames, duree: "2 jours" },
+      { origine: "Approfondissement suite à la formation " + f.intitule, nom: "Leadership et management agile", objectif: "Développer un style de management agile et adaptatif pour accompagner le changement", type: "Externe", formateur: "Comundi – Groupe Lefebvre Dalloz", nb: String(nbStagiaires), noms: stagiaireNames, duree: "3 jours" },
+      { origine: "Besoin identifié en gestion des conflits", nom: "Gestion des conflits et communication assertive", objectif: "Savoir prévenir et gérer les conflits au sein d'une équipe avec des techniques de communication assertive", type: "Externe", formateur: "Demos Formation", nb: String(nbStagiaires), noms: stagiaireNames, duree: "2 jours" },
     );
   } else if (intituleLower.includes('aide') || intituleLower.includes('soignant') || intituleLower.includes('accompagn') || intituleLower.includes('sanitaire') || intituleLower.includes('social') || intituleLower.includes('médico')) {
     futureTrainings.push(
-      { origine: "Perfectionnement professionnel suite à la formation " + f.intitule, nom: "Bientraitance et accompagnement des personnes vulnérables", objectif: "Renforcer les pratiques de bientraitance et prévenir les risques de maltraitance", type: "Externe", formateur: "Formateur spécialisé médico-social", nb: String(nbStagiaires), noms: stagiaireNames, duree: "2 jours" },
-      { origine: "Obligation réglementaire et montée en compétences", nom: "Gestes et postures – Prévention des TMS", objectif: "Maîtriser les techniques de manutention pour prévenir les troubles musculo-squelettiques", type: "Externe", formateur: "Ergonome certifié", nb: String(nbStagiaires), noms: stagiaireNames, duree: "1 jour" },
+      { origine: "Perfectionnement professionnel suite à la formation " + f.intitule, nom: "Bientraitance et accompagnement des personnes vulnérables", objectif: "Renforcer les pratiques de bientraitance et prévenir les risques de maltraitance", type: "Externe", formateur: "Grieps – Conseil et Formation Santé", nb: String(nbStagiaires), noms: stagiaireNames, duree: "2 jours" },
+      { origine: "Obligation réglementaire et montée en compétences", nom: "Gestes et postures – Prévention des TMS", objectif: "Maîtriser les techniques de manutention pour prévenir les troubles musculo-squelettiques", type: "Externe", formateur: "INRS – Institut National de Recherche et de Sécurité", nb: String(nbStagiaires), noms: stagiaireNames, duree: "1 jour" },
+    );
+  } else if (intituleLower.includes('ia') || intituleLower.includes('intelligence artificielle') || intituleLower.includes('chatgpt') || intituleLower.includes('data')) {
+    futureTrainings.push(
+      { origine: "Montée en compétences suite à la formation " + f.intitule, nom: "Deep Learning et Machine Learning – Applications métier", objectif: "Comprendre et appliquer les algorithmes de ML/DL pour automatiser des processus métier", type: "Externe", formateur: "Orsys Formation", nb: String(nbStagiaires), noms: stagiaireNames, duree: "3 jours" },
+      { origine: "Besoin identifié en IA générative", nom: "Prompt Engineering et IA générative avancée", objectif: "Maîtriser les techniques de prompt engineering pour optimiser l'utilisation des outils IA en entreprise", type: "Externe", formateur: "Jedha Bootcamp", nb: String(nbStagiaires), noms: stagiaireNames, duree: "2 jours" },
+    );
+  } else if (intituleLower.includes('fle') || intituleLower.includes('français langue') || intituleLower.includes('alphabétisation')) {
+    futureTrainings.push(
+      { origine: "Perfectionnement suite à la formation " + f.intitule, nom: "FLE – Niveau intermédiaire B1/B2 (communication professionnelle)", objectif: "Renforcer la maîtrise du français écrit et oral dans un contexte professionnel", type: "Externe", formateur: "Alliance Française", nb: String(nbStagiaires), noms: stagiaireNames, duree: "40 heures" },
+      { origine: "Préparation à la certification", nom: "Préparation au TCF / DELF Pro", objectif: "Obtenir une certification officielle de niveau de français professionnel", type: "Externe", formateur: "France Éducation International (CIEP)", nb: String(nbStagiaires), noms: stagiaireNames, duree: "20 heures" },
     );
   } else {
-    // Generic future trainings
     futureTrainings.push(
-      { origine: "Approfondissement suite à la formation " + f.intitule, nom: f.intitule + " – Niveau avancé", objectif: "Approfondir les compétences acquises et maîtriser les aspects avancés du domaine", type: "Externe", formateur: "Expert du domaine", nb: String(nbStagiaires), noms: stagiaireNames, duree: "3 jours" },
-      { origine: "Besoin identifié en digitalisation", nom: "Transformation digitale et outils numériques", objectif: "Intégrer les outils numériques dans ses pratiques professionnelles pour gagner en efficacité", type: "Externe", formateur: "Consultant digital", nb: String(nbStagiaires), noms: stagiaireNames, duree: "2 jours" },
+      { origine: "Approfondissement suite à la formation " + f.intitule, nom: f.intitule + " – Niveau avancé", objectif: "Approfondir les compétences acquises et maîtriser les aspects avancés du domaine", type: "Externe", formateur: "Cegos – Centre de formation", nb: String(nbStagiaires), noms: stagiaireNames, duree: "3 jours" },
+      { origine: "Besoin identifié en digitalisation", nom: "Transformation digitale et outils numériques", objectif: "Intégrer les outils numériques dans ses pratiques professionnelles pour gagner en efficacité", type: "Externe", formateur: "Orsys Formation", nb: String(nbStagiaires), noms: stagiaireNames, duree: "2 jours" },
     );
   }
 
-  // Always add IA + pédagogie for next year
+  // Formations spécifiques dirigeant : monde de la formation professionnelle
   futureTrainings.push(
-    { origine: "Veille technologique et innovation pédagogique", nom: "Intelligence Artificielle appliquée à la formation", objectif: "Intégrer les outils IA (ChatGPT, Gemini, etc.) dans les pratiques pédagogiques et administratives", type: "Externe", formateur: "Expert EdTech", nb: "1", noms: formateurName, duree: "2 jours" },
-    { origine: "Montée en compétences pédagogiques", nom: "Techniques d'animation de formation pour adultes", objectif: "Renforcer les techniques d'animation, de gestion de groupe et d'évaluation des acquis", type: "Externe", formateur: "Formateur certifié andragogie", nb: "1", noms: formateurName, duree: "2 jours" },
+    { origine: "Montée en compétences du dirigeant dans le secteur de la formation", nom: "Maîtriser la réglementation de la formation professionnelle", objectif: "Comprendre le cadre juridique (Code du travail, loi Avenir, décrets Qualiopi), les obligations déclaratives (BPF, NDA) et les droits des stagiaires", type: "Externe", formateur: "Centre Inffo – Centre de ressources de la formation", nb: "1", noms: formateurName, duree: "2 jours" },
+    { origine: "Développement commercial et stratégie de l'organisme", nom: "Développer et piloter un organisme de formation", objectif: "Structurer son offre, développer sa stratégie commerciale, gérer la relation avec les OPCO et les financeurs publics", type: "Externe", formateur: "Mbusiness Consulting", nb: "1", noms: formateurName, duree: "3 jours" },
+    { origine: "Veille technologique et innovation pédagogique", nom: "Intelligence Artificielle appliquée à la formation", objectif: "Intégrer les outils IA (ChatGPT, Gemini, Canva IA, etc.) dans l'ingénierie pédagogique, l'évaluation et la gestion administrative", type: "Externe", formateur: "Digiformag – Groupe Abilways", nb: "1", noms: formateurName, duree: "2 jours" },
+    { origine: "Obligation qualité et préparation audit", nom: "Audit Qualiopi – Préparation et maintien de la certification RNQ V9", objectif: "Préparer l'audit de surveillance, maîtriser les non-conformités et mettre en place un plan d'amélioration continue", type: "Externe", formateur: "Afnor Compétences", nb: "1", noms: formateurName, duree: "1 jour" },
+    { origine: "Montée en compétences pédagogiques", nom: "Concevoir et animer des formations pour adultes (andragogie)", objectif: "Renforcer les techniques d'animation, de gestion de groupe, d'évaluation des acquis et de scénarisation pédagogique", type: "Externe", formateur: "Cnam – Conservatoire National des Arts et Métiers", nb: "1", noms: formateurName, duree: "3 jours" },
   );
 
   futureTrainings.forEach(t => {
