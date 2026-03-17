@@ -89,7 +89,14 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
               <Label>Poste</Label>
               <Input value={stagiaire.poste} onChange={e => updateStagiaire(index, 'poste', e.target.value)} placeholder="Poste occupé" />
             </div>
-          </div>
+            <div>
+              <Label>Date début formation</Label>
+              <Input type="date" value={stagiaire.dateDebutFormation || ''} onChange={e => updateStagiaire(index, 'dateDebutFormation', e.target.value)} />
+            </div>
+            <div>
+              <Label>Date fin formation</Label>
+              <Input type="date" value={stagiaire.dateFinFormation || ''} onChange={e => updateStagiaire(index, 'dateFinFormation', e.target.value)} />
+            </div>
           {/* Signature stagiaire */}
           <div className="flex items-center gap-3 mt-2 pt-2 border-t border-border/50">
             <Label className="text-xs font-semibold flex items-center gap-1">
