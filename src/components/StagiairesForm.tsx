@@ -32,17 +32,12 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-qualiopi-orange/10 flex items-center justify-center">
-            <Users className="w-5 h-5 text-qualiopi-orange" />
-          </div>
-          <div>
-            <h2 className="text-xl font-bold">Stagiaires</h2>
-            <p className="text-sm text-muted-foreground">{data.length} stagiaire(s) ajouté(s)</p>
-          </div>
+        <div>
+          <h2 className="text-xl font-bold">Stagiaires</h2>
+          <p className="text-sm text-muted-foreground">{data.length} stagiaire(s) ajouté(s)</p>
         </div>
-        <Button onClick={addStagiaire} size="sm" className="gap-2">
-          <Plus className="w-4 h-4" /> Ajouter
+        <Button onClick={addStagiaire} size="sm">
+          + Ajouter
         </Button>
       </div>
 
