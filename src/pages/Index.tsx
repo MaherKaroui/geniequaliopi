@@ -7,7 +7,7 @@ import StagiairesForm from "@/components/StagiairesForm";
 import CriteresForm from "@/components/CriteresForm";
 import DocumentGenerator from "@/components/DocumentGenerator";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Shield, FileText, Sparkles, Package } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const STEPS = [
   { id: 1, label: "Organisme" },
