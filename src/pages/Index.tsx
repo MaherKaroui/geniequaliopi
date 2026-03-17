@@ -1,0 +1,140 @@
+import { useState } from "react";
+import { OrganismeInfo, FormationInfo, StagiaireInfo, CritereData, CRITERES } from "@/types/qualiopi";
+import StepIndicator from "@/components/StepIndicator";
+import OrganismeForm from "@/components/OrganismeForm";
+import FormationForm from "@/components/FormationForm";
+import StagiairesForm from "@/components/StagiairesForm";
+import CriteresForm from "@/components/CriteresForm";
+import DocumentGenerator from "@/components/DocumentGenerator";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight, Shield, FileText, Sparkles, Package } from "lucide-react";
+
+const STEPS = [
+  { id: 1, label: "Organisme" },
+  { id: 2, label: "Formation" },
+  { id: 3, label: "Stagiaires" },
+  { id: 4, label: "Critères" },
+  { id: 5, label: "Dossier" },
+];
+
+const emptyOrganisme: OrganismeInfo = {
+  nom: "", siret: "", adresse: "", codePostal: "", ville: "", telephone: "", email: "",
+  siteWeb: "", nda: "", dirigeant: "", responsablePedagogique: "", referentHandicap: "",
+  referentQualite: "", domainesFormation: "", typesActions: [], certifications: "", outilsUtilises: "",
+  version: "1", dateMaj: new Date().toISOString().slice(0, 10)
+};
+
+const emptyFormation: FormationInfo = {
+  intitule: "", objectifs: "", prerequis: "", duree: "", modalites: "", tarif: "",
+  programme: "", methodesEvaluation: "", moyensPedagogiques: "", publicVise: "",
+  delaiAcces: "", dateDebut: "", dateFin: "", lieu: "", nombreParticipants: "", formateur: ""
+};
+
+const Index = () => {
+  const [currentStep, setCurrentStep] = useState(() => {
+    const saved = sessionStorage.getItem('qualiopi_step');
+    return saved ? parseInt(saved, 10) : 1;
+  });
+  const [organisme, setOrganisme] = useState<OrganismeInfo>(() => {
+    try { const s = sessionStorage.getItem('qualiopi_org'); return s ? JSON.parse(s) : emptyOrganisme; } catch { return emptyOrganisme; }
+  });
+  const [formation, setFormation] = useState<FormationInfo>(() => {
+    try { const s = sessionStorage.getItem('qualiopi_form'); return s ? JSON.parse(s) : emptyFormation; } catch { return emptyFormation; }
+  });
+  const [stagiaires, setStagiaires] = useState<StagiaireInfo[]>(() => {
+    try { const s = sessionStorage.getItem('qualiopi_stag'); return s ? JSON.parse(s) : []; } catch { return []; }
+  });
+  const [criteres, setCriteres] = useState<CritereData[]>(() => {
+    try { const s = sessionStorage.getItem('qualiopi_crit'); return s ? JSON.parse(s) : JSON.parse(JSON.stringify(CRITERES)); } catch { return JSON.parse(JSON.stringify(CRITERES)); }
+  });
+  const [started, setStarted] = useState(() => sessionStorage.getItem('qualiopi_started') === '1');
+
+  // Persist state to sessionStorage
+  const updateStarted = (v: boolean | ((prev: boolean) => boolean)) => {
+    setStarted(prev => { const next = typeof v === 'function' ? v(prev) : v; sessionStorage.setItem('qualiopi_started', next ? '1' : '0'); return next; });
+  };
+  const updateStep = (v: number | ((prev: number) => number)) => {
+    setCurrentStep(prev => { const next = typeof v === 'function' ? v(prev) : v; sessionStorage.setItem('qualiopi_step', String(next)); return next; });
+  };
+  const updateOrganisme = (v: OrganismeInfo) => { setOrganisme(v); sessionStorage.setItem('qualiopi_org', JSON.stringify(v)); };
+  const updateFormation = (v: FormationInfo) => { setFormation(v); sessionStorage.setItem('qualiopi_form', JSON.stringify(v)); };
+  const updateStagiaires = (v: StagiaireInfo[]) => { setStagiaires(v); sessionStorage.setItem('qualiopi_stag', JSON.stringify(v)); };
+  const updateCriteres = (v: CritereData[]) => { setCriteres(v); sessionStorage.setItem('qualiopi_crit', JSON.stringify(v)); };
+
+  if (!started) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
+        <div className="max-w-2xl text-center space-y-8">
+          <div className="flex justify-center">
+            <div className="w-20 h-20 rounded-2xl bg-gradient-hero flex items-center justify-center shadow-elevated">
+              <Shield className="w-10 h-10 text-primary-foreground" />
+            </div>
+          </div>
+          <div>
+            <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
+              <span className="text-gradient-hero">Qualiopi</span> Generator
+            </h1>
+            <p className="text-lg text-muted-foreground mt-3 max-w-lg mx-auto">
+              Générez automatiquement votre dossier Qualiopi complet : ~500 documents de preuves pour les 7 critères et 32 indicateurs du RNQ.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
+            {[
+              { icon: Package, title: "~500 documents", desc: "Dossier complet prêt pour audit avec toutes les preuves" },
+              { icon: Shield, title: "32 indicateurs", desc: "Couverture intégrale du Référentiel National Qualité" },
+              { icon: Sparkles, title: "Pré-rempli", desc: "Documents remplis avec données réalistes et signatures" },
+            ].map((item, i) => (
+              <div key={i} className="p-5 bg-card rounded-xl border shadow-card">
+                <item.icon className="w-8 h-8 text-primary mb-3" />
+                <h3 className="font-semibold text-sm">{item.title}</h3>
+                <p className="text-xs text-muted-foreground mt-1">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+          <Button size="lg" className="bg-gradient-hero border-0 text-primary-foreground px-8 py-6 text-base shadow-elevated" onClick={() => updateStarted(true)}>
+            Commencer <ChevronRight className="w-5 h-5 ml-2" />
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-background">
+      <header className="border-b bg-card/80 backdrop-blur-sm sticky top-0 z-10">
+        <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-gradient-hero flex items-center justify-center">
+              <Shield className="w-4 h-4 text-primary-foreground" />
+            </div>
+            <span className="font-bold text-lg">Qualiopi Generator</span>
+          </div>
+          <Button variant="ghost" size="sm" onClick={() => updateStarted(false)}>Accueil</Button>
+        </div>
+      </header>
+
+      <main className="max-w-5xl mx-auto px-4 py-8">
+        <StepIndicator steps={STEPS} currentStep={currentStep} onStepClick={updateStep} />
+
+        <div className="bg-card rounded-2xl border shadow-card p-6 md:p-8">
+          {currentStep === 1 && <OrganismeForm data={organisme} onChange={updateOrganisme} />}
+          {currentStep === 2 && <FormationForm data={formation} onChange={updateFormation} onImportStagiaires={updateStagiaires} />}
+          {currentStep === 3 && <StagiairesForm data={stagiaires} onChange={updateStagiaires} />}
+          {currentStep === 4 && <CriteresForm data={criteres} onChange={updateCriteres} />}
+          {currentStep === 5 && <DocumentGenerator organisme={organisme} formation={formation} stagiaires={stagiaires} criteres={criteres} />}
+        </div>
+
+        <div className="flex justify-between mt-6">
+          <Button variant="outline" onClick={() => updateStep(s => Math.max(1, s - 1))} disabled={currentStep === 1} className="gap-2">
+            <ChevronLeft className="w-4 h-4" /> Précédent
+          </Button>
+          <Button onClick={() => updateStep(s => Math.min(5, s + 1))} disabled={currentStep === 5} className="gap-2">
+            Suivant <ChevronRight className="w-4 h-4" />
+          </Button>
+        </div>
+      </main>
+    </div>
+  );
+};
+
+export default Index;

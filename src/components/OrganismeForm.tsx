@@ -1,0 +1,147 @@
+import { OrganismeInfo } from "@/types/qualiopi";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Building2 } from "lucide-react";
+import LogoSignatureUpload from "./LogoSignatureUpload";
+
+interface OrganismeFormProps {
+  data: OrganismeInfo;
+  onChange: (data: OrganismeInfo) => void;
+}
+
+const OrganismeForm = ({ data, onChange }: OrganismeFormProps) => {
+  const update = (field: keyof OrganismeInfo, value: string) => {
+    onChange({ ...data, [field]: value });
+  };
+
+  const toggleType = (type: OrganismeInfo['typesActions'][0]) => {
+    const types = data.typesActions.includes(type)
+      ? data.typesActions.filter(t => t !== type)
+      : [...data.typesActions, type];
+    onChange({ ...data, typesActions: types });
+  };
+
+  const typesOptions = [
+    { value: 'actions-formation' as const, label: 'Actions de formation' },
+    { value: 'bilans-competences' as const, label: 'Bilans de compétences' },
+    { value: 'vae' as const, label: 'VAE' },
+    { value: 'apprentissage' as const, label: 'Apprentissage' },
+  ];
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center gap-3 mb-6">
+        <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+          <Building2 className="w-5 h-5 text-primary" />
+        </div>
+        <div>
+          <h2 className="text-xl font-bold font-heading">Informations de l'organisme</h2>
+          <p className="text-sm text-muted-foreground">Renseignez les informations de votre organisme de formation</p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="md:col-span-2">
+          <Label htmlFor="nom">Nom de l'organisme *</Label>
+          <Input id="nom" value={data.nom} onChange={e => update('nom', e.target.value)} placeholder="Ex: Formation Excellence SAS" />
+        </div>
+        <div>
+          <Label htmlFor="siret">SIRET *</Label>
+          <Input id="siret" value={data.siret} onChange={e => update('siret', e.target.value)} placeholder="Ex: 123 456 789 00012" />
+        </div>
+        <div>
+          <Label htmlFor="nda">N° Déclaration d'activité *</Label>
+          <Input id="nda" value={data.nda} onChange={e => update('nda', e.target.value)} placeholder="Ex: 11755555555" />
+        </div>
+        <div className="md:col-span-2">
+          <Label htmlFor="adresse">Adresse</Label>
+          <Input id="adresse" value={data.adresse} onChange={e => update('adresse', e.target.value)} placeholder="Ex: 12 rue de la Formation" />
+        </div>
+        <div>
+          <Label htmlFor="codePostal">Code postal</Label>
+          <Input id="codePostal" value={data.codePostal} onChange={e => update('codePostal', e.target.value)} placeholder="75001" />
+        </div>
+        <div>
+          <Label htmlFor="ville">Ville</Label>
+          <Input id="ville" value={data.ville} onChange={e => update('ville', e.target.value)} placeholder="Paris" />
+        </div>
+        <div>
+          <Label htmlFor="telephone">Téléphone</Label>
+          <Input id="telephone" value={data.telephone} onChange={e => update('telephone', e.target.value)} placeholder="01 23 45 67 89" />
+        </div>
+        <div>
+          <Label htmlFor="email">Email *</Label>
+          <Input id="email" type="email" value={data.email} onChange={e => update('email', e.target.value)} placeholder="contact@formation.fr" />
+        </div>
+        <div>
+          <Label htmlFor="siteWeb">Site internet</Label>
+          <Input id="siteWeb" value={data.siteWeb} onChange={e => update('siteWeb', e.target.value)} placeholder="https://www.formation.fr" />
+        </div>
+        <div>
+          <Label htmlFor="dirigeant">Dirigeant *</Label>
+          <Input id="dirigeant" value={data.dirigeant} onChange={e => update('dirigeant', e.target.value)} placeholder="Nom du dirigeant" />
+        </div>
+        <div>
+          <Label htmlFor="responsablePedagogique">Responsable pédagogique</Label>
+          <Input id="responsablePedagogique" value={data.responsablePedagogique} onChange={e => update('responsablePedagogique', e.target.value)} placeholder="Nom du responsable pédagogique" />
+        </div>
+        <div>
+          <Label htmlFor="referentHandicap">Référent handicap</Label>
+          <Input id="referentHandicap" value={data.referentHandicap} onChange={e => update('referentHandicap', e.target.value)} placeholder="Nom du référent handicap" />
+        </div>
+        <div>
+          <Label htmlFor="referentQualite">Référent qualité</Label>
+          <Input id="referentQualite" value={data.referentQualite} onChange={e => update('referentQualite', e.target.value)} placeholder="Nom du référent qualité" />
+        </div>
+        <div className="md:col-span-2">
+          <Label htmlFor="domainesFormation">Domaines de formation</Label>
+          <Textarea id="domainesFormation" value={data.domainesFormation} onChange={e => update('domainesFormation', e.target.value)} placeholder="Ex: Management, RH, Digital, Langues..." rows={2} />
+        </div>
+        <div className="md:col-span-2">
+          <Label htmlFor="certifications">Certifications déjà obtenues</Label>
+          <Input id="certifications" value={data.certifications} onChange={e => update('certifications', e.target.value)} placeholder="Ex: Qualiopi (valide jusqu'au...)" />
+        </div>
+        <div className="md:col-span-2">
+          <Label htmlFor="outilsUtilises">Outils utilisés</Label>
+          <Textarea id="outilsUtilises" value={data.outilsUtilises} onChange={e => update('outilsUtilises', e.target.value)} placeholder="Ex: Zoom, Moodle, Google Drive..." rows={2} />
+        </div>
+        <div>
+          <Label htmlFor="version">Version du dossier</Label>
+          <Input id="version" value={data.version} onChange={e => update('version', e.target.value)} placeholder="1" />
+        </div>
+        <div>
+          <Label htmlFor="dateMaj">Date de mise à jour (MAJ)</Label>
+          <Input id="dateMaj" type="date" value={data.dateMaj} onChange={e => update('dateMaj', e.target.value)} />
+        </div>
+        <div className="md:col-span-2">
+          <Label className="mb-3 block">Types d'actions *</Label>
+          <div className="flex flex-wrap gap-4">
+            {typesOptions.map(option => (
+              <label key={option.value} className="flex items-center gap-2 cursor-pointer">
+                <Checkbox
+                  checked={data.typesActions.includes(option.value)}
+                  onCheckedChange={() => toggleType(option.value)}
+                />
+                <span className="text-sm">{option.label}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        {/* Logo & Signature Upload */}
+        <LogoSignatureUpload
+          logoUrl={data.logoUrl}
+          signatureUrl={data.signatureUrl}
+          tamponUrl={data.tamponUrl}
+          onLogoChange={(url) => onChange({ ...data, logoUrl: url })}
+          onSignatureChange={(url) => onChange({ ...data, signatureUrl: url })}
+          onTamponChange={(url) => onChange({ ...data, tamponUrl: url })}
+        />
+      </div>
+    </div>
+  );
+};
+
+export default OrganismeForm;
