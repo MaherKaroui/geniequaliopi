@@ -682,14 +682,13 @@ export function generateStagiaireOpenAnswers(
 ): StagiaireOpenAnswer[] {
   const profile = getStagiaireTestProfile(stagiaireIndex);
   
-  return questions.map((q, qi) => {
+  // First pass: generate raw answers
+  const rawAnswers = questions.map((q, qi) => {
     const seed = (stagiaireIndex * 31 + qi * 17 + (isDebut ? 0 : 1000)) % 100;
     
-    // Determine answer quality based on profile
     let quality: 'full' | 'partial' | 'wrong' | 'empty';
     
     if (isDebut) {
-      // Début: lower scores (débutants score low, excellents score medium-high)
       if (profile.level === 'excellent') {
         quality = seed < 50 ? 'full' : seed < 85 ? 'partial' : 'wrong';
       } else if (profile.level === 'bon') {
@@ -700,7 +699,6 @@ export function generateStagiaireOpenAnswers(
         quality = seed < 10 ? 'full' : seed < 30 ? 'partial' : seed < 70 ? 'wrong' : 'empty';
       }
     } else {
-      // Fin: higher scores (progression after training)
       if (profile.level === 'excellent') {
         quality = seed < 85 ? 'full' : 'partial';
       } else if (profile.level === 'bon') {
@@ -712,30 +710,88 @@ export function generateStagiaireOpenAnswers(
       }
     }
     
-    const expected = q.reponseAttendue;
+    return { quality, seed, qi, question: q };
+  });
+
+  // Second pass: adjust to target 5-7/10 score range
+  // Calculate raw score
+  const scoreOf = (q: 'full' | 'partial' | 'wrong' | 'empty') => q === 'full' ? 1 : q === 'partial' ? 0.5 : 0;
+  let totalRaw = rawAnswers.reduce((s, a) => s + scoreOf(a.quality), 0);
+  
+  // Target: each stagiaire gets a unique score in 5-7 range
+  const targetScores = [5, 5.5, 6, 6.5, 7, 5.5, 6, 7, 6.5, 5];
+  const target = targetScores[stagiaireIndex % targetScores.length];
+  
+  // Adjust answers to hit target score
+  const adjustedQualities = rawAnswers.map(a => a.quality);
+  let currentScore = totalRaw;
+  
+  // If too high, downgrade some answers
+  while (currentScore > target + 0.25) {
+    // Find a 'full' answer to downgrade to 'partial'
+    const fullIdx = adjustedQualities.findIndex((q, i) => q === 'full' && (rawAnswers[i].seed + stagiaireIndex) % 3 !== 0);
+    if (fullIdx >= 0) {
+      adjustedQualities[fullIdx] = 'partial';
+      currentScore -= 0.5;
+      continue;
+    }
+    // Find a 'partial' to downgrade to 'wrong'
+    const partialIdx = adjustedQualities.findIndex(q => q === 'partial');
+    if (partialIdx >= 0) {
+      adjustedQualities[partialIdx] = 'wrong';
+      currentScore -= 0.5;
+      continue;
+    }
+    break;
+  }
+  
+  // If too low, upgrade some answers
+  while (currentScore < target - 0.25) {
+    // Find a 'wrong' or 'empty' to upgrade to 'partial'
+    const wrongIdx = adjustedQualities.findIndex(q => q === 'wrong' || q === 'empty');
+    if (wrongIdx >= 0) {
+      adjustedQualities[wrongIdx] = 'partial';
+      currentScore += 0.5;
+      continue;
+    }
+    // Find a 'partial' to upgrade to 'full'
+    const partialIdx = adjustedQualities.findIndex(q => q === 'partial');
+    if (partialIdx >= 0) {
+      adjustedQualities[partialIdx] = 'full';
+      currentScore += 0.5;
+      continue;
+    }
+    break;
+  }
+
+  // Generate final answers with adjusted qualities
+  return rawAnswers.map((raw, i) => {
+    const quality = adjustedQualities[i];
+    const expected = raw.question.reponseAttendue;
     let reponse: string;
     let score: number;
     let feedback: string;
     
     switch (quality) {
       case 'full':
-        reponse = generateFullAnswer(expected, stagiaireIndex, qi);
+        reponse = generateFullAnswer(expected, stagiaireIndex, raw.qi);
         score = 1;
         feedback = "Bonne réponse";
         break;
       case 'partial':
-        reponse = generatePartialAnswer(expected, seed, stagiaireIndex, qi);
+        reponse = generatePartialAnswer(expected, raw.seed, stagiaireIndex, raw.qi);
         score = 0.5;
         const partialFeedbacks = ["Réponse partielle", "Réponse incomplète", "Réponse acceptable", "Réponse partiellement correcte"];
-        feedback = partialFeedbacks[(seed + stagiaireIndex) % partialFeedbacks.length];
+        feedback = partialFeedbacks[(raw.seed + stagiaireIndex) % partialFeedbacks.length];
         break;
       case 'wrong':
-        reponse = generateWrongAnswer(expected, seed, stagiaireIndex, qi);
+        reponse = generateWrongAnswer(expected, raw.seed, stagiaireIndex, raw.qi);
         score = 0;
         const wrongFeedbacks = ["Réponse insuffisante", "Réponse incorrecte", "Réponse hors sujet", "Réponse erronée"];
-        feedback = wrongFeedbacks[(seed + stagiaireIndex) % wrongFeedbacks.length];
+        feedback = wrongFeedbacks[(raw.seed + stagiaireIndex) % wrongFeedbacks.length];
         break;
       case 'empty':
+      default:
         const emptyResponses = [
           "Je ne sais pas.",
           "Je ne sais pas exactement.", 
@@ -744,7 +800,7 @@ export function generateStagiaireOpenAnswers(
           "Aucune idée.",
           "Je ne me souviens plus.",
         ];
-        reponse = emptyResponses[(seed + stagiaireIndex * 3 + qi * 7) % emptyResponses.length];
+        reponse = emptyResponses[(raw.seed + stagiaireIndex * 3 + raw.qi * 7) % emptyResponses.length];
         score = 0;
         feedback = "Pas de réponse";
         break;
