@@ -1,8 +1,12 @@
+import { useState } from "react";
 import { OrganismeInfo } from "@/types/qualiopi";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 import LogoSignatureUpload from "./LogoSignatureUpload";
 
@@ -12,8 +16,46 @@ interface OrganismeFormProps {
 }
 
 const OrganismeForm = ({ data, onChange }: OrganismeFormProps) => {
+  const [pappersUrl, setPappersUrl] = useState("");
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
+
   const update = (field: keyof OrganismeInfo, value: string) => {
     onChange({ ...data, [field]: value });
+  };
+
+  const fetchPappers = async () => {
+    if (!pappersUrl.includes("pappers.fr")) {
+      toast({ title: "Erreur", description: "Veuillez coller un lien Pappers valide", variant: "destructive" });
+      return;
+    }
+    setLoading(true);
+    try {
+      const { data: result, error } = await supabase.functions.invoke("pappers-scrape", {
+        body: { url: pappersUrl },
+      });
+      if (error || !result?.success) {
+        throw new Error(result?.error || error?.message || "Erreur inconnue");
+      }
+      const d = result.data;
+      onChange({
+        ...data,
+        nom: d.nom || data.nom,
+        siret: d.siret || data.siret,
+        adresse: d.adresse || data.adresse,
+        codePostal: d.codePostal || data.codePostal,
+        ville: d.ville || data.ville,
+        dirigeant: d.dirigeant || data.dirigeant,
+        domainesFormation: d.domainesFormation || data.domainesFormation,
+        nda: d.nda || data.nda,
+        siteWeb: d.siteWeb || data.siteWeb,
+      });
+      toast({ title: "Importé", description: "Les informations Pappers ont été récupérées" });
+    } catch (err: any) {
+      toast({ title: "Erreur", description: err.message || "Impossible de récupérer les données", variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const toggleType = (type: OrganismeInfo['typesActions'][0]) => {
@@ -35,6 +77,24 @@ const OrganismeForm = ({ data, onChange }: OrganismeFormProps) => {
       <div className="mb-6">
         <h2 className="text-xl font-bold font-heading">Informations de l'organisme</h2>
         <p className="text-sm text-muted-foreground">Renseignez les informations de votre organisme de formation</p>
+      </div>
+
+      {/* Pappers import */}
+      <div className="md:col-span-2 p-4 border border-dashed border-primary/30 rounded-lg bg-muted/30">
+        <Label htmlFor="pappersUrl" className="font-semibold">Importer depuis Pappers</Label>
+        <p className="text-xs text-muted-foreground mb-2">Collez le lien Pappers de votre entreprise pour remplir automatiquement le formulaire</p>
+        <div className="flex gap-2">
+          <Input
+            id="pappersUrl"
+            value={pappersUrl}
+            onChange={e => setPappersUrl(e.target.value)}
+            placeholder="https://www.pappers.fr/entreprise/mon-organisme-123456789"
+            className="flex-1"
+          />
+          <Button onClick={fetchPappers} disabled={loading || !pappersUrl} variant="default" size="sm">
+            {loading ? "Chargement..." : "Importer"}
+          </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
