@@ -1,6 +1,6 @@
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 };
 
 Deno.serve(async (req) => {
@@ -18,97 +18,77 @@ Deno.serve(async (req) => {
       );
     }
 
-    console.log('Fetching Pappers URL:', url);
+    // Extract SIREN/SIRET from Pappers URL (e.g. /entreprise/nom-123456789)
+    const sirenMatch = url.match(/(\d{9,14})/);
+    if (!sirenMatch) {
+      return new Response(
+        JSON.stringify({ success: false, error: 'Impossible de trouver le SIREN/SIRET dans l\'URL' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
-    const response = await fetch(url, {
+    const siren = sirenMatch[1].slice(0, 9); // Take first 9 digits = SIREN
+    console.log('Fetching Pappers API for SIREN:', siren);
+
+    // Use Pappers public search page as JSON source
+    const apiUrl = `https://recherche.pappers.fr/v2/entreprise?siren=${siren}`;
+    
+    const response = await fetch(apiUrl, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml',
-        'Accept-Language': 'fr-FR,fr;q=0.9',
+        'Accept': 'application/json',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        'Referer': 'https://www.pappers.fr/',
       },
     });
 
     if (!response.ok) {
+      // Fallback: try the suggestions API
+      const searchUrl = `https://suggestions.pappers.fr/v2?q=${siren}&cibles=nom_entreprise,siren,siret`;
+      const searchResp = await fetch(searchUrl, {
+        headers: {
+          'Accept': 'application/json',
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        },
+      });
+      
+      if (!searchResp.ok) {
+        const body = await searchResp.text();
+        console.error('Search API error:', searchResp.status, body);
+        return new Response(
+          JSON.stringify({ success: false, error: `Erreur API Pappers: ${searchResp.status}` }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      
+      const searchData = await searchResp.json();
+      console.log('Search results:', JSON.stringify(searchData).slice(0, 500));
+      
+      const company = searchData?.resultats_siren?.[0] || searchData?.resultats_nom_entreprise?.[0] || searchData?.[0];
+      
+      if (!company) {
+        return new Response(
+          JSON.stringify({ success: false, error: 'Entreprise non trouvée' }),
+          { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      
+      const result = extractCompanyData(company);
+      console.log('Parsed from search:', JSON.stringify(result));
+      
       return new Response(
-        JSON.stringify({ success: false, error: `Erreur HTTP ${response.status}` }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ success: true, data: result }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    const html = await response.text();
-
-    // Extract company name from <h1> or <title>
-    const nomMatch = html.match(/<h1[^>]*>([^<]+)</) || html.match(/<title>([^<|]+)/);
-    const nom = nomMatch ? nomMatch[1].trim().replace(/\s*\(.*?\)\s*$/, '') : '';
-
-    // Extract SIREN from URL or page content
-    const sirenFromUrl = url.match(/(\d{9,14})/);
-    let siret = '';
-    let siren = sirenFromUrl ? sirenFromUrl[1] : '';
+    const data = await response.json();
+    console.log('API response keys:', Object.keys(data));
     
-    // Try to find SIRET (14 digits) in page
-    const siretMatch = html.match(/SIRET[^0-9]*(\d{3}\s?\d{3}\s?\d{3}\s?\d{5})/i) || 
-                        html.match(/(\d{14})/);
-    if (siretMatch) {
-      siret = siretMatch[1].replace(/\s/g, '');
-    } else if (siren.length === 9) {
-      siret = siren; // We'll just use SIREN
-    }
-
-    // Extract address
-    const adresseMatch = html.match(/Adresse[^:]*:\s*<\/[^>]+>\s*<[^>]+>([^<]+)/i) ||
-                          html.match(/Siège social[^:]*:\s*([^<]+)/i) ||
-                          html.match(/(?:adresse|siege)[^"]*"[^"]*"[^>]*>([^<]+)/i);
-    let adresse = '', codePostal = '', ville = '';
-    if (adresseMatch) {
-      const fullAddr = adresseMatch[1].trim();
-      const cpVilleMatch = fullAddr.match(/,?\s*(\d{5})\s+(.+)$/);
-      if (cpVilleMatch) {
-        codePostal = cpVilleMatch[1];
-        ville = cpVilleMatch[2].trim();
-        adresse = fullAddr.replace(/,?\s*\d{5}\s+.+$/, '').trim();
-      } else {
-        adresse = fullAddr;
-      }
-    }
-
-    // Extract dirigeant
-    const dirigeantMatch = html.match(/Dirigeants?[^:]*:\s*<\/[^>]+>\s*<[^>]+>[^>]*>([^<]+)/i) ||
-                           html.match(/dirigeant[^"]*"[^"]*"[^>]*>[^>]*>([^<]+)/i);
-    const dirigeant = dirigeantMatch ? dirigeantMatch[1].trim() : '';
-
-    // Extract activity / domaine
-    const activiteMatch = html.match(/Activit[ée][^:]*:\s*<\/[^>]+>\s*<[^>]+>([^<]+)/i);
-    const domainesFormation = activiteMatch ? activiteMatch[1].trim() : '';
-
-    // Try to extract NDA (Numéro de Déclaration d'Activité) - unlikely on Pappers
-    const ndaMatch = html.match(/(?:NDA|déclaration d'activité)[^0-9]*(\d{11})/i);
-    const nda = ndaMatch ? ndaMatch[1] : '';
-
-    // Try site web
-    const siteMatch = html.match(/site[^:]*:\s*<\/[^>]+>\s*<[^>]+href="([^"]+)"/i);
-    const siteWeb = siteMatch ? siteMatch[1] : '';
-
-    const result = {
-      success: true,
-      data: {
-        nom,
-        siret,
-        siren,
-        adresse,
-        codePostal,
-        ville,
-        dirigeant,
-        domainesFormation,
-        nda,
-        siteWeb,
-      }
-    };
-
-    console.log('Parsed data:', JSON.stringify(result.data));
+    const result = extractCompanyData(data);
+    console.log('Parsed data:', JSON.stringify(result));
 
     return new Response(
-      JSON.stringify(result),
+      JSON.stringify({ success: true, data: result }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {
@@ -119,3 +99,44 @@ Deno.serve(async (req) => {
     );
   }
 });
+
+function extractCompanyData(data: any) {
+  // Handle various Pappers API response formats
+  const nom = data.nom_complet || data.nom_entreprise || data.denomination || '';
+  const siret = data.siege?.siret || data.siret || '';
+  const siren = data.siren || '';
+  
+  // Address
+  const siege = data.siege || data;
+  const adresse = siege.adresse_ligne_1 || siege.adresse || '';
+  const codePostal = siege.code_postal || '';
+  const ville = siege.ville || siege.libelle_commune || '';
+  
+  // Dirigeant
+  let dirigeant = '';
+  if (data.representants && data.representants.length > 0) {
+    const rep = data.representants[0];
+    dirigeant = `${rep.prenom || ''} ${rep.nom || ''}`.trim();
+  } else if (data.dirigeants && data.dirigeants.length > 0) {
+    const dir = data.dirigeants[0];
+    dirigeant = `${dir.prenom || ''} ${dir.nom || ''}`.trim();
+  }
+  
+  // Activity
+  const domainesFormation = data.libelle_activite_principale || 
+                             siege.libelle_activite_principale ||
+                             data.activite_principale || '';
+
+  return {
+    nom,
+    siret: siret || (siren ? siren : ''),
+    siren,
+    adresse,
+    codePostal,
+    ville,
+    dirigeant,
+    domainesFormation,
+    nda: '',
+    siteWeb: '',
+  };
+}
