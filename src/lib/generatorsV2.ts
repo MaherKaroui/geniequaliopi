@@ -628,28 +628,56 @@ export function genExercicesStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
   ];
   const profile = profiles[stagiaireIdx % profiles.length];
 
-  // Approach descriptions — unique ways each stagiaire tackles exercises
-  const approaches = [
-    `${s.prenom} a débuté par une lecture attentive de la consigne, puis a structuré son travail en listant les étapes clés avant de commencer. Son approche est linéaire et méthodique.`,
-    `${s.prenom} a immédiatement identifié les points essentiels et s'est lancé(e) dans la réalisation en commençant par les aspects les plus complexes. Approche confiante et efficace.`,
-    `${s.prenom} a demandé des clarifications au formateur avant de démarrer. Après avoir bien compris les attentes, a procédé étape par étape en vérifiant régulièrement son avancement.`,
-    `${s.prenom} a d'abord fait un brouillon rapide pour organiser ses idées, puis a rédigé sa réponse proprement. A pris le temps de relire et corriger avant de rendre.`,
-    `${s.prenom} a hésité au départ, a relu la consigne plusieurs fois. A finalement commencé par les parties les mieux maîtrisées avant de s'attaquer aux points plus difficiles.`,
-    `${s.prenom} a travaillé de manière très autonome, en consultant ses notes personnelles prises pendant la formation. A enrichi sa réponse d'exemples concrets tirés de son expérience professionnelle.`,
-    `${s.prenom} a commencé rapidement mais a dû revenir en arrière pour corriger une erreur de compréhension. La deuxième tentative était nettement meilleure et plus structurée.`,
-    `${s.prenom} a pris beaucoup de notes pendant l'exercice et a adopté une démarche progressive. Chaque étape a été validée avant de passer à la suivante.`,
-    `${s.prenom} a fait preuve d'initiative en proposant une approche originale. A su combiner les connaissances acquises avec son expérience pour produire un travail personnalisé.`,
-    `${s.prenom} a eu besoin de plus de temps que prévu mais a produit un travail soigné. A privilégié la qualité à la rapidité, en vérifiant chaque détail.`,
+  // Introductory phrases that a real student would use to start their answer
+  const introsPhrases = [
+    `Pour répondre à cette consigne, je vais procéder de la manière suivante.`,
+    `Voici ma réponse à cet exercice, en m'appuyant sur ce que nous avons vu en formation.`,
+    `Je vais traiter cet exercice en suivant la méthodologie que nous avons apprise.`,
+    `Suite aux enseignements de la formation, voici mon travail sur cet exercice.`,
+    `En m'appuyant sur les acquis de cette formation, je propose le travail suivant.`,
+    `Voici le travail que j'ai réalisé pour cet exercice pratique.`,
+    `Je vais répondre à cette consigne en appliquant les connaissances acquises durant la formation.`,
+    `Après avoir bien lu la consigne, voici ma production pour cet exercice.`,
+    `En me basant sur ce que j'ai appris, voici ma réponse détaillée.`,
+    `Je vais répondre point par point à cette consigne en utilisant les outils vus en formation.`,
   ];
-  const approachIdx = (hash + stagiaireIdx * 7) % approaches.length;
+
+  // Transition/connector phrases to expand answers
+  const connectors = [
+    `De plus, il est important de souligner que`,
+    `Par ailleurs, je tiens à préciser que`,
+    `En complément, je voudrais ajouter que`,
+    `Il convient également de mentionner que`,
+    `J'ajouterais aussi que`,
+    `Un autre point essentiel est que`,
+    `Sur ce dernier point, je pense que`,
+    `Pour compléter ma réponse, je note que`,
+  ];
+
+  // Conclusion phrases
+  const conclusions = [
+    `En conclusion, je pense que cet exercice m'a permis de mieux comprendre les enjeux pratiques de ce sujet et de consolider mes acquis.`,
+    `Pour résumer, j'ai essayé d'appliquer au mieux la méthodologie apprise et je suis satisfait(e) du résultat obtenu.`,
+    `En définitive, ce travail m'a permis de mettre en pratique les notions vues en formation et de vérifier ma compréhension.`,
+    `Au final, je considère avoir traité les points essentiels de la consigne en m'appuyant sur les enseignements reçus.`,
+    `Je termine en soulignant que cet exercice m'a conforté(e) dans ma compréhension du sujet et m'a donné confiance pour l'appliquer en situation professionnelle.`,
+    `Pour conclure, j'ai pu mettre en application les compétences acquises et je me sens plus à l'aise sur ce type de problématique.`,
+  ];
+
+  // Personal experience additions
+  const experienceAdditions = [
+    `Dans mon expérience professionnelle chez ${s.entreprise}, j'ai déjà été confronté(e) à ce type de situation et je peux confirmer que la méthode proposée est tout à fait adaptée au terrain.`,
+    `Au sein de ${s.entreprise}, nous utilisons une approche similaire, ce qui me conforte dans la pertinence de cette méthodologie.`,
+    `J'ai pu faire le lien avec mon poste de ${s.poste} chez ${s.entreprise}, où ces compétences sont régulièrement mobilisées.`,
+    `Cette formation me sera très utile dans mes fonctions chez ${s.entreprise} car je suis amené(e) à traiter ce type de problématique au quotidien.`,
+    `En tant que ${s.poste}, je vois immédiatement comment appliquer ces acquis dans mon travail chez ${s.entreprise}.`,
+  ];
 
   selectedExercices.forEach((ex, localIdx) => {
     const ei = blockStart + localIdx;
-    // Truly varied notes: use profile + exercise-specific variation
     const exSeed = ((hash * 13 + ei * 37 + stagiaireIdx * 29) & 0x7FFFFFFF) % 100;
     let noteBase = profile.baseNote;
-    // Add exercise-specific variation: -1.5 to +0.5
-    const variation = ((exSeed % 20) - 10) / 10; // -1.0 to +1.0
+    const variation = ((exSeed % 20) - 10) / 10;
     const rawNote = noteBase + variation;
     const noteRound = Math.max(1, Math.min(5, Math.round(rawNote * 2) / 2));
     totalNote += noteRound;
@@ -661,72 +689,60 @@ export function genExercicesStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
     extra += `<p><strong>Consigne :</strong></p><p>${ex.consigne}</p>`;
     extra += `<p><strong>Travail réalisé par ${s.prenom} ${s.nom} :</strong></p>`;
 
-    // Detailed approach description
-    const approachText = approaches[(approachIdx + ei) % approaches.length];
-    
-    // Generate the actual stagiaire work — long, realistic, exercise-specific
     const repBase = ex.reponseAttendue;
-    const repSentences = repBase.split(/(?<=[.!])\s+/).filter(s => s.trim());
+    // Replace any brackets with realistic values
+    const repClean = repBase
+      .replace(/\[Name\]/gi, 'Mme Dupont')
+      .replace(/\[company\]/gi, s.entreprise || 'notre entreprise')
+      .replace(/\[position\]/gi, s.poste || 'collaborateur')
+      .replace(/\[tasks?\]/gi, 'la gestion des projets et le suivi des équipes')
+      .replace(/\[date\]/gi, 'le 15 du mois prochain')
+      .replace(/\[.*?\]/g, '');
+    const repSentences = repClean.split(/(?<=[.!])\s+/).filter(s => s.trim());
     const seed = ((hash * 17 + stagiaireIdx * 11 + ei * 23) & 0x7FFFFFFF) % 6;
+    const introIdx = (hash + stagiaireIdx * 3 + ei * 7) % introsPhrases.length;
+    const connIdx = (hash + stagiaireIdx * 5 + ei * 11) % connectors.length;
+    const concIdx = (hash + stagiaireIdx * 7 + ei * 13) % conclusions.length;
+    const expIdx = (hash + stagiaireIdx * 9 + ei * 17) % experienceAdditions.length;
 
     if (noteRound >= 4.5) {
-      // Excellent work: full answer + enrichments + personal additions
-      const enrichments = [
-        `De plus, ${s.prenom} a ajouté une vérification croisée des résultats en utilisant une méthode alternative, confirmant la validité de sa démarche. Le document final est structuré avec des titres clairs, une numérotation logique et des annotations explicatives pour chaque étape.`,
-        `${s.prenom} a également proposé des améliorations par rapport à la consigne initiale, en intégrant des éléments de bonnes pratiques professionnelles observées dans son environnement de travail. Le rendu est enrichi d'exemples concrets et de cas d'usage.`,
-        `Le travail inclut une section « points d'attention » que ${s.prenom} a spontanément ajoutée pour anticiper les erreurs courantes. La mise en forme est professionnelle et le document est directement exploitable en situation réelle.`,
-        `${s.prenom} a documenté sa démarche étape par étape, permettant une parfaite traçabilité du raisonnement. Le livrable final intègre des éléments visuels (schémas, tableaux récapitulatifs) qui facilitent la compréhension.`,
-        `En complément de la réponse attendue, ${s.prenom} a réalisé une synthèse comparative avec les pratiques habituelles de son entreprise ${s.entreprise}, montrant une réelle capacité de transfert des acquis en contexte professionnel.`,
-        `${s.prenom} a terminé l'exercice en avance et a profité du temps restant pour peaufiner la présentation et vérifier la cohérence globale. Le résultat témoigne d'une maîtrise approfondie et d'un souci du détail remarquable.`,
-      ];
-      extra += `<p><em>${approachText}</em></p>`;
-      extra += `<p>${repBase}</p>`;
-      extra += `<p>${enrichments[seed]}</p>`;
+      // Excellent: long, complete, detailed answer
+      extra += `<p>${introsPhrases[introIdx]}</p>`;
+      extra += `<p>${repClean}</p>`;
+      extra += `<p>${connectors[connIdx]} dans ce contexte, il faut aussi prendre en compte les spécificités du public concerné et adapter notre approche en conséquence. `;
+      extra += `La rigueur dans l'application de cette méthode est essentielle pour garantir des résultats de qualité. `;
+      extra += `Il est aussi nécessaire de documenter chaque étape afin de pouvoir justifier nos choix et assurer la traçabilité de notre démarche.</p>`;
+      extra += `<p>${experienceAdditions[expIdx]}</p>`;
+      extra += `<p>${conclusions[concIdx]}</p>`;
 
     } else if (noteRound >= 3.5) {
-      // Good work: most of the answer + some gaps
+      // Good: covers most of the answer but misses some points
       const coveredPart = repSentences.slice(0, Math.max(2, Math.ceil(repSentences.length * 0.75))).join(' ');
-      const gaps = [
-        `Cependant, ${s.prenom} n'a pas eu le temps de finaliser la dernière partie de l'exercice. La mise en forme du document final est restée à l'état de brouillon. Les étapes principales sont néanmoins correctement traitées et la logique de la démarche est cohérente.`,
-        `Un point a été traité de manière approximative : ${s.prenom} a inversé deux étapes dans la procédure, ce qui a entraîné un résultat légèrement différent de l'attendu. Après indication du formateur, la correction a été comprise et notée pour la suite.`,
-        `${s.prenom} a bien traité le cœur de l'exercice mais a omis de vérifier certains détails techniques. La réponse est globalement correcte mais manque de rigueur sur les aspects de finition. L'essentiel des compétences est démontré.`,
-        `Le travail est de bonne qualité dans l'ensemble. ${s.prenom} a cependant commis une erreur de calcul/raisonnement sur un point secondaire, détectée lors de la relecture. La correction a été apportée partiellement dans le temps imparti.`,
-        `${s.prenom} a répondu à la majorité des exigences de la consigne. Il manque toutefois l'analyse critique finale et les recommandations personnalisées qui auraient permis d'atteindre l'excellence. Le socle de compétences est néanmoins bien démontré.`,
-        `Bonne réalisation dans l'ensemble. ${s.prenom} a été perturbé(e) par un aspect technique qu'il/elle ne maîtrisait pas encore parfaitement, ce qui a ralenti la progression. Les parties réalisées sont de qualité satisfaisante.`,
-      ];
-      extra += `<p><em>${approachText}</em></p>`;
+      extra += `<p>${introsPhrases[introIdx]}</p>`;
       extra += `<p>${coveredPart}</p>`;
-      extra += `<p>${gaps[seed]}</p>`;
+      extra += `<p>${connectors[connIdx]} c'est un sujet que j'ai trouvé intéressant et que j'aimerais approfondir davantage. `;
+      extra += `Je n'ai pas eu le temps de détailler tous les aspects mais je pense avoir couvert les points principaux. `;
+      extra += `Il me reste à consolider certains aspects plus techniques que nous avons vus en fin de session.</p>`;
+      extra += `<p>${conclusions[(concIdx + 1) % conclusions.length]}</p>`;
 
     } else if (noteRound >= 2.5) {
-      // Partial work: only basics covered
+      // Partial: only basics, some confusion
       const basicPart = repSentences.slice(0, Math.max(1, Math.ceil(repSentences.length * 0.4))).join(' ');
-      const struggles = [
-        `${s.prenom} a eu des difficultés à structurer sa réponse. Après plusieurs tentatives, seule la première partie de l'exercice a été complétée. Les concepts théoriques semblent compris à l'oral mais leur application concrète pose encore problème. ${s.prenom} a noté les points à retravailler et a demandé des ressources complémentaires.`,
-        `Le travail de ${s.prenom} montre une compréhension partielle du sujet. La démarche est correcte dans ses grandes lignes mais les erreurs s'accumulent à mesure que la complexité augmente. L'aide du formateur a été sollicitée à trois reprises pendant l'exercice. ${s.prenom} a pris des notes détaillées sur les corrections apportées.`,
-        `${s.prenom} a réussi les premières étapes mais s'est retrouvé(e) bloqué(e) sur la partie centrale de l'exercice. Malgré les indications fournies, la finalisation n'a pas pu être menée à terme. Les fondamentaux sont en cours d'acquisition et nécessitent une pratique régulière supplémentaire.`,
-        `La réalisation de ${s.prenom} est en-deçà des attendus. L'exercice a révélé des lacunes sur des prérequis qui étaient supposés acquis. ${s.prenom} a fait preuve de bonne volonté et a tenté plusieurs approches, mais le résultat final reste incomplet. Un plan de rattrapage sera proposé.`,
-        `${s.prenom} a travaillé avec application mais la vitesse d'exécution est insuffisante. Seule la moitié de l'exercice a été traitée dans le temps imparti. Les parties réalisées sont de qualité acceptable mais le manque de pratique est évident. ${s.prenom} reconnaît la nécessité de s'entraîner davantage.`,
-        `Malgré une bonne compréhension orale des explications, ${s.prenom} a eu du mal à transposer les connaissances théoriques en actions concrètes. Le travail rendu est partiel et comporte plusieurs erreurs de méthodologie. ${s.prenom} a identifié ses points faibles et s'est montré(e) motivé(e) pour progresser.`,
-      ];
-      extra += `<p><em>${approachText}</em></p>`;
+      extra += `<p>${introsPhrases[(introIdx + 2) % introsPhrases.length]}</p>`;
       extra += `<p>${basicPart}</p>`;
-      extra += `<p>${struggles[seed]}</p>`;
+      extra += `<p>Je pense que c'est à peu près ça mais je ne suis pas totalement sûr(e) de tous les détails. `;
+      extra += `J'ai eu du mal avec certaines parties de l'exercice, notamment sur les aspects plus techniques. `;
+      extra += `Je comprends le principe général mais l'application concrète me pose encore quelques difficultés. `;
+      extra += `J'aurais besoin de revoir mes notes et de m'entraîner davantage sur ce type d'exercice pour être plus à l'aise.</p>`;
 
     } else {
-      // Major difficulties
-      const minimalPart = repSentences[0] || repBase.split('.')[0] + '.';
-      const blocks = [
-        `${s.prenom} n'a pas réussi à dépasser la phase de compréhension de la consigne. Malgré une reformulation par le formateur et deux tentatives, le travail produit ne correspond pas aux attendus. ${s.prenom} a exprimé le besoin d'une révision complète des fondamentaux avant de pouvoir aborder ce type d'exercice. Un accompagnement individuel renforcé est programmé pour la prochaine session.`,
-        `L'exercice s'est avéré trop complexe pour le niveau actuel de ${s.prenom}. Les prérequis nécessaires ne sont pas suffisamment consolidés. ${s.prenom} a tenté de s'appuyer sur ses notes mais n'a pas pu identifier les étapes à suivre de manière autonome. Le formateur a proposé un exercice simplifié en alternative, que ${s.prenom} a mieux réussi (cf. remarques ci-dessous).`,
-        `${s.prenom} a passé la majeure partie du temps à essayer de comprendre ce qui était demandé. Les quelques éléments produits sont très éloignés de la réponse attendue. Il apparaît clairement que les notions de base doivent être reprises intégralement. Un programme de remédiation personnalisé avec des exercices progressifs sera mis en place.`,
-        `Malgré la bonne volonté manifeste de ${s.prenom}, le résultat est très insuffisant. L'exercice a mis en lumière des lacunes importantes qui n'avaient pas été détectées lors des phases théoriques. ${s.prenom} a besoin d'un tutorat individuel et d'une série d'exercices de niveau inférieur pour construire progressivement les compétences requises.`,
-        `${s.prenom} a rencontré un blocage complet sur cet exercice. Après plusieurs tentatives infructueuses et l'intervention du formateur, seule une ébauche de réponse a pu être produite. ${s.prenom} est conscient(e) des difficultés et a demandé des exercices supplémentaires pour s'entraîner en dehors des heures de formation.`,
-        `Le travail de ${s.prenom} sur cet exercice n'est pas exploitable en l'état. Les erreurs sont trop nombreuses et la méthodologie n'est pas acquise. Le formateur a pris le temps d'expliquer individuellement les points clés et a fourni des ressources complémentaires. Un suivi rapproché est prévu pour accompagner la progression de ${s.prenom}.`,
-      ];
-      extra += `<p><em>${approachText}</em></p>`;
+      // Major difficulties: minimal answer
+      const minimalPart = repSentences[0] || repClean.split('.')[0] + '.';
+      extra += `<p>J'ai essayé de répondre à la consigne mais c'est un sujet que je ne maîtrise pas encore bien.</p>`;
       extra += `<p>${minimalPart}</p>`;
-      extra += `<p>${blocks[seed]}</p>`;
+      extra += `<p>Honnêtement, je n'ai pas réussi à aller plus loin. Je n'ai pas bien compris comment appliquer ce qu'on a vu en cours à cet exercice. `;
+      extra += `J'ai besoin de revoir les bases et de m'exercer plus. Je vais relire mes notes et demander des explications supplémentaires au formateur. `;
+      extra += `Je suis motivé(e) pour progresser mais cet exercice était trop difficile pour mon niveau actuel.</p>`;
     }
 
     // Formateur correction — unique, referencing the specific work
