@@ -65,11 +65,6 @@ const Index = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background p-4">
         <div className="max-w-2xl text-center space-y-8">
-          <div className="flex justify-center">
-            <div className="w-20 h-20 rounded-2xl bg-gradient-hero flex items-center justify-center shadow-elevated">
-              <Shield className="w-10 h-10 text-primary-foreground" />
-            </div>
-          </div>
           <div>
             <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
               <span className="text-gradient-hero">Qualiopi</span> Generator
@@ -80,12 +75,11 @@ const Index = () => {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
             {[
-              { icon: Package, title: "~500 documents", desc: "Dossier complet prêt pour audit avec toutes les preuves" },
-              { icon: Shield, title: "32 indicateurs", desc: "Couverture intégrale du Référentiel National Qualité" },
-              { icon: Sparkles, title: "Pré-rempli", desc: "Documents remplis avec données réalistes et signatures" },
+              { title: "~500 documents", desc: "Dossier complet prêt pour audit avec toutes les preuves" },
+              { title: "32 indicateurs", desc: "Couverture intégrale du Référentiel National Qualité" },
+              { title: "Pré-rempli", desc: "Documents remplis avec données réalistes et signatures" },
             ].map((item, i) => (
               <div key={i} className="p-5 bg-card rounded-xl border shadow-card">
-                <item.icon className="w-8 h-8 text-primary mb-3" />
                 <h3 className="font-semibold text-sm">{item.title}</h3>
                 <p className="text-xs text-muted-foreground mt-1">{item.desc}</p>
               </div>
