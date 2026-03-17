@@ -320,7 +320,7 @@ export function genContratFormationProStagiaire(o: OrganismeInfo, f: FormationIn
     <p>En cas de litige, les parties s'efforceront de trouver une solution amiable. À défaut, le litige sera porté devant les juridictions compétentes.</p>
     <h3>Article 14 – Entrée en vigueur</h3>
     <p>Le présent contrat prend effet à la date de sa signature par les deux parties.</p>
-    <p><strong>Fait à ${o.ville}, le :</strong> ${formatDate(subtractBusinessDays(f.dateDebut || new Date().toISOString(), 14))}</p>
+    <p><strong>Fait à ${o.ville}, le :</strong> ${formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || new Date().toISOString(), 14))}</p>
   `;
   extra += sigBlock(
     `Pour l'Organisme de formation<br>${o.nom}`, o.dirigeant, orgSig(o),
