@@ -899,8 +899,8 @@ function generateFullAnswer(expected: string, stagiaireIndex: number, questionIn
   return intro + varied.join(' ') + expansions[seed] + closings[seed];
 }
 
-function generatePartialAnswer(expected: string, seed: number, stagiaireIndex: number, questionIndex: number): string {
-  const cleaned = cleanBrackets(expected);
+function generatePartialAnswer(expected: string, seed: number, stagiaireIndex: number, questionIndex: number, stagiaireInfo?: { nom?: string; prenom?: string; entreprise?: string; poste?: string }): string {
+  const cleaned = cleanBrackets(expected, stagiaireInfo?.nom, stagiaireInfo?.prenom, stagiaireInfo?.entreprise, stagiaireInfo?.poste);
   const sentences = cleaned.split(/(?<=[.!])\s+/).filter(s => s.trim());
   const variation = (stagiaireIndex * 11 + questionIndex * 3) % 3;
   
