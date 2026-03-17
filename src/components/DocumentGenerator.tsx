@@ -457,7 +457,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
                           <span className="text-xs font-semibold text-primary">I{ind.numero}</span>
                           <span className="text-xs truncate flex-1">{ind.titre}</span>
                           <span className="text-xs text-muted-foreground shrink-0">{indDocs.length} docs</span>
-                          {indGenerated === indDocs.length && indDocs.length > 0 && <CheckCircle2 className="w-3 h-3 text-accent shrink-0" />}
+                          {indGenerated === indDocs.length && indDocs.length > 0 && <span className="text-xs text-accent font-bold shrink-0">✓</span>}
                         </button>
 
                         {isIndExpanded && (
