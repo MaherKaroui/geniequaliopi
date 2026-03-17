@@ -53,6 +53,19 @@ function formatPhone(raw: string | number | undefined): string {
   return String(raw);
 }
 
+// Helper: find value from row by trying multiple possible column names (case-insensitive, trimmed)
+function getCol(row: Record<string, any>, ...keys: string[]): any {
+  for (const key of keys) {
+    const kl = key.toLowerCase().trim();
+    for (const col of Object.keys(row)) {
+      if (col.toLowerCase().trim() === kl || col.toLowerCase().trim().replace(/[\s_]+/g, "_") === kl.replace(/[\s_]+/g, "_")) {
+        if (row[col] !== "" && row[col] !== undefined && row[col] !== null) return row[col];
+      }
+    }
+  }
+  return "";
+}
+
 export function parseEdofXlsx(data: ArrayBuffer): EdofSession[] {
   const workbook = XLSX.read(data, { type: "array" });
   const sheet = workbook.Sheets[workbook.SheetNames[0]];
@@ -62,7 +75,7 @@ export function parseEdofXlsx(data: ArrayBuffer): EdofSession[] {
   const groups = new Map<string, { rows: Record<string, any>[] }>();
 
   for (const row of rows) {
-    const title = row["INTITULE_FORMATION"] || row["INTITULE_CERTIF/THEM"] || "";
+    const title = getCol(row, "INTITULE_FORMATION", "INTITULE FORMATION", "INTITULE_CERTIF/THEM", "INTITULE CERTIF/THEM", "INTITULE", "Formation");
     if (!title) continue;
     if (!groups.has(title)) {
       groups.set(title, { rows: [] });
