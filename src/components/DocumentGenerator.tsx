@@ -6,7 +6,7 @@ import { setDocStyle } from "@/lib/docBuilder";
 import { SAMPLE_FORMATIONS, SAMPLE_FORMATEURS, mergeStagiaires, mergeOrganisme } from "@/lib/sampleData";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FileText, Download, Eye, ChevronDown, ChevronRight, FolderOpen, Folder, Package, X, CheckCircle2, Loader2, BookOpen, Edit3, Save, User, FileDown } from "lucide-react";
+import { ChevronDown, ChevronRight, X, Loader2 } from "lucide-react";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import DocStyleConfigPanel from "./DocStyleConfigPanel";
