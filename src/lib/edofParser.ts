@@ -128,18 +128,23 @@ export function parseEdofXlsx(data: ArrayBuffer): EdofSession[] {
       formateur: sampleMatch?.formateur || "",
     };
 
-    const stagiaires: StagiaireInfo[] = group.rows.map(row => ({
-      nom: String(getCol(row, "NOM", "Nom") || "").toUpperCase(),
-      prenom: String(getCol(row, "PRENOM", "Prénom", "Prenom") || "").charAt(0).toUpperCase() + String(getCol(row, "PRENOM", "Prénom", "Prenom") || "").slice(1).toLowerCase(),
-      email: String(getCol(row, "COURRIEL", "EMAIL", "Mail", "E-mail", "Courriel") || "").replace(/\\/g, ""),
-      telephone: formatPhone(getCol(row, "NUMERO_TELEPHONE_PORTABLE", "NUMERO TELEPHONE PORTABLE", "TELEPHONE", "Téléphone", "Tel", "Tél") || getCol(row, "NUMERO_TELEPHONE_FIXE", "NUMERO TELEPHONE FIXE")),
-      entreprise: String(getCol(row, "ENTREPRISE", "Entreprise", "SOCIETE", "Société") || ""),
-      poste: String(getCol(row, "POSTE", "Poste", "FONCTION", "Fonction") || ""),
-      dateNaissance: parseEdofDate(getCol(row, "DATE_DE_NAISSANCE", "DATE DE NAISSANCE", "DATE_NAISSANCE", "Date naissance")),
-      dateDebutFormation: parseEdofDate(getCol(row, "DATE_DEBUT_SESSION", "DATE DEBUT SESSION", "DATE_DEBUT", "DATE DEBUT", "Début", "Date début")),
-      dateFinFormation: parseEdofDate(getCol(row, "DATE_FIN_SESSION", "DATE FIN SESSION", "DATE_FIN", "DATE FIN", "Fin", "Date fin")),
-      signatureUrl: "",
-    }));
+    const stagiaires: StagiaireInfo[] = group.rows.map(row => {
+      const montant = getCol(row, "MONTANT_FORMATION", "MONTANT FORMATION", "MONTANT", "Tarif", "Prix", "COUT", "Coût");
+      const tarifStr = montant ? `${parseFloat(String(montant)).toLocaleString("fr-FR")} € HT` : "";
+      return {
+        nom: String(getCol(row, "NOM", "Nom") || "").toUpperCase(),
+        prenom: String(getCol(row, "PRENOM", "Prénom", "Prenom") || "").charAt(0).toUpperCase() + String(getCol(row, "PRENOM", "Prénom", "Prenom") || "").slice(1).toLowerCase(),
+        email: String(getCol(row, "COURRIEL", "EMAIL", "Mail", "E-mail", "Courriel") || "").replace(/\\/g, ""),
+        telephone: formatPhone(getCol(row, "NUMERO_TELEPHONE_PORTABLE", "NUMERO TELEPHONE PORTABLE", "TELEPHONE", "Téléphone", "Tel", "Tél") || getCol(row, "NUMERO_TELEPHONE_FIXE", "NUMERO TELEPHONE FIXE")),
+        entreprise: String(getCol(row, "ENTREPRISE", "Entreprise", "SOCIETE", "Société") || ""),
+        poste: String(getCol(row, "POSTE", "Poste", "FONCTION", "Fonction") || ""),
+        dateNaissance: parseEdofDate(getCol(row, "DATE_DE_NAISSANCE", "DATE DE NAISSANCE", "DATE_NAISSANCE", "Date naissance")),
+        dateDebutFormation: parseEdofDate(getCol(row, "DATE_DEBUT_SESSION", "DATE DEBUT SESSION", "DATE_DEBUT", "DATE DEBUT", "Début", "Date début")),
+        dateFinFormation: parseEdofDate(getCol(row, "DATE_FIN_SESSION", "DATE FIN SESSION", "DATE_FIN", "DATE FIN", "Fin", "Date fin")),
+        tarifFormation: tarifStr,
+        signatureUrl: "",
+      };
+    });
 
     sessions.push({ formation, stagiaires });
   }
