@@ -43,10 +43,9 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
 
       {data.length === 0 && (
         <div className="text-center py-12 bg-secondary/50 rounded-xl border border-dashed border-border">
-          <Users className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
           <p className="text-muted-foreground">Aucun stagiaire ajouté</p>
-          <Button onClick={addStagiaire} variant="outline" size="sm" className="mt-3 gap-2">
-            <Plus className="w-4 h-4" /> Ajouter un stagiaire
+          <Button onClick={addStagiaire} variant="outline" size="sm" className="mt-3">
+            + Ajouter un stagiaire
           </Button>
         </div>
       )}
