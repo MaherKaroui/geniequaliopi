@@ -27,8 +27,7 @@ const LogoSignatureUpload = ({ logoUrl, signatureUrl, tamponUrl, onLogoChange, o
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-4 bg-secondary/50 rounded-xl border">
       {/* Logo */}
       <div>
-        <Label className="mb-2 block font-semibold flex items-center gap-2">
-          <Image className="w-4 h-4 text-primary" /> Logo de l'organisme
+        <Label className="mb-2 block font-semibold">
         </Label>
         <div className="flex items-center gap-3">
           {logoUrl ? (
