@@ -775,12 +775,12 @@ export function generateStagiaireOpenAnswers(
     
     switch (quality) {
       case 'full':
-        reponse = generateFullAnswer(expected, stagiaireIndex, raw.qi);
+        reponse = generateFullAnswer(expected, stagiaireIndex, raw.qi, stagiaireInfo);
         score = 1;
         feedback = "Bonne réponse";
         break;
       case 'partial':
-        reponse = generatePartialAnswer(expected, raw.seed, stagiaireIndex, raw.qi);
+        reponse = generatePartialAnswer(expected, raw.seed, stagiaireIndex, raw.qi, stagiaireInfo);
         score = 0.5;
         const partialFeedbacks = ["Réponse partielle", "Réponse incomplète", "Réponse acceptable", "Réponse partiellement correcte"];
         feedback = partialFeedbacks[(raw.seed + stagiaireIndex) % partialFeedbacks.length];
