@@ -810,76 +810,124 @@ export function generateStagiaireOpenAnswers(
   });
 }
 
-// Generate a "correct" answer that's unique per stagiaire (rephrased)
-function generateFullAnswer(expected: string, stagiaireIndex: number, questionIndex: number): string {
-  const sentences = expected.split(/(?<=[.!])\s+/).filter(s => s.trim());
-  if (sentences.length <= 1) {
-    // Short answer: apply minor variation
-    return applyVariation(expected, stagiaireIndex, questionIndex);
-  }
-  // Longer answer: reorder or slightly vary
-  const varied = sentences.map(s => applyVariation(s, stagiaireIndex, questionIndex));
-  // Optionally swap two sentences for variety
-  if ((stagiaireIndex + questionIndex) % 3 === 0 && varied.length > 2) {
-    const tmp = varied[1];
-    varied[1] = varied[2];
-    varied[2] = tmp;
-  }
-  return varied.join(' ');
+// Clean brackets from expected answers and replace with realistic values
+function cleanBrackets(text: string): string {
+  return text
+    .replace(/\[Name\]/gi, 'Mme Dupont')
+    .replace(/\[company\]/gi, 'notre entreprise')
+    .replace(/\[position\]/gi, 'responsable de projet')
+    .replace(/\[tasks?\]/gi, 'la gestion des projets et le suivi des équipes')
+    .replace(/\[date\]/gi, 'le 15 du mois prochain')
+    .replace(/\[X\]/gi, '3')
+    .replace(/\[Area\]/gi, 'la gestion de projet')
+    .replace(/\[Department\]/gi, 'le service commercial')
+    .replace(/\[Responsibility\]/gi, 'la coordination des équipes')
+    .replace(/\[Job Title\]/gi, 'responsable de projet')
+    .replace(/\[.*?\]/g, '');
 }
 
-function applyVariation(text: string, stagiaireIndex: number, questionIndex: number): string {
-  const seed = (stagiaireIndex * 13 + questionIndex * 7) % 5;
-  // Apply subtle reformulations
-  const prefixes = ['', '', '', 'En fait, ', 'Pour résumer, '];
-  const prefix = seed < 3 ? '' : prefixes[seed];
+// Generate a "correct" answer that's unique per stagiaire (rephrased) — LONG and realistic
+function generateFullAnswer(expected: string, stagiaireIndex: number, questionIndex: number): string {
+  const cleaned = cleanBrackets(expected);
+  const sentences = cleaned.split(/(?<=[.!])\s+/).filter(s => s.trim());
+  const seed = (stagiaireIndex * 13 + questionIndex * 7) % 8;
   
-  // Minor word substitutions for variety
-  let result = text;
-  if (seed === 1) result = result.replace('Il faut', 'On doit').replace('il faut', 'on doit');
-  if (seed === 2) result = result.replace('permet de', 'sert à').replace('Il faut', 'Il est nécessaire de');
-  if (seed === 3) result = result.replace('par exemple', 'notamment').replace('Exemple :', 'Par exemple :');
-  if (seed === 4) result = result.replace('c\'est', 'il s\'agit de').replace('C\'est', 'Il s\'agit de');
+  const intros = [
+    'Alors pour répondre à cette question, ',
+    'D\'après ce que j\'ai appris, ',
+    'Si je me souviens bien de ce qu\'on a vu en formation, ',
+    'Je dirais que ',
+    'Pour moi, ',
+    'De ce que j\'ai compris, ',
+    'Comme on l\'a vu pendant la formation, ',
+    'Je pense pouvoir répondre que ',
+  ];
   
-  return prefix + result;
+  const expansions = [
+    ' C\'est quelque chose que je trouve très important dans notre métier car cela permet d\'assurer un travail de qualité.',
+    ' Je pense que c\'est essentiel de bien maîtriser ce point pour être efficace en situation professionnelle.',
+    ' C\'est un aspect que j\'ai bien retenu de la formation car il est directement applicable dans mon travail au quotidien.',
+    ' Je trouve que c\'est un élément fondamental que tout professionnel devrait connaître et savoir appliquer.',
+    ' Personnellement, c\'est un des points que j\'ai le mieux compris pendant cette formation.',
+    ' J\'ai particulièrement apprécié cette partie de la formation car elle m\'a permis de mieux comprendre les enjeux.',
+    ' C\'est un sujet sur lequel j\'ai beaucoup progressé depuis le début de la formation.',
+    ' Je suis assez confiant(e) sur ce point car nous l\'avons bien travaillé en cours.',
+  ];
+  
+  const closings = [
+    ' Voilà, j\'espère avoir été assez complet(e) dans ma réponse.',
+    ' Je pense avoir couvert les points essentiels.',
+    ' C\'est en tout cas ce que j\'ai retenu des cours.',
+    '',
+    ' Je pourrais développer davantage si nécessaire.',
+    '',
+    ' C\'est ce qui me semble le plus important à retenir.',
+    '',
+  ];
+
+  const intro = intros[seed];
+  const varied = sentences.map((s, i) => {
+    const sv = (stagiaireIndex * 13 + questionIndex * 7 + i * 3) % 5;
+    let result = s;
+    if (sv === 1) result = result.replace('Il faut', 'On doit').replace('il faut', 'on doit');
+    if (sv === 2) result = result.replace('permet de', 'sert à').replace('Il faut', 'Il est nécessaire de');
+    if (sv === 3) result = result.replace('par exemple', 'notamment').replace('Exemple :', 'Par exemple :');
+    if (sv === 4) result = result.replace('c\'est', 'il s\'agit de').replace('C\'est', 'Il s\'agit de');
+    return result;
+  });
+  
+  // Swap two sentences for variety
+  if ((stagiaireIndex + questionIndex) % 3 === 0 && varied.length > 2) {
+    const tmp = varied[1]; varied[1] = varied[2]; varied[2] = tmp;
+  }
+  
+  return intro + varied.join(' ') + expansions[seed] + closings[seed];
 }
 
 function generatePartialAnswer(expected: string, seed: number, stagiaireIndex: number, questionIndex: number): string {
-  const sentences = expected.split(/(?<=[.!])\s+/).filter(s => s.trim());
+  const cleaned = cleanBrackets(expected);
+  const sentences = cleaned.split(/(?<=[.!])\s+/).filter(s => s.trim());
   const variation = (stagiaireIndex * 11 + questionIndex * 3) % 3;
   
+  const partialIntros = [
+    'Je ne suis pas sûr(e) à 100% mais je pense que ',
+    'De mémoire, ',
+    'Si je me rappelle bien, ',
+  ];
+  
+  const partialClosings = [
+    ' Je ne me souviens plus exactement du reste mais je crois que c\'est à peu près ça.',
+    ' Il y avait d\'autres éléments mais je ne me rappelle plus de tout.',
+    ' Je pense qu\'il manque des choses dans ma réponse mais c\'est ce dont je me souviens.',
+  ];
+  
+  let mainContent: string;
   if (sentences.length > 2) {
-    // Take different parts depending on stagiaire
-    if (variation === 0) return applyVariation(sentences[0], stagiaireIndex, questionIndex);
-    if (variation === 1) return applyVariation(sentences[sentences.length - 1], stagiaireIndex, questionIndex);
-    return applyVariation(sentences.slice(0, Math.ceil(sentences.length / 2)).join(' '), stagiaireIndex, questionIndex);
+    if (variation === 0) mainContent = sentences[0];
+    else if (variation === 1) mainContent = sentences[sentences.length - 1];
+    else mainContent = sentences.slice(0, Math.ceil(sentences.length / 2)).join(' ');
+  } else if (sentences.length === 2) {
+    mainContent = sentences[variation % 2];
+  } else {
+    const words = cleaned.split(' ');
+    const cuts = [0.4, 0.5, 0.6];
+    const cutoff = Math.max(3, Math.floor(words.length * cuts[variation]));
+    mainContent = words.slice(0, cutoff).join(' ');
   }
   
-  if (sentences.length === 2) {
-    return applyVariation(sentences[variation % 2], stagiaireIndex, questionIndex);
-  }
-  
-  // Single sentence: take first part
-  const words = expected.split(' ');
-  const cuts = [0.4, 0.5, 0.6];
-  const cutoff = Math.max(3, Math.floor(words.length * cuts[variation]));
-  return words.slice(0, cutoff).join(' ') + ".";
+  return partialIntros[variation] + mainContent + '.' + partialClosings[variation];
 }
 
 function generateWrongAnswer(expected: string, seed: number, stagiaireIndex: number, questionIndex: number): string {
   const vaguePool = [
-    "Je pense que c'est lié au sujet mais je ne suis pas sûr(e) de la procédure exacte.",
-    "C'est quelque chose que j'ai déjà vu mais je ne me souviens plus des détails.",
-    "Il faut suivre un protocole mais je ne me souviens plus des étapes.",
-    "Je crois qu'il faut suivre une procédure spécifique mais je ne saurais pas la décrire.",
-    "Je pense qu'il faut en parler à l'infirmière mais je ne suis pas certain(e) de la suite.",
-    "Je ne connais pas la réponse précise mais je pense que c'est important dans notre métier.",
-    "J'ai une vague idée mais je ne pourrais pas l'expliquer clairement en français.",
-    "Il me semble que c'est lié à ce qu'on a vu en cours mais je confonds les termes.",
-    "Je dirais que c'est quelque chose en rapport avec l'accompagnement mais je ne suis pas certain(e).",
-    "C'est un sujet que je ne maîtrise pas encore suffisamment, j'ai besoin de plus de pratique.",
-    "Je connais un peu le sujet mais je n'arrive pas bien à formuler ma réponse.",
-    "C'est difficile pour moi d'expliquer, je comprends à l'oral mais pas à l'écrit.",
+    "Je ne suis pas vraiment sûr(e) de ma réponse. Je pense que c'est lié au sujet qu'on a vu en cours mais je n'arrive pas à me rappeler de la procédure exacte. Il faudrait que je revoie mes notes pour donner une réponse plus précise. C'est quelque chose que j'ai du mal à retenir.",
+    "C'est un sujet que j'ai déjà vu en formation mais honnêtement je ne me souviens plus très bien des détails. Je sais qu'il y a plusieurs étapes à suivre mais je ne saurais pas les énumérer correctement. J'ai besoin de plus de pratique sur ce point.",
+    "Je crois qu'il faut suivre un protocole spécifique mais je ne me souviens plus des étapes exactes. On en a parlé en cours je pense mais ça remonte un peu. Je vais essayer de revoir cette partie dans mes notes car c'est important pour mon travail.",
+    "De mémoire, je dirais que c'est quelque chose en rapport avec ce qu'on a vu le premier jour mais je confonds un peu les différentes notions. Je n'ai pas assez pratiqué pour être à l'aise avec ce sujet. Il faudrait que je m'entraîne davantage pour bien maîtriser cette compétence.",
+    "Franchement, je ne suis pas certain(e) de ma réponse. Je pense qu'il faut en parler à un responsable mais je ne connais pas la suite de la procédure. C'est un point sur lequel j'ai encore besoin de formation. Je comprends l'importance du sujet mais l'application pratique me pose problème.",
+    "J'ai une vague idée de ce qu'il faut faire mais je ne pourrais pas l'expliquer clairement. C'est un domaine que je ne maîtrise pas encore suffisamment. J'aurais besoin de revoir les cours et de pratiquer plus régulièrement pour pouvoir répondre correctement à cette question.",
+    "C'est difficile pour moi de répondre à cette question. J'ai compris le principe général quand le formateur l'a expliqué à l'oral mais quand il faut écrire la réponse, je me rends compte que je ne maîtrise pas encore assez le vocabulaire et les concepts. Je vais travailler dessus.",
+    "Je connais un peu le sujet mais je n'arrive pas bien à formuler ma réponse. C'est frustrant car je pense que j'ai compris à l'oral mais à l'écrit c'est plus compliqué. J'ai besoin de plus de temps et de pratique pour consolider mes connaissances sur ce thème.",
   ];
   return vaguePool[(seed + stagiaireIndex * 3 + questionIndex * 5) % vaguePool.length];
 }
