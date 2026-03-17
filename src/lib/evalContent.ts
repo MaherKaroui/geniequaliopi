@@ -678,7 +678,8 @@ interface StagiaireOpenAnswer {
 export function generateStagiaireOpenAnswers(
   questions: QuestionOuverte[],
   stagiaireIndex: number,
-  isDebut: boolean
+  isDebut: boolean,
+  stagiaireInfo?: { nom?: string; prenom?: string; entreprise?: string; poste?: string }
 ): StagiaireOpenAnswer[] {
   const profile = getStagiaireTestProfile(stagiaireIndex);
   
