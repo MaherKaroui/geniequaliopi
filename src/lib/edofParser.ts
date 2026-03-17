@@ -53,6 +53,19 @@ function formatPhone(raw: string | number | undefined): string {
   return String(raw);
 }
 
+// Helper: find value from row by trying multiple possible column names (case-insensitive, trimmed)
+function getCol(row: Record<string, any>, ...keys: string[]): any {
+  for (const key of keys) {
+    const kl = key.toLowerCase().trim();
+    for (const col of Object.keys(row)) {
+      if (col.toLowerCase().trim() === kl || col.toLowerCase().trim().replace(/[\s_]+/g, "_") === kl.replace(/[\s_]+/g, "_")) {
+        if (row[col] !== "" && row[col] !== undefined && row[col] !== null) return row[col];
+      }
+    }
+  }
+  return "";
+}
+
 export function parseEdofXlsx(data: ArrayBuffer): EdofSession[] {
   const workbook = XLSX.read(data, { type: "array" });
   const sheet = workbook.Sheets[workbook.SheetNames[0]];
@@ -62,7 +75,7 @@ export function parseEdofXlsx(data: ArrayBuffer): EdofSession[] {
   const groups = new Map<string, { rows: Record<string, any>[] }>();
 
   for (const row of rows) {
-    const title = row["INTITULE_FORMATION"] || row["INTITULE_CERTIF/THEM"] || "";
+    const title = getCol(row, "INTITULE_FORMATION", "INTITULE FORMATION", "INTITULE_CERTIF/THEM", "INTITULE CERTIF/THEM", "INTITULE", "Formation");
     if (!title) continue;
     if (!groups.has(title)) {
       groups.set(title, { rows: [] });
@@ -80,20 +93,20 @@ export function parseEdofXlsx(data: ArrayBuffer): EdofSession[] {
     );
 
     // Find earliest start and latest end dates
-    const allStarts = group.rows.map(r => parseEdofDate(r["DATE_DEBUT_SESSION"])).filter(Boolean).sort();
-    const allEnds = group.rows.map(r => parseEdofDate(r["DATE_FIN_SESSION"])).filter(Boolean).sort();
+    const allStarts = group.rows.map(r => parseEdofDate(getCol(r, "DATE_DEBUT_SESSION", "DATE DEBUT SESSION", "DATE_DEBUT", "DATE DEBUT", "Début", "Date début"))).filter(Boolean).sort();
+    const allEnds = group.rows.map(r => parseEdofDate(getCol(r, "DATE_FIN_SESSION", "DATE FIN SESSION", "DATE_FIN", "DATE FIN", "Fin", "Date fin"))).filter(Boolean).sort();
     const earliestStart = allStarts[0] || "";
     const latestEnd = allEnds[allEnds.length - 1] || "";
 
     // Collect unique locations
     const locations = [...new Set(group.rows.map(r => {
-      const ville = r["LIEU_FORMATION_VILLE"] || "";
-      const cp = r["LIEU_FORMATION_CODE_POSTAL"] || "";
+      const ville = getCol(r, "LIEU_FORMATION_VILLE", "LIEU FORMATION VILLE", "VILLE", "Ville");
+      const cp = getCol(r, "LIEU_FORMATION_CODE_POSTAL", "LIEU FORMATION CODE POSTAL", "CODE_POSTAL", "Code postal");
       return ville ? `${cp} ${ville}`.trim() : "";
     }).filter(Boolean))];
 
     // Average tarif
-    const tarifs = group.rows.map(r => parseFloat(String(r["MONTANT_FORMATION"] || "0"))).filter(t => t > 0);
+    const tarifs = group.rows.map(r => parseFloat(String(getCol(r, "MONTANT_FORMATION", "MONTANT FORMATION", "MONTANT", "Tarif", "Prix") || "0"))).filter(t => t > 0);
     const avgTarif = tarifs.length > 0 ? Math.round(tarifs.reduce((a, b) => a + b, 0) / tarifs.length) : 0;
 
     const formation: FormationInfo = {
@@ -116,15 +129,15 @@ export function parseEdofXlsx(data: ArrayBuffer): EdofSession[] {
     };
 
     const stagiaires: StagiaireInfo[] = group.rows.map(row => ({
-      nom: (row["NOM"] || "").toUpperCase(),
-      prenom: String(row["PRENOM"] || "").charAt(0).toUpperCase() + String(row["PRENOM"] || "").slice(1).toLowerCase(),
-      email: (row["COURRIEL"] || "").replace(/\\/g, ""),
-      telephone: formatPhone(row["NUMERO_TELEPHONE_PORTABLE"] || row["NUMERO_TELEPHONE_FIXE"]),
-      entreprise: "",
-      poste: "",
-      dateNaissance: parseEdofDate(row["DATE_DE_NAISSANCE"]),
-      dateDebutFormation: parseEdofDate(row["DATE_DEBUT_SESSION"]),
-      dateFinFormation: parseEdofDate(row["DATE_FIN_SESSION"]),
+      nom: String(getCol(row, "NOM", "Nom") || "").toUpperCase(),
+      prenom: String(getCol(row, "PRENOM", "Prénom", "Prenom") || "").charAt(0).toUpperCase() + String(getCol(row, "PRENOM", "Prénom", "Prenom") || "").slice(1).toLowerCase(),
+      email: String(getCol(row, "COURRIEL", "EMAIL", "Mail", "E-mail", "Courriel") || "").replace(/\\/g, ""),
+      telephone: formatPhone(getCol(row, "NUMERO_TELEPHONE_PORTABLE", "NUMERO TELEPHONE PORTABLE", "TELEPHONE", "Téléphone", "Tel", "Tél") || getCol(row, "NUMERO_TELEPHONE_FIXE", "NUMERO TELEPHONE FIXE")),
+      entreprise: String(getCol(row, "ENTREPRISE", "Entreprise", "SOCIETE", "Société") || ""),
+      poste: String(getCol(row, "POSTE", "Poste", "FONCTION", "Fonction") || ""),
+      dateNaissance: parseEdofDate(getCol(row, "DATE_DE_NAISSANCE", "DATE DE NAISSANCE", "DATE_NAISSANCE", "Date naissance")),
+      dateDebutFormation: parseEdofDate(getCol(row, "DATE_DEBUT_SESSION", "DATE DEBUT SESSION", "DATE_DEBUT", "DATE DEBUT", "Début", "Date début")),
+      dateFinFormation: parseEdofDate(getCol(row, "DATE_FIN_SESSION", "DATE FIN SESSION", "DATE_FIN", "DATE FIN", "Fin", "Date fin")),
       signatureUrl: "",
     }));
 
