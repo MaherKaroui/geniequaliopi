@@ -206,7 +206,7 @@ export function generateDocumentById(docId: string, template: string, params: Re
     case "grille_niveaux_positionnement": return genGrilleNiveauxPositionnement(o, f, stagiaires);
     // === Templates AF (Drive SELECT FORMATION) ===
     case "lien_site_internet": return genLienSiteInternet(o);
-    case "procedure_indicateurs_performance": return genProcedureIndicateursPerformance(o);
+    case "procedure_indicateurs_performance": return genProcedureIndicateursPerformance(o, stagiaires);
     case "procedure_eval_besoins": return genProcedureEvalBesoins(o);
     case "fiche_eval_besoins_psh": return genFicheEvalBesoinsPSH(o);
     case "trame_eval_besoins": return genTrameEvalBesoins(o, f, stagiaires);
@@ -2711,14 +2711,15 @@ function genLienSiteInternet(o: OrganismeInfo) {
   ] });
 }
 
-function genProcedureIndicateursPerformance(o: OrganismeInfo) {
+function genProcedureIndicateursPerformance(o: OrganismeInfo, stagiaires: StagiaireInfo[] = []) {
+  const nbStagiaires = stagiaires.length || 1;
   return buildDocument({ org: o, title: "PROCÉDURE DE SUIVI DES INDICATEURS DE PERFORMANCE", sections: [
     { heading: "Objectif", content: `<p>Assurer le suivi mensuel du taux de satisfaction des stagiaires et du nombre d'apprenants formés, afin d'améliorer la qualité des prestations.</p>` },
     { heading: "Fréquence", content: `<p><strong>Collecte des données :</strong> à la fin de chaque formation.</p><p><strong>Mise à jour du tableau de bord :</strong> une fois par mois.</p>` },
     { heading: "Indicateurs suivis", content: `<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%">
       <tr style="background:#1e3a7b;color:#fff"><th>Indicateur</th><th>Méthode de calcul</th><th>Objectif</th></tr>
       <tr><td>Taux de satisfaction</td><td>(Nb de stagiaires satisfaits ÷ Nb total de réponses) × 100</td><td>100 %</td></tr>
-      <tr><td>Nombre d'apprenants mensuel</td><td>Total des stagiaires formés sur le mois</td><td>1</td></tr>
+      <tr><td>Nombre d'apprenants mensuel</td><td>Total des stagiaires formés sur le mois</td><td>${nbStagiaires}</td></tr>
     </table>` },
     { heading: "Responsabilités", content: `<p><strong>${o.dirigeant || "Le Dirigeant"} :</strong> collecte, saisie et analyse mensuelle.</p><p><strong>Formateurs :</strong> transmission des questionnaires de satisfaction et des feuilles d'émargement.</p>` },
     { heading: "Suivi et amélioration", content: `<p>En cas de baisse du taux de satisfaction ou du nombre d'apprenants, une analyse rapide est réalisée pour identifier la cause et mettre en place une action corrective (ajustement pédagogique, accompagnement, communication, etc.).</p>` },
