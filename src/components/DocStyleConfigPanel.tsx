@@ -132,9 +132,7 @@ const DocStyleConfigPanel = ({ style, onChange }: DocStyleConfigPanelProps) => {
           {/* Fonts */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label className="text-xs mb-1 flex items-center gap-1">
-                <Type className="w-3 h-3" /> Police du corps
-              </Label>
+              <Label className="text-xs mb-1 block">Police du corps</Label>
               <Select value={style.fontFamily} onValueChange={v => update("fontFamily", v)}>
                 <SelectTrigger className="h-8 text-xs">
                   <SelectValue />
