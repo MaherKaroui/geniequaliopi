@@ -12,6 +12,48 @@ interface LogoSignatureUploadProps {
   onTamponChange?: (url: string) => void;
 }
 
+const UploadCard = ({
+  label,
+  imageUrl,
+  placeholder,
+  altText,
+  onClear,
+  onUpload,
+}: {
+  label: string;
+  imageUrl?: string;
+  placeholder: string;
+  altText: string;
+  onClear: () => void;
+  onUpload: () => void;
+}) => (
+  <div className="flex flex-col items-center gap-3 p-4 rounded-lg border border-border bg-background">
+    <Label className="font-semibold text-sm text-foreground">{label}</Label>
+    <div className="h-20 w-full flex items-center justify-center">
+      {imageUrl ? (
+        <div className="relative group">
+          <img
+            src={imageUrl}
+            alt={altText}
+            className="h-16 w-auto max-w-[140px] object-contain rounded border border-border bg-white p-1"
+          />
+          <button
+            onClick={onClear}
+            className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+          >
+            <X className="w-3 h-3" />
+          </button>
+        </div>
+      ) : (
+        <span className="text-xs text-muted-foreground">{placeholder}</span>
+      )}
+    </div>
+    <Button variant="outline" size="sm" className="w-full" onClick={onUpload}>
+      {imageUrl ? "Changer" : "Charger"}
+    </Button>
+  </div>
+);
+
 const LogoSignatureUpload = ({ logoUrl, signatureUrl, tamponUrl, onLogoChange, onSignatureChange, onTamponChange }: LogoSignatureUploadProps) => {
   const logoRef = useRef<HTMLInputElement>(null);
   const sigRef = useRef<HTMLInputElement>(null);
@@ -24,100 +66,47 @@ const LogoSignatureUpload = ({ logoUrl, signatureUrl, tamponUrl, onLogoChange, o
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-4 bg-secondary/50 rounded-xl border">
-      {/* Logo */}
-      <div>
-        <Label className="mb-2 block font-semibold">
-          Logo de l'organisme
-        </Label>
-        <div className="flex items-center gap-3">
-          {logoUrl ? (
-            <div className="relative group">
-              <img src={logoUrl} alt="Logo" className="h-16 w-auto max-w-[160px] object-contain rounded-lg border bg-white p-1" />
-              <button
-                onClick={() => onLogoChange("")}
-                className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
-              >
-                <X className="w-3 h-3" />
-              </button>
-            </div>
-          ) : (
-            <div className="h-16 w-32 border-2 border-dashed border-muted-foreground/30 rounded-lg flex items-center justify-center text-muted-foreground text-xs">
-              Pas de logo
-            </div>
-          )}
-          <input ref={logoRef} type="file" accept="image/*" className="hidden" onChange={e => {
-            const file = e.target.files?.[0];
-            if (file) handleFile(file, onLogoChange);
-          }} />
-          <Button variant="outline" size="sm" onClick={() => logoRef.current?.click()}>
-            {logoUrl ? "Changer" : "Charger"}
-          </Button>
-        </div>
-      </div>
-
-      {/* Signature */}
-      <div>
-        <Label className="mb-2 block font-semibold">
-          Signature du dirigeant
-        </Label>
-        <div className="flex items-center gap-3">
-          {signatureUrl ? (
-            <div className="relative group">
-              <img src={signatureUrl} alt="Signature" className="h-16 w-auto max-w-[160px] object-contain rounded-lg border bg-white p-1" />
-              <button
-                onClick={() => onSignatureChange("")}
-                className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
-              >
-                <X className="w-3 h-3" />
-              </button>
-            </div>
-          ) : (
-            <div className="h-16 w-32 border-2 border-dashed border-muted-foreground/30 rounded-lg flex items-center justify-center text-muted-foreground text-xs">
-              Pas de signature
-            </div>
-          )}
-          <input ref={sigRef} type="file" accept="image/*" className="hidden" onChange={e => {
-            const file = e.target.files?.[0];
-            if (file) handleFile(file, onSignatureChange);
-          }} />
-          <Button variant="outline" size="sm" onClick={() => sigRef.current?.click()}>
-            {signatureUrl ? "Changer" : "Charger"}
-          </Button>
-        </div>
-      </div>
-
-      {/* Tampon */}
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <input ref={logoRef} type="file" accept="image/*" className="hidden" onChange={e => {
+        const file = e.target.files?.[0];
+        if (file) handleFile(file, onLogoChange);
+      }} />
+      <input ref={sigRef} type="file" accept="image/*" className="hidden" onChange={e => {
+        const file = e.target.files?.[0];
+        if (file) handleFile(file, onSignatureChange);
+      }} />
       {onTamponChange && (
-        <div>
-          <Label className="mb-2 block font-semibold">
-            Tampon de l'organisme
-          </Label>
-          <div className="flex items-center gap-3">
-            {tamponUrl ? (
-              <div className="relative group">
-                <img src={tamponUrl} alt="Tampon" className="h-16 w-auto max-w-[160px] object-contain rounded-lg border bg-white p-1" />
-                <button
-                  onClick={() => onTamponChange("")}
-                  className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
-                >
-                  <X className="w-3 h-3" />
-                </button>
-              </div>
-            ) : (
-              <div className="h-16 w-32 border-2 border-dashed border-muted-foreground/30 rounded-lg flex items-center justify-center text-muted-foreground text-xs">
-                Pas de tampon
-              </div>
-            )}
-            <input ref={tamponRef} type="file" accept="image/*" className="hidden" onChange={e => {
-              const file = e.target.files?.[0];
-              if (file) handleFile(file, onTamponChange);
-            }} />
-            <Button variant="outline" size="sm" onClick={() => tamponRef.current?.click()}>
-              {tamponUrl ? "Changer" : "Charger"}
-            </Button>
-          </div>
-        </div>
+        <input ref={tamponRef} type="file" accept="image/*" className="hidden" onChange={e => {
+          const file = e.target.files?.[0];
+          if (file) handleFile(file, onTamponChange);
+        }} />
+      )}
+
+      <UploadCard
+        label="Logo de l'organisme"
+        imageUrl={logoUrl}
+        placeholder="Pas de logo"
+        altText="Logo"
+        onClear={() => onLogoChange("")}
+        onUpload={() => logoRef.current?.click()}
+      />
+      <UploadCard
+        label="Signature du dirigeant"
+        imageUrl={signatureUrl}
+        placeholder="Pas de signature"
+        altText="Signature"
+        onClear={() => onSignatureChange("")}
+        onUpload={() => sigRef.current?.click()}
+      />
+      {onTamponChange && (
+        <UploadCard
+          label="Tampon de l'organisme"
+          imageUrl={tamponUrl}
+          placeholder="Pas de tampon"
+          altText="Tampon"
+          onClear={() => onTamponChange("")}
+          onUpload={() => tamponRef.current?.click()}
+        />
       )}
     </div>
   );
