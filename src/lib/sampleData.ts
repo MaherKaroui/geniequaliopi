@@ -23,16 +23,16 @@ export const SAMPLE_ORGANISME: OrganismeInfo = {
 };
 
 export const SAMPLE_STAGIAIRES: StagiaireInfo[] = [
-  { nom: "Dupont", prenom: "Martin", email: "martin.dupont@techsolutions.fr", telephone: "06 12 34 56 78", entreprise: "Tech Solutions SAS", poste: "Comptable", dateNaissance: "1990-03-15" },
-  { nom: "Bernard", prenom: "Sophie", email: "sophie.bernard@innovcorp.fr", telephone: "06 23 45 67 89", entreprise: "Innov'Corp", poste: "Assistante RH", dateNaissance: "1985-07-22" },
-  { nom: "Moreau", prenom: "Lucas", email: "lucas.moreau@greentech.fr", telephone: "06 34 56 78 90", entreprise: "GreenTech SA", poste: "Chef de projet", dateNaissance: "1992-11-08" },
-  { nom: "Lefebvre", prenom: "Emma", email: "emma.lefebvre@mediasphere.fr", telephone: "06 45 67 89 01", entreprise: "MediaSphère", poste: "Chargée de communication", dateNaissance: "1988-05-30" },
-  { nom: "Roux", prenom: "Hugo", email: "hugo.roux@buildpro.fr", telephone: "06 56 78 90 12", entreprise: "BuildPro", poste: "Technicien", dateNaissance: "1995-01-17" },
-  { nom: "Fournier", prenom: "Léa", email: "lea.fournier@santeplus.fr", telephone: "06 67 89 01 23", entreprise: "Santé Plus", poste: "Infirmière coordinatrice", dateNaissance: "1991-09-25" },
-  { nom: "Girard", prenom: "Antoine", email: "antoine.girard@logifrance.fr", telephone: "06 78 90 12 34", entreprise: "LogiFrance", poste: "Responsable logistique", dateNaissance: "1987-12-03" },
-  { nom: "Durand", prenom: "Camille", email: "camille.durand@eduservices.fr", telephone: "06 89 01 23 45", entreprise: "EduServices", poste: "Formatrice junior", dateNaissance: "1993-06-14" },
-  { nom: "Mercier", prenom: "Thomas", email: "thomas.mercier@financegroup.fr", telephone: "06 90 12 34 56", entreprise: "Finance Group", poste: "Analyste financier", dateNaissance: "1989-08-19" },
-  { nom: "Lambert", prenom: "Julie", email: "julie.lambert@artisanat.fr", telephone: "06 01 23 45 67", entreprise: "Artisanat & Co", poste: "Gérante", dateNaissance: "1994-02-28" },
+  { civilite: "M.", nom: "Dupont", prenom: "Martin", email: "martin.dupont@techsolutions.fr", telephone: "06 12 34 56 78", entreprise: "Tech Solutions SAS", poste: "Comptable", dateNaissance: "1990-03-15" },
+  { civilite: "Mme", nom: "Bernard", prenom: "Sophie", email: "sophie.bernard@innovcorp.fr", telephone: "06 23 45 67 89", entreprise: "Innov'Corp", poste: "Assistante RH", dateNaissance: "1985-07-22" },
+  { civilite: "M.", nom: "Moreau", prenom: "Lucas", email: "lucas.moreau@greentech.fr", telephone: "06 34 56 78 90", entreprise: "GreenTech SA", poste: "Chef de projet", dateNaissance: "1992-11-08" },
+  { civilite: "Mme", nom: "Lefebvre", prenom: "Emma", email: "emma.lefebvre@mediasphere.fr", telephone: "06 45 67 89 01", entreprise: "MediaSphère", poste: "Chargée de communication", dateNaissance: "1988-05-30" },
+  { civilite: "M.", nom: "Roux", prenom: "Hugo", email: "hugo.roux@buildpro.fr", telephone: "06 56 78 90 12", entreprise: "BuildPro", poste: "Technicien", dateNaissance: "1995-01-17" },
+  { civilite: "Mme", nom: "Fournier", prenom: "Léa", email: "lea.fournier@santeplus.fr", telephone: "06 67 89 01 23", entreprise: "Santé Plus", poste: "Infirmière coordinatrice", dateNaissance: "1991-09-25" },
+  { civilite: "M.", nom: "Girard", prenom: "Antoine", email: "antoine.girard@logifrance.fr", telephone: "06 78 90 12 34", entreprise: "LogiFrance", poste: "Responsable logistique", dateNaissance: "1987-12-03" },
+  { civilite: "Mme", nom: "Durand", prenom: "Camille", email: "camille.durand@eduservices.fr", telephone: "06 89 01 23 45", entreprise: "EduServices", poste: "Formatrice junior", dateNaissance: "1993-06-14" },
+  { civilite: "M.", nom: "Mercier", prenom: "Thomas", email: "thomas.mercier@financegroup.fr", telephone: "06 90 12 34 56", entreprise: "Finance Group", poste: "Analyste financier", dateNaissance: "1989-08-19" },
+  { civilite: "Mme", nom: "Lambert", prenom: "Julie", email: "julie.lambert@artisanat.fr", telephone: "06 01 23 45 67", entreprise: "Artisanat & Co", poste: "Gérante", dateNaissance: "1994-02-28" },
 ];
 
 export interface FormateurInfo {

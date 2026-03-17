@@ -42,6 +42,7 @@ export interface OrganismeInfo {
 }
 
 export interface StagiaireInfo {
+  civilite: "M." | "Mme" | "";
   nom: string;
   prenom: string;
   email: string;
