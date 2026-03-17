@@ -1,6 +1,6 @@
 // Improved generators for IND 9, 10, 11 - Qualiopi compliant (reference: Select Formation docs)
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
-import { buildDocument, tableHTML, formatDate, subtractBusinessDays, getStagiaireDateDebut, getStagiaireDateFin } from "./docBuilder";
+import { buildDocument, tableHTML, formatDate, subtractBusinessDays, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif } from "./docBuilder";
 import { EVAL_SCORES, getFormationDays } from "./sampleData";
 import { getEvalContent, generateStagiaireAnswers, computeQCMScore, getQuestionsOuvertes, generateStagiaireOpenAnswers } from "./evalContent";
 
