@@ -1,6 +1,6 @@
 // Improved generators for IND 9, 10, 11 - Qualiopi compliant (reference: Select Formation docs)
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
-import { buildDocument, tableHTML, formatDate, subtractBusinessDays } from "./docBuilder";
+import { buildDocument, tableHTML, formatDate, subtractBusinessDays, getStagiaireDateDebut, getStagiaireDateFin } from "./docBuilder";
 import { EVAL_SCORES, getFormationDays } from "./sampleData";
 import { getEvalContent, generateStagiaireAnswers, computeQCMScore, getQuestionsOuvertes, generateStagiaireOpenAnswers } from "./evalContent";
 
@@ -115,7 +115,7 @@ export function genReglement_V2(o: OrganismeInfo, f: FormationInfo, stagiaires: 
   let sigPages = '';
   stagiaires.slice(0, 10).forEach((s, i) => {
     if (i > 0) sigPages += '<div class="page-break"></div>';
-    sigPages += `<p><strong>Fait à ${o.ville}, le :</strong> ${formatDate(subtractBusinessDays(f.dateDebut || new Date().toISOString(), 14))}</p>`;
+    sigPages += `<p><strong>Fait à ${o.ville}, le :</strong> ${formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || new Date().toISOString(), 14))}</p>`;
     sigPages += sigBlock(
       `Signature du stagiaire : ${s.prenom} ${s.nom}`, `${s.prenom} ${s.nom}`, stagSig(s),
       `Signature du centre`, o.nom, orgSig(o),
@@ -139,7 +139,7 @@ export function genConvocation_V2(o: OrganismeInfo, f: FormationInfo, stagiaires
       <p>${civilite},</p>
       <p>Nous avons le plaisir de vous confirmer votre inscription à la formation suivante :</p>
       <h3>Intitulé de la formation</h3><p>${f.intitule}</p>
-      <h3>Dates de la formation</h3><p>Du : ${formatDate(f.dateDebut)}<br>Au : ${formatDate(f.dateFin)}</p>
+      <h3>Dates de la formation</h3><p>Du : ${formatDate(getStagiaireDateDebut(s, f))}<br>Au : ${formatDate(getStagiaireDateFin(s, f))}</p>
       <h3>Horaires</h3><p>De : 09h00<br>À : 17h00</p>
       <h3>Durée totale</h3><p>${f.duree}</p>
       <h3>Modalité</h3><p>Formation ${modaliteTexte(f)}</p>
@@ -156,7 +156,7 @@ export function genConvocation_V2(o: OrganismeInfo, f: FormationInfo, stagiaires
       <p>Nous vous remercions de vous présenter 15 minutes avant le début de la formation.</p>
       <p>Pour toute question ou information complémentaire, vous pouvez nous contacter par email.</p>
       <p>Nous vous prions d'agréer, ${civilite}, l'expression de nos salutations distinguées.</p>
-      <p><strong>Fait à ${o.ville}, le :</strong> ${formatDate(subtractBusinessDays(f.dateDebut || new Date().toISOString(), 14))}</p>
+       <p><strong>Fait à ${o.ville}, le :</strong> ${formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || new Date().toISOString(), 14))}</p>
       <p><strong>Pour ${o.nom}</strong></p>
       <p>${o.dirigeant}<br>Président – Formateur</p>
       ${orgSig(o)}
@@ -186,7 +186,7 @@ export function genContratFormationPro_V2(o: OrganismeInfo, f: FormationInfo, st
       <p>À l'issue de la formation, le stagiaire sera capable de :</p>
       <p>${f.objectifs.split('\n').map(o => `• ${o}`).join('<br>')}</p>
       <h3>Article 3 – Organisation de la formation</h3>
-      <p><strong>Durée totale :</strong> ${f.duree}<br><strong>Dates :</strong> du ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)}<br><strong>Horaires :</strong> de 09h00 à 17h00<br><strong>Modalité :</strong> Formation ${modaliteTexte(f)}${isPresentiel(f) ? `<br><strong>Lieu :</strong> ${f.lieu}` : ''}</p>
+      <p><strong>Durée totale :</strong> ${f.duree}<br><strong>Dates :</strong> du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}<br><strong>Horaires :</strong> de 09h00 à 17h00<br><strong>Modalité :</strong> Formation ${modaliteTexte(f)}${isPresentiel(f) ? `<br><strong>Lieu :</strong> ${f.lieu}` : ''}</p>
       <h3>Article 4 – Prérequis</h3>
       <p>${f.prerequis || 'Aucun prérequis spécifique'}</p>
       <h3>Article 5 – Moyens pédagogiques et techniques</h3>
@@ -220,7 +220,7 @@ export function genContratFormationPro_V2(o: OrganismeInfo, f: FormationInfo, st
       <p>En cas de litige, les parties s'efforceront de trouver une solution amiable. À défaut, le litige sera porté devant les juridictions compétentes.</p>
       <h3>Article 14 – Entrée en vigueur</h3>
       <p>Le présent contrat prend effet à la date de sa signature par les deux parties.</p>
-      <p><strong>Fait à ${o.ville}, le :</strong> ${formatDate(subtractBusinessDays(f.dateDebut || new Date().toISOString(), 14))}</p>
+      <p><strong>Fait à ${o.ville}, le :</strong> ${formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || new Date().toISOString(), 14))}</p>
     `;
     extra += sigBlock(
       `Pour l'Organisme de formation<br>${o.nom}`, o.dirigeant, orgSig(o),
@@ -242,7 +242,7 @@ export function genConvocationStagiaire(o: OrganismeInfo, f: FormationInfo, stag
     <p>${civilite},</p>
     <p>Nous avons le plaisir de vous confirmer votre inscription à la formation suivante :</p>
     <h3>Intitulé de la formation</h3><p>${f.intitule}</p>
-    <h3>Dates de la formation</h3><p>Du : ${formatDate(f.dateDebut)}<br>Au : ${formatDate(f.dateFin)}</p>
+    <h3>Dates de la formation</h3><p>Du : ${formatDate(getStagiaireDateDebut(s, f))}<br>Au : ${formatDate(getStagiaireDateFin(s, f))}</p>
     <h3>Horaires</h3><p>De : 09h00<br>À : 17h00</p>
     <h3>Durée totale</h3><p>${f.duree}</p>
     <h3>Modalité</h3><p>Formation ${modaliteTexte(f)}</p>
@@ -259,7 +259,7 @@ export function genConvocationStagiaire(o: OrganismeInfo, f: FormationInfo, stag
     <p>Nous vous remercions de vous présenter 15 minutes avant le début de la formation.</p>
     <p>Pour toute question ou information complémentaire, vous pouvez nous contacter par email.</p>
     <p>Nous vous prions d'agréer, ${civilite}, l'expression de nos salutations distinguées.</p>
-    <p><strong>Fait à ${o.ville}, le :</strong> ${formatDate(subtractBusinessDays(f.dateDebut || new Date().toISOString(), 14))}</p>
+    <p><strong>Fait à ${o.ville}, le :</strong> ${formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || new Date().toISOString(), 14))}</p>
     <p><strong>Pour ${o.nom}</strong></p>
     <p>${o.dirigeant}<br>Président – Formateur</p>
     ${orgSig(o)}
@@ -286,7 +286,7 @@ export function genContratFormationProStagiaire(o: OrganismeInfo, f: FormationIn
     <p>À l'issue de la formation, le stagiaire sera capable de :</p>
     <p>${f.objectifs.split('\n').map(o => `• ${o}`).join('<br>')}</p>
     <h3>Article 3 – Organisation de la formation</h3>
-    <p><strong>Durée totale :</strong> ${f.duree}<br><strong>Dates :</strong> du ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)}<br><strong>Horaires :</strong> de 09h00 à 17h00<br><strong>Modalité :</strong> Formation ${modaliteTexte(f)}${isPresentiel(f) ? `<br><strong>Lieu :</strong> ${f.lieu}` : ''}</p>
+    <p><strong>Durée totale :</strong> ${f.duree}<br><strong>Dates :</strong> du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}<br><strong>Horaires :</strong> de 09h00 à 17h00<br><strong>Modalité :</strong> Formation ${modaliteTexte(f)}${isPresentiel(f) ? `<br><strong>Lieu :</strong> ${f.lieu}` : ''}</p>
     <h3>Article 4 – Prérequis</h3>
     <p>${f.prerequis || 'Aucun prérequis spécifique'}</p>
     <h3>Article 5 – Moyens pédagogiques et techniques</h3>
@@ -320,7 +320,7 @@ export function genContratFormationProStagiaire(o: OrganismeInfo, f: FormationIn
     <p>En cas de litige, les parties s'efforceront de trouver une solution amiable. À défaut, le litige sera porté devant les juridictions compétentes.</p>
     <h3>Article 14 – Entrée en vigueur</h3>
     <p>Le présent contrat prend effet à la date de sa signature par les deux parties.</p>
-    <p><strong>Fait à ${o.ville}, le :</strong> ${formatDate(subtractBusinessDays(f.dateDebut || new Date().toISOString(), 14))}</p>
+    <p><strong>Fait à ${o.ville}, le :</strong> ${formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || new Date().toISOString(), 14))}</p>
   `;
   extra += sigBlock(
     `Pour l'Organisme de formation<br>${o.nom}`, o.dirigeant, orgSig(o),
