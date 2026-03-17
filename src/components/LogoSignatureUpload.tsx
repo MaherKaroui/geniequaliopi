@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Image, PenTool, Stamp, X } from "lucide-react";
+import { X } from "lucide-react";
 
 interface LogoSignatureUploadProps {
   logoUrl?: string;
