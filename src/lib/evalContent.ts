@@ -842,8 +842,8 @@ function cleanBrackets(text: string, stagiaireNom?: string, stagiairePrenom?: st
 }
 
 // Generate a "correct" answer that's unique per stagiaire (rephrased) — LONG and realistic
-function generateFullAnswer(expected: string, stagiaireIndex: number, questionIndex: number): string {
-  const cleaned = cleanBrackets(expected);
+function generateFullAnswer(expected: string, stagiaireIndex: number, questionIndex: number, stagiaireInfo?: { nom?: string; prenom?: string; entreprise?: string; poste?: string }): string {
+  const cleaned = cleanBrackets(expected, stagiaireInfo?.nom, stagiaireInfo?.prenom, stagiaireInfo?.entreprise, stagiaireInfo?.poste);
   const sentences = cleaned.split(/(?<=[.!])\s+/).filter(s => s.trim());
   const seed = (stagiaireIndex * 13 + questionIndex * 7) % 8;
   
