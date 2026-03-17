@@ -65,12 +65,9 @@ const CriteresForm = ({ data, onChange }: CriteresFormProps) => {
                       <p className="text-sm font-medium">{indicateur.titre}</p>
                     </div>
                     <div className="ml-8 space-y-2">
-                      <div className="flex items-start gap-2 p-2 bg-qualiopi-blue-light rounded-md">
-                        <Info className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                        <div>
-                          <p className="text-xs font-semibold text-primary">Niveau attendu</p>
-                          <p className="text-xs text-foreground/80">{indicateur.niveauAttendu}</p>
-                        </div>
+                      <div className="p-2 bg-qualiopi-blue-light rounded-md">
+                        <p className="text-xs font-semibold text-primary">Niveau attendu</p>
+                        <p className="text-xs text-foreground/80">{indicateur.niveauAttendu}</p>
                       </div>
                       <div className="flex items-start gap-2 p-2 bg-qualiopi-green-light rounded-md">
                         <ClipboardCheck className="w-4 h-4 text-qualiopi-green shrink-0 mt-0.5" />
