@@ -3804,12 +3804,11 @@ function genMoyensMateriels(o: OrganismeInfo) {
 function genBailSousLocation(o: OrganismeInfo) {
   // Date du bail = dateMaj - 15 jours calendaires
   const refDate = o.dateMaj || new Date().toISOString().slice(0, 10);
-  const bailDate = new Date(refDate);
-  bailDate.setDate(bailDate.getDate() - 15);
-  const dateSignature = formatDate(bailDate.toISOString());
+  const bailDateStr = subtractBusinessDays(refDate, 15);
+  const dateSignature = formatDate(bailDateStr);
   const dateDebut = dateSignature; // le bail commence à la signature
   const dateFin = (() => {
-    const d = new Date(bailDate);
+    const d = new Date(bailDateStr);
     d.setFullYear(d.getFullYear() + 2);
     return formatDate(d.toISOString());
   })();
