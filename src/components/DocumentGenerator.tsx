@@ -409,7 +409,6 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
 
       {/* Progress */}
       <div className="p-3 bg-secondary rounded-xl flex items-center gap-3">
-        <CheckCircle2 className="w-5 h-5 text-accent" />
         <div className="flex-1">
           <div className="flex justify-between text-sm">
             <span>{generated.size} / {catalog.length} documents générés</span>
