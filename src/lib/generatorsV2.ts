@@ -259,7 +259,7 @@ export function genConvocationStagiaire(o: OrganismeInfo, f: FormationInfo, stag
     <p>Nous vous remercions de vous présenter 15 minutes avant le début de la formation.</p>
     <p>Pour toute question ou information complémentaire, vous pouvez nous contacter par email.</p>
     <p>Nous vous prions d'agréer, ${civilite}, l'expression de nos salutations distinguées.</p>
-    <p><strong>Fait à ${o.ville}, le :</strong> ${formatDate(subtractBusinessDays(f.dateDebut || new Date().toISOString(), 14))}</p>
+    <p><strong>Fait à ${o.ville}, le :</strong> ${formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || new Date().toISOString(), 14))}</p>
     <p><strong>Pour ${o.nom}</strong></p>
     <p>${o.dirigeant}<br>Président – Formateur</p>
     ${orgSig(o)}
