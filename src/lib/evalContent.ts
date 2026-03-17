@@ -811,18 +811,32 @@ export function generateStagiaireOpenAnswers(
 }
 
 // Clean brackets from expected answers and replace with realistic values
-function cleanBrackets(text: string): string {
+function cleanBrackets(text: string, stagiaireNom?: string, stagiairePrenom?: string, entreprise?: string, poste?: string): string {
+  const nom = stagiaireNom || 'Martin';
+  const prenom = stagiairePrenom || 'Sophie';
   return text
-    .replace(/\[Name\]/gi, 'Mme Dupont')
-    .replace(/\[company\]/gi, 'notre entreprise')
-    .replace(/\[position\]/gi, 'responsable de projet')
+    .replace(/\[Name\]/gi, `${prenom} ${nom}`)
+    .replace(/\[Nom[^\]]*\]/gi, `${prenom} ${nom}`)
+    .replace(/Mme Dupont/gi, `Mme ${nom}`)
+    .replace(/M\. Dupont/gi, `M. ${nom}`)
+    .replace(/\[company\]/gi, entreprise || 'mon entreprise')
+    .replace(/\[position\]/gi, poste || 'mon poste actuel')
     .replace(/\[tasks?\]/gi, 'la gestion des projets et le suivi des équipes')
     .replace(/\[date\]/gi, 'le 15 du mois prochain')
     .replace(/\[X\]/gi, '3')
     .replace(/\[Area\]/gi, 'la gestion de projet')
     .replace(/\[Department\]/gi, 'le service commercial')
     .replace(/\[Responsibility\]/gi, 'la coordination des équipes')
-    .replace(/\[Job Title\]/gi, 'responsable de projet')
+    .replace(/\[Job Title\]/gi, poste || 'responsable de projet')
+    .replace(/Le stagiaire doit /gi, 'J\'ai ')
+    .replace(/Le stagiaire /gi, 'J\'ai ')
+    .replace(/L['']apprenant doit /gi, 'J\'ai ')
+    .replace(/doit créer/gi, 'ai créé')
+    .replace(/doit utiliser/gi, 'ai utilisé')
+    .replace(/doit rédiger/gi, 'ai rédigé')
+    .replace(/doit appliquer/gi, 'ai appliqué')
+    .replace(/doit identifier/gi, 'ai identifié')
+    .replace(/doit réaliser/gi, 'ai réalisé')
     .replace(/\[.*?\]/g, '');
 }
 
