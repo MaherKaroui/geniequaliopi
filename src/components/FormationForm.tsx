@@ -74,14 +74,9 @@ const FormationForm = ({ data, onChange, onImportStagiaires }: FormationFormProp
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-3 mb-6">
-        <div className="w-10 h-10 rounded-xl bg-qualiopi-green/10 flex items-center justify-center">
-          <BookOpen className="w-5 h-5 text-qualiopi-green" />
-        </div>
-        <div>
-          <h2 className="text-xl font-bold">Informations de la formation</h2>
-          <p className="text-sm text-muted-foreground">Choisissez une formation exemple, importez un fichier EDOF ou remplissez manuellement</p>
-        </div>
+      <div className="mb-6">
+        <h2 className="text-xl font-bold">Informations de la formation</h2>
+        <p className="text-sm text-muted-foreground">Choisissez une formation exemple, importez un fichier EDOF ou remplissez manuellement</p>
       </div>
 
       {/* EDOF Import */}
