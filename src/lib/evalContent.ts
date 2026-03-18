@@ -594,7 +594,7 @@ const QUESTIONS_OUVERTES: Record<string, QuestionsOuvertesFormation> = {
       { question: "Quels sont vos objectifs pour cette formation de français ?", reponseAttendue: "Réponse ouverte : mieux communiquer au travail, écrire des transmissions, comprendre les protocoles, participer aux réunions." },
     ],
     fin: [
-      { question: "Rédigez une transmission pour un résident qui a refusé son repas.", reponseAttendue: "[Date] – [Heure] – M./Mme [Nom] a refusé le déjeuner. Il/elle a dit ne pas avoir faim. A bu un verre d'eau. Informé(e) l'infirmière. Signé : [Nom, Fonction]." },
+      { question: "Rédigez une transmission pour un résident qui a refusé son repas.", reponseAttendue: "[Date] – [Heure] – Le résident [Nom] a refusé le déjeuner. Le résident a dit ne pas avoir faim. A bu un verre d'eau. L'infirmière a été informée. Signé : [Nom, Fonction]." },
       { question: "Comment reformuler pour vérifier que vous avez bien compris ?", reponseAttendue: "Si je comprends bien, vous dites que… / Vous voulez dire que… / Est-ce que c'est bien cela ?" },
       { question: "Expliquez ce qu'est le secret professionnel.", reponseAttendue: "Le secret professionnel interdit de révéler des informations sur les usagers en dehors du cadre professionnel. On partage uniquement avec les collègues concernés (secret partagé)." },
       { question: "Que contient un livret d'accueil ?", reponseAttendue: "Le livret d'accueil présente la structure, ses services, les horaires, les droits des usagers, le règlement, les contacts, la charte des droits et libertés." },
