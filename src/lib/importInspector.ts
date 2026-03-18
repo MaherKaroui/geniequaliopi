@@ -83,7 +83,9 @@ function buildExpectedFiles({ catalog, dateMaj, exportFormat, orgName, stagiaire
   const expected: ExpectedFileDescriptor[] = [];
 
   for (const doc of catalog) {
-    const extension = getPreferredExtension(doc.template, exportFormat);
+    const extension = doc.template === "pdf_static" && doc.params?.pdfFile
+      ? (String(doc.params.pdfFile).match(/\.[^.]+$/)?.[0]?.toLowerCase() || ".pdf")
+      : getPreferredExtension(doc.template, exportFormat);
     const pushExpected = (suffix: string, stagiaire?: StagiaireInfo | null) => {
       const requestedName = buildDocumentFileName(doc, orgName, version, dateMaj, extension, stagiaire);
       expected.push({
