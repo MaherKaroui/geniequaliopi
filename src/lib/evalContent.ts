@@ -903,14 +903,14 @@ function generatePartialAnswer(expected: string, seed: number, stagiaireIndex: n
 
 function generateWrongAnswer(expected: string, seed: number, stagiaireIndex: number, questionIndex: number): string {
   const vaguePool = [
-    "Je ne suis pas vraiment sûr(e) de ma réponse. Je pense que c'est lié au sujet qu'on a vu en cours mais je n'arrive pas à me rappeler de la procédure exacte. Il faudrait que je revoie mes notes pour donner une réponse plus précise. C'est quelque chose que j'ai du mal à retenir.",
-    "C'est un sujet que j'ai déjà vu en formation mais honnêtement je ne me souviens plus très bien des détails. Je sais qu'il y a plusieurs étapes à suivre mais je ne saurais pas les énumérer correctement. J'ai besoin de plus de pratique sur ce point.",
-    "Je crois qu'il faut suivre un protocole spécifique mais je ne me souviens plus des étapes exactes. On en a parlé en cours je pense mais ça remonte un peu. Je vais essayer de revoir cette partie dans mes notes car c'est important pour mon travail.",
-    "De mémoire, je dirais que c'est quelque chose en rapport avec ce qu'on a vu le premier jour mais je confonds un peu les différentes notions. Je n'ai pas assez pratiqué pour être à l'aise avec ce sujet. Il faudrait que je m'entraîne davantage pour bien maîtriser cette compétence.",
-    "Franchement, je ne suis pas certain(e) de ma réponse. Je pense qu'il faut en parler à un responsable mais je ne connais pas la suite de la procédure. C'est un point sur lequel j'ai encore besoin de formation. Je comprends l'importance du sujet mais l'application pratique me pose problème.",
-    "J'ai une vague idée de ce qu'il faut faire mais je ne pourrais pas l'expliquer clairement. C'est un domaine que je ne maîtrise pas encore suffisamment. J'aurais besoin de revoir les cours et de pratiquer plus régulièrement pour pouvoir répondre correctement à cette question.",
-    "C'est difficile pour moi de répondre à cette question. J'ai compris le principe général quand le formateur l'a expliqué à l'oral mais quand il faut écrire la réponse, je me rends compte que je ne maîtrise pas encore assez le vocabulaire et les concepts. Je vais travailler dessus.",
-    "Je connais un peu le sujet mais je n'arrive pas bien à formuler ma réponse. C'est frustrant car je pense que j'ai compris à l'oral mais à l'écrit c'est plus compliqué. J'ai besoin de plus de temps et de pratique pour consolider mes connaissances sur ce thème.",
+    "Il faut suivre un protocole spécifique mais les étapes exactes ne sont pas claires pour moi.",
+    "Il y a plusieurs éléments à prendre en compte mais je ne saurais pas les détailler précisément.",
+    "Il faut en parler à un responsable, c'est la première chose à faire.",
+    "Il faut appliquer les règles qu'on a vues mais je ne me souviens plus de l'ordre exact.",
+    "Le principe général est de respecter les consignes de sécurité et d'hygiène.",
+    "Il faut documenter la situation et suivre le protocole en place.",
+    "La procédure demande de vérifier plusieurs points avant d'agir.",
+    "Il faut se référer aux fiches de procédure et appliquer les consignes.",
   ];
   return vaguePool[(seed + stagiaireIndex * 3 + questionIndex * 5) % vaguePool.length];
 }
