@@ -1063,7 +1063,7 @@ export function genCertificatReussite_V2(o: OrganismeInfo, f: FormationInfo, sta
         ${orgSig(o)}
       </div>`;
   });
-  return buildDocument({ org: o, title: "ATTESTATIONS DE RÉUSSITE", subtitle: f.intitule, extraHtml: extra });
+  return buildDocument({ org: o, title: "ATTESTATIONS DE RÉUSSITE", subtitle: f.intitule, stagiaires, extraHtml: extra });
   // Signatures inline per stagiaire (organisme only with tampon)
 }
 
