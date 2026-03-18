@@ -4402,7 +4402,7 @@ function genBilanChaud(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiaire
     extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%"><tr style="background:#1e3a7b;color:#fff"><th>Critères évalués</th><th>Très satisfaisant</th><th>Satisfaisant</th><th>Peu satisfaisant</th><th>Insuffisant</th></tr>`;
     criteres.forEach((label, idx) => {
       const note = pat[idx];
-      extra += `<tr><td>${label}</td><td>${note === 0 ? "☒" : "☐"}</td><td>${note === 1 ? "☒" : "☐"}</td><td>☐</td><td>☐</td></tr>`;
+      extra += `<tr><td>${label}</td><td style="text-align:center;font-weight:700">${note === 0 ? "X" : ""}</td><td style="text-align:center;font-weight:700">${note === 1 ? "X" : ""}</td><td></td><td></td></tr>`;
     });
     extra += `</table>`;
     const comments = [
