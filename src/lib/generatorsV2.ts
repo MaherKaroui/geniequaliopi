@@ -2,6 +2,11 @@
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { buildDocument, tableHTML, formatDate, subtractBusinessDays, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif } from "./docBuilder";
 import { EVAL_SCORES, getFormationDays, CONNECTION_TIMES_6H, CONNECTION_TIMES_7H, parseDuree } from "./sampleData";
+
+function getHoraireFin(f: FormationInfo): string {
+  const { hoursPerDay } = parseDuree(f.duree);
+  return hoursPerDay <= 6 ? "16h00" : "17h00";
+}
 import { getEvalContent, generateStagiaireAnswers, computeQCMScore, getQuestionsOuvertes, generateStagiaireOpenAnswers } from "./evalContent";
 
 // ========== HELPERS ==========
