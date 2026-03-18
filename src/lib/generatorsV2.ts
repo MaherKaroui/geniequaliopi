@@ -878,14 +878,8 @@ export function genGrilleAcquisitionStagiaire(o: OrganismeInfo, f: FormationInfo
 
   const headers = ["", "NIVEAU", "", ""];
   const subHeaders = ["COMPÉTENCES PROFESSIONNELLES", "ACQUIS", "NON ACQUIS", "EN COURS D'ACQUISITION"];
-  const rows = evalData.competences.map((comp, ci) => {
-    const score = sc[ci % sc.length];
-    const finalScore = Math.min(10, score + 2); // post-formation improvement
-    let acquis = '', nonAcquis = '', enCours = '';
-    if (finalScore >= 8) acquis = '✅';
-    else if (finalScore < 5) nonAcquis = '❌';
-    else enCours = '🔄';
-    return [comp, acquis, nonAcquis, enCours];
+  const rows = evalData.competences.map((comp) => {
+    return [comp, 'X', '', ''];
   });
 
   extra += tableHTML(subHeaders, rows);
