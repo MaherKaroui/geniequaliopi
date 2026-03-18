@@ -631,7 +631,8 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
   const heuresMatch = f.duree.match(/(\d+)\s*h/i);
   const totalHeures = heuresMatch ? parseInt(heuresMatch[1]) : 14;
   const heuresTotal = `${totalHeures} heures`;
-  const nbJours = Math.ceil(totalHeures / 7);
+  const joursMatch = f.duree.match(/(\d+)\s*jours?/i);
+  const nbJours = joursMatch ? parseInt(joursMatch[1]) : Math.ceil(totalHeures / 7);
 
   if (dayBlocks.length === 0 || !dayBlocks.some(d => d.rows.length > 0)) {
     // Extract objectives as content seeds for each day
