@@ -884,18 +884,6 @@ function generatePartialAnswer(expected: string, seed: number, stagiaireIndex: n
   const sentences = cleaned.split(/(?<=[.!])\s+/).filter(s => s.trim());
   const variation = (stagiaireIndex * 11 + questionIndex * 3) % 3;
   
-  const partialIntros = [
-    'Je ne suis pas sûr(e) à 100% mais je pense que ',
-    'De mémoire, ',
-    'Si je me rappelle bien, ',
-  ];
-  
-  const partialClosings = [
-    ' Je ne me souviens plus exactement du reste mais je crois que c\'est à peu près ça.',
-    ' Il y avait d\'autres éléments mais je ne me rappelle plus de tout.',
-    ' Je pense qu\'il manque des choses dans ma réponse mais c\'est ce dont je me souviens.',
-  ];
-  
   let mainContent: string;
   if (sentences.length > 2) {
     if (variation === 0) mainContent = sentences[0];
@@ -910,7 +898,7 @@ function generatePartialAnswer(expected: string, seed: number, stagiaireIndex: n
     mainContent = words.slice(0, cutoff).join(' ');
   }
   
-  return partialIntros[variation] + mainContent + '.' + partialClosings[variation];
+  return mainContent + '.';
 }
 
 function generateWrongAnswer(expected: string, seed: number, stagiaireIndex: number, questionIndex: number): string {
