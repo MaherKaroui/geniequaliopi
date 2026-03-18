@@ -28,7 +28,7 @@ export function buildFullCatalog(
 
     // IND 1 — Programme de formation
     formations.forEach((f, fi) => {
-      add(`af_c1i1_programme_${fi}`, `CT1 - IND 1 PROGRAMME DE FORMATION – ${f.intitule}`, 1, 1, "programme_formation", { fi });
+      add(`af_c1i1_programme_${fi}`, `CT1 - IND 1 PROGRAMME DE FORMATION`, 1, 1, "programme_formation", { fi });
     });
 
     // IND 2 — Indicateurs de résultats / performance
