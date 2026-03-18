@@ -152,13 +152,15 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
         const fileName = buildFileName(`${doc.nom} - ${s.prenom} ${s.nom}`, o.nom, o.version, o.dateMaj);
         await downloadFile(content, fileName);
       }
-    } else if (doc.template === "tableau_suivi_parcours_excel" || doc.template === "plan_dev_competences_excel" || doc.template === "tableau_amelioration_continue_excel" || doc.template === "suivi_dysfonctionnements_excel" || doc.template === "relances_appreciations_excel") {
+    } else if (doc.template === "tableau_suivi_parcours_excel" || doc.template === "plan_dev_competences_excel" || doc.template === "tableau_amelioration_continue_excel" || doc.template === "suivi_dysfonctionnements_excel" || doc.template === "relances_appreciations_excel" || doc.template === "indicateurs_performance") {
       const sf = formation.intitule
         ? { ...SAMPLE_FORMATIONS[0], ...Object.fromEntries(Object.entries(formation).filter(([, v]) => v && String(v).trim())) }
         : SAMPLE_FORMATIONS[0];
       let excelContent: string;
       if (doc.template === "tableau_suivi_parcours_excel") {
         excelContent = generateExcelTableauSuiviParcours(o, sf, allStagiaires);
+      } else if (doc.template === "indicateurs_performance") {
+        excelContent = generateExcelTableauBordPerformance(o, sf, allStagiaires);
       } else {
         excelContent = generateContent(doc);
       }
