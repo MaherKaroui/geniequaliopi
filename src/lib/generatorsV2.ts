@@ -362,12 +362,12 @@ export function genEmargementJour_V2(o: OrganismeInfo, f: FormationInfo, stagiai
         rows.push([
           day, 'Matin',
           `${s.prenom} ${s.nom}${s.signatureUrl ? `<br><img src="${s.signatureUrl}" alt="Sig" style="max-height:35px;max-width:80px;object-fit:contain" />` : `<br><span style="font-style:italic;color:#999;font-size:10px">Signé ${s.prenom[0]}.${s.nom}</span>`}`,
-          `${f.formateur}${o.tamponUrl ? `<br><img src="${o.tamponUrl}" alt="Tampon" style="max-height:35px;max-width:80px;object-fit:contain" />` : (o.signatureUrl ? `<br><img src="${o.signatureUrl}" alt="Sig" style="max-height:35px;max-width:80px;object-fit:contain" />` : '')}`
+          `${f.formateur}${o.signatureUrl ? `<br><img src="${o.signatureUrl}" alt="Sig" style="max-height:35px;max-width:80px;object-fit:contain" />` : ''}`
         ]);
         rows.push([
           '', 'Après-midi',
           `${s.prenom} ${s.nom}${s.signatureUrl ? `<br><img src="${s.signatureUrl}" alt="Sig" style="max-height:35px;max-width:80px;object-fit:contain" />` : `<br><span style="font-style:italic;color:#999;font-size:10px">Signé ${s.prenom[0]}.${s.nom}</span>`}`,
-          `${f.formateur}${o.tamponUrl ? `<br><img src="${o.tamponUrl}" alt="Tampon" style="max-height:35px;max-width:80px;object-fit:contain" />` : (o.signatureUrl ? `<br><img src="${o.signatureUrl}" alt="Sig" style="max-height:35px;max-width:80px;object-fit:contain" />` : '')}`
+          `${f.formateur}${o.signatureUrl ? `<br><img src="${o.signatureUrl}" alt="Sig" style="max-height:35px;max-width:80px;object-fit:contain" />` : ''}`
         ]);
       });
       extra += tableHTML(["Date", "Horaires", "Prénom et nom, Signature Du Stagiaire", "Prénom et nom du Formateur"], rows);

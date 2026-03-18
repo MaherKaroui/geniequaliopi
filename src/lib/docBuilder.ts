@@ -30,7 +30,7 @@ p{margin-bottom:8px;font-size:${s.fontSize}px}
 table{width:100%;border-collapse:collapse;margin:15px 0;font-size:${s.fontSize}px}
 th{background:${s.primaryColor};color:white;padding:10px;text-align:left}
 td{padding:8px 10px;border-bottom:1px solid #e0e0e0}
-tr:nth-child(even){background:#f8f9fa}
+tr:nth-child(even){background:#fff}
 .footer{margin-top:40px;padding-top:20px;border-top:2px solid #e0e0e0;font-size:${s.fontSize - 1}px;color:#666;text-align:center}
 .signature-block{display:grid;grid-template-columns:1fr 1fr 1fr;gap:30px;margin-top:40px}
 .signature-block-2{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:40px}
