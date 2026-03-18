@@ -4324,7 +4324,6 @@ function genBilanFroid(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiaire
   const dureeH = parseInt(f.duree) || 14;
   let extra = `<p><strong>Date :</strong> ${formatDate(f.dateFin)}</p><p><em>Délai de réalisation du bilan à froid : 3 à 6 mois après la formation</em></p>`;
   stagiaires.slice(0, 8).forEach((s, i) => {
-    const rng = seededRandom(i * 31 + 3);
     extra += `<h3>Stagiaire : ${s.prenom} ${s.nom}</h3>`;
     const criteres = [
       "Utilisez-vous encore les outils depuis la formation ?",
@@ -4337,11 +4336,22 @@ function genBilanFroid(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiaire
       "La durée de la formation était-elle adaptée ?",
       "Recommanderiez-vous cette formation avec du recul ?",
     ];
+    // Pattern: mostly 0 (Tout à fait) with some 1 (Plutôt oui), varying per stagiaire
+    const patterns = [
+      [0,0,1,0,0,0,1,0,0],
+      [0,1,0,0,1,0,0,0,0],
+      [1,0,0,0,0,1,0,0,1],
+      [0,0,0,1,0,0,0,1,0],
+      [0,0,1,0,1,0,0,0,0],
+      [0,1,0,0,0,0,1,0,0],
+      [1,0,0,0,0,0,0,1,0],
+      [0,0,0,1,0,1,0,0,0],
+    ];
+    const pat = patterns[i % patterns.length];
     extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%"><tr style="background:#1e3a7b;color:#fff"><th>Critères évalués</th><th>Tout à fait</th><th>Plutôt oui</th><th>Plutôt non</th><th>Non</th></tr>`;
-    criteres.forEach((label) => {
-      const r = rng();
-      const note: number = r < 0.5 ? 0 : r < 0.85 ? 1 : 2;
-      extra += `<tr><td>${label}</td><td>${note === 0 ? "☒" : "☐"}</td><td>${note === 1 ? "☒" : "☐"}</td><td>${note === 2 ? "☒" : "☐"}</td><td>${note === 3 ? "☒" : "☐"}</td></tr>`;
+    criteres.forEach((label, idx) => {
+      const note = pat[idx];
+      extra += `<tr><td>${label}</td><td>${note === 0 ? "☒" : "☐"}</td><td>${note === 1 ? "☒" : "☐"}</td><td>☐</td><td>☐</td></tr>`;
     });
     extra += `</table>`;
     const comments = [
@@ -4359,7 +4369,6 @@ function genBilanChaud(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiaire
   const dureeH = parseInt(f.duree) || 14;
   let extra = `<p><strong>Date :</strong> ${formatDate(f.dateFin)}</p>`;
   stagiaires.slice(0, 10).forEach((s, i) => {
-    const rng = seededRandom(i * 53 + 11);
     extra += `<h3>Stagiaire : ${s.prenom} ${s.nom}</h3>`;
     extra += `<p><strong>Date :</strong> ${formatDate(f.dateFin)}</p>`;
     const criteres = [
@@ -4376,11 +4385,24 @@ function genBilanChaud(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiaire
       "Utilité professionnelle de la formation",
       "Recommandation de la formation",
     ];
+    // Patterns: mostly 0 (Très satisfaisant) with some 1 (Satisfaisant), different per stagiaire
+    const patterns = [
+      [0,0,0,1,0,0,0,0,1,0,0,0],
+      [0,1,0,0,0,1,0,0,0,0,0,1],
+      [0,0,1,0,0,0,0,1,0,0,0,0],
+      [1,0,0,0,1,0,0,0,0,0,1,0],
+      [0,0,0,0,0,0,1,0,0,1,0,0],
+      [0,0,1,0,0,0,0,0,0,1,0,0],
+      [0,1,0,0,0,0,0,0,1,0,0,0],
+      [0,0,0,0,1,0,0,0,0,0,0,1],
+      [1,0,0,0,0,0,1,0,0,0,0,0],
+      [0,0,0,1,0,0,0,0,0,0,1,0],
+    ];
+    const pat = patterns[i % patterns.length];
     extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%"><tr style="background:#1e3a7b;color:#fff"><th>Critères évalués</th><th>Très satisfaisant</th><th>Satisfaisant</th><th>Peu satisfaisant</th><th>Insuffisant</th></tr>`;
-    criteres.forEach((label) => {
-      const r = rng();
-      const note: number = r < 0.55 ? 0 : r < 0.9 ? 1 : 2;
-      extra += `<tr><td>${label}</td><td>${note === 0 ? "☒" : "☐"}</td><td>${note === 1 ? "☒" : "☐"}</td><td>${note === 2 ? "☒" : "☐"}</td><td>${note === 3 ? "☒" : "☐"}</td></tr>`;
+    criteres.forEach((label, idx) => {
+      const note = pat[idx];
+      extra += `<tr><td>${label}</td><td>${note === 0 ? "☒" : "☐"}</td><td>${note === 1 ? "☒" : "☐"}</td><td>☐</td><td>☐</td></tr>`;
     });
     extra += `</table>`;
     const comments = [
@@ -4448,7 +4470,6 @@ function seededRandom(seed: number): () => number {
 function genBilanChaudStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = stagiaires[si] || stagiaires[0];
   const dureeH = parseInt(f.duree) || 14;
-  const rng = seededRandom(si * 31 + 7);
 
   const allCriteres = [
     "Satisfaction globale de la formation",
@@ -4465,10 +4486,19 @@ function genBilanChaudStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: 
     "Recommandation de la formation",
   ];
 
-  const notes: number[] = allCriteres.map(() => {
-    const r = rng();
-    return r < 0.45 ? 0 : r < 0.85 ? 1 : 2;
-  });
+  const patterns = [
+    [0,0,0,1,0,0,0,0,1,0,0,0],
+    [0,1,0,0,0,1,0,0,0,0,0,1],
+    [0,0,1,0,0,0,0,1,0,0,0,0],
+    [1,0,0,0,1,0,0,0,0,0,1,0],
+    [0,0,0,0,0,0,1,0,0,1,0,0],
+    [0,0,1,0,0,0,0,0,0,1,0,0],
+    [0,1,0,0,0,0,0,0,1,0,0,0],
+    [0,0,0,0,1,0,0,0,0,0,0,1],
+    [1,0,0,0,0,0,1,0,0,0,0,0],
+    [0,0,0,1,0,0,0,0,0,0,1,0],
+  ];
+  const pat = patterns[si % patterns.length];
 
   let extra = `<p><strong>Date :</strong> ${formatDate(f.dateFin)}</p>`;
   extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%">
@@ -4480,8 +4510,8 @@ function genBilanChaudStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: 
 
   extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%"><tr style="background:#1e3a7b;color:#fff"><th>Critères évalués</th><th>Très satisfaisant</th><th>Satisfaisant</th><th>Peu satisfaisant</th><th>Insuffisant</th></tr>`;
   allCriteres.forEach((label, idx) => {
-    const n = notes[idx];
-    extra += `<tr><td>${label}</td><td>${n === 0 ? "☒" : "☐"}</td><td>${n === 1 ? "☒" : "☐"}</td><td>${n === 2 ? "☒" : "☐"}</td><td>${n === 3 ? "☒" : "☐"}</td></tr>`;
+    const n = pat[idx];
+    extra += `<tr><td>${label}</td><td>${n === 0 ? "☒" : "☐"}</td><td>${n === 1 ? "☒" : "☐"}</td><td>☐</td><td>☐</td></tr>`;
   });
   extra += `</table>`;
 
@@ -4507,7 +4537,6 @@ function genBilanChaudStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: 
 function genBilanFroidStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = stagiaires[si] || stagiaires[0];
   const dureeH = parseInt(f.duree) || 14;
-  const rng = seededRandom(si * 47 + 13);
 
   const allCriteres = [
     "Utilisez-vous encore les outils depuis la formation ?",
@@ -4521,10 +4550,19 @@ function genBilanFroidStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: 
     "Recommanderiez-vous cette formation avec du recul ?",
   ];
 
-  const notes: number[] = allCriteres.map(() => {
-    const r = rng();
-    return r < 0.5 ? 0 : r < 0.88 ? 1 : 2;
-  });
+  const patterns = [
+    [0,0,1,0,0,0,1,0,0],
+    [0,1,0,0,1,0,0,0,0],
+    [1,0,0,0,0,1,0,0,1],
+    [0,0,0,1,0,0,0,1,0],
+    [0,0,1,0,1,0,0,0,0],
+    [0,1,0,0,0,0,1,0,0],
+    [1,0,0,0,0,0,0,1,0],
+    [0,0,0,1,0,1,0,0,0],
+    [0,0,0,0,0,0,1,0,0],
+    [0,1,0,0,0,0,0,0,1],
+  ];
+  const pat = patterns[si % patterns.length];
 
   let extra = `<p><strong>Date :</strong> ${formatDate(f.dateFin)}</p><p><em>Bilan réalisé 3 à 6 mois après la formation</em></p>`;
   extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%">
@@ -4535,8 +4573,8 @@ function genBilanFroidStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: 
 
   extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%"><tr style="background:#1e3a7b;color:#fff"><th>Critères évalués</th><th>Tout à fait</th><th>Plutôt oui</th><th>Plutôt non</th><th>Non</th></tr>`;
   allCriteres.forEach((label, idx) => {
-    const n = notes[idx];
-    extra += `<tr><td>${label}</td><td>${n === 0 ? "☒" : "☐"}</td><td>${n === 1 ? "☒" : "☐"}</td><td>${n === 2 ? "☒" : "☐"}</td><td>${n === 3 ? "☒" : "☐"}</td></tr>`;
+    const n = pat[idx];
+    extra += `<tr><td>${label}</td><td>${n === 0 ? "☒" : "☐"}</td><td>${n === 1 ? "☒" : "☐"}</td><td>☐</td><td>☐</td></tr>`;
   });
   extra += `</table>`;
 
