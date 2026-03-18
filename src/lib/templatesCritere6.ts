@@ -510,7 +510,14 @@ export function genContratSousTraitanceV2(o: OrganismeInfo, f: FormationInfo, st
     { heading: "Article 5 : Obligations du donneur d'ordre", content: `<p>${o.nom} s'engage à :</p><ul><li>Confier au sous-traitant la formation prévue à l'article 2</li><li>Prendre en charge la gestion administrative et logistique de la formation</li><li>Transmettre au sous-traitant une copie des feuilles de présence signées par les stagiaires</li><li>Transmettre au sous-traitant une copie des questionnaires de satisfaction remplis par les stagiaires</li><li>Prévenir le sous-traitant au moins 7 jours à l'avance en cas d'annulation ou de report</li></ul>` },
     { heading: "Article 6 : Modalités financières", content: `<p>À VOIR SELON LE PROFIL DU FORMATEUR</p>` },
     { heading: "Article 7 : Dispositions diverses", content: `<ul><li>Le présent contrat ne crée entre les parties aucun lien de subordination</li><li>Le sous-traitant déclare avoir souscrit une police d'assurance responsabilité civile professionnelle (RCP)</li><li>Le sous-traitant dispose d'une propriété intellectuelle et/ou artistique sur le contenu de sa formation. Le donneur d'ordre s'engage à ne pas reproduire ni diffuser ce contenu sans accord</li></ul>` },
-  ], signatures: { type: "2", labels: ["Le donneur d'ordre – " + o.nom, "Le sous-traitant"], names: [o.dirigeant, o.responsablePedagogique] } });
+  ], extraHtml: (() => {
+    const sigHtml = o.signatureUrl ? `<img src="${o.signatureUrl}" alt="Signature" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : "";
+    const tamponHtml = o.tamponUrl ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />` : "";
+    return `<div class="signature-block-2">
+      <div class="sig-box"><p class="sig-label">Le donneur d'ordre – ${o.nom}</p><p>Nom : ${o.dirigeant}</p><p>Date : ________________________</p><p style="margin-top:20px">Signature :</p>${sigHtml}</div>
+      <div class="sig-box"><p class="sig-label">Le sous-traitant</p><p>Nom : ${o.responsablePedagogique}</p><p>Date : ________________________</p><p style="margin-top:20px">Signature :</p>${tamponHtml}</div>
+    </div>`;
+  })() });
 }
 
 export function genCharteQualiteFormateurExterne(o: OrganismeInfo) {
