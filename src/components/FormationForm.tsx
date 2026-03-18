@@ -147,6 +147,53 @@ const FormationForm = ({ data, onChange, onImportStagiaires }: FormationFormProp
         </Select>
       </div>
 
+      {/* RNCP Code Selector */}
+      <div className="p-4 bg-orange-50 dark:bg-orange-950/20 border-2 border-orange-200 dark:border-orange-800 rounded-xl">
+        <Label className="font-semibold text-orange-700 dark:text-orange-400">Code RNCP (certification)</Label>
+        <p className="text-xs text-muted-foreground mb-2">Sélectionnez un titre RNCP pour générer automatiquement la Fiche Titre RNCP, la Matière et le Tableau croisé.</p>
+        <div className="flex gap-2">
+          <Select
+            value={data.codeRNCP || ""}
+            onValueChange={(val) => {
+              if (val === "__custom__") return;
+              update("codeRNCP", val);
+              const fiche = RNCP_FICHES.find(f => f.code === val);
+              if (fiche) {
+                toast.success(`Fiche RNCP ${fiche.code} – ${fiche.intitule} sélectionnée`);
+              }
+            }}
+          >
+            <SelectTrigger className="bg-card flex-1">
+              <SelectValue placeholder="Choisir un titre RNCP..." />
+            </SelectTrigger>
+            <SelectContent>
+              {RNCP_FICHES.map((f) => (
+                <SelectItem key={f.code} value={f.code}>
+                  {f.code} – {f.intitule}
+                </SelectItem>
+              ))}
+              <SelectItem value="__custom__" disabled className="text-muted-foreground italic">
+                ── ou saisissez un code ci-dessous ──
+              </SelectItem>
+            </SelectContent>
+          </Select>
+          <Input
+            className="w-40 bg-card"
+            placeholder="Ex: RNCP12345"
+            value={data.codeRNCP || ""}
+            onChange={e => update("codeRNCP", e.target.value.toUpperCase())}
+          />
+        </div>
+        {data.codeRNCP && (
+          <p className="text-xs text-orange-600 dark:text-orange-400 mt-1">
+            Code sélectionné : <strong>{data.codeRNCP}</strong>
+            {RNCP_FICHES.find(f => f.code === data.codeRNCP)
+              ? ` – ${RNCP_FICHES.find(f => f.code === data.codeRNCP)!.intitule}`
+              : " (code personnalisé)"}
+          </p>
+        )}
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="md:col-span-2">
           <Label htmlFor="intitule">Intitulé de la formation *</Label>
