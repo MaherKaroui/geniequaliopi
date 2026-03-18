@@ -181,22 +181,6 @@ export function genPlanDevCompetencesExcel(o: OrganismeInfo, f: FormationInfo, f
     <th>Année</th>
   </tr>`;
 
-  // ========== FORMATIONS RÉALISÉES (année en cours) ==========
-  html += `<tr><th colspan="9" style="background:#2d8659;text-align:left;padding:10px">FORMATIONS RÉALISÉES – ${year}</th></tr>`;
-
-  // Row 1: Formation based on current formation — Interne, with stagiaire names
-  html += `<tr>
-    <td>Besoin identifié lors de l'entretien annuel</td>
-    <td>${f.intitule}</td>
-    <td>${f.objectifs || "Maîtriser les fonctionnalités et développer les compétences pratiques"}</td>
-    <td>Interne</td>
-    <td>${formateurName}</td>
-    <td>${nbStagiaires}</td>
-    <td>${stagiaireNames}</td>
-    <td>${f.duree || "21 heures"}</td>
-    <td>${year}</td>
-  </tr>`;
-
   // ========== FORMATIONS PRÉVUES (année suivante) ==========
   html += `<tr><th colspan="9" style="background:#e8870e;text-align:left;padding:10px">FORMATIONS PRÉVUES – ${nextYear}</th></tr>`;
 
