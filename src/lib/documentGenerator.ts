@@ -4523,7 +4523,7 @@ function genBilanFroidStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: 
 
   const notes: number[] = allCriteres.map(() => {
     const r = rng();
-    return r < 0.55 ? 0 : 1;
+    return r < 0.5 ? 0 : r < 0.88 ? 1 : 2;
   });
 
   let extra = `<p><strong>Date :</strong> ${formatDate(f.dateFin)}</p><p><em>Bilan réalisé 3 à 6 mois après la formation</em></p>`;
