@@ -2384,115 +2384,105 @@ function genIndicateursResultatsCFA(o: OrganismeInfo, f: FormationInfo) {
 }
 
 function genTitreRNCPCFA(o: OrganismeInfo, f: FormationInfo) {
-  return buildDocument({ org: o, title: "FICHE TITRE RNCP", subtitle: `${f.intitule}`, sections: [
+  const rncp = getRNCPByCode(f.codeRNCP || "");
+  if (!rncp) {
+    // Fallback générique si code non trouvé dans la base
+    return buildDocument({ org: o, title: "FICHE TITRE RNCP", subtitle: `${f.intitule}`, sections: [
+      { heading: "Identification", content: `${tableHTML(["Élément", "Détail"], [
+        ["Intitulé", f.intitule], ["Code RNCP", f.codeRNCP || "Non renseigné"],
+        ["Organisme de formation", o.nom],
+      ])}<p><em>Pour générer une fiche complète, sélectionnez un code RNCP dans le formulaire de formation.</em></p>` },
+    ] });
+  }
+  return buildDocument({ org: o, title: "FICHE TITRE RNCP", subtitle: `${rncp.intitule}`, sections: [
     { heading: "Identification de la certification", content: `
-      ${tableHTML(
-        ["Élément", "Détail"],
-        [
-          ["Intitulé du titre", f.intitule],
-          ["Code RNCP", f.codeRNCP || "RNCP39063"],
-          ["Niveau de qualification", "Niveau 5 (Bac+2)"],
-          ["Certificateur", "MINISTÈRE DU TRAVAIL DU PLEIN EMPLOI ET DE L'INSERTION"],
-          ["Date d'enregistrement", "10/06/2024"],
-          ["Date d'échéance", "10/06/2029"],
-          ["Code(s) NSF", "312t – Négociation et vente"],
-          ["Formacode(s)", "34581 – Technico-commercial / 34572 – Négociation grand compte / 34593 – Prospection vente"],
-        ]
-      )}
+      ${tableHTML(["Élément", "Détail"], [
+        ["Intitulé du titre", rncp.intitule],
+        ["Code RNCP", rncp.code],
+        ["Niveau de qualification", rncp.niveau],
+        ["Certificateur", rncp.certificateur],
+        ["Date d'enregistrement", rncp.dateEnregistrement],
+        ["Date d'échéance", rncp.dateEcheance],
+        ["Code(s) NSF", rncp.codeNSF],
+        ["Formacode(s)", rncp.formacodes],
+      ])}
       <p><em>Source : France Compétences – www.francecompetences.fr</em></p>` },
-    { heading: "Résumé de la certification", content: `<p><strong>Objectifs et contexte :</strong><br>Le négociateur technico-commercial élabore une stratégie de prospection, organise et met en œuvre un plan d'actions commerciales et en évalue les résultats. Il conçoit des propositions techniques et commerciales personnalisées et les négocie avec les interlocuteurs de l'entreprise prospect ou cliente. Il assure leur suivi afin d'optimiser la satisfaction de l'entreprise cliente et de la fidéliser.</p>` },
-    { heading: "Activités visées", content: `<p>Le négociateur technico-commercial assure une veille continue. Il analyse le positionnement des produits et des services par rapport à ses concurrents, les tendances du marché, les évolutions de l'offre et les changements réglementaires. Il contribue à l'élaboration du plan commercial et met en œuvre les actions en fonction des besoins des entreprises.</p><p>Il recueille les données relatives aux attentes des entreprises, crée les profils idéaux (personas) de chaque segment et personnalise son approche de prospection. Il suit les indicateurs clés de performance et propose des axes d'amélioration.</p><p>Il conçoit des propositions techniques et commerciales personnalisées, construit un argumentaire de vente et prépare la présentation. Il négocie en adoptant une posture d'expert-conseil et intègre la dimension écologique dans ses échanges.</p>` },
-    { heading: "Compétences attestées", content: `<p><strong>Bloc 1 – Élaborer une stratégie de prospection et la mettre en œuvre</strong><br>• Assurer une veille commerciale<br>• Concevoir et organiser un plan d'actions commerciales<br>• Prospecter un secteur défini<br>• Analyser ses performances, élaborer et mettre en œuvre des actions correctives</p><p><strong>Bloc 2 – Négocier une solution technique et commerciale et consolider l'expérience client</strong><br>• Représenter l'entreprise et valoriser son image<br>• Concevoir une proposition technique et commerciale<br>• Négocier une solution technique et commerciale<br>• Réaliser le bilan, ajuster son activité commerciale et rendre compte<br>• Optimiser la gestion de la relation client</p>`, variant: "green" },
-    { heading: "Modalités d'évaluation", content: `<p><strong>Mise en situation professionnelle :</strong> 6h30<br>Partie écrite (4h) : étude de cas, tableau de bord, diaporama<br>Partie orale (2h30) : présentation, prospection téléphonique, négociation en face à face</p><p><strong>Entretien technique :</strong> 50 min<br>Analyse matrice SWOT, présentation, échanges avec le jury</p><p><strong>Questionnement à partir de productions :</strong> 1h<br>Document et diaporama sur veille commerciale, plan d'actions, relation client</p><p><strong>Entretien final :</strong> 10 min<br>Échange sur le dossier professionnel</p><p><strong>Durée totale :</strong> 8h30</p>` },
-    { heading: "Secteurs d'activité et types d'emplois", content: `<p><strong>Secteurs :</strong> Tous les secteurs nécessitant des négociateurs technico-commerciaux</p><p><strong>Types d'emplois accessibles :</strong><br>• Technico-commercial<br>• Chargé d'affaires<br>• Responsable grands comptes<br>• Chargé de développement commercial<br>• Business developer<br>• Key account manager</p><p><strong>Codes ROME :</strong> D1402, D1406, D1407</p>` },
-    { heading: "Voie d'accès à la certification", content: `<p>• Après un parcours de formation continue<br>• En contrat d'apprentissage<br>• Après un parcours de formation hors temps de travail<br>• Par expérience (VAE)</p>` },
+    { heading: "Résumé de la certification", content: `<p><strong>Objectifs et contexte :</strong><br>${rncp.resume}</p>` },
+    { heading: "Activités visées", content: `<p>${rncp.activitesVisees}</p>` },
+    { heading: "Compétences attestées", content: rncp.blocsCompetences.map((b, i) =>
+      `<p><strong>Bloc ${i + 1} – ${b.titre}</strong><br>${b.competences.map(c => `• ${c}`).join("<br>")}</p>`
+    ).join(""), variant: "green" },
+    { heading: "Modalités d'évaluation", content: rncp.blocsCompetences.map((b, i) =>
+      `<p><strong>Bloc ${i + 1} :</strong> ${b.modalitesEval}</p>`
+    ).join("") },
+    { heading: "Secteurs d'activité et types d'emplois", content: `<p><strong>Secteurs :</strong> ${rncp.secteursActivite}</p><p><strong>Types d'emplois :</strong><br>${rncp.typesEmplois.map(e => `• ${e}`).join("<br>")}</p><p><strong>Codes ROME :</strong> ${rncp.codesROME.join(", ")}</p>` },
+    { heading: "Voie d'accès à la certification", content: `<p>${rncp.voiesAcces.map(v => `• ${v}`).join("<br>")}</p>` },
   ] });
 }
 
 function genMatiereTitreCFA(o: OrganismeInfo, f: FormationInfo) {
-  return buildDocument({ org: o, title: "MATIÈRE DU TITRE", subtitle: `${f.intitule}`, sections: [
-    { heading: "Présentation du titre", content: `<p><strong>Titre professionnel :</strong> ${f.intitule}<br><strong>Code RNCP :</strong> ${f.codeRNCP || "RNCP39063"}<br><strong>Niveau :</strong> 5 (Bac+2)<br><strong>Certificateur :</strong> Ministère du Travail, du Plein Emploi et de l'Insertion</p>` },
-    { heading: "Bloc de compétences 1 – Élaborer une stratégie de prospection et la mettre en œuvre", content: `
-      ${tableHTML(
-        ["Compétence", "Contenu pédagogique", "Volume horaire"],
-        [
-          ["Assurer une veille commerciale", "Outils de veille, analyse concurrentielle, tendances marché, environnement réglementaire", "35h"],
-          ["Concevoir et organiser un plan d'actions commerciales", "Définition d'objectifs SMART, planification, outils CRM, tableaux de bord", "42h"],
-          ["Prospecter un secteur défini", "Personas, canaux de prospection (phoning, emailing, social selling, terrain), prise de RDV", "49h"],
-          ["Analyser ses performances et mettre en œuvre des actions correctives", "KPIs commerciaux, analyse des écarts, plan d'actions correctives, reporting", "28h"],
-        ]
-      )}
-      <p><strong>Sous-total Bloc 1 :</strong> 154h</p>` },
-    { heading: "Bloc de compétences 2 – Négocier une solution technique et commerciale et consolider l'expérience client", content: `
-      ${tableHTML(
-        ["Compétence", "Contenu pédagogique", "Volume horaire"],
-        [
-          ["Représenter l'entreprise et valoriser son image", "Communication professionnelle, image de marque, réseaux professionnels, événementiel", "28h"],
-          ["Concevoir une proposition technique et commerciale", "Analyse des besoins, rédaction de propositions, chiffrage, argumentation", "42h"],
-          ["Négocier une solution technique et commerciale", "Techniques de négociation, traitement des objections, closing, gestion de conflits", "56h"],
-          ["Réaliser le bilan et ajuster son activité commerciale", "Reporting, analyse de résultats, recommandations, amélioration continue", "21h"],
-          ["Optimiser la gestion de la relation client", "Fidélisation, CRM avancé, gestion des réclamations, upselling/cross-selling", "35h"],
-        ]
-      )}
-      <p><strong>Sous-total Bloc 2 :</strong> 182h</p>` },
-    { heading: "Modules transversaux", content: `
-      ${tableHTML(
-        ["Module", "Contenu", "Volume horaire"],
-        [
-          ["Communication professionnelle", "Expression orale et écrite, prise de parole, communication digitale", "28h"],
-          ["Outils numériques", "Pack Office, CRM, outils collaboratifs, IA appliquée au commerce", "28h"],
-          ["Anglais professionnel", "Vocabulaire commercial, négociation en anglais, niveau B2 visé", "28h"],
-        ]
-      )}
-      <p><strong>Sous-total transversaux :</strong> 84h</p>`, variant: "green" },
-    { heading: "Récapitulatif des volumes horaires", content: `
-      ${tableHTML(
-        ["Bloc / Module", "Volume horaire"],
-        [
-          ["Bloc 1 – Stratégie de prospection", "154h"],
-          ["Bloc 2 – Négociation et relation client", "182h"],
-          ["Modules transversaux", "84h"],
-          ["<strong>TOTAL</strong>", `<strong>${f.duree || "420h"}</strong>`],
-        ]
-      )}` },
-  ] });
+  const rncp = getRNCPByCode(f.codeRNCP || "");
+  if (!rncp) {
+    return buildDocument({ org: o, title: "MATIÈRE DU TITRE", subtitle: f.intitule, sections: [
+      { heading: "Information", content: `<p>Pour générer la matière du titre, sélectionnez un code RNCP dans le formulaire de formation.</p>` },
+    ] });
+  }
+  const sections: any[] = [
+    { heading: "Présentation du titre", content: `<p><strong>Titre professionnel :</strong> ${rncp.intitule}<br><strong>Code RNCP :</strong> ${rncp.code}<br><strong>Niveau :</strong> ${rncp.niveau}<br><strong>Certificateur :</strong> ${rncp.certificateur}</p>` },
+  ];
+  let totalH = 0;
+  const blocTotals: { titre: string; total: number }[] = [];
+  rncp.blocsCompetences.forEach((b, i) => {
+    const rows = b.matieres.map(m => [m.competence, m.contenu, m.volume]);
+    const blocTotal = b.matieres.reduce((s, m) => s + parseInt(m.volume), 0);
+    totalH += blocTotal;
+    blocTotals.push({ titre: b.titre, total: blocTotal });
+    sections.push({
+      heading: `Bloc de compétences ${i + 1} – ${b.titre}`,
+      content: `${tableHTML(["Compétence", "Contenu pédagogique", "Volume horaire"], rows)}<p><strong>Sous-total Bloc ${i + 1} :</strong> ${blocTotal}h</p>`,
+      ...(i === rncp.blocsCompetences.length - 1 ? { variant: "green" as const } : {}),
+    });
+  });
+  sections.push({
+    heading: "Récapitulatif des volumes horaires",
+    content: tableHTML(["Bloc / Module", "Volume horaire"], [
+      ...blocTotals.map(b => [b.titre, `${b.total}h`]),
+      [`<strong>TOTAL</strong>`, `<strong>${f.duree || rncp.dureeIndicative || totalH + "h"}</strong>`],
+    ]),
+  });
+  return buildDocument({ org: o, title: "MATIÈRE DU TITRE", subtitle: rncp.intitule, sections });
 }
 
 function genTableauCroiseCFA(o: OrganismeInfo, f: FormationInfo) {
-  return buildDocument({ org: o, title: "TABLEAU CROISÉ COMPÉTENCES / PROGRAMME", subtitle: `${f.intitule}`, sections: [
-    { heading: "Objet", content: `<p>Ce tableau croisé met en correspondance les compétences du référentiel de certification <strong>${f.intitule}</strong> (${f.codeRNCP || "RNCP39063"}) avec les modules de formation dispensés par le CFA <strong>${o.nom}</strong>.</p>` },
-    { heading: "Tableau croisé – Bloc 1", content: `
-      ${tableHTML(
-        ["Compétence du référentiel", "Module(s) de formation", "Évaluation"],
-        [
-          ["C1.1 – Assurer une veille commerciale", "Veille commerciale et concurrentielle", "Dossier de veille + oral"],
-          ["C1.2 – Concevoir et organiser un plan d'actions commerciales", "Plan d'actions commerciales / CRM", "Étude de cas écrite"],
-          ["C1.3 – Prospecter un secteur défini", "Prospection commerciale / Social selling", "Mise en situation (phoning + terrain)"],
-          ["C1.4 – Analyser ses performances", "Pilotage commercial / Tableaux de bord", "Analyse de KPIs + plan correctif"],
-        ]
-      )}` },
-    { heading: "Tableau croisé – Bloc 2", content: `
-      ${tableHTML(
-        ["Compétence du référentiel", "Module(s) de formation", "Évaluation"],
-        [
-          ["C2.1 – Représenter l'entreprise et valoriser son image", "Communication professionnelle / Image de marque", "Présentation orale + portfolio"],
-          ["C2.2 – Concevoir une proposition technique et commerciale", "Rédaction de propositions / Chiffrage", "Rédaction d'une proposition complète"],
-          ["C2.3 – Négocier une solution technique et commerciale", "Techniques de négociation / Jeux de rôle", "Mise en situation de négociation"],
-          ["C2.4 – Réaliser le bilan et ajuster son activité", "Reporting / Analyse de résultats", "Rapport d'activité + soutenance"],
-          ["C2.5 – Optimiser la gestion de la relation client", "CRM avancé / Fidélisation / Gestion réclamations", "Étude de cas + oral"],
-        ]
-      )}` },
-    { heading: "Couverture du référentiel", content: `<p>L'ensemble des compétences du référentiel de certification est couvert par le programme de formation. Chaque compétence fait l'objet d'au moins une évaluation spécifique permettant de valider les acquis.</p>
-      ${tableHTML(
-        ["Indicateur", "Résultat"],
-        [
-          ["Compétences couvertes", "9 / 9 (100%)"],
-          ["Modules de formation", "12 modules"],
-          ["Volume horaire total", f.duree || "420h"],
-          ["Nombre d'évaluations", "9 évaluations minimum"],
-        ]
-      )}`, variant: "green" },
-  ] });
+  const rncp = getRNCPByCode(f.codeRNCP || "");
+  if (!rncp) {
+    return buildDocument({ org: o, title: "TABLEAU CROISÉ COMPÉTENCES / PROGRAMME", subtitle: f.intitule, sections: [
+      { heading: "Information", content: `<p>Pour générer le tableau croisé, sélectionnez un code RNCP dans le formulaire de formation.</p>` },
+    ] });
+  }
+  const sections: any[] = [
+    { heading: "Objet", content: `<p>Ce tableau croisé met en correspondance les compétences du référentiel de certification <strong>${rncp.intitule}</strong> (${rncp.code}) avec les modules de formation dispensés par le CFA <strong>${o.nom}</strong>.</p>` },
+  ];
+  let totalComp = 0;
+  rncp.blocsCompetences.forEach((b, i) => {
+    totalComp += b.competences.length;
+    const rows = b.competences.map((c, ci) => {
+      const mat = b.matieres[ci];
+      return [`C${i + 1}.${ci + 1} – ${c}`, mat ? mat.contenu.split(",")[0].trim() : c, mat ? "Mise en situation + évaluation" : "Évaluation continue"];
+    });
+    sections.push({ heading: `Tableau croisé – Bloc ${i + 1} : ${b.titre}`, content: tableHTML(["Compétence du référentiel", "Module(s) de formation", "Évaluation"], rows) });
+  });
+  sections.push({
+    heading: "Couverture du référentiel",
+    content: `<p>L'ensemble des compétences du référentiel de certification est couvert par le programme de formation.</p>
+    ${tableHTML(["Indicateur", "Résultat"], [
+      ["Compétences couvertes", `${totalComp} / ${totalComp} (100%)`],
+      ["Volume horaire total", f.duree || rncp.dureeIndicative],
+      ["Nombre d'évaluations", `${totalComp} évaluations minimum`],
+    ])}`,
+    variant: "green",
+  });
+  return buildDocument({ org: o, title: "TABLEAU CROISÉ COMPÉTENCES / PROGRAMME", subtitle: rncp.intitule, sections });
 }
 
 // ============== BILAN DE COMPÉTENCES ==============
