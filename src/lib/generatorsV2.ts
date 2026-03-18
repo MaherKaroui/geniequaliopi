@@ -14,7 +14,7 @@ import { getEvalContent, generateStagiaireAnswers, computeQCMScore, getQuestions
 function stagSig(s: StagiaireInfo): string {
   return s.signatureUrl
     ? `<img src="${s.signatureUrl}" alt="Signature ${s.prenom} ${s.nom}" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />`
-    : `<p style="font-style:italic;color:#999;margin-top:10px">Signé par ${s.prenom} ${s.nom}</p>`;
+    : "";
 }
 
 function orgSig(o: OrganismeInfo): string {
