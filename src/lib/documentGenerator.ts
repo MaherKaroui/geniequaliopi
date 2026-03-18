@@ -631,7 +631,8 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
   const heuresMatch = f.duree.match(/(\d+)\s*h/i);
   const totalHeures = heuresMatch ? parseInt(heuresMatch[1]) : 14;
   const heuresTotal = `${totalHeures} heures`;
-  const nbJours = Math.ceil(totalHeures / 7);
+  const joursMatch = f.duree.match(/(\d+)\s*jours?/i);
+  const nbJours = joursMatch ? parseInt(joursMatch[1]) : Math.ceil(totalHeures / 7);
 
   if (dayBlocks.length === 0 || !dayBlocks.some(d => d.rows.length > 0)) {
     // Extract objectives as content seeds for each day
@@ -835,7 +836,7 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
     <div class="section">
       <p><strong>Durée totale :</strong> ${heuresTotal} (${nbJours} jour${nbJours > 1 ? "s" : ""})</p>
       <p><strong>Dates :</strong> Du ${dateDebutFmt} au ${dateFinFmt}</p>
-      <p><strong>Horaires :</strong> 09h00 – 12h30 / 13h30 – 17h00</p>
+      <p><strong>Horaires :</strong> 09h00 – 12h30 / 13h30 – ${totalHeures / nbJours <= 6 ? '16h00' : '17h00'}</p>
       <p><strong>Modalité :</strong> ${modaliteLabel}</p>
       <p><strong>Lieu de formation :</strong> ${f.lieu || `${o.adresse}, ${o.codePostal} ${o.ville}`}</p>
       <p><strong>Nombre de participants :</strong> ${nbStagiaires}</p>
@@ -4390,8 +4391,8 @@ function genBilanChaud(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiaire
 }
 
 function genCompteRenduFormateur(o: OrganismeInfo, f: FormationInfo) {
-  const dureeH = parseInt(f.duree) || 14;
-  const nbJours = Math.ceil(dureeH / 7);
+  const { totalHours, days: nbJours } = parseDuree(f.duree);
+  const dureeH = totalHours;
   return buildDocument({ org: o, title: "COMPTE–RENDU DE FORMATION", subtitle: f.intitule, sections: [
     { heading: "Informations générales", content: `<p><em>Fréquence : chaque fin de formation, relance une semaine durant un mois</em></p>
 <table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%">
