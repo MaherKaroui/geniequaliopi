@@ -850,40 +850,17 @@ function generateFullAnswer(expected: string, stagiaireIndex: number, questionIn
   const sentences = cleaned.split(/(?<=[.!])\s+/).filter(s => s.trim());
   const seed = (stagiaireIndex * 13 + questionIndex * 7) % 8;
   
-  const intros = [
-    'Alors pour répondre à cette question, ',
-    'D\'après ce que j\'ai appris, ',
-    'Si je me souviens bien de ce qu\'on a vu en formation, ',
-    'Je dirais que ',
-    'Pour moi, ',
-    'De ce que j\'ai compris, ',
-    'Comme on l\'a vu pendant la formation, ',
-    'Je pense pouvoir répondre que ',
-  ];
-  
   const expansions = [
-    ' C\'est quelque chose que je trouve très important dans notre métier car cela permet d\'assurer un travail de qualité.',
-    ' Je pense que c\'est essentiel de bien maîtriser ce point pour être efficace en situation professionnelle.',
-    ' C\'est un aspect que j\'ai bien retenu de la formation car il est directement applicable dans mon travail au quotidien.',
-    ' Je trouve que c\'est un élément fondamental que tout professionnel devrait connaître et savoir appliquer.',
-    ' Personnellement, c\'est un des points que j\'ai le mieux compris pendant cette formation.',
-    ' J\'ai particulièrement apprécié cette partie de la formation car elle m\'a permis de mieux comprendre les enjeux.',
-    ' C\'est un sujet sur lequel j\'ai beaucoup progressé depuis le début de la formation.',
-    ' Je suis assez confiant(e) sur ce point car nous l\'avons bien travaillé en cours.',
+    ' Cela permet d\'assurer un travail de qualité au quotidien.',
+    ' C\'est essentiel pour être efficace en situation professionnelle.',
+    ' C\'est directement applicable dans le cadre de mon travail.',
+    ' C\'est un élément fondamental à connaître et à savoir appliquer.',
+    '',
+    '',
+    '',
+    '',
   ];
   
-  const closings = [
-    ' Voilà, j\'espère avoir été assez complet(e) dans ma réponse.',
-    ' Je pense avoir couvert les points essentiels.',
-    ' C\'est en tout cas ce que j\'ai retenu des cours.',
-    '',
-    ' Je pourrais développer davantage si nécessaire.',
-    '',
-    ' C\'est ce qui me semble le plus important à retenir.',
-    '',
-  ];
-
-  const intro = intros[seed];
   const varied = sentences.map((s, i) => {
     const sv = (stagiaireIndex * 13 + questionIndex * 7 + i * 3) % 5;
     let result = s;
@@ -899,7 +876,7 @@ function generateFullAnswer(expected: string, stagiaireIndex: number, questionIn
     const tmp = varied[1]; varied[1] = varied[2]; varied[2] = tmp;
   }
   
-  return intro + varied.join(' ') + expansions[seed] + closings[seed];
+  return varied.join(' ') + expansions[seed];
 }
 
 function generatePartialAnswer(expected: string, seed: number, stagiaireIndex: number, questionIndex: number, stagiaireInfo?: { nom?: string; prenom?: string; entreprise?: string; poste?: string }): string {
