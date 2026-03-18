@@ -312,8 +312,12 @@ export function applyGender(html: string, s: { civilite?: string } | undefined |
     [/tenu\(e\)/gi, "tenu", "tenue"],
     [/retenu\(e\)/gi, "retenu", "retenue"],
     [/entendu\(e\)/gi, "entendu", "entendue"],
+    [/satisfait\(e\)/gi, "satisfait", "satisfaite"],
+    [/prêt\(e\)/gi, "prêt", "prête"],
     [/il\/elle/gi, "il", "elle"],
     [/le\/la stagiaire/gi, "le stagiaire", "la stagiaire"],
+    [/l'apprenant\(e\)/gi, "l'apprenant", "l'apprenante"],
+    [/L'apprenant\(e\)/gi, "L'apprenant", "L'apprenante"],
     [/l'apprenti\(e\)/gi, "l'apprenti", "l'apprentie"],
     [/L'Apprenti\(e\)/gi, "L'Apprenti", "L'Apprentie"],
   ];
