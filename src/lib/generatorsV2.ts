@@ -360,22 +360,16 @@ export function genEmargementJour_V2(o: OrganismeInfo, f: FormationInfo, stagiai
     const daysList = jourLabel ? [jourLabel] : days;
     daysList.forEach((day, di) => {
       if (di > 0) extra += '<div class="page-break"></div>';
-      extra += `<h3>Date : ${day}</h3>`;
+      extra += `<p style="margin-top:15px"><strong>Date : ${day}</strong></p>`;
       extra += `<p><strong>Formateur :</strong> ${f.formateur}<br><strong>Formation :</strong> ${f.intitule}</p>`;
-      let rows: string[][] = [];
+      let tableRows = '';
       stagiaires.slice(0, 10).forEach(s => {
-        rows.push([
-          day, 'Matin',
-          `${s.prenom} ${s.nom}${s.signatureUrl ? `<br><img src="${s.signatureUrl}" alt="Sig" style="max-height:35px;max-width:80px;object-fit:contain" />` : `<br><span style="font-style:italic;color:#999;font-size:10px">Signé ${s.prenom[0]}.${s.nom}</span>`}`,
-          `${f.formateur}${o.signatureUrl ? `<br><img src="${o.signatureUrl}" alt="Sig" style="max-height:35px;max-width:80px;object-fit:contain" />` : ''}`
-        ]);
-        rows.push([
-          '', 'Après-midi',
-          `${s.prenom} ${s.nom}${s.signatureUrl ? `<br><img src="${s.signatureUrl}" alt="Sig" style="max-height:35px;max-width:80px;object-fit:contain" />` : `<br><span style="font-style:italic;color:#999;font-size:10px">Signé ${s.prenom[0]}.${s.nom}</span>`}`,
-          `${f.formateur}${o.signatureUrl ? `<br><img src="${o.signatureUrl}" alt="Sig" style="max-height:35px;max-width:80px;object-fit:contain" />` : ''}`
-        ]);
+        const stagSigHtml = s.signatureUrl ? `<br><img src="${s.signatureUrl}" alt="Sig" style="max-height:35px;max-width:80px;object-fit:contain" />` : `<br><span style="font-style:italic;color:#999;font-size:10px">Signé ${s.prenom[0]}.${s.nom}</span>`;
+        const formateurSigHtml = o.signatureUrl ? `<br><img src="${o.signatureUrl}" alt="Sig" style="max-height:35px;max-width:80px;object-fit:contain" />` : '';
+        tableRows += `<tr style="background:#fff"><td>${day}</td><td>Matin</td><td>${s.prenom} ${s.nom}${stagSigHtml}</td><td>${f.formateur}${formateurSigHtml}</td></tr>`;
+        tableRows += `<tr style="background:#fff"><td></td><td>Après-midi</td><td>${s.prenom} ${s.nom}${stagSigHtml}</td><td>${f.formateur}${formateurSigHtml}</td></tr>`;
       });
-      extra += tableHTML(["Date", "Horaires", "Prénom et nom, Signature Du Stagiaire", "Prénom et nom du Formateur"], rows);
+      extra += `<table><tr><th>Date</th><th>Horaires</th><th>Prénom et nom, Signature Du Stagiaire</th><th>Prénom et nom du Formateur</th></tr>${tableRows}</table>`;
     });
   }
   if (dist && !pres) {
