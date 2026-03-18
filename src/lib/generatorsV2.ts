@@ -14,16 +14,18 @@ import { getEvalContent, generateStagiaireAnswers, computeQCMScore, getQuestions
 function stagSig(s: StagiaireInfo): string {
   return s.signatureUrl
     ? `<img src="${s.signatureUrl}" alt="Signature ${s.prenom} ${s.nom}" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />`
-    : "";
+    : `<p style="font-style:italic;color:#999;margin-top:10px">Signé par ${s.prenom} ${s.nom}</p>`;
 }
 
 function orgSig(o: OrganismeInfo): string {
   let h = '';
-  if (o.signatureUrl) {
-    h += `<img src="${o.signatureUrl}" alt="Signature" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />`;
-  }
   if (o.tamponUrl) {
+    // If tampon exists, show only tampon (no signature)
     h += `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />`;
+  } else if (o.signatureUrl) {
+    h += `<img src="${o.signatureUrl}" alt="Signature" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />`;
+  } else {
+    h += `<p style="font-style:italic;color:#999;margin-top:10px">Signé par ${o.dirigeant}</p>`;
   }
   return h;
 }
