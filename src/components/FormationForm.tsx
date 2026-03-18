@@ -8,6 +8,7 @@ import { Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SAMPLE_FORMATIONS } from "@/lib/sampleData";
 import { parseEdofXlsx, EdofSession } from "@/lib/edofParser";
+import { RNCP_FICHES } from "@/lib/rncpData";
 import { toast } from "sonner";
 
 interface FormationFormProps {
