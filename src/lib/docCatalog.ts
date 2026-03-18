@@ -48,13 +48,13 @@ export function buildFullCatalog(
 
     // IND 5 — Objectifs opérationnels et évaluables
     formations.forEach((f, fi) => {
-      add(`af_c2i5_deroule_pedagogique_${fi}`, `CT2 - IND 5 DÉROULÉ PÉDAGOGIQUE DÉTAILLÉ – ${f.intitule}`, 2, 5, "deroule_pedagogique_detaille", { fi });
+      add(`af_c2i5_deroule_pedagogique_${fi}`, `CT2 - IND 5 DÉROULÉ PÉDAGOGIQUE DÉTAILLÉ`, 2, 5, "deroule_pedagogique_detaille", { fi });
     });
 
     // IND 6 — Contenus et modalités adaptés (Programme + Déroulé pédagogique)
     formations.forEach((f, fi) => {
-      add(`af_c2i6_programme_${fi}`, `CT2 - IND 6 PROGRAMME DE FORMATION – ${f.intitule}`, 2, 6, "programme_formation", { fi });
-      add(`af_c2i6_deroule_pedagogique_${fi}`, `CT2 - IND 6 DÉROULÉ PÉDAGOGIQUE DÉTAILLÉ – ${f.intitule}`, 2, 6, "deroule_pedagogique_detaille", { fi });
+      add(`af_c2i6_programme_${fi}`, `CT2 - IND 6 PROGRAMME DE FORMATION`, 2, 6, "programme_formation", { fi });
+      add(`af_c2i6_deroule_pedagogique_${fi}`, `CT2 - IND 6 DÉROULÉ PÉDAGOGIQUE DÉTAILLÉ`, 2, 6, "deroule_pedagogique_detaille", { fi });
     });
 
     // IND 8 — Positionnement et évaluation des acquis à l'entrée
