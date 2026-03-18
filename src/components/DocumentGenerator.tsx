@@ -40,10 +40,11 @@ const PER_STAGIAIRE_TEMPLATES = new Set([
 /** Format court pour éviter les chemins >259 chars sur Windows */
 function buildFileName(docName: string, orgName: string, version: string, dateMaj: string, ext: string = ".doc"): string {
   const d = dateMaj ? new Date(dateMaj) : new Date();
-  const maj = `${String(d.getDate()).padStart(2, '0')}-${String(d.getMonth() + 1).padStart(2, '0')}-${d.getFullYear()}`;
-  const clean = (s: string) => s.replace(/[/\\:*?"<>|]/g, '_').substring(0, 60);
+  const maj = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  // Replace spaces, dashes and special chars with underscores for Google Drive compatibility
+  const clean = (s: string) => s.replace(/[/\\:*?"<>|–—]/g, '_').replace(/\s+/g, '_').replace(/_+/g, '_').substring(0, 80);
   const shortOrg = clean(orgName).substring(0, 20);
-  return `${clean(docName)} - ${shortOrg} - V${version || '1'} - ${maj}${ext}`;
+  return `${clean(docName)}_${shortOrg}_V${version || '1'}_${maj}${ext}`;
 }
 
 /** Shortened path for ZIP to avoid Windows 259 char limit */
