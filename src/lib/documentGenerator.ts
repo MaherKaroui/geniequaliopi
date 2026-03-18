@@ -349,6 +349,10 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "plaquette_commerciale_cfa": return genPlaquetteCommercialeCFA(o, f);
     case "procedure_inscription_cfa": return genProcedureInscriptionCFA(o, f);
     case "procedure_formation_cfa": return genProcedureFormationCFA(o, f);
+    case "indicateurs_resultats_cfa": return genIndicateursResultatsCFA(o, f);
+    case "titre_rncp_cfa": return genTitreRNCPCFA(o, f);
+    case "matiere_titre_cfa": return genMatiereTitreCFA(o, f);
+    case "tableau_croise_cfa": return genTableauCroiseCFA(o, f);
     case "fiche_autoevaluation_apprenti": return genFicheAutoevaluation(o, f, stagiaires);
     case "procedure_abandon_cfa": return genProcedureAbandon(o);
     case "procedure_absences_cfa": return genProcedureAbsences(o);
