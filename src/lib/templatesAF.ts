@@ -81,9 +81,12 @@ export function genGrilleAnalyseNiveauInitial(o: OrganismeInfo, f: FormationInfo
 
 export function genDeroulePedagogique(o: OrganismeInfo, f: FormationInfo) {
   const jours = f.programme.split("\n").filter(l => l.trim());
+  const totalH = parseInt(f.duree) || (jours.length * 7);
+  const hParJour = jours.length > 0 ? totalH / jours.length : 7;
+  const demiJournee = `${Math.round(hParJour / 2 * 10) / 10}h`;
   const rows = jours.map((j, i) => {
     const parts = j.replace(/^Jour \d+ :\s*/i, '').replace(/^Module \d+ :\s*/i, '');
-    return [`${i + 1}`, `Séquence ${i + 1}`, parts, i < jours.length / 2 ? "Apports théoriques + Exercices" : "Cas pratiques + Mises en situation", "3h30", i === 0 ? "QCM positionnement" : i === jours.length - 1 ? "Évaluation finale" : "Exercices formatifs"];
+    return [`${i + 1}`, `Séquence ${i + 1}`, parts, i < jours.length / 2 ? "Apports théoriques + Exercices" : "Cas pratiques + Mises en situation", demiJournee, i === 0 ? "QCM positionnement" : i === jours.length - 1 ? "Évaluation finale" : "Exercices formatifs"];
   });
   return buildDocument({ org: o, title: "DÉROULÉ PÉDAGOGIQUE", subtitle: f.intitule, formation: f, showFormationInfo: true, table: {
     headers: ["N°", "Séquence", "Contenu", "Méthodes", "Durée", "Évaluation"], rows

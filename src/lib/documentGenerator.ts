@@ -4391,8 +4391,8 @@ function genBilanChaud(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiaire
 }
 
 function genCompteRenduFormateur(o: OrganismeInfo, f: FormationInfo) {
-  const dureeH = parseInt(f.duree) || 14;
-  const nbJours = Math.ceil(dureeH / 7);
+  const { totalHours, days: nbJours } = parseDuree(f.duree);
+  const dureeH = totalHours;
   return buildDocument({ org: o, title: "COMPTE–RENDU DE FORMATION", subtitle: f.intitule, sections: [
     { heading: "Informations générales", content: `<p><em>Fréquence : chaque fin de formation, relance une semaine durant un mois</em></p>
 <table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%">
