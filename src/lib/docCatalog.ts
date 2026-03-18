@@ -108,8 +108,8 @@ export function buildFullCatalog(
       add(`af_c3i10_eval_besoins_${si}`, `CT3 - IND 10 ÉVALUATION DES BESOINS – ${s.prenom} ${s.nom}`, 3, 10, "trame_eval_besoins_stagiaire", { stagiaireIdx: si });
     });
     formations.forEach((f, fi) => {
-      add(`af_c3i10_deroule_pedagogique_${fi}`, `CT3 - IND 10 DÉROULÉ PÉDAGOGIQUE DÉTAILLÉ – ${f.intitule}`, 3, 10, "deroule_pedagogique_detaille", { fi });
-      add(`af_c3i10_tableau_suivi_${fi}`, `CT3 - IND 10 TABLEAU DE SUIVI DU PARCOURS BÉNÉFICIAIRES – ${f.intitule}`, 3, 10, "tableau_suivi_parcours_excel", { fi });
+      add(`af_c3i10_deroule_pedagogique_${fi}`, `CT3 - IND 10 DÉROULÉ PÉDAGOGIQUE DÉTAILLÉ`, 3, 10, "deroule_pedagogique_detaille", { fi });
+      add(`af_c3i10_tableau_suivi_${fi}`, `CT3 - IND 10 TABLEAU DE SUIVI DU PARCOURS BÉNÉFICIAIRES`, 3, 10, "tableau_suivi_parcours_excel", { fi });
     });
 
     // IND 11 — Évaluation de l'atteinte des objectifs
@@ -118,10 +118,10 @@ export function buildFullCatalog(
       const distanciel = moda.includes('distanciel') || moda.includes('e-learning') || moda.includes('foad');
       const presentiel = !distanciel || moda.includes('mixte');
       if (presentiel) {
-        add(`af_c3i11_emargement_${fi}`, `CT3 - IND 11 FEUILLE D'ÉMARGEMENT – ${f.intitule}`, 3, 11, "emargement_jour", { fi });
+        add(`af_c3i11_emargement_${fi}`, `CT3 - IND 11 FEUILLE D'ÉMARGEMENT`, 3, 11, "emargement_jour", { fi });
       }
       if (distanciel || moda.includes('mixte')) {
-        add(`af_c3i11_temps_connexion_${fi}`, `CT3 - IND 11 TEMPS DE CONNEXION RÉEL – ${f.intitule}`, 3, 11, "temps_connexion_reel", { fi });
+        add(`af_c3i11_temps_connexion_${fi}`, `CT3 - IND 11 TEMPS DE CONNEXION RÉEL`, 3, 11, "temps_connexion_reel", { fi });
       }
     });
     // Documents individuels per-stagiaire IND 11
@@ -129,16 +129,16 @@ export function buildFullCatalog(
       const nbJours = getFormationDays(f).length;
       const nbExercices = Math.max(1, Math.ceil(nbJours / 2));
       stagiaires.forEach((s, si) => {
-        add(`af_c3i11_test_debut_${fi}_${si}`, `CT3 - IND 11 TEST DÉBUT DE FORMATION – ${s.prenom} ${s.nom} – ${f.intitule}`, 3, 11, "test_positionnement_debut_stagiaire", { fi, stagiaireIdx: si });
-        add(`af_c3i11_test_fin_${fi}_${si}`, `CT3 - IND 11 TEST FIN DE FORMATION – ${s.prenom} ${s.nom} – ${f.intitule}`, 3, 11, "test_positionnement_fin_stagiaire", { fi, stagiaireIdx: si });
+        add(`af_c3i11_test_debut_${fi}_${si}`, `CT3 - IND 11 TEST DÉBUT DE FORMATION – ${s.prenom} ${s.nom}`, 3, 11, "test_positionnement_debut_stagiaire", { fi, stagiaireIdx: si });
+        add(`af_c3i11_test_fin_${fi}_${si}`, `CT3 - IND 11 TEST FIN DE FORMATION – ${s.prenom} ${s.nom}`, 3, 11, "test_positionnement_fin_stagiaire", { fi, stagiaireIdx: si });
         // Un fichier exercice par tranche de 2 jours
         for (let exIdx = 0; exIdx < nbExercices; exIdx++) {
           const jourDebut = exIdx * 2 + 1;
           const jourFin = Math.min(exIdx * 2 + 2, nbJours);
           const label = nbExercices > 1 ? ` (Jour ${jourDebut}-${jourFin})` : '';
-          add(`af_c3i11_exercices_${fi}_${si}_ex${exIdx}`, `CT3 - IND 11 EXERCICES PRATIQUES${label} – ${s.prenom} ${s.nom} – ${f.intitule}`, 3, 11, "exercices_stagiaire", { fi, stagiaireIdx: si, exerciceIdx: exIdx });
+          add(`af_c3i11_exercices_${fi}_${si}_ex${exIdx}`, `CT3 - IND 11 EXERCICES PRATIQUES${label} – ${s.prenom} ${s.nom}`, 3, 11, "exercices_stagiaire", { fi, stagiaireIdx: si, exerciceIdx: exIdx });
         }
-        add(`af_c3i11_grille_acquisition_${fi}_${si}`, `CT3 - IND 11 GRILLE D'ACQUISITION – ${s.prenom} ${s.nom} – ${f.intitule}`, 3, 11, "grille_acquisition_stagiaire", { fi, stagiaireIdx: si });
+        add(`af_c3i11_grille_acquisition_${fi}_${si}`, `CT3 - IND 11 GRILLE D'ACQUISITION – ${s.prenom} ${s.nom}`, 3, 11, "grille_acquisition_stagiaire", { fi, stagiaireIdx: si });
         add(`af_c3i11_attestation_${fi}_${si}`, `CT3 - IND 11 ATTESTATION DE RÉUSSITE – ${s.prenom} ${s.nom}`, 3, 11, "attestation_reussite_stagiaire", { fi, stagiaireIdx: si });
       });
     });
