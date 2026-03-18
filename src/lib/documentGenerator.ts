@@ -4467,7 +4467,7 @@ function genBilanChaudStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: 
 
   const notes: number[] = allCriteres.map(() => {
     const r = rng();
-    return r < 0.6 ? 0 : 1;
+    return r < 0.45 ? 0 : r < 0.85 ? 1 : 2;
   });
 
   let extra = `<p><strong>Date :</strong> ${formatDate(f.dateFin)}</p>`;
