@@ -4340,7 +4340,7 @@ function genBilanFroid(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiaire
     extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%"><tr style="background:#1e3a7b;color:#fff"><th>Critères évalués</th><th>Tout à fait</th><th>Plutôt oui</th><th>Plutôt non</th><th>Non</th></tr>`;
     criteres.forEach((label) => {
       const r = rng();
-      const note = r < 0.5 ? 0 : r < 0.85 ? 1 : 2;
+      const note: number = r < 0.5 ? 0 : r < 0.85 ? 1 : 2;
       extra += `<tr><td>${label}</td><td>${note === 0 ? "☒" : "☐"}</td><td>${note === 1 ? "☒" : "☐"}</td><td>${note === 2 ? "☒" : "☐"}</td><td>${note === 3 ? "☒" : "☐"}</td></tr>`;
     });
     extra += `</table>`;
