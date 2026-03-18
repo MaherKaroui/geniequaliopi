@@ -1025,9 +1025,8 @@ export function genGrilleAcquisition_V2(o: OrganismeInfo, f: FormationInfo, stag
     extra += `<p><strong>DATE :</strong> ${formatDate(f.dateDebut)} – ${formatDate(f.dateFin)}</p>`;
     extra += `<p><strong>NOM / PRÉNOM :</strong> ${s.prenom} ${s.nom}</p>`;
     extra += `<p><strong>FORMATION :</strong> ${f.intitule}</p>`;
-    const rows = evalData.competences.map((comp, ci) => {
-      const finalScore = Math.min(10, (sc[ci % sc.length]) + 2);
-      return [comp, finalScore >= 8 ? '✅' : '', finalScore < 5 ? '❌' : '', finalScore >= 5 && finalScore < 8 ? '🔄' : ''];
+    const rows = evalData.competences.map((comp) => {
+      return [comp, 'X', '', ''];
     });
     extra += tableHTML(["COMPÉTENCES PROFESSIONNELLES", "ACQUIS", "NON ACQUIS", "EN COURS D'ACQUISITION"], rows);
     extra += `<p>${formatDate(f.dateFin)}, par le Formateur : ${f.formateur}</p>`;
