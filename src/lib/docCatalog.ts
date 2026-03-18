@@ -60,23 +60,23 @@ export function buildFullCatalog(
     // IND 8 — Positionnement et évaluation des acquis à l'entrée
     // Trames vides (modèles)
     formations.forEach((f, fi) => {
-      add(`af_c2i8_trame_debut_${fi}`, `CT2 - IND 8 TEST DE POSITIONNEMENT DÉBUT DE FORMATION – ${f.intitule}`, 2, 8, "test_positionnement_debut_trame", { fi });
-      add(`af_c2i8_trame_fin_${fi}`, `CT2 - IND 8 TEST DE POSITIONNEMENT FIN DE FORMATION – ${f.intitule}`, 2, 8, "test_positionnement_fin_trame", { fi });
+      add(`af_c2i8_trame_debut_${fi}`, `CT2 - IND 8 TEST DE POSITIONNEMENT DÉBUT DE FORMATION`, 2, 8, "test_positionnement_debut_trame", { fi });
+      add(`af_c2i8_trame_fin_${fi}`, `CT2 - IND 8 TEST DE POSITIONNEMENT FIN DE FORMATION`, 2, 8, "test_positionnement_fin_trame", { fi });
     });
     // Procédures d'évaluation
     formations.forEach((f, fi) => {
-      add(`af_c2i8_procedure_debut_${fi}`, `CT2 - IND 8 PROCÉDURE D'ÉVALUATION DE DÉBUT DE FORMATION – ${f.intitule}`, 2, 8, "procedure_eval_debut", { fi });
-      add(`af_c2i8_procedure_fin_${fi}`, `CT2 - IND 8 PROCÉDURE D'ÉVALUATION DE FIN DE FORMATION – ${f.intitule}`, 2, 8, "procedure_eval_fin", { fi });
+      add(`af_c2i8_procedure_debut_${fi}`, `CT2 - IND 8 PROCÉDURE D'ÉVALUATION DE DÉBUT DE FORMATION`, 2, 8, "procedure_eval_debut", { fi });
+      add(`af_c2i8_procedure_fin_${fi}`, `CT2 - IND 8 PROCÉDURE D'ÉVALUATION DE FIN DE FORMATION`, 2, 8, "procedure_eval_fin", { fi });
     });
     // Grille de niveaux
     formations.forEach((f, fi) => {
-      add(`af_c2i8_grille_niveaux_${fi}`, `CT2 - IND 8 GRILLE DE NIVEAUX – ${f.intitule}`, 2, 8, "grille_niveaux_positionnement", { fi });
+      add(`af_c2i8_grille_niveaux_${fi}`, `CT2 - IND 8 GRILLE DE NIVEAUX`, 2, 8, "grille_niveaux_positionnement", { fi });
     });
     // Tests remplis par stagiaire (un fichier individuel par stagiaire)
     formations.forEach((f, fi) => {
       stagiaires.forEach((s, si) => {
-        add(`af_c2i8_test_debut_${fi}_${si}`, `CT2 - IND 8 TEST DÉBUT DE FORMATION – ${s.prenom} ${s.nom} – ${f.intitule}`, 2, 8, "test_positionnement_debut_stagiaire", { fi, stagiaireIdx: si });
-        add(`af_c2i8_test_fin_${fi}_${si}`, `CT2 - IND 8 TEST FIN DE FORMATION – ${s.prenom} ${s.nom} – ${f.intitule}`, 2, 8, "test_positionnement_fin_stagiaire", { fi, stagiaireIdx: si });
+        add(`af_c2i8_test_debut_${fi}_${si}`, `CT2 - IND 8 TEST DÉBUT DE FORMATION – ${s.prenom} ${s.nom}`, 2, 8, "test_positionnement_debut_stagiaire", { fi, stagiaireIdx: si });
+        add(`af_c2i8_test_fin_${fi}_${si}`, `CT2 - IND 8 TEST FIN DE FORMATION – ${s.prenom} ${s.nom}`, 2, 8, "test_positionnement_fin_stagiaire", { fi, stagiaireIdx: si });
       });
     });
 
