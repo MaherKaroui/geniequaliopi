@@ -190,10 +190,8 @@ export function genGrilleAcquisitionCompetences(o: OrganismeInfo, f: FormationIn
   stagiaires.slice(0, 10).forEach((s, i) => {
     const sc = EVAL_SCORES[i] || [7, 8, 7, 8, 7];
     extra += `<h3>${s.prenom} ${s.nom} – ${s.entreprise}</h3>`;
-    const rows = evalData.competences.map((comp, ci) => {
-      const initial = sc[ci % sc.length];
-      const final_ = Math.min(10, initial + 2);
-      return [comp, `${initial}/10`, `${final_}/10`, final_ >= 8 ? "✅ Acquis" : final_ >= 6 ? "🔄 En cours" : "❌ Non acquis", `+${final_ - initial} pts`];
+    const rows = evalData.competences.map((comp) => {
+      return [comp, "10/10", "10/10", "✅ Acquis", "+0 pts"];
     });
     extra += tableHTML(["Compétence", "Entrée", "Sortie", "Statut", "Progression"], rows);
   });
