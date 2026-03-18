@@ -492,13 +492,15 @@ export function genVeilleHandicap(o: OrganismeInfo, f?: FormationInfo) {
 // ===== IND 27 — PARTENAIRES, CONTRAT SOUS-TRAITANCE, CHARTE QUALITÉ =====
 
 export function genListePartenairesV2(o: OrganismeInfo) {
+  const tamponHtml = o.tamponUrl ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />` : "";
   return buildDocument({ org: o, title: "LES PARTENAIRES", sections: [
     { heading: "", content: `<p>${o.nom} s'attache à développer constamment son réseau de partenaires afin d'assurer une très grande employabilité à ses étudiants.</p>` },
   ], extraHtml: `<h2>Les partenaires de ${o.nom}</h2>
     <table>
       <tr><th>Partenaire</th><th>${o.dirigeant}</th></tr>
       <tr><td>Président</td><td>Président</td></tr>
-    </table>` });
+    </table>
+    <div style="margin-top:20px">${tamponHtml}</div>` });
 }
 
 export function genContratSousTraitanceV2(o: OrganismeInfo, f: FormationInfo, stagiaires: import("@/types/qualiopi").StagiaireInfo[]) {
