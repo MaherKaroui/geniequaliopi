@@ -32,7 +32,7 @@ describe("file naming convention", () => {
 
   it("normalizes accents, apostrophes and parenthesis", () => {
     expect(normalizeLooseFileName("CT2 IND 4 Trame d'évaluation (des besoins).pdf")).toBe(
-      "CT2_IND_4_TRAME_D_EVALUATION_DES_BESOINS",
+      "CT2_IND_4_TRAME_EVALUATION_DES_BESOINS",
     );
   });
 

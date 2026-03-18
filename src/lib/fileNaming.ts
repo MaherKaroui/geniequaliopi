@@ -34,11 +34,12 @@ function escapeRegExp(value: string): string {
 
 function cleanLooseText(value: string): string {
   return stripDiacritics(value)
-    .replace(/[’'`]/g, "")
+    .replace(/[’'`]/g, " ")
     .replace(/[(){}\[\]]/g, " ")
     .replace(/[&]/g, " ")
     .replace(/[\-–—]+/g, " ")
     .replace(/[^A-Za-z0-9_\s]+/g, " ")
+    .replace(/\b[DLJMSTCNdljmstcn]\b/g, " ")
     .replace(/_+/g, " ")
     .replace(/\s+/g, " ")
     .trim();
