@@ -1,0 +1,149 @@
+import { DocEntry, StagiaireInfo } from "@/types/qualiopi";
+
+export type ExportFormat = "doc" | "pdf";
+
+export const PER_STAGIAIRE_TEMPLATES = new Set([
+  "qcm_positionnement", "qcm_final", "exercices_pratiques",
+  "eval_positionnement_remplie", "eval_intermediaire_remplie", "eval_finale_remplie",
+  "attestation_formation", "certificat_reussite", "convocation",
+  "attestation_entree_formation", "attestation_assiduite", "certificat_realisation",
+  "fiche_autoevaluation", "fiche_renseignement", "trame_eval_besoins",
+  "contrat_formation_pro", "dossier_inscription",
+  "contrat_apprentissage", "livret_apprentissage_cfa",
+  "analyse_parcours_pro", "plan_action_bilan", "synthese_bilan",
+  "livret_recevabilite_vae", "dossier_validation_vae", "accompagnement_vae",
+  "attestation_inscription_cfa", "fiche_autoevaluation_apprenti",
+]);
+
+const EXCEL_TEMPLATES = new Set([
+  "tableau_suivi_parcours_excel",
+  "plan_dev_competences_excel",
+  "tableau_amelioration_continue_excel",
+  "suivi_dysfonctionnements_excel",
+  "relances_appreciations_excel",
+  "indicateurs_performance",
+]);
+
+function stripDiacritics(value: string): string {
+  return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function cleanLooseText(value: string): string {
+  return stripDiacritics(value)
+    .replace(/[’'`]/g, " ")
+    .replace(/[(){}\[\]]/g, " ")
+    .replace(/[&]/g, " ")
+    .replace(/[\-–—]+/g, " ")
+    .replace(/[^A-Za-z0-9_\s]+/g, " ")
+    .replace(/\b[DLJMSTCNdljmstcn]\b/g, " ")
+    .replace(/_+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function toWords(value: string): string[] {
+  return cleanLooseText(value).split(" ").filter(Boolean);
+}
+
+function toUpperSnakeCase(value: string): string {
+  return toWords(value).map((word) => word.toUpperCase()).join("_");
+}
+
+function toTitleCaseWord(word: string): string {
+  return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+}
+
+function toTitleSnakeCase(value: string): string {
+  return toWords(value).map(toTitleCaseWord).join("_");
+}
+
+function normalizeVersion(version: string): string {
+  const clean = String(version || "1").replace(/[^0-9]/g, "");
+  return clean || "1";
+}
+
+function formatDateISO(dateMaj: string): string {
+  if (!dateMaj) return new Date().toISOString().slice(0, 10);
+  const parsed = new Date(dateMaj);
+  if (Number.isNaN(parsed.getTime())) return dateMaj;
+  return `${parsed.getFullYear()}-${String(parsed.getMonth() + 1).padStart(2, "0")}-${String(parsed.getDate()).padStart(2, "0")}`;
+}
+
+function stripCatalogPrefix(label: string): string {
+  return label.replace(/^CT\s*\d+\s*-\s*IND\s*\d+\s*/i, "").trim();
+}
+
+function stripTrailingStagiaire(label: string, stagiaire?: StagiaireInfo | null): string {
+  if (!stagiaire) return label;
+  const fullName = `${stagiaire.prenom} ${stagiaire.nom}`.trim();
+  if (!fullName) return label;
+  return label.replace(new RegExp(`\\s*[–-]\\s*${escapeRegExp(fullName)}\\s*$`, "i"), "").trim();
+}
+
+function normalizeDocumentLabel(label: string, stagiaire?: StagiaireInfo | null): string {
+  return stripTrailingStagiaire(stripCatalogPrefix(label), stagiaire);
+}
+
+export function getFileBaseName(fileNameOrPath: string): string {
+  const name = fileNameOrPath.split("/").pop() ?? fileNameOrPath;
+  return name.replace(/\.[^.]+$/, "");
+}
+
+export function normalizeLooseFileName(fileNameOrPath: string): string {
+  return toUpperSnakeCase(getFileBaseName(fileNameOrPath));
+}
+
+export function getPreferredExtension(template: string, exportFormat: ExportFormat): string {
+  if (template === "pdf_static") return ".pdf";
+  if (EXCEL_TEMPLATES.has(template)) return ".xls";
+  return exportFormat === "pdf" ? ".pdf" : ".doc";
+}
+
+export function replaceFileExtension(fileName: string, extension: string): string {
+  const cleanExtension = extension.startsWith(".") ? extension : `.${extension}`;
+  return `${getFileBaseName(fileName)}${cleanExtension}`;
+}
+
+export function shortCriterePath(critere: number, indicateur: number): string {
+  return `QUALIOPI/CT${critere}/IND${indicateur}`;
+}
+
+export function buildGenericFileName(label: string, orgName: string, version: string, dateMaj: string, extension: string): string {
+  const parts = [
+    toUpperSnakeCase(label) || "DOCUMENT",
+    toUpperSnakeCase(orgName) || "ORGANISME",
+    `V${normalizeVersion(version)}`,
+    formatDateISO(dateMaj),
+  ];
+
+  return `${parts.filter(Boolean).join("_")}${extension}`;
+}
+
+export function buildDocumentFileName(
+  doc: DocEntry,
+  orgName: string,
+  version: string,
+  dateMaj: string,
+  extension: string,
+  stagiaire?: StagiaireInfo | null,
+): string {
+  const parts = [
+    `CT${doc.critere}`,
+    "IND",
+    String(doc.indicateur),
+    toUpperSnakeCase(normalizeDocumentLabel(doc.nom, stagiaire)) || "DOCUMENT",
+  ];
+
+  if (stagiaire?.prenom) parts.push(toTitleSnakeCase(stagiaire.prenom));
+  if (stagiaire?.nom) parts.push(toUpperSnakeCase(stagiaire.nom));
+
+  parts.push(toUpperSnakeCase(orgName) || "ORGANISME");
+  parts.push(`V${normalizeVersion(version)}`);
+  parts.push(formatDateISO(dateMaj));
+
+  return `${parts.filter(Boolean).join("_")}${extension}`;
+}
