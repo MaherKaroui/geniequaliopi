@@ -238,28 +238,28 @@ export function buildFullCatalog(
   if (isCFA) {
     // Indicateur 13 - Coordination alternance
     formations.forEach((f, fi) => {
-      add(`cfa_c3i13_contrat_${fi}`, `Contrat d'apprentissage – ${f.intitule}`, 3, 13, "contrat_apprentissage", { fi });
-      add(`cfa_c3i13_livret_${fi}`, `Livret d'apprentissage CFA – ${f.intitule}`, 3, 13, "livret_apprentissage_cfa", { fi });
-      add(`cfa_c3i13_competences_${fi}`, `Grille compétences alternance – ${f.intitule}`, 3, 13, "competences_alternance", { fi });
-      add(`cfa_c3i13_suivi_ent_${fi}`, `Suivi en entreprise – ${f.intitule}`, 3, 13, "suivi_entreprise_cfa", { fi });
+      add(`cfa_c3i13_contrat_${fi}`, `Contrat d'apprentissage`, 3, 13, "contrat_apprentissage", { fi });
+      add(`cfa_c3i13_livret_${fi}`, `Livret d'apprentissage CFA`, 3, 13, "livret_apprentissage_cfa", { fi });
+      add(`cfa_c3i13_competences_${fi}`, `Grille compétences alternance`, 3, 13, "competences_alternance", { fi });
+      add(`cfa_c3i13_suivi_ent_${fi}`, `Suivi en entreprise`, 3, 13, "suivi_entreprise_cfa", { fi });
     });
 
     // Indicateur 14 - Accompagnement socio-pro
     formations.forEach((f, fi) => {
-      add(`cfa_c3i14_suivi3mois_${fi}`, `Suivi à 3 mois – ${f.intitule}`, 3, 14, "suivi_3_mois", { fi });
-      add(`cfa_c3i14_insertion_${fi}`, `Questionnaire insertion – ${f.intitule}`, 3, 14, "questionnaire_insertion", { fi });
+      add(`cfa_c3i14_suivi3mois_${fi}`, `Suivi à 3 mois`, 3, 14, "suivi_3_mois", { fi });
+      add(`cfa_c3i14_insertion_${fi}`, `Questionnaire insertion`, 3, 14, "questionnaire_insertion", { fi });
     });
 
     // Indicateur 15 - Droits et devoirs apprenti
     formations.forEach((f, fi) => {
-      add(`cfa_c3i15_conditions_${fi}`, `Fiche conditions accueil – ${f.intitule}`, 3, 15, "conditions_accueil", { fi });
-      add(`cfa_c3i15_charte_${fi}`, `Charte accueil – ${f.intitule}`, 3, 15, "charte_accueil", { fi });
+      add(`cfa_c3i15_conditions_${fi}`, `Fiche conditions accueil`, 3, 15, "conditions_accueil", { fi });
+      add(`cfa_c3i15_charte_${fi}`, `Charte accueil`, 3, 15, "charte_accueil", { fi });
     });
 
     // Indicateur 16 - Présentation certification
     formations.forEach((f, fi) => {
-      add(`cfa_c3i16_livret_${fi}`, `Livret d'apprentissage – ${f.intitule}`, 3, 16, "livret_apprentissage", { fi });
-      add(`cfa_c3i16_suivi_tuteur_${fi}`, `Fiche suivi tuteur – ${f.intitule}`, 3, 16, "fiche_suivi_tuteur", { fi });
+      add(`cfa_c3i16_livret_${fi}`, `Livret d'apprentissage`, 3, 16, "livret_apprentissage", { fi });
+      add(`cfa_c3i16_suivi_tuteur_${fi}`, `Fiche suivi tuteur`, 3, 16, "fiche_suivi_tuteur", { fi });
     });
 
     // Documents CFA complémentaires
