@@ -182,7 +182,7 @@ export function genPlanDevCompetencesExcel(o: OrganismeInfo, f: FormationInfo, f
   </tr>`;
 
   // ========== FORMATIONS RÉALISÉES (année en cours) ==========
-  html += `<tr><th colspan="9" style="background:#2d8659;text-align:left;padding:10px">✅ FORMATIONS RÉALISÉES – ${year}</th></tr>`;
+  html += `<tr><th colspan="9" style="background:#2d8659;text-align:left;padding:10px">FORMATIONS RÉALISÉES – ${year}</th></tr>`;
 
   // Row 1: Formation based on current formation — Interne, with stagiaire names
   html += `<tr>
@@ -197,34 +197,8 @@ export function genPlanDevCompetencesExcel(o: OrganismeInfo, f: FormationInfo, f
     <td>${year}</td>
   </tr>`;
 
-  // Row 2: Real example - gérer son centre
-  html += `<tr>
-    <td>Prise de contact avec le cabinet Mbusiness pour suivre la formation gérer son centre</td>
-    <td>Gérer mon centre de formation</td>
-    <td>Développer mes compétences organisationnelles pour la gestion administrative de mon organisme de formation</td>
-    <td>Externe</td>
-    <td>Nadine Dendani</td>
-    <td>1</td>
-    <td>${formateurName}</td>
-    <td>15 jours</td>
-    <td>${year}</td>
-  </tr>`;
-
-  // Row 3: Qualiopi done this year
-  html += `<tr>
-    <td>Veille réglementaire et obligation Qualiopi</td>
-    <td>Formation Qualiopi – Référentiel National Qualité V9</td>
-    <td>Maîtriser les 32 indicateurs du RNQ et préparer l'audit initial</td>
-    <td>Externe</td>
-    <td>Consultant Qualiopi</td>
-    <td>1</td>
-    <td>${formateurName}</td>
-    <td>3 jours</td>
-    <td>${year}</td>
-  </tr>`;
-
   // ========== FORMATIONS PRÉVUES (année suivante) ==========
-  html += `<tr><th colspan="9" style="background:#e8870e;text-align:left;padding:10px">📅 FORMATIONS PRÉVUES – ${nextYear}</th></tr>`;
+  html += `<tr><th colspan="9" style="background:#e8870e;text-align:left;padding:10px">FORMATIONS PRÉVUES – ${nextYear}</th></tr>`;
 
   // Determine improvement trainings based on the current formation domain
   const intituleLower = (f.intitule || '').toLowerCase();

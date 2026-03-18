@@ -19,12 +19,46 @@ export function getFullCatalog(org: OrganismeInfo, userFormation: FormationInfo,
 }
 
 export function generateDocumentById(docId: string, template: string, params: Record<string, any> | undefined, org: OrganismeInfo, userFormation: FormationInfo, userStagiaires: StagiaireInfo[]): string {
-  const result = _generateDocumentByIdInner(docId, template, params, org, userFormation, userStagiaires);
+  let result = _generateDocumentByIdInner(docId, template, params, org, userFormation, userStagiaires);
   // Apply gender adaptation based on the relevant stagiaire
   const stagiaires = mergeStagiaires(userStagiaires);
   const si = params?.stagiaireIdx ?? 0;
   const targetStagiaire = stagiaires[si] || stagiaires[0] || null;
-  return applyGender(result, targetStagiaire);
+  result = applyGender(result, targetStagiaire);
+  // Remove all emoji icons and replace with plain text equivalents
+  result = stripEmojis(result);
+  return result;
+}
+
+function stripEmojis(html: string): string {
+  // Replace common status emojis with plain text
+  html = html.replace(/✅\s*/g, '');
+  html = html.replace(/❌\s*/g, '');
+  html = html.replace(/📝\s*/g, '');
+  html = html.replace(/📅\s*/g, '');
+  html = html.replace(/📊\s*/g, '');
+  html = html.replace(/📋\s*/g, '');
+  html = html.replace(/🔄\s*/g, '');
+  html = html.replace(/⏳\s*/g, '');
+  html = html.replace(/⚠️\s*/g, '');
+  html = html.replace(/🎓\s*/g, '');
+  html = html.replace(/🏆\s*/g, '');
+  html = html.replace(/📖\s*/g, '');
+  html = html.replace(/🔍\s*/g, '');
+  html = html.replace(/📞\s*/g, '');
+  html = html.replace(/💻\s*/g, '');
+  html = html.replace(/🗂️\s*/g, '');
+  html = html.replace(/🔧\s*/g, '');
+  html = html.replace(/📌\s*/g, '');
+  html = html.replace(/📈\s*/g, '');
+  // Remove any remaining emoji characters (common Unicode ranges)
+  html = html.replace(/[\u{1F600}-\u{1F64F}]/gu, '');
+  html = html.replace(/[\u{1F300}-\u{1F5FF}]/gu, '');
+  html = html.replace(/[\u{1F680}-\u{1F6FF}]/gu, '');
+  html = html.replace(/[\u{1F900}-\u{1F9FF}]/gu, '');
+  html = html.replace(/[\u{2600}-\u{26FF}]/gu, '');
+  html = html.replace(/[\u{2700}-\u{27BF}]/gu, '');
+  return html;
 }
 
 function _generateDocumentByIdInner(docId: string, template: string, params: Record<string, any> | undefined, org: OrganismeInfo, userFormation: FormationInfo, userStagiaires: StagiaireInfo[]): string {
@@ -4132,14 +4166,6 @@ function genSuiviDysfonctionnementsExcel(o: OrganismeInfo, f: FormationInfo, sta
 }
 
 function genRelancesAppreciationsExcel(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
-  const fmtDate2 = (d: Date) => `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
-  const addDays2 = (d: Date, n: number) => { const r = new Date(d); r.setDate(r.getDate() + n); return r; };
-  const rawDate = f.dateFin || f.dateDebut || "";
-  const parsedDate = rawDate ? new Date(rawDate + "T00:00:00") : null;
-  const baseDate = parsedDate && !isNaN(parsedDate.getTime()) ? parsedDate : new Date();
-  const dateEnvoi = fmtDate2(addDays2(baseDate, 1));
-  const dateRelance = fmtDate2(addDays2(baseDate, 8));
-
   let xlsHtml = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
 <head><meta charset="UTF-8"><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>Relances</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body>
 <table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse">
@@ -4158,24 +4184,8 @@ function genRelancesAppreciationsExcel(o: OrganismeInfo, f: FormationInfo, stagi
   <th>Raison sociale</th><th>Identité</th><th>Email</th><th>Tel</th>
 </tr>`;
 
-  stagiaires.slice(0, 10).forEach((s, i) => {
-    const dateReception = i < 7 ? fmtDate2(addDays2(baseDate, 3 + i)) : "";
-    const commentaire = i < 7 ? "Reçu" : (i < 9 ? "Relancé" : "");
-    xlsHtml += `<tr>
-  <td>${formatDate(f.dateFin)}</td>
-  <td>${f.intitule}</td>
-  <td>${s.entreprise || ""}</td>
-  <td>${s.prenom} ${s.nom}</td>
-  <td>${s.email || ""}</td>
-  <td>${s.telephone || ""}</td>
-  <td>${dateEnvoi}</td>
-  <td>${dateReception}</td>
-  <td>${i >= 7 ? dateRelance : ""}</td>
-  <td>${commentaire}</td>
-</tr>`;
-  });
-
-  for (let i = 0; i < 5; i++) {
+  // Empty rows for manual filling
+  for (let i = 0; i < 15; i++) {
     xlsHtml += `<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>`;
   }
 

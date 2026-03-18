@@ -594,7 +594,7 @@ const QUESTIONS_OUVERTES: Record<string, QuestionsOuvertesFormation> = {
       { question: "Quels sont vos objectifs pour cette formation de français ?", reponseAttendue: "Réponse ouverte : mieux communiquer au travail, écrire des transmissions, comprendre les protocoles, participer aux réunions." },
     ],
     fin: [
-      { question: "Rédigez une transmission pour un résident qui a refusé son repas.", reponseAttendue: "[Date] – [Heure] – M./Mme [Nom] a refusé le déjeuner. Il/elle a dit ne pas avoir faim. A bu un verre d'eau. Informé(e) l'infirmière. Signé : [Nom, Fonction]." },
+      { question: "Rédigez une transmission pour un résident qui a refusé son repas.", reponseAttendue: "[Date] – [Heure] – Le résident [Nom] a refusé le déjeuner. Le résident a dit ne pas avoir faim. A bu un verre d'eau. L'infirmière a été informée. Signé : [Nom, Fonction]." },
       { question: "Comment reformuler pour vérifier que vous avez bien compris ?", reponseAttendue: "Si je comprends bien, vous dites que… / Vous voulez dire que… / Est-ce que c'est bien cela ?" },
       { question: "Expliquez ce qu'est le secret professionnel.", reponseAttendue: "Le secret professionnel interdit de révéler des informations sur les usagers en dehors du cadre professionnel. On partage uniquement avec les collègues concernés (secret partagé)." },
       { question: "Que contient un livret d'accueil ?", reponseAttendue: "Le livret d'accueil présente la structure, ses services, les horaires, les droits des usagers, le règlement, les contacts, la charte des droits et libertés." },
@@ -714,13 +714,16 @@ export function generateStagiaireOpenAnswers(
     return { quality, seed, qi, question: q };
   });
 
-  // Second pass: adjust to target 5-7/10 score range
+  // Second pass: adjust to target score range
   // Calculate raw score
   const scoreOf = (q: 'full' | 'partial' | 'wrong' | 'empty') => q === 'full' ? 1 : q === 'partial' ? 0.5 : 0;
   let totalRaw = rawAnswers.reduce((s, a) => s + scoreOf(a.quality), 0);
   
-  // Target: each stagiaire gets a unique score in 5-7 range
-  const targetScores = [5, 5.5, 6, 6.5, 7, 5.5, 6, 7, 6.5, 5];
+  // Target: each stagiaire gets a unique score
+  // Début: 5-7 range, Fin: 8-10 range (good scores after training)
+  const targetScoresDebut = [5, 5.5, 6, 6.5, 7, 5.5, 6, 7, 6.5, 5];
+  const targetScoresFin = [8, 8.5, 9, 9.5, 10, 8.5, 9, 10, 9.5, 8];
+  const targetScores = isDebut ? targetScoresDebut : targetScoresFin;
   const target = targetScores[stagiaireIndex % targetScores.length];
   
   // Adjust answers to hit target score
