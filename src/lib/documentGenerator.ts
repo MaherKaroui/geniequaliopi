@@ -3904,7 +3904,7 @@ function genBailSousLocation(o: OrganismeInfo) {
         <p>Pour ${o.nom}</p>
         <p>Nom et qualité : ${o.dirigeant}</p>
         <p>Signature :</p>
-        ${o.tamponUrl ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:10px;opacity:0.85" />` : (o.signatureUrl ? `<img src="${o.signatureUrl}" alt="Signature" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:10px" />` : `<p style="font-style:italic;color:#999;margin-top:30px">Signé par ${o.dirigeant}</p>`)}
+        ${o.signatureUrl ? `<img src="${o.signatureUrl}" alt="Signature" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:10px" />` : ""}${o.tamponUrl ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:10px;opacity:0.85" />` : ""}
       </div>
     </div>
   ` });

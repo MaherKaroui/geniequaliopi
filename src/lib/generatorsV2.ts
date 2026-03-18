@@ -19,13 +19,11 @@ function stagSig(s: StagiaireInfo): string {
 
 function orgSig(o: OrganismeInfo): string {
   let h = '';
-  if (o.tamponUrl) {
-    // If tampon exists, show only tampon (no signature)
-    h += `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />`;
-  } else if (o.signatureUrl) {
+  if (o.signatureUrl) {
     h += `<img src="${o.signatureUrl}" alt="Signature" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />`;
-  } else {
-    h += `<p style="font-style:italic;color:#999;margin-top:10px">Signé par ${o.dirigeant}</p>`;
+  }
+  if (o.tamponUrl) {
+    h += `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />`;
   }
   return h;
 }
