@@ -1,6 +1,6 @@
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { buildDocument, htmlWrap, orgHeader, formationInfoBlock, formationInfoBlockStagiaire, tableHTML, signatureBlock3, signatureBlock2, footer, section, formatDate, infoGrid, getDocStyle, subtractBusinessDays, getStagiaireDateDebut, getStagiaireDateFin, applyGender } from "./docBuilder";
-import { FormateurInfo, SAMPLE_FORMATIONS, SAMPLE_STAGIAIRES, SAMPLE_FORMATEURS, SAMPLE_ORGANISME, EVAL_SCORES, SATISFACTION_SCORES, CONNECTION_TIMES, getFormationDays, mergeOrganisme, mergeStagiaires } from "./sampleData";
+import { FormateurInfo, SAMPLE_FORMATIONS, SAMPLE_STAGIAIRES, SAMPLE_FORMATEURS, SAMPLE_ORGANISME, EVAL_SCORES, SATISFACTION_SCORES, CONNECTION_TIMES, getFormationDays, mergeOrganisme, mergeStagiaires, getConnectionTimes, parseDuree } from "./sampleData";
 import { buildFullCatalog } from "./docCatalog";
 import { generateBookQualiopi } from "./bookQualiopi";
 import { getEvalContent, generateStagiaireAnswers, computeQCMScore, getQuestionsOuvertes, generateStagiaireOpenAnswers, QuestionOuverte } from "./evalContent";
@@ -1118,22 +1118,23 @@ function genEmargementJour(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
 
 function genRapportConnexion(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const days = getFormationDays(f);
+  const ct = getConnectionTimes(f);
   const rows: string[][] = [];
   stagiaires.slice(0, 10).forEach(s => {
-    days.slice(0, 3).forEach((day, di) => {
-      const ct = CONNECTION_TIMES[di % CONNECTION_TIMES.length];
-      rows.push([s.prenom + " " + s.nom, day, ct.heureConnexion, ct.heureDeconnexion, ct.duree]);
+    days.slice(0, 5).forEach((day, di) => {
+      rows.push([s.prenom + " " + s.nom, day, ct[di * 2 % ct.length].heureConnexion, ct[di * 2 % ct.length].heureDeconnexion, ct[di * 2 % ct.length].duree]);
+      rows.push([s.prenom + " " + s.nom, '', ct[(di * 2 + 1) % ct.length].heureConnexion, ct[(di * 2 + 1) % ct.length].heureDeconnexion, ct[(di * 2 + 1) % ct.length].duree]);
     });
   });
   return buildDocument({ org: o, title: "RAPPORT DE CONNEXION LMS", subtitle: f.intitule, formation: f, showFormationInfo: true, table: {
-    headers: ["Stagiaire", "Date", "Heure connexion", "Heure déconnexion", "Durée"], rows: rows.slice(0, 30)
+    headers: ["Stagiaire", "Date", "Heure connexion", "Heure déconnexion", "Durée"], rows: rows.slice(0, 60)
   } });
 }
 
 function genTempsConnexion(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
-  const rows = stagiaires.slice(0, 10).map((s, i) => {
-    const total = 18 + (i % 5);
-    return [s.prenom + " " + s.nom, `${total}h`, f.duree, `${Math.round(total / 21 * 100)}%`, total >= 15 ? "✅ Validé" : "⚠️ Insuffisant"];
+  const { totalHours } = parseDuree(f.duree);
+  const rows = stagiaires.slice(0, 10).map((s) => {
+    return [s.prenom + " " + s.nom, `${totalHours}h`, f.duree, `100%`, "✅ Validé"];
   });
   return buildDocument({ org: o, title: "TEMPS DE CONNEXION PAR STAGIAIRE", subtitle: f.intitule, formation: f, showFormationInfo: true, table: {
     headers: ["Stagiaire", "Temps total", "Durée formation", "Taux présence", "Statut"], rows
