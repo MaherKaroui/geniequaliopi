@@ -714,13 +714,16 @@ export function generateStagiaireOpenAnswers(
     return { quality, seed, qi, question: q };
   });
 
-  // Second pass: adjust to target 5-7/10 score range
+  // Second pass: adjust to target score range
   // Calculate raw score
   const scoreOf = (q: 'full' | 'partial' | 'wrong' | 'empty') => q === 'full' ? 1 : q === 'partial' ? 0.5 : 0;
   let totalRaw = rawAnswers.reduce((s, a) => s + scoreOf(a.quality), 0);
   
-  // Target: each stagiaire gets a unique score in 5-7 range
-  const targetScores = [5, 5.5, 6, 6.5, 7, 5.5, 6, 7, 6.5, 5];
+  // Target: each stagiaire gets a unique score
+  // Début: 5-7 range, Fin: 8-10 range (good scores after training)
+  const targetScoresDebut = [5, 5.5, 6, 6.5, 7, 5.5, 6, 7, 6.5, 5];
+  const targetScoresFin = [8, 8.5, 9, 9.5, 10, 8.5, 9, 10, 9.5, 8];
+  const targetScores = isDebut ? targetScoresDebut : targetScoresFin;
   const target = targetScores[stagiaireIndex % targetScores.length];
   
   // Adjust answers to hit target score
