@@ -498,7 +498,7 @@ export function genListePartenairesV2(o: OrganismeInfo) {
   ], extraHtml: `<h2>Les partenaires de ${o.nom}</h2>
     <table>
       <tr><th>Partenaire</th><th>${o.dirigeant}</th></tr>
-      <tr><td>Président</td><td>Président<br>${tamponHtml}</td></tr>
+      <tr style="background:#fff"><td>Président</td><td>Président<br>${tamponHtml}</td></tr>
     </table>` });
 }
 
