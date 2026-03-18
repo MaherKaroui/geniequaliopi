@@ -27,10 +27,11 @@ p{margin-bottom:8px;font-size:${s.fontSize}px}
 .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:15px 0}
 .info-item{font-size:${s.fontSize}px}
 .info-item strong{color:${s.primaryColor}}
-table{width:100%;border-collapse:collapse;margin:15px 0;font-size:${s.fontSize}px}
-th{background:${s.primaryColor};color:white;padding:10px;text-align:left}
-td{padding:8px 10px;border-bottom:1px solid #e0e0e0}
-tr:nth-child(even){background:#fff}
+table{width:100%;border-collapse:collapse;margin:15px 0;font-size:${s.fontSize - 1}px}
+th{background:${s.primaryColor};color:white;padding:8px 6px;text-align:left;font-size:${s.fontSize - 1}px}
+td{padding:8px 6px;border-bottom:1px solid #e0e0e0;vertical-align:top;font-size:${s.fontSize - 1}px}
+tr:nth-child(even){background:#f0f4fa}
+tr:nth-child(odd){background:#fff}
 .footer{margin-top:40px;padding-top:20px;border-top:2px solid #e0e0e0;font-size:${s.fontSize - 1}px;color:#666;text-align:center}
 .signature-block{display:grid;grid-template-columns:1fr 1fr 1fr;gap:30px;margin-top:40px}
 .signature-block-2{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:40px}
