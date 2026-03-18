@@ -244,8 +244,8 @@ export const EVAL_SCORES: number[][] = [
   [10, 8, 9, 8, 9], // Julie Lambert
 ];
 
-// Connection times for distanciel (realistic)
-export const CONNECTION_TIMES = [
+// Connection times for distanciel - 7h/jour (default)
+export const CONNECTION_TIMES_7H = [
   { heureConnexion: "08:55", heureDeconnexion: "12:05", duree: "3h10" },
   { heureConnexion: "13:28", heureDeconnexion: "17:02", duree: "3h34" },
   { heureConnexion: "09:02", heureDeconnexion: "12:15", duree: "3h13" },
@@ -253,6 +253,35 @@ export const CONNECTION_TIMES = [
   { heureConnexion: "08:58", heureDeconnexion: "12:10", duree: "3h12" },
   { heureConnexion: "13:32", heureDeconnexion: "17:05", duree: "3h33" },
 ];
+
+// Connection times for distanciel - 6h/jour
+export const CONNECTION_TIMES_6H = [
+  { heureConnexion: "09:00", heureDeconnexion: "12:05", duree: "3h05" },
+  { heureConnexion: "13:00", heureDeconnexion: "15:58", duree: "2h58" },
+  { heureConnexion: "09:02", heureDeconnexion: "12:08", duree: "3h06" },
+  { heureConnexion: "13:02", heureDeconnexion: "15:55", duree: "2h53" },
+  { heureConnexion: "08:58", heureDeconnexion: "12:03", duree: "3h05" },
+  { heureConnexion: "13:05", heureDeconnexion: "16:02", duree: "2h57" },
+];
+
+// Backward compat
+export const CONNECTION_TIMES = CONNECTION_TIMES_7H;
+
+/** Parse total hours and number of days from duree string like "24 heures (4 jours)" */
+export function parseDuree(duree: string): { totalHours: number; days: number; hoursPerDay: number } {
+  const hMatch = duree.match(/(\d+)\s*heures?/i);
+  const dMatch = duree.match(/(\d+)\s*jours?/i);
+  const totalHours = hMatch ? parseInt(hMatch[1]) : 21;
+  const days = dMatch ? parseInt(dMatch[1]) : 3;
+  const hoursPerDay = days > 0 ? totalHours / days : 7;
+  return { totalHours, days, hoursPerDay };
+}
+
+/** Get appropriate connection times based on hours per day */
+export function getConnectionTimes(f: FormationInfo): typeof CONNECTION_TIMES_7H {
+  const { hoursPerDay } = parseDuree(f.duree);
+  return hoursPerDay <= 6 ? CONNECTION_TIMES_6H : CONNECTION_TIMES_7H;
+}
 
 export function getFormationDays(f: FormationInfo): string[] {
   if (!f.dateDebut || !f.dateFin) return ["Jour 1", "Jour 2", "Jour 3"];
