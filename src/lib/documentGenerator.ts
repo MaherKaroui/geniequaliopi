@@ -345,6 +345,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "procedure_psh_cfa": return genDossierPSH(o);
     case "dossier_accompagnement_psh_cfa": return genDossierPSH(o);
     case "guide_aide_connexion_cfa": return genMailAideConnexion(o, f);
+    case "convention_formation_apprentissage": return genConventionFormationApprentissage(o, f, stagiaires, params?.stagiaireIdx ?? 0);
     case "fiche_autoevaluation_apprenti": return genFicheAutoevaluation(o, f, stagiaires);
     case "procedure_abandon_cfa": return genProcedureAbandon(o);
     case "procedure_absences_cfa": return genProcedureAbsences(o);
@@ -2244,6 +2245,30 @@ function genContratApprentissage(o: OrganismeInfo, f: FormationInfo, stagiaires:
     { heading: "Rémunération", content: "<p>Selon les dispositions légales et conventionnelles en vigueur, conformément à l'article D.6222-26 du Code du travail.</p>" },
     { heading: "Obligations", content: "<p><strong>L'employeur s'engage à :</strong><br>• Assurer la formation pratique de l'apprenti<br>• Désigner un maître d'apprentissage<br>• Permettre à l'apprenti de suivre la formation au CFA<br><br><strong>L'apprenti s'engage à :</strong><br>• Suivre assidûment la formation<br>• Respecter le règlement intérieur<br>• Participer aux évaluations</p>" },
   ], signatures: { type: "3", names: [s.prenom + " " + s.nom, f.formateur] } });
+}
+
+function genConventionFormationApprentissage(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
+  const s = stagiaires[si] || stagiaires[0] || { prenom: "Martin", nom: "Dupont", entreprise: "Tech Solutions SAS", email: "" };
+  const entreprise = s.entreprise || "Entreprise partenaire";
+  const dateDebut = formatDate(f.dateDebut);
+  const dateFin = formatDate(f.dateFin);
+  const duree = f.duree || "420 heures";
+  const lieu = `${o.nom}, ${o.adresse}`;
+  const montant = f.tarif || "8 000";
+  return buildDocument({ org: o, title: "CONVENTION DE FORMATION PAR APPRENTISSAGE", subtitle: f.intitule, formation: f, showFormationInfo: false, sections: [
+    { heading: "Entre les soussignés", content: `<h3>1. Le CFA ${o.nom}</h3><p>Adresse : ${o.adresse}<br>SIRET : ${o.siret}<br>Organisme de formation NDA : ${o.nda}<br>Représenté par ${o.dirigeant}, Directeur du CFA ${o.nom}</p><h3>2. L'entreprise</h3><p>Raison sociale : ${entreprise}<br>Représentée par le responsable désigné.<br>Maître d'apprentissage : désigné par l'employeur.</p><h3>3. L'apprenant(e)</h3><p>Nom et prénom : ${s.prenom} ${s.nom}<br>Date de début du contrat : ${dateDebut}<br>Date de fin du contrat : ${dateFin}</p><p>Est conclue la convention suivante (comprenant 5 annexes), en application des dispositions des Livres II et III de la sixième partie du Code du travail.</p>` },
+    { heading: "Article 1er : Objet de la convention", content: `<p>Le CFA ${o.nom} organise une action de formation par apprentissage au sens de l'article L.6313-6 du Code du travail.</p><ul><li><strong>Intitulé et objectif de l'action :</strong> ${f.intitule}</li><li><strong>Certificateur :</strong> ${o.certifications || "Certificateur enregistré au RNCP"}</li><li><strong>Durée de l'action de formation :</strong> ${duree}</li><li>Du ${dateDebut} au ${dateFin}</li><li><strong>Lieu principal de la formation :</strong> ${lieu}</li></ul>` },
+    { heading: "Article 2 : Modalités de déroulement et de suivi", content: `<p><strong>Modalités :</strong></p><ul><li>Alternance entreprise / centre de formation</li><li>Mode : ${f.modalites || "Présentiel"} – ${duree}</li><li>Lieu : ${lieu}</li></ul><p><strong>Moyens pédagogiques :</strong> Plateforme en ligne, salle équipée.</p><p><strong>Assistance technique :</strong> ${o.nom} – ${o.email}</p><p><strong>Suivi :</strong> Livret d'apprentissage, visites en entreprise (2/an), réunions de concertation, suivi de l'assiduité.</p><p><strong>Obtention du diplôme :</strong> Épreuves en CCF et ponctuelles.</p>` },
+    { heading: "Article 3 : Bénéficiaire", content: `<p>Nom et prénom(s) : ${s.prenom} ${s.nom}<br>Date de début : ${dateDebut}<br>Date de fin : ${dateFin}</p>` },
+    { heading: "Article 4 : Dispositions financières", content: `<p>Gratuité de la formation pour l'apprenti. Aucun frais ne peut être demandé.</p>${tableHTML(["", "Montant net de taxe", "Prise en charge OPCO", "Reste à charge"], [["1ère année", montant + " €", montant + " €", "0 €"]])}` },
+    { heading: "Article 5 : Modalités pédagogiques", content: `<ul><li>En présentiel au CFA : ${lieu}</li><li>En entreprise sous supervision du maître d'apprentissage.</li></ul><p><strong>FOAD :</strong> Certaines séquences en distanciel : plateforme en ligne, suivi personnalisé, traçabilité des connexions, évaluations en ligne.</p>` },
+    { heading: "Article 6 : Clause suspensive", content: `<p>Exécution soumise à l'enregistrement du contrat par l'OPCO (art. L.6224-1 du Code du travail).</p>` },
+    { heading: "Article 7 : Différends", content: `<p>Règlement amiable. À défaut, juridiction administrative compétente.</p>` },
+    { heading: "Article 8 : Suivi et évaluation", content: `<ul><li>Livret d'apprentissage tenu à jour par l'Apprenant, l'Employeur et le CFA.</li><li>Évaluations régulières en CFA et en entreprise.</li><li>Réunion tripartite au moins une fois par an.</li></ul>` },
+    { heading: "Article 9 : Résiliation", content: `<p>Fin à l'issue du contrat (${dateFin}) ou en cas de rupture anticipée (art. L.6222-18 du Code du travail).</p>` },
+    { heading: "Article 10 : Litiges", content: `<p>Tentative de règlement amiable. À défaut, juridictions compétentes.</p>` },
+    { heading: "Article 11 : Mandat", content: `<p>L'entreprise donne mandat au CFA pour accomplir les formalités prévues à l'article L. 6224-1 du code du travail, à titre gratuit. Le mandant fournit les informations nécessaires et donne pouvoir de représentation auprès des OPCO.</p>` },
+  ], signatures: { type: "3", names: [s.prenom + " " + s.nom, o.dirigeant + " – " + o.nom] } });
 }
 
 function genLivretApprentissageCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
