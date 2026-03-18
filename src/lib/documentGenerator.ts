@@ -4592,7 +4592,7 @@ function genBilanFroidStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: 
   ];
   extra += `<p><strong>Commentaire global :</strong> ${commentsPool[si % commentsPool.length]}</p>`;
 
-  return buildDocument({ org: o, title: "BILAN À FROID", subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, sections: [
+  return buildDocument({ org: o, title: "BILAN À FROID", subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, stagiaires: [s], sections: [
     { heading: "Informations", content: `<p><strong>Organisme :</strong> ${o.nom}<br><strong>Formation :</strong> ${f.intitule}<br><strong>Durée :</strong> ${dureeH} heures</p>` },
   ], extraHtml: extra });
 }
