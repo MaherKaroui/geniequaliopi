@@ -245,6 +245,14 @@ export function buildFullCatalog(
     add("cfa_c1i1_procedure_formation", "CT1 - IND 1 PROCÉDURE DE FORMATION CFA", 1, 1, "procedure_formation_cfa");
     add("cfa_c1i1_cgv", "CT1 - IND 1 CONDITIONS GÉNÉRALES DE VENTE CFA", 1, 1, "cgv");
 
+    // IND 2 — Indicateurs de résultats CFA
+    add("cfa_c1i2_indicateurs_resultats", "CT1 - IND 2 INDICATEURS DE RÉSULTATS CFA", 1, 2, "indicateurs_resultats_cfa");
+
+    // IND 3 — Taux d'obtention, certification RNCP
+    add("cfa_c1i3_titre_rncp", "CT1 - IND 3 FICHE TITRE RNCP", 1, 3, "titre_rncp_cfa");
+    add("cfa_c1i3_matiere_titre", "CT1 - IND 3 MATIÈRE DU TITRE", 1, 3, "matiere_titre_cfa");
+    add("cfa_c1i3_tableau_croise", "CT1 - IND 3 TABLEAU CROISÉ COMPÉTENCES PROGRAMME", 1, 3, "tableau_croise_cfa");
+
     // Indicateur 13 - Coordination alternance
     formations.forEach((f, fi) => {
       add(`cfa_c3i13_contrat_${fi}`, `Contrat d'apprentissage`, 3, 13, "contrat_apprentissage", { fi });
