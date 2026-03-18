@@ -514,8 +514,8 @@ export function genContratSousTraitanceV2(o: OrganismeInfo, f: FormationInfo, st
     const sigHtml = o.signatureUrl ? `<img src="${o.signatureUrl}" alt="Signature" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : "";
     const tamponHtml = o.tamponUrl ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />` : "";
     return `<div class="signature-block-2">
-      <div class="sig-box"><p class="sig-label">Le donneur d'ordre – ${o.nom}</p><p>Nom : ${o.dirigeant}</p><p>Date : ________________________</p><p style="margin-top:20px">Signature :</p>${sigHtml}</div>
-      <div class="sig-box"><p class="sig-label">Le sous-traitant</p><p>Nom : ${o.responsablePedagogique}</p><p>Date : ________________________</p><p style="margin-top:20px">Signature :</p>${tamponHtml}</div>
+      <div class="sig-box"><p class="sig-label">Le donneur d'ordre – ${o.nom}</p><p>Nom : ${o.dirigeant}</p><p>Date : ${(o as any).dateMaj ? new Date((o as any).dateMaj).toLocaleDateString("fr-FR") : new Date().toLocaleDateString("fr-FR")}</p><p style="margin-top:20px">Signature :</p>${sigHtml}</div>
+      <div class="sig-box"><p class="sig-label">Le sous-traitant</p><p>Nom : ${o.responsablePedagogique}</p><p>Date : ${(o as any).dateMaj ? new Date((o as any).dateMaj).toLocaleDateString("fr-FR") : new Date().toLocaleDateString("fr-FR")}</p><p style="margin-top:20px">Signature :</p>${tamponHtml}</div>
     </div>`;
   })() });
 }
