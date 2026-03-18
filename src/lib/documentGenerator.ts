@@ -19,12 +19,46 @@ export function getFullCatalog(org: OrganismeInfo, userFormation: FormationInfo,
 }
 
 export function generateDocumentById(docId: string, template: string, params: Record<string, any> | undefined, org: OrganismeInfo, userFormation: FormationInfo, userStagiaires: StagiaireInfo[]): string {
-  const result = _generateDocumentByIdInner(docId, template, params, org, userFormation, userStagiaires);
+  let result = _generateDocumentByIdInner(docId, template, params, org, userFormation, userStagiaires);
   // Apply gender adaptation based on the relevant stagiaire
   const stagiaires = mergeStagiaires(userStagiaires);
   const si = params?.stagiaireIdx ?? 0;
   const targetStagiaire = stagiaires[si] || stagiaires[0] || null;
-  return applyGender(result, targetStagiaire);
+  result = applyGender(result, targetStagiaire);
+  // Remove all emoji icons and replace with plain text equivalents
+  result = stripEmojis(result);
+  return result;
+}
+
+function stripEmojis(html: string): string {
+  // Replace common status emojis with plain text
+  html = html.replace(/✅\s*/g, '');
+  html = html.replace(/❌\s*/g, '');
+  html = html.replace(/📝\s*/g, '');
+  html = html.replace(/📅\s*/g, '');
+  html = html.replace(/📊\s*/g, '');
+  html = html.replace(/📋\s*/g, '');
+  html = html.replace(/🔄\s*/g, '');
+  html = html.replace(/⏳\s*/g, '');
+  html = html.replace(/⚠️\s*/g, '');
+  html = html.replace(/🎓\s*/g, '');
+  html = html.replace(/🏆\s*/g, '');
+  html = html.replace(/📖\s*/g, '');
+  html = html.replace(/🔍\s*/g, '');
+  html = html.replace(/📞\s*/g, '');
+  html = html.replace(/💻\s*/g, '');
+  html = html.replace(/🗂️\s*/g, '');
+  html = html.replace(/🔧\s*/g, '');
+  html = html.replace(/📌\s*/g, '');
+  html = html.replace(/📈\s*/g, '');
+  // Remove any remaining emoji characters (common Unicode ranges)
+  html = html.replace(/[\u{1F600}-\u{1F64F}]/gu, '');
+  html = html.replace(/[\u{1F300}-\u{1F5FF}]/gu, '');
+  html = html.replace(/[\u{1F680}-\u{1F6FF}]/gu, '');
+  html = html.replace(/[\u{1F900}-\u{1F9FF}]/gu, '');
+  html = html.replace(/[\u{2600}-\u{26FF}]/gu, '');
+  html = html.replace(/[\u{2700}-\u{27BF}]/gu, '');
+  return html;
 }
 
 function _generateDocumentByIdInner(docId: string, template: string, params: Record<string, any> | undefined, org: OrganismeInfo, userFormation: FormationInfo, userStagiaires: StagiaireInfo[]): string {
