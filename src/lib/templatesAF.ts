@@ -83,16 +83,118 @@ export function genDeroulePedagogique(o: OrganismeInfo, f: FormationInfo) {
   const jours = f.programme.split("\n").filter(l => l.trim());
   const totalH = parseInt(f.duree) || (jours.length * 7);
   const hParJour = jours.length > 0 ? totalH / jours.length : 7;
-  const demiJournee = `${Math.round(hParJour / 2 * 10) / 10}h`;
-  const rows = jours.map((j, i) => {
-    const parts = j.replace(/^Jour \d+ :\s*/i, '').replace(/^Module \d+ :\s*/i, '');
-    return [`${i + 1}`, `Séquence ${i + 1}`, parts, i < jours.length / 2 ? "Apports théoriques + Exercices" : "Cas pratiques + Mises en situation", demiJournee, i === 0 ? "QCM positionnement" : i === jours.length - 1 ? "Évaluation finale" : "Exercices formatifs"];
+
+  const methodesPool = [
+    "Démonstration + exercices pratiques",
+    "Exercices guidés",
+    "Mise en situation pratique",
+    "Démonstration + mise en pratique",
+    "Travail autonome accompagné",
+    "Démonstration + manipulation guidée",
+  ];
+  const outilsPool = "PC, plateforme e-learning, visioconférence";
+  const evalPool = [
+    "Test de positionnement initial",
+    "Exercice pratique",
+    "Observation en situation",
+    "Exercice corrigé",
+    "Vérification du document",
+    "Document réalisé",
+    "Évaluation formative",
+    "Évaluation finale",
+  ];
+  const adaptPool = [
+    "Aide individualisée",
+    "Temps supplémentaire",
+    "Soutien individualisé",
+    "Adaptation du rythme",
+    "Aide ciblée",
+    "Accompagnement renforcé",
+    "Adaptation pédagogique",
+  ];
+
+  // Build detailed sequences per day
+  const allRows: string[][] = [];
+  jours.forEach((j, jourIdx) => {
+    const jourTitle = j.replace(/^Jour \d+ :\s*/i, '').replace(/^Module \d+ :\s*/i, '');
+    const themes = jourTitle.split(/[,;–—-]+/).map(t => t.trim()).filter(Boolean);
+    
+    // First sequence: accueil on day 1
+    if (jourIdx === 0) {
+      allRows.push([
+        "Accueil & présentation", "0h30",
+        "Comprendre les objectifs et le cadre de la formation",
+        "Présentation du programme, des objectifs, des modalités d'évaluation",
+        "Échanges oraux", "Support de présentation",
+        "Questions-réponses", "Adaptation au rythme"
+      ]);
+      allRows.push([
+        "Positionnement & introduction", "1h00",
+        `Évaluer le niveau initial sur ${themes[0] || jourTitle}`,
+        `Test de positionnement, introduction aux concepts de ${themes[0] || jourTitle}`,
+        methodesPool[1], outilsPool, evalPool[0], adaptPool[0]
+      ]);
+    }
+
+    // Generate sequences from themes
+    const seqCount = Math.max(themes.length, 2);
+    const hPerSeq = jourIdx === 0
+      ? Math.round(((hParJour - 1.5) / seqCount) * 4) / 4
+      : Math.round((hParJour / seqCount) * 4) / 4;
+    const hLabel = `${Math.floor(hPerSeq)}h${(hPerSeq % 1) * 60 > 0 ? String(Math.round((hPerSeq % 1) * 60)).padStart(2, '0') : '00'}`;
+
+    themes.forEach((theme, ti) => {
+      const idx = (jourIdx * 3 + ti);
+      allRows.push([
+        theme || `Séquence ${ti + 1}`,
+        hLabel,
+        `Maîtriser ${theme.toLowerCase()}`,
+        `Concepts, méthodes et techniques de ${theme.toLowerCase()}`,
+        methodesPool[idx % methodesPool.length],
+        outilsPool,
+        evalPool[(idx + 1) % evalPool.length],
+        adaptPool[idx % adaptPool.length],
+      ]);
+    });
+
+    // Last day: add bilan & evaluation
+    if (jourIdx === jours.length - 1) {
+      allRows.push([
+        "Évaluation finale", "1h00",
+        "Vérifier l'acquisition des compétences",
+        "Cas pratique complet couvrant l'ensemble des acquis",
+        "Travail autonome", `${outilsPool}, grille d'évaluation`,
+        "Évaluation finale", "Accompagnement renforcé"
+      ]);
+      allRows.push([
+        "Bilan & grille d'acquisition", "0h30",
+        "Valider les acquis et clôturer la formation",
+        "Restitution, bilan individuel, remise des attestations",
+        "Échange formateur/stagiaire", "Grille d'acquisition, questionnaire de satisfaction",
+        "Validation des compétences", "Adaptation pédagogique"
+      ]);
+    }
+
+    // Add page break between days (except last)
+    if (jourIdx < jours.length - 1) {
+      allRows.push(["__PAGE_BREAK__"]);
+    }
   });
-  return buildDocument({ org: o, title: "DÉROULÉ PÉDAGOGIQUE", subtitle: f.intitule, formation: f, showFormationInfo: true, table: {
-    headers: ["N°", "Séquence", "Contenu", "Méthodes", "Durée", "Évaluation"], rows
-  }, sections: [
-    { heading: "Objectifs pédagogiques", content: `<p>${f.objectifs}</p>` },
-    { heading: "Méthodes mobilisées", content: "<p>• Apports théoriques (30%)<br>• Exercices pratiques et cas concrets (50%)<br>• Mises en situation et jeux de rôle (15%)<br>• Échanges et retours d'expérience (5%)</p>" },
+
+  // Build table HTML manually to support page breaks between days
+  const headers = ["Séquence", "Durée", "Objectif pédagogique", "Contenus abordés", "Méthodes & activités", "Outils / supports", "Évaluation", "Adaptations"];
+  let tableHtml = `<table><thead><tr>${headers.map(h => `<th>${h}</th>`).join("")}</tr></thead><tbody>`;
+  for (const row of allRows) {
+    if (row[0] === "__PAGE_BREAK__") {
+      tableHtml += `</tbody></table><div class="page-break"></div><table><thead><tr>${headers.map(h => `<th>${h}</th>`).join("")}</tr></thead><tbody>`;
+    } else {
+      tableHtml += `<tr>${row.map(c => `<td>${c}</td>`).join("")}</tr>`;
+    }
+  }
+  tableHtml += `</tbody></table>`;
+
+  return buildDocument({ org: o, title: "DÉROULÉ PÉDAGOGIQUE DÉTAILLÉ", subtitle: f.intitule, formation: f, showFormationInfo: true, sections: [
+    { heading: "", content: tableHtml },
   ] });
 }
 
