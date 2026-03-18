@@ -194,6 +194,50 @@ export async function htmlToPdfBlob(htmlContent: string): Promise<Blob> {
         continue;
       }
 
+      // Special handling for tables: split row by row, repeat thead
+      if (node instanceof HTMLElement && node.tagName === "TABLE") {
+        const thead = node.querySelector("thead");
+        const rows = Array.from(node.querySelectorAll("tbody tr, tr")).filter(
+          (tr) => !tr.closest("thead")
+        );
+
+        // Helper to create a new table shell with thead clone
+        const createTableShell = (): HTMLTableElement => {
+          const tbl = document.createElement("table");
+          // Copy attributes & styles from original table
+          for (const attr of Array.from(node.attributes)) {
+            tbl.setAttribute(attr.name, attr.value);
+          }
+          tbl.style.cssText = node.style.cssText;
+          if (thead) tbl.appendChild(thead.cloneNode(true) as HTMLElement);
+          const tbody = document.createElement("tbody");
+          tbl.appendChild(tbody);
+          return tbl;
+        };
+
+        let currentTable = createTableShell();
+        current.content.appendChild(currentTable);
+
+        for (const row of rows) {
+          const tbody = currentTable.querySelector("tbody") || currentTable;
+          const rowClone = row.cloneNode(true) as HTMLElement;
+          tbody.appendChild(rowClone);
+
+          // Check overflow after adding the row
+          if (current.content.scrollHeight > current.content.clientHeight + 1) {
+            tbody.removeChild(rowClone);
+            // Start new page with a fresh table (with thead)
+            current = createPage(host, footerHtml, footerHeightPx);
+            pages.push(current.page);
+            currentTable = createTableShell();
+            current.content.appendChild(currentTable);
+            const newTbody = currentTable.querySelector("tbody") || currentTable;
+            newTbody.appendChild(rowClone);
+          }
+        }
+        continue;
+      }
+
       const clone = node.cloneNode(true);
       current.content.appendChild(clone);
 
