@@ -700,14 +700,15 @@ export function generateStagiaireOpenAnswers(
         quality = seed < 10 ? 'full' : seed < 30 ? 'partial' : seed < 70 ? 'wrong' : 'empty';
       }
     } else {
+      // Fin de formation: all profiles perform well (scores 8-10)
       if (profile.level === 'excellent') {
-        quality = seed < 85 ? 'full' : 'partial';
+        quality = seed < 95 ? 'full' : 'partial';
       } else if (profile.level === 'bon') {
-        quality = seed < 70 ? 'full' : seed < 95 ? 'partial' : 'wrong';
+        quality = seed < 90 ? 'full' : 'partial';
       } else if (profile.level === 'moyen') {
-        quality = seed < 50 ? 'full' : seed < 85 ? 'partial' : 'wrong';
+        quality = seed < 80 ? 'full' : 'partial';
       } else {
-        quality = seed < 35 ? 'full' : seed < 70 ? 'partial' : seed < 90 ? 'wrong' : 'empty';
+        quality = seed < 70 ? 'full' : seed < 95 ? 'partial' : 'wrong';
       }
     }
     
