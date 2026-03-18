@@ -4359,24 +4359,27 @@ function genBilanChaud(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiaire
   const dureeH = parseInt(f.duree) || 14;
   let extra = `<p><strong>Date :</strong> ${formatDate(f.dateFin)}</p>`;
   stagiaires.slice(0, 10).forEach((s, i) => {
+    const rng = seededRandom(i * 53 + 11);
     extra += `<h3>Stagiaire : ${s.prenom} ${s.nom}</h3>`;
     extra += `<p><strong>Date :</strong> ${formatDate(f.dateFin)}</p>`;
     const criteres = [
-      ["Satisfaction globale de la formation", i % 3 === 0 ? 1 : 0],
-      ["Atteinte des objectifs pédagogiques", 0],
-      ["Clarté des explications", 0],
-      ["Progression pédagogique", i % 2 === 0 ? 1 : 0],
-      ["Adéquation du contenu au niveau", 0],
-      ["Méthodes pédagogiques", i % 2 === 0 ? 1 : 0],
-      ["Alternance théorie / pratique", 0],
-      ["Disponibilité du formateur", 0],
-      ["Organisation de la formation", i % 3 === 0 ? 1 : 0],
-      ["Conditions matérielles", 1],
-      ["Utilité professionnelle de la formation", 0],
-      ["Recommandation de la formation", i % 2 === 0 ? 1 : 0],
+      "Satisfaction globale de la formation",
+      "Atteinte des objectifs pédagogiques",
+      "Clarté des explications",
+      "Progression pédagogique",
+      "Adéquation du contenu au niveau",
+      "Méthodes pédagogiques",
+      "Alternance théorie / pratique",
+      "Disponibilité du formateur",
+      "Organisation de la formation",
+      "Conditions matérielles",
+      "Utilité professionnelle de la formation",
+      "Recommandation de la formation",
     ];
     extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%"><tr style="background:#1e3a7b;color:#fff"><th>Critères évalués</th><th>Très satisfaisant</th><th>Satisfaisant</th><th>Peu satisfaisant</th><th>Insuffisant</th></tr>`;
-    criteres.forEach(([label, note]) => {
+    criteres.forEach((label) => {
+      const r = rng();
+      const note = r < 0.55 ? 0 : r < 0.9 ? 1 : 2;
       extra += `<tr><td>${label}</td><td>${note === 0 ? "☒" : "☐"}</td><td>${note === 1 ? "☒" : "☐"}</td><td>${note === 2 ? "☒" : "☐"}</td><td>${note === 3 ? "☒" : "☐"}</td></tr>`;
     });
     extra += `</table>`;
