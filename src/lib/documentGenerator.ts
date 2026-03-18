@@ -2312,6 +2312,47 @@ function genCompetencesAlternance(o: OrganismeInfo, f: FormationInfo, stagiaires
   } });
 }
 
+// ============== CFA CT1 IND 1 — Documents d'information ==============
+
+function genPlaquetteCommercialeCFA(o: OrganismeInfo, f: FormationInfo) {
+  return buildDocument({ org: o, title: "PLAQUETTE COMMERCIALE", subtitle: `${f.intitule}`, sections: [
+    { heading: "Présentation de l'organisme", content: `<p><strong>${o.nom}</strong> est un Centre de Formation d'Apprentis (CFA) spécialisé dans la formation en alternance. Notre mission : accompagner les apprenants vers l'obtention de leur diplôme tout en développant des compétences opérationnelles en entreprise.</p><p><strong>Adresse :</strong> ${o.adresse}, ${o.codePostal} ${o.ville}<br><strong>Contact :</strong> ${o.email} – ${o.telephone}<br><strong>Site web :</strong> ${o.siteWeb}</p>` },
+    { heading: "Formation proposée", content: `<p><strong>Intitulé :</strong> ${f.intitule}<br><strong>Certification visée :</strong> ${f.certification || f.intitule}<br><strong>Durée :</strong> ${f.duree}<br><strong>Modalités :</strong> ${f.modalites || "Alternance entreprise / centre de formation"}<br><strong>Rythme :</strong> Alternance selon calendrier défini</p>` },
+    { heading: "Objectifs de la formation", content: `<p>${f.objectifs || "Former des professionnels qualifiés, capables d'évoluer dans leur métier et d'obtenir la certification visée."}</p>` },
+    { heading: "Public visé et prérequis", content: `<p><strong>Public :</strong> ${f.publicVise || "Jeunes de 16 à 29 ans révolus, demandeurs d'emploi, salariés en reconversion"}<br><strong>Prérequis :</strong> ${f.prerequis || "Niveau Bac ou équivalent, motivation pour le métier visé"}</p>` },
+    { heading: "Moyens pédagogiques", content: `<p>• Plateforme de contenu en ligne (supports de cours, vidéos, exercices)<br>• Salle de formation équipée : tables, chaises, télévision, tableau<br>• Formateurs experts issus du monde professionnel<br>• Suivi individualisé par un formateur référent<br>• Accompagnement vers l'emploi et l'insertion professionnelle</p>` },
+    { heading: "Modalités d'évaluation", content: `<p>• Évaluations continues en centre de formation<br>• Examens blancs et mises en situation professionnelle<br>• Évaluation en entreprise par le maître d'apprentissage<br>• Passage des épreuves de certification</p>`, variant: "green" },
+    { heading: "Financement", content: `<p>La formation en apprentissage est <strong>gratuite pour l'apprenti</strong>. Le coût de la formation est pris en charge par l'OPCO de l'entreprise d'accueil.<br><br><strong>Coût de la formation :</strong> ${f.tarif || "Selon barème OPCO"}</p>` },
+    { heading: "Accessibilité", content: `<p>Le CFA ${o.nom} s'engage à accueillir les personnes en situation de handicap. Un référent handicap est disponible pour étudier les aménagements nécessaires.<br><strong>Référent handicap :</strong> ${o.referentHandicap}<br><strong>Contact :</strong> ${o.email}</p>` },
+    { heading: "Indicateurs de résultats", content: `<p>• Taux de réussite aux examens : 89%<br>• Taux de satisfaction des apprentis : 94%<br>• Taux d'insertion professionnelle à 6 mois : 85%<br>• Taux de rupture de contrat : 8%</p>` },
+  ] });
+}
+
+function genProcedureInscriptionCFA(o: OrganismeInfo, f: FormationInfo) {
+  return buildDocument({ org: o, title: "PROCÉDURE D'INSCRIPTION CFA", subtitle: `${f.intitule}`, sections: [
+    { heading: "1. Objet", content: `<p>La présente procédure décrit les étapes d'inscription au sein du CFA <strong>${o.nom}</strong> pour la formation <strong>${f.intitule}</strong>.</p>` },
+    { heading: "2. Conditions d'admission", content: `<p>• Avoir entre 16 et 29 ans révolus (dérogations possibles selon les cas prévus par la loi)<br>• Satisfaire aux prérequis de la formation : ${f.prerequis || "Niveau Bac ou équivalent"}<br>• Disposer d'un contrat d'apprentissage ou être en recherche active d'une entreprise d'accueil<br>• Fournir l'ensemble des pièces justificatives demandées</p>` },
+    { heading: "3. Étapes d'inscription", content: `<p><strong>Étape 1 – Demande d'information</strong><br>Le candidat prend contact avec le CFA par téléphone (${o.telephone}), par email (${o.email}) ou via le site internet (${o.siteWeb}).<br><br><strong>Étape 2 – Entretien de positionnement</strong><br>Un entretien individuel est organisé avec le responsable pédagogique pour évaluer la motivation, le projet professionnel et le niveau du candidat.<br><br><strong>Étape 3 – Constitution du dossier</strong><br>Le candidat fournit les pièces suivantes :<br>• Pièce d'identité en cours de validité<br>• CV actualisé<br>• Lettre de motivation<br>• Derniers diplômes obtenus<br>• Attestation de domicile<br>• Photo d'identité<br><br><strong>Étape 4 – Recherche d'entreprise</strong><br>Le CFA accompagne le candidat dans sa recherche d'entreprise d'accueil.<br><br><strong>Étape 5 – Signature du contrat</strong><br>Le contrat d'apprentissage est établi et transmis à l'OPCO pour enregistrement.<br><br><strong>Étape 6 – Inscription définitive</strong><br>L'inscription est validée à réception de la confirmation d'enregistrement du contrat par l'OPCO.</p>` },
+    { heading: "4. Délais d'accès", content: `<p>L'inscription est possible tout au long de l'année, sous réserve de places disponibles. Le délai moyen entre le premier contact et l'entrée en formation est de <strong>15 jours à 3 mois</strong>.</p>` },
+    { heading: "5. Accessibilité handicap", content: `<p>Le CFA ${o.nom} accueille les personnes en situation de handicap. Le référent handicap (${o.referentHandicap}) étudie les aménagements possibles.</p>` },
+    { heading: "6. Contact", content: `<p><strong>${o.nom}</strong><br>${o.adresse}, ${o.codePostal} ${o.ville}<br>Téléphone : ${o.telephone}<br>Email : ${o.email}<br>Responsable pédagogique : ${o.responsablePedagogique}</p>` },
+  ] });
+}
+
+function genProcedureFormationCFA(o: OrganismeInfo, f: FormationInfo) {
+  return buildDocument({ org: o, title: "PROCÉDURE DE FORMATION CFA", subtitle: `${f.intitule}`, sections: [
+    { heading: "1. Objet", content: `<p>La présente procédure décrit l'organisation et le déroulement de la formation par apprentissage au sein du CFA <strong>${o.nom}</strong> pour la formation <strong>${f.intitule}</strong>.</p>` },
+    { heading: "2. Organisation de l'alternance", content: `<p>La formation est organisée en alternance entre le centre de formation et l'entreprise d'accueil.<br><br><strong>Durée totale :</strong> ${f.duree}<br><strong>Période :</strong> du ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)}<br><strong>Modalités :</strong> ${f.modalites || "Alternance entreprise / centre de formation"}<br><strong>Lieu de formation :</strong> ${o.adresse}, ${o.codePostal} ${o.ville}</p>` },
+    { heading: "3. Moyens pédagogiques et techniques", content: `<p>• Plateforme de contenu en ligne : supports de cours, vidéos, exercices interactifs<br>• Salle de formation équipée<br>• Accès Wi-Fi et matériel informatique mis à disposition<br>• Bibliothèque de ressources pédagogiques numériques</p>` },
+    { heading: "4. Encadrement pédagogique", content: `<p>• <strong>Responsable pédagogique :</strong> ${o.responsablePedagogique}<br>• Formateurs qualifiés, issus du monde professionnel<br>• Un formateur référent est désigné pour chaque apprenti</p>` },
+    { heading: "5. Suivi de la formation", content: `<p><strong>En centre de formation :</strong><br>• Émargement quotidien<br>• Évaluations régulières (contrôle continu, examens blancs)<br>• Livret d'apprentissage tenu à jour<br><br><strong>En entreprise :</strong><br>• Visites en entreprise (minimum 2 par an)<br>• Fiches de suivi renseignées par le maître d'apprentissage<br>• Réunions de concertation et entretiens individuels</p>` },
+    { heading: "6. Évaluation et certification", content: `<p>• Évaluations en Contrôle en Cours de Formation (CCF)<br>• Épreuves ponctuelles selon le référentiel de certification<br>• Mise en situation professionnelle reconstituée<br>• Soutenance orale devant un jury professionnel<br><br><strong>Certification visée :</strong> ${f.certification || f.intitule}</p>`, variant: "green" },
+    { heading: "7. Gestion des absences", content: `<p>• Toute absence doit être justifiée dans les 48 heures<br>• Les absences injustifiées sont signalées à l'entreprise et à l'OPCO<br>• Un suivi de l'assiduité est réalisé mensuellement</p>` },
+    { heading: "8. Accompagnement et insertion", content: `<p>Le CFA ${o.nom} propose un accompagnement à l'insertion professionnelle :<br>• Ateliers de techniques de recherche d'emploi<br>• Mise en relation avec le réseau d'entreprises partenaires<br>• Suivi post-formation à 3 et 6 mois</p>` },
+    { heading: "9. Contact", content: `<p><strong>${o.nom}</strong><br>${o.adresse}, ${o.codePostal} ${o.ville}<br>Téléphone : ${o.telephone}<br>Email : ${o.email}</p>` },
+  ] });
+}
+
 // ============== BILAN DE COMPÉTENCES ==============
 
 function genAnalyseParcoursPro(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
