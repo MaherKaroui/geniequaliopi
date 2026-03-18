@@ -4324,20 +4324,23 @@ function genBilanFroid(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiaire
   const dureeH = parseInt(f.duree) || 14;
   let extra = `<p><strong>Date :</strong> ${formatDate(f.dateFin)}</p><p><em>Délai de réalisation du bilan à froid : 3 à 6 mois après la formation</em></p>`;
   stagiaires.slice(0, 8).forEach((s, i) => {
+    const rng = seededRandom(i * 31 + 3);
     extra += `<h3>Stagiaire : ${s.prenom} ${s.nom}</h3>`;
     const criteres = [
-      ["Utilisez-vous encore les outils depuis la formation ?", i % 2 === 0 ? 0 : 1],
-      ["Les compétences acquises sont-elles utiles au quotidien ?", 0],
-      ["Avez-vous gagné en autonomie ?", i % 2 === 0 ? 1 : 0],
-      ["Appliquez-vous les méthodes vues en formation ?", 1],
-      ["La formation correspondait-elle à vos besoins professionnels ?", 0],
-      ["Les acquis ont-ils amélioré votre efficacité professionnelle ?", 1],
-      ["Les supports de formation sont-ils encore utilisés ?", 1],
-      ["La durée de la formation était-elle adaptée ?", i % 2 === 0 ? 1 : 0],
-      ["Recommanderiez-vous cette formation avec du recul ?", 0],
+      "Utilisez-vous encore les outils depuis la formation ?",
+      "Les compétences acquises sont-elles utiles au quotidien ?",
+      "Avez-vous gagné en autonomie ?",
+      "Appliquez-vous les méthodes vues en formation ?",
+      "La formation correspondait-elle à vos besoins professionnels ?",
+      "Les acquis ont-ils amélioré votre efficacité professionnelle ?",
+      "Les supports de formation sont-ils encore utilisés ?",
+      "La durée de la formation était-elle adaptée ?",
+      "Recommanderiez-vous cette formation avec du recul ?",
     ];
     extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%"><tr style="background:#1e3a7b;color:#fff"><th>Critères évalués</th><th>Tout à fait</th><th>Plutôt oui</th><th>Plutôt non</th><th>Non</th></tr>`;
-    criteres.forEach(([label, note]) => {
+    criteres.forEach((label) => {
+      const r = rng();
+      const note = r < 0.5 ? 0 : r < 0.85 ? 1 : 2;
       extra += `<tr><td>${label}</td><td>${note === 0 ? "☒" : "☐"}</td><td>${note === 1 ? "☒" : "☐"}</td><td>${note === 2 ? "☒" : "☐"}</td><td>${note === 3 ? "☒" : "☐"}</td></tr>`;
     });
     extra += `</table>`;
