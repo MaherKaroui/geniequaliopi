@@ -28,7 +28,7 @@ export function buildFullCatalog(
 
     // IND 1 — Programme de formation
     formations.forEach((f, fi) => {
-      add(`af_c1i1_programme_${fi}`, `CT1 - IND 1 PROGRAMME DE FORMATION – ${f.intitule}`, 1, 1, "programme_formation", { fi });
+      add(`af_c1i1_programme_${fi}`, `CT1 - IND 1 PROGRAMME DE FORMATION`, 1, 1, "programme_formation", { fi });
     });
 
     // IND 2 — Indicateurs de résultats / performance
@@ -48,35 +48,35 @@ export function buildFullCatalog(
 
     // IND 5 — Objectifs opérationnels et évaluables
     formations.forEach((f, fi) => {
-      add(`af_c2i5_deroule_pedagogique_${fi}`, `CT2 - IND 5 DÉROULÉ PÉDAGOGIQUE DÉTAILLÉ – ${f.intitule}`, 2, 5, "deroule_pedagogique_detaille", { fi });
+      add(`af_c2i5_deroule_pedagogique_${fi}`, `CT2 - IND 5 DÉROULÉ PÉDAGOGIQUE DÉTAILLÉ`, 2, 5, "deroule_pedagogique_detaille", { fi });
     });
 
     // IND 6 — Contenus et modalités adaptés (Programme + Déroulé pédagogique)
     formations.forEach((f, fi) => {
-      add(`af_c2i6_programme_${fi}`, `CT2 - IND 6 PROGRAMME DE FORMATION – ${f.intitule}`, 2, 6, "programme_formation", { fi });
-      add(`af_c2i6_deroule_pedagogique_${fi}`, `CT2 - IND 6 DÉROULÉ PÉDAGOGIQUE DÉTAILLÉ – ${f.intitule}`, 2, 6, "deroule_pedagogique_detaille", { fi });
+      add(`af_c2i6_programme_${fi}`, `CT2 - IND 6 PROGRAMME DE FORMATION`, 2, 6, "programme_formation", { fi });
+      add(`af_c2i6_deroule_pedagogique_${fi}`, `CT2 - IND 6 DÉROULÉ PÉDAGOGIQUE DÉTAILLÉ`, 2, 6, "deroule_pedagogique_detaille", { fi });
     });
 
     // IND 8 — Positionnement et évaluation des acquis à l'entrée
     // Trames vides (modèles)
     formations.forEach((f, fi) => {
-      add(`af_c2i8_trame_debut_${fi}`, `CT2 - IND 8 TEST DE POSITIONNEMENT DÉBUT DE FORMATION – ${f.intitule}`, 2, 8, "test_positionnement_debut_trame", { fi });
-      add(`af_c2i8_trame_fin_${fi}`, `CT2 - IND 8 TEST DE POSITIONNEMENT FIN DE FORMATION – ${f.intitule}`, 2, 8, "test_positionnement_fin_trame", { fi });
+      add(`af_c2i8_trame_debut_${fi}`, `CT2 - IND 8 TEST DE POSITIONNEMENT DÉBUT DE FORMATION`, 2, 8, "test_positionnement_debut_trame", { fi });
+      add(`af_c2i8_trame_fin_${fi}`, `CT2 - IND 8 TEST DE POSITIONNEMENT FIN DE FORMATION`, 2, 8, "test_positionnement_fin_trame", { fi });
     });
     // Procédures d'évaluation
     formations.forEach((f, fi) => {
-      add(`af_c2i8_procedure_debut_${fi}`, `CT2 - IND 8 PROCÉDURE D'ÉVALUATION DE DÉBUT DE FORMATION – ${f.intitule}`, 2, 8, "procedure_eval_debut", { fi });
-      add(`af_c2i8_procedure_fin_${fi}`, `CT2 - IND 8 PROCÉDURE D'ÉVALUATION DE FIN DE FORMATION – ${f.intitule}`, 2, 8, "procedure_eval_fin", { fi });
+      add(`af_c2i8_procedure_debut_${fi}`, `CT2 - IND 8 PROCÉDURE D'ÉVALUATION DE DÉBUT DE FORMATION`, 2, 8, "procedure_eval_debut", { fi });
+      add(`af_c2i8_procedure_fin_${fi}`, `CT2 - IND 8 PROCÉDURE D'ÉVALUATION DE FIN DE FORMATION`, 2, 8, "procedure_eval_fin", { fi });
     });
     // Grille de niveaux
     formations.forEach((f, fi) => {
-      add(`af_c2i8_grille_niveaux_${fi}`, `CT2 - IND 8 GRILLE DE NIVEAUX – ${f.intitule}`, 2, 8, "grille_niveaux_positionnement", { fi });
+      add(`af_c2i8_grille_niveaux_${fi}`, `CT2 - IND 8 GRILLE DE NIVEAUX`, 2, 8, "grille_niveaux_positionnement", { fi });
     });
     // Tests remplis par stagiaire (un fichier individuel par stagiaire)
     formations.forEach((f, fi) => {
       stagiaires.forEach((s, si) => {
-        add(`af_c2i8_test_debut_${fi}_${si}`, `CT2 - IND 8 TEST DÉBUT DE FORMATION – ${s.prenom} ${s.nom} – ${f.intitule}`, 2, 8, "test_positionnement_debut_stagiaire", { fi, stagiaireIdx: si });
-        add(`af_c2i8_test_fin_${fi}_${si}`, `CT2 - IND 8 TEST FIN DE FORMATION – ${s.prenom} ${s.nom} – ${f.intitule}`, 2, 8, "test_positionnement_fin_stagiaire", { fi, stagiaireIdx: si });
+        add(`af_c2i8_test_debut_${fi}_${si}`, `CT2 - IND 8 TEST DÉBUT DE FORMATION – ${s.prenom} ${s.nom}`, 2, 8, "test_positionnement_debut_stagiaire", { fi, stagiaireIdx: si });
+        add(`af_c2i8_test_fin_${fi}_${si}`, `CT2 - IND 8 TEST FIN DE FORMATION – ${s.prenom} ${s.nom}`, 2, 8, "test_positionnement_fin_stagiaire", { fi, stagiaireIdx: si });
       });
     });
 
@@ -108,8 +108,8 @@ export function buildFullCatalog(
       add(`af_c3i10_eval_besoins_${si}`, `CT3 - IND 10 ÉVALUATION DES BESOINS – ${s.prenom} ${s.nom}`, 3, 10, "trame_eval_besoins_stagiaire", { stagiaireIdx: si });
     });
     formations.forEach((f, fi) => {
-      add(`af_c3i10_deroule_pedagogique_${fi}`, `CT3 - IND 10 DÉROULÉ PÉDAGOGIQUE DÉTAILLÉ – ${f.intitule}`, 3, 10, "deroule_pedagogique_detaille", { fi });
-      add(`af_c3i10_tableau_suivi_${fi}`, `CT3 - IND 10 TABLEAU DE SUIVI DU PARCOURS BÉNÉFICIAIRES – ${f.intitule}`, 3, 10, "tableau_suivi_parcours_excel", { fi });
+      add(`af_c3i10_deroule_pedagogique_${fi}`, `CT3 - IND 10 DÉROULÉ PÉDAGOGIQUE DÉTAILLÉ`, 3, 10, "deroule_pedagogique_detaille", { fi });
+      add(`af_c3i10_tableau_suivi_${fi}`, `CT3 - IND 10 TABLEAU DE SUIVI DU PARCOURS BÉNÉFICIAIRES`, 3, 10, "tableau_suivi_parcours_excel", { fi });
     });
 
     // IND 11 — Évaluation de l'atteinte des objectifs
@@ -118,10 +118,10 @@ export function buildFullCatalog(
       const distanciel = moda.includes('distanciel') || moda.includes('e-learning') || moda.includes('foad');
       const presentiel = !distanciel || moda.includes('mixte');
       if (presentiel) {
-        add(`af_c3i11_emargement_${fi}`, `CT3 - IND 11 FEUILLE D'ÉMARGEMENT – ${f.intitule}`, 3, 11, "emargement_jour", { fi });
+        add(`af_c3i11_emargement_${fi}`, `CT3 - IND 11 FEUILLE D'ÉMARGEMENT`, 3, 11, "emargement_jour", { fi });
       }
       if (distanciel || moda.includes('mixte')) {
-        add(`af_c3i11_temps_connexion_${fi}`, `CT3 - IND 11 TEMPS DE CONNEXION RÉEL – ${f.intitule}`, 3, 11, "temps_connexion_reel", { fi });
+        add(`af_c3i11_temps_connexion_${fi}`, `CT3 - IND 11 TEMPS DE CONNEXION RÉEL`, 3, 11, "temps_connexion_reel", { fi });
       }
     });
     // Documents individuels per-stagiaire IND 11
@@ -129,16 +129,16 @@ export function buildFullCatalog(
       const nbJours = getFormationDays(f).length;
       const nbExercices = Math.max(1, Math.ceil(nbJours / 2));
       stagiaires.forEach((s, si) => {
-        add(`af_c3i11_test_debut_${fi}_${si}`, `CT3 - IND 11 TEST DÉBUT DE FORMATION – ${s.prenom} ${s.nom} – ${f.intitule}`, 3, 11, "test_positionnement_debut_stagiaire", { fi, stagiaireIdx: si });
-        add(`af_c3i11_test_fin_${fi}_${si}`, `CT3 - IND 11 TEST FIN DE FORMATION – ${s.prenom} ${s.nom} – ${f.intitule}`, 3, 11, "test_positionnement_fin_stagiaire", { fi, stagiaireIdx: si });
+        add(`af_c3i11_test_debut_${fi}_${si}`, `CT3 - IND 11 TEST DÉBUT DE FORMATION – ${s.prenom} ${s.nom}`, 3, 11, "test_positionnement_debut_stagiaire", { fi, stagiaireIdx: si });
+        add(`af_c3i11_test_fin_${fi}_${si}`, `CT3 - IND 11 TEST FIN DE FORMATION – ${s.prenom} ${s.nom}`, 3, 11, "test_positionnement_fin_stagiaire", { fi, stagiaireIdx: si });
         // Un fichier exercice par tranche de 2 jours
         for (let exIdx = 0; exIdx < nbExercices; exIdx++) {
           const jourDebut = exIdx * 2 + 1;
           const jourFin = Math.min(exIdx * 2 + 2, nbJours);
           const label = nbExercices > 1 ? ` (Jour ${jourDebut}-${jourFin})` : '';
-          add(`af_c3i11_exercices_${fi}_${si}_ex${exIdx}`, `CT3 - IND 11 EXERCICES PRATIQUES${label} – ${s.prenom} ${s.nom} – ${f.intitule}`, 3, 11, "exercices_stagiaire", { fi, stagiaireIdx: si, exerciceIdx: exIdx });
+          add(`af_c3i11_exercices_${fi}_${si}_ex${exIdx}`, `CT3 - IND 11 EXERCICES PRATIQUES${label} – ${s.prenom} ${s.nom}`, 3, 11, "exercices_stagiaire", { fi, stagiaireIdx: si, exerciceIdx: exIdx });
         }
-        add(`af_c3i11_grille_acquisition_${fi}_${si}`, `CT3 - IND 11 GRILLE D'ACQUISITION – ${s.prenom} ${s.nom} – ${f.intitule}`, 3, 11, "grille_acquisition_stagiaire", { fi, stagiaireIdx: si });
+        add(`af_c3i11_grille_acquisition_${fi}_${si}`, `CT3 - IND 11 GRILLE D'ACQUISITION – ${s.prenom} ${s.nom}`, 3, 11, "grille_acquisition_stagiaire", { fi, stagiaireIdx: si });
         add(`af_c3i11_attestation_${fi}_${si}`, `CT3 - IND 11 ATTESTATION DE RÉUSSITE – ${s.prenom} ${s.nom}`, 3, 11, "attestation_reussite_stagiaire", { fi, stagiaireIdx: si });
       });
     });
@@ -153,7 +153,7 @@ export function buildFullCatalog(
 
     // IND 19 — Ressources pédagogiques mises à disposition
     formations.forEach((f, fi) => {
-      add(`af_c4i19_support_cours_${fi}`, `CT4 - IND 19 SUPPORT DE COURS – ${f.intitule}`, 4, 19, "support_cours_ref", { fi });
+      add(`af_c4i19_support_cours_${fi}`, `CT4 - IND 19 SUPPORT DE COURS`, 4, 19, "support_cours_ref", { fi });
     });
     add("af_c4i19_ressources_pedagogiques", "CT4 - IND 19 RESSOURCES PÉDAGOGIQUES", 4, 19, "ressources_pedagogiques");
 
@@ -238,28 +238,28 @@ export function buildFullCatalog(
   if (isCFA) {
     // Indicateur 13 - Coordination alternance
     formations.forEach((f, fi) => {
-      add(`cfa_c3i13_contrat_${fi}`, `Contrat d'apprentissage – ${f.intitule}`, 3, 13, "contrat_apprentissage", { fi });
-      add(`cfa_c3i13_livret_${fi}`, `Livret d'apprentissage CFA – ${f.intitule}`, 3, 13, "livret_apprentissage_cfa", { fi });
-      add(`cfa_c3i13_competences_${fi}`, `Grille compétences alternance – ${f.intitule}`, 3, 13, "competences_alternance", { fi });
-      add(`cfa_c3i13_suivi_ent_${fi}`, `Suivi en entreprise – ${f.intitule}`, 3, 13, "suivi_entreprise_cfa", { fi });
+      add(`cfa_c3i13_contrat_${fi}`, `Contrat d'apprentissage`, 3, 13, "contrat_apprentissage", { fi });
+      add(`cfa_c3i13_livret_${fi}`, `Livret d'apprentissage CFA`, 3, 13, "livret_apprentissage_cfa", { fi });
+      add(`cfa_c3i13_competences_${fi}`, `Grille compétences alternance`, 3, 13, "competences_alternance", { fi });
+      add(`cfa_c3i13_suivi_ent_${fi}`, `Suivi en entreprise`, 3, 13, "suivi_entreprise_cfa", { fi });
     });
 
     // Indicateur 14 - Accompagnement socio-pro
     formations.forEach((f, fi) => {
-      add(`cfa_c3i14_suivi3mois_${fi}`, `Suivi à 3 mois – ${f.intitule}`, 3, 14, "suivi_3_mois", { fi });
-      add(`cfa_c3i14_insertion_${fi}`, `Questionnaire insertion – ${f.intitule}`, 3, 14, "questionnaire_insertion", { fi });
+      add(`cfa_c3i14_suivi3mois_${fi}`, `Suivi à 3 mois`, 3, 14, "suivi_3_mois", { fi });
+      add(`cfa_c3i14_insertion_${fi}`, `Questionnaire insertion`, 3, 14, "questionnaire_insertion", { fi });
     });
 
     // Indicateur 15 - Droits et devoirs apprenti
     formations.forEach((f, fi) => {
-      add(`cfa_c3i15_conditions_${fi}`, `Fiche conditions accueil – ${f.intitule}`, 3, 15, "conditions_accueil", { fi });
-      add(`cfa_c3i15_charte_${fi}`, `Charte accueil – ${f.intitule}`, 3, 15, "charte_accueil", { fi });
+      add(`cfa_c3i15_conditions_${fi}`, `Fiche conditions accueil`, 3, 15, "conditions_accueil", { fi });
+      add(`cfa_c3i15_charte_${fi}`, `Charte accueil`, 3, 15, "charte_accueil", { fi });
     });
 
     // Indicateur 16 - Présentation certification
     formations.forEach((f, fi) => {
-      add(`cfa_c3i16_livret_${fi}`, `Livret d'apprentissage – ${f.intitule}`, 3, 16, "livret_apprentissage", { fi });
-      add(`cfa_c3i16_suivi_tuteur_${fi}`, `Fiche suivi tuteur – ${f.intitule}`, 3, 16, "fiche_suivi_tuteur", { fi });
+      add(`cfa_c3i16_livret_${fi}`, `Livret d'apprentissage`, 3, 16, "livret_apprentissage", { fi });
+      add(`cfa_c3i16_suivi_tuteur_${fi}`, `Fiche suivi tuteur`, 3, 16, "fiche_suivi_tuteur", { fi });
     });
 
     // Documents CFA complémentaires
@@ -276,18 +276,18 @@ export function buildFullCatalog(
   // ===== Bilan de compétences =====
   if (isBDC) {
     formations.slice(0, 2).forEach((f, fi) => {
-      add(`bdc_analyse_parcours_${fi}`, `Analyse parcours professionnel – ${f.intitule}`, 2, 4, "analyse_parcours_pro", { fi });
-      add(`bdc_plan_action_${fi}`, `Plan d'action professionnel – ${f.intitule}`, 3, 14, "plan_action_bilan", { fi });
-      add(`bdc_synthese_${fi}`, `Synthèse bilan de compétences – ${f.intitule}`, 3, 12, "synthese_bilan", { fi });
+      add(`bdc_analyse_parcours_${fi}`, `Analyse parcours professionnel`, 2, 4, "analyse_parcours_pro", { fi });
+      add(`bdc_plan_action_${fi}`, `Plan d'action professionnel`, 3, 14, "plan_action_bilan", { fi });
+      add(`bdc_synthese_${fi}`, `Synthèse bilan de compétences`, 3, 12, "synthese_bilan", { fi });
     });
   }
 
   // ===== VAE =====
   if (isVAE) {
     formations.slice(0, 2).forEach((f, fi) => {
-      add(`vae_livret_recevabilite_${fi}`, `Livret de recevabilité VAE – ${f.intitule}`, 2, 4, "livret_recevabilite_vae", { fi });
-      add(`vae_dossier_validation_${fi}`, `Dossier de validation VAE – ${f.intitule}`, 3, 11, "dossier_validation_vae", { fi });
-      add(`vae_accompagnement_${fi}`, `Suivi accompagnement VAE – ${f.intitule}`, 3, 10, "accompagnement_vae", { fi });
+      add(`vae_livret_recevabilite_${fi}`, `Livret de recevabilité VAE`, 2, 4, "livret_recevabilite_vae", { fi });
+      add(`vae_dossier_validation_${fi}`, `Dossier de validation VAE`, 3, 11, "dossier_validation_vae", { fi });
+      add(`vae_accompagnement_${fi}`, `Suivi accompagnement VAE`, 3, 10, "accompagnement_vae", { fi });
     });
   }
 
