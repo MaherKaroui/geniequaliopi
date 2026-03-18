@@ -73,6 +73,7 @@ export interface FormationInfo {
   lieu: string;
   nombreParticipants: string;
   formateur: string;
+  codeRNCP?: string;
 }
 
 export interface IndicateurData {
