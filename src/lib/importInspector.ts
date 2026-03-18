@@ -184,11 +184,11 @@ function probableReason(expected: ExpectedFileDescriptor, closest?: ImportedFile
   return "Un fichier proche existe, mais il semble appartenir à un autre critère ou à un autre indicateur.";
 }
 
-function inspectSource(importedFiles: ImportedFileDescriptor[]) {
+function inspectSource(importedFiles: ImportedFileDescriptor[]): { sourceCheck: "ok" | "warning"; sourceMessage: string; sourceRoot: string } {
   const topLevelFolders = [...new Set(importedFiles.map((file) => file.relativePath.split("/")[0]).filter(Boolean))];
   const sourceRoot = topLevelFolders.length === 1 ? topLevelFolders[0] : (topLevelFolders[0] || "Dossier sélectionné");
   const structureHits = importedFiles.filter((file) => /(^|\/)QUALIOPI(\/|$)|(^|\/)CT\d+(\/|$)|CT\d+_IND_\d+/i.test(file.relativePath)).length;
-  const sourceCheck = structureHits > 0 ? "ok" : "warning";
+  const sourceCheck: "ok" | "warning" = structureHits > 0 ? "ok" : "warning";
   const sourceMessage = sourceCheck === "ok"
     ? `Dossier source détecté : ${sourceRoot}`
     : `Le dossier sélectionné (${sourceRoot}) ne contient pas la structure attendue (QUALIOPI / CTx / INDx).`;
