@@ -191,7 +191,7 @@ export function genContratFormationPro_V2(o: OrganismeInfo, f: FormationInfo, st
       <p>À l'issue de la formation, le stagiaire sera capable de :</p>
       <p>${f.objectifs.split('\n').map(o => `• ${o}`).join('<br>')}</p>
       <h3>Article 3 – Organisation de la formation</h3>
-      <p><strong>Durée totale :</strong> ${f.duree}<br><strong>Dates :</strong> du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}<br><strong>Horaires :</strong> de 09h00 à 17h00<br><strong>Modalité :</strong> Formation ${modaliteTexte(f)}${isPresentiel(f) ? `<br><strong>Lieu :</strong> ${f.lieu}` : ''}</p>
+      <p><strong>Durée totale :</strong> ${f.duree}<br><strong>Dates :</strong> du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}<br><strong>Horaires :</strong> de 09h00 à ${getHoraireFin(f)}<br><strong>Modalité :</strong> Formation ${modaliteTexte(f)}${isPresentiel(f) ? `<br><strong>Lieu :</strong> ${f.lieu}` : ''}</p>
       <h3>Article 4 – Prérequis</h3>
       <p>${f.prerequis || 'Aucun prérequis spécifique'}</p>
       <h3>Article 5 – Moyens pédagogiques et techniques</h3>
