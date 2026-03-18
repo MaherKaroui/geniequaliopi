@@ -276,18 +276,18 @@ export function buildFullCatalog(
   // ===== Bilan de compétences =====
   if (isBDC) {
     formations.slice(0, 2).forEach((f, fi) => {
-      add(`bdc_analyse_parcours_${fi}`, `Analyse parcours professionnel – ${f.intitule}`, 2, 4, "analyse_parcours_pro", { fi });
-      add(`bdc_plan_action_${fi}`, `Plan d'action professionnel – ${f.intitule}`, 3, 14, "plan_action_bilan", { fi });
-      add(`bdc_synthese_${fi}`, `Synthèse bilan de compétences – ${f.intitule}`, 3, 12, "synthese_bilan", { fi });
+      add(`bdc_analyse_parcours_${fi}`, `Analyse parcours professionnel`, 2, 4, "analyse_parcours_pro", { fi });
+      add(`bdc_plan_action_${fi}`, `Plan d'action professionnel`, 3, 14, "plan_action_bilan", { fi });
+      add(`bdc_synthese_${fi}`, `Synthèse bilan de compétences`, 3, 12, "synthese_bilan", { fi });
     });
   }
 
   // ===== VAE =====
   if (isVAE) {
     formations.slice(0, 2).forEach((f, fi) => {
-      add(`vae_livret_recevabilite_${fi}`, `Livret de recevabilité VAE – ${f.intitule}`, 2, 4, "livret_recevabilite_vae", { fi });
-      add(`vae_dossier_validation_${fi}`, `Dossier de validation VAE – ${f.intitule}`, 3, 11, "dossier_validation_vae", { fi });
-      add(`vae_accompagnement_${fi}`, `Suivi accompagnement VAE – ${f.intitule}`, 3, 10, "accompagnement_vae", { fi });
+      add(`vae_livret_recevabilite_${fi}`, `Livret de recevabilité VAE`, 2, 4, "livret_recevabilite_vae", { fi });
+      add(`vae_dossier_validation_${fi}`, `Dossier de validation VAE`, 3, 11, "dossier_validation_vae", { fi });
+      add(`vae_accompagnement_${fi}`, `Suivi accompagnement VAE`, 3, 10, "accompagnement_vae", { fi });
     });
   }
 
