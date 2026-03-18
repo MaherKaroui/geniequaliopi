@@ -236,6 +236,19 @@ export function buildFullCatalog(
   // ===== CFA — APPRENTISSAGE (placeholder) =====
   // =============================================
   if (isCFA) {
+    // ===== CRITÈRE 1 — INFORMATION DU PUBLIC (CFA) =====
+
+    // IND 1 — Programme et informations
+    formations.forEach((f, fi) => {
+      add(`cfa_c1i1_programme_${fi}`, `CT1 - IND 1 PROGRAMME DE FORMATION CFA`, 1, 1, "programme_formation", { fi });
+    });
+    add("cfa_c1i1_plaquette_commerciale", "CT1 - IND 1 PLAQUETTE COMMERCIALE CFA", 1, 1, "plaquette_commerciale_cfa");
+    add("cfa_c1i1_procedure_inscription", "CT1 - IND 1 PROCÉDURE D'INSCRIPTION CFA", 1, 1, "procedure_inscription_cfa");
+    add("cfa_c1i1_procedure_formation", "CT1 - IND 1 PROCÉDURE DE FORMATION CFA", 1, 1, "procedure_formation_cfa");
+    stagiaires.forEach((s, si) => {
+      add(`cfa_c1i1_cgv_${si}`, `CT1 - IND 1 CONDITIONS GÉNÉRALES DE VENTE CFA – ${s.prenom} ${s.nom}`, 1, 1, "cgv_stagiaire", { stagiaireIdx: si });
+    });
+
     // Indicateur 13 - Coordination alternance
     formations.forEach((f, fi) => {
       add(`cfa_c3i13_contrat_${fi}`, `Contrat d'apprentissage`, 3, 13, "contrat_apprentissage", { fi });
