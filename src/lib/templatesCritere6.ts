@@ -498,9 +498,8 @@ export function genListePartenairesV2(o: OrganismeInfo) {
   ], extraHtml: `<h2>Les partenaires de ${o.nom}</h2>
     <table>
       <tr><th>Partenaire</th><th>${o.dirigeant}</th></tr>
-      <tr><td>Président</td><td>Président</td></tr>
-    </table>
-    <div style="margin-top:20px">${tamponHtml}</div>` });
+      <tr><td>Président</td><td>Président<br>${tamponHtml}</td></tr>
+    </table>` });
 }
 
 export function genContratSousTraitanceV2(o: OrganismeInfo, f: FormationInfo, stagiaires: import("@/types/qualiopi").StagiaireInfo[]) {
