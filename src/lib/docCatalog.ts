@@ -139,7 +139,7 @@ export function buildFullCatalog(
           add(`af_c3i11_exercices_${fi}_${si}_ex${exIdx}`, `CT3 - IND 11 EXERCICES PRATIQUES${label} – ${s.prenom} ${s.nom} – ${f.intitule}`, 3, 11, "exercices_stagiaire", { fi, stagiaireIdx: si, exerciceIdx: exIdx });
         }
         add(`af_c3i11_grille_acquisition_${fi}_${si}`, `CT3 - IND 11 GRILLE D'ACQUISITION – ${s.prenom} ${s.nom} – ${f.intitule}`, 3, 11, "grille_acquisition_stagiaire", { fi, stagiaireIdx: si });
-        add(`af_c3i11_attestation_${fi}_${si}`, `CT3 - IND 11 ATTESTATION DE RÉUSSITE – ${s.prenom} ${s.nom} – ${f.intitule}`, 3, 11, "attestation_reussite_stagiaire", { fi, stagiaireIdx: si });
+        add(`af_c3i11_attestation_${fi}_${si}`, `CT3 - IND 11 ATTESTATION DE RÉUSSITE – ${s.prenom} ${s.nom}`, 3, 11, "attestation_reussite_stagiaire", { fi, stagiaireIdx: si });
       });
     });
 
