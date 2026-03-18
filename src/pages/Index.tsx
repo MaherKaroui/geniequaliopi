@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { OrganismeInfo, FormationInfo, StagiaireInfo, CritereData, CRITERES } from "@/types/qualiopi";
 import StepIndicator from "@/components/StepIndicator";
 import OrganismeForm from "@/components/OrganismeForm";
@@ -6,8 +7,10 @@ import FormationForm from "@/components/FormationForm";
 import StagiairesForm from "@/components/StagiairesForm";
 import CriteresForm from "@/components/CriteresForm";
 import DocumentGenerator from "@/components/DocumentGenerator";
+import DossierHistory from "@/components/DossierHistory";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, LogIn, LogOut, User } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 const STEPS = [
   { id: 1, label: "Organisme" },
@@ -31,6 +34,9 @@ const emptyFormation: FormationInfo = {
 };
 
 const Index = () => {
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+
   const [currentStep, setCurrentStep] = useState(() => {
     const saved = sessionStorage.getItem('qualiopi_step');
     return saved ? parseInt(saved, 10) : 1;
@@ -49,7 +55,6 @@ const Index = () => {
   });
   const [started, setStarted] = useState(() => sessionStorage.getItem('qualiopi_started') === '1');
 
-  // Persist state to sessionStorage
   const updateStarted = (v: boolean | ((prev: boolean) => boolean)) => {
     setStarted(prev => { const next = typeof v === 'function' ? v(prev) : v; sessionStorage.setItem('qualiopi_started', next ? '1' : '0'); return next; });
   };
@@ -61,10 +66,33 @@ const Index = () => {
   const updateStagiaires = (v: StagiaireInfo[]) => { setStagiaires(v); sessionStorage.setItem('qualiopi_stag', JSON.stringify(v)); };
   const updateCriteres = (v: CritereData[]) => { setCriteres(v); sessionStorage.setItem('qualiopi_crit', JSON.stringify(v)); };
 
+  const handleLoadDossier = (org: OrganismeInfo, form: FormationInfo, stag: StagiaireInfo[]) => {
+    updateOrganisme(org);
+    updateFormation(form);
+    updateStagiaires(stag);
+    updateStep(1);
+  };
+
   if (!started) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background p-4">
         <div className="max-w-2xl text-center space-y-8">
+          {/* Auth button top right */}
+          <div className="fixed top-4 right-4">
+            {user ? (
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground flex items-center gap-1">
+                  <User className="w-3.5 h-3.5" /> {user.email}
+                </span>
+                <Button variant="ghost" size="sm" onClick={signOut}><LogOut className="w-4 h-4" /></Button>
+              </div>
+            ) : (
+              <Button variant="outline" size="sm" onClick={() => navigate("/auth")} className="gap-2">
+                <LogIn className="w-4 h-4" /> Connexion
+              </Button>
+            )}
+          </div>
+
           <div>
             <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
               <span className="text-gradient-hero">Qualiopi</span> Generator
@@ -100,11 +128,34 @@ const Index = () => {
           <div className="flex items-center gap-3">
             <span className="font-bold text-lg">Qualiopi Generator</span>
           </div>
-          <Button variant="ghost" size="sm" onClick={() => updateStarted(false)}>Accueil</Button>
+          <div className="flex items-center gap-2">
+            {user ? (
+              <>
+                <span className="text-xs text-muted-foreground hidden sm:inline">{user.email}</span>
+                <Button variant="ghost" size="sm" onClick={signOut} title="Déconnexion"><LogOut className="w-4 h-4" /></Button>
+              </>
+            ) : (
+              <Button variant="outline" size="sm" onClick={() => navigate("/auth")} className="gap-1">
+                <LogIn className="w-4 h-4" /> Connexion
+              </Button>
+            )}
+            <Button variant="ghost" size="sm" onClick={() => updateStarted(false)}>Accueil</Button>
+          </div>
         </div>
       </header>
 
       <main className="max-w-5xl mx-auto px-4 py-8">
+        {/* History panel (only if logged in) */}
+        {user && (
+          <DossierHistory
+            userId={user.id}
+            organisme={organisme}
+            formation={formation}
+            stagiaires={stagiaires}
+            onLoad={handleLoadDossier}
+          />
+        )}
+
         <StepIndicator steps={STEPS} currentStep={currentStep} onStepClick={updateStep} />
 
         <div className="bg-card rounded-2xl border shadow-card p-6 md:p-8">
