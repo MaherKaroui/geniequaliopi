@@ -266,6 +266,10 @@ export function buildFullCatalog(
     add("cfa_attestation_inscription", "Attestation d'inscription CFA", 2, 4, "attestation_inscription_cfa");
     add("cfa_procedure_psh", "Procédure PSH CFA", 6, 26, "procedure_psh_cfa");
     add("cfa_guide_connexion", "Guide d'aide à la connexion CFA", 3, 9, "guide_aide_connexion_cfa");
+    // Convention de formation par apprentissage — un fichier par stagiaire
+    stagiaires.forEach((s, si) => {
+      add(`cfa_c3i9_convention_${si}`, `CT3 - IND 9 CONVENTION DE FORMATION PAR APPRENTISSAGE – ${s.prenom} ${s.nom}`, 3, 9, "convention_formation_apprentissage", { stagiaireIdx: si });
+    });
     add("cfa_fiche_autoevaluation", "Fiche autoévaluation apprenti", 3, 11, "fiche_autoevaluation_apprenti");
     add("cfa_procedure_abandon", "Procédure d'abandon CFA", 3, 12, "procedure_abandon_cfa");
     add("cfa_procedure_absences", "Procédure des absences CFA", 3, 12, "procedure_absences_cfa");
