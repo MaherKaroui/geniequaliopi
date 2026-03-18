@@ -377,15 +377,21 @@ export function genEmargementJour_V2(o: OrganismeInfo, f: FormationInfo, stagiai
     // Distanciel: rapport de connexion
     extra += `<h3>Rapport de connexion – Formation à distance</h3>`;
     const rows: string[][] = [];
+    const { hoursPerDay } = parseDuree(f.duree);
+    const ct = hoursPerDay <= 6 ? CONNECTION_TIMES_6H : CONNECTION_TIMES_7H;
     days.forEach(day => {
       stagiaires.slice(0, 10).forEach(s => {
-        const seed = (s.nom.charCodeAt(0) + day.charCodeAt(0)) % 5;
-        const connexion = `0${8 + seed % 2}h${seed * 5 < 10 ? '0' : ''}${seed * 5}`;
-        const deconnexion = `1${6 + seed % 2}h${(seed * 7) % 60 < 10 ? '0' : ''}${(seed * 7) % 60}`;
-        rows.push([s.prenom + ' ' + s.nom, day, connexion, deconnexion, `${7 + seed % 2}h${Math.abs(seed * 2 - 5) * 10}min`]);
+        const seed = (s.nom.charCodeAt(0) + day.charCodeAt(0)) % 3;
+        // Matin
+        const matin = ct[seed * 2 % ct.length];
+        // Après-midi
+        const apresmidi = ct[(seed * 2 + 1) % ct.length];
+        const totalMin = parseInt(matin.duree) * 60 + parseInt(apresmidi.duree) * 60;
+        rows.push([s.prenom + ' ' + s.nom, day, matin.heureConnexion, matin.heureDeconnexion, matin.duree]);
+        rows.push([s.prenom + ' ' + s.nom, '', apresmidi.heureConnexion, apresmidi.heureDeconnexion, apresmidi.duree]);
       });
     });
-    extra += tableHTML(["Stagiaire", "Date", "Heure connexion", "Heure déconnexion", "Durée"], rows.slice(0, 30));
+    extra += tableHTML(["Stagiaire", "Date", "Heure connexion", "Heure déconnexion", "Durée"], rows.slice(0, 60));
   }
 
   return buildDocument({ org: o, title: pres ? "FEUILLE D'ÉMARGEMENT" : "RAPPORT DE CONNEXION", subtitle: f.intitule, formation: f, showFormationInfo: true, extraHtml: extra });
