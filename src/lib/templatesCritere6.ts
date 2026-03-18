@@ -494,8 +494,11 @@ export function genVeilleHandicap(o: OrganismeInfo, f?: FormationInfo) {
 export function genListePartenairesV2(o: OrganismeInfo) {
   return buildDocument({ org: o, title: "LES PARTENAIRES", sections: [
     { heading: "", content: `<p>${o.nom} s'attache à développer constamment son réseau de partenaires afin d'assurer une très grande employabilité à ses étudiants.</p>` },
-    { heading: "Les partenaires de " + o.nom, content: `<p><strong>Président :</strong> ${o.dirigeant}</p><p><strong>Les Partenaires :</strong> ${o.responsablePedagogique}</p>` },
-  ] });
+  ], extraHtml: `<h2>Les partenaires de ${o.nom}</h2>
+    <table>
+      <tr><th>Partenaire</th><th>${o.dirigeant}</th></tr>
+      <tr><td>Président</td><td>Président</td></tr>
+    </table>` });
 }
 
 export function genContratSousTraitanceV2(o: OrganismeInfo, f: FormationInfo, stagiaires: import("@/types/qualiopi").StagiaireInfo[]) {
