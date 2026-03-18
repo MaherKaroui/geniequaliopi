@@ -153,7 +153,7 @@ export function buildFullCatalog(
 
     // IND 19 — Ressources pédagogiques mises à disposition
     formations.forEach((f, fi) => {
-      add(`af_c4i19_support_cours_${fi}`, `CT4 - IND 19 SUPPORT DE COURS – ${f.intitule}`, 4, 19, "support_cours_ref", { fi });
+      add(`af_c4i19_support_cours_${fi}`, `CT4 - IND 19 SUPPORT DE COURS`, 4, 19, "support_cours_ref", { fi });
     });
     add("af_c4i19_ressources_pedagogiques", "CT4 - IND 19 RESSOURCES PÉDAGOGIQUES", 4, 19, "ressources_pedagogiques");
 
