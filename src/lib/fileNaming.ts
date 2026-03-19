@@ -39,7 +39,7 @@ function cleanLooseText(value: string): string {
     .replace(/[&]/g, " ")
     .replace(/[\-–—]+/g, " ")
     .replace(/[^A-Za-z0-9_\s]+/g, " ")
-    .replace(/\b[DLJMSTCNdljmstcn]\b/g, " ")
+    .replace(/\b(d|l|j|m|s|t|c|n|de|du|des|la|le|les|un|une|au|aux|et|en|a)\b/gi, " ")
     .replace(/_+/g, " ")
     .replace(/\s+/g, " ")
     .trim();
@@ -66,11 +66,14 @@ function normalizeVersion(version: string): string {
   return clean || "1";
 }
 
-function formatDateISO(dateMaj: string): string {
-  if (!dateMaj) return new Date().toISOString().slice(0, 10);
+function formatDateCompact(dateMaj: string): string {
+  if (!dateMaj) {
+    const now = new Date();
+    return `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}${String(now.getDate()).padStart(2, "0")}`;
+  }
   const parsed = new Date(dateMaj);
-  if (Number.isNaN(parsed.getTime())) return dateMaj;
-  return `${parsed.getFullYear()}-${String(parsed.getMonth() + 1).padStart(2, "0")}-${String(parsed.getDate()).padStart(2, "0")}`;
+  if (Number.isNaN(parsed.getTime())) return dateMaj.replace(/[^0-9]/g, "");
+  return `${parsed.getFullYear()}${String(parsed.getMonth() + 1).padStart(2, "0")}${String(parsed.getDate()).padStart(2, "0")}`;
 }
 
 function stripCatalogPrefix(label: string): string {
@@ -109,7 +112,7 @@ export function replaceFileExtension(fileName: string, extension: string): strin
 }
 
 export function shortCriterePath(critere: number, indicateur: number): string {
-  return `QUALIOPI/CT${critere}/IND${indicateur}`;
+  return `Critere_${critere}/Indicateur_${indicateur}`;
 }
 
 export function buildGenericFileName(label: string, orgName: string, version: string, dateMaj: string, extension: string): string {
@@ -117,7 +120,7 @@ export function buildGenericFileName(label: string, orgName: string, version: st
     toUpperSnakeCase(label) || "DOCUMENT",
     toUpperSnakeCase(orgName) || "ORGANISME",
     `V${normalizeVersion(version)}`,
-    formatDateISO(dateMaj),
+    formatDateCompact(dateMaj),
   ];
 
   return `${parts.filter(Boolean).join("_")}${extension}`;
@@ -132,9 +135,6 @@ export function buildDocumentFileName(
   stagiaire?: StagiaireInfo | null,
 ): string {
   const parts = [
-    `CT${doc.critere}`,
-    "IND",
-    String(doc.indicateur),
     toUpperSnakeCase(normalizeDocumentLabel(doc.nom, stagiaire)) || "DOCUMENT",
   ];
 
@@ -143,7 +143,7 @@ export function buildDocumentFileName(
 
   parts.push(toUpperSnakeCase(orgName) || "ORGANISME");
   parts.push(`V${normalizeVersion(version)}`);
-  parts.push(formatDateISO(dateMaj));
+  parts.push(formatDateCompact(dateMaj));
 
   return `${parts.filter(Boolean).join("_")}${extension}`;
 }

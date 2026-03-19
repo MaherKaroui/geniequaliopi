@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildDocumentFileName, normalizeLooseFileName } from "@/lib/fileNaming";
+import { buildDocumentFileName, normalizeLooseFileName, shortCriterePath } from "@/lib/fileNaming";
 import { auditImportedFolder } from "@/lib/importInspector";
 import { DocEntry, StagiaireInfo } from "@/types/qualiopi";
 
@@ -24,24 +24,28 @@ const doc: DocEntry = {
 };
 
 describe("file naming convention", () => {
-  it("builds the expected import-friendly file name", () => {
+  it("builds the expected Google Drive-friendly file name", () => {
     expect(buildDocumentFileName(doc, "SODEVA", "1", "2025-03-03", ".pdf", stagiaire)).toBe(
-      "CT2_IND_4_TRAME_EVALUATION_DES_BESOINS_Abdelkrim_LAMBARKI_SODEVA_V1_2025-03-03.pdf",
+      "TRAME_EVALUATION_BESOINS_Abdelkrim_LAMBARKI_SODEVA_V1_20250303.pdf",
     );
   });
 
   it("normalizes accents, apostrophes and parenthesis", () => {
     expect(normalizeLooseFileName("CT2 IND 4 Trame d'évaluation (des besoins).pdf")).toBe(
-      "CT2_IND_4_TRAME_EVALUATION_DES_BESOINS",
+      "CT2_IND_4_TRAME_EVALUATION_BESOINS",
     );
+  });
+
+  it("uses Critere/Indicateur folder structure", () => {
+    expect(shortCriterePath(2, 4)).toBe("Critere_2/Indicateur_4");
   });
 
   it("matches a normalized file when the exact file name differs", () => {
     const file = new File([
       "demo",
-    ], "CT2 IND 4 Trame d'évaluation (des besoins) Abdelkrim LAMBARKI SODEVA V1 2025-03-03.pdf", { type: "application/pdf" });
+    ], "Trame evaluation besoins Abdelkrim LAMBARKI SODEVA V1 20250303.pdf", { type: "application/pdf" });
     Object.defineProperty(file, "webkitRelativePath", {
-      value: "QUALIOPI/CT2/IND4/CT2 IND 4 Trame d'évaluation (des besoins) Abdelkrim LAMBARKI SODEVA V1 2025-03-03.pdf",
+      value: "Critere_2/Indicateur_4/Trame evaluation besoins Abdelkrim LAMBARKI SODEVA V1 20250303.pdf",
     });
 
     const audit = auditImportedFolder({
@@ -56,6 +60,6 @@ describe("file naming convention", () => {
 
     expect(audit.normalizedCount).toBe(1);
     expect(audit.missingCount).toBe(0);
-    expect(audit.matches[0].expected.searchedPath).toContain("QUALIOPI/CT2/IND4/");
+    expect(audit.matches[0].expected.searchedPath).toContain("Critere_2/Indicateur_4/");
   });
 });
