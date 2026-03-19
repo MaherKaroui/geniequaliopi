@@ -92,6 +92,10 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
               <Input value={stagiaire.entreprise} onChange={e => updateStagiaire(index, 'entreprise', e.target.value)} placeholder="Entreprise" />
             </div>
             <div>
+              <Label>Responsable entreprise</Label>
+              <Input value={stagiaire.responsableEntreprise || ""} onChange={e => updateStagiaire(index, 'responsableEntreprise', e.target.value)} placeholder="Nom du responsable" />
+            </div>
+            <div>
               <Label>Poste</Label>
               <Input value={stagiaire.poste} onChange={e => updateStagiaire(index, 'poste', e.target.value)} placeholder="Poste occupé" />
             </div>
