@@ -120,7 +120,7 @@ export function buildGenericFileName(label: string, orgName: string, version: st
     toUpperSnakeCase(label) || "DOCUMENT",
     toUpperSnakeCase(orgName) || "ORGANISME",
     `V${normalizeVersion(version)}`,
-    formatDateISO(dateMaj),
+    formatDateCompact(dateMaj),
   ];
 
   return `${parts.filter(Boolean).join("_")}${extension}`;
