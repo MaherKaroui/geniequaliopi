@@ -203,7 +203,7 @@ export function signatureBlock2(label1: string, nom1: string, label2: string, no
 }
 
 export function tableHTML(headers: string[], rows: string[][]): string {
-  return `<table><tr>${headers.map(h => `<th>${h}</th>`).join("")}</tr>${rows.map(r => `<tr>${r.map(c => `<td>${c}</td>`).join("")}</tr>`).join("")}</table>`;
+  return `<table><thead><tr>${headers.map(h => `<th>${h}</th>`).join("")}</tr></thead><tbody>${rows.map(r => `<tr>${r.map(c => `<td>${c}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
 }
 
 export function footer(org: OrganismeInfo): string {
