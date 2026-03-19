@@ -4752,12 +4752,12 @@ function genBilanChaudStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: 
     <tr><td><strong>Formateur :</strong></td><td>${f.formateur}</td></tr>
   </table>`;
 
-  extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%"><tr style="background:#1e3a7b;color:#fff"><th>Critères évalués</th><th>Très satisfaisant</th><th>Satisfaisant</th><th>Peu satisfaisant</th><th>Insuffisant</th></tr>`;
+  extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%"><thead><tr style="background:#1e3a7b;color:#fff"><th>Critères évalués</th><th>Très satisfaisant</th><th>Satisfaisant</th><th>Peu satisfaisant</th><th>Insuffisant</th></tr></thead><tbody>`;
   allCriteres.forEach((label, idx) => {
     const n = pat[idx];
     extra += `<tr><td>${label}</td><td style="text-align:center;font-weight:700">${n === 0 ? "X" : ""}</td><td style="text-align:center;font-weight:700">${n === 1 ? "X" : ""}</td><td></td><td></td></tr>`;
   });
-  extra += `</table>`;
+  extra += `</tbody></table>`;
 
   const commentsPool = [
     `La formation ${f.intitule} était très enrichissante. Le formateur a su rendre le contenu accessible et les exercices pratiques étaient bien conçus. Je repars avec des outils concrets que je pourrai utiliser dès demain.`,
