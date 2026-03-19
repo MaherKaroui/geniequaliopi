@@ -248,13 +248,7 @@ tr:nth-child(even){background:#f8f9fa}
 
   // === FOOTER ===
   html += `<div class="page">
-    <div class="footer">
-      <p><strong>${org.nom}</strong></p>
-      <p>${org.adresse}, ${org.codePostal} ${org.ville}</p>
-      <p>${org.telephone} – ${org.email} – ${org.siteWeb}</p>
-      <p>SIRET : ${org.siret} – NDA : ${org.nda}</p>
-      <p style="margin-top:10px;font-style:italic">Document généré automatiquement – Dossier Qualiopi</p>
-    </div>
+    ${footer(org)}
   </div>`;
 
   html += `</body></html>`;
