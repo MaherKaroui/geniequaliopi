@@ -779,7 +779,8 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
   const evalItems = f.methodesEvaluation
     .split(/\n|[,;](?=\s)/)
     .map(l => l.trim())
-    .filter(l => l.length > 3);
+    .filter(l => l.length > 3)
+    .filter(l => !/questionnaire\s+de\s+satisfaction/i.test(l));
   const evalHtml = evalItems.length > 0
     ? `<ul>${evalItems.map(l => `<li>${l.replace(/^[-•]\s*/, "")}</li>`).join("")}<li>Grille d'acquisition des compétences</li></ul>`
     : `<ul>
