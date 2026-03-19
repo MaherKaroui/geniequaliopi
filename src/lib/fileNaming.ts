@@ -135,9 +135,6 @@ export function buildDocumentFileName(
   stagiaire?: StagiaireInfo | null,
 ): string {
   const parts = [
-    `CT${doc.critere}`,
-    "IND",
-    String(doc.indicateur),
     toUpperSnakeCase(normalizeDocumentLabel(doc.nom, stagiaire)) || "DOCUMENT",
   ];
 
@@ -146,7 +143,7 @@ export function buildDocumentFileName(
 
   parts.push(toUpperSnakeCase(orgName) || "ORGANISME");
   parts.push(`V${normalizeVersion(version)}`);
-  parts.push(formatDateISO(dateMaj));
+  parts.push(formatDateCompact(dateMaj));
 
   return `${parts.filter(Boolean).join("_")}${extension}`;
 }
