@@ -48,6 +48,7 @@ export interface StagiaireInfo {
   email: string;
   telephone: string;
   entreprise: string;
+  responsableEntreprise?: string;
   poste: string;
   dateNaissance: string;
   dateDebutFormation?: string;

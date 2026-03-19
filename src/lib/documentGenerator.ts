@@ -2256,15 +2256,18 @@ function genContratApprentissage(o: OrganismeInfo, f: FormationInfo, stagiaires:
 }
 
 function genConventionFormationApprentissage(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
-  const s = stagiaires[si] || stagiaires[0] || { prenom: "Martin", nom: "Dupont", entreprise: "Tech Solutions SAS", email: "" };
+  const s = stagiaires[si] || stagiaires[0] || { prenom: "Martin", nom: "Dupont", entreprise: "Tech Solutions SAS", email: "", responsableEntreprise: "", signatureUrl: "" } as StagiaireInfo;
   const entreprise = s.entreprise || "Entreprise partenaire";
+  const respEntreprise = (s as any).responsableEntreprise || "Le responsable désigné";
   const dateDebut = formatDate(f.dateDebut);
   const dateFin = formatDate(f.dateFin);
   const duree = f.duree || "420 heures";
   const lieu = `${o.nom}, ${o.adresse}`;
   const montant = f.tarif || "8 000";
-  return buildDocument({ org: o, title: "CONVENTION DE FORMATION PAR APPRENTISSAGE", subtitle: f.intitule, formation: f, showFormationInfo: false, sections: [
-    { heading: "Entre les soussignés", content: `<h3>1. Le CFA ${o.nom}</h3><p>Adresse : ${o.adresse}<br>SIRET : ${o.siret}<br>Organisme de formation NDA : ${o.nda}<br>Représenté par ${o.dirigeant}, Directeur du CFA ${o.nom}</p><h3>2. L'entreprise</h3><p>Raison sociale : ${entreprise}<br>Représentée par le responsable désigné.<br>Maître d'apprentissage : désigné par l'employeur.</p><h3>3. L'apprenant(e)</h3><p>Nom et prénom : ${s.prenom} ${s.nom}<br>Date de début du contrat : ${dateDebut}<br>Date de fin du contrat : ${dateFin}</p><p>Est conclue la convention suivante (comprenant 5 annexes), en application des dispositions des Livres II et III de la sixième partie du Code du travail.</p>` },
+  // Convention datée 15 jours ouvrés AVANT le début de la formation
+  const dateConvention = f.dateDebut ? formatDate(subtractBusinessDays(f.dateDebut, 15)) : "________________________";
+  const body = buildDocument({ org: o, title: "CONVENTION DE FORMATION PAR APPRENTISSAGE", subtitle: f.intitule, formation: f, showFormationInfo: false, sections: [
+    { heading: "Entre les soussignés", content: `<h3>1. Le CFA ${o.nom}</h3><p>Adresse : ${o.adresse}<br>SIRET : ${o.siret}<br>Organisme de formation NDA : ${o.nda}<br>Représenté par ${o.dirigeant}, Directeur du CFA ${o.nom}</p><h3>2. L'entreprise</h3><p>Raison sociale : ${entreprise}<br>Représentée par <strong>${respEntreprise}</strong>, en qualité de responsable.<br>Maître d'apprentissage : désigné par l'employeur.</p><h3>3. L'apprenant(e)</h3><p>Nom et prénom : ${s.prenom} ${s.nom}<br>Date de début du contrat : ${dateDebut}<br>Date de fin du contrat : ${dateFin}</p><p>Est conclue la convention suivante (comprenant 5 annexes), en application des dispositions des Livres II et III de la sixième partie du Code du travail.</p><p><strong>Fait le ${dateConvention}</strong></p>` },
     { heading: "Article 1er : Objet de la convention", content: `<p>Le CFA ${o.nom} organise une action de formation par apprentissage au sens de l'article L.6313-6 du Code du travail.</p><ul><li><strong>Intitulé et objectif de l'action :</strong> ${f.intitule}</li><li><strong>Certificateur :</strong> ${o.certifications || "Certificateur enregistré au RNCP"}</li><li><strong>Durée de l'action de formation :</strong> ${duree}</li><li>Du ${dateDebut} au ${dateFin}</li><li><strong>Lieu principal de la formation :</strong> ${lieu}</li></ul>` },
     { heading: "Article 2 : Modalités de déroulement et de suivi", content: `<p><strong>Modalités :</strong></p><ul><li>Alternance entreprise / centre de formation</li><li>Mode : ${f.modalites || "Présentiel"} – ${duree}</li><li>Lieu : ${lieu}</li></ul><p><strong>Moyens pédagogiques :</strong> Plateforme en ligne, salle équipée.</p><p><strong>Assistance technique :</strong> ${o.nom} – ${o.email}</p><p><strong>Suivi :</strong> Livret d'apprentissage, visites en entreprise (2/an), réunions de concertation, suivi de l'assiduité.</p><p><strong>Obtention du diplôme :</strong> Épreuves en CCF et ponctuelles.</p>` },
     { heading: "Article 3 : Bénéficiaire", content: `<p>Nom et prénom(s) : ${s.prenom} ${s.nom}<br>Date de début : ${dateDebut}<br>Date de fin : ${dateFin}</p>` },
@@ -2276,7 +2279,35 @@ function genConventionFormationApprentissage(o: OrganismeInfo, f: FormationInfo,
     { heading: "Article 9 : Résiliation", content: `<p>Fin à l'issue du contrat (${dateFin}) ou en cas de rupture anticipée (art. L.6222-18 du Code du travail).</p>` },
     { heading: "Article 10 : Litiges", content: `<p>Tentative de règlement amiable. À défaut, juridictions compétentes.</p>` },
     { heading: "Article 11 : Mandat", content: `<p>L'entreprise donne mandat au CFA pour accomplir les formalités prévues à l'article L. 6224-1 du code du travail, à titre gratuit. Le mandant fournit les informations nécessaires et donne pouvoir de représentation auprès des OPCO.</p>` },
-  ], signatures: { type: "3", names: [s.prenom + " " + s.nom, o.dirigeant + " – " + o.nom] } });
+  ], extraHtml: `
+    <div class="signature-block">
+      <div class="sig-box">
+        <p class="sig-label">Le/La Stagiaire</p>
+        <p>Nom : ${s.prenom} ${s.nom}</p>
+        <p>Date : ${dateConvention}</p>
+        <p style="margin-top:20px">Signature :</p>
+        ${s.signatureUrl ? `<img src="${s.signatureUrl}" alt="Signature stagiaire" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : `<p style="font-style:italic;color:#999;margin-top:15px"></p>`}
+      </div>
+      <div class="sig-box">
+        <p class="sig-label">Le CFA</p>
+        <p>Nom : ${o.dirigeant}</p>
+        <p>Organisme : ${o.nom}</p>
+        <p>Date : ${dateConvention}</p>
+        <p style="margin-top:20px">Signature :</p>
+        ${o.signatureUrl ? `<img src="${o.signatureUrl}" alt="Signature CFA" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : ""}
+        ${o.tamponUrl ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />` : ""}
+      </div>
+      <div class="sig-box">
+        <p class="sig-label">Le Responsable d'entreprise</p>
+        <p>Nom : ${respEntreprise}</p>
+        <p>Entreprise : ${entreprise}</p>
+        <p>Date : ${dateConvention}</p>
+        <p style="margin-top:20px">Signature :</p>
+        <p style="font-style:italic;color:#999;margin-top:15px"></p>
+      </div>
+    </div>
+  `, stagiaires: [s as StagiaireInfo] });
+  return body;
 }
 
 function genLivretApprentissageCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {

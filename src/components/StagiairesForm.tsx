@@ -11,7 +11,7 @@ interface StagiairesFormProps {
 }
 
 const emptyStagiaire: StagiaireInfo = {
-  civilite: "", nom: "", prenom: "", email: "", telephone: "", entreprise: "", poste: "", dateNaissance: "", dateDebutFormation: "", dateFinFormation: "", tarifFormation: "", signatureUrl: ""
+  civilite: "", nom: "", prenom: "", email: "", telephone: "", entreprise: "", responsableEntreprise: "", poste: "", dateNaissance: "", dateDebutFormation: "", dateFinFormation: "", tarifFormation: "", signatureUrl: ""
 };
 
 const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
@@ -90,6 +90,10 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
             <div>
               <Label>Entreprise</Label>
               <Input value={stagiaire.entreprise} onChange={e => updateStagiaire(index, 'entreprise', e.target.value)} placeholder="Entreprise" />
+            </div>
+            <div>
+              <Label>Responsable entreprise</Label>
+              <Input value={stagiaire.responsableEntreprise || ""} onChange={e => updateStagiaire(index, 'responsableEntreprise', e.target.value)} placeholder="Nom du responsable" />
             </div>
             <div>
               <Label>Poste</Label>
