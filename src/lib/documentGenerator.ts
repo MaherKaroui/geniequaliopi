@@ -781,7 +781,7 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
     .map(l => l.trim())
     .filter(l => l.length > 3);
   const evalHtml = evalItems.length > 0
-    ? `<ul>${evalItems.map(l => `<li>${l.replace(/^[-•]\s*/, "")}</li>`).join("")}</ul>`
+    ? `<ul>${evalItems.map(l => `<li>${l.replace(/^[-•]\s*/, "")}</li>`).join("")}<li>Grille d'acquisition des compétences</li></ul>`
     : `<ul>
         <li>Test de positionnement en début de formation</li>
         <li>Exercices pratiques et cas concrets tout au long de la formation</li>
