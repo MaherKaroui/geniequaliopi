@@ -209,9 +209,15 @@ export function tableHTML(headers: string[], rows: string[][]): string {
 export function footer(org: OrganismeInfo): string {
   const version = (org as any).version || "1";
   const dateMaj = (org as any).dateMaj
-    ? new Date((org as any).dateMaj).toLocaleDateString("fr-FR")
-    : new Date().toLocaleDateString("fr-FR");
-  return `<div class="footer"><p>${org.nom} | Version ${version} | MAJ ${dateMaj}</p><p>${org.adresse}, ${org.codePostal} ${org.ville} – ${org.telephone} – ${org.email}</p><p>SIRET : ${org.siret} – NDA : ${org.nda}</p></div>`;
+    ? new Date((org as any).dateMaj).toLocaleDateString("fr-FR", { day: 'numeric', month: 'long', year: 'numeric' })
+    : new Date().toLocaleDateString("fr-FR", { day: 'numeric', month: 'long', year: 'numeric' });
+  return `<div class="footer">
+    <p style="font-weight:700;font-size:inherit;margin-bottom:4px">${org.nom}</p>
+    <p>Adresse: ${org.adresse}, ${org.codePostal} ${org.ville}</p>
+    <p>Siret: ${org.siret}</p>
+    <p>Nda: ${org.nda} cet enregistrement ne vaut pas agrément de l'état</p>
+    <p style="margin-top:4px">V${version}  ${dateMaj}</p>
+  </div>`;
 }
 
 export function section(content: string, variant?: "green" | "orange"): string {
