@@ -2290,11 +2290,9 @@ function genConventionFormationApprentissage(o: OrganismeInfo, f: FormationInfo,
       </div>
       <div class="sig-box">
         <p class="sig-label">Le CFA</p>
-        <p>Nom : ${o.dirigeant}</p>
         <p>Organisme : ${o.nom}</p>
         <p>Date : ${dateConvention}</p>
-        <p style="margin-top:20px">Signature :</p>
-        ${o.signatureUrl ? `<img src="${o.signatureUrl}" alt="Signature CFA" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : ""}
+        <p style="margin-top:20px">Cachet :</p>
         ${o.tamponUrl ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />` : ""}
       </div>
       <div class="sig-box">
@@ -2303,7 +2301,7 @@ function genConventionFormationApprentissage(o: OrganismeInfo, f: FormationInfo,
         <p>Entreprise : ${entreprise}</p>
         <p>Date : ${dateConvention}</p>
         <p style="margin-top:20px">Signature :</p>
-        <p style="font-style:italic;color:#999;margin-top:15px"></p>
+        ${o.signatureUrl ? `<img src="${o.signatureUrl}" alt="Signature responsable" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : `<p style="font-style:italic;color:#999;margin-top:15px"></p>`}
       </div>
     </div>
   `, stagiaires: [s as StagiaireInfo] });
