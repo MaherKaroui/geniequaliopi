@@ -257,6 +257,7 @@ export async function htmlToPdfBlob(htmlContent: string): Promise<Blob> {
     }
 
     const pdf = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+    const pxToMm = A4_WIDTH_MM / A4_WIDTH_PX;
 
     for (let i = 0; i < pages.length; i++) {
       if (i > 0) pdf.addPage();
@@ -274,6 +275,22 @@ export async function htmlToPdfBlob(htmlContent: string): Promise<Blob> {
 
       const imgData = canvas.toDataURL("image/jpeg", 0.95);
       pdf.addImage(imgData, "JPEG", 0, 0, A4_WIDTH_MM, A4_HEIGHT_MM);
+
+      // Add clickable link annotations over the rasterized image
+      const anchors = pages[i].querySelectorAll("a[href]");
+      const pageRect = pages[i].getBoundingClientRect();
+      anchors.forEach((anchor) => {
+        const href = anchor.getAttribute("href");
+        if (!href || !href.startsWith("http")) return;
+        const rect = anchor.getBoundingClientRect();
+        const x = (rect.left - pageRect.left) * pxToMm;
+        const y = (rect.top - pageRect.top) * pxToMm;
+        const w = rect.width * pxToMm;
+        const h = rect.height * pxToMm;
+        if (w > 0 && h > 0) {
+          pdf.link(x, y, w, h, { url: href });
+        }
+      });
     }
 
     return pdf.output("blob");
