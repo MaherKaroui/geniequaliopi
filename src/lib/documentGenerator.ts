@@ -954,13 +954,8 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
         <li>Certificat de réalisation</li>
         <li>Grille d'acquisition des compétences</li>
         <li>Résultats des évaluations (test de positionnement début/fin)</li>
+        <li>Liens vidéos complémentaires</li>
       </ul>
-      ${(() => {
-        const videos = getYoutubeVideos(f.intitule);
-        if (videos.length === 0) return '';
-        return `<p style="margin-top:12px"><strong>🎥 Liens vidéos complémentaires :</strong></p>
-        <ul>${videos.map(v => `<li><a href="${v.url}" target="_blank" style="color:#1e3a7b">${v.title}</a> — ${v.description}</li>`).join('')}</ul>`;
-      })()}
     </div>
   `;
 
