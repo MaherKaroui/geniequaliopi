@@ -66,11 +66,14 @@ function normalizeVersion(version: string): string {
   return clean || "1";
 }
 
-function formatDateISO(dateMaj: string): string {
-  if (!dateMaj) return new Date().toISOString().slice(0, 10);
+function formatDateCompact(dateMaj: string): string {
+  if (!dateMaj) {
+    const now = new Date();
+    return `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}${String(now.getDate()).padStart(2, "0")}`;
+  }
   const parsed = new Date(dateMaj);
-  if (Number.isNaN(parsed.getTime())) return dateMaj;
-  return `${parsed.getFullYear()}-${String(parsed.getMonth() + 1).padStart(2, "0")}-${String(parsed.getDate()).padStart(2, "0")}`;
+  if (Number.isNaN(parsed.getTime())) return dateMaj.replace(/[^0-9]/g, "");
+  return `${parsed.getFullYear()}${String(parsed.getMonth() + 1).padStart(2, "0")}${String(parsed.getDate()).padStart(2, "0")}`;
 }
 
 function stripCatalogPrefix(label: string): string {
