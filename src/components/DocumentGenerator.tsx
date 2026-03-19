@@ -466,6 +466,89 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
     setGenerating(false);
   };
 
+  const handleUploadToDrive = async () => {
+    setUploadingDrive(true);
+    try {
+      const zip = new JSZip();
+      const toWordBlob = async (content: string) => {
+        const blob = await htmlToWordBlob(content);
+        const extension = blob.type.includes("officedocument") ? ".docx" : ".doc";
+        return { blob, extension };
+      };
+
+      const bookContent = generateBookQualiopi(mergedOrganisme, [selectedFormation], allStagiaires, catalog);
+      if (exportFormat === "pdf") {
+        zip.file(`BOOK_QUALIOPI.pdf`, await htmlToPdfBlob(bookContent));
+      } else {
+        const wordBlob = await toWordBlob(bookContent);
+        zip.file(`BOOK_QUALIOPI${wordBlob.extension}`, wordBlob.blob);
+      }
+
+      for (const critere of CRITERES_INFO) {
+        for (const ind of critere.indicateurs) {
+          const docs = catalog.filter((d) => d.indicateur === ind.numero);
+          for (const doc of docs) {
+            const basePath = shortCriterePath(critere.numero, ind.numero);
+            const isPerStagiaire = PER_STAGIAIRE_TEMPLATES.has(doc.template);
+
+            if (isPerStagiaire) {
+              for (let si = 0; si < allStagiaires.length; si++) {
+                const stagiaire = allStagiaires[si];
+                const stagFolder = `${basePath}/${stagiaire.nom}_${stagiaire.prenom}`.substring(0, 80);
+                const content = generateContent(doc, si);
+                if (exportFormat === "pdf") {
+                  zip.file(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, ".pdf")}`, await htmlToPdfBlob(content));
+                } else {
+                  const wordBlob = await toWordBlob(content);
+                  zip.file(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, wordBlob.extension)}`, wordBlob.blob);
+                }
+              }
+            } else if (doc.template === "pdf_static" && doc.params?.pdfFile) {
+              const resp = await fetch(`/docs/${doc.params.pdfFile}`);
+              const fileBlob = await resp.blob();
+              zip.file(`${basePath}/${buildCatalogFileName(doc)}`, fileBlob);
+            } else if (
+              ["indicateurs_performance", "tableau_suivi_parcours_excel", "plan_dev_competences_excel", "tableau_amelioration_continue_excel", "suivi_dysfonctionnements_excel", "relances_appreciations_excel"].includes(doc.template)
+            ) {
+              const excelContent = doc.template === "indicateurs_performance"
+                ? generateExcelTableauBordPerformance(mergedOrganisme, selectedFormation, allStagiaires)
+                : doc.template === "tableau_suivi_parcours_excel"
+                  ? generateExcelTableauSuiviParcours(mergedOrganisme, selectedFormation, allStagiaires)
+                  : generateContent(doc);
+              zip.file(`${basePath}/${buildCatalogFileName(doc, null, ".xls")}`, excelToBlob(excelContent));
+            } else {
+              const content = generateContent(doc);
+              if (exportFormat === "pdf") {
+                zip.file(`${basePath}/${buildCatalogFileName(doc, null, ".pdf")}`, await htmlToPdfBlob(content));
+              } else {
+                const wordBlob = await toWordBlob(content);
+                zip.file(`${basePath}/${buildCatalogFileName(doc, null, wordBlob.extension)}`, wordBlob.blob);
+              }
+            }
+          }
+        }
+      }
+
+      const zipBlob = await zip.generateAsync({ type: "blob" });
+      const zipName = buildGenericFileName("DOSSIER_QUALIOPI_COMPLET", mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, ".zip");
+      const folderName = `Qualiopi_${mergedOrganisme.nom}`.substring(0, 60);
+
+      const result = await saveToDrive(zipBlob, zipName, folderName);
+      toast.success("Dossier envoyé sur Google Drive !", {
+        description: "Cliquez pour ouvrir",
+        action: result.webViewLink ? { label: "Ouvrir", onClick: () => window.open(result.webViewLink, "_blank") } : undefined,
+      });
+    } catch (error: any) {
+      console.error("Google Drive upload error:", error);
+      if (error?.message?.includes("popup")) {
+        toast.error("Veuillez autoriser la fenêtre pop-up pour Google Drive.");
+      } else {
+        toast.error("Erreur lors de l'envoi sur Google Drive.");
+      }
+    }
+    setUploadingDrive(false);
+  };
+
   const getDocsForIndicateur = (indicateur: number) => catalog.filter((doc) => doc.indicateur === indicateur);
 
   return (
