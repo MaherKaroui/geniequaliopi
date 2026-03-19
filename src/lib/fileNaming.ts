@@ -112,7 +112,7 @@ export function replaceFileExtension(fileName: string, extension: string): strin
 }
 
 export function shortCriterePath(critere: number, indicateur: number): string {
-  return `QUALIOPI/CT${critere}/IND${indicateur}`;
+  return `Critere_${critere}/Indicateur_${indicateur}`;
 }
 
 export function buildGenericFileName(label: string, orgName: string, version: string, dateMaj: string, extension: string): string {
