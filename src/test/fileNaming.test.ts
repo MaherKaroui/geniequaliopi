@@ -26,7 +26,7 @@ const doc: DocEntry = {
 describe("file naming convention", () => {
   it("builds the expected Google Drive-friendly file name", () => {
     expect(buildDocumentFileName(doc, "SODEVA", "1", "2025-03-03", ".pdf", stagiaire)).toBe(
-      "TRAME_EVALUATION_BESOINS_Abdelkrim_LAMBARKI_SODEVA_V1_20250303.pdf",
+      "TRAME_EVALUATION_BESOINS_Abdelkrim_LAMBARKI_SODEVA_V1_2025_03_03.pdf",
     );
   });
 
@@ -43,9 +43,9 @@ describe("file naming convention", () => {
   it("matches a normalized file when the exact file name differs", () => {
     const file = new File([
       "demo",
-    ], "Trame evaluation besoins Abdelkrim LAMBARKI SODEVA V1 20250303.pdf", { type: "application/pdf" });
+    ], "Trame evaluation besoins Abdelkrim LAMBARKI SODEVA V1 2025_03_03.pdf", { type: "application/pdf" });
     Object.defineProperty(file, "webkitRelativePath", {
-      value: "Critere_2/Indicateur_4/Trame evaluation besoins Abdelkrim LAMBARKI SODEVA V1 20250303.pdf",
+      value: "Critere_2/Indicateur_4/Trame evaluation besoins Abdelkrim LAMBARKI SODEVA V1 2025_03_03.pdf",
     });
 
     const audit = auditImportedFolder({
