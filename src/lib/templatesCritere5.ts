@@ -108,7 +108,11 @@ export function genAutoEvaluationFormateurV2(o: OrganismeInfo, f: FormationInfo,
     <p>Développer des supports complémentaires en autonomie (fiches mémo, tutoriels courts).</p>
     <p>Renforcer encore la pratique sur des cas professionnels concrets.</p></div>
     <p><strong>Organisme de formation :</strong> ${o.nom}</p>
-  `, signatures: { type: "2", labels: ["Signature du formateur", "Le Responsable Pédagogique"], names: [fmt.prenom + " " + fmt.nom, o.responsablePedagogique], dates: [formatDate(f.dateFin), formatDate(f.dateFin)] } });
+    <div class="signature-block-2">
+      <div class="sig-box"><p class="sig-label">Signature du formateur</p><p>Nom : ${fmt.prenom} ${fmt.nom}</p><p>Date : ${formatDate(f.dateFin)}</p><p style="margin-top:20px">Signature :</p>${o.signatureUrl ? `<img src="${o.signatureUrl}" alt="Signature" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : ""}</div>
+      <div class="sig-box"><p class="sig-label">Le Responsable Pédagogique</p><p>Nom : ${o.responsablePedagogique}</p><p>Date : ${formatDate(f.dateFin)}</p><p style="margin-top:20px">Cachet :</p>${o.tamponUrl ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />` : ""}</div>
+    </div>
+  ` });
 }
 
 // ===== IND 21 — PROCESSUS DE RECRUTEMENT =====
