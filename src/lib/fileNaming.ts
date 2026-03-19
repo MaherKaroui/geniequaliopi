@@ -69,11 +69,11 @@ function normalizeVersion(version: string): string {
 function formatDateCompact(dateMaj: string): string {
   if (!dateMaj) {
     const now = new Date();
-    return `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}${String(now.getDate()).padStart(2, "0")}`;
+    return `${now.getFullYear()}_${String(now.getMonth() + 1).padStart(2, "0")}_${String(now.getDate()).padStart(2, "0")}`;
   }
   const parsed = new Date(dateMaj);
-  if (Number.isNaN(parsed.getTime())) return dateMaj.replace(/[^0-9]/g, "");
-  return `${parsed.getFullYear()}${String(parsed.getMonth() + 1).padStart(2, "0")}${String(parsed.getDate()).padStart(2, "0")}`;
+  if (Number.isNaN(parsed.getTime())) return dateMaj.replace(/[^0-9_]/g, "");
+  return `${parsed.getFullYear()}_${String(parsed.getMonth() + 1).padStart(2, "0")}_${String(parsed.getDate()).padStart(2, "0")}`;
 }
 
 function stripCatalogPrefix(label: string): string {

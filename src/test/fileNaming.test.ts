@@ -26,7 +26,7 @@ const doc: DocEntry = {
 describe("file naming convention", () => {
   it("builds the expected Google Drive-friendly file name", () => {
     expect(buildDocumentFileName(doc, "SODEVA", "1", "2025-03-03", ".pdf", stagiaire)).toBe(
-      "TRAME_EVALUATION_BESOINS_Abdelkrim_LAMBARKI_SODEVA_V1_20250303.pdf",
+      "TRAME_EVALUATION_BESOINS_Abdelkrim_LAMBARKI_SODEVA_V1_2025_03_03.pdf",
     );
   });
 
