@@ -49,6 +49,7 @@ export interface StagiaireInfo {
   telephone: string;
   entreprise: string;
   responsableEntreprise?: string;
+  signatureResponsableUrl?: string;
   poste: string;
   dateNaissance: string;
   dateDebutFormation?: string;

@@ -108,7 +108,7 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
           </div>
           {/* Signature stagiaire */}
           <div className="flex items-center gap-3 mt-2 pt-2 border-t border-border/50">
-            <Label className="text-xs font-semibold">Signature</Label>
+            <Label className="text-xs font-semibold">Signature stagiaire</Label>
             {stagiaire.signatureUrl ? (
               <div className="relative group">
                 <img src={stagiaire.signatureUrl} alt="Signature" className="h-10 w-auto max-w-[120px] object-contain rounded border bg-white p-0.5" />
@@ -129,6 +129,31 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
             />
             <Button variant="outline" size="sm" className="h-7 text-xs" onClick={() => sigRefs.current[index]?.click()}>
               {stagiaire.signatureUrl ? "Changer" : "Charger"}
+            </Button>
+          </div>
+          {/* Signature responsable entreprise */}
+          <div className="flex items-center gap-3 mt-2 pt-2 border-t border-border/50">
+            <Label className="text-xs font-semibold">Signature resp. entreprise</Label>
+            {stagiaire.signatureResponsableUrl ? (
+              <div className="relative group">
+                <img src={stagiaire.signatureResponsableUrl} alt="Signature responsable" className="h-10 w-auto max-w-[120px] object-contain rounded border bg-white p-0.5" />
+                <button
+                  onClick={() => updateStagiaire(index, 'signatureResponsableUrl', '')}
+                  className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <X className="w-2.5 h-2.5" />
+                </button>
+              </div>
+            ) : (
+              <span className="text-xs text-muted-foreground">Aucune</span>
+            )}
+            <input
+              ref={el => { sigRespRefs.current[index] = el; }}
+              type="file" accept="image/*" className="hidden"
+              onChange={e => { const f = e.target.files?.[0]; if (f) handleSigRespFile(index, f); }}
+            />
+            <Button variant="outline" size="sm" className="h-7 text-xs" onClick={() => sigRespRefs.current[index]?.click()}>
+              {stagiaire.signatureResponsableUrl ? "Changer" : "Charger"}
             </Button>
           </div>
         </div>
