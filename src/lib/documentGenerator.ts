@@ -2256,7 +2256,7 @@ function genContratApprentissage(o: OrganismeInfo, f: FormationInfo, stagiaires:
 }
 
 function genConventionFormationApprentissage(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
-  const s = stagiaires[si] || stagiaires[0] || { prenom: "Martin", nom: "Dupont", entreprise: "Tech Solutions SAS", email: "", responsableEntreprise: "" };
+  const s = stagiaires[si] || stagiaires[0] || { prenom: "Martin", nom: "Dupont", entreprise: "Tech Solutions SAS", email: "", responsableEntreprise: "", signatureUrl: "" } as StagiaireInfo;
   const entreprise = s.entreprise || "Entreprise partenaire";
   const respEntreprise = (s as any).responsableEntreprise || "Le responsable désigné";
   const dateDebut = formatDate(f.dateDebut);
