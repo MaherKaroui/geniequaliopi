@@ -16,6 +16,7 @@ const emptyStagiaire: StagiaireInfo = {
 
 const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
   const sigRefs = useRef<Record<number, HTMLInputElement | null>>({});
+  const sigRespRefs = useRef<Record<number, HTMLInputElement | null>>({});
   const addStagiaire = () => onChange([...data, { ...emptyStagiaire }]);
   const removeStagiaire = (index: number) => onChange(data.filter((_, i) => i !== index));
   const updateStagiaire = (index: number, field: keyof StagiaireInfo, value: string) => {
@@ -26,6 +27,11 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
   const handleSigFile = (index: number, file: File) => {
     const reader = new FileReader();
     reader.onload = () => updateStagiaire(index, 'signatureUrl', reader.result as string);
+    reader.readAsDataURL(file);
+  };
+  const handleSigRespFile = (index: number, file: File) => {
+    const reader = new FileReader();
+    reader.onload = () => updateStagiaire(index, 'signatureResponsableUrl', reader.result as string);
     reader.readAsDataURL(file);
   };
 
