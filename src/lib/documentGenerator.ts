@@ -781,7 +781,7 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
     .map(l => l.trim())
     .filter(l => l.length > 3);
   const evalHtml = evalItems.length > 0
-    ? `<ul>${evalItems.map(l => `<li>${l.replace(/^[-•]\s*/, "")}</li>`).join("")}</ul>`
+    ? `<ul>${evalItems.map(l => `<li>${l.replace(/^[-•]\s*/, "")}</li>`).join("")}<li>Grille d'acquisition des compétences</li></ul>`
     : `<ul>
         <li>Test de positionnement en début de formation</li>
         <li>Exercices pratiques et cas concrets tout au long de la formation</li>
@@ -954,6 +954,12 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
         <li>Grille d'acquisition des compétences</li>
         <li>Résultats des évaluations (test de positionnement début/fin)</li>
       </ul>
+      ${(() => {
+        const videos = getYoutubeVideos(f.intitule);
+        if (videos.length === 0) return '';
+        return `<p style="margin-top:12px"><strong>🎥 Liens vidéos complémentaires :</strong></p>
+        <ul>${videos.map(v => `<li><a href="${v.url}" target="_blank" style="color:#1e3a7b">${v.title}</a> — ${v.description}</li>`).join('')}</ul>`;
+      })()}
     </div>
   `;
 
