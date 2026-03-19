@@ -246,6 +246,7 @@ export const SATISFACTION_SCORES: Record<string, number[]> = {
   "Informatique": [4, 5, 5, 4, 5, 4, 5, 5],
   "Communiquer en français": [5, 4, 5, 4, 5, 5, 4, 5],
   "Création de contenus": [5, 5, 4, 5, 5, 4, 5, 5],
+  "Gestion Administrative": [4, 5, 4, 5, 4, 5, 5, 4],
 };
 
 // Evaluation scores per stagiaire (realistic 6-10/10)
