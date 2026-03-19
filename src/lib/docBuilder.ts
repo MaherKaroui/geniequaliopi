@@ -212,11 +212,11 @@ export function footer(org: OrganismeInfo): string {
     ? new Date((org as any).dateMaj).toLocaleDateString("fr-FR", { day: 'numeric', month: 'long', year: 'numeric' })
     : new Date().toLocaleDateString("fr-FR", { day: 'numeric', month: 'long', year: 'numeric' });
   return `<div class="footer">
-    <p style="font-weight:700;font-size:inherit;margin-bottom:4px">${org.nom}</p>
-    <p>Adresse: ${org.adresse}, ${org.codePostal} ${org.ville}</p>
-    <p>Siret: ${org.siret}</p>
-    <p>Nda: ${org.nda} cet enregistrement ne vaut pas agrément de l'état</p>
-    <p style="margin-top:4px">V${version}  ${dateMaj}</p>
+    <p style="font-weight:700;font-size:inherit;margin:0 0 4px">${org.nom}</p>
+    <p style="margin:0 0 8px">Adresse: ${org.adresse}, ${org.codePostal} ${org.ville}</p>
+    <p style="margin:0 0 8px">Siret: ${org.siret}</p>
+    <p style="margin:0 0 8px">Nda: ${org.nda} cet enregistrement ne vaut pas agrément de l'état</p>
+    <p style="margin:4px 0 0">V${version} ${dateMaj}</p>
   </div>`;
 }
 
