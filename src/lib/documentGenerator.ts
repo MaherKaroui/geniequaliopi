@@ -2301,7 +2301,7 @@ function genConventionFormationApprentissage(o: OrganismeInfo, f: FormationInfo,
         <p>Entreprise : ${entreprise}</p>
         <p>Date : ${dateConvention}</p>
         <p style="margin-top:20px">Signature :</p>
-        ${o.signatureUrl ? `<img src="${o.signatureUrl}" alt="Signature responsable" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : `<p style="font-style:italic;color:#999;margin-top:15px"></p>`}
+        ${s.signatureResponsableUrl ? `<img src="${s.signatureResponsableUrl}" alt="Signature responsable" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : `<p style="font-style:italic;color:#999;margin-top:15px"></p>`}
       </div>
     </div>
   `, stagiaires: [s as StagiaireInfo] });
