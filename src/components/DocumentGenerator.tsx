@@ -561,9 +561,13 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button onClick={handleDownloadAll} disabled={generating} className="gap-2 bg-gradient-hero text-primary-foreground border-0">
+          <Button onClick={handleDownloadAll} disabled={generating || uploadingDrive} className="gap-2 bg-gradient-hero text-primary-foreground border-0">
             {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
             {generating ? "Génération..." : "Télécharger tout (ZIP)"}
+          </Button>
+          <Button onClick={handleUploadToDrive} disabled={generating || uploadingDrive} variant="outline" className="gap-2">
+            {uploadingDrive ? <Loader2 className="w-4 h-4 animate-spin" /> : <Cloud className="w-4 h-4" />}
+            {uploadingDrive ? "Envoi…" : "Google Drive"}
           </Button>
         </div>
       </div>
