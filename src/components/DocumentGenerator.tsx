@@ -49,6 +49,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
   const [importAudit, setImportAudit] = useState<ImportAuditResult | null>(null);
   const [importingFolder, setImportingFolder] = useState(false);
   const [renamingFolder, setRenamingFolder] = useState(false);
+  const [uploadingDrive, setUploadingDrive] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const folderInputRef = useRef<HTMLInputElement>(null);
 
