@@ -394,7 +394,7 @@ function genOrganigramme(o: OrganismeInfo) {
     <div style="text-align:center;margin:30px 0">
       <div style="background:#1e3a7b;color:white;padding:15px 30px;border-radius:8px;display:inline-block;margin-bottom:20px"><strong>Direction Générale</strong><br>${o.dirigeant}</div>
       <div style="display:flex;justify-content:center;gap:20px;flex-wrap:wrap;margin-top:20px">
-        <div style="background:#e8f0fe;padding:12px 20px;border-radius:8px;min-width:180px"><strong>Pôle Pédagogique</strong><br>${o.responsablePedagogique}<br><em style="font-size:11px">5 formateurs</em></div>
+        <div style="background:#e8f0fe;padding:12px 20px;border-radius:8px;min-width:180px"><strong>Pôle Pédagogique</strong><br>${o.responsablePedagogique}<br><em style="font-size:11px">Formateurs</em></div>
         <div style="background:#e8f0fe;padding:12px 20px;border-radius:8px;min-width:180px"><strong>Pôle Qualité</strong><br>${o.referentQualite}<br><em style="font-size:11px">Amélioration continue</em></div>
         <div style="background:#e8f0fe;padding:12px 20px;border-radius:8px;min-width:180px"><strong>Pôle Handicap</strong><br>${o.referentHandicap}<br><em style="font-size:11px">Accessibilité</em></div>
         <div style="background:#e8f0fe;padding:12px 20px;border-radius:8px;min-width:180px"><strong>Pôle Administratif</strong><br>Marie Lecomte<br><em style="font-size:11px">Inscriptions, facturation</em></div>
