@@ -45,7 +45,7 @@ describe("file naming convention", () => {
       "demo",
     ], "Trame evaluation besoins Abdelkrim LAMBARKI SODEVA V1 2025_03_03.pdf", { type: "application/pdf" });
     Object.defineProperty(file, "webkitRelativePath", {
-      value: "Critere_2/Indicateur_4/Trame evaluation besoins Abdelkrim LAMBARKI SODEVA V1 20250303.pdf",
+      value: "Critere_2/Indicateur_4/Trame evaluation besoins Abdelkrim LAMBARKI SODEVA V1 2025_03_03.pdf",
     });
 
     const audit = auditImportedFolder({
