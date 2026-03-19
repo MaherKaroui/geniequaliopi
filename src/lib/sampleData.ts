@@ -215,6 +215,24 @@ export const SAMPLE_FORMATIONS: FormationInfo[] = [
     nombreParticipants: "12",
     formateur: "Alexandre Petit",
   },
+  {
+    intitule: "Gestion Administrative du Personnel & Obligations Légales",
+    objectifs: "Assurer la gestion administrative du personnel de l'entrée à la sortie, appliquer les obligations légales liées au contrat de travail, mettre à jour et sécuriser les dossiers salariés, rédiger les documents RH obligatoires, respecter les procédures, délais et règles du Code du travail.",
+    prerequis: "Aucun prérequis spécifique, une expérience en poste administratif est un plus",
+    duree: "14 heures (2 jours)",
+    modalites: "présentiel",
+    tarif: "600 € TTC par participant",
+    programme: "Jour 1 : Cadre juridique et documents RH obligatoires, formalités d'embauche (DPAE, registre du personnel, mutuelle), constitution et gestion du dossier salarié\nJour 2 : Gestion des absences, congés et arrêts maladie, rédaction des documents administratifs RH (avenants, certificats), conformité RGPD et archivage, obligations légales de fin de contrat",
+    methodesEvaluation: "QCM de validation, mises en situation professionnelles, exercices pratiques sur cas réels",
+    moyensPedagogiques: "Salle de formation équipée, supports de cours numériques et papier, modèles de documents RH, cas pratiques",
+    publicVise: "Assistants RH, gestionnaires de paie, secrétaires administratifs, responsables de PME/TPE",
+    delaiAcces: "7 jours après inscription",
+    dateDebut: "2024-12-09",
+    dateFin: "2024-12-10",
+    lieu: "25 avenue de la Formation Professionnelle, 75008 Paris – Salle A2",
+    nombreParticipants: "10",
+    formateur: "Philippe Martin",
+  },
 ];
 
 // Satisfaction scores (pre-filled realistic data)
@@ -228,6 +246,7 @@ export const SATISFACTION_SCORES: Record<string, number[]> = {
   "Informatique": [4, 5, 5, 4, 5, 4, 5, 5],
   "Communiquer en français": [5, 4, 5, 4, 5, 5, 4, 5],
   "Création de contenus": [5, 5, 4, 5, 5, 4, 5, 5],
+  "Gestion Administrative": [4, 5, 4, 5, 4, 5, 5, 4],
 };
 
 // Evaluation scores per stagiaire (realistic 6-10/10)
