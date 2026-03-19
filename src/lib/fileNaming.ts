@@ -39,7 +39,7 @@ function cleanLooseText(value: string): string {
     .replace(/[&]/g, " ")
     .replace(/[\-–—]+/g, " ")
     .replace(/[^A-Za-z0-9_\s]+/g, " ")
-    .replace(/\b[DLJMSTCNdljmstcn]\b/g, " ")
+    .replace(/\b(d|l|j|m|s|t|c|n|de|du|des|la|le|les|un|une|au|aux|et|en|a)\b/gi, " ")
     .replace(/_+/g, " ")
     .replace(/\s+/g, " ")
     .trim();
