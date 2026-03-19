@@ -11,6 +11,7 @@ const A4_HEIGHT_PX = 1123; // 297mm @ 96dpi
 const A4_WIDTH_MM = 210;
 const A4_HEIGHT_MM = 297;
 const FOOTER_OFFSET_PX = 40;
+const FOOTER_BUFFER_PX = 20;
 
 type PageParts = {
   page: HTMLDivElement;
@@ -99,7 +100,7 @@ function createPage(host: HTMLDivElement, footerHtml: string, footerHeightPx: nu
     "left:0",
     "top:0",
     `width:${A4_WIDTH_PX}px`,
-    `height:${A4_HEIGHT_PX - footerHeightPx - FOOTER_OFFSET_PX}px`,
+    `height:${A4_HEIGHT_PX - footerHeightPx - FOOTER_OFFSET_PX - 8}px`,
     "overflow:hidden",
     "background:#fff",
   ].join(";");
@@ -115,7 +116,7 @@ function createPage(host: HTMLDivElement, footerHtml: string, footerHeightPx: nu
       `bottom:${FOOTER_OFFSET_PX}px`,
       `width:${A4_WIDTH_PX}px`,
       `height:${footerHeightPx}px`,
-      "overflow:hidden",
+      "overflow:visible",
       "background:#fff",
     ].join(";");
     footer.innerHTML = footerHtml;
@@ -138,8 +139,8 @@ function measureFooterHeight(host: HTMLDivElement, footerHtml: string): number {
   const raw = Math.ceil(measure.scrollHeight);
   host.removeChild(measure);
 
-  // safe bounds to keep content readable
-  return Math.max(70, Math.min(180, raw + 6));
+  // extra safety buffer to avoid clipping the final footer line in PDFs
+  return Math.max(96, Math.min(220, raw + FOOTER_BUFFER_PX));
 }
 
 function getRenderableNodes(source: HTMLDivElement): ChildNode[] {
