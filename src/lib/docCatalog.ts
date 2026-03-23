@@ -257,11 +257,15 @@ export function buildFullCatalog(
 
     // IND 4 — Analyse du besoin du bénéficiaire (CFA)
     add("cfa_c2i4_grille_entretien", "CT2 - IND 4 GRILLE D'ENTRETIEN INDIVIDUEL – CANDIDAT", 2, 4, "grille_entretien_candidat_cfa");
+    add("cfa_c2i4_procedure_eval_besoins", "CT2 - IND 4 PROCÉDURE D'ÉVALUATION DES BESOINS", 2, 4, "procedure_eval_besoins");
+    add("cfa_c2i4_fiche_eval_psh", "CT2 - IND 4 FICHE D'ÉVALUATION DES BESOINS – PERSONNE EN SITUATION DE HANDICAP", 2, 4, "fiche_eval_besoins_psh");
     add("cfa_c2i4_procedure_missions", "CT2 - IND 4 PROCÉDURE VÉRIFICATION MISSIONS ENTREPRISE ET CERTIFICATION", 2, 4, "procedure_missions_entreprise_cfa");
     stagiaires.forEach((s, si) => {
       add(`cfa_c2i4_attestation_inscription_${si}`, `CT2 - IND 4 ATTESTATION D'INSCRIPTION – ${s.prenom} ${s.nom}`, 2, 4, "attestation_inscription_cfa", { stagiaireIdx: si });
       add(`cfa_c2i4_fiche_renseignement_${si}`, `CT2 - IND 4 FICHE DE RENSEIGNEMENT – ${s.prenom} ${s.nom}`, 2, 4, "fiche_renseignement_cfa", { stagiaireIdx: si });
+      add(`cfa_c2i4_trame_eval_besoins_${si}`, `CT2 - IND 4 TRAME ÉVALUATION DES BESOINS – ${s.prenom} ${s.nom}`, 2, 4, "trame_eval_besoins_stagiaire", { stagiaireIdx: si });
     });
+    add("cfa_c2i4_dossier_candidature", "CT2 - IND 4 DOSSIER DE CANDIDATURE", 2, 4, "dossier_candidature_cfa");
     add("cfa_c2i4_mail_type_candidat", "CT2 - IND 4 MAIL TYPES CANDIDAT (Renseignement, Dossier, Relance)", 2, 4, "mail_type_candidat_cfa");
 
     // IND 5 — Objectifs opérationnels et évaluables (CFA)
