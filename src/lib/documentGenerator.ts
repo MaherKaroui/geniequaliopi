@@ -1,5 +1,5 @@
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
-import { buildDocument, htmlWrap, orgHeader, formationInfoBlock, formationInfoBlockStagiaire, tableHTML, signatureBlock3, signatureBlock2, footer, section, formatDate, infoGrid, getDocStyle, subtractBusinessDays, getStagiaireDateDebut, getStagiaireDateFin, applyGender } from "./docBuilder";
+import { buildDocument, htmlWrap, orgHeader, formationInfoBlock, formationInfoBlockStagiaire, tableHTML, signatureBlock3, signatureBlock2, footer, section, formatDate, infoGrid, getDocStyle, subtractBusinessDays, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif, applyGender } from "./docBuilder";
 import { FormateurInfo, SAMPLE_FORMATIONS, SAMPLE_STAGIAIRES, SAMPLE_FORMATEURS, SAMPLE_ORGANISME, EVAL_SCORES, SATISFACTION_SCORES, CONNECTION_TIMES, getFormationDays, mergeOrganisme, mergeStagiaires, getConnectionTimes, parseDuree } from "./sampleData";
 import { buildFullCatalog } from "./docCatalog";
 import { generateBookQualiopi } from "./bookQualiopi";
@@ -342,7 +342,12 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "grille_entretien_annuel": return genGrilleEntretienAnnuel(o, fmt);
     case "enquete_satisfaction_formateur": return genEnqueteSatisfactionFormateur(o, f);
     // === Nouveaux templates CFA ===
-    case "attestation_inscription_cfa": return genAttestationInscriptionCFA(o, f, stagiaires);
+    case "attestation_inscription_cfa": return genAttestationInscriptionCFAV2(o, f, stagiaires, params?.stagiaireIdx ?? 0);
+    case "fiche_renseignement_cfa": return genFicheRenseignementCFA(o, f, stagiaires, params?.stagiaireIdx ?? 0);
+    case "grille_entretien_candidat_cfa": return genGrilleEntretienCandidatCFA(o, f);
+    case "procedure_missions_entreprise_cfa": return genProcedureMissionsEntrepriseCFA(o, f);
+    case "convention_formation_cfa": return genConventionFormationCFA(o, f, stagiaires, params?.stagiaireIdx ?? 0);
+    case "livret_apprentissage_cfa_v2": return genLivretApprentissageCFAV2(o, f, stagiaires, params?.stagiaireIdx ?? 0);
     case "procedure_psh_cfa": return genDossierPSH(o);
     case "dossier_accompagnement_psh_cfa": return genDossierPSH(o);
     case "guide_aide_connexion_cfa": return genMailAideConnexion(o, f);
@@ -2833,6 +2838,264 @@ function genListePartenairesHandicap(o: OrganismeInfo) {
       ["APF France Handicap", "Association", "Handicap moteur", "Antenne locale", "Non"],
     ]
   } });
+}
+
+// ============== CFA IND 4 — TEMPLATES BASÉS SUR DOCUMENTS SKILLORA ==============
+
+function genAttestationInscriptionCFAV2(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
+  const s = stagiaires[si] || stagiaires[0] || { prenom: "___", nom: "___", entreprise: "___", dateNaissance: "" } as StagiaireInfo;
+  const dateDebut = formatDate(getStagiaireDateDebut(s, f));
+  const dateFin = formatDate(getStagiaireDateFin(s, f));
+  const dateConvention = f.dateDebut ? formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || f.dateDebut, 15)) : "________________________";
+  return buildDocument({ org: o, title: "ATTESTATION D'INSCRIPTION", sections: [
+    { heading: "", content: `<p style="margin-top:20px">Je soussigné(e), <strong>${o.nom}</strong>, agissant en qualité du Centre de Formation par Apprentissage, atteste par la présente que :</p>
+<p style="text-align:center;font-size:15px;font-weight:bold;margin:20px 0">Nom et prénom de l'alternant(e) : ${s.prenom} ${s.nom}</p>
+<p style="text-align:center">Date de naissance : ${s.dateNaissance ? formatDate(s.dateNaissance) : "________________________"}</p>
+<p style="margin-top:15px">est inscrit(e) au sein du centre de formation pour suivre la formation suivante :</p>
+<p style="text-align:center;font-size:15px;font-weight:bold;margin:15px 0">« ${f.intitule} »</p>
+<p>Date prévisionnelle de début de formation : <strong>${dateDebut}</strong></p>
+<p>Date prévisionnelle de fin de formation : <strong>${dateFin}</strong></p>
+<p style="margin-top:15px">L'alternant(e) n'ayant pas encore trouvé d'entreprise d'accueil à ce jour, il/elle bénéficie d'une période de trois (3) mois à compter du ${dateDebut} pour effectuer ses démarches de recherche d'entreprise en vue de la signature d'un contrat d'alternance.</p>
+<p style="margin-top:15px;font-style:italic">Cette attestation est délivrée à la demande de l'intéressé(e), pour servir et valoir ce que de droit.</p>
+<p style="margin-top:20px">Fait à ${o.ville}, le ${dateConvention}</p>` },
+  ], extraHtml: `
+    <div style="margin-top:30px;text-align:center">
+      <p><strong>Signature et cachet du centre de formation</strong></p>
+      <p style="margin-top:10px"><strong>${o.nom}</strong><br>Service pédagogique</p>
+      ${o.tamponUrl ? `<div style="margin-top:10px"><img src="${o.tamponUrl}" alt="Tampon" style="max-height:70px;max-width:160px;object-fit:contain;opacity:0.85" /></div>` : ""}
+      ${o.signatureUrl ? `<div style="margin-top:5px"><img src="${o.signatureUrl}" alt="Signature" style="max-height:50px;max-width:120px;object-fit:contain" /></div>` : ""}
+    </div>` });
+}
+
+function genFicheRenseignementCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
+  const s = stagiaires[si] || stagiaires[0] || { prenom: "___", nom: "___", email: "", telephone: "", dateNaissance: "" } as StagiaireInfo;
+  return buildDocument({ org: o, title: "FICHE DE RENSEIGNEMENT CANDIDAT", sections: [
+    { heading: "", content: `
+${tableHTML(["Champ", "Information"], [
+  ["Nom de naissance", s.nom || "________________________"],
+  ["Prénom", s.prenom || "________________________"],
+  ["Date de naissance", s.dateNaissance ? formatDate(s.dateNaissance) : "________________________"],
+  ["NIR", "________________________"],
+  ["Sexe", s.civilite === "M." ? "M" : s.civilite === "Mme" ? "F" : "☐ M  ☐ F"],
+  ["Nationalité", "________________________"],
+  ["Adresse", "________________________"],
+  ["Code postal", "________________________"],
+  ["Commune", "________________________"],
+  ["Département de naissance", "________________________"],
+  ["Commune de naissance", "________________________"],
+  ["Téléphone", s.telephone || "________________________"],
+  ["Mail", s.email || "________________________"],
+  ["Diplôme le plus élevé obtenu", "________________________"],
+  ["RQTH", "☐ Oui  ☐ Non"],
+])}
+<p style="margin-top:15px"><strong>Formation visée :</strong> ${f.intitule}</p>
+<p><strong>Entreprise d'accueil :</strong> ${s.entreprise || "________________________"}</p>` },
+  ] });
+}
+
+function genGrilleEntretienCandidatCFA(o: OrganismeInfo, f: FormationInfo) {
+  return buildDocument({ org: o, title: "GRILLE D'ENTRETIEN INDIVIDUEL – CANDIDAT À LA FORMATION", sections: [
+    { heading: "", content: `<p><strong>Formation choisie :</strong> ${f.intitule}</p>` },
+    { heading: "1. INFORMATIONS GÉNÉRALES", content: `
+${tableHTML(["Champ", "Information"], [
+  ["Nom et prénom du candidat", ""],
+  ["Date de l'entretien", ""],
+  ["Nom du recruteur / formateur", f.formateur || ""],
+  ["Formation visée", f.intitule],
+  ["Type de contrat envisagé", "☐ Apprentissage  ☐ Professionnalisation  ☐ Autre"],
+  ["Situation actuelle", "☐ Étudiant(e)  ☐ Demandeur d'emploi  ☐ Salarié(e)  ☐ Autre"],
+  ["Niveau d'études atteint", ""],
+  ["Expérience professionnelle antérieure", ""],
+])}` },
+    { heading: "2. PRÉSENTATION ET MOTIVATION DU CANDIDAT", content: `
+${tableHTML(["Question", "Éléments observés / Réponses du candidat", "Appréciation"], [
+  ["Pouvez-vous vous présenter brièvement ?", "", "☐ Très satisfaisant  ☐ Satisfaisant  ☐ À renforcer"],
+  ["Pourquoi souhaitez-vous suivre cette formation ?", "", "☐ Très satisfaisant  ☐ Satisfaisant  ☐ À renforcer"],
+  ["Que savez-vous du métier visé ?", "", "☐ Très satisfaisant  ☐ Satisfaisant  ☐ À renforcer"],
+  ["Quels sont vos objectifs professionnels à moyen terme ?", "", "☐ Très satisfaisant  ☐ Satisfaisant  ☐ À renforcer"],
+  ["Pourquoi l'alternance vous semble adaptée ?", "", "☐ Très satisfaisant  ☐ Satisfaisant  ☐ À renforcer"],
+])}` },
+    { heading: "3. ÉVALUATION DU SAVOIR-ÊTRE ET DE LA POSTURE PROFESSIONNELLE", content: `
+${tableHTML(["Critère observé", "Observation du recruteur", "Évaluation"], [
+  ["Tenue, posture, présentation", "", "☐ Très satisfaisant  ☐ Satisfaisant  ☐ À renforcer"],
+  ["Expression orale et clarté du discours", "", "☐ Très satisfaisant  ☐ Satisfaisant  ☐ À renforcer"],
+  ["Écoute et reformulation", "", "☐ Très satisfaisant  ☐ Satisfaisant  ☐ À renforcer"],
+  ["Motivation et implication perçue", "", "☐ Très satisfaisant  ☐ Satisfaisant  ☐ À renforcer"],
+  ["Attitude professionnelle / politesse / ponctualité", "", "☐ Très satisfaisant  ☐ Satisfaisant  ☐ À renforcer"],
+])}` },
+    { heading: "4. ÉVALUATION DES COMPÉTENCES ET PRÉREQUIS", content: `
+${tableHTML(["Domaine", "Éléments évalués", "Appréciation"], [
+  ["Français écrit et oral", "Expression claire, orthographe, compréhension des consignes", "☐ Très satisfaisant  ☐ Satisfaisant  ☐ À renforcer"],
+  ["Bureautique", "Connaissance de Word, Excel, messagerie électronique", "☐ Très satisfaisant  ☐ Satisfaisant  ☐ À renforcer"],
+  ["Organisation / rigueur", "Capacité à hiérarchiser les priorités", "☐ Très satisfaisant  ☐ Satisfaisant  ☐ À renforcer"],
+  ["Relationnel", "Aisance relationnelle, écoute, respect du secret professionnel", "☐ Très satisfaisant  ☐ Satisfaisant  ☐ À renforcer"],
+  ["Connaissance du secteur", "Sensibilité au secteur visé, empathie", "☐ Très satisfaisant  ☐ Satisfaisant  ☐ À renforcer"],
+])}` },
+    { heading: "5. PROJET PROFESSIONNEL", content: `
+${tableHTML(["Question", "Réponse / Observation"], [
+  ["Quel métier souhaitez-vous exercer à l'issue de la formation ?", ""],
+  ["Avez-vous déjà identifié une entreprise d'accueil ?", ""],
+  ["Êtes-vous mobile géographiquement ?", ""],
+  ["Quelles qualités personnelles pensez-vous pouvoir apporter à ce métier ?", ""],
+])}` },
+    { heading: "6. CONCLUSION DE L'ENTRETIEN", content: `
+${tableHTML(["Élément", "Commentaire / Observation"], [
+  ["Points forts du candidat", ""],
+  ["Points de vigilance / axes d'amélioration", ""],
+  ["Recommandations pédagogiques", ""],
+  ["Avis final", "☐ Favorable  ☐ Favorable avec réserves  ☐ Défavorable"],
+])}` },
+  ] });
+}
+
+function genProcedureMissionsEntrepriseCFA(o: OrganismeInfo, f: FormationInfo) {
+  return buildDocument({ org: o, title: "PROCÉDURE VÉRIFICATION MISSIONS ENTREPRISE ET CERTIFICATION VISÉE", sections: [
+    { heading: "Objectif", content: `<p>S'assurer de la cohérence entre les missions confiées à l'apprenti en entreprise et le référentiel de la certification visée (${f.intitule}).</p>` },
+    { heading: "1. Collecte des missions proposées par l'entreprise", content: `<p>Transmission de la fiche de poste à l'entreprise ainsi que la fiche recueil de besoins afin de bien répondre aux attentes de l'entreprise mais aussi de l'apprenti.</p>` },
+    { heading: "2. Analyse de la correspondance avec le référentiel de certification", content: `<p>Les équipes pédagogiques analysent les missions proposées au regard du référentiel de la formation <strong>« ${f.intitule} »</strong>.</p><p>Objectifs évalués : ${f.objectifs || "Voir le programme de formation"}</p>` },
+    { heading: "3. Vérification et validation avec l'entreprise", content: `<p>Les équipes (conseillers en formation et la pédagogie) se réunissent et analysent la fiche de recueil. Le conseiller en formation fait un retour à l'entreprise (délai de 48h) :</p><ul><li><strong>Si cohérence</strong> : phase de contractualisation</li><li><strong>Si incohérence</strong> : faire un point et redéfinir les missions. Si non possibilité d'adaptation, informer l'apprenti qu'il doit relancer sa recherche d'entreprise.</li></ul>` },
+    { heading: "4. Formalisation et contractualisation", content: `<p>Si cohérence, le conseiller en formation met en place :</p><ul><li>Le CERFA (envoi de la fiche renseignement entreprise)</li><li>La convention de formation (ou l'on retrouvera les missions confiées)</li><li>Le livret d'apprentissage</li><li>Le guide du tuteur</li></ul>` },
+    { heading: "5. Suivi pendant la formation", content: `<p>Pendant la formation, le centre organisera un appel téléphonique après 45 jours et une visite entreprise (en présentiel de préférence) durant le suivi pédagogique de la formation de l'apprenti (durée : ${f.duree || "à définir"}).</p><p><strong>Le centre prendra contact avec l'entreprise pour 3 phases importantes :</strong></p><ul><li>Intégration et adaptation au poste (1er mois)</li><li>Suivi intermédiaire (mi-parcours)</li><li>Bilan final et préparation à la certification</li></ul>` },
+  ] });
+}
+
+// ============== CFA IND 5 — CONVENTION ET LIVRET ==============
+
+function genConventionFormationCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
+  const s = stagiaires[si] || stagiaires[0] || { prenom: "___", nom: "___", entreprise: "___" } as StagiaireInfo;
+  const entreprise = s.entreprise || "Entreprise partenaire";
+  const respEntreprise = (s as any).responsableEntreprise || "Le responsable désigné";
+  const dateDebut = formatDate(getStagiaireDateDebut(s, f));
+  const dateFin = formatDate(getStagiaireDateFin(s, f));
+  const duree = f.duree || "420 heures";
+  const montant = getStagiaireTarif(s, f) || f.tarif || "8 000";
+  const dateConvention = f.dateDebut ? formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || f.dateDebut, 15)) : "________________________";
+  return buildDocument({ org: o, title: "CONVENTION DE FORMATION PAR APPRENTISSAGE", subtitle: "Contrat hors convention régionale", formation: f, showFormationInfo: false, sections: [
+    { heading: "Entre les soussignés", content: `<p><strong>${o.nom}</strong><br>Adresse : ${o.adresse}, ${o.codePostal} ${o.ville}<br>SIRET : ${o.siret}<br>Numéro de déclaration à la Préfecture : ${o.nda}<br></p><p><strong>${entreprise}</strong><br>Adresse : ________________________<br>SIRET : ________________________<br>représenté(e) par <strong>${respEntreprise}</strong>,</p><p>CI-APRÈS DÉNOMMÉ(E) LE BÉNÉFICIAIRE,</p><p>est conclue la convention suivante, en application des dispositions des Livres II et III de la sixième partie du Code du travail.</p>` },
+    { heading: "Article 1er : Objet de la convention", content: `<p>Le ${o.nom} organise une action de formation par apprentissage au sens de l'article L. 6313-6 du Code du travail.</p><p><strong>Intitulé de l'action :</strong> « ${f.intitule} »</p><p><strong>Code diplôme et RNCP :</strong> ${f.codeRNCP || "________________________"}</p><p><strong>Dates de formation :</strong> Du ${dateDebut} au ${dateFin}</p><p><strong>Lieu de formation :</strong> ${f.lieu || `${o.adresse}, ${o.codePostal} ${o.ville}`}</p><p><strong>Stagiaire :</strong> ${s.prenom} ${s.nom}</p><p>Les actions envisagées entrent dans l'une des catégories aux articles L 6313-1 à L 6313-11 du code du travail :</p><p><em>Actions d'acquisition, d'entretien ou de perfectionnement des connaissances</em></p><p><strong>Durée de l'action de formation :</strong> ${duree}</p><p>Périodes de réalisation en entreprise et en CFA : voir calendrier du stagiaire en annexe</p>` },
+    { heading: "Article 2 : Modalités de déroulement, de suivi et d'obtention du titre", content: `<p><strong>Modalités de déroulement :</strong> ${f.modalites || "Hybride"}</p><p><strong>Modalités de suivi :</strong></p><ul><li>Feuille d'émargement</li><li>Séances de préparation à l'examen</li></ul><p><strong>Modalités d'obtention du titre :</strong></p><p>Présentation à l'examen en vue de l'obtention d'un titre professionnel</p>` },
+    { heading: "Article 3 : Dispositions financières", content: `<p><strong>Rappel :</strong> gratuité de la formation pour l'apprenti et son représentant légal, le cas échéant, aucune somme ne peut être demandée.</p>
+${tableHTML(["", "Quantité", "Unité", "Prix unitaire en €", "Montant net en €"], [
+  ["Intitulé de l'action de formation", "", "Montant global", "", montant + " €"],
+  ["Montant du niveau de prise en charge estimé - OPCO", "", "", "", "Intégral"],
+  ["Reste à charge éventuel de l'entreprise", "", "", "", "0 €"],
+])}
+<p style="text-align:right;font-weight:bold">TOTAL NET : ${montant} €</p>
+<p style="font-size:11px;color:#666"><sup>1</sup> Article 261 4, 4° du Code général des impôts<br><sup>2</sup> Il s'agit du niveau de prise en charge défini par la branche dont relève l'entreprise. Il est versé par l'opérateur de compétences (OPCO) concerné.</p>` },
+    { heading: "Article 4 : Frais annexes – pendant le temps en CFA uniquement", content: `<p>Lorsqu'ils sont financés par les CFA, l'OPCO prend en charge une partie de ces frais.</p>
+${tableHTML(["Frais", "Prise en charge"], [
+  ["Frais hébergement", "Non"],
+  ["Frais de restauration", "Non"],
+  ["Premier équipement pédagogique", "Oui"],
+  ["Frais liés à la mobilité internationale", "Non"],
+])}
+<p style="font-size:11px;color:#666">(Informations à destination de l'OPCO de l'entreprise)</p>` },
+    { heading: "Article 5 : Modalités de règlement", content: `<p>En cas de reste à charge de l'entreprise : par chèque ou virement à réception de facture.</p>` },
+    { heading: "Article 6 : Clause suspensive", content: `<p>L'exécution de la présente convention est soumise à l'enregistrement du contrat par la chambre consulaire ou la Direccte (L 6224-1 du Code du travail). Le contrat d'apprentissage enregistré sera transmis par le CFA à l'OPCO dont relève l'entreprise, pour prise en charge financière.</p>` },
+    { heading: "Article 7 : Engagements des contractants", content: `<p><strong>Engagements de l'organisme de formation :</strong></p><p>${o.nom} s'engage à mettre en œuvre les moyens pédagogiques, matériels et humains nécessaires à la formation, tels qu'ils sont décrits dans le programme de formation joint en annexe. Il se charge d'inscrire le salarié à l'examen, il établit les attestations de présence, sur la base des feuilles de présence émargées par le salarié.</p><p><strong>Engagements de l'entreprise :</strong></p><p>Conformément au principe d'alternance, l'entreprise permet au salarié d'exercer des activités professionnelles en relation avec la qualification préparée. Le salarié en contrat d'apprentissage sera suivi par le maître d'apprentissage désigné. L'entreprise organise le temps de travail du salarié de façon que le programme et le calendrier de formation soient respectés.</p><p><strong>Autorité :</strong> Les stagiaires sont placés sous l'autorité du responsable de l'organisme et sont tenus de respecter le règlement intérieur en vigueur.</p><p><strong>Justificatifs :</strong> Il sera remis une attestation de stage nominative à l'issue de l'action de formation.</p>` },
+    { heading: "Article 8 : Résiliation", content: `<p>En cas de dédit par le Bénéficiaire à moins de 15 jours francs avant le début d'une action de formation, ou d'abandon en cours de formation par le stagiaire, ${o.nom} retiendra sur le coût total, les sommes qu'il aura réellement dépensées ou engagées pour la réalisation de ladite action, conformément aux dispositions de l'article L920-9 du Code du Travail.</p>` },
+    { heading: "Article 9 : Différends éventuels", content: `<p>Si une contestation ou un différend ne peuvent être réglés à l'amiable, le Tribunal compétent réglera le litige.</p>` },
+  ], extraHtml: `
+    <p style="margin-top:30px">Fait en double exemplaire, à ${o.ville}, le ${dateConvention}</p>
+    <div class="signature-block-2">
+      <div class="sig-box">
+        <p class="sig-label">Pour ${o.nom}</p>
+        <p>(Cachet et signature)</p>
+        ${o.tamponUrl ? `<div style="margin-top:10px"><img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;opacity:0.85" /></div>` : ""}
+      </div>
+      <div class="sig-box">
+        <p class="sig-label">« ${entreprise} »</p>
+        <p>(Cachet et signature)</p>
+        ${s.signatureResponsableUrl ? `<div style="margin-top:10px"><img src="${s.signatureResponsableUrl}" alt="Signature responsable" style="max-height:50px;max-width:120px;object-fit:contain" /></div>` : ""}
+      </div>
+    </div>`, stagiaires: [s as StagiaireInfo] });
+}
+
+function genLivretApprentissageCFAV2(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
+  const s = stagiaires[si] || stagiaires[0] || { prenom: "___", nom: "___", entreprise: "___" } as StagiaireInfo;
+  const dateDebut = formatDate(getStagiaireDateDebut(s, f));
+  const dateFin = formatDate(getStagiaireDateFin(s, f));
+  // Generate dynamic objectives from formation
+  const objectifs = (f.objectifs || "").split(/[\n;•\-]/).filter(Boolean).map(o => o.trim()).filter(Boolean);
+  const objectifsHtml = objectifs.length > 0
+    ? `<ul>${objectifs.map(obj => `<li>${obj}</li>`).join("")}</ul>`
+    : `<ul><li>Maîtriser les compétences fondamentales de la formation</li><li>Appliquer les connaissances en situation professionnelle</li><li>Préparer la certification visée</li></ul>`;
+  // Generate dynamic programme/blocs from formation programme
+  const programmeLines = (f.programme || "").split(/[\n;]/).filter(Boolean).map(l => l.trim()).filter(Boolean);
+  // Build missions table dynamically
+  const missionsBloc1 = programmeLines.length > 0
+    ? programmeLines.slice(0, Math.ceil(programmeLines.length / 2)).map(line => [line, "Compétence professionnelle associée", ""])
+    : [
+      ["Tâche opérationnelle 1", "Compétence visée 1", ""],
+      ["Tâche opérationnelle 2", "Compétence visée 2", ""],
+      ["Tâche opérationnelle 3", "Compétence visée 3", ""],
+    ];
+  const missionsBloc2 = programmeLines.length > 3
+    ? programmeLines.slice(Math.ceil(programmeLines.length / 2)).map(line => [line, "Compétence professionnelle associée", ""])
+    : [
+      ["Tâche spécialisée 1", "Compétence avancée 1", ""],
+      ["Tâche spécialisée 2", "Compétence avancée 2", ""],
+    ];
+
+  return buildDocument({ org: o, title: "LIVRET D'APPRENTISSAGE", subtitle: f.intitule, sections: [
+    { heading: "1. INFORMATIONS GÉNÉRALES", content: `
+${tableHTML(["Champ", "Information"], [
+  ["Nom de l'apprenant(e)", `${s.prenom} ${s.nom}`],
+  ["Date de naissance", s.dateNaissance ? formatDate(s.dateNaissance) : "________________________"],
+  ["Date d'entrée en formation", dateDebut],
+  ["Date prévue de fin de formation", dateFin],
+  ["Type de contrat", "☐ Apprentissage  ☐ Professionnalisation  ☐ Autre"],
+  ["Entreprise d'accueil", s.entreprise || "________________________"],
+  ["Adresse de l'entreprise", "________________________"],
+  ["Tuteur / Maître d'apprentissage", "________________________"],
+  ["Formateur référent", f.formateur || o.responsablePedagogique],
+])}` },
+    { heading: "2. OBJECTIFS DE LA FORMATION", content: objectifsHtml },
+    { heading: "3. MISSIONS PROFESSIONNELLES EN ENTREPRISE", content: `
+<p><strong>Bloc 1 :</strong></p>
+${tableHTML(["Missions confiées à l'apprenant(e)", "Compétences professionnelles visées", "Observation du tuteur"], missionsBloc1)}
+<p style="margin-top:15px"><strong>Bloc 2 :</strong></p>
+${tableHTML(["Missions confiées à l'apprenant(e)", "Compétences professionnelles visées", "Observation du tuteur"], missionsBloc2)}` },
+    { heading: "4. ÉVALUATION PROGRESSIVE DE L'APPRENANT(E)", content: `
+${tableHTML(["Compétence / Comportement observé", "3 mois", "6 mois", "9 mois", "Commentaires"], [
+  ["Applique les consignes et procédures", "☐", "☐", "☐", ""],
+  ["Tient à jour les dossiers et documents", "☐", "☐", "☐", ""],
+  ["Utilise les outils professionnels", "☐", "☐", "☐", ""],
+  ["Applique les règles de confidentialité", "☐", "☐", "☐", ""],
+  ["Fait preuve d'organisation et d'autonomie", "☐", "☐", "☐", ""],
+  ["Communique efficacement avec l'équipe", "☐", "☐", "☐", ""],
+])}` },
+    { heading: "5. SUIVI ET ACCOMPAGNEMENT DE L'APPRENANT(E)", content: `
+${tableHTML(["Date du suivi", "Réalisé par", "Lieu", "Objectifs du suivi", "Observations / Actions"], [
+  ["3 mois", "Formateur référent + Tuteur", "Entreprise / CFA", "Intégration, autonomie, adaptation au poste", ""],
+  ["6 mois", "Formateur référent + Tuteur", "Entreprise / CFA", "Progression technique et relationnelle", ""],
+  ["9 mois", "Formateur référent + Tuteur", "Entreprise / CFA", "Préparation à la certification", ""],
+])}` },
+    { heading: "6. LIEN ENTRE FORMATION EN CENTRE ET ACTIVITÉS EN ENTREPRISE", content: `
+${tableHTML(["Thème de formation au CFA", "Mise en pratique en entreprise", "Observation du formateur"],
+  programmeLines.length > 0
+    ? programmeLines.slice(0, 5).map(line => [line, "Application pratique en entreprise", ""])
+    : [
+      ["Module théorique 1", "Application pratique en entreprise", ""],
+      ["Module théorique 2", "Mise en situation professionnelle", ""],
+      ["Module théorique 3", "Exercice supervisé par le tuteur", ""],
+    ]
+)}` },
+    { heading: "7. SYNTHÈSE FINALE", content: `
+${tableHTML(["Domaine", "Appréciation du tuteur", "Appréciation du formateur référent"], [
+  ["Compétences techniques", "", ""],
+  ["Rigueur et autonomie", "", ""],
+  ["Communication et relationnel", "", ""],
+  ["Intégration dans l'équipe", "", ""],
+  ["Potentiel d'évolution professionnelle", "", ""],
+])}` },
+    { heading: "8. VALIDATION ET SIGNATURES", content: `
+${tableHTML(["Participant", "Nom / Signature", "Date"], [
+  ["Apprenant(e)", `${s.prenom} ${s.nom}`, ""],
+  ["Tuteur / Maître d'apprentissage", "", ""],
+  ["Formateur référent " + o.nom, f.formateur || o.responsablePedagogique, ""],
+])}` },
+  ] });
 }
 
 function genAttestationInscriptionCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
