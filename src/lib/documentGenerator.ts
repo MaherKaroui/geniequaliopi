@@ -368,6 +368,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "logs_connexion_cfa": return genRapportConnexion(o, f, stagiaires);
     case "boite_formateur_cfa": return genBoiteFormateur(o, f);
     case "documents_certificateurs_cfa": return genDocumentsCertificateursCFA(o, f);
+    case "synopsis_cfa": return genSynopsisCFA(o, f);
     case "book_qualiopi": {
       const allFormations = [f];
       const allStagiaires = mergeStagiaires(stagiaires);
