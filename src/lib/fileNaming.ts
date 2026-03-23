@@ -13,6 +13,8 @@ export const PER_STAGIAIRE_TEMPLATES = new Set([
   "analyse_parcours_pro", "plan_action_bilan", "synthese_bilan",
   "livret_recevabilite_vae", "dossier_validation_vae", "accompagnement_vae",
   "attestation_inscription_cfa", "fiche_autoevaluation_apprenti",
+  "fiche_renseignement_cfa", "convention_formation_cfa", "livret_apprentissage_cfa_v2",
+  "convention_formation_apprentissage",
 ]);
 
 const EXCEL_TEMPLATES = new Set([
