@@ -3063,7 +3063,7 @@ ${tableHTML(["Information", "Détail"], [
   ["Modalités", f.modalites || "Présentiel"],
   ["Lieu", f.lieu || o.adresse || "___"],
   ["Dates", "Du " + formatDate(f.dateDebut) + " au " + formatDate(f.dateFin)],
-  ["Horaires", f.horaires || "9h00 – 12h30 / 13h30 – 17h00"],
+  ["Horaires", (f as any).horaires || "9h00 – 12h30 / 13h30 – 17h00"],
 ])}` },
     { heading: "Règles de vie", content: `
 <ul>
