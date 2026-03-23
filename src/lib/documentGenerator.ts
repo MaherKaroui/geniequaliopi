@@ -346,6 +346,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "fiche_renseignement_cfa": return genFicheRenseignementCFA(o, f, stagiaires, params?.stagiaireIdx ?? 0);
     case "grille_entretien_candidat_cfa": return genGrilleEntretienCandidatCFA(o, f);
     case "procedure_missions_entreprise_cfa": return genProcedureMissionsEntrepriseCFA(o, f);
+    case "mail_type_candidat_cfa": return genMailTypeCandidatCFA(o, f);
     case "convention_formation_cfa": return genConventionFormationCFA(o, f, stagiaires, params?.stagiaireIdx ?? 0);
     case "livret_apprentissage_cfa_v2": return genLivretApprentissageCFAV2(o, f, stagiaires, params?.stagiaireIdx ?? 0);
     case "procedure_psh_cfa": return genDossierPSH(o);
@@ -2956,6 +2957,45 @@ function genProcedureMissionsEntrepriseCFA(o: OrganismeInfo, f: FormationInfo) {
     { heading: "3. Vérification et validation avec l'entreprise", content: `<p>Les équipes (conseillers en formation et la pédagogie) se réunissent et analysent la fiche de recueil. Le conseiller en formation fait un retour à l'entreprise (délai de 48h) :</p><ul><li><strong>Si cohérence</strong> : phase de contractualisation</li><li><strong>Si incohérence</strong> : faire un point et redéfinir les missions. Si non possibilité d'adaptation, informer l'apprenti qu'il doit relancer sa recherche d'entreprise.</li></ul>` },
     { heading: "4. Formalisation et contractualisation", content: `<p>Si cohérence, le conseiller en formation met en place :</p><ul><li>Le CERFA (envoi de la fiche renseignement entreprise)</li><li>La convention de formation (ou l'on retrouvera les missions confiées)</li><li>Le livret d'apprentissage</li><li>Le guide du tuteur</li></ul>` },
     { heading: "5. Suivi pendant la formation", content: `<p>Pendant la formation, le centre organisera un appel téléphonique après 45 jours et une visite entreprise (en présentiel de préférence) durant le suivi pédagogique de la formation de l'apprenti (durée : ${f.duree || "à définir"}).</p><p><strong>Le centre prendra contact avec l'entreprise pour 3 phases importantes :</strong></p><ul><li>Intégration et adaptation au poste (1er mois)</li><li>Suivi intermédiaire (mi-parcours)</li><li>Bilan final et préparation à la certification</li></ul>` },
+  ] });
+}
+
+function genMailTypeCandidatCFA(o: OrganismeInfo, f: FormationInfo) {
+  const signataire = o.responsablePedagogique || o.dirigeant || "[Votre prénom et nom]";
+  return buildDocument({ org: o, title: "MAIL TYPES CANDIDAT", sections: [
+    { heading: "MAIL TYPE 1 — DEMANDE DE RENSEIGNEMENT", content: `
+<p><strong>À :</strong> name@email.com</p>
+<p><strong>Objet :</strong> Proposition d'entretien téléphonique à la suite de votre demande d'information</p>
+<hr/>
+<p>Bonjour,</p>
+<p>Nous vous remercions pour l'intérêt que vous portez à notre formation <strong>« ${f.intitule} »</strong>.</p>
+<p>Afin de mieux comprendre votre parcours, vos attentes et votre projet professionnel, nous vous proposons un entretien téléphonique. Cet échange nous permettra de vous présenter plus en détail le contenu de la formation, les modalités d'inscription ainsi que les possibilités d'accompagnement dont vous pouvez bénéficier.</p>
+<p>Seriez-vous disponible le <strong>(date et heure proposées)</strong> pour cet entretien ? Si ce créneau ne vous convient pas, n'hésitez pas à nous indiquer vos disponibilités, nous nous adapterons avec plaisir.</p>
+<p>Dans l'attente de votre réponse, je vous souhaite une excellente journée.</p>
+<p>Bien cordialement,</p>
+<p><strong>${signataire}</strong><br/>${o.nom}<br/>${o.telephone} – ${o.email}</p>` },
+
+    { heading: "MAIL TYPE 2 — DOSSIER DE CANDIDATURE", content: `
+<p><strong>À :</strong> name@email.com</p>
+<p><strong>Objet :</strong> Envoi du dossier de candidature et du programme de formation</p>
+<hr/>
+<p>Bonjour,</p>
+<p>Suite à notre échange téléphonique, je vous transmets ci-dessous le lien vers le dossier de candidature de la formation <strong>« ${f.intitule} »</strong> ainsi que le programme détaillé de la formation en pièce jointe.</p>
+<p>N'hésitez pas à revenir vers nous si vous avez la moindre question concernant votre inscription, le contenu de la formation ou les démarches à suivre. Nous restons à votre disposition pour vous accompagner dans votre projet.</p>
+<p>Au plaisir d'échanger de nouveau avec vous,</p>
+<p>Bien cordialement,</p>
+<p><strong>${signataire}</strong><br/>${o.nom}<br/>${o.telephone} – ${o.email}</p>` },
+
+    { heading: "MAIL TYPE 3 — RELANCE DOSSIER DE CANDIDATURE", content: `
+<p><strong>À :</strong> name@email.com</p>
+<p><strong>Objet :</strong> Relance concernant votre dossier de candidature</p>
+<hr/>
+<p>Bonjour,</p>
+<p>Sauf erreur de notre part, nous n'avons pas encore reçu votre dossier de candidature pour la formation <strong>« ${f.intitule} »</strong>.</p>
+<p>Si vous rencontrez la moindre difficulté pour le compléter ou si vous avez des questions concernant les pièces à fournir ou la procédure, n'hésitez surtout pas à nous contacter. Nous serons ravis de vous accompagner dans cette démarche.</p>
+<p>Dans l'attente de votre retour,</p>
+<p>Bien cordialement,</p>
+<p><strong>${signataire}</strong><br/>${o.nom}<br/>${o.telephone} – ${o.email}</p>` },
   ] });
 }
 
