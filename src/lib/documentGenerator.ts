@@ -3375,40 +3375,65 @@ function genDocumentsCertificateursCFA(o: OrganismeInfo, f: FormationInfo) {
 }
 
 function genSynopsisCFA(o: OrganismeInfo, f: FormationInfo) {
-  // Try to find RNCP data for this formation
   const rncp = getRNCPByCode(f.codeRNCP || '');
-  
+  const { totalHours } = parseDuree(f.duree);
+  const effectiveTotal = totalHours > 0 ? totalHours : (rncp ? parseInt(rncp.dureeIndicative) || 420 : 420);
+
+  // Rythme alternance
+  const rythme = f.rythmeAlternance || '1 semaine CFA / 3 semaines entreprise';
+
+  // Méthodes pédagogiques par bloc (variées)
+  const methodesSets = [
+    'Études de cas, jeux de rôle, ateliers prospection réelle, utilisation CRM, travail en sous-groupe',
+    'Ateliers de co-construction d\'offres, simulations de négociation filmées, analyse de cas réels, business game',
+    'Serious game management, mise en situation managériale, analyse de pratiques, retour d\'expérience',
+    'Ateliers pratiques sur poste informatique, travaux individuels et collectifs',
+  ];
+
   if (rncp && rncp.blocsCompetences.length > 0) {
-    // Dynamic synopsis from RNCP data
+    // Calculate total RNCP volume
+    const rncpTotalVolume = rncp.blocsCompetences.reduce((sum, bloc) =>
+      sum + bloc.matieres.reduce((s, m) => s + (parseInt(m.volume) || 0), 0), 0);
+    // Reserve ~15% for accompaniment
+    const accompHours = Math.round(effectiveTotal * 0.15);
+    const blocHoursTotal = effectiveTotal - accompHours;
+    // Scale factor
+    const scale = rncpTotalVolume > 0 ? blocHoursTotal / rncpTotalVolume : 1;
+
     const rows = rncp.blocsCompetences.map((bloc, i) => {
-      const contenus = bloc.matieres.map(m => `- ${m.contenu}`).join('<br>');
-      const volume = bloc.matieres.reduce((sum, m) => sum + parseInt(m.volume) || 0, 0);
-      const methodes = [
-        "Études de cas",
-        "Mises en situation professionnelle",
-        "Jeux de rôle",
-        "Ateliers pratiques",
-        "Travaux en sous-groupe",
-        "Analyse de cas réels d'entreprises"
-      ].slice(0, 4 + (i % 2)).join(', ');
+      const contenus = bloc.matieres.map(m => {
+        const scaledH = Math.round((parseInt(m.volume) || 0) * scale);
+        return `- ${m.contenu} <em>(${scaledH}h)</em>`;
+      }).join('<br>');
+      const volume = Math.round(bloc.matieres.reduce((s, m) => s + (parseInt(m.volume) || 0), 0) * scale);
+      const nbExercices = Math.max(2, Math.ceil(volume / 35));
       return `<tr>
         <td style="vertical-align:top"><strong>Bloc ${i + 1} – ${bloc.titre}</strong></td>
         <td style="vertical-align:top">${contenus}</td>
-        <td style="vertical-align:top">${bloc.modalitesEval}</td>
-        <td style="vertical-align:top;text-align:center">${volume} h</td>
-        <td style="vertical-align:top">${methodes}</td>
+        <td style="vertical-align:top">${bloc.modalitesEval}<br><br><strong>Exercices pratiques :</strong> ${nbExercices} exercices évalués (1 tous les ${Math.round(volume / nbExercices)}h)<br><strong>Évaluation en entreprise :</strong> livret d'alternance</td>
+        <td style="vertical-align:top;text-align:center"><strong>${volume} h</strong></td>
+        <td style="vertical-align:top">${methodesSets[i % methodesSets.length]}</td>
         <td style="vertical-align:top">Formateur expérimenté + tuteur en entreprise</td>
       </tr>`;
     });
 
-    // Add transversal row
-    rows.push(`<tr>
+    rows.push(`<tr style="background:#f0f4f8">
       <td style="vertical-align:top"><strong>Accompagnement individuel + Examens blancs + Jury final</strong></td>
       <td style="vertical-align:top">- Préparation personnalisée<br>- Entraînement aux épreuves<br>- Accompagnement projet professionnel</td>
       <td style="vertical-align:top">Examens blancs + entretien ex-post avec le jury professionnel</td>
-      <td style="vertical-align:top;text-align:center">70 h</td>
+      <td style="vertical-align:top;text-align:center"><strong>${accompHours} h</strong></td>
       <td style="vertical-align:top">Entretiens individuels, simulations jury, correction détaillée</td>
       <td style="vertical-align:top">Référent pédagogique + jury professionnel habilité</td>
+    </tr>`);
+
+    // Total row
+    const computedTotal = Math.round(rncp.blocsCompetences.reduce((s, bloc) =>
+      s + bloc.matieres.reduce((s2, m) => s2 + (parseInt(m.volume) || 0), 0) * scale, 0)) + accompHours;
+
+    rows.push(`<tr style="background:#1e3a7b;color:#fff;font-weight:bold">
+      <td colspan="3" style="text-align:right">TOTAL HEURES EN CENTRE DE FORMATION</td>
+      <td style="text-align:center">${computedTotal} h</td>
+      <td colspan="2"></td>
     </tr>`);
 
     const tableContent = `<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%">
@@ -3428,28 +3453,44 @@ function genSynopsisCFA(o: OrganismeInfo, f: FormationInfo) {
       title: "SYNOPSIS DE FORMATION",
       subtitle: f.intitule,
       sections: [
+        { heading: "Rythme d'alternance", content: `<p><strong>Rythme :</strong> ${rythme}</p><p><strong>Durée totale en centre :</strong> ${effectiveTotal} heures</p><p><strong>Certification visée :</strong> ${rncp.intitule} (${rncp.code})<br><strong>Niveau :</strong> ${rncp.niveau}<br><strong>Certificateur :</strong> ${rncp.certificateur}</p>` },
         { heading: "Tableau synoptique", content: tableContent },
-        { heading: "Certification visée", content: `<p><strong>Code RNCP :</strong> ${rncp.code}<br><strong>Intitulé :</strong> ${rncp.intitule}<br><strong>Niveau :</strong> ${rncp.niveau}<br><strong>Certificateur :</strong> ${rncp.certificateur}<br><strong>Durée indicative :</strong> ${rncp.dureeIndicative}</p>` },
       ],
     });
   }
 
-  // Fallback: generic synopsis with blank rows
+  // Fallback: generic synopsis — distribute hours across chapters
   const chapters = getCourseChapters(f.intitule);
   const nbBlocs = Math.max(2, Math.min(chapters.length, 5));
+  const accompHours = Math.round(effectiveTotal * 0.15);
+  const perBloc = Math.round((effectiveTotal - accompHours) / nbBlocs);
   const fallbackRows: string[] = [];
   for (let i = 0; i < nbBlocs; i++) {
     const ch = chapters[i];
     const contenus = ch ? ch.sections.slice(0, 4).map((s) => `- ${s.title}`).join('<br>') : '[À compléter]';
+    const nbExercices = Math.max(1, Math.ceil(perBloc / 35));
     fallbackRows.push(`<tr>
       <td style="vertical-align:top"><strong>${ch?.title || `Bloc ${i + 1}`}</strong></td>
       <td style="vertical-align:top">${contenus}</td>
-      <td style="vertical-align:top">[À compléter]</td>
-      <td style="vertical-align:top;text-align:center">[À compléter]</td>
-      <td style="vertical-align:top">Études de cas, mises en situation, travaux pratiques</td>
+      <td style="vertical-align:top">Mise en situation professionnelle + évaluation continue<br><strong>Exercices :</strong> ${nbExercices} exercices évalués<br><strong>Évaluation en entreprise :</strong> livret d'alternance</td>
+      <td style="vertical-align:top;text-align:center"><strong>${perBloc} h</strong></td>
+      <td style="vertical-align:top">${methodesSets[i % methodesSets.length]}</td>
       <td style="vertical-align:top">Formateur expérimenté + tuteur en entreprise</td>
     </tr>`);
   }
+  fallbackRows.push(`<tr style="background:#f0f4f8">
+    <td style="vertical-align:top"><strong>Accompagnement + Examens blancs</strong></td>
+    <td style="vertical-align:top">- Préparation personnalisée<br>- Entraînement aux épreuves</td>
+    <td style="vertical-align:top">Examens blancs + entretien jury</td>
+    <td style="vertical-align:top;text-align:center"><strong>${accompHours} h</strong></td>
+    <td style="vertical-align:top">Entretiens individuels, simulations jury</td>
+    <td style="vertical-align:top">Référent pédagogique</td>
+  </tr>`);
+  fallbackRows.push(`<tr style="background:#1e3a7b;color:#fff;font-weight:bold">
+    <td colspan="3" style="text-align:right">TOTAL HEURES EN CENTRE DE FORMATION</td>
+    <td style="text-align:center">${effectiveTotal} h</td>
+    <td colspan="2"></td>
+  </tr>`);
 
   const genericTable = `<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%">
     <tr style="background:#1e3a7b;color:#fff">
@@ -3468,6 +3509,7 @@ function genSynopsisCFA(o: OrganismeInfo, f: FormationInfo) {
     title: "SYNOPSIS DE FORMATION",
     subtitle: f.intitule,
     sections: [
+      { heading: "Rythme d'alternance", content: `<p><strong>Rythme :</strong> ${rythme}</p><p><strong>Durée totale en centre :</strong> ${effectiveTotal} heures</p>` },
       { heading: "Tableau synoptique", content: genericTable },
     ],
   });
