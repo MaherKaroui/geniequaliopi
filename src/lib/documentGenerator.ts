@@ -2869,27 +2869,30 @@ function genAttestationInscriptionCFAV2(o: OrganismeInfo, f: FormationInfo, stag
 
 function genFicheRenseignementCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = stagiaires[si] || stagiaires[0] || { prenom: "___", nom: "___", email: "", telephone: "", dateNaissance: "" } as StagiaireInfo;
+  const fill = (val: string | undefined) => val || "________________________";
+  const rqthVal = s.rqth === "oui" ? "☒ Oui  ☐ Non" : s.rqth === "non" ? "☐ Oui  ☒ Non" : "☐ Oui  ☐ Non";
+  const sexeVal = s.civilite === "M." ? "☒ M  ☐ F" : s.civilite === "Mme" ? "☐ M  ☒ F" : "☐ M  ☐ F";
   return buildDocument({ org: o, title: "FICHE DE RENSEIGNEMENT CANDIDAT", sections: [
     { heading: "", content: `
 ${tableHTML(["Champ", "Information"], [
-  ["Nom de naissance", s.nom || "________________________"],
-  ["Prénom", s.prenom || "________________________"],
+  ["Nom de naissance", fill(s.nom)],
+  ["Prénom", fill(s.prenom)],
   ["Date de naissance", s.dateNaissance ? formatDate(s.dateNaissance) : "________________________"],
-  ["NIR", "________________________"],
-  ["Sexe", s.civilite === "M." ? "M" : s.civilite === "Mme" ? "F" : "☐ M  ☐ F"],
-  ["Nationalité", "________________________"],
-  ["Adresse", "________________________"],
-  ["Code postal", "________________________"],
-  ["Commune", "________________________"],
-  ["Département de naissance", "________________________"],
-  ["Commune de naissance", "________________________"],
-  ["Téléphone", s.telephone || "________________________"],
-  ["Mail", s.email || "________________________"],
-  ["Diplôme le plus élevé obtenu", "________________________"],
-  ["RQTH", "☐ Oui  ☐ Non"],
+  ["NIR", fill(s.nir)],
+  ["Sexe", sexeVal],
+  ["Nationalité", fill(s.nationalite)],
+  ["Adresse", fill(s.adresse)],
+  ["Code postal", fill(s.codePostal)],
+  ["Commune", fill(s.commune)],
+  ["Département de naissance", fill(s.departementNaissance)],
+  ["Commune de naissance", fill(s.communeNaissance)],
+  ["Téléphone", fill(s.telephone)],
+  ["Mail", fill(s.email)],
+  ["Diplôme le plus élevé obtenu", fill(s.diplome)],
+  ["RQTH", rqthVal],
 ])}
 <p style="margin-top:15px"><strong>Formation visée :</strong> ${f.intitule}</p>
-<p><strong>Entreprise d'accueil :</strong> ${s.entreprise || "________________________"}</p>` },
+<p><strong>Entreprise d'accueil :</strong> ${fill(s.entreprise)}</p>` },
   ] });
 }
 

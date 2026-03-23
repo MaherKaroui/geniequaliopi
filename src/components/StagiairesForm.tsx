@@ -11,7 +11,8 @@ interface StagiairesFormProps {
 }
 
 const emptyStagiaire: StagiaireInfo = {
-  civilite: "", nom: "", prenom: "", email: "", telephone: "", entreprise: "", responsableEntreprise: "", signatureResponsableUrl: "", poste: "", dateNaissance: "", dateDebutFormation: "", dateFinFormation: "", tarifFormation: "", signatureUrl: ""
+  civilite: "", nom: "", prenom: "", email: "", telephone: "", entreprise: "", responsableEntreprise: "", signatureResponsableUrl: "", poste: "", dateNaissance: "", dateDebutFormation: "", dateFinFormation: "", tarifFormation: "", signatureUrl: "",
+  adresse: "", codePostal: "", commune: "", nationalite: "", nir: "", departementNaissance: "", communeNaissance: "", diplome: "", rqth: "",
 };
 
 const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
@@ -86,12 +87,60 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
               <Input value={stagiaire.prenom} onChange={e => updateStagiaire(index, 'prenom', e.target.value)} placeholder="Prénom" />
             </div>
             <div>
+              <Label>Date de naissance</Label>
+              <Input type="date" value={stagiaire.dateNaissance} onChange={e => updateStagiaire(index, 'dateNaissance', e.target.value)} />
+            </div>
+            <div>
               <Label>Email</Label>
               <Input value={stagiaire.email} onChange={e => updateStagiaire(index, 'email', e.target.value)} placeholder="email@exemple.fr" />
             </div>
             <div>
               <Label>Téléphone</Label>
               <Input value={stagiaire.telephone} onChange={e => updateStagiaire(index, 'telephone', e.target.value)} placeholder="06..." />
+            </div>
+            <div>
+              <Label>Nationalité</Label>
+              <Input value={stagiaire.nationalite || ""} onChange={e => updateStagiaire(index, 'nationalite', e.target.value)} placeholder="Française" />
+            </div>
+            <div>
+              <Label>NIR (n° sécu)</Label>
+              <Input value={stagiaire.nir || ""} onChange={e => updateStagiaire(index, 'nir', e.target.value)} placeholder="1 XX XX XX XXX XXX XX" />
+            </div>
+            <div className="md:col-span-2">
+              <Label>Adresse</Label>
+              <Input value={stagiaire.adresse || ""} onChange={e => updateStagiaire(index, 'adresse', e.target.value)} placeholder="12 rue de la Paix" />
+            </div>
+            <div>
+              <Label>Code postal</Label>
+              <Input value={stagiaire.codePostal || ""} onChange={e => updateStagiaire(index, 'codePostal', e.target.value)} placeholder="75001" />
+            </div>
+            <div>
+              <Label>Commune</Label>
+              <Input value={stagiaire.commune || ""} onChange={e => updateStagiaire(index, 'commune', e.target.value)} placeholder="Paris" />
+            </div>
+            <div>
+              <Label>Département de naissance</Label>
+              <Input value={stagiaire.departementNaissance || ""} onChange={e => updateStagiaire(index, 'departementNaissance', e.target.value)} placeholder="75" />
+            </div>
+            <div>
+              <Label>Commune de naissance</Label>
+              <Input value={stagiaire.communeNaissance || ""} onChange={e => updateStagiaire(index, 'communeNaissance', e.target.value)} placeholder="Paris" />
+            </div>
+            <div>
+              <Label>Diplôme le plus élevé</Label>
+              <Input value={stagiaire.diplome || ""} onChange={e => updateStagiaire(index, 'diplome', e.target.value)} placeholder="Baccalauréat, BTS..." />
+            </div>
+            <div>
+              <Label>RQTH</Label>
+              <select
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                value={stagiaire.rqth || ""}
+                onChange={e => updateStagiaire(index, 'rqth', e.target.value)}
+              >
+                <option value="">—</option>
+                <option value="oui">Oui</option>
+                <option value="non">Non</option>
+              </select>
             </div>
             <div>
               <Label>Entreprise</Label>
