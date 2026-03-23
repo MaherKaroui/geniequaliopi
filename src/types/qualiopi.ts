@@ -86,6 +86,7 @@ export interface FormationInfo {
   nombreParticipants: string;
   formateur: string;
   codeRNCP?: string;
+  rythmeAlternance?: string;
 }
 
 export interface IndicateurData {
