@@ -2868,31 +2868,28 @@ function genAttestationInscriptionCFAV2(o: OrganismeInfo, f: FormationInfo, stag
 }
 
 function genFicheRenseignementCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
-  const s = stagiaires[si] || stagiaires[0] || { prenom: "___", nom: "___", email: "", telephone: "", dateNaissance: "" } as StagiaireInfo;
-  const fill = (val: string | undefined) => val || "________________________";
-  const rqthVal = s.rqth === "oui" ? "☒ Oui  ☐ Non" : s.rqth === "non" ? "☐ Oui  ☒ Non" : "☐ Oui  ☐ Non";
-  const sexeVal = s.civilite === "M." ? "☒ M  ☐ F" : s.civilite === "Mme" ? "☐ M  ☒ F" : "☐ M  ☐ F";
+  const blank = "________________________";
   return buildDocument({ org: o, title: "FICHE DE RENSEIGNEMENT CANDIDAT", sections: [
     { heading: "", content: `
 ${tableHTML(["Champ", "Information"], [
-  ["Nom de naissance", fill(s.nom)],
-  ["Prénom", fill(s.prenom)],
-  ["Date de naissance", s.dateNaissance ? formatDate(s.dateNaissance) : "________________________"],
-  ["NIR", fill(s.nir)],
-  ["Sexe", sexeVal],
-  ["Nationalité", fill(s.nationalite)],
-  ["Adresse", fill(s.adresse)],
-  ["Code postal", fill(s.codePostal)],
-  ["Commune", fill(s.commune)],
-  ["Département de naissance", fill(s.departementNaissance)],
-  ["Commune de naissance", fill(s.communeNaissance)],
-  ["Téléphone", fill(s.telephone)],
-  ["Mail", fill(s.email)],
-  ["Diplôme le plus élevé obtenu", fill(s.diplome)],
-  ["RQTH", rqthVal],
+  ["Nom de naissance", blank],
+  ["Prénom", blank],
+  ["Date de naissance", blank],
+  ["NIR", blank],
+  ["Sexe", "☐ M  ☐ F"],
+  ["Nationalité", blank],
+  ["Adresse", blank],
+  ["Code postal", blank],
+  ["Commune", blank],
+  ["Département de naissance", blank],
+  ["Commune de naissance", blank],
+  ["Téléphone", blank],
+  ["Mail", blank],
+  ["Diplôme le plus élevé obtenu", blank],
+  ["RQTH", "☐ Oui  ☐ Non"],
 ])}
 <p style="margin-top:15px"><strong>Formation visée :</strong> ${f.intitule}</p>
-<p><strong>Entreprise d'accueil :</strong> ${fill(s.entreprise)}</p>` },
+<p><strong>Entreprise d'accueil :</strong> ${blank}</p>` },
   ] });
 }
 
