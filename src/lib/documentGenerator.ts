@@ -2909,27 +2909,27 @@ ${tableHTML(["Champ", "Information"], [
 ])}` },
     { heading: "2. PRÉSENTATION ET MOTIVATION DU CANDIDAT", content: `
 ${tableHTML(["Question", "Éléments observés / Réponses du candidat", "Appréciation"], [
-  ["Pouvez-vous vous présenter brièvement ?", "", "☐ Très satisfaisant  ☐ Satisfaisant  ☐ À renforcer"],
-  ["Pourquoi souhaitez-vous suivre cette formation ?", "", "☐ Très satisfaisant  ☐ Satisfaisant  ☐ À renforcer"],
-  ["Que savez-vous du métier visé ?", "", "☐ Très satisfaisant  ☐ Satisfaisant  ☐ À renforcer"],
-  ["Quels sont vos objectifs professionnels à moyen terme ?", "", "☐ Très satisfaisant  ☐ Satisfaisant  ☐ À renforcer"],
-  ["Pourquoi l'alternance vous semble adaptée ?", "", "☐ Très satisfaisant  ☐ Satisfaisant  ☐ À renforcer"],
+  ["Pouvez-vous vous présenter brièvement ?", "", "☐ Très satisfaisant<br/>☐ Satisfaisant<br/>☐ À renforcer"],
+  ["Pourquoi souhaitez-vous suivre cette formation ?", "", "☐ Très satisfaisant<br/>☐ Satisfaisant<br/>☐ À renforcer"],
+  ["Que savez-vous du métier visé ?", "", "☐ Très satisfaisant<br/>☐ Satisfaisant<br/>☐ À renforcer"],
+  ["Quels sont vos objectifs professionnels à moyen terme ?", "", "☐ Très satisfaisant<br/>☐ Satisfaisant<br/>☐ À renforcer"],
+  ["Pourquoi l'alternance vous semble adaptée ?", "", "☐ Très satisfaisant<br/>☐ Satisfaisant<br/>☐ À renforcer"],
 ])}` },
     { heading: "3. ÉVALUATION DU SAVOIR-ÊTRE ET DE LA POSTURE PROFESSIONNELLE", content: `
 ${tableHTML(["Critère observé", "Observation du recruteur", "Évaluation"], [
-  ["Tenue, posture, présentation", "", "☐ Très satisfaisant  ☐ Satisfaisant  ☐ À renforcer"],
-  ["Expression orale et clarté du discours", "", "☐ Très satisfaisant  ☐ Satisfaisant  ☐ À renforcer"],
-  ["Écoute et reformulation", "", "☐ Très satisfaisant  ☐ Satisfaisant  ☐ À renforcer"],
-  ["Motivation et implication perçue", "", "☐ Très satisfaisant  ☐ Satisfaisant  ☐ À renforcer"],
-  ["Attitude professionnelle / politesse / ponctualité", "", "☐ Très satisfaisant  ☐ Satisfaisant  ☐ À renforcer"],
+  ["Tenue, posture, présentation", "", "☐ Très satisfaisant<br/>☐ Satisfaisant<br/>☐ À renforcer"],
+  ["Expression orale et clarté du discours", "", "☐ Très satisfaisant<br/>☐ Satisfaisant<br/>☐ À renforcer"],
+  ["Écoute et reformulation", "", "☐ Très satisfaisant<br/>☐ Satisfaisant<br/>☐ À renforcer"],
+  ["Motivation et implication perçue", "", "☐ Très satisfaisant<br/>☐ Satisfaisant<br/>☐ À renforcer"],
+  ["Attitude professionnelle / politesse / ponctualité", "", "☐ Très satisfaisant<br/>☐ Satisfaisant<br/>☐ À renforcer"],
 ])}` },
     { heading: "4. ÉVALUATION DES COMPÉTENCES ET PRÉREQUIS", content: `
 ${tableHTML(["Domaine", "Éléments évalués", "Appréciation"], [
-  ["Français écrit et oral", "Expression claire, orthographe, compréhension des consignes", "☐ Très satisfaisant  ☐ Satisfaisant  ☐ À renforcer"],
-  ["Bureautique", "Connaissance de Word, Excel, messagerie électronique", "☐ Très satisfaisant  ☐ Satisfaisant  ☐ À renforcer"],
-  ["Organisation / rigueur", "Capacité à hiérarchiser les priorités", "☐ Très satisfaisant  ☐ Satisfaisant  ☐ À renforcer"],
-  ["Relationnel", "Aisance relationnelle, écoute, respect du secret professionnel", "☐ Très satisfaisant  ☐ Satisfaisant  ☐ À renforcer"],
-  ["Connaissance du secteur", "Sensibilité au secteur visé, empathie", "☐ Très satisfaisant  ☐ Satisfaisant  ☐ À renforcer"],
+  ["Français écrit et oral", "Expression claire, orthographe, compréhension des consignes", "☐ Très satisfaisant<br/>☐ Satisfaisant<br/>☐ À renforcer"],
+  ["Bureautique", "Connaissance de Word, Excel, messagerie électronique", "☐ Très satisfaisant<br/>☐ Satisfaisant<br/>☐ À renforcer"],
+  ["Organisation / rigueur", "Capacité à hiérarchiser les priorités", "☐ Très satisfaisant<br/>☐ Satisfaisant<br/>☐ À renforcer"],
+  ["Relationnel", "Aisance relationnelle, écoute, respect du secret professionnel", "☐ Très satisfaisant<br/>☐ Satisfaisant<br/>☐ À renforcer"],
+  ["Connaissance du secteur", "Sensibilité au secteur visé, empathie", "☐ Très satisfaisant<br/>☐ Satisfaisant<br/>☐ À renforcer"],
 ])}` },
     { heading: "5. PROJET PROFESSIONNEL", content: `
 ${tableHTML(["Question", "Réponse / Observation"], [
@@ -2943,7 +2943,7 @@ ${tableHTML(["Élément", "Commentaire / Observation"], [
   ["Points forts du candidat", ""],
   ["Points de vigilance / axes d'amélioration", ""],
   ["Recommandations pédagogiques", ""],
-  ["Avis final", "☐ Favorable  ☐ Favorable avec réserves  ☐ Défavorable"],
+  ["Avis final", "☐ Favorable<br/>☐ Favorable avec réserves<br/>☐ Défavorable"],
 ])}` },
   ] });
 }
