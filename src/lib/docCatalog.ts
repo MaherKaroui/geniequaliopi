@@ -276,7 +276,7 @@ export function buildFullCatalog(
     add("cfa_c2i5_documents_certificateurs", "CT2 - IND 5 DOCUMENTS CERTIFICATEURS CFA", 2, 5, "documents_certificateurs_cfa");
     add("cfa_c2i5_synopsis", "CT2 - IND 5 SYNOPSIS DE FORMATION", 2, 5, "synopsis_cfa");
     // Si formation NTC → ajouter le REAC
-    if (formations.some(f => f.intitule?.toLowerCase().includes('ntc') || f.intitule?.toLowerCase().includes('négociateur technico-commercial') || f.intitule?.toLowerCase().includes('negociateur technico'))) {
+    if (formations.some(f => f.codeRNCP?.toUpperCase() === 'RNCP39063' || f.intitule?.toLowerCase().includes('ntc') || f.intitule?.toLowerCase().includes('négociateur technico-commercial') || f.intitule?.toLowerCase().includes('negociateur technico'))) {
       add("cfa_c2i5_reac_ntc", "CT2 - IND 5 RÉFÉRENTIEL REAC – NÉGOCIATEUR TECHNICO-COMMERCIAL", 2, 5, "pdf_static", { pdfFile: "referentiel_reac_ntc.pdf" });
     }
 
