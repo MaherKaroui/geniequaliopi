@@ -1743,7 +1743,7 @@ function genExercicesPratiques(o: OrganismeInfo, f: FormationInfo, stagiaires: S
 // ===== NEW: QCM Final rempli =====
 function genQCMFinal(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const evalData = getEvalContent(f.intitule);
-  const questions = evalData.qcmPositionnementFinal;
+  const questions = evalData.qcmFinal;
   let extra = `<h2>QCM FINAL – ÉVALUATION SOMMATIVE</h2>`;
   extra += `<p><strong>Formation :</strong> ${f.intitule}<br><strong>Date :</strong> ${formatDate(f.dateFin)}<br><strong>Nombre de questions :</strong> ${questions.length}<br><strong>Durée :</strong> 45 minutes<br><strong>Seuil de validation :</strong> 6/${questions.length} (60%)</p>`;
 
@@ -5662,7 +5662,7 @@ function genExamenBlancCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiair
     extra += `<p><strong>Certification visée :</strong> ${rncp.intitule} (${rncp.code})</p>`;
 
     extra += `<h3>PARTIE 1 — ÉPREUVE ÉCRITE (QCM)</h3>`;
-    const questions = evalData.qcmPositionnement;
+    const questions = evalData.qcmFinal;
     const answers = termine ? generateStagiaireAnswers(questions, si) : [];
 
     questions.forEach((q, qi) => {
@@ -5738,7 +5738,7 @@ function genExamenBlancCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiair
     }
   } else {
     extra += `<h3>PARTIE 1 — QCM</h3>`;
-    evalData.qcmPositionnement.forEach((q, qi) => {
+    evalData.qcmFinal.forEach((q, qi) => {
       extra += `<p><strong>${qi + 1}. ${q.question}</strong></p><ul>`;
       q.options.forEach((opt, oi) => { extra += `<li>${String.fromCharCode(65 + oi)}) ${opt} &#9744;</li>`; });
       extra += `</ul>`;
