@@ -80,9 +80,55 @@ export function genGrilleAnalyseNiveauInitial(o: OrganismeInfo, f: FormationInfo
 }
 
 export function genDeroulePedagogique(o: OrganismeInfo, f: FormationInfo) {
-  const jours = f.programme.split("\n").filter(l => l.trim());
-  const totalH = parseInt(f.duree) || (jours.length * 7);
-  const hParJour = jours.length > 0 ? totalH / jours.length : 7;
+  // ── Determine number of days from duree field ──
+  const heuresMatch = f.duree.match(/(\d+)\s*h/i);
+  const joursMatch = f.duree.match(/(\d+)\s*jours?/i);
+  const totalH = heuresMatch ? parseInt(heuresMatch[1]) : 14;
+  const nbJours = joursMatch ? parseInt(joursMatch[1]) : Math.ceil(totalH / 7);
+  const hParJour = totalH / nbJours;
+
+  // ── Build day topics from programme + objectifs ──
+  const programmeLines = f.programme ? f.programme.split("\n").map(l => l.trim()).filter(l => l.length > 3) : [];
+  const objectifsItems = f.objectifs
+    ? f.objectifs.split(/\n|\.(?=\s)/).map(l => l.trim().replace(/^[-•*]\s*/, "").replace(/^À l'issue.*capable de\s*:?\s*/i, "")).filter(l => l.length > 5)
+    : [];
+
+  const explicitDayLines = programmeLines.filter(l => /^(Jour|Module)\s+\d+/i.test(l));
+  const contentLines = programmeLines
+    .filter(l => !/^(Jour|Module)\s+\d+/i.test(l))
+    .map(l => l.replace(/^[-•*]\s*/, "").trim())
+    .filter(l => l.length > 3);
+
+  const allTopics = [...contentLines];
+  for (const obj of objectifsItems) {
+    if (!allTopics.some(t => t.toLowerCase().includes(obj.toLowerCase().slice(0, 20)))) {
+      allTopics.push(obj);
+    }
+  }
+
+  const fillers = [
+    `Fondamentaux`, `Approfondissement`, `Techniques avancées`,
+    `Mise en pratique`, `Exercices pratiques`, `Études de cas`,
+    `Consolidation des acquis`, `Méthodologie`, `Synthèse`, `Atelier pratique`,
+  ];
+
+  // Build topics for each day
+  const topicsPerDay = Math.max(1, Math.ceil(allTopics.length / nbJours));
+  const dayTopicsList: string[][] = [];
+
+  for (let d = 0; d < nbJours; d++) {
+    if (d < explicitDayLines.length) {
+      const label = explicitDayLines[d].replace(/^(Jour|Module)\s*\d+\s*[:\-–]\s*/i, '').trim();
+      dayTopicsList.push(label.split(/[,;–—-]+/).map(t => t.trim()).filter(Boolean));
+    } else {
+      const slice = allTopics.slice(d * topicsPerDay, (d + 1) * topicsPerDay);
+      if (slice.length > 0) {
+        dayTopicsList.push(slice.map(s => s.split(/[,;–—-]+/).map(t => t.trim()).filter(Boolean)).flat().slice(0, 4));
+      } else {
+        dayTopicsList.push([fillers[d % fillers.length]]);
+      }
+    }
+  }
 
   const methodesPool = [
     "Démonstration + exercices pratiques",
@@ -115,12 +161,13 @@ export function genDeroulePedagogique(o: OrganismeInfo, f: FormationInfo) {
 
   // Build detailed sequences per day
   const allRows: string[][] = [];
-  jours.forEach((j, jourIdx) => {
-    const jourTitle = j.replace(/^Jour \d+ :\s*/i, '').replace(/^Module \d+ :\s*/i, '');
-    const themes = jourTitle.split(/[,;–—-]+/).map(t => t.trim()).filter(Boolean);
-    
+  for (let jourIdx = 0; jourIdx < nbJours; jourIdx++) {
+    const themes = dayTopicsList[jourIdx];
+    const isFirstDay = jourIdx === 0;
+    const isLastDay = jourIdx === nbJours - 1;
+
     // First sequence: accueil on day 1
-    if (jourIdx === 0) {
+    if (isFirstDay) {
       allRows.push([
         "Accueil & présentation", "0h30",
         "Comprendre les objectifs et le cadre de la formation",
@@ -130,17 +177,18 @@ export function genDeroulePedagogique(o: OrganismeInfo, f: FormationInfo) {
       ]);
       allRows.push([
         "Positionnement & introduction", "1h00",
-        `Évaluer le niveau initial sur ${themes[0] || jourTitle}`,
-        `Test de positionnement, introduction aux concepts de ${themes[0] || jourTitle}`,
+        `Évaluer le niveau initial sur ${themes[0] || f.intitule}`,
+        `Test de positionnement, introduction aux concepts de ${themes[0] || f.intitule}`,
         methodesPool[1], outilsPool, evalPool[0], adaptPool[0]
       ]);
     }
 
     // Generate sequences from themes
     const seqCount = Math.max(themes.length, 2);
-    const hPerSeq = jourIdx === 0
-      ? Math.round(((hParJour - 1.5) / seqCount) * 4) / 4
-      : Math.round((hParJour / seqCount) * 4) / 4;
+    const fixedH = isFirstDay ? 1.5 : 0;
+    const fixedEnd = isLastDay ? 1.5 : 0;
+    const contentH = hParJour - fixedH - fixedEnd;
+    const hPerSeq = Math.round((contentH / seqCount) * 4) / 4;
     const hLabel = `${Math.floor(hPerSeq)}h${(hPerSeq % 1) * 60 > 0 ? String(Math.round((hPerSeq % 1) * 60)).padStart(2, '0') : '00'}`;
 
     themes.forEach((theme, ti) => {
@@ -158,7 +206,7 @@ export function genDeroulePedagogique(o: OrganismeInfo, f: FormationInfo) {
     });
 
     // Last day: add bilan & evaluation
-    if (jourIdx === jours.length - 1) {
+    if (isLastDay) {
       allRows.push([
         "Évaluation finale", "1h00",
         "Vérifier l'acquisition des compétences",
@@ -176,10 +224,10 @@ export function genDeroulePedagogique(o: OrganismeInfo, f: FormationInfo) {
     }
 
     // Add page break between days (except last)
-    if (jourIdx < jours.length - 1) {
+    if (jourIdx < nbJours - 1) {
       allRows.push(["__PAGE_BREAK__"]);
     }
-  });
+  }
 
   // Build table HTML manually to support page breaks between days
   const headers = ["Séquence", "Durée", "Objectif pédagogique", "Contenus abordés", "Méthodes & activités", "Outils / supports", "Évaluation", "Adaptations"];
