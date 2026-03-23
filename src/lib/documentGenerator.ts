@@ -368,6 +368,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "logs_connexion_cfa": return genRapportConnexion(o, f, stagiaires);
     case "boite_formateur_cfa": return genBoiteFormateur(o, f);
     case "documents_certificateurs_cfa": return genDocumentsCertificateursCFA(o, f);
+    case "synopsis_cfa": return genSynopsisCFA(o, f);
     case "book_qualiopi": {
       const allFormations = [f];
       const allStagiaires = mergeStagiaires(stagiaires);
@@ -3371,6 +3372,105 @@ function genDocumentsCertificateursCFA(o: OrganismeInfo, f: FormationInfo) {
     { heading: "Modalités d'évaluation", content: "<p>• Épreuves écrites ponctuelles<br>• Évaluations en cours de formation (CCF)<br>• Épreuves pratiques<br>• Soutenance de dossier professionnel<br>• Évaluation en entreprise par le maître d'apprentissage</p>" },
     { heading: "Prérequis d'accès à la certification", content: "<p>• Avoir suivi l'intégralité du parcours de formation<br>• Avoir validé les évaluations en cours de formation<br>• Avoir réalisé la totalité des heures en entreprise<br>• Être à jour de l'assiduité</p>", variant: "green" },
   ] });
+}
+
+function genSynopsisCFA(o: OrganismeInfo, f: FormationInfo) {
+  // Try to find RNCP data for this formation
+  const rncp = getRNCPByCode(f.codeRNCP || '');
+  
+  if (rncp && rncp.blocsCompetences.length > 0) {
+    // Dynamic synopsis from RNCP data
+    const rows = rncp.blocsCompetences.map((bloc, i) => {
+      const contenus = bloc.matieres.map(m => `- ${m.contenu}`).join('<br>');
+      const volume = bloc.matieres.reduce((sum, m) => sum + parseInt(m.volume) || 0, 0);
+      const methodes = [
+        "Études de cas",
+        "Mises en situation professionnelle",
+        "Jeux de rôle",
+        "Ateliers pratiques",
+        "Travaux en sous-groupe",
+        "Analyse de cas réels d'entreprises"
+      ].slice(0, 4 + (i % 2)).join(', ');
+      return `<tr>
+        <td style="vertical-align:top"><strong>Bloc ${i + 1} – ${bloc.titre}</strong></td>
+        <td style="vertical-align:top">${contenus}</td>
+        <td style="vertical-align:top">${bloc.modalitesEval}</td>
+        <td style="vertical-align:top;text-align:center">${volume} h</td>
+        <td style="vertical-align:top">${methodes}</td>
+        <td style="vertical-align:top">Formateur expérimenté + tuteur en entreprise</td>
+      </tr>`;
+    });
+
+    // Add transversal row
+    rows.push(`<tr>
+      <td style="vertical-align:top"><strong>Accompagnement individuel + Examens blancs + Jury final</strong></td>
+      <td style="vertical-align:top">- Préparation personnalisée<br>- Entraînement aux épreuves<br>- Accompagnement projet professionnel</td>
+      <td style="vertical-align:top">Examens blancs + entretien ex-post avec le jury professionnel</td>
+      <td style="vertical-align:top;text-align:center">70 h</td>
+      <td style="vertical-align:top">Entretiens individuels, simulations jury, correction détaillée</td>
+      <td style="vertical-align:top">Référent pédagogique + jury professionnel habilité</td>
+    </tr>`);
+
+    const tableContent = `<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%">
+      <tr style="background:#1e3a7b;color:#fff">
+        <th>Bloc de compétences (${rncp.code})</th>
+        <th>Contenus de formation principaux</th>
+        <th>Modalités d'évaluation</th>
+        <th>Durée (heures)</th>
+        <th>Méthodes pédagogiques</th>
+        <th>Formateur / Alternance</th>
+      </tr>
+      ${rows.join('')}
+    </table>`;
+
+    return buildDocument({
+      org: o,
+      title: "SYNOPSIS DE FORMATION",
+      subtitle: f.intitule,
+      sections: [
+        { heading: "Tableau synoptique", content: tableContent },
+        { heading: "Certification visée", content: `<p><strong>Code RNCP :</strong> ${rncp.code}<br><strong>Intitulé :</strong> ${rncp.intitule}<br><strong>Niveau :</strong> ${rncp.niveau}<br><strong>Certificateur :</strong> ${rncp.certificateur}<br><strong>Durée indicative :</strong> ${rncp.dureeIndicative}</p>` },
+      ],
+    });
+  }
+
+  // Fallback: generic synopsis with blank rows
+  const chapters = getCourseChapters(f.intitule);
+  const nbBlocs = Math.max(2, Math.min(chapters.length, 5));
+  const fallbackRows: string[] = [];
+  for (let i = 0; i < nbBlocs; i++) {
+    const ch = chapters[i];
+    const contenus = ch ? ch.sections.slice(0, 4).map((s) => `- ${s.title}`).join('<br>') : '[À compléter]';
+    fallbackRows.push(`<tr>
+      <td style="vertical-align:top"><strong>${ch?.title || `Bloc ${i + 1}`}</strong></td>
+      <td style="vertical-align:top">${contenus}</td>
+      <td style="vertical-align:top">[À compléter]</td>
+      <td style="vertical-align:top;text-align:center">[À compléter]</td>
+      <td style="vertical-align:top">Études de cas, mises en situation, travaux pratiques</td>
+      <td style="vertical-align:top">Formateur expérimenté + tuteur en entreprise</td>
+    </tr>`);
+  }
+
+  const genericTable = `<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%">
+    <tr style="background:#1e3a7b;color:#fff">
+      <th>Bloc de compétences</th>
+      <th>Contenus de formation principaux</th>
+      <th>Modalités d'évaluation</th>
+      <th>Durée (heures)</th>
+      <th>Méthodes pédagogiques</th>
+      <th>Formateur / Alternance</th>
+    </tr>
+    ${fallbackRows.join('')}
+  </table>`;
+
+  return buildDocument({
+    org: o,
+    title: "SYNOPSIS DE FORMATION",
+    subtitle: f.intitule,
+    sections: [
+      { heading: "Tableau synoptique", content: genericTable },
+    ],
+  });
 }
 
 // ============== TEMPLATES SELECT FORMATION ==============
