@@ -2960,6 +2960,45 @@ function genProcedureMissionsEntrepriseCFA(o: OrganismeInfo, f: FormationInfo) {
   ] });
 }
 
+function genMailTypeCandidatCFA(o: OrganismeInfo, f: FormationInfo) {
+  const signataire = o.responsablePedagogique || o.dirigeant || "[Votre prénom et nom]";
+  return buildDocument({ org: o, title: "MAIL TYPES CANDIDAT", sections: [
+    { heading: "MAIL TYPE 1 — DEMANDE DE RENSEIGNEMENT", content: `
+<p><strong>À :</strong> name@email.com</p>
+<p><strong>Objet :</strong> Proposition d'entretien téléphonique à la suite de votre demande d'information</p>
+<hr/>
+<p>Bonjour,</p>
+<p>Nous vous remercions pour l'intérêt que vous portez à notre formation <strong>« ${f.intitule} »</strong>.</p>
+<p>Afin de mieux comprendre votre parcours, vos attentes et votre projet professionnel, nous vous proposons un entretien téléphonique. Cet échange nous permettra de vous présenter plus en détail le contenu de la formation, les modalités d'inscription ainsi que les possibilités d'accompagnement dont vous pouvez bénéficier.</p>
+<p>Seriez-vous disponible le <strong>(date et heure proposées)</strong> pour cet entretien ? Si ce créneau ne vous convient pas, n'hésitez pas à nous indiquer vos disponibilités, nous nous adapterons avec plaisir.</p>
+<p>Dans l'attente de votre réponse, je vous souhaite une excellente journée.</p>
+<p>Bien cordialement,</p>
+<p><strong>${signataire}</strong><br/>${o.nom}<br/>${o.telephone} – ${o.email}</p>` },
+
+    { heading: "MAIL TYPE 2 — DOSSIER DE CANDIDATURE", content: `
+<p><strong>À :</strong> name@email.com</p>
+<p><strong>Objet :</strong> Envoi du dossier de candidature et du programme de formation</p>
+<hr/>
+<p>Bonjour,</p>
+<p>Suite à notre échange téléphonique, je vous transmets ci-dessous le lien vers le dossier de candidature de la formation <strong>« ${f.intitule} »</strong> ainsi que le programme détaillé de la formation en pièce jointe.</p>
+<p>N'hésitez pas à revenir vers nous si vous avez la moindre question concernant votre inscription, le contenu de la formation ou les démarches à suivre. Nous restons à votre disposition pour vous accompagner dans votre projet.</p>
+<p>Au plaisir d'échanger de nouveau avec vous,</p>
+<p>Bien cordialement,</p>
+<p><strong>${signataire}</strong><br/>${o.nom}<br/>${o.telephone} – ${o.email}</p>` },
+
+    { heading: "MAIL TYPE 3 — RELANCE DOSSIER DE CANDIDATURE", content: `
+<p><strong>À :</strong> name@email.com</p>
+<p><strong>Objet :</strong> Relance concernant votre dossier de candidature</p>
+<hr/>
+<p>Bonjour,</p>
+<p>Sauf erreur de notre part, nous n'avons pas encore reçu votre dossier de candidature pour la formation <strong>« ${f.intitule} »</strong>.</p>
+<p>Si vous rencontrez la moindre difficulté pour le compléter ou si vous avez des questions concernant les pièces à fournir ou la procédure, n'hésitez surtout pas à nous contacter. Nous serons ravis de vous accompagner dans cette démarche.</p>
+<p>Dans l'attente de votre retour,</p>
+<p>Bien cordialement,</p>
+<p><strong>${signataire}</strong><br/>${o.nom}<br/>${o.telephone} – ${o.email}</p>` },
+  ] });
+}
+
 // ============== CFA IND 5 — CONVENTION ET LIVRET ==============
 
 function genConventionFormationCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
