@@ -2847,7 +2847,7 @@ function genAttestationInscriptionCFAV2(o: OrganismeInfo, f: FormationInfo, stag
   const dateDebut = formatDate(getStagiaireDateDebut(s, f));
   const dateFin = formatDate(getStagiaireDateFin(s, f));
   const dateConvention = f.dateDebut ? formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || f.dateDebut, 15)) : "________________________";
-  return buildDocument({ org: o, title: "ATTESTATION D'INSCRIPTION", docRef: `ATTEST-FORM-01-${o.version || "V1"}-${new Date().getFullYear()}`, sections: [
+  return buildDocument({ org: o, title: "ATTESTATION D'INSCRIPTION", sections: [
     { heading: "", content: `<p style="margin-top:20px">Je soussigné(e), <strong>${o.nom}</strong>, agissant en qualité du Centre de Formation par Apprentissage, atteste par la présente que :</p>
 <p style="text-align:center;font-size:15px;font-weight:bold;margin:20px 0">Nom et prénom de l'alternant(e) : ${s.prenom} ${s.nom}</p>
 <p style="text-align:center">Date de naissance : ${s.dateNaissance ? formatDate(s.dateNaissance) : "________________________"}</p>
@@ -2869,7 +2869,7 @@ function genAttestationInscriptionCFAV2(o: OrganismeInfo, f: FormationInfo, stag
 
 function genFicheRenseignementCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = stagiaires[si] || stagiaires[0] || { prenom: "___", nom: "___", email: "", telephone: "", dateNaissance: "" } as StagiaireInfo;
-  return buildDocument({ org: o, title: "FICHE DE RENSEIGNEMENT CANDIDAT", docRef: `FICHE-FORM-01-${o.version || "V1"}-${new Date().getFullYear()}`, sections: [
+  return buildDocument({ org: o, title: "FICHE DE RENSEIGNEMENT CANDIDAT", sections: [
     { heading: "", content: `
 ${tableHTML(["Champ", "Information"], [
   ["Nom de naissance", s.nom || "________________________"],
@@ -2894,7 +2894,7 @@ ${tableHTML(["Champ", "Information"], [
 }
 
 function genGrilleEntretienCandidatCFA(o: OrganismeInfo, f: FormationInfo) {
-  return buildDocument({ org: o, title: "GRILLE D'ENTRETIEN INDIVIDUEL – CANDIDAT À LA FORMATION", docRef: `DOC-GRILLE-01-${o.version || "V1"}-${new Date().getFullYear()}`, sections: [
+  return buildDocument({ org: o, title: "GRILLE D'ENTRETIEN INDIVIDUEL – CANDIDAT À LA FORMATION", sections: [
     { heading: "", content: `<p><strong>Formation choisie :</strong> ${f.intitule}</p>` },
     { heading: "1. INFORMATIONS GÉNÉRALES", content: `
 ${tableHTML(["Champ", "Information"], [
@@ -2949,7 +2949,7 @@ ${tableHTML(["Élément", "Commentaire / Observation"], [
 }
 
 function genProcedureMissionsEntrepriseCFA(o: OrganismeInfo, f: FormationInfo) {
-  return buildDocument({ org: o, title: "PROCÉDURE VÉRIFICATION MISSIONS ENTREPRISE ET CERTIFICATION VISÉE", docRef: `PROC-FORM-20-${o.version || "V1"}-${new Date().getFullYear()}`, sections: [
+  return buildDocument({ org: o, title: "PROCÉDURE VÉRIFICATION MISSIONS ENTREPRISE ET CERTIFICATION VISÉE", sections: [
     { heading: "Objectif", content: `<p>S'assurer de la cohérence entre les missions confiées à l'apprenti en entreprise et le référentiel de la certification visée (${f.intitule}).</p>` },
     { heading: "1. Collecte des missions proposées par l'entreprise", content: `<p>Transmission de la fiche de poste à l'entreprise ainsi que la fiche recueil de besoins afin de bien répondre aux attentes de l'entreprise mais aussi de l'apprenti.</p>` },
     { heading: "2. Analyse de la correspondance avec le référentiel de certification", content: `<p>Les équipes pédagogiques analysent les missions proposées au regard du référentiel de la formation <strong>« ${f.intitule} »</strong>.</p><p>Objectifs évalués : ${f.objectifs || "Voir le programme de formation"}</p>` },
@@ -2970,7 +2970,7 @@ function genConventionFormationCFA(o: OrganismeInfo, f: FormationInfo, stagiaire
   const duree = f.duree || "420 heures";
   const montant = getStagiaireTarif(s, f) || f.tarif || "8 000";
   const dateConvention = f.dateDebut ? formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || f.dateDebut, 15)) : "________________________";
-  return buildDocument({ org: o, title: "CONVENTION DE FORMATION PAR APPRENTISSAGE", subtitle: "Contrat hors convention régionale", docRef: `DOC-CONV-01-${o.version || "V1"}-${new Date().getFullYear()}`, formation: f, showFormationInfo: false, sections: [
+  return buildDocument({ org: o, title: "CONVENTION DE FORMATION PAR APPRENTISSAGE", subtitle: "Contrat hors convention régionale", formation: f, showFormationInfo: false, sections: [
     { heading: "Entre les soussignés", content: `<p><strong>${o.nom}</strong><br>Adresse : ${o.adresse}, ${o.codePostal} ${o.ville}<br>SIRET : ${o.siret}<br>Numéro de déclaration à la Préfecture : ${o.nda}<br></p><p><strong>${entreprise}</strong><br>Adresse : ________________________<br>SIRET : ________________________<br>représenté(e) par <strong>${respEntreprise}</strong>,</p><p>CI-APRÈS DÉNOMMÉ(E) LE BÉNÉFICIAIRE,</p><p>est conclue la convention suivante, en application des dispositions des Livres II et III de la sixième partie du Code du travail.</p>` },
     { heading: "Article 1er : Objet de la convention", content: `<p>Le ${o.nom} organise une action de formation par apprentissage au sens de l'article L. 6313-6 du Code du travail.</p><p><strong>Intitulé de l'action :</strong> « ${f.intitule} »</p><p><strong>Code diplôme et RNCP :</strong> ${f.codeRNCP || "________________________"}</p><p><strong>Dates de formation :</strong> Du ${dateDebut} au ${dateFin}</p><p><strong>Lieu de formation :</strong> ${f.lieu || `${o.adresse}, ${o.codePostal} ${o.ville}`}</p><p><strong>Stagiaire :</strong> ${s.prenom} ${s.nom}</p><p>Les actions envisagées entrent dans l'une des catégories aux articles L 6313-1 à L 6313-11 du code du travail :</p><p><em>Actions d'acquisition, d'entretien ou de perfectionnement des connaissances</em></p><p><strong>Durée de l'action de formation :</strong> ${duree}</p><p>Périodes de réalisation en entreprise et en CFA : voir calendrier du stagiaire en annexe</p>` },
     { heading: "Article 2 : Modalités de déroulement, de suivi et d'obtention du titre", content: `<p><strong>Modalités de déroulement :</strong> ${f.modalites || "Hybride"}</p><p><strong>Modalités de suivi :</strong></p><ul><li>Feuille d'émargement</li><li>Séances de préparation à l'examen</li></ul><p><strong>Modalités d'obtention du titre :</strong></p><p>Présentation à l'examen en vue de l'obtention d'un titre professionnel</p>` },
@@ -3037,7 +3037,7 @@ function genLivretApprentissageCFAV2(o: OrganismeInfo, f: FormationInfo, stagiai
       ["Tâche spécialisée 2", "Compétence avancée 2", ""],
     ];
 
-  return buildDocument({ org: o, title: "LIVRET D'APPRENTISSAGE", subtitle: f.intitule, docRef: `DOC-LIVRAPP-01-${o.version || "V1"}-${new Date().getFullYear()}`, sections: [
+  return buildDocument({ org: o, title: "LIVRET D'APPRENTISSAGE", subtitle: f.intitule, sections: [
     { heading: "1. INFORMATIONS GÉNÉRALES", content: `
 ${tableHTML(["Champ", "Information"], [
   ["Nom de l'apprenant(e)", `${s.prenom} ${s.nom}`],
