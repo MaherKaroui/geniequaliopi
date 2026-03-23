@@ -28,12 +28,13 @@ function veilleYear(f: FormationInfo, monthsBefore: number): string {
 }
 
 // ===== Detection helpers =====
-type FormationType = "fle" | "ia" | "word";
+type FormationType = "fle" | "ia" | "word" | "commercial";
 
 function detectFormationType(f: FormationInfo): FormationType {
   const title = (f.intitule || "").toLowerCase();
   if (title.includes("français") || title.includes("fle") || title.includes("social") || title.includes("médico") || title.includes("medico") || title.includes("communiquer en français")) return "fle";
   if (title.includes("intelligence artificielle") || title.includes("ia générative") || title.includes("ia ") || title.includes("contenus rédactionnels") || title.includes("chatgpt") || title.includes("prompt")) return "ia";
+  if (title.includes("commercial") || title.includes("conseiller") || title.includes("négociat") || title.includes("vente") || title.includes("relation client") || title.includes("prospection")) return "commercial";
   return "word";
 }
 
@@ -112,6 +113,39 @@ function veilleReglementaireRows(f: FormationInfo, type: FormationType): string[
         veilleDate(f, 3),
         "La participation financière obligatoire pour l'achat d'une formation mobilisant le CPF s'élève à 103,20 euros.",
         "Preuve: Informer les futurs apprenants de la hausse du ticket modérateur."
+      ],
+    ];
+  }
+
+  if (type === "commercial") {
+    return [...common,
+      [
+        `<a href="https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000006901294">Légifrance – Art. L.6321-1 Code du travail</a>`,
+        "Obligation de formation des salariés – adaptation au poste de travail",
+        veilleDate(f, 5),
+        "L'employeur doit assurer l'adaptation des salariés à leur poste, y compris les compétences commerciales et la relation client.",
+        "Preuve: Extrait code du travail. Action: Intégrer cette obligation dans le programme de formation commerciale pour justifier le besoin de montée en compétences."
+      ],
+      [
+        `<a href="https://www.francecompetences.fr/recherche/rncp/37717/">France Compétences – TP Conseiller Commercial</a>`,
+        "Fiche RNCP 37717 – Titre Professionnel Conseiller Commercial",
+        veilleDate(f, 4),
+        "Référentiel du TP Conseiller Commercial : activités types, compétences professionnelles, modalités d'évaluation, blocs de compétences.",
+        "Preuve: Fiche RNCP téléchargée. Action: Vérifier l'alignement du programme avec les blocs de compétences du référentiel (prospection, négociation, fidélisation)."
+      ],
+      [
+        `<a href="https://www.centre-inffo.fr/site-droit-formation/actualites-droit/cpf-hausse-du-montant-de-la-participation-forfaitaire">Centre Inffo – CPF</a>`,
+        "CPF : Hausse du montant de la participation forfaitaire",
+        veilleDate(f, 3),
+        "La participation financière obligatoire pour l'achat d'une formation mobilisant le CPF s'élève à 103,20 euros.",
+        "Preuve: Informer les futurs apprenants de la hausse du ticket modérateur. Sauf pour les personnes au chômage ou financées par les employeurs."
+      ],
+      [
+        `<a href="https://www.legifrance.gouv.fr/codes/section_lc/LEGITEXT000006069565/LEGISCTA000006179578/">Légifrance – Code de la consommation</a>`,
+        "Code de la consommation – Pratiques commerciales réglementées",
+        veilleDate(f, 2),
+        "Encadrement des pratiques commerciales déloyales, trompeuses et agressives. Obligations d'information précontractuelle du consommateur.",
+        "Preuve: Articles de loi. Action: Intégrer les obligations légales de la vente (droit de rétractation, CGV, RGPD) dans le module négociation et relation client."
       ],
     ];
   }
