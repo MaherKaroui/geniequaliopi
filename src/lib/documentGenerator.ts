@@ -3001,6 +3001,94 @@ function genMailTypeCandidatCFA(o: OrganismeInfo, f: FormationInfo) {
   ] });
 }
 
+function genDossierCandidatureCFA(o: OrganismeInfo, f: FormationInfo) {
+  const blank = "________________________";
+  return buildDocument({ org: o, title: "DOSSIER DE CANDIDATURE", subtitle: f.intitule, sections: [
+    { heading: "Informations personnelles", content: `
+${tableHTML(["Champ", "Réponse"], [
+  ["Nom", blank], ["Prénom", blank], ["Date de naissance", blank],
+  ["Adresse", blank], ["Code postal", blank], ["Ville", blank],
+  ["Téléphone", blank], ["Email", blank],
+  ["Nationalité", blank], ["NIR (Sécurité sociale)", blank],
+])}` },
+    { heading: "Situation actuelle", content: `
+<p><strong>Statut :</strong></p>
+<p>☐ Demandeur d'emploi &nbsp; ☐ Salarié(e) &nbsp; ☐ Étudiant(e) &nbsp; ☐ Autre : ${blank}</p>
+<p><strong>Dernier diplôme obtenu :</strong> ${blank}</p>
+<p><strong>Établissement :</strong> ${blank}</p>
+<p><strong>Année d'obtention :</strong> ${blank}</p>` },
+    { heading: "Projet professionnel", content: `
+<p><strong>Formation souhaitée :</strong> ${f.intitule}</p>
+<p><strong>Motivations :</strong></p>
+<p>${blank}</p><p>${blank}</p>
+<p><strong>Projet professionnel après la formation :</strong></p>
+<p>${blank}</p><p>${blank}</p>` },
+    { heading: "Entreprise d'accueil (si déjà trouvée)", content: `
+${tableHTML(["Champ", "Réponse"], [
+  ["Nom de l'entreprise", blank], ["Adresse", blank],
+  ["Nom du tuteur / maître d'apprentissage", blank],
+  ["Fonction du tuteur", blank], ["Téléphone", blank], ["Email", blank],
+])}` },
+    { heading: "Pièces à fournir", content: `
+<ul>
+<li>☐ Copie de la pièce d'identité</li>
+<li>☐ CV à jour</li>
+<li>☐ Lettre de motivation</li>
+<li>☐ Copie du dernier diplôme obtenu</li>
+<li>☐ Justificatif de domicile</li>
+<li>☐ Photo d'identité</li>
+<li>☐ Attestation de Sécurité sociale</li>
+</ul>` },
+    { heading: "Engagement du candidat", content: `
+<p>Je soussigné(e), certifie que les renseignements fournis dans ce dossier sont exacts. Je m'engage à fournir les pièces justificatives demandées dans les délais impartis.</p>
+<p><br/></p>
+<p>Fait à ${blank}, le ${blank}</p>
+<p><br/></p><p>Signature du candidat :</p><p><br/><br/></p>` },
+  ] });
+}
+
+function genLivretAccueilCFA(o: OrganismeInfo, f: FormationInfo) {
+  return buildDocument({ org: o, title: "LIVRET D'ACCUEIL", subtitle: f.intitule, sections: [
+    { heading: "Bienvenue !", content: `<p>Nous sommes heureux de vous accueillir au sein de <strong>${o.nom}</strong> pour la formation <strong>« ${f.intitule} »</strong>. Ce livret contient toutes les informations nécessaires au bon déroulement de votre parcours.</p>` },
+    { heading: "Présentation de l'organisme", content: `
+<p><strong>${o.nom}</strong></p>
+<p>N° de déclaration d'activité : ${o.nda || "___"}</p>
+<p>Adresse : ${o.adresse || "___"}</p>
+<p>Téléphone : ${o.telephone || "___"} – Email : ${o.email || "___"}</p>
+<p>Responsable pédagogique : ${o.responsablePedagogique || o.dirigeant || "___"}</p>` },
+    { heading: "Votre formation", content: `
+${tableHTML(["Information", "Détail"], [
+  ["Intitulé", f.intitule],
+  ["Durée", f.duree],
+  ["Modalités", f.modalites || "Présentiel"],
+  ["Lieu", f.lieu || o.adresse || "___"],
+  ["Dates", "Du " + formatDate(f.dateDebut) + " au " + formatDate(f.dateFin)],
+  ["Horaires", f.horaires || "9h00 – 12h30 / 13h30 – 17h00"],
+])}` },
+    { heading: "Règles de vie", content: `
+<ul>
+<li>Respecter les horaires et signaler toute absence au préalable</li>
+<li>Adopter un comportement respectueux envers les formateurs, les autres apprenants et le personnel</li>
+<li>Respecter le matériel mis à disposition</li>
+<li>Les téléphones portables doivent être éteints ou en mode silencieux pendant les cours</li>
+<li>Toute forme de discrimination ou de harcèlement est strictement interdite</li>
+</ul>` },
+    { heading: "Accompagnement et référents", content: `
+<p><strong>Référent pédagogique :</strong> ${o.responsablePedagogique || o.dirigeant || "___"}</p>
+<p><strong>Référent administratif :</strong> ${o.dirigeant || "___"}</p>
+<p><strong>Référent handicap :</strong> ${o.referentHandicap || o.dirigeant || "___"}</p>
+<p>N'hésitez pas à les contacter pour toute question ou besoin d'accompagnement spécifique.</p>` },
+    { heading: "Accessibilité et handicap", content: `
+<p>${o.nom} s'engage à accueillir les personnes en situation de handicap et à adapter les conditions de formation. Pour tout besoin, contactez notre référent handicap : <strong>${o.referentHandicap || o.dirigeant || "___"}</strong>.</p>` },
+    { heading: "Contacts utiles", content: `
+${tableHTML(["Service", "Contact"], [
+  ["Accueil / Secrétariat", (o.telephone || "___") + " – " + (o.email || "___")],
+  ["Direction", o.dirigeant || "___"],
+  ["Urgences", "15 (SAMU) / 18 (Pompiers) / 112"],
+])}` },
+  ] });
+}
+
 // ============== CFA IND 5 — CONVENTION ET LIVRET ==============
 
 function genConventionFormationCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
