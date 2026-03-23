@@ -313,7 +313,35 @@ export function buildFullCatalog(
     stagiaires.forEach((s, si) => {
       add(`cfa_c3i9_convention_${si}`, `CT3 - IND 9 CONVENTION DE FORMATION PAR APPRENTISSAGE – ${s.prenom} ${s.nom}`, 3, 9, "convention_formation_apprentissage", { stagiaireIdx: si });
     });
-    add("cfa_fiche_autoevaluation", "Fiche autoévaluation apprenti", 3, 11, "fiche_autoevaluation_apprenti");
+    // ===== IND 11 — Évaluation de l'atteinte des objectifs (CFA) =====
+    // Émargement
+    formations.forEach((f, fi) => {
+      add(`cfa_c3i11_emargement_${fi}`, `CT3 - IND 11 FEUILLE D'ÉMARGEMENT CFA`, 3, 11, "emargement_jour", { fi });
+    });
+    // Documents individuels per-stagiaire IND 11 CFA
+    formations.forEach((f, fi) => {
+      const nbJours = getFormationDays(f).length;
+      const nbExercices = Math.max(1, Math.ceil(nbJours / 2));
+      stagiaires.forEach((s, si) => {
+        // Tests début/fin (vide si formation pas terminée, rempli sinon)
+        add(`cfa_c3i11_test_debut_${fi}_${si}`, `CT3 - IND 11 TEST DÉBUT DE FORMATION – ${s.prenom} ${s.nom}`, 3, 11, "test_cfa_stagiaire", { fi, stagiaireIdx: si, phase: "debut" });
+        add(`cfa_c3i11_test_fin_${fi}_${si}`, `CT3 - IND 11 TEST FIN DE FORMATION – ${s.prenom} ${s.nom}`, 3, 11, "test_cfa_stagiaire", { fi, stagiaireIdx: si, phase: "fin" });
+        // Exercices pratiques (un par tranche de 2 jours)
+        for (let exIdx = 0; exIdx < nbExercices; exIdx++) {
+          const jourDebut = exIdx * 2 + 1;
+          const jourFin = Math.min(exIdx * 2 + 2, nbJours);
+          const label = nbExercices > 1 ? ` (Jour ${jourDebut}-${jourFin})` : '';
+          add(`cfa_c3i11_exercices_${fi}_${si}_ex${exIdx}`, `CT3 - IND 11 EXERCICES PRATIQUES${label} – ${s.prenom} ${s.nom}`, 3, 11, "exercices_cfa_stagiaire", { fi, stagiaireIdx: si, exerciceIdx: exIdx });
+        }
+        // Examen blanc
+        add(`cfa_c3i11_examen_blanc_${fi}_${si}`, `CT3 - IND 11 EXAMEN BLANC – ${s.prenom} ${s.nom}`, 3, 11, "examen_blanc_cfa_stagiaire", { fi, stagiaireIdx: si });
+        // Grille d'acquisition
+        add(`cfa_c3i11_grille_acquisition_${fi}_${si}`, `CT3 - IND 11 GRILLE D'ACQUISITION – ${s.prenom} ${s.nom}`, 3, 11, "grille_acquisition_cfa_stagiaire", { fi, stagiaireIdx: si });
+        // Attestation de réussite
+        add(`cfa_c3i11_attestation_${fi}_${si}`, `CT3 - IND 11 ATTESTATION DE RÉUSSITE – ${s.prenom} ${s.nom}`, 3, 11, "attestation_reussite_cfa_stagiaire", { fi, stagiaireIdx: si });
+      });
+    });
+    add("cfa_fiche_autoevaluation", "CT3 - IND 11 FICHE AUTOÉVALUATION APPRENTI", 3, 11, "fiche_autoevaluation_apprenti");
     add("cfa_procedure_abandon", "Procédure d'abandon CFA", 3, 12, "procedure_abandon_cfa");
     add("cfa_procedure_absences", "Procédure des absences CFA", 3, 12, "procedure_absences_cfa");
     add("cfa_logs_connexion", "Logs de connexion CFA", 3, 12, "logs_connexion_cfa");
