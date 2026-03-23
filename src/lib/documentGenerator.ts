@@ -925,7 +925,7 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
       <p><strong>Téléphone :</strong> ${o.telephone}</p>
     </div>
 
-    <h2>14. Indicateurs de performance – Année ${new Date().getFullYear()}</h2>
+    <h2>14. Indicateurs de performance – Année ${f.dateDebut ? new Date(f.dateDebut + "T00:00:00").getFullYear() : new Date().getFullYear()}</h2>
     <div class="section">
       <table>
         <tr><th>Indicateur</th><th>Résultat</th></tr>
