@@ -3655,28 +3655,83 @@ function generateEvalBesoinsAnswers(s: StagiaireInfo, f: FormationInfo, o: Organ
 }
 
 function genDeroulePedagogiqueDetaille(o: OrganismeInfo, f: FormationInfo) {
-  const jours = f.programme ? f.programme.split("\n").filter(l => l.trim()) : ["Contenu de la formation"];
-  const nbJours = jours.length;
   const formation = f.intitule || "la formation";
-  
-  // Parse total hours from duree field (e.g. "21 heures (3 jours)" -> 21)
-  const dureeMatch = f.duree.match(/(\d+)\s*h/i);
-  const totalHeures = dureeMatch ? parseInt(dureeMatch[1]) : nbJours * 7;
+
+  // ── Determine number of days from duree field ──
+  const heuresMatch = f.duree.match(/(\d+)\s*h/i);
+  const joursMatch = f.duree.match(/(\d+)\s*jours?/i);
+  const totalHeures = heuresMatch ? parseInt(heuresMatch[1]) : 14;
+  const nbJours = joursMatch ? parseInt(joursMatch[1]) : Math.ceil(totalHeures / 7);
   const heuresParJour = totalHeures / nbJours;
-  
-  // Parse each day's topic
-  const dayTopics = jours.map(j => j.replace(/^(Jour|Module)\s*\d+\s*[:\-–]\s*/i, '').trim());
-  
-  let extraHtml = '';
-  
-  jours.forEach((jour, di) => {
-    const topic = dayTopics[di];
+
+  // ── Build day topics from programme + objectifs ──
+  const programmeLines = f.programme ? f.programme.split("\n").map(l => l.trim()).filter(l => l.length > 3) : [];
+  const objectifsItems = f.objectifs
+    ? f.objectifs.split(/\n|\.(?=\s)/).map(l => l.trim().replace(/^[-•*]\s*/, "").replace(/^À l'issue.*capable de\s*:?\s*/i, "")).filter(l => l.length > 5)
+    : [];
+
+  // Extract explicit "Jour X" lines
+  const explicitDayLines = programmeLines.filter(l => /^(Jour|Module)\s+\d+/i.test(l));
+
+  // Extract module/content lines (not day headers)
+  const contentLines = programmeLines
+    .filter(l => !/^(Jour|Module)\s+\d+/i.test(l))
+    .map(l => l.replace(/^[-•*]\s*/, "").trim())
+    .filter(l => l.length > 3);
+
+  // Merge content + objectifs for topic pool
+  const allTopics = [...contentLines];
+  for (const obj of objectifsItems) {
+    if (!allTopics.some(t => t.toLowerCase().includes(obj.toLowerCase().slice(0, 20)))) {
+      allTopics.push(obj);
+    }
+  }
+
+  // Generate filler topics specific to the formation
+  const fillers = [
+    `Fondamentaux de ${formation}`,
+    `Approfondissement : ${formation}`,
+    `Techniques avancées – ${formation}`,
+    `Mise en pratique – ${formation}`,
+    `Exercices pratiques appliqués`,
+    `Études de cas et synthèse`,
+    `Consolidation des acquis`,
+    `Méthodologie et bonnes pratiques`,
+    `Synthèse et perspectives`,
+    `Atelier pratique guidé`,
+  ];
+
+  // Build a topic label for each day
+  const dayLabels: string[] = [];
+  const topicsPerDay = Math.max(1, Math.ceil(allTopics.length / nbJours));
+
+  for (let d = 0; d < nbJours; d++) {
+    if (d < explicitDayLines.length) {
+      // Use explicit day line from programme
+      dayLabels.push(explicitDayLines[d].replace(/^(Jour|Module)\s*\d+\s*[:\-–]\s*/i, '').trim());
+    } else {
+      // Build from topics pool
+      const dayTopicSlice = allTopics.slice(d * topicsPerDay, (d + 1) * topicsPerDay);
+      if (dayTopicSlice.length > 0) {
+        dayLabels.push(dayTopicSlice.slice(0, 2).join(" / "));
+      } else {
+        dayLabels.push(fillers[d % fillers.length]);
+      }
+    }
+  }
+
+  // ── Build HTML ──
+  let extraHtml = `<p style="margin-bottom:15px"><strong>Formation :</strong> ${f.intitule}<br>
+    <strong>Durée :</strong> ${totalHeures} heures — ${nbJours} jour${nbJours > 1 ? "s" : ""} (${heuresParJour}h/jour)<br>
+    <strong>Formateur :</strong> ${f.formateur || o.dirigeant}</p>`;
+
+  for (let di = 0; di < nbJours; di++) {
+    const topic = dayLabels[di];
     const isFirstDay = di === 0;
     const isLastDay = di === nbJours - 1;
-    const jourLabel = jour.match(/^(Jour|Module)\s*\d+/i) ? jour.split(/[:\-–]/)[0].trim() : `Jour ${di + 1}`;
-    
-    extraHtml += `<h3 style="margin-top:${di > 0 ? '25' : '10'}px;color:#1e3a7b;font-size:13pt">${jourLabel} – ${topic}</h3>`;
-    
+
+    extraHtml += `<h3 style="margin-top:${di > 0 ? '25' : '10'}px;color:#1e3a7b;font-size:13pt">Jour ${di + 1} – ${topic}</h3>`;
+
     extraHtml += `<table border="1" cellpadding="5" cellspacing="0" style="border-collapse:collapse;width:100%;font-size:9pt;margin-bottom:10px">`;
     extraHtml += `<tr style="background:#1e3a7b;color:#fff;font-weight:bold">
       <td style="width:15%">Séquence</td>
@@ -3688,7 +3743,7 @@ function genDeroulePedagogiqueDetaille(o: OrganismeInfo, f: FormationInfo) {
       <td style="width:12%">Évaluation</td>
       <td style="width:11%">Adaptations</td>
     </tr>`;
-    
+
     const sequences = generateDaySequences(topic, formation, isFirstDay, isLastDay, f, heuresParJour);
     sequences.forEach((seq, si) => {
       const bgColor = si % 2 === 0 ? '#ffffff' : '#f2f6fc';
@@ -3703,10 +3758,10 @@ function genDeroulePedagogiqueDetaille(o: OrganismeInfo, f: FormationInfo) {
         <td>${seq.adaptations}</td>
       </tr>`;
     });
-    
+
     extraHtml += `</table>`;
-  });
-  
+  }
+
   return buildDocument({ org: o, title: "Déroulé pédagogique détaillé de la formation", subtitle: f.intitule, extraHtml });
 }
 
