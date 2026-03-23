@@ -5520,3 +5520,294 @@ function genAppreciationsBeneficiairesStagiaire(o: OrganismeInfo, f: FormationIn
 
   return buildDocument({ org: o, title: "QUESTIONNAIRE DE SATISFACTION DU BÉNÉFICIAIRE", subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, formation: f, showFormationInfo: true, extraHtml: extra });
 }
+
+// =============================================
+// ===== CFA CT3 IND 11 — GÉNÉRATEURS AVEC LOGIQUE DATE =====
+// =============================================
+
+function isFormationTerminee(f: FormationInfo): boolean {
+  if (!f.dateFin) return false;
+  try {
+    const parts = f.dateFin.split('/');
+    if (parts.length === 3) {
+      const d = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+      return d < new Date();
+    }
+    const d = new Date(f.dateFin);
+    return !isNaN(d.getTime()) && d < new Date();
+  } catch { return false; }
+}
+
+function genTestCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number, phase: string) {
+  const s = stagiaires[si] || stagiaires[0];
+  const termine = isFormationTerminee(f);
+  const isDebut = phase === "debut";
+  const evalData = getEvalContent(f.intitule);
+  const rncp = getRNCPByCode(f.codeRNCP || '');
+
+  const titre = isDebut ? "TEST DE POSITIONNEMENT DÉBUT DE FORMATION" : "TEST DE POSITIONNEMENT FIN DE FORMATION";
+  const dateTest = isDebut ? formatDate(f.dateDebut) : formatDate(f.dateFin);
+
+  let extra = `<h2>${titre}</h2>
+    <p><strong>Formation :</strong> ${f.intitule}</p>
+    <p><strong>Apprenti(e) :</strong> ${s.prenom} ${s.nom}</p>
+    <p><strong>Date :</strong> ${dateTest}</p>`;
+
+  if (rncp) {
+    extra += `<p><strong>Certification visée :</strong> ${rncp.intitule} (${rncp.code})</p>`;
+  }
+
+  const questions = evalData.qcm;
+  const answers = termine ? generateStagiaireAnswers(questions, si) : [];
+  const score = termine ? computeQCMScore(questions, answers) : null;
+
+  extra += `<h3>Partie 1 — QCM (${questions.length} questions)</h3>`;
+  questions.forEach((q, qi) => {
+    extra += `<p><strong>${qi + 1}. ${q.question}</strong></p><ul>`;
+    q.options.forEach((opt, oi) => {
+      if (termine) {
+        const checked = answers[qi] === oi;
+        const isCorrect = oi === q.correctIndex;
+        const mark = checked ? (isCorrect ? ' [CORRECT]' : ' [INCORRECT]') : '';
+        extra += `<li>${checked ? '<strong>' : ''}${String.fromCharCode(65 + oi)}) ${opt}${mark}${checked ? '</strong>' : ''}</li>`;
+      } else {
+        extra += `<li>${String.fromCharCode(65 + oi)}) ${opt} &#9744;</li>`;
+      }
+    });
+    extra += `</ul>`;
+  });
+
+  if (termine && score) {
+    extra += `<p><strong>Score QCM :</strong> ${score.score} / ${score.total} (${Math.round(score.score / score.total * 100)}%)</p>`;
+  }
+
+  const questionsOuvertes = getQuestionsOuvertes(f.intitule);
+  const openQs = isDebut ? questionsOuvertes.debut : questionsOuvertes.fin;
+  const openAnswers = termine ? generateStagiaireOpenAnswers(openQs, si, isDebut, { nom: s.nom, prenom: s.prenom, entreprise: s.entreprise, poste: s.poste }) : [];
+
+  extra += `<h3>Partie 2 — Questions ouvertes</h3>`;
+  openQs.forEach((q, qi) => {
+    extra += `<p><strong>${qi + 1}. ${q.question}</strong></p>`;
+    if (termine && openAnswers[qi]) {
+      extra += `<p style="border:1px solid #ccc;padding:8px;background:#f9f9f9">${openAnswers[qi].reponse}</p>`;
+    } else {
+      extra += `<div style="border:1px solid #ccc;min-height:60px;padding:8px">&#160;</div>`;
+    }
+  });
+
+  if (termine) {
+    const appreciation = isDebut ? "Niveau initial évalué" : "Progression constatée en fin de formation";
+    extra += `<h3>Appréciation globale</h3><p>${appreciation} — Score QCM : ${score ? Math.round(score.score / score.total * 100) : 0}%</p>`;
+  }
+
+  return buildDocument({ org: o, title: titre, subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, formation: f, showFormationInfo: true, extraHtml: extra });
+}
+
+function genExercicesCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number, exerciceIdx: number) {
+  const termine = isFormationTerminee(f);
+  if (termine) {
+    return genExercicesStagiaire(o, f, stagiaires, si, exerciceIdx);
+  }
+  const s = stagiaires[si] || stagiaires[0];
+  const days = getFormationDays(f);
+  const nbJours = days.length;
+  const nbBlocks = Math.max(1, Math.ceil(nbJours / 2));
+  const jourDebut = exerciceIdx * 2 + 1;
+  const jourFin = Math.min(exerciceIdx * 2 + 2, nbJours);
+  const jourLabel = nbBlocks > 1 ? ` – Jour ${jourDebut}-${jourFin}` : '';
+
+  const evalData = getEvalContent(f.intitule);
+  const allExercices = [...evalData.exercices];
+  for (let i = allExercices.length; i < (exerciceIdx + 1) * 2; i++) {
+    allExercices.push({
+      titre: `Exercice ${i + 1} : Cas pratique – Jour ${Math.floor(i / 2) * 2 + 1}-${Math.min(Math.floor(i / 2) * 2 + 2, nbJours)}`,
+      consigne: `À partir de la situation professionnelle présentée, appliquez les compétences acquises.`,
+      reponseAttendue: `Application structurée des acquis de formation.`,
+    });
+  }
+  const blockStart = exerciceIdx * 2;
+  const selectedExercices = allExercices.slice(blockStart, blockStart + 2);
+
+  let extra = `<h2>EXERCICE PRATIQUE${jourLabel} – FORMATION ${f.intitule.toUpperCase()}</h2>
+    <p><strong>Nom et prénom :</strong> ${s.prenom} ${s.nom}</p>
+    <p><strong>Date :</strong> ___/___/______</p>`;
+
+  selectedExercices.forEach((ex) => {
+    extra += `<h3>${ex.titre}</h3>
+      <p><strong>Consigne :</strong> ${ex.consigne}</p>
+      <p><strong>Réponse de l'apprenti(e) :</strong></p>
+      <div style="border:1px solid #ccc;min-height:120px;padding:12px">&#160;</div>
+      <p><strong>Note :</strong> _____ / 5</p>
+      <p><strong>Observations du formateur :</strong></p>
+      <div style="border:1px solid #ccc;min-height:60px;padding:8px">&#160;</div>`;
+  });
+
+  return buildDocument({ org: o, title: `EXERCICE PRATIQUE${jourLabel}`, subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, formation: f, showFormationInfo: true, extraHtml: extra });
+}
+
+function genExamenBlancCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
+  const s = stagiaires[si] || stagiaires[0];
+  const termine = isFormationTerminee(f);
+  const rncp = getRNCPByCode(f.codeRNCP || '');
+  const evalData = getEvalContent(f.intitule);
+  const { totalHours } = parseDuree(f.duree);
+  const dureeExamen = Math.max(2, Math.round(totalHours * 0.05));
+
+  let extra = `<h2>EXAMEN BLANC – ${f.intitule.toUpperCase()}</h2>
+    <p><strong>Apprenti(e) :</strong> ${s.prenom} ${s.nom}</p>
+    <p><strong>Date :</strong> ${termine ? formatDate(f.dateFin) : '___/___/______'}</p>
+    <p><strong>Durée de l'épreuve :</strong> ${dureeExamen} heures</p>`;
+
+  if (rncp) {
+    extra += `<p><strong>Certification visée :</strong> ${rncp.intitule} (${rncp.code})</p>`;
+
+    extra += `<h3>PARTIE 1 — ÉPREUVE ÉCRITE (QCM)</h3>`;
+    const questions = evalData.qcm;
+    const answers = termine ? generateStagiaireAnswers(questions, si) : [];
+
+    questions.forEach((q, qi) => {
+      extra += `<p><strong>${qi + 1}. ${q.question}</strong></p><ul>`;
+      q.options.forEach((opt, oi) => {
+        if (termine) {
+          const checked = answers[qi] === oi;
+          const isCorrect = oi === q.correctIndex;
+          const mark = checked ? (isCorrect ? ' [CORRECT]' : ' [INCORRECT]') : '';
+          extra += `<li>${checked ? '<strong>' : ''}${String.fromCharCode(65 + oi)}) ${opt}${mark}${checked ? '</strong>' : ''}</li>`;
+        } else {
+          extra += `<li>${String.fromCharCode(65 + oi)}) ${opt} &#9744;</li>`;
+        }
+      });
+      extra += `</ul>`;
+    });
+
+    if (termine) {
+      const score = computeQCMScore(questions, answers);
+      extra += `<p><strong>Score QCM :</strong> ${score.score} / ${score.total}</p>`;
+    }
+
+    extra += `<h3>PARTIE 2 — MISE EN SITUATION PROFESSIONNELLE</h3>`;
+    rncp.blocsCompetences.forEach((bloc, bi) => {
+      extra += `<h4>Bloc ${bi + 1} — ${bloc.titre}</h4>`;
+      extra += `<p><strong>Consigne :</strong> En vous appuyant sur vos acquis, réalisez la mise en situation suivante en lien avec les compétences du bloc « ${bloc.titre} ».</p>`;
+      extra += `<p><em>Compétences évaluées : ${bloc.competences.slice(0, 3).join(', ')}</em></p>`;
+      if (termine) {
+        const profiles = [
+          "L'apprenti(e) a démontré une bonne maîtrise des compétences du bloc. La production est structurée, les outils sont correctement utilisés et le résultat est conforme aux attentes professionnelles.",
+          "L'apprenti(e) a répondu de manière satisfaisante à la consigne. Quelques imprécisions relevées mais l'ensemble est cohérent et montre une appropriation des compétences clés.",
+          "L'apprenti(e) a fourni un travail complet et rigoureux. Les méthodes sont bien appliquées et le livrable répond aux critères d'évaluation du bloc.",
+          "L'apprenti(e) a traité la mise en situation avec sérieux. Certains aspects mériteraient d'être approfondis, mais les fondamentaux sont acquis.",
+          "Très bon travail de l'apprenti(e). La démarche est professionnelle, les résultats sont pertinents et le niveau de maîtrise correspond aux attendus du titre.",
+        ];
+        extra += `<div style="border:1px solid #ccc;padding:12px;background:#f9f9f9"><p>${profiles[(si + bi) % profiles.length]}</p></div>`;
+        const notes = [14, 16, 12, 15, 17, 13, 18, 14, 16, 15];
+        extra += `<p><strong>Note :</strong> ${notes[(si + bi) % notes.length]} / 20</p>`;
+      } else {
+        extra += `<div style="border:1px solid #ccc;min-height:150px;padding:12px">&#160;</div>`;
+        extra += `<p><strong>Note :</strong> _____ / 20</p>`;
+      }
+      extra += `<p><strong>Observations du jury :</strong></p>`;
+      if (termine) {
+        const obs = ["Bon niveau d'ensemble, poursuivre les efforts.", "Très satisfaisant, l'apprenti(e) est opérationnel(le).", "Des progrès constants, quelques points à consolider.", "Solide prestation, les compétences sont bien maîtrisées.", "Résultats encourageants, la progression est notable."];
+        extra += `<p style="border:1px solid #ccc;padding:8px;background:#f9f9f9">${obs[(si + bi) % obs.length]}</p>`;
+      } else {
+        extra += `<div style="border:1px solid #ccc;min-height:60px;padding:8px">&#160;</div>`;
+      }
+    });
+
+    extra += `<h3>PARTIE 3 — ENTRETIEN PROFESSIONNEL</h3>`;
+    extra += `<p>Simulation d'un entretien de jury professionnel portant sur le dossier professionnel et l'expérience en entreprise.</p>`;
+    if (termine) {
+      const notesOral = [15, 17, 13, 16, 14, 18, 15, 16, 14, 17];
+      extra += `<p><strong>Note :</strong> ${notesOral[si % notesOral.length]} / 20</p>`;
+      const appGlobal = ["Très bonne prestation orale, argumentaire solide.", "Prestation correcte, le candidat a su défendre son projet.", "Bonne aisance à l'oral, réponses pertinentes aux questions du jury.", "L'apprenti(e) a présenté son parcours avec clarté et professionnalisme.", "Oral réussi, les compétences transversales sont bien maîtrisées."];
+      extra += `<p><strong>Appréciation :</strong> ${appGlobal[si % appGlobal.length]}</p>`;
+    } else {
+      extra += `<p><strong>Note :</strong> _____ / 20</p>`;
+      extra += `<p><strong>Appréciation :</strong></p><div style="border:1px solid #ccc;min-height:60px;padding:8px">&#160;</div>`;
+    }
+
+    extra += `<h3>RÉSULTAT GLOBAL DE L'EXAMEN BLANC</h3>`;
+    if (termine) {
+      const moyennes = [14.5, 16, 12.5, 15.5, 15, 17, 13.5, 15, 14, 16.5];
+      const moy = moyennes[si % moyennes.length];
+      extra += `<p><strong>Moyenne générale :</strong> ${moy} / 20</p>`;
+      extra += `<p><strong>Avis :</strong> ${moy >= 14 ? 'FAVORABLE — L\'apprenti(e) est prêt(e) pour l\'examen final.' : 'RÉSERVÉ — Des points sont à renforcer avant l\'examen final.'}</p>`;
+    } else {
+      extra += `<p><strong>Moyenne générale :</strong> _____ / 20</p>`;
+      extra += `<p><strong>Avis :</strong> &#9744; FAVORABLE &#9744; RÉSERVÉ</p>`;
+    }
+  } else {
+    extra += `<h3>PARTIE 1 — QCM</h3>`;
+    evalData.qcm.forEach((q, qi) => {
+      extra += `<p><strong>${qi + 1}. ${q.question}</strong></p><ul>`;
+      q.options.forEach((opt, oi) => { extra += `<li>${String.fromCharCode(65 + oi)}) ${opt} &#9744;</li>`; });
+      extra += `</ul>`;
+    });
+    extra += `<h3>PARTIE 2 — ÉTUDE DE CAS</h3>`;
+    extra += `<p>Réalisez une étude de cas en lien avec la formation « ${f.intitule} ».</p>`;
+    extra += `<div style="border:1px solid #ccc;min-height:200px;padding:12px">&#160;</div>`;
+    extra += `<p><strong>Note :</strong> _____ / 20</p>`;
+  }
+
+  return buildDocument({ org: o, title: "EXAMEN BLANC", subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, formation: f, showFormationInfo: true, extraHtml: extra });
+}
+
+function genGrilleAcquisitionCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
+  const termine = isFormationTerminee(f);
+  if (termine) {
+    return genGrilleAcquisitionStagiaire(o, f, stagiaires, si);
+  }
+  const s = stagiaires[si] || stagiaires[0];
+  const rncp = getRNCPByCode(f.codeRNCP || '');
+  let extra = `<h2>GRILLE D'ACQUISITION DES COMPÉTENCES</h2>
+    <p><strong>Apprenti(e) :</strong> ${s.prenom} ${s.nom}</p>
+    <p><strong>Formation :</strong> ${f.intitule}</p>
+    <p><strong>Date :</strong> ___/___/______</p>`;
+
+  extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%">
+    <tr style="background:#1e3a7b;color:#fff"><th>Compétence évaluée</th><th>Non acquis</th><th>En cours</th><th>Acquis</th><th>Maîtrisé</th><th>Observations</th></tr>`;
+
+  if (rncp) {
+    rncp.blocsCompetences.forEach(bloc => {
+      extra += `<tr style="background:#e8edf5;font-weight:bold"><td colspan="6">Bloc – ${bloc.titre}</td></tr>`;
+      bloc.competences.forEach(comp => {
+        extra += `<tr><td>${comp}</td><td style="text-align:center">&#9744;</td><td style="text-align:center">&#9744;</td><td style="text-align:center">&#9744;</td><td style="text-align:center">&#9744;</td><td></td></tr>`;
+      });
+    });
+  } else {
+    const chapters = getCourseChapters(f.intitule);
+    chapters.slice(0, 5).forEach(ch => {
+      extra += `<tr style="background:#e8edf5;font-weight:bold"><td colspan="6">${ch.title}</td></tr>`;
+      ch.sections.slice(0, 3).forEach(sec => {
+        extra += `<tr><td>${sec.title}</td><td style="text-align:center">&#9744;</td><td style="text-align:center">&#9744;</td><td style="text-align:center">&#9744;</td><td style="text-align:center">&#9744;</td><td></td></tr>`;
+      });
+    });
+  }
+  extra += `</table>`;
+  extra += `<p><strong>Appréciation globale :</strong></p><div style="border:1px solid #ccc;min-height:60px;padding:8px">&#160;</div>`;
+
+  return buildDocument({ org: o, title: "GRILLE D'ACQUISITION DES COMPÉTENCES", subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, formation: f, showFormationInfo: true, extraHtml: extra });
+}
+
+function genAttestationReussiteCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
+  const termine = isFormationTerminee(f);
+  if (termine) {
+    return genAttestationReussiteStagiaire(o, f, stagiaires, si);
+  }
+  const s = stagiaires[si] || stagiaires[0];
+  let extra = `<h2>ATTESTATION DE RÉUSSITE</h2>
+    <p>Je soussigné(e), ${o.responsable || '____________________'}, en qualité de responsable pédagogique de l'organisme de formation <strong>${o.nom}</strong>, certifie que :</p>
+    <p><strong>Nom :</strong> ${s.nom}<br><strong>Prénom :</strong> ${s.prenom}</p>
+    <p>a suivi la formation <strong>« ${f.intitule} »</strong> du __________ au __________.</p>
+    <p><strong>Résultats obtenus :</strong></p>
+    <ul>
+      <li>Test de positionnement début : _____ %</li>
+      <li>Test de positionnement fin : _____ %</li>
+      <li>Exercices pratiques : _____ / 5</li>
+      <li>Examen blanc : _____ / 20</li>
+    </ul>
+    <p><strong>Avis :</strong> &#9744; FAVORABLE &#9744; RÉSERVÉ</p>
+    <p>Fait à ${o.ville || '__________'}, le ___/___/______</p>`;
+
+  return buildDocument({ org: o, title: "ATTESTATION DE RÉUSSITE", subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, formation: f, showFormationInfo: true, extraHtml: extra });
+}
