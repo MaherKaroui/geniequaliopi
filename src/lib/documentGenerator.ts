@@ -581,7 +581,7 @@ function genPlanning(o: OrganismeInfo, f: FormationInfo) {
 
 function genQuestionnairePositionnement(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const evalData = getEvalContent(f.intitule);
-  const questions = evalData.qcmPositionnementPositionnement;
+  const questions = evalData.qcmPositionnement;
   let extra = `<h2>Résultats détaillés du questionnaire de positionnement</h2>`;
   extra += `<p><strong>Formation :</strong> ${f.intitule}<br><strong>Date :</strong> ${formatDate(f.dateDebut)}<br><strong>Formateur :</strong> ${f.formateur}</p>`;
 
@@ -1067,7 +1067,7 @@ function genFicheAmenagement(o: OrganismeInfo, f: FormationInfo) {
 
 function genTestEntree(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const evalData = getEvalContent(f.intitule);
-  const questions = evalData.qcmPositionnementPositionnement.slice(0, 5);
+  const questions = evalData.qcmPositionnement.slice(0, 5);
   let extra = `<h2>Test d'entrée en formation</h2>`;
   extra += `<p>Ce test permet d'évaluer le niveau initial de chaque stagiaire avant le début de la formation.</p>`;
 
@@ -1660,7 +1660,7 @@ function genGrilleNiveauxPositionnement(o: OrganismeInfo, f: FormationInfo, stag
 // ===== NEW: QCM Positionnement détaillé =====
 function genQCMPositionnement(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const evalData = getEvalContent(f.intitule);
-  const questions = evalData.qcmPositionnementPositionnement;
+  const questions = evalData.qcmPositionnement;
   let extra = `<h2>QCM DE POSITIONNEMENT</h2>`;
   extra += `<p><strong>Formation :</strong> ${f.intitule}<br><strong>Date :</strong> ${formatDate(f.dateDebut)}<br><strong>Nombre de questions :</strong> ${questions.length}<br><strong>Durée :</strong> 30 minutes<br><strong>Barème :</strong> 1 point par bonne réponse</p>`;
 
