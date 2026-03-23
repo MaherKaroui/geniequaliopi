@@ -233,6 +233,25 @@ export const SAMPLE_FORMATIONS: FormationInfo[] = [
     nombreParticipants: "10",
     formateur: "Philippe Martin",
   },
+  {
+    intitule: "Titre Professionnel Secrétaire Assistant(e) Médico-Administratif(ve) (TP SAMA)",
+    objectifs: "Former des professionnels capables d'assurer la gestion administrative et l'accueil au sein de structures médicales ou médico-sociales, dans le respect des protocoles et de la confidentialité des informations.",
+    prerequis: "Niveau 3 (CAP ou équivalent) ou expérience professionnelle dans le secteur administratif, médico-social ou hospitalier. Entretien individuel et test de positionnement.",
+    duree: "400 heures",
+    modalites: "mixte",
+    tarif: "6 950 € – Contrat d'apprentissage",
+    programme: "Module 1 : Gestion administrative des rendez-vous, admissions et dossiers médicaux\nModule 2 : Rédaction et mise en forme de documents professionnels\nModule 3 : Accueil et orientation des patients ou usagers\nModule 4 : Collaboration avec les professionnels de santé\nModule 5 : Communication écrite et orale adaptée au secteur médical",
+    methodesEvaluation: "Quiz, cas pratiques et mises en situation professionnelles, travaux pratiques de rédaction et de gestion de dossiers, examen final : dossier professionnel, mise en situation, entretien avec jury",
+    moyensPedagogiques: "Salle équipée (tableau, connexion internet), plateforme LMS avec classe virtuelle, supports pédagogiques numériques et imprimés, accompagnement individualisé (suivi en entreprise et tutorat pédagogique)",
+    publicVise: "Personnes en reconversion, jeunes en insertion, salariés du secteur médico-social ou administratif",
+    delaiAcces: "30 jours avant le début de la session",
+    dateDebut: "2024-09-02",
+    dateFin: "2025-06-30",
+    lieu: "25 avenue de la Formation Professionnelle, 75008 Paris – Salle D2",
+    nombreParticipants: "15",
+    formateur: "Catherine Dubois",
+    codeRNCP: "RNCP36805",
+  },
 ];
 
 // Satisfaction scores (pre-filled realistic data)
