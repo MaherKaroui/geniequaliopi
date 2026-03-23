@@ -56,6 +56,16 @@ export interface StagiaireInfo {
   dateFinFormation?: string;
   tarifFormation?: string;
   signatureUrl?: string;
+  // Champs fiche de renseignement CFA
+  adresse?: string;
+  codePostal?: string;
+  commune?: string;
+  nationalite?: string;
+  nir?: string;
+  departementNaissance?: string;
+  communeNaissance?: string;
+  diplome?: string;
+  rqth?: "oui" | "non" | "";
 }
 
 export interface FormationInfo {
