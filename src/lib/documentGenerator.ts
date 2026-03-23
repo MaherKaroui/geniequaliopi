@@ -3439,10 +3439,10 @@ function genSynopsisCFA(o: OrganismeInfo, f: FormationInfo) {
   const nbBlocs = Math.max(2, Math.min(chapters.length, 5));
   const fallbackRows: string[] = [];
   for (let i = 0; i < nbBlocs; i++) {
-    const ch = chapters[i] || { title: `Module ${i + 1}`, topics: [] };
-    const contenus = ch.topics?.length ? ch.topics.slice(0, 4).map((t: string) => `- ${t}`).join('<br>') : '[À compléter]';
+    const ch = chapters[i];
+    const contenus = ch ? ch.sections.slice(0, 4).map((s) => `- ${s.title}`).join('<br>') : '[À compléter]';
     fallbackRows.push(`<tr>
-      <td style="vertical-align:top"><strong>${ch.title || `Bloc ${i + 1}`}</strong></td>
+      <td style="vertical-align:top"><strong>${ch?.title || `Bloc ${i + 1}`}</strong></td>
       <td style="vertical-align:top">${contenus}</td>
       <td style="vertical-align:top">[À compléter]</td>
       <td style="vertical-align:top;text-align:center">[À compléter]</td>
