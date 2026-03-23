@@ -263,6 +263,10 @@ const FormationForm = ({ data, onChange, onImportStagiaires }: FormationFormProp
           <Textarea id="moyensPedagogiques" value={data.moyensPedagogiques} onChange={e => update('moyensPedagogiques', e.target.value)} placeholder="Ex: Supports de cours, vidéoprojecteur, exercices pratiques..." rows={2} />
         </div>
         <div className="md:col-span-2">
+          <Label htmlFor="rythmeAlternance">Rythme d'alternance (CFA)</Label>
+          <Input id="rythmeAlternance" value={data.rythmeAlternance || ''} onChange={e => update('rythmeAlternance', e.target.value)} placeholder="Ex: 1 semaine CFA / 3 semaines entreprise" />
+        </div>
+        <div className="md:col-span-2">
           <Label htmlFor="methodesEvaluation">Méthodes d'évaluation</Label>
           <Textarea id="methodesEvaluation" value={data.methodesEvaluation} onChange={e => update('methodesEvaluation', e.target.value)} placeholder="Ex: QCM, mise en situation, étude de cas..." rows={2} />
         </div>

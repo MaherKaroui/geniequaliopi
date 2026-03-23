@@ -30,7 +30,8 @@ const emptyOrganisme: OrganismeInfo = {
 const emptyFormation: FormationInfo = {
   intitule: "", objectifs: "", prerequis: "", duree: "", modalites: "", tarif: "",
   programme: "", methodesEvaluation: "", moyensPedagogiques: "", publicVise: "",
-  delaiAcces: "", dateDebut: "", dateFin: "", lieu: "", nombreParticipants: "", formateur: ""
+  delaiAcces: "", dateDebut: "", dateFin: "", lieu: "", nombreParticipants: "", formateur: "",
+  rythmeAlternance: ""
 };
 
 const Index = () => {
