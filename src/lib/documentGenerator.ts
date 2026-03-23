@@ -363,6 +363,28 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "matiere_titre_cfa": return genMatiereTitreCFA(o, f);
     case "tableau_croise_cfa": return genTableauCroiseCFA(o, f);
     case "fiche_autoevaluation_apprenti": return genFicheAutoevaluation(o, f, stagiaires);
+    case "test_cfa_stagiaire": {
+      const si = params?.stagiaireIdx ?? 0;
+      const phase = params?.phase ?? "debut";
+      return genTestCFAStagiaire(o, f, stagiaires, si, phase);
+    }
+    case "exercices_cfa_stagiaire": {
+      const si = params?.stagiaireIdx ?? 0;
+      const exIdx = params?.exerciceIdx ?? 0;
+      return genExercicesCFAStagiaire(o, f, stagiaires, si, exIdx);
+    }
+    case "examen_blanc_cfa_stagiaire": {
+      const si = params?.stagiaireIdx ?? 0;
+      return genExamenBlancCFAStagiaire(o, f, stagiaires, si);
+    }
+    case "grille_acquisition_cfa_stagiaire": {
+      const si = params?.stagiaireIdx ?? 0;
+      return genGrilleAcquisitionCFAStagiaire(o, f, stagiaires, si);
+    }
+    case "attestation_reussite_cfa_stagiaire": {
+      const si = params?.stagiaireIdx ?? 0;
+      return genAttestationReussiteCFAStagiaire(o, f, stagiaires, si);
+    }
     case "procedure_abandon_cfa": return genProcedureAbandon(o);
     case "procedure_absences_cfa": return genProcedureAbsences(o);
     case "logs_connexion_cfa": return genRapportConnexion(o, f, stagiaires);
