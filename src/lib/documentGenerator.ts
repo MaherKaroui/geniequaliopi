@@ -342,7 +342,12 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "grille_entretien_annuel": return genGrilleEntretienAnnuel(o, fmt);
     case "enquete_satisfaction_formateur": return genEnqueteSatisfactionFormateur(o, f);
     // === Nouveaux templates CFA ===
-    case "attestation_inscription_cfa": return genAttestationInscriptionCFA(o, f, stagiaires);
+    case "attestation_inscription_cfa": return genAttestationInscriptionCFAV2(o, f, stagiaires, params?.stagiaireIdx ?? 0);
+    case "fiche_renseignement_cfa": return genFicheRenseignementCFA(o, f, stagiaires, params?.stagiaireIdx ?? 0);
+    case "grille_entretien_candidat_cfa": return genGrilleEntretienCandidatCFA(o, f);
+    case "procedure_missions_entreprise_cfa": return genProcedureMissionsEntrepriseCFA(o, f);
+    case "convention_formation_cfa": return genConventionFormationCFA(o, f, stagiaires, params?.stagiaireIdx ?? 0);
+    case "livret_apprentissage_cfa_v2": return genLivretApprentissageCFAV2(o, f, stagiaires, params?.stagiaireIdx ?? 0);
     case "procedure_psh_cfa": return genDossierPSH(o);
     case "dossier_accompagnement_psh_cfa": return genDossierPSH(o);
     case "guide_aide_connexion_cfa": return genMailAideConnexion(o, f);
