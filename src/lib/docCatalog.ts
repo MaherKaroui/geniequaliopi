@@ -253,10 +253,26 @@ export function buildFullCatalog(
     add("cfa_c1i3_matiere_titre", "CT1 - IND 3 MATIÈRE DU TITRE", 1, 3, "matiere_titre_cfa");
     add("cfa_c1i3_tableau_croise", "CT1 - IND 3 TABLEAU CROISÉ COMPÉTENCES PROGRAMME", 1, 3, "tableau_croise_cfa");
 
+    // ===== CRITÈRE 2 — OBJECTIFS ET ADAPTATION (CFA) =====
+
+    // IND 4 — Analyse du besoin du bénéficiaire (CFA)
+    add("cfa_c2i4_grille_entretien", "CT2 - IND 4 GRILLE D'ENTRETIEN INDIVIDUEL – CANDIDAT", 2, 4, "grille_entretien_candidat_cfa");
+    add("cfa_c2i4_procedure_missions", "CT2 - IND 4 PROCÉDURE VÉRIFICATION MISSIONS ENTREPRISE ET CERTIFICATION", 2, 4, "procedure_missions_entreprise_cfa");
+    stagiaires.forEach((s, si) => {
+      add(`cfa_c2i4_attestation_inscription_${si}`, `CT2 - IND 4 ATTESTATION D'INSCRIPTION – ${s.prenom} ${s.nom}`, 2, 4, "attestation_inscription_cfa", { stagiaireIdx: si });
+      add(`cfa_c2i4_fiche_renseignement_${si}`, `CT2 - IND 4 FICHE DE RENSEIGNEMENT – ${s.prenom} ${s.nom}`, 2, 4, "fiche_renseignement_cfa", { stagiaireIdx: si });
+    });
+
+    // IND 5 — Objectifs opérationnels et évaluables (CFA)
+    stagiaires.forEach((s, si) => {
+      add(`cfa_c2i5_convention_formation_${si}`, `CT2 - IND 5 CONVENTION DE FORMATION PAR APPRENTISSAGE – ${s.prenom} ${s.nom}`, 2, 5, "convention_formation_cfa", { stagiaireIdx: si });
+      add(`cfa_c2i5_livret_apprentissage_${si}`, `CT2 - IND 5 LIVRET D'APPRENTISSAGE – ${s.prenom} ${s.nom}`, 2, 5, "livret_apprentissage_cfa_v2", { stagiaireIdx: si });
+    });
+    add("cfa_c2i5_documents_certificateurs", "CT2 - IND 5 DOCUMENTS CERTIFICATEURS CFA", 2, 5, "documents_certificateurs_cfa");
+
     // Indicateur 13 - Coordination alternance
     formations.forEach((f, fi) => {
       add(`cfa_c3i13_contrat_${fi}`, `Contrat d'apprentissage`, 3, 13, "contrat_apprentissage", { fi });
-      add(`cfa_c3i13_livret_${fi}`, `Livret d'apprentissage CFA`, 3, 13, "livret_apprentissage_cfa", { fi });
       add(`cfa_c3i13_competences_${fi}`, `Grille compétences alternance`, 3, 13, "competences_alternance", { fi });
       add(`cfa_c3i13_suivi_ent_${fi}`, `Suivi en entreprise`, 3, 13, "suivi_entreprise_cfa", { fi });
     });
@@ -280,10 +296,9 @@ export function buildFullCatalog(
     });
 
     // Documents CFA complémentaires
-    add("cfa_attestation_inscription", "Attestation d'inscription CFA", 2, 4, "attestation_inscription_cfa");
     add("cfa_procedure_psh", "Procédure PSH CFA", 6, 26, "procedure_psh_cfa");
     add("cfa_guide_connexion", "Guide d'aide à la connexion CFA", 3, 9, "guide_aide_connexion_cfa");
-    // Convention de formation par apprentissage — un fichier par stagiaire
+    // Convention de formation par apprentissage — CT3 IND 9
     stagiaires.forEach((s, si) => {
       add(`cfa_c3i9_convention_${si}`, `CT3 - IND 9 CONVENTION DE FORMATION PAR APPRENTISSAGE – ${s.prenom} ${s.nom}`, 3, 9, "convention_formation_apprentissage", { stagiaireIdx: si });
     });
@@ -291,7 +306,6 @@ export function buildFullCatalog(
     add("cfa_procedure_abandon", "Procédure d'abandon CFA", 3, 12, "procedure_abandon_cfa");
     add("cfa_procedure_absences", "Procédure des absences CFA", 3, 12, "procedure_absences_cfa");
     add("cfa_logs_connexion", "Logs de connexion CFA", 3, 12, "logs_connexion_cfa");
-    add("cfa_documents_certificateurs", "Documents certificateurs CFA", 2, 5, "documents_certificateurs_cfa");
   }
 
   // ===== Bilan de compétences =====
