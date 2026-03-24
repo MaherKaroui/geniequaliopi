@@ -57,6 +57,14 @@ export function buildFullCatalog(
       add(`af_c2i6_deroule_pedagogique_${fi}`, `CT2 - IND 6 DÉROULÉ PÉDAGOGIQUE DÉTAILLÉ`, 2, 6, "deroule_pedagogique_detaille", { fi });
     });
 
+    // IND 7 — Adéquation contenus / exigences certification (si formation avec code RS/RNCP)
+    formations.forEach((f, fi) => {
+      if (f.codeRNCP) {
+        add(`af_c2i7_fiche_certification_${fi}`, `CT2 - IND 7 FICHE CERTIFICATION RS/RNCP`, 2, 7, "fiche_certification_rs", { fi });
+        add(`af_c2i7_tableau_croise_${fi}`, `CT2 - IND 7 TABLEAU CROISÉ COMPÉTENCES / PROGRAMME`, 2, 7, "tableau_croise_cfa", { fi });
+      }
+    });
+
     // IND 8 — Positionnement et évaluation des acquis à l'entrée
     // Trames vides (modèles)
     formations.forEach((f, fi) => {
