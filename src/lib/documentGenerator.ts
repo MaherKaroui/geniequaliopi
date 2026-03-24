@@ -1,5 +1,5 @@
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
-import { buildDocument, htmlWrap, orgHeader, formationInfoBlock, formationInfoBlockStagiaire, tableHTML, signatureBlock3, signatureBlock2, footer, section, formatDate, infoGrid, getDocStyle, subtractBusinessDays, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif, applyGender } from "./docBuilder";
+import { buildDocument, htmlWrap, orgHeader, formationInfoBlock, formationInfoBlockStagiaire, tableHTML, signatureBlock3, signatureBlock2, footer, section, formatDate, infoGrid, getDocStyle, subtractBusinessDays, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif, applyGender, g } from "./docBuilder";
 import { FormateurInfo, SAMPLE_FORMATIONS, SAMPLE_STAGIAIRES, SAMPLE_FORMATEURS, SAMPLE_ORGANISME, EVAL_SCORES, SATISFACTION_SCORES, CONNECTION_TIMES, getFormationDays, mergeOrganisme, mergeStagiaires, getConnectionTimes, parseDuree } from "./sampleData";
 import { buildFullCatalog } from "./docCatalog";
 import { generateBookQualiopi } from "./bookQualiopi";
@@ -1518,7 +1518,7 @@ function generateFormateurComment(s: StagiaireInfo, f: FormationInfo, totalScore
       const actions = [
         `Le formateur prévoit pour ${fullName} des temps de remédiation individualisés, des supports simplifiés et un accompagnement pas à pas.`,
         `Un plan de rattrapage sera mis en place pour ${fullName} incluant des exercices guidés, des tutoriels vidéo et un suivi quotidien.`,
-        `${fullName} sera accompagné(e) de manière individuelle avec des objectifs intermédiaires pour favoriser une progression régulière.`,
+        `${fullName} sera ${g(s, "accompagné", "accompagnée")} de manière individuelle avec des objectifs intermédiaires pour favoriser une progression régulière.`,
       ];
       parts.push(actions[(si + 1) % actions.length]);
     } else {
@@ -2691,7 +2691,7 @@ function genConvocationCertification(o: OrganismeInfo, f: FormationInfo, stagiai
   dateEpreuves.setDate(dateEpreuves.getDate() + 7);
   const dateEpreuvesStr = dateEpreuves.toLocaleDateString("fr-FR");
 
-  const stagList = stagiaires.map(s => `<tr><td>${s.civilite || "M."} ${s.prenom} ${s.nom}</td><td>${s.email || "___"}</td><td>Convoqué(e)</td></tr>`).join("");
+  const stagList = stagiaires.map(s => `<tr><td>${s.civilite || "M."} ${s.prenom} ${s.nom}</td><td>${s.email || "___"}</td><td>${g(s, "Convoqué", "Convoquée")}</td></tr>`).join("");
 
   return buildDocument({ org: o, title: "CONVOCATION AUX ÉPREUVES DE CERTIFICATION", subtitle: `${certifIntitule} (${certifCode})`, sections: [
     { heading: "Objet", content: `
