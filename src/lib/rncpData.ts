@@ -227,6 +227,49 @@ export const RNCP_FICHES: RNCPFiche[] = [
     voiesAcces: ["Formation continue", "Contrat d'apprentissage", "VAE"],
     dureeIndicative: "273h",
   },
+  {
+    code: "RS6674",
+    intitule: "Communiquer en français dans les secteurs du social et du médico-social (niveau B1)",
+    niveau: "Répertoire Spécifique",
+    certificateur: "MYCENES CONSEIL",
+    dateEnregistrement: "27/06/2024",
+    dateEcheance: "27/06/2027",
+    codeNSF: "136 – Langues vivantes, civilisations étrangères et régionales",
+    formacodes: "15242 – Français à visée professionnelle / 15281 – Français mise à niveau / 44072 – Travail social",
+    resume: "La certification s'adresse aux professionnels exerçant ou souhaitant exercer dans les secteurs du social et du médico-social. Elle vise à faire acquérir et valider des compétences dans la communication en français des travailleurs étrangers récemment arrivés et ayant intégré des postes mais ne maîtrisant pas le vocabulaire et modes d'expressions écrites et orales spécifiques au secteur. Le niveau B1 correspond à un niveau d'utilisateur indépendant.",
+    activitesVisees: "Communication professionnelle en français dans le secteur social et médico-social : compréhension et rédaction de documents professionnels, échanges oraux avec patients, collègues et partenaires, utilisation du vocabulaire spécifique au secteur.",
+    blocsCompetences: [
+      {
+        titre: "Comprendre et produire des écrits professionnels du secteur social et médico-social",
+        competences: [
+          "Lire et identifier les informations recherchées sur les différents documents relatifs aux activités en lien avec les secteurs du social et du médico-social",
+          "Rédiger des compte rendus, écrits et messages professionnels en français, en utilisant le vocabulaire spécifique utilisé dans les secteurs du social et du médico-social",
+        ],
+        matieres: [
+          { competence: "Compréhension écrite professionnelle", contenu: "Lecture de documents administratifs (dossiers patients, fiches de liaison, protocoles de soins), identification des informations clés, vocabulaire médico-social spécialisé", volume: "25h" },
+          { competence: "Expression écrite professionnelle", contenu: "Rédaction de comptes rendus d'intervention, transmissions écrites, courriers professionnels, notes de synthèse, vocabulaire spécifique (pathologies, actes de soins, termes administratifs)", volume: "25h" },
+        ],
+        modalitesEval: "Evaluation E1 : Compréhension écrite d'un langage utilisé dans le secteur social et médico-social. Evaluation E2 : Expression écrite sur des documents relevant du secteur. Evaluation E3 : Expression écrite sur le champ lexical avec grammaire.",
+      },
+      {
+        titre: "Communiquer à l'oral dans le contexte professionnel du secteur social et médico-social",
+        competences: [
+          "Comprendre les informations transmises en direct ou à distance (téléphone, visio ou sur bande audio), en s'adaptant aux différents niveaux de langages",
+          "S'exprimer à l'oral, en construisant différents types de phrases (questions, réponses, déclarations, explications) avec des structures grammaticales compréhensibles",
+        ],
+        matieres: [
+          { competence: "Compréhension orale professionnelle", contenu: "Écoute de consignes, compréhension de conversations téléphoniques, réunions d'équipe, transmissions orales entre collègues, vocabulaire médical et social courant", volume: "20h" },
+          { competence: "Expression orale professionnelle", contenu: "Présentation de situations, échanges avec patients/résidents/usagers, communication avec l'équipe pluridisciplinaire, entretiens téléphoniques, reformulation et explication", volume: "20h" },
+        ],
+        modalitesEval: "Evaluation E4 : Compréhension orale d'un langage utilisé dans le secteur social et médico-social. Evaluation E5 : Expression orale avec un langage utilisé dans le secteur social et médico-social.",
+      },
+    ],
+    secteursActivite: "Social et médico-social : établissements de santé, EHPAD, services d'aide à domicile, centres médico-sociaux, hôpitaux, cliniques",
+    typesEmplois: ["Secrétaire médical", "Secrétaire médico-social", "Assistant médico-administratif", "Assistant médical", "Secrétaire hospitalier", "Auxiliaire de vie", "Assistant de vie", "Agent à domicile", "Garde d'enfant à domicile"],
+    codesROME: ["K1301", "K1302", "J1501"],
+    voiesAcces: ["Après un parcours de formation continue"],
+    dureeIndicative: "90h",
+  },
 ];
 
 export function getRNCPByCode(code: string): RNCPFiche | undefined {
