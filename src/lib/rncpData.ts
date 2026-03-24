@@ -270,8 +270,6 @@ export const RNCP_FICHES: RNCPFiche[] = [
     voiesAcces: ["Après un parcours de formation continue"],
     dureeIndicative: "90h",
   },
-];
-
   {
     code: "RS6776",
     intitule: "Création de contenus rédactionnels et visuels par l'usage responsable de l'intelligence artificielle générative",
@@ -322,7 +320,5 @@ export const RNCP_FICHES: RNCPFiche[] = [
 ];
 
 export function getRNCPByCode(code: string): RNCPFiche | undefined {
-  return RNCP_FICHES.find(f => f.code.toLowerCase() === code.toLowerCase());
-}
   return RNCP_FICHES.find(f => f.code.toLowerCase() === code.toLowerCase());
 }
