@@ -387,6 +387,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     }
     case "procedure_abandon_cfa": return genProcedureAbandon(o);
     case "procedure_absences_cfa": return genProcedureAbsences(o);
+    case "emargement_cfa": return genEmargementCFA(o, f, stagiaires);
     case "logs_connexion_cfa": return genRapportConnexion(o, f, stagiaires);
     case "boite_formateur_cfa": return genBoiteFormateur(o, f);
     case "documents_certificateurs_cfa": return genDocumentsCertificateursCFA(o, f);
