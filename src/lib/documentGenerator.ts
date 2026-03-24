@@ -3453,7 +3453,7 @@ function genEmargementCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
   return buildDocument({ org: o, title: "FEUILLE D'ÉMARGEMENT – APPRENTISSAGE", subtitle: f.intitule, formation: f, showFormationInfo: true, extraHtml: extra });
 }
 
-
+function genSynopsisCFA(o: OrganismeInfo, f: FormationInfo) {
   const rncp = getRNCPByCode(f.codeRNCP || '');
   const { totalHours } = parseDuree(f.duree);
   const effectiveTotal = totalHours > 0 ? totalHours : (rncp ? parseInt(rncp.dureeIndicative) || 420 : 420);
