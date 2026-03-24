@@ -160,9 +160,9 @@ export function getStagiaireDateFin(s: StagiaireInfo, f: FormationInfo): string 
   return normalizeDate(s.dateFinFormation || f.dateFin || "");
 }
 
-/** Get per-stagiaire tarif (falls back to formation tarif) */
+/** Get per-stagiaire tarif (uses formation tarif first, then stagiaire-specific) */
 export function getStagiaireTarif(s: StagiaireInfo, f: FormationInfo): string {
-  return s.tarifFormation || f.tarif || "";
+  return f.tarif || s.tarifFormation || "";
 }
 
 /** Format a formation info block for a specific stagiaire (uses their individual dates/tarif if available) */
