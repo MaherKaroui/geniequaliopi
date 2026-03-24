@@ -715,14 +715,14 @@ export function genContratSousTraitanceV2(o: OrganismeInfo, f: FormationInfo, st
       <p>Le Sous-traitant devra remettre au Donneur d'ordre, <strong>au plus tard 15 jours avant le début de la formation</strong>, les documents suivants :</p>
       <table>
         <tr><th style="width:5%">N°</th><th>Document</th><th style="width:15%">Statut</th></tr>
-        <tr><td>1</td><td>Contrat de sous-traitance signé</td><td>☐ Fourni</td></tr>
-        <tr><td>2</td><td>Extrait K-bis ou avis SIRENE à jour</td><td>☐ Fourni</td></tr>
-        <tr><td>3</td><td>Récépissé de déclaration d'activité de formation</td><td>☐ Fourni</td></tr>
-        <tr><td>4</td><td>CV détaillé(s) du/des formateur(s)</td><td>☐ Fourni</td></tr>
-        <tr><td>5</td><td>Copie des diplômes et certifications des formateurs</td><td>☐ Fourni</td></tr>
-        <tr><td>6</td><td>Attestation d'assurance RCP en cours de validité</td><td>☐ Fourni</td></tr>
-        <tr><td>7</td><td>Présentation des méthodes et moyens pédagogiques</td><td>☐ Fourni</td></tr>
-        <tr><td>8</td><td>Programme détaillé de la formation</td><td>☐ Fourni</td></tr>
+        <tr><td>1</td><td>Contrat de sous-traitance signé</td><td>Fourni</td></tr>
+        <tr><td>2</td><td>Extrait K-bis ou avis SIRENE à jour</td><td>Fourni</td></tr>
+        <tr><td>3</td><td>Récépissé de déclaration d'activité de formation</td><td>Fourni</td></tr>
+        <tr><td>4</td><td>CV détaillé(s) du/des formateur(s)</td><td>Fourni</td></tr>
+        <tr><td>5</td><td>Copie des diplômes et certifications des formateurs</td><td>Fourni</td></tr>
+        <tr><td>6</td><td>Attestation d'assurance RCP en cours de validité</td><td>Fourni</td></tr>
+        <tr><td>7</td><td>Présentation des méthodes et moyens pédagogiques</td><td>Fourni</td></tr>
+        <tr><td>8</td><td>Programme détaillé de la formation</td><td>Fourni</td></tr>
       </table>
     `, variant: "green" },
     { heading: "ARTICLE 12 – DURÉE ET RÉSILIATION", content: `
