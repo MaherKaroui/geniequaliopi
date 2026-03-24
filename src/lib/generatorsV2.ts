@@ -8,6 +8,7 @@ function getHoraireFin(f: FormationInfo): string {
   return hoursPerDay <= 6 ? "16h00" : "17h00";
 }
 import { getEvalContent, generateStagiaireAnswers, computeQCMScore, getQuestionsOuvertes, generateStagiaireOpenAnswers } from "./evalContent";
+import { getRNCPByCode } from "./rncpData";
 
 // ========== HELPERS ==========
 
