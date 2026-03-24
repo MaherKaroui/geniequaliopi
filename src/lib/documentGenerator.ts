@@ -5879,14 +5879,9 @@ function genExercicesCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires
     }
   }
 
-  // Generate module-specific exercise consigne
-  const consigneTemplates = [
-    `À partir du cas pratique ci-dessous, mettez en œuvre les compétences liées à « ${matiereTitle} ». Vous devez analyser la situation proposée, identifier les actions à mener et produire un livrable structuré en vous appuyant sur les notions vues en formation (${matiereContenu}).`,
-    `En vous basant sur la mise en situation professionnelle suivante, appliquez les méthodes et outils étudiés dans le cadre de « ${matiereTitle} ». Votre travail doit démontrer votre capacité à mobiliser les savoirs suivants : ${matiereContenu}. Justifiez chacune de vos réponses.`,
-    `Vous êtes en situation professionnelle. On vous demande de réaliser une mission en lien avec « ${matiereTitle} ». À l'aide des connaissances acquises (${matiereContenu}), produisez un travail complet, argumenté et structuré. Vous pouvez vous appuyer sur des exemples concrets.`,
-    `Dans le cadre de votre apprentissage, réalisez l'exercice suivant portant sur « ${matiereTitle} ». Mobilisez les compétences et outils vus en cours (${matiereContenu}) pour traiter la problématique posée. Présentez votre démarche de manière claire et professionnelle.`,
-  ];
-  const consigne = consigneTemplates[(si + exerciceIdx) % consigneTemplates.length];
+  // Generate module-specific exercise consigne and student response templates
+  const consigne = getModuleSpecificConsigne(matiereTitle, matiereContenu, moduleTitle, si, exerciceIdx, hash);
+
 
   const exerciceTitre = matiereTitle
     ? `Exercice ${exerciceIdx + 1} : ${matiereTitle}`
