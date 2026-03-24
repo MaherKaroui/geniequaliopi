@@ -151,6 +151,17 @@ export function buildFullCatalog(
       });
     });
 
+    // IND 16 — Présentation des bénéficiaires à la certification (si formation avec code RS/RNCP)
+    formations.forEach((f, fi) => {
+      if (f.codeRNCP) {
+        add(`af_c3i16_procedure_certification_${fi}`, `CT3 - IND 16 PROCÉDURE DE PRÉSENTATION À LA CERTIFICATION`, 3, 16, "procedure_presentation_certification", { fi });
+        add(`af_c3i16_convocation_certification_${fi}`, `CT3 - IND 16 CONVOCATION AUX ÉPREUVES DE CERTIFICATION`, 3, 16, "convocation_certification", { fi });
+        stagiaires.forEach((s, si) => {
+          add(`af_c3i16_attestation_presentation_${fi}_${si}`, `CT3 - IND 16 ATTESTATION DE PRÉSENTATION À LA CERTIFICATION – ${s.prenom} ${s.nom}`, 3, 16, "attestation_presentation_certification", { fi, stagiaireIdx: si });
+        });
+      }
+    });
+
     // ===== CRITÈRE 4 — ADÉQUATION DES MOYENS =====
 
     // IND 17 — Moyens humains, techniques et environnement
