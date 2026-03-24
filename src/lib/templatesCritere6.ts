@@ -607,8 +607,6 @@ export function genContratSousTraitanceV2(o: OrganismeInfo, f: FormationInfo, st
         <tr><td><strong>Modalités</strong></td><td>${f.modalites || "Présentiel et/ou distanciel (à adapter selon les besoins)"}</td></tr>
         <tr><td><strong>Lieu de formation</strong></td><td>${f.lieu || `${o.adresse}, ${o.codePostal} ${o.ville}`}</td></tr>
         <tr><td><strong>Horaires</strong></td><td>De 9h00 à 12h30 et de 13h30 à 17h00</td></tr>
-        <tr><td><strong>Stagiaire(s) concerné(s)</strong></td><td>${stagList}</td></tr>
-        <tr><td><strong>Tarif</strong></td><td>${f.tarif || "À compléter"}</td></tr>
       </table>
       <p style="margin-top:10px"><strong>Modules de formation :</strong></p>
       <ul>
@@ -679,8 +677,7 @@ export function genContratSousTraitanceV2(o: OrganismeInfo, f: FormationInfo, st
     ` },
     { heading: "ARTICLE 6 – MODALITÉS FINANCIÈRES", content: `
       <p><strong>6.1 – Rémunération :</strong></p>
-      <p>En contrepartie de la réalisation des prestations de formation, le Donneur d'ordre versera au Sous-traitant la somme de : <strong>__________ € HT</strong> par heure de formation dispensée.</p>
-      <p>Le montant total prévisionnel s'élève à : <strong>${f.tarif || "__________ €"} HT</strong>.</p>
+      <p>En contrepartie de la réalisation des prestations de formation, le Donneur d'ordre versera au Sous-traitant la somme de : <strong>50 € HT</strong> par heure de formation dispensée.</p>
       <p><strong>6.2 – Facturation et paiement :</strong></p>
       <ul>
         <li>Le Sous-traitant adressera une facture à l'issue de chaque session de formation</li>
@@ -718,14 +715,14 @@ export function genContratSousTraitanceV2(o: OrganismeInfo, f: FormationInfo, st
       <p>Le Sous-traitant devra remettre au Donneur d'ordre, <strong>au plus tard 15 jours avant le début de la formation</strong>, les documents suivants :</p>
       <table>
         <tr><th style="width:5%">N°</th><th>Document</th><th style="width:15%">Statut</th></tr>
-        <tr><td>1</td><td>Contrat de sous-traitance signé</td><td>☐ Fourni</td></tr>
-        <tr><td>2</td><td>Extrait K-bis ou avis SIRENE à jour</td><td>☐ Fourni</td></tr>
-        <tr><td>3</td><td>Récépissé de déclaration d'activité de formation</td><td>☐ Fourni</td></tr>
-        <tr><td>4</td><td>CV détaillé(s) du/des formateur(s)</td><td>☐ Fourni</td></tr>
-        <tr><td>5</td><td>Copie des diplômes et certifications des formateurs</td><td>☐ Fourni</td></tr>
-        <tr><td>6</td><td>Attestation d'assurance RCP en cours de validité</td><td>☐ Fourni</td></tr>
-        <tr><td>7</td><td>Présentation des méthodes et moyens pédagogiques</td><td>☐ Fourni</td></tr>
-        <tr><td>8</td><td>Programme détaillé de la formation</td><td>☐ Fourni</td></tr>
+        <tr><td>1</td><td>Contrat de sous-traitance signé</td><td>Fourni</td></tr>
+        <tr><td>2</td><td>Extrait K-bis ou avis SIRENE à jour</td><td>Fourni</td></tr>
+        <tr><td>3</td><td>Récépissé de déclaration d'activité de formation</td><td>Fourni</td></tr>
+        <tr><td>4</td><td>CV détaillé(s) du/des formateur(s)</td><td>Fourni</td></tr>
+        <tr><td>5</td><td>Copie des diplômes et certifications des formateurs</td><td>Fourni</td></tr>
+        <tr><td>6</td><td>Attestation d'assurance RCP en cours de validité</td><td>Fourni</td></tr>
+        <tr><td>7</td><td>Présentation des méthodes et moyens pédagogiques</td><td>Fourni</td></tr>
+        <tr><td>8</td><td>Programme détaillé de la formation</td><td>Fourni</td></tr>
       </table>
     `, variant: "green" },
     { heading: "ARTICLE 12 – DURÉE ET RÉSILIATION", content: `
