@@ -5921,11 +5921,13 @@ function genExercicesCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires
       [/c'est/g, 'ses'], [/s'est/g, 'c\'est'],
     ];
     let result = text;
-    const seed = hash + errorRate;
+    const seed = hash + Math.round(errorRate * 100);
     const nbErrors = Math.max(1, Math.floor(typos.length * errorRate));
     for (let i = 0; i < nbErrors; i++) {
-      const idx = (seed + i * 7) % typos.length;
-      result = result.replace(typos[idx][0], typos[idx][1]);
+      const idx = Math.floor((seed + i * 7) % typos.length);
+      const typo = typos[idx];
+      if (!typo) continue;
+      result = result.replace(typo[0], typo[1]);
     }
     return result;
   };
