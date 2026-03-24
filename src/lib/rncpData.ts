@@ -270,6 +270,53 @@ export const RNCP_FICHES: RNCPFiche[] = [
     voiesAcces: ["Après un parcours de formation continue"],
     dureeIndicative: "90h",
   },
+  {
+    code: "RS6776",
+    intitule: "Création de contenus rédactionnels et visuels par l'usage responsable de l'intelligence artificielle générative",
+    niveau: "Répertoire Spécifique",
+    certificateur: "INKREA FORMATIONS",
+    dateEnregistrement: "01/10/2024",
+    dateEcheance: "01/10/2029",
+    codeNSF: "324p – Organisation du travail de bureau / 326p – Informatique, traitement de l'information",
+    formacodes: "31028 – Intelligence artificielle",
+    resume: "Cette certification atteste les compétences nécessaires pour utiliser l'Intelligence Artificielle (IA) Générative de façon efficace, sécurisée, inclusive et réglementaire, dans le but de créer des contenus rédactionnels et visuels et de gagner en productivité. Elle s'adresse aux salariés et demandeurs d'emploi du secteur tertiaire dont le métier inclut la production de contenus rédactionnels ou visuels.",
+    activitesVisees: "Définition de la stratégie d'implémentation de l'IA Générative sur le poste de travail, utilisation optimale des outils d'IA Générative pour créer des contenus rédactionnels et visuels, évaluation et résolution des problématiques éthiques et réglementaires liées à l'utilisation d'outils d'IA générative.",
+    blocsCompetences: [
+      {
+        titre: "Définir et mettre en œuvre une stratégie d'implémentation de l'IA Générative",
+        competences: [
+          "Définir la stratégie d'implémentation de l'IA Générative en fonction du contexte professionnel et des outils existants (ChatGPT, Google Gemini, Adobe Firefly, Microsoft Copilot)",
+          "Rédiger un prompt optimal en utilisant les techniques de Prompt Engineering afin de générer des contenus rédactionnels et visuels satisfaisants",
+          "Garantir la confidentialité des données professionnelles dans l'utilisation d'outils d'IA Générative",
+        ],
+        matieres: [
+          { competence: "Stratégie d'implémentation IA", contenu: "Panorama des outils d'IA Générative (ChatGPT, Gemini, Adobe Firefly, Copilot), analyse du contexte professionnel, plan stratégique d'intégration, installation et configuration", volume: "7h" },
+          { competence: "Prompt Engineering", contenu: "Techniques de requêtage, structuration de prompts, contexte et objectifs, itération conversationnelle, optimisation des résultats", volume: "7h" },
+          { competence: "Confidentialité et sécurité des données", contenu: "Bonnes pratiques de sécurité, protection des informations sensibles, prévention des fuites de données, paramétrage de confidentialité", volume: "3h" },
+        ],
+        modalitesEval: "Mise en situation professionnelle : rapport écrit (préparation 10 jours) + soutenance orale (20 min). Taux de réussite global ≥ 70% requis.",
+      },
+      {
+        titre: "Produire des contenus conformes, inclusifs et optimisés par l'IA Générative",
+        competences: [
+          "Produire des contenus inclusifs adaptés aux besoins des personnes en situation de handicap",
+          "Utiliser les techniques d'optimisation des contenus générés par les outils d'IA Générative",
+          "Appliquer les directives de l'IA Act et du RGPD pour garantir la conformité éthique et réglementaire des contenus",
+        ],
+        matieres: [
+          { competence: "Contenus inclusifs et accessibles", contenu: "Accessibilité numérique, adaptation aux handicaps, normes d'inclusivité, bonnes pratiques rédactionnelles et visuelles", volume: "3h" },
+          { competence: "Optimisation des contenus IA", contenu: "Enrichissement du contexte, affinage des prompts, critères de qualité (contrainte, style, format), workflow rédactionnel + visuel intégré", volume: "4h" },
+          { competence: "Conformité IA Act et RGPD", contenu: "Réglementation européenne IA Act, RGPD appliqué à l'IA, veille réglementaire, identification des risques, mesures préventives et correctives", volume: "4h" },
+        ],
+        modalitesEval: "Mise en situation professionnelle : rapport écrit (préparation 10 jours) + soutenance orale (20 min). Taux de réussite global ≥ 70% requis.",
+      },
+    ],
+    secteursActivite: "Secteur tertiaire : assistanat, secrétariat, marketing, communication, ressources humaines, juridique",
+    typesEmplois: ["Assistant de direction", "Community manager", "Chargé de communication", "Rédacteur", "Responsable marketing", "Assistant RH"],
+    codesROME: ["E1104", "E1101", "M1604"],
+    voiesAcces: ["Après un parcours de formation continue", "Par candidature individuelle", "Par expérience (VAE)"],
+    dureeIndicative: "28h",
+  },
 ];
 
 export function getRNCPByCode(code: string): RNCPFiche | undefined {

@@ -215,6 +215,7 @@ export const SAMPLE_FORMATIONS: FormationInfo[] = [
     lieu: "25 avenue de la Formation Professionnelle, 75008 Paris – Salle Numérique B3",
     nombreParticipants: "12",
     formateur: "Alexandre Petit",
+    codeRNCP: "RS6776",
   },
   {
     intitule: "Gestion Administrative du Personnel & Obligations Légales",
