@@ -1,6 +1,6 @@
 import { DocEntry, FormationInfo } from "@/types/qualiopi";
 import { StagiaireInfo } from "@/types/qualiopi";
-import { FormateurInfo, getFormationDays } from "./sampleData";
+import { FormateurInfo, getFormationDays, parseDuree } from "./sampleData";
 
 export type ActionType = 'actions-formation' | 'bilans-competences' | 'vae' | 'apprentissage';
 
