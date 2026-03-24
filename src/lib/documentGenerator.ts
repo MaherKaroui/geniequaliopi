@@ -2735,6 +2735,83 @@ function genConvocationCertification(o: OrganismeInfo, f: FormationInfo, stagiai
     </div>` });
 }
 
+function genPVExamenCertification(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
+  const rncp = getRNCPByCode(f.codeRNCP || "");
+  const certifCode = rncp?.code || f.codeRNCP || "___";
+  const certifIntitule = rncp?.intitule || f.intitule;
+  const certifNom = rncp?.certificateur || "___";
+  const dateFin = f.dateFin ? new Date(f.dateFin) : new Date();
+  const dateEpreuves = new Date(dateFin);
+  dateEpreuves.setDate(dateEpreuves.getDate() + 7);
+  const dateEpreuvesStr = dateEpreuves.toLocaleDateString("fr-FR");
+
+  const resultRows = stagiaires.map((s, i) => {
+    const blocsHTML = rncp ? rncp.blocsCompetences.map((b, bi) =>
+      `<td style="text-align:center">☐ Acquis ☐ Non acquis</td>`
+    ).join("") : `<td style="text-align:center">☐ Acquis ☐ Non acquis</td>`;
+    return `<tr>
+      <td>${i + 1}</td>
+      <td>${s.civilite || "M."} ${s.prenom} ${s.nom}</td>
+      ${blocsHTML}
+      <td style="text-align:center"><strong>☐ ${g(s, "Admis", "Admise")} ☐ ${g(s, "Ajourné", "Ajournée")}</strong></td>
+    </tr>`;
+  }).join("");
+
+  const blocsHeaders = rncp ? rncp.blocsCompetences.map((b, i) => `<th>Bloc ${i + 1}</th>`).join("") : `<th>Épreuve</th>`;
+
+  return buildDocument({ org: o, title: "PROCÈS-VERBAL D'EXAMEN DE CERTIFICATION", subtitle: `${certifIntitule} (${certifCode})`, sections: [
+    { heading: "Informations générales", content: `
+      ${tableHTML(["Élément", "Détail"], [
+        ["Certification", `${certifIntitule} (${certifCode})`],
+        ["Certificateur (Nom légal)", certifNom],
+        ["Organisme de formation", o.nom],
+        ["Formation suivie", f.intitule],
+        ["Période de formation", `Du ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)}`],
+        ["Date des épreuves", dateEpreuvesStr],
+        ["Lieu des épreuves", f.lieu || `${o.adresse}, ${o.codePostal} ${o.ville}`],
+      ])}` },
+    { heading: "Composition du jury", content: `
+      <table>
+        <thead><tr><th>Fonction</th><th>Nom</th><th>Qualité</th></tr></thead>
+        <tbody>
+          <tr><td>Président du jury</td><td>________________________</td><td>________________________</td></tr>
+          <tr><td>Membre du jury</td><td>________________________</td><td>________________________</td></tr>
+          <tr><td>Membre du jury</td><td>________________________</td><td>________________________</td></tr>
+        </tbody>
+      </table>`, variant: "green" },
+    { heading: "Résultats individuels", content: `
+      <table>
+        <thead><tr><th>N°</th><th>Candidat</th>${blocsHeaders}<th>Décision finale</th></tr></thead>
+        <tbody>${resultRows}</tbody>
+      </table>` },
+    { heading: "Synthèse des résultats", content: `
+      ${tableHTML(["", "Nombre"], [
+        ["Nombre de candidats présentés", `${stagiaires.length}`],
+        ["Nombre de candidats admis", "______"],
+        ["Nombre de candidats ajournés", "______"],
+        ["Taux de réussite", "______%"],
+      ])}` },
+    { heading: "Observations du jury", content: `
+      <p style="min-height:80px;border:1px solid #ccc;padding:10px;border-radius:4px"><em>Observations éventuelles du jury sur le déroulement des épreuves, les résultats ou recommandations :</em></p>` },
+    { heading: "Certification sur l'honneur", content: `
+      <p>Les membres du jury certifient sur l'honneur que les épreuves se sont déroulées conformément aux modalités d'évaluation définies par le certificateur <strong>${certifNom}</strong> et que les résultats consignés ci-dessus sont exacts.</p>` },
+  ], extraHtml: `<div style="margin-top:40px;display:flex;gap:30px;flex-wrap:wrap">
+      <div class="sig-box" style="flex:1;min-width:200px">
+        <p class="sig-label">Le Président du jury</p>
+        <p>Nom : ________________________</p>
+        <p>Date : ${dateEpreuvesStr}</p>
+        <p style="margin-top:20px">Signature :</p>
+      </div>
+      <div class="sig-box" style="flex:1;min-width:200px">
+        <p class="sig-label">Le Responsable de l'organisme</p>
+        <p>Nom : ${o.dirigeant}</p>
+        <p>Date : ${dateEpreuvesStr}</p>
+        <p style="margin-top:20px">Signature :</p>
+        ${o.tamponUrl ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />` : ""}
+      </div>
+    </div>` });
+}
+
 function genAttestationPresentationCertification(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], stagiaireIdx: number) {
   const s = stagiaires[stagiaireIdx] || stagiaires[0];
   const rncp = getRNCPByCode(f.codeRNCP || "");
