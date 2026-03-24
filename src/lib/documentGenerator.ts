@@ -850,6 +850,27 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
     <h2>2. Intitulé de la formation</h2>
     <div class="section">
       <p style="font-size:${getDocStyle().fontSize + 2}px;font-weight:bold">${f.intitule}</p>
+      ${(() => {
+        const rncp = f.codeRNCP ? getRNCPByCode(f.codeRNCP) : undefined;
+        if (!rncp) return "";
+        const isRS = rncp.code.toUpperCase().startsWith("RS");
+        const label = isRS ? "Répertoire Spécifique" : "RNCP";
+        const fcUrl = isRS
+          ? `https://www.francecompetences.fr/recherche/rs/${rncp.code.replace(/\D/g, "")}/`
+          : `https://www.francecompetences.fr/recherche/rncp/${rncp.code.replace(/\D/g, "")}/`;
+        return `
+          <table style="margin-top:12px;width:100%">
+            <tr><th style="width:40%">Code ${label}</th><td>${rncp.code}</td></tr>
+            <tr><th>Intitulé de la certification</th><td>${rncp.intitule}</td></tr>
+            <tr><th>Certificateur – Nom légal</th><td>${rncp.certificateur}</td></tr>
+            <tr><th>Niveau</th><td>${rncp.niveau}</td></tr>
+            <tr><th>Date d'enregistrement</th><td>${rncp.dateEnregistrement}</td></tr>
+            <tr><th>Date d'échéance</th><td>${rncp.dateEcheance}</td></tr>
+            <tr><th>Code(s) NSF</th><td>${rncp.codeNSF}</td></tr>
+            <tr><th>Formacode(s)</th><td>${rncp.formacodes}</td></tr>
+            <tr><th>Lien France Compétences</th><td><a href="${fcUrl}" target="_blank">${fcUrl}</a></td></tr>
+          </table>`;
+      })()}
     </div>
 
     <h2>3. Prérequis</h2>
