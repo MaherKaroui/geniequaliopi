@@ -5879,6 +5879,9 @@ function genExercicesCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires
     }
   }
 
+  // Generate hash for deterministic variations
+  const hash = (s.nom + s.prenom + String(exerciceIdx)).split("").reduce((a: number, c: string) => a + c.charCodeAt(0), 0);
+
   // Generate module-specific exercise consigne and student response templates
   const consigne = getModuleSpecificConsigne(matiereTitle, matiereContenu, moduleTitle, si, exerciceIdx, hash);
 
