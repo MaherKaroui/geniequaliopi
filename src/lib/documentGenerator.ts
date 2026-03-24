@@ -5742,8 +5742,14 @@ function getCFAWeekDates(f: FormationInfo): { cfaWeekNum: number; weekStart: Dat
   const totalCFAWeeks = Math.max(1, Math.ceil(effectiveTotal / 35));
   const cycleLength = cfaPerCycle + entrepriseWeeks;
 
-  const startDate = f.dateDebut ? new Date(f.dateDebut.split('/').reverse().join('-')) : new Date();
-  if (isNaN(startDate.getTime())) startDate.setTime(Date.now());
+  const rawStartDate = f.dateDebut ? new Date(f.dateDebut.split('/').reverse().join('-')) : new Date();
+  if (isNaN(rawStartDate.getTime())) rawStartDate.setTime(Date.now());
+  rawStartDate.setHours(12, 0, 0, 0);
+
+  const firstWeekStart = new Date(rawStartDate);
+  const dayOfWeek = firstWeekStart.getDay();
+  const diffToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+  firstWeekStart.setDate(firstWeekStart.getDate() + diffToMonday);
 
   const result: { cfaWeekNum: number; weekStart: Date; weekEnd: Date }[] = [];
   let cfaWeekCount = 0;
@@ -5755,10 +5761,10 @@ function getCFAWeekDates(f: FormationInfo): { cfaWeekNum: number; weekStart: Dat
 
     if (isCFA) {
       cfaWeekCount++;
-      const weekStart = new Date(startDate);
-      weekStart.setDate(weekStart.getDate() + calendarWeek * 7);
+      const weekStart = new Date(firstWeekStart);
+      weekStart.setDate(firstWeekStart.getDate() + calendarWeek * 7);
       const weekEnd = new Date(weekStart);
-      weekEnd.setDate(weekEnd.getDate() + 4); // vendredi
+      weekEnd.setDate(weekEnd.getDate() + 4);
       result.push({ cfaWeekNum: cfaWeekCount, weekStart, weekEnd });
     }
     calendarWeek++;
