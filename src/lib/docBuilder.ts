@@ -157,7 +157,7 @@ export function getStagiaireDateDebut(s: StagiaireInfo, f: FormationInfo): strin
 
 /** Get the formation end date for a specific stagiaire */
 export function getStagiaireDateFin(s: StagiaireInfo, f: FormationInfo): string {
-  return normalizeDate(s.dateFinFormation || f.dateFin || "");
+  return normalizeDate(f.dateFin || s.dateFinFormation || "");
 }
 
 /** Get per-stagiaire tarif (uses formation tarif first, then stagiaire-specific) */
