@@ -2723,7 +2723,21 @@ function genConvocationCertification(o: OrganismeInfo, f: FormationInfo, stagiai
         <li>En cas d'empêchement, prévenir <strong>${o.nom}</strong> au moins 48h à l'avance</li>
         <li>L'utilisation de tout support non autorisé entraîne l'<strong>annulation de l'épreuve</strong></li>
       </ul>` },
-  ], signatures: { type: "2", labels: ["Le Responsable pédagogique", "Le/La Bénéficiaire"], names: [o.responsablePedagogique || o.dirigeant, "________________________"] } });
+  ], extraHtml: `<div class="signature-block-2" style="margin-top:40px">
+      <div class="sig-box">
+        <p class="sig-label">Le Responsable pédagogique</p>
+        <p>Nom : ${o.responsablePedagogique || o.dirigeant}</p>
+        <p>Date : ${formatDate(f.dateFin)}</p>
+        <p style="margin-top:20px">Signature :</p>
+        ${o.tamponUrl ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />` : ""}
+      </div>
+      <div class="sig-box">
+        <p class="sig-label">Le/La Bénéficiaire</p>
+        <p>Nom : ________________________</p>
+        <p>Date : ${formatDate(f.dateFin)}</p>
+        <p style="margin-top:20px">Signature :</p>
+      </div>
+    </div>` });
 }
 
 function genAttestationPresentationCertification(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], stagiaireIdx: number) {
@@ -2761,7 +2775,22 @@ function genAttestationPresentationCertification(o: OrganismeInfo, f: FormationI
         ["Présentation à la certification", "☐ Admis(e)  ☐ Non admis(e)  ☐ En attente des résultats"],
       ])}
       <p style="margin-top:10px"><em>Le résultat définitif sera communiqué par le certificateur <strong>${certifNom}</strong> selon ses délais propres.</em></p>` },
-  ], signatures: { type: "2", labels: ["Le Responsable de l'organisme", `Le/La Bénéficiaire`], names: [o.dirigeant, `${s.prenom} ${s.nom}`] }, stagiaires: [s] });
+  ], extraHtml: `<div class="signature-block-2" style="margin-top:40px">
+      <div class="sig-box">
+        <p class="sig-label">Le Responsable de l'organisme</p>
+        <p>Nom : ${o.dirigeant}</p>
+        <p>Date : ${formatDate(f.dateFin)}</p>
+        <p style="margin-top:20px">Signature :</p>
+        ${o.tamponUrl ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />` : ""}
+      </div>
+      <div class="sig-box">
+        <p class="sig-label">Le/La Bénéficiaire</p>
+        <p>Nom : ${s.prenom} ${s.nom}</p>
+        <p>Date : ${formatDate(f.dateFin)}</p>
+        <p style="margin-top:20px">Signature :</p>
+        ${s.signatureUrl ? `<img src="${s.signatureUrl}" alt="Signature" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : ""}
+      </div>
+    </div>`, stagiaires: [s] });
 }
 
 // ============== BILAN DE COMPÉTENCES ==============
