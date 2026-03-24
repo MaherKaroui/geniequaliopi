@@ -3454,7 +3454,11 @@ function genSynopsisCFA(o: OrganismeInfo, f: FormationInfo) {
     let calendarWeek = 1;
     let moduleIdx = 0;
     let remainingInModule = modules[0]?.volume || 0;
-    const weekPlan: { calWeek: number; cfaWeek: number; isCFA: boolean; moduleTitle: string; hours: number; exercices: string; entrepriseTask: string }[] = [];
+    const weekPlan: { calWeek: number; cfaWeek: number; isCFA: boolean; moduleTitle: string; hours: number; exercices: string; entrepriseTask: string; weekStartDate: Date; weekEndDate: Date }[] = [];
+
+    // Compute start date
+    const startDate = f.dateDebut ? new Date(f.dateDebut.split('/').reverse().join('-')) : new Date();
+    if (isNaN(startDate.getTime())) startDate.setTime(Date.now());
 
     for (let cycle = 0; cycle < totalCycles && moduleIdx < modules.length; cycle++) {
       // CFA weeks in this cycle
@@ -3462,14 +3466,20 @@ function genSynopsisCFA(o: OrganismeInfo, f: FormationInfo) {
         cfaWeekNum++;
         const weekHours = Math.min(35, remainingInModule);
         const mod = modules[moduleIdx];
+        const weekStart = new Date(startDate);
+        weekStart.setDate(weekStart.getDate() + calendarWeek * 7);
+        const weekEnd = new Date(weekStart);
+        weekEnd.setDate(weekEnd.getDate() + 4);
         weekPlan.push({
-          calWeek: calendarWeek,
+          calWeek: calendarWeek + 1,
           cfaWeek: cfaWeekNum,
           isCFA: true,
           moduleTitle: mod.titre,
           hours: weekHours,
           exercices: `Exercice 1 + Exercice 2 (${mod.modalitesEval.split(',')[0] || 'évaluation continue'})`,
           entrepriseTask: '',
+          weekStartDate: weekStart,
+          weekEndDate: weekEnd,
         });
         remainingInModule -= weekHours;
         if (remainingInModule <= 0) {
@@ -3481,23 +3491,32 @@ function genSynopsisCFA(o: OrganismeInfo, f: FormationInfo) {
       // Enterprise weeks
       for (let ew = 0; ew < entrepriseWeeks; ew++) {
         const currentMod = moduleIdx < modules.length ? modules[moduleIdx] : modules[modules.length - 1];
+        const weekStart = new Date(startDate);
+        weekStart.setDate(weekStart.getDate() + calendarWeek * 7);
+        const weekEnd = new Date(weekStart);
+        weekEnd.setDate(weekEnd.getDate() + 4);
         weekPlan.push({
-          calWeek: calendarWeek,
+          calWeek: calendarWeek + 1,
           cfaWeek: 0,
           isCFA: false,
           moduleTitle: '',
           hours: 0,
           exercices: '',
           entrepriseTask: `Mise en pratique : ${currentMod?.titre || 'compétences acquises'} — Livret d'alternance`,
+          weekStartDate: weekStart,
+          weekEndDate: weekEnd,
         });
         calendarWeek++;
       }
     }
 
+    const fmtDate = (d: Date) => d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
     // Week-by-week planning table
     planningHtml += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%">
       <tr style="background:#1e3a7b;color:#fff">
-        <th>Semaine calendaire</th>
+        <th>Semaine</th>
+        <th>Dates</th>
         <th>Lieu</th>
         <th>Sem. CFA</th>
         <th>Module / Bloc</th>
@@ -3505,9 +3524,11 @@ function genSynopsisCFA(o: OrganismeInfo, f: FormationInfo) {
         <th>Exercices / Évaluations</th>
       </tr>`;
     weekPlan.forEach(w => {
+      const dateRange = `${fmtDate(w.weekStartDate)} – ${fmtDate(w.weekEndDate)}`;
       if (w.isCFA) {
         planningHtml += `<tr>
           <td style="text-align:center">S${w.calWeek}</td>
+          <td style="text-align:center;font-size:0.85em">${dateRange}</td>
           <td><strong>CFA</strong></td>
           <td style="text-align:center">${w.cfaWeek}</td>
           <td>${w.moduleTitle}</td>
@@ -3517,6 +3538,7 @@ function genSynopsisCFA(o: OrganismeInfo, f: FormationInfo) {
       } else {
         planningHtml += `<tr style="background:#f0f8f0">
           <td style="text-align:center">S${w.calWeek}</td>
+          <td style="text-align:center;font-size:0.85em">${dateRange}</td>
           <td><strong>Entreprise</strong></td>
           <td style="text-align:center">—</td>
           <td colspan="2">${w.entrepriseTask}</td>
@@ -5708,6 +5730,43 @@ function genTestCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: Sta
   return buildDocument({ org: o, title: titre, subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, formation: f, showFormationInfo: true, extraHtml: extra });
 }
 
+/**
+ * Compute actual calendar dates for each CFA week based on dateDebut and alternance rhythm.
+ * Pattern: S1 CFA → S2-S4 Entreprise → S5 CFA → etc.
+ * Returns array of { cfaWeekNum, weekStartDate } for each CFA week.
+ */
+function getCFAWeekDates(f: FormationInfo): { cfaWeekNum: number; weekStart: Date; weekEnd: Date }[] {
+  const { cfaWeeks: cfaPerCycle, entrepriseWeeks } = parseRythmeAlternance(f.rythmeAlternance || '1 semaine CFA / 3 semaines entreprise');
+  const { totalHours } = parseDuree(f.duree);
+  const effectiveTotal = totalHours > 0 ? totalHours : 420;
+  const totalCFAWeeks = Math.max(1, Math.ceil(effectiveTotal / 35));
+  const cycleLength = cfaPerCycle + entrepriseWeeks;
+
+  const startDate = f.dateDebut ? new Date(f.dateDebut.split('/').reverse().join('-')) : new Date();
+  if (isNaN(startDate.getTime())) startDate.setTime(Date.now());
+
+  const result: { cfaWeekNum: number; weekStart: Date; weekEnd: Date }[] = [];
+  let cfaWeekCount = 0;
+  let calendarWeek = 0;
+
+  while (cfaWeekCount < totalCFAWeeks) {
+    const posInCycle = calendarWeek % cycleLength;
+    const isCFA = posInCycle < cfaPerCycle;
+
+    if (isCFA) {
+      cfaWeekCount++;
+      const weekStart = new Date(startDate);
+      weekStart.setDate(weekStart.getDate() + calendarWeek * 7);
+      const weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekEnd.getDate() + 4); // vendredi
+      result.push({ cfaWeekNum: cfaWeekCount, weekStart, weekEnd });
+    }
+    calendarWeek++;
+  }
+
+  return result;
+}
+
 function genExercicesCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number, exerciceIdx: number) {
   const termine = isFormationTerminee(f);
   if (termine) {
@@ -5717,11 +5776,23 @@ function genExercicesCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires
   const rncp = getRNCPByCode(f.codeRNCP || '');
   const { totalHours } = parseDuree(f.duree);
   const effectiveTotal = totalHours > 0 ? totalHours : 420;
-  const totalCFAWeeks = Math.max(1, Math.ceil(effectiveTotal / 35));
 
   // 2 exercises per CFA week → exerciceIdx maps to week + position
   const weekNum = Math.floor(exerciceIdx / 2) + 1;
   const exInWeek = (exerciceIdx % 2) + 1;
+
+  // Get actual dates for this CFA week
+  const cfaWeekDates = getCFAWeekDates(f);
+  const thisWeek = cfaWeekDates[weekNum - 1];
+  let dateStr = '___/___/______';
+  let periodeStr = '';
+  if (thisWeek) {
+    // Exercise 1 → lundi/mardi, Exercise 2 → mercredi/jeudi
+    const exDate = new Date(thisWeek.weekStart);
+    exDate.setDate(exDate.getDate() + (exInWeek === 1 ? 1 : 3)); // mardi ou jeudi
+    dateStr = exDate.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    periodeStr = `du ${thisWeek.weekStart.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })} au ${thisWeek.weekEnd.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })}`;
+  }
 
   // Determine which module/bloc this week falls into
   let moduleTitle = '';
@@ -5749,7 +5820,6 @@ function genExercicesCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires
 
   const evalData = getEvalContent(f.intitule);
   const allExercices = [...evalData.exercices];
-  // Pad with generated exercises if needed
   for (let i = allExercices.length; i <= exerciceIdx; i++) {
     allExercices.push({
       titre: `Exercice ${i + 1} : Cas pratique`,
@@ -5764,7 +5834,8 @@ function genExercicesCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires
     ${moduleTitle ? `<p><strong>Module :</strong> ${moduleTitle}</p>` : ''}
     <p><strong>Modalité d'évaluation :</strong> ${modalitesEval}</p>
     <p><strong>Nom et prénom :</strong> ${s.prenom} ${s.nom}</p>
-    <p><strong>Date :</strong> ___/___/______</p>`;
+    <p><strong>Semaine CFA :</strong> ${periodeStr || `Semaine ${weekNum}`}</p>
+    <p><strong>Date de l'exercice :</strong> ${dateStr}</p>`;
 
   extra += `<h3>${exercice.titre}</h3>
     <p><strong>Consigne :</strong> ${exercice.consigne}</p>
@@ -5774,7 +5845,7 @@ function genExercicesCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires
     <p><strong>Observations du formateur :</strong></p>
     <div style="border:1px solid #ccc;min-height:60px;padding:8px">&#160;</div>`;
 
-  return buildDocument({ org: o, title: `EXERCICE PRATIQUE – Sem. ${weekNum} Ex. ${exInWeek}`, subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, formation: f, showFormationInfo: true, extraHtml: extra });
+  return buildDocument({ org: o, title: `EXERCICE PRATIQUE – Sem. CFA ${weekNum} Ex. ${exInWeek}`, subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, formation: f, showFormationInfo: true, extraHtml: extra });
 }
 
 function genExamenBlancCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
