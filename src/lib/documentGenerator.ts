@@ -5817,7 +5817,7 @@ function getCFAWeekDates(f: FormationInfo): { cfaWeekNum: number; weekStart: Dat
 
 function genExercicesCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number, exerciceIdx: number) {
   const termine = isFormationTerminee(f);
-  const s = stagiaires[si] || stagiaires[0];
+  const s = stagiaires[si] || stagiaires[0] || { nom: 'Dupont', prenom: 'Marie', email: '', telephone: '', entreprise: '', poste: '' } as StagiaireInfo;
   const rncp = getRNCPByCode(f.codeRNCP || '');
   const { totalHours } = parseDuree(f.duree);
   const effectiveTotal = totalHours > 0 ? totalHours : 420;
