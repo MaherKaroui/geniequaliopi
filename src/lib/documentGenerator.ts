@@ -363,6 +363,10 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "titre_rncp_cfa": return genTitreRNCPCFA(o, f);
     case "matiere_titre_cfa": return genMatiereTitreCFA(o, f);
     case "tableau_croise_cfa": return genTableauCroiseCFA(o, f);
+    case "fiche_certification_rs": return genFicheCertificationRS(o, f);
+    case "procedure_presentation_certification": return genProcedurePresentationCertification(o, f);
+    case "convocation_certification": return genConvocationCertification(o, f, stagiaires);
+    case "attestation_presentation_certification": return genAttestationPresentationCertification(o, f, stagiaires, params?.stagiaireIdx ?? 0);
     case "fiche_autoevaluation_apprenti": return genFicheAutoevaluation(o, f, stagiaires);
     case "test_cfa_stagiaire": {
       const si = params?.stagiaireIdx ?? 0;
