@@ -8,6 +8,7 @@ function getHoraireFin(f: FormationInfo): string {
   return hoursPerDay <= 6 ? "16h00" : "17h00";
 }
 import { getEvalContent, generateStagiaireAnswers, computeQCMScore, getQuestionsOuvertes, generateStagiaireOpenAnswers } from "./evalContent";
+import { getRNCPByCode } from "./rncpData";
 
 // ========== HELPERS ==========
 
@@ -565,47 +566,65 @@ export function genExercicesStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
   const allExercices = evalData.exercices;
   const sc = EVAL_SCORES[stagiaireIdx] || [7, 8, 7, 8, 7];
 
-  // Calculate number of exercise blocks: 1 block per 2 days of training (minimum 1)
-  const days = getFormationDays(f);
-  const nbJours = days.length;
-  const nbBlocks = Math.max(1, Math.ceil(nbJours / 2));
-  const EXERCICES_PER_BLOCK = 2;
+  // Check if formation has competency blocs
+  const rncp = f.codeRNCP ? getRNCPByCode(f.codeRNCP) : null;
+  const hasBlocs = rncp && rncp.blocsCompetences && rncp.blocsCompetences.length > 0;
 
-  // Total exercises needed = nbBlocks × 2
+  let nbBlocks: number;
+  let EXERCICES_PER_BLOCK = 2;
+  let blocLabels: string[] = [];
+
+  if (hasBlocs) {
+    nbBlocks = rncp!.blocsCompetences.length;
+    blocLabels = rncp!.blocsCompetences.map(b => b.titre);
+  } else {
+    const days = getFormationDays(f);
+    const nbJours = days.length;
+    nbBlocks = Math.max(1, Math.ceil(nbJours / 2));
+  }
+
   const totalExNeeded = nbBlocks * EXERCICES_PER_BLOCK;
 
-  // Build exercise pool: use available ones, generate extras if needed
   const exercices = [...allExercices];
   for (let i = allExercices.length; i < totalExNeeded; i++) {
     const blockIdx = Math.floor(i / EXERCICES_PER_BLOCK);
-    const jourDebut = blockIdx * 2 + 1;
-    const jourFin = Math.min(blockIdx * 2 + 2, nbJours);
-    exercices.push({
-      titre: `Exercice ${i + 1} : Cas pratique – Jour ${jourDebut}-${jourFin}`,
-      consigne: `À partir de la situation professionnelle présentée, appliquez les compétences acquises durant les jours ${jourDebut} et ${jourFin} de la formation « ${f.intitule} » pour produire le livrable demandé.`,
-      reponseAttendue: `Application des acquis des jours ${jourDebut}-${jourFin} : mise en pratique structurée, utilisation des outils et méthodes vus en formation, résultat conforme aux attentes professionnelles.`,
-    });
+    if (hasBlocs) {
+      const blocTitre = blocLabels[blockIdx] || `Bloc ${blockIdx + 1}`;
+      exercices.push({
+        titre: `Exercice ${i + 1} : Cas pratique – ${blocTitre}`,
+        consigne: `À partir de la situation professionnelle présentée, appliquez les compétences acquises dans le bloc « ${blocTitre} » de la formation « ${f.intitule} » pour produire le livrable demandé.`,
+        reponseAttendue: `Application des acquis du bloc ${blocTitre} : mise en pratique structurée, utilisation des outils et méthodes vus en formation, résultat conforme aux attentes professionnelles.`,
+      });
+    } else {
+      const days = getFormationDays(f);
+      const nbJours = days.length;
+      const jourDebut = blockIdx * 2 + 1;
+      const jourFin = Math.min(blockIdx * 2 + 2, nbJours);
+      exercices.push({
+        titre: `Exercice ${i + 1} : Cas pratique – Jour ${jourDebut}-${jourFin}`,
+        consigne: `À partir de la situation professionnelle présentée, appliquez les compétences acquises durant les jours ${jourDebut} et ${jourFin} de la formation « ${f.intitule} » pour produire le livrable demandé.`,
+        reponseAttendue: `Application des acquis des jours ${jourDebut}-${jourFin} : mise en pratique structurée, utilisation des outils et méthodes vus en formation, résultat conforme aux attentes professionnelles.`,
+      });
+    }
   }
 
-  // Each block file contains 2 exercises
   const blockStart = exerciceIdx !== undefined ? exerciceIdx * EXERCICES_PER_BLOCK : 0;
   const blockEnd = exerciceIdx !== undefined ? blockStart + EXERCICES_PER_BLOCK : totalExNeeded;
   const selectedExercices = exercices.slice(blockStart, Math.min(blockEnd, exercices.length));
 
-  const jourLabel = exerciceIdx !== undefined && nbBlocks > 1
-    ? ` – Jour ${exerciceIdx * 2 + 1}-${Math.min(exerciceIdx * 2 + 2, nbJours)}`
-    : '';
+  let jourLabel: string;
+  if (hasBlocs && exerciceIdx !== undefined) {
+    const blocTitre = blocLabels[exerciceIdx] || `Bloc ${exerciceIdx + 1}`;
+    jourLabel = ` – ${blocTitre}`;
+  } else if (!hasBlocs && exerciceIdx !== undefined && nbBlocks > 1) {
+    const days = getFormationDays(f);
+    const nbJours = days.length;
+    jourLabel = ` – Jour ${exerciceIdx * 2 + 1}-${Math.min(exerciceIdx * 2 + 2, nbJours)}`;
+  } else {
+    jourLabel = '';
+  }
 
-  // Date of exercise = last day of the 2-day block (or last day of formation for last block)
-  const getExerciseDate = (exIdx: number): string => {
-    const jourFin = Math.min(exIdx * 2 + 2, nbJours);
-    if (days.length >= jourFin && f.dateDebut) {
-      return days[jourFin - 1];
-    }
-    return formatDate(f.dateFin);
-  };
-
-  const exerciseDate = exerciceIdx !== undefined ? getExerciseDate(exerciceIdx) : formatDate(f.dateFin);
+  const exerciseDate = formatDate(f.dateFin);
 
   let extra = `
     <h2>EXERCICE PRATIQUE${jourLabel} – FORMATION ${f.intitule.toUpperCase()}</h2>

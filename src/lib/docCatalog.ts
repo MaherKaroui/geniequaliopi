@@ -1,6 +1,7 @@
 import { DocEntry, FormationInfo } from "@/types/qualiopi";
 import { StagiaireInfo } from "@/types/qualiopi";
 import { FormateurInfo, getFormationDays, parseDuree } from "./sampleData";
+import { getRNCPByCode } from "./rncpData";
 
 export type ActionType = 'actions-formation' | 'bilans-competences' | 'vae' | 'apprentissage';
 
@@ -134,18 +135,31 @@ export function buildFullCatalog(
     });
     // Documents individuels per-stagiaire IND 11
     formations.forEach((f, fi) => {
+      const rncp = f.codeRNCP ? getRNCPByCode(f.codeRNCP) : null;
+      const hasBlocs = rncp && rncp.blocsCompetences && rncp.blocsCompetences.length > 0;
       const nbJours = getFormationDays(f).length;
-      const nbExercices = Math.max(1, Math.ceil(nbJours / 2));
+
       stagiaires.forEach((s, si) => {
         add(`af_c3i11_test_debut_${fi}_${si}`, `CT3 - IND 11 TEST DÉBUT DE FORMATION – ${s.prenom} ${s.nom}`, 3, 11, "test_positionnement_debut_stagiaire", { fi, stagiaireIdx: si });
         add(`af_c3i11_test_fin_${fi}_${si}`, `CT3 - IND 11 TEST FIN DE FORMATION – ${s.prenom} ${s.nom}`, 3, 11, "test_positionnement_fin_stagiaire", { fi, stagiaireIdx: si });
-        // Un fichier exercice par tranche de 2 jours
-        for (let exIdx = 0; exIdx < nbExercices; exIdx++) {
-          const jourDebut = exIdx * 2 + 1;
-          const jourFin = Math.min(exIdx * 2 + 2, nbJours);
-          const label = nbExercices > 1 ? ` (Jour ${jourDebut}-${jourFin})` : '';
-          add(`af_c3i11_exercices_${fi}_${si}_ex${exIdx}`, `CT3 - IND 11 EXERCICES PRATIQUES${label} – ${s.prenom} ${s.nom}`, 3, 11, "exercices_stagiaire", { fi, stagiaireIdx: si, exerciceIdx: exIdx });
+
+        if (hasBlocs) {
+          // Un fichier exercice par bloc de compétences
+          rncp!.blocsCompetences.forEach((bloc, blocIdx) => {
+            const blocLabel = bloc.titre.length > 50 ? bloc.titre.substring(0, 50) + '…' : bloc.titre;
+            add(`af_c3i11_exercices_${fi}_${si}_ex${blocIdx}`, `CT3 - IND 11 EXERCICES PRATIQUES (${blocLabel}) – ${s.prenom} ${s.nom}`, 3, 11, "exercices_stagiaire", { fi, stagiaireIdx: si, exerciceIdx: blocIdx });
+          });
+        } else {
+          // Fallback: un fichier exercice par tranche de 2 jours
+          const nbExercices = Math.max(1, Math.ceil(nbJours / 2));
+          for (let exIdx = 0; exIdx < nbExercices; exIdx++) {
+            const jourDebut = exIdx * 2 + 1;
+            const jourFin = Math.min(exIdx * 2 + 2, nbJours);
+            const label = nbExercices > 1 ? ` (Jour ${jourDebut}-${jourFin})` : '';
+            add(`af_c3i11_exercices_${fi}_${si}_ex${exIdx}`, `CT3 - IND 11 EXERCICES PRATIQUES${label} – ${s.prenom} ${s.nom}`, 3, 11, "exercices_stagiaire", { fi, stagiaireIdx: si, exerciceIdx: exIdx });
+          }
         }
+
         add(`af_c3i11_grille_acquisition_${fi}_${si}`, `CT3 - IND 11 GRILLE D'ACQUISITION – ${s.prenom} ${s.nom}`, 3, 11, "grille_acquisition_stagiaire", { fi, stagiaireIdx: si });
         add(`af_c3i11_attestation_${fi}_${si}`, `CT3 - IND 11 ATTESTATION DE RÉUSSITE – ${s.prenom} ${s.nom}`, 3, 11, "attestation_reussite_stagiaire", { fi, stagiaireIdx: si });
       });

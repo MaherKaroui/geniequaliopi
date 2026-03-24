@@ -240,28 +240,61 @@ export const RNCP_FICHES: RNCPFiche[] = [
     activitesVisees: "Communication professionnelle en français dans le secteur social et médico-social : compréhension et rédaction de documents professionnels, échanges oraux avec patients, collègues et partenaires, utilisation du vocabulaire spécifique au secteur.",
     blocsCompetences: [
       {
-        titre: "Comprendre et produire des écrits professionnels du secteur social et médico-social",
+        titre: "C1 – Compréhension écrite",
         competences: [
-          "Lire et identifier les informations recherchées sur les différents documents relatifs aux activités en lien avec les secteurs du social et du médico-social",
-          "Rédiger des compte rendus, écrits et messages professionnels en français, en utilisant le vocabulaire spécifique utilisé dans les secteurs du social et du médico-social",
+          "Lire et identifier les informations recherchées sur les différents documents relatifs aux activités en lien avec les secteurs du social et du médico-social (plan de travail, consignes, prescriptions…)",
+          "S'appuyer sur le vocabulaire utilisé dans le cadre professionnel spécifique et les habitudes de formulation (syntaxes raccourcies, abréviations…)",
+          "Assurer une prise en compte adéquate des écrits professionnels",
         ],
         matieres: [
-          { competence: "Compréhension écrite professionnelle", contenu: "Lecture de documents administratifs (dossiers patients, fiches de liaison, protocoles de soins), identification des informations clés, vocabulaire médico-social spécialisé", volume: "25h" },
-          { competence: "Expression écrite professionnelle", contenu: "Rédaction de comptes rendus d'intervention, transmissions écrites, courriers professionnels, notes de synthèse, vocabulaire spécifique (pathologies, actes de soins, termes administratifs)", volume: "25h" },
+          { competence: "Compréhension du vocabulaire spécifique", contenu: "Vocabulaire spécifique au domaine social et médico-social, textes factuels et clairs, environnement professionnel", volume: "10h" },
+          { competence: "Compréhension de textes professionnels", contenu: "Messages, consignes, textes courts en lien avec le niveau de responsabilité et d'intervention dans le secteur", volume: "8h" },
+          { competence: "Compréhension des demandes", contenu: "Messages exprimant des demandes des patients ou personnes accompagnées, consignes des collaborateurs", volume: "7h" },
         ],
-        modalitesEval: "Evaluation E1 : Compréhension écrite d'un langage utilisé dans le secteur social et médico-social. Evaluation E2 : Expression écrite sur des documents relevant du secteur. Evaluation E3 : Expression écrite sur le champ lexical avec grammaire.",
+        modalitesEval: "Evaluation E1 : Compréhension écrite – QCM 4 sections, 60 questions (51 écrans), durée 40 minutes. Une seule réponse exacte par question.",
       },
       {
-        titre: "Communiquer à l'oral dans le contexte professionnel du secteur social et médico-social",
+        titre: "C2 – Expression écrite",
         competences: [
-          "Comprendre les informations transmises en direct ou à distance (téléphone, visio ou sur bande audio), en s'adaptant aux différents niveaux de langages",
-          "S'exprimer à l'oral, en construisant différents types de phrases (questions, réponses, déclarations, explications) avec des structures grammaticales compréhensibles",
+          "Rédiger des comptes rendus, écrits et messages professionnels en français en utilisant le vocabulaire spécifique du secteur social et médico-social",
+          "Planifier ou gérer les rendez-vous de patients ou d'usagers pour le secteur médico-social",
+          "Retranscrire des informations à caractère social",
+          "Utiliser le champ lexical et la grammaire du secteur social et médico-social",
         ],
         matieres: [
-          { competence: "Compréhension orale professionnelle", contenu: "Écoute de consignes, compréhension de conversations téléphoniques, réunions d'équipe, transmissions orales entre collègues, vocabulaire médical et social courant", volume: "20h" },
-          { competence: "Expression orale professionnelle", contenu: "Présentation de situations, échanges avec patients/résidents/usagers, communication avec l'équipe pluridisciplinaire, entretiens téléphoniques, reformulation et explication", volume: "20h" },
+          { competence: "Expression écrite professionnelle", contenu: "Planification de rendez-vous (80 mots min.), production de documents professionnels courants (200 mots min.), vocabulaire et argumentation", volume: "10h" },
+          { competence: "Champ lexical et grammaire", contenu: "Expressions, vocabulaire professionnel, expressions téléphoniques, mots de liaison, expressions empathiques, adjectifs, adverbes, prépositions, temps, verbes modaux, comparatifs, conditionnels, gérondifs, voix passive, pronoms", volume: "10h" },
+          { competence: "Documents administratifs", contenu: "Documents de prise en charge sociale, transmissions écrites, comptes rendus d'intervention, courriers professionnels", volume: "5h" },
         ],
-        modalitesEval: "Evaluation E4 : Compréhension orale d'un langage utilisé dans le secteur social et médico-social. Evaluation E5 : Expression orale avec un langage utilisé dans le secteur social et médico-social.",
+        modalitesEval: "Evaluation E2 : Expression écrite – 2 sections (Section A : planification 80 mots min., Section B : retranscription 200 mots min.), durée 1h. Evaluation E3 : Champ lexical et grammaire – QCM 4 sections, 40 questions, durée 30 min, seuil 80%.",
+      },
+      {
+        titre: "C3 – Compréhension orale",
+        competences: [
+          "Comprendre les informations transmises en direct ou à distance (téléphone, visio ou sur bande audio)",
+          "S'adapter aux différents niveaux de langages (techniques et émotionnels)",
+          "S'adapter aux différentes vitesses d'élocutions et typologies d'accents",
+          "Faire usage des informations comprises lors des échanges à finalité professionnelle",
+        ],
+        matieres: [
+          { competence: "Compréhension orale en situation", contenu: "Écoute de consignes, conversations téléphoniques, réunions d'équipe, transmissions orales entre collègues", volume: "10h" },
+          { competence: "Vocabulaire médical et social courant", contenu: "Vocabulaire utilisé dans le champ habituel d'intervention, articulation et vocabulaire distinctement exprimé", volume: "10h" },
+        ],
+        modalitesEval: "Evaluation E4 : Compréhension orale – QCM 4 sections, 50 questions (64 écrans), durée 1h. Une seule réponse exacte par question.",
+      },
+      {
+        titre: "C4 – Expression orale",
+        competences: [
+          "S'exprimer à l'oral en construisant différents types de phrases (questions, réponses, déclarations, explications)",
+          "Utiliser des structures grammaticales compréhensibles et des champs lexicaux appropriés",
+          "Communiquer et interagir de façon claire, concise et efficace dans le cadre d'activités du secteur social et médico-social",
+          "Obtenir des renseignements et argumenter pour convaincre",
+        ],
+        matieres: [
+          { competence: "Expression orale en situation professionnelle", contenu: "Relater des faits professionnels, donner des explications, demande de renseignements, orientation et conseil", volume: "5h" },
+          { competence: "Argumentation et vocabulaire oral", contenu: "Expression d'opinions, argumentation simple, vocabulaire spécifique oral du domaine social et médico-social : termes, sigles et expressions courants", volume: "5h" },
+        ],
+        modalitesEval: "Evaluation E5 : Expression orale – Face à face avec examinateur, 15 minutes. Section A : Obtenir des renseignements (5 min). Section B : Argumenter pour convaincre (10 min).",
       },
     ],
     secteursActivite: "Social et médico-social : établissements de santé, EHPAD, services d'aide à domicile, centres médico-sociaux, hôpitaux, cliniques",
