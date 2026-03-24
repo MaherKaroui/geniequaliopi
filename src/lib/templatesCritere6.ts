@@ -677,8 +677,7 @@ export function genContratSousTraitanceV2(o: OrganismeInfo, f: FormationInfo, st
     ` },
     { heading: "ARTICLE 6 – MODALITÉS FINANCIÈRES", content: `
       <p><strong>6.1 – Rémunération :</strong></p>
-      <p>En contrepartie de la réalisation des prestations de formation, le Donneur d'ordre versera au Sous-traitant la somme de : <strong>__________ € HT</strong> par heure de formation dispensée.</p>
-      <p>Le montant total prévisionnel s'élève à : <strong>${f.tarif || "__________ €"} HT</strong>.</p>
+      <p>En contrepartie de la réalisation des prestations de formation, le Donneur d'ordre versera au Sous-traitant la somme de : <strong>50 € HT</strong> par heure de formation dispensée.</p>
       <p><strong>6.2 – Facturation et paiement :</strong></p>
       <ul>
         <li>Le Sous-traitant adressera une facture à l'issue de chaque session de formation</li>
