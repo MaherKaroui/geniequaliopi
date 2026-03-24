@@ -624,7 +624,30 @@ export function genExercicesStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
     jourLabel = '';
   }
 
-  const exerciseDate = formatDate(f.dateFin);
+  // Calculate exercise date: spread across formation days by bloc
+  let exerciseDate: string;
+  if (hasBlocs && exerciceIdx !== undefined) {
+    const days = getFormationDays(f);
+    const nbJours = days.length;
+    // Distribute days proportionally across blocs: each bloc ends at its proportional last day
+    const totalBlocVolumes = rncp!.blocsCompetences.map(b =>
+      b.matieres.reduce((sum, m) => sum + (parseInt(m.volume) || 0), 0)
+    );
+    const totalH = totalBlocVolumes.reduce((a, b) => a + b, 0) || nbJours;
+    let cumDays = 0;
+    for (let bi = 0; bi <= exerciceIdx; bi++) {
+      cumDays += Math.round((totalBlocVolumes[bi] / totalH) * nbJours);
+    }
+    cumDays = Math.min(cumDays, nbJours);
+    exerciseDate = days.length >= cumDays && cumDays > 0 ? days[cumDays - 1] : formatDate(f.dateFin);
+  } else if (!hasBlocs && exerciceIdx !== undefined) {
+    const days = getFormationDays(f);
+    const nbJours = days.length;
+    const jourFin = Math.min(exerciceIdx * 2 + 2, nbJours);
+    exerciseDate = days.length >= jourFin ? days[jourFin - 1] : formatDate(f.dateFin);
+  } else {
+    exerciseDate = formatDate(f.dateFin);
+  }
 
   let extra = `
     <h2>EXERCICE PRATIQUE${jourLabel} – FORMATION ${f.intitule.toUpperCase()}</h2>
