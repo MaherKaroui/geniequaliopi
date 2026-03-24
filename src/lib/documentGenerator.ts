@@ -5775,32 +5775,25 @@ function getCFAWeekDates(f: FormationInfo): { cfaWeekNum: number; weekStart: Dat
 
 function genExercicesCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number, exerciceIdx: number) {
   const termine = isFormationTerminee(f);
-  if (termine) {
-    return genExercicesStagiaire(o, f, stagiaires, si, exerciceIdx);
-  }
   const s = stagiaires[si] || stagiaires[0];
   const rncp = getRNCPByCode(f.codeRNCP || '');
   const { totalHours } = parseDuree(f.duree);
   const effectiveTotal = totalHours > 0 ? totalHours : 420;
 
-  // 2 exercises per CFA week → exerciceIdx maps to week + position
   const weekNum = Math.floor(exerciceIdx / 2) + 1;
   const exInWeek = (exerciceIdx % 2) + 1;
 
-  // Get actual dates for this CFA week
   const cfaWeekDates = getCFAWeekDates(f);
   const thisWeek = cfaWeekDates[weekNum - 1];
   let dateStr = '___/___/______';
   let periodeStr = '';
   if (thisWeek) {
-    // Exercise 1 → lundi/mardi, Exercise 2 → mercredi/jeudi
     const exDate = new Date(thisWeek.weekStart);
-    exDate.setDate(exDate.getDate() + (exInWeek === 1 ? 1 : 3)); // mardi ou jeudi
+    exDate.setDate(exDate.getDate() + (exInWeek === 1 ? 1 : 3));
     dateStr = exDate.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
     periodeStr = `du ${thisWeek.weekStart.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })} au ${thisWeek.weekEnd.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })}`;
   }
 
-  // Determine which module/bloc this week falls into
   let moduleTitle = '';
   let modalitesEval = 'Mise en situation professionnelle';
   if (rncp && rncp.blocsCompetences.length > 0) {
@@ -5835,6 +5828,39 @@ function genExercicesCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires
   }
   const exercice = allExercices[exerciceIdx] || allExercices[allExercices.length - 1];
 
+  const studentResponse = exercice.reponseAttendue
+    .replace(/Le stagiaire doit /gi, "J'ai ")
+    .replace(/Le stagiaire /gi, "J'ai ")
+    .replace(/L['’]apprenant doit /gi, "J'ai ")
+    .replace(/Il faut que le stagiaire /gi, "J'ai ")
+    .replace(/doit créer/gi, 'ai créé')
+    .replace(/doit utiliser/gi, 'ai utilisé')
+    .replace(/doit rédiger/gi, 'ai rédigé')
+    .replace(/doit appliquer/gi, 'ai appliqué')
+    .replace(/doit identifier/gi, 'ai identifié')
+    .replace(/doit mettre en place/gi, 'ai mis en place')
+    .replace(/doit réaliser/gi, 'ai réalisé')
+    .replace(/doit présenter/gi, 'ai présenté')
+    .replace(/doit analyser/gi, 'ai analysé')
+    .replace(/doit proposer/gi, 'ai proposé')
+    .replace(/\[Name\]/gi, `${s.prenom} ${s.nom}`)
+    .replace(/\[company\]/gi, s.entreprise || 'mon entreprise')
+    .replace(/\[position\]/gi, s.poste || 'mon poste')
+    .replace(/\[.*?\]/g, '');
+
+  const noteOptions = [3, 3.5, 4, 4.5, 5];
+  const note = noteOptions[(si + exerciceIdx) % noteOptions.length];
+  const appreciation = evalData.appreciations[(si + exerciceIdx) % evalData.appreciations.length]
+    || 'Exercice réalisé avec sérieux et implication.';
+
+  const responseBlock = termine
+    ? `<div style="border:1px solid #ccc;min-height:120px;padding:12px;background:#f9f9f9"><p>${studentResponse}</p></div>`
+    : `<div style="border:1px solid #ccc;min-height:120px;padding:12px">&#160;</div>`;
+
+  const observationBlock = termine
+    ? `<div style="border:1px solid #ccc;min-height:60px;padding:8px;background:#f9f9f9"><p>${appreciation}</p></div>`
+    : `<div style="border:1px solid #ccc;min-height:60px;padding:8px">&#160;</div>`;
+
   let extra = `<h2>EXERCICE PRATIQUE – Semaine CFA ${weekNum} / Exercice ${exInWeek}</h2>
     <p><strong>Formation :</strong> ${f.intitule}</p>
     ${moduleTitle ? `<p><strong>Module :</strong> ${moduleTitle}</p>` : ''}
@@ -5846,10 +5872,10 @@ function genExercicesCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires
   extra += `<h3>${exercice.titre}</h3>
     <p><strong>Consigne :</strong> ${exercice.consigne}</p>
     <p><strong>Réponse de l'apprenti(e) :</strong></p>
-    <div style="border:1px solid #ccc;min-height:120px;padding:12px">&#160;</div>
-    <p><strong>Note :</strong> _____ / 5</p>
+    ${responseBlock}
+    <p><strong>Note :</strong> ${termine ? String(note).replace('.', ',') : '_____'} / 5</p>
     <p><strong>Observations du formateur :</strong></p>
-    <div style="border:1px solid #ccc;min-height:60px;padding:8px">&#160;</div>`;
+    ${observationBlock}`;
 
   return buildDocument({ org: o, title: `EXERCICE PRATIQUE – Sem. CFA ${weekNum} Ex. ${exInWeek}`, subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, formation: f, showFormationInfo: true, extraHtml: extra });
 }
