@@ -3454,7 +3454,11 @@ function genSynopsisCFA(o: OrganismeInfo, f: FormationInfo) {
     let calendarWeek = 1;
     let moduleIdx = 0;
     let remainingInModule = modules[0]?.volume || 0;
-    const weekPlan: { calWeek: number; cfaWeek: number; isCFA: boolean; moduleTitle: string; hours: number; exercices: string; entrepriseTask: string }[] = [];
+    const weekPlan: { calWeek: number; cfaWeek: number; isCFA: boolean; moduleTitle: string; hours: number; exercices: string; entrepriseTask: string; weekStartDate: Date; weekEndDate: Date }[] = [];
+
+    // Compute start date
+    const startDate = f.dateDebut ? new Date(f.dateDebut.split('/').reverse().join('-')) : new Date();
+    if (isNaN(startDate.getTime())) startDate.setTime(Date.now());
 
     for (let cycle = 0; cycle < totalCycles && moduleIdx < modules.length; cycle++) {
       // CFA weeks in this cycle
@@ -3462,14 +3466,20 @@ function genSynopsisCFA(o: OrganismeInfo, f: FormationInfo) {
         cfaWeekNum++;
         const weekHours = Math.min(35, remainingInModule);
         const mod = modules[moduleIdx];
+        const weekStart = new Date(startDate);
+        weekStart.setDate(weekStart.getDate() + calendarWeek * 7);
+        const weekEnd = new Date(weekStart);
+        weekEnd.setDate(weekEnd.getDate() + 4);
         weekPlan.push({
-          calWeek: calendarWeek,
+          calWeek: calendarWeek + 1,
           cfaWeek: cfaWeekNum,
           isCFA: true,
           moduleTitle: mod.titre,
           hours: weekHours,
           exercices: `Exercice 1 + Exercice 2 (${mod.modalitesEval.split(',')[0] || 'évaluation continue'})`,
           entrepriseTask: '',
+          weekStartDate: weekStart,
+          weekEndDate: weekEnd,
         });
         remainingInModule -= weekHours;
         if (remainingInModule <= 0) {
@@ -3481,23 +3491,32 @@ function genSynopsisCFA(o: OrganismeInfo, f: FormationInfo) {
       // Enterprise weeks
       for (let ew = 0; ew < entrepriseWeeks; ew++) {
         const currentMod = moduleIdx < modules.length ? modules[moduleIdx] : modules[modules.length - 1];
+        const weekStart = new Date(startDate);
+        weekStart.setDate(weekStart.getDate() + calendarWeek * 7);
+        const weekEnd = new Date(weekStart);
+        weekEnd.setDate(weekEnd.getDate() + 4);
         weekPlan.push({
-          calWeek: calendarWeek,
+          calWeek: calendarWeek + 1,
           cfaWeek: 0,
           isCFA: false,
           moduleTitle: '',
           hours: 0,
           exercices: '',
           entrepriseTask: `Mise en pratique : ${currentMod?.titre || 'compétences acquises'} — Livret d'alternance`,
+          weekStartDate: weekStart,
+          weekEndDate: weekEnd,
         });
         calendarWeek++;
       }
     }
 
+    const fmtDate = (d: Date) => d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
     // Week-by-week planning table
     planningHtml += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%">
       <tr style="background:#1e3a7b;color:#fff">
-        <th>Semaine calendaire</th>
+        <th>Semaine</th>
+        <th>Dates</th>
         <th>Lieu</th>
         <th>Sem. CFA</th>
         <th>Module / Bloc</th>
@@ -3505,9 +3524,11 @@ function genSynopsisCFA(o: OrganismeInfo, f: FormationInfo) {
         <th>Exercices / Évaluations</th>
       </tr>`;
     weekPlan.forEach(w => {
+      const dateRange = `${fmtDate(w.weekStartDate)} – ${fmtDate(w.weekEndDate)}`;
       if (w.isCFA) {
         planningHtml += `<tr>
           <td style="text-align:center">S${w.calWeek}</td>
+          <td style="text-align:center;font-size:0.85em">${dateRange}</td>
           <td><strong>CFA</strong></td>
           <td style="text-align:center">${w.cfaWeek}</td>
           <td>${w.moduleTitle}</td>
@@ -3517,6 +3538,7 @@ function genSynopsisCFA(o: OrganismeInfo, f: FormationInfo) {
       } else {
         planningHtml += `<tr style="background:#f0f8f0">
           <td style="text-align:center">S${w.calWeek}</td>
+          <td style="text-align:center;font-size:0.85em">${dateRange}</td>
           <td><strong>Entreprise</strong></td>
           <td style="text-align:center">—</td>
           <td colspan="2">${w.entrepriseTask}</td>
