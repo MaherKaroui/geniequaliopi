@@ -51,7 +51,19 @@ tr:nth-child(odd){background:#fff}
 
 export function formatDate(dateStr: string): string {
   if (!dateStr) return "___/___/______";
+  // Handle Excel serial date numbers
+  if (/^\d{4,5}$/.test(dateStr.trim())) {
+    const serial = parseInt(dateStr.trim(), 10);
+    if (serial > 1000 && serial < 100000) {
+      const excelEpoch = new Date(1899, 11, 30);
+      const d = new Date(excelEpoch.getTime() + serial * 86400000);
+      if (!isNaN(d.getTime())) {
+        return d.toLocaleDateString("fr-FR");
+      }
+    }
+  }
   const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return dateStr;
   return d.toLocaleDateString("fr-FR");
 }
 
