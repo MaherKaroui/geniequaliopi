@@ -406,7 +406,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
 function genFicheIdentite(o: OrganismeInfo) {
   return buildDocument({ org: o, title: "FICHE D'IDENTITÉ DE L'ORGANISME", sections: [
     { heading: "Informations générales", content: `<p><strong>Raison sociale :</strong> ${o.nom}</p><p><strong>SIRET :</strong> ${o.siret}</p><p><strong>NDA :</strong> ${o.nda}</p><p><strong>Adresse :</strong> ${o.adresse}, ${o.codePostal} ${o.ville}</p><p><strong>Téléphone :</strong> ${o.telephone}</p><p><strong>Email :</strong> ${o.email}</p><p><strong>Site web :</strong> ${o.siteWeb}</p>` },
-    { heading: "Direction", content: `<p><strong>Dirigeant :</strong> ${o.dirigeant}</p><p><strong>Resp. pédagogique :</strong> ${o.dirigeantPedagogique}</p><p><strong>Réf. handicap :</strong> ${o.referentHandicap}</p><p><strong>Réf. qualité :</strong> ${o.referentQualite}</p>` },
+    { heading: "Direction", content: `<p><strong>Dirigeant :</strong> ${o.dirigeant}</p><p><strong>Resp. pédagogique :</strong> ${o.responsablePedagogique}</p><p><strong>Réf. handicap :</strong> ${o.referentHandicap}</p><p><strong>Réf. qualité :</strong> ${o.referentQualite}</p>` },
     { heading: "Activité", content: `<p><strong>Domaines :</strong> ${o.domainesFormation}</p><p><strong>Types d'actions :</strong> ${o.typesActions.join(", ")}</p><p><strong>Certifications :</strong> ${o.certifications}</p><p><strong>Outils :</strong> ${o.outilsUtilises}</p>` },
   ]});
 }
@@ -425,7 +425,7 @@ function genOrganigramme(o: OrganismeInfo) {
     <div style="text-align:center;margin:30px 0">
       <div style="background:#1e3a7b;color:white;padding:15px 30px;border-radius:8px;display:inline-block;margin-bottom:20px"><strong>Direction Générale</strong><br>${o.dirigeant}</div>
       <div style="display:flex;justify-content:center;gap:20px;flex-wrap:wrap;margin-top:20px">
-        <div style="background:#e8f0fe;padding:12px 20px;border-radius:8px;min-width:180px"><strong>Pôle Pédagogique</strong><br>${o.dirigeantPedagogique}<br><em style="font-size:11px">Formateurs</em></div>
+        <div style="background:#e8f0fe;padding:12px 20px;border-radius:8px;min-width:180px"><strong>Pôle Pédagogique</strong><br>${o.responsablePedagogique}<br><em style="font-size:11px">Formateurs</em></div>
         <div style="background:#e8f0fe;padding:12px 20px;border-radius:8px;min-width:180px"><strong>Pôle Qualité</strong><br>${o.referentQualite}<br><em style="font-size:11px">Amélioration continue</em></div>
         <div style="background:#e8f0fe;padding:12px 20px;border-radius:8px;min-width:180px"><strong>Pôle Handicap</strong><br>${o.referentHandicap}<br><em style="font-size:11px">Accessibilité</em></div>
         <div style="background:#e8f0fe;padding:12px 20px;border-radius:8px;min-width:180px"><strong>Pôle Administratif</strong><br>Marie Lecomte<br><em style="font-size:11px">Inscriptions, facturation</em></div>
@@ -619,7 +619,7 @@ function genQuestionnairePositionnement(o: OrganismeInfo, f: FormationInfo, stag
   });
 
   return buildDocument({ org: o, title: "QUESTIONNAIRE DE POSITIONNEMENT – RÉSULTATS DÉTAILLÉS", subtitle: f.intitule, formation: f, showFormationInfo: true, extraHtml: extra,
-    signatures: { type: "2", labels: ["Le Formateur", "Le Resp. Pédagogique"], names: [f.formateur, o.dirigeantPedagogique] } });
+    signatures: { type: "2", labels: ["Le Formateur", "Le Resp. Pédagogique"], names: [f.formateur, o.responsablePedagogique] } });
 }
 
 function genAnalyseBesoins(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
@@ -1093,7 +1093,7 @@ function genTestEntree(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiaire
   });
 
   return buildDocument({ org: o, title: "TEST D'ENTRÉE – RÉSULTATS DÉTAILLÉS", subtitle: f.intitule, formation: f, showFormationInfo: true, extraHtml: extra,
-    signatures: { type: "2", labels: ["Le Formateur", "Le Resp. Pédagogique"], names: [f.formateur, o.dirigeantPedagogique] } });
+    signatures: { type: "2", labels: ["Le Formateur", "Le Resp. Pédagogique"], names: [f.formateur, o.responsablePedagogique] } });
 }
 
 function genGrilleEvaluation(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
@@ -1113,7 +1113,7 @@ function genGrilleEvaluation(o: OrganismeInfo, f: FormationInfo, stagiaires: Sta
   }, sections: [
     { heading: "Légende des compétences évaluées", content: competences.map((c, i) => `<p><strong>C${i + 1} :</strong> ${c}</p>`).join("") },
     { heading: "Légende des niveaux", content: "<p>✅ Acquis (≥ 8/10) | 🔄 En cours d'acquisition (6-7/10) | ❌ Non acquis (< 6/10)</p>" },
-  ], signatures: { type: "2", labels: ["Le Formateur", "Le Resp. Pédagogique"], names: [f.formateur, o.dirigeantPedagogique] } });
+  ], signatures: { type: "2", labels: ["Le Formateur", "Le Resp. Pédagogique"], names: [f.formateur, o.responsablePedagogique] } });
 }
 
 function genReglement(o: OrganismeInfo) {
@@ -1130,7 +1130,7 @@ function genReglement(o: OrganismeInfo) {
 function genLivretAccueil(o: OrganismeInfo, f: FormationInfo) {
   return buildDocument({ org: o, title: "LIVRET D'ACCUEIL", subtitle: f.intitule, sections: [
     { heading: "Bienvenue !", content: `<p>Nous sommes heureux de vous accueillir pour la formation « ${f.intitule} ». Ce livret contient les informations essentielles.</p>` },
-    { heading: "Vos contacts", content: `<p><strong>Direction :</strong> ${o.dirigeant}<br><strong>Pédagogie :</strong> ${o.dirigeantPedagogique}<br><strong>Handicap :</strong> ${o.referentHandicap}<br><strong>Qualité :</strong> ${o.referentQualite}<br><strong>Tél :</strong> ${o.telephone}<br><strong>Email :</strong> ${o.email}</p>` },
+    { heading: "Vos contacts", content: `<p><strong>Direction :</strong> ${o.dirigeant}<br><strong>Pédagogie :</strong> ${o.responsablePedagogique}<br><strong>Handicap :</strong> ${o.referentHandicap}<br><strong>Qualité :</strong> ${o.referentQualite}<br><strong>Tél :</strong> ${o.telephone}<br><strong>Email :</strong> ${o.email}</p>` },
     { heading: "Votre formation", content: `<p><strong>Durée :</strong> ${f.duree}<br><strong>Lieu :</strong> ${f.lieu}<br><strong>Formateur :</strong> ${f.formateur}<br><strong>Horaires :</strong> 9h00-12h30 / 13h30-17h00</p>` },
     { heading: "Informations pratiques", content: "<p>• Merci de vous munir de cette convocation<br>• En cas d'absence, prévenir au " + o.telephone + "<br>• Le règlement intérieur vous sera remis le premier jour</p>" },
   ] });
@@ -1285,7 +1285,7 @@ function genEvalPositionnement(o: OrganismeInfo, f: FormationInfo, stagiaires: S
     extra += `<div class="section section-green"><p><strong>Note globale : ${avg}/10</strong></p><p><strong>Appréciation globale du formateur :</strong> ${evalData.appreciations[si] || "Niveau satisfaisant pour suivre la formation."}</p></div>`;
   });
   return buildDocument({ org: o, title: "ÉVALUATION DE POSITIONNEMENT – RÉSULTATS DÉTAILLÉS", subtitle: f.intitule, formation: f, showFormationInfo: true, extraHtml: extra,
-    signatures: { type: "2", labels: ["Le Formateur", "Le Resp. Pédagogique"], names: [f.formateur, o.dirigeantPedagogique] } });
+    signatures: { type: "2", labels: ["Le Formateur", "Le Resp. Pédagogique"], names: [f.formateur, o.responsablePedagogique] } });
 }
 
 function genEvalIntermediaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
@@ -1696,7 +1696,7 @@ function genQCMPositionnement(o: OrganismeInfo, f: FormationInfo, stagiaires: St
   });
 
   return buildDocument({ org: o, title: "QCM DE POSITIONNEMENT – DÉTAILLÉ", subtitle: f.intitule, formation: f, showFormationInfo: true, extraHtml: extra,
-    signatures: { type: "2", labels: ["Le Formateur", "Le Resp. Pédagogique"], names: [f.formateur, o.dirigeantPedagogique] } });
+    signatures: { type: "2", labels: ["Le Formateur", "Le Resp. Pédagogique"], names: [f.formateur, o.responsablePedagogique] } });
 }
 
 // ===== NEW: Exercices pratiques remplis =====
@@ -1737,7 +1737,7 @@ function genExercicesPratiques(o: OrganismeInfo, f: FormationInfo, stagiaires: S
   extra += tableHTML(["Stagiaire", ...exercices.map((_, i) => `Ex.${i + 1}`), "Moyenne", "Appréciation globale"], globalRows);
 
   return buildDocument({ org: o, title: "EXERCICES PRATIQUES – CORRIGÉS ET RÉSULTATS", subtitle: f.intitule, formation: f, showFormationInfo: true, extraHtml: extra,
-    signatures: { type: "2", labels: ["Le Formateur", "Le Resp. Pédagogique"], names: [f.formateur, o.dirigeantPedagogique] } });
+    signatures: { type: "2", labels: ["Le Formateur", "Le Resp. Pédagogique"], names: [f.formateur, o.responsablePedagogique] } });
 }
 
 // ===== NEW: QCM Final rempli =====
@@ -1874,7 +1874,7 @@ function genGuideElearning(o: OrganismeInfo, f: FormationInfo) {
 
 function genCRReunion(o: OrganismeInfo, mois: string) {
   return buildDocument({ org: o, title: "COMPTE-RENDU RÉUNION PÉDAGOGIQUE", subtitle: mois, sections: [
-    { heading: "Participants", content: `<p>${o.dirigeantPedagogique} (resp. pédagogique), Philippe Martin, Catherine Dubois, Marie Fontaine, Jean-Pierre Blanc, Alexandre Petit</p>` },
+    { heading: "Participants", content: `<p>${o.responsablePedagogique} (resp. pédagogique), Philippe Martin, Catherine Dubois, Marie Fontaine, Jean-Pierre Blanc, Alexandre Petit</p>` },
     { heading: "Ordre du jour", content: "<p>1. Bilan des formations du mois<br>2. Retours stagiaires et points d'amélioration<br>3. Mise à jour des supports pédagogiques<br>4. Planification du mois suivant</p>" },
     { heading: "Décisions prises", content: "<p>• Mise à jour du module Excel (ajout Power Query)<br>• Création d'un nouveau support pour le module Management à distance<br>• Réorganisation des créneaux de formation anglais<br>• Acquisition de 3 licences logicielles supplémentaires</p>", variant: "green" },
     { heading: "Actions à mener", content: "<p>• Philippe Martin : mettre à jour les supports Excel avant le 15 du mois<br>• Catherine Dubois : préparer le nouveau test TOEIC blanc<br>• Alexandre Petit : installer les environnements virtuels pour la formation IT</p>" },
@@ -1888,7 +1888,7 @@ function genPlanningFormateurs(o: OrganismeInfo, formateurs: FormateurInfo[], fo
 
 function genCoordination(o: OrganismeInfo, f: FormationInfo) {
   return buildDocument({ org: o, title: "COORDINATION PÉDAGOGIQUE", subtitle: f.intitule, formation: f, showFormationInfo: true, sections: [
-    { heading: "Équipe pédagogique", content: `<p>Formateur principal : ${f.formateur}<br>Responsable pédagogique : ${o.dirigeantPedagogique}<br>Coordinateur : ${o.dirigeantPedagogique}</p>` },
+    { heading: "Équipe pédagogique", content: `<p>Formateur principal : ${f.formateur}<br>Responsable pédagogique : ${o.responsablePedagogique}<br>Coordinateur : ${o.responsablePedagogique}</p>` },
     { heading: "Points de coordination", content: "<p>• Briefing pré-formation avec le formateur<br>• Point mi-parcours sur l'avancement<br>• Débriefing post-formation<br>• Analyse des évaluations et retours</p>" },
   ] });
 }
@@ -1949,7 +1949,7 @@ function genEntretienPro(o: OrganismeInfo, fmt: FormateurInfo) {
     { heading: "Bilan de l'année", content: `<p>Nombre d'heures de formation dispensées : 450h<br>Taux de satisfaction moyen : 4.8/5<br>Formations nouvelles créées : 2</p>` },
     { heading: "Objectifs pour l'année suivante", content: "<p>• Développer l'offre de formation à distance<br>• Obtenir la certification Qualiopi Formateur Expert<br>• Créer 3 nouveaux modules de formation</p>" },
     { heading: "Besoins de formation identifiés", content: "<p>• Formation avancée en IA appliquée<br>• Certification en ingénierie pédagogique digitale</p>" },
-  ], signatures: { type: "2", labels: ["Le Responsable", "Le Formateur"], names: [o.dirigeantPedagogique, fmt.prenom + " " + fmt.nom] } });
+  ], signatures: { type: "2", labels: ["Le Responsable", "Le Formateur"], names: [o.responsablePedagogique, fmt.prenom + " " + fmt.nom] } });
 }
 
 function genReferentielExpertise(o: OrganismeInfo, fmt: FormateurInfo) {
@@ -2065,7 +2065,7 @@ function genExploitationVeille(o: OrganismeInfo, trimestre: string) {
 function genPlanActionVeille(o: OrganismeInfo) {
   return buildDocument({ org: o, title: "PLAN D'ACTION ISSU DE LA VEILLE", table: {
     headers: ["Action", "Origine veille", "Responsable", "Échéance", "Statut"],
-    rows: [["Mise à jour CGV", "Décret 2024-XX", o.referentQualite, "T1 2024", "✅ Fait"], ["Nouveau module IA", "Veille pédagogique", o.dirigeantPedagogique, "T2 2024", "✅ Fait"], ["Certification formateurs", "Veille métiers", o.dirigeant, "T3 2024", "✅ Fait"], ["Audit accessibilité LMS", "Veille réglementaire", o.referentHandicap, "T4 2024", "🔄 En cours"]]
+    rows: [["Mise à jour CGV", "Décret 2024-XX", o.referentQualite, "T1 2024", "✅ Fait"], ["Nouveau module IA", "Veille pédagogique", o.responsablePedagogique, "T2 2024", "✅ Fait"], ["Certification formateurs", "Veille métiers", o.dirigeant, "T3 2024", "✅ Fait"], ["Audit accessibilité LMS", "Veille réglementaire", o.referentHandicap, "T4 2024", "🔄 En cours"]]
   } });
 }
 
@@ -2185,7 +2185,7 @@ function genPlanAmelioration(o: OrganismeInfo) {
       ["2", "Amélioration plateforme LMS", "Réclamation", "A. Petit", "T1 2024", "✅ Fait"],
       ["3", "Création évaluations interactives", "Innovation pédagogique", "C. Dubois", "T2 2024", "✅ Fait"],
       ["4", "Insonorisation salle A1", "Réclamation", "Service technique", "T2 2024", "✅ Fait"],
-      ["5", "Formation formateurs IA", "Veille pédagogique", o.dirigeantPedagogique, "T3 2024", "✅ Fait"],
+      ["5", "Formation formateurs IA", "Veille pédagogique", o.responsablePedagogique, "T3 2024", "✅ Fait"],
       ["6", "Automatisation convocations", "Réclamation", "Admin", "T2 2024", "✅ Fait"],
       ["7", "Nouveau programme marketing digital", "Veille métiers", "A. Petit", "T3 2024", "✅ Fait"],
       ["8", "Audit accessibilité LMS", "Veille réglementaire", o.referentHandicap, "T4 2024", "🔄 En cours"],
@@ -2214,7 +2214,7 @@ function genFicheAction(o: OrganismeInfo, num: number) {
 
 function genRevueDirection(o: OrganismeInfo) {
   return buildDocument({ org: o, title: "REVUE DE DIRECTION QUALITÉ 2024", sections: [
-    { heading: "Participants", content: `<p>${o.dirigeant} (Direction), ${o.dirigeantPedagogique} (Pédagogie), ${o.referentQualite} (Qualité), ${o.referentHandicap} (Handicap)</p>` },
+    { heading: "Participants", content: `<p>${o.dirigeant} (Direction), ${o.responsablePedagogique} (Pédagogie), ${o.referentQualite} (Qualité), ${o.referentHandicap} (Handicap)</p>` },
     { heading: "Bilan des indicateurs", content: "<p>✅ Tous les objectifs qualité 2024 sont atteints<br>✅ 5 réclamations traitées (vs 8 en 2023)<br>✅ 8 actions d'amélioration menées à bien<br>✅ Certification Qualiopi maintenue</p>", variant: "green" },
     { heading: "Décisions prises", content: "<p>1. Augmentation du budget formation formateurs de 20%<br>2. Investissement dans un nouveau LMS<br>3. Création de 5 nouvelles formations<br>4. Recrutement d'un assistant qualité</p>" },
     { heading: "Objectifs 2025", content: "<p>• Satisfaction ≥ 98%<br>• Réussite ≥ 90%<br>• 600 stagiaires<br>• Zéro réclamation non traitée sous 24h</p>" },
@@ -2224,7 +2224,7 @@ function genRevueDirection(o: OrganismeInfo) {
 function genTableauSuiviActions(o: OrganismeInfo, trimestre: string) {
   return buildDocument({ org: o, title: "TABLEAU DE SUIVI DES ACTIONS", subtitle: trimestre, table: {
     headers: ["Action", "Responsable", "Échéance", "Avancement", "Statut"],
-    rows: [["Mise à jour supports", "P. Martin", "31/03", "100%", "✅ Terminé"], ["Audit LMS", o.referentHandicap, "30/06", "70%", "🔄 En cours"], ["Formation IA", o.dirigeantPedagogique, "30/09", "100%", "✅ Terminé"], ["Nouveau programme", "A. Petit", "31/12", "85%", "🔄 En cours"]]
+    rows: [["Mise à jour supports", "P. Martin", "31/03", "100%", "✅ Terminé"], ["Audit LMS", o.referentHandicap, "30/06", "70%", "🔄 En cours"], ["Formation IA", o.responsablePedagogique, "30/09", "100%", "✅ Terminé"], ["Nouveau programme", "A. Petit", "31/12", "85%", "🔄 En cours"]]
   } });
 }
 
@@ -2344,7 +2344,7 @@ function genConventionFormationApprentissage(o: OrganismeInfo, f: FormationInfo,
 function genLivretApprentissageCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const s = stagiaires[0] || { prenom: "Martin", nom: "Dupont", entreprise: "Tech Solutions SAS" };
   return buildDocument({ org: o, title: "LIVRET D'APPRENTISSAGE", subtitle: `${s.prenom} ${s.nom} – ${f.intitule}`, formation: f, showFormationInfo: true, sections: [
-    { heading: "Parcours d'alternance", content: `<p><strong>Apprenti(e) :</strong> ${s.prenom} ${s.nom}<br><strong>Entreprise :</strong> ${s.entreprise}<br><strong>Maître d'apprentissage :</strong> ${f.formateur}<br><strong>Tuteur CFA :</strong> ${o.dirigeantPedagogique}</p>` },
+    { heading: "Parcours d'alternance", content: `<p><strong>Apprenti(e) :</strong> ${s.prenom} ${s.nom}<br><strong>Entreprise :</strong> ${s.entreprise}<br><strong>Maître d'apprentissage :</strong> ${f.formateur}<br><strong>Tuteur CFA :</strong> ${o.responsablePedagogique}</p>` },
     { heading: "Compétences acquises en entreprise", content: "<p>☑ Compétence 1 : Application des savoirs théoriques – <strong>Acquis</strong><br>☑ Compétence 2 : Travail en équipe – <strong>Acquis</strong><br>☑ Compétence 3 : Autonomie professionnelle – <strong>En cours</strong><br>☑ Compétence 4 : Gestion de projet – <strong>En cours</strong></p>" },
     { heading: "Compétences acquises au CFA", content: "<p>☑ Module 1 : Fondamentaux – <strong>Validé (8/10)</strong><br>☑ Module 2 : Spécialisation – <strong>Validé (7.5/10)</strong><br>☑ Module 3 : Projet – <strong>En cours</strong></p>" },
     { heading: "Observations", content: "<p>L'apprenti fait preuve d'une bonne progression. Les compétences attendues se développent conformément au référentiel. Le lien théorie/pratique est bien établi.</p>", variant: "green" },
@@ -2402,7 +2402,7 @@ function genProcedureInscriptionCFA(o: OrganismeInfo, f: FormationInfo) {
     { heading: "3. Étapes d'inscription", content: `<p><strong>Étape 1 – Demande d'information</strong><br>Le candidat prend contact avec le CFA par téléphone (${o.telephone}), par email (${o.email}) ou via le site internet (${o.siteWeb}).<br><br><strong>Étape 2 – Entretien de positionnement</strong><br>Un entretien individuel est organisé avec le responsable pédagogique pour évaluer la motivation, le projet professionnel et le niveau du candidat.<br><br><strong>Étape 3 – Constitution du dossier</strong><br>Le candidat fournit les pièces suivantes :<br>• Pièce d'identité en cours de validité<br>• CV actualisé<br>• Lettre de motivation<br>• Derniers diplômes obtenus<br>• Attestation de domicile<br>• Photo d'identité<br><br><strong>Étape 4 – Recherche d'entreprise</strong><br>Le CFA accompagne le candidat dans sa recherche d'entreprise d'accueil.<br><br><strong>Étape 5 – Signature du contrat</strong><br>Le contrat d'apprentissage est établi et transmis à l'OPCO pour enregistrement.<br><br><strong>Étape 6 – Inscription définitive</strong><br>L'inscription est validée à réception de la confirmation d'enregistrement du contrat par l'OPCO.</p>` },
     { heading: "4. Délais d'accès", content: `<p>L'inscription est possible tout au long de l'année, sous réserve de places disponibles. Le délai moyen entre le premier contact et l'entrée en formation est de <strong>15 jours à 3 mois</strong>.</p>` },
     { heading: "5. Accessibilité handicap", content: `<p>Le CFA ${o.nom} accueille les personnes en situation de handicap. Le référent handicap (${o.referentHandicap}) étudie les aménagements possibles.</p>` },
-    { heading: "6. Contact", content: `<p><strong>${o.nom}</strong><br>${o.adresse}, ${o.codePostal} ${o.ville}<br>Téléphone : ${o.telephone}<br>Email : ${o.email}<br>Responsable pédagogique : ${o.dirigeantPedagogique}</p>` },
+    { heading: "6. Contact", content: `<p><strong>${o.nom}</strong><br>${o.adresse}, ${o.codePostal} ${o.ville}<br>Téléphone : ${o.telephone}<br>Email : ${o.email}<br>Responsable pédagogique : ${o.responsablePedagogique}</p>` },
   ] });
 }
 
@@ -2411,7 +2411,7 @@ function genProcedureFormationCFA(o: OrganismeInfo, f: FormationInfo) {
     { heading: "1. Objet", content: `<p>La présente procédure décrit l'organisation et le déroulement de la formation par apprentissage au sein du CFA <strong>${o.nom}</strong> pour la formation <strong>${f.intitule}</strong>.</p>` },
     { heading: "2. Organisation de l'alternance", content: `<p>La formation est organisée en alternance entre le centre de formation et l'entreprise d'accueil.<br><br><strong>Durée totale :</strong> ${f.duree}<br><strong>Période :</strong> du ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)}<br><strong>Modalités :</strong> ${f.modalites || "Alternance entreprise / centre de formation"}<br><strong>Lieu de formation :</strong> ${o.adresse}, ${o.codePostal} ${o.ville}</p>` },
     { heading: "3. Moyens pédagogiques et techniques", content: `<p>• Plateforme de contenu en ligne : supports de cours, vidéos, exercices interactifs<br>• Salle de formation équipée<br>• Accès Wi-Fi et matériel informatique mis à disposition<br>• Bibliothèque de ressources pédagogiques numériques</p>` },
-    { heading: "4. Encadrement pédagogique", content: `<p>• <strong>Responsable pédagogique :</strong> ${o.dirigeantPedagogique}<br>• Formateurs qualifiés, issus du monde professionnel<br>• Un formateur référent est désigné pour chaque apprenti</p>` },
+    { heading: "4. Encadrement pédagogique", content: `<p>• <strong>Responsable pédagogique :</strong> ${o.responsablePedagogique}<br>• Formateurs qualifiés, issus du monde professionnel<br>• Un formateur référent est désigné pour chaque apprenti</p>` },
     { heading: "5. Suivi de la formation", content: `<p><strong>En centre de formation :</strong><br>• Émargement quotidien<br>• Évaluations régulières (contrôle continu, examens blancs)<br>• Livret d'apprentissage tenu à jour<br><br><strong>En entreprise :</strong><br>• Visites en entreprise (minimum 2 par an)<br>• Fiches de suivi renseignées par le maître d'apprentissage<br>• Réunions de concertation et entretiens individuels</p>` },
     { heading: "6. Évaluation et certification", content: `<p>• Évaluations en Contrôle en Cours de Formation (CCF)<br>• Épreuves ponctuelles selon le référentiel de certification<br>• Mise en situation professionnelle reconstituée<br>• Soutenance orale devant un jury professionnel<br><br><strong>Certification visée :</strong> ${f.intitule}</p>`, variant: "green" },
     { heading: "7. Gestion des absences", content: `<p>• Toute absence doit être justifiée dans les 48 heures<br>• Les absences injustifiées sont signalées à l'entreprise et à l'OPCO<br>• Un suivi de l'assiduité est réalisé mensuellement</p>` },
@@ -2557,7 +2557,7 @@ function genAnalyseParcoursPro(o: OrganismeInfo, f: FormationInfo, stagiaires: S
     { heading: "Parcours professionnel", content: "<p>• 2012-2016 : Assistant comptable – Cabinet Fiduciaire<br>• 2016-2019 : Comptable – Groupe Industriel<br>• 2019-2024 : Comptable senior – Tech Solutions SAS</p>" },
     { heading: "Compétences identifiées", content: "<p><strong>Savoir-faire :</strong><br>• Maîtrise de la comptabilité générale et analytique<br>• Gestion de trésorerie<br>• Déclarations fiscales et sociales<br>• Utilisation avancée des ERP<br><br><strong>Savoir-être :</strong><br>• Rigueur et organisation<br>• Esprit d'analyse<br>• Communication<br>• Adaptabilité</p>", variant: "green" },
     { heading: "Aspirations", content: "<p>Évolution vers un poste de Responsable Administratif et Financier (RAF) ou reconversion vers le conseil en gestion d'entreprise.</p>" },
-  ], signatures: { type: "2", labels: ["Le Conseiller bilan", "Le Bénéficiaire"], names: [o.dirigeantPedagogique, s.prenom + " " + s.nom] } });
+  ], signatures: { type: "2", labels: ["Le Conseiller bilan", "Le Bénéficiaire"], names: [o.responsablePedagogique, s.prenom + " " + s.nom] } });
 }
 
 function genPlanActionBilan(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
@@ -2567,17 +2567,17 @@ function genPlanActionBilan(o: OrganismeInfo, f: FormationInfo, stagiaires: Stag
     { heading: "Actions à court terme (0-3 mois)", content: "<p>1. Formation en management d'équipe (28h)<br>2. Mise à jour du CV et profil LinkedIn<br>3. Prise de contact avec le réseau professionnel</p>" },
     { heading: "Actions à moyen terme (3-12 mois)", content: "<p>4. Certification DSCG (si projet RAF)<br>5. Stage ou mission de consulting<br>6. Candidatures ciblées</p>", variant: "green" },
     { heading: "Ressources mobilisables", content: "<p>• CPF : 4 500€ disponibles<br>• Employeur : plan de développement des compétences<br>• Réseau : 3 contacts identifiés dans le secteur</p>" },
-  ], signatures: { type: "2", labels: ["Le Conseiller", "Le Bénéficiaire"], names: [o.dirigeantPedagogique, s.prenom + " " + s.nom] } });
+  ], signatures: { type: "2", labels: ["Le Conseiller", "Le Bénéficiaire"], names: [o.responsablePedagogique, s.prenom + " " + s.nom] } });
 }
 
 function genSyntheseBilan(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const s = stagiaires[0] || { prenom: "Martin", nom: "Dupont" };
   return buildDocument({ org: o, title: "SYNTHÈSE DU BILAN DE COMPÉTENCES", subtitle: `${s.prenom} ${s.nom}`, sections: [
-    { heading: "Contexte", content: `<p>Bilan réalisé du ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)} – ${f.duree}<br>Conseiller : ${o.dirigeantPedagogique}</p>` },
+    { heading: "Contexte", content: `<p>Bilan réalisé du ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)} – ${f.duree}<br>Conseiller : ${o.responsablePedagogique}</p>` },
     { heading: "Compétences clés identifiées", content: "<p>• Expertise comptable et financière (niveau expert)<br>• Management : potentiel identifié, formation nécessaire<br>• Communication : bon niveau, à renforcer en anglais<br>• Digital : niveau intermédiaire, formation recommandée</p>" },
     { heading: "Projet professionnel validé", content: "<p>Évolution vers un poste de RAF dans une PME/ETI, avec un plan de formation ciblé sur le management et le contrôle de gestion.</p>", variant: "green" },
     { heading: "Engagement", content: "<p>Le bénéficiaire s'engage à mettre en œuvre les actions définies dans le plan d'action et à effectuer un point de suivi à 6 mois.</p>" },
-  ], signatures: { type: "2", labels: ["Le Conseiller", "Le Bénéficiaire"], names: [o.dirigeantPedagogique, s.prenom + " " + s.nom] } });
+  ], signatures: { type: "2", labels: ["Le Conseiller", "Le Bénéficiaire"], names: [o.responsablePedagogique, s.prenom + " " + s.nom] } });
 }
 
 // ============== VAE ==============
@@ -2589,7 +2589,7 @@ function genLivretRecevabilite(o: OrganismeInfo, f: FormationInfo, stagiaires: S
     { heading: "Expérience professionnelle", content: "<p>Durée totale d'expérience en lien avec la certification : <strong>8 ans</strong><br><br>Employeur 1 : Cabinet Fiduciaire (2012-2016) – Assistant comptable<br>Employeur 2 : Groupe Industriel (2016-2019) – Comptable<br>Employeur 3 : Tech Solutions SAS (2019-2024) – Comptable senior</p>" },
     { heading: "Activités en lien avec la certification", content: "<p>• Tenue de la comptabilité générale et auxiliaire<br>• Établissement des déclarations fiscales<br>• Gestion de la trésorerie<br>• Clôture des comptes annuels<br>• Reporting financier</p>", variant: "green" },
     { heading: "Décision de recevabilité", content: "<p>☑ <strong>Recevable</strong> – Le candidat justifie d'une expérience suffisante en lien direct avec la certification visée.</p>" },
-  ], signatures: { type: "2", labels: ["Le Responsable VAE", "Le Candidat"], names: [o.dirigeantPedagogique, s.prenom + " " + s.nom] } });
+  ], signatures: { type: "2", labels: ["Le Responsable VAE", "Le Candidat"], names: [o.responsablePedagogique, s.prenom + " " + s.nom] } });
 }
 
 function genDossierValidation(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
@@ -2617,7 +2617,7 @@ function genAccompagnementVAE(o: OrganismeInfo, f: FormationInfo, stagiaires: St
       ["7", "03/04/2024", "Simulation passage devant le jury", "2h", "✅"],
     ]
   }, sections: [{ heading: "Bilan", content: `<p>Accompagnement de 17 heures réalisé sur 3 mois. Le candidat est prêt pour le passage devant le jury.</p>`, variant: "green" }],
-    signatures: { type: "2", labels: ["L'Accompagnateur VAE", "Le Candidat"], names: [o.dirigeantPedagogique, s.prenom + " " + s.nom] } });
+    signatures: { type: "2", labels: ["L'Accompagnateur VAE", "Le Candidat"], names: [o.responsablePedagogique, s.prenom + " " + s.nom] } });
 }
 
 // ============== NOUVEAUX TEMPLATES AF (Drive SKILLORA) ==============
@@ -2689,10 +2689,10 @@ function genTableauDysfonctionnements(o: OrganismeInfo) {
   return buildDocument({ org: o, title: "TABLEAU DES DYSFONCTIONNEMENTS", table: {
     headers: ["N°", "Date", "Nature du dysfonctionnement", "Gravité", "Action corrective", "Responsable", "Délai", "Statut"],
     rows: [
-      ["1", "15/01/2024", "Retard livraison supports de cours", "Modérée", "Commande anticipée J-10", o.dirigeantPedagogique, "Immédiat", "✅ Clôturé"],
+      ["1", "15/01/2024", "Retard livraison supports de cours", "Modérée", "Commande anticipée J-10", o.responsablePedagogique, "Immédiat", "✅ Clôturé"],
       ["2", "28/02/2024", "Panne vidéoprojecteur salle A1", "Mineure", "Remplacement et maintenance préventive", "Service technique", "48h", "✅ Clôturé"],
       ["3", "15/03/2024", "Problème connexion plateforme LMS", "Majeure", "Migration serveur, test de charge", "DSI", "1 semaine", "✅ Clôturé"],
-      ["4", "02/04/2024", "Absence formateur non remplacée", "Majeure", "Constitution vivier formateurs de remplacement", o.dirigeantPedagogique, "1 mois", "✅ Clôturé"],
+      ["4", "02/04/2024", "Absence formateur non remplacée", "Majeure", "Constitution vivier formateurs de remplacement", o.responsablePedagogique, "1 mois", "✅ Clôturé"],
       ["5", "20/05/2024", "Erreur facturation client", "Mineure", "Double vérification avant envoi", "Comptabilité", "Immédiat", "✅ Clôturé"],
     ]
   } });
@@ -2730,7 +2730,7 @@ function genGrilleRecrutementFormateur(o: OrganismeInfo) {
     ]
   }, sections: [
     { heading: "Décision", content: "<p>☐ Retenu(e) – Intégration dans le vivier formateurs<br>☐ En attente – Compléments demandés<br>☐ Non retenu(e) – Motif : ________________________________</p>" },
-  ], signatures: { type: "2", labels: ["Le Responsable pédagogique", "Le Dirigeant"], names: [o.dirigeantPedagogique, o.dirigeant] } });
+  ], signatures: { type: "2", labels: ["Le Responsable pédagogique", "Le Dirigeant"], names: [o.responsablePedagogique, o.dirigeant] } });
 }
 
 function genProcessRecrutementFormateur(o: OrganismeInfo) {
@@ -2759,7 +2759,7 @@ function genRegistrePersonnel(o: OrganismeInfo, formateurs: FormateurInfo[]) {
     headers: ["Nom", "Prénom", "Pôle", "Fonction", "Spécialité", "Type contrat", "Date entrée"],
     rows: [
       [o.dirigeant.split(" ").slice(-1)[0], o.dirigeant.split(" ").slice(0, -1).join(" "), "Direction", "Dirigeant", "Management général", "CDI", "01/01/2015"],
-      [o.dirigeantPedagogique.split(" ").slice(-1)[0], o.dirigeantPedagogique.split(" ").slice(0, -1).join(" "), "Pédagogique", "Resp. pédagogique", "Ingénierie de formation", "CDI", "15/03/2016"],
+      [o.responsablePedagogique.split(" ").slice(-1)[0], o.responsablePedagogique.split(" ").slice(0, -1).join(" "), "Pédagogique", "Resp. pédagogique", "Ingénierie de formation", "CDI", "15/03/2016"],
       [o.referentQualite.split(" ").slice(-1)[0], o.referentQualite.split(" ").slice(0, -1).join(" "), "Qualité", "Référent qualité", "Qualiopi / amélioration continue", "CDI", "01/09/2018"],
       [o.referentHandicap.split(" ").slice(-1)[0], o.referentHandicap.split(" ").slice(0, -1).join(" "), "Handicap", "Référent handicap", "Accessibilité, PSH", "CDI", "01/06/2019"],
       ...formateurs.map((f, i) => [f.nom, f.prenom, "Pédagogique", "Formateur", f.specialite, i < 2 ? "CDI" : "Prestataire", `01/0${i + 1}/2020`]),
@@ -2986,7 +2986,7 @@ function genProcedureMissionsEntrepriseCFA(o: OrganismeInfo, f: FormationInfo) {
 }
 
 function genMailTypeCandidatCFA(o: OrganismeInfo, f: FormationInfo) {
-  const signataire = o.dirigeantPedagogique || o.dirigeant || "[Votre prénom et nom]";
+  const signataire = o.responsablePedagogique || o.dirigeant || "[Votre prénom et nom]";
   return buildDocument({ org: o, title: "MAIL TYPES CANDIDAT", sections: [
     { heading: "MAIL TYPE 1 — DEMANDE DE RENSEIGNEMENT", content: `
 <p><strong>À :</strong> name@email.com</p>
@@ -3078,7 +3078,7 @@ function genLivretAccueilCFA(o: OrganismeInfo, f: FormationInfo) {
 <p>N° de déclaration d'activité : ${o.nda || "___"}</p>
 <p>Adresse : ${o.adresse || "___"}</p>
 <p>Téléphone : ${o.telephone || "___"} – Email : ${o.email || "___"}</p>
-<p>Responsable pédagogique : ${o.dirigeantPedagogique || o.dirigeant || "___"}</p>` },
+<p>Responsable pédagogique : ${o.responsablePedagogique || o.dirigeant || "___"}</p>` },
     { heading: "Votre formation", content: `
 ${tableHTML(["Information", "Détail"], [
   ["Intitulé", f.intitule],
@@ -3097,7 +3097,7 @@ ${tableHTML(["Information", "Détail"], [
 <li>Toute forme de discrimination ou de harcèlement est strictement interdite</li>
 </ul>` },
     { heading: "Accompagnement et référents", content: `
-<p><strong>Référent pédagogique :</strong> ${o.dirigeantPedagogique || o.dirigeant || "___"}</p>
+<p><strong>Référent pédagogique :</strong> ${o.responsablePedagogique || o.dirigeant || "___"}</p>
 <p><strong>Référent administratif :</strong> ${o.dirigeant || "___"}</p>
 <p><strong>Référent handicap :</strong> ${o.referentHandicap || o.dirigeant || "___"}</p>
 <p>N'hésitez pas à les contacter pour toute question ou besoin d'accompagnement spécifique.</p>` },
@@ -3201,7 +3201,7 @@ ${tableHTML(["Champ", "Information"], [
   ["Entreprise d'accueil", s.entreprise || "________________________"],
   ["Adresse de l'entreprise", "________________________"],
   ["Tuteur / Maître d'apprentissage", "________________________"],
-  ["Formateur référent", f.formateur || o.dirigeantPedagogique],
+  ["Formateur référent", f.formateur || o.responsablePedagogique],
 ])}` },
     { heading: "2. OBJECTIFS DE LA FORMATION", content: objectifsHtml },
     { heading: "3. MISSIONS PROFESSIONNELLES EN ENTREPRISE", content: `
@@ -3246,7 +3246,7 @@ ${tableHTML(["Domaine", "Appréciation du tuteur", "Appréciation du formateur r
 ${tableHTML(["Participant", "Nom / Signature", "Date"], [
   ["Apprenant(e)", `${s.prenom} ${s.nom}`, ""],
   ["Tuteur / Maître d'apprentissage", "", ""],
-  ["Formateur référent " + o.nom, f.formateur || o.dirigeantPedagogique, ""],
+  ["Formateur référent " + o.nom, f.formateur || o.responsablePedagogique, ""],
 ])}` },
   ] });
 }
@@ -3286,7 +3286,7 @@ function genGrilleEntretienCandidat(o: OrganismeInfo, f: FormationInfo) {
       ["Projet professionnel cohérent", "☐", "☐", "☐", "☐", ""],
     ]
   }, extraHtml: `<div class="section"><p><strong>Avis global :</strong> ☐ Favorable ☐ Favorable avec réserves ☐ Défavorable</p><p><strong>Commentaires :</strong> ________________________________</p></div>`,
-  signatures: { type: "2", labels: ["Le/La Candidat(e)", "Le Responsable Pédagogique"], names: ["________________________", o.dirigeantPedagogique] } });
+  signatures: { type: "2", labels: ["Le/La Candidat(e)", "Le Responsable Pédagogique"], names: ["________________________", o.responsablePedagogique] } });
 }
 
 function genSuiviInscriptions(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
@@ -3340,7 +3340,7 @@ function genSuiviAbsences(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
 
 function genFichePosteFormateur(o: OrganismeInfo, fmt: FormateurInfo) {
   return buildDocument({ org: o, title: `FICHE DE POSTE – FORMATEUR(TRICE)`, subtitle: `${fmt.prenom} ${fmt.nom}`, sections: [
-    { heading: "Identification du poste", content: `<p><strong>Intitulé :</strong> Formateur(trice) ${fmt.specialite}<br><strong>Rattachement :</strong> Pôle Pédagogique<br><strong>Responsable hiérarchique :</strong> ${o.dirigeantPedagogique}<br><strong>Lieu d'exercice :</strong> ${o.adresse}, ${o.codePostal} ${o.ville} + déplacements</p>` },
+    { heading: "Identification du poste", content: `<p><strong>Intitulé :</strong> Formateur(trice) ${fmt.specialite}<br><strong>Rattachement :</strong> Pôle Pédagogique<br><strong>Responsable hiérarchique :</strong> ${o.responsablePedagogique}<br><strong>Lieu d'exercice :</strong> ${o.adresse}, ${o.codePostal} ${o.ville} + déplacements</p>` },
     { heading: "Mission principale", content: `<p>Concevoir, animer et évaluer des actions de formation dans le domaine ${fmt.specialite}, en présentiel et/ou à distance, conformément au référentiel Qualiopi et aux exigences du RNQ.</p>` },
     { heading: "Activités et responsabilités", content: "<p>• Conception de programmes et supports pédagogiques<br>• Animation de sessions de formation (présentiel / FOAD / hybride)<br>• Évaluation des acquis : positionnement, intermédiaire, finale<br>• Suivi individuel des stagiaires<br>• Participation aux réunions pédagogiques<br>• Veille métier et pédagogique<br>• Rédaction de bilans pédagogiques</p>" },
     { heading: "Compétences requises", content: `<p>• Expertise technique dans le domaine ${fmt.specialite}<br>• Maîtrise des techniques d'animation<br>• Capacité d'adaptation aux différents publics<br>• Maîtrise des outils numériques et plateformes LMS<br>• Qualités relationnelles et pédagogiques</p>` },
@@ -3350,7 +3350,7 @@ function genFichePosteFormateur(o: OrganismeInfo, fmt: FormateurInfo) {
 
 function genGrilleEntretienAnnuel(o: OrganismeInfo, fmt: FormateurInfo) {
   return buildDocument({ org: o, title: "GRILLE D'ENTRETIEN ANNUEL – FORMATEUR(TRICE)", subtitle: `${fmt.prenom} ${fmt.nom}`, sections: [
-    { heading: "Informations", content: `<p><strong>Formateur :</strong> ${fmt.prenom} ${fmt.nom}<br><strong>Spécialité :</strong> ${fmt.specialite}<br><strong>Date de l'entretien :</strong> ___/___/______<br><strong>Entretien mené par :</strong> ${o.dirigeantPedagogique}</p>` },
+    { heading: "Informations", content: `<p><strong>Formateur :</strong> ${fmt.prenom} ${fmt.nom}<br><strong>Spécialité :</strong> ${fmt.specialite}<br><strong>Date de l'entretien :</strong> ___/___/______<br><strong>Entretien mené par :</strong> ${o.responsablePedagogique}</p>` },
   ], table: {
     headers: ["Domaine évalué", "1 – À améliorer", "2 – Satisfaisant", "3 – Bon", "4 – Excellent", "Commentaires"],
     rows: [
@@ -3366,7 +3366,7 @@ function genGrilleEntretienAnnuel(o: OrganismeInfo, fmt: FormateurInfo) {
       ["Esprit d'équipe et collaboration", "☐", "☐", "☐", "☐", ""],
     ]
   }, extraHtml: `<div class="section"><p><strong>Points forts identifiés :</strong> ________________________________</p><p><strong>Axes d'amélioration :</strong> ________________________________</p><p><strong>Objectifs pour l'année à venir :</strong> ________________________________</p><p><strong>Besoins en formation :</strong> ________________________________</p></div>`,
-  signatures: { type: "2", labels: ["Le/La Formateur(trice)", "Le Responsable Pédagogique"], names: [`${fmt.prenom} ${fmt.nom}`, o.dirigeantPedagogique] } });
+  signatures: { type: "2", labels: ["Le/La Formateur(trice)", "Le Responsable Pédagogique"], names: [`${fmt.prenom} ${fmt.nom}`, o.responsablePedagogique] } });
 }
 
 function genEnqueteSatisfactionFormateur(o: OrganismeInfo, f: FormationInfo) {
@@ -3396,15 +3396,32 @@ function genDocumentsCertificateursCFA(o: OrganismeInfo, f: FormationInfo) {
   ] });
 }
 
+/** Parse rythme alternance string to get CFA weeks and enterprise weeks per cycle */
+function parseRythmeAlternance(rythme: string): { cfaWeeks: number; entrepriseWeeks: number } {
+  const match = rythme.match(/(\d+)\s*sem.*?\/\s*(\d+)\s*sem/i);
+  if (match) return { cfaWeeks: parseInt(match[1]), entrepriseWeeks: parseInt(match[2]) };
+  return { cfaWeeks: 1, entrepriseWeeks: 3 };
+}
+
+/** Calculate the total number of CFA weeks for the formation */
+function getCFAWeeks(f: FormationInfo): number {
+  const { totalHours } = parseDuree(f.duree);
+  const effectiveTotal = totalHours > 0 ? totalHours : 420;
+  // 35h per CFA week
+  return Math.max(1, Math.ceil(effectiveTotal / 35));
+}
+
 function genSynopsisCFA(o: OrganismeInfo, f: FormationInfo) {
   const rncp = getRNCPByCode(f.codeRNCP || '');
   const { totalHours } = parseDuree(f.duree);
   const effectiveTotal = totalHours > 0 ? totalHours : (rncp ? parseInt(rncp.dureeIndicative) || 420 : 420);
 
-  // Rythme alternance
   const rythme = f.rythmeAlternance || '1 semaine CFA / 3 semaines entreprise';
+  const { cfaWeeks: cfaPerCycle, entrepriseWeeks } = parseRythmeAlternance(rythme);
+  const totalCFAWeeks = Math.max(1, Math.ceil(effectiveTotal / 35));
+  const cycleLength = cfaPerCycle + entrepriseWeeks;
+  const totalCycles = Math.ceil(totalCFAWeeks / cfaPerCycle);
 
-  // Méthodes pédagogiques par bloc (variées)
   const methodesSets = [
     'Études de cas, jeux de rôle, ateliers prospection réelle, utilisation CRM, travail en sous-groupe',
     'Ateliers de co-construction d\'offres, simulations de négociation filmées, analyse de cas réels, business game',
@@ -3412,28 +3429,117 @@ function genSynopsisCFA(o: OrganismeInfo, f: FormationInfo) {
     'Ateliers pratiques sur poste informatique, travaux individuels et collectifs',
   ];
 
+  // Build week-by-week planning section
+  let planningHtml = `<h3>Planification semaine par semaine</h3>
+    <p><em>Rythme : ${rythme} — Cycle de ${cycleLength} semaines (${cfaPerCycle} en CFA + ${entrepriseWeeks} en entreprise)</em></p>`;
+
   if (rncp && rncp.blocsCompetences.length > 0) {
-    // Calculate total RNCP volume
+    // Calculate volumes
     const rncpTotalVolume = rncp.blocsCompetences.reduce((sum, bloc) =>
       sum + bloc.matieres.reduce((s, m) => s + (parseInt(m.volume) || 0), 0), 0);
-    // Reserve ~15% for accompaniment
     const accompHours = Math.round(effectiveTotal * 0.15);
     const blocHoursTotal = effectiveTotal - accompHours;
-    // Scale factor
     const scale = rncpTotalVolume > 0 ? blocHoursTotal / rncpTotalVolume : 1;
 
+    // Build module list with scaled hours
+    const modules = rncp.blocsCompetences.map((bloc, i) => {
+      const volume = Math.round(bloc.matieres.reduce((s, m) => s + (parseInt(m.volume) || 0), 0) * scale);
+      return { titre: `Bloc ${i + 1} – ${bloc.titre}`, volume, modalitesEval: bloc.modalitesEval, bloc, index: i };
+    });
+    // Add accompagnement module
+    modules.push({ titre: 'Accompagnement + Examens blancs', volume: accompHours, modalitesEval: 'Examens blancs + entretien jury', bloc: null as any, index: modules.length });
+
+    // Distribute modules across CFA weeks
+    let cfaWeekNum = 0;
+    let calendarWeek = 1;
+    let moduleIdx = 0;
+    let remainingInModule = modules[0]?.volume || 0;
+    const weekPlan: { calWeek: number; cfaWeek: number; isCFA: boolean; moduleTitle: string; hours: number; exercices: string; entrepriseTask: string }[] = [];
+
+    for (let cycle = 0; cycle < totalCycles && moduleIdx < modules.length; cycle++) {
+      // CFA weeks in this cycle
+      for (let cw = 0; cw < cfaPerCycle && moduleIdx < modules.length; cw++) {
+        cfaWeekNum++;
+        const weekHours = Math.min(35, remainingInModule);
+        const mod = modules[moduleIdx];
+        weekPlan.push({
+          calWeek: calendarWeek,
+          cfaWeek: cfaWeekNum,
+          isCFA: true,
+          moduleTitle: mod.titre,
+          hours: weekHours,
+          exercices: `Exercice 1 + Exercice 2 (${mod.modalitesEval.split(',')[0] || 'évaluation continue'})`,
+          entrepriseTask: '',
+        });
+        remainingInModule -= weekHours;
+        if (remainingInModule <= 0) {
+          moduleIdx++;
+          remainingInModule = moduleIdx < modules.length ? modules[moduleIdx].volume : 0;
+        }
+        calendarWeek++;
+      }
+      // Enterprise weeks
+      for (let ew = 0; ew < entrepriseWeeks; ew++) {
+        const currentMod = moduleIdx < modules.length ? modules[moduleIdx] : modules[modules.length - 1];
+        weekPlan.push({
+          calWeek: calendarWeek,
+          cfaWeek: 0,
+          isCFA: false,
+          moduleTitle: '',
+          hours: 0,
+          exercices: '',
+          entrepriseTask: `Mise en pratique : ${currentMod?.titre || 'compétences acquises'} — Livret d'alternance`,
+        });
+        calendarWeek++;
+      }
+    }
+
+    // Week-by-week planning table
+    planningHtml += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%">
+      <tr style="background:#1e3a7b;color:#fff">
+        <th>Semaine calendaire</th>
+        <th>Lieu</th>
+        <th>Sem. CFA</th>
+        <th>Module / Bloc</th>
+        <th>Heures</th>
+        <th>Exercices / Évaluations</th>
+      </tr>`;
+    weekPlan.forEach(w => {
+      if (w.isCFA) {
+        planningHtml += `<tr>
+          <td style="text-align:center">S${w.calWeek}</td>
+          <td><strong>CFA</strong></td>
+          <td style="text-align:center">${w.cfaWeek}</td>
+          <td>${w.moduleTitle}</td>
+          <td style="text-align:center">${w.hours}h</td>
+          <td>${w.exercices}</td>
+        </tr>`;
+      } else {
+        planningHtml += `<tr style="background:#f0f8f0">
+          <td style="text-align:center">S${w.calWeek}</td>
+          <td><strong>Entreprise</strong></td>
+          <td style="text-align:center">—</td>
+          <td colspan="2">${w.entrepriseTask}</td>
+          <td>Suivi livret d'alternance</td>
+        </tr>`;
+      }
+    });
+    planningHtml += `</table>`;
+
+    // Main synopsis table (by module)
     const rows = rncp.blocsCompetences.map((bloc, i) => {
+      const mod = modules[i];
       const contenus = bloc.matieres.map(m => {
         const scaledH = Math.round((parseInt(m.volume) || 0) * scale);
         return `- ${m.contenu} <em>(${scaledH}h)</em>`;
       }).join('<br>');
-      const volume = Math.round(bloc.matieres.reduce((s, m) => s + (parseInt(m.volume) || 0), 0) * scale);
-      const nbExercices = Math.max(2, Math.ceil(volume / 35));
+      const nbCFAWeeks = Math.max(1, Math.ceil(mod.volume / 35));
+      const nbExercices = nbCFAWeeks * 2;
       return `<tr>
-        <td style="vertical-align:top"><strong>Bloc ${i + 1} – ${bloc.titre}</strong></td>
+        <td style="vertical-align:top"><strong>${mod.titre}</strong></td>
         <td style="vertical-align:top">${contenus}</td>
-        <td style="vertical-align:top">${bloc.modalitesEval}<br><br><strong>Exercices pratiques :</strong> ${nbExercices} exercices évalués (1 tous les ${Math.round(volume / nbExercices)}h)<br><strong>Évaluation en entreprise :</strong> livret d'alternance</td>
-        <td style="vertical-align:top;text-align:center"><strong>${volume} h</strong></td>
+        <td style="vertical-align:top">${bloc.modalitesEval}<br><br><strong>Exercices pratiques :</strong> ${nbExercices} exercices (2 par semaine CFA × ${nbCFAWeeks} sem.)<br><strong>Évaluation en entreprise :</strong> livret d'alternance (${entrepriseWeeks} sem./cycle)</td>
+        <td style="vertical-align:top;text-align:center"><strong>${mod.volume} h</strong><br><em>(${nbCFAWeeks} sem.)</em></td>
         <td style="vertical-align:top">${methodesSets[i % methodesSets.length]}</td>
         <td style="vertical-align:top">Formateur expérimenté + tuteur en entreprise</td>
       </tr>`;
@@ -3448,13 +3554,10 @@ function genSynopsisCFA(o: OrganismeInfo, f: FormationInfo) {
       <td style="vertical-align:top">Référent pédagogique + jury professionnel habilité</td>
     </tr>`);
 
-    // Total row
-    const computedTotal = Math.round(rncp.blocsCompetences.reduce((s, bloc) =>
-      s + bloc.matieres.reduce((s2, m) => s2 + (parseInt(m.volume) || 0), 0) * scale, 0)) + accompHours;
-
+    const computedTotal = modules.reduce((s, m) => s + m.volume, 0);
     rows.push(`<tr style="background:#1e3a7b;color:#fff;font-weight:bold">
       <td colspan="3" style="text-align:right">TOTAL HEURES EN CENTRE DE FORMATION</td>
-      <td style="text-align:center">${computedTotal} h</td>
+      <td style="text-align:center">${computedTotal} h (${totalCFAWeeks} semaines CFA)</td>
       <td colspan="2"></td>
     </tr>`);
 
@@ -3462,7 +3565,7 @@ function genSynopsisCFA(o: OrganismeInfo, f: FormationInfo) {
       <tr style="background:#1e3a7b;color:#fff">
         <th>Bloc de compétences (${rncp.code})</th>
         <th>Contenus de formation principaux</th>
-        <th>Modalités d'évaluation</th>
+        <th>Modalités d'évaluation / Exercices</th>
         <th>Durée (heures)</th>
         <th>Méthodes pédagogiques</th>
         <th>Formateur / Alternance</th>
@@ -3475,13 +3578,14 @@ function genSynopsisCFA(o: OrganismeInfo, f: FormationInfo) {
       title: "SYNOPSIS DE FORMATION",
       subtitle: f.intitule,
       sections: [
-        { heading: "Rythme d'alternance", content: `<p><strong>Rythme :</strong> ${rythme}</p><p><strong>Durée totale en centre :</strong> ${effectiveTotal} heures</p><p><strong>Certification visée :</strong> ${rncp.intitule} (${rncp.code})<br><strong>Niveau :</strong> ${rncp.niveau}<br><strong>Certificateur :</strong> ${rncp.certificateur}</p>` },
-        { heading: "Tableau synoptique", content: tableContent },
+        { heading: "Rythme d'alternance", content: `<p><strong>Rythme :</strong> ${rythme}</p><p><strong>Durée totale en centre :</strong> ${effectiveTotal} heures (${totalCFAWeeks} semaines CFA)</p><p><strong>Durée d'un cycle :</strong> ${cfaPerCycle} sem. CFA + ${entrepriseWeeks} sem. entreprise = ${cycleLength} semaines</p><p><strong>Nombre de cycles :</strong> ${totalCycles}</p>${rncp ? `<p><strong>Certification visée :</strong> ${rncp.intitule} (${rncp.code})<br><strong>Niveau :</strong> ${rncp.niveau}<br><strong>Certificateur :</strong> ${rncp.certificateur}</p>` : ''}` },
+        { heading: "Tableau synoptique par module", content: tableContent },
+        { heading: "Planning semaine par semaine (alternance CFA / Entreprise)", content: planningHtml },
       ],
     });
   }
 
-  // Fallback: generic synopsis — distribute hours across chapters
+  // Fallback: generic synopsis
   const chapters = getCourseChapters(f.intitule);
   const nbBlocs = Math.max(2, Math.min(chapters.length, 5));
   const accompHours = Math.round(effectiveTotal * 0.15);
@@ -3490,12 +3594,13 @@ function genSynopsisCFA(o: OrganismeInfo, f: FormationInfo) {
   for (let i = 0; i < nbBlocs; i++) {
     const ch = chapters[i];
     const contenus = ch ? ch.sections.slice(0, 4).map((s) => `- ${s.title}`).join('<br>') : '[À compléter]';
-    const nbExercices = Math.max(1, Math.ceil(perBloc / 35));
+    const nbCFAWeeks = Math.max(1, Math.ceil(perBloc / 35));
+    const nbExercices = nbCFAWeeks * 2;
     fallbackRows.push(`<tr>
       <td style="vertical-align:top"><strong>${ch?.title || `Bloc ${i + 1}`}</strong></td>
       <td style="vertical-align:top">${contenus}</td>
-      <td style="vertical-align:top">Mise en situation professionnelle + évaluation continue<br><strong>Exercices :</strong> ${nbExercices} exercices évalués<br><strong>Évaluation en entreprise :</strong> livret d'alternance</td>
-      <td style="vertical-align:top;text-align:center"><strong>${perBloc} h</strong></td>
+      <td style="vertical-align:top">Mise en situation professionnelle + évaluation continue<br><strong>Exercices :</strong> ${nbExercices} exercices (2/sem. × ${nbCFAWeeks} sem.)<br><strong>Évaluation en entreprise :</strong> livret d'alternance</td>
+      <td style="vertical-align:top;text-align:center"><strong>${perBloc} h</strong><br><em>(${nbCFAWeeks} sem.)</em></td>
       <td style="vertical-align:top">${methodesSets[i % methodesSets.length]}</td>
       <td style="vertical-align:top">Formateur expérimenté + tuteur en entreprise</td>
     </tr>`);
@@ -3510,7 +3615,7 @@ function genSynopsisCFA(o: OrganismeInfo, f: FormationInfo) {
   </tr>`);
   fallbackRows.push(`<tr style="background:#1e3a7b;color:#fff;font-weight:bold">
     <td colspan="3" style="text-align:right">TOTAL HEURES EN CENTRE DE FORMATION</td>
-    <td style="text-align:center">${effectiveTotal} h</td>
+    <td style="text-align:center">${effectiveTotal} h (${totalCFAWeeks} sem.)</td>
     <td colspan="2"></td>
   </tr>`);
 
@@ -3531,7 +3636,7 @@ function genSynopsisCFA(o: OrganismeInfo, f: FormationInfo) {
     title: "SYNOPSIS DE FORMATION",
     subtitle: f.intitule,
     sections: [
-      { heading: "Rythme d'alternance", content: `<p><strong>Rythme :</strong> ${rythme}</p><p><strong>Durée totale en centre :</strong> ${effectiveTotal} heures</p>` },
+      { heading: "Rythme d'alternance", content: `<p><strong>Rythme :</strong> ${rythme}</p><p><strong>Durée totale en centre :</strong> ${effectiveTotal} heures (${totalCFAWeeks} sem.)</p>` },
       { heading: "Tableau synoptique", content: genericTable },
     ],
   });
@@ -3641,7 +3746,7 @@ function genTrameEvalBesoins(o: OrganismeInfo, f: FormationInfo, stagiaires: Sta
 <p><em>Si oui, avez-vous besoin d'adaptations spécifiques (pédagogiques, techniques, matérielles) pour suivre la formation ?</em></p>
 <table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${answers.handicap}</td></tr></table>
 
-<p style="margin-top:20px"><strong>Analyse du référent pédagogique :</strong> ${o.dirigeantPedagogique}</p>
+<p style="margin-top:20px"><strong>Analyse du référent pédagogique :</strong> ${o.responsablePedagogique}</p>
 <p><strong>Date d'analyse :</strong> ${formatDate(subtractBusinessDays(f.dateDebut, 20))}</p>
 <p>FAIT À ${o.ville.toUpperCase()}</p>
 <p>LE : ${formatDate(subtractBusinessDays(f.dateDebut, 20))}</p>
@@ -3695,7 +3800,7 @@ function genTrameEvalBesoinsStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
 <p><em>Si oui, avez-vous besoin d'adaptations spécifiques (pédagogiques, techniques, matérielles) pour suivre la formation ?</em></p>
 <table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${answers.handicap}</td></tr></table>
 
-<p style="margin-top:20px"><strong>Analyse du référent pédagogique :</strong> ${o.dirigeantPedagogique}</p>
+<p style="margin-top:20px"><strong>Analyse du référent pédagogique :</strong> ${o.responsablePedagogique}</p>
 <p><strong>Date d'analyse :</strong> ${formatDate(subtractBusinessDays(f.dateDebut, 20))}</p>
 <p>FAIT À ${o.ville.toUpperCase()}</p>
 <p>LE : ${formatDate(subtractBusinessDays(f.dateDebut, 20))}</p>
@@ -4557,7 +4662,7 @@ function genProcedureAccueilStagiaires(o: OrganismeInfo) {
     { heading: "Jour J – Accueil", content: "<p>• Accueil personnalisé<br>• Tour de table<br>• Présentation programme et objectifs<br>• Remise des documents<br>• Information conditions d'accès</p>", variant: "green" },
     { heading: "En cours de formation", content: "<p>• Suivi présence (émargement)<br>• Points réguliers<br>• Adaptation du rythme si nécessaire</p>" },
     { heading: "Fin de formation", content: "<p>• Évaluation finale<br>• Questionnaire satisfaction<br>• Remise attestations</p>" },
-  ], signatures: { type: "2", labels: ["Le Resp. Pédagogique", "Le Dirigeant"], names: [o.dirigeantPedagogique, o.dirigeant] } });
+  ], signatures: { type: "2", labels: ["Le Resp. Pédagogique", "Le Dirigeant"], names: [o.responsablePedagogique, o.dirigeant] } });
 }
 
 function genGroupesNiveaux(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
@@ -4570,7 +4675,7 @@ function genGroupesNiveaux(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
     headers: ["Stagiaire", "Entreprise", "Niveau initial", "Groupe"], rows
   }, sections: [
     { heading: "Critères", content: "<p>• Groupe A (Débutant) : score < 5/10<br>• Groupe B (Intermédiaire) : score 5-7/10<br>• Groupe C (Avancé) : score > 7/10</p>", variant: "green" },
-  ], signatures: { type: "2", labels: ["Le Formateur", "Le Resp. Pédagogique"], names: [f.formateur, o.dirigeantPedagogique] } });
+  ], signatures: { type: "2", labels: ["Le Formateur", "Le Resp. Pédagogique"], names: [f.formateur, o.responsablePedagogique] } });
 }
 
 function genProcedureEvalDebutFormation(o: OrganismeInfo) {
@@ -4578,7 +4683,7 @@ function genProcedureEvalDebutFormation(o: OrganismeInfo) {
     { heading: "Objet", content: `<p>Modalités d'évaluation des acquis à l'entrée en formation chez ${o.nom} (indicateur 8 du RNQ).</p>` },
     { heading: "Modalités", content: "<p>1. Test de positionnement (QCM 20 questions)<br>2. Analyse des résultats par le formateur<br>3. Constitution des groupes de niveaux<br>4. Adaptation du programme</p>" },
     { heading: "Traçabilité", content: "<p>Les résultats sont conservés dans le dossier stagiaire pour mesurer la progression.</p>", variant: "green" },
-  ], signatures: { type: "2", labels: ["Le Resp. Pédagogique", "Le Dirigeant"], names: [o.dirigeantPedagogique, o.dirigeant] } });
+  ], signatures: { type: "2", labels: ["Le Resp. Pédagogique", "Le Dirigeant"], names: [o.responsablePedagogique, o.dirigeant] } });
 }
 
 function genGrilleAcquisitionCompetencesSF(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
@@ -4593,7 +4698,7 @@ function genGrilleAcquisitionCompetencesSF(o: OrganismeInfo, f: FormationInfo, s
     extra += tableHTML(["Compétence", "Entrée", "Sortie", "Statut", "Progression"], rows);
   });
   return buildDocument({ org: o, title: "GRILLE D'ACQUISITION DES COMPÉTENCES", subtitle: f.intitule, formation: f, showFormationInfo: true, extraHtml: extra,
-    signatures: { type: "2", labels: ["Le Formateur", "Le Resp. Pédagogique"], names: [f.formateur, o.dirigeantPedagogique] } });
+    signatures: { type: "2", labels: ["Le Formateur", "Le Resp. Pédagogique"], names: [f.formateur, o.responsablePedagogique] } });
 }
 
 function genSupportCoursRef(o: OrganismeInfo, f: FormationInfo) {
@@ -4636,7 +4741,7 @@ function genSupportCoursRef(o: OrganismeInfo, f: FormationInfo) {
       <div style="margin-top:40px">
         <p><strong>${o.dirigeant}</strong></p>
         <p style="color:#666">Dirigeant</p>
-        <p style="margin-top:15px"><strong>${o.dirigeantPedagogique || ''}</strong></p>
+        <p style="margin-top:15px"><strong>${o.responsablePedagogique || ''}</strong></p>
         <p style="color:#666">Référent pédagogique</p>
       </div>
       <div style="margin-top:40px;color:#999;font-size:11px">
@@ -4829,7 +4934,7 @@ function genAutoEvaluationFormateur(o: OrganismeInfo, fmt: FormateurInfo) {
       ["Veille professionnelle", "☐", "☐", "☑", "☐"],
     ]
   }, extraHtml: `<div class="section"><p><strong>Points forts :</strong> ________________________________</p><p><strong>Axes d'amélioration :</strong> ________________________________</p><p><strong>Besoins en formation :</strong> ________________________________</p></div>`,
-  signatures: { type: "2", labels: ["Le Formateur", "Le Resp. Pédagogique"], names: [`${fmt.prenom} ${fmt.nom}`, o.dirigeantPedagogique] } });
+  signatures: { type: "2", labels: ["Le Formateur", "Le Resp. Pédagogique"], names: [`${fmt.prenom} ${fmt.nom}`, o.responsablePedagogique] } });
 }
 
 function genListePartenaires(o: OrganismeInfo) {
@@ -4882,7 +4987,7 @@ function genProcedureAdaptation(o: OrganismeInfo) {
     { heading: "Objet", content: `<p>Modalités d'adaptation des formations de ${o.nom} en fonction des besoins identifiés.</p>` },
     { heading: "Étapes", content: "<p>1. Analyse résultats positionnement<br>2. Constitution groupes de niveaux<br>3. Ajustement déroulé pédagogique<br>4. Suivi en cours de formation<br>5. Bilan et traçabilité</p>" },
     { heading: "Documents associés", content: "<p>• Test de positionnement<br>• Groupes de niveaux<br>• Tableau suivi parcours<br>• Déroulé pédagogique</p>", variant: "green" },
-  ], signatures: { type: "2", labels: ["Le Resp. Pédagogique", "Le Dirigeant"], names: [o.dirigeantPedagogique, o.dirigeant] } });
+  ], signatures: { type: "2", labels: ["Le Resp. Pédagogique", "Le Dirigeant"], names: [o.responsablePedagogique, o.dirigeant] } });
 }
 
 function genTableauSuiviParcours(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
@@ -4892,16 +4997,16 @@ function genTableauSuiviParcours(o: OrganismeInfo, f: FormationInfo, stagiaires:
   });
   return buildDocument({ org: o, title: "TABLEAU DE SUIVI DU PARCOURS BÉNÉFICIAIRES ET ADAPTATIONS", subtitle: f.intitule, formation: f, showFormationInfo: true, table: {
     headers: ["Stagiaire", "Entreprise", "Niveau", "Adaptation", "Difficultés", "Statut"], rows
-  }, signatures: { type: "2", labels: ["Le Formateur", "Le Resp. Pédagogique"], names: [f.formateur, o.dirigeantPedagogique] } });
+  }, signatures: { type: "2", labels: ["Le Formateur", "Le Resp. Pédagogique"], names: [f.formateur, o.responsablePedagogique] } });
 }
 
 function genTableauAmeliorationContinue(o: OrganismeInfo) {
   return buildDocument({ org: o, title: "TABLEAU D'AMÉLIORATION CONTINUE", table: {
     headers: ["N°", "Source", "Constat", "Action corrective", "Responsable", "Délai", "Statut"],
     rows: [
-      ["1", "Satisfaction", "Plus de pratique demandée", "Exercices pratiques à 50%", o.dirigeantPedagogique, "T2 2025", "✅"],
+      ["1", "Satisfaction", "Plus de pratique demandée", "Exercices pratiques à 50%", o.responsablePedagogique, "T2 2025", "✅"],
       ["2", "Réclamation", "Délai réponse long", "Accusé réception sous 24h", o.referentQualite, "T1 2025", "✅"],
-      ["3", "Audit", "Supports à mettre à jour", "Refonte supports", o.dirigeantPedagogique, "T2 2025", "🔄"],
+      ["3", "Audit", "Supports à mettre à jour", "Refonte supports", o.responsablePedagogique, "T2 2025", "🔄"],
       ["4", "Veille", "RNQ V9", "Mise à jour charte qualité", o.referentQualite, "T1 2025", "✅"],
       ["5", "Entreprises", "Manque suivi post-formation", "Questionnaire J+90", o.referentQualite, "T3 2025", "📋"],
     ]
@@ -4938,12 +5043,12 @@ function genTableauAmeliorationContinueExcel(o: OrganismeInfo, f: FormationInfo,
 
   // Generate realistic improvement actions with dates after formation
   const actions = [
-    { date: dateOuverture, origine: "Analyse indicateurs", desc: "Taux de satisfaction stagiaires inférieur à l'objectif sur le T1", action: "Mise à jour des supports pédagogiques et adaptation du rythme de formation", qui: o.dirigeantPedagogique, delai: fmtDate(addDays(baseDate, 60)), cloture: fmtDate(addDays(baseDate, 55)), commentaire: "Supports refondus, satisfaction remontée à 95%" },
+    { date: dateOuverture, origine: "Analyse indicateurs", desc: "Taux de satisfaction stagiaires inférieur à l'objectif sur le T1", action: "Mise à jour des supports pédagogiques et adaptation du rythme de formation", qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, 60)), cloture: fmtDate(addDays(baseDate, 55)), commentaire: "Supports refondus, satisfaction remontée à 95%" },
     { date: dateOuverture, origine: "Réclamation stagiaire", desc: "Problème de connexion Internet pendant la formation", action: "Souscription d'une box Internet supplémentaire pour sécuriser la connexion", qui: o.dirigeant, delai: "Immédiat", cloture: fmtDate(addDays(baseDate, 10)), commentaire: "Box installée, plus aucune coupure signalée" },
-    { date: fmtDate(addDays(baseDate, 14)), origine: "Satisfaction parties prenantes", desc: "Demande de formats de formation plus courts", action: "Création de modules intensifs sur 1 journée", qui: o.dirigeantPedagogique, delai: fmtDate(addDays(baseDate, 90)), cloture: fmtDate(addDays(baseDate, 75)), commentaire: "3 formations intensives créées et planifiées" },
+    { date: fmtDate(addDays(baseDate, 14)), origine: "Satisfaction parties prenantes", desc: "Demande de formats de formation plus courts", action: "Création de modules intensifs sur 1 journée", qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, 90)), cloture: fmtDate(addDays(baseDate, 75)), commentaire: "3 formations intensives créées et planifiées" },
     { date: fmtDate(addDays(baseDate, 21)), origine: "Veille réglementaire", desc: "Évolution du guide de lecture Qualiopi V9", action: "Mise à jour de l'ensemble des procédures qualité", qui: o.referentQualite, delai: fmtDate(addDays(baseDate, 120)), cloture: fmtDate(addDays(baseDate, 110)), commentaire: "Procédures mises à jour, revue documentaire terminée" },
     { date: fmtDate(addDays(baseDate, 30)), origine: "Entretien formateur", desc: "Besoin de formation continue sur les outils numériques", action: "Inscription aux formations IA et outils collaboratifs", qui: o.dirigeant, delai: fmtDate(addDays(baseDate, 150)), cloture: "", commentaire: "Formation programmée" },
-    { date: fmtDate(addDays(baseDate, 45)), origine: "Enquête satisfaction", desc: "Souhait de plus de cas pratiques professionnels", action: "Développement d'exercices basés sur des situations réelles métier", qui: o.dirigeantPedagogique, delai: fmtDate(addDays(baseDate, 150)), cloture: "", commentaire: "En cours de développement" },
+    { date: fmtDate(addDays(baseDate, 45)), origine: "Enquête satisfaction", desc: "Souhait de plus de cas pratiques professionnels", action: "Développement d'exercices basés sur des situations réelles métier", qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, 150)), cloture: "", commentaire: "En cours de développement" },
     { date: fmtDate(addDays(baseDate, 60)), origine: "Dysfonctionnement", desc: "Retard dans l'envoi des attestations de fin de formation", action: "Automatisation de la génération et l'envoi des attestations", qui: o.referentQualite, delai: fmtDate(addDays(baseDate, 150)), cloture: "", commentaire: "Outil en phase de test" },
   ];
 
@@ -5609,40 +5714,67 @@ function genExercicesCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires
     return genExercicesStagiaire(o, f, stagiaires, si, exerciceIdx);
   }
   const s = stagiaires[si] || stagiaires[0];
-  const days = getFormationDays(f);
-  const nbJours = days.length;
-  const nbBlocks = Math.max(1, Math.ceil(nbJours / 2));
-  const jourDebut = exerciceIdx * 2 + 1;
-  const jourFin = Math.min(exerciceIdx * 2 + 2, nbJours);
-  const jourLabel = nbBlocks > 1 ? ` – Jour ${jourDebut}-${jourFin}` : '';
+  const rncp = getRNCPByCode(f.codeRNCP || '');
+  const { totalHours } = parseDuree(f.duree);
+  const effectiveTotal = totalHours > 0 ? totalHours : 420;
+  const totalCFAWeeks = Math.max(1, Math.ceil(effectiveTotal / 35));
+
+  // 2 exercises per CFA week → exerciceIdx maps to week + position
+  const weekNum = Math.floor(exerciceIdx / 2) + 1;
+  const exInWeek = (exerciceIdx % 2) + 1;
+
+  // Determine which module/bloc this week falls into
+  let moduleTitle = '';
+  let modalitesEval = 'Mise en situation professionnelle';
+  if (rncp && rncp.blocsCompetences.length > 0) {
+    const accompHours = Math.round(effectiveTotal * 0.15);
+    const blocHoursTotal = effectiveTotal - accompHours;
+    const rncpTotalVolume = rncp.blocsCompetences.reduce((sum, bloc) =>
+      sum + bloc.matieres.reduce((s2, m) => s2 + (parseInt(m.volume) || 0), 0), 0);
+    const scale = rncpTotalVolume > 0 ? blocHoursTotal / rncpTotalVolume : 1;
+
+    let cumulWeeks = 0;
+    for (const bloc of rncp.blocsCompetences) {
+      const volume = Math.round(bloc.matieres.reduce((s2, m) => s2 + (parseInt(m.volume) || 0), 0) * scale);
+      const blocWeeks = Math.max(1, Math.ceil(volume / 35));
+      cumulWeeks += blocWeeks;
+      if (weekNum <= cumulWeeks) {
+        moduleTitle = bloc.titre;
+        modalitesEval = bloc.modalitesEval || modalitesEval;
+        break;
+      }
+    }
+    if (!moduleTitle) moduleTitle = rncp.blocsCompetences[rncp.blocsCompetences.length - 1]?.titre || '';
+  }
 
   const evalData = getEvalContent(f.intitule);
   const allExercices = [...evalData.exercices];
-  for (let i = allExercices.length; i < (exerciceIdx + 1) * 2; i++) {
+  // Pad with generated exercises if needed
+  for (let i = allExercices.length; i <= exerciceIdx; i++) {
     allExercices.push({
-      titre: `Exercice ${i + 1} : Cas pratique – Jour ${Math.floor(i / 2) * 2 + 1}-${Math.min(Math.floor(i / 2) * 2 + 2, nbJours)}`,
-      consigne: `À partir de la situation professionnelle présentée, appliquez les compétences acquises.`,
+      titre: `Exercice ${i + 1} : Cas pratique`,
+      consigne: `À partir de la situation professionnelle présentée, appliquez les compétences acquises en lien avec le module en cours.`,
       reponseAttendue: `Application structurée des acquis de formation.`,
     });
   }
-  const blockStart = exerciceIdx * 2;
-  const selectedExercices = allExercices.slice(blockStart, blockStart + 2);
+  const exercice = allExercices[exerciceIdx] || allExercices[allExercices.length - 1];
 
-  let extra = `<h2>EXERCICE PRATIQUE${jourLabel} – FORMATION ${f.intitule.toUpperCase()}</h2>
+  let extra = `<h2>EXERCICE PRATIQUE – Semaine CFA ${weekNum} / Exercice ${exInWeek}</h2>
+    <p><strong>Formation :</strong> ${f.intitule}</p>
+    ${moduleTitle ? `<p><strong>Module :</strong> ${moduleTitle}</p>` : ''}
+    <p><strong>Modalité d'évaluation :</strong> ${modalitesEval}</p>
     <p><strong>Nom et prénom :</strong> ${s.prenom} ${s.nom}</p>
     <p><strong>Date :</strong> ___/___/______</p>`;
 
-  selectedExercices.forEach((ex) => {
-    extra += `<h3>${ex.titre}</h3>
-      <p><strong>Consigne :</strong> ${ex.consigne}</p>
-      <p><strong>Réponse de l'apprenti(e) :</strong></p>
-      <div style="border:1px solid #ccc;min-height:120px;padding:12px">&#160;</div>
-      <p><strong>Note :</strong> _____ / 5</p>
-      <p><strong>Observations du formateur :</strong></p>
-      <div style="border:1px solid #ccc;min-height:60px;padding:8px">&#160;</div>`;
-  });
+  extra += `<h3>${exercice.titre}</h3>
+    <p><strong>Consigne :</strong> ${exercice.consigne}</p>
+    <p><strong>Réponse de l'apprenti(e) :</strong></p>
+    <div style="border:1px solid #ccc;min-height:120px;padding:12px">&#160;</div>
+    <p><strong>Note :</strong> _____ / 5</p>
+    <p><strong>Observations du formateur :</strong></p>
+    <div style="border:1px solid #ccc;min-height:60px;padding:8px">&#160;</div>`;
 
-  return buildDocument({ org: o, title: `EXERCICE PRATIQUE${jourLabel}`, subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, formation: f, showFormationInfo: true, extraHtml: extra });
+  return buildDocument({ org: o, title: `EXERCICE PRATIQUE – Sem. ${weekNum} Ex. ${exInWeek}`, subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, formation: f, showFormationInfo: true, extraHtml: extra });
 }
 
 function genExamenBlancCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
