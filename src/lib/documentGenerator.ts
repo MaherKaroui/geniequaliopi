@@ -5891,7 +5891,7 @@ function genExercicesCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires
     : `Exercice ${exerciceIdx + 1} : Cas pratique`;
 
   // Generate long realistic student response with intentional spelling mistakes
-  const hash = (s.nom + s.prenom + String(exerciceIdx)).split("").reduce((a: number, c: string) => a + c.charCodeAt(0), 0);
+  // (hash already declared above)
 
   const studentProfiles = [
     { level: 'excellent', baseNote: 4.5, style: 'structuré et détaillé' },
