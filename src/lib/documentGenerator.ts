@@ -3396,15 +3396,32 @@ function genDocumentsCertificateursCFA(o: OrganismeInfo, f: FormationInfo) {
   ] });
 }
 
+/** Parse rythme alternance string to get CFA weeks and enterprise weeks per cycle */
+function parseRythmeAlternance(rythme: string): { cfaWeeks: number; entrepriseWeeks: number } {
+  const match = rythme.match(/(\d+)\s*sem.*?\/\s*(\d+)\s*sem/i);
+  if (match) return { cfaWeeks: parseInt(match[1]), entrepriseWeeks: parseInt(match[2]) };
+  return { cfaWeeks: 1, entrepriseWeeks: 3 };
+}
+
+/** Calculate the total number of CFA weeks for the formation */
+function getCFAWeeks(f: FormationInfo): number {
+  const { totalHours } = parseDuree(f.duree);
+  const effectiveTotal = totalHours > 0 ? totalHours : 420;
+  // 35h per CFA week
+  return Math.max(1, Math.ceil(effectiveTotal / 35));
+}
+
 function genSynopsisCFA(o: OrganismeInfo, f: FormationInfo) {
   const rncp = getRNCPByCode(f.codeRNCP || '');
   const { totalHours } = parseDuree(f.duree);
   const effectiveTotal = totalHours > 0 ? totalHours : (rncp ? parseInt(rncp.dureeIndicative) || 420 : 420);
 
-  // Rythme alternance
   const rythme = f.rythmeAlternance || '1 semaine CFA / 3 semaines entreprise';
+  const { cfaWeeks: cfaPerCycle, entrepriseWeeks } = parseRythmeAlternance(rythme);
+  const totalCFAWeeks = Math.max(1, Math.ceil(effectiveTotal / 35));
+  const cycleLength = cfaPerCycle + entrepriseWeeks;
+  const totalCycles = Math.ceil(totalCFAWeeks / cfaPerCycle);
 
-  // Méthodes pédagogiques par bloc (variées)
   const methodesSets = [
     'Études de cas, jeux de rôle, ateliers prospection réelle, utilisation CRM, travail en sous-groupe',
     'Ateliers de co-construction d\'offres, simulations de négociation filmées, analyse de cas réels, business game',
@@ -3412,28 +3429,117 @@ function genSynopsisCFA(o: OrganismeInfo, f: FormationInfo) {
     'Ateliers pratiques sur poste informatique, travaux individuels et collectifs',
   ];
 
+  // Build week-by-week planning section
+  let planningHtml = `<h3>Planification semaine par semaine</h3>
+    <p><em>Rythme : ${rythme} — Cycle de ${cycleLength} semaines (${cfaPerCycle} en CFA + ${entrepriseWeeks} en entreprise)</em></p>`;
+
   if (rncp && rncp.blocsCompetences.length > 0) {
-    // Calculate total RNCP volume
+    // Calculate volumes
     const rncpTotalVolume = rncp.blocsCompetences.reduce((sum, bloc) =>
       sum + bloc.matieres.reduce((s, m) => s + (parseInt(m.volume) || 0), 0), 0);
-    // Reserve ~15% for accompaniment
     const accompHours = Math.round(effectiveTotal * 0.15);
     const blocHoursTotal = effectiveTotal - accompHours;
-    // Scale factor
     const scale = rncpTotalVolume > 0 ? blocHoursTotal / rncpTotalVolume : 1;
 
+    // Build module list with scaled hours
+    const modules = rncp.blocsCompetences.map((bloc, i) => {
+      const volume = Math.round(bloc.matieres.reduce((s, m) => s + (parseInt(m.volume) || 0), 0) * scale);
+      return { titre: `Bloc ${i + 1} – ${bloc.titre}`, volume, modalitesEval: bloc.modalitesEval, bloc, index: i };
+    });
+    // Add accompagnement module
+    modules.push({ titre: 'Accompagnement + Examens blancs', volume: accompHours, modalitesEval: 'Examens blancs + entretien jury', bloc: null as any, index: modules.length });
+
+    // Distribute modules across CFA weeks
+    let cfaWeekNum = 0;
+    let calendarWeek = 1;
+    let moduleIdx = 0;
+    let remainingInModule = modules[0]?.volume || 0;
+    const weekPlan: { calWeek: number; cfaWeek: number; isCFA: boolean; moduleTitle: string; hours: number; exercices: string; entrepriseTask: string }[] = [];
+
+    for (let cycle = 0; cycle < totalCycles && moduleIdx < modules.length; cycle++) {
+      // CFA weeks in this cycle
+      for (let cw = 0; cw < cfaPerCycle && moduleIdx < modules.length; cw++) {
+        cfaWeekNum++;
+        const weekHours = Math.min(35, remainingInModule);
+        const mod = modules[moduleIdx];
+        weekPlan.push({
+          calWeek: calendarWeek,
+          cfaWeek: cfaWeekNum,
+          isCFA: true,
+          moduleTitle: mod.titre,
+          hours: weekHours,
+          exercices: `Exercice 1 + Exercice 2 (${mod.modalitesEval.split(',')[0] || 'évaluation continue'})`,
+          entrepriseTask: '',
+        });
+        remainingInModule -= weekHours;
+        if (remainingInModule <= 0) {
+          moduleIdx++;
+          remainingInModule = moduleIdx < modules.length ? modules[moduleIdx].volume : 0;
+        }
+        calendarWeek++;
+      }
+      // Enterprise weeks
+      for (let ew = 0; ew < entrepriseWeeks; ew++) {
+        const currentMod = moduleIdx < modules.length ? modules[moduleIdx] : modules[modules.length - 1];
+        weekPlan.push({
+          calWeek: calendarWeek,
+          cfaWeek: 0,
+          isCFA: false,
+          moduleTitle: '',
+          hours: 0,
+          exercices: '',
+          entrepriseTask: `Mise en pratique : ${currentMod?.titre || 'compétences acquises'} — Livret d'alternance`,
+        });
+        calendarWeek++;
+      }
+    }
+
+    // Week-by-week planning table
+    planningHtml += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%">
+      <tr style="background:#1e3a7b;color:#fff">
+        <th>Semaine calendaire</th>
+        <th>Lieu</th>
+        <th>Sem. CFA</th>
+        <th>Module / Bloc</th>
+        <th>Heures</th>
+        <th>Exercices / Évaluations</th>
+      </tr>`;
+    weekPlan.forEach(w => {
+      if (w.isCFA) {
+        planningHtml += `<tr>
+          <td style="text-align:center">S${w.calWeek}</td>
+          <td><strong>CFA</strong></td>
+          <td style="text-align:center">${w.cfaWeek}</td>
+          <td>${w.moduleTitle}</td>
+          <td style="text-align:center">${w.hours}h</td>
+          <td>${w.exercices}</td>
+        </tr>`;
+      } else {
+        planningHtml += `<tr style="background:#f0f8f0">
+          <td style="text-align:center">S${w.calWeek}</td>
+          <td><strong>Entreprise</strong></td>
+          <td style="text-align:center">—</td>
+          <td colspan="2">${w.entrepriseTask}</td>
+          <td>Suivi livret d'alternance</td>
+        </tr>`;
+      }
+    });
+    planningHtml += `</table>`;
+
+    // Main synopsis table (by module)
     const rows = rncp.blocsCompetences.map((bloc, i) => {
+      const mod = modules[i];
       const contenus = bloc.matieres.map(m => {
         const scaledH = Math.round((parseInt(m.volume) || 0) * scale);
         return `- ${m.contenu} <em>(${scaledH}h)</em>`;
       }).join('<br>');
-      const volume = Math.round(bloc.matieres.reduce((s, m) => s + (parseInt(m.volume) || 0), 0) * scale);
-      const nbExercices = Math.max(2, Math.ceil(volume / 35));
+      const nbCFAWeeks = Math.max(1, Math.ceil(mod.volume / 35));
+      const nbExercices = nbCFAWeeks * 2;
       return `<tr>
-        <td style="vertical-align:top"><strong>Bloc ${i + 1} – ${bloc.titre}</strong></td>
+        <td style="vertical-align:top"><strong>${mod.titre}</strong></td>
         <td style="vertical-align:top">${contenus}</td>
-        <td style="vertical-align:top">${bloc.modalitesEval}<br><br><strong>Exercices pratiques :</strong> ${nbExercices} exercices évalués (1 tous les ${Math.round(volume / nbExercices)}h)<br><strong>Évaluation en entreprise :</strong> livret d'alternance</td>
-        <td style="vertical-align:top;text-align:center"><strong>${volume} h</strong></td>
+        <td style="vertical-align:top">${bloc.modalitesEval}<br><br><strong>Exercices pratiques :</strong> ${nbExercices} exercices (2 par semaine CFA × ${nbCFAWeeks} sem.)<br><strong>Évaluation en entreprise :</strong> livret d'alternance (${entrepriseWeeks} sem./cycle)</td>
+        <td style="vertical-align:top;text-align:center"><strong>${mod.volume} h</strong><br><em>(${nbCFAWeeks} sem.)</em></td>
         <td style="vertical-align:top">${methodesSets[i % methodesSets.length]}</td>
         <td style="vertical-align:top">Formateur expérimenté + tuteur en entreprise</td>
       </tr>`;
@@ -3448,13 +3554,10 @@ function genSynopsisCFA(o: OrganismeInfo, f: FormationInfo) {
       <td style="vertical-align:top">Référent pédagogique + jury professionnel habilité</td>
     </tr>`);
 
-    // Total row
-    const computedTotal = Math.round(rncp.blocsCompetences.reduce((s, bloc) =>
-      s + bloc.matieres.reduce((s2, m) => s2 + (parseInt(m.volume) || 0), 0) * scale, 0)) + accompHours;
-
+    const computedTotal = modules.reduce((s, m) => s + m.volume, 0);
     rows.push(`<tr style="background:#1e3a7b;color:#fff;font-weight:bold">
       <td colspan="3" style="text-align:right">TOTAL HEURES EN CENTRE DE FORMATION</td>
-      <td style="text-align:center">${computedTotal} h</td>
+      <td style="text-align:center">${computedTotal} h (${totalCFAWeeks} semaines CFA)</td>
       <td colspan="2"></td>
     </tr>`);
 
@@ -3462,7 +3565,7 @@ function genSynopsisCFA(o: OrganismeInfo, f: FormationInfo) {
       <tr style="background:#1e3a7b;color:#fff">
         <th>Bloc de compétences (${rncp.code})</th>
         <th>Contenus de formation principaux</th>
-        <th>Modalités d'évaluation</th>
+        <th>Modalités d'évaluation / Exercices</th>
         <th>Durée (heures)</th>
         <th>Méthodes pédagogiques</th>
         <th>Formateur / Alternance</th>
@@ -3475,13 +3578,14 @@ function genSynopsisCFA(o: OrganismeInfo, f: FormationInfo) {
       title: "SYNOPSIS DE FORMATION",
       subtitle: f.intitule,
       sections: [
-        { heading: "Rythme d'alternance", content: `<p><strong>Rythme :</strong> ${rythme}</p><p><strong>Durée totale en centre :</strong> ${effectiveTotal} heures</p><p><strong>Certification visée :</strong> ${rncp.intitule} (${rncp.code})<br><strong>Niveau :</strong> ${rncp.niveau}<br><strong>Certificateur :</strong> ${rncp.certificateur}</p>` },
-        { heading: "Tableau synoptique", content: tableContent },
+        { heading: "Rythme d'alternance", content: `<p><strong>Rythme :</strong> ${rythme}</p><p><strong>Durée totale en centre :</strong> ${effectiveTotal} heures (${totalCFAWeeks} semaines CFA)</p><p><strong>Durée d'un cycle :</strong> ${cfaPerCycle} sem. CFA + ${entrepriseWeeks} sem. entreprise = ${cycleLength} semaines</p><p><strong>Nombre de cycles :</strong> ${totalCycles}</p>${rncp ? `<p><strong>Certification visée :</strong> ${rncp.intitule} (${rncp.code})<br><strong>Niveau :</strong> ${rncp.niveau}<br><strong>Certificateur :</strong> ${rncp.certificateur}</p>` : ''}` },
+        { heading: "Tableau synoptique par module", content: tableContent },
+        { heading: "Planning semaine par semaine (alternance CFA / Entreprise)", content: planningHtml },
       ],
     });
   }
 
-  // Fallback: generic synopsis — distribute hours across chapters
+  // Fallback: generic synopsis
   const chapters = getCourseChapters(f.intitule);
   const nbBlocs = Math.max(2, Math.min(chapters.length, 5));
   const accompHours = Math.round(effectiveTotal * 0.15);
@@ -3490,12 +3594,13 @@ function genSynopsisCFA(o: OrganismeInfo, f: FormationInfo) {
   for (let i = 0; i < nbBlocs; i++) {
     const ch = chapters[i];
     const contenus = ch ? ch.sections.slice(0, 4).map((s) => `- ${s.title}`).join('<br>') : '[À compléter]';
-    const nbExercices = Math.max(1, Math.ceil(perBloc / 35));
+    const nbCFAWeeks = Math.max(1, Math.ceil(perBloc / 35));
+    const nbExercices = nbCFAWeeks * 2;
     fallbackRows.push(`<tr>
       <td style="vertical-align:top"><strong>${ch?.title || `Bloc ${i + 1}`}</strong></td>
       <td style="vertical-align:top">${contenus}</td>
-      <td style="vertical-align:top">Mise en situation professionnelle + évaluation continue<br><strong>Exercices :</strong> ${nbExercices} exercices évalués<br><strong>Évaluation en entreprise :</strong> livret d'alternance</td>
-      <td style="vertical-align:top;text-align:center"><strong>${perBloc} h</strong></td>
+      <td style="vertical-align:top">Mise en situation professionnelle + évaluation continue<br><strong>Exercices :</strong> ${nbExercices} exercices (2/sem. × ${nbCFAWeeks} sem.)<br><strong>Évaluation en entreprise :</strong> livret d'alternance</td>
+      <td style="vertical-align:top;text-align:center"><strong>${perBloc} h</strong><br><em>(${nbCFAWeeks} sem.)</em></td>
       <td style="vertical-align:top">${methodesSets[i % methodesSets.length]}</td>
       <td style="vertical-align:top">Formateur expérimenté + tuteur en entreprise</td>
     </tr>`);
@@ -3510,7 +3615,7 @@ function genSynopsisCFA(o: OrganismeInfo, f: FormationInfo) {
   </tr>`);
   fallbackRows.push(`<tr style="background:#1e3a7b;color:#fff;font-weight:bold">
     <td colspan="3" style="text-align:right">TOTAL HEURES EN CENTRE DE FORMATION</td>
-    <td style="text-align:center">${effectiveTotal} h</td>
+    <td style="text-align:center">${effectiveTotal} h (${totalCFAWeeks} sem.)</td>
     <td colspan="2"></td>
   </tr>`);
 
@@ -3531,7 +3636,7 @@ function genSynopsisCFA(o: OrganismeInfo, f: FormationInfo) {
     title: "SYNOPSIS DE FORMATION",
     subtitle: f.intitule,
     sections: [
-      { heading: "Rythme d'alternance", content: `<p><strong>Rythme :</strong> ${rythme}</p><p><strong>Durée totale en centre :</strong> ${effectiveTotal} heures</p>` },
+      { heading: "Rythme d'alternance", content: `<p><strong>Rythme :</strong> ${rythme}</p><p><strong>Durée totale en centre :</strong> ${effectiveTotal} heures (${totalCFAWeeks} sem.)</p>` },
       { heading: "Tableau synoptique", content: genericTable },
     ],
   });
