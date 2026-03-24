@@ -1518,7 +1518,7 @@ function generateFormateurComment(s: StagiaireInfo, f: FormationInfo, totalScore
       const actions = [
         `Le formateur prévoit pour ${fullName} des temps de remédiation individualisés, des supports simplifiés et un accompagnement pas à pas.`,
         `Un plan de rattrapage sera mis en place pour ${fullName} incluant des exercices guidés, des tutoriels vidéo et un suivi quotidien.`,
-        `${fullName} sera ${g(stagiaires[si], "accompagné", "accompagnée")} de manière individuelle avec des objectifs intermédiaires pour favoriser une progression régulière.`,
+        `${fullName} sera ${g(s, "accompagné", "accompagnée")} de manière individuelle avec des objectifs intermédiaires pour favoriser une progression régulière.`,
       ];
       parts.push(actions[(si + 1) % actions.length]);
     } else {
