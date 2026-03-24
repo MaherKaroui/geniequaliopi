@@ -387,6 +387,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     }
     case "procedure_abandon_cfa": return genProcedureAbandon(o);
     case "procedure_absences_cfa": return genProcedureAbsences(o);
+    case "emargement_cfa": return genEmargementCFA(o, f, stagiaires);
     case "logs_connexion_cfa": return genRapportConnexion(o, f, stagiaires);
     case "boite_formateur_cfa": return genBoiteFormateur(o, f);
     case "documents_certificateurs_cfa": return genDocumentsCertificateursCFA(o, f);
@@ -3409,6 +3410,47 @@ function getCFAWeeks(f: FormationInfo): number {
   const effectiveTotal = totalHours > 0 ? totalHours : 420;
   // 35h per CFA week
   return Math.max(1, Math.ceil(effectiveTotal / 35));
+}
+
+function genEmargementCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
+  const cfaWeekDates = getCFAWeekDates(f);
+  const joursFR = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+
+  let extra = '';
+  cfaWeekDates.forEach((week, wi) => {
+    if (wi > 0) extra += '<div class="page-break"></div>';
+    const weekStartStr = week.weekStart.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    const weekEndStr = week.weekEnd.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+    extra += `<h3>Semaine CFA ${week.cfaWeekNum} — du ${weekStartStr} au ${weekEndStr}</h3>`;
+
+    // Generate 5 days (lundi to vendredi)
+    for (let d = 0; d < 5; d++) {
+      const dayDate = new Date(week.weekStart);
+      dayDate.setDate(dayDate.getDate() + d);
+      const dayStr = dayDate.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+      const dayName = joursFR[dayDate.getDay()];
+
+      extra += `<p style="margin-top:12px"><strong>${dayName} ${dayStr}</strong></p>`;
+      extra += `<p><strong>Formateur :</strong> ${f.formateur}<br><strong>Formation :</strong> ${f.intitule}</p>`;
+
+      let tableRows = '';
+      stagiaires.slice(0, 10).forEach(s => {
+        const stagName = `${s.prenom} ${s.nom.toUpperCase()}`;
+        const stagSigHtml = s.signatureUrl
+          ? `<br><img src="${s.signatureUrl}" alt="Sig" style="max-height:40px;max-width:90px;object-fit:contain;margin-top:4px" />`
+          : `<br><span style="font-style:italic;color:#999;font-size:10px">Signé ${s.prenom[0]}.${s.nom}</span>`;
+        const formateurSigHtml = o.signatureUrl
+          ? `<br><img src="${o.signatureUrl}" alt="Sig" style="max-height:40px;max-width:90px;object-fit:contain;margin-top:4px" />`
+          : '';
+        tableRows += `<tr style="background:#fff;border-bottom:1px solid #ddd"><td>${dayStr}</td><td>Matin<br><small>09h00–12h30</small></td><td style="padding:10px 6px">${stagName}${stagSigHtml}</td><td style="padding:10px 6px">${f.formateur}${formateurSigHtml}</td></tr>`;
+        tableRows += `<tr style="background:#fff;border-bottom:1px solid #ccc"><td></td><td>Après-midi<br><small>13h30–17h00</small></td><td style="padding:10px 6px">${stagName}${stagSigHtml}</td><td style="padding:10px 6px">${f.formateur}${formateurSigHtml}</td></tr>`;
+      });
+      extra += `<table><tr><th>Date</th><th>Horaires</th><th>Prénom et nom, Signature Du Stagiaire</th><th>Prénom et nom du Formateur</th></tr>${tableRows}</table>`;
+    }
+  });
+
+  return buildDocument({ org: o, title: "FEUILLE D'ÉMARGEMENT – APPRENTISSAGE", subtitle: f.intitule, formation: f, showFormationInfo: true, extraHtml: extra });
 }
 
 function genSynopsisCFA(o: OrganismeInfo, f: FormationInfo) {

@@ -314,9 +314,9 @@ export function buildFullCatalog(
       add(`cfa_c3i9_convention_${si}`, `CT3 - IND 9 CONVENTION DE FORMATION PAR APPRENTISSAGE – ${s.prenom} ${s.nom}`, 3, 9, "convention_formation_apprentissage", { stagiaireIdx: si });
     });
     // ===== IND 11 — Évaluation de l'atteinte des objectifs (CFA) =====
-    // Émargement
+    // Émargement CFA — une feuille par semaine CFA avec dates réelles
     formations.forEach((f, fi) => {
-      add(`cfa_c3i11_emargement_${fi}`, `CT3 - IND 11 FEUILLE D'ÉMARGEMENT CFA`, 3, 11, "emargement_jour", { fi });
+      add(`cfa_c3i11_emargement_${fi}`, `CT3 - IND 11 FEUILLE D'ÉMARGEMENT CFA`, 3, 11, "emargement_cfa", { fi });
     });
     // Documents individuels per-stagiaire IND 11 CFA
     formations.forEach((f, fi) => {
