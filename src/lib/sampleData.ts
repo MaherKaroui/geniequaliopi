@@ -196,6 +196,7 @@ export const SAMPLE_FORMATIONS: FormationInfo[] = [
     lieu: "25 avenue de la Formation Professionnelle, 75008 Paris – Salle D1",
     nombreParticipants: "10",
     formateur: "Catherine Dubois",
+    codeRNCP: "RS6674",
   },
   {
     intitule: "Création de contenus rédactionnels et visuels par l'usage responsable de l'intelligence artificielle générative",
