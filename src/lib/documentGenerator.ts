@@ -363,6 +363,10 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "titre_rncp_cfa": return genTitreRNCPCFA(o, f);
     case "matiere_titre_cfa": return genMatiereTitreCFA(o, f);
     case "tableau_croise_cfa": return genTableauCroiseCFA(o, f);
+    case "fiche_certification_rs": return genFicheCertificationRS(o, f);
+    case "procedure_presentation_certification": return genProcedurePresentationCertification(o, f);
+    case "convocation_certification": return genConvocationCertification(o, f, stagiaires);
+    case "attestation_presentation_certification": return genAttestationPresentationCertification(o, f, stagiaires, params?.stagiaireIdx ?? 0);
     case "fiche_autoevaluation_apprenti": return genFicheAutoevaluation(o, f, stagiaires);
     case "test_cfa_stagiaire": {
       const si = params?.stagiaireIdx ?? 0;
@@ -2569,6 +2573,195 @@ function genTableauCroiseCFA(o: OrganismeInfo, f: FormationInfo) {
     variant: "green",
   });
   return buildDocument({ org: o, title: "TABLEAU CROISÉ COMPÉTENCES / PROGRAMME", subtitle: rncp.intitule, sections });
+}
+
+// ============== CT2 IND 7 & CT3 IND 16 — CERTIFICATION RS/RNCP ==============
+
+function genFicheCertificationRS(o: OrganismeInfo, f: FormationInfo) {
+  const rncp = getRNCPByCode(f.codeRNCP || "");
+  if (!rncp) {
+    return buildDocument({ org: o, title: "FICHE CERTIFICATION RS/RNCP", subtitle: f.intitule, sections: [
+      { heading: "Information", content: `<p>Pour générer cette fiche, renseignez un code RS ou RNCP dans le formulaire de formation.</p>` },
+    ] });
+  }
+  const isRS = rncp.code.startsWith("RS");
+  const lienFC = isRS
+    ? `https://www.francecompetences.fr/recherche/rs/${rncp.code.replace("RS", "")}/`
+    : `https://www.francecompetences.fr/recherche/rncp/${rncp.code.replace("RNCP", "")}/`;
+
+  return buildDocument({ org: o, title: "FICHE CERTIFICATION", subtitle: `${rncp.intitule} (${rncp.code})`, sections: [
+    { heading: "1. Identification de la certification", content: `
+      ${tableHTML(["Élément", "Détail"], [
+        ["Code", rncp.code],
+        ["Intitulé", rncp.intitule],
+        ["Certificateur (Nom légal)", rncp.certificateur],
+        ["Date d'échéance", rncp.dateEcheance],
+        ["Niveau de qualification", rncp.niveau || "Non applicable"],
+        ["Lien France Compétences", `<a href="${lienFC}" target="_blank">${lienFC}</a>`],
+      ])}` },
+    { heading: "2. Objectifs de la certification", content: `<p>${rncp.resume}</p>` },
+    { heading: "3. Blocs de compétences", content: rncp.blocsCompetences.map((b, i) =>
+      `<p><strong>Bloc ${i + 1} – ${b.titre}</strong></p>
+      <ul>${b.competences.map(c => `<li>${c}</li>`).join("")}</ul>
+      <p><em>Modalités d'évaluation :</em> ${b.modalitesEval}</p>`
+    ).join("<br/>"), variant: "green" },
+    { heading: "4. Adéquation avec le programme de formation", content: `
+      <p>Le programme de formation <strong>${f.intitule}</strong> dispensé par <strong>${o.nom}</strong> est conçu en adéquation avec les exigences de la certification <strong>${rncp.code}</strong>.</p>
+      <p>Chaque bloc de compétences du référentiel est couvert par les modules de formation, avec des évaluations associées permettant de vérifier l'acquisition des compétences visées.</p>
+      ${tableHTML(["Indicateur", "Détail"], [
+        ["Volume horaire", f.duree || rncp.dureeIndicative || "À déterminer"],
+        ["Nombre de blocs couverts", `${rncp.blocsCompetences.length} / ${rncp.blocsCompetences.length}`],
+        ["Taux de couverture", "100%"],
+      ])}` },
+    { heading: "5. Conditions de certification", content: `
+      <p>La certification est obtenue par la validation de l'ensemble des blocs de compétences selon les modalités définies par le certificateur <strong>${rncp.certificateur}</strong>.</p>
+      ${rncp.voiesAcces && rncp.voiesAcces.length > 0 ? `<p><strong>Voies d'accès :</strong></p><ul>${rncp.voiesAcces.map(v => `<li>${v}</li>`).join("")}</ul>` : ""}` },
+  ] });
+}
+
+function genProcedurePresentationCertification(o: OrganismeInfo, f: FormationInfo) {
+  const rncp = getRNCPByCode(f.codeRNCP || "");
+  const certifCode = rncp?.code || f.codeRNCP || "___";
+  const certifIntitule = rncp?.intitule || f.intitule;
+  const certifNom = rncp?.certificateur || "___";
+  const dateEcheance = rncp?.dateEcheance || "___";
+  const isRS = certifCode.startsWith("RS");
+  const lienFC = isRS
+    ? `https://www.francecompetences.fr/recherche/rs/${certifCode.replace("RS", "")}/`
+    : `https://www.francecompetences.fr/recherche/rncp/${certifCode.replace("RNCP", "")}/`;
+
+  return buildDocument({ org: o, title: "PROCÉDURE DE PRÉSENTATION DES BÉNÉFICIAIRES À LA CERTIFICATION", subtitle: `${certifIntitule} (${certifCode})`, sections: [
+    { heading: "1. Objet", content: `
+      <p>La présente procédure décrit les modalités de présentation des bénéficiaires de la formation <strong>${f.intitule}</strong> aux épreuves de la certification <strong>${certifCode} – ${certifIntitule}</strong>, délivrée par <strong>${certifNom}</strong>.</p>
+      <p>Date d'échéance de l'enregistrement : <strong>${dateEcheance}</strong></p>
+      <p>Lien France Compétences : <a href="${lienFC}" target="_blank">${lienFC}</a></p>` },
+    { heading: "2. Conditions préalables à la présentation", content: `
+      <p>Avant d'être présenté aux épreuves de certification, le bénéficiaire doit :</p>
+      <ul>
+        <li>Avoir suivi <strong>l'intégralité du parcours de formation</strong> (${f.duree || "durée prévue"})</li>
+        <li>Avoir satisfait aux <strong>évaluations intermédiaires</strong> (exercices pratiques, QCM, mises en situation)</li>
+        <li>Avoir complété son <strong>dossier de candidature</strong> auprès du certificateur</li>
+        <li>Être à jour de ses <strong>obligations administratives</strong> (émargement, convention signée)</li>
+      </ul>` },
+    { heading: "3. Processus de présentation", content: `
+      ${tableHTML(["Étape", "Action", "Responsable", "Délai"], [
+        ["1", "Vérification de l'assiduité et des évaluations du stagiaire", "Responsable pédagogique", "J-30 avant épreuves"],
+        ["2", "Constitution du dossier de candidature à la certification", "Coordinateur administratif", "J-21 avant épreuves"],
+        ["3", "Transmission du dossier au certificateur", "Responsable pédagogique", "J-15 avant épreuves"],
+        ["4", "Confirmation de l'inscription et convocation du stagiaire", "Coordinateur administratif", "J-10 avant épreuves"],
+        ["5", "Préparation spécifique aux épreuves (examen blanc, révisions)", "Formateur", "Dernière semaine"],
+        ["6", "Présentation aux épreuves de certification", "Stagiaire", "Jour J"],
+        ["7", "Réception et transmission des résultats", "Responsable pédagogique", "Selon certificateur"],
+      ])}`, variant: "green" },
+    { heading: "4. Documents à fournir au certificateur", content: `
+      <ul>
+        <li>Copie de la pièce d'identité du candidat</li>
+        <li>Attestation de fin de formation délivrée par <strong>${o.nom}</strong></li>
+        <li>Relevé des résultats aux évaluations intermédiaires</li>
+        <li>Feuilles d'émargement attestant de l'assiduité</li>
+        <li>Dossier de candidature complété et signé</li>
+      </ul>` },
+    { heading: "5. En cas d'échec", content: `
+      <p>En cas de non-obtention de la certification, le bénéficiaire est informé :</p>
+      <ul>
+        <li>Des <strong>résultats détaillés</strong> par bloc de compétences</li>
+        <li>Des <strong>possibilités de rattrapage</strong> ou de représentation</li>
+        <li>Des <strong>blocs de compétences validés</strong> (qui restent acquis selon les conditions du certificateur)</li>
+        <li>Des <strong>dispositifs de financement</strong> mobilisables pour une nouvelle présentation</li>
+      </ul>` },
+    { heading: "6. Conformité Qualiopi – Indicateur 16", content: `
+      <p>Cette procédure répond aux exigences de l'<strong>indicateur 16 du Référentiel National Qualité</strong> :</p>
+      <ul>
+        <li>Respect des exigences formelles de la certification visée</li>
+        <li>Information des bénéficiaires sur les conditions de présentation</li>
+        <li>Traçabilité des démarches de présentation à la certification</li>
+        <li>Accompagnement du bénéficiaire jusqu'à la certification</li>
+      </ul>`, variant: "orange" },
+  ] });
+}
+
+function genConvocationCertification(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
+  const rncp = getRNCPByCode(f.codeRNCP || "");
+  const certifCode = rncp?.code || f.codeRNCP || "___";
+  const certifIntitule = rncp?.intitule || f.intitule;
+  const certifNom = rncp?.certificateur || "___";
+  const dateFin = f.dateFin ? new Date(f.dateFin) : new Date();
+  // Épreuves 5 jours ouvrés après la fin de formation
+  const dateEpreuves = new Date(dateFin);
+  dateEpreuves.setDate(dateEpreuves.getDate() + 7);
+  const dateEpreuvesStr = dateEpreuves.toLocaleDateString("fr-FR");
+
+  const stagList = stagiaires.map(s => `<tr><td>${s.civilite || "M."} ${s.prenom} ${s.nom}</td><td>${s.email || "___"}</td><td>Convoqué(e)</td></tr>`).join("");
+
+  return buildDocument({ org: o, title: "CONVOCATION AUX ÉPREUVES DE CERTIFICATION", subtitle: `${certifIntitule} (${certifCode})`, sections: [
+    { heading: "Objet", content: `
+      <p>Le présent document constitue la convocation des bénéficiaires de la formation <strong>${f.intitule}</strong> aux épreuves de la certification <strong>${certifCode}</strong> délivrée par <strong>${certifNom}</strong>.</p>` },
+    { heading: "Informations sur les épreuves", content: `
+      ${tableHTML(["Élément", "Détail"], [
+        ["Certification visée", `${certifIntitule} (${certifCode})`],
+        ["Certificateur", certifNom],
+        ["Date prévisionnelle des épreuves", dateEpreuvesStr],
+        ["Lieu", f.lieu || `${o.adresse}, ${o.codePostal} ${o.ville}`],
+        ["Horaires", "Se présenter à 8h30 – Début des épreuves à 9h00"],
+      ])}` },
+    { heading: "Candidats convoqués", content: `
+      <table><thead><tr><th>Candidat</th><th>Email</th><th>Statut</th></tr></thead><tbody>${stagList}</tbody></table>` },
+    { heading: "Documents à apporter le jour des épreuves", content: `
+      <ul>
+        <li><strong>Pièce d'identité</strong> en cours de validité (carte d'identité, passeport)</li>
+        <li><strong>Convocation</strong> imprimée ou sur support numérique</li>
+        <li>Tout matériel autorisé selon les conditions du certificateur</li>
+      </ul>` },
+    { heading: "Modalités des épreuves", content: `
+      <p>Les épreuves se déroulent conformément aux modalités d'évaluation définies par le certificateur <strong>${certifNom}</strong> :</p>
+      ${rncp ? rncp.blocsCompetences.map((b, i) =>
+        `<p><strong>Bloc ${i + 1} – ${b.titre} :</strong> ${b.modalitesEval}</p>`
+      ).join("") : `<p>Selon les conditions définies par le certificateur.</p>`}`, variant: "green" },
+    { heading: "Consignes importantes", content: `
+      <ul>
+        <li>Tout retard pourra entraîner <strong>l'impossibilité de passer les épreuves</strong></li>
+        <li>En cas d'empêchement, prévenir <strong>${o.nom}</strong> au moins 48h à l'avance</li>
+        <li>L'utilisation de tout support non autorisé entraîne l'<strong>annulation de l'épreuve</strong></li>
+      </ul>` },
+  ], signatures: { type: "2", labels: ["Le Responsable pédagogique", "Le/La Bénéficiaire"], names: [o.responsablePedagogique || o.dirigeant, "________________________"] } });
+}
+
+function genAttestationPresentationCertification(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], stagiaireIdx: number) {
+  const s = stagiaires[stagiaireIdx] || stagiaires[0];
+  const rncp = getRNCPByCode(f.codeRNCP || "");
+  const certifCode = rncp?.code || f.codeRNCP || "___";
+  const certifIntitule = rncp?.intitule || f.intitule;
+  const certifNom = rncp?.certificateur || "___";
+  const dateEcheance = rncp?.dateEcheance || "___";
+  const isRS = certifCode.startsWith("RS");
+  const lienFC = isRS
+    ? `https://www.francecompetences.fr/recherche/rs/${certifCode.replace("RS", "")}/`
+    : `https://www.francecompetences.fr/recherche/rncp/${certifCode.replace("RNCP", "")}/`;
+
+  return buildDocument({ org: o, title: "ATTESTATION DE PRÉSENTATION À LA CERTIFICATION", subtitle: `${certifIntitule} (${certifCode})`, sections: [
+    { heading: "", content: `
+      <p>Je soussigné(e), <strong>${o.dirigeant}</strong>, en qualité de responsable de l'organisme de formation <strong>${o.nom}</strong>, certifie que :</p>
+      <br/>
+      <p><strong>${s.civilite || "M."} ${s.prenom} ${s.nom}</strong></p>
+      ${s.dateNaissance ? `<p>Né(e) le : ${formatDate(s.dateNaissance)}</p>` : ""}
+      <br/>
+      <p>a suivi la formation <strong>${f.intitule}</strong> du <strong>${formatDate(f.dateDebut)}</strong> au <strong>${formatDate(f.dateFin)}</strong> (${f.duree}) et a été présenté(e) aux épreuves de la certification :</p>` },
+    { heading: "Certification visée", content: `
+      ${tableHTML(["Élément", "Détail"], [
+        ["Code", certifCode],
+        ["Intitulé", certifIntitule],
+        ["Certificateur (Nom légal)", certifNom],
+        ["Date d'échéance", dateEcheance],
+        ["Lien France Compétences", `<a href="${lienFC}" target="_blank">${lienFC}</a>`],
+      ])}`, variant: "green" },
+    { heading: "Résultat", content: `
+      ${tableHTML(["Élément", "Détail"], [
+        ["Assiduité", "Conforme – Présence attestée par les feuilles d'émargement"],
+        ["Évaluations intermédiaires", "Réalisées conformément au programme"],
+        ["Présentation à la certification", "☐ Admis(e)  ☐ Non admis(e)  ☐ En attente des résultats"],
+      ])}
+      <p style="margin-top:10px"><em>Le résultat définitif sera communiqué par le certificateur <strong>${certifNom}</strong> selon ses délais propres.</em></p>` },
+  ], signatures: { type: "2", labels: ["Le Responsable de l'organisme", `Le/La Bénéficiaire`], names: [o.dirigeant, `${s.prenom} ${s.nom}`] }, stagiaires: [s] });
 }
 
 // ============== BILAN DE COMPÉTENCES ==============
