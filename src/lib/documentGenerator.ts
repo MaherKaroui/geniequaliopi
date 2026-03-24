@@ -4699,29 +4699,32 @@ function generateEvalBesoinsAnswers(s: StagiaireInfo, f: FormationInfo, o: Organ
 function genDeroulePedagogiqueDetaille(o: OrganismeInfo, f: FormationInfo) {
   const formation = f.intitule || "la formation";
 
-  // ── Determine number of days from duree field ──
+  // Check if formation has competency blocs (RS/RNCP)
+  const rncp = f.codeRNCP ? getRNCPByCode(f.codeRNCP) : null;
+  const hasBlocs = rncp && rncp.blocsCompetences && rncp.blocsCompetences.length > 0;
+
+  if (hasBlocs) {
+    return genDeroulePedagogiqueParBlocs(o, f, rncp!);
+  }
+
+  // ── Standard: by day ──
   const heuresMatch = f.duree.match(/(\d+)\s*h/i);
   const joursMatch = f.duree.match(/(\d+)\s*jours?/i);
   const totalHeures = heuresMatch ? parseInt(heuresMatch[1]) : 14;
   const nbJours = joursMatch ? parseInt(joursMatch[1]) : Math.ceil(totalHeures / 7);
   const heuresParJour = totalHeures / nbJours;
 
-  // ── Build day topics from programme + objectifs ──
   const programmeLines = f.programme ? f.programme.split("\n").map(l => l.trim()).filter(l => l.length > 3) : [];
   const objectifsItems = f.objectifs
     ? f.objectifs.split(/\n|\.(?=\s)/).map(l => l.trim().replace(/^[-•*]\s*/, "").replace(/^À l'issue.*capable de\s*:?\s*/i, "")).filter(l => l.length > 5)
     : [];
 
-  // Extract explicit "Jour X" lines
   const explicitDayLines = programmeLines.filter(l => /^(Jour|Module)\s+\d+/i.test(l));
-
-  // Extract module/content lines (not day headers)
   const contentLines = programmeLines
     .filter(l => !/^(Jour|Module)\s+\d+/i.test(l))
     .map(l => l.replace(/^[-•*]\s*/, "").trim())
     .filter(l => l.length > 3);
 
-  // Merge content + objectifs for topic pool
   const allTopics = [...contentLines];
   for (const obj of objectifsItems) {
     if (!allTopics.some(t => t.toLowerCase().includes(obj.toLowerCase().slice(0, 20)))) {
@@ -4729,7 +4732,6 @@ function genDeroulePedagogiqueDetaille(o: OrganismeInfo, f: FormationInfo) {
     }
   }
 
-  // Generate filler topics specific to the formation
   const fillers = [
     `Fondamentaux de ${formation}`,
     `Approfondissement : ${formation}`,
@@ -4743,16 +4745,13 @@ function genDeroulePedagogiqueDetaille(o: OrganismeInfo, f: FormationInfo) {
     `Atelier pratique guidé`,
   ];
 
-  // Build a topic label for each day
   const dayLabels: string[] = [];
   const topicsPerDay = Math.max(1, Math.ceil(allTopics.length / nbJours));
 
   for (let d = 0; d < nbJours; d++) {
     if (d < explicitDayLines.length) {
-      // Use explicit day line from programme
       dayLabels.push(explicitDayLines[d].replace(/^(Jour|Module)\s*\d+\s*[:\-–]\s*/i, '').trim());
     } else {
-      // Build from topics pool
       const dayTopicSlice = allTopics.slice(d * topicsPerDay, (d + 1) * topicsPerDay);
       if (dayTopicSlice.length > 0) {
         dayLabels.push(dayTopicSlice.slice(0, 2).join(" / "));
@@ -4762,7 +4761,6 @@ function genDeroulePedagogiqueDetaille(o: OrganismeInfo, f: FormationInfo) {
     }
   }
 
-  // ── Build HTML ──
   let extraHtml = `<p style="margin-bottom:15px"><strong>Formation :</strong> ${f.intitule}<br>
     <strong>Durée :</strong> ${totalHeures} heures — ${nbJours} jour${nbJours > 1 ? "s" : ""} (${heuresParJour}h/jour)<br>
     <strong>Formateur :</strong> ${f.formateur || o.dirigeant}</p>`;
@@ -4803,6 +4801,163 @@ function genDeroulePedagogiqueDetaille(o: OrganismeInfo, f: FormationInfo) {
 
     extraHtml += `</table>`;
   }
+
+  return buildDocument({ org: o, title: "Déroulé pédagogique détaillé de la formation", subtitle: f.intitule, extraHtml });
+}
+
+function genDeroulePedagogiqueParBlocs(o: OrganismeInfo, f: FormationInfo, rncp: ReturnType<typeof getRNCPByCode>) {
+  const blocs = rncp!.blocsCompetences;
+  const heuresMatch = f.duree.match(/(\d+)\s*h/i);
+  const totalHeures = heuresMatch ? parseInt(heuresMatch[1]) : 90;
+
+  let extraHtml = `<p style="margin-bottom:15px"><strong>Formation :</strong> ${f.intitule}<br>
+    <strong>Durée totale :</strong> ${totalHeures} heures<br>
+    <strong>Organisation :</strong> ${blocs.length} blocs de compétences<br>
+    <strong>Formateur :</strong> ${f.formateur || o.dirigeant}</p>`;
+
+  // Summary table
+  extraHtml += `<h3 style="color:#1e3a7b;font-size:13pt;margin-top:15px">Répartition par bloc de compétences</h3>`;
+  extraHtml += `<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%;font-size:10pt;margin-bottom:20px">`;
+  extraHtml += `<tr style="background:#1e3a7b;color:#fff;font-weight:bold"><td>Bloc</td><td>Intitulé</td><td>Volume horaire</td><td>Modalités d'évaluation</td></tr>`;
+
+  blocs.forEach((bloc, bi) => {
+    const totalBlocH = bloc.matieres.reduce((sum, m) => {
+      const h = parseInt(m.volume) || 0;
+      return sum + h;
+    }, 0);
+    const bgColor = bi % 2 === 0 ? '#ffffff' : '#f2f6fc';
+    extraHtml += `<tr style="background:${bgColor}">
+      <td style="font-weight:bold">${bloc.titre}</td>
+      <td>${bloc.competences.map(c => `• ${c}`).join('<br>')}</td>
+      <td style="text-align:center">${totalBlocH}h</td>
+      <td>${bloc.modalitesEval}</td>
+    </tr>`;
+  });
+  extraHtml += `</table>`;
+
+  // Detailed per-bloc breakdown
+  blocs.forEach((bloc, bi) => {
+    extraHtml += `<div style="page-break-before:${bi > 0 ? 'always' : 'auto'}">`;
+    extraHtml += `<h3 style="margin-top:25px;color:#1e3a7b;font-size:13pt">${bloc.titre}</h3>`;
+
+    extraHtml += `<table border="1" cellpadding="5" cellspacing="0" style="border-collapse:collapse;width:100%;font-size:9pt;margin-bottom:10px">`;
+    extraHtml += `<tr style="background:#1e3a7b;color:#fff;font-weight:bold">
+      <td style="width:15%">Séquence</td>
+      <td style="width:7%">Durée</td>
+      <td style="width:14%">Objectif pédagogique</td>
+      <td style="width:16%">Contenus abordés</td>
+      <td style="width:13%">Méthodes & activités</td>
+      <td style="width:12%">Outils / supports</td>
+      <td style="width:12%">Évaluation</td>
+      <td style="width:11%">Adaptations</td>
+    </tr>`;
+
+    const modalite = (f.modalites || "présentiel").toLowerCase();
+    const isDistanciel = modalite.includes("distanciel") || modalite.includes("distance");
+    const outilsBase = isDistanciel ? "PC, plateforme e-learning, visioconférence" : "PC, vidéoprojecteur";
+
+    const methodesPool = [
+      "Apports théoriques + exercices pratiques",
+      "Mises en situation professionnelle",
+      "Jeux de rôle et simulations",
+      "Exercices guidés",
+      "Travail autonome accompagné",
+      "Ateliers collaboratifs",
+    ];
+    const evalPool = [
+      "Exercice pratique",
+      "QCM intermédiaire",
+      "Observation en situation",
+      "Production écrite évaluée",
+      "Évaluation formative",
+      "Mise en situation évaluée",
+    ];
+    const adaptPool = [
+      "Temps supplémentaire",
+      "Soutien individualisé",
+      "Support complémentaire",
+      "Adaptation du rythme",
+      "Aide ciblée",
+      "Accompagnement renforcé",
+    ];
+
+    // First bloc: add accueil
+    if (bi === 0) {
+      extraHtml += `<tr style="background:#ffffff">
+        <td>Accueil & présentation</td>
+        <td>0h30</td>
+        <td>Comprendre les objectifs et le cadre de la formation</td>
+        <td>Présentation du programme, des objectifs, des modalités d'évaluation, des blocs de compétences</td>
+        <td>Échanges oraux, présentation du formateur</td>
+        <td>Support de présentation</td>
+        <td>Questions-réponses</td>
+        <td>Adaptation du rythme</td>
+      </tr>`;
+      extraHtml += `<tr style="background:#f2f6fc">
+        <td>Test de positionnement</td>
+        <td>1h00</td>
+        <td>Évaluer le niveau initial</td>
+        <td>Test de positionnement sur les 4 compétences (C1 à C4)</td>
+        <td>QCM + production écrite + exercice oral</td>
+        <td>${outilsBase}</td>
+        <td>Test de positionnement initial</td>
+        <td>Aide individualisée</td>
+      </tr>`;
+    }
+
+    // Each matière as a sequence
+    bloc.matieres.forEach((mat, mi) => {
+      const bgColor = mi % 2 === 0 ? '#ffffff' : '#f2f6fc';
+      extraHtml += `<tr style="background:${bgColor}">
+        <td>${mat.competence}</td>
+        <td>${mat.volume}</td>
+        <td>Maîtriser : ${mat.competence.toLowerCase()}</td>
+        <td>${mat.contenu}</td>
+        <td>${methodesPool[(bi * 3 + mi) % methodesPool.length]}</td>
+        <td>${outilsBase}, supports spécialisés</td>
+        <td>${evalPool[(bi * 3 + mi) % evalPool.length]}</td>
+        <td>${adaptPool[(bi * 3 + mi) % adaptPool.length]}</td>
+      </tr>`;
+    });
+
+    // Exercices pratiques du bloc
+    extraHtml += `<tr style="background:#fff8e1">
+      <td>Exercices pratiques – ${bloc.titre}</td>
+      <td>2h00</td>
+      <td>Mobiliser les acquis du bloc</td>
+      <td>Exercices de synthèse et mises en situation du bloc ${bloc.titre}</td>
+      <td>Travail autonome accompagné</td>
+      <td>${outilsBase}, grille d'évaluation</td>
+      <td>Évaluation formative</td>
+      <td>Accompagnement renforcé</td>
+    </tr>`;
+
+    // Last bloc: add évaluation finale + bilan
+    if (bi === blocs.length - 1) {
+      extraHtml += `<tr style="background:#e8f5e9">
+        <td>Évaluation finale</td>
+        <td>2h00</td>
+        <td>Vérifier l'acquisition de toutes les compétences</td>
+        <td>Épreuve couvrant les ${blocs.length} blocs de compétences</td>
+        <td>Travail autonome</td>
+        <td>${outilsBase}, grille d'évaluation</td>
+        <td>Évaluation sommative</td>
+        <td>Aménagements spécifiques</td>
+      </tr>`;
+      extraHtml += `<tr style="background:#e3f2fd">
+        <td>Bilan & grille d'acquisition</td>
+        <td>0h30</td>
+        <td>Valider les acquis et clôturer la formation</td>
+        <td>Restitution, bilan individuel, remise des attestations</td>
+        <td>Échange formateur/stagiaire</td>
+        <td>Grille d'acquisition, questionnaire de satisfaction</td>
+        <td>Validation des compétences</td>
+        <td>Adaptation pédagogique</td>
+      </tr>`;
+    }
+
+    extraHtml += `</table></div>`;
+  });
 
   return buildDocument({ org: o, title: "Déroulé pédagogique détaillé de la formation", subtitle: f.intitule, extraHtml });
 }
