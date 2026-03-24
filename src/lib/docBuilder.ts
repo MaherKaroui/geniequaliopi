@@ -152,12 +152,12 @@ export function orgHeader(org: OrganismeInfo, subtitle?: string): string {
 
 /** Get the formation start date for a specific stagiaire (uses stagiaire-specific date if available, otherwise formation-level) */
 export function getStagiaireDateDebut(s: StagiaireInfo, f: FormationInfo): string {
-  return s.dateDebutFormation || f.dateDebut || "";
+  return normalizeDate(s.dateDebutFormation || f.dateDebut || "");
 }
 
 /** Get the formation end date for a specific stagiaire */
 export function getStagiaireDateFin(s: StagiaireInfo, f: FormationInfo): string {
-  return s.dateFinFormation || f.dateFin || "";
+  return normalizeDate(s.dateFinFormation || f.dateFin || "");
 }
 
 /** Get per-stagiaire tarif (falls back to formation tarif) */
