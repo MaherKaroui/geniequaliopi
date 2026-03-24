@@ -5794,8 +5794,13 @@ function genExercicesCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires
     periodeStr = `du ${thisWeek.weekStart.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })} au ${thisWeek.weekEnd.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })}`;
   }
 
+  // Find which module/matière this week falls into
   let moduleTitle = '';
+  let matiereTitle = '';
+  let matiereContenu = '';
   let modalitesEval = 'Mise en situation professionnelle';
+  let blocCompetences: string[] = [];
+
   if (rncp && rncp.blocsCompetences.length > 0) {
     const accompHours = Math.round(effectiveTotal * 0.15);
     const blocHoursTotal = effectiveTotal - accompHours;
@@ -5805,74 +5810,190 @@ function genExercicesCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires
 
     let cumulWeeks = 0;
     for (const bloc of rncp.blocsCompetences) {
-      const volume = Math.round(bloc.matieres.reduce((s2, m) => s2 + (parseInt(m.volume) || 0), 0) * scale);
-      const blocWeeks = Math.max(1, Math.ceil(volume / 35));
-      cumulWeeks += blocWeeks;
-      if (weekNum <= cumulWeeks) {
+      const blocMatiereWeeks: { matiere: typeof bloc.matieres[0]; startWeek: number; endWeek: number }[] = [];
+      for (const mat of bloc.matieres) {
+        const volume = Math.round((parseInt(mat.volume) || 0) * scale);
+        const matWeeks = Math.max(1, Math.ceil(volume / 35));
+        blocMatiereWeeks.push({ matiere: mat, startWeek: cumulWeeks + 1, endWeek: cumulWeeks + matWeeks });
+        cumulWeeks += matWeeks;
+      }
+      const found = blocMatiereWeeks.find(bm => weekNum >= bm.startWeek && weekNum <= bm.endWeek);
+      if (found) {
         moduleTitle = bloc.titre;
+        matiereTitle = found.matiere.competence;
+        matiereContenu = found.matiere.contenu;
         modalitesEval = bloc.modalitesEval || modalitesEval;
+        blocCompetences = bloc.competences;
         break;
       }
     }
-    if (!moduleTitle) moduleTitle = rncp.blocsCompetences[rncp.blocsCompetences.length - 1]?.titre || '';
+    if (!moduleTitle && rncp.blocsCompetences.length > 0) {
+      const lastBloc = rncp.blocsCompetences[rncp.blocsCompetences.length - 1];
+      moduleTitle = lastBloc.titre;
+      const lastMat = lastBloc.matieres[lastBloc.matieres.length - 1];
+      if (lastMat) { matiereTitle = lastMat.competence; matiereContenu = lastMat.contenu; }
+      modalitesEval = lastBloc.modalitesEval || modalitesEval;
+      blocCompetences = lastBloc.competences;
+    }
   }
 
-  const evalData = getEvalContent(f.intitule);
-  const allExercices = [...evalData.exercices];
-  for (let i = allExercices.length; i <= exerciceIdx; i++) {
-    allExercices.push({
-      titre: `Exercice ${i + 1} : Cas pratique`,
-      consigne: `À partir de la situation professionnelle présentée, appliquez les compétences acquises en lien avec le module en cours.`,
-      reponseAttendue: `Application structurée des acquis de formation.`,
-    });
-  }
-  const exercice = allExercices[exerciceIdx] || allExercices[allExercices.length - 1];
+  // Generate module-specific exercise consigne
+  const consigneTemplates = [
+    `À partir du cas pratique ci-dessous, mettez en œuvre les compétences liées à « ${matiereTitle} ». Vous devez analyser la situation proposée, identifier les actions à mener et produire un livrable structuré en vous appuyant sur les notions vues en formation (${matiereContenu}).`,
+    `En vous basant sur la mise en situation professionnelle suivante, appliquez les méthodes et outils étudiés dans le cadre de « ${matiereTitle} ». Votre travail doit démontrer votre capacité à mobiliser les savoirs suivants : ${matiereContenu}. Justifiez chacune de vos réponses.`,
+    `Vous êtes en situation professionnelle. On vous demande de réaliser une mission en lien avec « ${matiereTitle} ». À l'aide des connaissances acquises (${matiereContenu}), produisez un travail complet, argumenté et structuré. Vous pouvez vous appuyer sur des exemples concrets.`,
+    `Dans le cadre de votre apprentissage, réalisez l'exercice suivant portant sur « ${matiereTitle} ». Mobilisez les compétences et outils vus en cours (${matiereContenu}) pour traiter la problématique posée. Présentez votre démarche de manière claire et professionnelle.`,
+  ];
+  const consigne = consigneTemplates[(si + exerciceIdx) % consigneTemplates.length];
 
-  const studentResponse = exercice.reponseAttendue
-    .replace(/Le stagiaire doit /gi, "J'ai ")
-    .replace(/Le stagiaire /gi, "J'ai ")
-    .replace(/L['’]apprenant doit /gi, "J'ai ")
-    .replace(/Il faut que le stagiaire /gi, "J'ai ")
-    .replace(/doit créer/gi, 'ai créé')
-    .replace(/doit utiliser/gi, 'ai utilisé')
-    .replace(/doit rédiger/gi, 'ai rédigé')
-    .replace(/doit appliquer/gi, 'ai appliqué')
-    .replace(/doit identifier/gi, 'ai identifié')
-    .replace(/doit mettre en place/gi, 'ai mis en place')
-    .replace(/doit réaliser/gi, 'ai réalisé')
-    .replace(/doit présenter/gi, 'ai présenté')
-    .replace(/doit analyser/gi, 'ai analysé')
-    .replace(/doit proposer/gi, 'ai proposé')
-    .replace(/\[Name\]/gi, `${s.prenom} ${s.nom}`)
-    .replace(/\[company\]/gi, s.entreprise || 'mon entreprise')
-    .replace(/\[position\]/gi, s.poste || 'mon poste')
-    .replace(/\[.*?\]/g, '');
+  const exerciceTitre = matiereTitle
+    ? `Exercice ${exerciceIdx + 1} : ${matiereTitle}`
+    : `Exercice ${exerciceIdx + 1} : Cas pratique`;
 
-  const noteOptions = [3, 3.5, 4, 4.5, 5];
-  const note = noteOptions[(si + exerciceIdx) % noteOptions.length];
-  const appreciation = evalData.appreciations[(si + exerciceIdx) % evalData.appreciations.length]
-    || 'Exercice réalisé avec sérieux et implication.';
+  // Generate long realistic student response with intentional spelling mistakes
+  const hash = (s.nom + s.prenom + String(exerciceIdx)).split("").reduce((a: number, c: string) => a + c.charCodeAt(0), 0);
+
+  const studentProfiles = [
+    { level: 'excellent', baseNote: 4.5, style: 'structuré et détaillé' },
+    { level: 'bon', baseNote: 4, style: 'correct avec quelques approximations' },
+    { level: 'moyen', baseNote: 3, style: 'basique mais pertinent' },
+    { level: 'tres_bon', baseNote: 5, style: 'brillant et autonome' },
+    { level: 'passable', baseNote: 2.5, style: 'en cours d\'acquisition' },
+  ];
+  const profile = studentProfiles[si % studentProfiles.length];
+
+  // Spelling errors pool (realistic French apprentice mistakes)
+  const addTypos = (text: string, errorRate: number): string => {
+    const typos: [RegExp, string][] = [
+      [/développer/g, 'developper'], [/professionnelle/g, 'professionelle'],
+      [/acquisition/g, 'aquisition'], [/nécessaire/g, 'nécéssaire'],
+      [/apparaître/g, 'apparaitre'], [/stratégie/g, 'strategie'],
+      [/différent/g, 'différant'], [/connaissance/g, 'conaissance'],
+      [/compétence/g, 'compétance'], [/apprentissage/g, 'apprentisage'],
+      [/environnement/g, 'environement'], [/communication/g, 'comunication'],
+      [/recommandation/g, 'recomandation'], [/management/g, 'managment'],
+      [/concurrent/g, 'concurent'], [/efficacement/g, 'éfficacement'],
+      [/éventuellement/g, 'éventuelement'], [/fondamental/g, 'fondamentale'],
+      [/systématiquement/g, 'systématiquemant'], [/objectif/g, 'objetif'],
+      [/j'ai/g, 'jai'], [/aujourd'hui/g, "aujourd'ui"],
+      [/c'est/g, 'ses'], [/s'est/g, 'c\'est'],
+    ];
+    let result = text;
+    const seed = hash + errorRate;
+    const nbErrors = Math.max(1, Math.floor(typos.length * errorRate));
+    for (let i = 0; i < nbErrors; i++) {
+      const idx = (seed + i * 7) % typos.length;
+      result = result.replace(typos[idx][0], typos[idx][1]);
+    }
+    return result;
+  };
+
+  // Build long response based on module content and profile
+  const buildStudentResponse = (): string => {
+    const entreprise = s.entreprise || 'mon entreprise';
+    const poste = s.poste || 'mon poste actuel';
+    const prenom = s.prenom || 'L\'apprenti(e)';
+
+    const intros = [
+      `Pour cet exercice, je vais présenter mon travail sur ${matiereTitle || 'le sujet demandé'}. En formation, nous avons étudié ${matiereContenu || 'plusieurs notions importantes'} et je vais essayer de les appliquer à une situation concrète.`,
+      `Dans le cadre de cet exercice pratique sur ${matiereTitle || 'le module en cours'}, je vais mobiliser les connaissances acquises en formation. Nous avons travaillé sur ${matiereContenu || 'différents aspects du métier'} et je vais montrer comment je les applique.`,
+      `Je vais répondre à cette consigne en m'appuyant sur ce que nous avons vu en cours concernant ${matiereTitle || 'les compétences visées'}. Les notions abordées (${matiereContenu || 'outils et méthodes'}) me permettent de traiter cette situation.`,
+    ];
+
+    const developmentParagraphs = [
+      `Tout d'abord, dans mon entreprise ${entreprise}, en tant que ${poste}, je suis régulièrement confronté à ce type de situation. Par exemple, la semaine dernière, j'ai du gérer une problématique similaire et j'ai pu mettre en pratique les outils que nous avons vu en formation. J'ai commencé par analyser la situation en identifiant les points clés et les enjeux principaux. Ensuite, j'ai élaboré un plan d'action structuré avec des objectifs précis et mesurables.`,
+
+      `Concernant la méthodologie, j'ai procédé de la manière suivante : premièrement, j'ai réalisé un diagnostic de la situation en m'appuyant sur les grilles d'analyse vues en cours. Deuxièmement, j'ai identifié les parties prenantes et leurs attentes respectives. Troisièmement, j'ai proposé des solutions adaptées en tenant compte des contraintes de temps et de budget. Cette approche m'a permis d'être plus efficace et plus structuré dans ma démarche.`,
+
+      `En ce qui concerne les outils utilisés, j'ai fait appel à plusieurs techniques apprises en formation. J'ai utilisé un tableau de bord pour suivre les indicateurs de performance, un CRM pour gérer les contacts et les relances, et des tableaux de synthèse pour présenter les résultats à ma hiérarchie. Ces outils sont essentiels pour assurer un suivi rigoureux et professionel de l'activité.`,
+
+      `Un point important à souligner est la dimension relationnelle de cette compétence. Dans mon travail quotidien chez ${entreprise}, je dois communiquer avec différents interlocuteurs : clients, fournisseurs, collègues, direction. J'ai appris en formation qu'il faut adapter son discours en fonction de l'interlocuteur et de la situation. Par exemple, lors d'une négociation commerciale, il est nécéssaire de bien préparer ses arguments et de savoir écouter les besoins du client avant de proposer une solution.`,
+
+      `Pour la mise en pratique concrète, j'ai réalisé l'exercice en suivant les étapes suivantes : analyse du contexte, identification des problèmes, recherche de solutions, mise en oeuvre et suivi des résultats. Chaque étape a été documentée et argumentée. J'ai essayé d'être le plus précis possible dans mes réponses en m'appuyant sur des exemples concrets tirés de mon expérience en entreprise.`,
+
+      `Il me semble aussi important de mentionner que cette compétance s'inscrit dans une démarche globale d'amélioration continue. En effet, les méthodes et outils que nous avons étudié en formation ne sont pas figés : ils doivent être adaptés et améliorés en fonction des retours d'expérience et de l'évolution du marché. C'est pour cette raison que je m'efforce de prendre du recul sur mes pratiques et de me remettre en question régulièrement.`,
+
+      `En conclusion de cet exercice, je pense avoir démontré ma capacité à mobiliser les connaissances acquises en formation dans le cadre de ${matiereTitle || 'cette compétence'}. J'ai essayé de structurer ma réponse de manière claire et argumentée, en m'appuyant sur des exemples concrets de mon expérience chez ${entreprise}. Il reste encore des points à approfondir, mais je me sens de plus en plus à l'aise avec ces méthodes.`,
+
+      `Pour aller plus loin, je souhaiterais approfondir certains aspects comme la gestion des objections dans le cadre de la négociation, ou encore l'utilisation avancée des outils numériques pour le suivi d'activité. Je pense que ces compétences complémentaires me permettront d'être plus performant dans mon poste de ${poste}.`,
+    ];
+
+    const conclusions = [
+      `En résumé, cet exercice m'a permis de consolider mes acquis et de faire le lien entre la théorie vue en CFA et la pratique en entreprise. Je suis satisfait du travail réalisé même si je sais qu'il y a encore des axes d'amélioration.`,
+      `Pour conclure, je retiens de cet exercice l'importance d'une approche méthodique et structurée. Les compétences acquises lors de cette formation sont directement applicable dans mon travail quotidien et je compte bien continuer à les developper.`,
+      `Au final, je considère que cet exercice était très enrichissant. Il m'a permis de prendre conscience de mes points forts et de mes axes de progression. Je vais continuer à travailler sur ces compétences pour atteindre les objectifs fixés.`,
+    ];
+
+    const introIdx = (hash + si) % intros.length;
+    const concIdx = (hash + si + exerciceIdx) % conclusions.length;
+
+    let response = intros[introIdx] + '\n\n';
+
+    // Number of paragraphs based on profile level
+    let nbParagraphs: number;
+    if (profile.level === 'excellent' || profile.level === 'tres_bon') nbParagraphs = 5;
+    else if (profile.level === 'bon') nbParagraphs = 4;
+    else if (profile.level === 'moyen') nbParagraphs = 3;
+    else nbParagraphs = 2;
+
+    for (let p = 0; p < nbParagraphs; p++) {
+      const pIdx = (hash + si * 3 + exerciceIdx * 5 + p * 7) % developmentParagraphs.length;
+      response += developmentParagraphs[pIdx] + '\n\n';
+    }
+
+    response += conclusions[concIdx];
+
+    // Add spelling errors based on profile
+    let errorRate: number;
+    if (profile.level === 'tres_bon') errorRate = 0.05;
+    else if (profile.level === 'excellent') errorRate = 0.1;
+    else if (profile.level === 'bon') errorRate = 0.15;
+    else if (profile.level === 'moyen') errorRate = 0.25;
+    else errorRate = 0.35;
+
+    return addTypos(response, errorRate);
+  };
+
+  // Generate note
+  const noteVariation = ((hash + exerciceIdx * 13) % 5 - 2) * 0.5;
+  const rawNote = Math.max(1, Math.min(5, profile.baseNote + noteVariation));
+  const note = Math.round(rawNote * 2) / 2;
+
+  // Generate formateur observation
+  const observations = [
+    `Travail ${profile.style}. ${s.prenom} a su mobiliser les compétences liées à « ${matiereTitle} » de manière ${note >= 4 ? 'très satisfaisante' : note >= 3 ? 'satisfaisante' : 'partielle'}. ${note >= 4 ? 'Les exemples concrets issus de l\'expérience en entreprise enrichissent la réponse.' : 'Des efforts sont à poursuivre pour mieux structurer l\'argumentation.'}`,
+    `${s.prenom} démontre une ${note >= 4 ? 'bonne' : note >= 3 ? 'compréhension correcte' : 'compréhension partielle'} des enjeux liés à « ${matiereTitle} ». ${note >= 4 ? 'L\'analyse est pertinente et bien argumentée. Les liens avec l\'expérience professionnelle sont cohérents.' : 'Il faut approfondir certains aspects théoriques et mieux organiser les idées.'} ${note < 3 ? 'Accompagnement individuel recommandé.' : ''}`,
+    `Exercice ${note >= 4 ? 'bien réalisé' : note >= 3 ? 'réalisé correctement' : 'à reprendre en partie'}. ${s.prenom} a ${note >= 4 ? 'fait preuve d\'autonomie et de rigueur' : note >= 3 ? 'suivi la méthodologie avec quelques hésitations' : 'besoin d\'un accompagnement plus soutenu'} sur le module « ${matiereTitle} ». ${note >= 4.5 ? 'Excellente mise en application des acquis.' : ''}`,
+  ];
+  const obsIdx = (hash + si + exerciceIdx) % observations.length;
+  const observation = observations[obsIdx];
+
+  const studentText = termine ? buildStudentResponse() : '';
 
   const responseBlock = termine
-    ? `<div style="border:1px solid #ccc;min-height:120px;padding:12px;background:#f9f9f9"><p>${studentResponse}</p></div>`
+    ? `<div style="border:1px solid #ccc;padding:12px;background:#f9f9f9;line-height:1.6"><p>${studentText.replace(/\n\n/g, '</p><p>')}</p></div>`
     : `<div style="border:1px solid #ccc;min-height:120px;padding:12px">&#160;</div>`;
 
   const observationBlock = termine
-    ? `<div style="border:1px solid #ccc;min-height:60px;padding:8px;background:#f9f9f9"><p>${appreciation}</p></div>`
+    ? `<div style="border:1px solid #ccc;padding:8px;background:#f9f9f9"><p>${observation}</p></div>`
     : `<div style="border:1px solid #ccc;min-height:60px;padding:8px">&#160;</div>`;
 
   let extra = `<h2>EXERCICE PRATIQUE – Semaine CFA ${weekNum} / Exercice ${exInWeek}</h2>
     <p><strong>Formation :</strong> ${f.intitule}</p>
-    ${moduleTitle ? `<p><strong>Module :</strong> ${moduleTitle}</p>` : ''}
+    ${moduleTitle ? `<p><strong>Bloc de compétences :</strong> ${moduleTitle}</p>` : ''}
+    ${matiereTitle ? `<p><strong>Module / Compétence :</strong> ${matiereTitle}</p>` : ''}
+    ${matiereContenu ? `<p><strong>Contenu abordé :</strong> ${matiereContenu}</p>` : ''}
     <p><strong>Modalité d'évaluation :</strong> ${modalitesEval}</p>
     <p><strong>Nom et prénom :</strong> ${s.prenom} ${s.nom}</p>
     <p><strong>Semaine CFA :</strong> ${periodeStr || `Semaine ${weekNum}`}</p>
     <p><strong>Date de l'exercice :</strong> ${dateStr}</p>`;
 
-  extra += `<h3>${exercice.titre}</h3>
-    <p><strong>Consigne :</strong> ${exercice.consigne}</p>
+  extra += `<h3>${exerciceTitre}</h3>
+    <p><strong>Consigne :</strong></p><p>${consigne}</p>
+    <hr/>
     <p><strong>Réponse de l'apprenti(e) :</strong></p>
     ${responseBlock}
+    <br/>
     <p><strong>Note :</strong> ${termine ? String(note).replace('.', ',') : '_____'} / 5</p>
     <p><strong>Observations du formateur :</strong></p>
     ${observationBlock}`;
