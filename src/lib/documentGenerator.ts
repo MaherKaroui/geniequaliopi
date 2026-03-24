@@ -367,6 +367,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "procedure_presentation_certification": return genProcedurePresentationCertification(o, f);
     case "convocation_certification": return genConvocationCertification(o, f, stagiaires);
     case "attestation_presentation_certification": return genAttestationPresentationCertification(o, f, stagiaires, params?.stagiaireIdx ?? 0);
+    case "pv_examen_certification": return genPVExamenCertification(o, f, stagiaires);
     case "fiche_autoevaluation_apprenti": return genFicheAutoevaluation(o, f, stagiaires);
     case "test_cfa_stagiaire": {
       const si = params?.stagiaireIdx ?? 0;
