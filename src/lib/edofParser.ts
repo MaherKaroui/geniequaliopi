@@ -28,13 +28,50 @@ interface EdofRow {
 
 function parseEdofDate(raw: string | number | undefined): string {
   if (!raw) return "";
-  const str = String(raw);
-  // Handle M/D/YY or M/D/YYYY format
+
+  // Handle Excel serial date numbers (e.g. 45791 = days since 1899-12-30)
+  if (typeof raw === 'number' || /^\d{4,5}$/.test(String(raw).trim())) {
+    const serial = typeof raw === 'number' ? raw : parseInt(String(raw).trim(), 10);
+    if (serial > 1000 && serial < 100000) {
+      // Excel epoch: 1899-12-30
+      const excelEpoch = new Date(1899, 11, 30);
+      const d = new Date(excelEpoch.getTime() + serial * 86400000);
+      if (!isNaN(d.getTime())) {
+        return d.toISOString().slice(0, 10);
+      }
+    }
+  }
+
+  const str = String(raw).trim();
+
+  // Handle ISO format (YYYY-MM-DD)
+  if (/^\d{4}-\d{2}-\d{2}/.test(str)) {
+    return str.slice(0, 10);
+  }
+
+  // Handle DD/MM/YYYY or D/M/YYYY (French format, most common in EDOF)
   const parts = str.split("/");
   if (parts.length === 3) {
-    const month = parts[0].padStart(2, "0");
-    const day = parts[1].padStart(2, "0");
-    let year = parts[2];
+    let day: string, month: string, year: string;
+    // Detect format: if first part > 12, it's DD/MM/YYYY (French)
+    const firstNum = parseInt(parts[0], 10);
+    const secondNum = parseInt(parts[1], 10);
+    if (firstNum > 12) {
+      // DD/MM/YYYY (French)
+      day = parts[0].padStart(2, "0");
+      month = parts[1].padStart(2, "0");
+      year = parts[2];
+    } else if (secondNum > 12) {
+      // M/D/YYYY (American)
+      month = parts[0].padStart(2, "0");
+      day = parts[1].padStart(2, "0");
+      year = parts[2];
+    } else {
+      // Ambiguous — assume French DD/MM/YYYY
+      day = parts[0].padStart(2, "0");
+      month = parts[1].padStart(2, "0");
+      year = parts[2];
+    }
     if (year.length === 2) {
       year = parseInt(year) > 50 ? `19${year}` : `20${year}`;
     }
