@@ -2691,7 +2691,7 @@ function genConvocationCertification(o: OrganismeInfo, f: FormationInfo, stagiai
   dateEpreuves.setDate(dateEpreuves.getDate() + 7);
   const dateEpreuvesStr = dateEpreuves.toLocaleDateString("fr-FR");
 
-  const stagList = stagiaires.map(s => `<tr><td>${s.civilite || "M."} ${s.prenom} ${s.nom}</td><td>${s.email || "___"}</td><td>Convoqué(e)</td></tr>`).join("");
+  const stagList = stagiaires.map(s => `<tr><td>${s.civilite || "M."} ${s.prenom} ${s.nom}</td><td>${s.email || "___"}</td><td>${g(s, "Convoqué", "Convoquée")}</td></tr>`).join("");
 
   return buildDocument({ org: o, title: "CONVOCATION AUX ÉPREUVES DE CERTIFICATION", subtitle: `${certifIntitule} (${certifCode})`, sections: [
     { heading: "Objet", content: `
