@@ -100,10 +100,24 @@ function getFrenchHolidays(year: number): Set<string> {
   return holidays;
 }
 
+/** Convert possible Excel serial date to ISO string */
+function normalizeDate(dateStr: string): string {
+  if (/^\d{4,5}$/.test(dateStr.trim())) {
+    const serial = parseInt(dateStr.trim(), 10);
+    if (serial > 1000 && serial < 100000) {
+      const excelEpoch = new Date(1899, 11, 30);
+      const d = new Date(excelEpoch.getTime() + serial * 86400000);
+      if (!isNaN(d.getTime())) return d.toISOString().slice(0, 10);
+    }
+  }
+  return dateStr;
+}
+
 /** Subtract N business days from a date (skips weekends + French holidays) */
 export function subtractBusinessDays(dateStr: string, businessDays: number): string {
   if (!dateStr) return dateStr;
-  const d = new Date(dateStr);
+  const normalized = normalizeDate(dateStr);
+  const d = new Date(normalized);
   const holidays = getFrenchHolidays(d.getFullYear());
   // Also get previous year holidays in case we cross a year boundary
   const holidaysPrev = getFrenchHolidays(d.getFullYear() - 1);
@@ -138,12 +152,12 @@ export function orgHeader(org: OrganismeInfo, subtitle?: string): string {
 
 /** Get the formation start date for a specific stagiaire (uses stagiaire-specific date if available, otherwise formation-level) */
 export function getStagiaireDateDebut(s: StagiaireInfo, f: FormationInfo): string {
-  return s.dateDebutFormation || f.dateDebut || "";
+  return normalizeDate(s.dateDebutFormation || f.dateDebut || "");
 }
 
 /** Get the formation end date for a specific stagiaire */
 export function getStagiaireDateFin(s: StagiaireInfo, f: FormationInfo): string {
-  return s.dateFinFormation || f.dateFin || "";
+  return normalizeDate(s.dateFinFormation || f.dateFin || "");
 }
 
 /** Get per-stagiaire tarif (falls back to formation tarif) */
