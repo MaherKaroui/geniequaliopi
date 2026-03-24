@@ -607,8 +607,6 @@ export function genContratSousTraitanceV2(o: OrganismeInfo, f: FormationInfo, st
         <tr><td><strong>Modalités</strong></td><td>${f.modalites || "Présentiel et/ou distanciel (à adapter selon les besoins)"}</td></tr>
         <tr><td><strong>Lieu de formation</strong></td><td>${f.lieu || `${o.adresse}, ${o.codePostal} ${o.ville}`}</td></tr>
         <tr><td><strong>Horaires</strong></td><td>De 9h00 à 12h30 et de 13h30 à 17h00</td></tr>
-        <tr><td><strong>Stagiaire(s) concerné(s)</strong></td><td>${stagList}</td></tr>
-        <tr><td><strong>Tarif</strong></td><td>${f.tarif || "À compléter"}</td></tr>
       </table>
       <p style="margin-top:10px"><strong>Modules de formation :</strong></p>
       <ul>
