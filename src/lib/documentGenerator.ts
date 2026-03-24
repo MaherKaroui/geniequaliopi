@@ -5714,40 +5714,67 @@ function genExercicesCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires
     return genExercicesStagiaire(o, f, stagiaires, si, exerciceIdx);
   }
   const s = stagiaires[si] || stagiaires[0];
-  const days = getFormationDays(f);
-  const nbJours = days.length;
-  const nbBlocks = Math.max(1, Math.ceil(nbJours / 2));
-  const jourDebut = exerciceIdx * 2 + 1;
-  const jourFin = Math.min(exerciceIdx * 2 + 2, nbJours);
-  const jourLabel = nbBlocks > 1 ? ` – Jour ${jourDebut}-${jourFin}` : '';
+  const rncp = getRNCPByCode(f.codeRNCP || '');
+  const { totalHours } = parseDuree(f.duree);
+  const effectiveTotal = totalHours > 0 ? totalHours : 420;
+  const totalCFAWeeks = Math.max(1, Math.ceil(effectiveTotal / 35));
+
+  // 2 exercises per CFA week → exerciceIdx maps to week + position
+  const weekNum = Math.floor(exerciceIdx / 2) + 1;
+  const exInWeek = (exerciceIdx % 2) + 1;
+
+  // Determine which module/bloc this week falls into
+  let moduleTitle = '';
+  let modalitesEval = 'Mise en situation professionnelle';
+  if (rncp && rncp.blocsCompetences.length > 0) {
+    const accompHours = Math.round(effectiveTotal * 0.15);
+    const blocHoursTotal = effectiveTotal - accompHours;
+    const rncpTotalVolume = rncp.blocsCompetences.reduce((sum, bloc) =>
+      sum + bloc.matieres.reduce((s2, m) => s2 + (parseInt(m.volume) || 0), 0), 0);
+    const scale = rncpTotalVolume > 0 ? blocHoursTotal / rncpTotalVolume : 1;
+
+    let cumulWeeks = 0;
+    for (const bloc of rncp.blocsCompetences) {
+      const volume = Math.round(bloc.matieres.reduce((s2, m) => s2 + (parseInt(m.volume) || 0), 0) * scale);
+      const blocWeeks = Math.max(1, Math.ceil(volume / 35));
+      cumulWeeks += blocWeeks;
+      if (weekNum <= cumulWeeks) {
+        moduleTitle = bloc.titre;
+        modalitesEval = bloc.modalitesEval || modalitesEval;
+        break;
+      }
+    }
+    if (!moduleTitle) moduleTitle = rncp.blocsCompetences[rncp.blocsCompetences.length - 1]?.titre || '';
+  }
 
   const evalData = getEvalContent(f.intitule);
   const allExercices = [...evalData.exercices];
-  for (let i = allExercices.length; i < (exerciceIdx + 1) * 2; i++) {
+  // Pad with generated exercises if needed
+  for (let i = allExercices.length; i <= exerciceIdx; i++) {
     allExercices.push({
-      titre: `Exercice ${i + 1} : Cas pratique – Jour ${Math.floor(i / 2) * 2 + 1}-${Math.min(Math.floor(i / 2) * 2 + 2, nbJours)}`,
-      consigne: `À partir de la situation professionnelle présentée, appliquez les compétences acquises.`,
+      titre: `Exercice ${i + 1} : Cas pratique`,
+      consigne: `À partir de la situation professionnelle présentée, appliquez les compétences acquises en lien avec le module en cours.`,
       reponseAttendue: `Application structurée des acquis de formation.`,
     });
   }
-  const blockStart = exerciceIdx * 2;
-  const selectedExercices = allExercices.slice(blockStart, blockStart + 2);
+  const exercice = allExercices[exerciceIdx] || allExercices[allExercices.length - 1];
 
-  let extra = `<h2>EXERCICE PRATIQUE${jourLabel} – FORMATION ${f.intitule.toUpperCase()}</h2>
+  let extra = `<h2>EXERCICE PRATIQUE – Semaine CFA ${weekNum} / Exercice ${exInWeek}</h2>
+    <p><strong>Formation :</strong> ${f.intitule}</p>
+    ${moduleTitle ? `<p><strong>Module :</strong> ${moduleTitle}</p>` : ''}
+    <p><strong>Modalité d'évaluation :</strong> ${modalitesEval}</p>
     <p><strong>Nom et prénom :</strong> ${s.prenom} ${s.nom}</p>
     <p><strong>Date :</strong> ___/___/______</p>`;
 
-  selectedExercices.forEach((ex) => {
-    extra += `<h3>${ex.titre}</h3>
-      <p><strong>Consigne :</strong> ${ex.consigne}</p>
-      <p><strong>Réponse de l'apprenti(e) :</strong></p>
-      <div style="border:1px solid #ccc;min-height:120px;padding:12px">&#160;</div>
-      <p><strong>Note :</strong> _____ / 5</p>
-      <p><strong>Observations du formateur :</strong></p>
-      <div style="border:1px solid #ccc;min-height:60px;padding:8px">&#160;</div>`;
-  });
+  extra += `<h3>${exercice.titre}</h3>
+    <p><strong>Consigne :</strong> ${exercice.consigne}</p>
+    <p><strong>Réponse de l'apprenti(e) :</strong></p>
+    <div style="border:1px solid #ccc;min-height:120px;padding:12px">&#160;</div>
+    <p><strong>Note :</strong> _____ / 5</p>
+    <p><strong>Observations du formateur :</strong></p>
+    <div style="border:1px solid #ccc;min-height:60px;padding:8px">&#160;</div>`;
 
-  return buildDocument({ org: o, title: `EXERCICE PRATIQUE${jourLabel}`, subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, formation: f, showFormationInfo: true, extraHtml: extra });
+  return buildDocument({ org: o, title: `EXERCICE PRATIQUE – Sem. ${weekNum} Ex. ${exInWeek}`, subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, formation: f, showFormationInfo: true, extraHtml: extra });
 }
 
 function genExamenBlancCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
