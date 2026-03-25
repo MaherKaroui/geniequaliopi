@@ -11,7 +11,7 @@ export function genDevis(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiai
   const tarifUnit = f.tarif || "1 500 € HT";
   return buildDocument({ org: o, title: "DEVIS DE FORMATION", subtitle: `N° DEV-${new Date().getFullYear()}-${String(Math.floor(Math.random()*999)+1).padStart(3,'0')}`, formation: f, showFormationInfo: true, sections: [
     { heading: "Client", content: `<p><strong>Entreprise :</strong> ${stagiaires[0]?.entreprise || "_______________"}<br><strong>Contact :</strong> ${stagiaires[0]?.prenom || ""} ${stagiaires[0]?.nom || ""}<br><strong>Email :</strong> ${stagiaires[0]?.email || ""}</p>` },
-    { heading: "Prestation", content: `<p><strong>Formation :</strong> ${f.intitule}<br><strong>Durée :</strong> ${f.duree}<br><strong>Modalité :</strong> ${f.modalites}<br><strong>Lieu :</strong> ${f.lieu}<br><strong>Dates :</strong> Du ${formatDate(getStagiaireDateDebut(stagiaires[0] || {} as StagiaireInfo, f))} au ${formatDate(getStagiaireDateFin(stagiaires[0] || {} as StagiaireInfo, f))}<br><strong>Nombre de participants :</strong> ${nbParticipants}</p>` },
+    { heading: "Prestation", content: `<p><strong>Formation :</strong> ${f.intitule}<br><strong>Durée :</strong> ${f.duree}<br><strong>Modalité :</strong> ${f.modalites}<br><strong>Lieu :</strong> ${f.lieu}<br><strong>Nombre de participants :</strong> ${nbParticipants}</p>` },
   ], table: {
     headers: ["Désignation", "Quantité", "Prix unitaire HT", "Total HT"],
     rows: [
@@ -369,7 +369,7 @@ export function genBilanPedagogiqueIndividuel(o: OrganismeInfo, f: FormationInfo
 export function genRapportFinFormation(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const nbStag = Math.min(stagiaires.length, 10);
   return buildDocument({ org: o, title: "RAPPORT DE FIN DE FORMATION", subtitle: f.intitule, formation: f, showFormationInfo: true, sections: [
-    { heading: "Synthèse de la formation", content: `<p>La formation « ${f.intitule} » s'est déroulée du ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)} (${f.duree}) en modalité ${f.modalites} à ${f.lieu}.<br>Nombre de stagiaires : ${nbStag}<br>Formateur : ${f.formateur}</p>` },
+    { heading: "Synthèse de la formation", content: `<p>La formation « ${f.intitule} » d'une durée de ${f.duree} s'est déroulée en modalité ${f.modalites} à ${f.lieu}.<br>Nombre de stagiaires : ${nbStag}<br>Formateur : ${f.formateur}</p>` },
     { heading: "Déroulement", content: "<p>La formation s'est déroulée conformément au programme prévu. L'ensemble des modules a été couvert. Les stagiaires ont été actifs et participatifs tout au long de la formation.</p>" },
     { heading: "Résultats pédagogiques", content: `<p>• Taux de réussite : 90%<br>• Note moyenne du groupe : 8.2/10<br>• Taux de présence : 98%<br>• Satisfaction globale : 4.7/5 (94%)</p>`, variant: "green" },
     { heading: "Adaptations réalisées", content: "<p>• Rythme adapté pour 2 stagiaires de niveau débutant<br>• Exercices supplémentaires proposés aux stagiaires avancés<br>• Support de synthèse complémentaire distribué</p>" },

@@ -438,8 +438,8 @@ export function genTableauSuiviParcours_V2(o: OrganismeInfo, f: FormationInfo, s
       s.nom?.toUpperCase(), s.prenom?.toUpperCase(), sexe,
       si % 3 === 0 ? 'autofinancement' : si % 3 === 1 ? 'OPCO' : 'CPF',
       'numéraires', 'non', '',
-      formatDate(f.dateDebut), formatDate(f.dateFin),
-      formatDate(f.dateDebut), 'aucune', 'aucune', 'aucune',
+      formatDate(getStagiaireDateDebut(s, f)), formatDate(getStagiaireDateFin(s, f)),
+      formatDate(getStagiaireDateDebut(s, f)), 'aucune', 'aucune', 'aucune',
       ...presences,
       '', `${avg}/10`, avg >= 6 ? 'oui' : 'non', 'oui'
     ];
@@ -908,7 +908,7 @@ export function genGrilleAcquisitionStagiaire(o: OrganismeInfo, f: FormationInfo
 
   let extra = `
     <h3>GRILLE DE SUIVI DU NIVEAU D'ACQUISITION DES COMPÉTENCES PROFESSIONNELLES</h3>
-    <p><strong>DATE :</strong> ${formatDate(f.dateDebut)} – ${formatDate(f.dateFin)}</p>
+    <p><strong>DATE :</strong> ${formatDate(getStagiaireDateDebut(s, f))} – ${formatDate(getStagiaireDateFin(s, f))}</p>
     <p><strong>NOM / PRÉNOM :</strong> ${s.prenom} ${s.nom}</p>
     <p><strong>FORMATION :</strong> ${f.intitule}</p>
   `;
