@@ -582,7 +582,7 @@ function genPlanning(o: OrganismeInfo, f: FormationInfo) {
   return buildDocument({ org: o, title: "PLANNING DES SESSIONS", subtitle: f.intitule, table: {
     headers: ["Session", "Dates", "Lieu", "Places", "Statut"],
     rows: [
-      ["Session 1", `${formatDate(f.dateDebut)} – ${formatDate(f.dateFin)}`, f.lieu, f.nombreParticipants, "✅ Réalisée"],
+      ["Session 1", "Sessions individuelles", f.lieu, f.nombreParticipants, "✅ Réalisée"],
       ["Session 2", "Juin 2024", f.lieu, f.nombreParticipants, "✅ Réalisée"],
       ["Session 3", "Septembre 2024", f.lieu, f.nombreParticipants, "✅ Réalisée"],
       ["Session 4", "Décembre 2024", f.lieu, f.nombreParticipants, "📋 Programmée"],
@@ -1575,7 +1575,7 @@ function genTestPositionnementIndividuel(o: OrganismeInfo, f: FormationInfo, s: 
 
   const answers = generateStagiaireOpenAnswers(questions, si, isDebut, { nom: s.nom, prenom: s.prenom, entreprise: s.entreprise, poste: s.poste });
   const totalScore = answers.reduce((sum, a) => sum + a.score, 0);
-  const dateTest = isDebut ? formatDate(f.dateDebut) : formatDate(f.dateFin);
+  const dateTest = isDebut ? formatDate(getStagiaireDateDebut(s, f)) : formatDate(getStagiaireDateFin(s, f));
 
   let extra = `<h2>Test de positionnement en ${label} de formation – ${f.intitule}</h2>`;
   extra += `<p><strong>Nom du stagiaire :</strong> ${s.prenom} ${s.nom}</p>`;
@@ -1980,7 +1980,7 @@ function genCertificat(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiaire
   let extra = stagiaires.slice(0, 10).map((s, i) => {
     const sc = EVAL_SCORES[i] || [8, 8, 8, 8, 8];
     const note = Math.round(sc.reduce((a, b) => a + b, 0) / sc.length * 10) / 10;
-    return `<div class="section" style="text-align:center;padding:30px"><h2 style="color:#1e3a7b">CERTIFICAT DE RÉUSSITE</h2><p style="font-size:16px;margin:20px 0"><strong>${s.prenom} ${s.nom}</strong></p><p>a validé avec succès la formation</p><p style="font-size:15px;font-weight:700;color:#1e3a7b">${f.intitule}</p><p>Note obtenue : <strong>${note}/10</strong></p><p style="margin-top:20px">Fait à ${o.ville}, le ${formatDate(f.dateFin)}</p><p><em>Signé par ${o.dirigeant}</em></p></div><div class="page-break"></div>`;
+    return `<div class="section" style="text-align:center;padding:30px"><h2 style="color:#1e3a7b">CERTIFICAT DE RÉUSSITE</h2><p style="font-size:16px;margin:20px 0"><strong>${s.prenom} ${s.nom}</strong></p><p>a validé avec succès la formation</p><p style="font-size:15px;font-weight:700;color:#1e3a7b">${f.intitule}</p><p>Note obtenue : <strong>${note}/10</strong></p><p style="margin-top:20px">Fait à ${o.ville}, le ${formatDate(getStagiaireDateFin(s, f))}</p><p><em>Signé par ${o.dirigeant}</em></p></div><div class="page-break"></div>`;
   }).join("");
   return buildDocument({ org: o, title: "CERTIFICATS DE RÉUSSITE", subtitle: f.intitule, extraHtml: extra });
 }
@@ -2482,9 +2482,9 @@ function genConventionFormationApprentissage(o: OrganismeInfo, f: FormationInfo,
   const s = stagiaires[si] || stagiaires[0] || { prenom: "Martin", nom: "Dupont", entreprise: "Tech Solutions SAS", email: "", responsableEntreprise: "", signatureUrl: "" } as StagiaireInfo;
   const entreprise = s.entreprise || "Entreprise partenaire";
   const respEntreprise = (s as any).responsableEntreprise || "Le responsable désigné";
-  const dateDebut = formatDate(f.dateDebut);
-  const dateFin = formatDate(f.dateFin);
-  const duree = f.duree || "420 heures";
+  const dateDebut = formatDate(getStagiaireDateDebut(s as StagiaireInfo, f));
+  const dateFin = formatDate(getStagiaireDateFin(s as StagiaireInfo, f));
+  const duree = getStagiaireDuree(s as StagiaireInfo, f);
   const lieu = `${o.nom}, ${o.adresse}`;
   const montant = f.tarif || "8 000";
   // Convention datée 15 jours ouvrés AVANT le début de la formation

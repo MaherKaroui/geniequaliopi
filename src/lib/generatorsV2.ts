@@ -463,7 +463,7 @@ export function genEvaluationFinaleStagiaire(o: OrganismeInfo, f: FormationInfo,
   let extra = `
     <h2>Évaluation Finale – ${f.intitule}</h2>
     <p><strong>Nom du stagiaire :</strong> ${s.prenom} ${s.nom}</p>
-    <p><strong>Date :</strong> ${formatDate(f.dateFin)}</p>
+    <p><strong>Date :</strong> ${formatDate(getStagiaireDateFin(s, f))}</p>
     <p><strong>Organisme :</strong> ${o.nom}</p>
     <p><strong>Formation :</strong> ${f.intitule}</p>
     <h3>Partie 1 – QCM (5 points)</h3>
@@ -639,14 +639,14 @@ export function genExercicesStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
       cumDays += Math.round((totalBlocVolumes[bi] / totalH) * nbJours);
     }
     cumDays = Math.min(cumDays, nbJours);
-    exerciseDate = days.length >= cumDays && cumDays > 0 ? days[cumDays - 1] : formatDate(f.dateFin);
+    exerciseDate = days.length >= cumDays && cumDays > 0 ? days[cumDays - 1] : formatDate(getStagiaireDateFin(s, f));
   } else if (!hasBlocs && exerciceIdx !== undefined) {
     const days = getFormationDays(f);
     const nbJours = days.length;
     const jourFin = Math.min(exerciceIdx * 2 + 2, nbJours);
-    exerciseDate = days.length >= jourFin ? days[jourFin - 1] : formatDate(f.dateFin);
+    exerciseDate = days.length >= jourFin ? days[jourFin - 1] : formatDate(getStagiaireDateFin(s, f));
   } else {
-    exerciseDate = formatDate(f.dateFin);
+    exerciseDate = formatDate(getStagiaireDateFin(s, f));
   }
 
   let extra = `
@@ -894,7 +894,7 @@ export function genExercicesStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
   ];
 
   const appIdx = avgPct >= 80 ? 0 : avgPct >= 60 ? 1 : 2;
-  extra += `<h3>Appréciation globale du formateur : ${f.formateur}, ${formatDate(f.dateFin)}</h3>`;
+  extra += `<h3>Appréciation globale du formateur : ${f.formateur}, ${formatDate(getStagiaireDateFin(s, f))}</h3>`;
   extra += `<p>${appreciations[appIdx][appSeed]}</p>`;
 
   return buildDocument({ org: o, title: `EXERCICE PRATIQUE${jourLabel} – RÉSULTATS`, subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, extraHtml: extra });
