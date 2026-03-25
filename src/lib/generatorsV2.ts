@@ -1090,7 +1090,7 @@ export function genCertificatReussite_V2(o: OrganismeInfo, f: FormationInfo, sta
         <p style="margin-top:15px">a réussi avec succès la formation suivante :</p>
         <p style="font-size:16px;font-weight:700">${f.intitule}</p>
         <p><strong>Durée :</strong> ${dureeHeures} heures ${modaliteTexte(f)}</p>
-        <p>Du ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)}</p>
+        <p>Du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}</p>
         <p style="margin-top:15px">Cette formation a été dispensée conformément aux normes de qualité et aux exigences pédagogiques de ${o.nom}. L'apprenant(e) a démontré un haut niveau d'engagement et de participation active tout au long du programme.</p>
         <h3>Assiduité</h3>
         <p>Durée effective suivie : ${dureeHeures} heures, soit un taux de réalisation de 100.00 %.</p>
