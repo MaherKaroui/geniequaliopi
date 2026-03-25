@@ -574,7 +574,7 @@ function genDelaisAcces(o: OrganismeInfo) {
 function genFicheTarifs(o: OrganismeInfo, formations: FormationInfo[]) {
   return buildDocument({ org: o, title: "GRILLE TARIFAIRE 2024", table: {
     headers: ["Formation", "Durée", "Tarif HT", "Modalité"],
-    rows: formations.map(f => [f.intitule, f.duree, f.tarif, f.modalites])
+    rows: formations.map(f => [f.intitule, "À définir selon le groupe", "Tarif sur demande", f.modalites])
   }, sections: [{ heading: "Conditions", content: "<p>Tarifs nets de taxe (TVA non applicable, art. 261-4-4° du CGI). Tarifs dégressifs à partir de 3 inscriptions. Prise en charge OPCO possible.</p>" }] });
 }
 
