@@ -908,7 +908,7 @@ export function genGrilleAcquisitionStagiaire(o: OrganismeInfo, f: FormationInfo
 
   let extra = `
     <h3>GRILLE DE SUIVI DU NIVEAU D'ACQUISITION DES COMPÉTENCES PROFESSIONNELLES</h3>
-    <p><strong>DATE :</strong> ${formatDate(f.dateDebut)} – ${formatDate(f.dateFin)}</p>
+    <p><strong>DATE :</strong> ${formatDate(getStagiaireDateDebut(s, f))} – ${formatDate(getStagiaireDateFin(s, f))}</p>
     <p><strong>NOM / PRÉNOM :</strong> ${s.prenom} ${s.nom}</p>
     <p><strong>FORMATION :</strong> ${f.intitule}</p>
   `;
