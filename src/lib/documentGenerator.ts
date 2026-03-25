@@ -2482,9 +2482,9 @@ function genConventionFormationApprentissage(o: OrganismeInfo, f: FormationInfo,
   const s = stagiaires[si] || stagiaires[0] || { prenom: "Martin", nom: "Dupont", entreprise: "Tech Solutions SAS", email: "", responsableEntreprise: "", signatureUrl: "" } as StagiaireInfo;
   const entreprise = s.entreprise || "Entreprise partenaire";
   const respEntreprise = (s as any).responsableEntreprise || "Le responsable désigné";
-  const dateDebut = formatDate(f.dateDebut);
-  const dateFin = formatDate(f.dateFin);
-  const duree = f.duree || "420 heures";
+  const dateDebut = formatDate(getStagiaireDateDebut(s as StagiaireInfo, f));
+  const dateFin = formatDate(getStagiaireDateFin(s as StagiaireInfo, f));
+  const duree = getStagiaireDuree(s as StagiaireInfo, f);
   const lieu = `${o.nom}, ${o.adresse}`;
   const montant = f.tarif || "8 000";
   // Convention datée 15 jours ouvrés AVANT le début de la formation

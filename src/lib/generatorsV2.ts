@@ -894,7 +894,7 @@ export function genExercicesStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
   ];
 
   const appIdx = avgPct >= 80 ? 0 : avgPct >= 60 ? 1 : 2;
-  extra += `<h3>Appréciation globale du formateur : ${f.formateur}, ${formatDate(f.dateFin)}</h3>`;
+  extra += `<h3>Appréciation globale du formateur : ${f.formateur}, ${formatDate(getStagiaireDateFin(s, f))}</h3>`;
   extra += `<p>${appreciations[appIdx][appSeed]}</p>`;
 
   return buildDocument({ org: o, title: `EXERCICE PRATIQUE${jourLabel} – RÉSULTATS`, subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, extraHtml: extra });
