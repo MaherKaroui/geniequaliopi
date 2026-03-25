@@ -406,8 +406,8 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "bail_sous_location": return genBailSousLocation(o);
     case "facture_materiel": return genFactureMateriel(o, params);
     case "autoevaluation_formateur": {
-      // Use the formateur name from the formation, not from SAMPLE_FORMATEURS
-      const formateurName = f.formateur || fmt.prenom + " " + fmt.nom;
+      // Use formateurNom from params if provided (per-session formateur), else from formation
+      const formateurName = params?.formateurNom || f.formateur || fmt.prenom + " " + fmt.nom;
       const parts = formateurName.trim().split(/\s+/);
       const autoFmt: FormateurInfo = { ...fmt, prenom: parts.slice(0, -1).join(" ") || parts[0], nom: parts[parts.length - 1] || "" };
       return genAutoEvaluationFormateurV2(o, f, autoFmt);
