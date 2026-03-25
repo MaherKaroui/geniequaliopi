@@ -631,10 +631,74 @@ function genQuestionnairePositionnement(o: OrganismeInfo, f: FormationInfo, stag
 }
 
 function genAnalyseBesoins(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
+  const lower = f.intitule.toLowerCase();
+  const isFLE = lower.includes("français") || lower.includes("fle") || lower.includes("médico-social") || lower.includes("communiquer");
+
+  // Tableau récapitulatif des stagiaires avec leurs dates individuelles
+  let tableStag = "";
+  if (stagiaires.length > 0) {
+    const rows = stagiaires.slice(0, 10).map((s, i) => {
+      const dateD = formatDate(getStagiaireDateDebut(s, f));
+      const dateF = formatDate(getStagiaireDateFin(s, f));
+      if (isFLE) {
+        const besoins = [
+          "Renforcer la communication orale en situation professionnelle (accueil, transmissions, réunions)",
+          "Améliorer la rédaction de transmissions écrites et la compréhension des protocoles de soins",
+          "Développer le vocabulaire médico-social (sigles, termes techniques) et la compréhension de consignes",
+          "Acquérir les bases de la communication écrite professionnelle et les formules d'accueil",
+          "Consolider la compréhension écrite des documents administratifs (règlement, projet d'établissement)",
+          "Perfectionner la communication téléphonique et les échanges avec les familles",
+          "Maîtriser la rédaction de comptes rendus de réunion et de cahiers de liaison",
+          "Renforcer les compétences argumentatives pour les réunions d'équipe pluridisciplinaire",
+          "Améliorer la lecture et l'application des protocoles d'urgence et de soins",
+          "Développer les compétences rédactionnelles pour les projets personnalisés des résidents",
+        ];
+        return [s.civilite ? `${s.civilite} ${s.nom} ${s.prenom}` : `${s.prenom} ${s.nom}`, dateD, dateF, besoins[i % besoins.length]];
+      } else {
+        const besoins = [
+          "Développer les compétences opérationnelles",
+          "Obtenir la certification visée",
+          "Reconversion professionnelle",
+          "Montée en compétences sur le poste actuel",
+          "Développer l'autonomie professionnelle",
+          "Acquérir de nouvelles méthodes de travail",
+          "Valider les acquis de l'expérience",
+          "Se préparer à de nouvelles responsabilités",
+          "Renforcer les compétences techniques",
+          "Améliorer la performance globale",
+        ];
+        return [s.civilite ? `${s.civilite} ${s.nom} ${s.prenom}` : `${s.prenom} ${s.nom}`, dateD, dateF, besoins[i % besoins.length]];
+      }
+    });
+    tableStag = tableHTML(["Stagiaire", "Date début", "Date fin", "Besoin principal identifié"], rows);
+  }
+
+  const besoinsContent = isFLE
+    ? `<p>L'analyse des besoins a été réalisée auprès de ${stagiaires.length} candidats inscrits à la formation « ${f.intitule} » par entretien individuel et test de positionnement en français.</p>`
+      + tableStag
+      + `<p><strong>Synthèse des besoins identifiés :</strong></p>`
+      + `<p>• ${Math.round(stagiaires.length * 0.8)} stagiaires ont besoin de renforcer la communication orale en milieu médico-social (accueil des résidents, transmissions orales, réunions d'équipe)<br>`
+      + `• ${Math.round(stagiaires.length * 0.7)} stagiaires doivent améliorer la rédaction de transmissions écrites et la compréhension des protocoles de soins<br>`
+      + `• ${Math.round(stagiaires.length * 0.6)} stagiaires nécessitent un apprentissage du vocabulaire spécifique (EHPAD, IDE, AES, MDPH, PIA, CVS…)<br>`
+      + `• ${Math.round(stagiaires.length * 0.4)} stagiaires souhaitent perfectionner la communication avec les familles et les partenaires extérieurs<br>`
+      + `• ${Math.round(stagiaires.length * 0.3)} stagiaires demandent un accompagnement sur la lecture de documents administratifs (règlement de fonctionnement, projet d'établissement)</p>`
+    : `<p>Analyse réalisée sur ${stagiaires.length} candidats inscrits à la formation « ${f.intitule} ». Les besoins ont été recueillis via questionnaire en ligne et entretiens individuels.</p>`
+      + tableStag
+      + `<p><strong>Synthèse des besoins identifiés :</strong></p>`
+      + `<p>• 80% des stagiaires souhaitent développer leurs compétences opérationnelles<br>• 60% visent une certification ou une validation de compétences<br>• 40% sont en reconversion professionnelle<br>• 20% souhaitent un accompagnement spécifique (handicap, horaires aménagés)</p>`;
+
+  const adaptationsContent = isFLE
+    ? `<p>• Adaptation du rythme pédagogique au niveau de français de chaque stagiaire<br>`
+      + `• Mises en situation professionnelles contextualisées (accueil, toilette, repas, transmissions)<br>`
+      + `• Supports pédagogiques adaptés : documents réels du secteur médico-social (protocoles, fiches de liaison, cahiers de transmissions)<br>`
+      + `• Jeux de rôle avec vocabulaire spécifique au poste occupé<br>`
+      + `• Exercices de rédaction de transmissions sur cas concrets du secteur<br>`
+      + `• Travail spécifique sur la phonétique et l'intonation pour la communication téléphonique</p>`
+    : `<p>• Ajustement du rythme pédagogique<br>• Ajout d'exercices pratiques supplémentaires<br>• Mise à disposition de ressources complémentaires en ligne<br>• Aménagement d'horaires pour 2 stagiaires</p>`;
+
   return buildDocument({ org: o, title: "ANALYSE DES BESOINS", subtitle: f.intitule, formation: f, showFormationInfo: true, sections: [
-    { heading: "Contexte", content: `<p>Analyse réalisée sur ${stagiaires.length} candidats inscrits à la formation « ${f.intitule} ». Les besoins ont été recueillis via questionnaire en ligne et entretiens individuels.</p>` },
-    { heading: "Besoins identifiés", content: "<p>• 80% des stagiaires souhaitent développer leurs compétences opérationnelles<br>• 60% visent une certification ou une validation de compétences<br>• 40% sont en reconversion professionnelle<br>• 20% souhaitent un accompagnement spécifique (handicap, horaires aménagés)</p>" },
-    { heading: "Adaptations mises en place", content: "<p>• Ajustement du rythme pédagogique<br>• Ajout d'exercices pratiques supplémentaires<br>• Mise à disposition de ressources complémentaires en ligne<br>• Aménagement d'horaires pour 2 stagiaires</p>", variant: "green" },
+    { heading: "Contexte et besoins identifiés", content: besoinsContent },
+    { heading: "Adaptations mises en place", content: adaptationsContent, variant: "green" },
   ] });
 }
 
