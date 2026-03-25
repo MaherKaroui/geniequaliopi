@@ -984,17 +984,14 @@ export function genExercicesPratiques_V2(o: OrganismeInfo, f: FormationInfo, sta
     extra += `<div class="section section-green"><p><strong>Réponse attendue / Corrigé :</strong> ${ex.reponseAttendue}</p></div>`;
     extra += `<h3>Résultats par stagiaire</h3>`;
     const rows = stagiaires.slice(0, 10).map((s, si) => {
-      const sc = EVAL_SCORES[si] || [7, 8, 7, 8, 7];
-      const note = sc[ei % sc.length];
-      const noteFinale = Math.min(10, note + 1);
+      const variations = [9, 10, 9, 8, 10, 9, 8, 10, 9, 10];
+      const noteFinale = variations[(si + ei) % variations.length];
       // Unique appreciation per stagiaire
       const seed = (si * 7 + ei * 3) % 4;
       const apps = noteFinale >= 9
         ? [`${s.prenom} ${s.nom} a parfaitement réalisé cet exercice. Travail exemplaire.`, `Exercice réalisé avec méthode par ${s.prenom} ${s.nom}. Résultat conforme.`, `${s.prenom} ${s.nom} démontre une maîtrise complète. Excellent travail.`, `Travail de qualité de ${s.prenom} ${s.nom}. Compétence pleinement acquise.`]
-        : noteFinale >= 7
-        ? [`${s.prenom} ${s.nom} a réalisé un bon travail. Quelques points à perfectionner.`, `Bon exercice de ${s.prenom} ${s.nom}. La compréhension est bonne.`, `${s.prenom} ${s.nom} montre de solides acquis. Léger approfondissement souhaitable.`, `Travail satisfaisant de ${s.prenom} ${s.nom}. Progression encourageante.`]
-        : [`${s.prenom} ${s.nom} a réalisé un travail partiel. Approfondissement nécessaire.`, `Exercice incomplet pour ${s.prenom} ${s.nom}. Un accompagnement est recommandé.`, `${s.prenom} ${s.nom} doit consolider les bases. Travail à reprendre.`, `Résultat insuffisant pour ${s.prenom} ${s.nom}. Plan de remédiation conseillé.`];
-      return [s.prenom + " " + s.nom, `${noteFinale}/10`, noteFinale >= 7 ? "✅ Validé" : "🔄 À revoir", apps[seed]];
+        : [`${s.prenom} ${s.nom} a réalisé un très bon travail. Compétences bien acquises.`, `Bon exercice de ${s.prenom} ${s.nom}. La compréhension est solide.`, `${s.prenom} ${s.nom} montre de solides acquis. Travail satisfaisant.`, `Travail satisfaisant de ${s.prenom} ${s.nom}. Progression encourageante.`];
+      return [s.prenom + " " + s.nom, `${noteFinale}/10`, "✅ Validé", apps[seed]];
     });
     extra += tableHTML(["Stagiaire", "Note", "Statut", "Appréciation du formateur"], rows);
   });
