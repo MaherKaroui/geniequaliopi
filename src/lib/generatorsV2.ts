@@ -438,8 +438,8 @@ export function genTableauSuiviParcours_V2(o: OrganismeInfo, f: FormationInfo, s
       s.nom?.toUpperCase(), s.prenom?.toUpperCase(), sexe,
       si % 3 === 0 ? 'autofinancement' : si % 3 === 1 ? 'OPCO' : 'CPF',
       'numéraires', 'non', '',
-      formatDate(f.dateDebut), formatDate(f.dateFin),
-      formatDate(f.dateDebut), 'aucune', 'aucune', 'aucune',
+      formatDate(getStagiaireDateDebut(s, f)), formatDate(getStagiaireDateFin(s, f)),
+      formatDate(getStagiaireDateDebut(s, f)), 'aucune', 'aucune', 'aucune',
       ...presences,
       '', `${avg}/10`, avg >= 6 ? 'oui' : 'non', 'oui'
     ];
