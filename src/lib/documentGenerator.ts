@@ -2728,7 +2728,7 @@ function genConvocationCertification(o: OrganismeInfo, f: FormationInfo, stagiai
       <div class="sig-box" style="max-width:50%">
         <p class="sig-label">Le Responsable pédagogique</p>
         <p>Nom : ${o.responsablePedagogique || o.dirigeant}</p>
-        <p>Date : ${formatDate(f.dateFin)}</p>
+        <p>Date : ${formatDate(f.dateDebut)}</p>
         <p style="margin-top:20px">Signature :</p>
         ${o.tamponUrl ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />` : ""}
       </div>
