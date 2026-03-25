@@ -6268,7 +6268,7 @@ function genBilanFroidStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: 
   ];
   const pat = patterns[si % patterns.length];
 
-  let extra = `<p><strong>Date :</strong> ${formatDate(f.dateFin)}</p><p><em>Bilan réalisé 3 à 6 mois après la formation</em></p>`;
+  let extra = `<p><em>Bilan réalisé 3 à 6 mois après la formation</em></p>`;
   extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%">
     <tr><td><strong>Nom/prénom du participant :</strong></td><td>${s.prenom} ${s.nom}</td></tr>
     <tr><td><strong>Entreprise :</strong></td><td>${s.entreprise || "—"}</td></tr>
