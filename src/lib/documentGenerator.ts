@@ -1293,6 +1293,39 @@ function genEmargementJour(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
   }, signatures: { type: "2", labels: ["Le Formateur", "Le Responsable"], names: [f.formateur, o.dirigeant] } });
 }
 
+function genEmargementStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], stagiaireIdx: number) {
+  const s = stagiaires[stagiaireIdx] || stagiaires[0];
+  const dateDebut = s.dateDebutFormation || f.dateDebut || "";
+  const dateFin = s.dateFinFormation || f.dateFin || "";
+  let days: string[] = [];
+  if (dateDebut && dateFin) {
+    const start = new Date(dateDebut + "T00:00:00");
+    const end = new Date(dateFin + "T00:00:00");
+    const current = new Date(start);
+    while (current <= end) {
+      if (current.getDay() !== 0 && current.getDay() !== 6) {
+        days.push(current.toLocaleDateString("fr-FR", { weekday: "long", year: "numeric", month: "long", day: "numeric" }));
+      }
+      current.setDate(current.getDate() + 1);
+    }
+  }
+  if (days.length === 0) days = getFormationDays(f);
+  const stagName = `${s.civilite ? s.civilite + " " : ""}${s.prenom} ${s.nom.toUpperCase()}`;
+  const stagSigHtml = s.signatureUrl ? `<br><img src="${s.signatureUrl}" alt="Sig" style="max-height:40px;max-width:90px;object-fit:contain;margin-top:4px" />` : `<br><span style="font-style:italic;color:#999;font-size:10px">Signé ${s.prenom[0]}.${s.nom}</span>`;
+  const formateurSigHtml = o.signatureUrl ? `<br><img src="${o.signatureUrl}" alt="Sig" style="max-height:40px;max-width:90px;object-fit:contain;margin-top:4px" />` : '';
+  let extra = `<p><strong>Stagiaire :</strong> ${stagName}</p>`;
+  extra += `<p><strong>Session :</strong> Du ${formatDate(dateDebut)} au ${formatDate(dateFin)}</p>`;
+  extra += `<p><strong>Formateur :</strong> ${f.formateur}</p>`;
+  days.forEach((day, di) => {
+    if (di > 0 && di % 5 === 0) extra += '<div class="page-break"></div>';
+    let tableRows = '';
+    tableRows += `<tr style="background:#fff;border-bottom:1px solid #ddd"><td>${day}</td><td>Matin</td><td style="padding:10px 6px">${stagName}${stagSigHtml}</td><td style="padding:10px 6px">${f.formateur}${formateurSigHtml}</td></tr>`;
+    tableRows += `<tr style="background:#fff;border-bottom:1px solid #ccc"><td></td><td>Après-midi</td><td style="padding:10px 6px">${stagName}${stagSigHtml}</td><td style="padding:10px 6px">${f.formateur}${formateurSigHtml}</td></tr>`;
+    extra += `<table><tr><th>Date</th><th>Horaires</th><th>Signature du Stagiaire</th><th>Signature du Formateur</th></tr>${tableRows}</table>`;
+  });
+  return buildDocument({ org: o, title: "FEUILLE D'ÉMARGEMENT", subtitle: `${f.intitule} – ${stagName}`, extraHtml: extra });
+}
+
 function genRapportConnexion(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const days = getFormationDays(f);
   const ct = getConnectionTimes(f);
