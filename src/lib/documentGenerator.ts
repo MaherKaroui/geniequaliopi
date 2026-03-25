@@ -482,7 +482,7 @@ function genMentionsLegales(o: OrganismeInfo) {
 }
 
 function genCatalogue(o: OrganismeInfo, f: FormationInfo) {
-  return buildDocument({ org: o, title: `CATALOGUE DE FORMATION`, subtitle: f.intitule, formation: f, showFormationInfo: true, sections: [
+  return buildDocument({ org: o, title: `CATALOGUE DE FORMATION`, subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, sections: [
     { heading: "Objectifs pédagogiques", content: `<p>${f.objectifs}</p>` },
     { heading: "Programme", content: `<p>${f.programme.replace(/\n/g, "<br>")}</p>` },
     { heading: "Moyens pédagogiques", content: `<p>${f.moyensPedagogiques}</p>` },
@@ -492,7 +492,7 @@ function genCatalogue(o: OrganismeInfo, f: FormationInfo) {
 }
 
 function genFicheInfoFormation(o: OrganismeInfo, f: FormationInfo) {
-  return buildDocument({ org: o, title: "FICHE D'INFORMATION PUBLIQUE", subtitle: f.intitule, formation: f, showFormationInfo: true, sections: [
+  return buildDocument({ org: o, title: "FICHE D'INFORMATION PUBLIQUE", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, sections: [
     { heading: "Public visé", content: `<p>${f.publicVise}</p>` },
     { heading: "Prérequis", content: `<p>${f.prerequis}</p>` },
     { heading: "Objectifs", content: `<p>${f.objectifs}</p>` },
@@ -525,14 +525,14 @@ function genTauxSatisfactionGlobal(o: OrganismeInfo, formations: FormationInfo[]
 }
 
 function genTauxReussite(o: OrganismeInfo, f: FormationInfo, nbParticipants: number) {
-  return buildDocument({ org: o, title: "TAUX DE RÉUSSITE", subtitle: f.intitule, formation: f, showFormationInfo: true, table: {
+  return buildDocument({ org: o, title: "TAUX DE RÉUSSITE", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, table: {
     headers: ["Indicateur", "Résultat"],
     rows: [["Nombre de participants", `${nbParticipants}`], ["Réussites", `${nbParticipants}`], ["Taux de réussite", "100%"], ["Note moyenne", "10/10"], ["Satisfaction formation", "100%"]]
   } });
 }
 
 function genTauxSatisfactionFormation(o: OrganismeInfo, f: FormationInfo) {
-  return buildDocument({ org: o, title: "TAUX DE SATISFACTION", subtitle: f.intitule, formation: f, showFormationInfo: true, table: {
+  return buildDocument({ org: o, title: "TAUX DE SATISFACTION", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, table: {
     headers: ["Critère", "Note /5", "Satisfaction"],
     rows: [["Accueil et organisation", "4.8", "96%"], ["Atteinte des objectifs", "4.6", "92%"], ["Contenu adapté", "4.7", "94%"], ["Méthodes pédagogiques", "4.8", "96%"], ["Compétence du formateur", "4.9", "98%"], ["Supports de formation", "4.5", "90%"], ["Durée adaptée", "4.6", "92%"], ["Recommandation", "4.8", "96%"]]
   }, sections: [{ heading: "Moyenne globale", content: "<p><strong>4.7 / 5 – Satisfaction : 94%</strong></p>", variant: "green" }] });
@@ -1134,14 +1134,14 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
 }
 
 function genObjectifs(o: OrganismeInfo, f: FormationInfo) {
-  return buildDocument({ org: o, title: "OBJECTIFS PÉDAGOGIQUES", subtitle: f.intitule, formation: f, showFormationInfo: true, sections: [
+  return buildDocument({ org: o, title: "OBJECTIFS PÉDAGOGIQUES", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, sections: [
     { heading: "Objectif général", content: `<p>${f.objectifs}</p>` },
     { heading: "À l'issue de la formation, le stagiaire sera capable de", content: "<p>• Appliquer les méthodes et techniques présentées en situation professionnelle<br>• Utiliser les outils et ressources mis à disposition de manière autonome<br>• Évaluer sa progression et identifier ses axes d'amélioration<br>• Transférer les acquis dans son contexte professionnel</p>" },
   ] });
 }
 
 function genPlanPedagogique(o: OrganismeInfo, f: FormationInfo) {
-  return buildDocument({ org: o, title: "PLAN PÉDAGOGIQUE", subtitle: f.intitule, formation: f, showFormationInfo: true, sections: [
+  return buildDocument({ org: o, title: "PLAN PÉDAGOGIQUE", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, sections: [
     { heading: "Déroulé pédagogique", content: `<p>${f.programme.replace(/\n/g, "<br>")}</p>` },
     { heading: "Méthodes mobilisées", content: "<p>• Apports théoriques (30%)<br>• Exercices pratiques et cas concrets (50%)<br>• Mises en situation et jeux de rôle (15%)<br>• Échanges et retours d'expérience (5%)</p>" },
     { heading: "Supports", content: `<p>${f.moyensPedagogiques}</p>` },
@@ -1149,7 +1149,7 @@ function genPlanPedagogique(o: OrganismeInfo, f: FormationInfo) {
 }
 
 function genAdaptation(o: OrganismeInfo, f: FormationInfo) {
-  return buildDocument({ org: o, title: "ADAPTATION DU CONTENU PÉDAGOGIQUE", subtitle: f.intitule, formation: f, showFormationInfo: true, sections: [
+  return buildDocument({ org: o, title: "ADAPTATION DU CONTENU PÉDAGOGIQUE", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, sections: [
     { heading: "Adaptations réalisées", content: "<p>Suite à l'analyse des besoins et au positionnement initial, les adaptations suivantes ont été mises en place :</p><p>• Ajout d'exercices de niveau intermédiaire pour les stagiaires déjà expérimentés<br>• Temps supplémentaire pour les stagiaires débutants sur les fondamentaux<br>• Création d'un support de synthèse complémentaire<br>• Mise à disposition de tutoriels vidéo pour les révisions</p>" },
     { heading: "Résultats", content: "<p>Les adaptations ont permis de maintenir un taux de satisfaction de 96% et un taux de réussite de 90%.</p>", variant: "green" },
   ] });
@@ -1193,7 +1193,7 @@ function genRegistreAmenagements(o: OrganismeInfo) {
 }
 
 function genFicheAmenagement(o: OrganismeInfo, f: FormationInfo) {
-  return buildDocument({ org: o, title: "FICHE D'AMÉNAGEMENT", subtitle: f.intitule, formation: f, showFormationInfo: true, sections: [
+  return buildDocument({ org: o, title: "FICHE D'AMÉNAGEMENT", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, sections: [
     { heading: "Analyse de la situation", content: "<p>Entretien réalisé le ______ avec le référent handicap.<br>Type de handicap identifié : ______<br>Besoins exprimés : ______</p>" },
     { heading: "Aménagements mis en place", content: "<p>☐ Support adapté<br>☐ Temps supplémentaire<br>☐ Accessibilité des locaux<br>☐ Matériel spécifique<br>☐ Accompagnement individualisé<br>☐ Autre : ______</p>" },
   ], signatures: { type: "2", labels: ["Le Référent Handicap", "Le Stagiaire"], names: [o.referentHandicap, ""] } });
@@ -1226,7 +1226,7 @@ function genTestEntree(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiaire
     extra += `</ul>`;
   });
 
-  return buildDocument({ org: o, title: "TEST D'ENTRÉE – RÉSULTATS DÉTAILLÉS", subtitle: f.intitule, formation: f, showFormationInfo: true, extraHtml: extra,
+  return buildDocument({ org: o, title: "TEST D'ENTRÉE – RÉSULTATS DÉTAILLÉS", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra,
     signatures: { type: "2", labels: ["Le Formateur", "Le Resp. Pédagogique"], names: [f.formateur, o.responsablePedagogique] } });
 }
 
@@ -1242,7 +1242,7 @@ function genGrilleEvaluation(o: OrganismeInfo, f: FormationInfo, stagiaires: Sta
     const avg = Math.round(sc.reduce((a, b) => a + b, 0) / sc.length * 10) / 10;
     return [s.prenom + " " + s.nom, ...cols, `${avg}/10`, evalData.appreciations[i]?.split('.')[0] + '.' || ""];
   });
-  return buildDocument({ org: o, title: "GRILLE D'ÉVALUATION DES COMPÉTENCES", subtitle: f.intitule, formation: f, showFormationInfo: true, table: {
+  return buildDocument({ org: o, title: "GRILLE D'ÉVALUATION DES COMPÉTENCES", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, table: {
     headers: ["Stagiaire", ...competences.map((c, i) => `C${i + 1}`), "Note", "Appréciation"], rows
   }, sections: [
     { heading: "Légende des compétences évaluées", content: competences.map((c, i) => `<p><strong>C${i + 1} :</strong> ${c}</p>`).join("") },
@@ -1272,11 +1272,11 @@ function genLivretAccueil(o: OrganismeInfo, f: FormationInfo) {
 
 function genConvocation(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   let extra = stagiaires.slice(0, 5).map(s => `<div class="section"><p><strong>Destinataire :</strong> ${s.prenom} ${s.nom}</p><p><strong>Entreprise :</strong> ${s.entreprise}</p></div>`).join("");
-  return buildDocument({ org: o, title: "CONVOCATION À LA FORMATION", formation: f, showFormationInfo: true, extraHtml: extra + `<p>Nous vous remercions de vous présenter muni(e) de cette convocation.</p><p>Cordialement,<br><strong>${o.dirigeant}</strong></p>` });
+  return buildDocument({ org: o, title: "CONVOCATION À LA FORMATION", formation: f, showFormationInfo: true, stagiaires, extraHtml: extra + `<p>Nous vous remercions de vous présenter muni(e) de cette convocation.</p><p>Cordialement,<br><strong>${o.dirigeant}</strong></p>` });
 }
 
 function genConvention(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
-  return buildDocument({ org: o, title: "CONVENTION DE FORMATION PROFESSIONNELLE", subtitle: "Article L.6353-1 du Code du travail", formation: f, showFormationInfo: true, sections: [
+  return buildDocument({ org: o, title: "CONVENTION DE FORMATION PROFESSIONNELLE", subtitle: "Article L.6353-1 du Code du travail", formation: f, showFormationInfo: true, stagiaires, sections: [
     { heading: "Entre les soussignés", content: `<p><strong>L'organisme :</strong> ${o.nom}, ${o.adresse}, ${o.codePostal} ${o.ville}<br>SIRET : ${o.siret} – NDA : ${o.nda}<br>Représenté par : ${o.dirigeant}</p><p><strong>Et :</strong> ${stagiaires.slice(0, 3).map(s => s.prenom + " " + s.nom + " (" + s.entreprise + ")").join(", ")}</p>` },
     { heading: "Article 1 – Objet", content: `<p>Réalisation de la formation « ${f.intitule} »</p>` },
     { heading: "Article 2 – Tarif", content: `<p>Coût : ${f.tarif}</p>` },
@@ -1288,7 +1288,7 @@ function genConvention(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiaire
 function genEmargementJour(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], jour: number, jourLabel: string) {
   const rows = stagiaires.slice(0, 10).map(s => [s.nom, s.prenom, s.entreprise, `Signé ${s.prenom[0]}.${s.nom}`, `Signé ${s.prenom[0]}.${s.nom}`]);
   if (rows.length < 5) { for (let i = rows.length; i < 5; i++) rows.push(["", "", "", "", ""]); }
-  return buildDocument({ org: o, title: "FEUILLE D'ÉMARGEMENT", subtitle: `${f.intitule} – ${jourLabel}`, formation: f, showFormationInfo: true, table: {
+  return buildDocument({ org: o, title: "FEUILLE D'ÉMARGEMENT", subtitle: `${f.intitule} – ${jourLabel}`, formation: f, showFormationInfo: true, stagiaires, table: {
     headers: ["Nom", "Prénom", "Entreprise", "Signature Matin", "Signature Après-midi"], rows
   }, signatures: { type: "2", labels: ["Le Formateur", "Le Responsable"], names: [f.formateur, o.dirigeant] } });
 }
@@ -1336,7 +1336,7 @@ function genRapportConnexion(o: OrganismeInfo, f: FormationInfo, stagiaires: Sta
       rows.push([s.prenom + " " + s.nom, '', ct[(di * 2 + 1) % ct.length].heureConnexion, ct[(di * 2 + 1) % ct.length].heureDeconnexion, ct[(di * 2 + 1) % ct.length].duree]);
     });
   });
-  return buildDocument({ org: o, title: "RAPPORT DE CONNEXION LMS", subtitle: f.intitule, formation: f, showFormationInfo: true, table: {
+  return buildDocument({ org: o, title: "RAPPORT DE CONNEXION LMS", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, table: {
     headers: ["Stagiaire", "Date", "Heure connexion", "Heure déconnexion", "Durée"], rows: rows.slice(0, 60)
   } });
 }
@@ -1346,7 +1346,7 @@ function genTempsConnexion(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
   const rows = stagiaires.slice(0, 10).map((s) => {
     return [s.prenom + " " + s.nom, `${totalHours}h`, f.duree, `100%`, "✅ Validé"];
   });
-  return buildDocument({ org: o, title: "TEMPS DE CONNEXION PAR STAGIAIRE", subtitle: f.intitule, formation: f, showFormationInfo: true, table: {
+  return buildDocument({ org: o, title: "TEMPS DE CONNEXION PAR STAGIAIRE", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, table: {
     headers: ["Stagiaire", "Temps total", "Durée formation", "Taux présence", "Statut"], rows
   } });
 }
@@ -1424,7 +1424,7 @@ function genTempsConnexionReel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
   });
   extra += tableHTML(["Stagiaire", "Temps total connecté", "Durée formation", "Taux de présence", "Statut"], recapRows);
 
-  return buildDocument({ org: o, title: "RELEVÉ DES TEMPS DE CONNEXION RÉELS", subtitle: f.intitule, formation: f, showFormationInfo: true, extraHtml: extra });
+  return buildDocument({ org: o, title: "RELEVÉ DES TEMPS DE CONNEXION RÉELS", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra });
 }
 
 function genTableauPresence(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
@@ -1863,7 +1863,7 @@ function genQCMPositionnement(o: OrganismeInfo, f: FormationInfo, stagiaires: St
     extra += `<p><em>Appréciation : ${evalData.appreciations[si]?.split('.')[0] || "Niveau correct"}.</em></p>`;
   });
 
-  return buildDocument({ org: o, title: "QCM DE POSITIONNEMENT – DÉTAILLÉ", subtitle: f.intitule, formation: f, showFormationInfo: true, extraHtml: extra,
+  return buildDocument({ org: o, title: "QCM DE POSITIONNEMENT – DÉTAILLÉ", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra,
     signatures: { type: "2", labels: ["Le Formateur", "Le Resp. Pédagogique"], names: [f.formateur, o.responsablePedagogique] } });
 }
 
@@ -1904,7 +1904,7 @@ function genExercicesPratiques(o: OrganismeInfo, f: FormationInfo, stagiaires: S
   });
   extra += tableHTML(["Stagiaire", ...exercices.map((_, i) => `Ex.${i + 1}`), "Moyenne", "Appréciation globale"], globalRows);
 
-  return buildDocument({ org: o, title: "EXERCICES PRATIQUES – CORRIGÉS ET RÉSULTATS", subtitle: f.intitule, formation: f, showFormationInfo: true, extraHtml: extra,
+  return buildDocument({ org: o, title: "EXERCICES PRATIQUES – CORRIGÉS ET RÉSULTATS", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra,
     signatures: { type: "2", labels: ["Le Formateur", "Le Resp. Pédagogique"], names: [f.formateur, o.responsablePedagogique] } });
 }
 
@@ -1960,7 +1960,7 @@ function genQCMFinal(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireIn
     <p><strong>Appréciation générale :</strong> Les résultats du QCM final confirment une bonne acquisition des connaissances par le groupe. Les objectifs pédagogiques de la formation sont atteints.</p>
   </div>`;
 
-  return buildDocument({ org: o, title: "QCM FINAL – RÉSULTATS DÉTAILLÉS", subtitle: f.intitule, formation: f, showFormationInfo: true, extraHtml: extra,
+  return buildDocument({ org: o, title: "QCM FINAL – RÉSULTATS DÉTAILLÉS", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra,
     signatures: { type: "3", names: ["", f.formateur] } });
 }
 
@@ -1998,7 +1998,7 @@ function genQuestionnaireInsertion(o: OrganismeInfo, f: FormationInfo) {
 }
 
 function genConditionsAccueil(o: OrganismeInfo, f: FormationInfo) {
-  return buildDocument({ org: o, title: "FICHE CONDITIONS D'ACCUEIL", subtitle: f.intitule, formation: f, showFormationInfo: true, sections: [
+  return buildDocument({ org: o, title: "FICHE CONDITIONS D'ACCUEIL", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, sections: [
     { heading: "Locaux", content: `<p>Adresse : ${f.lieu}<br>Accès : Métro, bus, parking<br>Accessibilité PMR : ✅ Oui<br>Wifi : ✅ Disponible</p>` },
     { heading: "Équipements", content: `<p>${f.moyensPedagogiques}</p>` },
     { heading: "Horaires", content: "<p>Matin : 9h00 – 12h30<br>Après-midi : 13h30 – 17h00<br>Pause déjeuner : 12h30 – 13h30</p>" },
@@ -2012,7 +2012,7 @@ function genCharteAccueil(o: OrganismeInfo, f: FormationInfo) {
 }
 
 function genListeMoyens(o: OrganismeInfo, f: FormationInfo) {
-  return buildDocument({ org: o, title: "LISTE DES MOYENS PÉDAGOGIQUES", subtitle: f.intitule, formation: f, showFormationInfo: true, table: {
+  return buildDocument({ org: o, title: "LISTE DES MOYENS PÉDAGOGIQUES", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, table: {
     headers: ["Moyen", "Quantité", "État", "Dernière vérification"],
     rows: [["PC portables", "12", "✅ Bon", "01/01/2024"], ["Vidéoprojecteur", "1", "✅ Bon", "01/01/2024"], ["Tableau blanc interactif", "1", "✅ Bon", "01/01/2024"], ["Connexion internet fibre", "1", "✅ Bon", "01/01/2024"], ["Supports de cours imprimés", `${f.nombreParticipants}`, "✅ Neuf", formatDate(f.dateDebut)], ["Plateforme Moodle", "1", "✅ Opérationnel", "01/01/2024"]]
   } });
@@ -2026,7 +2026,7 @@ function genInventaire(o: OrganismeInfo, f: FormationInfo) {
 }
 
 function genSupportsCours(o: OrganismeInfo, f: FormationInfo) {
-  return buildDocument({ org: o, title: "SUPPORTS DE COURS", subtitle: f.intitule, formation: f, showFormationInfo: true, sections: [
+  return buildDocument({ org: o, title: "SUPPORTS DE COURS", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, sections: [
     { heading: "Supports fournis", content: "<p>• Manuel de formation (version papier et numérique)<br>• Fiches mémo synthétiques<br>• Exercices pratiques et corrigés<br>• Études de cas réels<br>• Vidéos tutorielles (accès 6 mois post-formation)<br>• Ressources complémentaires en ligne</p>" },
     { heading: "Accès numérique", content: `<p>Plateforme : ${o.outilsUtilises}<br>Durée d'accès : 6 mois après la formation<br>Identifiants envoyés par email avant le début de la formation</p>`, variant: "green" },
   ] });
@@ -2055,14 +2055,14 @@ function genPlanningFormateurs(o: OrganismeInfo, formateurs: FormateurInfo[], fo
 }
 
 function genCoordination(o: OrganismeInfo, f: FormationInfo) {
-  return buildDocument({ org: o, title: "COORDINATION PÉDAGOGIQUE", subtitle: f.intitule, formation: f, showFormationInfo: true, sections: [
+  return buildDocument({ org: o, title: "COORDINATION PÉDAGOGIQUE", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, sections: [
     { heading: "Équipe pédagogique", content: `<p>Formateur principal : ${f.formateur}<br>Responsable pédagogique : ${o.responsablePedagogique}<br>Coordinateur : ${o.responsablePedagogique}</p>` },
     { heading: "Points de coordination", content: "<p>• Briefing pré-formation avec le formateur<br>• Point mi-parcours sur l'avancement<br>• Débriefing post-formation<br>• Analyse des évaluations et retours</p>" },
   ] });
 }
 
 function genLivretApprentissage(o: OrganismeInfo, f: FormationInfo) {
-  return buildDocument({ org: o, title: "LIVRET D'APPRENTISSAGE", subtitle: f.intitule, formation: f, showFormationInfo: true, sections: [
+  return buildDocument({ org: o, title: "LIVRET D'APPRENTISSAGE", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, sections: [
     { heading: "Objectifs de la période", content: `<p>${f.objectifs}</p>` },
     { heading: "Compétences à développer", content: "<p>☐ Compétence 1 : Acquise<br>☐ Compétence 2 : En cours<br>☐ Compétence 3 : À développer</p>" },
     { heading: "Observations du tuteur", content: "<p>Le stagiaire fait preuve de motivation et d'assiduité. Les compétences se développent de manière satisfaisante.</p>" },
@@ -2070,7 +2070,7 @@ function genLivretApprentissage(o: OrganismeInfo, f: FormationInfo) {
 }
 
 function genFicheSuiviTuteur(o: OrganismeInfo, f: FormationInfo) {
-  return buildDocument({ org: o, title: "FICHE DE SUIVI TUTEUR", subtitle: f.intitule, formation: f, showFormationInfo: true, table: {
+  return buildDocument({ org: o, title: "FICHE DE SUIVI TUTEUR", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, table: {
     headers: ["Date", "Activité réalisée", "Compétences travaillées", "Évaluation"],
     rows: [["Semaine 1", "Observation et découverte", "Compétences de base", "Satisfaisant"], ["Semaine 2", "Pratique guidée", "Compétences intermédiaires", "Bien"], ["Semaine 3", "Pratique autonome", "Compétences avancées", "Très bien"], ["Semaine 4", "Mise en situation réelle", "Compétences transversales", "Excellent"]]
   }, signatures: { type: "2", labels: ["Le Tuteur", "Le Stagiaire"], names: [f.formateur, ""] } });
@@ -2244,7 +2244,7 @@ function genSatisfactionRemplie(o: OrganismeInfo, f: FormationInfo, stagiaires: 
     const scores = [4, 5, 4, 5, 5, 4, 5, 5].map((v, i) => v - (si % 2 === 0 && i % 3 === 0 ? 0 : 0));
     extra += `<h3>${s.prenom} ${s.nom}</h3>` + tableHTML(["Critère", "Note /5"], questions.map((q, i) => [q, `${scores[i]}/5`]));
   });
-  return buildDocument({ org: o, title: "QUESTIONNAIRES DE SATISFACTION REMPLIS", subtitle: f.intitule, formation: f, showFormationInfo: true, extraHtml: extra,
+  return buildDocument({ org: o, title: "QUESTIONNAIRES DE SATISFACTION REMPLIS", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra,
     sections: [{ heading: "Satisfaction moyenne", content: "<p><strong>4.7 / 5 – 94% de satisfaction</strong></p>", variant: "green" }] });
 }
 
@@ -2468,7 +2468,7 @@ function genRapportAmelioration(o: OrganismeInfo) {
 
 function genContratApprentissage(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const s = stagiaires[0] || { prenom: "Martin", nom: "Dupont", entreprise: "Tech Solutions SAS" };
-  return buildDocument({ org: o, title: "CONTRAT D'APPRENTISSAGE", subtitle: f.intitule, formation: f, showFormationInfo: true, sections: [
+  return buildDocument({ org: o, title: "CONTRAT D'APPRENTISSAGE", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, sections: [
     { heading: "Parties", content: `<p><strong>Employeur :</strong> ${s.entreprise}<br><strong>Apprenti(e) :</strong> ${s.prenom} ${s.nom}<br><strong>CFA :</strong> ${o.nom}<br><strong>Formation :</strong> ${f.intitule}</p>` },
     { heading: "Durée du contrat", content: `<p>Du ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)}<br>Durée de la formation : ${f.duree}<br>Rythme d'alternance : 3 jours en entreprise / 2 jours en CFA</p>` },
     { heading: "Rémunération", content: "<p>Selon les dispositions légales et conventionnelles en vigueur, conformément à l'article D.6222-26 du Code du travail.</p>" },
@@ -2531,7 +2531,7 @@ function genConventionFormationApprentissage(o: OrganismeInfo, f: FormationInfo,
 
 function genLivretApprentissageCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const s = stagiaires[0] || { prenom: "Martin", nom: "Dupont", entreprise: "Tech Solutions SAS" };
-  return buildDocument({ org: o, title: "LIVRET D'APPRENTISSAGE", subtitle: `${s.prenom} ${s.nom} – ${f.intitule}`, formation: f, showFormationInfo: true, sections: [
+  return buildDocument({ org: o, title: "LIVRET D'APPRENTISSAGE", subtitle: `${s.prenom} ${s.nom} – ${f.intitule}`, formation: f, showFormationInfo: true, stagiaires, sections: [
     { heading: "Parcours d'alternance", content: `<p><strong>Apprenti(e) :</strong> ${s.prenom} ${s.nom}<br><strong>Entreprise :</strong> ${s.entreprise}<br><strong>Maître d'apprentissage :</strong> ${f.formateur}<br><strong>Tuteur CFA :</strong> ${o.responsablePedagogique}</p>` },
     { heading: "Compétences acquises en entreprise", content: "<p>☑ Compétence 1 : Application des savoirs théoriques – <strong>Acquis</strong><br>☑ Compétence 2 : Travail en équipe – <strong>Acquis</strong><br>☑ Compétence 3 : Autonomie professionnelle – <strong>En cours</strong><br>☑ Compétence 4 : Gestion de projet – <strong>En cours</strong></p>" },
     { heading: "Compétences acquises au CFA", content: "<p>☑ Module 1 : Fondamentaux – <strong>Validé (8/10)</strong><br>☑ Module 2 : Spécialisation – <strong>Validé (7.5/10)</strong><br>☑ Module 3 : Projet – <strong>En cours</strong></p>" },
@@ -3157,7 +3157,7 @@ function genProcedureFormationFC(o: OrganismeInfo) {
 
 function genDossierInscription(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const s = stagiaires[0] || { prenom: "___", nom: "___", email: "___", telephone: "___", entreprise: "___", poste: "___", dateNaissance: "" };
-  return buildDocument({ org: o, title: "DOSSIER D'INSCRIPTION", subtitle: f.intitule, formation: f, showFormationInfo: true, sections: [
+  return buildDocument({ org: o, title: "DOSSIER D'INSCRIPTION", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, sections: [
     { heading: "Informations du candidat", content: `<p><strong>Nom :</strong> ${s.nom}<br><strong>Prénom :</strong> ${s.prenom}<br><strong>Date de naissance :</strong> ${formatDate(s.dateNaissance)}<br><strong>Email :</strong> ${s.email}<br><strong>Téléphone :</strong> ${s.telephone}<br><strong>Entreprise :</strong> ${s.entreprise}<br><strong>Poste :</strong> ${s.poste}</p>` },
     { heading: "Pièces à fournir", content: "<p>☐ Pièce d'identité en cours de validité<br>☐ CV actualisé<br>☐ Lettre de motivation ou projet professionnel<br>☐ Justificatif de domicile de moins de 3 mois<br>☐ Attestation employeur ou convention de stage si applicable<br>☐ Accord de prise en charge OPCO (si financement OPCO)</p>" },
     { heading: "Déclaration sur l'honneur", content: `<p>Je soussigné(e) ${s.prenom} ${s.nom}, certifie l'exactitude des informations fournies dans ce dossier et m'engage à respecter le règlement intérieur de ${o.nom}.</p>` },
@@ -3312,7 +3312,7 @@ function genContratSousTraitance(o: OrganismeInfo) {
 
 function genFicheAutoevaluation(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const s = stagiaires[0] || { prenom: "___", nom: "___" };
-  return buildDocument({ org: o, title: "FICHE D'AUTOÉVALUATION", subtitle: `${s.prenom} ${s.nom} – ${f.intitule}`, formation: f, showFormationInfo: true, table: {
+  return buildDocument({ org: o, title: "FICHE D'AUTOÉVALUATION", subtitle: `${s.prenom} ${s.nom} – ${f.intitule}`, formation: f, showFormationInfo: true, stagiaires, table: {
     headers: ["Compétence / Objectif", "Avant formation (1-5)", "Après formation (1-5)", "Progression"],
     rows: [
       ["Maîtrise des concepts fondamentaux", "2", "4", "+2 ↑"],
@@ -3815,7 +3815,7 @@ function genSuiviInscriptions(o: OrganismeInfo, f: FormationInfo, stagiaires: St
     ? stagiaires.map((s, i) => [String(i + 1), `${s.prenom} ${s.nom}`, s.entreprise || "—", formatDate(f.dateDebut), "✅ Validée", "☐ Oui", formatDate(f.dateDebut)])
     : [["1", "NOM Prénom", "Entreprise", "___/___/___", "☐ En attente", "☐ Non", "___/___/___"],
        ["2", "NOM Prénom", "Entreprise", "___/___/___", "☐ En attente", "☐ Non", "___/___/___"]];
-  return buildDocument({ org: o, title: "SUIVI DES INSCRIPTIONS EN FORMATION", subtitle: f.intitule, formation: f, showFormationInfo: true,
+  return buildDocument({ org: o, title: "SUIVI DES INSCRIPTIONS EN FORMATION", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires,
     table: { headers: ["N°", "Stagiaire", "Entreprise", "Date inscription", "Statut", "Dossier complet", "Date entrée"], rows },
     sections: [{ heading: "Légende statuts", content: "<p>✅ Validée | ⏳ En attente de pièces | ❌ Annulée | 📋 Liste d'attente</p>", variant: "green" }]
   });
@@ -3851,7 +3851,7 @@ function genSuiviAbsences(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
   const rows = stagiaires.length > 0
     ? stagiaires.map(s => [s.prenom + " " + s.nom, s.entreprise || "—", "0", "0", "0h", "100%", "RAS"])
     : [["NOM Prénom", "Entreprise", "0", "0", "0h", "100%", "—"]];
-  return buildDocument({ org: o, title: "SUIVI DES ABSENCES – CENTRALISATION", subtitle: f.intitule, formation: f, showFormationInfo: true,
+  return buildDocument({ org: o, title: "SUIVI DES ABSENCES – CENTRALISATION", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires,
     table: { headers: ["Stagiaire", "Entreprise", "Absences justifiées", "Absences injustifiées", "Total heures absentes", "Taux présence", "Observations"], rows },
     sections: [
       { heading: "Procédure en cas d'absence", content: "<p>• Toute absence doit être signalée dans les 24h<br>• Un justificatif est exigé sous 48h<br>• Au-delà de 3 absences injustifiées : convocation par le responsable pédagogique<br>• L'employeur et/ou le financeur sont informés de toute absence prolongée</p>" },
@@ -3970,7 +3970,7 @@ function genEmargementCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
     }
   });
 
-  return buildDocument({ org: o, title: "FEUILLE D'ÉMARGEMENT – APPRENTISSAGE", subtitle: f.intitule, formation: f, showFormationInfo: true, extraHtml: extra });
+  return buildDocument({ org: o, title: "FEUILLE D'ÉMARGEMENT – APPRENTISSAGE", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra });
 }
 
 function genSynopsisCFA(o: OrganismeInfo, f: FormationInfo) {
@@ -5386,7 +5386,7 @@ function generateContenus(part: string): string {
 
 function genContratFormationPro(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const s = stagiaires[0] || { prenom: "___", nom: "___", email: "", telephone: "" };
-  return buildDocument({ org: o, title: "CONTRAT DE FORMATION PROFESSIONNELLE", subtitle: "Article L.6353-3 du Code du travail", formation: f, showFormationInfo: true, sections: [
+  return buildDocument({ org: o, title: "CONTRAT DE FORMATION PROFESSIONNELLE", subtitle: "Article L.6353-3 du Code du travail", formation: f, showFormationInfo: true, stagiaires, sections: [
     { heading: "Entre les parties", content: `<p><strong>L'organisme :</strong> ${o.nom}, ${o.adresse}, ${o.codePostal} ${o.ville}<br>SIRET : ${o.siret} – NDA : ${o.nda}<br>Représenté par : ${o.dirigeant}</p><p><strong>Le stagiaire :</strong> ${s.prenom} ${s.nom}<br>Email : ${s.email}</p>` },
     { heading: "Article 1 – Objet", content: `<p>Réalisation de l'action de formation « ${f.intitule} ».</p>` },
     { heading: "Article 2 – Caractéristiques", content: `<p><strong>Durée :</strong> ${f.duree}<br><strong>Dates :</strong> Du ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)}<br><strong>Modalité :</strong> ${f.modalites}<br><strong>Lieu :</strong> ${f.lieu}</p>` },
@@ -5410,7 +5410,7 @@ function genGroupesNiveaux(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
     const groupe = i % 3 === 0 ? "Groupe A" : i % 3 === 1 ? "Groupe B" : "Groupe C";
     return [s.prenom + " " + s.nom, s.entreprise, niveau, groupe];
   });
-  return buildDocument({ org: o, title: "GROUPES DE NIVEAUX", subtitle: f.intitule, formation: f, showFormationInfo: true, table: {
+  return buildDocument({ org: o, title: "GROUPES DE NIVEAUX", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, table: {
     headers: ["Stagiaire", "Entreprise", "Niveau initial", "Groupe"], rows
   }, sections: [
     { heading: "Critères", content: "<p>• Groupe A (Débutant) : score < 5/10<br>• Groupe B (Intermédiaire) : score 5-7/10<br>• Groupe C (Avancé) : score > 7/10</p>", variant: "green" },
@@ -5436,7 +5436,7 @@ function genGrilleAcquisitionCompetencesSF(o: OrganismeInfo, f: FormationInfo, s
     });
     extra += tableHTML(["Compétence", "Entrée", "Sortie", "Statut", "Progression"], rows);
   });
-  return buildDocument({ org: o, title: "GRILLE D'ACQUISITION DES COMPÉTENCES", subtitle: f.intitule, formation: f, showFormationInfo: true, extraHtml: extra,
+  return buildDocument({ org: o, title: "GRILLE D'ACQUISITION DES COMPÉTENCES", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra,
     signatures: { type: "2", labels: ["Le Formateur", "Le Resp. Pédagogique"], names: [f.formateur, o.responsablePedagogique] } });
 }
 
@@ -5497,7 +5497,7 @@ function genSupportCoursRef(o: OrganismeInfo, f: FormationInfo) {
     title: "SUPPORT DE COURS", 
     subtitle: f.intitule, 
     formation: f, 
-    showFormationInfo: true, 
+    showFormationInfo: true, stagiaires, 
     sections: [
       { heading: "Informations", content: `<p><strong>Type :</strong> Support PDF fourni à chaque stagiaire<br><strong>Mise à jour :</strong> ${o.dateMaj || new Date().toLocaleDateString('fr-FR')}<br><strong>Version :</strong> V${o.version || '1'}</p>` },
     ],
@@ -5517,7 +5517,7 @@ function genRessourcesPedagogiques(o: OrganismeInfo, f: FormationInfo) {
     </div>`;
   });
 
-  return buildDocument({ org: o, title: "RESSOURCES PÉDAGOGIQUES", subtitle: f.intitule, formation: f, showFormationInfo: true, sections: [
+  return buildDocument({ org: o, title: "RESSOURCES PÉDAGOGIQUES", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, sections: [
     { heading: "Supports de formation", content: `<p>• Support de cours PDF complet remis à chaque stagiaire<br>• Diaporama de présentation (PowerPoint)<br>• Fiches mémo et synthèses par chapitre<br>• Exercices pratiques et corrigés</p>` },
     { heading: "Outils numériques", content: `<p>• ${o.outilsUtilises || 'Plateforme e-learning, outils collaboratifs'}<br>• Plateforme e-learning (accès 6 mois après la formation)<br>• Outils de visioconférence pour les sessions distancielles<br>• QCM en ligne pour l'auto-évaluation</p>` },
     { heading: "Ressources vidéo complémentaires", content: `<p>Les vidéos ci-dessous sont mises à disposition des stagiaires pour approfondir les notions abordées en formation :</p>${videosHtml}` },
@@ -5734,7 +5734,7 @@ function genTableauSuiviParcours(o: OrganismeInfo, f: FormationInfo, stagiaires:
     const niveau = i % 3 === 0 ? "Débutant" : i % 3 === 1 ? "Intermédiaire" : "Avancé";
     return [s.prenom + " " + s.nom, s.entreprise, niveau, i % 3 === 0 ? "Exercices simplifiés" : "Parcours standard", "Aucune", "En cours"];
   });
-  return buildDocument({ org: o, title: "TABLEAU DE SUIVI DU PARCOURS BÉNÉFICIAIRES ET ADAPTATIONS", subtitle: f.intitule, formation: f, showFormationInfo: true, table: {
+  return buildDocument({ org: o, title: "TABLEAU DE SUIVI DU PARCOURS BÉNÉFICIAIRES ET ADAPTATIONS", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, table: {
     headers: ["Stagiaire", "Entreprise", "Niveau", "Adaptation", "Difficultés", "Statut"], rows
   }, signatures: { type: "2", labels: ["Le Formateur", "Le Resp. Pédagogique"], names: [f.formateur, o.responsablePedagogique] } });
 }
@@ -5952,7 +5952,7 @@ function genAppreciationsBeneficiaires(o: OrganismeInfo, f: FormationInfo, stagi
     const comments = ["La formation s'est globalement bien déroulée. Les explications étaient claires et progressives. Le formateur était disponible et prenait le temps de répondre aux questions.", "Formation enrichissante. Les exercices pratiques ont été utiles pour mettre en application les notions vues. Je me sens plus à l'aise pour utiliser les outils dans un cadre professionnel."];
     extra += `<p><strong>Commentaire :</strong> ${comments[i % comments.length]}</p><hr/>`;
   });
-  return buildDocument({ org: o, title: "QUESTIONNAIRE DE SATISFACTION DU BÉNÉFICIAIRE", subtitle: f.intitule, formation: f, showFormationInfo: true, extraHtml: extra });
+  return buildDocument({ org: o, title: "QUESTIONNAIRE DE SATISFACTION DU BÉNÉFICIAIRE", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra });
 }
 
 function genAppreciationsEntreprises(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
@@ -5988,7 +5988,7 @@ function genAppreciationsEntreprises(o: OrganismeInfo, f: FormationInfo, stagiai
       extra += `<p><strong>Remarques ou suggestions :</strong> ………………………………………………………………</p>`;
     }
   });
-  return buildDocument({ org: o, title: "QUESTIONNAIRE DE SATISFACTION CLIENT COMMANDITAIRE", subtitle: f.intitule, formation: f, showFormationInfo: true, extraHtml: extra });
+  return buildDocument({ org: o, title: "QUESTIONNAIRE DE SATISFACTION CLIENT COMMANDITAIRE", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra });
 }
 
 function genAppreciationsFinanceurs(o: OrganismeInfo, f: FormationInfo) {
@@ -6362,7 +6362,7 @@ function genAppreciationsBeneficiairesStagiaire(o: OrganismeInfo, f: FormationIn
   ];
   extra += `<p><strong>Commentaire :</strong> ${commentsPool[si % commentsPool.length]}</p>`;
 
-  return buildDocument({ org: o, title: "QUESTIONNAIRE DE SATISFACTION DU BÉNÉFICIAIRE", subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, formation: f, showFormationInfo: true, extraHtml: extra });
+  return buildDocument({ org: o, title: "QUESTIONNAIRE DE SATISFACTION DU BÉNÉFICIAIRE", subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra });
 }
 
 // =============================================
@@ -6444,7 +6444,7 @@ function genTestCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: Sta
     extra += `<h3>Appréciation globale</h3><p>${appreciation} — Score QCM : ${score ? Math.round(score.score / score.total * 100) : 0}%</p>`;
   }
 
-  return buildDocument({ org: o, title: titre, subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, formation: f, showFormationInfo: true, extraHtml: extra });
+  return buildDocument({ org: o, title: titre, subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra });
 }
 
 /**
@@ -6715,7 +6715,7 @@ function genExercicesCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires
     <p><strong>Observations du formateur :</strong></p>
     ${observationBlock}`;
 
-  return buildDocument({ org: o, title: `EXERCICE PRATIQUE – Sem. CFA ${weekNum} Ex. ${exInWeek}`, subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, formation: f, showFormationInfo: true, extraHtml: extra });
+  return buildDocument({ org: o, title: `EXERCICE PRATIQUE – Sem. CFA ${weekNum} Ex. ${exInWeek}`, subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra });
 }
 
 function genExamenBlancCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
@@ -6822,7 +6822,7 @@ function genExamenBlancCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiair
     extra += `<p><strong>Note :</strong> _____ / 20</p>`;
   }
 
-  return buildDocument({ org: o, title: "EXAMEN BLANC", subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, formation: f, showFormationInfo: true, extraHtml: extra });
+  return buildDocument({ org: o, title: "EXAMEN BLANC", subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra });
 }
 
 function genGrilleAcquisitionCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
@@ -6859,7 +6859,7 @@ function genGrilleAcquisitionCFAStagiaire(o: OrganismeInfo, f: FormationInfo, st
   extra += `</table>`;
   extra += `<p><strong>Appréciation globale :</strong></p><div style="border:1px solid #ccc;min-height:60px;padding:8px">&#160;</div>`;
 
-  return buildDocument({ org: o, title: "GRILLE D'ACQUISITION DES COMPÉTENCES", subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, formation: f, showFormationInfo: true, extraHtml: extra });
+  return buildDocument({ org: o, title: "GRILLE D'ACQUISITION DES COMPÉTENCES", subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra });
 }
 
 function genAttestationReussiteCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
@@ -6882,5 +6882,5 @@ function genAttestationReussiteCFAStagiaire(o: OrganismeInfo, f: FormationInfo, 
     <p><strong>Avis :</strong> &#9744; FAVORABLE &#9744; RÉSERVÉ</p>
     <p>Fait à ${o.ville || '__________'}, le ___/___/______</p>`;
 
-  return buildDocument({ org: o, title: "ATTESTATION DE RÉUSSITE", subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, formation: f, showFormationInfo: true, extraHtml: extra });
+  return buildDocument({ org: o, title: "ATTESTATION DE RÉUSSITE", subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra });
 }

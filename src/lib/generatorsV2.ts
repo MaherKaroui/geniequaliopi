@@ -395,7 +395,7 @@ export function genEmargementJour_V2(o: OrganismeInfo, f: FormationInfo, stagiai
     extra += tableHTML(["Stagiaire", "Date", "Heure connexion", "Heure déconnexion", "Durée"], rows.slice(0, 60));
   }
 
-  return buildDocument({ org: o, title: pres ? "FEUILLE D'ÉMARGEMENT" : "RAPPORT DE CONNEXION", subtitle: f.intitule, formation: f, showFormationInfo: true, extraHtml: extra });
+  return buildDocument({ org: o, title: pres ? "FEUILLE D'ÉMARGEMENT" : "RAPPORT DE CONNEXION", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra });
   // NO signature block on the document itself - signatures are IN the table
 }
 
@@ -445,7 +445,7 @@ export function genTableauSuiviParcours_V2(o: OrganismeInfo, f: FormationInfo, s
     ];
   });
 
-  return buildDocument({ org: o, title: "TABLEAU DE SUIVI DU PARCOURS BÉNÉFICIAIRES ET ADAPTATIONS", subtitle: f.intitule, formation: f, showFormationInfo: true,
+  return buildDocument({ org: o, title: "TABLEAU DE SUIVI DU PARCOURS BÉNÉFICIAIRES ET ADAPTATIONS", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires,
     table: { headers, rows } });
   // NO signatures
 }
@@ -999,7 +999,7 @@ export function genExercicesPratiques_V2(o: OrganismeInfo, f: FormationInfo, sta
     extra += tableHTML(["Stagiaire", "Note", "Statut", "Appréciation du formateur"], rows);
   });
 
-  return buildDocument({ org: o, title: "EXERCICES PRATIQUES – CORRIGÉS ET RÉSULTATS", subtitle: f.intitule, formation: f, showFormationInfo: true, extraHtml: extra });
+  return buildDocument({ org: o, title: "EXERCICES PRATIQUES – CORRIGÉS ET RÉSULTATS", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra });
   // NO signatures
 }
 
@@ -1047,7 +1047,7 @@ export function genQCMFinal_V2(o: OrganismeInfo, f: FormationInfo, stagiaires: S
     extra += `<p><em>Appréciation : ${remarques[seed]}</em></p>`;
   });
 
-  return buildDocument({ org: o, title: "ÉVALUATION FINALE – RÉSULTATS", subtitle: f.intitule, formation: f, showFormationInfo: true, extraHtml: extra });
+  return buildDocument({ org: o, title: "ÉVALUATION FINALE – RÉSULTATS", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra });
   // NO signatures
 }
 
@@ -1069,7 +1069,7 @@ export function genGrilleAcquisition_V2(o: OrganismeInfo, f: FormationInfo, stag
     extra += `<p>${formatDate(getStagiaireDateFin(s, f))}, par le Formateur : ${f.formateur}</p>`;
     extra += `<div class="section"><p>*NON ACQUIS : 1/10 - 4/10 | *EN COURS D'ACQUISITION : 5/10 - 7/10 | *ACQUIS : 8/10 - 10/10</p></div>`;
   });
-  return buildDocument({ org: o, title: "GRILLE D'ACQUISITION DES COMPÉTENCES", subtitle: f.intitule, formation: f, showFormationInfo: true, extraHtml: extra });
+  return buildDocument({ org: o, title: "GRILLE D'ACQUISITION DES COMPÉTENCES", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra });
   // NO signatures
 }
 

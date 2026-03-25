@@ -9,7 +9,7 @@ import { getEvalContent, generateStagiaireAnswers, computeQCMScore } from "./eva
 export function genDevis(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const nbParticipants = parseInt(f.nombreParticipants || "1") || stagiaires.length || 1;
   const tarifUnit = f.tarif || "1 500 € HT";
-  return buildDocument({ org: o, title: "DEVIS DE FORMATION", subtitle: `N° DEV-${new Date().getFullYear()}-${String(Math.floor(Math.random()*999)+1).padStart(3,'0')}`, formation: f, showFormationInfo: true, sections: [
+  return buildDocument({ org: o, title: "DEVIS DE FORMATION", subtitle: `N° DEV-${new Date().getFullYear()}-${String(Math.floor(Math.random()*999)+1).padStart(3,'0')}`, formation: f, showFormationInfo: true, stagiaires, sections: [
     { heading: "Client", content: `<p><strong>Entreprise :</strong> ${stagiaires[0]?.entreprise || "_______________"}<br><strong>Contact :</strong> ${stagiaires[0]?.prenom || ""} ${stagiaires[0]?.nom || ""}<br><strong>Email :</strong> ${stagiaires[0]?.email || ""}</p>` },
     { heading: "Prestation", content: `<p><strong>Formation :</strong> ${f.intitule}<br><strong>Durée :</strong> ${f.duree}<br><strong>Modalité :</strong> ${f.modalites}<br><strong>Lieu :</strong> ${f.lieu}<br><strong>Nombre de participants :</strong> ${nbParticipants}</p>` },
   ], table: {
@@ -27,7 +27,7 @@ export function genDevis(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiai
 
 export function genContratFormationParticulier(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const s = stagiaires[0] || { prenom: "___", nom: "___", email: "", telephone: "" };
-  return buildDocument({ org: o, title: "CONTRAT DE FORMATION PROFESSIONNELLE", subtitle: "Article L.6353-3 du Code du travail – Particulier", formation: f, showFormationInfo: true, sections: [
+  return buildDocument({ org: o, title: "CONTRAT DE FORMATION PROFESSIONNELLE", subtitle: "Article L.6353-3 du Code du travail – Particulier", formation: f, showFormationInfo: true, stagiaires, sections: [
     { heading: "Entre les parties", content: `<p><strong>L'organisme de formation :</strong> ${o.nom}, ${o.adresse}, ${o.codePostal} ${o.ville}<br>SIRET : ${o.siret} – NDA : ${o.nda}<br>Représenté par : ${o.dirigeant}</p><p><strong>Et le stagiaire :</strong> ${s.prenom} ${s.nom}<br>Email : ${s.email}<br>Téléphone : ${s.telephone}</p>` },
     { heading: "Article 1 – Objet du contrat", content: `<p>Le présent contrat a pour objet la réalisation de l'action de formation « ${f.intitule} » selon le programme annexé.</p>` },
     { heading: "Article 2 – Nature et caractéristiques", content: `<p><strong>Intitulé :</strong> ${f.intitule}<br><strong>Objectifs :</strong> ${f.objectifs}<br><strong>Durée :</strong> ${f.duree}<br><strong>Dates :</strong> Du ${formatDate(getStagiaireDateDebut(s as StagiaireInfo, f))} au ${formatDate(getStagiaireDateFin(s as StagiaireInfo, f))}<br><strong>Modalité :</strong> ${f.modalites}<br><strong>Lieu :</strong> ${f.lieu}</p>` },
@@ -71,7 +71,7 @@ export function genGrilleAnalyseNiveauInitial(o: OrganismeInfo, f: FormationInfo
     const niveau = avg >= 8 ? "Avancé" : avg >= 6 ? "Intermédiaire" : "Débutant";
     return [s.prenom + " " + s.nom, s.entreprise, s.poste, `${avg}/10`, niveau, evalData.appreciations[i]?.split('.')[0] + '.' || "Niveau correct."];
   });
-  return buildDocument({ org: o, title: "GRILLE D'ANALYSE DU NIVEAU INITIAL", subtitle: f.intitule, formation: f, showFormationInfo: true, table: {
+  return buildDocument({ org: o, title: "GRILLE D'ANALYSE DU NIVEAU INITIAL", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, table: {
     headers: ["Stagiaire", "Entreprise", "Poste", "Score", "Niveau", "Observations"], rows
   }, sections: [
     { heading: "Synthèse", content: `<p>Sur ${rows.length} stagiaires évalués :<br>• Avancés : ${rows.filter(r => r[4] === "Avancé").length}<br>• Intermédiaires : ${rows.filter(r => r[4] === "Intermédiaire").length}<br>• Débutants : ${rows.filter(r => r[4] === "Débutant").length}</p>`, variant: "green" },
@@ -283,7 +283,7 @@ export function genGrilleEvaluationFormative(o: OrganismeInfo, f: FormationInfo,
       return score >= 8 ? "✅ Acquis" : score >= 6 ? "🔄 En cours" : "❌ Non acquis";
     }), evalData.appreciations[i]?.split('.')[0] + '.' || ""];
   });
-  return buildDocument({ org: o, title: "GRILLE D'ÉVALUATION FORMATIVE", subtitle: `${f.intitule} – En cours de formation`, formation: f, showFormationInfo: true, table: {
+  return buildDocument({ org: o, title: "GRILLE D'ÉVALUATION FORMATIVE", subtitle: `${f.intitule} – En cours de formation`, formation: f, showFormationInfo: true, stagiaires, table: {
     headers: ["Stagiaire", ...evalData.competences.slice(0, 4).map((c, i) => `C${i+1}`), "Observations"], rows
   }, sections: [
     { heading: "Légende", content: evalData.competences.slice(0, 4).map((c, i) => `<p><strong>C${i+1} :</strong> ${c}</p>`).join("") + "<p>✅ Acquis | 🔄 En cours | ❌ Non acquis</p>" },
@@ -298,7 +298,7 @@ export function genGrilleEvaluationSommative(o: OrganismeInfo, f: FormationInfo,
     const avg = Math.round(finalSc.reduce((a, b) => a + b, 0) / finalSc.length * 10) / 10;
     return [s.prenom + " " + s.nom, ...evalData.competences.map((_, ci) => `${finalSc[ci % finalSc.length]}/10`), `${avg}/10`, avg >= 7 ? "✅ Validé" : "⚠️ À renforcer"];
   });
-  return buildDocument({ org: o, title: "GRILLE D'ÉVALUATION SOMMATIVE", subtitle: `${f.intitule} – Fin de formation`, formation: f, showFormationInfo: true, table: {
+  return buildDocument({ org: o, title: "GRILLE D'ÉVALUATION SOMMATIVE", subtitle: `${f.intitule} – Fin de formation`, formation: f, showFormationInfo: true, stagiaires, table: {
     headers: ["Stagiaire", ...evalData.competences.map((_, i) => `C${i+1}`), "Moyenne", "Résultat"], rows
   }, sections: [
     { heading: "Légende", content: evalData.competences.map((c, i) => `<p><strong>C${i+1} :</strong> ${c}</p>`).join("") },
@@ -330,7 +330,7 @@ export function genTestFinal(o: OrganismeInfo, f: FormationInfo, stagiaires: Sta
   });
   extra += tableHTML(["Stagiaire", "Score", "%", "Résultat"], summaryRows);
   
-  return buildDocument({ org: o, title: "TEST FINAL DE VALIDATION", subtitle: f.intitule, formation: f, showFormationInfo: true, extraHtml: extra,
+  return buildDocument({ org: o, title: "TEST FINAL DE VALIDATION", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra,
     signatures: { type: "2", labels: ["Le Formateur", "Le Resp. Pédagogique"], names: [f.formateur, o.responsablePedagogique] } });
 }
 
@@ -345,7 +345,7 @@ export function genGrilleAcquisitionCompetences(o: OrganismeInfo, f: FormationIn
     });
     extra += tableHTML(["Compétence", "Entrée", "Sortie", "Statut", "Progression"], rows);
   });
-  return buildDocument({ org: o, title: "GRILLE D'ACQUISITION DES COMPÉTENCES", subtitle: f.intitule, formation: f, showFormationInfo: true, extraHtml: extra,
+  return buildDocument({ org: o, title: "GRILLE D'ACQUISITION DES COMPÉTENCES", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra,
     signatures: { type: "2", labels: ["Le Formateur", "Le Resp. Pédagogique"], names: [f.formateur, o.responsablePedagogique] } });
 }
 
@@ -362,13 +362,13 @@ export function genBilanPedagogiqueIndividuel(o: OrganismeInfo, f: FormationInfo
     extra += `<p><strong>Axes d'amélioration :</strong> ${avg >= 8 ? "Approfondir les cas complexes. Partager les acquis avec les collègues." : "Consolider les acquis par la pratique. Revoir les points théoriques."}</p>`;
     extra += `<p><strong>Recommandations :</strong> ${avg >= 8 ? "Formation complémentaire de niveau expert recommandée." : "Mise en pratique régulière et suivi à 3 mois."}</p>`;
   });
-  return buildDocument({ org: o, title: "BILANS PÉDAGOGIQUES INDIVIDUELS", subtitle: f.intitule, formation: f, showFormationInfo: true, extraHtml: extra,
+  return buildDocument({ org: o, title: "BILANS PÉDAGOGIQUES INDIVIDUELS", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra,
     signatures: { type: "2", labels: ["Le Formateur", "Le Resp. Pédagogique"], names: [f.formateur, o.responsablePedagogique] } });
 }
 
 export function genRapportFinFormation(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const nbStag = Math.min(stagiaires.length, 10);
-  return buildDocument({ org: o, title: "RAPPORT DE FIN DE FORMATION", subtitle: f.intitule, formation: f, showFormationInfo: true, sections: [
+  return buildDocument({ org: o, title: "RAPPORT DE FIN DE FORMATION", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, sections: [
     { heading: "Synthèse de la formation", content: `<p>La formation « ${f.intitule} » d'une durée de ${f.duree} s'est déroulée en modalité ${f.modalites} à ${f.lieu}.<br>Nombre de stagiaires : ${nbStag}<br>Formateur : ${f.formateur}</p>` },
     { heading: "Déroulement", content: "<p>La formation s'est déroulée conformément au programme prévu. L'ensemble des modules a été couvert. Les stagiaires ont été actifs et participatifs tout au long de la formation.</p>" },
     { heading: "Résultats pédagogiques", content: `<p>• Taux de réussite : 90%<br>• Note moyenne du groupe : 8.2/10<br>• Taux de présence : 98%<br>• Satisfaction globale : 4.7/5 (94%)</p>`, variant: "green" },
@@ -403,7 +403,7 @@ export function genSatisfactionFroid(o: OrganismeInfo, f: FormationInfo, stagiai
     extra += tableHTML(["Critère", "Note /5"], questions.map((q, i) => [q, `${scores[i]}/5`]));
     extra += `<p><em>Commentaire : ${commentaires[si % commentaires.length]}</em></p>`;
   });
-  return buildDocument({ org: o, title: "QUESTIONNAIRE DE SATISFACTION À FROID", subtitle: `${f.intitule} – 3 mois après`, formation: f, showFormationInfo: true, extraHtml: extra,
+  return buildDocument({ org: o, title: "QUESTIONNAIRE DE SATISFACTION À FROID", subtitle: `${f.intitule} – 3 mois après`, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra,
     sections: [{ heading: "Synthèse", content: "<p><strong>Satisfaction à froid : 4.3/5 (86%)</strong><br>Impact sur la pratique professionnelle confirmé par 90% des répondants.</p>", variant: "green" }] });
 }
 
@@ -422,7 +422,7 @@ export function genSatisfactionEntreprise(o: OrganismeInfo, f: FormationInfo, st
       ["Satisfaction globale", `${scores[5]}/5`],
     ]);
   });
-  return buildDocument({ org: o, title: "QUESTIONNAIRE DE SATISFACTION ENTREPRISE", subtitle: f.intitule, formation: f, showFormationInfo: true, extraHtml: extra,
+  return buildDocument({ org: o, title: "QUESTIONNAIRE DE SATISFACTION ENTREPRISE", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra,
     sections: [{ heading: "Moyenne", content: "<p><strong>Satisfaction entreprises : 4.5/5</strong><br>100% des entreprises renouvellent leur confiance.</p>", variant: "green" }] });
 }
 
