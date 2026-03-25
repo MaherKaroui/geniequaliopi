@@ -8024,10 +8024,11 @@ function genAttestationReussiteCFAStagiaire(o: OrganismeInfo, f: FormationInfo, 
   return buildDocument({ org: o, title: "ATTESTATION DE RÉUSSITE", subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra });
 }
 
-function genBilanFinFormationFormateur(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
+function genBilanFinFormationFormateur(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], formateurNomParam?: string) {
   const { totalHours, days: nbJours } = parseDuree(f.duree);
-  const formateurs = [...new Set(stagiaires.map(s => s.formateur).filter(Boolean))];
-  const formateurNom = formateurs[0] || f.formateur || "Le formateur";
+  const formateurNom = formateurNomParam || f.formateur || "Le formateur";
+  const stagiairesFormateur = stagiaires.filter(s => s.formateur === formateurNom);
+  const nbStagiairesFormateur = stagiairesFormateur.length || stagiaires.length;
 
   // Find the matching stagiaire for signature
   const matchingStagiaire = stagiaires.find(s => s.formateur === formateurNom);
