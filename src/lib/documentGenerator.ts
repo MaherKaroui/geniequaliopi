@@ -2052,7 +2052,7 @@ function genCRReunion(o: OrganismeInfo, mois: string) {
 }
 
 function genPlanningFormateurs(o: OrganismeInfo, formateurs: FormateurInfo[], formations: FormationInfo[]) {
-  const rows = formations.map(f => [f.intitule, f.formateur, `${formatDate(f.dateDebut)} – ${formatDate(f.dateFin)}`, f.duree, f.modalites]);
+  const rows = formations.map(f => [f.intitule, f.formateur, "Sessions individuelles", "À définir selon le groupe", f.modalites]);
   return buildDocument({ org: o, title: "PLANNING DES FORMATEURS 2024", table: { headers: ["Formation", "Formateur", "Dates", "Durée", "Modalité"], rows } });
 }
 
