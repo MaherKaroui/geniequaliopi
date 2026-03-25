@@ -1326,43 +1326,67 @@ function genEmargementStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: 
   return buildDocument({ org: o, title: "FEUILLE D'ÉMARGEMENT", subtitle: `${f.intitule} – ${stagName}`, extraHtml: extra });
 }
 
+function getStagiaireDays(s: StagiaireInfo, f: FormationInfo): string[] {
+  const debut = getStagiaireDateDebut(s, f);
+  const fin = getStagiaireDateFin(s, f);
+  if (!debut || !fin) return getFormationDays(f);
+  const start = new Date(debut);
+  const end = new Date(fin);
+  const days: string[] = [];
+  const current = new Date(start);
+  while (current <= end) {
+    if (current.getDay() !== 0 && current.getDay() !== 6) {
+      days.push(current.toLocaleDateString("fr-FR", { weekday: "long", year: "numeric", month: "long", day: "numeric" }));
+    }
+    current.setDate(current.getDate() + 1);
+  }
+  return days.length > 0 ? days : getFormationDays(f);
+}
+
 function genRapportConnexion(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
-  const days = getFormationDays(f);
   const ct = getConnectionTimes(f);
-  const rows: string[][] = [];
-  stagiaires.slice(0, 10).forEach(s => {
-    days.slice(0, 5).forEach((day, di) => {
-      rows.push([s.prenom + " " + s.nom, day, ct[di * 2 % ct.length].heureConnexion, ct[di * 2 % ct.length].heureDeconnexion, ct[di * 2 % ct.length].duree]);
-      rows.push([s.prenom + " " + s.nom, '', ct[(di * 2 + 1) % ct.length].heureConnexion, ct[(di * 2 + 1) % ct.length].heureDeconnexion, ct[(di * 2 + 1) % ct.length].duree]);
+  let extra = '';
+  stagiaires.slice(0, 10).forEach((s, si) => {
+    const days = getStagiaireDays(s, f);
+    if (si > 0) extra += '<div class="page-break"></div>';
+    extra += `<h3>📋 ${s.prenom} ${s.nom}</h3>`;
+    extra += `<p><strong>Période :</strong> ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}</p>`;
+    const rows: string[][] = [];
+    days.forEach((day, di) => {
+      rows.push([day, ct[di * 2 % ct.length].heureConnexion, ct[di * 2 % ct.length].heureDeconnexion, ct[di * 2 % ct.length].duree]);
+      rows.push(['', ct[(di * 2 + 1) % ct.length].heureConnexion, ct[(di * 2 + 1) % ct.length].heureDeconnexion, ct[(di * 2 + 1) % ct.length].duree]);
     });
+    extra += tableHTML(["Date", "Heure connexion", "Heure déconnexion", "Durée"], rows);
   });
-  return buildDocument({ org: o, title: "RAPPORT DE CONNEXION LMS", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, table: {
-    headers: ["Stagiaire", "Date", "Heure connexion", "Heure déconnexion", "Durée"], rows: rows.slice(0, 60)
-  } });
+  return buildDocument({ org: o, title: "RAPPORT DE CONNEXION LMS", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra });
 }
 
 function genTempsConnexion(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const rows = stagiaires.slice(0, 10).map((s) => {
     const stagDuree = getStagiaireDuree(s, f);
-    const totalH = parseInt(stagDuree) || (getFormationDays(f).length * 7);
-    return [s.prenom + " " + s.nom, `${totalH}h`, stagDuree, `100%`, "✅ Validé"];
+    const totalH = parseInt(stagDuree) || (getStagiaireDays(s, f).length * 7);
+    const dateDebut = formatDate(getStagiaireDateDebut(s, f));
+    const dateFin = formatDate(getStagiaireDateFin(s, f));
+    return [s.prenom + " " + s.nom, `${dateDebut} - ${dateFin}`, `${totalH}h`, stagDuree, `100%`, "✅ Validé"];
   });
   return buildDocument({ org: o, title: "TEMPS DE CONNEXION PAR STAGIAIRE", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, table: {
-    headers: ["Stagiaire", "Temps total", "Durée formation", "Taux présence", "Statut"], rows
+    headers: ["Stagiaire", "Période", "Temps total", "Durée formation", "Taux présence", "Statut"], rows
   } });
 }
 
 function genTempsConnexionReel(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
-  const days = getFormationDays(f);
   let extra = '';
 
-  days.forEach((day, di) => {
-    if (di > 0) extra += '<div class="page-break"></div>';
-    extra += `<h3>📅 Date : ${day}</h3>`;
-    extra += `<p><strong>Formation :</strong> ${f.intitule}<br><strong>Plateforme :</strong> ${o.outilsUtilises || 'Zoom / Teams'}</p>`;
+  stagiaires.slice(0, 10).forEach((s, si) => {
+    const days = getStagiaireDays(s, f);
+    if (si > 0) extra += '<div class="page-break"></div>';
+    extra += `<h3>📋 ${s.prenom} ${s.nom}</h3>`;
+    extra += `<p><strong>Période :</strong> ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}<br><strong>Plateforme :</strong> ${o.outilsUtilises || 'Zoom / Teams'}</p>`;
 
-    const rows: string[][] = [];
-    stagiaires.slice(0, 10).forEach((s, si) => {
+    days.forEach((day, di) => {
+      if (di > 0 && di % 5 === 0) extra += '<div class="page-break"></div>';
+      extra += `<h4>📅 ${day}</h4>`;
+
       const seed = (s.nom.charCodeAt(0) * 7 + di * 13 + si * 3) % 256;
       const ip = `${80 + (seed % 120)}.${(seed * 3 + si * 17) % 256}.${(seed * 7 + di * 31) % 256}.${(seed * 11 + si * 23 + di * 5) % 256}`;
       const hConnexion = 8 + (seed % 2);
@@ -1379,29 +1403,21 @@ function genTempsConnexionReel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
       const hTotal = Math.floor(dureeTotal / 60);
       const mTotal = dureeTotal % 60;
 
-      rows.push([
-        `${s.prenom} ${s.nom}`,
-        ip,
-        `${String(hConnexion).padStart(2, '0')}h${String(mConnexion).padStart(2, '0')}`,
-        `${String(hDeconnexion).padStart(2, '0')}h${String(mDeconnexion).padStart(2, '0')}`,
-        `${String(hReconnexion).padStart(2, '0')}h${String(mReconnexion).padStart(2, '0')}`,
-        `${String(hFinale).padStart(2, '0')}h${String(mFinale).padStart(2, '0')}`,
-        `${hTotal}h${String(mTotal).padStart(2, '0')}min`,
-        '✅ Connecté'
-      ]);
+      extra += tableHTML(
+        ["Adresse IP", "Connexion matin", "Déconnexion midi", "Reconnexion", "Déconnexion soir", "Durée totale", "Statut"],
+        [[
+          ip,
+          `${String(hConnexion).padStart(2, '0')}h${String(mConnexion).padStart(2, '0')}`,
+          `${String(hDeconnexion).padStart(2, '0')}h${String(mDeconnexion).padStart(2, '0')}`,
+          `${String(hReconnexion).padStart(2, '0')}h${String(mReconnexion).padStart(2, '0')}`,
+          `${String(hFinale).padStart(2, '0')}h${String(mFinale).padStart(2, '0')}`,
+          `${hTotal}h${String(mTotal).padStart(2, '0')}min`,
+          '✅ Connecté'
+        ]]
+      );
     });
 
-    extra += tableHTML(
-      ["Stagiaire", "Adresse IP", "Connexion matin", "Déconnexion midi", "Reconnexion", "Déconnexion soir", "Durée totale", "Statut"],
-      rows
-    );
-  });
-
-  // Récapitulatif global
-  extra += '<div class="page-break"></div>';
-  extra += '<h3>📊 Récapitulatif des temps de connexion</h3>';
-  const recapRows: string[][] = [];
-  stagiaires.slice(0, 10).forEach((s, si) => {
+    // Récap individuel
     let totalMinutes = 0;
     days.forEach((_, di) => {
       const seed = (s.nom.charCodeAt(0) * 7 + di * 13 + si * 3) % 256;
@@ -1416,15 +1432,8 @@ function genTempsConnexionReel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
     const stagDuree = getStagiaireDuree(s, f);
     const dureeFormationH = parseInt(stagDuree) || days.length * 7;
     const taux = Math.min(100, Math.round((totalMinutes / (dureeFormationH * 60)) * 100));
-    recapRows.push([
-      `${s.prenom} ${s.nom}`,
-      `${hT}h${String(mT).padStart(2, '0')}min`,
-      stagDuree,
-      `${taux}%`,
-      taux >= 80 ? '✅ Validé' : '⚠️ Insuffisant'
-    ]);
+    extra += `<p style="margin-top:10px"><strong>Total connecté :</strong> ${hT}h${String(mT).padStart(2, '0')}min | <strong>Durée formation :</strong> ${stagDuree} | <strong>Taux :</strong> ${taux}% | ${taux >= 80 ? '✅ Validé' : '⚠️ Insuffisant'}</p>`;
   });
-  extra += tableHTML(["Stagiaire", "Temps total connecté", "Durée formation", "Taux de présence", "Statut"], recapRows);
 
   return buildDocument({ org: o, title: "RELEVÉ DES TEMPS DE CONNEXION RÉELS", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra });
 }
