@@ -556,6 +556,9 @@ export function genContratSousTraitanceV2(o: OrganismeInfo, f: FormationInfo, st
   const stagList = stagiaires.map(s => `${s.prenom} ${s.nom}${s.poste ? ' – ' + s.poste : ''}`).join(', ') || "___";
   const dateMaj = (o as any).dateMaj ? new Date((o as any).dateMaj).toLocaleDateString("fr-FR") : new Date().toLocaleDateString("fr-FR");
   const formateurNom = f.formateur || "";
+  // Find the matching stagiaire for this formateur to get their specific signature
+  const matchingStagiaire = stagiaires.find(s => s.formateur === formateurNom);
+  const fmtSigUrl = matchingStagiaire?.formateurSignatureUrl || f.formateurSignatureUrl;
 
   // Déterminer si le formateur est lié à VICTOR ACADEMY ou est une personne physique
   const isVictorAcademy = formateurNom.toUpperCase().includes("RENUKA");
