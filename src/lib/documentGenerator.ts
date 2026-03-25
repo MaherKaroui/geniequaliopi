@@ -500,7 +500,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
         ? { ...fmt, nom: params.formateurNom, prenom: "", specialite: fmt.specialite, diplomes: fmt.diplomes, experience: fmt.experience, email: fmt.email }
         : fmt;
       const fForEntretien = params?.formateurNom ? { ...f, formateur: params.formateurNom } : f;
-      return genFicheEntretienAnnuelFormateur(o, fForEntretien, fmtForEntretien);
+      return genFicheEntretienAnnuelFormateur(o, fForEntretien, fmtForEntretien, stagiaires);
     }
     case "enquete_satisfaction_formateur": return genEnqueteSatisfactionFormateur(o, f);
     // === Nouveaux templates CFA ===
