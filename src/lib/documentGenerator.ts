@@ -4882,8 +4882,8 @@ function genGrilleEntretienAnnuel(o: OrganismeInfo, fmt: FormateurInfo) {
 }
 
 function genFicheEntretienAnnuelFormateur(o: OrganismeInfo, f: FormationInfo, fmt: FormateurInfo) {
-  const dateEntretien = formatDate(f.dateFin || new Date().toISOString().slice(0, 10));
-  const formateurNom = `${fmt.prenom} ${fmt.nom}`;
+  const formateurNom = f.formateur || `${fmt.prenom} ${fmt.nom}`;
+  const dateEntretien = formatDate(o.dateMaj || new Date().toISOString().slice(0, 10));
   const dateQualif = formatDate(f.dateDebut || new Date().toISOString().slice(0, 10));
 
   return buildDocument({
