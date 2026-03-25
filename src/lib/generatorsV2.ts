@@ -1,6 +1,6 @@
 // Improved generators for IND 9, 10, 11 - Qualiopi compliant (reference: Select Formation docs)
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
-import { buildDocument, tableHTML, formatDate, subtractBusinessDays, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif } from "./docBuilder";
+import { buildDocument, tableHTML, formatDate, subtractBusinessDays, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif, getStagiaireDuree } from "./docBuilder";
 import { EVAL_SCORES, getFormationDays, CONNECTION_TIMES_6H, CONNECTION_TIMES_7H, parseDuree } from "./sampleData";
 
 function getHoraireFin(f: FormationInfo): string {
@@ -147,7 +147,7 @@ export function genConvocation_V2(o: OrganismeInfo, f: FormationInfo, stagiaires
       <h3>Intitulé de la formation</h3><p>${f.intitule}</p>
       <h3>Dates de la formation</h3><p>Du : ${formatDate(getStagiaireDateDebut(s, f))}<br>Au : ${formatDate(getStagiaireDateFin(s, f))}</p>
       <h3>Horaires</h3><p>De : 09h00<br>À : ${getHoraireFin(f)}</p>
-      <h3>Durée totale</h3><p>${f.duree}</p>
+      <h3>Durée totale</h3><p>${getStagiaireDuree(s, f)}</p>
       <h3>Modalité</h3><p>Formation ${modaliteTexte(f)}</p>
       ${isPresentiel(f) ? `<h3>Lieu de formation</h3><p>${f.lieu}</p>` : `<h3>Accès à la plateforme</h3><p>Les identifiants de connexion vous seront transmis par email avant le début de la formation.</p>`}
       <h3>Documents remis avant l'entrée en formation</h3>
@@ -192,7 +192,7 @@ export function genContratFormationPro_V2(o: OrganismeInfo, f: FormationInfo, st
       <p>À l'issue de la formation, le stagiaire sera capable de :</p>
       <p>${f.objectifs.split('\n').map(o => `• ${o}`).join('<br>')}</p>
       <h3>Article 3 – Organisation de la formation</h3>
-      <p><strong>Durée totale :</strong> ${f.duree}<br><strong>Dates :</strong> du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}<br><strong>Horaires :</strong> de 09h00 à ${getHoraireFin(f)}<br><strong>Modalité :</strong> Formation ${modaliteTexte(f)}${isPresentiel(f) ? `<br><strong>Lieu :</strong> ${f.lieu}` : ''}</p>
+      <p><strong>Durée totale :</strong> ${getStagiaireDuree(s, f)}<br><strong>Dates :</strong> du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}<br><strong>Horaires :</strong> de 09h00 à ${getHoraireFin(f)}<br><strong>Modalité :</strong> Formation ${modaliteTexte(f)}${isPresentiel(f) ? `<br><strong>Lieu :</strong> ${f.lieu}` : ''}</p>
       <h3>Article 4 – Prérequis</h3>
       <p>${f.prerequis || 'Aucun prérequis spécifique'}</p>
       <h3>Article 5 – Moyens pédagogiques et techniques</h3>
@@ -250,7 +250,7 @@ export function genConvocationStagiaire(o: OrganismeInfo, f: FormationInfo, stag
     <h3>Intitulé de la formation</h3><p>${f.intitule}</p>
     <h3>Dates de la formation</h3><p>Du : ${formatDate(getStagiaireDateDebut(s, f))}<br>Au : ${formatDate(getStagiaireDateFin(s, f))}</p>
     <h3>Horaires</h3><p>De : 09h00<br>À : ${getHoraireFin(f)}</p>
-    <h3>Durée totale</h3><p>${f.duree}</p>
+    <h3>Durée totale</h3><p>${getStagiaireDuree(s, f)}</p>
     <h3>Modalité</h3><p>Formation ${modaliteTexte(f)}</p>
     ${isPresentiel(f) ? `<h3>Lieu de formation</h3><p>${f.lieu}</p>` : `<h3>Accès à la plateforme</h3><p>Les identifiants de connexion vous seront transmis par email avant le début de la formation.</p>`}
     <h3>Documents remis avant l'entrée en formation</h3>
@@ -292,7 +292,7 @@ export function genContratFormationProStagiaire(o: OrganismeInfo, f: FormationIn
     <p>À l'issue de la formation, le stagiaire sera capable de :</p>
     <p>${f.objectifs.split('\n').map(o => `• ${o}`).join('<br>')}</p>
     <h3>Article 3 – Organisation de la formation</h3>
-    <p><strong>Durée totale :</strong> ${f.duree}<br><strong>Dates :</strong> du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}<br><strong>Horaires :</strong> de 09h00 à ${getHoraireFin(f)}<br><strong>Modalité :</strong> Formation ${modaliteTexte(f)}${isPresentiel(f) ? `<br><strong>Lieu :</strong> ${f.lieu}` : ''}</p>
+    <p><strong>Durée totale :</strong> ${getStagiaireDuree(s, f)}<br><strong>Dates :</strong> du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}<br><strong>Horaires :</strong> de 09h00 à ${getHoraireFin(f)}<br><strong>Modalité :</strong> Formation ${modaliteTexte(f)}${isPresentiel(f) ? `<br><strong>Lieu :</strong> ${f.lieu}` : ''}</p>
     <h3>Article 4 – Prérequis</h3>
     <p>${f.prerequis || 'Aucun prérequis spécifique'}</p>
     <h3>Article 5 – Moyens pédagogiques et techniques</h3>
@@ -933,8 +933,8 @@ export function genGrilleAcquisitionStagiaire(o: OrganismeInfo, f: FormationInfo
 
 export function genAttestationReussiteStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], stagiaireIdx: number) {
   const s = stagiaires[stagiaireIdx] || stagiaires[0];
-  const days = getFormationDays(f);
-  const dureeHeures = parseInt(f.duree) || (days.length * 7);
+  const stagDuree = getStagiaireDuree(s, f);
+  const dureeHeures = parseInt(stagDuree) || (getFormationDays(f).length * 7);
   const tauxRealisation = 100; // Default to 100%
 
   let extra = `
@@ -945,7 +945,7 @@ export function genAttestationReussiteStagiaire(o: OrganismeInfo, f: FormationIn
       ${s.email ? `<p><strong>Email :</strong> ${s.email}</p>` : ''}
       <p style="margin-top:15px">a réussi avec succès la formation suivante :</p>
       <p style="font-size:16px;font-weight:700">${f.intitule}</p>
-      <p><strong>Durée de la formation :</strong> ${dureeHeures} heures de formation ${modaliteTexte(f)}</p>
+      <p><strong>Durée de la formation :</strong> ${stagDuree} de formation ${modaliteTexte(f)}</p>
       <p><strong>Date de début :</strong> ${formatDate(getStagiaireDateDebut(s, f))}</p>
       <p><strong>Date de fin :</strong> ${formatDate(getStagiaireDateFin(s, f))}</p>
       <p style="margin-top:15px">Cette formation a été dispensée conformément aux normes de qualité et aux exigences pédagogiques de ${o.nom}. L'apprenant(e) a démontré un haut niveau d'engagement, de compétence et de participation active tout au long du programme.</p>
@@ -1075,12 +1075,11 @@ export function genGrilleAcquisition_V2(o: OrganismeInfo, f: FormationInfo, stag
 
 // Improved certificat_reussite (group format) with assiduité - signature organisme only
 export function genCertificatReussite_V2(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
-  const days = getFormationDays(f);
-  const dureeHeures = parseInt(f.duree) || (days.length * 7);
-
   let extra = '';
   stagiaires.slice(0, 10).forEach((s, si) => {
     if (si > 0) extra += '<div class="page-break"></div>';
+    const stagDuree = getStagiaireDuree(s, f);
+    const dureeHeures = parseInt(stagDuree) || (getFormationDays(f).length * 7);
     extra += `
       <div style="text-align:center;padding:30px">
         <h2>ATTESTATION DE RÉUSSITE</h2>
@@ -1089,7 +1088,7 @@ export function genCertificatReussite_V2(o: OrganismeInfo, f: FormationInfo, sta
         ${s.email ? `<p><strong>Email :</strong> ${s.email}</p>` : ''}
         <p style="margin-top:15px">a réussi avec succès la formation suivante :</p>
         <p style="font-size:16px;font-weight:700">${f.intitule}</p>
-        <p><strong>Durée :</strong> ${dureeHeures} heures ${modaliteTexte(f)}</p>
+        <p><strong>Durée :</strong> ${stagDuree} ${modaliteTexte(f)}</p>
         <p>Du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}</p>
         <p style="margin-top:15px">Cette formation a été dispensée conformément aux normes de qualité et aux exigences pédagogiques de ${o.nom}. L'apprenant(e) a démontré un haut niveau d'engagement et de participation active tout au long du programme.</p>
         <h3>Assiduité</h3>

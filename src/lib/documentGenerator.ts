@@ -1,5 +1,5 @@
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
-import { buildDocument, htmlWrap, orgHeader, formationInfoBlock, formationInfoBlockStagiaire, tableHTML, signatureBlock3, signatureBlock2, footer, section, formatDate, infoGrid, getDocStyle, subtractBusinessDays, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif, applyGender, g } from "./docBuilder";
+import { buildDocument, htmlWrap, orgHeader, formationInfoBlock, formationInfoBlockStagiaire, tableHTML, signatureBlock3, signatureBlock2, footer, section, formatDate, infoGrid, getDocStyle, subtractBusinessDays, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif, getStagiaireDuree, applyGender, g, getDisplayDuree } from "./docBuilder";
 import { FormateurInfo, SAMPLE_FORMATIONS, SAMPLE_STAGIAIRES, SAMPLE_FORMATEURS, SAMPLE_ORGANISME, EVAL_SCORES, SATISFACTION_SCORES, CONNECTION_TIMES, getFormationDays, mergeOrganisme, mergeStagiaires, getConnectionTimes, parseDuree } from "./sampleData";
 import { buildFullCatalog } from "./docCatalog";
 import { generateBookQualiopi } from "./bookQualiopi";
@@ -574,7 +574,7 @@ function genDelaisAcces(o: OrganismeInfo) {
 function genFicheTarifs(o: OrganismeInfo, formations: FormationInfo[]) {
   return buildDocument({ org: o, title: "GRILLE TARIFAIRE 2024", table: {
     headers: ["Formation", "Durée", "Tarif HT", "Modalité"],
-    rows: formations.map(f => [f.intitule, f.duree, f.tarif, f.modalites])
+    rows: formations.map(f => [f.intitule, "À définir selon le groupe", "Tarif sur demande", f.modalites])
   }, sections: [{ heading: "Conditions", content: "<p>Tarifs nets de taxe (TVA non applicable, art. 261-4-4° du CGI). Tarifs dégressifs à partir de 3 inscriptions. Prise en charge OPCO possible.</p>" }] });
 }
 
@@ -1265,7 +1265,7 @@ function genLivretAccueil(o: OrganismeInfo, f: FormationInfo) {
   return buildDocument({ org: o, title: "LIVRET D'ACCUEIL", subtitle: f.intitule, sections: [
     { heading: "Bienvenue !", content: `<p>Nous sommes heureux de vous accueillir pour la formation « ${f.intitule} ». Ce livret contient les informations essentielles.</p>` },
     { heading: "Vos contacts", content: `<p><strong>Direction :</strong> ${o.dirigeant}<br><strong>Pédagogie :</strong> ${o.responsablePedagogique}<br><strong>Handicap :</strong> ${o.referentHandicap}<br><strong>Qualité :</strong> ${o.referentQualite}<br><strong>Tél :</strong> ${o.telephone}<br><strong>Email :</strong> ${o.email}</p>` },
-    { heading: "Votre formation", content: `<p><strong>Durée :</strong> ${f.duree}<br><strong>Lieu :</strong> ${f.lieu}<br><strong>Formateur :</strong> ${f.formateur}<br><strong>Horaires :</strong> 9h00-12h30 / 13h30-17h00</p>` },
+    { heading: "Votre formation", content: `<p><strong>Durée :</strong> À définir selon le groupe<br><strong>Lieu :</strong> ${f.lieu}<br><strong>Formateur :</strong> ${f.formateur}<br><strong>Horaires :</strong> 9h00-12h30 / 13h30-17h00</p>` },
     { heading: "Informations pratiques", content: "<p>• Merci de vous munir de cette convocation<br>• En cas d'absence, prévenir au " + o.telephone + "<br>• Le règlement intérieur vous sera remis le premier jour</p>" },
   ] });
 }
@@ -1342,9 +1342,10 @@ function genRapportConnexion(o: OrganismeInfo, f: FormationInfo, stagiaires: Sta
 }
 
 function genTempsConnexion(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
-  const { totalHours } = parseDuree(f.duree);
   const rows = stagiaires.slice(0, 10).map((s) => {
-    return [s.prenom + " " + s.nom, `${totalHours}h`, f.duree, `100%`, "✅ Validé"];
+    const stagDuree = getStagiaireDuree(s, f);
+    const totalH = parseInt(stagDuree) || (getFormationDays(f).length * 7);
+    return [s.prenom + " " + s.nom, `${totalH}h`, stagDuree, `100%`, "✅ Validé"];
   });
   return buildDocument({ org: o, title: "TEMPS DE CONNEXION PAR STAGIAIRE", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, table: {
     headers: ["Stagiaire", "Temps total", "Durée formation", "Taux présence", "Statut"], rows
@@ -1412,12 +1413,13 @@ function genTempsConnexionReel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
     });
     const hT = Math.floor(totalMinutes / 60);
     const mT = totalMinutes % 60;
-    const dureeFormationH = parseInt(f.duree) || days.length * 7;
+    const stagDuree = getStagiaireDuree(s, f);
+    const dureeFormationH = parseInt(stagDuree) || days.length * 7;
     const taux = Math.min(100, Math.round((totalMinutes / (dureeFormationH * 60)) * 100));
     recapRows.push([
       `${s.prenom} ${s.nom}`,
       `${hT}h${String(mT).padStart(2, '0')}min`,
-      f.duree,
+      stagDuree,
       `${taux}%`,
       taux >= 80 ? '✅ Validé' : '⚠️ Insuffisant'
     ]);
@@ -1966,9 +1968,9 @@ function genQCMFinal(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireIn
 
 function genAttestation(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   let extra = stagiaires.slice(0, 10).map(s => `
-    <div class="section"><p>Je soussigné, <strong>${o.dirigeant}</strong>, atteste que <strong>${s.prenom} ${s.nom}</strong> (${s.entreprise}) a suivi la formation « ${f.intitule} » du ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)} (${f.duree}).</p>
+    <div class="section"><p>Je soussigné, <strong>${o.dirigeant}</strong>, atteste que <strong>${s.prenom} ${s.nom}</strong> (${s.entreprise}) a suivi la formation « ${f.intitule} » du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))} (${getStagiaireDuree(s, f)}).</p>
     <p><strong>Objectifs atteints :</strong> ${f.objectifs}</p>
-    <p>Fait à ${o.ville}, le ${formatDate(f.dateFin)}</p>
+    <p>Fait à ${o.ville}, le ${formatDate(getStagiaireDateFin(s, f))}</p>
     ${signatureBlock2("Le Responsable", o.dirigeant, "Le Stagiaire", s.prenom + " " + s.nom)}
     </div><div class="page-break"></div>`).join("");
   return buildDocument({ org: o, title: "ATTESTATIONS DE FIN DE FORMATION", subtitle: f.intitule, extraHtml: extra });
@@ -2050,7 +2052,7 @@ function genCRReunion(o: OrganismeInfo, mois: string) {
 }
 
 function genPlanningFormateurs(o: OrganismeInfo, formateurs: FormateurInfo[], formations: FormationInfo[]) {
-  const rows = formations.map(f => [f.intitule, f.formateur, `${formatDate(f.dateDebut)} – ${formatDate(f.dateFin)}`, f.duree, f.modalites]);
+  const rows = formations.map(f => [f.intitule, f.formateur, "Sessions individuelles", "À définir selon le groupe", f.modalites]);
   return buildDocument({ org: o, title: "PLANNING DES FORMATEURS 2024", table: { headers: ["Formation", "Formateur", "Dates", "Durée", "Modalité"], rows } });
 }
 
@@ -2470,7 +2472,7 @@ function genContratApprentissage(o: OrganismeInfo, f: FormationInfo, stagiaires:
   const s = stagiaires[0] || { prenom: "Martin", nom: "Dupont", entreprise: "Tech Solutions SAS" };
   return buildDocument({ org: o, title: "CONTRAT D'APPRENTISSAGE", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, sections: [
     { heading: "Parties", content: `<p><strong>Employeur :</strong> ${s.entreprise}<br><strong>Apprenti(e) :</strong> ${s.prenom} ${s.nom}<br><strong>CFA :</strong> ${o.nom}<br><strong>Formation :</strong> ${f.intitule}</p>` },
-    { heading: "Durée du contrat", content: `<p>Du ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)}<br>Durée de la formation : ${f.duree}<br>Rythme d'alternance : 3 jours en entreprise / 2 jours en CFA</p>` },
+    { heading: "Durée du contrat", content: `<p>Sessions : Dates individuelles par stagiaire<br>Durée de la formation : À définir selon le groupe<br>Rythme d'alternance : 3 jours en entreprise / 2 jours en CFA</p>` },
     { heading: "Rémunération", content: "<p>Selon les dispositions légales et conventionnelles en vigueur, conformément à l'article D.6222-26 du Code du travail.</p>" },
     { heading: "Obligations", content: "<p><strong>L'employeur s'engage à :</strong><br>• Assurer la formation pratique de l'apprenti<br>• Désigner un maître d'apprentissage<br>• Permettre à l'apprenti de suivre la formation au CFA<br><br><strong>L'apprenti s'engage à :</strong><br>• Suivre assidûment la formation<br>• Respecter le règlement intérieur<br>• Participer aux évaluations</p>" },
   ], signatures: { type: "3", names: [s.prenom + " " + s.nom, f.formateur] } });

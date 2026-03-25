@@ -602,8 +602,8 @@ export function genContratSousTraitanceV2(o: OrganismeInfo, f: FormationInfo, st
         <tr><td><strong>Intitulé de la formation</strong></td><td>${f.intitule}</td></tr>
         <tr><td><strong>Type de formation</strong></td><td>Formation en Langue Française – Français Langue Étrangère (FLE)</td></tr>
         <tr><td><strong>Public visé</strong></td><td>Adultes</td></tr>
-        <tr><td><strong>Durée totale</strong></td><td>${f.duree || "À déterminer selon le parcours individualisé"}</td></tr>
-        <tr><td><strong>Dates prévisionnelles</strong></td><td>Du ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)}</td></tr>
+        <tr><td><strong>Durée totale</strong></td><td>À définir selon le groupe</td></tr>
+        <tr><td><strong>Dates prévisionnelles</strong></td><td>Sessions : Dates individuelles par stagiaire</td></tr>
         <tr><td><strong>Modalités</strong></td><td>${f.modalites || "Présentiel et/ou distanciel (à adapter selon les besoins)"}</td></tr>
         <tr><td><strong>Lieu de formation</strong></td><td>${f.lieu || `${o.adresse}, ${o.codePostal} ${o.ville}`}</td></tr>
         <tr><td><strong>Horaires</strong></td><td>De 9h00 à 12h30 et de 13h30 à 17h00</td></tr>
