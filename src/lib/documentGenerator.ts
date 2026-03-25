@@ -900,9 +900,30 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
     : f.modalites === "mixte" ? "Mixte (présentiel et distanciel)"
     : f.modalites || "Présentiel";
 
-  // Format dates
-  const dateDebutFmt = f.dateDebut ? formatDate(f.dateDebut) : "À définir";
-  const dateFinFmt = f.dateFin ? formatDate(f.dateFin) : "À définir";
+  // Detect if formation has individual dates (sessions par stagiaire)
+  const hasIndiv = stagiaires.some(s => s.dateDebutFormation || s.dateFinFormation);
+  const anneeFormation = f.dateDebut ? new Date(f.dateDebut + "T00:00:00").getFullYear() : new Date().getFullYear();
+
+  // Build sessions table if individual dates
+  let sessionsHtml = "";
+  if (hasIndiv) {
+    const sessRows = stagiaires.slice(0, 10).map(s => {
+      const deb = getStagiaireDateDebut(s, f);
+      const fin = getStagiaireDateFin(s, f);
+      return [s.civilite ? `${s.civilite} ${s.nom} ${s.prenom}` : `${s.prenom} ${s.nom}`, formatDate(deb), formatDate(fin)];
+    });
+    sessionsHtml = `<p><strong>Sessions – Année de formation ${anneeFormation}</strong></p>` + tableHTML(["Stagiaire", "Date début", "Date fin"], sessRows);
+  }
+
+  // Detect FLE / certification by competence blocks
+  const lower = f.intitule.toLowerCase();
+  const isFLEOrCertif = lower.includes("français") || lower.includes("fle") || lower.includes("médico-social") || lower.includes("communiquer");
+  const isIACertif = lower.includes("ia générative") || lower.includes("intelligence artificielle");
+  const isBlocFormation = isFLEOrCertif || isIACertif;
+
+  // For bloc-based formations, override duration display
+  const displayDuree = isBlocFormation ? "À définir selon le groupe" : heuresTotal;
+  const displayTarif = isBlocFormation ? "Tarif sur demande" : f.tarif;
 
   const extraContent = `
     <h2>1. Organisme de formation</h2>
