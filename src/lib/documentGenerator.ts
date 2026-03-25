@@ -8047,7 +8047,7 @@ function genBilanFinFormationFormateur(o: OrganismeInfo, f: FormationInfo, stagi
 <tr><td><strong>Dates</strong></td><td>Du ${formatDate(f.dateDebut)} au ${formatDate(matchingStagiaire?.dateFinFormation || f.dateFin)}</td></tr>
 <tr><td><strong>Durée</strong></td><td>${totalHours} heures (${nbJours} jours)</td></tr>
 <tr><td><strong>Lieu</strong></td><td>${f.lieu || "Présentiel"}</td></tr>
-<tr><td><strong>Nombre de stagiaires</strong></td><td>${nbStagiaires}</td></tr>
+<tr><td><strong>Nombre de stagiaires</strong></td><td>${nbStagiairesFormateur}</td></tr>
 </table>
 
 <h3>1. Déroulement général de la formation</h3>
