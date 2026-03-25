@@ -39,9 +39,9 @@ export function genContratFormationParticulier(o: OrganismeInfo, f: FormationInf
 
 export function genAttestationAssiduite(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   let extra = stagiaires.slice(0, 10).map(s => `
-    <div class="section"><p>Je soussigné, <strong>${o.dirigeant}</strong>, directeur de ${o.nom}, atteste que <strong>${s.prenom} ${s.nom}</strong> (${s.entreprise}) a suivi avec assiduité la formation « ${f.intitule} » du ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)}, soit ${f.duree}.</p>
+    <div class="section"><p>Je soussigné, <strong>${o.dirigeant}</strong>, directeur de ${o.nom}, atteste que <strong>${s.prenom} ${s.nom}</strong> (${s.entreprise}) a suivi avec assiduité la formation « ${f.intitule} » du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}, soit ${f.duree}.</p>
     <p><strong>Taux de présence :</strong> 100%<br><strong>Absences :</strong> Aucune absence constatée</p>
-    <p>Fait à ${o.ville}, le ${formatDate(f.dateFin)}</p>
+    <p>Fait à ${o.ville}, le ${formatDate(getStagiaireDateFin(s, f))}</p>
     </div><div class="page-break"></div>`).join("");
   return buildDocument({ org: o, title: "ATTESTATION D'ASSIDUITÉ", subtitle: f.intitule, extraHtml: extra,
     signatures: { type: "2", labels: ["Le Responsable", "Cachet de l'organisme"], names: [o.dirigeant, o.nom] } });
