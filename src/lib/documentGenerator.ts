@@ -3073,6 +3073,7 @@ function genPVExamenCertification(o: OrganismeInfo, f: FormationInfo, stagiaires
         <p>Nom : ${formateurNom}</p>
         <p>Date : ${dateEpreuvesStr}</p>
         <p style="margin-top:20px">Signature :</p>
+        ${f.formateurSignatureUrl ? `<img src="${f.formateurSignatureUrl}" alt="Signature formateur" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : ""}
       </div>
     </div>` });
 }
