@@ -924,8 +924,29 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
   // For bloc-based formations, override duration display
   const displayDuree = isBlocFormation ? "À définir selon le groupe" : heuresTotal;
   const displayTarif = isBlocFormation ? "Tarif sur demande" : f.tarif;
+  // Build bloc-based déroulé for FLE/certification formations
+  let blocDerouleHtml = "";
+  if (isBlocFormation) {
+    const chapters = getCourseChapters(f.intitule);
+    if (chapters.length > 0) {
+      for (const chapter of chapters) {
+        blocDerouleHtml += `<h3 style="margin-top:20px;color:${getDocStyle().primaryColor}">${chapter.title}</h3>`;
+        blocDerouleHtml += `<p style="font-style:italic;margin-bottom:8px">${chapter.description}</p>`;
+        blocDerouleHtml += `<table><tr><th style="width:35%">Thème</th><th>Contenu abordé</th></tr>`;
+        for (const sec of chapter.sections) {
+          // Extract a short summary from HTML content
+          const plainText = sec.content.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+          const summary = plainText.length > 200 ? plainText.substring(0, 200) + "…" : plainText;
+          blocDerouleHtml += `<tr><td><strong>${sec.title}</strong></td><td>${summary}</td></tr>`;
+        }
+        blocDerouleHtml += `</table>`;
+      }
+    } else {
+      blocDerouleHtml = derouleHtml;
+    }
+  }
 
-  const extraContent = `
+
     <h2>1. Organisme de formation</h2>
     <div class="section">
       <p><strong>Nom :</strong> ${o.nom}</p>
