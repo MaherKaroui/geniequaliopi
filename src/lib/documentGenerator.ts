@@ -4381,7 +4381,7 @@ function genTrameEvalBesoins(o: OrganismeInfo, f: FormationInfo, stagiaires: Sta
 <p><strong>2. Quel objectif professionnel ou personnel souhaitez-vous atteindre grâce à cette formation ?</strong></p>
 <table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${answers.objectif}</td></tr></table>
 
-<p><strong>3. Quel budget avez-vous prévu pour cette formation et bénéficiez-vous d'un dispositif de financement (CPF, OPCO, Pôle emploi, etc.) ?</strong></p>
+<p><strong>3. Quel budget avez-vous prévu pour cette formation et bénéficiez-vous d'un dispositif de financement (CPF, OPCO, Pôle emploi, financement personnel) ?</strong></p>
 <table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${answers.budget}</td></tr></table>
 
 <p><strong>4. En quoi pensez-vous que cette formation contribuera à la réalisation de votre projet professionnel ou personnel ?</strong></p>
@@ -4435,7 +4435,7 @@ function genTrameEvalBesoinsStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
 <p><strong>2. Quel objectif professionnel ou personnel souhaitez-vous atteindre grâce à cette formation ?</strong></p>
 <table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${answers.objectif}</td></tr></table>
 
-<p><strong>3. Quel budget avez-vous prévu pour cette formation et bénéficiez-vous d'un dispositif de financement (CPF, OPCO, Pôle emploi, etc.) ?</strong></p>
+<p><strong>3. Quel budget avez-vous prévu pour cette formation et bénéficiez-vous d'un dispositif de financement (CPF, OPCO, Pôle emploi, financement personnel) ?</strong></p>
 <table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${answers.budget}</td></tr></table>
 
 <p><strong>4. En quoi pensez-vous que cette formation contribuera à la réalisation de votre projet professionnel ou personnel ?</strong></p>
@@ -4600,30 +4600,18 @@ function generateEvalBesoinsAnswers(s: StagiaireInfo, f: FormationInfo, o: Organ
   }
   const diplome = diplomes[h(2) % diplomes.length];
   
-  // === FINANCEMENTS (10 options variées) ===
+  // === FINANCEMENTS (4 options : CPF, OPCO, Pôle emploi, financement personnel) ===
   const financementsEntreprise = [
     "OPCO – prise en charge employeur à 100%",
-    "Plan de développement des compétences de l'entreprise",
-    "CPF co-financé par l'employeur (50/50)",
     "OPCO – prise en charge partielle + complément entreprise",
-    "Plan de formation annuel – budget RH",
-    "CPF mobilisé par le salarié avec accord de l'employeur",
     "OPCO – fonds mutualisés TPE/PME",
-    "Plan de développement des compétences – dispositif Pro-A",
-    "FNE-Formation (aide exceptionnelle de l'État)",
-    "CPF de transition professionnelle (ex-CIF)",
+    "CPF mobilisé par le salarié avec accord de l'employeur",
   ];
   const financementsIndividuel = [
     "CPF (Compte Personnel de Formation) – solde suffisant",
     "Pôle emploi – AIF (Aide Individuelle à la Formation)",
     "Financement personnel – paiement en 3 fois",
-    "CPF complété par un financement personnel",
-    "Conseil Régional – aide à la formation des demandeurs d'emploi",
-    "Pôle emploi – POEI (Préparation Opérationnelle à l'Emploi)",
     "Financement personnel intégral",
-    "CPF – utilisation de la totalité du solde disponible",
-    "AGEFIPH – aide à la formation des travailleurs handicapés",
-    "Financement mixte : CPF + Pôle emploi (abondement)",
   ];
   const budget = hasEntreprise
     ? financementsEntreprise[h(3) % financementsEntreprise.length]
