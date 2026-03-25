@@ -3095,7 +3095,7 @@ function genAttestationPresentationCertification(o: OrganismeInfo, f: FormationI
       <p><strong>${s.civilite || "M."} ${s.prenom} ${s.nom}</strong></p>
       ${s.dateNaissance ? `<p>Né(e) le : ${formatDate(s.dateNaissance)}</p>` : ""}
       <br/>
-      <p>a suivi la formation <strong>${f.intitule}</strong> du <strong>${formatDate(f.dateDebut)}</strong> au <strong>${formatDate(f.dateFin)}</strong> (${f.duree}) et a été présenté(e) aux épreuves de la certification :</p>` },
+      <p>a suivi la formation <strong>${f.intitule}</strong> du <strong>${formatDate(getStagiaireDateDebut(s, f))}</strong> au <strong>${formatDate(getStagiaireDateFin(s, f))}</strong> (${getStagiaireDuree(s, f)}) et a été présenté(e) aux épreuves de la certification :</p>` },
     { heading: "Certification visée", content: `
       ${tableHTML(["Élément", "Détail"], [
         ["Code", certifCode],
