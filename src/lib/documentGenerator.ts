@@ -238,29 +238,82 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "accompagnement_vae": return genAccompagnementVAE(o, f, stagiaires);
     // === VAE complet ===
     case "vae_plaquette_info": return genVAEPlaquetteInfo(o);
+    case "vae_diffusion_info": return genVAEDiffusionInfo(o, f);
     case "vae_procedure_info": return genVAEProcedureInfo(o);
     case "vae_indicateurs_resultats": return genVAEIndicateursResultats(o);
     case "vae_taux_certification": return genVAETauxCertification(o);
+    case "vae_info_certification": return genVAEInfoCertification(o, f);
+    case "vae_process_analyse_besoin": return genVAEProcessAnalyseBesoin(o);
     case "vae_entretien_faisabilite": return genVAEEntretienFaisabilite(o, f);
+    case "vae_analyse_besoin": {
+      const si = params?.stagiaireIdx ?? 0;
+      return genVAEAnalyseBesoin(o, f, stagiaires, si);
+    }
     case "vae_diagnostic_faisabilite": {
       const si = params?.stagiaireIdx ?? 0;
       return genVAEDiagnosticFaisabilite(o, f, stagiaires, si);
     }
-    case "vae_referentiel_accompagnement": return genVAEReferentielAccompagnement(o, f);
-    case "vae_programme_accompagnement": return genVAEProgrammeAccompagnement(o, f);
-    case "vae_positionnement_initial": {
+    case "vae_livret1_recevabilite": {
       const si = params?.stagiaireIdx ?? 0;
-      return genVAEPositionnementInitial(o, f, stagiaires, si);
+      return genVAELivret1Recevabilite(o, f, stagiaires, si);
+    }
+    case "vae_contrat_accompagnement": {
+      const si = params?.stagiaireIdx ?? 0;
+      return genVAEContratAccompagnement(o, f, stagiaires, si);
+    }
+    case "vae_convention_tripartite": {
+      const si = params?.stagiaireIdx ?? 0;
+      return genVAEConventionTripartite(o, f, stagiaires, si);
+    }
+    case "vae_handicap_entretien": return genVAEHandicapEntretien(o);
+    case "vae_handicap_formalisation": return genVAEHandicapFormalisation(o);
+    case "vae_handicap_bilan": return genVAEHandicapBilan(o);
+    case "vae_mail_handicap": return genVAEMailHandicap(o);
+    case "vae_referentiel_accompagnement": return genVAEReferentielAccompagnement(o, f);
+    case "vae_engagements_respectifs": return genVAEEngagementsRespectifs(o);
+    case "vae_programme_accompagnement": return genVAEProgrammeAccompagnement(o, f);
+    case "vae_livret2": return genVAELivret2(o, f);
+    case "vae_positionnement_debut": {
+      const si = params?.stagiaireIdx ?? 0;
+      return genVAEPositionnementDebut(o, f, stagiaires, si);
+    }
+    case "vae_positionnement_fin": {
+      const si = params?.stagiaireIdx ?? 0;
+      return genVAEPositionnementFin(o, f, stagiaires, si);
     }
     case "vae_livret_accueil": return genVAELivretAccueil(o, f);
+    case "vae_cgv": return genVAECGV(o);
     case "vae_convention_accompagnement": {
       const si = params?.stagiaireIdx ?? 0;
       return genVAEConventionAccompagnement(o, f, stagiaires, si);
     }
     case "vae_reglement_interieur": return genVAEReglementInterieur(o);
+    case "vae_droit_image": return genVAEDroitImage(o);
+    case "vae_infos_peripheriques": return genVAEInfosPeripheriques(o);
+    case "vae_certificat_realisation": {
+      const si = params?.stagiaireIdx ?? 0;
+      return genVAECertificatRealisation(o, f, stagiaires, si);
+    }
+    case "vae_mail_introduction": return genVAEMailIntroduction(o);
+    case "vae_mail_preparation_dossier": return genVAEMailPreparationDossier(o);
+    case "vae_mail_recap": return genVAEMailRecap(o, f);
+    case "vae_mail_suivi_evolution": return genVAEMailSuiviEvolution(o);
+    case "vae_mail_preparation_entretien": return genVAEMailPreparationEntretien(o);
+    case "vae_mail_post_validation": return genVAEMailPostValidation(o);
+    case "vae_mail_envoi_certificat": return genVAEMailEnvoiCertificat(o);
+    case "vae_adaptation_accompagnement": return genVAEAdaptationAccompagnement(o);
+    case "vae_fiche_pedagogique": return genVAEFichePedagogique(o, f);
     case "vae_fiche_suivi_individuel": {
       const si = params?.stagiaireIdx ?? 0;
       return genVAEFicheSuiviIndividuel(o, f, stagiaires, si);
+    }
+    case "vae_entretien_intermediaire": {
+      const si = params?.stagiaireIdx ?? 0;
+      return genVAEEntretienIntermediaire(o, f, stagiaires, si);
+    }
+    case "vae_dossier_suivi_parcours": {
+      const si = params?.stagiaireIdx ?? 0;
+      return genVAEDossierSuiviParcours(o, f, stagiaires, si);
     }
     case "vae_grille_evaluation_dossier": {
       const si = params?.stagiaireIdx ?? 0;
@@ -271,11 +324,16 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
       return genVAEEmargement(o, f, stagiaires, si);
     }
     case "vae_procedure_abandon": return genVAEProcedureAbandon(o);
+    case "vae_eviter_echec": return genVAEEviterEchec(o);
+    case "vae_favoriser_engagement": return genVAEFavoriserEngagement(o);
+    case "vae_guide_entretien_abandons": return genVAEGuideEntretienAbandons(o);
+    case "vae_mail_relance_abandon": return genVAEMailRelanceAbandon(o);
     case "vae_attestation_assiduite": {
       const si = params?.stagiaireIdx ?? 0;
       return genVAEAttestationAssiduite(o, f, stagiaires, si);
     }
     case "vae_procedure_jury": return genVAEProcedureJury(o, f);
+    case "vae_mail_conditions_certification": return genVAEMailConditionsCertification(o, f);
     case "vae_convocation_jury": {
       const si = params?.stagiaireIdx ?? 0;
       return genVAEConvocationJury(o, f, stagiaires, si);
@@ -289,7 +347,11 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
       return genVAENotificationDecision(o, f, stagiaires, si);
     }
     case "vae_moyens_dedies": return genVAEMoyensDedies(o);
+    case "vae_mail_aide_connexion": return genVAEMailAideConnexion(o);
+    case "vae_moyens_techniques_presentiel": return genVAEMoyensTechniquesPresentiel(o);
     case "vae_coordination_accompagnateurs": return genVAECoordinationAccompagnateurs(o);
+    case "vae_annuaire_contacts": return genVAEAnnuaireContacts(o);
+    case "vae_differents_poles": return genVAEDifferentsPoles(o);
     case "vae_ressources": return genVAERessources(o);
     case "vae_fiche_poste_accompagnateur": return genVAEFichePosteAccompagnateur(o);
     case "vae_plan_dev_accompagnateurs": return genVAEPlanDevAccompagnateurs(o);
