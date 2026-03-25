@@ -1075,12 +1075,11 @@ export function genGrilleAcquisition_V2(o: OrganismeInfo, f: FormationInfo, stag
 
 // Improved certificat_reussite (group format) with assiduité - signature organisme only
 export function genCertificatReussite_V2(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
-  const days = getFormationDays(f);
-  const dureeHeures = parseInt(f.duree) || (days.length * 7);
-
   let extra = '';
   stagiaires.slice(0, 10).forEach((s, si) => {
     if (si > 0) extra += '<div class="page-break"></div>';
+    const stagDuree = getStagiaireDuree(s, f);
+    const dureeHeures = parseInt(stagDuree) || (getFormationDays(f).length * 7);
     extra += `
       <div style="text-align:center;padding:30px">
         <h2>ATTESTATION DE RÉUSSITE</h2>
@@ -1089,7 +1088,7 @@ export function genCertificatReussite_V2(o: OrganismeInfo, f: FormationInfo, sta
         ${s.email ? `<p><strong>Email :</strong> ${s.email}</p>` : ''}
         <p style="margin-top:15px">a réussi avec succès la formation suivante :</p>
         <p style="font-size:16px;font-weight:700">${f.intitule}</p>
-        <p><strong>Durée :</strong> ${dureeHeures} heures ${modaliteTexte(f)}</p>
+        <p><strong>Durée :</strong> ${stagDuree} ${modaliteTexte(f)}</p>
         <p>Du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}</p>
         <p style="margin-top:15px">Cette formation a été dispensée conformément aux normes de qualité et aux exigences pédagogiques de ${o.nom}. L'apprenant(e) a démontré un haut niveau d'engagement et de participation active tout au long du programme.</p>
         <h3>Assiduité</h3>
