@@ -1527,7 +1527,7 @@ function genEvalFinale(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiaire
     <p><strong>Appréciation générale du formateur :</strong> Groupe de bon niveau, très impliqué. Les objectifs pédagogiques sont globalement atteints. ${tauxReussite === 100 ? "Tous les stagiaires ont validé la formation." : "Quelques stagiaires nécessitent un suivi complémentaire."}</p>
   </div>`;
 
-  return buildDocument({ org: o, title: "ÉVALUATION FINALE – RÉSULTATS DÉTAILLÉS", subtitle: f.intitule, formation: f, showFormationInfo: true, extraHtml: extra,
+  return buildDocument({ org: o, title: "ÉVALUATION FINALE – RÉSULTATS DÉTAILLÉS", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra,
     signatures: { type: "3", names: ["", f.formateur] } });
 }
 
