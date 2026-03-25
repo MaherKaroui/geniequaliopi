@@ -1364,11 +1364,13 @@ function genRapportConnexion(o: OrganismeInfo, f: FormationInfo, stagiaires: Sta
 function genTempsConnexion(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const rows = stagiaires.slice(0, 10).map((s) => {
     const stagDuree = getStagiaireDuree(s, f);
-    const totalH = parseInt(stagDuree) || (getFormationDays(f).length * 7);
-    return [s.prenom + " " + s.nom, `${totalH}h`, stagDuree, `100%`, "✅ Validé"];
+    const totalH = parseInt(stagDuree) || (getStagiaireDays(s, f).length * 7);
+    const dateDebut = formatDate(getStagiaireDateDebut(s, f));
+    const dateFin = formatDate(getStagiaireDateFin(s, f));
+    return [s.prenom + " " + s.nom, `${dateDebut} - ${dateFin}`, `${totalH}h`, stagDuree, `100%`, "✅ Validé"];
   });
   return buildDocument({ org: o, title: "TEMPS DE CONNEXION PAR STAGIAIRE", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, table: {
-    headers: ["Stagiaire", "Temps total", "Durée formation", "Taux présence", "Statut"], rows
+    headers: ["Stagiaire", "Période", "Temps total", "Durée formation", "Taux présence", "Statut"], rows
   } });
 }
 
