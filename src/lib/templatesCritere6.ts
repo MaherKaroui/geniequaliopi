@@ -804,7 +804,7 @@ export function genContratSousTraitanceV2(o: OrganismeInfo, f: FormationInfo, st
         <p>Qualité : ${sousTraitantSignQualite}</p>
         <p>Date : ${dateMaj}</p>
         <p style="margin-top:15px">Signature :</p>
-        ${f.formateurSignatureUrl ? `<img src="${f.formateurSignatureUrl}" alt="Signature formateur" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : ""}
+        ${fmtSigUrl ? `<img src="${fmtSigUrl}" alt="Signature formateur" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : ""}
         <p style="font-size:11px;color:#888;margin-top:8px;font-style:italic">Lu et approuvé – Bon pour accord</p>
       </div>
     </div>`;
