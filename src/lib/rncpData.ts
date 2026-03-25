@@ -316,32 +316,84 @@ export const RNCP_FICHES: RNCPFiche[] = [
     activitesVisees: "Définition de la stratégie d'implémentation de l'IA Générative sur le poste de travail, utilisation optimale des outils d'IA Générative pour créer des contenus rédactionnels et visuels, évaluation et résolution des problématiques éthiques et réglementaires liées à l'utilisation d'outils d'IA générative.",
     blocsCompetences: [
       {
-        titre: "Définir et mettre en œuvre une stratégie d'implémentation de l'IA Générative",
+        titre: "C1 – Stratégie d'implémentation de l'IA Générative",
         competences: [
           "Définir la stratégie d'implémentation de l'IA Générative en fonction du contexte professionnel et des outils existants (ChatGPT, Google Gemini, Adobe Firefly, Microsoft Copilot)",
-          "Rédiger un prompt optimal en utilisant les techniques de Prompt Engineering afin de générer des contenus rédactionnels et visuels satisfaisants",
-          "Garantir la confidentialité des données professionnelles dans l'utilisation d'outils d'IA Générative",
+          "Identifier les optimisations envisageables sur le poste de travail",
+          "Dégager un plan stratégique d'intégration et d'installation des outils d'IA Générative",
         ],
         matieres: [
-          { competence: "Stratégie d'implémentation IA", contenu: "Panorama des outils d'IA Générative (ChatGPT, Gemini, Adobe Firefly, Copilot), analyse du contexte professionnel, plan stratégique d'intégration, installation et configuration", volume: "7h" },
-          { competence: "Prompt Engineering", contenu: "Techniques de requêtage, structuration de prompts, contexte et objectifs, itération conversationnelle, optimisation des résultats", volume: "7h" },
-          { competence: "Confidentialité et sécurité des données", contenu: "Bonnes pratiques de sécurité, protection des informations sensibles, prévention des fuites de données, paramétrage de confidentialité", volume: "3h" },
+          { competence: "Panorama des outils d'IA Générative", contenu: "ChatGPT, Google Gemini, Adobe Firefly, Microsoft Copilot : fonctionnalités, cas d'usage, installation et configuration", volume: "4h" },
+          { competence: "Analyse du contexte professionnel", contenu: "Analyse du poste, identification des tâches optimisables, évaluation des gains de productivité", volume: "2h" },
+          { competence: "Plan stratégique d'intégration", contenu: "Élaboration d'un plan d'implémentation, justification des choix d'outils, organisation des tâches optimisées", volume: "2h" },
         ],
-        modalitesEval: "Mise en situation professionnelle : rapport écrit (préparation 10 jours) + soutenance orale (20 min). Taux de réussite global ≥ 70% requis.",
+        modalitesEval: "E1 : Mise en situation professionnelle – Rapport écrit (préparation 10 jours) + soutenance orale (20 min). Élaboration et mise en œuvre d'une stratégie d'implémentation de l'IA Générative sur le poste de travail.",
       },
       {
-        titre: "Produire des contenus conformes, inclusifs et optimisés par l'IA Générative",
+        titre: "C2 – Prompt Engineering (requêtage)",
         competences: [
-          "Produire des contenus inclusifs adaptés aux besoins des personnes en situation de handicap",
-          "Utiliser les techniques d'optimisation des contenus générés par les outils d'IA Générative",
-          "Appliquer les directives de l'IA Act et du RGPD pour garantir la conformité éthique et réglementaire des contenus",
+          "Rédiger un prompt optimal sur un outil d'IA Générative en utilisant les techniques de Prompt Engineering",
+          "Respecter la structure de rédaction de prompt (Rôle, Cible, Objectif, Contexte, Format)",
+          "Produire des contenus satisfaisants au regard de la demande",
         ],
         matieres: [
-          { competence: "Contenus inclusifs et accessibles", contenu: "Accessibilité numérique, adaptation aux handicaps, normes d'inclusivité, bonnes pratiques rédactionnelles et visuelles", volume: "3h" },
-          { competence: "Optimisation des contenus IA", contenu: "Enrichissement du contexte, affinage des prompts, critères de qualité (contrainte, style, format), workflow rédactionnel + visuel intégré", volume: "4h" },
-          { competence: "Conformité IA Act et RGPD", contenu: "Réglementation européenne IA Act, RGPD appliqué à l'IA, veille réglementaire, identification des risques, mesures préventives et correctives", volume: "4h" },
+          { competence: "Techniques de Prompt Engineering", contenu: "Structure Rôle-Cible-Objectif-Contexte-Format, rédaction de prompts efficaces, itération conversationnelle", volume: "4h" },
+          { competence: "Optimisation des résultats", contenu: "Évaluation de la pertinence des contenus générés, ajustement des prompts, few-shot prompting, chain-of-thought", volume: "3h" },
         ],
-        modalitesEval: "Mise en situation professionnelle : rapport écrit (préparation 10 jours) + soutenance orale (20 min). Taux de réussite global ≥ 70% requis.",
+        modalitesEval: "E2 : Mise en situation professionnelle – Rédaction d'un prompt à partir d'une demande imposée + soutenance orale justifiant la structure et les contenus générés.",
+      },
+      {
+        titre: "C3 – Confidentialité des données professionnelles",
+        competences: [
+          "Garantir la confidentialité des données professionnelles dans l'utilisation d'outils d'IA Générative",
+          "Appliquer les bonnes pratiques en matière de sécurité et de protection des informations sensibles",
+          "Prévenir toute fuite ou violation de la confidentialité",
+        ],
+        matieres: [
+          { competence: "Sécurité des données et IA", contenu: "Identification des données sensibles, risques de fuite, anonymisation, paramétrage de confidentialité des outils", volume: "2h" },
+          { competence: "Bonnes pratiques de protection", contenu: "Politiques de sécurité internes, correction de prompts à risque, justification des mesures de protection", volume: "1h" },
+        ],
+        modalitesEval: "E3 : Mise en situation professionnelle – Correction d'un prompt présentant des risques de violation de données internes + justification orale des corrections apportées.",
+      },
+      {
+        titre: "C4 – Production de contenus inclusifs",
+        competences: [
+          "Produire des contenus inclusifs en les adaptant aux besoins spécifiques des personnes en situation de handicap",
+          "Garantir l'accessibilité des contenus rédactionnels et visuels",
+          "Adapter les contenus aux handicaps visuel, auditif et cognitif",
+        ],
+        matieres: [
+          { competence: "Accessibilité et handicap visuel", contenu: "Descriptions textuelles (textes alternatifs), adaptation aux lecteurs d'écran, versions audios des contenus", volume: "1h" },
+          { competence: "Accessibilité et handicap auditif", contenu: "Transcription écrite des contenus audio, sous-titrage, alternatives visuelles", volume: "1h" },
+          { competence: "Accessibilité et handicap cognitif", contenu: "Langage simple et clair, structure logique et hiérarchisée, FALC (Facile à Lire et à Comprendre)", volume: "1h" },
+        ],
+        modalitesEval: "E4 : Mise en situation professionnelle – Production d'un contenu rédactionnel accessible tenant compte d'un handicap cognitif + soutenance orale sur les 3 types de handicap.",
+      },
+      {
+        titre: "C5 – Optimisation des contenus générés par l'IA",
+        competences: [
+          "Utiliser les techniques d'optimisation des contenus générés par les outils d'IA Générative",
+          "Enrichir le contexte de la demande dans les échanges conversationnels",
+          "Affiner le prompt initial pour produire des contenus adaptés et améliorés selon des critères définis",
+        ],
+        matieres: [
+          { competence: "Techniques d'optimisation", contenu: "Enrichissement du contexte, affinage itératif des prompts, critères de qualité (contrainte, contexte, style, format)", volume: "2h" },
+          { competence: "Workflow intégré et amélioration", contenu: "Stratégie d'amélioration des contenus, prise en compte du ton et du handicap, évaluation de la qualité finale", volume: "2h" },
+        ],
+        modalitesEval: "E5 : Mise en situation professionnelle – Amélioration d'un contenu déjà généré via un prompt d'optimisation selon des critères imposés (ton, handicap) + soutenance orale.",
+      },
+      {
+        titre: "C6 – Conformité IA Act et RGPD",
+        competences: [
+          "Appliquer les directives de l'IA Act et du RGPD",
+          "Mettre en place une veille réglementaire",
+          "Identifier les risques au sein des contenus et mettre en œuvre des mesures préventives et correctives",
+        ],
+        matieres: [
+          { competence: "Cadre réglementaire IA Act", contenu: "Directives européennes IA Act, obligations de transparence, classification des risques, dernières révisions", volume: "2h" },
+          { competence: "RGPD appliqué à l'IA", contenu: "Protection des données personnelles, veille réglementaire, identification et résolution des problématiques éthiques et réglementaires", volume: "2h" },
+        ],
+        modalitesEval: "E6 : Mise en situation professionnelle – Identification et analyse des risques liés à l'utilisation d'outils d'IA Générative + proposition de solutions conformes IA Act et RGPD + soutenance orale.",
       },
     ],
     secteursActivite: "Secteur tertiaire : assistanat, secrétariat, marketing, communication, ressources humaines, juridique",
