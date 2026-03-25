@@ -7408,12 +7408,12 @@ function genBilanFroidStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: 
     <tr><td><strong>Formation suivie :</strong></td><td>${f.intitule}</td></tr>
   </table>`;
 
-  extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%"><tr style="background:#1e3a7b;color:#fff"><th>Critères évalués</th><th>Tout à fait</th><th>Plutôt oui</th><th>Plutôt non</th><th>Non</th></tr>`;
+  extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%"><thead><tr style="background:#1e3a7b;color:#fff"><th>Critères évalués</th><th>Tout à fait</th><th>Plutôt oui</th><th>Plutôt non</th><th>Non</th></tr></thead><tbody>`;
   allCriteres.forEach((label, idx) => {
     const n = pat[idx];
     extra += `<tr><td>${label}</td><td style="text-align:center;font-weight:700">${n === 0 ? "X" : ""}</td><td style="text-align:center;font-weight:700">${n === 1 ? "X" : ""}</td><td></td><td></td></tr>`;
   });
-  extra += `</table>`;
+  extra += `</tbody></table>`;
 
   const commentsPool = [
     `Avec du recul, la formation ${f.intitule} m'a été réellement utile. J'utilise encore les outils régulièrement dans mon travail quotidien. Les bases vues pendant la formation me permettent de travailler de manière plus autonome.`,
