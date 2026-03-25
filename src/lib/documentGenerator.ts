@@ -900,10 +900,51 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
     : f.modalites === "mixte" ? "Mixte (présentiel et distanciel)"
     : f.modalites || "Présentiel";
 
-  // Format dates
-  const dateDebutFmt = f.dateDebut ? formatDate(f.dateDebut) : "À définir";
-  const dateFinFmt = f.dateFin ? formatDate(f.dateFin) : "À définir";
+  // Detect if formation has individual dates (sessions par stagiaire)
+  const hasIndiv = stagiaires.some(s => s.dateDebutFormation || s.dateFinFormation);
+  const anneeFormation = f.dateDebut ? new Date(f.dateDebut + "T00:00:00").getFullYear() : new Date().getFullYear();
 
+  // Build sessions table if individual dates
+  let sessionsHtml = "";
+  if (hasIndiv) {
+    const sessRows = stagiaires.slice(0, 10).map(s => {
+      const deb = getStagiaireDateDebut(s, f);
+      const fin = getStagiaireDateFin(s, f);
+      return [s.civilite ? `${s.civilite} ${s.nom} ${s.prenom}` : `${s.prenom} ${s.nom}`, formatDate(deb), formatDate(fin)];
+    });
+    sessionsHtml = `<p><strong>Sessions – Année de formation ${anneeFormation}</strong></p>` + tableHTML(["Stagiaire", "Date début", "Date fin"], sessRows);
+  }
+
+  // Detect FLE / certification by competence blocks
+  const lower = f.intitule.toLowerCase();
+  const isFLEOrCertif = lower.includes("français") || lower.includes("fle") || lower.includes("médico-social") || lower.includes("communiquer");
+  const isIACertif = lower.includes("ia générative") || lower.includes("intelligence artificielle");
+  const isBlocFormation = isFLEOrCertif || isIACertif;
+
+  // For bloc-based formations, override duration display
+  const displayDuree = isBlocFormation ? "À définir selon le groupe" : heuresTotal;
+  const displayTarif = isBlocFormation ? "Tarif sur demande" : f.tarif;
+  // Build bloc-based déroulé for FLE/certification formations
+  let blocDerouleHtml = "";
+  if (isBlocFormation) {
+    const chapters = getCourseChapters(f.intitule);
+    if (chapters.length > 0) {
+      for (const chapter of chapters) {
+        blocDerouleHtml += `<h3 style="margin-top:20px;color:${getDocStyle().primaryColor}">${chapter.title}</h3>`;
+        blocDerouleHtml += `<p style="font-style:italic;margin-bottom:8px">${chapter.description}</p>`;
+        blocDerouleHtml += `<table><tr><th style="width:35%">Thème</th><th>Contenu abordé</th></tr>`;
+        for (const sec of chapter.sections) {
+          // Extract a short summary from HTML content
+          const plainText = sec.content.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+          const summary = plainText.length > 200 ? plainText.substring(0, 200) + "…" : plainText;
+          blocDerouleHtml += `<tr><td><strong>${sec.title}</strong></td><td>${summary}</td></tr>`;
+        }
+        blocDerouleHtml += `</table>`;
+      }
+    } else {
+      blocDerouleHtml = derouleHtml;
+    }
+  }
   const extraContent = `
     <h2>1. Organisme de formation</h2>
     <div class="section">
@@ -968,9 +1009,9 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
 
     <h2>7. Durée et lieu de formation</h2>
     <div class="section">
-      <p><strong>Durée totale :</strong> ${heuresTotal} (${nbJours} jour${nbJours > 1 ? "s" : ""})</p>
-      <p><strong>Dates :</strong> Du ${dateDebutFmt} au ${dateFinFmt}</p>
-      <p><strong>Horaires :</strong> 09h00 – 12h30 / 13h30 – ${totalHeures / nbJours <= 6 ? '16h00' : '17h00'}</p>
+      <p><strong>Durée totale :</strong> ${displayDuree}${!isBlocFormation ? ` (${nbJours} jour${nbJours > 1 ? "s" : ""})` : ""}</p>
+      ${hasIndiv ? sessionsHtml : ""}
+      <p><strong>Horaires :</strong> 09h00 – 12h30 / 13h30 – 17h00</p>
       <p><strong>Modalité :</strong> ${modaliteLabel}</p>
       <p><strong>Lieu de formation :</strong> ${f.lieu || `${o.adresse}, ${o.codePostal} ${o.ville}`}</p>
       <p><strong>Nombre de participants :</strong> ${nbStagiaires}</p>
@@ -1004,7 +1045,7 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
 
     <h2>10. Tarif</h2>
     <div class="section">
-      <p><strong>Tarif :</strong> ${f.tarif}</p>
+      <p><strong>Tarif :</strong> ${displayTarif}</p>
       <p>TVA non applicable, article 261-4-4° du CGI.</p>
       <p><em>Possibilité de prise en charge par votre OPCO ou Pôle Emploi. Contactez-nous pour un devis personnalisé.</em></p>
     </div>
@@ -1049,7 +1090,7 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
       <p><strong>Téléphone :</strong> ${o.telephone}</p>
     </div>
 
-    <h2>14. Indicateurs de performance – Année ${f.dateDebut ? new Date(f.dateDebut + "T00:00:00").getFullYear() : new Date().getFullYear()}</h2>
+    <h2>14. Indicateurs de performance – Année ${anneeFormation}</h2>
     <div class="section">
       <table>
         <tr><th>Indicateur</th><th>Résultat</th></tr>
@@ -1062,13 +1103,13 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
       <p style="margin-top:8px"><em>Ces indicateurs sont mis à jour annuellement et consultables sur le site internet de ${o.nom}.</em></p>
     </div>
 
-    <h2>15. Déroulé pédagogique de la formation (${heuresTotal})</h2>
+    <h2>15. Déroulé pédagogique de la formation${!isBlocFormation ? ` (${heuresTotal})` : ""}</h2>
     <div class="section" style="padding:5px">
       <p style="margin-bottom:10px"><strong>Formation :</strong> ${f.intitule}<br>
-      <strong>Durée :</strong> ${heuresTotal} — ${nbJours} jour${nbJours > 1 ? "s" : ""}<br>
+      <strong>Durée :</strong> ${displayDuree}<br>
       <strong>Formateur :</strong> ${f.formateur || o.dirigeant}</p>
     </div>
-    ${derouleHtml}
+    ${isBlocFormation ? blocDerouleHtml : derouleHtml}
 
     <div class="section section-orange" style="margin-top:25px">
       <p><strong>📋 Documents remis au stagiaire :</strong></p>
