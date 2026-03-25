@@ -367,7 +367,8 @@ export function genEmargementJour_V2(o: OrganismeInfo, f: FormationInfo, stagiai
       stagiaires.slice(0, 10).forEach(s => {
         const stagName = `${s.prenom} ${s.nom.toUpperCase()}`;
         const stagSigHtml = s.signatureUrl ? `<br><img src="${s.signatureUrl}" alt="Sig" style="max-height:40px;max-width:90px;object-fit:contain;margin-top:4px" />` : `<br><span style="font-style:italic;color:#999;font-size:10px">Signé ${s.prenom[0]}.${s.nom}</span>`;
-        const formateurSigHtml = o.signatureUrl ? `<br><img src="${o.signatureUrl}" alt="Sig" style="max-height:40px;max-width:90px;object-fit:contain;margin-top:4px" />` : '';
+        const fmtSigUrl = s.formateurSignatureUrl || f.formateurSignatureUrl;
+        const formateurSigHtml = fmtSigUrl ? `<br><img src="${fmtSigUrl}" alt="Sig formateur" style="max-height:40px;max-width:90px;object-fit:contain;margin-top:4px" />` : (o.signatureUrl ? `<br><img src="${o.signatureUrl}" alt="Sig" style="max-height:40px;max-width:90px;object-fit:contain;margin-top:4px" />` : '');
         tableRows += `<tr style="background:#fff;border-bottom:1px solid #ddd"><td>${day}</td><td>Matin</td><td style="padding:10px 6px">${stagName}${stagSigHtml}</td><td style="padding:10px 6px">${f.formateur}${formateurSigHtml}</td></tr>`;
         tableRows += `<tr style="background:#fff;border-bottom:1px solid #ccc"><td></td><td>Après-midi</td><td style="padding:10px 6px">${stagName}${stagSigHtml}</td><td style="padding:10px 6px">${f.formateur}${formateurSigHtml}</td></tr>`;
       });

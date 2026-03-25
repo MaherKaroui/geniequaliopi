@@ -337,8 +337,9 @@ export function buildDocument(config: DocBuildConfig): string {
     body += config.extraHtml;
   }
   if (config.signatures) {
+    const fmtSigUrl = config.signatures.formateurSignatureUrl || config.formation?.formateurSignatureUrl;
     if (config.signatures.type === "3") {
-      body += signatureBlock3(config.org, config.signatures.names?.[0], config.signatures.names?.[1], config.signatures.stagiaireSignatureUrl);
+      body += signatureBlock3(config.org, config.signatures.names?.[0], config.signatures.names?.[1], config.signatures.stagiaireSignatureUrl, fmtSigUrl);
     } else {
       body += signatureBlock2(
         config.signatures.labels?.[0] || "Partie 1",
@@ -348,7 +349,8 @@ export function buildDocument(config: DocBuildConfig): string {
         config.org.signatureUrl,
         config.org.tamponUrl,
         config.signatures.stagiaireSignatureUrl,
-        config.signatures.dates
+        config.signatures.dates,
+        fmtSigUrl
       );
     }
   }
