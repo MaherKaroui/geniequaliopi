@@ -6725,9 +6725,9 @@ function genExercicesCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires
     return addTypos(response, errorRate);
   };
 
-  // Generate note
-  const noteVariation = ((hash + exerciceIdx * 13) % 5 - 2) * 0.5;
-  const rawNote = Math.max(1, Math.min(5, profile.baseNote + noteVariation));
+  // Generate note — always good notes (4-5/5)
+  const noteVariation = ((hash + exerciceIdx * 13) % 3) * 0.5;
+  const rawNote = Math.max(4, Math.min(5, profile.baseNote + noteVariation));
   const note = Math.round(rawNote * 2) / 2;
 
   // Generate formateur observation
