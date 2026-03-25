@@ -456,6 +456,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
       return genBilanChaudStagiaire(o, f, stagiaires, si);
     }
     case "compte_rendu_formateur": return genCompteRenduFormateur(o, f);
+    case "bilan_fin_formation_formateur": return genBilanFinFormationFormateur(o, f, stagiaires);
     case "tableau_relance_appreciations": return genTableauRelanceAppreciations(o);
     case "procedure_formation_fc": return genProcedureFormationFC(o);
     case "dossier_inscription": return genDossierInscription(o, f, stagiaires);
