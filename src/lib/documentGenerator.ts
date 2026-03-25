@@ -7129,6 +7129,8 @@ function genExercicesCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires
   // Generate module-specific exercise consigne and student response templates
   const consigne = getModuleSpecificConsigne(matiereTitle, matiereContenu, moduleTitle, si, exerciceIdx, hash);
 
+const FALLBACK_STAGIAIRE: StagiaireInfo = { prenom: "Martin", nom: "Dupont", civilite: "" as const, email: "", telephone: "", entreprise: "", poste: "", dateNaissance: "" };
+
 
   const exerciceTitre = matiereTitle
     ? `Exercice ${exerciceIdx + 1} : ${matiereTitle}`
