@@ -644,9 +644,9 @@ export function genExercicesStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
     const days = getFormationDays(f);
     const nbJours = days.length;
     const jourFin = Math.min(exerciceIdx * 2 + 2, nbJours);
-    exerciseDate = days.length >= jourFin ? days[jourFin - 1] : formatDate(f.dateFin);
+    exerciseDate = days.length >= jourFin ? days[jourFin - 1] : formatDate(getStagiaireDateFin(s, f));
   } else {
-    exerciseDate = formatDate(f.dateFin);
+    exerciseDate = formatDate(getStagiaireDateFin(s, f));
   }
 
   let extra = `
