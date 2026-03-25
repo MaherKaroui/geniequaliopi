@@ -53,9 +53,9 @@ export function genCertificatRealisation(o: OrganismeInfo, f: FormationInfo, sta
     <p>Je soussigné(e), <strong>${o.dirigeant}</strong>, représentant l'organisme de formation <strong>${o.nom}</strong> (NDA : ${o.nda}),</p>
     <p>atteste que <strong>${s.prenom} ${s.nom}</strong></p>
     <p>a bien suivi l'action de formation ci-dessous :</p>
-    <p><strong>Intitulé :</strong> ${f.intitule}<br><strong>Objectif :</strong> ${f.objectifs}<br><strong>Durée :</strong> ${f.duree}<br><strong>Du :</strong> ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)}<br><strong>Modalité :</strong> ${f.modalites}<br><strong>Lieu :</strong> ${f.lieu}</p>
+    <p><strong>Intitulé :</strong> ${f.intitule}<br><strong>Objectif :</strong> ${f.objectifs}<br><strong>Durée :</strong> ${f.duree}<br><strong>Du :</strong> ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}<br><strong>Modalité :</strong> ${f.modalites}<br><strong>Lieu :</strong> ${f.lieu}</p>
     <p><strong>Nature de l'action :</strong> Action de formation au sens de l'article L.6313-1 du Code du travail</p>
-    <p>Fait à ${o.ville}, le ${formatDate(f.dateFin)}</p>
+    <p>Fait à ${o.ville}, le ${formatDate(getStagiaireDateFin(s, f))}</p>
     </div><div class="page-break"></div>`).join("");
   return buildDocument({ org: o, title: "CERTIFICATS DE RÉALISATION", subtitle: f.intitule, extraHtml: extra,
     signatures: { type: "2", labels: ["Le Responsable de l'organisme", "Cachet"], names: [o.dirigeant, ""] } });
