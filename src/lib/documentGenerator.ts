@@ -6624,10 +6624,10 @@ function genExercicesCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires
 
   const studentProfiles = [
     { level: 'excellent', baseNote: 4.5, style: 'structuré et détaillé' },
-    { level: 'bon', baseNote: 4, style: 'correct avec quelques approximations' },
-    { level: 'moyen', baseNote: 3, style: 'basique mais pertinent' },
     { level: 'tres_bon', baseNote: 5, style: 'brillant et autonome' },
-    { level: 'passable', baseNote: 2.5, style: 'en cours d\'acquisition' },
+    { level: 'bon', baseNote: 4, style: 'rigoureux et appliqué' },
+    { level: 'excellent', baseNote: 4.5, style: 'clair et méthodique' },
+    { level: 'tres_bon', baseNote: 4.5, style: 'pertinent et bien argumenté' },
   ];
   const profile = studentProfiles[si % studentProfiles.length];
 
