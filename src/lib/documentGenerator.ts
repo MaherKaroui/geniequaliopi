@@ -235,6 +235,73 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "livret_recevabilite_vae": return genLivretRecevabilite(o, f, stagiaires);
     case "dossier_validation_vae": return genDossierValidation(o, f, stagiaires);
     case "accompagnement_vae": return genAccompagnementVAE(o, f, stagiaires);
+    // === VAE complet ===
+    case "vae_plaquette_info": return genVAEPlaquetteInfo(o);
+    case "vae_procedure_info": return genVAEProcedureInfo(o);
+    case "vae_indicateurs_resultats": return genVAEIndicateursResultats(o);
+    case "vae_taux_certification": return genVAETauxCertification(o);
+    case "vae_entretien_faisabilite": return genVAEEntretienFaisabilite(o, f);
+    case "vae_diagnostic_faisabilite": {
+      const si = params?.stagiaireIdx ?? 0;
+      return genVAEDiagnosticFaisabilite(o, f, stagiaires, si);
+    }
+    case "vae_referentiel_accompagnement": return genVAEReferentielAccompagnement(o, f);
+    case "vae_programme_accompagnement": return genVAEProgrammeAccompagnement(o, f);
+    case "vae_positionnement_initial": {
+      const si = params?.stagiaireIdx ?? 0;
+      return genVAEPositionnementInitial(o, f, stagiaires, si);
+    }
+    case "vae_livret_accueil": return genVAELivretAccueil(o, f);
+    case "vae_convention_accompagnement": {
+      const si = params?.stagiaireIdx ?? 0;
+      return genVAEConventionAccompagnement(o, f, stagiaires, si);
+    }
+    case "vae_reglement_interieur": return genVAEReglementInterieur(o);
+    case "vae_fiche_suivi_individuel": {
+      const si = params?.stagiaireIdx ?? 0;
+      return genVAEFicheSuiviIndividuel(o, f, stagiaires, si);
+    }
+    case "vae_grille_evaluation_dossier": {
+      const si = params?.stagiaireIdx ?? 0;
+      return genVAEGrilleEvaluationDossier(o, f, stagiaires, si);
+    }
+    case "vae_emargement": {
+      const si = params?.stagiaireIdx ?? 0;
+      return genVAEEmargement(o, f, stagiaires, si);
+    }
+    case "vae_procedure_abandon": return genVAEProcedureAbandon(o);
+    case "vae_attestation_assiduite": {
+      const si = params?.stagiaireIdx ?? 0;
+      return genVAEAttestationAssiduite(o, f, stagiaires, si);
+    }
+    case "vae_procedure_jury": return genVAEProcedureJury(o, f);
+    case "vae_convocation_jury": {
+      const si = params?.stagiaireIdx ?? 0;
+      return genVAEConvocationJury(o, f, stagiaires, si);
+    }
+    case "vae_pv_jury": {
+      const si = params?.stagiaireIdx ?? 0;
+      return genVAEPVJury(o, f, stagiaires, si);
+    }
+    case "vae_notification_decision": {
+      const si = params?.stagiaireIdx ?? 0;
+      return genVAENotificationDecision(o, f, stagiaires, si);
+    }
+    case "vae_moyens_dedies": return genVAEMoyensDedies(o);
+    case "vae_coordination_accompagnateurs": return genVAECoordinationAccompagnateurs(o);
+    case "vae_ressources": return genVAERessources(o);
+    case "vae_fiche_poste_accompagnateur": return genVAEFichePosteAccompagnateur(o);
+    case "vae_plan_dev_accompagnateurs": return genVAEPlanDevAccompagnateurs(o);
+    case "vae_veille_reglementaire": return genVAEVeilleReglementaire(o);
+    case "vae_accessibilite_handicap": return genVAEAccessibiliteHandicap(o);
+    case "vae_partenaires": return genVAEPartenaires(o);
+    case "vae_satisfaction": {
+      const si = params?.stagiaireIdx ?? 0;
+      return genVAESatisfaction(o, f, stagiaires, si);
+    }
+    case "vae_synthese_satisfaction": return genVAESyntheseSatisfaction(o);
+    case "vae_procedure_reclamation": return genVAEProcedureReclamation(o);
+    case "vae_plan_amelioration": return genVAEPlanAmelioration(o);
     case "qcm_positionnement": return genQCMPositionnement(o, f, stagiaires);
     case "exercices_pratiques": return genExercicesPratiques_V2(o, f, stagiaires);
     case "qcm_final": return genQCMFinal_V2(o, f, stagiaires);
