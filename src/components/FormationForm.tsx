@@ -279,6 +279,21 @@ const FormationForm = ({ data, onChange, onImportStagiaires }: FormationFormProp
           <Label htmlFor="methodesEvaluation">Méthodes d'évaluation</Label>
           <Textarea id="methodesEvaluation" value={data.methodesEvaluation} onChange={e => update('methodesEvaluation', e.target.value)} placeholder="Ex: QCM, mise en situation, étude de cas..." rows={2} />
         </div>
+        <div className="md:col-span-2">
+          <Label>Signature du formateur</Label>
+          <div className="flex items-center gap-4 mt-1">
+            {data.formateurSignatureUrl ? (
+              <div className="relative">
+                <img src={data.formateurSignatureUrl} alt="Signature formateur" className="h-16 border rounded p-1" />
+                <button type="button" onClick={() => onChange({ ...data, formateurSignatureUrl: '' })} className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">×</button>
+              </div>
+            ) : null}
+            <Button type="button" variant="outline" size="sm" onClick={() => formateurSigRef.current?.click()}>
+              <Upload className="w-4 h-4 mr-1" /> Importer signature
+            </Button>
+            <input ref={formateurSigRef} type="file" accept="image/*" className="hidden" onChange={e => { if (e.target.files?.[0]) handleFormateurSigFile(e.target.files[0]); }} />
+          </div>
+        </div>
       </div>
     </div>
   );
