@@ -74,8 +74,19 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
   const realStagiairesCount = userStagiaires.filter(s => s.nom && s.nom.trim()).length || 1;
   const formateurs = SAMPLE_FORMATEURS;
   const fi = params?.fi ?? 0;
-  const f = formations[fi] || formations[0];
+  let f = formations[fi] || formations[0];
   const fmt = formateurs[params?.formateurIdx ?? 0];
+
+  // Override formateur from stagiaire's assigned formateur if available
+  const si = params?.stagiaireIdx ?? 0;
+  const targetStagiaire = stagiaires[si] || stagiaires[0];
+  if (targetStagiaire?.formateur && targetStagiaire.formateur.trim()) {
+    f = { ...f, formateur: targetStagiaire.formateur };
+  }
+  // Also override from explicit formateurNom param (e.g. sous-traitance per-formateur docs)
+  if (params?.formateurNom) {
+    f = { ...f, formateur: params.formateurNom };
+  }
 
   switch (template) {
     case "fiche_identite": return genFicheIdentite(o);
