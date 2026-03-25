@@ -548,7 +548,7 @@ export function genListePartenairesV2(o: OrganismeInfo) {
   ], extraHtml: `<h2>Les partenaires de ${o.nom}</h2>
     <table>
       <tr><th>Partenaire</th><th>${o.dirigeant}</th></tr>
-      <tr style="background:#fff"><td>Président</td><td>Président<br>${tamponHtml}</td></tr>
+      <tr style="background:#fff"><td>Dirigeant</td><td>Dirigeant<br>${tamponHtml}</td></tr>
     </table>` });
 }
 
@@ -562,7 +562,7 @@ export function genContratSousTraitanceV2(o: OrganismeInfo, f: FormationInfo, st
   const sousTraitantSiren = "910 645 563";
   const sousTraitantAdresse = "5 Allée Watteau, 95200 SARCELLES";
   const sousTraitantDirigeant = "Monsieur Jeganathan SOFIANE";
-  const sousTraitantQualite = "Président";
+  const sousTraitantQualite = "Dirigeant";
 
   return buildDocument({ org: o, title: "CONTRAT DE SOUS-TRAITANCE EN FORMATION PROFESSIONNELLE", subtitle: "Conformément aux articles L.6351-1 et suivants du Code du travail et au Référentiel National Qualité (Qualiopi)", sections: [
     { heading: "ENTRE LES SOUSSIGNÉS", content: `
