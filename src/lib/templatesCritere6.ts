@@ -555,15 +555,56 @@ export function genListePartenairesV2(o: OrganismeInfo) {
 export function genContratSousTraitanceV2(o: OrganismeInfo, f: FormationInfo, stagiaires: import("@/types/qualiopi").StagiaireInfo[]) {
   const stagList = stagiaires.map(s => `${s.prenom} ${s.nom}${s.poste ? ' – ' + s.poste : ''}`).join(', ') || "___";
   const dateMaj = (o as any).dateMaj ? new Date((o as any).dateMaj).toLocaleDateString("fr-FR") : new Date().toLocaleDateString("fr-FR");
-  // Sous-traitant info from formation or org
-  const sousTraitantNom = "VICTOR ACADEMY";
-  const sousTraitantForme = "SASU – Société par Actions Simplifiée Unipersonnelle";
-  const sousTraitantSiret = "910 645 563 00016";
-  const sousTraitantSiren = "910 645 563";
-  const sousTraitantAdresse = "5 Allée Watteau, 95200 SARCELLES";
-  const sousTraitantDirigeant = "Monsieur Jeganathan SOFIANE";
-  const sousTraitantQualite = "Dirigeant";
   const formateurNom = f.formateur || "";
+
+  // Déterminer si le formateur est lié à VICTOR ACADEMY ou est une personne physique
+  const isVictorAcademy = formateurNom.toUpperCase().includes("RENUKA");
+
+  // Infos sous-traitant selon le cas
+  const sousTraitantNom = isVictorAcademy ? "VICTOR ACADEMY" : formateurNom || "Le Sous-traitant";
+  const sousTraitantType = isVictorAcademy ? "société" : "personne physique";
+
+  // Bloc d'identification du sous-traitant
+  let sousTraitantBlock = "";
+  if (isVictorAcademy) {
+    sousTraitantBlock = `
+      <p><strong>${sousTraitantNom}</strong></p>
+      <p>Forme juridique : SASU – Société par Actions Simplifiée Unipersonnelle</p>
+      <p>SIRET : 910 645 563 00016 | SIREN : 910 645 563</p>
+      <p>Siège social : 5 Allée Watteau, 95200 SARCELLES</p>
+      <p>Représenté par : <strong>Monsieur Jeganathan SOFIANE</strong>, en qualité de Dirigeant</p>
+      <p>Ci-après dénommé <strong>« le Sous-traitant »</strong></p>
+      <br/><p><strong>Formateur désigné :</strong> ${formateurNom}</p>
+    `;
+  } else {
+    sousTraitantBlock = `
+      <p><strong>Monsieur/Madame ${formateurNom}</strong></p>
+      <p>Formateur indépendant – Personne physique</p>
+      <p>Ci-après dénommé(e) <strong>« le Sous-traitant »</strong></p>
+    `;
+  }
+
+  // Bloc signature sous-traitant
+  const sousTraitantSignLabel = isVictorAcademy ? `Pour le Sous-traitant – VICTOR ACADEMY` : `Pour le Sous-traitant – ${formateurNom}`;
+  const sousTraitantSignRepresentant = isVictorAcademy ? `Monsieur Jeganathan SOFIANE` : formateurNom;
+  const sousTraitantSignQualite = isVictorAcademy ? "Dirigeant" : "Formateur indépendant";
+
+  // Préambule adapté
+  const preambuleSousTraitant = isVictorAcademy
+    ? `Le Sous-traitant, <strong>VICTOR ACADEMY</strong>, est un organisme de formation professionnelle disposant de formateurs salariés qualifiés dans le domaine de l'enseignement du Français Langue Étrangère (FLE).`
+    : `Le Sous-traitant, <strong>${formateurNom}</strong>, est un formateur indépendant (personne physique) qualifié dans le domaine de la formation professionnelle.`;
+
+  const preambuleFormateur = isVictorAcademy
+    ? `<p>Le formateur désigné pour l'exécution de la présente prestation est <strong>${formateurNom}</strong>, salarié du Sous-traitant.</p>`
+    : "";
+
+  // Article 1 adapté
+  const art1Intermediaire = isVictorAcademy
+    ? `son formateur salarié <strong>${formateurNom}</strong>`
+    : `<strong>${formateurNom}</strong>, en qualité de formateur indépendant`;
+  const art1Statut = isVictorAcademy
+    ? `<p><strong>Il est expressément convenu que le formateur ${formateurNom} intervenant dans le cadre du présent contrat est un salarié du Sous-traitant et non du Donneur d'ordre.</strong></p>`
+    : `<p><strong>Il est expressément convenu que ${formateurNom} intervient en qualité de prestataire indépendant et qu'aucun lien de subordination n'existe entre le Donneur d'ordre et le Sous-traitant.</strong></p>`;
 
   return buildDocument({ org: o, title: "CONTRAT DE SOUS-TRAITANCE EN FORMATION PROFESSIONNELLE", subtitle: "Conformément aux articles L.6351-1 et suivants du Code du travail et au Référentiel National Qualité (Qualiopi)", sections: [
     { heading: "ENTRE LES SOUSSIGNÉS", content: `
@@ -577,27 +618,21 @@ export function genContratSousTraitanceV2(o: OrganismeInfo, f: FormationInfo, st
       <p>Ci-après dénommé <strong>« le Donneur d'ordre »</strong></p>
       <br/>
       <p><strong>2. LE SOUS-TRAITANT :</strong></p>
-      <p><strong>${sousTraitantNom}</strong></p>
-      <p>Forme juridique : ${sousTraitantForme}</p>
-      <p>SIRET : ${sousTraitantSiret} | SIREN : ${sousTraitantSiren}</p>
-      <p>Siège social : ${sousTraitantAdresse}</p>
-      <p>Représenté par : <strong>${sousTraitantDirigeant}</strong>, en qualité de ${sousTraitantQualite}</p>
-      <p>Ci-après dénommé <strong>« le Sous-traitant »</strong></p>
-      ${formateurNom ? `<br/><p><strong>Formateur désigné :</strong> ${formateurNom}</p>` : ""}
+      ${sousTraitantBlock}
       <br/>
       <p style="font-style:italic">Ci-après désignés ensemble « les Parties ».</p>
     ` },
     { heading: "PRÉAMBULE", content: `
       <p>Le Donneur d'ordre, <strong>${o.nom}</strong>, est un organisme de formation professionnelle déclaré auprès de la DREETS sous le numéro ${o.nda}.</p>
-      <p>Le Sous-traitant, <strong>${sousTraitantNom}</strong>, est un organisme de formation professionnelle disposant de formateurs salariés qualifiés dans le domaine de l'enseignement du Français Langue Étrangère (FLE).</p>
+      <p>${preambuleSousTraitant}</p>
       <p>Le Donneur d'ordre souhaite confier au Sous-traitant, qui l'accepte, la réalisation de prestations de formation en sous-traitance, dans les conditions définies ci-après.</p>
-      ${formateurNom ? `<p>Le formateur désigné pour l'exécution de la présente prestation est <strong>${formateurNom}</strong>, salarié du Sous-traitant.</p>` : ""}
+      ${preambuleFormateur}
       <p>Le présent contrat est conclu dans le cadre des articles <strong>L.6351-1 et suivants du Code du travail</strong> relatifs à la sous-traitance en formation professionnelle.</p>
     ` },
     { heading: "ARTICLE 1 – OBJET DU CONTRAT", content: `
       <p>Le présent contrat a pour objet de définir les conditions dans lesquelles le Donneur d'ordre confie au Sous-traitant la réalisation de prestations de formation professionnelle continue au bénéfice de ses apprenants.</p>
-      <p>Le Sous-traitant s'engage à réaliser les prestations de formation par l'intermédiaire de ${formateurNom ? `son formateur salarié <strong>${formateurNom}</strong>` : `ses <strong>formateurs salariés</strong>`}, conformément aux programmes, objectifs pédagogiques et conditions définis par le Donneur d'ordre.</p>
-      <p><strong>Il est expressément convenu que ${formateurNom ? `le formateur ${formateurNom} intervenant` : "les formateurs intervenant"} dans le cadre du présent contrat ${formateurNom ? "est un salarié" : "sont des salariés"} du Sous-traitant et non du Donneur d'ordre.</strong></p>
+      <p>Le Sous-traitant s'engage à réaliser les prestations de formation par l'intermédiaire de ${art1Intermediaire}, conformément aux programmes, objectifs pédagogiques et conditions définis par le Donneur d'ordre.</p>
+      ${art1Statut}
     ` },
     { heading: "ARTICLE 2 – DESCRIPTION DE LA FORMATION", content: `
       <table>
