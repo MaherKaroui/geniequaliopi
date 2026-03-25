@@ -8031,15 +8031,14 @@ function genBilanFinFormationFormateur(o: OrganismeInfo, f: FormationInfo, stagi
   const nbStagiairesFormateur = stagiairesFormateur.length || stagiaires.length;
 
   // Find the matching stagiaire for signature
-  const matchingStagiaire = stagiaires.find(s => s.formateur === formateurNom);
+  const matchingStagiaire = stagiairesFormateur[0] || stagiaires.find(s => s.formateur === formateurNom);
   const fmtSigUrl = matchingStagiaire?.formateurSignatureUrl || f.formateurSignatureUrl;
   const fmtSigHtml = fmtSigUrl
     ? `<img src="${fmtSigUrl}" alt="Signature formateur" style="max-height:60px;margin-top:4px;" />`
     : "";
 
-  const nbStagiaires = stagiaires.length;
-  const tauxReussite = Math.min(100, Math.round(80 + (nbStagiaires * 3)));
-  const tauxPresence = Math.min(100, Math.round(90 + (nbStagiaires * 2)));
+  const tauxReussite = Math.min(100, Math.round(80 + (nbStagiairesFormateur * 3)));
+  const tauxPresence = Math.min(100, Math.round(90 + (nbStagiairesFormateur * 2)));
 
   let extra = `
 <table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%">
