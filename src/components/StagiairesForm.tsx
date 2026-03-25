@@ -47,6 +47,11 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
     reader.onload = () => updateStagiaire(index, 'signatureResponsableUrl', reader.result as string);
     reader.readAsDataURL(file);
   };
+  const handleSigFormateurFile = (index: number, file: File) => {
+    const reader = new FileReader();
+    reader.onload = () => updateStagiaire(index, 'formateurSignatureUrl', reader.result as string);
+    reader.readAsDataURL(file);
+  };
 
   return (
     <div className="space-y-6">
