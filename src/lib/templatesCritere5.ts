@@ -113,7 +113,7 @@ export function genAutoEvaluationFormateurV2(o: OrganismeInfo, f: FormationInfo,
     <p>Renforcer encore la pratique sur des cas professionnels concrets.</p></div>
     <p><strong>Organisme de formation :</strong> ${o.nom}</p>
     <div class="signature-block-2">
-      <div class="sig-box"><p class="sig-label">Signature du formateur</p><p>Nom : ${fmt.prenom} ${fmt.nom}</p><p>Date : ${formatDate(f.dateFin)}</p><p style="margin-top:20px">Signature :</p>${f.formateurSignatureUrl ? `<img src="${f.formateurSignatureUrl}" alt="Signature formateur" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : (o.signatureUrl ? `<img src="${o.signatureUrl}" alt="Signature" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : "")}</div>
+      <div class="sig-box"><p class="sig-label">Signature du formateur</p><p>Nom : ${formateurNom}</p><p>Date : ${formatDate(f.dateFin)}</p><p style="margin-top:20px">Signature :</p>${fmtSigUrl ? `<img src="${fmtSigUrl}" alt="Signature formateur" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : ""}</div>
       <div class="sig-box"><p class="sig-label">Le Responsable Pédagogique</p><p>Nom : ${o.responsablePedagogique}</p><p>Date : ${formatDate(f.dateFin)}</p><p style="margin-top:20px">Cachet :</p>${o.tamponUrl ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />` : ""}</div>
     </div>
   ` });
