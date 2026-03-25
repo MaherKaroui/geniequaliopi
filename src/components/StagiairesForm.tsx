@@ -162,6 +162,10 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
               <Label>Date fin formation</Label>
               <Input type="date" value={stagiaire.dateFinFormation} onChange={e => updateStagiaire(index, 'dateFinFormation', e.target.value)} />
             </div>
+            <div className="md:col-span-2">
+              <Label>Formateur de la session</Label>
+              <Input value={stagiaire.formateur || ""} onChange={e => updateStagiaire(index, 'formateur', e.target.value)} placeholder="Nom du formateur (ex: RENUKA CALISSTUS SURESH)" />
+            </div>
           </div>
           {/* Signature stagiaire */}
           <div className="flex items-center gap-3 mt-2 pt-2 border-t border-border/50">
