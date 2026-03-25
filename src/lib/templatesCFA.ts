@@ -93,7 +93,7 @@ export function genProcedureSuiviApprentissage(o: OrganismeInfo) {
 
 export function genConventionPedagogiqueCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const s = stagiaires[0] || { prenom: "___", nom: "___", entreprise: "___" };
-  return buildDocument({ org: o, title: "CONVENTION PÉDAGOGIQUE CFA / ENTREPRISE", subtitle: f.intitule, formation: f, showFormationInfo: true, sections: [
+  return buildDocument({ org: o, title: "CONVENTION PÉDAGOGIQUE CFA / ENTREPRISE", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, sections: [
     { heading: "Entre", content: `<p><strong>Le CFA :</strong> ${o.nom}<br>Représenté par : ${o.dirigeant}<br><br><strong>L'entreprise :</strong> ${s.entreprise}<br><strong>L'apprenti(e) :</strong> ${s.prenom} ${s.nom}</p>` },
     { heading: "Objet", content: `<p>La présente convention définit les modalités de mise en œuvre de la formation « ${f.intitule} » en alternance.</p>` },
     { heading: "Rythme d'alternance", content: `<p>3 jours en entreprise / 2 jours au CFA<br>Période : du ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)}<br>Durée totale : ${f.duree}</p>` },
@@ -132,7 +132,7 @@ export function genCalendrierCFA(o: OrganismeInfo, f: FormationInfo) {
 
 export function genConvocationApprenti(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   let extra = stagiaires.slice(0, 5).map(s => `<div class="section"><p><strong>Destinataire :</strong> ${s.prenom} ${s.nom}</p><p><strong>Entreprise d'accueil :</strong> ${s.entreprise}</p><p><strong>Formation :</strong> ${f.intitule}</p><p><strong>Période CFA :</strong> Du ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)}</p></div>`).join("");
-  return buildDocument({ org: o, title: "CONVOCATION APPRENTI AU CFA", subtitle: f.intitule, formation: f, showFormationInfo: true, extraHtml: extra + `<p>Merci de vous présenter muni(e) de cette convocation et de votre carnet de liaison.</p>` });
+  return buildDocument({ org: o, title: "CONVOCATION APPRENTI AU CFA", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra + `<p>Merci de vous présenter muni(e) de cette convocation et de votre carnet de liaison.</p>` });
 }
 
 export function genFicheMissionEntreprise(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
@@ -182,7 +182,7 @@ export function genPositionnementInitialApprenti(o: OrganismeInfo, f: FormationI
     const avg = Math.round(sc.reduce((a, b) => a + b, 0) / sc.length * 10) / 10;
     return [s.prenom + " " + s.nom, s.entreprise, `${avg}/10`, avg >= 8 ? "Avancé" : avg >= 6 ? "Intermédiaire" : "Débutant", evalData.appreciations[i]?.split('.')[0] + '.' || ""];
   });
-  return buildDocument({ org: o, title: "POSITIONNEMENT INITIAL DES APPRENTIS", subtitle: f.intitule, formation: f, showFormationInfo: true, table: {
+  return buildDocument({ org: o, title: "POSITIONNEMENT INITIAL DES APPRENTIS", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, table: {
     headers: ["Apprenti(e)", "Entreprise", "Score", "Niveau", "Observations"], rows
   } });
 }
@@ -198,11 +198,11 @@ export function genEntretienPositionnement(o: OrganismeInfo, f: FormationInfo, s
       <p><strong>Aménagements nécessaires :</strong> ${s.entreprise ? "Aucun" : "À évaluer"}</p>
     </div>`;
   });
-  return buildDocument({ org: o, title: "ENTRETIENS DE POSITIONNEMENT", subtitle: f.intitule, formation: f, showFormationInfo: true, extraHtml: extra });
+  return buildDocument({ org: o, title: "ENTRETIENS DE POSITIONNEMENT", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra });
 }
 
 export function genAnalyseBesoinsApprenti(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
-  return buildDocument({ org: o, title: "ANALYSE DES BESOINS – APPRENTIS", subtitle: f.intitule, formation: f, showFormationInfo: true, sections: [
+  return buildDocument({ org: o, title: "ANALYSE DES BESOINS – APPRENTIS", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, sections: [
     { heading: "Méthodologie", content: `<p>L'analyse des besoins des ${Math.min(stagiaires.length, 10)} apprentis a été réalisée via :<br>• Entretiens individuels de positionnement<br>• Questionnaire en ligne<br>• Échange avec les maîtres d'apprentissage<br>• Tests de niveau</p>` },
     { heading: "Besoins identifiés", content: "<p>• 70% souhaitent un accompagnement renforcé en entreprise<br>• 60% ont besoin de consolider les bases théoriques<br>• 40% demandent un suivi personnalisé<br>• 20% nécessitent des aménagements spécifiques</p>" },
     { heading: "Plan de formation individualisé", content: "<p>Chaque apprenti bénéficie d'un plan de formation individualisé intégrant :<br>• Les compétences à acquérir au CFA<br>• Les missions en entreprise<br>• Les modalités d'évaluation<br>• Le calendrier d'alternance adapté</p>", variant: "green" },
@@ -221,7 +221,7 @@ export function genPlanIndividuelFormation(o: OrganismeInfo, f: FormationInfo, s
       ["Compétence 4 – Certification", "Préparation examen", "Mise en situation professionnelle", "T4", "📋"],
     ]);
   });
-  return buildDocument({ org: o, title: "PLANS INDIVIDUELS DE FORMATION", subtitle: f.intitule, formation: f, showFormationInfo: true, extraHtml: extra });
+  return buildDocument({ org: o, title: "PLANS INDIVIDUELS DE FORMATION", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra });
 }
 
 export function genProgressionPedagogique(o: OrganismeInfo, f: FormationInfo) {
@@ -287,7 +287,7 @@ export function genBilanIntermediaireApprenti(o: OrganismeInfo, f: FormationInfo
     extra += `<div class="section"><h3>${s.prenom} ${s.nom} – ${s.entreprise}</h3>
       <p><strong>Note intermédiaire :</strong> ${avg}/10<br><strong>Assiduité CFA :</strong> ${95 + (i % 5)}%<br><strong>Appréciation MA :</strong> ${avg >= 8 ? "Très satisfaisant" : avg >= 6 ? "Satisfaisant" : "En progression"}<br><strong>Appréciation CFA :</strong> ${avg >= 8 ? "Excellent parcours" : "Bonne progression"}</p></div>`;
   });
-  return buildDocument({ org: o, title: "BILANS INTERMÉDIAIRES DES APPRENTIS", subtitle: f.intitule, formation: f, showFormationInfo: true, extraHtml: extra });
+  return buildDocument({ org: o, title: "BILANS INTERMÉDIAIRES DES APPRENTIS", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra });
 }
 
 export function genBilanFinalApprenti(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
@@ -298,7 +298,7 @@ export function genBilanFinalApprenti(o: OrganismeInfo, f: FormationInfo, stagia
     extra += `<div class="section"><h3>${s.prenom} ${s.nom}</h3>
       <p><strong>Note finale :</strong> ${avg}/10<br><strong>Certification :</strong> ${avg >= 7 ? "✅ Obtenue" : "⚠️ À repasser"}<br><strong>Bilan entreprise :</strong> ${avg >= 8 ? "Proposition d'embauche" : "Expérience concluante"}<br><strong>Poursuite :</strong> ${avg >= 8 ? "Poursuite d'études envisagée" : "Insertion professionnelle"}</p></div>`;
   });
-  return buildDocument({ org: o, title: "BILANS FINAUX DES APPRENTIS", subtitle: f.intitule, formation: f, showFormationInfo: true, extraHtml: extra,
+  return buildDocument({ org: o, title: "BILANS FINAUX DES APPRENTIS", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra,
     signatures: { type: "2", labels: ["Le Coordinateur CFA", "Le Directeur"], names: [o.responsablePedagogique, o.dirigeant] } });
 }
 
