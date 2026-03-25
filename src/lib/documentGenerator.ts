@@ -132,6 +132,10 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     }
     case "convention_formation": return genConvention(o, f, stagiaires);
     case "emargement_jour": return genEmargementJour_V2(o, f, stagiaires, params?.jour ?? 0, params?.jourLabel ?? "");
+    case "emargement_stagiaire": {
+      const si = params?.stagiaireIdx ?? 0;
+      return genEmargementStagiaire(o, f, stagiaires, si);
+    }
     case "rapport_connexion": return genRapportConnexion(o, f, stagiaires);
     case "temps_connexion": return genTempsConnexion(o, f, stagiaires);
     case "temps_connexion_reel": return genTempsConnexionReel(o, f, stagiaires);
