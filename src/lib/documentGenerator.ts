@@ -5095,9 +5095,10 @@ function genEmargementCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
         const stagSigHtml = s.signatureUrl
           ? `<br><img src="${s.signatureUrl}" alt="Sig" style="max-height:40px;max-width:90px;object-fit:contain;margin-top:4px" />`
           : `<br><span style="font-style:italic;color:#999;font-size:10px">Signé ${s.prenom[0]}.${s.nom}</span>`;
-        const formateurSigHtml = o.signatureUrl
-          ? `<br><img src="${o.signatureUrl}" alt="Sig" style="max-height:40px;max-width:90px;object-fit:contain;margin-top:4px" />`
-          : '';
+        const fmtSigUrl = s.formateurSignatureUrl || f.formateurSignatureUrl;
+        const formateurSigHtml = fmtSigUrl
+          ? `<br><img src="${fmtSigUrl}" alt="Sig formateur" style="max-height:40px;max-width:90px;object-fit:contain;margin-top:4px" />`
+          : (o.signatureUrl ? `<br><img src="${o.signatureUrl}" alt="Sig" style="max-height:40px;max-width:90px;object-fit:contain;margin-top:4px" />` : '');
         tableRows += `<tr style="background:#fff;border-bottom:1px solid #ddd"><td>${dayStr}</td><td>Matin<br><small>09h00–12h30</small></td><td style="padding:10px 6px">${stagName}${stagSigHtml}</td><td style="padding:10px 6px">${f.formateur}${formateurSigHtml}</td></tr>`;
         tableRows += `<tr style="background:#fff;border-bottom:1px solid #ccc"><td></td><td>Après-midi<br><small>13h30–17h00</small></td><td style="padding:10px 6px">${stagName}${stagSigHtml}</td><td style="padding:10px 6px">${f.formateur}${formateurSigHtml}</td></tr>`;
       });
