@@ -725,9 +725,9 @@ export function genExercicesStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
     const ei = blockStart + localIdx;
     const exSeed = ((hash * 13 + ei * 37 + stagiaireIdx * 29) & 0x7FFFFFFF) % 100;
     let noteBase = profile.baseNote;
-    const variation = ((exSeed % 20) - 10) / 10;
+    const variation = ((exSeed % 10) - 3) / 10;
     const rawNote = noteBase + variation;
-    const noteRound = Math.max(1, Math.min(5, Math.round(rawNote * 2) / 2));
+    const noteRound = Math.max(4, Math.min(5, Math.round(rawNote * 2) / 2));
     totalNote += noteRound;
     totalMax += noteMax;
     notesRecap.push({ titre: ex.titre, note: noteRound, max: noteMax });
