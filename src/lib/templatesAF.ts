@@ -11,7 +11,7 @@ export function genDevis(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiai
   const tarifUnit = f.tarif || "1 500 € HT";
   return buildDocument({ org: o, title: "DEVIS DE FORMATION", subtitle: `N° DEV-${new Date().getFullYear()}-${String(Math.floor(Math.random()*999)+1).padStart(3,'0')}`, formation: f, showFormationInfo: true, sections: [
     { heading: "Client", content: `<p><strong>Entreprise :</strong> ${stagiaires[0]?.entreprise || "_______________"}<br><strong>Contact :</strong> ${stagiaires[0]?.prenom || ""} ${stagiaires[0]?.nom || ""}<br><strong>Email :</strong> ${stagiaires[0]?.email || ""}</p>` },
-    { heading: "Prestation", content: `<p><strong>Formation :</strong> ${f.intitule}<br><strong>Durée :</strong> ${f.duree}<br><strong>Modalité :</strong> ${f.modalites}<br><strong>Lieu :</strong> ${f.lieu}<br><strong>Dates :</strong> Du ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)}<br><strong>Nombre de participants :</strong> ${nbParticipants}</p>` },
+    { heading: "Prestation", content: `<p><strong>Formation :</strong> ${f.intitule}<br><strong>Durée :</strong> ${f.duree}<br><strong>Modalité :</strong> ${f.modalites}<br><strong>Lieu :</strong> ${f.lieu}<br><strong>Dates :</strong> Du ${formatDate(getStagiaireDateDebut(stagiaires[0] || {} as StagiaireInfo, f))} au ${formatDate(getStagiaireDateFin(stagiaires[0] || {} as StagiaireInfo, f))}<br><strong>Nombre de participants :</strong> ${nbParticipants}</p>` },
   ], table: {
     headers: ["Désignation", "Quantité", "Prix unitaire HT", "Total HT"],
     rows: [
