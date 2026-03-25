@@ -1365,7 +1365,8 @@ function genEvalPositionnement(o: OrganismeInfo, f: FormationInfo, stagiaires: S
   let extra = "";
   stagiaires.slice(0, 10).forEach((s, si) => {
     const sc = EVAL_SCORES[si] || [7, 8, 7, 8, 7];
-    extra += `<h3>📋 ${s.prenom} ${s.nom} – ${s.entreprise} (${s.poste})</h3>`;
+    extra += `<h3>${s.civilite ? s.civilite + " " : ""}${s.prenom} ${s.nom} – ${s.entreprise} (${s.poste})</h3>`;
+    extra += `<p><strong>Session :</strong> Du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}</p>`;
     extra += tableHTML(["Compétence évaluée", "Note /10", "Niveau", "Commentaire formateur"],
       competences.map((comp, ci) => {
         const score = sc[ci % sc.length];
@@ -1389,12 +1390,12 @@ function genEvalIntermediaire(o: OrganismeInfo, f: FormationInfo, stagiaires: St
 
   stagiaires.slice(0, 10).forEach((s, i) => {
     const sc = EVAL_SCORES[i] || [7, 8, 7, 8, 7];
-    // Intermediate scores are slightly higher than positioning (progression)
     const interScores = sc.map(s => Math.min(10, s + 1));
     const avg = Math.round(interScores.reduce((a, b) => a + b, 0) / interScores.length * 10) / 10;
     const progression = avg >= 8 ? "Excellente progression" : avg >= 7 ? "Bonne progression" : "Progression satisfaisante";
 
-    extra += `<h3>📋 ${s.prenom} ${s.nom}</h3>`;
+    extra += `<h3>${s.civilite ? s.civilite + " " : ""}${s.prenom} ${s.nom}</h3>`;
+    extra += `<p><strong>Session :</strong> Du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}</p>`;
     extra += tableHTML(["Compétence", "Note positionnement", "Note intermédiaire", "Progression"],
       competences.map((comp, ci) => {
         const initial = sc[ci % sc.length];
@@ -1407,28 +1408,28 @@ function genEvalIntermediaire(o: OrganismeInfo, f: FormationInfo, stagiaires: St
   });
 
   return buildDocument({ org: o, title: "ÉVALUATION INTERMÉDIAIRE – RÉSULTATS DÉTAILLÉS", subtitle: f.intitule, formation: f, showFormationInfo: true, extraHtml: extra,
-    signatures: { type: "2", labels: ["Le Formateur", "Date"], names: [f.formateur, formatDate(f.dateDebut)] } });
+    signatures: { type: "2", labels: ["Le Formateur", "Date"], names: [f.formateur, ""] } });
 }
 
 function genEvalFinale(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const evalData = getEvalContent(f.intitule);
   const competences = evalData.competences;
   let extra = `<h2>Évaluation finale de la formation</h2>`;
-  extra += `<p>Évaluation sommative réalisée en fin de formation « ${f.intitule} ».<br>Date : ${formatDate(f.dateFin)}</p>`;
+  extra += `<p>Évaluation sommative réalisée en fin de formation « ${f.intitule} ».</p>`;
 
   let totalReussis = 0;
   let totalNote = 0;
 
   stagiaires.slice(0, 10).forEach((s, i) => {
     const sc = EVAL_SCORES[i] || [7, 8, 7, 8, 7];
-    // Final scores are higher (progression throughout formation)
     const finalScores = sc.map(s => Math.min(10, s + 2));
     const avg = Math.round(finalScores.reduce((a, b) => a + b, 0) / finalScores.length * 10) / 10;
     totalNote += avg;
     const reussi = avg >= 6;
     if (reussi) totalReussis++;
 
-    extra += `<h3>${reussi ? '✅' : '⚠️'} ${s.prenom} ${s.nom} – Note finale : ${avg}/10</h3>`;
+    extra += `<h3>${reussi ? '✅' : '⚠️'} ${s.civilite ? s.civilite + " " : ""}${s.prenom} ${s.nom} – Note finale : ${avg}/10</h3>`;
+    extra += `<p><strong>Session :</strong> Du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}</p>`;
     extra += tableHTML(["Compétence", "Note initiale", "Note finale", "Acquis ?"],
       competences.map((comp, ci) => {
         const initial = sc[ci % sc.length];
