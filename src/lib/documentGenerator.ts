@@ -83,6 +83,10 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
   if (targetStagiaire?.formateur && targetStagiaire.formateur.trim()) {
     f = { ...f, formateur: targetStagiaire.formateur };
   }
+  // Override formateur signature from stagiaire's formateurSignatureUrl if available
+  if (targetStagiaire?.formateurSignatureUrl && targetStagiaire.formateurSignatureUrl.trim()) {
+    f = { ...f, formateurSignatureUrl: targetStagiaire.formateurSignatureUrl };
+  }
   // Also override from explicit formateurNom param (e.g. sous-traitance per-formateur docs)
   if (params?.formateurNom) {
     f = { ...f, formateur: params.formateurNom };
