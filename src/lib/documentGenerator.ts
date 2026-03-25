@@ -1980,7 +1980,7 @@ function genCertificat(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiaire
   let extra = stagiaires.slice(0, 10).map((s, i) => {
     const sc = EVAL_SCORES[i] || [8, 8, 8, 8, 8];
     const note = Math.round(sc.reduce((a, b) => a + b, 0) / sc.length * 10) / 10;
-    return `<div class="section" style="text-align:center;padding:30px"><h2 style="color:#1e3a7b">CERTIFICAT DE RÉUSSITE</h2><p style="font-size:16px;margin:20px 0"><strong>${s.prenom} ${s.nom}</strong></p><p>a validé avec succès la formation</p><p style="font-size:15px;font-weight:700;color:#1e3a7b">${f.intitule}</p><p>Note obtenue : <strong>${note}/10</strong></p><p style="margin-top:20px">Fait à ${o.ville}, le ${formatDate(f.dateFin)}</p><p><em>Signé par ${o.dirigeant}</em></p></div><div class="page-break"></div>`;
+    return `<div class="section" style="text-align:center;padding:30px"><h2 style="color:#1e3a7b">CERTIFICAT DE RÉUSSITE</h2><p style="font-size:16px;margin:20px 0"><strong>${s.prenom} ${s.nom}</strong></p><p>a validé avec succès la formation</p><p style="font-size:15px;font-weight:700;color:#1e3a7b">${f.intitule}</p><p>Note obtenue : <strong>${note}/10</strong></p><p style="margin-top:20px">Fait à ${o.ville}, le ${formatDate(getStagiaireDateFin(s, f))}</p><p><em>Signé par ${o.dirigeant}</em></p></div><div class="page-break"></div>`;
   }).join("");
   return buildDocument({ org: o, title: "CERTIFICATS DE RÉUSSITE", subtitle: f.intitule, extraHtml: extra });
 }
