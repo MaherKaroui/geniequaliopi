@@ -205,16 +205,22 @@ export function infoGrid(items: Record<string, string>): string {
 }
 
 export function formationInfoBlock(f: FormationInfo, stagiaires?: StagiaireInfo[]): string {
-  return infoGrid({
+  const hasIndiv = stagiaires && hasIndividualDates(stagiaires);
+  const items: Record<string, string> = {
     "Formation": f.intitule,
     "Durée": getDisplayDuree(f, stagiaires),
-    "Du": formatDate(f.dateDebut),
-    "Au": formatDate(f.dateFin),
-    "Lieu": f.lieu,
-    "Modalités": f.modalites,
-    "Formateur": f.formateur,
-    "Tarif": getDisplayTarif(f, stagiaires),
-  });
+  };
+  if (hasIndiv) {
+    items["Sessions"] = "Dates individuelles par stagiaire";
+  } else if (f.dateDebut || f.dateFin) {
+    items["Du"] = formatDate(f.dateDebut);
+    items["Au"] = formatDate(f.dateFin);
+  }
+  items["Lieu"] = f.lieu;
+  items["Modalités"] = f.modalites;
+  items["Formateur"] = f.formateur;
+  items["Tarif"] = getDisplayTarif(f, stagiaires);
+  return infoGrid(items);
 }
 
 export function signatureBlock3(org: OrganismeInfo, stagiaireNom?: string, formateurNom?: string, stagiaireSignatureUrl?: string): string {
