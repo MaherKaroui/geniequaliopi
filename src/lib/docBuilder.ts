@@ -186,11 +186,33 @@ export function getDisplayTarif(f: FormationInfo, stagiaires?: StagiaireInfo[]):
   return f.tarif;
 }
 
+/** Calculate individual stagiaire duration based on their dates (business days × hours/day) */
+export function getStagiaireDuree(s: StagiaireInfo, f: FormationInfo): string {
+  const dateDebut = s.dateDebutFormation || "";
+  const dateFin = s.dateFinFormation || "";
+  if (dateDebut && dateFin) {
+    const start = new Date(dateDebut + "T00:00:00");
+    const end = new Date(dateFin + "T00:00:00");
+    let businessDays = 0;
+    const current = new Date(start);
+    while (current <= end) {
+      if (current.getDay() !== 0 && current.getDay() !== 6) businessDays++;
+      current.setDate(current.getDate() + 1);
+    }
+    if (businessDays > 0) {
+      const hoursPerDay = 7;
+      const totalHours = businessDays * hoursPerDay;
+      return `${totalHours} heures (${businessDays} jours)`;
+    }
+  }
+  return "À définir selon le groupe";
+}
+
 /** Format a formation info block for a specific stagiaire (uses their individual dates/tarif if available) */
 export function formationInfoBlockStagiaire(f: FormationInfo, s: StagiaireInfo): string {
   return infoGrid({
     "Formation": f.intitule,
-    "Durée": f.duree,
+    "Durée": getStagiaireDuree(s, f),
     "Du": formatDate(getStagiaireDateDebut(s, f)),
     "Au": formatDate(getStagiaireDateFin(s, f)),
     "Lieu": f.lieu,
