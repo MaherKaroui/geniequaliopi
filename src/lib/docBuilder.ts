@@ -260,17 +260,21 @@ export function signatureBlock3(org: OrganismeInfo, stagiaireNom?: string, forma
   </div>`;
 }
 
-export function signatureBlock2(label1: string, nom1: string, label2: string, nom2: string, signatureUrl?: string, tamponUrl?: string, stagiaireSignatureUrl?: string, dates?: string[]): string {
+export function signatureBlock2(label1: string, nom1: string, label2: string, nom2: string, signatureUrl?: string, tamponUrl?: string, stagiaireSignatureUrl?: string, dates?: string[], formateurSignatureUrl?: string): string {
   const isFormateurLabel1 = /formateur/i.test(label1);
   const isFormateurLabel2 = /formateur/i.test(label2);
-  // Si le label contient "formateur", on utilise la signature du dirigeant (signatureUrl)
-  const sig1Html = isFormateurLabel1 && signatureUrl
-    ? `<img src="${signatureUrl}" alt="Signature" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />`
+  // Si le label contient "formateur", utiliser la signature formateur dédiée si disponible, sinon celle du dirigeant
+  const formateurSigUrl = formateurSignatureUrl || signatureUrl;
+  const sig1Html = isFormateurLabel1 && formateurSigUrl
+    ? `<img src="${formateurSigUrl}" alt="Signature formateur" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />`
     : stagiaireSignatureUrl
       ? `<img src="${stagiaireSignatureUrl}" alt="Signature" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />`
       : `<p style="font-style:italic;color:#999;margin-top:15px">Signé par ${nom1}</p>`;
   const tamponHtml = tamponUrl ? `<img src="${tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />` : "";
-  const sig2Html = signatureUrl ? `<img src="${signatureUrl}" alt="Signature" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : "";
+  // Si label2 est formateur, utiliser la signature formateur
+  const sig2Html = isFormateurLabel2 && formateurSigUrl
+    ? `<img src="${formateurSigUrl}" alt="Signature formateur" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />`
+    : signatureUrl ? `<img src="${signatureUrl}" alt="Signature" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : "";
   const date1 = dates?.[0] || "________________________";
   const date2 = dates?.[1] || "________________________";
   return `<div class="signature-block-2">
