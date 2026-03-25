@@ -1083,13 +1083,13 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
       <p style="margin-top:8px"><em>Ces indicateurs sont mis à jour annuellement et consultables sur le site internet de ${o.nom}.</em></p>
     </div>
 
-    <h2>15. Déroulé pédagogique de la formation (${heuresTotal})</h2>
+    <h2>15. Déroulé pédagogique de la formation${!isBlocFormation ? ` (${heuresTotal})` : ""}</h2>
     <div class="section" style="padding:5px">
       <p style="margin-bottom:10px"><strong>Formation :</strong> ${f.intitule}<br>
-      <strong>Durée :</strong> ${heuresTotal} — ${nbJours} jour${nbJours > 1 ? "s" : ""}<br>
+      <strong>Durée :</strong> ${displayDuree}<br>
       <strong>Formateur :</strong> ${f.formateur || o.dirigeant}</p>
     </div>
-    ${derouleHtml}
+    ${isBlocFormation ? blocDerouleHtml : derouleHtml}
 
     <div class="section section-orange" style="margin-top:25px">
       <p><strong>📋 Documents remis au stagiaire :</strong></p>
