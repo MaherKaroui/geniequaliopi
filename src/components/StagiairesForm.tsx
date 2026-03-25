@@ -29,6 +29,7 @@ const emptyStagiaire: StagiaireInfo = {
 const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
   const sigRefs = useRef<Record<number, HTMLInputElement | null>>({});
   const sigRespRefs = useRef<Record<number, HTMLInputElement | null>>({});
+  const sigFormateurRefs = useRef<Record<number, HTMLInputElement | null>>({});
   const addStagiaire = () => onChange([...data, { ...emptyStagiaire }]);
   const removeStagiaire = (index: number) => onChange(data.filter((_, i) => i !== index));
   const updateStagiaire = (index: number, field: keyof StagiaireInfo, value: string) => {
