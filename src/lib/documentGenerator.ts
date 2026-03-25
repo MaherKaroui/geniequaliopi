@@ -3279,6 +3279,445 @@ function genAccompagnementVAE(o: OrganismeInfo, f: FormationInfo, stagiaires: St
     signatures: { type: "2", labels: ["L'Accompagnateur VAE", "Le Candidat"], names: [o.responsablePedagogique, s.prenom + " " + s.nom] } });
 }
 
+// ============== VAE COMPLET ==============
+
+function genVAEPlaquetteInfo(o: OrganismeInfo) {
+  return buildDocument({ org: o, title: "PLAQUETTE D'INFORMATION – VALIDATION DES ACQUIS DE L'EXPÉRIENCE", sections: [
+    { heading: "Qu'est-ce que la VAE ?", content: `<p>La Validation des Acquis de l'Expérience (VAE) est un droit individuel inscrit dans le Code du travail (articles L.6411-1 et suivants). Elle permet à toute personne, quels que soient son âge, son niveau d'études ou son statut, de faire reconnaître officiellement les compétences acquises par l'expérience professionnelle, associative ou bénévole.</p><p>La VAE aboutit à l'obtention totale ou partielle d'une certification (diplôme, titre professionnel, certificat de qualification professionnelle) inscrite au RNCP.</p>` },
+    { heading: "À qui s'adresse la VAE ?", content: `<p>• Salariés du secteur privé ou public<br>• Travailleurs indépendants<br>• Demandeurs d'emploi<br>• Bénévoles et volontaires<br><br><strong>Condition :</strong> justifier d'au moins 1 an d'expérience en rapport direct avec la certification visée.</p>` },
+    { heading: "Les étapes de la VAE chez ${o.nom}", content: `<p><strong>1. Entretien de faisabilité</strong> (gratuit, 1h) – Analyse de votre projet et vérification de l'adéquation avec la certification visée.<br><strong>2. Livret de recevabilité (Livret 1)</strong> – Constitution du dossier administratif.<br><strong>3. Accompagnement personnalisé</strong> (24 heures) – Aide à la rédaction du dossier de validation et préparation au jury.<br><strong>4. Passage devant le jury</strong> – Présentation et soutenance du dossier.<br><strong>5. Décision du jury</strong> – Validation totale, partielle ou refus.</p>` },
+    { heading: "Informations pratiques", content: `<p><strong>Durée de l'accompagnement :</strong> 24 heures sur 3 à 6 mois<br><strong>Modalité :</strong> Individuel, en présentiel et/ou à distance<br><strong>Tarif :</strong> Sur devis, finançable par le CPF, l'employeur ou un OPCO<br><strong>Délai d'accès :</strong> 30 jours après l'entretien de faisabilité<br><strong>Contact :</strong> ${o.email} – ${o.telephone}<br><strong>Référent VAE :</strong> ${o.responsablePedagogique}<br><strong>Référent handicap :</strong> ${o.referentHandicap}</p>`, variant: "green" },
+    { heading: "Accessibilité", content: `<p>Notre accompagnement VAE est accessible aux personnes en situation de handicap. Des aménagements sont possibles sur demande. Contactez notre référent handicap : ${o.referentHandicap}.</p>` },
+  ] });
+}
+
+function genVAEProcedureInfo(o: OrganismeInfo) {
+  return buildDocument({ org: o, title: "PROCÉDURE D'INFORMATION DU PUBLIC – VAE", sections: [
+    { heading: "Objet", content: `<p>Cette procédure décrit les modalités de diffusion de l'information relative à l'offre d'accompagnement VAE de ${o.nom}, conformément à l'indicateur 1 du Référentiel National Qualité.</p>` },
+    { heading: "Canaux de diffusion", content: `<p>• <strong>Site internet :</strong> ${o.siteWeb} – Page dédiée VAE avec informations complètes<br>• <strong>Plaquette d'information</strong> remise lors de l'entretien de faisabilité<br>• <strong>Réseaux sociaux et annuaires professionnels</strong><br>• <strong>Partenaires institutionnels</strong> : Pôle emploi, OPCO, Transitions Pro, CEP</p>` },
+    { heading: "Informations diffusées", content: `<p>Conformément au RNQ, les informations suivantes sont systématiquement communiquées :<br>• Prérequis (1 an d'expérience minimum)<br>• Objectifs de l'accompagnement<br>• Durée (24 heures sur 3 à 6 mois)<br>• Modalités d'accès et délais<br>• Tarifs et financements possibles<br>• Méthodes mobilisées<br>• Modalités d'évaluation (passage devant le jury)<br>• Accessibilité aux personnes handicapées<br>• Contact du référent VAE et du référent handicap</p>`, variant: "green" },
+    { heading: "Mise à jour", content: `<p>Les informations sont actualisées au minimum une fois par an et à chaque évolution réglementaire. La dernière mise à jour date du ${formatDate(o.dateMaj)}.</p>` },
+  ] });
+}
+
+function genVAEIndicateursResultats(o: OrganismeInfo) {
+  return buildDocument({ org: o, title: "INDICATEURS DE RÉSULTATS – VAE", table: {
+    headers: ["Indicateur", "Année N-1", "Année N", "Objectif"],
+    rows: [
+      ["Nombre de candidats accompagnés", "12", "18", "20"],
+      ["Taux de recevabilité", "95%", "94%", "≥ 90%"],
+      ["Taux de validation totale", "75%", "83%", "≥ 80%"],
+      ["Taux de validation partielle", "17%", "11%", "≤ 15%"],
+      ["Taux de refus", "8%", "6%", "≤ 10%"],
+      ["Taux de satisfaction candidats", "92%", "96%", "≥ 90%"],
+      ["Taux d'abandon", "8%", "6%", "≤ 10%"],
+      ["Durée moyenne d'accompagnement", "4 mois", "3,5 mois", "3-6 mois"],
+    ]
+  }, sections: [
+    { heading: "Analyse", content: `<p>Les résultats montrent une progression significative du taux de validation totale (+8 points) et une amélioration de la satisfaction des candidats. Le nombre de candidats accompagnés est en hausse de 50%, témoignant de l'attractivité de notre offre VAE.</p>`, variant: "green" },
+  ] });
+}
+
+function genVAETauxCertification(o: OrganismeInfo) {
+  return buildDocument({ org: o, title: "TAUX D'OBTENTION DES CERTIFICATIONS – VAE", table: {
+    headers: ["Certification visée", "Candidats présentés", "Validation totale", "Validation partielle", "Refus", "Taux réussite"],
+    rows: [
+      ["Titre professionnel Comptable", "6", "5", "1", "0", "100%"],
+      ["Titre professionnel Gestionnaire de paie", "4", "3", "1", "0", "100%"],
+      ["BTS Management commercial", "3", "3", "0", "0", "100%"],
+      ["Titre professionnel Formateur", "3", "2", "1", "0", "100%"],
+      ["Licence professionnelle RH", "2", "2", "0", "0", "100%"],
+    ]
+  }, sections: [
+    { heading: "Suites de parcours", content: `<p>• 78% des candidats ayant obtenu une validation totale ont connu une évolution professionnelle dans les 6 mois<br>• 100% des candidats ayant obtenu une validation partielle se sont réinscrits pour obtenir les blocs manquants<br>• Possibilité de poursuivre vers un niveau supérieur (Licence, Master, titre de niveau 6 ou 7)</p>` },
+    { heading: "Équivalences et passerelles", content: `<p>Les certifications obtenues par VAE sont identiques à celles obtenues par la formation initiale ou continue. Elles permettent les mêmes poursuites d'études et débouchés professionnels.</p>`, variant: "green" },
+  ] });
+}
+
+function genVAEEntretienFaisabilite(o: OrganismeInfo, f: FormationInfo) {
+  return buildDocument({ org: o, title: "TRAME D'ENTRETIEN DE FAISABILITÉ – VAE", sections: [
+    { heading: "Informations candidat", content: `<p><strong>Nom / Prénom :</strong> ____________________________<br><strong>Téléphone :</strong> ____________________________<br><strong>Email :</strong> ____________________________<br><strong>Situation actuelle :</strong> ☐ Salarié ☐ Demandeur d'emploi ☐ Indépendant ☐ Autre<br><strong>Certification visée :</strong> ${f.intitule || "____________________________"}</p>` },
+    { heading: "Analyse de l'expérience", content: `<p><strong>Durée totale d'expérience professionnelle :</strong> ______ ans<br><strong>Durée en lien avec la certification :</strong> ______ ans<br><strong>Postes occupés en lien :</strong><br>1. ____________________________<br>2. ____________________________<br>3. ____________________________</p>` },
+    { heading: "Motivation et projet", content: `<p><strong>Motivations du candidat :</strong><br>____________________________<br><strong>Projet professionnel après VAE :</strong><br>____________________________<br><strong>Disponibilité pour l'accompagnement :</strong> ☐ Temps plein ☐ Temps partiel ☐ Soirs/weekends</p>` },
+    { heading: "Avis du conseiller", content: `<p>☐ <strong>Faisabilité confirmée</strong> – Le candidat remplit les conditions et le projet est cohérent.<br>☐ <strong>Faisabilité sous réserve</strong> – Compléments d'expérience nécessaires.<br>☐ <strong>Réorientation conseillée</strong> – Autre certification ou autre dispositif recommandé.<br><br><strong>Commentaires :</strong><br>____________________________</p>`, variant: "green" },
+  ], signatures: { type: "2", labels: ["Le Conseiller VAE", "Le Candidat"], names: [o.responsablePedagogique, ""] } });
+}
+
+function genVAEDiagnosticFaisabilite(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
+  const s = stagiaires[si] || stagiaires[0] || { prenom: "Martin", nom: "Dupont", poste: "Salarié", entreprise: "Entreprise" };
+  return buildDocument({ org: o, title: "DIAGNOSTIC DE FAISABILITÉ VAE", subtitle: `${s.prenom} ${s.nom}`, sections: [
+    { heading: "Candidat", content: `<p><strong>Nom :</strong> ${s.prenom} ${s.nom}<br><strong>Poste actuel :</strong> ${s.poste || "Non renseigné"}<br><strong>Entreprise :</strong> ${s.entreprise || "Non renseignée"}<br><strong>Certification visée :</strong> ${f.intitule}</p>` },
+    { heading: "Expérience en lien avec la certification", content: `<p><strong>Durée d'expérience totale :</strong> 8 ans<br><strong>Durée en lien direct :</strong> 6 ans<br><br><strong>Activités principales identifiées :</strong><br>• Gestion opérationnelle du domaine visé<br>• Encadrement et coordination d'équipe<br>• Mise en place de procédures qualité<br>• Reporting et analyse de performance<br>• Formation et accompagnement de collaborateurs</p>` },
+    { heading: "Adéquation avec le référentiel", content: `<p><strong>Blocs de compétences couverts par l'expérience :</strong></p><table><tr><th>Bloc</th><th>Couverture</th><th>Observations</th></tr><tr><td>Bloc 1 – Compétences fondamentales</td><td>Complète</td><td>Expérience solide et documentée</td></tr><tr><td>Bloc 2 – Compétences spécialisées</td><td>Complète</td><td>Maîtrise avérée</td></tr><tr><td>Bloc 3 – Compétences transversales</td><td>Complète</td><td>Compétences managériales démontrées</td></tr></table>`, variant: "green" },
+    { heading: "Conclusion", content: `<p><strong>Avis : FAVORABLE</strong><br><br>Le parcours de ${s.prenom} ${s.nom} présente une adéquation forte avec la certification « ${f.intitule} ». La durée et la diversité de l'expérience couvrent l'ensemble des blocs de compétences du référentiel.<br><br><strong>Recommandation :</strong> Engagement dans la démarche VAE avec un accompagnement de 24 heures.</p>` },
+  ], signatures: { type: "2", labels: ["Le Conseiller VAE", "Le Candidat"], names: [o.responsablePedagogique, s.prenom + " " + s.nom] } });
+}
+
+function genVAEReferentielAccompagnement(o: OrganismeInfo, f: FormationInfo) {
+  return buildDocument({ org: o, title: "RÉFÉRENTIEL D'ACCOMPAGNEMENT VAE", sections: [
+    { heading: "Objectifs de l'accompagnement", content: `<p>L'accompagnement VAE proposé par ${o.nom} vise à :<br>• Aider le candidat à identifier et formaliser ses compétences acquises par l'expérience<br>• Accompagner la rédaction du dossier de validation (Livret 2)<br>• Préparer le candidat au passage devant le jury<br>• Maximiser les chances de validation totale</p>` },
+    { heading: "Objectifs opérationnels", content: `<p>À l'issue de l'accompagnement, le candidat sera capable de :<br>• Analyser le référentiel de la certification visée<br>• Décrire ses activités professionnelles en lien avec chaque bloc de compétences<br>• Produire des preuves pertinentes et organisées<br>• Rédiger un dossier de validation structuré et argumenté<br>• Présenter et soutenir son dossier devant un jury professionnel</p>`, variant: "green" },
+    { heading: "Programme détaillé", content: `<p><strong>Phase 1 – Appropriation du référentiel (4h)</strong><br>• Présentation de la démarche VAE et du calendrier<br>• Analyse détaillée du référentiel de certification<br>• Identification des activités à décrire<br><br><strong>Phase 2 – Rédaction du dossier (14h)</strong><br>• Méthodologie de description des activités<br>• Rédaction bloc par bloc avec relecture<br>• Constitution du portefeuille de preuves<br>• Mise en cohérence globale du dossier<br><br><strong>Phase 3 – Préparation au jury (6h)</strong><br>• Méthodologie de la présentation orale<br>• Simulation de passage devant le jury<br>• Gestion du stress et techniques de communication</p>` },
+    { heading: "Modalités d'évaluation", content: `<p>• Auto-évaluation du candidat à chaque étape<br>• Relecture critique du dossier par l'accompagnateur<br>• Simulation de jury avec grille d'évaluation<br>• Évaluation finale par le jury de certification</p>` },
+  ] });
+}
+
+function genVAEProgrammeAccompagnement(o: OrganismeInfo, f: FormationInfo) {
+  return buildDocument({ org: o, title: "PROGRAMME D'ACCOMPAGNEMENT VAE", subtitle: `Certification visée : ${f.intitule}`, table: {
+    headers: ["Séance", "Durée", "Contenu", "Livrables"],
+    rows: [
+      ["1", "2h", "Accueil, présentation de la démarche, analyse du référentiel", "Planning personnalisé"],
+      ["2", "2h", "Identification des activités professionnelles à décrire", "Liste des activités clés"],
+      ["3", "3h", "Rédaction Bloc 1 – Compétences fondamentales", "Bloc 1 rédigé"],
+      ["4", "3h", "Rédaction Bloc 2 – Compétences spécialisées", "Bloc 2 rédigé"],
+      ["5", "3h", "Rédaction Bloc 3 – Compétences transversales", "Bloc 3 rédigé"],
+      ["6", "2h", "Constitution du portefeuille de preuves et annexes", "Dossier complet"],
+      ["7", "3h", "Relecture globale, mise en cohérence, corrections", "Dossier finalisé"],
+      ["8", "2h", "Méthodologie de présentation orale et gestion du stress", "Trame de présentation"],
+      ["9", "2h", "Simulation de passage devant le jury", "Grille de retour"],
+      ["10", "2h", "Derniers ajustements et envoi du dossier", "Dossier envoyé"],
+    ]
+  }, sections: [
+    { heading: "Modalités", content: `<p><strong>Durée totale :</strong> 24 heures réparties sur 10 séances<br><strong>Rythme :</strong> 1 à 2 séances par semaine sur 3 à 4 mois<br><strong>Modalité :</strong> Individuel – Présentiel et/ou visioconférence<br><strong>Lieu :</strong> ${o.adresse}, ${o.codePostal} ${o.ville} ou à distance</p>`, variant: "green" },
+  ] });
+}
+
+function genVAEPositionnementInitial(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
+  const s = stagiaires[si] || stagiaires[0] || { prenom: "Martin", nom: "Dupont" };
+  return buildDocument({ org: o, title: "POSITIONNEMENT INITIAL VAE", subtitle: `${s.prenom} ${s.nom} – ${f.intitule}`, table: {
+    headers: ["Compétence du référentiel", "Niveau actuel", "Preuves disponibles", "Observations"],
+    rows: [
+      ["Bloc 1 – Compétences fondamentales", "Maîtrise", "Attestations employeur, bilans", "Expérience significative"],
+      ["Bloc 2 – Compétences spécialisées", "Maîtrise", "Rapports, projets réalisés", "Compétences bien documentées"],
+      ["Bloc 3 – Compétences transversales", "Maîtrise", "Comptes-rendus, évaluations", "Bonnes capacités relationnelles"],
+      ["Rédaction du dossier", "À développer", "—", "Besoin d'accompagnement méthodologique"],
+      ["Présentation orale", "À développer", "—", "Simulation de jury nécessaire"],
+    ]
+  }, sections: [
+    { heading: "Synthèse du positionnement", content: `<p>${s.prenom} ${s.nom} dispose d'un niveau de maîtrise élevé sur les compétences métier du référentiel. L'accompagnement se concentrera principalement sur la méthodologie de rédaction du dossier et la préparation à l'oral devant le jury.</p>`, variant: "green" },
+  ], signatures: { type: "2", labels: ["L'Accompagnateur VAE", "Le Candidat"], names: [o.responsablePedagogique, s.prenom + " " + s.nom] } });
+}
+
+function genVAELivretAccueil(o: OrganismeInfo, f: FormationInfo) {
+  return buildDocument({ org: o, title: "LIVRET D'ACCUEIL – ACCOMPAGNEMENT VAE", sections: [
+    { heading: "Bienvenue", content: `<p>Vous avez choisi ${o.nom} pour vous accompagner dans votre démarche de Validation des Acquis de l'Expérience. Ce livret vous présente les informations essentielles pour le bon déroulement de votre accompagnement.</p>` },
+    { heading: "Votre accompagnateur", content: `<p><strong>Nom :</strong> ${o.responsablePedagogique}<br><strong>Email :</strong> ${o.email}<br><strong>Téléphone :</strong> ${o.telephone}<br><br>Votre accompagnateur est votre interlocuteur privilégié tout au long de la démarche. N'hésitez pas à le contacter en cas de question ou de difficulté.</p>` },
+    { heading: "Déroulement de l'accompagnement", content: `<p><strong>Durée :</strong> 24 heures sur 3 à 6 mois<br><strong>Rythme :</strong> 1 à 2 séances par semaine<br><strong>Format :</strong> Séances individuelles en présentiel ou à distance<br><br><strong>Les grandes étapes :</strong><br>1. Analyse du référentiel et identification des activités<br>2. Rédaction du dossier de validation bloc par bloc<br>3. Constitution du portefeuille de preuves<br>4. Préparation au passage devant le jury<br>5. Passage devant le jury de certification</p>` },
+    { heading: "Vos droits et engagements", content: `<p><strong>Vos droits :</strong><br>• Accompagnement personnalisé et bienveillant<br>• Confidentialité des informations partagées<br>• Possibilité de report ou d'aménagement<br>• Accès au référent handicap si nécessaire<br><br><strong>Vos engagements :</strong><br>• Assiduité aux séances programmées<br>• Travail personnel entre les séances (rédaction, collecte de preuves)<br>• Respect des délais convenus<br>• Communication en cas de difficulté</p>`, variant: "green" },
+    { heading: "Contacts utiles", content: `<p><strong>Référent handicap :</strong> ${o.referentHandicap}<br><strong>Réclamation :</strong> ${o.email}<br><strong>Organisme :</strong> ${o.nom} – ${o.adresse}, ${o.codePostal} ${o.ville}</p>` },
+  ] });
+}
+
+function genVAEConventionAccompagnement(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
+  const s = stagiaires[si] || stagiaires[0] || { prenom: "Martin", nom: "Dupont", email: "", telephone: "" };
+  const dateDebut = getStagiaireDateDebut(s, { ...f });
+  const dateFin = getStagiaireDateFin(s, { ...f });
+  return buildDocument({ org: o, title: "CONVENTION D'ACCOMPAGNEMENT VAE", sections: [
+    { heading: "Entre les parties", content: `<p><strong>L'organisme accompagnateur :</strong><br>${o.nom} – SIRET : ${o.siret}<br>${o.adresse}, ${o.codePostal} ${o.ville}<br>NDA : ${o.nda}<br>Représenté par ${o.dirigeant}, en qualité de dirigeant<br><br><strong>Le candidat :</strong><br>${s.prenom} ${s.nom}<br>Email : ${s.email}<br>Téléphone : ${s.telephone}</p>` },
+    { heading: "Objet de la convention", content: `<p>La présente convention a pour objet de définir les conditions de l'accompagnement VAE du candidat en vue de l'obtention de la certification : <strong>« ${f.intitule} »</strong></p>` },
+    { heading: "Modalités de l'accompagnement", content: `<p><strong>Durée :</strong> 24 heures<br><strong>Période :</strong> du ${formatDate(dateDebut)} au ${formatDate(dateFin)}<br><strong>Rythme :</strong> 10 séances individuelles de 2 à 3 heures<br><strong>Format :</strong> Présentiel et/ou visioconférence<br><strong>Lieu :</strong> ${f.lieu || o.adresse + ", " + o.codePostal + " " + o.ville}</p>` },
+    { heading: "Tarif et financement", content: `<p><strong>Tarif de l'accompagnement :</strong> ${getStagiaireTarif(s, f)}<br><strong>Financement :</strong> CPF / Employeur / OPCO / Autofinancement<br><br>En cas d'abandon du candidat avant la fin de l'accompagnement, seules les heures réalisées seront facturées.</p>`, variant: "green" },
+    { heading: "Obligations des parties", content: `<p><strong>L'organisme s'engage à :</strong><br>• Fournir un accompagnement personnalisé et de qualité<br>• Mettre à disposition un accompagnateur qualifié<br>• Respecter la confidentialité des informations<br>• Remettre une attestation de fin d'accompagnement<br><br><strong>Le candidat s'engage à :</strong><br>• Être assidu aux séances programmées<br>• Fournir les documents et preuves nécessaires<br>• Réaliser le travail personnel demandé entre les séances<br>• Informer l'organisme en cas de difficulté ou d'absence</p>` },
+  ], signatures: { type: "2", labels: ["Le Dirigeant", "Le Candidat"], names: [o.dirigeant, s.prenom + " " + s.nom] } });
+}
+
+function genVAEReglementInterieur(o: OrganismeInfo) {
+  return buildDocument({ org: o, title: "RÈGLEMENT INTÉRIEUR – ACCOMPAGNEMENT VAE", sections: [
+    { heading: "Article 1 – Objet et champ d'application", content: `<p>Le présent règlement s'applique à tous les candidats bénéficiant d'un accompagnement VAE dispensé par ${o.nom}. Il définit les règles de fonctionnement et de discipline applicables.</p>` },
+    { heading: "Article 2 – Assiduité et ponctualité", content: `<p>Le candidat s'engage à être présent et ponctuel à chaque séance programmée. En cas d'absence prévisible, il doit prévenir l'accompagnateur au moins 48 heures à l'avance. Toute absence non justifiée pourra entraîner la suspension de l'accompagnement.</p>` },
+    { heading: "Article 3 – Comportement et respect mutuel", content: `<p>Le candidat s'engage à adopter un comportement respectueux envers l'accompagnateur et le personnel de l'organisme. Tout comportement irrespectueux, violent ou discriminatoire pourra entraîner l'exclusion immédiate.</p>` },
+    { heading: "Article 4 – Confidentialité", content: `<p>Les informations personnelles et professionnelles communiquées dans le cadre de l'accompagnement sont strictement confidentielles. L'organisme et l'accompagnateur s'engagent au respect du secret professionnel.</p>` },
+    { heading: "Article 5 – Propriété intellectuelle", content: `<p>Le dossier de validation rédigé par le candidat reste sa propriété exclusive. L'organisme ne pourra en aucun cas utiliser ou diffuser le contenu du dossier sans l'accord écrit du candidat.</p>` },
+    { heading: "Article 6 – Réclamations", content: `<p>Toute réclamation peut être adressée par écrit à : ${o.email}. L'organisme s'engage à accuser réception sous 48 heures et à apporter une réponse sous 15 jours ouvrés.</p>`, variant: "green" },
+  ] });
+}
+
+function genVAEFicheSuiviIndividuel(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
+  const s = stagiaires[si] || stagiaires[0] || { prenom: "Martin", nom: "Dupont" };
+  const dateDebut = getStagiaireDateDebut(s, f);
+  return buildDocument({ org: o, title: "FICHE DE SUIVI INDIVIDUEL VAE", subtitle: `${s.prenom} ${s.nom}`, table: {
+    headers: ["Séance", "Date", "Objectifs travaillés", "Réalisations", "Travail à faire", "Observations"],
+    rows: [
+      ["1", formatDate(dateDebut), "Analyse du référentiel", "Référentiel décrypté, activités listées", "Lister les preuves disponibles", "Candidat motivé et organisé"],
+      ["2", "J+7", "Identification des compétences", "Cartographie des compétences réalisée", "Rédiger introduction Bloc 1", "Bonne compréhension du référentiel"],
+      ["3", "J+14", "Rédaction Bloc 1", "Bloc 1 rédigé à 80%", "Finaliser Bloc 1 et rassembler preuves", "Bonne qualité rédactionnelle"],
+      ["4", "J+21", "Finalisation Bloc 1 + Début Bloc 2", "Bloc 1 terminé, Bloc 2 entamé", "Poursuivre rédaction Bloc 2", "Progression régulière"],
+      ["5", "J+28", "Rédaction Bloc 2", "Bloc 2 rédigé à 90%", "Finaliser Bloc 2", "Très bon travail"],
+      ["6", "J+35", "Rédaction Bloc 3", "Bloc 3 rédigé", "Rassembler toutes les preuves", "Contenu riche et pertinent"],
+      ["7", "J+42", "Portefeuille de preuves et annexes", "Preuves organisées et classées", "Relire le dossier complet", "Dossier bien structuré"],
+      ["8", "J+49", "Relecture globale", "Corrections apportées, dossier finalisé", "Préparer la présentation orale", "Dossier prêt pour envoi"],
+      ["9", "J+56", "Préparation orale", "Trame de présentation validée", "S'entraîner à la présentation", "Bon potentiel à l'oral"],
+      ["10", "J+63", "Simulation jury + envoi dossier", "Simulation réussie, dossier envoyé", "Attendre convocation jury", "Candidat prêt"],
+    ]
+  }, sections: [
+    { heading: "Bilan global", content: `<p>Accompagnement de 24 heures réalisé sur 10 séances. ${s.prenom} ${s.nom} a fait preuve d'un engagement exemplaire tout au long de la démarche. Le dossier de validation est complet, bien structuré et argumenté. Le candidat est prêt pour le passage devant le jury.</p>`, variant: "green" },
+  ], signatures: { type: "2", labels: ["L'Accompagnateur VAE", "Le Candidat"], names: [o.responsablePedagogique, s.prenom + " " + s.nom] } });
+}
+
+function genVAEGrilleEvaluationDossier(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
+  const s = stagiaires[si] || stagiaires[0] || { prenom: "Martin", nom: "Dupont" };
+  return buildDocument({ org: o, title: "GRILLE D'ÉVALUATION DU DOSSIER VAE", subtitle: `${s.prenom} ${s.nom} – ${f.intitule}`, table: {
+    headers: ["Critère d'évaluation", "Note /5", "Observations"],
+    rows: [
+      ["Conformité et complétude du dossier", "5/5", "Dossier complet, toutes les rubriques renseignées"],
+      ["Pertinence des activités décrites", "5/5", "Activités en lien direct avec le référentiel"],
+      ["Qualité de la description des compétences", "4/5", "Descriptions claires et détaillées"],
+      ["Preuves et annexes", "5/5", "Preuves diversifiées et probantes"],
+      ["Cohérence globale du dossier", "5/5", "Excellent fil conducteur"],
+      ["Qualité rédactionnelle", "4/5", "Rédaction soignée et professionnelle"],
+      ["Argumentation et analyse réflexive", "5/5", "Bonne prise de recul sur les pratiques"],
+    ]
+  }, sections: [
+    { heading: "Appréciation globale", content: `<p><strong>Note globale : 33/35 – Excellent</strong><br><br>Le dossier de ${s.prenom} ${s.nom} est d'une qualité remarquable. Les activités sont parfaitement décrites et en adéquation avec le référentiel de certification. Les preuves apportées sont diversifiées et pertinentes. Le candidat est prêt pour le passage devant le jury.</p>`, variant: "green" },
+  ], signatures: { type: "2", labels: ["L'Accompagnateur VAE", ""], names: [o.responsablePedagogique, ""] } });
+}
+
+function genVAEEmargement(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
+  const s = stagiaires[si] || stagiaires[0] || { prenom: "Martin", nom: "Dupont" };
+  const dateDebut = getStagiaireDateDebut(s, f);
+  const rows: string[][] = [];
+  for (let i = 0; i < 10; i++) {
+    const d = new Date(dateDebut);
+    d.setDate(d.getDate() + i * 7);
+    const dateStr = `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
+    const duree = i < 2 || i >= 8 ? "2h" : "3h";
+    rows.push([`${i + 1}`, dateStr, `${duree}`, "09:00", i < 2 || i >= 8 ? "11:00" : "12:00", s.signatureUrl ? `<img src="${s.signatureUrl}" style="max-height:30px;">` : "Signé"]);
+  }
+  return buildDocument({ org: o, title: "FEUILLE D'ÉMARGEMENT – ACCOMPAGNEMENT VAE", subtitle: `${s.prenom} ${s.nom}`, table: {
+    headers: ["Séance", "Date", "Durée", "Heure début", "Heure fin", "Signature candidat"],
+    rows
+  }, sections: [
+    { heading: "Total", content: `<p><strong>Total des heures réalisées : 24 heures</strong></p>` },
+  ], signatures: { type: "2", labels: ["L'Accompagnateur VAE", "Le Candidat"], names: [o.responsablePedagogique, s.prenom + " " + s.nom] } });
+}
+
+function genVAEProcedureAbandon(o: OrganismeInfo) {
+  return buildDocument({ org: o, title: "PROCÉDURE DE PRÉVENTION DES ABANDONS – VAE", sections: [
+    { heading: "Objet", content: `<p>Cette procédure décrit les mesures mises en place par ${o.nom} pour prévenir les abandons en cours d'accompagnement VAE et favoriser l'engagement des candidats jusqu'au passage devant le jury.</p>` },
+    { heading: "Indicateurs d'alerte", content: `<p>Les signaux suivants déclenchent une action préventive :<br>• 2 absences consécutives non justifiées<br>• Retard significatif dans la production du dossier<br>• Expression de doutes ou de découragement par le candidat<br>• Absence de communication depuis plus de 15 jours</p>` },
+    { heading: "Actions de prévention", content: `<p><strong>Niveau 1 – Contact téléphonique :</strong> Appel de l'accompagnateur pour identifier les difficultés et proposer des solutions.<br><br><strong>Niveau 2 – Entretien individuel :</strong> Rencontre pour faire le point sur la situation, réajuster le planning si nécessaire.<br><br><strong>Niveau 3 – Plan de remédiation :</strong> Mise en place d'un plan personnalisé (allongement de la durée, aménagements, soutien renforcé).<br><br><strong>Niveau 4 – Suspension temporaire :</strong> Possibilité de suspendre l'accompagnement avec reprise ultérieure.</p>`, variant: "green" },
+    { heading: "Traçabilité", content: `<p>Toutes les actions de prévention sont consignées dans la fiche de suivi individuel du candidat. Un bilan annuel des abandons est réalisé dans le cadre de l'amélioration continue.</p>` },
+  ] });
+}
+
+function genVAEAttestationAssiduite(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
+  const s = stagiaires[si] || stagiaires[0] || { prenom: "Martin", nom: "Dupont" };
+  const dateDebut = getStagiaireDateDebut(s, f);
+  const dateFin = getStagiaireDateFin(s, f);
+  return buildDocument({ org: o, title: "ATTESTATION D'ASSIDUITÉ – ACCOMPAGNEMENT VAE", sections: [
+    { heading: "", content: `<p>Je soussigné(e), ${o.dirigeant}, en qualité de dirigeant de ${o.nom}, atteste que :</p><p><strong>${s.prenom} ${s.nom}</strong></p><p>a suivi avec assiduité l'accompagnement VAE en vue de l'obtention de la certification :</p><p><strong>« ${f.intitule} »</strong></p><p><strong>Période :</strong> du ${formatDate(dateDebut)} au ${formatDate(dateFin)}<br><strong>Durée totale réalisée :</strong> 24 heures sur 10 séances<br><strong>Taux de présence :</strong> 100%</p><p>La présente attestation est délivrée pour servir et valoir ce que de droit.</p><p>Fait à ${o.ville}, le ${formatDate(dateFin)}</p>` },
+  ], signatures: { type: "2", labels: ["Le Dirigeant", ""], names: [o.dirigeant, ""] } });
+}
+
+function genVAEProcedureJury(o: OrganismeInfo, f: FormationInfo) {
+  return buildDocument({ org: o, title: "PROCÉDURE DE PASSAGE DEVANT LE JURY – VAE", sections: [
+    { heading: "Composition du jury", content: `<p>Conformément à la réglementation, le jury VAE est composé de :<br>• Un président de jury (enseignant ou professionnel qualifié)<br>• Au moins 2 membres professionnels du secteur concerné<br>• Un représentant de l'organisme certificateur<br><br>Au moins 25% des membres du jury sont des professionnels qualifiés.</p>` },
+    { heading: "Déroulement de l'épreuve", content: `<p><strong>1. Accueil du candidat</strong> (5 min) – Présentation du jury et rappel des modalités.<br><strong>2. Présentation du candidat</strong> (20-30 min) – Exposé du parcours et des compétences en lien avec la certification.<br><strong>3. Questions du jury</strong> (20-30 min) – Échanges et approfondissement des activités décrites.<br><strong>4. Délibération</strong> (à huis clos) – Le jury statue sur la validation.<br><strong>5. Notification</strong> – Le résultat est communiqué au candidat par courrier.</p>` },
+    { heading: "Critères d'évaluation du jury", content: `<p>• Adéquation des activités décrites avec le référentiel de certification<br>• Qualité et pertinence des preuves apportées<br>• Capacité d'analyse et de prise de recul du candidat<br>• Clarté et structuration de la présentation orale<br>• Maîtrise des compétences visées par la certification</p>`, variant: "green" },
+    { heading: "Décisions possibles", content: `<p><strong>Validation totale :</strong> Le candidat obtient la certification complète.<br><strong>Validation partielle :</strong> Le candidat valide certains blocs de compétences. Il dispose de 5 ans pour valider les blocs manquants (par VAE ou formation complémentaire).<br><strong>Refus de validation :</strong> Le candidat peut redéposer un dossier après enrichissement de son expérience.</p>` },
+  ] });
+}
+
+function genVAEConvocationJury(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
+  const s = stagiaires[si] || stagiaires[0] || { prenom: "Martin", nom: "Dupont" };
+  const dateFin = getStagiaireDateFin(s, f);
+  const dateJury = new Date(dateFin);
+  dateJury.setDate(dateJury.getDate() + 30);
+  const dateJuryStr = `${String(dateJury.getDate()).padStart(2, "0")}/${String(dateJury.getMonth() + 1).padStart(2, "0")}/${dateJury.getFullYear()}`;
+  return buildDocument({ org: o, title: "CONVOCATION AU JURY VAE", sections: [
+    { heading: "", content: `<p>Objet : Convocation au passage devant le jury de VAE</p><p>Madame, Monsieur ${s.nom},</p><p>Nous avons le plaisir de vous informer que votre dossier de validation des acquis de l'expérience pour la certification :</p><p style="text-align:center;font-size:15px;font-weight:bold">« ${f.intitule} »</p><p>a été jugé recevable. Vous êtes convoqué(e) devant le jury le :</p><p><strong>Date :</strong> ${dateJuryStr}<br><strong>Heure :</strong> 14h00<br><strong>Lieu :</strong> ${f.lieu || o.adresse + ", " + o.codePostal + " " + o.ville}<br><strong>Durée prévue :</strong> 1 heure (présentation + questions)</p><p><strong>Documents à apporter :</strong><br>• Pièce d'identité en cours de validité<br>• Un exemplaire de votre dossier de validation<br>• Les originaux des preuves citées dans le dossier</p><p>Nous vous souhaitons pleine réussite dans cette démarche.</p>` },
+  ], signatures: { type: "2", labels: ["Le Responsable VAE", ""], names: [o.responsablePedagogique, ""] } });
+}
+
+function genVAEPVJury(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
+  const s = stagiaires[si] || stagiaires[0] || { prenom: "Martin", nom: "Dupont" };
+  const dateFin = getStagiaireDateFin(s, f);
+  const dateJury = new Date(dateFin);
+  dateJury.setDate(dateJury.getDate() + 30);
+  const dateJuryStr = `${String(dateJury.getDate()).padStart(2, "0")}/${String(dateJury.getMonth() + 1).padStart(2, "0")}/${dateJury.getFullYear()}`;
+  return buildDocument({ org: o, title: "PROCÈS-VERBAL DE JURY – VAE", subtitle: `${s.prenom} ${s.nom}`, sections: [
+    { heading: "Informations", content: `<p><strong>Date du jury :</strong> ${dateJuryStr}<br><strong>Candidat :</strong> ${s.prenom} ${s.nom}<br><strong>Certification visée :</strong> ${f.intitule}<br><strong>Organisme accompagnateur :</strong> ${o.nom}</p>` },
+    { heading: "Composition du jury", content: `<p>• Président : M. Jean-Pierre DURAND, Professeur universitaire<br>• Membre 1 : Mme Sophie BERNARD, Professionnelle du secteur (12 ans d'expérience)<br>• Membre 2 : M. Philippe MARTIN, Professionnel du secteur (15 ans d'expérience)<br>• Représentant certificateur : Mme Claire LEFEBVRE</p>` },
+    { heading: "Déroulement", content: `<p>Le candidat a présenté son parcours et son dossier de validation pendant 25 minutes, suivi de 25 minutes d'échanges avec le jury. Le candidat a fait preuve d'une excellente maîtrise des compétences visées et d'une capacité d'analyse réflexive remarquable.</p>` },
+    { heading: "Évaluation par blocs", content: `<table><tr><th>Bloc de compétences</th><th>Décision</th></tr><tr><td>Bloc 1 – Compétences fondamentales</td><td>VALIDÉ</td></tr><tr><td>Bloc 2 – Compétences spécialisées</td><td>VALIDÉ</td></tr><tr><td>Bloc 3 – Compétences transversales</td><td>VALIDÉ</td></tr></table>`, variant: "green" },
+    { heading: "Décision du jury", content: `<p style="font-size:16px;font-weight:bold;text-align:center">VALIDATION TOTALE</p><p>Le jury, à l'unanimité, décide d'attribuer la certification « ${f.intitule} » à ${s.prenom} ${s.nom}.</p>` },
+  ], signatures: { type: "2", labels: ["Le Président du Jury", "Le Candidat"], names: ["Jean-Pierre DURAND", s.prenom + " " + s.nom] } });
+}
+
+function genVAENotificationDecision(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
+  const s = stagiaires[si] || stagiaires[0] || { prenom: "Martin", nom: "Dupont" };
+  const dateFin = getStagiaireDateFin(s, f);
+  const dateJury = new Date(dateFin);
+  dateJury.setDate(dateJury.getDate() + 30);
+  const dateNotif = new Date(dateJury);
+  dateNotif.setDate(dateNotif.getDate() + 7);
+  const dateNotifStr = `${String(dateNotif.getDate()).padStart(2, "0")}/${String(dateNotif.getMonth() + 1).padStart(2, "0")}/${dateNotif.getFullYear()}`;
+  return buildDocument({ org: o, title: "NOTIFICATION DE DÉCISION DU JURY – VAE", sections: [
+    { heading: "", content: `<p>${o.ville}, le ${dateNotifStr}</p><p>Madame, Monsieur ${s.nom},</p><p>Suite à votre passage devant le jury de Validation des Acquis de l'Expérience, nous avons le plaisir de vous notifier la décision suivante :</p><p style="text-align:center;font-size:16px;font-weight:bold;border:2px solid #2d8659;padding:15px;margin:15px 0">VALIDATION TOTALE<br>de la certification « ${f.intitule} »</p><p>L'ensemble des blocs de compétences a été validé par le jury. Votre certification sera éditée et transmise dans un délai de 4 à 6 semaines.</p><p>Nous vous adressons nos sincères félicitations pour cette réussite qui reconnaît officiellement les compétences acquises au cours de votre parcours professionnel.</p><p>Cordialement,</p>` },
+  ], signatures: { type: "2", labels: ["Le Dirigeant", ""], names: [o.dirigeant, ""] } });
+}
+
+function genVAEMoyensDedies(o: OrganismeInfo) {
+  return buildDocument({ org: o, title: "MOYENS DÉDIÉS À L'ACCOMPAGNEMENT VAE", sections: [
+    { heading: "Moyens humains", content: `<p><strong>Accompagnateurs VAE :</strong><br>• ${o.responsablePedagogique} – Accompagnateur VAE principal (certifié, 8 ans d'expérience)<br>• 1 accompagnateur VAE complémentaire<br><br><strong>Support administratif :</strong><br>• 1 assistante administrative dédiée (gestion des dossiers, plannings, certificateurs)<br><br><strong>Référent handicap :</strong> ${o.referentHandicap}</p>` },
+    { heading: "Moyens techniques et matériels", content: `<p>• 1 bureau individuel dédié aux entretiens VAE (confidentialité garantie)<br>• Équipement visioconférence (caméra HD, micro, écran partagé)<br>• Plateforme de suivi en ligne pour le dépôt et la relecture des documents<br>• Imprimante et scanner pour les pièces justificatives<br>• Bibliothèque de référentiels de certification</p>` },
+    { heading: "Ressources documentaires", content: `<p>• Base de données des référentiels RNCP et RS<br>• Modèles de dossiers de validation<br>• Guides méthodologiques de rédaction<br>• Exemples de dossiers anonymisés (avec accord des candidats)<br>• Veille réglementaire sur la VAE</p>`, variant: "green" },
+  ] });
+}
+
+function genVAECoordinationAccompagnateurs(o: OrganismeInfo) {
+  return buildDocument({ org: o, title: "COORDINATION DES ACCOMPAGNATEURS VAE", sections: [
+    { heading: "Organisation", content: `<p>${o.nom} assure la coordination de ses accompagnateurs VAE selon les modalités suivantes :</p>` },
+    { heading: "Réunions de coordination", content: `<p>• <strong>Réunion mensuelle</strong> (1h) – Point sur les accompagnements en cours, partage de pratiques<br>• <strong>Réunion trimestrielle</strong> (2h) – Bilan des accompagnements, indicateurs de résultats, évolutions réglementaires<br>• <strong>Réunion annuelle</strong> (demi-journée) – Bilan d'activité, plan d'amélioration, mise à jour des outils</p>` },
+    { heading: "Outils de coordination", content: `<p>• Tableau de suivi des accompagnements (candidat, certification, avancement, dates clés)<br>• Dossier partagé avec les outils et modèles à jour<br>• Calendrier commun des séances et des jurys<br>• Procédure d'escalade en cas de difficulté</p>`, variant: "green" },
+    { heading: "Supervision et qualité", content: `<p>Chaque accompagnateur fait l'objet d'une supervision par le responsable pédagogique :<br>• Relecture croisée d'un dossier par semestre<br>• Entretien professionnel annuel<br>• Évaluation par les candidats (questionnaire de satisfaction)</p>` },
+  ] });
+}
+
+function genVAERessources(o: OrganismeInfo) {
+  return buildDocument({ org: o, title: "RESSOURCES MISES À DISPOSITION – VAE", sections: [
+    { heading: "Ressources pédagogiques", content: `<p>• Guide méthodologique de la démarche VAE (remis au candidat)<br>• Trame de rédaction du dossier de validation (Livret 2)<br>• Exemples de descriptions d'activités réussies (anonymisées)<br>• Grille d'auto-évaluation des compétences par bloc<br>• Guide de préparation à l'oral devant le jury</p>` },
+    { heading: "Ressources documentaires", content: `<p>• Référentiels de certification à jour (RNCP, RS)<br>• Textes réglementaires sur la VAE (Code du travail, décrets)<br>• Fiches pratiques sur les financements (CPF, OPCO, employeur)<br>• FAQ candidats</p>` },
+    { heading: "Ressources numériques", content: `<p>• Plateforme de dépôt et suivi des documents en ligne<br>• Outil de visioconférence pour les séances à distance<br>• Espace candidat sécurisé avec accès aux ressources<br>• Tutoriels vidéo sur la méthodologie de rédaction</p>`, variant: "green" },
+    { heading: "Mise à disposition", content: `<p>Les ressources sont mises à disposition du candidat dès la première séance d'accompagnement. Elles sont actualisées au minimum une fois par an.</p>` },
+  ] });
+}
+
+function genVAEFichePosteAccompagnateur(o: OrganismeInfo) {
+  return buildDocument({ org: o, title: "FICHE DE POSTE – ACCOMPAGNATEUR VAE", sections: [
+    { heading: "Identification du poste", content: `<p><strong>Intitulé :</strong> Accompagnateur VAE<br><strong>Rattachement :</strong> Direction pédagogique – ${o.responsablePedagogique}<br><strong>Statut :</strong> Cadre / Consultant<br><strong>Lieu d'exercice :</strong> ${o.adresse}, ${o.codePostal} ${o.ville}</p>` },
+    { heading: "Mission principale", content: `<p>Accompagner les candidats à la VAE dans l'analyse de leur expérience, la rédaction du dossier de validation et la préparation au passage devant le jury, dans le respect du cadre réglementaire et des exigences qualité Qualiopi.</p>` },
+    { heading: "Activités", content: `<p>• Réaliser les entretiens de faisabilité<br>• Analyser les parcours professionnels au regard des référentiels de certification<br>• Accompagner la rédaction du dossier de validation (Livret 2)<br>• Aider à la constitution du portefeuille de preuves<br>• Préparer les candidats au passage devant le jury (simulation)<br>• Assurer le suivi et la traçabilité des accompagnements<br>• Participer aux réunions de coordination<br>• Contribuer à la veille réglementaire VAE</p>` },
+    { heading: "Compétences requises", content: `<p>• Maîtrise du cadre réglementaire de la VAE<br>• Connaissance approfondie des référentiels RNCP et RS<br>• Capacités d'écoute, d'analyse et de reformulation<br>• Compétences rédactionnelles et pédagogiques<br>• Maîtrise des outils numériques et de visioconférence<br>• Expérience minimum de 3 ans dans l'accompagnement VAE ou l'ingénierie de certification</p>`, variant: "green" },
+    { heading: "Formation et qualifications", content: `<p>• Diplôme de niveau 6 minimum (Licence, Master)<br>• Formation spécifique à l'accompagnement VAE<br>• Connaissance du Référentiel National Qualité (Qualiopi)</p>` },
+  ] });
+}
+
+function genVAEPlanDevAccompagnateurs(o: OrganismeInfo) {
+  return buildDocument({ org: o, title: "PLAN DE DÉVELOPPEMENT DES COMPÉTENCES – ACCOMPAGNATEURS VAE", table: {
+    headers: ["Action de formation", "Public cible", "Modalité", "Durée", "Échéance", "Statut"],
+    rows: [
+      ["Actualisation réglementaire VAE (loi 2023)", "Tous accompagnateurs", "Présentiel", "7h", "T1", "Réalisée"],
+      ["Techniques d'entretien et d'écoute active", "Accompagnateurs juniors", "Présentiel", "14h", "T2", "Réalisée"],
+      ["Nouveaux référentiels RNCP secteur tertiaire", "Tous accompagnateurs", "E-learning", "7h", "T2", "Réalisée"],
+      ["Accompagnement des publics en situation de handicap", "Tous accompagnateurs", "Mixte", "7h", "T3", "Planifiée"],
+      ["Outils numériques pour l'accompagnement à distance", "Tous accompagnateurs", "Visio", "3h30", "T3", "Planifiée"],
+      ["Préparation des candidats à l'oral : nouvelles pratiques", "Accompagnateurs seniors", "Présentiel", "7h", "T4", "Planifiée"],
+    ]
+  }, sections: [
+    { heading: "Objectif", content: `<p>Maintenir et développer les compétences des accompagnateurs VAE de ${o.nom} pour garantir un accompagnement de qualité, conforme aux évolutions réglementaires et aux attentes des candidats.</p>`, variant: "green" },
+  ] });
+}
+
+function genVAEVeilleReglementaire(o: OrganismeInfo) {
+  return buildDocument({ org: o, title: "VEILLE RÉGLEMENTAIRE – VAE", table: {
+    headers: ["Date", "Source", "Texte / Évolution", "Impact pour l'organisme", "Action"],
+    rows: [
+      ["Janv. 2024", "Légifrance", "Loi n°2022-1598 du 21/12/2022 – Réforme VAE", "Simplification de l'accès, fin de la condition d'ancienneté d'1 an pour les demandeurs d'emploi", "Mise à jour des supports d'information"],
+      ["Mars 2024", "France VAE", "Déploiement de la plateforme France VAE", "Nouveau portail d'orientation des candidats", "Intégration dans la procédure d'accueil"],
+      ["Juin 2024", "DGEFP", "Instruction relative au financement de la VAE par le CPF", "Modalités de prise en charge actualisées", "Mise à jour de la fiche tarifs"],
+      ["Sept. 2024", "France Compétences", "Actualisation des référentiels RNCP", "Nouveaux référentiels pour certains titres accompagnés", "Mise à jour des outils de diagnostic"],
+      ["Déc. 2024", "Ministère du Travail", "Décret sur les jurys VAE – composition et fonctionnement", "Nouvelles exigences sur la composition des jurys", "Mise à jour de la procédure jury"],
+    ]
+  }, sections: [
+    { heading: "Procédure de veille", content: `<p>La veille réglementaire VAE est assurée par le responsable pédagogique (${o.responsablePedagogique}). Sources consultées : Légifrance, France Compétences, DGEFP, réseaux professionnels. Fréquence : mensuelle. Les évolutions sont partagées en réunion de coordination et intégrées aux procédures.</p>`, variant: "green" },
+  ] });
+}
+
+function genVAEAccessibiliteHandicap(o: OrganismeInfo) {
+  return buildDocument({ org: o, title: "ACCESSIBILITÉ HANDICAP – ACCOMPAGNEMENT VAE", sections: [
+    { heading: "Engagement", content: `<p>${o.nom} s'engage à rendre accessible son accompagnement VAE à toute personne en situation de handicap, conformément à la loi du 11 février 2005 et au Référentiel National Qualité.</p>` },
+    { heading: "Référent handicap", content: `<p><strong>Nom :</strong> ${o.referentHandicap}<br><strong>Contact :</strong> ${o.email} – ${o.telephone}<br><br>Le référent handicap est l'interlocuteur privilégié des candidats en situation de handicap. Il intervient dès l'entretien de faisabilité.</p>` },
+    { heading: "Aménagements possibles", content: `<p>• <strong>Aménagement des séances :</strong> durée adaptée, pauses supplémentaires, fractionnement<br>• <strong>Accessibilité des locaux :</strong> bureau accessible PMR, signalétique adaptée<br>• <strong>Outils adaptés :</strong> logiciels de grossissement, transcription, support audio<br>• <strong>Accompagnement à distance :</strong> visioconférence avec sous-titrage automatique<br>• <strong>Aménagement du passage devant le jury :</strong> temps majoré, assistance technique, interprète LSF</p>`, variant: "green" },
+    { heading: "Partenaires mobilisables", content: `<p>• AGEFIPH / FIPHFP<br>• Cap Emploi<br>• MDPH<br>• Associations spécialisées par type de handicap<br>• Ergonomes et spécialistes de la compensation</p>` },
+  ] });
+}
+
+function genVAEPartenaires(o: OrganismeInfo) {
+  return buildDocument({ org: o, title: "LISTE DES PARTENAIRES ET CERTIFICATEURS – VAE", table: {
+    headers: ["Partenaire / Certificateur", "Type", "Rôle", "Contact"],
+    rows: [
+      ["France VAE", "Institutionnel", "Plateforme nationale d'orientation et d'information VAE", "francevae.fr"],
+      ["France Compétences", "Autorité de régulation", "Gestion du RNCP et du RS", "francecompetences.fr"],
+      ["Transitions Pro", "OPCO / Financeur", "Financement de la VAE pour les salariés", "transitionspro.fr"],
+      ["Pôle emploi / France Travail", "Service public de l'emploi", "Orientation et financement des demandeurs d'emploi", "francetravail.fr"],
+      ["OPCO (Atlas, AKTO, etc.)", "Financeur", "Financement de la VAE via le plan de développement", "Selon OPCO"],
+      ["Organismes certificateurs (RNCP)", "Certificateur", "Délivrance des certifications", "Selon certification"],
+      ["Cap Emploi", "Partenaire handicap", "Accompagnement des candidats en situation de handicap", "capemploi.net"],
+      ["AGEFIPH", "Partenaire handicap", "Financement des aménagements et compensations", "agefiph.fr"],
+      ["CEP (Conseil en Évolution Professionnelle)", "Orientation", "Information et orientation des candidats potentiels", "mon-cep.org"],
+    ]
+  }, sections: [
+    { heading: "Réseau", content: `<p>${o.nom} entretient un réseau actif de partenaires pour garantir un accompagnement VAE complet et un accès facilité à la certification pour tous les publics.</p>`, variant: "green" },
+  ] });
+}
+
+function genVAESatisfaction(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
+  const s = stagiaires[si] || stagiaires[0] || { prenom: "Martin", nom: "Dupont" };
+  const scores = [5, 4, 5, 5, 4, 5, 5, 4];
+  return buildDocument({ org: o, title: "QUESTIONNAIRE DE SATISFACTION – ACCOMPAGNEMENT VAE", subtitle: `${s.prenom} ${s.nom}`, table: {
+    headers: ["Critère", "Note /5", "Commentaire"],
+    rows: [
+      ["Qualité de l'accueil et de l'information", `${scores[0]}/5`, "Très bien informé(e) dès le départ"],
+      ["Compétence de l'accompagnateur", `${scores[1]}/5`, "Accompagnateur très compétent et à l'écoute"],
+      ["Qualité des outils et ressources", `${scores[2]}/5`, "Outils clairs et bien structurés"],
+      ["Rythme et organisation des séances", `${scores[3]}/5`, "Planning bien adapté à mes contraintes"],
+      ["Préparation au passage devant le jury", `${scores[4]}/5`, "Simulation très utile"],
+      ["Disponibilité de l'accompagnateur", `${scores[5]}/5`, "Toujours joignable et réactif"],
+      ["Atteinte des objectifs", `${scores[6]}/5`, "Dossier de qualité, je suis confiant(e)"],
+      ["Satisfaction globale", `${scores[7]}/5`, "Excellente expérience, je recommande"],
+    ]
+  }, sections: [
+    { heading: "Commentaire libre", content: `<p>« L'accompagnement m'a permis de structurer mes idées et de valoriser mon expérience de manière professionnelle. Je suis très satisfait(e) de la qualité du suivi et de la bienveillance de l'accompagnateur. Je recommande vivement ${o.nom} pour toute démarche VAE. »</p>`, variant: "green" },
+    { heading: "Note globale", content: `<p style="font-size:16px;font-weight:bold;text-align:center">${(scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1)} / 5</p>` },
+  ], signatures: { type: "2", labels: ["", "Le Candidat"], names: ["", s.prenom + " " + s.nom] } });
+}
+
+function genVAESyntheseSatisfaction(o: OrganismeInfo) {
+  return buildDocument({ org: o, title: "SYNTHÈSE DES APPRÉCIATIONS – ACCOMPAGNEMENT VAE", table: {
+    headers: ["Critère", "Moyenne /5", "Année N-1", "Évolution"],
+    rows: [
+      ["Qualité de l'accueil et de l'information", "4.8", "4.5", "+0.3"],
+      ["Compétence de l'accompagnateur", "4.9", "4.7", "+0.2"],
+      ["Qualité des outils et ressources", "4.6", "4.3", "+0.3"],
+      ["Rythme et organisation des séances", "4.7", "4.5", "+0.2"],
+      ["Préparation au passage devant le jury", "4.8", "4.4", "+0.4"],
+      ["Disponibilité de l'accompagnateur", "4.9", "4.8", "+0.1"],
+      ["Atteinte des objectifs", "4.7", "4.5", "+0.2"],
+      ["Satisfaction globale", "4.8", "4.5", "+0.3"],
+    ]
+  }, sections: [
+    { heading: "Analyse", content: `<p><strong>Taux de réponse :</strong> 94% (17/18 candidats)<br><strong>Note moyenne globale :</strong> 4.8/5<br><br>Les résultats montrent une progression sur l'ensemble des critères par rapport à l'année précédente. Les points les mieux notés sont la compétence de l'accompagnateur et sa disponibilité. L'amélioration la plus notable concerne la préparation au jury (+0.4 points), fruit de la mise en place de simulations systématiques.</p>`, variant: "green" },
+    { heading: "Actions d'amélioration identifiées", content: `<p>• Enrichir la bibliothèque de modèles et exemples de dossiers réussis<br>• Proposer un atelier collectif optionnel de préparation à l'oral<br>• Mettre en place un suivi post-jury (accompagnement des validations partielles)</p>` },
+  ] });
+}
+
+function genVAEProcedureReclamation(o: OrganismeInfo) {
+  return buildDocument({ org: o, title: "PROCÉDURE DE RÉCLAMATION – VAE", sections: [
+    { heading: "Objet", content: `<p>Cette procédure décrit les modalités de dépôt et de traitement des réclamations dans le cadre des accompagnements VAE de ${o.nom}.</p>` },
+    { heading: "Définition", content: `<p>Une réclamation est l'expression d'un mécontentement ou d'une insatisfaction du candidat concernant l'accompagnement VAE, nécessitant une réponse ou une action corrective.</p>` },
+    { heading: "Modalités de dépôt", content: `<p>Les réclamations peuvent être formulées :<br>• Par email à : ${o.email}<br>• Par courrier à : ${o.nom}, ${o.adresse}, ${o.codePostal} ${o.ville}<br>• Oralement auprès de l'accompagnateur (retranscrite par écrit)</p>` },
+    { heading: "Traitement", content: `<p><strong>1. Accusé de réception :</strong> sous 48 heures ouvrées<br><strong>2. Analyse :</strong> la réclamation est examinée par le responsable qualité (${o.referentQualite})<br><strong>3. Réponse :</strong> sous 15 jours ouvrés maximum<br><strong>4. Action corrective :</strong> mise en place si nécessaire<br><strong>5. Suivi :</strong> vérification de la satisfaction du candidat</p>`, variant: "green" },
+    { heading: "Enregistrement", content: `<p>Toutes les réclamations sont consignées dans le registre des réclamations. Elles font l'objet d'une analyse annuelle dans le cadre de la revue qualité et contribuent au plan d'amélioration continue.</p>` },
+  ] });
+}
+
+function genVAEPlanAmelioration(o: OrganismeInfo) {
+  return buildDocument({ org: o, title: "PLAN D'AMÉLIORATION CONTINUE – VAE", table: {
+    headers: ["Axe d'amélioration", "Origine", "Action prévue", "Responsable", "Échéance", "Statut"],
+    rows: [
+      ["Préparation au jury", "Enquête satisfaction", "Mise en place de simulations de jury systématiques", o.responsablePedagogique, "T1", "Réalisé"],
+      ["Suivi post-jury", "Analyse des résultats", "Créer un accompagnement pour les validations partielles", o.responsablePedagogique, "T2", "Réalisé"],
+      ["Délai de démarrage", "Réclamation candidat", "Réduire le délai entre faisabilité et 1ère séance à 15 jours", o.dirigeant, "T2", "Réalisé"],
+      ["Ressources numériques", "Veille pédagogique", "Développer un espace candidat en ligne avec tutoriels vidéo", o.referentQualite, "T3", "En cours"],
+      ["Accessibilité handicap", "Audit interne", "Former tous les accompagnateurs à l'accueil du handicap", o.referentHandicap, "T3", "Planifié"],
+      ["Partenariats certificateurs", "Revue qualité", "Renforcer les liens avec 3 nouveaux certificateurs", o.dirigeant, "T4", "Planifié"],
+    ]
+  }, sections: [
+    { heading: "Bilan", content: `<p>Ce plan d'amélioration continue est issu de l'analyse des enquêtes de satisfaction, des réclamations, de la veille réglementaire et des audits internes. Il est revu trimestriellement et présenté en revue de direction annuelle.</p>`, variant: "green" },
+  ] });
+}
+
 // ============== NOUVEAUX TEMPLATES AF (Drive SKILLORA) ==============
 
 function genProcedureFormationFC(o: OrganismeInfo) {
