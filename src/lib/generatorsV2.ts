@@ -1059,7 +1059,7 @@ export function genGrilleAcquisition_V2(o: OrganismeInfo, f: FormationInfo, stag
     if (si > 0) extra += '<div class="page-break"></div>';
     const sc = EVAL_SCORES[si] || [7, 8, 7, 8, 7];
     extra += `<h3>GRILLE DE SUIVI DU NIVEAU D'ACQUISITION DES COMPÉTENCES PROFESSIONNELLES</h3>`;
-    extra += `<p><strong>DATE :</strong> ${formatDate(f.dateDebut)} – ${formatDate(f.dateFin)}</p>`;
+    extra += `<p><strong>DATE :</strong> ${formatDate(getStagiaireDateDebut(s, f))} – ${formatDate(getStagiaireDateFin(s, f))}</p>`;
     extra += `<p><strong>NOM / PRÉNOM :</strong> ${s.prenom} ${s.nom}</p>`;
     extra += `<p><strong>FORMATION :</strong> ${f.intitule}</p>`;
     const rows = evalData.competences.map((comp) => {
