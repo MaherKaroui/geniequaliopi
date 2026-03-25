@@ -12,6 +12,7 @@ import { genVeilleReglementaireV2, genVeilleMetierV2, genVeilleTechnologiqueV2, 
 import { getRNCPByCode } from "./rncpData";
 import { getModuleSpecificConsigne } from "./cfaExerciseContent";
 
+const FALLBACK_STAGIAIRE: StagiaireInfo = { prenom: "Martin", nom: "Dupont", civilite: "" as "M." | "Mme" | "", email: "", telephone: "", entreprise: "", poste: "", dateNaissance: "" };
 export function getFullCatalog(org: OrganismeInfo, userFormation: FormationInfo, userStagiaires: StagiaireInfo[]): DocEntry[] {
   // Use only the single selected formation (merged with sample defaults if needed)
   const selectedFormation = userFormation.intitule
