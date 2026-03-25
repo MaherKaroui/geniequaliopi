@@ -15,6 +15,7 @@ export const PER_STAGIAIRE_TEMPLATES = new Set([
   "attestation_inscription_cfa", "fiche_autoevaluation_apprenti",
   "fiche_renseignement_cfa", "convention_formation_cfa", "livret_apprentissage_cfa_v2",
   "convention_formation_apprentissage",
+  "convocation_certification",
 ]);
 
 const EXCEL_TEMPLATES = new Set([
