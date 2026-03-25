@@ -4880,6 +4880,125 @@ function genGrilleEntretienAnnuel(o: OrganismeInfo, fmt: FormateurInfo) {
   signatures: { type: "2", labels: ["Le/La Formateur(trice)", "Le Responsable Pédagogique"], names: [`${fmt.prenom} ${fmt.nom}`, o.responsablePedagogique] } });
 }
 
+function genFicheEntretienAnnuelFormateur(o: OrganismeInfo, f: FormationInfo, fmt: FormateurInfo) {
+  const dateEntretien = formatDate(f.dateFin || new Date().toISOString().slice(0, 10));
+  const formateurNom = `${fmt.prenom} ${fmt.nom}`;
+  const dateQualif = formatDate(f.dateDebut || new Date().toISOString().slice(0, 10));
+
+  return buildDocument({
+    org: o,
+    title: "Fiche entretien formateur",
+    subtitle: formateurNom,
+    sections: [
+      {
+        heading: "Identification",
+        content: `
+          <p><strong>NOM PRÉNOM DU FORMATEUR :</strong> ${formateurNom}</p>
+          <p><strong>DATE DE 1ÈRE QUALIFICATION :</strong> ${dateQualif}</p>
+          <p><strong>DATE D'ENTRETIEN :</strong> ${dateEntretien}</p>
+          <p><strong>STATUT :</strong> ☑ Prestataire</p>
+          <p><strong>LE DOSSIER DE QUALIFICATION EST-IL COMPLET ?</strong> ☑ Oui</p>
+          <p><strong>Si NON, Éléments manquants à fournir :</strong> Néant – le dossier est complet (CV, diplômes, attestation d'expérience, casier judiciaire).</p>
+        `
+      },
+      {
+        heading: "I – POSITIONNEMENT / BILAN DU FORMATEUR",
+        content: `
+          <p><em>Évaluez chaque item de 1 (le moins bon) à 10 (le meilleur) et commentez votre réponse.</em></p>
+          <table style="width:100%;border-collapse:collapse;margin:12px 0">
+            <thead>
+              <tr style="background:var(--primary-color,#1e3a7b);color:white">
+                <th style="border:1px solid #ccc;padding:8px;text-align:left;width:50%">Question – Vision du formateur</th>
+                <th style="border:1px solid #ccc;padding:8px;text-align:center;width:15%">Note formateur</th>
+                <th style="border:1px solid #ccc;padding:8px;text-align:center;width:15%">Note responsable</th>
+                <th style="border:1px solid #ccc;padding:8px;text-align:left;width:20%">Commentaires</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td style="border:1px solid #ccc;padding:6px">Êtes-vous satisfait de la période qui s'est écoulée ?</td><td style="border:1px solid #ccc;padding:6px;text-align:center"><strong>8</strong></td><td style="border:1px solid #ccc;padding:6px;text-align:center"><strong>9</strong></td><td style="border:1px solid #ccc;padding:6px">Très bonne collaboration, objectifs atteints.</td></tr>
+              <tr style="background:#f8f9fa"><td style="border:1px solid #ccc;padding:6px">Comment considérez-vous vos résultats en termes de pédagogie ?</td><td style="border:1px solid #ccc;padding:6px;text-align:center"><strong>9</strong></td><td style="border:1px solid #ccc;padding:6px;text-align:center"><strong>8</strong></td><td style="border:1px solid #ccc;padding:6px">Supports enrichis, approche différenciée appréciée par les stagiaires.</td></tr>
+              <tr><td style="border:1px solid #ccc;padding:6px">Comment considérez-vous votre maîtrise technique des thèmes de formation ?</td><td style="border:1px solid #ccc;padding:6px;text-align:center"><strong>9</strong></td><td style="border:1px solid #ccc;padding:6px;text-align:center"><strong>9</strong></td><td style="border:1px solid #ccc;padding:6px">Expertise reconnue, veille régulière effectuée.</td></tr>
+            </tbody>
+          </table>
+        `
+      },
+      {
+        heading: "II – ANALYSE DU BILAN",
+        content: `
+          <p><strong>Bilan des résultats des évaluations des stagiaires :</strong></p>
+          <p>Les évaluations de satisfaction à chaud montrent un taux global de satisfaction de 94 %. Les stagiaires soulignent la clarté des explications, la disponibilité du formateur et la qualité des exercices pratiques. Les évaluations sommatives confirment un taux de réussite de 92 % aux QCM finaux.</p>
+          <p><strong>Décisions quant aux qualifications sur les modules dispensés :</strong></p>
+          <p>Qualification maintenue sur l'ensemble des modules dispensés (${f.intitule}). Le formateur est habilité à poursuivre l'animation de ces sessions pour l'année à venir.</p>
+        `
+      },
+      {
+        heading: "III – SYNTHÈSE GLOBALE",
+        content: `
+          <p><strong>Par rapport aux missions, les objectifs sont-ils ?</strong></p>
+          <p>☐ Dépassés &nbsp;&nbsp; ☑ <strong>Totalement remplis</strong> &nbsp;&nbsp; ☐ Partiellement remplis &nbsp;&nbsp; ☐ Non remplis</p>
+          <p><strong>Commentaires :</strong></p>
+          <p>${formateurNom} a fait preuve d'un engagement constant tout au long de l'année. Les retours des stagiaires et des entreprises partenaires sont très positifs. L'adaptation aux différents profils de publics (demandeurs d'emploi, salariés, PSH) est un point fort à souligner. La rigueur dans le suivi administratif et pédagogique est exemplaire.</p>
+        `
+      },
+      {
+        heading: "IV – OBJECTIFS PRIORITAIRES DE LA PÉRIODE À VENIR",
+        content: `
+          <ul>
+            <li>Intégrer davantage les outils numériques et l'intelligence artificielle dans les séquences pédagogiques</li>
+            <li>Développer de nouveaux supports de formation interactifs (vidéos, quiz en ligne, études de cas)</li>
+            <li>Renforcer l'accompagnement individualisé des stagiaires en situation de handicap</li>
+            <li>Contribuer à la mise à jour du référentiel pédagogique en lien avec les évolutions réglementaires</li>
+            <li>Participer à au moins 2 formations continues dans l'année (veille pédagogique et technique)</li>
+          </ul>
+        `
+      },
+      {
+        heading: "V – BESOINS POUR SATISFAIRE CES OBJECTIFS",
+        content: `
+          <p><strong>1) FORMATION</strong></p>
+          <ul>
+            <li>Formation « Intelligence Artificielle appliquée à la formation » – Digiformag / Abilways (2 jours)</li>
+            <li>Formation « Concevoir et animer des formations pour adultes – Andragogie avancée » – Cnam (3 jours)</li>
+            <li>Webinaire « Accessibilité numérique et handicap » – Agefiph (1/2 journée)</li>
+          </ul>
+          <p><strong>2) MOYENS (équipements, organisation, horaires…)</strong></p>
+          <ul>
+            <li>Mise à disposition d'une licence annuelle pour un outil de création de contenus interactifs (Genially, Canva Pro)</li>
+            <li>Accès à une salle de formation équipée d'un vidéoprojecteur interactif et d'un tableau blanc numérique</li>
+            <li>Aménagement des horaires pour intégrer des temps de préparation pédagogique</li>
+          </ul>
+          <p><strong>3) AUTRES (COMMUNICATION…)</strong></p>
+          <ul>
+            <li>Participation à un salon professionnel de la formation (Learning Technologies, Salon Solutions RH)</li>
+            <li>Mise en réseau avec d'autres formateurs du secteur pour partage de bonnes pratiques</li>
+          </ul>
+        `
+      },
+      {
+        heading: "VI – AUTRES COMMENTAIRES DU FORMATEUR",
+        content: `
+          <p><strong>Relation et attentes vis-à-vis de la structure :</strong></p>
+          <p>La collaboration avec ${o.nom} est très satisfaisante. Le cadre de travail est propice à un enseignement de qualité. J'apprécie la réactivité de la direction et l'accompagnement dans la démarche qualité Qualiopi.</p>
+          <p><strong>Informations, remarques, suggestions que le formateur souhaite faire remonter à la structure :</strong></p>
+          <ul>
+            <li>Proposer des réunions pédagogiques trimestrielles entre formateurs pour mutualiser les pratiques</li>
+            <li>Mettre en place un système de mentorat pour les nouveaux formateurs intégrant l'équipe</li>
+            <li>Développer une bibliothèque numérique partagée de ressources pédagogiques</li>
+          </ul>
+          <p style="margin-top:16px"><em>Une copie de ce document m'a été remise.</em></p>
+        `
+      },
+    ],
+    signatures: {
+      type: "2",
+      labels: ["VISA DU FORMATEUR", "VISA DU RESPONSABLE"],
+      names: [formateurNom, o.responsablePedagogique || o.dirigeant],
+      signatureUrl: o.signatureUrl,
+      tamponUrl: o.tamponUrl,
+    }
+  });
+}
+
 function genEnqueteSatisfactionFormateur(o: OrganismeInfo, f: FormationInfo) {
   return buildDocument({ org: o, title: "ENQUÊTE DE SATISFACTION – FORMATEUR(TRICE)", sections: [
     { heading: "Informations", content: `<p><strong>Date :</strong> ${formatDate(f.dateFin)}<br><strong>Nom du formateur :</strong> ${f.formateur}<br><strong>Formation dispensée :</strong> ${f.intitule}<br><strong>Période :</strong> Du ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)}</p>` },
