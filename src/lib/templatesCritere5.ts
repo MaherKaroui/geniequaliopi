@@ -83,9 +83,13 @@ function genFichePosteResponsablePedagogique(o: OrganismeInfo) {
 
 // ===== IND 21 — AUTO-ÉVALUATION FORMATEUR =====
 
-export function genAutoEvaluationFormateurV2(o: OrganismeInfo, f: FormationInfo, fmt: FormateurInfo) {
-  return buildDocument({ org: o, title: "Auto-évaluation du formateur", subtitle: `${fmt.prenom} ${fmt.nom}`, sections: [
-    { heading: "Informations", content: `<p><strong>Nom :</strong> ${fmt.prenom} ${fmt.nom}<br><strong>Date :</strong> ${formatDate(f.dateFin)}<br><strong>Formation concernée :</strong> ${f.intitule}</p>` },
+export function genAutoEvaluationFormateurV2(o: OrganismeInfo, f: FormationInfo, fmt: FormateurInfo, stagiaires: StagiaireInfo[] = []) {
+  const formateurNom = `${fmt.prenom} ${fmt.nom}`.trim();
+  // Find matching stagiaire for this formateur to get their specific signature
+  const matchingStagiaire = stagiaires.find(s => s.formateur === formateurNom || s.formateur === f.formateur);
+  const fmtSigUrl = matchingStagiaire?.formateurSignatureUrl || f.formateurSignatureUrl;
+  return buildDocument({ org: o, title: "Auto-évaluation du formateur", subtitle: formateurNom, sections: [
+    { heading: "Informations", content: `<p><strong>Nom :</strong> ${formateurNom}<br><strong>Date :</strong> ${formatDate(f.dateFin)}<br><strong>Formation concernée :</strong> ${f.intitule}</p>` },
   ], table: {
     headers: ["Critères", "Évaluation (1 à 5)", "Commentaires / Remarques"],
     rows: [
