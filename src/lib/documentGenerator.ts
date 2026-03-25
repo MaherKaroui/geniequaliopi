@@ -7183,12 +7183,12 @@ function genBilanFroid(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiaire
       [0,0,0,1,0,1,0,0,0],
     ];
     const pat = patterns[i % patterns.length];
-    extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%"><tr style="background:#1e3a7b;color:#fff"><th>Critères évalués</th><th>Tout à fait</th><th>Plutôt oui</th><th>Plutôt non</th><th>Non</th></tr>`;
+    extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%"><thead><tr style="background:#1e3a7b;color:#fff"><th>Critères évalués</th><th>Tout à fait</th><th>Plutôt oui</th><th>Plutôt non</th><th>Non</th></tr></thead><tbody>`;
     criteres.forEach((label, idx) => {
       const note = pat[idx];
       extra += `<tr><td>${label}</td><td style="text-align:center;font-weight:700">${note === 0 ? "X" : ""}</td><td style="text-align:center;font-weight:700">${note === 1 ? "X" : ""}</td><td></td><td></td></tr>`;
     });
-    extra += `</table>`;
+    extra += `</tbody></table>`;
     const comments = [
       `Avec du recul, la formation ${f.intitule} m'a été réellement utile. J'utilise encore les outils régulièrement, notamment pour rédiger et mettre en forme des documents simples dans un cadre professionnel. Les bases vues pendant la formation me permettent aujourd'hui de travailler de manière plus autonome et plus rapide.`,
       `La formation correspondait bien à mon niveau au moment où je l'ai suivie. Les méthodes expliquées restent claires et faciles à réutiliser lorsque j'en ai besoin. Les supports fournis sont pratiques et me servent encore de rappel.`,
@@ -7408,12 +7408,12 @@ function genBilanFroidStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: 
     <tr><td><strong>Formation suivie :</strong></td><td>${f.intitule}</td></tr>
   </table>`;
 
-  extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%"><tr style="background:#1e3a7b;color:#fff"><th>Critères évalués</th><th>Tout à fait</th><th>Plutôt oui</th><th>Plutôt non</th><th>Non</th></tr>`;
+  extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%"><thead><tr style="background:#1e3a7b;color:#fff"><th>Critères évalués</th><th>Tout à fait</th><th>Plutôt oui</th><th>Plutôt non</th><th>Non</th></tr></thead><tbody>`;
   allCriteres.forEach((label, idx) => {
     const n = pat[idx];
     extra += `<tr><td>${label}</td><td style="text-align:center;font-weight:700">${n === 0 ? "X" : ""}</td><td style="text-align:center;font-weight:700">${n === 1 ? "X" : ""}</td><td></td><td></td></tr>`;
   });
-  extra += `</table>`;
+  extra += `</tbody></table>`;
 
   const commentsPool = [
     `Avec du recul, la formation ${f.intitule} m'a été réellement utile. J'utilise encore les outils régulièrement dans mon travail quotidien. Les bases vues pendant la formation me permettent de travailler de manière plus autonome.`,
