@@ -369,7 +369,7 @@ export function genBilanPedagogiqueIndividuel(o: OrganismeInfo, f: FormationInfo
 export function genRapportFinFormation(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const nbStag = Math.min(stagiaires.length, 10);
   return buildDocument({ org: o, title: "RAPPORT DE FIN DE FORMATION", subtitle: f.intitule, formation: f, showFormationInfo: true, sections: [
-    { heading: "Synthèse de la formation", content: `<p>La formation « ${f.intitule} » s'est déroulée du ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)} (${f.duree}) en modalité ${f.modalites} à ${f.lieu}.<br>Nombre de stagiaires : ${nbStag}<br>Formateur : ${f.formateur}</p>` },
+    { heading: "Synthèse de la formation", content: `<p>La formation « ${f.intitule} » d'une durée de ${f.duree} s'est déroulée en modalité ${f.modalites} à ${f.lieu}.<br>Nombre de stagiaires : ${nbStag}<br>Formateur : ${f.formateur}</p>` },
     { heading: "Déroulement", content: "<p>La formation s'est déroulée conformément au programme prévu. L'ensemble des modules a été couvert. Les stagiaires ont été actifs et participatifs tout au long de la formation.</p>" },
     { heading: "Résultats pédagogiques", content: `<p>• Taux de réussite : 90%<br>• Note moyenne du groupe : 8.2/10<br>• Taux de présence : 98%<br>• Satisfaction globale : 4.7/5 (94%)</p>`, variant: "green" },
     { heading: "Adaptations réalisées", content: "<p>• Rythme adapté pour 2 stagiaires de niveau débutant<br>• Exercices supplémentaires proposés aux stagiaires avancés<br>• Support de synthèse complémentaire distribué</p>" },
