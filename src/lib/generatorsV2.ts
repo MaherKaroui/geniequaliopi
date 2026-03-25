@@ -639,7 +639,7 @@ export function genExercicesStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
       cumDays += Math.round((totalBlocVolumes[bi] / totalH) * nbJours);
     }
     cumDays = Math.min(cumDays, nbJours);
-    exerciseDate = days.length >= cumDays && cumDays > 0 ? days[cumDays - 1] : formatDate(f.dateFin);
+    exerciseDate = days.length >= cumDays && cumDays > 0 ? days[cumDays - 1] : formatDate(getStagiaireDateFin(s, f));
   } else if (!hasBlocs && exerciceIdx !== undefined) {
     const days = getFormationDays(f);
     const nbJours = days.length;
