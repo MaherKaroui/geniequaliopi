@@ -590,7 +590,7 @@ function genQuestionnairePositionnement(o: OrganismeInfo, f: FormationInfo, stag
   const evalData = getEvalContent(f.intitule);
   const questions = evalData.qcmPositionnement;
   let extra = `<h2>Résultats détaillés du questionnaire de positionnement</h2>`;
-  extra += `<p><strong>Formation :</strong> ${f.intitule}<br><strong>Date :</strong> ${formatDate(f.dateDebut)}<br><strong>Formateur :</strong> ${f.formateur}</p>`;
+  extra += `<p><strong>Formation :</strong> ${f.intitule}<br><strong>Formateur :</strong> ${f.formateur}</p>`;
 
   // Summary table
   const summaryRows = stagiaires.slice(0, 10).map((s, i) => {
@@ -598,10 +598,10 @@ function genQuestionnairePositionnement(o: OrganismeInfo, f: FormationInfo, stag
     const result = computeQCMScore(questions, answers);
     const pct = Math.round(result.score / result.total * 100);
     const niveau = pct >= 80 ? "Avancé" : pct >= 60 ? "Intermédiaire" : "Débutant";
-    return [s.prenom + " " + s.nom, `${result.score}/${result.total}`, `${pct}%`, niveau, evalData.appreciations[i] ? evalData.appreciations[i].split('.')[0] + '.' : "Niveau correct."];
+    return [s.prenom + " " + s.nom, formatDate(getStagiaireDateDebut(s, f)), `${result.score}/${result.total}`, `${pct}%`, niveau, evalData.appreciations[i] ? evalData.appreciations[i].split('.')[0] + '.' : "Niveau correct."];
   });
   extra += `<h3>Synthèse des résultats</h3>`;
-  extra += tableHTML(["Stagiaire", "Score", "%", "Niveau", "Appréciation du formateur"], summaryRows);
+  extra += tableHTML(["Stagiaire", "Date début", "Score", "%", "Niveau", "Appréciation du formateur"], summaryRows);
 
   // Detailed per-stagiaire answer sheets (first 5)
   stagiaires.slice(0, 5).forEach((s, si) => {
@@ -610,6 +610,7 @@ function genQuestionnairePositionnement(o: OrganismeInfo, f: FormationInfo, stag
     extra += `<div class="page-break"></div>`;
     extra += `<h2>Fiche individuelle – ${s.prenom} ${s.nom}</h2>`;
     extra += `<p><strong>Entreprise :</strong> ${s.entreprise} | <strong>Poste :</strong> ${s.poste}</p>`;
+    extra += `<p><strong>Session :</strong> Du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}</p>`;
     extra += `<p><strong>Score :</strong> ${result.score}/${result.total} (${Math.round(result.score / result.total * 100)}%)</p>`;
     const qRows = questions.map((q, qi) => {
       const isCorrect = result.details[qi].correct;
