@@ -482,7 +482,7 @@ function genMentionsLegales(o: OrganismeInfo) {
 }
 
 function genCatalogue(o: OrganismeInfo, f: FormationInfo) {
-  return buildDocument({ org: o, title: `CATALOGUE DE FORMATION`, subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, sections: [
+  return buildDocument({ org: o, title: `CATALOGUE DE FORMATION`, subtitle: f.intitule, formation: f, showFormationInfo: true, sections: [
     { heading: "Objectifs pédagogiques", content: `<p>${f.objectifs}</p>` },
     { heading: "Programme", content: `<p>${f.programme.replace(/\n/g, "<br>")}</p>` },
     { heading: "Moyens pédagogiques", content: `<p>${f.moyensPedagogiques}</p>` },
@@ -492,7 +492,7 @@ function genCatalogue(o: OrganismeInfo, f: FormationInfo) {
 }
 
 function genFicheInfoFormation(o: OrganismeInfo, f: FormationInfo) {
-  return buildDocument({ org: o, title: "FICHE D'INFORMATION PUBLIQUE", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, sections: [
+  return buildDocument({ org: o, title: "FICHE D'INFORMATION PUBLIQUE", subtitle: f.intitule, formation: f, showFormationInfo: true, sections: [
     { heading: "Public visé", content: `<p>${f.publicVise}</p>` },
     { heading: "Prérequis", content: `<p>${f.prerequis}</p>` },
     { heading: "Objectifs", content: `<p>${f.objectifs}</p>` },
@@ -525,14 +525,14 @@ function genTauxSatisfactionGlobal(o: OrganismeInfo, formations: FormationInfo[]
 }
 
 function genTauxReussite(o: OrganismeInfo, f: FormationInfo, nbParticipants: number) {
-  return buildDocument({ org: o, title: "TAUX DE RÉUSSITE", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, table: {
+  return buildDocument({ org: o, title: "TAUX DE RÉUSSITE", subtitle: f.intitule, formation: f, showFormationInfo: true, table: {
     headers: ["Indicateur", "Résultat"],
     rows: [["Nombre de participants", `${nbParticipants}`], ["Réussites", `${nbParticipants}`], ["Taux de réussite", "100%"], ["Note moyenne", "10/10"], ["Satisfaction formation", "100%"]]
   } });
 }
 
 function genTauxSatisfactionFormation(o: OrganismeInfo, f: FormationInfo) {
-  return buildDocument({ org: o, title: "TAUX DE SATISFACTION", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, table: {
+  return buildDocument({ org: o, title: "TAUX DE SATISFACTION", subtitle: f.intitule, formation: f, showFormationInfo: true, table: {
     headers: ["Critère", "Note /5", "Satisfaction"],
     rows: [["Accueil et organisation", "4.8", "96%"], ["Atteinte des objectifs", "4.6", "92%"], ["Contenu adapté", "4.7", "94%"], ["Méthodes pédagogiques", "4.8", "96%"], ["Compétence du formateur", "4.9", "98%"], ["Supports de formation", "4.5", "90%"], ["Durée adaptée", "4.6", "92%"], ["Recommandation", "4.8", "96%"]]
   }, sections: [{ heading: "Moyenne globale", content: "<p><strong>4.7 / 5 – Satisfaction : 94%</strong></p>", variant: "green" }] });
@@ -1134,14 +1134,14 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
 }
 
 function genObjectifs(o: OrganismeInfo, f: FormationInfo) {
-  return buildDocument({ org: o, title: "OBJECTIFS PÉDAGOGIQUES", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, sections: [
+  return buildDocument({ org: o, title: "OBJECTIFS PÉDAGOGIQUES", subtitle: f.intitule, formation: f, showFormationInfo: true, sections: [
     { heading: "Objectif général", content: `<p>${f.objectifs}</p>` },
     { heading: "À l'issue de la formation, le stagiaire sera capable de", content: "<p>• Appliquer les méthodes et techniques présentées en situation professionnelle<br>• Utiliser les outils et ressources mis à disposition de manière autonome<br>• Évaluer sa progression et identifier ses axes d'amélioration<br>• Transférer les acquis dans son contexte professionnel</p>" },
   ] });
 }
 
 function genPlanPedagogique(o: OrganismeInfo, f: FormationInfo) {
-  return buildDocument({ org: o, title: "PLAN PÉDAGOGIQUE", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, sections: [
+  return buildDocument({ org: o, title: "PLAN PÉDAGOGIQUE", subtitle: f.intitule, formation: f, showFormationInfo: true, sections: [
     { heading: "Déroulé pédagogique", content: `<p>${f.programme.replace(/\n/g, "<br>")}</p>` },
     { heading: "Méthodes mobilisées", content: "<p>• Apports théoriques (30%)<br>• Exercices pratiques et cas concrets (50%)<br>• Mises en situation et jeux de rôle (15%)<br>• Échanges et retours d'expérience (5%)</p>" },
     { heading: "Supports", content: `<p>${f.moyensPedagogiques}</p>` },
@@ -1149,7 +1149,7 @@ function genPlanPedagogique(o: OrganismeInfo, f: FormationInfo) {
 }
 
 function genAdaptation(o: OrganismeInfo, f: FormationInfo) {
-  return buildDocument({ org: o, title: "ADAPTATION DU CONTENU PÉDAGOGIQUE", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, sections: [
+  return buildDocument({ org: o, title: "ADAPTATION DU CONTENU PÉDAGOGIQUE", subtitle: f.intitule, formation: f, showFormationInfo: true, sections: [
     { heading: "Adaptations réalisées", content: "<p>Suite à l'analyse des besoins et au positionnement initial, les adaptations suivantes ont été mises en place :</p><p>• Ajout d'exercices de niveau intermédiaire pour les stagiaires déjà expérimentés<br>• Temps supplémentaire pour les stagiaires débutants sur les fondamentaux<br>• Création d'un support de synthèse complémentaire<br>• Mise à disposition de tutoriels vidéo pour les révisions</p>" },
     { heading: "Résultats", content: "<p>Les adaptations ont permis de maintenir un taux de satisfaction de 96% et un taux de réussite de 90%.</p>", variant: "green" },
   ] });
@@ -1193,7 +1193,7 @@ function genRegistreAmenagements(o: OrganismeInfo) {
 }
 
 function genFicheAmenagement(o: OrganismeInfo, f: FormationInfo) {
-  return buildDocument({ org: o, title: "FICHE D'AMÉNAGEMENT", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, sections: [
+  return buildDocument({ org: o, title: "FICHE D'AMÉNAGEMENT", subtitle: f.intitule, formation: f, showFormationInfo: true, sections: [
     { heading: "Analyse de la situation", content: "<p>Entretien réalisé le ______ avec le référent handicap.<br>Type de handicap identifié : ______<br>Besoins exprimés : ______</p>" },
     { heading: "Aménagements mis en place", content: "<p>☐ Support adapté<br>☐ Temps supplémentaire<br>☐ Accessibilité des locaux<br>☐ Matériel spécifique<br>☐ Accompagnement individualisé<br>☐ Autre : ______</p>" },
   ], signatures: { type: "2", labels: ["Le Référent Handicap", "Le Stagiaire"], names: [o.referentHandicap, ""] } });
@@ -1998,7 +1998,7 @@ function genQuestionnaireInsertion(o: OrganismeInfo, f: FormationInfo) {
 }
 
 function genConditionsAccueil(o: OrganismeInfo, f: FormationInfo) {
-  return buildDocument({ org: o, title: "FICHE CONDITIONS D'ACCUEIL", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, sections: [
+  return buildDocument({ org: o, title: "FICHE CONDITIONS D'ACCUEIL", subtitle: f.intitule, formation: f, showFormationInfo: true, sections: [
     { heading: "Locaux", content: `<p>Adresse : ${f.lieu}<br>Accès : Métro, bus, parking<br>Accessibilité PMR : ✅ Oui<br>Wifi : ✅ Disponible</p>` },
     { heading: "Équipements", content: `<p>${f.moyensPedagogiques}</p>` },
     { heading: "Horaires", content: "<p>Matin : 9h00 – 12h30<br>Après-midi : 13h30 – 17h00<br>Pause déjeuner : 12h30 – 13h30</p>" },
@@ -2012,7 +2012,7 @@ function genCharteAccueil(o: OrganismeInfo, f: FormationInfo) {
 }
 
 function genListeMoyens(o: OrganismeInfo, f: FormationInfo) {
-  return buildDocument({ org: o, title: "LISTE DES MOYENS PÉDAGOGIQUES", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, table: {
+  return buildDocument({ org: o, title: "LISTE DES MOYENS PÉDAGOGIQUES", subtitle: f.intitule, formation: f, showFormationInfo: true, table: {
     headers: ["Moyen", "Quantité", "État", "Dernière vérification"],
     rows: [["PC portables", "12", "✅ Bon", "01/01/2024"], ["Vidéoprojecteur", "1", "✅ Bon", "01/01/2024"], ["Tableau blanc interactif", "1", "✅ Bon", "01/01/2024"], ["Connexion internet fibre", "1", "✅ Bon", "01/01/2024"], ["Supports de cours imprimés", `${f.nombreParticipants}`, "✅ Neuf", formatDate(f.dateDebut)], ["Plateforme Moodle", "1", "✅ Opérationnel", "01/01/2024"]]
   } });
@@ -2026,7 +2026,7 @@ function genInventaire(o: OrganismeInfo, f: FormationInfo) {
 }
 
 function genSupportsCours(o: OrganismeInfo, f: FormationInfo) {
-  return buildDocument({ org: o, title: "SUPPORTS DE COURS", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, sections: [
+  return buildDocument({ org: o, title: "SUPPORTS DE COURS", subtitle: f.intitule, formation: f, showFormationInfo: true, sections: [
     { heading: "Supports fournis", content: "<p>• Manuel de formation (version papier et numérique)<br>• Fiches mémo synthétiques<br>• Exercices pratiques et corrigés<br>• Études de cas réels<br>• Vidéos tutorielles (accès 6 mois post-formation)<br>• Ressources complémentaires en ligne</p>" },
     { heading: "Accès numérique", content: `<p>Plateforme : ${o.outilsUtilises}<br>Durée d'accès : 6 mois après la formation<br>Identifiants envoyés par email avant le début de la formation</p>`, variant: "green" },
   ] });
@@ -2055,14 +2055,14 @@ function genPlanningFormateurs(o: OrganismeInfo, formateurs: FormateurInfo[], fo
 }
 
 function genCoordination(o: OrganismeInfo, f: FormationInfo) {
-  return buildDocument({ org: o, title: "COORDINATION PÉDAGOGIQUE", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, sections: [
+  return buildDocument({ org: o, title: "COORDINATION PÉDAGOGIQUE", subtitle: f.intitule, formation: f, showFormationInfo: true, sections: [
     { heading: "Équipe pédagogique", content: `<p>Formateur principal : ${f.formateur}<br>Responsable pédagogique : ${o.responsablePedagogique}<br>Coordinateur : ${o.responsablePedagogique}</p>` },
     { heading: "Points de coordination", content: "<p>• Briefing pré-formation avec le formateur<br>• Point mi-parcours sur l'avancement<br>• Débriefing post-formation<br>• Analyse des évaluations et retours</p>" },
   ] });
 }
 
 function genLivretApprentissage(o: OrganismeInfo, f: FormationInfo) {
-  return buildDocument({ org: o, title: "LIVRET D'APPRENTISSAGE", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, sections: [
+  return buildDocument({ org: o, title: "LIVRET D'APPRENTISSAGE", subtitle: f.intitule, formation: f, showFormationInfo: true, sections: [
     { heading: "Objectifs de la période", content: `<p>${f.objectifs}</p>` },
     { heading: "Compétences à développer", content: "<p>☐ Compétence 1 : Acquise<br>☐ Compétence 2 : En cours<br>☐ Compétence 3 : À développer</p>" },
     { heading: "Observations du tuteur", content: "<p>Le stagiaire fait preuve de motivation et d'assiduité. Les compétences se développent de manière satisfaisante.</p>" },
@@ -2070,7 +2070,7 @@ function genLivretApprentissage(o: OrganismeInfo, f: FormationInfo) {
 }
 
 function genFicheSuiviTuteur(o: OrganismeInfo, f: FormationInfo) {
-  return buildDocument({ org: o, title: "FICHE DE SUIVI TUTEUR", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, table: {
+  return buildDocument({ org: o, title: "FICHE DE SUIVI TUTEUR", subtitle: f.intitule, formation: f, showFormationInfo: true, table: {
     headers: ["Date", "Activité réalisée", "Compétences travaillées", "Évaluation"],
     rows: [["Semaine 1", "Observation et découverte", "Compétences de base", "Satisfaisant"], ["Semaine 2", "Pratique guidée", "Compétences intermédiaires", "Bien"], ["Semaine 3", "Pratique autonome", "Compétences avancées", "Très bien"], ["Semaine 4", "Mise en situation réelle", "Compétences transversales", "Excellent"]]
   }, signatures: { type: "2", labels: ["Le Tuteur", "Le Stagiaire"], names: [f.formateur, ""] } });
@@ -5497,7 +5497,7 @@ function genSupportCoursRef(o: OrganismeInfo, f: FormationInfo) {
     title: "SUPPORT DE COURS", 
     subtitle: f.intitule, 
     formation: f, 
-    showFormationInfo: true, stagiaires, 
+    showFormationInfo: true, 
     sections: [
       { heading: "Informations", content: `<p><strong>Type :</strong> Support PDF fourni à chaque stagiaire<br><strong>Mise à jour :</strong> ${o.dateMaj || new Date().toLocaleDateString('fr-FR')}<br><strong>Version :</strong> V${o.version || '1'}</p>` },
     ],
@@ -5517,7 +5517,7 @@ function genRessourcesPedagogiques(o: OrganismeInfo, f: FormationInfo) {
     </div>`;
   });
 
-  return buildDocument({ org: o, title: "RESSOURCES PÉDAGOGIQUES", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, sections: [
+  return buildDocument({ org: o, title: "RESSOURCES PÉDAGOGIQUES", subtitle: f.intitule, formation: f, showFormationInfo: true, sections: [
     { heading: "Supports de formation", content: `<p>• Support de cours PDF complet remis à chaque stagiaire<br>• Diaporama de présentation (PowerPoint)<br>• Fiches mémo et synthèses par chapitre<br>• Exercices pratiques et corrigés</p>` },
     { heading: "Outils numériques", content: `<p>• ${o.outilsUtilises || 'Plateforme e-learning, outils collaboratifs'}<br>• Plateforme e-learning (accès 6 mois après la formation)<br>• Outils de visioconférence pour les sessions distancielles<br>• QCM en ligne pour l'auto-évaluation</p>` },
     { heading: "Ressources vidéo complémentaires", content: `<p>Les vidéos ci-dessous sont mises à disposition des stagiaires pour approfondir les notions abordées en formation :</p>${videosHtml}` },
