@@ -463,7 +463,7 @@ export function genEvaluationFinaleStagiaire(o: OrganismeInfo, f: FormationInfo,
   let extra = `
     <h2>Évaluation Finale – ${f.intitule}</h2>
     <p><strong>Nom du stagiaire :</strong> ${s.prenom} ${s.nom}</p>
-    <p><strong>Date :</strong> ${formatDate(f.dateFin)}</p>
+    <p><strong>Date :</strong> ${formatDate(getStagiaireDateFin(s, f))}</p>
     <p><strong>Organisme :</strong> ${o.nom}</p>
     <p><strong>Formation :</strong> ${f.intitule}</p>
     <h3>Partie 1 – QCM (5 points)</h3>
