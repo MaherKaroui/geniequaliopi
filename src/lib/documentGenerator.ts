@@ -6024,7 +6024,7 @@ function genAppreciationsFinanceurs(o: OrganismeInfo, f: FormationInfo) {
 
 function genBilanFroid(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const dureeH = parseInt(f.duree) || 14;
-  let extra = `<p><strong>Date :</strong> ${formatDate(f.dateFin)}</p><p><em>Délai de réalisation du bilan à froid : 3 à 6 mois après la formation</em></p>`;
+  let extra = `<p><em>Bilan réalisé 3 à 6 mois après la formation</em></p>`;
   stagiaires.slice(0, 8).forEach((s, i) => {
     extra += `<h3>Stagiaire : ${s.prenom} ${s.nom}</h3>`;
     const criteres = [
