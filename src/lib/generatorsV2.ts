@@ -74,7 +74,7 @@ export function genCGV_V2(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
   let sigPages = '';
   stagiaires.slice(0, 10).forEach((s, i) => {
     if (i > 0) sigPages += '<div class="page-break"></div>';
-    sigPages += `<p><strong>Fait à ${o.ville}, le :</strong> ${formatDate(subtractBusinessDays(f.dateDebut || new Date().toISOString(), 14))}</p>`;
+    sigPages += `<p><strong>Fait à ${o.ville}, le :</strong> ${formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || new Date().toISOString(), 14))}</p>`;
     sigPages += sigBlock(
       `Le Stagiaire`, `${s.prenom} ${s.nom}`, stagSig(s),
       `Pour l'Organisme de formation`, o.dirigeant, orgSig(o),
@@ -920,7 +920,7 @@ export function genGrilleAcquisitionStagiaire(o: OrganismeInfo, f: FormationInfo
   });
 
   extra += tableHTML(subHeaders, rows);
-  extra += `<p><strong>${formatDate(f.dateFin)}, par le Formateur : ${f.formateur}</strong></p>`;
+  extra += `<p><strong>${formatDate(getStagiaireDateFin(s, f))}, par le Formateur : ${f.formateur}</strong></p>`;
   extra += `<div class="section">
     <p>*NON ACQUIS (DES GRANDES LACUNES) : 1/10 - 4/10</p>
     <p>*EN COURS D'ACQUISITION : 5/10 - 7/10</p>
@@ -946,12 +946,12 @@ export function genAttestationReussiteStagiaire(o: OrganismeInfo, f: FormationIn
       <p style="margin-top:15px">a réussi avec succès la formation suivante :</p>
       <p style="font-size:16px;font-weight:700">${f.intitule}</p>
       <p><strong>Durée de la formation :</strong> ${dureeHeures} heures de formation ${modaliteTexte(f)}</p>
-      <p><strong>Date de début :</strong> ${formatDate(f.dateDebut)}</p>
-      <p><strong>Date de fin :</strong> ${formatDate(f.dateFin)}</p>
+      <p><strong>Date de début :</strong> ${formatDate(getStagiaireDateDebut(s, f))}</p>
+      <p><strong>Date de fin :</strong> ${formatDate(getStagiaireDateFin(s, f))}</p>
       <p style="margin-top:15px">Cette formation a été dispensée conformément aux normes de qualité et aux exigences pédagogiques de ${o.nom}. L'apprenant(e) a démontré un haut niveau d'engagement, de compétence et de participation active tout au long du programme.</p>
       <h3>Assiduité du stagiaire</h3>
       <p>Durée effective suivie par le/la stagiaire : ${dureeHeures} heures, soit un taux de réalisation de ${tauxRealisation.toFixed(2)} %.</p>
-      <p style="margin-top:20px"><strong>Fait à ${o.ville}, le :</strong> ${formatDate(f.dateFin)}</p>
+      <p style="margin-top:20px"><strong>Fait à ${o.ville}, le :</strong> ${formatDate(getStagiaireDateFin(s, f))}</p>
       <p style="margin-top:15px"><strong>Pour ${o.nom}</strong></p>
       <p>${o.dirigeant}<br>Président – Formateur</p>
       ${orgSig(o)}
@@ -1059,14 +1059,14 @@ export function genGrilleAcquisition_V2(o: OrganismeInfo, f: FormationInfo, stag
     if (si > 0) extra += '<div class="page-break"></div>';
     const sc = EVAL_SCORES[si] || [7, 8, 7, 8, 7];
     extra += `<h3>GRILLE DE SUIVI DU NIVEAU D'ACQUISITION DES COMPÉTENCES PROFESSIONNELLES</h3>`;
-    extra += `<p><strong>DATE :</strong> ${formatDate(f.dateDebut)} – ${formatDate(f.dateFin)}</p>`;
+    extra += `<p><strong>DATE :</strong> ${formatDate(getStagiaireDateDebut(s, f))} – ${formatDate(getStagiaireDateFin(s, f))}</p>`;
     extra += `<p><strong>NOM / PRÉNOM :</strong> ${s.prenom} ${s.nom}</p>`;
     extra += `<p><strong>FORMATION :</strong> ${f.intitule}</p>`;
     const rows = evalData.competences.map((comp) => {
       return [comp, 'X', '', ''];
     });
     extra += tableHTML(["COMPÉTENCES PROFESSIONNELLES", "ACQUIS", "NON ACQUIS", "EN COURS D'ACQUISITION"], rows);
-    extra += `<p>${formatDate(f.dateFin)}, par le Formateur : ${f.formateur}</p>`;
+    extra += `<p>${formatDate(getStagiaireDateFin(s, f))}, par le Formateur : ${f.formateur}</p>`;
     extra += `<div class="section"><p>*NON ACQUIS : 1/10 - 4/10 | *EN COURS D'ACQUISITION : 5/10 - 7/10 | *ACQUIS : 8/10 - 10/10</p></div>`;
   });
   return buildDocument({ org: o, title: "GRILLE D'ACQUISITION DES COMPÉTENCES", subtitle: f.intitule, formation: f, showFormationInfo: true, extraHtml: extra });
@@ -1090,11 +1090,11 @@ export function genCertificatReussite_V2(o: OrganismeInfo, f: FormationInfo, sta
         <p style="margin-top:15px">a réussi avec succès la formation suivante :</p>
         <p style="font-size:16px;font-weight:700">${f.intitule}</p>
         <p><strong>Durée :</strong> ${dureeHeures} heures ${modaliteTexte(f)}</p>
-        <p>Du ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)}</p>
+        <p>Du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}</p>
         <p style="margin-top:15px">Cette formation a été dispensée conformément aux normes de qualité et aux exigences pédagogiques de ${o.nom}. L'apprenant(e) a démontré un haut niveau d'engagement et de participation active tout au long du programme.</p>
         <h3>Assiduité</h3>
         <p>Durée effective suivie : ${dureeHeures} heures, soit un taux de réalisation de 100.00 %.</p>
-        <p style="margin-top:20px"><strong>Fait à ${o.ville}, le :</strong> ${formatDate(f.dateFin)}</p>
+        <p style="margin-top:20px"><strong>Fait à ${o.ville}, le :</strong> ${formatDate(getStagiaireDateFin(s, f))}</p>
         <p><strong>Pour ${o.nom}</strong></p>
         <p>${o.dirigeant}</p>
         ${orgSig(o)}
@@ -1126,7 +1126,7 @@ export function genCGVStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: 
     { heading: "Article 16 – Acceptation des CGV", content: `<p>L'inscription à la formation vaut acceptation sans réserve des présentes Conditions Générales de Vente.</p>` },
   ];
 
-  let sigPages = `<p><strong>Fait à ${o.ville}, le :</strong> ${formatDate(subtractBusinessDays(f.dateDebut || new Date().toISOString(), 14))}</p>`;
+  let sigPages = `<p><strong>Fait à ${o.ville}, le :</strong> ${formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || new Date().toISOString(), 14))}</p>`;
   sigPages += sigBlock(
     `Le Stagiaire`, `${s.prenom} ${s.nom}`, stagSig(s),
     `Pour l'Organisme de formation`, o.dirigeant, orgSig(o),
@@ -1170,7 +1170,7 @@ export function genReglementStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
     { heading: `Article ${artNum++} – Entrée en vigueur`, content: `<p>Le présent règlement intérieur entre en vigueur à compter de la date de signature par le stagiaire.</p><p>Il est remis à chaque stagiaire avant le début de la formation.</p>` },
   );
 
-  let sigPages = `<p><strong>Fait à ${o.ville}, le :</strong> ${formatDate(subtractBusinessDays(f.dateDebut || new Date().toISOString(), 14))}</p>`;
+  let sigPages = `<p><strong>Fait à ${o.ville}, le :</strong> ${formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || new Date().toISOString(), 14))}</p>`;
   sigPages += sigBlock(
     `Signature du stagiaire : ${s.prenom} ${s.nom}`, `${s.prenom} ${s.nom}`, stagSig(s),
     `Signature du centre`, o.nom, orgSig(o),

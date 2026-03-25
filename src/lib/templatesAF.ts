@@ -1,6 +1,6 @@
 // Additional AF (Action de Formation) template generators
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
-import { buildDocument, formatDate, tableHTML, signatureBlock2, signatureBlock3 } from "./docBuilder";
+import { buildDocument, formatDate, tableHTML, signatureBlock2, signatureBlock3, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif } from "./docBuilder";
 import { FormateurInfo, EVAL_SCORES } from "./sampleData";
 import { getEvalContent, generateStagiaireAnswers, computeQCMScore } from "./evalContent";
 
@@ -11,7 +11,7 @@ export function genDevis(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiai
   const tarifUnit = f.tarif || "1 500 € HT";
   return buildDocument({ org: o, title: "DEVIS DE FORMATION", subtitle: `N° DEV-${new Date().getFullYear()}-${String(Math.floor(Math.random()*999)+1).padStart(3,'0')}`, formation: f, showFormationInfo: true, sections: [
     { heading: "Client", content: `<p><strong>Entreprise :</strong> ${stagiaires[0]?.entreprise || "_______________"}<br><strong>Contact :</strong> ${stagiaires[0]?.prenom || ""} ${stagiaires[0]?.nom || ""}<br><strong>Email :</strong> ${stagiaires[0]?.email || ""}</p>` },
-    { heading: "Prestation", content: `<p><strong>Formation :</strong> ${f.intitule}<br><strong>Durée :</strong> ${f.duree}<br><strong>Modalité :</strong> ${f.modalites}<br><strong>Lieu :</strong> ${f.lieu}<br><strong>Dates :</strong> Du ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)}<br><strong>Nombre de participants :</strong> ${nbParticipants}</p>` },
+    { heading: "Prestation", content: `<p><strong>Formation :</strong> ${f.intitule}<br><strong>Durée :</strong> ${f.duree}<br><strong>Modalité :</strong> ${f.modalites}<br><strong>Lieu :</strong> ${f.lieu}<br><strong>Dates :</strong> Du ${formatDate(getStagiaireDateDebut(stagiaires[0] || {} as StagiaireInfo, f))} au ${formatDate(getStagiaireDateFin(stagiaires[0] || {} as StagiaireInfo, f))}<br><strong>Nombre de participants :</strong> ${nbParticipants}</p>` },
   ], table: {
     headers: ["Désignation", "Quantité", "Prix unitaire HT", "Total HT"],
     rows: [
@@ -30,7 +30,7 @@ export function genContratFormationParticulier(o: OrganismeInfo, f: FormationInf
   return buildDocument({ org: o, title: "CONTRAT DE FORMATION PROFESSIONNELLE", subtitle: "Article L.6353-3 du Code du travail – Particulier", formation: f, showFormationInfo: true, sections: [
     { heading: "Entre les parties", content: `<p><strong>L'organisme de formation :</strong> ${o.nom}, ${o.adresse}, ${o.codePostal} ${o.ville}<br>SIRET : ${o.siret} – NDA : ${o.nda}<br>Représenté par : ${o.dirigeant}</p><p><strong>Et le stagiaire :</strong> ${s.prenom} ${s.nom}<br>Email : ${s.email}<br>Téléphone : ${s.telephone}</p>` },
     { heading: "Article 1 – Objet du contrat", content: `<p>Le présent contrat a pour objet la réalisation de l'action de formation « ${f.intitule} » selon le programme annexé.</p>` },
-    { heading: "Article 2 – Nature et caractéristiques", content: `<p><strong>Intitulé :</strong> ${f.intitule}<br><strong>Objectifs :</strong> ${f.objectifs}<br><strong>Durée :</strong> ${f.duree}<br><strong>Dates :</strong> Du ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)}<br><strong>Modalité :</strong> ${f.modalites}<br><strong>Lieu :</strong> ${f.lieu}</p>` },
+    { heading: "Article 2 – Nature et caractéristiques", content: `<p><strong>Intitulé :</strong> ${f.intitule}<br><strong>Objectifs :</strong> ${f.objectifs}<br><strong>Durée :</strong> ${f.duree}<br><strong>Dates :</strong> Du ${formatDate(getStagiaireDateDebut(s as StagiaireInfo, f))} au ${formatDate(getStagiaireDateFin(s as StagiaireInfo, f))}<br><strong>Modalité :</strong> ${f.modalites}<br><strong>Lieu :</strong> ${f.lieu}</p>` },
     { heading: "Article 3 – Prix et conditions de paiement", content: `<p>Le prix de la formation est fixé à ${f.tarif}.<br>TVA non applicable (art. 261-4-4° du CGI).<br>Le règlement s'effectue à la signature ou en 3 mensualités.</p>` },
     { heading: "Article 4 – Droit de rétractation", content: "<p>Conformément à l'article L.6353-5 du Code du travail, le stagiaire dispose d'un délai de rétractation de 10 jours à compter de la signature du présent contrat. Aucune somme ne peut être exigée avant l'expiration de ce délai.</p>" },
     { heading: "Article 5 – Interruption", content: "<p>En cas d'interruption de la formation, seules les heures réalisées seront facturées au prorata.</p>" },
@@ -39,9 +39,9 @@ export function genContratFormationParticulier(o: OrganismeInfo, f: FormationInf
 
 export function genAttestationAssiduite(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   let extra = stagiaires.slice(0, 10).map(s => `
-    <div class="section"><p>Je soussigné, <strong>${o.dirigeant}</strong>, directeur de ${o.nom}, atteste que <strong>${s.prenom} ${s.nom}</strong> (${s.entreprise}) a suivi avec assiduité la formation « ${f.intitule} » du ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)}, soit ${f.duree}.</p>
+    <div class="section"><p>Je soussigné, <strong>${o.dirigeant}</strong>, directeur de ${o.nom}, atteste que <strong>${s.prenom} ${s.nom}</strong> (${s.entreprise}) a suivi avec assiduité la formation « ${f.intitule} » du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}, soit ${f.duree}.</p>
     <p><strong>Taux de présence :</strong> 100%<br><strong>Absences :</strong> Aucune absence constatée</p>
-    <p>Fait à ${o.ville}, le ${formatDate(f.dateFin)}</p>
+    <p>Fait à ${o.ville}, le ${formatDate(getStagiaireDateFin(s, f))}</p>
     </div><div class="page-break"></div>`).join("");
   return buildDocument({ org: o, title: "ATTESTATION D'ASSIDUITÉ", subtitle: f.intitule, extraHtml: extra,
     signatures: { type: "2", labels: ["Le Responsable", "Cachet de l'organisme"], names: [o.dirigeant, o.nom] } });
@@ -53,9 +53,9 @@ export function genCertificatRealisation(o: OrganismeInfo, f: FormationInfo, sta
     <p>Je soussigné(e), <strong>${o.dirigeant}</strong>, représentant l'organisme de formation <strong>${o.nom}</strong> (NDA : ${o.nda}),</p>
     <p>atteste que <strong>${s.prenom} ${s.nom}</strong></p>
     <p>a bien suivi l'action de formation ci-dessous :</p>
-    <p><strong>Intitulé :</strong> ${f.intitule}<br><strong>Objectif :</strong> ${f.objectifs}<br><strong>Durée :</strong> ${f.duree}<br><strong>Du :</strong> ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)}<br><strong>Modalité :</strong> ${f.modalites}<br><strong>Lieu :</strong> ${f.lieu}</p>
+    <p><strong>Intitulé :</strong> ${f.intitule}<br><strong>Objectif :</strong> ${f.objectifs}<br><strong>Durée :</strong> ${f.duree}<br><strong>Du :</strong> ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}<br><strong>Modalité :</strong> ${f.modalites}<br><strong>Lieu :</strong> ${f.lieu}</p>
     <p><strong>Nature de l'action :</strong> Action de formation au sens de l'article L.6313-1 du Code du travail</p>
-    <p>Fait à ${o.ville}, le ${formatDate(f.dateFin)}</p>
+    <p>Fait à ${o.ville}, le ${formatDate(getStagiaireDateFin(s, f))}</p>
     </div><div class="page-break"></div>`).join("");
   return buildDocument({ org: o, title: "CERTIFICATS DE RÉALISATION", subtitle: f.intitule, extraHtml: extra,
     signatures: { type: "2", labels: ["Le Responsable de l'organisme", "Cachet"], names: [o.dirigeant, ""] } });
