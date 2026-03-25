@@ -1264,7 +1264,7 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
     <div class="section" style="padding:5px">
       <p style="margin-bottom:10px"><strong>Formation :</strong> ${f.intitule}<br>
       <strong>Durée :</strong> ${displayDuree}<br>
-      <strong>Formateur :</strong> ${f.formateur || o.dirigeant}</p>
+      <strong>Formateur${(() => { const allFormateurs = [...new Set(stagiaires.filter(s => s.formateur && s.formateur.trim()).map(s => s.formateur!.trim()))]; if (allFormateurs.length === 0) return `:</strong> ${f.formateur || o.dirigeant}`; if (allFormateurs.length === 1) return `:</strong> ${allFormateurs[0]}`; return `s:</strong> ${allFormateurs.join(", ")}`; })()}</p>
     </div>
     ${isBlocFormation ? blocDerouleHtml : derouleHtml}
 
