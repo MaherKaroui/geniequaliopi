@@ -4908,9 +4908,12 @@ function genGrilleEntretienAnnuel(o: OrganismeInfo, fmt: FormateurInfo) {
   signatures: { type: "2", labels: ["Le/La Formateur(trice)", "Le Responsable Pédagogique"], names: [`${fmt.prenom} ${fmt.nom}`, o.responsablePedagogique] } });
 }
 
-function genFicheEntretienAnnuelFormateur(o: OrganismeInfo, f: FormationInfo, fmt: FormateurInfo) {
+function genFicheEntretienAnnuelFormateur(o: OrganismeInfo, f: FormationInfo, fmt: FormateurInfo, stagiaires: StagiaireInfo[] = []) {
   const formateurNom = f.formateur || `${fmt.prenom} ${fmt.nom}`;
   const dateEntretien = formatDate(o.dateMaj || new Date().toISOString().slice(0, 10));
+  // Date fin = date fin du stagiaire assigné à ce formateur, sinon date fin formation
+  const matchingStagiaire = stagiaires.find(s => s.formateur === formateurNom);
+  const dateFinFormateur = matchingStagiaire?.dateFinFormation || f.dateFin || new Date().toISOString().slice(0, 10);
   const dateQualif = formatDate(f.dateDebut || new Date().toISOString().slice(0, 10));
 
   return buildDocument({
