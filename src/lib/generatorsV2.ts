@@ -920,7 +920,7 @@ export function genGrilleAcquisitionStagiaire(o: OrganismeInfo, f: FormationInfo
   });
 
   extra += tableHTML(subHeaders, rows);
-  extra += `<p><strong>${formatDate(f.dateFin)}, par le Formateur : ${f.formateur}</strong></p>`;
+  extra += `<p><strong>${formatDate(getStagiaireDateFin(s, f))}, par le Formateur : ${f.formateur}</strong></p>`;
   extra += `<div class="section">
     <p>*NON ACQUIS (DES GRANDES LACUNES) : 1/10 - 4/10</p>
     <p>*EN COURS D'ACQUISITION : 5/10 - 7/10</p>
