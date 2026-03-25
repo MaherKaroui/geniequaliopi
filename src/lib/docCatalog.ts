@@ -275,6 +275,7 @@ export function buildFullCatalog(
       add(`af_c7i30_bilan_froid_${si}`, `CT7 - IND 30 BILAN À FROID – ${s.prenom} ${s.nom}`, 7, 30, "bilan_froid_stagiaire", { stagiaireIdx: si });
     });
     add("af_c7i30_compte_rendu_formateur", "CT7 - IND 30 COMPTE-RENDU DE FORMATION", 7, 30, "compte_rendu_formateur");
+    add("af_c7i30_bilan_fin_formation_formateur", "CT7 - IND 30 BILAN DE FIN DE FORMATION FORMATEUR", 7, 30, "bilan_fin_formation_formateur");
     // Questionnaire satisfaction bénéficiaire — un fichier par stagiaire
     stagiaires.forEach((s, si) => {
       add(`af_c7i30_appreciations_beneficiaires_${si}`, `CT7 - IND 30 QUESTIONNAIRE DE SATISFACTION – ${s.prenom} ${s.nom}`, 7, 30, "appreciations_beneficiaires_stagiaire", { stagiaireIdx: si });
