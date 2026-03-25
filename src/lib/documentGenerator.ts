@@ -3179,7 +3179,7 @@ function genPVExamenCertification(o: OrganismeInfo, f: FormationInfo, stagiaires
         <thead><tr><th>Fonction</th><th>Nom</th><th>Qualité</th><th>Signature</th></tr></thead>
         <tbody>
           <tr><td>Dirigeant</td><td>${o.dirigeant}</td><td>Responsable de l'organisme</td><td>${o.signatureUrl ? `<img src="${o.signatureUrl}" alt="Signature" style="max-height:40px;max-width:100px;object-fit:contain" />` : "<em>Signé</em>"}</td></tr>
-          <tr><td>Formateur</td><td>${formateurNom}</td><td>Formateur référent</td><td>${f.formateurSignatureUrl ? `<img src="${f.formateurSignatureUrl}" alt="Signature" style="max-height:40px;max-width:100px;object-fit:contain" />` : "<em>Signé</em>"}</td></tr>
+          <tr><td>Formateur</td><td>${formateurNom}</td><td>Formateur référent</td><td>${(s.formateurSignatureUrl || f.formateurSignatureUrl) ? `<img src="${s.formateurSignatureUrl || f.formateurSignatureUrl}" alt="Signature" style="max-height:40px;max-width:100px;object-fit:contain" />` : "<em>Signé</em>"}</td></tr>
         </tbody>
       </table>`, variant: "green" },
     // — Section 4 : Résultats par épreuve
