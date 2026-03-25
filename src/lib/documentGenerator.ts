@@ -2843,22 +2843,24 @@ function genProcedurePresentationCertification(o: OrganismeInfo, f: FormationInf
   ] });
 }
 
-function genConvocationCertification(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
+function genConvocationCertification(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], stagiaireIdx: number) {
+  const s = stagiaires[stagiaireIdx] || stagiaires[0];
   const rncp = getRNCPByCode(f.codeRNCP || "");
   const certifCode = rncp?.code || f.codeRNCP || "___";
   const certifIntitule = rncp?.intitule || f.intitule;
   const certifNom = rncp?.certificateur || "___";
-  const dateFin = f.dateFin ? new Date(f.dateFin) : new Date();
+  const dateDebut = getStagiaireDateDebut(s, f);
+  const dateFin = getStagiaireDateFin(s, f);
+  const dateFinDate = dateFin ? new Date(dateFin) : new Date();
   // Épreuves 5 jours ouvrés après la fin de formation
-  const dateEpreuves = new Date(dateFin);
+  const dateEpreuves = new Date(dateFinDate);
   dateEpreuves.setDate(dateEpreuves.getDate() + 7);
   const dateEpreuvesStr = dateEpreuves.toLocaleDateString("fr-FR");
 
-  const stagList = stagiaires.map(s => `<tr><td>${s.civilite || "M."} ${s.prenom} ${s.nom}</td><td>${s.email || "___"}</td><td>${g(s, "Convoqué", "Convoquée")}</td></tr>`).join("");
-
   return buildDocument({ org: o, title: "CONVOCATION AUX ÉPREUVES DE CERTIFICATION", subtitle: `${certifIntitule} (${certifCode})`, sections: [
     { heading: "Objet", content: `
-      <p>Le présent document constitue la convocation des bénéficiaires de la formation <strong>${f.intitule}</strong> aux épreuves de la certification <strong>${certifCode}</strong> délivrée par <strong>${certifNom}</strong>.</p>` },
+      <p>Le présent document constitue la convocation de <strong>${s.civilite || "M."} ${s.prenom} ${s.nom}</strong> aux épreuves de la certification <strong>${certifCode}</strong> délivrée par <strong>${certifNom}</strong>.</p>
+      <p>Formation suivie : <strong>${f.intitule}</strong> du <strong>${formatDate(dateDebut)}</strong> au <strong>${formatDate(dateFin)}</strong>.</p>` },
     { heading: "Informations sur les épreuves", content: `
       ${tableHTML(["Élément", "Détail"], [
         ["Certification visée", `${certifIntitule} (${certifCode})`],
@@ -2867,8 +2869,10 @@ function genConvocationCertification(o: OrganismeInfo, f: FormationInfo, stagiai
         ["Lieu", f.lieu || `${o.adresse}, ${o.codePostal} ${o.ville}`],
         ["Horaires", "Se présenter à 8h30 – Début des épreuves à 9h00"],
       ])}` },
-    { heading: "Candidats convoqués", content: `
-      <table><thead><tr><th>Candidat</th><th>Email</th><th>Statut</th></tr></thead><tbody>${stagList}</tbody></table>` },
+    { heading: "Candidat convoqué", content: `
+      ${tableHTML(["Candidat", "Email", "Statut"], [
+        [`${s.civilite || "M."} ${s.prenom} ${s.nom}`, s.email || "___", g(s, "Convoqué", "Convoquée")]
+      ])}` },
     { heading: "Documents à apporter le jour des épreuves", content: `
       <ul>
         <li><strong>Pièce d'identité</strong> en cours de validité (carte d'identité, passeport)</li>
@@ -2890,11 +2894,11 @@ function genConvocationCertification(o: OrganismeInfo, f: FormationInfo, stagiai
       <div class="sig-box" style="max-width:50%">
         <p class="sig-label">Le Responsable pédagogique</p>
         <p>Nom : ${o.responsablePedagogique || o.dirigeant}</p>
-        <p>Date : ${formatDate(f.dateDebut)}</p>
+        <p>Date : ${formatDate(dateDebut)}</p>
         <p style="margin-top:20px">Signature :</p>
         ${o.tamponUrl ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />` : ""}
       </div>
-    </div>` });
+    </div>`, stagiaires: [s] });
 }
 
 function genPVExamenCertification(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], stagiaireIdx: number) {
