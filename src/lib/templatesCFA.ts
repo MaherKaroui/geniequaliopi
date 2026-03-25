@@ -96,7 +96,7 @@ export function genConventionPedagogiqueCFA(o: OrganismeInfo, f: FormationInfo, 
   return buildDocument({ org: o, title: "CONVENTION PÉDAGOGIQUE CFA / ENTREPRISE", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, sections: [
     { heading: "Entre", content: `<p><strong>Le CFA :</strong> ${o.nom}<br>Représenté par : ${o.dirigeant}<br><br><strong>L'entreprise :</strong> ${s.entreprise}<br><strong>L'apprenti(e) :</strong> ${s.prenom} ${s.nom}</p>` },
     { heading: "Objet", content: `<p>La présente convention définit les modalités de mise en œuvre de la formation « ${f.intitule} » en alternance.</p>` },
-    { heading: "Rythme d'alternance", content: `<p>3 jours en entreprise / 2 jours au CFA<br>Période : du ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)}<br>Durée totale : ${f.duree}</p>` },
+    { heading: "Rythme d'alternance", content: `<p>3 jours en entreprise / 2 jours au CFA<br>Période : du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}<br>Durée totale : ${getStagiaireDuree(s, f)}</p>` },
     { heading: "Engagements du CFA", content: "<p>• Assurer la formation théorique selon le programme<br>• Désigner un formateur référent<br>• Réaliser les visites en entreprise<br>• Informer l'entreprise de l'assiduité de l'apprenti<br>• Préparer l'apprenti à la certification</p>" },
     { heading: "Engagements de l'entreprise", content: "<p>• Confier à l'apprenti des missions en lien avec la formation<br>• Désigner un maître d'apprentissage<br>• Libérer l'apprenti pour les jours de CFA<br>• Participer au suivi et à l'évaluation<br>• Remplir le carnet de liaison</p>" },
   ], signatures: { type: "3", names: [s.prenom + " " + s.nom, ""] } });
