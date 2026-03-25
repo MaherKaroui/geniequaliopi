@@ -164,7 +164,7 @@ export function genConvocation_V2(o: OrganismeInfo, f: FormationInfo, stagiaires
       <p>Nous vous prions d'agréer, ${civilite}, l'expression de nos salutations distinguées.</p>
        <p><strong>Fait à ${o.ville}, le :</strong> ${formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || new Date().toISOString(), 14))}</p>
       <p><strong>Pour ${o.nom}</strong></p>
-      <p>${o.dirigeant}<br>Président – Formateur</p>
+      <p>${o.dirigeant}<br>Dirigeant – Formateur</p>
       ${orgSig(o)}
     `;
   });
@@ -267,7 +267,7 @@ export function genConvocationStagiaire(o: OrganismeInfo, f: FormationInfo, stag
     <p>Nous vous prions d'agréer, ${civilite}, l'expression de nos salutations distinguées.</p>
     <p><strong>Fait à ${o.ville}, le :</strong> ${formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || new Date().toISOString(), 14))}</p>
     <p><strong>Pour ${o.nom}</strong></p>
-    <p>${o.dirigeant}<br>Président – Formateur</p>
+    <p>${o.dirigeant}<br>Dirigeant – Formateur</p>
     ${orgSig(o)}
   `;
   return buildDocument({ org: o, title: `CONVOCATION À LA FORMATION – ${s.prenom} ${s.nom}`, extraHtml: extra });
@@ -953,7 +953,7 @@ export function genAttestationReussiteStagiaire(o: OrganismeInfo, f: FormationIn
       <p>Durée effective suivie par le/la stagiaire : ${dureeHeures} heures, soit un taux de réalisation de ${tauxRealisation.toFixed(2)} %.</p>
       <p style="margin-top:20px"><strong>Fait à ${o.ville}, le :</strong> ${formatDate(getStagiaireDateFin(s, f))}</p>
       <p style="margin-top:15px"><strong>Pour ${o.nom}</strong></p>
-      <p>${o.dirigeant}<br>Président – Formateur</p>
+      <p>${o.dirigeant}<br>Dirigeant – Formateur</p>
       ${orgSig(o)}
     </div>
   `;

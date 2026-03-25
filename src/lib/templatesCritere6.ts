@@ -572,7 +572,7 @@ export function genContratSousTraitanceV2(o: OrganismeInfo, f: FormationInfo, st
       <p>SIRET : ${o.siret}</p>
       <p>Numéro de Déclaration d'Activité (NDA) : ${o.nda}</p>
       <p>Siège social : ${o.adresse}, ${o.codePostal} ${o.ville}</p>
-      <p>Représenté par : <strong>${o.dirigeant}</strong>, en qualité de Président</p>
+      <p>Représenté par : <strong>${o.dirigeant}</strong>, en qualité de Dirigeant</p>
       <p>Ci-après dénommé <strong>« le Donneur d'ordre »</strong></p>
       <br/>
       <p><strong>2. LE SOUS-TRAITANT :</strong></p>
@@ -742,7 +742,7 @@ export function genContratSousTraitanceV2(o: OrganismeInfo, f: FormationInfo, st
       <div class="sig-box">
         <p class="sig-label">Pour le Donneur d'ordre – ${o.nom}</p>
         <p>Représenté par : <strong>${o.dirigeant}</strong></p>
-        <p>Qualité : Président</p>
+        <p>Qualité : Dirigeant</p>
         <p>Date : ${dateMaj}</p>
         <p style="margin-top:15px">Signature et cachet :</p>
         ${sigHtml}
