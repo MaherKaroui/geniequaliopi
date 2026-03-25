@@ -367,7 +367,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "procedure_presentation_certification": return genProcedurePresentationCertification(o, f);
     case "convocation_certification": return genConvocationCertification(o, f, stagiaires);
     case "attestation_presentation_certification": return genAttestationPresentationCertification(o, f, stagiaires, params?.stagiaireIdx ?? 0);
-    case "pv_examen_certification": return genPVExamenCertification(o, f, stagiaires);
+    case "pv_examen_certification": return genPVExamenCertification(o, f, stagiaires, params?.stagiaireIdx ?? 0);
     case "fiche_autoevaluation_apprenti": return genFicheAutoevaluation(o, f, stagiaires);
     case "test_cfa_stagiaire": {
       const si = params?.stagiaireIdx ?? 0;
@@ -2735,7 +2735,8 @@ function genConvocationCertification(o: OrganismeInfo, f: FormationInfo, stagiai
     </div>` });
 }
 
-function genPVExamenCertification(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
+function genPVExamenCertification(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], stagiaireIdx: number) {
+  const s = stagiaires[stagiaireIdx] || stagiaires[0];
   const rncp = getRNCPByCode(f.codeRNCP || "");
   const certifCode = rncp?.code || f.codeRNCP || "___";
   const certifIntitule = rncp?.intitule || f.intitule;
@@ -2745,64 +2746,107 @@ function genPVExamenCertification(o: OrganismeInfo, f: FormationInfo, stagiaires
   dateEpreuves.setDate(dateEpreuves.getDate() + 7);
   const dateEpreuvesStr = dateEpreuves.toLocaleDateString("fr-FR");
 
-  const resultRows = stagiaires.map((s, i) => {
-    const blocsHTML = rncp ? rncp.blocsCompetences.map((b, bi) =>
-      `<td style="text-align:center">☐ Acquis ☐ Non acquis</td>`
-    ).join("") : `<td style="text-align:center">☐ Acquis ☐ Non acquis</td>`;
-    return `<tr>
-      <td>${i + 1}</td>
-      <td>${s.civilite || "M."} ${s.prenom} ${s.nom}</td>
-      ${blocsHTML}
-      <td style="text-align:center"><strong>☐ ${g(s, "Admis", "Admise")} ☐ ${g(s, "Ajourné", "Ajournée")}</strong></td>
-    </tr>`;
-  }).join("");
+  // Épreuves du jury avec colonnes Note / Observations
+  const epreuves = rncp ? rncp.blocsCompetences.map((b, i) => ({
+    nom: `Épreuve ${i + 1} – ${b.titre}`,
+    modalite: b.modalitesEval || "Selon référentiel"
+  })) : [{ nom: "Épreuve unique", modalite: "Selon référentiel" }];
 
-  const blocsHeaders = rncp ? rncp.blocsCompetences.map((b, i) => `<th>Bloc ${i + 1}</th>`).join("") : `<th>Épreuve</th>`;
+  const juryRows = epreuves.map(ep =>
+    `<tr>
+      <td style="font-weight:600">${ep.nom}</td>
+      <td style="font-size:0.85em;color:#555">${ep.modalite}</td>
+      <td style="text-align:center;min-width:60px">____/20</td>
+      <td style="text-align:center">☐ Acquis ☐ Non acquis</td>
+      <td></td>
+    </tr>`
+  ).join("");
 
-  return buildDocument({ org: o, title: "PROCÈS-VERBAL D'EXAMEN DE CERTIFICATION", subtitle: `${certifIntitule} (${certifCode})`, sections: [
-    { heading: "Informations générales", content: `
+  return buildDocument({ org: o, title: "PROCÈS-VERBAL INDIVIDUEL D'EXAMEN", subtitle: `${certifIntitule} (${certifCode})`, sections: [
+    // — Section 1 : Informations candidat
+    { heading: "Informations du candidat", content: `
       ${tableHTML(["Élément", "Détail"], [
-        ["Certification", `${certifIntitule} (${certifCode})`],
-        ["Certificateur (Nom légal)", certifNom],
-        ["Organisme de formation", o.nom],
+        ["Civilité", s.civilite || "___"],
+        ["Nom", s.nom],
+        ["Prénom", s.prenom],
+        ...(s.dateNaissance ? [["Date de naissance", formatDate(s.dateNaissance)]] : []),
+        ["Email", s.email || "___"],
+        ["Téléphone", s.telephone || "___"],
+      ])}` },
+    // — Section 2 : Informations formation & certification
+    { heading: "Formation et certification", content: `
+      ${tableHTML(["Élément", "Détail"], [
         ["Formation suivie", f.intitule],
+        ["Organisme de formation", o.nom],
         ["Période de formation", `Du ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)}`],
+        ["Durée", f.duree],
+        ["Certification visée", `${certifIntitule} (${certifCode})`],
+        ["Certificateur (Nom légal)", certifNom],
         ["Date des épreuves", dateEpreuvesStr],
         ["Lieu des épreuves", f.lieu || `${o.adresse}, ${o.codePostal} ${o.ville}`],
       ])}` },
+    // — Section 3 : Composition du jury
     { heading: "Composition du jury", content: `
       <table>
-        <thead><tr><th>Fonction</th><th>Nom</th><th>Qualité</th></tr></thead>
+        <thead><tr><th>Fonction</th><th>Nom</th><th>Qualité</th><th>Signature</th></tr></thead>
         <tbody>
-          <tr><td>Président du jury</td><td>________________________</td><td>________________________</td></tr>
-          <tr><td>Membre du jury</td><td>________________________</td><td>________________________</td></tr>
-          <tr><td>Membre du jury</td><td>________________________</td><td>________________________</td></tr>
+          <tr><td>Président du jury</td><td>________________________</td><td>________________________</td><td></td></tr>
+          <tr><td>Membre du jury</td><td>________________________</td><td>________________________</td><td></td></tr>
+          <tr><td>Membre du jury</td><td>________________________</td><td>________________________</td><td></td></tr>
         </tbody>
       </table>`, variant: "green" },
-    { heading: "Résultats individuels", content: `
+    // — Section 4 : Résultats par épreuve
+    { heading: "Résultats par épreuve", content: `
       <table>
-        <thead><tr><th>N°</th><th>Candidat</th>${blocsHeaders}<th>Décision finale</th></tr></thead>
-        <tbody>${resultRows}</tbody>
+        <thead><tr><th>Épreuve</th><th>Modalité d'évaluation</th><th>Note</th><th>Résultat</th><th>Observations</th></tr></thead>
+        <tbody>${juryRows}</tbody>
       </table>` },
-    { heading: "Synthèse des résultats", content: `
-      ${tableHTML(["", "Nombre"], [
-        ["Nombre de candidats présentés", `${stagiaires.length}`],
-        ["Nombre de candidats admis", "______"],
-        ["Nombre de candidats ajournés", "______"],
-        ["Taux de réussite", "______%"],
-      ])}` },
+    // — Section 5 : Décision finale
+    { heading: "Décision finale du jury", content: `
+      <table style="width:100%">
+        <tbody>
+          <tr>
+            <td style="padding:15px;font-size:1.1em">
+              <strong>☐ ${g(s, "ADMIS", "ADMISE")}</strong> — ${g(s, "Le candidat", "La candidate")} a satisfait aux exigences de la certification
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:15px;font-size:1.1em">
+              <strong>☐ ${g(s, "AJOURNÉ", "AJOURNÉE")}</strong> — ${g(s, "Le candidat", "La candidate")} n'a pas satisfait aux exigences
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:15px;font-size:1.1em">
+              <strong>☐ VALIDATION PARTIELLE</strong> — Blocs acquis : ________________________
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p style="margin-top:10px"><em>Mention particulière : ________________________</em></p>` },
+    // — Section 6 : Observations du jury
     { heading: "Observations du jury", content: `
-      <p style="min-height:80px;border:1px solid #ccc;padding:10px;border-radius:4px"><em>Observations éventuelles du jury sur le déroulement des épreuves, les résultats ou recommandations :</em></p>` },
+      <div style="min-height:80px;border:1px solid #ccc;padding:12px;border-radius:4px">
+        <p><em>Observations éventuelles du jury concernant ${g(s, "le candidat", "la candidate")} :</em></p>
+        <br/><br/>
+      </div>` },
+    // — Section 7 : Certification sur l'honneur
     { heading: "Certification sur l'honneur", content: `
-      <p>Les membres du jury certifient sur l'honneur que les épreuves se sont déroulées conformément aux modalités d'évaluation définies par le certificateur <strong>${certifNom}</strong> et que les résultats consignés ci-dessus sont exacts.</p>` },
-  ], extraHtml: `<div style="margin-top:40px;display:flex;gap:30px;flex-wrap:wrap">
-      <div class="sig-box" style="flex:1;min-width:200px">
+      <p>Les membres du jury certifient sur l'honneur que les épreuves se sont déroulées conformément aux modalités d'évaluation définies par le certificateur <strong>${certifNom}</strong> et que les résultats consignés ci-dessus sont exacts et sincères.</p>` },
+  ], extraHtml: `<div style="margin-top:40px;display:flex;gap:20px;flex-wrap:wrap">
+      <div class="sig-box" style="flex:1;min-width:180px">
+        <p class="sig-label">${g(s, "Le Candidat", "La Candidate")}</p>
+        <p>Nom : ${s.civilite || "M."} ${s.prenom} ${s.nom}</p>
+        <p>Date : ${dateEpreuvesStr}</p>
+        <p style="margin-top:20px">Signature :</p>
+        ${s.signatureUrl ? `<img src="${s.signatureUrl}" alt="Signature" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : ""}
+      </div>
+      <div class="sig-box" style="flex:1;min-width:180px">
         <p class="sig-label">Le Président du jury</p>
         <p>Nom : ________________________</p>
         <p>Date : ${dateEpreuvesStr}</p>
         <p style="margin-top:20px">Signature :</p>
       </div>
-      <div class="sig-box" style="flex:1;min-width:200px">
+      <div class="sig-box" style="flex:1;min-width:180px">
         <p class="sig-label">Le Responsable de l'organisme</p>
         <p>Nom : ${o.dirigeant}</p>
         <p>Date : ${dateEpreuvesStr}</p>
