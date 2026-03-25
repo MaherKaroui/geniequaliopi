@@ -3344,7 +3344,7 @@ function genVAEEntretienFaisabilite(o: OrganismeInfo, f: FormationInfo) {
 }
 
 function genVAEDiagnosticFaisabilite(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
-  const s = stagiaires[si] || stagiaires[0] || { prenom: "Martin", nom: "Dupont", poste: "Salarié", entreprise: "Entreprise" };
+  const s = stagiaires[si] || stagiaires[0] || { prenom: "Martin", nom: "Dupont", poste: "Salarié", entreprise: "Entreprise", civilite: "" as const, email: "", telephone: "", dateNaissance: "" } as StagiaireInfo;
   return buildDocument({ org: o, title: "DIAGNOSTIC DE FAISABILITÉ VAE", subtitle: `${s.prenom} ${s.nom}`, sections: [
     { heading: "Candidat", content: `<p><strong>Nom :</strong> ${s.prenom} ${s.nom}<br><strong>Poste actuel :</strong> ${s.poste || "Non renseigné"}<br><strong>Entreprise :</strong> ${s.entreprise || "Non renseignée"}<br><strong>Certification visée :</strong> ${f.intitule}</p>` },
     { heading: "Expérience en lien avec la certification", content: `<p><strong>Durée d'expérience totale :</strong> 8 ans<br><strong>Durée en lien direct :</strong> 6 ans<br><br><strong>Activités principales identifiées :</strong><br>• Gestion opérationnelle du domaine visé<br>• Encadrement et coordination d'équipe<br>• Mise en place de procédures qualité<br>• Reporting et analyse de performance<br>• Formation et accompagnement de collaborateurs</p>` },
@@ -3409,7 +3409,7 @@ function genVAELivretAccueil(o: OrganismeInfo, f: FormationInfo) {
 }
 
 function genVAEConventionAccompagnement(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
-  const s = stagiaires[si] || stagiaires[0] || { prenom: "Martin", nom: "Dupont", email: "", telephone: "" };
+  const s = stagiaires[si] || stagiaires[0] || { prenom: "Martin", nom: "Dupont", email: "", telephone: "", civilite: "" as const, entreprise: "", poste: "", dateNaissance: "" } as StagiaireInfo;
   const dateDebut = getStagiaireDateDebut(s, { ...f });
   const dateFin = getStagiaireDateFin(s, { ...f });
   return buildDocument({ org: o, title: "CONVENTION D'ACCOMPAGNEMENT VAE", sections: [
