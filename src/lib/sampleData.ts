@@ -271,18 +271,18 @@ export const SATISFACTION_SCORES: Record<string, number[]> = {
   "TP SAMA": [5, 4, 5, 5, 4, 5, 4, 5],
 };
 
-// Evaluation scores per stagiaire (realistic 6-10/10)
+// Evaluation scores per stagiaire (good scores 8-10/10)
 export const EVAL_SCORES: number[][] = [
-  [8, 9, 7, 8, 9], // Martin Dupont
-  [9, 8, 9, 8, 8], // Sophie Bernard
-  [7, 8, 8, 9, 7], // Lucas Moreau
-  [8, 7, 8, 7, 8], // Emma Lefebvre
-  [9, 9, 8, 9, 9], // Hugo Roux
-  [7, 8, 7, 8, 7], // Léa Fournier
-  [8, 8, 9, 8, 8], // Antoine Girard
-  [9, 7, 8, 8, 9], // Camille Durand
-  [8, 9, 8, 9, 8], // Thomas Mercier
-  [10, 8, 9, 8, 9], // Julie Lambert
+  [9, 10, 8, 9, 10], // Martin Dupont
+  [10, 9, 10, 9, 9], // Sophie Bernard
+  [8, 9, 9, 10, 8], // Lucas Moreau
+  [9, 8, 9, 8, 9], // Emma Lefebvre
+  [10, 10, 9, 10, 10], // Hugo Roux
+  [8, 9, 8, 9, 8], // Léa Fournier
+  [9, 9, 10, 9, 9], // Antoine Girard
+  [10, 8, 9, 9, 10], // Camille Durand
+  [9, 10, 9, 10, 9], // Thomas Mercier
+  [10, 9, 10, 9, 10], // Julie Lambert
 ];
 
 // Connection times for distanciel - 7h/jour (default)

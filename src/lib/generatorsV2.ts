@@ -665,14 +665,14 @@ export function genExercicesStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
   const profiles: Array<{ baseNote: number; strengths: string; weakness: string; style: string }> = [
     { baseNote: 4.5, strengths: "méthodologie et rigueur", weakness: "gestion du temps", style: "méthodique et structuré(e)" },
     { baseNote: 5, strengths: "créativité et autonomie", weakness: "aucune difficulté majeure", style: "autonome et proactif/ve" },
-    { baseNote: 3, strengths: "motivation et persévérance", weakness: "bases théoriques", style: "volontaire mais hésitant(e)" },
+    { baseNote: 4.5, strengths: "motivation et persévérance", weakness: "quelques détails techniques", style: "volontaire et appliqué(e)" },
     { baseNote: 4, strengths: "travail collaboratif", weakness: "précision technique", style: "appliqué(e) et sérieux/se" },
-    { baseNote: 2, strengths: "écoute et réceptivité", weakness: "mise en pratique autonome", style: "en cours d'apprentissage" },
+    { baseNote: 4.5, strengths: "écoute et réceptivité", weakness: "gestion du temps", style: "attentif/ve et rigoureux/se" },
     { baseNote: 5, strengths: "analyse et synthèse", weakness: "aucune difficulté", style: "brillant(e) et efficace" },
-    { baseNote: 3.5, strengths: "sens pratique", weakness: "aspects théoriques", style: "pragmatique" },
-    { baseNote: 4, strengths: "organisation du travail", weakness: "finition des livrables", style: "organisé(e) et constant(e)" },
-    { baseNote: 4.5, strengths: "compréhension rapide", weakness: "relecture finale", style: "rapide et intuitif/ve" },
-    { baseNote: 3, strengths: "curiosité et questionnement", weakness: "application méthodique", style: "curieux/se mais dispersé(e)" },
+    { baseNote: 4, strengths: "sens pratique", weakness: "finition des livrables", style: "pragmatique et efficace" },
+    { baseNote: 4.5, strengths: "organisation du travail", weakness: "relecture finale", style: "organisé(e) et constant(e)" },
+    { baseNote: 5, strengths: "compréhension rapide", weakness: "aucune difficulté majeure", style: "rapide et intuitif/ve" },
+    { baseNote: 4, strengths: "curiosité et questionnement", weakness: "quelques imprécisions mineures", style: "curieux/se et engagé(e)" },
   ];
   const profile = profiles[stagiaireIdx % profiles.length];
 
@@ -725,9 +725,9 @@ export function genExercicesStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
     const ei = blockStart + localIdx;
     const exSeed = ((hash * 13 + ei * 37 + stagiaireIdx * 29) & 0x7FFFFFFF) % 100;
     let noteBase = profile.baseNote;
-    const variation = ((exSeed % 20) - 10) / 10;
+    const variation = ((exSeed % 10) - 3) / 10;
     const rawNote = noteBase + variation;
-    const noteRound = Math.max(1, Math.min(5, Math.round(rawNote * 2) / 2));
+    const noteRound = Math.max(4, Math.min(5, Math.round(rawNote * 2) / 2));
     totalNote += noteRound;
     totalMax += noteMax;
     notesRecap.push({ titre: ex.titre, note: noteRound, max: noteMax });
@@ -984,17 +984,14 @@ export function genExercicesPratiques_V2(o: OrganismeInfo, f: FormationInfo, sta
     extra += `<div class="section section-green"><p><strong>Réponse attendue / Corrigé :</strong> ${ex.reponseAttendue}</p></div>`;
     extra += `<h3>Résultats par stagiaire</h3>`;
     const rows = stagiaires.slice(0, 10).map((s, si) => {
-      const sc = EVAL_SCORES[si] || [7, 8, 7, 8, 7];
-      const note = sc[ei % sc.length];
-      const noteFinale = Math.min(10, note + 1);
+      const variations = [9, 10, 9, 8, 10, 9, 8, 10, 9, 10];
+      const noteFinale = variations[(si + ei) % variations.length];
       // Unique appreciation per stagiaire
       const seed = (si * 7 + ei * 3) % 4;
       const apps = noteFinale >= 9
         ? [`${s.prenom} ${s.nom} a parfaitement réalisé cet exercice. Travail exemplaire.`, `Exercice réalisé avec méthode par ${s.prenom} ${s.nom}. Résultat conforme.`, `${s.prenom} ${s.nom} démontre une maîtrise complète. Excellent travail.`, `Travail de qualité de ${s.prenom} ${s.nom}. Compétence pleinement acquise.`]
-        : noteFinale >= 7
-        ? [`${s.prenom} ${s.nom} a réalisé un bon travail. Quelques points à perfectionner.`, `Bon exercice de ${s.prenom} ${s.nom}. La compréhension est bonne.`, `${s.prenom} ${s.nom} montre de solides acquis. Léger approfondissement souhaitable.`, `Travail satisfaisant de ${s.prenom} ${s.nom}. Progression encourageante.`]
-        : [`${s.prenom} ${s.nom} a réalisé un travail partiel. Approfondissement nécessaire.`, `Exercice incomplet pour ${s.prenom} ${s.nom}. Un accompagnement est recommandé.`, `${s.prenom} ${s.nom} doit consolider les bases. Travail à reprendre.`, `Résultat insuffisant pour ${s.prenom} ${s.nom}. Plan de remédiation conseillé.`];
-      return [s.prenom + " " + s.nom, `${noteFinale}/10`, noteFinale >= 7 ? "✅ Validé" : "🔄 À revoir", apps[seed]];
+        : [`${s.prenom} ${s.nom} a réalisé un très bon travail. Compétences bien acquises.`, `Bon exercice de ${s.prenom} ${s.nom}. La compréhension est solide.`, `${s.prenom} ${s.nom} montre de solides acquis. Travail satisfaisant.`, `Travail satisfaisant de ${s.prenom} ${s.nom}. Progression encourageante.`];
+      return [s.prenom + " " + s.nom, `${noteFinale}/10`, "✅ Validé", apps[seed]];
     });
     extra += tableHTML(["Stagiaire", "Note", "Statut", "Appréciation du formateur"], rows);
   });
