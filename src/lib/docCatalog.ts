@@ -406,13 +406,112 @@ export function buildFullCatalog(
     });
   }
 
-  // ===== VAE =====
+  // ===== VAE — VALIDATION DES ACQUIS DE L'EXPÉRIENCE =====
   if (isVAE) {
+
+    // ===== CRITÈRE 1 — INFORMATION DU PUBLIC =====
+    add("vae_c1i1_plaquette", "CT1 - IND 1 PLAQUETTE INFORMATION VAE", 1, 1, "vae_plaquette_info");
+    add("vae_c1i1_procedure_info", "CT1 - IND 1 PROCÉDURE D'INFORMATION DU PUBLIC VAE", 1, 1, "vae_procedure_info");
+    add("vae_c1i2_indicateurs_resultats", "CT1 - IND 2 INDICATEURS DE RÉSULTATS VAE", 1, 2, "vae_indicateurs_resultats");
+    add("vae_c1i3_taux_certification", "CT1 - IND 3 TAUX D'OBTENTION DES CERTIFICATIONS VAE", 1, 3, "vae_taux_certification");
+
+    // ===== CRITÈRE 2 — OBJECTIFS ET ADAPTATION =====
+    // IND 4 — Analyse du besoin
+    add("vae_c2i4_entretien_faisabilite", "CT2 - IND 4 ENTRETIEN DE FAISABILITÉ VAE", 2, 4, "vae_entretien_faisabilite");
     formations.slice(0, 2).forEach((f, fi) => {
-      add(`vae_livret_recevabilite_${fi}`, `Livret de recevabilité VAE`, 2, 4, "livret_recevabilite_vae", { fi });
-      add(`vae_dossier_validation_${fi}`, `Dossier de validation VAE`, 3, 11, "dossier_validation_vae", { fi });
-      add(`vae_accompagnement_${fi}`, `Suivi accompagnement VAE`, 3, 10, "accompagnement_vae", { fi });
+      add(`vae_c2i4_livret_recevabilite_${fi}`, `CT2 - IND 4 LIVRET DE RECEVABILITÉ VAE`, 2, 4, "livret_recevabilite_vae", { fi });
     });
+    stagiaires.forEach((s, si) => {
+      add(`vae_c2i4_diagnostic_${si}`, `CT2 - IND 4 DIAGNOSTIC DE FAISABILITÉ – ${s.prenom} ${s.nom}`, 2, 4, "vae_diagnostic_faisabilite", { stagiaireIdx: si });
+    });
+
+    // IND 5 — Objectifs opérationnels
+    add("vae_c2i5_referentiel_accompagnement", "CT2 - IND 5 RÉFÉRENTIEL D'ACCOMPAGNEMENT VAE", 2, 5, "vae_referentiel_accompagnement");
+
+    // IND 6 — Contenus et modalités adaptés
+    add("vae_c2i6_programme_accompagnement", "CT2 - IND 6 PROGRAMME D'ACCOMPAGNEMENT VAE", 2, 6, "vae_programme_accompagnement");
+
+    // IND 8 — Positionnement à l'entrée
+    stagiaires.forEach((s, si) => {
+      add(`vae_c2i8_positionnement_${si}`, `CT2 - IND 8 POSITIONNEMENT INITIAL VAE – ${s.prenom} ${s.nom}`, 2, 8, "vae_positionnement_initial", { stagiaireIdx: si });
+    });
+
+    // ===== CRITÈRE 3 — ACCUEIL, ACCOMPAGNEMENT, SUIVI ET ÉVALUATION =====
+    // IND 9 — Conditions de déroulement
+    add("vae_c3i9_livret_accueil", "CT3 - IND 9 LIVRET D'ACCUEIL VAE", 3, 9, "vae_livret_accueil");
+    stagiaires.forEach((s, si) => {
+      add(`vae_c3i9_convention_${si}`, `CT3 - IND 9 CONVENTION D'ACCOMPAGNEMENT VAE – ${s.prenom} ${s.nom}`, 3, 9, "vae_convention_accompagnement", { stagiaireIdx: si });
+    });
+    add("vae_c3i9_reglement_interieur", "CT3 - IND 9 RÈGLEMENT INTÉRIEUR VAE", 3, 9, "vae_reglement_interieur");
+
+    // IND 10 — Adaptation et accompagnement
+    formations.slice(0, 2).forEach((f, fi) => {
+      add(`vae_c3i10_accompagnement_${fi}`, `CT3 - IND 10 SUIVI D'ACCOMPAGNEMENT VAE`, 3, 10, "accompagnement_vae", { fi });
+    });
+    stagiaires.forEach((s, si) => {
+      add(`vae_c3i10_fiche_suivi_${si}`, `CT3 - IND 10 FICHE DE SUIVI INDIVIDUEL VAE – ${s.prenom} ${s.nom}`, 3, 10, "vae_fiche_suivi_individuel", { stagiaireIdx: si });
+    });
+
+    // IND 11 — Évaluation de l'atteinte des objectifs
+    formations.slice(0, 2).forEach((f, fi) => {
+      add(`vae_c3i11_dossier_validation_${fi}`, `CT3 - IND 11 DOSSIER DE VALIDATION VAE`, 3, 11, "dossier_validation_vae", { fi });
+    });
+    stagiaires.forEach((s, si) => {
+      add(`vae_c3i11_grille_evaluation_${si}`, `CT3 - IND 11 GRILLE D'ÉVALUATION DU DOSSIER VAE – ${s.prenom} ${s.nom}`, 3, 11, "vae_grille_evaluation_dossier", { stagiaireIdx: si });
+    });
+    // Émargement
+    stagiaires.forEach((s, si) => {
+      add(`vae_c3i11_emargement_${si}`, `CT3 - IND 11 FEUILLE D'ÉMARGEMENT VAE – ${s.prenom} ${s.nom}`, 3, 11, "vae_emargement", { stagiaireIdx: si });
+    });
+
+    // IND 12 — Engagement et prévention des ruptures
+    add("vae_c3i12_procedure_abandon", "CT3 - IND 12 PROCÉDURE DE PRÉVENTION DES ABANDONS VAE", 3, 12, "vae_procedure_abandon");
+    stagiaires.forEach((s, si) => {
+      add(`vae_c3i12_attestation_assiduite_${si}`, `CT3 - IND 12 ATTESTATION D'ASSIDUITÉ VAE – ${s.prenom} ${s.nom}`, 3, 12, "vae_attestation_assiduite", { stagiaireIdx: si });
+    });
+
+    // IND 16 — Présentation à la certification
+    add("vae_c3i16_procedure_jury", "CT3 - IND 16 PROCÉDURE DE PASSAGE DEVANT LE JURY VAE", 3, 16, "vae_procedure_jury");
+    stagiaires.forEach((s, si) => {
+      add(`vae_c3i16_convocation_jury_${si}`, `CT3 - IND 16 CONVOCATION JURY VAE – ${s.prenom} ${s.nom}`, 3, 16, "vae_convocation_jury", { stagiaireIdx: si });
+      add(`vae_c3i16_pv_jury_${si}`, `CT3 - IND 16 PROCÈS-VERBAL DE JURY VAE – ${s.prenom} ${s.nom}`, 3, 16, "vae_pv_jury", { stagiaireIdx: si });
+      add(`vae_c3i16_notification_decision_${si}`, `CT3 - IND 16 NOTIFICATION DE DÉCISION VAE – ${s.prenom} ${s.nom}`, 3, 16, "vae_notification_decision", { stagiaireIdx: si });
+    });
+
+    // ===== CRITÈRE 4 — ADÉQUATION DES MOYENS =====
+    // IND 17 — Moyens humains et techniques
+    add("vae_c4i17_moyens_dedies", "CT4 - IND 17 MOYENS DÉDIÉS À L'ACCOMPAGNEMENT VAE", 4, 17, "vae_moyens_dedies");
+
+    // IND 18 — Coordination des intervenants
+    add("vae_c4i18_coordination_accompagnateurs", "CT4 - IND 18 COORDINATION DES ACCOMPAGNATEURS VAE", 4, 18, "vae_coordination_accompagnateurs");
+
+    // IND 19 — Ressources pédagogiques
+    add("vae_c4i19_ressources_vae", "CT4 - IND 19 RESSOURCES MISES À DISPOSITION VAE", 4, 19, "vae_ressources");
+
+    // ===== CRITÈRE 5 — QUALIFICATION DU PERSONNEL =====
+    // IND 21
+    add("vae_c5i21_fiche_poste_accompagnateur", "CT5 - IND 21 FICHE DE POSTE ACCOMPAGNATEUR VAE", 5, 21, "vae_fiche_poste_accompagnateur");
+
+    // IND 22
+    add("vae_c5i22_plan_dev_accompagnateurs", "CT5 - IND 22 PLAN DE DÉVELOPPEMENT DES COMPÉTENCES ACCOMPAGNATEURS VAE", 5, 22, "vae_plan_dev_accompagnateurs");
+
+    // ===== CRITÈRE 6 — ENVIRONNEMENT PROFESSIONNEL =====
+    add("vae_c6i23_veille_reglementaire", "CT6 - IND 23 VEILLE RÉGLEMENTAIRE VAE", 6, 23, "vae_veille_reglementaire");
+    add("vae_c6i26_accessibilite_handicap", "CT6 - IND 26 ACCESSIBILITÉ HANDICAP VAE", 6, 26, "vae_accessibilite_handicap");
+    add("vae_c6i27_partenaires_vae", "CT6 - IND 27 LISTE DES PARTENAIRES ET CERTIFICATEURS VAE", 6, 27, "vae_partenaires");
+
+    // ===== CRITÈRE 7 — AMÉLIORATION CONTINUE =====
+    // IND 30
+    stagiaires.forEach((s, si) => {
+      add(`vae_c7i30_satisfaction_${si}`, `CT7 - IND 30 QUESTIONNAIRE DE SATISFACTION VAE – ${s.prenom} ${s.nom}`, 7, 30, "vae_satisfaction", { stagiaireIdx: si });
+    });
+    add("vae_c7i30_synthese_satisfaction", "CT7 - IND 30 SYNTHÈSE DES APPRÉCIATIONS VAE", 7, 30, "vae_synthese_satisfaction");
+
+    // IND 31
+    add("vae_c7i31_procedure_reclamation", "CT7 - IND 31 PROCÉDURE DE RÉCLAMATION VAE", 7, 31, "vae_procedure_reclamation");
+
+    // IND 32
+    add("vae_c7i32_plan_amelioration", "CT7 - IND 32 PLAN D'AMÉLIORATION CONTINUE VAE", 7, 32, "vae_plan_amelioration");
   }
 
   return d;
