@@ -1885,13 +1885,11 @@ function genExercicesPratiques(o: OrganismeInfo, f: FormationInfo, stagiaires: S
     // Results per stagiaire
     extra += `<h3>Résultats par stagiaire</h3>`;
     const rows = stagiaires.slice(0, 10).map((s, si) => {
-      const sc = EVAL_SCORES[si] || [7, 8, 7, 8, 7];
-      const note = sc[ei % sc.length];
-      const noteFinale = Math.min(10, note + 1);
+      const variations = [9, 10, 9, 8, 10, 9, 8, 10, 9, 10];
+      const noteFinale = variations[(si + ei) % variations.length];
       const appreciation = noteFinale >= 9 ? "Excellent travail, exercice parfaitement réalisé"
-        : noteFinale >= 7 ? "Bon travail, quelques points à améliorer"
-        : "Travail correct, nécessite un approfondissement";
-      return [s.prenom + " " + s.nom, `${noteFinale}/10`, noteFinale >= 7 ? "✅ Validé" : "🔄 À revoir", appreciation];
+        : "Très bon travail, compétences bien acquises";
+      return [s.prenom + " " + s.nom, `${noteFinale}/10`, "Validé", appreciation];
     });
     extra += tableHTML(["Stagiaire", "Note", "Statut", "Appréciation du formateur"], rows);
   });
