@@ -425,7 +425,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
       const formateurName = params?.formateurNom || f.formateur || fmt.prenom + " " + fmt.nom;
       const parts = formateurName.trim().split(/\s+/);
       const autoFmt: FormateurInfo = { ...fmt, prenom: parts.slice(0, -1).join(" ") || parts[0], nom: parts[parts.length - 1] || "" };
-      return genAutoEvaluationFormateurV2(o, f, autoFmt);
+      return genAutoEvaluationFormateurV2(o, f, autoFmt, stagiaires);
     }
     case "liste_partenaires": return genListePartenairesV2(o);
     case "mandat_qualiopi": return genMandatQualiopi(o);
