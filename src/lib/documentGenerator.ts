@@ -1968,9 +1968,9 @@ function genQCMFinal(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireIn
 
 function genAttestation(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   let extra = stagiaires.slice(0, 10).map(s => `
-    <div class="section"><p>Je soussigné, <strong>${o.dirigeant}</strong>, atteste que <strong>${s.prenom} ${s.nom}</strong> (${s.entreprise}) a suivi la formation « ${f.intitule} » du ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)} (${f.duree}).</p>
+    <div class="section"><p>Je soussigné, <strong>${o.dirigeant}</strong>, atteste que <strong>${s.prenom} ${s.nom}</strong> (${s.entreprise}) a suivi la formation « ${f.intitule} » du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))} (${getStagiaireDuree(s, f)}).</p>
     <p><strong>Objectifs atteints :</strong> ${f.objectifs}</p>
-    <p>Fait à ${o.ville}, le ${formatDate(f.dateFin)}</p>
+    <p>Fait à ${o.ville}, le ${formatDate(getStagiaireDateFin(s, f))}</p>
     ${signatureBlock2("Le Responsable", o.dirigeant, "Le Stagiaire", s.prenom + " " + s.nom)}
     </div><div class="page-break"></div>`).join("");
   return buildDocument({ org: o, title: "ATTESTATIONS DE FIN DE FORMATION", subtitle: f.intitule, extraHtml: extra });
