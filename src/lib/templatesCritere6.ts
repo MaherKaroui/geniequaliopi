@@ -796,9 +796,9 @@ export function genContratSousTraitanceV2(o: OrganismeInfo, f: FormationInfo, st
         <p style="font-size:11px;color:#888;margin-top:8px;font-style:italic">Lu et approuvé – Bon pour accord</p>
       </div>
       <div class="sig-box">
-        <p class="sig-label">Pour le Sous-traitant – ${sousTraitantNom}</p>
-        <p>Représenté par : <strong>${sousTraitantDirigeant}</strong></p>
-        <p>Qualité : ${sousTraitantQualite}</p>
+        <p class="sig-label">${sousTraitantSignLabel}</p>
+        <p>Représenté par : <strong>${sousTraitantSignRepresentant}</strong></p>
+        <p>Qualité : ${sousTraitantSignQualite}</p>
         <p>Date : ${dateMaj}</p>
         <p style="margin-top:15px">Signature et cachet :</p>
         ${tamponHtml}
