@@ -1375,16 +1375,18 @@ function genTempsConnexion(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
 }
 
 function genTempsConnexionReel(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
-  const days = getFormationDays(f);
   let extra = '';
 
-  days.forEach((day, di) => {
-    if (di > 0) extra += '<div class="page-break"></div>';
-    extra += `<h3>📅 Date : ${day}</h3>`;
-    extra += `<p><strong>Formation :</strong> ${f.intitule}<br><strong>Plateforme :</strong> ${o.outilsUtilises || 'Zoom / Teams'}</p>`;
+  stagiaires.slice(0, 10).forEach((s, si) => {
+    const days = getStagiaireDays(s, f);
+    if (si > 0) extra += '<div class="page-break"></div>';
+    extra += `<h3>📋 ${s.prenom} ${s.nom}</h3>`;
+    extra += `<p><strong>Période :</strong> ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}<br><strong>Plateforme :</strong> ${o.outilsUtilises || 'Zoom / Teams'}</p>`;
 
-    const rows: string[][] = [];
-    stagiaires.slice(0, 10).forEach((s, si) => {
+    days.forEach((day, di) => {
+      if (di > 0 && di % 5 === 0) extra += '<div class="page-break"></div>';
+      extra += `<h4>📅 ${day}</h4>`;
+
       const seed = (s.nom.charCodeAt(0) * 7 + di * 13 + si * 3) % 256;
       const ip = `${80 + (seed % 120)}.${(seed * 3 + si * 17) % 256}.${(seed * 7 + di * 31) % 256}.${(seed * 11 + si * 23 + di * 5) % 256}`;
       const hConnexion = 8 + (seed % 2);
@@ -1401,29 +1403,21 @@ function genTempsConnexionReel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
       const hTotal = Math.floor(dureeTotal / 60);
       const mTotal = dureeTotal % 60;
 
-      rows.push([
-        `${s.prenom} ${s.nom}`,
-        ip,
-        `${String(hConnexion).padStart(2, '0')}h${String(mConnexion).padStart(2, '0')}`,
-        `${String(hDeconnexion).padStart(2, '0')}h${String(mDeconnexion).padStart(2, '0')}`,
-        `${String(hReconnexion).padStart(2, '0')}h${String(mReconnexion).padStart(2, '0')}`,
-        `${String(hFinale).padStart(2, '0')}h${String(mFinale).padStart(2, '0')}`,
-        `${hTotal}h${String(mTotal).padStart(2, '0')}min`,
-        '✅ Connecté'
-      ]);
+      extra += tableHTML(
+        ["Adresse IP", "Connexion matin", "Déconnexion midi", "Reconnexion", "Déconnexion soir", "Durée totale", "Statut"],
+        [[
+          ip,
+          `${String(hConnexion).padStart(2, '0')}h${String(mConnexion).padStart(2, '0')}`,
+          `${String(hDeconnexion).padStart(2, '0')}h${String(mDeconnexion).padStart(2, '0')}`,
+          `${String(hReconnexion).padStart(2, '0')}h${String(mReconnexion).padStart(2, '0')}`,
+          `${String(hFinale).padStart(2, '0')}h${String(mFinale).padStart(2, '0')}`,
+          `${hTotal}h${String(mTotal).padStart(2, '0')}min`,
+          '✅ Connecté'
+        ]]
+      );
     });
 
-    extra += tableHTML(
-      ["Stagiaire", "Adresse IP", "Connexion matin", "Déconnexion midi", "Reconnexion", "Déconnexion soir", "Durée totale", "Statut"],
-      rows
-    );
-  });
-
-  // Récapitulatif global
-  extra += '<div class="page-break"></div>';
-  extra += '<h3>📊 Récapitulatif des temps de connexion</h3>';
-  const recapRows: string[][] = [];
-  stagiaires.slice(0, 10).forEach((s, si) => {
+    // Récap individuel
     let totalMinutes = 0;
     days.forEach((_, di) => {
       const seed = (s.nom.charCodeAt(0) * 7 + di * 13 + si * 3) % 256;
@@ -1438,15 +1432,8 @@ function genTempsConnexionReel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
     const stagDuree = getStagiaireDuree(s, f);
     const dureeFormationH = parseInt(stagDuree) || days.length * 7;
     const taux = Math.min(100, Math.round((totalMinutes / (dureeFormationH * 60)) * 100));
-    recapRows.push([
-      `${s.prenom} ${s.nom}`,
-      `${hT}h${String(mT).padStart(2, '0')}min`,
-      stagDuree,
-      `${taux}%`,
-      taux >= 80 ? '✅ Validé' : '⚠️ Insuffisant'
-    ]);
+    extra += `<p style="margin-top:10px"><strong>Total connecté :</strong> ${hT}h${String(mT).padStart(2, '0')}min | <strong>Durée formation :</strong> ${stagDuree} | <strong>Taux :</strong> ${taux}% | ${taux >= 80 ? '✅ Validé' : '⚠️ Insuffisant'}</p>`;
   });
-  extra += tableHTML(["Stagiaire", "Temps total connecté", "Durée formation", "Taux de présence", "Statut"], recapRows);
 
   return buildDocument({ org: o, title: "RELEVÉ DES TEMPS DE CONNEXION RÉELS", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra });
 }
