@@ -630,7 +630,7 @@ function genQuestionnairePositionnement(o: OrganismeInfo, f: FormationInfo, stag
     extra += `<div class="section section-green"><p><strong>Appréciation du formateur :</strong> ${evalData.appreciations[si] || "Niveau satisfaisant."}</p></div>`;
   });
 
-  return buildDocument({ org: o, title: "QUESTIONNAIRE DE POSITIONNEMENT – RÉSULTATS DÉTAILLÉS", subtitle: f.intitule, formation: f, showFormationInfo: true, extraHtml: extra,
+  return buildDocument({ org: o, title: "QUESTIONNAIRE DE POSITIONNEMENT – RÉSULTATS DÉTAILLÉS", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra,
     signatures: { type: "2", labels: ["Le Formateur", "Le Resp. Pédagogique"], names: [f.formateur, o.responsablePedagogique] } });
 }
 
