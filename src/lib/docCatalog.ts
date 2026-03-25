@@ -220,20 +220,16 @@ export function buildFullCatalog(
     add("af_c5i22_fiche_entretien_annuel", "CT5 - IND 22 FICHE D'ENTRETIEN ANNUEL FORMATEUR", 5, 22, "fiche_entretien_annuel_formateur");
 
     // --- Per-formateur docs: extract unique formateur names from stagiaires ---
-    // Formateurs sous-traitants (VICTOR ACADEMY) — seul RENUKA CALISSTUS SURESH a un contrat de sous-traitance
-    const FORMATEURS_SOUS_TRAITANTS = ["RENUKA CALISSTUS SURESH"];
     const uniqueFormateurs = Array.from(new Set(stagiaires.map(s => (s as any).formateur).filter((f: any) => f && String(f).trim())));
     uniqueFormateurs.forEach((fName) => {
       const fname = String(fName).trim();
       const slug = fname.replace(/\s+/g, '_').toUpperCase();
-      // Fiche d'entretien annuel per formateur (tous les formateurs)
+      // Fiche d'entretien annuel per formateur
       add(`af_c5i22_fiche_entretien_${slug}`, `CT5 - IND 22 FICHE D'ENTRETIEN ANNUEL – ${fname}`, 5, 22, "fiche_entretien_annuel_formateur", { formateurNom: fname });
-      // Auto-évaluation per formateur (tous les formateurs)
+      // Auto-évaluation per formateur
       add(`af_c5i21_autoevaluation_${slug}`, `CT5 - IND 21 AUTO-ÉVALUATION – ${fname}`, 5, 21, "autoevaluation_formateur", { formateurNom: fname });
-      // Contrat de sous-traitance UNIQUEMENT pour les sous-traitants (VICTOR ACADEMY)
-      if (FORMATEURS_SOUS_TRAITANTS.some(st => st.toUpperCase() === fname.toUpperCase())) {
-        add(`af_c6i27_contrat_soustraitance_${slug}`, `CT6 - IND 27 CONTRAT DE SOUS-TRAITANCE – ${fname}`, 6, 27, "contrat_sous_traitance_v2", { formateurNom: fname });
-      }
+      // Contrat de sous-traitance per formateur
+      add(`af_c6i27_contrat_soustraitance_${slug}`, `CT6 - IND 27 CONTRAT DE SOUS-TRAITANCE – ${fname}`, 6, 27, "contrat_sous_traitance_v2", { formateurNom: fname });
     });
 
     // ===== CRITÈRE 6 — ENVIRONNEMENT PROFESSIONNEL =====
