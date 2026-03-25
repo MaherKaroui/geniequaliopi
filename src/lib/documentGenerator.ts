@@ -1897,8 +1897,8 @@ function genExercicesPratiques(o: OrganismeInfo, f: FormationInfo, stagiaires: S
   // Global summary
   extra += `<div class="page-break"></div><h2>Synthèse des exercices pratiques</h2>`;
   const globalRows = stagiaires.slice(0, 10).map((s, si) => {
-    const sc = EVAL_SCORES[si] || [7, 8, 7, 8, 7];
-    const notes = exercices.map((_, ei) => Math.min(10, sc[ei % sc.length] + 1));
+    const variations = [9, 10, 9, 8, 10, 9, 8, 10, 9, 10];
+    const notes = exercices.map((_, ei) => variations[(si + ei) % variations.length]);
     const avg = Math.round(notes.reduce((a, b) => a + b, 0) / notes.length * 10) / 10;
     return [s.prenom + " " + s.nom, ...notes.map(n => `${n}/10`), `<strong>${avg}/10</strong>`, evalData.appreciations[si]?.split('.')[0] + '.' || ""];
   });
