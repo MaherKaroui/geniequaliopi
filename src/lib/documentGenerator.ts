@@ -369,7 +369,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "tableau_croise_cfa": return genTableauCroiseCFA(o, f);
     case "fiche_certification_rs": return genFicheCertificationRS(o, f);
     case "procedure_presentation_certification": return genProcedurePresentationCertification(o, f);
-    case "convocation_certification": return genConvocationCertification(o, f, stagiaires);
+    case "convocation_certification": return genConvocationCertification(o, f, stagiaires, params?.stagiaireIdx ?? 0);
     case "attestation_presentation_certification": return genAttestationPresentationCertification(o, f, stagiaires, params?.stagiaireIdx ?? 0);
     case "pv_examen_certification": return genPVExamenCertification(o, f, stagiaires, params?.stagiaireIdx ?? 0);
     case "fiche_autoevaluation_apprenti": return genFicheAutoevaluation(o, f, stagiaires);
