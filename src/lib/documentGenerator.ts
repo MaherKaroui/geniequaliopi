@@ -4350,7 +4350,7 @@ function genTrameEvalBesoinsStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
 <strong>Prénom :</strong> ${s.prenom}<br>
 <strong>Téléphone :</strong> ${s.telephone || "___"}<br>
 <strong>Mail :</strong> ${s.email || "___"}<br>
-<strong>Date :</strong> du ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)}<br>
+<strong>Date :</strong> du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}<br>
 <strong>Formation souhaitée :</strong> ${f.intitule}
 </td></tr></table>`;
 
