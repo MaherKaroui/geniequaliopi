@@ -243,6 +243,31 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
               {stagiaire.signatureResponsableUrl ? "Changer" : "Charger"}
             </Button>
           </div>
+          {/* Signature formateur */}
+          <div className="flex items-center gap-3 mt-2 pt-2 border-t border-border/50">
+            <Label className="text-xs font-semibold">Signature formateur</Label>
+            {stagiaire.formateurSignatureUrl ? (
+              <div className="relative group">
+                <img src={stagiaire.formateurSignatureUrl} alt="Signature formateur" className="h-10 w-auto max-w-[120px] object-contain rounded border bg-white p-0.5" />
+                <button
+                  onClick={() => updateStagiaire(index, 'formateurSignatureUrl', '')}
+                  className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <X className="w-2.5 h-2.5" />
+                </button>
+              </div>
+            ) : (
+              <span className="text-xs text-muted-foreground">Aucune</span>
+            )}
+            <input
+              ref={el => { sigFormateurRefs.current[index] = el; }}
+              type="file" accept="image/*" className="hidden"
+              onChange={e => { const f = e.target.files?.[0]; if (f) handleSigFormateurFile(index, f); }}
+            />
+            <Button variant="outline" size="sm" className="h-7 text-xs" onClick={() => sigFormateurRefs.current[index]?.click()}>
+              {stagiaire.formateurSignatureUrl ? "Changer" : "Charger"}
+            </Button>
+          </div>
         </div>
       ))}
     </div>
