@@ -702,7 +702,7 @@ function genAnalyseBesoins(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
       + `• Travail spécifique sur la phonétique et l'intonation pour la communication téléphonique</p>`
     : `<p>• Ajustement du rythme pédagogique<br>• Ajout d'exercices pratiques supplémentaires<br>• Mise à disposition de ressources complémentaires en ligne<br>• Aménagement d'horaires pour 2 stagiaires</p>`;
 
-  return buildDocument({ org: o, title: "ANALYSE DES BESOINS", subtitle: f.intitule, formation: f, showFormationInfo: true, sections: [
+  return buildDocument({ org: o, title: "ANALYSE DES BESOINS", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, sections: [
     { heading: "Contexte et besoins identifiés", content: besoinsContent },
     { heading: "Adaptations mises en place", content: adaptationsContent, variant: "green" },
   ] });
