@@ -2910,7 +2910,7 @@ function genPVExamenCertification(o: OrganismeInfo, f: FormationInfo, stagiaires
 
   // Épreuves du jury avec notes = moyennes exercices + test fin
   const evalContent = getEvalContent(f.intitule);
-  const questions = evalContent.questions;
+  const questions = evalContent.qcmFinal;
   const answers = generateStagiaireAnswers(questions, stagiaireIdx);
   const qcmResult = computeQCMScore(questions, answers);
   const qcmNote = Math.round((qcmResult.score / qcmResult.total) * 20 * 10) / 10;
