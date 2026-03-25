@@ -245,11 +245,13 @@ export function formationInfoBlock(f: FormationInfo, stagiaires?: StagiaireInfo[
   return infoGrid(items);
 }
 
-export function signatureBlock3(org: OrganismeInfo, stagiaireNom?: string, formateurNom?: string, stagiaireSignatureUrl?: string): string {
+export function signatureBlock3(org: OrganismeInfo, stagiaireNom?: string, formateurNom?: string, stagiaireSignatureUrl?: string, formateurSignatureUrl?: string): string {
   const tamponHtml = org.tamponUrl ? `<img src="${org.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />` : "";
   const stagSigHtml = stagiaireSignatureUrl ? `<img src="${stagiaireSignatureUrl}" alt="Signature stagiaire" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : `<p style="font-style:italic;color:#999;margin-top:15px">${stagiaireNom ? `Signé par ${stagiaireNom}` : ""}</p>`;
-  // Formateur = même signature que le dirigeant
-  const formateurSigHtml = org.signatureUrl ? `<img src="${org.signatureUrl}" alt="Signature" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : "";
+  // Formateur : utiliser la signature formateur dédiée si disponible, sinon celle du dirigeant
+  const formateurSigHtml = formateurSignatureUrl
+    ? `<img src="${formateurSignatureUrl}" alt="Signature formateur" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />`
+    : org.signatureUrl ? `<img src="${org.signatureUrl}" alt="Signature" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : "";
   const responsableSigHtml = org.signatureUrl ? `<img src="${org.signatureUrl}" alt="Signature" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : "";
   return `<div class="signature-block">
     <div class="sig-box"><p class="sig-label">Le/La Stagiaire</p><p>Nom : ${stagiaireNom || "________________________"}</p><p>Date : ________________________</p><p style="margin-top:20px">Signature :</p>${stagSigHtml}</div>
