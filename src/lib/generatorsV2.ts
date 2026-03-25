@@ -665,14 +665,14 @@ export function genExercicesStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
   const profiles: Array<{ baseNote: number; strengths: string; weakness: string; style: string }> = [
     { baseNote: 4.5, strengths: "méthodologie et rigueur", weakness: "gestion du temps", style: "méthodique et structuré(e)" },
     { baseNote: 5, strengths: "créativité et autonomie", weakness: "aucune difficulté majeure", style: "autonome et proactif/ve" },
-    { baseNote: 3, strengths: "motivation et persévérance", weakness: "bases théoriques", style: "volontaire mais hésitant(e)" },
+    { baseNote: 4.5, strengths: "motivation et persévérance", weakness: "quelques détails techniques", style: "volontaire et appliqué(e)" },
     { baseNote: 4, strengths: "travail collaboratif", weakness: "précision technique", style: "appliqué(e) et sérieux/se" },
-    { baseNote: 2, strengths: "écoute et réceptivité", weakness: "mise en pratique autonome", style: "en cours d'apprentissage" },
+    { baseNote: 4.5, strengths: "écoute et réceptivité", weakness: "gestion du temps", style: "attentif/ve et rigoureux/se" },
     { baseNote: 5, strengths: "analyse et synthèse", weakness: "aucune difficulté", style: "brillant(e) et efficace" },
-    { baseNote: 3.5, strengths: "sens pratique", weakness: "aspects théoriques", style: "pragmatique" },
-    { baseNote: 4, strengths: "organisation du travail", weakness: "finition des livrables", style: "organisé(e) et constant(e)" },
-    { baseNote: 4.5, strengths: "compréhension rapide", weakness: "relecture finale", style: "rapide et intuitif/ve" },
-    { baseNote: 3, strengths: "curiosité et questionnement", weakness: "application méthodique", style: "curieux/se mais dispersé(e)" },
+    { baseNote: 4, strengths: "sens pratique", weakness: "finition des livrables", style: "pragmatique et efficace" },
+    { baseNote: 4.5, strengths: "organisation du travail", weakness: "relecture finale", style: "organisé(e) et constant(e)" },
+    { baseNote: 5, strengths: "compréhension rapide", weakness: "aucune difficulté majeure", style: "rapide et intuitif/ve" },
+    { baseNote: 4, strengths: "curiosité et questionnement", weakness: "quelques imprécisions mineures", style: "curieux/se et engagé(e)" },
   ];
   const profile = profiles[stagiaireIdx % profiles.length];
 
