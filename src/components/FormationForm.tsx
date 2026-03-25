@@ -19,8 +19,17 @@ interface FormationFormProps {
 
 const FormationForm = ({ data, onChange, onImportStagiaires }: FormationFormProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const formateurSigRef = useRef<HTMLInputElement>(null);
   const [importedSessions, setImportedSessions] = useState<EdofSession[]>([]);
   const [importing, setImporting] = useState(false);
+
+  const handleFormateurSigFile = (file: File) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      onChange({ ...data, formateurSignatureUrl: e.target?.result as string });
+    };
+    reader.readAsDataURL(file);
+  };
 
   const update = (field: keyof FormationInfo, value: string) => {
     onChange({ ...data, [field]: value });
