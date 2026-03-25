@@ -87,6 +87,7 @@ export interface FormationInfo {
   formateur: string;
   codeRNCP?: string;
   rythmeAlternance?: string;
+  formateurSignatureUrl?: string;
 }
 
 export interface IndicateurData {
