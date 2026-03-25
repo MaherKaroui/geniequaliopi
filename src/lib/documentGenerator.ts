@@ -590,7 +590,7 @@ function genQuestionnairePositionnement(o: OrganismeInfo, f: FormationInfo, stag
   const evalData = getEvalContent(f.intitule);
   const questions = evalData.qcmPositionnement;
   let extra = `<h2>Résultats détaillés du questionnaire de positionnement</h2>`;
-  extra += `<p><strong>Formation :</strong> ${f.intitule}<br><strong>Date :</strong> ${formatDate(f.dateDebut)}<br><strong>Formateur :</strong> ${f.formateur}</p>`;
+  extra += `<p><strong>Formation :</strong> ${f.intitule}<br><strong>Formateur :</strong> ${f.formateur}</p>`;
 
   // Summary table
   const summaryRows = stagiaires.slice(0, 10).map((s, i) => {
@@ -598,10 +598,10 @@ function genQuestionnairePositionnement(o: OrganismeInfo, f: FormationInfo, stag
     const result = computeQCMScore(questions, answers);
     const pct = Math.round(result.score / result.total * 100);
     const niveau = pct >= 80 ? "Avancé" : pct >= 60 ? "Intermédiaire" : "Débutant";
-    return [s.prenom + " " + s.nom, `${result.score}/${result.total}`, `${pct}%`, niveau, evalData.appreciations[i] ? evalData.appreciations[i].split('.')[0] + '.' : "Niveau correct."];
+    return [s.prenom + " " + s.nom, formatDate(getStagiaireDateDebut(s, f)), `${result.score}/${result.total}`, `${pct}%`, niveau, evalData.appreciations[i] ? evalData.appreciations[i].split('.')[0] + '.' : "Niveau correct."];
   });
   extra += `<h3>Synthèse des résultats</h3>`;
-  extra += tableHTML(["Stagiaire", "Score", "%", "Niveau", "Appréciation du formateur"], summaryRows);
+  extra += tableHTML(["Stagiaire", "Date début", "Score", "%", "Niveau", "Appréciation du formateur"], summaryRows);
 
   // Detailed per-stagiaire answer sheets (first 5)
   stagiaires.slice(0, 5).forEach((s, si) => {
@@ -610,6 +610,7 @@ function genQuestionnairePositionnement(o: OrganismeInfo, f: FormationInfo, stag
     extra += `<div class="page-break"></div>`;
     extra += `<h2>Fiche individuelle – ${s.prenom} ${s.nom}</h2>`;
     extra += `<p><strong>Entreprise :</strong> ${s.entreprise} | <strong>Poste :</strong> ${s.poste}</p>`;
+    extra += `<p><strong>Session :</strong> Du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}</p>`;
     extra += `<p><strong>Score :</strong> ${result.score}/${result.total} (${Math.round(result.score / result.total * 100)}%)</p>`;
     const qRows = questions.map((q, qi) => {
       const isCorrect = result.details[qi].correct;
@@ -630,10 +631,74 @@ function genQuestionnairePositionnement(o: OrganismeInfo, f: FormationInfo, stag
 }
 
 function genAnalyseBesoins(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
+  const lower = f.intitule.toLowerCase();
+  const isFLE = lower.includes("français") || lower.includes("fle") || lower.includes("médico-social") || lower.includes("communiquer");
+
+  // Tableau récapitulatif des stagiaires avec leurs dates individuelles
+  let tableStag = "";
+  if (stagiaires.length > 0) {
+    const rows = stagiaires.slice(0, 10).map((s, i) => {
+      const dateD = formatDate(getStagiaireDateDebut(s, f));
+      const dateF = formatDate(getStagiaireDateFin(s, f));
+      if (isFLE) {
+        const besoins = [
+          "Renforcer la communication orale en situation professionnelle (accueil, transmissions, réunions)",
+          "Améliorer la rédaction de transmissions écrites et la compréhension des protocoles de soins",
+          "Développer le vocabulaire médico-social (sigles, termes techniques) et la compréhension de consignes",
+          "Acquérir les bases de la communication écrite professionnelle et les formules d'accueil",
+          "Consolider la compréhension écrite des documents administratifs (règlement, projet d'établissement)",
+          "Perfectionner la communication téléphonique et les échanges avec les familles",
+          "Maîtriser la rédaction de comptes rendus de réunion et de cahiers de liaison",
+          "Renforcer les compétences argumentatives pour les réunions d'équipe pluridisciplinaire",
+          "Améliorer la lecture et l'application des protocoles d'urgence et de soins",
+          "Développer les compétences rédactionnelles pour les projets personnalisés des résidents",
+        ];
+        return [s.civilite ? `${s.civilite} ${s.nom} ${s.prenom}` : `${s.prenom} ${s.nom}`, dateD, dateF, besoins[i % besoins.length]];
+      } else {
+        const besoins = [
+          "Développer les compétences opérationnelles",
+          "Obtenir la certification visée",
+          "Reconversion professionnelle",
+          "Montée en compétences sur le poste actuel",
+          "Développer l'autonomie professionnelle",
+          "Acquérir de nouvelles méthodes de travail",
+          "Valider les acquis de l'expérience",
+          "Se préparer à de nouvelles responsabilités",
+          "Renforcer les compétences techniques",
+          "Améliorer la performance globale",
+        ];
+        return [s.civilite ? `${s.civilite} ${s.nom} ${s.prenom}` : `${s.prenom} ${s.nom}`, dateD, dateF, besoins[i % besoins.length]];
+      }
+    });
+    tableStag = tableHTML(["Stagiaire", "Date début", "Date fin", "Besoin principal identifié"], rows);
+  }
+
+  const besoinsContent = isFLE
+    ? `<p>L'analyse des besoins a été réalisée auprès de ${stagiaires.length} candidats inscrits à la formation « ${f.intitule} » par entretien individuel et test de positionnement en français.</p>`
+      + tableStag
+      + `<p><strong>Synthèse des besoins identifiés :</strong></p>`
+      + `<p>• ${Math.round(stagiaires.length * 0.8)} stagiaires ont besoin de renforcer la communication orale en milieu médico-social (accueil des résidents, transmissions orales, réunions d'équipe)<br>`
+      + `• ${Math.round(stagiaires.length * 0.7)} stagiaires doivent améliorer la rédaction de transmissions écrites et la compréhension des protocoles de soins<br>`
+      + `• ${Math.round(stagiaires.length * 0.6)} stagiaires nécessitent un apprentissage du vocabulaire spécifique (EHPAD, IDE, AES, MDPH, PIA, CVS…)<br>`
+      + `• ${Math.round(stagiaires.length * 0.4)} stagiaires souhaitent perfectionner la communication avec les familles et les partenaires extérieurs<br>`
+      + `• ${Math.round(stagiaires.length * 0.3)} stagiaires demandent un accompagnement sur la lecture de documents administratifs (règlement de fonctionnement, projet d'établissement)</p>`
+    : `<p>Analyse réalisée sur ${stagiaires.length} candidats inscrits à la formation « ${f.intitule} ». Les besoins ont été recueillis via questionnaire en ligne et entretiens individuels.</p>`
+      + tableStag
+      + `<p><strong>Synthèse des besoins identifiés :</strong></p>`
+      + `<p>• 80% des stagiaires souhaitent développer leurs compétences opérationnelles<br>• 60% visent une certification ou une validation de compétences<br>• 40% sont en reconversion professionnelle<br>• 20% souhaitent un accompagnement spécifique (handicap, horaires aménagés)</p>`;
+
+  const adaptationsContent = isFLE
+    ? `<p>• Adaptation du rythme pédagogique au niveau de français de chaque stagiaire<br>`
+      + `• Mises en situation professionnelles contextualisées (accueil, toilette, repas, transmissions)<br>`
+      + `• Supports pédagogiques adaptés : documents réels du secteur médico-social (protocoles, fiches de liaison, cahiers de transmissions)<br>`
+      + `• Jeux de rôle avec vocabulaire spécifique au poste occupé<br>`
+      + `• Exercices de rédaction de transmissions sur cas concrets du secteur<br>`
+      + `• Travail spécifique sur la phonétique et l'intonation pour la communication téléphonique</p>`
+    : `<p>• Ajustement du rythme pédagogique<br>• Ajout d'exercices pratiques supplémentaires<br>• Mise à disposition de ressources complémentaires en ligne<br>• Aménagement d'horaires pour 2 stagiaires</p>`;
+
   return buildDocument({ org: o, title: "ANALYSE DES BESOINS", subtitle: f.intitule, formation: f, showFormationInfo: true, sections: [
-    { heading: "Contexte", content: `<p>Analyse réalisée sur ${stagiaires.length} candidats inscrits à la formation « ${f.intitule} ». Les besoins ont été recueillis via questionnaire en ligne et entretiens individuels.</p>` },
-    { heading: "Besoins identifiés", content: "<p>• 80% des stagiaires souhaitent développer leurs compétences opérationnelles<br>• 60% visent une certification ou une validation de compétences<br>• 40% sont en reconversion professionnelle<br>• 20% souhaitent un accompagnement spécifique (handicap, horaires aménagés)</p>" },
-    { heading: "Adaptations mises en place", content: "<p>• Ajustement du rythme pédagogique<br>• Ajout d'exercices pratiques supplémentaires<br>• Mise à disposition de ressources complémentaires en ligne<br>• Aménagement d'horaires pour 2 stagiaires</p>", variant: "green" },
+    { heading: "Contexte et besoins identifiés", content: besoinsContent },
+    { heading: "Adaptations mises en place", content: adaptationsContent, variant: "green" },
   ] });
 }
 
@@ -1300,7 +1365,8 @@ function genEvalPositionnement(o: OrganismeInfo, f: FormationInfo, stagiaires: S
   let extra = "";
   stagiaires.slice(0, 10).forEach((s, si) => {
     const sc = EVAL_SCORES[si] || [7, 8, 7, 8, 7];
-    extra += `<h3>📋 ${s.prenom} ${s.nom} – ${s.entreprise} (${s.poste})</h3>`;
+    extra += `<h3>${s.civilite ? s.civilite + " " : ""}${s.prenom} ${s.nom} – ${s.entreprise} (${s.poste})</h3>`;
+    extra += `<p><strong>Session :</strong> Du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}</p>`;
     extra += tableHTML(["Compétence évaluée", "Note /10", "Niveau", "Commentaire formateur"],
       competences.map((comp, ci) => {
         const score = sc[ci % sc.length];
@@ -1324,12 +1390,12 @@ function genEvalIntermediaire(o: OrganismeInfo, f: FormationInfo, stagiaires: St
 
   stagiaires.slice(0, 10).forEach((s, i) => {
     const sc = EVAL_SCORES[i] || [7, 8, 7, 8, 7];
-    // Intermediate scores are slightly higher than positioning (progression)
     const interScores = sc.map(s => Math.min(10, s + 1));
     const avg = Math.round(interScores.reduce((a, b) => a + b, 0) / interScores.length * 10) / 10;
     const progression = avg >= 8 ? "Excellente progression" : avg >= 7 ? "Bonne progression" : "Progression satisfaisante";
 
-    extra += `<h3>📋 ${s.prenom} ${s.nom}</h3>`;
+    extra += `<h3>${s.civilite ? s.civilite + " " : ""}${s.prenom} ${s.nom}</h3>`;
+    extra += `<p><strong>Session :</strong> Du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}</p>`;
     extra += tableHTML(["Compétence", "Note positionnement", "Note intermédiaire", "Progression"],
       competences.map((comp, ci) => {
         const initial = sc[ci % sc.length];
@@ -1342,28 +1408,28 @@ function genEvalIntermediaire(o: OrganismeInfo, f: FormationInfo, stagiaires: St
   });
 
   return buildDocument({ org: o, title: "ÉVALUATION INTERMÉDIAIRE – RÉSULTATS DÉTAILLÉS", subtitle: f.intitule, formation: f, showFormationInfo: true, extraHtml: extra,
-    signatures: { type: "2", labels: ["Le Formateur", "Date"], names: [f.formateur, formatDate(f.dateDebut)] } });
+    signatures: { type: "2", labels: ["Le Formateur", "Date"], names: [f.formateur, ""] } });
 }
 
 function genEvalFinale(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const evalData = getEvalContent(f.intitule);
   const competences = evalData.competences;
   let extra = `<h2>Évaluation finale de la formation</h2>`;
-  extra += `<p>Évaluation sommative réalisée en fin de formation « ${f.intitule} ».<br>Date : ${formatDate(f.dateFin)}</p>`;
+  extra += `<p>Évaluation sommative réalisée en fin de formation « ${f.intitule} ».</p>`;
 
   let totalReussis = 0;
   let totalNote = 0;
 
   stagiaires.slice(0, 10).forEach((s, i) => {
     const sc = EVAL_SCORES[i] || [7, 8, 7, 8, 7];
-    // Final scores are higher (progression throughout formation)
     const finalScores = sc.map(s => Math.min(10, s + 2));
     const avg = Math.round(finalScores.reduce((a, b) => a + b, 0) / finalScores.length * 10) / 10;
     totalNote += avg;
     const reussi = avg >= 6;
     if (reussi) totalReussis++;
 
-    extra += `<h3>${reussi ? '✅' : '⚠️'} ${s.prenom} ${s.nom} – Note finale : ${avg}/10</h3>`;
+    extra += `<h3>${reussi ? '✅' : '⚠️'} ${s.civilite ? s.civilite + " " : ""}${s.prenom} ${s.nom} – Note finale : ${avg}/10</h3>`;
+    extra += `<p><strong>Session :</strong> Du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}</p>`;
     extra += tableHTML(["Compétence", "Note initiale", "Note finale", "Acquis ?"],
       competences.map((comp, ci) => {
         const initial = sc[ci % sc.length];
