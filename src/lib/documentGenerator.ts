@@ -945,8 +945,7 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
       blocDerouleHtml = derouleHtml;
     }
   }
-
-
+  const extraContent = `
     <h2>1. Organisme de formation</h2>
     <div class="section">
       <p><strong>Nom :</strong> ${o.nom}</p>
