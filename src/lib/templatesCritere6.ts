@@ -548,7 +548,7 @@ export function genListePartenairesV2(o: OrganismeInfo) {
   ], extraHtml: `<h2>Les partenaires de ${o.nom}</h2>
     <table>
       <tr><th>Partenaire</th><th>${o.dirigeant}</th></tr>
-      <tr style="background:#fff"><td>Président</td><td>Président<br>${tamponHtml}</td></tr>
+      <tr style="background:#fff"><td>Dirigeant</td><td>Dirigeant<br>${tamponHtml}</td></tr>
     </table>` });
 }
 
@@ -562,7 +562,7 @@ export function genContratSousTraitanceV2(o: OrganismeInfo, f: FormationInfo, st
   const sousTraitantSiren = "910 645 563";
   const sousTraitantAdresse = "5 Allée Watteau, 95200 SARCELLES";
   const sousTraitantDirigeant = "Monsieur Jeganathan SOFIANE";
-  const sousTraitantQualite = "Président";
+  const sousTraitantQualite = "Dirigeant";
 
   return buildDocument({ org: o, title: "CONTRAT DE SOUS-TRAITANCE EN FORMATION PROFESSIONNELLE", subtitle: "Conformément aux articles L.6351-1 et suivants du Code du travail et au Référentiel National Qualité (Qualiopi)", sections: [
     { heading: "ENTRE LES SOUSSIGNÉS", content: `
@@ -572,7 +572,7 @@ export function genContratSousTraitanceV2(o: OrganismeInfo, f: FormationInfo, st
       <p>SIRET : ${o.siret}</p>
       <p>Numéro de Déclaration d'Activité (NDA) : ${o.nda}</p>
       <p>Siège social : ${o.adresse}, ${o.codePostal} ${o.ville}</p>
-      <p>Représenté par : <strong>${o.dirigeant}</strong>, en qualité de Président</p>
+      <p>Représenté par : <strong>${o.dirigeant}</strong>, en qualité de Dirigeant</p>
       <p>Ci-après dénommé <strong>« le Donneur d'ordre »</strong></p>
       <br/>
       <p><strong>2. LE SOUS-TRAITANT :</strong></p>
@@ -742,7 +742,7 @@ export function genContratSousTraitanceV2(o: OrganismeInfo, f: FormationInfo, st
       <div class="sig-box">
         <p class="sig-label">Pour le Donneur d'ordre – ${o.nom}</p>
         <p>Représenté par : <strong>${o.dirigeant}</strong></p>
-        <p>Qualité : Président</p>
+        <p>Qualité : Dirigeant</p>
         <p>Date : ${dateMaj}</p>
         <p style="margin-top:15px">Signature et cachet :</p>
         ${sigHtml}

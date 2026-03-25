@@ -955,7 +955,7 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
       <p><strong>Téléphone :</strong> ${o.telephone}</p>
       <p><strong>Email :</strong> ${o.email}</p>
       <p><strong>Site web :</strong> ${o.siteWeb || "—"}</p>
-      <p><strong>Président – Formateur – Référent pédagogique – Référent handicap :</strong><br>Monsieur/Madame ${o.dirigeant}</p>
+      <p><strong>Dirigeant – Formateur – Référent pédagogique – Référent handicap :</strong><br>Monsieur/Madame ${o.dirigeant}</p>
     </div>
 
     <h2>2. Intitulé de la formation</h2>
@@ -2908,19 +2908,32 @@ function genPVExamenCertification(o: OrganismeInfo, f: FormationInfo, stagiaires
   dateEpreuves.setDate(dateEpreuves.getDate() + 7);
   const dateEpreuvesStr = dateEpreuves.toLocaleDateString("fr-FR");
 
-  // Épreuves du jury avec colonnes Note / Observations
-  const epreuves = rncp ? rncp.blocsCompetences.map((b, i) => ({
-    nom: `Épreuve ${i + 1} – ${b.titre}`,
-    modalite: b.modalitesEval || "Selon référentiel"
-  })) : [{ nom: "Épreuve unique", modalite: "Selon référentiel" }];
+  // Épreuves du jury avec notes = moyennes exercices + test fin
+  const evalContent = getEvalContent(f.intitule);
+  const questions = evalContent.qcmFinal;
+  const answers = generateStagiaireAnswers(questions, stagiaireIdx);
+  const qcmResult = computeQCMScore(questions, answers);
+  const qcmNote = Math.round((qcmResult.score / qcmResult.total) * 20 * 10) / 10;
+
+  const epreuves = rncp ? rncp.blocsCompetences.map((b, i) => {
+    // Note entre 14 et 18 basée sur le score QCM + variation par bloc
+    const baseNote = qcmNote;
+    const variation = ((stagiaireIdx + i) % 5) - 2; // -2 to +2
+    const note = Math.min(20, Math.max(12, Math.round((baseNote + variation) * 10) / 10));
+    return {
+      nom: `Épreuve ${i + 1} – ${b.titre}`,
+      modalite: b.modalitesEval || "Selon référentiel",
+      note
+    };
+  }) : [{ nom: "Épreuve unique", modalite: "Selon référentiel", note: qcmNote }];
 
   const juryRows = epreuves.map(ep =>
     `<tr>
       <td style="font-weight:600">${ep.nom}</td>
       <td style="font-size:0.85em;color:#555">${ep.modalite}</td>
-      <td style="text-align:center;min-width:60px">____/20</td>
-      <td style="text-align:center">☐ Acquis ☐ Non acquis</td>
-      <td></td>
+      <td style="text-align:center;min-width:60px">${ep.note}/20</td>
+      <td style="text-align:center">${ep.note >= 10 ? "✅ Acquis" : "❌ Non acquis"}</td>
+      <td>${ep.note >= 14 ? "Très bien" : ep.note >= 12 ? "Bien" : ep.note >= 10 ? "Satisfaisant" : "Insuffisant"}</td>
     </tr>`
   ).join("");
 
@@ -2952,9 +2965,9 @@ function genPVExamenCertification(o: OrganismeInfo, f: FormationInfo, stagiaires
       <table>
         <thead><tr><th>Fonction</th><th>Nom</th><th>Qualité</th><th>Signature</th></tr></thead>
         <tbody>
-          <tr><td>Président du jury</td><td>________________________</td><td>________________________</td><td></td></tr>
-          <tr><td>Membre du jury</td><td>________________________</td><td>________________________</td><td></td></tr>
-          <tr><td>Membre du jury</td><td>________________________</td><td>________________________</td><td></td></tr>
+          <tr><td>Dirigeant</td><td>________________________</td><td>________________________</td><td></td></tr>
+          <tr><td>Formateur</td><td>________________________</td><td>________________________</td><td></td></tr>
+          <tr><td>Formateur</td><td>________________________</td><td>________________________</td><td></td></tr>
         </tbody>
       </table>`, variant: "green" },
     // — Section 4 : Résultats par épreuve
@@ -3003,7 +3016,7 @@ function genPVExamenCertification(o: OrganismeInfo, f: FormationInfo, stagiaires
         ${s.signatureUrl ? `<img src="${s.signatureUrl}" alt="Signature" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : ""}
       </div>
       <div class="sig-box" style="flex:1;min-width:180px">
-        <p class="sig-label">Le Président du jury</p>
+        <p class="sig-label">Le Dirigeant</p>
         <p>Nom : ________________________</p>
         <p>Date : ${dateEpreuvesStr}</p>
         <p style="margin-top:20px">Signature :</p>
@@ -3123,7 +3136,7 @@ function genDossierValidation(o: OrganismeInfo, f: FormationInfo, stagiaires: St
     { heading: "Bloc 2 – Compétences spécialisées", content: "<p><strong>Activité décrite :</strong> Mise en place d'un contrôle de gestion et de tableaux de bord financiers.<br><strong>Preuves :</strong> Tableaux de bord, rapports d'analyse<br><strong>Évaluation :</strong> ✅ Validé</p>", variant: "green" },
     { heading: "Bloc 3 – Compétences transversales", content: "<p><strong>Activité décrite :</strong> Coordination avec les équipes, reporting à la direction, formation des juniors.<br><strong>Preuves :</strong> Comptes-rendus, mails, attestation employeur<br><strong>Évaluation :</strong> ✅ Validé</p>", variant: "green" },
     { heading: "Décision du jury", content: "<p><strong>Validation totale</strong> – L'ensemble des blocs de compétences est validé. La certification est attribuée.</p>" },
-  ], signatures: { type: "2", labels: ["Le Président du jury", "Le Candidat"], names: [o.dirigeant, s.prenom + " " + s.nom] } });
+  ], signatures: { type: "2", labels: ["Le Dirigeant", "Le Candidat"], names: [o.dirigeant, s.prenom + " " + s.nom] } });
 }
 
 function genAccompagnementVAE(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
