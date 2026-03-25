@@ -1481,7 +1481,7 @@ function genEvalIntermediaire(o: OrganismeInfo, f: FormationInfo, stagiaires: St
     extra += `<div class="section"><p><strong>Moyenne intermédiaire : ${avg}/10</strong> – ${progression}</p><p><strong>Appréciation du formateur :</strong> ${evalData.appreciations[i] || "Progression satisfaisante."}</p><p><strong>Axes d'amélioration identifiés :</strong> ${avg < 8 ? "Renforcer la pratique sur les compétences les moins maîtrisées. Proposer des exercices complémentaires." : "Maintenir le niveau. Proposer des cas avancés pour approfondir."}</p></div>`;
   });
 
-  return buildDocument({ org: o, title: "ÉVALUATION INTERMÉDIAIRE – RÉSULTATS DÉTAILLÉS", subtitle: f.intitule, formation: f, showFormationInfo: true, extraHtml: extra,
+  return buildDocument({ org: o, title: "ÉVALUATION INTERMÉDIAIRE – RÉSULTATS DÉTAILLÉS", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra,
     signatures: { type: "2", labels: ["Le Formateur", "Date"], names: [f.formateur, ""] } });
 }
 
