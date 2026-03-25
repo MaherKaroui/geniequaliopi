@@ -989,9 +989,9 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
 
     <h2>7. Durée et lieu de formation</h2>
     <div class="section">
-      <p><strong>Durée totale :</strong> ${heuresTotal} (${nbJours} jour${nbJours > 1 ? "s" : ""})</p>
-      <p><strong>Dates :</strong> Du ${dateDebutFmt} au ${dateFinFmt}</p>
-      <p><strong>Horaires :</strong> 09h00 – 12h30 / 13h30 – ${totalHeures / nbJours <= 6 ? '16h00' : '17h00'}</p>
+      <p><strong>Durée totale :</strong> ${displayDuree}${!isBlocFormation ? ` (${nbJours} jour${nbJours > 1 ? "s" : ""})` : ""}</p>
+      ${hasIndiv ? sessionsHtml : ""}
+      <p><strong>Horaires :</strong> 09h00 – 12h30 / 13h30 – 17h00</p>
       <p><strong>Modalité :</strong> ${modaliteLabel}</p>
       <p><strong>Lieu de formation :</strong> ${f.lieu || `${o.adresse}, ${o.codePostal} ${o.ville}`}</p>
       <p><strong>Nombre de participants :</strong> ${nbStagiaires}</p>
