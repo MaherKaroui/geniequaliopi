@@ -5,6 +5,17 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 
+const FORMATEURS_PREDIFINIS = [
+  "AHMED EL HILALI",
+  "CHRISTIAN PEREZ",
+  "DA COSTA DAVID",
+  "HAMADI SOULEIMANI",
+  "LOUIS PELEGRY",
+  "PHILIPPE DYLAN",
+  "Thierry VANDENABEELE",
+  "RENUKA CALISSTUS SURESH",
+];
+
 interface StagiairesFormProps {
   data: StagiaireInfo[];
   onChange: (data: StagiaireInfo[]) => void;
@@ -164,7 +175,16 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
             </div>
             <div className="md:col-span-2">
               <Label>Formateur de la session</Label>
-              <Input value={stagiaire.formateur || ""} onChange={e => updateStagiaire(index, 'formateur', e.target.value)} placeholder="Nom du formateur (ex: RENUKA CALISSTUS SURESH)" />
+              <select
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                value={stagiaire.formateur || ""}
+                onChange={e => updateStagiaire(index, 'formateur', e.target.value)}
+              >
+                <option value="">— Aucun —</option>
+                {FORMATEURS_PREDIFINIS.map(f => (
+                  <option key={f} value={f}>{f}</option>
+                ))}
+              </select>
             </div>
           </div>
           {/* Signature stagiaire */}
