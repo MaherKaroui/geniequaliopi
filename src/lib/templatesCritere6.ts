@@ -563,6 +563,7 @@ export function genContratSousTraitanceV2(o: OrganismeInfo, f: FormationInfo, st
   const sousTraitantAdresse = "5 Allée Watteau, 95200 SARCELLES";
   const sousTraitantDirigeant = "Monsieur Jeganathan SOFIANE";
   const sousTraitantQualite = "Dirigeant";
+  const formateurNom = f.formateur || "";
 
   return buildDocument({ org: o, title: "CONTRAT DE SOUS-TRAITANCE EN FORMATION PROFESSIONNELLE", subtitle: "Conformément aux articles L.6351-1 et suivants du Code du travail et au Référentiel National Qualité (Qualiopi)", sections: [
     { heading: "ENTRE LES SOUSSIGNÉS", content: `
@@ -582,6 +583,7 @@ export function genContratSousTraitanceV2(o: OrganismeInfo, f: FormationInfo, st
       <p>Siège social : ${sousTraitantAdresse}</p>
       <p>Représenté par : <strong>${sousTraitantDirigeant}</strong>, en qualité de ${sousTraitantQualite}</p>
       <p>Ci-après dénommé <strong>« le Sous-traitant »</strong></p>
+      ${formateurNom ? `<br/><p><strong>Formateur désigné :</strong> ${formateurNom}</p>` : ""}
       <br/>
       <p style="font-style:italic">Ci-après désignés ensemble « les Parties ».</p>
     ` },
@@ -589,12 +591,13 @@ export function genContratSousTraitanceV2(o: OrganismeInfo, f: FormationInfo, st
       <p>Le Donneur d'ordre, <strong>${o.nom}</strong>, est un organisme de formation professionnelle déclaré auprès de la DREETS sous le numéro ${o.nda}.</p>
       <p>Le Sous-traitant, <strong>${sousTraitantNom}</strong>, est un organisme de formation professionnelle disposant de formateurs salariés qualifiés dans le domaine de l'enseignement du Français Langue Étrangère (FLE).</p>
       <p>Le Donneur d'ordre souhaite confier au Sous-traitant, qui l'accepte, la réalisation de prestations de formation en sous-traitance, dans les conditions définies ci-après.</p>
+      ${formateurNom ? `<p>Le formateur désigné pour l'exécution de la présente prestation est <strong>${formateurNom}</strong>, salarié du Sous-traitant.</p>` : ""}
       <p>Le présent contrat est conclu dans le cadre des articles <strong>L.6351-1 et suivants du Code du travail</strong> relatifs à la sous-traitance en formation professionnelle.</p>
     ` },
     { heading: "ARTICLE 1 – OBJET DU CONTRAT", content: `
       <p>Le présent contrat a pour objet de définir les conditions dans lesquelles le Donneur d'ordre confie au Sous-traitant la réalisation de prestations de formation professionnelle continue au bénéfice de ses apprenants.</p>
-      <p>Le Sous-traitant s'engage à réaliser les prestations de formation par l'intermédiaire de ses <strong>formateurs salariés</strong>, conformément aux programmes, objectifs pédagogiques et conditions définis par le Donneur d'ordre.</p>
-      <p><strong>Il est expressément convenu que les formateurs intervenant dans le cadre du présent contrat sont des salariés du Sous-traitant et non du Donneur d'ordre.</strong></p>
+      <p>Le Sous-traitant s'engage à réaliser les prestations de formation par l'intermédiaire de ${formateurNom ? `son formateur salarié <strong>${formateurNom}</strong>` : `ses <strong>formateurs salariés</strong>`}, conformément aux programmes, objectifs pédagogiques et conditions définis par le Donneur d'ordre.</p>
+      <p><strong>Il est expressément convenu que ${formateurNom ? `le formateur ${formateurNom} intervenant` : "les formateurs intervenant"} dans le cadre du présent contrat ${formateurNom ? "est un salarié" : "sont des salariés"} du Sous-traitant et non du Donneur d'ordre.</strong></p>
     ` },
     { heading: "ARTICLE 2 – DESCRIPTION DE LA FORMATION", content: `
       <table>
