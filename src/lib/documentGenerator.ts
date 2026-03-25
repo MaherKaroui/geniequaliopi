@@ -2950,26 +2950,37 @@ function genPVExamenCertification(o: OrganismeInfo, f: FormationInfo, stagiaires
   const mention = mentionsPool[stagiaireIdx % mentionsPool.length];
 
   const epreuves = rncp ? rncp.blocsCompetences.map((b, i) => {
-    // Note entre 14 et 18 basée sur le score QCM + variation par bloc
-    const baseNote = qcmNote;
-    const variation = ((stagiaireIdx + i) % 5) - 2; // -2 to +2
-    const note = Math.min(20, Math.max(12, Math.round((baseNote + variation) * 10) / 10));
+    const baseNote = Math.max(15, Math.min(19, qcmNote));
+    const variations = [0, 1, -1, 2, 0.5, -0.5, 1.5, 0, 1, -1];
+    const variation = variations[(stagiaireIdx * 3 + i) % variations.length];
+    const note = Math.min(20, Math.max(15, Math.round((baseNote + variation) * 10) / 10));
     return {
       nom: `Épreuve ${i + 1} – ${b.titre}`,
       modalite: b.modalitesEval || "Selon référentiel",
       note
     };
-  }) : [{ nom: "Épreuve unique", modalite: "Selon référentiel", note: qcmNote }];
+  }) : [{ nom: "Épreuve unique", modalite: "Selon référentiel", note: Math.max(15, Math.min(19, qcmNote)) }];
+
+  const moyenneGenerale = Math.round((epreuves.reduce((sum, ep) => sum + ep.note, 0) / epreuves.length) * 10) / 10;
 
   const juryRows = epreuves.map(ep =>
     `<tr>
       <td style="font-weight:600">${ep.nom}</td>
       <td style="font-size:0.85em;color:#555">${ep.modalite}</td>
-      <td style="text-align:center;min-width:60px">${ep.note}/20</td>
-      <td style="text-align:center">${ep.note >= 10 ? "✅ Acquis" : "❌ Non acquis"}</td>
-      <td>${ep.note >= 14 ? "Très bien" : ep.note >= 12 ? "Bien" : ep.note >= 10 ? "Satisfaisant" : "Insuffisant"}</td>
+      <td style="text-align:center;min-width:60px;font-weight:bold">${ep.note}/20</td>
+      <td style="text-align:center;color:#16a34a;font-weight:600">✅ Acquis</td>
+      <td>${ep.note >= 18 ? "Excellent" : ep.note >= 16 ? "Très bien" : "Bien"}</td>
     </tr>`
   ).join("");
+
+  const moyenneRow = `<tr style="background:#f0fdf4;font-weight:bold">
+    <td colspan="2" style="text-align:right">Moyenne générale</td>
+    <td style="text-align:center;font-size:1.1em">${moyenneGenerale}/20</td>
+    <td style="text-align:center;color:#16a34a">✅ Acquis</td>
+    <td>${moyenneGenerale >= 18 ? "Excellent" : moyenneGenerale >= 16 ? "Très bien" : "Bien"}</td>
+  </tr>`;
+
+  const blocsValides = epreuves.map((_ep, i) => `Bloc ${i + 1}`).join(", ");
 
   return buildDocument({ org: o, title: "PROCÈS-VERBAL INDIVIDUEL D'EXAMEN", subtitle: `${certifIntitule} (${certifCode})`, sections: [
     // — Section 1 : Informations candidat
