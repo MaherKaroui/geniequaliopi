@@ -406,8 +406,8 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "bail_sous_location": return genBailSousLocation(o);
     case "facture_materiel": return genFactureMateriel(o, params);
     case "autoevaluation_formateur": {
-      // Use the formateur name from the formation, not from SAMPLE_FORMATEURS
-      const formateurName = f.formateur || fmt.prenom + " " + fmt.nom;
+      // Use formateurNom from params if provided (per-session formateur), else from formation
+      const formateurName = params?.formateurNom || f.formateur || fmt.prenom + " " + fmt.nom;
       const parts = formateurName.trim().split(/\s+/);
       const autoFmt: FormateurInfo = { ...fmt, prenom: parts.slice(0, -1).join(" ") || parts[0], nom: parts[parts.length - 1] || "" };
       return genAutoEvaluationFormateurV2(o, f, autoFmt);
@@ -471,11 +471,22 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "certificat_realisation": return genCertificatRealisation(o, f, stagiaires);
     case "suivi_absences": return genSuiviAbsences(o, f, stagiaires);
     case "fiche_poste_formateur": return genFichePosteRole(o, params?.role ?? "formateur");
-    case "contrat_sous_traitance_v2": return genContratSousTraitanceV2(o, f, stagiaires);
+    case "contrat_sous_traitance_v2": {
+      // If a specific formateur name is passed, override the formation formateur
+      const fForST = params?.formateurNom ? { ...f, formateur: params.formateurNom } : f;
+      return genContratSousTraitanceV2(o, fForST, stagiaires);
+    }
     case "charte_qualite_formateur_externe": return genCharteQualiteFormateurExterne(o);
     case "plan_dev_competences_excel": return genPlanDevCompetencesExcel(o, f, formateurs, stagiaires);
     case "grille_entretien_annuel": return genGrilleEntretienAnnuel(o, fmt);
-    case "fiche_entretien_annuel_formateur": return genFicheEntretienAnnuelFormateur(o, f, fmt);
+    case "fiche_entretien_annuel_formateur": {
+      // If a specific formateur name is passed, create a mock FormateurInfo
+      const fmtForEntretien = params?.formateurNom
+        ? { ...fmt, nom: params.formateurNom, prenom: "", specialite: fmt.specialite, diplomes: fmt.diplomes, experience: fmt.experience, email: fmt.email }
+        : fmt;
+      const fForEntretien = params?.formateurNom ? { ...f, formateur: params.formateurNom } : f;
+      return genFicheEntretienAnnuelFormateur(o, fForEntretien, fmtForEntretien);
+    }
     case "enquete_satisfaction_formateur": return genEnqueteSatisfactionFormateur(o, f);
     // === Nouveaux templates CFA ===
     case "attestation_inscription_cfa": return genAttestationInscriptionCFAV2(o, f, stagiaires, params?.stagiaireIdx ?? 0);

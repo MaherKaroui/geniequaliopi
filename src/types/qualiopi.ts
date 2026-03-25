@@ -66,6 +66,7 @@ export interface StagiaireInfo {
   communeNaissance?: string;
   diplome?: string;
   rqth?: "oui" | "non" | "";
+  formateur?: string;
 }
 
 export interface FormationInfo {

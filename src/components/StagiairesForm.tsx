@@ -12,7 +12,7 @@ interface StagiairesFormProps {
 
 const emptyStagiaire: StagiaireInfo = {
   civilite: "", nom: "", prenom: "", email: "", telephone: "", entreprise: "", responsableEntreprise: "", signatureResponsableUrl: "", poste: "", dateNaissance: "", dateDebutFormation: "", dateFinFormation: "", tarifFormation: "", signatureUrl: "",
-  adresse: "", codePostal: "", commune: "", nationalite: "", nir: "", departementNaissance: "", communeNaissance: "", diplome: "", rqth: "",
+  adresse: "", codePostal: "", commune: "", nationalite: "", nir: "", departementNaissance: "", communeNaissance: "", diplome: "", rqth: "", formateur: "",
 };
 
 const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
@@ -161,6 +161,10 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
             <div>
               <Label>Date fin formation</Label>
               <Input type="date" value={stagiaire.dateFinFormation} onChange={e => updateStagiaire(index, 'dateFinFormation', e.target.value)} />
+            </div>
+            <div className="md:col-span-2">
+              <Label>Formateur de la session</Label>
+              <Input value={stagiaire.formateur || ""} onChange={e => updateStagiaire(index, 'formateur', e.target.value)} placeholder="Nom du formateur (ex: RENUKA CALISSTUS SURESH)" />
             </div>
           </div>
           {/* Signature stagiaire */}
