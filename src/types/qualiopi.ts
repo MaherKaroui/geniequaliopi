@@ -67,6 +67,7 @@ export interface StagiaireInfo {
   diplome?: string;
   rqth?: "oui" | "non" | "";
   formateur?: string;
+  formateurSignatureUrl?: string;
 }
 
 export interface FormationInfo {
