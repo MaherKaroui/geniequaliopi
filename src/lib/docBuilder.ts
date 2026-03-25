@@ -150,19 +150,40 @@ export function orgHeader(org: OrganismeInfo, subtitle?: string): string {
   </div>`;
 }
 
-/** Get the formation start date for a specific stagiaire (uses stagiaire-specific date if available, otherwise formation-level) */
+/** Get the formation start date for a specific stagiaire (prioritizes stagiaire-specific date, then formation-level) */
 export function getStagiaireDateDebut(s: StagiaireInfo, f: FormationInfo): string {
-  return normalizeDate(f.dateDebut || s.dateDebutFormation || "");
+  return normalizeDate(s.dateDebutFormation || f.dateDebut || "");
 }
 
 /** Get the formation end date for a specific stagiaire */
 export function getStagiaireDateFin(s: StagiaireInfo, f: FormationInfo): string {
-  return normalizeDate(f.dateFin || s.dateFinFormation || "");
+  return normalizeDate(s.dateFinFormation || f.dateFin || "");
 }
 
-/** Get per-stagiaire tarif (uses formation tarif first, then stagiaire-specific) */
+/** Get per-stagiaire tarif (prioritizes stagiaire-specific, then formation-level) */
 export function getStagiaireTarif(s: StagiaireInfo, f: FormationInfo): string {
-  return f.tarif || s.tarifFormation || "";
+  return s.tarifFormation || f.tarif || "";
+}
+
+/** Check if stagiaires have individual (varying) dates */
+export function hasIndividualDates(stagiaires: StagiaireInfo[]): boolean {
+  const withDates = stagiaires.filter(s => s.dateDebutFormation || s.dateFinFormation);
+  if (withDates.length === 0) return false;
+  const firsts = new Set(withDates.map(s => s.dateDebutFormation).filter(Boolean));
+  const lasts = new Set(withDates.map(s => s.dateFinFormation).filter(Boolean));
+  return firsts.size > 1 || lasts.size > 1;
+}
+
+/** Get display durée — shows "À définir selon le groupe" if individual dates differ */
+export function getDisplayDuree(f: FormationInfo, stagiaires?: StagiaireInfo[]): string {
+  if (stagiaires && hasIndividualDates(stagiaires)) return "À définir selon le groupe";
+  return f.duree;
+}
+
+/** Get display tarif — shows "Tarif sur demande" if individual dates differ */
+export function getDisplayTarif(f: FormationInfo, stagiaires?: StagiaireInfo[]): string {
+  if (stagiaires && hasIndividualDates(stagiaires)) return "Tarif sur demande";
+  return f.tarif;
 }
 
 /** Format a formation info block for a specific stagiaire (uses their individual dates/tarif if available) */
