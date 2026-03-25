@@ -582,7 +582,7 @@ function genPlanning(o: OrganismeInfo, f: FormationInfo) {
   return buildDocument({ org: o, title: "PLANNING DES SESSIONS", subtitle: f.intitule, table: {
     headers: ["Session", "Dates", "Lieu", "Places", "Statut"],
     rows: [
-      ["Session 1", `${formatDate(f.dateDebut)} – ${formatDate(f.dateFin)}`, f.lieu, f.nombreParticipants, "✅ Réalisée"],
+      ["Session 1", "Sessions individuelles", f.lieu, f.nombreParticipants, "✅ Réalisée"],
       ["Session 2", "Juin 2024", f.lieu, f.nombreParticipants, "✅ Réalisée"],
       ["Session 3", "Septembre 2024", f.lieu, f.nombreParticipants, "✅ Réalisée"],
       ["Session 4", "Décembre 2024", f.lieu, f.nombreParticipants, "📋 Programmée"],
