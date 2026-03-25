@@ -6203,7 +6203,8 @@ function genBilanChaudStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: 
   ];
   const pat = patterns[si % patterns.length];
 
-  let extra = `<p><strong>Date :</strong> ${formatDate(f.dateFin)}</p>`;
+  const dateFin = getStagiaireDateFin(s, f);
+  let extra = `<p><strong>Date du bilan :</strong> ${formatDate(dateFin)} (dernier jour de formation)</p>`;
   extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%">
     <tr><td><strong>Nom/prénom du participant :</strong></td><td>${s.prenom} ${s.nom}</td></tr>
     <tr><td><strong>Entreprise :</strong></td><td>${s.entreprise || "—"}</td></tr>
