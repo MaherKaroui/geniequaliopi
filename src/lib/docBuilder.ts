@@ -204,16 +204,16 @@ export function infoGrid(items: Record<string, string>): string {
   return `<div class="info-grid">${Object.entries(items).map(([k, v]) => `<div class="info-item"><strong>${k} :</strong> ${v || "___"}</div>`).join("")}</div>`;
 }
 
-export function formationInfoBlock(f: FormationInfo): string {
+export function formationInfoBlock(f: FormationInfo, stagiaires?: StagiaireInfo[]): string {
   return infoGrid({
     "Formation": f.intitule,
-    "Durée": f.duree,
+    "Durée": getDisplayDuree(f, stagiaires),
     "Du": formatDate(f.dateDebut),
     "Au": formatDate(f.dateFin),
     "Lieu": f.lieu,
     "Modalités": f.modalites,
     "Formateur": f.formateur,
-    "Tarif": f.tarif,
+    "Tarif": getDisplayTarif(f, stagiaires),
   });
 }
 
