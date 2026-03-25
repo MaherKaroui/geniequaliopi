@@ -637,9 +637,11 @@ function genAnalyseBesoins(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
   // Tableau récapitulatif des stagiaires avec leurs dates individuelles
   let tableStag = "";
   if (stagiaires.length > 0) {
+    const financements = ["OPCO", "Pôle Emploi", "Financement personnel"];
     const rows = stagiaires.slice(0, 10).map((s, i) => {
       const dateD = formatDate(getStagiaireDateDebut(s, f));
       const dateF = formatDate(getStagiaireDateFin(s, f));
+      const financement = financements[i % financements.length];
       if (isFLE) {
         const besoins = [
           "Renforcer la communication orale en situation professionnelle (accueil, transmissions, réunions)",
@@ -653,7 +655,7 @@ function genAnalyseBesoins(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
           "Améliorer la lecture et l'application des protocoles d'urgence et de soins",
           "Développer les compétences rédactionnelles pour les projets personnalisés des résidents",
         ];
-        return [s.civilite ? `${s.civilite} ${s.nom} ${s.prenom}` : `${s.prenom} ${s.nom}`, dateD, dateF, besoins[i % besoins.length]];
+        return [s.civilite ? `${s.civilite} ${s.nom} ${s.prenom}` : `${s.prenom} ${s.nom}`, dateD, dateF, financement, besoins[i % besoins.length]];
       } else {
         const besoins = [
           "Développer les compétences opérationnelles",
@@ -667,10 +669,10 @@ function genAnalyseBesoins(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
           "Renforcer les compétences techniques",
           "Améliorer la performance globale",
         ];
-        return [s.civilite ? `${s.civilite} ${s.nom} ${s.prenom}` : `${s.prenom} ${s.nom}`, dateD, dateF, besoins[i % besoins.length]];
+        return [s.civilite ? `${s.civilite} ${s.nom} ${s.prenom}` : `${s.prenom} ${s.nom}`, dateD, dateF, financement, besoins[i % besoins.length]];
       }
     });
-    tableStag = tableHTML(["Stagiaire", "Date début", "Date fin", "Besoin principal identifié"], rows);
+    tableStag = tableHTML(["Stagiaire", "Date début", "Date fin", "Prise en charge", "Besoin principal identifié"], rows);
   }
 
   const besoinsContent = isFLE
