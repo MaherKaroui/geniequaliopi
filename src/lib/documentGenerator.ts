@@ -2915,6 +2915,40 @@ function genPVExamenCertification(o: OrganismeInfo, f: FormationInfo, stagiaires
   const qcmResult = computeQCMScore(questions, answers);
   const qcmNote = Math.round((qcmResult.score / qcmResult.total) * 20 * 10) / 10;
 
+  // Formateur info
+  const formateur = SAMPLE_FORMATEURS[0];
+  const formateurNom = `${formateur.prenom} ${formateur.nom}`;
+
+  // Observations personnalisées par stagiaire
+  const observationsPool = [
+    `${g(s, "Le candidat", "La candidate")} a fait preuve d'une excellente maîtrise des compétences évaluées. Les réponses sont claires, structurées et démontrent une compréhension approfondie du domaine.`,
+    `Très bonne prestation globale. ${g(s, "Le candidat", "La candidate")} a su mobiliser ses connaissances avec pertinence et a démontré une capacité d'analyse remarquable.`,
+    `${g(s, "Le candidat", "La candidate")} a répondu avec aisance aux différentes épreuves. Les compétences transversales sont particulièrement bien maîtrisées.`,
+    `Excellente performance. ${g(s, "Le candidat", "La candidate")} a démontré une solide capacité à appliquer les connaissances théoriques à des situations concrètes.`,
+    `${g(s, "Le candidat", "La candidate")} a su démontrer une très bonne compréhension des enjeux professionnels liés à la certification. Prestation convaincante et bien argumentée.`,
+    `Performance très satisfaisante. ${g(s, "Le candidat", "La candidate")} maîtrise l'ensemble des blocs de compétences avec une rigueur et une clarté appréciables.`,
+    `${g(s, "Le candidat", "La candidate")} a présenté un travail de qualité, reflétant un investissement sérieux dans la formation. Les acquis sont solides et bien restitués.`,
+    `Très bon niveau de compétences observé. ${g(s, "Le candidat", "La candidate")} a su répondre aux exigences du référentiel avec professionnalisme.`,
+    `${g(s, "Le candidat", "La candidate")} a brillamment démontré sa capacité à intégrer les savoirs et savoir-faire. Les épreuves pratiques ont été particulièrement réussies.`,
+    `Prestation globale de haut niveau. ${g(s, "Le candidat", "La candidate")} possède les compétences nécessaires à l'exercice professionnel dans ce domaine.`,
+  ];
+  const observation = observationsPool[stagiaireIdx % observationsPool.length];
+
+  // Mentions personnalisées
+  const mentionsPool = [
+    "Félicitations du jury pour l'excellence des résultats",
+    "Mention Très Bien — Dossier exemplaire",
+    "Le jury souligne la qualité exceptionnelle du travail présenté",
+    "Félicitations pour la rigueur et le professionnalisme démontrés",
+    "Mention Bien — Résultats très satisfaisants",
+    "Le jury salue l'investissement remarquable du candidat",
+    "Félicitations — Prestation de très haute qualité",
+    "Mention Très Bien — Compétences pleinement validées",
+    "Le jury félicite le candidat pour sa maîtrise du sujet",
+    "Mention Bien — Parcours de formation exemplaire",
+  ];
+  const mention = mentionsPool[stagiaireIdx % mentionsPool.length];
+
   const epreuves = rncp ? rncp.blocsCompetences.map((b, i) => {
     // Note entre 14 et 18 basée sur le score QCM + variation par bloc
     const baseNote = qcmNote;
