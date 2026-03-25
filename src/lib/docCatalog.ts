@@ -217,6 +217,7 @@ export function buildFullCatalog(
 
     // IND 22 — Entretien et développement des compétences
     add("af_c5i22_plan_dev_competences", "CT5 - IND 22 PLAN DE DÉVELOPPEMENT DES COMPÉTENCES", 5, 22, "plan_dev_competences_excel");
+    add("af_c5i22_fiche_entretien_annuel", "CT5 - IND 22 FICHE D'ENTRETIEN ANNUEL FORMATEUR", 5, 22, "fiche_entretien_annuel_formateur");
 
     // ===== CRITÈRE 6 — ENVIRONNEMENT PROFESSIONNEL =====
 
