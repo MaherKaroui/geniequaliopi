@@ -4993,8 +4993,6 @@ function genFicheEntretienAnnuelFormateur(o: OrganismeInfo, f: FormationInfo, fm
       type: "2",
       labels: ["VISA DU FORMATEUR", "VISA DU RESPONSABLE"],
       names: [formateurNom, o.responsablePedagogique || o.dirigeant],
-      signatureUrl: o.signatureUrl,
-      tamponUrl: o.tamponUrl,
     }
   });
 }
