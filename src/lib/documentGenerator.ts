@@ -2915,27 +2915,72 @@ function genPVExamenCertification(o: OrganismeInfo, f: FormationInfo, stagiaires
   const qcmResult = computeQCMScore(questions, answers);
   const qcmNote = Math.round((qcmResult.score / qcmResult.total) * 20 * 10) / 10;
 
+  // Formateur info
+  const formateur = SAMPLE_FORMATEURS[0];
+  const formateurNom = `${formateur.prenom} ${formateur.nom}`;
+
+  // Observations personnalisées par stagiaire
+  const observationsPool = [
+    `${g(s, "Le candidat", "La candidate")} a fait preuve d'une excellente maîtrise des compétences évaluées. Les réponses sont claires, structurées et démontrent une compréhension approfondie du domaine.`,
+    `Très bonne prestation globale. ${g(s, "Le candidat", "La candidate")} a su mobiliser ses connaissances avec pertinence et a démontré une capacité d'analyse remarquable.`,
+    `${g(s, "Le candidat", "La candidate")} a répondu avec aisance aux différentes épreuves. Les compétences transversales sont particulièrement bien maîtrisées.`,
+    `Excellente performance. ${g(s, "Le candidat", "La candidate")} a démontré une solide capacité à appliquer les connaissances théoriques à des situations concrètes.`,
+    `${g(s, "Le candidat", "La candidate")} a su démontrer une très bonne compréhension des enjeux professionnels liés à la certification. Prestation convaincante et bien argumentée.`,
+    `Performance très satisfaisante. ${g(s, "Le candidat", "La candidate")} maîtrise l'ensemble des blocs de compétences avec une rigueur et une clarté appréciables.`,
+    `${g(s, "Le candidat", "La candidate")} a présenté un travail de qualité, reflétant un investissement sérieux dans la formation. Les acquis sont solides et bien restitués.`,
+    `Très bon niveau de compétences observé. ${g(s, "Le candidat", "La candidate")} a su répondre aux exigences du référentiel avec professionnalisme.`,
+    `${g(s, "Le candidat", "La candidate")} a brillamment démontré sa capacité à intégrer les savoirs et savoir-faire. Les épreuves pratiques ont été particulièrement réussies.`,
+    `Prestation globale de haut niveau. ${g(s, "Le candidat", "La candidate")} possède les compétences nécessaires à l'exercice professionnel dans ce domaine.`,
+  ];
+  const observation = observationsPool[stagiaireIdx % observationsPool.length];
+
+  // Mentions personnalisées
+  const mentionsPool = [
+    "Félicitations du jury pour l'excellence des résultats",
+    "Mention Très Bien — Dossier exemplaire",
+    "Le jury souligne la qualité exceptionnelle du travail présenté",
+    "Félicitations pour la rigueur et le professionnalisme démontrés",
+    "Mention Bien — Résultats très satisfaisants",
+    "Le jury salue l'investissement remarquable du candidat",
+    "Félicitations — Prestation de très haute qualité",
+    "Mention Très Bien — Compétences pleinement validées",
+    "Le jury félicite le candidat pour sa maîtrise du sujet",
+    "Mention Bien — Parcours de formation exemplaire",
+  ];
+  const mention = mentionsPool[stagiaireIdx % mentionsPool.length];
+
   const epreuves = rncp ? rncp.blocsCompetences.map((b, i) => {
-    // Note entre 14 et 18 basée sur le score QCM + variation par bloc
-    const baseNote = qcmNote;
-    const variation = ((stagiaireIdx + i) % 5) - 2; // -2 to +2
-    const note = Math.min(20, Math.max(12, Math.round((baseNote + variation) * 10) / 10));
+    const baseNote = Math.max(15, Math.min(19, qcmNote));
+    const variations = [0, 1, -1, 2, 0.5, -0.5, 1.5, 0, 1, -1];
+    const variation = variations[(stagiaireIdx * 3 + i) % variations.length];
+    const note = Math.min(20, Math.max(15, Math.round((baseNote + variation) * 10) / 10));
     return {
       nom: `Épreuve ${i + 1} – ${b.titre}`,
       modalite: b.modalitesEval || "Selon référentiel",
       note
     };
-  }) : [{ nom: "Épreuve unique", modalite: "Selon référentiel", note: qcmNote }];
+  }) : [{ nom: "Épreuve unique", modalite: "Selon référentiel", note: Math.max(15, Math.min(19, qcmNote)) }];
+
+  const moyenneGenerale = Math.round((epreuves.reduce((sum, ep) => sum + ep.note, 0) / epreuves.length) * 10) / 10;
 
   const juryRows = epreuves.map(ep =>
     `<tr>
       <td style="font-weight:600">${ep.nom}</td>
       <td style="font-size:0.85em;color:#555">${ep.modalite}</td>
-      <td style="text-align:center;min-width:60px">${ep.note}/20</td>
-      <td style="text-align:center">${ep.note >= 10 ? "✅ Acquis" : "❌ Non acquis"}</td>
-      <td>${ep.note >= 14 ? "Très bien" : ep.note >= 12 ? "Bien" : ep.note >= 10 ? "Satisfaisant" : "Insuffisant"}</td>
+      <td style="text-align:center;min-width:60px;font-weight:bold">${ep.note}/20</td>
+      <td style="text-align:center;color:#16a34a;font-weight:600">✅ Acquis</td>
+      <td>${ep.note >= 18 ? "Excellent" : ep.note >= 16 ? "Très bien" : "Bien"}</td>
     </tr>`
   ).join("");
+
+  const moyenneRow = `<tr style="background:#f0fdf4;font-weight:bold">
+    <td colspan="2" style="text-align:right">Moyenne générale</td>
+    <td style="text-align:center;font-size:1.1em">${moyenneGenerale}/20</td>
+    <td style="text-align:center;color:#16a34a">✅ Acquis</td>
+    <td>${moyenneGenerale >= 18 ? "Excellent" : moyenneGenerale >= 16 ? "Très bien" : "Bien"}</td>
+  </tr>`;
+
+  const blocsValides = epreuves.map((_ep, i) => `Bloc ${i + 1}`).join(", ");
 
   return buildDocument({ org: o, title: "PROCÈS-VERBAL INDIVIDUEL D'EXAMEN", subtitle: `${certifIntitule} (${certifCode})`, sections: [
     // — Section 1 : Informations candidat
@@ -2953,8 +2998,8 @@ function genPVExamenCertification(o: OrganismeInfo, f: FormationInfo, stagiaires
       ${tableHTML(["Élément", "Détail"], [
         ["Formation suivie", f.intitule],
         ["Organisme de formation", o.nom],
-        ["Période de formation", `Du ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)}`],
-        ["Durée", f.duree],
+        ["Période de formation", `Du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}`],
+        ["Durée", getStagiaireDuree(s, f)],
         ["Certification visée", `${certifIntitule} (${certifCode})`],
         ["Certificateur (Nom légal)", certifNom],
         ["Date des épreuves", dateEpreuvesStr],
@@ -2965,16 +3010,15 @@ function genPVExamenCertification(o: OrganismeInfo, f: FormationInfo, stagiaires
       <table>
         <thead><tr><th>Fonction</th><th>Nom</th><th>Qualité</th><th>Signature</th></tr></thead>
         <tbody>
-          <tr><td>Dirigeant</td><td>________________________</td><td>________________________</td><td></td></tr>
-          <tr><td>Formateur</td><td>________________________</td><td>________________________</td><td></td></tr>
-          <tr><td>Formateur</td><td>________________________</td><td>________________________</td><td></td></tr>
+          <tr><td>Dirigeant</td><td>${o.dirigeant}</td><td>Responsable de l'organisme</td><td>${o.signatureUrl ? `<img src="${o.signatureUrl}" alt="Signature" style="max-height:40px;max-width:100px;object-fit:contain" />` : "<em>Signé</em>"}</td></tr>
+          <tr><td>Formateur</td><td>${formateurNom}</td><td>Formateur référent</td><td><em>Signé</em></td></tr>
         </tbody>
       </table>`, variant: "green" },
     // — Section 4 : Résultats par épreuve
     { heading: "Résultats par épreuve", content: `
       <table>
         <thead><tr><th>Épreuve</th><th>Modalité d'évaluation</th><th>Note</th><th>Résultat</th><th>Observations</th></tr></thead>
-        <tbody>${juryRows}</tbody>
+        <tbody>${juryRows}${moyenneRow}</tbody>
       </table>` },
     // — Section 5 : Décision finale
     { heading: "Décision finale du jury", content: `
@@ -2982,27 +3026,28 @@ function genPVExamenCertification(o: OrganismeInfo, f: FormationInfo, stagiaires
         <tbody>
           <tr>
             <td style="padding:15px;font-size:1.1em">
-              <strong>☐ ${g(s, "ADMIS", "ADMISE")}</strong> — ${g(s, "Le candidat", "La candidate")} a satisfait aux exigences de la certification
+              <strong>☑ ${g(s, "ADMIS", "ADMISE")}</strong> — ${g(s, "Le candidat", "La candidate")} a satisfait aux exigences de la certification
             </td>
           </tr>
           <tr>
-            <td style="padding:15px;font-size:1.1em">
+            <td style="padding:15px;font-size:1.1em;color:#999">
               <strong>☐ ${g(s, "AJOURNÉ", "AJOURNÉE")}</strong> — ${g(s, "Le candidat", "La candidate")} n'a pas satisfait aux exigences
             </td>
           </tr>
           <tr>
-            <td style="padding:15px;font-size:1.1em">
-              <strong>☐ VALIDATION PARTIELLE</strong> — Blocs acquis : ________________________
+            <td style="padding:15px;font-size:1.1em;color:#999">
+              <strong>☐ VALIDATION PARTIELLE</strong> — Blocs acquis : —
             </td>
           </tr>
         </tbody>
       </table>
-      <p style="margin-top:10px"><em>Mention particulière : ________________________</em></p>` },
+      <p style="margin-top:10px"><em>Mention particulière : ${mention}</em></p>
+      <p><em>Blocs de compétences validés : ${blocsValides}</em></p>
+      <p><strong>Moyenne générale obtenue : ${moyenneGenerale}/20</strong></p>` },
     // — Section 6 : Observations du jury
     { heading: "Observations du jury", content: `
       <div style="min-height:80px;border:1px solid #ccc;padding:12px;border-radius:4px">
-        <p><em>Observations éventuelles du jury concernant ${g(s, "le candidat", "la candidate")} :</em></p>
-        <br/><br/>
+        <p>${observation}</p>
       </div>` },
     // — Section 7 : Certification sur l'honneur
     { heading: "Certification sur l'honneur", content: `
@@ -3017,16 +3062,17 @@ function genPVExamenCertification(o: OrganismeInfo, f: FormationInfo, stagiaires
       </div>
       <div class="sig-box" style="flex:1;min-width:180px">
         <p class="sig-label">Le Dirigeant</p>
-        <p>Nom : ________________________</p>
-        <p>Date : ${dateEpreuvesStr}</p>
-        <p style="margin-top:20px">Signature :</p>
-      </div>
-      <div class="sig-box" style="flex:1;min-width:180px">
-        <p class="sig-label">Le Responsable de l'organisme</p>
         <p>Nom : ${o.dirigeant}</p>
         <p>Date : ${dateEpreuvesStr}</p>
         <p style="margin-top:20px">Signature :</p>
+        ${o.signatureUrl ? `<img src="${o.signatureUrl}" alt="Signature" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : ""}
         ${o.tamponUrl ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />` : ""}
+      </div>
+      <div class="sig-box" style="flex:1;min-width:180px">
+        <p class="sig-label">Le Formateur</p>
+        <p>Nom : ${formateurNom}</p>
+        <p>Date : ${dateEpreuvesStr}</p>
+        <p style="margin-top:20px">Signature :</p>
       </div>
     </div>` });
 }
