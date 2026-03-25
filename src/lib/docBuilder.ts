@@ -245,11 +245,13 @@ export function formationInfoBlock(f: FormationInfo, stagiaires?: StagiaireInfo[
   return infoGrid(items);
 }
 
-export function signatureBlock3(org: OrganismeInfo, stagiaireNom?: string, formateurNom?: string, stagiaireSignatureUrl?: string): string {
+export function signatureBlock3(org: OrganismeInfo, stagiaireNom?: string, formateurNom?: string, stagiaireSignatureUrl?: string, formateurSignatureUrl?: string): string {
   const tamponHtml = org.tamponUrl ? `<img src="${org.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />` : "";
   const stagSigHtml = stagiaireSignatureUrl ? `<img src="${stagiaireSignatureUrl}" alt="Signature stagiaire" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : `<p style="font-style:italic;color:#999;margin-top:15px">${stagiaireNom ? `Signé par ${stagiaireNom}` : ""}</p>`;
-  // Formateur = même signature que le dirigeant
-  const formateurSigHtml = org.signatureUrl ? `<img src="${org.signatureUrl}" alt="Signature" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : "";
+  // Formateur : utiliser la signature formateur dédiée si disponible, sinon celle du dirigeant
+  const formateurSigHtml = formateurSignatureUrl
+    ? `<img src="${formateurSignatureUrl}" alt="Signature formateur" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />`
+    : org.signatureUrl ? `<img src="${org.signatureUrl}" alt="Signature" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : "";
   const responsableSigHtml = org.signatureUrl ? `<img src="${org.signatureUrl}" alt="Signature" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : "";
   return `<div class="signature-block">
     <div class="sig-box"><p class="sig-label">Le/La Stagiaire</p><p>Nom : ${stagiaireNom || "________________________"}</p><p>Date : ________________________</p><p style="margin-top:20px">Signature :</p>${stagSigHtml}</div>
@@ -258,17 +260,21 @@ export function signatureBlock3(org: OrganismeInfo, stagiaireNom?: string, forma
   </div>`;
 }
 
-export function signatureBlock2(label1: string, nom1: string, label2: string, nom2: string, signatureUrl?: string, tamponUrl?: string, stagiaireSignatureUrl?: string, dates?: string[]): string {
+export function signatureBlock2(label1: string, nom1: string, label2: string, nom2: string, signatureUrl?: string, tamponUrl?: string, stagiaireSignatureUrl?: string, dates?: string[], formateurSignatureUrl?: string): string {
   const isFormateurLabel1 = /formateur/i.test(label1);
   const isFormateurLabel2 = /formateur/i.test(label2);
-  // Si le label contient "formateur", on utilise la signature du dirigeant (signatureUrl)
-  const sig1Html = isFormateurLabel1 && signatureUrl
-    ? `<img src="${signatureUrl}" alt="Signature" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />`
+  // Si le label contient "formateur", utiliser la signature formateur dédiée si disponible, sinon celle du dirigeant
+  const formateurSigUrl = formateurSignatureUrl || signatureUrl;
+  const sig1Html = isFormateurLabel1 && formateurSigUrl
+    ? `<img src="${formateurSigUrl}" alt="Signature formateur" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />`
     : stagiaireSignatureUrl
       ? `<img src="${stagiaireSignatureUrl}" alt="Signature" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />`
       : `<p style="font-style:italic;color:#999;margin-top:15px">Signé par ${nom1}</p>`;
   const tamponHtml = tamponUrl ? `<img src="${tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />` : "";
-  const sig2Html = signatureUrl ? `<img src="${signatureUrl}" alt="Signature" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : "";
+  // Si label2 est formateur, utiliser la signature formateur
+  const sig2Html = isFormateurLabel2 && formateurSigUrl
+    ? `<img src="${formateurSigUrl}" alt="Signature formateur" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />`
+    : signatureUrl ? `<img src="${signatureUrl}" alt="Signature" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : "";
   const date1 = dates?.[0] || "________________________";
   const date2 = dates?.[1] || "________________________";
   return `<div class="signature-block-2">
@@ -308,7 +314,7 @@ export interface DocBuildConfig {
   sections?: { heading: string; content: string; variant?: "green" | "orange" }[];
   table?: { headers: string[]; rows: string[][] };
   extraHtml?: string;
-  signatures?: { type: "3" | "2"; labels?: string[]; names?: string[]; stagiaireSignatureUrl?: string; dates?: string[] };
+  signatures?: { type: "3" | "2"; labels?: string[]; names?: string[]; stagiaireSignatureUrl?: string; formateurSignatureUrl?: string; dates?: string[] };
   stagiaires?: StagiaireInfo[];
 }
 
@@ -331,8 +337,9 @@ export function buildDocument(config: DocBuildConfig): string {
     body += config.extraHtml;
   }
   if (config.signatures) {
+    const fmtSigUrl = config.signatures.formateurSignatureUrl || config.formation?.formateurSignatureUrl;
     if (config.signatures.type === "3") {
-      body += signatureBlock3(config.org, config.signatures.names?.[0], config.signatures.names?.[1], config.signatures.stagiaireSignatureUrl);
+      body += signatureBlock3(config.org, config.signatures.names?.[0], config.signatures.names?.[1], config.signatures.stagiaireSignatureUrl, fmtSigUrl);
     } else {
       body += signatureBlock2(
         config.signatures.labels?.[0] || "Partie 1",
@@ -342,7 +349,8 @@ export function buildDocument(config: DocBuildConfig): string {
         config.org.signatureUrl,
         config.org.tamponUrl,
         config.signatures.stagiaireSignatureUrl,
-        config.signatures.dates
+        config.signatures.dates,
+        fmtSigUrl
       );
     }
   }
