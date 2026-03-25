@@ -2915,9 +2915,8 @@ function genPVExamenCertification(o: OrganismeInfo, f: FormationInfo, stagiaires
   const qcmResult = computeQCMScore(questions, answers);
   const qcmNote = Math.round((qcmResult.score / qcmResult.total) * 20 * 10) / 10;
 
-  // Formateur info
-  const formateur = SAMPLE_FORMATEURS[0];
-  const formateurNom = `${formateur.prenom} ${formateur.nom}`;
+  // Formateur info — use formation's formateur field, not sample data
+  const formateurNom = f.formateur || SAMPLE_FORMATEURS[0]?.nom || "___";
 
   // Observations personnalisées par stagiaire
   const observationsPool = [
