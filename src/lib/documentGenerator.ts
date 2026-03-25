@@ -4381,7 +4381,7 @@ function genTrameEvalBesoins(o: OrganismeInfo, f: FormationInfo, stagiaires: Sta
 <p><strong>2. Quel objectif professionnel ou personnel souhaitez-vous atteindre grâce à cette formation ?</strong></p>
 <table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${answers.objectif}</td></tr></table>
 
-<p><strong>3. Quel budget avez-vous prévu pour cette formation et bénéficiez-vous d'un dispositif de financement (CPF, OPCO, Pôle emploi, etc.) ?</strong></p>
+<p><strong>3. Quel budget avez-vous prévu pour cette formation et bénéficiez-vous d'un dispositif de financement (CPF, OPCO, Pôle emploi, financement personnel) ?</strong></p>
 <table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${answers.budget}</td></tr></table>
 
 <p><strong>4. En quoi pensez-vous que cette formation contribuera à la réalisation de votre projet professionnel ou personnel ?</strong></p>
@@ -4435,7 +4435,7 @@ function genTrameEvalBesoinsStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
 <p><strong>2. Quel objectif professionnel ou personnel souhaitez-vous atteindre grâce à cette formation ?</strong></p>
 <table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${answers.objectif}</td></tr></table>
 
-<p><strong>3. Quel budget avez-vous prévu pour cette formation et bénéficiez-vous d'un dispositif de financement (CPF, OPCO, Pôle emploi, etc.) ?</strong></p>
+<p><strong>3. Quel budget avez-vous prévu pour cette formation et bénéficiez-vous d'un dispositif de financement (CPF, OPCO, Pôle emploi, financement personnel) ?</strong></p>
 <table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${answers.budget}</td></tr></table>
 
 <p><strong>4. En quoi pensez-vous que cette formation contribuera à la réalisation de votre projet professionnel ou personnel ?</strong></p>
