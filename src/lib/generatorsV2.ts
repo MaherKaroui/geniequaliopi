@@ -933,8 +933,8 @@ export function genGrilleAcquisitionStagiaire(o: OrganismeInfo, f: FormationInfo
 
 export function genAttestationReussiteStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], stagiaireIdx: number) {
   const s = stagiaires[stagiaireIdx] || stagiaires[0];
-  const days = getFormationDays(f);
-  const dureeHeures = parseInt(f.duree) || (days.length * 7);
+  const stagDuree = getStagiaireDuree(s, f);
+  const dureeHeures = parseInt(stagDuree) || (getFormationDays(f).length * 7);
   const tauxRealisation = 100; // Default to 100%
 
   let extra = `
@@ -945,7 +945,7 @@ export function genAttestationReussiteStagiaire(o: OrganismeInfo, f: FormationIn
       ${s.email ? `<p><strong>Email :</strong> ${s.email}</p>` : ''}
       <p style="margin-top:15px">a réussi avec succès la formation suivante :</p>
       <p style="font-size:16px;font-weight:700">${f.intitule}</p>
-      <p><strong>Durée de la formation :</strong> ${dureeHeures} heures de formation ${modaliteTexte(f)}</p>
+      <p><strong>Durée de la formation :</strong> ${stagDuree} de formation ${modaliteTexte(f)}</p>
       <p><strong>Date de début :</strong> ${formatDate(getStagiaireDateDebut(s, f))}</p>
       <p><strong>Date de fin :</strong> ${formatDate(getStagiaireDateFin(s, f))}</p>
       <p style="margin-top:15px">Cette formation a été dispensée conformément aux normes de qualité et aux exigences pédagogiques de ${o.nom}. L'apprenant(e) a démontré un haut niveau d'engagement, de compétence et de participation active tout au long du programme.</p>
