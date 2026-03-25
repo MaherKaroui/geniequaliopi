@@ -1326,19 +1326,39 @@ function genEmargementStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: 
   return buildDocument({ org: o, title: "FEUILLE D'ÉMARGEMENT", subtitle: `${f.intitule} – ${stagName}`, extraHtml: extra });
 }
 
+function getStagiaireDays(s: StagiaireInfo, f: FormationInfo): string[] {
+  const debut = getStagiaireDateDebut(s, f);
+  const fin = getStagiaireDateFin(s, f);
+  if (!debut || !fin) return getFormationDays(f);
+  const start = new Date(debut);
+  const end = new Date(fin);
+  const days: string[] = [];
+  const current = new Date(start);
+  while (current <= end) {
+    if (current.getDay() !== 0 && current.getDay() !== 6) {
+      days.push(current.toLocaleDateString("fr-FR", { weekday: "long", year: "numeric", month: "long", day: "numeric" }));
+    }
+    current.setDate(current.getDate() + 1);
+  }
+  return days.length > 0 ? days : getFormationDays(f);
+}
+
 function genRapportConnexion(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
-  const days = getFormationDays(f);
   const ct = getConnectionTimes(f);
-  const rows: string[][] = [];
-  stagiaires.slice(0, 10).forEach(s => {
-    days.slice(0, 5).forEach((day, di) => {
-      rows.push([s.prenom + " " + s.nom, day, ct[di * 2 % ct.length].heureConnexion, ct[di * 2 % ct.length].heureDeconnexion, ct[di * 2 % ct.length].duree]);
-      rows.push([s.prenom + " " + s.nom, '', ct[(di * 2 + 1) % ct.length].heureConnexion, ct[(di * 2 + 1) % ct.length].heureDeconnexion, ct[(di * 2 + 1) % ct.length].duree]);
+  let extra = '';
+  stagiaires.slice(0, 10).forEach((s, si) => {
+    const days = getStagiaireDays(s, f);
+    if (si > 0) extra += '<div class="page-break"></div>';
+    extra += `<h3>📋 ${s.prenom} ${s.nom}</h3>`;
+    extra += `<p><strong>Période :</strong> ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}</p>`;
+    const rows: string[][] = [];
+    days.forEach((day, di) => {
+      rows.push([day, ct[di * 2 % ct.length].heureConnexion, ct[di * 2 % ct.length].heureDeconnexion, ct[di * 2 % ct.length].duree]);
+      rows.push(['', ct[(di * 2 + 1) % ct.length].heureConnexion, ct[(di * 2 + 1) % ct.length].heureDeconnexion, ct[(di * 2 + 1) % ct.length].duree]);
     });
+    extra += tableHTML(["Date", "Heure connexion", "Heure déconnexion", "Durée"], rows);
   });
-  return buildDocument({ org: o, title: "RAPPORT DE CONNEXION LMS", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, table: {
-    headers: ["Stagiaire", "Date", "Heure connexion", "Heure déconnexion", "Durée"], rows: rows.slice(0, 60)
-  } });
+  return buildDocument({ org: o, title: "RAPPORT DE CONNEXION LMS", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra });
 }
 
 function genTempsConnexion(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
