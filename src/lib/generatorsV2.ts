@@ -946,8 +946,8 @@ export function genAttestationReussiteStagiaire(o: OrganismeInfo, f: FormationIn
       <p style="margin-top:15px">a réussi avec succès la formation suivante :</p>
       <p style="font-size:16px;font-weight:700">${f.intitule}</p>
       <p><strong>Durée de la formation :</strong> ${dureeHeures} heures de formation ${modaliteTexte(f)}</p>
-      <p><strong>Date de début :</strong> ${formatDate(f.dateDebut)}</p>
-      <p><strong>Date de fin :</strong> ${formatDate(f.dateFin)}</p>
+      <p><strong>Date de début :</strong> ${formatDate(getStagiaireDateDebut(s, f))}</p>
+      <p><strong>Date de fin :</strong> ${formatDate(getStagiaireDateFin(s, f))}</p>
       <p style="margin-top:15px">Cette formation a été dispensée conformément aux normes de qualité et aux exigences pédagogiques de ${o.nom}. L'apprenant(e) a démontré un haut niveau d'engagement, de compétence et de participation active tout au long du programme.</p>
       <h3>Assiduité du stagiaire</h3>
       <p>Durée effective suivie par le/la stagiaire : ${dureeHeures} heures, soit un taux de réalisation de ${tauxRealisation.toFixed(2)} %.</p>
