@@ -1452,7 +1452,7 @@ function genEvalPositionnement(o: OrganismeInfo, f: FormationInfo, stagiaires: S
     const avg = Math.round(sc.reduce((a, b) => a + b, 0) / sc.length * 10) / 10;
     extra += `<div class="section section-green"><p><strong>Note globale : ${avg}/10</strong></p><p><strong>Appréciation globale du formateur :</strong> ${evalData.appreciations[si] || "Niveau satisfaisant pour suivre la formation."}</p></div>`;
   });
-  return buildDocument({ org: o, title: "ÉVALUATION DE POSITIONNEMENT – RÉSULTATS DÉTAILLÉS", subtitle: f.intitule, formation: f, showFormationInfo: true, extraHtml: extra,
+  return buildDocument({ org: o, title: "ÉVALUATION DE POSITIONNEMENT – RÉSULTATS DÉTAILLÉS", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra,
     signatures: { type: "2", labels: ["Le Formateur", "Le Resp. Pédagogique"], names: [f.formateur, o.responsablePedagogique] } });
 }
 
