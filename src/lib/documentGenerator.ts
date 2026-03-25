@@ -456,7 +456,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
       return genBilanChaudStagiaire(o, f, stagiaires, si);
     }
     case "compte_rendu_formateur": return genCompteRenduFormateur(o, f);
-    case "bilan_fin_formation_formateur": return genBilanFinFormationFormateur(o, f, stagiaires);
+    case "bilan_fin_formation_formateur": return genBilanFinFormationFormateur(o, f, stagiaires, params?.formateurNom);
     case "tableau_relance_appreciations": return genTableauRelanceAppreciations(o);
     case "procedure_formation_fc": return genProcedureFormationFC(o);
     case "dossier_inscription": return genDossierInscription(o, f, stagiaires);
@@ -8024,21 +8024,21 @@ function genAttestationReussiteCFAStagiaire(o: OrganismeInfo, f: FormationInfo, 
   return buildDocument({ org: o, title: "ATTESTATION DE RÉUSSITE", subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra });
 }
 
-function genBilanFinFormationFormateur(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
+function genBilanFinFormationFormateur(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], formateurNomParam?: string) {
   const { totalHours, days: nbJours } = parseDuree(f.duree);
-  const formateurs = [...new Set(stagiaires.map(s => s.formateur).filter(Boolean))];
-  const formateurNom = formateurs[0] || f.formateur || "Le formateur";
+  const formateurNom = formateurNomParam || f.formateur || "Le formateur";
+  const stagiairesFormateur = stagiaires.filter(s => s.formateur === formateurNom);
+  const nbStagiairesFormateur = stagiairesFormateur.length || stagiaires.length;
 
   // Find the matching stagiaire for signature
-  const matchingStagiaire = stagiaires.find(s => s.formateur === formateurNom);
+  const matchingStagiaire = stagiairesFormateur[0] || stagiaires.find(s => s.formateur === formateurNom);
   const fmtSigUrl = matchingStagiaire?.formateurSignatureUrl || f.formateurSignatureUrl;
   const fmtSigHtml = fmtSigUrl
     ? `<img src="${fmtSigUrl}" alt="Signature formateur" style="max-height:60px;margin-top:4px;" />`
     : "";
 
-  const nbStagiaires = stagiaires.length;
-  const tauxReussite = Math.min(100, Math.round(80 + (nbStagiaires * 3)));
-  const tauxPresence = Math.min(100, Math.round(90 + (nbStagiaires * 2)));
+  const tauxReussite = Math.min(100, Math.round(80 + (nbStagiairesFormateur * 3)));
+  const tauxPresence = Math.min(100, Math.round(90 + (nbStagiairesFormateur * 2)));
 
   let extra = `
 <table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%">
@@ -8047,7 +8047,7 @@ function genBilanFinFormationFormateur(o: OrganismeInfo, f: FormationInfo, stagi
 <tr><td><strong>Dates</strong></td><td>Du ${formatDate(f.dateDebut)} au ${formatDate(matchingStagiaire?.dateFinFormation || f.dateFin)}</td></tr>
 <tr><td><strong>Durée</strong></td><td>${totalHours} heures (${nbJours} jours)</td></tr>
 <tr><td><strong>Lieu</strong></td><td>${f.lieu || "Présentiel"}</td></tr>
-<tr><td><strong>Nombre de stagiaires</strong></td><td>${nbStagiaires}</td></tr>
+<tr><td><strong>Nombre de stagiaires</strong></td><td>${nbStagiairesFormateur}</td></tr>
 </table>
 
 <h3>1. Déroulement général de la formation</h3>
