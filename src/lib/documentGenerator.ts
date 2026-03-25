@@ -475,6 +475,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "charte_qualite_formateur_externe": return genCharteQualiteFormateurExterne(o);
     case "plan_dev_competences_excel": return genPlanDevCompetencesExcel(o, f, formateurs, stagiaires);
     case "grille_entretien_annuel": return genGrilleEntretienAnnuel(o, fmt);
+    case "fiche_entretien_annuel_formateur": return genFicheEntretienAnnuelFormateur(o, f, fmt);
     case "enquete_satisfaction_formateur": return genEnqueteSatisfactionFormateur(o, f);
     // === Nouveaux templates CFA ===
     case "attestation_inscription_cfa": return genAttestationInscriptionCFAV2(o, f, stagiaires, params?.stagiaireIdx ?? 0);
