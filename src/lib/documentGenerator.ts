@@ -1342,9 +1342,10 @@ function genRapportConnexion(o: OrganismeInfo, f: FormationInfo, stagiaires: Sta
 }
 
 function genTempsConnexion(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
-  const { totalHours } = parseDuree(f.duree);
   const rows = stagiaires.slice(0, 10).map((s) => {
-    return [s.prenom + " " + s.nom, `${totalHours}h`, f.duree, `100%`, "✅ Validé"];
+    const stagDuree = getStagiaireDuree(s, f);
+    const totalH = parseInt(stagDuree) || (getFormationDays(f).length * 7);
+    return [s.prenom + " " + s.nom, `${totalH}h`, stagDuree, `100%`, "✅ Validé"];
   });
   return buildDocument({ org: o, title: "TEMPS DE CONNEXION PAR STAGIAIRE", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, table: {
     headers: ["Stagiaire", "Temps total", "Durée formation", "Taux présence", "Statut"], rows
