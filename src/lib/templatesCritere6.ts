@@ -655,7 +655,7 @@ export function genContratSousTraitanceV2(o: OrganismeInfo, f: FormationInfo, st
         <li>Préparation aux certifications (le cas échéant)</li>
       </ul>
     ` },
-    { heading: "ARTICLE 3 – STATUT DES FORMATEURS", content: `
+    { heading: "ARTICLE 3 – STATUT DU SOUS-TRAITANT", content: isVictorAcademy ? `
       <p>Les formateurs mis à disposition par le Sous-traitant pour assurer les prestations objet du présent contrat sont <strong>exclusivement des salariés du Sous-traitant</strong>.</p>
       <p>Le Sous-traitant assume seul la qualité d'employeur vis-à-vis de ses formateurs. Il est seul responsable :</p>
       <ul>
@@ -665,6 +665,15 @@ export function genContratSousTraitanceV2(o: OrganismeInfo, f: FormationInfo, st
         <li>De leur formation continue et du maintien de leurs compétences</li>
       </ul>
       <p><strong>Aucun lien de subordination</strong> n'existe ni ne saurait exister entre le Donneur d'ordre et les formateurs salariés du Sous-traitant. Le Donneur d'ordre ne peut en aucun cas donner des directives aux formateurs sur l'organisation de leur travail, ni exercer un pouvoir disciplinaire à leur égard.</p>
+    ` : `
+      <p>Le Sous-traitant, <strong>${formateurNom}</strong>, intervient en qualité de <strong>personne physique – formateur indépendant</strong>.</p>
+      <p>Le Sous-traitant exerce son activité de manière indépendante et est seul responsable :</p>
+      <ul>
+        <li>De ses obligations fiscales et sociales</li>
+        <li>De sa couverture sociale et de son assurance professionnelle</li>
+        <li>Du maintien et du développement de ses compétences</li>
+      </ul>
+      <p><strong>Aucun lien de subordination</strong> n'existe ni ne saurait exister entre le Donneur d'ordre et le Sous-traitant. Le Donneur d'ordre ne peut en aucun cas donner des directives au Sous-traitant sur l'organisation de son travail, ni exercer un pouvoir disciplinaire à son égard.</p>
     `, variant: "green" },
     { heading: "ARTICLE 4 – OBLIGATIONS DU SOUS-TRAITANT", content: `
       <p>Le Sous-traitant s'engage à :</p>
