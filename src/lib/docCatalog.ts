@@ -126,8 +126,17 @@ export function buildFullCatalog(
       const moda = (f.modalites || '').toLowerCase();
       const distanciel = moda.includes('distanciel') || moda.includes('e-learning') || moda.includes('foad');
       const presentiel = !distanciel || moda.includes('mixte');
+      // Check if stagiaires have individual dates
+      const hasIndivDates = stagiaires.some(s => s.dateDebutFormation || s.dateFinFormation);
       if (presentiel) {
-        add(`af_c3i11_emargement_${fi}`, `CT3 - IND 11 FEUILLE D'ÉMARGEMENT`, 3, 11, "emargement_jour", { fi });
+        if (hasIndivDates) {
+          // One emargement per stagiaire with their individual dates
+          stagiaires.forEach((s, si) => {
+            add(`af_c3i11_emargement_${fi}_${si}`, `CT3 - IND 11 FEUILLE D'ÉMARGEMENT – ${s.prenom} ${s.nom}`, 3, 11, "emargement_stagiaire", { fi, stagiaireIdx: si });
+          });
+        } else {
+          add(`af_c3i11_emargement_${fi}`, `CT3 - IND 11 FEUILLE D'ÉMARGEMENT`, 3, 11, "emargement_jour", { fi });
+        }
       }
       if (distanciel || moda.includes('mixte')) {
         add(`af_c3i11_temps_connexion_${fi}`, `CT3 - IND 11 TEMPS DE CONNEXION RÉEL`, 3, 11, "temps_connexion_reel", { fi });

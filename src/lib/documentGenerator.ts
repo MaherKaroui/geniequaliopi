@@ -132,6 +132,10 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     }
     case "convention_formation": return genConvention(o, f, stagiaires);
     case "emargement_jour": return genEmargementJour_V2(o, f, stagiaires, params?.jour ?? 0, params?.jourLabel ?? "");
+    case "emargement_stagiaire": {
+      const si = params?.stagiaireIdx ?? 0;
+      return genEmargementStagiaire(o, f, stagiaires, si);
+    }
     case "rapport_connexion": return genRapportConnexion(o, f, stagiaires);
     case "temps_connexion": return genTempsConnexion(o, f, stagiaires);
     case "temps_connexion_reel": return genTempsConnexionReel(o, f, stagiaires);
@@ -626,7 +630,7 @@ function genQuestionnairePositionnement(o: OrganismeInfo, f: FormationInfo, stag
     extra += `<div class="section section-green"><p><strong>Appréciation du formateur :</strong> ${evalData.appreciations[si] || "Niveau satisfaisant."}</p></div>`;
   });
 
-  return buildDocument({ org: o, title: "QUESTIONNAIRE DE POSITIONNEMENT – RÉSULTATS DÉTAILLÉS", subtitle: f.intitule, formation: f, showFormationInfo: true, extraHtml: extra,
+  return buildDocument({ org: o, title: "QUESTIONNAIRE DE POSITIONNEMENT – RÉSULTATS DÉTAILLÉS", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra,
     signatures: { type: "2", labels: ["Le Formateur", "Le Resp. Pédagogique"], names: [f.formateur, o.responsablePedagogique] } });
 }
 
@@ -698,7 +702,7 @@ function genAnalyseBesoins(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
       + `• Travail spécifique sur la phonétique et l'intonation pour la communication téléphonique</p>`
     : `<p>• Ajustement du rythme pédagogique<br>• Ajout d'exercices pratiques supplémentaires<br>• Mise à disposition de ressources complémentaires en ligne<br>• Aménagement d'horaires pour 2 stagiaires</p>`;
 
-  return buildDocument({ org: o, title: "ANALYSE DES BESOINS", subtitle: f.intitule, formation: f, showFormationInfo: true, sections: [
+  return buildDocument({ org: o, title: "ANALYSE DES BESOINS", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, sections: [
     { heading: "Contexte et besoins identifiés", content: besoinsContent },
     { heading: "Adaptations mises en place", content: adaptationsContent, variant: "green" },
   ] });
@@ -1289,6 +1293,39 @@ function genEmargementJour(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
   }, signatures: { type: "2", labels: ["Le Formateur", "Le Responsable"], names: [f.formateur, o.dirigeant] } });
 }
 
+function genEmargementStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], stagiaireIdx: number) {
+  const s = stagiaires[stagiaireIdx] || stagiaires[0];
+  const dateDebut = s.dateDebutFormation || f.dateDebut || "";
+  const dateFin = s.dateFinFormation || f.dateFin || "";
+  let days: string[] = [];
+  if (dateDebut && dateFin) {
+    const start = new Date(dateDebut + "T00:00:00");
+    const end = new Date(dateFin + "T00:00:00");
+    const current = new Date(start);
+    while (current <= end) {
+      if (current.getDay() !== 0 && current.getDay() !== 6) {
+        days.push(current.toLocaleDateString("fr-FR", { weekday: "long", year: "numeric", month: "long", day: "numeric" }));
+      }
+      current.setDate(current.getDate() + 1);
+    }
+  }
+  if (days.length === 0) days = getFormationDays(f);
+  const stagName = `${s.civilite ? s.civilite + " " : ""}${s.prenom} ${s.nom.toUpperCase()}`;
+  const stagSigHtml = s.signatureUrl ? `<br><img src="${s.signatureUrl}" alt="Sig" style="max-height:40px;max-width:90px;object-fit:contain;margin-top:4px" />` : `<br><span style="font-style:italic;color:#999;font-size:10px">Signé ${s.prenom[0]}.${s.nom}</span>`;
+  const formateurSigHtml = o.signatureUrl ? `<br><img src="${o.signatureUrl}" alt="Sig" style="max-height:40px;max-width:90px;object-fit:contain;margin-top:4px" />` : '';
+  let extra = `<p><strong>Stagiaire :</strong> ${stagName}</p>`;
+  extra += `<p><strong>Session :</strong> Du ${formatDate(dateDebut)} au ${formatDate(dateFin)}</p>`;
+  extra += `<p><strong>Formateur :</strong> ${f.formateur}</p>`;
+  days.forEach((day, di) => {
+    if (di > 0 && di % 5 === 0) extra += '<div class="page-break"></div>';
+    let tableRows = '';
+    tableRows += `<tr style="background:#fff;border-bottom:1px solid #ddd"><td>${day}</td><td>Matin</td><td style="padding:10px 6px">${stagName}${stagSigHtml}</td><td style="padding:10px 6px">${f.formateur}${formateurSigHtml}</td></tr>`;
+    tableRows += `<tr style="background:#fff;border-bottom:1px solid #ccc"><td></td><td>Après-midi</td><td style="padding:10px 6px">${stagName}${stagSigHtml}</td><td style="padding:10px 6px">${f.formateur}${formateurSigHtml}</td></tr>`;
+    extra += `<table><tr><th>Date</th><th>Horaires</th><th>Signature du Stagiaire</th><th>Signature du Formateur</th></tr>${tableRows}</table>`;
+  });
+  return buildDocument({ org: o, title: "FEUILLE D'ÉMARGEMENT", subtitle: `${f.intitule} – ${stagName}`, extraHtml: extra });
+}
+
 function genRapportConnexion(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const days = getFormationDays(f);
   const ct = getConnectionTimes(f);
@@ -1415,7 +1452,7 @@ function genEvalPositionnement(o: OrganismeInfo, f: FormationInfo, stagiaires: S
     const avg = Math.round(sc.reduce((a, b) => a + b, 0) / sc.length * 10) / 10;
     extra += `<div class="section section-green"><p><strong>Note globale : ${avg}/10</strong></p><p><strong>Appréciation globale du formateur :</strong> ${evalData.appreciations[si] || "Niveau satisfaisant pour suivre la formation."}</p></div>`;
   });
-  return buildDocument({ org: o, title: "ÉVALUATION DE POSITIONNEMENT – RÉSULTATS DÉTAILLÉS", subtitle: f.intitule, formation: f, showFormationInfo: true, extraHtml: extra,
+  return buildDocument({ org: o, title: "ÉVALUATION DE POSITIONNEMENT – RÉSULTATS DÉTAILLÉS", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra,
     signatures: { type: "2", labels: ["Le Formateur", "Le Resp. Pédagogique"], names: [f.formateur, o.responsablePedagogique] } });
 }
 
@@ -1444,7 +1481,7 @@ function genEvalIntermediaire(o: OrganismeInfo, f: FormationInfo, stagiaires: St
     extra += `<div class="section"><p><strong>Moyenne intermédiaire : ${avg}/10</strong> – ${progression}</p><p><strong>Appréciation du formateur :</strong> ${evalData.appreciations[i] || "Progression satisfaisante."}</p><p><strong>Axes d'amélioration identifiés :</strong> ${avg < 8 ? "Renforcer la pratique sur les compétences les moins maîtrisées. Proposer des exercices complémentaires." : "Maintenir le niveau. Proposer des cas avancés pour approfondir."}</p></div>`;
   });
 
-  return buildDocument({ org: o, title: "ÉVALUATION INTERMÉDIAIRE – RÉSULTATS DÉTAILLÉS", subtitle: f.intitule, formation: f, showFormationInfo: true, extraHtml: extra,
+  return buildDocument({ org: o, title: "ÉVALUATION INTERMÉDIAIRE – RÉSULTATS DÉTAILLÉS", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra,
     signatures: { type: "2", labels: ["Le Formateur", "Date"], names: [f.formateur, ""] } });
 }
 
@@ -1490,7 +1527,7 @@ function genEvalFinale(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiaire
     <p><strong>Appréciation générale du formateur :</strong> Groupe de bon niveau, très impliqué. Les objectifs pédagogiques sont globalement atteints. ${tauxReussite === 100 ? "Tous les stagiaires ont validé la formation." : "Quelques stagiaires nécessitent un suivi complémentaire."}</p>
   </div>`;
 
-  return buildDocument({ org: o, title: "ÉVALUATION FINALE – RÉSULTATS DÉTAILLÉS", subtitle: f.intitule, formation: f, showFormationInfo: true, extraHtml: extra,
+  return buildDocument({ org: o, title: "ÉVALUATION FINALE – RÉSULTATS DÉTAILLÉS", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra,
     signatures: { type: "3", names: ["", f.formateur] } });
 }
 
