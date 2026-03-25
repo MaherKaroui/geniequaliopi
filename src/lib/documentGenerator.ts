@@ -3221,7 +3221,7 @@ function genAnalyseParcoursPro(o: OrganismeInfo, f: FormationInfo, stagiaires: S
 }
 
 function genPlanActionBilan(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
-  const s = stagiaires[0] || { prenom: "Martin", nom: "Dupont", civilite: "" as const, email: "", telephone: "", entreprise: "", poste: "", dateNaissance: "" } as StagiaireInfo;
+  const s = stagiaires[0] || FALLBACK_STAGIAIRE;
   return buildDocument({ org: o, title: "PLAN D'ACTION PROFESSIONNEL", subtitle: `${s.prenom} ${s.nom}`, sections: [
     { heading: "Projet retenu", content: "<p><strong>Projet principal :</strong> Évolution vers un poste de Responsable Administratif et Financier<br><strong>Projet alternatif :</strong> Création d'un cabinet de conseil en gestion</p>" },
     { heading: "Actions à court terme (0-3 mois)", content: "<p>1. Formation en management d'équipe (28h)<br>2. Mise à jour du CV et profil LinkedIn<br>3. Prise de contact avec le réseau professionnel</p>" },
@@ -3231,7 +3231,7 @@ function genPlanActionBilan(o: OrganismeInfo, f: FormationInfo, stagiaires: Stag
 }
 
 function genSyntheseBilan(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
-  const s = stagiaires[0] || { prenom: "Martin", nom: "Dupont", civilite: "" as const, email: "", telephone: "", entreprise: "", poste: "", dateNaissance: "" } as StagiaireInfo;
+  const s = stagiaires[0] || FALLBACK_STAGIAIRE;
   return buildDocument({ org: o, title: "SYNTHÈSE DU BILAN DE COMPÉTENCES", subtitle: `${s.prenom} ${s.nom}`, sections: [
     { heading: "Contexte", content: `<p>Bilan réalisé du ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)} – ${f.duree}<br>Conseiller : ${o.responsablePedagogique}</p>` },
     { heading: "Compétences clés identifiées", content: "<p>• Expertise comptable et financière (niveau expert)<br>• Management : potentiel identifié, formation nécessaire<br>• Communication : bon niveau, à renforcer en anglais<br>• Digital : niveau intermédiaire, formation recommandée</p>" },
@@ -3253,7 +3253,7 @@ function genLivretRecevabilite(o: OrganismeInfo, f: FormationInfo, stagiaires: S
 }
 
 function genDossierValidation(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
-  const s = stagiaires[0] || { prenom: "Martin", nom: "Dupont", civilite: "" as const, email: "", telephone: "", entreprise: "", poste: "", dateNaissance: "" } as StagiaireInfo;
+  const s = stagiaires[0] || FALLBACK_STAGIAIRE;
   return buildDocument({ org: o, title: "DOSSIER DE VALIDATION – VAE", subtitle: `${s.prenom} ${s.nom} – ${f.intitule}`, sections: [
     { heading: "Présentation du candidat", content: `<p>${s.prenom} ${s.nom} présente son dossier de validation pour la certification « ${f.intitule} ». Ce dossier détaille les activités professionnelles réalisées en lien avec chaque bloc de compétences du référentiel.</p>` },
     { heading: "Bloc 1 – Compétences fondamentales", content: "<p><strong>Activité décrite :</strong> Gestion complète de la comptabilité d'une PME de 50 salariés.<br><strong>Preuves :</strong> Bilans, grand livre, déclarations fiscales<br><strong>Évaluation :</strong> ✅ Validé</p>", variant: "green" },
@@ -3264,7 +3264,7 @@ function genDossierValidation(o: OrganismeInfo, f: FormationInfo, stagiaires: St
 }
 
 function genAccompagnementVAE(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
-  const s = stagiaires[0] || { prenom: "Martin", nom: "Dupont", civilite: "" as const, email: "", telephone: "", entreprise: "", poste: "", dateNaissance: "" } as StagiaireInfo;
+  const s = stagiaires[0] || FALLBACK_STAGIAIRE;
   return buildDocument({ org: o, title: "SUIVI D'ACCOMPAGNEMENT VAE", subtitle: `${s.prenom} ${s.nom}`, table: {
     headers: ["Séance", "Date", "Thème", "Durée", "Avancement"],
     rows: [
@@ -3345,7 +3345,7 @@ function genVAEEntretienFaisabilite(o: OrganismeInfo, f: FormationInfo) {
 }
 
 function genVAEDiagnosticFaisabilite(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
-  const s = stagiaires[si] || stagiaires[0] || { prenom: "Martin", nom: "Dupont", poste: "Salarié", entreprise: "Entreprise", civilite: "" as const, email: "", telephone: "", dateNaissance: "" } as StagiaireInfo;
+  const s = stagiaires[si] || stagiaires[0] || FALLBACK_STAGIAIRE;
   return buildDocument({ org: o, title: "DIAGNOSTIC DE FAISABILITÉ VAE", subtitle: `${s.prenom} ${s.nom}`, sections: [
     { heading: "Candidat", content: `<p><strong>Nom :</strong> ${s.prenom} ${s.nom}<br><strong>Poste actuel :</strong> ${s.poste || "Non renseigné"}<br><strong>Entreprise :</strong> ${s.entreprise || "Non renseignée"}<br><strong>Certification visée :</strong> ${f.intitule}</p>` },
     { heading: "Expérience en lien avec la certification", content: `<p><strong>Durée d'expérience totale :</strong> 8 ans<br><strong>Durée en lien direct :</strong> 6 ans<br><br><strong>Activités principales identifiées :</strong><br>• Gestion opérationnelle du domaine visé<br>• Encadrement et coordination d'équipe<br>• Mise en place de procédures qualité<br>• Reporting et analyse de performance<br>• Formation et accompagnement de collaborateurs</p>` },
@@ -3384,7 +3384,7 @@ function genVAEProgrammeAccompagnement(o: OrganismeInfo, f: FormationInfo) {
 }
 
 function genVAEPositionnementInitial(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
-  const s = stagiaires[si] || stagiaires[0] || { prenom: "Martin", nom: "Dupont", civilite: "" as const, email: "", telephone: "", entreprise: "", poste: "", dateNaissance: "" } as StagiaireInfo;
+  const s = stagiaires[si] || stagiaires[0] || FALLBACK_STAGIAIRE;
   return buildDocument({ org: o, title: "POSITIONNEMENT INITIAL VAE", subtitle: `${s.prenom} ${s.nom} – ${f.intitule}`, table: {
     headers: ["Compétence du référentiel", "Niveau actuel", "Preuves disponibles", "Observations"],
     rows: [
@@ -3410,7 +3410,7 @@ function genVAELivretAccueil(o: OrganismeInfo, f: FormationInfo) {
 }
 
 function genVAEConventionAccompagnement(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
-  const s = stagiaires[si] || stagiaires[0] || { prenom: "Martin", nom: "Dupont", email: "", telephone: "", civilite: "" as const, entreprise: "", poste: "", dateNaissance: "" } as StagiaireInfo;
+  const s = stagiaires[si] || stagiaires[0] || FALLBACK_STAGIAIRE;
   const dateDebut = getStagiaireDateDebut(s, { ...f });
   const dateFin = getStagiaireDateFin(s, { ...f });
   return buildDocument({ org: o, title: "CONVENTION D'ACCOMPAGNEMENT VAE", sections: [
@@ -3434,7 +3434,7 @@ function genVAEReglementInterieur(o: OrganismeInfo) {
 }
 
 function genVAEFicheSuiviIndividuel(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
-  const s = stagiaires[si] || stagiaires[0] || { prenom: "Martin", nom: "Dupont", civilite: "" as const, email: "", telephone: "", entreprise: "", poste: "", dateNaissance: "" } as StagiaireInfo;
+  const s = stagiaires[si] || stagiaires[0] || FALLBACK_STAGIAIRE;
   const dateDebut = getStagiaireDateDebut(s, f);
   return buildDocument({ org: o, title: "FICHE DE SUIVI INDIVIDUEL VAE", subtitle: `${s.prenom} ${s.nom}`, table: {
     headers: ["Séance", "Date", "Objectifs travaillés", "Réalisations", "Travail à faire", "Observations"],
@@ -3456,7 +3456,7 @@ function genVAEFicheSuiviIndividuel(o: OrganismeInfo, f: FormationInfo, stagiair
 }
 
 function genVAEGrilleEvaluationDossier(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
-  const s = stagiaires[si] || stagiaires[0] || { prenom: "Martin", nom: "Dupont", civilite: "" as const, email: "", telephone: "", entreprise: "", poste: "", dateNaissance: "" } as StagiaireInfo;
+  const s = stagiaires[si] || stagiaires[0] || FALLBACK_STAGIAIRE;
   return buildDocument({ org: o, title: "GRILLE D'ÉVALUATION DU DOSSIER VAE", subtitle: `${s.prenom} ${s.nom} – ${f.intitule}`, table: {
     headers: ["Critère d'évaluation", "Note /5", "Observations"],
     rows: [
@@ -3474,7 +3474,7 @@ function genVAEGrilleEvaluationDossier(o: OrganismeInfo, f: FormationInfo, stagi
 }
 
 function genVAEEmargement(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
-  const s = stagiaires[si] || stagiaires[0] || { prenom: "Martin", nom: "Dupont", civilite: "" as const, email: "", telephone: "", entreprise: "", poste: "", dateNaissance: "" } as StagiaireInfo;
+  const s = stagiaires[si] || stagiaires[0] || FALLBACK_STAGIAIRE;
   const dateDebut = getStagiaireDateDebut(s, f);
   const rows: string[][] = [];
   for (let i = 0; i < 10; i++) {
@@ -3502,7 +3502,7 @@ function genVAEProcedureAbandon(o: OrganismeInfo) {
 }
 
 function genVAEAttestationAssiduite(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
-  const s = stagiaires[si] || stagiaires[0] || { prenom: "Martin", nom: "Dupont", civilite: "" as const, email: "", telephone: "", entreprise: "", poste: "", dateNaissance: "" } as StagiaireInfo;
+  const s = stagiaires[si] || stagiaires[0] || FALLBACK_STAGIAIRE;
   const dateDebut = getStagiaireDateDebut(s, f);
   const dateFin = getStagiaireDateFin(s, f);
   return buildDocument({ org: o, title: "ATTESTATION D'ASSIDUITÉ – ACCOMPAGNEMENT VAE", sections: [
@@ -3520,7 +3520,7 @@ function genVAEProcedureJury(o: OrganismeInfo, f: FormationInfo) {
 }
 
 function genVAEConvocationJury(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
-  const s = stagiaires[si] || stagiaires[0] || { prenom: "Martin", nom: "Dupont", civilite: "" as const, email: "", telephone: "", entreprise: "", poste: "", dateNaissance: "" } as StagiaireInfo;
+  const s = stagiaires[si] || stagiaires[0] || FALLBACK_STAGIAIRE;
   const dateFin = getStagiaireDateFin(s, f);
   const dateJury = new Date(dateFin);
   dateJury.setDate(dateJury.getDate() + 30);
@@ -3531,7 +3531,7 @@ function genVAEConvocationJury(o: OrganismeInfo, f: FormationInfo, stagiaires: S
 }
 
 function genVAEPVJury(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
-  const s = stagiaires[si] || stagiaires[0] || { prenom: "Martin", nom: "Dupont", civilite: "" as const, email: "", telephone: "", entreprise: "", poste: "", dateNaissance: "" } as StagiaireInfo;
+  const s = stagiaires[si] || stagiaires[0] || FALLBACK_STAGIAIRE;
   const dateFin = getStagiaireDateFin(s, f);
   const dateJury = new Date(dateFin);
   dateJury.setDate(dateJury.getDate() + 30);
@@ -3546,7 +3546,7 @@ function genVAEPVJury(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
 }
 
 function genVAENotificationDecision(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
-  const s = stagiaires[si] || stagiaires[0] || { prenom: "Martin", nom: "Dupont", civilite: "" as const, email: "", telephone: "", entreprise: "", poste: "", dateNaissance: "" } as StagiaireInfo;
+  const s = stagiaires[si] || stagiaires[0] || FALLBACK_STAGIAIRE;
   const dateFin = getStagiaireDateFin(s, f);
   const dateJury = new Date(dateFin);
   dateJury.setDate(dateJury.getDate() + 30);
@@ -3654,7 +3654,7 @@ function genVAEPartenaires(o: OrganismeInfo) {
 }
 
 function genVAESatisfaction(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
-  const s = stagiaires[si] || stagiaires[0] || { prenom: "Martin", nom: "Dupont", civilite: "" as const, email: "", telephone: "", entreprise: "", poste: "", dateNaissance: "" } as StagiaireInfo;
+  const s = stagiaires[si] || stagiaires[0] || FALLBACK_STAGIAIRE;
   const scores = [5, 4, 5, 5, 4, 5, 5, 4];
   return buildDocument({ org: o, title: "QUESTIONNAIRE DE SATISFACTION – ACCOMPAGNEMENT VAE", subtitle: `${s.prenom} ${s.nom}`, table: {
     headers: ["Critère", "Note /5", "Commentaire"],
