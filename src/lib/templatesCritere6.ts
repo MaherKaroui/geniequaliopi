@@ -556,6 +556,9 @@ export function genContratSousTraitanceV2(o: OrganismeInfo, f: FormationInfo, st
   const stagList = stagiaires.map(s => `${s.prenom} ${s.nom}${s.poste ? ' – ' + s.poste : ''}`).join(', ') || "___";
   const dateMaj = (o as any).dateMaj ? new Date((o as any).dateMaj).toLocaleDateString("fr-FR") : new Date().toLocaleDateString("fr-FR");
   const formateurNom = f.formateur || "";
+  // Find the matching stagiaire for this formateur to get their specific signature
+  const matchingStagiaire = stagiaires.find(s => s.formateur === formateurNom);
+  const fmtSigUrl = matchingStagiaire?.formateurSignatureUrl || f.formateurSignatureUrl;
 
   // Déterminer si le formateur est lié à VICTOR ACADEMY ou est une personne physique
   const isVictorAcademy = formateurNom.toUpperCase().includes("RENUKA");
@@ -801,7 +804,7 @@ export function genContratSousTraitanceV2(o: OrganismeInfo, f: FormationInfo, st
         <p>Qualité : ${sousTraitantSignQualite}</p>
         <p>Date : ${dateMaj}</p>
         <p style="margin-top:15px">Signature :</p>
-        ${f.formateurSignatureUrl ? `<img src="${f.formateurSignatureUrl}" alt="Signature formateur" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : ""}
+        ${fmtSigUrl ? `<img src="${fmtSigUrl}" alt="Signature formateur" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : ""}
         <p style="font-size:11px;color:#888;margin-top:8px;font-style:italic">Lu et approuvé – Bon pour accord</p>
       </div>
     </div>`;

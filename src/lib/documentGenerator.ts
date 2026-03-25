@@ -425,7 +425,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
       const formateurName = params?.formateurNom || f.formateur || fmt.prenom + " " + fmt.nom;
       const parts = formateurName.trim().split(/\s+/);
       const autoFmt: FormateurInfo = { ...fmt, prenom: parts.slice(0, -1).join(" ") || parts[0], nom: parts[parts.length - 1] || "" };
-      return genAutoEvaluationFormateurV2(o, f, autoFmt);
+      return genAutoEvaluationFormateurV2(o, f, autoFmt, stagiaires);
     }
     case "liste_partenaires": return genListePartenairesV2(o);
     case "mandat_qualiopi": return genMandatQualiopi(o);
@@ -3179,7 +3179,7 @@ function genPVExamenCertification(o: OrganismeInfo, f: FormationInfo, stagiaires
         <thead><tr><th>Fonction</th><th>Nom</th><th>Qualité</th><th>Signature</th></tr></thead>
         <tbody>
           <tr><td>Dirigeant</td><td>${o.dirigeant}</td><td>Responsable de l'organisme</td><td>${o.signatureUrl ? `<img src="${o.signatureUrl}" alt="Signature" style="max-height:40px;max-width:100px;object-fit:contain" />` : "<em>Signé</em>"}</td></tr>
-          <tr><td>Formateur</td><td>${formateurNom}</td><td>Formateur référent</td><td>${f.formateurSignatureUrl ? `<img src="${f.formateurSignatureUrl}" alt="Signature" style="max-height:40px;max-width:100px;object-fit:contain" />` : "<em>Signé</em>"}</td></tr>
+          <tr><td>Formateur</td><td>${formateurNom}</td><td>Formateur référent</td><td>${(s.formateurSignatureUrl || f.formateurSignatureUrl) ? `<img src="${s.formateurSignatureUrl || f.formateurSignatureUrl}" alt="Signature" style="max-height:40px;max-width:100px;object-fit:contain" />` : "<em>Signé</em>"}</td></tr>
         </tbody>
       </table>`, variant: "green" },
     // — Section 4 : Résultats par épreuve
@@ -3240,7 +3240,7 @@ function genPVExamenCertification(o: OrganismeInfo, f: FormationInfo, stagiaires
         <p>Nom : ${formateurNom}</p>
         <p>Date : ${dateEpreuvesStr}</p>
         <p style="margin-top:20px">Signature :</p>
-        ${f.formateurSignatureUrl ? `<img src="${f.formateurSignatureUrl}" alt="Signature formateur" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : ""}
+        ${(s.formateurSignatureUrl || f.formateurSignatureUrl) ? `<img src="${s.formateurSignatureUrl || f.formateurSignatureUrl}" alt="Signature formateur" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : ""}
       </div>
     </div>` });
 }
