@@ -294,7 +294,7 @@ export function buildDocument(config: DocBuildConfig): string {
   let body = orgHeader(config.org, config.subtitle);
   body += `<h1>${config.title}</h1>`;
   if (config.formation && config.showFormationInfo) {
-    body += formationInfoBlock(config.formation);
+    body += formationInfoBlock(config.formation, config.stagiaires);
   }
   if (config.sections) {
     for (const s of config.sections) {
