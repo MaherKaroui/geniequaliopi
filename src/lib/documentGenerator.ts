@@ -5020,11 +5020,16 @@ function genFicheEntretienAnnuelFormateur(o: OrganismeInfo, f: FormationInfo, fm
         `
       },
     ],
-    signatures: {
-      type: "2",
-      labels: ["VISA DU FORMATEUR", "VISA DU RESPONSABLE"],
-      names: [formateurNom, o.responsablePedagogique || o.dirigeant],
-    }
+    extraHtml: (() => {
+      const fmtSigUrl = matchingStagiaire?.formateurSignatureUrl || f.formateurSignatureUrl;
+      const fmtSigHtml = fmtSigUrl ? `<img src="${fmtSigUrl}" alt="Signature formateur" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : "";
+      const tamponHtml = o.tamponUrl ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />` : "";
+      return `<p style="margin-top:20px"><strong>Date de fin de formation :</strong> ${formatDate(dateFinFormateur)}</p>
+      <div class="signature-block-2">
+        <div class="sig-box"><p class="sig-label">VISA DU FORMATEUR</p><p>Nom : ${formateurNom}</p><p>Date : ${dateEntretien}</p><p style="margin-top:20px">Signature :</p>${fmtSigHtml}</div>
+        <div class="sig-box"><p class="sig-label">VISA DU RESPONSABLE</p><p>Nom : ${o.responsablePedagogique || o.dirigeant}</p><p>Date : ${dateEntretien}</p><p style="margin-top:20px">Cachet :</p>${tamponHtml}</div>
+      </div>`;
+    })()
   });
 }
 
