@@ -500,7 +500,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
         ? { ...fmt, nom: params.formateurNom, prenom: "", specialite: fmt.specialite, diplomes: fmt.diplomes, experience: fmt.experience, email: fmt.email }
         : fmt;
       const fForEntretien = params?.formateurNom ? { ...f, formateur: params.formateurNom } : f;
-      return genFicheEntretienAnnuelFormateur(o, fForEntretien, fmtForEntretien);
+      return genFicheEntretienAnnuelFormateur(o, fForEntretien, fmtForEntretien, stagiaires);
     }
     case "enquete_satisfaction_formateur": return genEnqueteSatisfactionFormateur(o, f);
     // === Nouveaux templates CFA ===
@@ -4908,9 +4908,12 @@ function genGrilleEntretienAnnuel(o: OrganismeInfo, fmt: FormateurInfo) {
   signatures: { type: "2", labels: ["Le/La Formateur(trice)", "Le Responsable Pédagogique"], names: [`${fmt.prenom} ${fmt.nom}`, o.responsablePedagogique] } });
 }
 
-function genFicheEntretienAnnuelFormateur(o: OrganismeInfo, f: FormationInfo, fmt: FormateurInfo) {
+function genFicheEntretienAnnuelFormateur(o: OrganismeInfo, f: FormationInfo, fmt: FormateurInfo, stagiaires: StagiaireInfo[] = []) {
   const formateurNom = f.formateur || `${fmt.prenom} ${fmt.nom}`;
   const dateEntretien = formatDate(o.dateMaj || new Date().toISOString().slice(0, 10));
+  // Date fin = date fin du stagiaire assigné à ce formateur, sinon date fin formation
+  const matchingStagiaire = stagiaires.find(s => s.formateur === formateurNom);
+  const dateFinFormateur = matchingStagiaire?.dateFinFormation || f.dateFin || new Date().toISOString().slice(0, 10);
   const dateQualif = formatDate(f.dateDebut || new Date().toISOString().slice(0, 10));
 
   return buildDocument({
@@ -5017,11 +5020,16 @@ function genFicheEntretienAnnuelFormateur(o: OrganismeInfo, f: FormationInfo, fm
         `
       },
     ],
-    signatures: {
-      type: "2",
-      labels: ["VISA DU FORMATEUR", "VISA DU RESPONSABLE"],
-      names: [formateurNom, o.responsablePedagogique || o.dirigeant],
-    }
+    extraHtml: (() => {
+      const fmtSigUrl = matchingStagiaire?.formateurSignatureUrl || f.formateurSignatureUrl;
+      const fmtSigHtml = fmtSigUrl ? `<img src="${fmtSigUrl}" alt="Signature formateur" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : "";
+      const tamponHtml = o.tamponUrl ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />` : "";
+      return `<p style="margin-top:20px"><strong>Date de fin de formation :</strong> ${formatDate(dateFinFormateur)}</p>
+      <div class="signature-block-2">
+        <div class="sig-box"><p class="sig-label">VISA DU FORMATEUR</p><p>Nom : ${formateurNom}</p><p>Date : ${dateEntretien}</p><p style="margin-top:20px">Signature :</p>${fmtSigHtml}</div>
+        <div class="sig-box"><p class="sig-label">VISA DU RESPONSABLE</p><p>Nom : ${o.responsablePedagogique || o.dirigeant}</p><p>Date : ${dateEntretien}</p><p style="margin-top:20px">Cachet :</p>${tamponHtml}</div>
+      </div>`;
+    })()
   });
 }
 
