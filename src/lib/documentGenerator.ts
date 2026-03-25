@@ -2377,21 +2377,41 @@ function genAuditInterne(o: OrganismeInfo, semestre: string) {
 function genIndicateursPerformance(o: OrganismeInfo, formations: FormationInfo[], stagiaires: StagiaireInfo[]) {
   const f = formations[0];
   const mois = ["janv.", "févr.", "mars", "avr.", "mai", "juin", "juil.", "août", "sept.", "oct.", "nov.", "déc."];
-  const rawDate = f?.dateDebut || f?.dateFin || "";
-  const parsedDate = rawDate ? new Date(rawDate + "T00:00:00") : null;
-  const annee = parsedDate && !isNaN(parsedDate.getTime()) ? parsedDate.getFullYear() : new Date().getFullYear();
-  const moisFormation = parsedDate && !isNaN(parsedDate.getTime()) ? parsedDate.getMonth() : -1;
   const nbStagiaires = stagiaires.filter(s => s.nom && s.nom.trim()).length || 1;
+
+  // Determine year from individual dates or formation
+  const firstDate = stagiaires.find(s => s.dateDebutFormation)?.dateDebutFormation || f?.dateDebut || f?.dateFin || "";
+  const parsedDate = firstDate ? new Date(firstDate + "T00:00:00") : null;
+  const annee = parsedDate && !isNaN(parsedDate.getTime()) ? parsedDate.getFullYear() : new Date().getFullYear();
+
+  // Count stagiaires per month based on individual dates
+  const countPerMonth = new Array(12).fill(0);
+  const hasIndividualDates = stagiaires.some(s => s.dateDebutFormation);
+
+  if (hasIndividualDates) {
+    stagiaires.filter(s => s.nom && s.nom.trim()).forEach(s => {
+      const d = s.dateDebutFormation || f?.dateDebut || "";
+      if (d) {
+        const pd = new Date(d + "T00:00:00");
+        if (!isNaN(pd.getTime())) countPerMonth[pd.getMonth()]++;
+      }
+    });
+  } else {
+    const fallbackDate = f?.dateDebut || f?.dateFin || "";
+    const pd = fallbackDate ? new Date(fallbackDate + "T00:00:00") : null;
+    const moisF = pd && !isNaN(pd.getTime()) ? pd.getMonth() : -1;
+    if (moisF >= 0) countPerMonth[moisF] = nbStagiaires;
+  }
 
   let tableHtml = `<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%;font-size:10px">
     <tr style="background:#1e3a7b;color:#fff"><th>Action de formation</th><th>Indicateur</th>`;
   mois.forEach(m => { tableHtml += `<th>${m}-${String(annee).slice(2)}</th>`; });
   tableHtml += `<th>Commentaires / analyse</th></tr>`;
   tableHtml += `<tr><td rowspan="2">${f?.intitule || o.nom}</td><td>Taux de satisfaction appréciation des bénéficiaires</td>`;
-  mois.forEach((_, i) => { tableHtml += `<td>${i === moisFormation ? "100%" : ""}</td>`; });
+  mois.forEach((_, i) => { tableHtml += `<td>${countPerMonth[i] > 0 ? "100%" : ""}</td>`; });
   tableHtml += `<td style="font-size:9px">${f?.intitule || o.nom} a reçu ${nbStagiaires} stagiaire${nbStagiaires > 1 ? "s" : ""} pour l'année ${annee}. Nous avons été noté 10/10 sur le taux de satisfaction pour l'année ${annee} au critère 7.30.</td></tr>`;
   tableHtml += `<tr><td>Nombre de stagiaires</td>`;
-  mois.forEach((_, i) => { tableHtml += `<td>${i === moisFormation ? nbStagiaires : ""}</td>`; });
+  mois.forEach((_, i) => { tableHtml += `<td>${countPerMonth[i] > 0 ? countPerMonth[i] : ""}</td>`; });
   tableHtml += `<td></td></tr></table>`;
   tableHtml += `<p style="margin-top:12px;font-style:italic;color:#666">⚠️ Ce document est généré au format Excel (.xls) dans le dossier ZIP exporté.</p>`;
 

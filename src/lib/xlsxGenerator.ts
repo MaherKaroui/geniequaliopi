@@ -207,25 +207,43 @@ export function generateExcelTableauBordPerformance(o: OrganismeInfo, f: Formati
   const mois = ["janv.", "févr.", "mars", "avr.", "mai", "juin", "juil.", "août", "sept.", "oct.", "nov.", "déc."];
   const nbStagiaires = stagiaires.filter(s => s.nom && s.nom.trim()).length || 1;
 
-  // Determine year and month from formation dates (dateDebut or dateFin)
-  const rawDate = f.dateDebut || f.dateFin || "";
-  const parsedDate = rawDate ? new Date(rawDate + "T00:00:00") : null;
+  // Determine year
+  const firstDate = stagiaires.find(s => s.dateDebutFormation)?.dateDebutFormation || f.dateDebut || f.dateFin || "";
+  const parsedDate = firstDate ? new Date(firstDate + "T00:00:00") : null;
   const annee = parsedDate && !isNaN(parsedDate.getTime()) ? parsedDate.getFullYear() : new Date().getFullYear();
-  const moisFormation = parsedDate && !isNaN(parsedDate.getTime()) ? parsedDate.getMonth() : new Date().getMonth();
+
+  // Count stagiaires per month based on individual dates
+  const countPerMonth = new Array(12).fill(0);
+  const hasIndividualDates = stagiaires.some(s => s.dateDebutFormation);
+
+  if (hasIndividualDates) {
+    stagiaires.filter(s => s.nom && s.nom.trim()).forEach(s => {
+      const d = s.dateDebutFormation || f.dateDebut || "";
+      if (d) {
+        const pd = new Date(d + "T00:00:00");
+        if (!isNaN(pd.getTime())) countPerMonth[pd.getMonth()]++;
+      }
+    });
+  } else {
+    const fallbackDate = f.dateDebut || f.dateFin || "";
+    const pd = fallbackDate ? new Date(fallbackDate + "T00:00:00") : null;
+    const moisF = pd && !isNaN(pd.getTime()) ? pd.getMonth() : new Date().getMonth();
+    countPerMonth[moisF] = nbStagiaires;
+  }
 
   // Header row
   let html = `<tr><th>Action de formation</th><th>Indicateur</th>`;
   mois.forEach(m => { html += `<th>${m}-${String(annee).slice(2)}</th>`; });
   html += `<th>Commentaires / analyse</th></tr>`;
 
-  // Taux de satisfaction row - put 100% in the training month
+  // Taux de satisfaction row
   html += `<tr><td rowspan="2">${f.intitule || o.nom}</td><td>Taux de satisfaction appréciation des bénéficiaires</td>`;
-  mois.forEach((_, i) => { html += `<td>${i === moisFormation ? "100%" : ""}</td>`; });
+  mois.forEach((_, i) => { html += `<td>${countPerMonth[i] > 0 ? "100%" : ""}</td>`; });
   html += `<td>${f.intitule || o.nom} a reçu ${nbStagiaires} stagiaire${nbStagiaires > 1 ? "s" : ""} pour l'année ${annee}. Nous avons été noté 10/10 sur le taux de satisfaction pour l'année ${annee} au critère 7.30. Nous communiquerons cet élément de diffusion sur notre site internet et sur notre programme de formation.</td></tr>`;
 
-  // Nombre de stagiaires row - put count in the training month
+  // Nombre de stagiaires row
   html += `<tr><td>Nombre de stagiaires</td>`;
-  mois.forEach((_, i) => { html += `<td>${i === moisFormation ? nbStagiaires : ""}</td>`; });
+  mois.forEach((_, i) => { html += `<td>${countPerMonth[i] > 0 ? countPerMonth[i] : ""}</td>`; });
   html += `<td></td></tr>`;
 
   return excelWrap(`TABLEAU DE BORD INDICATEURS DE PERFORMANCE – ${annee}`, [{ name: "Tableau de bord", html }]);
