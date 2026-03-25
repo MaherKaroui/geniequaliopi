@@ -6069,10 +6069,11 @@ function genBilanFroid(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiaire
 
 function genBilanChaud(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const dureeH = parseInt(f.duree) || 14;
-  let extra = `<p><strong>Date :</strong> ${formatDate(f.dateFin)}</p>`;
+  let extra = '';
   stagiaires.slice(0, 10).forEach((s, i) => {
+    const dateFin = getStagiaireDateFin(s, f);
     extra += `<h3>Stagiaire : ${s.prenom} ${s.nom}</h3>`;
-    extra += `<p><strong>Date :</strong> ${formatDate(f.dateFin)}</p>`;
+    extra += `<p><strong>Date du bilan :</strong> ${formatDate(dateFin)} (dernier jour de formation)</p>`;
     const criteres = [
       "Satisfaction globale de la formation",
       "Atteinte des objectifs pédagogiques",
