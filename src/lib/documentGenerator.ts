@@ -1885,13 +1885,11 @@ function genExercicesPratiques(o: OrganismeInfo, f: FormationInfo, stagiaires: S
     // Results per stagiaire
     extra += `<h3>Résultats par stagiaire</h3>`;
     const rows = stagiaires.slice(0, 10).map((s, si) => {
-      const sc = EVAL_SCORES[si] || [7, 8, 7, 8, 7];
-      const note = sc[ei % sc.length];
-      const noteFinale = Math.min(10, note + 1);
+      const variations = [9, 10, 9, 8, 10, 9, 8, 10, 9, 10];
+      const noteFinale = variations[(si + ei) % variations.length];
       const appreciation = noteFinale >= 9 ? "Excellent travail, exercice parfaitement réalisé"
-        : noteFinale >= 7 ? "Bon travail, quelques points à améliorer"
-        : "Travail correct, nécessite un approfondissement";
-      return [s.prenom + " " + s.nom, `${noteFinale}/10`, noteFinale >= 7 ? "✅ Validé" : "🔄 À revoir", appreciation];
+        : "Très bon travail, compétences bien acquises";
+      return [s.prenom + " " + s.nom, `${noteFinale}/10`, "Validé", appreciation];
     });
     extra += tableHTML(["Stagiaire", "Note", "Statut", "Appréciation du formateur"], rows);
   });
@@ -1899,8 +1897,8 @@ function genExercicesPratiques(o: OrganismeInfo, f: FormationInfo, stagiaires: S
   // Global summary
   extra += `<div class="page-break"></div><h2>Synthèse des exercices pratiques</h2>`;
   const globalRows = stagiaires.slice(0, 10).map((s, si) => {
-    const sc = EVAL_SCORES[si] || [7, 8, 7, 8, 7];
-    const notes = exercices.map((_, ei) => Math.min(10, sc[ei % sc.length] + 1));
+    const variations = [9, 10, 9, 8, 10, 9, 8, 10, 9, 10];
+    const notes = exercices.map((_, ei) => variations[(si + ei) % variations.length]);
     const avg = Math.round(notes.reduce((a, b) => a + b, 0) / notes.length * 10) / 10;
     return [s.prenom + " " + s.nom, ...notes.map(n => `${n}/10`), `<strong>${avg}/10</strong>`, evalData.appreciations[si]?.split('.')[0] + '.' || ""];
   });
@@ -6626,10 +6624,10 @@ function genExercicesCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires
 
   const studentProfiles = [
     { level: 'excellent', baseNote: 4.5, style: 'structuré et détaillé' },
-    { level: 'bon', baseNote: 4, style: 'correct avec quelques approximations' },
-    { level: 'moyen', baseNote: 3, style: 'basique mais pertinent' },
     { level: 'tres_bon', baseNote: 5, style: 'brillant et autonome' },
-    { level: 'passable', baseNote: 2.5, style: 'en cours d\'acquisition' },
+    { level: 'bon', baseNote: 4, style: 'rigoureux et appliqué' },
+    { level: 'excellent', baseNote: 4.5, style: 'clair et méthodique' },
+    { level: 'tres_bon', baseNote: 4.5, style: 'pertinent et bien argumenté' },
   ];
   const profile = studentProfiles[si % studentProfiles.length];
 
@@ -6727,9 +6725,9 @@ function genExercicesCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires
     return addTypos(response, errorRate);
   };
 
-  // Generate note
-  const noteVariation = ((hash + exerciceIdx * 13) % 5 - 2) * 0.5;
-  const rawNote = Math.max(1, Math.min(5, profile.baseNote + noteVariation));
+  // Generate note — always good notes (4-5/5)
+  const noteVariation = ((hash + exerciceIdx * 13) % 3) * 0.5;
+  const rawNote = Math.max(4, Math.min(5, profile.baseNote + noteVariation));
   const note = Math.round(rawNote * 2) / 2;
 
   // Generate formateur observation
