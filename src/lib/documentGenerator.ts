@@ -2998,8 +2998,8 @@ function genPVExamenCertification(o: OrganismeInfo, f: FormationInfo, stagiaires
       ${tableHTML(["Élément", "Détail"], [
         ["Formation suivie", f.intitule],
         ["Organisme de formation", o.nom],
-        ["Période de formation", `Du ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)}`],
-        ["Durée", f.duree],
+        ["Période de formation", `Du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}`],
+        ["Durée", getStagiaireDuree(s, f)],
         ["Certification visée", `${certifIntitule} (${certifCode})`],
         ["Certificateur (Nom légal)", certifNom],
         ["Date des épreuves", dateEpreuvesStr],
@@ -3010,16 +3010,15 @@ function genPVExamenCertification(o: OrganismeInfo, f: FormationInfo, stagiaires
       <table>
         <thead><tr><th>Fonction</th><th>Nom</th><th>Qualité</th><th>Signature</th></tr></thead>
         <tbody>
-          <tr><td>Dirigeant</td><td>________________________</td><td>________________________</td><td></td></tr>
-          <tr><td>Formateur</td><td>________________________</td><td>________________________</td><td></td></tr>
-          <tr><td>Formateur</td><td>________________________</td><td>________________________</td><td></td></tr>
+          <tr><td>Dirigeant</td><td>${o.dirigeant}</td><td>Responsable de l'organisme</td><td>${o.signatureUrl ? `<img src="${o.signatureUrl}" alt="Signature" style="max-height:40px;max-width:100px;object-fit:contain" />` : "<em>Signé</em>"}</td></tr>
+          <tr><td>Formateur</td><td>${formateurNom}</td><td>Formateur référent</td><td><em>Signé</em></td></tr>
         </tbody>
       </table>`, variant: "green" },
     // — Section 4 : Résultats par épreuve
     { heading: "Résultats par épreuve", content: `
       <table>
         <thead><tr><th>Épreuve</th><th>Modalité d'évaluation</th><th>Note</th><th>Résultat</th><th>Observations</th></tr></thead>
-        <tbody>${juryRows}</tbody>
+        <tbody>${juryRows}${moyenneRow}</tbody>
       </table>` },
     // — Section 5 : Décision finale
     { heading: "Décision finale du jury", content: `
@@ -3027,27 +3026,28 @@ function genPVExamenCertification(o: OrganismeInfo, f: FormationInfo, stagiaires
         <tbody>
           <tr>
             <td style="padding:15px;font-size:1.1em">
-              <strong>☐ ${g(s, "ADMIS", "ADMISE")}</strong> — ${g(s, "Le candidat", "La candidate")} a satisfait aux exigences de la certification
+              <strong>☑ ${g(s, "ADMIS", "ADMISE")}</strong> — ${g(s, "Le candidat", "La candidate")} a satisfait aux exigences de la certification
             </td>
           </tr>
           <tr>
-            <td style="padding:15px;font-size:1.1em">
+            <td style="padding:15px;font-size:1.1em;color:#999">
               <strong>☐ ${g(s, "AJOURNÉ", "AJOURNÉE")}</strong> — ${g(s, "Le candidat", "La candidate")} n'a pas satisfait aux exigences
             </td>
           </tr>
           <tr>
-            <td style="padding:15px;font-size:1.1em">
-              <strong>☐ VALIDATION PARTIELLE</strong> — Blocs acquis : ________________________
+            <td style="padding:15px;font-size:1.1em;color:#999">
+              <strong>☐ VALIDATION PARTIELLE</strong> — Blocs acquis : —
             </td>
           </tr>
         </tbody>
       </table>
-      <p style="margin-top:10px"><em>Mention particulière : ________________________</em></p>` },
+      <p style="margin-top:10px"><em>Mention particulière : ${mention}</em></p>
+      <p><em>Blocs de compétences validés : ${blocsValides}</em></p>
+      <p><strong>Moyenne générale obtenue : ${moyenneGenerale}/20</strong></p>` },
     // — Section 6 : Observations du jury
     { heading: "Observations du jury", content: `
       <div style="min-height:80px;border:1px solid #ccc;padding:12px;border-radius:4px">
-        <p><em>Observations éventuelles du jury concernant ${g(s, "le candidat", "la candidate")} :</em></p>
-        <br/><br/>
+        <p>${observation}</p>
       </div>` },
     // — Section 7 : Certification sur l'honneur
     { heading: "Certification sur l'honneur", content: `
@@ -3062,16 +3062,17 @@ function genPVExamenCertification(o: OrganismeInfo, f: FormationInfo, stagiaires
       </div>
       <div class="sig-box" style="flex:1;min-width:180px">
         <p class="sig-label">Le Dirigeant</p>
-        <p>Nom : ________________________</p>
-        <p>Date : ${dateEpreuvesStr}</p>
-        <p style="margin-top:20px">Signature :</p>
-      </div>
-      <div class="sig-box" style="flex:1;min-width:180px">
-        <p class="sig-label">Le Responsable de l'organisme</p>
         <p>Nom : ${o.dirigeant}</p>
         <p>Date : ${dateEpreuvesStr}</p>
         <p style="margin-top:20px">Signature :</p>
+        ${o.signatureUrl ? `<img src="${o.signatureUrl}" alt="Signature" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : ""}
         ${o.tamponUrl ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />` : ""}
+      </div>
+      <div class="sig-box" style="flex:1;min-width:180px">
+        <p class="sig-label">Le Formateur</p>
+        <p>Nom : ${formateurNom}</p>
+        <p>Date : ${dateEpreuvesStr}</p>
+        <p style="margin-top:20px">Signature :</p>
       </div>
     </div>` });
 }
