@@ -6306,7 +6306,8 @@ function genAppreciationsBeneficiairesStagiaire(o: OrganismeInfo, f: FormationIn
   const rng = seededRandom(si * 59 + 23);
 
   let extra = `<p><em>Fréquence : fin de formation. En cas de non-retour, l'enquête est renvoyée dans un délai d'une semaine.</em></p>`;
-  extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td><strong>Intitulé de la formation :</strong></td><td>${f.intitule}</td></tr><tr><td><strong>Date :</strong></td><td>${formatDate(f.dateFin)}</td></tr><tr><td><strong>Nom/prénom des intervenants :</strong></td><td>${f.formateur}</td></tr><tr><td><strong>Nom/prénom du participant :</strong></td><td>${s.prenom} ${s.nom}</td></tr><tr><td><strong>Entreprise :</strong></td><td>${s.entreprise || "—"}</td></tr></table>`;
+  const dateFinStag = getStagiaireDateFin(s, f);
+  extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td><strong>Intitulé de la formation :</strong></td><td>${f.intitule}</td></tr><tr><td><strong>Date :</strong></td><td>${formatDate(dateFinStag)}</td></tr><tr><td><strong>Nom/prénom des intervenants :</strong></td><td>${f.formateur}</td></tr><tr><td><strong>Nom/prénom du participant :</strong></td><td>${s.prenom} ${s.nom}</td></tr><tr><td><strong>Entreprise :</strong></td><td>${s.entreprise || "—"}</td></tr></table>`;
 
   const generateNote = () => {
     const r = rng();
