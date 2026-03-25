@@ -4387,9 +4387,9 @@ function genTrameEvalBesoinsStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
 <table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${answers.handicap}</td></tr></table>
 
 <p style="margin-top:20px"><strong>Analyse du référent pédagogique :</strong> ${o.responsablePedagogique}</p>
-<p><strong>Date d'analyse :</strong> ${formatDate(subtractBusinessDays(f.dateDebut, 20))}</p>
+<p><strong>Date d'analyse :</strong> ${formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f), 20))}</p>
 <p>FAIT À ${o.ville.toUpperCase()}</p>
-<p>LE : ${formatDate(subtractBusinessDays(f.dateDebut, 20))}</p>
+<p>LE : ${formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f), 20))}</p>
 ` });
 }
 
