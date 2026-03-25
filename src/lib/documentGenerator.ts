@@ -1575,7 +1575,7 @@ function genTestPositionnementIndividuel(o: OrganismeInfo, f: FormationInfo, s: 
 
   const answers = generateStagiaireOpenAnswers(questions, si, isDebut, { nom: s.nom, prenom: s.prenom, entreprise: s.entreprise, poste: s.poste });
   const totalScore = answers.reduce((sum, a) => sum + a.score, 0);
-  const dateTest = isDebut ? formatDate(f.dateDebut) : formatDate(f.dateFin);
+  const dateTest = isDebut ? formatDate(getStagiaireDateDebut(s, f)) : formatDate(getStagiaireDateFin(s, f));
 
   let extra = `<h2>Test de positionnement en ${label} de formation – ${f.intitule}</h2>`;
   extra += `<p><strong>Nom du stagiaire :</strong> ${s.prenom} ${s.nom}</p>`;
