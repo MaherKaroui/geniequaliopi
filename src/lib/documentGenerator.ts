@@ -1413,12 +1413,13 @@ function genTempsConnexionReel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
     });
     const hT = Math.floor(totalMinutes / 60);
     const mT = totalMinutes % 60;
-    const dureeFormationH = parseInt(f.duree) || days.length * 7;
+    const stagDuree = getStagiaireDuree(s, f);
+    const dureeFormationH = parseInt(stagDuree) || days.length * 7;
     const taux = Math.min(100, Math.round((totalMinutes / (dureeFormationH * 60)) * 100));
     recapRows.push([
       `${s.prenom} ${s.nom}`,
       `${hT}h${String(mT).padStart(2, '0')}min`,
-      f.duree,
+      stagDuree,
       `${taux}%`,
       taux >= 80 ? '✅ Validé' : '⚠️ Insuffisant'
     ]);
