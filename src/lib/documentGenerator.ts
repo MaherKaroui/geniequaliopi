@@ -906,15 +906,9 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
   const hasIndiv = stagiaires.some(s => s.dateDebutFormation || s.dateFinFormation);
   const anneeFormation = f.dateDebut ? new Date(f.dateDebut + "T00:00:00").getFullYear() : new Date().getFullYear();
 
-  // Build sessions table if individual dates
   let sessionsHtml = "";
   if (hasIndiv) {
-    const sessRows = stagiaires.slice(0, 10).map(s => {
-      const deb = getStagiaireDateDebut(s, f);
-      const fin = getStagiaireDateFin(s, f);
-      return [s.civilite ? `${s.civilite} ${s.nom} ${s.prenom}` : `${s.prenom} ${s.nom}`, formatDate(deb), formatDate(fin)];
-    });
-    sessionsHtml = `<p><strong>Sessions – Année de formation ${anneeFormation}</strong></p>` + tableHTML(["Stagiaire", "Date début", "Date fin"], sessRows);
+    sessionsHtml = `<p><strong>Sessions en ${anneeFormation}</strong></p>`;
   }
 
   // Detect FLE / certification by competence blocks
