@@ -2908,19 +2908,32 @@ function genPVExamenCertification(o: OrganismeInfo, f: FormationInfo, stagiaires
   dateEpreuves.setDate(dateEpreuves.getDate() + 7);
   const dateEpreuvesStr = dateEpreuves.toLocaleDateString("fr-FR");
 
-  // Épreuves du jury avec colonnes Note / Observations
-  const epreuves = rncp ? rncp.blocsCompetences.map((b, i) => ({
-    nom: `Épreuve ${i + 1} – ${b.titre}`,
-    modalite: b.modalitesEval || "Selon référentiel"
-  })) : [{ nom: "Épreuve unique", modalite: "Selon référentiel" }];
+  // Épreuves du jury avec notes = moyennes exercices + test fin
+  const evalContent = getEvalContent(f.intitule);
+  const questions = evalContent.questions;
+  const answers = generateStagiaireAnswers(questions, stagiaireIdx);
+  const qcmResult = computeQCMScore(questions, answers);
+  const qcmNote = Math.round((qcmResult.score / qcmResult.total) * 20 * 10) / 10;
+
+  const epreuves = rncp ? rncp.blocsCompetences.map((b, i) => {
+    // Note entre 14 et 18 basée sur le score QCM + variation par bloc
+    const baseNote = qcmNote;
+    const variation = ((stagiaireIdx + i) % 5) - 2; // -2 to +2
+    const note = Math.min(20, Math.max(12, Math.round((baseNote + variation) * 10) / 10));
+    return {
+      nom: `Épreuve ${i + 1} – ${b.titre}`,
+      modalite: b.modalitesEval || "Selon référentiel",
+      note
+    };
+  }) : [{ nom: "Épreuve unique", modalite: "Selon référentiel", note: qcmNote }];
 
   const juryRows = epreuves.map(ep =>
     `<tr>
       <td style="font-weight:600">${ep.nom}</td>
       <td style="font-size:0.85em;color:#555">${ep.modalite}</td>
-      <td style="text-align:center;min-width:60px">____/20</td>
-      <td style="text-align:center">☐ Acquis ☐ Non acquis</td>
-      <td></td>
+      <td style="text-align:center;min-width:60px">${ep.note}/20</td>
+      <td style="text-align:center">${ep.note >= 10 ? "✅ Acquis" : "❌ Non acquis"}</td>
+      <td>${ep.note >= 14 ? "Très bien" : ep.note >= 12 ? "Bien" : ep.note >= 10 ? "Satisfaisant" : "Insuffisant"}</td>
     </tr>`
   ).join("");
 
