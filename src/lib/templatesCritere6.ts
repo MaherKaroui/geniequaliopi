@@ -371,6 +371,100 @@ function veilleMetierRows(f: FormationInfo, type: FormationType): string[][] {
     ];
   }
 
+  if (type === "webmarketing") {
+    return [
+      [
+        `<a href="https://www.blogdumoderateur.com/dossier/social-media/">blogdumoderateur.com</a>`,
+        "Blog du Modérateur – Dossier Social Media",
+        veilleMonthYear(f, 8),
+        "Veille complète sur les réseaux sociaux : nouvelles fonctionnalités Instagram, LinkedIn, TikTok, évolutions algorithmiques, tendances de contenu.",
+        "Preuve : capture + lien. Action : mise à jour des modules réseaux sociaux selon les dernières fonctionnalités (carrousels LinkedIn, Reels Instagram, TikTok Shop)."
+      ],
+      [
+        `<a href="https://www.hubspot.fr/blog">HubSpot Blog France</a>`,
+        "HubSpot – Tendances marketing digital et inbound marketing",
+        veilleMonthYear(f, 7),
+        "Blog de référence sur le marketing digital : SEO, content marketing, email marketing, tunnels de vente, automation. Études de cas et statistiques actualisées.",
+        "Action Qualiopi : aligner les cas pratiques sur les dernières tendances inbound marketing et les benchmarks HubSpot."
+      ],
+      [
+        `<a href="https://www.semrush.com/blog/">SEMrush Blog</a>`,
+        "SEMrush – Études SEO et marketing de contenu",
+        veilleYear(f, 6),
+        "Publications d'études et rapports sur l'état du SEO, les tendances de recherche, et les meilleures pratiques de content marketing.",
+        "Preuve : rapport annuel SEMrush. Action : mise à jour du module SEO avec les dernières données de positionnement et les bonnes pratiques."
+      ],
+      [
+        `<a href="https://www.socialmediatoday.com/">Social Media Today</a>`,
+        "Social Media Today – Actualités réseaux sociaux",
+        veilleMonthYear(f, 5),
+        "Source internationale sur les évolutions des plateformes sociales : changements d'algorithme, nouvelles fonctionnalités, études d'engagement.",
+        "Action : adaptation des stratégies de publication et des formats de contenu enseignés selon les évolutions algorithmiques."
+      ],
+      [
+        `<a href="https://www.france-num.gouv.fr/guides-et-conseils/communication-et-publicite/reseaux-sociaux">France Num – Réseaux sociaux TPE/PME</a>`,
+        "France Num – Guide réseaux sociaux pour les entreprises",
+        veilleMonthYear(f, 4),
+        "Guide gouvernemental sur l'utilisation des réseaux sociaux par les TPE/PME : stratégie, bonnes pratiques, retours d'expérience.",
+        "Preuve : guide PDF France Num. Action Qualiopi : aligner les exercices sur les usages recommandés pour les entrepreneurs et indépendants."
+      ],
+      [
+        `<a href="https://www.meta.com/fr/blog/">Meta – Blog actualités</a>`,
+        "Meta – Nouvelles fonctionnalités Facebook, Instagram, Threads",
+        veilleMonthYear(f, 3),
+        "Annonces officielles Meta : évolutions publicitaires (Meta Ads), nouveaux formats, intelligence artificielle intégrée aux outils créateurs.",
+        "Preuve : captures annonces. Action : mise à jour du module publicité en ligne (Facebook Ads, Instagram Ads) avec les nouvelles options de ciblage."
+      ],
+    ];
+  }
+
+  if (type === "crm") {
+    return [
+      [
+        `<a href="https://www.hubspot.fr/blog">HubSpot Blog France</a>`,
+        "HubSpot – Tendances CRM et automation marketing",
+        veilleMonthYear(f, 8),
+        "Blog de référence sur le CRM, l'automation marketing et les tunnels de vente. Études de cas, guides pratiques et benchmarks sectoriels.",
+        "Preuve : capture + lien. Action : mise à jour des workflows et cas pratiques selon les nouvelles fonctionnalités HubSpot."
+      ],
+      [
+        `<a href="https://www.salesforce.com/fr/blog/">Salesforce Blog France</a>`,
+        "Salesforce – État du CRM et tendances relation client",
+        veilleMonthYear(f, 7),
+        "Rapport annuel « State of Sales » et « State of Marketing » : évolution des pratiques CRM, adoption de l'IA dans la relation client, tendances automation.",
+        "Action Qualiopi : intégrer les dernières tendances CRM (IA prédictive, scoring automatisé) dans le programme de formation."
+      ],
+      [
+        `<a href="https://www.make.com/en/blog">Make (Integromat) Blog</a>`,
+        "Make – Évolutions de la plateforme d'automation",
+        veilleYear(f, 6),
+        "Nouvelles intégrations, templates de scénarios, fonctionnalités IA intégrées. Plateforme clé pour l'enseignement de l'automation no-code.",
+        "Preuve : changelog + captures. Action : mise à jour des exercices Make avec les nouveaux connecteurs et modèles."
+      ],
+      [
+        `<a href="https://www.brevo.com/fr/blog/">Brevo Blog</a>`,
+        "Brevo – Email marketing, automation et CRM",
+        veilleMonthYear(f, 5),
+        "Évolutions de Brevo (ex-Sendinblue) : nouvelles fonctionnalités automation, segmentation avancée, intégration CRM, conformité RGPD.",
+        "Action : actualiser le module email marketing automation avec les nouvelles fonctionnalités Brevo (scoring, A/B test automation)."
+      ],
+      [
+        `<a href="https://zapier.com/blog/">Zapier Blog</a>`,
+        "Zapier – Tendances automation et productivité",
+        veilleMonthYear(f, 4),
+        "Articles sur l'automation des workflows métiers, comparatifs d'outils, templates de zaps. Rapport annuel sur les tendances automation.",
+        "Preuve : rapport + captures. Action : enrichir le module intégrations avec les zaps les plus utilisés par les entrepreneurs."
+      ],
+      [
+        `<a href="https://www.france-num.gouv.fr/guides-et-conseils/relation-client-et-fidelisation/outils-crm">France Num – CRM pour TPE/PME</a>`,
+        "France Num – Guide CRM pour les entreprises",
+        veilleMonthYear(f, 3),
+        "Guide gouvernemental sur l'adoption du CRM par les TPE/PME : choix d'outil, mise en place, bonnes pratiques, retours d'expérience.",
+        "Preuve : guide PDF France Num. Action Qualiopi : aligner les recommandations de choix CRM sur les préconisations France Num."
+      ],
+    ];
+  }
+
   // Default: word/bureautique
   return [
     [
