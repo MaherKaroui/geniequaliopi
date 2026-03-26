@@ -3920,9 +3920,26 @@ function genVAEAnalyseBesoin(o: OrganismeInfo, f: FormationInfo, stagiaires: Sta
   const entreprise = s.entreprise || "Entreprise non renseignée";
   const responsable = s.responsableEntreprise || "Responsable non renseigné";
   const poste = s.poste || "Poste non renseigné";
-  const formateurSig = s.signatureFormateurUrl || f.formateurSignatureUrl || "";
+  const formateurSig = s.formateurSignatureUrl || f.formateurSignatureUrl || "";
   const modalite = (f.modalites || "").toLowerCase();
   const modeAccomp = modalite.includes("distanciel") ? "☐ Présentiel ☒ Distanciel ☐ Mixte" : modalite.includes("mixte") ? "☐ Présentiel ☐ Distanciel ☒ Mixte" : "☒ Présentiel ☐ Distanciel ☐ Mixte";
+
+  // Build custom 3-column signature block with Accompagnateur, Candidat, Responsable entreprise
+  const accompSigHtml = formateurSig
+    ? `<img src="${formateurSig}" alt="Signature formateur" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />`
+    : o.signatureUrl ? `<img src="${o.signatureUrl}" alt="Signature" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : "";
+  const candidatSigHtml = s.signatureUrl
+    ? `<img src="${s.signatureUrl}" alt="Signature candidat" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />`
+    : `<p style="font-style:italic;color:#999;margin-top:15px">Signé par ${s.prenom} ${s.nom}</p>`;
+  const respSigHtml = s.signatureResponsableUrl
+    ? `<img src="${s.signatureResponsableUrl}" alt="Signature responsable" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />`
+    : `<p style="font-style:italic;color:#999;margin-top:15px">Signé par ${responsable}</p>`;
+
+  const sigBlock = `<div class="signature-block" style="display:flex;justify-content:space-between;margin-top:30px;gap:10px">
+    <div class="sig-box" style="flex:1;border:1px solid #ccc;border-radius:6px;padding:12px;text-align:center"><p class="sig-label" style="font-weight:700">L'Accompagnateur VAE</p><p>Nom : ${o.responsablePedagogique}</p><p>Date : ${formatDate(dateAnalyse)}</p><p style="margin-top:20px">Signature :</p>${accompSigHtml}</div>
+    <div class="sig-box" style="flex:1;border:1px solid #ccc;border-radius:6px;padding:12px;text-align:center"><p class="sig-label" style="font-weight:700">Le Candidat</p><p>Nom : ${s.prenom} ${s.nom}</p><p>Date : ${formatDate(dateAnalyse)}</p><p style="margin-top:20px">Signature :</p>${candidatSigHtml}</div>
+    <div class="sig-box" style="flex:1;border:1px solid #ccc;border-radius:6px;padding:12px;text-align:center"><p class="sig-label" style="font-weight:700">Le Responsable d'entreprise</p><p>Nom : ${responsable}</p><p>Date : ${formatDate(dateAnalyse)}</p><p style="margin-top:20px">Signature :</p>${respSigHtml}</div>
+  </div>`;
 
   return buildDocument({ org: o, title: "ANALYSE DU BESOIN BÉNÉFICIAIRE – VAE", subtitle: `${s.prenom} ${s.nom}`, date: formatDate(dateAnalyse), sections: [
     { heading: "1. Identification du candidat", content: `<p><strong>Civilité :</strong> ${s.civilite || "Mme"}<br><strong>Nom :</strong> ${s.nom}<br><strong>Prénom :</strong> ${s.prenom}<br><strong>Date de naissance :</strong> ${s.dateNaissance || "___"}<br><strong>Adresse :</strong> ${s.adresse || "___"}<br><strong>Code postal :</strong> ${s.codePostal || "___"} – <strong>Ville :</strong> ${s.commune || "___"}<br><strong>Téléphone :</strong> ${s.telephone}<br><strong>Email :</strong> ${s.email}</p>` },
@@ -3933,7 +3950,7 @@ function genVAEAnalyseBesoin(o: OrganismeInfo, f: FormationInfo, stagiaires: Sta
     { heading: "6. Situation de handicap", content: `<p>Le candidat est-il en situation de handicap ? ☒ Non<br><br>Orientation vers le référent handicap si besoin : ${o.referentHandicap || o.responsablePedagogique}</p>`, variant: "green" },
     { heading: "7. Financement envisagé", content: `<p>☒ CPF (Compte Personnel de Formation)<br>☐ Plan de développement des compétences de l'employeur<br>☐ OPCO<br>☐ Autofinancement<br>☐ Autre</p>` },
     { heading: "8. Avis de l'employeur", content: `<p><strong>Entreprise :</strong> ${entreprise}<br><strong>Responsable :</strong> ${responsable}<br><strong>Fonction :</strong> Directeur / Responsable de service<br><br>L'employeur confirme que ${s.civilite === "M." ? "M." : "Mme"} ${s.prenom} ${s.nom} occupe le poste de <strong>${poste}</strong> au sein de l'entreprise <strong>${entreprise}</strong> et soutient ${s.civilite === "M." ? "son" : "sa"} démarche de VAE.<br><br><em>Fait à ${o.ville}, le ${formatDate(dateAnalyse)}</em></p>` },
-  ], signatures: { type: "3col", labels: ["L'Accompagnateur VAE", "Le Candidat", "Le Responsable d'entreprise"], names: [o.responsablePedagogique, `${s.prenom} ${s.nom}`, responsable], formateurSignatureUrl: formateurSig, stagiaireSignatureUrl: s.signatureUrl, responsableSignatureUrl: s.signatureResponsableUrl, dates: [formatDate(dateAnalyse), formatDate(dateAnalyse), formatDate(dateAnalyse)] } });
+  ], extraHtml: sigBlock });
 }
 
 function genVAELivret1Recevabilite(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
