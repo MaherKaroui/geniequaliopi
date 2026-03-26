@@ -223,6 +223,8 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
         excelContent = generateExcelTableauSuiviParcours(mergedOrganisme, selectedFormation, allStagiaires);
       } else if (doc.template === "indicateurs_performance") {
         excelContent = generateExcelTableauBordPerformance(mergedOrganisme, selectedFormation, allStagiaires);
+      } else if (doc.template === "vae_indicateurs_previsionnels") {
+        excelContent = generateExcelIndicateursPrevisionnelsVAE(mergedOrganisme, selectedFormation);
       } else {
         excelContent = generateContent(doc);
       }
