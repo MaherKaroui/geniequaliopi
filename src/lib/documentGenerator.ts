@@ -3620,6 +3620,7 @@ function genVAEFicheSuiviIndividuel(o: OrganismeInfo, f: FormationInfo, stagiair
 
 function genVAEGrilleEvaluationDossier(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = stagiaires[si] || stagiaires[0] || FALLBACK_STAGIAIRE;
+  const dateFin = getStagiaireDateFin(s, f);
   return buildDocument({ org: o, title: "GRILLE D'ÉVALUATION DU DOSSIER VAE", subtitle: `${s.prenom} ${s.nom} – ${f.intitule}`, table: {
     headers: ["Critère d'évaluation", "Note /5", "Observations"],
     rows: [
@@ -3632,8 +3633,8 @@ function genVAEGrilleEvaluationDossier(o: OrganismeInfo, f: FormationInfo, stagi
       ["Argumentation et analyse réflexive", "5/5", "Bonne prise de recul sur les pratiques"],
     ]
   }, sections: [
-    { heading: "Appréciation globale", content: `<p><strong>Note globale : 33/35 – Excellent</strong><br><br>Le dossier de ${s.prenom} ${s.nom} est d'une qualité remarquable. Les activités sont parfaitement décrites et en adéquation avec le référentiel de certification. Les preuves apportées sont diversifiées et pertinentes. Le candidat est prêt pour le passage devant le jury.</p>`, variant: "green" },
-  ], signatures: { type: "2", labels: ["L'Accompagnateur VAE", ""], names: [o.responsablePedagogique, ""] } });
+    { heading: "Appréciation globale", content: `<p><strong>Note globale : 33/35 – Excellent</strong><br><br>Le dossier de ${s.prenom} ${s.nom} est d'une qualité remarquable. Les activités sont parfaitement décrites et en adéquation avec le référentiel de certification. Les preuves apportées sont diversifiées et pertinentes. Le candidat est prêt pour le passage devant le jury.</p><p>Fait à ${o.ville}, le ${formatDate(dateFin)}</p>`, variant: "green" },
+  ], signatures: { type: "2", labels: ["L'Accompagnateur VAE (Formateur)", "Le Candidat"], names: [o.responsablePedagogique, `${s.prenom} ${s.nom}`], stagiaireSignatureUrl: s.signatureUrl, formateurSignatureUrl: s.formateurSignatureUrl || f.formateurSignatureUrl, dates: [formatDate(dateFin), formatDate(dateFin)] } });
 }
 
 function genVAEEmargement(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
