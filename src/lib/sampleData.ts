@@ -272,6 +272,25 @@ export const SAMPLE_FORMATIONS: FormationInfo[] = [
     nombreParticipants: "8",
     formateur: "Philippe Martin",
   },
+  {
+    intitule: "Accompagnement VAE – Négociateur Technico-Commercial (RNCP39063)",
+    objectifs: "Accompagner le candidat dans sa démarche de Validation des Acquis de l'Expérience pour l'obtention du titre professionnel Négociateur Technico-Commercial (niveau 5). Analyser le parcours professionnel, constituer le livret 1 de recevabilité, rédiger le livret 2 en lien avec le référentiel RNCP39063, et préparer le candidat à l'entretien devant le jury.",
+    prerequis: "Justifier d'au moins 1 an d'expérience en rapport avec la certification visée (activités commerciales, négociation, prospection, relation client). Avoir un projet VAE validé.",
+    duree: "24 heures (4 semaines)",
+    modalites: "mixte",
+    tarif: "2 400 € HT par candidat",
+    programme: "Semaine 1 (6h) : Analyse du parcours professionnel, aide à la constitution du livret 1 (recevabilité), positionnement du candidat par rapport au référentiel RNCP39063\nSemaine 2 (6h) : Début de rédaction du livret 2, identification et formalisation des compétences acquises, structuration des expériences professionnelles\nSemaine 3 (8h) : Rédaction approfondie du livret 2, mise en lien systématique avec les blocs de compétences du référentiel RNCP39063 (stratégie de prospection, négociation et fidélisation)\nSemaine 4 (6h) : Finalisation du dossier, préparation à l'oral devant le jury, simulation d'entretien avec feedback",
+    methodesEvaluation: "Évaluation continue de la progression du livret, grille de positionnement par bloc de compétences, simulation d'entretien jury avec grille d'observation, auto-évaluation du candidat",
+    moyensPedagogiques: "Accompagnement individuel, référentiel RNCP39063 complet, modèles de livrets 1 et 2, grilles d'analyse des compétences, supports méthodologiques de rédaction, visioconférence pour les séances à distance",
+    publicVise: "Professionnels commerciaux, vendeurs, indépendants, chargés de clientèle souhaitant faire reconnaître leurs compétences par un titre professionnel de niveau 5",
+    delaiAcces: "14 jours après validation du projet VAE",
+    dateDebut: "2026-02-02",
+    dateFin: "2026-02-27",
+    lieu: "25 avenue de la Formation Professionnelle, 75008 Paris – Salle A1 + accompagnement à distance",
+    nombreParticipants: "1",
+    formateur: "Jean-Pierre Blanc",
+    codeRNCP: "RNCP39063",
+  },
 ];
 
 // Satisfaction scores (pre-filled realistic data)
