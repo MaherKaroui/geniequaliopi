@@ -401,12 +401,15 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
             || doc.template === "tableau_amelioration_continue_excel"
             || doc.template === "suivi_dysfonctionnements_excel"
             || doc.template === "relances_appreciations_excel"
+            || doc.template === "vae_indicateurs_previsionnels"
           ) {
             const excelContent = doc.template === "indicateurs_performance"
               ? generateExcelTableauBordPerformance(mergedOrganisme, selectedFormation, allStagiaires)
               : doc.template === "tableau_suivi_parcours_excel"
                 ? generateExcelTableauSuiviParcours(mergedOrganisme, selectedFormation, allStagiaires)
-                : generateContent(doc);
+                : doc.template === "vae_indicateurs_previsionnels"
+                  ? generateExcelIndicateursPrevisionnelsVAE(mergedOrganisme, selectedFormation)
+                  : generateContent(doc);
             zip.file(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, ".xls")}`, excelToBlob(excelContent));
           } else {
             const content = generateContent(doc);
