@@ -4068,7 +4068,7 @@ function genVAECertificatRealisation(o: OrganismeInfo, f: FormationInfo, stagiai
   const dateFin = getStagiaireDateFin(s, f);
   return buildDocument({ org: o, title: "CERTIFICAT DE RÉALISATION", sections: [
     { heading: "", content: `<p>Je soussigné(e) ${o.dirigeant}, représentant légal de :</p><p>${o.nom}<br>${o.adresse}, ${o.codePostal} ${o.ville}<br>Numéro d'activité : ${o.nda}<br>SIRET : ${o.siret}</p><p>atteste que :</p><p>${s.civilite} <strong>${s.prenom} ${s.nom}</strong></p><p>${s.entreprise ? `salarié(e) de l'entreprise ${s.entreprise}` : ""}</p><p>a suivi l'action de <strong>VAE – ${f.intitule}</strong></p><p>Nature de l'action concourant au développement des compétences (article L. 6313-1 du Code du travail) :<br>☐ Action de formation<br>☐ Bilan de compétences<br>☒ <strong>Action de VAE</strong><br>☐ Action de formation par apprentissage</p><p>qui s'est déroulée du <strong>${formatDate(dateDebut)}</strong> au <strong>${formatDate(dateFin)}</strong></p><p>pour une durée de <strong>24 heures</strong>.</p><p>Fait à ${o.ville}, le ${formatDate(dateFin)}</p>` },
-  ], signatures: { type: "2", labels: ["Le Dirigeant", ""], names: [o.dirigeant, ""] } });
+  ], signatures: { type: "2", labels: ["Le Dirigeant", "Le Candidat"], names: [o.dirigeant, `${s.prenom} ${s.nom}`], stagiaireSignatureUrl: s.signatureUrl, noOrgSignature: true, dates: [formatDate(dateFin), formatDate(dateFin)] } });
 }
 
 function genVAEMailIntroduction(o: OrganismeInfo) {
