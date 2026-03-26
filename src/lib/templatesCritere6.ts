@@ -28,12 +28,14 @@ function veilleYear(f: FormationInfo, monthsBefore: number): string {
 }
 
 // ===== Detection helpers =====
-type FormationType = "fle" | "ia" | "word" | "commercial";
+type FormationType = "fle" | "ia" | "word" | "commercial" | "webmarketing" | "crm";
 
 function detectFormationType(f: FormationInfo): FormationType {
   const title = (f.intitule || "").toLowerCase();
   if (title.includes("français") || title.includes("fle") || title.includes("social") || title.includes("médico") || title.includes("medico") || title.includes("communiquer en français")) return "fle";
   if (title.includes("intelligence artificielle") || title.includes("ia générative") || title.includes("ia ") || title.includes("contenus rédactionnels") || title.includes("chatgpt") || title.includes("prompt")) return "ia";
+  if (title.includes("crm") || title.includes("automation") || title.includes("automatisation")) return "crm";
+  if (title.includes("webmarketing") || title.includes("marketing de contenus") || title.includes("réseaux sociaux") || title.includes("marketing digital")) return "webmarketing";
   if (title.includes("commercial") || title.includes("conseiller") || title.includes("négociat") || title.includes("vente") || title.includes("relation client") || title.includes("prospection")) return "commercial";
   return "word";
 }
@@ -166,6 +168,85 @@ function veilleReglementaireRows(f: FormationInfo, type: FormationType): string[
     ];
   }
 
+  if (type === "webmarketing") {
+    const yr = veilleYear(f, 0);
+    const yrPrev = veilleYear(f, 12);
+    return [
+      ...common,
+      [
+        `<a href="https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000006904070">Légifrance – Art. L6316-1</a>`,
+        "Article L6316-1 du Code du travail (Qualité des actions de formation)",
+        `Version en vigueur ${yrPrev}`,
+        "Obligation de certification Qualiopi pour les prestataires de formation souhaitant accéder aux fonds publics ou mutualisés.",
+        "Vérification annuelle du maintien de la certification + mise à jour procédures internes."
+      ],
+      [
+        `<a href="https://www.cnil.fr/fr/reglement-europeen-protection-donnees">CNIL – RGPD</a>`,
+        "RGPD – Règlement général sur la protection des données",
+        veilleDate(f, 8),
+        "Cadre réglementaire sur la collecte et le traitement des données personnelles. Impact direct sur les pratiques d'email marketing, tracking web (cookies, pixels), ciblage publicitaire et gestion des bases CRM.",
+        "Preuve : synthèse RGPD + checklist conformité. Action : intégrer un module RGPD dans la formation (mentions légales, consentement, opt-in, politique de confidentialité)."
+      ],
+      [
+        `<a href="https://www.economie.gouv.fr/dgccrf/Publications/Vie-pratique/Fiches-pratiques/pratiques-commerciales-trompeuses">DGCCRF – Pratiques commerciales</a>`,
+        "Réglementation des pratiques commerciales sur Internet",
+        veilleDate(f, 6),
+        "Encadrement des publicités en ligne, mentions obligatoires, interdiction des pratiques trompeuses (faux avis, prix barrés abusifs, influenceurs).",
+        "Preuve : fiche DGCCRF. Action : module sur les obligations légales de la publicité en ligne et des partenariats influenceurs."
+      ],
+      [
+        `<a href="https://www.cnil.fr/fr/cookies-et-autres-traceurs/regles/cookies">CNIL – Cookies et traceurs</a>`,
+        "CNIL – Lignes directrices cookies et traceurs",
+        veilleDate(f, 5),
+        "Encadrement de l'utilisation des cookies, pixels de suivi et traceurs publicitaires (Meta Pixel, Google Analytics). Obligation de consentement préalable.",
+        "Preuve : publication CNIL. Action : enseigner la mise en conformité cookies dans le module Analytics (bandeau cookie, Google Consent Mode)."
+      ],
+      [
+        `<a href="https://www.centre-inffo.fr/site-droit-formation/actualites-droit/cpf-hausse-du-montant-de-la-participation-forfaitaire">Centre Inffo – CPF</a>`,
+        "CPF : Hausse du montant de la participation forfaitaire",
+        veilleDate(f, 3),
+        "La participation financière pour l'achat d'une formation CPF s'élève à 103,20 euros. Impact sur le financement des formations marketing digital.",
+        "Preuve : article Centre Inffo. Action : informer les futurs stagiaires de la hausse du reste à charge CPF."
+      ],
+    ];
+  }
+
+  if (type === "crm") {
+    const yr = veilleYear(f, 0);
+    const yrPrev = veilleYear(f, 12);
+    return [
+      ...common,
+      [
+        `<a href="https://www.cnil.fr/fr/reglement-europeen-protection-donnees">CNIL – RGPD</a>`,
+        "RGPD – Règlement général sur la protection des données",
+        veilleDate(f, 8),
+        "Cadre réglementaire majeur pour les CRM : collecte de données, consentement, droit d'accès/suppression, DPA avec les sous-traitants (HubSpot, Brevo, etc.).",
+        "Preuve : synthèse RGPD + checklist. Action : module RGPD obligatoire dans la formation CRM (registre des traitements, base légale, durée de conservation)."
+      ],
+      [
+        `<a href="https://www.cnil.fr/fr/la-prospection-commerciale-par-courrier-electronique">CNIL – Prospection commerciale</a>`,
+        "CNIL – Prospection commerciale par email",
+        veilleDate(f, 6),
+        "Encadrement strict de la prospection B2C (opt-in obligatoire) et B2B (opt-out). Règles spécifiques pour les séquences d'email automation.",
+        "Preuve : publication CNIL. Action : intégrer les règles de prospection dans le module email marketing (distinction B2B/B2C, désinscription, mentions légales)."
+      ],
+      [
+        `<a href="https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000006904070">Légifrance – Art. L6316-1</a>`,
+        "Article L6316-1 du Code du travail (Qualité des actions de formation)",
+        `Version en vigueur ${yrPrev}`,
+        "Obligation de certification Qualiopi pour les prestataires souhaitant accéder aux fonds publics ou mutualisés.",
+        "Vérification annuelle du maintien de la certification + mise à jour des procédures internes."
+      ],
+      [
+        `<a href="https://www.centre-inffo.fr/site-droit-formation/actualites-droit/cpf-hausse-du-montant-de-la-participation-forfaitaire">Centre Inffo – CPF</a>`,
+        "CPF : Hausse du montant de la participation forfaitaire",
+        veilleDate(f, 3),
+        "La participation financière pour l'achat d'une formation CPF s'élève à 103,20 euros.",
+        "Preuve : article Centre Inffo. Action : informer les futurs stagiaires du reste à charge CPF."
+      ],
+    ];
+  }
+
   // Default: word/bureautique
   return [...common,
     [
@@ -286,6 +367,100 @@ function veilleMetierRows(f: FormationInfo, type: FormationType): string[][] {
         veilleMonthYear(f, 3),
         "Guide gouvernemental sur l'adoption de l'IA par les TPE/PME : usages concrets, outils recommandés, bonnes pratiques.",
         "Action Qualiopi : aligner les cas pratiques de la formation sur les usages IA recommandés par France Num."
+      ],
+    ];
+  }
+
+  if (type === "webmarketing") {
+    return [
+      [
+        `<a href="https://www.blogdumoderateur.com/dossier/social-media/">blogdumoderateur.com</a>`,
+        "Blog du Modérateur – Dossier Social Media",
+        veilleMonthYear(f, 8),
+        "Veille complète sur les réseaux sociaux : nouvelles fonctionnalités Instagram, LinkedIn, TikTok, évolutions algorithmiques, tendances de contenu.",
+        "Preuve : capture + lien. Action : mise à jour des modules réseaux sociaux selon les dernières fonctionnalités (carrousels LinkedIn, Reels Instagram, TikTok Shop)."
+      ],
+      [
+        `<a href="https://www.hubspot.fr/blog">HubSpot Blog France</a>`,
+        "HubSpot – Tendances marketing digital et inbound marketing",
+        veilleMonthYear(f, 7),
+        "Blog de référence sur le marketing digital : SEO, content marketing, email marketing, tunnels de vente, automation. Études de cas et statistiques actualisées.",
+        "Action Qualiopi : aligner les cas pratiques sur les dernières tendances inbound marketing et les benchmarks HubSpot."
+      ],
+      [
+        `<a href="https://www.semrush.com/blog/">SEMrush Blog</a>`,
+        "SEMrush – Études SEO et marketing de contenu",
+        veilleYear(f, 6),
+        "Publications d'études et rapports sur l'état du SEO, les tendances de recherche, et les meilleures pratiques de content marketing.",
+        "Preuve : rapport annuel SEMrush. Action : mise à jour du module SEO avec les dernières données de positionnement et les bonnes pratiques."
+      ],
+      [
+        `<a href="https://www.socialmediatoday.com/">Social Media Today</a>`,
+        "Social Media Today – Actualités réseaux sociaux",
+        veilleMonthYear(f, 5),
+        "Source internationale sur les évolutions des plateformes sociales : changements d'algorithme, nouvelles fonctionnalités, études d'engagement.",
+        "Action : adaptation des stratégies de publication et des formats de contenu enseignés selon les évolutions algorithmiques."
+      ],
+      [
+        `<a href="https://www.france-num.gouv.fr/guides-et-conseils/communication-et-publicite/reseaux-sociaux">France Num – Réseaux sociaux TPE/PME</a>`,
+        "France Num – Guide réseaux sociaux pour les entreprises",
+        veilleMonthYear(f, 4),
+        "Guide gouvernemental sur l'utilisation des réseaux sociaux par les TPE/PME : stratégie, bonnes pratiques, retours d'expérience.",
+        "Preuve : guide PDF France Num. Action Qualiopi : aligner les exercices sur les usages recommandés pour les entrepreneurs et indépendants."
+      ],
+      [
+        `<a href="https://www.meta.com/fr/blog/">Meta – Blog actualités</a>`,
+        "Meta – Nouvelles fonctionnalités Facebook, Instagram, Threads",
+        veilleMonthYear(f, 3),
+        "Annonces officielles Meta : évolutions publicitaires (Meta Ads), nouveaux formats, intelligence artificielle intégrée aux outils créateurs.",
+        "Preuve : captures annonces. Action : mise à jour du module publicité en ligne (Facebook Ads, Instagram Ads) avec les nouvelles options de ciblage."
+      ],
+    ];
+  }
+
+  if (type === "crm") {
+    return [
+      [
+        `<a href="https://www.hubspot.fr/blog">HubSpot Blog France</a>`,
+        "HubSpot – Tendances CRM et automation marketing",
+        veilleMonthYear(f, 8),
+        "Blog de référence sur le CRM, l'automation marketing et les tunnels de vente. Études de cas, guides pratiques et benchmarks sectoriels.",
+        "Preuve : capture + lien. Action : mise à jour des workflows et cas pratiques selon les nouvelles fonctionnalités HubSpot."
+      ],
+      [
+        `<a href="https://www.salesforce.com/fr/blog/">Salesforce Blog France</a>`,
+        "Salesforce – État du CRM et tendances relation client",
+        veilleMonthYear(f, 7),
+        "Rapport annuel « State of Sales » et « State of Marketing » : évolution des pratiques CRM, adoption de l'IA dans la relation client, tendances automation.",
+        "Action Qualiopi : intégrer les dernières tendances CRM (IA prédictive, scoring automatisé) dans le programme de formation."
+      ],
+      [
+        `<a href="https://www.make.com/en/blog">Make (Integromat) Blog</a>`,
+        "Make – Évolutions de la plateforme d'automation",
+        veilleYear(f, 6),
+        "Nouvelles intégrations, templates de scénarios, fonctionnalités IA intégrées. Plateforme clé pour l'enseignement de l'automation no-code.",
+        "Preuve : changelog + captures. Action : mise à jour des exercices Make avec les nouveaux connecteurs et modèles."
+      ],
+      [
+        `<a href="https://www.brevo.com/fr/blog/">Brevo Blog</a>`,
+        "Brevo – Email marketing, automation et CRM",
+        veilleMonthYear(f, 5),
+        "Évolutions de Brevo (ex-Sendinblue) : nouvelles fonctionnalités automation, segmentation avancée, intégration CRM, conformité RGPD.",
+        "Action : actualiser le module email marketing automation avec les nouvelles fonctionnalités Brevo (scoring, A/B test automation)."
+      ],
+      [
+        `<a href="https://zapier.com/blog/">Zapier Blog</a>`,
+        "Zapier – Tendances automation et productivité",
+        veilleMonthYear(f, 4),
+        "Articles sur l'automation des workflows métiers, comparatifs d'outils, templates de zaps. Rapport annuel sur les tendances automation.",
+        "Preuve : rapport + captures. Action : enrichir le module intégrations avec les zaps les plus utilisés par les entrepreneurs."
+      ],
+      [
+        `<a href="https://www.france-num.gouv.fr/guides-et-conseils/relation-client-et-fidelisation/outils-crm">France Num – CRM pour TPE/PME</a>`,
+        "France Num – Guide CRM pour les entreprises",
+        veilleMonthYear(f, 3),
+        "Guide gouvernemental sur l'adoption du CRM par les TPE/PME : choix d'outil, mise en place, bonnes pratiques, retours d'expérience.",
+        "Preuve : guide PDF France Num. Action Qualiopi : aligner les recommandations de choix CRM sur les préconisations France Num."
       ],
     ];
   }
@@ -441,6 +616,86 @@ function veilleTechnoRows(f: FormationInfo, type: FormationType): string[][] {
         veilleDate(f, 3),
         "Synthèse des pratiques : l'IA générative devient un outil quotidien pour la création de contenus dans les organismes de formation.",
         "Preuve : PDF baromètre. Action Qualiopi : alignement offre/compétences sur tendances IA et numériques."
+      ],
+    ];
+  }
+
+  if (type === "webmarketing") {
+    return [...commonDigitalLearning,
+      [
+        `<a href="https://www.canva.com/designschool/">Canva Design School</a>`,
+        "Canva – Formation création visuelle et design",
+        veilleMonthYear(f, 7),
+        "Plateforme d'apprentissage gratuite de Canva : tutoriels design, templates, intégration IA pour la génération de visuels professionnels.",
+        "Preuve : captures tutoriels. Action : intégrer les nouveaux templates et fonctionnalités IA Canva dans le module création visuelle."
+      ],
+      [
+        `<a href="https://business.facebook.com/">Meta Business Suite</a>`,
+        "Meta Business Suite – Évolutions outils de gestion réseaux sociaux",
+        veilleMonthYear(f, 6),
+        "Plateforme centralisée pour la gestion Facebook/Instagram : planification, statistiques, messagerie, publicité. Nouvelles fonctionnalités IA pour le ciblage Advantage+.",
+        "Action : mise à jour du module community management avec les nouvelles fonctionnalités Meta Business Suite."
+      ],
+      [
+        `<a href="https://analytics.google.com/">Google Analytics 4</a>`,
+        "Google Analytics 4 – Évolutions et nouvelles fonctionnalités",
+        veilleDate(f, 5),
+        "Passage obligatoire à GA4 : nouvelles métriques (engaged sessions), rapports d'exploration, intégration BigQuery, predictive audiences.",
+        "Preuve : documentation GA4. Action : mise à jour complète du module Analytics avec l'interface GA4 et les nouvelles métriques."
+      ],
+      [
+        `<a href="https://www.learningtechnologiesfrance.com/">learningtechnologiesfrance.com</a>`,
+        "Learning Technologies France – EdTech et formation digitale",
+        veilleYear(f, 5),
+        "Salon des technologies de formation : outils de création de contenu, plateformes LMS, solutions d'évaluation en ligne.",
+        "Preuve : programme + notes de veille. Action Qualiopi : benchmark des outils pédagogiques pour la formation marketing digital."
+      ],
+      [
+        `<a href="https://www.talenco.com/nos-publications/barometre-formation-professionnelle-tendances-pratiques-2025/">TalenCo – Baromètre</a>`,
+        "Baromètre formation professionnelle – transformation digitale",
+        veilleDate(f, 3),
+        "Synthèse des tendances : vidéo courte, IA dans le contenu marketing, social commerce, personal branding.",
+        "Preuve : PDF baromètre. Action Qualiopi : alignement du programme sur les tendances digitales émergentes."
+      ],
+    ];
+  }
+
+  if (type === "crm") {
+    return [...commonDigitalLearning,
+      [
+        `<a href="https://www.hubspot.fr/state-of-marketing">HubSpot – State of Marketing</a>`,
+        "HubSpot – Rapport annuel State of Marketing & CRM",
+        veilleMonthYear(f, 7),
+        "Rapport de référence sur l'état du CRM et de l'automation marketing : taux d'adoption, ROI, tendances (IA prédictive, chatbots, scoring automatisé).",
+        "Preuve : rapport PDF. Action : aligner les cas pratiques sur les benchmarks d'usage CRM les plus récents."
+      ],
+      [
+        `<a href="https://www.make.com/en/blog">Make Blog</a>`,
+        "Make – Nouveautés et templates d'automation",
+        veilleMonthYear(f, 6),
+        "Évolutions de la plateforme Make : nouveaux connecteurs (HubSpot, Brevo, Stripe), templates de scénarios, fonctionnalités IA intégrées.",
+        "Action : mise à jour des exercices Make avec les derniers connecteurs et modèles de scénarios."
+      ],
+      [
+        `<a href="https://www.brevo.com/fr/blog/">Brevo – Innovation email & automation</a>`,
+        "Brevo – Nouvelles fonctionnalités automation et IA",
+        veilleDate(f, 5),
+        "Évolutions Brevo : IA pour l'optimisation des objets d'email, segmentation prédictive, A/B test automatisé, intégration WhatsApp Business.",
+        "Preuve : changelog Brevo. Action : intégrer les nouvelles fonctionnalités dans le module email marketing automation."
+      ],
+      [
+        `<a href="https://www.learningtechnologiesfrance.com/">learningtechnologiesfrance.com</a>`,
+        "Learning Technologies France – CRM & automation pour la formation",
+        veilleYear(f, 5),
+        "Salon des technologies de formation : solutions CRM éducatives, automation de la gestion des apprenants.",
+        "Preuve : programme + notes. Action Qualiopi : veille sur les outils CRM adaptés au secteur de la formation."
+      ],
+      [
+        `<a href="https://www.talenco.com/nos-publications/barometre-formation-professionnelle-tendances-pratiques-2025/">TalenCo – Baromètre</a>`,
+        "Baromètre formation professionnelle – digitalisation et automation",
+        veilleDate(f, 3),
+        "Synthèse des tendances : automation des processus de gestion, CRM pour les OF, outils no-code.",
+        "Preuve : PDF baromètre. Action Qualiopi : alignement des outils enseignés sur les tendances du marché."
       ],
     ];
   }
