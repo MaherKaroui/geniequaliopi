@@ -3590,23 +3590,32 @@ function genVAEReglementInterieur(o: OrganismeInfo) {
 function genVAEFicheSuiviIndividuel(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = stagiaires[si] || stagiaires[0] || FALLBACK_STAGIAIRE;
   const dateDebut = getStagiaireDateDebut(s, f);
+  const dateFin = getStagiaireDateFin(s, f);
+  // Calculate actual dates for each session spread between dateDebut and dateFin
+  const dStart = new Date(dateDebut);
+  const dEnd = new Date(dateFin);
+  const totalDays = Math.max(1, Math.round((dEnd.getTime() - dStart.getTime()) / 86400000));
+  const seanceDate = (idx: number) => {
+    const d = new Date(dStart.getTime() + Math.round((idx / 9) * totalDays) * 86400000);
+    return formatDate(d.toISOString().slice(0, 10));
+  };
   return buildDocument({ org: o, title: "FICHE DE SUIVI INDIVIDUEL VAE", subtitle: `${s.prenom} ${s.nom}`, table: {
     headers: ["Séance", "Date", "Objectifs travaillés", "Réalisations", "Travail à faire", "Observations"],
     rows: [
-      ["1", formatDate(dateDebut), "Analyse du référentiel", "Référentiel décrypté, activités listées", "Lister les preuves disponibles", "Candidat motivé et organisé"],
-      ["2", "J+7", "Identification des compétences", "Cartographie des compétences réalisée", "Rédiger introduction Bloc 1", "Bonne compréhension du référentiel"],
-      ["3", "J+14", "Rédaction Bloc 1", "Bloc 1 rédigé à 80%", "Finaliser Bloc 1 et rassembler preuves", "Bonne qualité rédactionnelle"],
-      ["4", "J+21", "Finalisation Bloc 1 + Début Bloc 2", "Bloc 1 terminé, Bloc 2 entamé", "Poursuivre rédaction Bloc 2", "Progression régulière"],
-      ["5", "J+28", "Rédaction Bloc 2", "Bloc 2 rédigé à 90%", "Finaliser Bloc 2", "Très bon travail"],
-      ["6", "J+35", "Rédaction Bloc 3", "Bloc 3 rédigé", "Rassembler toutes les preuves", "Contenu riche et pertinent"],
-      ["7", "J+42", "Portefeuille de preuves et annexes", "Preuves organisées et classées", "Relire le dossier complet", "Dossier bien structuré"],
-      ["8", "J+49", "Relecture globale", "Corrections apportées, dossier finalisé", "Préparer la présentation orale", "Dossier prêt pour envoi"],
-      ["9", "J+56", "Préparation orale", "Trame de présentation validée", "S'entraîner à la présentation", "Bon potentiel à l'oral"],
-      ["10", "J+63", "Simulation jury + envoi dossier", "Simulation réussie, dossier envoyé", "Attendre convocation jury", "Candidat prêt"],
+      ["1", seanceDate(0), "Analyse du référentiel", "Référentiel décrypté, activités listées", "Lister les preuves disponibles", "Candidat motivé et organisé"],
+      ["2", seanceDate(1), "Identification des compétences", "Cartographie des compétences réalisée", "Rédiger introduction Bloc 1", "Bonne compréhension du référentiel"],
+      ["3", seanceDate(2), "Rédaction Bloc 1", "Bloc 1 rédigé à 80%", "Finaliser Bloc 1 et rassembler preuves", "Bonne qualité rédactionnelle"],
+      ["4", seanceDate(3), "Finalisation Bloc 1 + Début Bloc 2", "Bloc 1 terminé, Bloc 2 entamé", "Poursuivre rédaction Bloc 2", "Progression régulière"],
+      ["5", seanceDate(4), "Rédaction Bloc 2", "Bloc 2 rédigé à 90%", "Finaliser Bloc 2", "Très bon travail"],
+      ["6", seanceDate(5), "Rédaction Bloc 3", "Bloc 3 rédigé", "Rassembler toutes les preuves", "Contenu riche et pertinent"],
+      ["7", seanceDate(6), "Portefeuille de preuves et annexes", "Preuves organisées et classées", "Relire le dossier complet", "Dossier bien structuré"],
+      ["8", seanceDate(7), "Relecture globale", "Corrections apportées, dossier finalisé", "Préparer la présentation orale", "Dossier prêt pour envoi"],
+      ["9", seanceDate(8), "Préparation orale", "Trame de présentation validée", "S'entraîner à la présentation", "Bon potentiel à l'oral"],
+      ["10", seanceDate(9), "Simulation jury + envoi dossier", "Simulation réussie, dossier envoyé", "Attendre convocation jury", "Candidat prêt"],
     ]
   }, sections: [
-    { heading: "Bilan global", content: `<p>Accompagnement de 24 heures réalisé sur 10 séances. ${s.prenom} ${s.nom} a fait preuve d'un engagement exemplaire tout au long de la démarche. Le dossier de validation est complet, bien structuré et argumenté. Le candidat est prêt pour le passage devant le jury.</p>`, variant: "green" },
-  ], signatures: { type: "2", labels: ["L'Accompagnateur VAE", "Le Candidat"], names: [o.responsablePedagogique, s.prenom + " " + s.nom] } });
+    { heading: "Bilan global", content: `<p>Accompagnement de 24 heures réalisé sur 10 séances du ${formatDate(dateDebut)} au ${formatDate(dateFin)}. ${s.prenom} ${s.nom} a fait preuve d'un engagement exemplaire tout au long de la démarche. Le dossier de validation est complet, bien structuré et argumenté. Le candidat est prêt pour le passage devant le jury.</p><p>Fait à ${o.ville}, le ${formatDate(dateFin)}</p>`, variant: "green" },
+  ], signatures: { type: "2", labels: ["L'Accompagnateur VAE (Formateur)", "Le Candidat"], names: [o.responsablePedagogique, s.prenom + " " + s.nom], stagiaireSignatureUrl: s.signatureUrl, formateurSignatureUrl: s.formateurSignatureUrl || f.formateurSignatureUrl, dates: [formatDate(dateFin), formatDate(dateFin)] } });
 }
 
 function genVAEGrilleEvaluationDossier(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
