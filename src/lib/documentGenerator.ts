@@ -3990,11 +3990,14 @@ function genVAEMailHandicap(o: OrganismeInfo) {
   ] });
 }
 
-function genVAEEngagementsRespectifs(o: OrganismeInfo) {
+function genVAEEngagementsRespectifs(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
+  const s = stagiaires[0] || FALLBACK_STAGIAIRE;
+  const dateDebut = getStagiaireDateDebut(s, f);
+  const dateSignature = subtractBusinessDays(dateDebut, 14);
   return buildDocument({ org: o, title: "ENGAGEMENTS RESPECTIFS – VAE", sections: [
     { heading: `${o.nom} s'engage à`, content: `<p>1. Fournir toutes les informations utiles et précises sur la durée, les procédures, les étapes de l'accompagnement et le suivi post jury d'une démarche VAE.<br>2. Clarifier le projet du bénéficiaire.<br>3. Donner les informations nécessaires concernant les objectifs, les compétences et les savoirs visés par les certifications délivrées, pour permettre au bénéficiaire d'identifier celui qui est le plus en rapport avec son parcours ainsi que son projet.<br>4. Adapter les besoins du bénéficiaire par un accompagnement individualisé.<br>5. Respecter les principes de confidentialité et de neutralité à l'égard des informations transmises par le bénéficiaire.<br>6. Apporter une aide méthodologique au bénéficiaire tout au long du processus de validation même après la décision du jury.<br>7. Établir une relation où le bénéficiaire s'engage à être un acteur volontaire et responsable de sa démarche VAE.<br>8. Aider le bénéficiaire à remplir le Livret 1 et le Livret 2.<br>9. Préparer le bénéficiaire à l'entretien qui aura lieu devant le jury par la validation totale ou partielle de la certification visée.<br>10. Respecter la charte de déontologie des membres du jury de VAE.</p>` },
-    { heading: "Le bénéficiaire s'engage à", content: `<p>1. Participer aux différentes étapes de l'accompagnement.<br>2. Respecter le calendrier des rendez-vous définis avec le prestataire.<br>3. Rédiger les deux livrets.<br>4. Fournir toute information utile à une mise en œuvre efficace de la VAE.</p>`, variant: "green" },
-  ], signatures: { type: "2", labels: ["Le Dirigeant", "Le Bénéficiaire"], names: [o.dirigeant, ""] } });
+    { heading: "Le bénéficiaire s'engage à", content: `<p>1. Participer aux différentes étapes de l'accompagnement.<br>2. Respecter le calendrier des rendez-vous définis avec le prestataire.<br>3. Rédiger les deux livrets.<br>4. Fournir toute information utile à une mise en œuvre efficace de la VAE.</p><p>Fait à ${o.ville}, le ${formatDate(dateSignature)}</p>`, variant: "green" },
+  ], signatures: { type: "2", labels: ["Le Dirigeant", "Le Bénéficiaire"], names: [o.dirigeant, `${s.prenom} ${s.nom}`], stagiaireSignatureUrl: s.signatureUrl, dates: [formatDate(dateSignature), formatDate(dateSignature)] } });
 }
 
 function genVAELivret2(o: OrganismeInfo, f: FormationInfo) {
