@@ -402,6 +402,73 @@ export const RNCP_FICHES: RNCPFiche[] = [
     voiesAcces: ["Après un parcours de formation continue", "Par candidature individuelle", "Par expérience (VAE)"],
     dureeIndicative: "28h",
   },
+  {
+    code: "RNCP31041",
+    intitule: "CAP Esthétique Cosmétique Parfumerie",
+    niveau: "Niveau 3 (CAP)",
+    certificateur: "Ministère de l'Éducation nationale et de la Jeunesse",
+    dateEnregistrement: "2017-07-05",
+    dateEcheance: "2028-12-31",
+    codeNSF: "336",
+    formacodes: "42032, 42040, 42056",
+    resume: "Le titulaire du CAP Esthétique Cosmétique Parfumerie est un professionnel qualifié qui réalise des soins esthétiques du visage et du corps, des épilations, des maquillages, des manucures et des conseils de vente de produits cosmétiques et de parfumerie. Il accueille, conseille et fidélise la clientèle dans le respect des protocoles d'hygiène et de sécurité.",
+    activitesVisees: "Réalisation de techniques esthétiques : soins du visage et du corps, épilations, maquillage, manucure et beauté des pieds. Conseil et vente de produits cosmétiques et de parfumerie. Accueil et prise en charge de la clientèle. Gestion de l'espace de travail et respect des protocoles d'hygiène.",
+    blocsCompetences: [
+      {
+        titre: "Bloc 1 – Techniques esthétiques du visage, des mains et des pieds",
+        competences: [
+          "Réaliser des soins esthétiques du visage",
+          "Réaliser des épilations du visage",
+          "Réaliser un maquillage du visage",
+          "Réaliser des soins des mains et des pieds (manucure, beauté des pieds)",
+          "Mettre en œuvre les protocoles d'hygiène et de sécurité"
+        ],
+        matieres: [
+          { competence: "Soins du visage", contenu: "Analyse de peau, nettoyage, gommage, modelage, masques, soins spécifiques", volume: "60h" },
+          { competence: "Épilation du visage", contenu: "Techniques à la cire chaude et tiède, finitions", volume: "20h" },
+          { competence: "Maquillage", contenu: "Étude du visage, maquillage jour et soir, auto-maquillage, maquillage correctif", volume: "40h" },
+          { competence: "Soins des mains et pieds", contenu: "Manucure, mise en beauté des ongles, soin des pieds, pose de vernis", volume: "30h" }
+        ],
+        modalitesEval: "Épreuve pratique : réalisation de soins esthétiques du visage, d'un maquillage, d'une manucure et d'une épilation sur modèle vivant."
+      },
+      {
+        titre: "Bloc 2 – Techniques esthétiques liées aux phanères",
+        competences: [
+          "Réaliser des épilations sur différentes zones du corps",
+          "Réaliser des soins des ongles et des prothèses ongulaires simples",
+          "Réaliser des colorations et décolorations des poils et cils",
+          "Appliquer les règles d'hygiène et de sécurité spécifiques"
+        ],
+        matieres: [
+          { competence: "Épilations corporelles", contenu: "Techniques d'épilation à la cire (toutes zones), utilisation des différents types de cire", volume: "40h" },
+          { competence: "Soins des ongles", contenu: "Techniques de limage, polissage, pose de vernis semi-permanent, décorations simples", volume: "30h" },
+          { competence: "Coloration/décoloration", contenu: "Teinture des cils et sourcils, décoloration des duvets", volume: "15h" }
+        ],
+        modalitesEval: "Épreuve pratique : réalisation d'une épilation et de soins des ongles sur modèle vivant."
+      },
+      {
+        titre: "Bloc 3 – Conduite d'un institut de beauté et de bien-être : conseil et vente",
+        competences: [
+          "Accueillir et prendre en charge la clientèle",
+          "Conseiller et vendre des produits cosmétiques et de parfumerie",
+          "Mettre en valeur et promouvoir des produits, des services",
+          "Participer à la vie d'un institut (organisation, encaissement, fidélisation)",
+          "Gérer les rendez-vous et l'espace de vente"
+        ],
+        matieres: [
+          { competence: "Conseil et vente", contenu: "Connaissance des produits cosmétiques, techniques de vente, argumentation commerciale, fidélisation", volume: "40h" },
+          { competence: "Gestion d'institut", contenu: "Gestion des stocks, encaissement, tenue de caisse, planification des rendez-vous", volume: "25h" },
+          { competence: "Communication professionnelle", contenu: "Accueil client, écoute active, gestion des réclamations", volume: "15h" }
+        ],
+        modalitesEval: "Épreuve orale et écrite : mise en situation de conseil et vente, analyse d'une situation professionnelle en institut."
+      }
+    ],
+    secteursActivite: "Esthétique, cosmétique, parfumerie, bien-être, spa, parapharmacie, grande distribution spécialisée",
+    typesEmplois: ["Esthéticien(ne)", "Conseiller(ère) de vente en parfumerie", "Prothésiste ongulaire", "Maquilleur(se)", "Spa praticien(ne)"],
+    codesROME: ["D1208", "D1214"],
+    voiesAcces: ["Formation initiale sous statut scolaire", "Apprentissage", "Formation professionnelle continue", "Candidature individuelle", "VAE"],
+    dureeIndicative: "600h (formation) + 12 semaines de stage en milieu professionnel",
+  },
 ];
 
 export function getRNCPByCode(code: string): RNCPFiche | undefined {

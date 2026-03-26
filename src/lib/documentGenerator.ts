@@ -256,6 +256,8 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "vae_diffusion_info": return genVAEDiffusionInfo(o, f);
     case "vae_procedure_info": return genVAEProcedureInfo(o);
     case "vae_indicateurs_resultats": return genVAEIndicateursResultats(o);
+    case "vae_indicateurs_previsionnels": return ""; // Excel template – handled in DocumentGenerator.tsx
+    case "vae_presentation_nouvel_entrant": return genVAEPresentationNouvelEntrant(o, f);
     case "vae_taux_certification": return genVAETauxCertification(o);
     case "vae_info_certification": return genVAEInfoCertification(o, f);
     case "vae_process_analyse_besoin": return genVAEProcessAnalyseBesoin(o);
@@ -3393,6 +3395,26 @@ function genVAEProcedureInfo(o: OrganismeInfo) {
 }
 
 function genVAEIndicateursResultats(o: OrganismeInfo) {
+  const isNouvelEntrant = !o.typesActions?.includes('actions-formation') || o.typesActions?.includes('vae');
+  if (isNouvelEntrant) {
+    return buildDocument({ org: o, title: "INDICATEURS DE RÉSULTATS – VAE", subtitle: "Nouvel entrant – Phase de lancement", sections: [
+      { heading: "Contexte : nouvel entrant VAE", content: `<p>${o.nom} lance son activité d'accompagnement VAE en 2026. En tant que <strong>nouvel entrant</strong> sur ce périmètre d'activité, l'organisme ne dispose pas encore d'indicateurs de résultats historiques pour cette prestation.</p><p>Conformément aux exigences du Référentiel National Qualité (Qualiopi), les indicateurs de résultats seront renseignés au fur et à mesure de l'activité et diffusés dès qu'ils seront significatifs.</p><p><strong>L'organisme s'engage à :</strong></p><ul><li>Mettre en place un dispositif de collecte des données dès le premier candidat accompagné</li><li>Suivre les indicateurs définis ci-dessous sur une base trimestrielle</li><li>Diffuser les résultats annuels dès la fin du premier exercice complet</li><li>Communiquer de manière transparente sur l'absence d'historique lors de l'information du public</li></ul>` },
+    ], table: {
+      headers: ["Indicateur", "Historique", "Objectif prévisionnel 2026", "Méthode de calcul", "Périodicité de suivi"],
+      rows: [
+        ["Nombre de candidats accompagnés", "Pas d'historique – nouvel entrant", "≥ 5 candidats", "Comptage des conventions signées", "Trimestriel"],
+        ["Taux de recevabilité (Livret 1)", "Pas d'historique – nouvel entrant", "≥ 90%", "Livrets 1 recevables / Livrets 1 déposés × 100", "À chaque dépôt"],
+        ["Taux de présentation au jury", "Pas d'historique – nouvel entrant", "≥ 80%", "Candidats présentés / Candidats accompagnés × 100", "Annuel"],
+        ["Taux de validation totale", "Pas d'historique – nouvel entrant", "≥ 70%", "Validations totales / Candidats présentés × 100", "Annuel"],
+        ["Taux de validation partielle", "Pas d'historique – nouvel entrant", "≤ 25%", "Validations partielles / Candidats présentés × 100", "Annuel"],
+        ["Taux de satisfaction candidats", "Pas d'historique – nouvel entrant", "≥ 90%", "Notes ≥ 4/5 / Total questionnaires × 100", "À chaque fin d'accompagnement"],
+        ["Taux d'abandon", "Pas d'historique – nouvel entrant", "≤ 10%", "Abandons / Candidats engagés × 100", "Trimestriel"],
+        ["Taux de recommandation", "Pas d'historique – nouvel entrant", "≥ 80%", "Candidats recommandant / Candidats interrogés × 100", "Annuel"],
+        ["Délai moyen de réponse aux demandes", "Pas d'historique – nouvel entrant", "≤ 48h", "Moyenne des délais de première réponse", "Mensuel"],
+        ["Taux de complétude des dossiers", "Pas d'historique – nouvel entrant", "≥ 85%", "Dossiers complets au premier dépôt / Total dossiers × 100", "À chaque dépôt"],
+      ]
+    } });
+  }
   return buildDocument({ org: o, title: "INDICATEURS DE RÉSULTATS – VAE", table: {
     headers: ["Indicateur", "Année N-1", "Année N", "Objectif"],
     rows: [
@@ -3411,6 +3433,15 @@ function genVAEIndicateursResultats(o: OrganismeInfo) {
 }
 
 function genVAETauxCertification(o: OrganismeInfo) {
+  const isNouvelEntrant = !o.typesActions?.includes('actions-formation') || o.typesActions?.includes('vae');
+  if (isNouvelEntrant) {
+    return buildDocument({ org: o, title: "TAUX D'OBTENTION DES CERTIFICATIONS – VAE", subtitle: "Nouvel entrant – Phase de lancement", sections: [
+      { heading: "Contexte : nouvel entrant", content: `<p>${o.nom} débute son activité d'accompagnement VAE en 2026. Aucun candidat n'ayant encore été présenté devant un jury à ce jour, les taux d'obtention des certifications ne sont pas encore disponibles.</p><p>Ce document sera mis à jour dès que les premiers résultats seront connus, conformément aux exigences de l'indicateur 3 du Référentiel National Qualité.</p>` },
+      { heading: "Certifications visées", content: `<p>Les certifications proposées dans le cadre de l'accompagnement VAE sont les suivantes :</p><table><tr><th>Certification</th><th>Code RNCP</th><th>Niveau</th><th>Candidats en cours</th><th>Résultats</th></tr><tr><td>CAP Esthétique Cosmétique Parfumerie</td><td>RNCP31041</td><td>Niveau 3</td><td>À renseigner</td><td>En attente – activité en lancement</td></tr></table>`, variant: "green" },
+      { heading: "Dispositif de suivi prévu", content: `<p>Dès le premier passage devant un jury, l'organisme s'engage à :<br>• Enregistrer le résultat (validation totale, partielle ou refus)<br>• Calculer le taux d'obtention par certification<br>• Diffuser ces résultats sur ses supports de communication<br>• Analyser les résultats pour identifier les axes d'amélioration</p>` },
+      { heading: "Suites de parcours envisagées", content: `<p>• Poursuite vers un BP Esthétique Cosmétique Parfumerie (niveau 4) pour les validations totales<br>• Accompagnement complémentaire pour l'obtention des blocs manquants en cas de validation partielle<br>• Orientation vers d'autres dispositifs (formation complémentaire, bilan de compétences) si nécessaire</p>` },
+    ] });
+  }
   return buildDocument({ org: o, title: "TAUX D'OBTENTION DES CERTIFICATIONS – VAE", table: {
     headers: ["Certification visée", "Candidats présentés", "Validation totale", "Validation partielle", "Refus", "Taux réussite"],
     rows: [
@@ -3434,6 +3465,23 @@ function genVAEEntretienFaisabilite(o: OrganismeInfo, f: FormationInfo) {
     { heading: "Avis du conseiller", content: `<p>☐ <strong>Faisabilité confirmée</strong> – Le candidat remplit les conditions et le projet est cohérent.<br>☐ <strong>Faisabilité sous réserve</strong> – Compléments d'expérience nécessaires.<br>☐ <strong>Réorientation conseillée</strong> – Autre certification ou autre dispositif recommandé.<br><br><strong>Commentaires :</strong><br>____________________________</p>`, variant: "green" },
   ], signatures: { type: "2", labels: ["Le Conseiller VAE", "Le Candidat"], names: [o.responsablePedagogique, ""] } });
 }
+
+function genVAEPresentationNouvelEntrant(o: OrganismeInfo, f: FormationInfo) {
+  const certName = f.intitule || "CAP Esthétique Cosmétique Parfumerie";
+  const codeRNCP = f.codeRNCP || "RNCP31041";
+  return buildDocument({ org: o, title: "PRÉSENTATION DE L'ACTIVITÉ VAE – NOUVEL ENTRANT", subtitle: certName, sections: [
+    { heading: "1. Présentation de l'activité", content: `<p><strong>Intitulé :</strong> Accompagnement VAE – ${certName}</p><p><strong>Type d'action :</strong> Actions de Validation des Acquis de l'Expérience (VAE) – Article L.6313-1 du Code du travail</p><p><strong>Positionnement :</strong> <span style="color:#c0392b;font-weight:bold;">Nouvel entrant</span> – ${o.nom} lance son activité d'accompagnement VAE en 2026. L'organisme est nouvel entrant sur ce périmètre d'activité.</p><p><strong>Certification visée :</strong> ${certName} (${codeRNCP}) – Niveau 3 – Certificateur : Ministère de l'Éducation nationale et de la Jeunesse</p>` },
+    { heading: "2. Public visé", content: `<p>L'accompagnement VAE s'adresse aux :</p><ul><li>Esthéticien(ne)s exerçant sans diplôme depuis au moins 1 an</li><li>Conseiller(ère)s en parfumerie et cosmétique</li><li>Prothésistes ongulaires</li><li>Spa praticien(ne)s</li><li>Coiffeur(se)s ayant développé des compétences en esthétique</li><li>Toute personne justifiant d'au moins 1 an (1 607 heures) d'expérience en rapport direct avec les activités visées par le CAP Esthétique Cosmétique Parfumerie</li></ul><p><strong>Statuts éligibles :</strong> salariés, indépendants, demandeurs d'emploi, bénévoles</p>` },
+    { heading: "3. Prérequis", content: `<ul><li>Justifier d'au moins <strong>1 an d'expérience</strong> (1 607 heures) en rapport direct avec la certification visée</li><li>Activités concernées : soins esthétiques du visage et du corps, épilations, maquillage, manucure, conseil et vente de produits cosmétiques et de parfumerie</li><li>Avoir un projet VAE validé (par un conseiller en évolution professionnelle ou lors de l'entretien de faisabilité)</li><li>Maîtriser les savoirs de base (lire, écrire, s'exprimer en français)</li></ul>` },
+    { heading: "4. Objectifs de l'accompagnement", content: `<p>L'accompagnement VAE proposé par ${o.nom} vise à :</p><ul><li>Analyser le parcours professionnel du candidat au regard du référentiel ${codeRNCP}</li><li>Constituer le livret 1 de recevabilité</li><li>Rédiger le livret 2 (dossier de validation) en lien avec les 3 blocs de compétences : techniques esthétiques visage/mains/pieds, techniques liées aux phanères, conduite d'institut et conseil/vente</li><li>Constituer un portefeuille de preuves (photos, attestations, certificats)</li><li>Préparer le candidat au passage devant le jury (simulation d'entretien)</li><li>Accompagner jusqu'à la décision du jury</li></ul>`, variant: "green" },
+    { heading: "5. Modalités d'accompagnement", content: `<p><strong>Durée recommandée :</strong> 24 heures réparties sur 4 semaines</p><p><strong>Organisation :</strong></p><ul><li><strong>Semaine 1 (6h) :</strong> Analyse du parcours, aide au livret 1, positionnement par rapport au référentiel</li><li><strong>Semaine 2 (6h) :</strong> Début du livret 2, identification des compétences, structuration des expériences</li><li><strong>Semaine 3 (8h) :</strong> Rédaction du livret 2, mise en lien avec les 3 blocs du référentiel ${codeRNCP}</li><li><strong>Semaine 4 (6h) :</strong> Finalisation du dossier, préparation à l'oral jury, simulation d'entretien</li></ul><p><strong>Format :</strong> Accompagnement individuel, en présentiel et/ou à distance (visioconférence)</p>` },
+    { heading: "6. Modalités d'évaluation", content: `<ul><li>Évaluation continue de la progression du livret 2</li><li>Grille de positionnement par bloc de compétences du référentiel ${codeRNCP}</li><li>Simulation d'entretien devant le jury avec grille d'observation</li><li>Auto-évaluation du candidat à chaque étape</li><li>Évaluation finale par le jury de certification (indépendant de l'organisme)</li></ul>` },
+    { heading: "7. Accessibilité handicap", content: `<p>L'accompagnement VAE est accessible aux personnes en situation de handicap. Des aménagements sont possibles sur demande :</p><ul><li>Adaptation du rythme et de la durée de l'accompagnement</li><li>Aménagement des supports et outils</li><li>Accompagnement renforcé par le référent handicap</li><li>Orientation vers les partenaires spécialisés (Agefiph, MDPH)</li></ul><p><strong>Référent handicap :</strong> ${o.referentHandicap} – ${o.email}</p>` },
+    { heading: "8. Modalités de contact et d'inscription", content: `<p><strong>Étape 1 :</strong> Prise de contact par email (${o.email}) ou téléphone (${o.telephone})<br><strong>Étape 2 :</strong> Entretien de faisabilité gratuit (1h) – analyse du projet et du parcours<br><strong>Étape 3 :</strong> Si faisabilité confirmée, signature de la convention d'accompagnement<br><strong>Étape 4 :</strong> Début de l'accompagnement sous 14 jours</p><p><strong>Tarif :</strong> 2 200 € HT – Finançable par le CPF, l'employeur ou un OPCO</p><p><strong>Contact :</strong> ${o.nom} – ${o.telephone} – ${o.email}<br><strong>Référent VAE :</strong> ${o.responsablePedagogique}</p>`, variant: "green" },
+    { heading: "9. Positionnement nouvel entrant – Démarche qualité", content: `<p>${o.nom} est <strong>nouvel entrant</strong> sur l'activité d'accompagnement VAE. À ce titre :</p><ul><li>Les indicateurs de performance historiques (taux de validation, taux de satisfaction, etc.) ne sont <strong>pas encore disponibles</strong></li><li>Aucune statistique passée n'est communiquée : l'organisme fait preuve de <strong>transparence totale</strong> sur l'absence d'historique</li><li>Un <strong>dispositif de suivi</strong> est mis en place dès le démarrage pour mesurer :<ul><li>Nombre de candidats accompagnés</li><li>Taux d'abandon</li><li>Taux de satisfaction</li><li>Taux de présentation au jury</li><li>Taux de validation totale ou partielle</li><li>Taux de recommandation</li><li>Délai moyen de réponse aux demandes</li></ul></li><li>Des <strong>objectifs prévisionnels 2026</strong> sont définis et serviront de référence pour l'amélioration continue</li><li>Les résultats seront diffusés dès qu'ils seront significatifs, conformément aux exigences du RNQ</li></ul>` },
+  ] });
+}
+
 
 function genVAEDiagnosticFaisabilite(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = stagiaires[si] || stagiaires[0] || FALLBACK_STAGIAIRE;

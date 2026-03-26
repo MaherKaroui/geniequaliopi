@@ -448,6 +448,8 @@ export function buildFullCatalog(
     add("vae_c1i1_diffusion_info", "CT1 - IND 1 Diffusion d'information sur la VAE", 1, 1, "vae_diffusion_info");
     add("vae_c1i1_procedure_info", "CT1 - IND 1 Procédure d'information du public VAE", 1, 1, "vae_procedure_info");
     add("vae_c1i2_indicateurs_resultats", "CT1 - IND 2 Indicateurs de résultats VAE", 1, 2, "vae_indicateurs_resultats");
+    add("vae_c1i2_indicateurs_previsionnels", "CT1 - IND 2 Indicateurs prévisionnels VAE – Nouvel entrant (Excel)", 1, 2, "vae_indicateurs_previsionnels");
+    add("vae_c1i2_presentation_nouvel_entrant", "CT1 - IND 2 Présentation nouvel entrant VAE", 1, 2, "vae_presentation_nouvel_entrant");
     add("vae_c1i3_taux_certification", "CT1 - IND 3 Taux d'obtention des certifications VAE", 1, 3, "vae_taux_certification");
     add("vae_c1i3_info_certification", "CT1 - IND 3 Information certification professionnelle", 1, 3, "vae_info_certification");
 

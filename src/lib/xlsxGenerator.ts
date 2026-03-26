@@ -242,21 +242,23 @@ export function generateExcelTableauBordPerformance(o: OrganismeInfo, f: Formati
   html += `<th>Commentaires / analyse</th></tr>`;
 
   // Taux de satisfaction row
-  const satisfactionN1 = isVAE ? "N/A" : "";
+  const satisfactionN1 = isVAE ? "N/A – Nouvel entrant" : "";
   html += `<tr><td rowspan="3">${f.intitule || o.nom}</td><td>Taux de satisfaction appréciation des bénéficiaires</td><td>${satisfactionN1}</td>`;
   mois.forEach((_, i) => { html += `<td>${countPerMonth[i] > 0 ? "100%" : ""}</td>`; });
-  html += `<td>${f.intitule || o.nom} a reçu ${nbStagiaires} ${nbStagiaires > 1 ? labelBeneficiaires : labelBeneficiaire} pour l'année ${annee}. Nous avons été noté 10/10 sur le taux de satisfaction pour l'année ${annee} au critère 7.30. Nous communiquerons cet élément de diffusion sur notre site internet et sur notre programme de formation.</td></tr>`;
+  html += `<td>${isVAE 
+    ? `${o.nom} est nouvel entrant sur l'activité VAE. ${nbStagiaires} ${nbStagiaires > 1 ? labelBeneficiaires : labelBeneficiaire} accompagné${nbStagiaires > 1 ? "s" : ""} pour l'année ${annee}. Les indicateurs seront renseignés au fur et à mesure de l'activité et diffusés dès qu'ils seront significatifs.`
+    : `${f.intitule || o.nom} a reçu ${nbStagiaires} ${nbStagiaires > 1 ? labelBeneficiaires : labelBeneficiaire} pour l'année ${annee}. Nous avons été noté 10/10 sur le taux de satisfaction pour l'année ${annee} au critère 7.30. Nous communiquerons cet élément de diffusion sur notre site internet et sur notre programme de formation.`}</td></tr>`;
 
   // Nombre de bénéficiaires row
-  html += `<tr><td>Nombre de ${labelBeneficiaires}</td><td>0</td>`;
+  html += `<tr><td>Nombre de ${labelBeneficiaires}</td><td>${isVAE ? "0 – Nouvel entrant" : "0"}</td>`;
   mois.forEach((_, i) => { html += `<td>${countPerMonth[i] > 0 ? countPerMonth[i] : ""}</td>`; });
-  html += `<td>${isVAE ? `Première année d'activité VAE – aucun ${labelBeneficiaire} accompagné en ${anneeN1}.` : ""}</td></tr>`;
+  html += `<td>${isVAE ? `Nouvel entrant VAE – aucun ${labelBeneficiaire} accompagné en ${anneeN1}. Objectif prévisionnel ${annee} : ≥ 5 ${labelBeneficiaires}.` : ""}</td></tr>`;
 
   // Taux de réussite row (VAE specific: certification obtenue)
   const labelReussite = isVAE ? "Taux de validation (certification obtenue)" : "Taux de réussite";
-  html += `<tr><td>${labelReussite}</td><td>0</td>`;
+  html += `<tr><td>${labelReussite}</td><td>${isVAE ? "0 – Nouvel entrant" : "0"}</td>`;
   mois.forEach((_, i) => { html += `<td>${countPerMonth[i] > 0 ? "100%" : ""}</td>`; });
-  html += `<td>${isVAE ? `Aucun historique en ${anneeN1}. ${nbStagiaires} ${labelBeneficiaire}${nbStagiaires > 1 ? "s" : ""} en cours de validation pour ${annee}.` : ""}</td></tr>`;
+  html += `<td>${isVAE ? `Nouvel entrant – aucun historique en ${anneeN1}. ${nbStagiaires} ${labelBeneficiaire}${nbStagiaires > 1 ? "s" : ""} en cours de validation pour ${annee}. Objectif prévisionnel : taux de validation totale ≥ 70%.` : ""}</td></tr>`;
 
   return excelWrap(`TABLEAU DE BORD INDICATEURS DE PERFORMANCE – ${annee}`, [{ name: "Tableau de bord", html }]);
 }
@@ -293,6 +295,39 @@ export function generateExcelTableauSuiviParcours(o: OrganismeInfo, f: Formation
   });
 
   return excelWrap(`TABLEAU DE SUIVI DU PARCOURS BÉNÉFICIAIRES ET ADAPTATIONS – ${f.intitule}`, [{ name: "Suivi parcours", html }]);
+}
+
+export function generateExcelIndicateursPrevisionnelsVAE(o: OrganismeInfo, f: FormationInfo): string {
+  const annee = new Date().getFullYear();
+  let html = tableRow(["Indicateur", "Méthode de calcul", "Objectif 2026", "Périodicité de suivi", "Seuil d'alerte", "Action corrective prévue si objectif non atteint"], true);
+  const data: string[][] = [
+    ["Nombre de candidats accompagnés", "Comptage des conventions d'accompagnement signées", "≥ 5 candidats", "Trimestriel", "< 2 candidats / trimestre", "Renforcement de la communication (site, réseaux, partenaires CEP/Pôle emploi), participation à des salons professionnels esthétique"],
+    ["Taux de satisfaction des candidats", "Questionnaires de satisfaction – notes ≥ 4/5 / total répondants × 100", "≥ 90%", "À chaque fin d'accompagnement", "< 80%", "Analyse des retours, entretien individuel avec les candidats insatisfaits, adaptation des méthodes d'accompagnement"],
+    ["Taux de complétude des dossiers", "Dossiers complets au 1er dépôt / total dossiers déposés × 100", "≥ 85%", "À chaque dépôt de dossier", "< 70%", "Renforcement de l'accompagnement rédactionnel, checklist de contrôle, relecture systématique avant dépôt"],
+    ["Taux de présentation au jury", "Candidats présentés au jury / candidats accompagnés × 100", "≥ 80%", "Annuel", "< 60%", "Suivi renforcé des candidats à risque, entretiens de remotivation, aménagement du planning"],
+    ["Taux de validation totale", "Validations totales / candidats présentés au jury × 100", "≥ 70%", "Annuel", "< 50%", "Analyse des dossiers non validés, renforcement de la préparation jury, simulation d'entretien supplémentaire"],
+    ["Taux de validation partielle", "Validations partielles / candidats présentés × 100", "≤ 25%", "Annuel", "> 30%", "Accompagnement complémentaire ciblé sur les blocs non validés, plan d'action personnalisé"],
+    ["Taux d'abandon", "Abandons / candidats ayant débuté l'accompagnement × 100", "≤ 10%", "Trimestriel", "> 15%", "Entretiens de prévention dès le 2e signal d'alerte, aménagement du rythme, plan de remédiation individualisé"],
+    ["Délai moyen de réponse aux demandes", "Moyenne des délais entre réception et 1ère réponse", "≤ 48h ouvrées", "Mensuel", "> 72h", "Mise en place d'un accusé de réception automatique, organisation de permanences dédiées"],
+    ["Taux de recommandation (NPS)", "Candidats recommandant l'organisme / total interrogés × 100", "≥ 80%", "Annuel (enquête post-jury)", "< 60%", "Analyse qualitative des freins à la recommandation, plan d'amélioration de l'expérience candidat"],
+    ["Taux de traitement des réclamations < 15 jours", "Réclamations traitées sous 15 jours / total réclamations × 100", "100%", "En continu", "< 90%", "Revue de la procédure de réclamation, nomination d'un référent dédié"],
+  ];
+  data.forEach(r => html += tableRow(r));
+
+  // Second sheet: planning de suivi trimestriel
+  let html2 = tableRow(["Trimestre", "Actions de suivi prévues", "Indicateurs à mesurer", "Responsable", "Statut"], true);
+  const planning: string[][] = [
+    ["T1 2026 (jan-mars)", "Lancement activité, premiers accompagnements, mise en place des outils de suivi", "Nb candidats, taux de satisfaction", o.responsablePedagogique || o.dirigeant, "À renseigner"],
+    ["T2 2026 (avr-juin)", "Suivi des premiers dossiers, ajustements méthodologiques", "Nb candidats, complétude dossiers, taux d'abandon", o.responsablePedagogique || o.dirigeant, "À renseigner"],
+    ["T3 2026 (juil-sept)", "Bilan semestriel, premières présentations jury", "Taux présentation jury, satisfaction, recommandation", o.responsablePedagogique || o.dirigeant, "À renseigner"],
+    ["T4 2026 (oct-déc)", "Bilan annuel, diffusion des résultats, plan d'amélioration", "Tous indicateurs – bilan complet", o.referentQualite || o.dirigeant, "À renseigner"],
+  ];
+  planning.forEach(r => html2 += tableRow(r));
+
+  return excelWrap(`INDICATEURS PRÉVISIONNELS VAE – NOUVEL ENTRANT ${annee}`, [
+    { name: "Indicateurs prévisionnels", html },
+    { name: "Planning suivi", html: html2 }
+  ]);
 }
 
 // Helper to generate Excel blob
