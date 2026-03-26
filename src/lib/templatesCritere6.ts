@@ -168,6 +168,85 @@ function veilleReglementaireRows(f: FormationInfo, type: FormationType): string[
     ];
   }
 
+  if (type === "webmarketing") {
+    const yr = veilleYear(f, 0);
+    const yrPrev = veilleYear(f, 12);
+    return [
+      ...common,
+      [
+        `<a href="https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000006904070">Légifrance – Art. L6316-1</a>`,
+        "Article L6316-1 du Code du travail (Qualité des actions de formation)",
+        `Version en vigueur ${yrPrev}`,
+        "Obligation de certification Qualiopi pour les prestataires de formation souhaitant accéder aux fonds publics ou mutualisés.",
+        "Vérification annuelle du maintien de la certification + mise à jour procédures internes."
+      ],
+      [
+        `<a href="https://www.cnil.fr/fr/reglement-europeen-protection-donnees">CNIL – RGPD</a>`,
+        "RGPD – Règlement général sur la protection des données",
+        veilleDate(f, 8),
+        "Cadre réglementaire sur la collecte et le traitement des données personnelles. Impact direct sur les pratiques d'email marketing, tracking web (cookies, pixels), ciblage publicitaire et gestion des bases CRM.",
+        "Preuve : synthèse RGPD + checklist conformité. Action : intégrer un module RGPD dans la formation (mentions légales, consentement, opt-in, politique de confidentialité)."
+      ],
+      [
+        `<a href="https://www.economie.gouv.fr/dgccrf/Publications/Vie-pratique/Fiches-pratiques/pratiques-commerciales-trompeuses">DGCCRF – Pratiques commerciales</a>`,
+        "Réglementation des pratiques commerciales sur Internet",
+        veilleDate(f, 6),
+        "Encadrement des publicités en ligne, mentions obligatoires, interdiction des pratiques trompeuses (faux avis, prix barrés abusifs, influenceurs).",
+        "Preuve : fiche DGCCRF. Action : module sur les obligations légales de la publicité en ligne et des partenariats influenceurs."
+      ],
+      [
+        `<a href="https://www.cnil.fr/fr/cookies-et-autres-traceurs/regles/cookies">CNIL – Cookies et traceurs</a>`,
+        "CNIL – Lignes directrices cookies et traceurs",
+        veilleDate(f, 5),
+        "Encadrement de l'utilisation des cookies, pixels de suivi et traceurs publicitaires (Meta Pixel, Google Analytics). Obligation de consentement préalable.",
+        "Preuve : publication CNIL. Action : enseigner la mise en conformité cookies dans le module Analytics (bandeau cookie, Google Consent Mode)."
+      ],
+      [
+        `<a href="https://www.centre-inffo.fr/site-droit-formation/actualites-droit/cpf-hausse-du-montant-de-la-participation-forfaitaire">Centre Inffo – CPF</a>`,
+        "CPF : Hausse du montant de la participation forfaitaire",
+        veilleDate(f, 3),
+        "La participation financière pour l'achat d'une formation CPF s'élève à 103,20 euros. Impact sur le financement des formations marketing digital.",
+        "Preuve : article Centre Inffo. Action : informer les futurs stagiaires de la hausse du reste à charge CPF."
+      ],
+    ];
+  }
+
+  if (type === "crm") {
+    const yr = veilleYear(f, 0);
+    const yrPrev = veilleYear(f, 12);
+    return [
+      ...common,
+      [
+        `<a href="https://www.cnil.fr/fr/reglement-europeen-protection-donnees">CNIL – RGPD</a>`,
+        "RGPD – Règlement général sur la protection des données",
+        veilleDate(f, 8),
+        "Cadre réglementaire majeur pour les CRM : collecte de données, consentement, droit d'accès/suppression, DPA avec les sous-traitants (HubSpot, Brevo, etc.).",
+        "Preuve : synthèse RGPD + checklist. Action : module RGPD obligatoire dans la formation CRM (registre des traitements, base légale, durée de conservation)."
+      ],
+      [
+        `<a href="https://www.cnil.fr/fr/la-prospection-commerciale-par-courrier-electronique">CNIL – Prospection commerciale</a>`,
+        "CNIL – Prospection commerciale par email",
+        veilleDate(f, 6),
+        "Encadrement strict de la prospection B2C (opt-in obligatoire) et B2B (opt-out). Règles spécifiques pour les séquences d'email automation.",
+        "Preuve : publication CNIL. Action : intégrer les règles de prospection dans le module email marketing (distinction B2B/B2C, désinscription, mentions légales)."
+      ],
+      [
+        `<a href="https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000006904070">Légifrance – Art. L6316-1</a>`,
+        "Article L6316-1 du Code du travail (Qualité des actions de formation)",
+        `Version en vigueur ${yrPrev}`,
+        "Obligation de certification Qualiopi pour les prestataires souhaitant accéder aux fonds publics ou mutualisés.",
+        "Vérification annuelle du maintien de la certification + mise à jour des procédures internes."
+      ],
+      [
+        `<a href="https://www.centre-inffo.fr/site-droit-formation/actualites-droit/cpf-hausse-du-montant-de-la-participation-forfaitaire">Centre Inffo – CPF</a>`,
+        "CPF : Hausse du montant de la participation forfaitaire",
+        veilleDate(f, 3),
+        "La participation financière pour l'achat d'une formation CPF s'élève à 103,20 euros.",
+        "Preuve : article Centre Inffo. Action : informer les futurs stagiaires du reste à charge CPF."
+      ],
+    ];
+  }
+
   // Default: word/bureautique
   return [...common,
     [
