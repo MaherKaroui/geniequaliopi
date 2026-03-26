@@ -305,7 +305,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
       return genVAEConventionAccompagnement(o, f, stagiaires, si);
     }
     case "vae_reglement_interieur": return genVAEReglementInterieur(o);
-    case "vae_droit_image": return genVAEDroitImage(o);
+    case "vae_droit_image": return genVAEDroitImage(o, f, stagiaires);
     case "vae_infos_peripheriques": return genVAEInfosPeripheriques(o);
     case "vae_certificat_realisation": {
       const si = params?.stagiaireIdx ?? 0;
