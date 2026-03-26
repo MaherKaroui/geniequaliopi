@@ -3393,6 +3393,26 @@ function genVAEProcedureInfo(o: OrganismeInfo) {
 }
 
 function genVAEIndicateursResultats(o: OrganismeInfo) {
+  const isNouvelEntrant = !o.typesActions?.includes('actions-formation') || o.typesActions?.includes('vae');
+  if (isNouvelEntrant) {
+    return buildDocument({ org: o, title: "INDICATEURS DE RÉSULTATS – VAE", subtitle: "Nouvel entrant – Phase de lancement", sections: [
+      { heading: "Contexte : nouvel entrant VAE", content: `<p>${o.nom} lance son activité d'accompagnement VAE en 2026. En tant que <strong>nouvel entrant</strong> sur ce périmètre d'activité, l'organisme ne dispose pas encore d'indicateurs de résultats historiques pour cette prestation.</p><p>Conformément aux exigences du Référentiel National Qualité (Qualiopi), les indicateurs de résultats seront renseignés au fur et à mesure de l'activité et diffusés dès qu'ils seront significatifs.</p><p><strong>L'organisme s'engage à :</strong></p><ul><li>Mettre en place un dispositif de collecte des données dès le premier candidat accompagné</li><li>Suivre les indicateurs définis ci-dessous sur une base trimestrielle</li><li>Diffuser les résultats annuels dès la fin du premier exercice complet</li><li>Communiquer de manière transparente sur l'absence d'historique lors de l'information du public</li></ul>` },
+    ], table: {
+      headers: ["Indicateur", "Historique", "Objectif prévisionnel 2026", "Méthode de calcul", "Périodicité de suivi"],
+      rows: [
+        ["Nombre de candidats accompagnés", "Pas d'historique – nouvel entrant", "≥ 5 candidats", "Comptage des conventions signées", "Trimestriel"],
+        ["Taux de recevabilité (Livret 1)", "Pas d'historique – nouvel entrant", "≥ 90%", "Livrets 1 recevables / Livrets 1 déposés × 100", "À chaque dépôt"],
+        ["Taux de présentation au jury", "Pas d'historique – nouvel entrant", "≥ 80%", "Candidats présentés / Candidats accompagnés × 100", "Annuel"],
+        ["Taux de validation totale", "Pas d'historique – nouvel entrant", "≥ 70%", "Validations totales / Candidats présentés × 100", "Annuel"],
+        ["Taux de validation partielle", "Pas d'historique – nouvel entrant", "≤ 25%", "Validations partielles / Candidats présentés × 100", "Annuel"],
+        ["Taux de satisfaction candidats", "Pas d'historique – nouvel entrant", "≥ 90%", "Notes ≥ 4/5 / Total questionnaires × 100", "À chaque fin d'accompagnement"],
+        ["Taux d'abandon", "Pas d'historique – nouvel entrant", "≤ 10%", "Abandons / Candidats engagés × 100", "Trimestriel"],
+        ["Taux de recommandation", "Pas d'historique – nouvel entrant", "≥ 80%", "Candidats recommandant / Candidats interrogés × 100", "Annuel"],
+        ["Délai moyen de réponse aux demandes", "Pas d'historique – nouvel entrant", "≤ 48h", "Moyenne des délais de première réponse", "Mensuel"],
+        ["Taux de complétude des dossiers", "Pas d'historique – nouvel entrant", "≥ 85%", "Dossiers complets au premier dépôt / Total dossiers × 100", "À chaque dépôt"],
+      ]
+    } });
+  }
   return buildDocument({ org: o, title: "INDICATEURS DE RÉSULTATS – VAE", table: {
     headers: ["Indicateur", "Année N-1", "Année N", "Objectif"],
     rows: [
