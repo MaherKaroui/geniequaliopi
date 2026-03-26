@@ -217,6 +217,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
       || doc.template === "suivi_dysfonctionnements_excel"
       || doc.template === "relances_appreciations_excel"
       || doc.template === "indicateurs_performance"
+      || doc.template === "vae_indicateurs_previsionnels"
     ) {
       let excelContent: string;
       if (doc.template === "tableau_suivi_parcours_excel") {
