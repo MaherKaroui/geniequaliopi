@@ -180,6 +180,12 @@ export function buildFullCatalog(
       });
     });
 
+    // IND 12 — Engagement des bénéficiaires et prévention des ruptures
+    add("af_c3i12_pdf_cv_renuka", "CT3 - IND 12 CV RENUKA CALISSTUS SURESH", 3, 12, "pdf_static", { pdfFile: "cv_renuka_calisstus_suresh.pdf" });
+    add("af_c3i12_pdf_certificat_rs_renuka", "CT3 - IND 12 CERTIFICAT RS RENUKA CALISSTUS SURESH", 3, 12, "pdf_static", { pdfFile: "certificat_rs_renuka_calisstus_suresh.pdf" });
+    add("af_c3i12_pdf_cv_abdellah", "CT3 - IND 12 CV ABDELLAH SALAM", 3, 12, "pdf_static", { pdfFile: "cv_abdellah_salam.pdf" });
+    add("af_c3i12_pdf_attestation_bts_abdellah", "CT3 - IND 12 ATTESTATION BTS ABDELLAH SALAM", 3, 12, "pdf_static", { pdfFile: "attestation_bts_abdellah_salam.pdf" });
+
     // IND 16 — Présentation des bénéficiaires à la certification (si formation avec code RS/RNCP)
     formations.forEach((f, fi) => {
       if (f.codeRNCP) {
