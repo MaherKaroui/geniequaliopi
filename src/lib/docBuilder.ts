@@ -314,7 +314,7 @@ export interface DocBuildConfig {
   sections?: { heading: string; content: string; variant?: "green" | "orange" }[];
   table?: { headers: string[]; rows: string[][] };
   extraHtml?: string;
-  signatures?: { type: "3" | "2"; labels?: string[]; names?: string[]; stagiaireSignatureUrl?: string; formateurSignatureUrl?: string; dates?: string[] };
+  signatures?: { type: "3" | "2"; labels?: string[]; names?: string[]; stagiaireSignatureUrl?: string; formateurSignatureUrl?: string; dates?: string[]; noOrgSignature?: boolean };
   stagiaires?: StagiaireInfo[];
 }
 
@@ -346,7 +346,7 @@ export function buildDocument(config: DocBuildConfig): string {
         config.signatures.names?.[0] || "",
         config.signatures.labels?.[1] || "Partie 2",
         config.signatures.names?.[1] || "",
-        config.org.signatureUrl,
+        config.signatures.noOrgSignature ? undefined : config.org.signatureUrl,
         config.org.tamponUrl,
         config.signatures.stagiaireSignatureUrl,
         config.signatures.dates,

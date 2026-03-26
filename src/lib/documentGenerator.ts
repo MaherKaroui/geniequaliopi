@@ -3375,6 +3375,18 @@ function genAccompagnementVAE(o: OrganismeInfo, f: FormationInfo, stagiaires: St
 
 // ============== VAE COMPLET ==============
 
+/** VAE signature helper: candidat LEFT (with sig), organisme RIGHT (tampon only, no handwritten sig) */
+function vaeSig(candidatLabel: string, candidatNom: string, orgLabel: string, orgNom: string, s?: StagiaireInfo | null, dateStr?: string) {
+  return {
+    type: "2" as const,
+    labels: [candidatLabel, orgLabel],
+    names: [candidatNom, orgNom],
+    noOrgSignature: true,
+    stagiaireSignatureUrl: s?.signatureUrl,
+    dates: dateStr ? [dateStr, dateStr] : undefined,
+  };
+}
+
 function genVAEPlaquetteInfo(o: OrganismeInfo) {
   return buildDocument({ org: o, title: "PLAQUETTE D'INFORMATION – VALIDATION DES ACQUIS DE L'EXPÉRIENCE", sections: [
     { heading: "Qu'est-ce que la VAE ?", content: `<p>La Validation des Acquis de l'Expérience (VAE) est un droit individuel inscrit dans le Code du travail (articles L.6411-1 et suivants). Elle permet à toute personne, quels que soient son âge, son niveau d'études ou son statut, de faire reconnaître officiellement les compétences acquises par l'expérience professionnelle, associative ou bénévole.</p><p>La VAE aboutit à l'obtention totale ou partielle d'une certification (diplôme, titre professionnel, certificat de qualification professionnelle) inscrite au RNCP.</p>` },
