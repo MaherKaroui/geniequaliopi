@@ -37,11 +37,6 @@ export function buildFullCatalog(
     add("af_c1i2_procedure_indicateurs_perf", "CT1 - IND 2 PROCÉDURE DE SUIVI DES INDICATEURS DE PERFORMANCE", 1, 2, "procedure_indicateurs_performance");
     add("af_c1i2_tableau_bord_perf", "CT1 - IND 2 TABLEAU DE BORD INDICATEURS DE PERFORMANCE", 1, 2, "indicateurs_performance");
 
-    // IND 3 — Taux d'obtention des certifications
-    add("af_c1i3_pdf_cv_renuka", "CT1 - IND 3 CV RENUKA CALISSTUS SURESH", 1, 3, "pdf_static", { pdfFile: "cv_renuka_calisstus_suresh.pdf" });
-    add("af_c1i3_pdf_certificat_rs_renuka", "CT1 - IND 3 CERTIFICAT RS RENUKA CALISSTUS SURESH", 1, 3, "pdf_static", { pdfFile: "certificat_rs_renuka_calisstus_suresh.pdf" });
-    add("af_c1i3_pdf_cv_abdellah", "CT1 - IND 3 CV ABDELLAH SALAM", 1, 3, "pdf_static", { pdfFile: "cv_abdellah_salam.pdf" });
-    add("af_c1i3_pdf_attestation_bts_abdellah", "CT1 - IND 3 ATTESTATION BTS ABDELLAH SALAM", 1, 3, "pdf_static", { pdfFile: "attestation_bts_abdellah_salam.pdf" });
 
     // ===== CRITÈRE 2 — OBJECTIFS ET ADAPTATION =====
 
