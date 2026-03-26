@@ -4157,7 +4157,7 @@ function genVAEEntretienIntermediaire(o: OrganismeInfo, f: FormationInfo, stagia
 
 function genVAEDossierSuiviParcours(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = stagiaires[si] || stagiaires[0] || FALLBACK_STAGIAIRE;
-  const dateDebut = getStagiaireDateDebut(s, f);
+  const dateFin = getStagiaireDateFin(s, f);
   return buildDocument({ org: o, title: "DOSSIER DE SUIVI PARCOURS VAE", subtitle: `${s.prenom} ${s.nom} – ${f.intitule}`, table: {
     headers: ["Étape", "Objectif", "Réalisé", "Observations"],
     rows: [
@@ -4173,8 +4173,8 @@ function genVAEDossierSuiviParcours(o: OrganismeInfo, f: FormationInfo, stagiair
       ["Passage devant le jury", "Obtenir la validation de la certification", "✅ Oui", "VALIDATION TOTALE"],
     ]
   }, sections: [
-    { heading: "Bilan global", content: `<p>${s.prenom} ${s.nom} a suivi l'intégralité de l'accompagnement VAE avec assiduité et engagement. Le dossier de validation est complet, bien argumenté et illustré de preuves pertinentes. Le candidat a obtenu la validation totale de la certification « ${f.intitule} ».</p>`, variant: "green" },
-  ], signatures: { type: "2", labels: ["L'Accompagnateur VAE", "Le Candidat"], names: [o.responsablePedagogique, `${s.prenom} ${s.nom}`] } });
+    { heading: "Bilan global", content: `<p>${s.prenom} ${s.nom} a suivi l'intégralité de l'accompagnement VAE avec assiduité et engagement. Le dossier de validation est complet, bien argumenté et illustré de preuves pertinentes. Le candidat a obtenu la validation totale de la certification « ${f.intitule} ».</p><p>Fait à ${o.ville}, le ${formatDate(dateFin)}</p>`, variant: "green" },
+  ], signatures: { type: "2", labels: ["L'Accompagnateur VAE (Formateur)", "Le Candidat"], names: [o.responsablePedagogique, `${s.prenom} ${s.nom}`], stagiaireSignatureUrl: s.signatureUrl, formateurSignatureUrl: s.formateurSignatureUrl || f.formateurSignatureUrl, dates: [formatDate(dateFin), formatDate(dateFin)] } });
 }
 
 function genVAEEviterEchec(o: OrganismeInfo) {
