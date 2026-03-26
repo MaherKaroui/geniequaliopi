@@ -242,21 +242,23 @@ export function generateExcelTableauBordPerformance(o: OrganismeInfo, f: Formati
   html += `<th>Commentaires / analyse</th></tr>`;
 
   // Taux de satisfaction row
-  const satisfactionN1 = isVAE ? "N/A" : "";
+  const satisfactionN1 = isVAE ? "N/A – Nouvel entrant" : "";
   html += `<tr><td rowspan="3">${f.intitule || o.nom}</td><td>Taux de satisfaction appréciation des bénéficiaires</td><td>${satisfactionN1}</td>`;
   mois.forEach((_, i) => { html += `<td>${countPerMonth[i] > 0 ? "100%" : ""}</td>`; });
-  html += `<td>${f.intitule || o.nom} a reçu ${nbStagiaires} ${nbStagiaires > 1 ? labelBeneficiaires : labelBeneficiaire} pour l'année ${annee}. Nous avons été noté 10/10 sur le taux de satisfaction pour l'année ${annee} au critère 7.30. Nous communiquerons cet élément de diffusion sur notre site internet et sur notre programme de formation.</td></tr>`;
+  html += `<td>${isVAE 
+    ? `${o.nom} est nouvel entrant sur l'activité VAE. ${nbStagiaires} ${nbStagiaires > 1 ? labelBeneficiaires : labelBeneficiaire} accompagné${nbStagiaires > 1 ? "s" : ""} pour l'année ${annee}. Les indicateurs seront renseignés au fur et à mesure de l'activité et diffusés dès qu'ils seront significatifs.`
+    : `${f.intitule || o.nom} a reçu ${nbStagiaires} ${nbStagiaires > 1 ? labelBeneficiaires : labelBeneficiaire} pour l'année ${annee}. Nous avons été noté 10/10 sur le taux de satisfaction pour l'année ${annee} au critère 7.30. Nous communiquerons cet élément de diffusion sur notre site internet et sur notre programme de formation.`}</td></tr>`;
 
   // Nombre de bénéficiaires row
-  html += `<tr><td>Nombre de ${labelBeneficiaires}</td><td>0</td>`;
+  html += `<tr><td>Nombre de ${labelBeneficiaires}</td><td>${isVAE ? "0 – Nouvel entrant" : "0"}</td>`;
   mois.forEach((_, i) => { html += `<td>${countPerMonth[i] > 0 ? countPerMonth[i] : ""}</td>`; });
-  html += `<td>${isVAE ? `Première année d'activité VAE – aucun ${labelBeneficiaire} accompagné en ${anneeN1}.` : ""}</td></tr>`;
+  html += `<td>${isVAE ? `Nouvel entrant VAE – aucun ${labelBeneficiaire} accompagné en ${anneeN1}. Objectif prévisionnel ${annee} : ≥ 5 ${labelBeneficiaires}.` : ""}</td></tr>`;
 
   // Taux de réussite row (VAE specific: certification obtenue)
   const labelReussite = isVAE ? "Taux de validation (certification obtenue)" : "Taux de réussite";
-  html += `<tr><td>${labelReussite}</td><td>0</td>`;
+  html += `<tr><td>${labelReussite}</td><td>${isVAE ? "0 – Nouvel entrant" : "0"}</td>`;
   mois.forEach((_, i) => { html += `<td>${countPerMonth[i] > 0 ? "100%" : ""}</td>`; });
-  html += `<td>${isVAE ? `Aucun historique en ${anneeN1}. ${nbStagiaires} ${labelBeneficiaire}${nbStagiaires > 1 ? "s" : ""} en cours de validation pour ${annee}.` : ""}</td></tr>`;
+  html += `<td>${isVAE ? `Nouvel entrant – aucun historique en ${anneeN1}. ${nbStagiaires} ${labelBeneficiaire}${nbStagiaires > 1 ? "s" : ""} en cours de validation pour ${annee}. Objectif prévisionnel : taux de validation totale ≥ 70%.` : ""}</td></tr>`;
 
   return excelWrap(`TABLEAU DE BORD INDICATEURS DE PERFORMANCE – ${annee}`, [{ name: "Tableau de bord", html }]);
 }
