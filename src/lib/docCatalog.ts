@@ -515,6 +515,8 @@ export function buildFullCatalog(
       add(`vae_c3i11_dossier_suivi_${si}`, `CT3 - IND 11 Dossier de suivi parcours VAE – ${s.prenom} ${s.nom}`, 3, 11, "vae_dossier_suivi_parcours", { stagiaireIdx: si });
       add(`vae_c3i11_grille_evaluation_${si}`, `CT3 - IND 11 Grille d'évaluation du dossier VAE – ${s.prenom} ${s.nom}`, 3, 11, "vae_grille_evaluation_dossier", { stagiaireIdx: si });
       add(`vae_c3i11_emargement_${si}`, `CT3 - IND 11 Feuille d'émargement VAE – ${s.prenom} ${s.nom}`, 3, 11, "vae_emargement", { stagiaireIdx: si });
+      add(`vae_c3i11_temps_connexion_${si}`, `CT3 - IND 11 Temps de connexion VAE – ${s.prenom} ${s.nom}`, 3, 11, "vae_temps_connexion", { stagiaireIdx: si });
+      add(`vae_c3i11_rapport_connexion_${si}`, `CT3 - IND 11 Rapport de connexion LMS VAE – ${s.prenom} ${s.nom}`, 3, 11, "vae_rapport_connexion", { stagiaireIdx: si });
     });
 
     // IND 12 — Engagement et prévention des ruptures

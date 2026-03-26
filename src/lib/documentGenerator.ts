@@ -340,6 +340,14 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
       const si = params?.stagiaireIdx ?? 0;
       return genVAEEmargement(o, f, stagiaires, si);
     }
+    case "vae_temps_connexion": {
+      const si = params?.stagiaireIdx ?? 0;
+      return genVAETempsConnexion(o, f, stagiaires, si);
+    }
+    case "vae_rapport_connexion": {
+      const si = params?.stagiaireIdx ?? 0;
+      return genVAERapportConnexion(o, f, stagiaires, si);
+    }
     case "vae_procedure_abandon": return genVAEProcedureAbandon(o);
     case "vae_eviter_echec": return genVAEEviterEchec(o);
     case "vae_favoriser_engagement": return genVAEFavoriserEngagement(o);
