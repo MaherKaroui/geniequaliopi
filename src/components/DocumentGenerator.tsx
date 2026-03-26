@@ -13,7 +13,7 @@ import { saveAs } from "file-saver";
 import { toast } from "sonner";
 import DocStyleConfigPanel from "./DocStyleConfigPanel";
 import { downloadAsWord, htmlToWordBlob } from "@/lib/wordExport";
-import { generateExcelTableauBordPerformance, generateExcelTableauSuiviParcours, excelToBlob } from "@/lib/xlsxGenerator";
+import { generateExcelTableauBordPerformance, generateExcelTableauSuiviParcours, generateExcelIndicateursPrevisionnelsVAE, excelToBlob } from "@/lib/xlsxGenerator";
 import { downloadAsPdf, htmlToPdfBlob } from "@/lib/pdfExport";
 import { auditImportedFolder, ImportAuditResult } from "@/lib/importInspector";
 import {
