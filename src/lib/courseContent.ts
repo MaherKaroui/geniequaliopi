@@ -211,8 +211,9 @@ import { getGenericChapters } from "./courseContentGeneric";
 import { getFLEChapters } from "./courseContentFLE";
 import { getIAChapters } from "./courseContentIA";
 import { getWebmarketingChapters } from "./courseContentWebmarketing";
+import { getCRMChapters } from "./courseContentCRM";
 
-export { getWordChapters, getAnglaisChapters, getManagementChapters, getGenericChapters, getFLEChapters, getIAChapters, getWebmarketingChapters };
+export { getWordChapters, getAnglaisChapters, getManagementChapters, getGenericChapters, getFLEChapters, getIAChapters, getWebmarketingChapters, getCRMChapters };
 
 export function getCourseChapters(formationIntitule: string): CourseChapter[] {
   const t = formationIntitule.toLowerCase();
@@ -223,5 +224,6 @@ export function getCourseChapters(formationIntitule: string): CourseChapter[] {
   if (t.includes('français') || t.includes('médico-social') || t.includes('social')) return getFLEChapters();
   if (t.includes('intelligence artificielle') || t.includes('ia générative') || t.includes('contenus rédactionnels')) return getIAChapters();
   if (t.includes('webmarketing') || t.includes('marketing de contenus') || t.includes('réseaux sociaux') || t.includes('marketing digital')) return getWebmarketingChapters();
+  if (t.includes('crm') || t.includes('automation') || t.includes('automatisation')) return getCRMChapters();
   return getGenericChapters(formationIntitule);
 }
