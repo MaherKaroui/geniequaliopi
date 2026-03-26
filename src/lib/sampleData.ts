@@ -254,6 +254,24 @@ export const SAMPLE_FORMATIONS: FormationInfo[] = [
     formateur: "Catherine Dubois",
     codeRNCP: "RNCP36805",
   },
+  {
+    intitule: "Initiation Word",
+    objectifs: "Identifier l'interface du logiciel Microsoft Word. Créer, enregistrer, ouvrir et modifier un document Word. Mettre en forme du texte et des paragraphes. Insérer des objets simples (images, tableaux, formes). Mettre en page un document en vue de son impression.",
+    prerequis: "Savoir utiliser un ordinateur (clavier, souris, navigation simple). Aucun prérequis en bureautique n'est exigé. Formation accessible aux débutants.",
+    duree: "14 heures (2 jours)",
+    modalites: "présentiel",
+    tarif: "700 € TTC",
+    programme: "Jour 1 – Découverte et bases (7h) :\n09h00–09h30 : Accueil, présentation de la formation et des objectifs\n09h30–10h30 : Découverte de l'interface de Microsoft Word et test de positionnement\n10h30–11h30 : Création, ouverture et enregistrement d'un document\n11h30–13h00 : Saisie et modification de texte\n14h00–15h30 : Mise en forme du texte (police, taille, couleur, alignement)\n15h30–16h00 : Gestion des paragraphes et interlignes\n16h00–17h00 : Exercices pratiques guidés\n\nJour 2 – Mise en forme et documents professionnels (7h) :\n09h00–11h00 : Insertion d'images, tableaux et formes simples\n11h00–12h00 : Création de listes à puces et numérotées\n13h00–14h30 : Mise en page (marges, orientation, en-têtes, pieds de page)\n14h30–15h30 : Préparation d'un document pour l'impression et test de positionnement fin de formation\n15h30–16h30 : Évaluation finale et bilan de formation\n16h30–17h00 : Grille d'acquisition",
+    methodesEvaluation: "Test de positionnement en début et fin de formation, cas pratiques et mises en situation professionnelle, évaluation finale, grille d'acquisition des compétences",
+    moyensPedagogiques: "Ordinateur individuel par stagiaire, logiciel Microsoft Word (version récente), vidéoprojecteur ou écran de projection, supports pédagogiques numériques, exercices pratiques fournis par le formateur, connexion Internet, support de stockage (clé USB ou espace cloud), assistance pédagogique continue",
+    publicVise: "Débutants en bureautique, salariés, demandeurs d'emploi, indépendants, toute personne souhaitant acquérir les bases de Word",
+    delaiAcces: "14 jours après validation de la préinscription et réception du dossier complet",
+    dateDebut: "2025-09-16",
+    dateFin: "2025-09-17",
+    lieu: "9 rue Hélène Boucher, 91550 Paray-Vieille-Poste",
+    nombreParticipants: "8",
+    formateur: "Philippe Martin",
+  },
 ];
 
 // Satisfaction scores (pre-filled realistic data)
@@ -269,6 +287,7 @@ export const SATISFACTION_SCORES: Record<string, number[]> = {
   "Création de contenus": [5, 5, 4, 5, 5, 4, 5, 5],
   "Gestion Administrative": [4, 5, 4, 5, 4, 5, 5, 4],
   "TP SAMA": [5, 4, 5, 5, 4, 5, 4, 5],
+  "Initiation Word": [5, 5, 4, 5, 4, 5, 5, 4],
 };
 
 // Evaluation scores per stagiaire (good scores 8-10/10)

@@ -286,6 +286,7 @@ function getContentKey(intitule: string): string {
   if (lower.includes("informatique") || lower.includes("admin") || lower.includes("réseau") || lower.includes("système")) return "Informatique";
   if (lower.includes("management") || lower.includes("leadership")) return "Management";
   if (lower.includes("digital") || lower.includes("marketing") || lower.includes("seo")) return "Digital Marketing";
+  if (lower.includes("initiation word")) return "Initiation Word";
   if (lower.includes("bureautique") || lower.includes("word") || lower.includes("pack office")) return "Bureautique";
   if (lower.includes("esthétique") || lower.includes("cosmétique") || lower.includes("cap")) return "CAP Esthétique";
   if (lower.includes("français") || lower.includes("médico-social") || lower.includes("social")) return "FLE Médico-Social";
