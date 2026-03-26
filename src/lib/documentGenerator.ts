@@ -287,7 +287,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "vae_handicap_bilan": return genVAEHandicapBilan(o);
     case "vae_mail_handicap": return genVAEMailHandicap(o);
     case "vae_referentiel_accompagnement": return genVAEReferentielAccompagnement(o, f);
-    case "vae_engagements_respectifs": return genVAEEngagementsRespectifs(o);
+    case "vae_engagements_respectifs": return genVAEEngagementsRespectifs(o, f, stagiaires);
     case "vae_programme_accompagnement": return genVAEProgrammeAccompagnement(o, f);
     case "vae_livret2": return genVAELivret2(o, f);
     case "vae_positionnement_debut": {
