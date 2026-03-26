@@ -4141,13 +4141,18 @@ function genVAEFichePedagogique(o: OrganismeInfo, f: FormationInfo) {
 
 function genVAEEntretienIntermediaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = stagiaires[si] || stagiaires[0] || FALLBACK_STAGIAIRE;
+  const dateDebut = getStagiaireDateDebut(s, f);
+  const dateFin = getStagiaireDateFin(s, f);
+  const dStart = new Date(dateDebut); const dEnd = new Date(dateFin);
+  const dateMilieu = new Date(dStart.getTime() + (dEnd.getTime() - dStart.getTime()) / 2);
+  const dateMilieuStr = dateMilieu.toISOString().slice(0, 10);
   return buildDocument({ org: o, title: "ENTRETIEN INTERMÉDIAIRE BÉNÉFICIAIRE – VAE", subtitle: `${s.prenom} ${s.nom}`, sections: [
-    { heading: "Informations", content: `<p><strong>Candidat :</strong> ${s.prenom} ${s.nom}<br><strong>Certification visée :</strong> ${f.intitule}<br><strong>Accompagnateur :</strong> ${o.responsablePedagogique}<br><strong>Date de l'entretien :</strong> ___<br><strong>Séance n° :</strong> 5 (mi-parcours)</p>` },
+    { heading: "Informations", content: `<p><strong>Candidat :</strong> ${s.prenom} ${s.nom}<br><strong>Certification visée :</strong> ${f.intitule}<br><strong>Accompagnateur :</strong> ${o.responsablePedagogique}<br><strong>Date de l'entretien :</strong> ${formatDate(dateMilieuStr)}<br><strong>Séance n° :</strong> 5 (mi-parcours)</p>` },
     { heading: "État d'avancement", content: `<p><strong>Blocs rédigés :</strong> Blocs 1 et 2 – Avancement satisfaisant<br><strong>Blocs en cours :</strong> Bloc 3 – En bonne voie<br><strong>Preuves rassemblées :</strong> 70% du portefeuille constitué<br><br><strong>Points forts identifiés :</strong><br>• Bonne compréhension du référentiel<br>• Descriptions d'activités détaillées et pertinentes<br>• Travail personnel régulier entre les séances</p>` },
     { heading: "Points à améliorer", content: `<p>• Approfondir l'analyse réflexive sur certaines situations<br>• Compléter le portefeuille de preuves pour le bloc 3<br>• Travailler la synthèse et la structuration des paragraphes</p>` },
     { heading: "Adaptations éventuelles", content: `<p>☐ Ajustement du planning nécessaire<br>☐ Séances supplémentaires recommandées<br>☐ Changement de modalité (présentiel/distanciel)<br>☐ Autres : ___</p>`, variant: "green" },
-    { heading: "Satisfaction du candidat", content: `<p>Le candidat est-il satisfait de l'accompagnement à mi-parcours ?<br>☐ Très satisfait ☒ Satisfait ☐ Moyennement satisfait ☐ Insatisfait</p>` },
-  ], signatures: { type: "2", labels: ["L'Accompagnateur", "Le Candidat"], names: [o.responsablePedagogique, `${s.prenom} ${s.nom}`] } });
+    { heading: "Satisfaction du candidat", content: `<p>Le candidat est-il satisfait de l'accompagnement à mi-parcours ?<br>☐ Très satisfait ☒ Satisfait ☐ Moyennement satisfait ☐ Insatisfait</p><p>Fait à ${o.ville}, le ${formatDate(dateMilieuStr)}</p>` },
+  ], signatures: { type: "2", labels: ["L'Accompagnateur VAE (Formateur)", "Le Candidat"], names: [o.responsablePedagogique, `${s.prenom} ${s.nom}`], stagiaireSignatureUrl: s.signatureUrl, formateurSignatureUrl: s.formateurSignatureUrl || f.formateurSignatureUrl, dates: [formatDate(dateMilieuStr), formatDate(dateMilieuStr)] } });
 }
 
 function genVAEDossierSuiviParcours(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
