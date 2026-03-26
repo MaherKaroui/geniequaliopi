@@ -5,13 +5,13 @@ import { FormateurInfo } from "./sampleData";
 
 // ===== IND 21 — FICHES DE POSTE (role-based) =====
 
-export function genFichePosteRole(o: OrganismeInfo, role: string) {
+export function genFichePosteRole(o: OrganismeInfo, role: string, formateurNom?: string) {
   switch (role) {
     case "referent_handicap": return genFichePosteRefHandicap(o);
     case "referent_administratif": return genFichePosteRefAdmin(o);
-    case "formateur": return genFichePosteFormateur(o);
+    case "formateur": return genFichePosteFormateurNom(o, formateurNom);
     case "dirigeant": return genFichePosteResponsablePedagogique(o);
-    default: return genFichePosteFormateur(o);
+    default: return genFichePosteFormateurNom(o, formateurNom);
   }
 }
 
