@@ -620,6 +620,86 @@ function veilleTechnoRows(f: FormationInfo, type: FormationType): string[][] {
     ];
   }
 
+  if (type === "webmarketing") {
+    return [...commonDigitalLearning,
+      [
+        `<a href="https://www.canva.com/designschool/">Canva Design School</a>`,
+        "Canva – Formation création visuelle et design",
+        veilleMonthYear(f, 7),
+        "Plateforme d'apprentissage gratuite de Canva : tutoriels design, templates, intégration IA pour la génération de visuels professionnels.",
+        "Preuve : captures tutoriels. Action : intégrer les nouveaux templates et fonctionnalités IA Canva dans le module création visuelle."
+      ],
+      [
+        `<a href="https://business.facebook.com/">Meta Business Suite</a>`,
+        "Meta Business Suite – Évolutions outils de gestion réseaux sociaux",
+        veilleMonthYear(f, 6),
+        "Plateforme centralisée pour la gestion Facebook/Instagram : planification, statistiques, messagerie, publicité. Nouvelles fonctionnalités IA pour le ciblage Advantage+.",
+        "Action : mise à jour du module community management avec les nouvelles fonctionnalités Meta Business Suite."
+      ],
+      [
+        `<a href="https://analytics.google.com/">Google Analytics 4</a>`,
+        "Google Analytics 4 – Évolutions et nouvelles fonctionnalités",
+        veilleDate(f, 5),
+        "Passage obligatoire à GA4 : nouvelles métriques (engaged sessions), rapports d'exploration, intégration BigQuery, predictive audiences.",
+        "Preuve : documentation GA4. Action : mise à jour complète du module Analytics avec l'interface GA4 et les nouvelles métriques."
+      ],
+      [
+        `<a href="https://www.learningtechnologiesfrance.com/">learningtechnologiesfrance.com</a>`,
+        "Learning Technologies France – EdTech et formation digitale",
+        veilleYear(f, 5),
+        "Salon des technologies de formation : outils de création de contenu, plateformes LMS, solutions d'évaluation en ligne.",
+        "Preuve : programme + notes de veille. Action Qualiopi : benchmark des outils pédagogiques pour la formation marketing digital."
+      ],
+      [
+        `<a href="https://www.talenco.com/nos-publications/barometre-formation-professionnelle-tendances-pratiques-2025/">TalenCo – Baromètre</a>`,
+        "Baromètre formation professionnelle – transformation digitale",
+        veilleDate(f, 3),
+        "Synthèse des tendances : vidéo courte, IA dans le contenu marketing, social commerce, personal branding.",
+        "Preuve : PDF baromètre. Action Qualiopi : alignement du programme sur les tendances digitales émergentes."
+      ],
+    ];
+  }
+
+  if (type === "crm") {
+    return [...commonDigitalLearning,
+      [
+        `<a href="https://www.hubspot.fr/state-of-marketing">HubSpot – State of Marketing</a>`,
+        "HubSpot – Rapport annuel State of Marketing & CRM",
+        veilleMonthYear(f, 7),
+        "Rapport de référence sur l'état du CRM et de l'automation marketing : taux d'adoption, ROI, tendances (IA prédictive, chatbots, scoring automatisé).",
+        "Preuve : rapport PDF. Action : aligner les cas pratiques sur les benchmarks d'usage CRM les plus récents."
+      ],
+      [
+        `<a href="https://www.make.com/en/blog">Make Blog</a>`,
+        "Make – Nouveautés et templates d'automation",
+        veilleMonthYear(f, 6),
+        "Évolutions de la plateforme Make : nouveaux connecteurs (HubSpot, Brevo, Stripe), templates de scénarios, fonctionnalités IA intégrées.",
+        "Action : mise à jour des exercices Make avec les derniers connecteurs et modèles de scénarios."
+      ],
+      [
+        `<a href="https://www.brevo.com/fr/blog/">Brevo – Innovation email & automation</a>`,
+        "Brevo – Nouvelles fonctionnalités automation et IA",
+        veilleDate(f, 5),
+        "Évolutions Brevo : IA pour l'optimisation des objets d'email, segmentation prédictive, A/B test automatisé, intégration WhatsApp Business.",
+        "Preuve : changelog Brevo. Action : intégrer les nouvelles fonctionnalités dans le module email marketing automation."
+      ],
+      [
+        `<a href="https://www.learningtechnologiesfrance.com/">learningtechnologiesfrance.com</a>`,
+        "Learning Technologies France – CRM & automation pour la formation",
+        veilleYear(f, 5),
+        "Salon des technologies de formation : solutions CRM éducatives, automation de la gestion des apprenants.",
+        "Preuve : programme + notes. Action Qualiopi : veille sur les outils CRM adaptés au secteur de la formation."
+      ],
+      [
+        `<a href="https://www.talenco.com/nos-publications/barometre-formation-professionnelle-tendances-pratiques-2025/">TalenCo – Baromètre</a>`,
+        "Baromètre formation professionnelle – digitalisation et automation",
+        veilleDate(f, 3),
+        "Synthèse des tendances : automation des processus de gestion, CRM pour les OF, outils no-code.",
+        "Preuve : PDF baromètre. Action Qualiopi : alignement des outils enseignés sur les tendances du marché."
+      ],
+    ];
+  }
+
   // Default: word/bureautique
   return [...commonDigitalLearning,
     [
