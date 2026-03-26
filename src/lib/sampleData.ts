@@ -329,6 +329,24 @@ export const SAMPLE_FORMATIONS: FormationInfo[] = [
     formateur: "Alexandre Petit",
     codeRNCP: "RS6702",
   },
+  {
+    intitule: "Utiliser les automations et un CRM",
+    objectifs: "Maîtriser les outils d'automatisation marketing et de gestion de la relation client (CRM). Configurer des workflows automatisés pour la prospection, le suivi client et la fidélisation. Exploiter un CRM pour centraliser les données clients, segmenter les contacts et piloter l'activité commerciale. Mettre en place des scénarios d'automation (emailing, relances, scoring) pour optimiser le tunnel de vente.",
+    prerequis: "Maîtriser les bases de l'utilisation d'un ordinateur et de la navigation web. Avoir une activité professionnelle impliquant de la relation client ou de la prospection commerciale. Aucune compétence technique en programmation n'est requise.",
+    duree: "107 heures (15 jours)",
+    modalites: "distanciel",
+    tarif: "2 086,50 € par stagiaire",
+    programme: "Jour 1-2 : Introduction aux CRM – Qu'est-ce qu'un CRM, panorama des solutions (HubSpot, Pipedrive, Salesforce, Zoho), choix d'un CRM adapté à son activité, création et configuration du compte\nJour 3-4 : Gestion des contacts et segmentation – Import et structuration des données clients, création de fiches contacts/entreprises, segmentation avancée (tags, listes, filtres), pipeline de vente, étapes du tunnel commercial\nJour 5-6 : Suivi commercial dans le CRM – Gestion des opportunités et des deals, tableaux de bord commerciaux, prévisions de vente, rapports d'activité, gestion des tâches et relances\nJour 7-8 : Introduction aux automations marketing – Principes de l'automation, mapping des parcours clients, déclencheurs et actions, outils d'automation (HubSpot Workflows, Brevo, ActiveCampaign, Make/Zapier)\nJour 9-10 : Email marketing automatisé – Création de séquences email automatisées, personnalisation dynamique, A/B testing, lead nurturing, scoring des prospects\nJour 11-12 : Automations avancées et intégrations – Connexion CRM + outils tiers (formulaires, calendrier, facturation), automatisation multi-canal (email + SMS + réseaux sociaux), scénarios de relance et fidélisation\nJour 13-14 : Analyse et optimisation – KPI CRM (taux de conversion, cycle de vente, valeur client), tableaux de bord analytics, optimisation des workflows, RGPD et gestion des données personnelles\nJour 15 : Projet final et évaluation – Mise en place d'un CRM complet avec automations pour un cas réel, soutenance et évaluation finale",
+    methodesEvaluation: "QCM de positionnement initial et final, exercices pratiques par module (configuration CRM, création de workflows), projet final évalué (mise en place complète d'un CRM avec automations), soutenance devant jury",
+    moyensPedagogiques: "Plateforme de visioconférence (Zoom/Teams), accès aux outils CRM (HubSpot gratuit, Brevo), outils d'automation (Make/Zapier), supports de cours numériques, tutoriels vidéo, exercices pratiques sur cas réels, accompagnement individuel à distance",
+    publicVise: "Entrepreneurs, indépendants, commerciaux, responsables marketing, chargés de clientèle, personnes en reconversion vers les métiers du digital et de la relation client",
+    delaiAcces: "14 jours après validation de l'inscription",
+    dateDebut: "2024-11-04",
+    dateFin: "2024-11-22",
+    lieu: "Formation à distance – Plateforme Zoom + espace collaboratif en ligne",
+    nombreParticipants: "2",
+    formateur: "Alexandre Petit",
+  },
 ];
 
 // Satisfaction scores (pre-filled realistic data)
