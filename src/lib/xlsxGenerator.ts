@@ -324,7 +324,7 @@ export function generateExcelIndicateursPrevisionnelsVAE(o: OrganismeInfo, f: Fo
 
   return excelWrap(`INDICATEURS PRÉVISIONNELS VAE – NOUVEL ENTRANT ${annee}`, [
     { name: "Indicateurs prévisionnels", html },
-    { name: "Planning suivi", html2 }
+    { name: "Planning suivi", html: html2 }
   ]);
 }
 
