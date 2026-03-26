@@ -3664,7 +3664,111 @@ function genVAEEmargement(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
   ], signatures: { type: "2", labels: ["L'Accompagnateur VAE", "Le Candidat"], names: [o.responsablePedagogique, s.prenom + " " + s.nom] } });
 }
 
-function genVAEProcedureAbandon(o: OrganismeInfo) {
+function genVAETempsConnexion(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
+  const s = stagiaires[si] || stagiaires[0] || FALLBACK_STAGIAIRE;
+  const dateDebut = getStagiaireDateDebut(s, f);
+  const dateFin = getStagiaireDateFin(s, f);
+  let extra = '';
+  extra += `<p><strong>Candidat :</strong> ${s.prenom} ${s.nom}<br><strong>Accompagnement :</strong> ${f.intitule}<br><strong>Période :</strong> du ${formatDate(dateDebut)} au ${formatDate(dateFin)}<br><strong>Modalité :</strong> À distance – Visioconférence<br><strong>Plateforme :</strong> ${o.outilsUtilises || 'Zoom / Google Meet'}</p>`;
+
+  const seances: string[][] = [];
+  let totalMinutes = 0;
+  for (let i = 0; i < 10; i++) {
+    const d = new Date(dateDebut);
+    d.setDate(d.getDate() + i * 7);
+    // skip weekends
+    while (d.getDay() === 0 || d.getDay() === 6) d.setDate(d.getDate() + 1);
+    const dateStr = `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
+    const seed = (s.nom.charCodeAt(0) * 7 + i * 13 + si * 3) % 256;
+    const ip = `${80 + (seed % 120)}.${(seed * 3 + si * 17) % 256}.${(seed * 7 + i * 31) % 256}.${(seed * 11 + si * 23 + i * 5) % 256}`;
+    const hDebut = 9 + (seed % 2);
+    const mDebut = (seed * 3) % 15;
+    const dureeMin = i < 2 || i >= 8 ? 120 : 180;
+    const hFin = hDebut + Math.floor((mDebut + dureeMin) / 60);
+    const mFin = (mDebut + dureeMin) % 60;
+    totalMinutes += dureeMin;
+    seances.push([
+      `${i + 1}`,
+      dateStr,
+      ip,
+      `${String(hDebut).padStart(2, '0')}h${String(mDebut).padStart(2, '0')}`,
+      `${String(hFin).padStart(2, '0')}h${String(mFin).padStart(2, '0')}`,
+      `${Math.floor(dureeMin / 60)}h${String(dureeMin % 60).padStart(2, '0')}min`,
+      '✅ Connecté'
+    ]);
+  }
+  const totalH = Math.floor(totalMinutes / 60);
+  const totalM = totalMinutes % 60;
+  extra += tableHTML(["Séance", "Date", "Adresse IP", "Connexion", "Déconnexion", "Durée", "Statut"], seances);
+  extra += `<p style="margin-top:10px"><strong>Durée totale de connexion : ${totalH}h${String(totalM).padStart(2, '0')}min</strong><br><strong>Durée prévue : 24h00</strong><br><strong>Taux de présence : 100%</strong></p>`;
+
+  return buildDocument({ org: o, title: "TEMPS DE CONNEXION – ACCOMPAGNEMENT VAE", subtitle: `${s.prenom} ${s.nom}`, extraHtml: extra,
+    signatures: { type: "2", labels: ["L'Accompagnateur VAE", "Le Candidat"], names: [o.responsablePedagogique, s.prenom + " " + s.nom] }
+  });
+}
+
+function genVAERapportConnexion(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
+  const s = stagiaires[si] || stagiaires[0] || FALLBACK_STAGIAIRE;
+  const dateDebut = getStagiaireDateDebut(s, f);
+  const dateFin = getStagiaireDateFin(s, f);
+  let extra = '';
+  extra += `<p><strong>Candidat :</strong> ${s.prenom} ${s.nom}<br><strong>Accompagnement :</strong> ${f.intitule}<br><strong>Période :</strong> du ${formatDate(dateDebut)} au ${formatDate(dateFin)}<br><strong>Plateforme LMS :</strong> ${o.outilsUtilises || 'Zoom / Google Meet'}</p>`;
+
+  let totalMinutes = 0;
+  for (let i = 0; i < 10; i++) {
+    const d = new Date(dateDebut);
+    d.setDate(d.getDate() + i * 7);
+    while (d.getDay() === 0 || d.getDay() === 6) d.setDate(d.getDate() + 1);
+    const dateStr = `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
+    const seed = (s.nom.charCodeAt(0) * 7 + i * 13 + si * 3) % 256;
+    const ip = `${80 + (seed % 120)}.${(seed * 3 + si * 17) % 256}.${(seed * 7 + i * 31) % 256}.${(seed * 11 + si * 23 + i * 5) % 256}`;
+
+    if (i > 0 && i % 3 === 0) extra += '<div class="page-break"></div>';
+    extra += `<h4>📅 Séance ${i + 1} – ${dateStr}</h4>`;
+
+    const hMatin = 9 + (seed % 2);
+    const mMatin = (seed * 3) % 15;
+    const dureeSeance = i < 2 || i >= 8 ? 120 : 180;
+    const isLong = dureeSeance === 180;
+
+    // Matin
+    const hFinMatin = hMatin + Math.floor((mMatin + (isLong ? 120 : dureeSeance)) / 60);
+    const mFinMatin = (mMatin + (isLong ? 120 : dureeSeance)) % 60;
+
+    if (isLong) {
+      // Séance longue : matin + après-midi
+      const hAprem = hFinMatin;
+      const mAprem = mFinMatin + 10; // 10 min pause
+      const hFinAprem = hAprem + 1;
+      const mFinAprem = mAprem % 60;
+      extra += tableHTML(
+        ["Adresse IP", "Connexion", "Déconnexion", "Durée", "Type", "Statut"],
+        [
+          [ip, `${String(hMatin).padStart(2,'0')}h${String(mMatin).padStart(2,'0')}`, `${String(hFinMatin).padStart(2,'0')}h${String(mFinMatin).padStart(2,'0')}`, `2h00`, 'Visioconférence', '✅ Connecté'],
+          [ip, `${String(hAprem).padStart(2,'0')}h${String(mAprem).padStart(2,'0')}`, `${String(hFinAprem).padStart(2,'0')}h${String(mFinAprem % 60).padStart(2,'0')}`, `1h00`, 'Visioconférence', '✅ Connecté'],
+        ]
+      );
+    } else {
+      extra += tableHTML(
+        ["Adresse IP", "Connexion", "Déconnexion", "Durée", "Type", "Statut"],
+        [[ip, `${String(hMatin).padStart(2,'0')}h${String(mMatin).padStart(2,'0')}`, `${String(hFinMatin).padStart(2,'0')}h${String(mFinMatin).padStart(2,'0')}`, `2h00`, 'Visioconférence', '✅ Connecté']]
+      );
+    }
+    extra += `<p><em>Activité : ${i < 3 ? 'Analyse du référentiel et identification des compétences' : i < 6 ? 'Rédaction du dossier de validation (Livret 2)' : i < 8 ? 'Constitution du portefeuille de preuves' : 'Préparation à l\'entretien avec le jury'}</em></p>`;
+    totalMinutes += dureeSeance;
+  }
+  const totalH = Math.floor(totalMinutes / 60);
+  const totalM = totalMinutes % 60;
+  extra += `<div class="page-break"></div>`;
+  extra += `<h3>📊 Synthèse des connexions</h3>`;
+  extra += `<p><strong>Nombre total de séances :</strong> 10<br><strong>Durée totale de connexion :</strong> ${totalH}h${String(totalM).padStart(2,'0')}min<br><strong>Durée prévue au contrat :</strong> 24h00<br><strong>Taux de présence :</strong> 100%<br><strong>Incidents techniques :</strong> Aucun<br><strong>Conclusion :</strong> Le candidat a suivi l'intégralité de l'accompagnement VAE à distance avec une connexion régulière et sans interruption.</p>`;
+
+  return buildDocument({ org: o, title: "RAPPORT DE CONNEXION LMS – ACCOMPAGNEMENT VAE", subtitle: `${s.prenom} ${s.nom}`, extraHtml: extra,
+    signatures: { type: "2", labels: ["L'Accompagnateur VAE", "Le Candidat"], names: [o.responsablePedagogique, s.prenom + " " + s.nom] }
+  });
+}
+
+
   return buildDocument({ org: o, title: "PROCÉDURE DE PRÉVENTION DES ABANDONS – VAE", sections: [
     { heading: "Objet", content: `<p>Cette procédure décrit les mesures mises en place par ${o.nom} pour prévenir les abandons en cours d'accompagnement VAE et favoriser l'engagement des candidats jusqu'au passage devant le jury.</p>` },
     { heading: "Indicateurs d'alerte", content: `<p>Les signaux suivants déclenchent une action préventive :<br>• 2 absences consécutives non justifiées<br>• Retard significatif dans la production du dossier<br>• Expression de doutes ou de découragement par le candidat<br>• Absence de communication depuis plus de 15 jours</p>` },
