@@ -3431,6 +3431,15 @@ function genVAEIndicateursResultats(o: OrganismeInfo) {
 }
 
 function genVAETauxCertification(o: OrganismeInfo) {
+  const isNouvelEntrant = !o.typesActions?.includes('actions-formation') || o.typesActions?.includes('vae');
+  if (isNouvelEntrant) {
+    return buildDocument({ org: o, title: "TAUX D'OBTENTION DES CERTIFICATIONS – VAE", subtitle: "Nouvel entrant – Phase de lancement", sections: [
+      { heading: "Contexte : nouvel entrant", content: `<p>${o.nom} débute son activité d'accompagnement VAE en 2026. Aucun candidat n'ayant encore été présenté devant un jury à ce jour, les taux d'obtention des certifications ne sont pas encore disponibles.</p><p>Ce document sera mis à jour dès que les premiers résultats seront connus, conformément aux exigences de l'indicateur 3 du Référentiel National Qualité.</p>` },
+      { heading: "Certifications visées", content: `<p>Les certifications proposées dans le cadre de l'accompagnement VAE sont les suivantes :</p><table><tr><th>Certification</th><th>Code RNCP</th><th>Niveau</th><th>Candidats en cours</th><th>Résultats</th></tr><tr><td>CAP Esthétique Cosmétique Parfumerie</td><td>RNCP31041</td><td>Niveau 3</td><td>À renseigner</td><td>En attente – activité en lancement</td></tr></table>`, variant: "green" },
+      { heading: "Dispositif de suivi prévu", content: `<p>Dès le premier passage devant un jury, l'organisme s'engage à :<br>• Enregistrer le résultat (validation totale, partielle ou refus)<br>• Calculer le taux d'obtention par certification<br>• Diffuser ces résultats sur ses supports de communication<br>• Analyser les résultats pour identifier les axes d'amélioration</p>` },
+      { heading: "Suites de parcours envisagées", content: `<p>• Poursuite vers un BP Esthétique Cosmétique Parfumerie (niveau 4) pour les validations totales<br>• Accompagnement complémentaire pour l'obtention des blocs manquants en cas de validation partielle<br>• Orientation vers d'autres dispositifs (formation complémentaire, bilan de compétences) si nécessaire</p>` },
+    ] });
+  }
   return buildDocument({ org: o, title: "TAUX D'OBTENTION DES CERTIFICATIONS – VAE", table: {
     headers: ["Certification visée", "Candidats présentés", "Validation totale", "Validation partielle", "Refus", "Taux réussite"],
     rows: [
