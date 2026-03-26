@@ -229,6 +229,8 @@ export function buildFullCatalog(
       const slug = fname.replace(/\s+/g, '_').toUpperCase();
       // Fiche d'entretien annuel per formateur
       add(`af_c5i22_fiche_entretien_${slug}`, `CT5 - IND 22 FICHE D'ENTRETIEN ANNUEL – ${fname}`, 5, 22, "fiche_entretien_annuel_formateur", { formateurNom: fname });
+      // Fiche de poste per formateur
+      add(`af_c5i21_fiche_poste_formateur_${slug}`, `CT5 - IND 21 FICHE DE POSTE – ${fname}`, 5, 21, "fiche_poste_formateur", { role: "formateur", formateurNom: fname });
       // Auto-évaluation per formateur
       add(`af_c5i21_autoevaluation_${slug}`, `CT5 - IND 21 AUTO-ÉVALUATION – ${fname}`, 5, 21, "autoevaluation_formateur", { formateurNom: fname });
       // Contrat de sous-traitance per formateur
