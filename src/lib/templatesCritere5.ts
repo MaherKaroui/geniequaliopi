@@ -47,8 +47,9 @@ function genFichePosteRefAdmin(o: OrganismeInfo) {
   ] });
 }
 
-function genFichePosteFormateur(o: OrganismeInfo) {
-  return buildDocument({ org: o, title: "FICHE DE POSTE", subtitle: "Formateur / Formatrice Bureautique – Microsoft Word", sections: [
+function genFichePosteFormateurNom(o: OrganismeInfo, formateurNom?: string) {
+  const subtitleName = formateurNom ? `Formateur / Formatrice – ${formateurNom}` : "Formateur / Formatrice Bureautique – Microsoft Word";
+  return buildDocument({ org: o, title: "FICHE DE POSTE", subtitle: subtitleName, sections: [
     { heading: "Organisme de formation", content: `<p><strong>${o.nom}</strong></p>` },
     { heading: "Lieu d'intervention", content: `<p>La mission est réalisée exclusivement en présentiel, au sein des locaux de l'organisme de formation situés au :</p><p>${o.adresse}, ${o.codePostal} ${o.ville}.</p><p>Des interventions ponctuelles peuvent également être organisées sur des sites partenaires, dans le cadre d'actions de formation planifiées par l'organisme.</p>` },
     { heading: "Type de contrat", content: `<p>Le poste est proposé sous l'un des statuts suivants, en fonction des besoins pédagogiques :</p><ul><li>Vacataire de la formation professionnelle, avec rémunération à l'heure ou à la journée d'intervention,</li><li>Formateur indépendant, dans le cadre d'un contrat de prestation de services,</li><li>Salarié en contrat à durée déterminée ou indéterminée, selon le volume d'activité.</li></ul><p>L'ensemble des modalités contractuelles est établi dans le respect du cadre réglementaire de la formation professionnelle continue et des exigences du Référentiel National Qualité (Qualiopi).</p>` },
