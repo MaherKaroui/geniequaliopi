@@ -87,6 +87,14 @@ const YOUTUBE_WEBMARKETING: CourseData['youtubeVideos'] = [
   { title: "Google Analytics 4 – Le guide complet en français", url: "https://www.youtube.com/watch?v=tnVdK9wKXjE", description: "Comprendre et utiliser Google Analytics 4 pour mesurer les performances de votre site web." },
 ];
 
+const YOUTUBE_CRM: CourseData['youtubeVideos'] = [
+  { title: "HubSpot CRM – Tutoriel complet pour débutants", url: "https://www.youtube.com/watch?v=kmu8gHP4vKw", description: "Prise en main complète de HubSpot CRM : contacts, pipeline, deals et tableaux de bord." },
+  { title: "Make (Integromat) – Automatiser son business en 2024", url: "https://www.youtube.com/watch?v=O2k7XP8fniA", description: "Créer des scénarios d'automation avec Make pour connecter ses outils et gagner du temps." },
+  { title: "Email Marketing – Créer des séquences qui convertissent", url: "https://www.youtube.com/watch?v=_X0jXVFxJYE", description: "Les clés pour créer des séquences email efficaces : nurturing, vente et fidélisation." },
+  { title: "Zapier – Automatiser ses tâches sans coder", url: "https://www.youtube.com/watch?v=rGiIPsLhXBc", description: "Découvrir Zapier et créer ses premières automatisations entre applications." },
+  { title: "Brevo (Sendinblue) – Formation complète email marketing", url: "https://www.youtube.com/watch?v=jWgMm5EjXE0", description: "Maîtriser Brevo pour l'email marketing : campagnes, automation et conformité RGPD." },
+];
+
 export function getYoutubeVideos(formationIntitule: string): CourseData['youtubeVideos'] {
   const t = formationIntitule.toLowerCase();
   if (t.includes('excel')) return YOUTUBE_EXCEL;
@@ -97,6 +105,7 @@ export function getYoutubeVideos(formationIntitule: string): CourseData['youtube
   if (t.includes('français') || t.includes('fle') || t.includes('médico-social') || t.includes('social')) return YOUTUBE_FLE;
   if (t.includes('intelligence artificielle') || t.includes('ia générative') || t.includes('contenus rédactionnels')) return YOUTUBE_IA;
   if (t.includes('webmarketing') || t.includes('marketing de contenus') || t.includes('réseaux sociaux') || t.includes('marketing digital')) return YOUTUBE_WEBMARKETING;
+  if (t.includes('crm') || t.includes('automation') || t.includes('automatisation')) return YOUTUBE_CRM;
   return YOUTUBE_GENERIC;
 }
 
