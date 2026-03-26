@@ -517,13 +517,15 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
               const fileBlob = await resp.blob();
               zip.file(`${basePath}/${buildCatalogFileName(doc)}`, fileBlob);
             } else if (
-              ["indicateurs_performance", "tableau_suivi_parcours_excel", "plan_dev_competences_excel", "tableau_amelioration_continue_excel", "suivi_dysfonctionnements_excel", "relances_appreciations_excel"].includes(doc.template)
+              ["indicateurs_performance", "tableau_suivi_parcours_excel", "plan_dev_competences_excel", "tableau_amelioration_continue_excel", "suivi_dysfonctionnements_excel", "relances_appreciations_excel", "vae_indicateurs_previsionnels"].includes(doc.template)
             ) {
               const excelContent = doc.template === "indicateurs_performance"
                 ? generateExcelTableauBordPerformance(mergedOrganisme, selectedFormation, allStagiaires)
                 : doc.template === "tableau_suivi_parcours_excel"
                   ? generateExcelTableauSuiviParcours(mergedOrganisme, selectedFormation, allStagiaires)
-                  : generateContent(doc);
+                  : doc.template === "vae_indicateurs_previsionnels"
+                    ? generateExcelIndicateursPrevisionnelsVAE(mergedOrganisme, selectedFormation)
+                    : generateContent(doc);
               zip.file(`${basePath}/${buildCatalogFileName(doc, null, ".xls")}`, excelToBlob(excelContent));
             } else {
               const content = generateContent(doc);
