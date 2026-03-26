@@ -205,14 +205,19 @@ export function generateExcelSuiviRupturesCFA(o: OrganismeInfo): string {
 
 export function generateExcelTableauBordPerformance(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]): string {
   const mois = ["janv.", "févr.", "mars", "avr.", "mai", "juin", "juil.", "août", "sept.", "oct.", "nov.", "déc."];
+  const isVAE = o.typesActions?.includes('vae');
   const nbStagiaires = stagiaires.filter(s => s.nom && s.nom.trim()).length || 1;
+  const labelBeneficiaire = isVAE ? "candidat" : "stagiaire";
+  const labelBeneficiaires = isVAE ? "candidats" : "stagiaires";
+  const labelAction = isVAE ? "Accompagnement VAE" : "Action de formation";
 
   // Determine year
   const firstDate = stagiaires.find(s => s.dateDebutFormation)?.dateDebutFormation || f.dateDebut || f.dateFin || "";
   const parsedDate = firstDate ? new Date(firstDate + "T00:00:00") : null;
   const annee = parsedDate && !isNaN(parsedDate.getTime()) ? parsedDate.getFullYear() : new Date().getFullYear();
+  const anneeN1 = annee - 1;
 
-  // Count stagiaires per month based on individual dates
+  // Count per month based on individual dates
   const countPerMonth = new Array(12).fill(0);
   const hasIndividualDates = stagiaires.some(s => s.dateDebutFormation);
 
@@ -231,20 +236,27 @@ export function generateExcelTableauBordPerformance(o: OrganismeInfo, f: Formati
     countPerMonth[moisF] = nbStagiaires;
   }
 
-  // Header row
-  let html = `<tr><th>Action de formation</th><th>Indicateur</th>`;
+  // Header row with Année n-1 column
+  let html = `<tr><th>${labelAction}</th><th>Indicateur</th><th>Année n-1 (${anneeN1})</th>`;
   mois.forEach(m => { html += `<th>${m}-${String(annee).slice(2)}</th>`; });
   html += `<th>Commentaires / analyse</th></tr>`;
 
   // Taux de satisfaction row
-  html += `<tr><td rowspan="2">${f.intitule || o.nom}</td><td>Taux de satisfaction appréciation des bénéficiaires</td>`;
+  const satisfactionN1 = isVAE ? "N/A" : "";
+  html += `<tr><td rowspan="3">${f.intitule || o.nom}</td><td>Taux de satisfaction appréciation des bénéficiaires</td><td>${satisfactionN1}</td>`;
   mois.forEach((_, i) => { html += `<td>${countPerMonth[i] > 0 ? "100%" : ""}</td>`; });
-  html += `<td>${f.intitule || o.nom} a reçu ${nbStagiaires} stagiaire${nbStagiaires > 1 ? "s" : ""} pour l'année ${annee}. Nous avons été noté 10/10 sur le taux de satisfaction pour l'année ${annee} au critère 7.30. Nous communiquerons cet élément de diffusion sur notre site internet et sur notre programme de formation.</td></tr>`;
+  html += `<td>${f.intitule || o.nom} a reçu ${nbStagiaires} ${nbStagiaires > 1 ? labelBeneficiaires : labelBeneficiaire} pour l'année ${annee}. Nous avons été noté 10/10 sur le taux de satisfaction pour l'année ${annee} au critère 7.30. Nous communiquerons cet élément de diffusion sur notre site internet et sur notre programme de formation.</td></tr>`;
 
-  // Nombre de stagiaires row
-  html += `<tr><td>Nombre de stagiaires</td>`;
+  // Nombre de bénéficiaires row
+  html += `<tr><td>Nombre de ${labelBeneficiaires}</td><td>0</td>`;
   mois.forEach((_, i) => { html += `<td>${countPerMonth[i] > 0 ? countPerMonth[i] : ""}</td>`; });
-  html += `<td></td></tr>`;
+  html += `<td>${isVAE ? `Première année d'activité VAE – aucun ${labelBeneficiaire} accompagné en ${anneeN1}.` : ""}</td></tr>`;
+
+  // Taux de réussite row (VAE specific: certification obtenue)
+  const labelReussite = isVAE ? "Taux de validation (certification obtenue)" : "Taux de réussite";
+  html += `<tr><td>${labelReussite}</td><td>0</td>`;
+  mois.forEach((_, i) => { html += `<td>${countPerMonth[i] > 0 ? "100%" : ""}</td>`; });
+  html += `<td>${isVAE ? `Aucun historique en ${anneeN1}. ${nbStagiaires} ${labelBeneficiaire}${nbStagiaires > 1 ? "s" : ""} en cours de validation pour ${annee}.` : ""}</td></tr>`;
 
   return excelWrap(`TABLEAU DE BORD INDICATEURS DE PERFORMANCE – ${annee}`, [{ name: "Tableau de bord", html }]);
 }
