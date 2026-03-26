@@ -192,8 +192,9 @@ import { getManagementChapters } from "./courseContentManagement";
 import { getGenericChapters } from "./courseContentGeneric";
 import { getFLEChapters } from "./courseContentFLE";
 import { getIAChapters } from "./courseContentIA";
+import { getWebmarketingChapters } from "./courseContentWebmarketing";
 
-export { getWordChapters, getAnglaisChapters, getManagementChapters, getGenericChapters, getFLEChapters, getIAChapters };
+export { getWordChapters, getAnglaisChapters, getManagementChapters, getGenericChapters, getFLEChapters, getIAChapters, getWebmarketingChapters };
 
 export function getCourseChapters(formationIntitule: string): CourseChapter[] {
   const t = formationIntitule.toLowerCase();
@@ -203,5 +204,6 @@ export function getCourseChapters(formationIntitule: string): CourseChapter[] {
   if (t.includes('management') || t.includes('manager')) return getManagementChapters();
   if (t.includes('français') || t.includes('médico-social') || t.includes('social')) return getFLEChapters();
   if (t.includes('intelligence artificielle') || t.includes('ia générative') || t.includes('contenus rédactionnels')) return getIAChapters();
+  if (t.includes('webmarketing') || t.includes('marketing de contenus') || t.includes('réseaux sociaux') || t.includes('marketing digital')) return getWebmarketingChapters();
   return getGenericChapters(formationIntitule);
 }
