@@ -583,6 +583,22 @@ const QUESTIONS_OUVERTES: Record<string, QuestionsOuvertesFormation> = {
       { question: "Qu'avez-vous appris pendant cette formation en marketing digital ?", reponseAttendue: "J'ai appris à optimiser le SEO, créer des campagnes Google Ads et social media, analyser les données avec Google Analytics, et construire une stratégie de content marketing." },
     ],
   },
+  "Initiation Word": {
+    debut: [
+      { question: "Avez-vous déjà utilisé un logiciel de traitement de texte ?", reponseAttendue: "Réponse libre : le stagiaire peut mentionner Word, LibreOffice Writer, Google Docs ou indiquer qu'il n'a jamais utilisé de traitement de texte." },
+      { question: "À quoi sert Microsoft Word selon vous ?", reponseAttendue: "Microsoft Word est un logiciel de traitement de texte qui permet de créer, modifier et mettre en forme des documents comme des lettres, CV, rapports." },
+      { question: "Savez-vous ce qu'est une mise en forme de texte ? Donnez un exemple.", reponseAttendue: "La mise en forme consiste à modifier l'apparence du texte : gras, italique, souligné, changement de police, taille, couleur." },
+      { question: "Comment enregistrez-vous habituellement un fichier sur votre ordinateur ?", reponseAttendue: "En utilisant le menu Fichier > Enregistrer ou Enregistrer sous, ou avec le raccourci Ctrl+S." },
+      { question: "Qu'attendez-vous de cette formation Initiation Word ?", reponseAttendue: "Réponse libre : le stagiaire exprime ses attentes (apprendre les bases, créer des documents professionnels, être autonome sur Word)." },
+    ],
+    fin: [
+      { question: "Citez trois fonctionnalités de mise en forme que vous avez apprises.", reponseAttendue: "Gras, italique, souligné, changement de police, taille de caractères, couleur du texte, alignement, interligne, listes à puces." },
+      { question: "Expliquez les étapes pour insérer et redimensionner une image dans Word.", reponseAttendue: "Onglet Insertion > Images > choisir l'image > Insérer. Pour redimensionner : cliquer sur l'image, utiliser les poignées d'angle en maintenant la touche Maj pour garder les proportions." },
+      { question: "Comment préparer un document pour l'impression ?", reponseAttendue: "Vérifier les marges (Mise en page), l'orientation, ajouter en-têtes/pieds de page si nécessaire, utiliser l'aperçu avant impression (Ctrl+P) pour vérifier le rendu." },
+      { question: "Quelle est la différence entre Enregistrer et Enregistrer sous ?", reponseAttendue: "Enregistrer sauvegarde le document au même emplacement sous le même nom. Enregistrer sous permet de choisir un nouvel emplacement et/ou un nouveau nom de fichier." },
+      { question: "Qu'avez-vous appris pendant cette formation Initiation Word ?", reponseAttendue: "J'ai appris à créer des documents Word, mettre en forme du texte et des paragraphes, insérer des images et tableaux, gérer la mise en page et préparer un document pour l'impression." },
+    ],
+  },
   "Bureautique": {
     debut: [
       { question: "À quoi sert le logiciel Microsoft Word ?", reponseAttendue: "Microsoft Word est un traitement de texte qui permet de créer, modifier et mettre en forme des documents professionnels (lettres, rapports, CV)." },
