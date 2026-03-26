@@ -346,7 +346,7 @@ export function buildDocument(config: DocBuildConfig): string {
         config.signatures.names?.[0] || "",
         config.signatures.labels?.[1] || "Partie 2",
         config.signatures.names?.[1] || "",
-        config.org.signatureUrl,
+        config.signatures.noOrgSignature ? undefined : config.org.signatureUrl,
         config.org.tamponUrl,
         config.signatures.stagiaireSignatureUrl,
         config.signatures.dates,
