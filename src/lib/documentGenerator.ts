@@ -3475,7 +3475,7 @@ function genVAEEntretienFaisabilite(o: OrganismeInfo, f: FormationInfo) {
     { heading: "Analyse de l'expérience", content: `<p><strong>Durée totale d'expérience professionnelle :</strong> ______ ans<br><strong>Durée en lien avec la certification :</strong> ______ ans<br><strong>Postes occupés en lien :</strong><br>1. ____________________________<br>2. ____________________________<br>3. ____________________________</p>` },
     { heading: "Motivation et projet", content: `<p><strong>Motivations du candidat :</strong><br>____________________________<br><strong>Projet professionnel après VAE :</strong><br>____________________________<br><strong>Disponibilité pour l'accompagnement :</strong> ☐ Temps plein ☐ Temps partiel ☐ Soirs/weekends</p>` },
     { heading: "Avis du conseiller", content: `<p>☐ <strong>Faisabilité confirmée</strong> – Le candidat remplit les conditions et le projet est cohérent.<br>☐ <strong>Faisabilité sous réserve</strong> – Compléments d'expérience nécessaires.<br>☐ <strong>Réorientation conseillée</strong> – Autre certification ou autre dispositif recommandé.<br><br><strong>Commentaires :</strong><br>____________________________</p>`, variant: "green" },
-  ], signatures: { type: "2", labels: ["Le Conseiller VAE", "Le Candidat"], names: [o.responsablePedagogique, ""] } });
+  ], signatures: { type: "2", labels: ["Le Conseiller VAE (Formateur)", "Le Candidat"], names: [o.responsablePedagogique, ""], formateurSignatureUrl: f.formateurSignatureUrl } });
 }
 
 function genVAEPresentationNouvelEntrant(o: OrganismeInfo, f: FormationInfo) {
