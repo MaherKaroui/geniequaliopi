@@ -79,6 +79,14 @@ const YOUTUBE_IA: CourseData['youtubeVideos'] = [
   { title: "DALL-E 3 et Canva IA – Créer des visuels pro", url: "https://www.youtube.com/watch?v=sqEnb4M3jIU", description: "Utiliser DALL-E et Canva IA pour créer des visuels professionnels sans compétences graphiques." },
 ];
 
+const YOUTUBE_WEBMARKETING: CourseData['youtubeVideos'] = [
+  { title: "Marketing Digital – Formation complète pour débutants", url: "https://www.youtube.com/watch?v=LGqBQMJpq1M", description: "Les fondamentaux du marketing digital : stratégie, contenus, réseaux sociaux, publicité et analytics." },
+  { title: "SEO – Référencement naturel : le guide complet", url: "https://www.youtube.com/watch?v=OFCeAh8jBKk", description: "Tout comprendre sur le référencement naturel Google pour booster votre visibilité en ligne." },
+  { title: "Facebook Ads – Créer sa première campagne publicitaire", url: "https://www.youtube.com/watch?v=_X0jXVFxJYE", description: "Tutoriel pas à pas pour lancer une campagne Facebook Ads performante avec un petit budget." },
+  { title: "Canva – Créer des visuels professionnels gratuitement", url: "https://www.youtube.com/watch?v=zRbzSMNynrE", description: "Maîtriser Canva pour créer des visuels attractifs pour les réseaux sociaux sans compétences graphiques." },
+  { title: "Google Analytics 4 – Le guide complet en français", url: "https://www.youtube.com/watch?v=tnVdK9wKXjE", description: "Comprendre et utiliser Google Analytics 4 pour mesurer les performances de votre site web." },
+];
+
 export function getYoutubeVideos(formationIntitule: string): CourseData['youtubeVideos'] {
   const t = formationIntitule.toLowerCase();
   if (t.includes('excel')) return YOUTUBE_EXCEL;
@@ -88,6 +96,7 @@ export function getYoutubeVideos(formationIntitule: string): CourseData['youtube
   if (t.includes('management') || t.includes('manager')) return YOUTUBE_MANAGEMENT;
   if (t.includes('français') || t.includes('fle') || t.includes('médico-social') || t.includes('social')) return YOUTUBE_FLE;
   if (t.includes('intelligence artificielle') || t.includes('ia générative') || t.includes('contenus rédactionnels')) return YOUTUBE_IA;
+  if (t.includes('webmarketing') || t.includes('marketing de contenus') || t.includes('réseaux sociaux') || t.includes('marketing digital')) return YOUTUBE_WEBMARKETING;
   return YOUTUBE_GENERIC;
 }
 
