@@ -256,6 +256,8 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "vae_diffusion_info": return genVAEDiffusionInfo(o, f);
     case "vae_procedure_info": return genVAEProcedureInfo(o);
     case "vae_indicateurs_resultats": return genVAEIndicateursResultats(o);
+    case "vae_indicateurs_previsionnels": return ""; // Excel template – handled in DocumentGenerator.tsx
+    case "vae_presentation_nouvel_entrant": return genVAEPresentationNouvelEntrant(o, f);
     case "vae_taux_certification": return genVAETauxCertification(o);
     case "vae_info_certification": return genVAEInfoCertification(o, f);
     case "vae_process_analyse_besoin": return genVAEProcessAnalyseBesoin(o);
