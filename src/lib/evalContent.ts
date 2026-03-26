@@ -173,6 +173,53 @@ const EVAL_CONTENT: Record<string, FormationEvalContent> = {
       "Progression remarquable entre le début et la fin de formation. Les objectifs B1 sont atteints dans le contexte professionnel.",
     ],
   },
+  "Initiation Word": {
+    qcmPositionnement: [
+      { question: "À quoi sert Microsoft Word ?", options: ["Faire des calculs", "Créer et mettre en forme des documents texte", "Naviguer sur Internet", "Retoucher des photos"], correctIndex: 1 },
+      { question: "Comment créer un nouveau document dans Word ?", options: ["Fichier > Nouveau", "Affichage > Nouveau", "Insertion > Document", "Outils > Créer"], correctIndex: 0 },
+      { question: "Quel raccourci permet de sauvegarder un document ?", options: ["Ctrl+P", "Ctrl+S", "Ctrl+N", "Ctrl+Z"], correctIndex: 1 },
+      { question: "Comment mettre un texte en gras ?", options: ["Ctrl+I", "Ctrl+G", "Ctrl+B", "Ctrl+U"], correctIndex: 2 },
+      { question: "Que signifie l'extension .docx ?", options: ["Un fichier image", "Un fichier Word", "Un fichier Excel", "Un fichier PDF"], correctIndex: 1 },
+      { question: "Quel onglet permet d'insérer une image ?", options: ["Accueil", "Insertion", "Mise en page", "Révision"], correctIndex: 1 },
+      { question: "Comment annuler la dernière action ?", options: ["Ctrl+Y", "Ctrl+Z", "Ctrl+A", "Ctrl+X"], correctIndex: 1 },
+      { question: "Qu'est-ce qu'un en-tête dans Word ?", options: ["Le titre du document", "Une zone qui apparaît en haut de chaque page", "La première ligne du texte", "Le nom du fichier"], correctIndex: 1 },
+      { question: "Comment sélectionner tout le texte d'un document ?", options: ["Ctrl+T", "Ctrl+A", "Ctrl+S", "Ctrl+E"], correctIndex: 1 },
+      { question: "Quel menu permet de modifier les marges ?", options: ["Accueil", "Insertion", "Mise en page", "Affichage"], correctIndex: 2 },
+    ],
+    qcmFinal: [
+      { question: "Comment insérer un tableau dans Word ?", options: ["Insertion > Tableau", "Accueil > Tableau", "Mise en page > Grille", "Affichage > Tableau"], correctIndex: 0 },
+      { question: "Quel raccourci permet de copier du texte ?", options: ["Ctrl+V", "Ctrl+C", "Ctrl+X", "Ctrl+P"], correctIndex: 1 },
+      { question: "Comment changer l'orientation d'une page en paysage ?", options: ["Accueil > Orientation", "Mise en page > Orientation > Paysage", "Insertion > Page paysage", "Affichage > Paysage"], correctIndex: 1 },
+      { question: "À quoi sert le pied de page ?", options: ["Afficher du texte en bas de chaque page", "Ajouter une note de bas de page", "Numéroter les paragraphes", "Insérer une image en bas"], correctIndex: 0 },
+      { question: "Comment créer une liste à puces ?", options: ["Accueil > Puces", "Insertion > Liste", "Mise en page > Puces", "Révision > Liste"], correctIndex: 0 },
+      { question: "Quel bouton permet d'aligner le texte au centre ?", options: ["Aligner à gauche", "Centrer", "Justifier", "Aligner à droite"], correctIndex: 1 },
+      { question: "Comment modifier l'interligne d'un paragraphe ?", options: ["Accueil > Interligne", "Insertion > Espacement", "Mise en page > Retrait", "Affichage > Lignes"], correctIndex: 0 },
+      { question: "Quel format est recommandé pour imprimer un document Word ?", options: [".xlsx", ".pptx", ".pdf", ".txt"], correctIndex: 2 },
+      { question: "Comment insérer un saut de page ?", options: ["Insertion > Saut de page", "Accueil > Page suivante", "Mise en page > Couper", "Appuyer 20 fois sur Entrée"], correctIndex: 0 },
+      { question: "Que fait le raccourci Ctrl+P ?", options: ["Coller", "Imprimer", "Enregistrer", "Fermer"], correctIndex: 1 },
+    ],
+    exercices: [
+      { titre: "Exercice 1 : Création d'un courrier professionnel", consigne: "Créez un courrier professionnel avec en-tête, date, adresse du destinataire, objet, corps de texte et signature. Appliquez une police Times New Roman taille 12, un interligne 1,5 et des marges de 2,5 cm.", reponseAttendue: "Document avec mise en forme professionnelle : en-tête avec coordonnées, date alignée à droite, adresse du destinataire à gauche, objet en gras, corps de texte justifié, formule de politesse et signature." },
+      { titre: "Exercice 2 : Mise en forme d'un CV", consigne: "Créez un CV d'une page avec : nom et prénom en titre, photo insérée, sections (Expérience, Formation, Compétences) avec puces, mise en forme soignée avec couleurs et bordures.", reponseAttendue: "CV structuré avec titre en gras taille 16, photo insérée et redimensionnée, sections clairement identifiées avec titres en couleur, listes à puces pour les éléments, mise en page aérée et professionnelle." },
+      { titre: "Exercice 3 : Tableau et mise en page", consigne: "Créez un tableau de 4 colonnes et 6 lignes représentant un planning hebdomadaire. Mettez en forme les en-têtes (fond coloré, texte en gras blanc), ajustez les largeurs de colonnes et centrez le tableau.", reponseAttendue: "Tableau avec en-têtes colorés (Jour, Matin, Après-midi, Soir), bordures nettes, texte centré dans les cellules, largeurs de colonnes adaptées au contenu, tableau centré sur la page." },
+      { titre: "Exercice 4 : Document avec images et formes", consigne: "Créez un document de type 'flyer' d'une page : insérez un titre WordArt, 2 images avec habillage de texte, une forme avec du texte et une bordure de page décorative.", reponseAttendue: "Flyer attractif avec titre WordArt centré, images insérées avec habillage 'carré' ou 'rapproché', forme (rectangle arrondi) avec texte d'accroche, bordure de page appliquée via Mise en page > Bordures." },
+      { titre: "Exercice 5 : Préparation à l'impression", consigne: "Prenez le document fourni et préparez-le pour l'impression : ajoutez un en-tête avec le nom de l'entreprise, un pied de page avec numérotation, vérifiez l'aperçu avant impression et ajustez les marges si nécessaire.", reponseAttendue: "Document avec en-tête personnalisé (nom entreprise + logo), pied de page avec numéro de page centré, marges ajustées (2 cm), aperçu vérifié sans débordement, document prêt à l'impression." },
+      { titre: "Exercice 6 : Synthèse – Document professionnel complet", consigne: "Créez un document professionnel de 2 pages : page 1 avec titre, introduction et tableau récapitulatif ; page 2 avec listes à puces, image insérée et conclusion. Appliquez une mise en page cohérente avec en-têtes/pieds de page.", reponseAttendue: "Document de 2 pages avec saut de page, mise en forme cohérente (police uniforme, titres en gras et colorés), tableau professionnel, listes structurées, image pertinente, en-tête et pied de page sur chaque page." },
+    ],
+    competences: ["Découverte et navigation dans l'interface Word", "Création et enregistrement de documents", "Mise en forme du texte et des paragraphes", "Insertion d'objets (images, tableaux, formes)", "Mise en page et préparation à l'impression"],
+    appreciations: [
+      "Excellente prise en main de Word. Les documents créés sont soignés et professionnels. Très bonne autonomie dès le 2e jour.",
+      "Bonne progression sur la mise en forme. Les tableaux sont bien maîtrisés. L'insertion d'images nécessite encore un peu de pratique.",
+      "Très bon travail d'ensemble. Le CV et le courrier sont de qualité professionnelle. Exercices réalisés avec soin.",
+      "Niveau satisfaisant. Les bases sont acquises. Doit encore consolider la gestion des en-têtes et pieds de page.",
+      "Excellente participation. A terminé tous les exercices avec brio. Capable de créer des documents professionnels de qualité.",
+      "Bonne compréhension des fonctionnalités. La mise en page est maîtrisée. Quelques hésitations sur l'habillage d'images.",
+      "Solide acquisition des compétences Word de base. Les exercices pratiques sont bien réussis. Progression visible.",
+      "Très bonne implication tout au long de la formation. Le document de synthèse finale est remarquable.",
+      "Bon niveau atteint. Les listes, tableaux et mises en forme sont acquis. Continue de pratiquer régulièrement.",
+      "Progression remarquable entre le test initial et l'évaluation finale. Objectifs pleinement atteints.",
+    ],
+  },
   "IA Générative": {
     qcmPositionnement: [
       { question: "Qu'est-ce que l'IA générative ?", options: ["Un robot physique", "Un algorithme capable de créer du contenu nouveau", "Un moteur de recherche", "Un réseau social"], correctIndex: 1 },
@@ -286,6 +333,7 @@ function getContentKey(intitule: string): string {
   if (lower.includes("informatique") || lower.includes("admin") || lower.includes("réseau") || lower.includes("système")) return "Informatique";
   if (lower.includes("management") || lower.includes("leadership")) return "Management";
   if (lower.includes("digital") || lower.includes("marketing") || lower.includes("seo")) return "Digital Marketing";
+  if (lower.includes("initiation word")) return "Initiation Word";
   if (lower.includes("bureautique") || lower.includes("word") || lower.includes("pack office")) return "Bureautique";
   if (lower.includes("esthétique") || lower.includes("cosmétique") || lower.includes("cap")) return "CAP Esthétique";
   if (lower.includes("français") || lower.includes("médico-social") || lower.includes("social")) return "FLE Médico-Social";
@@ -533,6 +581,22 @@ const QUESTIONS_OUVERTES: Record<string, QuestionsOuvertesFormation> = {
       { question: "Qu'est-ce que le remarketing et comment le mettre en place ?", reponseAttendue: "Le remarketing cible les utilisateurs ayant déjà visité votre site. Mise en place : installer le pixel (Google/Facebook), créer des audiences, concevoir des annonces personnalisées." },
       { question: "Comment analyser la concurrence en marketing digital ?", reponseAttendue: "Outils : SEMrush, Ahrefs, SimilarWeb. Analyser : mots-clés, backlinks, contenu, présence social media, publicité, positionnement, points forts/faibles." },
       { question: "Qu'avez-vous appris pendant cette formation en marketing digital ?", reponseAttendue: "J'ai appris à optimiser le SEO, créer des campagnes Google Ads et social media, analyser les données avec Google Analytics, et construire une stratégie de content marketing." },
+    ],
+  },
+  "Initiation Word": {
+    debut: [
+      { question: "Avez-vous déjà utilisé un logiciel de traitement de texte ?", reponseAttendue: "Réponse libre : le stagiaire peut mentionner Word, LibreOffice Writer, Google Docs ou indiquer qu'il n'a jamais utilisé de traitement de texte." },
+      { question: "À quoi sert Microsoft Word selon vous ?", reponseAttendue: "Microsoft Word est un logiciel de traitement de texte qui permet de créer, modifier et mettre en forme des documents comme des lettres, CV, rapports." },
+      { question: "Savez-vous ce qu'est une mise en forme de texte ? Donnez un exemple.", reponseAttendue: "La mise en forme consiste à modifier l'apparence du texte : gras, italique, souligné, changement de police, taille, couleur." },
+      { question: "Comment enregistrez-vous habituellement un fichier sur votre ordinateur ?", reponseAttendue: "En utilisant le menu Fichier > Enregistrer ou Enregistrer sous, ou avec le raccourci Ctrl+S." },
+      { question: "Qu'attendez-vous de cette formation Initiation Word ?", reponseAttendue: "Réponse libre : le stagiaire exprime ses attentes (apprendre les bases, créer des documents professionnels, être autonome sur Word)." },
+    ],
+    fin: [
+      { question: "Citez trois fonctionnalités de mise en forme que vous avez apprises.", reponseAttendue: "Gras, italique, souligné, changement de police, taille de caractères, couleur du texte, alignement, interligne, listes à puces." },
+      { question: "Expliquez les étapes pour insérer et redimensionner une image dans Word.", reponseAttendue: "Onglet Insertion > Images > choisir l'image > Insérer. Pour redimensionner : cliquer sur l'image, utiliser les poignées d'angle en maintenant la touche Maj pour garder les proportions." },
+      { question: "Comment préparer un document pour l'impression ?", reponseAttendue: "Vérifier les marges (Mise en page), l'orientation, ajouter en-têtes/pieds de page si nécessaire, utiliser l'aperçu avant impression (Ctrl+P) pour vérifier le rendu." },
+      { question: "Quelle est la différence entre Enregistrer et Enregistrer sous ?", reponseAttendue: "Enregistrer sauvegarde le document au même emplacement sous le même nom. Enregistrer sous permet de choisir un nouvel emplacement et/ou un nouveau nom de fichier." },
+      { question: "Qu'avez-vous appris pendant cette formation Initiation Word ?", reponseAttendue: "J'ai appris à créer des documents Word, mettre en forme du texte et des paragraphes, insérer des images et tableaux, gérer la mise en page et préparer un document pour l'impression." },
     ],
   },
   "Bureautique": {
