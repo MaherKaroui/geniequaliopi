@@ -25,6 +25,7 @@ const EXCEL_TEMPLATES = new Set([
   "suivi_dysfonctionnements_excel",
   "relances_appreciations_excel",
   "indicateurs_performance",
+  "vae_indicateurs_previsionnels",
 ]);
 
 function stripDiacritics(value: string): string {
