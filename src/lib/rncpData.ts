@@ -469,6 +469,101 @@ export const RNCP_FICHES: RNCPFiche[] = [
     voiesAcces: ["Formation initiale sous statut scolaire", "Apprentissage", "Formation professionnelle continue", "Candidature individuelle", "VAE"],
     dureeIndicative: "600h (formation) + 12 semaines de stage en milieu professionnel",
   },
+  {
+    code: "RS6702",
+    intitule: "Développer son activité professionnelle grâce au marketing de contenus et aux réseaux sociaux",
+    niveau: "Sans niveau spécifique",
+    certificateur: "WEBMARKETING & CO'M",
+    dateEnregistrement: "29/09/2023",
+    dateEcheance: "29/09/2026",
+    codeNSF: "320 – Spécialités plurivalentes de la communication et de l'information",
+    formacodes: "46301 – Communication entreprise / 46205 – Réseau social / 46341 – Marketing digital / 34093 – Stratégie commerciale",
+    resume: "La certification RS6702 atteste de la capacité du candidat à définir et déployer une stratégie de marketing de contenus et de réseaux sociaux pour développer la visibilité, l'audience et l'activité commerciale d'une entreprise ou d'un professionnel indépendant.",
+    activitesVisees: "Élaboration d'une stratégie webmarketing, création de contenus digitaux (articles, visuels, vidéos), gestion de communautés sur les réseaux sociaux, mise en place de campagnes d'acquisition, analyse des performances et optimisation continue.",
+    blocsCompetences: [
+      {
+        titre: "C1 – Définir une stratégie webmarketing",
+        competences: [
+          "Analyser le marché et la concurrence en ligne",
+          "Définir les objectifs webmarketing (notoriété, trafic, leads, ventes)",
+          "Identifier les personas et les parcours clients",
+          "Élaborer un plan de communication digitale",
+          "Choisir les canaux pertinents (SEO, SEA, réseaux sociaux, emailing)"
+        ],
+        matieres: [
+          { competence: "Audit digital", contenu: "Analyse de la présence en ligne, benchmarking concurrentiel, analyse SWOT digitale, outils d'audit (SEMrush, Ubersuggest, SimilarWeb)", volume: "7h" },
+          { competence: "Stratégie digitale", contenu: "Définition des objectifs SMART, tunnel de conversion, buyer personas, parcours client digital, plan d'action marketing", volume: "7h" }
+        ],
+        modalitesEval: "Étude de cas : élaboration d'une stratégie webmarketing complète pour un projet réel ou simulé, avec présentation orale et soutenance devant un jury professionnel."
+      },
+      {
+        titre: "C2 – Créer du contenu digital professionnel",
+        competences: [
+          "Rédiger des contenus optimisés pour le web (SEO)",
+          "Concevoir des visuels attractifs pour les réseaux sociaux",
+          "Produire des contenus vidéo pour les plateformes digitales",
+          "Adapter le contenu selon les plateformes (LinkedIn, Instagram, Facebook, TikTok)",
+          "Mettre en place un calendrier éditorial"
+        ],
+        matieres: [
+          { competence: "Rédaction web & SEO", contenu: "Techniques de rédaction web, optimisation SEO on-page, structure de contenu, balises HTML, mots-clés, méta-descriptions, outils (Yoast, Answer the Public)", volume: "7h" },
+          { competence: "Création visuelle", contenu: "Design graphique pour le web, outils de création (Canva, Adobe Express), formats visuels par plateforme, charte graphique digitale, banques d'images", volume: "7h" },
+          { competence: "Production vidéo", contenu: "Formats vidéo courts (Reels, TikTok, Shorts), scénarisation, tournage smartphone, montage basique (CapCut, InShot), sous-titrage", volume: "3h30" }
+        ],
+        modalitesEval: "Production d'un portefeuille de contenus : 3 articles optimisés SEO, 10 visuels réseaux sociaux, 2 vidéos courtes, accompagnés d'un calendrier éditorial sur 1 mois."
+      },
+      {
+        titre: "C3 – Gérer les réseaux sociaux et développer une communauté",
+        competences: [
+          "Créer et optimiser des profils professionnels sur les réseaux sociaux",
+          "Planifier et publier du contenu de manière régulière",
+          "Animer une communauté en ligne et gérer les interactions",
+          "Modérer les commentaires et gérer la e-réputation",
+          "Utiliser les outils de programmation (Buffer, Hootsuite, Meta Business Suite)"
+        ],
+        matieres: [
+          { competence: "Community management", contenu: "Stratégie communautaire, tonalité de marque, gestion des interactions, modération, gestion de crise, outils de veille (Mention, Google Alerts)", volume: "7h" },
+          { competence: "Outils et programmation", contenu: "Planification de contenu, outils de scheduling, Meta Business Suite, LinkedIn Campaign Manager, analyse des meilleurs horaires de publication", volume: "3h30" }
+        ],
+        modalitesEval: "Mise en situation : gestion d'un compte professionnel sur 2 semaines avec création de contenu, planification, interaction communauté et rapport d'activité."
+      },
+      {
+        titre: "C4 – Mettre en place une stratégie d'acquisition digitale",
+        competences: [
+          "Concevoir des tunnels de vente (landing pages, lead magnets, séquences email)",
+          "Mettre en place des campagnes publicitaires (Facebook Ads, Google Ads)",
+          "Créer des séquences d'email marketing (newsletters, automation)",
+          "Optimiser les taux de conversion (CRO)",
+          "Gérer un budget publicitaire"
+        ],
+        matieres: [
+          { competence: "Publicité en ligne", contenu: "Facebook Ads Manager, Google Ads, ciblage d'audience, retargeting, A/B testing, budgétisation, pixels de conversion", volume: "7h" },
+          { competence: "Email marketing & tunnel de vente", contenu: "Plateformes d'emailing (Mailchimp, Brevo), création de landing pages, lead magnets, séquences automatisées, segmentation, taux d'ouverture et de clic", volume: "7h" }
+        ],
+        modalitesEval: "Création d'un tunnel de vente complet avec landing page, lead magnet, séquence email automatisée et configuration d'une campagne publicitaire (budget simulé)."
+      },
+      {
+        titre: "C5 – Analyser les performances et optimiser la stratégie",
+        competences: [
+          "Mettre en place des KPI pertinents",
+          "Utiliser Google Analytics et les statistiques des réseaux sociaux",
+          "Interpréter les données et rédiger des rapports de performance",
+          "Proposer des actions correctives basées sur les données",
+          "Effectuer une veille permanente sur les tendances digitales"
+        ],
+        matieres: [
+          { competence: "Analytics & KPI", contenu: "Google Analytics 4, UTM, tableaux de bord, KPI (taux de conversion, coût par lead, ROI, engagement rate), data visualization", volume: "7h" },
+          { competence: "Veille et optimisation", contenu: "Veille concurrentielle, veille technologique, tendances (IA, social commerce, short video), optimisation continue, rapports mensuels", volume: "3h30" }
+        ],
+        modalitesEval: "Analyse de données réelles : interprétation d'un dashboard Google Analytics, rédaction d'un rapport de performance avec recommandations d'optimisation."
+      }
+    ],
+    secteursActivite: "Marketing digital, communication, commerce, entrepreneuriat, consulting, e-commerce, services aux entreprises",
+    typesEmplois: ["Community manager", "Chargé(e) de communication digitale", "Responsable webmarketing", "Social media manager", "Content manager", "Entrepreneur / Freelance"],
+    codesROME: ["E1101", "M1705", "E1103"],
+    voiesAcces: ["Formation continue", "Formation professionnelle", "CPF"],
+    dureeIndicative: "70 heures (10 jours)",
+  },
 ];
 
 export function getRNCPByCode(code: string): RNCPFiche | undefined {
