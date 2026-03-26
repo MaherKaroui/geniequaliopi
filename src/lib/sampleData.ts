@@ -291,6 +291,25 @@ export const SAMPLE_FORMATIONS: FormationInfo[] = [
     formateur: "Jean-Pierre Blanc",
     codeRNCP: "RNCP39063",
   },
+  {
+    intitule: "Accompagnement VAE – CAP Esthétique Cosmétique Parfumerie (RNCP31041)",
+    objectifs: "Accompagner le candidat dans sa démarche de Validation des Acquis de l'Expérience pour l'obtention du CAP Esthétique Cosmétique Parfumerie (niveau 3). Analyser le parcours professionnel en esthétique, constituer le livret 1 de recevabilité, rédiger le livret 2 en lien avec le référentiel RNCP31041 (soins du visage, épilations, maquillage, manucure, conseil et vente), et préparer le candidat à l'entretien devant le jury.",
+    prerequis: "Justifier d'au moins 1 an d'expérience (1 607 heures) en rapport direct avec la certification visée : activités d'esthétique, cosmétique, parfumerie (soins du visage et du corps, épilations, maquillage, conseil et vente de produits cosmétiques). Avoir un projet VAE validé par un conseiller en évolution professionnelle (CEP) ou lors de l'entretien de faisabilité.",
+    duree: "24 heures (4 semaines)",
+    modalites: "mixte",
+    tarif: "2 200 € HT par candidat",
+    programme: "Semaine 1 (6h) : Analyse du parcours professionnel en esthétique, aide à la constitution du livret 1 (recevabilité), positionnement du candidat par rapport au référentiel RNCP31041 (3 blocs de compétences)\nSemaine 2 (6h) : Début de rédaction du livret 2, identification et formalisation des compétences acquises (soins visage, épilations, maquillage, manucure, vente), structuration des expériences professionnelles\nSemaine 3 (8h) : Rédaction approfondie du livret 2, mise en lien systématique avec les 3 blocs de compétences du référentiel RNCP31041 (techniques esthétiques visage/mains/pieds, techniques liées aux phanères, conduite d'institut/conseil et vente)\nSemaine 4 (6h) : Finalisation du dossier, constitution du portefeuille de preuves (photos, attestations employeur, certificats), préparation à l'oral devant le jury, simulation d'entretien avec feedback",
+    methodesEvaluation: "Évaluation continue de la progression du livret, grille de positionnement par bloc de compétences RNCP31041, simulation d'entretien jury avec grille d'observation, auto-évaluation du candidat",
+    moyensPedagogiques: "Accompagnement individuel, référentiel RNCP31041 complet, modèles de livrets 1 et 2, grilles d'analyse des compétences esthétiques, supports méthodologiques de rédaction, visioconférence pour les séances à distance",
+    publicVise: "Esthéticien(ne)s, conseiller(ère)s en parfumerie, prothésistes ongulaires, spa praticien(ne)s, coiffeur(se)s avec expérience en esthétique, toute personne justifiant d'une expérience significative dans les métiers de l'esthétique, de la cosmétique et de la parfumerie",
+    delaiAcces: "14 jours après validation du projet VAE et de l'entretien de faisabilité",
+    dateDebut: "2026-03-02",
+    dateFin: "2026-03-27",
+    lieu: "25 avenue de la Formation Professionnelle, 75008 Paris – Salle A1 + accompagnement à distance",
+    nombreParticipants: "1",
+    formateur: "Catherine Dubois",
+    codeRNCP: "RNCP31041",
+  },
 ];
 
 // Satisfaction scores (pre-filled realistic data)
