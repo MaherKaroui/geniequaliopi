@@ -206,9 +206,15 @@ export function buildFullCatalog(
 
     // ===== CRITÈRE 5 — QUALIFICATION DU PERSONNEL =====
 
+    // --- Per-formateur docs: extract unique formateur names from stagiaires ---
+    const uniqueFormateurs = Array.from(new Set(stagiaires.map(s => (s as any).formateur).filter((f: any) => f && String(f).trim())));
+
     // IND 21 — Compétences des intervenants
     add("af_c5i21_fiche_poste_dirigeant", "CT5 - IND 21 FICHE DE POSTE – RESPONSABLE PÉDAGOGIQUE", 5, 21, "fiche_poste_formateur", { role: "dirigeant" });
-    add("af_c5i21_fiche_poste_formateur", "CT5 - IND 21 FICHE DE POSTE – FORMATEUR", 5, 21, "fiche_poste_formateur", { role: "formateur" });
+    // Fiche de poste formateur générique (si aucun formateur assigné)
+    if (uniqueFormateurs.length === 0) {
+      add("af_c5i21_fiche_poste_formateur", "CT5 - IND 21 FICHE DE POSTE – FORMATEUR", 5, 21, "fiche_poste_formateur", { role: "formateur" });
+    }
     add("af_c5i21_fiche_poste_ref_admin", "CT5 - IND 21 FICHE DE POSTE – RÉFÉRENT ADMINISTRATIF", 5, 21, "fiche_poste_formateur", { role: "referent_administratif" });
     add("af_c5i21_fiche_poste_ref_handicap", "CT5 - IND 21 FICHE DE POSTE – RÉFÉRENT HANDICAP", 5, 21, "fiche_poste_formateur", { role: "referent_handicap" });
     // Une seule auto-évaluation pour le formateur de la formation
@@ -219,13 +225,14 @@ export function buildFullCatalog(
     add("af_c5i22_plan_dev_competences", "CT5 - IND 22 PLAN DE DÉVELOPPEMENT DES COMPÉTENCES", 5, 22, "plan_dev_competences_excel");
     add("af_c5i22_fiche_entretien_annuel", "CT5 - IND 22 FICHE D'ENTRETIEN ANNUEL FORMATEUR", 5, 22, "fiche_entretien_annuel_formateur");
 
-    // --- Per-formateur docs: extract unique formateur names from stagiaires ---
-    const uniqueFormateurs = Array.from(new Set(stagiaires.map(s => (s as any).formateur).filter((f: any) => f && String(f).trim())));
+
     uniqueFormateurs.forEach((fName) => {
       const fname = String(fName).trim();
       const slug = fname.replace(/\s+/g, '_').toUpperCase();
       // Fiche d'entretien annuel per formateur
       add(`af_c5i22_fiche_entretien_${slug}`, `CT5 - IND 22 FICHE D'ENTRETIEN ANNUEL – ${fname}`, 5, 22, "fiche_entretien_annuel_formateur", { formateurNom: fname });
+      // Fiche de poste per formateur
+      add(`af_c5i21_fiche_poste_formateur_${slug}`, `CT5 - IND 21 FICHE DE POSTE – ${fname}`, 5, 21, "fiche_poste_formateur", { role: "formateur", formateurNom: fname });
       // Auto-évaluation per formateur
       add(`af_c5i21_autoevaluation_${slug}`, `CT5 - IND 21 AUTO-ÉVALUATION – ${fname}`, 5, 21, "autoevaluation_formateur", { formateurNom: fname });
       // Contrat de sous-traitance per formateur
