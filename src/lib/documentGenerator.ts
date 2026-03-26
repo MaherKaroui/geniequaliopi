@@ -287,7 +287,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "vae_handicap_bilan": return genVAEHandicapBilan(o);
     case "vae_mail_handicap": return genVAEMailHandicap(o);
     case "vae_referentiel_accompagnement": return genVAEReferentielAccompagnement(o, f);
-    case "vae_engagements_respectifs": return genVAEEngagementsRespectifs(o);
+    case "vae_engagements_respectifs": return genVAEEngagementsRespectifs(o, f, stagiaires);
     case "vae_programme_accompagnement": return genVAEProgrammeAccompagnement(o, f);
     case "vae_livret2": return genVAELivret2(o, f);
     case "vae_positionnement_debut": {
@@ -305,7 +305,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
       return genVAEConventionAccompagnement(o, f, stagiaires, si);
     }
     case "vae_reglement_interieur": return genVAEReglementInterieur(o);
-    case "vae_droit_image": return genVAEDroitImage(o);
+    case "vae_droit_image": return genVAEDroitImage(o, f, stagiaires);
     case "vae_infos_peripheriques": return genVAEInfosPeripheriques(o);
     case "vae_certificat_realisation": {
       const si = params?.stagiaireIdx ?? 0;
@@ -3475,7 +3475,7 @@ function genVAEEntretienFaisabilite(o: OrganismeInfo, f: FormationInfo) {
     { heading: "Analyse de l'expérience", content: `<p><strong>Durée totale d'expérience professionnelle :</strong> ______ ans<br><strong>Durée en lien avec la certification :</strong> ______ ans<br><strong>Postes occupés en lien :</strong><br>1. ____________________________<br>2. ____________________________<br>3. ____________________________</p>` },
     { heading: "Motivation et projet", content: `<p><strong>Motivations du candidat :</strong><br>____________________________<br><strong>Projet professionnel après VAE :</strong><br>____________________________<br><strong>Disponibilité pour l'accompagnement :</strong> ☐ Temps plein ☐ Temps partiel ☐ Soirs/weekends</p>` },
     { heading: "Avis du conseiller", content: `<p>☐ <strong>Faisabilité confirmée</strong> – Le candidat remplit les conditions et le projet est cohérent.<br>☐ <strong>Faisabilité sous réserve</strong> – Compléments d'expérience nécessaires.<br>☐ <strong>Réorientation conseillée</strong> – Autre certification ou autre dispositif recommandé.<br><br><strong>Commentaires :</strong><br>____________________________</p>`, variant: "green" },
-  ], signatures: { type: "2", labels: ["Le Conseiller VAE", "Le Candidat"], names: [o.responsablePedagogique, ""] } });
+  ], signatures: { type: "2", labels: ["Le Conseiller VAE (Formateur)", "Le Candidat"], names: [o.responsablePedagogique, ""], formateurSignatureUrl: f.formateurSignatureUrl } });
 }
 
 function genVAEPresentationNouvelEntrant(o: OrganismeInfo, f: FormationInfo) {
@@ -3497,12 +3497,14 @@ function genVAEPresentationNouvelEntrant(o: OrganismeInfo, f: FormationInfo) {
 
 function genVAEDiagnosticFaisabilite(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = stagiaires[si] || stagiaires[0] || FALLBACK_STAGIAIRE;
+  const dateDebut = getStagiaireDateDebut(s, f);
+  const dateAnalyse = subtractBusinessDays(dateDebut, 20);
   return buildDocument({ org: o, title: "DIAGNOSTIC DE FAISABILITÉ VAE", subtitle: `${s.prenom} ${s.nom}`, sections: [
-    { heading: "Candidat", content: `<p><strong>Nom :</strong> ${s.prenom} ${s.nom}<br><strong>Poste actuel :</strong> ${s.poste || "Non renseigné"}<br><strong>Entreprise :</strong> ${s.entreprise || "Non renseignée"}<br><strong>Certification visée :</strong> ${f.intitule}</p>` },
+    { heading: "Candidat", content: `<p><strong>Nom :</strong> ${s.prenom} ${s.nom}<br><strong>Poste actuel :</strong> ${s.poste || "Non renseigné"}<br><strong>Entreprise :</strong> ${s.entreprise || "Non renseignée"}<br><strong>Certification visée :</strong> ${f.intitule}<br><strong>Date de l'analyse :</strong> ${formatDate(dateAnalyse)}</p>` },
     { heading: "Expérience en lien avec la certification", content: `<p><strong>Durée d'expérience totale :</strong> 8 ans<br><strong>Durée en lien direct :</strong> 6 ans<br><br><strong>Activités principales identifiées :</strong><br>• Gestion opérationnelle du domaine visé<br>• Encadrement et coordination d'équipe<br>• Mise en place de procédures qualité<br>• Reporting et analyse de performance<br>• Formation et accompagnement de collaborateurs</p>` },
     { heading: "Adéquation avec le référentiel", content: `<p><strong>Blocs de compétences couverts par l'expérience :</strong></p><table><tr><th>Bloc</th><th>Couverture</th><th>Observations</th></tr><tr><td>Bloc 1 – Compétences fondamentales</td><td>Complète</td><td>Expérience solide et documentée</td></tr><tr><td>Bloc 2 – Compétences spécialisées</td><td>Complète</td><td>Maîtrise avérée</td></tr><tr><td>Bloc 3 – Compétences transversales</td><td>Complète</td><td>Compétences managériales démontrées</td></tr></table>`, variant: "green" },
-    { heading: "Conclusion", content: `<p><strong>Avis : FAVORABLE</strong><br><br>Le parcours de ${s.prenom} ${s.nom} présente une adéquation forte avec la certification « ${f.intitule} ». La durée et la diversité de l'expérience couvrent l'ensemble des blocs de compétences du référentiel.<br><br><strong>Recommandation :</strong> Engagement dans la démarche VAE avec un accompagnement de 24 heures.</p>` },
-  ], signatures: { type: "2", labels: ["Le Conseiller VAE", "Le Candidat"], names: [o.responsablePedagogique, s.prenom + " " + s.nom] } });
+    { heading: "Conclusion", content: `<p><strong>Avis : FAVORABLE</strong><br><br>Le parcours de ${s.prenom} ${s.nom} présente une adéquation forte avec la certification « ${f.intitule} ». La durée et la diversité de l'expérience couvrent l'ensemble des blocs de compétences du référentiel.<br><br><strong>Recommandation :</strong> Engagement dans la démarche VAE avec un accompagnement de 24 heures.</p><p>Fait à ${o.ville}, le ${formatDate(dateAnalyse)}</p>` },
+  ], signatures: { type: "2", labels: ["L'Accompagnateur VAE (Formateur)", "Le Candidat"], names: [o.responsablePedagogique, s.prenom + " " + s.nom], stagiaireSignatureUrl: s.signatureUrl, formateurSignatureUrl: s.formateurSignatureUrl || f.formateurSignatureUrl, dates: [formatDate(dateAnalyse), formatDate(dateAnalyse)] } });
 }
 
 function genVAEReferentielAccompagnement(o: OrganismeInfo, f: FormationInfo) {
@@ -3564,13 +3566,14 @@ function genVAEConventionAccompagnement(o: OrganismeInfo, f: FormationInfo, stag
   const s = stagiaires[si] || stagiaires[0] || FALLBACK_STAGIAIRE;
   const dateDebut = getStagiaireDateDebut(s, { ...f });
   const dateFin = getStagiaireDateFin(s, { ...f });
+  const dateSignature = subtractBusinessDays(dateDebut, 14);
   return buildDocument({ org: o, title: "CONVENTION D'ACCOMPAGNEMENT VAE", sections: [
     { heading: "Entre les parties", content: `<p><strong>L'organisme accompagnateur :</strong><br>${o.nom} – SIRET : ${o.siret}<br>${o.adresse}, ${o.codePostal} ${o.ville}<br>NDA : ${o.nda}<br>Représenté par ${o.dirigeant}, en qualité de dirigeant<br><br><strong>Le candidat :</strong><br>${s.prenom} ${s.nom}<br>Email : ${s.email}<br>Téléphone : ${s.telephone}</p>` },
     { heading: "Objet de la convention", content: `<p>La présente convention a pour objet de définir les conditions de l'accompagnement VAE du candidat en vue de l'obtention de la certification : <strong>« ${f.intitule} »</strong></p>` },
     { heading: "Modalités de l'accompagnement", content: `<p><strong>Durée :</strong> 24 heures<br><strong>Période :</strong> du ${formatDate(dateDebut)} au ${formatDate(dateFin)}<br><strong>Rythme :</strong> 10 séances individuelles de 2 à 3 heures<br><strong>Format :</strong> Présentiel et/ou visioconférence<br><strong>Lieu :</strong> ${f.lieu || o.adresse + ", " + o.codePostal + " " + o.ville}</p>` },
     { heading: "Tarif et financement", content: `<p><strong>Tarif de l'accompagnement :</strong> ${getStagiaireTarif(s, f)}<br><strong>Financement :</strong> CPF / Employeur / OPCO / Autofinancement<br><br>En cas d'abandon du candidat avant la fin de l'accompagnement, seules les heures réalisées seront facturées.</p>`, variant: "green" },
-    { heading: "Obligations des parties", content: `<p><strong>L'organisme s'engage à :</strong><br>• Fournir un accompagnement personnalisé et de qualité<br>• Mettre à disposition un accompagnateur qualifié<br>• Respecter la confidentialité des informations<br>• Remettre une attestation de fin d'accompagnement<br><br><strong>Le candidat s'engage à :</strong><br>• Être assidu aux séances programmées<br>• Fournir les documents et preuves nécessaires<br>• Réaliser le travail personnel demandé entre les séances<br>• Informer l'organisme en cas de difficulté ou d'absence</p>` },
-  ], signatures: { type: "2", labels: ["Le Dirigeant", "Le Candidat"], names: [o.dirigeant, s.prenom + " " + s.nom] } });
+    { heading: "Obligations des parties", content: `<p><strong>L'organisme s'engage à :</strong><br>• Fournir un accompagnement personnalisé et de qualité<br>• Mettre à disposition un accompagnateur qualifié<br>• Respecter la confidentialité des informations<br>• Remettre une attestation de fin d'accompagnement<br><br><strong>Le candidat s'engage à :</strong><br>• Être assidu aux séances programmées<br>• Fournir les documents et preuves nécessaires<br>• Réaliser le travail personnel demandé entre les séances<br>• Informer l'organisme en cas de difficulté ou d'absence</p><p>Fait à ${o.ville}, le ${formatDate(dateSignature)}</p>` },
+  ], signatures: { type: "2", labels: ["Le Dirigeant", "Le Candidat"], names: [o.dirigeant, s.prenom + " " + s.nom], stagiaireSignatureUrl: s.signatureUrl, noOrgSignature: true, dates: [formatDate(dateSignature), formatDate(dateSignature)] } });
 }
 
 function genVAEReglementInterieur(o: OrganismeInfo) {
@@ -3587,27 +3590,37 @@ function genVAEReglementInterieur(o: OrganismeInfo) {
 function genVAEFicheSuiviIndividuel(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = stagiaires[si] || stagiaires[0] || FALLBACK_STAGIAIRE;
   const dateDebut = getStagiaireDateDebut(s, f);
+  const dateFin = getStagiaireDateFin(s, f);
+  // Calculate actual dates for each session spread between dateDebut and dateFin
+  const dStart = new Date(dateDebut);
+  const dEnd = new Date(dateFin);
+  const totalDays = Math.max(1, Math.round((dEnd.getTime() - dStart.getTime()) / 86400000));
+  const seanceDate = (idx: number) => {
+    const d = new Date(dStart.getTime() + Math.round((idx / 9) * totalDays) * 86400000);
+    return formatDate(d.toISOString().slice(0, 10));
+  };
   return buildDocument({ org: o, title: "FICHE DE SUIVI INDIVIDUEL VAE", subtitle: `${s.prenom} ${s.nom}`, table: {
     headers: ["Séance", "Date", "Objectifs travaillés", "Réalisations", "Travail à faire", "Observations"],
     rows: [
-      ["1", formatDate(dateDebut), "Analyse du référentiel", "Référentiel décrypté, activités listées", "Lister les preuves disponibles", "Candidat motivé et organisé"],
-      ["2", "J+7", "Identification des compétences", "Cartographie des compétences réalisée", "Rédiger introduction Bloc 1", "Bonne compréhension du référentiel"],
-      ["3", "J+14", "Rédaction Bloc 1", "Bloc 1 rédigé à 80%", "Finaliser Bloc 1 et rassembler preuves", "Bonne qualité rédactionnelle"],
-      ["4", "J+21", "Finalisation Bloc 1 + Début Bloc 2", "Bloc 1 terminé, Bloc 2 entamé", "Poursuivre rédaction Bloc 2", "Progression régulière"],
-      ["5", "J+28", "Rédaction Bloc 2", "Bloc 2 rédigé à 90%", "Finaliser Bloc 2", "Très bon travail"],
-      ["6", "J+35", "Rédaction Bloc 3", "Bloc 3 rédigé", "Rassembler toutes les preuves", "Contenu riche et pertinent"],
-      ["7", "J+42", "Portefeuille de preuves et annexes", "Preuves organisées et classées", "Relire le dossier complet", "Dossier bien structuré"],
-      ["8", "J+49", "Relecture globale", "Corrections apportées, dossier finalisé", "Préparer la présentation orale", "Dossier prêt pour envoi"],
-      ["9", "J+56", "Préparation orale", "Trame de présentation validée", "S'entraîner à la présentation", "Bon potentiel à l'oral"],
-      ["10", "J+63", "Simulation jury + envoi dossier", "Simulation réussie, dossier envoyé", "Attendre convocation jury", "Candidat prêt"],
+      ["1", seanceDate(0), "Analyse du référentiel", "Référentiel décrypté, activités listées", "Lister les preuves disponibles", "Candidat motivé et organisé"],
+      ["2", seanceDate(1), "Identification des compétences", "Cartographie des compétences réalisée", "Rédiger introduction Bloc 1", "Bonne compréhension du référentiel"],
+      ["3", seanceDate(2), "Rédaction Bloc 1", "Bloc 1 rédigé à 80%", "Finaliser Bloc 1 et rassembler preuves", "Bonne qualité rédactionnelle"],
+      ["4", seanceDate(3), "Finalisation Bloc 1 + Début Bloc 2", "Bloc 1 terminé, Bloc 2 entamé", "Poursuivre rédaction Bloc 2", "Progression régulière"],
+      ["5", seanceDate(4), "Rédaction Bloc 2", "Bloc 2 rédigé à 90%", "Finaliser Bloc 2", "Très bon travail"],
+      ["6", seanceDate(5), "Rédaction Bloc 3", "Bloc 3 rédigé", "Rassembler toutes les preuves", "Contenu riche et pertinent"],
+      ["7", seanceDate(6), "Portefeuille de preuves et annexes", "Preuves organisées et classées", "Relire le dossier complet", "Dossier bien structuré"],
+      ["8", seanceDate(7), "Relecture globale", "Corrections apportées, dossier finalisé", "Préparer la présentation orale", "Dossier prêt pour envoi"],
+      ["9", seanceDate(8), "Préparation orale", "Trame de présentation validée", "S'entraîner à la présentation", "Bon potentiel à l'oral"],
+      ["10", seanceDate(9), "Simulation jury + envoi dossier", "Simulation réussie, dossier envoyé", "Attendre convocation jury", "Candidat prêt"],
     ]
   }, sections: [
-    { heading: "Bilan global", content: `<p>Accompagnement de 24 heures réalisé sur 10 séances. ${s.prenom} ${s.nom} a fait preuve d'un engagement exemplaire tout au long de la démarche. Le dossier de validation est complet, bien structuré et argumenté. Le candidat est prêt pour le passage devant le jury.</p>`, variant: "green" },
-  ], signatures: { type: "2", labels: ["L'Accompagnateur VAE", "Le Candidat"], names: [o.responsablePedagogique, s.prenom + " " + s.nom] } });
+    { heading: "Bilan global", content: `<p>Accompagnement de 24 heures réalisé sur 10 séances du ${formatDate(dateDebut)} au ${formatDate(dateFin)}. ${s.prenom} ${s.nom} a fait preuve d'un engagement exemplaire tout au long de la démarche. Le dossier de validation est complet, bien structuré et argumenté. Le candidat est prêt pour le passage devant le jury.</p><p>Fait à ${o.ville}, le ${formatDate(dateFin)}</p>`, variant: "green" },
+  ], signatures: { type: "2", labels: ["L'Accompagnateur VAE (Formateur)", "Le Candidat"], names: [o.responsablePedagogique, s.prenom + " " + s.nom], stagiaireSignatureUrl: s.signatureUrl, formateurSignatureUrl: s.formateurSignatureUrl || f.formateurSignatureUrl, dates: [formatDate(dateFin), formatDate(dateFin)] } });
 }
 
 function genVAEGrilleEvaluationDossier(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = stagiaires[si] || stagiaires[0] || FALLBACK_STAGIAIRE;
+  const dateFin = getStagiaireDateFin(s, f);
   return buildDocument({ org: o, title: "GRILLE D'ÉVALUATION DU DOSSIER VAE", subtitle: `${s.prenom} ${s.nom} – ${f.intitule}`, table: {
     headers: ["Critère d'évaluation", "Note /5", "Observations"],
     rows: [
@@ -3620,8 +3633,8 @@ function genVAEGrilleEvaluationDossier(o: OrganismeInfo, f: FormationInfo, stagi
       ["Argumentation et analyse réflexive", "5/5", "Bonne prise de recul sur les pratiques"],
     ]
   }, sections: [
-    { heading: "Appréciation globale", content: `<p><strong>Note globale : 33/35 – Excellent</strong><br><br>Le dossier de ${s.prenom} ${s.nom} est d'une qualité remarquable. Les activités sont parfaitement décrites et en adéquation avec le référentiel de certification. Les preuves apportées sont diversifiées et pertinentes. Le candidat est prêt pour le passage devant le jury.</p>`, variant: "green" },
-  ], signatures: { type: "2", labels: ["L'Accompagnateur VAE", ""], names: [o.responsablePedagogique, ""] } });
+    { heading: "Appréciation globale", content: `<p><strong>Note globale : 33/35 – Excellent</strong><br><br>Le dossier de ${s.prenom} ${s.nom} est d'une qualité remarquable. Les activités sont parfaitement décrites et en adéquation avec le référentiel de certification. Les preuves apportées sont diversifiées et pertinentes. Le candidat est prêt pour le passage devant le jury.</p><p>Fait à ${o.ville}, le ${formatDate(dateFin)}</p>`, variant: "green" },
+  ], signatures: { type: "2", labels: ["L'Accompagnateur VAE (Formateur)", "Le Candidat"], names: [o.responsablePedagogique, `${s.prenom} ${s.nom}`], stagiaireSignatureUrl: s.signatureUrl, formateurSignatureUrl: s.formateurSignatureUrl || f.formateurSignatureUrl, dates: [formatDate(dateFin), formatDate(dateFin)] } });
 }
 
 function genVAEEmargement(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
@@ -3913,20 +3926,23 @@ function genVAEAnalyseBesoin(o: OrganismeInfo, f: FormationInfo, stagiaires: Sta
 
 function genVAELivret1Recevabilite(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = stagiaires[si] || stagiaires[0] || FALLBACK_STAGIAIRE;
+  const dateDebut = getStagiaireDateDebut(s, f);
+  const dateSignature = subtractBusinessDays(dateDebut, 20);
   return buildDocument({ org: o, title: "LIVRET 1 – DOSSIER DE RECEVABILITÉ VAE", subtitle: `${s.prenom} ${s.nom} – ${f.intitule}`, sections: [
-    { heading: "1. Identification du candidat", content: `<p><strong>Civilité :</strong> ${s.civilite || "___"}<br><strong>Nom :</strong> ${s.nom}<br><strong>Prénom :</strong> ${s.prenom}<br><strong>Date de naissance :</strong> ${s.dateNaissance || "___"}<br><strong>Adresse :</strong> ${s.adresse || "___"}<br><strong>Code postal :</strong> ${s.codePostal || "___"}<br><strong>Commune :</strong> ${s.commune || "___"}<br><strong>Téléphone :</strong> ${s.telephone}<br><strong>Email :</strong> ${s.email}</p>` },
-    { heading: "2. Certification visée", content: `<p><strong>Intitulé de la certification :</strong> ${f.intitule}<br><strong>Code RNCP :</strong> ${f.codeRNCP || "___"}<br><strong>Organisme certificateur :</strong> ___<br><strong>Niveau de qualification :</strong> ___</p>` },
-    { heading: "3. Expérience professionnelle", content: `<p><strong>Durée totale de l'expérience en rapport avec la certification :</strong> ___ ans<br><br><strong>Expérience 1 :</strong><br>Employeur : ${s.entreprise || "___"}<br>Poste occupé : ${s.poste || "___"}<br>Durée : ___<br>Activités principales : ___<br><br><strong>Expérience 2 :</strong><br>Employeur : ___<br>Poste occupé : ___<br>Durée : ___<br>Activités principales : ___</p>` },
-    { heading: "4. Formation initiale et continue", content: `<p><strong>Dernier diplôme obtenu :</strong> ${s.diplome || "___"}<br><strong>Formations continues suivies en lien avec la certification :</strong><br>1. ___<br>2. ___</p>` },
-    { heading: "5. Activités bénévoles ou extra-professionnelles", content: `<p>Décrivez les activités en lien avec la certification (bénévolat, engagement associatif, responsabilités syndicales, etc.) :<br>___</p>`, variant: "green" },
-    { heading: "6. Pièces justificatives à joindre", content: `<p>☐ Copie de la pièce d'identité<br>☐ Attestations d'emploi / bulletins de salaire<br>☐ CV détaillé<br>☐ Certificats de formation continue<br>☐ Attestations de bénévolat<br>☐ Tout document attestant de l'expérience en rapport avec la certification</p>` },
-  ], signatures: { type: "2", labels: ["Le Candidat", ""], names: [`${s.prenom} ${s.nom}`, ""] } });
+    { heading: "1. Identification du candidat", content: `<p><strong>Civilité :</strong> ${s.civilite || "Mme"}<br><strong>Nom :</strong> ${s.nom}<br><strong>Prénom :</strong> ${s.prenom}<br><strong>Date de naissance :</strong> ${s.dateNaissance || "___"}<br><strong>Adresse :</strong> ${s.adresse || "___"}<br><strong>Code postal :</strong> ${s.codePostal || "___"}<br><strong>Commune :</strong> ${s.commune || "___"}<br><strong>Téléphone :</strong> ${s.telephone}<br><strong>Email :</strong> ${s.email}</p>` },
+    { heading: "2. Certification visée", content: `<p><strong>Intitulé de la certification :</strong> ${f.intitule}<br><strong>Code RNCP :</strong> ${f.codeRNCP || "___"}<br><strong>Organisme certificateur :</strong> ${o.nom}<br><strong>Niveau de qualification :</strong> Niveau 3 à 7 selon certification</p>` },
+    { heading: "3. Expérience professionnelle", content: `<p><strong>Durée totale de l'expérience en rapport avec la certification :</strong> 6 ans<br><br><strong>Expérience 1 :</strong><br>Employeur : ${s.entreprise || "___"}<br>Poste occupé : ${s.poste || "___"}<br>Durée : 4 ans<br>Activités principales : Gestion opérationnelle, coordination d'équipe, mise en place de procédures qualité, reporting et analyse de performance<br><br><strong>Expérience 2 :</strong><br>Employeur : Entreprise précédente<br>Poste occupé : Assistant(e) de direction<br>Durée : 2 ans<br>Activités principales : Organisation administrative, suivi des dossiers, communication interne et externe</p>` },
+    { heading: "4. Formation initiale et continue", content: `<p><strong>Dernier diplôme obtenu :</strong> ${s.diplome || "Baccalauréat professionnel"}<br><strong>Formations continues suivies en lien avec la certification :</strong><br>1. Formation en gestion de projet (35h)<br>2. Formation en management d'équipe (21h)</p>` },
+    { heading: "5. Activités bénévoles ou extra-professionnelles", content: `<p>Membre actif d'une association professionnelle du secteur depuis 3 ans. Participation à l'organisation d'événements professionnels et à la formation de nouveaux adhérents.</p>`, variant: "green" },
+    { heading: "6. Pièces justificatives à joindre", content: `<p>☒ Copie de la pièce d'identité<br>☒ Attestations d'emploi / bulletins de salaire<br>☒ CV détaillé<br>☒ Certificats de formation continue<br>☒ Attestations de bénévolat<br>☒ Tout document attestant de l'expérience en rapport avec la certification</p>` },
+  ], signatures: { type: "2", labels: ["Le Candidat", "L'Organisme"], names: [`${s.prenom} ${s.nom}`, o.dirigeant], stagiaireSignatureUrl: s.signatureUrl, noOrgSignature: true, dates: [formatDate(dateSignature), formatDate(dateSignature)] } });
 }
 
 function genVAEContratAccompagnement(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = stagiaires[si] || stagiaires[0] || FALLBACK_STAGIAIRE;
   const dateDebut = getStagiaireDateDebut(s, f);
   const dateFin = getStagiaireDateFin(s, f);
+  const dateSignature = subtractBusinessDays(dateDebut, 14);
   return buildDocument({ org: o, title: "CONTRAT D'ACCOMPAGNEMENT EN VUE DE LA VALIDATION DES ACQUIS DE L'EXPÉRIENCE", sections: [
     { heading: "Entre les soussignés", content: `<p><strong>1) d'une part,</strong> ${s.civilite} ${s.prenom} ${s.nom}, ci-dessous désigné le(la) candidat(e),<br><br><strong>2) d'autre part,</strong><br>${o.nom}<br>${o.adresse}, ${o.codePostal} ${o.ville}<br>Représenté par : ${o.dirigeant}<br>Déclaration enregistrée sous le n° : ${o.nda}<br>SIRET : ${o.siret}<br><br>ci-dessous désigné le prestataire, est conclu le contrat suivant, en application des dispositions de la partie VI du Code du travail portant sur l'organisation de la formation professionnelle continue.</p>` },
     { heading: "Article 1er : Objet du contrat", content: `<p>Le(la) candidat(e) vise l'obtention de la certification <strong>« ${f.intitule} »</strong>.<br><br>En exécution du présent contrat, le prestataire s'engage à organiser l'accompagnement du(de la) candidat(e) à la préparation de la Validation des Acquis de son Expérience en vue de l'obtention de la certification visée, dans les conditions fixées par les articles suivants.</p>` },
@@ -3934,21 +3950,22 @@ function genVAEContratAccompagnement(o: OrganismeInfo, f: FormationInfo, stagiai
     { heading: "Article 3 : Organisation", content: `<p>Le présent contrat prend effet à compter du <strong>${formatDate(dateDebut)}</strong>, pour s'achever au plus tard le <strong>${formatDate(dateFin)}</strong>.<br><br>L'accompagnement est organisé sous la modalité d'accompagnement individualisé. Il aura lieu en présentiel et/ou à distance.<br><br><strong>Durée totale :</strong> 24 heures sur 10 séances<br><strong>Rythme :</strong> 1 à 2 séances par semaine</p>`, variant: "green" },
     { heading: "Article 4 : Dispositions financières", content: `<p><strong>Tarif de l'accompagnement :</strong> ${getStagiaireTarif(s, f)}<br><br>En cas de rupture anticipée de l'accompagnement du fait du candidat, seules les heures réalisées seront facturées.<br>Le paiement est dû à réception de la facture, dans un délai de 30 jours.</p>` },
     { heading: "Article 5 : Engagement du candidat", content: `<p>L'attention du candidat est attirée sur la forte mobilisation nécessaire pour la réalisation de son projet de Validation des Acquis de son Expérience. Le candidat s'engage à :<br>• Être assidu aux séances programmées<br>• Réaliser le travail personnel demandé entre les séances<br>• Fournir les documents et preuves nécessaires dans les délais convenus</p>` },
-    { heading: "Article 6 : Cas de litige", content: `<p>Si une contestation ou un différend n'ont pu être réglés à l'amiable, le tribunal compétent sera celui du siège de l'organisme de formation.</p>` },
-  ], signatures: { type: "2", labels: ["Pour le candidat", "Pour l'organisme de formation"], names: [`${s.prenom} ${s.nom}`, o.dirigeant] } });
+    { heading: "Article 6 : Cas de litige", content: `<p>Si une contestation ou un différend n'ont pu être réglés à l'amiable, le tribunal compétent sera celui du siège de l'organisme de formation.</p><p>Fait à ${o.ville}, le ${formatDate(dateSignature)}</p>` },
+  ], signatures: { type: "2", labels: ["Le Candidat", "Pour l'organisme"], names: [`${s.prenom} ${s.nom}`, o.dirigeant], stagiaireSignatureUrl: s.signatureUrl, noOrgSignature: true, dates: [formatDate(dateSignature), formatDate(dateSignature)] } });
 }
 
 function genVAEConventionTripartite(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = stagiaires[si] || stagiaires[0] || FALLBACK_STAGIAIRE;
   const dateDebut = getStagiaireDateDebut(s, f);
   const dateFin = getStagiaireDateFin(s, f);
+  const dateSignature = subtractBusinessDays(dateDebut, 14);
   return buildDocument({ org: o, title: "CONVENTION TRIPARTITE ACTION VAE", subtitle: "Prise en charge dans le cadre du plan de développement des compétences", sections: [
     { heading: "Entre les soussignés", content: `<p><strong>1) Le(la) candidat(e) :</strong><br>${s.civilite} ${s.prenom} ${s.nom}<br>Email : ${s.email}<br>Téléphone : ${s.telephone}<br><br><strong>2) L'employeur :</strong><br>${s.entreprise || "___"}<br>Représenté par : ${s.responsableEntreprise || "___"}<br><br><strong>3) L'organisme accompagnateur :</strong><br>${o.nom} – SIRET : ${o.siret}<br>${o.adresse}, ${o.codePostal} ${o.ville}<br>NDA : ${o.nda}<br>Représenté par : ${o.dirigeant}</p>` },
     { heading: "Article 1 : Objet", content: `<p>La présente convention a pour objet de définir les conditions dans lesquelles ${o.nom} accompagnera le(la) candidat(e) dans sa démarche de VAE en vue de l'obtention de la certification <strong>« ${f.intitule} »</strong>.</p>` },
     { heading: "Article 2 : Modalités", content: `<p><strong>Durée :</strong> 24 heures<br><strong>Période :</strong> du ${formatDate(dateDebut)} au ${formatDate(dateFin)}<br><strong>Format :</strong> Séances individuelles en présentiel et/ou à distance<br><strong>Lieu :</strong> ${f.lieu || o.adresse + ", " + o.codePostal + " " + o.ville}</p>` },
     { heading: "Article 3 : Dispositions financières", content: `<p><strong>Coût total :</strong> ${getStagiaireTarif(s, f)}<br><strong>Prise en charge :</strong> Plan de développement des compétences de l'employeur<br><br>La facturation sera adressée à l'employeur. En cas d'abandon, seules les heures réalisées seront facturées.</p>`, variant: "green" },
-    { heading: "Article 4 : Obligations des parties", content: `<p><strong>L'organisme s'engage à :</strong> fournir un accompagnement de qualité, respecter la confidentialité, remettre une attestation de fin d'accompagnement.<br><br><strong>L'employeur s'engage à :</strong> libérer le(la) candidat(e) sur son temps de travail, financer la prestation, faciliter l'accès aux preuves professionnelles.<br><br><strong>Le(la) candidat(e) s'engage à :</strong> être assidu(e), fournir les documents nécessaires, réaliser le travail personnel entre les séances.</p>` },
-  ], signatures: { type: "2", labels: ["Pour l'organisme – Le Dirigeant", "Pour l'employeur"], names: [o.dirigeant, s.responsableEntreprise || "Le Responsable"] } });
+    { heading: "Article 4 : Obligations des parties", content: `<p><strong>L'organisme s'engage à :</strong> fournir un accompagnement de qualité, respecter la confidentialité, remettre une attestation de fin d'accompagnement.<br><br><strong>L'employeur s'engage à :</strong> libérer le(la) candidat(e) sur son temps de travail, financer la prestation, faciliter l'accès aux preuves professionnelles.<br><br><strong>Le(la) candidat(e) s'engage à :</strong> être assidu(e), fournir les documents nécessaires, réaliser le travail personnel entre les séances.</p><p>Fait à ${o.ville}, le ${formatDate(dateSignature)}</p>` },
+  ], signatures: { type: "2", labels: ["Pour l'organisme – Le Dirigeant", "Pour l'employeur"], names: [o.dirigeant, ""], noOrgSignature: true, dates: [formatDate(dateSignature), ""] } });
 }
 
 function genVAEHandicapEntretien(o: OrganismeInfo) {
@@ -3984,11 +4001,14 @@ function genVAEMailHandicap(o: OrganismeInfo) {
   ] });
 }
 
-function genVAEEngagementsRespectifs(o: OrganismeInfo) {
+function genVAEEngagementsRespectifs(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
+  const s = stagiaires[0] || FALLBACK_STAGIAIRE;
+  const dateDebut = getStagiaireDateDebut(s, f);
+  const dateSignature = subtractBusinessDays(dateDebut, 14);
   return buildDocument({ org: o, title: "ENGAGEMENTS RESPECTIFS – VAE", sections: [
     { heading: `${o.nom} s'engage à`, content: `<p>1. Fournir toutes les informations utiles et précises sur la durée, les procédures, les étapes de l'accompagnement et le suivi post jury d'une démarche VAE.<br>2. Clarifier le projet du bénéficiaire.<br>3. Donner les informations nécessaires concernant les objectifs, les compétences et les savoirs visés par les certifications délivrées, pour permettre au bénéficiaire d'identifier celui qui est le plus en rapport avec son parcours ainsi que son projet.<br>4. Adapter les besoins du bénéficiaire par un accompagnement individualisé.<br>5. Respecter les principes de confidentialité et de neutralité à l'égard des informations transmises par le bénéficiaire.<br>6. Apporter une aide méthodologique au bénéficiaire tout au long du processus de validation même après la décision du jury.<br>7. Établir une relation où le bénéficiaire s'engage à être un acteur volontaire et responsable de sa démarche VAE.<br>8. Aider le bénéficiaire à remplir le Livret 1 et le Livret 2.<br>9. Préparer le bénéficiaire à l'entretien qui aura lieu devant le jury par la validation totale ou partielle de la certification visée.<br>10. Respecter la charte de déontologie des membres du jury de VAE.</p>` },
-    { heading: "Le bénéficiaire s'engage à", content: `<p>1. Participer aux différentes étapes de l'accompagnement.<br>2. Respecter le calendrier des rendez-vous définis avec le prestataire.<br>3. Rédiger les deux livrets.<br>4. Fournir toute information utile à une mise en œuvre efficace de la VAE.</p>`, variant: "green" },
-  ], signatures: { type: "2", labels: ["Le Dirigeant", "Le Bénéficiaire"], names: [o.dirigeant, ""] } });
+    { heading: "Le bénéficiaire s'engage à", content: `<p>1. Participer aux différentes étapes de l'accompagnement.<br>2. Respecter le calendrier des rendez-vous définis avec le prestataire.<br>3. Rédiger les deux livrets.<br>4. Fournir toute information utile à une mise en œuvre efficace de la VAE.</p><p>Fait à ${o.ville}, le ${formatDate(dateSignature)}</p>`, variant: "green" },
+  ], signatures: { type: "2", labels: ["Le Dirigeant", "Le Bénéficiaire"], names: [o.dirigeant, `${s.prenom} ${s.nom}`], stagiaireSignatureUrl: s.signatureUrl, dates: [formatDate(dateSignature), formatDate(dateSignature)] } });
 }
 
 function genVAELivret2(o: OrganismeInfo, f: FormationInfo) {
@@ -4002,18 +4022,20 @@ function genVAELivret2(o: OrganismeInfo, f: FormationInfo) {
 
 function genVAEPositionnementDebut(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = stagiaires[si] || stagiaires[0] || FALLBACK_STAGIAIRE;
+  const dateDebut = getStagiaireDateDebut(s, f);
   return buildDocument({ org: o, title: "QUESTIONNAIRE DE POSITIONNEMENT – DÉBUT D'ACCOMPAGNEMENT VAE", subtitle: `${s.prenom} ${s.nom}`, sections: [
-    { heading: "Présentation personnelle", content: `<p><strong>Nom :</strong> ${s.nom}<br><strong>Prénom :</strong> ${s.prenom}<br><strong>Certification visée :</strong> ${f.intitule}</p>` },
-    { heading: "Questions", content: `<p><strong>1. Parlez-nous de vous et de ce qui vous a motivé à suivre cette démarche VAE :</strong><br><em>J'ai une expérience significative dans le domaine et je souhaite faire reconnaître officiellement mes compétences par l'obtention d'une certification.</em><br><br><strong>2. Avez-vous déjà travaillé dans le domaine de la certification visée ? Donnez quelques détails sur votre expérience :</strong><br><em>Oui, j'exerce dans ce domaine depuis plusieurs années à différents postes qui m'ont permis de développer des compétences variées.</em><br><br><strong>3. Qu'espérez-vous accomplir grâce à cette VAE ?</strong><br><em>Obtenir la certification pour valider officiellement mon parcours et ouvrir de nouvelles perspectives professionnelles.</em><br><br><strong>4. Quelles compétences spécifiques souhaitez-vous mettre en avant ?</strong><br><em>Mes compétences techniques acquises sur le terrain, ma capacité d'adaptation et mon expertise dans mon domaine.</em><br><br><strong>5. Avez-vous des défis spécifiques (situation personnelle, handicap) que nous devons prendre en compte ?</strong><br><em>___</em></p>` },
-  ], signatures: { type: "2", labels: ["L'Accompagnateur", "Le Candidat"], names: [o.responsablePedagogique, `${s.prenom} ${s.nom}`] } });
+    { heading: "Présentation personnelle", content: `<p><strong>Nom :</strong> ${s.nom}<br><strong>Prénom :</strong> ${s.prenom}<br><strong>Certification visée :</strong> ${f.intitule}<br><strong>Date :</strong> ${formatDate(dateDebut)}</p>` },
+    { heading: "Questions", content: `<p><strong>1. Parlez-nous de vous et de ce qui vous a motivé à suivre cette démarche VAE :</strong><br><em>J'ai une expérience significative dans le domaine et je souhaite faire reconnaître officiellement mes compétences par l'obtention d'une certification.</em><br><br><strong>2. Avez-vous déjà travaillé dans le domaine de la certification visée ? Donnez quelques détails sur votre expérience :</strong><br><em>Oui, j'exerce dans ce domaine depuis plusieurs années à différents postes qui m'ont permis de développer des compétences variées.</em><br><br><strong>3. Qu'espérez-vous accomplir grâce à cette VAE ?</strong><br><em>Obtenir la certification pour valider officiellement mon parcours et ouvrir de nouvelles perspectives professionnelles.</em><br><br><strong>4. Quelles compétences spécifiques souhaitez-vous mettre en avant ?</strong><br><em>Mes compétences techniques acquises sur le terrain, ma capacité d'adaptation et mon expertise dans mon domaine.</em><br><br><strong>5. Avez-vous des défis spécifiques (situation personnelle, handicap) que nous devons prendre en compte ?</strong><br><em>Non, pas de besoin particulier à ce stade.</em></p>` },
+  ], signatures: { type: "2", labels: ["L'Accompagnateur VAE (Formateur)", "Le Candidat"], names: [o.responsablePedagogique, `${s.prenom} ${s.nom}`], stagiaireSignatureUrl: s.signatureUrl, formateurSignatureUrl: s.formateurSignatureUrl || f.formateurSignatureUrl, dates: [formatDate(dateDebut), formatDate(dateDebut)] } });
 }
 
 function genVAEPositionnementFin(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = stagiaires[si] || stagiaires[0] || FALLBACK_STAGIAIRE;
+  const dateFin = getStagiaireDateFin(s, f);
   return buildDocument({ org: o, title: "QUESTIONNAIRE DE POSITIONNEMENT – FIN D'ACCOMPAGNEMENT VAE", subtitle: `${s.prenom} ${s.nom}`, sections: [
-    { heading: "Présentation", content: `<p><strong>Nom :</strong> ${s.nom}<br><strong>Prénom :</strong> ${s.prenom}<br><strong>Certification visée :</strong> ${f.intitule}</p>` },
-    { heading: "Bilan de l'accompagnement", content: `<p><strong>1. Qu'avez-vous le plus apprécié dans cet accompagnement VAE ?</strong><br><em>J'ai particulièrement apprécié l'aide méthodologique et les conseils personnalisés pour la rédaction du dossier, ainsi que la simulation d'entretien.</em><br><br><strong>2. Quelles compétences pensez-vous avoir le plus mises en valeur ?</strong><br><em>J'ai pu mettre en lumière des compétences que je n'avais pas toujours conscience de posséder, notamment en analyse et en prise de recul sur mes pratiques.</em><br><br><strong>3. Comment évalueriez-vous la qualité de l'accompagnement ?</strong><br><em>L'accompagnement a été excellent. L'accompagnateur était toujours disponible et bienveillant.</em><br><br><strong>4. Dans quelle mesure cet accompagnement a-t-il répondu à vos attentes ?</strong><br><em>Cet accompagnement a dépassé mes attentes. Je me sens bien préparé(e) pour le passage devant le jury.</em><br><br><strong>5. Avez-vous des suggestions d'amélioration ?</strong><br><em>___</em><br><br><strong>6. Quel message transmettriez-vous aux futurs candidats VAE ?</strong><br><em>Je leur dirais de s'engager pleinement dans la démarche et de ne pas hésiter à solliciter l'accompagnateur.</em></p>` },
-  ], signatures: { type: "2", labels: ["L'Accompagnateur", "Le Candidat"], names: [o.responsablePedagogique, `${s.prenom} ${s.nom}`] } });
+    { heading: "Présentation", content: `<p><strong>Nom :</strong> ${s.nom}<br><strong>Prénom :</strong> ${s.prenom}<br><strong>Certification visée :</strong> ${f.intitule}<br><strong>Date :</strong> ${formatDate(dateFin)}</p>` },
+    { heading: "Bilan de l'accompagnement", content: `<p><strong>1. Qu'avez-vous le plus apprécié dans cet accompagnement VAE ?</strong><br><em>J'ai particulièrement apprécié l'aide méthodologique et les conseils personnalisés pour la rédaction du dossier, ainsi que la simulation d'entretien.</em><br><br><strong>2. Quelles compétences pensez-vous avoir le plus mises en valeur ?</strong><br><em>J'ai pu mettre en lumière des compétences que je n'avais pas toujours conscience de posséder, notamment en analyse et en prise de recul sur mes pratiques.</em><br><br><strong>3. Comment évalueriez-vous la qualité de l'accompagnement ?</strong><br><em>L'accompagnement a été excellent. L'accompagnateur était toujours disponible et bienveillant.</em><br><br><strong>4. Dans quelle mesure cet accompagnement a-t-il répondu à vos attentes ?</strong><br><em>Cet accompagnement a dépassé mes attentes. Je me sens bien préparé(e) pour le passage devant le jury.</em><br><br><strong>5. Avez-vous des suggestions d'amélioration ?</strong><br><em>Peut-être proposer des ateliers collectifs entre candidats pour partager les expériences.</em><br><br><strong>6. Quel message transmettriez-vous aux futurs candidats VAE ?</strong><br><em>Je leur dirais de s'engager pleinement dans la démarche et de ne pas hésiter à solliciter l'accompagnateur.</em></p>` },
+  ], signatures: { type: "2", labels: ["L'Accompagnateur VAE (Formateur)", "Le Candidat"], names: [o.responsablePedagogique, `${s.prenom} ${s.nom}`], stagiaireSignatureUrl: s.signatureUrl, formateurSignatureUrl: s.formateurSignatureUrl || f.formateurSignatureUrl, dates: [formatDate(dateFin), formatDate(dateFin)] } });
 }
 
 function genVAECGV(o: OrganismeInfo) {
@@ -4027,14 +4049,17 @@ function genVAECGV(o: OrganismeInfo) {
   ] });
 }
 
-function genVAEDroitImage(o: OrganismeInfo) {
+function genVAEDroitImage(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
+  const s = stagiaires[0] || FALLBACK_STAGIAIRE;
+  const dateDebut = getStagiaireDateDebut(s, f);
+  const dateSignature = subtractBusinessDays(dateDebut, 14);
   return buildDocument({ org: o, title: "CONTRAT DE CESSION DE DROIT D'IMAGE", sections: [
-    { heading: "Entre les parties", content: `<p><strong>Le Participant :</strong> « Nom du bénéficiaire », demeurant au « Adresse du bénéficiaire »<br><br><strong>Et :</strong><br>${o.nom}<br>${o.adresse}, ${o.codePostal} ${o.ville}<br>Représenté par ${o.dirigeant}</p>` },
+    { heading: "Entre les parties", content: `<p><strong>Le Participant :</strong> ${s.prenom} ${s.nom}, demeurant au ${s.adresse || "___"}, ${s.codePostal || ""} ${s.commune || ""}<br><br><strong>Et :</strong><br>${o.nom}<br>${o.adresse}, ${o.codePostal} ${o.ville}<br>Représenté par ${o.dirigeant}</p>` },
     { heading: "Article 1 : Objet du contrat", content: `<p>Le présent contrat a pour but de préciser les conditions dans lesquelles le cédant autorise le cessionnaire à exploiter son droit à l'image, qui sera captée à l'occasion de l'accompagnement VAE.</p>` },
     { heading: "Article 2 : Autorisation", content: `<p>Le Participant autorise ${o.nom} à fixer, reproduire et communiquer au public les photographies et/ou vidéos prises dans le cadre de l'accompagnement VAE, sur les supports suivants :<br>• Site internet de ${o.nom}<br>• Réseaux sociaux<br>• Supports de communication print et digital<br>• Rapports d'activité et documents internes</p>` },
     { heading: "Article 3 : Durée et territoire", content: `<p>La présente autorisation est consentie pour une durée de 5 ans à compter de la signature, pour le territoire mondial.</p>` },
-    { heading: "Article 4 : Droit de retrait", content: `<p>Le Participant peut à tout moment retirer son autorisation par courrier recommandé. Le retrait prendra effet dans un délai de 30 jours, sans remettre en cause les utilisations antérieures.</p>`, variant: "green" },
-  ], signatures: { type: "2", labels: ["Le Participant", "Pour l'organisme"], names: ["", o.dirigeant] } });
+    { heading: "Article 4 : Droit de retrait", content: `<p>Le Participant peut à tout moment retirer son autorisation par courrier recommandé. Le retrait prendra effet dans un délai de 30 jours, sans remettre en cause les utilisations antérieures.</p><p>Fait à ${o.ville}, le ${formatDate(dateSignature)}</p>`, variant: "green" },
+  ], signatures: { type: "2", labels: ["Le Participant", "Pour l'organisme"], names: [`${s.prenom} ${s.nom}`, o.dirigeant], stagiaireSignatureUrl: s.signatureUrl, noOrgSignature: true, dates: [formatDate(dateSignature), formatDate(dateSignature)] } });
 }
 
 function genVAEInfosPeripheriques(o: OrganismeInfo) {
@@ -4053,7 +4078,7 @@ function genVAECertificatRealisation(o: OrganismeInfo, f: FormationInfo, stagiai
   const dateFin = getStagiaireDateFin(s, f);
   return buildDocument({ org: o, title: "CERTIFICAT DE RÉALISATION", sections: [
     { heading: "", content: `<p>Je soussigné(e) ${o.dirigeant}, représentant légal de :</p><p>${o.nom}<br>${o.adresse}, ${o.codePostal} ${o.ville}<br>Numéro d'activité : ${o.nda}<br>SIRET : ${o.siret}</p><p>atteste que :</p><p>${s.civilite} <strong>${s.prenom} ${s.nom}</strong></p><p>${s.entreprise ? `salarié(e) de l'entreprise ${s.entreprise}` : ""}</p><p>a suivi l'action de <strong>VAE – ${f.intitule}</strong></p><p>Nature de l'action concourant au développement des compétences (article L. 6313-1 du Code du travail) :<br>☐ Action de formation<br>☐ Bilan de compétences<br>☒ <strong>Action de VAE</strong><br>☐ Action de formation par apprentissage</p><p>qui s'est déroulée du <strong>${formatDate(dateDebut)}</strong> au <strong>${formatDate(dateFin)}</strong></p><p>pour une durée de <strong>24 heures</strong>.</p><p>Fait à ${o.ville}, le ${formatDate(dateFin)}</p>` },
-  ], signatures: { type: "2", labels: ["Le Dirigeant", ""], names: [o.dirigeant, ""] } });
+  ], signatures: { type: "2", labels: ["Le Dirigeant", "Le Candidat"], names: [o.dirigeant, `${s.prenom} ${s.nom}`], stagiaireSignatureUrl: s.signatureUrl, noOrgSignature: true, dates: [formatDate(dateFin), formatDate(dateFin)] } });
 }
 
 function genVAEMailIntroduction(o: OrganismeInfo) {
@@ -4117,18 +4142,23 @@ function genVAEFichePedagogique(o: OrganismeInfo, f: FormationInfo) {
 
 function genVAEEntretienIntermediaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = stagiaires[si] || stagiaires[0] || FALLBACK_STAGIAIRE;
+  const dateDebut = getStagiaireDateDebut(s, f);
+  const dateFin = getStagiaireDateFin(s, f);
+  const dStart = new Date(dateDebut); const dEnd = new Date(dateFin);
+  const dateMilieu = new Date(dStart.getTime() + (dEnd.getTime() - dStart.getTime()) / 2);
+  const dateMilieuStr = dateMilieu.toISOString().slice(0, 10);
   return buildDocument({ org: o, title: "ENTRETIEN INTERMÉDIAIRE BÉNÉFICIAIRE – VAE", subtitle: `${s.prenom} ${s.nom}`, sections: [
-    { heading: "Informations", content: `<p><strong>Candidat :</strong> ${s.prenom} ${s.nom}<br><strong>Certification visée :</strong> ${f.intitule}<br><strong>Accompagnateur :</strong> ${o.responsablePedagogique}<br><strong>Date de l'entretien :</strong> ___<br><strong>Séance n° :</strong> 5 (mi-parcours)</p>` },
+    { heading: "Informations", content: `<p><strong>Candidat :</strong> ${s.prenom} ${s.nom}<br><strong>Certification visée :</strong> ${f.intitule}<br><strong>Accompagnateur :</strong> ${o.responsablePedagogique}<br><strong>Date de l'entretien :</strong> ${formatDate(dateMilieuStr)}<br><strong>Séance n° :</strong> 5 (mi-parcours)</p>` },
     { heading: "État d'avancement", content: `<p><strong>Blocs rédigés :</strong> Blocs 1 et 2 – Avancement satisfaisant<br><strong>Blocs en cours :</strong> Bloc 3 – En bonne voie<br><strong>Preuves rassemblées :</strong> 70% du portefeuille constitué<br><br><strong>Points forts identifiés :</strong><br>• Bonne compréhension du référentiel<br>• Descriptions d'activités détaillées et pertinentes<br>• Travail personnel régulier entre les séances</p>` },
     { heading: "Points à améliorer", content: `<p>• Approfondir l'analyse réflexive sur certaines situations<br>• Compléter le portefeuille de preuves pour le bloc 3<br>• Travailler la synthèse et la structuration des paragraphes</p>` },
     { heading: "Adaptations éventuelles", content: `<p>☐ Ajustement du planning nécessaire<br>☐ Séances supplémentaires recommandées<br>☐ Changement de modalité (présentiel/distanciel)<br>☐ Autres : ___</p>`, variant: "green" },
-    { heading: "Satisfaction du candidat", content: `<p>Le candidat est-il satisfait de l'accompagnement à mi-parcours ?<br>☐ Très satisfait ☒ Satisfait ☐ Moyennement satisfait ☐ Insatisfait</p>` },
-  ], signatures: { type: "2", labels: ["L'Accompagnateur", "Le Candidat"], names: [o.responsablePedagogique, `${s.prenom} ${s.nom}`] } });
+    { heading: "Satisfaction du candidat", content: `<p>Le candidat est-il satisfait de l'accompagnement à mi-parcours ?<br>☐ Très satisfait ☒ Satisfait ☐ Moyennement satisfait ☐ Insatisfait</p><p>Fait à ${o.ville}, le ${formatDate(dateMilieuStr)}</p>` },
+  ], signatures: { type: "2", labels: ["L'Accompagnateur VAE (Formateur)", "Le Candidat"], names: [o.responsablePedagogique, `${s.prenom} ${s.nom}`], stagiaireSignatureUrl: s.signatureUrl, formateurSignatureUrl: s.formateurSignatureUrl || f.formateurSignatureUrl, dates: [formatDate(dateMilieuStr), formatDate(dateMilieuStr)] } });
 }
 
 function genVAEDossierSuiviParcours(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = stagiaires[si] || stagiaires[0] || FALLBACK_STAGIAIRE;
-  const dateDebut = getStagiaireDateDebut(s, f);
+  const dateFin = getStagiaireDateFin(s, f);
   return buildDocument({ org: o, title: "DOSSIER DE SUIVI PARCOURS VAE", subtitle: `${s.prenom} ${s.nom} – ${f.intitule}`, table: {
     headers: ["Étape", "Objectif", "Réalisé", "Observations"],
     rows: [
@@ -4144,8 +4174,8 @@ function genVAEDossierSuiviParcours(o: OrganismeInfo, f: FormationInfo, stagiair
       ["Passage devant le jury", "Obtenir la validation de la certification", "✅ Oui", "VALIDATION TOTALE"],
     ]
   }, sections: [
-    { heading: "Bilan global", content: `<p>${s.prenom} ${s.nom} a suivi l'intégralité de l'accompagnement VAE avec assiduité et engagement. Le dossier de validation est complet, bien argumenté et illustré de preuves pertinentes. Le candidat a obtenu la validation totale de la certification « ${f.intitule} ».</p>`, variant: "green" },
-  ], signatures: { type: "2", labels: ["L'Accompagnateur VAE", "Le Candidat"], names: [o.responsablePedagogique, `${s.prenom} ${s.nom}`] } });
+    { heading: "Bilan global", content: `<p>${s.prenom} ${s.nom} a suivi l'intégralité de l'accompagnement VAE avec assiduité et engagement. Le dossier de validation est complet, bien argumenté et illustré de preuves pertinentes. Le candidat a obtenu la validation totale de la certification « ${f.intitule} ».</p><p>Fait à ${o.ville}, le ${formatDate(dateFin)}</p>`, variant: "green" },
+  ], signatures: { type: "2", labels: ["L'Accompagnateur VAE (Formateur)", "Le Candidat"], names: [o.responsablePedagogique, `${s.prenom} ${s.nom}`], stagiaireSignatureUrl: s.signatureUrl, formateurSignatureUrl: s.formateurSignatureUrl || f.formateurSignatureUrl, dates: [formatDate(dateFin), formatDate(dateFin)] } });
 }
 
 function genVAEEviterEchec(o: OrganismeInfo) {
