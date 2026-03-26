@@ -3768,7 +3768,7 @@ function genVAERapportConnexion(o: OrganismeInfo, f: FormationInfo, stagiaires: 
   });
 }
 
-
+function genVAEProcedureAbandon(o: OrganismeInfo) {
   return buildDocument({ org: o, title: "PROCÉDURE DE PRÉVENTION DES ABANDONS – VAE", sections: [
     { heading: "Objet", content: `<p>Cette procédure décrit les mesures mises en place par ${o.nom} pour prévenir les abandons en cours d'accompagnement VAE et favoriser l'engagement des candidats jusqu'au passage devant le jury.</p>` },
     { heading: "Indicateurs d'alerte", content: `<p>Les signaux suivants déclenchent une action préventive :<br>• 2 absences consécutives non justifiées<br>• Retard significatif dans la production du dossier<br>• Expression de doutes ou de découragement par le candidat<br>• Absence de communication depuis plus de 15 jours</p>` },
