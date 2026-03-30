@@ -210,6 +210,13 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
     }
 
     const isPerStagiaire = PER_STAGIAIRE_TEMPLATES.has(doc.template);
+    const hasOwnStagiaire = typeof doc.params?.stagiaireIdx === "number";
+    if (hasOwnStagiaire) {
+      const content = generateDocumentById(doc.id, doc.template, doc.params, organisme, formation, allStagiaires);
+      const stagiaire = allStagiaires[doc.params!.stagiaireIdx as number] || null;
+      await downloadFile(content, buildCatalogFileName(doc, stagiaire));
+      return;
+    }
     if (isPerStagiaire && selectedStagiaire === -1) {
       for (const [index, stagiaire] of allStagiaires.entries()) {
         const content = generateContent(doc, index);
