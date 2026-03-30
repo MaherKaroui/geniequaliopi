@@ -1009,33 +1009,43 @@ function cleanBrackets(text: string, stagiaireNom?: string, stagiairePrenom?: st
 }
 
 // Generate a "correct" answer that's unique per stagiaire (rephrased) — LONG and realistic
-function generateFullAnswer(expected: string, stagiaireIndex: number, questionIndex: number, stagiaireInfo?: { nom?: string; prenom?: string; entreprise?: string; poste?: string }): string {
+function generateFullAnswer(expected: string, stagiaireIndex: number, questionIndex: number, stagiaireInfo?: { nom?: string; prenom?: string; entreprise?: string; poste?: string }, isEnglish?: boolean): string {
   const cleaned = cleanBrackets(expected, stagiaireInfo?.nom, stagiaireInfo?.prenom, stagiaireInfo?.entreprise, stagiaireInfo?.poste);
   const sentences = cleaned.split(/(?<=[.!])\s+/).filter(s => s.trim());
   const seed = (stagiaireIndex * 13 + questionIndex * 7) % 8;
   
-  const expansions = [
-    ' Cela permet d\'assurer un travail de qualité au quotidien.',
-    ' C\'est essentiel pour être efficace en situation professionnelle.',
-    ' C\'est directement applicable dans le cadre de mon travail.',
-    ' C\'est un élément fondamental à connaître et à savoir appliquer.',
-    '',
-    '',
-    '',
-    '',
-  ];
+  const expansions = isEnglish
+    ? [
+        ' This is very useful in everyday life.',
+        ' This is important to know for communication.',
+        ' I can use this at work every day.',
+        ' This is a key skill I learned during the training.',
+        '', '', '', '',
+      ]
+    : [
+        ' Cela permet d\'assurer un travail de qualité au quotidien.',
+        ' C\'est essentiel pour être efficace en situation professionnelle.',
+        ' C\'est directement applicable dans le cadre de mon travail.',
+        ' C\'est un élément fondamental à connaître et à savoir appliquer.',
+        '', '', '', '',
+      ];
   
   const varied = sentences.map((s, i) => {
     const sv = (stagiaireIndex * 13 + questionIndex * 7 + i * 3) % 5;
     let result = s;
-    if (sv === 1) result = result.replace('Il faut', 'On doit').replace('il faut', 'on doit');
-    if (sv === 2) result = result.replace('permet de', 'sert à').replace('Il faut', 'Il est nécessaire de');
-    if (sv === 3) result = result.replace('par exemple', 'notamment').replace('Exemple :', 'Par exemple :');
-    if (sv === 4) result = result.replace('c\'est', 'il s\'agit de').replace('C\'est', 'Il s\'agit de');
+    if (!isEnglish) {
+      if (sv === 1) result = result.replace('Il faut', 'On doit').replace('il faut', 'on doit');
+      if (sv === 2) result = result.replace('permet de', 'sert à').replace('Il faut', 'Il est nécessaire de');
+      if (sv === 3) result = result.replace('par exemple', 'notamment').replace('Exemple :', 'Par exemple :');
+      if (sv === 4) result = result.replace('c\'est', 'il s\'agit de').replace('C\'est', 'Il s\'agit de');
+    } else {
+      if (sv === 1) result = result.replace('You can', 'It is possible to');
+      if (sv === 2) result = result.replace('For example', 'For instance');
+      if (sv === 3) result = result.replace('It is', 'This is');
+    }
     return result;
   });
   
-  // Swap two sentences for variety
   if ((stagiaireIndex + questionIndex) % 3 === 0 && varied.length > 2) {
     const tmp = varied[1]; varied[1] = varied[2]; varied[2] = tmp;
   }
@@ -1043,7 +1053,7 @@ function generateFullAnswer(expected: string, stagiaireIndex: number, questionIn
   return varied.join(' ') + expansions[seed];
 }
 
-function generatePartialAnswer(expected: string, seed: number, stagiaireIndex: number, questionIndex: number, stagiaireInfo?: { nom?: string; prenom?: string; entreprise?: string; poste?: string }): string {
+function generatePartialAnswer(expected: string, seed: number, stagiaireIndex: number, questionIndex: number, stagiaireInfo?: { nom?: string; prenom?: string; entreprise?: string; poste?: string }, isEnglish?: boolean): string {
   const cleaned = cleanBrackets(expected, stagiaireInfo?.nom, stagiaireInfo?.prenom, stagiaireInfo?.entreprise, stagiaireInfo?.poste);
   const sentences = cleaned.split(/(?<=[.!])\s+/).filter(s => s.trim());
   const variation = (stagiaireIndex * 11 + questionIndex * 3) % 3;
