@@ -33,6 +33,8 @@ export const SAMPLE_STAGIAIRES: StagiaireInfo[] = [
   { civilite: "Mme", nom: "Durand", prenom: "Camille", email: "camille.durand@eduservices.fr", telephone: "06 89 01 23 45", entreprise: "EduServices", poste: "Formatrice junior", dateNaissance: "1993-06-14" },
   { civilite: "M.", nom: "Mercier", prenom: "Thomas", email: "thomas.mercier@financegroup.fr", telephone: "06 90 12 34 56", entreprise: "Finance Group", poste: "Analyste financier", dateNaissance: "1989-08-19" },
   { civilite: "Mme", nom: "Lambert", prenom: "Julie", email: "julie.lambert@artisanat.fr", telephone: "06 01 23 45 67", entreprise: "Artisanat & Co", poste: "Gérante", dateNaissance: "1994-02-28" },
+  { civilite: "M.", nom: "Petit", prenom: "Karim", email: "karim.petit@translog.fr", telephone: "06 11 22 33 44", entreprise: "TransLog Express", poste: "Agent logistique", dateNaissance: "1996-04-10" },
+  { civilite: "Mme", nom: "Haddad", prenom: "Leïla", email: "leila.haddad@beautyspa.fr", telephone: "06 55 66 77 88", entreprise: "Beauty Spa Paris", poste: "Esthéticienne", dateNaissance: "1991-11-02" },
 ];
 
 export interface FormateurInfo {
@@ -330,6 +332,24 @@ export const SAMPLE_FORMATIONS: FormationInfo[] = [
     codeRNCP: "RS6702",
   },
   {
+    intitule: "Anglais Niveau A1 – Débutant",
+    objectifs: "Acquérir les bases de la langue anglaise au niveau A1 du CECRL : se présenter, comprendre et utiliser des expressions familières et quotidiennes, poser des questions simples, décrire son environnement immédiat, rédiger des messages courts en anglais.",
+    prerequis: "Aucun prérequis en anglais. Formation accessible aux vrais débutants.",
+    duree: "74 heures (11 jours)",
+    modalites: "distanciel",
+    tarif: "1 443 € HT par stagiaire",
+    programme: "Jour 1 : Accueil, test de positionnement, alphabet, phonétique de base, salutations et présentations\nJour 2 : Nombres 1-100, jours, mois, dates, heure, verbe TO BE (affirmatif, négatif, interrogatif)\nJour 3 : Vocabulaire de la vie quotidienne (famille, nourriture, vêtements, couleurs, corps)\nJour 4 : Verbe TO HAVE, articles (a/an/the), pronoms personnels et possessifs\nJour 5 : Present Simple – habitudes et routines, adverbes de fréquence, décrire sa journée\nJour 6 : Métiers et professions, parler de son travail, vocabulaire du bureau\nJour 7 : Conversations pratiques – au magasin, au restaurant, à l'hôtel, demander des directions\nJour 8 : Chez le médecin, au téléphone, demander de l'aide, expressions de politesse\nJour 9 : Écrire un email simple, parler de son emploi du temps, communication au travail\nJour 10 : Révisions intensives, dialogues pratiques, erreurs courantes des francophones\nJour 11 : Évaluation finale (QCM + oral + exercices écrits), bilan individuel, plan de progression",
+    methodesEvaluation: "Test de positionnement initial, exercices pratiques en continu, mises en situation (jeux de rôle), évaluation intermédiaire, évaluation finale écrite et orale, grille d'acquisition des compétences A1",
+    moyensPedagogiques: "Plateforme LMS avec classe virtuelle, supports audio et vidéo, fiches de vocabulaire illustrées, exercices interactifs, jeux de rôle, accès e-learning 24/7",
+    publicVise: "Tout public débutant en anglais : salariés, demandeurs d'emploi, indépendants, personnes en reconversion souhaitant acquérir les bases de l'anglais",
+    delaiAcces: "14 jours après inscription",
+    dateDebut: "2026-11-02",
+    dateFin: "2026-11-16",
+    lieu: "Formation à distance – Plateforme LMS + Classe virtuelle Zoom",
+    nombreParticipants: "12",
+    formateur: "Catherine Dubois",
+  },
+  {
     intitule: "Utiliser les automations et un CRM",
     objectifs: "Maîtriser les outils d'automatisation marketing et de gestion de la relation client (CRM). Configurer des workflows automatisés pour la prospection, le suivi client et la fidélisation. Exploiter un CRM pour centraliser les données clients, segmenter les contacts et piloter l'activité commerciale. Mettre en place des scénarios d'automation (emailing, relances, scoring) pour optimiser le tunnel de vente.",
     prerequis: "Maîtriser les bases de l'utilisation d'un ordinateur et de la navigation web. Avoir une activité professionnelle impliquant de la relation client ou de la prospection commerciale. Aucune compétence technique en programmation n'est requise.",
@@ -363,6 +383,7 @@ export const SATISFACTION_SCORES: Record<string, number[]> = {
   "Gestion Administrative": [4, 5, 4, 5, 4, 5, 5, 4],
   "TP SAMA": [5, 4, 5, 5, 4, 5, 4, 5],
   "Initiation Word": [5, 5, 4, 5, 4, 5, 5, 4],
+  "Anglais A1": [5, 4, 5, 4, 5, 5, 4, 5],
 };
 
 // Evaluation scores per stagiaire (good scores 8-10/10)
@@ -377,6 +398,8 @@ export const EVAL_SCORES: number[][] = [
   [10, 8, 9, 9, 10], // Camille Durand
   [9, 10, 9, 10, 9], // Thomas Mercier
   [10, 9, 10, 9, 10], // Julie Lambert
+  [8, 9, 8, 10, 9],  // Karim Petit
+  [9, 10, 9, 8, 10],  // Leïla Haddad
 ];
 
 // Connection times for distanciel - 7h/jour (default)

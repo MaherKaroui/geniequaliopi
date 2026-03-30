@@ -28,7 +28,7 @@ function veilleYear(f: FormationInfo, monthsBefore: number): string {
 }
 
 // ===== Detection helpers =====
-type FormationType = "fle" | "ia" | "word" | "commercial" | "webmarketing" | "crm";
+type FormationType = "fle" | "ia" | "word" | "commercial" | "webmarketing" | "crm" | "anglais";
 
 function detectFormationType(f: FormationInfo): FormationType {
   const title = (f.intitule || "").toLowerCase();
@@ -36,6 +36,7 @@ function detectFormationType(f: FormationInfo): FormationType {
   if (title.includes("intelligence artificielle") || title.includes("ia générative") || title.includes("ia ") || title.includes("contenus rédactionnels") || title.includes("chatgpt") || title.includes("prompt")) return "ia";
   if (title.includes("crm") || title.includes("automation") || title.includes("automatisation")) return "crm";
   if (title.includes("webmarketing") || title.includes("marketing de contenus") || title.includes("réseaux sociaux") || title.includes("marketing digital")) return "webmarketing";
+  if (title.includes("anglais") || title.includes("english") || title.includes("toeic")) return "anglais";
   if (title.includes("commercial") || title.includes("conseiller") || title.includes("négociat") || title.includes("vente") || title.includes("relation client") || title.includes("prospection")) return "commercial";
   return "word";
 }
@@ -243,6 +244,32 @@ function veilleReglementaireRows(f: FormationInfo, type: FormationType): string[
         veilleDate(f, 3),
         "La participation financière pour l'achat d'une formation CPF s'élève à 103,20 euros.",
         "Preuve : article Centre Inffo. Action : informer les futurs stagiaires du reste à charge CPF."
+      ],
+    ];
+  }
+
+  if (type === "anglais") {
+    return [...common,
+      [
+        `<a href="https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000006901294">Légifrance – Art. L.6321-1 Code du travail</a>`,
+        "Obligation de formation des salariés – adaptation au poste et compétences linguistiques",
+        veilleDate(f, 5),
+        "L'employeur doit assurer l'adaptation des salariés à leur poste de travail. Les compétences en anglais sont essentielles dans un contexte professionnel internationalisé.",
+        "Preuve : extrait du Code du travail. Action : justifier la formation anglais comme compétence professionnelle d'adaptation au poste."
+      ],
+      [
+        `<a href="https://www.centre-inffo.fr/site-droit-formation/actualites-droit/cpf-hausse-du-montant-de-la-participation-forfaitaire">Centre Inffo – CPF</a>`,
+        "CPF : Hausse du montant de la participation forfaitaire",
+        veilleDate(f, 3),
+        "La participation financière pour l'achat d'une formation CPF s'élève à 103,20 euros. Impact direct sur les inscriptions en formation langue.",
+        "Preuve : article Centre Inffo. Action : informer les futurs stagiaires du ticket modérateur CPF."
+      ],
+      [
+        `<a href="https://www.europe-education-formation.fr/erasmus-plus-formation.php">Erasmus+ Formation Professionnelle</a>`,
+        "Erasmus+ – Mobilité et formation linguistique en Europe",
+        veilleDate(f, 2),
+        "Programme européen soutenant la mobilité professionnelle et l'apprentissage des langues. Financements disponibles pour les organismes certifiés.",
+        "Preuve : site Erasmus+. Action : explorer les financements Erasmus+ pour les parcours de formation en anglais et enrichir l'offre."
       ],
     ];
   }
@@ -461,6 +488,53 @@ function veilleMetierRows(f: FormationInfo, type: FormationType): string[][] {
         veilleMonthYear(f, 3),
         "Guide gouvernemental sur l'adoption du CRM par les TPE/PME : choix d'outil, mise en place, bonnes pratiques, retours d'expérience.",
         "Preuve : guide PDF France Num. Action Qualiopi : aligner les recommandations de choix CRM sur les préconisations France Num."
+      ],
+    ];
+  }
+
+  if (type === "anglais") {
+    return [
+      [
+        `<a href="https://www.britishcouncil.fr/">britishcouncil.fr</a>`,
+        "British Council France – Enseignement de l'anglais et certifications",
+        veilleMonthYear(f, 8),
+        "Organisme de référence pour l'enseignement de l'anglais : ressources pédagogiques, certifications (IELTS, Linguaskill), formations de formateurs, événements.",
+        "Preuve : capture + lien. Action : aligner les objectifs pédagogiques sur le CECRL et les standards British Council."
+      ],
+      [
+        `<a href="https://www.cambridgeenglish.org/fr/">Cambridge English</a>`,
+        "Cambridge English – Cadre européen et évaluations",
+        veilleMonthYear(f, 7),
+        "Référentiel international pour l'évaluation des compétences en anglais. Niveaux A1 à C2 du CECRL. Outils de positionnement gratuits.",
+        "Action Qualiopi : utiliser les descripteurs Cambridge pour définir les objectifs pédagogiques par niveau et les critères d'évaluation."
+      ],
+      [
+        `<a href="https://www.ets.org/toeic.html">ETS – TOEIC / TOEFL</a>`,
+        "ETS Global – Évolutions des certifications TOEIC",
+        veilleYear(f, 6),
+        "Évolutions du format TOEIC, nouvelles modalités de passage, statistiques de scores par pays. Le TOEIC reste la certification la plus demandée par les employeurs français.",
+        "Preuve : site officiel ETS. Action : adapter les modules de préparation aux certifications selon les dernières évolutions."
+      ],
+      [
+        `<a href="https://www.youtube.com/watch?v=TpqGIwLz6Yg">YouTube – 50 phrases pour parler anglais au travail</a>`,
+        "50 expressions pour l'anglais professionnel",
+        veilleMonthYear(f, 5),
+        "Vidéo pédagogique présentant les 50 expressions anglaises les plus utiles en contexte professionnel (réunions, emails, téléphone).",
+        "Preuve : fiche synthèse vidéo. Action : intégrer ces expressions dans les exercices de mise en situation professionnelle."
+      ],
+      [
+        `<a href="https://www.france-num.gouv.fr/guides-et-conseils/developpement-commercial/internationalisation">France Num – Internationalisation des entreprises</a>`,
+        "France Num – L'anglais comme levier d'internationalisation",
+        veilleMonthYear(f, 4),
+        "Guide sur l'internationalisation des TPE/PME : la maîtrise de l'anglais est identifiée comme compétence clé pour le développement commercial à l'international.",
+        "Preuve : guide France Num. Action : contextualiser la formation anglais comme compétence métier stratégique pour les entreprises."
+      ],
+      [
+        `<a href="https://www.ef.fr/epi/">EF Education First – EPI</a>`,
+        "EF EPI – Indice de compétence en anglais dans le monde",
+        veilleYear(f, 3),
+        "Rapport annuel classant les pays par niveau d'anglais. La France se situe au rang 'modéré', soulignant le besoin de formation.",
+        "Preuve : rapport PDF EF EPI. Action Qualiopi : utiliser ces données pour justifier la pertinence des formations anglais débutant."
       ],
     ];
   }
@@ -696,6 +770,46 @@ function veilleTechnoRows(f: FormationInfo, type: FormationType): string[][] {
         veilleDate(f, 3),
         "Synthèse des tendances : automation des processus de gestion, CRM pour les OF, outils no-code.",
         "Preuve : PDF baromètre. Action Qualiopi : alignement des outils enseignés sur les tendances du marché."
+      ],
+    ];
+  }
+
+  if (type === "anglais") {
+    return [...commonDigitalLearning,
+      [
+        `<a href="https://www.duolingo.com/">Duolingo</a>`,
+        "Duolingo – Application d'apprentissage des langues par IA",
+        veilleMonthYear(f, 7),
+        "Application leader mondial de l'apprentissage des langues. Utilise l'IA adaptative pour personnaliser les parcours. Référence en gamification pédagogique.",
+        "Preuve : captures de l'app + analyse pédagogique. Action : recommander Duolingo comme outil complémentaire d'auto-apprentissage entre les sessions."
+      ],
+      [
+        `<a href="https://www.babbel.com/fr/">Babbel</a>`,
+        "Babbel – Plateforme d'apprentissage linguistique professionnel",
+        veilleMonthYear(f, 6),
+        "Plateforme d'apprentissage de l'anglais orientée professionnels. Reconnaissance vocale intégrée pour la prononciation. Parcours thématiques (business, voyage, quotidien).",
+        "Action : benchmark des plateformes d'e-learning linguistique pour enrichir les recommandations aux stagiaires."
+      ],
+      [
+        `<a href="https://www.learningtechnologiesfrance.com/">learningtechnologiesfrance.com</a>`,
+        "Learning Technologies France – EdTech linguistique",
+        veilleYear(f, 5),
+        "Salon des technologies de formation : solutions IA pour l'apprentissage des langues, speech-to-text, chatbots conversationnels en anglais.",
+        "Preuve : programme + notes de veille. Action Qualiopi : évaluer l'intégration de chatbots IA pour la pratique conversationnelle."
+      ],
+      [
+        `<a href="https://www.youtube.com/watch?v=oxs5sjCmfMU">YouTube – Business English Conversation</a>`,
+        "Anglais des affaires – Dialogues et mises en situation",
+        veilleDate(f, 4),
+        "Ressource vidéo pour la pratique de l'anglais professionnel : dialogues réalistes, vocabulaire business, exercices de compréhension.",
+        "Preuve : fiche synthèse + lien. Action : intégrer comme ressource complémentaire pour les exercices de listening."
+      ],
+      [
+        `<a href="https://www.talenco.com/nos-publications/barometre-formation-professionnelle-tendances-pratiques-2025/">TalenCo – Baromètre</a>`,
+        "Baromètre formation professionnelle – langues et numérique",
+        veilleDate(f, 3),
+        "Synthèse des tendances : la formation en langues reste dans le top 3 des formations les plus demandées. L'anglais représente 80% des demandes linguistiques.",
+        "Preuve : PDF baromètre. Action Qualiopi : justifier la pertinence de l'offre anglais dans le plan de développement."
       ],
     ];
   }

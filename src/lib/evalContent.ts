@@ -122,6 +122,59 @@ const EVAL_CONTENT: Record<string, FormationEvalContent> = {
       "Excellent résultat global. A atteint le score TOEIC visé. Autonome en anglais professionnel.",
     ],
   },
+  "Anglais A1": {
+    qcmPositionnement: [
+      { question: "How do you say 'bonjour' in English?", options: ["Goodbye", "Hello", "Sorry", "Please"], correctIndex: 1 },
+      { question: "What is the English word for 'maison'?", options: ["Car", "Book", "House", "School"], correctIndex: 2 },
+      { question: "Choose the correct sentence:", options: ["I is French", "I am French", "I are French", "I be French"], correctIndex: 1 },
+      { question: "'She ___ a doctor.'", options: ["am", "are", "is", "be"], correctIndex: 2 },
+      { question: "What day comes after Monday?", options: ["Wednesday", "Sunday", "Tuesday", "Thursday"], correctIndex: 2 },
+      { question: "How do you say your age in English?", options: ["I have 30 years", "I am 30 years old", "I am 30 years", "I have 30 old"], correctIndex: 1 },
+      { question: "What is the plural of 'child'?", options: ["Childs", "Childrens", "Children", "Childes"], correctIndex: 2 },
+      { question: "'I ___ coffee every morning.'", options: ["drinks", "drink", "drinking", "am drink"], correctIndex: 1 },
+      { question: "What colour is the sky?", options: ["Red", "Green", "Blue", "Yellow"], correctIndex: 2 },
+      { question: "'Where ___ you from?'", options: ["is", "am", "do", "are"], correctIndex: 3 },
+    ],
+    qcmFinal: [
+      { question: "'He ___ to work by bus every day.'", options: ["go", "goes", "going", "goed"], correctIndex: 1 },
+      { question: "Choose the correct article: '___ apple'", options: ["a", "an", "the", "—"], correctIndex: 1 },
+      { question: "'They ___ have a car.'", options: ["doesn't", "isn't", "don't", "aren't"], correctIndex: 2 },
+      { question: "What time is 14:30?", options: ["Two thirty", "Half past two", "Quarter past two", "Both A and B"], correctIndex: 3 },
+      { question: "'___ is your name?' – 'My name is Sophie.'", options: ["Where", "How", "What", "Who"], correctIndex: 2 },
+      { question: "'I like ___.'", options: ["swim", "to swimming", "swimming", "swims"], correctIndex: 2 },
+      { question: "'The book is ___ the table.'", options: ["in", "on", "at", "to"], correctIndex: 1 },
+      { question: "'She ___ two brothers and one sister.'", options: ["have", "has", "is", "are"], correctIndex: 1 },
+      { question: "Which sentence is correct?", options: ["She is a nurse", "She is nurse", "She am a nurse", "She are nurse"], correctIndex: 0 },
+      { question: "'Can I have the ___, please?' (at a restaurant)", options: ["ticket", "bill", "note", "paper"], correctIndex: 1 },
+    ],
+    exercices: [
+      { titre: "Exercise 1: Introduce Yourself", consigne: "Write 8 sentences about yourself in English. Include: your name, age, nationality, job, family, where you live, what you like, and your daily routine.", reponseAttendue: "My name is [Name]. I am [age] years old. I am French. I work as a [job] at [company]. I have [number] children. I live in [city]. I like [hobby]. I wake up at [time] every day." },
+      { titre: "Exercise 2: Describe Your Family", consigne: "Write a short paragraph (6-8 sentences) describing your family in English. Use: my mother, my father, my brother/sister, names, ages, and jobs.", reponseAttendue: "My family is not very big. My mother's name is... She is... years old. She is a... My father works as a... I have one brother. His name is... He is..." },
+      { titre: "Exercise 3: Write a Simple Email", consigne: "Write a short professional email to your colleague to invite them to a meeting tomorrow at 10 o'clock. Include: greeting, the information, and closing.", reponseAttendue: "Dear [Name], I hope you are well. The meeting is tomorrow at 10 o'clock in the meeting room. Can you bring the report, please? Thank you. Best regards, [Your name]." },
+      { titre: "Exercise 4: At the Restaurant – Dialogue", consigne: "Write a dialogue between a waiter and a customer at a restaurant. The customer orders a main course, a drink, and asks for the bill. Minimum 10 lines.", reponseAttendue: "Waiter: Good evening. A table for one? Customer: Yes, please. Waiter: Here is the menu... Customer: I'd like the chicken with vegetables. Waiter: And to drink? Customer: A glass of water. Customer: Can I have the bill, please?" },
+      { titre: "Exercise 5: My Daily Routine", consigne: "Describe your typical day from morning to evening in English. Write at least 10 sentences using the present simple and time expressions.", reponseAttendue: "I wake up at 7 o'clock. I have breakfast at 7:30. I leave home at 8:15. I take the bus to work. I start work at 9. I have lunch at 12:30. I finish work at 5:30. I go home. I cook dinner. I go to bed at 10:30." },
+      { titre: "Exercise 6: Describe a Picture", consigne: "Look at the picture provided (an office scene) and describe what you see in English. Use: there is/there are, prepositions of place, and colours. Write at least 8 sentences.", reponseAttendue: "There is a desk in the room. There are two chairs. The computer is on the desk. There is a window behind the desk. The walls are white. There is a plant next to the door. There are books on the shelf. The lamp is on the left." },
+      { titre: "Exercise 7: Shopping Role Play", consigne: "Write a dialogue in a clothing shop. You want to buy a shirt. Ask about the price, the size, and the colour. Minimum 8 lines.", reponseAttendue: "Customer: Hello, I'm looking for a shirt. Assistant: What size? Customer: Medium. How much is it? Assistant: 25 euros. Customer: Do you have it in blue? Assistant: Yes. Customer: I'll take it. Can I pay by card?" },
+      { titre: "Exercise 8: My Hobbies", consigne: "Write a short text (8-10 sentences) about your hobbies and free time activities in English. Use: I like + verb-ing, I enjoy, I love, I don't like.", reponseAttendue: "In my free time, I like reading books. I enjoy cooking French food. I love travelling to new countries. I don't like running. I sometimes watch films at the weekend. I play football on Saturdays. I listen to music every day. I enjoy gardening in the summer." },
+      { titre: "Exercise 9: Asking for Directions", consigne: "Write a dialogue where you ask a stranger for directions to the train station. Include: excuse me, go straight, turn left/right, how far, thank you.", reponseAttendue: "You: Excuse me, where is the train station? Stranger: Go straight ahead, then turn left. It's on the right, opposite the supermarket. You: Is it far? Stranger: No, about 5 minutes. You: Thank you very much!" },
+      { titre: "Exercise 10: At the Doctor", consigne: "Write a dialogue at the doctor's office. You have a headache and a sore throat. The doctor asks questions and gives advice. Minimum 10 lines.", reponseAttendue: "Doctor: What seems to be the problem? Patient: I have a headache and a sore throat. Doctor: How long have you had this? Patient: For two days. Doctor: Are you taking any medication? Patient: No. Doctor: Take this medicine twice a day. You should rest." },
+    ],
+    competences: ["Se présenter en anglais", "Comprendre des phrases simples", "Utiliser le vocabulaire quotidien", "Écrire des messages courts", "Participer à des conversations simples", "Décrire son environnement", "Utiliser les structures grammaticales de base"],
+    appreciations: [
+      "Excellent progress for a beginner. Can introduce herself/himself confidently. Good pronunciation and enthusiasm. Vocabulary well acquired.",
+      "Very good participation. The basic grammar (to be, to have, present simple) is well mastered. Writing exercises are clear and correct.",
+      "Good overall level. Can hold simple conversations about daily life. Needs more practice with spelling and written expression.",
+      "Satisfactory progress. The essential vocabulary is acquired. Must continue practising the present simple (especially the -s for he/she).",
+      "Strong motivation and regular participation. The dialogues are well performed. Good comprehension of spoken English.",
+      "Good command of basic structures. Can write simple emails and describe routine. Pronunciation improving steadily.",
+      "Very good work throughout the course. The exercises on family, food and daily routine are excellent. Confident speaker.",
+      "Solid foundation in A1 English built. Can ask and answer simple questions. Reading comprehension is good. Should practise listening more.",
+      "Active participant with good engagement. Can navigate basic situations (restaurant, shopping, directions). Grammar foundations in place.",
+      "Remarkable progression from zero to functional A1. Can introduce himself/herself, describe daily routine, and write short messages.",
+      "Good acquisition of A1 competences. Particularly strong in vocabulary (colours, numbers, family). Should review articles (a/an/the).",
+      "Excellent dedication and practice. Consistently completed all exercises. Ready to progress to A2 level.",
+    ],
+  },
   "FLE Médico-Social": {
     qcmPositionnement: [
       { question: "Comment dit-on 'bonjour' de manière formelle à un usager ?", options: ["Salut !", "Bonjour Madame / Monsieur", "Coucou", "Hey"], correctIndex: 1 },
@@ -329,6 +382,7 @@ const DEFAULT_CONTENT: FormationEvalContent = {
 function getContentKey(intitule: string): string {
   const lower = intitule.toLowerCase();
   if (lower.includes("excel")) return "Excel Professionnel";
+  if ((lower.includes("anglais") || lower.includes("english")) && (lower.includes("a1") || lower.includes("débutant"))) return "Anglais A1";
   if (lower.includes("anglais")) return "Anglais Professionnel";
   if (lower.includes("informatique") || lower.includes("admin") || lower.includes("réseau") || lower.includes("système")) return "Informatique";
   if (lower.includes("management") || lower.includes("leadership")) return "Management";
