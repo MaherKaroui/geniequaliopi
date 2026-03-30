@@ -26,6 +26,13 @@ import {
   shortCriterePath,
 } from "@/lib/fileNaming";
 
+const yieldToBrowser = (delayMs = 0) =>
+  new Promise<void>((resolve) => {
+    requestAnimationFrame(() => {
+      window.setTimeout(resolve, delayMs);
+    });
+  });
+
 interface DocumentGeneratorProps {
   organisme: OrganismeInfo;
   formation: FormationInfo;
@@ -50,6 +57,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
   const [importingFolder, setImportingFolder] = useState(false);
   const [renamingFolder, setRenamingFolder] = useState(false);
   const [uploadingDrive, setUploadingDrive] = useState(false);
+  const [generationProgressText, setGenerationProgressText] = useState("");
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const folderInputRef = useRef<HTMLInputElement>(null);
 
@@ -373,8 +381,24 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
 
   const handleDownloadAll = async () => {
     setGenerating(true);
+    setGenerationProgressText("");
     try {
       const zip = new JSZip();
+      const totalFiles = 1 + catalog.reduce((count, doc) => {
+        const isPerStagiaire = PER_STAGIAIRE_TEMPLATES.has(doc.template);
+        const hasStagiaireIdx = doc.params?.stagiaireIdx !== undefined;
+        return count + (isPerStagiaire && !hasStagiaireIdx ? allStagiaires.length : 1);
+      }, 0);
+      let processedFiles = 0;
+      const progressTick = exportFormat === "pdf" ? 1 : 4;
+      const updateProgress = async () => {
+        processedFiles += 1;
+        if (processedFiles % progressTick === 0 || processedFiles === totalFiles) {
+          setGenerationProgressText(`${processedFiles}/${totalFiles}`);
+          await yieldToBrowser(exportFormat === "pdf" ? 24 : 0);
+        }
+      };
+
       const toWordBlob = async (content: string) => {
         const blob = await htmlToWordBlob(content);
         const extension = blob.type.includes("officedocument") ? ".docx" : ".doc";
@@ -394,6 +418,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
           bookBlob.blob,
         );
       }
+      await updateProgress();
 
       for (const doc of catalog) {
         const isPerStagiaire = PER_STAGIAIRE_TEMPLATES.has(doc.template);
@@ -409,6 +434,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
             const resp = await fetch(`/docs/${doc.params.pdfFile}`);
             const fileBlob = await resp.blob();
             zip.file(`${stagFolder}/${buildCatalogFileName(doc, stagiaire)}`, fileBlob);
+            await updateProgress();
           } else if (
             doc.template === "indicateurs_performance"
             || doc.template === "tableau_suivi_parcours_excel"
@@ -426,6 +452,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
                   ? generateExcelIndicateursPrevisionnelsVAE(mergedOrganisme, selectedFormation)
                   : generateContent(doc);
             zip.file(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, ".xls")}`, excelToBlob(excelContent));
+            await updateProgress();
           } else {
             const content = generateContent(doc);
             if (exportFormat === "pdf") {
@@ -434,6 +461,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
               const wordBlob = await toWordBlob(content);
               zip.file(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, wordBlob.extension)}`, wordBlob.blob);
             }
+            await updateProgress();
           }
         } else if (isPerStagiaire) {
           for (let si = 0; si < allStagiaires.length; si++) {
@@ -446,11 +474,13 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
               const wordBlob = await toWordBlob(content);
               zip.file(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, wordBlob.extension)}`, wordBlob.blob);
             }
+            await updateProgress();
           }
         } else if (doc.template === "pdf_static" && doc.params?.pdfFile) {
           const resp = await fetch(`/docs/${doc.params.pdfFile}`);
           const fileBlob = await resp.blob();
           zip.file(`${basePath}/${buildCatalogFileName(doc)}`, fileBlob);
+          await updateProgress();
         } else if (
           doc.template === "indicateurs_performance"
           || doc.template === "tableau_suivi_parcours_excel"
@@ -468,6 +498,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
                 ? generateExcelIndicateursPrevisionnelsVAE(mergedOrganisme, selectedFormation)
                 : generateContent(doc);
           zip.file(`${basePath}/${buildCatalogFileName(doc, null, ".xls")}`, excelToBlob(excelContent));
+          await updateProgress();
         } else {
           const content = generateContent(doc);
           if (exportFormat === "pdf") {
@@ -476,6 +507,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
             const wordBlob = await toWordBlob(content);
             zip.file(`${basePath}/${buildCatalogFileName(doc, null, wordBlob.extension)}`, wordBlob.blob);
           }
+          await updateProgress();
         }
         setGenerated((prev) => new Set(prev).add(doc.id));
       }
@@ -486,8 +518,10 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
     } catch (error) {
       console.error(error);
       toast.error("Erreur pendant la génération du ZIP.");
+    } finally {
+      setGenerating(false);
+      setGenerationProgressText("");
     }
-    setGenerating(false);
   };
 
   const handleUploadToDrive = async () => {
@@ -589,7 +623,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
         <div className="flex items-center gap-2">
           <Button onClick={handleDownloadAll} disabled={generating || uploadingDrive} className="gap-2 bg-gradient-hero text-primary-foreground border-0">
             {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-            {generating ? "Génération..." : "Télécharger tout (ZIP)"}
+            {generating ? `Génération...${generationProgressText ? ` ${generationProgressText}` : ""}` : "Télécharger tout (ZIP)"}
           </Button>
           <Button onClick={handleUploadToDrive} disabled={generating || uploadingDrive} variant="outline" className="gap-2">
             {uploadingDrive ? <Loader2 className="w-4 h-4 animate-spin" /> : <Cloud className="w-4 h-4" />}
