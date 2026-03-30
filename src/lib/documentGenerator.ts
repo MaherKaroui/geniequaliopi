@@ -539,6 +539,8 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "titre_rncp_cfa": return genTitreRNCPCFA(o, f);
     case "matiere_titre_cfa": return genMatiereTitreCFA(o, f);
     case "tableau_croise_cfa": return genTableauCroiseCFA(o, f);
+    case "matrice_competences_excel": return genMatriceCompetencesExcel(o, f);
+    case "suivi_chiffre_formation_excel": return genSuiviChiffreFormationExcel(o, f, stagiaires);
     case "fiche_certification_rs": return genFicheCertificationRS(o, f);
     case "procedure_presentation_certification": return genProcedurePresentationCertification(o, f);
     case "convocation_certification": return genConvocationCertification(o, f, stagiaires, params?.stagiaireIdx ?? 0);
