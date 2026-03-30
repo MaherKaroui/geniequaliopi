@@ -574,6 +574,9 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "boite_formateur_cfa": return genBoiteFormateur(o, f);
     case "documents_certificateurs_cfa": return genDocumentsCertificateursCFA(o, f);
     case "synopsis_cfa": return genSynopsisCFA(o, f);
+    case "support_cours_cfa": return genSupportCoursCFA(o, f);
+    case "calendrier_annuel_cfa": return genCalendrierAnnuelCFA(o, f);
+    case "decoupage_formation_cfa_excel": return genDecoupageFormationCFAExcel(o, f);
     case "book_qualiopi": {
       const allFormations = [f];
       const allStagiaires = mergeStagiaires(stagiaires);
@@ -8349,4 +8352,328 @@ function genBilanFinFormationFormateur(o: OrganismeInfo, f: FormationInfo, stagi
 </div>`;
 
   return buildDocument({ org: o, title: "BILAN DE FIN DE FORMATION – FORMATEUR", subtitle: f.intitule, sections: [], extraHtml: extra });
+}
+
+// ============ CFA CT2 - IND 6 GENERATORS ============
+
+function genSupportCoursCFA(o: OrganismeInfo, f: FormationInfo) {
+  const chapters = getCourseChapters(f.intitule);
+  const rncp = getRNCPByCode(f.codeRNCP || '');
+
+  let chaptersHtml = '';
+  chapters.forEach((ch, ci) => {
+    chaptersHtml += `<div class="page-break"></div>`;
+    chaptersHtml += `<div style="background:linear-gradient(135deg,hsl(220,60%,50%),hsl(240,50%,40%));color:white;padding:40px;border-radius:12px;margin-bottom:30px">`;
+    chaptersHtml += `<h2 style="color:white;font-size:28px;margin:0">CHAPITRE ${ci + 1}</h2>`;
+    chaptersHtml += `<h3 style="color:white;font-size:20px;margin-top:10px">${ch.title}</h3>`;
+    chaptersHtml += `<p style="color:rgba(255,255,255,0.85);margin-top:10px">${ch.description}</p>`;
+    chaptersHtml += `</div>`;
+
+    ch.sections.forEach((sec, si) => {
+      if (si > 0 && si % 2 === 0) chaptersHtml += `<div class="page-break"></div>`;
+      chaptersHtml += `<div style="margin-bottom:25px">`;
+      chaptersHtml += `<h3 style="color:hsl(220,60%,50%);font-size:16px;border-bottom:2px solid hsl(220,60%,50%);padding-bottom:5px;margin-bottom:12px">Section ${ci + 1}.${si + 1} — ${sec.title}</h3>`;
+      chaptersHtml += sec.content;
+      chaptersHtml += `</div>`;
+    });
+  });
+
+  // Table des matières
+  let tocHtml = '<div style="margin-bottom:30px"><h2 style="text-align:center;color:hsl(220,60%,50%)">SOMMAIRE</h2>';
+  chapters.forEach((ch, ci) => {
+    tocHtml += `<div style="margin:10px 0;font-weight:bold;font-size:14px">CHAPITRE ${ci + 1} — ${ch.title}</div>`;
+    ch.sections.forEach((sec, si) => {
+      tocHtml += `<div style="margin-left:20px;font-size:12px;color:#555">${ci + 1}.${si + 1} ${sec.title}</div>`;
+    });
+  });
+  tocHtml += '</div>';
+
+  const closingHtml = `<div class="page-break"></div>
+    <div style="text-align:center;padding:60px 20px">
+      <h2 style="color:hsl(220,60%,50%);font-size:24px">Merci de votre attention</h2>
+      <p style="color:#666;margin-top:15px">Nous espérons que ce support de cours vous a apporté les clés nécessaires pour maîtriser les compétences visées.</p>
+      <div style="margin-top:40px">
+        <p><strong>${o.dirigeant}</strong></p>
+        <p style="color:#666">Dirigeant</p>
+        <p style="margin-top:15px"><strong>${o.responsablePedagogique || ''}</strong></p>
+        <p style="color:#666">Référent pédagogique</p>
+      </div>
+      <div style="margin-top:40px;color:#999;font-size:11px">
+        <p>${o.nom}</p>
+        <p>${o.adresse}, ${o.codePostal} ${o.ville}</p>
+        <p>${o.email}</p>
+        <p>SIRET ${o.siret}</p>
+        ${o.nda ? `<p>NDA ${o.nda}</p>` : ''}
+      </div>
+    </div>`;
+
+  return buildDocument({
+    org: o,
+    title: "SUPPORT DE COURS – CFA",
+    subtitle: f.intitule,
+    formation: f,
+    showFormationInfo: true,
+    sections: [
+      { heading: "Informations", content: `<p><strong>Type :</strong> Support PDF fourni à chaque apprenti<br><strong>Formation :</strong> ${f.intitule}${rncp ? `<br><strong>Certification visée :</strong> ${rncp.intitule} (${rncp.code})` : ''}<br><strong>Mise à jour :</strong> ${o.dateMaj || new Date().toLocaleDateString('fr-FR')}<br><strong>Version :</strong> V${o.version || '1'}</p>` },
+    ],
+    extraHtml: tocHtml + chaptersHtml + closingHtml
+  });
+}
+
+function genCalendrierAnnuelCFA(o: OrganismeInfo, f: FormationInfo) {
+  const rythme = f.rythmeAlternance || '1 semaine CFA / 3 semaines entreprise';
+  const { cfaWeeks: cfaPerCycle, entrepriseWeeks } = parseRythmeAlternance(rythme);
+  const { totalHours } = parseDuree(f.duree);
+  const effectiveTotal = totalHours > 0 ? totalHours : 420;
+  const totalCFAWeeks = Math.max(1, Math.ceil(effectiveTotal / 35));
+  const cycleLength = cfaPerCycle + entrepriseWeeks;
+  const totalCycles = Math.ceil(totalCFAWeeks / cfaPerCycle);
+
+  const startDate = f.dateDebut ? new Date(f.dateDebut.split('/').reverse().join('-')) : new Date();
+  if (isNaN(startDate.getTime())) startDate.setTime(Date.now());
+  const fmtD = (d: Date) => d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+  // Build week-by-week calendar
+  let calendarRows = '';
+  let calendarWeek = 0;
+  let cfaWeekNum = 0;
+  const rncp = getRNCPByCode(f.codeRNCP || '');
+  const chapters = rncp ? rncp.blocsCompetences : [];
+  const accompHours = Math.round(effectiveTotal * 0.15);
+  const blocHoursTotal = effectiveTotal - accompHours;
+  const scale = chapters.length > 0 ? blocHoursTotal / chapters.reduce((s, b) => s + b.matieres.reduce((ss, m) => ss + (parseInt(m.volume) || 0), 0), 0) || 1 : 1;
+  const modules = chapters.length > 0
+    ? chapters.map((bloc, i) => ({ titre: `Bloc ${i + 1} – ${bloc.titre}`, volume: Math.round(bloc.matieres.reduce((s, m) => s + (parseInt(m.volume) || 0), 0) * scale) }))
+    : getCourseChapters(f.intitule).slice(0, 5).map((ch, i) => ({ titre: ch.title, volume: Math.round((effectiveTotal - accompHours) / Math.min(getCourseChapters(f.intitule).length, 5)) }));
+  modules.push({ titre: 'Accompagnement + Examens', volume: accompHours });
+
+  let moduleIdx = 0;
+  let remainingInModule = modules[0]?.volume || 0;
+
+  // Months header
+  const moisFR = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+
+  for (let cycle = 0; cycle < totalCycles && moduleIdx < modules.length; cycle++) {
+    for (let cw = 0; cw < cfaPerCycle && moduleIdx < modules.length; cw++) {
+      cfaWeekNum++;
+      const weekStart = new Date(startDate);
+      weekStart.setDate(weekStart.getDate() + calendarWeek * 7);
+      const weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekEnd.getDate() + 4);
+      const mois = moisFR[weekStart.getMonth()];
+      const mod = modules[moduleIdx];
+      calendarRows += `<tr>
+        <td style="text-align:center">S${calendarWeek + 1}</td>
+        <td style="text-align:center">${fmtD(weekStart)} – ${fmtD(weekEnd)}</td>
+        <td>${mois}</td>
+        <td style="background:#e8f0fe"><strong>CFA</strong></td>
+        <td style="text-align:center">${cfaWeekNum}</td>
+        <td>${mod.titre}</td>
+        <td style="text-align:center">35h</td>
+      </tr>`;
+      remainingInModule -= 35;
+      if (remainingInModule <= 0) {
+        moduleIdx++;
+        remainingInModule = moduleIdx < modules.length ? modules[moduleIdx].volume : 0;
+      }
+      calendarWeek++;
+    }
+    for (let ew = 0; ew < entrepriseWeeks; ew++) {
+      const weekStart = new Date(startDate);
+      weekStart.setDate(weekStart.getDate() + calendarWeek * 7);
+      const weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekEnd.getDate() + 4);
+      const mois = moisFR[weekStart.getMonth()];
+      calendarRows += `<tr style="background:#f0f8f0">
+        <td style="text-align:center">S${calendarWeek + 1}</td>
+        <td style="text-align:center">${fmtD(weekStart)} – ${fmtD(weekEnd)}</td>
+        <td>${mois}</td>
+        <td><strong>Entreprise</strong></td>
+        <td style="text-align:center">—</td>
+        <td>Mise en pratique en entreprise</td>
+        <td style="text-align:center">35h</td>
+      </tr>`;
+      calendarWeek++;
+    }
+  }
+
+  const endDate = new Date(startDate);
+  endDate.setDate(endDate.getDate() + calendarWeek * 7);
+
+  const tableHtml = `<table border="1" cellpadding="5" cellspacing="0" style="border-collapse:collapse;width:100%">
+    <tr style="background:#1e3a7b;color:#fff">
+      <th>Semaine</th>
+      <th>Dates</th>
+      <th>Mois</th>
+      <th>Lieu</th>
+      <th>Sem. CFA</th>
+      <th>Contenu / Module</th>
+      <th>Heures</th>
+    </tr>
+    ${calendarRows}
+  </table>`;
+
+  return buildDocument({
+    org: o,
+    title: "CALENDRIER ANNUEL DE FORMATION – CFA",
+    subtitle: f.intitule,
+    sections: [
+      { heading: "Informations générales", content: `<p><strong>Formation :</strong> ${f.intitule}<br><strong>Rythme d'alternance :</strong> ${rythme}<br><strong>Durée totale en centre :</strong> ${effectiveTotal}h (${totalCFAWeeks} semaines CFA)<br><strong>Période :</strong> du ${fmtD(startDate)} au ${fmtD(endDate)}<br><strong>Cycle :</strong> ${cfaPerCycle} sem. CFA + ${entrepriseWeeks} sem. entreprise = ${cycleLength} semaines</p>` },
+      { heading: "Calendrier détaillé", content: tableHtml },
+      { heading: "Légende", content: `<p><span style="background:#e8f0fe;padding:2px 8px;border-radius:4px">CFA</span> = Semaine en centre de formation &nbsp;&nbsp; <span style="background:#f0f8f0;padding:2px 8px;border-radius:4px">Entreprise</span> = Semaine en entreprise</p>`, variant: "green" },
+    ],
+  });
+}
+
+function genDecoupageFormationCFAExcel(o: OrganismeInfo, f: FormationInfo) {
+  const rncp = getRNCPByCode(f.codeRNCP || '');
+  const { totalHours } = parseDuree(f.duree);
+  const effectiveTotal = totalHours > 0 ? totalHours : 420;
+  const accompHours = Math.round(effectiveTotal * 0.15);
+  const blocHoursTotal = effectiveTotal - accompHours;
+
+  // Build the multi-sheet Excel content
+  const tableRowFn = (cells: string[], isHeader = false) => {
+    const tag = isHeader ? 'th' : 'td';
+    return `<tr>${cells.map(c => `<${tag}>${c}</${tag}>`).join('')}</tr>`;
+  };
+
+  // Sheet 1: Vue globale (REAC-like)
+  let sheet1 = tableRowFn(["N° AT", "Activité type", "N° CP", "Compétence professionnelle", "Modules associés", "Nombre d'heures", "Objectifs pédagogiques"], true);
+
+  if (rncp && rncp.blocsCompetences.length > 0) {
+    const rncpTotalVolume = rncp.blocsCompetences.reduce((sum, bloc) =>
+      sum + bloc.matieres.reduce((s, m) => s + (parseInt(m.volume) || 0), 0), 0);
+    const scale = rncpTotalVolume > 0 ? blocHoursTotal / rncpTotalVolume : 1;
+
+    rncp.blocsCompetences.forEach((bloc, bi) => {
+      const blocVolume = Math.round(bloc.matieres.reduce((s, m) => s + (parseInt(m.volume) || 0), 0) * scale);
+      const modulesStr = bloc.matieres.map(m => m.contenu).join('\n');
+      const objectifs = bloc.matieres.map(m => `Maîtriser : ${m.contenu}`).join('\n');
+      sheet1 += tableRowFn([
+        `${bi + 1}`,
+        bloc.titre,
+        bloc.matieres.map((_, mi) => `${bi + 1}.${mi + 1}`).join('\n'),
+        bloc.matieres.map(m => m.contenu).join('\n'),
+        modulesStr,
+        `${blocVolume}h`,
+        objectifs
+      ]);
+    });
+    sheet1 += tableRowFn(["", "Accompagnement + Examens", "", "Préparation certification", "Accompagnement individuel", `${accompHours}h`, "Préparer le passage de la certification"]);
+    sheet1 += tableRowFn(["", "TOTAL", "", "", "", `${effectiveTotal}h`, ""], true);
+  } else {
+    const chapters = getCourseChapters(f.intitule);
+    const nbBlocs = Math.min(chapters.length, 5);
+    const perBloc = Math.round(blocHoursTotal / Math.max(1, nbBlocs));
+    chapters.slice(0, nbBlocs).forEach((ch, ci) => {
+      const objectifs = ch.sections.slice(0, 3).map(s => s.title).join('\n');
+      sheet1 += tableRowFn([`${ci + 1}`, ch.title, `${ci + 1}.1`, ch.description, ch.sections.map(s => s.title).join('\n'), `${perBloc}h`, objectifs]);
+    });
+    sheet1 += tableRowFn(["", "Accompagnement + Examens", "", "", "", `${accompHours}h`, ""]);
+    sheet1 += tableRowFn(["", "TOTAL", "", "", "", `${effectiveTotal}h`, ""], true);
+  }
+
+  // Sheet 2: Détail par module
+  let sheet2 = tableRowFn(["Module", "Chapitre / Contenu", "Savoirs", "Compétences transversales", "Outils / Logiciels", "Objectifs pédagogiques", "Modalités d'évaluation", "Heures"], true);
+
+  if (rncp && rncp.blocsCompetences.length > 0) {
+    const rncpTotalVolume = rncp.blocsCompetences.reduce((sum, bloc) =>
+      sum + bloc.matieres.reduce((s, m) => s + (parseInt(m.volume) || 0), 0), 0);
+    const scale = rncpTotalVolume > 0 ? blocHoursTotal / rncpTotalVolume : 1;
+
+    rncp.blocsCompetences.forEach((bloc, bi) => {
+      bloc.matieres.forEach((mat, mi) => {
+        const vol = Math.round((parseInt(mat.volume) || 0) * scale);
+        sheet2 += tableRowFn([
+          `Bloc ${bi + 1} – ${bloc.titre}`,
+          mat.contenu,
+          `Maîtriser les techniques de ${mat.contenu.toLowerCase()}`,
+          "Communication professionnelle, travail en équipe, autonomie",
+          "CRM, Suite bureautique, outils numériques",
+          `Être capable de ${mat.contenu.toLowerCase()}`,
+          bloc.modalitesEval || "Mise en situation + évaluation continue",
+          `${vol}h`
+        ]);
+      });
+    });
+  } else {
+    const chapters = getCourseChapters(f.intitule);
+    const nbBlocs = Math.min(chapters.length, 5);
+    const perBloc = Math.round(blocHoursTotal / Math.max(1, nbBlocs));
+    chapters.slice(0, nbBlocs).forEach((ch, ci) => {
+      ch.sections.forEach((sec, si) => {
+        const vol = Math.round(perBloc / ch.sections.length);
+        sheet2 += tableRowFn([
+          ch.title,
+          sec.title,
+          `Connaissances liées à ${sec.title.toLowerCase()}`,
+          "Communication, autonomie, travail collaboratif",
+          "Suite bureautique, outils numériques",
+          `Maîtriser ${sec.title.toLowerCase()}`,
+          "Mise en situation professionnelle + QCM",
+          `${vol}h`
+        ]);
+      });
+    });
+  }
+
+  // Sheet 3: Planning alternance
+  const rythme = f.rythmeAlternance || '1 semaine CFA / 3 semaines entreprise';
+  const { cfaWeeks: cfaPerCycle, entrepriseWeeks } = parseRythmeAlternance(rythme);
+  const totalCFAWeeks = Math.max(1, Math.ceil(effectiveTotal / 35));
+  const totalCycles = Math.ceil(totalCFAWeeks / cfaPerCycle);
+
+  let sheet3 = tableRowFn(["Semaine", "Dates", "Lieu", "Module / Bloc", "Heures"], true);
+  const startDate = f.dateDebut ? new Date(f.dateDebut.split('/').reverse().join('-')) : new Date();
+  if (isNaN(startDate.getTime())) startDate.setTime(Date.now());
+  const fmtD = (d: Date) => d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+  let calWeek = 0;
+  let cfaWk = 0;
+  const modList = rncp && rncp.blocsCompetences.length > 0
+    ? rncp.blocsCompetences.map((b, i) => `Bloc ${i + 1} – ${b.titre}`)
+    : getCourseChapters(f.intitule).slice(0, 5).map(ch => ch.title);
+  modList.push('Accompagnement + Examens');
+
+  for (let cycle = 0; cycle < totalCycles; cycle++) {
+    for (let cw = 0; cw < cfaPerCycle; cw++) {
+      cfaWk++;
+      const ws = new Date(startDate);
+      ws.setDate(ws.getDate() + calWeek * 7);
+      const we = new Date(ws);
+      we.setDate(we.getDate() + 4);
+      const modIdx = Math.min(cfaWk - 1, modList.length - 1);
+      sheet3 += tableRowFn([`S${calWeek + 1}`, `${fmtD(ws)} – ${fmtD(we)}`, "CFA", modList[modIdx] || "", "35h"]);
+      calWeek++;
+    }
+    for (let ew = 0; ew < entrepriseWeeks; ew++) {
+      const ws = new Date(startDate);
+      ws.setDate(ws.getDate() + calWeek * 7);
+      const we = new Date(ws);
+      we.setDate(we.getDate() + 4);
+      sheet3 += tableRowFn([`S${calWeek + 1}`, `${fmtD(ws)} – ${fmtD(we)}`, "Entreprise", "Mise en pratique", "35h"]);
+      calWeek++;
+    }
+  }
+
+  // Build multi-sheet Excel HTML
+  const sheetDefs = [
+    { name: "Vue globale", html: `<table>${sheet1}</table>` },
+    { name: "Détail par module", html: `<table>${sheet2}</table>` },
+    { name: "Planning alternance", html: `<table>${sheet3}</table>` },
+  ];
+  const sheetXML = sheetDefs.map(s => `<x:ExcelWorksheet><x:Name>${s.name}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet>`).join("");
+
+  return `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+<head><meta charset="utf-8">
+<!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets>${sheetXML}</x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->
+<style>
+table { border-collapse: collapse; font-family: Calibri, Arial, sans-serif; font-size: 11pt; }
+th { background-color: #1e3a7b; color: white; padding: 8px 12px; text-align: left; font-weight: bold; border: 1px solid #1e3a7b; }
+td { padding: 6px 10px; border: 1px solid #ccc; vertical-align: top; }
+tr:nth-child(even) { background-color: #f5f7fa; }
+</style></head><body>
+${sheetDefs.map((s, i) => `<div id="sheet${i}" style="${i > 0 ? 'page-break-before:always' : ''}">${s.html}</div>`).join('')}
+</body></html>`;
 }
