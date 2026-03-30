@@ -533,6 +533,32 @@ const QUESTIONS_OUVERTES: Record<string, QuestionsOuvertesFormation> = {
       { question: "Qu'avez-vous appris pendant cette formation ?", reponseAttendue: "J'ai appris à utiliser les formules avancées (RECHERCHEV, SI imbriqués), créer des TCD, faire de la mise en forme conditionnelle et automatiser des tâches." },
     ],
   },
+  "Anglais A1": {
+    debut: [
+      { question: "How do you say 'bonjour' in English?", reponseAttendue: "Hello / Good morning / Good afternoon." },
+      { question: "What is your name? Answer in a complete sentence.", reponseAttendue: "My name is [Name]." },
+      { question: "How do you spell your last name in English? (Spell each letter)", reponseAttendue: "The student spells their last name using the English alphabet (e.g., D-U-P-O-N-T)." },
+      { question: "What are the days of the week in English?", reponseAttendue: "Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday." },
+      { question: "Count from 1 to 10 in English.", reponseAttendue: "One, two, three, four, five, six, seven, eight, nine, ten." },
+      { question: "What colour is the sky?", reponseAttendue: "The sky is blue." },
+      { question: "How do you say 'merci beaucoup' in English?", reponseAttendue: "Thank you very much." },
+      { question: "Complete: 'I ___ a student.' (am/is/are)", reponseAttendue: "I am a student." },
+      { question: "What time is it? (Show a clock at 3:00)", reponseAttendue: "It is three o'clock." },
+      { question: "Why do you want to learn English?", reponseAttendue: "Open answer – expected: for work, travel, communication, personal development, etc." },
+    ],
+    fin: [
+      { question: "Introduce yourself in English (name, age, job, city).", reponseAttendue: "My name is [Name]. I am [age] years old. I am a [job]. I live in [city]." },
+      { question: "Describe your typical day using at least 5 sentences.", reponseAttendue: "I wake up at 7 o'clock. I have breakfast. I go to work by bus. I work from 9 to 5. I have dinner with my family. I go to bed at 10 o'clock." },
+      { question: "Ask 3 questions to a new colleague in English.", reponseAttendue: "What is your name? Where are you from? What is your job? / How long have you been working here?" },
+      { question: "Write a short email to say you cannot come to work tomorrow.", reponseAttendue: "Dear [Name], I am writing to inform you that I cannot come to work tomorrow because I am sick. I am sorry for the inconvenience. Best regards, [Name]." },
+      { question: "What is the difference between 'this' and 'that'?", reponseAttendue: "'This' is for something close to you. 'That' is for something far from you. Example: This is my pen (here). That is your pen (there)." },
+      { question: "Put these words in the correct order: 'like / I / very much / English'", reponseAttendue: "I like English very much." },
+      { question: "Translate into English: 'Je travaille dans un bureau. J'aime mon travail.'", reponseAttendue: "I work in an office. I like my job." },
+      { question: "Describe the weather today in English.", reponseAttendue: "Today it is sunny/cloudy/rainy. It is warm/cold. The temperature is about [X] degrees." },
+      { question: "What did you learn during this English A1 training? (Answer in English)", reponseAttendue: "I learned the alphabet, numbers, colours, days of the week, how to introduce myself, basic grammar (to be, to have), vocabulary for daily life and work, and how to write simple emails." },
+      { question: "Name 5 things you can see in an office.", reponseAttendue: "A desk, a chair, a computer, a phone, a printer / a pen / a book / a lamp." },
+    ],
+  },
   "Anglais Professionnel": {
     debut: [
       { question: "How do you introduce yourself in a professional context?", reponseAttendue: "Good morning, my name is [Name], I am [position] at [company]. I am responsible for [tasks]." },
@@ -894,6 +920,9 @@ export function generateStagiaireOpenAnswers(
     break;
   }
 
+  // Detect if questions are in English
+  const isEnglish = questions.some(q => /^(how|what|why|where|when|who|which|do |does |can |could |complete|count|put |name |write |ask |describe |translate |introduce)/i.test(q.question));
+
   // Generate final answers with adjusted qualities
   return rawAnswers.map((raw, i) => {
     const quality = adjustedQualities[i];
@@ -904,32 +933,41 @@ export function generateStagiaireOpenAnswers(
     
     switch (quality) {
       case 'full':
-        reponse = generateFullAnswer(expected, stagiaireIndex, raw.qi, stagiaireInfo);
+        reponse = generateFullAnswer(expected, stagiaireIndex, raw.qi, stagiaireInfo, isEnglish);
         score = 1;
         feedback = "Bonne réponse";
         break;
       case 'partial':
-        reponse = generatePartialAnswer(expected, raw.seed, stagiaireIndex, raw.qi, stagiaireInfo);
+        reponse = generatePartialAnswer(expected, raw.seed, stagiaireIndex, raw.qi, stagiaireInfo, isEnglish);
         score = 0.5;
         const partialFeedbacks = ["Réponse partielle", "Réponse incomplète", "Réponse acceptable", "Réponse partiellement correcte"];
         feedback = partialFeedbacks[(raw.seed + stagiaireIndex) % partialFeedbacks.length];
         break;
       case 'wrong':
-        reponse = generateWrongAnswer(expected, raw.seed, stagiaireIndex, raw.qi);
+        reponse = generateWrongAnswer(expected, raw.seed, stagiaireIndex, raw.qi, isEnglish);
         score = 0;
         const wrongFeedbacks = ["Réponse insuffisante", "Réponse incorrecte", "Réponse hors sujet", "Réponse erronée"];
         feedback = wrongFeedbacks[(raw.seed + stagiaireIndex) % wrongFeedbacks.length];
         break;
       case 'empty':
       default:
-        const emptyResponses = [
-          "Je ne sais pas.",
-          "Je ne sais pas exactement.", 
-          "/",
-          "Je n'ai pas assez de connaissances pour répondre.",
-          "Aucune idée.",
-          "Je ne me souviens plus.",
-        ];
+        const emptyResponses = isEnglish
+          ? [
+              "I don't know.",
+              "I am not sure.",
+              "/",
+              "I don't have enough knowledge to answer.",
+              "No idea.",
+              "I don't remember.",
+            ]
+          : [
+              "Je ne sais pas.",
+              "Je ne sais pas exactement.", 
+              "/",
+              "Je n'ai pas assez de connaissances pour répondre.",
+              "Aucune idée.",
+              "Je ne me souviens plus.",
+            ];
         reponse = emptyResponses[(raw.seed + stagiaireIndex * 3 + raw.qi * 7) % emptyResponses.length];
         score = 0;
         feedback = "Pas de réponse";
@@ -971,33 +1009,43 @@ function cleanBrackets(text: string, stagiaireNom?: string, stagiairePrenom?: st
 }
 
 // Generate a "correct" answer that's unique per stagiaire (rephrased) — LONG and realistic
-function generateFullAnswer(expected: string, stagiaireIndex: number, questionIndex: number, stagiaireInfo?: { nom?: string; prenom?: string; entreprise?: string; poste?: string }): string {
+function generateFullAnswer(expected: string, stagiaireIndex: number, questionIndex: number, stagiaireInfo?: { nom?: string; prenom?: string; entreprise?: string; poste?: string }, isEnglish?: boolean): string {
   const cleaned = cleanBrackets(expected, stagiaireInfo?.nom, stagiaireInfo?.prenom, stagiaireInfo?.entreprise, stagiaireInfo?.poste);
   const sentences = cleaned.split(/(?<=[.!])\s+/).filter(s => s.trim());
   const seed = (stagiaireIndex * 13 + questionIndex * 7) % 8;
   
-  const expansions = [
-    ' Cela permet d\'assurer un travail de qualité au quotidien.',
-    ' C\'est essentiel pour être efficace en situation professionnelle.',
-    ' C\'est directement applicable dans le cadre de mon travail.',
-    ' C\'est un élément fondamental à connaître et à savoir appliquer.',
-    '',
-    '',
-    '',
-    '',
-  ];
+  const expansions = isEnglish
+    ? [
+        ' This is very useful in everyday life.',
+        ' This is important to know for communication.',
+        ' I can use this at work every day.',
+        ' This is a key skill I learned during the training.',
+        '', '', '', '',
+      ]
+    : [
+        ' Cela permet d\'assurer un travail de qualité au quotidien.',
+        ' C\'est essentiel pour être efficace en situation professionnelle.',
+        ' C\'est directement applicable dans le cadre de mon travail.',
+        ' C\'est un élément fondamental à connaître et à savoir appliquer.',
+        '', '', '', '',
+      ];
   
   const varied = sentences.map((s, i) => {
     const sv = (stagiaireIndex * 13 + questionIndex * 7 + i * 3) % 5;
     let result = s;
-    if (sv === 1) result = result.replace('Il faut', 'On doit').replace('il faut', 'on doit');
-    if (sv === 2) result = result.replace('permet de', 'sert à').replace('Il faut', 'Il est nécessaire de');
-    if (sv === 3) result = result.replace('par exemple', 'notamment').replace('Exemple :', 'Par exemple :');
-    if (sv === 4) result = result.replace('c\'est', 'il s\'agit de').replace('C\'est', 'Il s\'agit de');
+    if (!isEnglish) {
+      if (sv === 1) result = result.replace('Il faut', 'On doit').replace('il faut', 'on doit');
+      if (sv === 2) result = result.replace('permet de', 'sert à').replace('Il faut', 'Il est nécessaire de');
+      if (sv === 3) result = result.replace('par exemple', 'notamment').replace('Exemple :', 'Par exemple :');
+      if (sv === 4) result = result.replace('c\'est', 'il s\'agit de').replace('C\'est', 'Il s\'agit de');
+    } else {
+      if (sv === 1) result = result.replace('You can', 'It is possible to');
+      if (sv === 2) result = result.replace('For example', 'For instance');
+      if (sv === 3) result = result.replace('It is', 'This is');
+    }
     return result;
   });
   
-  // Swap two sentences for variety
   if ((stagiaireIndex + questionIndex) % 3 === 0 && varied.length > 2) {
     const tmp = varied[1]; varied[1] = varied[2]; varied[2] = tmp;
   }
@@ -1005,7 +1053,7 @@ function generateFullAnswer(expected: string, stagiaireIndex: number, questionIn
   return varied.join(' ') + expansions[seed];
 }
 
-function generatePartialAnswer(expected: string, seed: number, stagiaireIndex: number, questionIndex: number, stagiaireInfo?: { nom?: string; prenom?: string; entreprise?: string; poste?: string }): string {
+function generatePartialAnswer(expected: string, seed: number, stagiaireIndex: number, questionIndex: number, stagiaireInfo?: { nom?: string; prenom?: string; entreprise?: string; poste?: string }, isEnglish?: boolean): string {
   const cleaned = cleanBrackets(expected, stagiaireInfo?.nom, stagiaireInfo?.prenom, stagiaireInfo?.entreprise, stagiaireInfo?.poste);
   const sentences = cleaned.split(/(?<=[.!])\s+/).filter(s => s.trim());
   const variation = (stagiaireIndex * 11 + questionIndex * 3) % 3;
@@ -1027,17 +1075,28 @@ function generatePartialAnswer(expected: string, seed: number, stagiaireIndex: n
   return mainContent + '.';
 }
 
-function generateWrongAnswer(expected: string, seed: number, stagiaireIndex: number, questionIndex: number): string {
-  const vaguePool = [
-    "Il faut suivre un protocole spécifique mais les étapes exactes ne sont pas claires pour moi.",
-    "Il y a plusieurs éléments à prendre en compte mais je ne saurais pas les détailler précisément.",
-    "Il faut en parler à un responsable, c'est la première chose à faire.",
-    "Il faut appliquer les règles qu'on a vues mais je ne me souviens plus de l'ordre exact.",
-    "Le principe général est de respecter les consignes de sécurité et d'hygiène.",
-    "Il faut documenter la situation et suivre le protocole en place.",
-    "La procédure demande de vérifier plusieurs points avant d'agir.",
-    "Il faut se référer aux fiches de procédure et appliquer les consignes.",
-  ];
+function generateWrongAnswer(expected: string, seed: number, stagiaireIndex: number, questionIndex: number, isEnglish?: boolean): string {
+  const vaguePool = isEnglish
+    ? [
+        "I think it is something important but I am not sure about the details.",
+        "I don't remember exactly but I think it is related to grammar.",
+        "I know there are rules but I cannot explain them clearly.",
+        "I think it is about vocabulary but I am not confident.",
+        "I believe it has to do with English but I need to study more.",
+        "I am not sure, maybe it is about communication.",
+        "I think the answer is yes but I cannot explain why.",
+        "I remember hearing about this but I forgot the details.",
+      ]
+    : [
+        "Il faut suivre un protocole spécifique mais les étapes exactes ne sont pas claires pour moi.",
+        "Il y a plusieurs éléments à prendre en compte mais je ne saurais pas les détailler précisément.",
+        "Il faut en parler à un responsable, c'est la première chose à faire.",
+        "Il faut appliquer les règles qu'on a vues mais je ne me souviens plus de l'ordre exact.",
+        "Le principe général est de respecter les consignes de sécurité et d'hygiène.",
+        "Il faut documenter la situation et suivre le protocole en place.",
+        "La procédure demande de vérifier plusieurs points avant d'agir.",
+        "Il faut se référer aux fiches de procédure et appliquer les consignes.",
+      ];
   return vaguePool[(seed + stagiaireIndex * 3 + questionIndex * 5) % vaguePool.length];
 }
 
