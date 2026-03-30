@@ -920,6 +920,9 @@ export function generateStagiaireOpenAnswers(
     break;
   }
 
+  // Detect if questions are in English
+  const isEnglish = questions.some(q => /^(how|what|why|where|when|who|which|do |does |can |could |complete|count|put |name |write |ask |describe |translate |introduce)/i.test(q.question));
+
   // Generate final answers with adjusted qualities
   return rawAnswers.map((raw, i) => {
     const quality = adjustedQualities[i];
@@ -930,32 +933,41 @@ export function generateStagiaireOpenAnswers(
     
     switch (quality) {
       case 'full':
-        reponse = generateFullAnswer(expected, stagiaireIndex, raw.qi, stagiaireInfo);
+        reponse = generateFullAnswer(expected, stagiaireIndex, raw.qi, stagiaireInfo, isEnglish);
         score = 1;
         feedback = "Bonne réponse";
         break;
       case 'partial':
-        reponse = generatePartialAnswer(expected, raw.seed, stagiaireIndex, raw.qi, stagiaireInfo);
+        reponse = generatePartialAnswer(expected, raw.seed, stagiaireIndex, raw.qi, stagiaireInfo, isEnglish);
         score = 0.5;
         const partialFeedbacks = ["Réponse partielle", "Réponse incomplète", "Réponse acceptable", "Réponse partiellement correcte"];
         feedback = partialFeedbacks[(raw.seed + stagiaireIndex) % partialFeedbacks.length];
         break;
       case 'wrong':
-        reponse = generateWrongAnswer(expected, raw.seed, stagiaireIndex, raw.qi);
+        reponse = generateWrongAnswer(expected, raw.seed, stagiaireIndex, raw.qi, isEnglish);
         score = 0;
         const wrongFeedbacks = ["Réponse insuffisante", "Réponse incorrecte", "Réponse hors sujet", "Réponse erronée"];
         feedback = wrongFeedbacks[(raw.seed + stagiaireIndex) % wrongFeedbacks.length];
         break;
       case 'empty':
       default:
-        const emptyResponses = [
-          "Je ne sais pas.",
-          "Je ne sais pas exactement.", 
-          "/",
-          "Je n'ai pas assez de connaissances pour répondre.",
-          "Aucune idée.",
-          "Je ne me souviens plus.",
-        ];
+        const emptyResponses = isEnglish
+          ? [
+              "I don't know.",
+              "I am not sure.",
+              "/",
+              "I don't have enough knowledge to answer.",
+              "No idea.",
+              "I don't remember.",
+            ]
+          : [
+              "Je ne sais pas.",
+              "Je ne sais pas exactement.", 
+              "/",
+              "Je n'ai pas assez de connaissances pour répondre.",
+              "Aucune idée.",
+              "Je ne me souviens plus.",
+            ];
         reponse = emptyResponses[(raw.seed + stagiaireIndex * 3 + raw.qi * 7) % emptyResponses.length];
         score = 0;
         feedback = "Pas de réponse";
