@@ -63,9 +63,11 @@ export function buildFullCatalog(
     formations.forEach((f, fi) => {
       if (f.codeRNCP) {
         add(`af_c2i7_fiche_certification_${fi}`, `CT2 - IND 7 FICHE CERTIFICATION RS/RNCP`, 2, 7, "fiche_certification_rs", { fi });
-        add(`af_c2i7_tableau_croise_${fi}`, `CT2 - IND 7 TABLEAU CROISÉ COMPÉTENCES / PROGRAMME`, 2, 7, "tableau_croise_cfa", { fi });
+        add(`af_c2i7_tableau_croise_${fi}`, `CT2 - IND 7 TABLEAU CROISÉ`, 2, 7, "tableau_croise_cfa", { fi });
+        add(`af_c2i7_matrice_competences_${fi}`, `CT2 - IND 7 MATRICE DE COMPÉTENCES (Excel)`, 2, 7, "matrice_competences_excel", { fi });
       }
     });
+    add("af_c2i7_suivi_chiffre", "CT2 - IND 7 SUIVI CHIFFRÉ DE LA FORMATION (Excel)", 2, 7, "suivi_chiffre_formation_excel");
 
     // IND 8 — Positionnement et évaluation des acquis à l'entrée
     // Trames vides (modèles)
