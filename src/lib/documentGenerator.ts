@@ -6284,7 +6284,7 @@ function genDeroulePedagogiqueDetaille(o: OrganismeInfo, f: FormationInfo) {
   const joursMatch = f.duree.match(/(\d+)\s*jours?/i);
   const totalHeures = heuresMatch ? parseInt(heuresMatch[1]) : 14;
   const nbJours = joursMatch ? parseInt(joursMatch[1]) : Math.ceil(totalHeures / 7);
-  const heuresParJour = totalHeures / nbJours;
+  const heuresParJour = Math.round((totalHeures / nbJours) * 100) / 100;
 
   const programmeLines = f.programme ? f.programme.split("\n").map(l => l.trim()).filter(l => l.length > 3) : [];
   const objectifsItems = f.objectifs
