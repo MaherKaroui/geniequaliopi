@@ -730,6 +730,12 @@ export function genExercicesStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
     exerciseDate = formatDate(getStagiaireDateFin(s, f));
   }
 
+  // Detect if formation is English-related
+  const isEnglishFormation = (() => {
+    const lower = f.intitule.toLowerCase();
+    return lower.includes('anglais') || lower.includes('english') || lower.includes('toeic');
+  })();
+
   let extra = isEnglishFormation ? `
     <h2>PRACTICAL EXERCISE${jourLabel} – COURSE ${f.intitule.toUpperCase()}</h2>
     <p><strong>Full name:</strong> ${s.prenom} ${s.nom}</p>
@@ -745,12 +751,6 @@ export function genExercicesStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
   let totalNote = 0;
   let totalMax = 0;
   const notesRecap: { titre: string; note: number; max: number }[] = [];
-
-  // Detect if formation is English-related
-  const isEnglishFormation = (() => {
-    const lower = f.intitule.toLowerCase();
-    return lower.includes('anglais') || lower.includes('english') || lower.includes('toeic');
-  })();
 
   // Build a truly unique profile per stagiaire for realistic note distribution
   const profiles: Array<{ baseNote: number; strengths: string; weakness: string; style: string; strengthsEN: string; weaknessEN: string; styleEN: string }> = [
