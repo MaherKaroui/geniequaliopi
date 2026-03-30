@@ -48,6 +48,14 @@ const YOUTUBE_ANGLAIS: CourseData['youtubeVideos'] = [
   { title: "Anglais des affaires – Business English conversation", url: "https://www.youtube.com/watch?v=oxs5sjCmfMU", description: "Dialogues et mises en situation pour l'anglais des affaires." },
 ];
 
+const YOUTUBE_ANGLAIS_A1: CourseData['youtubeVideos'] = [
+  { title: "Apprendre l'anglais pour les débutants – Niveau A1", url: "https://www.youtube.com/watch?v=juKd26qkNAw", description: "Cours complet d'anglais pour grands débutants : alphabet, vocabulaire de base, grammaire essentielle." },
+  { title: "Les 100 mots les plus utilisés en anglais", url: "https://www.youtube.com/watch?v=GBPwMgHv5jE", description: "Vocabulaire fondamental : les 100 mots anglais indispensables pour communiquer au quotidien." },
+  { title: "Se présenter en anglais – Débutant", url: "https://www.youtube.com/watch?v=oVSqR3k_YlQ", description: "Apprendre à se présenter en anglais : nom, âge, nationalité, métier, loisirs." },
+  { title: "Cours d'anglais – Les verbes TO BE et TO HAVE", url: "https://www.youtube.com/watch?v=5kq8cMhJb9g", description: "Maîtriser les deux verbes les plus importants en anglais : conjugaison, emploi et exercices." },
+  { title: "Anglais débutant – La vie quotidienne", url: "https://www.youtube.com/watch?v=WqDkYMHFvJc", description: "Vocabulaire et phrases pour parler de sa routine quotidienne en anglais." },
+];
+
 const YOUTUBE_MANAGEMENT: CourseData['youtubeVideos'] = [
   { title: "5 choses essentielles pour bien débuter dans vos fonctions de manager", url: "https://www.youtube.com/watch?v=TpPzFt-DTxg", description: "Les premières actions à mettre en place lors de sa prise de poste en tant que manager." },
   { title: "Modèle de Tuckman : les 5 étapes rythmant la vie d'une équipe", url: "https://www.youtube.com/watch?v=nSD4lsDna5w", description: "Comprendre les phases de développement d'une équipe pour mieux la manager." },
