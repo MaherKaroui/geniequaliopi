@@ -1076,16 +1076,27 @@ function generatePartialAnswer(expected: string, seed: number, stagiaireIndex: n
 }
 
 function generateWrongAnswer(expected: string, seed: number, stagiaireIndex: number, questionIndex: number, isEnglish?: boolean): string {
-  const vaguePool = [
-    "Il faut suivre un protocole spécifique mais les étapes exactes ne sont pas claires pour moi.",
-    "Il y a plusieurs éléments à prendre en compte mais je ne saurais pas les détailler précisément.",
-    "Il faut en parler à un responsable, c'est la première chose à faire.",
-    "Il faut appliquer les règles qu'on a vues mais je ne me souviens plus de l'ordre exact.",
-    "Le principe général est de respecter les consignes de sécurité et d'hygiène.",
-    "Il faut documenter la situation et suivre le protocole en place.",
-    "La procédure demande de vérifier plusieurs points avant d'agir.",
-    "Il faut se référer aux fiches de procédure et appliquer les consignes.",
-  ];
+  const vaguePool = isEnglish
+    ? [
+        "I think it is something important but I am not sure about the details.",
+        "I don't remember exactly but I think it is related to grammar.",
+        "I know there are rules but I cannot explain them clearly.",
+        "I think it is about vocabulary but I am not confident.",
+        "I believe it has to do with English but I need to study more.",
+        "I am not sure, maybe it is about communication.",
+        "I think the answer is yes but I cannot explain why.",
+        "I remember hearing about this but I forgot the details.",
+      ]
+    : [
+        "Il faut suivre un protocole spécifique mais les étapes exactes ne sont pas claires pour moi.",
+        "Il y a plusieurs éléments à prendre en compte mais je ne saurais pas les détailler précisément.",
+        "Il faut en parler à un responsable, c'est la première chose à faire.",
+        "Il faut appliquer les règles qu'on a vues mais je ne me souviens plus de l'ordre exact.",
+        "Le principe général est de respecter les consignes de sécurité et d'hygiène.",
+        "Il faut documenter la situation et suivre le protocole en place.",
+        "La procédure demande de vérifier plusieurs points avant d'agir.",
+        "Il faut se référer aux fiches de procédure et appliquer les consignes.",
+      ];
   return vaguePool[(seed + stagiaireIndex * 3 + questionIndex * 5) % vaguePool.length];
 }
 
