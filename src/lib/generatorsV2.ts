@@ -742,65 +742,26 @@ export function genExercicesStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
   let totalMax = 0;
   const notesRecap: { titre: string; note: number; max: number }[] = [];
 
+  // Detect if formation is English-related
+  const isEnglishFormation = (() => {
+    const lower = f.intitule.toLowerCase();
+    return lower.includes('anglais') || lower.includes('english') || lower.includes('toeic');
+  })();
+
   // Build a truly unique profile per stagiaire for realistic note distribution
-  const profiles: Array<{ baseNote: number; strengths: string; weakness: string; style: string }> = [
-    { baseNote: 4.5, strengths: "méthodologie et rigueur", weakness: "gestion du temps", style: "méthodique et structuré(e)" },
-    { baseNote: 5, strengths: "créativité et autonomie", weakness: "aucune difficulté majeure", style: "autonome et proactif/ve" },
-    { baseNote: 4.5, strengths: "motivation et persévérance", weakness: "quelques détails techniques", style: "volontaire et appliqué(e)" },
-    { baseNote: 4, strengths: "travail collaboratif", weakness: "précision technique", style: "appliqué(e) et sérieux/se" },
-    { baseNote: 4.5, strengths: "écoute et réceptivité", weakness: "gestion du temps", style: "attentif/ve et rigoureux/se" },
-    { baseNote: 5, strengths: "analyse et synthèse", weakness: "aucune difficulté", style: "brillant(e) et efficace" },
-    { baseNote: 4, strengths: "sens pratique", weakness: "finition des livrables", style: "pragmatique et efficace" },
-    { baseNote: 4.5, strengths: "organisation du travail", weakness: "relecture finale", style: "organisé(e) et constant(e)" },
-    { baseNote: 5, strengths: "compréhension rapide", weakness: "aucune difficulté majeure", style: "rapide et intuitif/ve" },
-    { baseNote: 4, strengths: "curiosité et questionnement", weakness: "quelques imprécisions mineures", style: "curieux/se et engagé(e)" },
+  const profiles: Array<{ baseNote: number; strengths: string; weakness: string; style: string; strengthsEN: string; weaknessEN: string; styleEN: string }> = [
+    { baseNote: 4.5, strengths: "méthodologie et rigueur", weakness: "gestion du temps", style: "méthodique et structuré(e)", strengthsEN: "methodology and rigour", weaknessEN: "time management", styleEN: "methodical and well-structured" },
+    { baseNote: 5, strengths: "créativité et autonomie", weakness: "aucune difficulté majeure", style: "autonome et proactif/ve", strengthsEN: "creativity and independence", weaknessEN: "no major difficulty", styleEN: "independent and proactive" },
+    { baseNote: 4.5, strengths: "motivation et persévérance", weakness: "quelques détails techniques", style: "volontaire et appliqué(e)", strengthsEN: "motivation and perseverance", weaknessEN: "a few technical details", styleEN: "willing and diligent" },
+    { baseNote: 4, strengths: "travail collaboratif", weakness: "précision technique", style: "appliqué(e) et sérieux/se", strengthsEN: "collaborative work", weaknessEN: "technical precision", styleEN: "diligent and serious" },
+    { baseNote: 4.5, strengths: "écoute et réceptivité", weakness: "gestion du temps", style: "attentif/ve et rigoureux/se", strengthsEN: "listening skills and receptiveness", weaknessEN: "time management", styleEN: "attentive and thorough" },
+    { baseNote: 5, strengths: "analyse et synthèse", weakness: "aucune difficulté", style: "brillant(e) et efficace", strengthsEN: "analysis and synthesis", weaknessEN: "no difficulty", styleEN: "brilliant and efficient" },
+    { baseNote: 4, strengths: "sens pratique", weakness: "finition des livrables", style: "pragmatique et efficace", strengthsEN: "practical sense", weaknessEN: "finishing deliverables", styleEN: "pragmatic and efficient" },
+    { baseNote: 4.5, strengths: "organisation du travail", weakness: "relecture finale", style: "organisé(e) et constant(e)", strengthsEN: "work organisation", weaknessEN: "final proofreading", styleEN: "organised and consistent" },
+    { baseNote: 5, strengths: "compréhension rapide", weakness: "aucune difficulté majeure", style: "rapide et intuitif/ve", strengthsEN: "quick understanding", weaknessEN: "no major difficulty", styleEN: "quick and intuitive" },
+    { baseNote: 4, strengths: "curiosité et questionnement", weakness: "quelques imprécisions mineures", style: "curieux/se et engagé(e)", strengthsEN: "curiosity and questioning", weaknessEN: "minor inaccuracies", styleEN: "curious and engaged" },
   ];
   const profile = profiles[stagiaireIdx % profiles.length];
-
-  // Introductory phrases that a real student would use to start their answer
-  const introsPhrases = [
-    `Pour répondre à cette consigne, je vais procéder de la manière suivante.`,
-    `Voici ma réponse à cet exercice, en m'appuyant sur ce que nous avons vu en formation.`,
-    `Je vais traiter cet exercice en suivant la méthodologie que nous avons apprise.`,
-    `Suite aux enseignements de la formation, voici mon travail sur cet exercice.`,
-    `En m'appuyant sur les acquis de cette formation, je propose le travail suivant.`,
-    `Voici le travail que j'ai réalisé pour cet exercice pratique.`,
-    `Je vais répondre à cette consigne en appliquant les connaissances acquises durant la formation.`,
-    `Après avoir bien lu la consigne, voici ma production pour cet exercice.`,
-    `En me basant sur ce que j'ai appris, voici ma réponse détaillée.`,
-    `Je vais répondre point par point à cette consigne en utilisant les outils vus en formation.`,
-  ];
-
-  // Transition/connector phrases to expand answers
-  const connectors = [
-    `De plus, il est important de souligner que`,
-    `Par ailleurs, je tiens à préciser que`,
-    `En complément, je voudrais ajouter que`,
-    `Il convient également de mentionner que`,
-    `J'ajouterais aussi que`,
-    `Un autre point essentiel est que`,
-    `Sur ce dernier point, je pense que`,
-    `Pour compléter ma réponse, je note que`,
-  ];
-
-  // Conclusion phrases
-  const conclusions = [
-    `En conclusion, je pense que cet exercice m'a permis de mieux comprendre les enjeux pratiques de ce sujet et de consolider mes acquis.`,
-    `Pour résumer, j'ai essayé d'appliquer au mieux la méthodologie apprise et je suis satisfait(e) du résultat obtenu.`,
-    `En définitive, ce travail m'a permis de mettre en pratique les notions vues en formation et de vérifier ma compréhension.`,
-    `Au final, je considère avoir traité les points essentiels de la consigne en m'appuyant sur les enseignements reçus.`,
-    `Je termine en soulignant que cet exercice m'a conforté(e) dans ma compréhension du sujet et m'a donné confiance pour l'appliquer en situation professionnelle.`,
-    `Pour conclure, j'ai pu mettre en application les compétences acquises et je me sens plus à l'aise sur ce type de problématique.`,
-  ];
-
-  // Personal experience additions
-  const experienceAdditions = [
-    `Dans mon expérience professionnelle chez ${s.entreprise}, j'ai déjà été confronté(e) à ce type de situation et je peux confirmer que la méthode proposée est tout à fait adaptée au terrain.`,
-    `Au sein de ${s.entreprise}, nous utilisons une approche similaire, ce qui me conforte dans la pertinence de cette méthodologie.`,
-    `J'ai pu faire le lien avec mon poste de ${s.poste} chez ${s.entreprise}, où ces compétences sont régulièrement mobilisées.`,
-    `Cette formation me sera très utile dans mes fonctions chez ${s.entreprise} car je suis amené(e) à traiter ce type de problématique au quotidien.`,
-    `En tant que ${s.poste}, je vois immédiatement comment appliquer ces acquis dans mon travail chez ${s.entreprise}.`,
-  ];
 
   selectedExercices.forEach((ex, localIdx) => {
     const ei = blockStart + localIdx;
@@ -815,12 +776,12 @@ export function genExercicesStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
 
     if (localIdx > 0) extra += `<br/>`;
     extra += `<h3>${ex.titre}</h3>`;
-    extra += `<p><strong>Consigne :</strong></p><p>${ex.consigne}</p>`;
-    extra += `<p><strong>Travail réalisé par ${s.prenom} ${s.nom} :</strong></p>`;
+    extra += `<p><strong>${isEnglishFormation ? 'Instructions:' : 'Consigne :'}</strong></p><p>${ex.consigne}</p>`;
+    extra += `<p><strong>${isEnglishFormation ? `Work completed by ${s.prenom} ${s.nom}:` : `Travail réalisé par ${s.prenom} ${s.nom} :`}</strong></p>`;
 
     const repBase = ex.reponseAttendue;
     // Transform third-person meta-descriptions into first-person student writing
-    const repFirstPerson = repBase
+    const repFirstPerson = isEnglishFormation ? repBase : repBase
       .replace(/Le stagiaire doit /gi, 'J\'ai ')
       .replace(/Le stagiaire /gi, 'J\'ai ')
       .replace(/L['']apprenant doit /gi, 'J\'ai ')
@@ -841,56 +802,77 @@ export function genExercicesStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
       .replace(/\[Nom[^\]]*\]/gi, `${s.prenom} ${s.nom}`)
       .replace(/Mme Dupont/gi, `Mme ${s.nom}`)
       .replace(/M\. Dupont/gi, `M. ${s.nom}`)
-      .replace(/\[company\]/gi, s.entreprise || 'mon entreprise')
-      .replace(/\[position\]/gi, s.poste || 'mon poste')
-      .replace(/\[tasks?\]/gi, 'la gestion des projets et le suivi des équipes')
-      .replace(/\[date\]/gi, 'le 15 du mois prochain')
+      .replace(/\[company\]/gi, s.entreprise || (isEnglishFormation ? 'my company' : 'mon entreprise'))
+      .replace(/\[position\]/gi, s.poste || (isEnglishFormation ? 'my position' : 'mon poste'))
+      .replace(/\[tasks?\]/gi, isEnglishFormation ? 'project management and team coordination' : 'la gestion des projets et le suivi des équipes')
+      .replace(/\[date\]/gi, isEnglishFormation ? 'the 15th of next month' : 'le 15 du mois prochain')
+      .replace(/\[age\]/gi, `${25 + (stagiaireIdx * 3) % 20}`)
+      .replace(/\[job\]/gi, s.poste || (isEnglishFormation ? 'professional' : 'professionnel'))
+      .replace(/\[city\]/gi, isEnglishFormation ? 'Paris' : 'Paris')
+      .replace(/\[hobby\]/gi, isEnglishFormation ? 'reading and cooking' : 'la lecture et la cuisine')
+      .replace(/\[time\]/gi, isEnglishFormation ? 'seven o\'clock' : '7 heures')
+      .replace(/\[number\]/gi, `${1 + stagiaireIdx % 3}`)
       .replace(/\[.*?\]/g, '');
-    const repSentences = repClean.split(/(?<=[.!])\s+/).filter(s => s.trim());
-    const seed = ((hash * 17 + stagiaireIdx * 11 + ei * 23) & 0x7FFFFFFF) % 6;
-    const introIdx = (hash + stagiaireIdx * 3 + ei * 7) % introsPhrases.length;
-    const connIdx = (hash + stagiaireIdx * 5 + ei * 11) % connectors.length;
-    const concIdx = (hash + stagiaireIdx * 7 + ei * 13) % conclusions.length;
-    const expIdx = (hash + stagiaireIdx * 9 + ei * 17) % experienceAdditions.length;
 
-    if (noteRound >= 4.5) {
-      // Excellent: long, complete, detailed answer
-      extra += `<p>${introsPhrases[introIdx]}</p>`;
-      extra += `<p>${repClean}</p>`;
-      extra += `<p>${connectors[connIdx]} dans ce contexte, il faut aussi prendre en compte les spécificités du public concerné et adapter notre approche en conséquence. `;
-      extra += `La rigueur dans l'application de cette méthode est essentielle pour garantir des résultats de qualité. `;
-      extra += `Il est aussi nécessaire de documenter chaque étape afin de pouvoir justifier nos choix et assurer la traçabilité de notre démarche.</p>`;
-      extra += `<p>${experienceAdditions[expIdx]}</p>`;
-      extra += `<p>${conclusions[concIdx]}</p>`;
+    // Output the student response as a single flowing block — no extra filler paragraphs
+    extra += `<p>${repClean}</p>`;
 
-    } else if (noteRound >= 3.5) {
-      // Good: covers most of the answer but misses some points
-      const coveredPart = repSentences.slice(0, Math.max(2, Math.ceil(repSentences.length * 0.75))).join(' ');
-      extra += `<p>${introsPhrases[introIdx]}</p>`;
-      extra += `<p>${coveredPart}</p>`;
-      extra += `<p>${connectors[connIdx]} c'est un sujet que j'ai trouvé intéressant et que j'aimerais approfondir davantage. `;
-      extra += `Je n'ai pas eu le temps de détailler tous les aspects mais je pense avoir couvert les points principaux. `;
-      extra += `Il me reste à consolider certains aspects plus techniques que nous avons vus en fin de session.</p>`;
-      extra += `<p>${conclusions[(concIdx + 1) % conclusions.length]}</p>`;
-
-    } else if (noteRound >= 2.5) {
-      // Partial: only basics, some confusion
-      const basicPart = repSentences.slice(0, Math.max(1, Math.ceil(repSentences.length * 0.4))).join(' ');
-      extra += `<p>${introsPhrases[(introIdx + 2) % introsPhrases.length]}</p>`;
-      extra += `<p>${basicPart}</p>`;
-      extra += `<p>Je pense que c'est à peu près ça mais je ne suis pas totalement sûr(e) de tous les détails. `;
-      extra += `J'ai eu du mal avec certaines parties de l'exercice, notamment sur les aspects plus techniques. `;
-      extra += `Je comprends le principe général mais l'application concrète me pose encore quelques difficultés. `;
-      extra += `J'aurais besoin de revoir mes notes et de m'entraîner davantage sur ce type d'exercice pour être plus à l'aise.</p>`;
-
+    // Formateur correction
+    const corrSeed = ((hash * 19 + stagiaireIdx * 13 + ei * 29) & 0x7FFFFFFF) % 6;
+    extra += `<h4>${isEnglishFormation ? 'Trainer correction and feedback:' : 'Correction et commentaire du formateur :'}</h4>`;
+    
+    if (isEnglishFormation) {
+      // English formateur corrections
+      if (noteRound >= 4.5) {
+        const corrs = [
+          `<p><strong>Strengths:</strong> ${s.prenom} ${s.nom} has fully met the requirements of this exercise. The work is complete, well-structured and shows an excellent command of the A1 vocabulary and grammar covered in the course. The sentences are correct, natural and demonstrate real progress. ${s.prenom} shows ${profile.strengthsEN} throughout.</p><p><strong>Areas for improvement:</strong> No major issues. ${s.prenom} could further expand vocabulary to prepare for A2 level.</p><p><strong>Skill assessed:</strong> Fully acquired – Level: Mastery.</p>`,
+          `<p><strong>Strengths:</strong> Excellent work by ${s.prenom}. The exercise demonstrates a genuine understanding of the language structures taught. The writing is clear, coherent and goes beyond the minimum requirements. ${s.prenom} has shown a ${profile.styleEN} approach that serves them well.</p><p><strong>Areas for improvement:</strong> Nothing significant. ${s.prenom} is ready to progress to the next level.</p><p><strong>Skill assessed:</strong> Acquired with excellence – Level: Expert.</p>`,
+          `<p><strong>Strengths:</strong> ${s.prenom} ${s.nom} has produced outstanding work. Every sentence is grammatically correct and the vocabulary is well chosen. The response shows confidence and fluency appropriate for A1 level. ${s.prenom} is one of the top performers in the group.</p><p><strong>Areas for improvement:</strong> Continue developing ${profile.strengthsEN}. No weaknesses identified in this exercise.</p><p><strong>Skill assessed:</strong> Acquired – Full validation.</p>`,
+          `<p><strong>Strengths:</strong> Exemplary work from ${s.prenom}. The instructions were followed perfectly and the content is relevant and well-organised. ${s.prenom} demonstrates natural English expression for a beginner level.</p><p><strong>Areas for improvement:</strong> ${s.prenom} could share their methodology with the group. No areas of concern.</p><p><strong>Skill assessed:</strong> Fully acquired.</p>`,
+          `<p><strong>Strengths:</strong> ${s.prenom} ${s.nom} has shown excellent comprehension and great autonomy. The work is impeccable in both content and form. Their ${profile.styleEN} profile allows them to handle this type of exercise with ease.</p><p><strong>Areas for improvement:</strong> No critical areas. ${s.prenom} is encouraged to explore more advanced vocabulary.</p><p><strong>Skill assessed:</strong> Acquired – Congratulations.</p>`,
+          `<p><strong>Strengths:</strong> ${s.prenom} completed this exercise brilliantly. All steps are correctly identified and executed. The result shows deep understanding and a real ability to use English in practical situations at work at ${s.entreprise}.</p><p><strong>Areas for improvement:</strong> Nothing to report. ${s.prenom} is among the best in the group.</p><p><strong>Skill assessed:</strong> Acquired with distinction.</p>`,
+        ];
+        extra += corrs[corrSeed];
+      } else {
+        const corrs = [
+          `<p><strong>Strengths:</strong> ${s.prenom} ${s.nom} understood the exercise objective and addressed the key points correctly. Their ${profile.styleEN} approach is reflected in the quality of work. The fundamentals are well mastered.</p><p><strong>Areas to improve:</strong> Some inaccuracies in ${profile.weaknessEN}. ${s.prenom} should review the course materials on this topic. Additional practice recommended.</p><p><strong>Skill assessed:</strong> Being acquired – Level: Satisfactory.</p>`,
+          `<p><strong>Strengths:</strong> Good overall work from ${s.prenom}. The main steps were correctly carried out. ${s.prenom} has demonstrated ${profile.strengthsEN} effectively.</p><p><strong>Areas to improve:</strong> Finishing touches need attention. Some technical details were overlooked (${profile.weaknessEN}). I recommend redoing the exercise independently to consolidate learning.</p><p><strong>Skill assessed:</strong> On track for acquisition.</p>`,
+          `<p><strong>Strengths:</strong> ${s.prenom} ${s.nom} did solid work. Understanding of the topic is demonstrated and instructions are generally followed. ${s.prenom} shows good aptitude for ${profile.strengthsEN}.</p><p><strong>Areas to improve:</strong> Minor errors in ${profile.weaknessEN} were noted. With a little more practice, ${s.prenom} will reach mastery level.</p><p><strong>Skill assessed:</strong> Partially acquired – Progressing.</p>`,
+          `<p><strong>Strengths:</strong> ${s.prenom}'s work is generally satisfactory. The approach is logical and the main points are covered. ${s.prenom} has shown ${profile.strengthsEN} throughout the exercise.</p><p><strong>Areas to improve:</strong> The section concerning ${profile.weaknessEN} was not handled optimally. Targeted support on this point would help ${s.prenom} progress quickly.</p><p><strong>Skill assessed:</strong> Being acquired – Good momentum.</p>`,
+          `<p><strong>Strengths:</strong> ${s.prenom} produced correct work showing good understanding. The approach is ${profile.styleEN} and the effort is commendable. The main points of the instructions are addressed.</p><p><strong>Areas to improve:</strong> ${profile.weaknessEN} remains an area of focus for ${s.prenom}. Additional reinforcement exercises have been provided.</p><p><strong>Skill assessed:</strong> Partially acquired – Progress expected.</p>`,
+          `<p><strong>Strengths:</strong> ${s.prenom} ${s.nom} made a commendable effort and the result is encouraging. The basics are there and ${profile.strengthsEN} is an asset for the rest of the course.</p><p><strong>Areas to improve:</strong> Some approximations in ${profile.weaknessEN}. ${s.prenom} would benefit from additional practice.</p><p><strong>Skill assessed:</strong> Being acquired – Encouragement.</p>`,
+        ];
+        extra += corrs[corrSeed];
+      }
     } else {
-      // Major difficulties: minimal answer
-      const minimalPart = repSentences[0] || repClean.split('.')[0] + '.';
-      extra += `<p>J'ai essayé de répondre à la consigne mais c'est un sujet que je ne maîtrise pas encore bien.</p>`;
-      extra += `<p>${minimalPart}</p>`;
-      extra += `<p>Honnêtement, je n'ai pas réussi à aller plus loin. Je n'ai pas bien compris comment appliquer ce qu'on a vu en cours à cet exercice. `;
-      extra += `J'ai besoin de revoir les bases et de m'exercer plus. Je vais relire mes notes et demander des explications supplémentaires au formateur. `;
-      extra += `Je suis motivé(e) pour progresser mais cet exercice était trop difficile pour mon niveau actuel.</p>`;
+      // French formateur corrections (original)
+      if (noteRound >= 4.5) {
+        const corrs = [
+          `<p><strong>Points forts :</strong> ${s.prenom} ${s.nom} a parfaitement respecté la consigne et la méthodologie attendue. Le travail est complet, bien structuré et directement exploitable en contexte professionnel. J'apprécie particulièrement ${profile.strengths} dont ${s.prenom} a fait preuve tout au long de l'exercice.</p><p><strong>Axes d'amélioration :</strong> Aucun point bloquant. ${s.prenom} pourrait simplement approfondir certains aspects avancés pour aller encore plus loin. L'ensemble est excellent.</p><p><strong>Compétence évaluée :</strong> Pleinement acquise – Niveau : Maîtrise.</p>`,
+          `<p><strong>Points forts :</strong> Excellent travail, ${s.prenom} démontre une réelle appropriation des compétences visées. La démarche est ${profile.style} et le résultat dépasse les attendus. ${s.prenom} a su enrichir l'exercice d'apports personnels pertinents issus de son expérience chez ${s.entreprise}.</p><p><strong>Axes d'amélioration :</strong> RAS – Le niveau est au-dessus des objectifs de la formation. ${s.prenom} est pleinement opérationnel(le).</p><p><strong>Compétence évaluée :</strong> Acquise avec excellence – Niveau : Expert.</p>`,
+          `<p><strong>Points forts :</strong> ${s.prenom} ${s.nom} a fait preuve d'une maîtrise remarquable. Le travail est rigoureux, chaque étape est documentée et justifiée. La qualité du rendu est professionnelle. ${s.prenom} montre une capacité d'analyse et de synthèse supérieure à la moyenne du groupe.</p><p><strong>Axes d'amélioration :</strong> Continuer à développer ${profile.strengths} qui est un véritable atout. Aucune lacune identifiée sur cet exercice.</p><p><strong>Compétence évaluée :</strong> Acquise – Validation sans réserve.</p>`,
+          `<p><strong>Points forts :</strong> Travail exemplaire de ${s.prenom}. L'approche est ${profile.style}, les consignes sont parfaitement respectées. Le livrable est soigné et complet. ${s.prenom} a même anticipé des problèmes potentiels dans sa réponse, ce qui démontre une maturité professionnelle appréciable.</p><p><strong>Axes d'amélioration :</strong> ${s.prenom} pourrait partager sa méthodologie avec le groupe pour tirer l'ensemble vers le haut. Aucun point de faiblesse identifié.</p><p><strong>Compétence évaluée :</strong> Pleinement acquise.</p>`,
+          `<p><strong>Points forts :</strong> ${s.prenom} ${s.nom} a démontré une excellente compréhension et une grande autonomie. Le travail est irréprochable sur le fond et la forme. Son profil ${profile.style} lui permet de traiter ce type d'exercice avec aisance et efficacité.</p><p><strong>Axes d'amélioration :</strong> Aucun axe critique. ${s.prenom} est encouragé(e) à explorer des cas d'usage plus avancés pour continuer sa progression.</p><p><strong>Compétence évaluée :</strong> Acquise – Félicitations.</p>`,
+          `<p><strong>Points forts :</strong> ${s.prenom} a réalisé cet exercice avec brio. Toutes les étapes sont correctement identifiées et exécutées. Le résultat témoigne d'une compréhension approfondie du sujet et d'une capacité réelle à transférer les acquis en situation de travail chez ${s.entreprise}.</p><p><strong>Axes d'amélioration :</strong> Rien à signaler. ${s.prenom} fait partie des meilleur(e)s du groupe sur cet exercice.</p><p><strong>Compétence évaluée :</strong> Acquise avec distinction.</p>`,
+        ];
+        extra += corrs[corrSeed];
+      } else if (noteRound >= 3.5) {
+        const corrs = [
+          `<p><strong>Points forts :</strong> ${s.prenom} ${s.nom} a bien compris l'objectif de l'exercice et a traité les points essentiels correctement. Son profil ${profile.style} se reflète dans la qualité du travail rendu. La démarche globale est cohérente et les fondamentaux sont maîtrisés.</p><p><strong>Points à améliorer :</strong> J'ai constaté quelques imprécisions sur ${profile.weakness}. ${s.prenom} devrait consacrer du temps à retravailler ce point spécifique. La relecture du support de cours pages 12-15 est recommandée.</p><p><strong>Compétence évaluée :</strong> En cours d'acquisition – Niveau : Satisfaisant.</p>`,
+          `<p><strong>Points forts :</strong> Bon travail d'ensemble de ${s.prenom}. Les étapes principales sont correctement menées. ${s.prenom} a su mobiliser ${profile.strengths} pour avancer de manière efficace. Le résultat est conforme à l'essentiel des attendus.</p><p><strong>Points à améliorer :</strong> La finition du travail mérite attention. Quelques détails techniques ont été négligés (${profile.weakness}). Je recommande de refaire l'exercice en autonomie pour consolider les acquis.</p><p><strong>Compétence évaluée :</strong> En bonne voie d'acquisition.</p>`,
+          `<p><strong>Points forts :</strong> ${s.prenom} ${s.nom} a fait un travail solide. La compréhension du sujet est démontrée et les consignes sont globalement respectées. ${s.prenom} montre de bonnes dispositions pour ${profile.strengths}.</p><p><strong>Points à améliorer :</strong> Des erreurs mineures sur ${profile.weakness} ont été relevées. Avec un peu plus de pratique et d'attention aux détails, ${s.prenom} atteindra le niveau de maîtrise. Exercice complémentaire n°${ei + 7} recommandé.</p><p><strong>Compétence évaluée :</strong> Partiellement acquise – En progression.</p>`,
+          `<p><strong>Points forts :</strong> Le travail de ${s.prenom} est globalement satisfaisant. La démarche est logique et les principaux points sont traités. ${s.prenom} a fait preuve de ${profile.strengths} tout au long de l'exercice.</p><p><strong>Points à améliorer :</strong> La partie concernant ${profile.weakness} n'a pas été traitée de manière optimale. Un accompagnement ciblé sur ce point permettrait à ${s.prenom} de progresser rapidement. Rendez-vous en fin de journée pour un point individuel.</p><p><strong>Compétence évaluée :</strong> En acquisition – Bonne dynamique.</p>`,
+          `<p><strong>Points forts :</strong> ${s.prenom} a produit un travail correct qui montre une bonne compréhension des enjeux. L'approche est ${profile.style} et le sérieux est au rendez-vous. Les points principaux de la consigne sont traités.</p><p><strong>Points à améliorer :</strong> ${profile.weakness} reste un point de vigilance pour ${s.prenom}. Je lui transmets des exercices de renforcement supplémentaires. Le prochain exercice devrait montrer une amélioration sur ce point.</p><p><strong>Compétence évaluée :</strong> Partiellement acquise – Progrès attendus.</p>`,
+          `<p><strong>Points forts :</strong> ${s.prenom} ${s.nom} a fourni un effort louable et le résultat est encourageant. Les bases sont là et ${profile.strengths} est un atout pour la suite du parcours. Le cœur de l'exercice est bien traité.</p><p><strong>Points à améliorer :</strong> Quelques approximations sur ${profile.weakness}. ${s.prenom} bénéficierait d'une session de travail supplémentaire sur les points techniques. Fiches ressources n°${ei + 3} et n°${ei + 5} transmises.</p><p><strong>Compétence évaluée :</strong> En cours d'acquisition – Encouragements.</p>`,
+        ];
+        extra += corrs[corrSeed];
+      } else {
+        const corrs = [
+          `<p><strong>Points forts :</strong> ${s.prenom} ${s.nom} a fait preuve de motivation malgré les difficultés rencontrées.</p><p><strong>Points à travailler :</strong> Des lacunes importantes sur ${profile.weakness}. Accompagnement individuel programmé.</p><p><strong>Compétence évaluée :</strong> Non acquise – Nécessite un renforcement.</p>`,
+          `<p><strong>Points forts :</strong> ${s.prenom} montre de la bonne volonté et a su identifier les grandes étapes.</p><p><strong>Points à travailler :</strong> Le passage à l'action reste difficile. ${profile.weakness} est le principal frein. Plan de progression personnalisé établi.</p><p><strong>Compétence évaluée :</strong> En cours d'acquisition – Plan de remédiation prévu.</p>`,
+        ];
+        extra += corrs[corrSeed % corrs.length];
+      }
     }
 
     // Formateur correction — unique, referencing the specific work
