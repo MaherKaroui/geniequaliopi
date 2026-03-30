@@ -533,6 +533,32 @@ const QUESTIONS_OUVERTES: Record<string, QuestionsOuvertesFormation> = {
       { question: "Qu'avez-vous appris pendant cette formation ?", reponseAttendue: "J'ai appris à utiliser les formules avancées (RECHERCHEV, SI imbriqués), créer des TCD, faire de la mise en forme conditionnelle et automatiser des tâches." },
     ],
   },
+  "Anglais A1": {
+    debut: [
+      { question: "How do you say 'bonjour' in English?", reponseAttendue: "Hello / Good morning / Good afternoon." },
+      { question: "What is your name? Answer in a complete sentence.", reponseAttendue: "My name is [Name]." },
+      { question: "How do you spell your last name in English? (Spell each letter)", reponseAttendue: "The student spells their last name using the English alphabet (e.g., D-U-P-O-N-T)." },
+      { question: "What are the days of the week in English?", reponseAttendue: "Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday." },
+      { question: "Count from 1 to 10 in English.", reponseAttendue: "One, two, three, four, five, six, seven, eight, nine, ten." },
+      { question: "What colour is the sky?", reponseAttendue: "The sky is blue." },
+      { question: "How do you say 'merci beaucoup' in English?", reponseAttendue: "Thank you very much." },
+      { question: "Complete: 'I ___ a student.' (am/is/are)", reponseAttendue: "I am a student." },
+      { question: "What time is it? (Show a clock at 3:00)", reponseAttendue: "It is three o'clock." },
+      { question: "Why do you want to learn English?", reponseAttendue: "Open answer – expected: for work, travel, communication, personal development, etc." },
+    ],
+    fin: [
+      { question: "Introduce yourself in English (name, age, job, city).", reponseAttendue: "My name is [Name]. I am [age] years old. I am a [job]. I live in [city]." },
+      { question: "Describe your typical day using at least 5 sentences.", reponseAttendue: "I wake up at 7 o'clock. I have breakfast. I go to work by bus. I work from 9 to 5. I have dinner with my family. I go to bed at 10 o'clock." },
+      { question: "Ask 3 questions to a new colleague in English.", reponseAttendue: "What is your name? Where are you from? What is your job? / How long have you been working here?" },
+      { question: "Write a short email to say you cannot come to work tomorrow.", reponseAttendue: "Dear [Name], I am writing to inform you that I cannot come to work tomorrow because I am sick. I am sorry for the inconvenience. Best regards, [Name]." },
+      { question: "What is the difference between 'this' and 'that'?", reponseAttendue: "'This' is for something close to you. 'That' is for something far from you. Example: This is my pen (here). That is your pen (there)." },
+      { question: "Put these words in the correct order: 'like / I / very much / English'", reponseAttendue: "I like English very much." },
+      { question: "Translate into English: 'Je travaille dans un bureau. J'aime mon travail.'", reponseAttendue: "I work in an office. I like my job." },
+      { question: "Describe the weather today in English.", reponseAttendue: "Today it is sunny/cloudy/rainy. It is warm/cold. The temperature is about [X] degrees." },
+      { question: "What did you learn during this English A1 training? (Answer in English)", reponseAttendue: "I learned the alphabet, numbers, colours, days of the week, how to introduce myself, basic grammar (to be, to have), vocabulary for daily life and work, and how to write simple emails." },
+      { question: "Name 5 things you can see in an office.", reponseAttendue: "A desk, a chair, a computer, a phone, a printer / a pen / a book / a lamp." },
+    ],
+  },
   "Anglais Professionnel": {
     debut: [
       { question: "How do you introduce yourself in a professional context?", reponseAttendue: "Good morning, my name is [Name], I am [position] at [company]. I am responsible for [tasks]." },
