@@ -926,16 +926,27 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
 
           return (
             <div key={critere.numero} className="bg-card border rounded-xl overflow-hidden shadow-card">
-              <button
-                onClick={() => toggleCritere(critere.numero)}
-                className="w-full p-3 flex items-center gap-3 hover:bg-secondary/50 transition-colors text-left"
-              >
-                {isExpanded ? <ChevronDown className="w-4 h-4 text-primary shrink-0" /> : <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />}
-                <span className="text-sm font-semibold">Critère {critere.numero} – {critere.titre}</span>
-                <span className="text-xs text-muted-foreground ml-2">
-                  ({critereDocs.length} docs, {critereGenerated} générés)
-                </span>
-              </button>
+              <div className="flex items-center">
+                <button
+                  onClick={() => toggleCritere(critere.numero)}
+                  className="flex-1 p-3 flex items-center gap-3 hover:bg-secondary/50 transition-colors text-left"
+                >
+                  {isExpanded ? <ChevronDown className="w-4 h-4 text-primary shrink-0" /> : <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />}
+                  <span className="text-sm font-semibold">Critère {critere.numero} – {critere.titre}</span>
+                  <span className="text-xs text-muted-foreground ml-2">
+                    ({critereDocs.length} docs, {critereGenerated} générés)
+                  </span>
+                </button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="mr-2 text-xs gap-1 shrink-0"
+                  disabled={generating}
+                  onClick={(e) => { e.stopPropagation(); handleDownloadCritere(critere.numero); }}
+                >
+                  <Archive className="w-3 h-3" /> ZIP
+                </Button>
+              </div>
 
               {isExpanded && (
                 <div className="border-t px-3 pb-3 space-y-1">
