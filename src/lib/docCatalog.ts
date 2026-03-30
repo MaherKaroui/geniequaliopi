@@ -162,7 +162,7 @@ export function buildFullCatalog(
           // Un fichier exercice par bloc de compétences
           rncp!.blocsCompetences.forEach((bloc, blocIdx) => {
             const blocLabel = bloc.titre.length > 50 ? bloc.titre.substring(0, 50) + '…' : bloc.titre;
-            add(`af_c3i11_exercices_${fi}_${si}_ex${blocIdx}`, `CT3 - IND 11 ÉVALUATION FINALE – Exercices & Jeux (${blocLabel}) – ${s.prenom} ${s.nom}`, 3, 11, "exercices_stagiaire", { fi, stagiaireIdx: si, exerciceIdx: blocIdx });
+            add(`af_c3i11_exercices_${fi}_${si}_ex${blocIdx}`, `CT3 - IND 11 EXERCICES PRATIQUES (${blocLabel}) – ${s.prenom} ${s.nom}`, 3, 11, "exercices_stagiaire", { fi, stagiaireIdx: si, exerciceIdx: blocIdx });
           });
         } else {
           // Fallback: un fichier exercice par tranche de 2 jours
