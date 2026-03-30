@@ -18,6 +18,12 @@ type PageParts = {
   content: HTMLDivElement;
 };
 
+type PdfExportOptions = {
+  scale?: number;
+  imageQuality?: number;
+  pageYieldMs?: number;
+};
+
 function extractCssAndBody(htmlContent: string): { cssText: string; bodyContent: string } {
   const styleMatches = htmlContent.match(/<style[^>]*>([\s\S]*?)<\/style>/gi) || [];
   const bodyMatch = htmlContent.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
@@ -150,7 +156,12 @@ function getRenderableNodes(source: HTMLDivElement): ChildNode[] {
   });
 }
 
-export async function htmlToPdfBlob(htmlContent: string): Promise<Blob> {
+export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptions = {}): Promise<Blob> {
+  const {
+    scale = 2,
+    imageQuality = 0.95,
+    pageYieldMs = 0,
+  } = options;
   const { cssText, bodyContent } = extractCssAndBody(htmlContent);
   await ensureGoogleFontsLoaded(htmlContent);
 
@@ -263,7 +274,7 @@ export async function htmlToPdfBlob(htmlContent: string): Promise<Blob> {
       if (i > 0) pdf.addPage();
 
       const canvas = await html2canvas(pages[i], {
-        scale: 2,
+        scale,
         useCORS: true,
         logging: false,
         backgroundColor: "#ffffff",
@@ -273,7 +284,7 @@ export async function htmlToPdfBlob(htmlContent: string): Promise<Blob> {
         windowHeight: A4_HEIGHT_PX,
       });
 
-      const imgData = canvas.toDataURL("image/jpeg", 0.95);
+      const imgData = canvas.toDataURL("image/jpeg", imageQuality);
       pdf.addImage(imgData, "JPEG", 0, 0, A4_WIDTH_MM, A4_HEIGHT_MM);
 
       // Add clickable link annotations over the rasterized image
@@ -291,6 +302,10 @@ export async function htmlToPdfBlob(htmlContent: string): Promise<Blob> {
           pdf.link(x, y, w, h, { url: href });
         }
       });
+
+      if (pageYieldMs > 0 && i < pages.length - 1) {
+        await new Promise((resolve) => setTimeout(resolve, pageYieldMs));
+      }
     }
 
     return pdf.output("blob");
