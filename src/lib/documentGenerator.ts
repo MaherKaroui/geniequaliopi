@@ -6334,7 +6334,7 @@ function genDeroulePedagogiqueDetaille(o: OrganismeInfo, f: FormationInfo) {
   }
 
   let extraHtml = `<p style="margin-bottom:15px"><strong>Formation :</strong> ${f.intitule}<br>
-    <strong>Durée :</strong> ${totalHeures} heures — ${nbJours} jour${nbJours > 1 ? "s" : ""} (${heuresParJour}h/jour)<br>
+    <strong>Durée :</strong> ${totalHeures} heures — ${nbJours} jour${nbJours > 1 ? "s" : ""} (7h/jour)<br>
     <strong>Formateur :</strong> ${f.formateur || o.dirigeant}</p>`;
 
   for (let di = 0; di < nbJours; di++) {
