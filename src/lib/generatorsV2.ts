@@ -730,7 +730,11 @@ export function genExercicesStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
     exerciseDate = formatDate(getStagiaireDateFin(s, f));
   }
 
-  let extra = `
+  let extra = isEnglishFormation ? `
+    <h2>PRACTICAL EXERCISE${jourLabel} – COURSE ${f.intitule.toUpperCase()}</h2>
+    <p><strong>Full name:</strong> ${s.prenom} ${s.nom}</p>
+    <p><strong>Date:</strong> ${exerciseDate}</p>
+  ` : `
     <h2>EXERCICE PRATIQUE${jourLabel} – FORMATION ${f.intitule.toUpperCase()}</h2>
     <p><strong>Nom et prénom :</strong> ${s.prenom} ${s.nom}</p>
     <p><strong>Date :</strong> ${exerciseDate}</p>
