@@ -539,6 +539,8 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "titre_rncp_cfa": return genTitreRNCPCFA(o, f);
     case "matiere_titre_cfa": return genMatiereTitreCFA(o, f);
     case "tableau_croise_cfa": return genTableauCroiseCFA(o, f);
+    case "matrice_competences_excel": return genMatriceCompetencesExcel(o, f);
+    case "suivi_chiffre_formation_excel": return genSuiviChiffreFormationExcel(o, f, stagiaires);
     case "fiche_certification_rs": return genFicheCertificationRS(o, f);
     case "procedure_presentation_certification": return genProcedurePresentationCertification(o, f);
     case "convocation_certification": return genConvocationCertification(o, f, stagiaires, params?.stagiaireIdx ?? 0);
@@ -2892,33 +2894,282 @@ function genMatiereTitreCFA(o: OrganismeInfo, f: FormationInfo) {
 function genTableauCroiseCFA(o: OrganismeInfo, f: FormationInfo) {
   const rncp = getRNCPByCode(f.codeRNCP || "");
   if (!rncp) {
-    return buildDocument({ org: o, title: "TABLEAU CROISÉ COMPÉTENCES / PROGRAMME", subtitle: f.intitule, sections: [
+    return buildDocument({ org: o, title: "TABLEAU CROISÉ", subtitle: f.intitule, sections: [
       { heading: "Information", content: `<p>Pour générer le tableau croisé, sélectionnez un code RNCP dans le formulaire de formation.</p>` },
     ] });
   }
-  const sections: any[] = [
-    { heading: "Objet", content: `<p>Ce tableau croisé met en correspondance les compétences du référentiel de certification <strong>${rncp.intitule}</strong> (${rncp.code}) avec les modules de formation dispensés par le CFA <strong>${o.nom}</strong>.</p>` },
-  ];
-  let totalComp = 0;
-  rncp.blocsCompetences.forEach((b, i) => {
-    totalComp += b.competences.length;
-    const rows = b.competences.map((c, ci) => {
-      const mat = b.matieres[ci];
-      return [`C${i + 1}.${ci + 1} – ${c}`, mat ? mat.contenu.split(",")[0].trim() : c, mat ? "Mise en situation + évaluation" : "Évaluation continue"];
+
+  // Format matching the example: CCP | Compétences attestées | Activités visées (AT du REAC) | Modalités d'évaluation (RE) | Correspondances | Référentiel
+  let tableRows = '';
+  rncp.blocsCompetences.forEach((bloc, bi) => {
+    const competencesList = bloc.competences.map(c => `• ${c}`).join('<br>');
+    tableRows += `<tr>
+      <td style="vertical-align:top;font-weight:bold">CCP${bi + 1} – ${bloc.titre}</td>
+      <td style="vertical-align:top">${competencesList}</td>
+      <td style="vertical-align:top">AT${bi + 1} – ${bloc.titre}</td>
+      <td style="vertical-align:top">• ${bloc.modalitesEval.replace(/\./g, '<br>• ').replace(/• $/, '')}</td>
+      <td style="vertical-align:top">Correspondances possibles avec :<br>• Titres ou blocs orientés ${bloc.titre.toLowerCase()} (le cas échéant)</td>
+      <td style="vertical-align:top">REAC – ${rncp.code}</td>
+    </tr>`;
+  });
+
+  const tableHtml = `<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse;width:100%;font-size:12px">
+    <thead><tr style="background:#1e3a7b;color:#fff">
+      <th style="width:18%">Bloc de compétences (CCP)</th>
+      <th style="width:22%">Compétences attestées</th>
+      <th style="width:18%">Activités visées (Activités Types du REAC)</th>
+      <th style="width:18%">Modalités d'évaluation (RE)</th>
+      <th style="width:14%">Liens avec certifications antérieures / Correspondances</th>
+      <th style="width:10%">Référentiel</th>
+    </tr></thead>
+    <tbody>${tableRows}</tbody>
+  </table>`;
+
+  return buildDocument({ org: o, title: "TABLEAU CROISÉ", subtitle: rncp.intitule, sections: [
+    { heading: "", content: tableHtml },
+  ] });
+}
+
+// ============== CT2 IND 7 — MATRICE COMPÉTENCES EXCEL ==============
+
+function genMatriceCompetencesExcel(o: OrganismeInfo, f: FormationInfo) {
+  const rncp = getRNCPByCode(f.codeRNCP || '');
+  const { totalHours } = parseDuree(f.duree);
+  const effectiveTotal = totalHours > 0 ? totalHours : 420;
+
+  const tr = (cells: string[], isHeader = false) => {
+    const tag = isHeader ? 'th' : 'td';
+    return `<tr>${cells.map(c => `<${tag}>${c}</${tag}>`).join('')}</tr>`;
+  };
+
+  const sheets: { name: string; html: string }[] = [];
+
+  if (rncp && rncp.blocsCompetences.length > 0) {
+    const accompHours = Math.round(effectiveTotal * 0.15);
+    const blocHoursTotal = effectiveTotal - accompHours;
+    const rncpTotalVolume = rncp.blocsCompetences.reduce((sum, bloc) =>
+      sum + bloc.matieres.reduce((s, m) => s + (parseInt(m.volume) || 0), 0), 0);
+    const scale = rncpTotalVolume > 0 ? blocHoursTotal / rncpTotalVolume : 1;
+
+    // Sheet 1: Vue d'ensemble
+    let sheet1 = tr(["CCP / Bloc", "Compétence", "Module de formation", "Volume horaire", "Modalités d'évaluation", "Niveau attendu", "Couverture"], true);
+    rncp.blocsCompetences.forEach((bloc, bi) => {
+      bloc.matieres.forEach((mat, mi) => {
+        const vol = Math.round((parseInt(mat.volume) || 0) * scale);
+        sheet1 += tr([
+          mi === 0 ? `CCP${bi + 1} – ${bloc.titre}` : "",
+          mat.competence,
+          mat.contenu.split(',')[0]?.trim() || mat.competence,
+          `${vol}h`,
+          mi === 0 ? bloc.modalitesEval : "Évaluation continue",
+          "Maîtrise opérationnelle",
+          "✓ 100%"
+        ]);
+      });
     });
-    sections.push({ heading: `Tableau croisé – Bloc ${i + 1} : ${b.titre}`, content: tableHTML(["Compétence du référentiel", "Module(s) de formation", "Évaluation"], rows) });
+    sheet1 += tr(["", "", "Accompagnement + Examens blancs", `${accompHours}h`, "Examens blancs + jury", "", "✓"]);
+    sheet1 += tr(["TOTAL", "", "", `${effectiveTotal}h`, "", "", "100%"], true);
+    sheets.push({ name: "Matrice compétences", html: `<table>${sheet1}</table>` });
+
+    // Sheet 2: Détail par bloc
+    rncp.blocsCompetences.forEach((bloc, bi) => {
+      let sheetHtml = tr(["Compétence", "Savoirs associés", "Savoir-faire", "Critères d'évaluation", "Moyens pédagogiques", "Indicateurs de réussite", "Volume", "Statut"], true);
+      bloc.matieres.forEach(mat => {
+        const vol = Math.round((parseInt(mat.volume) || 0) * scale);
+        const contenuItems = mat.contenu.split(',').map(s => s.trim()).filter(Boolean);
+        sheetHtml += tr([
+          mat.competence,
+          contenuItems.map(c => `• ${c}`).join('\n'),
+          `• Mettre en œuvre ${mat.competence.toLowerCase()}\n• Appliquer en situation professionnelle\n• Évaluer et ajuster sa pratique`,
+          `• ${bloc.modalitesEval.split('.').filter(Boolean).slice(0, 2).join('\n• ')}`,
+          "• Cours magistraux\n• Travaux pratiques\n• Études de cas\n• Mises en situation",
+          "• Compétence validée lors de l'évaluation\n• Application en entreprise vérifiée\n• Dossier professionnel complété",
+          `${vol}h`,
+          "À évaluer"
+        ]);
+      });
+      const sheetName = `CCP${bi + 1} ${bloc.titre}`.substring(0, 31).replace(/[\/\\?*\[\]]/g, '');
+      sheets.push({ name: sheetName, html: `<table>${sheetHtml}</table>` });
+    });
+
+    // Sheet 3: Suivi acquisition par stagiaire (vide pour saisie)
+    let sheetSuivi = tr(["Apprenti", ...rncp.blocsCompetences.flatMap((b, bi) => b.competences.map((c, ci) => `C${bi + 1}.${ci + 1}`)), "% Global", "Observations"], true);
+    // 10 empty rows for manual entry
+    for (let i = 0; i < 10; i++) {
+      sheetSuivi += tr(["", ...rncp.blocsCompetences.flatMap(b => b.competences.map(() => "")), "", ""]);
+    }
+    sheetSuivi += tr(["Légende", ...rncp.blocsCompetences.flatMap(b => b.competences.map(() => "")), "", "NA = Non Acquis / EA = En cours / A = Acquis / M = Maîtrisé"], true);
+    sheets.push({ name: "Suivi acquisition", html: `<table>${sheetSuivi}</table>` });
+
+  } else {
+    // Generic: course chapters based
+    const chapters = getCourseChapters(f.intitule);
+    const nbBlocs = Math.min(chapters.length, 6);
+    const perBloc = Math.round((effectiveTotal * 0.85) / Math.max(1, nbBlocs));
+
+    let sheet1 = tr(["Module", "Compétences visées", "Volume horaire", "Modalités d'évaluation", "Niveau attendu", "Couverture"], true);
+    chapters.slice(0, nbBlocs).forEach((ch, ci) => {
+      const competences = ch.sections.slice(0, 4).map(s => `• ${s.title}`).join('\n');
+      sheet1 += tr([`Module ${ci + 1} – ${ch.title}`, competences, `${perBloc}h`, "QCM + exercices pratiques + mise en situation", "Maîtrise opérationnelle", "✓ 100%"]);
+    });
+    sheet1 += tr(["Accompagnement", "", `${Math.round(effectiveTotal * 0.15)}h`, "Examens blancs", "", "✓"]);
+    sheet1 += tr(["TOTAL", "", `${effectiveTotal}h`, "", "", "100%"], true);
+    sheets.push({ name: "Matrice compétences", html: `<table>${sheet1}</table>` });
+  }
+
+  // Build multi-sheet Excel HTML
+  const sheetXML = sheets.map(s => `<x:ExcelWorksheet><x:Name>${s.name}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet>`).join("");
+  return `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+<head><meta charset="utf-8">
+<!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets>${sheetXML}</x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->
+<style>
+table { border-collapse: collapse; font-family: Calibri, Arial, sans-serif; font-size: 11pt; }
+th { background-color: #1e3a7b; color: white; padding: 8px 12px; text-align: left; font-weight: bold; border: 1px solid #1e3a7b; }
+td { padding: 6px 10px; border: 1px solid #ccc; vertical-align: top; white-space: pre-wrap; }
+tr:nth-child(even) { background-color: #f5f7fa; }
+</style></head><body>
+${sheets.map((s, i) => `<div id="sheet${i}" style="${i > 0 ? 'page-break-before:always' : ''}">${s.html}</div>`).join('')}
+</body></html>`;
+}
+
+// ============== CT2 IND 7 — SUIVI CHIFFRÉ FORMATION EXCEL ==============
+
+function genSuiviChiffreFormationExcel(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
+  const rncp = getRNCPByCode(f.codeRNCP || '');
+  const { totalHours } = parseDuree(f.duree);
+  const effectiveTotal = totalHours > 0 ? totalHours : 420;
+  const isCFA = !!(f.rythmeAlternance && f.rythmeAlternance.trim().length > 0);
+  const totalCFAWeeks = Math.max(1, Math.ceil(effectiveTotal / 35));
+
+  const tr = (cells: string[], isHeader = false) => {
+    const tag = isHeader ? 'th' : 'td';
+    return `<tr>${cells.map(c => `<${tag}>${c}</${tag}>`).join('')}</tr>`;
+  };
+
+  const sheets: { name: string; html: string }[] = [];
+  const fmtD = (d: Date) => d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  const now = new Date();
+  const startDate = f.dateDebut ? new Date(f.dateDebut.split('/').reverse().join('-')) : now;
+  if (isNaN(startDate.getTime())) startDate.setTime(now.getTime());
+  const endDate = f.dateFin ? new Date(f.dateFin.split('/').reverse().join('-')) : new Date(startDate.getTime() + 365 * 86400000);
+  if (isNaN(endDate.getTime())) endDate.setTime(startDate.getTime() + 365 * 86400000);
+
+  // Sheet 1: Indicateurs globaux
+  let sheet1 = tr(["Indicateur", "Valeur", "Objectif", "Écart", "Observations"], true);
+  sheet1 += tr(["Formation", f.intitule, "", "", ""]);
+  sheet1 += tr(["Code certification", f.codeRNCP || "Non certifiante", "", "", ""]);
+  sheet1 += tr(["Période", `${fmtD(startDate)} – ${fmtD(endDate)}`, "", "", ""]);
+  sheet1 += tr(["Volume horaire total", `${effectiveTotal}h`, `${effectiveTotal}h`, "0", ""]);
+  if (isCFA) {
+    sheet1 += tr(["Rythme alternance", f.rythmeAlternance || "", "", "", ""]);
+    sheet1 += tr(["Semaines CFA", `${totalCFAWeeks}`, "", "", ""]);
+  }
+  sheet1 += tr(["Nombre d'inscrits", `${stagiaires.length}`, "", "", ""]);
+  sheet1 += tr(["Nombre de présents", `${stagiaires.length}`, `${stagiaires.length}`, "0", ""]);
+  sheet1 += tr(["Taux de présence", "100%", "≥ 90%", "", "À compléter"]);
+  sheet1 += tr(["Taux d'abandon", "0%", "< 5%", "", "À compléter"]);
+  sheet1 += tr(["Taux de satisfaction global", "", "≥ 80%", "", "À compléter"]);
+  if (rncp) {
+    sheet1 += tr(["Taux de réussite certification", "", "≥ 70%", "", "À compléter"]);
+    sheet1 += tr(["Taux de présentation à l'examen", "", "≥ 90%", "", "À compléter"]);
+    sheet1 += tr(["Taux d'insertion professionnelle", "", "≥ 60%", "", "À compléter à 6 mois"]);
+  }
+  if (isCFA) {
+    sheet1 += tr(["Taux de rupture de contrat", "", "< 10%", "", "À compléter"]);
+    sheet1 += tr(["Nombre de visites entreprise", "", `≥ ${stagiaires.length * 2}`, "", "À compléter"]);
+  }
+  sheets.push({ name: "Indicateurs globaux", html: `<table>${sheet1}</table>` });
+
+  // Sheet 2: Suivi par stagiaire
+  const stagHeaders = ["N°", "Nom", "Prénom"];
+  if (isCFA) stagHeaders.push("Entreprise");
+  stagHeaders.push("Date début", "Date fin", "Heures prévues", "Heures réalisées", "Taux présence", "Absences (h)");
+  if (rncp) stagHeaders.push("Résultat certification");
+  stagHeaders.push("Satisfaction", "Observations");
+
+  let sheet2 = tr(stagHeaders, true);
+  stagiaires.forEach((s, si) => {
+    const cells: string[] = [`${si + 1}`, s.nom, s.prenom];
+    if (isCFA) cells.push(s.entreprise || "");
+    cells.push(
+      s.dateDebutFormation || f.dateDebut || "",
+      s.dateFinFormation || f.dateFin || "",
+      `${effectiveTotal}h`,
+      "", // heures réalisées to fill
+      "", // taux presence to fill
+      ""  // absences to fill
+    );
+    if (rncp) cells.push(""); // résultat certification
+    cells.push("", ""); // satisfaction, observations
+    sheet2 += tr(cells);
   });
-  sections.push({
-    heading: "Couverture du référentiel",
-    content: `<p>L'ensemble des compétences du référentiel de certification est couvert par le programme de formation.</p>
-    ${tableHTML(["Indicateur", "Résultat"], [
-      ["Compétences couvertes", `${totalComp} / ${totalComp} (100%)`],
-      ["Volume horaire total", f.duree || rncp.dureeIndicative],
-      ["Nombre d'évaluations", `${totalComp} évaluations minimum`],
-    ])}`,
-    variant: "green",
-  });
-  return buildDocument({ org: o, title: "TABLEAU CROISÉ COMPÉTENCES / PROGRAMME", subtitle: rncp.intitule, sections });
+  // Add 5 empty rows for future additions
+  for (let i = 0; i < 5; i++) {
+    const emptyCells = stagHeaders.map(() => "");
+    sheet2 += tr(emptyCells);
+  }
+  sheets.push({ name: "Suivi par stagiaire", html: `<table>${sheet2}</table>` });
+
+  // Sheet 3: Suivi par module/bloc
+  if (rncp && rncp.blocsCompetences.length > 0) {
+    const accompHours = Math.round(effectiveTotal * 0.15);
+    const blocHoursTotal = effectiveTotal - accompHours;
+    const rncpTotalVolume = rncp.blocsCompetences.reduce((sum, b) =>
+      sum + b.matieres.reduce((s, m) => s + (parseInt(m.volume) || 0), 0), 0);
+    const scale = rncpTotalVolume > 0 ? blocHoursTotal / rncpTotalVolume : 1;
+
+    let sheet3 = tr(["Bloc / Module", "Heures prévues", "Heures réalisées", "Écart", "Taux réalisation", "Nb évaluations prévues", "Nb évaluations réalisées", "Note moyenne", "Observations"], true);
+    rncp.blocsCompetences.forEach((bloc, bi) => {
+      const blocVol = Math.round(bloc.matieres.reduce((s, m) => s + (parseInt(m.volume) || 0), 0) * scale);
+      sheet3 += tr([`Bloc ${bi + 1} – ${bloc.titre}`, `${blocVol}h`, "", "", "", `${bloc.matieres.length}`, "", "", ""], false);
+      bloc.matieres.forEach(mat => {
+        const vol = Math.round((parseInt(mat.volume) || 0) * scale);
+        sheet3 += tr([`  └ ${mat.competence}`, `${vol}h`, "", "", "", "1", "", "", ""]);
+      });
+    });
+    sheet3 += tr(["Accompagnement + Examens", `${accompHours}h`, "", "", "", "", "", "", ""]);
+    sheet3 += tr(["TOTAL", `${effectiveTotal}h`, "", "", "", "", "", "", ""], true);
+    sheets.push({ name: "Suivi par module", html: `<table>${sheet3}</table>` });
+  } else {
+    const chapters = getCourseChapters(f.intitule);
+    const nbBlocs = Math.min(chapters.length, 6);
+    const perBloc = Math.round((effectiveTotal * 0.85) / Math.max(1, nbBlocs));
+
+    let sheet3 = tr(["Module", "Heures prévues", "Heures réalisées", "Écart", "Taux réalisation", "Note moyenne", "Observations"], true);
+    chapters.slice(0, nbBlocs).forEach((ch, ci) => {
+      sheet3 += tr([`Module ${ci + 1} – ${ch.title}`, `${perBloc}h`, "", "", "", "", ""]);
+    });
+    sheet3 += tr(["Accompagnement", `${Math.round(effectiveTotal * 0.15)}h`, "", "", "", "", ""]);
+    sheet3 += tr(["TOTAL", `${effectiveTotal}h`, "", "", "", "", ""], true);
+    sheets.push({ name: "Suivi par module", html: `<table>${sheet3}</table>` });
+  }
+
+  // Sheet 4: Suivi mensuel (CFA) ou hebdomadaire
+  if (isCFA) {
+    const moisFR = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+    let sheet4 = tr(["Mois", "Semaines CFA", "Heures CFA", "Semaines entreprise", "Nb stagiaires présents", "Absences (h)", "Taux présence", "Événements / Observations"], true);
+    for (let m = 0; m < 12; m++) {
+      const moisDate = new Date(startDate);
+      moisDate.setMonth(moisDate.getMonth() + m);
+      sheet4 += tr([`${moisFR[moisDate.getMonth()]} ${moisDate.getFullYear()}`, "", "", "", "", "", "", ""]);
+    }
+    sheet4 += tr(["TOTAL ANNUEL", "", "", "", "", "", "", ""], true);
+    sheets.push({ name: "Suivi mensuel", html: `<table>${sheet4}</table>` });
+  }
+
+  // Build multi-sheet Excel HTML
+  const sheetXML = sheets.map(s => `<x:ExcelWorksheet><x:Name>${s.name}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet>`).join("");
+  return `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+<head><meta charset="utf-8">
+<!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets>${sheetXML}</x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->
+<style>
+table { border-collapse: collapse; font-family: Calibri, Arial, sans-serif; font-size: 11pt; }
+th { background-color: #1e3a7b; color: white; padding: 8px 12px; text-align: left; font-weight: bold; border: 1px solid #1e3a7b; }
+td { padding: 6px 10px; border: 1px solid #ccc; vertical-align: top; white-space: pre-wrap; }
+tr:nth-child(even) { background-color: #f5f7fa; }
+</style></head><body>
+${sheets.map((s, i) => `<div id="sheet${i}" style="${i > 0 ? 'page-break-before:always' : ''}">${s.html}</div>`).join('')}
+</body></html>`;
 }
 
 // ============== CT2 IND 7 & CT3 IND 16 — CERTIFICATION RS/RNCP ==============

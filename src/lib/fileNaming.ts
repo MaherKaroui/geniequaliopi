@@ -27,6 +27,8 @@ const EXCEL_TEMPLATES = new Set([
   "indicateurs_performance",
   "vae_indicateurs_previsionnels",
   "decoupage_formation_cfa_excel",
+  "matrice_competences_excel",
+  "suivi_chiffre_formation_excel",
 ]);
 
 function stripDiacritics(value: string): string {
