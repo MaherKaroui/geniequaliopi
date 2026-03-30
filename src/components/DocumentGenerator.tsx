@@ -731,7 +731,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
           const resp = await fetch(`/docs/${doc.params.pdfFile}`);
           zip.file(`${basePath}/${buildCatalogFileName(doc)}`, await resp.blob());
           await updateProgress();
-        } else if (["indicateurs_performance", "tableau_suivi_parcours_excel", "plan_dev_competences_excel", "tableau_amelioration_continue_excel", "suivi_dysfonctionnements_excel", "relances_appreciations_excel", "vae_indicateurs_previsionnels"].includes(doc.template)) {
+        } else if (["indicateurs_performance", "tableau_suivi_parcours_excel", "plan_dev_competences_excel", "tableau_amelioration_continue_excel", "suivi_dysfonctionnements_excel", "relances_appreciations_excel", "vae_indicateurs_previsionnels", "decoupage_formation_cfa_excel"].includes(doc.template)) {
           const excelContent = doc.template === "indicateurs_performance"
             ? generateExcelTableauBordPerformance(mergedOrganisme, selectedFormation, allStagiaires)
             : doc.template === "tableau_suivi_parcours_excel"
