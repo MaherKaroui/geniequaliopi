@@ -8433,13 +8433,25 @@ function genCalendrierAnnuelCFA(o: OrganismeInfo, f: FormationInfo) {
   if (isNaN(startDate.getTime())) startDate.setTime(Date.now());
   const fmtD = (d: Date) => d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
+  const moisFR = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+
+  const rncp = getRNCPByCode(f.codeRNCP || '');
+  const chapters = rncp ? rncp.blocsCompetences : [];
+  const accompHours = Math.round(effectiveTotal * 0.15);
+  const blocHoursTotal = effectiveTotal - accompHours;
+  const scale = chapters.length > 0 ? blocHoursTotal / chapters.reduce((s, b) => s + b.matieres.reduce((ss, m) => ss + (parseInt(m.volume) || 0), 0), 0) || 1 : 1;
+  const modules = chapters.length > 0
+    ? chapters.map((bloc, i) => ({ titre: `Bloc ${i + 1} – ${bloc.titre}`, volume: Math.round(bloc.matieres.reduce((s, m) => s + (parseInt(m.volume) || 0), 0) * scale) }))
+    : getCourseChapters(f.intitule).slice(0, 5).map((ch, i) => ({ titre: ch.title, volume: Math.round(blocHoursTotal / Math.min(getCourseChapters(f.intitule).length, 5)) }));
+  modules.push({ titre: 'Accompagnement + Examens', volume: accompHours });
+
   // Build full-year calendar (52 weeks from start date)
   let calendarRows = '';
   let cfaWeekNum = 0;
   let moduleIdx = 0;
   let remainingInModule = modules[0]?.volume || 0;
   const totalWeeksInYear = 52;
-  let posInCycle = 0; // position within current alternance cycle
+  let posInCycle = 0;
 
   // French school holidays approximation (week numbers to skip)
   const getWeekOfYear = (d: Date) => {
