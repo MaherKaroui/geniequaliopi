@@ -874,14 +874,15 @@ export function genExercicesStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
         extra += corrs[corrSeed % corrs.length];
       }
     }
+    extra += `<p><strong>${isEnglishFormation ? 'Mark awarded:' : 'Note attribuée :'} ${noteRound} / ${noteMax}</strong></p>`;
 
   });
 
   // Recap table
-  extra += `<h3>RÉCAPITULATIF DES NOTES</h3>`;
+  extra += `<h3>${isEnglishFormation ? 'MARKS SUMMARY' : 'RÉCAPITULATIF DES NOTES'}</h3>`;
   const recapRows = notesRecap.map(n => [n.titre, `${n.note} / ${n.max}`]);
-  extra += tableHTML(["Exercice", "Note"], recapRows);
-  extra += `<p><strong>NOTE FINALE : ${totalNote} / ${totalMax}</strong></p>`;
+  extra += tableHTML([isEnglishFormation ? "Exercise" : "Exercice", isEnglishFormation ? "Mark" : "Note"], recapRows);
+  extra += `<p><strong>${isEnglishFormation ? 'FINAL MARK:' : 'NOTE FINALE :'} ${totalNote} / ${totalMax}</strong></p>`;
 
   // Global appreciation — truly unique per stagiaire
   const avgPct = totalNote / totalMax * 100;
