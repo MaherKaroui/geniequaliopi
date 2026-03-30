@@ -383,14 +383,16 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
     setGenerating(true);
     setGenerationProgressText("");
     try {
+      const generatedIds = new Set(generated);
       const totalFiles = 1 + catalog.reduce((count, doc) => {
         const isPerStagiaire = PER_STAGIAIRE_TEMPLATES.has(doc.template);
         const hasStagiaireIdx = doc.params?.stagiaireIdx !== undefined;
         return count + (isPerStagiaire && !hasStagiaireIdx ? allStagiaires.length : 1);
       }, 0);
 
-      const maxFilesPerZip = exportFormat === "pdf" ? 40 : 140;
+      const maxFilesPerZip = exportFormat === "pdf" ? 24 : 140;
       const splitZip = totalFiles > maxFilesPerZip;
+      const bulkPdfOptions = { scale: 1.35, imageQuality: 0.84, pageYieldMs: 8 };
       let zip = new JSZip();
       let zipPart = 1;
       let filesInCurrentZip = 0;
@@ -436,7 +438,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
       if (exportFormat === "pdf") {
         await addFileToZip(
           `QUALIOPI/${buildGenericFileName("BOOK_QUALIOPI", mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, ".pdf")}`,
-          await htmlToPdfBlob(bookContent),
+          await htmlToPdfBlob(bookContent, bulkPdfOptions),
         );
       } else {
         const bookBlob = await toWordBlob(bookContent);
@@ -483,7 +485,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
           } else {
             const content = generateContent(doc);
             if (exportFormat === "pdf") {
-              await addFileToZip(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, ".pdf")}`, await htmlToPdfBlob(content));
+              await addFileToZip(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, ".pdf")}`, await htmlToPdfBlob(content, bulkPdfOptions));
             } else {
               const wordBlob = await toWordBlob(content);
               await addFileToZip(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, wordBlob.extension)}`, wordBlob.blob);
@@ -496,7 +498,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
             const stagFolder = `${basePath}/${stagiaire.nom}_${stagiaire.prenom}`.substring(0, 80);
             const content = generateContent(doc, si);
             if (exportFormat === "pdf") {
-              await addFileToZip(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, ".pdf")}`, await htmlToPdfBlob(content));
+              await addFileToZip(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, ".pdf")}`, await htmlToPdfBlob(content, bulkPdfOptions));
             } else {
               const wordBlob = await toWordBlob(content);
               await addFileToZip(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, wordBlob.extension)}`, wordBlob.blob);
@@ -529,17 +531,18 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
         } else {
           const content = generateContent(doc);
           if (exportFormat === "pdf") {
-            await addFileToZip(`${basePath}/${buildCatalogFileName(doc, null, ".pdf")}`, await htmlToPdfBlob(content));
+            await addFileToZip(`${basePath}/${buildCatalogFileName(doc, null, ".pdf")}`, await htmlToPdfBlob(content, bulkPdfOptions));
           } else {
             const wordBlob = await toWordBlob(content);
             await addFileToZip(`${basePath}/${buildCatalogFileName(doc, null, wordBlob.extension)}`, wordBlob.blob);
           }
           await updateProgress();
         }
-        setGenerated((prev) => new Set(prev).add(doc.id));
+        generatedIds.add(doc.id);
       }
 
       await flushZip(true);
+      setGenerated(generatedIds);
       toast.success(
         splitZip
           ? `${generatedZipCount} ZIP générés automatiquement pour éviter le blocage navigateur.`
