@@ -28,7 +28,7 @@ function veilleYear(f: FormationInfo, monthsBefore: number): string {
 }
 
 // ===== Detection helpers =====
-type FormationType = "fle" | "ia" | "word" | "commercial" | "webmarketing" | "crm";
+type FormationType = "fle" | "ia" | "word" | "commercial" | "webmarketing" | "crm" | "anglais";
 
 function detectFormationType(f: FormationInfo): FormationType {
   const title = (f.intitule || "").toLowerCase();
@@ -36,6 +36,7 @@ function detectFormationType(f: FormationInfo): FormationType {
   if (title.includes("intelligence artificielle") || title.includes("ia générative") || title.includes("ia ") || title.includes("contenus rédactionnels") || title.includes("chatgpt") || title.includes("prompt")) return "ia";
   if (title.includes("crm") || title.includes("automation") || title.includes("automatisation")) return "crm";
   if (title.includes("webmarketing") || title.includes("marketing de contenus") || title.includes("réseaux sociaux") || title.includes("marketing digital")) return "webmarketing";
+  if (title.includes("anglais") || title.includes("english") || title.includes("toeic")) return "anglais";
   if (title.includes("commercial") || title.includes("conseiller") || title.includes("négociat") || title.includes("vente") || title.includes("relation client") || title.includes("prospection")) return "commercial";
   return "word";
 }

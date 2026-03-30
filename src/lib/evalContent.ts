@@ -329,6 +329,7 @@ const DEFAULT_CONTENT: FormationEvalContent = {
 function getContentKey(intitule: string): string {
   const lower = intitule.toLowerCase();
   if (lower.includes("excel")) return "Excel Professionnel";
+  if ((lower.includes("anglais") || lower.includes("english")) && (lower.includes("a1") || lower.includes("débutant"))) return "Anglais A1";
   if (lower.includes("anglais")) return "Anglais Professionnel";
   if (lower.includes("informatique") || lower.includes("admin") || lower.includes("réseau") || lower.includes("système")) return "Informatique";
   if (lower.includes("management") || lower.includes("leadership")) return "Management";

@@ -206,6 +206,7 @@ function getExcelChapters(): CourseChapter[] {
 
 import { getWordChapters } from "./courseContentWord";
 import { getAnglaisChapters } from "./courseContentAnglais";
+import { getAnglaisA1Chapters } from "./courseContentAnglaisA1";
 import { getManagementChapters } from "./courseContentManagement";
 import { getGenericChapters } from "./courseContentGeneric";
 import { getFLEChapters } from "./courseContentFLE";
@@ -213,12 +214,13 @@ import { getIAChapters } from "./courseContentIA";
 import { getWebmarketingChapters } from "./courseContentWebmarketing";
 import { getCRMChapters } from "./courseContentCRM";
 
-export { getWordChapters, getAnglaisChapters, getManagementChapters, getGenericChapters, getFLEChapters, getIAChapters, getWebmarketingChapters, getCRMChapters };
+export { getWordChapters, getAnglaisChapters, getAnglaisA1Chapters, getManagementChapters, getGenericChapters, getFLEChapters, getIAChapters, getWebmarketingChapters, getCRMChapters };
 
 export function getCourseChapters(formationIntitule: string): CourseChapter[] {
   const t = formationIntitule.toLowerCase();
   if (t.includes('excel')) return getExcelChapters();
   if (t.includes('word')) return getWordChapters();
+  if ((t.includes('anglais') || t.includes('english')) && (t.includes('a1') || t.includes('débutant') || t.includes('niveau a1'))) return getAnglaisA1Chapters();
   if (t.includes('anglais') || t.includes('english')) return getAnglaisChapters();
   if (t.includes('management') || t.includes('manager')) return getManagementChapters();
   if (t.includes('français') || t.includes('médico-social') || t.includes('social')) return getFLEChapters();
