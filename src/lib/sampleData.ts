@@ -398,6 +398,8 @@ export const EVAL_SCORES: number[][] = [
   [10, 8, 9, 9, 10], // Camille Durand
   [9, 10, 9, 10, 9], // Thomas Mercier
   [10, 9, 10, 9, 10], // Julie Lambert
+  [8, 9, 8, 10, 9],  // Karim Petit
+  [9, 10, 9, 8, 10],  // Leïla Haddad
 ];
 
 // Connection times for distanciel - 7h/jour (default)
