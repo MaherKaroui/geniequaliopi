@@ -127,7 +127,8 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
     const isPerStagiaire = PER_STAGIAIRE_TEMPLATES.has(doc.template);
     if (isPerStagiaire && stagiaireIdx !== undefined) {
       const singleStagiaire = [allStagiaires[stagiaireIdx]];
-      return generateDocumentById(doc.id, doc.template, doc.params, organisme, formation, singleStagiaire);
+      const overriddenParams = { ...doc.params, stagiaireIdx: 0 };
+      return generateDocumentById(doc.id, doc.template, overriddenParams, organisme, formation, singleStagiaire);
     }
     return generateDocumentById(doc.id, doc.template, doc.params, organisme, formation, stagiaires);
   }, [organisme, formation, stagiaires, allStagiaires, editedContents]);
