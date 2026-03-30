@@ -398,9 +398,8 @@ export function genConventionFormationTripartite(o: OrganismeInfo, f: FormationI
     + '<div style="flex:1;border:1px solid #ccc;border-radius:6px;padding:15px;text-align:center">'
     + '<p style="font-weight:bold;margin-bottom:8px">Pour l\'Organisme de formation</p>'
     + '<p>' + o.nom + '</p><p>Nom : ' + o.dirigeant + '</p>'
-    + '<p style="font-style:italic;font-size:11px">(Lu et approuvé)</p><p>Signature :</p>'
-    + (o.signatureUrl ? '<img src="' + o.signatureUrl + '" alt="Signature" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />' : '')
-    + (o.tamponUrl ? '<img src="' + o.tamponUrl + '" alt="Tampon" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px;opacity:0.85" />' : '')
+    + '<p style="font-style:italic;font-size:11px">(Lu et approuvé)</p><p>Cachet :</p>'
+    + (o.tamponUrl ? '<img src="' + o.tamponUrl + '" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />' : '')
     + '</div>'
     + '<div style="flex:1;border:1px solid #ccc;border-radius:6px;padding:15px;text-align:center">'
     + '<p style="font-weight:bold;margin-bottom:8px">Pour l\'Entreprise</p>'
