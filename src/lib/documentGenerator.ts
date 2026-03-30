@@ -2892,33 +2892,40 @@ function genMatiereTitreCFA(o: OrganismeInfo, f: FormationInfo) {
 function genTableauCroiseCFA(o: OrganismeInfo, f: FormationInfo) {
   const rncp = getRNCPByCode(f.codeRNCP || "");
   if (!rncp) {
-    return buildDocument({ org: o, title: "TABLEAU CROISÉ COMPÉTENCES / PROGRAMME", subtitle: f.intitule, sections: [
+    return buildDocument({ org: o, title: "TABLEAU CROISÉ", subtitle: f.intitule, sections: [
       { heading: "Information", content: `<p>Pour générer le tableau croisé, sélectionnez un code RNCP dans le formulaire de formation.</p>` },
     ] });
   }
-  const sections: any[] = [
-    { heading: "Objet", content: `<p>Ce tableau croisé met en correspondance les compétences du référentiel de certification <strong>${rncp.intitule}</strong> (${rncp.code}) avec les modules de formation dispensés par le CFA <strong>${o.nom}</strong>.</p>` },
-  ];
-  let totalComp = 0;
-  rncp.blocsCompetences.forEach((b, i) => {
-    totalComp += b.competences.length;
-    const rows = b.competences.map((c, ci) => {
-      const mat = b.matieres[ci];
-      return [`C${i + 1}.${ci + 1} – ${c}`, mat ? mat.contenu.split(",")[0].trim() : c, mat ? "Mise en situation + évaluation" : "Évaluation continue"];
-    });
-    sections.push({ heading: `Tableau croisé – Bloc ${i + 1} : ${b.titre}`, content: tableHTML(["Compétence du référentiel", "Module(s) de formation", "Évaluation"], rows) });
+
+  // Format matching the example: CCP | Compétences attestées | Activités visées (AT du REAC) | Modalités d'évaluation (RE) | Correspondances | Référentiel
+  let tableRows = '';
+  rncp.blocsCompetences.forEach((bloc, bi) => {
+    const competencesList = bloc.competences.map(c => `• ${c}`).join('<br>');
+    tableRows += `<tr>
+      <td style="vertical-align:top;font-weight:bold">CCP${bi + 1} – ${bloc.titre}</td>
+      <td style="vertical-align:top">${competencesList}</td>
+      <td style="vertical-align:top">AT${bi + 1} – ${bloc.titre}</td>
+      <td style="vertical-align:top">• ${bloc.modalitesEval.replace(/\./g, '<br>• ').replace(/• $/, '')}</td>
+      <td style="vertical-align:top">Correspondances possibles avec :<br>• Titres ou blocs orientés ${bloc.titre.toLowerCase()} (le cas échéant)</td>
+      <td style="vertical-align:top">REAC – ${rncp.code}</td>
+    </tr>`;
   });
-  sections.push({
-    heading: "Couverture du référentiel",
-    content: `<p>L'ensemble des compétences du référentiel de certification est couvert par le programme de formation.</p>
-    ${tableHTML(["Indicateur", "Résultat"], [
-      ["Compétences couvertes", `${totalComp} / ${totalComp} (100%)`],
-      ["Volume horaire total", f.duree || rncp.dureeIndicative],
-      ["Nombre d'évaluations", `${totalComp} évaluations minimum`],
-    ])}`,
-    variant: "green",
-  });
-  return buildDocument({ org: o, title: "TABLEAU CROISÉ COMPÉTENCES / PROGRAMME", subtitle: rncp.intitule, sections });
+
+  const tableHtml = `<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse;width:100%;font-size:12px">
+    <thead><tr style="background:#1e3a7b;color:#fff">
+      <th style="width:18%">Bloc de compétences (CCP)</th>
+      <th style="width:22%">Compétences attestées</th>
+      <th style="width:18%">Activités visées (Activités Types du REAC)</th>
+      <th style="width:18%">Modalités d'évaluation (RE)</th>
+      <th style="width:14%">Liens avec certifications antérieures / Correspondances</th>
+      <th style="width:10%">Référentiel</th>
+    </tr></thead>
+    <tbody>${tableRows}</tbody>
+  </table>`;
+
+  return buildDocument({ org: o, title: "TABLEAU CROISÉ", subtitle: rncp.intitule, sections: [
+    { heading: "", content: tableHtml },
+  ] });
 }
 
 // ============== CT2 IND 7 & CT3 IND 16 — CERTIFICATION RS/RNCP ==============
