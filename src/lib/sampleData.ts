@@ -33,6 +33,8 @@ export const SAMPLE_STAGIAIRES: StagiaireInfo[] = [
   { civilite: "Mme", nom: "Durand", prenom: "Camille", email: "camille.durand@eduservices.fr", telephone: "06 89 01 23 45", entreprise: "EduServices", poste: "Formatrice junior", dateNaissance: "1993-06-14" },
   { civilite: "M.", nom: "Mercier", prenom: "Thomas", email: "thomas.mercier@financegroup.fr", telephone: "06 90 12 34 56", entreprise: "Finance Group", poste: "Analyste financier", dateNaissance: "1989-08-19" },
   { civilite: "Mme", nom: "Lambert", prenom: "Julie", email: "julie.lambert@artisanat.fr", telephone: "06 01 23 45 67", entreprise: "Artisanat & Co", poste: "Gérante", dateNaissance: "1994-02-28" },
+  { civilite: "M.", nom: "Petit", prenom: "Karim", email: "karim.petit@translog.fr", telephone: "06 11 22 33 44", entreprise: "TransLog Express", poste: "Agent logistique", dateNaissance: "1996-04-10" },
+  { civilite: "Mme", nom: "Haddad", prenom: "Leïla", email: "leila.haddad@beautyspa.fr", telephone: "06 55 66 77 88", entreprise: "Beauty Spa Paris", poste: "Esthéticienne", dateNaissance: "1991-11-02" },
 ];
 
 export interface FormateurInfo {
