@@ -819,7 +819,7 @@ export function genExercicesStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
 
     // Formateur correction
     const corrSeed = ((hash * 19 + stagiaireIdx * 13 + ei * 29) & 0x7FFFFFFF) % 6;
-    extra += `<h4>${isEnglishFormation ? 'Trainer correction and feedback:' : 'Correction et commentaire du formateur :'}</h4>`;
+    extra += `<h4>Correction et commentaire du formateur :</h4>`;
     
     if (isEnglishFormation) {
       // English formateur corrections
