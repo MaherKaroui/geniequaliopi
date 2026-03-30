@@ -364,6 +364,11 @@ export function buildFullCatalog(
       add("cfa_c2i5_reac_ntc", "CT2 - IND 5 RÉFÉRENTIEL REAC – NÉGOCIATEUR TECHNICO-COMMERCIAL", 2, 5, "pdf_static", { pdfFile: "referentiel_reac_ntc.pdf" });
     }
 
+    // IND 6 — Contenus et modalités adaptés (CFA)
+    add("cfa_c2i6_support_cours", "CT2 - IND 6 SUPPORT DE COURS CFA", 2, 6, "support_cours_cfa");
+    add("cfa_c2i6_calendrier_annuel", "CT2 - IND 6 CALENDRIER ANNUEL CFA", 2, 6, "calendrier_annuel_cfa");
+    add("cfa_c2i6_decoupage_formation", "CT2 - IND 6 DÉCOUPAGE DE FORMATION CFA (Excel)", 2, 6, "decoupage_formation_cfa_excel");
+
     // Indicateur 13 - Coordination alternance
     formations.forEach((f, fi) => {
       add(`cfa_c3i13_contrat_${fi}`, `Contrat d'apprentissage`, 3, 13, "contrat_apprentissage", { fi });
