@@ -8359,34 +8359,192 @@ function genBilanFinFormationFormateur(o: OrganismeInfo, f: FormationInfo, stagi
 function genSupportCoursCFA(o: OrganismeInfo, f: FormationInfo) {
   const chapters = getCourseChapters(f.intitule);
   const rncp = getRNCPByCode(f.codeRNCP || '');
+  const { totalHours } = parseDuree(f.duree);
+  const effectiveTotal = totalHours > 0 ? totalHours : 420;
 
   let chaptersHtml = '';
-  chapters.forEach((ch, ci) => {
+  let tocHtml = '<div style="margin-bottom:30px"><h2 style="text-align:center;color:hsl(220,60%,50%)">SOMMAIRE</h2>';
+
+  if (rncp && rncp.blocsCompetences.length > 0) {
+    // ===== RNCP-based rich support de cours =====
+    const accompHours = Math.round(effectiveTotal * 0.15);
+    const blocHoursTotal = effectiveTotal - accompHours;
+    const rncpTotalVolume = rncp.blocsCompetences.reduce((sum, bloc) =>
+      sum + bloc.matieres.reduce((s, m) => s + (parseInt(m.volume) || 0), 0), 0);
+    const scale = rncpTotalVolume > 0 ? blocHoursTotal / rncpTotalVolume : 1;
+
+    // TOC for RNCP blocs
+    rncp.blocsCompetences.forEach((bloc, bi) => {
+      tocHtml += `<div style="margin:12px 0;font-weight:bold;font-size:15px;color:hsl(220,60%,50%)">PARTIE ${bi + 1} — ${bloc.titre}</div>`;
+      bloc.matieres.forEach((mat, mi) => {
+        const vol = Math.round((parseInt(mat.volume) || 0) * scale);
+        tocHtml += `<div style="margin-left:20px;font-size:12px;color:#555">${bi + 1}.${mi + 1} ${mat.competence} <span style="color:#999">(${vol}h)</span></div>`;
+      });
+    });
+    tocHtml += `<div style="margin:12px 0;font-weight:bold;font-size:15px;color:hsl(220,60%,50%)">PARTIE ${rncp.blocsCompetences.length + 1} — Accompagnement et préparation à la certification</div>`;
+    tocHtml += '</div>';
+
+    // Generate rich content per bloc
+    rncp.blocsCompetences.forEach((bloc, bi) => {
+      chaptersHtml += `<div class="page-break"></div>`;
+      chaptersHtml += `<div style="background:linear-gradient(135deg,hsl(220,60%,50%),hsl(240,50%,40%));color:white;padding:40px;border-radius:12px;margin-bottom:30px">`;
+      chaptersHtml += `<h2 style="color:white;font-size:28px;margin:0">PARTIE ${bi + 1}</h2>`;
+      chaptersHtml += `<h3 style="color:white;font-size:20px;margin-top:10px">${bloc.titre}</h3>`;
+      chaptersHtml += `<p style="color:rgba(255,255,255,0.85);margin-top:10px">Durée : ${Math.round(bloc.matieres.reduce((s, m) => s + (parseInt(m.volume) || 0), 0) * scale)}h &nbsp;|&nbsp; ${bloc.matieres.length} compétences professionnelles</p>`;
+      chaptersHtml += `</div>`;
+
+      // Overview table for this bloc
+      chaptersHtml += `<div style="margin-bottom:25px">`;
+      chaptersHtml += `<h3 style="color:hsl(220,60%,50%);border-bottom:2px solid hsl(220,60%,50%);padding-bottom:5px;margin-bottom:12px">Vue d'ensemble du bloc</h3>`;
+      chaptersHtml += `<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%;font-size:12px"><thead><tr style="background:#1e3a7b;color:#fff"><th>Compétence</th><th>Contenu</th><th>Volume</th></tr></thead><tbody>`;
+      bloc.matieres.forEach(mat => {
+        const vol = Math.round((parseInt(mat.volume) || 0) * scale);
+        chaptersHtml += `<tr><td style="font-weight:bold">${mat.competence}</td><td>${mat.contenu}</td><td style="text-align:center">${vol}h</td></tr>`;
+      });
+      chaptersHtml += `</tbody></table></div>`;
+
+      // Detailed content per matière
+      bloc.matieres.forEach((mat, mi) => {
+        const vol = Math.round((parseInt(mat.volume) || 0) * scale);
+        const contenuItems = mat.contenu.split(',').map(s => s.trim()).filter(Boolean);
+        chaptersHtml += `<div class="page-break"></div>`;
+        chaptersHtml += `<div style="margin-bottom:25px">`;
+        chaptersHtml += `<h3 style="color:hsl(220,60%,50%);font-size:16px;border-bottom:2px solid hsl(220,60%,50%);padding-bottom:5px;margin-bottom:12px">Module ${bi + 1}.${mi + 1} — ${mat.competence}</h3>`;
+        chaptersHtml += `<p><strong>Volume horaire :</strong> ${vol}h &nbsp;|&nbsp; <strong>Bloc :</strong> ${bloc.titre}</p>`;
+
+        // 1. Objectifs pédagogiques
+        chaptersHtml += `<div style="background:#f0f7ff;border-left:4px solid hsl(220,60%,50%);padding:15px;border-radius:6px;margin:15px 0">`;
+        chaptersHtml += `<h4 style="margin:0 0 8px 0;color:hsl(220,60%,50%)">🎯 Objectifs pédagogiques</h4>`;
+        chaptersHtml += `<p>À l'issue de ce module, l'apprenant sera capable de :</p><ul>`;
+        contenuItems.forEach(item => {
+          chaptersHtml += `<li>Maîtriser : ${item}</li>`;
+        });
+        chaptersHtml += `<li>Appliquer les connaissances dans un contexte professionnel réel</li>`;
+        chaptersHtml += `<li>Évaluer sa pratique et identifier des axes d'amélioration</li>`;
+        chaptersHtml += `</ul></div>`;
+
+        // 2. Contenu détaillé par thème
+        chaptersHtml += `<h4 style="color:hsl(220,50%,35%);margin-top:20px">📚 Contenu détaillé</h4>`;
+        contenuItems.forEach((item, ii) => {
+          chaptersHtml += `<div style="background:${ii % 2 === 0 ? '#fafbfc' : '#fff'};border:1px solid #e0e0e0;border-radius:8px;padding:15px;margin:10px 0">`;
+          chaptersHtml += `<h5 style="margin:0 0 8px 0;color:hsl(220,50%,35%)">${bi + 1}.${mi + 1}.${ii + 1} — ${item}</h5>`;
+          chaptersHtml += `<p><strong>Définition :</strong> ${item} constitue un ensemble de savoirs et de savoir-faire essentiels dans le cadre de la compétence « ${mat.competence} ». Ce thème couvre les aspects théoriques et pratiques nécessaires à la maîtrise professionnelle.</p>`;
+          chaptersHtml += `<p><strong>Points clés à retenir :</strong></p><ul>`;
+          chaptersHtml += `<li>Comprendre les fondamentaux de ${item.toLowerCase()}</li>`;
+          chaptersHtml += `<li>Identifier les outils et méthodes associés</li>`;
+          chaptersHtml += `<li>Appliquer les bonnes pratiques professionnelles</li>`;
+          chaptersHtml += `<li>Analyser des situations concrètes et proposer des solutions adaptées</li>`;
+          chaptersHtml += `<li>Évaluer les résultats obtenus et ajuster sa démarche</li>`;
+          chaptersHtml += `</ul>`;
+          chaptersHtml += `<p><strong>Méthodologie pédagogique :</strong> Apports théoriques illustrés par des cas pratiques, exercices individuels et collectifs, mises en situation professionnelle, analyse de documents professionnels, travaux collaboratifs.</p>`;
+          chaptersHtml += `<p><strong>Ressources :</strong> Supports de cours numériques, fiches de synthèse, vidéos tutorielles, documentation de référence, accès plateforme LMS.</p>`;
+          chaptersHtml += `</div>`;
+        });
+
+        // 3. Application en entreprise
+        chaptersHtml += `<div style="background:#f0faf0;border-left:4px solid #2e7d32;padding:15px;border-radius:6px;margin:15px 0">`;
+        chaptersHtml += `<h4 style="margin:0 0 8px 0;color:#2e7d32">🏢 Application en entreprise</h4>`;
+        chaptersHtml += `<p>Pendant les périodes en entreprise, l'apprenti mettra en pratique les connaissances acquises :</p><ul>`;
+        chaptersHtml += `<li>Observation et analyse des pratiques professionnelles liées à « ${mat.competence.toLowerCase()} »</li>`;
+        chaptersHtml += `<li>Réalisation de missions concrètes sous la supervision du maître d'apprentissage</li>`;
+        chaptersHtml += `<li>Collecte d'éléments pour le dossier professionnel (exemples, situations, preuves)</li>`;
+        chaptersHtml += `<li>Auto-évaluation et compte-rendu dans le livret d'apprentissage</li>`;
+        chaptersHtml += `</ul></div>`;
+
+        // 4. Évaluation
+        chaptersHtml += `<div style="background:#fff8e1;border-left:4px solid #f57f17;padding:15px;border-radius:6px;margin:15px 0">`;
+        chaptersHtml += `<h4 style="margin:0 0 8px 0;color:#e65100">📝 Modalités d'évaluation</h4>`;
+        chaptersHtml += `<ul>`;
+        chaptersHtml += `<li>QCM de connaissances (20 questions minimum)</li>`;
+        chaptersHtml += `<li>Exercices pratiques et études de cas</li>`;
+        chaptersHtml += `<li>Mise en situation professionnelle simulée</li>`;
+        chaptersHtml += `<li>Évaluation continue en entreprise par le maître d'apprentissage</li>`;
+        chaptersHtml += `</ul>`;
+        chaptersHtml += `<p><strong>Évaluation certifiante :</strong> ${bloc.modalitesEval}</p>`;
+        chaptersHtml += `</div>`;
+
+        chaptersHtml += `</div>`;
+      });
+    });
+
+    // Partie accompagnement
     chaptersHtml += `<div class="page-break"></div>`;
-    chaptersHtml += `<div style="background:linear-gradient(135deg,hsl(220,60%,50%),hsl(240,50%,40%));color:white;padding:40px;border-radius:12px;margin-bottom:30px">`;
-    chaptersHtml += `<h2 style="color:white;font-size:28px;margin:0">CHAPITRE ${ci + 1}</h2>`;
-    chaptersHtml += `<h3 style="color:white;font-size:20px;margin-top:10px">${ch.title}</h3>`;
-    chaptersHtml += `<p style="color:rgba(255,255,255,0.85);margin-top:10px">${ch.description}</p>`;
+    chaptersHtml += `<div style="background:linear-gradient(135deg,hsl(150,50%,40%),hsl(170,40%,35%));color:white;padding:40px;border-radius:12px;margin-bottom:30px">`;
+    chaptersHtml += `<h2 style="color:white;font-size:28px;margin:0">PARTIE ${rncp.blocsCompetences.length + 1}</h2>`;
+    chaptersHtml += `<h3 style="color:white;font-size:20px;margin-top:10px">Accompagnement et préparation à la certification</h3>`;
+    chaptersHtml += `<p style="color:rgba(255,255,255,0.85);margin-top:10px">Durée : ${accompHours}h</p>`;
     chaptersHtml += `</div>`;
 
-    ch.sections.forEach((sec, si) => {
-      if (si > 0 && si % 2 === 0) chaptersHtml += `<div class="page-break"></div>`;
-      chaptersHtml += `<div style="margin-bottom:25px">`;
-      chaptersHtml += `<h3 style="color:hsl(220,60%,50%);font-size:16px;border-bottom:2px solid hsl(220,60%,50%);padding-bottom:5px;margin-bottom:12px">Section ${ci + 1}.${si + 1} — ${sec.title}</h3>`;
-      chaptersHtml += sec.content;
-      chaptersHtml += `</div>`;
-    });
-  });
+    chaptersHtml += `<div style="margin-bottom:25px">`;
+    chaptersHtml += `<h3 style="color:hsl(150,50%,35%);border-bottom:2px solid hsl(150,50%,35%);padding-bottom:5px;margin-bottom:12px">Contenu de l'accompagnement</h3>`;
+    chaptersHtml += `<div style="background:#f0faf0;padding:15px;border-radius:8px;margin:10px 0">`;
+    chaptersHtml += `<h4>1. Accompagnement individuel</h4>`;
+    chaptersHtml += `<ul><li>Entretiens individuels de suivi réguliers</li><li>Aide à la rédaction du dossier professionnel</li><li>Points d'avancement sur les compétences acquises</li><li>Soutien méthodologique et orientation</li></ul>`;
+    chaptersHtml += `<h4>2. Préparation aux épreuves certifiantes</h4>`;
+    chaptersHtml += `<ul><li>Revue des attendus du référentiel de certification</li><li>Examens blancs dans les conditions réelles</li><li>Préparation à l'oral devant le jury</li><li>Correction des examens blancs et plan de remédiation</li></ul>`;
+    chaptersHtml += `<h4>3. Techniques de recherche d'emploi</h4>`;
+    chaptersHtml += `<ul><li>Rédaction du CV et de la lettre de motivation</li><li>Préparation aux entretiens d'embauche</li><li>Développement du réseau professionnel (LinkedIn)</li><li>Connaissance du marché de l'emploi du secteur</li></ul>`;
+    chaptersHtml += `</div></div>`;
 
-  // Table des matières
-  let tocHtml = '<div style="margin-bottom:30px"><h2 style="text-align:center;color:hsl(220,60%,50%)">SOMMAIRE</h2>';
-  chapters.forEach((ch, ci) => {
-    tocHtml += `<div style="margin:10px 0;font-weight:bold;font-size:14px">CHAPITRE ${ci + 1} — ${ch.title}</div>`;
-    ch.sections.forEach((sec, si) => {
-      tocHtml += `<div style="margin-left:20px;font-size:12px;color:#555">${ci + 1}.${si + 1} ${sec.title}</div>`;
+    // Fiche résumé certification
+    chaptersHtml += `<div class="page-break"></div>`;
+    chaptersHtml += `<div style="margin-bottom:25px">`;
+    chaptersHtml += `<h3 style="color:hsl(220,60%,50%);border-bottom:2px solid hsl(220,60%,50%);padding-bottom:5px;margin-bottom:12px">Fiche résumé de la certification</h3>`;
+    chaptersHtml += `<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse;width:100%;font-size:12px">`;
+    chaptersHtml += `<tr><th style="background:#1e3a7b;color:#fff;width:35%">Information</th><th style="background:#1e3a7b;color:#fff">Détail</th></tr>`;
+    chaptersHtml += `<tr><td><strong>Titre</strong></td><td>${rncp.intitule}</td></tr>`;
+    chaptersHtml += `<tr><td><strong>Code RNCP</strong></td><td>${rncp.code}</td></tr>`;
+    chaptersHtml += `<tr><td><strong>Niveau</strong></td><td>${rncp.niveau}</td></tr>`;
+    chaptersHtml += `<tr><td><strong>Certificateur</strong></td><td>${rncp.certificateur}</td></tr>`;
+    chaptersHtml += `<tr><td><strong>Date d'enregistrement</strong></td><td>${rncp.dateEnregistrement}</td></tr>`;
+    chaptersHtml += `<tr><td><strong>Date d'échéance</strong></td><td>${rncp.dateEcheance}</td></tr>`;
+    chaptersHtml += `<tr><td><strong>Durée indicative</strong></td><td>${rncp.dureeIndicative || effectiveTotal + 'h'}</td></tr>`;
+    chaptersHtml += `<tr><td><strong>Secteurs d'activité</strong></td><td>${rncp.secteursActivite}</td></tr>`;
+    chaptersHtml += `<tr><td><strong>Types d'emplois</strong></td><td>${rncp.typesEmplois.join(', ')}</td></tr>`;
+    chaptersHtml += `<tr><td><strong>Codes ROME</strong></td><td>${rncp.codesROME.join(', ')}</td></tr>`;
+    chaptersHtml += `</table></div>`;
+
+    // Blocs de compétences summary
+    chaptersHtml += `<div style="margin-bottom:25px">`;
+    chaptersHtml += `<h3 style="color:hsl(220,60%,50%);border-bottom:2px solid hsl(220,60%,50%);padding-bottom:5px;margin-bottom:12px">Synthèse des blocs de compétences</h3>`;
+    chaptersHtml += `<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%;font-size:12px"><thead><tr style="background:#1e3a7b;color:#fff"><th>Bloc</th><th>Intitulé</th><th>Compétences</th><th>Volume</th><th>Modalités d'évaluation</th></tr></thead><tbody>`;
+    rncp.blocsCompetences.forEach((bloc, bi) => {
+      const vol = Math.round(bloc.matieres.reduce((s, m) => s + (parseInt(m.volume) || 0), 0) * scale);
+      chaptersHtml += `<tr><td style="text-align:center;font-weight:bold">BC${bi + 1}</td><td>${bloc.titre}</td><td>${bloc.competences.join('<br>')}</td><td style="text-align:center">${vol}h</td><td style="font-size:11px">${bloc.modalitesEval}</td></tr>`;
     });
-  });
-  tocHtml += '</div>';
+    chaptersHtml += `<tr style="background:#f5f5f5;font-weight:bold"><td></td><td>Accompagnement + Certification</td><td></td><td style="text-align:center">${accompHours}h</td><td></td></tr>`;
+    chaptersHtml += `<tr style="background:#1e3a7b;color:#fff;font-weight:bold"><td></td><td>TOTAL</td><td></td><td style="text-align:center">${effectiveTotal}h</td><td></td></tr>`;
+    chaptersHtml += `</tbody></table></div>`;
+
+  } else {
+    // ===== Generic course chapters (same as before but with more per-section content) =====
+    chapters.forEach((ch, ci) => {
+      tocHtml += `<div style="margin:10px 0;font-weight:bold;font-size:14px">CHAPITRE ${ci + 1} — ${ch.title}</div>`;
+      ch.sections.forEach((sec, si) => {
+        tocHtml += `<div style="margin-left:20px;font-size:12px;color:#555">${ci + 1}.${si + 1} ${sec.title}</div>`;
+      });
+    });
+    tocHtml += '</div>';
+
+    chapters.forEach((ch, ci) => {
+      chaptersHtml += `<div class="page-break"></div>`;
+      chaptersHtml += `<div style="background:linear-gradient(135deg,hsl(220,60%,50%),hsl(240,50%,40%));color:white;padding:40px;border-radius:12px;margin-bottom:30px">`;
+      chaptersHtml += `<h2 style="color:white;font-size:28px;margin:0">CHAPITRE ${ci + 1}</h2>`;
+      chaptersHtml += `<h3 style="color:white;font-size:20px;margin-top:10px">${ch.title}</h3>`;
+      chaptersHtml += `<p style="color:rgba(255,255,255,0.85);margin-top:10px">${ch.description}</p>`;
+      chaptersHtml += `</div>`;
+
+      ch.sections.forEach((sec, si) => {
+        if (si > 0 && si % 2 === 0) chaptersHtml += `<div class="page-break"></div>`;
+        chaptersHtml += `<div style="margin-bottom:25px">`;
+        chaptersHtml += `<h3 style="color:hsl(220,60%,50%);font-size:16px;border-bottom:2px solid hsl(220,60%,50%);padding-bottom:5px;margin-bottom:12px">Section ${ci + 1}.${si + 1} — ${sec.title}</h3>`;
+        chaptersHtml += sec.content;
+        chaptersHtml += `</div>`;
+      });
+    });
+  }
+
+  if (!rncp) tocHtml += '</div>';
 
   const closingHtml = `<div class="page-break"></div>
     <div style="text-align:center;padding:60px 20px">
@@ -8414,7 +8572,7 @@ function genSupportCoursCFA(o: OrganismeInfo, f: FormationInfo) {
     formation: f,
     showFormationInfo: true,
     sections: [
-      { heading: "Informations", content: `<p><strong>Type :</strong> Support PDF fourni à chaque apprenti<br><strong>Formation :</strong> ${f.intitule}${rncp ? `<br><strong>Certification visée :</strong> ${rncp.intitule} (${rncp.code})` : ''}<br><strong>Mise à jour :</strong> ${o.dateMaj || new Date().toLocaleDateString('fr-FR')}<br><strong>Version :</strong> V${o.version || '1'}</p>` },
+      { heading: "Informations", content: `<p><strong>Type :</strong> Support PDF fourni à chaque apprenti<br><strong>Formation :</strong> ${f.intitule}${rncp ? `<br><strong>Certification visée :</strong> ${rncp.intitule} (${rncp.code})<br><strong>Niveau :</strong> ${rncp.niveau}` : ''}<br><strong>Durée totale :</strong> ${effectiveTotal}h<br><strong>Mise à jour :</strong> ${o.dateMaj || new Date().toLocaleDateString('fr-FR')}<br><strong>Version :</strong> V${o.version || '1'}</p>` },
     ],
     extraHtml: tocHtml + chaptersHtml + closingHtml
   });
