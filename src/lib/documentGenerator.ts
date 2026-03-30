@@ -9030,54 +9030,119 @@ function genDecoupageFormationCFAExcel(o: OrganismeInfo, f: FormationInfo) {
       sum + bloc.matieres.reduce((s, m) => s + (parseInt(m.volume) || 0), 0), 0);
     const scale = rncpTotalVolume > 0 ? blocHoursTotal / rncpTotalVolume : 1;
 
-    // Sheet 1: Vue globale
+    // Sheet 1: Vue globale REAC
     let sheet1 = tr(["N° Fiche AT", "Activités types", "N° Fiche CP", "Compétences professionnelles", "Description", "Savoirs", "Critères de performance", "Connaissances", "Modules associés", "Logiciels et outils", "Heures", "Objectifs pédagogiques", "Critères d'évaluation"], true);
     rncp.blocsCompetences.forEach((bloc, bi) => {
       bloc.matieres.forEach((mat, mi) => {
         const vol = Math.round((parseInt(mat.volume) || 0) * scale);
-        sheet1 += tr([`${bi + 1}`, bloc.titre, `${mi + 1}`, mat.competence, mat.contenu, `Maîtriser : ${mat.contenu}`, bloc.modalitesEval.split('.')[0] || "", `Connaissance de : ${mat.contenu.toLowerCase()}`, mat.contenu.split(',')[0], "Outils numériques, Suite bureautique", `${vol}h`, `Être capable de ${mat.competence.toLowerCase()}`, bloc.modalitesEval]);
+        const contenuItems = mat.contenu.split(',').map(s => s.trim()).filter(Boolean);
+        sheet1 += tr([
+          `${bi + 1}`, bloc.titre,
+          `${bi + 1}.${mi + 1}`, mat.competence,
+          mat.contenu,
+          contenuItems.map(c => `Maîtriser : ${c}`).join('\n'),
+          bloc.modalitesEval.split('.')[0] || "",
+          contenuItems.map(c => `Connaissance approfondie de : ${c.toLowerCase()}`).join('\n'),
+          contenuItems[0] || "",
+          "Suite bureautique, outils métier, plateformes spécialisées",
+          `${vol}h`,
+          contenuItems.map(c => `Être capable de ${c.toLowerCase()}`).join('\n'),
+          bloc.modalitesEval
+        ]);
       });
     });
-    sheet1 += tr(["", "Accompagnement + Examens", "", "", "", "", "", "", "", "", `${accompHours}h`, "", ""], false);
+    sheet1 += tr(["", "Accompagnement + Examens", "", "Préparation certification", "Préparation personnalisée aux épreuves", "", "", "", "Accompagnement individuel", "", `${accompHours}h`, "Préparer le passage de la certification", "Examens blancs + entretien jury"], false);
     sheet1 += tr(["", "TOTAL", "", "", "", "", "", "", "", "", `${effectiveTotal}h`, "", ""], true);
     sheets.push({ name: "Vue globale REAC", html: `<table>${sheet1}</table>` });
 
-    // One sheet per bloc
+    // One detailed sheet per bloc
     rncp.blocsCompetences.forEach((bloc, bi) => {
-      let sheetHtml = tr(["Module", "Compétence professionnelle", "Description", "Savoirs", "Connaissances", "Compétences transversales", "Logiciels", "Objectifs pédagogiques", "Critères de performance", "Modalités d'évaluation", "Heures"], true);
+      let sheetHtml = tr(["Module", "Compétence professionnelle", "Sous-thème", "Description détaillée", "Savoirs", "Connaissances", "Compétences transversales", "Logiciels et outils", "Objectifs pédagogiques", "Critères de performance", "Modalités d'évaluation", "Heures"], true);
       bloc.matieres.forEach((mat, mi) => {
         const vol = Math.round((parseInt(mat.volume) || 0) * scale);
-        sheetHtml += tr([`Bloc ${bi + 1} – ${bloc.titre}`, mat.competence, mat.contenu, `Maîtriser : ${mat.contenu}`, `Connaissance approfondie de ${mat.contenu.toLowerCase()}`, "Communication, autonomie, travail en équipe", "Suite bureautique, outils métier", `Être capable de ${mat.competence.toLowerCase()}`, bloc.modalitesEval.split('.')[0] || "", bloc.modalitesEval, `${vol}h`]);
+        const contenuItems = mat.contenu.split(',').map(s => s.trim()).filter(Boolean);
+        const perItem = Math.round(vol / Math.max(1, contenuItems.length));
+        contenuItems.forEach((item, ii) => {
+          sheetHtml += tr([
+            ii === 0 ? `Bloc ${bi + 1} – ${bloc.titre}` : "",
+            ii === 0 ? mat.competence : "",
+            item,
+            `Maîtrise théorique et pratique de ${item.toLowerCase()}. Application en contexte professionnel réel. Analyse de situations concrètes et résolution de problèmes.`,
+            `Maîtriser les fondamentaux de ${item.toLowerCase()}\nIdentifier les outils et méthodes associés\nAppliquer les bonnes pratiques professionnelles`,
+            `Connaissance approfondie de ${item.toLowerCase()}\nConnaissance des normes et réglementations associées\nConnaissance des acteurs du secteur`,
+            "Communication professionnelle\nTravail en équipe\nAutonomie et initiative\nAdaptabilité",
+            "Suite bureautique\nLogiciels métier spécialisés\nOutils collaboratifs\nPlateforme LMS",
+            `Être capable de maîtriser ${item.toLowerCase()}\nSavoir appliquer en situation professionnelle\nÉvaluer et améliorer sa pratique`,
+            `La maîtrise de ${item.toLowerCase()} est démontrée\nLes résultats sont conformes aux attendus professionnels`,
+            ii === 0 ? bloc.modalitesEval : "Exercices pratiques + QCM",
+            `${perItem}h`
+          ]);
+        });
       });
-      const sheetName = `Bloc ${bi + 1}`.substring(0, 31);
+      const sheetName = `Bloc ${bi + 1} - ${bloc.titre}`.substring(0, 31).replace(/[\/\\?*\[\]]/g, '');
       sheets.push({ name: sheetName, html: `<table>${sheetHtml}</table>` });
     });
 
+    // Sheet: Modules transversaux
+    let sheetTransv = tr(["Module transversal", "Compétences visées", "Description", "Savoirs", "Connaissances", "Logiciels", "Objectifs", "Modalités d'évaluation", "Heures"], true);
+    const transversalModules = [
+      { module: "Bureautique et outils numériques", competences: "Maîtriser les outils bureautiques professionnels", description: "Suite Office (Word, Excel, PowerPoint), outils collaboratifs (Teams, Google Workspace), gestion documentaire numérique", savoirs: "Créer des documents professionnels\nUtiliser les tableurs pour l'analyse\nCréer des présentations efficaces", connaissances: "Connaissance des fonctionnalités avancées\nConnaissance des outils collaboratifs cloud", logiciels: "Microsoft Office 365\nGoogle Workspace\nOutils de gestion documentaire", objectifs: "Produire des documents professionnels de qualité\nMaîtriser les tableaux de bord\nCollaborer efficacement en ligne", eval: "Exercices pratiques sur poste\nProduction de documents professionnels", heures: `${Math.round(effectiveTotal * 0.08)}h` },
+      { module: "Communication professionnelle", competences: "Communiquer efficacement en contexte professionnel", description: "Communication orale et écrite, techniques de présentation, gestion des relations interpersonnelles, communication non verbale", savoirs: "Maîtriser les règles de communication écrite et orale\nAdapter sa communication à l'interlocuteur\nGérer les situations conflictuelles", connaissances: "Connaissance des codes professionnels\nConnaissance des techniques d'écoute active", logiciels: "Outils de visioconférence\nRéseaux sociaux professionnels\nOutils de présentation", objectifs: "Communiquer avec aisance en milieu professionnel\nAnimer des réunions\nRédiger des courriers professionnels", eval: "Mises en situation orale\nJeux de rôle\nProduction écrite", heures: `${Math.round(effectiveTotal * 0.05)}h` },
+      { module: "Techniques de recherche d'emploi", competences: "Préparer sa recherche d'emploi et d'alternance", description: "Rédaction CV et lettre de motivation, préparation aux entretiens, développement du réseau professionnel, connaissance du marché de l'emploi", savoirs: "Rédiger un CV percutant\nPréparer un entretien d'embauche\nDévelopper son personal branding", connaissances: "Connaissance du marché de l'emploi\nConnaissance des plateformes de recrutement", logiciels: "LinkedIn\nFrance Travail\nJobboards spécialisés", objectifs: "Créer un CV adapté\nMaîtriser les techniques d'entretien\nDévelopper une stratégie de recherche efficace", eval: "Simulation d'entretien\nProduction d'un dossier de candidature", heures: `${Math.round(effectiveTotal * 0.04)}h` },
+      { module: "Préparation du dossier professionnel", competences: "Rédiger le dossier professionnel pour le jury", description: "Structure du DP, description des activités professionnelles, illustration des compétences par des exemples concrets, préparation de la soutenance orale", savoirs: "Structurer le DP selon le référentiel\nDécrire ses activités de manière détaillée\nPréparer la soutenance", connaissances: "Connaissance de la structure du DP\nConnaissance des attendus du jury", logiciels: "Suite bureautique\nModèle de DP officiel", objectifs: "Rédiger un DP complet et conforme\nIllustrer chaque compétence\nPréparer l'oral devant le jury", eval: "Relecture croisée du DP\nSimulation de jury blanc", heures: `${Math.round(effectiveTotal * 0.05)}h` },
+    ];
+    transversalModules.forEach(mod => {
+      sheetTransv += tr([mod.module, mod.competences, mod.description, mod.savoirs, mod.connaissances, mod.logiciels, mod.objectifs, mod.eval, mod.heures]);
+    });
+    sheets.push({ name: "Modules transversaux", html: `<table>${sheetTransv}</table>` });
+
   } else {
-    // Generic: use course chapters
+    // Generic: use course chapters with detailed breakdown
     const chapters = getCourseChapters(f.intitule);
     const nbBlocs = Math.min(chapters.length, 6);
     const perBloc = Math.round(blocHoursTotal / Math.max(1, nbBlocs));
 
-    let sheet1 = tr(["N° Module", "Module", "Sections", "Description", "Heures", "Objectifs pédagogiques", "Modalités d'évaluation"], true);
+    // Sheet 1: Vue globale
+    let sheet1 = tr(["N° Module", "Module", "Sections", "Description", "Savoirs", "Connaissances", "Compétences transversales", "Heures", "Objectifs pédagogiques", "Modalités d'évaluation"], true);
     chapters.slice(0, nbBlocs).forEach((ch, ci) => {
       const secs = ch.sections.map(s => s.title).join('\n');
-      sheet1 += tr([`${ci + 1}`, ch.title, secs, ch.description, `${perBloc}h`, ch.sections.slice(0, 3).map(s => `Maîtriser ${s.title.toLowerCase()}`).join('\n'), "Mise en situation + QCM + exercices pratiques"]);
+      const savoirs = ch.sections.slice(0, 4).map(s => `Maîtriser : ${s.title.toLowerCase()}`).join('\n');
+      const connaissances = ch.sections.slice(0, 3).map(s => `Connaissance de ${s.title.toLowerCase()}`).join('\n');
+      sheet1 += tr([`${ci + 1}`, ch.title, secs, ch.description, savoirs, connaissances, "Communication\nTravail en équipe\nAutonomie\nOrganisation", `${perBloc}h`, ch.sections.slice(0, 4).map(s => `Être capable de ${s.title.toLowerCase()}`).join('\n'), "Mise en situation + QCM + exercices pratiques + étude de cas"]);
     });
-    sheet1 += tr(["", "Accompagnement + Examens", "", "", `${accompHours}h`, "", ""], false);
-    sheet1 += tr(["", "TOTAL", "", "", `${effectiveTotal}h`, "", ""], true);
+    sheet1 += tr(["", "Accompagnement + Examens", "", "Préparation aux épreuves", "", "", "", `${accompHours}h`, "Préparer le passage de la certification", "Examens blancs + entretien"]);
+    sheet1 += tr(["", "TOTAL", "", "", "", "", "", `${effectiveTotal}h`, "", ""], true);
     sheets.push({ name: "Vue globale", html: `<table>${sheet1}</table>` });
 
-    // One sheet per chapter
+    // One detailed sheet per chapter
     chapters.slice(0, nbBlocs).forEach((ch, ci) => {
-      let sheetHtml = tr(["Section", "Contenu", "Savoirs", "Objectifs", "Modalités d'évaluation", "Heures"], true);
+      let sheetHtml = tr(["Section", "Sous-thème", "Contenu détaillé", "Savoirs", "Connaissances", "Compétences transversales", "Objectifs pédagogiques", "Modalités d'évaluation", "Heures"], true);
       const perSec = Math.round(perBloc / ch.sections.length);
-      ch.sections.forEach((sec, si) => {
-        sheetHtml += tr([sec.title, sec.content.replace(/<[^>]*>/g, '').substring(0, 200), `Connaissance de ${sec.title.toLowerCase()}`, `Maîtriser ${sec.title.toLowerCase()}`, "Exercices pratiques + QCM", `${perSec}h`]);
+      ch.sections.forEach((sec) => {
+        const plainContent = sec.content.replace(/<[^>]*>/g, '').substring(0, 300);
+        sheetHtml += tr([
+          sec.title,
+          ch.title,
+          plainContent,
+          `Maîtriser les fondamentaux de ${sec.title.toLowerCase()}\nIdentifier les outils et méthodes\nAppliquer les bonnes pratiques`,
+          `Connaissance de ${sec.title.toLowerCase()}\nConnaissance des normes et standards`,
+          "Communication\nTravail en équipe\nAutonomie\nRigueur",
+          `Être capable de ${sec.title.toLowerCase()}\nSavoir appliquer en situation professionnelle`,
+          "Exercices pratiques + QCM + étude de cas",
+          `${perSec}h`
+        ]);
       });
-      const sheetName = `Ch${ci + 1} ${ch.title}`.substring(0, 31).replace(/[\/\\?*\[\]]/g, '');
+      const sheetName = `M${ci + 1} ${ch.title}`.substring(0, 31).replace(/[\/\\?*\[\]]/g, '');
       sheets.push({ name: sheetName, html: `<table>${sheetHtml}</table>` });
     });
+
+    // Sheet: Modules transversaux
+    let sheetTransv = tr(["Module transversal", "Compétences visées", "Description", "Objectifs", "Heures"], true);
+    sheetTransv += tr(["Bureautique et outils numériques", "Maîtriser les outils bureautiques", "Suite Office, outils collaboratifs, gestion documentaire", "Produire des documents professionnels", `${Math.round(effectiveTotal * 0.08)}h`]);
+    sheetTransv += tr(["Communication professionnelle", "Communiquer efficacement", "Communication orale et écrite, présentation, relations interpersonnelles", "Communiquer avec aisance", `${Math.round(effectiveTotal * 0.05)}h`]);
+    sheetTransv += tr(["Techniques de recherche d'emploi", "Préparer sa recherche d'emploi", "CV, lettre de motivation, entretiens, réseau professionnel", "Développer une stratégie de recherche", `${Math.round(effectiveTotal * 0.04)}h`]);
+    sheetTransv += tr(["Préparation dossier professionnel", "Rédiger le dossier professionnel", "Structure du DP, exemples, préparation jury", "Rédiger un DP complet", `${Math.round(effectiveTotal * 0.05)}h`]);
+    sheets.push({ name: "Modules transversaux", html: `<table>${sheetTransv}</table>` });
   }
 
   // Sheet: Planning alternance
