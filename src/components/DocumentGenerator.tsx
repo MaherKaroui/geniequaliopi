@@ -498,6 +498,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
           || doc.template === "suivi_dysfonctionnements_excel"
           || doc.template === "relances_appreciations_excel"
           || doc.template === "vae_indicateurs_previsionnels"
+          || doc.template === "decoupage_formation_cfa_excel"
         ) {
           const excelContent = doc.template === "indicateurs_performance"
             ? generateExcelTableauBordPerformance(mergedOrganisme, selectedFormation, allStagiaires)
