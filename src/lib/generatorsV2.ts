@@ -963,23 +963,24 @@ function getDocStyleColor(): string {
   } catch { return "#1e3a7b"; }
 }
 
-// Improved existing exercices_pratiques (group format) - removes signatures
+// Évaluation finale par exercices et jeux (group format)
 export function genExercicesPratiques_V2(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const evalData = getEvalContent(f.intitule);
   const exercices = evalData.exercices;
-  let extra = `<h2>EXERCICES PRATIQUES – RÉSULTATS</h2>`;
-  extra += `<p><strong>Formation :</strong> ${f.intitule}<br><strong>Formateur :</strong> ${f.formateur}<br><strong>Nombre d'exercices :</strong> ${exercices.length}</p>`;
+  let extra = `<h2>ÉVALUATION FINALE – EXERCICES & JEUX</h2>`;
+  extra += `<p><strong>Formation :</strong> ${f.intitule}<br><strong>Formateur :</strong> ${f.formateur}<br><strong>Date :</strong> ${formatDate(f.dateFin)}<br><strong>Nombre d'épreuves :</strong> ${exercices.length + 2} (${exercices.length} exercices + 2 jeux pédagogiques)</p>`;
 
+  // --- PARTIE 1 : EXERCICES PRATIQUES ---
+  extra += `<h2>PARTIE 1 – EXERCICES PRATIQUES</h2>`;
   exercices.forEach((ex, ei) => {
     extra += `<div class="page-break"></div>`;
-    extra += `<h2>${ex.titre}</h2>`;
+    extra += `<h3>Exercice ${ei + 1} : ${ex.titre}</h3>`;
     extra += `<div class="section"><p><strong>Consigne :</strong> ${ex.consigne}</p></div>`;
     extra += `<div class="section section-green"><p><strong>Réponse attendue / Corrigé :</strong> ${ex.reponseAttendue}</p></div>`;
-    extra += `<h3>Résultats par stagiaire</h3>`;
+    extra += `<h4>Résultats par stagiaire</h4>`;
     const rows = stagiaires.slice(0, 10).map((s, si) => {
       const variations = [9, 10, 9, 8, 10, 9, 8, 10, 9, 10];
       const noteFinale = variations[(si + ei) % variations.length];
-      // Unique appreciation per stagiaire
       const seed = (si * 7 + ei * 3) % 4;
       const apps = noteFinale >= 9
         ? [`${s.prenom} ${s.nom} a parfaitement réalisé cet exercice. Travail exemplaire.`, `Exercice réalisé avec méthode par ${s.prenom} ${s.nom}. Résultat conforme.`, `${s.prenom} ${s.nom} démontre une maîtrise complète. Excellent travail.`, `Travail de qualité de ${s.prenom} ${s.nom}. Compétence pleinement acquise.`]
@@ -989,8 +990,55 @@ export function genExercicesPratiques_V2(o: OrganismeInfo, f: FormationInfo, sta
     extra += tableHTML(["Stagiaire", "Note", "Statut", "Appréciation du formateur"], rows);
   });
 
-  return buildDocument({ org: o, title: "EXERCICES PRATIQUES – CORRIGÉS ET RÉSULTATS", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra });
-  // NO signatures
+  // --- PARTIE 2 : JEUX PÉDAGOGIQUES ---
+  extra += `<div class="page-break"></div>`;
+  extra += `<h2>PARTIE 2 – JEUX PÉDAGOGIQUES</h2>`;
+
+  // Jeu 1 : Quiz Rapidité
+  extra += `<h3>Jeu 1 : Quiz Rapidité – Questions Flash</h3>`;
+  extra += `<div class="section"><p><strong>Règle du jeu :</strong> Le formateur pose 10 questions rapides sur les notions clés de la formation. Chaque stagiaire dispose de 15 secondes pour répondre. 1 point par bonne réponse. Bonus de 2 points pour la réponse la plus rapide.</p></div>`;
+  const quizRows = stagiaires.slice(0, 10).map((s, si) => {
+    const score = 7 + ((si * 3 + 5) % 4); // 7 à 10
+    const bonus = si % 3 === 0 ? 2 : 0;
+    const total = Math.min(12, score + bonus);
+    return [s.prenom + " " + s.nom, `${score}/10`, bonus > 0 ? "+2 (rapidité)" : "0", `${total}/12`, total >= 9 ? "🏆 Excellent" : "✅ Validé"];
+  });
+  extra += tableHTML(["Stagiaire", "Score Quiz", "Bonus", "Total", "Résultat"], quizRows);
+
+  // Jeu 2 : Défi en équipe / Jeu de rôle
+  extra += `<div class="page-break"></div>`;
+  extra += `<h3>Jeu 2 : Mise en Situation – Jeu de Rôle</h3>`;
+  extra += `<div class="section"><p><strong>Règle du jeu :</strong> Les stagiaires sont répartis en binômes. Chaque binôme doit résoudre un cas pratique en temps limité (20 minutes) en mobilisant les compétences acquises durant la formation. Le formateur évalue la collaboration, la pertinence des réponses et la créativité des solutions proposées.</p></div>`;
+  const roleRows = stagiaires.slice(0, 10).map((s, si) => {
+    const collab = 3 + ((si * 2 + 1) % 3); // 3-5
+    const pertin = 3 + ((si * 3 + 2) % 3); // 3-5
+    const creat = 3 + ((si + 4) % 3); // 3-5
+    const total = collab + pertin + creat;
+    const seed = (si * 5 + 7) % 4;
+    const comments = [
+      `${s.prenom} a montré un excellent esprit d'équipe et une capacité de synthèse remarquable.`,
+      `Très bonne participation de ${s.prenom}. Solutions créatives et bien argumentées.`,
+      `${s.prenom} a su mobiliser efficacement les acquis de la formation dans ce jeu de rôle.`,
+      `Participation active et pertinente de ${s.prenom}. Bonne gestion du temps imparti.`,
+    ];
+    return [s.prenom + " " + s.nom, `${collab}/5`, `${pertin}/5`, `${creat}/5`, `${total}/15`, comments[seed]];
+  });
+  extra += tableHTML(["Stagiaire", "Collaboration", "Pertinence", "Créativité", "Total", "Commentaire"], roleRows);
+
+  // --- BILAN GLOBAL ---
+  extra += `<div class="page-break"></div>`;
+  extra += `<h2>BILAN GLOBAL DE L'ÉVALUATION FINALE</h2>`;
+  const bilanRows = stagiaires.slice(0, 10).map((s, si) => {
+    const exNote = 8 + ((si * 2 + 3) % 3); // 8-10
+    const quizNote = 7 + ((si * 3 + 5) % 4);
+    const roleNote = (3 + ((si * 2 + 1) % 3)) + (3 + ((si * 3 + 2) % 3)) + (3 + ((si + 4) % 3));
+    const roleSur10 = Math.round(roleNote / 15 * 10);
+    const moyenne = Math.round((exNote + quizNote + roleSur10) / 3 * 10) / 10;
+    return [s.prenom + " " + s.nom, `${exNote}/10`, `${quizNote}/10`, `${roleSur10}/10`, `${moyenne}/10`, moyenne >= 7 ? "✅ VALIDÉ" : "⚠️ À consolider"];
+  });
+  extra += tableHTML(["Stagiaire", "Exercices", "Quiz Rapidité", "Jeu de Rôle", "Moyenne", "Décision"], bilanRows);
+
+  return buildDocument({ org: o, title: "ÉVALUATION FINALE – EXERCICES & JEUX – RÉSULTATS", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra });
 }
 
 // Improved QCM Final (2-part format: QCM + cas pratique) - removes signatures
