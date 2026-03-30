@@ -557,6 +557,116 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
     }
   };
 
+  const handleDownloadCritere = async (critereNum: number) => {
+    setGenerating(true);
+    setGenerationProgressText("");
+    try {
+      const critereDocs = catalog.filter((doc) => doc.critere === critereNum);
+      const totalFiles = critereDocs.reduce((count, doc) => {
+        const isPerStagiaire = PER_STAGIAIRE_TEMPLATES.has(doc.template);
+        const hasStagiaireIdx = doc.params?.stagiaireIdx !== undefined;
+        return count + (isPerStagiaire && !hasStagiaireIdx ? allStagiaires.length : 1);
+      }, 0);
+
+      const bulkPdfOptions = { scale: 1.35, imageQuality: 0.84, pageYieldMs: 8 };
+      const zip = new JSZip();
+      let processedFiles = 0;
+
+      const toWordBlob = async (content: string) => {
+        const blob = await htmlToWordBlob(content);
+        const extension = blob.type.includes("officedocument") ? ".docx" : ".doc";
+        return { blob, extension };
+      };
+
+      const updateProgress = async () => {
+        processedFiles += 1;
+        setGenerationProgressText(`${processedFiles}/${totalFiles}`);
+        await yieldToBrowser(exportFormat === "pdf" ? 24 : 0);
+      };
+
+      for (const doc of critereDocs) {
+        const isPerStagiaire = PER_STAGIAIRE_TEMPLATES.has(doc.template);
+        const hasStagiaireIdx = doc.params?.stagiaireIdx !== undefined;
+        const basePath = shortCriterePath(doc.critere, doc.indicateur);
+
+        if (hasStagiaireIdx) {
+          const si = doc.params!.stagiaireIdx as number;
+          const stagiaire = allStagiaires[si] || allStagiaires[0];
+          const stagFolder = `${basePath}/${stagiaire.nom}_${stagiaire.prenom}`.substring(0, 80);
+
+          if (doc.template === "pdf_static" && doc.params?.pdfFile) {
+            const resp = await fetch(`/docs/${doc.params.pdfFile}`);
+            zip.file(`${stagFolder}/${buildCatalogFileName(doc, stagiaire)}`, await resp.blob());
+          } else if (["indicateurs_performance", "tableau_suivi_parcours_excel", "plan_dev_competences_excel", "tableau_amelioration_continue_excel", "suivi_dysfonctionnements_excel", "relances_appreciations_excel", "vae_indicateurs_previsionnels"].includes(doc.template)) {
+            const excelContent = doc.template === "indicateurs_performance"
+              ? generateExcelTableauBordPerformance(mergedOrganisme, selectedFormation, allStagiaires)
+              : doc.template === "tableau_suivi_parcours_excel"
+                ? generateExcelTableauSuiviParcours(mergedOrganisme, selectedFormation, allStagiaires)
+                : doc.template === "vae_indicateurs_previsionnels"
+                  ? generateExcelIndicateursPrevisionnelsVAE(mergedOrganisme, selectedFormation)
+                  : generateContent(doc);
+            zip.file(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, ".xls")}`, excelToBlob(excelContent));
+          } else {
+            const content = generateContent(doc);
+            if (exportFormat === "pdf") {
+              zip.file(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, ".pdf")}`, await htmlToPdfBlob(content, bulkPdfOptions));
+            } else {
+              const wordBlob = await toWordBlob(content);
+              zip.file(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, wordBlob.extension)}`, wordBlob.blob);
+            }
+          }
+          await updateProgress();
+        } else if (isPerStagiaire) {
+          for (let si = 0; si < allStagiaires.length; si++) {
+            const stagiaire = allStagiaires[si];
+            const stagFolder = `${basePath}/${stagiaire.nom}_${stagiaire.prenom}`.substring(0, 80);
+            const content = generateContent(doc, si);
+            if (exportFormat === "pdf") {
+              zip.file(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, ".pdf")}`, await htmlToPdfBlob(content, bulkPdfOptions));
+            } else {
+              const wordBlob = await toWordBlob(content);
+              zip.file(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, wordBlob.extension)}`, wordBlob.blob);
+            }
+            await updateProgress();
+          }
+        } else if (doc.template === "pdf_static" && doc.params?.pdfFile) {
+          const resp = await fetch(`/docs/${doc.params.pdfFile}`);
+          zip.file(`${basePath}/${buildCatalogFileName(doc)}`, await resp.blob());
+          await updateProgress();
+        } else if (["indicateurs_performance", "tableau_suivi_parcours_excel", "plan_dev_competences_excel", "tableau_amelioration_continue_excel", "suivi_dysfonctionnements_excel", "relances_appreciations_excel", "vae_indicateurs_previsionnels"].includes(doc.template)) {
+          const excelContent = doc.template === "indicateurs_performance"
+            ? generateExcelTableauBordPerformance(mergedOrganisme, selectedFormation, allStagiaires)
+            : doc.template === "tableau_suivi_parcours_excel"
+              ? generateExcelTableauSuiviParcours(mergedOrganisme, selectedFormation, allStagiaires)
+              : doc.template === "vae_indicateurs_previsionnels"
+                ? generateExcelIndicateursPrevisionnelsVAE(mergedOrganisme, selectedFormation)
+                : generateContent(doc);
+          zip.file(`${basePath}/${buildCatalogFileName(doc, null, ".xls")}`, excelToBlob(excelContent));
+          await updateProgress();
+        } else {
+          const content = generateContent(doc);
+          if (exportFormat === "pdf") {
+            zip.file(`${basePath}/${buildCatalogFileName(doc, null, ".pdf")}`, await htmlToPdfBlob(content, bulkPdfOptions));
+          } else {
+            const wordBlob = await toWordBlob(content);
+            zip.file(`${basePath}/${buildCatalogFileName(doc, null, wordBlob.extension)}`, wordBlob.blob);
+          }
+          await updateProgress();
+        }
+      }
+
+      const blob = await zip.generateAsync({ type: "blob" });
+      saveAs(blob, buildGenericFileName(`CRITERE_${critereNum}`, mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, ".zip"));
+      toast.success(`ZIP Critère ${critereNum} téléchargé.`);
+    } catch (error) {
+      console.error(error);
+      toast.error(`Erreur pendant la génération du ZIP Critère ${critereNum}.`);
+    } finally {
+      setGenerating(false);
+      setGenerationProgressText("");
+    }
+  };
+
   const handleUploadToDrive = async () => {
     setUploadingDrive(true);
     try {
@@ -816,16 +926,27 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
 
           return (
             <div key={critere.numero} className="bg-card border rounded-xl overflow-hidden shadow-card">
-              <button
-                onClick={() => toggleCritere(critere.numero)}
-                className="w-full p-3 flex items-center gap-3 hover:bg-secondary/50 transition-colors text-left"
-              >
-                {isExpanded ? <ChevronDown className="w-4 h-4 text-primary shrink-0" /> : <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />}
-                <span className="text-sm font-semibold">Critère {critere.numero} – {critere.titre}</span>
-                <span className="text-xs text-muted-foreground ml-2">
-                  ({critereDocs.length} docs, {critereGenerated} générés)
-                </span>
-              </button>
+              <div className="flex items-center">
+                <button
+                  onClick={() => toggleCritere(critere.numero)}
+                  className="flex-1 p-3 flex items-center gap-3 hover:bg-secondary/50 transition-colors text-left"
+                >
+                  {isExpanded ? <ChevronDown className="w-4 h-4 text-primary shrink-0" /> : <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />}
+                  <span className="text-sm font-semibold">Critère {critere.numero} – {critere.titre}</span>
+                  <span className="text-xs text-muted-foreground ml-2">
+                    ({critereDocs.length} docs, {critereGenerated} générés)
+                  </span>
+                </button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="mr-2 text-xs gap-1 shrink-0"
+                  disabled={generating}
+                  onClick={(e) => { e.stopPropagation(); handleDownloadCritere(critere.numero); }}
+                >
+                  <Archive className="w-3 h-3" /> ZIP
+                </Button>
+              </div>
 
               {isExpanded && (
                 <div className="border-t px-3 pb-3 space-y-1">
