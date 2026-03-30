@@ -1075,7 +1075,7 @@ function generatePartialAnswer(expected: string, seed: number, stagiaireIndex: n
   return mainContent + '.';
 }
 
-function generateWrongAnswer(expected: string, seed: number, stagiaireIndex: number, questionIndex: number): string {
+function generateWrongAnswer(expected: string, seed: number, stagiaireIndex: number, questionIndex: number, isEnglish?: boolean): string {
   const vaguePool = [
     "Il faut suivre un protocole spécifique mais les étapes exactes ne sont pas claires pour moi.",
     "Il y a plusieurs éléments à prendre en compte mais je ne saurais pas les détailler précisément.",
