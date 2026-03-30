@@ -371,6 +371,12 @@ export function buildFullCatalog(
     add("cfa_c2i6_calendrier_annuel", "CT2 - IND 6 CALENDRIER ANNUEL CFA", 2, 6, "calendrier_annuel_cfa");
     add("cfa_c2i6_decoupage_formation", "CT2 - IND 6 DÉCOUPAGE DE FORMATION CFA (Excel)", 2, 6, "decoupage_formation_cfa_excel");
 
+    // IND 7 — Adéquation contenus / exigences certification (CFA)
+    add("cfa_c2i7_fiche_certification", "CT2 - IND 7 FICHE CERTIFICATION RS/RNCP", 2, 7, "fiche_certification_rs");
+    add("cfa_c2i7_tableau_croise", "CT2 - IND 7 TABLEAU CROISÉ", 2, 7, "tableau_croise_cfa");
+    add("cfa_c2i7_matrice_competences", "CT2 - IND 7 MATRICE DE COMPÉTENCES (Excel)", 2, 7, "matrice_competences_excel");
+    add("cfa_c2i7_suivi_chiffre", "CT2 - IND 7 SUIVI CHIFFRÉ DE LA FORMATION (Excel)", 2, 7, "suivi_chiffre_formation_excel");
+
     // Indicateur 13 - Coordination alternance
     formations.forEach((f, fi) => {
       add(`cfa_c3i13_contrat_${fi}`, `Contrat d'apprentissage`, 3, 13, "contrat_apprentissage", { fi });
