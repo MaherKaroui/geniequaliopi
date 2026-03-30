@@ -890,7 +890,7 @@ export function genExercicesStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
   extra += `<h3>Appréciation globale du formateur : ${f.formateur}, ${formatDate(getStagiaireDateFin(s, f))}</h3>`;
   extra += `<p>${appreciationsFR[appIdx][appSeed]}</p>`;
 
-  return buildDocument({ org: o, title: `${isEnglishFormation ? 'PRACTICAL EXERCISE' : 'EXERCICE PRATIQUE'}${jourLabel} – ${isEnglishFormation ? 'RESULTS' : 'RÉSULTATS'}`, subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, extraHtml: extra });
+  return buildDocument({ org: o, title: `EXERCICE PRATIQUE${jourLabel} – RÉSULTATS`, subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, extraHtml: extra });
   // NO signatures
 }
 
