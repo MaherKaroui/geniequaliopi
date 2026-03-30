@@ -8433,10 +8433,8 @@ function genCalendrierAnnuelCFA(o: OrganismeInfo, f: FormationInfo) {
   if (isNaN(startDate.getTime())) startDate.setTime(Date.now());
   const fmtD = (d: Date) => d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
-  // Build week-by-week calendar
-  let calendarRows = '';
-  let calendarWeek = 0;
-  let cfaWeekNum = 0;
+  const moisFR = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+
   const rncp = getRNCPByCode(f.codeRNCP || '');
   const chapters = rncp ? rncp.blocsCompetences : [];
   const accompHours = Math.round(effectiveTotal * 0.15);
@@ -8444,26 +8442,57 @@ function genCalendrierAnnuelCFA(o: OrganismeInfo, f: FormationInfo) {
   const scale = chapters.length > 0 ? blocHoursTotal / chapters.reduce((s, b) => s + b.matieres.reduce((ss, m) => ss + (parseInt(m.volume) || 0), 0), 0) || 1 : 1;
   const modules = chapters.length > 0
     ? chapters.map((bloc, i) => ({ titre: `Bloc ${i + 1} – ${bloc.titre}`, volume: Math.round(bloc.matieres.reduce((s, m) => s + (parseInt(m.volume) || 0), 0) * scale) }))
-    : getCourseChapters(f.intitule).slice(0, 5).map((ch, i) => ({ titre: ch.title, volume: Math.round((effectiveTotal - accompHours) / Math.min(getCourseChapters(f.intitule).length, 5)) }));
+    : getCourseChapters(f.intitule).slice(0, 5).map((ch, i) => ({ titre: ch.title, volume: Math.round(blocHoursTotal / Math.min(getCourseChapters(f.intitule).length, 5)) }));
   modules.push({ titre: 'Accompagnement + Examens', volume: accompHours });
 
+  // Build full-year calendar (52 weeks from start date)
+  let calendarRows = '';
+  let cfaWeekNum = 0;
   let moduleIdx = 0;
   let remainingInModule = modules[0]?.volume || 0;
+  const totalWeeksInYear = 52;
+  let posInCycle = 0;
 
-  // Months header
-  const moisFR = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+  // French school holidays approximation (week numbers to skip)
+  const getWeekOfYear = (d: Date) => {
+    const start = new Date(d.getFullYear(), 0, 1);
+    const diff = (d.getTime() - start.getTime()) / 86400000;
+    return Math.ceil((diff + start.getDay() + 1) / 7);
+  };
 
-  for (let cycle = 0; cycle < totalCycles && moduleIdx < modules.length; cycle++) {
-    for (let cw = 0; cw < cfaPerCycle && moduleIdx < modules.length; cw++) {
+  for (let w = 0; w < totalWeeksInYear; w++) {
+    const weekStart = new Date(startDate);
+    weekStart.setDate(weekStart.getDate() + w * 7);
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekEnd.getDate() + 4);
+    const mois = moisFR[weekStart.getMonth()];
+    const weekNum = getWeekOfYear(weekStart);
+
+    // Check if August (vacation)
+    const isVacation = weekStart.getMonth() === 7; // August
+
+    if (isVacation) {
+      calendarRows += `<tr style="background:#fff3cd">
+        <td style="text-align:center">S${w + 1}</td>
+        <td style="text-align:center">${fmtD(weekStart)} – ${fmtD(weekEnd)}</td>
+        <td>${mois}</td>
+        <td><strong>🏖 Congés</strong></td>
+        <td style="text-align:center">—</td>
+        <td>Vacances d'été</td>
+        <td style="text-align:center">—</td>
+      </tr>`;
+      continue;
+    }
+
+    const isCFAWeek = posInCycle < cfaPerCycle;
+    posInCycle++;
+    if (posInCycle >= cycleLength) posInCycle = 0;
+
+    if (isCFAWeek && moduleIdx < modules.length) {
       cfaWeekNum++;
-      const weekStart = new Date(startDate);
-      weekStart.setDate(weekStart.getDate() + calendarWeek * 7);
-      const weekEnd = new Date(weekStart);
-      weekEnd.setDate(weekEnd.getDate() + 4);
-      const mois = moisFR[weekStart.getMonth()];
       const mod = modules[moduleIdx];
       calendarRows += `<tr>
-        <td style="text-align:center">S${calendarWeek + 1}</td>
+        <td style="text-align:center">S${w + 1}</td>
         <td style="text-align:center">${fmtD(weekStart)} – ${fmtD(weekEnd)}</td>
         <td>${mois}</td>
         <td style="background:#e8f0fe"><strong>CFA</strong></td>
@@ -8476,16 +8505,21 @@ function genCalendrierAnnuelCFA(o: OrganismeInfo, f: FormationInfo) {
         moduleIdx++;
         remainingInModule = moduleIdx < modules.length ? modules[moduleIdx].volume : 0;
       }
-      calendarWeek++;
-    }
-    for (let ew = 0; ew < entrepriseWeeks; ew++) {
-      const weekStart = new Date(startDate);
-      weekStart.setDate(weekStart.getDate() + calendarWeek * 7);
-      const weekEnd = new Date(weekStart);
-      weekEnd.setDate(weekEnd.getDate() + 4);
-      const mois = moisFR[weekStart.getMonth()];
+    } else if (isCFAWeek && moduleIdx >= modules.length) {
+      // All modules done, remaining CFA weeks = revision/exams
+      cfaWeekNum++;
+      calendarRows += `<tr>
+        <td style="text-align:center">S${w + 1}</td>
+        <td style="text-align:center">${fmtD(weekStart)} – ${fmtD(weekEnd)}</td>
+        <td>${mois}</td>
+        <td style="background:#e8f0fe"><strong>CFA</strong></td>
+        <td style="text-align:center">${cfaWeekNum}</td>
+        <td>Révisions / Examens blancs / Certification</td>
+        <td style="text-align:center">35h</td>
+      </tr>`;
+    } else {
       calendarRows += `<tr style="background:#f0f8f0">
-        <td style="text-align:center">S${calendarWeek + 1}</td>
+        <td style="text-align:center">S${w + 1}</td>
         <td style="text-align:center">${fmtD(weekStart)} – ${fmtD(weekEnd)}</td>
         <td>${mois}</td>
         <td><strong>Entreprise</strong></td>
@@ -8493,12 +8527,11 @@ function genCalendrierAnnuelCFA(o: OrganismeInfo, f: FormationInfo) {
         <td>Mise en pratique en entreprise</td>
         <td style="text-align:center">35h</td>
       </tr>`;
-      calendarWeek++;
     }
   }
 
   const endDate = new Date(startDate);
-  endDate.setDate(endDate.getDate() + calendarWeek * 7);
+  endDate.setDate(endDate.getDate() + totalWeeksInYear * 7);
 
   const tableHtml = `<table border="1" cellpadding="5" cellspacing="0" style="border-collapse:collapse;width:100%">
     <tr style="background:#1e3a7b;color:#fff">
@@ -8518,9 +8551,9 @@ function genCalendrierAnnuelCFA(o: OrganismeInfo, f: FormationInfo) {
     title: "CALENDRIER ANNUEL DE FORMATION – CFA",
     subtitle: f.intitule,
     sections: [
-      { heading: "Informations générales", content: `<p><strong>Formation :</strong> ${f.intitule}<br><strong>Rythme d'alternance :</strong> ${rythme}<br><strong>Durée totale en centre :</strong> ${effectiveTotal}h (${totalCFAWeeks} semaines CFA)<br><strong>Période :</strong> du ${fmtD(startDate)} au ${fmtD(endDate)}<br><strong>Cycle :</strong> ${cfaPerCycle} sem. CFA + ${entrepriseWeeks} sem. entreprise = ${cycleLength} semaines</p>` },
-      { heading: "Calendrier détaillé", content: tableHtml },
-      { heading: "Légende", content: `<p><span style="background:#e8f0fe;padding:2px 8px;border-radius:4px">CFA</span> = Semaine en centre de formation &nbsp;&nbsp; <span style="background:#f0f8f0;padding:2px 8px;border-radius:4px">Entreprise</span> = Semaine en entreprise</p>`, variant: "green" },
+      { heading: "Informations générales", content: `<p><strong>Formation :</strong> ${f.intitule}<br><strong>Rythme d'alternance :</strong> ${rythme}<br><strong>Durée totale en centre :</strong> ${effectiveTotal}h (${totalCFAWeeks} semaines CFA)<br><strong>Période :</strong> du ${fmtD(startDate)} au ${fmtD(endDate)} (52 semaines)<br><strong>Cycle :</strong> ${cfaPerCycle} sem. CFA + ${entrepriseWeeks} sem. entreprise = ${cycleLength} semaines</p>` },
+      { heading: "Calendrier détaillé – Année complète", content: tableHtml },
+      { heading: "Légende", content: `<p><span style="background:#e8f0fe;padding:2px 8px;border-radius:4px">CFA</span> = Semaine en centre &nbsp;&nbsp; <span style="background:#f0f8f0;padding:2px 8px;border-radius:4px">Entreprise</span> = Semaine en entreprise &nbsp;&nbsp; <span style="background:#fff3cd;padding:2px 8px;border-radius:4px">🏖 Congés</span> = Vacances</p><p><strong>Total semaines CFA :</strong> ${cfaWeekNum} &nbsp;|&nbsp; <strong>Heures en centre :</strong> ${cfaWeekNum * 35}h</p>`, variant: "green" },
     ],
   });
 }
