@@ -241,6 +241,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
       || doc.template === "relances_appreciations_excel"
       || doc.template === "indicateurs_performance"
       || doc.template === "vae_indicateurs_previsionnels"
+      || doc.template === "decoupage_formation_cfa_excel"
     ) {
       let excelContent: string;
       if (doc.template === "tableau_suivi_parcours_excel") {
