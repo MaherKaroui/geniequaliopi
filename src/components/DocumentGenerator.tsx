@@ -390,40 +390,18 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
         return count + (isPerStagiaire && !hasStagiaireIdx ? allStagiaires.length : 1);
       }, 0);
 
-      const maxFilesPerZip = exportFormat === "pdf" ? 24 : 140;
-      const splitZip = totalFiles > maxFilesPerZip;
       const bulkPdfOptions = { scale: 1.35, imageQuality: 0.84, pageYieldMs: 8 };
-      let zip = new JSZip();
-      let zipPart = 1;
-      let filesInCurrentZip = 0;
-      let generatedZipCount = 0;
+      const zip = new JSZip();
 
-      const flushZip = async (force = false) => {
-        if ((!force && filesInCurrentZip < maxFilesPerZip) || filesInCurrentZip === 0) return;
-
-        const zipLabel = splitZip ? `DOSSIER_QUALIOPI_COMPLET_PART_${zipPart}` : "DOSSIER_QUALIOPI_COMPLET";
-        const blob = await zip.generateAsync({ type: "blob" });
-        saveAs(blob, buildGenericFileName(zipLabel, mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, ".zip"));
-
-        generatedZipCount += 1;
-        zipPart += 1;
-        filesInCurrentZip = 0;
-        zip = new JSZip();
-        await yieldToBrowser(80);
-      };
-
-      const addFileToZip = async (path: string, payload: Blob | ArrayBuffer | string) => {
+      const addFileToZip = (path: string, payload: Blob | ArrayBuffer | string) => {
         zip.file(path, payload);
-        filesInCurrentZip += 1;
-        await flushZip(false);
       };
 
       let processedFiles = 0;
-      const progressTick = exportFormat === "pdf" ? 1 : 4;
       const updateProgress = async () => {
         processedFiles += 1;
-        if (processedFiles % progressTick === 0 || processedFiles === totalFiles) {
-          setGenerationProgressText(`${processedFiles}/${totalFiles}${splitZip ? ` • lot ${generatedZipCount + 1}` : ""}`);
+        if (processedFiles % (exportFormat === "pdf" ? 1 : 4) === 0 || processedFiles === totalFiles) {
+          setGenerationProgressText(`${processedFiles}/${totalFiles}`);
           await yieldToBrowser(exportFormat === "pdf" ? 24 : 0);
         }
       };
@@ -436,13 +414,13 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
 
       const bookContent = generateBookQualiopi(mergedOrganisme, [selectedFormation], allStagiaires, catalog);
       if (exportFormat === "pdf") {
-        await addFileToZip(
+        addFileToZip(
           `QUALIOPI/${buildGenericFileName("BOOK_QUALIOPI", mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, ".pdf")}`,
           await htmlToPdfBlob(bookContent, bulkPdfOptions),
         );
       } else {
         const bookBlob = await toWordBlob(bookContent);
-        await addFileToZip(
+        addFileToZip(
           `QUALIOPI/${buildGenericFileName("BOOK_QUALIOPI", mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, bookBlob.extension)}`,
           bookBlob.blob,
         );
@@ -462,7 +440,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
           if (doc.template === "pdf_static" && doc.params?.pdfFile) {
             const resp = await fetch(`/docs/${doc.params.pdfFile}`);
             const fileBlob = await resp.blob();
-            await addFileToZip(`${stagFolder}/${buildCatalogFileName(doc, stagiaire)}`, fileBlob);
+            addFileToZip(`${stagFolder}/${buildCatalogFileName(doc, stagiaire)}`, fileBlob);
             await updateProgress();
           } else if (
             doc.template === "indicateurs_performance"
@@ -480,15 +458,15 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
                 : doc.template === "vae_indicateurs_previsionnels"
                   ? generateExcelIndicateursPrevisionnelsVAE(mergedOrganisme, selectedFormation)
                   : generateContent(doc);
-            await addFileToZip(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, ".xls")}`, excelToBlob(excelContent));
+            addFileToZip(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, ".xls")}`, excelToBlob(excelContent));
             await updateProgress();
           } else {
             const content = generateContent(doc);
             if (exportFormat === "pdf") {
-              await addFileToZip(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, ".pdf")}`, await htmlToPdfBlob(content, bulkPdfOptions));
+              addFileToZip(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, ".pdf")}`, await htmlToPdfBlob(content, bulkPdfOptions));
             } else {
               const wordBlob = await toWordBlob(content);
-              await addFileToZip(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, wordBlob.extension)}`, wordBlob.blob);
+              addFileToZip(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, wordBlob.extension)}`, wordBlob.blob);
             }
             await updateProgress();
           }
@@ -498,17 +476,17 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
             const stagFolder = `${basePath}/${stagiaire.nom}_${stagiaire.prenom}`.substring(0, 80);
             const content = generateContent(doc, si);
             if (exportFormat === "pdf") {
-              await addFileToZip(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, ".pdf")}`, await htmlToPdfBlob(content, bulkPdfOptions));
+              addFileToZip(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, ".pdf")}`, await htmlToPdfBlob(content, bulkPdfOptions));
             } else {
               const wordBlob = await toWordBlob(content);
-              await addFileToZip(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, wordBlob.extension)}`, wordBlob.blob);
+              addFileToZip(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, wordBlob.extension)}`, wordBlob.blob);
             }
             await updateProgress();
           }
         } else if (doc.template === "pdf_static" && doc.params?.pdfFile) {
           const resp = await fetch(`/docs/${doc.params.pdfFile}`);
           const fileBlob = await resp.blob();
-          await addFileToZip(`${basePath}/${buildCatalogFileName(doc)}`, fileBlob);
+          addFileToZip(`${basePath}/${buildCatalogFileName(doc)}`, fileBlob);
           await updateProgress();
         } else if (
           doc.template === "indicateurs_performance"
@@ -526,28 +504,25 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
               : doc.template === "vae_indicateurs_previsionnels"
                 ? generateExcelIndicateursPrevisionnelsVAE(mergedOrganisme, selectedFormation)
                 : generateContent(doc);
-          await addFileToZip(`${basePath}/${buildCatalogFileName(doc, null, ".xls")}`, excelToBlob(excelContent));
+          addFileToZip(`${basePath}/${buildCatalogFileName(doc, null, ".xls")}`, excelToBlob(excelContent));
           await updateProgress();
         } else {
           const content = generateContent(doc);
           if (exportFormat === "pdf") {
-            await addFileToZip(`${basePath}/${buildCatalogFileName(doc, null, ".pdf")}`, await htmlToPdfBlob(content, bulkPdfOptions));
+            addFileToZip(`${basePath}/${buildCatalogFileName(doc, null, ".pdf")}`, await htmlToPdfBlob(content, bulkPdfOptions));
           } else {
             const wordBlob = await toWordBlob(content);
-            await addFileToZip(`${basePath}/${buildCatalogFileName(doc, null, wordBlob.extension)}`, wordBlob.blob);
+            addFileToZip(`${basePath}/${buildCatalogFileName(doc, null, wordBlob.extension)}`, wordBlob.blob);
           }
           await updateProgress();
         }
         generatedIds.add(doc.id);
       }
 
-      await flushZip(true);
+      const blob = await zip.generateAsync({ type: "blob" });
+      saveAs(blob, buildGenericFileName("DOSSIER_QUALIOPI_COMPLET", mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, ".zip"));
       setGenerated(generatedIds);
-      toast.success(
-        splitZip
-          ? `${generatedZipCount} ZIP générés automatiquement pour éviter le blocage navigateur.`
-          : "ZIP généré avec la convention de nommage compatible import.",
-      );
+      toast.success("ZIP généré avec la convention de nommage compatible import.");
     } catch (error) {
       console.error(error);
       toast.error("Erreur pendant la génération du ZIP.");
@@ -573,13 +548,8 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
         return;
       }
 
-      const maxFilesPerZip = exportFormat === "pdf" ? 24 : 140;
-      const splitZip = totalFiles > maxFilesPerZip;
       const bulkPdfOptions = { scale: 1.35, imageQuality: 0.84, pageYieldMs: 8 };
-      let zip = new JSZip();
-      let zipPart = 1;
-      let filesInCurrentZip = 0;
-      let generatedZipCount = 0;
+      const zip = new JSZip();
       let processedFiles = 0;
 
       const toWordBlob = async (content: string) => {
@@ -588,29 +558,9 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
         return { blob, extension };
       };
 
-      const flushZip = async (force = false) => {
-        if ((!force && filesInCurrentZip < maxFilesPerZip) || filesInCurrentZip === 0) return;
-
-        const zipLabel = splitZip ? `CRITERE_${critereNum}_PART_${zipPart}` : `CRITERE_${critereNum}`;
-        const blob = await zip.generateAsync({ type: "blob" });
-        saveAs(blob, buildGenericFileName(zipLabel, mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, ".zip"));
-
-        generatedZipCount += 1;
-        zipPart += 1;
-        filesInCurrentZip = 0;
-        zip = new JSZip();
-        await yieldToBrowser(80);
-      };
-
-      const addFileToZip = async (path: string, payload: Blob | ArrayBuffer | string) => {
-        zip.file(path, payload);
-        filesInCurrentZip += 1;
-        await flushZip(false);
-      };
-
       const updateProgress = async () => {
         processedFiles += 1;
-        setGenerationProgressText(`${processedFiles}/${totalFiles}${splitZip ? ` • lot ${generatedZipCount + 1}` : ""}`);
+        setGenerationProgressText(`${processedFiles}/${totalFiles}`);
         await yieldToBrowser(exportFormat === "pdf" ? 24 : 0);
       };
 
@@ -626,7 +576,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
 
           if (doc.template === "pdf_static" && doc.params?.pdfFile) {
             const resp = await fetch(`/docs/${doc.params.pdfFile}`);
-            await addFileToZip(`${stagFolder}/${buildCatalogFileName(doc, stagiaire)}`, await resp.blob());
+            zip.file(`${stagFolder}/${buildCatalogFileName(doc, stagiaire)}`, await resp.blob());
           } else if (["indicateurs_performance", "tableau_suivi_parcours_excel", "plan_dev_competences_excel", "tableau_amelioration_continue_excel", "suivi_dysfonctionnements_excel", "relances_appreciations_excel", "vae_indicateurs_previsionnels"].includes(doc.template)) {
             const excelContent = doc.template === "indicateurs_performance"
               ? generateExcelTableauBordPerformance(mergedOrganisme, selectedFormation, allStagiaires)
@@ -635,14 +585,14 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
                 : doc.template === "vae_indicateurs_previsionnels"
                   ? generateExcelIndicateursPrevisionnelsVAE(mergedOrganisme, selectedFormation)
                   : generateContent(doc);
-            await addFileToZip(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, ".xls")}`, excelToBlob(excelContent));
+            zip.file(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, ".xls")}`, excelToBlob(excelContent));
           } else {
             const content = generateContent(doc);
             if (exportFormat === "pdf") {
-              await addFileToZip(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, ".pdf")}`, await htmlToPdfBlob(content, bulkPdfOptions));
+              zip.file(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, ".pdf")}`, await htmlToPdfBlob(content, bulkPdfOptions));
             } else {
               const wordBlob = await toWordBlob(content);
-              await addFileToZip(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, wordBlob.extension)}`, wordBlob.blob);
+              zip.file(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, wordBlob.extension)}`, wordBlob.blob);
             }
           }
           await updateProgress();
@@ -652,16 +602,16 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
             const stagFolder = `${basePath}/${stagiaire.nom}_${stagiaire.prenom}`.substring(0, 80);
             const content = generateContent(doc, si);
             if (exportFormat === "pdf") {
-              await addFileToZip(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, ".pdf")}`, await htmlToPdfBlob(content, bulkPdfOptions));
+              zip.file(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, ".pdf")}`, await htmlToPdfBlob(content, bulkPdfOptions));
             } else {
               const wordBlob = await toWordBlob(content);
-              await addFileToZip(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, wordBlob.extension)}`, wordBlob.blob);
+              zip.file(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, wordBlob.extension)}`, wordBlob.blob);
             }
             await updateProgress();
           }
         } else if (doc.template === "pdf_static" && doc.params?.pdfFile) {
           const resp = await fetch(`/docs/${doc.params.pdfFile}`);
-          await addFileToZip(`${basePath}/${buildCatalogFileName(doc)}`, await resp.blob());
+          zip.file(`${basePath}/${buildCatalogFileName(doc)}`, await resp.blob());
           await updateProgress();
         } else if (["indicateurs_performance", "tableau_suivi_parcours_excel", "plan_dev_competences_excel", "tableau_amelioration_continue_excel", "suivi_dysfonctionnements_excel", "relances_appreciations_excel", "vae_indicateurs_previsionnels"].includes(doc.template)) {
           const excelContent = doc.template === "indicateurs_performance"
@@ -671,26 +621,23 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
               : doc.template === "vae_indicateurs_previsionnels"
                 ? generateExcelIndicateursPrevisionnelsVAE(mergedOrganisme, selectedFormation)
                 : generateContent(doc);
-          await addFileToZip(`${basePath}/${buildCatalogFileName(doc, null, ".xls")}`, excelToBlob(excelContent));
+          zip.file(`${basePath}/${buildCatalogFileName(doc, null, ".xls")}`, excelToBlob(excelContent));
           await updateProgress();
         } else {
           const content = generateContent(doc);
           if (exportFormat === "pdf") {
-            await addFileToZip(`${basePath}/${buildCatalogFileName(doc, null, ".pdf")}`, await htmlToPdfBlob(content, bulkPdfOptions));
+            zip.file(`${basePath}/${buildCatalogFileName(doc, null, ".pdf")}`, await htmlToPdfBlob(content, bulkPdfOptions));
           } else {
             const wordBlob = await toWordBlob(content);
-            await addFileToZip(`${basePath}/${buildCatalogFileName(doc, null, wordBlob.extension)}`, wordBlob.blob);
+            zip.file(`${basePath}/${buildCatalogFileName(doc, null, wordBlob.extension)}`, wordBlob.blob);
           }
           await updateProgress();
         }
       }
 
-      await flushZip(true);
-      toast.success(
-        splitZip
-          ? `${generatedZipCount} ZIP générés pour le Critère ${critereNum} (anti-blocage navigateur).`
-          : `ZIP Critère ${critereNum} téléchargé.`,
-      );
+      const blob = await zip.generateAsync({ type: "blob" });
+      saveAs(blob, buildGenericFileName(`CRITERE_${critereNum}`, mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, ".zip"));
+      toast.success(`ZIP Critère ${critereNum} téléchargé.`);
     } catch (error) {
       console.error(error);
       toast.error(`Erreur pendant la génération du ZIP Critère ${critereNum}.`);
