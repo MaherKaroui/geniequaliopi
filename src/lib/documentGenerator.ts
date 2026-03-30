@@ -8551,9 +8551,9 @@ function genCalendrierAnnuelCFA(o: OrganismeInfo, f: FormationInfo) {
     title: "CALENDRIER ANNUEL DE FORMATION – CFA",
     subtitle: f.intitule,
     sections: [
-      { heading: "Informations générales", content: `<p><strong>Formation :</strong> ${f.intitule}<br><strong>Rythme d'alternance :</strong> ${rythme}<br><strong>Durée totale en centre :</strong> ${effectiveTotal}h (${totalCFAWeeks} semaines CFA)<br><strong>Période :</strong> du ${fmtD(startDate)} au ${fmtD(endDate)}<br><strong>Cycle :</strong> ${cfaPerCycle} sem. CFA + ${entrepriseWeeks} sem. entreprise = ${cycleLength} semaines</p>` },
-      { heading: "Calendrier détaillé", content: tableHtml },
-      { heading: "Légende", content: `<p><span style="background:#e8f0fe;padding:2px 8px;border-radius:4px">CFA</span> = Semaine en centre de formation &nbsp;&nbsp; <span style="background:#f0f8f0;padding:2px 8px;border-radius:4px">Entreprise</span> = Semaine en entreprise</p>`, variant: "green" },
+      { heading: "Informations générales", content: `<p><strong>Formation :</strong> ${f.intitule}<br><strong>Rythme d'alternance :</strong> ${rythme}<br><strong>Durée totale en centre :</strong> ${effectiveTotal}h (${totalCFAWeeks} semaines CFA)<br><strong>Période :</strong> du ${fmtD(startDate)} au ${fmtD(endDate)} (52 semaines)<br><strong>Cycle :</strong> ${cfaPerCycle} sem. CFA + ${entrepriseWeeks} sem. entreprise = ${cycleLength} semaines</p>` },
+      { heading: "Calendrier détaillé – Année complète", content: tableHtml },
+      { heading: "Légende", content: `<p><span style="background:#e8f0fe;padding:2px 8px;border-radius:4px">CFA</span> = Semaine en centre &nbsp;&nbsp; <span style="background:#f0f8f0;padding:2px 8px;border-radius:4px">Entreprise</span> = Semaine en entreprise &nbsp;&nbsp; <span style="background:#fff3cd;padding:2px 8px;border-radius:4px">🏖 Congés</span> = Vacances</p><p><strong>Total semaines CFA :</strong> ${cfaWeekNum} &nbsp;|&nbsp; <strong>Heures en centre :</strong> ${cfaWeekNum * 35}h</p>`, variant: "green" },
     ],
   });
 }
