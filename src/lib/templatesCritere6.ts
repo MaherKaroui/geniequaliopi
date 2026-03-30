@@ -492,6 +492,53 @@ function veilleMetierRows(f: FormationInfo, type: FormationType): string[][] {
     ];
   }
 
+  if (type === "anglais") {
+    return [
+      [
+        `<a href="https://www.britishcouncil.fr/">britishcouncil.fr</a>`,
+        "British Council France – Enseignement de l'anglais et certifications",
+        veilleMonthYear(f, 8),
+        "Organisme de référence pour l'enseignement de l'anglais : ressources pédagogiques, certifications (IELTS, Linguaskill), formations de formateurs, événements.",
+        "Preuve : capture + lien. Action : aligner les objectifs pédagogiques sur le CECRL et les standards British Council."
+      ],
+      [
+        `<a href="https://www.cambridgeenglish.org/fr/">Cambridge English</a>`,
+        "Cambridge English – Cadre européen et évaluations",
+        veilleMonthYear(f, 7),
+        "Référentiel international pour l'évaluation des compétences en anglais. Niveaux A1 à C2 du CECRL. Outils de positionnement gratuits.",
+        "Action Qualiopi : utiliser les descripteurs Cambridge pour définir les objectifs pédagogiques par niveau et les critères d'évaluation."
+      ],
+      [
+        `<a href="https://www.ets.org/toeic.html">ETS – TOEIC / TOEFL</a>`,
+        "ETS Global – Évolutions des certifications TOEIC",
+        veilleYear(f, 6),
+        "Évolutions du format TOEIC, nouvelles modalités de passage, statistiques de scores par pays. Le TOEIC reste la certification la plus demandée par les employeurs français.",
+        "Preuve : site officiel ETS. Action : adapter les modules de préparation aux certifications selon les dernières évolutions."
+      ],
+      [
+        `<a href="https://www.youtube.com/watch?v=TpqGIwLz6Yg">YouTube – 50 phrases pour parler anglais au travail</a>`,
+        "50 expressions pour l'anglais professionnel",
+        veilleMonthYear(f, 5),
+        "Vidéo pédagogique présentant les 50 expressions anglaises les plus utiles en contexte professionnel (réunions, emails, téléphone).",
+        "Preuve : fiche synthèse vidéo. Action : intégrer ces expressions dans les exercices de mise en situation professionnelle."
+      ],
+      [
+        `<a href="https://www.france-num.gouv.fr/guides-et-conseils/developpement-commercial/internationalisation">France Num – Internationalisation des entreprises</a>`,
+        "France Num – L'anglais comme levier d'internationalisation",
+        veilleMonthYear(f, 4),
+        "Guide sur l'internationalisation des TPE/PME : la maîtrise de l'anglais est identifiée comme compétence clé pour le développement commercial à l'international.",
+        "Preuve : guide France Num. Action : contextualiser la formation anglais comme compétence métier stratégique pour les entreprises."
+      ],
+      [
+        `<a href="https://www.ef.fr/epi/">EF Education First – EPI</a>`,
+        "EF EPI – Indice de compétence en anglais dans le monde",
+        veilleYear(f, 3),
+        "Rapport annuel classant les pays par niveau d'anglais. La France se situe au rang 'modéré', soulignant le besoin de formation.",
+        "Preuve : rapport PDF EF EPI. Action Qualiopi : utiliser ces données pour justifier la pertinence des formations anglais débutant."
+      ],
+    ];
+  }
+
   // Default: word/bureautique
   return [
     [
