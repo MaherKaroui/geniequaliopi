@@ -248,6 +248,32 @@ function veilleReglementaireRows(f: FormationInfo, type: FormationType): string[
     ];
   }
 
+  if (type === "anglais") {
+    return [...common,
+      [
+        `<a href="https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000006901294">Légifrance – Art. L.6321-1 Code du travail</a>`,
+        "Obligation de formation des salariés – adaptation au poste et compétences linguistiques",
+        veilleDate(f, 5),
+        "L'employeur doit assurer l'adaptation des salariés à leur poste de travail. Les compétences en anglais sont essentielles dans un contexte professionnel internationalisé.",
+        "Preuve : extrait du Code du travail. Action : justifier la formation anglais comme compétence professionnelle d'adaptation au poste."
+      ],
+      [
+        `<a href="https://www.centre-inffo.fr/site-droit-formation/actualites-droit/cpf-hausse-du-montant-de-la-participation-forfaitaire">Centre Inffo – CPF</a>`,
+        "CPF : Hausse du montant de la participation forfaitaire",
+        veilleDate(f, 3),
+        "La participation financière pour l'achat d'une formation CPF s'élève à 103,20 euros. Impact direct sur les inscriptions en formation langue.",
+        "Preuve : article Centre Inffo. Action : informer les futurs stagiaires du ticket modérateur CPF."
+      ],
+      [
+        `<a href="https://www.europe-education-formation.fr/erasmus-plus-formation.php">Erasmus+ Formation Professionnelle</a>`,
+        "Erasmus+ – Mobilité et formation linguistique en Europe",
+        veilleDate(f, 2),
+        "Programme européen soutenant la mobilité professionnelle et l'apprentissage des langues. Financements disponibles pour les organismes certifiés.",
+        "Preuve : site Erasmus+. Action : explorer les financements Erasmus+ pour les parcours de formation en anglais et enrichir l'offre."
+      ],
+    ];
+  }
+
   // Default: word/bureautique
   return [...common,
     [
