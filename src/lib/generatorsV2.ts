@@ -776,8 +776,8 @@ export function genExercicesStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
 
     if (localIdx > 0) extra += `<br/>`;
     extra += `<h3>${ex.titre}</h3>`;
-    extra += `<p><strong>${isEnglishFormation ? 'Instructions:' : 'Consigne :'}</strong></p><p>${ex.consigne}</p>`;
-    extra += `<p><strong>${isEnglishFormation ? `Work completed by ${s.prenom} ${s.nom}:` : `Travail réalisé par ${s.prenom} ${s.nom} :`}</strong></p>`;
+    extra += `<p><strong>Consigne :</strong></p><p>${ex.consigne}</p>`;
+    extra += `<p><strong>Travail réalisé par ${s.prenom} ${s.nom} :</strong></p>`;
 
     const repBase = ex.reponseAttendue;
     // Transform third-person meta-descriptions into first-person student writing
