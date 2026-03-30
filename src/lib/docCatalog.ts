@@ -170,6 +170,8 @@ export function buildFullCatalog(
           for (let exIdx = 0; exIdx < nbExercices; exIdx++) {
             const jourDebut = exIdx * 2 + 1;
             const jourFin = Math.min(exIdx * 2 + 2, nbJours);
+            // Skip single-day duplicates like "Jour 11-11"
+            if (jourDebut === jourFin && exIdx > 0) continue;
             const label = nbExercices > 1 ? ` (Jour ${jourDebut}-${jourFin})` : '';
             add(`af_c3i11_exercices_${fi}_${si}_ex${exIdx}`, `CT3 - IND 11 EXERCICES PRATIQUES${label} – ${s.prenom} ${s.nom}`, 3, 11, "exercices_stagiaire", { fi, stagiaireIdx: si, exerciceIdx: exIdx });
           }
