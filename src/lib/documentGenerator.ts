@@ -146,6 +146,10 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
       const si = params?.stagiaireIdx ?? 0;
       return genContratFormationProStagiaire(o, f, stagiaires, si);
     }
+    case "convention_formation_tripartite": {
+      const si = params?.stagiaireIdx ?? 0;
+      return genConventionFormationTripartite(o, f, stagiaires, si);
+    }
     case "convention_formation": return genConvention(o, f, stagiaires);
     case "emargement_jour": return genEmargementJour_V2(o, f, stagiaires, params?.jour ?? 0, params?.jourLabel ?? "");
     case "emargement_stagiaire": {
