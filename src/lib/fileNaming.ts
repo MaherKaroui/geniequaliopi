@@ -8,7 +8,7 @@ export const PER_STAGIAIRE_TEMPLATES = new Set([
   "attestation_formation", "certificat_reussite", "convocation",
   "attestation_entree_formation", "attestation_assiduite", "certificat_realisation",
   "fiche_autoevaluation", "fiche_renseignement", "trame_eval_besoins",
-  "contrat_formation_pro", "dossier_inscription",
+  "contrat_formation_pro", "convention_formation_tripartite", "dossier_inscription",
   "contrat_apprentissage", "livret_apprentissage_cfa",
   "analyse_parcours_pro", "plan_action_bilan", "synthese_bilan",
   "livret_recevabilite_vae", "dossier_validation_vae", "accompagnement_vae",

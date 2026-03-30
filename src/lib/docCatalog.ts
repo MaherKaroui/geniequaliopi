@@ -97,9 +97,14 @@ export function buildFullCatalog(
     stagiaires.forEach((s, si) => {
       add(`af_c3i9_cgv_${si}`, `CT3 - IND 9 CONDITIONS GÉNÉRALES DE VENTE – ${s.prenom} ${s.nom}`, 3, 9, "cgv_stagiaire", { stagiaireIdx: si });
     });
-    // Contrat de formation — un fichier par stagiaire
+    // Contrat ou Convention de formation — un fichier par stagiaire
     stagiaires.forEach((s, si) => {
-      add(`af_c3i9_contrat_formation_${si}`, `CT3 - IND 9 CONTRAT DE FORMATION – ${s.prenom} ${s.nom}`, 3, 9, "contrat_formation_pro_stagiaire", { stagiaireIdx: si });
+      const hasEntreprise = !!(s.entreprise && s.entreprise.trim());
+      if (hasEntreprise) {
+        add(`af_c3i9_convention_formation_${si}`, `CT3 - IND 9 CONVENTION DE FORMATION TRIPARTITE – ${s.prenom} ${s.nom}`, 3, 9, "convention_formation_tripartite", { stagiaireIdx: si });
+      } else {
+        add(`af_c3i9_contrat_formation_${si}`, `CT3 - IND 9 CONTRAT DE FORMATION – ${s.prenom} ${s.nom}`, 3, 9, "contrat_formation_pro_stagiaire", { stagiaireIdx: si });
+      }
     });
     // Convocation — un fichier par stagiaire
     stagiaires.forEach((s, si) => {

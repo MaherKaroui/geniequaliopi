@@ -336,6 +336,87 @@ export function genContratFormationProStagiaire(o: OrganismeInfo, f: FormationIn
   return buildDocument({ org: o, title: `CONTRAT DE FORMATION – ${s.prenom} ${s.nom}`, extraHtml: extra });
 }
 
+export function genConventionFormationTripartite(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
+  const s = stagiaires[si] || stagiaires[0];
+  const respEntreprise = s.responsableEntreprise || "Le Responsable";
+  const entrepriseNom = s.entreprise || "_______________";
+  const poste = s.poste || "_______________";
+  const sigDate = formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || new Date().toISOString(), 14));
+  const respSigHtml = s.signatureResponsableUrl
+    ? `<img src="${s.signatureResponsableUrl}" alt="Signature responsable" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />`
+    : `<p style="font-style:italic;color:#999;margin-top:15px">Signé par ${respEntreprise}</p>`;
+  let extra = `
+    <h2>CONVENTION DE FORMATION PROFESSIONNELLE TRIPARTITE</h2>
+    <p style="font-style:italic">(Articles L.6353-1 et L.6353-2 du Code du travail)</p>
+    <h3>Entre les soussignés</h3>
+    <h4>1. L'Organisme de formation</h4>
+    <p><strong>${o.nom}</strong><br>Adresse : ${o.adresse}, ${o.codePostal} ${o.ville}<br>SIRET : ${o.siret} – NDA : ${o.nda}<br>Représenté par : ${o.dirigeant}, en qualité de Dirigeant<br>Email : ${o.email}</p>
+    <p>Ci-après dénommé « l'Organisme de formation »,</p>
+    <h4>2. L'Entreprise</h4>
+    <p><strong>${entrepriseNom}</strong><br>Représentée par : ${respEntreprise}${poste !== "_______________" ? `, en qualité de ${poste}` : ""}</p>
+    <p>Ci-après dénommée « l'Entreprise »,</p>
+    <h4>3. Le/La Stagiaire</h4>
+    <p><strong>${s.prenom} ${s.nom}</strong>${s.poste ? `<br>Poste occupé : ${s.poste}` : ""}${s.email ? `<br>Email : ${s.email}` : ""}${s.telephone ? `<br>Téléphone : ${s.telephone}` : ""}</p>
+    <p>Ci-après dénommé(e) « le/la Stagiaire »,</p>
+    <h3>Article 1 – Objet de la convention</h3>
+    <p>La présente convention définit les conditions de l'action de formation au bénéfice du/de la Stagiaire, salarié(e) de l'Entreprise :</p>
+    <p><strong>Intitulé :</strong> ${f.intitule}<br><strong>Nature :</strong> Action de formation (article L.6313-1 du Code du travail)</p>
+    <h3>Article 2 – Objectifs de la formation</h3>
+    <p>À l'issue de la formation, le/la stagiaire sera capable de :</p>
+    <p>${f.objectifs.split('\n').map(obj => '• ' + obj).join('<br>')}</p>
+    <h3>Article 3 – Organisation de la formation</h3>
+    <p><strong>Durée totale :</strong> ${getStagiaireDuree(s, f)}<br><strong>Dates :</strong> du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}<br><strong>Horaires :</strong> de 09h00 à ${getHoraireFin(f)}<br><strong>Modalité :</strong> Formation ${modaliteTexte(f)}${isPresentiel(f) ? '<br><strong>Lieu :</strong> ' + f.lieu : ''}</p>
+    <h3>Article 4 – Programme</h3>
+    <p>Le programme détaillé est annexé à la présente convention.</p>
+    <p><strong>Prérequis :</strong> ${f.prerequis || 'Aucun prérequis spécifique'}</p>
+    <h3>Article 5 – Moyens pédagogiques</h3>
+    <ul><li>Apports théoriques et méthodologiques</li><li>Démonstrations commentées</li><li>Exercices pratiques et mises en situation</li><li>Support de cours remis au stagiaire</li></ul>
+    <p><strong>Moyens mobilisés :</strong> ${f.moyensPedagogiques}</p>
+    <h3>Article 6 – Modalités d'évaluation</h3>
+    <ul><li>Test de positionnement en début de formation</li><li>Exercices pratiques en cours de formation</li><li>Évaluation finale en fin de formation</li><li>Grille d'acquisition des compétences</li></ul>
+    <p>Une attestation de fin de formation et un certificat de réalisation seront remis au stagiaire et à l'Entreprise.</p>
+    <h3>Article 7 – Engagements de l'Entreprise</h3>
+    <ul><li>Libérer le/la salarié(e) pendant toute la durée de la formation</li><li>Maintenir la rémunération du/de la salarié(e)</li><li>Informer l'Organisme de tout changement</li></ul>
+    <h3>Article 8 – Dispositions financières</h3>
+    <p><strong>Coût total :</strong> ${getStagiaireTarif(s, f)}</p>
+    <p>TVA non applicable (article 261-4-4° du CGI). Facturation adressée à l'Entreprise, règlement à 30 jours.</p>
+    <h3>Article 9 – Accessibilité</h3>
+    <div class="section section-green"><p>Formation accessible aux personnes en situation de handicap.<br><strong>Référent handicap :</strong> ${o.referentHandicap} – ${o.email}</p></div>
+    <h3>Article 10 – Annulation</h3>
+    <p>Annulation moins de 7 jours ouvrés avant le début : indemnité de 30%. Abandon : facturation au prorata.</p>
+    <h3>Article 11 – Règlement intérieur</h3>
+    <p>Le/La stagiaire s'engage à respecter le règlement intérieur de l'Organisme.</p>
+    <h3>Article 12 – RGPD</h3>
+    <p>Données personnelles traitées conformément au RGPD.</p>
+    <h3>Article 13 – Litiges</h3>
+    <p>Solution amiable privilégiée. À défaut, juridictions compétentes de ${o.ville}.</p>
+    <h3>Article 14 – Entrée en vigueur</h3>
+    <p>Convention effective à la signature par les trois parties.</p>
+    <p><strong>Fait en trois exemplaires, à ${o.ville}, le ${sigDate}</strong></p>
+  `;
+  extra += '<div style="display:flex;justify-content:space-between;margin-top:30px;gap:15px">'
+    + '<div style="flex:1;border:1px solid #ccc;border-radius:6px;padding:15px;text-align:center">'
+    + '<p style="font-weight:bold;margin-bottom:8px">Pour l\'Organisme de formation</p>'
+    + '<p>' + o.nom + '</p><p>Nom : ' + o.dirigeant + '</p>'
+    + '<p style="font-style:italic;font-size:11px">(Lu et approuvé)</p><p>Signature :</p>'
+    + (o.signatureUrl ? '<img src="' + o.signatureUrl + '" alt="Signature" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />' : '')
+    + (o.tamponUrl ? '<img src="' + o.tamponUrl + '" alt="Tampon" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px;opacity:0.85" />' : '')
+    + '</div>'
+    + '<div style="flex:1;border:1px solid #ccc;border-radius:6px;padding:15px;text-align:center">'
+    + '<p style="font-weight:bold;margin-bottom:8px">Pour l\'Entreprise</p>'
+    + '<p>' + entrepriseNom + '</p><p>Nom : ' + respEntreprise + '</p>'
+    + '<p style="font-style:italic;font-size:11px">(Lu et approuvé)</p><p>Signature :</p>'
+    + respSigHtml
+    + '</div>'
+    + '<div style="flex:1;border:1px solid #ccc;border-radius:6px;padding:15px;text-align:center">'
+    + '<p style="font-weight:bold;margin-bottom:8px">Le/La Stagiaire</p>'
+    + '<p>Nom : ' + s.prenom + ' ' + s.nom + '</p>'
+    + '<p style="font-style:italic;font-size:11px">(Lu et approuvé)</p><p>Signature :</p>'
+    + (s.signatureUrl ? '<img src="' + s.signatureUrl + '" alt="Signature stagiaire" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />' : '<p style="font-style:italic;color:#999">Signé par ' + s.prenom + ' ' + s.nom + '</p>')
+    + '</div></div>';
+  return buildDocument({ org: o, title: 'CONVENTION DE FORMATION TRIPARTITE – ' + s.prenom + ' ' + s.nom, extraHtml: extra });
+}
+
 export function genProcedureAccueil_V2(o: OrganismeInfo) {
   return buildDocument({ org: o, title: "PROCÉDURE D'ACCUEIL DES STAGIAIRES", sections: [
     { heading: "Objectif de la procédure", content: `<p>Assurer un accueil structuré, bienveillant et informatif des stagiaires afin de leur permettre de comprendre le déroulement de la formation, leurs droits, devoirs et les ressources mises à leur disposition.</p><p>Cette étape garantit la conformité à l'indicateur 9 du Référentiel National Qualité Qualiopi.</p>` },
