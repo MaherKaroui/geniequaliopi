@@ -736,11 +736,7 @@ export function genExercicesStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
     return lower.includes('anglais') || lower.includes('english') || lower.includes('toeic');
   })();
 
-  let extra = isEnglishFormation ? `
-    <h2>PRACTICAL EXERCISE${jourLabel} – COURSE ${f.intitule.toUpperCase()}</h2>
-    <p><strong>Full name:</strong> ${s.prenom} ${s.nom}</p>
-    <p><strong>Date:</strong> ${exerciseDate}</p>
-  ` : `
+  let extra = `
     <h2>EXERCICE PRATIQUE${jourLabel} – FORMATION ${f.intitule.toUpperCase()}</h2>
     <p><strong>Nom et prénom :</strong> ${s.prenom} ${s.nom}</p>
     <p><strong>Date :</strong> ${exerciseDate}</p>
