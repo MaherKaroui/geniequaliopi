@@ -127,7 +127,8 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
     const isPerStagiaire = PER_STAGIAIRE_TEMPLATES.has(doc.template);
     if (isPerStagiaire && stagiaireIdx !== undefined) {
       const singleStagiaire = [allStagiaires[stagiaireIdx]];
-      return generateDocumentById(doc.id, doc.template, doc.params, organisme, formation, singleStagiaire);
+      const overriddenParams = { ...doc.params, stagiaireIdx: 0 };
+      return generateDocumentById(doc.id, doc.template, overriddenParams, organisme, formation, singleStagiaire);
     }
     return generateDocumentById(doc.id, doc.template, doc.params, organisme, formation, stagiaires);
   }, [organisme, formation, stagiaires, allStagiaires, editedContents]);
@@ -170,7 +171,14 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
       return;
     }
     const isPerStagiaire = PER_STAGIAIRE_TEMPLATES.has(doc.template);
-    if (isPerStagiaire && selectedStagiaire === -1) {
+    const hasOwnStagiaire = typeof doc.params?.stagiaireIdx === "number";
+    if (hasOwnStagiaire) {
+      // Doc already bound to a specific stagiaire — use params directly, pass all stagiaires
+      const content = generateDocumentById(doc.id, doc.template, doc.params, organisme, formation, allStagiaires);
+      const currentStagiaire = allStagiaires[doc.params!.stagiaireIdx as number] || null;
+      setPreviewContent(content);
+      setPreviewTitle(doc.nom + (currentStagiaire ? ` – ${currentStagiaire.prenom} ${currentStagiaire.nom}` : ""));
+    } else if (isPerStagiaire && selectedStagiaire === -1) {
       const allContent = allStagiaires.map((_, index) => generateContent(doc, index)).join("<hr style='border:2px solid #1e3a7b;margin:30px 0'>");
       setPreviewContent(allContent);
       setPreviewTitle(`${doc.nom} – Tous les stagiaires (${allStagiaires.length})`);
@@ -202,6 +210,13 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
     }
 
     const isPerStagiaire = PER_STAGIAIRE_TEMPLATES.has(doc.template);
+    const hasOwnStagiaire = typeof doc.params?.stagiaireIdx === "number";
+    if (hasOwnStagiaire) {
+      const content = generateDocumentById(doc.id, doc.template, doc.params, organisme, formation, allStagiaires);
+      const stagiaire = allStagiaires[doc.params!.stagiaireIdx as number] || null;
+      await downloadFile(content, buildCatalogFileName(doc, stagiaire));
+      return;
+    }
     if (isPerStagiaire && selectedStagiaire === -1) {
       for (const [index, stagiaire] of allStagiaires.entries()) {
         const content = generateContent(doc, index);
