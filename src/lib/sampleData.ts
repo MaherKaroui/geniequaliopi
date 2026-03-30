@@ -383,6 +383,7 @@ export const SATISFACTION_SCORES: Record<string, number[]> = {
   "Gestion Administrative": [4, 5, 4, 5, 4, 5, 5, 4],
   "TP SAMA": [5, 4, 5, 5, 4, 5, 4, 5],
   "Initiation Word": [5, 5, 4, 5, 4, 5, 5, 4],
+  "Anglais A1": [5, 4, 5, 4, 5, 5, 4, 5],
 };
 
 // Evaluation scores per stagiaire (good scores 8-10/10)
