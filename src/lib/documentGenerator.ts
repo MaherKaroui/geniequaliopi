@@ -8532,99 +8532,370 @@ function genDecoupageFormationCFAExcel(o: OrganismeInfo, f: FormationInfo) {
   const accompHours = Math.round(effectiveTotal * 0.15);
   const blocHoursTotal = effectiveTotal - accompHours;
 
-  // Build the multi-sheet Excel content
-  const tableRowFn = (cells: string[], isHeader = false) => {
+  const tr = (cells: string[], isHeader = false) => {
     const tag = isHeader ? 'th' : 'td';
     return `<tr>${cells.map(c => `<${tag}>${c}</${tag}>`).join('')}</tr>`;
   };
 
-  // Sheet 1: Vue globale (REAC-like)
-  let sheet1 = tableRowFn(["N° AT", "Activité type", "N° CP", "Compétence professionnelle", "Modules associés", "Nombre d'heures", "Objectifs pédagogiques"], true);
+  // NTC-specific detailed module data
+  const ntcModulesData: Record<string, { module: string; rows: { at: string; atNum: string; cp: string; cpNum: string; description: string; savoirs: string; connaissances: string; transversales: string; logiciels: string; objectifs: string; criteres: string; evaluation: string }[] }> = {
+    "Gestion commerciale": {
+      module: "Gestion commerciale",
+      rows: [
+        { at: "Élaborer une stratégie de prospection et la mettre en oeuvre", atNum: "1", cp: "Assurer une veille commerciale pour analyser l'état du marché", cpNum: "1",
+          description: "Analyse du marché, fournir des réponses et des conseils pertinents aux professionnels",
+          savoirs: "Utiliser les techniques et technologies d'information en lien avec son activité commerciale\nMettre en place un système de veille",
+          connaissances: "Connaissance des procédures internes à l'entreprise\nConnaissance des mouvements du marché",
+          transversales: "L'environnement économique, juridique et sociétale\nCalcul commercial et statistiques",
+          logiciels: "Logiciels d'analyse statistique\nCRM\nLogiciel de géo-optimisation",
+          objectifs: "Définir le marché et ses composantes\nIdentifier les sources d'information\nMettre en place une veille concurrentielle",
+          criteres: "Le système de veille est opérationnel et actualisé\nLes informations collectées sont fiables et exploitables",
+          evaluation: "Entretien technique (30 min)\nQuestionnement à partir de productions" },
+        { at: "Élaborer une stratégie de prospection et la mettre en oeuvre", atNum: "1", cp: "Organiser un plan d'actions commerciales", cpNum: "2",
+          description: "Se baser sur les objectifs de la direction commerciale et l'analyse du marché pour organiser les actions",
+          savoirs: "Appliquer les procédures de l'entreprise\nAnalyser ses objectifs commerciaux\nConcevoir un plan d'actions commerciales",
+          connaissances: "Connaissance du potentiel clients/prospects\nConnaissance de la politique commerciale",
+          transversales: "Bureautique / réseaux sociaux / outils numériques\nDéveloppement durable\nGestion commerciale",
+          logiciels: "CRM\nLogiciel de géo-optimisation\nOutils digitaux",
+          objectifs: "Définir et analyser les objectifs commerciaux\nSegmenter le portefeuille clients\nPlanifier les actions commerciales",
+          criteres: "L'analyse et la segmentation du portefeuille sont pertinentes\nLes moyens d'action sont cohérents avec la politique commerciale",
+          evaluation: "Questionnement à partir de productions\nMise en situation professionnelle" },
+        { at: "Élaborer une stratégie de prospection et la mettre en oeuvre", atNum: "1", cp: "Mettre en oeuvre des actions de fidélisation", cpNum: "3",
+          description: "Suivre l'affaire conclue jusqu'à la livraison et le règlement\nGérer les réclamations et les litiges",
+          savoirs: "Concevoir et utiliser un planning pour le suivi des affaires\nRéaliser un bilan de satisfaction client",
+          connaissances: "Connaissance des conditions générales et particulières de vente\nConnaissance des outils de fidélisation",
+          transversales: "Gestion commerciale\nBureautique / outils numériques\nCommunication et posture professionnelle",
+          logiciels: "Analyse SWOT\nCRM\nOutils marketing",
+          objectifs: "Fidéliser sa clientèle par un suivi rigoureux\nTraiter les réclamations de manière professionnelle\nMesurer la satisfaction client",
+          criteres: "Respect de la politique commerciale\nTraitement des réclamations conforme aux procédures",
+          evaluation: "Questionnement à partir de productions\nEntretien technique" },
+        { at: "Élaborer une stratégie de prospection et la mettre en oeuvre", atNum: "1", cp: "Réaliser le bilan de l'activité commerciale et rendre compte", cpNum: "4",
+          description: "Réaliser et analyser le bilan de son activité commerciale et de ses résultats",
+          savoirs: "Utiliser et exploiter un tableau de bord\nDécliner un objectif global en sous-objectifs\nAnalyser les écarts",
+          connaissances: "Connaissance des objectifs fixés par l'entreprise\nConnaissance des outils de suivi et reporting",
+          transversales: "Gestion commerciale\nQualité (arbre des causes)\nCalcul commercial\nBureautique",
+          logiciels: "CRM\nLogiciel de gestion de la relation client\nTableaux de bord Excel",
+          objectifs: "Décliner un objectif global en sous-objectifs\nAnalyser les résultats et identifier les écarts\nProposer des actions correctives",
+          criteres: "Réalisation et analyse du bilan de l'activité commerciale\nIdentification des éventuels écarts",
+          evaluation: "Mise en situation professionnelle (4h30)\nEntretien technique" },
+      ]
+    },
+    "Techniques de prospection": {
+      module: "Les techniques de prospection",
+      rows: [
+        { at: "Négocier une solution technique et commerciale et consolider l'expérience client", atNum: "2", cp: "Prospecter à distance et physiquement un secteur géographique", cpNum: "5",
+          description: "Prendre contact par téléphone, campagnes de publipostage ou courriels\nProspecter physiquement un secteur",
+          savoirs: "Maîtriser les techniques de prospection\nDéfinir une cible en créant un avatar client\nConstruire un argumentaire",
+          connaissances: "Connaissance des techniques de prise de rendez-vous\nConnaissance des outils de gestion de leads",
+          transversales: "Communication et posture professionnelle\nStatistique de base\nBureautique / réseaux sociaux",
+          logiciels: "Outils d'aide à la vente\nSite web, Emailing, Réseaux sociaux\nOutils d'automatisation",
+          objectifs: "Maîtriser les techniques de prospection téléphonique et physique\nCréer des supports de prospection efficaces\nOrganiser les tournées commerciales",
+          criteres: "La cible de prospects est cohérente avec le plan d'actions\nLe langage est adapté à l'interlocuteur",
+          evaluation: "Mise en situation professionnelle\nJeu de rôle de prospection" },
+      ]
+    },
+    "Les techniques de vente": {
+      module: "Les techniques de vente face à face",
+      rows: [
+        { at: "Négocier une solution technique et commerciale et consolider l'expérience client", atNum: "2", cp: "Concevoir une solution technique et commerciale appropriée", cpNum: "6",
+          description: "Recueillir des informations relatives aux attentes du client par des techniques d'écoute active\nRéaliser une démonstration",
+          savoirs: "Prendre des notes exploitables au cours d'un entretien\nRéaliser une démonstration adaptée\nChiffrer une proposition",
+          connaissances: "Connaissance des solutions techniques et de leurs contraintes\nConnaissance des processus de décision du client",
+          transversales: "Communication interpersonnelle\nAnalyse des besoins\nArgumentation commerciale",
+          logiciels: "Outils de chiffrage\nPrésentations commerciales\nCRM",
+          objectifs: "Maîtriser les techniques de découverte des besoins\nConcevoir une offre personnalisée\nPrésenter et argumenter la solution",
+          criteres: "La présentation et la posture professionnelle mettent en valeur le produit\nLa solution répond aux besoins détectés",
+          evaluation: "Mise en situation professionnelle (4h45)\nJeu de rôle de vente" },
+        { at: "Négocier une solution technique et commerciale et consolider l'expérience client", atNum: "2", cp: "Négocier une solution technique et commerciale", cpNum: "7",
+          description: "Présenter la solution technique et commerciale en face à face\nArgumenter en valorisant les bénéfices\nTraiter les objections",
+          savoirs: "Adapter sa présentation en fonction des supports utilisés\nPréparer et dérouler une négociation\nGérer les situations difficiles",
+          connaissances: "Connaissance des techniques de négociation\nConnaissance de la psychologie de l'acheteur",
+          transversales: "Communication assertive\nGestion du stress\nIntelligence émotionnelle",
+          logiciels: "Supports de présentation\nOutils de simulation tarifaire",
+          objectifs: "Maîtriser les étapes de la négociation commerciale\nTraiter efficacement les objections\nConclure la vente",
+          criteres: "La solution technique et commerciale répond aux besoins\nL'argumentation est adaptée et convaincante",
+          evaluation: "Mise en situation professionnelle\nNégociation filmée et analysée" },
+      ]
+    },
+    "Communication": {
+      module: "Communication et posture professionnelle",
+      rows: [
+        { at: "Élaborer une stratégie de prospection et la mettre en oeuvre", atNum: "1", cp: "Assurer une veille commerciale", cpNum: "1",
+          description: "Maîtriser la communication interpersonnelle dans un contexte commercial",
+          savoirs: "Maîtriser les règles de la communication écrite et orale\nAdopter une posture professionnelle adaptée",
+          connaissances: "Connaissance des principes de communication non-verbale\nConnaissance des codes culturels",
+          transversales: "Développement personnel\nIntelligence relationnelle\nÉcoute active",
+          logiciels: "Outils de visioconférence\nSuite bureautique\nRéseaux sociaux professionnels",
+          objectifs: "Communication interpersonnelle efficace\nAnimer et consolider une relation commerciale\nAdapter sa communication à l'interlocuteur",
+          criteres: "Le langage est professionnel et adapté\nLa posture inspire confiance",
+          evaluation: "Mise en situation orale\nJeu de rôle" },
+        { at: "Négocier une solution technique et commerciale", atNum: "2", cp: "Prospecter à distance et physiquement", cpNum: "5",
+          description: "Prendre contact professionnel, maîtriser l'entretien téléphonique, la relation en face à face",
+          savoirs: "Prospecter par téléphone et en face à face\nAdapter sa communication au canal utilisé",
+          connaissances: "Connaissance des techniques de prise de rendez-vous\nConnaissance de la communication multicanal",
+          transversales: "Expression orale\nGestion du stress\nArgumentation",
+          logiciels: "Téléphonie professionnelle\nOutils CRM\nSolutions d'emailing",
+          objectifs: "Maîtriser l'accueil téléphonique et physique\nDévelopper une aisance relationnelle\nGérer les situations conflictuelles",
+          criteres: "Le prospect est mis en confiance\nLe discours est structuré et convaincant",
+          evaluation: "Simulation d'appels\nEntretien de prospection filmé" },
+      ]
+    },
+    "Bureautique": {
+      module: "Bureautique et outils numériques",
+      rows: [
+        { at: "Élaborer une stratégie de prospection et la mettre en oeuvre", atNum: "1", cp: "Organiser un plan d'actions commerciales", cpNum: "2",
+          description: "Maîtriser les outils bureautiques pour la gestion commerciale",
+          savoirs: "Utiliser Excel pour les tableaux de bord\nCréer des présentations professionnelles\nGérer une base de données clients",
+          connaissances: "Connaissance des fonctionnalités avancées de la suite Office\nConnaissance des outils collaboratifs",
+          transversales: "Organisation du travail\nGestion de l'information\nProductivité numérique",
+          logiciels: "Microsoft Office (Excel, Word, PowerPoint)\nGoogle Workspace\nOutils collaboratifs (Teams, Slack)",
+          objectifs: "Créer et exploiter des tableaux de bord commerciaux\nRédiger des courriers et rapports professionnels\nGérer efficacement les données clients",
+          criteres: "Les documents produits sont professionnels et conformes\nLes données sont exploitées de manière pertinente",
+          evaluation: "Exercices pratiques sur poste\nProduction de documents professionnels" },
+        { at: "Élaborer une stratégie de prospection et la mettre en oeuvre", atNum: "1", cp: "Réaliser le bilan de l'activité commerciale", cpNum: "4",
+          description: "Exploiter les outils numériques pour le reporting et l'analyse de données",
+          savoirs: "Créer des graphiques et tableaux croisés dynamiques\nUtiliser des fonctions de calcul avancées\nAutomatiser les tâches répétitives",
+          connaissances: "Connaissance des formules Excel avancées\nConnaissance des outils de data visualisation",
+          transversales: "Analyse de données\nSynthèse et restitution\nRigueur et précision",
+          logiciels: "Excel avancé (TCD, macros)\nPower BI\nCRM (export et analyse)",
+          objectifs: "Analyser des données commerciales avec Excel avancé\nCréer des reportings automatisés\nPrésenter les résultats de manière visuelle",
+          criteres: "Les analyses sont fiables et pertinentes\nLes rapports sont clairs et exploitables",
+          evaluation: "Cas pratique d'analyse de données\nProduction d'un tableau de bord" },
+      ]
+    },
+    "Marketing digital": {
+      module: "Marketing digital et réseaux sociaux",
+      rows: [
+        { at: "Élaborer une stratégie de prospection et la mettre en oeuvre", atNum: "1", cp: "Assurer une veille commerciale", cpNum: "1",
+          description: "Utiliser les outils digitaux pour la veille et la prospection en ligne",
+          savoirs: "Utiliser les réseaux sociaux professionnels pour la prospection\nMettre en place une stratégie de contenu\nAnalyser les métriques digitales",
+          connaissances: "Connaissance des plateformes sociales professionnelles\nConnaissance du marketing de contenu\nConnaissance du SEO/SEA",
+          transversales: "Créativité\nAdaptabilité digitale\nPersonal branding",
+          logiciels: "LinkedIn Sales Navigator\nGoogle Analytics\nOutils de social selling\nMailchimp/Brevo",
+          objectifs: "Développer une présence professionnelle en ligne\nProspecter via les réseaux sociaux\nCréer du contenu à valeur ajoutée",
+          criteres: "La stratégie digitale est cohérente avec les objectifs commerciaux\nLes KPIs digitaux sont suivis et analysés",
+          evaluation: "Création d'un plan de social selling\nAnalyse de campagne digitale" },
+        { at: "Négocier une solution technique et commerciale", atNum: "2", cp: "Prospecter à distance", cpNum: "5",
+          description: "Utiliser les canaux digitaux pour la prospection à distance",
+          savoirs: "Rédiger des emails de prospection efficaces\nCréer des séquences d'automatisation\nMesurer les taux de conversion",
+          connaissances: "Connaissance des techniques de copywriting\nConnaissance de l'inbound marketing",
+          transversales: "Rédaction persuasive\nA/B testing\nGrowth hacking",
+          logiciels: "Outils d'emailing (Mailchimp, Brevo)\nCRM avec automatisation\nOutils de tracking (UTM, pixels)",
+          objectifs: "Concevoir des campagnes d'emailing performantes\nAutomatiser les séquences de prospection\nOptimiser les taux de conversion",
+          criteres: "Les campagnes respectent le RGPD\nLes résultats sont mesurés et optimisés",
+          evaluation: "Création d'une campagne email\nAnalyse des résultats" },
+      ]
+    },
+    "Calcul commercial": {
+      module: "Calcul commercial et statistiques",
+      rows: [
+        { at: "Élaborer une stratégie de prospection et la mettre en oeuvre", atNum: "1", cp: "Assurer une veille commerciale", cpNum: "1",
+          description: "Exploiter les statistiques commerciales pour l'analyse de marché",
+          savoirs: "Exploiter les données statistiques du marché\nCalculer des indicateurs de performance commerciale",
+          connaissances: "Connaissance des indicateurs statistiques de base\nConnaissance des méthodes d'analyse quantitative",
+          transversales: "Rigueur mathématique\nAnalyse quantitative\nSynthèse",
+          logiciels: "Excel (fonctions statistiques)\nLogiciels d'analyse statistique",
+          objectifs: "Utiliser les logiciels d'analyse statistique\nCalculer et interpréter les KPIs commerciaux",
+          criteres: "Les calculs sont exacts\nL'interprétation des données est pertinente",
+          evaluation: "Exercices de calcul commercial\nÉtude de cas chiffrée" },
+        { at: "Négocier une solution technique et commerciale", atNum: "2", cp: "Concevoir une solution technique et commerciale", cpNum: "6",
+          description: "Chiffrer une proposition commerciale adaptée au client",
+          savoirs: "Calculer un prix de vente, une marge, un coût de revient\nÉlaborer un devis complexe\nCalculer la rentabilité d'une opération",
+          connaissances: "Connaissance de la structure de coûts\nConnaissance des mécanismes de marge\nConnaissance de la TVA et des remises",
+          transversales: "Précision et rigueur\nNégociation tarifaire\nAnalyse financière de base",
+          logiciels: "Excel (formules financières)\nOutils de devis/facturation\nERP",
+          objectifs: "Maîtriser les calculs de marge et de prix\nÉlaborer des devis professionnels\nAnalyser la rentabilité d'une affaire",
+          criteres: "Les calculs sont exacts et la proposition est rentable\nLe devis est clair et professionnel",
+          evaluation: "Cas pratique de chiffrage\nÉlaboration d'un devis complet" },
+      ]
+    },
+    "Organisation de l'entreprise": {
+      module: "Environnement économique, juridique et sociétal",
+      rows: [
+        { at: "Élaborer une stratégie de prospection et la mettre en oeuvre", atNum: "1", cp: "Assurer une veille commerciale", cpNum: "1",
+          description: "Comprendre l'environnement économique, juridique et sociétal de l'entreprise",
+          savoirs: "Identifier les acteurs de l'environnement économique\nComprendre le cadre juridique de la vente",
+          connaissances: "Connaissance du droit commercial et du droit social\nConnaissance des formes juridiques d'entreprise",
+          transversales: "Culture économique\nÉthique professionnelle\nResponsabilité sociétale",
+          logiciels: "Bases de données juridiques\nSites institutionnels",
+          objectifs: "Connaître les notions de droit social et commercial\nComprendre l'organisation d'une entreprise\nIntégrer la RSE dans sa pratique",
+          criteres: "Les aspects juridiques sont pris en compte dans l'activité commerciale\nLa démarche RSE est intégrée",
+          evaluation: "QCM de connaissances\nÉtude de cas juridique" },
+        { at: "Négocier une solution technique et commerciale", atNum: "2", cp: "Concevoir une solution technique et commerciale", cpNum: "6",
+          description: "Prendre en compte les contraintes juridiques et contractuelles dans la négociation",
+          savoirs: "Rédiger des CGV\nComprendre les clauses contractuelles\nGérer les litiges commerciaux",
+          connaissances: "Connaissance du droit des contrats\nConnaissance des CGV et CGU\nConnaissance de la réglementation RGPD",
+          transversales: "Rigueur juridique\nProtection des données\nGestion des risques",
+          logiciels: "Modèles de contrats\nOutils de signature électronique",
+          objectifs: "Rédiger des documents commerciaux conformes\nIntégrer les aspects juridiques dans la négociation\nProtéger les intérêts de l'entreprise",
+          criteres: "Les documents sont juridiquement conformes\nLes risques contractuels sont identifiés et gérés",
+          evaluation: "Rédaction d'une proposition commerciale\nAnalyse de clauses contractuelles" },
+      ]
+    },
+    "Développement durable": {
+      module: "Développement durable et RSE",
+      rows: [
+        { at: "Élaborer une stratégie de prospection et la mettre en oeuvre", atNum: "1", cp: "Organiser un plan d'actions commerciales", cpNum: "2",
+          description: "Intégrer les enjeux du développement durable dans la démarche commerciale",
+          savoirs: "Identifier les enjeux RSE du secteur d'activité\nIntégrer les critères environnementaux dans l'offre commerciale",
+          connaissances: "Connaissance des normes ISO 26000 et 14001\nConnaissance des labels et certifications environnementales",
+          transversales: "Éco-responsabilité\nÉthique commerciale\nInnovation durable",
+          logiciels: "Outils de bilan carbone\nPlateformes de reporting RSE",
+          objectifs: "Comprendre les enjeux du développement durable en entreprise\nValoriser une offre responsable auprès des clients\nMesurer l'impact environnemental",
+          criteres: "La démarche commerciale intègre les critères RSE\nL'argumentation valorise les engagements durables",
+          evaluation: "Étude de cas RSE\nProposition commerciale intégrant le DD" },
+      ]
+    },
+    "Qualité": {
+      module: "Démarche qualité et amélioration continue",
+      rows: [
+        { at: "Élaborer une stratégie de prospection et la mettre en oeuvre", atNum: "1", cp: "Réaliser le bilan de l'activité commerciale", cpNum: "4",
+          description: "Appliquer les principes de la démarche qualité dans l'activité commerciale",
+          savoirs: "Utiliser les outils qualité (Ishikawa, PDCA, 5 Pourquoi)\nMettre en place des indicateurs de performance",
+          connaissances: "Connaissance des principes de la qualité totale\nConnaissance des normes ISO 9001",
+          transversales: "Amélioration continue\nRésolution de problèmes\nOrientation client",
+          logiciels: "Outils de management de la qualité\nTableaux de bord qualité",
+          objectifs: "Appliquer la démarche qualité au processus commercial\nIdentifier et résoudre les dysfonctionnements\nMettre en place des actions correctives",
+          criteres: "Les processus commerciaux sont documentés et suivis\nLes non-conformités sont traitées",
+          evaluation: "Analyse d'un processus qualité\nPlan d'amélioration continue" },
+      ]
+    },
+    "Préparation à la recherche d'emploi": {
+      module: "Techniques de recherche d'emploi",
+      rows: [
+        { at: "Compétences transversales", atNum: "CT", cp: "Préparer sa recherche d'emploi et d'alternance", cpNum: "CT1",
+          description: "Maîtriser les techniques de recherche d'emploi et de stage en entreprise",
+          savoirs: "Rédiger un CV et une lettre de motivation percutants\nPréparer et réussir un entretien d'embauche\nDévelopper son réseau professionnel",
+          connaissances: "Connaissance du marché de l'emploi\nConnaissance des plateformes de recrutement\nConnaissance des codes du milieu professionnel",
+          transversales: "Personal branding\nNetworking\nConfiance en soi",
+          logiciels: "LinkedIn\nPôle Emploi / France Travail\nJobboards spécialisés",
+          objectifs: "Créer un CV adapté au poste visé\nMaîtriser les techniques d'entretien\nDévelopper une stratégie de recherche efficace",
+          criteres: "Le CV est professionnel et ciblé\nL'entretien est préparé et structuré",
+          evaluation: "Simulation d'entretien\nProduction d'un dossier de candidature" },
+      ]
+    },
+    "Dossier professionnel": {
+      module: "Préparation du dossier professionnel",
+      rows: [
+        { at: "Compétences transversales", atNum: "CT", cp: "Préparer la rédaction du dossier professionnel", cpNum: "CT2",
+          description: "Préparer et rédiger le dossier professionnel en vue du passage devant le jury",
+          savoirs: "Structurer le dossier professionnel selon les exigences du référentiel\nDécrire ses activités professionnelles de manière détaillée\nPréparer la soutenance orale",
+          connaissances: "Connaissance de la structure du DP\nConnaissance des attendus du jury\nConnaissance des critères d'évaluation",
+          transversales: "Rédaction professionnelle\nSynthèse\nPrise de recul sur sa pratique",
+          logiciels: "Suite bureautique\nModèle de DP officiel",
+          objectifs: "Rédiger un dossier professionnel complet et conforme\nIllustrer chaque compétence par des exemples concrets\nPréparer l'oral devant le jury",
+          criteres: "Le DP couvre l'ensemble des compétences du référentiel\nLes exemples sont concrets et détaillés",
+          evaluation: "Relecture croisée du DP\nSimulation de jury blanc" },
+      ]
+    },
+  };
 
-  if (rncp && rncp.blocsCompetences.length > 0) {
+  const sheets: { name: string; html: string }[] = [];
+
+  if (rncp && (rncp.code === 'RNCP39063' || f.intitule?.toLowerCase().includes('ntc') || f.intitule?.toLowerCase().includes('négociateur technico'))) {
+    // NTC: use detailed module data
     const rncpTotalVolume = rncp.blocsCompetences.reduce((sum, bloc) =>
       sum + bloc.matieres.reduce((s, m) => s + (parseInt(m.volume) || 0), 0), 0);
     const scale = rncpTotalVolume > 0 ? blocHoursTotal / rncpTotalVolume : 1;
 
-    rncp.blocsCompetences.forEach((bloc, bi) => {
-      const blocVolume = Math.round(bloc.matieres.reduce((s, m) => s + (parseInt(m.volume) || 0), 0) * scale);
-      const modulesStr = bloc.matieres.map(m => m.contenu).join('\n');
-      const objectifs = bloc.matieres.map(m => `Maîtriser : ${m.contenu}`).join('\n');
-      sheet1 += tableRowFn([
-        `${bi + 1}`,
-        bloc.titre,
-        bloc.matieres.map((_, mi) => `${bi + 1}.${mi + 1}`).join('\n'),
-        bloc.matieres.map(m => m.contenu).join('\n'),
-        modulesStr,
-        `${blocVolume}h`,
-        objectifs
-      ]);
-    });
-    sheet1 += tableRowFn(["", "Accompagnement + Examens", "", "Préparation certification", "Accompagnement individuel", `${accompHours}h`, "Préparer le passage de la certification"]);
-    sheet1 += tableRowFn(["", "TOTAL", "", "", "", `${effectiveTotal}h`, ""], true);
-  } else {
-    const chapters = getCourseChapters(f.intitule);
-    const nbBlocs = Math.min(chapters.length, 5);
-    const perBloc = Math.round(blocHoursTotal / Math.max(1, nbBlocs));
-    chapters.slice(0, nbBlocs).forEach((ch, ci) => {
-      const objectifs = ch.sections.slice(0, 3).map(s => s.title).join('\n');
-      sheet1 += tableRowFn([`${ci + 1}`, ch.title, `${ci + 1}.1`, ch.description, ch.sections.map(s => s.title).join('\n'), `${perBloc}h`, objectifs]);
-    });
-    sheet1 += tableRowFn(["", "Accompagnement + Examens", "", "", "", `${accompHours}h`, ""]);
-    sheet1 += tableRowFn(["", "TOTAL", "", "", "", `${effectiveTotal}h`, ""], true);
-  }
-
-  // Sheet 2: Détail par module
-  let sheet2 = tableRowFn(["Module", "Chapitre / Contenu", "Savoirs", "Compétences transversales", "Outils / Logiciels", "Objectifs pédagogiques", "Modalités d'évaluation", "Heures"], true);
-
-  if (rncp && rncp.blocsCompetences.length > 0) {
-    const rncpTotalVolume = rncp.blocsCompetences.reduce((sum, bloc) =>
-      sum + bloc.matieres.reduce((s, m) => s + (parseInt(m.volume) || 0), 0), 0);
-    const scale = rncpTotalVolume > 0 ? blocHoursTotal / rncpTotalVolume : 1;
+    // Sheet 1: Vue globale REAC
+    let sheet1 = tr(["N° Fiche AT", "Activités types", "N° Fiche CP", "Compétences professionnelles", "Description", "Savoirs", "Critères de performance", "Connaissances", "Modules associés", "Logiciels et outils associés", "Nombre d'heures", "Objectifs pédagogiques", "Critères d'évaluation"], true);
 
     rncp.blocsCompetences.forEach((bloc, bi) => {
       bloc.matieres.forEach((mat, mi) => {
         const vol = Math.round((parseInt(mat.volume) || 0) * scale);
-        sheet2 += tableRowFn([
-          `Bloc ${bi + 1} – ${bloc.titre}`,
+        sheet1 += tr([
+          `${bi + 1}`, bloc.titre,
+          `${mi + 1}`, mat.competence,
           mat.contenu,
-          `Maîtriser les techniques de ${mat.contenu.toLowerCase()}`,
-          "Communication professionnelle, travail en équipe, autonomie",
+          `Maîtriser : ${mat.contenu}`,
+          bloc.modalitesEval.split('.')[0] || "",
+          `Connaissance approfondie de : ${mat.contenu.toLowerCase()}`,
+          mat.contenu.split(',')[0] || "",
           "CRM, Suite bureautique, outils numériques",
-          `Être capable de ${mat.contenu.toLowerCase()}`,
-          bloc.modalitesEval || "Mise en situation + évaluation continue",
-          `${vol}h`
+          `${vol}h`,
+          `Être capable de ${mat.competence.toLowerCase()}`,
+          bloc.modalitesEval
         ]);
       });
     });
-  } else {
-    const chapters = getCourseChapters(f.intitule);
-    const nbBlocs = Math.min(chapters.length, 5);
-    const perBloc = Math.round(blocHoursTotal / Math.max(1, nbBlocs));
-    chapters.slice(0, nbBlocs).forEach((ch, ci) => {
-      ch.sections.forEach((sec, si) => {
-        const vol = Math.round(perBloc / ch.sections.length);
-        sheet2 += tableRowFn([
-          ch.title,
-          sec.title,
-          `Connaissances liées à ${sec.title.toLowerCase()}`,
-          "Communication, autonomie, travail collaboratif",
-          "Suite bureautique, outils numériques",
-          `Maîtriser ${sec.title.toLowerCase()}`,
-          "Mise en situation professionnelle + QCM",
-          `${vol}h`
-        ]);
+    sheet1 += tr(["", "Accompagnement + Examens blancs", "", "Préparation certification", "Préparation personnalisée aux épreuves", "", "", "", "Accompagnement individuel", "", `${accompHours}h`, "Préparer le passage de la certification", "Examens blancs + entretien jury"], false);
+    sheet1 += tr(["", "TOTAL", "", "", "", "", "", "", "", "", `${effectiveTotal}h`, "", ""], true);
+    sheets.push({ name: "Vue globale REAC", html: `<table>${sheet1}</table>` });
+
+    // One sheet per detailed module
+    Object.entries(ntcModulesData).forEach(([key, modData]) => {
+      let sheetHtml = tr(["Modules", "Activités types", "Compétences professionnelles", "Description", "Savoirs", "Connaissances", "Compétences transversales", "Logiciels et outils", "Objectifs pédagogiques", "Critères de performance", "Modalités d'évaluation"], true);
+      modData.rows.forEach(r => {
+        sheetHtml += tr([modData.module, r.at, r.cp, r.description, r.savoirs, r.connaissances, r.transversales, r.logiciels, r.objectifs, r.criteres, r.evaluation]);
       });
+      const sheetName = modData.module.substring(0, 31).replace(/[\/\\?*\[\]]/g, '');
+      sheets.push({ name: sheetName, html: `<table>${sheetHtml}</table>` });
+    });
+
+  } else if (rncp && rncp.blocsCompetences.length > 0) {
+    // Other RNCP: generate detailed sheets from RNCP data
+    const rncpTotalVolume = rncp.blocsCompetences.reduce((sum, bloc) =>
+      sum + bloc.matieres.reduce((s, m) => s + (parseInt(m.volume) || 0), 0), 0);
+    const scale = rncpTotalVolume > 0 ? blocHoursTotal / rncpTotalVolume : 1;
+
+    // Sheet 1: Vue globale
+    let sheet1 = tr(["N° Fiche AT", "Activités types", "N° Fiche CP", "Compétences professionnelles", "Description", "Savoirs", "Critères de performance", "Connaissances", "Modules associés", "Logiciels et outils", "Heures", "Objectifs pédagogiques", "Critères d'évaluation"], true);
+    rncp.blocsCompetences.forEach((bloc, bi) => {
+      bloc.matieres.forEach((mat, mi) => {
+        const vol = Math.round((parseInt(mat.volume) || 0) * scale);
+        sheet1 += tr([`${bi + 1}`, bloc.titre, `${mi + 1}`, mat.competence, mat.contenu, `Maîtriser : ${mat.contenu}`, bloc.modalitesEval.split('.')[0] || "", `Connaissance de : ${mat.contenu.toLowerCase()}`, mat.contenu.split(',')[0], "Outils numériques, Suite bureautique", `${vol}h`, `Être capable de ${mat.competence.toLowerCase()}`, bloc.modalitesEval]);
+      });
+    });
+    sheet1 += tr(["", "Accompagnement + Examens", "", "", "", "", "", "", "", "", `${accompHours}h`, "", ""], false);
+    sheet1 += tr(["", "TOTAL", "", "", "", "", "", "", "", "", `${effectiveTotal}h`, "", ""], true);
+    sheets.push({ name: "Vue globale REAC", html: `<table>${sheet1}</table>` });
+
+    // One sheet per bloc
+    rncp.blocsCompetences.forEach((bloc, bi) => {
+      let sheetHtml = tr(["Module", "Compétence professionnelle", "Description", "Savoirs", "Connaissances", "Compétences transversales", "Logiciels", "Objectifs pédagogiques", "Critères de performance", "Modalités d'évaluation", "Heures"], true);
+      bloc.matieres.forEach((mat, mi) => {
+        const vol = Math.round((parseInt(mat.volume) || 0) * scale);
+        sheetHtml += tr([`Bloc ${bi + 1} – ${bloc.titre}`, mat.competence, mat.contenu, `Maîtriser : ${mat.contenu}`, `Connaissance approfondie de ${mat.contenu.toLowerCase()}`, "Communication, autonomie, travail en équipe", "Suite bureautique, outils métier", `Être capable de ${mat.competence.toLowerCase()}`, bloc.modalitesEval.split('.')[0] || "", bloc.modalitesEval, `${vol}h`]);
+      });
+      const sheetName = `Bloc ${bi + 1}`.substring(0, 31);
+      sheets.push({ name: sheetName, html: `<table>${sheetHtml}</table>` });
+    });
+
+  } else {
+    // Generic: use course chapters
+    const chapters = getCourseChapters(f.intitule);
+    const nbBlocs = Math.min(chapters.length, 6);
+    const perBloc = Math.round(blocHoursTotal / Math.max(1, nbBlocs));
+
+    let sheet1 = tr(["N° Module", "Module", "Sections", "Description", "Heures", "Objectifs pédagogiques", "Modalités d'évaluation"], true);
+    chapters.slice(0, nbBlocs).forEach((ch, ci) => {
+      const secs = ch.sections.map(s => s.title).join('\n');
+      sheet1 += tr([`${ci + 1}`, ch.title, secs, ch.description, `${perBloc}h`, ch.sections.slice(0, 3).map(s => `Maîtriser ${s.title.toLowerCase()}`).join('\n'), "Mise en situation + QCM + exercices pratiques"]);
+    });
+    sheet1 += tr(["", "Accompagnement + Examens", "", "", `${accompHours}h`, "", ""], false);
+    sheet1 += tr(["", "TOTAL", "", "", `${effectiveTotal}h`, "", ""], true);
+    sheets.push({ name: "Vue globale", html: `<table>${sheet1}</table>` });
+
+    // One sheet per chapter
+    chapters.slice(0, nbBlocs).forEach((ch, ci) => {
+      let sheetHtml = tr(["Section", "Contenu", "Savoirs", "Objectifs", "Modalités d'évaluation", "Heures"], true);
+      const perSec = Math.round(perBloc / ch.sections.length);
+      ch.sections.forEach((sec, si) => {
+        sheetHtml += tr([sec.title, sec.content.replace(/<[^>]*>/g, '').substring(0, 200), `Connaissance de ${sec.title.toLowerCase()}`, `Maîtriser ${sec.title.toLowerCase()}`, "Exercices pratiques + QCM", `${perSec}h`]);
+      });
+      const sheetName = `Ch${ci + 1} ${ch.title}`.substring(0, 31).replace(/[\/\\?*\[\]]/g, '');
+      sheets.push({ name: sheetName, html: `<table>${sheetHtml}</table>` });
     });
   }
 
-  // Sheet 3: Planning alternance
+  // Sheet: Planning alternance
   const rythme = f.rythmeAlternance || '1 semaine CFA / 3 semaines entreprise';
   const { cfaWeeks: cfaPerCycle, entrepriseWeeks } = parseRythmeAlternance(rythme);
   const totalCFAWeeks = Math.max(1, Math.ceil(effectiveTotal / 35));
   const totalCycles = Math.ceil(totalCFAWeeks / cfaPerCycle);
 
-  let sheet3 = tableRowFn(["Semaine", "Dates", "Lieu", "Module / Bloc", "Heures"], true);
+  let sheetPlanning = tr(["Semaine", "Dates", "Lieu", "Module / Bloc", "Heures", "Observations"], true);
   const startDate = f.dateDebut ? new Date(f.dateDebut.split('/').reverse().join('-')) : new Date();
   if (isNaN(startDate.getTime())) startDate.setTime(Date.now());
   const fmtD = (d: Date) => d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
@@ -8644,7 +8915,7 @@ function genDecoupageFormationCFAExcel(o: OrganismeInfo, f: FormationInfo) {
       const we = new Date(ws);
       we.setDate(we.getDate() + 4);
       const modIdx = Math.min(cfaWk - 1, modList.length - 1);
-      sheet3 += tableRowFn([`S${calWeek + 1}`, `${fmtD(ws)} – ${fmtD(we)}`, "CFA", modList[modIdx] || "", "35h"]);
+      sheetPlanning += tr([`S${calWeek + 1}`, `${fmtD(ws)} – ${fmtD(we)}`, "CFA", modList[modIdx] || "", "35h", "Cours + exercices pratiques"]);
       calWeek++;
     }
     for (let ew = 0; ew < entrepriseWeeks; ew++) {
@@ -8652,18 +8923,14 @@ function genDecoupageFormationCFAExcel(o: OrganismeInfo, f: FormationInfo) {
       ws.setDate(ws.getDate() + calWeek * 7);
       const we = new Date(ws);
       we.setDate(we.getDate() + 4);
-      sheet3 += tableRowFn([`S${calWeek + 1}`, `${fmtD(ws)} – ${fmtD(we)}`, "Entreprise", "Mise en pratique", "35h"]);
+      sheetPlanning += tr([`S${calWeek + 1}`, `${fmtD(ws)} – ${fmtD(we)}`, "Entreprise", "Mise en pratique en entreprise", "35h", "Suivi livret d'alternance"]);
       calWeek++;
     }
   }
+  sheets.push({ name: "Planning alternance", html: `<table>${sheetPlanning}</table>` });
 
   // Build multi-sheet Excel HTML
-  const sheetDefs = [
-    { name: "Vue globale", html: `<table>${sheet1}</table>` },
-    { name: "Détail par module", html: `<table>${sheet2}</table>` },
-    { name: "Planning alternance", html: `<table>${sheet3}</table>` },
-  ];
-  const sheetXML = sheetDefs.map(s => `<x:ExcelWorksheet><x:Name>${s.name}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet>`).join("");
+  const sheetXML = sheets.map(s => `<x:ExcelWorksheet><x:Name>${s.name}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet>`).join("");
 
   return `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
 <head><meta charset="utf-8">
@@ -8671,9 +8938,9 @@ function genDecoupageFormationCFAExcel(o: OrganismeInfo, f: FormationInfo) {
 <style>
 table { border-collapse: collapse; font-family: Calibri, Arial, sans-serif; font-size: 11pt; }
 th { background-color: #1e3a7b; color: white; padding: 8px 12px; text-align: left; font-weight: bold; border: 1px solid #1e3a7b; }
-td { padding: 6px 10px; border: 1px solid #ccc; vertical-align: top; }
+td { padding: 6px 10px; border: 1px solid #ccc; vertical-align: top; white-space: pre-wrap; }
 tr:nth-child(even) { background-color: #f5f7fa; }
 </style></head><body>
-${sheetDefs.map((s, i) => `<div id="sheet${i}" style="${i > 0 ? 'page-break-before:always' : ''}">${s.html}</div>`).join('')}
+${sheets.map((s, i) => `<div id="sheet${i}" style="${i > 0 ? 'page-break-before:always' : ''}">${s.html}</div>`).join('')}
 </body></html>`;
 }
