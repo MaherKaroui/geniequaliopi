@@ -3092,8 +3092,8 @@ function genSuiviChiffreFormationExcel(o: OrganismeInfo, f: FormationInfo, stagi
     const cells: string[] = [`${si + 1}`, s.nom, s.prenom];
     if (isCFA) cells.push(s.entreprise || "");
     cells.push(
-      s.dateDebut || f.dateDebut || "",
-      s.dateFin || f.dateFin || "",
+      s.dateDebutFormation || f.dateDebut || "",
+      s.dateFinFormation || f.dateFin || "",
       `${effectiveTotal}h`,
       "", // heures réalisées to fill
       "", // taux presence to fill
