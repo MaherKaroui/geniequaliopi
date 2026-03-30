@@ -853,37 +853,99 @@ export function genExercicesStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
 
   });
 
-  // Recap table
-  extra += `<h3>RÉCAPITULATIF DES NOTES</h3>`;
+  // --- PARTIE 2 : JEUX PÉDAGOGIQUES ---
+  extra += `<div class="page-break"></div>`;
+  extra += `<h3>PARTIE 2 – JEUX PÉDAGOGIQUES</h3>`;
+
+  // Jeu 1 : Quiz Rapidité
+  const quizSeed = ((hash * 11 + stagiaireIdx * 7) & 0x7FFFFFFF) % 4;
+  const quizScore = 7 + ((stagiaireIdx * 3 + 5) % 4);
+  const quizBonus = stagiaireIdx % 3 === 0 ? 2 : 0;
+  const quizTotal = Math.min(12, quizScore + quizBonus);
+  extra += `<h4>Jeu 1 : Quiz Rapidité – Questions Flash</h4>`;
+  extra += `<div class="section"><p><strong>Règle du jeu :</strong> Le formateur pose 10 questions rapides sur les notions clés de la formation. Chaque participant dispose de 15 secondes pour répondre. 1 point par bonne réponse. Bonus de 2 points pour la réponse la plus rapide.</p></div>`;
+  extra += tableHTML(["Critère", "Résultat"], [
+    ["Score quiz (sur 10)", `${quizScore}/10`],
+    ["Bonus rapidité", quizBonus > 0 ? "+2 points" : "0"],
+    ["Total", `${quizTotal}/12`],
+    ["Résultat", quizTotal >= 9 ? "🏆 Excellent" : "✅ Validé"],
+  ]);
+  const quizComments = [
+    `${s.prenom} a fait preuve d'une réactivité exemplaire et a su mobiliser rapidement ses connaissances. Les réponses sont précises et témoignent d'une excellente mémorisation des notions clés.`,
+    `Très bonne performance de ${s.prenom} au quiz. La rapidité de réponse démontre une assimilation solide des concepts abordés en formation. Participation dynamique et enthousiaste.`,
+    `${s.prenom} a participé activement au quiz avec enthousiasme. Les bonnes réponses montrent une compréhension claire des fondamentaux. Quelques hésitations sur les questions avancées mais le résultat global est très satisfaisant.`,
+    `Participation active et résultats positifs pour ${s.prenom}. Le quiz confirme une bonne maîtrise des connaissances de base et une capacité à raisonner rapidement sous contrainte de temps.`,
+  ];
+  extra += `<p><em>Commentaire : ${quizComments[quizSeed]}</em></p>`;
+
+  // Jeu 2 : Jeu de Rôle / Mise en situation
+  extra += `<h4>Jeu 2 : Mise en Situation – Jeu de Rôle</h4>`;
+  extra += `<div class="section"><p><strong>Règle du jeu :</strong> En binôme, résoudre un cas pratique en 20 minutes en mobilisant les compétences acquises. Le formateur évalue la collaboration, la pertinence et la créativité.</p></div>`;
+  const collab = 3 + ((stagiaireIdx * 2 + 1) % 3);
+  const pertin = 3 + ((stagiaireIdx * 3 + 2) % 3);
+  const creat = 3 + ((stagiaireIdx + 4) % 3);
+  const roleTotal = collab + pertin + creat;
+  extra += tableHTML(["Critère", "Note"], [
+    ["Collaboration", `${collab}/5`],
+    ["Pertinence des réponses", `${pertin}/5`],
+    ["Créativité", `${creat}/5`],
+    ["Total", `${roleTotal}/15`],
+  ]);
+  const roleSeed = ((hash * 13 + stagiaireIdx * 11) & 0x7FFFFFFF) % 4;
+  const roleComments = [
+    `${s.prenom} a montré un excellent esprit d'équipe et une capacité de synthèse remarquable durant le jeu de rôle. Les solutions proposées sont pertinentes et directement applicables en situation professionnelle chez ${s.entreprise || 'son entreprise'}.`,
+    `Très bonne participation de ${s.prenom}. Les solutions avancées sont créatives et bien argumentées. ${s.prenom} a su écouter son binôme tout en apportant des idées constructives. Le travail collaboratif est fluide et efficace.`,
+    `${s.prenom} a su mobiliser efficacement les acquis de la formation dans ce jeu de rôle. La mise en situation a révélé des compétences transversales solides : communication, analyse et prise de décision. Excellent travail d'équipe.`,
+    `Participation active et pertinente de ${s.prenom}. Bonne gestion du temps imparti et capacité à hiérarchiser les priorités dans la résolution du cas pratique. Le binôme a produit un livrable de qualité.`,
+  ];
+  extra += `<p><em>Commentaire : ${roleComments[roleSeed]}</em></p>`;
+
+  // --- BILAN GLOBAL ---
+  extra += `<div class="page-break"></div>`;
+  extra += `<h3>BILAN GLOBAL DE L'ÉVALUATION FINALE</h3>`;
+  const exMoyenne = Math.round(totalNote / totalMax * 10 * 10) / 10;
+  const quizSur10 = Math.round(quizTotal / 12 * 10 * 10) / 10;
+  const roleSur10 = Math.round(roleTotal / 15 * 10 * 10) / 10;
+  const moyenneFinale = Math.round((exMoyenne + quizSur10 + roleSur10) / 3 * 10) / 10;
+
+  extra += tableHTML(["Épreuve", "Note /10"], [
+    ["Exercices pratiques", `${exMoyenne}/10`],
+    ["Quiz Rapidité", `${quizSur10}/10`],
+    ["Jeu de Rôle", `${roleSur10}/10`],
+    ["MOYENNE FINALE", `${moyenneFinale}/10`],
+  ]);
+  extra += `<p><strong>Décision : ${moyenneFinale >= 7 ? '✅ VALIDÉ – Compétences acquises' : '⚠️ À consolider – Plan de progression recommandé'}</strong></p>`;
+
+  // Recap table for exercises
+  extra += `<h4>Détail des notes – Exercices pratiques</h4>`;
   const recapRows = notesRecap.map(n => [n.titre, `${n.note} / ${n.max}`]);
   extra += tableHTML(["Exercice", "Note"], recapRows);
-  extra += `<p><strong>NOTE FINALE : ${totalNote} / ${totalMax}</strong></p>`;
 
-  // Global appreciation — truly unique per stagiaire
-  const avgPct = totalNote / totalMax * 100;
+  // Global appreciation
+  const avgPct = moyenneFinale * 10;
   const appSeed = ((hash * 29 + stagiaireIdx * 19) & 0x7FFFFFFF) % 5;
 
   const appreciationsFR = [
     [ // excellent (>=80%)
-      `${s.prenom} ${s.nom} a fait preuve d'une excellente maîtrise des compétences pratiques tout au long de la formation « ${f.intitule} ». Son profil ${profile.style} lui permet d'aborder les exercices avec assurance et efficacité. Les travaux rendus sont systématiquement de qualité professionnelle. ${s.prenom} est un(e) élément moteur du groupe qui tire ses pairs vers le haut. Les objectifs pédagogiques sont pleinement atteints. ${profile.strengths} est un atout majeur qui sera précieux dans son poste de ${s.poste} chez ${s.entreprise}. Avis très favorable – Je recommande vivement ${s.prenom} pour toute responsabilité nécessitant ces compétences.`,
-      `Les résultats pratiques de ${s.prenom} ${s.nom} sont remarquables et témoignent d'une appropriation profonde des contenus de la formation « ${f.intitule} ». ${s.prenom} a su combiner ${profile.strengths} avec une capacité réelle de transfert en contexte professionnel. La progression entre le positionnement initial et l'évaluation finale est significative, passant d'un niveau déjà solide à un niveau de maîtrise complète. Le travail fourni est exemplaire tant sur le fond que sur la forme. ${s.prenom} constitue une référence pour le groupe. Évaluation globale : Excellent.`,
-      `${s.prenom} ${s.nom} a brillamment réussi l'ensemble des exercices pratiques. Chaque travail rendu démontre une compréhension approfondie, une méthodologie rigoureuse et une autonomie remarquable. En tant que ${s.poste}, ${s.prenom} saura exploiter immédiatement ces acquis dans son environnement professionnel chez ${s.entreprise}. La formation a permis de consolider et d'enrichir un socle de compétences déjà solide. ${s.prenom} fait partie des meilleur(e)s participant(e)s que j'ai eu(e)s l'occasion d'accompagner cette année. Félicitations et encouragements pour la suite.`,
-      `Excellent parcours de formation pour ${s.prenom} ${s.nom}. L'engagement, la qualité du travail et ${profile.strengths} sont les marqueurs constants de cette session. ${s.prenom} a non seulement atteint les objectifs mais les a dépassés en enrichissant ses réponses d'apports personnels pertinents. La capacité de transfert des acquis est avérée. ${s.prenom} est opérationnel(le) et autonome sur l'ensemble des compétences évaluées. Note globale : Très satisfaisant – Validation complète des compétences.`,
-      `${s.prenom} ${s.nom} termine cette formation « ${f.intitule} » avec un bilan élogieux. La constance dans l'excellence, ${profile.strengths} et la maturité professionnelle dont ${s.prenom} a fait preuve sont remarquables. Chaque exercice a été l'occasion de démontrer une maîtrise croissante. Le transfert en situation professionnelle ne fait aucun doute. ${s.prenom} est un(e) professionnel(le) compétent(e) et fiable. Je signe cette appréciation avec conviction : compétences pleinement acquises et validées.`,
+      `${s.prenom} ${s.nom} a fait preuve d'une excellente maîtrise des compétences pratiques tout au long de la formation « ${f.intitule} ». Son profil ${profile.style} lui permet d'aborder les exercices avec assurance et efficacité. Les jeux pédagogiques ont révélé un dynamisme et une réactivité au-dessus de la moyenne. Les travaux rendus sont systématiquement de qualité professionnelle. ${s.prenom} est un(e) élément moteur du groupe. ${profile.strengths} est un atout majeur pour son poste de ${s.poste} chez ${s.entreprise}. Avis très favorable.`,
+      `Les résultats de ${s.prenom} ${s.nom} sont remarquables sur l'ensemble de l'évaluation finale : exercices, quiz et jeu de rôle. ${s.prenom} a su combiner ${profile.strengths} avec une capacité réelle de transfert en contexte professionnel. La progression est significative. Le travail fourni est exemplaire. Évaluation globale : Excellent.`,
+      `${s.prenom} ${s.nom} a brillamment réussi l'évaluation finale. Chaque épreuve démontre une compréhension approfondie et une autonomie remarquable. En tant que ${s.poste}, ${s.prenom} saura exploiter immédiatement ces acquis chez ${s.entreprise}. Félicitations.`,
+      `Excellent parcours pour ${s.prenom} ${s.nom}. L'engagement est constant, les résultats dépassent les objectifs tant sur les exercices que sur les jeux pédagogiques. ${s.prenom} est opérationnel(le) et autonome sur l'ensemble des compétences évaluées. Validation complète.`,
+      `${s.prenom} ${s.nom} termine cette évaluation avec un bilan élogieux. La constance dans l'excellence et la maturité professionnelle sont remarquables. Compétences pleinement acquises et validées.`,
     ],
     [ // bon (60-80%)
-      `${s.prenom} ${s.nom} a suivi cette formation « ${f.intitule} » avec sérieux et engagement. Les exercices pratiques sont globalement bien réussis, avec un profil ${profile.style} qui se retrouve dans la qualité constante du travail. Les compétences principales sont acquises, même si des points de perfectionnement ont été identifiés, notamment sur ${profile.weakness}. ${s.prenom} a su progresser au fil des exercices et les derniers travaux sont de meilleure qualité que les premiers. Avec une pratique régulière, ${s.prenom} atteindra rapidement le niveau de maîtrise. Bilan positif – Compétences en bonne voie.`,
-      `Bonne performance d'ensemble pour ${s.prenom} ${s.nom}. La formation « ${f.intitule} » a permis à ${s.prenom} de développer des compétences solides qu'il/elle pourra mobiliser dans son poste de ${s.poste} chez ${s.entreprise}. ${profile.strengths} est un point fort identifié. En revanche, ${profile.weakness} mérite un travail complémentaire pour atteindre l'autonomie complète. La motivation et l'implication de ${s.prenom} tout au long de la formation sont de bon augure pour la suite. Recommandation : poursuivre l'entraînement sur les points identifiés.`,
-      `${s.prenom} ${s.nom} a atteint la majorité des objectifs pratiques de la formation. Le travail est de qualité satisfaisante à bonne selon les exercices. ${s.prenom} montre une réelle progression et une bonne capacité d'apprentissage. Les points forts (${profile.strengths}) compensent les axes d'amélioration (${profile.weakness}). Avec les ressources complémentaires transmises et une pratique régulière, ${s.prenom} consolidera ses acquis dans les semaines à venir. Appréciation : Bien – Encouragements.`,
-      `Le bilan pratique de ${s.prenom} ${s.nom} est positif. Les exercices montrent une compréhension solide des fondamentaux et une capacité croissante à les appliquer. Le profil ${profile.style} de ${s.prenom} est un atout pour son environnement professionnel. Quelques ajustements sur ${profile.weakness} permettront d'atteindre le niveau d'excellence. La formation a rempli son rôle de montée en compétences et ${s.prenom} est en bonne posture pour la suite de son parcours.`,
-      `${s.prenom} ${s.nom} clôture cette formation avec un bilan encourageant. Les exercices pratiques révèlent des compétences acquises sur l'essentiel du programme. ${s.prenom} a fait preuve de ${profile.strengths} et d'une bonne capacité d'adaptation aux exercices proposés. Le plan de développement post-formation ciblera ${profile.weakness} pour permettre à ${s.prenom} d'être pleinement autonome. Je reste disponible pour un suivi à 3 mois. Appréciation globale : Bien.`,
+      `${s.prenom} ${s.nom} a suivi cette évaluation avec sérieux. Les exercices et les jeux sont globalement bien réussis, avec un profil ${profile.style}. Les compétences principales sont acquises, même si ${profile.weakness} mérite attention. Bilan positif.`,
+      `Bonne performance d'ensemble pour ${s.prenom} ${s.nom}. La formation a permis de développer des compétences solides. ${profile.strengths} est un point fort. Le quiz et le jeu de rôle confirment une bonne dynamique d'apprentissage. Encouragements.`,
+      `${s.prenom} ${s.nom} a atteint la majorité des objectifs. Le quiz et le jeu de rôle montrent une bonne capacité d'adaptation. Appréciation : Bien.`,
+      `Le bilan de ${s.prenom} ${s.nom} est positif. Les exercices et les jeux montrent une compréhension solide des fondamentaux. Quelques ajustements sur ${profile.weakness} permettront d'atteindre l'excellence.`,
+      `${s.prenom} ${s.nom} clôture cette évaluation avec un bilan encourageant. Les jeux pédagogiques ont révélé de bonnes compétences transversales. Appréciation globale : Bien.`,
     ],
     [ // moyen (<60%)
-      `${s.prenom} ${s.nom} a participé activement à la formation « ${f.intitule} » malgré des résultats pratiques en-deçà des objectifs. Les exercices ont mis en évidence des lacunes sur ${profile.weakness} qui freinent l'acquisition des compétences visées. Néanmoins, ${profile.strengths} montre que ${s.prenom} a le potentiel pour progresser significativement. Un plan de remédiation a été établi. Je recommande vivement à ${s.prenom} de mettre en pratique les acquis au quotidien dans son poste de ${s.poste}. Rendez-vous dans 1 mois pour un bilan intermédiaire.`,
-      `Le parcours pratique de ${s.prenom} ${s.nom} appelle un plan d'accompagnement complémentaire. Si la motivation est réelle et ${profile.strengths} est un atout, ${profile.weakness} constitue un frein important à l'autonomie. Les compétences sont partiellement acquises et nécessitent un renforcement systématique. ${s.prenom} a reçu un programme d'autoformation personnalisé et bénéficiera d'un suivi rapproché.`,
-      `${s.prenom} ${s.nom} a fourni des efforts tout au long de la formation mais les résultats pratiques restent fragiles. Les fondamentaux de « ${f.intitule} » ne sont pas encore suffisamment consolidés. ${profile.weakness} est le principal axe de travail identifié. Un dispositif de soutien a été mis en place.`,
-      `Le bilan de ${s.prenom} ${s.nom} est mitigé sur la partie pratique. Certains exercices montrent une compréhension correcte tandis que d'autres révèlent des difficultés persistantes. Son profil ${profile.style} est un élément positif qui, combiné à de la pratique régulière, devrait permettre une progression. Ressources de remédiation transmises.`,
-      `${s.prenom} ${s.nom} termine la formation avec des acquis partiels sur les compétences pratiques. La formation a permis d'identifier clairement les axes de progression et de mettre en place un plan d'action adapté. Appréciation : Insuffisant à ce stade – Accompagnement renforcé activé.`,
+      `${s.prenom} ${s.nom} a participé activement malgré des résultats en-deçà des objectifs. ${profile.strengths} montre du potentiel. Plan de remédiation établi.`,
+      `Le parcours de ${s.prenom} ${s.nom} appelle un accompagnement complémentaire. Les jeux pédagogiques montrent de bonnes dispositions mais les exercices pratiques révèlent des lacunes sur ${profile.weakness}.`,
+      `${s.prenom} ${s.nom} a fourni des efforts mais les résultats restent fragiles. Dispositif de soutien mis en place.`,
+      `Le bilan de ${s.prenom} ${s.nom} est mitigé. Les jeux pédagogiques sont encourageants mais les exercices nécessitent un renforcement. Ressources de remédiation transmises.`,
+      `${s.prenom} ${s.nom} termine l'évaluation avec des acquis partiels. Plan d'action adapté mis en place. Accompagnement renforcé activé.`,
     ],
   ];
 
@@ -891,7 +953,7 @@ export function genExercicesStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
   extra += `<h3>Appréciation globale du formateur : ${f.formateur}, ${formatDate(getStagiaireDateFin(s, f))}</h3>`;
   extra += `<p>${appreciationsFR[appIdx][appSeed]}</p>`;
 
-  return buildDocument({ org: o, title: `EXERCICE PRATIQUE${jourLabel} – RÉSULTATS`, subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, extraHtml: extra });
+  return buildDocument({ org: o, title: `ÉVALUATION FINALE – EXERCICES & JEUX${jourLabel} – RÉSULTATS`, subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, extraHtml: extra });
   // NO signatures
 }
 
