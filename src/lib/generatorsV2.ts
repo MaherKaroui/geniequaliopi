@@ -1087,22 +1087,35 @@ export function genExercicesPratiques_V2(o: OrganismeInfo, f: FormationInfo, sta
   // Jeu 2 : Défi en équipe / Jeu de rôle
   extra += `<div class="page-break"></div>`;
   extra += `<h3>Jeu 2 : Mise en Situation – Jeu de Rôle</h3>`;
-  extra += `<div class="section"><p><strong>Règle du jeu :</strong> Les stagiaires sont répartis en binômes. Chaque binôme doit résoudre un cas pratique en temps limité (20 minutes) en mobilisant les compétences acquises durant la formation. Le formateur évalue la collaboration, la pertinence des réponses et la créativité des solutions proposées.</p></div>`;
+  const isSoloGroup = stagiaires.length <= 1;
+  extra += `<div class="section"><p><strong>Règle du jeu :</strong> ${isSoloGroup
+    ? `Le stagiaire doit résoudre un cas pratique en temps limité (20 minutes) en mobilisant les compétences acquises durant la formation. Le formateur évalue la pertinence des réponses, la créativité des solutions proposées et la qualité de l'argumentation.`
+    : `Les stagiaires sont répartis en binômes. Chaque binôme doit résoudre un cas pratique en temps limité (20 minutes) en mobilisant les compétences acquises durant la formation. Le formateur évalue la collaboration, la pertinence des réponses et la créativité des solutions proposées.`
+  }</p></div>`;
   const roleRows = stagiaires.slice(0, 10).map((s, si) => {
-    const collab = 3 + ((si * 2 + 1) % 3); // 3-5
-    const pertin = 3 + ((si * 3 + 2) % 3); // 3-5
-    const creat = 3 + ((si + 4) % 3); // 3-5
+    const collab = 3 + ((si * 2 + 1) % 3);
+    const pertin = 3 + ((si * 3 + 2) % 3);
+    const creat = 3 + ((si + 4) % 3);
     const total = collab + pertin + creat;
     const seed = (si * 5 + 7) % 4;
-    const comments = [
+    const comments = isSoloGroup ? [
+      `${s.prenom} a fait preuve d'une excellente capacité d'analyse et de synthèse.`,
+      `Très bonne prestation de ${s.prenom}. Solutions créatives et bien argumentées.`,
+      `${s.prenom} a su mobiliser efficacement les acquis de la formation.`,
+      `Participation active et pertinente de ${s.prenom}. Bonne gestion du temps imparti.`,
+    ] : [
       `${s.prenom} a montré un excellent esprit d'équipe et une capacité de synthèse remarquable.`,
       `Très bonne participation de ${s.prenom}. Solutions créatives et bien argumentées.`,
       `${s.prenom} a su mobiliser efficacement les acquis de la formation dans ce jeu de rôle.`,
       `Participation active et pertinente de ${s.prenom}. Bonne gestion du temps imparti.`,
     ];
-    return [s.prenom + " " + s.nom, `${collab}/5`, `${pertin}/5`, `${creat}/5`, `${total}/15`, comments[seed]];
+    return isSoloGroup
+      ? [s.prenom + " " + s.nom, `${pertin}/5`, `${creat}/5`, `${collab}/5`, `${total}/15`, comments[seed]]
+      : [s.prenom + " " + s.nom, `${collab}/5`, `${pertin}/5`, `${creat}/5`, `${total}/15`, comments[seed]];
   });
-  extra += tableHTML(["Stagiaire", "Collaboration", "Pertinence", "Créativité", "Total", "Commentaire"], roleRows);
+  extra += isSoloGroup
+    ? tableHTML(["Stagiaire", "Pertinence", "Créativité", "Argumentation", "Total", "Commentaire"], roleRows)
+    : tableHTML(["Stagiaire", "Collaboration", "Pertinence", "Créativité", "Total", "Commentaire"], roleRows);
 
   // --- BILAN GLOBAL ---
   extra += `<div class="page-break"></div>`;
