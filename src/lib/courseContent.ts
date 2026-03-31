@@ -103,6 +103,38 @@ const YOUTUBE_CRM: CourseData['youtubeVideos'] = [
   { title: "Brevo (Sendinblue) – Formation complète email marketing", url: "https://www.youtube.com/watch?v=jWgMm5EjXE0", description: "Maîtriser Brevo pour l'email marketing : campagnes, automation et conformité RGPD." },
 ];
 
+const YOUTUBE_MASSAGE: CourseData['youtubeVideos'] = [
+  { title: "Massage prénatal – Techniques et bienfaits pour la femme enceinte", url: "https://www.youtube.com/watch?v=_qTpCmxGiQI", description: "Démonstration des techniques de massage adaptées à chaque trimestre de la grossesse." },
+  { title: "Massage du dos en décubitus latéral – Grossesse", url: "https://www.youtube.com/watch?v=pQN_v0qJBSk", description: "Technique de massage du dos en position latérale sécurisée pour la femme enceinte." },
+  { title: "Drainage lymphatique des jambes – Grossesse et œdèmes", url: "https://www.youtube.com/watch?v=3hhfHsjUQrA", description: "Protocole de drainage des membres inférieurs pour réduire les œdèmes liés à la grossesse." },
+  { title: "Relaxation et respiration – Accompagnement prénatal", url: "https://www.youtube.com/watch?v=inpok4MKVLM", description: "Techniques de relaxation et de respiration pour accompagner la femme enceinte vers le bien-être." },
+  { title: "Anatomie de la grossesse – Ce que le praticien doit savoir", url: "https://www.youtube.com/watch?v=NmjSMiG5jz0", description: "Comprendre les changements anatomiques et physiologiques de la grossesse pour adapter sa pratique." },
+];
+
+const YOUTUBE_ESTHETIQUE: CourseData['youtubeVideos'] = [
+  { title: "CAP Esthétique – Soin du visage complet (protocole)", url: "https://www.youtube.com/watch?v=TbL4OGhYVvE", description: "Protocole complet de soin du visage pour le CAP Esthétique : démaquillage, gommage, modelage, masque." },
+  { title: "Techniques de maquillage professionnel – Les bases", url: "https://www.youtube.com/watch?v=jXfWpqXYzPk", description: "Les fondamentaux du maquillage professionnel : teint, yeux, lèvres, correction et mise en beauté." },
+  { title: "L'épilation – Techniques et protocoles en institut", url: "https://www.youtube.com/watch?v=PZ_HYXQ8fhY", description: "Méthodes d'épilation à la cire chaude et tiède, technique du strip-wax et précautions." },
+  { title: "Manucure et pose de vernis – Protocole esthétique", url: "https://www.youtube.com/watch?v=nCKnR3rYWwM", description: "Protocole complet de manucure : limage, cuticules, modelage des mains et pose de vernis." },
+  { title: "Hygiène et stérilisation en institut de beauté", url: "https://www.youtube.com/watch?v=LPwbHvW22XA", description: "Règles d'hygiène, stérilisation du matériel et prévention des risques en institut." },
+];
+
+const YOUTUBE_SECRETAIRE: CourseData['youtubeVideos'] = [
+  { title: "Le métier de secrétaire médicale – Présentation complète", url: "https://www.youtube.com/watch?v=V_bwp2mJTZI", description: "Découverte du métier : accueil patients, gestion des dossiers médicaux, facturation et coordination." },
+  { title: "Vocabulaire médical – Les bases indispensables", url: "https://www.youtube.com/watch?v=Gq5RrDj_eyI", description: "Les termes médicaux essentiels : préfixes, suffixes, racines et abréviations courantes." },
+  { title: "Facturation des actes médicaux – CCAM et NGAP", url: "https://www.youtube.com/watch?v=djk1jCevPiE", description: "Comprendre la facturation médicale : nomenclatures, cotations et télétransmission." },
+  { title: "Accueil physique et téléphonique en cabinet médical", url: "https://www.youtube.com/watch?v=HBxCHonP6Ro", description: "Techniques d'accueil professionnel : gestion des appels, prise de rendez-vous et orientation des patients." },
+  { title: "Le DPI – Dossier Patient Informatisé", url: "https://www.youtube.com/watch?v=KzNPxMgRX7Q", description: "Gestion du dossier patient informatisé : saisie, archivage, confidentialité et réglementation." },
+];
+
+const YOUTUBE_COMMERCIAL: CourseData['youtubeVideos'] = [
+  { title: "Techniques de prospection commerciale – Guide complet", url: "https://www.youtube.com/watch?v=uQk8PaFQ5ZQ", description: "Stratégies de prospection B2B et B2C : téléphone, email, réseaux sociaux et terrain." },
+  { title: "La négociation commerciale – Méthodes et astuces", url: "https://www.youtube.com/watch?v=vGkk3rFGeHE", description: "Techniques de négociation : découverte des besoins, argumentation, traitement des objections et closing." },
+  { title: "SONCAS – La méthode de vente incontournable", url: "https://www.youtube.com/watch?v=KKDwpE0XKRA", description: "Comprendre les motivations d'achat avec la méthode SONCAS : Sécurité, Orgueil, Nouveauté, Confort, Argent, Sympathie." },
+  { title: "LinkedIn – Prospecter et vendre en B2B", url: "https://www.youtube.com/watch?v=WmIwA3q6gok", description: "Social selling sur LinkedIn : optimiser son profil, identifier les prospects et engager la conversation." },
+  { title: "Réussir sa proposition commerciale", url: "https://www.youtube.com/watch?v=lBqFcFNO4bw", description: "Structurer une proposition commerciale convaincante : contexte, solution, avantages et prix." },
+];
+
 export function getYoutubeVideos(formationIntitule: string): CourseData['youtubeVideos'] {
   const t = formationIntitule.toLowerCase();
   if (t.includes('massage') || t.includes('prénatal') || t.includes('prenatal') || t.includes('relaxation') || t.includes('bien-être')) return YOUTUBE_MASSAGE;
