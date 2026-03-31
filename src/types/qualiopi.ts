@@ -1,4 +1,5 @@
 export type DocTheme = 'classique' | 'moderne' | 'elegant' | 'minimaliste' | 'bold' | 'nature' | 'academique' | 'corporate';
+export type HeadingStyle = 'line-bottom' | 'filled' | 'gradient' | 'left-bar' | 'underline-double' | 'plain' | 'pill';
 
 export interface DocStyleConfig {
   primaryColor: string;    // hex color for headers, accents
@@ -8,7 +9,8 @@ export interface DocStyleConfig {
   fontSize: number;        // base font size in px
   logoPosition: 'left' | 'center' | 'right';
   theme: DocTheme;
-  showSectionBorder: boolean; // show/hide left border on sections
+  showSectionBorder: boolean;
+  headingStyle: HeadingStyle;
 }
 
 export const DEFAULT_DOC_STYLE: DocStyleConfig = {
@@ -20,6 +22,7 @@ export const DEFAULT_DOC_STYLE: DocStyleConfig = {
   logoPosition: 'center',
   theme: 'classique',
   showSectionBorder: true,
+  headingStyle: 'line-bottom',
 };
 
 export interface OrganismeInfo {
