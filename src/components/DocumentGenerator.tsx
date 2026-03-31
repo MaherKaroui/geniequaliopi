@@ -88,12 +88,26 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
     [importAudit],
   );
 
+  const getStaticFileUrl = useCallback((doc: DocEntry): string | null => {
+    if (doc.template !== "pdf_static") return null;
+    if (doc.params?.pdfFile) return `/docs/${doc.params.pdfFile}`;
+    if (doc.params?.pdfUrl) return String(doc.params.pdfUrl);
+    return null;
+  }, []);
+
+  const getStaticFileName = useCallback((doc: DocEntry): string | null => {
+    if (doc.params?.pdfFile) return String(doc.params.pdfFile);
+    if (doc.params?.pdfUrl) return String(doc.params.pdfUrl).split('/').pop() || null;
+    return null;
+  }, []);
+
   const getDocExtension = useCallback((doc: DocEntry) => {
-    if (doc.template === "pdf_static" && doc.params?.pdfFile) {
-      return String(doc.params.pdfFile).match(/\.[^.]+$/)?.[0]?.toLowerCase() || ".pdf";
+    const staticFile = getStaticFileName(doc);
+    if (doc.template === "pdf_static" && staticFile) {
+      return staticFile.match(/\.[^.]+$/)?.[0]?.toLowerCase() || ".pdf";
     }
     return getPreferredExtension(doc.template, exportFormat);
-  }, [exportFormat]);
+  }, [exportFormat, getStaticFileName]);
 
   const getDocStagiaire = useCallback((doc: DocEntry, fallbackIdx?: number) => {
     const paramIdx = typeof doc.params?.stagiaireIdx === "number" ? doc.params.stagiaireIdx : undefined;
