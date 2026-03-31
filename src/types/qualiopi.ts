@@ -1,3 +1,5 @@
+export type DocTheme = 'classique' | 'moderne' | 'elegant' | 'minimaliste' | 'bold' | 'nature' | 'academique' | 'corporate';
+
 export interface DocStyleConfig {
   primaryColor: string;    // hex color for headers, accents
   secondaryColor: string;  // hex color for section borders
@@ -5,6 +7,7 @@ export interface DocStyleConfig {
   headingFont: string;     // font family for headings
   fontSize: number;        // base font size in px
   logoPosition: 'left' | 'center' | 'right';
+  theme: DocTheme;
 }
 
 export const DEFAULT_DOC_STYLE: DocStyleConfig = {
@@ -14,6 +17,7 @@ export const DEFAULT_DOC_STYLE: DocStyleConfig = {
   headingFont: "'Segoe UI', Arial, sans-serif",
   fontSize: 13,
   logoPosition: 'center',
+  theme: 'classique',
 };
 
 export interface OrganismeInfo {
