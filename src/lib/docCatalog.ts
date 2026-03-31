@@ -459,6 +459,16 @@ export function buildFullCatalog(
     add("cfa_c3i10_livret_accompagnez_alternants", "CT3 - IND 10 LIVRET ACCOMPAGNEZ VOS ALTERNANTS", 3, 10, "pdf_static", { pdfUrl: "/pdfs/livret_accompagnez_alternants.pdf" });
     add("cfa_c3i10_boostez_mobilite", "CT3 - IND 10 BOOSTEZ LA MOBILITÉ", 3, 10, "pdf_static", { pdfUrl: "/pdfs/boostez_mobilite.pdf" });
     add("cfa_c3i10_vademecum_controle_pedagogique", "CT3 - IND 10 VADEMECUM CONTRÔLE PÉDAGOGIQUE APPRENTISSAGE", 3, 10, "pdf_static", { pdfUrl: "/pdfs/vademecum_controle_pedagogique.pdf" });
+    // --- IND 10 — Dossier Affichage ---
+    add("cfa_c3i10_aff_convention_egalite_hf", "CT3 - IND 10 📁 AFFICHAGE – Convention Égalité Hommes Femmes", 3, 10, "pdf_static", { pdfUrl: "/pdfs/convention_egalite_hf.pdf" });
+    add("cfa_c3i10_aff_declaration_droits_homme", "CT3 - IND 10 📁 AFFICHAGE – Déclaration des Droits de l'Homme", 3, 10, "pdf_static", { pdfUrl: "/pdfs/declaration_droits_homme.pdf" });
+    add("cfa_c3i10_aff_lgbt_affiche", "CT3 - IND 10 📁 AFFICHAGE – Affiche LGBT", 3, 10, "pdf_static", { pdfUrl: "/pdfs/lgbt_affiche.pdf" });
+    add("cfa_c3i10_aff_aide_financiere_apprenti_idf", "CT3 - IND 10 📁 AFFICHAGE – Aide Financière Apprenti Île-de-France", 3, 10, "pdf_static", { pdfUrl: "/pdfs/aide_financiere_apprenti_idf.pdf" });
+    add("cfa_c3i10_aff_racisme_antisemitisme", "CT3 - IND 10 📁 AFFICHAGE – Racisme et Antisémitisme", 3, 10, "pdf_static", { pdfUrl: "/pdfs/racisme_antisemitisme.pdf" });
+    add("cfa_c3i10_aff_harcelement_reseaux_sociaux", "CT3 - IND 10 📁 AFFICHAGE – Harcèlement Réseaux Sociaux", 3, 10, "pdf_static", { pdfUrl: "/pdfs/harcelement_reseaux_sociaux.pdf" });
+    add("cfa_c3i10_aff_harcelement_sur_site", "CT3 - IND 10 📁 AFFICHAGE – Affiche Non au Harcèlement", 3, 10, "pdf_static", { pdfUrl: "/pdfs/harcelement_sur_site.jpg" });
+    add("cfa_c3i10_aff_charte_laicite", "CT3 - IND 10 📁 AFFICHAGE – Charte de la Laïcité", 3, 10, "pdf_static", { pdfUrl: "/pdfs/charte_laicite.pdf" });
+    add("cfa_c3i10_aff_contacts_ressources_handicap", "CT3 - IND 10 📁 AFFICHAGE – Contacts Ressources Handicap Formation", 3, 10, "pdf_static", { pdfUrl: "/pdfs/contacts_ressources_handicap.pdf" });
 
     // Documents CFA complémentaires (autres critères)
     add("cfa_c1i1_livret_accueil", "CT1 - IND 1 LIVRET D'ACCUEIL CFA", 1, 1, "livret_accueil_cfa");
