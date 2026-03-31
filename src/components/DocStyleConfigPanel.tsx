@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DocStyleConfig, DEFAULT_DOC_STYLE, DocTheme, HeadingStyle, HeaderStyle } from "@/types/qualiopi";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -6,7 +6,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, ChevronRight, Palette, Type, Layout, Paintbrush } from "lucide-react";
+import { ChevronDown, ChevronRight, Palette, Type, Layout, Paintbrush, Save, Star, Trash2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface DocStyleConfigPanelProps {
   style: DocStyleConfig;
