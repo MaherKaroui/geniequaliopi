@@ -7264,6 +7264,13 @@ function generateEvalBesoinsAnswers(s: StagiaireInfo, f: FormationInfo, o: Organ
 function genDeroulePedagogiqueDetaille(o: OrganismeInfo, f: FormationInfo) {
   const formation = f.intitule || "la formation";
 
+  // Massage prénatal: use dedicated déroulé with real day structure (9h + 4h)
+  const t = (f.intitule || "").toLowerCase();
+  const isMassage = t.includes("massage") && (t.includes("prénatal") || t.includes("prenatal") || t.includes("relaxation"));
+  if (isMassage) {
+    return genDeroulePedagogique(o, f);
+  }
+
   // Check if formation has competency blocs (RS/RNCP)
   const rncp = f.codeRNCP ? getRNCPByCode(f.codeRNCP) : null;
   const hasBlocs = rncp && rncp.blocsCompetences && rncp.blocsCompetences.length > 0;
