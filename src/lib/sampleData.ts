@@ -52,6 +52,7 @@ export const SAMPLE_FORMATEURS: FormateurInfo[] = [
   { nom: "Fontaine", prenom: "Marie", specialite: "Esthétique, Cosmétique", diplomes: "CAP/BEP Esthétique + DU Cosmétologie", experience: "18 ans dans le secteur esthétique", email: "m.fontaine@formapro-excellence.fr" },
   { nom: "Blanc", prenom: "Jean-Pierre", specialite: "Management, Leadership", diplomes: "MBA HEC Paris", experience: "20 ans de direction et formation en management", email: "jp.blanc@formapro-excellence.fr" },
   { nom: "Petit", prenom: "Alexandre", specialite: "Digital Marketing, Informatique", diplomes: "Master Marketing Digital – ESSEC", experience: "10 ans en stratégie digitale et formation", email: "a.petit@formapro-excellence.fr" },
+  { nom: "Mendy", prenom: "Fideline", specialite: "Massage prénatal, Thérapies africaines, Bien-être", diplomes: "Spécialiste des thérapies africaines – École du Toucher Bien-naître", experience: "15 ans d'expérience en massages et techniques de bien-être prénatal", email: "f.mendy@naturoafricaine.com" },
 ];
 
 export const SAMPLE_FORMATIONS: FormationInfo[] = [
