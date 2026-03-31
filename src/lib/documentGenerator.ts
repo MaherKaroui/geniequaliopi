@@ -5254,7 +5254,7 @@ function genReglementInterieurCFA_V2(o: OrganismeInfo, f: FormationInfo, stagiai
 
     { heading: "Article 8 : Représentation des apprenants", content: `<h4>Délégué de classe</h4><p>Pour les formations de plus de 400 heures :</p><ul><li>Tous les apprenants sont électeurs et éligibles</li><li>Élection d'un délégué titulaire et d'un suppléant au scrutin uninominal à deux tours</li><li>Le scrutin a lieu dans les deux mois suivant le début de la formation</li><li>Les délégués représentent les apprenants dans tous les conseils de classe</li><li>Ils font toute suggestion pour améliorer les conditions de formation</li></ul>
 <h4>Conseil de Perfectionnement</h4><p>Le Conseil de Perfectionnement se réunit au moins une fois par an. Il est composé de représentants parmi les apprenants, le personnel administratif et l'équipe pédagogique. Il est présidé par le Directeur. Chaque réunion fait l'objet d'un procès-verbal.</p>` },
-  ], signatures: { type: "2", labels: ["Le Directeur du CFA", "L'Apprenti(e) (lu et approuvé)"], names: [o.dirigeant || '___', `${s.prenom} ${s.nom}`], noOrgSignature: true, stagiaireSignatureUrl: s.signatureUrl } });
+  ], signatures: { type: "2", labels: ["Le Directeur du CFA", "L'Apprenti(e) (lu et approuvé)"], names: [o.dirigeant || '___', `${s.prenom} ${s.nom}`], noOrgSignature: true, stagiaireSignatureUrl: s.signatureUrl, dates: [dateSignature, dateSignature] } });
 }
 
 // ============== CFA IND 9 — LIVRE D'APPRENTISSAGE (complet, par stagiaire) ==============
