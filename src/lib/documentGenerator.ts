@@ -555,7 +555,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "exercices_cfa_stagiaire": {
       const si = params?.stagiaireIdx ?? 0;
       const exIdx = params?.exerciceIdx ?? 0;
-      return genExercicesCFAStagiaire(o, f, stagiaires, si, exIdx);
+      return genExercicesCFAStagiaire(o, f, stagiaires, si, exIdx, params);
     }
     case "examen_blanc_cfa_stagiaire": {
       const si = params?.stagiaireIdx ?? 0;
