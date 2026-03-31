@@ -7085,8 +7085,20 @@ function generateEvalBesoinsAnswers(s: StagiaireInfo, f: FormationInfo, o: Organ
       "Je veux gagner en confiance dans ma communication écrite et orale en français pour être pleinement intégré(e) à l'équipe et reconnu(e) pour mes compétences professionnelles.",
       "Cette formation est une étape clé pour mon intégration professionnelle durable dans le secteur sanitaire et social en France, secteur dans lequel j'exerce depuis plusieurs années.",
     ];
-  } else if (isIA) {
+  } else if (isMassage) {
     objectifOptions = [
+      "Je souhaite acquérir les techniques de massage prénatal pour accompagner les femmes enceintes en toute sécurité et enrichir ma palette de compétences en bien-être maternel.",
+      "Mon objectif est de maîtriser les positions d'installation sécurisées et les protocoles de massage adaptés à chaque trimestre de la grossesse.",
+      "Je veux apprendre à identifier les contre-indications au massage prénatal et à adapter mes techniques aux spécificités anatomiques et physiologiques de la grossesse.",
+      "Cette formation me permettra de proposer des séances de massage prénatal complètes, de l'anamnèse à la clôture, avec un protocole structuré et sécurisé.",
+      "Mon but est de me spécialiser dans l'accompagnement bien-être de la femme enceinte pour développer une activité dédiée à la maternité.",
+      "Je souhaite maîtriser les techniques de drainage lymphatique et de soulagement des tensions lombaires spécifiques à la grossesse pour répondre aux besoins de mes clientes enceintes.",
+      "Mon objectif est d'intégrer les techniques de relaxation et de respiration dans ma pratique de massage pour offrir un accompagnement holistique aux futures mamans.",
+      "Cette formation doit me permettre de connaître les huiles et produits adaptés à la grossesse et de créer des protocoles personnalisés pour chaque cliente.",
+      "Je veux développer mon écoute active et mes compétences en accompagnement émotionnel pour offrir un espace de bien-être bienveillant aux femmes enceintes.",
+      "Mon objectif est de devenir une praticienne reconnue en massage prénatal et de pouvoir accompagner les femmes tout au long de leur grossesse avec des techniques adaptées et sûres.",
+    ];
+  } else if (isIA) {
       "Je souhaite maîtriser les outils d'IA générative (ChatGPT, Midjourney, DALL-E) pour créer des contenus professionnels de qualité et gagner significativement en productivité dans ma production de contenus.",
       "Mon objectif est d'intégrer l'IA dans mon workflow quotidien de création de contenus pour produire des campagnes complètes (texte + visuel) de manière rapide, efficace et cohérente.",
       "Je veux comprendre les bonnes pratiques et le cadre juridique de l'IA générative (RGPD, droit d'auteur, AI Act) pour utiliser ces outils de manière responsable et conforme dans mon activité.",
