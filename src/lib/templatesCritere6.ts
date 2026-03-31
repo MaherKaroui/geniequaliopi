@@ -28,11 +28,15 @@ function veilleYear(f: FormationInfo, monthsBefore: number): string {
 }
 
 // ===== Detection helpers =====
-type FormationType = "fle" | "ia" | "word" | "commercial" | "webmarketing" | "crm" | "anglais";
+type FormationType = "fle" | "ia" | "word" | "commercial" | "webmarketing" | "crm" | "anglais" | "massage" | "esthetique" | "secretaire" | "management";
 
 function detectFormationType(f: FormationInfo): FormationType {
   const title = (f.intitule || "").toLowerCase();
   if (title.includes("français") || title.includes("fle") || title.includes("social") || title.includes("médico") || title.includes("medico") || title.includes("communiquer en français")) return "fle";
+  if (title.includes("massage") || title.includes("prénatal") || title.includes("prenatal") || title.includes("relaxation") || title.includes("bien-être") || title.includes("bien être")) return "massage";
+  if (title.includes("esthéti") || title.includes("cosmétique") || title.includes("parfumerie") || title.includes("beauté")) return "esthetique";
+  if (title.includes("secrétaire") || title.includes("assistant") || title.includes("médico-admin")) return "secretaire";
+  if (title.includes("management") || title.includes("encadrement") || title.includes("leadership") || title.includes("manager")) return "management";
   if (title.includes("intelligence artificielle") || title.includes("ia générative") || title.includes("ia ") || title.includes("contenus rédactionnels") || title.includes("chatgpt") || title.includes("prompt")) return "ia";
   if (title.includes("crm") || title.includes("automation") || title.includes("automatisation")) return "crm";
   if (title.includes("webmarketing") || title.includes("marketing de contenus") || title.includes("réseaux sociaux") || title.includes("marketing digital")) return "webmarketing";
