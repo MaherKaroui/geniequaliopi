@@ -403,6 +403,37 @@ const DocStyleConfigPanel = ({ style, onChange }: DocStyleConfigPanelProps) => {
             {/* LAYOUT TAB */}
             {activeTab === "layout" && (
               <div className="space-y-5">
+                {/* Heading style */}
+                <div>
+                  <Label className="text-xs mb-2 block font-semibold">Style des en-têtes (H1 / H2)</Label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {([
+                      { id: "line-bottom" as HeadingStyle, label: "Ligne dessous" },
+                      { id: "filled" as HeadingStyle, label: "Fond plein" },
+                      { id: "gradient" as HeadingStyle, label: "Dégradé" },
+                      { id: "left-bar" as HeadingStyle, label: "Barre gauche" },
+                      { id: "underline-double" as HeadingStyle, label: "Double ligne" },
+                      { id: "plain" as HeadingStyle, label: "Sans décoration" },
+                      { id: "pill" as HeadingStyle, label: "Pilule / Badge" },
+                    ]).map(opt => {
+                      const isActive = (style.headingStyle || 'line-bottom') === opt.id;
+                      return (
+                        <button
+                          key={opt.id}
+                          onClick={() => onChange({ ...style, headingStyle: opt.id })}
+                          className={`text-left p-2 rounded-lg border text-xs transition-all ${
+                            isActive ? "border-primary ring-2 ring-primary/20 bg-primary/5 font-semibold" : "hover:border-primary/30"
+                          }`}
+                        >
+                          <HeadingMiniPreview headingStyle={opt.id} primary={style.primaryColor} secondary={style.secondaryColor} headFont={style.headingFont} />
+                          <div className="mt-1 text-[10px] text-muted-foreground">{opt.label}</div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Logo position */}
                 <div>
                   <Label className="text-xs mb-1 block font-semibold">Position du logo</Label>
                   <div className="flex gap-2">
@@ -421,6 +452,8 @@ const DocStyleConfigPanel = ({ style, onChange }: DocStyleConfigPanelProps) => {
                     ))}
                   </div>
                 </div>
+
+                {/* Section border toggle */}
                 <div className="flex items-center justify-between">
                   <div>
                     <Label className="text-xs font-semibold block">Barre latérale des sections</Label>
