@@ -13,7 +13,7 @@ import { genDeroulePedagogique } from "./templatesAF";
 import { getRNCPByCode } from "./rncpData";
 import { generateExcelSuiviInscriptions, generateExcelSuiviParcoursBeneficiairesCFA } from "./xlsxGenerator";
 import { getModuleSpecificConsigne } from "./cfaExerciseContent";
-import { genProcedureAbandonReorientationCFA, genAccompagnementDistancielCFA, genEnquetePartenaireEmployeurCFA, genFicheRenseignementsCommanditaireCFA, genContratApprentissageModeEmploiCFA, genProcedureAccueilBeneficiairesCFA, genProcedureAdaptationPedagogiqueCFA, genProcedureGestionAnnulationsCFA, genProcedureRuptureContratApprentissageCFA } from "./templatesCFA";
+import { genProcedureAbandonReorientationCFA, genAccompagnementDistancielCFA, genEnquetePartenaireEmployeurCFA, genFicheRenseignementsCommanditaireCFA, genContratApprentissageModeEmploiCFA, genProcedureAccueilBeneficiairesCFA, genProcedureAdaptationPedagogiqueCFA, genProcedureGestionAnnulationsCFA, genProcedureRuptureContratApprentissageCFA, genLivretApprentissageCFA as genLivretApprentissageInd10, genLivretMaitreApprentissageCFA } from "./templatesCFA";
 
 const FALLBACK_STAGIAIRE: StagiaireInfo = { prenom: "Martin", nom: "Dupont", civilite: "" as "M." | "Mme" | "", email: "", telephone: "", entreprise: "", poste: "", dateNaissance: "" };
 export function getFullCatalog(org: OrganismeInfo, userFormation: FormationInfo, userStagiaires: StagiaireInfo[]): DocEntry[] {
@@ -590,6 +590,8 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "procedure_adaptation_pedagogique_cfa": return genProcedureAdaptationPedagogiqueCFA(o);
     case "procedure_gestion_annulations_cfa": return genProcedureGestionAnnulationsCFA(o);
     case "procedure_rupture_contrat_apprentissage_cfa": return genProcedureRuptureContratApprentissageCFA(o);
+    case "livret_apprentissage_ind10_cfa": return genLivretApprentissageInd10(o, f, stagiaires, params?.stagiaireIdx ?? 0);
+    case "livret_maitre_apprentissage_cfa": return genLivretMaitreApprentissageCFA(o);
     case "tableau_suivi_parcours_beneficiaires_cfa_excel": return generateExcelSuiviParcoursBeneficiairesCFA(o, f, stagiaires);
     case "procedure_abandon_cfa": return genProcedureAbandon(o);
     case "procedure_absences_cfa": return genProcedureAbsences(o);

@@ -682,3 +682,198 @@ export function genProcedureRuptureContratApprentissageCFA(o: OrganismeInfo) {
     { heading: "CONSÉQUENCES DE LA RUPTURE DU CONTRAT", content: `<p>Si l'employeur a été reconnu en torts ou si la rupture est prononcée par l'administration, il doit reverser :</p><ul><li>L'indemnité forfaitaire reçue de la Région</li><li>Les exonérations de charges sociales et le crédit d'impôt de l'État</li></ul><p>La loi « Avenir professionnel » (contrats signés à partir du 01/01/2019) oblige le CFA à permettre à l'apprenti de continuer sa formation théorique pendant 6 mois et à contribuer à lui trouver un nouvel employeur.</p>` },
   ] });
 }
+
+// ========== IND 10 — LIVRET D'APPRENTISSAGE ET MAÎTRE D'APPRENTISSAGE ==========
+
+export function genLivretApprentissageCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
+  const s = stagiaires[si] || stagiaires[0];
+  return buildDocument({ org: o, title: "LIVRET D'APPRENTISSAGE", extraHtml: `
+    <h2 style="text-align:center;margin-top:10px">${f.intitule || 'FORMATION EN APPRENTISSAGE'}</h2>
+    <h3 style="text-align:center;color:#555">CENTRE DE FORMATION PAR APPRENTISSAGE</h3>
+
+    <h2 style="margin-top:30px">LE LIVRET D'APPRENTISSAGE</h2>
+    <p>Outil de base de la formation professionnelle par apprentissage, le livret d'apprentissage répartit et articule les responsabilités de formation entre l'entreprise et le CFA.</p>
+    <p>Les contenus de formation se répartissent sur 2 semestres. Le document s'articule autour de 2 domaines d'activités. Il s'agit d'un document évolutif. Des modifications ou ajustements pourront se faire après bilan.</p>
+    <p>La concertation entre <strong>${o.nom}</strong> et l'entreprise est nécessaire pour améliorer la qualité et l'efficacité de la formation et établir une bonne communication entre les partenaires qui encadrent les apprentis.</p>
+    <p>L'essentiel de la formation professionnelle des apprentis a lieu en entreprise, le CFA intervient en complément de celle-ci.</p>
+    <p>Ce document doit être consulté régulièrement. Il doit « vivre » et permettre une réelle <strong>INTERACTIVITÉ</strong> entre les travaux réalisés au sein du centre de formation et de l'entreprise.</p>
+
+    <h2 style="margin-top:30px">CONTEXTE GÉNÉRAL DE L'APPRENTISSAGE</h2>
+    <p><strong>${o.nom}</strong> a choisi de se développer en proposant des formations en apprentissage et/ou en contrat de professionnalisation. Nous dispensons aux jeunes sous contrat d'apprentissage une formation générale associée à un enseignement pratique. Nous avons pour mission :</p>
+    <ul>
+      <li>La formation des jeunes en alternance</li>
+      <li>Le développement de l'apprentissage</li>
+      <li>Informer les jeunes et leurs familles sur les formations</li>
+    </ul>
+
+    <h2 style="margin-top:30px">QU'EST-CE QUE L'APPRENTISSAGE ?</h2>
+    <p>L'apprentissage est une entrée dans la vie active en vue de l'acquisition d'une qualification professionnelle certifiée par un diplôme ou par un titre homologué. Cette formation fait l'objet d'un contrat d'apprentissage. Cette insertion dans l'emploi permet aux jeunes d'acquérir une formation appliquée, des compétences opérationnelles qui leur permettent une intégration plus rapide dans la vie professionnelle.</p>
+
+    <h2 style="margin-top:30px">COORDONNÉES DE L'APPRENTI(E)</h2>
+    <table style="width:100%;border-collapse:collapse;margin-top:10px">
+      <tr><td style="padding:8px;border:1px solid #ccc;width:35%;font-weight:bold">Nom</td><td style="padding:8px;border:1px solid #ccc">${s.nom}</td></tr>
+      <tr><td style="padding:8px;border:1px solid #ccc;font-weight:bold">Prénom</td><td style="padding:8px;border:1px solid #ccc">${s.prenom}</td></tr>
+      <tr><td style="padding:8px;border:1px solid #ccc;font-weight:bold">Date de naissance</td><td style="padding:8px;border:1px solid #ccc">${s.dateNaissance || '___/___/______'}</td></tr>
+      <tr><td style="padding:8px;border:1px solid #ccc;font-weight:bold">Adresse</td><td style="padding:8px;border:1px solid #ccc">${s.email || '___________________'}</td></tr>
+      <tr><td style="padding:8px;border:1px solid #ccc;font-weight:bold">Téléphone</td><td style="padding:8px;border:1px solid #ccc">${s.telephone || '___________________'}</td></tr>
+      <tr><td style="padding:8px;border:1px solid #ccc;font-weight:bold">Entreprise</td><td style="padding:8px;border:1px solid #ccc">${s.entreprise || '___________________'}</td></tr>
+    </table>
+
+    <h2 style="margin-top:30px">LES 10 ENGAGEMENTS DE L'ENTREPRISE</h2>
+    <ol>
+      <li>Accueillir l'apprenti(e) en lui présentant l'entreprise, les collaborateurs, son maître d'apprentissage et le lieu de travail.</li>
+      <li>Mettre en œuvre les moyens de lui assurer une formation progressive et complète sous la responsabilité de son maître d'apprentissage.</li>
+      <li>Suivre l'évolution de la formation dispensée en CFA en utilisant régulièrement le livret professionnel de l'apprentissage.</li>
+      <li>S'assurer périodiquement de l'évolution des acquis professionnels de l'apprenti(e).</li>
+      <li>Prendre en compte le statut particulier de l'apprenti(e) à la fois travailleur salarié et jeune en formation.</li>
+      <li>Respecter l'ensemble de la législation relative au droit du travail.</li>
+      <li>S'impliquer dans le contrôle en cours de formation.</li>
+      <li>Participer aux rencontres organisées à l'intention des maîtres d'apprentissage.</li>
+      <li>Solliciter le concours d'une médiation en cas de situation conflictuelle.</li>
+      <li>Soutenir l'apprenti(e) dans ses démarches d'intégration professionnelle à l'issue du contrat.</li>
+    </ol>
+    <p style="margin-top:15px"><strong>Signature de l'employeur :</strong> ___________________________</p>
+    <p><strong>Signature du maître d'apprentissage :</strong> ___________________________</p>
+
+    <h2 style="margin-top:30px">LES 10 ENGAGEMENTS DU CFA</h2>
+    <ol>
+      <li>Dispenser aux apprentis un enseignement général, technique, théorique et pratique en adéquation avec la formation dispensée en entreprise.</li>
+      <li>Assurer la coordination entre la formation dispensée en partenariat avec l'entreprise.</li>
+      <li>Arrêter d'un commun accord avec les entreprises les progressions de formations pratiques.</li>
+      <li>Désigner pour chaque apprenti(e) un formateur chargé d'assurer la liaison avec le maître d'apprentissage.</li>
+      <li>Organiser et effectuer pour chaque apprenti au minimum deux visites en entreprise par an.</li>
+      <li>Organiser des réunions de travail avec les formateurs en entreprise.</li>
+      <li>Diffuser aux entreprises tous documents pédagogiques pouvant aider à assurer une bonne formation pratique.</li>
+      <li>Fournir sur le Livret Professionnel de l'Apprentissage tous renseignements permettant à l'entreprise de suivre l'assiduité et les résultats.</li>
+      <li>Veiller à l'inscription de l'apprenti en temps voulu à l'examen.</li>
+      <li>Soutenir l'apprenti(e) dans ses démarches administratives et sociales.</li>
+    </ol>
+    <p style="margin-top:15px"><strong>Signature pour la Direction du CFA :</strong> ___________________________</p>
+
+    <h2 style="margin-top:30px">LES 10 ENGAGEMENTS DE L'APPRENTI(E)</h2>
+    <p>En signant mon contrat d'apprentissage, je m'engage à :</p>
+    <ol>
+      <li>Avoir un comportement compatible avec les exigences du métier (tenue, langage, disponibilité…).</li>
+      <li>Utiliser les deux premiers mois du contrat pour confirmer mon choix d'orientation et ma motivation.</li>
+      <li>Adopter une attitude positive dans la réalisation du travail confié par mon maître d'apprentissage.</li>
+      <li>Suivre assidûment les cours du Centre de Formation d'Apprentis.</li>
+      <li>Tenir régulièrement à jour le livret professionnel de l'apprentissage.</li>
+      <li>Respecter les consignes et les règlements intérieurs de l'entreprise et du CFA.</li>
+      <li>Prévenir immédiatement l'entreprise et le CFA de mon absence et en fournir les justificatifs.</li>
+      <li>Persévérer dans mon projet professionnel lorsque je rencontre des difficultés.</li>
+      <li>Solliciter le concours d'une médiation en cas de situation conflictuelle.</li>
+      <li>Me présenter à toutes les épreuves d'examen.</li>
+    </ol>
+    <p style="margin-top:15px"><strong>Signature de l'apprenti(e) :</strong> ___________________________</p>
+  ` });
+}
+
+export function genLivretMaitreApprentissageCFA(o: OrganismeInfo) {
+  return buildDocument({ org: o, title: "LIVRET DU MAÎTRE D'APPRENTISSAGE", extraHtml: `
+    <p style="text-align:center;font-style:italic;font-size:16px;margin-bottom:30px">Les clés pour réussir votre mission</p>
+
+    <h2>L'APPRENTISSAGE, UN PARCOURS « GAGNANT-GAGNANT »</h2>
+    <h3>Côté entreprise :</h3>
+    <ul>
+      <li>C'est un investissement qui contribue à perpétuer votre métier, à former vos futurs salariés</li>
+      <li>Vous intégrez un collaborateur et le formez à vos méthodes de travail</li>
+      <li>Vous bénéficiez d'une bonne formule de pré-recrutement de vos salariés</li>
+      <li>Vous transmettez votre savoir-faire, étape indispensable pour l'avenir de votre métier</li>
+      <li>Vous bénéficiez de méthodes de travail novatrices</li>
+      <li>Vous préparez et anticipez sereinement la reprise de votre entreprise</li>
+    </ul>
+    <h3>Côté apprenti(e) :</h3>
+    <ul>
+      <li>Il/Elle prépare un diplôme tout en bénéficiant d'une expérience professionnelle</li>
+      <li>Il/Elle dispose d'un tremplin vers l'emploi</li>
+      <li>Il/Elle se dote d'expertise sur les méthodes et techniques de l'entreprise</li>
+    </ul>
+
+    <h2 style="margin-top:30px">LE RÔLE DU MAÎTRE D'APPRENTISSAGE</h2>
+    <p>La fonction de maître d'apprentissage peut être exercée par le chef d'entreprise ou l'un de ses salariés. Le maître d'apprentissage doit :</p>
+    <ul>
+      <li>Être majeur et présenter les garanties de moralité</li>
+      <li>Avoir le diplôme préparé par le jeune et 2 ans d'expérience professionnelle dans le métier ou posséder une expérience professionnelle de 3 ans</li>
+    </ul>
+    <p>Un maître d'apprentissage peut suivre au maximum deux apprentis et un(e) apprenti(e) redoublant.</p>
+
+    <h2 style="margin-top:30px">SES MISSIONS</h2>
+    <p>Il a deux missions essentielles :</p>
+    <ul>
+      <li><strong>La formation au métier</strong></li>
+      <li><strong>L'accompagnement dans la vie professionnelle et sociale de l'apprenti</strong></li>
+    </ul>
+
+    <h3>Maître d'apprentissage formateur</h3>
+    <p>Vous transmettez vos savoirs et savoir-faire techniques à votre apprenti(e) en situation réelle d'exercice du métier. Grâce à une coordination avec le CFA, vous vous assurez de la correspondance entre les apprentissages dans l'entreprise et ceux acquis au centre de formation.</p>
+
+    <h3>Maître d'apprentissage accompagnateur</h3>
+    <p>Vous aidez votre apprenti(e) à s'insérer dans l'entreprise, à comprendre les règles et les formes de l'organisation. Vous intervenez à 3 niveaux :</p>
+    <ul>
+      <li><strong>Le savoir :</strong> conseiller, accompagner le jeune dans sa formation générale</li>
+      <li><strong>Le savoir-faire :</strong> veiller à ce que l'activité du jeune corresponde à l'acquisition des connaissances</li>
+      <li><strong>Le savoir-être :</strong> participer à l'entrée du jeune dans la vie active</li>
+    </ul>
+
+    <h2 style="margin-top:30px">ACCUEILLIR ET INTÉGRER VOTRE APPRENTI(E)</h2>
+    <h3>Préparez l'arrivée de votre apprenti(e)</h3>
+    <p>Les débuts de la relation entre votre apprenti(e) et l'entreprise sont déterminants. Quelques conseils :</p>
+    <ul>
+      <li>Informez l'équipe de l'arrivée de l'apprenti(e), de son statut, du diplôme préparé</li>
+      <li>Réservez des plages horaires dans votre planning pour accompagner l'apprenti(e)</li>
+      <li>Prenez connaissance du référentiel de formation du diplôme préparé</li>
+      <li>Adaptez l'organisation du travail en fonction du rythme de l'alternance</li>
+      <li>N'oubliez pas d'effectuer la Déclaration Unique d'Embauche et la visite médicale</li>
+    </ul>
+
+    <h2 style="margin-top:30px">ACCOMPAGNER L'APPRENTI TOUT AU LONG DE SA FORMATION</h2>
+    <p>Le maître d'apprentissage forme l'apprenti(e) au métier en suivant une progression pédagogique en lien avec le CFA.</p>
+    <p>Le CFA assure l'accueil des apprentis et la coordination avec l'entreprise :</p>
+    <ul>
+      <li>Il organise et communique le calendrier de l'alternance</li>
+      <li>Il désigne un tuteur enseignant chargé de suivre l'apprenti(e)</li>
+      <li>Il organise des rencontres entre l'apprenti, le maître d'apprentissage et l'équipe pédagogique</li>
+    </ul>
+
+    <h2 style="margin-top:30px">UNE FORMATION SOUS CONTRAT</h2>
+    <h3>Le contrat d'apprentissage</h3>
+    <p>Vous signez un contrat de travail (CERFA 14) avec l'apprenti(e) et son représentant légal s'il est mineur. Il sera ensuite enregistré par <strong>${o.nom}</strong>. Il s'agit d'un CDD de type particulier car le temps est partagé entre l'entreprise et le CFA.</p>
+    <p>Le contrat d'apprentissage varie de 1 à 3 ans en fonction du diplôme préparé.</p>
+
+    <h3>Le salaire de l'apprenti</h3>
+    <table style="width:100%;border-collapse:collapse;margin-top:10px">
+      <tr style="background:#1e3a7b;color:white"><th style="padding:8px;border:1px solid #ccc">Année</th><th style="padding:8px;border:1px solid #ccc">- de 18 ans</th><th style="padding:8px;border:1px solid #ccc">18 à 20 ans</th><th style="padding:8px;border:1px solid #ccc">21 à 25 ans</th><th style="padding:8px;border:1px solid #ccc">26 ans et +</th></tr>
+      <tr><td style="padding:8px;border:1px solid #ccc;font-weight:bold">1ère année</td><td style="padding:8px;border:1px solid #ccc;text-align:center">27% SMIC</td><td style="padding:8px;border:1px solid #ccc;text-align:center">43% SMIC</td><td style="padding:8px;border:1px solid #ccc;text-align:center">53% SMIC</td><td style="padding:8px;border:1px solid #ccc;text-align:center">100% SMIC</td></tr>
+      <tr><td style="padding:8px;border:1px solid #ccc;font-weight:bold">2ème année</td><td style="padding:8px;border:1px solid #ccc;text-align:center">39% SMIC</td><td style="padding:8px;border:1px solid #ccc;text-align:center">51% SMIC</td><td style="padding:8px;border:1px solid #ccc;text-align:center">61% SMIC</td><td style="padding:8px;border:1px solid #ccc;text-align:center">100% SMIC</td></tr>
+      <tr><td style="padding:8px;border:1px solid #ccc;font-weight:bold">3ème année</td><td style="padding:8px;border:1px solid #ccc;text-align:center">55% SMIC</td><td style="padding:8px;border:1px solid #ccc;text-align:center">67% SMIC</td><td style="padding:8px;border:1px solid #ccc;text-align:center">78% SMIC</td><td style="padding:8px;border:1px solid #ccc;text-align:center">100% SMIC</td></tr>
+    </table>
+
+    <h3 style="margin-top:20px">La validation de la formation : le diplôme</h3>
+    <ul>
+      <li><strong>Le Contrôle en Cours de Formation (CCF) :</strong> Évaluation en cours d'année des pratiques professionnelles</li>
+      <li><strong>L'examen terminal</strong></li>
+    </ul>
+
+    <h2 style="margin-top:30px">FORMATION MAÎTRE D'APPRENTISSAGE</h2>
+    <p style="font-style:italic">« Accompagnez la réussite de vos apprentis » – Stage de 2 jours</p>
+    <h3>Objectifs</h3>
+    <ul>
+      <li>Doter le maître d'apprentissage d'outils méthodologiques et pédagogiques pour transmettre son savoir-faire</li>
+      <li>Favoriser la réussite professionnelle de l'apprenti en partenariat avec le centre de formation</li>
+    </ul>
+    <h3>Programme</h3>
+    <ul>
+      <li>Appréhender les caractéristiques et les spécificités du public jeune</li>
+      <li>Identifier les missions du maître d'apprentissage</li>
+      <li>Évaluer la progression de l'apprenti : méthodes et outils</li>
+    </ul>
+
+    <h2 style="margin-top:30px">AIDES FINANCIÈRES</h2>
+    <h3>Prime régionale aux employeurs d'apprentis</h3>
+    <p>Pour les entreprises de moins de 11 salariés : 1000€ pour chaque année de formation inscrite au contrat d'apprentissage.</p>
+    <h3>Crédit d'impôt</h3>
+    <p>1600€ par apprenti présent dans l'entreprise (porté à 2200€ pour un apprenti reconnu travailleur handicapé).</p>
+    <h3>Cotisations sociales</h3>
+    <p>Pour les entreprises de moins de 11 salariés inscrites au Répertoire des métiers : exonération de toutes cotisations patronales et salariales d'origine légale.</p>
+  ` });
+}
