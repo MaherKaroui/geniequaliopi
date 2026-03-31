@@ -5505,7 +5505,7 @@ ${tableHTML(["Président de séance", "Délégué titulaire élu", "Délégué s
 
 function genDroitImageCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = stagiaires[si] || stagiaires[0] || { prenom: '___', nom: '___' } as StagiaireInfo;
-  const dateSignature = f.dateDebut ? formatDate(subtractBusinessDays(f.dateDebut, 14)) : '____/____/________';
+  const dateSignature = f.dateDebut ? formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || f.dateDebut, 14)) : formatDate(new Date().toISOString().slice(0, 10));
 
   return buildDocument({ org: o, title: "DEMANDE D'AUTORISATION DROIT À L'IMAGE", subtitle: "À des fins pédagogiques et éducatives", sections: [
     { heading: "Identité", content: `<p><strong>Je soussigné(e) :</strong> ${s.civilite || ''} ${s.prenom} ${s.nom}</p><p><strong>Formation suivie :</strong> ${f.intitule}</p>` },
