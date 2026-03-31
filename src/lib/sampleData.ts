@@ -52,6 +52,7 @@ export const SAMPLE_FORMATEURS: FormateurInfo[] = [
   { nom: "Fontaine", prenom: "Marie", specialite: "Esthétique, Cosmétique", diplomes: "CAP/BEP Esthétique + DU Cosmétologie", experience: "18 ans dans le secteur esthétique", email: "m.fontaine@formapro-excellence.fr" },
   { nom: "Blanc", prenom: "Jean-Pierre", specialite: "Management, Leadership", diplomes: "MBA HEC Paris", experience: "20 ans de direction et formation en management", email: "jp.blanc@formapro-excellence.fr" },
   { nom: "Petit", prenom: "Alexandre", specialite: "Digital Marketing, Informatique", diplomes: "Master Marketing Digital – ESSEC", experience: "10 ans en stratégie digitale et formation", email: "a.petit@formapro-excellence.fr" },
+  { nom: "Mendy", prenom: "Fideline", specialite: "Massage prénatal, Thérapies africaines, Bien-être", diplomes: "Spécialiste des thérapies africaines – École du Toucher Bien-naître", experience: "15 ans d'expérience en massages et techniques de bien-être prénatal", email: "f.mendy@naturoafricaine.com" },
 ];
 
 export const SAMPLE_FORMATIONS: FormationInfo[] = [
@@ -367,6 +368,24 @@ export const SAMPLE_FORMATIONS: FormationInfo[] = [
     nombreParticipants: "2",
     formateur: "Alexandre Petit",
   },
+  {
+    intitule: "Massage & Relaxation Prénatals",
+    objectifs: "Savoir mettre en place et appliquer des séances de relaxation pendant la grossesse grâce à différentes pratiques. Permettre à la femme enceinte de visualiser son schéma corporel en toute douceur à travers des techniques de respiration et palpation afin de vivre la naissance en toute conscience.",
+    prerequis: "Aucun",
+    duree: "13 heures (2 jours)",
+    modalites: "présentiel",
+    tarif: "580 € en participation individuelle / 480 € pour les demandeurs d'emploi",
+    programme: "Jour 1 (8h30-12h30 / 13h30-18h30 – 9h) : Pratique de recentrage avec exercices de respiration, vivre sa grossesse en pleine conscience, les apports du massage prénatal, les fascias et les liquides, les points sensibles, les conditions du masseur, les produits de massage pour femme enceinte, apprentissage d'un protocole de massage spécifique pendant la période prénatale, adaptation du protocole en fonction du stade et état de grossesse, les contre-indications, l'ergonomie\nJour 2 (8h30-12h30 – 4h) : Prise de conscience du grand et petit bassin (théorie et pratique), prise de conscience des muscles du périnée (théorie et pratique), prise de conscience du col de l'utérus (théorie et pratique), relaxation avec exercices de respirations, présence à soi et au bébé, construction d'une séance de massage prénatal, construction d'une séance de massage et relaxation prénatal 'Maternité en toute sérénité', évaluation continue et évaluation écrite",
+    methodesEvaluation: "Évaluation continue des pratiques mises en place lors de la formation, évaluation écrite en fin de formation, mise en situation pratique",
+    moyensPedagogiques: "Alternance de parties théoriques et pratiques, pratique de recentrage et apport d'énergie en début de journée, guide pédagogique complet et détaillé, attestation de présence, matériel de massage (tables, huiles, coussins)",
+    publicVise: "Professionnels du bien-être, praticiens en massage, sages-femmes, toute personne souhaitant se former au massage prénatal",
+    delaiAcces: "1 semaine dans la limite des places disponibles",
+    dateDebut: "2026-05-12",
+    dateFin: "2026-05-13",
+    lieu: "78 Avenue des Champs-Élysées, 75008 Paris",
+    nombreParticipants: "4",
+    formateur: "Fideline Mendy",
+  },
 ];
 
 // Satisfaction scores (pre-filled realistic data)
@@ -384,6 +403,7 @@ export const SATISFACTION_SCORES: Record<string, number[]> = {
   "TP SAMA": [5, 4, 5, 5, 4, 5, 4, 5],
   "Initiation Word": [5, 5, 4, 5, 4, 5, 5, 4],
   "Anglais A1": [5, 4, 5, 4, 5, 5, 4, 5],
+  "Massage Prénatal": [5, 5, 5, 5, 4, 5, 5, 5],
 };
 
 // Evaluation scores per stagiaire (good scores 8-10/10)
