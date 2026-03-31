@@ -5370,7 +5370,7 @@ ${tableHTML(["", ""], [
     { heading: "SIGNATURES ET VALIDATION DU LIVRET", content: `<p>Le présent livret d'apprentissage est remis à l'apprenti(e) en début de formation.</p><p><strong>Fait à</strong> ${o.ville || 'Paris'}</p><p><strong>Date :</strong> ${dateSignature}</p>
 <div style="display:flex;justify-content:space-between;margin-top:30px">
 <div style="text-align:center;width:30%"><p><strong>Signature de l'apprenti(e) :</strong></p><div style="min-height:80px;border:1px solid #ccc;padding:10px">${sigApprentie}</div><p>${s.prenom} ${s.nom}</p></div>
-<div style="text-align:center;width:30%"><p><strong>Signature du maître d'apprentissage :</strong></p><div style="min-height:80px;border:1px solid #ccc;padding:10px">&#160;</div></div>
+<div style="text-align:center;width:30%"><p><strong>Signature du maître d'apprentissage :</strong></p><div style="min-height:80px;border:1px solid #ccc;padding:10px">${s.signatureResponsableUrl ? `<img src="${s.signatureResponsableUrl}" style="max-height:60px" />` : '&#160;'}</div></div>
 <div style="text-align:center;width:30%"><p><strong>Signature et cachet du CFA :</strong></p><div style="min-height:80px;border:1px solid #ccc;padding:10px">${tamponCFA}</div><p>${o.nom}</p></div>
 </div>` },
   ] });
@@ -5403,7 +5403,7 @@ function genConvocationCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
     { heading: "CONTACTS", content: `<p>Pour toute information complémentaire, vous pouvez contacter :</p><ul><li><strong>Référent pédagogique :</strong> ${o.responsablePedagogique || o.dirigeant || '___'}</li><li><strong>Référente administrative :</strong> ${o.dirigeant || '___'}</li></ul><p>${o.email || '___'} | ${o.telephone || '___'}</p>` },
 
     { heading: "INFORMATIONS SUR L'ORGANISME", content: `<p><strong>Nom :</strong> ${o.nom}<br><strong>Adresse :</strong> ${o.adresse || '___'}, ${o.codePostal || '___'} ${o.ville || '___'}<br><strong>SIRET :</strong> ${o.siret || '___'}<br><strong>Email :</strong> ${o.email || '___'}<br><strong>Téléphone :</strong> ${o.telephone || '___'}<br><strong>N° déclaration d'activité :</strong> ${o.nda || '___'}</p>` },
-  ], signatures: { type: "2", labels: ["Le Directeur du CFA", ""], names: [o.dirigeant || '___', ''], noOrgSignature: true }, extraHtml: `<p style="margin-top:20px"><strong>Fait à</strong> ${o.ville || 'Paris'}, <strong>le</strong> ${dateSignature}</p>` });
+  ], signatures: { type: "2", labels: ["Le Directeur du CFA", "L'Apprenti(e) (lu et approuvé)"], names: [o.dirigeant || '___', `${s.prenom} ${s.nom}`], noOrgSignature: true, stagiaireSignatureUrl: s.signatureUrl }, extraHtml: `<p style="margin-top:20px"><strong>Fait à</strong> ${o.ville || 'Paris'}, <strong>le</strong> ${dateSignature}</p>` });
 }
 
 // ============== CFA IND 9 — CGV ==============
