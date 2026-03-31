@@ -5403,7 +5403,7 @@ function genConvocationCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
     { heading: "CONTACTS", content: `<p>Pour toute information complémentaire, vous pouvez contacter :</p><ul><li><strong>Référent pédagogique :</strong> ${o.responsablePedagogique || o.dirigeant || '___'}</li><li><strong>Référente administrative :</strong> ${o.dirigeant || '___'}</li></ul><p>${o.email || '___'} | ${o.telephone || '___'}</p>` },
 
     { heading: "INFORMATIONS SUR L'ORGANISME", content: `<p><strong>Nom :</strong> ${o.nom}<br><strong>Adresse :</strong> ${o.adresse || '___'}, ${o.codePostal || '___'} ${o.ville || '___'}<br><strong>SIRET :</strong> ${o.siret || '___'}<br><strong>Email :</strong> ${o.email || '___'}<br><strong>Téléphone :</strong> ${o.telephone || '___'}<br><strong>N° déclaration d'activité :</strong> ${o.nda || '___'}</p>` },
-  ], signatures: { type: "2", labels: ["Le Directeur du CFA", ""], names: [o.dirigeant || '___', ''], noOrgSignature: true }, date: dateSignature });
+  ], signatures: { type: "2", labels: ["Le Directeur du CFA", ""], names: [o.dirigeant || '___', ''], noOrgSignature: true }, extraHtml: `<p style="margin-top:20px"><strong>Fait à</strong> ${o.ville || 'Paris'}, <strong>le</strong> ${dateSignature}</p>` });
 }
 
 // ============== CFA IND 9 — CGV ==============
