@@ -1,6 +1,6 @@
 // Additional AF (Action de Formation) template generators
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
-import { buildDocument, formatDate, tableHTML, signatureBlock2, signatureBlock3, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif } from "./docBuilder";
+import { buildDocument, formatDate, tableHTML, signatureBlock2, signatureBlock3, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif, linkUrl } from "./docBuilder";
 import { FormateurInfo, EVAL_SCORES } from "./sampleData";
 import { getEvalContent, generateStagiaireAnswers, computeQCMScore } from "./evalContent";
 
