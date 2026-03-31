@@ -7099,6 +7099,7 @@ function generateEvalBesoinsAnswers(s: StagiaireInfo, f: FormationInfo, o: Organ
       "Mon objectif est de devenir une praticienne reconnue en massage prénatal et de pouvoir accompagner les femmes tout au long de leur grossesse avec des techniques adaptées et sûres.",
     ];
   } else if (isIA) {
+    objectifOptions = [
       "Je souhaite maîtriser les outils d'IA générative (ChatGPT, Midjourney, DALL-E) pour créer des contenus professionnels de qualité et gagner significativement en productivité dans ma production de contenus.",
       "Mon objectif est d'intégrer l'IA dans mon workflow quotidien de création de contenus pour produire des campagnes complètes (texte + visuel) de manière rapide, efficace et cohérente.",
       "Je veux comprendre les bonnes pratiques et le cadre juridique de l'IA générative (RGPD, droit d'auteur, AI Act) pour utiliser ces outils de manière responsable et conforme dans mon activité.",
