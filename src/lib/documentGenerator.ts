@@ -8116,7 +8116,7 @@ function getCFAWeekDates(f: FormationInfo): { cfaWeekNum: number; weekStart: Dat
   return result;
 }
 
-function genExercicesCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number, exerciceIdx: number) {
+function genExercicesCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number, exerciceIdx: number, extraParams?: Record<string, any>) {
   const termine = isFormationTerminee(f);
   const s = stagiaires[si] || stagiaires[0] || { nom: 'Dupont', prenom: 'Marie', email: '', telephone: '', entreprise: '', poste: '' } as StagiaireInfo;
   const rncp = getRNCPByCode(f.codeRNCP || '');
@@ -8127,10 +8127,9 @@ function genExercicesCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires
   const totalCFAWeeks = cfaWeekDates.length || 1;
 
   // Determine bloc/matière/exercise from params or fallback
-  const params = arguments.length > 5 ? arguments[5] : undefined;
-  let blocIdx = params?.blocIdx;
-  let matiereIdx = params?.matiereIdx;
-  let exInMatiere = params?.exInMatiere;
+  let blocIdx = extraParams?.blocIdx;
+  let matiereIdx = extraParams?.matiereIdx;
+  let exInMatiere = extraParams?.exInMatiere;
 
   let moduleTitle = '';
   let matiereTitle = '';
