@@ -453,5 +453,9 @@ export function applyGender(html: string, s: { civilite?: string } | undefined |
   // Catch remaining patterns like "xxxé(e)" not in our list
   result = result.replace(/([éi])\(e\)/g, isFem ? "$1e" : "$1");
   result = result.replace(/([u])\(e\)/g, isFem ? "$1e" : "$1");
+  // Catch M./Mme patterns
+  result = result.replace(/M\.\/Mme/g, isFem ? "Mme" : "M.");
+  // Catch "il/elle" variants with capitals
+  result = result.replace(/Il\/Elle/g, isFem ? "Elle" : "Il");
   return result;
 }
