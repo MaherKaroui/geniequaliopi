@@ -10,6 +10,7 @@ import { genCGV_V2, genReglement_V2, genConvocation_V2, genContratFormationPro_V
 import { genFichePosteRole, genAutoEvaluationFormateurV2, genProcessusRecrutementV2, genPlanDevCompetencesExcel } from "./templatesCritere5";
 import { genVeilleReglementaireV2, genVeilleMetierV2, genVeilleTechnologiqueV2, genVeilleHandicap, genListePartenairesV2, genContratSousTraitanceV2, genCharteQualiteFormateurExterne } from "./templatesCritere6";
 import { getRNCPByCode } from "./rncpData";
+import { generateExcelSuiviInscriptions } from "./xlsxGenerator";
 import { getModuleSpecificConsigne } from "./cfaExerciseContent";
 
 const FALLBACK_STAGIAIRE: StagiaireInfo = { prenom: "Martin", nom: "Dupont", civilite: "" as "M." | "Mme" | "", email: "", telephone: "", entreprise: "", poste: "", dateNaissance: "" };
