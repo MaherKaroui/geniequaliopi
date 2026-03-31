@@ -404,6 +404,51 @@ const DocStyleConfigPanel = ({ style, onChange }: DocStyleConfigPanelProps) => {
                     );
                   })}
                 </div>
+
+                {/* Save current theme */}
+                <div className="border-t pt-3 mt-3">
+                  <div className="flex items-center gap-2">
+                    <Input
+                      placeholder="Nom du thème à sauvegarder..."
+                      value={saveName}
+                      onChange={e => setSaveName(e.target.value)}
+                      className="text-xs h-8 flex-1"
+                      onKeyDown={e => e.key === "Enter" && handleSave()}
+                    />
+                    <Button size="sm" className="h-8 text-xs gap-1" onClick={handleSave} disabled={!saveName.trim()}>
+                      <Save className="w-3 h-3" /> Sauvegarder
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Saved themes */}
+                {savedThemes.length > 0 && (
+                  <div className="border-t pt-3 mt-3">
+                    <Label className="text-xs font-semibold text-muted-foreground mb-2 block">MES THÈMES SAUVEGARDÉS</Label>
+                    <div className="space-y-1.5">
+                      {savedThemes.map(st => (
+                        <div key={st.id} className="flex items-center gap-2 p-2 rounded-lg border hover:border-primary/30 transition-all group">
+                          <div className="flex gap-0.5 flex-shrink-0">
+                            <div className="w-3 h-3 rounded-full" style={{ background: st.config.primaryColor }} />
+                            <div className="w-3 h-3 rounded-full" style={{ background: st.config.secondaryColor }} />
+                          </div>
+                          <button
+                            onClick={() => onChange({ ...st.config })}
+                            className="flex-1 text-left text-xs font-medium hover:text-primary transition-colors"
+                          >
+                            {st.name}
+                          </button>
+                          <button
+                            onClick={() => handleDelete(st.id, st.name)}
+                            className="opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive/80"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
