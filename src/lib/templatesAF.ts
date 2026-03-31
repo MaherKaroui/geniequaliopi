@@ -80,6 +80,113 @@ export function genGrilleAnalyseNiveauInitial(o: OrganismeInfo, f: FormationInfo
 }
 
 export function genDeroulePedagogique(o: OrganismeInfo, f: FormationInfo) {
+  const t = (f.intitule || "").toLowerCase();
+  const isMassage = t.includes("massage") && (t.includes("prénatal") || t.includes("prenatal") || t.includes("relaxation"));
+
+  if (isMassage) {
+    return genDerouleMassagePrenatal(o, f);
+  }
+
+  // ── Generic déroulé logic ──
+  return genDeroulePedagogiqueGeneric(o, f);
+}
+
+function genDerouleMassagePrenatal(o: OrganismeInfo, f: FormationInfo) {
+  const headers = ["Séquence", "Durée", "Objectif pédagogique", "Contenus abordés", "Méthodes & activités", "Outils / supports", "Évaluation", "Adaptations"];
+
+  const jour1Rows: string[][] = [
+    ["Accueil & présentation", "0h30",
+      "Se connaître et poser le cadre de la formation",
+      "Tour de table, recueil des attentes, présentation du programme, des objectifs et des modalités d'évaluation",
+      "Échanges oraux, tour de table", "Support de présentation, livret d'accueil",
+      "Questions-réponses", "Adaptation au rythme"],
+    ["Pratique de recentrage & respiration", "1h00",
+      "Maîtriser les techniques de respiration guidée et de recentrage pour débuter chaque séance",
+      "Respiration abdominale en 4 temps (inspiration 4s, pause 2s, expiration 6s, pause 2s), balayage corporel (body scan), connexion mère-bébé, visualisation",
+      "Démonstration + pratique guidée en binôme", "Tapis, coussins, musique douce, huiles",
+      "Observation de la pratique", "Adaptation au stade de grossesse"],
+    ["Anatomie & physiologie de la femme enceinte", "1h00",
+      "Comprendre les modifications corporelles et les contre-indications du massage pendant la grossesse",
+      "Système musculo-squelettique (lordose, relaxine), système circulatoire (veine cave, œdèmes), contre-indications absolues (pré-éclampsie, placenta praevia), précautions par trimestre, points d'acupression à éviter (Hegu, Sanyinjiao)",
+      "Exposé interactif illustré", "Planches anatomiques, support pédagogique",
+      "QCM de positionnement", "Aide individualisée"],
+    ["Les huiles et produits adaptés", "0h30",
+      "Savoir choisir les huiles végétales adaptées à la grossesse et identifier les produits interdits",
+      "Huiles recommandées (amande douce, jojoba, argan, coco) : propriétés et utilisations. Huiles essentielles à éviter (sauge, romarin, menthe poivrée). Test de tolérance cutanée",
+      "Démonstration + manipulation", "Huiles végétales, fiches techniques",
+      "Exercice d'identification", "Adaptation selon allergies"],
+    ["Positions d'installation de la cliente", "0h30",
+      "Maîtriser les positions sécurisées d'installation de la femme enceinte",
+      "Décubitus latéral gauche (position principale), position semi-assise à 45°, position assise sur ballon. Utilisation des coussins de soutien. Positions à éviter selon le trimestre",
+      "Démonstration + mise en pratique", "Table de massage, coussins, ballon",
+      "Mise en situation pratique", "Adaptation au confort de la cliente"],
+    ["Massage du dos – Effleurage & pétrissage", "1h30",
+      "Réaliser un massage du dos adapté à la grossesse : effleurage, pétrissage doux et pressions glissées",
+      "Effleurage du dos (mains à plat, glissement sacrum → épaules), pétrissage doux des paravertébraux (pouces en cercles), pressions glissées le long des gouttières paravertébrales, massage du sacrum, mobilisations douces des épaules",
+      "Démonstration pas-à-pas + pratique en binôme", "Table de massage, huiles, coussins de positionnement",
+      "Observation et correction des gestes", "Accompagnement renforcé sur la pression"],
+    ["Drainage des jambes & massage des pieds", "1h30",
+      "Pratiquer le drainage lymphatique doux des membres inférieurs et la réflexologie plantaire adaptée",
+      "Drainage ascendant (chevilles → cuisses), zones à éviter (varices, malléole interne), technique de pompage. Massage des pieds : pressions du pouce sur la voûte plantaire, rotations des orteils, zones réflexologiques sûres et interdites. Mobilisations des chevilles (flexion/extension, rotations, pompage veineux)",
+      "Démonstration + pratique guidée", "Table de massage, huiles, schéma des zones réflexes",
+      "Observation en situation", "Adaptation aux œdèmes"],
+    ["Construction du protocole & pratique intégrale", "2h00",
+      "Structurer et réaliser une séance complète de massage prénatal de 60 minutes",
+      "Déroulé d'une séance type : accueil/anamnèse (5 min), recentrage/respiration (8 min), massage du dos (15 min), drainage des jambes (12 min), massage des pieds (8 min), conscience du bassin (7 min), retour au calme (5 min). Pratique intégrale en binôme avec feedback du formateur",
+      "Mise en situation professionnelle complète", "Table de massage, huiles, coussins, chronomètre, fiche protocole",
+      "Évaluation formative de la séance complète", "Soutien individualisé"],
+    ["Bilan de la journée", "0h30",
+      "Synthétiser les acquis de la première journée",
+      "Retour d'expérience, questions/réponses, préparation du jour 2",
+      "Échange formateur/stagiaires", "Carnet de notes",
+      "Auto-évaluation", "Adaptation du programme J2"],
+  ];
+
+  const jour2Rows: string[][] = [
+    ["Conscience du bassin – Mobilisations", "1h00",
+      "Maîtriser les exercices de prise de conscience du bassin pour préparer la femme enceinte à l'accouchement",
+      "Antéversion/rétroversion sur ballon (10 répétitions), cercles du bassin (5 dans chaque sens), bercements latéraux. Bénéfices : mobilité du bassin, soulagement sacro-iliaque, préparation à la descente du bébé",
+      "Démonstration + pratique sur ballon", "Ballons de grossesse, tapis, coussins",
+      "Observation de la pratique", "Adaptation au stade de grossesse"],
+    ["Travail du périnée & étirements", "1h00",
+      "Guider les exercices de préparation périnéale et les étirements adaptés à la grossesse",
+      "Exercices de Kegel (contraction 5s / relâchement 10s, 3×10), Kegel inversés (relâchement conscient), visualisation du périnée. Étirements : psoas (chevalier servant), adducteurs (papillon), chat-vache adapté, torsion douce. Coordination respiration/périnée",
+      "Démonstration + pratique guidée", "Tapis, coussins, ballon",
+      "Exercice pratique corrigé", "Accompagnement renforcé"],
+    ["Construction d'une séance « Maternité en toute sérénité »", "1h00",
+      "Concevoir et personnaliser une séance complète de massage et relaxation prénatal",
+      "Construction personnalisée intégrant : recentrage/respiration, massage adapté au trimestre, conscience du bassin, relaxation finale. Fiche d'anamnèse prénatale : stade de grossesse, suivi médical, contre-indications temporaires. Éthique et cadre professionnel : consentement, confidentialité, limites de compétence",
+      "Travail individuel accompagné", "Fiche protocole vierge, fiche d'anamnèse, guide déontologique",
+      "Document réalisé évalué", "Aide individualisée"],
+    ["Évaluation finale & bilan", "1h00",
+      "Valider les acquis et clôturer la formation",
+      "Évaluation écrite (QCM + questions ouvertes), mise en situation pratique évaluée : réalisation d'un protocole complet. Bilan individuel, conseils post-formation : auto-massage, étirements quotidiens, rythme des séances recommandé. Remise des attestations",
+      "Évaluation écrite + mise en situation", "QCM, grille d'évaluation, attestations",
+      "Évaluation sommative finale", "Temps supplémentaire si nécessaire"],
+  ];
+
+  let tableHtml = `<h3>Jour 1 – Fondamentaux, techniques de massage et protocole (8h30–12h30 / 13h30–18h30 – 9h)</h3>`;
+  tableHtml += `<table><thead><tr>${headers.map(h => `<th>${h}</th>`).join("")}</tr></thead><tbody>`;
+  for (const row of jour1Rows) {
+    tableHtml += `<tr>${row.map(c => `<td>${c}</td>`).join("")}</tr>`;
+  }
+  tableHtml += `</tbody></table>`;
+
+  tableHtml += `<div class="page-break"></div>`;
+
+  tableHtml += `<h3>Jour 2 – Bassin, périnée et construction de séance (8h30–12h30 – 4h)</h3>`;
+  tableHtml += `<table><thead><tr>${headers.map(h => `<th>${h}</th>`).join("")}</tr></thead><tbody>`;
+  for (const row of jour2Rows) {
+    tableHtml += `<tr>${row.map(c => `<td>${c}</td>`).join("")}</tr>`;
+  }
+  tableHtml += `</tbody></table>`;
+
+  return buildDocument({ org: o, title: "DÉROULÉ PÉDAGOGIQUE DÉTAILLÉ", subtitle: f.intitule, formation: f, showFormationInfo: true, sections: [
+    { heading: "", content: tableHtml },
+  ] });
+}
+
+function genDeroulePedagogiqueGeneric(o: OrganismeInfo, f: FormationInfo) {
   // ── Determine number of days from duree field ──
   const heuresMatch = f.duree.match(/(\d+)\s*h/i);
   const joursMatch = f.duree.match(/(\d+)\s*jours?/i);
