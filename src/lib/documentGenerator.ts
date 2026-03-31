@@ -528,7 +528,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "dossier_candidature_cfa": return genDossierCandidatureCFA(o, f);
     case "livret_accueil_cfa": return genLivretAccueilCFA(o, f);
     case "livret_accueil_cfa_v2": return genLivretAccueilCFA_V2(o, f, stagiaires, params?.stagiaireIdx ?? 0);
-    case "reglement_interieur_cfa_v2": return genReglementInterieurCFA_V2(o, f);
+    case "reglement_interieur_cfa_v2": return genReglementInterieurCFA_V2(o, f, stagiaires, params?.stagiaireIdx ?? 0);
     case "pv_election_delegues_cfa": return genPVElectionDeleguesCFA(o, f, stagiaires);
     case "droit_image_cfa": return genDroitImageCFA(o, f, stagiaires, params?.stagiaireIdx ?? 0);
     case "convention_formation_cfa": return genConventionFormationCFA(o, f, stagiaires, params?.stagiaireIdx ?? 0);
@@ -5196,14 +5196,16 @@ function genLivretAccueilCFA_V2(o: OrganismeInfo, f: FormationInfo, stagiaires: 
     // ===== CONSEILS =====
     { heading: "Conseils pour réussir votre alternance", content: `<ul><li>Soyez ponctuel(le) et assidu(e) au CFA et en entreprise</li><li>Organisez votre travail : planning, révisions, dossier professionnel</li><li>Communiquez avec votre tuteur et vos formateurs</li><li>Tenez à jour votre livret d'apprentissage chaque semaine</li><li>N'hésitez pas à solliciter de l'aide dès que vous en ressentez le besoin</li><li>Préparez activement vos épreuves de certification</li></ul>` },
 
-    // ===== ATTESTATION D'ENGAGEMENT =====
-    { heading: "Attestation d'engagement", content: `<p>Je soussigné(e) <strong>${s.civilite || ''} ${s.prenom} ${s.nom}</strong> déclare avoir pris connaissance du présent livret d'accueil, du règlement intérieur et de la charte de l'apprentissage. Je m'engage à respecter l'ensemble des règles et dispositions qui y sont mentionnées.</p><p><strong>Date :</strong> ${dateSignature}</p><br/><p><strong>Signature de l'apprenti(e) :</strong></p><div style="border:1px solid #ccc;min-height:60px;padding:8px">${sigHtml}</div>` },
-  ] });
+     // ===== ATTESTATION D'ENGAGEMENT =====
+    { heading: "Attestation d'engagement", content: `<p>Je soussigné(e) <strong>${s.civilite || ''} ${s.prenom} ${s.nom}</strong> déclare avoir pris connaissance du présent livret d'accueil, du règlement intérieur et de la charte de l'apprentissage. Je m'engage à respecter l'ensemble des règles et dispositions qui y sont mentionnées.</p><p><strong>Date :</strong> ${dateSignature}</p>` },
+  ], signatures: { type: "2", labels: ["Le Directeur du CFA", "L'Apprenti(e) (lu et approuvé)"], names: [o.dirigeant || '___', `${s.prenom} ${s.nom}`], noOrgSignature: true, stagiaireSignatureUrl: s.signatureUrl } });
 }
 
 // ============== CFA IND 9 — RÈGLEMENT INTÉRIEUR V2 (complet 8 articles) ==============
 
-function genReglementInterieurCFA_V2(o: OrganismeInfo, f: FormationInfo) {
+function genReglementInterieurCFA_V2(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
+  const s = stagiaires[si] || stagiaires[0] || { prenom: '___', nom: '___' } as StagiaireInfo;
+  const dateSignature = f.dateDebut ? formatDate(subtractBusinessDays(f.dateDebut, 14)) : '____/____/________';
   return buildDocument({ org: o, title: "RÈGLEMENT INTÉRIEUR DU CFA", sections: [
     { heading: "Préambule", content: `<p>Le premier objectif de <strong>${o.nom}</strong> est la pleine réussite et l'épanouissement de ses apprenants : réussite aux examens, réussite en entreprise, réussite sur le marché du travail, réussite en matière de développement personnel. L'atteinte de ces ambitions est l'affaire de tous : elle passe nécessairement par une forte implication des apprenants dans leur formation et par le strict respect des règles de vie mentionnées dans ce règlement.</p>` },
 
@@ -5246,7 +5248,7 @@ function genReglementInterieurCFA_V2(o: OrganismeInfo, f: FormationInfo) {
 
     { heading: "Article 8 : Représentation des apprenants", content: `<h4>Délégué de classe</h4><p>Pour les formations de plus de 400 heures :</p><ul><li>Tous les apprenants sont électeurs et éligibles</li><li>Élection d'un délégué titulaire et d'un suppléant au scrutin uninominal à deux tours</li><li>Le scrutin a lieu dans les deux mois suivant le début de la formation</li><li>Les délégués représentent les apprenants dans tous les conseils de classe</li><li>Ils font toute suggestion pour améliorer les conditions de formation</li></ul>
 <h4>Conseil de Perfectionnement</h4><p>Le Conseil de Perfectionnement se réunit au moins une fois par an. Il est composé de représentants parmi les apprenants, le personnel administratif et l'équipe pédagogique. Il est présidé par le Directeur. Chaque réunion fait l'objet d'un procès-verbal.</p>` },
-  ], signatures: { type: "2", labels: ["Le Directeur du CFA", "L'Apprenti(e) (lu et approuvé)"], names: [o.dirigeant || '___', ""] } });
+  ], signatures: { type: "2", labels: ["Le Directeur du CFA", "L'Apprenti(e) (lu et approuvé)"], names: [o.dirigeant || '___', `${s.prenom} ${s.nom}`], noOrgSignature: true, stagiaireSignatureUrl: s.signatureUrl } });
 }
 
 // ============== CFA IND 9 — PV ÉLECTION DES DÉLÉGUÉS ==============
@@ -5293,8 +5295,8 @@ function genDroitImageCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
 
     { heading: "Conditions", content: `<p>L'autorisation de me photographier ou de me filmer est valable pour la durée de la formation.</p><p>La photographie ne sera ni communiquée à d'autres personnes, ni vendue, ni utilisée à d'autres usages que ceux mentionnés ci-dessus.</p><p>La publication ou la diffusion de mon image, sans limite de durée, ainsi que des légendes non-nominatives, ne devront pas porter atteinte à ma dignité, à ma vie privée ou à ma réputation.</p><p>Conformément à la loi, le libre accès aux données photographiques qui me concernent est garanti. Je peux donc à tout moment vérifier l'usage qui en est fait et je dispose du <strong>droit de retrait</strong> de cette image si je le juge utile.</p>` },
 
-    { heading: "Signature", content: `<p><strong>Date :</strong> ${dateSignature}</p><br/><p><strong>Signature de l'apprenti(e) :</strong></p><div style="border:1px solid #ccc;min-height:60px;padding:8px">&#160;</div>` },
-  ] });
+    { heading: "Signature", content: `<p><strong>Date :</strong> ${dateSignature}</p>` },
+  ], signatures: { type: "2", labels: ["Le Directeur du CFA", "L'Apprenti(e)"], names: [o.dirigeant || '___', `${s.prenom} ${s.nom}`], noOrgSignature: true, stagiaireSignatureUrl: s.signatureUrl } });
 }
 
 

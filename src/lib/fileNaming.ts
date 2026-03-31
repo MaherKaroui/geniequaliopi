@@ -18,6 +18,7 @@ export const PER_STAGIAIRE_TEMPLATES = new Set([
   "convocation_certification",
   "livret_accueil_cfa_v2",
   "droit_image_cfa",
+  "reglement_interieur_cfa_v2",
 ]);
 
 const EXCEL_TEMPLATES = new Set([
