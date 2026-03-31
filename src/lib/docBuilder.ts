@@ -179,7 +179,43 @@ td{padding:8px 6px;vertical-align:top;font-size:${s.fontSize - 1}px}
 @media print{body{padding:20px}.page-break{page-break-after:always}}
 ${themeRules}
 ${!s.showSectionBorder ? `.section{border-left:none !important} .section-green{border-left:none !important} .section-orange{border-left:none !important} h2{border-left:none !important}` : ''}
+${getHeadingStyleCSS(s)}
 </style>`;
+}
+
+function getHeadingStyleCSS(s: DocStyleConfig): string {
+  const hs = s.headingStyle || 'line-bottom';
+  const overrides: Record<string, string> = {
+    'line-bottom': `
+h1{border-bottom:3px solid ${s.primaryColor} !important;padding-bottom:10px !important;background:none !important;color:${s.primaryColor} !important;border-radius:0 !important;box-shadow:none !important;border-left:none !important;padding:0 0 10px 0 !important}
+h2{border-bottom:2px solid ${s.primaryColor}40 !important;padding-bottom:6px !important;background:none !important;color:${s.primaryColor} !important;border-radius:0 !important;border-left:none !important;padding-left:0 !important}
+`,
+    'filled': `
+h1{background:${s.primaryColor} !important;color:white !important;padding:14px 20px !important;border-radius:6px !important;border-bottom:none !important;border-left:none !important;box-shadow:0 2px 8px ${s.primaryColor}40 !important}
+h2{background:${s.primaryColor}cc !important;color:white !important;padding:8px 16px !important;border-radius:4px !important;border-bottom:none !important;border-left:none !important}
+`,
+    'gradient': `
+h1{background:linear-gradient(135deg,${s.primaryColor},${s.secondaryColor}) !important;color:white !important;padding:14px 20px !important;border-radius:8px !important;border-bottom:none !important;border-left:none !important;box-shadow:none !important}
+h2{background:linear-gradient(135deg,${s.primaryColor}15,${s.secondaryColor}15) !important;color:${s.primaryColor} !important;padding:8px 14px !important;border-radius:6px !important;border-bottom:none !important;border-left:none !important}
+`,
+    'left-bar': `
+h1{border-left:5px solid ${s.primaryColor} !important;padding-left:16px !important;border-bottom:none !important;background:${s.primaryColor}08 !important;padding:12px 16px !important;border-radius:0 6px 6px 0 !important;color:${s.primaryColor} !important;box-shadow:none !important}
+h2{border-left:4px solid ${s.secondaryColor} !important;padding-left:12px !important;border-bottom:none !important;background:none !important;color:${s.primaryColor} !important;border-radius:0 !important}
+`,
+    'underline-double': `
+h1{border-bottom:double 4px ${s.primaryColor} !important;padding-bottom:10px !important;background:none !important;color:${s.primaryColor} !important;border-radius:0 !important;box-shadow:none !important;border-left:none !important;padding-left:0 !important}
+h2{border-bottom:double 3px ${s.primaryColor}60 !important;padding-bottom:6px !important;background:none !important;color:${s.primaryColor} !important;border-radius:0 !important;border-left:none !important;padding-left:0 !important}
+`,
+    'plain': `
+h1{border-bottom:none !important;background:none !important;color:${s.primaryColor} !important;padding:0 !important;border-radius:0 !important;box-shadow:none !important;border-left:none !important}
+h2{border-bottom:none !important;background:none !important;color:${s.primaryColor} !important;padding:0 !important;border-radius:0 !important;border-left:none !important}
+`,
+    'pill': `
+h1{background:${s.primaryColor}12 !important;color:${s.primaryColor} !important;padding:10px 24px !important;border-radius:30px !important;border-bottom:none !important;border-left:none !important;box-shadow:none !important;display:inline-block !important;margin-bottom:20px !important}
+h2{background:${s.primaryColor}08 !important;color:${s.primaryColor} !important;padding:6px 18px !important;border-radius:20px !important;border-bottom:none !important;border-left:none !important;display:inline-block !important;margin-bottom:10px !important}
+`,
+  };
+  return overrides[hs] || '';
 }
 
 export function formatDate(dateStr: string): string {
