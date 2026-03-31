@@ -7193,8 +7193,20 @@ function generateEvalBesoinsAnswers(s: StagiaireInfo, f: FormationInfo, o: Organ
       `Mon projet est de pouvoir aider les nouvelles recrues étrangères de mon établissement en devenant un relais linguistique au sein de l'équipe.`,
       `À terme, je souhaite créer une petite structure d'aide à domicile, et la maîtrise du français professionnel est indispensable pour les démarches administratives et la relation avec les bénéficiaires.`,
     ];
-  } else if (isIA) {
+  } else if (isMassage) {
     projetProOptions = [
+      `Cette formation me permettra de proposer des séances de massage prénatal dans mon cabinet et d'accompagner les femmes enceintes dans leur bien-être physique et émotionnel tout au long de la grossesse.`,
+      `Grâce à cette spécialisation, je pourrai développer une activité dédiée à la maternité (massage prénatal, postnatal, relaxation) et me positionner sur un marché en forte demande.`,
+      `En maîtrisant le massage prénatal, je pourrai enrichir mon offre de services bien-être et fidéliser une clientèle de futures mamans qui cherchent un accompagnement naturel et bienveillant.`,
+      `Cette formation s'inscrit dans mon projet de création d'un espace dédié au bien-être maternel, combinant massage prénatal, sophrologie et accompagnement à la naissance.`,
+      `Mon projet est de devenir une référence locale en massage prénatal et d'être recommandée par les sages-femmes et les maternités de ma région.`,
+      `Grâce à cette formation, je pourrai intégrer le massage prénatal dans mon activité de ${s.poste || "praticien(ne) bien-être"} et répondre à une demande croissante de ma clientèle.`,
+      `Cette spécialisation me permettra de me différencier dans le secteur du bien-être et d'attirer une clientèle spécifique (femmes enceintes, jeunes mamans) avec des besoins précis.`,
+      `Mon projet professionnel est de combiner le massage prénatal avec d'autres techniques (réflexologie, aromathérapie) pour proposer un accompagnement complet de la maternité.`,
+      `Cette formation me donnera la confiance et les compétences nécessaires pour travailler en collaboration avec des professionnels de santé (sages-femmes, gynécologues) autour de l'accompagnement de la grossesse.`,
+      `À terme, je souhaite former d'autres praticiens au massage prénatal et partager cette expertise avec la communauté du bien-être maternel.`,
+    ];
+  } else if (isIA) {
       `Grâce à la maîtrise de l'IA générative, je pourrai proposer des prestations de création de contenus à haute valeur ajoutée et me positionner sur un marché en forte croissance.`,
       `Cette formation me permettra d'intégrer l'IA dans ma pratique professionnelle de ${s.poste} chez ${s.entreprise}, de multiplier ma productivité et de me démarquer par des compétences innovantes.`,
       `En maîtrisant les outils d'IA, je pourrai créer de manière autonome l'ensemble des supports de communication de ${s.entreprise} et réduire significativement les coûts de production.`,
