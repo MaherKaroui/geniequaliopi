@@ -104,11 +104,11 @@ const YOUTUBE_CRM: CourseData['youtubeVideos'] = [
 ];
 
 const YOUTUBE_MASSAGE: CourseData['youtubeVideos'] = [
-  { title: "Massage prénatal – Techniques et bienfaits pour la femme enceinte", url: "https://www.youtube.com/watch?v=_qTpCmxGiQI", description: "Démonstration des techniques de massage adaptées à chaque trimestre de la grossesse." },
-  { title: "Massage du dos en décubitus latéral – Grossesse", url: "https://www.youtube.com/watch?v=pQN_v0qJBSk", description: "Technique de massage du dos en position latérale sécurisée pour la femme enceinte." },
-  { title: "Drainage lymphatique des jambes – Grossesse et œdèmes", url: "https://www.youtube.com/watch?v=3hhfHsjUQrA", description: "Protocole de drainage des membres inférieurs pour réduire les œdèmes liés à la grossesse." },
-  { title: "Relaxation et respiration – Accompagnement prénatal", url: "https://www.youtube.com/watch?v=inpok4MKVLM", description: "Techniques de relaxation et de respiration pour accompagner la femme enceinte vers le bien-être." },
-  { title: "Anatomie de la grossesse – Ce que le praticien doit savoir", url: "https://www.youtube.com/watch?v=NmjSMiG5jz0", description: "Comprendre les changements anatomiques et physiologiques de la grossesse pour adapter sa pratique." },
+  { title: "Les gestes fondamentaux pour masser – Les secrets d'un massage du dos", url: "https://www.youtube.com/watch?v=qAT3TgVyLbY", description: "Maîtriser les bases du massage : posture, pression, respiration du modèle et techniques d'effleurage/pétrissage." },
+  { title: "Périnée hypertonique – Techniques de massage pour détendre le périnée", url: "https://www.youtube.com/watch?v=0DulJJp7FIg", description: "Techniques de massage périnéal par une kinésithérapeute spécialisée en santé de la femme." },
+  { title: "La respiration diaphragmatique – Sophrologie", url: "https://www.youtube.com/watch?v=mXxhVVG6rI4", description: "Vidéo pédagogique illustrant le muscle diaphragmatique en action, essentiel pour la relaxation prénatale." },
+  { title: "Tuto massage des mollets – Techniques de drainage et de détente", url: "https://www.youtube.com/watch?v=-l1G8dYcaIM", description: "Protocole de massage des membres inférieurs : deep tissue, percussion et travail en extension." },
+  { title: "Yoga pour débutants et femmes enceintes – Séance complète", url: "https://www.youtube.com/watch?v=qxn5J-O28gY", description: "Séance de yoga adaptée aux femmes enceintes : postures, respiration et relaxation en toute sécurité." },
 ];
 
 const YOUTUBE_ESTHETIQUE: CourseData['youtubeVideos'] = [
