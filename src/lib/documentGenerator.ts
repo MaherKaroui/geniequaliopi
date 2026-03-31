@@ -5145,7 +5145,153 @@ ${tableHTML(["Service", "Contact"], [
   ] });
 }
 
-// ============== CFA IND 5 — CONVENTION ET LIVRET ==============
+// ============== CFA IND 9 — LIVRET D'ACCUEIL V2 (complet) ==============
+
+function genLivretAccueilCFA_V2(o: OrganismeInfo, f: FormationInfo) {
+  const rncp = getRNCPByCode(f.codeRNCP || '');
+  const titreFormation = f.intitule || 'Formation en alternance';
+  const blocsHtml = rncp ? rncp.blocsCompetences.map((b, i) =>
+    `<p><strong>Bloc ${i + 1} :</strong> ${b.titre}</p><ul>${b.competences.map(c => `<li>${c}</li>`).join('')}</ul>`
+  ).join('') : '<p>Voir programme détaillé.</p>';
+
+  return buildDocument({ org: o, title: "LIVRET D'ACCUEIL DE L'APPRENTI", subtitle: titreFormation, sections: [
+    // ===== BIENVENUE =====
+    { heading: "Bienvenue !", content: `<p>Nous sommes heureux de vous accueillir au sein de <strong>${o.nom}</strong> pour la formation <strong>« ${titreFormation} »</strong>.</p><p>Ce livret contient toutes les informations nécessaires au bon déroulement de votre parcours d'alternance. Nous sommes convaincus que chaque apprenant a le droit de façonner son propre avenir professionnel.</p>` },
+    { heading: "Nos valeurs", content: `<ul><li><strong>Apprendre avec sens :</strong> une formation centrée sur l'apprenant, ses besoins, ses objectifs professionnels</li><li><strong>Évoluer en confiance :</strong> un accompagnement personnalisé, un suivi de progression, un retour concret sur les acquis</li><li><strong>Réussir durablement :</strong> nous construisons les conditions pour que la réussite soit réelle et durable</li></ul>` },
+
+    // ===== L'ÉQUIPE =====
+    { heading: "L'équipe", content: `${tableHTML(["Fonction", "Nom", "Contact"], [
+      ["Direction", o.dirigeant || '___', o.email || '___'],
+      ["Coordination pédagogique", o.responsablePedagogique || '___', o.email || '___'],
+      ["Référent handicap", o.referentHandicap || '___', o.email || '___'],
+      ["Référent qualité", o.referentQualite || '___', o.email || '___'],
+    ])}<p><strong>Téléphone :</strong> ${o.telephone || '___'}<br><strong>Email :</strong> ${o.email || '___'}</p>` },
+
+    // ===== INFORMATIONS GÉNÉRALES =====
+    { heading: "Informations générales", content: `<p><strong>Adresse du CFA :</strong> ${o.adresse || '___'}, ${o.codePostal || '___'} ${o.ville || '___'}</p><p><strong>Horaires d'ouverture :</strong> du lundi au vendredi – de 9h00 à 17h00</p><p><strong>Restauration :</strong> Vous pouvez apporter votre repas. Des réfrigérateurs et micro-ondes sont à votre disposition.</p>`, variant: "green" },
+
+    // ===== PRÉSENTATION DE LA FORMATION =====
+    { heading: "Présentation de la formation", content: `<p><strong>Intitulé :</strong> ${titreFormation}</p><p><strong>Code RNCP :</strong> ${f.codeRNCP || '___'}</p><p><strong>Niveau :</strong> ${rncp?.niveau || '___'}</p><p><strong>Durée :</strong> ${f.duree || '___'}</p><p><strong>Dates :</strong> Du ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)}</p><p><strong>Rythme d'alternance :</strong> ${(f as any).rythmeAlternance || '1 semaine CFA / 3 semaines entreprise'}</p><h4>Blocs de compétences :</h4>${blocsHtml}<p>La réussite à l'ensemble des épreuves permet d'obtenir le Titre Professionnel délivré par le Ministère du Travail.</p><p><strong>Débouchés :</strong> ${rncp?.typesEmplois?.join(', ') || 'Voir fiche RNCP'}</p>` },
+
+    // ===== ACCUEIL ET INTÉGRATION =====
+    { heading: "Accueil et intégration", content: `<p>Chaque apprenant participe à une <strong>journée d'intégration</strong> organisée par le CFA, destinée à présenter :</p><ul><li>Le fonctionnement du centre et les équipes pédagogiques et administratives</li><li>Le règlement intérieur et la charte de l'apprenant</li><li>Les outils pédagogiques mis à disposition</li></ul><p>Au cours de cette journée, le règlement intérieur doit être lu attentivement. Une <strong>attestation de prise de connaissance</strong> sera remise. Sa signature est obligatoire pour accéder aux cours.</p>` },
+
+    // ===== CHARTE DE L'APPRENTISSAGE =====
+    { heading: "Charte de l'apprentissage", content: `<h4>Engagements de ${o.nom}</h4><ul><li>Proposer une formation de qualité conforme au référentiel</li><li>Assurer un suivi individualisé de chaque apprenti</li><li>Coordonner les périodes CFA et entreprise</li><li>Désigner un référent pour chaque apprenti</li><li>Communiquer régulièrement avec l'entreprise d'accueil</li></ul><h4>Engagements de l'entreprise d'accueil</h4><ul><li>Désigner un maître d'apprentissage qualifié</li><li>Confier des missions en lien avec la certification visée</li><li>Libérer l'apprenti pour les temps de formation au CFA</li><li>Participer aux bilans intermédiaires et de fin de parcours</li><li>Assurer les conditions de sécurité sur le lieu de travail</li></ul><h4>Engagements de l'apprenti(e)</h4><ul><li>Suivre avec assiduité la formation au CFA et en entreprise</li><li>Respecter le règlement intérieur du CFA et de l'entreprise</li><li>Tenir à jour son livret d'apprentissage et son carnet de liaison</li><li>Prévenir en cas d'absence (CFA ET entreprise)</li><li>Participer aux évaluations et préparer les épreuves de certification</li><li>Adopter une attitude professionnelle en toutes circonstances</li></ul>` },
+
+    // ===== RÔLE DU MAÎTRE D'APPRENTISSAGE =====
+    { heading: "Rôle du maître/tuteur d'apprentissage", content: `<p>Le maître d'apprentissage est la personne directement responsable de la formation de l'apprenti dans l'entreprise. Ses missions :</p><ul><li>Accueillir et intégrer l'apprenti dans l'entreprise</li><li>Organiser le parcours de formation en entreprise</li><li>Transmettre les compétences professionnelles</li><li>Assurer le lien avec le CFA et participer aux bilans</li><li>Évaluer l'acquisition des compétences en situation de travail</li></ul>` },
+
+    // ===== INFORMATIONS UTILES =====
+    { heading: "Informations utiles – Aides et droits", content: `<ul><li><strong>Aide au permis de conduire :</strong> Aide de 500€ pour le passage du permis B (sous conditions)</li><li><strong>Aide au premier équipement :</strong> Forfait équipement professionnel (selon la formation)</li><li><strong>Aide à la mobilité :</strong> Prise en charge partielle des frais de transport</li><li><strong>Aide au logement :</strong> Accès à l'APL, Mobili-Jeune, Action Logement</li><li><strong>Carte d'étudiant des métiers :</strong> Remise en début de formation, ouvrant droit aux réductions étudiantes</li><li><strong>Accompagnement social :</strong> Orientation vers les services sociaux compétents en cas de besoin</li></ul>`, variant: "green" },
+
+    // ===== SÉCURITÉ ET HANDICAP =====
+    { heading: "Sécurité et handicap", content: `<p><strong>Sécurité :</strong> Les consignes d'évacuation sont affichées dans chaque salle. En cas d'alerte incendie, suivez les instructions du formateur et les panneaux de signalisation. Les numéros d'urgence : 15 (SAMU), 18 (Pompiers), 112 (Urgences).</p><p><strong>Handicap :</strong> ${o.nom} s'engage à accueillir les personnes en situation de handicap et à adapter les conditions de formation. Pour tout besoin spécifique, contactez notre référent handicap : <strong>${o.referentHandicap || o.dirigeant || '___'}</strong>.</p>` },
+
+    // ===== CONSEILS =====
+    { heading: "Conseils pour réussir votre alternance", content: `<ul><li>Soyez ponctuel(le) et assidu(e) au CFA et en entreprise</li><li>Organisez votre travail : planning, révisions, dossier professionnel</li><li>Communiquez avec votre tuteur et vos formateurs</li><li>Tenez à jour votre livret d'apprentissage chaque semaine</li><li>N'hésitez pas à solliciter de l'aide dès que vous en ressentez le besoin</li><li>Préparez activement vos épreuves de certification</li></ul>` },
+
+    // ===== ATTESTATION D'ENGAGEMENT =====
+    { heading: "Attestation d'engagement", content: `<p>Je soussigné(e) __________________________________ déclare avoir pris connaissance du présent livret d'accueil, du règlement intérieur et de la charte de l'apprentissage. Je m'engage à respecter l'ensemble des règles et dispositions qui y sont mentionnées.</p><p><strong>Date :</strong> ____/____/________</p><br/><p><strong>Signature de l'apprenti(e) :</strong></p><div style="border:1px solid #ccc;min-height:60px;padding:8px">&#160;</div>` },
+  ] });
+}
+
+// ============== CFA IND 9 — RÈGLEMENT INTÉRIEUR V2 (complet 8 articles) ==============
+
+function genReglementInterieurCFA_V2(o: OrganismeInfo, f: FormationInfo) {
+  return buildDocument({ org: o, title: "RÈGLEMENT INTÉRIEUR DU CFA", sections: [
+    { heading: "Préambule", content: `<p>Le premier objectif de <strong>${o.nom}</strong> est la pleine réussite et l'épanouissement de ses apprenants : réussite aux examens, réussite en entreprise, réussite sur le marché du travail, réussite en matière de développement personnel. L'atteinte de ces ambitions est l'affaire de tous : elle passe nécessairement par une forte implication des apprenants dans leur formation et par le strict respect des règles de vie mentionnées dans ce règlement.</p>` },
+
+    { heading: "Article 1 : Objet", content: `<p>Conformément à l'article L6325-5 du Code du Travail, le présent règlement a pour objet de préciser l'application de la réglementation en matière :</p><ul><li>D'hygiène et de sécurité</li><li>De discipline</li><li>De droits et devoirs des apprenants</li><li>De représentation des apprenants</li></ul><p>Ces dispositions sont applicables dans les locaux habituels de l'organisme de formation ou tout autre local que celui-ci sera amené à utiliser. Le présent règlement est communiqué à chaque apprenant avant toute inscription définitive.</p><p>Pendant le temps en entreprise, les apprenants doivent se conformer au règlement intérieur de leur entreprise.</p>` },
+
+    { heading: "Article 2 : Discipline", content: `<p>L'apprenant s'est engagé dans un plan de formation exigeant. L'organisme attend qu'il fasse preuve d'implication, de réflexion, de concentration et d'exigence. Il devra faire preuve d'un comportement adapté dans ses rapports avec les autres apprenants, les enseignants et la Direction.</p>
+<h4>Tenue vestimentaire et comportement</h4><p>Les apprenants adopteront une tenue vestimentaire professionnelle. Les accessoires tels que casquettes, bobs, bonnets ne sont pas permis en salle de cours. La Direction se réserve le droit de refuser l'accès à tout apprenant dont la tenue ne serait pas professionnelle.</p>
+<h4>Usage du téléphone</h4><p>L'usage du téléphone portable est interdit pendant les cours. Le portable doit être éteint et rangé dans le sac. En cas de non-respect après avertissement, l'apprenant pourra être exclu et sanctionné.</p>
+<h4>Requêtes et réclamations</h4><p>Toute requête ou réclamation devra être faite par écrit au service pédagogique.</p>
+<h4>Éthique</h4><p>La Direction veille au respect d'autrui et de ses convictions. Tous types de harcèlement, attitudes discriminatoires et violences (verbales, psychologiques ou physiques) sont interdits.</p>
+<p><strong>L'apprenant a le droit :</strong></p><ul><li>D'être respecté tel qu'il est</li><li>De s'exprimer librement dans le respect de tous</li><li>D'être protégé contre toute forme de violence</li><li>D'être respecté dans sa vie privée</li></ul>
+<p><strong>L'apprenant a le devoir :</strong></p><ul><li>De respecter les autres tels qu'ils sont</li><li>De s'interdire toute forme de violence</li><li>D'alerter un responsable en cas de violence ou mal-être</li><li>De respecter la vie privée et le droit à l'image des autres</li><li>De se présenter dans une tenue professionnelle</li></ul>` },
+
+    { heading: "Article 3 : Hygiène et sécurité", content: `<h4>Hygiène</h4><p>L'introduction et la consommation de boissons alcoolisées sont strictement interdites. Il est interdit de fumer et vapoter à l'intérieur de l'établissement. La nourriture est autorisée uniquement dans les espaces communs pendant les pauses déjeuner. L'espace devra être nettoyé après le repas.</p>
+<h4>Sécurité</h4><p>En cas de danger, le formateur doit entreprendre toute action nécessaire pour se retirer et retirer les apprenants. Tout accident doit être signalé au service pédagogique. Il est interdit d'introduire une arme, de détenir ou vendre de la drogue, ou de faire du commerce dans l'établissement.</p>
+<h4>Sécurité – Incendie</h4><p>En cas d'incendie : prévenir immédiatement le service pédagogique et suivre les instructions des panneaux de signalisation. Des exercices d'évacuation sont organisés chaque année.</p>
+<h4>Locaux et matériel</h4><p>Toute dégradation volontaire fera l'objet de sanctions disciplinaires et le montant des dégâts sera facturé.</p>
+<h4>Vols</h4><p>Chaque apprenant est responsable de ses affaires personnelles. La responsabilité de l'organisme ne saurait être engagée en cas de perte ou de vol.</p>` },
+
+    { heading: "Article 4 : Horaires et présence", content: `<h4>Entrée – Sortie</h4><p>L'accès aux locaux est autorisé de 9h00 à 17h30, du lundi au vendredi. Les apprenants ne sont pas autorisés à sortir avant la fin de l'heure de cours sans accord du formateur.</p>
+<h4>Horaires des cours – Pauses</h4><p>Les apprenants doivent se conformer aux horaires du programme. Les heures mentionnées marquent avec exactitude le début et la fin de chaque cours. La sortie de l'établissement durant les pauses est une tolérance, pas un droit.</p>
+<h4>Absences des alternants</h4><p>Les alternants ont une obligation d'assiduité. La présence est validée par signature sur la feuille d'émargement. Un oubli équivaut à une absence. Toute demande d'absence doit être faite par écrit et approuvée par le service pédagogique.</p>
+<p>Absences justifiées : arrêt maladie, demande exceptionnelle de l'entreprise, convocation administrative, décès d'un proche. Justificatif à fournir sous 48h.</p>
+<p>Des absences injustifiées dépassant <strong>20% des heures de formation</strong> peuvent entraîner une non-présentation aux examens et/ou une exclusion.</p>
+<h4>Retards</h4><p>L'apprenant arrivant après l'appel sera marqué absent. Le formateur peut refuser l'accès. L'intégration ne se fera qu'à la pause suivante. Les retards répétés non justifiés peuvent entraîner des sanctions.</p>` },
+
+    { heading: "Article 5 : Usage des moyens informatiques", content: `<p>L'utilisation des ordinateurs, matériel informatique et connexions Internet est réservée à un usage pédagogique et professionnel. Il est interdit d'utiliser un équipement pour des vidéos, jeux vidéo ou réseaux sociaux hors activité pédagogique.</p><p>Chaque apprenant est responsable du matériel qui lui est confié. Seuls les logiciels dont la licence a été acquise par ${o.nom} peuvent être installés. Toute dégradation volontaire fera l'objet de sanctions.</p>` },
+
+    { heading: "Article 6 : Évaluation de la formation", content: `<h4>Consignes générales pour les examens</h4><p>En salle d'examen : installer en silence à la place assignée, affaires rangées, seul le matériel nécessaire sur la table, téléphone éteint et rangé. En cas de tricherie : note de 0 et sanctions disciplinaires.</p>
+<h4>Déroulement des évaluations</h4><p>Plusieurs types d'évaluations sont prévus : devoirs sur table, examens écrits et oraux. Toute absence non justifiée entraîne la note de 0. L'exclusion d'une évaluation entraîne la note de 0.</p>
+<h4>Bulletins</h4><p>Des bulletins sont établis à partir des notes, de l'assiduité et des conclusions du service pédagogique et du tuteur. Ils sont transmis après chaque semestre.</p>
+<h4>Fraude</h4><p>Toute fraude (y compris le plagiat) entraîne la note de 0 pour le module et une sanction décidée par le service pédagogique après avis du conseil de discipline.</p>` },
+
+    { heading: "Article 7 : Sanctions et procédures disciplinaires", content: `<p>Tout manquement au présent règlement peut provoquer des mesures disciplinaires. Aucune sanction ne peut être infligée sans information préalable de l'apprenant. Les sanctions sont graduelles :</p>
+<ol><li><strong>Avertissement oral :</strong> convocation par le responsable pédagogique</li>
+<li><strong>Avertissement écrit :</strong> courrier, mail ou remise en main propre. Copie à l'entreprise</li>
+<li><strong>Entretien de situation :</strong> convocation de l'apprenant, son tuteur, la Direction. L'apprenant peut être accompagné d'un délégué</li>
+<li><strong>Conseil de discipline :</strong> convocation par courrier recommandé. Peut mener à l'exclusion temporaire ou définitive</li></ol>
+<p><strong>Absences injustifiées :</strong></p><ul><li>À 35 heures : convocation en entretien de situation</li><li>À 70 heures ou 20% des heures : conseil de discipline pouvant mener à l'exclusion</li></ul>` },
+
+    { heading: "Article 8 : Représentation des apprenants", content: `<h4>Délégué de classe</h4><p>Pour les formations de plus de 400 heures :</p><ul><li>Tous les apprenants sont électeurs et éligibles</li><li>Élection d'un délégué titulaire et d'un suppléant au scrutin uninominal à deux tours</li><li>Le scrutin a lieu dans les deux mois suivant le début de la formation</li><li>Les délégués représentent les apprenants dans tous les conseils de classe</li><li>Ils font toute suggestion pour améliorer les conditions de formation</li></ul>
+<h4>Conseil de Perfectionnement</h4><p>Le Conseil de Perfectionnement se réunit au moins une fois par an. Il est composé de représentants parmi les apprenants, le personnel administratif et l'équipe pédagogique. Il est présidé par le Directeur. Chaque réunion fait l'objet d'un procès-verbal.</p>` },
+  ], signatures: { type: "2", labels: ["Le Directeur du CFA", "L'Apprenti(e) (lu et approuvé)"], names: [o.dirigeant || '___', ""] } });
+}
+
+// ============== CFA IND 9 — PV ÉLECTION DES DÉLÉGUÉS ==============
+
+function genPVElectionDeleguesCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
+  const nbInscrits = stagiaires.length || '____';
+  const dateElection = f.dateDebut ? (() => {
+    const d = new Date(f.dateDebut.split('/').reverse().join('-'));
+    d.setDate(d.getDate() + 45);
+    return d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  })() : '____/____/________';
+
+  return buildDocument({ org: o, title: "PROCÈS-VERBAL D'ÉLECTION DES DÉLÉGUÉS DES APPRENTIS", sections: [
+    { heading: "1. Informations générales", content: `<p><strong>Centre de Formation d'Apprentis (CFA) :</strong> ${o.nom}</p><p><strong>Formation :</strong> ${f.intitule}</p><p><strong>Date de l'élection :</strong> ${dateElection}</p><p><strong>Lieu :</strong> ${f.lieu || `${o.adresse}, ${o.codePostal} ${o.ville}`}</p><p><strong>Président de séance (formateur / référent) :</strong> ${o.responsablePedagogique || o.dirigeant || '___'}</p>` },
+
+    { heading: "2. Rappel du cadre", content: `<p>Conformément aux dispositions relatives à la représentation des apprentis en formation, une élection des délégués et suppléants a été organisée afin d'assurer la participation des apprentis à la vie du CFA et le relais d'information entre l'équipe pédagogique et les apprentis.</p>` },
+
+    { heading: "3. Liste des candidats", content: `<p><strong>Candidats au poste de délégué titulaire :</strong></p><ul><li>________________________________</li><li>________________________________</li><li>________________________________</li></ul><p><strong>Candidats au poste de délégué suppléant :</strong></p><ul><li>________________________________</li><li>________________________________</li></ul>` },
+
+    { heading: "4. Modalités de vote", content: `<p>☐ Vote à bulletin secret<br>☐ Vote à main levée<br>☐ Autre (préciser) : ________________________________</p><p><strong>Nombre total d'apprentis inscrits :</strong> ${nbInscrits}</p><p><strong>Nombre de votants :</strong> ________</p><p><strong>Nombre de votes exprimés :</strong> ________</p><p><strong>Nombre de votes nuls :</strong> ________</p>` },
+
+    { heading: "5. Résultats de l'élection", content: `<h4>Délégué titulaire élu :</h4><p>Nom Prénom : ________________________________<br>Nombre de voix obtenues : ________</p><h4>Délégué suppléant élu :</h4><p>Nom Prénom : ________________________________<br>Nombre de voix obtenues : ________</p>` },
+
+    { heading: "6. Observations éventuelles", content: `<div style="border:1px solid #ccc;min-height:80px;padding:12px">&#160;</div>` },
+
+    { heading: "7. Validation du procès-verbal", content: `<p>Fait à ${o.ville || '_______________'} le ${dateElection}</p>
+${tableHTML(["Président de séance", "Délégué titulaire élu", "Délégué suppléant élu", "Cachet du CFA"], [
+  ["", "", "", ""],
+  ["Signature", "Signature", "Signature", ""],
+])}` },
+  ] });
+}
+
+// ============== CFA IND 9 — DROIT À L'IMAGE ==============
+
+function genDroitImageCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
+  const s = stagiaires[si] || stagiaires[0] || { prenom: '___', nom: '___' } as StagiaireInfo;
+  const dateSignature = f.dateDebut ? formatDate(subtractBusinessDays(f.dateDebut, 14)) : '____/____/________';
+
+  return buildDocument({ org: o, title: "DEMANDE D'AUTORISATION DROIT À L'IMAGE", subtitle: "À des fins pédagogiques et éducatives", sections: [
+    { heading: "Identité", content: `<p><strong>Je soussigné(e) :</strong> ${s.civilite || ''} ${s.prenom} ${s.nom}</p><p><strong>Formation suivie :</strong> ${f.intitule}</p>` },
+
+    { heading: "Autorisation", content: `<p>Autorise l'équipe pédagogique représentée par <strong>${o.dirigeant || '___'}</strong>, Directeur/Directrice de <strong>${o.nom}</strong>, à me photographier ou à me filmer dans le cadre des usages suivants :</p><ul><li>Publication dans le journal du centre</li><li>Utilisation dans le cadre d'une activité pédagogique</li><li>Exposition de photographies ou de vidéos dans le cadre des activités pédagogiques</li><li>Publication sur le site Internet du centre et pages officielles du centre sur les réseaux sociaux</li></ul>` },
+
+    { heading: "Conditions", content: `<p>L'autorisation de me photographier ou de me filmer est valable pour la durée de la formation.</p><p>La photographie ne sera ni communiquée à d'autres personnes, ni vendue, ni utilisée à d'autres usages que ceux mentionnés ci-dessus.</p><p>La publication ou la diffusion de mon image, sans limite de durée, ainsi que des légendes non-nominatives, ne devront pas porter atteinte à ma dignité, à ma vie privée ou à ma réputation.</p><p>Conformément à la loi, le libre accès aux données photographiques qui me concernent est garanti. Je peux donc à tout moment vérifier l'usage qui en est fait et je dispose du <strong>droit de retrait</strong> de cette image si je le juge utile.</p>` },
+
+    { heading: "Signature", content: `<p><strong>Date :</strong> ${dateSignature}</p><br/><p><strong>Signature de l'apprenti(e) :</strong></p><div style="border:1px solid #ccc;min-height:60px;padding:8px">&#160;</div>` },
+  ] });
+}
+
 
 function genConventionFormationCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = stagiaires[si] || stagiaires[0] || { prenom: "___", nom: "___", entreprise: "___" } as StagiaireInfo;
