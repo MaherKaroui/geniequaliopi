@@ -14,7 +14,7 @@ export const PER_STAGIAIRE_TEMPLATES = new Set([
   "livret_recevabilite_vae", "dossier_validation_vae", "accompagnement_vae",
   "attestation_inscription_cfa", "fiche_autoevaluation_apprenti",
   "fiche_renseignement_cfa", "convention_formation_cfa", "livret_apprentissage_cfa_v2",
-  "convention_formation_apprentissage",
+  "convention_formation_apprentissage", "livre_apprentissage_cfa", "convocation_cfa", "cgv_cfa",
   "convocation_certification",
   "livret_accueil_cfa_v2",
   "droit_image_cfa",
