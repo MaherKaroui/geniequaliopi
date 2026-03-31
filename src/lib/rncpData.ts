@@ -564,7 +564,6 @@ export const RNCP_FICHES: RNCPFiche[] = [
     voiesAcces: ["Formation continue", "Formation professionnelle", "CPF"],
     dureeIndicative: "70 heures (10 jours)",
   },
-  },
   {
     code: "RNCP40800",
     intitule: "TP - Secrétaire assistant médico-administratif",
