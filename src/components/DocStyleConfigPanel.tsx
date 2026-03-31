@@ -259,9 +259,48 @@ function ThemeMiniPreview({ theme, primary, secondary, bodyFont, headFont }: { t
   );
 }
 
+interface SavedTheme {
+  id: string;
+  name: string;
+  config: DocStyleConfig;
+}
+
 const DocStyleConfigPanel = ({ style, onChange }: DocStyleConfigPanelProps) => {
   const [expanded, setExpanded] = useState(false);
   const [activeTab, setActiveTab] = useState<"themes" | "colors" | "fonts" | "layout">("themes");
+  const [savedThemes, setSavedThemes] = useState<SavedTheme[]>([]);
+  const [saveName, setSaveName] = useState("");
+  const [showSaveInput, setShowSaveInput] = useState(false);
+
+  useEffect(() => {
+    if (expanded) loadSavedThemes();
+  }, [expanded]);
+
+  const loadSavedThemes = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const { data } = await supabase.from("saved_themes").select("id, name, config").eq("user_id", user.id).order("created_at", { ascending: false });
+    if (data) setSavedThemes(data.map(d => ({ id: d.id, name: d.name, config: d.config as unknown as DocStyleConfig })));
+  };
+
+  const handleSave = async () => {
+    if (!saveName.trim()) return;
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) { toast.error("Connectez-vous pour sauvegarder"); return; }
+    const { error } = await supabase.from("saved_themes").insert({ user_id: user.id, name: saveName.trim(), config: style as unknown as Record<string, unknown> });
+    if (error) { toast.error("Erreur de sauvegarde"); return; }
+    toast.success(`Thème "${saveName.trim()}" sauvegardé`);
+    setSaveName("");
+    setShowSaveInput(false);
+    loadSavedThemes();
+  };
+
+  const handleDelete = async (id: string, name: string) => {
+    const { error } = await supabase.from("saved_themes").delete().eq("id", id);
+    if (error) { toast.error("Erreur"); return; }
+    toast.success(`Thème "${name}" supprimé`);
+    loadSavedThemes();
+  };
 
   const update = (field: keyof DocStyleConfig, value: string | number) => {
     onChange({ ...style, [field]: value });
