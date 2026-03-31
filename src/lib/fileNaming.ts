@@ -29,6 +29,7 @@ const EXCEL_TEMPLATES = new Set([
   "decoupage_formation_cfa_excel",
   "matrice_competences_excel",
   "suivi_chiffre_formation_excel",
+  "suivi_inscriptions_excel",
 ]);
 
 function stripDiacritics(value: string): string {

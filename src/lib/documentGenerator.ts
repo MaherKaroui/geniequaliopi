@@ -10,6 +10,7 @@ import { genCGV_V2, genReglement_V2, genConvocation_V2, genContratFormationPro_V
 import { genFichePosteRole, genAutoEvaluationFormateurV2, genProcessusRecrutementV2, genPlanDevCompetencesExcel } from "./templatesCritere5";
 import { genVeilleReglementaireV2, genVeilleMetierV2, genVeilleTechnologiqueV2, genVeilleHandicap, genListePartenairesV2, genContratSousTraitanceV2, genCharteQualiteFormateurExterne } from "./templatesCritere6";
 import { getRNCPByCode } from "./rncpData";
+import { generateExcelSuiviInscriptions } from "./xlsxGenerator";
 import { getModuleSpecificConsigne } from "./cfaExerciseContent";
 
 const FALLBACK_STAGIAIRE: StagiaireInfo = { prenom: "Martin", nom: "Dupont", civilite: "" as "M." | "Mme" | "", email: "", telephone: "", entreprise: "", poste: "", dateNaissance: "" };
@@ -583,6 +584,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "support_cours_cfa": return genSupportCoursCFA(o, f);
     case "calendrier_annuel_cfa": return genCalendrierAnnuelCFA(o, f);
     case "decoupage_formation_cfa_excel": return genDecoupageFormationCFAExcel(o, f);
+    case "suivi_inscriptions_excel": return generateExcelSuiviInscriptions(o, f, stagiaires);
     case "book_qualiopi": {
       const allFormations = [f];
       const allStagiaires = mergeStagiaires(stagiaires);
