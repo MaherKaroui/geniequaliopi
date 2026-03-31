@@ -476,6 +476,11 @@ export function buildFullCatalog(
     add("cfa_c3i10_permisb_aide_financement", "CT3 - IND 10 📁 PERMIS B – Aide au Financement Permis B", 3, 10, "pdf_static", { pdfUrl: "/pdfs/aide_financement_permis_b.pdf" });
     // --- IND 10 — Dossier Mission N°5 Charte Qualité CFA (14 Missions) ---
     add("cfa_c3i10_mission5_rupture_contrat", "CT3 - IND 10 📁 MISSION 5 – Procédure de Rupture du Contrat d'Apprentissage", 3, 10, "procedure_rupture_contrat_apprentissage_cfa");
+    // --- IND 10 — Dossier Mission N°6 Charte Qualité CFA (14 Missions) ---
+    add("cfa_c3i10_mission6_aide_ara", "CT3 - IND 10 📁 MISSION 6 – Aide Régionale à l'Apprentissage (ARA)", 3, 10, "pdf_static", { pdfUrl: "/pdfs/aide_ara.png" });
+    add("cfa_c3i10_mission6_aide_equipement", "CT3 - IND 10 📁 MISSION 6 – Aide Régionale Équipement Individuel", 3, 10, "pdf_static", { pdfUrl: "/pdfs/aide_regionale_equipement.png" });
+    add("cfa_c3i10_mission6_sante_psy", "CT3 - IND 10 📁 MISSION 6 – Santé Psy Étudiant", 3, 10, "pdf_static", { pdfUrl: "/pdfs/sante_psy_etudiant.png" });
+    add("cfa_c3i10_mission6_carte_imagine_r", "CT3 - IND 10 📁 MISSION 6 – Carte Imagine R Scolaire", 3, 10, "pdf_static", { pdfUrl: "/pdfs/carte_imagine_r.png" });
 
     // Documents CFA complémentaires (autres critères)
     add("cfa_c1i1_livret_accueil", "CT1 - IND 1 LIVRET D'ACCUEIL CFA", 1, 1, "livret_accueil_cfa");
