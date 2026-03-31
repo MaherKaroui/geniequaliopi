@@ -8152,16 +8152,115 @@ function genTableauSuiviParcours(o: OrganismeInfo, f: FormationInfo, stagiaires:
   }, signatures: { type: "2", labels: ["Le Formateur", "Le Resp. Pédagogique"], names: [f.formateur, o.responsablePedagogique] } });
 }
 
-function genTableauAmeliorationContinue(o: OrganismeInfo) {
-  return buildDocument({ org: o, title: "TABLEAU D'AMÉLIORATION CONTINUE", table: {
+function genTableauAmeliorationContinue(o: OrganismeInfo, f?: FormationInfo) {
+  const t = (f?.intitule || "").toLowerCase();
+  const isMassage = t.includes("massage") || t.includes("prénatal") || t.includes("prenatal");
+  const isIA = t.includes("intelligence artificielle") || t.includes(" ia ");
+  const isCRM = t.includes("crm") || t.includes("hubspot");
+  const isAnglais = t.includes("anglais") || t.includes("toeic");
+  const isEsth = t.includes("esthétique") || t.includes("cosmétique") || t.includes("cap esthétique");
+  const isFLE = t.includes("français") || t.includes("fle");
+  const isWord = t.includes("word");
+  const isWebmark = t.includes("webmarketing") || t.includes("marketing de contenus") || t.includes("réseaux sociaux");
+  const isNTC = t.includes("négociateur") || t.includes("technico-commercial");
+  const isSAMA = t.includes("secrétaire assistant") || t.includes("médico-administratif") || t.includes("médico-social");
+  const formName = f?.intitule || "la formation";
+
+  let rows: string[][] = [];
+
+  if (isMassage) {
+    rows = [
+      ["1", "Satisfaction", "Demande de plus de pratique sur mannequin", "Ajout d'une demi-journée de pratique sur mannequin de grossesse", o.responsablePedagogique, "T2 2025", "✅"],
+      ["2", "Réclamation", "Huiles de massage inadaptées aux peaux sensibles", "Référencement d'huiles bio hypoallergéniques certifiées", o.referentQualite, "T1 2025", "✅"],
+      ["3", "Veille", "Nouvelles recommandations HAS sur le massage périnatal", "Mise à jour du protocole et des contre-indications", o.responsablePedagogique, "T2 2025", "🔄"],
+      ["4", "Entreprises", "Besoin d'un module relaxation du dos spécifique 3ème trimestre", "Création d'un module complémentaire 3ème trimestre", o.responsablePedagogique, "T3 2025", "📋"],
+      ["5", "Audit", "Fiches anatomiques de la grossesse à actualiser", "Refonte des supports visuels anatomie de la femme enceinte", o.referentQualite, "T2 2025", "✅"],
+    ];
+  } else if (isEsth) {
+    rows = [
+      ["1", "Satisfaction", "Demande de plus de pratique sur modèles vivants", "Augmentation des heures de TP à 60% du temps", o.responsablePedagogique, "T2 2025", "✅"],
+      ["2", "Réclamation", "Produits cosmétiques périmés en salle de TP", "Inventaire trimestriel et renouvellement systématique", o.referentQualite, "T1 2025", "✅"],
+      ["3", "Veille", "Nouvelle réglementation cosmétique européenne (CE 1223/2009)", "Formation du formateur sur les nouvelles normes", o.responsablePedagogique, "T2 2025", "🔄"],
+      ["4", "Entreprises", "Manque de connaissances en conseil personnalisé", "Ajout d'ateliers conseil client et diagnostic de peau", o.responsablePedagogique, "T3 2025", "📋"],
+      ["5", "Audit", "Supports UV/manucure à mettre à jour", "Refonte des fiches techniques soins visage et manucure", o.referentQualite, "T2 2025", "✅"],
+    ];
+  } else if (isAnglais) {
+    rows = [
+      ["1", "Satisfaction", "Demande de plus de mises en situation orales", "Ajout de jeux de rôle professionnels à chaque séance", o.responsablePedagogique, "T2 2025", "✅"],
+      ["2", "Réclamation", "Vocabulaire trop généraliste, pas assez professionnel", "Création de glossaires métier spécifiques par secteur", o.referentQualite, "T1 2025", "✅"],
+      ["3", "Veille", "Évolution du format TOEIC 2025", "Mise à jour des examens blancs et grilles de scoring", o.responsablePedagogique, "T2 2025", "🔄"],
+      ["4", "Entreprises", "Besoin de modules téléphone/visioconférence en anglais", "Développement d'un module communication à distance en anglais", o.responsablePedagogique, "T3 2025", "📋"],
+      ["5", "Audit", "Supports audio de compréhension orale obsolètes", "Renouvellement avec podcasts et vidéos professionnels récents", o.referentQualite, "T2 2025", "✅"],
+    ];
+  } else if (isIA) {
+    rows = [
+      ["1", "Satisfaction", "Demande d'exercices avec des outils IA plus récents", "Intégration de Gemini, Claude et Midjourney dans les TP", o.responsablePedagogique, "T2 2025", "✅"],
+      ["2", "Réclamation", "Prompts d'exemples trop basiques", "Création d'une bibliothèque de prompts avancés par métier", o.referentQualite, "T1 2025", "✅"],
+      ["3", "Veille", "Réglementation IA Act européen", "Mise à jour du module éthique et cadre légal de l'IA", o.responsablePedagogique, "T2 2025", "🔄"],
+      ["4", "Entreprises", "Besoin de cas d'usage IA spécifiques au secteur du client", "Personnalisation des exercices par secteur d'activité", o.responsablePedagogique, "T3 2025", "📋"],
+      ["5", "Audit", "Captures d'écran des outils IA obsolètes", "Refonte des supports avec captures actualisées", o.referentQualite, "T2 2025", "✅"],
+    ];
+  } else if (isCRM) {
+    rows = [
+      ["1", "Satisfaction", "Demande de plus de pratique sur HubSpot/Pipedrive", "Doublement du temps TP avec comptes sandbox dédiés", o.responsablePedagogique, "T2 2025", "✅"],
+      ["2", "Réclamation", "Comptes de démonstration CRM expirés", "Souscription annuelle de licences formation CRM", o.referentQualite, "T1 2025", "✅"],
+      ["3", "Veille", "Nouvelles fonctionnalités CRM (IA intégrée, scoring)", "Mise à jour du module automatisation et scoring prédictif", o.responsablePedagogique, "T2 2025", "🔄"],
+      ["4", "Entreprises", "Besoin d'intégration CRM avec outils existants", "Ajout d'un module intégration CRM/ERP/emailing", o.responsablePedagogique, "T3 2025", "📋"],
+      ["5", "Audit", "Fiches procédure CRM à actualiser", "Refonte des guides pas-à-pas avec captures récentes", o.referentQualite, "T2 2025", "✅"],
+    ];
+  } else if (isNTC) {
+    rows = [
+      ["1", "Satisfaction", "Demande de plus de négociations simulées", "Ajout de 3 mises en situation de négociation filmées", o.responsablePedagogique, "T2 2025", "✅"],
+      ["2", "Réclamation", "Études de cas trop théoriques", "Création de cas réels issus de PME partenaires", o.referentQualite, "T1 2025", "✅"],
+      ["3", "Veille", "Évolution des techniques de vente (social selling)", "Intégration du module social selling et prospection digitale", o.responsablePedagogique, "T2 2025", "🔄"],
+      ["4", "Entreprises", "Manque de suivi post-formation terrain", "Mise en place d'un coaching individuel J+30", o.responsablePedagogique, "T3 2025", "📋"],
+      ["5", "Audit", "Grilles d'évaluation négociation à revoir", "Refonte avec critères RNCP mis à jour", o.referentQualite, "T2 2025", "✅"],
+    ];
+  } else if (isSAMA) {
+    rows = [
+      ["1", "Satisfaction", "Demande de plus de pratique sur logiciels médicaux", "Ajout d'heures TP sur Doctolib et logiciels de facturation T2A", o.responsablePedagogique, "T2 2025", "✅"],
+      ["2", "Réclamation", "Terminologie médicale trop dense en début de formation", "Réorganisation progressive de la terminologie par système", o.referentQualite, "T1 2025", "✅"],
+      ["3", "Veille", "Évolution de la nomenclature CCAM/NGAP", "Mise à jour des supports de facturation et codification", o.responsablePedagogique, "T2 2025", "🔄"],
+      ["4", "Entreprises", "Besoin de mises en situation accueil patient", "Création de scénarios d'accueil et gestion de conflits", o.responsablePedagogique, "T3 2025", "📋"],
+      ["5", "Audit", "Fiches de transcription médicale à actualiser", "Refonte avec dictées médicales actualisées", o.referentQualite, "T2 2025", "✅"],
+    ];
+  } else if (isWebmark) {
+    rows = [
+      ["1", "Satisfaction", "Demande de plus de pratique réseaux sociaux", "Ajout d'ateliers création de contenu sur Instagram/LinkedIn/TikTok", o.responsablePedagogique, "T2 2025", "✅"],
+      ["2", "Réclamation", "Algorithmes présentés déjà obsolètes", "Veille mensuelle et mise à jour des supports algorithmes", o.referentQualite, "T1 2025", "✅"],
+      ["3", "Veille", "Évolution Google Analytics (GA4) et SEO", "Mise à jour du module analytics et référencement", o.responsablePedagogique, "T2 2025", "🔄"],
+      ["4", "Entreprises", "Besoin de stratégie de contenu personnalisée", "Ajout d'un atelier création de calendrier éditorial", o.responsablePedagogique, "T3 2025", "📋"],
+      ["5", "Audit", "Supports réseaux sociaux obsolètes (interfaces changées)", "Refonte des captures d'écran et tutoriels", o.referentQualite, "T2 2025", "✅"],
+    ];
+  } else if (isFLE) {
+    rows = [
+      ["1", "Satisfaction", "Demande de plus de mises en situation du quotidien", "Ajout de jeux de rôle (courses, rendez-vous médical, administration)", o.responsablePedagogique, "T2 2025", "✅"],
+      ["2", "Réclamation", "Rythme trop rapide pour les niveaux A1", "Différenciation pédagogique avec groupes de niveaux", o.referentQualite, "T1 2025", "✅"],
+      ["3", "Veille", "Nouveau référentiel CECRL (volume compagnon)", "Mise à jour des grilles d'évaluation et des objectifs", o.responsablePedagogique, "T2 2025", "🔄"],
+      ["4", "Entreprises", "Besoin de vocabulaire professionnel sectoriel", "Création de modules FLE métier (BTP, restauration, santé)", o.responsablePedagogique, "T3 2025", "📋"],
+      ["5", "Audit", "Supports phonétique et prononciation à renouveler", "Enregistrement de nouveaux audios avec accents variés", o.referentQualite, "T2 2025", "✅"],
+    ];
+  } else if (isWord) {
+    rows = [
+      ["1", "Satisfaction", "Demande de plus d'exercices de mise en page avancée", "Ajout d'ateliers publipostage et documents longs", o.responsablePedagogique, "T2 2025", "✅"],
+      ["2", "Réclamation", "Version de Word différente entre salle et entreprise", "Installation de Word 2021 et Microsoft 365 en parallèle", o.referentQualite, "T1 2025", "✅"],
+      ["3", "Veille", "Nouvelles fonctionnalités Copilot dans Word", "Intégration d'un module IA dans Word (Copilot)", o.responsablePedagogique, "T2 2025", "🔄"],
+      ["4", "Entreprises", "Besoin de modèles de documents professionnels", "Création d'une bibliothèque de templates métier", o.responsablePedagogique, "T3 2025", "📋"],
+      ["5", "Audit", "Supports sur Word 2016 obsolètes", "Refonte complète sur Word 2021/365", o.referentQualite, "T2 2025", "✅"],
+    ];
+  } else {
+    rows = [
+      ["1", "Satisfaction", `Demande de plus de pratique sur ${formName}`, `Augmentation des exercices pratiques à 50% du temps de formation`, o.responsablePedagogique, "T2 2025", "✅"],
+      ["2", "Réclamation", "Délai de réponse aux questions trop long", "Mise en place d'un accusé de réception sous 24h", o.referentQualite, "T1 2025", "✅"],
+      ["3", "Audit", `Supports pédagogiques ${formName} à mettre à jour`, `Refonte des supports de cours et fiches pratiques`, o.responsablePedagogique, "T2 2025", "🔄"],
+      ["4", "Veille", "Évolution réglementaire RNQ V9", "Mise à jour de la charte qualité et des procédures", o.referentQualite, "T1 2025", "✅"],
+      ["5", "Entreprises", "Manque de suivi post-formation", "Mise en place d'un questionnaire de satisfaction à J+90", o.referentQualite, "T3 2025", "📋"],
+    ];
+  }
+
+  return buildDocument({ org: o, title: "TABLEAU D'AMÉLIORATION CONTINUE", subtitle: f?.intitule, table: {
     headers: ["N°", "Source", "Constat", "Action corrective", "Responsable", "Délai", "Statut"],
-    rows: [
-      ["1", "Satisfaction", "Plus de pratique demandée", "Exercices pratiques à 50%", o.responsablePedagogique, "T2 2025", "✅"],
-      ["2", "Réclamation", "Délai réponse long", "Accusé réception sous 24h", o.referentQualite, "T1 2025", "✅"],
-      ["3", "Audit", "Supports à mettre à jour", "Refonte supports", o.responsablePedagogique, "T2 2025", "🔄"],
-      ["4", "Veille", "RNQ V9", "Mise à jour charte qualité", o.referentQualite, "T1 2025", "✅"],
-      ["5", "Entreprises", "Manque suivi post-formation", "Questionnaire J+90", o.referentQualite, "T3 2025", "📋"],
-    ]
+    rows
   }, signatures: { type: "2", labels: ["Le Référent Qualité", "Le Dirigeant"], names: [o.referentQualite, o.dirigeant] } });
 }
 
