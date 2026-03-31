@@ -607,6 +607,133 @@ function veilleMetierRows(f: FormationInfo, type: FormationType): string[][] {
     ];
   }
 
+  if (type === "massage" || type === "esthetique") {
+    return [
+      [
+        `<a href="https://www.ffmbe.fr/">ffmbe.fr – Fédération Française de Massage Bien-Être</a>`,
+        "FFMBE – Fédération du massage bien-être en France",
+        veilleMonthYear(f, 8),
+        "Fédération professionnelle de référence pour les praticiens en massage bien-être. Informations sur les certifications, le cadre légal et les bonnes pratiques de la profession.",
+        "Preuve : capture + lien. Action : aligner les objectifs pédagogiques sur les standards FFMBE et les bonnes pratiques fédérales."
+      ],
+      [
+        `<a href="https://www.doctissimo.fr/grossesse/bien-etre-pendant-la-grossesse/massage-prenatal">Doctissimo – Massage prénatal</a>`,
+        "Massage prénatal : bienfaits, techniques et précautions",
+        veilleMonthYear(f, 7),
+        "Article de référence sur les bienfaits du massage pendant la grossesse : réduction du stress, soulagement des douleurs, amélioration du sommeil. Contre-indications détaillées.",
+        "Action Qualiopi : mettre à jour le module contre-indications avec les dernières recommandations médicales."
+      ],
+      [
+        `<a href="https://www.has-sante.fr/">HAS – Haute Autorité de Santé</a>`,
+        "HAS – Recommandations sur l'accompagnement de la grossesse",
+        veilleYear(f, 6),
+        "Recommandations de la HAS sur le suivi de grossesse et les pratiques d'accompagnement non médicamenteux (massage, relaxation, sophrologie).",
+        "Preuve : synthèse recommandations HAS. Action : intégrer les recommandations dans le module anatomie et physiologie de la grossesse."
+      ],
+      [
+        `<a href="https://www.perinat-france.org/">Perinat France</a>`,
+        "Réseau périnatal – Accompagnement de la grossesse et du post-partum",
+        veilleMonthYear(f, 5),
+        "Réseau national de périnatalité : ressources sur l'accompagnement des femmes enceintes, les pratiques complémentaires et le bien-être maternel.",
+        "Action : enrichir le contenu pédagogique avec les ressources du réseau périnatal sur l'accompagnement non médicamenteux."
+      ],
+      [
+        `<a href="https://www.youtube.com/watch?v=_qTpCmxGiQI">YouTube – Massage prénatal techniques de base</a>`,
+        "Massage prénatal – Techniques et positions sécurisées",
+        veilleYear(f, 4),
+        "Vidéo démonstrative des techniques de massage prénatal : installation en décubitus latéral, pressions adaptées, zones à éviter.",
+        "Preuve : fiche synthèse vidéo. Action : utiliser comme support complémentaire pour les mises en pratique supervisées."
+      ],
+      [
+        `<a href="https://www.france-num.gouv.fr/guides-et-conseils/developpement-commercial">France Num – Développement des activités bien-être</a>`,
+        "France Num – Développer son activité de praticien bien-être",
+        veilleMonthYear(f, 3),
+        "Guide sur la digitalisation des activités de services à la personne : prise de rendez-vous en ligne, communication digitale, fidélisation.",
+        "Preuve : guide France Num. Action : sensibiliser les stagiaires au développement de leur activité de massage prénatal."
+      ],
+    ];
+  }
+
+  if (type === "management") {
+    return [
+      [
+        `<a href="https://www.hbrfrance.fr/">Harvard Business Review France</a>`,
+        "HBR France – Tendances management et leadership",
+        veilleMonthYear(f, 8),
+        "Revue de référence mondiale sur le management : articles sur le leadership, la gestion d'équipe, le changement organisationnel et l'innovation managériale.",
+        "Preuve : capture + lien. Action : intégrer les dernières études de cas HBR dans les exercices pratiques du module management."
+      ],
+      [
+        `<a href="https://www.anact.fr/">ANACT – Agence nationale pour l'amélioration des conditions de travail</a>`,
+        "ANACT – Qualité de vie et conditions de travail",
+        veilleMonthYear(f, 7),
+        "Ressources sur la QVCT, la prévention des RPS, et le management bienveillant. Référence pour les managers en exercice.",
+        "Action Qualiopi : enrichir le module gestion des conflits avec les outils ANACT (diagnostic, plans d'action)."
+      ],
+      [
+        `<a href="https://www.youtube.com/watch?v=TpPzFt-DTxg">YouTube – Débuter comme manager</a>`,
+        "5 choses essentielles pour bien débuter dans ses fonctions de manager",
+        veilleYear(f, 6),
+        "Vidéo de formation sur les premières actions à mettre en place lors de sa prise de poste managériale.",
+        "Preuve : fiche synthèse vidéo. Action : intégrer comme ressource dans le module prise de poste."
+      ],
+      [
+        `<a href="https://www.manager-go.com/">Manager GO!</a>`,
+        "Manager GO – Fiches pratiques et outils de management",
+        veilleMonthYear(f, 5),
+        "Portail de ressources managériales : fiches pratiques, modèles, outils de gestion d'équipe et de pilotage de projets.",
+        "Action : utiliser les fiches Manager GO comme supports complémentaires pour les ateliers pratiques."
+      ],
+      [
+        `<a href="https://www.france-num.gouv.fr/guides-et-conseils/strategie-numerique/management">France Num – Management et digital</a>`,
+        "France Num – Le management à l'ère du numérique",
+        veilleMonthYear(f, 3),
+        "Guide sur l'évolution des pratiques managériales avec le numérique : management hybride, outils collaboratifs, communication à distance.",
+        "Preuve : guide France Num. Action : intégrer le management hybride et le télétravail dans les cas pratiques."
+      ],
+    ];
+  }
+
+  if (type === "secretaire") {
+    return [
+      [
+        `<a href="https://www.ameli.fr/medecin/exercice-liberal/facturation-remboursement">Ameli – Facturation des actes médicaux</a>`,
+        "Ameli – CCAM et facturation des actes médicaux",
+        veilleMonthYear(f, 8),
+        "Portail de référence pour la facturation des actes médicaux : nomenclatures CCAM et NGAP, tarifs conventionnels, télétransmission.",
+        "Preuve : capture + lien. Action : mettre à jour le module facturation avec les derniers tarifs et nomenclatures."
+      ],
+      [
+        `<a href="https://www.has-sante.fr/jcms/c_1098455/fr/dossier-medical">HAS – Dossier médical</a>`,
+        "HAS – Recommandations sur la tenue du dossier médical",
+        veilleMonthYear(f, 7),
+        "Recommandations de la HAS sur la constitution, la tenue et la conservation du dossier médical patient (DMP, DPI).",
+        "Action Qualiopi : aligner le module gestion du DPI sur les dernières recommandations HAS."
+      ],
+      [
+        `<a href="https://www.youtube.com/watch?v=V_bwp2mJTZI">YouTube – Secrétaire médicale au quotidien</a>`,
+        "Le métier de secrétaire médicale – Témoignage et quotidien",
+        veilleYear(f, 6),
+        "Vidéo témoignage sur le quotidien d'une secrétaire médicale : accueil patients, gestion des plannings, archivage, relation avec les praticiens.",
+        "Preuve : fiche synthèse. Action : enrichir les mises en situation avec des cas réels du quotidien professionnel."
+      ],
+      [
+        `<a href="https://solidarites.gouv.fr/">Ministère de la Santé – Actualités</a>`,
+        "Ministère de la Santé – Évolutions du secteur médico-social",
+        veilleMonthYear(f, 4),
+        "Actualités réglementaires et organisationnelles du secteur de la santé : réformes hospitalières, numerus clausus, télémédecine.",
+        "Action : contextualiser la formation dans les évolutions du secteur sanitaire et social."
+      ],
+      [
+        `<a href="https://www.france-num.gouv.fr/guides-et-conseils/strategie-numerique/sante-numerique">France Num – Santé numérique</a>`,
+        "France Num – Transformation numérique du secteur santé",
+        veilleMonthYear(f, 3),
+        "Guide sur la digitalisation du secteur de la santé : Mon Espace Santé, DMP, téléconsultation, IA en santé.",
+        "Preuve : guide France Num. Action : intégrer les outils numériques de santé dans le programme de formation."
+      ],
+    ];
+  }
+
   // Default: word/bureautique
   return [
     [
