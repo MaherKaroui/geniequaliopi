@@ -825,16 +825,11 @@ function genAnalyseBesoins(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
   const lower = f.intitule.toLowerCase();
   const isFLE = lower.includes("français") || lower.includes("fle") || lower.includes("médico-social") || lower.includes("communiquer");
 
-  // Tableau récapitulatif des stagiaires avec leurs dates individuelles
-  let tableStag = "";
-  if (stagiaires.length > 0) {
-    const financements = ["OPCO", "Pôle Emploi", "Financement personnel"];
-    const rows = stagiaires.slice(0, 10).map((s, i) => {
-      const dateD = formatDate(getStagiaireDateDebut(s, f));
-      const dateF = formatDate(getStagiaireDateFin(s, f));
-      const financement = financements[i % financements.length];
-      if (isFLE) {
-        const besoins = [
+  // Domain-specific besoins based on formation title
+  function getDomainBesoins(): { besoins: string[]; synthese: string; adaptations: string } {
+    if (isFLE) {
+      return {
+        besoins: [
           "Renforcer la communication orale en situation professionnelle (accueil, transmissions, réunions)",
           "Améliorer la rédaction de transmissions écrites et la compréhension des protocoles de soins",
           "Développer le vocabulaire médico-social (sigles, termes techniques) et la compréhension de consignes",
@@ -845,49 +840,343 @@ function genAnalyseBesoins(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
           "Renforcer les compétences argumentatives pour les réunions d'équipe pluridisciplinaire",
           "Améliorer la lecture et l'application des protocoles d'urgence et de soins",
           "Développer les compétences rédactionnelles pour les projets personnalisés des résidents",
-        ];
-        return [s.civilite ? `${s.civilite} ${s.nom} ${s.prenom}` : `${s.prenom} ${s.nom}`, dateD, dateF, financement, besoins[i % besoins.length]];
-      } else {
-        const besoins = [
-          "Développer les compétences opérationnelles",
-          "Obtenir la certification visée",
-          "Reconversion professionnelle",
-          "Montée en compétences sur le poste actuel",
-          "Développer l'autonomie professionnelle",
-          "Acquérir de nouvelles méthodes de travail",
-          "Valider les acquis de l'expérience",
-          "Se préparer à de nouvelles responsabilités",
-          "Renforcer les compétences techniques",
-          "Améliorer la performance globale",
-        ];
-        return [s.civilite ? `${s.civilite} ${s.nom} ${s.prenom}` : `${s.prenom} ${s.nom}`, dateD, dateF, financement, besoins[i % besoins.length]];
-      }
+        ],
+        synthese: `• ${Math.round(stagiaires.length * 0.8)} stagiaires ont besoin de renforcer la communication orale en milieu médico-social<br>`
+          + `• ${Math.round(stagiaires.length * 0.7)} stagiaires doivent améliorer la rédaction de transmissions écrites<br>`
+          + `• ${Math.round(stagiaires.length * 0.6)} stagiaires nécessitent un apprentissage du vocabulaire spécifique<br>`
+          + `• ${Math.round(stagiaires.length * 0.4)} stagiaires souhaitent perfectionner la communication avec les familles<br>`
+          + `• ${Math.round(stagiaires.length * 0.3)} stagiaires demandent un accompagnement sur la lecture de documents administratifs`,
+        adaptations: `• Adaptation du rythme pédagogique au niveau de français de chaque stagiaire<br>`
+          + `• Mises en situation professionnelles contextualisées (accueil, toilette, repas, transmissions)<br>`
+          + `• Supports pédagogiques adaptés : documents réels du secteur médico-social<br>`
+          + `• Jeux de rôle avec vocabulaire spécifique au poste occupé<br>`
+          + `• Exercices de rédaction de transmissions sur cas concrets du secteur<br>`
+          + `• Travail spécifique sur la phonétique et l'intonation pour la communication téléphonique`,
+      };
+    }
+    if (lower.includes("massage") || lower.includes("prénatal") || lower.includes("prenatal") || lower.includes("bien-être") || lower.includes("relaxation")) {
+      return {
+        besoins: [
+          "Maîtriser les techniques de massage adaptées à la femme enceinte et aux différents stades de grossesse",
+          "Comprendre l'anatomie et la physiologie de la grossesse pour adapter les protocoles",
+          "Acquérir les postures et installations sécurisées (décubitus latéral, positions semi-assises)",
+          "Apprendre les contre-indications absolues et relatives au massage prénatal",
+          "Développer la maîtrise des techniques de drainage et de soulagement des tensions lombaires",
+          "Savoir accompagner la femme enceinte dans la respiration et la relaxation profonde",
+          "Intégrer les huiles et produits adaptés à la grossesse dans la pratique",
+          "Acquérir les protocoles spécifiques de massage des jambes et pieds pour réduire les œdèmes",
+          "Développer une approche holistique intégrant le bien-être émotionnel de la future maman",
+          "Maîtriser le massage du dos et du bassin pour préparer le corps à l'accouchement",
+        ],
+        synthese: `• ${Math.round(stagiaires.length * 0.8)} stagiaires souhaitent maîtriser les techniques de massage spécifiques à la grossesse<br>`
+          + `• ${Math.round(stagiaires.length * 0.7)} stagiaires ont besoin de comprendre les contre-indications et les précautions<br>`
+          + `• ${Math.round(stagiaires.length * 0.6)} stagiaires veulent acquérir les postures d'installation sécurisées<br>`
+          + `• ${Math.round(stagiaires.length * 0.4)} stagiaires recherchent des compétences en relaxation et accompagnement émotionnel<br>`
+          + `• ${Math.round(stagiaires.length * 0.3)} stagiaires souhaitent intégrer le massage prénatal dans leur pratique existante`,
+        adaptations: `• Alternance théorie/pratique avec mise en situation sur mannequin et binômes<br>`
+          + `• Adaptation des exercices selon l'expérience préalable en massage<br>`
+          + `• Supports visuels anatomiques spécifiques à la grossesse<br>`
+          + `• Pratique supervisée avec correction individuelle des gestes<br>`
+          + `• Fiches protocoles remises pour chaque technique enseignée<br>`
+          + `• Temps de debriefing après chaque mise en pratique`,
+      };
+    }
+    if (lower.includes("anglais") || lower.includes("english") || lower.includes("toeic")) {
+      return {
+        besoins: [
+          "Améliorer la compréhension orale en contexte professionnel (réunions, appels téléphoniques)",
+          "Développer l'aisance à l'oral pour les présentations et négociations en anglais",
+          "Renforcer la rédaction d'emails et de documents professionnels en anglais",
+          "Acquérir le vocabulaire technique spécifique au secteur d'activité",
+          "Préparer la certification TOEIC pour valider le niveau atteint",
+          "Maîtriser les structures grammaticales essentielles pour la communication écrite",
+          "Développer les techniques de compréhension écrite de documents techniques",
+          "Améliorer la prononciation et la fluidité à l'oral",
+          "Acquérir les formules et codes culturels de la communication anglo-saxonne",
+          "Renforcer la confiance en soi lors d'échanges professionnels en anglais",
+        ],
+        synthese: `• ${Math.round(stagiaires.length * 0.8)} stagiaires ont besoin d'améliorer leur expression orale professionnelle en anglais<br>`
+          + `• ${Math.round(stagiaires.length * 0.7)} stagiaires souhaitent renforcer la rédaction d'emails et documents en anglais<br>`
+          + `• ${Math.round(stagiaires.length * 0.5)} stagiaires visent la certification TOEIC<br>`
+          + `• ${Math.round(stagiaires.length * 0.4)} stagiaires ont besoin de vocabulaire technique sectoriel<br>`
+          + `• ${Math.round(stagiaires.length * 0.3)} stagiaires demandent un travail spécifique sur la compréhension orale`,
+        adaptations: `• Tests de niveau pour constituer des groupes homogènes<br>`
+          + `• Mises en situation professionnelles (jeux de rôle, simulations d'appels)<br>`
+          + `• Supports authentiques : articles, vidéos, emails réels<br>`
+          + `• Exercices de préparation au TOEIC avec corrigés individualisés<br>`
+          + `• Sessions de conversation libre pour développer la fluidité<br>`
+          + `• Ressources complémentaires en ligne pour le travail personnel`,
+      };
+    }
+    if (lower.includes("ia") || lower.includes("intelligence artificielle") || lower.includes("contenus") || lower.includes("rédactionnel")) {
+      return {
+        besoins: [
+          "Comprendre les fondamentaux de l'IA générative et ses applications professionnelles",
+          "Maîtriser la rédaction de prompts efficaces pour des contenus de qualité",
+          "Apprendre à créer des contenus visuels assistés par l'IA (images, infographies)",
+          "Développer une stratégie de contenus intégrant l'IA de manière éthique et responsable",
+          "Acquérir les réflexes de vérification et de relecture des productions IA",
+          "Savoir adapter le ton et le style des contenus générés au contexte professionnel",
+          "Maîtriser les outils IA de création de contenus (ChatGPT, Midjourney, DALL-E…)",
+          "Comprendre les enjeux juridiques et éthiques liés à l'utilisation de l'IA",
+          "Optimiser sa productivité en automatisant certaines tâches rédactionnelles",
+          "Intégrer l'IA dans un workflow de création de contenus existant",
+        ],
+        synthese: `• ${Math.round(stagiaires.length * 0.8)} stagiaires souhaitent maîtriser les outils d'IA générative pour la création de contenus<br>`
+          + `• ${Math.round(stagiaires.length * 0.7)} stagiaires veulent améliorer leur capacité à rédiger des prompts efficaces<br>`
+          + `• ${Math.round(stagiaires.length * 0.5)} stagiaires recherchent une utilisation éthique et responsable de l'IA<br>`
+          + `• ${Math.round(stagiaires.length * 0.4)} stagiaires ont besoin d'optimiser leur productivité via l'IA<br>`
+          + `• ${Math.round(stagiaires.length * 0.3)} stagiaires demandent une formation sur les aspects juridiques`,
+        adaptations: `• Ateliers pratiques sur poste informatique avec accès aux outils IA<br>`
+          + `• Exercices de création de contenus sur des cas réels des stagiaires<br>`
+          + `• Comparaison de résultats entre différents outils et modèles IA<br>`
+          + `• Sessions de retour critique sur les productions générées<br>`
+          + `• Fiches méthodologiques sur les bonnes pratiques de prompting<br>`
+          + `• Veille partagée sur les évolutions des outils IA`,
+      };
+    }
+    if (lower.includes("webmarketing") || lower.includes("marketing") || lower.includes("réseaux sociaux") || lower.includes("digital")) {
+      return {
+        besoins: [
+          "Élaborer une stratégie de marketing digital adaptée à son activité",
+          "Maîtriser la création de contenus engageants pour les réseaux sociaux",
+          "Comprendre les mécaniques du référencement naturel (SEO) et payant (SEA)",
+          "Développer une stratégie d'email marketing et de fidélisation client",
+          "Analyser les performances de ses actions digitales via les KPIs",
+          "Acquérir les bases de la publicité sur les réseaux sociaux (Meta Ads, LinkedIn Ads)",
+          "Maîtriser les outils de planification et d'automatisation marketing",
+          "Comprendre le parcours client digital et optimiser les points de conversion",
+          "Développer sa marque personnelle et son personal branding",
+          "Créer un calendrier éditorial cohérent et pérenne",
+        ],
+        synthese: `• ${Math.round(stagiaires.length * 0.8)} stagiaires souhaitent développer leur présence sur les réseaux sociaux<br>`
+          + `• ${Math.round(stagiaires.length * 0.7)} stagiaires ont besoin de maîtriser les bases du référencement<br>`
+          + `• ${Math.round(stagiaires.length * 0.5)} stagiaires veulent créer des contenus engageants régulièrement<br>`
+          + `• ${Math.round(stagiaires.length * 0.4)} stagiaires recherchent des compétences en analyse de performance<br>`
+          + `• ${Math.round(stagiaires.length * 0.3)} stagiaires souhaitent lancer des campagnes publicitaires en ligne`,
+        adaptations: `• Ateliers pratiques sur les comptes réels des stagiaires<br>`
+          + `• Audit personnalisé de la présence digitale de chaque participant<br>`
+          + `• Création d'un plan d'action individualisé par stagiaire<br>`
+          + `• Exercices sur des outils concrets (Canva, Hootsuite, Google Analytics)<br>`
+          + `• Études de cas sectorielles adaptées aux métiers des stagiaires<br>`
+          + `• Ressources et templates réutilisables après la formation`,
+      };
+    }
+    if (lower.includes("crm") || lower.includes("automation") || lower.includes("commercial")) {
+      return {
+        besoins: [
+          "Centraliser et organiser la gestion de la relation client avec un CRM",
+          "Automatiser les tâches commerciales répétitives pour gagner en productivité",
+          "Améliorer le suivi des prospects et des opportunités commerciales",
+          "Mettre en place des workflows d'automatisation marketing et commerciale",
+          "Analyser les données clients pour prendre des décisions éclairées",
+          "Maîtriser la segmentation client et la personnalisation des communications",
+          "Développer les compétences en gestion de pipeline commercial",
+          "Intégrer le CRM dans l'écosystème d'outils existant de l'entreprise",
+          "Optimiser les processus de fidélisation et de relance client",
+          "Comprendre les indicateurs de performance commerciale (taux de conversion, panier moyen)",
+        ],
+        synthese: `• ${Math.round(stagiaires.length * 0.8)} stagiaires ont besoin de structurer leur gestion de la relation client<br>`
+          + `• ${Math.round(stagiaires.length * 0.7)} stagiaires souhaitent automatiser leurs processus commerciaux<br>`
+          + `• ${Math.round(stagiaires.length * 0.5)} stagiaires veulent mieux analyser leurs données clients<br>`
+          + `• ${Math.round(stagiaires.length * 0.4)} stagiaires recherchent une optimisation de leur pipeline commercial<br>`
+          + `• ${Math.round(stagiaires.length * 0.3)} stagiaires demandent une intégration CRM avec leurs outils existants`,
+        adaptations: `• Exercices sur un CRM de démonstration avec données réalistes<br>`
+          + `• Configuration personnalisée selon le secteur d'activité de chaque stagiaire<br>`
+          + `• Création de workflows d'automatisation sur cas réels<br>`
+          + `• Tableaux de bord personnalisés par participant<br>`
+          + `• Import et nettoyage de données clients réelles (anonymisées)<br>`
+          + `• Plan d'action de déploiement post-formation`,
+      };
+    }
+    if (lower.includes("word") || lower.includes("bureautique") || lower.includes("excel") || lower.includes("office")) {
+      return {
+        besoins: [
+          "Maîtriser la mise en forme avancée de documents professionnels",
+          "Créer et utiliser des modèles de documents normalisés",
+          "Automatiser les tâches répétitives avec les styles et le publipostage",
+          "Gérer les documents longs (table des matières, en-têtes, pagination)",
+          "Maîtriser les tableaux, les graphiques et les insertions d'objets",
+          "Utiliser les fonctionnalités collaboratives (révision, commentaires, suivi des modifications)",
+          "Créer des formulaires et des documents interactifs",
+          "Optimiser la productivité avec les raccourcis et les macros",
+          "Préparer des documents pour impression professionnelle et export PDF",
+          "Normaliser les documents selon la charte graphique de l'entreprise",
+        ],
+        synthese: `• ${Math.round(stagiaires.length * 0.8)} stagiaires ont besoin de maîtriser la mise en forme avancée<br>`
+          + `• ${Math.round(stagiaires.length * 0.7)} stagiaires souhaitent créer des modèles de documents normalisés<br>`
+          + `• ${Math.round(stagiaires.length * 0.5)} stagiaires veulent automatiser les tâches avec le publipostage<br>`
+          + `• ${Math.round(stagiaires.length * 0.4)} stagiaires recherchent des compétences en documents longs<br>`
+          + `• ${Math.round(stagiaires.length * 0.3)} stagiaires demandent une formation sur les fonctionnalités collaboratives`,
+        adaptations: `• Exercices progressifs du niveau débutant au niveau avancé<br>`
+          + `• Travail sur des documents réels issus du contexte professionnel des stagiaires<br>`
+          + `• Fiches mémo des raccourcis clavier essentiels<br>`
+          + `• Création de modèles réutilisables en situation professionnelle<br>`
+          + `• Exercices de publipostage sur des cas concrets<br>`
+          + `• Évaluation pratique sur un projet de document complet`,
+      };
+    }
+    if (lower.includes("management") || lower.includes("encadrement") || lower.includes("leadership")) {
+      return {
+        besoins: [
+          "Développer un style de management adapté à son équipe et son contexte",
+          "Maîtriser les techniques de communication managériale (feedback, entretiens)",
+          "Apprendre à motiver et fédérer son équipe autour d'objectifs communs",
+          "Gérer les conflits et les situations difficiles avec assertivité",
+          "Acquérir les outils de délégation et de suivi de performance",
+          "Développer son leadership et sa posture de manager",
+          "Maîtriser la conduite de réunions productives",
+          "Accompagner le changement et gérer les résistances",
+          "Développer l'autonomie et la responsabilisation des collaborateurs",
+          "Construire une relation de confiance avec son équipe",
+        ],
+        synthese: `• ${Math.round(stagiaires.length * 0.8)} stagiaires souhaitent développer leur posture managériale<br>`
+          + `• ${Math.round(stagiaires.length * 0.7)} stagiaires ont besoin d'outils de communication managériale<br>`
+          + `• ${Math.round(stagiaires.length * 0.5)} stagiaires veulent maîtriser la gestion des conflits<br>`
+          + `• ${Math.round(stagiaires.length * 0.4)} stagiaires recherchent des techniques de motivation d'équipe<br>`
+          + `• ${Math.round(stagiaires.length * 0.3)} stagiaires souhaitent améliorer la conduite de réunions`,
+        adaptations: `• Mises en situation managériales filmées avec debriefing<br>`
+          + `• Études de cas adaptées au secteur d'activité de chaque participant<br>`
+          + `• Jeux de rôle sur la gestion de conflits et les entretiens<br>`
+          + `• Auto-diagnostic de son style de management<br>`
+          + `• Plan d'action individuel de développement managérial<br>`
+          + `• Sessions de co-développement entre pairs`,
+      };
+    }
+    if (lower.includes("esthéti") || lower.includes("cosmétique") || lower.includes("parfumerie") || lower.includes("beauté")) {
+      return {
+        besoins: [
+          "Maîtriser les protocoles de soins esthétiques du visage et du corps",
+          "Acquérir les techniques de maquillage professionnel adaptées à chaque type de peau",
+          "Comprendre la cosmétologie et la composition des produits de beauté",
+          "Développer les compétences en conseil et vente de produits cosmétiques",
+          "Maîtriser les techniques d'épilation et de soins des ongles (manucure/pédicure)",
+          "Acquérir les gestes professionnels en soin du visage (nettoyage, modelage, masques)",
+          "Comprendre les réglementations sanitaires et d'hygiène en institut",
+          "Développer la relation client et la fidélisation en institut de beauté",
+          "Maîtriser la gestion d'un espace de travail esthétique",
+          "Préparer les épreuves pratiques et théoriques du CAP Esthétique",
+        ],
+        synthese: `• ${Math.round(stagiaires.length * 0.8)} stagiaires souhaitent maîtriser les protocoles de soins esthétiques<br>`
+          + `• ${Math.round(stagiaires.length * 0.7)} stagiaires ont besoin de développer leurs techniques de maquillage<br>`
+          + `• ${Math.round(stagiaires.length * 0.5)} stagiaires veulent approfondir la cosmétologie<br>`
+          + `• ${Math.round(stagiaires.length * 0.4)} stagiaires recherchent des compétences en conseil et vente<br>`
+          + `• ${Math.round(stagiaires.length * 0.3)} stagiaires demandent un accompagnement sur les réglementations d'hygiène`,
+        adaptations: `• Ateliers pratiques sur modèles vivants avec correction individuelle<br>`
+          + `• Utilisation de produits professionnels variés pour chaque technique<br>`
+          + `• Fiches protocoles détaillées remises pour chaque soin<br>`
+          + `• Mises en situation d'accueil client et de conseil personnalisé<br>`
+          + `• Exercices d'hygiène et de préparation du poste de travail<br>`
+          + `• Entraînement aux épreuves du CAP avec examens blancs`,
+      };
+    }
+    if (lower.includes("secrétaire") || lower.includes("assistant") || lower.includes("médico-admin") || lower.includes("administratif")) {
+      return {
+        besoins: [
+          "Maîtriser l'accueil physique et téléphonique des patients et usagers",
+          "Acquérir les techniques de gestion administrative des dossiers médicaux",
+          "Comprendre le vocabulaire médical et les principales pathologies",
+          "Maîtriser la facturation des actes médicaux (CCAM, NGAP, T2A)",
+          "Développer les compétences en planification et coordination des rendez-vous",
+          "Assurer la gestion et l'archivage des dossiers patients (DPI)",
+          "Maîtriser les logiciels métier (Doctolib, Hôpital Manager, etc.)",
+          "Comprendre les droits des patients et la confidentialité médicale",
+          "Rédiger des courriers médicaux et des comptes rendus de consultation",
+          "Coordonner les relations avec les organismes de santé (CPAM, mutuelles)",
+        ],
+        synthese: `• ${Math.round(stagiaires.length * 0.8)} stagiaires ont besoin de maîtriser l'accueil et la gestion administrative médicale<br>`
+          + `• ${Math.round(stagiaires.length * 0.7)} stagiaires souhaitent acquérir le vocabulaire médical professionnel<br>`
+          + `• ${Math.round(stagiaires.length * 0.5)} stagiaires veulent maîtriser la facturation des actes médicaux<br>`
+          + `• ${Math.round(stagiaires.length * 0.4)} stagiaires recherchent des compétences en gestion du DPI<br>`
+          + `• ${Math.round(stagiaires.length * 0.3)} stagiaires demandent une formation sur les logiciels métier`,
+        adaptations: `• Mises en situation d'accueil avec jeux de rôle<br>`
+          + `• Exercices de facturation sur cas réels anonymisés<br>`
+          + `• Travail sur des dossiers patients fictifs mais réalistes<br>`
+          + `• Utilisation de logiciels métier en version de démonstration<br>`
+          + `• Fiches vocabulaire médical par spécialité<br>`
+          + `• Visites ou témoignages de professionnels en poste`,
+      };
+    }
+    if (lower.includes("négociateur") || lower.includes("technico") || lower.includes("ntc") || lower.includes("vente") || lower.includes("commerce")) {
+      return {
+        besoins: [
+          "Maîtriser les techniques de prospection multicanale (téléphone, email, réseaux sociaux)",
+          "Développer les compétences en négociation commerciale complexe",
+          "Acquérir les méthodes de découverte des besoins client (SONCAS, SPIN)",
+          "Construire et défendre une proposition commerciale convaincante",
+          "Maîtriser la gestion d'un portefeuille clients et la fidélisation",
+          "Développer son réseau professionnel et sa stratégie de veille commerciale",
+          "Savoir conclure une vente et traiter les objections avec efficacité",
+          "Comprendre les aspects techniques des produits/services pour mieux les valoriser",
+          "Analyser son marché et identifier les opportunités de développement",
+          "Maîtriser les outils CRM et le reporting commercial",
+        ],
+        synthese: `• ${Math.round(stagiaires.length * 0.8)} stagiaires souhaitent améliorer leurs techniques de négociation<br>`
+          + `• ${Math.round(stagiaires.length * 0.7)} stagiaires ont besoin de maîtriser la prospection multicanale<br>`
+          + `• ${Math.round(stagiaires.length * 0.5)} stagiaires veulent développer leur capacité à conclure des ventes<br>`
+          + `• ${Math.round(stagiaires.length * 0.4)} stagiaires recherchent des compétences en gestion de portefeuille<br>`
+          + `• ${Math.round(stagiaires.length * 0.3)} stagiaires demandent une formation sur l'analyse de marché`,
+        adaptations: `• Simulations de négociation filmées avec debriefing individuel<br>`
+          + `• Travail sur des cas réels de prospection issus du secteur des stagiaires<br>`
+          + `• Création d'un argumentaire commercial personnalisé par participant<br>`
+          + `• Exercices de traitement des objections les plus fréquentes<br>`
+          + `• Ateliers LinkedIn et social selling<br>`
+          + `• Plan d'action commercial individuel post-formation`,
+      };
+    }
+    // Fallback: extract from objectives
+    const objItems = f.objectifs.split(/\n|[.;]/).map(l => l.trim().replace(/^[-•*]\s*/, '')).filter(l => l.length > 10);
+    const domainBesoins = objItems.length >= 5
+      ? objItems.slice(0, 10).map(obj => `Développer la capacité à ${obj.charAt(0).toLowerCase()}${obj.slice(1)}`)
+      : [
+        `Acquérir les compétences fondamentales en ${f.intitule}`,
+        `Maîtriser les techniques et outils spécifiques à ${f.intitule}`,
+        `Développer une pratique professionnelle dans le domaine de ${f.intitule}`,
+        `Obtenir la certification ou validation visée par la formation`,
+        `Renforcer l'autonomie et la confiance dans la pratique de ${f.intitule}`,
+        `Appliquer les connaissances acquises en situation professionnelle réelle`,
+        `Comprendre les enjeux et les évolutions du domaine de ${f.intitule}`,
+        `Développer un réseau professionnel dans le secteur`,
+        `Maîtriser les bonnes pratiques et les normes du domaine`,
+        `Consolider les acquis par la pratique et les mises en situation`,
+      ];
+    return {
+      besoins: domainBesoins,
+      synthese: `• ${Math.round(stagiaires.length * 0.8)} stagiaires souhaitent acquérir les compétences fondamentales en ${f.intitule}<br>`
+        + `• ${Math.round(stagiaires.length * 0.7)} stagiaires ont besoin de maîtriser les outils et techniques spécifiques<br>`
+        + `• ${Math.round(stagiaires.length * 0.5)} stagiaires visent la certification ou la validation des compétences<br>`
+        + `• ${Math.round(stagiaires.length * 0.4)} stagiaires recherchent un accompagnement personnalisé<br>`
+        + `• ${Math.round(stagiaires.length * 0.3)} stagiaires souhaitent un suivi post-formation`,
+      adaptations: `• Exercices pratiques adaptés au domaine de ${f.intitule}<br>`
+        + `• Mises en situation professionnelles contextualisées<br>`
+        + `• Supports pédagogiques spécifiques au secteur<br>`
+        + `• Adaptation du rythme selon le niveau de chaque stagiaire<br>`
+        + `• Ressources complémentaires en ligne pour approfondir<br>`
+        + `• Évaluations formatives régulières pour ajuster le parcours`,
+    };
+  }
+
+  const domain = getDomainBesoins();
+
+  // Tableau récapitulatif des stagiaires avec leurs dates individuelles
+  let tableStag = "";
+  if (stagiaires.length > 0) {
+    const financements = ["OPCO", "Pôle Emploi", "Financement personnel"];
+    const rows = stagiaires.slice(0, 10).map((s, i) => {
+      const dateD = formatDate(getStagiaireDateDebut(s, f));
+      const dateF = formatDate(getStagiaireDateFin(s, f));
+      const financement = financements[i % financements.length];
+      return [s.civilite ? `${s.civilite} ${s.nom} ${s.prenom}` : `${s.prenom} ${s.nom}`, dateD, dateF, financement, domain.besoins[i % domain.besoins.length]];
     });
     tableStag = tableHTML(["Stagiaire", "Date début", "Date fin", "Prise en charge", "Besoin principal identifié"], rows);
   }
 
-  const besoinsContent = isFLE
-    ? `<p>L'analyse des besoins a été réalisée auprès de ${stagiaires.length} candidats inscrits à la formation « ${f.intitule} » par entretien individuel et test de positionnement en français.</p>`
-      + tableStag
-      + `<p><strong>Synthèse des besoins identifiés :</strong></p>`
-      + `<p>• ${Math.round(stagiaires.length * 0.8)} stagiaires ont besoin de renforcer la communication orale en milieu médico-social (accueil des résidents, transmissions orales, réunions d'équipe)<br>`
-      + `• ${Math.round(stagiaires.length * 0.7)} stagiaires doivent améliorer la rédaction de transmissions écrites et la compréhension des protocoles de soins<br>`
-      + `• ${Math.round(stagiaires.length * 0.6)} stagiaires nécessitent un apprentissage du vocabulaire spécifique (EHPAD, IDE, AES, MDPH, PIA, CVS…)<br>`
-      + `• ${Math.round(stagiaires.length * 0.4)} stagiaires souhaitent perfectionner la communication avec les familles et les partenaires extérieurs<br>`
-      + `• ${Math.round(stagiaires.length * 0.3)} stagiaires demandent un accompagnement sur la lecture de documents administratifs (règlement de fonctionnement, projet d'établissement)</p>`
-    : `<p>Analyse réalisée sur ${stagiaires.length} candidats inscrits à la formation « ${f.intitule} ». Les besoins ont été recueillis via questionnaire en ligne et entretiens individuels.</p>`
-      + tableStag
-      + `<p><strong>Synthèse des besoins identifiés :</strong></p>`
-      + `<p>• 80% des stagiaires souhaitent développer leurs compétences opérationnelles<br>• 60% visent une certification ou une validation de compétences<br>• 40% sont en reconversion professionnelle<br>• 20% souhaitent un accompagnement spécifique (handicap, horaires aménagés)</p>`;
+  const besoinsContent = `<p>L'analyse des besoins a été réalisée auprès de ${stagiaires.length} candidats inscrits à la formation « ${f.intitule} » par entretien individuel et test de positionnement.</p>`
+    + tableStag
+    + `<p><strong>Synthèse des besoins identifiés :</strong></p>`
+    + `<p>${domain.synthese}</p>`;
 
-  const adaptationsContent = isFLE
-    ? `<p>• Adaptation du rythme pédagogique au niveau de français de chaque stagiaire<br>`
-      + `• Mises en situation professionnelles contextualisées (accueil, toilette, repas, transmissions)<br>`
-      + `• Supports pédagogiques adaptés : documents réels du secteur médico-social (protocoles, fiches de liaison, cahiers de transmissions)<br>`
-      + `• Jeux de rôle avec vocabulaire spécifique au poste occupé<br>`
-      + `• Exercices de rédaction de transmissions sur cas concrets du secteur<br>`
-      + `• Travail spécifique sur la phonétique et l'intonation pour la communication téléphonique</p>`
-    : `<p>• Ajustement du rythme pédagogique<br>• Ajout d'exercices pratiques supplémentaires<br>• Mise à disposition de ressources complémentaires en ligne<br>• Aménagement d'horaires pour 2 stagiaires</p>`;
+  const adaptationsContent = `<p>${domain.adaptations}</p>`;
 
   return buildDocument({ org: o, title: "ANALYSE DES BESOINS", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, sections: [
     { heading: "Contexte et besoins identifiés", content: besoinsContent },
