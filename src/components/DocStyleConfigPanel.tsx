@@ -4,6 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
+import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronRight, Palette, Type, Layout, Paintbrush } from "lucide-react";
 
