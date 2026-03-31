@@ -455,6 +455,10 @@ export function buildFullCatalog(
     add("cfa_c3i10_procedure_adaptation_pedagogique", "CT3 - IND 10 PROCÉDURE D'ADAPTATION PÉDAGOGIQUE", 3, 10, "procedure_adaptation_pedagogique_cfa");
     add("cfa_c3i10_procedure_gestion_annulations", "CT3 - IND 10 PROCÉDURE DE GESTION DES ANNULATIONS", 3, 10, "procedure_gestion_annulations_cfa");
     add("cfa_c3i10_tableau_suivi_parcours_excel", "CT3 - IND 10 TABLEAU DE SUIVI DU PARCOURS BÉNÉFICIAIRES (Excel)", 3, 10, "tableau_suivi_parcours_beneficiaires_cfa_excel");
+    add("cfa_c3i10_guide_parents_walt", "CT3 - IND 10 GUIDE PARENTS – WALT", 3, 10, "pdf_static", { pdfUrl: "/pdfs/guide_parents_walt.pdf" });
+    add("cfa_c3i10_livret_accompagnez_alternants", "CT3 - IND 10 LIVRET ACCOMPAGNEZ VOS ALTERNANTS", 3, 10, "pdf_static", { pdfUrl: "/pdfs/livret_accompagnez_alternants.pdf" });
+    add("cfa_c3i10_boostez_mobilite", "CT3 - IND 10 BOOSTEZ LA MOBILITÉ", 3, 10, "pdf_static", { pdfUrl: "/pdfs/boostez_mobilite.pdf" });
+    add("cfa_c3i10_vademecum_controle_pedagogique", "CT3 - IND 10 VADEMECUM CONTRÔLE PÉDAGOGIQUE APPRENTISSAGE", 3, 10, "pdf_static", { pdfUrl: "/pdfs/vademecum_controle_pedagogique.pdf" });
 
     // Documents CFA complémentaires (autres critères)
     add("cfa_c1i1_livret_accueil", "CT1 - IND 1 LIVRET D'ACCUEIL CFA", 1, 1, "livret_accueil_cfa");
