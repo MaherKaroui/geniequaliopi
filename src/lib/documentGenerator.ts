@@ -555,7 +555,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "exercices_cfa_stagiaire": {
       const si = params?.stagiaireIdx ?? 0;
       const exIdx = params?.exerciceIdx ?? 0;
-      return genExercicesCFAStagiaire(o, f, stagiaires, si, exIdx);
+      return genExercicesCFAStagiaire(o, f, stagiaires, si, exIdx, params);
     }
     case "examen_blanc_cfa_stagiaire": {
       const si = params?.stagiaireIdx ?? 0;
@@ -8116,67 +8116,132 @@ function getCFAWeekDates(f: FormationInfo): { cfaWeekNum: number; weekStart: Dat
   return result;
 }
 
-function genExercicesCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number, exerciceIdx: number) {
+function genExercicesCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number, exerciceIdx: number, extraParams?: Record<string, any>) {
   const termine = isFormationTerminee(f);
   const s = stagiaires[si] || stagiaires[0] || { nom: 'Dupont', prenom: 'Marie', email: '', telephone: '', entreprise: '', poste: '' } as StagiaireInfo;
   const rncp = getRNCPByCode(f.codeRNCP || '');
   const { totalHours } = parseDuree(f.duree);
   const effectiveTotal = totalHours > 0 ? totalHours : 420;
 
-  const weekNum = Math.floor(exerciceIdx / 2) + 1;
-  const exInWeek = (exerciceIdx % 2) + 1;
-
   const cfaWeekDates = getCFAWeekDates(f);
-  const thisWeek = cfaWeekDates[weekNum - 1];
-  let dateStr = '___/___/______';
-  let periodeStr = '';
-  if (thisWeek) {
-    const exDate = new Date(thisWeek.weekStart);
-    exDate.setDate(exDate.getDate() + (exInWeek === 1 ? 1 : 3));
-    dateStr = exDate.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-    periodeStr = `du ${thisWeek.weekStart.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })} au ${thisWeek.weekEnd.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })}`;
-  }
+  const totalCFAWeeks = cfaWeekDates.length || 1;
 
-  // Find which module/matière this week falls into
+  // Determine bloc/matière/exercise from params or fallback
+  let blocIdx = extraParams?.blocIdx;
+  let matiereIdx = extraParams?.matiereIdx;
+  let exInMatiere = extraParams?.exInMatiere;
+
   let moduleTitle = '';
   let matiereTitle = '';
   let matiereContenu = '';
   let modalitesEval = 'Mise en situation professionnelle';
   let blocCompetences: string[] = [];
+  let weekNum = 1;
+  let exInWeek = 1;
+  let dateStr = '___/___/______';
+  let periodeStr = '';
 
-  if (rncp && rncp.blocsCompetences.length > 0) {
+  if (rncp && rncp.blocsCompetences.length > 0 && blocIdx !== undefined && matiereIdx !== undefined && exInMatiere !== undefined) {
+    // --- NEW: 5 exercises per matière with proportional dating ---
+    const bloc = rncp.blocsCompetences[blocIdx];
+    const mat = bloc?.matieres[matiereIdx];
+    if (bloc) {
+      moduleTitle = bloc.titre;
+      blocCompetences = bloc.competences;
+      modalitesEval = bloc.modalitesEval || modalitesEval;
+    }
+    if (mat) {
+      matiereTitle = mat.competence;
+      matiereContenu = mat.contenu;
+    }
+
+    // Calculate which CFA weeks belong to this matière (proportional to volume)
     const accompHours = Math.round(effectiveTotal * 0.15);
     const blocHoursTotal = effectiveTotal - accompHours;
-    const rncpTotalVolume = rncp.blocsCompetences.reduce((sum, bloc) =>
-      sum + bloc.matieres.reduce((s2, m) => s2 + (parseInt(m.volume) || 0), 0), 0);
+    const rncpTotalVolume = rncp.blocsCompetences.reduce((sum, b) =>
+      sum + b.matieres.reduce((s2, m) => s2 + (parseInt(m.volume) || 0), 0), 0);
     const scale = rncpTotalVolume > 0 ? blocHoursTotal / rncpTotalVolume : 1;
 
+    // Find the CFA week range for this matière
     let cumulWeeks = 0;
-    for (const bloc of rncp.blocsCompetences) {
-      const blocMatiereWeeks: { matiere: typeof bloc.matieres[0]; startWeek: number; endWeek: number }[] = [];
-      for (const mat of bloc.matieres) {
-        const volume = Math.round((parseInt(mat.volume) || 0) * scale);
-        const matWeeks = Math.max(1, Math.ceil(volume / 35));
-        blocMatiereWeeks.push({ matiere: mat, startWeek: cumulWeeks + 1, endWeek: cumulWeeks + matWeeks });
+    let matStartWeek = 0;
+    let matEndWeek = 0;
+    for (let bi = 0; bi < rncp.blocsCompetences.length; bi++) {
+      for (let mi = 0; mi < rncp.blocsCompetences[bi].matieres.length; mi++) {
+        const vol = Math.round((parseInt(rncp.blocsCompetences[bi].matieres[mi].volume) || 0) * scale);
+        const matWeeks = Math.max(1, Math.ceil(vol / 35));
+        if (bi === blocIdx && mi === matiereIdx) {
+          matStartWeek = cumulWeeks;
+          matEndWeek = cumulWeeks + matWeeks - 1;
+        }
         cumulWeeks += matWeeks;
       }
-      const found = blocMatiereWeeks.find(bm => weekNum >= bm.startWeek && weekNum <= bm.endWeek);
-      if (found) {
-        moduleTitle = bloc.titre;
-        matiereTitle = found.matiere.competence;
-        matiereContenu = found.matiere.contenu;
-        modalitesEval = bloc.modalitesEval || modalitesEval;
-        blocCompetences = bloc.competences;
-        break;
-      }
     }
-    if (!moduleTitle && rncp.blocsCompetences.length > 0) {
-      const lastBloc = rncp.blocsCompetences[rncp.blocsCompetences.length - 1];
-      moduleTitle = lastBloc.titre;
-      const lastMat = lastBloc.matieres[lastBloc.matieres.length - 1];
-      if (lastMat) { matiereTitle = lastMat.competence; matiereContenu = lastMat.contenu; }
-      modalitesEval = lastBloc.modalitesEval || modalitesEval;
-      blocCompetences = lastBloc.competences;
+
+    // Spread 5 exercises across the matière's week range
+    const matWeekSpan = matEndWeek - matStartWeek + 1;
+    const exWeekOffset = matWeekSpan <= 1
+      ? 0
+      : Math.round((exInMatiere / 4) * (matWeekSpan - 1));
+    weekNum = matStartWeek + exWeekOffset + 1;
+    // Day within week: cycle through Mon(0), Tue(1), Wed(2), Thu(3), Fri(4)
+    const dayOffset = [1, 2, 3, 1, 3][exInMatiere % 5];
+
+    const thisWeek = cfaWeekDates[weekNum - 1];
+    if (thisWeek) {
+      const exDate = new Date(thisWeek.weekStart);
+      exDate.setDate(exDate.getDate() + dayOffset);
+      dateStr = exDate.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+      periodeStr = `du ${thisWeek.weekStart.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })} au ${thisWeek.weekEnd.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })}`;
+    }
+    exInWeek = exInMatiere + 1;
+  } else {
+    // --- FALLBACK: old week-based logic ---
+    weekNum = Math.floor(exerciceIdx / 2) + 1;
+    exInWeek = (exerciceIdx % 2) + 1;
+
+    const thisWeek = cfaWeekDates[weekNum - 1];
+    if (thisWeek) {
+      const exDate = new Date(thisWeek.weekStart);
+      exDate.setDate(exDate.getDate() + (exInWeek === 1 ? 1 : 3));
+      dateStr = exDate.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+      periodeStr = `du ${thisWeek.weekStart.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })} au ${thisWeek.weekEnd.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })}`;
+    }
+
+    if (rncp && rncp.blocsCompetences.length > 0) {
+      const accompHours = Math.round(effectiveTotal * 0.15);
+      const blocHoursTotal = effectiveTotal - accompHours;
+      const rncpTotalVolume = rncp.blocsCompetences.reduce((sum, b) =>
+        sum + b.matieres.reduce((s2, m) => s2 + (parseInt(m.volume) || 0), 0), 0);
+      const scale = rncpTotalVolume > 0 ? blocHoursTotal / rncpTotalVolume : 1;
+
+      let cumulWeeks = 0;
+      for (const bloc of rncp.blocsCompetences) {
+        const blocMatiereWeeks: { matiere: typeof bloc.matieres[0]; startWeek: number; endWeek: number }[] = [];
+        for (const mat of bloc.matieres) {
+          const volume = Math.round((parseInt(mat.volume) || 0) * scale);
+          const matWeeks = Math.max(1, Math.ceil(volume / 35));
+          blocMatiereWeeks.push({ matiere: mat, startWeek: cumulWeeks + 1, endWeek: cumulWeeks + matWeeks });
+          cumulWeeks += matWeeks;
+        }
+        const found = blocMatiereWeeks.find(bm => weekNum >= bm.startWeek && weekNum <= bm.endWeek);
+        if (found) {
+          moduleTitle = bloc.titre;
+          matiereTitle = found.matiere.competence;
+          matiereContenu = found.matiere.contenu;
+          modalitesEval = bloc.modalitesEval || modalitesEval;
+          blocCompetences = bloc.competences;
+          break;
+        }
+      }
+      if (!moduleTitle && rncp.blocsCompetences.length > 0) {
+        const lastBloc = rncp.blocsCompetences[rncp.blocsCompetences.length - 1];
+        moduleTitle = lastBloc.titre;
+        const lastMat = lastBloc.matieres[lastBloc.matieres.length - 1];
+        if (lastMat) { matiereTitle = lastMat.competence; matiereContenu = lastMat.contenu; }
+        modalitesEval = lastBloc.modalitesEval || modalitesEval;
+        blocCompetences = lastBloc.competences;
+      }
     }
   }
 
@@ -8323,7 +8388,12 @@ const FALLBACK_STAGIAIRE: StagiaireInfo = { prenom: "Martin", nom: "Dupont", civ
     ? `<div style="border:1px solid #ccc;padding:8px;background:#f9f9f9"><p>${observation}</p></div>`
     : `<div style="border:1px solid #ccc;min-height:60px;padding:8px">&#160;</div>`;
 
-  let extra = `<h2>EXERCICE PRATIQUE – Semaine CFA ${weekNum} / Exercice ${exInWeek}</h2>
+  const blocLabel = blocIdx !== undefined ? `Bloc ${blocIdx + 1}` : '';
+  const exLabel = exInMatiere !== undefined
+    ? `${blocLabel} – ${matiereTitle || 'Module'} – Ex. ${exInMatiere + 1}/5`
+    : `Semaine CFA ${weekNum} / Exercice ${exInWeek}`;
+
+  let extra = `<h2>EXERCICE PRATIQUE – ${exLabel}</h2>
     <p><strong>Formation :</strong> ${f.intitule}</p>
     ${moduleTitle ? `<p><strong>Bloc de compétences :</strong> ${moduleTitle}</p>` : ''}
     ${matiereTitle ? `<p><strong>Module / Compétence :</strong> ${matiereTitle}</p>` : ''}
@@ -8343,7 +8413,7 @@ const FALLBACK_STAGIAIRE: StagiaireInfo = { prenom: "Martin", nom: "Dupont", civ
     <p><strong>Observations du formateur :</strong></p>
     ${observationBlock}`;
 
-  return buildDocument({ org: o, title: `EXERCICE PRATIQUE – Sem. CFA ${weekNum} Ex. ${exInWeek}`, subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra });
+  return buildDocument({ org: o, title: `EXERCICE PRATIQUE – ${exLabel}`, subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra });
 }
 
 function genExamenBlancCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
