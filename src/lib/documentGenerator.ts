@@ -7053,6 +7053,7 @@ function generateEvalBesoinsAnswers(s: StagiaireInfo, f: FormationInfo, o: Organ
       `Former ${s.prenom} au massage prénatal nous permettra de répondre aux demandes croissantes de nos clientes enceintes et de créer un parcours bien-être complet autour de la maternité.`,
     ];
   } else if (isIA) {
+    contributionEntreprise = [
       `Cette formation permettra à ${s.entreprise} de multiplier par 3 la production de contenus de qualité tout en réduisant les coûts de sous-traitance graphique et rédactionnelle.`,
       `La maîtrise des outils d'IA par ${s.prenom} accélérera la création de campagnes marketing et renforcera la réactivité de la communication de ${s.entreprise} sur les réseaux sociaux.`,
       `L'intégration de l'IA dans nos processus de création de contenus améliorera la compétitivité de ${s.entreprise} et notre capacité à produire des supports professionnels de manière autonome.`,
