@@ -8388,7 +8388,12 @@ const FALLBACK_STAGIAIRE: StagiaireInfo = { prenom: "Martin", nom: "Dupont", civ
     ? `<div style="border:1px solid #ccc;padding:8px;background:#f9f9f9"><p>${observation}</p></div>`
     : `<div style="border:1px solid #ccc;min-height:60px;padding:8px">&#160;</div>`;
 
-  let extra = `<h2>EXERCICE PRATIQUE – Semaine CFA ${weekNum} / Exercice ${exInWeek}</h2>
+  const blocLabel = blocIdx !== undefined ? `Bloc ${blocIdx + 1}` : '';
+  const exLabel = exInMatiere !== undefined
+    ? `${blocLabel} – ${matiereTitle || 'Module'} – Ex. ${exInMatiere + 1}/5`
+    : `Semaine CFA ${weekNum} / Exercice ${exInWeek}`;
+
+  let extra = `<h2>EXERCICE PRATIQUE – ${exLabel}</h2>
     <p><strong>Formation :</strong> ${f.intitule}</p>
     ${moduleTitle ? `<p><strong>Bloc de compétences :</strong> ${moduleTitle}</p>` : ''}
     ${matiereTitle ? `<p><strong>Module / Compétence :</strong> ${matiereTitle}</p>` : ''}
@@ -8408,7 +8413,7 @@ const FALLBACK_STAGIAIRE: StagiaireInfo = { prenom: "Martin", nom: "Dupont", civ
     <p><strong>Observations du formateur :</strong></p>
     ${observationBlock}`;
 
-  return buildDocument({ org: o, title: `EXERCICE PRATIQUE – Sem. CFA ${weekNum} Ex. ${exInWeek}`, subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra });
+  return buildDocument({ org: o, title: `EXERCICE PRATIQUE – ${exLabel}`, subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra });
 }
 
 function genExamenBlancCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
