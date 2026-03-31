@@ -469,6 +469,11 @@ export function buildFullCatalog(
     add("cfa_c3i10_aff_harcelement_sur_site", "CT3 - IND 10 📁 AFFICHAGE – Affiche Non au Harcèlement", 3, 10, "pdf_static", { pdfUrl: "/pdfs/harcelement_sur_site.jpg" });
     add("cfa_c3i10_aff_charte_laicite", "CT3 - IND 10 📁 AFFICHAGE – Charte de la Laïcité", 3, 10, "pdf_static", { pdfUrl: "/pdfs/charte_laicite.pdf" });
     add("cfa_c3i10_aff_contacts_ressources_handicap", "CT3 - IND 10 📁 AFFICHAGE – Contacts Ressources Handicap Formation", 3, 10, "pdf_static", { pdfUrl: "/pdfs/contacts_ressources_handicap.pdf" });
+    // --- IND 10 — Dossier Aide au financement Permis B ---
+    add("cfa_c3i10_permisb_bordereau_transmission", "CT3 - IND 10 📁 PERMIS B – Bordereau de Transmission", 3, 10, "pdf_static", { pdfUrl: "/pdfs/bordereau_transmission_permis_b.pdf" });
+    add("cfa_c3i10_permisb_formulaire_aide", "CT3 - IND 10 📁 PERMIS B – Formulaire Aide au Financement", 3, 10, "pdf_static", { pdfUrl: "/pdfs/formulaire_aide_financement_permis_b.pdf" });
+    add("cfa_c3i10_permisb_permis", "CT3 - IND 10 📁 PERMIS B – Permis B", 3, 10, "pdf_static", { pdfUrl: "/pdfs/permis_b.pdf" });
+    add("cfa_c3i10_permisb_aide_financement", "CT3 - IND 10 📁 PERMIS B – Aide au Financement Permis B", 3, 10, "pdf_static", { pdfUrl: "/pdfs/aide_financement_permis_b.pdf" });
 
     // Documents CFA complémentaires (autres critères)
     add("cfa_c1i1_livret_accueil", "CT1 - IND 1 LIVRET D'ACCUEIL CFA", 1, 1, "livret_accueil_cfa");
