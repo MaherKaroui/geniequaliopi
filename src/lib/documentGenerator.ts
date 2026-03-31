@@ -6708,6 +6708,7 @@ function generateEvalBesoinsAnswers(s: StagiaireInfo, f: FormationInfo, o: Organ
   
   // Detect formation type for coherent answers
   const isFLE = t.includes("français") || t.includes("médico-social") || t.includes("fle") || t.includes("communiquer en");
+  const isMassage = t.includes("massage") || t.includes("prénatal") || t.includes("prenatal") || t.includes("relaxation") || t.includes("bien-être") || t.includes("bien être");
   const isIA = t.includes("intelligence artificielle") || t.includes("ia générative") || t.includes("contenus rédactionnels");
   const isExcel = t.includes("excel");
   const isAnglais = t.includes("anglais") || t.includes("toeic");
@@ -6731,6 +6732,19 @@ function generateEvalBesoinsAnswers(s: StagiaireInfo, f: FormationInfo, o: Organ
       "BEP Carrières sanitaires et sociales",
       "Brevet des collèges (obtenu en France)",
       "DELF A2 – Diplôme d'études en langue française",
+    ];
+  } else if (isMassage) {
+    diplomes = [
+      "CAP Esthétique Cosmétique Parfumerie",
+      "Certificat de praticien en massage bien-être (FFMBE)",
+      "Diplôme d'aide-soignant(e) (DEAS)",
+      "Baccalauréat Sciences et Technologies de la Santé et du Social (ST2S)",
+      "BTS Esthétique Cosmétique Parfumerie",
+      "Titre professionnel Spa praticien",
+      "Attestation de formation en réflexologie plantaire",
+      "Diplôme universitaire (DU) en accompagnement périnatal",
+      "Certificat de sophrologue – RNCP niveau 6",
+      "Diplôme d'État de sage-femme (en reconversion vers le bien-être)",
     ];
   } else if (isIA) {
     diplomes = [
@@ -6871,6 +6885,19 @@ function generateEvalBesoinsAnswers(s: StagiaireInfo, f: FormationInfo, o: Organ
       `Développer chez ${s.prenom} la capacité à communiquer de manière professionnelle et adaptée avec les familles des résidents, en respectant le secret professionnel et les règles de bienveillance.`,
       `Offrir à ${s.prenom} les outils linguistiques pour exercer son métier de ${s.poste} en toute confiance et sécurité, tant dans les gestes professionnels que dans la communication orale et écrite.`,
     ];
+  } else if (isMassage) {
+    attentesOptions = [
+      `Permettre à ${s.prenom} d'acquérir les techniques de massage prénatal sécurisées pour proposer un accompagnement adapté aux femmes enceintes dans le cadre de son activité au sein de ${s.entreprise || "son cabinet"}.`,
+      `Former ${s.prenom} à l'anatomie et à la physiologie de la grossesse pour adapter ses protocoles de massage et garantir la sécurité des femmes enceintes qu'il/elle accompagne.`,
+      `Développer les compétences de ${s.prenom} en techniques de drainage lymphatique et de soulagement des tensions lombaires spécifiques à la grossesse, pour enrichir son offre de services.`,
+      `Accompagner ${s.prenom} dans la maîtrise des positions d'installation sécurisées (décubitus latéral, semi-assise) et des contre-indications au massage prénatal.`,
+      `Permettre à ${s.prenom} d'intégrer le massage prénatal dans son offre de prestations bien-être et d'accompagner les futures mamans tout au long de leur grossesse.`,
+      `Former ${s.prenom} aux techniques de relaxation et de respiration adaptées à la grossesse pour compléter sa pratique de massage par un accompagnement holistique.`,
+      `Donner à ${s.prenom} les compétences pour créer un protocole de séance complet de massage prénatal, de l'anamnèse à la clôture, en toute sécurité.`,
+      `Permettre à ${s.prenom} de se différencier sur le marché du bien-être en ajoutant une spécialisation reconnue en massage prénatal à son offre de services.`,
+      `Accompagner ${s.prenom} dans la connaissance des huiles et produits adaptés à la femme enceinte pour proposer des soins personnalisés et respectueux de la santé maternelle.`,
+      `Former ${s.prenom} à l'écoute active et à l'accompagnement émotionnel de la femme enceinte, compétence essentielle pour une pratique bienveillante du massage prénatal.`,
+    ];
   } else if (isIA) {
     attentesOptions = [
       `Permettre à ${s.prenom} de maîtriser les outils d'IA générative (ChatGPT, Midjourney, DALL-E) pour créer des contenus rédactionnels et visuels professionnels de qualité pour les besoins de communication de ${s.entreprise}.`,
@@ -6966,6 +6993,19 @@ function generateEvalBesoinsAnswers(s: StagiaireInfo, f: FormationInfo, o: Organ
       `${s.prenom} est amené(e) à accueillir les nouveaux résidents, à leur présenter la structure et à les accompagner dans leur phase d'intégration au sein de l'établissement.`,
       `En plus des soins quotidiens, ${s.prenom} participe à la prévention des risques (chutes, dénutrition) et alerte l'équipe médicale en cas de changement d'état de santé des résidents.`,
     ];
+  } else if (isMassage) {
+    missionsEntreprise = [
+      `${s.prenom} propose des séances de massage bien-être et de relaxation aux clientes de ${s.entreprise || "l'institut"}. Il/elle souhaite enrichir son offre avec le massage prénatal pour accompagner les femmes enceintes.`,
+      `En tant que ${s.poste || "praticien(ne) bien-être"}, ${s.prenom} réalise des soins corporels, des massages relaxants et des protocoles de soin personnalisés au sein de ${s.entreprise || "son cabinet"}.`,
+      `${s.prenom} accompagne une clientèle diversifiée en massage bien-être. L'ajout du massage prénatal lui permettra de toucher une nouvelle clientèle et de répondre à une demande croissante.`,
+      `Au sein de ${s.entreprise || "l'espace bien-être"}, ${s.prenom} est chargé(e) de l'accueil des clientes, de la réalisation des soins, de l'hygiène du matériel et du suivi de la satisfaction des clientes.`,
+      `${s.prenom} intervient comme praticien(ne) en massage bien-être à domicile et souhaite se spécialiser dans l'accompagnement des femmes enceintes pour développer cette activité.`,
+      `Les missions de ${s.prenom} incluent la réalisation de massages relaxants, de drainages lymphatiques et de soins corporels. Le massage prénatal complétera naturellement cette palette de compétences.`,
+      `${s.prenom} exerce en tant que ${s.poste || "praticien(ne)"} et cherche à se spécialiser dans le bien-être maternel pour proposer un accompagnement complet de la grossesse au post-partum.`,
+      `En tant qu'esthéticien(ne) chez ${s.entreprise || "l'institut"}, ${s.prenom} souhaite acquérir les techniques de massage prénatal pour compléter son offre de soins dédiés aux futures mamans.`,
+      `${s.prenom} travaille dans le secteur du bien-être et de la relaxation. Le massage prénatal est une spécialisation très demandée par sa clientèle de femmes enceintes.`,
+      `Au sein de ${s.entreprise || "la maternité"}, ${s.prenom} participe à l'accompagnement non médicamenteux des femmes enceintes et souhaite enrichir sa pratique avec le massage prénatal.`,
+    ];
   } else if (isIA) {
     missionsEntreprise = [
       `${s.prenom} est en charge de la création de contenus marketing pour ${s.entreprise} : articles de blog, newsletters mensuelles, posts réseaux sociaux et visuels pour les campagnes de communication.`,
@@ -7004,6 +7044,14 @@ function generateEvalBesoinsAnswers(s: StagiaireInfo, f: FormationInfo, o: Organ
       `Cette formation s'inscrit dans notre politique d'intégration et de valorisation des compétences de nos salariés d'origine étrangère. Elle permettra à ${s.prenom} de s'épanouir professionnellement.`,
       `En développant le français professionnel de ${s.prenom}, nous améliorerons la traçabilité des soins et la conformité de nos pratiques avec les exigences réglementaires du secteur médico-social.`,
     ];
+  } else if (isMassage) {
+    contributionEntreprise = [
+      `Cette formation permettra à ${s.entreprise || "notre structure"} d'enrichir son offre de soins en proposant le massage prénatal, un service très demandé par les futures mamans et qui fidélise une clientèle en pleine croissance.`,
+      `En formant ${s.prenom} au massage prénatal, ${s.entreprise || "notre cabinet"} se positionnera sur un segment de marché porteur et se différenciera de la concurrence par une offre spécialisée.`,
+      `L'ajout du massage prénatal à notre catalogue de prestations attirera une nouvelle clientèle (femmes enceintes, jeunes mamans) et générera un chiffre d'affaires complémentaire pour ${s.entreprise || "notre activité"}.`,
+      `Cette spécialisation renforcera l'image professionnelle de ${s.entreprise || "notre institut"} et apportera une dimension d'accompagnement holistique de la maternité très valorisée.`,
+      `Former ${s.prenom} au massage prénatal nous permettra de répondre aux demandes croissantes de nos clientes enceintes et de créer un parcours bien-être complet autour de la maternité.`,
+    ];
   } else if (isIA) {
     contributionEntreprise = [
       `Cette formation permettra à ${s.entreprise} de multiplier par 3 la production de contenus de qualité tout en réduisant les coûts de sous-traitance graphique et rédactionnelle.`,
@@ -7036,6 +7084,19 @@ function generateEvalBesoinsAnswers(s: StagiaireInfo, f: FormationInfo, o: Organ
       "Mon but est de pouvoir remplir correctement les documents administratifs (fiches d'incident, projets personnalisés, comptes rendus) sans avoir besoin d'aide de mes collègues.",
       "Je veux gagner en confiance dans ma communication écrite et orale en français pour être pleinement intégré(e) à l'équipe et reconnu(e) pour mes compétences professionnelles.",
       "Cette formation est une étape clé pour mon intégration professionnelle durable dans le secteur sanitaire et social en France, secteur dans lequel j'exerce depuis plusieurs années.",
+    ];
+  } else if (isMassage) {
+    objectifOptions = [
+      "Je souhaite acquérir les techniques de massage prénatal pour accompagner les femmes enceintes en toute sécurité et enrichir ma palette de compétences en bien-être maternel.",
+      "Mon objectif est de maîtriser les positions d'installation sécurisées et les protocoles de massage adaptés à chaque trimestre de la grossesse.",
+      "Je veux apprendre à identifier les contre-indications au massage prénatal et à adapter mes techniques aux spécificités anatomiques et physiologiques de la grossesse.",
+      "Cette formation me permettra de proposer des séances de massage prénatal complètes, de l'anamnèse à la clôture, avec un protocole structuré et sécurisé.",
+      "Mon but est de me spécialiser dans l'accompagnement bien-être de la femme enceinte pour développer une activité dédiée à la maternité.",
+      "Je souhaite maîtriser les techniques de drainage lymphatique et de soulagement des tensions lombaires spécifiques à la grossesse pour répondre aux besoins de mes clientes enceintes.",
+      "Mon objectif est d'intégrer les techniques de relaxation et de respiration dans ma pratique de massage pour offrir un accompagnement holistique aux futures mamans.",
+      "Cette formation doit me permettre de connaître les huiles et produits adaptés à la grossesse et de créer des protocoles personnalisés pour chaque cliente.",
+      "Je veux développer mon écoute active et mes compétences en accompagnement émotionnel pour offrir un espace de bien-être bienveillant aux femmes enceintes.",
+      "Mon objectif est de devenir une praticienne reconnue en massage prénatal et de pouvoir accompagner les femmes tout au long de leur grossesse avec des techniques adaptées et sûres.",
     ];
   } else if (isIA) {
     objectifOptions = [
@@ -7131,6 +7192,19 @@ function generateEvalBesoinsAnswers(s: StagiaireInfo, f: FormationInfo, o: Organ
       `Cette formation me rapprochera de mon objectif d'obtenir la nationalité française, pour laquelle un niveau B1 en français est exigé.`,
       `Mon projet est de pouvoir aider les nouvelles recrues étrangères de mon établissement en devenant un relais linguistique au sein de l'équipe.`,
       `À terme, je souhaite créer une petite structure d'aide à domicile, et la maîtrise du français professionnel est indispensable pour les démarches administratives et la relation avec les bénéficiaires.`,
+    ];
+  } else if (isMassage) {
+    projetProOptions = [
+      `Cette formation me permettra de proposer des séances de massage prénatal dans mon cabinet et d'accompagner les femmes enceintes dans leur bien-être physique et émotionnel tout au long de la grossesse.`,
+      `Grâce à cette spécialisation, je pourrai développer une activité dédiée à la maternité (massage prénatal, postnatal, relaxation) et me positionner sur un marché en forte demande.`,
+      `En maîtrisant le massage prénatal, je pourrai enrichir mon offre de services bien-être et fidéliser une clientèle de futures mamans qui cherchent un accompagnement naturel et bienveillant.`,
+      `Cette formation s'inscrit dans mon projet de création d'un espace dédié au bien-être maternel, combinant massage prénatal, sophrologie et accompagnement à la naissance.`,
+      `Mon projet est de devenir une référence locale en massage prénatal et d'être recommandée par les sages-femmes et les maternités de ma région.`,
+      `Grâce à cette formation, je pourrai intégrer le massage prénatal dans mon activité de ${s.poste || "praticien(ne) bien-être"} et répondre à une demande croissante de ma clientèle.`,
+      `Cette spécialisation me permettra de me différencier dans le secteur du bien-être et d'attirer une clientèle spécifique (femmes enceintes, jeunes mamans) avec des besoins précis.`,
+      `Mon projet professionnel est de combiner le massage prénatal avec d'autres techniques (réflexologie, aromathérapie) pour proposer un accompagnement complet de la maternité.`,
+      `Cette formation me donnera la confiance et les compétences nécessaires pour travailler en collaboration avec des professionnels de santé (sages-femmes, gynécologues) autour de l'accompagnement de la grossesse.`,
+      `À terme, je souhaite former d'autres praticiens au massage prénatal et partager cette expertise avec la communauté du bien-être maternel.`,
     ];
   } else if (isIA) {
     projetProOptions = [
