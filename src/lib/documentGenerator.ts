@@ -5265,7 +5265,7 @@ function genLivreApprentissageCFA(o: OrganismeInfo, f: FormationInfo, stagiaires
   const titreFormation = f.intitule || 'Formation en alternance';
   const dateDebut = formatDate(getStagiaireDateDebut(s, f));
   const dateFin = formatDate(getStagiaireDateFin(s, f));
-  const dateSignature = f.dateDebut ? formatDate(subtractBusinessDays(f.dateDebut, 14)) : '____/____/________';
+  const dateSignature = f.dateDebut ? formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || f.dateDebut, 14)) : formatDate(new Date().toISOString().slice(0, 10));
   const sigApprentie = s.signatureUrl ? `<img src="${s.signatureUrl}" style="max-height:60px" />` : '&#160;';
   const tamponCFA = o.tamponUrl ? `<img src="${o.tamponUrl}" style="max-height:80px" />` : '&#160;';
 
