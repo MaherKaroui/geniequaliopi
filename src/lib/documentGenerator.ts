@@ -6733,6 +6733,19 @@ function generateEvalBesoinsAnswers(s: StagiaireInfo, f: FormationInfo, o: Organ
       "Brevet des collèges (obtenu en France)",
       "DELF A2 – Diplôme d'études en langue française",
     ];
+  } else if (isMassage) {
+    diplomes = [
+      "CAP Esthétique Cosmétique Parfumerie",
+      "Certificat de praticien en massage bien-être (FFMBE)",
+      "Diplôme d'aide-soignant(e) (DEAS)",
+      "Baccalauréat Sciences et Technologies de la Santé et du Social (ST2S)",
+      "BTS Esthétique Cosmétique Parfumerie",
+      "Titre professionnel Spa praticien",
+      "Attestation de formation en réflexologie plantaire",
+      "Diplôme universitaire (DU) en accompagnement périnatal",
+      "Certificat de sophrologue – RNCP niveau 6",
+      "Diplôme d'État de sage-femme (en reconversion vers le bien-être)",
+    ];
   } else if (isIA) {
     diplomes = [
       "Baccalauréat général",
