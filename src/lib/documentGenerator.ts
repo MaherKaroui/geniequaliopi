@@ -579,6 +579,16 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
       const si = params?.stagiaireIdx ?? 0;
       return genAttestationReussiteCFAStagiaire(o, f, stagiaires, si);
     }
+    // === IND 10 CFA templates ===
+    case "procedure_abandon_reorientation_cfa": return genProcedureAbandonReorientationCFA(o);
+    case "accompagnement_distanciel_cfa": return genAccompagnementDistancielCFA(o);
+    case "enquete_partenaire_employeur_cfa": return genEnquetePartenaireEmployeurCFA(o, f, stagiaires, params?.stagiaireIdx ?? 0);
+    case "fiche_renseignements_commanditaire_cfa": return genFicheRenseignementsCommanditaireCFA(o, f);
+    case "contrat_apprentissage_mode_emploi_cfa": return genContratApprentissageModeEmploiCFA(o);
+    case "procedure_accueil_beneficiaires_cfa": return genProcedureAccueilBeneficiairesCFA(o, f);
+    case "procedure_adaptation_pedagogique_cfa": return genProcedureAdaptationPedagogiqueCFA(o);
+    case "procedure_gestion_annulations_cfa": return genProcedureGestionAnnulationsCFA(o);
+    case "tableau_suivi_parcours_beneficiaires_cfa_excel": return generateExcelSuiviParcoursBeneficiairesCFA(o, f, stagiaires);
     case "procedure_abandon_cfa": return genProcedureAbandon(o);
     case "procedure_absences_cfa": return genProcedureAbsences(o);
     case "emargement_cfa": return genEmargementCFA(o, f, stagiaires);
