@@ -5210,7 +5210,8 @@ function genLivretAccueilCFA_V2(o: OrganismeInfo, f: FormationInfo, stagiaires: 
 
 function genReglementInterieurCFA_V2(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = stagiaires[si] || stagiaires[0] || { prenom: '___', nom: '___' } as StagiaireInfo;
-  const dateSignature = f.dateDebut ? formatDate(subtractBusinessDays(f.dateDebut, 14)) : '____/____/________';
+  const rawDateDebut = getStagiaireDateDebut(s, f) || f.dateDebut;
+  const dateSignature = rawDateDebut ? formatDate(subtractBusinessDays(rawDateDebut, 14)) : formatDate(new Date().toISOString().slice(0, 10));
   return buildDocument({ org: o, title: "RÈGLEMENT INTÉRIEUR DU CFA", sections: [
     { heading: "Préambule", content: `<p>Le premier objectif de <strong>${o.nom}</strong> est la pleine réussite et l'épanouissement de ses apprenants : réussite aux examens, réussite en entreprise, réussite sur le marché du travail, réussite en matière de développement personnel. L'atteinte de ces ambitions est l'affaire de tous : elle passe nécessairement par une forte implication des apprenants dans leur formation et par le strict respect des règles de vie mentionnées dans ce règlement.</p>` },
 
