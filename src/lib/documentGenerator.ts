@@ -5196,9 +5196,9 @@ function genLivretAccueilCFA_V2(o: OrganismeInfo, f: FormationInfo, stagiaires: 
     // ===== CONSEILS =====
     { heading: "Conseils pour réussir votre alternance", content: `<ul><li>Soyez ponctuel(le) et assidu(e) au CFA et en entreprise</li><li>Organisez votre travail : planning, révisions, dossier professionnel</li><li>Communiquez avec votre tuteur et vos formateurs</li><li>Tenez à jour votre livret d'apprentissage chaque semaine</li><li>N'hésitez pas à solliciter de l'aide dès que vous en ressentez le besoin</li><li>Préparez activement vos épreuves de certification</li></ul>` },
 
-    // ===== ATTESTATION D'ENGAGEMENT =====
-    { heading: "Attestation d'engagement", content: `<p>Je soussigné(e) <strong>${s.civilite || ''} ${s.prenom} ${s.nom}</strong> déclare avoir pris connaissance du présent livret d'accueil, du règlement intérieur et de la charte de l'apprentissage. Je m'engage à respecter l'ensemble des règles et dispositions qui y sont mentionnées.</p><p><strong>Date :</strong> ${dateSignature}</p><br/><p><strong>Signature de l'apprenti(e) :</strong></p><div style="border:1px solid #ccc;min-height:60px;padding:8px">${sigHtml}</div>` },
-  ] });
+     // ===== ATTESTATION D'ENGAGEMENT =====
+    { heading: "Attestation d'engagement", content: `<p>Je soussigné(e) <strong>${s.civilite || ''} ${s.prenom} ${s.nom}</strong> déclare avoir pris connaissance du présent livret d'accueil, du règlement intérieur et de la charte de l'apprentissage. Je m'engage à respecter l'ensemble des règles et dispositions qui y sont mentionnées.</p><p><strong>Date :</strong> ${dateSignature}</p>` },
+  ], signatures: { type: "2", labels: ["Le Directeur du CFA", "L'Apprenti(e) (lu et approuvé)"], names: [o.dirigeant || '___', `${s.prenom} ${s.nom}`], noOrgSignature: true, stagiaireSignatureUrl: s.signatureUrl } });
 }
 
 // ============== CFA IND 9 — RÈGLEMENT INTÉRIEUR V2 (complet 8 articles) ==============
