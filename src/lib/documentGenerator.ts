@@ -448,7 +448,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "procedure_adaptation": return genProcedureAdaptation_V2(o, f);
     case "tableau_suivi_parcours": return genTableauSuiviParcours_V2(o, f, stagiaires);
     case "tableau_suivi_parcours_excel": return genTableauSuiviParcours_V2(o, f, stagiaires);
-    case "tableau_amelioration_continue": return genTableauAmeliorationContinue(o);
+    case "tableau_amelioration_continue": return genTableauAmeliorationContinue(o, f);
     case "tableau_amelioration_continue_excel": return genTableauAmeliorationContinueExcel(o, f, formations, stagiaires);
     case "suivi_dysfonctionnements_excel": return genSuiviDysfonctionnementsExcel(o, f, stagiaires);
     case "relances_appreciations_excel": return genRelancesAppreciationsExcel(o, f, stagiaires);
@@ -8152,16 +8152,115 @@ function genTableauSuiviParcours(o: OrganismeInfo, f: FormationInfo, stagiaires:
   }, signatures: { type: "2", labels: ["Le Formateur", "Le Resp. Pédagogique"], names: [f.formateur, o.responsablePedagogique] } });
 }
 
-function genTableauAmeliorationContinue(o: OrganismeInfo) {
-  return buildDocument({ org: o, title: "TABLEAU D'AMÉLIORATION CONTINUE", table: {
+function genTableauAmeliorationContinue(o: OrganismeInfo, f?: FormationInfo) {
+  const t = (f?.intitule || "").toLowerCase();
+  const isMassage = t.includes("massage") || t.includes("prénatal") || t.includes("prenatal");
+  const isIA = t.includes("intelligence artificielle") || t.includes(" ia ");
+  const isCRM = t.includes("crm") || t.includes("hubspot");
+  const isAnglais = t.includes("anglais") || t.includes("toeic");
+  const isEsth = t.includes("esthétique") || t.includes("cosmétique") || t.includes("cap esthétique");
+  const isFLE = t.includes("français") || t.includes("fle");
+  const isWord = t.includes("word");
+  const isWebmark = t.includes("webmarketing") || t.includes("marketing de contenus") || t.includes("réseaux sociaux");
+  const isNTC = t.includes("négociateur") || t.includes("technico-commercial");
+  const isSAMA = t.includes("secrétaire assistant") || t.includes("médico-administratif") || t.includes("médico-social");
+  const formName = f?.intitule || "la formation";
+
+  let rows: string[][] = [];
+
+  if (isMassage) {
+    rows = [
+      ["1", "Satisfaction", "Demande de plus de pratique sur mannequin", "Ajout d'une demi-journée de pratique sur mannequin de grossesse", o.responsablePedagogique, "T2 2025", "✅"],
+      ["2", "Réclamation", "Huiles de massage inadaptées aux peaux sensibles", "Référencement d'huiles bio hypoallergéniques certifiées", o.referentQualite, "T1 2025", "✅"],
+      ["3", "Veille", "Nouvelles recommandations HAS sur le massage périnatal", "Mise à jour du protocole et des contre-indications", o.responsablePedagogique, "T2 2025", "🔄"],
+      ["4", "Entreprises", "Besoin d'un module relaxation du dos spécifique 3ème trimestre", "Création d'un module complémentaire 3ème trimestre", o.responsablePedagogique, "T3 2025", "📋"],
+      ["5", "Audit", "Fiches anatomiques de la grossesse à actualiser", "Refonte des supports visuels anatomie de la femme enceinte", o.referentQualite, "T2 2025", "✅"],
+    ];
+  } else if (isEsth) {
+    rows = [
+      ["1", "Satisfaction", "Demande de plus de pratique sur modèles vivants", "Augmentation des heures de TP à 60% du temps", o.responsablePedagogique, "T2 2025", "✅"],
+      ["2", "Réclamation", "Produits cosmétiques périmés en salle de TP", "Inventaire trimestriel et renouvellement systématique", o.referentQualite, "T1 2025", "✅"],
+      ["3", "Veille", "Nouvelle réglementation cosmétique européenne (CE 1223/2009)", "Formation du formateur sur les nouvelles normes", o.responsablePedagogique, "T2 2025", "🔄"],
+      ["4", "Entreprises", "Manque de connaissances en conseil personnalisé", "Ajout d'ateliers conseil client et diagnostic de peau", o.responsablePedagogique, "T3 2025", "📋"],
+      ["5", "Audit", "Supports UV/manucure à mettre à jour", "Refonte des fiches techniques soins visage et manucure", o.referentQualite, "T2 2025", "✅"],
+    ];
+  } else if (isAnglais) {
+    rows = [
+      ["1", "Satisfaction", "Demande de plus de mises en situation orales", "Ajout de jeux de rôle professionnels à chaque séance", o.responsablePedagogique, "T2 2025", "✅"],
+      ["2", "Réclamation", "Vocabulaire trop généraliste, pas assez professionnel", "Création de glossaires métier spécifiques par secteur", o.referentQualite, "T1 2025", "✅"],
+      ["3", "Veille", "Évolution du format TOEIC 2025", "Mise à jour des examens blancs et grilles de scoring", o.responsablePedagogique, "T2 2025", "🔄"],
+      ["4", "Entreprises", "Besoin de modules téléphone/visioconférence en anglais", "Développement d'un module communication à distance en anglais", o.responsablePedagogique, "T3 2025", "📋"],
+      ["5", "Audit", "Supports audio de compréhension orale obsolètes", "Renouvellement avec podcasts et vidéos professionnels récents", o.referentQualite, "T2 2025", "✅"],
+    ];
+  } else if (isIA) {
+    rows = [
+      ["1", "Satisfaction", "Demande d'exercices avec des outils IA plus récents", "Intégration de Gemini, Claude et Midjourney dans les TP", o.responsablePedagogique, "T2 2025", "✅"],
+      ["2", "Réclamation", "Prompts d'exemples trop basiques", "Création d'une bibliothèque de prompts avancés par métier", o.referentQualite, "T1 2025", "✅"],
+      ["3", "Veille", "Réglementation IA Act européen", "Mise à jour du module éthique et cadre légal de l'IA", o.responsablePedagogique, "T2 2025", "🔄"],
+      ["4", "Entreprises", "Besoin de cas d'usage IA spécifiques au secteur du client", "Personnalisation des exercices par secteur d'activité", o.responsablePedagogique, "T3 2025", "📋"],
+      ["5", "Audit", "Captures d'écran des outils IA obsolètes", "Refonte des supports avec captures actualisées", o.referentQualite, "T2 2025", "✅"],
+    ];
+  } else if (isCRM) {
+    rows = [
+      ["1", "Satisfaction", "Demande de plus de pratique sur HubSpot/Pipedrive", "Doublement du temps TP avec comptes sandbox dédiés", o.responsablePedagogique, "T2 2025", "✅"],
+      ["2", "Réclamation", "Comptes de démonstration CRM expirés", "Souscription annuelle de licences formation CRM", o.referentQualite, "T1 2025", "✅"],
+      ["3", "Veille", "Nouvelles fonctionnalités CRM (IA intégrée, scoring)", "Mise à jour du module automatisation et scoring prédictif", o.responsablePedagogique, "T2 2025", "🔄"],
+      ["4", "Entreprises", "Besoin d'intégration CRM avec outils existants", "Ajout d'un module intégration CRM/ERP/emailing", o.responsablePedagogique, "T3 2025", "📋"],
+      ["5", "Audit", "Fiches procédure CRM à actualiser", "Refonte des guides pas-à-pas avec captures récentes", o.referentQualite, "T2 2025", "✅"],
+    ];
+  } else if (isNTC) {
+    rows = [
+      ["1", "Satisfaction", "Demande de plus de négociations simulées", "Ajout de 3 mises en situation de négociation filmées", o.responsablePedagogique, "T2 2025", "✅"],
+      ["2", "Réclamation", "Études de cas trop théoriques", "Création de cas réels issus de PME partenaires", o.referentQualite, "T1 2025", "✅"],
+      ["3", "Veille", "Évolution des techniques de vente (social selling)", "Intégration du module social selling et prospection digitale", o.responsablePedagogique, "T2 2025", "🔄"],
+      ["4", "Entreprises", "Manque de suivi post-formation terrain", "Mise en place d'un coaching individuel J+30", o.responsablePedagogique, "T3 2025", "📋"],
+      ["5", "Audit", "Grilles d'évaluation négociation à revoir", "Refonte avec critères RNCP mis à jour", o.referentQualite, "T2 2025", "✅"],
+    ];
+  } else if (isSAMA) {
+    rows = [
+      ["1", "Satisfaction", "Demande de plus de pratique sur logiciels médicaux", "Ajout d'heures TP sur Doctolib et logiciels de facturation T2A", o.responsablePedagogique, "T2 2025", "✅"],
+      ["2", "Réclamation", "Terminologie médicale trop dense en début de formation", "Réorganisation progressive de la terminologie par système", o.referentQualite, "T1 2025", "✅"],
+      ["3", "Veille", "Évolution de la nomenclature CCAM/NGAP", "Mise à jour des supports de facturation et codification", o.responsablePedagogique, "T2 2025", "🔄"],
+      ["4", "Entreprises", "Besoin de mises en situation accueil patient", "Création de scénarios d'accueil et gestion de conflits", o.responsablePedagogique, "T3 2025", "📋"],
+      ["5", "Audit", "Fiches de transcription médicale à actualiser", "Refonte avec dictées médicales actualisées", o.referentQualite, "T2 2025", "✅"],
+    ];
+  } else if (isWebmark) {
+    rows = [
+      ["1", "Satisfaction", "Demande de plus de pratique réseaux sociaux", "Ajout d'ateliers création de contenu sur Instagram/LinkedIn/TikTok", o.responsablePedagogique, "T2 2025", "✅"],
+      ["2", "Réclamation", "Algorithmes présentés déjà obsolètes", "Veille mensuelle et mise à jour des supports algorithmes", o.referentQualite, "T1 2025", "✅"],
+      ["3", "Veille", "Évolution Google Analytics (GA4) et SEO", "Mise à jour du module analytics et référencement", o.responsablePedagogique, "T2 2025", "🔄"],
+      ["4", "Entreprises", "Besoin de stratégie de contenu personnalisée", "Ajout d'un atelier création de calendrier éditorial", o.responsablePedagogique, "T3 2025", "📋"],
+      ["5", "Audit", "Supports réseaux sociaux obsolètes (interfaces changées)", "Refonte des captures d'écran et tutoriels", o.referentQualite, "T2 2025", "✅"],
+    ];
+  } else if (isFLE) {
+    rows = [
+      ["1", "Satisfaction", "Demande de plus de mises en situation du quotidien", "Ajout de jeux de rôle (courses, rendez-vous médical, administration)", o.responsablePedagogique, "T2 2025", "✅"],
+      ["2", "Réclamation", "Rythme trop rapide pour les niveaux A1", "Différenciation pédagogique avec groupes de niveaux", o.referentQualite, "T1 2025", "✅"],
+      ["3", "Veille", "Nouveau référentiel CECRL (volume compagnon)", "Mise à jour des grilles d'évaluation et des objectifs", o.responsablePedagogique, "T2 2025", "🔄"],
+      ["4", "Entreprises", "Besoin de vocabulaire professionnel sectoriel", "Création de modules FLE métier (BTP, restauration, santé)", o.responsablePedagogique, "T3 2025", "📋"],
+      ["5", "Audit", "Supports phonétique et prononciation à renouveler", "Enregistrement de nouveaux audios avec accents variés", o.referentQualite, "T2 2025", "✅"],
+    ];
+  } else if (isWord) {
+    rows = [
+      ["1", "Satisfaction", "Demande de plus d'exercices de mise en page avancée", "Ajout d'ateliers publipostage et documents longs", o.responsablePedagogique, "T2 2025", "✅"],
+      ["2", "Réclamation", "Version de Word différente entre salle et entreprise", "Installation de Word 2021 et Microsoft 365 en parallèle", o.referentQualite, "T1 2025", "✅"],
+      ["3", "Veille", "Nouvelles fonctionnalités Copilot dans Word", "Intégration d'un module IA dans Word (Copilot)", o.responsablePedagogique, "T2 2025", "🔄"],
+      ["4", "Entreprises", "Besoin de modèles de documents professionnels", "Création d'une bibliothèque de templates métier", o.responsablePedagogique, "T3 2025", "📋"],
+      ["5", "Audit", "Supports sur Word 2016 obsolètes", "Refonte complète sur Word 2021/365", o.referentQualite, "T2 2025", "✅"],
+    ];
+  } else {
+    rows = [
+      ["1", "Satisfaction", `Demande de plus de pratique sur ${formName}`, `Augmentation des exercices pratiques à 50% du temps de formation`, o.responsablePedagogique, "T2 2025", "✅"],
+      ["2", "Réclamation", "Délai de réponse aux questions trop long", "Mise en place d'un accusé de réception sous 24h", o.referentQualite, "T1 2025", "✅"],
+      ["3", "Audit", `Supports pédagogiques ${formName} à mettre à jour`, `Refonte des supports de cours et fiches pratiques`, o.responsablePedagogique, "T2 2025", "🔄"],
+      ["4", "Veille", "Évolution réglementaire RNQ V9", "Mise à jour de la charte qualité et des procédures", o.referentQualite, "T1 2025", "✅"],
+      ["5", "Entreprises", "Manque de suivi post-formation", "Mise en place d'un questionnaire de satisfaction à J+90", o.referentQualite, "T3 2025", "📋"],
+    ];
+  }
+
+  return buildDocument({ org: o, title: "TABLEAU D'AMÉLIORATION CONTINUE", subtitle: f?.intitule, table: {
     headers: ["N°", "Source", "Constat", "Action corrective", "Responsable", "Délai", "Statut"],
-    rows: [
-      ["1", "Satisfaction", "Plus de pratique demandée", "Exercices pratiques à 50%", o.responsablePedagogique, "T2 2025", "✅"],
-      ["2", "Réclamation", "Délai réponse long", "Accusé réception sous 24h", o.referentQualite, "T1 2025", "✅"],
-      ["3", "Audit", "Supports à mettre à jour", "Refonte supports", o.responsablePedagogique, "T2 2025", "🔄"],
-      ["4", "Veille", "RNQ V9", "Mise à jour charte qualité", o.referentQualite, "T1 2025", "✅"],
-      ["5", "Entreprises", "Manque suivi post-formation", "Questionnaire J+90", o.referentQualite, "T3 2025", "📋"],
-    ]
+    rows
   }, signatures: { type: "2", labels: ["Le Référent Qualité", "Le Dirigeant"], names: [o.referentQualite, o.dirigeant] } });
 }
 
@@ -8193,16 +8292,62 @@ function genTableauAmeliorationContinueExcel(o: OrganismeInfo, f: FormationInfo,
   <th>Commentaires / avancement</th>
 </tr>`;
 
-  // Generate realistic improvement actions with dates after formation
-  const actions = [
-    { date: dateOuverture, origine: "Analyse indicateurs", desc: "Taux de satisfaction stagiaires inférieur à l'objectif sur le T1", action: "Mise à jour des supports pédagogiques et adaptation du rythme de formation", qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, 60)), cloture: fmtDate(addDays(baseDate, 55)), commentaire: "Supports refondus, satisfaction remontée à 95%" },
-    { date: dateOuverture, origine: "Réclamation stagiaire", desc: "Problème de connexion Internet pendant la formation", action: "Souscription d'une box Internet supplémentaire pour sécuriser la connexion", qui: o.dirigeant, delai: "Immédiat", cloture: fmtDate(addDays(baseDate, 10)), commentaire: "Box installée, plus aucune coupure signalée" },
-    { date: fmtDate(addDays(baseDate, 14)), origine: "Satisfaction parties prenantes", desc: "Demande de formats de formation plus courts", action: "Création de modules intensifs sur 1 journée", qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, 90)), cloture: fmtDate(addDays(baseDate, 75)), commentaire: "3 formations intensives créées et planifiées" },
-    { date: fmtDate(addDays(baseDate, 21)), origine: "Veille réglementaire", desc: "Évolution du guide de lecture Qualiopi V9", action: "Mise à jour de l'ensemble des procédures qualité", qui: o.referentQualite, delai: fmtDate(addDays(baseDate, 120)), cloture: fmtDate(addDays(baseDate, 110)), commentaire: "Procédures mises à jour, revue documentaire terminée" },
-    { date: fmtDate(addDays(baseDate, 30)), origine: "Entretien formateur", desc: "Besoin de formation continue sur les outils numériques", action: "Inscription aux formations IA et outils collaboratifs", qui: o.dirigeant, delai: fmtDate(addDays(baseDate, 150)), cloture: "", commentaire: "Formation programmée" },
-    { date: fmtDate(addDays(baseDate, 45)), origine: "Enquête satisfaction", desc: "Souhait de plus de cas pratiques professionnels", action: "Développement d'exercices basés sur des situations réelles métier", qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, 150)), cloture: "", commentaire: "En cours de développement" },
-    { date: fmtDate(addDays(baseDate, 60)), origine: "Dysfonctionnement", desc: "Retard dans l'envoi des attestations de fin de formation", action: "Automatisation de la génération et l'envoi des attestations", qui: o.referentQualite, delai: fmtDate(addDays(baseDate, 150)), cloture: "", commentaire: "Outil en phase de test" },
-  ];
+  const t = (f.intitule || "").toLowerCase();
+  const isMassage = t.includes("massage") || t.includes("prénatal") || t.includes("prenatal");
+  const isEsth = t.includes("esthétique") || t.includes("cosmétique");
+  const isAnglais = t.includes("anglais") || t.includes("toeic");
+  const isIA = t.includes("intelligence artificielle") || t.includes(" ia ");
+  const isCRM = t.includes("crm") || t.includes("hubspot");
+  const isNTC = t.includes("négociateur") || t.includes("technico-commercial");
+  const isSAMA = t.includes("secrétaire assistant") || t.includes("médico");
+  const isWebmark = t.includes("webmarketing") || t.includes("marketing de contenus") || t.includes("réseaux sociaux");
+  const isFLE = t.includes("français") || t.includes("fle");
+  const isWord = t.includes("word");
+  const formName = f.intitule || "la formation";
+
+  let actions: Array<{ date: string; origine: string; desc: string; action: string; qui: string; delai: string; cloture: string; commentaire: string }> = [];
+
+  if (isMassage) {
+    actions = [
+      { date: dateOuverture, origine: "Enquête satisfaction", desc: "Stagiaires demandent davantage de pratique sur mannequin de grossesse", action: "Ajout d'une demi-journée supplémentaire de pratique guidée sur mannequin", qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, 60)), cloture: fmtDate(addDays(baseDate, 55)), commentaire: "Demi-journée ajoutée, satisfaction en hausse" },
+      { date: dateOuverture, origine: "Réclamation stagiaire", desc: "Huiles de massage provoquant des réactions cutanées chez certaines femmes enceintes", action: "Référencement exclusif d'huiles bio hypoallergéniques certifiées grossesse", qui: o.dirigeant, delai: "Immédiat", cloture: fmtDate(addDays(baseDate, 10)), commentaire: "Huiles bio commandées et livrées" },
+      { date: fmtDate(addDays(baseDate, 14)), origine: "Veille réglementaire", desc: "Nouvelles recommandations HAS sur le massage périnatal et les contre-indications", action: "Mise à jour du protocole de massage et de la liste des contre-indications absolues/relatives", qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, 90)), cloture: fmtDate(addDays(baseDate, 75)), commentaire: "Protocole mis à jour avec les recommandations HAS 2025" },
+      { date: fmtDate(addDays(baseDate, 21)), origine: "Retour formateur", desc: "Manque d'un module spécifique relaxation du 3ème trimestre", action: "Création d'un module complémentaire : techniques de soulagement lombaire et bassin 3ème trimestre", qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, 120)), cloture: fmtDate(addDays(baseDate, 110)), commentaire: "Module créé et intégré au programme" },
+      { date: fmtDate(addDays(baseDate, 30)), origine: "Audit interne", desc: "Fiches anatomiques de la grossesse (trimestres) à actualiser", action: "Refonte des supports visuels anatomie de la femme enceinte avec illustrations médicales récentes", qui: o.referentQualite, delai: fmtDate(addDays(baseDate, 150)), cloture: fmtDate(addDays(baseDate, 140)), commentaire: "Supports refondus avec illustrateur médical" },
+      { date: fmtDate(addDays(baseDate, 45)), origine: "Satisfaction parties prenantes", desc: "Demande d'un livret récapitulatif des gestes à remettre aux stagiaires", action: "Création d'un livret mémo des protocoles de massage prénatal illustré", qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, 150)), cloture: "", commentaire: "En cours de maquettage" },
+      { date: fmtDate(addDays(baseDate, 60)), origine: "Dysfonctionnement", desc: "Table de massage non réglable en hauteur, inconfortable pour les praticiennes", action: "Acquisition de tables de massage électriques réglables adaptées aux femmes enceintes", qui: o.dirigeant, delai: fmtDate(addDays(baseDate, 150)), cloture: "", commentaire: "Devis en cours" },
+    ];
+  } else if (isEsth) {
+    actions = [
+      { date: dateOuverture, origine: "Enquête satisfaction", desc: "Demande de plus de TP sur modèles vivants pour les soins visage", action: "Augmentation des heures de TP modèles vivants à 60% du temps total", qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, 60)), cloture: fmtDate(addDays(baseDate, 55)), commentaire: "Planning TP réorganisé" },
+      { date: dateOuverture, origine: "Réclamation stagiaire", desc: "Produits cosmétiques en salle de TP proches de la date de péremption", action: "Inventaire trimestriel et renouvellement systématique des produits", qui: o.dirigeant, delai: "Immédiat", cloture: fmtDate(addDays(baseDate, 10)), commentaire: "Stock renouvelé, procédure instaurée" },
+      { date: fmtDate(addDays(baseDate, 14)), origine: "Veille réglementaire", desc: "Évolution du règlement cosmétique européen (CE 1223/2009)", action: "Mise à jour du module réglementation et sécurité cosmétique", qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, 90)), cloture: fmtDate(addDays(baseDate, 75)), commentaire: "Module actualisé" },
+      { date: fmtDate(addDays(baseDate, 21)), origine: "Retour entreprises", desc: "Manque de compétences en conseil personnalisé et diagnostic de peau", action: "Ajout d'ateliers conseil client et diagnostic de peau avec dermatoscope", qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, 120)), cloture: fmtDate(addDays(baseDate, 110)), commentaire: "Ateliers créés" },
+      { date: fmtDate(addDays(baseDate, 30)), origine: "Audit interne", desc: "Fiches techniques soins UV et manucure obsolètes", action: "Refonte complète des fiches techniques avec normes actuelles", qui: o.referentQualite, delai: fmtDate(addDays(baseDate, 150)), cloture: "", commentaire: "En cours" },
+      { date: fmtDate(addDays(baseDate, 45)), origine: "Satisfaction", desc: "Souhait de découvrir les nouvelles tendances (nail art, microblading)", action: "Ajout d'un module tendances et innovations esthétiques", qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, 150)), cloture: "", commentaire: "Programmé" },
+      { date: fmtDate(addDays(baseDate, 60)), origine: "Dysfonctionnement", desc: "Stérilisateur UV en panne récurrente", action: "Remplacement du stérilisateur et contrat de maintenance", qui: o.dirigeant, delai: fmtDate(addDays(baseDate, 150)), cloture: "", commentaire: "Devis accepté" },
+    ];
+  } else if (isAnglais) {
+    actions = [
+      { date: dateOuverture, origine: "Enquête satisfaction", desc: "Demande de plus de mises en situation orales professionnelles", action: "Ajout de jeux de rôle (réunion, appel client, présentation) à chaque séance", qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, 60)), cloture: fmtDate(addDays(baseDate, 55)), commentaire: "Jeux de rôle intégrés" },
+      { date: dateOuverture, origine: "Réclamation stagiaire", desc: "Vocabulaire trop généraliste, pas assez orienté métier", action: "Création de glossaires métier (commerce, santé, tech) avec exercices", qui: o.referentQualite, delai: "Immédiat", cloture: fmtDate(addDays(baseDate, 10)), commentaire: "3 glossaires créés" },
+      { date: fmtDate(addDays(baseDate, 14)), origine: "Veille", desc: "Évolution du format TOEIC 2025", action: "Mise à jour des examens blancs et grilles de scoring TOEIC", qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, 90)), cloture: fmtDate(addDays(baseDate, 75)), commentaire: "Examen blanc V2025 créé" },
+      { date: fmtDate(addDays(baseDate, 21)), origine: "Retour entreprises", desc: "Besoin de modules téléphone et visioconférence en anglais", action: "Développement d'un module communication à distance en anglais", qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, 120)), cloture: fmtDate(addDays(baseDate, 110)), commentaire: "Module livré" },
+      { date: fmtDate(addDays(baseDate, 30)), origine: "Audit", desc: "Supports audio de compréhension orale obsolètes", action: "Renouvellement avec podcasts BBC et vidéos TED récentes", qui: o.referentQualite, delai: fmtDate(addDays(baseDate, 150)), cloture: "", commentaire: "En cours de sélection" },
+      { date: fmtDate(addDays(baseDate, 45)), origine: "Satisfaction", desc: "Souhait d'accès à une plateforme e-learning entre les séances", action: "Mise en place d'un accès Babbel/Gymglish pour les intersessions", qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, 150)), cloture: "", commentaire: "Licence en négociation" },
+      { date: fmtDate(addDays(baseDate, 60)), origine: "Dysfonctionnement", desc: "Casques audio défectueux en salle multimédia", action: "Remplacement des casques et achat de casques de réserve", qui: o.dirigeant, delai: fmtDate(addDays(baseDate, 150)), cloture: "", commentaire: "Commande passée" },
+    ];
+  } else {
+    actions = [
+      { date: dateOuverture, origine: "Analyse indicateurs", desc: `Taux de satisfaction stagiaires inférieur à l'objectif sur la formation ${formName}`, action: `Mise à jour des supports pédagogiques et adaptation du rythme de ${formName}`, qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, 60)), cloture: fmtDate(addDays(baseDate, 55)), commentaire: "Supports refondus, satisfaction remontée à 95%" },
+      { date: dateOuverture, origine: "Réclamation stagiaire", desc: "Problème de connexion Internet pendant la formation", action: "Souscription d'une box Internet supplémentaire pour sécuriser la connexion", qui: o.dirigeant, delai: "Immédiat", cloture: fmtDate(addDays(baseDate, 10)), commentaire: "Box installée, plus aucune coupure signalée" },
+      { date: fmtDate(addDays(baseDate, 14)), origine: "Satisfaction parties prenantes", desc: `Demande de formats plus courts et intensifs pour ${formName}`, action: "Création de modules intensifs sur 1 journée", qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, 90)), cloture: fmtDate(addDays(baseDate, 75)), commentaire: "3 formations intensives créées et planifiées" },
+      { date: fmtDate(addDays(baseDate, 21)), origine: "Veille réglementaire", desc: "Évolution du guide de lecture Qualiopi V9", action: "Mise à jour de l'ensemble des procédures qualité", qui: o.referentQualite, delai: fmtDate(addDays(baseDate, 120)), cloture: fmtDate(addDays(baseDate, 110)), commentaire: "Procédures mises à jour, revue documentaire terminée" },
+      { date: fmtDate(addDays(baseDate, 30)), origine: "Entretien formateur", desc: `Besoin de formation continue sur les outils pédagogiques de ${formName}`, action: "Inscription aux formations outils numériques et innovation pédagogique", qui: o.dirigeant, delai: fmtDate(addDays(baseDate, 150)), cloture: "", commentaire: "Formation programmée" },
+      { date: fmtDate(addDays(baseDate, 45)), origine: "Enquête satisfaction", desc: `Souhait de plus de cas pratiques professionnels en ${formName}`, action: "Développement d'exercices basés sur des situations réelles métier", qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, 150)), cloture: "", commentaire: "En cours de développement" },
+      { date: fmtDate(addDays(baseDate, 60)), origine: "Dysfonctionnement", desc: "Retard dans l'envoi des attestations de fin de formation", action: "Automatisation de la génération et l'envoi des attestations", qui: o.referentQualite, delai: fmtDate(addDays(baseDate, 150)), cloture: "", commentaire: "Outil en phase de test" },
+    ];
+  }
 
   actions.forEach(a => {
     xlsHtml += `<tr>
