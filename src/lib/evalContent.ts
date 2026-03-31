@@ -445,6 +445,7 @@ function getContentKey(intitule: string): string {
   if (lower.includes("esthétique") || lower.includes("cosmétique") || lower.includes("cap")) return "CAP Esthétique";
   if (lower.includes("français") || lower.includes("médico-social") || lower.includes("social")) return "FLE Médico-Social";
   if (lower.includes("intelligence artificielle") || lower.includes("ia générative") || lower.includes("contenus rédactionnels")) return "IA Générative";
+  if (lower.includes("massage") || lower.includes("prénatal") || lower.includes("prenatal") || lower.includes("relaxation prénatals")) return "Massage Prénatal";
   return "";
 }
 
