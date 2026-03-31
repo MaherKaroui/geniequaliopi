@@ -443,6 +443,19 @@ export function buildFullCatalog(
         add("cfa_c3i9_guide_connexion", "CT3 - IND 9 GUIDE D'AIDE À LA CONNEXION", 3, 9, "guide_aide_connexion_cfa");
       }
     });
+    // ===== IND 10 — Adaptation de la prestation et accompagnement (CFA) =====
+    add("cfa_c3i10_procedure_abandon_reorientation", "CT3 - IND 10 PROCÉDURE EN CAS D'ABANDON OU RÉORIENTATION", 3, 10, "procedure_abandon_reorientation_cfa");
+    add("cfa_c3i10_accompagnement_distanciel", "CT3 - IND 10 ACCOMPAGNEMENT DISTANCIEL", 3, 10, "accompagnement_distanciel_cfa");
+    stagiaires.forEach((s, si) => {
+      add(`cfa_c3i10_enquete_partenaire_${si}`, `CT3 - IND 10 FICHE DE SUIVI APPRENTI – ${s.prenom} ${s.nom}`, 3, 10, "enquete_partenaire_employeur_cfa", { stagiaireIdx: si });
+    });
+    add("cfa_c3i10_fiche_renseignements_commanditaire", "CT3 - IND 10 FICHE DE RENSEIGNEMENT COMMANDITAIRE", 3, 10, "fiche_renseignements_commanditaire_cfa");
+    add("cfa_c3i10_contrat_apprentissage_mode_emploi", "CT3 - IND 10 CONTRAT D'APPRENTISSAGE – MODE D'EMPLOI", 3, 10, "contrat_apprentissage_mode_emploi_cfa");
+    add("cfa_c3i10_procedure_accueil_beneficiaires", "CT3 - IND 10 PROCÉDURE D'ACCUEIL DES BÉNÉFICIAIRES", 3, 10, "procedure_accueil_beneficiaires_cfa");
+    add("cfa_c3i10_procedure_adaptation_pedagogique", "CT3 - IND 10 PROCÉDURE D'ADAPTATION PÉDAGOGIQUE", 3, 10, "procedure_adaptation_pedagogique_cfa");
+    add("cfa_c3i10_procedure_gestion_annulations", "CT3 - IND 10 PROCÉDURE DE GESTION DES ANNULATIONS", 3, 10, "procedure_gestion_annulations_cfa");
+    add("cfa_c3i10_tableau_suivi_parcours_excel", "CT3 - IND 10 TABLEAU DE SUIVI DU PARCOURS BÉNÉFICIAIRES (Excel)", 3, 10, "tableau_suivi_parcours_beneficiaires_cfa_excel");
+
     // Documents CFA complémentaires (autres critères)
     add("cfa_c1i1_livret_accueil", "CT1 - IND 1 LIVRET D'ACCUEIL CFA", 1, 1, "livret_accueil_cfa");
     add("cfa_procedure_psh", "Procédure PSH CFA", 6, 26, "procedure_psh_cfa");

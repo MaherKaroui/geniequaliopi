@@ -541,3 +541,126 @@ export function genPreuveVeilleAmeliorationCFA(o: OrganismeInfo) {
     { heading: "Amélioration continue", content: "<p>☑ Plan d'amélioration CFA<br>☑ Synthèse qualité CFA<br>☑ Tableau des indicateurs CFA<br>☑ Actions correctives mises en place</p>", variant: "green" },
   ] });
 }
+
+// ========== IND 10 — ADAPTATION ET ACCOMPAGNEMENT CFA ==========
+
+export function genProcedureAbandonReorientationCFA(o: OrganismeInfo) {
+  return buildDocument({ org: o, title: "PROCÉDURE EN CAS D'ABANDON OU RÉORIENTATION OU D'ACCOMPAGNEMENT", sections: [
+    { heading: "Objectif", content: `<p>Le référent pédagogique s'assure de l'accompagnement des apprentis en cas de réorientation ou d'abandon durant la formation. Il aide à chercher d'autres axes et moyens pour la suite de leurs études, et fait appel à un réseau d'entreprise.</p>` },
+    { heading: "Mission Locale et aides pour la jeunesse", content: `<ul><li>Soutenir les jeunes en formation en CFA en recherche de contrat d'apprentissage</li><li>Proposer une orientation vers la prépa apprentissage aux jeunes les plus en difficulté qui n'ont pas encore finalisé leur projet professionnel, qui ne possèdent pas le niveau de maîtrise du socle commun de compétences ou ceux qui ne sont ni en scolarité, ni en formation, ni en emploi</li><li>Inciter les CFA à alimenter le tableau de bord de l'apprentissage, outil d'amélioration de la qualité du pilotage de l'apprentissage</li></ul>` },
+    { heading: "Les Centres d'Information et d'Orientation (CIO)", content: `<p>Les CIO accueillent tous les publics et les informent sur les métiers, les formations et les aident dans leur orientation professionnelle :</p><ul><li>Accueillir tout public et en priorité des jeunes scolarisés et de leur famille</li><li>Informer sur les études, les formations professionnelles, les qualifications et les professions</li><li>Conseiller les personnes</li><li>Observer et analyser les transformations locales du système éducatif et des évolutions du marché du travail</li><li>Animer les échanges et les réflexions entre les partenaires du système éducatif, les parents, les jeunes, les décideurs locaux et les responsables économiques</li></ul>` },
+    { heading: "Salaire moyen après la formation", content: `<p>Compte tenu de la diversité des diplômes préparés en CFA, il est impossible de donner un salaire moyen après la formation. Cependant, il faut noter qu'ayant été apprenti et pouvant ainsi justifier d'une expérience d'une à plusieurs années dans un secteur, l'apprenti sera apte à négocier son salaire à la hausse.</p>` },
+    { heading: "Débouchés et métiers après la formation", content: `<p>Pas de métier type en sortie de CFA car cela dépendra du diplôme préparé. Selon celui-ci, l'apprenti pourra être agent opérationnel, manager, à son compte... Les possibilités sont multiples.</p><p>Quelques chiffres : selon une enquête de la Dares, 58 % des apprentis l'étaient dans la fonction tertiaire. L'apprentissage n'est donc plus seulement la chasse gardée de l'artisanat ou de l'industrie. Des secteurs comme la banque, l'assurance ou encore l'informatique cherchent chaque année à recruter de nouveaux apprentis.</p>` },
+    { heading: "Formations supérieures accessibles", content: `<p>Après un cursus en CFA, plusieurs options s'offrent à l'apprenti : continuer ses études ou s'insérer professionnellement. S'il décide de continuer ses études, cela sera possible en alternance ou en formation continue : Licence en 3ème année à l'université après un BTS, Master, Licence Professionnelle, écoles de commerce, écoles d'ingénieurs...</p>` },
+  ] });
+}
+
+export function genAccompagnementDistancielCFA(o: OrganismeInfo) {
+  return buildDocument({ org: o, title: "DOCUMENTS ET SUIVI – ACCOMPAGNEMENT DISTANCIEL", sections: [
+    { heading: "Documents et Suivi", content: `<p>Les preuves de temps de connexion, présentation des élèves à la certification et relance, preuve de contrat, règlement intérieur, CGV (signés) / Attestation de présence et de réussite, envoi des évaluations et grilles d'acquisition. Bilan à chaud et à froid ainsi que le suivi pédagogique sur ${o.nom} entre le stagiaire et le formateur.</p>` },
+    { heading: "Moyens pédagogiques et techniques – Distanciel", content: `<p>Les stagiaires ont accès à l'ensemble des outils : bibliothèques avec ressources numériques et documentaires, espace numérique de travail, plateforme interactive...</p><p>Les modalités d'enseignement sont adaptées aux objectifs du programme.</p><p>Outils pour la formation à distance LMS (échanges asynchrones : mails, partage de fichiers, mise en commun d'informations trouvées par les apprenants, mutualisation de travaux, forums thématiques)</p>` },
+    { heading: "Assistance technique et Pédagogique", content: `<p>Les modules proposent des fiches d'activités qui permettent de s'approprier les notions proposées à partir de la réflexion sur une pratique.</p><p>La formation proposée est une Formation Ouverte et à Distance qui met les apprenants en situation de formation sur Internet afin qu'ils expérimentent eux-mêmes les conditions d'un apprentissage à distance.</p><p>La situation d'autonomie des apprenants est soutenue par un environnement riche en ressources, théoriques et pratiques, complémentaires au programme. Le dispositif s'appuie sur le groupe des apprenants, constitué en communauté d'apprentissage, avec l'accompagnement méthodologique des formateurs/tuteurs.</p><p>Le planning des sessions, ainsi qu'un mail de relance est envoyé avant, pendant et après la formation.</p><p>Évaluation répartie tout au long de la formation dans chaque axe de la formation en distanciel, permettant d'évaluer le niveau de l'apprenant en début et en sortie de formation.</p>` },
+  ] });
+}
+
+export function genEnquetePartenaireEmployeurCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
+  const s = stagiaires[si] || stagiaires[0];
+  return buildDocument({ org: o, title: "FICHE DE SUIVI APPRENTI(E)", extraHtml: `
+    <p style="margin-bottom:20px">Afin de suivre au mieux votre apprenti et assurer un lien constant entre l'école et l'entreprise, nous vous proposons cette fiche d'évaluation permettant d'évaluer le jeune que vous accueillez dans votre établissement.</p>
+    <p>Merci de nous retourner cette fiche remplie à notre chargé de pédagogie professionnelle à l'adresse suivante : <strong>${o.email}</strong></p>
+    <p>En vous remerciant très chaleureusement.</p>
+    <table style="width:100%;border-collapse:collapse;margin-top:20px">
+      <tr><td style="padding:8px;border:1px solid #ccc"><strong>Nom et prénom de votre apprenti(e) :</strong></td><td style="padding:8px;border:1px solid #ccc">${s.prenom} ${s.nom}</td></tr>
+      <tr><td style="padding:8px;border:1px solid #ccc"><strong>Nom et prénom du maître d'apprentissage :</strong></td><td style="padding:8px;border:1px solid #ccc">${s.entreprise || '___________________'}</td></tr>
+    </table>
+    <table style="width:100%;border-collapse:collapse;margin-top:20px">
+      <tr style="background:#1e3a7b;color:white"><th style="padding:8px;border:1px solid #ccc;text-align:left">Critère</th><th style="padding:8px;border:1px solid #ccc">Très satisfaisant</th><th style="padding:8px;border:1px solid #ccc">Satisfaisant</th><th style="padding:8px;border:1px solid #ccc">À améliorer</th></tr>
+      <tr><td style="padding:8px;border:1px solid #ccc">Montée en compétence de votre apprenti(e)</td><td style="padding:8px;border:1px solid #ccc;text-align:center">☑</td><td style="padding:8px;border:1px solid #ccc;text-align:center">☐</td><td style="padding:8px;border:1px solid #ccc;text-align:center">☐</td></tr>
+      <tr><td style="padding:8px;border:1px solid #ccc">Implication de votre apprenti(e)</td><td style="padding:8px;border:1px solid #ccc;text-align:center">☐</td><td style="padding:8px;border:1px solid #ccc;text-align:center">☑</td><td style="padding:8px;border:1px solid #ccc;text-align:center">☐</td></tr>
+      <tr><td style="padding:8px;border:1px solid #ccc">Ponctualité de votre apprenti(e)</td><td style="padding:8px;border:1px solid #ccc;text-align:center">☑</td><td style="padding:8px;border:1px solid #ccc;text-align:center">☐</td><td style="padding:8px;border:1px solid #ccc;text-align:center">☐</td></tr>
+    </table>
+    <p style="margin-top:20px"><strong>Commentaires (optionnel) :</strong></p>
+    <div style="border:1px solid #ccc;min-height:60px;padding:10px;margin-top:5px">Bon apprenti, motivé et impliqué dans les missions confiées.</div>
+  ` });
+}
+
+export function genFicheRenseignementsCommanditaireCFA(o: OrganismeInfo, f: FormationInfo) {
+  return buildDocument({ org: o, title: "FICHE DE RENSEIGNEMENT COMMANDITAIRE", extraHtml: `
+    <p><strong>Date du contact :</strong> ____ / ____ / ________</p>
+    <h3 style="margin-top:20px">1. L'entreprise (ou « le demandeur » si votre client est un particulier)</h3>
+    <table style="width:100%;border-collapse:collapse;margin-top:10px">
+      <tr><td style="padding:8px;border:1px solid #ccc;width:35%;font-weight:bold">Nom de l'entreprise</td><td style="padding:8px;border:1px solid #ccc"></td></tr>
+      <tr><td style="padding:8px;border:1px solid #ccc;font-weight:bold">Nom et prénom du responsable</td><td style="padding:8px;border:1px solid #ccc"></td></tr>
+      <tr><td style="padding:8px;border:1px solid #ccc;font-weight:bold">Nom et prénom du contact</td><td style="padding:8px;border:1px solid #ccc"></td></tr>
+      <tr><td style="padding:8px;border:1px solid #ccc;font-weight:bold">Adresse</td><td style="padding:8px;border:1px solid #ccc"></td></tr>
+      <tr><td style="padding:8px;border:1px solid #ccc;font-weight:bold">Téléphone</td><td style="padding:8px;border:1px solid #ccc"></td></tr>
+      <tr><td style="padding:8px;border:1px solid #ccc;font-weight:bold">E-mail</td><td style="padding:8px;border:1px solid #ccc"></td></tr>
+      <tr><td style="padding:8px;border:1px solid #ccc;font-weight:bold">Activité</td><td style="padding:8px;border:1px solid #ccc"></td></tr>
+      <tr><td style="padding:8px;border:1px solid #ccc;font-weight:bold">Code NAF</td><td style="padding:8px;border:1px solid #ccc"></td></tr>
+      <tr><td style="padding:8px;border:1px solid #ccc;font-weight:bold">Numéro SIRET</td><td style="padding:8px;border:1px solid #ccc"></td></tr>
+      <tr><td style="padding:8px;border:1px solid #ccc;font-weight:bold">Nombre de salariés</td><td style="padding:8px;border:1px solid #ccc"></td></tr>
+      <tr><td style="padding:8px;border:1px solid #ccc;font-weight:bold">OPCO</td><td style="padding:8px;border:1px solid #ccc"></td></tr>
+    </table>
+    <h3 style="margin-top:20px">2. Les stagiaires et les formations</h3>
+    <table style="width:100%;border-collapse:collapse;margin-top:10px">
+      <tr style="background:#1e3a7b;color:white"><th style="padding:8px;border:1px solid #ccc">Nom et prénom</th><th style="padding:8px;border:1px solid #ccc">Fonction dans l'entreprise</th><th style="padding:8px;border:1px solid #ccc">Intitulé de la formation</th><th style="padding:8px;border:1px solid #ccc">Durée</th><th style="padding:8px;border:1px solid #ccc">Dates prévisionnelles</th></tr>
+      <tr><td style="padding:8px;border:1px solid #ccc"></td><td style="padding:8px;border:1px solid #ccc"></td><td style="padding:8px;border:1px solid #ccc">${f.intitule}</td><td style="padding:8px;border:1px solid #ccc">${f.duree}</td><td style="padding:8px;border:1px solid #ccc">${formatDate(f.dateDebut)} – ${formatDate(f.dateFin)}</td></tr>
+    </table>
+    <p style="margin-top:10px"><strong>Lieu de la formation :</strong> ${f.lieu || o.adresse + ', ' + o.codePostal + ' ' + o.ville}</p>
+    <p><strong>Si formation sur site :</strong> Les locaux de l'entreprise sont-ils appropriés ? _______________</p>
+    <p><strong>Besoin spécifique lié à une situation de handicap d'un salarié ?</strong> _______________</p>
+    <h3 style="margin-top:20px">3. Les adaptations à prévoir :</h3>
+    <div style="border:1px solid #ccc;min-height:60px;padding:10px;margin-top:5px"></div>
+  ` });
+}
+
+export function genContratApprentissageModeEmploiCFA(o: OrganismeInfo) {
+  return buildDocument({ org: o, title: "CONTRAT D'APPRENTISSAGE – MODE D'EMPLOI", sections: [
+    { heading: "C'est quoi l'apprentissage ?", content: `<p>C'est un contrat de travail en CDD ou CDI alternant les périodes d'apprentissage en entreprise et en Centre de Formation d'Apprentis en vue de l'obtention d'un diplôme ou d'un titre professionnel. La formation est gratuite pour l'apprenti(e).</p><ul><li>Sont concernés les jeunes de 15 à 30 ans et les personnes en situation de handicap sans limite d'âge maximum</li><li>Tous les établissements publics ou privés disposant d'un numéro SIRET en France peuvent signer un contrat d'apprentissage</li><li>Le contrat peut commencer 3 mois avant et après le début du cycle de la formation</li><li>Les métiers et formations de tout niveau peuvent être suivis (du CAP au BAC +5)</li><li>L'apprenti(e) doit être accompagné(e) par un Maître d'Apprentissage</li><li>Le temps de travail de l'apprenti est identique à celui des autres salariés (35h max pour les mineurs)</li></ul><p><strong>SANS CONTRAT IL NE PEUT Y AVOIR D'INSCRIPTION.</strong></p>` },
+    { heading: "Rémunération de l'apprenti(e)", content: `<p>L'apprenti(e) perçoit une rémunération déterminée en pourcentage du SMIC :</p>
+    <table style="width:100%;border-collapse:collapse;margin-top:10px"><tr style="background:#1e3a7b;color:white"><th style="padding:6px;border:1px solid #ccc">Âge</th><th style="padding:6px;border:1px solid #ccc">1ère année</th><th style="padding:6px;border:1px solid #ccc">2ème année</th><th style="padding:6px;border:1px solid #ccc">3ème année</th></tr>
+    <tr><td style="padding:6px;border:1px solid #ccc">16 - 17 ans</td><td style="padding:6px;border:1px solid #ccc">27% – 486,48 EUR</td><td style="padding:6px;border:1px solid #ccc">39% – 702,70 EUR</td><td style="padding:6px;border:1px solid #ccc">55% – 990,99 EUR</td></tr>
+    <tr><td style="padding:6px;border:1px solid #ccc">18 - 20 ans</td><td style="padding:6px;border:1px solid #ccc">43% – 774,77 EUR</td><td style="padding:6px;border:1px solid #ccc">51% – 918,91 EUR</td><td style="padding:6px;border:1px solid #ccc">67% – 1 207,20 EUR</td></tr>
+    <tr><td style="padding:6px;border:1px solid #ccc">21 - 25 ans</td><td style="padding:6px;border:1px solid #ccc">53% – 954,95 EUR</td><td style="padding:6px;border:1px solid #ccc">61% – 1 099,09 EUR</td><td style="padding:6px;border:1px solid #ccc">78% – 1 405,40 EUR</td></tr>
+    <tr><td style="padding:6px;border:1px solid #ccc">26 ans +</td><td colspan="3" style="padding:6px;border:1px solid #ccc">100% du SMIC – 1 801,80 EUR</td></tr></table>` },
+    { heading: "Formalités pour conclure un contrat", content: `<p>Le contrat d'apprentissage est conclu à l'aide d'un formulaire type signé par l'employeur et l'apprenti(e) (Formulaire Cerfa FA 13).</p><ol><li>Vérifier que les conditions pour accueillir un apprenti sont remplies (Maître d'Apprentissage qualifié)</li><li>Remplir le formulaire avec le futur apprenti et le CFA</li><li>Déposer le contrat à l'OPCO dans les 5 jours ouvrables</li></ol>` },
+    { heading: "Maître d'apprentissage", content: `<p>Le maître d'apprentissage est la personne directement responsable de l'apprenti dans l'entreprise. Il doit être :<br>- Salarié de l'entreprise, volontaire, majeur et offrant toutes garanties de moralité<br>- Titulaire d'un diplôme au moins du même niveau que celui préparé par l'apprenti, avec 1 an minimum d'expérience professionnelle en rapport avec la qualification préparée, OU justifier de 2 années d'expérience professionnelle en rapport avec la qualification préparée.</p>` },
+  ] });
+}
+
+export function genProcedureAccueilBeneficiairesCFA(o: OrganismeInfo, f: FormationInfo) {
+  return buildDocument({ org: o, title: "PROCÉDURE D'ACCUEIL ET D'ACCOMPAGNEMENT DES STAGIAIRES TOUT AU LONG DE LA FORMATION", sections: [
+    { heading: "Accueil et accompagnement", content: `<p>Tout au long de la formation, les stagiaires sont accueillis de la façon suivante :</p><ul>
+    <li>Dès leur arrivée, les stagiaires sont accueillis par le formateur qui s'assure d'être présent le premier. Au préalable, le formateur prépare la salle et vérifie le bon fonctionnement des équipements et la disponibilité du matériel prévu.</li>
+    <li>Au début de la formation, le formateur fournit des informations sur la configuration des locaux, les horaires de début, les horaires des pauses, les horaires de fin, le règlement intérieur, le déroulement de la formation, les connexions wifi, le matériel utilisé, les modalités de repas et de pause.</li>
+    <li>Au démarrage de la formation, le formateur recueille les attentes des participants.</li>
+    <li>Durant la formation, le formateur informe les stagiaires sur les modalités pédagogiques, les supports remis, les objectifs de la formation, les modalités d'évaluation des acquis et d'évaluation de la formation, le contenu du programme du stage.</li>
+    <li>Durant tout le déroulement du stage, le formateur s'assure du suivi et de la progression pédagogique de chaque participant, d'une façon personnalisée. Il répond à chaque question des participants.</li>
+    <li>À la fin de la formation, le formateur évalue l'atteinte des objectifs, la satisfaction des attentes, identifie les points à améliorer, remet une attestation de fin de formation, et indique comment le contacter après la formation pour répondre aux éventuelles questions.</li>
+    <li>Après la formation, il s'assure de la remise en état de la salle, de son rangement et de sa propreté.</li></ul>` },
+    { heading: "1. Sécurité et confort des stagiaires", content: `<p>Tout au long de la présence des stagiaires dans les locaux de la formation, le formateur s'assure de leur sécurité et de leur confort.</p>` },
+  ] });
+}
+
+export function genProcedureAdaptationPedagogiqueCFA(o: OrganismeInfo) {
+  return buildDocument({ org: o, title: "PROCÉDURE D'ADAPTATION DES MODALITÉS PÉDAGOGIQUES AUX OBJECTIFS ET AU PUBLIC DE LA FORMATION", extraHtml: `
+    <p>Je soussigné(e) ${o.dirigeant} agissant en qualité de responsable légal(e) de l'organisme de formation ${o.nom}, atteste de l'adaptation des modalités pédagogiques aux objectifs et au public de la formation selon le descriptif fourni ci-dessous :</p>
+    <ul style="margin-top:15px">
+      <li>Diagnostic du bénéficiaire et adaptation de l'action de formation pour les personnes en situation de handicap</li>
+      <li>Évaluation des pré-requis des stagiaires (test de positionnement début)</li>
+      <li>Apport théorique et vécu (expérience sur le champ de la formation et de l'audit)</li>
+      <li>Réflexions sur les cas réels</li>
+      <li>Mises en situation par questionnement collectif</li>
+      <li>Retours d'expériences sur les formations réalisées</li>
+      <li>Tests de contrôle de connaissances en fin de formation (évaluation de fin de formation)</li>
+    </ul>
+  ` });
+}
+
+export function genProcedureGestionAnnulationsCFA(o: OrganismeInfo) {
+  return buildDocument({ org: o, title: "PROCÉDURE DE GESTION DES ANNULATIONS", sections: [
+    { heading: "Annulation + de 15 jours avant l'entrée en formation", content: `<ul><li>Proposition de report de dates par mail (garder une trace écrite) + relance téléphone</li><li>Restitution de l'acompte si l'annulation définitive</li></ul>` },
+    { heading: "Annulation - de 15 jours avant l'entrée en formation", content: `<ul><li>Proposition de report de dates par mail (garder une trace écrite) + relance téléphone</li><li>Acompte non restitué sauf contre justificatif pour cause majeure dûment reconnue</li></ul>` },
+    { heading: "Abandon en cours de formation", content: `<ul><li>Dans le cas où un stagiaire ne se présente pas et ne signe pas la feuille d'émargement, il est rappelé dans la demi-journée pour information</li><li>Soit un imprévu ne lui permet pas de continuer la formation et de nouvelles dates sont fixées</li><li>Soit nous demandons au stagiaire de justifier son abandon afin de le comprendre et de mettre en place des modifications si les raisons nous incombent</li><li>Si Abandon sans nouvelles : relances mail, téléphone, sms – copier sur un doc Word et enregistrer dans son dossier</li><li>Abandon sans report de dates de formation : Facturer les heures au réel si justificatif d'absence fourni</li></ul>` },
+  ] });
+}
