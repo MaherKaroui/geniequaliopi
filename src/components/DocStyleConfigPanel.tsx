@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { DocStyleConfig, DEFAULT_DOC_STYLE, DocTheme } from "@/types/qualiopi";
+import { DocStyleConfig, DEFAULT_DOC_STYLE, DocTheme, HeadingStyle } from "@/types/qualiopi";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
