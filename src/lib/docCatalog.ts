@@ -413,6 +413,20 @@ export function buildFullCatalog(
     add("cfa_c3i9_pdf_guide_numerique_psh", "CT3 - IND 9 GUIDE NUMÉRIQUE PSH", 3, 9, "pdf_static", { pdfFile: "CT3_IND9_GUIDE_NUMERIQUE_PSH.pdf" });
     add("cfa_c3i9_pdf_droit_apprentis", "CT3 - IND 9 DROIT DES APPRENTIS", 3, 9, "pdf_static", { pdfFile: "CT3_IND9_DROIT_DES_APPRENTIS.pdf" });
     add("cfa_c3i9_suivi_inscriptions_excel", "CT3 - IND 9 SUIVI DES INSCRIPTIONS (Excel)", 3, 9, "suivi_inscriptions_excel");
+    // Livre d'apprentissage — un par stagiaire
+    stagiaires.forEach((s, si) => {
+      add(`cfa_c3i9_livre_apprentissage_${si}`, `CT3 - IND 9 LIVRE D'APPRENTISSAGE – ${s.prenom} ${s.nom}`, 3, 9, "livre_apprentissage_cfa", { stagiaireIdx: si });
+    });
+    // Convocation à la formation CFA — un par stagiaire
+    stagiaires.forEach((s, si) => {
+      add(`cfa_c3i9_convocation_${si}`, `CT3 - IND 9 CONVOCATION À LA FORMATION – ${s.prenom} ${s.nom}`, 3, 9, "convocation_cfa", { stagiaireIdx: si });
+    });
+    // CGV CFA — un par stagiaire
+    stagiaires.forEach((s, si) => {
+      add(`cfa_c3i9_cgv_${si}`, `CT3 - IND 9 CONDITIONS GÉNÉRALES DE VENTE (CGV) – ${s.prenom} ${s.nom}`, 3, 9, "cgv_cfa", { stagiaireIdx: si });
+    });
+    // Procédure d'accueil et d'adaptation pédagogique
+    add("cfa_c3i9_procedure_accueil_adaptation", "CT3 - IND 9 PROCÉDURE D'ACCUEIL ET D'ADAPTATION PÉDAGOGIQUE", 3, 9, "procedure_accueil_adaptation_cfa");
     // Droit à l'image — un par stagiaire
     stagiaires.forEach((s, si) => {
       add(`cfa_c3i9_droit_image_${si}`, `CT3 - IND 9 DEMANDE D'AUTORISATION DROIT À L'IMAGE – ${s.prenom} ${s.nom}`, 3, 9, "droit_image_cfa", { stagiaireIdx: si });

@@ -537,6 +537,10 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "dossier_accompagnement_psh_cfa": return genDossierPSH(o);
     case "guide_aide_connexion_cfa": return genMailAideConnexion(o, f);
     case "convention_formation_apprentissage": return genConventionFormationApprentissage(o, f, stagiaires, params?.stagiaireIdx ?? 0);
+    case "livre_apprentissage_cfa": return genLivreApprentissageCFA(o, f, stagiaires, params?.stagiaireIdx ?? 0);
+    case "convocation_cfa": return genConvocationCFA(o, f, stagiaires, params?.stagiaireIdx ?? 0);
+    case "cgv_cfa": return genCGVCFA(o, f, stagiaires, params?.stagiaireIdx ?? 0);
+    case "procedure_accueil_adaptation_cfa": return genProcedureAccueilAdaptationCFA(o, f);
     case "plaquette_commerciale_cfa": return genPlaquetteCommercialeCFA(o, f);
     case "procedure_inscription_cfa": return genProcedureInscriptionCFA(o, f);
     case "procedure_formation_cfa": return genProcedureFormationCFA(o, f);
@@ -5249,6 +5253,219 @@ function genReglementInterieurCFA_V2(o: OrganismeInfo, f: FormationInfo, stagiai
     { heading: "Article 8 : Représentation des apprenants", content: `<h4>Délégué de classe</h4><p>Pour les formations de plus de 400 heures :</p><ul><li>Tous les apprenants sont électeurs et éligibles</li><li>Élection d'un délégué titulaire et d'un suppléant au scrutin uninominal à deux tours</li><li>Le scrutin a lieu dans les deux mois suivant le début de la formation</li><li>Les délégués représentent les apprenants dans tous les conseils de classe</li><li>Ils font toute suggestion pour améliorer les conditions de formation</li></ul>
 <h4>Conseil de Perfectionnement</h4><p>Le Conseil de Perfectionnement se réunit au moins une fois par an. Il est composé de représentants parmi les apprenants, le personnel administratif et l'équipe pédagogique. Il est présidé par le Directeur. Chaque réunion fait l'objet d'un procès-verbal.</p>` },
   ], signatures: { type: "2", labels: ["Le Directeur du CFA", "L'Apprenti(e) (lu et approuvé)"], names: [o.dirigeant || '___', `${s.prenom} ${s.nom}`], noOrgSignature: true, stagiaireSignatureUrl: s.signatureUrl } });
+}
+
+// ============== CFA IND 9 — LIVRE D'APPRENTISSAGE (complet, par stagiaire) ==============
+
+function genLivreApprentissageCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
+  const s = stagiaires[si] || stagiaires[0] || { prenom: '___', nom: '___', entreprise: '___' } as StagiaireInfo;
+  const rncp = getRNCPByCode(f.codeRNCP || '');
+  const titreFormation = f.intitule || 'Formation en alternance';
+  const dateDebut = formatDate(getStagiaireDateDebut(s, f));
+  const dateFin = formatDate(getStagiaireDateFin(s, f));
+  const dateSignature = f.dateDebut ? formatDate(subtractBusinessDays(f.dateDebut, 14)) : '____/____/________';
+  const sigApprentie = s.signatureUrl ? `<img src="${s.signatureUrl}" style="max-height:60px" />` : '&#160;';
+  const tamponCFA = o.tamponUrl ? `<img src="${o.tamponUrl}" style="max-height:80px" />` : '&#160;';
+
+  const blocsHtml = rncp ? rncp.blocsCompetences.map((b, i) =>
+    `<p><strong>Bloc ${i + 1} (CCP${i + 1}) :</strong> ${b.titre}</p><ul>${b.competences.map(c => `<li>${c}</li>`).join('')}</ul>`
+  ).join('') : '<p>Voir programme détaillé de la formation.</p>';
+
+  const grilleRows = rncp ? rncp.blocsCompetences.map((b, i) =>
+    [`<strong>CCP${i + 1} – ${b.titre}</strong>`, `Compétences du bloc ${i + 1} issues du référentiel ${f.codeRNCP || 'RNCP'}`, '', '', '']
+  ) : [
+    ["CCP1", "Compétences du bloc 1", "", "", ""],
+    ["CCP2", "Compétences du bloc 2", "", "", ""],
+  ];
+
+  const programmeLines = (f.programme || "").split(/[\n;]/).filter(Boolean).map(l => l.trim()).filter(Boolean);
+
+  return buildDocument({ org: o, title: "LIVRE D'APPRENTISSAGE – CFA", subtitle: titreFormation, sections: [
+    // PAGE DE GARDE
+    { heading: "PAGE DE GARDE ET IDENTIFICATION", content: `<p>Le présent document constitue le livre d'apprentissage officiel du Centre de Formation d'Apprentis <strong>${o.nom}</strong>. Il est remis à chaque apprenti dès son entrée en formation et l'accompagne tout au long de son parcours en alternance.</p>
+${tableHTML(["", ""], [
+  ["Centre de Formation d'Apprentis", o.nom],
+  ["Adresse", `${o.adresse || '___'}, ${o.codePostal || '___'} ${o.ville || '___'}`],
+  ["Téléphone", o.telephone || '___'],
+  ["Adresse électronique", o.email || '___'],
+  ["SIRET", o.siret || '___'],
+  ["Formation suivie", titreFormation],
+  ["Apprenti(e)", `${s.prenom} ${s.nom}`],
+  ["Entreprise d'accueil", s.entreprise || '___'],
+  ["Année de formation", `${new Date(f.dateDebut || Date.now()).getFullYear()}/${new Date(f.dateFin || Date.now()).getFullYear()}`],
+])}<p>Ce livret est un document personnel, pédagogique et réglementaire.</p>` },
+
+    // MESSAGE D'ACCUEIL
+    { heading: "MESSAGE D'ACCUEIL DU CFA", content: `<p>Le CFA <strong>${o.nom}</strong> souhaite la bienvenue à <strong>${s.prenom} ${s.nom}</strong>.</p><p>L'apprentissage est une voie d'excellence qui permet d'acquérir une qualification reconnue tout en développant une expérience professionnelle concrète. En intégrant notre CFA, vous vous engagez dans un parcours exigeant, structurant et professionnalisant.</p><p>Le centre de formation s'engage à vous accompagner à chaque étape de votre parcours, tant sur le plan pédagogique que professionnel et social. Ce livret d'apprentissage est conçu comme un outil de suivi, de dialogue et de valorisation de vos compétences.</p>` },
+
+    // CADRE GÉNÉRAL
+    { heading: "CADRE GÉNÉRAL DE L'APPRENTISSAGE", content: `<p>L'apprentissage est un dispositif de formation en alternance régi par le Code du travail. Il repose sur un contrat de travail conclu entre l'apprenti(e), l'entreprise d'accueil et le CFA.</p><p>Ce dispositif permet de préparer un diplôme ou un titre professionnel tout en exerçant une activité salariée. Il vise l'insertion professionnelle durable et la montée en compétences progressive.</p>` },
+
+    // PRÉSENTATION ET ENGAGEMENTS DU CFA
+    { heading: "PRÉSENTATION ET ENGAGEMENTS DU CFA", content: `<p>Le CFA <strong>${o.nom}</strong> a pour mission de former des professionnels compétents, autonomes et responsables. Il met en œuvre des méthodes pédagogiques adaptées à l'alternance et s'appuie sur des équipes qualifiées.</p><p>Le CFA s'engage à garantir l'égalité d'accès à la formation, à prendre en compte les situations individuelles et à assurer un accompagnement personnalisé.</p>` },
+
+    // RÔLE DES ACTEURS
+    { heading: "RÔLE DES ACTEURS DE L'APPRENTISSAGE", content: `<p><strong>Apprenti(e) concerné(e) :</strong> ${s.prenom} ${s.nom}</p><p>Le parcours d'apprentissage repose sur la coopération étroite entre trois acteurs essentiels : l'apprenti(e), l'entreprise d'accueil et le Centre de Formation d'Apprentis ${o.nom}.</p><p>L'apprenti(e), <strong>${s.prenom} ${s.nom}</strong>, est au cœur du dispositif d'apprentissage. En tant que salarié(e) en formation, ${g(s, 'il', 'elle')} s'engage à suivre avec assiduité les enseignements dispensés par le CFA, à respecter les règles de fonctionnement du centre et de l'entreprise, et à s'impliquer activement dans l'acquisition des compétences professionnelles.</p>` },
+
+    // RÔLE DU MAÎTRE D'APPRENTISSAGE
+    { heading: "RÔLE DU MAÎTRE D'APPRENTISSAGE", content: `<p>Le maître d'apprentissage occupe une place centrale dans le dispositif de formation en alternance. Désigné par l'entreprise d'accueil, ${g(s, 'il', 'elle')} est chargé(e) d'accompagner l'apprenti(e), <strong>${s.prenom} ${s.nom}</strong>, au quotidien et de faciliter son intégration au sein de l'entreprise.</p><p>Le maître d'apprentissage transmet les savoir-faire professionnels nécessaires à l'exercice du métier. Il confie à l'apprenti(e) des missions progressives et adaptées à son niveau de formation.</p><p>Il assure un suivi régulier de l'activité de l'apprenti(e), l'accompagne dans la réalisation de ses missions et l'aide à développer son autonomie, son sens des responsabilités et ses compétences professionnelles.</p><p>Il participe activement à l'évaluation des compétences de l'apprenti(e), notamment lors des temps de suivi pédagogique et des visites en entreprise organisées par le CFA.</p>` },
+
+    // LES 14 MISSIONS DU CFA
+    { heading: "LES 14 MISSIONS DU CFA", content: `<p>Conformément aux dispositions légales et réglementaires encadrant l'apprentissage, le CFA <strong>${o.nom}</strong> exerce un ensemble de quatorze missions obligatoires.</p>
+<h4>Missions 1 à 5</h4>
+<ol><li>Informer les publics sur les métiers, formations et débouchés professionnels</li>
+<li>Accompagner les candidats dans leur orientation et la construction de leur projet professionnel</li>
+<li>Organiser l'évaluation des besoins et le positionnement pédagogique à l'entrée</li>
+<li>Concevoir, organiser et mettre en œuvre les actions de formation en alternance</li>
+<li>Désigner pour chaque apprenti(e) un référent pédagogique</li></ol>
+<h4>Missions 6 à 10</h4>
+<ol start="6"><li>Assurer le suivi pédagogique des apprentis tout au long du parcours</li>
+<li>Coordonner les relations entre apprenti(e), entreprise et équipes pédagogiques</li>
+<li>Mettre en place des évaluations régulières des acquis</li>
+<li>Préparer les apprentis aux épreuves de certification</li>
+<li>Contribuer à la sécurisation des parcours</li></ol>
+<h4>Missions 11 à 14</h4>
+<ol start="11"><li>Assurer un accompagnement social des apprentis</li>
+<li>Mettre en œuvre des actions de prévention des ruptures de contrat</li>
+<li>Favoriser l'insertion professionnelle à l'issue de la formation</li>
+<li>Assurer la veille réglementaire et l'amélioration continue</li></ol>` },
+
+    // ORGANISATION DE L'ALTERNANCE
+    { heading: "ORGANISATION DE L'ALTERNANCE", content: `<p>La formation est organisée selon un principe d'alternance entre des périodes de formation au CFA et des périodes de mise en pratique professionnelle en entreprise.</p><p>Le rythme de l'alternance est défini par un calendrier prévisionnel communiqué à l'apprenti(e) et à l'entreprise d'accueil : <strong>${(f as any).rythmeAlternance || '1 semaine CFA / 3 semaines entreprise'}</strong>.</p><p><strong>Dates :</strong> Du ${dateDebut} au ${dateFin}</p><p><strong>Durée totale :</strong> ${f.duree || '___'}</p>` },
+
+    // PROGRAMME ET BLOCS DE COMPÉTENCES
+    { heading: "PROGRAMME DE FORMATION ET BLOCS DE COMPÉTENCES", content: `<p>La formation <strong>${titreFormation}</strong>${f.codeRNCP ? ` (${f.codeRNCP})` : ''} est structurée en blocs de compétences :</p>${blocsHtml}<p>L'acquisition de l'ensemble de ces blocs permet l'obtention du titre professionnel.</p>` },
+
+    // GRILLE D'ACQUISITION
+    { heading: "GRILLE D'ACQUISITION DES COMPÉTENCES", content: `<p>La grille ci-dessous permet de suivre la progression de l'apprenti(e) de manière homogène tout au long du parcours.</p>
+${tableHTML(["Bloc de compétences", "Compétence évaluée", "Non acquis", "En cours d'acquisition", "Acquis"], grilleRows)}
+<p><strong>Niveaux d'évaluation :</strong></p><ul><li><strong>Non acquis :</strong> la compétence n'est pas maîtrisée</li><li><strong>En cours d'acquisition :</strong> la compétence est partiellement maîtrisée</li><li><strong>Acquis :</strong> la compétence est maîtrisée de manière autonome</li></ul>
+<p><strong>Appréciation globale du formateur / maître d'apprentissage :</strong></p><p>.......................................................................................................................</p>` },
+
+    // SUIVI PÉDAGOGIQUE
+    { heading: "SUIVI PÉDAGOGIQUE CONTINU", content: `<p>Le suivi pédagogique est assuré tout au long du parcours de formation afin de garantir la progression régulière de l'apprenti(e).</p><p>Ce suivi repose sur des échanges réguliers entre l'apprenti(e), le formateur référent et le maître d'apprentissage.</p>` },
+
+    // VISITES EN ENTREPRISE
+    { heading: "VISITES EN ENTREPRISE ET BILANS", content: `<p>Le CFA organise deux visites par an en entreprise. Ces visites constituent des temps formalisés essentiels.</p>
+${tableHTML(["", ""], [
+  ["Nom du CFA", o.nom],
+  ["Nom et prénom de l'apprenti(e)", `${s.prenom} ${s.nom}`],
+  ["Entreprise d'accueil", s.entreprise || '___'],
+  ["Type de visite", "1ère visite annuelle ou 2e visite annuelle"],
+])}<p>Chaque visite donne lieu à un compte rendu écrit et formalisé.</p>` },
+
+    // ACCOMPAGNEMENT SOCIAL
+    { heading: "ACCOMPAGNEMENT SOCIAL ET PRÉVENTION DES RUPTURES", content: `<p>Le CFA <strong>${o.nom}</strong> met en œuvre un accompagnement social structuré et individualisé afin de sécuriser le parcours de l'apprenti(e) et prévenir les ruptures de contrat.</p><p>La prévention des ruptures constitue une priorité. Elle s'appuie sur le dialogue, la médiation et la mobilisation de solutions adaptées.</p>` },
+
+    // AIDES MOBILISABLES
+    { heading: "AIDES MOBILISABLES POUR L'APPRENTI(E)", content: `<p>Parmi les aides mobilisables figurent notamment :</p><ul><li>Accompagnement de la Mission Locale</li><li>Services d'assistance sociale</li><li>Aides financières de la CAF</li><li>Dispositifs d'aide au permis de conduire</li><li>Épiceries solidaires</li><li>Aides locales ou territoriales</li></ul><p>Le CFA accompagne l'apprenti(e) dans l'identification de ces dispositifs et les démarches administratives nécessaires.</p>` },
+
+    // HANDICAP
+    { heading: "HANDICAP, ACCESSIBILITÉ ET AMÉNAGEMENTS", content: `<p>Le CFA est attentif à l'accueil des personnes en situation de handicap (PMR et PSH).</p><p>En cas de besoin d'aménagement, l'apprenti(e) peut contacter le référent handicap :</p><p><strong>Référent handicap :</strong> ${o.referentHandicap || o.dirigeant || '___'}<br><strong>Email :</strong> ${o.email || '___'}<br><strong>Téléphone :</strong> ${o.telephone || '___'}</p>` },
+
+    // ENGAGEMENTS
+    { heading: "ENGAGEMENTS DES PARTIES PRENANTES", content: `<p>Le présent livret d'apprentissage formalise les engagements réciproques des différentes parties prenantes.</p><p><strong>L'apprenti(e)</strong> s'engage à suivre avec assiduité la formation, à respecter les règles de fonctionnement du CFA et de l'entreprise.</p><p><strong>L'entreprise d'accueil</strong> s'engage à confier des missions en lien avec la formation suivie et à accompagner le développement des compétences professionnelles.</p><p><strong>Le CFA</strong> s'engage à assurer un accompagnement pédagogique, professionnel et social de qualité.</p>` },
+
+    // SIGNATURES
+    { heading: "SIGNATURES ET VALIDATION DU LIVRET", content: `<p>Le présent livret d'apprentissage est remis à l'apprenti(e) en début de formation.</p><p><strong>Fait à</strong> ${o.ville || 'Paris'}</p><p><strong>Date :</strong> ${dateSignature}</p>
+<div style="display:flex;justify-content:space-between;margin-top:30px">
+<div style="text-align:center;width:30%"><p><strong>Signature de l'apprenti(e) :</strong></p><div style="min-height:80px;border:1px solid #ccc;padding:10px">${sigApprentie}</div><p>${s.prenom} ${s.nom}</p></div>
+<div style="text-align:center;width:30%"><p><strong>Signature du maître d'apprentissage :</strong></p><div style="min-height:80px;border:1px solid #ccc;padding:10px">&#160;</div></div>
+<div style="text-align:center;width:30%"><p><strong>Signature et cachet du CFA :</strong></p><div style="min-height:80px;border:1px solid #ccc;padding:10px">${tamponCFA}</div><p>${o.nom}</p></div>
+</div>` },
+  ] });
+}
+
+// ============== CFA IND 9 — CONVOCATION À LA FORMATION ==============
+
+function genConvocationCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
+  const s = stagiaires[si] || stagiaires[0] || { prenom: '___', nom: '___' } as StagiaireInfo;
+  const dateDebut = formatDate(getStagiaireDateDebut(s, f));
+  const dateFin = formatDate(getStagiaireDateFin(s, f));
+  const dateSignature = f.dateDebut ? formatDate(subtractBusinessDays(f.dateDebut, 14)) : '____/____/________';
+  const dureeTotal = f.duree || '___';
+  const lieu = f.lieu || `${o.adresse || '___'}, ${o.codePostal || '___'} ${o.ville || '___'}`;
+  const tamponCFA = o.tamponUrl ? `<img src="${o.tamponUrl}" style="max-height:80px" />` : '&#160;';
+
+  return buildDocument({ org: o, title: "CONVOCATION À LA FORMATION", subtitle: f.intitule, sections: [
+    { heading: `Objet : Convocation à la formation « ${f.intitule} »`, content: `<p><strong>Nom et prénom du stagiaire :</strong> ${s.civilite || ''} ${s.prenom} ${s.nom}</p><p><strong>Lieu de formation :</strong><br>${lieu}</p><p>Madame, Monsieur,</p><p>Nous avons le plaisir de vous informer que vous êtes convoqué(e) à la formation <strong>${f.intitule}</strong>, organisée par le CFA <strong>${o.nom}</strong>.</p>` },
+
+    { heading: "INFORMATIONS GÉNÉRALES", content: `<ul>
+<li><strong>Intitulé de la formation :</strong> ${f.intitule}</li>
+<li><strong>Dates de la formation :</strong> ${dateDebut} au ${dateFin}</li>
+<li><strong>Durée totale :</strong> ${dureeTotal}</li>
+<li><strong>Rythme d'alternance :</strong> ${(f as any).rythmeAlternance || '1 semaine à l\'école / 3 semaines en entreprise'}</li>
+<li><strong>Horaires :</strong> 9h à 12h et 13h à 17h</li>
+</ul>` },
+
+    { heading: "DOCUMENTS À APPORTER", content: `<p>Le jour de votre entrée en formation, merci de vous munir des documents suivants :</p><ul><li>Une pièce d'identité en cours de validité</li><li>Un carnet et de quoi prendre des notes</li><li>Votre contrat d'apprentissage ou de professionnalisation (si disponible)</li></ul><p>Nous vous remercions de vous présenter le premier jour de formation à l'heure précise indiquée et de respecter l'ensemble des consignes transmises par le CFA.</p>` },
+
+    { heading: "CONTACTS", content: `<p>Pour toute information complémentaire, vous pouvez contacter :</p><ul><li><strong>Référent pédagogique :</strong> ${o.responsablePedagogique || o.dirigeant || '___'}</li><li><strong>Référente administrative :</strong> ${o.dirigeant || '___'}</li></ul><p>${o.email || '___'} | ${o.telephone || '___'}</p>` },
+
+    { heading: "INFORMATIONS SUR L'ORGANISME", content: `<p><strong>Nom :</strong> ${o.nom}<br><strong>Adresse :</strong> ${o.adresse || '___'}, ${o.codePostal || '___'} ${o.ville || '___'}<br><strong>SIRET :</strong> ${o.siret || '___'}<br><strong>Email :</strong> ${o.email || '___'}<br><strong>Téléphone :</strong> ${o.telephone || '___'}<br><strong>N° déclaration d'activité :</strong> ${o.nda || '___'}</p>` },
+  ], signatures: { type: "2", labels: ["Le Directeur du CFA", ""], names: [o.dirigeant || '___', ''], noOrgSignature: true }, extraHtml: `<p style="margin-top:20px"><strong>Fait à</strong> ${o.ville || 'Paris'}, <strong>le</strong> ${dateSignature}</p>` });
+}
+
+// ============== CFA IND 9 — CGV ==============
+
+function genCGVCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
+  const s = stagiaires[si] || stagiaires[0] || { prenom: '___', nom: '___' } as StagiaireInfo;
+  const dateSignature = f.dateDebut ? formatDate(subtractBusinessDays(f.dateDebut, 14)) : '____/____/________';
+  const modaliteTexte = (f.modalites || 'Présentiel').charAt(0).toUpperCase() + (f.modalites || 'présentiel').slice(1);
+  const sigApprentie = s.signatureUrl ? `<img src="${s.signatureUrl}" style="max-height:60px" />` : '&#160;';
+  const tamponCFA = o.tamponUrl ? `<img src="${o.tamponUrl}" style="max-height:80px" />` : '&#160;';
+
+  return buildDocument({ org: o, title: "Conditions Générales de Vente (CGV)", sections: [
+    { heading: "Article 1 – Objet", content: `<p>Les présentes Conditions Générales de Vente (CGV) régissent l'ensemble des prestations de formation proposées par <strong>${o.nom}</strong>, organisme de formation déclaré et enregistré conformément aux dispositions légales en vigueur.</p>` },
+
+    { heading: "Article 2 – Champ d'application", content: `<p>Toute commande de formation implique l'adhésion entière et sans réserve du client (entreprise, stagiaire ou financeur) aux présentes CGV, qui prévalent sur tout autre document.</p>` },
+
+    { heading: "Article 3 – Inscription", content: `<p>L'inscription à une action de formation nécessite la signature d'une convention de formation entre l'organisme, l'entreprise (ou le stagiaire à titre individuel) et, le cas échéant, l'OPCO. L'inscription est définitive à réception de la convention signée.</p>` },
+
+    { heading: "Article 4 – Prix et règlement", content: `<p>Le prix de chaque action de formation est indiqué dans la convention de formation.</p><ul><li>En cas de financement par un OPCO, il appartient au client d'effectuer les démarches nécessaires.</li><li>Si l'OPCO ne prend pas en charge la totalité du coût, le solde reste dû par le client.</li><li>En cas de financement individuel, un échéancier peut être proposé. Tous nos prix sont indiqués en euros et exonérés de TVA (art. 261-4-4° du CGI).</li></ul>` },
+
+    { heading: "Article 5 – Conditions de paiement", content: `<p>Les factures sont payables à réception, sauf accord particulier stipulé dans la convention. En cas de retard de paiement, des pénalités pourront être appliquées conformément à l'article L441-10 du Code de commerce.</p>` },
+
+    { heading: "Article 6 – Déroulement des formations", content: `<p>Les formations sont dispensées en <strong>${modaliteTexte}</strong> selon ce qui est précisé dans la convention. L'organisme de formation se réserve le droit de modifier le contenu, la durée, les intervenants ou le planning, tout en respectant les objectifs pédagogiques annoncés.</p>` },
+
+    { heading: "Article 7 – Annulation, report et remplacement", content: `<ul><li>Toute annulation par le client doit être communiquée par écrit au moins 15 jours avant le début de la formation.</li><li>En cas d'annulation tardive ou d'absence non justifiée, la formation sera facturée en totalité.</li><li>En cas de force majeure (maladie, accident, événement exceptionnel), un report pourra être proposé.</li></ul>` },
+
+    { heading: "Article 8 – Obligations de l'organisme de formation", content: `<p><strong>${o.nom}</strong> s'engage à :</p><ul><li>Assurer la réalisation des actions de formation prévues</li><li>Fournir les supports pédagogiques nécessaires</li><li>Mettre à disposition des formateurs qualifiés et expérimentés</li><li>Évaluer les acquis conformément au référentiel des titres professionnels</li></ul>` },
+
+    { heading: "Article 9 – Obligations du stagiaire et/ou de l'entreprise", content: `<p>Le stagiaire s'engage à :</p><ul><li>Suivre la formation avec assiduité et respecter le règlement intérieur</li><li>Réaliser les travaux demandés et participer aux évaluations</li><li>Informer l'organisme de tout empêchement dans les plus brefs délais</li></ul>` },
+
+    { heading: "Article 10 – Accessibilité", content: `<p>Nos formations sont accessibles aux personnes en situation de handicap. Toute demande d'adaptation doit être formulée avant l'inscription afin de mobiliser le référent handicap.</p>` },
+
+    { heading: "Article 11 – Confidentialité et propriété intellectuelle", content: `<p>Les supports pédagogiques remis au stagiaire sont protégés par le droit d'auteur. Ils ne peuvent être reproduits, utilisés ou diffusés sans autorisation écrite préalable de l'organisme de formation.</p>` },
+
+    { heading: "Article 12 – Données personnelles", content: `<p>Les informations collectées sont nécessaires à l'inscription et au suivi pédagogique. Conformément au RGPD et à la loi Informatique et Libertés, le stagiaire dispose d'un droit d'accès, de rectification et d'opposition aux données le concernant.</p>` },
+
+    { heading: "Article 13 – Litiges", content: `<p>Tout différend relatif à l'exécution de la présente convention qui ne pourrait être réglé à l'amiable sera porté devant les juridictions compétentes du ressort du siège social de l'organisme de formation.</p>` },
+  ], extraHtml: `<div style="display:flex;justify-content:space-between;margin-top:40px">
+<div style="text-align:center;width:45%"><p><strong>${o.nom}</strong></p><p>${o.dirigeant || '___'}, Dirigeant</p><div style="min-height:80px;border:1px solid #ccc;padding:10px">${tamponCFA}</div></div>
+<div style="text-align:center;width:45%"><p><strong>Le Stagiaire</strong></p><p>${s.prenom} ${s.nom}</p><p><em>Signature précédée de la mention « Lu et approuvé »</em></p><div style="min-height:80px;border:1px solid #ccc;padding:10px">${sigApprentie}</div></div>
+</div>
+<p style="text-align:center;margin-top:10px"><strong>Fait à</strong> ${o.ville || 'Paris'}, <strong>le</strong> ${dateSignature}</p>` });
+}
+
+// ============== CFA IND 9 — PROCÉDURE D'ACCUEIL ET D'ADAPTATION PÉDAGOGIQUE ==============
+
+function genProcedureAccueilAdaptationCFA(o: OrganismeInfo, f: FormationInfo) {
+  return buildDocument({ org: o, title: "PROCÉDURE D'ACCUEIL ET D'ACCOMPAGNEMENT DES STAGIAIRES TOUT AU LONG DE LA FORMATION", sections: [
+    { heading: "", content: `<p>Tout au long de la formation, les stagiaires sont accueillis de la façon suivante :</p>
+<ul>
+<li>Dès leur arrivée, les stagiaires sont accueillis par le formateur qui s'assure d'être présent le premier. Au préalable, le formateur prépare la salle et vérifie le bon fonctionnement des équipements et la disponibilité du matériel prévu.</li>
+<li>Au début de la formation, le formateur fournit des informations sur la configuration des locaux, les horaires de début, les horaires des pauses, les horaires de fin, le règlement intérieur, le déroulement de la formation, les connexions wifi, le matériel utilisé, les modalités de repas et de pause.</li>
+<li>Au démarrage de la formation, le formateur recueille les attentes des participants.</li>
+<li>Durant la formation, le formateur informe les stagiaires sur les modalités pédagogiques, les supports remis, les objectifs de la formation, les modalités d'évaluation des acquis et d'évaluation de la formation, le contenu du programme du stage.</li>
+<li>Durant tout le déroulement du stage, le formateur s'assure du suivi et de la progression pédagogique de chaque participant, d'une façon personnalisée. Il répond à chaque question des participants.</li>
+<li>À la fin de la formation, le formateur évalue l'atteinte des objectifs, la satisfaction des attentes, identifie les points à améliorer, remet une attestation de fin de formation.</li>
+</ul>` },
+
+    { heading: "Indications pour le contact après la formation", content: `<p>Le formateur indique comment le contacter après la formation pour répondre aux éventuelles questions.</p><p><strong>Contact :</strong> ${o.email || '___'} | ${o.telephone || '___'}</p>` },
+
+    { heading: "Responsabilités du formateur", content: `<ul><li>Après la formation, il s'assure de la remise en état de la salle, de son rangement et de sa propreté.</li><li>Enfin, tout au long de la présence des stagiaires dans les locaux de la formation, le formateur s'assure de leur sécurité et de leur confort.</li></ul>` },
+  ] });
 }
 
 // ============== CFA IND 9 — PV ÉLECTION DES DÉLÉGUÉS ==============
