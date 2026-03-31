@@ -7044,8 +7044,15 @@ function generateEvalBesoinsAnswers(s: StagiaireInfo, f: FormationInfo, o: Organ
       `Cette formation s'inscrit dans notre politique d'intégration et de valorisation des compétences de nos salariés d'origine étrangère. Elle permettra à ${s.prenom} de s'épanouir professionnellement.`,
       `En développant le français professionnel de ${s.prenom}, nous améliorerons la traçabilité des soins et la conformité de nos pratiques avec les exigences réglementaires du secteur médico-social.`,
     ];
-  } else if (isIA) {
+  } else if (isMassage) {
     contributionEntreprise = [
+      `Cette formation permettra à ${s.entreprise || "notre structure"} d'enrichir son offre de soins en proposant le massage prénatal, un service très demandé par les futures mamans et qui fidélise une clientèle en pleine croissance.`,
+      `En formant ${s.prenom} au massage prénatal, ${s.entreprise || "notre cabinet"} se positionnera sur un segment de marché porteur et se différenciera de la concurrence par une offre spécialisée.`,
+      `L'ajout du massage prénatal à notre catalogue de prestations attirera une nouvelle clientèle (femmes enceintes, jeunes mamans) et générera un chiffre d'affaires complémentaire pour ${s.entreprise || "notre activité"}.`,
+      `Cette spécialisation renforcera l'image professionnelle de ${s.entreprise || "notre institut"} et apportera une dimension d'accompagnement holistique de la maternité très valorisée.`,
+      `Former ${s.prenom} au massage prénatal nous permettra de répondre aux demandes croissantes de nos clientes enceintes et de créer un parcours bien-être complet autour de la maternité.`,
+    ];
+  } else if (isIA) {
       `Cette formation permettra à ${s.entreprise} de multiplier par 3 la production de contenus de qualité tout en réduisant les coûts de sous-traitance graphique et rédactionnelle.`,
       `La maîtrise des outils d'IA par ${s.prenom} accélérera la création de campagnes marketing et renforcera la réactivité de la communication de ${s.entreprise} sur les réseaux sociaux.`,
       `L'intégration de l'IA dans nos processus de création de contenus améliorera la compétitivité de ${s.entreprise} et notre capacité à produire des supports professionnels de manière autonome.`,
