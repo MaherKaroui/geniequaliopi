@@ -1009,6 +1009,91 @@ function veilleTechnoRows(f: FormationInfo, type: FormationType): string[][] {
     ];
   }
 
+  if (type === "massage" || type === "esthetique") {
+    return [...commonDigitalLearning,
+      [
+        `<a href="https://www.ffmbe.fr/se-former/">FFMBE – Se former au massage bien-être</a>`,
+        "FFMBE – Référentiel de formation au massage bien-être",
+        veilleMonthYear(f, 7),
+        "Fédération professionnelle proposant un référentiel de compétences et des formations certifiantes pour les praticiens en massage bien-être.",
+        "Preuve : référentiel FFMBE + captures. Action : aligner le contenu pédagogique sur le référentiel FFMBE."
+      ],
+      [
+        `<a href="https://www.youtube.com/watch?v=_qTpCmxGiQI">YouTube – Massage prénatal démonstration</a>`,
+        "Techniques de massage prénatal – Démonstration complète",
+        veilleYear(f, 6),
+        "Vidéo démonstrative des techniques de massage adaptées à la grossesse : positions sécurisées, pressions douces, zones spécifiques.",
+        "Preuve : fiche synthèse vidéo. Action : utiliser comme support pédagogique complémentaire."
+      ],
+      [
+        `<a href="https://www.perinat-france.org/">Perinat France – Réseau périnatal</a>`,
+        "Réseau périnatal – Pratiques d'accompagnement de la grossesse",
+        veilleMonthYear(f, 5),
+        "Ressources sur les pratiques complémentaires (massage, relaxation, sophrologie) dans l'accompagnement de la grossesse.",
+        "Action : enrichir les supports pédagogiques avec les protocoles recommandés par le réseau périnatal."
+      ],
+      [
+        `<a href="https://www.talenco.com/nos-publications/barometre-formation-professionnelle-tendances-pratiques-2025/">TalenCo – Baromètre</a>`,
+        "Baromètre formation professionnelle – Secteur bien-être et santé",
+        veilleDate(f, 3),
+        "Tendances de la formation dans les métiers du bien-être : digitalisation, prise de rendez-vous en ligne, outils de suivi client.",
+        "Preuve : PDF baromètre. Action Qualiopi : intégrer les tendances numériques du secteur bien-être dans la formation."
+      ],
+    ];
+  }
+
+  if (type === "management") {
+    return [...commonDigitalLearning,
+      [
+        `<a href="https://www.hbrfrance.fr/">HBR France – Outils numériques managériaux</a>`,
+        "Harvard Business Review – Technologies et management",
+        veilleMonthYear(f, 7),
+        "Articles sur les outils collaboratifs, le management hybride, l'IA appliquée à la gestion d'équipe et les plateformes de feedback.",
+        "Preuve : captures articles. Action : intégrer les outils collaboratifs modernes dans les exercices pratiques."
+      ],
+      [
+        `<a href="https://www.learningtechnologiesfrance.com/">learningtechnologiesfrance.com</a>`,
+        "Learning Technologies France – Formation managériale",
+        veilleYear(f, 6),
+        "Salon EdTech : solutions de formation au management (simulateurs, serious games, coaching digital).",
+        "Preuve : programme + notes. Action : benchmark des outils pédagogiques pour le management."
+      ],
+      [
+        `<a href="https://www.talenco.com/nos-publications/barometre-formation-professionnelle-tendances-pratiques-2025/">TalenCo – Baromètre</a>`,
+        "Baromètre formation – Management et soft skills",
+        veilleDate(f, 3),
+        "Le management et les soft skills dans le top 5 des demandes de formation. Focus sur le leadership et la gestion du changement.",
+        "Preuve : PDF baromètre. Action Qualiopi : aligner l'offre management sur les tendances du marché."
+      ],
+    ];
+  }
+
+  if (type === "secretaire") {
+    return [...commonDigitalLearning,
+      [
+        `<a href="https://www.ameli.fr/">Ameli – Services numériques santé</a>`,
+        "Ameli – Évolutions numériques de l'Assurance Maladie",
+        veilleMonthYear(f, 7),
+        "Évolutions de la plateforme Ameli : télétransmission, Espace Pro, Mon Espace Santé, facturation en ligne.",
+        "Preuve : captures fonctionnalités. Action : mettre à jour le module facturation avec les outils numériques Ameli."
+      ],
+      [
+        `<a href="https://www.doctolib.fr/presse">Doctolib – Actualités</a>`,
+        "Doctolib – Innovations de la prise de rendez-vous médicale",
+        veilleMonthYear(f, 6),
+        "Évolutions de Doctolib : téléconsultation intégrée, messagerie sécurisée, gestion des plannings multi-praticiens.",
+        "Action : former les stagiaires aux dernières fonctionnalités Doctolib utilisées en cabinet."
+      ],
+      [
+        `<a href="https://www.talenco.com/nos-publications/barometre-formation-professionnelle-tendances-pratiques-2025/">TalenCo – Baromètre</a>`,
+        "Baromètre formation – Santé et numérique",
+        veilleDate(f, 3),
+        "La transformation numérique du secteur santé accélère : DMP, télémédecine, IA en imagerie médicale.",
+        "Preuve : PDF baromètre. Action Qualiopi : intégrer les nouvelles technologies santé dans le programme."
+      ],
+    ];
+  }
+
   // Default: word/bureautique
   return [...commonDigitalLearning,
     [

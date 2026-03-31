@@ -105,6 +105,7 @@ const YOUTUBE_CRM: CourseData['youtubeVideos'] = [
 
 export function getYoutubeVideos(formationIntitule: string): CourseData['youtubeVideos'] {
   const t = formationIntitule.toLowerCase();
+  if (t.includes('massage') || t.includes('prénatal') || t.includes('prenatal') || t.includes('relaxation') || t.includes('bien-être')) return YOUTUBE_MASSAGE;
   if (t.includes('excel')) return YOUTUBE_EXCEL;
   if (t.includes('word')) return YOUTUBE_WORD;
   if (t.includes('powerpoint') || t.includes('ppt')) return YOUTUBE_POWERPOINT;
@@ -115,6 +116,9 @@ export function getYoutubeVideos(formationIntitule: string): CourseData['youtube
   if (t.includes('intelligence artificielle') || t.includes('ia générative') || t.includes('contenus rédactionnels')) return YOUTUBE_IA;
   if (t.includes('webmarketing') || t.includes('marketing de contenus') || t.includes('réseaux sociaux') || t.includes('marketing digital')) return YOUTUBE_WEBMARKETING;
   if (t.includes('crm') || t.includes('automation') || t.includes('automatisation')) return YOUTUBE_CRM;
+  if (t.includes('esthéti') || t.includes('cosmétique') || t.includes('beauté')) return YOUTUBE_ESTHETIQUE;
+  if (t.includes('secrétaire') || t.includes('assistant') || t.includes('médico-admin')) return YOUTUBE_SECRETAIRE;
+  if (t.includes('négociat') || t.includes('technico') || t.includes('ntc') || t.includes('commercial') || t.includes('vente')) return YOUTUBE_COMMERCIAL;
   return YOUTUBE_GENERIC;
 }
 
