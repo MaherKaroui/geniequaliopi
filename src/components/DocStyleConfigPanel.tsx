@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DocStyleConfig, DEFAULT_DOC_STYLE, DocTheme, HeadingStyle, HeaderStyle } from "@/types/qualiopi";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -6,7 +6,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, ChevronRight, Palette, Type, Layout, Paintbrush } from "lucide-react";
+import { ChevronDown, ChevronRight, Palette, Type, Layout, Paintbrush, Save, Trash2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface DocStyleConfigPanelProps {
   style: DocStyleConfig;
@@ -257,9 +259,52 @@ function ThemeMiniPreview({ theme, primary, secondary, bodyFont, headFont }: { t
   );
 }
 
+interface SavedTheme {
+  id: string;
+  name: string;
+  config: DocStyleConfig;
+}
+
 const DocStyleConfigPanel = ({ style, onChange }: DocStyleConfigPanelProps) => {
   const [expanded, setExpanded] = useState(false);
   const [activeTab, setActiveTab] = useState<"themes" | "colors" | "fonts" | "layout">("themes");
+  const [savedThemes, setSavedThemes] = useState<SavedTheme[]>([]);
+  const [saveName, setSaveName] = useState("");
+  const [showSaveInput, setShowSaveInput] = useState(false);
+
+  useEffect(() => {
+    if (expanded) loadSavedThemes();
+  }, [expanded]);
+
+  const loadSavedThemes = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const { data } = await supabase.from("saved_themes").select("id, name, config").eq("user_id", user.id).order("created_at", { ascending: false });
+    if (data) setSavedThemes(data.map(d => ({ id: d.id, name: d.name, config: d.config as unknown as DocStyleConfig })));
+  };
+
+  const handleSave = async () => {
+    if (!saveName.trim()) return;
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) { toast.error("Connectez-vous pour sauvegarder"); return; }
+    const { error } = await supabase.from("saved_themes").insert({
+      user_id: user.id,
+      name: saveName.trim(),
+      config: style as unknown as Record<string, unknown>
+    } as any);
+    if (error) { toast.error("Erreur de sauvegarde"); return; }
+    toast.success(`Thème "${saveName.trim()}" sauvegardé`);
+    setSaveName("");
+    setShowSaveInput(false);
+    loadSavedThemes();
+  };
+
+  const handleDelete = async (id: string, name: string) => {
+    const { error } = await supabase.from("saved_themes").delete().eq("id", id);
+    if (error) { toast.error("Erreur"); return; }
+    toast.success(`Thème "${name}" supprimé`);
+    loadSavedThemes();
+  };
 
   const update = (field: keyof DocStyleConfig, value: string | number) => {
     onChange({ ...style, [field]: value });
@@ -359,6 +404,51 @@ const DocStyleConfigPanel = ({ style, onChange }: DocStyleConfigPanelProps) => {
                     );
                   })}
                 </div>
+
+                {/* Save current theme */}
+                <div className="border-t pt-3 mt-3">
+                  <div className="flex items-center gap-2">
+                    <Input
+                      placeholder="Nom du thème à sauvegarder..."
+                      value={saveName}
+                      onChange={e => setSaveName(e.target.value)}
+                      className="text-xs h-8 flex-1"
+                      onKeyDown={e => e.key === "Enter" && handleSave()}
+                    />
+                    <Button size="sm" className="h-8 text-xs gap-1" onClick={handleSave} disabled={!saveName.trim()}>
+                      <Save className="w-3 h-3" /> Sauvegarder
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Saved themes */}
+                {savedThemes.length > 0 && (
+                  <div className="border-t pt-3 mt-3">
+                    <Label className="text-xs font-semibold text-muted-foreground mb-2 block">MES THÈMES SAUVEGARDÉS</Label>
+                    <div className="space-y-1.5">
+                      {savedThemes.map(st => (
+                        <div key={st.id} className="flex items-center gap-2 p-2 rounded-lg border hover:border-primary/30 transition-all group">
+                          <div className="flex gap-0.5 flex-shrink-0">
+                            <div className="w-3 h-3 rounded-full" style={{ background: st.config.primaryColor }} />
+                            <div className="w-3 h-3 rounded-full" style={{ background: st.config.secondaryColor }} />
+                          </div>
+                          <button
+                            onClick={() => onChange({ ...st.config })}
+                            className="flex-1 text-left text-xs font-medium hover:text-primary transition-colors"
+                          >
+                            {st.name}
+                          </button>
+                          <button
+                            onClick={() => handleDelete(st.id, st.name)}
+                            className="opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive/80"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
