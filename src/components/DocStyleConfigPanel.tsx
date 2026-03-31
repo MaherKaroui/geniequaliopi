@@ -287,7 +287,11 @@ const DocStyleConfigPanel = ({ style, onChange }: DocStyleConfigPanelProps) => {
     if (!saveName.trim()) return;
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { toast.error("Connectez-vous pour sauvegarder"); return; }
-    const { error } = await supabase.from("saved_themes").insert({ user_id: user.id, name: saveName.trim(), config: style as unknown as Record<string, unknown> });
+    const { error } = await supabase.from("saved_themes").insert({
+      user_id: user.id,
+      name: saveName.trim(),
+      config: style as unknown as Record<string, unknown>
+    } as any);
     if (error) { toast.error("Erreur de sauvegarde"); return; }
     toast.success(`Thème "${saveName.trim()}" sauvegardé`);
     setSaveName("");
