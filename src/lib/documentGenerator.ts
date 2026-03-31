@@ -5203,7 +5203,7 @@ function genLivretAccueilCFA_V2(o: OrganismeInfo, f: FormationInfo, stagiaires: 
 
      // ===== ATTESTATION D'ENGAGEMENT =====
     { heading: "Attestation d'engagement", content: `<p>Je soussigné(e) <strong>${s.civilite || ''} ${s.prenom} ${s.nom}</strong> déclare avoir pris connaissance du présent livret d'accueil, du règlement intérieur et de la charte de l'apprentissage. Je m'engage à respecter l'ensemble des règles et dispositions qui y sont mentionnées.</p><p><strong>Date :</strong> ${dateSignature}</p>` },
-  ], signatures: { type: "2", labels: ["Le Directeur du CFA", "L'Apprenti(e) (lu et approuvé)"], names: [o.dirigeant || '___', `${s.prenom} ${s.nom}`], noOrgSignature: true, stagiaireSignatureUrl: s.signatureUrl } });
+  ], signatures: { type: "2", labels: ["Le Directeur du CFA", "L'Apprenti(e) (lu et approuvé)"], names: [o.dirigeant || '___', `${s.prenom} ${s.nom}`], noOrgSignature: true, stagiaireSignatureUrl: s.signatureUrl, dates: [dateSignature, dateSignature] } });
 }
 
 // ============== CFA IND 9 — RÈGLEMENT INTÉRIEUR V2 (complet 8 articles) ==============
