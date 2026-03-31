@@ -5515,7 +5515,7 @@ function genDroitImageCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
     { heading: "Conditions", content: `<p>L'autorisation de me photographier ou de me filmer est valable pour la durée de la formation.</p><p>La photographie ne sera ni communiquée à d'autres personnes, ni vendue, ni utilisée à d'autres usages que ceux mentionnés ci-dessus.</p><p>La publication ou la diffusion de mon image, sans limite de durée, ainsi que des légendes non-nominatives, ne devront pas porter atteinte à ma dignité, à ma vie privée ou à ma réputation.</p><p>Conformément à la loi, le libre accès aux données photographiques qui me concernent est garanti. Je peux donc à tout moment vérifier l'usage qui en est fait et je dispose du <strong>droit de retrait</strong> de cette image si je le juge utile.</p>` },
 
     { heading: "Signature", content: `<p><strong>Date :</strong> ${dateSignature}</p>` },
-  ], signatures: { type: "2", labels: ["Le Directeur du CFA", "L'Apprenti(e)"], names: [o.dirigeant || '___', `${s.prenom} ${s.nom}`], noOrgSignature: true, stagiaireSignatureUrl: s.signatureUrl } });
+  ], signatures: { type: "2", labels: ["Le Directeur du CFA", "L'Apprenti(e)"], names: [o.dirigeant || '___', `${s.prenom} ${s.nom}`], noOrgSignature: true, stagiaireSignatureUrl: s.signatureUrl, dates: [dateSignature, dateSignature] } });
 }
 
 
