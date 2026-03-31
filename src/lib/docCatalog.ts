@@ -474,6 +474,8 @@ export function buildFullCatalog(
     add("cfa_c3i10_permisb_formulaire_aide", "CT3 - IND 10 📁 PERMIS B – Formulaire Aide au Financement", 3, 10, "pdf_static", { pdfUrl: "/pdfs/formulaire_aide_financement_permis_b.pdf" });
     add("cfa_c3i10_permisb_permis", "CT3 - IND 10 📁 PERMIS B – Permis B", 3, 10, "pdf_static", { pdfUrl: "/pdfs/permis_b.pdf" });
     add("cfa_c3i10_permisb_aide_financement", "CT3 - IND 10 📁 PERMIS B – Aide au Financement Permis B", 3, 10, "pdf_static", { pdfUrl: "/pdfs/aide_financement_permis_b.pdf" });
+    // --- IND 10 — Dossier Mission N°5 Charte Qualité CFA (14 Missions) ---
+    add("cfa_c3i10_mission5_rupture_contrat", "CT3 - IND 10 📁 MISSION 5 – Procédure de Rupture du Contrat d'Apprentissage", 3, 10, "procedure_rupture_contrat_apprentissage_cfa");
 
     // Documents CFA complémentaires (autres critères)
     add("cfa_c1i1_livret_accueil", "CT1 - IND 1 LIVRET D'ACCUEIL CFA", 1, 1, "livret_accueil_cfa");
