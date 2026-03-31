@@ -448,7 +448,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "procedure_adaptation": return genProcedureAdaptation_V2(o, f);
     case "tableau_suivi_parcours": return genTableauSuiviParcours_V2(o, f, stagiaires);
     case "tableau_suivi_parcours_excel": return genTableauSuiviParcours_V2(o, f, stagiaires);
-    case "tableau_amelioration_continue": return genTableauAmeliorationContinue(o);
+    case "tableau_amelioration_continue": return genTableauAmeliorationContinue(o, f);
     case "tableau_amelioration_continue_excel": return genTableauAmeliorationContinueExcel(o, f, formations, stagiaires);
     case "suivi_dysfonctionnements_excel": return genSuiviDysfonctionnementsExcel(o, f, stagiaires);
     case "relances_appreciations_excel": return genRelancesAppreciationsExcel(o, f, stagiaires);
