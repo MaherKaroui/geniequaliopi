@@ -222,8 +222,9 @@ import { getFLEChapters } from "./courseContentFLE";
 import { getIAChapters } from "./courseContentIA";
 import { getWebmarketingChapters } from "./courseContentWebmarketing";
 import { getCRMChapters } from "./courseContentCRM";
+import { getMassagePrenatalChapters } from "./courseContentMassagePrenatal";
 
-export { getWordChapters, getAnglaisChapters, getAnglaisA1Chapters, getManagementChapters, getGenericChapters, getFLEChapters, getIAChapters, getWebmarketingChapters, getCRMChapters };
+export { getWordChapters, getAnglaisChapters, getAnglaisA1Chapters, getManagementChapters, getGenericChapters, getFLEChapters, getIAChapters, getWebmarketingChapters, getCRMChapters, getMassagePrenatalChapters };
 
 export function getCourseChapters(formationIntitule: string): CourseChapter[] {
   const t = formationIntitule.toLowerCase();
@@ -236,5 +237,6 @@ export function getCourseChapters(formationIntitule: string): CourseChapter[] {
   if (t.includes('intelligence artificielle') || t.includes('ia générative') || t.includes('contenus rédactionnels')) return getIAChapters();
   if (t.includes('webmarketing') || t.includes('marketing de contenus') || t.includes('réseaux sociaux') || t.includes('marketing digital')) return getWebmarketingChapters();
   if (t.includes('crm') || t.includes('automation') || t.includes('automatisation')) return getCRMChapters();
+  if (t.includes('massage') || t.includes('prénatal') || t.includes('prenatal')) return getMassagePrenatalChapters();
   return getGenericChapters(formationIntitule);
 }
