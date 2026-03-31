@@ -405,7 +405,14 @@ export function buildFullCatalog(
     // Documents CFA complémentaires
     add("cfa_c1i1_livret_accueil", "CT1 - IND 1 LIVRET D'ACCUEIL CFA", 1, 1, "livret_accueil_cfa");
     add("cfa_procedure_psh", "Procédure PSH CFA", 6, 26, "procedure_psh_cfa");
-    add("cfa_guide_connexion", "Guide d'aide à la connexion CFA", 3, 9, "guide_aide_connexion_cfa");
+    // Guide connexion uniquement si distanciel
+    formations.forEach((f) => {
+      const moda = (f.modalites || '').toLowerCase();
+      const isDistanciel = moda.includes('distanciel') || moda.includes('e-learning') || moda.includes('foad') || moda.includes('mixte');
+      if (isDistanciel) {
+        add("cfa_guide_connexion", "Guide d'aide à la connexion CFA", 3, 9, "guide_aide_connexion_cfa");
+      }
+    });
     // Convention de formation par apprentissage — CT3 IND 9
     stagiaires.forEach((s, si) => {
       add(`cfa_c3i9_convention_${si}`, `CT3 - IND 9 CONVENTION DE FORMATION PAR APPRENTISSAGE – ${s.prenom} ${s.nom}`, 3, 9, "convention_formation_apprentissage", { stagiaireIdx: si });
