@@ -187,7 +187,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
   }, []);
 
   const handlePreview = (doc: DocEntry) => {
-    if (doc.template === "pdf_static" && doc.params?.pdfFile) {
+    if (doc.template === "pdf_static" && getStaticFileUrl(doc)) {
       window.open(`/docs/${doc.params.pdfFile}`, "_blank");
       setGenerated((prev) => new Set(prev).add(doc.id));
       return;
@@ -224,8 +224,8 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
   };
 
   const handleDownload = async (doc: DocEntry) => {
-    if (doc.template === "pdf_static" && doc.params?.pdfFile) {
-      const resp = await fetch(`/docs/${doc.params.pdfFile}`);
+    if (doc.template === "pdf_static" && getStaticFileUrl(doc)) {
+      const resp = await fetch(getStaticFileUrl(doc)!);
       const blob = await resp.blob();
       saveAs(blob, buildCatalogFileName(doc));
       return;
@@ -454,8 +454,8 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
           const stagiaire = allStagiaires[si] || allStagiaires[0];
           const stagFolder = `${basePath}/${stagiaire.nom}_${stagiaire.prenom}`.substring(0, 80);
 
-          if (doc.template === "pdf_static" && doc.params?.pdfFile) {
-            const resp = await fetch(`/docs/${doc.params.pdfFile}`);
+          if (doc.template === "pdf_static" && getStaticFileUrl(doc)) {
+            const resp = await fetch(getStaticFileUrl(doc)!);
             const fileBlob = await resp.blob();
             addFileToZip(`${stagFolder}/${buildCatalogFileName(doc, stagiaire)}`, fileBlob);
             await updateProgress();
@@ -503,8 +503,8 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
             }
             await updateProgress();
           }
-        } else if (doc.template === "pdf_static" && doc.params?.pdfFile) {
-          const resp = await fetch(`/docs/${doc.params.pdfFile}`);
+        } else if (doc.template === "pdf_static" && getStaticFileUrl(doc)) {
+          const resp = await fetch(getStaticFileUrl(doc)!);
           const fileBlob = await resp.blob();
           addFileToZip(`${basePath}/${buildCatalogFileName(doc)}`, fileBlob);
           await updateProgress();
@@ -597,8 +597,8 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
           const stagiaire = allStagiaires[si] || allStagiaires[0];
           const stagFolder = `${basePath}/${stagiaire.nom}_${stagiaire.prenom}`.substring(0, 80);
 
-          if (doc.template === "pdf_static" && doc.params?.pdfFile) {
-            const resp = await fetch(`/docs/${doc.params.pdfFile}`);
+          if (doc.template === "pdf_static" && getStaticFileUrl(doc)) {
+            const resp = await fetch(getStaticFileUrl(doc)!);
             zip.file(`${stagFolder}/${buildCatalogFileName(doc, stagiaire)}`, await resp.blob());
           } else if (["indicateurs_performance", "tableau_suivi_parcours_excel", "plan_dev_competences_excel", "tableau_amelioration_continue_excel", "suivi_dysfonctionnements_excel", "relances_appreciations_excel", "vae_indicateurs_previsionnels"].includes(doc.template)) {
             const excelContent = doc.template === "indicateurs_performance"
@@ -632,8 +632,8 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
             }
             await updateProgress();
           }
-        } else if (doc.template === "pdf_static" && doc.params?.pdfFile) {
-          const resp = await fetch(`/docs/${doc.params.pdfFile}`);
+        } else if (doc.template === "pdf_static" && getStaticFileUrl(doc)) {
+          const resp = await fetch(getStaticFileUrl(doc)!);
           zip.file(`${basePath}/${buildCatalogFileName(doc)}`, await resp.blob());
           await updateProgress();
         } else if (["indicateurs_performance", "tableau_suivi_parcours_excel", "plan_dev_competences_excel", "tableau_amelioration_continue_excel", "suivi_dysfonctionnements_excel", "relances_appreciations_excel", "vae_indicateurs_previsionnels"].includes(doc.template)) {
@@ -712,8 +712,8 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
           const stagiaire = allStagiaires[si] || allStagiaires[0];
           const stagFolder = `${basePath}/${stagiaire.nom}_${stagiaire.prenom}`.substring(0, 80);
 
-          if (doc.template === "pdf_static" && doc.params?.pdfFile) {
-            const resp = await fetch(`/docs/${doc.params.pdfFile}`);
+          if (doc.template === "pdf_static" && getStaticFileUrl(doc)) {
+            const resp = await fetch(getStaticFileUrl(doc)!);
             zip.file(`${stagFolder}/${buildCatalogFileName(doc, stagiaire)}`, await resp.blob());
           } else if (["indicateurs_performance", "tableau_suivi_parcours_excel", "plan_dev_competences_excel", "tableau_amelioration_continue_excel", "suivi_dysfonctionnements_excel", "relances_appreciations_excel", "vae_indicateurs_previsionnels", "decoupage_formation_cfa_excel", "matrice_competences_excel", "suivi_chiffre_formation_excel"].includes(doc.template)) {
             const excelContent = doc.template === "indicateurs_performance"
@@ -747,8 +747,8 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
             }
             await updateProgress();
           }
-        } else if (doc.template === "pdf_static" && doc.params?.pdfFile) {
-          const resp = await fetch(`/docs/${doc.params.pdfFile}`);
+        } else if (doc.template === "pdf_static" && getStaticFileUrl(doc)) {
+          const resp = await fetch(getStaticFileUrl(doc)!);
           zip.file(`${basePath}/${buildCatalogFileName(doc)}`, await resp.blob());
           await updateProgress();
         } else if (["indicateurs_performance", "tableau_suivi_parcours_excel", "plan_dev_competences_excel", "tableau_amelioration_continue_excel", "suivi_dysfonctionnements_excel", "relances_appreciations_excel", "vae_indicateurs_previsionnels", "decoupage_formation_cfa_excel", "matrice_competences_excel", "suivi_chiffre_formation_excel"].includes(doc.template)) {
@@ -822,8 +822,8 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
                   zip.file(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, wordBlob.extension)}`, wordBlob.blob);
                 }
               }
-            } else if (doc.template === "pdf_static" && doc.params?.pdfFile) {
-              const resp = await fetch(`/docs/${doc.params.pdfFile}`);
+            } else if (doc.template === "pdf_static" && getStaticFileUrl(doc)) {
+              const resp = await fetch(getStaticFileUrl(doc)!);
               const fileBlob = await resp.blob();
               zip.file(`${basePath}/${buildCatalogFileName(doc)}`, fileBlob);
             } else if (
