@@ -309,13 +309,72 @@ export function htmlWrap(content: string): string {
 
 export function orgHeader(org: OrganismeInfo, subtitle?: string): string {
   const s = _currentStyle;
+  const hs = s.headerStyle || 'classic';
   const logoAlign = s.logoPosition === 'left' ? 'text-align:left' : s.logoPosition === 'right' ? 'text-align:right' : 'text-align:center';
-  const logoHtml = org.logoUrl ? `<div style="margin-bottom:10px;${logoAlign}"><img src="${org.logoUrl}" alt="Logo ${org.nom}" style="max-height:80px;max-width:200px;object-fit:contain" /></div>` : "";
+  const logoHtml = org.logoUrl ? `<img src="${org.logoUrl}" alt="Logo ${org.nom}" style="max-height:80px;max-width:200px;object-fit:contain" />` : "";
+  const subtitleHtml = subtitle ? `<div style="margin-top:8px;font-weight:600;font-size:${s.fontSize + 3}px;font-family:${s.headingFont}">${subtitle}</div>` : "";
+  const ndaLine = `Organisme de formation – NDA : ${org.nda} – SIRET : ${org.siret}`;
+
+  if (hs === 'banner') {
+    return `<div style="background:${s.primaryColor};color:white;padding:20px 24px;border-radius:8px;margin-bottom:24px;${logoAlign}">
+      ${logoHtml ? `<div style="margin-bottom:10px">${logoHtml}</div>` : ""}
+      <div style="font-size:${s.fontSize + 13}px;font-weight:700;font-family:${s.headingFont}">${org.nom}</div>
+      <div style="opacity:0.85;font-size:${s.fontSize}px;margin-top:4px">${ndaLine}</div>
+      ${subtitleHtml ? `<div style="margin-top:10px;font-weight:600;font-size:${s.fontSize + 3}px;opacity:0.95">${subtitle}</div>` : ""}
+    </div>`;
+  }
+
+  if (hs === 'compact') {
+    return `<div style="display:flex;align-items:center;gap:16px;margin-bottom:24px;padding-bottom:14px;border-bottom:2px solid ${s.primaryColor}">
+      ${logoHtml ? `<div style="flex-shrink:0">${logoHtml}</div>` : ""}
+      <div style="flex:1">
+        <div style="font-size:${s.fontSize + 8}px;font-weight:700;color:${s.primaryColor};font-family:${s.headingFont}">${org.nom}</div>
+        <div style="color:#666;font-size:${s.fontSize - 1}px;margin-top:2px">${ndaLine}</div>
+        ${subtitleHtml}
+      </div>
+    </div>`;
+  }
+
+  if (hs === 'elegant') {
+    return `<div style="${logoAlign};margin-bottom:24px">
+      ${logoHtml ? `<div style="margin-bottom:12px">${logoHtml}</div>` : ""}
+      <div style="font-size:${s.fontSize + 13}px;font-weight:600;color:${s.primaryColor};font-family:${s.headingFont};letter-spacing:-0.5px;font-style:italic">${org.nom}</div>
+      <div style="width:60px;height:2px;background:${s.primaryColor};margin:10px ${s.logoPosition === 'center' ? 'auto' : s.logoPosition === 'right' ? '0 0 auto' : 'auto 0'};opacity:0.5"></div>
+      <div style="color:#888;font-size:${s.fontSize - 1}px;margin-top:8px;letter-spacing:0.3px">${ndaLine}</div>
+      ${subtitleHtml}
+    </div>`;
+  }
+
+  if (hs === 'boxed') {
+    return `<div style="border:2px solid ${s.primaryColor};border-radius:10px;padding:18px 22px;margin-bottom:24px;${logoAlign}">
+      ${logoHtml ? `<div style="margin-bottom:10px">${logoHtml}</div>` : ""}
+      <div style="font-size:${s.fontSize + 13}px;font-weight:700;color:${s.primaryColor};font-family:${s.headingFont}">${org.nom}</div>
+      <div style="color:#666;font-size:${s.fontSize}px;margin-top:4px">${ndaLine}</div>
+      ${subtitleHtml}
+    </div>`;
+  }
+
+  if (hs === 'split') {
+    return `<div style="display:flex;align-items:center;gap:20px;margin-bottom:24px;padding:16px 0;border-top:3px solid ${s.primaryColor};border-bottom:3px solid ${s.primaryColor}">
+      ${logoHtml ? `<div style="flex-shrink:0">${logoHtml}</div>` : ""}
+      <div style="flex:1;${s.logoPosition === 'right' ? 'text-align:right' : ''}">
+        <div style="font-size:${s.fontSize + 13}px;font-weight:700;color:${s.primaryColor};font-family:${s.headingFont}">${org.nom}</div>
+        ${subtitleHtml}
+      </div>
+      <div style="flex-shrink:0;text-align:right;font-size:${s.fontSize - 2}px;color:#666;line-height:1.8">
+        <div>NDA : ${org.nda}</div>
+        <div>SIRET : ${org.siret}</div>
+        <div>${org.telephone}</div>
+      </div>
+    </div>`;
+  }
+
+  // Classic (default)
   return `<div class="header" style="${logoAlign}">
-    ${logoHtml}
+    ${logoHtml ? `<div style="margin-bottom:10px">${logoHtml}</div>` : ""}
     <div class="org-name">${org.nom}</div>
-    <div class="subtitle">Organisme de formation – NDA : ${org.nda} – SIRET : ${org.siret}</div>
-    ${subtitle ? `<div class="subtitle" style="margin-top:8px;font-weight:600;font-size:${s.fontSize + 3}px">${subtitle}</div>` : ""}
+    <div class="subtitle">${ndaLine}</div>
+    ${subtitleHtml}
   </div>`;
 }
 

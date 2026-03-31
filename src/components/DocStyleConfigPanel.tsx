@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { DocStyleConfig, DEFAULT_DOC_STYLE, DocTheme, HeadingStyle } from "@/types/qualiopi";
+import { DocStyleConfig, DEFAULT_DOC_STYLE, DocTheme, HeadingStyle, HeaderStyle } from "@/types/qualiopi";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -161,6 +161,46 @@ function HeadingMiniPreview({ headingStyle, primary, secondary, headFont }: { he
     'pill': { ...base, background: `${primary}12`, color: primary, padding: "3px 12px", borderRadius: 20 },
   };
   return <div style={styles[headingStyle]}>Titre</div>;
+}
+
+function HeaderMiniPreview({ headerStyle, primary, headFont }: { headerStyle: HeaderStyle; primary: string; headFont: string }) {
+  const nameStyle = { fontFamily: headFont, fontWeight: 700, fontSize: 10 } as React.CSSProperties;
+  const subStyle = { fontSize: 7, color: "#888", marginTop: 1 } as React.CSSProperties;
+  if (headerStyle === 'banner') {
+    return (<div style={{ background: primary, color: "white", padding: "4px 8px", borderRadius: 5 }}>
+      <div style={{ ...nameStyle, color: "white" }}>ORGANISME</div>
+      <div style={{ ...subStyle, color: "rgba(255,255,255,0.8)" }}>NDA – SIRET</div>
+    </div>);
+  }
+  if (headerStyle === 'compact') {
+    return (<div style={{ display: "flex", alignItems: "center", gap: 6, borderBottom: `1.5px solid ${primary}`, paddingBottom: 3 }}>
+      <div style={{ width: 14, height: 14, borderRadius: 3, background: `${primary}20`, flexShrink: 0 }} />
+      <div><div style={{ ...nameStyle, color: primary }}>ORGANISME</div><div style={subStyle}>NDA – SIRET</div></div>
+    </div>);
+  }
+  if (headerStyle === 'elegant') {
+    return (<div style={{ textAlign: "center" }}>
+      <div style={{ ...nameStyle, color: primary, fontStyle: "italic" }}>ORGANISME</div>
+      <div style={{ width: 20, height: 1.5, background: primary, margin: "3px auto", opacity: 0.5 }} />
+      <div style={{ ...subStyle, letterSpacing: 0.3 }}>NDA – SIRET</div>
+    </div>);
+  }
+  if (headerStyle === 'boxed') {
+    return (<div style={{ border: `1.5px solid ${primary}`, borderRadius: 6, padding: "4px 8px", textAlign: "center" }}>
+      <div style={{ ...nameStyle, color: primary }}>ORGANISME</div>
+      <div style={subStyle}>NDA – SIRET</div>
+    </div>);
+  }
+  if (headerStyle === 'split') {
+    return (<div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderTop: `2px solid ${primary}`, borderBottom: `2px solid ${primary}`, padding: "3px 0" }}>
+      <div style={{ ...nameStyle, color: primary }}>ORGANISME</div>
+      <div style={{ fontSize: 6, color: "#888", textAlign: "right" }}>NDA<br/>SIRET</div>
+    </div>);
+  }
+  return (<div style={{ textAlign: "center" }}>
+    <div style={{ ...nameStyle, color: primary }}>ORGANISME</div>
+    <div style={subStyle}>NDA – SIRET</div>
+  </div>);
 }
 
 function ThemeMiniPreview({ theme, primary, secondary, bodyFont, headFont }: { theme: DocTheme; primary: string; secondary: string; bodyFont: string; headFont: string; fontSize: number }) {
@@ -447,7 +487,36 @@ const DocStyleConfigPanel = ({ style, onChange }: DocStyleConfigPanelProps) => {
                   </div>
                 </div>
 
-                {/* Logo position */}
+                {/* Header style (en-tête du document) */}
+                <div>
+                  <Label className="text-xs mb-2 block font-semibold">Style de l'en-tête du document</Label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {([
+                      { id: "classic" as HeaderStyle, label: "Classique", desc: "Logo + nom centré + ligne NDA" },
+                      { id: "banner" as HeaderStyle, label: "Bannière", desc: "Fond plein coloré, texte blanc" },
+                      { id: "compact" as HeaderStyle, label: "Compact", desc: "Logo à gauche, infos à droite" },
+                      { id: "elegant" as HeaderStyle, label: "Élégant", desc: "Trait fin décoratif, italique" },
+                      { id: "boxed" as HeaderStyle, label: "Encadré", desc: "Bordure autour de l'en-tête" },
+                      { id: "split" as HeaderStyle, label: "Séparé", desc: "Logo + nom | NDA/SIRET à droite" },
+                    ]).map(opt => {
+                      const isActive = (style.headerStyle || 'classic') === opt.id;
+                      return (
+                        <button
+                          key={opt.id}
+                          onClick={() => onChange({ ...style, headerStyle: opt.id })}
+                          className={`text-left p-2.5 rounded-lg border text-xs transition-all ${
+                            isActive ? "border-primary ring-2 ring-primary/20 bg-primary/5 font-semibold" : "hover:border-primary/30"
+                          }`}
+                        >
+                          <HeaderMiniPreview headerStyle={opt.id} primary={style.primaryColor} headFont={style.headingFont} />
+                          <div className="mt-1.5 font-semibold text-[11px]">{opt.label}</div>
+                          <div className="text-[9px] text-muted-foreground">{opt.desc}</div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
                 <div>
                   <Label className="text-xs mb-1 block font-semibold">Position du logo</Label>
                   <div className="flex gap-2">
