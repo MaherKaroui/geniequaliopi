@@ -363,7 +363,7 @@ export function generateExcelSuiviInscriptions(o: OrganismeInfo, f: FormationInf
 
 // ===== TABLEAU DE SUIVI DU PARCOURS BÉNÉFICIAIRES ET ADAPTATION (CFA IND 10) =====
 export function generateExcelSuiviParcoursBeneficiairesCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]): string {
-  const today = formatDate(new Date().toISOString().slice(0, 10));
+  const today = "31/03/2026";
   const stags = stagiaires.length > 0 ? stagiaires : [{ prenom: "Martin", nom: "Dupont", civilite: "M." as const, email: "", telephone: "", entreprise: "", poste: "", dateNaissance: "" }];
 
   let html = `<table>`;
