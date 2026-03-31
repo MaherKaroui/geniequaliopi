@@ -5203,7 +5203,7 @@ function genLivretAccueilCFA_V2(o: OrganismeInfo, f: FormationInfo, stagiaires: 
 
      // ===== ATTESTATION D'ENGAGEMENT =====
     { heading: "Attestation d'engagement", content: `<p>Je soussigné(e) <strong>${s.civilite || ''} ${s.prenom} ${s.nom}</strong> déclare avoir pris connaissance du présent livret d'accueil, du règlement intérieur et de la charte de l'apprentissage. Je m'engage à respecter l'ensemble des règles et dispositions qui y sont mentionnées.</p><p><strong>Date :</strong> ${dateSignature}</p>` },
-  ], signatures: { type: "2", labels: ["Le Directeur du CFA", "L'Apprenti(e) (lu et approuvé)"], names: [o.dirigeant || '___', `${s.prenom} ${s.nom}`], noOrgSignature: true, stagiaireSignatureUrl: s.signatureUrl } });
+  ], signatures: { type: "2", labels: ["Le Directeur du CFA", "L'Apprenti(e) (lu et approuvé)"], names: [o.dirigeant || '___', `${s.prenom} ${s.nom}`], noOrgSignature: true, stagiaireSignatureUrl: s.signatureUrl, dates: [dateSignature, dateSignature] } });
 }
 
 // ============== CFA IND 9 — RÈGLEMENT INTÉRIEUR V2 (complet 8 articles) ==============
@@ -5254,7 +5254,7 @@ function genReglementInterieurCFA_V2(o: OrganismeInfo, f: FormationInfo, stagiai
 
     { heading: "Article 8 : Représentation des apprenants", content: `<h4>Délégué de classe</h4><p>Pour les formations de plus de 400 heures :</p><ul><li>Tous les apprenants sont électeurs et éligibles</li><li>Élection d'un délégué titulaire et d'un suppléant au scrutin uninominal à deux tours</li><li>Le scrutin a lieu dans les deux mois suivant le début de la formation</li><li>Les délégués représentent les apprenants dans tous les conseils de classe</li><li>Ils font toute suggestion pour améliorer les conditions de formation</li></ul>
 <h4>Conseil de Perfectionnement</h4><p>Le Conseil de Perfectionnement se réunit au moins une fois par an. Il est composé de représentants parmi les apprenants, le personnel administratif et l'équipe pédagogique. Il est présidé par le Directeur. Chaque réunion fait l'objet d'un procès-verbal.</p>` },
-  ], signatures: { type: "2", labels: ["Le Directeur du CFA", "L'Apprenti(e) (lu et approuvé)"], names: [o.dirigeant || '___', `${s.prenom} ${s.nom}`], noOrgSignature: true, stagiaireSignatureUrl: s.signatureUrl } });
+  ], signatures: { type: "2", labels: ["Le Directeur du CFA", "L'Apprenti(e) (lu et approuvé)"], names: [o.dirigeant || '___', `${s.prenom} ${s.nom}`], noOrgSignature: true, stagiaireSignatureUrl: s.signatureUrl, dates: [dateSignature, dateSignature] } });
 }
 
 // ============== CFA IND 9 — LIVRE D'APPRENTISSAGE (complet, par stagiaire) ==============
@@ -5405,7 +5405,7 @@ function genConvocationCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
     { heading: "CONTACTS", content: `<p>Pour toute information complémentaire, vous pouvez contacter :</p><ul><li><strong>Référent pédagogique :</strong> ${o.responsablePedagogique || o.dirigeant || '___'}</li><li><strong>Référente administrative :</strong> ${o.dirigeant || '___'}</li></ul><p>${o.email || '___'} | ${o.telephone || '___'}</p>` },
 
     { heading: "INFORMATIONS SUR L'ORGANISME", content: `<p><strong>Nom :</strong> ${o.nom}<br><strong>Adresse :</strong> ${o.adresse || '___'}, ${o.codePostal || '___'} ${o.ville || '___'}<br><strong>SIRET :</strong> ${o.siret || '___'}<br><strong>Email :</strong> ${o.email || '___'}<br><strong>Téléphone :</strong> ${o.telephone || '___'}<br><strong>N° déclaration d'activité :</strong> ${o.nda || '___'}</p>` },
-  ], signatures: { type: "2", labels: ["Le Directeur du CFA", "L'Apprenti(e) (lu et approuvé)"], names: [o.dirigeant || '___', `${s.prenom} ${s.nom}`], noOrgSignature: true, stagiaireSignatureUrl: s.signatureUrl }, extraHtml: `<p style="margin-top:20px"><strong>Fait à</strong> ${o.ville || 'Paris'}, <strong>le</strong> ${dateSignature}</p>` });
+  ], signatures: { type: "2", labels: ["Le Directeur du CFA", "L'Apprenti(e) (lu et approuvé)"], names: [o.dirigeant || '___', `${s.prenom} ${s.nom}`], noOrgSignature: true, stagiaireSignatureUrl: s.signatureUrl, dates: [dateSignature, dateSignature] }, extraHtml: `<p style="margin-top:20px"><strong>Fait à</strong> ${o.ville || 'Paris'}, <strong>le</strong> ${dateSignature}</p>` });
 }
 
 // ============== CFA IND 9 — CGV ==============
@@ -5515,7 +5515,7 @@ function genDroitImageCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
     { heading: "Conditions", content: `<p>L'autorisation de me photographier ou de me filmer est valable pour la durée de la formation.</p><p>La photographie ne sera ni communiquée à d'autres personnes, ni vendue, ni utilisée à d'autres usages que ceux mentionnés ci-dessus.</p><p>La publication ou la diffusion de mon image, sans limite de durée, ainsi que des légendes non-nominatives, ne devront pas porter atteinte à ma dignité, à ma vie privée ou à ma réputation.</p><p>Conformément à la loi, le libre accès aux données photographiques qui me concernent est garanti. Je peux donc à tout moment vérifier l'usage qui en est fait et je dispose du <strong>droit de retrait</strong> de cette image si je le juge utile.</p>` },
 
     { heading: "Signature", content: `<p><strong>Date :</strong> ${dateSignature}</p>` },
-  ], signatures: { type: "2", labels: ["Le Directeur du CFA", "L'Apprenti(e)"], names: [o.dirigeant || '___', `${s.prenom} ${s.nom}`], noOrgSignature: true, stagiaireSignatureUrl: s.signatureUrl } });
+  ], signatures: { type: "2", labels: ["Le Directeur du CFA", "L'Apprenti(e)"], names: [o.dirigeant || '___', `${s.prenom} ${s.nom}`], noOrgSignature: true, stagiaireSignatureUrl: s.signatureUrl, dates: [dateSignature, dateSignature] } });
 }
 
 
