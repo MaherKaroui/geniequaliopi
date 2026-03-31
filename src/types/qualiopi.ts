@@ -8,6 +8,7 @@ export interface DocStyleConfig {
   fontSize: number;        // base font size in px
   logoPosition: 'left' | 'center' | 'right';
   theme: DocTheme;
+  showSectionBorder: boolean; // show/hide left border on sections
 }
 
 export const DEFAULT_DOC_STYLE: DocStyleConfig = {
@@ -18,6 +19,7 @@ export const DEFAULT_DOC_STYLE: DocStyleConfig = {
   fontSize: 13,
   logoPosition: 'center',
   theme: 'classique',
+  showSectionBorder: true,
 };
 
 export interface OrganismeInfo {
