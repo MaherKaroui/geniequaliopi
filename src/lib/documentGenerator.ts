@@ -5157,7 +5157,8 @@ function genLivretAccueilCFA_V2(o: OrganismeInfo, f: FormationInfo, stagiaires: 
   const rncp = getRNCPByCode(f.codeRNCP || '');
   const titreFormation = f.intitule || 'Formation en alternance';
   const s = stagiaires[si] || stagiaires[0] || { prenom: '___', nom: '___' } as StagiaireInfo;
-  const dateSignature = f.dateDebut ? formatDate(subtractBusinessDays(f.dateDebut, 14)) : '____/____/________';
+  const rawDateDebut = getStagiaireDateDebut(s, f) || f.dateDebut;
+  const dateSignature = rawDateDebut ? formatDate(subtractBusinessDays(rawDateDebut, 14)) : formatDate(new Date().toISOString().slice(0, 10));
   const sigHtml = s.signatureUrl ? `<img src="${s.signatureUrl}" style="max-height:60px" />` : '&#160;';
   const blocsHtml = rncp ? rncp.blocsCompetences.map((b, i) =>
     `<p><strong>Bloc ${i + 1} :</strong> ${b.titre}</p><ul>${b.competences.map(c => `<li>${c}</li>`).join('')}</ul>`
@@ -5209,7 +5210,8 @@ function genLivretAccueilCFA_V2(o: OrganismeInfo, f: FormationInfo, stagiaires: 
 
 function genReglementInterieurCFA_V2(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = stagiaires[si] || stagiaires[0] || { prenom: '___', nom: '___' } as StagiaireInfo;
-  const dateSignature = f.dateDebut ? formatDate(subtractBusinessDays(f.dateDebut, 14)) : '____/____/________';
+  const rawDateDebut = getStagiaireDateDebut(s, f) || f.dateDebut;
+  const dateSignature = rawDateDebut ? formatDate(subtractBusinessDays(rawDateDebut, 14)) : formatDate(new Date().toISOString().slice(0, 10));
   return buildDocument({ org: o, title: "RÈGLEMENT INTÉRIEUR DU CFA", sections: [
     { heading: "Préambule", content: `<p>Le premier objectif de <strong>${o.nom}</strong> est la pleine réussite et l'épanouissement de ses apprenants : réussite aux examens, réussite en entreprise, réussite sur le marché du travail, réussite en matière de développement personnel. L'atteinte de ces ambitions est l'affaire de tous : elle passe nécessairement par une forte implication des apprenants dans leur formation et par le strict respect des règles de vie mentionnées dans ce règlement.</p>` },
 
@@ -5263,7 +5265,7 @@ function genLivreApprentissageCFA(o: OrganismeInfo, f: FormationInfo, stagiaires
   const titreFormation = f.intitule || 'Formation en alternance';
   const dateDebut = formatDate(getStagiaireDateDebut(s, f));
   const dateFin = formatDate(getStagiaireDateFin(s, f));
-  const dateSignature = f.dateDebut ? formatDate(subtractBusinessDays(f.dateDebut, 14)) : '____/____/________';
+  const dateSignature = f.dateDebut ? formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || f.dateDebut, 14)) : formatDate(new Date().toISOString().slice(0, 10));
   const sigApprentie = s.signatureUrl ? `<img src="${s.signatureUrl}" style="max-height:60px" />` : '&#160;';
   const tamponCFA = o.tamponUrl ? `<img src="${o.tamponUrl}" style="max-height:80px" />` : '&#160;';
 
@@ -5382,7 +5384,7 @@ function genConvocationCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
   const s = stagiaires[si] || stagiaires[0] || { prenom: '___', nom: '___' } as StagiaireInfo;
   const dateDebut = formatDate(getStagiaireDateDebut(s, f));
   const dateFin = formatDate(getStagiaireDateFin(s, f));
-  const dateSignature = f.dateDebut ? formatDate(subtractBusinessDays(f.dateDebut, 14)) : '____/____/________';
+  const dateSignature = f.dateDebut ? formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || f.dateDebut, 14)) : formatDate(new Date().toISOString().slice(0, 10));
   const dureeTotal = f.duree || '___';
   const lieu = f.lieu || `${o.adresse || '___'}, ${o.codePostal || '___'} ${o.ville || '___'}`;
   const tamponCFA = o.tamponUrl ? `<img src="${o.tamponUrl}" style="max-height:80px" />` : '&#160;';
@@ -5503,7 +5505,7 @@ ${tableHTML(["Président de séance", "Délégué titulaire élu", "Délégué s
 
 function genDroitImageCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = stagiaires[si] || stagiaires[0] || { prenom: '___', nom: '___' } as StagiaireInfo;
-  const dateSignature = f.dateDebut ? formatDate(subtractBusinessDays(f.dateDebut, 14)) : '____/____/________';
+  const dateSignature = f.dateDebut ? formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || f.dateDebut, 14)) : formatDate(new Date().toISOString().slice(0, 10));
 
   return buildDocument({ org: o, title: "DEMANDE D'AUTORISATION DROIT À L'IMAGE", subtitle: "À des fins pédagogiques et éducatives", sections: [
     { heading: "Identité", content: `<p><strong>Je soussigné(e) :</strong> ${s.civilite || ''} ${s.prenom} ${s.nom}</p><p><strong>Formation suivie :</strong> ${f.intitule}</p>` },
