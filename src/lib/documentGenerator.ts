@@ -426,7 +426,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "deroule_pedagogique_detaille": return genDeroulePedagogiqueDetaille(o, f);
     case "contrat_formation_pro": return genContratFormationPro_V2(o, f, stagiaires);
     case "procedure_accueil_stagiaires": return genProcedureAccueil_V2(o);
-    case "reglement_interieur": return genReglement_V2(o, f, stagiaires);
+    // duplicate removed — handled at line 135
     case "groupes_niveaux": return genGroupesNiveaux(o, f, stagiaires);
     case "procedure_eval_debut_formation": return genProcedureEvalDebutFormation(o);
     case "grille_acquisition_competences": return genGrilleAcquisition_V2(o, f, stagiaires);
