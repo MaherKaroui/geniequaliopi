@@ -880,19 +880,35 @@ export function genExercicesStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
 
   // Jeu 2 : Jeu de Rôle / Mise en situation
   extra += `<h4>Jeu 2 : Mise en Situation – Jeu de Rôle</h4>`;
-  extra += `<div class="section"><p><strong>Règle du jeu :</strong> En binôme, résoudre un cas pratique en 20 minutes en mobilisant les compétences acquises. Le formateur évalue la collaboration, la pertinence et la créativité.</p></div>`;
+  const isSolo = stagiaires.length <= 1;
+  extra += `<div class="section"><p><strong>Règle du jeu :</strong> ${isSolo
+    ? `Le stagiaire doit résoudre un cas pratique en 20 minutes en mobilisant les compétences acquises. Le formateur évalue la pertinence, la créativité et la qualité de l'argumentation.`
+    : `En binôme, résoudre un cas pratique en 20 minutes en mobilisant les compétences acquises. Le formateur évalue la collaboration, la pertinence et la créativité.`
+  }</p></div>`;
   const collab = 3 + ((stagiaireIdx * 2 + 1) % 3);
   const pertin = 3 + ((stagiaireIdx * 3 + 2) % 3);
   const creat = 3 + ((stagiaireIdx + 4) % 3);
   const roleTotal = collab + pertin + creat;
-  extra += tableHTML(["Critère", "Note"], [
-    ["Collaboration", `${collab}/5`],
-    ["Pertinence des réponses", `${pertin}/5`],
-    ["Créativité", `${creat}/5`],
-    ["Total", `${roleTotal}/15`],
-  ]);
+  extra += isSolo
+    ? tableHTML(["Critère", "Note"], [
+        ["Pertinence des réponses", `${pertin}/5`],
+        ["Créativité", `${creat}/5`],
+        ["Qualité de l'argumentation", `${collab}/5`],
+        ["Total", `${roleTotal}/15`],
+      ])
+    : tableHTML(["Critère", "Note"], [
+        ["Collaboration", `${collab}/5`],
+        ["Pertinence des réponses", `${pertin}/5`],
+        ["Créativité", `${creat}/5`],
+        ["Total", `${roleTotal}/15`],
+      ]);
   const roleSeed = ((hash * 13 + stagiaireIdx * 11) & 0x7FFFFFFF) % 4;
-  const roleComments = [
+  const roleComments = isSolo ? [
+    `${s.prenom} a fait preuve d'une excellente capacité d'analyse et de synthèse durant la mise en situation. Les solutions proposées sont pertinentes et directement applicables en situation professionnelle chez ${s.entreprise || 'son entreprise'}.`,
+    `Très bonne prestation de ${s.prenom}. Les solutions avancées sont créatives et bien argumentées. ${s.prenom} a su structurer sa réflexion de manière méthodique et proposer des pistes concrètes.`,
+    `${s.prenom} a su mobiliser efficacement les acquis de la formation dans cette mise en situation. L'exercice a révélé des compétences transversales solides : communication, analyse et prise de décision.`,
+    `Participation active et pertinente de ${s.prenom}. Bonne gestion du temps imparti et capacité à hiérarchiser les priorités dans la résolution du cas pratique. Le livrable produit est de qualité.`,
+  ] : [
     `${s.prenom} a montré un excellent esprit d'équipe et une capacité de synthèse remarquable durant le jeu de rôle. Les solutions proposées sont pertinentes et directement applicables en situation professionnelle chez ${s.entreprise || 'son entreprise'}.`,
     `Très bonne participation de ${s.prenom}. Les solutions avancées sont créatives et bien argumentées. ${s.prenom} a su écouter son binôme tout en apportant des idées constructives. Le travail collaboratif est fluide et efficace.`,
     `${s.prenom} a su mobiliser efficacement les acquis de la formation dans ce jeu de rôle. La mise en situation a révélé des compétences transversales solides : communication, analyse et prise de décision. Excellent travail d'équipe.`,
