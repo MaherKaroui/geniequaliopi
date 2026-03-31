@@ -417,22 +417,44 @@ export function buildFullCatalog(
     });
     // Documents individuels per-stagiaire IND 11 CFA
     formations.forEach((f, fi) => {
-      // Calculate CFA weeks: totalHours / 35h per week
-      const dur = parseDuree(f.duree);
-      const totalCFAWeeks = Math.max(1, Math.ceil((dur.totalHours > 0 ? dur.totalHours : 420) / 35));
-      // 2 exercises per CFA week
-      const nbExercices = totalCFAWeeks * 2;
+      const rncp = getRNCPByCode(f.codeRNCP || '');
       stagiaires.forEach((s, si) => {
-        // Tests début/fin (vide si formation pas terminée, rempli sinon)
+        // Tests début/fin
         add(`cfa_c3i11_test_debut_${fi}_${si}`, `CT3 - IND 11 TEST DÉBUT DE FORMATION – ${s.prenom} ${s.nom}`, 3, 11, "test_cfa_stagiaire", { fi, stagiaireIdx: si, phase: "debut" });
         add(`cfa_c3i11_test_fin_${fi}_${si}`, `CT3 - IND 11 TEST FIN DE FORMATION – ${s.prenom} ${s.nom}`, 3, 11, "test_cfa_stagiaire", { fi, stagiaireIdx: si, phase: "fin" });
-        // Exercices pratiques (2 par semaine CFA)
-        for (let exIdx = 0; exIdx < nbExercices; exIdx++) {
-          const weekNum = Math.floor(exIdx / 2) + 1;
-          const exInWeek = (exIdx % 2) + 1;
-          const label = ` (Semaine ${weekNum} - Ex. ${exInWeek})`;
-          add(`cfa_c3i11_exercices_${fi}_${si}_ex${exIdx}`, `CT3 - IND 11 EXERCICE PRATIQUE${label} – ${s.prenom} ${s.nom}`, 3, 11, "exercices_cfa_stagiaire", { fi, stagiaireIdx: si, exerciceIdx: exIdx });
+
+        // Exercices pratiques : 5 par matière par bloc RNCP
+        if (rncp && rncp.blocsCompetences.length > 0) {
+          let globalExIdx = 0;
+          rncp.blocsCompetences.forEach((bloc, bi) => {
+            bloc.matieres.forEach((mat, mi) => {
+              for (let exNum = 0; exNum < 5; exNum++) {
+                const blocLabel = `Bloc ${bi + 1}`;
+                const matLabel = mat.competence.length > 40 ? mat.competence.substring(0, 40) + '…' : mat.competence;
+                const label = ` (${blocLabel} – ${matLabel} – Ex. ${exNum + 1}/5)`;
+                add(
+                  `cfa_c3i11_exercices_${fi}_${si}_b${bi}_m${mi}_ex${exNum}`,
+                  `CT3 - IND 11 EXERCICE PRATIQUE${label} – ${s.prenom} ${s.nom}`,
+                  3, 11, "exercices_cfa_stagiaire",
+                  { fi, stagiaireIdx: si, exerciceIdx: globalExIdx, blocIdx: bi, matiereIdx: mi, exInMatiere: exNum }
+                );
+                globalExIdx++;
+              }
+            });
+          });
+        } else {
+          // Fallback : 2 exercices par semaine CFA
+          const dur = parseDuree(f.duree);
+          const totalCFAWeeks = Math.max(1, Math.ceil((dur.totalHours > 0 ? dur.totalHours : 420) / 35));
+          const nbExercices = totalCFAWeeks * 2;
+          for (let exIdx = 0; exIdx < nbExercices; exIdx++) {
+            const weekNum = Math.floor(exIdx / 2) + 1;
+            const exInWeek = (exIdx % 2) + 1;
+            const label = ` (Semaine ${weekNum} - Ex. ${exInWeek})`;
+            add(`cfa_c3i11_exercices_${fi}_${si}_ex${exIdx}`, `CT3 - IND 11 EXERCICE PRATIQUE${label} – ${s.prenom} ${s.nom}`, 3, 11, "exercices_cfa_stagiaire", { fi, stagiaireIdx: si, exerciceIdx: exIdx });
+          }
         }
+
         // Examen blanc
         add(`cfa_c3i11_examen_blanc_${fi}_${si}`, `CT3 - IND 11 EXAMEN BLANC – ${s.prenom} ${s.nom}`, 3, 11, "examen_blanc_cfa_stagiaire", { fi, stagiaireIdx: si });
         // Grille d'acquisition
