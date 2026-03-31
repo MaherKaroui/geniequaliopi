@@ -837,6 +837,32 @@ const QUESTIONS_OUVERTES: Record<string, QuestionsOuvertesFormation> = {
       { question: "Qu'avez-vous appris pendant cette formation ?", reponseAttendue: "J'ai appris la stratégie d'implémentation IA (C1), le prompt engineering (C2), la protection des données (C3), la production de contenus inclusifs (C4), l'optimisation des contenus (C5) et la conformité IA Act/RGPD (C6)." },
     ],
   },
+  "Massage Prénatal": {
+    debut: [
+      { question: "Qu'est-ce que le massage prénatal ?", reponseAttendue: "Le massage prénatal est une technique de massage adaptée aux femmes enceintes, visant à soulager les tensions musculaires, favoriser la relaxation et accompagner les transformations corporelles de la grossesse." },
+      { question: "Quelles sont les principales contre-indications au massage prénatal ?", reponseAttendue: "Grossesse à risque, menace d'accouchement prématuré, pré-éclampsie, placenta praevia, saignements, fièvre, contractions régulières avant terme." },
+      { question: "Pourquoi est-il déconseillé de masser une femme enceinte au 1er trimestre ?", reponseAttendue: "Le premier trimestre présente un risque accru de fausse couche. Par précaution, on attend généralement la fin du 1er trimestre pour commencer les massages." },
+      { question: "Quelles zones du corps sont les plus sollicitées pendant la grossesse ?", reponseAttendue: "Le bas du dos (lombaires), le bassin, les jambes (rétention d'eau, jambes lourdes), les épaules et la nuque (tensions posturales)." },
+      { question: "Quelle est la différence entre un massage relaxant et un massage prénatal ?", reponseAttendue: "Le massage prénatal est spécifiquement adapté à la grossesse : positions, pressions, zones à éviter, prise en compte des modifications corporelles et des contre-indications spécifiques." },
+      { question: "Qu'est-ce que le périnée et pourquoi est-il important pendant la grossesse ?", reponseAttendue: "Le périnée est l'ensemble des muscles du plancher pelvien qui soutient les organes. Pendant la grossesse, il subit une pression accrue et doit être préparé pour l'accouchement." },
+      { question: "Quelles huiles sont adaptées au massage prénatal ?", reponseAttendue: "Huiles végétales neutres : amande douce, jojoba, argan. Éviter les huiles essentielles sans avis médical, en particulier celles à base de sauge, romarin ou menthe poivrée." },
+      { question: "Décrivez la position de décubitus latéral.", reponseAttendue: "Position allongée sur le côté (généralement gauche), avec un coussin sous la tête, un entre les genoux et un sous le ventre pour un soutien optimal." },
+      { question: "Qu'est-ce que la respiration abdominale ?", reponseAttendue: "C'est une respiration profonde où l'on gonfle le ventre à l'inspiration et on le relâche à l'expiration, permettant une détente profonde et une meilleure oxygénation." },
+      { question: "Quels sont vos objectifs pour cette formation en massage prénatal ?", reponseAttendue: "Réponse ouverte : apprendre les techniques spécifiques au massage prénatal, comprendre l'anatomie de la femme enceinte, savoir adapter les gestes, accompagner le bien-être maternel." },
+    ],
+    fin: [
+      { question: "Décrivez le protocole complet d'une séance de massage prénatal.", reponseAttendue: "1. Accueil et anamnèse (vérification des contre-indications). 2. Installation en décubitus latéral. 3. Recentrage et respiration. 4. Massage du dos. 5. Massage des jambes. 6. Exercices de conscience du bassin. 7. Retour au calme progressif. 8. Conseils post-séance." },
+      { question: "Quelles sont les techniques de drainage adaptées aux jambes lourdes de la grossesse ?", reponseAttendue: "Effleurage ascendant léger des chevilles vers les cuisses, mouvements lents et réguliers, évitement des varices et des zones sensibles (malléole interne), surélévation légère des pieds." },
+      { question: "Comment réaliser un exercice de prise de conscience du bassin ?", reponseAttendue: "Guidance verbale pour amener la conscience sur le bassin, mobilisations douces (antéversion/rétroversion, cercles, bercements), coordination avec la respiration, travail de relâchement du périnée." },
+      { question: "Quels sont les bienfaits du massage prénatal sur le plan psychologique ?", reponseAttendue: "Réduction du stress et de l'anxiété, amélioration du sommeil, connexion mère-bébé, sentiment de bien-être et de prise en charge, préparation mentale à l'accouchement." },
+      { question: "Comment adapter votre pratique au 3ème trimestre de grossesse ?", reponseAttendue: "Pressions plus douces, durée de séance éventuellement réduite, position exclusivement latérale, attention accrue aux signes de fatigue, pause fréquentes, évitement total des points d'acupression stimulants." },
+      { question: "Quels points d'acupression faut-il impérativement éviter chez la femme enceinte ?", reponseAttendue: "Le point Hegu (entre pouce et index), le point Sanyinjiao (malléole interne, 4 doigts au-dessus), le point Jianjing (trapèze supérieur). Ces points peuvent stimuler les contractions." },
+      { question: "Décrivez les techniques de recentrage en début de séance.", reponseAttendue: "Installation confortable, respiration guidée en 4 temps (inspiration 4s, pause 2s, expiration 6s), balayage corporel progressif de la tête aux pieds, invitation à la connexion avec le bébé." },
+      { question: "Quels conseils d'auto-massage donner à une femme enceinte ?", reponseAttendue: "Auto-massage du bas du dos avec une balle contre un mur, massage des pieds, étirements doux du psoas, mobilisations du bassin sur ballon, respiration quotidienne, hydratation régulière." },
+      { question: "Comment gérer une situation d'inconfort pendant la séance ?", reponseAttendue: "Communiquer en continu, observer les réactions non verbales, ajuster immédiatement la position ou la pression, proposer des pauses, arrêter si nécessaire, orienter vers un professionnel de santé si besoin." },
+      { question: "Qu'avez-vous appris pendant cette formation en massage prénatal ?", reponseAttendue: "J'ai appris les techniques de recentrage et respiration, le massage du dos en décubitus latéral, le drainage des jambes, la prise de conscience du bassin, les contre-indications et les protocoles d'auto-massage à transmettre." },
+    ],
+  },
 };
 
 const DEFAULT_QUESTIONS_OUVERTES: QuestionsOuvertesFormation = {
