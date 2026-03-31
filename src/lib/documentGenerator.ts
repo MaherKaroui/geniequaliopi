@@ -5370,7 +5370,7 @@ ${tableHTML(["", ""], [
     { heading: "SIGNATURES ET VALIDATION DU LIVRET", content: `<p>Le présent livret d'apprentissage est remis à l'apprenti(e) en début de formation.</p><p><strong>Fait à</strong> ${o.ville || 'Paris'}</p><p><strong>Date :</strong> ${dateSignature}</p>
 <div style="display:flex;justify-content:space-between;margin-top:30px">
 <div style="text-align:center;width:30%"><p><strong>Signature de l'apprenti(e) :</strong></p><div style="min-height:80px;border:1px solid #ccc;padding:10px">${sigApprentie}</div><p>${s.prenom} ${s.nom}</p></div>
-<div style="text-align:center;width:30%"><p><strong>Signature du maître d'apprentissage :</strong></p><div style="min-height:80px;border:1px solid #ccc;padding:10px">&#160;</div></div>
+<div style="text-align:center;width:30%"><p><strong>Signature du maître d'apprentissage :</strong></p><div style="min-height:80px;border:1px solid #ccc;padding:10px">${s.signatureResponsableUrl ? `<img src="${s.signatureResponsableUrl}" style="max-height:60px" />` : '&#160;'}</div></div>
 <div style="text-align:center;width:30%"><p><strong>Signature et cachet du CFA :</strong></p><div style="min-height:80px;border:1px solid #ccc;padding:10px">${tamponCFA}</div><p>${o.nom}</p></div>
 </div>` },
   ] });
