@@ -613,6 +613,73 @@ export const RNCP_FICHES: RNCPFiche[] = [
     voiesAcces: ["Contrat d'apprentissage", "Formation continue", "Contrat de professionnalisation", "VAE"],
     dureeIndicative: "285 heures (6 mois en alternance)",
   },
+  {
+    code: "RNCP36805",
+    intitule: "TP - Secrétaire assistant médico-social",
+    niveau: "Niveau 4 (Bac)",
+    certificateur: "MINISTÈRE DU TRAVAIL DU PLEIN EMPLOI ET DE L'INSERTION",
+    dateEnregistrement: "01/03/2023",
+    dateEcheance: "01/09/2025",
+    codeNSF: "324t – Saisie, mise en forme et communication des données",
+    formacodes: "35015 – Secrétariat assistanat médicosocial / 35056 – Télésecrétariat / 43421 – Accueil hôpital / 43401 – Dossier soin",
+    resume: "Le secrétaire assistant médico-social assure, au sein des structures sanitaires, médico-sociales ou sociales, l'accueil et la prise en charge des patients et des usagers, la planification des activités du service, le traitement et le suivi administratif des dossiers, la coordination des opérations liées au parcours des patients ou des usagers.",
+    activitesVisees: "Accueil physique et téléphonique des patients et usagers, prise en charge administrative et financière, planification des rendez-vous, transcription de comptes rendus médicaux, suivi et mise à jour des dossiers, coordination du parcours patient, élaboration de tableaux de suivi. Le secrétaire assistant médico-social exerce dans le respect du secret professionnel et médical, sous l'autorité d'un professionnel de santé ou d'un chef de service.",
+    blocsCompetences: [
+      {
+        titre: "Assister une équipe dans la communication des informations et l'organisation des activités",
+        competences: [
+          "Produire des documents professionnels courants",
+          "Communiquer des informations par écrit",
+          "Assurer la traçabilité et la conservation des informations",
+          "Accueillir un visiteur et transmettre des informations oralement",
+          "Planifier et organiser les activités de l'équipe"
+        ],
+        matieres: [
+          { competence: "Production documentaire", contenu: "Rédaction de courriers, notes de service, comptes rendus de réunion, mise en forme de documents professionnels, utilisation avancée du traitement de texte, modèles et publipostage, tableaux et graphiques", volume: "35h" },
+          { competence: "Communication écrite", contenu: "Rédaction professionnelle adaptée au secteur médico-social, emails, notes internes, synthèses, terminologie administrative et médicale, règles de confidentialité dans les écrits", volume: "25h" },
+          { competence: "Traçabilité et archivage", contenu: "Classement et archivage physique et numérique, gestion électronique des documents (GED), normes d'archivage médical, durée de conservation, procédures de destruction sécurisée, RGPD appliqué au secteur médico-social", volume: "20h" },
+          { competence: "Accueil et communication orale", contenu: "Techniques d'accueil physique et téléphonique, gestion des situations difficiles (patients anxieux, agressivité), transmission d'informations orales, prise de messages, filtrage des appels, communication interculturelle", volume: "30h" },
+          { competence: "Planification et organisation", contenu: "Gestion d'agendas multiples, planification de réunions pluridisciplinaires, coordination des emplois du temps, outils de planification collaborative, gestion des urgences et des priorités, tableaux de bord d'activité", volume: "25h" }
+        ],
+        modalitesEval: "Mise en situation écrite (2h) et orale (20 min) : traitement de dossiers, production de documents, accueil téléphonique. Entretien technique (20 min) sur le classement, l'archivage et la planification. Durée totale : 2h40."
+      },
+      {
+        titre: "Assurer l'accueil et la prise en charge administrative du patient ou de l'usager",
+        competences: [
+          "Renseigner et orienter le public dans un service sanitaire, médico-social ou social",
+          "Planifier et gérer les rendez-vous de patients ou d'usagers",
+          "Assurer la prise en charge médico-administrative et sociale du patient ou de l'usager"
+        ],
+        matieres: [
+          { competence: "Accueil et orientation du public", contenu: "Accueil en milieu sanitaire et social, orientation vers les services compétents, connaissance de l'organisation hospitalière (pôles, services), information sur les droits des patients, gestion des situations d'urgence sociale, communication adaptée aux publics fragiles", volume: "30h" },
+          { competence: "Gestion des rendez-vous", contenu: "Logiciels de prise de rendez-vous (Doctolib, logiciels hospitaliers), planification des consultations et examens, gestion des annulations et reports, coordination multi-praticiens, téléconsultation, gestion des listes d'attente", volume: "25h" },
+          { competence: "Prise en charge médico-administrative", contenu: "Création et mise à jour du dossier administratif patient, collecte des documents (carte vitale, mutuelle, CMU-C, AME), admission et sortie des patients, facturation (T2A, codage CCAM/NGAP), télétransmission, relations avec les organismes d'assurance maladie, parcours de soins coordonnés", volume: "40h" }
+        ],
+        modalitesEval: "Mise en situation écrite (1h15) et orale (45 min) : accueil téléphonique (20 min) et face à face (25 min). Entretien technique (20 min). Durée totale : 2h20."
+      },
+      {
+        titre: "Traiter les dossiers et coordonner les opérations liées au parcours du patient ou de l'usager",
+        competences: [
+          "Retranscrire des informations à caractère médical ou social",
+          "Assurer le suivi et la mise à jour des dossiers de patients ou d'usagers",
+          "Coordonner les opérations liées au parcours du patient ou de l'usager",
+          "Élaborer et actualiser des tableaux de suivi dans un service sanitaire, médico-social ou social"
+        ],
+        matieres: [
+          { competence: "Transcription médicale", contenu: "Terminologie médicale approfondie (anatomie, pathologies, pharmacologie), transcription de comptes rendus opératoires, de consultations et d'examens, dictée numérique et reconnaissance vocale, mise en forme normée, vérification orthographique spécialisée", volume: "50h" },
+          { competence: "Suivi des dossiers patients", contenu: "Gestion du dossier patient informatisé (DPI), logiciels métier (HM, Orbis, Crossway), suivi des examens et résultats, correspondances médicales, communication avec les laboratoires et services d'imagerie, archivage du dossier médical", volume: "35h" },
+          { competence: "Coordination du parcours", contenu: "Coordination avec les services internes (admissions, bloc opératoire, imagerie), communication avec les intervenants externes (médecins traitants, spécialistes, CPAM), gestion des transferts et hospitalisations, suivi post-hospitalisation, liens avec les structures médico-sociales (SSR, HAD, EHPAD)", volume: "30h" },
+          { competence: "Tableaux de suivi", contenu: "Création et mise à jour de tableaux de bord (activité du service, taux d'occupation, délais d'attente), indicateurs qualité, statistiques médicales (PMSI), tableur avancé (Excel/Calc), extraction et analyse de données, rapports d'activité", volume: "25h" }
+        ],
+        modalitesEval: "Mise en situation écrite (3h) : analyse de situations professionnelles, traitement de dossiers, production de documents. Entretien technique (20 min). Durée totale : 3h20."
+      }
+    ],
+    secteursActivite: "Secteur sanitaire (hôpitaux, cliniques, cabinets médicaux, maisons de santé, centres d'imagerie, laboratoires), secteur médico-social (EHPAD, ESAT, IME, CMPP, CRP), secteur social (CCAS, CAF, MDPH, CHRS, MECS), télétravail en libéral ou sociétés de télésecrétariat",
+    typesEmplois: ["Secrétaire médical", "Secrétaire médico-social", "Secrétaire social", "Assistant médico-administratif", "Assistant médical", "Secrétaire hospitalier", "Télésecrétaire médical"],
+    codesROME: ["M1609"],
+    voiesAcces: ["Contrat d'apprentissage", "Formation continue", "Contrat de professionnalisation", "VAE"],
+    dureeIndicative: "700 heures (6 à 8 mois)",
+  },
 ];
 
 export function getRNCPByCode(code: string): RNCPFiche | undefined {
