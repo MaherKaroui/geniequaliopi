@@ -1,16 +1,66 @@
 import { useState } from "react";
-import { DocStyleConfig, DEFAULT_DOC_STYLE } from "@/types/qualiopi";
+import { DocStyleConfig, DEFAULT_DOC_STYLE, DocTheme } from "@/types/qualiopi";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, ChevronRight, Palette, Type, Layout } from "lucide-react";
+import { ChevronDown, ChevronRight, Palette, Type, Layout, Paintbrush } from "lucide-react";
 
 interface DocStyleConfigPanelProps {
   style: DocStyleConfig;
   onChange: (style: DocStyleConfig) => void;
 }
+
+interface ThemePreset {
+  id: DocTheme;
+  name: string;
+  description: string;
+  defaults: Partial<DocStyleConfig>;
+}
+
+const THEME_PRESETS: ThemePreset[] = [
+  {
+    id: "classique", name: "Classique",
+    description: "Lignes bleues, tableaux alternés bleu/blanc, bordures fines",
+    defaults: { primaryColor: "#1e3a7b", secondaryColor: "#2d8659", fontFamily: "'Segoe UI', Arial, sans-serif", headingFont: "'Segoe UI', Arial, sans-serif" }
+  },
+  {
+    id: "moderne", name: "Moderne",
+    description: "Dégradés, coins arrondis, ombres douces, titres colorés plein",
+    defaults: { primaryColor: "#0277bd", secondaryColor: "#ef6c00", fontFamily: "'DM Sans', sans-serif", headingFont: "'Space Grotesk', sans-serif" }
+  },
+  {
+    id: "elegant", name: "Élégant",
+    description: "Titres italiques, bordures subtiles, tons pastel, style raffiné",
+    defaults: { primaryColor: "#4a148c", secondaryColor: "#c8a415", fontFamily: "'Raleway', sans-serif", headingFont: "'Playfair Display', serif" }
+  },
+  {
+    id: "minimaliste", name: "Minimaliste",
+    description: "Pas de fond, lignes fines, noir dominant, ultra-épuré",
+    defaults: { primaryColor: "#212121", secondaryColor: "#616161", fontFamily: "'Outfit', sans-serif", headingFont: "'Outfit', sans-serif" }
+  },
+  {
+    id: "bold", name: "Bold / Impact",
+    description: "En-têtes pleins, majuscules, bordures épaisses, look puissant",
+    defaults: { primaryColor: "#ad1457", secondaryColor: "#00838f", fontFamily: "'Barlow', sans-serif", headingFont: "'Montserrat', sans-serif" }
+  },
+  {
+    id: "nature", name: "Nature / Doux",
+    description: "Dégradés légers, bordures pointillées, tons organiques",
+    defaults: { primaryColor: "#1b5e20", secondaryColor: "#e65100", fontFamily: "'Nunito', sans-serif", headingFont: "'Lora', serif" }
+  },
+  {
+    id: "academique", name: "Académique",
+    description: "Doubles bordures, quadrillage complet, style universitaire",
+    defaults: { primaryColor: "#37474f", secondaryColor: "#5d4037", fontFamily: "'EB Garamond', serif", headingFont: "'EB Garamond', serif", fontSize: 14 }
+  },
+  {
+    id: "corporate", name: "Corporate Pro",
+    description: "En-têtes avec ombre, tableaux encadrés, look entreprise premium",
+    defaults: { primaryColor: "#1a237e", secondaryColor: "#00695c", fontFamily: "'Inter', sans-serif", headingFont: "'Inter', sans-serif" }
+  },
+];
 
 const FONT_CATEGORIES = [
   {
@@ -48,7 +98,6 @@ const FONT_CATEGORIES = [
       { value: "'Lexend', sans-serif", label: "Lexend" },
       { value: "'Red Hat Display', sans-serif", label: "Red Hat Display" },
       { value: "'Urbanist', sans-serif", label: "Urbanist" },
-      { value: "'General Sans', sans-serif", label: "General Sans" },
     ]
   },
   {
@@ -83,8 +132,6 @@ const FONT_CATEGORIES = [
   },
 ];
 
-const ALL_FONTS = FONT_CATEGORIES.flatMap(c => c.fonts);
-
 const COLOR_PRESETS = [
   { name: "Bleu classique", primary: "#1e3a7b", secondary: "#2d8659" },
   { name: "Marine & Or", primary: "#1a237e", secondary: "#c8a415" },
@@ -100,73 +147,75 @@ const COLOR_PRESETS = [
   { name: "Prune & Menthe", primary: "#6a1b9a", secondary: "#26a69a" },
 ];
 
-interface DesignPreset {
-  name: string;
-  description: string;
-  style: Partial<DocStyleConfig>;
-}
+// Mini preview renderer per theme
+function ThemeMiniPreview({ theme, primary, secondary, bodyFont, headFont, fontSize }: { theme: DocTheme; primary: string; secondary: string; bodyFont: string; headFont: string; fontSize: number }) {
+  const common = { fontSize: 8, lineHeight: "1.4" };
 
-const DESIGN_PRESETS: DesignPreset[] = [
-  {
-    name: "Corporate classique",
-    description: "Segoe UI, bleu marine, professionnel",
-    style: { primaryColor: "#1e3a7b", secondaryColor: "#2d8659", fontFamily: "'Segoe UI', Arial, sans-serif", headingFont: "'Segoe UI', Arial, sans-serif", fontSize: 13 }
-  },
-  {
-    name: "Moderne élégant",
-    description: "Inter + Playfair, noir & doré",
-    style: { primaryColor: "#1a1a2e", secondaryColor: "#b8860b", fontFamily: "'Inter', sans-serif", headingFont: "'Playfair Display', serif", fontSize: 13 }
-  },
-  {
-    name: "Startup tech",
-    description: "DM Sans + Space Grotesk, bleu vif",
-    style: { primaryColor: "#0277bd", secondaryColor: "#ef6c00", fontFamily: "'DM Sans', sans-serif", headingFont: "'Space Grotesk', sans-serif", fontSize: 13 }
-  },
-  {
-    name: "Académique",
-    description: "EB Garamond, vert forêt",
-    style: { primaryColor: "#1b5e20", secondaryColor: "#5d4037", fontFamily: "'EB Garamond', serif", headingFont: "'EB Garamond', serif", fontSize: 14 }
-  },
-  {
-    name: "Luxe & Raffiné",
-    description: "Cormorant + Raleway, prune & or",
-    style: { primaryColor: "#4a148c", secondaryColor: "#c8a415", fontFamily: "'Raleway', sans-serif", headingFont: "'Cormorant Garamond', serif", fontSize: 13 }
-  },
-  {
-    name: "Minimaliste",
-    description: "Outfit, noir & gris",
-    style: { primaryColor: "#212121", secondaryColor: "#616161", fontFamily: "'Outfit', sans-serif", headingFont: "'Outfit', sans-serif", fontSize: 13 }
-  },
-  {
-    name: "Chaleureux",
-    description: "Nunito + Lora, bordeaux & olive",
-    style: { primaryColor: "#7b1e3a", secondaryColor: "#827717", fontFamily: "'Nunito', sans-serif", headingFont: "'Lora', serif", fontSize: 13 }
-  },
-  {
-    name: "Institutionnel",
-    description: "Source Serif + Source Sans, bleu ardoise",
-    style: { primaryColor: "#37474f", secondaryColor: "#00897b", fontFamily: "'Source Sans 3', sans-serif", headingFont: "'Source Serif 4', serif", fontSize: 13 }
-  },
-];
+  const h1Styles: Record<DocTheme, React.CSSProperties> = {
+    classique: { borderBottom: `2px solid ${primary}`, paddingBottom: 3, color: primary, fontFamily: headFont, fontWeight: 700, fontSize: 11 },
+    moderne: { background: `linear-gradient(135deg,${primary},${secondary})`, color: "white", padding: "4px 8px", borderRadius: 6, fontFamily: headFont, fontWeight: 700, fontSize: 11 },
+    elegant: { borderBottom: `1px solid ${primary}60`, color: primary, fontFamily: headFont, fontWeight: 600, fontStyle: "italic", fontSize: 11 },
+    minimaliste: { color: "#111", fontFamily: headFont, fontWeight: 800, letterSpacing: -0.5, fontSize: 11 },
+    bold: { background: primary, color: "white", padding: "4px 8px", fontFamily: headFont, fontWeight: 800, textTransform: "uppercase" as const, letterSpacing: 0.5, fontSize: 10 },
+    nature: { background: `${primary}15`, borderLeft: `3px solid ${primary}`, padding: "3px 8px", color: primary, fontFamily: headFont, fontWeight: 700, fontSize: 11, borderRadius: "0 4px 4px 0" },
+    academique: { borderBottom: `3px double ${primary}`, paddingBottom: 3, color: primary, fontFamily: headFont, fontWeight: 600, fontSize: 11 },
+    corporate: { background: primary, color: "white", padding: "5px 8px", borderRadius: 4, boxShadow: `0 1px 4px ${primary}50`, fontFamily: headFont, fontWeight: 700, fontSize: 11 },
+  };
+
+  const thStyles: Record<DocTheme, React.CSSProperties> = {
+    classique: { background: primary, color: "white", padding: "2px 4px", fontSize: 7 },
+    moderne: { background: `linear-gradient(135deg,${primary},${primary}dd)`, color: "white", padding: "2px 4px", fontSize: 7, textTransform: "uppercase" as const, letterSpacing: 0.3 },
+    elegant: { background: `${primary}12`, color: primary, padding: "2px 4px", fontSize: 7, borderBottom: `1px solid ${primary}40` },
+    minimaliste: { background: "none", color: "#111", padding: "2px 4px", fontSize: 7, borderBottom: "1.5px solid #111", fontWeight: 700 },
+    bold: { background: primary, color: "white", padding: "2px 4px", fontSize: 7, textTransform: "uppercase" as const, fontWeight: 800 },
+    nature: { background: `${primary}18`, color: primary, padding: "2px 4px", fontSize: 7, borderBottom: `1px solid ${primary}30` },
+    academique: { background: `${primary}10`, color: primary, padding: "2px 4px", fontSize: 7, borderBottom: `1.5px solid ${primary}`, borderRight: `0.5px solid ${primary}20` },
+    corporate: { background: primary, color: "white", padding: "3px 4px", fontSize: 7 },
+  };
+
+  const sectionStyles: Record<DocTheme, React.CSSProperties> = {
+    classique: { background: "#f8f9fa", borderLeft: `3px solid ${primary}`, borderRadius: 4, padding: "3px 6px", ...common, fontFamily: bodyFont },
+    moderne: { background: `linear-gradient(135deg,${primary}08,${secondary}08)`, borderLeft: `3px solid ${primary}`, borderRadius: 6, padding: "3px 6px", ...common, fontFamily: bodyFont },
+    elegant: { background: `${primary}06`, borderLeft: `2px solid ${primary}60`, borderRight: `2px solid ${primary}20`, borderRadius: 2, padding: "3px 6px", ...common, fontFamily: bodyFont },
+    minimaliste: { borderLeft: `1.5px solid #111`, padding: "3px 6px", ...common, fontFamily: bodyFont },
+    bold: { background: `${primary}08`, borderLeft: `4px solid ${primary}`, padding: "3px 6px", ...common, fontFamily: bodyFont },
+    nature: { background: `linear-gradient(to right,${primary}08,${secondary}05)`, borderLeft: `3px solid ${secondary}`, borderRadius: 4, padding: "3px 6px", ...common, fontFamily: bodyFont },
+    academique: { border: `0.5px solid ${primary}25`, borderLeft: `3px solid ${primary}`, padding: "3px 6px", ...common, fontFamily: bodyFont },
+    corporate: { background: "#f4f7fb", borderLeft: `3px solid ${secondary}`, borderRadius: 4, padding: "3px 6px", boxShadow: "0 0.5px 2px rgba(0,0,0,0.04)", ...common, fontFamily: bodyFont },
+  };
+
+  return (
+    <div className="bg-white rounded border p-2 space-y-1.5" style={{ minHeight: 90 }}>
+      <div style={h1Styles[theme]}>Titre principal</div>
+      <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 7, fontFamily: bodyFont }}>
+        <thead><tr>
+          <th style={thStyles[theme]}>Colonne</th>
+          <th style={thStyles[theme]}>Valeur</th>
+        </tr></thead>
+        <tbody>
+          <tr><td style={{ padding: "1px 4px", borderBottom: "0.5px solid #eee" }}>Ligne 1</td><td style={{ padding: "1px 4px", borderBottom: "0.5px solid #eee" }}>Données</td></tr>
+          <tr style={{ background: theme === "minimaliste" ? "transparent" : `${primary}06` }}><td style={{ padding: "1px 4px" }}>Ligne 2</td><td style={{ padding: "1px 4px" }}>Données</td></tr>
+        </tbody>
+      </table>
+      <div style={sectionStyles[theme]}>Section encadrée</div>
+    </div>
+  );
+}
 
 const DocStyleConfigPanel = ({ style, onChange }: DocStyleConfigPanelProps) => {
   const [expanded, setExpanded] = useState(false);
-  const [activeTab, setActiveTab] = useState<"presets" | "colors" | "fonts" | "layout">("presets");
+  const [activeTab, setActiveTab] = useState<"themes" | "colors" | "fonts" | "layout">("themes");
 
   const update = (field: keyof DocStyleConfig, value: string | number) => {
     onChange({ ...style, [field]: value });
   };
 
-  const applyPreset = (preset: typeof COLOR_PRESETS[0]) => {
-    onChange({ ...style, primaryColor: preset.primary, secondaryColor: preset.secondary });
-  };
-
-  const applyDesignPreset = (preset: DesignPreset) => {
-    onChange({ ...style, ...preset.style });
+  const applyTheme = (preset: ThemePreset) => {
+    onChange({ ...style, ...preset.defaults, theme: preset.id });
   };
 
   const tabs = [
-    { id: "presets" as const, label: "Designs", icon: Layout },
+    { id: "themes" as const, label: "Thèmes", icon: Paintbrush },
     { id: "colors" as const, label: "Couleurs", icon: Palette },
     { id: "fonts" as const, label: "Polices", icon: Type },
     { id: "layout" as const, label: "Mise en page", icon: Layout },
@@ -181,7 +230,7 @@ const DocStyleConfigPanel = ({ style, onChange }: DocStyleConfigPanelProps) => {
         {expanded ? <ChevronDown className="w-4 h-4 text-primary" /> : <ChevronRight className="w-4 h-4 text-muted-foreground" />}
         <div className="flex-1">
           <span className="text-sm font-semibold">Personnaliser le design des documents</span>
-          <span className="text-xs text-muted-foreground ml-2">Couleurs, polices, mise en page</span>
+          <span className="text-xs text-muted-foreground ml-2">Thèmes, couleurs, polices</span>
         </div>
         <Button
           variant="ghost"
@@ -214,38 +263,42 @@ const DocStyleConfigPanel = ({ style, onChange }: DocStyleConfigPanelProps) => {
           </div>
 
           <div className="p-4 space-y-4">
-            {/* PRESETS TAB */}
-            {activeTab === "presets" && (
-              <div className="space-y-4">
-                <Label className="text-xs font-semibold text-muted-foreground">DESIGNS COMPLETS PRÉDÉFINIS</Label>
+            {/* THEMES TAB */}
+            {activeTab === "themes" && (
+              <div className="space-y-3">
+                <Label className="text-xs font-semibold text-muted-foreground">CHOISISSEZ UN DESIGN COMPLET</Label>
                 <div className="grid grid-cols-2 gap-3">
-                  {DESIGN_PRESETS.map(preset => {
-                    const isActive = style.primaryColor === preset.style.primaryColor
-                      && style.fontFamily === preset.style.fontFamily;
+                  {THEME_PRESETS.map(preset => {
+                    const isActive = style.theme === preset.id;
+                    const p = preset.defaults;
                     return (
                       <button
-                        key={preset.name}
-                        onClick={() => applyDesignPreset(preset)}
-                        className={`text-left p-3 rounded-lg border transition-all hover:shadow-md ${
-                          isActive ? "border-primary ring-2 ring-primary/20 bg-primary/5" : "hover:border-primary/30"
+                        key={preset.id}
+                        onClick={() => applyTheme(preset)}
+                        className={`text-left rounded-lg border transition-all hover:shadow-md overflow-hidden ${
+                          isActive ? "border-primary ring-2 ring-primary/20" : "hover:border-primary/30"
                         }`}
                       >
-                        <div className="flex items-center gap-2 mb-1">
-                          <div className="flex gap-0.5">
-                            <div className="w-3 h-3 rounded-full" style={{ background: preset.style.primaryColor }} />
-                            <div className="w-3 h-3 rounded-full" style={{ background: preset.style.secondaryColor }} />
+                        <div className="p-2.5 pb-1.5">
+                          <div className="flex items-center gap-2 mb-0.5">
+                            <div className="flex gap-0.5">
+                              <div className="w-3 h-3 rounded-full" style={{ background: p.primaryColor }} />
+                              <div className="w-3 h-3 rounded-full" style={{ background: p.secondaryColor }} />
+                            </div>
+                            <span className="text-xs font-bold">{preset.name}</span>
+                            {isActive && <span className="text-[9px] bg-primary text-primary-foreground px-1.5 py-0.5 rounded-full ml-auto">Actif</span>}
                           </div>
-                          <span className="text-xs font-semibold">{preset.name}</span>
+                          <div className="text-[9px] text-muted-foreground mb-1.5">{preset.description}</div>
                         </div>
-                        <div className="text-[10px] text-muted-foreground">{preset.description}</div>
-                        {/* Mini preview */}
-                        <div className="mt-2 p-2 bg-white rounded border" style={{ fontSize: 9 }}>
-                          <div style={{ fontFamily: preset.style.headingFont, color: preset.style.primaryColor, fontWeight: 700, fontSize: 11 }}>
-                            Titre exemple
-                          </div>
-                          <div style={{ fontFamily: preset.style.fontFamily, fontSize: 9, marginTop: 2 }}>
-                            Corps du texte <span style={{ color: preset.style.secondaryColor, fontWeight: 600 }}>accentué</span>
-                          </div>
+                        <div className="px-2.5 pb-2.5">
+                          <ThemeMiniPreview
+                            theme={preset.id}
+                            primary={p.primaryColor || "#1e3a7b"}
+                            secondary={p.secondaryColor || "#2d8659"}
+                            bodyFont={p.fontFamily || "'Segoe UI'"}
+                            headFont={p.headingFont || "'Segoe UI'"}
+                            fontSize={p.fontSize || 13}
+                          />
                         </div>
                       </button>
                     );
@@ -263,7 +316,7 @@ const DocStyleConfigPanel = ({ style, onChange }: DocStyleConfigPanelProps) => {
                     {COLOR_PRESETS.map(preset => (
                       <button
                         key={preset.name}
-                        onClick={() => applyPreset(preset)}
+                        onClick={() => onChange({ ...style, primaryColor: preset.primary, secondaryColor: preset.secondary })}
                         className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs transition-all hover:shadow-md ${
                           style.primaryColor === preset.primary ? "border-primary ring-2 ring-primary/20 bg-primary/5" : "hover:border-primary/30"
                         }`}
@@ -277,7 +330,6 @@ const DocStyleConfigPanel = ({ style, onChange }: DocStyleConfigPanelProps) => {
                     ))}
                   </div>
                 </div>
-
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label className="text-xs mb-1 block">Couleur principale</Label>
@@ -300,7 +352,6 @@ const DocStyleConfigPanel = ({ style, onChange }: DocStyleConfigPanelProps) => {
             {/* FONTS TAB */}
             {activeTab === "fonts" && (
               <div className="space-y-5">
-                {/* Body font */}
                 <div>
                   <Label className="text-xs mb-1 block font-semibold">Police du corps</Label>
                   <Select value={style.fontFamily} onValueChange={v => update("fontFamily", v)}>
@@ -321,8 +372,6 @@ const DocStyleConfigPanel = ({ style, onChange }: DocStyleConfigPanelProps) => {
                     </SelectContent>
                   </Select>
                 </div>
-
-                {/* Heading font */}
                 <div>
                   <Label className="text-xs mb-1 block font-semibold">Police des titres</Label>
                   <Select value={style.headingFont} onValueChange={v => update("headingFont", v)}>
@@ -343,41 +392,9 @@ const DocStyleConfigPanel = ({ style, onChange }: DocStyleConfigPanelProps) => {
                     </SelectContent>
                   </Select>
                 </div>
-
-                {/* Font size */}
                 <div>
                   <Label className="text-xs mb-1 block font-semibold">Taille de police : {style.fontSize}px</Label>
                   <Slider min={10} max={18} step={1} value={[style.fontSize]} onValueChange={([v]) => update("fontSize", v)} />
-                </div>
-
-                {/* Quick font pairings */}
-                <div>
-                  <Label className="text-xs mb-2 block font-semibold text-muted-foreground">COMBINAISONS RECOMMANDÉES</Label>
-                  <div className="grid grid-cols-2 gap-2">
-                    {[
-                      { body: "'Inter', sans-serif", heading: "'Playfair Display', serif", label: "Inter + Playfair" },
-                      { body: "'DM Sans', sans-serif", heading: "'Space Grotesk', sans-serif", label: "DM Sans + Space Grotesk" },
-                      { body: "'Lato', sans-serif", heading: "'Merriweather', serif", label: "Lato + Merriweather" },
-                      { body: "'Nunito', sans-serif", heading: "'Lora', serif", label: "Nunito + Lora" },
-                      { body: "'Raleway', sans-serif", heading: "'Cormorant Garamond', serif", label: "Raleway + Cormorant" },
-                      { body: "'Source Sans 3', sans-serif", heading: "'Source Serif 4', serif", label: "Source Sans + Serif" },
-                      { body: "'Outfit', sans-serif", heading: "'Fraunces', serif", label: "Outfit + Fraunces" },
-                      { body: "'Manrope', sans-serif", heading: "'DM Serif Display', serif", label: "Manrope + DM Serif" },
-                    ].map(pair => (
-                      <button
-                        key={pair.label}
-                        onClick={() => onChange({ ...style, fontFamily: pair.body, headingFont: pair.heading })}
-                        className={`text-left p-2 rounded-lg border text-xs transition-all hover:shadow-sm ${
-                          style.fontFamily === pair.body && style.headingFont === pair.heading
-                            ? "border-primary ring-1 ring-primary/20 bg-primary/5"
-                            : "hover:border-primary/30"
-                        }`}
-                      >
-                        <div style={{ fontFamily: pair.heading, fontWeight: 700, fontSize: 11 }}>Titre</div>
-                        <div style={{ fontFamily: pair.body, fontSize: 10, color: "#666" }}>{pair.label}</div>
-                      </button>
-                    ))}
-                  </div>
                 </div>
               </div>
             )}
@@ -398,7 +415,7 @@ const DocStyleConfigPanel = ({ style, onChange }: DocStyleConfigPanelProps) => {
                             : "hover:border-primary/30"
                         }`}
                       >
-                        {pos === "left" ? "⬅ Gauche" : pos === "center" ? "⬛ Centre" : "➡ Droite"}
+                        {pos === "left" ? "Gauche" : pos === "center" ? "Centre" : "Droite"}
                       </button>
                     ))}
                   </div>
@@ -408,32 +425,15 @@ const DocStyleConfigPanel = ({ style, onChange }: DocStyleConfigPanelProps) => {
 
             {/* Live preview */}
             <div className="mt-4 p-4 bg-white rounded-lg border">
-              <div className="text-[10px] text-muted-foreground mb-2 font-semibold">APERÇU EN DIRECT</div>
-              <div style={{ fontFamily: style.headingFont, color: style.primaryColor, fontSize: style.fontSize + 6, fontWeight: 700 }}>
-                Titre du document
-              </div>
-              <div style={{ fontFamily: style.headingFont, color: style.primaryColor, fontSize: style.fontSize + 2, fontWeight: 600, marginTop: 8, opacity: 0.8 }}>
-                Sous-titre de section
-              </div>
-              <div style={{ fontFamily: style.fontFamily, fontSize: style.fontSize, marginTop: 6, lineHeight: 1.6 }}>
-                Corps du texte avec la police sélectionnée. Exemple de contenu pour visualiser le rendu final.
-                <span style={{ color: style.secondaryColor, fontWeight: 600 }}> Texte accentué en couleur secondaire.</span>
-              </div>
-              <div style={{ marginTop: 8, padding: "6px 10px", background: `${style.primaryColor}10`, borderLeft: `3px solid ${style.primaryColor}`, borderRadius: 4, fontSize: style.fontSize - 1, fontFamily: style.fontFamily }}>
-                Section de contenu avec le style appliqué.
-              </div>
-              <table style={{ width: "100%", borderCollapse: "collapse", marginTop: 10, fontSize: style.fontSize - 1, fontFamily: style.fontFamily }}>
-                <thead>
-                  <tr>
-                    <th style={{ background: style.primaryColor, color: "white", padding: "5px 8px", textAlign: "left", fontSize: style.fontSize - 1 }}>Colonne A</th>
-                    <th style={{ background: style.primaryColor, color: "white", padding: "5px 8px", textAlign: "left", fontSize: style.fontSize - 1 }}>Colonne B</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr><td style={{ padding: "5px 8px", borderBottom: "1px solid #e0e0e0" }}>Donnée 1</td><td style={{ padding: "5px 8px", borderBottom: "1px solid #e0e0e0" }}>Valeur</td></tr>
-                  <tr style={{ background: "#f0f4fa" }}><td style={{ padding: "5px 8px", borderBottom: "1px solid #e0e0e0" }}>Donnée 2</td><td style={{ padding: "5px 8px", borderBottom: "1px solid #e0e0e0" }}>Valeur</td></tr>
-                </tbody>
-              </table>
+              <div className="text-[10px] text-muted-foreground mb-2 font-semibold">APERÇU DU THÈME « {THEME_PRESETS.find(t => t.id === style.theme)?.name || "Classique"} »</div>
+              <ThemeMiniPreview
+                theme={style.theme || "classique"}
+                primary={style.primaryColor}
+                secondary={style.secondaryColor}
+                bodyFont={style.fontFamily}
+                headFont={style.headingFont}
+                fontSize={style.fontSize}
+              />
             </div>
           </div>
         </div>
