@@ -188,7 +188,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
 
   const handlePreview = (doc: DocEntry) => {
     if (doc.template === "pdf_static" && getStaticFileUrl(doc)) {
-      window.open(`/docs/${doc.params.pdfFile}`, "_blank");
+      window.open(getStaticFileUrl(doc)!, "_blank");
       setGenerated((prev) => new Set(prev).add(doc.id));
       return;
     }
