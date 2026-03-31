@@ -1,5 +1,12 @@
 import { OrganismeInfo, FormationInfo, StagiaireInfo, DocStyleConfig, DEFAULT_DOC_STYLE } from "@/types/qualiopi";
 
+/** Ensure a URL has a protocol prefix and return a clickable <a> tag */
+export function linkUrl(url: string | undefined | null, label?: string): string {
+  if (!url) return "—";
+  const href = /^https?:\/\//i.test(url) ? url : `https://${url}`;
+  return `<a href="${href}" target="_blank" style="color:#1a56db;text-decoration:underline">${label || url}</a>`;
+}
+
 let _currentStyle: DocStyleConfig = { ...DEFAULT_DOC_STYLE };
 
 export function setDocStyle(style: DocStyleConfig) {
