@@ -6993,8 +6993,20 @@ function generateEvalBesoinsAnswers(s: StagiaireInfo, f: FormationInfo, o: Organ
       `${s.prenom} est amené(e) à accueillir les nouveaux résidents, à leur présenter la structure et à les accompagner dans leur phase d'intégration au sein de l'établissement.`,
       `En plus des soins quotidiens, ${s.prenom} participe à la prévention des risques (chutes, dénutrition) et alerte l'équipe médicale en cas de changement d'état de santé des résidents.`,
     ];
-  } else if (isIA) {
+  } else if (isMassage) {
     missionsEntreprise = [
+      `${s.prenom} propose des séances de massage bien-être et de relaxation aux clientes de ${s.entreprise || "l'institut"}. Il/elle souhaite enrichir son offre avec le massage prénatal pour accompagner les femmes enceintes.`,
+      `En tant que ${s.poste || "praticien(ne) bien-être"}, ${s.prenom} réalise des soins corporels, des massages relaxants et des protocoles de soin personnalisés au sein de ${s.entreprise || "son cabinet"}.`,
+      `${s.prenom} accompagne une clientèle diversifiée en massage bien-être. L'ajout du massage prénatal lui permettra de toucher une nouvelle clientèle et de répondre à une demande croissante.`,
+      `Au sein de ${s.entreprise || "l'espace bien-être"}, ${s.prenom} est chargé(e) de l'accueil des clientes, de la réalisation des soins, de l'hygiène du matériel et du suivi de la satisfaction des clientes.`,
+      `${s.prenom} intervient comme praticien(ne) en massage bien-être à domicile et souhaite se spécialiser dans l'accompagnement des femmes enceintes pour développer cette activité.`,
+      `Les missions de ${s.prenom} incluent la réalisation de massages relaxants, de drainages lymphatiques et de soins corporels. Le massage prénatal complétera naturellement cette palette de compétences.`,
+      `${s.prenom} exerce en tant que ${s.poste || "praticien(ne)"} et cherche à se spécialiser dans le bien-être maternel pour proposer un accompagnement complet de la grossesse au post-partum.`,
+      `En tant qu'esthéticien(ne) chez ${s.entreprise || "l'institut"}, ${s.prenom} souhaite acquérir les techniques de massage prénatal pour compléter son offre de soins dédiés aux futures mamans.`,
+      `${s.prenom} travaille dans le secteur du bien-être et de la relaxation. Le massage prénatal est une spécialisation très demandée par sa clientèle de femmes enceintes.`,
+      `Au sein de ${s.entreprise || "la maternité"}, ${s.prenom} participe à l'accompagnement non médicamenteux des femmes enceintes et souhaite enrichir sa pratique avec le massage prénatal.`,
+    ];
+  } else if (isIA) {
       `${s.prenom} est en charge de la création de contenus marketing pour ${s.entreprise} : articles de blog, newsletters mensuelles, posts réseaux sociaux et visuels pour les campagnes de communication.`,
       `En tant que ${s.poste}, ${s.prenom} gère la communication digitale de ${s.entreprise} : production de contenus rédactionnels, création de visuels pour le site web et animation des réseaux sociaux.`,
       `${s.prenom} développe les supports de communication de ${s.entreprise} (brochures, présentations, flyers) et produit des contenus multimédias pour les différents canaux de diffusion.`,
