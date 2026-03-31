@@ -330,6 +330,37 @@ export function generateExcelIndicateursPrevisionnelsVAE(o: OrganismeInfo, f: Fo
   ]);
 }
 
+export function generateExcelSuiviInscriptions(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]): string {
+  const headers = ["SITUATION AVANT DÉMARRAGE FORMATION", "CIVILITÉ", "NOM", "PRÉNOM", "DATE DE NAISSANCE", "PAYS DE NAISSANCE", "INSCRIT SOUS QUEL STATUT", "COMMUNE", "ADRESSE", "CODE POSTAL", "TÉLÉPHONE", "MAIL", "INTITULÉ DE LA FORMATION", "DIPLÔME VISÉ", "DATE DÉBUT DE FORMATION", "DATE DE FIN DE FORMATION", "COMMENTAIRE OBSERVATION"];
+  let html = tableRow(headers, true);
+  stagiaires.slice(0, 15).forEach((s, i) => {
+    html += tableRow([
+      i === 0 ? "Demandeur d'emploi" : i === 1 ? "Salarié" : "",
+      s.civilite || "",
+      s.nom,
+      s.prenom,
+      formatDate(s.dateNaissance),
+      "France",
+      "Apprenti",
+      o.ville || "",
+      "",
+      o.codePostal || "",
+      s.telephone || "",
+      s.email || "",
+      f.intitule || "",
+      f.intitule || "",
+      formatDate(f.dateDebut),
+      formatDate(f.dateFin),
+      ""
+    ]);
+  });
+  // Add empty rows for manual entry
+  for (let i = 0; i < 15; i++) {
+    html += tableRow(headers.map(() => ""));
+  }
+  return excelWrap(`SUIVI DES INSCRIPTIONS ${new Date().getFullYear()}-${new Date().getFullYear() + 1} ${o.nom}`, [{ name: "Inscriptions", html }]);
+}
+
 // Helper to generate Excel blob
 export function excelToBlob(htmlContent: string): Blob {
   return new Blob(["\ufeff", htmlContent], { type: "application/vnd.ms-excel" });
