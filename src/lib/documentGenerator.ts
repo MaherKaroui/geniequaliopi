@@ -8400,8 +8400,7 @@ const FALLBACK_STAGIAIRE: StagiaireInfo = { prenom: "Martin", nom: "Dupont", civ
     ${matiereContenu ? `<p><strong>Contenu abordé :</strong> ${matiereContenu}</p>` : ''}
     <p><strong>Modalité d'évaluation :</strong> ${modalitesEval}</p>
     <p><strong>Nom et prénom :</strong> ${s.prenom} ${s.nom}</p>
-    <p><strong>Semaine CFA :</strong> ${periodeStr || `Semaine ${weekNum}`}</p>
-    <p><strong>Date de l'exercice :</strong> ${dateStr}</p>`;
+    <p><strong>Semaine CFA :</strong> ${periodeStr || `Semaine ${weekNum}`}</p>`;
 
   extra += `<h3>${exerciceTitre}</h3>
     <p><strong>Consigne :</strong></p><p>${consigne}</p>
