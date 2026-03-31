@@ -8123,60 +8123,126 @@ function genExercicesCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires
   const { totalHours } = parseDuree(f.duree);
   const effectiveTotal = totalHours > 0 ? totalHours : 420;
 
-  const weekNum = Math.floor(exerciceIdx / 2) + 1;
-  const exInWeek = (exerciceIdx % 2) + 1;
-
   const cfaWeekDates = getCFAWeekDates(f);
-  const thisWeek = cfaWeekDates[weekNum - 1];
-  let dateStr = '___/___/______';
-  let periodeStr = '';
-  if (thisWeek) {
-    const exDate = new Date(thisWeek.weekStart);
-    exDate.setDate(exDate.getDate() + (exInWeek === 1 ? 1 : 3));
-    dateStr = exDate.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-    periodeStr = `du ${thisWeek.weekStart.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })} au ${thisWeek.weekEnd.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })}`;
-  }
+  const totalCFAWeeks = cfaWeekDates.length || 1;
 
-  // Find which module/matière this week falls into
+  // Determine bloc/matière/exercise from params or fallback
+  const params = arguments.length > 5 ? arguments[5] : undefined;
+  let blocIdx = params?.blocIdx;
+  let matiereIdx = params?.matiereIdx;
+  let exInMatiere = params?.exInMatiere;
+
   let moduleTitle = '';
   let matiereTitle = '';
   let matiereContenu = '';
   let modalitesEval = 'Mise en situation professionnelle';
   let blocCompetences: string[] = [];
+  let weekNum = 1;
+  let exInWeek = 1;
+  let dateStr = '___/___/______';
+  let periodeStr = '';
 
-  if (rncp && rncp.blocsCompetences.length > 0) {
+  if (rncp && rncp.blocsCompetences.length > 0 && blocIdx !== undefined && matiereIdx !== undefined && exInMatiere !== undefined) {
+    // --- NEW: 5 exercises per matière with proportional dating ---
+    const bloc = rncp.blocsCompetences[blocIdx];
+    const mat = bloc?.matieres[matiereIdx];
+    if (bloc) {
+      moduleTitle = bloc.titre;
+      blocCompetences = bloc.competences;
+      modalitesEval = bloc.modalitesEval || modalitesEval;
+    }
+    if (mat) {
+      matiereTitle = mat.competence;
+      matiereContenu = mat.contenu;
+    }
+
+    // Calculate which CFA weeks belong to this matière (proportional to volume)
     const accompHours = Math.round(effectiveTotal * 0.15);
     const blocHoursTotal = effectiveTotal - accompHours;
-    const rncpTotalVolume = rncp.blocsCompetences.reduce((sum, bloc) =>
-      sum + bloc.matieres.reduce((s2, m) => s2 + (parseInt(m.volume) || 0), 0), 0);
+    const rncpTotalVolume = rncp.blocsCompetences.reduce((sum, b) =>
+      sum + b.matieres.reduce((s2, m) => s2 + (parseInt(m.volume) || 0), 0), 0);
     const scale = rncpTotalVolume > 0 ? blocHoursTotal / rncpTotalVolume : 1;
 
+    // Find the CFA week range for this matière
     let cumulWeeks = 0;
-    for (const bloc of rncp.blocsCompetences) {
-      const blocMatiereWeeks: { matiere: typeof bloc.matieres[0]; startWeek: number; endWeek: number }[] = [];
-      for (const mat of bloc.matieres) {
-        const volume = Math.round((parseInt(mat.volume) || 0) * scale);
-        const matWeeks = Math.max(1, Math.ceil(volume / 35));
-        blocMatiereWeeks.push({ matiere: mat, startWeek: cumulWeeks + 1, endWeek: cumulWeeks + matWeeks });
+    let matStartWeek = 0;
+    let matEndWeek = 0;
+    for (let bi = 0; bi < rncp.blocsCompetences.length; bi++) {
+      for (let mi = 0; mi < rncp.blocsCompetences[bi].matieres.length; mi++) {
+        const vol = Math.round((parseInt(rncp.blocsCompetences[bi].matieres[mi].volume) || 0) * scale);
+        const matWeeks = Math.max(1, Math.ceil(vol / 35));
+        if (bi === blocIdx && mi === matiereIdx) {
+          matStartWeek = cumulWeeks;
+          matEndWeek = cumulWeeks + matWeeks - 1;
+        }
         cumulWeeks += matWeeks;
       }
-      const found = blocMatiereWeeks.find(bm => weekNum >= bm.startWeek && weekNum <= bm.endWeek);
-      if (found) {
-        moduleTitle = bloc.titre;
-        matiereTitle = found.matiere.competence;
-        matiereContenu = found.matiere.contenu;
-        modalitesEval = bloc.modalitesEval || modalitesEval;
-        blocCompetences = bloc.competences;
-        break;
-      }
     }
-    if (!moduleTitle && rncp.blocsCompetences.length > 0) {
-      const lastBloc = rncp.blocsCompetences[rncp.blocsCompetences.length - 1];
-      moduleTitle = lastBloc.titre;
-      const lastMat = lastBloc.matieres[lastBloc.matieres.length - 1];
-      if (lastMat) { matiereTitle = lastMat.competence; matiereContenu = lastMat.contenu; }
-      modalitesEval = lastBloc.modalitesEval || modalitesEval;
-      blocCompetences = lastBloc.competences;
+
+    // Spread 5 exercises across the matière's week range
+    const matWeekSpan = matEndWeek - matStartWeek + 1;
+    const exWeekOffset = matWeekSpan <= 1
+      ? 0
+      : Math.round((exInMatiere / 4) * (matWeekSpan - 1));
+    weekNum = matStartWeek + exWeekOffset + 1;
+    // Day within week: cycle through Mon(0), Tue(1), Wed(2), Thu(3), Fri(4)
+    const dayOffset = [1, 2, 3, 1, 3][exInMatiere % 5];
+
+    const thisWeek = cfaWeekDates[weekNum - 1];
+    if (thisWeek) {
+      const exDate = new Date(thisWeek.weekStart);
+      exDate.setDate(exDate.getDate() + dayOffset);
+      dateStr = exDate.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+      periodeStr = `du ${thisWeek.weekStart.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })} au ${thisWeek.weekEnd.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })}`;
+    }
+    exInWeek = exInMatiere + 1;
+  } else {
+    // --- FALLBACK: old week-based logic ---
+    weekNum = Math.floor(exerciceIdx / 2) + 1;
+    exInWeek = (exerciceIdx % 2) + 1;
+
+    const thisWeek = cfaWeekDates[weekNum - 1];
+    if (thisWeek) {
+      const exDate = new Date(thisWeek.weekStart);
+      exDate.setDate(exDate.getDate() + (exInWeek === 1 ? 1 : 3));
+      dateStr = exDate.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+      periodeStr = `du ${thisWeek.weekStart.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })} au ${thisWeek.weekEnd.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })}`;
+    }
+
+    if (rncp && rncp.blocsCompetences.length > 0) {
+      const accompHours = Math.round(effectiveTotal * 0.15);
+      const blocHoursTotal = effectiveTotal - accompHours;
+      const rncpTotalVolume = rncp.blocsCompetences.reduce((sum, b) =>
+        sum + b.matieres.reduce((s2, m) => s2 + (parseInt(m.volume) || 0), 0), 0);
+      const scale = rncpTotalVolume > 0 ? blocHoursTotal / rncpTotalVolume : 1;
+
+      let cumulWeeks = 0;
+      for (const bloc of rncp.blocsCompetences) {
+        const blocMatiereWeeks: { matiere: typeof bloc.matieres[0]; startWeek: number; endWeek: number }[] = [];
+        for (const mat of bloc.matieres) {
+          const volume = Math.round((parseInt(mat.volume) || 0) * scale);
+          const matWeeks = Math.max(1, Math.ceil(volume / 35));
+          blocMatiereWeeks.push({ matiere: mat, startWeek: cumulWeeks + 1, endWeek: cumulWeeks + matWeeks });
+          cumulWeeks += matWeeks;
+        }
+        const found = blocMatiereWeeks.find(bm => weekNum >= bm.startWeek && weekNum <= bm.endWeek);
+        if (found) {
+          moduleTitle = bloc.titre;
+          matiereTitle = found.matiere.competence;
+          matiereContenu = found.matiere.contenu;
+          modalitesEval = bloc.modalitesEval || modalitesEval;
+          blocCompetences = bloc.competences;
+          break;
+        }
+      }
+      if (!moduleTitle && rncp.blocsCompetences.length > 0) {
+        const lastBloc = rncp.blocsCompetences[rncp.blocsCompetences.length - 1];
+        moduleTitle = lastBloc.titre;
+        const lastMat = lastBloc.matieres[lastBloc.matieres.length - 1];
+        if (lastMat) { matiereTitle = lastMat.competence; matiereContenu = lastMat.contenu; }
+        modalitesEval = lastBloc.modalitesEval || modalitesEval;
+        blocCompetences = lastBloc.competences;
+      }
     }
   }
 
