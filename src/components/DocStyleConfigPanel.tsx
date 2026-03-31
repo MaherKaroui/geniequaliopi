@@ -149,7 +149,21 @@ const COLOR_PRESETS = [
 ];
 
 // Mini preview renderer per theme
-function ThemeMiniPreview({ theme, primary, secondary, bodyFont, headFont, fontSize }: { theme: DocTheme; primary: string; secondary: string; bodyFont: string; headFont: string; fontSize: number }) {
+function HeadingMiniPreview({ headingStyle, primary, secondary, headFont }: { headingStyle: HeadingStyle; primary: string; secondary: string; headFont: string }) {
+  const base = { fontFamily: headFont, fontWeight: 700, fontSize: 10 } as React.CSSProperties;
+  const styles: Record<HeadingStyle, React.CSSProperties> = {
+    'line-bottom': { ...base, color: primary, borderBottom: `2px solid ${primary}`, paddingBottom: 2 },
+    'filled': { ...base, background: primary, color: "white", padding: "3px 8px", borderRadius: 4 },
+    'gradient': { ...base, background: `linear-gradient(135deg,${primary},${secondary})`, color: "white", padding: "3px 8px", borderRadius: 6 },
+    'left-bar': { ...base, borderLeft: `3px solid ${primary}`, paddingLeft: 8, color: primary, background: `${primary}08` },
+    'underline-double': { ...base, color: primary, borderBottom: `3px double ${primary}`, paddingBottom: 2 },
+    'plain': { ...base, color: primary },
+    'pill': { ...base, background: `${primary}12`, color: primary, padding: "3px 12px", borderRadius: 20 },
+  };
+  return <div style={styles[headingStyle]}>Titre</div>;
+}
+
+function ThemeMiniPreview({ theme, primary, secondary, bodyFont, headFont }: { theme: DocTheme; primary: string; secondary: string; bodyFont: string; headFont: string; fontSize: number }) {
   const common = { fontSize: 8, lineHeight: "1.4" };
 
   const h1Styles: Record<DocTheme, React.CSSProperties> = {
