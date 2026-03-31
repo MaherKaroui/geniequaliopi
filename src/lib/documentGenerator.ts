@@ -528,7 +528,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "dossier_candidature_cfa": return genDossierCandidatureCFA(o, f);
     case "livret_accueil_cfa": return genLivretAccueilCFA(o, f);
     case "livret_accueil_cfa_v2": return genLivretAccueilCFA_V2(o, f, stagiaires, params?.stagiaireIdx ?? 0);
-    case "reglement_interieur_cfa_v2": return genReglementInterieurCFA_V2(o, f);
+    case "reglement_interieur_cfa_v2": return genReglementInterieurCFA_V2(o, f, stagiaires, params?.stagiaireIdx ?? 0);
     case "pv_election_delegues_cfa": return genPVElectionDeleguesCFA(o, f, stagiaires);
     case "droit_image_cfa": return genDroitImageCFA(o, f, stagiaires, params?.stagiaireIdx ?? 0);
     case "convention_formation_cfa": return genConventionFormationCFA(o, f, stagiaires, params?.stagiaireIdx ?? 0);
