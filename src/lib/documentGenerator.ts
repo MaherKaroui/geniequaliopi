@@ -6708,6 +6708,7 @@ function generateEvalBesoinsAnswers(s: StagiaireInfo, f: FormationInfo, o: Organ
   
   // Detect formation type for coherent answers
   const isFLE = t.includes("français") || t.includes("médico-social") || t.includes("fle") || t.includes("communiquer en");
+  const isMassage = t.includes("massage") || t.includes("prénatal") || t.includes("prenatal") || t.includes("relaxation") || t.includes("bien-être") || t.includes("bien être");
   const isIA = t.includes("intelligence artificielle") || t.includes("ia générative") || t.includes("contenus rédactionnels");
   const isExcel = t.includes("excel");
   const isAnglais = t.includes("anglais") || t.includes("toeic");
