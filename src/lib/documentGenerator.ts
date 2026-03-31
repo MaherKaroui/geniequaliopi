@@ -11,8 +11,9 @@ import { genFichePosteRole, genAutoEvaluationFormateurV2, genProcessusRecrutemen
 import { genVeilleReglementaireV2, genVeilleMetierV2, genVeilleTechnologiqueV2, genVeilleHandicap, genListePartenairesV2, genContratSousTraitanceV2, genCharteQualiteFormateurExterne } from "./templatesCritere6";
 import { genDeroulePedagogique } from "./templatesAF";
 import { getRNCPByCode } from "./rncpData";
-import { generateExcelSuiviInscriptions } from "./xlsxGenerator";
+import { generateExcelSuiviInscriptions, generateExcelSuiviParcoursBeneficiairesCFA } from "./xlsxGenerator";
 import { getModuleSpecificConsigne } from "./cfaExerciseContent";
+import { genProcedureAbandonReorientationCFA, genAccompagnementDistancielCFA, genEnquetePartenaireEmployeurCFA, genFicheRenseignementsCommanditaireCFA, genContratApprentissageModeEmploiCFA, genProcedureAccueilBeneficiairesCFA, genProcedureAdaptationPedagogiqueCFA, genProcedureGestionAnnulationsCFA } from "./templatesCFA";
 
 const FALLBACK_STAGIAIRE: StagiaireInfo = { prenom: "Martin", nom: "Dupont", civilite: "" as "M." | "Mme" | "", email: "", telephone: "", entreprise: "", poste: "", dateNaissance: "" };
 export function getFullCatalog(org: OrganismeInfo, userFormation: FormationInfo, userStagiaires: StagiaireInfo[]): DocEntry[] {
