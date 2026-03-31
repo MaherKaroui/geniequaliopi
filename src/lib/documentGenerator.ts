@@ -527,7 +527,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "mail_type_candidat_cfa": return genMailTypeCandidatCFA(o, f);
     case "dossier_candidature_cfa": return genDossierCandidatureCFA(o, f);
     case "livret_accueil_cfa": return genLivretAccueilCFA(o, f);
-    case "livret_accueil_cfa_v2": return genLivretAccueilCFA_V2(o, f);
+    case "livret_accueil_cfa_v2": return genLivretAccueilCFA_V2(o, f, stagiaires, params?.stagiaireIdx ?? 0);
     case "reglement_interieur_cfa_v2": return genReglementInterieurCFA_V2(o, f);
     case "pv_election_delegues_cfa": return genPVElectionDeleguesCFA(o, f, stagiaires);
     case "droit_image_cfa": return genDroitImageCFA(o, f, stagiaires, params?.stagiaireIdx ?? 0);
@@ -5149,9 +5149,12 @@ ${tableHTML(["Service", "Contact"], [
 
 // ============== CFA IND 9 — LIVRET D'ACCUEIL V2 (complet) ==============
 
-function genLivretAccueilCFA_V2(o: OrganismeInfo, f: FormationInfo) {
+function genLivretAccueilCFA_V2(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const rncp = getRNCPByCode(f.codeRNCP || '');
   const titreFormation = f.intitule || 'Formation en alternance';
+  const s = stagiaires[si] || stagiaires[0] || { prenom: '___', nom: '___' } as StagiaireInfo;
+  const dateSignature = f.dateDebut ? formatDate(subtractBusinessDays(f.dateDebut, 14)) : '____/____/________';
+  const sigHtml = s.signatureUrl ? `<img src="${s.signatureUrl}" style="max-height:60px" />` : '&#160;';
   const blocsHtml = rncp ? rncp.blocsCompetences.map((b, i) =>
     `<p><strong>Bloc ${i + 1} :</strong> ${b.titre}</p><ul>${b.competences.map(c => `<li>${c}</li>`).join('')}</ul>`
   ).join('') : '<p>Voir programme détaillé.</p>';
@@ -5194,7 +5197,7 @@ function genLivretAccueilCFA_V2(o: OrganismeInfo, f: FormationInfo) {
     { heading: "Conseils pour réussir votre alternance", content: `<ul><li>Soyez ponctuel(le) et assidu(e) au CFA et en entreprise</li><li>Organisez votre travail : planning, révisions, dossier professionnel</li><li>Communiquez avec votre tuteur et vos formateurs</li><li>Tenez à jour votre livret d'apprentissage chaque semaine</li><li>N'hésitez pas à solliciter de l'aide dès que vous en ressentez le besoin</li><li>Préparez activement vos épreuves de certification</li></ul>` },
 
     // ===== ATTESTATION D'ENGAGEMENT =====
-    { heading: "Attestation d'engagement", content: `<p>Je soussigné(e) __________________________________ déclare avoir pris connaissance du présent livret d'accueil, du règlement intérieur et de la charte de l'apprentissage. Je m'engage à respecter l'ensemble des règles et dispositions qui y sont mentionnées.</p><p><strong>Date :</strong> ____/____/________</p><br/><p><strong>Signature de l'apprenti(e) :</strong></p><div style="border:1px solid #ccc;min-height:60px;padding:8px">&#160;</div>` },
+    { heading: "Attestation d'engagement", content: `<p>Je soussigné(e) <strong>${s.civilite || ''} ${s.prenom} ${s.nom}</strong> déclare avoir pris connaissance du présent livret d'accueil, du règlement intérieur et de la charte de l'apprentissage. Je m'engage à respecter l'ensemble des règles et dispositions qui y sont mentionnées.</p><p><strong>Date :</strong> ${dateSignature}</p><br/><p><strong>Signature de l'apprenti(e) :</strong></p><div style="border:1px solid #ccc;min-height:60px;padding:8px">${sigHtml}</div>` },
   ] });
 }
 

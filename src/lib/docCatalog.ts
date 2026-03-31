@@ -403,7 +403,9 @@ export function buildFullCatalog(
     });
 
     // ===== CRITÈRE 3 — IND 9 — CONDITIONS DE DÉROULEMENT (CFA) =====
-    add("cfa_c3i9_livret_accueil", "CT3 - IND 9 LIVRET D'ACCUEIL DE L'APPRENTI", 3, 9, "livret_accueil_cfa_v2");
+    stagiaires.forEach((s, si) => {
+      add(`cfa_c3i9_livret_accueil_${si}`, `CT3 - IND 9 LIVRET D'ACCUEIL DE L'APPRENTI – ${s.prenom} ${s.nom}`, 3, 9, "livret_accueil_cfa_v2", { stagiaireIdx: si });
+    });
     add("cfa_c3i9_reglement_interieur", "CT3 - IND 9 RÈGLEMENT INTÉRIEUR DU CFA", 3, 9, "reglement_interieur_cfa_v2");
     add("cfa_c3i9_pv_election_delegues", "CT3 - IND 9 PROCÈS-VERBAL D'ÉLECTION DES DÉLÉGUÉS", 3, 9, "pv_election_delegues_cfa");
     add("cfa_c3i9_pdf_guide_numerique_psh", "CT3 - IND 9 GUIDE NUMÉRIQUE PSH", 3, 9, "pdf_static", { pdfFile: "CT3_IND9_GUIDE_NUMERIQUE_PSH.pdf" });
