@@ -8292,16 +8292,62 @@ function genTableauAmeliorationContinueExcel(o: OrganismeInfo, f: FormationInfo,
   <th>Commentaires / avancement</th>
 </tr>`;
 
-  // Generate realistic improvement actions with dates after formation
-  const actions = [
-    { date: dateOuverture, origine: "Analyse indicateurs", desc: "Taux de satisfaction stagiaires inférieur à l'objectif sur le T1", action: "Mise à jour des supports pédagogiques et adaptation du rythme de formation", qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, 60)), cloture: fmtDate(addDays(baseDate, 55)), commentaire: "Supports refondus, satisfaction remontée à 95%" },
-    { date: dateOuverture, origine: "Réclamation stagiaire", desc: "Problème de connexion Internet pendant la formation", action: "Souscription d'une box Internet supplémentaire pour sécuriser la connexion", qui: o.dirigeant, delai: "Immédiat", cloture: fmtDate(addDays(baseDate, 10)), commentaire: "Box installée, plus aucune coupure signalée" },
-    { date: fmtDate(addDays(baseDate, 14)), origine: "Satisfaction parties prenantes", desc: "Demande de formats de formation plus courts", action: "Création de modules intensifs sur 1 journée", qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, 90)), cloture: fmtDate(addDays(baseDate, 75)), commentaire: "3 formations intensives créées et planifiées" },
-    { date: fmtDate(addDays(baseDate, 21)), origine: "Veille réglementaire", desc: "Évolution du guide de lecture Qualiopi V9", action: "Mise à jour de l'ensemble des procédures qualité", qui: o.referentQualite, delai: fmtDate(addDays(baseDate, 120)), cloture: fmtDate(addDays(baseDate, 110)), commentaire: "Procédures mises à jour, revue documentaire terminée" },
-    { date: fmtDate(addDays(baseDate, 30)), origine: "Entretien formateur", desc: "Besoin de formation continue sur les outils numériques", action: "Inscription aux formations IA et outils collaboratifs", qui: o.dirigeant, delai: fmtDate(addDays(baseDate, 150)), cloture: "", commentaire: "Formation programmée" },
-    { date: fmtDate(addDays(baseDate, 45)), origine: "Enquête satisfaction", desc: "Souhait de plus de cas pratiques professionnels", action: "Développement d'exercices basés sur des situations réelles métier", qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, 150)), cloture: "", commentaire: "En cours de développement" },
-    { date: fmtDate(addDays(baseDate, 60)), origine: "Dysfonctionnement", desc: "Retard dans l'envoi des attestations de fin de formation", action: "Automatisation de la génération et l'envoi des attestations", qui: o.referentQualite, delai: fmtDate(addDays(baseDate, 150)), cloture: "", commentaire: "Outil en phase de test" },
-  ];
+  const t = (f.intitule || "").toLowerCase();
+  const isMassage = t.includes("massage") || t.includes("prénatal") || t.includes("prenatal");
+  const isEsth = t.includes("esthétique") || t.includes("cosmétique");
+  const isAnglais = t.includes("anglais") || t.includes("toeic");
+  const isIA = t.includes("intelligence artificielle") || t.includes(" ia ");
+  const isCRM = t.includes("crm") || t.includes("hubspot");
+  const isNTC = t.includes("négociateur") || t.includes("technico-commercial");
+  const isSAMA = t.includes("secrétaire assistant") || t.includes("médico");
+  const isWebmark = t.includes("webmarketing") || t.includes("marketing de contenus") || t.includes("réseaux sociaux");
+  const isFLE = t.includes("français") || t.includes("fle");
+  const isWord = t.includes("word");
+  const formName = f.intitule || "la formation";
+
+  let actions: Array<{ date: string; origine: string; desc: string; action: string; qui: string; delai: string; cloture: string; commentaire: string }> = [];
+
+  if (isMassage) {
+    actions = [
+      { date: dateOuverture, origine: "Enquête satisfaction", desc: "Stagiaires demandent davantage de pratique sur mannequin de grossesse", action: "Ajout d'une demi-journée supplémentaire de pratique guidée sur mannequin", qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, 60)), cloture: fmtDate(addDays(baseDate, 55)), commentaire: "Demi-journée ajoutée, satisfaction en hausse" },
+      { date: dateOuverture, origine: "Réclamation stagiaire", desc: "Huiles de massage provoquant des réactions cutanées chez certaines femmes enceintes", action: "Référencement exclusif d'huiles bio hypoallergéniques certifiées grossesse", qui: o.dirigeant, delai: "Immédiat", cloture: fmtDate(addDays(baseDate, 10)), commentaire: "Huiles bio commandées et livrées" },
+      { date: fmtDate(addDays(baseDate, 14)), origine: "Veille réglementaire", desc: "Nouvelles recommandations HAS sur le massage périnatal et les contre-indications", action: "Mise à jour du protocole de massage et de la liste des contre-indications absolues/relatives", qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, 90)), cloture: fmtDate(addDays(baseDate, 75)), commentaire: "Protocole mis à jour avec les recommandations HAS 2025" },
+      { date: fmtDate(addDays(baseDate, 21)), origine: "Retour formateur", desc: "Manque d'un module spécifique relaxation du 3ème trimestre", action: "Création d'un module complémentaire : techniques de soulagement lombaire et bassin 3ème trimestre", qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, 120)), cloture: fmtDate(addDays(baseDate, 110)), commentaire: "Module créé et intégré au programme" },
+      { date: fmtDate(addDays(baseDate, 30)), origine: "Audit interne", desc: "Fiches anatomiques de la grossesse (trimestres) à actualiser", action: "Refonte des supports visuels anatomie de la femme enceinte avec illustrations médicales récentes", qui: o.referentQualite, delai: fmtDate(addDays(baseDate, 150)), cloture: fmtDate(addDays(baseDate, 140)), commentaire: "Supports refondus avec illustrateur médical" },
+      { date: fmtDate(addDays(baseDate, 45)), origine: "Satisfaction parties prenantes", desc: "Demande d'un livret récapitulatif des gestes à remettre aux stagiaires", action: "Création d'un livret mémo des protocoles de massage prénatal illustré", qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, 150)), cloture: "", commentaire: "En cours de maquettage" },
+      { date: fmtDate(addDays(baseDate, 60)), origine: "Dysfonctionnement", desc: "Table de massage non réglable en hauteur, inconfortable pour les praticiennes", action: "Acquisition de tables de massage électriques réglables adaptées aux femmes enceintes", qui: o.dirigeant, delai: fmtDate(addDays(baseDate, 150)), cloture: "", commentaire: "Devis en cours" },
+    ];
+  } else if (isEsth) {
+    actions = [
+      { date: dateOuverture, origine: "Enquête satisfaction", desc: "Demande de plus de TP sur modèles vivants pour les soins visage", action: "Augmentation des heures de TP modèles vivants à 60% du temps total", qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, 60)), cloture: fmtDate(addDays(baseDate, 55)), commentaire: "Planning TP réorganisé" },
+      { date: dateOuverture, origine: "Réclamation stagiaire", desc: "Produits cosmétiques en salle de TP proches de la date de péremption", action: "Inventaire trimestriel et renouvellement systématique des produits", qui: o.dirigeant, delai: "Immédiat", cloture: fmtDate(addDays(baseDate, 10)), commentaire: "Stock renouvelé, procédure instaurée" },
+      { date: fmtDate(addDays(baseDate, 14)), origine: "Veille réglementaire", desc: "Évolution du règlement cosmétique européen (CE 1223/2009)", action: "Mise à jour du module réglementation et sécurité cosmétique", qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, 90)), cloture: fmtDate(addDays(baseDate, 75)), commentaire: "Module actualisé" },
+      { date: fmtDate(addDays(baseDate, 21)), origine: "Retour entreprises", desc: "Manque de compétences en conseil personnalisé et diagnostic de peau", action: "Ajout d'ateliers conseil client et diagnostic de peau avec dermatoscope", qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, 120)), cloture: fmtDate(addDays(baseDate, 110)), commentaire: "Ateliers créés" },
+      { date: fmtDate(addDays(baseDate, 30)), origine: "Audit interne", desc: "Fiches techniques soins UV et manucure obsolètes", action: "Refonte complète des fiches techniques avec normes actuelles", qui: o.referentQualite, delai: fmtDate(addDays(baseDate, 150)), cloture: "", commentaire: "En cours" },
+      { date: fmtDate(addDays(baseDate, 45)), origine: "Satisfaction", desc: "Souhait de découvrir les nouvelles tendances (nail art, microblading)", action: "Ajout d'un module tendances et innovations esthétiques", qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, 150)), cloture: "", commentaire: "Programmé" },
+      { date: fmtDate(addDays(baseDate, 60)), origine: "Dysfonctionnement", desc: "Stérilisateur UV en panne récurrente", action: "Remplacement du stérilisateur et contrat de maintenance", qui: o.dirigeant, delai: fmtDate(addDays(baseDate, 150)), cloture: "", commentaire: "Devis accepté" },
+    ];
+  } else if (isAnglais) {
+    actions = [
+      { date: dateOuverture, origine: "Enquête satisfaction", desc: "Demande de plus de mises en situation orales professionnelles", action: "Ajout de jeux de rôle (réunion, appel client, présentation) à chaque séance", qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, 60)), cloture: fmtDate(addDays(baseDate, 55)), commentaire: "Jeux de rôle intégrés" },
+      { date: dateOuverture, origine: "Réclamation stagiaire", desc: "Vocabulaire trop généraliste, pas assez orienté métier", action: "Création de glossaires métier (commerce, santé, tech) avec exercices", qui: o.referentQualite, delai: "Immédiat", cloture: fmtDate(addDays(baseDate, 10)), commentaire: "3 glossaires créés" },
+      { date: fmtDate(addDays(baseDate, 14)), origine: "Veille", desc: "Évolution du format TOEIC 2025", action: "Mise à jour des examens blancs et grilles de scoring TOEIC", qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, 90)), cloture: fmtDate(addDays(baseDate, 75)), commentaire: "Examen blanc V2025 créé" },
+      { date: fmtDate(addDays(baseDate, 21)), origine: "Retour entreprises", desc: "Besoin de modules téléphone et visioconférence en anglais", action: "Développement d'un module communication à distance en anglais", qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, 120)), cloture: fmtDate(addDays(baseDate, 110)), commentaire: "Module livré" },
+      { date: fmtDate(addDays(baseDate, 30)), origine: "Audit", desc: "Supports audio de compréhension orale obsolètes", action: "Renouvellement avec podcasts BBC et vidéos TED récentes", qui: o.referentQualite, delai: fmtDate(addDays(baseDate, 150)), cloture: "", commentaire: "En cours de sélection" },
+      { date: fmtDate(addDays(baseDate, 45)), origine: "Satisfaction", desc: "Souhait d'accès à une plateforme e-learning entre les séances", action: "Mise en place d'un accès Babbel/Gymglish pour les intersessions", qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, 150)), cloture: "", commentaire: "Licence en négociation" },
+      { date: fmtDate(addDays(baseDate, 60)), origine: "Dysfonctionnement", desc: "Casques audio défectueux en salle multimédia", action: "Remplacement des casques et achat de casques de réserve", qui: o.dirigeant, delai: fmtDate(addDays(baseDate, 150)), cloture: "", commentaire: "Commande passée" },
+    ];
+  } else {
+    actions = [
+      { date: dateOuverture, origine: "Analyse indicateurs", desc: `Taux de satisfaction stagiaires inférieur à l'objectif sur la formation ${formName}`, action: `Mise à jour des supports pédagogiques et adaptation du rythme de ${formName}`, qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, 60)), cloture: fmtDate(addDays(baseDate, 55)), commentaire: "Supports refondus, satisfaction remontée à 95%" },
+      { date: dateOuverture, origine: "Réclamation stagiaire", desc: "Problème de connexion Internet pendant la formation", action: "Souscription d'une box Internet supplémentaire pour sécuriser la connexion", qui: o.dirigeant, delai: "Immédiat", cloture: fmtDate(addDays(baseDate, 10)), commentaire: "Box installée, plus aucune coupure signalée" },
+      { date: fmtDate(addDays(baseDate, 14)), origine: "Satisfaction parties prenantes", desc: `Demande de formats plus courts et intensifs pour ${formName}`, action: "Création de modules intensifs sur 1 journée", qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, 90)), cloture: fmtDate(addDays(baseDate, 75)), commentaire: "3 formations intensives créées et planifiées" },
+      { date: fmtDate(addDays(baseDate, 21)), origine: "Veille réglementaire", desc: "Évolution du guide de lecture Qualiopi V9", action: "Mise à jour de l'ensemble des procédures qualité", qui: o.referentQualite, delai: fmtDate(addDays(baseDate, 120)), cloture: fmtDate(addDays(baseDate, 110)), commentaire: "Procédures mises à jour, revue documentaire terminée" },
+      { date: fmtDate(addDays(baseDate, 30)), origine: "Entretien formateur", desc: `Besoin de formation continue sur les outils pédagogiques de ${formName}`, action: "Inscription aux formations outils numériques et innovation pédagogique", qui: o.dirigeant, delai: fmtDate(addDays(baseDate, 150)), cloture: "", commentaire: "Formation programmée" },
+      { date: fmtDate(addDays(baseDate, 45)), origine: "Enquête satisfaction", desc: `Souhait de plus de cas pratiques professionnels en ${formName}`, action: "Développement d'exercices basés sur des situations réelles métier", qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, 150)), cloture: "", commentaire: "En cours de développement" },
+      { date: fmtDate(addDays(baseDate, 60)), origine: "Dysfonctionnement", desc: "Retard dans l'envoi des attestations de fin de formation", action: "Automatisation de la génération et l'envoi des attestations", qui: o.referentQualite, delai: fmtDate(addDays(baseDate, 150)), cloture: "", commentaire: "Outil en phase de test" },
+    ];
+  }
 
   actions.forEach(a => {
     xlsHtml += `<tr>

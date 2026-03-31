@@ -193,15 +193,98 @@ export function genPlanDevCompetencesExcel(o: OrganismeInfo, f: FormationInfo, f
   // ========== FORMATIONS PRÉVUES (année suivante) ==========
   html += `<tr><th colspan="9" style="background:#e8870e;text-align:left;padding:10px">FORMATIONS PRÉVUES – ${nextYear}</th></tr>`;
 
-  // Formations spécifiques dirigeant : monde de la formation professionnelle
+  const t = (f.intitule || "").toLowerCase();
+  const isMassage = t.includes("massage") || t.includes("prénatal") || t.includes("prenatal");
+  const isEsth = t.includes("esthétique") || t.includes("cosmétique");
+  const isAnglais = t.includes("anglais") || t.includes("toeic");
+  const isIA = t.includes("intelligence artificielle") || t.includes(" ia ");
+  const isCRM = t.includes("crm") || t.includes("hubspot");
+  const isNTC = t.includes("négociateur") || t.includes("technico-commercial");
+  const isSAMA = t.includes("secrétaire assistant") || t.includes("médico");
+  const isWebmark = t.includes("webmarketing") || t.includes("marketing de contenus") || t.includes("réseaux sociaux");
+  const isFLE = t.includes("français") || t.includes("fle");
+  const isWord = t.includes("word");
+
   const futureTrainings: Array<{ origine: string; nom: string; objectif: string; type: string; formateur: string; nb: string; noms: string; duree: string }> = [];
 
-  futureTrainings.push(
-    { origine: "Montée en compétences du dirigeant dans le secteur de la formation", nom: "Maîtriser la réglementation de la formation professionnelle", objectif: "Comprendre le cadre juridique (Code du travail, loi Avenir, décrets Qualiopi), les obligations déclaratives (BPF, NDA) et les droits des stagiaires", type: "Externe", formateur: "Centre Inffo – Centre de ressources de la formation", nb: "1", noms: formateurName, duree: "2 jours" },
-    { origine: "Veille technologique et innovation pédagogique", nom: "Intelligence Artificielle appliquée à la formation", objectif: "Intégrer les outils IA (ChatGPT, Gemini, Canva IA, etc.) dans l'ingénierie pédagogique, l'évaluation et la gestion administrative", type: "Externe", formateur: "Digiformag – Groupe Abilways", nb: "1", noms: formateurName, duree: "2 jours" },
-    { origine: "Obligation qualité et préparation audit", nom: "Audit Qualiopi – Préparation et maintien de la certification RNQ V9", objectif: "Préparer l'audit de surveillance, maîtriser les non-conformités et mettre en place un plan d'amélioration continue", type: "Externe", formateur: "Afnor Compétences", nb: "1", noms: formateurName, duree: "1 jour" },
-    { origine: "Montée en compétences pédagogiques", nom: "Concevoir et animer des formations pour adultes (andragogie)", objectif: "Renforcer les techniques d'animation, de gestion de groupe, d'évaluation des acquis et de scénarisation pédagogique", type: "Externe", formateur: "Cnam – Conservatoire National des Arts et Métiers", nb: "1", noms: formateurName, duree: "3 jours" },
-  );
+  if (isMassage) {
+    futureTrainings.push(
+      { origine: "Montée en compétences du formateur en massage prénatal", nom: "Techniques avancées de massage périnatal et post-partum", objectif: "Maîtriser les techniques de drainage lymphatique adapté à la grossesse, les points de pression contre-indiqués et les protocoles du 3ème trimestre", type: "Externe", formateur: "FFMBE – Fédération Française de Massage Bien-Être", nb: "1", noms: formateurName, duree: "3 jours" },
+      { origine: "Veille sécurité et réglementation santé", nom: "Anatomie et physiologie de la grossesse – Mise à jour des connaissances", objectif: "Actualiser les connaissances sur les modifications physiologiques de la grossesse, les contre-indications absolues et relatives au massage", type: "Externe", formateur: "Institut de Formation en Périnatalité", nb: "1", noms: formateurName, duree: "2 jours" },
+      { origine: "Obligation qualité et préparation audit", nom: "Audit Qualiopi – Préparation et maintien de la certification RNQ V9", objectif: "Préparer l'audit de surveillance, maîtriser les non-conformités et mettre en place un plan d'amélioration continue", type: "Externe", formateur: "Afnor Compétences", nb: "1", noms: formateurName, duree: "1 jour" },
+      { origine: "Innovation pédagogique bien-être", nom: "Aromathérapie et huiles essentielles adaptées à la grossesse", objectif: "Connaître les huiles essentielles autorisées et interdites pendant la grossesse, savoir composer des synergies adaptées", type: "Externe", formateur: "École Française d'Aromathérapie", nb: "1", noms: formateurName, duree: "2 jours" },
+    );
+  } else if (isEsth) {
+    futureTrainings.push(
+      { origine: "Montée en compétences techniques esthétiques", nom: "Nouvelles techniques de soins visage anti-âge et haute technologie", objectif: "Maîtriser les protocoles de soins haute technologie (LED, microcourants, radiofréquence) et les actifs cosmétiques innovants", type: "Externe", formateur: "CIDESCO – Comité International d'Esthétique", nb: "1", noms: formateurName, duree: "3 jours" },
+      { origine: "Veille réglementaire cosmétique", nom: "Réglementation cosmétique européenne – Mise à jour CE 1223/2009", objectif: "Maîtriser les évolutions réglementaires, l'étiquetage, les substances interdites et les bonnes pratiques de fabrication", type: "Externe", formateur: "FEBEA – Fédération des Entreprises de la Beauté", nb: "1", noms: formateurName, duree: "1 jour" },
+      { origine: "Obligation qualité et préparation audit", nom: "Audit Qualiopi – Préparation et maintien de la certification RNQ V9", objectif: "Préparer l'audit de surveillance et mettre en place un plan d'amélioration continue", type: "Externe", formateur: "Afnor Compétences", nb: "1", noms: formateurName, duree: "1 jour" },
+      { origine: "Innovation pédagogique", nom: "Tendances beauté et bien-être – Nail art, microblading et maquillage permanent", objectif: "Découvrir et maîtriser les nouvelles tendances pour enrichir l'offre de formation", type: "Externe", formateur: "Académie de la Beauté Paris", nb: "1", noms: formateurName, duree: "2 jours" },
+    );
+  } else if (isAnglais) {
+    futureTrainings.push(
+      { origine: "Montée en compétences du formateur en anglais", nom: "Teaching English for Specific Purposes (ESP) – Méthodologie", objectif: "Maîtriser les approches pédagogiques de l'anglais de spécialité (business, médical, technique) et la différenciation pédagogique", type: "Externe", formateur: "Cambridge Assessment – Teacher Development", nb: "1", noms: formateurName, duree: "3 jours" },
+      { origine: "Veille certification et évaluation", nom: "Nouvelles modalités TOEIC et certifications d'anglais 2025", objectif: "Maîtriser les évolutions du format TOEIC, Linguaskill et les nouvelles grilles de scoring", type: "Externe", formateur: "ETS Global France", nb: "1", noms: formateurName, duree: "1 jour" },
+      { origine: "Obligation qualité et préparation audit", nom: "Audit Qualiopi – Préparation et maintien de la certification RNQ V9", objectif: "Préparer l'audit de surveillance et mettre en place un plan d'amélioration continue", type: "Externe", formateur: "Afnor Compétences", nb: "1", noms: formateurName, duree: "1 jour" },
+      { origine: "Innovation pédagogique numérique", nom: "Outils numériques pour l'enseignement des langues (e-learning, IA)", objectif: "Intégrer les plateformes adaptatives (Gymglish, Babbel Pro) et les outils IA dans la pédagogie des langues", type: "Externe", formateur: "Digiformag – Groupe Abilways", nb: "1", noms: formateurName, duree: "2 jours" },
+    );
+  } else if (isIA) {
+    futureTrainings.push(
+      { origine: "Montée en compétences IA avancée", nom: "IA Générative avancée – Prompt engineering et fine-tuning", objectif: "Maîtriser les techniques avancées de prompt engineering, le fine-tuning de modèles et les RAG (Retrieval-Augmented Generation)", type: "Externe", formateur: "OpenClassrooms – Parcours IA", nb: "1", noms: formateurName, duree: "3 jours" },
+      { origine: "Veille réglementaire IA", nom: "AI Act européen et éthique de l'IA – Cadre juridique", objectif: "Comprendre les obligations du règlement européen sur l'IA, les niveaux de risque et les bonnes pratiques éthiques", type: "Externe", formateur: "CNIL Formations", nb: "1", noms: formateurName, duree: "1 jour" },
+      { origine: "Obligation qualité et préparation audit", nom: "Audit Qualiopi – Préparation et maintien de la certification RNQ V9", objectif: "Préparer l'audit de surveillance et mettre en place un plan d'amélioration continue", type: "Externe", formateur: "Afnor Compétences", nb: "1", noms: formateurName, duree: "1 jour" },
+      { origine: "Innovation pédagogique", nom: "Concevoir des formations avec l'IA (ChatGPT, Gemini, Midjourney)", objectif: "Utiliser l'IA pour créer des supports, évaluer les acquis et personnaliser les parcours de formation", type: "Externe", formateur: "Digiformag – Groupe Abilways", nb: "1", noms: formateurName, duree: "2 jours" },
+    );
+  } else if (isNTC) {
+    futureTrainings.push(
+      { origine: "Montée en compétences commerciales", nom: "Négociation complexe et vente stratégique grands comptes", objectif: "Maîtriser la vente consultative, la négociation multi-interlocuteurs et les techniques de closing avancées", type: "Externe", formateur: "Halifax Consulting", nb: "1", noms: formateurName, duree: "3 jours" },
+      { origine: "Veille commerciale et digitale", nom: "Social Selling et prospection digitale B2B", objectif: "Maîtriser LinkedIn Sales Navigator, l'inbound marketing et les outils de prospection automatisée", type: "Externe", formateur: "Groupe Cegos", nb: "1", noms: formateurName, duree: "2 jours" },
+      { origine: "Obligation qualité et préparation audit", nom: "Audit Qualiopi – Préparation et maintien de la certification RNQ V9", objectif: "Préparer l'audit de surveillance et mettre en place un plan d'amélioration continue", type: "Externe", formateur: "Afnor Compétences", nb: "1", noms: formateurName, duree: "1 jour" },
+      { origine: "Innovation pédagogique", nom: "Concevoir et animer des formations pour adultes (andragogie)", objectif: "Renforcer les techniques d'animation, de gestion de groupe et de scénarisation pédagogique", type: "Externe", formateur: "Cnam – Conservatoire National des Arts et Métiers", nb: "1", noms: formateurName, duree: "3 jours" },
+    );
+  } else if (isSAMA) {
+    futureTrainings.push(
+      { origine: "Montée en compétences secrétariat médical", nom: "Terminologie médicale avancée et codification CCAM/NGAP", objectif: "Approfondir la terminologie par spécialité, maîtriser la codification des actes et la facturation T2A", type: "Externe", formateur: "Sup Santé – École de secrétariat médical", nb: "1", noms: formateurName, duree: "3 jours" },
+      { origine: "Veille réglementaire santé", nom: "RGPD et gestion du dossier patient informatisé (DPI)", objectif: "Maîtriser les obligations RGPD en établissement de santé et les bonnes pratiques du DPI", type: "Externe", formateur: "CNIL Formations", nb: "1", noms: formateurName, duree: "1 jour" },
+      { origine: "Obligation qualité et préparation audit", nom: "Audit Qualiopi – Préparation et maintien de la certification RNQ V9", objectif: "Préparer l'audit de surveillance et mettre en place un plan d'amélioration continue", type: "Externe", formateur: "Afnor Compétences", nb: "1", noms: formateurName, duree: "1 jour" },
+      { origine: "Innovation pédagogique numérique", nom: "Logiciels médicaux et outils de gestion de cabinet", objectif: "Maîtriser Doctolib Pro, les logiciels de facturation et la télétransmission", type: "Externe", formateur: "Digiformag – Groupe Abilways", nb: "1", noms: formateurName, duree: "2 jours" },
+    );
+  } else if (isWebmark) {
+    futureTrainings.push(
+      { origine: "Montée en compétences marketing digital", nom: "Stratégie de contenu avancée et SEO technique", objectif: "Maîtriser le référencement technique, la stratégie de content marketing et les algorithmes des réseaux sociaux", type: "Externe", formateur: "Groupe Cegos – Parcours Marketing Digital", nb: "1", noms: formateurName, duree: "3 jours" },
+      { origine: "Veille technologique réseaux sociaux", nom: "TikTok, Instagram Reels et vidéo courte pour les marques", objectif: "Maîtriser la création de contenu vidéo court, les algorithmes de recommandation et les stratégies d'engagement", type: "Externe", formateur: "Digiformag – Groupe Abilways", nb: "1", noms: formateurName, duree: "2 jours" },
+      { origine: "Obligation qualité et préparation audit", nom: "Audit Qualiopi – Préparation et maintien de la certification RNQ V9", objectif: "Préparer l'audit de surveillance et mettre en place un plan d'amélioration continue", type: "Externe", formateur: "Afnor Compétences", nb: "1", noms: formateurName, duree: "1 jour" },
+      { origine: "Innovation pédagogique", nom: "Intelligence Artificielle appliquée au marketing (ChatGPT, Canva IA)", objectif: "Utiliser l'IA pour automatiser la création de contenu, l'analyse de données et la personnalisation des campagnes", type: "Externe", formateur: "OpenClassrooms", nb: "1", noms: formateurName, duree: "2 jours" },
+    );
+  } else if (isFLE) {
+    futureTrainings.push(
+      { origine: "Montée en compétences FLE", nom: "Didactique du FLE – Approche actionnelle et CECRL", objectif: "Maîtriser l'approche actionnelle, la conception de tâches communicatives et l'évaluation selon le CECRL", type: "Externe", formateur: "Alliance Française – Formation de formateurs", nb: "1", noms: formateurName, duree: "3 jours" },
+      { origine: "Veille pédagogique FLE", nom: "FLE et interculturalité – Accompagner les publics migrants", objectif: "Adapter la pédagogie aux publics allophones, gérer l'hétérogénéité et favoriser l'intégration", type: "Externe", formateur: "CIEP – Centre International d'Études Pédagogiques", nb: "1", noms: formateurName, duree: "2 jours" },
+      { origine: "Obligation qualité et préparation audit", nom: "Audit Qualiopi – Préparation et maintien de la certification RNQ V9", objectif: "Préparer l'audit de surveillance et mettre en place un plan d'amélioration continue", type: "Externe", formateur: "Afnor Compétences", nb: "1", noms: formateurName, duree: "1 jour" },
+      { origine: "Innovation numérique", nom: "Outils numériques pour l'enseignement du FLE (LMS, IA)", objectif: "Intégrer les plateformes de e-learning et les outils IA dans l'enseignement du français", type: "Externe", formateur: "Digiformag – Groupe Abilways", nb: "1", noms: formateurName, duree: "2 jours" },
+    );
+  } else if (isWord) {
+    futureTrainings.push(
+      { origine: "Montée en compétences bureautique", nom: "Microsoft 365 avancé – Word, Excel, PowerPoint et Copilot", objectif: "Maîtriser les fonctions avancées de la suite Office 365, y compris l'assistant IA Copilot", type: "Externe", formateur: "ENI – École Nationale d'Informatique", nb: "1", noms: formateurName, duree: "3 jours" },
+      { origine: "Veille technologique", nom: "Copilot et IA dans Microsoft Office – Intégration pédagogique", objectif: "Comprendre et enseigner l'utilisation de Copilot dans Word, Excel et PowerPoint", type: "Externe", formateur: "Microsoft Learning Partners", nb: "1", noms: formateurName, duree: "1 jour" },
+      { origine: "Obligation qualité et préparation audit", nom: "Audit Qualiopi – Préparation et maintien de la certification RNQ V9", objectif: "Préparer l'audit de surveillance et mettre en place un plan d'amélioration continue", type: "Externe", formateur: "Afnor Compétences", nb: "1", noms: formateurName, duree: "1 jour" },
+      { origine: "Innovation pédagogique", nom: "Concevoir et animer des formations pour adultes (andragogie)", objectif: "Renforcer les techniques d'animation, de gestion de groupe et de scénarisation pédagogique", type: "Externe", formateur: "Cnam – Conservatoire National des Arts et Métiers", nb: "1", noms: formateurName, duree: "3 jours" },
+    );
+  } else if (isCRM) {
+    futureTrainings.push(
+      { origine: "Montée en compétences CRM", nom: "HubSpot CRM avancé – Automatisation et reporting", objectif: "Maîtriser les workflows avancés, le lead scoring, le reporting personnalisé et les intégrations API", type: "Externe", formateur: "HubSpot Academy – Certification avancée", nb: "1", noms: formateurName, duree: "2 jours" },
+      { origine: "Veille technologique CRM", nom: "CRM et Intelligence Artificielle – Scoring prédictif et chatbots", objectif: "Comprendre l'intégration de l'IA dans les CRM (scoring, chatbots, recommandations)", type: "Externe", formateur: "Digiformag – Groupe Abilways", nb: "1", noms: formateurName, duree: "2 jours" },
+      { origine: "Obligation qualité et préparation audit", nom: "Audit Qualiopi – Préparation et maintien de la certification RNQ V9", objectif: "Préparer l'audit de surveillance et mettre en place un plan d'amélioration continue", type: "Externe", formateur: "Afnor Compétences", nb: "1", noms: formateurName, duree: "1 jour" },
+      { origine: "Innovation pédagogique", nom: "Concevoir et animer des formations pour adultes (andragogie)", objectif: "Renforcer les techniques d'animation, de gestion de groupe et de scénarisation pédagogique", type: "Externe", formateur: "Cnam – Conservatoire National des Arts et Métiers", nb: "1", noms: formateurName, duree: "3 jours" },
+    );
+  } else {
+    futureTrainings.push(
+      { origine: "Montée en compétences du dirigeant dans le secteur de la formation", nom: "Maîtriser la réglementation de la formation professionnelle", objectif: "Comprendre le cadre juridique (Code du travail, loi Avenir, décrets Qualiopi), les obligations déclaratives (BPF, NDA) et les droits des stagiaires", type: "Externe", formateur: "Centre Inffo – Centre de ressources de la formation", nb: "1", noms: formateurName, duree: "2 jours" },
+      { origine: "Veille technologique et innovation pédagogique", nom: "Intelligence Artificielle appliquée à la formation", objectif: "Intégrer les outils IA (ChatGPT, Gemini, Canva IA, etc.) dans l'ingénierie pédagogique, l'évaluation et la gestion administrative", type: "Externe", formateur: "Digiformag – Groupe Abilways", nb: "1", noms: formateurName, duree: "2 jours" },
+      { origine: "Obligation qualité et préparation audit", nom: "Audit Qualiopi – Préparation et maintien de la certification RNQ V9", objectif: "Préparer l'audit de surveillance, maîtriser les non-conformités et mettre en place un plan d'amélioration continue", type: "Externe", formateur: "Afnor Compétences", nb: "1", noms: formateurName, duree: "1 jour" },
+      { origine: "Montée en compétences pédagogiques", nom: "Concevoir et animer des formations pour adultes (andragogie)", objectif: "Renforcer les techniques d'animation, de gestion de groupe, d'évaluation des acquis et de scénarisation pédagogique", type: "Externe", formateur: "Cnam – Conservatoire National des Arts et Métiers", nb: "1", noms: formateurName, duree: "3 jours" },
+    );
+  }
 
   futureTrainings.forEach(t => {
     html += `<tr>
