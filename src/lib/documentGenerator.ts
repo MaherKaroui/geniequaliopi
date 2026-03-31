@@ -6239,9 +6239,10 @@ function genSynopsisCFA(o: OrganismeInfo, f: FormationInfo) {
 // ============== TEMPLATES SELECT FORMATION ==============
 
 function genLienSiteInternet(o: OrganismeInfo) {
+  const dateMaj = o.dateMaj ? new Date(o.dateMaj).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) : new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
   return buildDocument({ org: o, title: "LIEN DU SITE INTERNET", sections: [
-    { heading: "Site internet", content: `<p><strong>URL :</strong> ${linkUrl(o.siteWeb)}</p><p>Le site diffuse l'ensemble des informations obligatoires : intitulés, objectifs, durées, modalités, tarifs, prérequis, contacts, indicateurs de résultats et accessibilité handicap.</p>` }, : intitulés, objectifs, durées, modalités, tarifs, prérequis, contacts, indicateurs de résultats et accessibilité handicap.</p>` },<p>Le site diffuse l'ensemble des informations obligatoires : intitulés, objectifs, durées, modalités, tarifs, prérequis, contacts, indicateurs de résultats et accessibilité handicap.</p>` },
-    { heading: "Mise à jour", content: `<p>Dernière mise à jour : ${o.dateMaj ? new Date(o.dateMaj).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) : new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</p>`, variant: "green" },
+    { heading: "Site internet", content: '<p><strong>URL :</strong> ' + linkUrl(o.siteWeb) + '</p><p>Le site diffuse l\'ensemble des informations obligatoires : intitulés, objectifs, durées, modalités, tarifs, prérequis, contacts, indicateurs de résultats et accessibilité handicap.</p>' },
+    { heading: "Mise à jour", content: '<p>Dernière mise à jour : ' + dateMaj + '</p>', variant: "green" },
   ] });
 }
 
