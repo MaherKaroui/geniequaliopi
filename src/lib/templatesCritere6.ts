@@ -28,11 +28,15 @@ function veilleYear(f: FormationInfo, monthsBefore: number): string {
 }
 
 // ===== Detection helpers =====
-type FormationType = "fle" | "ia" | "word" | "commercial" | "webmarketing" | "crm" | "anglais";
+type FormationType = "fle" | "ia" | "word" | "commercial" | "webmarketing" | "crm" | "anglais" | "massage" | "esthetique" | "secretaire" | "management";
 
 function detectFormationType(f: FormationInfo): FormationType {
   const title = (f.intitule || "").toLowerCase();
   if (title.includes("français") || title.includes("fle") || title.includes("social") || title.includes("médico") || title.includes("medico") || title.includes("communiquer en français")) return "fle";
+  if (title.includes("massage") || title.includes("prénatal") || title.includes("prenatal") || title.includes("relaxation") || title.includes("bien-être") || title.includes("bien être")) return "massage";
+  if (title.includes("esthéti") || title.includes("cosmétique") || title.includes("parfumerie") || title.includes("beauté")) return "esthetique";
+  if (title.includes("secrétaire") || title.includes("assistant") || title.includes("médico-admin")) return "secretaire";
+  if (title.includes("management") || title.includes("encadrement") || title.includes("leadership") || title.includes("manager")) return "management";
   if (title.includes("intelligence artificielle") || title.includes("ia générative") || title.includes("ia ") || title.includes("contenus rédactionnels") || title.includes("chatgpt") || title.includes("prompt")) return "ia";
   if (title.includes("crm") || title.includes("automation") || title.includes("automatisation")) return "crm";
   if (title.includes("webmarketing") || title.includes("marketing de contenus") || title.includes("réseaux sociaux") || title.includes("marketing digital")) return "webmarketing";
@@ -270,6 +274,70 @@ function veilleReglementaireRows(f: FormationInfo, type: FormationType): string[
         veilleDate(f, 2),
         "Programme européen soutenant la mobilité professionnelle et l'apprentissage des langues. Financements disponibles pour les organismes certifiés.",
         "Preuve : site Erasmus+. Action : explorer les financements Erasmus+ pour les parcours de formation en anglais et enrichir l'offre."
+      ],
+    ];
+  }
+
+  if (type === "massage" || type === "esthetique") {
+    return [...common,
+      [
+        `<a href="https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000006912284">Légifrance – Art. L1110-4 Code de la santé publique</a>`,
+        "Respect de la vie privée et secret professionnel dans le secteur du bien-être",
+        veilleDate(f, 5),
+        "Obligation de respecter la vie privée et le secret professionnel pour les praticiens du bien-être et du massage. Encadrement de la relation praticien-client.",
+        "Preuve : extrait du Code de la santé publique. Action : intégrer un module sur l'éthique et la déontologie dans la formation massage."
+      ],
+      [
+        `<a href="https://www.centre-inffo.fr/site-droit-formation/actualites-droit/cpf-hausse-du-montant-de-la-participation-forfaitaire">Centre Inffo – CPF</a>`,
+        "CPF : Hausse du montant de la participation forfaitaire",
+        veilleDate(f, 3),
+        "La participation financière obligatoire pour l'achat d'une formation CPF s'élève à 103,20 euros.",
+        "Preuve : article Centre Inffo. Action : informer les futurs stagiaires du reste à charge CPF."
+      ],
+      [
+        `<a href="https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000006910978">Légifrance – Art. R4127-39 Code de la santé publique</a>`,
+        "Encadrement des pratiques de bien-être et distinction avec les actes médicaux",
+        veilleDate(f, 2),
+        "Distinction entre massage de bien-être et massage thérapeutique (kinésithérapie). Les praticiens en massage prénatal doivent connaître les limites de leur exercice.",
+        "Preuve : texte réglementaire. Action : clarifier dans le programme les contre-indications et le périmètre d'intervention du praticien bien-être."
+      ],
+    ];
+  }
+
+  if (type === "management") {
+    return [...common,
+      [
+        `<a href="https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000006901294">Légifrance – Art. L.6321-1 Code du travail</a>`,
+        "Obligation de formation des salariés – Développement des compétences managériales",
+        veilleDate(f, 5),
+        "L'employeur assure l'adaptation des salariés à leur poste. La montée en compétences managériales est un levier clé de la politique RH.",
+        "Preuve : extrait Code du travail. Action : intégrer les obligations légales dans le module management des ressources humaines."
+      ],
+      [
+        `<a href="https://www.centre-inffo.fr/site-droit-formation/actualites-droit/cpf-hausse-du-montant-de-la-participation-forfaitaire">Centre Inffo – CPF</a>`,
+        "CPF : Hausse du montant de la participation forfaitaire",
+        veilleDate(f, 3),
+        "Participation financière obligatoire pour les formations CPF. Impact sur les formations en management et leadership.",
+        "Preuve : article Centre Inffo. Action : informer les futurs stagiaires managers du reste à charge."
+      ],
+    ];
+  }
+
+  if (type === "secretaire") {
+    return [...common,
+      [
+        `<a href="https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000006912284">Légifrance – Art. L1110-4 CSP</a>`,
+        "Secret médical et confidentialité des données de santé",
+        veilleDate(f, 5),
+        "Obligation de secret professionnel pour les secrétaires médico-administratifs. Encadrement strict de l'accès aux données de santé (DPI, courriers médicaux).",
+        "Preuve : Code de la santé publique. Action : module sur le secret médical et la gestion sécurisée des dossiers patients."
+      ],
+      [
+        `<a href="https://www.centre-inffo.fr/site-droit-formation/actualites-droit/cpf-hausse-du-montant-de-la-participation-forfaitaire">Centre Inffo – CPF</a>`,
+        "CPF : Hausse du montant de la participation forfaitaire",
+        veilleDate(f, 3),
+        "Participation financière CPF de 103,20 euros. Impact sur les formations secrétariat médical.",
+        "Preuve : article Centre Inffo. Action : informer les stagiaires du reste à charge CPF."
       ],
     ];
   }
@@ -535,6 +603,133 @@ function veilleMetierRows(f: FormationInfo, type: FormationType): string[][] {
         veilleYear(f, 3),
         "Rapport annuel classant les pays par niveau d'anglais. La France se situe au rang 'modéré', soulignant le besoin de formation.",
         "Preuve : rapport PDF EF EPI. Action Qualiopi : utiliser ces données pour justifier la pertinence des formations anglais débutant."
+      ],
+    ];
+  }
+
+  if (type === "massage" || type === "esthetique") {
+    return [
+      [
+        `<a href="https://www.ffmbe.fr/">ffmbe.fr – Fédération Française de Massage Bien-Être</a>`,
+        "FFMBE – Fédération du massage bien-être en France",
+        veilleMonthYear(f, 8),
+        "Fédération professionnelle de référence pour les praticiens en massage bien-être. Informations sur les certifications, le cadre légal et les bonnes pratiques de la profession.",
+        "Preuve : capture + lien. Action : aligner les objectifs pédagogiques sur les standards FFMBE et les bonnes pratiques fédérales."
+      ],
+      [
+        `<a href="https://www.doctissimo.fr/grossesse/bien-etre-pendant-la-grossesse/massage-prenatal">Doctissimo – Massage prénatal</a>`,
+        "Massage prénatal : bienfaits, techniques et précautions",
+        veilleMonthYear(f, 7),
+        "Article de référence sur les bienfaits du massage pendant la grossesse : réduction du stress, soulagement des douleurs, amélioration du sommeil. Contre-indications détaillées.",
+        "Action Qualiopi : mettre à jour le module contre-indications avec les dernières recommandations médicales."
+      ],
+      [
+        `<a href="https://www.has-sante.fr/">HAS – Haute Autorité de Santé</a>`,
+        "HAS – Recommandations sur l'accompagnement de la grossesse",
+        veilleYear(f, 6),
+        "Recommandations de la HAS sur le suivi de grossesse et les pratiques d'accompagnement non médicamenteux (massage, relaxation, sophrologie).",
+        "Preuve : synthèse recommandations HAS. Action : intégrer les recommandations dans le module anatomie et physiologie de la grossesse."
+      ],
+      [
+        `<a href="https://www.perinat-france.org/">Perinat France</a>`,
+        "Réseau périnatal – Accompagnement de la grossesse et du post-partum",
+        veilleMonthYear(f, 5),
+        "Réseau national de périnatalité : ressources sur l'accompagnement des femmes enceintes, les pratiques complémentaires et le bien-être maternel.",
+        "Action : enrichir le contenu pédagogique avec les ressources du réseau périnatal sur l'accompagnement non médicamenteux."
+      ],
+      [
+        `<a href="https://www.youtube.com/watch?v=_qTpCmxGiQI">YouTube – Massage prénatal techniques de base</a>`,
+        "Massage prénatal – Techniques et positions sécurisées",
+        veilleYear(f, 4),
+        "Vidéo démonstrative des techniques de massage prénatal : installation en décubitus latéral, pressions adaptées, zones à éviter.",
+        "Preuve : fiche synthèse vidéo. Action : utiliser comme support complémentaire pour les mises en pratique supervisées."
+      ],
+      [
+        `<a href="https://www.france-num.gouv.fr/guides-et-conseils/developpement-commercial">France Num – Développement des activités bien-être</a>`,
+        "France Num – Développer son activité de praticien bien-être",
+        veilleMonthYear(f, 3),
+        "Guide sur la digitalisation des activités de services à la personne : prise de rendez-vous en ligne, communication digitale, fidélisation.",
+        "Preuve : guide France Num. Action : sensibiliser les stagiaires au développement de leur activité de massage prénatal."
+      ],
+    ];
+  }
+
+  if (type === "management") {
+    return [
+      [
+        `<a href="https://www.hbrfrance.fr/">Harvard Business Review France</a>`,
+        "HBR France – Tendances management et leadership",
+        veilleMonthYear(f, 8),
+        "Revue de référence mondiale sur le management : articles sur le leadership, la gestion d'équipe, le changement organisationnel et l'innovation managériale.",
+        "Preuve : capture + lien. Action : intégrer les dernières études de cas HBR dans les exercices pratiques du module management."
+      ],
+      [
+        `<a href="https://www.anact.fr/">ANACT – Agence nationale pour l'amélioration des conditions de travail</a>`,
+        "ANACT – Qualité de vie et conditions de travail",
+        veilleMonthYear(f, 7),
+        "Ressources sur la QVCT, la prévention des RPS, et le management bienveillant. Référence pour les managers en exercice.",
+        "Action Qualiopi : enrichir le module gestion des conflits avec les outils ANACT (diagnostic, plans d'action)."
+      ],
+      [
+        `<a href="https://www.youtube.com/watch?v=TpPzFt-DTxg">YouTube – Débuter comme manager</a>`,
+        "5 choses essentielles pour bien débuter dans ses fonctions de manager",
+        veilleYear(f, 6),
+        "Vidéo de formation sur les premières actions à mettre en place lors de sa prise de poste managériale.",
+        "Preuve : fiche synthèse vidéo. Action : intégrer comme ressource dans le module prise de poste."
+      ],
+      [
+        `<a href="https://www.manager-go.com/">Manager GO!</a>`,
+        "Manager GO – Fiches pratiques et outils de management",
+        veilleMonthYear(f, 5),
+        "Portail de ressources managériales : fiches pratiques, modèles, outils de gestion d'équipe et de pilotage de projets.",
+        "Action : utiliser les fiches Manager GO comme supports complémentaires pour les ateliers pratiques."
+      ],
+      [
+        `<a href="https://www.france-num.gouv.fr/guides-et-conseils/strategie-numerique/management">France Num – Management et digital</a>`,
+        "France Num – Le management à l'ère du numérique",
+        veilleMonthYear(f, 3),
+        "Guide sur l'évolution des pratiques managériales avec le numérique : management hybride, outils collaboratifs, communication à distance.",
+        "Preuve : guide France Num. Action : intégrer le management hybride et le télétravail dans les cas pratiques."
+      ],
+    ];
+  }
+
+  if (type === "secretaire") {
+    return [
+      [
+        `<a href="https://www.ameli.fr/medecin/exercice-liberal/facturation-remboursement">Ameli – Facturation des actes médicaux</a>`,
+        "Ameli – CCAM et facturation des actes médicaux",
+        veilleMonthYear(f, 8),
+        "Portail de référence pour la facturation des actes médicaux : nomenclatures CCAM et NGAP, tarifs conventionnels, télétransmission.",
+        "Preuve : capture + lien. Action : mettre à jour le module facturation avec les derniers tarifs et nomenclatures."
+      ],
+      [
+        `<a href="https://www.has-sante.fr/jcms/c_1098455/fr/dossier-medical">HAS – Dossier médical</a>`,
+        "HAS – Recommandations sur la tenue du dossier médical",
+        veilleMonthYear(f, 7),
+        "Recommandations de la HAS sur la constitution, la tenue et la conservation du dossier médical patient (DMP, DPI).",
+        "Action Qualiopi : aligner le module gestion du DPI sur les dernières recommandations HAS."
+      ],
+      [
+        `<a href="https://www.youtube.com/watch?v=V_bwp2mJTZI">YouTube – Secrétaire médicale au quotidien</a>`,
+        "Le métier de secrétaire médicale – Témoignage et quotidien",
+        veilleYear(f, 6),
+        "Vidéo témoignage sur le quotidien d'une secrétaire médicale : accueil patients, gestion des plannings, archivage, relation avec les praticiens.",
+        "Preuve : fiche synthèse. Action : enrichir les mises en situation avec des cas réels du quotidien professionnel."
+      ],
+      [
+        `<a href="https://solidarites.gouv.fr/">Ministère de la Santé – Actualités</a>`,
+        "Ministère de la Santé – Évolutions du secteur médico-social",
+        veilleMonthYear(f, 4),
+        "Actualités réglementaires et organisationnelles du secteur de la santé : réformes hospitalières, numerus clausus, télémédecine.",
+        "Action : contextualiser la formation dans les évolutions du secteur sanitaire et social."
+      ],
+      [
+        `<a href="https://www.france-num.gouv.fr/guides-et-conseils/strategie-numerique/sante-numerique">France Num – Santé numérique</a>`,
+        "France Num – Transformation numérique du secteur santé",
+        veilleMonthYear(f, 3),
+        "Guide sur la digitalisation du secteur de la santé : Mon Espace Santé, DMP, téléconsultation, IA en santé.",
+        "Preuve : guide France Num. Action : intégrer les outils numériques de santé dans le programme de formation."
       ],
     ];
   }
@@ -810,6 +1005,91 @@ function veilleTechnoRows(f: FormationInfo, type: FormationType): string[][] {
         veilleDate(f, 3),
         "Synthèse des tendances : la formation en langues reste dans le top 3 des formations les plus demandées. L'anglais représente 80% des demandes linguistiques.",
         "Preuve : PDF baromètre. Action Qualiopi : justifier la pertinence de l'offre anglais dans le plan de développement."
+      ],
+    ];
+  }
+
+  if (type === "massage" || type === "esthetique") {
+    return [...commonDigitalLearning,
+      [
+        `<a href="https://www.ffmbe.fr/se-former/">FFMBE – Se former au massage bien-être</a>`,
+        "FFMBE – Référentiel de formation au massage bien-être",
+        veilleMonthYear(f, 7),
+        "Fédération professionnelle proposant un référentiel de compétences et des formations certifiantes pour les praticiens en massage bien-être.",
+        "Preuve : référentiel FFMBE + captures. Action : aligner le contenu pédagogique sur le référentiel FFMBE."
+      ],
+      [
+        `<a href="https://www.youtube.com/watch?v=_qTpCmxGiQI">YouTube – Massage prénatal démonstration</a>`,
+        "Techniques de massage prénatal – Démonstration complète",
+        veilleYear(f, 6),
+        "Vidéo démonstrative des techniques de massage adaptées à la grossesse : positions sécurisées, pressions douces, zones spécifiques.",
+        "Preuve : fiche synthèse vidéo. Action : utiliser comme support pédagogique complémentaire."
+      ],
+      [
+        `<a href="https://www.perinat-france.org/">Perinat France – Réseau périnatal</a>`,
+        "Réseau périnatal – Pratiques d'accompagnement de la grossesse",
+        veilleMonthYear(f, 5),
+        "Ressources sur les pratiques complémentaires (massage, relaxation, sophrologie) dans l'accompagnement de la grossesse.",
+        "Action : enrichir les supports pédagogiques avec les protocoles recommandés par le réseau périnatal."
+      ],
+      [
+        `<a href="https://www.talenco.com/nos-publications/barometre-formation-professionnelle-tendances-pratiques-2025/">TalenCo – Baromètre</a>`,
+        "Baromètre formation professionnelle – Secteur bien-être et santé",
+        veilleDate(f, 3),
+        "Tendances de la formation dans les métiers du bien-être : digitalisation, prise de rendez-vous en ligne, outils de suivi client.",
+        "Preuve : PDF baromètre. Action Qualiopi : intégrer les tendances numériques du secteur bien-être dans la formation."
+      ],
+    ];
+  }
+
+  if (type === "management") {
+    return [...commonDigitalLearning,
+      [
+        `<a href="https://www.hbrfrance.fr/">HBR France – Outils numériques managériaux</a>`,
+        "Harvard Business Review – Technologies et management",
+        veilleMonthYear(f, 7),
+        "Articles sur les outils collaboratifs, le management hybride, l'IA appliquée à la gestion d'équipe et les plateformes de feedback.",
+        "Preuve : captures articles. Action : intégrer les outils collaboratifs modernes dans les exercices pratiques."
+      ],
+      [
+        `<a href="https://www.learningtechnologiesfrance.com/">learningtechnologiesfrance.com</a>`,
+        "Learning Technologies France – Formation managériale",
+        veilleYear(f, 6),
+        "Salon EdTech : solutions de formation au management (simulateurs, serious games, coaching digital).",
+        "Preuve : programme + notes. Action : benchmark des outils pédagogiques pour le management."
+      ],
+      [
+        `<a href="https://www.talenco.com/nos-publications/barometre-formation-professionnelle-tendances-pratiques-2025/">TalenCo – Baromètre</a>`,
+        "Baromètre formation – Management et soft skills",
+        veilleDate(f, 3),
+        "Le management et les soft skills dans le top 5 des demandes de formation. Focus sur le leadership et la gestion du changement.",
+        "Preuve : PDF baromètre. Action Qualiopi : aligner l'offre management sur les tendances du marché."
+      ],
+    ];
+  }
+
+  if (type === "secretaire") {
+    return [...commonDigitalLearning,
+      [
+        `<a href="https://www.ameli.fr/">Ameli – Services numériques santé</a>`,
+        "Ameli – Évolutions numériques de l'Assurance Maladie",
+        veilleMonthYear(f, 7),
+        "Évolutions de la plateforme Ameli : télétransmission, Espace Pro, Mon Espace Santé, facturation en ligne.",
+        "Preuve : captures fonctionnalités. Action : mettre à jour le module facturation avec les outils numériques Ameli."
+      ],
+      [
+        `<a href="https://www.doctolib.fr/presse">Doctolib – Actualités</a>`,
+        "Doctolib – Innovations de la prise de rendez-vous médicale",
+        veilleMonthYear(f, 6),
+        "Évolutions de Doctolib : téléconsultation intégrée, messagerie sécurisée, gestion des plannings multi-praticiens.",
+        "Action : former les stagiaires aux dernières fonctionnalités Doctolib utilisées en cabinet."
+      ],
+      [
+        `<a href="https://www.talenco.com/nos-publications/barometre-formation-professionnelle-tendances-pratiques-2025/">TalenCo – Baromètre</a>`,
+        "Baromètre formation – Santé et numérique",
+        veilleDate(f, 3),
+        "La transformation numérique du secteur santé accélère : DMP, télémédecine, IA en imagerie médicale.",
+        "Preuve : PDF baromètre. Action Qualiopi : intégrer les nouvelles technologies santé dans le programme."
       ],
     ];
   }
