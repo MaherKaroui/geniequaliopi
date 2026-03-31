@@ -402,21 +402,29 @@ export function buildFullCatalog(
       add(`cfa_c3i16_suivi_tuteur_${fi}`, `Fiche suivi tuteur`, 3, 16, "fiche_suivi_tuteur", { fi });
     });
 
-    // Documents CFA complémentaires
-    add("cfa_c1i1_livret_accueil", "CT1 - IND 1 LIVRET D'ACCUEIL CFA", 1, 1, "livret_accueil_cfa");
-    add("cfa_procedure_psh", "Procédure PSH CFA", 6, 26, "procedure_psh_cfa");
+    // ===== CRITÈRE 3 — IND 9 — CONDITIONS DE DÉROULEMENT (CFA) =====
+    add("cfa_c3i9_livret_accueil", "CT3 - IND 9 LIVRET D'ACCUEIL DE L'APPRENTI", 3, 9, "livret_accueil_cfa_v2");
+    add("cfa_c3i9_reglement_interieur", "CT3 - IND 9 RÈGLEMENT INTÉRIEUR DU CFA", 3, 9, "reglement_interieur_cfa_v2");
+    add("cfa_c3i9_pv_election_delegues", "CT3 - IND 9 PROCÈS-VERBAL D'ÉLECTION DES DÉLÉGUÉS", 3, 9, "pv_election_delegues_cfa");
+    // Droit à l'image — un par stagiaire
+    stagiaires.forEach((s, si) => {
+      add(`cfa_c3i9_droit_image_${si}`, `CT3 - IND 9 DEMANDE D'AUTORISATION DROIT À L'IMAGE – ${s.prenom} ${s.nom}`, 3, 9, "droit_image_cfa", { stagiaireIdx: si });
+    });
+    // Convention de formation par apprentissage — un par stagiaire
+    stagiaires.forEach((s, si) => {
+      add(`cfa_c3i9_convention_${si}`, `CT3 - IND 9 CONVENTION DE FORMATION PAR APPRENTISSAGE – ${s.prenom} ${s.nom}`, 3, 9, "convention_formation_apprentissage", { stagiaireIdx: si });
+    });
     // Guide connexion uniquement si distanciel
     formations.forEach((f) => {
       const moda = (f.modalites || '').toLowerCase();
       const isDistanciel = moda.includes('distanciel') || moda.includes('e-learning') || moda.includes('foad') || moda.includes('mixte');
       if (isDistanciel) {
-        add("cfa_guide_connexion", "Guide d'aide à la connexion CFA", 3, 9, "guide_aide_connexion_cfa");
+        add("cfa_c3i9_guide_connexion", "CT3 - IND 9 GUIDE D'AIDE À LA CONNEXION", 3, 9, "guide_aide_connexion_cfa");
       }
     });
-    // Convention de formation par apprentissage — CT3 IND 9
-    stagiaires.forEach((s, si) => {
-      add(`cfa_c3i9_convention_${si}`, `CT3 - IND 9 CONVENTION DE FORMATION PAR APPRENTISSAGE – ${s.prenom} ${s.nom}`, 3, 9, "convention_formation_apprentissage", { stagiaireIdx: si });
-    });
+    // Documents CFA complémentaires (autres critères)
+    add("cfa_c1i1_livret_accueil", "CT1 - IND 1 LIVRET D'ACCUEIL CFA", 1, 1, "livret_accueil_cfa");
+    add("cfa_procedure_psh", "Procédure PSH CFA", 6, 26, "procedure_psh_cfa");
     // ===== IND 11 — Évaluation de l'atteinte des objectifs (CFA) =====
     // Émargement CFA — une feuille par semaine CFA avec dates réelles
     formations.forEach((f, fi) => {
