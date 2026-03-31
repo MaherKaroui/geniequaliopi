@@ -366,10 +366,24 @@ export function generateExcelSuiviParcoursBeneficiairesCFA(o: OrganismeInfo, f: 
   const today = "31/03/2026";
   const stags = stagiaires.length > 0 ? stagiaires : [{ prenom: "Martin", nom: "Dupont", civilite: "M." as const, email: "", telephone: "", entreprise: "", poste: "", dateNaissance: "" }];
 
+  // Calculate number of weeks from formation dates (default 52)
+  let nbWeeks = 52;
+  if (f.dateDebut && f.dateFin) {
+    const start = new Date(f.dateDebut);
+    const end = new Date(f.dateFin);
+    const diffMs = end.getTime() - start.getTime();
+    nbWeeks = Math.max(1, Math.ceil(diffMs / (7 * 24 * 60 * 60 * 1000)));
+  }
+
+  // Generate week headers (S1, S2, ... Sn)
+  const weekHeaders = Array.from({ length: nbWeeks }, (_, i) => `<th>S${i + 1}</th>`).join("");
+  const weekCells = Array.from({ length: nbWeeks }, () => `<td>P</td>`).join("");
+
   let html = `<table>`;
   // Title row
+  const totalCols = 16 + nbWeeks + 10;
   html += `<tr><td class="title" colspan="8">${o.nom}</td><td colspan="5"></td><td>Version à jour au :</td><td colspan="2">${today}</td></tr>`;
-  html += `<tr><td colspan="16"></td></tr>`;
+  html += `<tr><td colspan="${totalCols}"></td></tr>`;
   // Section headers
   html += `<tr class="header-row">
     <td colspan="4" style="text-align:center;font-weight:bold">FICHE D'IDENTITÉ DES BÉNÉFICIAIRES</td>
@@ -377,7 +391,7 @@ export function generateExcelSuiviParcoursBeneficiairesCFA(o: OrganismeInfo, f: 
     <td colspan="3" style="text-align:center;font-weight:bold">STATUT</td>
     <td colspan="3" style="text-align:center;font-weight:bold">FORMATION</td>
     <td colspan="3" style="text-align:center;font-weight:bold">Suivi de l'adaptation à l'accompagnement</td>
-    <td colspan="13" style="text-align:center;font-weight:bold">PRÉSENCE PAR JOURNÉE DE STAGE</td>
+    <td colspan="${nbWeeks + 1}" style="text-align:center;font-weight:bold">PRÉSENCE PAR SEMAINE DE FORMATION</td>
     <td colspan="2" style="text-align:center;font-weight:bold">INTERRUPTION</td>
     <td colspan="2" style="text-align:center;font-weight:bold">TEST FINAL</td>
     <td colspan="2" style="text-align:center;font-weight:bold">Questionnaire satisfaction</td>
@@ -389,7 +403,7 @@ export function generateExcelSuiviParcoursBeneficiairesCFA(o: OrganismeInfo, f: 
     <th>Prise en charge</th><th>Nature</th><th>Observations</th>
     <th>Date d'entrée</th><th>Date de sortie</th>
     <th>Date</th><th>Problème rencontré</th><th>Adaptation</th><th>Suivi</th>
-    <th>JS1</th><th>JS2</th><th>JS3</th><th>JS4</th><th>JS5</th><th>JS6</th><th>JS7</th><th>JS8</th><th>JS9</th><th>JS10</th><th>JS11</th><th>JS12</th>
+    ${weekHeaders}<th>Total</th>
     <th>Oui/Non</th><th>Cause</th>
     <th>QCM</th><th>Envoyé</th>
     <th>À chaud</th><th>Relance</th><th>À froid</th><th>Relance</th>
@@ -402,7 +416,7 @@ export function generateExcelSuiviParcoursBeneficiairesCFA(o: OrganismeInfo, f: 
       <td>OPCO</td><td>Apprentissage</td><td></td>
       <td>${f.dateDebut ? formatDate(f.dateDebut) : ''}</td><td>${f.dateFin ? formatDate(f.dateFin) : ''}</td>
       <td></td><td></td><td></td><td></td>
-      <td>P</td><td>P</td><td>P</td><td>P</td><td>P</td><td>P</td><td>P</td><td>P</td><td>P</td><td>P</td><td>P</td><td>P</td>
+      ${weekCells}<td>${nbWeeks}/${nbWeeks}</td>
       <td>Non</td><td></td>
       <td class="green">Validé</td><td>Oui</td>
       <td>Oui</td><td></td><td>Oui</td><td></td>
