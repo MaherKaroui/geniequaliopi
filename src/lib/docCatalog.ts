@@ -445,6 +445,123 @@ export function buildFullCatalog(
     add("cfa_procedure_abandon", "Procédure d'abandon CFA", 3, 12, "procedure_abandon_cfa");
     add("cfa_procedure_absences", "Procédure des absences CFA", 3, 12, "procedure_absences_cfa");
     add("cfa_logs_connexion", "Logs de connexion CFA", 3, 12, "logs_connexion_cfa");
+
+    // ===== IND 8 — Positionnement et évaluation des acquis à l'entrée (CFA) =====
+    formations.forEach((f, fi) => {
+      add(`cfa_c2i8_trame_debut_${fi}`, `CT2 - IND 8 TEST DE POSITIONNEMENT DÉBUT DE FORMATION`, 2, 8, "test_positionnement_debut_trame", { fi });
+      add(`cfa_c2i8_trame_fin_${fi}`, `CT2 - IND 8 TEST DE POSITIONNEMENT FIN DE FORMATION`, 2, 8, "test_positionnement_fin_trame", { fi });
+      add(`cfa_c2i8_procedure_debut_${fi}`, `CT2 - IND 8 PROCÉDURE D'ÉVALUATION DE DÉBUT DE FORMATION`, 2, 8, "procedure_eval_debut", { fi });
+      add(`cfa_c2i8_procedure_fin_${fi}`, `CT2 - IND 8 PROCÉDURE D'ÉVALUATION DE FIN DE FORMATION`, 2, 8, "procedure_eval_fin", { fi });
+      add(`cfa_c2i8_grille_niveaux_${fi}`, `CT2 - IND 8 GRILLE DE NIVEAUX`, 2, 8, "grille_niveaux_positionnement", { fi });
+    });
+    formations.forEach((f, fi) => {
+      stagiaires.forEach((s, si) => {
+        add(`cfa_c2i8_test_debut_${fi}_${si}`, `CT2 - IND 8 TEST DÉBUT DE FORMATION – ${s.prenom} ${s.nom}`, 2, 8, "test_positionnement_debut_stagiaire", { fi, stagiaireIdx: si });
+        add(`cfa_c2i8_test_fin_${fi}_${si}`, `CT2 - IND 8 TEST FIN DE FORMATION – ${s.prenom} ${s.nom}`, 2, 8, "test_positionnement_fin_stagiaire", { fi, stagiaireIdx: si });
+      });
+    });
+
+    // ===== CRITÈRE 4 — ADÉQUATION DES MOYENS (CFA) =====
+
+    // IND 17 — Moyens humains, techniques et environnement
+    add("cfa_c4i17_bail", "CT4 - IND 17 BAIL DE SOUS-LOCATION", 4, 17, "bail_sous_location");
+
+    // IND 18 — Coordination des intervenants
+    add("cfa_c4i18_organigramme", "CT4 - IND 18 ORGANIGRAMME", 4, 18, "organigramme");
+
+    // IND 19 — Ressources pédagogiques mises à disposition
+    formations.forEach((f, fi) => {
+      add(`cfa_c4i19_support_cours_${fi}`, `CT4 - IND 19 SUPPORT DE COURS`, 4, 19, "support_cours_ref", { fi });
+    });
+    add("cfa_c4i19_ressources_pedagogiques", "CT4 - IND 19 RESSOURCES PÉDAGOGIQUES", 4, 19, "ressources_pedagogiques");
+
+    // ===== CRITÈRE 5 — QUALIFICATION DU PERSONNEL (CFA) =====
+
+    const uniqueFormateursCFA = Array.from(new Set(stagiaires.map(s => (s as any).formateur).filter((f: any) => f && String(f).trim())));
+
+    // IND 21 — Compétences des intervenants
+    add("cfa_c5i21_fiche_poste_dirigeant", "CT5 - IND 21 FICHE DE POSTE – RESPONSABLE PÉDAGOGIQUE", 5, 21, "fiche_poste_formateur", { role: "dirigeant" });
+    if (uniqueFormateursCFA.length === 0) {
+      add("cfa_c5i21_fiche_poste_formateur", "CT5 - IND 21 FICHE DE POSTE – FORMATEUR", 5, 21, "fiche_poste_formateur", { role: "formateur" });
+    }
+    add("cfa_c5i21_fiche_poste_ref_admin", "CT5 - IND 21 FICHE DE POSTE – RÉFÉRENT ADMINISTRATIF", 5, 21, "fiche_poste_formateur", { role: "referent_administratif" });
+    add("cfa_c5i21_fiche_poste_ref_handicap", "CT5 - IND 21 FICHE DE POSTE – RÉFÉRENT HANDICAP", 5, 21, "fiche_poste_formateur", { role: "referent_handicap" });
+    add("cfa_c5i21_autoevaluation_0", `CT5 - IND 21 AUTO-ÉVALUATION FORMATEUR`, 5, 21, "autoevaluation_formateur", { formateurIdx: 0 });
+    add("cfa_c5i21_processus_recrutement", "CT5 - IND 21 DESCRIPTION DU PROCESSUS DE RECRUTEMENT", 5, 21, "procedure_recrutement_formateur");
+
+    // IND 22 — Entretien et développement des compétences
+    add("cfa_c5i22_plan_dev_competences", "CT5 - IND 22 PLAN DE DÉVELOPPEMENT DES COMPÉTENCES", 5, 22, "plan_dev_competences_excel");
+    add("cfa_c5i22_fiche_entretien_annuel", "CT5 - IND 22 FICHE D'ENTRETIEN ANNUEL FORMATEUR", 5, 22, "fiche_entretien_annuel_formateur");
+
+    uniqueFormateursCFA.forEach((fName) => {
+      const fname = String(fName).trim();
+      const slug = fname.replace(/\s+/g, '_').toUpperCase();
+      add(`cfa_c5i22_fiche_entretien_${slug}`, `CT5 - IND 22 FICHE D'ENTRETIEN ANNUEL – ${fname}`, 5, 22, "fiche_entretien_annuel_formateur", { formateurNom: fname });
+      add(`cfa_c5i21_fiche_poste_formateur_${slug}`, `CT5 - IND 21 FICHE DE POSTE – ${fname}`, 5, 21, "fiche_poste_formateur", { role: "formateur", formateurNom: fname });
+      add(`cfa_c5i21_autoevaluation_${slug}`, `CT5 - IND 21 AUTO-ÉVALUATION – ${fname}`, 5, 21, "autoevaluation_formateur", { formateurNom: fname });
+      add(`cfa_c6i27_contrat_soustraitance_${slug}`, `CT6 - IND 27 CONTRAT DE SOUS-TRAITANCE – ${fname}`, 6, 27, "contrat_sous_traitance_v2", { formateurNom: fname });
+    });
+
+    // ===== CRITÈRE 6 — ENVIRONNEMENT PROFESSIONNEL (CFA) =====
+
+    // IND 23 — Veille légale et réglementaire
+    add("cfa_c6i23_veille_reglementaire", "CT6 - IND 23 VEILLE RÉGLEMENTAIRE", 6, 23, "tableau_veille", { type: "réglementaire" });
+    add("cfa_c6i23_pdf_guide_qualiopi", "CT6 - IND 23 V9 GUIDE DE LECTURE QUALIOPI", 6, 23, "pdf_static", { pdfFile: "v9_guide_lecture_qualiopi.pdf" });
+
+    // IND 24 — Veille métiers et emplois
+    add("cfa_c6i24_tableau_veille_metier", "CT6 - IND 24 TABLEAU DE VEILLE MÉTIER", 6, 24, "tableau_veille", { type: "métier" });
+
+    // IND 25 — Veille innovations pédagogiques et technologiques
+    add("cfa_c6i25_tableau_veille_techno", "CT6 - IND 25 TABLEAU DE VEILLE TECHNOLOGIQUE", 6, 25, "tableau_veille", { type: "technologique" });
+
+    // IND 26 — Accueil et accompagnement handicap
+    add("cfa_c6i26_veille_handicap", "CT6 - IND 26 VEILLE HANDICAP", 6, 26, "tableau_veille", { type: "handicap" });
+    add("cfa_c6i26_pdf_referentiel_defi", "CT6 - IND 26 RÉFÉRENTIEL HANDICAP DÉFI MÉTIER", 6, 26, "pdf_static", { pdfFile: "referentiel_handicap_defi_metier.pdf" });
+    add("cfa_c6i26_pdf_agefiph_fiche", "CT6 - IND 26 AGEFIPH FICHE PRATIQUE QUALITÉ", 6, 26, "pdf_static", { pdfFile: "agefiph_fiche_pratique_qualite.pdf" });
+    add("cfa_c6i26_pdf_agefiph_contacts", "CT6 - IND 26 AGEFIPH RHF CONTACTS", 6, 26, "pdf_static", { pdfFile: "agefiph_rhf_contacts.pdf" });
+    add("cfa_c6i26_pdf_diplome_rhf", "CT6 - IND 26 DIPLÔME RÉFÉRENT HANDICAP", 6, 26, "pdf_static", { pdfFile: "diplome_referent_handicap.pdf" });
+    add("cfa_c6i26_pdf_fiche_rhf_idf", "CT6 - IND 26 FICHE TECHNIQUE RHF IDF", 6, 26, "pdf_static", { pdfFile: "fiche_technique_rhf_idf.pdf" });
+    add("cfa_c6i26_pdf_recruter_handicap", "CT6 - IND 26 COMMENT RECRUTER UNE PERSONNE HANDICAPÉE", 6, 26, "pdf_static", { pdfFile: "handicap_comment_recruter.pdf" });
+    add("cfa_c6i26_pdf_procedure_communiquer", "CT6 - IND 26 PROCÉDURE COMMUNIQUER AVEC DES PERSONNES HANDICAPÉES", 6, 26, "pdf_static", { pdfFile: "procedure_communiquer_handicap.pptx" });
+
+    // IND 27 — Sous-traitance et partenariats
+    add("cfa_c6i27_partenaires", "CT6 - IND 27 LES PARTENAIRES", 6, 27, "liste_partenaires");
+    add("cfa_c6i27_contrat_sous_traitance", "CT6 - IND 27 CONTRAT DE SOUS-TRAITANCE DE FORMATEUR", 6, 27, "contrat_sous_traitance_v2");
+    add("cfa_c6i27_charte_qualite_formateur", "CT6 - IND 27 CHARTE QUALITÉ FORMATEUR EXTERNE", 6, 27, "charte_qualite_formateur_externe");
+    add("cfa_c6i27_mandat_qualiopi", "CT6 - IND 27 MANDAT DE PRÉSENTATION ET DE GESTION QUALIOPI", 6, 27, "mandat_qualiopi");
+    add("cfa_c6i27_pdf_guide_qualiopi", "CT6 - IND 27 V9 GUIDE DE LECTURE QUALIOPI", 6, 27, "pdf_static", { pdfFile: "v9_guide_lecture_qualiopi.pdf" });
+
+    // ===== CRITÈRE 7 — AMÉLIORATION CONTINUE (CFA) =====
+
+    // IND 30 — Appréciations et amélioration continue
+    add("cfa_c7i30_eval_formateur", "CT7 - IND 30 ÉVALUATION FORMATEUR", 7, 30, "enquete_satisfaction_formateur");
+    stagiaires.forEach((s, si) => {
+      add(`cfa_c7i30_bilan_chaud_${si}`, `CT7 - IND 30 BILAN À CHAUD – ${s.prenom} ${s.nom}`, 7, 30, "bilan_chaud_stagiaire", { stagiaireIdx: si });
+    });
+    stagiaires.forEach((s, si) => {
+      add(`cfa_c7i30_bilan_froid_${si}`, `CT7 - IND 30 BILAN À FROID – ${s.prenom} ${s.nom}`, 7, 30, "bilan_froid_stagiaire", { stagiaireIdx: si });
+    });
+    add("cfa_c7i30_compte_rendu_formateur", "CT7 - IND 30 COMPTE-RENDU DE FORMATION", 7, 30, "compte_rendu_formateur");
+    uniqueFormateursCFA.forEach((fName) => {
+      const fname = String(fName).trim();
+      const slug = fname.replace(/\s+/g, '_').toUpperCase();
+      add(`cfa_c7i30_bilan_fin_formateur_${slug}`, `CT7 - IND 30 BILAN DE FIN DE FORMATION – ${fname}`, 7, 30, "bilan_fin_formation_formateur", { formateurNom: fname });
+    });
+    stagiaires.forEach((s, si) => {
+      add(`cfa_c7i30_appreciations_beneficiaires_${si}`, `CT7 - IND 30 QUESTIONNAIRE DE SATISFACTION – ${s.prenom} ${s.nom}`, 7, 30, "appreciations_beneficiaires_stagiaire", { stagiaireIdx: si });
+    });
+    add("cfa_c7i30_appreciations_entreprises", "CT7 - IND 30 QUESTIONNAIRE DE SATISFACTION CLIENT COMMANDITAIRE", 7, 30, "appreciations_entreprises");
+    add("cfa_c7i30_appreciations_financeurs", "CT7 - IND 30 ENQUÊTE SATISFACTION FINANCEUR", 7, 30, "appreciations_financeurs");
+    add("cfa_c7i30_relances_appreciations_excel", "CT7 - IND 30 TABLEAU DE RELANCES DES APPRÉCIATIONS", 7, 30, "relances_appreciations_excel");
+
+    // IND 31 — Réclamations et dysfonctionnements
+    add("cfa_c7i31_formulaire_reclamation", "CT7 - IND 31 FORMULAIRE DE DÉPÔT DE RÉCLAMATION", 7, 31, "formulaire_reclamation");
+    add("cfa_c7i31_gestion_reclamations", "CT7 - IND 31 GESTION DES RÉCLAMATIONS ET DYSFONCTIONNEMENTS", 7, 31, "procedure_reclamation");
+    add("cfa_c7i31_suivi_dysfonctionnements_excel", "CT7 - IND 31 SUIVI DES DYSFONCTIONNEMENTS INTERNES ET EXTERNES", 7, 31, "suivi_dysfonctionnements_excel");
+
+    // IND 32 — Amélioration continue
+    add("cfa_c7i32_tableau_amelioration_excel", "CT7 - IND 32 TABLEAU D'AMÉLIORATION CONTINUE", 7, 32, "tableau_amelioration_continue_excel");
+    add("cfa_c7i32_procedure_amelioration", "CT7 - IND 32 PROCÉDURE AMÉLIORATION CONTINUE", 7, 32, "procedure_amelioration_continue");
   }
 
   // ===== Bilan de compétences =====
