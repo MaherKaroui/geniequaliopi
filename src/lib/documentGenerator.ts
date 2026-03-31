@@ -6885,9 +6885,20 @@ function generateEvalBesoinsAnswers(s: StagiaireInfo, f: FormationInfo, o: Organ
       `Développer chez ${s.prenom} la capacité à communiquer de manière professionnelle et adaptée avec les familles des résidents, en respectant le secret professionnel et les règles de bienveillance.`,
       `Offrir à ${s.prenom} les outils linguistiques pour exercer son métier de ${s.poste} en toute confiance et sécurité, tant dans les gestes professionnels que dans la communication orale et écrite.`,
     ];
-  } else if (isIA) {
+  } else if (isMassage) {
     attentesOptions = [
-      `Permettre à ${s.prenom} de maîtriser les outils d'IA générative (ChatGPT, Midjourney, DALL-E) pour créer des contenus rédactionnels et visuels professionnels de qualité pour les besoins de communication de ${s.entreprise}.`,
+      `Permettre à ${s.prenom} d'acquérir les techniques de massage prénatal sécurisées pour proposer un accompagnement adapté aux femmes enceintes dans le cadre de son activité au sein de ${s.entreprise || "son cabinet"}.`,
+      `Former ${s.prenom} à l'anatomie et à la physiologie de la grossesse pour adapter ses protocoles de massage et garantir la sécurité des femmes enceintes qu'il/elle accompagne.`,
+      `Développer les compétences de ${s.prenom} en techniques de drainage lymphatique et de soulagement des tensions lombaires spécifiques à la grossesse, pour enrichir son offre de services.`,
+      `Accompagner ${s.prenom} dans la maîtrise des positions d'installation sécurisées (décubitus latéral, semi-assise) et des contre-indications au massage prénatal.`,
+      `Permettre à ${s.prenom} d'intégrer le massage prénatal dans son offre de prestations bien-être et d'accompagner les futures mamans tout au long de leur grossesse.`,
+      `Former ${s.prenom} aux techniques de relaxation et de respiration adaptées à la grossesse pour compléter sa pratique de massage par un accompagnement holistique.`,
+      `Donner à ${s.prenom} les compétences pour créer un protocole de séance complet de massage prénatal, de l'anamnèse à la clôture, en toute sécurité.`,
+      `Permettre à ${s.prenom} de se différencier sur le marché du bien-être en ajoutant une spécialisation reconnue en massage prénatal à son offre de services.`,
+      `Accompagner ${s.prenom} dans la connaissance des huiles et produits adaptés à la femme enceinte pour proposer des soins personnalisés et respectueux de la santé maternelle.`,
+      `Former ${s.prenom} à l'écoute active et à l'accompagnement émotionnel de la femme enceinte, compétence essentielle pour une pratique bienveillante du massage prénatal.`,
+    ];
+  } else if (isIA) {
       `Former ${s.prenom} au prompt engineering avancé pour optimiser la production de contenus marketing (articles, posts, newsletters) et réduire notre dépendance aux prestataires externes.`,
       `Accompagner ${s.prenom} dans la compréhension du cadre juridique et éthique de l'IA (RGPD, droit d'auteur, AI Act) pour une utilisation responsable et conforme dans notre activité.`,
       `Développer les compétences de ${s.prenom} en création visuelle assistée par IA pour produire des visuels cohérents avec notre charte graphique, sans recourir systématiquement à un graphiste.`,
