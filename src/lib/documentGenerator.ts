@@ -6703,8 +6703,7 @@ function generateEvalBesoinsAnswers(s: StagiaireInfo, f: FormationInfo, o: Organ
   
   const hasEntreprise = !!(s.entreprise && s.entreprise.trim() && s.entreprise.trim().toLowerCase() !== "entreprise");
   
-  const civilites = ["Monsieur", "Madame"];
-  const civilite = civilites[h(1) % 2];
+  const civilite = s.civilite === "Mme" ? "Madame" : s.civilite === "M." ? "Monsieur" : (s.civilite || "Madame");
   
   // Detect formation type for coherent answers
   const isFLE = t.includes("français") || t.includes("médico-social") || t.includes("fle") || t.includes("communiquer en");
