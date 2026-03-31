@@ -163,6 +163,46 @@ function HeadingMiniPreview({ headingStyle, primary, secondary, headFont }: { he
   return <div style={styles[headingStyle]}>Titre</div>;
 }
 
+function HeaderMiniPreview({ headerStyle, primary, headFont }: { headerStyle: HeaderStyle; primary: string; headFont: string }) {
+  const nameStyle = { fontFamily: headFont, fontWeight: 700, fontSize: 10 } as React.CSSProperties;
+  const subStyle = { fontSize: 7, color: "#888", marginTop: 1 } as React.CSSProperties;
+  if (headerStyle === 'banner') {
+    return (<div style={{ background: primary, color: "white", padding: "4px 8px", borderRadius: 5 }}>
+      <div style={{ ...nameStyle, color: "white" }}>ORGANISME</div>
+      <div style={{ ...subStyle, color: "rgba(255,255,255,0.8)" }}>NDA – SIRET</div>
+    </div>);
+  }
+  if (headerStyle === 'compact') {
+    return (<div style={{ display: "flex", alignItems: "center", gap: 6, borderBottom: `1.5px solid ${primary}`, paddingBottom: 3 }}>
+      <div style={{ width: 14, height: 14, borderRadius: 3, background: `${primary}20`, flexShrink: 0 }} />
+      <div><div style={{ ...nameStyle, color: primary }}>ORGANISME</div><div style={subStyle}>NDA – SIRET</div></div>
+    </div>);
+  }
+  if (headerStyle === 'elegant') {
+    return (<div style={{ textAlign: "center" }}>
+      <div style={{ ...nameStyle, color: primary, fontStyle: "italic" }}>ORGANISME</div>
+      <div style={{ width: 20, height: 1.5, background: primary, margin: "3px auto", opacity: 0.5 }} />
+      <div style={{ ...subStyle, letterSpacing: 0.3 }}>NDA – SIRET</div>
+    </div>);
+  }
+  if (headerStyle === 'boxed') {
+    return (<div style={{ border: `1.5px solid ${primary}`, borderRadius: 6, padding: "4px 8px", textAlign: "center" }}>
+      <div style={{ ...nameStyle, color: primary }}>ORGANISME</div>
+      <div style={subStyle}>NDA – SIRET</div>
+    </div>);
+  }
+  if (headerStyle === 'split') {
+    return (<div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderTop: `2px solid ${primary}`, borderBottom: `2px solid ${primary}`, padding: "3px 0" }}>
+      <div style={{ ...nameStyle, color: primary }}>ORGANISME</div>
+      <div style={{ fontSize: 6, color: "#888", textAlign: "right" }}>NDA<br/>SIRET</div>
+    </div>);
+  }
+  return (<div style={{ textAlign: "center" }}>
+    <div style={{ ...nameStyle, color: primary }}>ORGANISME</div>
+    <div style={subStyle}>NDA – SIRET</div>
+  </div>);
+}
+
 function ThemeMiniPreview({ theme, primary, secondary, bodyFont, headFont }: { theme: DocTheme; primary: string; secondary: string; bodyFont: string; headFont: string; fontSize: number }) {
   const common = { fontSize: 8, lineHeight: "1.4" };
 
