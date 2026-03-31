@@ -94,6 +94,20 @@ export function genDeroulePedagogique(o: OrganismeInfo, f: FormationInfo) {
 function genDerouleMassagePrenatal(o: OrganismeInfo, f: FormationInfo) {
   const headers = ["Séquence", "Durée", "Objectif pédagogique", "Contenus abordés", "Méthodes & activités", "Outils / supports", "Évaluation", "Adaptations"];
 
+  // Compute real dates for Jour 1 and Jour 2
+  const dateDebut = f.dateDebut ? new Date(f.dateDebut) : null;
+  const dateFin = f.dateFin ? new Date(f.dateFin) : null;
+  const joursFr = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
+  const moisFr = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"];
+
+  const formatJourDate = (d: Date | null) => {
+    if (!d) return "";
+    return `${joursFr[d.getDay()]} ${d.getDate()} ${moisFr[d.getMonth()]} ${d.getFullYear()}`;
+  };
+
+  const jour1Label = dateDebut ? ` – ${formatJourDate(dateDebut)}` : "";
+  const jour2Label = dateFin && dateFin.getTime() !== dateDebut?.getTime() ? ` – ${formatJourDate(dateFin)}` : dateDebut ? ` – ${formatJourDate(new Date(dateDebut.getTime() + 86400000))}` : "";
+
   const jour1Rows: string[][] = [
     ["Accueil & présentation de la formation", "0h30",
       "Poser le cadre de la formation et recueillir les attentes",
@@ -185,7 +199,7 @@ function genDerouleMassagePrenatal(o: OrganismeInfo, f: FormationInfo) {
       "Évaluation sommative finale", "Temps supplémentaire si nécessaire"],
   ];
 
-  let tableHtml = `<h3>Jour 1 (8h30-12h30 / 13h30-18h30 – 9h) : Pratique de recentrage avec exercices de respiration, vivre sa grossesse en pleine conscience, les apports du massage prénatal, les fascias et les liquides, les points sensibles, les conditions du masseur, les produits de massage pour femme enceinte, apprentissage d'un protocole de massage spécifique pendant la période prénatale, adaptation du protocole en fonction du stade et état de grossesse, les contre-indications, l'ergonomie</h3>`;
+  let tableHtml = `<h3>Jour 1${jour1Label} (8h30-12h30 / 13h30-18h30 – 9h) : Pratique de recentrage avec exercices de respiration, vivre sa grossesse en pleine conscience, les apports du massage prénatal, les fascias et les liquides, les points sensibles, les conditions du masseur, les produits de massage pour femme enceinte, apprentissage d'un protocole de massage spécifique pendant la période prénatale, adaptation du protocole en fonction du stade et état de grossesse, les contre-indications, l'ergonomie</h3>`;
   tableHtml += `<table><thead><tr>${headers.map(h => `<th>${h}</th>`).join("")}</tr></thead><tbody>`;
   for (const row of jour1Rows) {
     tableHtml += `<tr>${row.map(c => `<td>${c}</td>`).join("")}</tr>`;
@@ -194,7 +208,7 @@ function genDerouleMassagePrenatal(o: OrganismeInfo, f: FormationInfo) {
 
   tableHtml += `<div class="page-break"></div>`;
 
-  tableHtml += `<h3>Jour 2 (8h30-12h30 – 4h) : Prise de conscience du grand et petit bassin (théorie et pratique), prise de conscience des muscles du périnée (théorie et pratique), prise de conscience du col de l'utérus (théorie et pratique), relaxation avec exercices de respirations, présence à soi et au bébé, construction d'une séance de massage prénatal, construction d'une séance de massage et relaxation prénatal « Maternité en toute sérénité », évaluation continue et évaluation écrite</h3>`;
+  tableHtml += `<h3>Jour 2${jour2Label} (8h30-12h30 – 4h) : Prise de conscience du grand et petit bassin (théorie et pratique), prise de conscience des muscles du périnée (théorie et pratique), prise de conscience du col de l'utérus (théorie et pratique), relaxation avec exercices de respirations, présence à soi et au bébé, construction d'une séance de massage prénatal, construction d'une séance de massage et relaxation prénatal « Maternité en toute sérénité », évaluation continue et évaluation écrite</h3>`;
   tableHtml += `<table><thead><tr>${headers.map(h => `<th>${h}</th>`).join("")}</tr></thead><tbody>`;
   for (const row of jour2Rows) {
     tableHtml += `<tr>${row.map(c => `<td>${c}</td>`).join("")}</tr>`;
