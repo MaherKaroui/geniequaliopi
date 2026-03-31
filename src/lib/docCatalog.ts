@@ -486,6 +486,10 @@ export function buildFullCatalog(
       add(`cfa_c3i10_livret_apprentissage_${si}`, `CT3 - IND 10 📁 LIVRETS – Livret d'Apprentissage – ${s.prenom} ${s.nom}`, 3, 10, "livret_apprentissage_ind10_cfa", { stagiaireIdx: si });
     });
     add("cfa_c3i10_livret_maitre_apprentissage", "CT3 - IND 10 📁 LIVRETS – Livret du Maître d'Apprentissage", 3, 10, "livret_maitre_apprentissage_cfa");
+    // --- IND 10 — Dossier N°1 Handicap ---
+    add("cfa_c3i10_handicap_livret_referent", "CT3 - IND 10 📁 HANDICAP – Livret Référent Handicap", 3, 10, "pdf_static", { pdfUrl: "/pdfs/livret_referent_handicap.docx" });
+    add("cfa_c3i10_handicap_eval_besoins_agefiph", "CT3 - IND 10 📁 HANDICAP – Évaluation Besoins Apprenants AGEFIPH (Excel)", 3, 10, "pdf_static", { pdfUrl: "/pdfs/evaluation_besoins_handicap_agefiph.xlsx" });
+    add("cfa_c3i10_handicap_types_moyens", "CT3 - IND 10 📁 HANDICAP – Types de Handicap, Moyens et Partenaires (Excel)", 3, 10, "pdf_static", { pdfUrl: "/pdfs/handicap_types_moyens_partenaires.xlsx" });
 
     // Documents CFA complémentaires (autres critères)
     add("cfa_c1i1_livret_accueil", "CT1 - IND 1 LIVRET D'ACCUEIL CFA", 1, 1, "livret_accueil_cfa");
