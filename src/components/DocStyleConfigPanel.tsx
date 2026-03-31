@@ -447,7 +447,36 @@ const DocStyleConfigPanel = ({ style, onChange }: DocStyleConfigPanelProps) => {
                   </div>
                 </div>
 
-                {/* Logo position */}
+                {/* Header style (en-tête du document) */}
+                <div>
+                  <Label className="text-xs mb-2 block font-semibold">Style de l'en-tête du document</Label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {([
+                      { id: "classic" as HeaderStyle, label: "Classique", desc: "Logo + nom centré + ligne NDA" },
+                      { id: "banner" as HeaderStyle, label: "Bannière", desc: "Fond plein coloré, texte blanc" },
+                      { id: "compact" as HeaderStyle, label: "Compact", desc: "Logo à gauche, infos à droite" },
+                      { id: "elegant" as HeaderStyle, label: "Élégant", desc: "Trait fin décoratif, italique" },
+                      { id: "boxed" as HeaderStyle, label: "Encadré", desc: "Bordure autour de l'en-tête" },
+                      { id: "split" as HeaderStyle, label: "Séparé", desc: "Logo + nom | NDA/SIRET à droite" },
+                    ]).map(opt => {
+                      const isActive = (style.headerStyle || 'classic') === opt.id;
+                      return (
+                        <button
+                          key={opt.id}
+                          onClick={() => onChange({ ...style, headerStyle: opt.id })}
+                          className={`text-left p-2.5 rounded-lg border text-xs transition-all ${
+                            isActive ? "border-primary ring-2 ring-primary/20 bg-primary/5 font-semibold" : "hover:border-primary/30"
+                          }`}
+                        >
+                          <HeaderMiniPreview headerStyle={opt.id} primary={style.primaryColor} headFont={style.headingFont} />
+                          <div className="mt-1.5 font-semibold text-[11px]">{opt.label}</div>
+                          <div className="text-[9px] text-muted-foreground">{opt.desc}</div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
                 <div>
                   <Label className="text-xs mb-1 block font-semibold">Position du logo</Label>
                   <div className="flex gap-2">
