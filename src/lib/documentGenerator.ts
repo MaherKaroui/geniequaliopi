@@ -7207,6 +7207,7 @@ function generateEvalBesoinsAnswers(s: StagiaireInfo, f: FormationInfo, o: Organ
       `À terme, je souhaite former d'autres praticiens au massage prénatal et partager cette expertise avec la communauté du bien-être maternel.`,
     ];
   } else if (isIA) {
+    projetProOptions = [
       `Grâce à la maîtrise de l'IA générative, je pourrai proposer des prestations de création de contenus à haute valeur ajoutée et me positionner sur un marché en forte croissance.`,
       `Cette formation me permettra d'intégrer l'IA dans ma pratique professionnelle de ${s.poste} chez ${s.entreprise}, de multiplier ma productivité et de me démarquer par des compétences innovantes.`,
       `En maîtrisant les outils d'IA, je pourrai créer de manière autonome l'ensemble des supports de communication de ${s.entreprise} et réduire significativement les coûts de production.`,
