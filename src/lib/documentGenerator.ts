@@ -5157,7 +5157,8 @@ function genLivretAccueilCFA_V2(o: OrganismeInfo, f: FormationInfo, stagiaires: 
   const rncp = getRNCPByCode(f.codeRNCP || '');
   const titreFormation = f.intitule || 'Formation en alternance';
   const s = stagiaires[si] || stagiaires[0] || { prenom: '___', nom: '___' } as StagiaireInfo;
-  const dateSignature = f.dateDebut ? formatDate(subtractBusinessDays(f.dateDebut, 14)) : '____/____/________';
+  const rawDateDebut = getStagiaireDateDebut(s, f) || f.dateDebut;
+  const dateSignature = rawDateDebut ? formatDate(subtractBusinessDays(rawDateDebut, 14)) : formatDate(new Date().toISOString().slice(0, 10));
   const sigHtml = s.signatureUrl ? `<img src="${s.signatureUrl}" style="max-height:60px" />` : '&#160;';
   const blocsHtml = rncp ? rncp.blocsCompetences.map((b, i) =>
     `<p><strong>Bloc ${i + 1} :</strong> ${b.titre}</p><ul>${b.competences.map(c => `<li>${c}</li>`).join('')}</ul>`
