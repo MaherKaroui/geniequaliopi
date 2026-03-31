@@ -6899,6 +6899,8 @@ function generateEvalBesoinsAnswers(s: StagiaireInfo, f: FormationInfo, o: Organ
       `Former ${s.prenom} à l'écoute active et à l'accompagnement émotionnel de la femme enceinte, compétence essentielle pour une pratique bienveillante du massage prénatal.`,
     ];
   } else if (isIA) {
+    attentesOptions = [
+      `Permettre à ${s.prenom} de maîtriser les outils d'IA générative (ChatGPT, Midjourney, DALL-E) pour créer des contenus rédactionnels et visuels professionnels de qualité pour les besoins de communication de ${s.entreprise}.`,
       `Former ${s.prenom} au prompt engineering avancé pour optimiser la production de contenus marketing (articles, posts, newsletters) et réduire notre dépendance aux prestataires externes.`,
       `Accompagner ${s.prenom} dans la compréhension du cadre juridique et éthique de l'IA (RGPD, droit d'auteur, AI Act) pour une utilisation responsable et conforme dans notre activité.`,
       `Développer les compétences de ${s.prenom} en création visuelle assistée par IA pour produire des visuels cohérents avec notre charte graphique, sans recourir systématiquement à un graphiste.`,
