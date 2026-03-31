@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { DocStyleConfig, DEFAULT_DOC_STYLE, DocTheme } from "@/types/qualiopi";
+import { DocStyleConfig, DEFAULT_DOC_STYLE, DocTheme, HeadingStyle } from "@/types/qualiopi";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -149,7 +149,21 @@ const COLOR_PRESETS = [
 ];
 
 // Mini preview renderer per theme
-function ThemeMiniPreview({ theme, primary, secondary, bodyFont, headFont, fontSize }: { theme: DocTheme; primary: string; secondary: string; bodyFont: string; headFont: string; fontSize: number }) {
+function HeadingMiniPreview({ headingStyle, primary, secondary, headFont }: { headingStyle: HeadingStyle; primary: string; secondary: string; headFont: string }) {
+  const base = { fontFamily: headFont, fontWeight: 700, fontSize: 10 } as React.CSSProperties;
+  const styles: Record<HeadingStyle, React.CSSProperties> = {
+    'line-bottom': { ...base, color: primary, borderBottom: `2px solid ${primary}`, paddingBottom: 2 },
+    'filled': { ...base, background: primary, color: "white", padding: "3px 8px", borderRadius: 4 },
+    'gradient': { ...base, background: `linear-gradient(135deg,${primary},${secondary})`, color: "white", padding: "3px 8px", borderRadius: 6 },
+    'left-bar': { ...base, borderLeft: `3px solid ${primary}`, paddingLeft: 8, color: primary, background: `${primary}08` },
+    'underline-double': { ...base, color: primary, borderBottom: `3px double ${primary}`, paddingBottom: 2 },
+    'plain': { ...base, color: primary },
+    'pill': { ...base, background: `${primary}12`, color: primary, padding: "3px 12px", borderRadius: 20 },
+  };
+  return <div style={styles[headingStyle]}>Titre</div>;
+}
+
+function ThemeMiniPreview({ theme, primary, secondary, bodyFont, headFont }: { theme: DocTheme; primary: string; secondary: string; bodyFont: string; headFont: string; fontSize: number }) {
   const common = { fontSize: 8, lineHeight: "1.4" };
 
   const h1Styles: Record<DocTheme, React.CSSProperties> = {
@@ -403,6 +417,37 @@ const DocStyleConfigPanel = ({ style, onChange }: DocStyleConfigPanelProps) => {
             {/* LAYOUT TAB */}
             {activeTab === "layout" && (
               <div className="space-y-5">
+                {/* Heading style */}
+                <div>
+                  <Label className="text-xs mb-2 block font-semibold">Style des en-têtes (H1 / H2)</Label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {([
+                      { id: "line-bottom" as HeadingStyle, label: "Ligne dessous" },
+                      { id: "filled" as HeadingStyle, label: "Fond plein" },
+                      { id: "gradient" as HeadingStyle, label: "Dégradé" },
+                      { id: "left-bar" as HeadingStyle, label: "Barre gauche" },
+                      { id: "underline-double" as HeadingStyle, label: "Double ligne" },
+                      { id: "plain" as HeadingStyle, label: "Sans décoration" },
+                      { id: "pill" as HeadingStyle, label: "Pilule / Badge" },
+                    ]).map(opt => {
+                      const isActive = (style.headingStyle || 'line-bottom') === opt.id;
+                      return (
+                        <button
+                          key={opt.id}
+                          onClick={() => onChange({ ...style, headingStyle: opt.id })}
+                          className={`text-left p-2 rounded-lg border text-xs transition-all ${
+                            isActive ? "border-primary ring-2 ring-primary/20 bg-primary/5 font-semibold" : "hover:border-primary/30"
+                          }`}
+                        >
+                          <HeadingMiniPreview headingStyle={opt.id} primary={style.primaryColor} secondary={style.secondaryColor} headFont={style.headingFont} />
+                          <div className="mt-1 text-[10px] text-muted-foreground">{opt.label}</div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Logo position */}
                 <div>
                   <Label className="text-xs mb-1 block font-semibold">Position du logo</Label>
                   <div className="flex gap-2">
@@ -421,6 +466,8 @@ const DocStyleConfigPanel = ({ style, onChange }: DocStyleConfigPanelProps) => {
                     ))}
                   </div>
                 </div>
+
+                {/* Section border toggle */}
                 <div className="flex items-center justify-between">
                   <div>
                     <Label className="text-xs font-semibold block">Barre latérale des sections</Label>
