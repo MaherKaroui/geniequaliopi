@@ -564,6 +564,55 @@ export const RNCP_FICHES: RNCPFiche[] = [
     voiesAcces: ["Formation continue", "Formation professionnelle", "CPF"],
     dureeIndicative: "70 heures (10 jours)",
   },
+  {
+    code: "RNCP40800",
+    intitule: "TP - Secrétaire assistant médico-administratif",
+    niveau: "Niveau 4 (Bac)",
+    certificateur: "MINISTÈRE DU TRAVAIL DU PLEIN EMPLOI ET DE L'INSERTION",
+    dateEnregistrement: "19/06/2025",
+    dateEcheance: "01/09/2030",
+    codeNSF: "324 – Secrétariat, bureautique",
+    formacodes: "35015 – Secrétariat assistanat médicosocial / 43421 – Accueil hôpital / 43401 – Dossier soin",
+    resume: "Le secrétaire assistant médico-administratif est le premier interlocuteur du patient et travaille en étroite collaboration avec les professionnels de santé d'une structure médicale. Il assure l'accueil, la prise en charge administrative et financière du patient, la planification des activités des professionnels de santé, la transcription d'écrits médicaux et le suivi médico-administratif du dossier patient.",
+    activitesVisees: "Accueil physique et téléphonique du patient, prise en charge administrative et financière, gestion des plannings et agendas des professionnels de santé, transmission d'informations administratives et médicales, suivi médico-administratif du dossier patient, transcription et mise en forme de documents médicaux, traitement des demandes d'accès au dossier médical. Le secrétaire assistant médico-administratif exerce dans le respect du secret professionnel, du secret médical, des règles de confidentialité et d'identitovigilance.",
+    blocsCompetences: [
+      {
+        titre: "Assurer l'accueil du patient et les activités administratives courantes d'une structure médicale",
+        competences: [
+          "Accueillir, renseigner et orienter un patient",
+          "Gérer les plannings et les agendas des professionnels de santé",
+          "Réaliser la prise en charge administrative et financière du patient",
+          "Transmettre par écrit des informations administratives et médicales à l'interne et à l'externe"
+        ],
+        matieres: [
+          { competence: "Accueil patient", contenu: "Techniques d'accueil physique et téléphonique, gestion des situations difficiles, orientation du patient, communication adaptée, identitovigilance, respect du secret médical, gestion des urgences et des priorités", volume: "40h" },
+          { competence: "Gestion des plannings", contenu: "Utilisation de logiciels de gestion de rendez-vous (Doctolib, etc.), planification des consultations et examens, gestion des annulations et reports, coordination multi-praticiens, optimisation des créneaux", volume: "30h" },
+          { competence: "Prise en charge administrative et financière", contenu: "Collecte et vérification des documents (carte vitale, mutuelle, CMU), enregistrement dans le logiciel métier (ERP), création et mise à jour du dossier administratif, facturation des actes médicaux, télétransmission, gestion des impayés", volume: "50h" },
+          { competence: "Transmission d'informations", contenu: "Rédaction de courriers administratifs et médicaux, comptes rendus, notes de service, utilisation de la messagerie sécurisée de santé (MSSanté), communication interne et externe, respect de la confidentialité", volume: "30h" }
+        ],
+        modalitesEval: "Mise en situation professionnelle écrite (1h) et orale (45 min) : accueil physique (10 min), accueil téléphonique (5 min), rédaction et transmission de documents, mise à jour d'agenda. Entretien technique (20 min). Durée totale : 2h05."
+      },
+      {
+        titre: "Assister les professionnels de santé d'une structure médicale dans le suivi et la coordination du parcours du patient",
+        competences: [
+          "Assurer le suivi médico-administratif du dossier patient",
+          "Transcrire, vérifier et mettre en forme des documents médicaux",
+          "Renseigner sur l'accès au dossier médical du patient ou préparer les éléments"
+        ],
+        matieres: [
+          { competence: "Suivi dossier patient", contenu: "Gestion du dossier patient informatisé (DPI), suivi des examens et résultats, coordination avec les services (imagerie, laboratoire, spécialistes), mise à jour des informations médicales, gestion des correspondances médicales, parcours de soins coordonnés", volume: "50h" },
+          { competence: "Transcription médicale", contenu: "Terminologie médicale (anatomie, pathologies, spécialités), transcription de comptes rendus opératoires et de consultations, mise en forme selon les normes, vérification orthographique spécialisée, dictée numérique, utilisation de logiciels de reconnaissance vocale", volume: "60h" },
+          { competence: "Accès au dossier médical", contenu: "Cadre réglementaire de l'accès au dossier médical (loi Kouchner), procédures de communication, délais légaux, préparation des éléments communicables, anonymisation si nécessaire, gestion des demandes (patient, ayant droit, médecin), archivage et conservation", volume: "25h" }
+        ],
+        modalitesEval: "Mise en situation professionnelle écrite (1h35) : analyse de situations, traitement de dossiers, production de documents. Entretien technique (10 min). Durée totale : 1h45."
+      }
+    ],
+    secteursActivite: "Établissements publics et privés de santé (hôpitaux, centres hospitaliers spécialisés, cliniques), structures de ville (cabinets médicaux, maisons de santé, centres de santé, centres d'imagerie médicale, laboratoires d'analyses médicales)",
+    typesEmplois: ["Secrétaire médical", "Secrétaire assistant médical", "Secrétaire administratif et médical", "Assistant médico-administratif"],
+    codesROME: ["M1609"],
+    voiesAcces: ["Contrat d'apprentissage", "Formation continue", "Contrat de professionnalisation", "VAE"],
+    dureeIndicative: "285 heures (6 mois en alternance)",
+  },
 ];
 
 export function getRNCPByCode(code: string): RNCPFiche | undefined {
