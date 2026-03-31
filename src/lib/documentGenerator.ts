@@ -7007,6 +7007,7 @@ function generateEvalBesoinsAnswers(s: StagiaireInfo, f: FormationInfo, o: Organ
       `Au sein de ${s.entreprise || "la maternité"}, ${s.prenom} participe à l'accompagnement non médicamenteux des femmes enceintes et souhaite enrichir sa pratique avec le massage prénatal.`,
     ];
   } else if (isIA) {
+    missionsEntreprise = [
       `${s.prenom} est en charge de la création de contenus marketing pour ${s.entreprise} : articles de blog, newsletters mensuelles, posts réseaux sociaux et visuels pour les campagnes de communication.`,
       `En tant que ${s.poste}, ${s.prenom} gère la communication digitale de ${s.entreprise} : production de contenus rédactionnels, création de visuels pour le site web et animation des réseaux sociaux.`,
       `${s.prenom} développe les supports de communication de ${s.entreprise} (brochures, présentations, flyers) et produit des contenus multimédias pour les différents canaux de diffusion.`,
