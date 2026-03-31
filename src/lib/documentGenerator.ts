@@ -5203,8 +5203,10 @@ function genLivretAccueilCFA_V2(o: OrganismeInfo, f: FormationInfo, stagiaires: 
 
 // ============== CFA IND 9 — RÈGLEMENT INTÉRIEUR V2 (complet 8 articles) ==============
 
-function genReglementInterieurCFA_V2(o: OrganismeInfo, f: FormationInfo) {
-  return buildDocument({ org: o, title: "RÈGLEMENT INTÉRIEUR DU CFA", sections: [
+function genReglementInterieurCFA_V2(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
+  const s = stagiaires[si] || stagiaires[0] || { prenom: '___', nom: '___' } as StagiaireInfo;
+  const dateSignature = f.dateDebut ? formatDate(subtractBusinessDays(f.dateDebut, 14)) : '____/____/________';
+  return buildDocument({ org: o, title: "RÈGLEMENT INTÉRIEUR DU CFA", date: dateSignature, sections: [
     { heading: "Préambule", content: `<p>Le premier objectif de <strong>${o.nom}</strong> est la pleine réussite et l'épanouissement de ses apprenants : réussite aux examens, réussite en entreprise, réussite sur le marché du travail, réussite en matière de développement personnel. L'atteinte de ces ambitions est l'affaire de tous : elle passe nécessairement par une forte implication des apprenants dans leur formation et par le strict respect des règles de vie mentionnées dans ce règlement.</p>` },
 
     { heading: "Article 1 : Objet", content: `<p>Conformément à l'article L6325-5 du Code du Travail, le présent règlement a pour objet de préciser l'application de la réglementation en matière :</p><ul><li>D'hygiène et de sécurité</li><li>De discipline</li><li>De droits et devoirs des apprenants</li><li>De représentation des apprenants</li></ul><p>Ces dispositions sont applicables dans les locaux habituels de l'organisme de formation ou tout autre local que celui-ci sera amené à utiliser. Le présent règlement est communiqué à chaque apprenant avant toute inscription définitive.</p><p>Pendant le temps en entreprise, les apprenants doivent se conformer au règlement intérieur de leur entreprise.</p>` },
@@ -5246,7 +5248,7 @@ function genReglementInterieurCFA_V2(o: OrganismeInfo, f: FormationInfo) {
 
     { heading: "Article 8 : Représentation des apprenants", content: `<h4>Délégué de classe</h4><p>Pour les formations de plus de 400 heures :</p><ul><li>Tous les apprenants sont électeurs et éligibles</li><li>Élection d'un délégué titulaire et d'un suppléant au scrutin uninominal à deux tours</li><li>Le scrutin a lieu dans les deux mois suivant le début de la formation</li><li>Les délégués représentent les apprenants dans tous les conseils de classe</li><li>Ils font toute suggestion pour améliorer les conditions de formation</li></ul>
 <h4>Conseil de Perfectionnement</h4><p>Le Conseil de Perfectionnement se réunit au moins une fois par an. Il est composé de représentants parmi les apprenants, le personnel administratif et l'équipe pédagogique. Il est présidé par le Directeur. Chaque réunion fait l'objet d'un procès-verbal.</p>` },
-  ], signatures: { type: "2", labels: ["Le Directeur du CFA", "L'Apprenti(e) (lu et approuvé)"], names: [o.dirigeant || '___', ""] } });
+  ], signatures: { type: "2", labels: ["Le Directeur du CFA", "L'Apprenti(e) (lu et approuvé)"], names: [o.dirigeant || '___', `${s.prenom} ${s.nom}`], noOrgSignature: true, stagiaireSignatureUrl: s.signatureUrl } });
 }
 
 // ============== CFA IND 9 — PV ÉLECTION DES DÉLÉGUÉS ==============
