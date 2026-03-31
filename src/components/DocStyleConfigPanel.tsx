@@ -421,6 +421,16 @@ const DocStyleConfigPanel = ({ style, onChange }: DocStyleConfigPanelProps) => {
                     ))}
                   </div>
                 </div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label className="text-xs font-semibold block">Barre latérale des sections</Label>
+                    <span className="text-[10px] text-muted-foreground">Bordure colorée à gauche des blocs de contenu</span>
+                  </div>
+                  <Switch
+                    checked={style.showSectionBorder !== false}
+                    onCheckedChange={(v) => onChange({ ...style, showSectionBorder: v })}
+                  />
+                </div>
               </div>
             )}
 

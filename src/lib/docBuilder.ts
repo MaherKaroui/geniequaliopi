@@ -178,6 +178,7 @@ td{padding:8px 6px;vertical-align:top;font-size:${s.fontSize - 1}px}
 .page-break{page-break-after:always;margin:30px 0;border-top:2px dashed #ccc}
 @media print{body{padding:20px}.page-break{page-break-after:always}}
 ${themeRules}
+${!s.showSectionBorder ? `.section{border-left:none !important} .section-green{border-left:none !important} .section-orange{border-left:none !important} h2{border-left:none !important}` : ''}
 </style>`;
 }
 
