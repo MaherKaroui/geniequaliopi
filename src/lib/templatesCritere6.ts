@@ -278,6 +278,70 @@ function veilleReglementaireRows(f: FormationInfo, type: FormationType): string[
     ];
   }
 
+  if (type === "massage" || type === "esthetique") {
+    return [...common,
+      [
+        `<a href="https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000006912284">Légifrance – Art. L1110-4 Code de la santé publique</a>`,
+        "Respect de la vie privée et secret professionnel dans le secteur du bien-être",
+        veilleDate(f, 5),
+        "Obligation de respecter la vie privée et le secret professionnel pour les praticiens du bien-être et du massage. Encadrement de la relation praticien-client.",
+        "Preuve : extrait du Code de la santé publique. Action : intégrer un module sur l'éthique et la déontologie dans la formation massage."
+      ],
+      [
+        `<a href="https://www.centre-inffo.fr/site-droit-formation/actualites-droit/cpf-hausse-du-montant-de-la-participation-forfaitaire">Centre Inffo – CPF</a>`,
+        "CPF : Hausse du montant de la participation forfaitaire",
+        veilleDate(f, 3),
+        "La participation financière obligatoire pour l'achat d'une formation CPF s'élève à 103,20 euros.",
+        "Preuve : article Centre Inffo. Action : informer les futurs stagiaires du reste à charge CPF."
+      ],
+      [
+        `<a href="https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000006910978">Légifrance – Art. R4127-39 Code de la santé publique</a>`,
+        "Encadrement des pratiques de bien-être et distinction avec les actes médicaux",
+        veilleDate(f, 2),
+        "Distinction entre massage de bien-être et massage thérapeutique (kinésithérapie). Les praticiens en massage prénatal doivent connaître les limites de leur exercice.",
+        "Preuve : texte réglementaire. Action : clarifier dans le programme les contre-indications et le périmètre d'intervention du praticien bien-être."
+      ],
+    ];
+  }
+
+  if (type === "management") {
+    return [...common,
+      [
+        `<a href="https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000006901294">Légifrance – Art. L.6321-1 Code du travail</a>`,
+        "Obligation de formation des salariés – Développement des compétences managériales",
+        veilleDate(f, 5),
+        "L'employeur assure l'adaptation des salariés à leur poste. La montée en compétences managériales est un levier clé de la politique RH.",
+        "Preuve : extrait Code du travail. Action : intégrer les obligations légales dans le module management des ressources humaines."
+      ],
+      [
+        `<a href="https://www.centre-inffo.fr/site-droit-formation/actualites-droit/cpf-hausse-du-montant-de-la-participation-forfaitaire">Centre Inffo – CPF</a>`,
+        "CPF : Hausse du montant de la participation forfaitaire",
+        veilleDate(f, 3),
+        "Participation financière obligatoire pour les formations CPF. Impact sur les formations en management et leadership.",
+        "Preuve : article Centre Inffo. Action : informer les futurs stagiaires managers du reste à charge."
+      ],
+    ];
+  }
+
+  if (type === "secretaire") {
+    return [...common,
+      [
+        `<a href="https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000006912284">Légifrance – Art. L1110-4 CSP</a>`,
+        "Secret médical et confidentialité des données de santé",
+        veilleDate(f, 5),
+        "Obligation de secret professionnel pour les secrétaires médico-administratifs. Encadrement strict de l'accès aux données de santé (DPI, courriers médicaux).",
+        "Preuve : Code de la santé publique. Action : module sur le secret médical et la gestion sécurisée des dossiers patients."
+      ],
+      [
+        `<a href="https://www.centre-inffo.fr/site-droit-formation/actualites-droit/cpf-hausse-du-montant-de-la-participation-forfaitaire">Centre Inffo – CPF</a>`,
+        "CPF : Hausse du montant de la participation forfaitaire",
+        veilleDate(f, 3),
+        "Participation financière CPF de 103,20 euros. Impact sur les formations secrétariat médical.",
+        "Preuve : article Centre Inffo. Action : informer les stagiaires du reste à charge CPF."
+      ],
+    ];
+  }
+
   // Default: word/bureautique
   return [...common,
     [
