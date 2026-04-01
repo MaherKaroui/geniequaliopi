@@ -1231,6 +1231,39 @@ function veilleTechnoRows(f: FormationInfo, type: FormationType): string[][] {
     ];
   }
 
+  if (type === "ecsr") {
+    return [...commonDigitalLearning,
+      [
+        `<a href="https://www.securite-routiere.gouv.fr/">Sécurité Routière – Simulateurs</a>`,
+        "Simulateurs de conduite et outils numériques pédagogiques",
+        veilleMonthYear(f, 7),
+        "Évolutions des simulateurs de conduite pour la formation : réalité virtuelle, scénarios de conduite en conditions dégradées, éco-conduite.",
+        "Preuve : benchmark simulateurs. Action : évaluer l'intégration d'un simulateur dans la formation pratique ECSR."
+      ],
+      [
+        `<a href="https://www.inserr.fr/">INSERR – Outils pédagogiques numériques</a>`,
+        "INSERR – Technologies pour l'enseignement de la conduite",
+        veilleMonthYear(f, 6),
+        "Innovations technologiques dans la formation à la conduite : tablettes embarquées, applications de suivi pédagogique, e-learning code de la route.",
+        "Action : intégrer les outils numériques INSERR dans les pratiques de formation."
+      ],
+      [
+        `<a href="https://www.learningtechnologiesfrance.com/">learningtechnologiesfrance.com</a>`,
+        "Learning Technologies France – EdTech et conduite",
+        veilleYear(f, 5),
+        "Salon des technologies de formation : solutions IA, VR et serious games appliquées à l'enseignement de la conduite.",
+        "Preuve : programme + notes. Action Qualiopi : benchmark des solutions EdTech pour la formation ECSR."
+      ],
+      [
+        `<a href="https://www.talenco.com/nos-publications/barometre-formation-professionnelle-tendances-pratiques-2025/">TalenCo – Baromètre</a>`,
+        "Baromètre formation professionnelle – Secteur transport et mobilité",
+        veilleDate(f, 3),
+        "Tendances : digitalisation de la formation à la conduite, simulateurs VR, permis connecté, éco-conduite obligatoire.",
+        "Preuve : PDF baromètre. Action Qualiopi : aligner les outils pédagogiques sur les tendances technologiques du secteur."
+      ],
+    ];
+  }
+
   // Default: word/bureautique
   return [...commonDigitalLearning,
     [
