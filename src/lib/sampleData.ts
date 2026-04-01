@@ -406,6 +406,24 @@ export const SAMPLE_FORMATIONS: FormationInfo[] = [
     codeRNCP: "RNCP35329",
     rythmeAlternance: "Alternance théorie/pratique répartie sur 8 mois (CCP1 : 560h centre + 140h entreprise / CCP2 : 350h centre + 140h entreprise)",
   },
+  {
+    intitule: "Anglais Professionnel – Certification VTest Business English (RS6905)",
+    objectifs: "Développer et certifier les compétences en anglais professionnel à l'oral comme à l'écrit (niveaux A2 à C2 CECRL). Préparer à la certification VTest Business English – 4 Skills (RS6905) : compréhension écrite, compréhension orale, expression écrite, expression orale.",
+    prerequis: "Niveau A1 minimum en anglais (test de positionnement réalisé avant l'entrée en formation). Motivation à interagir en anglais.",
+    duree: "40 heures (6 jours)",
+    modalites: "distanciel",
+    tarif: "999 € HT par stagiaire",
+    programme: "Jour 1 : Test de positionnement, objectifs individuels, compréhension écrite (emails, rapports, documents RH)\nJour 2 : Compréhension orale (appels téléphoniques, réunions, présentations, consignes)\nJour 3 : Expression écrite (emails professionnels, comptes rendus, propositions commerciales, faux-amis)\nJour 4 : Expression orale (présentation professionnelle, participation en réunion, pitch, négociation)\nJour 5 : Grammaire et vocabulaire professionnel (temps, modaux, vocabulaire thématique, phrasal verbs)\nJour 6 : Préparation certification VTest (format d'examen, stratégies par compétence, simulation complète, bilan)",
+    methodesEvaluation: "Test de positionnement initial, exercices pratiques par compétence, mises en situation professionnelles, simulation VTest chronométrée, évaluation finale orale et écrite, grille d'acquisition des compétences",
+    moyensPedagogiques: "Plateforme LMS avec classe virtuelle, supports numériques interactifs, études de cas concrets, documents professionnels authentiques, accès démo VTest en ligne, suivi personnalisé avec expert dédié",
+    publicVise: "Professionnels souhaitant évoluer dans un environnement anglophone, salariés, demandeurs d'emploi, indépendants",
+    delaiAcces: "14 jours après inscription",
+    dateDebut: "2026-09-07",
+    dateFin: "2026-09-14",
+    lieu: "Formation à distance – Plateforme LMS + Classe virtuelle",
+    nombreParticipants: "10",
+    formateur: "Catherine Dubois",
+  },
 ];
 
 // Satisfaction scores (pre-filled realistic data)
