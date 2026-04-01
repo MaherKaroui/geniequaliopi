@@ -28,10 +28,12 @@ function veilleYear(f: FormationInfo, monthsBefore: number): string {
 }
 
 // ===== Detection helpers =====
-type FormationType = "fle" | "ia" | "word" | "commercial" | "webmarketing" | "crm" | "anglais" | "massage" | "esthetique" | "secretaire" | "management";
+type FormationType = "fle" | "ia" | "word" | "commercial" | "webmarketing" | "crm" | "anglais" | "massage" | "esthetique" | "secretaire" | "management" | "ecsr";
 
 function detectFormationType(f: FormationInfo): FormationType {
   const title = (f.intitule || "").toLowerCase();
+  const code = (f.codeRNCP || "").toLowerCase();
+  if (title.includes("conduite") || title.includes("ecsr") || title.includes("enseignant de la conduite") || code.includes("35329")) return "ecsr";
   if (title.includes("français") || title.includes("fle") || title.includes("social") || title.includes("médico") || title.includes("medico") || title.includes("communiquer en français")) return "fle";
   if (title.includes("massage") || title.includes("prénatal") || title.includes("prenatal") || title.includes("relaxation") || title.includes("bien-être") || title.includes("bien être")) return "massage";
   if (title.includes("esthéti") || title.includes("cosmétique") || title.includes("parfumerie") || title.includes("beauté")) return "esthetique";
@@ -349,6 +351,39 @@ function veilleReglementaireRows(f: FormationInfo, type: FormationType): string[
         veilleDate(f, 3),
         "Participation financière CPF de 103,20 euros. Impact sur les formations secrétariat médical.",
         "Preuve : article Centre Inffo. Action : informer les stagiaires du reste à charge CPF."
+      ],
+    ];
+  }
+
+  if (type === "ecsr") {
+    return [...common,
+      [
+        `<a href="https://www.legifrance.gouv.fr/codes/section_lc/LEGITEXT000006074228/LEGISCTA000006159515/">Légifrance – Code de la route</a>`,
+        "Code de la route – Réglementation de l'enseignement de la conduite",
+        veilleDate(f, 6),
+        "Encadrement réglementaire des écoles de conduite et des enseignants : agrément, programme de formation, conditions d'exercice. Évolutions du permis de conduire.",
+        "Preuve : textes réglementaires + synthèse. Action : mettre à jour les modules pédagogiques selon les évolutions du Code de la route."
+      ],
+      [
+        `<a href="https://www.securite-routiere.gouv.fr/">Sécurité Routière – Actualités</a>`,
+        "Délégation à la Sécurité Routière – Réglementation et prévention",
+        veilleDate(f, 5),
+        "Actualités réglementaires : nouvelles mesures de sécurité routière, évolutions des sanctions, campagnes de prévention, réforme du permis.",
+        "Preuve : publications officielles. Action : intégrer les nouvelles mesures dans le programme de sensibilisation à la sécurité routière."
+      ],
+      [
+        `<a href="https://www.centre-inffo.fr/site-droit-formation/actualites-droit/cpf-hausse-du-montant-de-la-participation-forfaitaire">Centre Inffo – CPF</a>`,
+        "CPF : Hausse du montant de la participation forfaitaire",
+        veilleDate(f, 3),
+        "Participation financière obligatoire CPF de 103,20 euros. Impact sur les formations ECSR financées par le CPF.",
+        "Preuve : article Centre Inffo. Action : informer les futurs stagiaires ECSR du reste à charge CPF."
+      ],
+      [
+        `<a href="https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000044465890">Légifrance – Arrêté REAC ECSR</a>`,
+        "Arrêté relatif au titre professionnel ECSR (RNCP 35329)",
+        veilleDate(f, 4),
+        "Référentiel Emploi Activités Compétences du titre professionnel Enseignant de la Conduite et de la Sécurité Routière. 2 CCP : formation à la conduite et sensibilisation à la sécurité routière.",
+        "Preuve : REAC officiel. Action : vérifier l'alignement du programme sur les 2 CCP et les compétences du REAC."
       ],
     ];
   }
@@ -771,6 +806,53 @@ function veilleMetierRows(f: FormationInfo, type: FormationType): string[][] {
     ];
   }
 
+  if (type === "ecsr") {
+    return [
+      [
+        `<a href="https://www.securite-routiere.gouv.fr/">securite-routiere.gouv.fr</a>`,
+        "Délégation à la Sécurité Routière – Statistiques et prévention",
+        veilleMonthYear(f, 8),
+        "Données officielles sur l'accidentalité routière, les comportements à risque et les campagnes de prévention. Référence pour les modules de sensibilisation.",
+        "Preuve : rapport annuel accidentalité. Action : actualiser les données statistiques dans le module sécurité routière (CCP2)."
+      ],
+      [
+        `<a href="https://www.inserr.fr/">INSERR – Institut National de Sécurité Routière</a>`,
+        "INSERR – Formation et recherche en sécurité routière",
+        veilleMonthYear(f, 7),
+        "Institut de référence pour la formation des professionnels de la conduite. Programmes de perfectionnement, recherches sur la pédagogie de la conduite.",
+        "Action Qualiopi : aligner les pratiques pédagogiques sur les recommandations INSERR."
+      ],
+      [
+        `<a href="https://www.preventionroutiere.asso.fr/">Prévention Routière</a>`,
+        "Association Prévention Routière – Ressources pédagogiques",
+        veilleMonthYear(f, 6),
+        "Supports pédagogiques pour la sensibilisation à la sécurité routière : simulateurs, vidéos, quiz interactifs, interventions en entreprise.",
+        "Preuve : ressources téléchargées. Action : enrichir le module animation de sensibilisation (CCP2) avec les supports officiels."
+      ],
+      [
+        `<a href="https://www.youtube.com/watch?v=LpT0v5YzYAA">YouTube – Pédagogie de la conduite</a>`,
+        "Techniques pédagogiques pour l'enseignement de la conduite",
+        veilleYear(f, 5),
+        "Vidéo sur les approches pédagogiques modernes : apprentissage progressif, gestion du stress, pédagogie par objectifs.",
+        "Preuve : fiche synthèse vidéo. Action : intégrer dans le module pédagogie de la formation initiale (CCP1)."
+      ],
+      [
+        `<a href="https://www.france-num.gouv.fr/guides-et-conseils/strategie-numerique">France Num – Numérique auto-école</a>`,
+        "France Num – Digitalisation des auto-écoles",
+        veilleMonthYear(f, 4),
+        "Guide sur la transformation numérique des auto-écoles : simulateurs, e-learning code, plateformes de réservation de créneaux.",
+        "Preuve : guide France Num. Action : intégrer les outils numériques dans l'enseignement de la conduite."
+      ],
+      [
+        `<a href="https://www.cnpa.fr/">CNPA – Conseil National des Professions de l'Automobile</a>`,
+        "CNPA – Actualités du secteur automobile et auto-écoles",
+        veilleMonthYear(f, 3),
+        "Organisation professionnelle représentant les écoles de conduite. Veille sur les évolutions réglementaires, la convention collective et les enjeux du secteur.",
+        "Preuve : newsletter + captures. Action Qualiopi : veille sectorielle sur les évolutions du métier d'enseignant de la conduite."
+      ],
+    ];
+  }
+
   // Default: word/bureautique
   return [
     [
@@ -1145,6 +1227,39 @@ function veilleTechnoRows(f: FormationInfo, type: FormationType): string[][] {
         veilleDate(f, 3),
         "La transformation numérique du secteur santé accélère : DMP, télémédecine, IA en imagerie médicale.",
         "Preuve : PDF baromètre. Action Qualiopi : intégrer les nouvelles technologies santé dans le programme."
+      ],
+    ];
+  }
+
+  if (type === "ecsr") {
+    return [...commonDigitalLearning,
+      [
+        `<a href="https://www.securite-routiere.gouv.fr/">Sécurité Routière – Simulateurs</a>`,
+        "Simulateurs de conduite et outils numériques pédagogiques",
+        veilleMonthYear(f, 7),
+        "Évolutions des simulateurs de conduite pour la formation : réalité virtuelle, scénarios de conduite en conditions dégradées, éco-conduite.",
+        "Preuve : benchmark simulateurs. Action : évaluer l'intégration d'un simulateur dans la formation pratique ECSR."
+      ],
+      [
+        `<a href="https://www.inserr.fr/">INSERR – Outils pédagogiques numériques</a>`,
+        "INSERR – Technologies pour l'enseignement de la conduite",
+        veilleMonthYear(f, 6),
+        "Innovations technologiques dans la formation à la conduite : tablettes embarquées, applications de suivi pédagogique, e-learning code de la route.",
+        "Action : intégrer les outils numériques INSERR dans les pratiques de formation."
+      ],
+      [
+        `<a href="https://www.learningtechnologiesfrance.com/">learningtechnologiesfrance.com</a>`,
+        "Learning Technologies France – EdTech et conduite",
+        veilleYear(f, 5),
+        "Salon des technologies de formation : solutions IA, VR et serious games appliquées à l'enseignement de la conduite.",
+        "Preuve : programme + notes. Action Qualiopi : benchmark des solutions EdTech pour la formation ECSR."
+      ],
+      [
+        `<a href="https://www.talenco.com/nos-publications/barometre-formation-professionnelle-tendances-pratiques-2025/">TalenCo – Baromètre</a>`,
+        "Baromètre formation professionnelle – Secteur transport et mobilité",
+        veilleDate(f, 3),
+        "Tendances : digitalisation de la formation à la conduite, simulateurs VR, permis connecté, éco-conduite obligatoire.",
+        "Preuve : PDF baromètre. Action Qualiopi : aligner les outils pédagogiques sur les tendances technologiques du secteur."
       ],
     ];
   }
