@@ -3045,7 +3045,7 @@ function genFicheMaitreApprentissage(o: OrganismeInfo, f: FormationInfo) {
     { heading: "Identité", content: `<p><strong>Nom :</strong> ${f.formateur}<br><strong>Entreprise :</strong> Tech Solutions SAS<br><strong>Fonction :</strong> Responsable de département<br><strong>Expérience :</strong> 10 ans dans le métier</p>` },
     { heading: "Qualifications", content: "<p>• Diplôme de niveau Bac+5 dans le domaine<br>• Formation de maître d'apprentissage (14h)<br>• Expérience d'encadrement d'apprentis : 5 ans</p>" },
     { heading: "Missions", content: "<p>• Accueillir l'apprenti dans l'entreprise<br>• Organiser le parcours d'apprentissage en entreprise<br>• Accompagner l'apprenti dans l'acquisition des compétences<br>• Assurer le lien avec le CFA<br>• Participer aux évaluations</p>" },
-  ], signatures: { type: "2", labels: ["Le Maître d'apprentissage", "Le Responsable RH"], names: [f.formateur, "Marie Lecomte"] } });
+  ], signatures: { type: "2", labels: ["Le Maître d'apprentissage", "Le Responsable RH"], names: [f.formateur, o.poleAdministratif] } });
 }
 
 function genSuiviEntrepriseCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {

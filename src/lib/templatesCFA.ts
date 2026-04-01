@@ -22,7 +22,7 @@ export function genOrganigrammeCFA(o: OrganismeInfo) {
       <div style="background:#1e3a7b;color:white;padding:15px 30px;border-radius:8px;display:inline-block;margin-bottom:20px"><strong>Direction du CFA</strong><br>${o.dirigeant}</div>
       <div style="display:flex;justify-content:center;gap:20px;flex-wrap:wrap;margin-top:20px">
         <div style="background:#e8f0fe;padding:12px 20px;border-radius:8px;min-width:180px"><strong>Coordination Pédagogique</strong><br>${o.responsablePedagogique}<br><em style="font-size:11px">Formateurs CFA</em></div>
-        <div style="background:#e8f0fe;padding:12px 20px;border-radius:8px;min-width:180px"><strong>Relations Entreprises</strong><br>Marie Lecomte<br><em style="font-size:11px">Maîtres d'apprentissage</em></div>
+        <div style="background:#e8f0fe;padding:12px 20px;border-radius:8px;min-width:180px"><strong>Relations Entreprises</strong><br>${o.poleAdministratif}<br><em style="font-size:11px">Maîtres d'apprentissage</em></div>
         <div style="background:#e8f0fe;padding:12px 20px;border-radius:8px;min-width:180px"><strong>Référent Handicap</strong><br>${o.referentHandicap}<br><em style="font-size:11px">Accessibilité</em></div>
         <div style="background:#e8f0fe;padding:12px 20px;border-radius:8px;min-width:180px"><strong>Vie Scolaire</strong><br>${o.referentQualite}<br><em style="font-size:11px">Suivi apprentis</em></div>
       </div>
