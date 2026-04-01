@@ -138,13 +138,14 @@ const ControleEY = () => {
                   />
                 )}
                 {key === "stagiaires" && <StagiairesForm data={stagiaires} onChange={handleStagChange} />}
+                {key === "design" && <DocStyleConfigPanel style={docStyle} onChange={handleStyleChange} />}
               </div>
             )}
           </div>
         ))}
 
         {/* Checklist */}
-        <ControleEDOF organisme={organisme} formation={formation} stagiaires={stagiaires} criteres={criteres} />
+        <ControleEDOF organisme={organisme} formation={formation} stagiaires={stagiaires} criteres={criteres} docStyle={docStyle} />
       </main>
     </div>
   );
