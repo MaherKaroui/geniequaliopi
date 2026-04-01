@@ -641,7 +641,7 @@ function genOrganigramme(o: OrganismeInfo) {
         <div style="background:#e8f0fe;padding:12px 20px;border-radius:8px;min-width:180px"><strong>Pôle Pédagogique</strong><br>${o.responsablePedagogique}<br><em style="font-size:11px">Formateurs</em></div>
         <div style="background:#e8f0fe;padding:12px 20px;border-radius:8px;min-width:180px"><strong>Pôle Qualité</strong><br>${o.referentQualite}<br><em style="font-size:11px">Amélioration continue</em></div>
         <div style="background:#e8f0fe;padding:12px 20px;border-radius:8px;min-width:180px"><strong>Pôle Handicap</strong><br>${o.referentHandicap}<br><em style="font-size:11px">Accessibilité</em></div>
-        <div style="background:#e8f0fe;padding:12px 20px;border-radius:8px;min-width:180px"><strong>Pôle Administratif</strong><br>Marie Lecomte<br><em style="font-size:11px">Inscriptions, facturation</em></div>
+        <div style="background:#e8f0fe;padding:12px 20px;border-radius:8px;min-width:180px"><strong>Pôle Administratif</strong><br>${o.poleAdministratif}<br><em style="font-size:11px">Inscriptions, facturation</em></div>
       </div>
     </div>` });
 }
@@ -3045,7 +3045,7 @@ function genFicheMaitreApprentissage(o: OrganismeInfo, f: FormationInfo) {
     { heading: "Identité", content: `<p><strong>Nom :</strong> ${f.formateur}<br><strong>Entreprise :</strong> Tech Solutions SAS<br><strong>Fonction :</strong> Responsable de département<br><strong>Expérience :</strong> 10 ans dans le métier</p>` },
     { heading: "Qualifications", content: "<p>• Diplôme de niveau Bac+5 dans le domaine<br>• Formation de maître d'apprentissage (14h)<br>• Expérience d'encadrement d'apprentis : 5 ans</p>" },
     { heading: "Missions", content: "<p>• Accueillir l'apprenti dans l'entreprise<br>• Organiser le parcours d'apprentissage en entreprise<br>• Accompagner l'apprenti dans l'acquisition des compétences<br>• Assurer le lien avec le CFA<br>• Participer aux évaluations</p>" },
-  ], signatures: { type: "2", labels: ["Le Maître d'apprentissage", "Le Responsable RH"], names: [f.formateur, "Marie Lecomte"] } });
+  ], signatures: { type: "2", labels: ["Le Maître d'apprentissage", "Le Responsable RH"], names: [f.formateur, o.poleAdministratif] } });
 }
 
 function genSuiviEntrepriseCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {

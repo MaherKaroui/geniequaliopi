@@ -166,7 +166,7 @@ tr:nth-child(even){background:#f8f9fa}
         <div style="background:#e8f0fe;padding:15px;border-radius:10px;text-align:center"><strong>Pôle Pédagogique</strong><br><span style="font-size:12px">${org.responsablePedagogique}</span><br><em style="font-size:11px;color:#666">Formateurs</em></div>
         <div style="background:#e8f0fe;padding:15px;border-radius:10px;text-align:center"><strong>Pôle Qualité</strong><br><span style="font-size:12px">${org.referentQualite}</span><br><em style="font-size:11px;color:#666">Amélioration continue</em></div>
         <div style="background:#e8f0fe;padding:15px;border-radius:10px;text-align:center"><strong>Pôle Handicap</strong><br><span style="font-size:12px">${org.referentHandicap}</span><br><em style="font-size:11px;color:#666">Accessibilité</em></div>
-        <div style="background:#e8f0fe;padding:15px;border-radius:10px;text-align:center"><strong>Pôle Administratif</strong><br><span style="font-size:12px">Marie Lecomte</span><br><em style="font-size:11px;color:#666">Inscriptions, facturation</em></div>
+        <div style="background:#e8f0fe;padding:15px;border-radius:10px;text-align:center"><strong>Pôle Administratif</strong><br><span style="font-size:12px">${org.poleAdministratif}</span><br><em style="font-size:11px;color:#666">Inscriptions, facturation</em></div>
       </div>
     </div>
   </div>`;
