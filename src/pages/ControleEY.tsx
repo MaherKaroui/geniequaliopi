@@ -120,14 +120,14 @@ const ControleEY = () => {
     const name = saveName.trim() || organisme.nom || "Sans titre";
     setSaving(true);
     try {
-      const payload = {
+      const payload: any = {
         user_id: user.id,
         name,
-        organisme: organisme as unknown as Record<string, unknown>,
-        formation: formation as unknown as Record<string, unknown>,
-        stagiaires: stagiaires as unknown as Record<string, unknown>[],
-        doc_states: {} as Record<string, unknown>,
-        doc_style: (docStyle || null) as unknown as Record<string, unknown> | null,
+        organisme,
+        formation,
+        stagiaires,
+        doc_states: {},
+        doc_style: docStyle || null,
         updated_at: new Date().toISOString(),
       };
 
