@@ -5255,7 +5255,7 @@ function genAttestationInscriptionCFAV2(o: OrganismeInfo, f: FormationInfo, stag
       <p><strong>Signature et cachet du centre de formation</strong></p>
       <p style="margin-top:10px"><strong>${o.nom}</strong><br>Service pédagogique</p>
       ${o.tamponUrl ? `<div style="margin-top:10px"><img src="${o.tamponUrl}" alt="Tampon" style="max-height:70px;max-width:160px;object-fit:contain;opacity:0.85" /></div>` : ""}
-      ${o.signatureUrl ? `<div style="margin-top:5px"><img src="${o.signatureUrl}" alt="Signature" style="max-height:50px;max-width:120px;object-fit:contain" /></div>` : ""}
+      
     </div>` });
 }
 
