@@ -641,7 +641,7 @@ function genOrganigramme(o: OrganismeInfo) {
         <div style="background:#e8f0fe;padding:12px 20px;border-radius:8px;min-width:180px"><strong>Pôle Pédagogique</strong><br>${o.responsablePedagogique}<br><em style="font-size:11px">Formateurs</em></div>
         <div style="background:#e8f0fe;padding:12px 20px;border-radius:8px;min-width:180px"><strong>Pôle Qualité</strong><br>${o.referentQualite}<br><em style="font-size:11px">Amélioration continue</em></div>
         <div style="background:#e8f0fe;padding:12px 20px;border-radius:8px;min-width:180px"><strong>Pôle Handicap</strong><br>${o.referentHandicap}<br><em style="font-size:11px">Accessibilité</em></div>
-        <div style="background:#e8f0fe;padding:12px 20px;border-radius:8px;min-width:180px"><strong>Pôle Administratif</strong><br>Marie Lecomte<br><em style="font-size:11px">Inscriptions, facturation</em></div>
+        <div style="background:#e8f0fe;padding:12px 20px;border-radius:8px;min-width:180px"><strong>Pôle Administratif</strong><br>${o.poleAdministratif}<br><em style="font-size:11px">Inscriptions, facturation</em></div>
       </div>
     </div>` });
 }
