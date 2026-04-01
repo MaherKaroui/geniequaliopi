@@ -473,41 +473,104 @@ export function formationInfoBlock(f: FormationInfo, stagiaires?: StagiaireInfo[
   return infoGrid(items);
 }
 
-export function signatureBlock3(org: OrganismeInfo, stagiaireNom?: string, formateurNom?: string, stagiaireSignatureUrl?: string, formateurSignatureUrl?: string): string {
-  const tamponHtml = org.tamponUrl ? `<img src="${org.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />` : "";
-  const stagSigHtml = stagiaireSignatureUrl ? `<img src="${stagiaireSignatureUrl}" alt="Signature stagiaire" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : `<p style="font-style:italic;color:#999;margin-top:15px">${stagiaireNom ? `Signé par ${stagiaireNom}` : ""}</p>`;
-  // Formateur : utiliser la signature formateur dédiée si disponible, sinon celle du dirigeant
-  const formateurSigHtml = formateurSignatureUrl
-    ? `<img src="${formateurSignatureUrl}" alt="Signature formateur" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />`
-    : org.signatureUrl ? `<img src="${org.signatureUrl}" alt="Signature" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : "";
-  const responsableSigHtml = org.signatureUrl ? `<img src="${org.signatureUrl}" alt="Signature" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : "";
+/**
+ * Auto-detect which signature image to use based on label text.
+ * Rules:
+ * - "organisme" / "cachet" → tampon only, no signature
+ * - "stagiaire" / "apprenant" / "apprenti" / "candidat" / "bénéficiaire" → stagiaire signature
+ * - "formateur" → formateur signature
+ * - "dirigeant" / "responsable" (without "entreprise") / "directeur" → dirigeant signature + tampon
+ * - "entreprise" / "employeur" / "maître" → responsable entreprise signature
+ */
+interface SignatureUrls {
+  dirigeantSignatureUrl?: string;
+  tamponUrl?: string;
+  stagiaireSignatureUrl?: string;
+  formateurSignatureUrl?: string;
+  responsableEntrepriseSignatureUrl?: string;
+}
+
+function sigImg(url: string | undefined, alt: string): string {
+  if (!url) return "";
+  return `<img src="${url}" alt="${alt}" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />`;
+}
+
+function tamponImg(url: string | undefined): string {
+  if (!url) return "";
+  return `<img src="${url}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />`;
+}
+
+function resolveSignature(label: string, nom: string, urls: SignatureUrls): string {
+  const l = label.toLowerCase();
+  // Organisme / Cachet → tampon only
+  if ((/organisme|cachet/i.test(l) && !/responsable/i.test(l)) || l === 'cachet') {
+    return tamponImg(urls.tamponUrl);
+  }
+  // Stagiaire / Apprenant / Apprenti / Candidat / Bénéficiaire
+  if (/stagiaire|apprenant|apprenti|candidat|bénéficiaire/i.test(l)) {
+    return urls.stagiaireSignatureUrl
+      ? sigImg(urls.stagiaireSignatureUrl, "Signature stagiaire")
+      : `<p style="font-style:italic;color:#999;margin-top:15px">${nom ? `Signé par ${nom}` : ""}</p>`;
+  }
+  // Formateur (but not "Formateur" in a general sentence)
+  if (/formateur/i.test(l)) {
+    return sigImg(urls.formateurSignatureUrl, "Signature formateur");
+  }
+  // Responsable entreprise / Employeur / Maître d'apprentissage
+  if (/entreprise|employeur|maître/i.test(l)) {
+    return urls.responsableEntrepriseSignatureUrl
+      ? sigImg(urls.responsableEntrepriseSignatureUrl, "Signature responsable entreprise")
+      : `<p style="font-style:italic;color:#999;margin-top:15px">${nom ? `Signé par ${nom}` : ""}</p>`;
+  }
+  // Resp. Pédagogique / Référent qualité / Référent handicap → no auto signature (different people)
+  if (/pédagogique|qualité|handicap|référent/i.test(l)) {
+    return `<p style="font-style:italic;color:#999;margin-top:15px">${nom ? `Signé par ${nom}` : ""}</p>`;
+  }
+  // Dirigeant / Responsable (of org) / Directeur → dirigeant signature + tampon
+  if (/dirigeant|responsable|directeur/i.test(l)) {
+    return sigImg(urls.dirigeantSignatureUrl, "Signature dirigeant") + tamponImg(urls.tamponUrl);
+  }
+  // Client / other → no auto signature
+  if (/client|accord/i.test(l)) {
+    return `<p style="font-style:italic;color:#999;margin-top:15px">${nom ? `Signé par ${nom}` : ""}</p>`;
+  }
+  // Default: dirigeant signature + tampon
+  return sigImg(urls.dirigeantSignatureUrl, "Signature") + tamponImg(urls.tamponUrl);
+}
+
+export function signatureBlock3(org: OrganismeInfo, stagiaireNom?: string, formateurNom?: string, stagiaireSignatureUrl?: string, formateurSignatureUrl?: string, responsableEntrepriseSignatureUrl?: string): string {
+  const urls: SignatureUrls = {
+    dirigeantSignatureUrl: org.signatureUrl,
+    tamponUrl: org.tamponUrl,
+    stagiaireSignatureUrl,
+    formateurSignatureUrl,
+    responsableEntrepriseSignatureUrl,
+  };
+  const stagSigHtml = resolveSignature("Le/La Stagiaire", stagiaireNom || "", urls);
+  const fmtSigHtml = resolveSignature("Le/La Formateur(trice)", formateurNom || "", urls);
+  const respSigHtml = resolveSignature("Le Responsable", org.dirigeant, urls);
   return `<div class="signature-block">
     <div class="sig-box"><p class="sig-label">Le/La Stagiaire</p><p>Nom : ${stagiaireNom || "________________________"}</p><p>Date : ________________________</p><p style="margin-top:20px">Signature :</p>${stagSigHtml}</div>
-    <div class="sig-box"><p class="sig-label">Le/La Formateur(trice)</p><p>Nom : ${formateurNom || "________________________"}</p><p>Date : ________________________</p><p style="margin-top:20px">Signature :</p>${formateurSigHtml}</div>
-    <div class="sig-box"><p class="sig-label">Le Responsable</p><p>Nom : ${org.dirigeant}</p><p>Date : ________________________</p><p style="margin-top:20px">Signature :</p>${responsableSigHtml}${tamponHtml}</div>
+    <div class="sig-box"><p class="sig-label">Le/La Formateur(trice)</p><p>Nom : ${formateurNom || "________________________"}</p><p>Date : ________________________</p><p style="margin-top:20px">Signature :</p>${fmtSigHtml}</div>
+    <div class="sig-box"><p class="sig-label">Le Responsable</p><p>Nom : ${org.dirigeant}</p><p>Date : ________________________</p><p style="margin-top:20px">Signature :</p>${respSigHtml}</div>
   </div>`;
 }
 
-export function signatureBlock2(label1: string, nom1: string, label2: string, nom2: string, signatureUrl?: string, tamponUrl?: string, stagiaireSignatureUrl?: string, dates?: string[], formateurSignatureUrl?: string): string {
-  const isFormateurLabel1 = /formateur/i.test(label1);
-  const isFormateurLabel2 = /formateur/i.test(label2);
-  // Si le label contient "formateur", utiliser la signature formateur dédiée si disponible, sinon celle du dirigeant
-  const formateurSigUrl = formateurSignatureUrl || signatureUrl;
-  const sig1Html = isFormateurLabel1 && formateurSigUrl
-    ? `<img src="${formateurSigUrl}" alt="Signature formateur" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />`
-    : stagiaireSignatureUrl
-      ? `<img src="${stagiaireSignatureUrl}" alt="Signature" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />`
-      : `<p style="font-style:italic;color:#999;margin-top:15px">Signé par ${nom1}</p>`;
-  const tamponHtml = tamponUrl ? `<img src="${tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />` : "";
-  // Si label2 est formateur, utiliser la signature formateur
-  const sig2Html = isFormateurLabel2 && formateurSigUrl
-    ? `<img src="${formateurSigUrl}" alt="Signature formateur" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />`
-    : signatureUrl ? `<img src="${signatureUrl}" alt="Signature" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : "";
+export function signatureBlock2(label1: string, nom1: string, label2: string, nom2: string, signatureUrl?: string, tamponUrl?: string, stagiaireSignatureUrl?: string, dates?: string[], formateurSignatureUrl?: string, responsableEntrepriseSignatureUrl?: string): string {
+  const urls: SignatureUrls = {
+    dirigeantSignatureUrl: signatureUrl,
+    tamponUrl,
+    stagiaireSignatureUrl,
+    formateurSignatureUrl,
+    responsableEntrepriseSignatureUrl,
+  };
+  const sig1Html = resolveSignature(label1, nom1, urls);
+  const sig2Html = resolveSignature(label2, nom2, urls);
   const date1 = dates?.[0] || "________________________";
   const date2 = dates?.[1] || "________________________";
   return `<div class="signature-block-2">
     <div class="sig-box"><p class="sig-label">${label1}</p><p>Nom : ${nom1}</p><p>Date : ${date1}</p><p style="margin-top:20px">Signature :</p>${sig1Html}</div>
-    <div class="sig-box"><p class="sig-label">${label2}</p><p>Nom : ${nom2}</p><p>Date : ${date2}</p><p style="margin-top:20px">Signature :</p>${sig2Html}${tamponHtml}</div>
+    <div class="sig-box"><p class="sig-label">${label2}</p><p>Nom : ${nom2}</p><p>Date : ${date2}</p><p style="margin-top:20px">Signature :</p>${sig2Html}</div>
   </div>`;
 }
 
@@ -542,7 +605,7 @@ export interface DocBuildConfig {
   sections?: { heading: string; content: string; variant?: "green" | "orange" }[];
   table?: { headers: string[]; rows: string[][] };
   extraHtml?: string;
-  signatures?: { type: "3" | "2"; labels?: string[]; names?: string[]; stagiaireSignatureUrl?: string; formateurSignatureUrl?: string; dates?: string[]; noOrgSignature?: boolean };
+  signatures?: { type: "3" | "2"; labels?: string[]; names?: string[]; stagiaireSignatureUrl?: string; formateurSignatureUrl?: string; responsableEntrepriseSignatureUrl?: string; dates?: string[]; noOrgSignature?: boolean };
   stagiaires?: StagiaireInfo[];
 }
 
@@ -565,9 +628,12 @@ export function buildDocument(config: DocBuildConfig): string {
     body += config.extraHtml;
   }
   if (config.signatures) {
-    const fmtSigUrl = config.signatures.formateurSignatureUrl || config.formation?.formateurSignatureUrl;
+    const firstStagiaire = config.stagiaires?.[0];
+    const fmtSigUrl = config.signatures.formateurSignatureUrl || firstStagiaire?.formateurSignatureUrl || config.formation?.formateurSignatureUrl;
+    const stagSigUrl = config.signatures.stagiaireSignatureUrl || firstStagiaire?.signatureUrl;
+    const respEntSigUrl = config.signatures.responsableEntrepriseSignatureUrl || firstStagiaire?.signatureResponsableUrl;
     if (config.signatures.type === "3") {
-      body += signatureBlock3(config.org, config.signatures.names?.[0], config.signatures.names?.[1], config.signatures.stagiaireSignatureUrl, fmtSigUrl);
+      body += signatureBlock3(config.org, config.signatures.names?.[0], config.signatures.names?.[1], stagSigUrl, fmtSigUrl, respEntSigUrl);
     } else {
       body += signatureBlock2(
         config.signatures.labels?.[0] || "Partie 1",
@@ -576,19 +642,18 @@ export function buildDocument(config: DocBuildConfig): string {
         config.signatures.names?.[1] || "",
         config.signatures.noOrgSignature ? undefined : config.org.signatureUrl,
         config.org.tamponUrl,
-        config.signatures.stagiaireSignatureUrl,
+        stagSigUrl,
         config.signatures.dates,
-        fmtSigUrl
+        fmtSigUrl,
+        respEntSigUrl
       );
     }
   }
   body += footer(config.org);
   let result = htmlWrap(body);
-  // Auto-apply gender based on first stagiaire if available
   if (config.stagiaires && config.stagiaires.length > 0) {
     result = applyGender(result, config.stagiaires[0]);
   } else {
-    // Default: remove (e) with masculine form
     result = applyGender(result, null);
   }
   return result;

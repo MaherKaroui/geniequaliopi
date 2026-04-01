@@ -1826,7 +1826,7 @@ function genEmargementStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: 
   const stagName = `${s.civilite ? s.civilite + " " : ""}${s.prenom} ${s.nom.toUpperCase()}`;
   const stagSigHtml = s.signatureUrl ? `<br><img src="${s.signatureUrl}" alt="Sig" style="max-height:40px;max-width:90px;object-fit:contain;margin-top:4px" />` : `<br><span style="font-style:italic;color:#999;font-size:10px">Signé ${s.prenom[0]}.${s.nom}</span>`;
   const fmtSigUrl = s.formateurSignatureUrl || f.formateurSignatureUrl;
-  const formateurSigHtml = fmtSigUrl ? `<br><img src="${fmtSigUrl}" alt="Sig formateur" style="max-height:40px;max-width:90px;object-fit:contain;margin-top:4px" />` : (o.signatureUrl ? `<br><img src="${o.signatureUrl}" alt="Sig" style="max-height:40px;max-width:90px;object-fit:contain;margin-top:4px" />` : '');
+  const formateurSigHtml = fmtSigUrl ? `<br><img src="${fmtSigUrl}" alt="Sig formateur" style="max-height:40px;max-width:90px;object-fit:contain;margin-top:4px" />` : '';
   let extra = `<p><strong>Stagiaire :</strong> ${stagName}</p>`;
   extra += `<p><strong>Session :</strong> Du ${formatDate(dateDebut)} au ${formatDate(dateFin)}</p>`;
   extra += `<p><strong>Formateur :</strong> ${f.formateur}</p>`;
@@ -2492,7 +2492,7 @@ function genAttestation(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiair
     <div class="section"><p>Je soussigné, <strong>${o.dirigeant}</strong>, atteste que <strong>${s.prenom} ${s.nom}</strong> (${s.entreprise}) a suivi la formation « ${f.intitule} » du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))} (${getStagiaireDuree(s, f)}).</p>
     <p><strong>Objectifs atteints :</strong> ${f.objectifs}</p>
     <p>Fait à ${o.ville}, le ${formatDate(getStagiaireDateFin(s, f))}</p>
-    ${signatureBlock2("Le Responsable", o.dirigeant, "Le Stagiaire", s.prenom + " " + s.nom)}
+    ${signatureBlock2("Le Responsable", o.dirigeant, "Le Stagiaire", s.prenom + " " + s.nom, o.signatureUrl, o.tamponUrl, s.signatureUrl)}
     </div><div class="page-break"></div>`).join("");
   return buildDocument({ org: o, title: "ATTESTATIONS DE FIN DE FORMATION", subtitle: f.intitule, extraHtml: extra });
 }
@@ -3837,7 +3837,8 @@ function genPVExamenCertification(o: OrganismeInfo, f: FormationInfo, stagiaires
         <p class="sig-label">Le Dirigeant</p>
         <p>Nom : ${o.dirigeant}</p>
         <p>Date : ${dateEpreuvesStr}</p>
-        <p style="margin-top:20px">Tampon :</p>
+        <p style="margin-top:20px">Signature :</p>
+        ${o.signatureUrl ? `<img src="${o.signatureUrl}" alt="Signature dirigeant" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : ""}
         ${o.tamponUrl ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />` : ""}
       </div>
       <div class="sig-box" style="flex:1;min-width:180px">
@@ -4633,7 +4634,7 @@ function genVAEAnalyseBesoin(o: OrganismeInfo, f: FormationInfo, stagiaires: Sta
   // Build custom 3-column signature block with Accompagnateur, Candidat, Responsable entreprise
   const accompSigHtml = formateurSig
     ? `<img src="${formateurSig}" alt="Signature formateur" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />`
-    : o.signatureUrl ? `<img src="${o.signatureUrl}" alt="Signature" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : "";
+    : "";
   const candidatSigHtml = s.signatureUrl
     ? `<img src="${s.signatureUrl}" alt="Signature candidat" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />`
     : `<p style="font-style:italic;color:#999;margin-top:15px">Signé par ${s.prenom} ${s.nom}</p>`;
@@ -5254,7 +5255,7 @@ function genAttestationInscriptionCFAV2(o: OrganismeInfo, f: FormationInfo, stag
       <p><strong>Signature et cachet du centre de formation</strong></p>
       <p style="margin-top:10px"><strong>${o.nom}</strong><br>Service pédagogique</p>
       ${o.tamponUrl ? `<div style="margin-top:10px"><img src="${o.tamponUrl}" alt="Tampon" style="max-height:70px;max-width:160px;object-fit:contain;opacity:0.85" /></div>` : ""}
-      ${o.signatureUrl ? `<div style="margin-top:5px"><img src="${o.signatureUrl}" alt="Signature" style="max-height:50px;max-width:120px;object-fit:contain" /></div>` : ""}
+      
     </div>` });
 }
 
@@ -6298,7 +6299,7 @@ function genEmargementCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
         const fmtSigUrl = s.formateurSignatureUrl || f.formateurSignatureUrl;
         const formateurSigHtml = fmtSigUrl
           ? `<br><img src="${fmtSigUrl}" alt="Sig formateur" style="max-height:40px;max-width:90px;object-fit:contain;margin-top:4px" />`
-          : (o.signatureUrl ? `<br><img src="${o.signatureUrl}" alt="Sig" style="max-height:40px;max-width:90px;object-fit:contain;margin-top:4px" />` : '');
+          : '';
         tableRows += `<tr style="background:#fff;border-bottom:1px solid #ddd"><td>${dayStr}</td><td>Matin<br><small>09h00–12h30</small></td><td style="padding:10px 6px">${stagName}${stagSigHtml}</td><td style="padding:10px 6px">${f.formateur}${formateurSigHtml}</td></tr>`;
         tableRows += `<tr style="background:#fff;border-bottom:1px solid #ccc"><td></td><td>Après-midi<br><small>13h30–17h00</small></td><td style="padding:10px 6px">${stagName}${stagSigHtml}</td><td style="padding:10px 6px">${f.formateur}${formateurSigHtml}</td></tr>`;
       });

@@ -19,16 +19,43 @@ function stagSig(s: StagiaireInfo): string {
 }
 
 function orgSig(o: OrganismeInfo): string {
-  let h = '';
+  // Organisme = tampon seulement, jamais la signature du dirigeant
   if (o.tamponUrl) {
-    // If tampon exists, show only tampon (no signature)
+    return `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />`;
+  }
+  return `<p style="font-style:italic;color:#999;margin-top:10px">Cachet de ${o.nom}</p>`;
+}
+
+function dirigeantSig(o: OrganismeInfo): string {
+  // Dirigeant = signature du dirigeant + tampon
+  let h = '';
+  if (o.signatureUrl) {
+    h += `<img src="${o.signatureUrl}" alt="Signature dirigeant" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />`;
+  }
+  if (o.tamponUrl) {
     h += `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />`;
-  } else if (o.signatureUrl) {
-    h += `<img src="${o.signatureUrl}" alt="Signature" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />`;
-  } else {
+  }
+  if (!o.signatureUrl && !o.tamponUrl) {
     h += `<p style="font-style:italic;color:#999;margin-top:10px">Signé par ${o.dirigeant}</p>`;
   }
   return h;
+}
+
+function formateurSigGen(f: FormationInfo, s?: StagiaireInfo): string {
+  // Formateur = signature formateur (du stagiaire ou de la formation)
+  const url = s?.formateurSignatureUrl || f.formateurSignatureUrl;
+  if (url) {
+    return `<img src="${url}" alt="Signature formateur" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />`;
+  }
+  return `<p style="font-style:italic;color:#999;margin-top:10px">Signé par ${f.formateur}</p>`;
+}
+
+function respEntrepriseSig(s: StagiaireInfo): string {
+  // Responsable entreprise = signature responsable entreprise
+  if (s.signatureResponsableUrl) {
+    return `<img src="${s.signatureResponsableUrl}" alt="Signature responsable entreprise" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />`;
+  }
+  return `<p style="font-style:italic;color:#999;margin-top:10px">Signé par ${s.responsableEntreprise || 'le responsable'}</p>`;
 }
 
 function modaliteTexte(f: FormationInfo): string {
@@ -165,7 +192,7 @@ export function genConvocation_V2(o: OrganismeInfo, f: FormationInfo, stagiaires
        <p><strong>Fait à ${o.ville}, le :</strong> ${formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || new Date().toISOString(), 14))}</p>
       <p><strong>Pour ${o.nom}</strong></p>
       <p>${o.dirigeant}<br>Dirigeant – Formateur</p>
-      ${orgSig(o)}
+      ${dirigeantSig(o)}
     `;
   });
   return buildDocument({ org: o, title: "CONVOCATION À LA FORMATION", extraHtml: extra });
@@ -268,7 +295,7 @@ export function genConvocationStagiaire(o: OrganismeInfo, f: FormationInfo, stag
     <p><strong>Fait à ${o.ville}, le :</strong> ${formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || new Date().toISOString(), 14))}</p>
     <p><strong>Pour ${o.nom}</strong></p>
     <p>${o.dirigeant}<br>Dirigeant – Formateur</p>
-    ${orgSig(o)}
+    ${dirigeantSig(o)}
   `;
   return buildDocument({ org: o, title: `CONVOCATION À LA FORMATION – ${s.prenom} ${s.nom}`, extraHtml: extra });
 }
@@ -448,7 +475,7 @@ export function genEmargementJour_V2(o: OrganismeInfo, f: FormationInfo, stagiai
         const stagName = `${s.prenom} ${s.nom.toUpperCase()}`;
         const stagSigHtml = s.signatureUrl ? `<br><img src="${s.signatureUrl}" alt="Sig" style="max-height:40px;max-width:90px;object-fit:contain;margin-top:4px" />` : `<br><span style="font-style:italic;color:#999;font-size:10px">Signé ${s.prenom[0]}.${s.nom}</span>`;
         const fmtSigUrl = s.formateurSignatureUrl || f.formateurSignatureUrl;
-        const formateurSigHtml = fmtSigUrl ? `<br><img src="${fmtSigUrl}" alt="Sig formateur" style="max-height:40px;max-width:90px;object-fit:contain;margin-top:4px" />` : (o.signatureUrl ? `<br><img src="${o.signatureUrl}" alt="Sig" style="max-height:40px;max-width:90px;object-fit:contain;margin-top:4px" />` : '');
+        const formateurSigHtml = fmtSigUrl ? `<br><img src="${fmtSigUrl}" alt="Sig formateur" style="max-height:40px;max-width:90px;object-fit:contain;margin-top:4px" />` : '';
         tableRows += `<tr style="background:#fff;border-bottom:1px solid #ddd"><td>${day}</td><td>Matin</td><td style="padding:10px 6px">${stagName}${stagSigHtml}</td><td style="padding:10px 6px">${f.formateur}${formateurSigHtml}</td></tr>`;
         tableRows += `<tr style="background:#fff;border-bottom:1px solid #ccc"><td></td><td>Après-midi</td><td style="padding:10px 6px">${stagName}${stagSigHtml}</td><td style="padding:10px 6px">${f.formateur}${formateurSigHtml}</td></tr>`;
       });
@@ -1026,7 +1053,7 @@ export function genAttestationReussiteStagiaire(o: OrganismeInfo, f: FormationIn
       <p style="margin-top:20px"><strong>Fait à ${o.ville}, le :</strong> ${formatDate(getStagiaireDateFin(s, f))}</p>
       <p style="margin-top:15px"><strong>Pour ${o.nom}</strong></p>
       <p>${o.dirigeant}<br>Dirigeant – Formateur</p>
-      ${orgSig(o)}
+      ${dirigeantSig(o)}
     </div>
   `;
 
@@ -1226,7 +1253,7 @@ export function genCertificatReussite_V2(o: OrganismeInfo, f: FormationInfo, sta
         <p style="margin-top:20px"><strong>Fait à ${o.ville}, le :</strong> ${formatDate(getStagiaireDateFin(s, f))}</p>
         <p><strong>Pour ${o.nom}</strong></p>
         <p>${o.dirigeant}</p>
-        ${orgSig(o)}
+        ${dirigeantSig(o)}
       </div>`;
   });
   return buildDocument({ org: o, title: "ATTESTATIONS DE RÉUSSITE", subtitle: f.intitule, stagiaires, extraHtml: extra });
