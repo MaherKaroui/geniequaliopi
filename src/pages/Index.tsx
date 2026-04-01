@@ -8,6 +8,7 @@ import StagiairesForm from "@/components/StagiairesForm";
 import CriteresForm from "@/components/CriteresForm";
 import DocumentGenerator from "@/components/DocumentGenerator";
 import DossierHistory from "@/components/DossierHistory";
+import ControleEDOF from "@/components/ControleEDOF";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, LogIn, LogOut, User, FileSpreadsheet, Upload, Loader2 } from "lucide-react";
 import { exportFormDataToExcel } from "@/lib/exportFormData";
@@ -21,6 +22,7 @@ const STEPS = [
   { id: 3, label: "Stagiaires" },
   { id: 4, label: "Critères" },
   { id: 5, label: "Dossier" },
+  { id: 6, label: "Contrôle EY" },
 ];
 
 const emptyOrganisme: OrganismeInfo = {
@@ -216,13 +218,14 @@ const Index = () => {
           {currentStep === 3 && <StagiairesForm data={stagiaires} onChange={updateStagiaires} />}
           {currentStep === 4 && <CriteresForm data={criteres} onChange={updateCriteres} />}
           {currentStep === 5 && <DocumentGenerator organisme={organisme} formation={formation} stagiaires={stagiaires} criteres={criteres} />}
+          {currentStep === 6 && <ControleEDOF organisme={organisme} formation={formation} stagiaires={stagiaires} criteres={criteres} />}
         </div>
 
         <div className="flex justify-between mt-6">
           <Button variant="outline" onClick={() => updateStep(s => Math.max(1, s - 1))} disabled={currentStep === 1} className="gap-2">
             <ChevronLeft className="w-4 h-4" /> Précédent
           </Button>
-          <Button onClick={() => updateStep(s => Math.min(5, s + 1))} disabled={currentStep === 5} className="gap-2">
+          <Button onClick={() => updateStep(s => Math.min(6, s + 1))} disabled={currentStep === 6} className="gap-2">
             Suivant <ChevronRight className="w-4 h-4" />
           </Button>
         </div>
