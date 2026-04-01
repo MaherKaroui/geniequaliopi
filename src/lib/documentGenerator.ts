@@ -597,6 +597,26 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "procedure_absences_cfa": return genProcedureAbsences(o);
     case "emargement_cfa": return genEmargementCFA(o, f, stagiaires);
     case "logs_connexion_cfa": return genRapportConnexion(o, f, stagiaires);
+    // === IND 12 CFA templates ===
+    case "mesures_engagement_beneficiaires_cfa": return genMesuresEngagementBeneficiairesCFA(o);
+    case "prevention_gestion_abandons_cfa": return genPreventionGestionAbandonsCFA(o);
+    case "guide_entretien_abandons_cfa": return genGuideEntretienAbandonsCFA(o);
+    case "eviter_situations_echec_cfa": return genEviterSituationsEchecCFA(o);
+    case "procedure_annulations_abandons_cfa": return genProcedureAnnulationsAbandonsCFA(o);
+    case "fichier_gestion_annulations_cfa": return genFichierGestionAnnulationsCFA(o);
+    case "accompagnement_recherche_contrat_cfa": return genAccompagnementRechercheContratCFA(o);
+    case "liste_aide_social_cfa": return genListeAideSocialCFA(o);
+    case "certificat_realisation_cfa": return genCertificatRealisationCFA(o, f, stagiaires);
+    case "suivi_public_beneficiaire_excel": return generateExcelSuiviPublicBeneficiaire(o, f, stagiaires);
+    case "suivi_pfmp_excel": return generateExcelSuiviPFMP(o, f, stagiaires);
+    // === IND 13 CFA Excel ===
+    case "outils_suivi_alternance_excel": return generateExcelOutilsSuiviAlternance(o, f, stagiaires);
+    // === IND 14 CFA templates ===
+    case "webinaire_formation_competences_cfa": return genWebinaireFormationCompetencesCFA(o);
+    case "webinaire_ntc_cfa": return genWebinaireNTCCFA(o);
+    // === IND 15 CFA templates ===
+    case "droits_devoirs_apprenti_cfa": return genDroitsDevoirsApprentiCFA(o);
+    case "regles_sante_securite_cfa": return genReglesSSMilieuProCFA(o);
     case "boite_formateur_cfa": return genBoiteFormateur(o, f);
     case "documents_certificateurs_cfa": return genDocumentsCertificateursCFA(o, f);
     case "synopsis_cfa": return genSynopsisCFA(o, f);
