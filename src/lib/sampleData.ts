@@ -424,6 +424,8 @@ export const SAMPLE_FORMATIONS: FormationInfo[] = [
     lieu: "Formation à distance – Plateforme LMS + Classe virtuelle",
     nombreParticipants: "10",
     formateur: "Catherine Dubois",
+    codeRNCP: "RS6905",
+    rythmeAlternance: "",
   },
 ];
 
