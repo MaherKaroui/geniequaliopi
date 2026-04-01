@@ -896,7 +896,9 @@ function genAnalyseBesoins(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
           + `• Temps de debriefing après chaque mise en pratique`,
       };
     }
-    if (lower.includes("anglais") || lower.includes("english") || lower.includes("toeic")) {
+    if (lower.includes("anglais") || lower.includes("english") || lower.includes("toeic") || lower.includes("vtest") || lower.includes("v-test") || lower.includes("rs6905")) {
+      const isVTest = lower.includes("vtest") || lower.includes("v-test") || lower.includes("rs6905");
+      const certName = isVTest ? "VTest Business English – 4 Skills (RS6905)" : "TOEIC";
       return {
         besoins: [
           "Améliorer la compréhension orale en contexte professionnel (réunions, appels téléphoniques)",
