@@ -737,6 +737,89 @@ export const RNCP_FICHES: RNCPFiche[] = [
     voiesAcces: ["Formation continue", "Contrat de professionnalisation", "Contrat d'apprentissage", "VAE"],
     dureeIndicative: "1190 heures (910h centre + 280h entreprise)",
   },
+  {
+    code: "RS6905",
+    intitule: "VTest Business English – 4 Skills",
+    niveau: "Certification (niveaux A2 à C2 CECRL)",
+    certificateur: "EXASSESS (Burlington English)",
+    dateEnregistrement: "20/07/2023",
+    dateEcheance: "20/07/2026",
+    codeNSF: "136 – Langues vivantes, civilisations étrangères et régionales",
+    formacodes: "15214 – Anglais commercial / 15234 – Anglais appliqué",
+    resume: "Le test VTest Business English – 4 Skills évalue les compétences professionnelles en anglais selon l'échelle du Cadre Européen commun de Référence pour les Langues (CECRL), du niveau A2 au niveau C2. Il est destiné aux personnes désireuses de certifier leurs compétences en anglais dans un contexte professionnel, pour les compétences de compréhension et d'expression, à l'oral ou à l'écrit. Le test est accessible en ligne via la plateforme VTEST.",
+    activitesVisees: "Écouter et comprendre des énoncés, dialogues et monologues en anglais professionnel. Comprendre et analyser des textes, emails et articles. S'exprimer et communiquer à l'oral sur des sujets professionnels. Rédiger en anglais avec un vocabulaire et des tournures grammaticales appropriées. Identifier la problématique lors d'échanges ou dialogues. Mener un exposé, conduire une réunion, lire à haute voix, écouter et répéter, répondre à des questions ouvertes.",
+    blocsCompetences: [
+      {
+        titre: "C1 – Compréhension orale (Listening)",
+        competences: [
+          "Écouter et comprendre un ensemble d'énoncés, de dialogues et de monologues en anglais professionnel",
+          "Repérer, distinguer, identifier, sélectionner et apprécier des informations en anglais parlé",
+          "Interpréter un ensemble varié d'affirmations, conversations et interrogations",
+          "Identifier la problématique lors d'un échange ou d'un dialogue entre deux personnes",
+        ],
+        matieres: [
+          { competence: "Compréhension de déclarations orales", contenu: "Écouter des déclarations enregistrées et répondre à des QCM. Repérer les informations clés dans des consignes de travail simples à complexes.", volume: "10h" },
+          { competence: "Compréhension de dialogues courts et longs", contenu: "Écouter des dialogues en deux parties, répondre à des questions de compréhension. Identifier les idées principales et les nuances d'un discours complexe.", volume: "10h" },
+          { competence: "Compréhension de monologues", contenu: "Écouter des monologues professionnels (présentations, exposés), répondre à des QCM sur les détails et les idées principales.", volume: "5h" },
+          { competence: "Réponse construite orale", contenu: "Écouter un court dialogue/monologue et saisir des informations spécifiques mentionnées. Exercices de prise de notes et reformulation.", volume: "5h" },
+        ],
+        modalitesEval: "Évaluation en ligne adaptative sur la plateforme VTest. Déclarations – écouter et sélectionner (QCM 4 options). Réponse construite (saisie d'informations spécifiques). Dialogues courts et longs – écouter et sélectionner. Monologues – écouter et sélectionner. Le test se termine lorsque l'algorithme a suffisamment d'informations pour déterminer le niveau.",
+      },
+      {
+        titre: "C2 – Compréhension écrite (Reading)",
+        competences: [
+          "Comprendre et analyser un ensemble de textes, emails et articles en anglais professionnel",
+          "Repérer, distinguer, identifier, sélectionner et apprécier des informations écrites",
+          "Comprendre dans un article ou document le sujet énoncé en sélectionnant les informations pertinentes",
+          "Distinguer les nuances afin de répondre aux questions avec précision",
+        ],
+        matieres: [
+          { competence: "Lecture de textes professionnels courts", contenu: "Notes, mémos, messages texte, courriels. Identifier les points essentiels et informations spécifiques.", volume: "8h" },
+          { competence: "Lecture de documents longs", contenu: "Textes commerciaux, articles, rapports. Comprendre les éléments d'argumentation et identifier les détails y compris attitudes et opinions implicites.", volume: "8h" },
+          { competence: "Vocabulaire et structures écrites", contenu: "Vocabulaire professionnel, faux-amis, connecteurs logiques, structures grammaticales complexes.", volume: "7h" },
+          { competence: "Stratégies de lecture", contenu: "Skimming, scanning, lecture intensive. Repérer les informations pertinentes dans des documents variés.", volume: "7h" },
+        ],
+        modalitesEval: "Évaluation en ligne adaptative sur la plateforme VTest. Lire et sélectionner : QCM à 4 options sur des notes, mémos, emails, textes commerciaux et articles. Les questions testent les informations dans l'ordre de présentation. La difficulté augmente progressivement.",
+      },
+      {
+        titre: "C3 – Expression orale (Speaking)",
+        competences: [
+          "S'exprimer et communiquer à l'oral en anglais professionnel",
+          "Échanger, décrire, formuler, argumenter sur un ensemble de sujets professionnels",
+          "Mener un exposé en présentant ses arguments de façon structurée",
+          "Conduire une réunion ou un entretien en donnant des indications précises et détaillées",
+        ],
+        matieres: [
+          { competence: "Lecture à haute voix", contenu: "Lire à haute voix 3 textes de longueur croissante. Travailler la prononciation, l'intonation et le rythme.", volume: "5h" },
+          { competence: "Écoute et répétition", contenu: "Écouter puis répéter 6 énoncés de la longueur d'une phrase. Travailler la fluidité et la précision phonétique.", volume: "5h" },
+          { competence: "Expression libre et argumentation", contenu: "Répondre à des questions ouvertes sur des sujets professionnels variés. Produire un discours clair, fluide et structuré.", volume: "10h" },
+          { competence: "Présentations et réunions", contenu: "Mener un exposé, conduire une réunion, décrire objectifs et attendus. Argumenter avec nuance et précision.", volume: "10h" },
+        ],
+        modalitesEval: "Évaluation en ligne sur la plateforme VTest avec notation automatique par système vocal. 3 parties : Lecture à haute voix (3 textes), Écoute et répétition (6 énoncés), Questions ouvertes sur la fluidité. Évaluation sur : temps de production, qualité de la production, respect du sujet traité.",
+      },
+      {
+        titre: "C4 – Expression écrite (Writing)",
+        competences: [
+          "Rédiger en anglais avec un vocabulaire et des tournures grammaticales appropriées",
+          "Écrire, décrire, formuler, questionner, argumenter et structurer ses idées sur un sujet professionnel",
+          "Rédiger un document préparatoire à une réunion, une revue de projet ou un retour d'expérience",
+          "Rédiger un texte structuré en anglais sur un sujet professionnel précis",
+        ],
+        matieres: [
+          { competence: "Rédaction d'emails et notes professionnels", contenu: "Répondre à des emails, rédiger des notes simples à complexes. Registres formel et semi-formel.", volume: "8h" },
+          { competence: "Rédaction de documents élaborés", contenu: "Rapports techniques, analyses de marché, cahiers des charges, brochures commerciales. Structure et argumentation.", volume: "8h" },
+          { competence: "Cohérence et cohésion textuelle", contenu: "Mots de liaison, connecteurs logiques, structuration des paragraphes, développement d'arguments.", volume: "7h" },
+          { competence: "Grammaire et vocabulaire avancés", contenu: "Contrôle des formes grammaticales, vocabulaire exhaustif et précis, registre adapté au contexte.", volume: "7h" },
+        ],
+        modalitesEval: "Évaluation en ligne sur la plateforme VTest. Rédaction d'un essai libre en 30 minutes sur un sujet professionnel. Nombre de mots minimum selon le niveau : 80 mots (A2), 150 mots (B1/B2.1), 200 mots (B2.2+). Critères : respect du sujet et du temps, cohérence et cohésion, contrôle grammatical, qualité et exhaustivité du vocabulaire.",
+      },
+    ],
+    secteursActivite: "Tous secteurs d'activité nécessitant des compétences en anglais professionnel",
+    typesEmplois: ["Cadre international", "Commercial export", "Assistant de direction bilingue", "Chef de projet international", "Responsable achats internationaux", "Ingénieur en contexte international"],
+    codesROME: ["M1204", "D1406", "M1607"],
+    voiesAcces: ["Formation continue", "CPF", "Plan de développement des compétences"],
+    dureeIndicative: "40 heures (6 jours)",
+  },
 ];
 
 export function getRNCPByCode(code: string): RNCPFiche | undefined {
