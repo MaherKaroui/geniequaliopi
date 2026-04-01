@@ -8179,7 +8179,8 @@ function genTableauAmeliorationContinue(o: OrganismeInfo, f?: FormationInfo) {
   const isMassage = t.includes("massage") || t.includes("prénatal") || t.includes("prenatal");
   const isIA = t.includes("intelligence artificielle") || t.includes(" ia ");
   const isCRM = t.includes("crm") || t.includes("hubspot");
-  const isAnglais = t.includes("anglais") || t.includes("toeic");
+  const isAnglaisA1 = (t.includes("anglais") && (t.includes("a1") || t.includes("débutant") || t.includes("debutant")));
+  const isAnglais = !isAnglaisA1 && (t.includes("anglais") || t.includes("toeic"));
   const isEsth = t.includes("esthétique") || t.includes("cosmétique") || t.includes("cap esthétique");
   const isFLE = t.includes("français") || t.includes("fle");
   const isWord = t.includes("word");
@@ -8190,21 +8191,13 @@ function genTableauAmeliorationContinue(o: OrganismeInfo, f?: FormationInfo) {
 
   let rows: string[][] = [];
 
-  if (isMassage) {
+  if (isAnglaisA1) {
     rows = [
-      ["1", "Satisfaction", "Demande de plus de pratique sur mannequin", "Ajout d'une demi-journée de pratique sur mannequin de grossesse", o.responsablePedagogique, "T2 2025", "✅"],
-      ["2", "Réclamation", "Huiles de massage inadaptées aux peaux sensibles", "Référencement d'huiles bio hypoallergéniques certifiées", o.referentQualite, "T1 2025", "✅"],
-      ["3", "Veille", "Nouvelles recommandations HAS sur le massage périnatal", "Mise à jour du protocole et des contre-indications", o.responsablePedagogique, "T2 2025", "🔄"],
-      ["4", "Entreprises", "Besoin d'un module relaxation du dos spécifique 3ème trimestre", "Création d'un module complémentaire 3ème trimestre", o.responsablePedagogique, "T3 2025", "📋"],
-      ["5", "Audit", "Fiches anatomiques de la grossesse à actualiser", "Refonte des supports visuels anatomie de la femme enceinte", o.referentQualite, "T2 2025", "✅"],
-    ];
-  } else if (isEsth) {
-    rows = [
-      ["1", "Satisfaction", "Demande de plus de pratique sur modèles vivants", "Augmentation des heures de TP à 60% du temps", o.responsablePedagogique, "T2 2025", "✅"],
-      ["2", "Réclamation", "Produits cosmétiques périmés en salle de TP", "Inventaire trimestriel et renouvellement systématique", o.referentQualite, "T1 2025", "✅"],
-      ["3", "Veille", "Nouvelle réglementation cosmétique européenne (CE 1223/2009)", "Formation du formateur sur les nouvelles normes", o.responsablePedagogique, "T2 2025", "🔄"],
-      ["4", "Entreprises", "Manque de connaissances en conseil personnalisé", "Ajout d'ateliers conseil client et diagnostic de peau", o.responsablePedagogique, "T3 2025", "📋"],
-      ["5", "Audit", "Supports UV/manucure à mettre à jour", "Refonte des fiches techniques soins visage et manucure", o.referentQualite, "T2 2025", "✅"],
+      ["1", "Satisfaction", "Rythme trop rapide pour les vrais débutants, vocabulaire non assimilé", "Réduction du volume par séance et ajout de révisions systématiques en début de cours", o.responsablePedagogique, "T2 2025", "✅"],
+      ["2", "Réclamation", "Supports trop textuels, manque de visuels et d'audio pour le niveau A1", "Refonte des supports avec images, pictogrammes et fichiers audio de prononciation", o.referentQualite, "T1 2025", "✅"],
+      ["3", "Veille", "Nouvelles ressources CECRL pour le niveau A1 (volume compagnon 2024)", "Mise à jour des grilles d'évaluation et des descripteurs A1 selon le CECRL actualisé", o.responsablePedagogique, "T2 2025", "🔄"],
+      ["4", "Entreprises", "Besoin de vocabulaire professionnel de base (accueil, téléphone)", "Création d'un module vocabulaire professionnel A1 : se présenter, répondre au téléphone, accueillir un visiteur", o.responsablePedagogique, "T3 2025", "📋"],
+      ["5", "Audit", "Exercices d'écoute trop rapides et inadaptés au niveau débutant", "Enregistrement de dialogues lents et articulés avec sous-titres pour le niveau A1", o.referentQualite, "T2 2025", "✅"],
     ];
   } else if (isAnglais) {
     rows = [
@@ -8317,7 +8310,8 @@ function genTableauAmeliorationContinueExcel(o: OrganismeInfo, f: FormationInfo,
   const t = (f.intitule || "").toLowerCase();
   const isMassage = t.includes("massage") || t.includes("prénatal") || t.includes("prenatal");
   const isEsth = t.includes("esthétique") || t.includes("cosmétique");
-  const isAnglais = t.includes("anglais") || t.includes("toeic");
+  const isAnglaisA1 = (t.includes("anglais") && (t.includes("a1") || t.includes("débutant") || t.includes("debutant")));
+  const isAnglais = !isAnglaisA1 && (t.includes("anglais") || t.includes("toeic"));
   const isIA = t.includes("intelligence artificielle") || t.includes(" ia ");
   const isCRM = t.includes("crm") || t.includes("hubspot");
   const isNTC = t.includes("négociateur") || t.includes("technico-commercial");
@@ -8329,25 +8323,15 @@ function genTableauAmeliorationContinueExcel(o: OrganismeInfo, f: FormationInfo,
 
   let actions: Array<{ date: string; origine: string; desc: string; action: string; qui: string; delai: string; cloture: string; commentaire: string }> = [];
 
-  if (isMassage) {
+  if (isAnglaisA1) {
     actions = [
-      { date: dateOuverture, origine: "Enquête satisfaction", desc: "Stagiaires demandent davantage de pratique sur mannequin de grossesse", action: "Ajout d'une demi-journée supplémentaire de pratique guidée sur mannequin", qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, 60)), cloture: fmtDate(addDays(baseDate, 55)), commentaire: "Demi-journée ajoutée, satisfaction en hausse" },
-      { date: dateOuverture, origine: "Réclamation stagiaire", desc: "Huiles de massage provoquant des réactions cutanées chez certaines femmes enceintes", action: "Référencement exclusif d'huiles bio hypoallergéniques certifiées grossesse", qui: o.dirigeant, delai: "Immédiat", cloture: fmtDate(addDays(baseDate, 10)), commentaire: "Huiles bio commandées et livrées" },
-      { date: fmtDate(addDays(baseDate, 14)), origine: "Veille réglementaire", desc: "Nouvelles recommandations HAS sur le massage périnatal et les contre-indications", action: "Mise à jour du protocole de massage et de la liste des contre-indications absolues/relatives", qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, 90)), cloture: fmtDate(addDays(baseDate, 75)), commentaire: "Protocole mis à jour avec les recommandations HAS 2025" },
-      { date: fmtDate(addDays(baseDate, 21)), origine: "Retour formateur", desc: "Manque d'un module spécifique relaxation du 3ème trimestre", action: "Création d'un module complémentaire : techniques de soulagement lombaire et bassin 3ème trimestre", qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, 120)), cloture: fmtDate(addDays(baseDate, 110)), commentaire: "Module créé et intégré au programme" },
-      { date: fmtDate(addDays(baseDate, 30)), origine: "Audit interne", desc: "Fiches anatomiques de la grossesse (trimestres) à actualiser", action: "Refonte des supports visuels anatomie de la femme enceinte avec illustrations médicales récentes", qui: o.referentQualite, delai: fmtDate(addDays(baseDate, 150)), cloture: fmtDate(addDays(baseDate, 140)), commentaire: "Supports refondus avec illustrateur médical" },
-      { date: fmtDate(addDays(baseDate, 45)), origine: "Satisfaction parties prenantes", desc: "Demande d'un livret récapitulatif des gestes à remettre aux stagiaires", action: "Création d'un livret mémo des protocoles de massage prénatal illustré", qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, 150)), cloture: "", commentaire: "En cours de maquettage" },
-      { date: fmtDate(addDays(baseDate, 60)), origine: "Dysfonctionnement", desc: "Table de massage non réglable en hauteur, inconfortable pour les praticiennes", action: "Acquisition de tables de massage électriques réglables adaptées aux femmes enceintes", qui: o.dirigeant, delai: fmtDate(addDays(baseDate, 150)), cloture: "", commentaire: "Devis en cours" },
-    ];
-  } else if (isEsth) {
-    actions = [
-      { date: dateOuverture, origine: "Enquête satisfaction", desc: "Demande de plus de TP sur modèles vivants pour les soins visage", action: "Augmentation des heures de TP modèles vivants à 60% du temps total", qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, 60)), cloture: fmtDate(addDays(baseDate, 55)), commentaire: "Planning TP réorganisé" },
-      { date: dateOuverture, origine: "Réclamation stagiaire", desc: "Produits cosmétiques en salle de TP proches de la date de péremption", action: "Inventaire trimestriel et renouvellement systématique des produits", qui: o.dirigeant, delai: "Immédiat", cloture: fmtDate(addDays(baseDate, 10)), commentaire: "Stock renouvelé, procédure instaurée" },
-      { date: fmtDate(addDays(baseDate, 14)), origine: "Veille réglementaire", desc: "Évolution du règlement cosmétique européen (CE 1223/2009)", action: "Mise à jour du module réglementation et sécurité cosmétique", qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, 90)), cloture: fmtDate(addDays(baseDate, 75)), commentaire: "Module actualisé" },
-      { date: fmtDate(addDays(baseDate, 21)), origine: "Retour entreprises", desc: "Manque de compétences en conseil personnalisé et diagnostic de peau", action: "Ajout d'ateliers conseil client et diagnostic de peau avec dermatoscope", qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, 120)), cloture: fmtDate(addDays(baseDate, 110)), commentaire: "Ateliers créés" },
-      { date: fmtDate(addDays(baseDate, 30)), origine: "Audit interne", desc: "Fiches techniques soins UV et manucure obsolètes", action: "Refonte complète des fiches techniques avec normes actuelles", qui: o.referentQualite, delai: fmtDate(addDays(baseDate, 150)), cloture: "", commentaire: "En cours" },
-      { date: fmtDate(addDays(baseDate, 45)), origine: "Satisfaction", desc: "Souhait de découvrir les nouvelles tendances (nail art, microblading)", action: "Ajout d'un module tendances et innovations esthétiques", qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, 150)), cloture: "", commentaire: "Programmé" },
-      { date: fmtDate(addDays(baseDate, 60)), origine: "Dysfonctionnement", desc: "Stérilisateur UV en panne récurrente", action: "Remplacement du stérilisateur et contrat de maintenance", qui: o.dirigeant, delai: fmtDate(addDays(baseDate, 150)), cloture: "", commentaire: "Devis accepté" },
+      { date: dateOuverture, origine: "Enquête satisfaction", desc: "Rythme trop rapide pour les grands débutants, vocabulaire non retenu entre les séances", action: "Réduction du volume de vocabulaire par séance (max 10 mots) et ajout de révisions systématiques en début de cours avec flashcards", qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, 60)), cloture: fmtDate(addDays(baseDate, 55)), commentaire: "Flashcards créées, rythme adapté, retours positifs" },
+      { date: dateOuverture, origine: "Réclamation stagiaire", desc: "Supports trop textuels et intimidants pour des débutants, manque de visuels", action: "Refonte complète des supports avec images, pictogrammes, codes couleur et fichiers audio de prononciation", qui: o.referentQualite, delai: "Immédiat", cloture: fmtDate(addDays(baseDate, 10)), commentaire: "Supports visuels créés avec audio intégré" },
+      { date: fmtDate(addDays(baseDate, 14)), origine: "Veille pédagogique", desc: "Nouvelles ressources CECRL volume compagnon pour le niveau A1 (descripteurs actualisés)", action: "Mise à jour des grilles d'évaluation A1 et des objectifs pédagogiques selon le CECRL actualisé", qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, 90)), cloture: fmtDate(addDays(baseDate, 75)), commentaire: "Grilles mises à jour avec nouveaux descripteurs A1" },
+      { date: fmtDate(addDays(baseDate, 21)), origine: "Retour entreprises", desc: "Besoin de vocabulaire professionnel de base : se présenter, répondre au téléphone, accueillir un visiteur", action: "Création d'un module vocabulaire professionnel A1 avec jeux de rôle simples (accueil, téléphone, présentation)", qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, 120)), cloture: fmtDate(addDays(baseDate, 110)), commentaire: "Module créé avec 6 scénarios de base" },
+      { date: fmtDate(addDays(baseDate, 30)), origine: "Audit interne", desc: "Exercices d'écoute trop rapides et inadaptés au niveau grand débutant", action: "Enregistrement de 20 dialogues lents et articulés avec sous-titres, adaptés au niveau A1", qui: o.referentQualite, delai: fmtDate(addDays(baseDate, 150)), cloture: fmtDate(addDays(baseDate, 140)), commentaire: "Dialogues enregistrés par native speaker" },
+      { date: fmtDate(addDays(baseDate, 45)), origine: "Satisfaction", desc: "Souhait d'accéder à des exercices entre les séances pour réviser le vocabulaire", action: "Mise en place d'un accès à une application de révision (Duolingo/Memrise) entre les sessions", qui: o.responsablePedagogique, delai: fmtDate(addDays(baseDate, 150)), cloture: "", commentaire: "Licences en cours de négociation" },
+      { date: fmtDate(addDays(baseDate, 60)), origine: "Dysfonctionnement", desc: "Casques audio défectueux empêchant les exercices de compréhension orale", action: "Remplacement des casques et achat de casques de réserve", qui: o.dirigeant, delai: fmtDate(addDays(baseDate, 150)), cloture: "", commentaire: "Commande passée" },
     ];
   } else if (isAnglais) {
     actions = [

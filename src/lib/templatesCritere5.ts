@@ -196,7 +196,8 @@ export function genPlanDevCompetencesExcel(o: OrganismeInfo, f: FormationInfo, f
   const t = (f.intitule || "").toLowerCase();
   const isMassage = t.includes("massage") || t.includes("prénatal") || t.includes("prenatal");
   const isEsth = t.includes("esthétique") || t.includes("cosmétique");
-  const isAnglais = t.includes("anglais") || t.includes("toeic");
+  const isAnglaisA1 = (t.includes("anglais") && (t.includes("a1") || t.includes("débutant") || t.includes("debutant")));
+  const isAnglais = !isAnglaisA1 && (t.includes("anglais") || t.includes("toeic"));
   const isIA = t.includes("intelligence artificielle") || t.includes(" ia ");
   const isCRM = t.includes("crm") || t.includes("hubspot");
   const isNTC = t.includes("négociateur") || t.includes("technico-commercial");
@@ -207,27 +208,14 @@ export function genPlanDevCompetencesExcel(o: OrganismeInfo, f: FormationInfo, f
 
   const futureTrainings: Array<{ origine: string; nom: string; objectif: string; type: string; formateur: string; nb: string; noms: string; duree: string }> = [];
 
-  if (isMassage) {
+  if (isAnglaisA1) {
     futureTrainings.push(
-      { origine: "Montée en compétences du formateur en massage prénatal", nom: "Techniques avancées de massage périnatal et post-partum", objectif: "Maîtriser les techniques de drainage lymphatique adapté à la grossesse, les points de pression contre-indiqués et les protocoles du 3ème trimestre", type: "Externe", formateur: "FFMBE – Fédération Française de Massage Bien-Être", nb: "1", noms: formateurName, duree: "3 jours" },
-      { origine: "Veille sécurité et réglementation santé", nom: "Anatomie et physiologie de la grossesse – Mise à jour des connaissances", objectif: "Actualiser les connaissances sur les modifications physiologiques de la grossesse, les contre-indications absolues et relatives au massage", type: "Externe", formateur: "Institut de Formation en Périnatalité", nb: "1", noms: formateurName, duree: "2 jours" },
-      { origine: "Obligation qualité et préparation audit", nom: "Audit Qualiopi – Préparation et maintien de la certification RNQ V9", objectif: "Préparer l'audit de surveillance, maîtriser les non-conformités et mettre en place un plan d'amélioration continue", type: "Externe", formateur: "Afnor Compétences", nb: "1", noms: formateurName, duree: "1 jour" },
-      { origine: "Innovation pédagogique bien-être", nom: "Aromathérapie et huiles essentielles adaptées à la grossesse", objectif: "Connaître les huiles essentielles autorisées et interdites pendant la grossesse, savoir composer des synergies adaptées", type: "Externe", formateur: "École Française d'Aromathérapie", nb: "1", noms: formateurName, duree: "2 jours" },
-    );
-  } else if (isEsth) {
-    futureTrainings.push(
-      { origine: "Montée en compétences techniques esthétiques", nom: "Nouvelles techniques de soins visage anti-âge et haute technologie", objectif: "Maîtriser les protocoles de soins haute technologie (LED, microcourants, radiofréquence) et les actifs cosmétiques innovants", type: "Externe", formateur: "CIDESCO – Comité International d'Esthétique", nb: "1", noms: formateurName, duree: "3 jours" },
-      { origine: "Veille réglementaire cosmétique", nom: "Réglementation cosmétique européenne – Mise à jour CE 1223/2009", objectif: "Maîtriser les évolutions réglementaires, l'étiquetage, les substances interdites et les bonnes pratiques de fabrication", type: "Externe", formateur: "FEBEA – Fédération des Entreprises de la Beauté", nb: "1", noms: formateurName, duree: "1 jour" },
+      { origine: "Montée en compétences du formateur en anglais débutant", nom: "Enseigner l'anglais aux grands débutants – Approches ludiques et CECRL A1", objectif: "Maîtriser les techniques d'enseignement pour un public débutant : supports visuels, répétition espacée, phonétique de base et mise en confiance", type: "Externe", formateur: "British Council – Teacher Development", nb: "1", noms: formateurName, duree: "2 jours" },
+      { origine: "Veille pédagogique langues étrangères", nom: "Nouveaux outils numériques pour l'apprentissage des langues – Niveau débutant", objectif: "Découvrir et intégrer les applications adaptées au niveau A1 (Duolingo, Busuu, Memrise) et les plateformes d'exercices interactifs", type: "Externe", formateur: "Digiformag – Groupe Abilways", nb: "1", noms: formateurName, duree: "1 jour" },
       { origine: "Obligation qualité et préparation audit", nom: "Audit Qualiopi – Préparation et maintien de la certification RNQ V9", objectif: "Préparer l'audit de surveillance et mettre en place un plan d'amélioration continue", type: "Externe", formateur: "Afnor Compétences", nb: "1", noms: formateurName, duree: "1 jour" },
-      { origine: "Innovation pédagogique", nom: "Tendances beauté et bien-être – Nail art, microblading et maquillage permanent", objectif: "Découvrir et maîtriser les nouvelles tendances pour enrichir l'offre de formation", type: "Externe", formateur: "Académie de la Beauté Paris", nb: "1", noms: formateurName, duree: "2 jours" },
+      { origine: "Innovation pédagogique inclusive", nom: "Phonétique anglaise et prononciation pour francophones débutants", objectif: "Maîtriser l'alphabet phonétique international (IPA) appliqué à l'anglais, les paires minimales et les exercices de discrimination auditive pour le niveau A1", type: "Externe", formateur: "Alliance Française – Formation de formateurs en langues", nb: "1", noms: formateurName, duree: "2 jours" },
     );
-  } else if (isAnglais) {
-    futureTrainings.push(
-      { origine: "Montée en compétences du formateur en anglais", nom: "Teaching English for Specific Purposes (ESP) – Méthodologie", objectif: "Maîtriser les approches pédagogiques de l'anglais de spécialité (business, médical, technique) et la différenciation pédagogique", type: "Externe", formateur: "Cambridge Assessment – Teacher Development", nb: "1", noms: formateurName, duree: "3 jours" },
-      { origine: "Veille certification et évaluation", nom: "Nouvelles modalités TOEIC et certifications d'anglais 2025", objectif: "Maîtriser les évolutions du format TOEIC, Linguaskill et les nouvelles grilles de scoring", type: "Externe", formateur: "ETS Global France", nb: "1", noms: formateurName, duree: "1 jour" },
-      { origine: "Obligation qualité et préparation audit", nom: "Audit Qualiopi – Préparation et maintien de la certification RNQ V9", objectif: "Préparer l'audit de surveillance et mettre en place un plan d'amélioration continue", type: "Externe", formateur: "Afnor Compétences", nb: "1", noms: formateurName, duree: "1 jour" },
-      { origine: "Innovation pédagogique numérique", nom: "Outils numériques pour l'enseignement des langues (e-learning, IA)", objectif: "Intégrer les plateformes adaptatives (Gymglish, Babbel Pro) et les outils IA dans la pédagogie des langues", type: "Externe", formateur: "Digiformag – Groupe Abilways", nb: "1", noms: formateurName, duree: "2 jours" },
-    );
+  } else if (isMassage) {
   } else if (isIA) {
     futureTrainings.push(
       { origine: "Montée en compétences IA avancée", nom: "IA Générative avancée – Prompt engineering et fine-tuning", objectif: "Maîtriser les techniques avancées de prompt engineering, le fine-tuning de modèles et les RAG (Retrieval-Augmented Generation)", type: "Externe", formateur: "OpenClassrooms – Parcours IA", nb: "1", noms: formateurName, duree: "3 jours" },
