@@ -493,6 +493,80 @@ const ECSR_CONTENT: FormationEvalContent = {
 
 EVAL_CONTENT["ECSR"] = ECSR_CONTENT;
 
+const VTEST_CONTENT: FormationEvalContent = {
+  qcmPositionnement: [
+    { question: "What does 'ROI' stand for in a business context?", options: ["Return on Investment", "Rate of Interest", "Report on Income", "Review of Inventory"], correctIndex: 0 },
+    { question: "Which expression is the most formal way to start a professional email?", options: ["Hey John,", "Dear Mr. Smith,", "Hi there,", "What's up,"], correctIndex: 1 },
+    { question: "What is the correct meaning of the false friend 'actually'?", options: ["Actuellement", "En fait", "Vraiment", "Activement"], correctIndex: 1 },
+    { question: "Which tense is used to describe a completed action at a specific time in the past?", options: ["Present Perfect", "Past Simple", "Past Continuous", "Present Simple"], correctIndex: 1 },
+    { question: "What does 'Could you hold the line?' mean on the phone?", options: ["Raccrochez", "Patientez un instant", "Rappelez plus tard", "Parlez plus fort"], correctIndex: 1 },
+    { question: "Which word means 'chiffre d'affaires' in English?", options: ["Benefits", "Revenue", "Salary", "Expenses"], correctIndex: 1 },
+    { question: "What is the purpose of an 'Executive Summary' in a report?", options: ["Detailed analysis", "Brief overview of key points", "Financial data only", "List of participants"], correctIndex: 1 },
+    { question: "Which modal verb expresses a strong obligation?", options: ["Could", "Might", "Must", "Would"], correctIndex: 2 },
+    { question: "What does 'to follow up' mean in a professional context?", options: ["Suivre physiquement", "Assurer le suivi", "Copier", "Ignorer"], correctIndex: 1 },
+    { question: "Which expression is used to politely disagree in a meeting?", options: ["You're wrong!", "I see your point, but…", "That's ridiculous.", "No way."], correctIndex: 1 },
+  ],
+  qcmFinal: [
+    { question: "Which closing is appropriate for a formal business email to someone you don't know?", options: ["Cheers,", "Yours faithfully,", "See you,", "XOXO,"], correctIndex: 1 },
+    { question: "In the sentence 'We have increased sales by 20% this year', which tense is used?", options: ["Past Simple", "Present Perfect", "Future", "Past Perfect"], correctIndex: 1 },
+    { question: "What does 'break-even point' mean?", options: ["Point de rupture", "Seuil de rentabilité", "Point culminant", "Fin de contrat"], correctIndex: 1 },
+    { question: "Which technique involves reading only titles and first sentences to get the main idea?", options: ["Scanning", "Skimming", "Intensive reading", "Proofreading"], correctIndex: 1 },
+    { question: "What is the correct structure for a conditional offer in negotiation?", options: ["If you do X, I will Y.", "Do X or else.", "I demand X.", "X is my final offer."], correctIndex: 0 },
+    { question: "Which expression means 'ordre du jour' (not the French meaning)?", options: ["Diary", "Agenda", "Calendar", "Schedule"], correctIndex: 1 },
+    { question: "What does VTest Business English evaluate?", options: ["Only grammar", "4 skills: Reading, Listening, Writing, Speaking", "Only vocabulary", "Only pronunciation"], correctIndex: 1 },
+    { question: "Which connector introduces a contrast?", options: ["Furthermore", "However", "In addition", "Moreover"], correctIndex: 1 },
+    { question: "What is 'onboarding' in HR terminology?", options: ["Licenciement", "Intégration d'un nouveau collaborateur", "Entretien annuel", "Démission"], correctIndex: 1 },
+    { question: "Which phrase is used to summarize at the end of a meeting?", options: ["Let's move on.", "So, to recap…", "Any other business?", "Let's get started."], correctIndex: 1 },
+  ],
+  exercices: [
+    { titre: "Rédaction d'email professionnel", consigne: "Rédigez un email formel en anglais (150 mots) pour confirmer une réunion avec un client. Incluez : la date, l'heure, le lieu, l'ordre du jour et une demande de confirmation.", reponseAttendue: "Dear Mr. Johnson, I am writing to confirm our meeting scheduled for Tuesday, March 15th at 10:00 AM in Conference Room B. The agenda will cover the Q2 budget review and the new project timeline. Please confirm your attendance at your earliest convenience. Best regards." },
+    { titre: "Compréhension d'un rapport financier", consigne: "Lisez le passage suivant et répondez aux 3 questions : 'Revenue increased by 8% year-on-year, driven primarily by strong performance in the APAC market. Operating expenses rose by 3%, resulting in an improved profit margin of 12.5%.'", reponseAttendue: "1. Revenue grew by 8%. 2. The APAC market was the main driver. 3. Profit margin improved to 12.5% despite a 3% rise in operating expenses." },
+    { titre: "Simulation d'appel téléphonique", consigne: "Rédigez un script de conversation téléphonique professionnelle : vous appelez pour reporter une livraison prévue vendredi au lundi suivant. Utilisez les expressions téléphoniques appropriées.", reponseAttendue: "Good morning, this is [Name] from [Company]. I'm calling regarding order #4521. I'm afraid we need to reschedule the delivery from Friday to next Monday. Could you please confirm that this is possible? Thank you for your understanding." },
+    { titre: "Présentation orale structurée", consigne: "Préparez un plan de présentation orale (3 minutes) pour présenter un nouveau produit/service à un groupe de clients potentiels. Structurez avec : Hook, 3 points clés, conclusion avec call to action.", reponseAttendue: "Hook: 'Did you know that 70% of businesses lose clients due to poor communication?' Point 1: Our solution streamlines communication. Point 2: Real-time analytics dashboard. Point 3: 24/7 support. Conclusion: 'Let's schedule a demo next week.'" },
+    { titre: "Négociation commerciale", consigne: "Vous négociez un contrat de prestation. Le client demande 20% de réduction et un paiement à 90 jours. Votre maximum est 12% et 60 jours. Rédigez vos 3 arguments en anglais avec des expressions de softening.", reponseAttendue: "1. 'I understand your position, and I was wondering if we could meet halfway at 12%.' 2. 'Would it be possible to consider 60-day payment terms?' 3. 'If you could agree, we would include an additional month of premium support at no extra cost.'" },
+  ],
+  competences: [
+    "Lire et comprendre des documents professionnels en anglais",
+    "Comprendre des échanges oraux professionnels",
+    "Rédiger des emails et documents avec le registre adapté",
+    "S'exprimer à l'oral en contexte professionnel",
+    "Maîtriser la grammaire du Business English",
+    "Identifier et éviter les faux-amis",
+    "Utiliser les stratégies de skimming et scanning",
+    "Appliquer les techniques de négociation en anglais",
+    "Structurer une présentation orale efficace",
+    "Se préparer à la certification VTest (4 Skills)",
+  ],
+  appreciations: [
+    "Excellent niveau d'anglais professionnel. Expression fluide et vocabulaire riche.",
+    "Très bon niveau. Compréhension écrite et orale solides.",
+    "Bon niveau général. Progrès notables en expression écrite.",
+    "Niveau satisfaisant. Bonne compréhension écrite.",
+    "Progression remarquable. Vocabulaire professionnel bien assimilé.",
+    "Très bonne participation. Maîtrise des expressions de réunion et négociation.",
+    "Excellent travail sur les emails et comptes rendus. Grammaire solide.",
+    "Bonne assimilation du vocabulaire financier et RH.",
+    "Stagiaire motivé(e). Présentations orales bien structurées.",
+    "Niveau solide en compréhension. Expression écrite précise.",
+  ],
+  questionsOuvertesDebut: [
+    { question: "In which professional situations do you currently use English?", reponseAttendue: "I use English for emails with international clients and reading technical documentation." },
+    { question: "What are your main difficulties when communicating in English at work?", reponseAttendue: "My main difficulties are understanding native speakers on the phone and expressing complex ideas during meetings." },
+    { question: "What is your target level after this training?", reponseAttendue: "I would like to reach at least B2 level to participate confidently in international meetings." },
+    { question: "Describe a recent situation where you needed English at work.", reponseAttendue: "Last month, I had to present our quarterly results to the international management team." },
+    { question: "What type of professional documents do you read or write in English?", reponseAttendue: "I regularly read market reports and write emails and prepare presentations in English." },
+  ],
+  questionsOuvertesFin: [
+    { question: "How has your confidence in using English professionally evolved?", reponseAttendue: "I feel much more confident now, especially in meetings and when writing formal emails." },
+    { question: "Which of the four skills has improved the most?", reponseAttendue: "My speaking skills have improved the most. I feel comfortable presenting ideas and participating in discussions." },
+    { question: "Describe how you would handle a business negotiation in English now.", reponseAttendue: "I would prepare arguments in advance, use softening language, and propose compromises using conditional structures." },
+    { question: "What strategies will you use to continue improving your English?", reponseAttendue: "I plan to listen to business podcasts, read industry articles in English, and practice speaking with colleagues." },
+    { question: "How do you feel about taking the VTest certification exam?", reponseAttendue: "I feel well-prepared thanks to the practice tests and strategies. I am confident I can achieve at least a B2 score." },
+  ],
+};
+
+EVAL_CONTENT["VTest"] = VTEST_CONTENT;
+
 // Map formation intitulé to content key
 function getContentKey(intitule: string): string {
   const lower = intitule.toLowerCase();
