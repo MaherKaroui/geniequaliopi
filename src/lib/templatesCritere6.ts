@@ -355,6 +355,39 @@ function veilleReglementaireRows(f: FormationInfo, type: FormationType): string[
     ];
   }
 
+  if (type === "ecsr") {
+    return [...common,
+      [
+        `<a href="https://www.legifrance.gouv.fr/codes/section_lc/LEGITEXT000006074228/LEGISCTA000006159515/">Légifrance – Code de la route</a>`,
+        "Code de la route – Réglementation de l'enseignement de la conduite",
+        veilleDate(f, 6),
+        "Encadrement réglementaire des écoles de conduite et des enseignants : agrément, programme de formation, conditions d'exercice. Évolutions du permis de conduire.",
+        "Preuve : textes réglementaires + synthèse. Action : mettre à jour les modules pédagogiques selon les évolutions du Code de la route."
+      ],
+      [
+        `<a href="https://www.securite-routiere.gouv.fr/">Sécurité Routière – Actualités</a>`,
+        "Délégation à la Sécurité Routière – Réglementation et prévention",
+        veilleDate(f, 5),
+        "Actualités réglementaires : nouvelles mesures de sécurité routière, évolutions des sanctions, campagnes de prévention, réforme du permis.",
+        "Preuve : publications officielles. Action : intégrer les nouvelles mesures dans le programme de sensibilisation à la sécurité routière."
+      ],
+      [
+        `<a href="https://www.centre-inffo.fr/site-droit-formation/actualites-droit/cpf-hausse-du-montant-de-la-participation-forfaitaire">Centre Inffo – CPF</a>`,
+        "CPF : Hausse du montant de la participation forfaitaire",
+        veilleDate(f, 3),
+        "Participation financière obligatoire CPF de 103,20 euros. Impact sur les formations ECSR financées par le CPF.",
+        "Preuve : article Centre Inffo. Action : informer les futurs stagiaires ECSR du reste à charge CPF."
+      ],
+      [
+        `<a href="https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000044465890">Légifrance – Arrêté REAC ECSR</a>`,
+        "Arrêté relatif au titre professionnel ECSR (RNCP 35329)",
+        veilleDate(f, 4),
+        "Référentiel Emploi Activités Compétences du titre professionnel Enseignant de la Conduite et de la Sécurité Routière. 2 CCP : formation à la conduite et sensibilisation à la sécurité routière.",
+        "Preuve : REAC officiel. Action : vérifier l'alignement du programme sur les 2 CCP et les compétences du REAC."
+      ],
+    ];
+  }
+
   // Default: word/bureautique
   return [...common,
     [
