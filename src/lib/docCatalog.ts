@@ -666,6 +666,7 @@ export function buildFullCatalog(
     });
     add("cfa_c3i15_droits_devoirs_apprenti", "CT3 - IND 15 DROITS ET DEVOIRS DE L'APPRENTI", 3, 15, "droits_devoirs_apprenti_cfa");
     add("cfa_c3i15_regles_sante_securite", "CT3 - IND 15 RÈGLES SANTÉ ET SÉCURITÉ EN MILIEU PROFESSIONNEL", 3, 15, "regles_sante_securite_cfa");
+    add("cfa_c3i15_sst_livret", "CT3 - IND 15 📁 LIVRET SST – Sauveteur Secouriste du Travail", 3, 15, "pdf_static", { pdfUrl: "/pdfs/sst_livret.pdf" });
 
     // ===== IND 8 — Positionnement et évaluation des acquis à l'entrée (CFA) =====
     formations.forEach((f, fi) => {
