@@ -58,7 +58,6 @@ const Index = () => {
       setAirtableLoading(false);
     }
   };
-  const navigate = useNavigate();
 
   const [currentStep, setCurrentStep] = useState(() => {
     const saved = sessionStorage.getItem('qualiopi_step');
