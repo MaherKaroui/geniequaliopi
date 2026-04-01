@@ -562,8 +562,8 @@ export function buildFullCatalog(
       add(`cfa_c3i14_insertion_${fi}`, `CT3 - IND 14 QUESTIONNAIRE INSERTION`, 3, 14, "questionnaire_insertion", { fi });
     });
     // Webinaires uniquement si distanciel
-    formations.forEach((f, fi) => {
-      const moda = (f.modalite || '').toLowerCase();
+    formations.forEach((f) => {
+      const moda = (f.modalites || '').toLowerCase();
       const isDistanciel = moda.includes('distanciel') || moda.includes('e-learning') || moda.includes('foad') || moda.includes('mixte');
       if (isDistanciel) {
         add("cfa_c3i14_webinaire_formation_competences", "CT3 - IND 14 WEBINAIRE FORMATION ET DÉVELOPPEMENT DES COMPÉTENCES", 3, 14, "webinaire_formation_competences_cfa");
