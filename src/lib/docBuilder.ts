@@ -637,8 +637,15 @@ export function buildDocument(config: DocBuildConfig): string {
     const fmtSigUrl = config.signatures.formateurSignatureUrl || firstStagiaire?.formateurSignatureUrl || config.formation?.formateurSignatureUrl;
     const stagSigUrl = config.signatures.stagiaireSignatureUrl || firstStagiaire?.signatureUrl;
     const respEntSigUrl = config.signatures.responsableEntrepriseSignatureUrl || firstStagiaire?.signatureResponsableUrl;
+    // Auto-compute signature dates if not provided
+    let sigDates = config.signatures.dates;
+    if (!sigDates || sigDates.length === 0) {
+      const refDate = firstStagiaire?.dateDebutFormation || config.formation?.dateDebut || "";
+      const computedDate = refDate ? formatDate(subtractBusinessDays(refDate, 14)) : new Date().toLocaleDateString("fr-FR");
+      sigDates = [computedDate, computedDate];
+    }
     if (config.signatures.type === "3") {
-      body += signatureBlock3(config.org, config.signatures.names?.[0], config.signatures.names?.[1], stagSigUrl, fmtSigUrl, respEntSigUrl);
+      body += signatureBlock3(config.org, config.signatures.names?.[0], config.signatures.names?.[1], stagSigUrl, fmtSigUrl, respEntSigUrl, sigDates);
     } else {
       body += signatureBlock2(
         config.signatures.labels?.[0] || "Partie 1",
@@ -648,7 +655,7 @@ export function buildDocument(config: DocBuildConfig): string {
         config.signatures.noOrgSignature ? undefined : config.org.signatureUrl,
         config.org.tamponUrl,
         stagSigUrl,
-        config.signatures.dates,
+        sigDates,
         fmtSigUrl,
         respEntSigUrl
       );
