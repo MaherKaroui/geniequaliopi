@@ -526,9 +526,9 @@ function resolveSignature(label: string, nom: string, urls: SignatureUrls): stri
   if (/pédagogique|qualité|handicap|référent/i.test(l)) {
     return `<p style="font-style:italic;color:#999;margin-top:15px">${nom ? `Signé par ${nom}` : ""}</p>`;
   }
-  // Dirigeant / Responsable (of org) / Directeur → dirigeant signature + tampon
+  // Dirigeant / Responsable (of org) / Directeur → tampon only
   if (/dirigeant|responsable|directeur/i.test(l)) {
-    return sigImg(urls.dirigeantSignatureUrl, "Signature dirigeant") + tamponImg(urls.tamponUrl);
+    return tamponImg(urls.tamponUrl);
   }
   // Client / other → no auto signature
   if (/client|accord/i.test(l)) {
