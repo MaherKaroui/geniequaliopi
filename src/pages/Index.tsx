@@ -8,9 +8,9 @@ import StagiairesForm from "@/components/StagiairesForm";
 import CriteresForm from "@/components/CriteresForm";
 import DocumentGenerator from "@/components/DocumentGenerator";
 import DossierHistory from "@/components/DossierHistory";
-import ControleEDOF from "@/components/ControleEDOF";
+
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, LogIn, LogOut, User, FileSpreadsheet, Upload, Loader2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, LogIn, LogOut, User, FileSpreadsheet, Upload, Loader2, ShieldCheck } from "lucide-react";
 import { exportFormDataToExcel } from "@/lib/exportFormData";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -22,7 +22,6 @@ const STEPS = [
   { id: 3, label: "Stagiaires" },
   { id: 4, label: "Critères" },
   { id: 5, label: "Dossier" },
-  { id: 6, label: "Contrôle EY" },
 ];
 
 const emptyOrganisme: OrganismeInfo = {
@@ -160,9 +159,14 @@ const Index = () => {
               </div>
             ))}
           </div>
-          <Button size="lg" className="bg-gradient-hero border-0 text-primary-foreground px-8 py-6 text-base shadow-elevated" onClick={() => updateStarted(true)}>
-            Commencer <ChevronRight className="w-5 h-5 ml-2" />
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Button size="lg" className="bg-gradient-hero border-0 text-primary-foreground px-8 py-6 text-base shadow-elevated" onClick={() => updateStarted(true)}>
+              Commencer <ChevronRight className="w-5 h-5 ml-2" />
+            </Button>
+            <Button size="lg" variant="outline" className="px-8 py-6 text-base gap-2" onClick={() => navigate("/controle-ey")}>
+              <ShieldCheck className="w-5 h-5" /> Contrôle EDOF / EY
+            </Button>
+          </div>
         </div>
       </div>
     );
@@ -218,14 +222,13 @@ const Index = () => {
           {currentStep === 3 && <StagiairesForm data={stagiaires} onChange={updateStagiaires} />}
           {currentStep === 4 && <CriteresForm data={criteres} onChange={updateCriteres} />}
           {currentStep === 5 && <DocumentGenerator organisme={organisme} formation={formation} stagiaires={stagiaires} criteres={criteres} />}
-          {currentStep === 6 && <ControleEDOF organisme={organisme} formation={formation} stagiaires={stagiaires} criteres={criteres} />}
         </div>
 
         <div className="flex justify-between mt-6">
           <Button variant="outline" onClick={() => updateStep(s => Math.max(1, s - 1))} disabled={currentStep === 1} className="gap-2">
             <ChevronLeft className="w-4 h-4" /> Précédent
           </Button>
-          <Button onClick={() => updateStep(s => Math.min(6, s + 1))} disabled={currentStep === 6} className="gap-2">
+          <Button onClick={() => updateStep(s => Math.min(5, s + 1))} disabled={currentStep === 5} className="gap-2">
             Suivant <ChevronRight className="w-4 h-4" />
           </Button>
         </div>
