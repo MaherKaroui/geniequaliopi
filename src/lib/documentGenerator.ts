@@ -905,7 +905,7 @@ function genAnalyseBesoins(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
           "Développer l'aisance à l'oral pour les présentations et négociations en anglais",
           "Renforcer la rédaction d'emails et de documents professionnels en anglais",
           "Acquérir le vocabulaire technique spécifique au secteur d'activité",
-          "Préparer la certification TOEIC pour valider le niveau atteint",
+          "Préparer la certification " + certName + " pour valider le niveau atteint",
           "Maîtriser les structures grammaticales essentielles pour la communication écrite",
           "Développer les techniques de compréhension écrite de documents techniques",
           "Améliorer la prononciation et la fluidité à l'oral",
@@ -914,7 +914,7 @@ function genAnalyseBesoins(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
         ],
         synthese: `• ${Math.round(stagiaires.length * 0.8)} stagiaires ont besoin d'améliorer leur expression orale professionnelle en anglais<br>`
           + `• ${Math.round(stagiaires.length * 0.7)} stagiaires souhaitent renforcer la rédaction d'emails et documents en anglais<br>`
-          + `• ${Math.round(stagiaires.length * 0.5)} stagiaires visent la certification TOEIC<br>`
+          + `• ${Math.round(stagiaires.length * 0.5)} stagiaires visent la certification ${certName}<br>`
           + `• ${Math.round(stagiaires.length * 0.4)} stagiaires ont besoin de vocabulaire technique sectoriel<br>`
           + `• ${Math.round(stagiaires.length * 0.3)} stagiaires demandent un travail spécifique sur la compréhension orale`,
         adaptations: `• Tests de niveau pour constituer des groupes homogènes<br>`
