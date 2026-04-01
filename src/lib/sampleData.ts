@@ -14,6 +14,7 @@ export const SAMPLE_ORGANISME: OrganismeInfo = {
   responsablePedagogique: "Dr. Catherine Moreau",
   referentHandicap: "Isabelle Fontaine",
   referentQualite: "Laurent Vasseur",
+  poleAdministratif: "Marie Lecomte",
   domainesFormation: "Bureautique, Langues, Management, Digital, Esthétique, Informatique",
   typesActions: ["actions-formation", "bilans-competences"],
   certifications: "Qualiopi, RS, RNCP",

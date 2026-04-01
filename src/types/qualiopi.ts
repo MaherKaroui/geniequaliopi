@@ -42,6 +42,7 @@ export interface OrganismeInfo {
   responsablePedagogique: string;
   referentHandicap: string;
   referentQualite: string;
+  poleAdministratif: string;
   domainesFormation: string;
   typesActions: ('actions-formation' | 'bilans-competences' | 'vae' | 'apprentissage')[];
   certifications: string;

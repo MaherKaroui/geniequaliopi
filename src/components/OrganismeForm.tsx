@@ -150,6 +150,10 @@ const OrganismeForm = ({ data, onChange }: OrganismeFormProps) => {
           <Label htmlFor="referentQualite">Référent qualité</Label>
           <Input id="referentQualite" value={data.referentQualite} onChange={e => update('referentQualite', e.target.value)} placeholder="Nom du référent qualité" />
         </div>
+        <div>
+          <Label htmlFor="poleAdministratif">Pôle Administratif</Label>
+          <Input id="poleAdministratif" value={data.poleAdministratif} onChange={e => update('poleAdministratif', e.target.value)} placeholder="Nom du responsable administratif" />
+        </div>
         <div className="md:col-span-2">
           <Label htmlFor="domainesFormation">Domaines de formation</Label>
           <Textarea id="domainesFormation" value={data.domainesFormation} onChange={e => update('domainesFormation', e.target.value)} placeholder="Ex: Management, RH, Digital, Langues..." rows={2} />
