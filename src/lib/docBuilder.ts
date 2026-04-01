@@ -538,7 +538,7 @@ function resolveSignature(label: string, nom: string, urls: SignatureUrls): stri
   return tamponImg(urls.tamponUrl);
 }
 
-export function signatureBlock3(org: OrganismeInfo, stagiaireNom?: string, formateurNom?: string, stagiaireSignatureUrl?: string, formateurSignatureUrl?: string, responsableEntrepriseSignatureUrl?: string): string {
+export function signatureBlock3(org: OrganismeInfo, stagiaireNom?: string, formateurNom?: string, stagiaireSignatureUrl?: string, formateurSignatureUrl?: string, responsableEntrepriseSignatureUrl?: string, dates?: string[]): string {
   const urls: SignatureUrls = {
     dirigeantSignatureUrl: org.signatureUrl,
     tamponUrl: org.tamponUrl,
@@ -546,13 +546,17 @@ export function signatureBlock3(org: OrganismeInfo, stagiaireNom?: string, forma
     formateurSignatureUrl,
     responsableEntrepriseSignatureUrl,
   };
+  const fallbackDate = new Date().toLocaleDateString("fr-FR");
+  const d1 = dates?.[0] || fallbackDate;
+  const d2 = dates?.[1] || d1;
+  const d3 = dates?.[2] || d1;
   const stagSigHtml = resolveSignature("Le/La Stagiaire", stagiaireNom || "", urls);
   const fmtSigHtml = resolveSignature("Le/La Formateur(trice)", formateurNom || "", urls);
   const respSigHtml = resolveSignature("Le Responsable", org.dirigeant, urls);
   return `<div class="signature-block">
-    <div class="sig-box"><p class="sig-label">Le/La Stagiaire</p><p>Nom : ${stagiaireNom || "________________________"}</p><p>Date : ________________________</p><p style="margin-top:20px">Signature :</p>${stagSigHtml}</div>
-    <div class="sig-box"><p class="sig-label">Le/La Formateur(trice)</p><p>Nom : ${formateurNom || "________________________"}</p><p>Date : ________________________</p><p style="margin-top:20px">Signature :</p>${fmtSigHtml}</div>
-    <div class="sig-box"><p class="sig-label">Le Responsable</p><p>Nom : ${org.dirigeant}</p><p>Date : ________________________</p><p style="margin-top:20px">Signature :</p>${respSigHtml}</div>
+    <div class="sig-box"><p class="sig-label">Le/La Stagiaire</p><p>Nom : ${stagiaireNom || "________________________"}</p><p>Date : ${d1}</p><p style="margin-top:20px">Signature :</p>${stagSigHtml}</div>
+    <div class="sig-box"><p class="sig-label">Le/La Formateur(trice)</p><p>Nom : ${formateurNom || "________________________"}</p><p>Date : ${d2}</p><p style="margin-top:20px">Signature :</p>${fmtSigHtml}</div>
+    <div class="sig-box"><p class="sig-label">Le Responsable</p><p>Nom : ${org.dirigeant}</p><p>Date : ${d3}</p><p style="margin-top:20px">Signature :</p>${respSigHtml}</div>
   </div>`;
 }
 
@@ -566,8 +570,9 @@ export function signatureBlock2(label1: string, nom1: string, label2: string, no
   };
   const sig1Html = resolveSignature(label1, nom1, urls);
   const sig2Html = resolveSignature(label2, nom2, urls);
-  const date1 = dates?.[0] || "________________________";
-  const date2 = dates?.[1] || "________________________";
+  const fallbackDate = new Date().toLocaleDateString("fr-FR");
+  const date1 = dates?.[0] || fallbackDate;
+  const date2 = dates?.[1] || date1;
   return `<div class="signature-block-2">
     <div class="sig-box"><p class="sig-label">${label1}</p><p>Nom : ${nom1}</p><p>Date : ${date1}</p><p style="margin-top:20px">Signature :</p>${sig1Html}</div>
     <div class="sig-box"><p class="sig-label">${label2}</p><p>Nom : ${nom2}</p><p>Date : ${date2}</p><p style="margin-top:20px">Signature :</p>${sig2Html}</div>
@@ -632,8 +637,15 @@ export function buildDocument(config: DocBuildConfig): string {
     const fmtSigUrl = config.signatures.formateurSignatureUrl || firstStagiaire?.formateurSignatureUrl || config.formation?.formateurSignatureUrl;
     const stagSigUrl = config.signatures.stagiaireSignatureUrl || firstStagiaire?.signatureUrl;
     const respEntSigUrl = config.signatures.responsableEntrepriseSignatureUrl || firstStagiaire?.signatureResponsableUrl;
+    // Auto-compute signature dates if not provided
+    let sigDates = config.signatures.dates;
+    if (!sigDates || sigDates.length === 0) {
+      const refDate = firstStagiaire?.dateDebutFormation || config.formation?.dateDebut || "";
+      const computedDate = refDate ? formatDate(subtractBusinessDays(refDate, 14)) : new Date().toLocaleDateString("fr-FR");
+      sigDates = [computedDate, computedDate];
+    }
     if (config.signatures.type === "3") {
-      body += signatureBlock3(config.org, config.signatures.names?.[0], config.signatures.names?.[1], stagSigUrl, fmtSigUrl, respEntSigUrl);
+      body += signatureBlock3(config.org, config.signatures.names?.[0], config.signatures.names?.[1], stagSigUrl, fmtSigUrl, respEntSigUrl, sigDates);
     } else {
       body += signatureBlock2(
         config.signatures.labels?.[0] || "Partie 1",
@@ -643,7 +655,7 @@ export function buildDocument(config: DocBuildConfig): string {
         config.signatures.noOrgSignature ? undefined : config.org.signatureUrl,
         config.org.tamponUrl,
         stagSigUrl,
-        config.signatures.dates,
+        sigDates,
         fmtSigUrl,
         respEntSigUrl
       );

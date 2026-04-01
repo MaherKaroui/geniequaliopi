@@ -27,18 +27,11 @@ function orgSig(o: OrganismeInfo): string {
 }
 
 function dirigeantSig(o: OrganismeInfo): string {
-  // Dirigeant = signature du dirigeant + tampon
-  let h = '';
-  if (o.signatureUrl) {
-    h += `<img src="${o.signatureUrl}" alt="Signature dirigeant" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />`;
-  }
+  // Dirigeant = tampon seulement (pas de signature personnelle)
   if (o.tamponUrl) {
-    h += `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />`;
+    return `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />`;
   }
-  if (!o.signatureUrl && !o.tamponUrl) {
-    h += `<p style="font-style:italic;color:#999;margin-top:10px">Signé par ${o.dirigeant}</p>`;
-  }
-  return h;
+  return `<p style="font-style:italic;color:#999;margin-top:10px">Cachet de ${o.nom}</p>`;
 }
 
 function formateurSigGen(f: FormationInfo, s?: StagiaireInfo): string {
@@ -67,11 +60,13 @@ function modaliteTexte(f: FormationInfo): string {
 function isPresentiel(f: FormationInfo): boolean { const m = (f.modalites||'').toLowerCase(); return !m.includes('distanciel') && !m.includes('e-learning') && !m.includes('foad') || m.includes('mixte'); }
 function isDistanciel(f: FormationInfo): boolean { const m = (f.modalites||'').toLowerCase(); return m.includes('distanciel') || m.includes('e-learning') || m.includes('foad') || m.includes('mixte'); }
 
-function sigBlock(label1: string, nom1: string, sig1Html: string, label2: string, nom2: string, sig2Html: string, mention?: string): string {
+function sigBlock(label1: string, nom1: string, sig1Html: string, label2: string, nom2: string, sig2Html: string, mention?: string, date1?: string, date2?: string): string {
   const mentionHtml = mention ? `<p style="font-style:italic;font-size:11px">(${mention})</p>` : '';
+  const d1 = date1 || new Date().toLocaleDateString("fr-FR");
+  const d2 = date2 || d1;
   return `<div class="signature-block-2">
-    <div class="sig-box"><p class="sig-label">${label1}</p><p>Nom : ${nom1}</p>${mentionHtml}<p>Signature :</p>${sig1Html}</div>
-    <div class="sig-box"><p class="sig-label">${label2}</p><p>Nom : ${nom2}</p>${mentionHtml}<p>Signature :</p>${sig2Html}</div>
+    <div class="sig-box"><p class="sig-label">${label1}</p><p>Nom : ${nom1}</p><p>Date : ${d1}</p>${mentionHtml}<p>Signature :</p>${sig1Html}</div>
+    <div class="sig-box"><p class="sig-label">${label2}</p><p>Nom : ${nom2}</p><p>Date : ${d2}</p>${mentionHtml}<p>Signature :</p>${sig2Html}</div>
   </div>`;
 }
 
@@ -101,11 +96,12 @@ export function genCGV_V2(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
   let sigPages = '';
   stagiaires.slice(0, 10).forEach((s, i) => {
     if (i > 0) sigPages += '<div class="page-break"></div>';
-    sigPages += `<p><strong>Fait à ${o.ville}, le :</strong> ${formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || new Date().toISOString(), 14))}</p>`;
+    const sigDate = formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || new Date().toISOString(), 14));
+    sigPages += `<p><strong>Fait à ${o.ville}, le :</strong> ${sigDate}</p>`;
     sigPages += sigBlock(
       `Le Stagiaire`, `${s.prenom} ${s.nom}`, stagSig(s),
       `Pour l'Organisme de formation`, o.dirigeant, orgSig(o),
-      'Précédée de la mention « Lu et approuvé »'
+      'Précédée de la mention « Lu et approuvé »', sigDate, sigDate
     );
   });
 
@@ -148,11 +144,12 @@ export function genReglement_V2(o: OrganismeInfo, f: FormationInfo, stagiaires: 
   let sigPages = '';
   stagiaires.slice(0, 10).forEach((s, i) => {
     if (i > 0) sigPages += '<div class="page-break"></div>';
-    sigPages += `<p><strong>Fait à ${o.ville}, le :</strong> ${formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || new Date().toISOString(), 14))}</p>`;
+    const sigDate = formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || new Date().toISOString(), 14));
+    sigPages += `<p><strong>Fait à ${o.ville}, le :</strong> ${sigDate}</p>`;
     sigPages += sigBlock(
       `Signature du stagiaire : ${s.prenom} ${s.nom}`, `${s.prenom} ${s.nom}`, stagSig(s),
       `Signature du centre`, o.nom, orgSig(o),
-      'Précédée de la mention « Lu et approuvé »'
+      'Précédée de la mention « Lu et approuvé »', sigDate, sigDate
     );
   });
 
@@ -255,10 +252,11 @@ export function genContratFormationPro_V2(o: OrganismeInfo, f: FormationInfo, st
       <p>Le présent contrat prend effet à la date de sa signature par les deux parties.</p>
       <p><strong>Fait à ${o.ville}, le :</strong> ${formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || new Date().toISOString(), 14))}</p>
     `;
+    const sigDate2 = formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || new Date().toISOString(), 14));
     extra += sigBlock(
       `Pour l'Organisme de formation<br>${o.nom}`, o.dirigeant, orgSig(o),
       `Le Stagiaire`, `${s.prenom} ${s.nom}`, stagSig(s),
-      'Précédée de la mention « Lu et approuvé »'
+      'Précédée de la mention « Lu et approuvé »', sigDate2, sigDate2
     );
   });
   return buildDocument({ org: o, title: "CONTRAT DE FORMATION PROFESSIONNELLE", extraHtml: extra });
@@ -355,10 +353,11 @@ export function genContratFormationProStagiaire(o: OrganismeInfo, f: FormationIn
     <p>Le présent contrat prend effet à la date de sa signature par les deux parties.</p>
     <p><strong>Fait à ${o.ville}, le :</strong> ${formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || new Date().toISOString(), 14))}</p>
   `;
+  const sigDate3 = formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || new Date().toISOString(), 14));
   extra += sigBlock(
     `Pour l'Organisme de formation<br>${o.nom}`, o.dirigeant, orgSig(o),
     `Le Stagiaire`, `${s.prenom} ${s.nom}`, stagSig(s),
-    'Précédée de la mention « Lu et approuvé »'
+    'Précédée de la mention « Lu et approuvé »', sigDate3, sigDate3
   );
   return buildDocument({ org: o, title: `CONTRAT DE FORMATION – ${s.prenom} ${s.nom}`, extraHtml: extra });
 }
@@ -1282,11 +1281,12 @@ export function genCGVStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: 
     { heading: "Article 16 – Acceptation des CGV", content: `<p>L'inscription à la formation vaut acceptation sans réserve des présentes Conditions Générales de Vente.</p>` },
   ];
 
-  let sigPages = `<p><strong>Fait à ${o.ville}, le :</strong> ${formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || new Date().toISOString(), 14))}</p>`;
+  const sigDateCGV = formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || new Date().toISOString(), 14));
+  let sigPages = `<p><strong>Fait à ${o.ville}, le :</strong> ${sigDateCGV}</p>`;
   sigPages += sigBlock(
     `Le Stagiaire`, `${s.prenom} ${s.nom}`, stagSig(s),
     `Pour l'Organisme de formation`, o.dirigeant, orgSig(o),
-    'Précédée de la mention « Lu et approuvé »'
+    'Précédée de la mention « Lu et approuvé »', sigDateCGV, sigDateCGV
   );
 
   return buildDocument({ org: o, title: `CONDITIONS GÉNÉRALES DE VENTE – ${s.prenom} ${s.nom}`, sections, extraHtml: sigPages });
@@ -1326,11 +1326,12 @@ export function genReglementStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
     { heading: `Article ${artNum++} – Entrée en vigueur`, content: `<p>Le présent règlement intérieur entre en vigueur à compter de la date de signature par le stagiaire.</p><p>Il est remis à chaque stagiaire avant le début de la formation.</p>` },
   );
 
-  let sigPages = `<p><strong>Fait à ${o.ville}, le :</strong> ${formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || new Date().toISOString(), 14))}</p>`;
+  const sigDateReg = formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || new Date().toISOString(), 14));
+  let sigPages = `<p><strong>Fait à ${o.ville}, le :</strong> ${sigDateReg}</p>`;
   sigPages += sigBlock(
     `Signature du stagiaire : ${s.prenom} ${s.nom}`, `${s.prenom} ${s.nom}`, stagSig(s),
     `Signature du centre`, o.nom, orgSig(o),
-    'Précédée de la mention « Lu et approuvé »'
+    'Précédée de la mention « Lu et approuvé »', sigDateReg, sigDateReg
   );
 
   return buildDocument({ org: o, title: `RÈGLEMENT INTÉRIEUR – ${s.prenom} ${s.nom}`, subtitle: `Applicable aux stagiaires en formation ${modTxt}`, sections, extraHtml: sigPages });
