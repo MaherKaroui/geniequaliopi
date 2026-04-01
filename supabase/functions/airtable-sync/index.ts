@@ -10,30 +10,16 @@ interface AirtableField {
   type: string;
 }
 
-async function getExistingTables(baseId: string, headers: Record<string, string>): Promise<string[]> {
-  const res = await fetch(`${META_URL}/${baseId}/tables`, { headers });
-  if (!res.ok) {
-    const err = await res.text();
-    throw new Error(`Failed to list tables: ${res.status} ${err}`);
-  }
-  const data = await res.json();
-  return (data.tables || []).map((t: any) => t.name);
-}
+class AirtableHttpError extends Error {
+  status: number;
+  body: string;
 
-async function createTable(baseId: string, name: string, fields: AirtableField[], headers: Record<string, string>) {
-  const res = await fetch(`${META_URL}/${baseId}/tables`, {
-    method: 'POST',
-    headers: { ...headers, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      name,
-      fields: fields.map(f => ({ name: f.name, type: f.type })),
-    }),
-  });
-  if (!res.ok) {
-    const err = await res.text();
-    throw new Error(`Failed to create table "${name}": ${res.status} ${err}`);
+  constructor(message: string, status: number, body: string) {
+    super(message);
+    this.name = 'AirtableHttpError';
+    this.status = status;
+    this.body = body;
   }
-  return await res.json();
 }
 
 const ORGANISME_FIELDS: AirtableField[] = [
@@ -103,51 +89,160 @@ const STAGIAIRES_FIELDS: AirtableField[] = [
   { name: 'Formateur', type: 'singleLineText' },
 ];
 
+const jsonResponse = (payload: unknown, status = 200) =>
+  new Response(JSON.stringify(payload), {
+    status,
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  });
+
+const safeJsonParse = (text: string) => {
+  try {
+    return JSON.parse(text);
+  } catch {
+    return null;
+  }
+};
+
+const extractBaseId = (rawValue: string) => {
+  const trimmed = rawValue.trim();
+  const match = trimmed.match(/app[a-zA-Z0-9]{10,}/);
+
+  if (match) {
+    return match[0];
+  }
+
+  throw new Error('AIRTABLE_BASE_ID must contain a valid Airtable base id like `app...` or a full Airtable base URL.');
+};
+
+const getErrorDetails = (error: unknown) => {
+  if (error instanceof AirtableHttpError) {
+    return safeJsonParse(error.body) ?? error.body ?? error.message;
+  }
+
+  return error instanceof Error ? error.message : 'Unknown error';
+};
+
+async function airtableRequest(url: string, options: RequestInit, errorLabel: string) {
+  const response = await fetch(url, options);
+  const text = await response.text();
+
+  if (!response.ok) {
+    throw new AirtableHttpError(
+      `${errorLabel}: ${response.status} ${text || response.statusText}`,
+      response.status,
+      text || response.statusText,
+    );
+  }
+
+  return text ? safeJsonParse(text) : null;
+}
+
+async function getAccessibleBaseIds(headers: Record<string, string>) {
+  try {
+    const data = await airtableRequest(META_URL, { headers }, 'Failed to list accessible bases') as { bases?: Array<{ id: string }> } | null;
+    return Array.isArray(data?.bases) ? data.bases.map((base) => base.id) : [];
+  } catch {
+    return null;
+  }
+}
+
+async function getExistingTables(baseId: string, headers: Record<string, string>) {
+  const data = await airtableRequest(`${META_URL}/${baseId}/tables`, { headers }, 'Failed to list tables') as { tables?: Array<{ name: string }> } | null;
+  return Array.isArray(data?.tables) ? data.tables.map((table) => table.name) : [];
+}
+
+async function createTable(baseId: string, name: string, fields: AirtableField[], headers: Record<string, string>) {
+  return await airtableRequest(
+    `${META_URL}/${baseId}/tables`,
+    {
+      method: 'POST',
+      headers: { ...headers, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name,
+        fields: fields.map((field) => ({ name: field.name, type: field.type })),
+      }),
+    },
+    `Failed to create table "${name}"`,
+  );
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
 
-  const AIRTABLE_API_KEY = Deno.env.get('AIRTABLE_API_KEY');
-  const AIRTABLE_BASE_ID = Deno.env.get('AIRTABLE_BASE_ID');
+  const airtableApiKey = Deno.env.get('AIRTABLE_API_KEY')?.trim();
+  const rawAirtableBaseId = Deno.env.get('AIRTABLE_BASE_ID');
 
-  if (!AIRTABLE_API_KEY) {
-    return new Response(JSON.stringify({ error: 'AIRTABLE_API_KEY not configured' }), {
-      status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    });
-  }
-  if (!AIRTABLE_BASE_ID) {
-    return new Response(JSON.stringify({ error: 'AIRTABLE_BASE_ID not configured' }), {
-      status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    });
+  if (!airtableApiKey) {
+    return jsonResponse({ success: false, error: 'AIRTABLE_API_KEY not configured' });
   }
 
-  const BASE_URL = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}`;
-  const authHeaders = { 'Authorization': `Bearer ${AIRTABLE_API_KEY}` };
+  if (!rawAirtableBaseId) {
+    return jsonResponse({ success: false, error: 'AIRTABLE_BASE_ID not configured' });
+  }
+
+  let airtableBaseId = '';
 
   try {
-    const { organisme, formation, stagiaires } = await req.json();
+    airtableBaseId = extractBaseId(rawAirtableBaseId);
+  } catch (error: unknown) {
+    return jsonResponse({ success: false, error: getErrorDetails(error) });
+  }
 
-    // Step 1: Check existing tables and create missing ones
-    const existingTables = await getExistingTables(AIRTABLE_BASE_ID, authHeaders);
-    console.log('Existing tables:', existingTables);
+  const authHeaders = { Authorization: `Bearer ${airtableApiKey}` };
+  const baseUrl = `https://api.airtable.com/v0/${airtableBaseId}`;
 
-    const tablesToCreate: [string, AirtableField[]][] = [];
-    if (!existingTables.includes('Organisme')) tablesToCreate.push(['Organisme', ORGANISME_FIELDS]);
-    if (!existingTables.includes('Formation')) tablesToCreate.push(['Formation', FORMATION_FIELDS]);
-    if (!existingTables.includes('Stagiaires')) tablesToCreate.push(['Stagiaires', STAGIAIRES_FIELDS]);
+  try {
+    const payload = await req.json().catch(() => ({}));
+    const { organisme, formation, stagiaires } = payload as {
+      organisme?: Record<string, any>;
+      formation?: Record<string, any>;
+      stagiaires?: Array<Record<string, any>>;
+    };
 
-    for (const [name, fields] of tablesToCreate) {
-      console.log(`Creating table: ${name}`);
-      await createTable(AIRTABLE_BASE_ID, name, fields, authHeaders);
+    const results: Record<string, unknown> = {};
+    const warnings: string[] = [];
+    let hasFailures = false;
+    let existingTables: string[] | null = null;
+
+    try {
+      existingTables = await getExistingTables(airtableBaseId, authHeaders);
+    } catch (error: unknown) {
+      const accessibleBaseIds = await getAccessibleBaseIds(authHeaders);
+      const baseAccessMessage = Array.isArray(accessibleBaseIds)
+        ? accessibleBaseIds.includes(airtableBaseId)
+          ? `Airtable metadata is unavailable for base ${airtableBaseId}.`
+          : `The current Airtable token does not seem to have access to base ${airtableBaseId}.`
+        : `Airtable metadata could not be verified for base ${airtableBaseId}.`;
+
+      warnings.push(`${baseAccessMessage} The sync will continue without auto-creating missing tables.`);
+      results.meta = { error: getErrorDetails(error) };
     }
 
-    const results: Record<string, any> = {};
-    if (tablesToCreate.length > 0) {
-      results.tablesCreated = tablesToCreate.map(([n]) => n);
+    if (existingTables) {
+      const tablesToCreate: Array<[string, AirtableField[]]> = [];
+      const createdTables: string[] = [];
+
+      if (!existingTables.includes('Organisme')) tablesToCreate.push(['Organisme', ORGANISME_FIELDS]);
+      if (!existingTables.includes('Formation')) tablesToCreate.push(['Formation', FORMATION_FIELDS]);
+      if (!existingTables.includes('Stagiaires')) tablesToCreate.push(['Stagiaires', STAGIAIRES_FIELDS]);
+
+      for (const [name, fields] of tablesToCreate) {
+        try {
+          await createTable(airtableBaseId, name, fields, authHeaders);
+          createdTables.push(name);
+        } catch (error: unknown) {
+          hasFailures = true;
+          results[`create_${name}`] = { error: getErrorDetails(error) };
+        }
+      }
+
+      if (createdTables.length > 0) {
+        results.tablesCreated = createdTables;
+      }
     }
 
-    // Step 2: Insert data
     const postHeaders = { ...authHeaders, 'Content-Type': 'application/json' };
 
     if (organisme) {
@@ -173,13 +268,21 @@ Deno.serve(async (req) => {
         'Date MAJ': organisme.dateMaj || '',
       };
 
-      const orgRes = await fetch(`${BASE_URL}/Organisme`, {
-        method: 'POST',
-        headers: postHeaders,
-        body: JSON.stringify({ records: [{ fields: orgFields }] }),
-      });
-      const orgData = await orgRes.json();
-      results.organisme = orgRes.ok ? { success: true, count: 1 } : { error: orgData };
+      try {
+        await airtableRequest(
+          `${baseUrl}/Organisme`,
+          {
+            method: 'POST',
+            headers: postHeaders,
+            body: JSON.stringify({ records: [{ fields: orgFields }] }),
+          },
+          'Failed to insert Organisme record',
+        );
+        results.organisme = { success: true, count: 1 };
+      } catch (error: unknown) {
+        hasFailures = true;
+        results.organisme = { error: getErrorDetails(error) };
+      }
     }
 
     if (formation) {
@@ -204,74 +307,90 @@ Deno.serve(async (req) => {
         'Rythme Alternance': formation.rythmeAlternance || '',
       };
 
-      const formRes = await fetch(`${BASE_URL}/Formation`, {
-        method: 'POST',
-        headers: postHeaders,
-        body: JSON.stringify({ records: [{ fields: formFields }] }),
-      });
-      const formData = await formRes.json();
-      results.formation = formRes.ok ? { success: true, count: 1 } : { error: formData };
+      try {
+        await airtableRequest(
+          `${baseUrl}/Formation`,
+          {
+            method: 'POST',
+            headers: postHeaders,
+            body: JSON.stringify({ records: [{ fields: formFields }] }),
+          },
+          'Failed to insert Formation record',
+        );
+        results.formation = { success: true, count: 1 };
+      } catch (error: unknown) {
+        hasFailures = true;
+        results.formation = { error: getErrorDetails(error) };
+      }
     }
 
     if (stagiaires && stagiaires.length > 0) {
-      const stagRecords = stagiaires.map((s: any) => ({
+      const stagRecords = stagiaires.map((stagiaire) => ({
         fields: {
-          'Civilite': s.civilite || '',
-          'Nom': s.nom || '',
-          'Prenom': s.prenom || '',
-          'Email': s.email || '',
-          'Telephone': s.telephone || '',
-          'Entreprise': s.entreprise || '',
-          'Poste': s.poste || '',
-          'Date Naissance': s.dateNaissance || '',
-          'Date Debut Formation': s.dateDebutFormation || '',
-          'Date Fin Formation': s.dateFinFormation || '',
-          'Tarif Formation': s.tarifFormation || '',
-          'Adresse': s.adresse || '',
-          'Code Postal': s.codePostal || '',
-          'Commune': s.commune || '',
-          'Nationalite': s.nationalite || '',
-          'NIR': s.nir || '',
-          'Departement Naissance': s.departementNaissance || '',
-          'Commune Naissance': s.communeNaissance || '',
-          'Diplome': s.diplome || '',
-          'RQTH': s.rqth || '',
-          'Formateur': s.formateur || '',
-        }
+          'Civilite': stagiaire.civilite || '',
+          'Nom': stagiaire.nom || '',
+          'Prenom': stagiaire.prenom || '',
+          'Email': stagiaire.email || '',
+          'Telephone': stagiaire.telephone || '',
+          'Entreprise': stagiaire.entreprise || '',
+          'Poste': stagiaire.poste || '',
+          'Date Naissance': stagiaire.dateNaissance || '',
+          'Date Debut Formation': stagiaire.dateDebutFormation || '',
+          'Date Fin Formation': stagiaire.dateFinFormation || '',
+          'Tarif Formation': stagiaire.tarifFormation || '',
+          'Adresse': stagiaire.adresse || '',
+          'Code Postal': stagiaire.codePostal || '',
+          'Commune': stagiaire.commune || '',
+          'Nationalite': stagiaire.nationalite || '',
+          'NIR': stagiaire.nir || '',
+          'Departement Naissance': stagiaire.departementNaissance || '',
+          'Commune Naissance': stagiaire.communeNaissance || '',
+          'Diplome': stagiaire.diplome || '',
+          'RQTH': stagiaire.rqth || '',
+          'Formateur': stagiaire.formateur || '',
+        },
       }));
 
       let totalCreated = 0;
-      const errors: any[] = [];
-      for (let i = 0; i < stagRecords.length; i += 10) {
-        const batch = stagRecords.slice(i, i + 10);
-        const stagRes = await fetch(`${BASE_URL}/Stagiaires`, {
-          method: 'POST',
-          headers: postHeaders,
-          body: JSON.stringify({ records: batch }),
-        });
-        const stagData = await stagRes.json();
-        if (!stagRes.ok) {
-          errors.push(stagData);
-        } else {
-          totalCreated += (stagData.records || []).length;
+      const batchErrors: unknown[] = [];
+
+      for (let index = 0; index < stagRecords.length; index += 10) {
+        const batch = stagRecords.slice(index, index + 10);
+
+        try {
+          const data = await airtableRequest(
+            `${baseUrl}/Stagiaires`,
+            {
+              method: 'POST',
+              headers: postHeaders,
+              body: JSON.stringify({ records: batch }),
+            },
+            'Failed to insert Stagiaires records',
+          ) as { records?: unknown[] } | null;
+          totalCreated += Array.isArray(data?.records) ? data.records.length : batch.length;
+        } catch (error: unknown) {
+          hasFailures = true;
+          batchErrors.push(getErrorDetails(error));
         }
       }
-      results.stagiaires = errors.length > 0
-        ? { error: errors, created: totalCreated }
+
+      results.stagiaires = batchErrors.length > 0
+        ? { error: batchErrors, created: totalCreated }
         : { success: true, count: totalCreated };
     }
 
-    return new Response(JSON.stringify({ success: true, results }), {
-      status: 200,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    return jsonResponse({
+      success: !hasFailures,
+      error: hasFailures ? 'Airtable sync failed.' : null,
+      warnings,
+      baseId: airtableBaseId,
+      results,
     });
-
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Unknown error';
-    console.error('Airtable sync error:', message);
-    return new Response(JSON.stringify({ error: message }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    return jsonResponse({
+      success: false,
+      error: getErrorDetails(error),
+      baseId: airtableBaseId,
     });
   }
 });
