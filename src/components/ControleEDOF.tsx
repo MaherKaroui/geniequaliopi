@@ -154,6 +154,7 @@ export default function ControleEDOF({ organisme, formation, stagiaires }: Contr
     }
   }, [previewHtml, previewDoc, orgName]);
 
+  const downloadZip = useCallback(async () => {
     setGenerating(true);
     setProgress(0);
     setProgressText("Préparation du dossier contrôle EY...");
