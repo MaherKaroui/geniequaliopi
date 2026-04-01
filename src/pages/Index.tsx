@@ -22,6 +22,7 @@ const STEPS = [
   { id: 3, label: "Stagiaires" },
   { id: 4, label: "Critères" },
   { id: 5, label: "Dossier" },
+  { id: 6, label: "Contrôle EY" },
 ];
 
 const emptyOrganisme: OrganismeInfo = {
