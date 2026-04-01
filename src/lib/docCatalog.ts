@@ -561,8 +561,15 @@ export function buildFullCatalog(
       add(`cfa_c3i14_suivi3mois_${fi}`, `CT3 - IND 14 SUIVI À 3 MOIS`, 3, 14, "suivi_3_mois", { fi });
       add(`cfa_c3i14_insertion_${fi}`, `CT3 - IND 14 QUESTIONNAIRE INSERTION`, 3, 14, "questionnaire_insertion", { fi });
     });
-    add("cfa_c3i14_webinaire_formation_competences", "CT3 - IND 14 WEBINAIRE FORMATION ET DÉVELOPPEMENT DES COMPÉTENCES", 3, 14, "webinaire_formation_competences_cfa");
-    add("cfa_c3i14_webinaire_ntc", "CT3 - IND 14 WEBINAIRE TECHNIQUES ET OUTILS DU NTC", 3, 14, "webinaire_ntc_cfa");
+    // Webinaires uniquement si distanciel
+    formations.forEach((f) => {
+      const moda = (f.modalites || '').toLowerCase();
+      const isDistanciel = moda.includes('distanciel') || moda.includes('e-learning') || moda.includes('foad') || moda.includes('mixte');
+      if (isDistanciel) {
+        add("cfa_c3i14_webinaire_formation_competences", "CT3 - IND 14 WEBINAIRE FORMATION ET DÉVELOPPEMENT DES COMPÉTENCES", 3, 14, "webinaire_formation_competences_cfa");
+        add("cfa_c3i14_webinaire_ntc", "CT3 - IND 14 WEBINAIRE TECHNIQUES ET OUTILS DU NTC", 3, 14, "webinaire_ntc_cfa");
+      }
+    });
 
     // ===== IND 14 — DOSSIER PERMIS B =====
     add("cfa_c3i14_permisb_aide_financement", "CT3 - IND 14 📁 PERMIS B – Aide au Financement Permis B", 3, 14, "pdf_static", { pdfUrl: "/pdfs/aide_financement_permis_b.pdf" });
