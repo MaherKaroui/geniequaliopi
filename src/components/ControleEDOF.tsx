@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback, useRef } from "react";
-import { OrganismeInfo, FormationInfo, StagiaireInfo, CritereData } from "@/types/qualiopi";
+import { OrganismeInfo, FormationInfo, StagiaireInfo, CritereData, DocStyleConfig } from "@/types/qualiopi";
 import { EY_DOCUMENTS, EY_CATEGORIES, EYCategory, EYDocState, EYDocStatus, EYDocumentItem } from "@/lib/eyControlData";
 import { generateDocumentById } from "@/lib/documentGenerator";
 import { mergeStagiaires, mergeOrganisme } from "@/lib/sampleData";
@@ -19,6 +19,7 @@ interface ControleEDOFProps {
   formation: FormationInfo;
   stagiaires: StagiaireInfo[];
   criteres: CritereData[];
+  docStyle?: DocStyleConfig;
 }
 
 const STATUS_CONFIG: Record<EYDocStatus, { label: string; icon: React.ReactNode; color: string }> = {

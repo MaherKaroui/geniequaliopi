@@ -1,12 +1,13 @@
 import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { OrganismeInfo, FormationInfo, StagiaireInfo, CritereData, CRITERES } from "@/types/qualiopi";
+import { OrganismeInfo, FormationInfo, StagiaireInfo, CritereData, CRITERES, DocStyleConfig, DEFAULT_DOC_STYLE } from "@/types/qualiopi";
 import OrganismeForm from "@/components/OrganismeForm";
 import FormationForm from "@/components/FormationForm";
 import StagiairesForm from "@/components/StagiairesForm";
+import DocStyleConfigPanel from "@/components/DocStyleConfigPanel";
 import ControleEDOF from "@/components/ControleEDOF";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, LogIn, LogOut, ChevronDown, ChevronRight, Building2, GraduationCap, Users } from "lucide-react";
+import { ChevronLeft, LogIn, LogOut, ChevronDown, ChevronRight, Building2, GraduationCap, Users, Palette } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
 const emptyOrganisme: OrganismeInfo = {
@@ -39,6 +40,9 @@ const ControleEY = () => {
   const [criteres] = useState<CritereData[]>(() => {
     try { const s = sessionStorage.getItem('qualiopi_crit'); return s ? JSON.parse(s) : JSON.parse(JSON.stringify(CRITERES)); } catch { return JSON.parse(JSON.stringify(CRITERES)); }
   });
+  const [docStyle, setDocStyle] = useState<DocStyleConfig>(() => {
+    try { const s = sessionStorage.getItem('qualiopi_style'); return s ? JSON.parse(s) : DEFAULT_DOC_STYLE; } catch { return DEFAULT_DOC_STYLE; }
+  });
 
   // Collapsible sections
   const [openSections, setOpenSections] = useState<Set<string>>(new Set());
@@ -66,10 +70,16 @@ const ControleEY = () => {
     sessionStorage.setItem('qualiopi_stag', JSON.stringify(data));
   }, []);
 
+  const handleStyleChange = useCallback((style: DocStyleConfig) => {
+    setDocStyle(style);
+    sessionStorage.setItem('qualiopi_style', JSON.stringify(style));
+  }, []);
+
   const sections = [
     { key: "organisme", label: "Organisme", icon: <Building2 className="w-4 h-4" />, filled: !!organisme.nom },
     { key: "formation", label: "Formation", icon: <GraduationCap className="w-4 h-4" />, filled: !!formation.intitule },
     { key: "stagiaires", label: "Stagiaires", icon: <Users className="w-4 h-4" />, count: stagiaires.length },
+    { key: "design", label: "Design des documents", icon: <Palette className="w-4 h-4" /> },
   ];
 
   return (
@@ -128,13 +138,14 @@ const ControleEY = () => {
                   />
                 )}
                 {key === "stagiaires" && <StagiairesForm data={stagiaires} onChange={handleStagChange} />}
+                {key === "design" && <DocStyleConfigPanel style={docStyle} onChange={handleStyleChange} />}
               </div>
             )}
           </div>
         ))}
 
         {/* Checklist */}
-        <ControleEDOF organisme={organisme} formation={formation} stagiaires={stagiaires} criteres={criteres} />
+        <ControleEDOF organisme={organisme} formation={formation} stagiaires={stagiaires} criteres={criteres} docStyle={docStyle} />
       </main>
     </div>
   );
