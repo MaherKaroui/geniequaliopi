@@ -538,7 +538,7 @@ function resolveSignature(label: string, nom: string, urls: SignatureUrls): stri
   return tamponImg(urls.tamponUrl);
 }
 
-export function signatureBlock3(org: OrganismeInfo, stagiaireNom?: string, formateurNom?: string, stagiaireSignatureUrl?: string, formateurSignatureUrl?: string, responsableEntrepriseSignatureUrl?: string): string {
+export function signatureBlock3(org: OrganismeInfo, stagiaireNom?: string, formateurNom?: string, stagiaireSignatureUrl?: string, formateurSignatureUrl?: string, responsableEntrepriseSignatureUrl?: string, dates?: string[]): string {
   const urls: SignatureUrls = {
     dirigeantSignatureUrl: org.signatureUrl,
     tamponUrl: org.tamponUrl,
@@ -546,13 +546,17 @@ export function signatureBlock3(org: OrganismeInfo, stagiaireNom?: string, forma
     formateurSignatureUrl,
     responsableEntrepriseSignatureUrl,
   };
+  const fallbackDate = new Date().toLocaleDateString("fr-FR");
+  const d1 = dates?.[0] || fallbackDate;
+  const d2 = dates?.[1] || d1;
+  const d3 = dates?.[2] || d1;
   const stagSigHtml = resolveSignature("Le/La Stagiaire", stagiaireNom || "", urls);
   const fmtSigHtml = resolveSignature("Le/La Formateur(trice)", formateurNom || "", urls);
   const respSigHtml = resolveSignature("Le Responsable", org.dirigeant, urls);
   return `<div class="signature-block">
-    <div class="sig-box"><p class="sig-label">Le/La Stagiaire</p><p>Nom : ${stagiaireNom || "________________________"}</p><p>Date : ________________________</p><p style="margin-top:20px">Signature :</p>${stagSigHtml}</div>
-    <div class="sig-box"><p class="sig-label">Le/La Formateur(trice)</p><p>Nom : ${formateurNom || "________________________"}</p><p>Date : ________________________</p><p style="margin-top:20px">Signature :</p>${fmtSigHtml}</div>
-    <div class="sig-box"><p class="sig-label">Le Responsable</p><p>Nom : ${org.dirigeant}</p><p>Date : ________________________</p><p style="margin-top:20px">Signature :</p>${respSigHtml}</div>
+    <div class="sig-box"><p class="sig-label">Le/La Stagiaire</p><p>Nom : ${stagiaireNom || "________________________"}</p><p>Date : ${d1}</p><p style="margin-top:20px">Signature :</p>${stagSigHtml}</div>
+    <div class="sig-box"><p class="sig-label">Le/La Formateur(trice)</p><p>Nom : ${formateurNom || "________________________"}</p><p>Date : ${d2}</p><p style="margin-top:20px">Signature :</p>${fmtSigHtml}</div>
+    <div class="sig-box"><p class="sig-label">Le Responsable</p><p>Nom : ${org.dirigeant}</p><p>Date : ${d3}</p><p style="margin-top:20px">Signature :</p>${respSigHtml}</div>
   </div>`;
 }
 
