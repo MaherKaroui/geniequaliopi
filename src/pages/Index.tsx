@@ -40,6 +40,25 @@ const emptyFormation: FormationInfo = {
 const Index = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  const [airtableLoading, setAirtableLoading] = useState(false);
+
+  const syncToAirtable = async () => {
+    setAirtableLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('airtable-sync', {
+        body: { organisme, formation, stagiaires },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      toast.success("Données synchronisées vers Airtable !");
+    } catch (err: any) {
+      console.error('Airtable sync error:', err);
+      toast.error("Erreur Airtable : " + (err.message || 'Erreur inconnue'));
+    } finally {
+      setAirtableLoading(false);
+    }
+  };
+  const navigate = useNavigate();
 
   const [currentStep, setCurrentStep] = useState(() => {
     const saved = sessionStorage.getItem('qualiopi_step');
