@@ -46,6 +46,13 @@ export default function ControleEDOF({ organisme, formation, stagiaires }: Contr
   const [progressText, setProgressText] = useState("");
   const fileInputRefs = useRef<Map<string, HTMLInputElement>>(new Map());
 
+  // Preview state
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewHtml, setPreviewHtml] = useState("");
+  const [previewTitle, setPreviewTitle] = useState("");
+  const [previewLoading, setPreviewLoading] = useState(false);
+  const [previewDoc, setPreviewDoc] = useState<EYDocumentItem | null>(null);
+
   const orgName = organisme.nom || "Organisme";
 
   const stats = useMemo(() => {
