@@ -4359,7 +4359,7 @@ function genVAERapportConnexion(o: OrganismeInfo, f: FormationInfo, stagiaires: 
   extra += `<p><strong>Nombre total de séances :</strong> 10<br><strong>Durée totale de connexion :</strong> ${totalH}h${String(totalM).padStart(2,'0')}min<br><strong>Durée prévue au contrat :</strong> 24h00<br><strong>Taux de présence :</strong> 100%<br><strong>Incidents techniques :</strong> Aucun<br><strong>Conclusion :</strong> Le candidat a suivi l'intégralité de l'accompagnement VAE à distance avec une connexion régulière et sans interruption.</p>`;
 
   return buildDocument({ org: o, title: "RAPPORT DE CONNEXION LMS – ACCOMPAGNEMENT VAE", subtitle: `${s.prenom} ${s.nom}`, extraHtml: extra,
-    signatures: { type: "2", labels: ["L'Accompagnateur VAE", "Le Candidat"], names: [o.responsablePedagogique, s.prenom + " " + s.nom] }
+    signatures: { type: "2", labels: ["L'Accompagnateur VAE (Formateur)", "Le Candidat"], names: [o.responsablePedagogique, s.prenom + " " + s.nom], stagiaireSignatureUrl: s.signatureUrl, formateurSignatureUrl: s.formateurSignatureUrl || f.formateurSignatureUrl, dates: [formatDate(dateFin), formatDate(dateFin)] }
   });
 }
 
