@@ -61,7 +61,7 @@ export default function ControleEDOF({ organisme, formation, stagiaires }: Contr
   const toggleCategory = (cat: EYCategory) => {
     setExpandedCats(prev => {
       const next = new Set(prev);
-      next.has(cat) ? next.delete(cat) : next.add(cat);
+      if (next.has(cat)) next.delete(cat); else next.add(cat);
       return next;
     });
   };
