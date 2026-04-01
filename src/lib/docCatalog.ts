@@ -564,6 +564,13 @@ export function buildFullCatalog(
     add("cfa_c3i14_webinaire_formation_competences", "CT3 - IND 14 WEBINAIRE FORMATION ET DÉVELOPPEMENT DES COMPÉTENCES", 3, 14, "webinaire_formation_competences_cfa");
     add("cfa_c3i14_webinaire_ntc", "CT3 - IND 14 WEBINAIRE TECHNIQUES ET OUTILS DU NTC", 3, 14, "webinaire_ntc_cfa");
 
+    // ===== IND 14 — DOSSIER PERMIS B =====
+    add("cfa_c3i14_permisb_aide_financement", "CT3 - IND 14 📁 PERMIS B – Aide au Financement Permis B", 3, 14, "pdf_static", { pdfUrl: "/pdfs/aide_financement_permis_b.pdf" });
+    add("cfa_c3i14_permisb_bordereau_transmission", "CT3 - IND 14 📁 PERMIS B – Bordereau de Transmission", 3, 14, "pdf_static", { pdfUrl: "/pdfs/bordereau_transmission_permis_b.pdf" });
+    add("cfa_c3i14_permisb_formulaire_aide", "CT3 - IND 14 📁 PERMIS B – Formulaire Aide au Financement", 3, 14, "pdf_static", { pdfUrl: "/pdfs/formulaire_aide_financement_permis_b.pdf" });
+    add("cfa_c3i14_permisb_permis", "CT3 - IND 14 📁 PERMIS B – Permis B", 3, 14, "pdf_static", { pdfUrl: "/pdfs/permis_b.pdf" });
+    add("cfa_c3i14_notice_aide_financiere_idf", "CT3 - IND 14 📁 NOTICE – Aide Financière Apprenti Île-de-France", 3, 14, "pdf_static", { pdfUrl: "/pdfs/notice_aide_financiere_apprenti_idf.pdf" });
+
     // ===== IND 14 — DOSSIER CITOYENNETÉ (Vie Publique) =====
     add("cfa_c3i14_cit_chaque_citoyen_a_t_il_droit_au_respect_d", "CT3 - IND 14 📁 CITOYENNETÉ – Droits & Libertés – Chaque citoyen a t il droit au respect de sa vie privée", 3, 14, "pdf_static", { pdfUrl: "/pdfs/citoyennete/chaque_citoyen_a_t_il_droit_au_respect_de_sa_vie_privee.pdf" });
     add("cfa_c3i14_cit_comment_sont_proteges_les_droits_des_cit", "CT3 - IND 14 📁 CITOYENNETÉ – Droits & Libertés – Comment sont protégés les droits des citoyens", 3, 14, "pdf_static", { pdfUrl: "/pdfs/citoyennete/comment_sont_proteges_les_droits_des_citoyens.pdf" });
