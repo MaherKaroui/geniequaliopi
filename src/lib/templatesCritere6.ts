@@ -806,6 +806,53 @@ function veilleMetierRows(f: FormationInfo, type: FormationType): string[][] {
     ];
   }
 
+  if (type === "ecsr") {
+    return [
+      [
+        `<a href="https://www.securite-routiere.gouv.fr/">securite-routiere.gouv.fr</a>`,
+        "Délégation à la Sécurité Routière – Statistiques et prévention",
+        veilleMonthYear(f, 8),
+        "Données officielles sur l'accidentalité routière, les comportements à risque et les campagnes de prévention. Référence pour les modules de sensibilisation.",
+        "Preuve : rapport annuel accidentalité. Action : actualiser les données statistiques dans le module sécurité routière (CCP2)."
+      ],
+      [
+        `<a href="https://www.inserr.fr/">INSERR – Institut National de Sécurité Routière</a>`,
+        "INSERR – Formation et recherche en sécurité routière",
+        veilleMonthYear(f, 7),
+        "Institut de référence pour la formation des professionnels de la conduite. Programmes de perfectionnement, recherches sur la pédagogie de la conduite.",
+        "Action Qualiopi : aligner les pratiques pédagogiques sur les recommandations INSERR."
+      ],
+      [
+        `<a href="https://www.preventionroutiere.asso.fr/">Prévention Routière</a>`,
+        "Association Prévention Routière – Ressources pédagogiques",
+        veilleMonthYear(f, 6),
+        "Supports pédagogiques pour la sensibilisation à la sécurité routière : simulateurs, vidéos, quiz interactifs, interventions en entreprise.",
+        "Preuve : ressources téléchargées. Action : enrichir le module animation de sensibilisation (CCP2) avec les supports officiels."
+      ],
+      [
+        `<a href="https://www.youtube.com/watch?v=LpT0v5YzYAA">YouTube – Pédagogie de la conduite</a>`,
+        "Techniques pédagogiques pour l'enseignement de la conduite",
+        veilleYear(f, 5),
+        "Vidéo sur les approches pédagogiques modernes : apprentissage progressif, gestion du stress, pédagogie par objectifs.",
+        "Preuve : fiche synthèse vidéo. Action : intégrer dans le module pédagogie de la formation initiale (CCP1)."
+      ],
+      [
+        `<a href="https://www.france-num.gouv.fr/guides-et-conseils/strategie-numerique">France Num – Numérique auto-école</a>`,
+        "France Num – Digitalisation des auto-écoles",
+        veilleMonthYear(f, 4),
+        "Guide sur la transformation numérique des auto-écoles : simulateurs, e-learning code, plateformes de réservation de créneaux.",
+        "Preuve : guide France Num. Action : intégrer les outils numériques dans l'enseignement de la conduite."
+      ],
+      [
+        `<a href="https://www.cnpa.fr/">CNPA – Conseil National des Professions de l'Automobile</a>`,
+        "CNPA – Actualités du secteur automobile et auto-écoles",
+        veilleMonthYear(f, 3),
+        "Organisation professionnelle représentant les écoles de conduite. Veille sur les évolutions réglementaires, la convention collective et les enjeux du secteur.",
+        "Preuve : newsletter + captures. Action Qualiopi : veille sectorielle sur les évolutions du métier d'enseignant de la conduite."
+      ],
+    ];
+  }
+
   // Default: word/bureautique
   return [
     [
