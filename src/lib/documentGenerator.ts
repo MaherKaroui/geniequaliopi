@@ -4298,7 +4298,7 @@ function genVAETempsConnexion(o: OrganismeInfo, f: FormationInfo, stagiaires: St
   extra += `<p style="margin-top:10px"><strong>Durée totale de connexion : ${totalH}h${String(totalM).padStart(2, '0')}min</strong><br><strong>Durée prévue : 24h00</strong><br><strong>Taux de présence : 100%</strong></p>`;
 
   return buildDocument({ org: o, title: "TEMPS DE CONNEXION – ACCOMPAGNEMENT VAE", subtitle: `${s.prenom} ${s.nom}`, extraHtml: extra,
-    signatures: { type: "2", labels: ["L'Accompagnateur VAE", "Le Candidat"], names: [o.responsablePedagogique, s.prenom + " " + s.nom] }
+    signatures: { type: "2", labels: ["L'Accompagnateur VAE (Formateur)", "Le Candidat"], names: [o.responsablePedagogique, s.prenom + " " + s.nom], stagiaireSignatureUrl: s.signatureUrl, formateurSignatureUrl: s.formateurSignatureUrl || f.formateurSignatureUrl, dates: [formatDate(dateFin), formatDate(dateFin)] }
   });
 }
 
