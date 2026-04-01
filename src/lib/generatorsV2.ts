@@ -252,10 +252,11 @@ export function genContratFormationPro_V2(o: OrganismeInfo, f: FormationInfo, st
       <p>Le présent contrat prend effet à la date de sa signature par les deux parties.</p>
       <p><strong>Fait à ${o.ville}, le :</strong> ${formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || new Date().toISOString(), 14))}</p>
     `;
+    const sigDate2 = formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || new Date().toISOString(), 14));
     extra += sigBlock(
       `Pour l'Organisme de formation<br>${o.nom}`, o.dirigeant, orgSig(o),
       `Le Stagiaire`, `${s.prenom} ${s.nom}`, stagSig(s),
-      'Précédée de la mention « Lu et approuvé »'
+      'Précédée de la mention « Lu et approuvé »', sigDate2, sigDate2
     );
   });
   return buildDocument({ org: o, title: "CONTRAT DE FORMATION PROFESSIONNELLE", extraHtml: extra });
