@@ -493,7 +493,8 @@ const ECSR_CONTENT: FormationEvalContent = {
 
 EVAL_CONTENT["ECSR"] = ECSR_CONTENT;
 
-
+// Map formation intitulé to content key
+function getContentKey(intitule: string): string {
   const lower = intitule.toLowerCase();
   if (lower.includes("ecsr") || lower.includes("enseignant de la conduite") || lower.includes("sécurité routière")) return "ECSR";
   if (lower.includes("excel")) return "Excel Professionnel";
