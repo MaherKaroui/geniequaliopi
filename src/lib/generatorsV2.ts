@@ -27,18 +27,11 @@ function orgSig(o: OrganismeInfo): string {
 }
 
 function dirigeantSig(o: OrganismeInfo): string {
-  // Dirigeant = signature du dirigeant + tampon
-  let h = '';
-  if (o.signatureUrl) {
-    h += `<img src="${o.signatureUrl}" alt="Signature dirigeant" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />`;
-  }
+  // Dirigeant = tampon seulement (pas de signature personnelle)
   if (o.tamponUrl) {
-    h += `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />`;
+    return `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />`;
   }
-  if (!o.signatureUrl && !o.tamponUrl) {
-    h += `<p style="font-style:italic;color:#999;margin-top:10px">Signé par ${o.dirigeant}</p>`;
-  }
-  return h;
+  return `<p style="font-style:italic;color:#999;margin-top:10px">Cachet de ${o.nom}</p>`;
 }
 
 function formateurSigGen(f: FormationInfo, s?: StagiaireInfo): string {
