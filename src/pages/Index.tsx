@@ -42,15 +42,38 @@ const Index = () => {
   const navigate = useNavigate();
   const [airtableLoading, setAirtableLoading] = useState(false);
 
+  const getAirtableErrorMessage = (payload: any) => {
+    if (!payload) return "Erreur Airtable inconnue";
+    if (typeof payload.error === "string" && payload.error.trim()) return payload.error;
+
+    const messages = Object.entries(payload.results ?? {}).flatMap(([key, value]) => {
+      if (!value || typeof value !== "object") return [];
+      if (!("error" in value) || !value.error) return [];
+      return [`${key}: ${typeof value.error === "string" ? value.error : JSON.stringify(value.error)}`];
+    });
+
+    return messages.length > 0 ? messages.join(" | ") : "Erreur Airtable inconnue";
+  };
+
   const syncToAirtable = async () => {
     setAirtableLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke('airtable-sync', {
         body: { organisme, formation, stagiaires },
       });
+
       if (error) throw error;
-      if (data?.error) throw new Error(data.error);
-      toast.success("Données synchronisées vers Airtable !");
+      if (!data?.success) throw new Error(getAirtableErrorMessage(data));
+
+      const createdTables = Array.isArray(data?.results?.tablesCreated)
+        ? data.results.tablesCreated.join(', ')
+        : '';
+
+      toast.success(
+        createdTables
+          ? `Données synchronisées. Tables créées : ${createdTables}`
+          : "Données synchronisées vers Airtable !"
+      );
     } catch (err: any) {
       console.error('Airtable sync error:', err);
       toast.error("Erreur Airtable : " + (err.message || 'Erreur inconnue'));
