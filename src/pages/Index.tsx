@@ -9,7 +9,8 @@ import CriteresForm from "@/components/CriteresForm";
 import DocumentGenerator from "@/components/DocumentGenerator";
 import DossierHistory from "@/components/DossierHistory";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, LogIn, LogOut, User } from "lucide-react";
+import { ChevronLeft, ChevronRight, LogIn, LogOut, User, FileSpreadsheet } from "lucide-react";
+import { exportFormDataToExcel } from "@/lib/exportFormData";
 import { useAuth } from "@/hooks/useAuth";
 
 const STEPS = [
@@ -140,6 +141,9 @@ const Index = () => {
                 <LogIn className="w-4 h-4" /> Connexion
               </Button>
             )}
+            <Button variant="outline" size="sm" onClick={() => exportFormDataToExcel(organisme, formation, stagiaires)} className="gap-1">
+              <FileSpreadsheet className="w-4 h-4" /> Export Excel
+            </Button>
             <Button variant="ghost" size="sm" onClick={() => updateStarted(false)}>Accueil</Button>
           </div>
         </div>
