@@ -141,6 +141,9 @@ const Index = () => {
                 <LogIn className="w-4 h-4" /> Connexion
               </Button>
             )}
+            <Button variant="outline" size="sm" onClick={() => exportFormDataToExcel(organisme, formation, stagiaires)} className="gap-1">
+              <FileSpreadsheet className="w-4 h-4" /> Export Excel
+            </Button>
             <Button variant="ghost" size="sm" onClick={() => updateStarted(false)}>Accueil</Button>
           </div>
         </div>
