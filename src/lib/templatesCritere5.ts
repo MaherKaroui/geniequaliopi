@@ -194,28 +194,73 @@ export function genPlanDevCompetencesExcel(o: OrganismeInfo, f: FormationInfo, f
   html += `<tr><th colspan="9" style="background:#e8870e;text-align:left;padding:10px">FORMATIONS PRÉVUES – ${nextYear}</th></tr>`;
 
   const t = (f.intitule || "").toLowerCase();
-  const isMassage = t.includes("massage") || t.includes("prénatal") || t.includes("prenatal");
-  const isEsth = t.includes("esthétique") || t.includes("cosmétique");
+  const code = (f.codeRNCP || "").toLowerCase();
+  const isECSR = t.includes("conduite") || t.includes("ecsr") || t.includes("enseignant de la conduite") || code.includes("35329");
+  const isMassage = !isECSR && (t.includes("massage") || t.includes("prénatal") || t.includes("prenatal"));
+  const isEsth = !isECSR && (t.includes("esthétique") || t.includes("cosmétique") || t.includes("beauté") || t.includes("parfumerie"));
   const isAnglaisA1 = (t.includes("anglais") && (t.includes("a1") || t.includes("débutant") || t.includes("debutant")));
-  const isAnglais = !isAnglaisA1 && (t.includes("anglais") || t.includes("toeic"));
-  const isIA = t.includes("intelligence artificielle") || t.includes(" ia ");
-  const isCRM = t.includes("crm") || t.includes("hubspot");
+  const isAnglais = !isAnglaisA1 && (t.includes("anglais") || t.includes("toeic") || t.includes("vtest") || t.includes("v-test") || t.includes("rs6905"));
+  const isIA = t.includes("intelligence artificielle") || t.includes(" ia ") || t.includes("chatgpt") || t.includes("prompt");
+  const isCRM = t.includes("crm") || t.includes("hubspot") || t.includes("automation");
   const isNTC = t.includes("négociateur") || t.includes("technico-commercial");
+  const isCommercial = !isNTC && (t.includes("commercial") || t.includes("vente") || t.includes("prospection") || t.includes("relation client"));
   const isSAMA = t.includes("secrétaire assistant") || t.includes("médico");
-  const isWebmark = t.includes("webmarketing") || t.includes("marketing de contenus") || t.includes("réseaux sociaux");
+  const isWebmark = t.includes("webmarketing") || t.includes("marketing de contenus") || t.includes("réseaux sociaux") || t.includes("marketing digital");
   const isFLE = t.includes("français") || t.includes("fle");
+  const isManagement = t.includes("management") || t.includes("encadrement") || t.includes("leadership") || t.includes("manager");
   const isWord = t.includes("word");
 
   const futureTrainings: Array<{ origine: string; nom: string; objectif: string; type: string; formateur: string; nb: string; noms: string; duree: string }> = [];
 
-  if (isAnglaisA1) {
+  if (isECSR) {
+    futureTrainings.push(
+      { origine: "Montée en compétences pédagogiques conduite", nom: "Perfectionnement à la pédagogie de la conduite et de la sécurité routière", objectif: "Approfondir les techniques pédagogiques d'enseignement de la conduite : gestion du stress, conduite commentée, éco-conduite et conduite en conditions difficiles", type: "Externe", formateur: "INSERR – Institut National de Sécurité Routière", nb: "1", noms: formateurName, duree: "3 jours" },
+      { origine: "Veille réglementaire sécurité routière", nom: "Évolutions réglementaires du Code de la route et du permis de conduire", objectif: "Maîtriser les dernières modifications du Code de la route, les nouvelles sanctions et les évolutions du permis (permis numérique, réforme 2024)", type: "Externe", formateur: "Sécurité Routière – Formation continue", nb: "1", noms: formateurName, duree: "1 jour" },
+      { origine: "Obligation qualité et préparation audit", nom: "Audit Qualiopi – Préparation et maintien de la certification RNQ V9", objectif: "Préparer l'audit de surveillance et mettre en place un plan d'amélioration continue", type: "Externe", formateur: "Afnor Compétences", nb: "1", noms: formateurName, duree: "1 jour" },
+      { origine: "Innovation pédagogique conduite", nom: "Simulateurs de conduite et outils numériques pour la formation ECSR", objectif: "Maîtriser l'utilisation des simulateurs de conduite, des applications e-learning et des outils de suivi pédagogique numérique", type: "Externe", formateur: "Codes Rousseau – Formation continue", nb: "1", noms: formateurName, duree: "2 jours" },
+    );
+  } else if (isAnglaisA1) {
     futureTrainings.push(
       { origine: "Montée en compétences du formateur en anglais débutant", nom: "Enseigner l'anglais aux grands débutants – Approches ludiques et CECRL A1", objectif: "Maîtriser les techniques d'enseignement pour un public débutant : supports visuels, répétition espacée, phonétique de base et mise en confiance", type: "Externe", formateur: "British Council – Teacher Development", nb: "1", noms: formateurName, duree: "2 jours" },
       { origine: "Veille pédagogique langues étrangères", nom: "Nouveaux outils numériques pour l'apprentissage des langues – Niveau débutant", objectif: "Découvrir et intégrer les applications adaptées au niveau A1 (Duolingo, Busuu, Memrise) et les plateformes d'exercices interactifs", type: "Externe", formateur: "Digiformag – Groupe Abilways", nb: "1", noms: formateurName, duree: "1 jour" },
       { origine: "Obligation qualité et préparation audit", nom: "Audit Qualiopi – Préparation et maintien de la certification RNQ V9", objectif: "Préparer l'audit de surveillance et mettre en place un plan d'amélioration continue", type: "Externe", formateur: "Afnor Compétences", nb: "1", noms: formateurName, duree: "1 jour" },
       { origine: "Innovation pédagogique inclusive", nom: "Phonétique anglaise et prononciation pour francophones débutants", objectif: "Maîtriser l'alphabet phonétique international (IPA) appliqué à l'anglais, les paires minimales et les exercices de discrimination auditive pour le niveau A1", type: "Externe", formateur: "Alliance Française – Formation de formateurs en langues", nb: "1", noms: formateurName, duree: "2 jours" },
     );
+  } else if (isAnglais) {
+    futureTrainings.push(
+      { origine: "Montée en compétences du formateur en anglais professionnel", nom: "Business English avancé – Préparation aux certifications (TOEIC, VTest, Linguaskill)", objectif: "Maîtriser les méthodologies de préparation aux certifications d'anglais professionnel et les techniques d'évaluation des 4 compétences (listening, reading, writing, speaking)", type: "Externe", formateur: "British Council – Teacher Development", nb: "1", noms: formateurName, duree: "3 jours" },
+      { origine: "Veille pédagogique langues étrangères", nom: "Outils numériques et IA pour l'enseignement des langues", objectif: "Intégrer les plateformes adaptatives (Babbel, Busuu), les chatbots conversationnels et les outils de speech-to-text dans l'enseignement de l'anglais", type: "Externe", formateur: "Digiformag – Groupe Abilways", nb: "1", noms: formateurName, duree: "2 jours" },
+      { origine: "Obligation qualité et préparation audit", nom: "Audit Qualiopi – Préparation et maintien de la certification RNQ V9", objectif: "Préparer l'audit de surveillance et mettre en place un plan d'amélioration continue", type: "Externe", formateur: "Afnor Compétences", nb: "1", noms: formateurName, duree: "1 jour" },
+      { origine: "Innovation pédagogique", nom: "Gamification et apprentissage immersif de l'anglais", objectif: "Créer des scénarios d'apprentissage immersifs : jeux de rôle professionnels, simulations de réunions, négociations en anglais", type: "Externe", formateur: "Cambridge English – Formation de formateurs", nb: "1", noms: formateurName, duree: "2 jours" },
+    );
   } else if (isMassage) {
+    futureTrainings.push(
+      { origine: "Montée en compétences massage et bien-être", nom: "Aromathérapie et huiles essentielles pour la grossesse et le post-partum", objectif: "Maîtriser les huiles essentielles compatibles avec la grossesse, les protocoles d'application et les contre-indications spécifiques", type: "Externe", formateur: "FFMBE – Fédération Française de Massage Bien-Être", nb: "1", noms: formateurName, duree: "2 jours" },
+      { origine: "Veille métier bien-être prénatal", nom: "Accompagnement périnatal et nouvelles pratiques de relaxation", objectif: "Découvrir les évolutions des pratiques de bien-être maternel : sophrologie prénatale, hypnose, réflexologie plantaire adaptée", type: "Externe", formateur: "Institut de Formation en Périnatalité", nb: "1", noms: formateurName, duree: "2 jours" },
+      { origine: "Obligation qualité et préparation audit", nom: "Audit Qualiopi – Préparation et maintien de la certification RNQ V9", objectif: "Préparer l'audit de surveillance et mettre en place un plan d'amélioration continue", type: "Externe", formateur: "Afnor Compétences", nb: "1", noms: formateurName, duree: "1 jour" },
+      { origine: "Innovation pédagogique", nom: "Anatomie palpatoire et physiologie de la grossesse – Approfondissement", objectif: "Approfondir les connaissances en anatomie du bassin, physiologie des fascias et adaptations corporelles pendant la grossesse", type: "Externe", formateur: "École de massage reconnue", nb: "1", noms: formateurName, duree: "3 jours" },
+    );
+  } else if (isEsth) {
+    futureTrainings.push(
+      { origine: "Montée en compétences esthétique", nom: "Techniques avancées en soins du visage et cosmétologie", objectif: "Maîtriser les dernières techniques de soins esthétiques : micro-needling, LED-thérapie, cosmétiques bio et personnalisés", type: "Externe", formateur: "École Internationale d'Esthétique", nb: "1", noms: formateurName, duree: "3 jours" },
+      { origine: "Veille réglementaire cosmétiques", nom: "Réglementation cosmétique européenne et normes d'hygiène en institut", objectif: "Maîtriser le règlement CE 1223/2009, les obligations d'étiquetage, la traçabilité des produits et les protocoles d'hygiène", type: "Externe", formateur: "FEBEA – Fédération des Entreprises de la Beauté", nb: "1", noms: formateurName, duree: "1 jour" },
+      { origine: "Obligation qualité et préparation audit", nom: "Audit Qualiopi – Préparation et maintien de la certification RNQ V9", objectif: "Préparer l'audit de surveillance et mettre en place un plan d'amélioration continue", type: "Externe", formateur: "Afnor Compétences", nb: "1", noms: formateurName, duree: "1 jour" },
+      { origine: "Innovation numérique beauté", nom: "Digitalisation du secteur beauté et réseaux sociaux pour esthéticiennes", objectif: "Maîtriser Instagram, TikTok et les outils de prise de rendez-vous en ligne pour développer son activité", type: "Externe", formateur: "Digiformag – Groupe Abilways", nb: "1", noms: formateurName, duree: "2 jours" },
+    );
+  } else if (isManagement) {
+    futureTrainings.push(
+      { origine: "Montée en compétences managériales", nom: "Leadership et management d'équipe – Approches contemporaines", objectif: "Maîtriser le management situationnel, la gestion des conflits, le feedback constructif et le management hybride (présentiel/distanciel)", type: "Externe", formateur: "Groupe Cegos – Parcours Management", nb: "1", noms: formateurName, duree: "3 jours" },
+      { origine: "Veille RH et management", nom: "Qualité de Vie et Conditions de Travail (QVCT) – Enjeux managériaux", objectif: "Comprendre les obligations légales QVCT, les outils de prévention des RPS et le rôle du manager dans le bien-être au travail", type: "Externe", formateur: "ANACT – Agence nationale pour l'amélioration des conditions de travail", nb: "1", noms: formateurName, duree: "2 jours" },
+      { origine: "Obligation qualité et préparation audit", nom: "Audit Qualiopi – Préparation et maintien de la certification RNQ V9", objectif: "Préparer l'audit de surveillance et mettre en place un plan d'amélioration continue", type: "Externe", formateur: "Afnor Compétences", nb: "1", noms: formateurName, duree: "1 jour" },
+      { origine: "Innovation pédagogique", nom: "Coaching et accompagnement managérial – Outils et postures", objectif: "Acquérir les techniques de coaching pour accompagner les collaborateurs : écoute active, questionnement puissant, co-développement", type: "Externe", formateur: "Cnam – Conservatoire National des Arts et Métiers", nb: "1", noms: formateurName, duree: "2 jours" },
+    );
+  } else if (isCommercial) {
+    futureTrainings.push(
+      { origine: "Montée en compétences commerciales", nom: "Techniques de vente et négociation commerciale avancée", objectif: "Maîtriser les techniques de vente consultative, la gestion des objections, le closing et la fidélisation client", type: "Externe", formateur: "Halifax Consulting", nb: "1", noms: formateurName, duree: "3 jours" },
+      { origine: "Veille commerciale et digitale", nom: "Social Selling et prospection digitale B2B", objectif: "Maîtriser LinkedIn Sales Navigator, l'inbound marketing et les outils de prospection automatisée (CRM, séquences email)", type: "Externe", formateur: "Groupe Cegos", nb: "1", noms: formateurName, duree: "2 jours" },
+      { origine: "Obligation qualité et préparation audit", nom: "Audit Qualiopi – Préparation et maintien de la certification RNQ V9", objectif: "Préparer l'audit de surveillance et mettre en place un plan d'amélioration continue", type: "Externe", formateur: "Afnor Compétences", nb: "1", noms: formateurName, duree: "1 jour" },
+      { origine: "Innovation pédagogique", nom: "Concevoir et animer des formations pour adultes (andragogie)", objectif: "Renforcer les techniques d'animation, de gestion de groupe et de scénarisation pédagogique", type: "Externe", formateur: "Cnam – Conservatoire National des Arts et Métiers", nb: "1", noms: formateurName, duree: "3 jours" },
+    );
   } else if (isIA) {
     futureTrainings.push(
       { origine: "Montée en compétences IA avancée", nom: "IA Générative avancée – Prompt engineering et fine-tuning", objectif: "Maîtriser les techniques avancées de prompt engineering, le fine-tuning de modèles et les RAG (Retrieval-Augmented Generation)", type: "Externe", formateur: "OpenClassrooms – Parcours IA", nb: "1", noms: formateurName, duree: "3 jours" },
