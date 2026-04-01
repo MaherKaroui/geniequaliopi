@@ -896,14 +896,16 @@ function genAnalyseBesoins(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
           + `• Temps de debriefing après chaque mise en pratique`,
       };
     }
-    if (lower.includes("anglais") || lower.includes("english") || lower.includes("toeic")) {
+    if (lower.includes("anglais") || lower.includes("english") || lower.includes("toeic") || lower.includes("vtest") || lower.includes("v-test") || lower.includes("rs6905")) {
+      const isVTest = lower.includes("vtest") || lower.includes("v-test") || lower.includes("rs6905");
+      const certName = isVTest ? "VTest Business English – 4 Skills (RS6905)" : "TOEIC";
       return {
         besoins: [
           "Améliorer la compréhension orale en contexte professionnel (réunions, appels téléphoniques)",
           "Développer l'aisance à l'oral pour les présentations et négociations en anglais",
           "Renforcer la rédaction d'emails et de documents professionnels en anglais",
           "Acquérir le vocabulaire technique spécifique au secteur d'activité",
-          "Préparer la certification TOEIC pour valider le niveau atteint",
+          "Préparer la certification " + certName + " pour valider le niveau atteint",
           "Maîtriser les structures grammaticales essentielles pour la communication écrite",
           "Développer les techniques de compréhension écrite de documents techniques",
           "Améliorer la prononciation et la fluidité à l'oral",
@@ -912,7 +914,7 @@ function genAnalyseBesoins(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
         ],
         synthese: `• ${Math.round(stagiaires.length * 0.8)} stagiaires ont besoin d'améliorer leur expression orale professionnelle en anglais<br>`
           + `• ${Math.round(stagiaires.length * 0.7)} stagiaires souhaitent renforcer la rédaction d'emails et documents en anglais<br>`
-          + `• ${Math.round(stagiaires.length * 0.5)} stagiaires visent la certification TOEIC<br>`
+          + `• ${Math.round(stagiaires.length * 0.5)} stagiaires visent la certification ${certName}<br>`
           + `• ${Math.round(stagiaires.length * 0.4)} stagiaires ont besoin de vocabulaire technique sectoriel<br>`
           + `• ${Math.round(stagiaires.length * 0.3)} stagiaires demandent un travail spécifique sur la compréhension orale`,
         adaptations: `• Tests de niveau pour constituer des groupes homogènes<br>`

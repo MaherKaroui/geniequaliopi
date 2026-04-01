@@ -40,7 +40,7 @@ function detectFormationType(f: FormationInfo): FormationType {
   if (title.includes("intelligence artificielle") || title.includes("ia générative") || title.includes("ia ") || title.includes("contenus rédactionnels") || title.includes("chatgpt") || title.includes("prompt")) return "ia";
   if (title.includes("crm") || title.includes("automation") || title.includes("automatisation")) return "crm";
   if (title.includes("webmarketing") || title.includes("marketing de contenus") || title.includes("réseaux sociaux") || title.includes("marketing digital")) return "webmarketing";
-  if (title.includes("anglais") || title.includes("english") || title.includes("toeic")) return "anglais";
+  if (title.includes("anglais") || title.includes("english") || title.includes("toeic") || title.includes("vtest") || title.includes("v-test") || title.includes("rs6905")) return "anglais";
   if (title.includes("commercial") || title.includes("conseiller") || title.includes("négociat") || title.includes("vente") || title.includes("relation client") || title.includes("prospection")) return "commercial";
   return "word";
 }
@@ -253,7 +253,18 @@ function veilleReglementaireRows(f: FormationInfo, type: FormationType): string[
   }
 
   if (type === "anglais") {
+    const isVTest = f.intitule.toLowerCase().includes("vtest") || f.intitule.toLowerCase().includes("v-test") || f.intitule.toLowerCase().includes("rs6905");
+    const vtestReglEntries: string[][] = isVTest ? [
+      [
+        `<a href="https://www.francecompetences.fr/recherche/rs/6905/">France Compétences – RS6905</a>`,
+        "Enregistrement RS6905 – VTest Business English – 4 Skills (ExAssess)",
+        veilleDate(f, 6),
+        "Certification enregistrée au Répertoire Spécifique sous le code RS6905 par ExAssess (Burlington English). Validité : 20/07/2023 au 20/07/2026. Évalue les 4 compétences linguistiques (C1 à C4) du niveau A2 au C2 CECRL.",
+        "Preuve : fiche France Compétences RS6905. Action : vérifier la validité de la certification et adapter le programme aux compétences du référentiel."
+      ],
+    ] : [];
     return [...common,
+      ...vtestReglEntries,
       [
         `<a href="https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000006901294">Légifrance – Art. L.6321-1 Code du travail</a>`,
         "Obligation de formation des salariés – adaptation au poste et compétences linguistiques",
@@ -561,7 +572,30 @@ function veilleMetierRows(f: FormationInfo, type: FormationType): string[][] {
   }
 
   if (type === "anglais") {
-    return [
+    const isVTest = f.intitule.toLowerCase().includes("vtest") || f.intitule.toLowerCase().includes("v-test") || f.intitule.toLowerCase().includes("rs6905");
+    const certEntries: string[][] = isVTest ? [
+      [
+        `<a href="https://www.vtest.com/fr/">vtest.com</a>`,
+        "VTest – Plateforme officielle de certification Business English – 4 Skills",
+        veilleMonthYear(f, 8),
+        "Plateforme officielle de la certification VTest Business English (RS6905). Évaluation adaptative des 4 compétences (Reading, Listening, Writing, Speaking) du niveau A2 au C2 CECRL. Accessible en ligne, instructions en 21 langues, gestion du handicap.",
+        "Preuve : capture de la plateforme + référentiel RS6905. Action Qualiopi : aligner les objectifs pédagogiques sur les 4 compétences évaluées par VTest et préparer les stagiaires au format adaptatif."
+      ],
+      [
+        `<a href="https://www.francecompetences.fr/recherche/rs/6905/">France Compétences – RS6905</a>`,
+        "Fiche RS6905 – VTest Business English – 4 Skills",
+        veilleMonthYear(f, 7),
+        "Fiche officielle de la certification RS6905 sur France Compétences. Certificateur : ExAssess (Burlington English). 4 blocs de compétences : Compréhension orale (C1), Compréhension écrite (C2), Expression orale (C3), Expression écrite (C4). Échéance : 20/07/2026.",
+        "Preuve : fiche France Compétences + capture. Action : vérifier la validité de l'enregistrement et adapter le programme aux compétences du référentiel."
+      ],
+      [
+        `<a href="https://www.cambridgeenglish.org/fr/">Cambridge English – CECRL</a>`,
+        "Cambridge English – Cadre européen et descripteurs de niveaux",
+        veilleMonthYear(f, 6),
+        "Référentiel international pour l'évaluation des compétences en anglais. Niveaux A1 à C2 du CECRL. Les descripteurs servent de base pour les niveaux VTest (A2.1/A2.2, B1.1/B1.2, etc.).",
+        "Action Qualiopi : utiliser les descripteurs Cambridge/CECRL pour définir les objectifs pédagogiques par niveau et les critères d'évaluation VTest."
+      ],
+    ] : [
       [
         `<a href="https://www.britishcouncil.fr/">britishcouncil.fr</a>`,
         "British Council France – Enseignement de l'anglais et certifications",
@@ -583,6 +617,9 @@ function veilleMetierRows(f: FormationInfo, type: FormationType): string[][] {
         "Évolutions du format TOEIC, nouvelles modalités de passage, statistiques de scores par pays. Le TOEIC reste la certification la plus demandée par les employeurs français.",
         "Preuve : site officiel ETS. Action : adapter les modules de préparation aux certifications selon les dernières évolutions."
       ],
+    ];
+    return [
+      ...certEntries,
       [
         `<a href="https://www.youtube.com/watch?v=TpqGIwLz6Yg">YouTube – 50 phrases pour parler anglais au travail</a>`,
         "50 expressions pour l'anglais professionnel",
@@ -970,39 +1007,57 @@ function veilleTechnoRows(f: FormationInfo, type: FormationType): string[][] {
   }
 
   if (type === "anglais") {
+    const isVTest = f.intitule.toLowerCase().includes("vtest") || f.intitule.toLowerCase().includes("v-test") || f.intitule.toLowerCase().includes("rs6905");
+    const vtestTechEntries: string[][] = isVTest ? [
+      [
+        `<a href="https://candidate.vtest.com/">candidate.vtest.com</a>`,
+        "Plateforme candidate VTest – Environnement d'examen en ligne",
+        veilleMonthYear(f, 8),
+        "Plateforme officielle de passage de la certification VTest Business English. Test adaptatif en ligne avec notation automatique (système vocal exclusif pour l'oral). Interface candidat accessible en 21 langues.",
+        "Preuve : capture de l'interface candidate. Action : familiariser les stagiaires avec l'environnement d'examen et les fonctionnalités de la plateforme."
+      ],
+      [
+        `<a href="https://www.vtest.com/fr/la-gestion-du-handicap-chez-vtest/">VTest – Gestion du handicap</a>`,
+        "VTest – Accessibilité et aménagements pour candidats en situation de handicap",
+        veilleMonthYear(f, 7),
+        "Procédures et aménagements VTest pour les candidats ayant des besoins particuliers. Adaptation du format du test selon les besoins identifiés.",
+        "Preuve : page officielle + procédure interne. Action Qualiopi : intégrer les procédures d'aménagement VTest dans le protocole d'accueil des stagiaires en situation de handicap."
+      ],
+    ] : [];
     return [...commonDigitalLearning,
+      ...vtestTechEntries,
       [
         `<a href="https://www.duolingo.com/">Duolingo</a>`,
         "Duolingo – Application d'apprentissage des langues par IA",
-        veilleMonthYear(f, 7),
+        veilleMonthYear(f, isVTest ? 6 : 7),
         "Application leader mondial de l'apprentissage des langues. Utilise l'IA adaptative pour personnaliser les parcours. Référence en gamification pédagogique.",
         "Preuve : captures de l'app + analyse pédagogique. Action : recommander Duolingo comme outil complémentaire d'auto-apprentissage entre les sessions."
       ],
       [
         `<a href="https://www.babbel.com/fr/">Babbel</a>`,
         "Babbel – Plateforme d'apprentissage linguistique professionnel",
-        veilleMonthYear(f, 6),
+        veilleMonthYear(f, isVTest ? 5 : 6),
         "Plateforme d'apprentissage de l'anglais orientée professionnels. Reconnaissance vocale intégrée pour la prononciation. Parcours thématiques (business, voyage, quotidien).",
         "Action : benchmark des plateformes d'e-learning linguistique pour enrichir les recommandations aux stagiaires."
       ],
       [
         `<a href="https://www.learningtechnologiesfrance.com/">learningtechnologiesfrance.com</a>`,
         "Learning Technologies France – EdTech linguistique",
-        veilleYear(f, 5),
+        veilleYear(f, isVTest ? 4 : 5),
         "Salon des technologies de formation : solutions IA pour l'apprentissage des langues, speech-to-text, chatbots conversationnels en anglais.",
         "Preuve : programme + notes de veille. Action Qualiopi : évaluer l'intégration de chatbots IA pour la pratique conversationnelle."
       ],
       [
         `<a href="https://www.youtube.com/watch?v=oxs5sjCmfMU">YouTube – Business English Conversation</a>`,
         "Anglais des affaires – Dialogues et mises en situation",
-        veilleDate(f, 4),
+        veilleDate(f, isVTest ? 3 : 4),
         "Ressource vidéo pour la pratique de l'anglais professionnel : dialogues réalistes, vocabulaire business, exercices de compréhension.",
         "Preuve : fiche synthèse + lien. Action : intégrer comme ressource complémentaire pour les exercices de listening."
       ],
       [
         `<a href="https://www.talenco.com/nos-publications/barometre-formation-professionnelle-tendances-pratiques-2025/">TalenCo – Baromètre</a>`,
         "Baromètre formation professionnelle – langues et numérique",
-        veilleDate(f, 3),
+        veilleDate(f, isVTest ? 2 : 3),
         "Synthèse des tendances : la formation en langues reste dans le top 3 des formations les plus demandées. L'anglais représente 80% des demandes linguistiques.",
         "Preuve : PDF baromètre. Action Qualiopi : justifier la pertinence de l'offre anglais dans le plan de développement."
       ],
