@@ -1,12 +1,13 @@
 import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { OrganismeInfo, FormationInfo, StagiaireInfo, CritereData, CRITERES } from "@/types/qualiopi";
+import { OrganismeInfo, FormationInfo, StagiaireInfo, CritereData, CRITERES, DocStyleConfig, DEFAULT_DOC_STYLE } from "@/types/qualiopi";
 import OrganismeForm from "@/components/OrganismeForm";
 import FormationForm from "@/components/FormationForm";
 import StagiairesForm from "@/components/StagiairesForm";
+import DocStyleConfigPanel from "@/components/DocStyleConfigPanel";
 import ControleEDOF from "@/components/ControleEDOF";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, LogIn, LogOut, ChevronDown, ChevronRight, Building2, GraduationCap, Users } from "lucide-react";
+import { ChevronLeft, LogIn, LogOut, ChevronDown, ChevronRight, Building2, GraduationCap, Users, Palette } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
 const emptyOrganisme: OrganismeInfo = {
