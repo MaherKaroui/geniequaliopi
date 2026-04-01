@@ -3,6 +3,106 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+const META_URL = 'https://api.airtable.com/v0/meta/bases';
+
+interface AirtableField {
+  name: string;
+  type: string;
+}
+
+async function getExistingTables(baseId: string, headers: Record<string, string>): Promise<string[]> {
+  const res = await fetch(`${META_URL}/${baseId}/tables`, { headers });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Failed to list tables: ${res.status} ${err}`);
+  }
+  const data = await res.json();
+  return (data.tables || []).map((t: any) => t.name);
+}
+
+async function createTable(baseId: string, name: string, fields: AirtableField[], headers: Record<string, string>) {
+  const res = await fetch(`${META_URL}/${baseId}/tables`, {
+    method: 'POST',
+    headers: { ...headers, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      name,
+      fields: fields.map(f => ({ name: f.name, type: f.type })),
+    }),
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Failed to create table "${name}": ${res.status} ${err}`);
+  }
+  return await res.json();
+}
+
+const ORGANISME_FIELDS: AirtableField[] = [
+  { name: 'Nom', type: 'singleLineText' },
+  { name: 'SIRET', type: 'singleLineText' },
+  { name: 'Adresse', type: 'singleLineText' },
+  { name: 'Code Postal', type: 'singleLineText' },
+  { name: 'Ville', type: 'singleLineText' },
+  { name: 'Telephone', type: 'singleLineText' },
+  { name: 'Email', type: 'email' },
+  { name: 'Site Web', type: 'url' },
+  { name: 'NDA', type: 'singleLineText' },
+  { name: 'Dirigeant', type: 'singleLineText' },
+  { name: 'Responsable Pedagogique', type: 'singleLineText' },
+  { name: 'Referent Handicap', type: 'singleLineText' },
+  { name: 'Referent Qualite', type: 'singleLineText' },
+  { name: 'Domaines Formation', type: 'multilineText' },
+  { name: 'Types Actions', type: 'singleLineText' },
+  { name: 'Certifications', type: 'multilineText' },
+  { name: 'Outils Utilises', type: 'multilineText' },
+  { name: 'Version', type: 'singleLineText' },
+  { name: 'Date MAJ', type: 'singleLineText' },
+];
+
+const FORMATION_FIELDS: AirtableField[] = [
+  { name: 'Intitule', type: 'singleLineText' },
+  { name: 'Objectifs', type: 'multilineText' },
+  { name: 'Prerequis', type: 'multilineText' },
+  { name: 'Duree', type: 'singleLineText' },
+  { name: 'Modalites', type: 'singleLineText' },
+  { name: 'Tarif', type: 'singleLineText' },
+  { name: 'Programme', type: 'multilineText' },
+  { name: 'Methodes Evaluation', type: 'multilineText' },
+  { name: 'Moyens Pedagogiques', type: 'multilineText' },
+  { name: 'Public Vise', type: 'multilineText' },
+  { name: 'Delai Acces', type: 'singleLineText' },
+  { name: 'Date Debut', type: 'singleLineText' },
+  { name: 'Date Fin', type: 'singleLineText' },
+  { name: 'Lieu', type: 'singleLineText' },
+  { name: 'Nombre Participants', type: 'singleLineText' },
+  { name: 'Formateur', type: 'singleLineText' },
+  { name: 'Code RNCP', type: 'singleLineText' },
+  { name: 'Rythme Alternance', type: 'singleLineText' },
+];
+
+const STAGIAIRES_FIELDS: AirtableField[] = [
+  { name: 'Civilite', type: 'singleLineText' },
+  { name: 'Nom', type: 'singleLineText' },
+  { name: 'Prenom', type: 'singleLineText' },
+  { name: 'Email', type: 'email' },
+  { name: 'Telephone', type: 'singleLineText' },
+  { name: 'Entreprise', type: 'singleLineText' },
+  { name: 'Poste', type: 'singleLineText' },
+  { name: 'Date Naissance', type: 'singleLineText' },
+  { name: 'Date Debut Formation', type: 'singleLineText' },
+  { name: 'Date Fin Formation', type: 'singleLineText' },
+  { name: 'Tarif Formation', type: 'singleLineText' },
+  { name: 'Adresse', type: 'singleLineText' },
+  { name: 'Code Postal', type: 'singleLineText' },
+  { name: 'Commune', type: 'singleLineText' },
+  { name: 'Nationalite', type: 'singleLineText' },
+  { name: 'NIR', type: 'singleLineText' },
+  { name: 'Departement Naissance', type: 'singleLineText' },
+  { name: 'Commune Naissance', type: 'singleLineText' },
+  { name: 'Diplome', type: 'singleLineText' },
+  { name: 'RQTH', type: 'singleLineText' },
+  { name: 'Formateur', type: 'singleLineText' },
+];
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
@@ -23,17 +123,33 @@ Deno.serve(async (req) => {
   }
 
   const BASE_URL = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}`;
-  const headers = {
-    'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
-    'Content-Type': 'application/json',
-  };
+  const authHeaders = { 'Authorization': `Bearer ${AIRTABLE_API_KEY}` };
 
   try {
     const { organisme, formation, stagiaires } = await req.json();
 
-    const results: Record<string, any> = {};
+    // Step 1: Check existing tables and create missing ones
+    const existingTables = await getExistingTables(AIRTABLE_BASE_ID, authHeaders);
+    console.log('Existing tables:', existingTables);
 
-    // 1. Upsert Organisme (single record)
+    const tablesToCreate: [string, AirtableField[]][] = [];
+    if (!existingTables.includes('Organisme')) tablesToCreate.push(['Organisme', ORGANISME_FIELDS]);
+    if (!existingTables.includes('Formation')) tablesToCreate.push(['Formation', FORMATION_FIELDS]);
+    if (!existingTables.includes('Stagiaires')) tablesToCreate.push(['Stagiaires', STAGIAIRES_FIELDS]);
+
+    for (const [name, fields] of tablesToCreate) {
+      console.log(`Creating table: ${name}`);
+      await createTable(AIRTABLE_BASE_ID, name, fields, authHeaders);
+    }
+
+    const results: Record<string, any> = {};
+    if (tablesToCreate.length > 0) {
+      results.tablesCreated = tablesToCreate.map(([n]) => n);
+    }
+
+    // Step 2: Insert data
+    const postHeaders = { ...authHeaders, 'Content-Type': 'application/json' };
+
     if (organisme) {
       const orgFields: Record<string, string> = {
         'Nom': organisme.nom || '',
@@ -59,18 +175,13 @@ Deno.serve(async (req) => {
 
       const orgRes = await fetch(`${BASE_URL}/Organisme`, {
         method: 'POST',
-        headers,
+        headers: postHeaders,
         body: JSON.stringify({ records: [{ fields: orgFields }] }),
       });
       const orgData = await orgRes.json();
-      if (!orgRes.ok) {
-        results.organisme = { error: orgData };
-      } else {
-        results.organisme = { success: true, count: 1 };
-      }
+      results.organisme = orgRes.ok ? { success: true, count: 1 } : { error: orgData };
     }
 
-    // 2. Upsert Formation (single record)
     if (formation) {
       const formFields: Record<string, string> = {
         'Intitule': formation.intitule || '',
@@ -95,18 +206,13 @@ Deno.serve(async (req) => {
 
       const formRes = await fetch(`${BASE_URL}/Formation`, {
         method: 'POST',
-        headers,
+        headers: postHeaders,
         body: JSON.stringify({ records: [{ fields: formFields }] }),
       });
       const formData = await formRes.json();
-      if (!formRes.ok) {
-        results.formation = { error: formData };
-      } else {
-        results.formation = { success: true, count: 1 };
-      }
+      results.formation = formRes.ok ? { success: true, count: 1 } : { error: formData };
     }
 
-    // 3. Upsert Stagiaires (batch, max 10 per request)
     if (stagiaires && stagiaires.length > 0) {
       const stagRecords = stagiaires.map((s: any) => ({
         fields: {
@@ -134,14 +240,13 @@ Deno.serve(async (req) => {
         }
       }));
 
-      // Airtable allows max 10 records per request
       let totalCreated = 0;
       const errors: any[] = [];
       for (let i = 0; i < stagRecords.length; i += 10) {
         const batch = stagRecords.slice(i, i + 10);
         const stagRes = await fetch(`${BASE_URL}/Stagiaires`, {
           method: 'POST',
-          headers,
+          headers: postHeaders,
           body: JSON.stringify({ records: batch }),
         });
         const stagData = await stagRes.json();
