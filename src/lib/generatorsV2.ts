@@ -1326,11 +1326,12 @@ export function genReglementStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
     { heading: `Article ${artNum++} – Entrée en vigueur`, content: `<p>Le présent règlement intérieur entre en vigueur à compter de la date de signature par le stagiaire.</p><p>Il est remis à chaque stagiaire avant le début de la formation.</p>` },
   );
 
-  let sigPages = `<p><strong>Fait à ${o.ville}, le :</strong> ${formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || new Date().toISOString(), 14))}</p>`;
+  const sigDateReg = formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || new Date().toISOString(), 14));
+  let sigPages = `<p><strong>Fait à ${o.ville}, le :</strong> ${sigDateReg}</p>`;
   sigPages += sigBlock(
     `Signature du stagiaire : ${s.prenom} ${s.nom}`, `${s.prenom} ${s.nom}`, stagSig(s),
     `Signature du centre`, o.nom, orgSig(o),
-    'Précédée de la mention « Lu et approuvé »'
+    'Précédée de la mention « Lu et approuvé »', sigDateReg, sigDateReg
   );
 
   return buildDocument({ org: o, title: `RÈGLEMENT INTÉRIEUR – ${s.prenom} ${s.nom}`, subtitle: `Applicable aux stagiaires en formation ${modTxt}`, sections, extraHtml: sigPages });
