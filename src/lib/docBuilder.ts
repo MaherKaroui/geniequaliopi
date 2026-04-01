@@ -570,8 +570,9 @@ export function signatureBlock2(label1: string, nom1: string, label2: string, no
   };
   const sig1Html = resolveSignature(label1, nom1, urls);
   const sig2Html = resolveSignature(label2, nom2, urls);
-  const date1 = dates?.[0] || "________________________";
-  const date2 = dates?.[1] || "________________________";
+  const fallbackDate = new Date().toLocaleDateString("fr-FR");
+  const date1 = dates?.[0] || fallbackDate;
+  const date2 = dates?.[1] || date1;
   return `<div class="signature-block-2">
     <div class="sig-box"><p class="sig-label">${label1}</p><p>Nom : ${nom1}</p><p>Date : ${date1}</p><p style="margin-top:20px">Signature :</p>${sig1Html}</div>
     <div class="sig-box"><p class="sig-label">${label2}</p><p>Nom : ${nom2}</p><p>Date : ${date2}</p><p style="margin-top:20px">Signature :</p>${sig2Html}</div>
