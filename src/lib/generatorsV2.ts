@@ -192,7 +192,7 @@ export function genConvocation_V2(o: OrganismeInfo, f: FormationInfo, stagiaires
        <p><strong>Fait à ${o.ville}, le :</strong> ${formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || new Date().toISOString(), 14))}</p>
       <p><strong>Pour ${o.nom}</strong></p>
       <p>${o.dirigeant}<br>Dirigeant – Formateur</p>
-      ${orgSig(o)}
+      ${dirigeantSig(o)}
     `;
   });
   return buildDocument({ org: o, title: "CONVOCATION À LA FORMATION", extraHtml: extra });
