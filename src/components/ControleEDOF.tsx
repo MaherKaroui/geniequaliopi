@@ -28,7 +28,7 @@ const STATUS_CONFIG: Record<EYDocStatus, { label: string; icon: React.ReactNode;
   not_applicable: { label: "N/A", icon: <XCircle className="w-4 h-4 text-muted-foreground" />, color: "bg-muted text-muted-foreground" },
 };
 
-export default function ControleEDOF({ organisme, formation, stagiaires, criteres }: ControleEDOFProps) {
+export default function ControleEDOF({ organisme, formation, stagiaires }: ControleEDOFProps) {
   const [docStates, setDocStates] = useState<Map<string, EYDocState>>(() => {
     const m = new Map<string, EYDocState>();
     EY_DOCUMENTS.forEach(d => {
