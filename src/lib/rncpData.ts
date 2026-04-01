@@ -680,6 +680,63 @@ export const RNCP_FICHES: RNCPFiche[] = [
     voiesAcces: ["Contrat d'apprentissage", "Formation continue", "Contrat de professionnalisation", "VAE"],
     dureeIndicative: "700 heures (6 à 8 mois)",
   },
+  {
+    code: "RNCP35329",
+    intitule: "TP - Enseignant de la conduite et de la sécurité routière (ECSR)",
+    niveau: "Niveau 5 (Bac+2)",
+    certificateur: "MINISTÈRE DU TRAVAIL DU PLEIN EMPLOI ET DE L'INSERTION",
+    dateEnregistrement: "29/04/2021",
+    dateEcheance: "28/04/2026",
+    codeNSF: "311u – Conduite des véhicules, conduite des engins de manutention et de levage",
+    formacodes: "31802 – Monitorat auto-école",
+    resume: "L'enseignant de la conduite et de la sécurité routière contribue à la mise en œuvre de la politique de sécurité routière. Il prépare des actions de formation pour tous publics, dans le cadre du « continuum éducatif », en se conformant au Référentiel pour l'éducation à une mobilité citoyenne (REMC). Il anime ces actions dans le but de faire adopter aux apprenants un comportement respectueux des autres usagers de la route et de favoriser leur prise de conscience des enjeux du développement durable.",
+    activitesVisees: "Il prépare des apprenants à la conduite d'un véhicule de catégorie B et BE, construit et anime des séances collectives de formation sur les règles du Code de la route et les facteurs de risques. Il assure des prestations de sensibilisation auprès de publics diversifiés (enfants, adolescents, conducteurs novices et expérimentés, salariés d'entreprise). Il représente l'établissement et contribue à son image de marque. Il participe à la gestion administrative et logistique des formations.",
+    blocsCompetences: [
+      {
+        titre: "RNCP35329BC01 – Former des apprenants conducteurs par des actions individuelles et collectives, dans le respect des cadres réglementaires en vigueur",
+        competences: [
+          "Construire et préparer le scénario d'une séance individuelle ou collective de formation",
+          "Animer une séance collective de formation à la sécurité routière",
+          "Animer une séance individuelle ou collective de formation à la conduite d'un véhicule léger",
+          "Évaluer le degré d'acquisition des compétences des apprenants",
+          "Encadrer et faciliter l'intervention d'un tiers dans une situation d'apprentissage",
+          "Repérer les difficultés d'apprentissage et essayer d'y remédier",
+          "Apprécier la dynamique de l'environnement routier et en identifier les risques potentiels"
+        ],
+        matieres: [
+          { competence: "Construire et préparer le scénario d'une séance individuelle ou collective de formation", contenu: "Identification des objectifs pédagogiques, choix des outils et méthodes, élaboration du scénario pédagogique, préparation des ressources matérielles, utilisation du REMC", volume: "80h" },
+          { competence: "Animer une séance collective de formation à la sécurité routière", contenu: "Techniques d'animation de groupe, pédagogie active, gestion des dynamiques de groupe, utilisation de supports multimédias, Code de la route et réglementation", volume: "100h" },
+          { competence: "Animer une séance individuelle ou collective de formation à la conduite d'un véhicule léger", contenu: "Pédagogie de la conduite accompagnée, apprentissage anticipé, conduite supervisée, progression en conduite, gestion du véhicule à double commande", volume: "200h" },
+          { competence: "Évaluer le degré d'acquisition des compétences des apprenants", contenu: "Méthodes d'évaluation formative et sommative, grilles d'évaluation, livret d'apprentissage, analyse des acquis, préparation à l'examen du permis de conduire", volume: "60h" },
+          { competence: "Encadrer et faciliter l'intervention d'un tiers dans une situation d'apprentissage", contenu: "Rôle de l'accompagnateur en AAC/conduite supervisée, rendez-vous pédagogiques, communication avec les tiers, consignes de sécurité", volume: "40h" },
+          { competence: "Repérer les difficultés d'apprentissage et essayer d'y remédier", contenu: "Diagnostic des difficultés, stratégies de remédiation, adaptation pédagogique, psychologie de l'apprentissage, gestion du stress de l'apprenant", volume: "40h" },
+          { competence: "Apprécier la dynamique de l'environnement routier et en identifier les risques potentiels", contenu: "Analyse des situations de conduite, anticipation des risques, éco-conduite, développement durable, accidentologie", volume: "40h" }
+        ],
+        modalitesEval: "Mise en situation professionnelle : animation d'une séance de formation en salle et d'une séance de conduite en circulation sur véhicule à double commande. Entretien technique. Dossier professionnel. Résultats des évaluations en cours de formation."
+      },
+      {
+        titre: "RNCP35329BC02 – Sensibiliser l'ensemble des usagers de la route à l'adoption de comportements sûrs et respectueux de l'environnement",
+        competences: [
+          "Analyser une demande relative à une prestation de sensibilisation",
+          "Construire et préparer une action de sensibilisation",
+          "Animer une séance de sensibilisation à la sécurité routière, au respect des usagers et de l'environnement",
+          "Analyser ses pratiques professionnelles afin de les faire évoluer"
+        ],
+        matieres: [
+          { competence: "Analyser une demande relative à une prestation de sensibilisation", contenu: "Analyse du cahier des charges, identification du public cible, étude des besoins, contexte réglementaire, proposition commerciale", volume: "60h" },
+          { competence: "Construire et préparer une action de sensibilisation", contenu: "Conception de supports pédagogiques, scénarisation de l'intervention, outils de communication, logistique de l'action, partenariats institutionnels", volume: "80h" },
+          { competence: "Animer une séance de sensibilisation à la sécurité routière", contenu: "Techniques d'animation tous publics, interventions en milieu scolaire, sensibilisation en entreprise, prévention des risques routiers, enjeux du développement durable", volume: "120h" },
+          { competence: "Analyser ses pratiques professionnelles afin de les faire évoluer", contenu: "Auto-évaluation, veille réglementaire et pédagogique, retour d'expérience, formation continue, évolution du métier d'enseignant de la conduite", volume: "90h" }
+        ],
+        modalitesEval: "Mise en situation professionnelle : préparation et animation d'une action de sensibilisation devant un public. Entretien technique portant sur l'analyse de la prestation. Dossier professionnel. Résultats des évaluations en cours de formation."
+      }
+    ],
+    secteursActivite: "Établissements privés d'enseignement de la conduite et de la sécurité routière, établissements associatifs d'enseignement de la conduite et de la sécurité routière",
+    typesEmplois: ["Enseignant de la conduite et de la sécurité routière", "Coordinateur d'enseignants", "Coordinateur pédagogique en auto-école", "Formateur sécurité routière en entreprise"],
+    codesROME: ["K2110"],
+    voiesAcces: ["Formation continue", "Contrat de professionnalisation", "Contrat d'apprentissage", "VAE"],
+    dureeIndicative: "1190 heures (910h centre + 280h entreprise)",
+  },
 ];
 
 export function getRNCPByCode(code: string): RNCPFiche | undefined {
