@@ -1,9 +1,12 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { OrganismeInfo, FormationInfo, StagiaireInfo, CritereData, CRITERES } from "@/types/qualiopi";
+import OrganismeForm from "@/components/OrganismeForm";
+import FormationForm from "@/components/FormationForm";
+import StagiairesForm from "@/components/StagiairesForm";
 import ControleEDOF from "@/components/ControleEDOF";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, LogIn, LogOut, User } from "lucide-react";
+import { ChevronLeft, LogIn, LogOut, ChevronDown, ChevronRight, Building2, GraduationCap, Users } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
 const emptyOrganisme: OrganismeInfo = {
@@ -37,6 +40,38 @@ const ControleEY = () => {
     try { const s = sessionStorage.getItem('qualiopi_crit'); return s ? JSON.parse(s) : JSON.parse(JSON.stringify(CRITERES)); } catch { return JSON.parse(JSON.stringify(CRITERES)); }
   });
 
+  // Collapsible sections
+  const [openSections, setOpenSections] = useState<Set<string>>(new Set());
+
+  const toggleSection = (section: string) => {
+    setOpenSections(prev => {
+      const next = new Set(prev);
+      if (next.has(section)) next.delete(section); else next.add(section);
+      return next;
+    });
+  };
+
+  const handleOrgChange = useCallback((data: OrganismeInfo) => {
+    setOrganisme(data);
+    sessionStorage.setItem('qualiopi_org', JSON.stringify(data));
+  }, []);
+
+  const handleFormChange = useCallback((data: FormationInfo) => {
+    setFormation(data);
+    sessionStorage.setItem('qualiopi_form', JSON.stringify(data));
+  }, []);
+
+  const handleStagChange = useCallback((data: StagiaireInfo[]) => {
+    setStagiaires(data);
+    sessionStorage.setItem('qualiopi_stag', JSON.stringify(data));
+  }, []);
+
+  const sections = [
+    { key: "organisme", label: "Organisme", icon: <Building2 className="w-4 h-4" />, filled: !!organisme.nom },
+    { key: "formation", label: "Formation", icon: <GraduationCap className="w-4 h-4" />, filled: !!formation.intitule },
+    { key: "stagiaires", label: "Stagiaires", icon: <Users className="w-4 h-4" />, count: stagiaires.length },
+  ];
+
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b bg-card/80 backdrop-blur-sm sticky top-0 z-10">
@@ -62,7 +97,43 @@ const ControleEY = () => {
         </div>
       </header>
 
-      <main className="max-w-5xl mx-auto px-4 py-8">
+      <main className="max-w-5xl mx-auto px-4 py-8 space-y-6">
+        {/* Collapsible data forms */}
+        {sections.map(({ key, label, icon, filled, count }) => (
+          <div key={key} className="border rounded-xl overflow-hidden">
+            <button
+              onClick={() => toggleSection(key)}
+              className="w-full flex items-center justify-between p-4 bg-card hover:bg-muted/50 transition-colors text-left"
+            >
+              <div className="flex items-center gap-3">
+                {openSections.has(key) ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+                {icon}
+                <span className="font-semibold">{label}</span>
+                {count !== undefined && (
+                  <span className="text-xs text-muted-foreground">({count})</span>
+                )}
+                {filled && (
+                  <span className="text-xs text-green-600 bg-green-50 px-2 py-0.5 rounded-full">Rempli</span>
+                )}
+              </div>
+            </button>
+            {openSections.has(key) && (
+              <div className="p-4 border-t bg-background">
+                {key === "organisme" && <OrganismeForm data={organisme} onChange={handleOrgChange} />}
+                {key === "formation" && (
+                  <FormationForm
+                    data={formation}
+                    onChange={handleFormChange}
+                    onImportStagiaires={handleStagChange}
+                  />
+                )}
+                {key === "stagiaires" && <StagiairesForm data={stagiaires} onChange={handleStagChange} />}
+              </div>
+            )}
+          </div>
+        ))}
+
+        {/* Checklist */}
         <ControleEDOF organisme={organisme} formation={formation} stagiaires={stagiaires} criteres={criteres} />
       </main>
     </div>
