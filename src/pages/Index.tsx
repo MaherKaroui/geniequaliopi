@@ -225,7 +225,7 @@ const Index = () => {
           <Button variant="outline" onClick={() => updateStep(s => Math.max(1, s - 1))} disabled={currentStep === 1} className="gap-2">
             <ChevronLeft className="w-4 h-4" /> Précédent
           </Button>
-          <Button onClick={() => updateStep(s => Math.min(5, s + 1))} disabled={currentStep === 5} className="gap-2">
+          <Button onClick={() => updateStep(s => Math.min(6, s + 1))} disabled={currentStep === 6} className="gap-2">
             Suivant <ChevronRight className="w-4 h-4" />
           </Button>
         </div>
