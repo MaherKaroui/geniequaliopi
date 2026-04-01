@@ -534,8 +534,8 @@ function resolveSignature(label: string, nom: string, urls: SignatureUrls): stri
   if (/client|accord/i.test(l)) {
     return `<p style="font-style:italic;color:#999;margin-top:15px">${nom ? `Signé par ${nom}` : ""}</p>`;
   }
-  // Default: dirigeant signature + tampon
-  return sigImg(urls.dirigeantSignatureUrl, "Signature") + tamponImg(urls.tamponUrl);
+  // Default: tampon only
+  return tamponImg(urls.tamponUrl);
 }
 
 export function signatureBlock3(org: OrganismeInfo, stagiaireNom?: string, formateurNom?: string, stagiaireSignatureUrl?: string, formateurSignatureUrl?: string, responsableEntrepriseSignatureUrl?: string): string {
