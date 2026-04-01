@@ -119,7 +119,41 @@ export default function ControleEDOF({ organisme, formation, stagiaires }: Contr
     }
   }, [organisme, formation, stagiaires, orgName]);
 
-  const downloadZip = useCallback(async () => {
+  // Preview a document
+  const handlePreview = useCallback(async (eyDoc: EYDocumentItem) => {
+    if (eyDoc.autoTemplates.length === 0) return;
+    setPreviewLoading(true);
+    setPreviewTitle(`${eyDoc.code} — ${eyDoc.label}`);
+    setPreviewDoc(eyDoc);
+    setPreviewOpen(true);
+    try {
+      const template = eyDoc.autoTemplates[0];
+      const o = mergeOrganisme(organisme);
+      const s = mergeStagiaires(stagiaires);
+      const params = eyDoc.perStagiaire && s.length > 0 ? { stagiaireIdx: 0, fi: 0 } : { fi: 0 };
+      const html = generateDocumentById(`ey_${eyDoc.code}`, template, params, o, formation, s);
+      setPreviewHtml(html || "<p>Impossible de générer l'aperçu</p>");
+    } catch (e) {
+      console.error("Preview error:", e);
+      setPreviewHtml("<p>Erreur lors de la génération de l'aperçu</p>");
+    } finally {
+      setPreviewLoading(false);
+    }
+  }, [organisme, formation, stagiaires]);
+
+  // Download single preview document as PDF
+  const handleDownloadPreview = useCallback(async () => {
+    if (!previewHtml || !previewDoc) return;
+    try {
+      const blob = await htmlToPdfBlob(previewHtml);
+      const safeName = orgName.replace(/[^a-zA-Z0-9_-]/g, "_");
+      saveAs(blob, `${safeName}_${previewDoc.code}.pdf`);
+      toast.success("Document téléchargé !");
+    } catch (e: any) {
+      toast.error("Erreur : " + (e.message || "Erreur inconnue"));
+    }
+  }, [previewHtml, previewDoc, orgName]);
+
     setGenerating(true);
     setProgress(0);
     setProgressText("Préparation du dossier contrôle EY...");
