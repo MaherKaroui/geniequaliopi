@@ -503,7 +503,7 @@ function tamponImg(url: string | undefined): string {
 function resolveSignature(label: string, nom: string, urls: SignatureUrls): string {
   const l = label.toLowerCase();
   // Organisme / Cachet → tampon only
-  if (/organisme|cachet/i.test(l) && !/responsable/i.test(l)) {
+  if ((/organisme|cachet/i.test(l) && !/responsable/i.test(l)) || l === 'cachet') {
     return tamponImg(urls.tamponUrl);
   }
   // Stagiaire / Apprenant / Apprenti / Candidat / Bénéficiaire
@@ -512,7 +512,7 @@ function resolveSignature(label: string, nom: string, urls: SignatureUrls): stri
       ? sigImg(urls.stagiaireSignatureUrl, "Signature stagiaire")
       : `<p style="font-style:italic;color:#999;margin-top:15px">${nom ? `Signé par ${nom}` : ""}</p>`;
   }
-  // Formateur
+  // Formateur (but not "Formateur" in a general sentence)
   if (/formateur/i.test(l)) {
     return sigImg(urls.formateurSignatureUrl, "Signature formateur");
   }
@@ -522,8 +522,12 @@ function resolveSignature(label: string, nom: string, urls: SignatureUrls): stri
       ? sigImg(urls.responsableEntrepriseSignatureUrl, "Signature responsable entreprise")
       : `<p style="font-style:italic;color:#999;margin-top:15px">${nom ? `Signé par ${nom}` : ""}</p>`;
   }
-  // Dirigeant / Responsable (of org) / Directeur / Resp. Pédagogique / Référent
-  if (/dirigeant|responsable|directeur|resp\.|référent/i.test(l)) {
+  // Resp. Pédagogique / Référent qualité / Référent handicap → no auto signature (different people)
+  if (/pédagogique|qualité|handicap|référent/i.test(l)) {
+    return `<p style="font-style:italic;color:#999;margin-top:15px">${nom ? `Signé par ${nom}` : ""}</p>`;
+  }
+  // Dirigeant / Responsable (of org) / Directeur → dirigeant signature + tampon
+  if (/dirigeant|responsable|directeur/i.test(l)) {
     return sigImg(urls.dirigeantSignatureUrl, "Signature dirigeant") + tamponImg(urls.tamponUrl);
   }
   // Client / other → no auto signature
