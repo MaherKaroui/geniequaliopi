@@ -1253,7 +1253,7 @@ export function genCertificatReussite_V2(o: OrganismeInfo, f: FormationInfo, sta
         <p style="margin-top:20px"><strong>Fait à ${o.ville}, le :</strong> ${formatDate(getStagiaireDateFin(s, f))}</p>
         <p><strong>Pour ${o.nom}</strong></p>
         <p>${o.dirigeant}</p>
-        ${orgSig(o)}
+        ${dirigeantSig(o)}
       </div>`;
   });
   return buildDocument({ org: o, title: "ATTESTATIONS DE RÉUSSITE", subtitle: f.intitule, stagiaires, extraHtml: extra });
