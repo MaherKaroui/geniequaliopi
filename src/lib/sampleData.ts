@@ -386,6 +386,26 @@ export const SAMPLE_FORMATIONS: FormationInfo[] = [
     nombreParticipants: "4",
     formateur: "Fideline Mendy",
   },
+  {
+    intitule: "TP - Enseignant de la conduite et de la sécurité routière (ECSR)",
+    objectifs: "Préparer à l'obtention du TP ECSR (RNCP35329), former des enseignants de la conduite et de la sécurité routière capables d'assurer l'apprentissage théorique et pratique en sécurité, dans le respect des cadres réglementaires en vigueur.",
+    prerequis: "Être titulaire du permis B en cours de validité. Casier judiciaire vierge (bulletin n°2). Bonne maîtrise du français (écrit et oral). Bonne condition physique (visite médicale obligatoire).",
+    duree: "1190 heures (910h centre + 280h entreprise)",
+    modalites: "présentiel",
+    tarif: "5 733,11 € HT",
+    programme: "CCP1 – Former des apprenants conducteurs (560h centre + 140h entreprise) :\n- Construction et préparation de séances de formation\n- Animation de séances collectives (Code de la route)\n- Animation de séances individuelles de conduite (véhicule léger)\n- Évaluation des compétences des apprenants\n- Encadrement de tiers (AAC / conduite supervisée)\n- Remédiation des difficultés d'apprentissage\n- Analyse de l'environnement routier\n\nCCP2 – Sensibiliser à la sécurité routière (350h centre + 140h entreprise) :\n- Analyse de demandes de sensibilisation\n- Conception d'actions de sensibilisation\n- Animation de séances de sensibilisation tous publics\n- Analyse et évolution des pratiques professionnelles",
+    methodesEvaluation: "QCM réglementaire (semaine 2 et 4), exercice oral conduite commentée (semaine 3), animation pédagogique (semaine 6), examen blanc complet (semaine 8), mise en situation professionnelle, entretien technique, dossier professionnel",
+    moyensPedagogiques: "Salle équipée vidéoprojecteur, plateau technique, véhicule à double commande, supports REMC, livret de suivi ECSR, guide du formateur, Livret ECSR Codes Rousseau, classeurs de réglementation, accès e-learning (codesrousseau.fr)",
+    publicVise: "Toute personne souhaitant exercer en tant qu'enseignant de la conduite et de la sécurité routière, demandeurs d'emploi, salariés en reconversion",
+    delaiAcces: "15 jours avant le début",
+    dateDebut: "2025-05-26",
+    dateFin: "2026-05-18",
+    lieu: "Tour A, 130 rue du 8 mai 1945, 92000 Nanterre",
+    nombreParticipants: "12",
+    formateur: "Ouachek Abdelhakim",
+    codeRNCP: "RNCP35329",
+    rythmeAlternance: "Alternance théorie/pratique répartie sur 8 mois (CCP1 : 560h centre + 140h entreprise / CCP2 : 350h centre + 140h entreprise)",
+  },
 ];
 
 // Satisfaction scores (pre-filled realistic data)
