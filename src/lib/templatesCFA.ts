@@ -877,3 +877,219 @@ export function genLivretMaitreApprentissageCFA(o: OrganismeInfo) {
     <p>Pour les entreprises de moins de 11 salariés inscrites au Répertoire des métiers : exonération de toutes cotisations patronales et salariales d'origine légale.</p>
   ` });
 }
+
+// ========== IND 12 — ENGAGEMENT DES BÉNÉFICIAIRES (CFA) ==========
+
+export function genMesuresEngagementBeneficiairesCFA(o: OrganismeInfo) {
+  return buildDocument({ org: o, title: "MESURES POUR FAVORISER L'ENGAGEMENT DES BÉNÉFICIAIRES", sections: [
+    { heading: "Objectif", content: `<p>Cette procédure vise à adapter la prestation de formation pour répondre aux besoins spécifiques des apprenants, afin de garantir un apprentissage équitable et inclusif, tout en respectant les objectifs pédagogiques des formations proposées.</p>` },
+    { heading: "1. Communication claire et anticipation des attentes", content: `<p><strong>Objectif :</strong> Clarifier les attentes et objectifs avant la formation pour éviter toute confusion et assurer un bon départ.</p><p><strong>Mesures :</strong></p><ul><li>Envoi d'un livret d'accueil avant le début de la formation, incluant le programme, les objectifs et les modalités</li><li>Réalisation d'entretiens individuels avec chaque bénéficiaire pour discuter de leurs objectifs, attentes et besoins spécifiques</li><li>Co-construction des objectifs d'apprentissage avec les bénéficiaires pour les impliquer dès le départ</li></ul>` },
+    { heading: "2. Suivi régulier et individualisé pendant la formation", content: `<p><strong>Objectif :</strong> Maintenir un lien constant avec les bénéficiaires pour détecter rapidement toute difficulté et favoriser leur engagement.</p><p><strong>Mesures :</strong></p><ul><li>Planification d'entretiens de suivi individuels tout au long de la formation</li><li>Feedback continu et constructif sur les exercices, travaux pratiques et tests intermédiaires</li><li>Mise en place d'un espace numérique dédié (forum, chat) pour les échanges entre bénéficiaires et formateurs</li></ul>` },
+    { heading: "3. Variété des méthodes pédagogiques", content: `<p><strong>Mesures :</strong></p><ul><li>Intégration d'études de cas, jeux de rôle, simulations et ateliers pratiques</li><li>Utilisation d'outils interactifs : quiz en ligne, tests de connaissances, jeux éducatifs</li><li>Organisation de travaux en groupe pour favoriser l'apprentissage par les pairs</li></ul>` },
+    { heading: "4. Personnalisation du parcours de formation", content: `<p><strong>Objectif :</strong> Adapter la formation aux besoins spécifiques des bénéficiaires.</p><p><strong>Mesures :</strong></p><ul><li>Plans d'apprentissage personnalisés selon le rythme et le niveau de chaque apprenant</li><li>Supports pédagogiques variés (audio, vidéo, écrits)</li><li>Possibilité de choisir des modules optionnels selon les intérêts et besoins</li></ul>` },
+    { heading: "5. Création d'un environnement inclusif et motivant", content: `<p><strong>Mesures :</strong></p><ul><li>Encouragement d'un climat où les erreurs sont perçues comme des opportunités d'apprentissage</li><li>Mise à disposition de ressources supplémentaires (tutorat, coaching individuel)</li><li>Suivi psychologique ou social pour les bénéficiaires rencontrant des difficultés personnelles</li></ul>` },
+    { heading: "6. Évaluation régulière et réajustement", content: `<p><strong>Mesures :</strong></p><ul><li>Organisation de questionnaires pour mesurer l'engagement et la satisfaction</li><li>Groupes de discussion pour recueillir des suggestions</li><li>Réajustement immédiat du contenu, du rythme ou des supports en fonction des retours</li></ul>` },
+    { heading: "Conclusion", content: `<p>Ces mesures visent à favoriser un engagement durable des bénéficiaires tout au long de la formation, en s'assurant que chacun soit activement impliqué et soutenu, et en valorisant les progrès à chaque étape du parcours.</p>` },
+  ] });
+}
+
+export function genPreventionGestionAbandonsCFA(o: OrganismeInfo) {
+  return buildDocument({ org: o, title: "PRÉVENTION ET GESTION DES ABANDONS", sections: [
+    { heading: "1. Prévention en amont", content: `<p><strong>Objectif :</strong> Identifier et traiter les signes avant-coureurs d'abandon avant le début de la formation.</p><p><strong>Actions :</strong></p><ul><li>Entretien individuel pré-formation pour évaluer la motivation et détecter les freins</li><li>Analyse des besoins pour s'assurer de l'adéquation entre le projet du bénéficiaire et la formation</li><li>Information claire sur les conditions, le rythme et les exigences de la formation</li></ul>` },
+    { heading: "2. Détection précoce des risques", content: `<p><strong>Actions :</strong></p><ul><li>Suivi régulier de l'assiduité et des résultats</li><li>Entretiens de suivi à intervalles réguliers avec le référent pédagogique</li><li>Mise en place d'indicateurs d'alerte (absences répétées, baisse de résultats, désengagement)</li></ul>` },
+    { heading: "3. Accompagnement renforcé", content: `<p><strong>Actions :</strong></p><ul><li>Proposition d'un accompagnement individualisé dès les premiers signes de difficulté</li><li>Orientation vers les dispositifs d'aide sociale si nécessaire (logement, transport, santé)</li><li>Aménagement du parcours de formation si besoin (rythme, modalités)</li></ul>` },
+    { heading: "4. Gestion de l'abandon", content: `<p><strong>Actions :</strong></p><ul><li>Entretien systématique en cas d'abandon pour comprendre les raisons</li><li>Proposition d'alternatives : report, réorientation, mise en pause</li><li>Documentation de chaque situation dans le registre des abandons</li><li>Analyse des causes pour mettre en place des actions correctives</li></ul>` },
+    { heading: "5. Suivi post-abandon", content: `<p><strong>Actions :</strong></p><ul><li>Relance à 1 mois et 3 mois pour proposer une reprise ou une réorientation</li><li>Accompagnement vers d'autres dispositifs de formation ou d'insertion</li></ul>` },
+  ] });
+}
+
+export function genGuideEntretienAbandonsCFA(o: OrganismeInfo) {
+  return buildDocument({ org: o, title: "GUIDE D'ENTRETIEN DES ABANDONS", extraHtml: `
+    <table style="width:100%;border-collapse:collapse;margin:20px 0">
+      <tr><td style="padding:8px;border:1px solid #ccc;width:30%"><strong>Nom :</strong></td><td style="padding:8px;border:1px solid #ccc">_________________________</td></tr>
+      <tr><td style="padding:8px;border:1px solid #ccc"><strong>Date :</strong></td><td style="padding:8px;border:1px solid #ccc">_________________________</td></tr>
+      <tr><td style="padding:8px;border:1px solid #ccc"><strong>Formation :</strong></td><td style="padding:8px;border:1px solid #ccc">_________________________</td></tr>
+    </table>
+    <h3>Questions</h3>
+    <ol style="line-height:2.5">
+      <li>Pourquoi souhaitez-vous abandonner la formation ?<br><div style="border-bottom:1px dotted #999;margin:5px 0 15px;height:40px"></div></li>
+      <li>Quels sont les points qui vous ont contraint à prendre cette décision ?<br><div style="border-bottom:1px dotted #999;margin:5px 0 15px;height:40px"></div></li>
+      <li>Avez-vous rencontré des difficultés personnelles (logement, transport, santé) ?<br><div style="border-bottom:1px dotted #999;margin:5px 0 15px;height:40px"></div></li>
+      <li>La formation correspondait-elle à vos attentes initiales ?<br><div style="border-bottom:1px dotted #999;margin:5px 0 15px;height:40px"></div></li>
+      <li>Avez-vous sollicité un accompagnement auprès du référent pédagogique ?<br><div style="border-bottom:1px dotted #999;margin:5px 0 15px;height:40px"></div></li>
+      <li>Seriez-vous intéressé(e) par un report ou une réorientation ?<br><div style="border-bottom:1px dotted #999;margin:5px 0 15px;height:40px"></div></li>
+      <li>Avez-vous des suggestions pour améliorer la formation ?<br><div style="border-bottom:1px dotted #999;margin:5px 0 15px;height:40px"></div></li>
+    </ol>
+    <p style="margin-top:30px"><strong>Observations du référent :</strong></p>
+    <div style="border:1px solid #ccc;min-height:80px;padding:10px"></div>
+    <p style="margin-top:20px"><strong>Date :</strong> _________________ <strong>Signature du référent :</strong> _________________</p>
+  ` });
+}
+
+export function genEviterSituationsEchecCFA(o: OrganismeInfo) {
+  return buildDocument({ org: o, title: "ÉVITER LES SITUATIONS D'ÉCHEC", sections: [
+    { heading: "Questionnaire d'analyse des besoins", content: `<p>L'orientation par défaut est cause de nombreuses ruptures. Pour éviter cela, nous transmettons à nos candidats un questionnaire d'analyse de leurs besoins afin de :</p><ul><li>Valider les objectifs de la formation qu'ils vont suivre</li><li>Anticiper les connaissances et compétences visées</li><li>Exprimer d'éventuelles attentes ou souhaits autour d'une situation professionnelle</li></ul><p>Ce questionnaire prévoit également la prise en charge de situations tel un handicap physique ou la maîtrise de la langue française.</p>` },
+    { heading: "Diffusion de l'information", content: `<p>Une convention (ou un contrat) de formation a été éditée à laquelle a été annexé le programme détaillé, mettant en parallèle les objectifs, les méthodes pédagogiques, les moyens d'encadrement et les modalités d'évaluation.</p><p>Nous essayons de diffuser l'information de manière la plus complète possible pour que le candidat vérifie que nos formations correspondent à ses besoins et envies.</p>` },
+    { heading: "Pédagogie et méthodes d'apprentissage", content: `<p>Les méthodes d'apprentissage interrogent le rapport au savoir de ceux qui reçoivent la formation et de ceux qui la dispensent. C'est pour cette raison que nous avons décidé de former un nombre limité d'étudiants par session, garantissant une grande efficacité dans la transmission du savoir et l'accompagnement.</p>` },
+    { heading: "Identification et repérage des étudiants en difficulté", content: `<p>Afin de concevoir et mettre en œuvre les dispositifs de prévention et de remédiation des ruptures, il est essentiel d'identifier les bénéficiaires en difficulté.</p><p>Le <strong>pôle administratif</strong> (${o.poleAdministratif}) prend en charge la gestion de l'accueil des étudiants tout au long de la formation. Le <strong>pôle compétences</strong> accompagne les étudiants dans l'acquisition des compétences professionnelles. Si besoin, un accompagnement individualisé est proposé.</p>` },
+    { heading: "Questionnaire de satisfaction", content: `<p>À la fin de chaque formation, nous envoyons un questionnaire de satisfaction afin d'analyser les besoins d'amélioration :</p><ul><li>Disposer d'indicateurs objectifs de la satisfaction</li><li>Améliorer les différents services proposés</li><li>Suivre l'évolution de la satisfaction</li><li>Être à l'écoute des étudiants</li><li>Identifier les attentes et construire des plans d'actions d'amélioration</li></ul>` },
+  ] });
+}
+
+export function genProcedureAnnulationsAbandonsCFA(o: OrganismeInfo) {
+  return buildDocument({ org: o, title: "PROCÉDURE DE GESTION DES ANNULATIONS ET DES ABANDONS DES BÉNÉFICIAIRES", sections: [
+    { heading: "Annulation + de 15 jours avant l'entrée en formation", content: `<ul><li>Proposition de report de dates par mail (garder une trace écrite) + relance téléphone</li><li>Restitution de l'acompte si l'annulation définitive</li></ul>` },
+    { heading: "Annulation - de 15 jours avant l'entrée en formation", content: `<ul><li>Proposition de report de dates par mail (garder une trace écrite) + relance téléphone</li><li>Acompte non restitué sauf contre justificatif pour cause majeure dûment reconnue</li></ul>` },
+    { heading: "Abandon en cours de formation", content: `<ul><li>Dans le cas où un stagiaire ne se présente pas et ne signe pas la feuille d'émargement, il est rappelé dans la demi-journée pour information</li><li>Soit un imprévu ne lui permet pas de continuer et de nouvelles dates sont fixées</li><li>Soit nous demandons au stagiaire de justifier son abandon afin de le comprendre et de mettre en place des modifications si les raisons nous incombent</li><li>Si abandon sans nouvelles : relances mail, téléphone, SMS – copier sur un document et enregistrer dans son dossier</li><li>Abandon sans report : facturer les heures au réel si justificatif d'absence fourni</li><li>Abandon sans report / financement personnel : facturer les heures au réel si justificatif, sans justificatif la somme restante est due à ${o.nom}</li></ul>` },
+  ] });
+}
+
+export function genFichierGestionAnnulationsCFA(o: OrganismeInfo) {
+  return buildDocument({ org: o, title: "SUIVI DE GESTION DES ABANDONS", extraHtml: `
+    <table style="width:100%;border-collapse:collapse;margin:20px 0">
+      <tr style="background:#1e3a7b;color:white"><th style="padding:8px;border:1px solid #ccc">Nom stagiaire</th><th style="padding:8px;border:1px solid #ccc">Prénom</th><th style="padding:8px;border:1px solid #ccc">Date de formation</th><th style="padding:8px;border:1px solid #ccc">Intitulé de formation</th><th style="padding:8px;border:1px solid #ccc">Motif annulation ou absence</th><th style="padding:8px;border:1px solid #ccc">Reprogrammée ?</th><th style="padding:8px;border:1px solid #ccc">Nouvelle date</th></tr>
+      ${Array.from({length: 10}, () => '<tr>' + Array.from({length: 7}, () => '<td style="padding:12px;border:1px solid #ccc">&nbsp;</td>').join('') + '</tr>').join('')}
+    </table>
+  ` });
+}
+
+export function genAccompagnementRechercheContratCFA(o: OrganismeInfo) {
+  return buildDocument({ org: o, title: "L'ACCOMPAGNEMENT À LA RECHERCHE D'UN CONTRAT", sections: [
+    { heading: "Accompagnement dès l'admission", content: `<p>Dès son admission pédagogique, le CFA ${o.nom} accompagnera le candidat-apprenti dans sa recherche d'entreprise jusqu'à la signature d'un contrat d'apprentissage par :</p><ul><li>Le Responsable de la formation (${o.responsablePedagogique})</li><li>Un référent d'aide au placement ou chargé de relation entreprises</li><li>Des ateliers de Techniques de Recherche d'Entreprises (TRE)</li></ul>` },
+    { heading: "Entretiens et ateliers", content: `<p>L'équipe du CFA ${o.nom} propose des entretiens individuels et collectifs :</p><ul><li>Entretien d'aide au projet professionnel</li><li>Les plus-values de la formation et les missions en entreprise</li><li>Ateliers de Techniques de Recherche d'Entreprises : CV, lettre de motivation</li><li>Ateliers phoning, démarchage</li><li>Simulations d'entretien d'embauche</li></ul>` },
+    { heading: "Mise en relation avec les entreprises partenaires", content: `<p>Nos entreprises partenaires ont la possibilité de déposer des offres de missions en apprentissage. Une fois étudiées et validées par les Responsables de Formation, elles sont diffusées auprès des candidats :</p><ul><li>Via la personne en charge de l'accompagnement</li><li>Lors du jobdating apprentissage annuel</li></ul><p>Pour tout renseignement : <strong>${o.email}</strong></p>` },
+    { heading: "La fiche de mission", content: `<p>L'entreprise trouvée par le candidat devra proposer une mission en adéquation avec les objectifs de la formation. Le futur employeur devra rédiger une fiche de missions, validée par le Responsable de Formation.</p>` },
+    { heading: "Le suivi personnalisé pendant la formation", content: `<p>Pour suivre la progression de l'apprenti(e) et assurer la cohésion pédagogique, ${o.nom} met en place un suivi personnalisé :</p><ul><li>Un référent dédié au suivi pédagogique et en entreprise</li><li>Lien constant entre le CFA et le maître d'apprentissage</li><li>Suivi de la partie pédagogique et du suivi en entreprise (appels téléphoniques et visites)</li></ul>` },
+  ] });
+}
+
+export function genListeAideSocialCFA(o: OrganismeInfo) {
+  return buildDocument({ org: o, title: "LISTE AIDE SOCIAL", extraHtml: `
+    <table style="width:100%;border-collapse:collapse;margin:20px 0">
+      <tr style="background:#1e3a7b;color:white"><th style="padding:10px;border:1px solid #ccc;text-align:left">Structure</th><th style="padding:10px;border:1px solid #ccc;text-align:left">Horaires</th><th style="padding:10px;border:1px solid #ccc;text-align:left">Contact</th></tr>
+      <tr><td style="padding:8px;border:1px solid #ccc"><strong>MISSION LOCALE</strong></td><td style="padding:8px;border:1px solid #ccc">Lundi-Jeudi : 08:30–12:30, 13:30–17:00<br>Vendredi : 08:30–12:30</td><td style="padding:8px;border:1px solid #ccc">${o.telephone}</td></tr>
+      <tr><td style="padding:8px;border:1px solid #ccc"><strong>SERVICE JEUNESSE</strong></td><td style="padding:8px;border:1px solid #ccc">Lundi-Jeudi : 13:30–18:00<br>Mercredi : 10:30–18:00<br>Vendredi : 13:30–17:00</td><td style="padding:8px;border:1px solid #ccc">${o.telephone}</td></tr>
+      <tr><td style="padding:8px;border:1px solid #ccc"><strong>ASSISTANTE SOCIALE</strong></td><td style="padding:8px;border:1px solid #ccc">Sur rendez-vous</td><td style="padding:8px;border:1px solid #ccc">${o.adresse}, ${o.codePostal} ${o.ville}<br>${o.telephone}</td></tr>
+      <tr><td style="padding:8px;border:1px solid #ccc"><strong>PÔLE EMPLOI</strong></td><td style="padding:8px;border:1px solid #ccc">Lundi-Vendredi : 09:00–16:30</td><td style="padding:8px;border:1px solid #ccc">3949</td></tr>
+      <tr><td style="padding:8px;border:1px solid #ccc"><strong>CAF</strong></td><td style="padding:8px;border:1px solid #ccc">Lundi-Vendredi : 09:00–16:00</td><td style="padding:8px;border:1px solid #ccc">www.caf.fr</td></tr>
+    </table>
+    <p style="margin-top:20px"><em>Cette liste est fournie à titre indicatif et peut être complétée par le référent pédagogique en fonction des besoins spécifiques du bénéficiaire.</em></p>
+  ` });
+}
+
+export function genCertificatRealisationCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
+  const stagList = stagiaires.length > 0 ? stagiaires.map(s => `${s.civilite} ${s.prenom} ${s.nom}`).join(', ') : '___________________';
+  return buildDocument({ org: o, title: "CERTIFICAT DE RÉALISATION", extraHtml: `
+    <p>Je soussigné <strong>${o.dirigeant}</strong>, représentant légal du dispensateur de l'action concourant au développement des compétences, de l'organisme de formation <strong>${o.nom}</strong></p>
+    <p>atteste que :</p>
+    <p style="font-size:14pt;font-weight:bold;text-align:center;margin:20px 0">${stagList}</p>
+    <p>a suivi l'action <strong>${f.intitule}</strong></p>
+    <p><strong>Nature de l'action :</strong></p>
+    <ul>
+      <li>☐ action de formation</li>
+      <li>☐ bilan de compétences</li>
+      <li>☐ action de VAE</li>
+      <li>☑ action de formation par apprentissage</li>
+    </ul>
+    <p>Qui s'est déroulée du <strong>${formatDate(f.dateDebut)}</strong> au <strong>${formatDate(f.dateFin)}</strong> pour une durée de <strong>${f.duree}</strong></p>
+    <p style="margin-top:20px">Sans préjudice des délais imposés par les règles fiscales, comptables ou commerciales, je m'engage à conserver l'ensemble des pièces justificatives qui ont permis d'établir le présent certificat pendant une durée de 3 ans à compter de la fin de l'année du dernier paiement.</p>
+    <p>En cas de cofinancement des fonds européens, la durée de conservation est étendue conformément aux obligations conventionnelles spécifiques.</p>
+    <p style="margin-top:30px">Fait à <strong>${o.ville}</strong>, le <strong>${formatDate(f.dateFin)}</strong></p>
+    <p>Cachet et signature du responsable du dispensateur de formation</p>
+    <p style="margin-top:40px"><strong>${o.dirigeant}</strong></p>
+  ` });
+}
+
+// ========== IND 14 — WEBINAIRES (CFA) ==========
+
+export function genWebinaireFormationCompetencesCFA(o: OrganismeInfo) {
+  return buildDocument({ org: o, title: "WEBINAIRE SUR LA FORMATION ET LE DÉVELOPPEMENT DES COMPÉTENCES", extraHtml: `
+    <table style="width:100%;border-collapse:collapse;margin:20px 0">
+      <tr><td style="padding:8px;border:1px solid #ccc;width:30%"><strong>Organisé par :</strong></td><td style="padding:8px;border:1px solid #ccc">${o.nom}</td></tr>
+      <tr><td style="padding:8px;border:1px solid #ccc"><strong>Lieu :</strong></td><td style="padding:8px;border:1px solid #ccc">${o.adresse}, ${o.codePostal} ${o.ville}</td></tr>
+      <tr><td style="padding:8px;border:1px solid #ccc"><strong>Durée :</strong></td><td style="padding:8px;border:1px solid #ccc">2H</td></tr>
+      <tr><td style="padding:8px;border:1px solid #ccc"><strong>Intervenants :</strong></td><td style="padding:8px;border:1px solid #ccc">${o.responsablePedagogique} – Référent Pédagogique</td></tr>
+    </table>
+    <h3>Description</h3>
+    <p>${o.nom} a organisé un webinaire sur le thème de la formation et le développement des compétences, visant à sensibiliser les professionnels à l'importance d'une gestion optimale des plans de formation.</p>
+    <h3>Thèmes abordés</h3>
+    <ul>
+      <li>Identification des besoins en formation des employés</li>
+      <li>Élaboration et gestion d'un plan de formation efficace</li>
+      <li>Les dispositifs de financement disponibles (OPCO, CPF)</li>
+      <li>Évaluation des résultats des formations et retour sur investissement</li>
+      <li>Accompagnement des collaborateurs dans leur développement professionnel</li>
+    </ul>
+    <h3>Points clés</h3>
+    <ul>
+      <li>Identification des besoins de formation dans l'entreprise</li>
+      <li>Importance de la formation continue pour l'employabilité</li>
+      <li>Financement des formations professionnelles : CPF, OPCO</li>
+      <li>Suivi et évaluation des résultats des actions de formation</li>
+    </ul>
+  ` });
+}
+
+export function genWebinaireNTCCFA(o: OrganismeInfo) {
+  return buildDocument({ org: o, title: "WEBINAIRE – TECHNIQUES ET OUTILS DU NÉGOCIATEUR TECHNICO-COMMERCIAL", extraHtml: `
+    <table style="width:100%;border-collapse:collapse;margin:20px 0">
+      <tr><td style="padding:8px;border:1px solid #ccc;width:30%"><strong>Organisé par :</strong></td><td style="padding:8px;border:1px solid #ccc">${o.nom}</td></tr>
+      <tr><td style="padding:8px;border:1px solid #ccc"><strong>Lieu :</strong></td><td style="padding:8px;border:1px solid #ccc">${o.adresse}, ${o.codePostal} ${o.ville}</td></tr>
+      <tr><td style="padding:8px;border:1px solid #ccc"><strong>Durée :</strong></td><td style="padding:8px;border:1px solid #ccc">3H</td></tr>
+      <tr><td style="padding:8px;border:1px solid #ccc"><strong>Intervenants :</strong></td><td style="padding:8px;border:1px solid #ccc">${o.responsablePedagogique} – Référent Pédagogique</td></tr>
+    </table>
+    <h3>Description</h3>
+    <p>Le webinaire organisé par ${o.nom} portait sur les techniques et outils du négociateur technico-commercial, un sujet essentiel pour les professionnels souhaitant développer leurs compétences en prospection, négociation et gestion de la relation client.</p>
+    <h3>Thèmes abordés</h3>
+    <ul>
+      <li>Les fondamentaux du métier de négociateur technico-commercial</li>
+      <li>Les techniques de prospection et de qualification des prospects</li>
+      <li>L'utilisation des outils numériques commerciaux (CRM, suivi des opportunités)</li>
+      <li>Les techniques de négociation commerciale et de conclusion des ventes</li>
+      <li>La gestion et la fidélisation de la relation client</li>
+      <li>La veille commerciale et l'adaptation aux évolutions du marché</li>
+    </ul>
+    <h3>Points clés</h3>
+    <ul>
+      <li>Rôle et compétences du négociateur technico-commercial</li>
+      <li>Techniques de prospection, négociation et fidélisation client</li>
+      <li>Utilisation des outils numériques commerciaux (CRM, suivi client)</li>
+      <li>Importance de la communication et de l'écoute active</li>
+      <li>Veille commerciale et adaptation aux évolutions du marché</li>
+    </ul>
+  ` });
+}
+
+// ========== IND 15 — DROITS ET DEVOIRS (CFA) ==========
+
+export function genDroitsDevoirsApprentiCFA(o: OrganismeInfo) {
+  return buildDocument({ org: o, title: "DROITS ET DEVOIRS DE L'APPRENTI", sections: [
+    { heading: "Les droits", content: `<p>L'apprenti bénéficie des mêmes conditions de travail et de protection sociale que les autres salariés :</p>
+      <ul>
+        <li><strong>Le temps de travail :</strong> les heures passées en cours sont considérées comme du temps de travail et comptent parmi les 35 ou 39 heures hebdomadaires</li>
+        <li><strong>La rémunération :</strong> chaque mois, l'entreprise fournit une fiche de paie dont le montant est fixé en fonction de l'âge, la durée du contrat et le diplôme. Le taux varie entre 27 et 100 % du SMIC</li>
+        <li><strong>La prise en charge des frais :</strong> l'employeur prend en charge 50 % des frais de déplacements en transport en commun</li>
+        <li><strong>Frais de formation :</strong> les coûts de la formation ne peuvent être supportés par l'apprenti</li>
+        <li><strong>Les congés :</strong> comme tout salarié, l'apprenti a droit à un salaire et des jours de repos. Pour la préparation du diplôme, 5 jours supplémentaires peuvent être demandés</li>
+        <li><strong>La protection sociale :</strong> prise en charge des accidents de travail et maladies professionnelles. L'entreprise propose une mutuelle obligatoire</li>
+        <li><strong>Retraite :</strong> les années de formation sont capitalisables comme années pleines</li>
+        <li><strong>Litige :</strong> période d'essai de 45 jours (jours en entreprise uniquement). En cas de litige, contacter le CFA ou un médiateur de l'apprentissage</li>
+      </ul>` },
+    { heading: "Les devoirs", content: `<ul>
+        <li><strong>Le respect des règles :</strong> respecter le règlement intérieur de l'établissement et de l'entreprise, notamment les règles d'hygiène et de sécurité</li>
+        <li><strong>L'attitude professionnelle :</strong> respecter les horaires de travail, justifier toute absence, prévenir de tout retard. En cas de maladie, adresser un certificat médical dans les 48 heures</li>
+        <li><strong>Le travail et la formation :</strong> suivre les enseignements, effectuer les tâches/missions confiées par l'entreprise, se présenter aux certifications</li>
+        <li><strong>Le suivi administratif :</strong> fournir à l'employeur et au CFA tout changement de situation personnelle ou difficulté pouvant avoir une incidence sur la formation</li>
+      </ul>` },
+  ] });
+}
+
+export function genReglesSSMilieuProCFA(o: OrganismeInfo) {
+  return buildDocument({ org: o, title: "LES RÈGLES APPLICABLES EN MATIÈRE DE SANTÉ ET DE SÉCURITÉ EN MILIEU PROFESSIONNEL", sections: [
+    { heading: "Suivi de l'état de santé", content: `<p>Votre employeur est tenu d'assurer le suivi de votre état de santé, afin de vous informer sur les risques éventuels auxquels vous expose votre poste de travail.</p><p>En fonction de votre poste, des risques professionnels et de votre âge, vous bénéficiez d'une <strong>visite d'information et de prévention (VIP)</strong> au plus tard dans les 2 mois suivant l'embauche (ou avant l'affectation pour les mineurs).</p><p>La VIP a pour objectifs :</p><ul><li>Vous interroger sur votre état de santé</li><li>Vous informer sur les risques de votre poste</li><li>Vous sensibiliser sur les moyens de prévention</li><li>Identifier si un suivi médecin du travail est nécessaire</li></ul>` },
+    { heading: "Droits et devoirs de l'employeur et du salarié", content: `<p><strong>L'employeur (Art L4121-1) :</strong> prend les mesures nécessaires pour assurer la sécurité et protéger la santé physique et mentale des travailleurs.</p><p><strong>L'employeur (Art R4141-2) :</strong> informe les travailleurs sur les risques pour leur santé et sécurité.</p><p><strong>Le salarié (Art L4122-1) :</strong> chaque travailleur doit prendre soin de sa santé et sécurité ainsi que de celles des autres personnes.</p>` },
+    { heading: "Interlocuteurs internes à l'entreprise", content: `<ul><li><strong>Le CSE :</strong> attributions en matière de santé, sécurité et conditions de travail (obligatoire à partir de 11 salariés)</li><li><strong>Le responsable sécurité :</strong> assiste l'employeur dans la politique de prévention des risques</li><li><strong>L'infirmier(e) de santé au travail :</strong> suivi de la santé des salariés (obligatoire à partir de 200 salariés industrie / 500 tertiaire)</li><li><strong>Le SST (Sauveteur Secouriste du Travail) :</strong> intervient en cas d'accident du travail et participe à la prévention</li></ul>` },
+    { heading: "Interlocuteurs externes", content: `<ul><li><strong>Le service de santé au travail :</strong> visites régulières pour maintenir l'aptitude au poste</li><li><strong>L'inspection du travail :</strong> informe, conseille et contrôle l'application du droit du travail</li></ul>` },
+    { heading: "Les atteintes à la santé en milieu professionnel", content: `<ul><li><strong>Accident de trajet :</strong> entre le lieu de travail et le domicile, ou le lieu de repas</li><li><strong>Accident du travail :</strong> accident survenu par le fait ou à l'occasion du travail</li><li><strong>Maladie professionnelle :</strong> maladie contractée du fait de l'exposition à un risque lors de l'exercice professionnel</li></ul>` },
+  ] });
+}

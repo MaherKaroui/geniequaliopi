@@ -427,6 +427,86 @@ export function generateExcelSuiviParcoursBeneficiairesCFA(o: OrganismeInfo, f: 
   return excelWrap(`SUIVI PARCOURS BÉNÉFICIAIRES ${o.nom}`, [{ name: "Suivi Parcours", html }]);
 }
 
+// ========== IND 12 — Suivi du public et du bénéficiaire (Excel) ==========
+export function generateExcelSuiviPublicBeneficiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]): string {
+  let html = `<table border="1" cellspacing="0" cellpadding="4">`;
+  html += `<tr><td colspan="7" style="font-size:14pt;font-weight:bold;background:#1e3a7b;color:#fff;padding:10px">${o.nom} – Cahier de contact</td></tr>`;
+  html += `<tr style="background:#e8f0fe;font-weight:bold"><th style="border:1px solid #999;padding:6px">Date</th><th style="border:1px solid #999;padding:6px">Thème</th><th style="border:1px solid #999;padding:6px">Raison sociale</th><th style="border:1px solid #999;padding:6px">Identité</th><th style="border:1px solid #999;padding:6px">Email</th><th style="border:1px solid #999;padding:6px">Tél</th><th style="border:1px solid #999;padding:6px">Résumé des échanges</th></tr>`;
+  for (let i = 0; i < 20; i++) {
+    html += `<tr>${Array.from({length:7}, () => '<td style="border:1px solid #999;padding:6px">&nbsp;</td>').join('')}</tr>`;
+  }
+  html += `</table>`;
+  return excelWrap(`Cahier de contact ${o.nom}`, [{ name: "Cahier de contact", html }]);
+}
+
+// ========== IND 12 — Tableau de suivi PFMP (Excel) ==========
+export function generateExcelSuiviPFMP(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]): string {
+  let html = `<table border="1" cellspacing="0" cellpadding="4">`;
+  html += `<tr><td colspan="16" style="font-size:14pt;font-weight:bold;background:#1e3a7b;color:#fff;padding:10px">SUIVI PFMP – ${o.nom}</td></tr>`;
+  html += `<tr><td colspan="4" style="padding:6px;border:1px solid #999"><strong>Établissement :</strong> ${o.nom}</td><td colspan="4" style="padding:6px;border:1px solid #999"><strong>Diplôme :</strong> ${f.intitule}</td><td colspan="8" style="padding:6px;border:1px solid #999"><strong>Session :</strong> ${new Date().getFullYear()}</td></tr>`;
+  html += `<tr style="background:#e8f0fe;font-weight:bold"><th style="border:1px solid #999;padding:6px">Noms des Élèves</th><th style="border:1px solid #999;padding:6px">P1</th><th style="border:1px solid #999;padding:6px">P2</th><th style="border:1px solid #999;padding:6px">P3</th><th style="border:1px solid #999;padding:6px">P4</th><th style="border:1px solid #999;padding:6px">P5</th><th style="border:1px solid #999;padding:6px">P6</th><th style="border:1px solid #999;padding:6px">Jours certif.</th><th style="border:1px solid #999;padding:6px">Jours à récupérer</th><th style="border:1px solid #999;padding:6px">Rattrapage</th><th style="border:1px solid #999;padding:6px">Conformité</th></tr>`;
+  stagiaires.forEach(s => {
+    html += `<tr><td style="border:1px solid #999;padding:6px">${s.prenom} ${s.nom}</td>`;
+    for (let i = 0; i < 10; i++) html += `<td style="border:1px solid #999;padding:6px">&nbsp;</td>`;
+    html += `</tr>`;
+  });
+  for (let i = 0; i < Math.max(0, 10 - stagiaires.length); i++) {
+    html += `<tr>${Array.from({length:11}, () => '<td style="border:1px solid #999;padding:6px">&nbsp;</td>').join('')}</tr>`;
+  }
+  html += `</table>`;
+  return excelWrap(`Suivi PFMP ${o.nom}`, [{ name: "Formations 3 ans", html }, { name: "Formations 2 ans", html }]);
+}
+
+// ========== IND 13 — Outils de suivi alternance (Excel) ==========
+export function generateExcelOutilsSuiviAlternance(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]): string {
+  // Sheet 1 - Informations générales
+  let infoHtml = `<table border="1" cellspacing="0" cellpadding="4">`;
+  infoHtml += `<tr><td colspan="6" style="font-size:14pt;font-weight:bold;background:#1e3a7b;color:#fff;padding:10px">INFORMATIONS GÉNÉRALES</td></tr>`;
+  infoHtml += `<tr><td colspan="6" style="padding:6px;border:1px solid #999;font-style:italic">Document à compléter à la fin de chaque période (à l'école ou en entreprise)</td></tr>`;
+  const s0 = stagiaires[0];
+  infoHtml += `<tr><td colspan="2" style="padding:6px;border:1px solid #999"><strong>Nom de l'entreprise :</strong></td><td colspan="4" style="padding:6px;border:1px solid #999">${s0?.entreprise || ''}</td></tr>`;
+  infoHtml += `<tr><td colspan="2" style="padding:6px;border:1px solid #999"><strong>Nom de l'apprenti :</strong></td><td colspan="4" style="padding:6px;border:1px solid #999">${s0 ? s0.prenom + ' ' + s0.nom : ''}</td></tr>`;
+  infoHtml += `<tr><td colspan="2" style="padding:6px;border:1px solid #999"><strong>Nom du tuteur :</strong></td><td colspan="4" style="padding:6px;border:1px solid #999">${o.responsablePedagogique}</td></tr>`;
+  infoHtml += `<tr><td colspan="2" style="padding:6px;border:1px solid #999"><strong>Nom de l'organisme :</strong></td><td colspan="4" style="padding:6px;border:1px solid #999">${o.nom}</td></tr>`;
+  infoHtml += `<tr><td colspan="2" style="padding:6px;border:1px solid #999"><strong>Référent pédagogique :</strong></td><td colspan="4" style="padding:6px;border:1px solid #999">${o.responsablePedagogique}</td></tr>`;
+  infoHtml += `</table>`;
+
+  // Sheet 2 - Entretien fin de période d'essai
+  let entretienHtml = `<table border="1" cellspacing="0" cellpadding="4">`;
+  entretienHtml += `<tr><td colspan="6" style="font-size:14pt;font-weight:bold;background:#1e3a7b;color:#fff;padding:10px">ENTRETIEN DE FIN DE PÉRIODE D'ESSAI</td></tr>`;
+  entretienHtml += `<tr><td colspan="6" style="padding:6px;border:1px solid #999;font-style:italic">Se référer aux compétences visées par la qualification</td></tr>`;
+  entretienHtml += `<tr style="background:#e8f0fe;font-weight:bold"><th style="border:1px solid #999;padding:6px">Compétences à développer</th><th style="border:1px solid #999;padding:6px">Activités à réaliser</th><th style="border:1px solid #999;padding:6px">Lieu</th><th style="border:1px solid #999;padding:6px">Date entretien</th><th style="border:1px solid #999;padding:6px">Évaluation</th><th style="border:1px solid #999;padding:6px">Observations</th></tr>`;
+  for (let i = 0; i < 10; i++) {
+    entretienHtml += `<tr>${Array.from({length:6}, () => '<td style="border:1px solid #999;padding:6px">&nbsp;</td>').join('')}</tr>`;
+  }
+  entretienHtml += `</table>`;
+
+  // Sheet 3 - Bilan intermédiaire
+  let bilanHtml = `<table border="1" cellspacing="0" cellpadding="4">`;
+  bilanHtml += `<tr><td colspan="6" style="font-size:14pt;font-weight:bold;background:#1e3a7b;color:#fff;padding:10px">BILAN INTERMÉDIAIRE</td></tr>`;
+  bilanHtml += `<tr style="background:#e8f0fe;font-weight:bold"><th style="border:1px solid #999;padding:6px">Compétences</th><th style="border:1px solid #999;padding:6px">Activités</th><th style="border:1px solid #999;padding:6px">Lieu</th><th style="border:1px solid #999;padding:6px">Date</th><th style="border:1px solid #999;padding:6px">Évaluation</th><th style="border:1px solid #999;padding:6px">Observations</th></tr>`;
+  for (let i = 0; i < 10; i++) {
+    bilanHtml += `<tr>${Array.from({length:6}, () => '<td style="border:1px solid #999;padding:6px">&nbsp;</td>').join('')}</tr>`;
+  }
+  bilanHtml += `</table>`;
+
+  // Sheet 4 - Bilan final
+  let finalHtml = `<table border="1" cellspacing="0" cellpadding="4">`;
+  finalHtml += `<tr><td colspan="6" style="font-size:14pt;font-weight:bold;background:#1e3a7b;color:#fff;padding:10px">BILAN FINAL</td></tr>`;
+  finalHtml += `<tr style="background:#e8f0fe;font-weight:bold"><th style="border:1px solid #999;padding:6px">Compétences</th><th style="border:1px solid #999;padding:6px">Activités</th><th style="border:1px solid #999;padding:6px">Lieu</th><th style="border:1px solid #999;padding:6px">Date</th><th style="border:1px solid #999;padding:6px">Évaluation</th><th style="border:1px solid #999;padding:6px">Observations</th></tr>`;
+  for (let i = 0; i < 10; i++) {
+    finalHtml += `<tr>${Array.from({length:6}, () => '<td style="border:1px solid #999;padding:6px">&nbsp;</td>').join('')}</tr>`;
+  }
+  finalHtml += `</table>`;
+
+  return excelWrap(`Outils de suivi ${o.nom}`, [
+    { name: "Informations générales", html: infoHtml },
+    { name: "Entretien fin période essai", html: entretienHtml },
+    { name: "Bilan intermédiaire", html: bilanHtml },
+    { name: "Bilan final", html: finalHtml },
+  ]);
+}
+
 // Helper to generate Excel blob
 export function excelToBlob(htmlContent: string): Blob {
   return new Blob(["\ufeff", htmlContent], { type: "application/vnd.ms-excel" });
