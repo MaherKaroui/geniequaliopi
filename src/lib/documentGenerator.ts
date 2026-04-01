@@ -4378,7 +4378,7 @@ function genVAEAttestationAssiduite(o: OrganismeInfo, f: FormationInfo, stagiair
   const dateFin = getStagiaireDateFin(s, f);
   return buildDocument({ org: o, title: "ATTESTATION D'ASSIDUITÉ – ACCOMPAGNEMENT VAE", sections: [
     { heading: "", content: `<p>Je soussigné(e), ${o.dirigeant}, en qualité de dirigeant de ${o.nom}, atteste que :</p><p><strong>${s.prenom} ${s.nom}</strong></p><p>a suivi avec assiduité l'accompagnement VAE en vue de l'obtention de la certification :</p><p><strong>« ${f.intitule} »</strong></p><p><strong>Période :</strong> du ${formatDate(dateDebut)} au ${formatDate(dateFin)}<br><strong>Durée totale réalisée :</strong> 24 heures sur 10 séances<br><strong>Taux de présence :</strong> 100%</p><p>La présente attestation est délivrée pour servir et valoir ce que de droit.</p><p>Fait à ${o.ville}, le ${formatDate(dateFin)}</p>` },
-  ], signatures: { type: "2", labels: ["Le Dirigeant", ""], names: [o.dirigeant, ""] } });
+  ], signatures: { type: "2", labels: ["Le Dirigeant", "Le Candidat"], names: [o.dirigeant, `${s.prenom} ${s.nom}`], stagiaireSignatureUrl: s.signatureUrl, dates: [formatDate(dateFin), formatDate(dateFin)] } });
 }
 
 function genVAEProcedureJury(o: OrganismeInfo, f: FormationInfo) {
