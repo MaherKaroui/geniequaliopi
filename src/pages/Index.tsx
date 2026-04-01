@@ -8,7 +8,7 @@ import StagiairesForm from "@/components/StagiairesForm";
 import CriteresForm from "@/components/CriteresForm";
 import DocumentGenerator from "@/components/DocumentGenerator";
 import DossierHistory from "@/components/DossierHistory";
-import ControleEDOF from "@/components/ControleEDOF";
+
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, LogIn, LogOut, User, FileSpreadsheet, Upload, Loader2 } from "lucide-react";
 import { exportFormDataToExcel } from "@/lib/exportFormData";
