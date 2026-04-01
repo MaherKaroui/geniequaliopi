@@ -1281,11 +1281,12 @@ export function genCGVStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: 
     { heading: "Article 16 – Acceptation des CGV", content: `<p>L'inscription à la formation vaut acceptation sans réserve des présentes Conditions Générales de Vente.</p>` },
   ];
 
-  let sigPages = `<p><strong>Fait à ${o.ville}, le :</strong> ${formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || new Date().toISOString(), 14))}</p>`;
+  const sigDateCGV = formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || new Date().toISOString(), 14));
+  let sigPages = `<p><strong>Fait à ${o.ville}, le :</strong> ${sigDateCGV}</p>`;
   sigPages += sigBlock(
     `Le Stagiaire`, `${s.prenom} ${s.nom}`, stagSig(s),
     `Pour l'Organisme de formation`, o.dirigeant, orgSig(o),
-    'Précédée de la mention « Lu et approuvé »'
+    'Précédée de la mention « Lu et approuvé »', sigDateCGV, sigDateCGV
   );
 
   return buildDocument({ org: o, title: `CONDITIONS GÉNÉRALES DE VENTE – ${s.prenom} ${s.nom}`, sections, extraHtml: sigPages });
