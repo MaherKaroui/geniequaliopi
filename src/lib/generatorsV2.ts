@@ -96,11 +96,12 @@ export function genCGV_V2(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
   let sigPages = '';
   stagiaires.slice(0, 10).forEach((s, i) => {
     if (i > 0) sigPages += '<div class="page-break"></div>';
-    sigPages += `<p><strong>Fait à ${o.ville}, le :</strong> ${formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || new Date().toISOString(), 14))}</p>`;
+    const sigDate = formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || new Date().toISOString(), 14));
+    sigPages += `<p><strong>Fait à ${o.ville}, le :</strong> ${sigDate}</p>`;
     sigPages += sigBlock(
       `Le Stagiaire`, `${s.prenom} ${s.nom}`, stagSig(s),
       `Pour l'Organisme de formation`, o.dirigeant, orgSig(o),
-      'Précédée de la mention « Lu et approuvé »'
+      'Précédée de la mention « Lu et approuvé »', sigDate, sigDate
     );
   });
 
