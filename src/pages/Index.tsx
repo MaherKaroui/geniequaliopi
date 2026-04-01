@@ -9,9 +9,11 @@ import CriteresForm from "@/components/CriteresForm";
 import DocumentGenerator from "@/components/DocumentGenerator";
 import DossierHistory from "@/components/DossierHistory";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, LogIn, LogOut, User, FileSpreadsheet } from "lucide-react";
+import { ChevronLeft, ChevronRight, LogIn, LogOut, User, FileSpreadsheet, Upload, Loader2 } from "lucide-react";
 import { exportFormDataToExcel } from "@/lib/exportFormData";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const STEPS = [
   { id: 1, label: "Organisme" },
@@ -38,6 +40,24 @@ const emptyFormation: FormationInfo = {
 const Index = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  const [airtableLoading, setAirtableLoading] = useState(false);
+
+  const syncToAirtable = async () => {
+    setAirtableLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('airtable-sync', {
+        body: { organisme, formation, stagiaires },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      toast.success("Données synchronisées vers Airtable !");
+    } catch (err: any) {
+      console.error('Airtable sync error:', err);
+      toast.error("Erreur Airtable : " + (err.message || 'Erreur inconnue'));
+    } finally {
+      setAirtableLoading(false);
+    }
+  };
 
   const [currentStep, setCurrentStep] = useState(() => {
     const saved = sessionStorage.getItem('qualiopi_step');
@@ -143,6 +163,10 @@ const Index = () => {
             )}
             <Button variant="outline" size="sm" onClick={() => exportFormDataToExcel(organisme, formation, stagiaires)} className="gap-1">
               <FileSpreadsheet className="w-4 h-4" /> Export Excel
+            </Button>
+            <Button variant="outline" size="sm" onClick={syncToAirtable} disabled={airtableLoading} className="gap-1">
+              {airtableLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+              {airtableLoading ? 'Envoi...' : 'Airtable'}
             </Button>
             <Button variant="ghost" size="sm" onClick={() => updateStarted(false)}>Accueil</Button>
           </div>
