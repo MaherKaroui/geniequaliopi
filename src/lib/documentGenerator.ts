@@ -4256,7 +4256,7 @@ function genVAEEmargement(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
     rows
   }, sections: [
     { heading: "Total", content: `<p><strong>Total des heures réalisées : 24 heures</strong></p>` },
-  ], signatures: { type: "2", labels: ["L'Accompagnateur VAE", "Le Candidat"], names: [o.responsablePedagogique, s.prenom + " " + s.nom] } });
+  ], signatures: { type: "2", labels: ["L'Accompagnateur VAE (Formateur)", "Le Candidat"], names: [o.responsablePedagogique, s.prenom + " " + s.nom], stagiaireSignatureUrl: s.signatureUrl, formateurSignatureUrl: s.formateurSignatureUrl || f.formateurSignatureUrl, dates: [formatDate(dateDebut), formatDate(dateDebut)] } });
 }
 
 function genVAETempsConnexion(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
