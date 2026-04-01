@@ -548,9 +548,46 @@ export function buildFullCatalog(
       });
     });
     add("cfa_fiche_autoevaluation", "CT3 - IND 11 FICHE AUTOÉVALUATION APPRENTI", 3, 11, "fiche_autoevaluation_apprenti");
-    add("cfa_procedure_abandon", "Procédure d'abandon CFA", 3, 12, "procedure_abandon_cfa");
-    add("cfa_procedure_absences", "Procédure des absences CFA", 3, 12, "procedure_absences_cfa");
-    add("cfa_logs_connexion", "Logs de connexion CFA", 3, 12, "logs_connexion_cfa");
+
+    // ===== IND 12 — ENGAGEMENT DES BÉNÉFICIAIRES (CFA) =====
+    add("cfa_procedure_abandon", "CT3 - IND 12 PROCÉDURE D'ABANDON CFA", 3, 12, "procedure_abandon_cfa");
+    add("cfa_procedure_absences", "CT3 - IND 12 PROCÉDURE DES ABSENCES CFA", 3, 12, "procedure_absences_cfa");
+    add("cfa_logs_connexion", "CT3 - IND 12 LOGS DE CONNEXION CFA", 3, 12, "logs_connexion_cfa");
+    add("cfa_c3i12_mesures_engagement", "CT3 - IND 12 MESURES POUR FAVORISER L'ENGAGEMENT DES BÉNÉFICIAIRES", 3, 12, "mesures_engagement_beneficiaires_cfa");
+    add("cfa_c3i12_prevention_abandons", "CT3 - IND 12 PRÉVENTION ET GESTION DES ABANDONS", 3, 12, "prevention_gestion_abandons_cfa");
+    add("cfa_c3i12_guide_entretien_abandons", "CT3 - IND 12 GUIDE D'ENTRETIEN DES ABANDONS", 3, 12, "guide_entretien_abandons_cfa");
+    add("cfa_c3i12_eviter_echec", "CT3 - IND 12 ÉVITER LES SITUATIONS D'ÉCHEC", 3, 12, "eviter_situations_echec_cfa");
+    add("cfa_c3i12_procedure_annulations_abandons", "CT3 - IND 12 PROCÉDURE DE GESTION DES ANNULATIONS ET ABANDONS", 3, 12, "procedure_annulations_abandons_cfa");
+    add("cfa_c3i12_fichier_gestion_annulations", "CT3 - IND 12 FICHIER GESTION DES ANNULATIONS", 3, 12, "fichier_gestion_annulations_cfa");
+    add("cfa_c3i12_accompagnement_recherche_contrat", "CT3 - IND 12 ACCOMPAGNEMENT À LA RECHERCHE D'UN CONTRAT", 3, 12, "accompagnement_recherche_contrat_cfa");
+    add("cfa_c3i12_liste_aide_social", "CT3 - IND 12 LISTE AIDE SOCIAL", 3, 12, "liste_aide_social_cfa");
+    add("cfa_c3i12_certificat_realisation", "CT3 - IND 12 CERTIFICAT DE RÉALISATION", 3, 12, "certificat_realisation_cfa");
+    add("cfa_c3i12_suivi_public_excel", "CT3 - IND 12 SUIVI DU PUBLIC ET DU BÉNÉFICIAIRE (Excel)", 3, 12, "suivi_public_beneficiaire_excel");
+    add("cfa_c3i12_suivi_pfmp_excel", "CT3 - IND 12 TABLEAU DE SUIVI PFMP (Excel)", 3, 12, "suivi_pfmp_excel");
+
+    // ===== IND 13 — COORDINATION ALTERNANCE (CFA) =====
+    formations.forEach((f, fi) => {
+      add(`cfa_c3i13_contrat_${fi}`, `CT3 - IND 13 CONTRAT D'APPRENTISSAGE`, 3, 13, "contrat_apprentissage", { fi });
+      add(`cfa_c3i13_competences_${fi}`, `CT3 - IND 13 GRILLE COMPÉTENCES ALTERNANCE`, 3, 13, "competences_alternance", { fi });
+      add(`cfa_c3i13_suivi_ent_${fi}`, `CT3 - IND 13 SUIVI EN ENTREPRISE`, 3, 13, "suivi_entreprise_cfa", { fi });
+    });
+    add("cfa_c3i13_outils_suivi_excel", "CT3 - IND 13 OUTILS DE SUIVI ALTERNANCE (Excel)", 3, 13, "outils_suivi_alternance_excel");
+
+    // ===== IND 14 — ACCOMPAGNEMENT SOCIO-PROFESSIONNEL (CFA) =====
+    formations.forEach((f, fi) => {
+      add(`cfa_c3i14_suivi3mois_${fi}`, `CT3 - IND 14 SUIVI À 3 MOIS`, 3, 14, "suivi_3_mois", { fi });
+      add(`cfa_c3i14_insertion_${fi}`, `CT3 - IND 14 QUESTIONNAIRE INSERTION`, 3, 14, "questionnaire_insertion", { fi });
+    });
+    add("cfa_c3i14_webinaire_formation_competences", "CT3 - IND 14 WEBINAIRE FORMATION ET DÉVELOPPEMENT DES COMPÉTENCES", 3, 14, "webinaire_formation_competences_cfa");
+    add("cfa_c3i14_webinaire_ntc", "CT3 - IND 14 WEBINAIRE TECHNIQUES ET OUTILS DU NTC", 3, 14, "webinaire_ntc_cfa");
+
+    // ===== IND 15 — DROITS ET DEVOIRS DE L'APPRENTI (CFA) =====
+    formations.forEach((f, fi) => {
+      add(`cfa_c3i15_conditions_${fi}`, `CT3 - IND 15 FICHE CONDITIONS ACCUEIL`, 3, 15, "conditions_accueil", { fi });
+      add(`cfa_c3i15_charte_${fi}`, `CT3 - IND 15 CHARTE ACCUEIL`, 3, 15, "charte_accueil", { fi });
+    });
+    add("cfa_c3i15_droits_devoirs_apprenti", "CT3 - IND 15 DROITS ET DEVOIRS DE L'APPRENTI", 3, 15, "droits_devoirs_apprenti_cfa");
+    add("cfa_c3i15_regles_sante_securite", "CT3 - IND 15 RÈGLES SANTÉ ET SÉCURITÉ EN MILIEU PROFESSIONNEL", 3, 15, "regles_sante_securite_cfa");
 
     // ===== IND 8 — Positionnement et évaluation des acquis à l'entrée (CFA) =====
     formations.forEach((f, fi) => {
