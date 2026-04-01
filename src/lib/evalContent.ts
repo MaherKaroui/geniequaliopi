@@ -431,8 +431,69 @@ const DEFAULT_CONTENT: FormationEvalContent = {
   ],
 };
 
-// Map formation intitulé to content key
-function getContentKey(intitule: string): string {
+const ECSR_CONTENT: FormationEvalContent = {
+  qcmPositionnement: [
+    { question: "Quel document est le référentiel de base pour l'enseignement de la conduite ?", options: ["Le Code de la route", "Le REMC", "Le PNF", "Le livret d'apprentissage"], correctIndex: 1 },
+    { question: "Quelle autorité délivre l'autorisation d'enseigner la conduite ?", options: ["Le maire", "Le préfet", "Le ministre", "La DREETS"], correctIndex: 1 },
+    { question: "Quelle est la durée de validité de l'autorisation d'enseigner ?", options: ["3 ans", "5 ans", "10 ans", "Illimitée"], correctIndex: 1 },
+    { question: "Combien de compétences globales comporte le REMC ?", options: ["2", "3", "4", "5"], correctIndex: 2 },
+    { question: "Quel est le taux maximal d'alcoolémie pour un conducteur novice ?", options: ["0,5 g/l", "0,2 g/l", "0,0 g/l", "0,8 g/l"], correctIndex: 1 },
+    { question: "Quel est le nombre minimum de bonnes réponses pour réussir l'ETG ?", options: ["30/40", "32/40", "35/40", "38/40"], correctIndex: 2 },
+    { question: "Quelle est la durée de l'épreuve pratique du permis B ?", options: ["20 minutes", "25 minutes", "30 minutes", "32 minutes"], correctIndex: 3 },
+    { question: "Que signifie l'acronyme REMC ?", options: ["Règlement d'Évaluation des Moniteurs Certifiés", "Référentiel pour l'Éducation à une Mobilité Citoyenne", "Registre des Enseignants et Moniteurs de Conduite", "Référentiel Européen de Mobilité et Conduite"], correctIndex: 1 },
+    { question: "Quel modèle hiérarchique est utilisé dans le REMC ?", options: ["Modèle ADDIE", "Matrice GDE", "Pyramide de Maslow", "Modèle de Kirkpatrick"], correctIndex: 1 },
+    { question: "Quel numéro d'urgence est commun à toute l'Europe ?", options: ["15", "18", "112", "114"], correctIndex: 2 },
+  ],
+  qcmFinal: [
+    { question: "Qu'est-ce que la conduite commentée ?", options: ["L'enseignant commente la route", "L'apprenant verbalise son analyse de l'environnement routier", "Un commentaire écrit après la leçon", "Une vidéo commentée de conduite"], correctIndex: 1 },
+    { question: "Quel est le premier facteur d'accident mortel en France ?", options: ["L'alcool", "La vitesse", "Le téléphone", "La fatigue"], correctIndex: 1 },
+    { question: "Que signifie AAC ?", options: ["Apprentissage Assisté par Conduite", "Apprentissage Anticipé de la Conduite", "Autorisation Administrative de Conduire", "Attestation d'Aptitude à la Conduite"], correctIndex: 1 },
+    { question: "Quel type d'évaluation permet d'ajuster la pédagogie en cours d'apprentissage ?", options: ["Diagnostique", "Formative", "Sommative", "Certificative"], correctIndex: 1 },
+    { question: "Quelle théorie de l'apprentissage met l'accent sur la construction des connaissances par l'apprenant ?", options: ["Behaviorisme", "Cognitivisme", "Constructivisme", "Connectivisme"], correctIndex: 2 },
+    { question: "Combien de CCP composent le titre professionnel ECSR ?", options: ["1", "2", "3", "4"], correctIndex: 1 },
+    { question: "Quelle est la zone proximale de développement (ZPD) ?", options: ["La distance de freinage", "L'écart entre ce que l'apprenant sait faire seul et avec aide", "La zone de danger en intersection", "L'espace de manœuvre du véhicule"], correctIndex: 1 },
+    { question: "Quel document l'enseignant doit-il renseigner avec l'apprenant après chaque séance ?", options: ["Le carnet d'entretien", "Le livret d'apprentissage", "Le contrat de formation", "La fiche de paie"], correctIndex: 1 },
+    { question: "Que doit faire l'enseignant en premier en cas d'accident ?", options: ["Appeler la police", "Protéger la zone", "Secourir les victimes", "Remplir le constat"], correctIndex: 1 },
+    { question: "Quelle est la particularité du véhicule d'apprentissage ?", options: ["Il est électrique", "Il possède une double commande", "Il est plus petit", "Il a un moteur bridé"], correctIndex: 1 },
+  ],
+  exercices: [
+    { titre: "Construction d'un scénario pédagogique", consigne: "Construisez un scénario pédagogique pour une séance individuelle de conduite de 1h portant sur les intersections avec priorité à droite. Détaillez les objectifs, les méthodes, le parcours choisi et les critères d'évaluation.", reponseAttendue: "Objectif : Maîtriser le franchissement des intersections avec priorité à droite. Méthode : Progression du simple au complexe (quartier calme → zone urbaine dense). Parcours : itinéraire avec 8-10 intersections de difficulté croissante. Évaluation : observation du regard, ralentissement adapté, placement correct." },
+    { titre: "Animation d'une séance collective sur l'alcool au volant", consigne: "Préparez le plan d'animation d'une séance collective de 45 minutes sur les dangers de l'alcool au volant. Précisez les supports, méthodes pédagogiques et le déroulement.", reponseAttendue: "Plan en 3 phases : 1) Recueil des représentations (brainstorming 10 min), 2) Apport d'informations (diaporama + vidéo – effets de l'alcool, réglementation, sanctions – 20 min), 3) Mise en situation avec lunettes de simulation et débat (15 min). Supports : vidéoprojecteur, lunettes d'alcoolémie, données accidentologiques ONISR." },
+    { titre: "Analyse d'une situation de conduite à risque", consigne: "À partir de la situation suivante : 'Un apprenant roule à 50 km/h en agglomération et ne ralentit pas à l'approche d'un passage piéton où des enfants sortent d'une école', analysez les risques et proposez une stratégie de remédiation.", reponseAttendue: "Risques : vitesse inadaptée, non-anticipation, piétons vulnérables. Remédiation : travail sur l'exploration visuelle (regard loin + balayage latéral), compréhension de la signalisation (zone 30, abords d'école), conscience des usagers vulnérables, exercice de conduite commentée dans la zone." },
+    { titre: "Conception d'une action de sensibilisation en entreprise", consigne: "Une entreprise vous demande d'animer une demi-journée de sensibilisation au risque routier professionnel pour ses 30 salariés commerciaux. Rédigez votre proposition d'intervention.", reponseAttendue: "Proposition : 1) Accueil et quiz de positionnement (30 min), 2) Conférence interactive sur les risques routiers professionnels avec données accidentologiques (45 min), 3) Atelier pratique en 3 groupes tournants : simulateur, vérifications véhicule, éco-conduite (1h30), 4) Bilan et engagement individuel (15 min). Supports : simulateur, véhicule de démonstration, lunettes alcool/drogue." },
+    { titre: "Évaluation des compétences d'un apprenant", consigne: "Un apprenant a effectué 25 heures de conduite. Rédigez un bilan de ses compétences en vous appuyant sur les 4 compétences globales du REMC et proposez un plan de progression pour les prochaines séances.", reponseAttendue: "Bilan REMC : C1 (Maîtriser) – Acquis : démarrage, arrêt, vitesses. À travailler : manœuvres en espace réduit. C2 (Appréhender) – Acquis : signalisation courante. À travailler : anticipation des priorités. C3 (Circuler) – Acquis : insertion sur voie rapide. À travailler : gestion des ronds-points complexes. C4 (Autonomie) – En cours d'acquisition. Plan : 5h de ronds-points et intersections complexes, puis évaluation de synthèse." },
+  ],
+  competences: [
+    "Construire et préparer un scénario pédagogique de formation à la conduite",
+    "Animer une séance collective de formation à la sécurité routière",
+    "Animer une séance individuelle de formation à la conduite d'un véhicule léger",
+    "Évaluer le degré d'acquisition des compétences des apprenants",
+    "Encadrer et faciliter l'intervention d'un tiers (AAC/conduite supervisée)",
+    "Repérer les difficultés d'apprentissage et proposer des remédiations",
+    "Apprécier la dynamique de l'environnement routier et identifier les risques",
+    "Analyser une demande de prestation de sensibilisation",
+    "Construire et préparer une action de sensibilisation",
+    "Animer une séance de sensibilisation à la sécurité routière",
+    "Analyser ses pratiques professionnelles pour les faire évoluer",
+    "Maîtriser la réglementation routière et le cadre institutionnel",
+  ],
+  appreciations: [
+    "Excellent niveau pédagogique. Les séances sont construites avec rigueur et les apprenants progressent rapidement. Maîtrise solide du REMC.",
+    "Bonne progression tout au long de la formation. Les mises en situation professionnelle sont réussies. Quelques points à consolider en animation de groupe.",
+    "Très bonne implication dans les activités pratiques. La conduite commentée est bien maîtrisée. Doit renforcer les connaissances réglementaires.",
+    "Niveau satisfaisant. Les fondamentaux de la pédagogie de la conduite sont acquis. Doit poursuivre la pratique en situation réelle.",
+    "Excellente capacité d'adaptation aux différents publics. Les séances de sensibilisation sont dynamiques et pertinentes.",
+    "Bon résultat aux évaluations. L'analyse des situations de conduite est pertinente. Axes de progression identifiés en gestion de groupe.",
+    "Solide acquisition des compétences du CCP1. Les séances individuelles de conduite sont bien menées avec un bon dosage des interventions.",
+    "Très bonne maîtrise de l'environnement routier et des facteurs de risque. Les supports pédagogiques sont bien exploités.",
+    "Progression significative. L'examen blanc a été réussi avec de bons résultats. Prêt pour la certification.",
+    "Excellent résultat global. Maîtrise complète des deux blocs de compétences. Profil prometteur pour la profession.",
+  ],
+};
+
+EVAL_CONTENT["ECSR"] = ECSR_CONTENT;
+
+
   const lower = intitule.toLowerCase();
   if (lower.includes("ecsr") || lower.includes("enseignant de la conduite") || lower.includes("sécurité routière")) return "ECSR";
   if (lower.includes("excel")) return "Excel Professionnel";
