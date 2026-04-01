@@ -68,6 +68,45 @@ export type Database = {
         }
         Relationships: []
       }
+      saved_ey_controls: {
+        Row: {
+          created_at: string
+          doc_states: Json
+          doc_style: Json | null
+          formation: Json
+          id: string
+          name: string
+          organisme: Json
+          stagiaires: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          doc_states?: Json
+          doc_style?: Json | null
+          formation: Json
+          id?: string
+          name?: string
+          organisme: Json
+          stagiaires?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          doc_states?: Json
+          doc_style?: Json | null
+          formation?: Json
+          id?: string
+          name?: string
+          organisme?: Json
+          stagiaires?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       saved_themes: {
         Row: {
           config: Json

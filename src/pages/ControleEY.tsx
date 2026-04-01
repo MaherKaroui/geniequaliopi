@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { OrganismeInfo, FormationInfo, StagiaireInfo, CritereData, CRITERES, DocStyleConfig, DEFAULT_DOC_STYLE } from "@/types/qualiopi";
 import OrganismeForm from "@/components/OrganismeForm";
@@ -7,8 +7,11 @@ import StagiairesForm from "@/components/StagiairesForm";
 import DocStyleConfigPanel from "@/components/DocStyleConfigPanel";
 import ControleEDOF from "@/components/ControleEDOF";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, LogIn, LogOut, ChevronDown, ChevronRight, Building2, GraduationCap, Users, Palette } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { ChevronLeft, LogIn, LogOut, ChevronDown, ChevronRight, Building2, GraduationCap, Users, Palette, Save, FolderOpen, Trash2, Plus } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const emptyOrganisme: OrganismeInfo = {
   nom: "", siret: "", adresse: "", codePostal: "", ville: "", telephone: "", email: "",
@@ -23,6 +26,18 @@ const emptyFormation: FormationInfo = {
   delaiAcces: "", dateDebut: "", dateFin: "", lieu: "", nombreParticipants: "", formateur: "",
   rythmeAlternance: ""
 };
+
+interface SavedEYControl {
+  id: string;
+  name: string;
+  organisme: OrganismeInfo;
+  formation: FormationInfo;
+  stagiaires: StagiaireInfo[];
+  doc_states: Record<string, any>;
+  doc_style: DocStyleConfig | null;
+  created_at: string;
+  updated_at: string;
+}
 
 const ControleEY = () => {
   const { user, signOut } = useAuth();
@@ -44,8 +59,29 @@ const ControleEY = () => {
     try { const s = sessionStorage.getItem('qualiopi_style'); return s ? JSON.parse(s) : DEFAULT_DOC_STYLE; } catch { return DEFAULT_DOC_STYLE; }
   });
 
+  // Save/Load state
+  const [savedList, setSavedList] = useState<SavedEYControl[]>([]);
+  const [currentSaveId, setCurrentSaveId] = useState<string | null>(null);
+  const [saveName, setSaveName] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [showSaved, setShowSaved] = useState(false);
+
   // Collapsible sections
   const [openSections, setOpenSections] = useState<Set<string>>(new Set());
+
+  // Load saved controls list
+  const loadSavedList = useCallback(async () => {
+    if (!user) return;
+    const { data, error } = await supabase
+      .from("saved_ey_controls")
+      .select("*")
+      .order("updated_at", { ascending: false });
+    if (!error && data) {
+      setSavedList(data as unknown as SavedEYControl[]);
+    }
+  }, [user]);
+
+  useEffect(() => { loadSavedList(); }, [loadSavedList]);
 
   const toggleSection = (section: string) => {
     setOpenSections(prev => {
@@ -73,6 +109,94 @@ const ControleEY = () => {
   const handleStyleChange = useCallback((style: DocStyleConfig) => {
     setDocStyle(style);
     sessionStorage.setItem('qualiopi_style', JSON.stringify(style));
+  }, []);
+
+  // Save current data
+  const handleSave = useCallback(async () => {
+    if (!user) {
+      toast.error("Connectez-vous pour sauvegarder");
+      return;
+    }
+    const name = saveName.trim() || organisme.nom || "Sans titre";
+    setSaving(true);
+    try {
+      const payload: any = {
+        user_id: user.id,
+        name,
+        organisme,
+        formation,
+        stagiaires,
+        doc_states: {},
+        doc_style: docStyle || null,
+        updated_at: new Date().toISOString(),
+      };
+
+      if (currentSaveId) {
+        const { error } = await supabase
+          .from("saved_ey_controls")
+          .update(payload)
+          .eq("id", currentSaveId);
+        if (error) throw error;
+        toast.success("Dossier EY mis à jour");
+      } else {
+        const { data, error } = await supabase
+          .from("saved_ey_controls")
+          .insert(payload)
+          .select("id")
+          .single();
+        if (error) throw error;
+        setCurrentSaveId(data.id);
+        toast.success("Dossier EY enregistré");
+      }
+      setSaveName(name);
+      await loadSavedList();
+    } catch (e: any) {
+      toast.error("Erreur : " + (e.message || "Erreur inconnue"));
+    } finally {
+      setSaving(false);
+    }
+  }, [user, saveName, organisme, formation, stagiaires, docStyle, currentSaveId, loadSavedList]);
+
+  // Load saved data
+  const handleLoad = useCallback((item: SavedEYControl) => {
+    setOrganisme(item.organisme);
+    setFormation(item.formation);
+    setStagiaires(item.stagiaires || []);
+    if (item.doc_style) setDocStyle(item.doc_style);
+    setCurrentSaveId(item.id);
+    setSaveName(item.name);
+
+    sessionStorage.setItem('qualiopi_org', JSON.stringify(item.organisme));
+    sessionStorage.setItem('qualiopi_form', JSON.stringify(item.formation));
+    sessionStorage.setItem('qualiopi_stag', JSON.stringify(item.stagiaires || []));
+    if (item.doc_style) sessionStorage.setItem('qualiopi_style', JSON.stringify(item.doc_style));
+
+    setShowSaved(false);
+    toast.success(`Dossier "${item.name}" chargé`);
+  }, []);
+
+  // Delete saved
+  const handleDelete = useCallback(async (id: string) => {
+    const { error } = await supabase.from("saved_ey_controls").delete().eq("id", id);
+    if (error) { toast.error("Erreur suppression"); return; }
+    if (currentSaveId === id) { setCurrentSaveId(null); setSaveName(""); }
+    toast.success("Dossier supprimé");
+    await loadSavedList();
+  }, [currentSaveId, loadSavedList]);
+
+  // New dossier
+  const handleNew = useCallback(() => {
+    setOrganisme(emptyOrganisme);
+    setFormation(emptyFormation);
+    setStagiaires([]);
+    setDocStyle(DEFAULT_DOC_STYLE);
+    setCurrentSaveId(null);
+    setSaveName("");
+    sessionStorage.removeItem('qualiopi_org');
+    sessionStorage.removeItem('qualiopi_form');
+    sessionStorage.removeItem('qualiopi_stag');
+    sessionStorage.removeItem('qualiopi_style');
+    toast.info("Nouveau dossier créé");
   }, []);
 
   const sections = [
@@ -108,6 +232,71 @@ const ControleEY = () => {
       </header>
 
       <main className="max-w-5xl mx-auto px-4 py-8 space-y-6">
+        {/* Save/Load bar */}
+        {user && (
+          <div className="border rounded-xl p-4 bg-card space-y-3">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+              <div className="flex-1 flex items-center gap-2 w-full">
+                <Input
+                  placeholder="Nom du dossier EY..."
+                  value={saveName}
+                  onChange={e => setSaveName(e.target.value)}
+                  className="max-w-xs"
+                />
+                {currentSaveId && (
+                  <span className="text-xs text-muted-foreground whitespace-nowrap">
+                    (modifié)
+                  </span>
+                )}
+              </div>
+              <div className="flex items-center gap-2">
+                <Button size="sm" onClick={handleSave} disabled={saving} className="gap-1">
+                  <Save className="w-4 h-4" />
+                  {currentSaveId ? "Mettre à jour" : "Enregistrer"}
+                </Button>
+                <Button size="sm" variant="outline" onClick={() => setShowSaved(!showSaved)} className="gap-1">
+                  <FolderOpen className="w-4 h-4" />
+                  Mes dossiers ({savedList.length})
+                </Button>
+                <Button size="sm" variant="ghost" onClick={handleNew} className="gap-1">
+                  <Plus className="w-4 h-4" />
+                  Nouveau
+                </Button>
+              </div>
+            </div>
+
+            {showSaved && (
+              <div className="border-t pt-3 space-y-2">
+                {savedList.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">Aucun dossier sauvegardé</p>
+                ) : (
+                  savedList.map(item => (
+                    <div key={item.id} className="flex items-center justify-between p-2 rounded-lg hover:bg-muted/50 transition-colors">
+                      <button
+                        onClick={() => handleLoad(item)}
+                        className="flex-1 text-left"
+                      >
+                        <span className="font-medium text-sm">{item.name}</span>
+                        <span className="text-xs text-muted-foreground ml-2">
+                          {new Date(item.updated_at).toLocaleDateString("fr-FR")}
+                        </span>
+                      </button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => { e.stopPropagation(); handleDelete(item.id); }}
+                        className="text-destructive hover:text-destructive"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </Button>
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Collapsible data forms */}
         {sections.map(({ key, label, icon, filled, count }) => (
           <div key={key} className="border rounded-xl overflow-hidden">
@@ -123,7 +312,7 @@ const ControleEY = () => {
                   <span className="text-xs text-muted-foreground">({count})</span>
                 )}
                 {filled && (
-                  <span className="text-xs text-green-600 bg-green-50 px-2 py-0.5 rounded-full">Rempli</span>
+                  <span className="text-xs text-primary bg-primary/10 px-2 py-0.5 rounded-full">Rempli</span>
                 )}
               </div>
             </button>
