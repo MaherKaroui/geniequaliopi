@@ -267,6 +267,7 @@ export { getWordChapters, getAnglaisChapters, getAnglaisA1Chapters, getManagemen
 export function getCourseChapters(formationIntitule: string): CourseChapter[] {
   const t = formationIntitule.toLowerCase();
   if (t.includes('ecsr') || t.includes('enseignant de la conduite') || t.includes('sécurité routière')) return getECSRChapters();
+  if (t.includes('vtest') || t.includes('v-test') || t.includes('rs6905')) return getVTestChapters();
   if (t.includes('excel')) return getExcelChapters();
   if (t.includes('word')) return getWordChapters();
   if ((t.includes('anglais') || t.includes('english')) && (t.includes('a1') || t.includes('débutant') || t.includes('niveau a1'))) return getAnglaisA1Chapters();
