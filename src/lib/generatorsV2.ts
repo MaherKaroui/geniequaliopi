@@ -1053,7 +1053,7 @@ export function genAttestationReussiteStagiaire(o: OrganismeInfo, f: FormationIn
       <p style="margin-top:20px"><strong>Fait à ${o.ville}, le :</strong> ${formatDate(getStagiaireDateFin(s, f))}</p>
       <p style="margin-top:15px"><strong>Pour ${o.nom}</strong></p>
       <p>${o.dirigeant}<br>Dirigeant – Formateur</p>
-      ${orgSig(o)}
+      ${dirigeantSig(o)}
     </div>
   `;
 
