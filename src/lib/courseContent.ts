@@ -259,11 +259,13 @@ import { getIAChapters } from "./courseContentIA";
 import { getWebmarketingChapters } from "./courseContentWebmarketing";
 import { getCRMChapters } from "./courseContentCRM";
 import { getMassagePrenatalChapters } from "./courseContentMassagePrenatal";
+import { getECSRChapters } from "./courseContentECSR";
 
-export { getWordChapters, getAnglaisChapters, getAnglaisA1Chapters, getManagementChapters, getGenericChapters, getFLEChapters, getIAChapters, getWebmarketingChapters, getCRMChapters, getMassagePrenatalChapters };
+export { getWordChapters, getAnglaisChapters, getAnglaisA1Chapters, getManagementChapters, getGenericChapters, getFLEChapters, getIAChapters, getWebmarketingChapters, getCRMChapters, getMassagePrenatalChapters, getECSRChapters };
 
 export function getCourseChapters(formationIntitule: string): CourseChapter[] {
   const t = formationIntitule.toLowerCase();
+  if (t.includes('ecsr') || t.includes('enseignant de la conduite') || t.includes('sécurité routière')) return getECSRChapters();
   if (t.includes('excel')) return getExcelChapters();
   if (t.includes('word')) return getWordChapters();
   if ((t.includes('anglais') || t.includes('english')) && (t.includes('a1') || t.includes('débutant') || t.includes('niveau a1'))) return getAnglaisA1Chapters();
