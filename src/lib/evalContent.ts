@@ -497,6 +497,7 @@ EVAL_CONTENT["ECSR"] = ECSR_CONTENT;
 function getContentKey(intitule: string): string {
   const lower = intitule.toLowerCase();
   if (lower.includes("ecsr") || lower.includes("enseignant de la conduite") || lower.includes("sécurité routière")) return "ECSR";
+  if (lower.includes("vtest") || lower.includes("v-test") || lower.includes("rs6905")) return "VTest";
   if (lower.includes("excel")) return "Excel Professionnel";
   if ((lower.includes("anglais") || lower.includes("english")) && (lower.includes("a1") || lower.includes("débutant"))) return "Anglais A1";
   if (lower.includes("anglais")) return "Anglais Professionnel";
