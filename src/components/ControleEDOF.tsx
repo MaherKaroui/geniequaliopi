@@ -395,6 +395,42 @@ export default function ControleEDOF({ organisme, formation, stagiaires }: Contr
           </div>
         </div>
       </div>
+
+      {/* Preview Dialog */}
+      <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Eye className="w-5 h-5" />
+              {previewTitle}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 overflow-auto border rounded-lg bg-white">
+            {previewLoading ? (
+              <div className="flex items-center justify-center p-12">
+                <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                <span className="ml-3 text-muted-foreground">Génération de l'aperçu...</span>
+              </div>
+            ) : (
+              <iframe
+                srcDoc={previewHtml}
+                className="w-full h-[60vh] border-0"
+                title="Aperçu du document"
+                sandbox="allow-same-origin"
+              />
+            )}
+          </div>
+          <div className="flex justify-end gap-2 pt-2">
+            <Button variant="outline" onClick={() => setPreviewOpen(false)}>
+              Fermer
+            </Button>
+            <Button onClick={handleDownloadPreview} className="gap-1">
+              <Download className="w-4 h-4" />
+              Télécharger en PDF
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
