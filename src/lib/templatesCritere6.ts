@@ -561,7 +561,30 @@ function veilleMetierRows(f: FormationInfo, type: FormationType): string[][] {
   }
 
   if (type === "anglais") {
-    return [
+    const isVTest = f.intitule.toLowerCase().includes("vtest") || f.intitule.toLowerCase().includes("v-test") || f.intitule.toLowerCase().includes("rs6905");
+    const certEntries: string[][] = isVTest ? [
+      [
+        `<a href="https://www.vtest.com/fr/">vtest.com</a>`,
+        "VTest – Plateforme officielle de certification Business English – 4 Skills",
+        veilleMonthYear(f, 8),
+        "Plateforme officielle de la certification VTest Business English (RS6905). Évaluation adaptative des 4 compétences (Reading, Listening, Writing, Speaking) du niveau A2 au C2 CECRL. Accessible en ligne, instructions en 21 langues, gestion du handicap.",
+        "Preuve : capture de la plateforme + référentiel RS6905. Action Qualiopi : aligner les objectifs pédagogiques sur les 4 compétences évaluées par VTest et préparer les stagiaires au format adaptatif."
+      ],
+      [
+        `<a href="https://www.francecompetences.fr/recherche/rs/6905/">France Compétences – RS6905</a>`,
+        "Fiche RS6905 – VTest Business English – 4 Skills",
+        veilleMonthYear(f, 7),
+        "Fiche officielle de la certification RS6905 sur France Compétences. Certificateur : ExAssess (Burlington English). 4 blocs de compétences : Compréhension orale (C1), Compréhension écrite (C2), Expression orale (C3), Expression écrite (C4). Échéance : 20/07/2026.",
+        "Preuve : fiche France Compétences + capture. Action : vérifier la validité de l'enregistrement et adapter le programme aux compétences du référentiel."
+      ],
+      [
+        `<a href="https://www.cambridgeenglish.org/fr/">Cambridge English – CECRL</a>`,
+        "Cambridge English – Cadre européen et descripteurs de niveaux",
+        veilleMonthYear(f, 6),
+        "Référentiel international pour l'évaluation des compétences en anglais. Niveaux A1 à C2 du CECRL. Les descripteurs servent de base pour les niveaux VTest (A2.1/A2.2, B1.1/B1.2, etc.).",
+        "Action Qualiopi : utiliser les descripteurs Cambridge/CECRL pour définir les objectifs pédagogiques par niveau et les critères d'évaluation VTest."
+      ],
+    ] : [
       [
         `<a href="https://www.britishcouncil.fr/">britishcouncil.fr</a>`,
         "British Council France – Enseignement de l'anglais et certifications",
@@ -583,6 +606,9 @@ function veilleMetierRows(f: FormationInfo, type: FormationType): string[][] {
         "Évolutions du format TOEIC, nouvelles modalités de passage, statistiques de scores par pays. Le TOEIC reste la certification la plus demandée par les employeurs français.",
         "Preuve : site officiel ETS. Action : adapter les modules de préparation aux certifications selon les dernières évolutions."
       ],
+    ];
+    return [
+      ...certEntries,
       [
         `<a href="https://www.youtube.com/watch?v=TpqGIwLz6Yg">YouTube – 50 phrases pour parler anglais au travail</a>`,
         "50 expressions pour l'anglais professionnel",
