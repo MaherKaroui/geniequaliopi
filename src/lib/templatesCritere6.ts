@@ -253,7 +253,18 @@ function veilleReglementaireRows(f: FormationInfo, type: FormationType): string[
   }
 
   if (type === "anglais") {
+    const isVTest = f.intitule.toLowerCase().includes("vtest") || f.intitule.toLowerCase().includes("v-test") || f.intitule.toLowerCase().includes("rs6905");
+    const vtestReglEntries: string[][] = isVTest ? [
+      [
+        `<a href="https://www.francecompetences.fr/recherche/rs/6905/">France Compétences – RS6905</a>`,
+        "Enregistrement RS6905 – VTest Business English – 4 Skills (ExAssess)",
+        veilleDate(f, 6),
+        "Certification enregistrée au Répertoire Spécifique sous le code RS6905 par ExAssess (Burlington English). Validité : 20/07/2023 au 20/07/2026. Évalue les 4 compétences linguistiques (C1 à C4) du niveau A2 au C2 CECRL.",
+        "Preuve : fiche France Compétences RS6905. Action : vérifier la validité de la certification et adapter le programme aux compétences du référentiel."
+      ],
+    ] : [];
     return [...common,
+      ...vtestReglEntries,
       [
         `<a href="https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000006901294">Légifrance – Art. L.6321-1 Code du travail</a>`,
         "Obligation de formation des salariés – adaptation au poste et compétences linguistiques",
