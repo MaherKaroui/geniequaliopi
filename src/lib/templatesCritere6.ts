@@ -996,39 +996,57 @@ function veilleTechnoRows(f: FormationInfo, type: FormationType): string[][] {
   }
 
   if (type === "anglais") {
+    const isVTest = f.intitule.toLowerCase().includes("vtest") || f.intitule.toLowerCase().includes("v-test") || f.intitule.toLowerCase().includes("rs6905");
+    const vtestTechEntries: string[][] = isVTest ? [
+      [
+        `<a href="https://candidate.vtest.com/">candidate.vtest.com</a>`,
+        "Plateforme candidate VTest – Environnement d'examen en ligne",
+        veilleMonthYear(f, 8),
+        "Plateforme officielle de passage de la certification VTest Business English. Test adaptatif en ligne avec notation automatique (système vocal exclusif pour l'oral). Interface candidat accessible en 21 langues.",
+        "Preuve : capture de l'interface candidate. Action : familiariser les stagiaires avec l'environnement d'examen et les fonctionnalités de la plateforme."
+      ],
+      [
+        `<a href="https://www.vtest.com/fr/la-gestion-du-handicap-chez-vtest/">VTest – Gestion du handicap</a>`,
+        "VTest – Accessibilité et aménagements pour candidats en situation de handicap",
+        veilleMonthYear(f, 7),
+        "Procédures et aménagements VTest pour les candidats ayant des besoins particuliers. Adaptation du format du test selon les besoins identifiés.",
+        "Preuve : page officielle + procédure interne. Action Qualiopi : intégrer les procédures d'aménagement VTest dans le protocole d'accueil des stagiaires en situation de handicap."
+      ],
+    ] : [];
     return [...commonDigitalLearning,
+      ...vtestTechEntries,
       [
         `<a href="https://www.duolingo.com/">Duolingo</a>`,
         "Duolingo – Application d'apprentissage des langues par IA",
-        veilleMonthYear(f, 7),
+        veilleMonthYear(f, isVTest ? 6 : 7),
         "Application leader mondial de l'apprentissage des langues. Utilise l'IA adaptative pour personnaliser les parcours. Référence en gamification pédagogique.",
         "Preuve : captures de l'app + analyse pédagogique. Action : recommander Duolingo comme outil complémentaire d'auto-apprentissage entre les sessions."
       ],
       [
         `<a href="https://www.babbel.com/fr/">Babbel</a>`,
         "Babbel – Plateforme d'apprentissage linguistique professionnel",
-        veilleMonthYear(f, 6),
+        veilleMonthYear(f, isVTest ? 5 : 6),
         "Plateforme d'apprentissage de l'anglais orientée professionnels. Reconnaissance vocale intégrée pour la prononciation. Parcours thématiques (business, voyage, quotidien).",
         "Action : benchmark des plateformes d'e-learning linguistique pour enrichir les recommandations aux stagiaires."
       ],
       [
         `<a href="https://www.learningtechnologiesfrance.com/">learningtechnologiesfrance.com</a>`,
         "Learning Technologies France – EdTech linguistique",
-        veilleYear(f, 5),
+        veilleYear(f, isVTest ? 4 : 5),
         "Salon des technologies de formation : solutions IA pour l'apprentissage des langues, speech-to-text, chatbots conversationnels en anglais.",
         "Preuve : programme + notes de veille. Action Qualiopi : évaluer l'intégration de chatbots IA pour la pratique conversationnelle."
       ],
       [
         `<a href="https://www.youtube.com/watch?v=oxs5sjCmfMU">YouTube – Business English Conversation</a>`,
         "Anglais des affaires – Dialogues et mises en situation",
-        veilleDate(f, 4),
+        veilleDate(f, isVTest ? 3 : 4),
         "Ressource vidéo pour la pratique de l'anglais professionnel : dialogues réalistes, vocabulaire business, exercices de compréhension.",
         "Preuve : fiche synthèse + lien. Action : intégrer comme ressource complémentaire pour les exercices de listening."
       ],
       [
         `<a href="https://www.talenco.com/nos-publications/barometre-formation-professionnelle-tendances-pratiques-2025/">TalenCo – Baromètre</a>`,
         "Baromètre formation professionnelle – langues et numérique",
-        veilleDate(f, 3),
+        veilleDate(f, isVTest ? 2 : 3),
         "Synthèse des tendances : la formation en langues reste dans le top 3 des formations les plus demandées. L'anglais représente 80% des demandes linguistiques.",
         "Preuve : PDF baromètre. Action Qualiopi : justifier la pertinence de l'offre anglais dans le plan de développement."
       ],
