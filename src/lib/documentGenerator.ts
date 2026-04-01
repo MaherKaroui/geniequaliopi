@@ -8179,7 +8179,8 @@ function genTableauAmeliorationContinue(o: OrganismeInfo, f?: FormationInfo) {
   const isMassage = t.includes("massage") || t.includes("prénatal") || t.includes("prenatal");
   const isIA = t.includes("intelligence artificielle") || t.includes(" ia ");
   const isCRM = t.includes("crm") || t.includes("hubspot");
-  const isAnglais = t.includes("anglais") || t.includes("toeic");
+  const isAnglaisA1 = (t.includes("anglais") && (t.includes("a1") || t.includes("débutant") || t.includes("debutant")));
+  const isAnglais = !isAnglaisA1 && (t.includes("anglais") || t.includes("toeic"));
   const isEsth = t.includes("esthétique") || t.includes("cosmétique") || t.includes("cap esthétique");
   const isFLE = t.includes("français") || t.includes("fle");
   const isWord = t.includes("word");
@@ -8190,21 +8191,13 @@ function genTableauAmeliorationContinue(o: OrganismeInfo, f?: FormationInfo) {
 
   let rows: string[][] = [];
 
-  if (isMassage) {
+  if (isAnglaisA1) {
     rows = [
-      ["1", "Satisfaction", "Demande de plus de pratique sur mannequin", "Ajout d'une demi-journée de pratique sur mannequin de grossesse", o.responsablePedagogique, "T2 2025", "✅"],
-      ["2", "Réclamation", "Huiles de massage inadaptées aux peaux sensibles", "Référencement d'huiles bio hypoallergéniques certifiées", o.referentQualite, "T1 2025", "✅"],
-      ["3", "Veille", "Nouvelles recommandations HAS sur le massage périnatal", "Mise à jour du protocole et des contre-indications", o.responsablePedagogique, "T2 2025", "🔄"],
-      ["4", "Entreprises", "Besoin d'un module relaxation du dos spécifique 3ème trimestre", "Création d'un module complémentaire 3ème trimestre", o.responsablePedagogique, "T3 2025", "📋"],
-      ["5", "Audit", "Fiches anatomiques de la grossesse à actualiser", "Refonte des supports visuels anatomie de la femme enceinte", o.referentQualite, "T2 2025", "✅"],
-    ];
-  } else if (isEsth) {
-    rows = [
-      ["1", "Satisfaction", "Demande de plus de pratique sur modèles vivants", "Augmentation des heures de TP à 60% du temps", o.responsablePedagogique, "T2 2025", "✅"],
-      ["2", "Réclamation", "Produits cosmétiques périmés en salle de TP", "Inventaire trimestriel et renouvellement systématique", o.referentQualite, "T1 2025", "✅"],
-      ["3", "Veille", "Nouvelle réglementation cosmétique européenne (CE 1223/2009)", "Formation du formateur sur les nouvelles normes", o.responsablePedagogique, "T2 2025", "🔄"],
-      ["4", "Entreprises", "Manque de connaissances en conseil personnalisé", "Ajout d'ateliers conseil client et diagnostic de peau", o.responsablePedagogique, "T3 2025", "📋"],
-      ["5", "Audit", "Supports UV/manucure à mettre à jour", "Refonte des fiches techniques soins visage et manucure", o.referentQualite, "T2 2025", "✅"],
+      ["1", "Satisfaction", "Rythme trop rapide pour les vrais débutants, vocabulaire non assimilé", "Réduction du volume par séance et ajout de révisions systématiques en début de cours", o.responsablePedagogique, "T2 2025", "✅"],
+      ["2", "Réclamation", "Supports trop textuels, manque de visuels et d'audio pour le niveau A1", "Refonte des supports avec images, pictogrammes et fichiers audio de prononciation", o.referentQualite, "T1 2025", "✅"],
+      ["3", "Veille", "Nouvelles ressources CECRL pour le niveau A1 (volume compagnon 2024)", "Mise à jour des grilles d'évaluation et des descripteurs A1 selon le CECRL actualisé", o.responsablePedagogique, "T2 2025", "🔄"],
+      ["4", "Entreprises", "Besoin de vocabulaire professionnel de base (accueil, téléphone)", "Création d'un module vocabulaire professionnel A1 : se présenter, répondre au téléphone, accueillir un visiteur", o.responsablePedagogique, "T3 2025", "📋"],
+      ["5", "Audit", "Exercices d'écoute trop rapides et inadaptés au niveau débutant", "Enregistrement de dialogues lents et articulés avec sous-titres pour le niveau A1", o.referentQualite, "T2 2025", "✅"],
     ];
   } else if (isAnglais) {
     rows = [
