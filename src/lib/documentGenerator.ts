@@ -4543,7 +4543,7 @@ function genVAESatisfaction(o: OrganismeInfo, f: FormationInfo, stagiaires: Stag
   }, sections: [
     { heading: "Commentaire libre", content: `<p>« L'accompagnement m'a permis de structurer mes idées et de valoriser mon expérience de manière professionnelle. Je suis très satisfait(e) de la qualité du suivi et de la bienveillance de l'accompagnateur. Je recommande vivement ${o.nom} pour toute démarche VAE. »</p>`, variant: "green" },
     { heading: "Note globale", content: `<p style="font-size:16px;font-weight:bold;text-align:center">${(scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1)} / 5</p>` },
-  ], signatures: { type: "2", labels: ["", "Le Candidat"], names: ["", s.prenom + " " + s.nom] } });
+  ], signatures: { type: "2", labels: ["L'Accompagnateur VAE (Formateur)", "Le Candidat"], names: [o.responsablePedagogique, s.prenom + " " + s.nom], stagiaireSignatureUrl: s.signatureUrl, formateurSignatureUrl: s.formateurSignatureUrl || f.formateurSignatureUrl, dates: [formatDate(getStagiaireDateFin(s, f)), formatDate(getStagiaireDateFin(s, f))] } });
 }
 
 function genVAESyntheseSatisfaction(o: OrganismeInfo) {
