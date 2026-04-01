@@ -424,6 +424,7 @@ export const SATISFACTION_SCORES: Record<string, number[]> = {
   "Initiation Word": [5, 5, 4, 5, 4, 5, 5, 4],
   "Anglais A1": [5, 4, 5, 4, 5, 5, 4, 5],
   "Massage Prénatal": [5, 5, 5, 5, 4, 5, 5, 5],
+  "ECSR": [5, 4, 5, 5, 5, 4, 5, 5],
 };
 
 // Evaluation scores per stagiaire (good scores 8-10/10)
