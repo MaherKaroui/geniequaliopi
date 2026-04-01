@@ -217,7 +217,6 @@ const Index = () => {
           {currentStep === 3 && <StagiairesForm data={stagiaires} onChange={updateStagiaires} />}
           {currentStep === 4 && <CriteresForm data={criteres} onChange={updateCriteres} />}
           {currentStep === 5 && <DocumentGenerator organisme={organisme} formation={formation} stagiaires={stagiaires} criteres={criteres} />}
-          {currentStep === 6 && <ControleEDOF organisme={organisme} formation={formation} stagiaires={stagiaires} criteres={criteres} />}
         </div>
 
         <div className="flex justify-between mt-6">
