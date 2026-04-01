@@ -164,6 +164,10 @@ const Index = () => {
             <Button variant="outline" size="sm" onClick={() => exportFormDataToExcel(organisme, formation, stagiaires)} className="gap-1">
               <FileSpreadsheet className="w-4 h-4" /> Export Excel
             </Button>
+            <Button variant="outline" size="sm" onClick={syncToAirtable} disabled={airtableLoading} className="gap-1">
+              {airtableLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+              {airtableLoading ? 'Envoi...' : 'Airtable'}
+            </Button>
             <Button variant="ghost" size="sm" onClick={() => updateStarted(false)}>Accueil</Button>
           </div>
         </div>
