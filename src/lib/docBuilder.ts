@@ -601,7 +601,7 @@ export interface DocBuildConfig {
   sections?: { heading: string; content: string; variant?: "green" | "orange" }[];
   table?: { headers: string[]; rows: string[][] };
   extraHtml?: string;
-  signatures?: { type: "3" | "2"; labels?: string[]; names?: string[]; stagiaireSignatureUrl?: string; formateurSignatureUrl?: string; dates?: string[]; noOrgSignature?: boolean };
+  signatures?: { type: "3" | "2"; labels?: string[]; names?: string[]; stagiaireSignatureUrl?: string; formateurSignatureUrl?: string; responsableEntrepriseSignatureUrl?: string; dates?: string[]; noOrgSignature?: boolean };
   stagiaires?: StagiaireInfo[];
 }
 
@@ -625,8 +625,9 @@ export function buildDocument(config: DocBuildConfig): string {
   }
   if (config.signatures) {
     const fmtSigUrl = config.signatures.formateurSignatureUrl || config.formation?.formateurSignatureUrl;
+    const respEntSigUrl = config.signatures.responsableEntrepriseSignatureUrl;
     if (config.signatures.type === "3") {
-      body += signatureBlock3(config.org, config.signatures.names?.[0], config.signatures.names?.[1], config.signatures.stagiaireSignatureUrl, fmtSigUrl);
+      body += signatureBlock3(config.org, config.signatures.names?.[0], config.signatures.names?.[1], config.signatures.stagiaireSignatureUrl, fmtSigUrl, respEntSigUrl);
     } else {
       body += signatureBlock2(
         config.signatures.labels?.[0] || "Partie 1",
@@ -637,17 +638,16 @@ export function buildDocument(config: DocBuildConfig): string {
         config.org.tamponUrl,
         config.signatures.stagiaireSignatureUrl,
         config.signatures.dates,
-        fmtSigUrl
+        fmtSigUrl,
+        respEntSigUrl
       );
     }
   }
   body += footer(config.org);
   let result = htmlWrap(body);
-  // Auto-apply gender based on first stagiaire if available
   if (config.stagiaires && config.stagiaires.length > 0) {
     result = applyGender(result, config.stagiaires[0]);
   } else {
-    // Default: remove (e) with masculine form
     result = applyGender(result, null);
   }
   return result;
