@@ -60,11 +60,13 @@ function modaliteTexte(f: FormationInfo): string {
 function isPresentiel(f: FormationInfo): boolean { const m = (f.modalites||'').toLowerCase(); return !m.includes('distanciel') && !m.includes('e-learning') && !m.includes('foad') || m.includes('mixte'); }
 function isDistanciel(f: FormationInfo): boolean { const m = (f.modalites||'').toLowerCase(); return m.includes('distanciel') || m.includes('e-learning') || m.includes('foad') || m.includes('mixte'); }
 
-function sigBlock(label1: string, nom1: string, sig1Html: string, label2: string, nom2: string, sig2Html: string, mention?: string): string {
+function sigBlock(label1: string, nom1: string, sig1Html: string, label2: string, nom2: string, sig2Html: string, mention?: string, date1?: string, date2?: string): string {
   const mentionHtml = mention ? `<p style="font-style:italic;font-size:11px">(${mention})</p>` : '';
+  const d1 = date1 || new Date().toLocaleDateString("fr-FR");
+  const d2 = date2 || d1;
   return `<div class="signature-block-2">
-    <div class="sig-box"><p class="sig-label">${label1}</p><p>Nom : ${nom1}</p>${mentionHtml}<p>Signature :</p>${sig1Html}</div>
-    <div class="sig-box"><p class="sig-label">${label2}</p><p>Nom : ${nom2}</p>${mentionHtml}<p>Signature :</p>${sig2Html}</div>
+    <div class="sig-box"><p class="sig-label">${label1}</p><p>Nom : ${nom1}</p><p>Date : ${d1}</p>${mentionHtml}<p>Signature :</p>${sig1Html}</div>
+    <div class="sig-box"><p class="sig-label">${label2}</p><p>Nom : ${nom2}</p><p>Date : ${d2}</p>${mentionHtml}<p>Signature :</p>${sig2Html}</div>
   </div>`;
 }
 
