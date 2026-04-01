@@ -144,11 +144,12 @@ export function genReglement_V2(o: OrganismeInfo, f: FormationInfo, stagiaires: 
   let sigPages = '';
   stagiaires.slice(0, 10).forEach((s, i) => {
     if (i > 0) sigPages += '<div class="page-break"></div>';
-    sigPages += `<p><strong>Fait à ${o.ville}, le :</strong> ${formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || new Date().toISOString(), 14))}</p>`;
+    const sigDate = formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || new Date().toISOString(), 14));
+    sigPages += `<p><strong>Fait à ${o.ville}, le :</strong> ${sigDate}</p>`;
     sigPages += sigBlock(
       `Signature du stagiaire : ${s.prenom} ${s.nom}`, `${s.prenom} ${s.nom}`, stagSig(s),
       `Signature du centre`, o.nom, orgSig(o),
-      'Précédée de la mention « Lu et approuvé »'
+      'Précédée de la mention « Lu et approuvé »', sigDate, sigDate
     );
   });
 
