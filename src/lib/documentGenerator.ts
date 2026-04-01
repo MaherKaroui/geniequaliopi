@@ -4634,7 +4634,7 @@ function genVAEAnalyseBesoin(o: OrganismeInfo, f: FormationInfo, stagiaires: Sta
   // Build custom 3-column signature block with Accompagnateur, Candidat, Responsable entreprise
   const accompSigHtml = formateurSig
     ? `<img src="${formateurSig}" alt="Signature formateur" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />`
-    : o.signatureUrl ? `<img src="${o.signatureUrl}" alt="Signature" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : "";
+    : "";
   const candidatSigHtml = s.signatureUrl
     ? `<img src="${s.signatureUrl}" alt="Signature candidat" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />`
     : `<p style="font-style:italic;color:#999;margin-top:15px">Signé par ${s.prenom} ${s.nom}</p>`;
