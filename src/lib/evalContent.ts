@@ -1001,6 +1001,32 @@ const QUESTIONS_OUVERTES: Record<string, QuestionsOuvertesFormation> = {
       { question: "Qu'avez-vous appris pendant cette formation en massage prénatal ?", reponseAttendue: "J'ai appris les techniques de recentrage et respiration, le massage du dos en décubitus latéral, le drainage des jambes, la prise de conscience du bassin, les contre-indications et les protocoles d'auto-massage à transmettre." },
     ],
   },
+  "VTest": {
+    debut: [
+      { question: "In which professional situations do you currently use English?", reponseAttendue: "I use English for emails with international clients, reading technical documentation, and participating in conference calls with colleagues abroad." },
+      { question: "What are your main difficulties when communicating in English at work?", reponseAttendue: "My main difficulties are understanding native speakers on the phone and expressing complex ideas fluently during meetings and presentations." },
+      { question: "Which of the four skills (Reading, Listening, Writing, Speaking) do you find most challenging?", reponseAttendue: "I find Speaking the most challenging because I need to think in real time and I lack confidence in my pronunciation and fluency." },
+      { question: "Have you ever taken a language certification test before? If so, which one?", reponseAttendue: "Yes, I took the TOEIC two years ago and scored 650. I also did a Cambridge placement test at B1 level." },
+      { question: "What is your target CECRL level after this training?", reponseAttendue: "I would like to reach at least B2 level to participate confidently in international meetings and write detailed professional reports." },
+      { question: "Describe a recent situation where you needed English at work.", reponseAttendue: "Last month, I had to present our quarterly results to the international management team via video conference. I struggled with technical vocabulary and fielding questions." },
+      { question: "What type of professional documents do you read or write in English?", reponseAttendue: "I regularly read market reports and industry articles, and I write emails, meeting minutes, and commercial proposals in English." },
+      { question: "How comfortable are you with writing a formal business email in English?", reponseAttendue: "I can write basic emails but I'm not confident with the formal register, appropriate closings, and I sometimes mix up false friends like 'actually' and 'eventually'." },
+      { question: "What do you know about the VTest Business English certification?", reponseAttendue: "I know it evaluates 4 skills (Reading, Listening, Writing, Speaking) and provides a CECRL level from A2 to C2. It is taken online on the VTest platform." },
+      { question: "What specific vocabulary areas do you need to develop for your job?", reponseAttendue: "I need to develop vocabulary related to finance (revenue, profit margin, ROI), project management (milestones, deliverables), and negotiation (compromise, terms and conditions)." },
+    ],
+    fin: [
+      { question: "How has your confidence in using English professionally evolved during this training?", reponseAttendue: "My confidence has improved significantly. I now feel comfortable participating in meetings, writing formal emails, and giving short presentations in English." },
+      { question: "Which of the four VTest skills (Reading, Listening, Writing, Speaking) has improved the most?", reponseAttendue: "My Speaking skills have improved the most. The role-play exercises and presentation practice helped me become more fluent and confident when expressing ideas orally." },
+      { question: "Write a short professional email to confirm a meeting with a client.", reponseAttendue: "Dear Mr. Johnson, I am writing to confirm our meeting scheduled for Tuesday, March 15th at 10:00 AM. The agenda will cover the Q2 budget review. Please confirm at your earliest convenience. Best regards." },
+      { question: "Describe how you would handle a business negotiation in English now.", reponseAttendue: "I would prepare my arguments in advance, use softening language like 'I was wondering if...', propose compromises using conditional structures, and seek a win-win outcome." },
+      { question: "Explain the difference between 'affect' and 'effect', and give a professional example.", reponseAttendue: "Affect is a verb meaning to influence: 'The budget cuts will affect the project timeline.' Effect is a noun meaning the result: 'The effect of the new strategy was positive.'" },
+      { question: "What strategies will you use to continue improving your English after this training?", reponseAttendue: "I plan to listen to business podcasts daily, read industry articles in English, practice speaking with native-speaking colleagues, and use apps like Babbel for vocabulary review." },
+      { question: "How do you feel about taking the VTest certification exam?", reponseAttendue: "I feel well-prepared thanks to the practice tests and exam strategies we covered. I am confident I can achieve at least a B2 level across all four skills." },
+      { question: "Summarize the key grammar structures you learned for professional writing.", reponseAttendue: "I learned to use the Present Perfect for results, passive voice for formal reports, conditional structures for negotiations, and modal verbs (could, would, should) for diplomatic requests." },
+      { question: "What are the main false friends you will avoid in professional communication?", reponseAttendue: "Actually (en fait, not actuellement), eventually (finalement, not éventuellement), to attend (assister à, not attendre), delay (retard, not délai), resume (CV, not résumé)." },
+      { question: "What have you learned during this VTest Business English training?", reponseAttendue: "I learned professional email writing, meeting vocabulary, presentation techniques, negotiation strategies, grammar for business contexts, and exam preparation for the 4 VTest skills." },
+    ],
+  },
 };
 
 const DEFAULT_QUESTIONS_OUVERTES: QuestionsOuvertesFormation = {
