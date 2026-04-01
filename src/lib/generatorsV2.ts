@@ -19,16 +19,43 @@ function stagSig(s: StagiaireInfo): string {
 }
 
 function orgSig(o: OrganismeInfo): string {
-  let h = '';
+  // Organisme = tampon seulement, jamais la signature du dirigeant
   if (o.tamponUrl) {
-    // If tampon exists, show only tampon (no signature)
+    return `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />`;
+  }
+  return `<p style="font-style:italic;color:#999;margin-top:10px">Cachet de ${o.nom}</p>`;
+}
+
+function dirigeantSig(o: OrganismeInfo): string {
+  // Dirigeant = signature du dirigeant + tampon
+  let h = '';
+  if (o.signatureUrl) {
+    h += `<img src="${o.signatureUrl}" alt="Signature dirigeant" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />`;
+  }
+  if (o.tamponUrl) {
     h += `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />`;
-  } else if (o.signatureUrl) {
-    h += `<img src="${o.signatureUrl}" alt="Signature" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />`;
-  } else {
+  }
+  if (!o.signatureUrl && !o.tamponUrl) {
     h += `<p style="font-style:italic;color:#999;margin-top:10px">Signé par ${o.dirigeant}</p>`;
   }
   return h;
+}
+
+function formateurSigGen(f: FormationInfo, s?: StagiaireInfo): string {
+  // Formateur = signature formateur (du stagiaire ou de la formation)
+  const url = s?.formateurSignatureUrl || f.formateurSignatureUrl;
+  if (url) {
+    return `<img src="${url}" alt="Signature formateur" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />`;
+  }
+  return `<p style="font-style:italic;color:#999;margin-top:10px">Signé par ${f.formateur}</p>`;
+}
+
+function respEntrepriseSig(s: StagiaireInfo): string {
+  // Responsable entreprise = signature responsable entreprise
+  if (s.signatureResponsableUrl) {
+    return `<img src="${s.signatureResponsableUrl}" alt="Signature responsable entreprise" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />`;
+  }
+  return `<p style="font-style:italic;color:#999;margin-top:10px">Signé par ${s.responsableEntreprise || 'le responsable'}</p>`;
 }
 
 function modaliteTexte(f: FormationInfo): string {
