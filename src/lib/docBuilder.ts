@@ -628,10 +628,12 @@ export function buildDocument(config: DocBuildConfig): string {
     body += config.extraHtml;
   }
   if (config.signatures) {
-    const fmtSigUrl = config.signatures.formateurSignatureUrl || config.formation?.formateurSignatureUrl;
-    const respEntSigUrl = config.signatures.responsableEntrepriseSignatureUrl;
+    const firstStagiaire = config.stagiaires?.[0];
+    const fmtSigUrl = config.signatures.formateurSignatureUrl || firstStagiaire?.formateurSignatureUrl || config.formation?.formateurSignatureUrl;
+    const stagSigUrl = config.signatures.stagiaireSignatureUrl || firstStagiaire?.signatureUrl;
+    const respEntSigUrl = config.signatures.responsableEntrepriseSignatureUrl || firstStagiaire?.signatureResponsableUrl;
     if (config.signatures.type === "3") {
-      body += signatureBlock3(config.org, config.signatures.names?.[0], config.signatures.names?.[1], config.signatures.stagiaireSignatureUrl, fmtSigUrl, respEntSigUrl);
+      body += signatureBlock3(config.org, config.signatures.names?.[0], config.signatures.names?.[1], stagSigUrl, fmtSigUrl, respEntSigUrl);
     } else {
       body += signatureBlock2(
         config.signatures.labels?.[0] || "Partie 1",
@@ -640,7 +642,7 @@ export function buildDocument(config: DocBuildConfig): string {
         config.signatures.names?.[1] || "",
         config.signatures.noOrgSignature ? undefined : config.org.signatureUrl,
         config.org.tamponUrl,
-        config.signatures.stagiaireSignatureUrl,
+        stagSigUrl,
         config.signatures.dates,
         fmtSigUrl,
         respEntSigUrl
