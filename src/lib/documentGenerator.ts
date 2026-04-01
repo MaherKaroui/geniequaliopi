@@ -4413,8 +4413,8 @@ function genVAEPVJury(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
     { heading: "Composition du jury", content: `<p>• Président : M. Jean-Pierre DURAND, Professeur universitaire<br>• Membre 1 : Mme Sophie BERNARD, Professionnelle du secteur (12 ans d'expérience)<br>• Membre 2 : M. Philippe MARTIN, Professionnel du secteur (15 ans d'expérience)<br>• Représentant certificateur : Mme Claire LEFEBVRE</p>` },
     { heading: "Déroulement", content: `<p>Le candidat a présenté son parcours et son dossier de validation pendant 25 minutes, suivi de 25 minutes d'échanges avec le jury. Le candidat a fait preuve d'une excellente maîtrise des compétences visées et d'une capacité d'analyse réflexive remarquable.</p>` },
     { heading: "Évaluation par blocs", content: `<table><tr><th>Bloc de compétences</th><th>Décision</th></tr><tr><td>Bloc 1 – Compétences fondamentales</td><td>VALIDÉ</td></tr><tr><td>Bloc 2 – Compétences spécialisées</td><td>VALIDÉ</td></tr><tr><td>Bloc 3 – Compétences transversales</td><td>VALIDÉ</td></tr></table>`, variant: "green" },
-    { heading: "Décision du jury", content: `<p style="font-size:16px;font-weight:bold;text-align:center">VALIDATION TOTALE</p><p>Le jury, à l'unanimité, décide d'attribuer la certification « ${f.intitule} » à ${s.prenom} ${s.nom}.</p>` },
-  ], signatures: { type: "2", labels: ["Le Président du Jury", "Le Candidat"], names: ["Jean-Pierre DURAND", s.prenom + " " + s.nom] } });
+    { heading: "Décision du jury", content: `<p style="font-size:16px;font-weight:bold;text-align:center">VALIDATION TOTALE</p><p>Le jury, à l'unanimité, décide d'attribuer la certification « ${f.intitule} » à ${s.prenom} ${s.nom}.</p><p>Fait à ${o.ville}, le ${dateJuryStr}</p>` },
+  ], signatures: { type: "2", labels: ["Le Président du Jury", "Le Candidat"], names: ["Jean-Pierre DURAND", s.prenom + " " + s.nom], stagiaireSignatureUrl: s.signatureUrl, dates: [dateJuryStr, dateJuryStr] } });
 }
 
 function genVAENotificationDecision(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
