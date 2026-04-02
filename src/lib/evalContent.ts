@@ -572,11 +572,99 @@ const VTEST_CONTENT: FormationEvalContent = {
 
 EVAL_CONTENT["VTest"] = VTEST_CONTENT;
 
+EVAL_CONTENT["SAMA"] = {
+  qcmPositionnement: [
+    { question: "Quel document permet d'identifier un patient à l'accueil ?", options: ["La carte de fidélité", "La carte Vitale", "Le permis de conduire uniquement", "Un ticket de caisse"], correctIndex: 1 },
+    { question: "Que signifie le sigle DPI ?", options: ["Dossier Patient Informatisé", "Document de Planification Interne", "Données Personnelles Informatiques", "Dossier Professionnel Individuel"], correctIndex: 0 },
+    { question: "Qu'est-ce que l'identitovigilance ?", options: ["La surveillance des badges d'accès", "La vérification de l'identité du patient à chaque étape", "Le contrôle des identifiants informatiques", "La protection des données du personnel"], correctIndex: 1 },
+    { question: "Quel logiciel est couramment utilisé pour la prise de rendez-vous médicaux en ligne ?", options: ["Excel", "Doctolib", "PowerPoint", "Photoshop"], correctIndex: 1 },
+    { question: "Que signifie le sigle CMU ?", options: ["Couverture Maladie Universelle", "Centre Médical Universitaire", "Caisse Mutuelle Unique", "Consultation Médicale Urgente"], correctIndex: 0 },
+    { question: "Quel est le délai légal pour communiquer un dossier médical au patient ?", options: ["48 heures", "1 semaine", "8 jours maximum", "3 mois"], correctIndex: 2 },
+    { question: "Qu'est-ce que la télétransmission ?", options: ["L'envoi de fax", "La transmission électronique des feuilles de soins à l'Assurance Maladie", "L'envoi d'emails aux patients", "La visioconférence médicale"], correctIndex: 1 },
+    { question: "Quel professionnel rédige un compte rendu opératoire ?", options: ["L'infirmier", "Le secrétaire médical", "Le chirurgien", "Le directeur de l'hôpital"], correctIndex: 2 },
+    { question: "Que signifie le secret médical ?", options: ["Interdiction de parler de son travail", "Obligation de confidentialité sur les informations du patient", "Interdiction de communiquer entre collègues", "Protection du salaire des médecins"], correctIndex: 1 },
+    { question: "Quel est le rôle principal du secrétaire assistant médico-administratif ?", options: ["Réaliser des soins infirmiers", "Assurer l'accueil et la gestion administrative du patient", "Prescrire des médicaments", "Gérer la comptabilité de l'hôpital"], correctIndex: 1 },
+  ],
+  qcmFinal: [
+    { question: "Lors de l'accueil d'un patient, quelle est la première vérification à effectuer ?", options: ["Son groupe sanguin", "Son identité (identitovigilance)", "Son poids", "Sa tension artérielle"], correctIndex: 1 },
+    { question: "Quel document est nécessaire pour la prise en charge financière d'un patient ?", options: ["Une ordonnance", "L'attestation de droits (carte Vitale + mutuelle)", "Le carnet de vaccination", "Le livret de famille"], correctIndex: 1 },
+    { question: "Qu'est-ce qu'un codage CCAM ?", options: ["Un code postal médical", "La Classification Commune des Actes Médicaux pour la facturation", "Un code d'accès au dossier patient", "Un certificat médical"], correctIndex: 1 },
+    { question: "Quel est le principe de la loi Kouchner (4 mars 2002) concernant le dossier médical ?", options: ["Le médecin peut refuser l'accès au dossier", "Le patient a un droit d'accès direct à son dossier médical", "Seule la famille peut consulter le dossier", "Le dossier doit être détruit après 5 ans"], correctIndex: 1 },
+    { question: "Qu'est-ce que la MSSanté ?", options: ["Un logiciel de comptabilité", "La Messagerie Sécurisée de Santé pour les échanges entre professionnels", "Un réseau social médical", "Une mutuelle santé"], correctIndex: 1 },
+    { question: "Comment gère-t-on un patient mécontent à l'accueil ?", options: ["On l'ignore", "On écoute, reformule et propose une solution adaptée", "On appelle la sécurité immédiatement", "On lui demande de revenir un autre jour"], correctIndex: 1 },
+    { question: "Que doit contenir un compte rendu de consultation ?", options: ["Les coordonnées bancaires du patient", "Les motifs, observations, diagnostic et prescriptions", "Le menu du restaurant de l'hôpital", "Le planning des congés du médecin"], correctIndex: 1 },
+    { question: "Quel est le rôle du parcours de soins coordonnés ?", options: ["Réduire les effectifs hospitaliers", "Organiser le suivi du patient via le médecin traitant", "Supprimer les spécialistes", "Remplacer les consultations par des emails"], correctIndex: 1 },
+    { question: "Comment archiver un dossier médical ?", options: ["Le jeter après la dernière consultation", "Respecter les durées légales de conservation (20 ans minimum)", "Le stocker sur une clé USB personnelle", "L'envoyer au patient par courrier"], correctIndex: 1 },
+    { question: "Que signifie T2A dans le contexte hospitalier ?", options: ["Tarification À l'Activité", "Temps de Travail Annuel", "Taxe d'Accueil Ambulatoire", "Transfert Automatique d'Agenda"], correctIndex: 0 },
+  ],
+  exercices: [
+    { titre: "Accueil et identification du patient", consigne: "Un patient se présente à l'accueil avec sa carte Vitale mais sans pièce d'identité. Décrivez la procédure d'identitovigilance à suivre et les documents à demander.", reponseAttendue: "Vérifier l'identité par questions (nom, prénom, date de naissance), demander une pièce d'identité pour la prochaine visite, noter l'alerte dans le dossier, appliquer le protocole d'identitovigilance de l'établissement." },
+    { titre: "Gestion de planning multi-praticiens", consigne: "Le Dr Martin (cardiologue) est absent demain. Il a 8 rendez-vous programmés. Décrivez les étapes pour gérer cette situation : report, priorisation, communication.", reponseAttendue: "Identifier les urgences à reporter en priorité vers un confrère, contacter chaque patient pour proposer un nouveau créneau, mettre à jour Doctolib, informer l'équipe, noter les reports dans le dossier patient." },
+    { titre: "Prise en charge administrative et financière", consigne: "Mme Dupont consulte un spécialiste sans avoir été orientée par son médecin traitant. Expliquez les conséquences financières et la procédure à suivre.", reponseAttendue: "Hors parcours de soins coordonnés : remboursement réduit (30% au lieu de 70%). Informer la patiente, proposer de contacter le médecin traitant pour régulariser, enregistrer le statut dans le logiciel de facturation." },
+    { titre: "Transcription d'un compte rendu médical", consigne: "Transcrivez la dictée suivante du Dr Bernard : 'Patient vu ce jour pour douleurs thoraciques atypiques. ECG normal. Bilan sanguin : troponine négative. Pas de syndrome coronarien aigu. Surveillance ambulatoire préconisée. Contrôle à 15 jours.'", reponseAttendue: "Compte rendu mis en forme avec en-tête du praticien, date, identité du patient, motif de consultation, examens réalisés et résultats, conclusion diagnostique et conduite à tenir." },
+    { titre: "Gestion d'une demande d'accès au dossier médical", consigne: "Le fils d'un patient décédé demande l'accès au dossier médical de son père. Quels documents devez-vous vérifier et quelle est la procédure ?", reponseAttendue: "Vérifier : acte de décès, preuve de la filiation (livret de famille), pièce d'identité. Vérifier que le patient n'avait pas exprimé d'opposition. Préparer les éléments communicables en excluant les notes personnelles du médecin. Respecter le délai légal de 8 jours." },
+    { titre: "Communication via MSSanté", consigne: "Le médecin traitant de M. Leblanc demande les résultats de son IRM par email. Décrivez la procédure sécurisée à suivre.", reponseAttendue: "Utiliser exclusivement la messagerie MSSanté (jamais un email classique). Vérifier l'identité du destinataire dans l'annuaire. Joindre le compte rendu en pièce jointe. Mentionner les références du patient. Conserver une trace de l'envoi." },
+    { titre: "Facturation et télétransmission", consigne: "Un patient présente une carte Vitale expirée et une attestation papier de la CPAM. Comment procédez-vous pour la facturation de la consultation ?", reponseAttendue: "Saisir manuellement les informations de l'attestation papier dans le logiciel. Créer une feuille de soins papier ou électronique. Conserver une copie de l'attestation. Informer le patient de la mise à jour de sa carte Vitale. Effectuer la télétransmission dès que possible." },
+    { titre: "Terminologie médicale", consigne: "Expliquez les termes suivants en langage courant : dyspnée, tachycardie, hématurie, céphalée, asthénie.", reponseAttendue: "Dyspnée = difficulté à respirer ; Tachycardie = rythme cardiaque trop rapide ; Hématurie = sang dans les urines ; Céphalée = mal de tête ; Asthénie = fatigue intense." },
+    { titre: "Gestion de conflit à l'accueil", consigne: "Un patient s'énerve car il attend depuis 45 minutes alors qu'il avait rendez-vous. Le médecin a pris du retard à cause d'une urgence. Comment réagissez-vous ?", reponseAttendue: "Écouter le patient avec empathie, s'excuser pour l'attente, expliquer qu'une urgence a décalé les consultations sans donner de détails (secret médical), proposer un verre d'eau, informer le médecin, proposer un nouveau rendez-vous si le patient ne peut pas attendre." },
+    { titre: "Archivage et conservation des dossiers", consigne: "Votre établissement doit archiver les dossiers des patients sortis depuis plus de 5 ans. Décrivez la procédure d'archivage dans le respect de la réglementation.", reponseAttendue: "Durée légale de conservation : 20 ans à compter de la dernière consultation (ou 28 ans pour les mineurs). Trier les dossiers par date. Vérifier qu'aucun n'est en dessous du seuil. Archiver en local sécurisé ou via prestataire agréé. Mettre à jour le registre d'archivage. Respecter le RGPD." },
+  ],
+  competences: [
+    "Accueil physique et téléphonique du patient",
+    "Identitovigilance et vérification d'identité",
+    "Gestion des plannings et agendas médicaux",
+    "Prise en charge administrative et financière du patient",
+    "Facturation et télétransmission des actes médicaux",
+    "Transcription et mise en forme de documents médicaux",
+    "Terminologie médicale",
+    "Suivi médico-administratif du dossier patient",
+    "Communication via messagerie sécurisée de santé",
+    "Gestion de l'accès au dossier médical",
+    "Archivage et conservation des dossiers",
+    "Respect du secret médical et de la confidentialité",
+  ],
+  appreciations: [
+    "Excellente maîtrise de l'accueil patient et des procédures d'identitovigilance. Transcription médicale de très bonne qualité.",
+    "Bonne progression sur la terminologie médicale et la gestion des plannings. La facturation est bien assimilée.",
+    "Très bonne implication. La gestion des situations conflictuelles à l'accueil est maîtrisée. La transcription nécessite encore un peu de pratique.",
+    "Niveau satisfaisant. Les procédures administratives sont acquises. Doit encore approfondir la terminologie des spécialités médicales.",
+    "Stagiaire sérieux(se) et appliqué(e). La prise en charge financière et la télétransmission sont bien comprises.",
+    "Bonne compréhension du cadre réglementaire. L'utilisation de MSSanté et du DPI est opérationnelle.",
+  ],
+};
+
+EVAL_CONTENT["SAMS"] = {
+  ...EVAL_CONTENT["SAMA"],
+  qcmPositionnement: [
+    ...EVAL_CONTENT["SAMA"].qcmPositionnement.slice(0, 7),
+    { question: "Que signifie le sigle MDPH ?", options: ["Maison Départementale des Personnes Handicapées", "Mutuelle De Protection Hospitalière", "Module De Planification Hospitalière", "Maison De soins Pour Hospitalisés"], correctIndex: 0 },
+    { question: "Quel est le rôle du CCAS ?", options: ["Centre Communal d'Action Sociale : aide aux personnes en difficulté", "Centre de Consultation et d'Aide Sanitaire", "Caisse Centrale d'Assurance Sociale", "Comité de Coordination des Aides Sociales"], correctIndex: 0 },
+    { question: "Qu'est-ce qu'un PIA dans le secteur médico-social ?", options: ["Plan d'Investissement Annuel", "Projet Individuel d'Accompagnement", "Programme d'Insertion Administrative", "Protocole d'Intervention Avancée"], correctIndex: 1 },
+  ],
+  competences: [
+    "Accueil physique et téléphonique des usagers",
+    "Gestion administrative des dossiers des usagers",
+    "Suivi des parcours et des prises en charge",
+    "Rédaction de comptes rendus et transmissions",
+    "Coordination avec les partenaires sociaux et médico-sociaux",
+    "Terminologie médico-sociale",
+    "Gestion des plannings des intervenants",
+    "Facturation et suivi financier des prestations",
+    "Communication avec les familles et les aidants",
+    "Respect du secret professionnel et de la confidentialité",
+    "Utilisation des logiciels métier (DUI, dossier usager)",
+    "Archivage et gestion documentaire",
+  ],
+};
+
 // Map formation intitulé to content key
 function getContentKey(intitule: string): string {
   const lower = intitule.toLowerCase();
   if (lower.includes("ecsr") || lower.includes("enseignant de la conduite") || lower.includes("sécurité routière")) return "ECSR";
   if (lower.includes("vtest") || lower.includes("v-test") || lower.includes("rs6905")) return "VTest";
+  // SAMA / SAMS must be checked BEFORE generic "médico-social" / "social"
+  if (lower.includes("sama") || lower.includes("rncp40800") || lower.includes("secrétaire assistant médico-administratif") || lower.includes("secretaire assistant medico-administratif")) return "SAMA";
+  if (lower.includes("sams") || lower.includes("rncp36805") || lower.includes("secrétaire assistant médico-social") || lower.includes("secretaire assistant medico-social")) return "SAMS";
   if (lower.includes("excel")) return "Excel Professionnel";
   if ((lower.includes("anglais") || lower.includes("english")) && (lower.includes("a1") || lower.includes("débutant"))) return "Anglais A1";
   if (lower.includes("anglais")) return "Anglais Professionnel";
@@ -1032,6 +1120,38 @@ const QUESTIONS_OUVERTES: Record<string, QuestionsOuvertesFormation> = {
       { question: "What have you learned during this VTest Business English training?", reponseAttendue: "I learned professional email writing, meeting vocabulary, presentation techniques, negotiation strategies, grammar for business contexts, and exam preparation for the 4 VTest skills." },
     ],
   },
+};
+
+QUESTIONS_OUVERTES["SAMA"] = {
+  debut: [
+    { question: "Avez-vous déjà travaillé dans un environnement médical ou médico-administratif ?", reponseAttendue: "Oui/Non avec description de l'expérience : type de structure (hôpital, clinique, cabinet), durée et fonctions exercées." },
+    { question: "Que signifie pour vous le secret médical ?", reponseAttendue: "Le secret médical est l'obligation de confidentialité sur toutes les informations relatives au patient : état de santé, traitements, vie privée." },
+    { question: "Quels logiciels bureautiques ou médicaux connaissez-vous ?", reponseAttendue: "Word, Excel, Doctolib, logiciels de gestion de cabinet, DPI, messagerie sécurisée de santé." },
+    { question: "Comment accueillez-vous une personne en situation de stress ou d'angoisse ?", reponseAttendue: "Écoute active, ton calme et rassurant, reformulation, proposer de l'aide concrète, orienter si nécessaire." },
+    { question: "Que savez-vous de la carte Vitale et de son utilisation ?", reponseAttendue: "La carte Vitale contient les informations d'assurance maladie du patient et permet la télétransmission des feuilles de soins à la CPAM." },
+    { question: "Pourquoi avez-vous choisi la formation de secrétaire assistant médico-administratif ?", reponseAttendue: "Motivation personnelle liée au secteur médical, envie d'aider les patients, intérêt pour l'organisation administrative." },
+    { question: "Connaissez-vous la différence entre un hôpital public et une clinique privée ?", reponseAttendue: "L'hôpital public est géré par l'État et accueille tous les patients. La clinique privée est un établissement à but lucratif ou non lucratif avec des tarifs pouvant différer." },
+    { question: "Qu'est-ce qu'un dossier patient selon vous ?", reponseAttendue: "Le dossier patient regroupe toutes les informations administratives et médicales d'un patient : identité, antécédents, examens, comptes rendus, prescriptions." },
+    { question: "Comment organisez-vous votre travail au quotidien ?", reponseAttendue: "Planification des tâches par priorité, utilisation d'un agenda, gestion des urgences, suivi des dossiers en cours." },
+    { question: "Que feriez-vous si un patient vous demande des informations sur son diagnostic ?", reponseAttendue: "Je l'orienterais vers le médecin car le secrétaire médical ne peut pas communiquer d'informations médicales au patient." },
+  ],
+  fin: [
+    { question: "Décrivez la procédure d'accueil d'un nouveau patient dans une structure médicale.", reponseAttendue: "Vérification d'identité (identitovigilance), collecte des documents (carte Vitale, mutuelle, ordonnance), création du dossier administratif, orientation vers le service concerné." },
+    { question: "Expliquez le processus de facturation d'un acte médical.", reponseAttendue: "Saisie de l'acte avec le code CCAM/NGAP, vérification des droits du patient, application du tiers payant si applicable, télétransmission à la CPAM et à la mutuelle." },
+    { question: "Quelles sont les règles de conservation d'un dossier médical ?", reponseAttendue: "Conservation de 20 ans minimum à compter de la dernière consultation, 28 ans pour les mineurs. Archivage sécurisé conforme au RGPD." },
+    { question: "Comment gérez-vous un conflit entre un patient et un professionnel de santé ?", reponseAttendue: "Rester neutre, écouter les deux parties, proposer une médiation, orienter si besoin vers le service des relations avec les usagers." },
+    { question: "Décrivez les étapes de transcription d'un compte rendu médical.", reponseAttendue: "Écoute de la dictée, transcription avec mise en forme normée, vérification de la terminologie médicale, relecture, transmission au médecin pour validation." },
+    { question: "Quels sont vos acquis les plus importants de cette formation ?", reponseAttendue: "Maîtrise de la terminologie médicale, gestion du DPI, accueil patient, facturation et télétransmission, respect du cadre réglementaire." },
+    { question: "Comment utilisez-vous la messagerie sécurisée de santé (MSSanté) ?", reponseAttendue: "Connexion via identifiant professionnel, envoi de documents médicaux uniquement via MSSanté, vérification du destinataire dans l'annuaire, conservation des traces d'envoi." },
+    { question: "Expliquez la procédure de communication d'un dossier médical à un ayant droit.", reponseAttendue: "Vérification de la qualité d'ayant droit (acte de décès, filiation), vérification de l'absence d'opposition du patient de son vivant, communication des éléments hors notes personnelles du médecin, respect du délai de 8 jours." },
+    { question: "Qu'est-ce que le parcours de soins coordonnés et quel est son impact sur la facturation ?", reponseAttendue: "Le parcours de soins coordonnés passe par le médecin traitant qui oriente vers les spécialistes. Hors parcours, le remboursement est réduit (30% au lieu de 70%)." },
+    { question: "Qu'avez-vous appris pendant cette formation ?", reponseAttendue: "J'ai appris l'accueil patient, la gestion administrative et financière, la transcription médicale, la terminologie, le cadre réglementaire, la gestion du DPI et l'utilisation des outils numériques de santé." },
+  ],
+};
+
+QUESTIONS_OUVERTES["SAMS"] = {
+  debut: QUESTIONS_OUVERTES["SAMA"].debut,
+  fin: QUESTIONS_OUVERTES["SAMA"].fin,
 };
 
 const DEFAULT_QUESTIONS_OUVERTES: QuestionsOuvertesFormation = {
