@@ -543,6 +543,11 @@ export function genRapportFinFormation(o: OrganismeInfo, f: FormationInfo, stagi
 // ========== DOCUMENTS QUALITÉ AF ==========
 
 export function genSatisfactionFroid(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
+  const termine = isFormationTerminee(f);
+  if (!termine) {
+    return buildDocument({ org: o, title: "QUESTIONNAIRE DE SATISFACTION À FROID", subtitle: `${f.intitule} – 3 mois après`, formation: f, showFormationInfo: true, stagiaires,
+      extraHtml: `<div class="section section-green"><p><em>La formation est en cours. L'enquête de satisfaction à froid sera réalisée 3 mois après la fin de la formation.</em></p></div>` });
+  }
   const questions = ["Utilisation des acquis au quotidien", "Impact sur la performance", "Compétences encore utiles", "Besoins complémentaires identifiés", "Recommanderiez-vous cette formation"];
   let extra = `<p><em>Enquête réalisée 3 mois après la formation – Taux de réponse : ${Math.min(stagiaires.length, 10) > 5 ? "85" : "90"}%</em></p>`;
   stagiaires.slice(0, 8).forEach((s, si) => {
