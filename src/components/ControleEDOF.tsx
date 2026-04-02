@@ -9,7 +9,6 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { CheckCircle2, Circle, Upload, Archive, Loader2, FileText, AlertTriangle, Sparkles, XCircle, ChevronDown, ChevronRight, Eye, Download, PenTool } from "lucide-react";
-import SignaturePad from "@/components/SignaturePad";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import { toast } from "sonner";
@@ -22,6 +21,7 @@ interface ControleEDOFProps {
   stagiaires: StagiaireInfo[];
   criteres: CritereData[];
   docStyle?: DocStyleConfig;
+  signature?: string;
 }
 
 const STATUS_CONFIG: Record<EYDocStatus, { label: string; icon: React.ReactNode; color: string }> = {
@@ -31,7 +31,7 @@ const STATUS_CONFIG: Record<EYDocStatus, { label: string; icon: React.ReactNode;
   not_applicable: { label: "N/A", icon: <XCircle className="w-4 h-4 text-muted-foreground" />, color: "bg-muted text-muted-foreground" },
 };
 
-export default function ControleEDOF({ organisme, formation, stagiaires }: ControleEDOFProps) {
+export default function ControleEDOF({ organisme, formation, stagiaires, signature }: ControleEDOFProps) {
   const [docStates, setDocStates] = useState<Map<string, EYDocState>>(() => {
     const m = new Map<string, EYDocState>();
     EY_DOCUMENTS.forEach(d => {
@@ -54,10 +54,6 @@ export default function ControleEDOF({ organisme, formation, stagiaires }: Contr
   const [previewTitle, setPreviewTitle] = useState("");
   const [previewLoading, setPreviewLoading] = useState(false);
   const [previewDoc, setPreviewDoc] = useState<EYDocumentItem | null>(null);
-  const [showSignaturePad, setShowSignaturePad] = useState(false);
-  const [savedSignature, setSavedSignature] = useState<string>(() => {
-    try { return sessionStorage.getItem('ey_signature') || ''; } catch { return ''; }
-  });
   const orgName = organisme.nom || "Organisme";
 
   const stats = useMemo(() => {
@@ -253,9 +249,9 @@ export default function ControleEDOF({ organisme, formation, stagiaires }: Contr
 
   // Download with signature
   const handleSignAndDownload = useCallback(async () => {
-    if (!previewHtml || !previewDoc || !savedSignature) return;
+    if (!previewHtml || !previewDoc || !signature) return;
     try {
-      const signedHtml = injectSignatureIntoHtml(previewHtml, savedSignature);
+      const signedHtml = injectSignatureIntoHtml(previewHtml, signature);
       const blob = await htmlToPdfBlob(signedHtml);
       const safeName = orgName.replace(/[^a-zA-Z0-9_-]/g, "_");
       saveAs(blob, `${safeName}_${previewDoc.code}_signe.pdf`);
@@ -263,7 +259,7 @@ export default function ControleEDOF({ organisme, formation, stagiaires }: Contr
     } catch (e: any) {
       toast.error("Erreur : " + (e.message || "Erreur inconnue"));
     }
-  }, [previewHtml, previewDoc, orgName, savedSignature, injectSignatureIntoHtml]);
+  }, [previewHtml, previewDoc, orgName, signature, injectSignatureIntoHtml]);
 
   const downloadZip = useCallback(async () => {
     setGenerating(true);
@@ -540,7 +536,7 @@ export default function ControleEDOF({ organisme, formation, stagiaires }: Contr
       </div>
 
       {/* Preview Dialog */}
-      <Dialog open={previewOpen} onOpenChange={(open) => { setPreviewOpen(open); if (!open) setShowSignaturePad(false); }}>
+      <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
         <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
@@ -557,64 +553,35 @@ export default function ControleEDOF({ organisme, formation, stagiaires }: Contr
             ) : (
               <iframe
                 srcDoc={previewHtml}
-                className="w-full h-[50vh] border-0"
+                className="w-full h-[60vh] border-0"
                 title="Aperçu du document"
                 sandbox="allow-same-origin"
               />
             )}
           </div>
 
-          {/* Signature section */}
-          {showSignaturePad ? (
-            <div className="border rounded-lg p-4 bg-muted/30">
-              <SignaturePad
-                label="✍️ Dessinez votre signature"
-                onSave={(dataUrl) => {
-                  setSavedSignature(dataUrl);
-                  sessionStorage.setItem('ey_signature', dataUrl);
-                  setShowSignaturePad(false);
-                  toast.success("Signature enregistrée !");
-                }}
-                onCancel={() => setShowSignaturePad(false)}
-              />
-            </div>
-          ) : savedSignature ? (
+          {signature && (
             <div className="flex items-center gap-3 border rounded-lg p-3 bg-muted/30">
-              <img src={savedSignature} alt="Signature" className="h-12 border rounded bg-white p-1" />
-              <span className="text-sm text-muted-foreground flex-1">Signature enregistrée</span>
-              <Button variant="ghost" size="sm" className="text-xs" onClick={() => setShowSignaturePad(true)}>
-                Modifier
-              </Button>
-              <Button variant="ghost" size="sm" className="text-xs text-destructive" onClick={() => { setSavedSignature(''); sessionStorage.removeItem('ey_signature'); }}>
-                Supprimer
-              </Button>
+              <img src={signature} alt="Signature" className="h-10 border rounded bg-white p-1" />
+              <span className="text-xs text-muted-foreground">Signature enregistrée — sera appliquée au téléchargement</span>
             </div>
-          ) : null}
+          )}
 
-          <div className="flex justify-between gap-2 pt-2">
-            <div>
-              {!showSignaturePad && !savedSignature && (
-                <Button variant="outline" size="sm" onClick={() => setShowSignaturePad(true)} className="gap-1">
-                  <PenTool className="w-4 h-4" />
-                  Ajouter une signature
-                </Button>
-              )}
-            </div>
-            <div className="flex gap-2">
-              <Button variant="outline" onClick={() => setPreviewOpen(false)}>
-                Fermer
+          <div className="flex justify-end gap-2 pt-2">
+            <Button variant="outline" onClick={() => setPreviewOpen(false)}>
+              Fermer
+            </Button>
+            {signature ? (
+              <Button onClick={handleSignAndDownload} className="gap-1">
+                <PenTool className="w-4 h-4" />
+                Télécharger signé
               </Button>
-              <Button onClick={handleDownloadPreview} variant="secondary" className="gap-1">
+            ) : (
+              <Button onClick={handleDownloadPreview} className="gap-1">
                 <Download className="w-4 h-4" />
-                PDF sans signature
+                Télécharger en PDF
               </Button>
-              {savedSignature && (
-                <Button onClick={handleSignAndDownload} className="gap-1">
-                  <PenTool className="w-4 h-4" />
-                  Signer &amp; télécharger
-                </Button>
-              )}
-            </div>
+            )}
           </div>
         </DialogContent>
       </Dialog>

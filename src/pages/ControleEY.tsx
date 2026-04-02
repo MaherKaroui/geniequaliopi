@@ -5,10 +5,11 @@ import OrganismeForm from "@/components/OrganismeForm";
 import FormationForm from "@/components/FormationForm";
 import StagiairesForm from "@/components/StagiairesForm";
 import DocStyleConfigPanel from "@/components/DocStyleConfigPanel";
+import SignaturePad from "@/components/SignaturePad";
 import ControleEDOF from "@/components/ControleEDOF";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ChevronLeft, LogIn, LogOut, ChevronDown, ChevronRight, Building2, GraduationCap, Users, Palette, Save, FolderOpen, Trash2, Plus } from "lucide-react";
+import { ChevronLeft, LogIn, LogOut, ChevronDown, ChevronRight, Building2, GraduationCap, Users, Palette, Save, FolderOpen, Trash2, Plus, PenTool } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -58,6 +59,10 @@ const ControleEY = () => {
   const [docStyle, setDocStyle] = useState<DocStyleConfig>(() => {
     try { const s = sessionStorage.getItem('qualiopi_style'); return s ? JSON.parse(s) : DEFAULT_DOC_STYLE; } catch { return DEFAULT_DOC_STYLE; }
   });
+  const [signature, setSignature] = useState<string>(() => {
+    try { return sessionStorage.getItem('ey_signature') || ''; } catch { return ''; }
+  });
+  const [showSigPad, setShowSigPad] = useState(false);
 
   // Save/Load state
   const [savedList, setSavedList] = useState<SavedEYControl[]>([]);
@@ -203,6 +208,7 @@ const ControleEY = () => {
     { key: "organisme", label: "Organisme", icon: <Building2 className="w-4 h-4" />, filled: !!organisme.nom },
     { key: "formation", label: "Formation", icon: <GraduationCap className="w-4 h-4" />, filled: !!formation.intitule },
     { key: "stagiaires", label: "Stagiaires", icon: <Users className="w-4 h-4" />, count: stagiaires.length },
+    { key: "signature", label: "Signature électronique", icon: <PenTool className="w-4 h-4" />, filled: !!signature },
     { key: "design", label: "Design des documents", icon: <Palette className="w-4 h-4" /> },
   ];
 
@@ -327,6 +333,53 @@ const ControleEY = () => {
                   />
                 )}
                 {key === "stagiaires" && <StagiairesForm data={stagiaires} onChange={handleStagChange} />}
+                {key === "signature" && (
+                  <div className="space-y-4">
+                    {signature ? (
+                      <div className="flex items-center gap-4">
+                        <div className="border rounded-lg p-2 bg-white">
+                          <img src={signature} alt="Signature" className="h-16" />
+                        </div>
+                        <div className="flex flex-col gap-2">
+                          <span className="text-sm text-muted-foreground">Votre signature sera appliquée sur tous les documents téléchargés</span>
+                          <div className="flex gap-2">
+                            <Button variant="outline" size="sm" onClick={() => setShowSigPad(true)}>Modifier</Button>
+                            <Button variant="ghost" size="sm" className="text-destructive" onClick={() => { setSignature(''); sessionStorage.removeItem('ey_signature'); }}>Supprimer</Button>
+                          </div>
+                        </div>
+                      </div>
+                    ) : showSigPad ? (
+                      <SignaturePad
+                        label="✍️ Dessinez votre signature"
+                        onSave={(dataUrl) => {
+                          setSignature(dataUrl);
+                          sessionStorage.setItem('ey_signature', dataUrl);
+                          setShowSigPad(false);
+                        }}
+                        onCancel={() => setShowSigPad(false)}
+                      />
+                    ) : (
+                      <div className="text-center py-6">
+                        <p className="text-sm text-muted-foreground mb-3">Aucune signature enregistrée</p>
+                        <Button onClick={() => setShowSigPad(true)} className="gap-2">
+                          <PenTool className="w-4 h-4" />
+                          Dessiner ma signature
+                        </Button>
+                      </div>
+                    )}
+                    {signature && showSigPad && (
+                      <SignaturePad
+                        label="✍️ Nouvelle signature"
+                        onSave={(dataUrl) => {
+                          setSignature(dataUrl);
+                          sessionStorage.setItem('ey_signature', dataUrl);
+                          setShowSigPad(false);
+                        }}
+                        onCancel={() => setShowSigPad(false)}
+                      />
+                    )}
+                  </div>
+                )}
                 {key === "design" && <DocStyleConfigPanel style={docStyle} onChange={handleStyleChange} />}
               </div>
             )}
@@ -334,7 +387,7 @@ const ControleEY = () => {
         ))}
 
         {/* Checklist */}
-        <ControleEDOF organisme={organisme} formation={formation} stagiaires={stagiaires} criteres={criteres} docStyle={docStyle} />
+        <ControleEDOF organisme={organisme} formation={formation} stagiaires={stagiaires} criteres={criteres} docStyle={docStyle} signature={signature} />
       </main>
     </div>
   );
