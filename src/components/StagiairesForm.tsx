@@ -1,9 +1,10 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { StagiaireInfo } from "@/types/qualiopi";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { X } from "lucide-react";
+import { X, PenTool } from "lucide-react";
+import SignaturePad from "@/components/SignaturePad";
 
 const FORMATEURS_PREDIFINIS = [
   "AHMED EL HILALI",
@@ -31,6 +32,8 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
   const sigRefs = useRef<Record<number, HTMLInputElement | null>>({});
   const sigRespRefs = useRef<Record<number, HTMLInputElement | null>>({});
   const sigFormateurRefs = useRef<Record<number, HTMLInputElement | null>>({});
+  // Track which signature pad is open: "sig-0", "resp-1", "formateur-2", etc.
+  const [drawingPad, setDrawingPad] = useState<string | null>(null);
   const addStagiaire = () => onChange([...data, { ...emptyStagiaire }]);
   const removeStagiaire = (index: number) => onChange(data.filter((_, i) => i !== index));
   const updateStagiaire = (index: number, field: keyof StagiaireInfo, value: string) => {
@@ -203,79 +206,115 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
             </div>
           </div>
           {/* Signature stagiaire */}
-          <div className="flex items-center gap-3 mt-2 pt-2 border-t border-border/50">
-            <Label className="text-xs font-semibold">Signature stagiaire</Label>
-            {stagiaire.signatureUrl ? (
-              <div className="relative group">
-                <img src={stagiaire.signatureUrl} alt="Signature" className="h-10 w-auto max-w-[120px] object-contain rounded border bg-white p-0.5" />
-                <button
-                  onClick={() => updateStagiaire(index, 'signatureUrl', '')}
-                  className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
-                >
-                  <X className="w-2.5 h-2.5" />
-                </button>
-              </div>
-            ) : (
-              <span className="text-xs text-muted-foreground">Aucune</span>
+          <div className="space-y-2 mt-2 pt-2 border-t border-border/50">
+            <div className="flex items-center gap-3">
+              <Label className="text-xs font-semibold">Signature stagiaire</Label>
+              {stagiaire.signatureUrl ? (
+                <div className="relative group">
+                  <img src={stagiaire.signatureUrl} alt="Signature" className="h-10 w-auto max-w-[120px] object-contain rounded border bg-white p-0.5" />
+                  <button
+                    onClick={() => updateStagiaire(index, 'signatureUrl', '')}
+                    className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <X className="w-2.5 h-2.5" />
+                  </button>
+                </div>
+              ) : (
+                <span className="text-xs text-muted-foreground">Aucune</span>
+              )}
+              <input
+                ref={el => { sigRefs.current[index] = el; }}
+                type="file" accept="image/*" className="hidden"
+                onChange={e => { const f = e.target.files?.[0]; if (f) handleSigFile(index, f); }}
+              />
+              <Button variant="outline" size="sm" className="h-7 text-xs" onClick={() => sigRefs.current[index]?.click()}>
+                {stagiaire.signatureUrl ? "Changer" : "Charger"}
+              </Button>
+              <Button variant="outline" size="sm" className="h-7 text-xs gap-1" onClick={() => setDrawingPad(drawingPad === `sig-${index}` ? null : `sig-${index}`)}>
+                <PenTool className="w-3 h-3" /> Dessiner
+              </Button>
+            </div>
+            {drawingPad === `sig-${index}` && (
+              <SignaturePad
+                label="✍️ Signature stagiaire"
+                onSave={(dataUrl) => { updateStagiaire(index, 'signatureUrl', dataUrl); setDrawingPad(null); }}
+                onCancel={() => setDrawingPad(null)}
+              />
             )}
-            <input
-              ref={el => { sigRefs.current[index] = el; }}
-              type="file" accept="image/*" className="hidden"
-              onChange={e => { const f = e.target.files?.[0]; if (f) handleSigFile(index, f); }}
-            />
-            <Button variant="outline" size="sm" className="h-7 text-xs" onClick={() => sigRefs.current[index]?.click()}>
-              {stagiaire.signatureUrl ? "Changer" : "Charger"}
-            </Button>
           </div>
           {/* Signature responsable entreprise */}
-          <div className="flex items-center gap-3 mt-2 pt-2 border-t border-border/50">
-            <Label className="text-xs font-semibold">Signature resp. entreprise</Label>
-            {stagiaire.signatureResponsableUrl ? (
-              <div className="relative group">
-                <img src={stagiaire.signatureResponsableUrl} alt="Signature responsable" className="h-10 w-auto max-w-[120px] object-contain rounded border bg-white p-0.5" />
-                <button
-                  onClick={() => updateStagiaire(index, 'signatureResponsableUrl', '')}
-                  className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
-                >
-                  <X className="w-2.5 h-2.5" />
-                </button>
-              </div>
-            ) : (
-              <span className="text-xs text-muted-foreground">Aucune</span>
+          <div className="space-y-2 mt-2 pt-2 border-t border-border/50">
+            <div className="flex items-center gap-3">
+              <Label className="text-xs font-semibold">Signature resp. entreprise</Label>
+              {stagiaire.signatureResponsableUrl ? (
+                <div className="relative group">
+                  <img src={stagiaire.signatureResponsableUrl} alt="Signature responsable" className="h-10 w-auto max-w-[120px] object-contain rounded border bg-white p-0.5" />
+                  <button
+                    onClick={() => updateStagiaire(index, 'signatureResponsableUrl', '')}
+                    className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <X className="w-2.5 h-2.5" />
+                  </button>
+                </div>
+              ) : (
+                <span className="text-xs text-muted-foreground">Aucune</span>
+              )}
+              <input
+                ref={el => { sigRespRefs.current[index] = el; }}
+                type="file" accept="image/*" className="hidden"
+                onChange={e => { const f = e.target.files?.[0]; if (f) handleSigRespFile(index, f); }}
+              />
+              <Button variant="outline" size="sm" className="h-7 text-xs" onClick={() => sigRespRefs.current[index]?.click()}>
+                {stagiaire.signatureResponsableUrl ? "Changer" : "Charger"}
+              </Button>
+              <Button variant="outline" size="sm" className="h-7 text-xs gap-1" onClick={() => setDrawingPad(drawingPad === `resp-${index}` ? null : `resp-${index}`)}>
+                <PenTool className="w-3 h-3" /> Dessiner
+              </Button>
+            </div>
+            {drawingPad === `resp-${index}` && (
+              <SignaturePad
+                label="✍️ Signature responsable entreprise"
+                onSave={(dataUrl) => { updateStagiaire(index, 'signatureResponsableUrl', dataUrl); setDrawingPad(null); }}
+                onCancel={() => setDrawingPad(null)}
+              />
             )}
-            <input
-              ref={el => { sigRespRefs.current[index] = el; }}
-              type="file" accept="image/*" className="hidden"
-              onChange={e => { const f = e.target.files?.[0]; if (f) handleSigRespFile(index, f); }}
-            />
-            <Button variant="outline" size="sm" className="h-7 text-xs" onClick={() => sigRespRefs.current[index]?.click()}>
-              {stagiaire.signatureResponsableUrl ? "Changer" : "Charger"}
-            </Button>
           </div>
           {/* Signature formateur */}
-          <div className="flex items-center gap-3 mt-2 pt-2 border-t border-border/50">
-            <Label className="text-xs font-semibold">Signature formateur</Label>
-            {stagiaire.formateurSignatureUrl ? (
-              <div className="relative group">
-                <img src={stagiaire.formateurSignatureUrl} alt="Signature formateur" className="h-10 w-auto max-w-[120px] object-contain rounded border bg-white p-0.5" />
-                <button
-                  onClick={() => updateStagiaire(index, 'formateurSignatureUrl', '')}
-                  className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
-                >
-                  <X className="w-2.5 h-2.5" />
-                </button>
-              </div>
-            ) : (
-              <span className="text-xs text-muted-foreground">Aucune</span>
+          <div className="space-y-2 mt-2 pt-2 border-t border-border/50">
+            <div className="flex items-center gap-3">
+              <Label className="text-xs font-semibold">Signature formateur</Label>
+              {stagiaire.formateurSignatureUrl ? (
+                <div className="relative group">
+                  <img src={stagiaire.formateurSignatureUrl} alt="Signature formateur" className="h-10 w-auto max-w-[120px] object-contain rounded border bg-white p-0.5" />
+                  <button
+                    onClick={() => updateStagiaire(index, 'formateurSignatureUrl', '')}
+                    className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <X className="w-2.5 h-2.5" />
+                  </button>
+                </div>
+              ) : (
+                <span className="text-xs text-muted-foreground">Aucune</span>
+              )}
+              <input
+                ref={el => { sigFormateurRefs.current[index] = el; }}
+                type="file" accept="image/*" className="hidden"
+                onChange={e => { const f = e.target.files?.[0]; if (f) handleSigFormateurFile(index, f); }}
+              />
+              <Button variant="outline" size="sm" className="h-7 text-xs" onClick={() => sigFormateurRefs.current[index]?.click()}>
+                {stagiaire.formateurSignatureUrl ? "Changer" : "Charger"}
+              </Button>
+              <Button variant="outline" size="sm" className="h-7 text-xs gap-1" onClick={() => setDrawingPad(drawingPad === `formateur-${index}` ? null : `formateur-${index}`)}>
+                <PenTool className="w-3 h-3" /> Dessiner
+              </Button>
+            </div>
+            {drawingPad === `formateur-${index}` && (
+              <SignaturePad
+                label="✍️ Signature formateur"
+                onSave={(dataUrl) => { updateStagiaire(index, 'formateurSignatureUrl', dataUrl); setDrawingPad(null); }}
+                onCancel={() => setDrawingPad(null)}
+              />
             )}
-            <input
-              ref={el => { sigFormateurRefs.current[index] = el; }}
-              type="file" accept="image/*" className="hidden"
-              onChange={e => { const f = e.target.files?.[0]; if (f) handleSigFormateurFile(index, f); }}
-            />
-            <Button variant="outline" size="sm" className="h-7 text-xs" onClick={() => sigFormateurRefs.current[index]?.click()}>
-              {stagiaire.formateurSignatureUrl ? "Changer" : "Charger"}
-            </Button>
           </div>
         </div>
       ))}
