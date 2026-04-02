@@ -2,9 +2,22 @@ import { OrganismeInfo, FormationInfo, StagiaireInfo, DocStyleConfig, DEFAULT_DO
 
 /** Ensure a URL has a protocol prefix and return a clickable <a> tag */
 export function linkUrl(url: string | undefined | null, label?: string): string {
-  if (!url) return "—";
+  if (!url || !url.trim()) return "";
   const href = /^https?:\/\//i.test(url) ? url : `https://${url}`;
   return `<a href="${href}" target="_blank" style="color:#1a56db;text-decoration:underline">${label || url}</a>`;
+}
+
+/** Returns an HTML line for site web only if the value is non-empty */
+export function optSiteWeb(o: { siteWeb?: string }, labelPrefix?: string): string {
+  if (!o.siteWeb || !o.siteWeb.trim()) return "";
+  const label = labelPrefix || "Site web";
+  return `<p><strong>${label} :</strong> ${linkUrl(o.siteWeb)}</p>`;
+}
+
+/** Conditionally render a bullet or line mentioning siteWeb */
+export function optSiteWebBr(o: { siteWeb?: string }, prefix?: string): string {
+  if (!o.siteWeb || !o.siteWeb.trim()) return "";
+  return `${prefix || ""}${linkUrl(o.siteWeb)}`;
 }
 
 let _currentStyle: DocStyleConfig = { ...DEFAULT_DOC_STYLE };
