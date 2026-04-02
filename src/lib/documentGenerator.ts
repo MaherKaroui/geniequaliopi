@@ -6258,12 +6258,73 @@ function genEnqueteSatisfactionFormateur(o: OrganismeInfo, f: FormationInfo) {
   });
 }
 function genDocumentsCertificateursCFA(o: OrganismeInfo, f: FormationInfo) {
-  return buildDocument({ org: o, title: "DOCUMENTS CERTIFICATEURS – CFA", subtitle: f.intitule, sections: [
-    { heading: "Référentiel de certification", content: `<p><strong>Certification visée :</strong> ${f.intitule}<br><strong>Code RNCP/RS :</strong> [À compléter]<br><strong>Organisme certificateur :</strong> [À compléter]<br><strong>Date d'enregistrement :</strong> [À compléter]<br><strong>Date de fin de validité :</strong> [À compléter]</p>` },
-    { heading: "Blocs de compétences", content: "<p><strong>Bloc 1 :</strong> [Intitulé du bloc 1]<br><strong>Bloc 2 :</strong> [Intitulé du bloc 2]<br><strong>Bloc 3 :</strong> [Intitulé du bloc 3]<br><strong>Bloc 4 :</strong> [Intitulé du bloc 4]</p>" },
-    { heading: "Modalités d'évaluation", content: "<p>• Épreuves écrites ponctuelles<br>• Évaluations en cours de formation (CCF)<br>• Épreuves pratiques<br>• Soutenance de dossier professionnel<br>• Évaluation en entreprise par le maître d'apprentissage</p>" },
-    { heading: "Prérequis d'accès à la certification", content: "<p>• Avoir suivi l'intégralité du parcours de formation<br>• Avoir validé les évaluations en cours de formation<br>• Avoir réalisé la totalité des heures en entreprise<br>• Être à jour de l'assiduité</p>", variant: "green" },
-  ] });
+  const fiche = f.codeRNCP ? getRNCPByCode(f.codeRNCP) : undefined;
+
+  const codeLabel = f.codeRNCP || "[Non renseigné]";
+  const certificateur = fiche?.certificateur || "[À compléter]";
+  const dateEnreg = fiche?.dateEnregistrement || "[À compléter]";
+  const dateEch = fiche?.dateEcheance || "[À compléter]";
+  const niveau = fiche?.niveau || "[À compléter]";
+  const codeNSF = fiche?.codeNSF || "";
+  const formacodes = fiche?.formacodes || "";
+  const lienFC = f.codeRNCP ? `https://www.francecompetences.fr/recherche/rncp/${f.codeRNCP.replace(/\\D/g, '')}/` : "";
+
+  let refContent = `<p><strong>Certification visée :</strong> ${f.intitule}</p>`;
+  refContent += `<p><strong>Code RNCP/RS :</strong> ${codeLabel}</p>`;
+  refContent += `<p><strong>Niveau :</strong> ${niveau}</p>`;
+  refContent += `<p><strong>Organisme certificateur :</strong> ${certificateur}</p>`;
+  refContent += `<p><strong>Date d'enregistrement :</strong> ${dateEnreg}</p>`;
+  refContent += `<p><strong>Date de fin de validité :</strong> ${dateEch}</p>`;
+  if (codeNSF) refContent += `<p><strong>Code NSF :</strong> ${codeNSF}</p>`;
+  if (formacodes) refContent += `<p><strong>Formacodes :</strong> ${formacodes}</p>`;
+  if (lienFC) refContent += `<p><strong>Lien France Compétences :</strong> <a href="${lienFC}">${lienFC}</a></p>`;
+
+  let resumeContent = "";
+  if (fiche?.resume) resumeContent += `<p>${fiche.resume}</p>`;
+  if (fiche?.activitesVisees) resumeContent += `<h4>Activités visées</h4><p>${fiche.activitesVisees}</p>`;
+  if (fiche?.secteursActivite) resumeContent += `<h4>Secteurs d'activité</h4><p>${fiche.secteursActivite}</p>`;
+  if (fiche?.typesEmplois && fiche.typesEmplois.length > 0) {
+    resumeContent += `<h4>Types d'emplois accessibles</h4><ul>${fiche.typesEmplois.map(e => `<li>${e}</li>`).join("")}</ul>`;
+  }
+  if (fiche?.codesROME && fiche.codesROME.length > 0) {
+    resumeContent += `<p><strong>Codes ROME :</strong> ${fiche.codesROME.join(", ")}</p>`;
+  }
+
+  let blocsContent = "";
+  if (fiche?.blocsCompetences && fiche.blocsCompetences.length > 0) {
+    blocsContent += `<table border="1" cellpadding="6" cellspacing="0" style="width:100%;border-collapse:collapse">`;
+    blocsContent += `<tr style="background:#f0f0f0"><th>Bloc</th><th>Compétences</th><th>Modalités d'évaluation</th></tr>`;
+    fiche.blocsCompetences.forEach((bloc) => {
+      const compList = bloc.competences.map(c => `• ${c}`).join("<br>");
+      blocsContent += `<tr><td style="vertical-align:top"><strong>${bloc.titre}</strong></td><td style="vertical-align:top">${compList}</td><td style="vertical-align:top">${bloc.modalitesEval || "—"}</td></tr>`;
+    });
+    blocsContent += `</table>`;
+  } else {
+    blocsContent = "<p>[Blocs de compétences : à compléter selon le référentiel de certification]</p>";
+  }
+
+  let voiesContent = "";
+  if (fiche?.voiesAcces && fiche.voiesAcces.length > 0) {
+    voiesContent = `<ul>${fiche.voiesAcces.map(v => `<li>${v}</li>`).join("")}</ul>`;
+  } else {
+    voiesContent = "<p>• Formation continue<br>• Contrat d'apprentissage<br>• Contrat de professionnalisation<br>• VAE</p>";
+  }
+
+  let prerequisContent = "<p>• Avoir suivi l'intégralité du parcours de formation<br>• Avoir validé les évaluations en cours de formation<br>• Avoir réalisé la totalité des heures en entreprise<br>• Être à jour de l'assiduité</p>";
+  if (fiche?.dureeIndicative) {
+    prerequisContent += `<p><strong>Durée indicative :</strong> ${fiche.dureeIndicative}</p>`;
+  }
+
+  const sections: { heading: string; content: string; variant?: "green" | "orange" }[] = [
+    { heading: "1. Référentiel de certification", content: refContent },
+  ];
+  if (resumeContent) sections.push({ heading: "2. Présentation de la certification", content: resumeContent });
+  const n = resumeContent ? 3 : 2;
+  sections.push({ heading: `${n}. Blocs de compétences et modalités d'évaluation`, content: blocsContent });
+  sections.push({ heading: `${n + 1}. Voies d'accès à la certification`, content: voiesContent });
+  sections.push({ heading: `${n + 2}. Prérequis d'accès à la certification`, content: prerequisContent, variant: "green" });
+
+  return buildDocument({ org: o, title: "DOCUMENTS CERTIFICATEURS – CFA", subtitle: f.intitule, sections });
 }
 
 /** Parse rythme alternance string to get CFA weeks and enterprise weeks per cycle */
