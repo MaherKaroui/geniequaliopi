@@ -59,6 +59,10 @@ const ControleEY = () => {
   const [docStyle, setDocStyle] = useState<DocStyleConfig>(() => {
     try { const s = sessionStorage.getItem('qualiopi_style'); return s ? JSON.parse(s) : DEFAULT_DOC_STYLE; } catch { return DEFAULT_DOC_STYLE; }
   });
+  const [signature, setSignature] = useState<string>(() => {
+    try { return sessionStorage.getItem('ey_signature') || ''; } catch { return ''; }
+  });
+  const [showSigPad, setShowSigPad] = useState(false);
 
   // Save/Load state
   const [savedList, setSavedList] = useState<SavedEYControl[]>([]);
