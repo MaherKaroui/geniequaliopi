@@ -607,6 +607,7 @@ export function genAccompagnementDistancielCFA(o: OrganismeInfo) {
 
 export function genEnquetePartenaireEmployeurCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = stagiaires[si] || stagiaires[0];
+  const termine = isFormationTerminee(f);
   return buildDocument({ org: o, title: "FICHE DE SUIVI APPRENTI(E)", extraHtml: `
     <p style="margin-bottom:20px">Afin de suivre au mieux votre apprenti et assurer un lien constant entre l'école et l'entreprise, nous vous proposons cette fiche d'évaluation permettant d'évaluer le jeune que vous accueillez dans votre établissement.</p>
     <p>Merci de nous retourner cette fiche remplie à notre chargé de pédagogie professionnelle à l'adresse suivante : <strong>${o.email}</strong></p>
@@ -617,12 +618,12 @@ export function genEnquetePartenaireEmployeurCFA(o: OrganismeInfo, f: FormationI
     </table>
     <table style="width:100%;border-collapse:collapse;margin-top:20px">
       <tr style="background:#1e3a7b;color:white"><th style="padding:8px;border:1px solid #ccc;text-align:left">Critère</th><th style="padding:8px;border:1px solid #ccc">Très satisfaisant</th><th style="padding:8px;border:1px solid #ccc">Satisfaisant</th><th style="padding:8px;border:1px solid #ccc">À améliorer</th></tr>
-      <tr><td style="padding:8px;border:1px solid #ccc">Montée en compétence de votre apprenti(e)</td><td style="padding:8px;border:1px solid #ccc;text-align:center">☑</td><td style="padding:8px;border:1px solid #ccc;text-align:center">☐</td><td style="padding:8px;border:1px solid #ccc;text-align:center">☐</td></tr>
-      <tr><td style="padding:8px;border:1px solid #ccc">Implication de votre apprenti(e)</td><td style="padding:8px;border:1px solid #ccc;text-align:center">☐</td><td style="padding:8px;border:1px solid #ccc;text-align:center">☑</td><td style="padding:8px;border:1px solid #ccc;text-align:center">☐</td></tr>
-      <tr><td style="padding:8px;border:1px solid #ccc">Ponctualité de votre apprenti(e)</td><td style="padding:8px;border:1px solid #ccc;text-align:center">☑</td><td style="padding:8px;border:1px solid #ccc;text-align:center">☐</td><td style="padding:8px;border:1px solid #ccc;text-align:center">☐</td></tr>
+      <tr><td style="padding:8px;border:1px solid #ccc">Montée en compétence de votre apprenti(e)</td><td style="padding:8px;border:1px solid #ccc;text-align:center">${termine ? '☑' : '☐'}</td><td style="padding:8px;border:1px solid #ccc;text-align:center">☐</td><td style="padding:8px;border:1px solid #ccc;text-align:center">☐</td></tr>
+      <tr><td style="padding:8px;border:1px solid #ccc">Implication de votre apprenti(e)</td><td style="padding:8px;border:1px solid #ccc;text-align:center">☐</td><td style="padding:8px;border:1px solid #ccc;text-align:center">${termine ? '☑' : '☐'}</td><td style="padding:8px;border:1px solid #ccc;text-align:center">☐</td></tr>
+      <tr><td style="padding:8px;border:1px solid #ccc">Ponctualité de votre apprenti(e)</td><td style="padding:8px;border:1px solid #ccc;text-align:center">${termine ? '☑' : '☐'}</td><td style="padding:8px;border:1px solid #ccc;text-align:center">☐</td><td style="padding:8px;border:1px solid #ccc;text-align:center">☐</td></tr>
     </table>
     <p style="margin-top:20px"><strong>Commentaires (optionnel) :</strong></p>
-    <div style="border:1px solid #ccc;min-height:60px;padding:10px;margin-top:5px">Bon apprenti, motivé et impliqué dans les missions confiées.</div>
+    <div style="border:1px solid #ccc;min-height:60px;padding:10px;margin-top:5px">${termine ? 'Bon apprenti, motivé et impliqué dans les missions confiées.' : ''}</div>
   ` });
 }
 

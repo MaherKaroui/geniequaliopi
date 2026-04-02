@@ -2524,9 +2524,10 @@ function genSuivi3Mois(o: OrganismeInfo, f: FormationInfo) {
 }
 
 function genQuestionnaireInsertion(o: OrganismeInfo, f: FormationInfo) {
+  const termine = isFormationTerminee(f);
   return buildDocument({ org: o, title: "QUESTIONNAIRE D'INSERTION PROFESSIONNELLE", subtitle: f.intitule, table: {
     headers: ["Question", "Réponse"],
-    rows: [["Êtes-vous en emploi ?", "✅ Oui"], ["Type de contrat", "CDI"], ["Le poste est-il en lien avec la formation ?", "✅ Oui"], ["La formation a contribué à votre insertion ?", "✅ Oui, significativement"], ["Note de satisfaction globale", "4.5/5"]]
+    rows: [["Êtes-vous en emploi ?", termine ? "✅ Oui" : ""], ["Type de contrat", termine ? "CDI" : ""], ["Le poste est-il en lien avec la formation ?", termine ? "✅ Oui" : ""], ["La formation a contribué à votre insertion ?", termine ? "✅ Oui, significativement" : ""], ["Note de satisfaction globale", termine ? "4.5/5" : ""]]
   } });
 }
 
