@@ -1,9 +1,10 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { StagiaireInfo } from "@/types/qualiopi";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { X } from "lucide-react";
+import { X, PenTool } from "lucide-react";
+import SignaturePad from "@/components/SignaturePad";
 
 const FORMATEURS_PREDIFINIS = [
   "AHMED EL HILALI",
