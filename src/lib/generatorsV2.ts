@@ -1046,6 +1046,11 @@ export function genGrilleAcquisitionStagiaire(o: OrganismeInfo, f: FormationInfo
 
 export function genAttestationReussiteStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], stagiaireIdx: number) {
   const s = stagiaires[stagiaireIdx] || stagiaires[0];
+  const termine = isFormationTerminee(f);
+  if (!termine) {
+    return buildDocument({ org: o, title: "ATTESTATION DE RÉUSSITE", subtitle: `${s.prenom} ${s.nom} – ${f.intitule}`, stagiaires: [s],
+      extraHtml: `<div class="section section-green"><p><em>La formation est en cours. L'attestation de réussite sera délivrée à l'issue de la formation.</em></p></div>` });
+  }
   const stagDuree = getStagiaireDuree(s, f);
   const dureeHeures = parseInt(stagDuree) || (getFormationDays(f).length * 7);
   const tauxRealisation = 100; // Default to 100%
