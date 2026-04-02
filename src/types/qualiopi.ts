@@ -81,6 +81,8 @@ export interface StagiaireInfo {
   rqth?: "oui" | "non" | "";
   formateur?: string;
   formateurSignatureUrl?: string;
+  adresseEntreprise?: string;
+  siretEntreprise?: string;
 }
 
 export interface FormationInfo {
