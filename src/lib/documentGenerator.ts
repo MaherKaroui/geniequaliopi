@@ -3137,16 +3137,18 @@ function genProcedureInscriptionCFA(o: OrganismeInfo, f: FormationInfo) {
 }
 
 function genProcedureFormationCFA(o: OrganismeInfo, f: FormationInfo) {
+  const mc = getModaliteContent(f, o);
   return buildDocument({ org: o, title: "PROCÉDURE DE FORMATION CFA", subtitle: `${f.intitule}`, sections: [
     { heading: "1. Objet", content: `<p>La présente procédure décrit l'organisation et le déroulement de la formation par apprentissage au sein du CFA <strong>${o.nom}</strong> pour la formation <strong>${f.intitule}</strong>.</p>` },
-    { heading: "2. Organisation de l'alternance", content: `<p>La formation est organisée en alternance entre le centre de formation et l'entreprise d'accueil.<br><br><strong>Durée totale :</strong> ${f.duree}<br><strong>Période :</strong> du ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)}<br><strong>Modalités :</strong> ${f.modalites || "Alternance entreprise / centre de formation"}<br><strong>Lieu de formation :</strong> ${o.adresse}, ${o.codePostal} ${o.ville}</p>` },
-    { heading: "3. Moyens pédagogiques et techniques", content: `<p>• Plateforme de contenu en ligne : supports de cours, vidéos, exercices interactifs<br>• Salle de formation équipée<br>• Accès Wi-Fi et matériel informatique mis à disposition<br>• Bibliothèque de ressources pédagogiques numériques</p>` },
+    { heading: "2. Organisation de l'alternance", content: `<p>La formation est organisée en alternance entre ${mc.isDist ? 'la plateforme e-learning' : 'le centre de formation'} et l'entreprise d'accueil.<br><br><strong>Durée totale :</strong> ${f.duree}<br><strong>Période :</strong> du ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)}<br><strong>Modalités :</strong> ${mc.modaliteLabel}<br><strong>Lieu de formation :</strong> ${mc.lieuFormation}<br><strong>Horaires :</strong> ${mc.horaires}</p>` },
+    { heading: "3. Moyens pédagogiques et techniques", content: mc.moyensPedagogiques + mc.moyensTechniques },
     { heading: "4. Encadrement pédagogique", content: `<p>• <strong>Responsable pédagogique :</strong> ${o.responsablePedagogique}<br>• Formateurs qualifiés, issus du monde professionnel<br>• Un formateur référent est désigné pour chaque apprenti</p>` },
-    { heading: "5. Suivi de la formation", content: `<p><strong>En centre de formation :</strong><br>• Émargement quotidien<br>• Évaluations régulières (contrôle continu, examens blancs)<br>• Livret d'apprentissage tenu à jour<br><br><strong>En entreprise :</strong><br>• Visites en entreprise (minimum 2 par an)<br>• Fiches de suivi renseignées par le maître d'apprentissage<br>• Réunions de concertation et entretiens individuels</p>` },
+    { heading: "5. Suivi de la formation", content: `<p><strong>${mc.isDist ? 'En formation à distance' : 'En centre de formation'} :</strong><br>${mc.suiviAssiduiteDetail}${mc.isDist ? '' : '<br><strong>En entreprise :</strong><br>• Visites en entreprise (minimum 2 par an)<br>• Fiches de suivi renseignées par le maître d\'apprentissage<br>• Réunions de concertation et entretiens individuels'}</p>` },
     { heading: "6. Évaluation et certification", content: `<p>• Évaluations en Contrôle en Cours de Formation (CCF)<br>• Épreuves ponctuelles selon le référentiel de certification<br>• Mise en situation professionnelle reconstituée<br>• Soutenance orale devant un jury professionnel<br><br><strong>Certification visée :</strong> ${f.intitule}</p>`, variant: "green" },
-    { heading: "7. Gestion des absences", content: `<p>• Toute absence doit être justifiée dans les 48 heures<br>• Les absences injustifiées sont signalées à l'entreprise et à l'OPCO<br>• Un suivi de l'assiduité est réalisé mensuellement</p>` },
+    { heading: "7. Gestion des absences", content: `<p>• Toute absence doit être justifiée dans les 48 heures<br>• Les absences injustifiées sont signalées à l'entreprise et à l'OPCO<br>• Un suivi de l'assiduité est réalisé ${mc.isDist ? 'via la plateforme de formation' : 'mensuellement'}</p>` },
     { heading: "8. Accompagnement et insertion", content: `<p>Le CFA ${o.nom} propose un accompagnement à l'insertion professionnelle :<br>• Ateliers de techniques de recherche d'emploi<br>• Mise en relation avec le réseau d'entreprises partenaires<br>• Suivi post-formation à 3 et 6 mois</p>` },
-    { heading: "9. Contact", content: `<p><strong>${o.nom}</strong><br>${o.adresse}, ${o.codePostal} ${o.ville}<br>Téléphone : ${o.telephone}<br>Email : ${o.email}</p>` },
+    ...(mc.isDist ? [{ heading: "9. Matériel nécessaire", content: mc.materielNecessaire }] : []),
+    { heading: `${mc.isDist ? '10' : '9'}. Contact`, content: `<p><strong>${o.nom}</strong><br>${o.adresse}, ${o.codePostal} ${o.ville}<br>Téléphone : ${o.telephone}<br>Email : ${o.email}</p>` },
   ] });
 }
 
