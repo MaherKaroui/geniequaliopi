@@ -3434,10 +3434,19 @@ function genSuiviChiffreFormationExcel(o: OrganismeInfo, f: FormationInfo, stagi
   const pastCFAHours = pastCFAWeeks.length * 35;
   const progressRatio = termine ? 1 : Math.min(1, pastCFAHours / effectiveTotal);
 
-  // Sheet 1: Indicateurs globaux — fill past data
+  // Sheet 1: Indicateurs globaux — synchronized with other documents
+  // Attendance = 100% (matches émargement sheets where all students are ✅ Présent)
   const heuresRealisees = termine ? effectiveTotal : pastCFAHours;
-  const tauxPresence = heuresRealisees > 0 ? (92 + Math.round(Math.random() * 6)) : 0; // realistic 92-98%
-  const absencesGlobales = heuresRealisees > 0 ? Math.round(heuresRealisees * (100 - tauxPresence) / 100) : 0;
+  const tauxPresence = heuresRealisees > 0 ? 100 : 0;
+  const absencesGlobales = 0; // 100% présence = 0 absence (synchronized with émargement)
+
+  // Notes synchronized with EVAL_SCORES (used in exercises, grilles, QCM, etc.)
+  const globalAvgNote = stagiaires.length > 0
+    ? Math.round(stagiaires.slice(0, 10).reduce((sum, _, si) => {
+        const sc = EVAL_SCORES[si] || [7, 8, 7, 8, 7];
+        return sum + sc.reduce((a, b) => a + b, 0) / sc.length;
+      }, 0) / Math.min(stagiaires.length, 10) * 2 * 10) / 10 // *2 to convert /10 → /20
+    : 0;
 
   let sheet1 = tr(["Indicateur", "Valeur", "Objectif", "Écart", "Observations"], true);
   sheet1 += tr(["Formation", f.intitule, "", "", ""]);
@@ -3453,9 +3462,12 @@ function genSuiviChiffreFormationExcel(o: OrganismeInfo, f: FormationInfo, stagi
   sheet1 += tr(["Nombre d'inscrits", `${stagiaires.length}`, "", "", ""]);
   if (heuresRealisees > 0) {
     sheet1 += tr(["Nombre de présents", `${stagiaires.length}`, `${stagiaires.length}`, "0", ""]);
-    sheet1 += tr(["Taux de présence moyen", `${tauxPresence}%`, "≥ 90%", `+${tauxPresence - 90}%`, ""]);
-    sheet1 += tr(["Volume d'absences cumulé", `${absencesGlobales}h`, "", "", ""]);
+    sheet1 += tr(["Taux de présence moyen", "100%", "≥ 90%", "+10%", "Conforme aux feuilles d'émargement"]);
+    sheet1 += tr(["Volume d'absences cumulé", "0h", "", "", "Aucune absence enregistrée"]);
     sheet1 += tr(["Taux d'abandon", "0%", "< 5%", "", "Aucun abandon à date"]);
+    if (globalAvgNote > 0) {
+      sheet1 += tr(["Note moyenne aux évaluations", `${globalAvgNote.toFixed(1)}/20`, "≥ 12/20", globalAvgNote >= 12 ? `+${(globalAvgNote - 12).toFixed(1)}` : `${(globalAvgNote - 12).toFixed(1)}`, "Synchronisé avec les exercices et évaluations"]);
+    }
   } else {
     sheet1 += tr(["Nombre de présents", "—", `${stagiaires.length}`, "", "Formation non démarrée"]);
     sheet1 += tr(["Taux de présence moyen", "—", "≥ 90%", "", "Formation non démarrée"]);
@@ -3463,9 +3475,21 @@ function genSuiviChiffreFormationExcel(o: OrganismeInfo, f: FormationInfo, stagi
   }
   sheet1 += tr(["Taux de satisfaction global", termine ? "" : "—", "≥ 80%", "", termine ? "À compléter" : "Enquête à réaliser en fin de formation"]);
   if (rncp) {
-    sheet1 += tr(["Taux de réussite certification", termine ? "" : "—", "≥ 70%", "", termine ? "À compléter" : "Formation en cours"]);
-    sheet1 += tr(["Taux de présentation à l'examen", termine ? "" : "—", "≥ 90%", "", termine ? "À compléter" : "Formation en cours"]);
-    sheet1 += tr(["Taux d'insertion professionnelle", termine ? "" : "—", "≥ 60%", "", termine ? "À compléter à 6 mois" : "Formation en cours"]);
+    if (termine) {
+      // Synchronized: count students with avg >= 7/10 as certified
+      const nbReussis = stagiaires.slice(0, 10).filter((_, si) => {
+        const sc = EVAL_SCORES[si] || [7, 8, 7, 8, 7];
+        return sc.reduce((a, b) => a + b, 0) / sc.length >= 7;
+      }).length;
+      const tauxReussite = Math.round(nbReussis / Math.min(stagiaires.length, 10) * 100);
+      sheet1 += tr(["Taux de réussite certification", `${tauxReussite}%`, "≥ 70%", `${tauxReussite >= 70 ? '+' : ''}${tauxReussite - 70}%`, `${nbReussis}/${Math.min(stagiaires.length, 10)} certifiés`]);
+      sheet1 += tr(["Taux de présentation à l'examen", "100%", "≥ 90%", "+10%", ""]);
+      sheet1 += tr(["Taux d'insertion professionnelle", "", "≥ 60%", "", "À compléter à 6 mois"]);
+    } else {
+      sheet1 += tr(["Taux de réussite certification", "—", "≥ 70%", "", "Formation en cours"]);
+      sheet1 += tr(["Taux de présentation à l'examen", "—", "≥ 90%", "", "Formation en cours"]);
+      sheet1 += tr(["Taux d'insertion professionnelle", "—", "≥ 60%", "", "Formation en cours"]);
+    }
   }
   if (isCFA) {
     sheet1 += tr(["Taux de rupture de contrat", termine ? "" : "0%", "< 10%", "", termine ? "À compléter" : "Aucune rupture à date"]);
@@ -3488,8 +3512,10 @@ function genSuiviChiffreFormationExcel(o: OrganismeInfo, f: FormationInfo, stagi
     const sTermine = sFin < now;
     const sPastWeeks = cfaWeekDates.filter(w => w.weekEnd < now && w.weekStart >= sDebut);
     const sHeuresRealisees = sTermine ? effectiveTotal : sPastWeeks.length * 35;
-    const sTaux = sHeuresRealisees > 0 ? (91 + (si * 3 + 7) % 9) : 0; // 91-99% varied per stagiaire
-    const sAbsences = sHeuresRealisees > 0 ? Math.round(sHeuresRealisees * (100 - sTaux) / 100) : 0;
+
+    // Synchronized: use EVAL_SCORES for notes, 100% attendance
+    const sc = EVAL_SCORES[si] || [7, 8, 7, 8, 7];
+    const avgNote = Math.round(sc.reduce((a, b) => a + b, 0) / sc.length * 2 * 10) / 10; // /10 → /20
 
     const cells: string[] = [`${si + 1}`, s.nom, s.prenom];
     if (isCFA) cells.push(s.entreprise || "");
@@ -3498,12 +3524,18 @@ function genSuiviChiffreFormationExcel(o: OrganismeInfo, f: FormationInfo, stagi
       s.dateFinFormation || f.dateFin || "",
       `${effectiveTotal}h`,
       sHeuresRealisees > 0 ? `${sHeuresRealisees}h` : "—",
-      sHeuresRealisees > 0 ? `${sTaux}%` : "—",
-      sHeuresRealisees > 0 ? `${sAbsences}h` : "—",
+      sHeuresRealisees > 0 ? "100%" : "—", // Synchronized with émargement
+      "0h", // No absences (synchronized)
     );
-    if (rncp) cells.push(sTermine ? "" : "—");
+    if (rncp) {
+      if (sTermine) {
+        cells.push(avgNote >= 14 ? "Obtenue" : "En cours de validation");
+      } else {
+        cells.push("—");
+      }
+    }
     cells.push(
-      sTermine ? "" : "—",
+      sTermine ? `${avgNote.toFixed(1)}/20` : sHeuresRealisees > 0 ? `${avgNote.toFixed(1)}/20` : "—", // Note synchronized with EVAL_SCORES
       sTermine ? "Formation terminée" : sHeuresRealisees > 0 ? "En cours de formation" : "Non démarrée",
       ""
     );
@@ -3533,7 +3565,14 @@ function genSuiviChiffreFormationExcel(o: OrganismeInfo, f: FormationInfo, stagi
       const blocRealisees = blocDone ? blocVol : blocPartial ? Math.min(blocVol, heuresRealisees - cumulHours) : 0;
       const blocTaux = blocVol > 0 ? Math.round(blocRealisees / blocVol * 100) : 0;
       const nbEvalRealisees = blocDone ? bloc.matieres.length : blocPartial ? Math.ceil(bloc.matieres.length * blocRealisees / blocVol) : 0;
-      const noteAvg = blocRealisees > 0 ? `${(13 + (bi * 1.3) % 4).toFixed(1)}/20` : "";
+      // Synchronized with EVAL_SCORES: use bloc-index-mapped scores
+      const blocScoreAvg = stagiaires.length > 0
+        ? Math.round(stagiaires.slice(0, 10).reduce((sum, _, si) => {
+            const sc = EVAL_SCORES[si] || [7, 8, 7, 8, 7];
+            return sum + Math.min(10, sc[bi % sc.length] + 1);
+          }, 0) / Math.min(stagiaires.length, 10) * 2 * 10) / 10
+        : 0;
+      const noteAvg = blocRealisees > 0 ? `${blocScoreAvg.toFixed(1)}/20` : "";
       const obs = blocDone ? "Bloc terminé" : blocPartial ? "En cours" : "";
 
       sheet3 += tr([`Bloc ${bi + 1} – ${bloc.titre}`, `${blocVol}h`, `${blocRealisees}h`, `${blocVol - blocRealisees}h`, `${blocTaux}%`, `${bloc.matieres.length}`, `${nbEvalRealisees}`, noteAvg, obs], false);
@@ -3545,7 +3584,14 @@ function genSuiviChiffreFormationExcel(o: OrganismeInfo, f: FormationInfo, stagi
         const matPartial = !matDone && cumulHours + matCumul < heuresRealisees;
         const matReal = matDone ? vol : matPartial ? Math.min(vol, heuresRealisees - cumulHours - matCumul) : 0;
         const matTaux = vol > 0 ? Math.round(matReal / vol * 100) : 0;
-        const matNote = matReal > 0 ? `${(12.5 + ((bi + matCumul) * 1.7) % 5).toFixed(1)}/20` : "";
+        // Synchronized note per matière with EVAL_SCORES
+        const matScoreAvg = stagiaires.length > 0
+          ? Math.round(stagiaires.slice(0, 10).reduce((sum, _, si) => {
+              const sc = EVAL_SCORES[si] || [7, 8, 7, 8, 7];
+              return sum + Math.min(10, sc[(bi + matCumul) % sc.length] + 1);
+            }, 0) / Math.min(stagiaires.length, 10) * 2 * 10) / 10
+          : 0;
+        const matNote = matReal > 0 ? `${matScoreAvg.toFixed(1)}/20` : "";
         sheet3 += tr([`  └ ${mat.competence}`, `${vol}h`, `${matReal}h`, `${vol - matReal}h`, `${matTaux}%`, "1", matReal > 0 ? "1" : "0", matNote, ""]);
         matCumul += vol;
       });
@@ -3567,7 +3613,14 @@ function genSuiviChiffreFormationExcel(o: OrganismeInfo, f: FormationInfo, stagi
       const modPartial = !modDone && moduleCumul < heuresRealisees;
       const modReal = modDone ? perBloc : modPartial ? Math.min(perBloc, heuresRealisees - moduleCumul) : 0;
       const modTaux = perBloc > 0 ? Math.round(modReal / perBloc * 100) : 0;
-      const modNote = modReal > 0 ? `${(13 + (ci * 1.5) % 4).toFixed(1)}/20` : "";
+      // Synchronized note with EVAL_SCORES
+      const modScoreAvg = stagiaires.length > 0
+        ? Math.round(stagiaires.slice(0, 10).reduce((sum, _, si) => {
+            const sc = EVAL_SCORES[si] || [7, 8, 7, 8, 7];
+            return sum + Math.min(10, sc[ci % sc.length] + 1);
+          }, 0) / Math.min(stagiaires.length, 10) * 2 * 10) / 10
+        : 0;
+      const modNote = modReal > 0 ? `${modScoreAvg.toFixed(1)}/20` : "";
       sheet3 += tr([`Module ${ci + 1} – ${ch.title}`, `${perBloc}h`, `${modReal}h`, `${perBloc - modReal}h`, `${modTaux}%`, modNote, modDone ? "Terminé" : modPartial ? "En cours" : ""]);
       moduleCumul += perBloc;
     });
@@ -3590,7 +3643,7 @@ function genSuiviChiffreFormationExcel(o: OrganismeInfo, f: FormationInfo, stagi
     let totalSemCFA = 0;
     let totalHeuresCFA = 0;
     let totalSemEntreprise = 0;
-    let totalAbsences = 0;
+    
 
     for (let m = 0; m < 12; m++) {
       const moisDate = new Date(startDate);
@@ -3614,20 +3667,18 @@ function genSuiviChiffreFormationExcel(o: OrganismeInfo, f: FormationInfo, stagi
       if (isAout) {
         sheet4 += tr([`${moisFR[moisDate.getMonth()]} ${moisDate.getFullYear()}`, "0", "0h", "0", "—", "—", "—", "Congés annuels"]);
       } else if (isPast && semCFA > 0) {
-        const moisTaux = 91 + (m * 3 + 5) % 8; // 91-98%
-        const moisAbsences = Math.round(heuresCFA * stagiaires.length * (100 - moisTaux) / 100);
+        // Synchronized: 100% attendance, 0 absences (matches émargement)
         totalSemCFA += semCFA;
         totalHeuresCFA += heuresCFA;
         totalSemEntreprise += semEntreprise;
-        totalAbsences += moisAbsences;
         sheet4 += tr([
           `${moisFR[moisDate.getMonth()]} ${moisDate.getFullYear()}`,
           `${semCFA}`,
           `${heuresCFA}h`,
           `${semEntreprise}`,
           `${stagiaires.length}`,
-          `${moisAbsences}h`,
-          `${moisTaux}%`,
+          "0h",
+          "100%",
           ""
         ]);
       } else if (isPast && semCFA === 0) {
@@ -3641,8 +3692,8 @@ function genSuiviChiffreFormationExcel(o: OrganismeInfo, f: FormationInfo, stagi
         totalSemEntreprise += semEntreprise;
       }
     }
-    const totalTaux = totalHeuresCFA > 0 && pastCFAWeeks.length > 0 ? Math.round((totalHeuresCFA * stagiaires.length - totalAbsences) / (totalHeuresCFA * stagiaires.length) * 100) : 0;
-    sheet4 += tr(["TOTAL ANNUEL", `${totalSemCFA}`, `${totalHeuresCFA}h`, `${totalSemEntreprise}`, `${stagiaires.length}`, `${totalAbsences}h`, totalTaux > 0 ? `${totalTaux}%` : "—", ""], true);
+    const totalTaux = pastCFAWeeks.length > 0 ? 100 : 0; // Synchronized: 100% attendance
+    sheet4 += tr(["TOTAL ANNUEL", `${totalSemCFA}`, `${totalHeuresCFA}h`, `${totalSemEntreprise}`, `${stagiaires.length}`, "0h", totalTaux > 0 ? "100%" : "—", ""], true);
     sheets.push({ name: "Suivi mensuel", html: `<table>${sheet4}</table>` });
   }
 
