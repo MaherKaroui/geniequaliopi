@@ -83,6 +83,7 @@ export interface StagiaireInfo {
   formateurSignatureUrl?: string;
   adresseEntreprise?: string;
   siretEntreprise?: string;
+  numeroAction?: string;
 }
 
 export interface FormationInfo {

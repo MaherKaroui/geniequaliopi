@@ -196,6 +196,7 @@ export function parseEdofXlsx(data: ArrayBuffer): EdofSession[] {
         communeNaissance: String(getCol(row, "VILLE_LIEU_DE_NAISSANCE", "VILLE LIEU DE NAISSANCE", "Commune naissance") || ""),
         diplome: "",
         rqth: "",
+        numeroAction: String(getCol(row, "NUMERO_ACTION", "NUMERO ACTION", "NUMERO_ ACTION", "N° ACTION", "NUM_ACTION", "Numéro action") || ""),
       };
     });
 
