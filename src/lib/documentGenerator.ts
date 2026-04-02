@@ -1613,7 +1613,7 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
         <tr><td>Taux d'abandon</td><td>0 %</td></tr>
         <tr><td>Taux de recommandation</td><td>100 %</td></tr>
       </table>
-      <p style="margin-top:8px"><em>Ces indicateurs sont mis à jour annuellement et consultables sur le site internet de ${o.nom}.</em></p>
+      <p style="margin-top:8px"><em>Ces indicateurs sont mis à jour annuellement${o.siteWeb && o.siteWeb.trim() ? ` et consultables sur le site internet de ${o.nom}` : ''}.</em></p>
     </div>
 
     <h2>15. Déroulé pédagogique de la formation${!isBlocFormation ? ` (${heuresTotal})` : ""}</h2>
