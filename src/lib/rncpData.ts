@@ -820,6 +820,73 @@ export const RNCP_FICHES: RNCPFiche[] = [
     voiesAcces: ["Formation continue", "CPF", "Plan de développement des compétences"],
     dureeIndicative: "40 heures (6 jours)",
   },
+  {
+    code: "RNCP37274",
+    intitule: "TP - Conseiller en insertion professionnelle",
+    niveau: "Niveau 5 (Bac+2)",
+    certificateur: "MINISTÈRE DU TRAVAIL DU PLEIN EMPLOI ET DE L'INSERTION",
+    dateEnregistrement: "29/05/2023",
+    dateEcheance: "29/05/2028",
+    codeNSF: "332t – Travail social",
+    formacodes: "44569 – Conseil insertion professionnelle / 44556 – Accompagnement vers emploi",
+    resume: "Le conseiller en insertion professionnelle (CIP) accueille les personnes individuellement ou en groupe et facilite leur insertion professionnelle. Il analyse la demande, pose un diagnostic, informe et aide à l'orientation. Il accompagne la personne dans son parcours d'insertion socioprofessionnelle, il co-construit avec elle un projet professionnel et en planifie la mise en œuvre.",
+    activitesVisees: "Le CIP accueille des personnes en recherche d'emploi ou en reconversion, les aide à identifier leurs compétences et leurs freins, co-construit des parcours d'insertion, mobilise des dispositifs de droit commun et d'insertion, développe des partenariats et anime des ateliers collectifs.",
+    blocsCompetences: [
+      {
+        titre: "Accueillir pour analyser la demande des personnes et poser les bases d'un diagnostic partagé",
+        competences: [
+          "Informer une personne ou un groupe sur les ressources en matière d'insertion et les services dématérialisés",
+          "Analyser la demande de la personne et poser les bases d'un diagnostic partagé",
+          "Exercer une veille informationnelle, technique et prospective pour adapter son activité au public et au contexte",
+          "Travailler en équipe, en réseau et dans un cadre partenarial pour optimiser la réponse aux besoins des personnes accueillies",
+        ],
+        matieres: [
+          { competence: "Informer sur les ressources en matière d'insertion", contenu: "Connaissance des dispositifs d'insertion (Pôle emploi/France Travail, missions locales, PLIE, Cap emploi), aides sociales (RSA, ASS, ARE, prime d'activité), formation professionnelle (CPF, AIF, POEI, AFPR), services dématérialisés, droits des demandeurs d'emploi", volume: "42h" },
+          { competence: "Analyser la demande et poser un diagnostic partagé", contenu: "Techniques d'entretien (non-directif, semi-directif, directif), écoute active, reformulation, grilles d'analyse des besoins, freins périphériques à l'emploi (logement, santé, mobilité, garde d'enfants), posture professionnelle du CIP", volume: "56h" },
+          { competence: "Exercer une veille informationnelle et prospective", contenu: "Sources d'information (DARES, INSEE, Pôle emploi, CARIF-OREF), marché du travail local, évolutions réglementaires, veille sectorielle, outils de veille (alertes, flux RSS, réseaux professionnels)", volume: "28h" },
+          { competence: "Travailler en équipe, en réseau et en partenariat", contenu: "Cartographie des acteurs de l'insertion, partenariats institutionnels, coordination pluridisciplinaire, techniques de communication professionnelle, outils collaboratifs, secret professionnel et éthique", volume: "35h" },
+        ],
+        modalitesEval: "Mise en situation professionnelle (45 min) : simulation d'un entretien d'accueil. Dossier professionnel avec annexes. Entretien technique (30 min). Questionnement à partir de productions (1h). Durée totale : 2h15.",
+      },
+      {
+        titre: "Accompagner les personnes dans leur parcours d'insertion sociale et professionnelle",
+        competences: [
+          "Contractualiser et conduire un projet d'insertion professionnelle",
+          "Accompagner la réalisation du projet d'insertion professionnelle",
+          "Concevoir, préparer et animer des ateliers thématiques favorisant l'insertion professionnelle",
+          "Préparer et animer des ateliers thématiques favorisant l'insertion",
+        ],
+        matieres: [
+          { competence: "Contractualiser et conduire un projet d'insertion", contenu: "Élaboration du projet professionnel (bilan de compétences, portefeuille de compétences, ADVP, test d'intérêts professionnels), contrat d'engagement réciproque, plan d'action individualisé, suivi et évaluation de parcours", volume: "63h" },
+          { competence: "Accompagner la réalisation du projet", contenu: "Techniques de recherche d'emploi (CV, lettre de motivation, entretien d'embauche, réseaux sociaux professionnels), immersions professionnelles (PMSMP), formation qualifiante, création d'entreprise, accompagnement des transitions professionnelles", volume: "56h" },
+          { competence: "Concevoir et animer des ateliers thématiques", contenu: "Ingénierie pédagogique (objectifs, méthodes, supports), animation de groupe (techniques participatives, gestion de la dynamique de groupe), ateliers TRE, ateliers numériques, ateliers confiance en soi, évaluation des ateliers", volume: "49h" },
+          { competence: "Préparer et animer des ateliers d'insertion", contenu: "Ateliers CV et lettre de motivation, simulation d'entretien d'embauche, ateliers mobilité, ateliers savoirs de base, ateliers orientation professionnelle, outils numériques pour la recherche d'emploi", volume: "42h" },
+        ],
+        modalitesEval: "Mise en situation professionnelle (1h) : conduite d'un entretien d'accompagnement. Dossier professionnel. Entretien technique (30 min). Questionnement à partir de productions (1h15). Durée totale : 2h45.",
+      },
+      {
+        titre: "Mettre en œuvre une offre de services auprès des employeurs pour favoriser l'insertion professionnelle",
+        competences: [
+          "Déployer, dans une démarche projet, des actions de prospection avec les employeurs du territoire pour favoriser l'insertion professionnelle",
+          "Apporter un appui technique aux employeurs en matière de recrutement",
+          "Faciliter l'intégration et le maintien du salarié dans son environnement professionnel",
+          "Inscrire ses actes professionnels dans une démarche de développement durable et inclusive",
+        ],
+        matieres: [
+          { competence: "Déployer des actions de prospection employeurs", contenu: "Prospection commerciale en insertion (phoning, mailing, visites entreprises), argumentaire de l'offre de services, connaissance du tissu économique local, partenariats entreprises, clauses sociales dans les marchés publics", volume: "42h" },
+          { competence: "Apporter un appui technique au recrutement", contenu: "Analyse de poste, rédaction et diffusion d'offres d'emploi, présélection de candidats, méthode de recrutement par simulation (MRS), job dating, forums emploi, aides à l'embauche (contrats aidés, alternance)", volume: "35h" },
+          { competence: "Faciliter l'intégration et le maintien en emploi", contenu: "Accompagnement post-placement, médiation employeur-salarié, aménagement de poste, prévention de la désinsertion professionnelle, suivi en emploi, bilan à 3 et 6 mois", volume: "28h" },
+          { competence: "Inscrire ses actes dans une démarche durable et inclusive", contenu: "RSE et insertion, non-discrimination à l'embauche, diversité et inclusion, handicap et emploi, égalité professionnelle, développement durable dans l'accompagnement", volume: "21h" },
+        ],
+        modalitesEval: "Mise en situation professionnelle (45 min) : simulation d'un entretien de prospection employeur. Dossier professionnel. Entretien technique (30 min). Questionnement à partir de productions (45 min). Durée totale : 2h.",
+      },
+    ],
+    secteursActivite: "Insertion sociale et professionnelle, emploi, formation, action sociale",
+    typesEmplois: ["Conseiller en insertion professionnelle", "Conseiller emploi formation", "Chargé d'accompagnement social et professionnel", "Chargé de relation entreprise", "Conseiller à l'emploi", "Conseiller de mission locale"],
+    codesROME: ["K1801", "K1207"],
+    voiesAcces: ["Après un parcours de formation continue", "En contrat d'apprentissage", "Par expérience (VAE)"],
+    dureeIndicative: "497h",
+  },
 ];
 
 export function getRNCPByCode(code: string): RNCPFiche | undefined {
