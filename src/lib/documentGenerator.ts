@@ -3565,7 +3565,14 @@ function genSuiviChiffreFormationExcel(o: OrganismeInfo, f: FormationInfo, stagi
       const blocRealisees = blocDone ? blocVol : blocPartial ? Math.min(blocVol, heuresRealisees - cumulHours) : 0;
       const blocTaux = blocVol > 0 ? Math.round(blocRealisees / blocVol * 100) : 0;
       const nbEvalRealisees = blocDone ? bloc.matieres.length : blocPartial ? Math.ceil(bloc.matieres.length * blocRealisees / blocVol) : 0;
-      const noteAvg = blocRealisees > 0 ? `${(13 + (bi * 1.3) % 4).toFixed(1)}/20` : "";
+      // Synchronized with EVAL_SCORES: use bloc-index-mapped scores
+      const blocScoreAvg = stagiaires.length > 0
+        ? Math.round(stagiaires.slice(0, 10).reduce((sum, _, si) => {
+            const sc = EVAL_SCORES[si] || [7, 8, 7, 8, 7];
+            return sum + Math.min(10, sc[bi % sc.length] + 1);
+          }, 0) / Math.min(stagiaires.length, 10) * 2 * 10) / 10
+        : 0;
+      const noteAvg = blocRealisees > 0 ? `${blocScoreAvg.toFixed(1)}/20` : "";
       const obs = blocDone ? "Bloc terminé" : blocPartial ? "En cours" : "";
 
       sheet3 += tr([`Bloc ${bi + 1} – ${bloc.titre}`, `${blocVol}h`, `${blocRealisees}h`, `${blocVol - blocRealisees}h`, `${blocTaux}%`, `${bloc.matieres.length}`, `${nbEvalRealisees}`, noteAvg, obs], false);
