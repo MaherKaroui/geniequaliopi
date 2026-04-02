@@ -1234,6 +1234,7 @@ export function genQCMFinal_V2(o: OrganismeInfo, f: FormationInfo, stagiaires: S
 // Improved grille acquisition (group format) - removes signatures
 export function genGrilleAcquisition_V2(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const evalData = getEvalContent(f.intitule);
+  const termine = isFormationTerminee(f);
   let extra = '';
   stagiaires.slice(0, 10).forEach((s, si) => {
     if (si > 0) extra += '<div class="page-break"></div>';
