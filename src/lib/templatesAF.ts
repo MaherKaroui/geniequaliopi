@@ -575,6 +575,11 @@ export function genSatisfactionFroid(o: OrganismeInfo, f: FormationInfo, stagiai
 }
 
 export function genSatisfactionEntreprise(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
+  const termine = isFormationTerminee(f);
+  if (!termine) {
+    return buildDocument({ org: o, title: "QUESTIONNAIRE DE SATISFACTION ENTREPRISE", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires,
+      extraHtml: `<div class="section section-green"><p><em>La formation est en cours. L'enquête de satisfaction entreprise sera réalisée à l'issue de la formation.</em></p></div>` });
+  }
   const entreprises = [...new Set(stagiaires.slice(0, 10).map(s => s.entreprise).filter(Boolean))];
   let extra = "";
   entreprises.forEach((ent, i) => {
