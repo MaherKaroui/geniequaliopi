@@ -502,42 +502,76 @@ export function generateExcelSuiviPFMP(o: OrganismeInfo, f: FormationInfo, stagi
 
 // ========== IND 13 — Outils de suivi alternance (Excel) ==========
 export function generateExcelOutilsSuiviAlternance(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]): string {
+  const now = new Date();
+  const termine = isFormationTerminee(f);
+  const isCFA = !!(f.rythmeAlternance && f.rythmeAlternance.trim().length > 0);
+  const cfaWeekDates = isCFA ? getCFAWeekDates(f) : [];
+  const pastWeeks = cfaWeekDates.filter(w => w.weekEnd < now).length;
+  const rncp = getRNCPByCode(f.codeRNCP || '');
+  const s0 = stagiaires[0];
+  const sc0 = EVAL_SCORES[0] || [7, 8, 7, 8, 7];
+
   // Sheet 1 - Informations générales
   let infoHtml = `<table border="1" cellspacing="0" cellpadding="4">`;
   infoHtml += `<tr><td colspan="6" style="font-size:14pt;font-weight:bold;background:#1e3a7b;color:#fff;padding:10px">INFORMATIONS GÉNÉRALES</td></tr>`;
   infoHtml += `<tr><td colspan="6" style="padding:6px;border:1px solid #999;font-style:italic">Document à compléter à la fin de chaque période (à l'école ou en entreprise)</td></tr>`;
-  const s0 = stagiaires[0];
   infoHtml += `<tr><td colspan="2" style="padding:6px;border:1px solid #999"><strong>Nom de l'entreprise :</strong></td><td colspan="4" style="padding:6px;border:1px solid #999">${s0?.entreprise || ''}</td></tr>`;
   infoHtml += `<tr><td colspan="2" style="padding:6px;border:1px solid #999"><strong>Nom de l'apprenti :</strong></td><td colspan="4" style="padding:6px;border:1px solid #999">${s0 ? s0.prenom + ' ' + s0.nom : ''}</td></tr>`;
   infoHtml += `<tr><td colspan="2" style="padding:6px;border:1px solid #999"><strong>Nom du tuteur :</strong></td><td colspan="4" style="padding:6px;border:1px solid #999">${o.responsablePedagogique}</td></tr>`;
   infoHtml += `<tr><td colspan="2" style="padding:6px;border:1px solid #999"><strong>Nom de l'organisme :</strong></td><td colspan="4" style="padding:6px;border:1px solid #999">${o.nom}</td></tr>`;
   infoHtml += `<tr><td colspan="2" style="padding:6px;border:1px solid #999"><strong>Référent pédagogique :</strong></td><td colspan="4" style="padding:6px;border:1px solid #999">${o.responsablePedagogique}</td></tr>`;
+  infoHtml += `<tr><td colspan="2" style="padding:6px;border:1px solid #999"><strong>Rythme d'alternance :</strong></td><td colspan="4" style="padding:6px;border:1px solid #999">${f.rythmeAlternance || '1 semaine CFA / 3 semaines entreprise'}</td></tr>`;
+  infoHtml += `<tr><td colspan="2" style="padding:6px;border:1px solid #999"><strong>Semaines CFA réalisées :</strong></td><td colspan="4" style="padding:6px;border:1px solid #999">${pastWeeks} / ${cfaWeekDates.length}</td></tr>`;
+  infoHtml += `<tr><td colspan="2" style="padding:6px;border:1px solid #999"><strong>Taux de présence :</strong></td><td colspan="4" style="padding:6px;border:1px solid #999">100%</td></tr>`;
   infoHtml += `</table>`;
 
-  // Sheet 2 - Entretien fin de période d'essai
+  // Sheet 2 - Entretien fin de période d'essai (pre-filled if past)
   let entretienHtml = `<table border="1" cellspacing="0" cellpadding="4">`;
   entretienHtml += `<tr><td colspan="6" style="font-size:14pt;font-weight:bold;background:#1e3a7b;color:#fff;padding:10px">ENTRETIEN DE FIN DE PÉRIODE D'ESSAI</td></tr>`;
   entretienHtml += `<tr><td colspan="6" style="padding:6px;border:1px solid #999;font-style:italic">Se référer aux compétences visées par la qualification</td></tr>`;
   entretienHtml += `<tr style="background:#e8f0fe;font-weight:bold"><th style="border:1px solid #999;padding:6px">Compétences à développer</th><th style="border:1px solid #999;padding:6px">Activités à réaliser</th><th style="border:1px solid #999;padding:6px">Lieu</th><th style="border:1px solid #999;padding:6px">Date entretien</th><th style="border:1px solid #999;padding:6px">Évaluation</th><th style="border:1px solid #999;padding:6px">Observations</th></tr>`;
-  for (let i = 0; i < 10; i++) {
+
+  // Pre-fill with RNCP blocs if available and past
+  const competences = rncp ? rncp.blocsCompetences.slice(0, 5).map(b => b.titre) : ["Compétence 1", "Compétence 2", "Compétence 3"];
+  const entretienDate = pastWeeks >= 4 && cfaWeekDates.length >= 4
+    ? cfaWeekDates[3].weekEnd.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })
+    : "";
+  competences.forEach((comp, ci) => {
+    const evalNote = pastWeeks >= 4 ? `${Math.min(10, sc0[ci % sc0.length] + 1)}/10` : "";
+    entretienHtml += `<tr><td style="border:1px solid #999;padding:6px">${comp}</td><td style="border:1px solid #999;padding:6px">${pastWeeks >= 4 ? "Mise en situation professionnelle" : ""}</td><td style="border:1px solid #999;padding:6px">${pastWeeks >= 4 ? "CFA + Entreprise" : ""}</td><td style="border:1px solid #999;padding:6px">${entretienDate}</td><td style="border:1px solid #999;padding:6px">${evalNote}</td><td style="border:1px solid #999;padding:6px">${pastWeeks >= 4 ? "Acquis en cours" : ""}</td></tr>`;
+  });
+  for (let i = competences.length; i < 10; i++) {
     entretienHtml += `<tr>${Array.from({length:6}, () => '<td style="border:1px solid #999;padding:6px">&nbsp;</td>').join('')}</tr>`;
   }
   entretienHtml += `</table>`;
 
-  // Sheet 3 - Bilan intermédiaire
+  // Sheet 3 - Bilan intermédiaire (pre-filled if enough weeks passed)
+  const midPoint = Math.floor(cfaWeekDates.length / 2);
+  const bilanIntermediaireDone = pastWeeks >= midPoint && midPoint > 0;
   let bilanHtml = `<table border="1" cellspacing="0" cellpadding="4">`;
   bilanHtml += `<tr><td colspan="6" style="font-size:14pt;font-weight:bold;background:#1e3a7b;color:#fff;padding:10px">BILAN INTERMÉDIAIRE</td></tr>`;
   bilanHtml += `<tr style="background:#e8f0fe;font-weight:bold"><th style="border:1px solid #999;padding:6px">Compétences</th><th style="border:1px solid #999;padding:6px">Activités</th><th style="border:1px solid #999;padding:6px">Lieu</th><th style="border:1px solid #999;padding:6px">Date</th><th style="border:1px solid #999;padding:6px">Évaluation</th><th style="border:1px solid #999;padding:6px">Observations</th></tr>`;
-  for (let i = 0; i < 10; i++) {
+  const bilanDate = bilanIntermediaireDone && cfaWeekDates[midPoint - 1]
+    ? cfaWeekDates[midPoint - 1].weekEnd.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })
+    : "";
+  competences.forEach((comp, ci) => {
+    const evalNote = bilanIntermediaireDone ? `${Math.min(10, sc0[ci % sc0.length] + 1)}/10` : "";
+    bilanHtml += `<tr><td style="border:1px solid #999;padding:6px">${comp}</td><td style="border:1px solid #999;padding:6px">${bilanIntermediaireDone ? "Évaluation en situation" : ""}</td><td style="border:1px solid #999;padding:6px">${bilanIntermediaireDone ? "CFA + Entreprise" : ""}</td><td style="border:1px solid #999;padding:6px">${bilanDate}</td><td style="border:1px solid #999;padding:6px">${evalNote}</td><td style="border:1px solid #999;padding:6px">${bilanIntermediaireDone ? "Progression satisfaisante" : ""}</td></tr>`;
+  });
+  for (let i = competences.length; i < 10; i++) {
     bilanHtml += `<tr>${Array.from({length:6}, () => '<td style="border:1px solid #999;padding:6px">&nbsp;</td>').join('')}</tr>`;
   }
   bilanHtml += `</table>`;
 
-  // Sheet 4 - Bilan final
+  // Sheet 4 - Bilan final (pre-filled only if formation terminée)
   let finalHtml = `<table border="1" cellspacing="0" cellpadding="4">`;
   finalHtml += `<tr><td colspan="6" style="font-size:14pt;font-weight:bold;background:#1e3a7b;color:#fff;padding:10px">BILAN FINAL</td></tr>`;
   finalHtml += `<tr style="background:#e8f0fe;font-weight:bold"><th style="border:1px solid #999;padding:6px">Compétences</th><th style="border:1px solid #999;padding:6px">Activités</th><th style="border:1px solid #999;padding:6px">Lieu</th><th style="border:1px solid #999;padding:6px">Date</th><th style="border:1px solid #999;padding:6px">Évaluation</th><th style="border:1px solid #999;padding:6px">Observations</th></tr>`;
-  for (let i = 0; i < 10; i++) {
+  competences.forEach((comp, ci) => {
+    const evalNote = termine ? `${Math.min(10, sc0[ci % sc0.length] + 2)}/10` : "";
+    finalHtml += `<tr><td style="border:1px solid #999;padding:6px">${comp}</td><td style="border:1px solid #999;padding:6px">${termine ? "Évaluation finale" : ""}</td><td style="border:1px solid #999;padding:6px">${termine ? "CFA + Entreprise" : ""}</td><td style="border:1px solid #999;padding:6px">${termine ? formatDate(f.dateFin) : ""}</td><td style="border:1px solid #999;padding:6px">${evalNote}</td><td style="border:1px solid #999;padding:6px">${termine ? "Compétence acquise" : ""}</td></tr>`;
+  });
+  for (let i = competences.length; i < 10; i++) {
     finalHtml += `<tr>${Array.from({length:6}, () => '<td style="border:1px solid #999;padding:6px">&nbsp;</td>').join('')}</tr>`;
   }
   finalHtml += `</table>`;
