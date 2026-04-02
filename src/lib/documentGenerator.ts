@@ -3515,6 +3515,10 @@ function genSuiviChiffreFormationExcel(o: OrganismeInfo, f: FormationInfo, stagi
     const sTaux = sHeuresRealisees > 0 ? (91 + (si * 3 + 7) % 9) : 0; // 91-99% varied per stagiaire
     const sAbsences = sHeuresRealisees > 0 ? Math.round(sHeuresRealisees * (100 - sTaux) / 100) : 0;
 
+    // Synchronized: use EVAL_SCORES for notes, 100% attendance
+    const sc = EVAL_SCORES[si] || [7, 8, 7, 8, 7];
+    const avgNote = Math.round(sc.reduce((a, b) => a + b, 0) / sc.length * 2 * 10) / 10; // /10 → /20
+
     const cells: string[] = [`${si + 1}`, s.nom, s.prenom];
     if (isCFA) cells.push(s.entreprise || "");
     cells.push(
@@ -3522,12 +3526,18 @@ function genSuiviChiffreFormationExcel(o: OrganismeInfo, f: FormationInfo, stagi
       s.dateFinFormation || f.dateFin || "",
       `${effectiveTotal}h`,
       sHeuresRealisees > 0 ? `${sHeuresRealisees}h` : "—",
-      sHeuresRealisees > 0 ? `${sTaux}%` : "—",
-      sHeuresRealisees > 0 ? `${sAbsences}h` : "—",
+      sHeuresRealisees > 0 ? "100%" : "—", // Synchronized with émargement
+      "0h", // No absences (synchronized)
     );
-    if (rncp) cells.push(sTermine ? "" : "—");
+    if (rncp) {
+      if (sTermine) {
+        cells.push(avgNote >= 14 ? "Obtenue" : "En cours de validation");
+      } else {
+        cells.push("—");
+      }
+    }
     cells.push(
-      sTermine ? "" : "—",
+      sTermine ? `${avgNote.toFixed(1)}/20` : sHeuresRealisees > 0 ? `${avgNote.toFixed(1)}/20` : "—", // Note synchronized with EVAL_SCORES
       sTermine ? "Formation terminée" : sHeuresRealisees > 0 ? "En cours de formation" : "Non démarrée",
       ""
     );
