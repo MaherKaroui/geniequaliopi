@@ -3613,7 +3613,14 @@ function genSuiviChiffreFormationExcel(o: OrganismeInfo, f: FormationInfo, stagi
       const modPartial = !modDone && moduleCumul < heuresRealisees;
       const modReal = modDone ? perBloc : modPartial ? Math.min(perBloc, heuresRealisees - moduleCumul) : 0;
       const modTaux = perBloc > 0 ? Math.round(modReal / perBloc * 100) : 0;
-      const modNote = modReal > 0 ? `${(13 + (ci * 1.5) % 4).toFixed(1)}/20` : "";
+      // Synchronized note with EVAL_SCORES
+      const modScoreAvg = stagiaires.length > 0
+        ? Math.round(stagiaires.slice(0, 10).reduce((sum, _, si) => {
+            const sc = EVAL_SCORES[si] || [7, 8, 7, 8, 7];
+            return sum + Math.min(10, sc[ci % sc.length] + 1);
+          }, 0) / Math.min(stagiaires.length, 10) * 2 * 10) / 10
+        : 0;
+      const modNote = modReal > 0 ? `${modScoreAvg.toFixed(1)}/20` : "";
       sheet3 += tr([`Module ${ci + 1} – ${ch.title}`, `${perBloc}h`, `${modReal}h`, `${perBloc - modReal}h`, `${modTaux}%`, modNote, modDone ? "Terminé" : modPartial ? "En cours" : ""]);
       moduleCumul += perBloc;
     });
