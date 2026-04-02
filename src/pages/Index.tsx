@@ -83,23 +83,40 @@ const Index = () => {
     }
   };
 
+  // Emergency reset via ?reset query param
+  const shouldReset = new URLSearchParams(window.location.search).has('reset');
+  if (shouldReset) {
+    sessionStorage.removeItem('qualiopi_step');
+    sessionStorage.removeItem('qualiopi_org');
+    sessionStorage.removeItem('qualiopi_form');
+    sessionStorage.removeItem('qualiopi_stag');
+    sessionStorage.removeItem('qualiopi_crit');
+    sessionStorage.removeItem('qualiopi_started');
+    window.history.replaceState({}, '', '/');
+  }
+
   const [currentStep, setCurrentStep] = useState(() => {
+    if (shouldReset) return 1;
     const saved = sessionStorage.getItem('qualiopi_step');
     return saved ? parseInt(saved, 10) : 1;
   });
   const [organisme, setOrganisme] = useState<OrganismeInfo>(() => {
+    if (shouldReset) return emptyOrganisme;
     try { const s = sessionStorage.getItem('qualiopi_org'); return s ? JSON.parse(s) : emptyOrganisme; } catch { return emptyOrganisme; }
   });
   const [formation, setFormation] = useState<FormationInfo>(() => {
+    if (shouldReset) return emptyFormation;
     try { const s = sessionStorage.getItem('qualiopi_form'); return s ? JSON.parse(s) : emptyFormation; } catch { return emptyFormation; }
   });
   const [stagiaires, setStagiaires] = useState<StagiaireInfo[]>(() => {
+    if (shouldReset) return [];
     try { const s = sessionStorage.getItem('qualiopi_stag'); return s ? JSON.parse(s) : []; } catch { return []; }
   });
   const [criteres, setCriteres] = useState<CritereData[]>(() => {
+    if (shouldReset) return JSON.parse(JSON.stringify(CRITERES));
     try { const s = sessionStorage.getItem('qualiopi_crit'); return s ? JSON.parse(s) : JSON.parse(JSON.stringify(CRITERES)); } catch { return JSON.parse(JSON.stringify(CRITERES)); }
   });
-  const [started, setStarted] = useState(() => sessionStorage.getItem('qualiopi_started') === '1');
+  const [started, setStarted] = useState(() => shouldReset ? false : sessionStorage.getItem('qualiopi_started') === '1');
 
   const updateStarted = (v: boolean | ((prev: boolean) => boolean)) => {
     setStarted(prev => { const next = typeof v === 'function' ? v(prev) : v; sessionStorage.setItem('qualiopi_started', next ? '1' : '0'); return next; });
