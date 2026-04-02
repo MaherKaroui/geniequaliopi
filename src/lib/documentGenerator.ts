@@ -8962,18 +8962,7 @@ function genAppreciationsBeneficiairesStagiaire(o: OrganismeInfo, f: FormationIn
 // ===== CFA CT3 IND 11 — GÉNÉRATEURS AVEC LOGIQUE DATE =====
 // =============================================
 
-function isFormationTerminee(f: FormationInfo): boolean {
-  if (!f.dateFin) return false;
-  try {
-    const parts = f.dateFin.split('/');
-    if (parts.length === 3) {
-      const d = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
-      return d < new Date();
-    }
-    const d = new Date(f.dateFin);
-    return !isNaN(d.getTime()) && d < new Date();
-  } catch { return false; }
-}
+// isFormationTerminee is now imported from docBuilder
 
 function genTestCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number, phase: string) {
   const s = stagiaires[si] || stagiaires[0];
