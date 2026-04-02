@@ -184,9 +184,13 @@ export function generateExcelPlanActions(o: OrganismeInfo): string {
 }
 
 export function generateExcelSuiviApprentis(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]): string {
+  const termine = isFormationTerminee(f);
   let html = tableRow(["N°", "Apprenti", "Entreprise", "MA", "Assiduité CFA", "Assiduité Ent.", "Note CFA", "Éval MA", "Visite 1", "Visite 2", "Statut"], true);
   stagiaires.slice(0, 10).forEach((s, i) => {
-    html += tableRow([`${i+1}`, s.prenom + " " + s.nom, s.entreprise, f.formateur, `${95+(i%5)}%`, `${97+(i%3)}%`, `${7+(i%3)}/10`, `${8+(i%2)}/10`, "✅", i < 7 ? "✅" : "📋", "✅ En cours"]);
+    const sc = EVAL_SCORES[i] || [7, 8, 7, 8, 7];
+    const avg = Math.round(sc.reduce((a, b) => a + b, 0) / sc.length * 10) / 10;
+    const avgMA = Math.round(sc.map(v => Math.min(10, v + 1)).reduce((a, b) => a + b, 0) / sc.length * 10) / 10;
+    html += tableRow([`${i+1}`, s.prenom + " " + s.nom, s.entreprise, f.formateur, "100%", "100%", `${avg}/10`, `${avgMA}/10`, "✅", termine ? "✅" : "📋", termine ? "✅ Terminé" : "✅ En cours"]);
   });
   return excelWrap(`Suivi apprentis – ${f.intitule}`, [{ name: "Apprentis", html }]);
 }
