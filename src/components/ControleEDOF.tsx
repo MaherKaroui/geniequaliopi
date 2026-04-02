@@ -46,6 +46,7 @@ export default function ControleEDOF({ organisme, formation, stagiaires }: Contr
   const [progress, setProgress] = useState(0);
   const [progressText, setProgressText] = useState("");
   const fileInputRefs = useRef<Map<string, HTMLInputElement>>(new Map());
+  const [selectedDocs, setSelectedDocs] = useState<Set<string>>(new Set());
 
   // Preview state
   const [previewOpen, setPreviewOpen] = useState(false);
