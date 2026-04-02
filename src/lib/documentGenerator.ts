@@ -1,5 +1,5 @@
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
-import { buildDocument, htmlWrap, orgHeader, formationInfoBlock, formationInfoBlockStagiaire, tableHTML, signatureBlock3, signatureBlock2, footer, section, formatDate, infoGrid, getDocStyle, subtractBusinessDays, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif, getStagiaireDuree, applyGender, g, getDisplayDuree, linkUrl, optSiteWeb, isFormationTerminee } from "./docBuilder";
+import { buildDocument, htmlWrap, orgHeader, formationInfoBlock, formationInfoBlockStagiaire, tableHTML, signatureBlock3, signatureBlock2, footer, section, formatDate, infoGrid, getDocStyle, subtractBusinessDays, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif, getStagiaireDuree, applyGender, g, getDisplayDuree, linkUrl, optSiteWeb, isFormationTerminee, getModaliteContent, hasDistanciel, hasPresentiel } from "./docBuilder";
 import { FormateurInfo, SAMPLE_FORMATIONS, SAMPLE_STAGIAIRES, SAMPLE_FORMATEURS, SAMPLE_ORGANISME, EVAL_SCORES, SATISFACTION_SCORES, CONNECTION_TIMES, getFormationDays, mergeOrganisme, mergeStagiaires, getConnectionTimes, parseDuree } from "./sampleData";
 import { buildFullCatalog } from "./docCatalog";
 import { generateBookQualiopi } from "./bookQualiopi";
@@ -3105,20 +3105,23 @@ function genCompetencesAlternance(o: OrganismeInfo, f: FormationInfo, stagiaires
 
 function genPlaquetteCommercialeCFA(o: OrganismeInfo, f: FormationInfo) {
   const termine = isFormationTerminee(f);
+  const mc = getModaliteContent(f, o);
   const indicateursContent = termine
     ? `<p>• Taux de réussite aux examens : 89%<br>• Taux de satisfaction des apprentis : 94%<br>• Taux d'insertion professionnelle à 6 mois : 85%<br>• Taux de rupture de contrat : 8%</p>`
     : `<p><em>Nouvel entrant – Phase de lancement</em><br><br>La formation <strong>${f.intitule}</strong> est en cours de déploiement. Les indicateurs de résultats seront disponibles à l'issue de la première promotion.<br><br><strong>Objectifs prévisionnels :</strong><br>• Taux de réussite aux examens visé : ≥ 80%<br>• Taux de satisfaction des apprentis visé : ≥ 90%<br>• Taux d'insertion professionnelle à 6 mois visé : ≥ 75%<br>• Taux de rupture de contrat visé : &lt; 10%</p>`;
 
   return buildDocument({ org: o, title: "PLAQUETTE COMMERCIALE", subtitle: `${f.intitule}`, sections: [
     { heading: "Présentation de l'organisme", content: `<p><strong>${o.nom}</strong> est un Centre de Formation d'Apprentis (CFA) spécialisé dans la formation en alternance. Notre mission : accompagner les apprenants vers l'obtention de leur diplôme tout en développant des compétences opérationnelles en entreprise.</p><p><strong>Adresse :</strong> ${o.adresse}, ${o.codePostal} ${o.ville}<br><strong>Contact :</strong> ${o.email} – ${o.telephone}${o.siteWeb ? `<br><strong>Site web :</strong> ${linkUrl(o.siteWeb)}` : ''}</p>` },
-    { heading: "Formation proposée", content: `<p><strong>Intitulé :</strong> ${f.intitule}<br><strong>Certification visée :</strong> ${f.intitule}<br><strong>Durée :</strong> ${f.duree}<br><strong>Modalités :</strong> ${f.modalites || "Alternance entreprise / centre de formation"}<br><strong>Rythme :</strong> Alternance selon calendrier défini</p>` },
+    { heading: "Formation proposée", content: `<p><strong>Intitulé :</strong> ${f.intitule}<br><strong>Certification visée :</strong> ${f.intitule}<br><strong>Durée :</strong> ${f.duree}<br><strong>Modalités :</strong> ${mc.modaliteLabel}<br><strong>Lieu :</strong> ${mc.lieuFormation}<br><strong>Rythme :</strong> Alternance selon calendrier défini</p>` },
     { heading: "Objectifs de la formation", content: `<p>${f.objectifs || "Former des professionnels qualifiés, capables d'évoluer dans leur métier et d'obtenir la certification visée."}</p>` },
     { heading: "Public visé et prérequis", content: `<p><strong>Public :</strong> ${f.publicVise || "Jeunes de 16 à 29 ans révolus, demandeurs d'emploi, salariés en reconversion"}<br><strong>Prérequis :</strong> ${f.prerequis || "Niveau Bac ou équivalent, motivation pour le métier visé"}</p>` },
-    { heading: "Moyens pédagogiques", content: `<p>• Plateforme de contenu en ligne (supports de cours, vidéos, exercices)<br>• Salle de formation équipée : tables, chaises, télévision, tableau<br>• Formateurs experts issus du monde professionnel<br>• Suivi individualisé par un formateur référent<br>• Accompagnement vers l'emploi et l'insertion professionnelle</p>` },
-    { heading: "Modalités d'évaluation", content: `<p>• Évaluations continues en centre de formation<br>• Examens blancs et mises en situation professionnelle<br>• Évaluation en entreprise par le maître d'apprentissage<br>• Passage des épreuves de certification</p>`, variant: "green" },
+    { heading: "Moyens pédagogiques", content: mc.moyensPedagogiques },
+    { heading: "Moyens techniques", content: mc.moyensTechniques },
+    { heading: "Modalités d'évaluation", content: `<p>• Évaluations continues ${mc.isDist ? 'en ligne' : 'en centre de formation'}<br>• Examens blancs et mises en situation professionnelle<br>• Évaluation en entreprise par le maître d'apprentissage<br>• Passage des épreuves de certification</p>`, variant: "green" },
     { heading: "Financement", content: `<p>La formation en apprentissage est <strong>gratuite pour l'apprenti</strong>. Le coût de la formation est pris en charge par l'OPCO de l'entreprise d'accueil.<br><br><strong>Coût de la formation :</strong> ${f.tarif || "Selon barème OPCO"}</p>` },
     { heading: "Accessibilité", content: `<p>Le CFA ${o.nom} s'engage à accueillir les personnes en situation de handicap. Un référent handicap est disponible pour étudier les aménagements nécessaires.<br><strong>Référent handicap :</strong> ${o.referentHandicap}<br><strong>Contact :</strong> ${o.email}</p>` },
     { heading: "Indicateurs de résultats", content: indicateursContent },
+    ...(mc.isDist ? [{ heading: "Matériel nécessaire pour le stagiaire", content: mc.materielNecessaire }] : []),
   ] });
 }
 
@@ -3134,16 +3137,18 @@ function genProcedureInscriptionCFA(o: OrganismeInfo, f: FormationInfo) {
 }
 
 function genProcedureFormationCFA(o: OrganismeInfo, f: FormationInfo) {
+  const mc = getModaliteContent(f, o);
   return buildDocument({ org: o, title: "PROCÉDURE DE FORMATION CFA", subtitle: `${f.intitule}`, sections: [
     { heading: "1. Objet", content: `<p>La présente procédure décrit l'organisation et le déroulement de la formation par apprentissage au sein du CFA <strong>${o.nom}</strong> pour la formation <strong>${f.intitule}</strong>.</p>` },
-    { heading: "2. Organisation de l'alternance", content: `<p>La formation est organisée en alternance entre le centre de formation et l'entreprise d'accueil.<br><br><strong>Durée totale :</strong> ${f.duree}<br><strong>Période :</strong> du ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)}<br><strong>Modalités :</strong> ${f.modalites || "Alternance entreprise / centre de formation"}<br><strong>Lieu de formation :</strong> ${o.adresse}, ${o.codePostal} ${o.ville}</p>` },
-    { heading: "3. Moyens pédagogiques et techniques", content: `<p>• Plateforme de contenu en ligne : supports de cours, vidéos, exercices interactifs<br>• Salle de formation équipée<br>• Accès Wi-Fi et matériel informatique mis à disposition<br>• Bibliothèque de ressources pédagogiques numériques</p>` },
+    { heading: "2. Organisation de l'alternance", content: `<p>La formation est organisée en alternance entre ${mc.isDist ? 'la plateforme e-learning' : 'le centre de formation'} et l'entreprise d'accueil.<br><br><strong>Durée totale :</strong> ${f.duree}<br><strong>Période :</strong> du ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)}<br><strong>Modalités :</strong> ${mc.modaliteLabel}<br><strong>Lieu de formation :</strong> ${mc.lieuFormation}<br><strong>Horaires :</strong> ${mc.horaires}</p>` },
+    { heading: "3. Moyens pédagogiques et techniques", content: mc.moyensPedagogiques + mc.moyensTechniques },
     { heading: "4. Encadrement pédagogique", content: `<p>• <strong>Responsable pédagogique :</strong> ${o.responsablePedagogique}<br>• Formateurs qualifiés, issus du monde professionnel<br>• Un formateur référent est désigné pour chaque apprenti</p>` },
-    { heading: "5. Suivi de la formation", content: `<p><strong>En centre de formation :</strong><br>• Émargement quotidien<br>• Évaluations régulières (contrôle continu, examens blancs)<br>• Livret d'apprentissage tenu à jour<br><br><strong>En entreprise :</strong><br>• Visites en entreprise (minimum 2 par an)<br>• Fiches de suivi renseignées par le maître d'apprentissage<br>• Réunions de concertation et entretiens individuels</p>` },
+    { heading: "5. Suivi de la formation", content: `<p><strong>${mc.isDist ? 'En formation à distance' : 'En centre de formation'} :</strong><br>${mc.suiviAssiduiteDetail}${mc.isDist ? '' : '<br><strong>En entreprise :</strong><br>• Visites en entreprise (minimum 2 par an)<br>• Fiches de suivi renseignées par le maître d\'apprentissage<br>• Réunions de concertation et entretiens individuels'}</p>` },
     { heading: "6. Évaluation et certification", content: `<p>• Évaluations en Contrôle en Cours de Formation (CCF)<br>• Épreuves ponctuelles selon le référentiel de certification<br>• Mise en situation professionnelle reconstituée<br>• Soutenance orale devant un jury professionnel<br><br><strong>Certification visée :</strong> ${f.intitule}</p>`, variant: "green" },
-    { heading: "7. Gestion des absences", content: `<p>• Toute absence doit être justifiée dans les 48 heures<br>• Les absences injustifiées sont signalées à l'entreprise et à l'OPCO<br>• Un suivi de l'assiduité est réalisé mensuellement</p>` },
+    { heading: "7. Gestion des absences", content: `<p>• Toute absence doit être justifiée dans les 48 heures<br>• Les absences injustifiées sont signalées à l'entreprise et à l'OPCO<br>• Un suivi de l'assiduité est réalisé ${mc.isDist ? 'via la plateforme de formation' : 'mensuellement'}</p>` },
     { heading: "8. Accompagnement et insertion", content: `<p>Le CFA ${o.nom} propose un accompagnement à l'insertion professionnelle :<br>• Ateliers de techniques de recherche d'emploi<br>• Mise en relation avec le réseau d'entreprises partenaires<br>• Suivi post-formation à 3 et 6 mois</p>` },
-    { heading: "9. Contact", content: `<p><strong>${o.nom}</strong><br>${o.adresse}, ${o.codePostal} ${o.ville}<br>Téléphone : ${o.telephone}<br>Email : ${o.email}</p>` },
+    ...(mc.isDist ? [{ heading: "9. Matériel nécessaire", content: mc.materielNecessaire }] : []),
+    { heading: `${mc.isDist ? '10' : '9'}. Contact`, content: `<p><strong>${o.nom}</strong><br>${o.adresse}, ${o.codePostal} ${o.ville}<br>Téléphone : ${o.telephone}<br>Email : ${o.email}</p>` },
   ] });
 }
 
@@ -5470,6 +5475,7 @@ ${tableHTML(["Champ", "Réponse"], [
 }
 
 function genLivretAccueilCFA(o: OrganismeInfo, f: FormationInfo) {
+  const mc = getModaliteContent(f, o);
   return buildDocument({ org: o, title: "LIVRET D'ACCUEIL", subtitle: f.intitule, sections: [
     { heading: "Bienvenue !", content: `<p>Nous sommes heureux de vous accueillir au sein de <strong>${o.nom}</strong> pour la formation <strong>« ${f.intitule} »</strong>. Ce livret contient toutes les informations nécessaires au bon déroulement de votre parcours.</p>` },
     { heading: "Présentation de l'organisme", content: `
@@ -5482,19 +5488,13 @@ function genLivretAccueilCFA(o: OrganismeInfo, f: FormationInfo) {
 ${tableHTML(["Information", "Détail"], [
   ["Intitulé", f.intitule],
   ["Durée", f.duree],
-  ["Modalités", f.modalites || "Présentiel"],
-  ["Lieu", f.lieu || o.adresse || "___"],
+  ["Modalités", mc.modaliteLabel],
+  ["Lieu", mc.lieuFormation],
   ["Dates", "Du " + formatDate(f.dateDebut) + " au " + formatDate(f.dateFin)],
-  ["Horaires", (f as any).horaires || "9h00 – 12h30 / 13h30 – 17h00"],
+  ["Horaires", mc.horaires],
 ])}` },
-    { heading: "Règles de vie", content: `
-<ul>
-<li>Respecter les horaires et signaler toute absence au préalable</li>
-<li>Adopter un comportement respectueux envers les formateurs, les autres apprenants et le personnel</li>
-<li>Respecter le matériel mis à disposition</li>
-<li>Les téléphones portables doivent être éteints ou en mode silencieux pendant les cours</li>
-<li>Toute forme de discrimination ou de harcèlement est strictement interdite</li>
-</ul>` },
+    { heading: "Moyens pédagogiques", content: mc.moyensPedagogiques },
+    { heading: "Règles de vie", content: mc.reglesSalle },
     { heading: "Accompagnement et référents", content: `
 <p><strong>Référent pédagogique :</strong> ${o.responsablePedagogique || o.dirigeant || "___"}</p>
 <p><strong>Référent administratif :</strong> ${o.dirigeant || "___"}</p>
@@ -5502,6 +5502,7 @@ ${tableHTML(["Information", "Détail"], [
 <p>N'hésitez pas à les contacter pour toute question ou besoin d'accompagnement spécifique.</p>` },
     { heading: "Accessibilité et handicap", content: `
 <p>${o.nom} s'engage à accueillir les personnes en situation de handicap et à adapter les conditions de formation. Pour tout besoin, contactez notre référent handicap : <strong>${o.referentHandicap || o.dirigeant || "___"}</strong>.</p>` },
+    ...(mc.isDist ? [{ heading: "Matériel nécessaire", content: mc.materielNecessaire }] : []),
     { heading: "Contacts utiles", content: `
 ${tableHTML(["Service", "Contact"], [
   ["Accueil / Secrétariat", (o.telephone || "___") + " – " + (o.email || "___")],
@@ -5523,6 +5524,7 @@ function genLivretAccueilCFA_V2(o: OrganismeInfo, f: FormationInfo, stagiaires: 
   const blocsHtml = rncp ? rncp.blocsCompetences.map((b, i) =>
     `<p><strong>Bloc ${i + 1} :</strong> ${b.titre}</p><ul>${b.competences.map(c => `<li>${c}</li>`).join('')}</ul>`
   ).join('') : '<p>Voir programme détaillé.</p>';
+  const mc = getModaliteContent(f, o);
 
   return buildDocument({ org: o, title: "LIVRET D'ACCUEIL DE L'APPRENTI", subtitle: titreFormation, sections: [
     // ===== BIENVENUE =====
@@ -5538,13 +5540,23 @@ function genLivretAccueilCFA_V2(o: OrganismeInfo, f: FormationInfo, stagiaires: 
     ])}<p><strong>Téléphone :</strong> ${o.telephone || '___'}<br><strong>Email :</strong> ${o.email || '___'}</p>` },
 
     // ===== INFORMATIONS GÉNÉRALES =====
-    { heading: "Informations générales", content: `<p><strong>Adresse du CFA :</strong> ${o.adresse || '___'}, ${o.codePostal || '___'} ${o.ville || '___'}</p><p><strong>Horaires d'ouverture :</strong> du lundi au vendredi – de 9h00 à 17h00</p><p><strong>Restauration :</strong> Vous pouvez apporter votre repas. Des réfrigérateurs et micro-ondes sont à votre disposition.</p>`, variant: "green" },
+    { heading: "Informations générales", content: mc.isDist
+      ? `<p><strong>Modalité :</strong> ${mc.modaliteLabel}</p><p><strong>Plateforme de formation :</strong> Accès via identifiants personnels transmis par email</p><p><strong>Horaires d'accompagnement :</strong> ${mc.horaires}</p><p><strong>Support technique :</strong> ${o.email || '___'} – ${o.telephone || '___'}</p>`
+      : mc.isMixte
+      ? `<p><strong>Modalité :</strong> ${mc.modaliteLabel}</p><p><strong>Adresse du CFA :</strong> ${o.adresse || '___'}, ${o.codePostal || '___'} ${o.ville || '___'}</p><p><strong>Plateforme de formation :</strong> Accès via identifiants personnels</p><p><strong>Horaires :</strong> ${mc.horaires}</p><p><strong>Restauration :</strong> Vous pouvez apporter votre repas. Des réfrigérateurs et micro-ondes sont à votre disposition.</p>`
+      : `<p><strong>Modalité :</strong> Présentiel</p><p><strong>Adresse du CFA :</strong> ${o.adresse || '___'}, ${o.codePostal || '___'} ${o.ville || '___'}</p><p><strong>Horaires d'ouverture :</strong> du lundi au vendredi – de 9h00 à 17h00</p><p><strong>Restauration :</strong> Vous pouvez apporter votre repas. Des réfrigérateurs et micro-ondes sont à votre disposition.</p>`,
+      variant: "green" },
 
     // ===== PRÉSENTATION DE LA FORMATION =====
-    { heading: "Présentation de la formation", content: `<p><strong>Intitulé :</strong> ${titreFormation}</p><p><strong>Code RNCP :</strong> ${f.codeRNCP || '___'}</p><p><strong>Niveau :</strong> ${rncp?.niveau || '___'}</p><p><strong>Durée :</strong> ${f.duree || '___'}</p><p><strong>Dates :</strong> Du ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)}</p><p><strong>Rythme d'alternance :</strong> ${(f as any).rythmeAlternance || '1 semaine CFA / 3 semaines entreprise'}</p><h4>Blocs de compétences :</h4>${blocsHtml}<p>La réussite à l'ensemble des épreuves permet d'obtenir le Titre Professionnel délivré par le Ministère du Travail.</p><p><strong>Débouchés :</strong> ${rncp?.typesEmplois?.join(', ') || 'Voir fiche RNCP'}</p>` },
+    { heading: "Présentation de la formation", content: `<p><strong>Intitulé :</strong> ${titreFormation}</p><p><strong>Code RNCP :</strong> ${f.codeRNCP || '___'}</p><p><strong>Niveau :</strong> ${rncp?.niveau || '___'}</p><p><strong>Durée :</strong> ${f.duree || '___'}</p><p><strong>Modalité :</strong> ${mc.modaliteLabel}</p><p><strong>Dates :</strong> Du ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)}</p><p><strong>Rythme d'alternance :</strong> ${(f as any).rythmeAlternance || '1 semaine CFA / 3 semaines entreprise'}</p><h4>Blocs de compétences :</h4>${blocsHtml}<p>La réussite à l'ensemble des épreuves permet d'obtenir le Titre Professionnel délivré par le Ministère du Travail.</p><p><strong>Débouchés :</strong> ${rncp?.typesEmplois?.join(', ') || 'Voir fiche RNCP'}</p>` },
+
+    // ===== MOYENS PÉDAGOGIQUES =====
+    { heading: "Moyens pédagogiques et techniques", content: mc.moyensPedagogiques + mc.moyensTechniques + (mc.isDist ? mc.materielNecessaire : '') },
 
     // ===== ACCUEIL ET INTÉGRATION =====
-    { heading: "Accueil et intégration", content: `<p>Chaque apprenant participe à une <strong>journée d'intégration</strong> organisée par le CFA, destinée à présenter :</p><ul><li>Le fonctionnement du centre et les équipes pédagogiques et administratives</li><li>Le règlement intérieur et la charte de l'apprenant</li><li>Les outils pédagogiques mis à disposition</li></ul><p>Au cours de cette journée, le règlement intérieur doit être lu attentivement. Une <strong>attestation de prise de connaissance</strong> sera remise. Sa signature est obligatoire pour accéder aux cours.</p>` },
+    { heading: "Accueil et intégration", content: mc.isDist
+      ? `<p>Chaque apprenant bénéficie d'une <strong>session d'intégration en visioconférence</strong> organisée par le CFA, destinée à présenter :</p><ul><li>Le fonctionnement de la plateforme de formation et les outils numériques</li><li>Le règlement intérieur et la charte de l'apprenant</li><li>Les modalités de suivi et d'évaluation à distance</li><li>Les contacts des référents pédagogiques et techniques</li></ul><p>Le règlement intérieur doit être lu attentivement. Une <strong>attestation de prise de connaissance</strong> sera transmise par voie dématérialisée.</p>`
+      : `<p>Chaque apprenant participe à une <strong>journée d'intégration</strong> organisée par le CFA, destinée à présenter :</p><ul><li>Le fonctionnement du centre et les équipes pédagogiques et administratives</li><li>Le règlement intérieur et la charte de l'apprenant</li><li>Les outils pédagogiques mis à disposition</li></ul><p>Au cours de cette journée, le règlement intérieur doit être lu attentivement. Une <strong>attestation de prise de connaissance</strong> sera remise. Sa signature est obligatoire pour accéder aux cours.</p>` },
 
     // ===== CHARTE DE L'APPRENTISSAGE =====
     { heading: "Charte de l'apprentissage", content: `<h4>Engagements de ${o.nom}</h4><ul><li>Proposer une formation de qualité conforme au référentiel</li><li>Assurer un suivi individualisé de chaque apprenti</li><li>Coordonner les périodes CFA et entreprise</li><li>Désigner un référent pour chaque apprenti</li><li>Communiquer régulièrement avec l'entreprise d'accueil</li></ul><h4>Engagements de l'entreprise d'accueil</h4><ul><li>Désigner un maître d'apprentissage qualifié</li><li>Confier des missions en lien avec la certification visée</li><li>Libérer l'apprenti pour les temps de formation au CFA</li><li>Participer aux bilans intermédiaires et de fin de parcours</li><li>Assurer les conditions de sécurité sur le lieu de travail</li></ul><h4>Engagements de l'apprenti(e)</h4><ul><li>Suivre avec assiduité la formation au CFA et en entreprise</li><li>Respecter le règlement intérieur du CFA et de l'entreprise</li><li>Tenir à jour son livret d'apprentissage et son carnet de liaison</li><li>Prévenir en cas d'absence (CFA ET entreprise)</li><li>Participer aux évaluations et préparer les épreuves de certification</li><li>Adopter une attitude professionnelle en toutes circonstances</li></ul>` },
@@ -5572,26 +5584,35 @@ function genReglementInterieurCFA_V2(o: OrganismeInfo, f: FormationInfo, stagiai
   const s = stagiaires[si] || stagiaires[0] || { prenom: '___', nom: '___' } as StagiaireInfo;
   const rawDateDebut = getStagiaireDateDebut(s, f) || f.dateDebut;
   const dateSignature = rawDateDebut ? formatDate(subtractBusinessDays(rawDateDebut, 14)) : formatDate(new Date().toISOString().slice(0, 10));
+  const mc = getModaliteContent(f, o);
   return buildDocument({ org: o, title: "RÈGLEMENT INTÉRIEUR DU CFA", sections: [
     { heading: "Préambule", content: `<p>Le premier objectif de <strong>${o.nom}</strong> est la pleine réussite et l'épanouissement de ses apprenants : réussite aux examens, réussite en entreprise, réussite sur le marché du travail, réussite en matière de développement personnel. L'atteinte de ces ambitions est l'affaire de tous : elle passe nécessairement par une forte implication des apprenants dans leur formation et par le strict respect des règles de vie mentionnées dans ce règlement.</p>` },
 
-    { heading: "Article 1 : Objet", content: `<p>Conformément à l'article L6325-5 du Code du Travail, le présent règlement a pour objet de préciser l'application de la réglementation en matière :</p><ul><li>D'hygiène et de sécurité</li><li>De discipline</li><li>De droits et devoirs des apprenants</li><li>De représentation des apprenants</li></ul><p>Ces dispositions sont applicables dans les locaux habituels de l'organisme de formation ou tout autre local que celui-ci sera amené à utiliser. Le présent règlement est communiqué à chaque apprenant avant toute inscription définitive.</p><p>Pendant le temps en entreprise, les apprenants doivent se conformer au règlement intérieur de leur entreprise.</p>` },
+    { heading: "Article 1 : Objet", content: `<p>Conformément à l'article L6325-5 du Code du Travail, le présent règlement a pour objet de préciser l'application de la réglementation en matière :</p><ul><li>D'hygiène et de sécurité</li><li>De discipline</li><li>De droits et devoirs des apprenants</li><li>De représentation des apprenants</li></ul><p>Ces dispositions sont applicables ${mc.isDist ? 'dans le cadre de la formation à distance dispensée par l\'organisme de formation' : 'dans les locaux habituels de l\'organisme de formation ou tout autre local que celui-ci sera amené à utiliser'}. Le présent règlement est communiqué à chaque apprenant avant toute inscription définitive.</p><p>Pendant le temps en entreprise, les apprenants doivent se conformer au règlement intérieur de leur entreprise.</p>` },
 
     { heading: "Article 2 : Discipline", content: `<p>L'apprenant s'est engagé dans un plan de formation exigeant. L'organisme attend qu'il fasse preuve d'implication, de réflexion, de concentration et d'exigence. Il devra faire preuve d'un comportement adapté dans ses rapports avec les autres apprenants, les enseignants et la Direction.</p>
-<h4>Tenue vestimentaire et comportement</h4><p>Les apprenants adopteront une tenue vestimentaire professionnelle. Les accessoires tels que casquettes, bobs, bonnets ne sont pas permis en salle de cours. La Direction se réserve le droit de refuser l'accès à tout apprenant dont la tenue ne serait pas professionnelle.</p>
-<h4>Usage du téléphone</h4><p>L'usage du téléphone portable est interdit pendant les cours. Le portable doit être éteint et rangé dans le sac. En cas de non-respect après avertissement, l'apprenant pourra être exclu et sanctionné.</p>
+${mc.isDist ? `<h4>Comportement en classe virtuelle</h4><p>Les apprenants adopteront un comportement professionnel lors des sessions en visioconférence. La caméra doit être activée pendant les classes virtuelles sauf accord du formateur. L'arrière-plan doit être neutre et adapté à un cadre professionnel.</p>` : `<h4>Tenue vestimentaire et comportement</h4><p>Les apprenants adopteront une tenue vestimentaire professionnelle. Les accessoires tels que casquettes, bobs, bonnets ne sont pas permis en salle de cours. La Direction se réserve le droit de refuser l'accès à tout apprenant dont la tenue ne serait pas professionnelle.</p>`}
+<h4>Usage du téléphone</h4><p>${mc.isDist ? "L'usage du téléphone portable est interdit pendant les classes virtuelles sauf autorisation du formateur." : "L'usage du téléphone portable est interdit pendant les cours. Le portable doit être éteint et rangé dans le sac. En cas de non-respect après avertissement, l'apprenant pourra être exclu et sanctionné."}</p>
 <h4>Requêtes et réclamations</h4><p>Toute requête ou réclamation devra être faite par écrit au service pédagogique.</p>
 <h4>Éthique</h4><p>La Direction veille au respect d'autrui et de ses convictions. Tous types de harcèlement, attitudes discriminatoires et violences (verbales, psychologiques ou physiques) sont interdits.</p>
 <p><strong>L'apprenant a le droit :</strong></p><ul><li>D'être respecté tel qu'il est</li><li>De s'exprimer librement dans le respect de tous</li><li>D'être protégé contre toute forme de violence</li><li>D'être respecté dans sa vie privée</li></ul>
-<p><strong>L'apprenant a le devoir :</strong></p><ul><li>De respecter les autres tels qu'ils sont</li><li>De s'interdire toute forme de violence</li><li>D'alerter un responsable en cas de violence ou mal-être</li><li>De respecter la vie privée et le droit à l'image des autres</li><li>De se présenter dans une tenue professionnelle</li></ul>` },
+<p><strong>L'apprenant a le devoir :</strong></p><ul><li>De respecter les autres tels qu'ils sont</li><li>De s'interdire toute forme de violence</li><li>D'alerter un responsable en cas de violence ou mal-être</li><li>De respecter la vie privée et le droit à l'image des autres</li>${mc.isDist ? '' : '<li>De se présenter dans une tenue professionnelle</li>'}</ul>` },
 
-    { heading: "Article 3 : Hygiène et sécurité", content: `<h4>Hygiène</h4><p>L'introduction et la consommation de boissons alcoolisées sont strictement interdites. Il est interdit de fumer et vapoter à l'intérieur de l'établissement. La nourriture est autorisée uniquement dans les espaces communs pendant les pauses déjeuner. L'espace devra être nettoyé après le repas.</p>
+    { heading: "Article 3 : Hygiène et sécurité", content: mc.isDist
+      ? `<h4>Sécurité numérique</h4><p>L'apprenant s'engage à ne pas partager ses identifiants de connexion à la plateforme de formation. Toute tentative d'accès non autorisé aux systèmes informatiques est strictement interdite.</p><h4>Environnement de travail</h4><p>L'apprenant doit disposer d'un espace de travail adapté, calme et sécurisé. Il est responsable de son propre matériel informatique et de sa connexion internet.</p>`
+      : `<h4>Hygiène</h4><p>L'introduction et la consommation de boissons alcoolisées sont strictement interdites. Il est interdit de fumer et vapoter à l'intérieur de l'établissement. La nourriture est autorisée uniquement dans les espaces communs pendant les pauses déjeuner. L'espace devra être nettoyé après le repas.</p>
 <h4>Sécurité</h4><p>En cas de danger, le formateur doit entreprendre toute action nécessaire pour se retirer et retirer les apprenants. Tout accident doit être signalé au service pédagogique. Il est interdit d'introduire une arme, de détenir ou vendre de la drogue, ou de faire du commerce dans l'établissement.</p>
 <h4>Sécurité – Incendie</h4><p>En cas d'incendie : prévenir immédiatement le service pédagogique et suivre les instructions des panneaux de signalisation. Des exercices d'évacuation sont organisés chaque année.</p>
 <h4>Locaux et matériel</h4><p>Toute dégradation volontaire fera l'objet de sanctions disciplinaires et le montant des dégâts sera facturé.</p>
 <h4>Vols</h4><p>Chaque apprenant est responsable de ses affaires personnelles. La responsabilité de l'organisme ne saurait être engagée en cas de perte ou de vol.</p>` },
 
-    { heading: "Article 4 : Horaires et présence", content: `<h4>Entrée – Sortie</h4><p>L'accès aux locaux est autorisé de 9h00 à 17h30, du lundi au vendredi. Les apprenants ne sont pas autorisés à sortir avant la fin de l'heure de cours sans accord du formateur.</p>
+    { heading: "Article 4 : Horaires et présence", content: mc.isDist
+      ? `<h4>Connexion et disponibilité</h4><p>L'accès à la plateforme de formation est disponible 24h/24. Les classes virtuelles avec le formateur sont programmées selon le calendrier communiqué. L'apprenant doit se connecter à l'heure prévue.</p>
+<h4>Suivi de l'assiduité</h4><p>Les alternants ont une obligation d'assiduité. La présence est validée par le suivi des temps de connexion sur la plateforme et la participation aux classes virtuelles. Toute demande d'absence doit être faite par écrit et approuvée par le service pédagogique.</p>
+<p>Absences justifiées : arrêt maladie, demande exceptionnelle de l'entreprise, convocation administrative, décès d'un proche. Justificatif à fournir sous 48h.</p>
+<p>Des absences injustifiées dépassant <strong>20% des heures de formation</strong> peuvent entraîner une non-présentation aux examens et/ou une exclusion.</p>
+<h4>Retards</h4><p>L'apprenant se connectant après le début de la classe virtuelle sera marqué en retard. Les retards répétés non justifiés peuvent entraîner des sanctions.</p>`
+      : `<h4>Entrée – Sortie</h4><p>L'accès aux locaux est autorisé de 9h00 à 17h30, du lundi au vendredi. Les apprenants ne sont pas autorisés à sortir avant la fin de l'heure de cours sans accord du formateur.</p>
 <h4>Horaires des cours – Pauses</h4><p>Les apprenants doivent se conformer aux horaires du programme. Les heures mentionnées marquent avec exactitude le début et la fin de chaque cours. La sortie de l'établissement durant les pauses est une tolérance, pas un droit.</p>
 <h4>Absences des alternants</h4><p>Les alternants ont une obligation d'assiduité. La présence est validée par signature sur la feuille d'émargement. Un oubli équivaut à une absence. Toute demande d'absence doit être faite par écrit et approuvée par le service pédagogique.</p>
 <p>Absences justifiées : arrêt maladie, demande exceptionnelle de l'entreprise, convocation administrative, décès d'un proche. Justificatif à fournir sous 48h.</p>
@@ -5883,6 +5904,7 @@ function genConventionFormationCFA(o: OrganismeInfo, f: FormationInfo, stagiaire
   const s = stagiaires[si] || stagiaires[0] || { prenom: "___", nom: "___", entreprise: "___" } as StagiaireInfo;
   const entreprise = s.entreprise || "Entreprise partenaire";
   const respEntreprise = (s as any).responsableEntreprise || "Le responsable désigné";
+  const mc = getModaliteContent(f, o);
   const dateDebut = formatDate(getStagiaireDateDebut(s, f));
   const dateFin = formatDate(getStagiaireDateFin(s, f));
   const duree = f.duree || "420 heures";
@@ -5890,8 +5912,8 @@ function genConventionFormationCFA(o: OrganismeInfo, f: FormationInfo, stagiaire
   const dateConvention = f.dateDebut ? formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || f.dateDebut, 15)) : "________________________";
   return buildDocument({ org: o, title: "CONVENTION DE FORMATION PAR APPRENTISSAGE", subtitle: "Contrat hors convention régionale", formation: f, showFormationInfo: false, sections: [
     { heading: "Entre les soussignés", content: `<p><strong>${o.nom}</strong><br>Adresse : ${o.adresse}, ${o.codePostal} ${o.ville}<br>SIRET : ${o.siret}<br>Numéro de déclaration à la Préfecture : ${o.nda}<br></p><p><strong>${entreprise}</strong><br>Adresse : ${s.adresseEntreprise || "________________________"}<br>SIRET : ${s.siretEntreprise || "________________________"}<br>représenté(e) par <strong>${respEntreprise}</strong>,</p><p>CI-APRÈS DÉNOMMÉ(E) LE BÉNÉFICIAIRE,</p><p>est conclue la convention suivante, en application des dispositions des Livres II et III de la sixième partie du Code du travail.</p>` },
-    { heading: "Article 1er : Objet de la convention", content: `<p>Le ${o.nom} organise une action de formation par apprentissage au sens de l'article L. 6313-6 du Code du travail.</p><p><strong>Intitulé de l'action :</strong> « ${f.intitule} »</p><p><strong>Code diplôme et RNCP :</strong> ${f.codeRNCP || "________________________"}</p><p><strong>Dates de formation :</strong> Du ${dateDebut} au ${dateFin}</p><p><strong>Lieu de formation :</strong> ${f.lieu || `${o.adresse}, ${o.codePostal} ${o.ville}`}</p><p><strong>Stagiaire :</strong> ${s.prenom} ${s.nom}</p><p>Les actions envisagées entrent dans l'une des catégories aux articles L 6313-1 à L 6313-11 du code du travail :</p><p><em>Actions d'acquisition, d'entretien ou de perfectionnement des connaissances</em></p><p><strong>Durée de l'action de formation :</strong> ${duree}</p><p>Périodes de réalisation en entreprise et en CFA : voir calendrier du stagiaire en annexe</p>` },
-    { heading: "Article 2 : Modalités de déroulement, de suivi et d'obtention du titre", content: `<p><strong>Modalités de déroulement :</strong> ${f.modalites || "Hybride"}</p><p><strong>Modalités de suivi :</strong></p><ul><li>Feuille d'émargement</li><li>Séances de préparation à l'examen</li></ul><p><strong>Modalités d'obtention du titre :</strong></p><p>Présentation à l'examen en vue de l'obtention d'un titre professionnel</p>` },
+    { heading: "Article 1er : Objet de la convention", content: `<p>Le ${o.nom} organise une action de formation par apprentissage au sens de l'article L. 6313-6 du Code du travail.</p><p><strong>Intitulé de l'action :</strong> « ${f.intitule} »</p><p><strong>Code diplôme et RNCP :</strong> ${f.codeRNCP || "________________________"}</p><p><strong>Dates de formation :</strong> Du ${dateDebut} au ${dateFin}</p><p><strong>Modalité :</strong> ${mc.modaliteLabel}</p><p><strong>Lieu de formation :</strong> ${mc.lieuFormation}</p><p><strong>Stagiaire :</strong> ${s.prenom} ${s.nom}</p><p>Les actions envisagées entrent dans l'une des catégories aux articles L 6313-1 à L 6313-11 du code du travail :</p><p><em>Actions d'acquisition, d'entretien ou de perfectionnement des connaissances</em></p><p><strong>Durée de l'action de formation :</strong> ${duree}</p><p>Périodes de réalisation en entreprise et en CFA : voir calendrier du stagiaire en annexe</p>` },
+    { heading: "Article 2 : Modalités de déroulement, de suivi et d'obtention du titre", content: `<p><strong>Modalités de déroulement :</strong> ${mc.modaliteLabel}</p><p><strong>Modalités de suivi :</strong></p><ul>${mc.isDist ? '<li>Suivi des temps de connexion sur la plateforme e-learning</li><li>Progression pédagogique et participation aux classes virtuelles</li>' : '<li>Feuille d\'émargement</li>'}${mc.isMixte ? '<li>Suivi des temps de connexion pour les sessions à distance</li>' : ''}<li>Séances de préparation à l'examen</li></ul><p><strong>Modalités d'obtention du titre :</strong></p><p>Présentation à l'examen en vue de l'obtention d'un titre professionnel</p>` },
     { heading: "Article 3 : Dispositions financières", content: `<p><strong>Rappel :</strong> gratuité de la formation pour l'apprenti et son représentant légal, le cas échéant, aucune somme ne peut être demandée.</p>
 ${tableHTML(["", "Quantité", "Unité", "Prix unitaire en €", "Montant net en €"], [
   ["Intitulé de l'action de formation", "", "Montant global", "", montant + " €"],

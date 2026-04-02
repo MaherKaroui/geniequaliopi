@@ -837,3 +837,93 @@ export function getPassedFormationDays(f: FormationInfo): string[] {
     } catch { return false; }
   });
 }
+
+/** Check if a formation is distanciel (e-learning, FOAD, or mixed) */
+export function isDistanciel(f: FormationInfo): boolean {
+  const moda = (f.modalites || '').toLowerCase();
+  return moda.includes('distanciel') || moda.includes('e-learning') || moda.includes('foad');
+}
+
+/** Check if a formation is mixte (has both présentiel and distanciel) */
+export function isMixte(f: FormationInfo): boolean {
+  const moda = (f.modalites || '').toLowerCase();
+  return moda.includes('mixte');
+}
+
+/** Check if a formation has a distanciel component (distanciel or mixte) */
+export function hasDistanciel(f: FormationInfo): boolean {
+  return isDistanciel(f) || isMixte(f);
+}
+
+/** Check if a formation has a présentiel component (not pure distanciel) */
+export function hasPresentiel(f: FormationInfo): boolean {
+  return !isDistanciel(f) || isMixte(f);
+}
+
+/** Get modalité-adapted content blocks for CFA documents */
+export function getModaliteContent(f: FormationInfo, o: OrganismeInfo) {
+  const dist = isDistanciel(f);
+  const mixte = isMixte(f);
+
+  const lieuFormation = dist
+    ? "Formation à distance – Plateforme e-learning"
+    : mixte
+    ? `Mixte : ${o.adresse || '___'}, ${o.codePostal || '___'} ${o.ville || '___'} + Plateforme e-learning`
+    : `${f.lieu || o.adresse || '___'}, ${o.codePostal || '___'} ${o.ville || '___'}`;
+
+  const horaires = dist
+    ? "Accès à la plateforme 24h/24 – Accompagnement synchrone : 09h00 – 17h00"
+    : "09h00 – 12h30 / 13h30 – 17h00";
+
+  const moyensPedagogiques = dist
+    ? `<p>• Plateforme e-learning (supports de cours, vidéos, exercices interactifs)<br>• Classes virtuelles avec le formateur<br>• Messagerie et forum de discussion<br>• Ressources pédagogiques numériques accessibles 24h/24<br>• Ordinateur personnel et connexion internet requis</p>`
+    : mixte
+    ? `<p>• Plateforme e-learning (supports de cours, vidéos, exercices interactifs)<br>• Salle de formation équipée : tables, chaises, télévision, tableau<br>• Classes virtuelles et sessions en présentiel<br>• Formateurs experts issus du monde professionnel<br>• Accès Wi-Fi et matériel informatique mis à disposition</p>`
+    : `<p>• Salle de formation équipée : tables, chaises, télévision, tableau<br>• Formateurs experts issus du monde professionnel<br>• Supports de cours remis en format papier et/ou numérique<br>• Accès Wi-Fi et matériel informatique mis à disposition<br>• Bibliothèque de ressources pédagogiques</p>`;
+
+  const moyensTechniques = dist
+    ? `<p>• Plateforme de formation en ligne sécurisée<br>• Outils de visioconférence (classes virtuelles)<br>• Espace de stockage et de partage de documents<br>• Support technique dédié pour les problèmes de connexion</p>`
+    : mixte
+    ? `<p>• Salle de formation équipée (vidéoprojecteur, paperboard, matériel informatique)<br>• Plateforme de formation en ligne sécurisée<br>• Outils de visioconférence pour les sessions à distance<br>• Accès Wi-Fi haut débit</p>`
+    : `<p>• Salle de formation équipée (vidéoprojecteur, paperboard, matériel informatique)<br>• Accès Wi-Fi haut débit<br>• Matériel informatique mis à disposition si nécessaire<br>• Supports pédagogiques remis à chaque apprenant</p>`;
+
+  const suiviAssiduite = dist
+    ? "Suivi via temps de connexion et progression sur la plateforme e-learning"
+    : mixte
+    ? "Émargement en présentiel + suivi des temps de connexion à distance"
+    : "Émargement quotidien (matin et après-midi)";
+
+  const suiviAssiduiteDetail = dist
+    ? `<p>• Suivi des temps de connexion sur la plateforme<br>• Suivi de la progression pédagogique (modules complétés, exercices rendus)<br>• Participation aux classes virtuelles<br>• Échanges réguliers par messagerie avec le formateur référent</p>`
+    : mixte
+    ? `<p>• Émargement quotidien lors des sessions en présentiel<br>• Suivi des temps de connexion sur la plateforme pour les sessions à distance<br>• Suivi de la progression pédagogique<br>• Livret d'apprentissage tenu à jour</p>`
+    : `<p>• Émargement quotidien (matin et après-midi)<br>• Évaluations régulières (contrôle continu, examens blancs)<br>• Livret d'apprentissage tenu à jour<br>• Suivi individualisé par le formateur référent</p>`;
+
+  const materielNecessaire = dist
+    ? `<p>L'apprenti doit disposer de :<br>• Un ordinateur (PC ou Mac) avec webcam et micro<br>• Une connexion internet stable (minimum 5 Mbps)<br>• Un navigateur web à jour (Chrome, Firefox, Edge)<br>• Un espace de travail calme et adapté</p>`
+    : `<p>Le matériel pédagogique est mis à disposition par le CFA pendant les sessions de formation.</p>`;
+
+  const reglesSalle = dist
+    ? `<ul><li>Se connecter à l'heure prévue pour les classes virtuelles</li><li>Activer la caméra pendant les sessions synchrones</li><li>Couper son micro lorsqu'on ne prend pas la parole</li><li>Respecter les consignes du formateur et les règles de savoir-vivre en ligne</li><li>Signaler tout problème technique au support</li></ul>`
+    : mixte
+    ? `<ul><li>Respecter les horaires et signaler toute absence au préalable</li><li>Adopter un comportement respectueux envers les formateurs et les autres apprenants</li><li>Respecter le matériel mis à disposition</li><li>Se connecter à l'heure prévue pour les classes virtuelles</li><li>Activer la caméra pendant les sessions à distance</li></ul>`
+    : `<ul><li>Respecter les horaires et signaler toute absence au préalable</li><li>Adopter un comportement respectueux envers les formateurs, les autres apprenants et le personnel</li><li>Respecter le matériel mis à disposition</li><li>Les téléphones portables doivent être éteints ou en mode silencieux pendant les cours</li><li>Toute forme de discrimination ou de harcèlement est strictement interdite</li></ul>`;
+
+  const modaliteLabel = dist ? "Distanciel (e-learning)"
+    : mixte ? "Mixte (présentiel et distanciel)"
+    : "Présentiel";
+
+  return {
+    lieuFormation,
+    horaires,
+    moyensPedagogiques,
+    moyensTechniques,
+    suiviAssiduite,
+    suiviAssiduiteDetail,
+    materielNecessaire,
+    reglesSalle,
+    modaliteLabel,
+    isDist: dist,
+    isMixte: mixte,
+  };
+}
