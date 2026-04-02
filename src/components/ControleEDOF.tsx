@@ -110,13 +110,6 @@ export default function ControleEDOF({ organisme, formation, stagiaires }: Contr
     });
   }, []);
 
-  const toggleSelectAll = useCallback(() => {
-    setSelectedDocs(prev => {
-      if (prev.size === EY_DOCUMENTS.length) return new Set();
-      return new Set(EY_DOCUMENTS.map(d => d.code));
-    });
-  }, []);
-
   const generateAutoDocForStagiaire = useCallback(async (eyDoc: EYDocumentItem, stagiaireIdx: number): Promise<{ blob: Blob; fileName: string } | null> => {
     if (eyDoc.autoTemplates.length === 0) return null;
     const template = eyDoc.autoTemplates[0];
