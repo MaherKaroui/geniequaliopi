@@ -6007,7 +6007,7 @@ function genAttestationInscriptionCFA(o: OrganismeInfo, f: FormationInfo, stagia
 // ============== NOUVEAUX GENERATORS SKILLORA AF ==============
 
 function genFicheRenseignement(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
-  const s = stagiaires[0] || { prenom: "___", nom: "___", entreprise: "___", poste: "___" };
+  const s = (stagiaires[0] || { prenom: "___", nom: "___", entreprise: "___", poste: "___" }) as StagiaireInfo;
   return buildDocument({ org: o, title: "FICHE DE RENSEIGNEMENT", subtitle: f.intitule, sections: [
     { heading: "Identité du candidat", content: `<p><strong>Nom :</strong> ${s.nom}<br><strong>Prénom :</strong> ${s.prenom}<br><strong>Date de naissance :</strong> ${s.dateNaissance ? formatDate(s.dateNaissance) : "___/___/______"}<br><strong>Adresse :</strong> ${s.adresse ? `${s.adresse}, ${s.codePostal || ""} ${s.commune || ""}`.trim() : "________________________________"}<br><strong>Téléphone :</strong> ${s.telephone || "________________________________"}<br><strong>Email :</strong> ${s.email || "________________________________"}</p>` },
     { heading: "Situation professionnelle", content: `<p><strong>Statut :</strong> ☐ Salarié(e) ☐ Demandeur d'emploi ☐ Indépendant(e) ☐ Autre<br><strong>Entreprise :</strong> ${s.entreprise}<br><strong>Poste occupé :</strong> ${s.poste}<br><strong>Ancienneté :</strong> ________________________________</p>` },
