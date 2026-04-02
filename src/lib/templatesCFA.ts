@@ -244,9 +244,14 @@ export function genProgressionPedagogique(o: OrganismeInfo, f: FormationInfo) {
 }
 
 export function genDeroulePedagogiqueCFA(o: OrganismeInfo, f: FormationInfo) {
+  const evalData = getEvalContent(f.intitule);
+  const comps = evalData.competences;
+  const half = Math.ceil(comps.length / 2);
+  const sem1Content = comps.slice(0, half).map((c, i) => `<strong>Module ${i+1} :</strong> ${c}`).join('<br>') || `<strong>Module 1 :</strong> ${f.programme.split("\n")[0] || "Fondamentaux"}`;
+  const sem2Content = comps.slice(half).map((c, i) => `<strong>Module ${half+i+1} :</strong> ${c}`).join('<br>') || `<strong>Module 2 :</strong> ${f.programme.split("\n")[1] || "Approfondissement"}`;
   return buildDocument({ org: o, title: "DÉROULÉ PÉDAGOGIQUE – CFA", subtitle: f.intitule, formation: f, showFormationInfo: true, sections: [
-    { heading: "Semestre 1", content: `<p><strong>Module 1 :</strong> ${f.programme.split("\n")[0] || "Fondamentaux"}<br><strong>Module 2 :</strong> ${f.programme.split("\n")[1] || "Approfondissement"}<br><strong>Évaluation :</strong> Contrôle continu + examen de mi-parcours</p>` },
-    { heading: "Semestre 2", content: `<p><strong>Module 3 :</strong> ${f.programme.split("\n")[2] || "Spécialisation"}<br><strong>Module 4 :</strong> ${f.programme.split("\n")[3] || "Projet professionnel"}<br><strong>Évaluation :</strong> Soutenance de projet + examen final</p>` },
+    { heading: "Semestre 1", content: `<p>${sem1Content}<br><strong>Évaluation :</strong> Contrôle continu + examen de mi-parcours</p>` },
+    { heading: "Semestre 2", content: `<p>${sem2Content}<br><strong>Évaluation :</strong> Soutenance de projet + examen final</p>` },
     { heading: "Méthodes pédagogiques", content: "<p>• Cours magistraux et travaux dirigés (30%)<br>• Travaux pratiques et ateliers (40%)<br>• Projets tutorés (20%)<br>• Accompagnement individualisé (10%)</p>", variant: "green" },
   ] });
 }
