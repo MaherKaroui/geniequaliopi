@@ -71,14 +71,19 @@ export function generateExcelAssiduite(o: OrganismeInfo, f: FormationInfo, stagi
 
 export function generateExcelEvaluations(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]): string {
   const evalData = getEvalContent(f.intitule);
+  const termine = isFormationTerminee(f);
   let html = tableRow(["Stagiaire", "Positionnement", "Intermédiaire", "Finale", "Moyenne", "Progression", "Résultat"], true);
   stagiaires.slice(0, 10).forEach((s, i) => {
-    const sc = EVAL_SCORES[i] || [7, 8, 7, 8, 7];
-    const pos = Math.round(sc.reduce((a, b) => a + b, 0) / sc.length * 10) / 10;
-    const inter = Math.round((pos * 10 + 10) / 10 * 10) / 10;
-    const fin = Math.round((pos * 10 + 20) / 10 * 10) / 10;
-    const avg = Math.round((pos + inter + fin) / 3 * 10) / 10;
-    html += tableRow([s.prenom + " " + s.nom, `${pos}/10`, `${Math.min(10, inter)}/10`, `${Math.min(10, fin)}/10`, `${Math.min(10, avg)}/10`, `+${Math.round((fin - pos) * 10) / 10}`, fin >= 6 ? "✅ Validé" : "⚠️"]);
+    if (termine) {
+      const sc = EVAL_SCORES[i] || [7, 8, 7, 8, 7];
+      const pos = Math.round(sc.reduce((a, b) => a + b, 0) / sc.length * 10) / 10;
+      const inter = Math.round((pos * 10 + 10) / 10 * 10) / 10;
+      const fin = Math.round((pos * 10 + 20) / 10 * 10) / 10;
+      const avg = Math.round((pos + inter + fin) / 3 * 10) / 10;
+      html += tableRow([s.prenom + " " + s.nom, `${pos}/10`, `${Math.min(10, inter)}/10`, `${Math.min(10, fin)}/10`, `${Math.min(10, avg)}/10`, `+${Math.round((fin - pos) * 10) / 10}`, fin >= 6 ? "✅ Validé" : "⚠️"]);
+    } else {
+      html += tableRow([s.prenom + " " + s.nom, "", "", "", "", "", ""]);
+    }
   });
   return excelWrap(`Évaluations – ${f.intitule}`, [{ name: "Évaluations", html }]);
 }
