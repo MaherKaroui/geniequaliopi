@@ -346,11 +346,17 @@ export function genCarnetLiaison(o: OrganismeInfo, f: FormationInfo, stagiaires:
 export function genCompteRenduVisiteEntreprise(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const s = stagiaires[0] || { prenom: "___", nom: "___", entreprise: "___" };
   const termine = isFormationTerminee(f);
+  const progress = getFormationProgress(f);
+  const enCours = !termine && progress > 0;
+  // Date de visite: 2 months after debut for first visit
+  const debut = f.dateDebut ? new Date(f.dateDebut.split('/').reverse().join('-')) : new Date();
+  const dateVisite = new Date(debut.getFullYear(), debut.getMonth() + 2, 15);
+  const visiteFaite = dateVisite <= new Date();
   return buildDocument({ org: o, title: "COMPTE-RENDU DE VISITE EN ENTREPRISE", subtitle: `${s.prenom} ${s.nom} – ${s.entreprise}`, sections: [
-    { heading: "Informations", content: `<p><strong>Date de visite :</strong> ${formatDate(f.dateDebut)}<br><strong>Apprenti(e) :</strong> ${s.prenom} ${s.nom}<br><strong>Entreprise :</strong> ${s.entreprise}<br><strong>Maître d'apprentissage :</strong> ${f.formateur}<br><strong>Visiteur CFA :</strong> ${o.responsablePedagogique}</p>` },
-    { heading: "Intégration dans l'entreprise", content: termine ? "<p>☑ Bonne intégration dans l'équipe<br>☑ Missions en adéquation avec la formation<br>☑ Maître d'apprentissage disponible et impliqué<br>☑ Conditions de travail satisfaisantes</p>" : "<p>☐ Intégration dans l'équipe : ___<br>☐ Missions en adéquation avec la formation : ___<br>☐ Maître d'apprentissage disponible : ___<br>☐ Conditions de travail : ___</p>", variant: "green" },
-    { heading: "Progression des compétences", content: termine ? "<p>• Compétences techniques : En bonne voie d'acquisition<br>• Autonomie : En progression<br>• Communication : Satisfaisante<br>• Initiative : À développer</p>" : "<p>• Compétences techniques : ___<br>• Autonomie : ___<br>• Communication : ___<br>• Initiative : ___</p>" },
-    { heading: "Points d'attention", content: termine ? "<p>Aucun point bloquant identifié. L'apprenti est encouragé à prendre davantage d'initiative.</p>" : "<p>___</p>" },
+    { heading: "Informations", content: `<p><strong>Date de visite :</strong> ${visiteFaite ? dateVisite.toLocaleDateString('fr-FR') : '___'}<br><strong>Apprenti(e) :</strong> ${s.prenom} ${s.nom}<br><strong>Entreprise :</strong> ${s.entreprise}<br><strong>Maître d'apprentissage :</strong> ${f.formateur}<br><strong>Visiteur CFA :</strong> ${o.responsablePedagogique}</p>` },
+    { heading: "Intégration dans l'entreprise", content: (termine || visiteFaite) ? "<p>☑ Bonne intégration dans l'équipe<br>☑ Missions en adéquation avec la formation<br>☑ Maître d'apprentissage disponible et impliqué<br>☑ Conditions de travail satisfaisantes</p>" : "<p>☐ Intégration dans l'équipe : ___<br>☐ Missions en adéquation avec la formation : ___<br>☐ Maître d'apprentissage disponible : ___<br>☐ Conditions de travail : ___</p>", variant: "green" },
+    { heading: "Progression des compétences", content: (termine || visiteFaite) ? "<p>• Compétences techniques : En bonne voie d'acquisition<br>• Autonomie : En progression<br>• Communication : Satisfaisante<br>• Initiative : À développer</p>" : "<p>• Compétences techniques : ___<br>• Autonomie : ___<br>• Communication : ___<br>• Initiative : ___</p>" },
+    { heading: "Points d'attention", content: (termine || visiteFaite) ? "<p>Aucun point bloquant identifié. L'apprenti est encouragé à prendre davantage d'initiative.</p>" : "<p>___</p>" },
   ], signatures: { type: "3", names: [s.prenom + " " + s.nom, f.formateur] } });
 }
 
