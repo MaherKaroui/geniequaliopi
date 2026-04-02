@@ -662,6 +662,9 @@ function getContentKey(intitule: string): string {
   const lower = intitule.toLowerCase();
   if (lower.includes("ecsr") || lower.includes("enseignant de la conduite") || lower.includes("sécurité routière")) return "ECSR";
   if (lower.includes("vtest") || lower.includes("v-test") || lower.includes("rs6905")) return "VTest";
+  // SAMA / SAMS must be checked BEFORE generic "médico-social" / "social"
+  if (lower.includes("sama") || lower.includes("rncp40800") || lower.includes("secrétaire assistant médico-administratif") || lower.includes("secretaire assistant medico-administratif")) return "SAMA";
+  if (lower.includes("sams") || lower.includes("rncp36805") || lower.includes("secrétaire assistant médico-social") || lower.includes("secretaire assistant medico-social")) return "SAMS";
   if (lower.includes("excel")) return "Excel Professionnel";
   if ((lower.includes("anglais") || lower.includes("english")) && (lower.includes("a1") || lower.includes("débutant"))) return "Anglais A1";
   if (lower.includes("anglais")) return "Anglais Professionnel";
