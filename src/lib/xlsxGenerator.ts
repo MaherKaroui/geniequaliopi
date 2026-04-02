@@ -355,9 +355,16 @@ export function generateExcelIndicateursPrevisionnelsVAE(o: OrganismeInfo, f: Fo
 export function generateExcelSuiviInscriptions(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]): string {
   const headers = ["SITUATION AVANT DÉMARRAGE FORMATION", "CIVILITÉ", "NOM", "PRÉNOM", "DATE DE NAISSANCE", "PAYS DE NAISSANCE", "INSCRIT SOUS QUEL STATUT", "COMMUNE", "ADRESSE", "CODE POSTAL", "TÉLÉPHONE", "MAIL", "INTITULÉ DE LA FORMATION", "DIPLÔME VISÉ", "DATE DÉBUT DE FORMATION", "DATE DE FIN DE FORMATION", "COMMENTAIRE OBSERVATION"];
   let html = tableRow(headers, true);
+  const now = new Date();
   stagiaires.slice(0, 15).forEach((s, i) => {
+    // Synchronized: use individual stagiaire dates
+    const dateDebut = s.dateDebutFormation || f.dateDebut || "";
+    const dateFin = s.dateFinFormation || f.dateFin || "";
+    const debutDate = dateDebut ? new Date(dateDebut.split('/').reverse().join('-')) : null;
+    const isPast = debutDate && debutDate < now;
+    const situation = isPast ? "En formation" : "Inscrit";
     html += tableRow([
-      i === 0 ? "Demandeur d'emploi" : i === 1 ? "Salarié" : "",
+      situation,
       s.civilite || "",
       s.nom,
       s.prenom,
@@ -371,9 +378,9 @@ export function generateExcelSuiviInscriptions(o: OrganismeInfo, f: FormationInf
       s.email || "",
       f.intitule || "",
       f.intitule || "",
-      formatDate(f.dateDebut),
-      formatDate(f.dateFin),
-      ""
+      formatDate(dateDebut),
+      formatDate(dateFin),
+      isPast ? "Formation démarrée" : ""
     ]);
   });
   // Add empty rows for manual entry
