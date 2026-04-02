@@ -3643,7 +3643,7 @@ function genSuiviChiffreFormationExcel(o: OrganismeInfo, f: FormationInfo, stagi
     let totalSemCFA = 0;
     let totalHeuresCFA = 0;
     let totalSemEntreprise = 0;
-    let totalAbsences = 0;
+    
 
     for (let m = 0; m < 12; m++) {
       const moisDate = new Date(startDate);
