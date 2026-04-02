@@ -208,6 +208,7 @@ const ControleEY = () => {
     { key: "organisme", label: "Organisme", icon: <Building2 className="w-4 h-4" />, filled: !!organisme.nom },
     { key: "formation", label: "Formation", icon: <GraduationCap className="w-4 h-4" />, filled: !!formation.intitule },
     { key: "stagiaires", label: "Stagiaires", icon: <Users className="w-4 h-4" />, count: stagiaires.length },
+    { key: "signature", label: "Signature électronique", icon: <PenTool className="w-4 h-4" />, filled: !!signature },
     { key: "design", label: "Design des documents", icon: <Palette className="w-4 h-4" /> },
   ];
 
