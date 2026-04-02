@@ -89,14 +89,21 @@ export function generateExcelEvaluations(o: OrganismeInfo, f: FormationInfo, sta
 }
 
 export function generateExcelSatisfaction(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]): string {
+  const termine = isFormationTerminee(f);
   const criteres = ["Accueil", "Objectifs", "Contenu", "Pédagogie", "Formateur", "Supports", "Durée", "Recommandation"];
   let html = tableRow(["Stagiaire", ...criteres, "Moyenne"], true);
   stagiaires.slice(0, 10).forEach((s, i) => {
-    const scores = criteres.map((_, ci) => 4 + ((i + ci) % 2));
-    const avg = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length * 10) / 10;
-    html += tableRow([s.prenom + " " + s.nom, ...scores.map(v => `${v}/5`), `${avg}/5`]);
+    if (termine) {
+      const scores = criteres.map((_, ci) => 4 + ((i + ci) % 2));
+      const avg = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length * 10) / 10;
+      html += tableRow([s.prenom + " " + s.nom, ...scores.map(v => `${v}/5`), `${avg}/5`]);
+    } else {
+      html += tableRow([s.prenom + " " + s.nom, ...criteres.map(() => ""), ""]);
+    }
   });
-  html += tableRow(["MOYENNE", ...criteres.map((_, ci) => { const vals = stagiaires.slice(0,10).map((_, i) => 4 + ((i + ci) % 2)); return `${(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1)}/5`; }), "4.5/5"]);
+  if (termine) {
+    html += tableRow(["MOYENNE", ...criteres.map((_, ci) => { const vals = stagiaires.slice(0,10).map((_, i) => 4 + ((i + ci) % 2)); return `${(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1)}/5`; }), "4.5/5"]);
+  }
   return excelWrap(`Satisfaction – ${f.intitule}`, [{ name: "Satisfaction", html }]);
 }
 
