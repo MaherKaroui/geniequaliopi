@@ -271,11 +271,12 @@ export function genCarnetLiaison(o: OrganismeInfo, f: FormationInfo, stagiaires:
 
 export function genCompteRenduVisiteEntreprise(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const s = stagiaires[0] || { prenom: "___", nom: "___", entreprise: "___" };
+  const termine = isFormationTerminee(f);
   return buildDocument({ org: o, title: "COMPTE-RENDU DE VISITE EN ENTREPRISE", subtitle: `${s.prenom} ${s.nom} – ${s.entreprise}`, sections: [
     { heading: "Informations", content: `<p><strong>Date de visite :</strong> ${formatDate(f.dateDebut)}<br><strong>Apprenti(e) :</strong> ${s.prenom} ${s.nom}<br><strong>Entreprise :</strong> ${s.entreprise}<br><strong>Maître d'apprentissage :</strong> ${f.formateur}<br><strong>Visiteur CFA :</strong> ${o.responsablePedagogique}</p>` },
-    { heading: "Intégration dans l'entreprise", content: "<p>☑ Bonne intégration dans l'équipe<br>☑ Missions en adéquation avec la formation<br>☑ Maître d'apprentissage disponible et impliqué<br>☑ Conditions de travail satisfaisantes</p>", variant: "green" },
-    { heading: "Progression des compétences", content: "<p>• Compétences techniques : En bonne voie d'acquisition<br>• Autonomie : En progression<br>• Communication : Satisfaisante<br>• Initiative : À développer</p>" },
-    { heading: "Points d'attention", content: "<p>Aucun point bloquant identifié. L'apprenti est encouragé à prendre davantage d'initiative.</p>" },
+    { heading: "Intégration dans l'entreprise", content: termine ? "<p>☑ Bonne intégration dans l'équipe<br>☑ Missions en adéquation avec la formation<br>☑ Maître d'apprentissage disponible et impliqué<br>☑ Conditions de travail satisfaisantes</p>" : "<p>☐ Intégration dans l'équipe : ___<br>☐ Missions en adéquation avec la formation : ___<br>☐ Maître d'apprentissage disponible : ___<br>☐ Conditions de travail : ___</p>", variant: "green" },
+    { heading: "Progression des compétences", content: termine ? "<p>• Compétences techniques : En bonne voie d'acquisition<br>• Autonomie : En progression<br>• Communication : Satisfaisante<br>• Initiative : À développer</p>" : "<p>• Compétences techniques : ___<br>• Autonomie : ___<br>• Communication : ___<br>• Initiative : ___</p>" },
+    { heading: "Points d'attention", content: termine ? "<p>Aucun point bloquant identifié. L'apprenti est encouragé à prendre davantage d'initiative.</p>" : "<p>___</p>" },
   ], signatures: { type: "3", names: [s.prenom + " " + s.nom, f.formateur] } });
 }
 
@@ -365,10 +366,11 @@ export function genSupportCoursCFA(o: OrganismeInfo, f: FormationInfo) {
 }
 
 export function genGrilleAccompagnementIndividualise(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
+  const termine = isFormationTerminee(f);
   const rows = stagiaires.slice(0, 10).map((s, i) => [
     s.prenom + " " + s.nom, s.entreprise,
-    i % 3 === 0 ? "Soutien scolaire" : i % 3 === 1 ? "Méthodologie" : "Aucun",
-    `${2 + (i % 3)}h/mois`, i < 7 ? "✅ En place" : "📋 Planifié"
+    termine ? (i % 3 === 0 ? "Soutien scolaire" : i % 3 === 1 ? "Méthodologie" : "Aucun") : "",
+    termine ? `${2 + (i % 3)}h/mois` : "", termine ? (i < 7 ? "✅ En place" : "📋 Planifié") : ""
   ]);
   return buildDocument({ org: o, title: "GRILLE D'ACCOMPAGNEMENT INDIVIDUALISÉ", subtitle: f.intitule, table: {
     headers: ["Apprenti(e)", "Entreprise", "Type d'accompagnement", "Fréquence", "Statut"], rows
@@ -378,8 +380,16 @@ export function genGrilleAccompagnementIndividualise(o: OrganismeInfo, f: Format
 // ========== C. DOCUMENTS QUALITÉ CFA ==========
 
 export function genSatisfactionApprenti(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
+  const termine = isFormationTerminee(f);
   let extra = "";
   const criteres = ["Accueil au CFA", "Qualité des cours", "Lien CFA/Entreprise", "Accompagnement", "Supports", "Préparation examen"];
+  if (!termine) {
+    stagiaires.slice(0, 8).forEach((s) => {
+      extra += `<h3>${s.prenom} ${s.nom}</h3>` + tableHTML(["Critère", "Note /5"], criteres.map((c) => [c, ""]));
+    });
+    return buildDocument({ org: o, title: "QUESTIONNAIRE SATISFACTION APPRENTI", subtitle: f.intitule, extraHtml: extra,
+      sections: [{ heading: "Moyenne", content: "<p><em>Formation en cours – questionnaire à compléter à l'issue de la formation.</em></p>", variant: "green" }] });
+  }
   stagiaires.slice(0, 8).forEach((s, si) => {
     const scores = criteres.map((_, ci) => 4 + ((si + ci) % 2));
     extra += `<h3>${s.prenom} ${s.nom}</h3>` + tableHTML(["Critère", "Note /5"], criteres.map((c, i) => [c, `${scores[i]}/5`]));
@@ -389,25 +399,27 @@ export function genSatisfactionApprenti(o: OrganismeInfo, f: FormationInfo, stag
 }
 
 export function genSatisfactionEntrepriseCFA(o: OrganismeInfo, f: FormationInfo) {
+  const termine = isFormationTerminee(f);
   return buildDocument({ org: o, title: "QUESTIONNAIRE SATISFACTION ENTREPRISE – CFA", subtitle: f.intitule, table: {
     headers: ["Critère", "Note /5"],
     rows: [
-      ["Qualité de la coordination CFA/entreprise", "4.5/5"],
-      ["Compétences acquises par l'apprenti", "4.3/5"],
-      ["Disponibilité du formateur référent", "4.7/5"],
-      ["Qualité des visites en entreprise", "4.4/5"],
-      ["Adéquation formation/besoins métier", "4.6/5"],
-      ["Satisfaction globale", "4.5/5"],
+      ["Qualité de la coordination CFA/entreprise", termine ? "4.5/5" : ""],
+      ["Compétences acquises par l'apprenti", termine ? "4.3/5" : ""],
+      ["Disponibilité du formateur référent", termine ? "4.7/5" : ""],
+      ["Qualité des visites en entreprise", termine ? "4.4/5" : ""],
+      ["Adéquation formation/besoins métier", termine ? "4.6/5" : ""],
+      ["Satisfaction globale", termine ? "4.5/5" : ""],
     ]
   } });
 }
 
-export function genSatisfactionFormateurCFA(o: OrganismeInfo) {
+export function genSatisfactionFormateurCFA(o: OrganismeInfo, f: FormationInfo) {
+  const termine = isFormationTerminee(f);
   return buildDocument({ org: o, title: "QUESTIONNAIRE SATISFACTION FORMATEUR – CFA", table: {
     headers: ["Critère", "Note /5"],
     rows: [
-      ["Conditions de travail", "4.5/5"], ["Moyens pédagogiques", "4.3/5"], ["Accompagnement direction", "4.7/5"],
-      ["Relations avec les entreprises", "4.4/5"], ["Niveau des apprentis", "4.2/5"], ["Satisfaction globale", "4.5/5"],
+      ["Conditions de travail", termine ? "4.5/5" : ""], ["Moyens pédagogiques", termine ? "4.3/5" : ""], ["Accompagnement direction", termine ? "4.7/5" : ""],
+      ["Relations avec les entreprises", termine ? "4.4/5" : ""], ["Niveau des apprentis", termine ? "4.2/5" : ""], ["Satisfaction globale", termine ? "4.5/5" : ""],
     ]
   } });
 }
@@ -434,14 +446,16 @@ export function genTableauSuiviInsertion(o: OrganismeInfo) {
 }
 
 export function genTableauSuiviAssiduite(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
-  const rows = stagiaires.slice(0, 10).map((s, i) => [s.prenom + " " + s.nom, s.entreprise, `${95 + (i % 5)}%`, `${i % 10 < 8 ? 0 : 1}`, `${i % 10 < 7 ? 0 : 1}`, i < 8 ? "✅ Bon" : "⚠️ À suivre"]);
+  const termine = isFormationTerminee(f);
+  const rows = stagiaires.slice(0, 10).map((s, i) => [s.prenom + " " + s.nom, s.entreprise, termine ? `${95 + (i % 5)}%` : "", termine ? `${i % 10 < 8 ? 0 : 1}` : "", termine ? `${i % 10 < 7 ? 0 : 1}` : "", termine ? (i < 8 ? "✅ Bon" : "⚠️ À suivre") : ""]);
   return buildDocument({ org: o, title: "TABLEAU DE SUIVI DE L'ASSIDUITÉ – CFA", subtitle: f.intitule, table: {
     headers: ["Apprenti(e)", "Entreprise", "Taux présence", "Abs justifiées", "Abs injustifiées", "Statut"], rows
   } });
 }
 
 export function genTableauSuiviAccompagnement(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
-  const rows = stagiaires.slice(0, 10).map((s, i) => [s.prenom + " " + s.nom, i % 3 === 0 ? "Renforcé" : "Standard", `${1 + (i % 3)} visites`, i < 7 ? "✅" : "🔄", ""]);
+  const termine = isFormationTerminee(f);
+  const rows = stagiaires.slice(0, 10).map((s, i) => [s.prenom + " " + s.nom, termine ? (i % 3 === 0 ? "Renforcé" : "Standard") : "", termine ? `${1 + (i % 3)} visites` : "", termine ? (i < 7 ? "✅" : "🔄") : "", ""]);
   return buildDocument({ org: o, title: "TABLEAU DE SUIVI DE L'ACCOMPAGNEMENT", subtitle: f.intitule, table: {
     headers: ["Apprenti(e)", "Niveau accompagnement", "Visites réalisées", "Objectif atteint", "Remarques"], rows
   } });
@@ -593,6 +607,7 @@ export function genAccompagnementDistancielCFA(o: OrganismeInfo) {
 
 export function genEnquetePartenaireEmployeurCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = stagiaires[si] || stagiaires[0];
+  const termine = isFormationTerminee(f);
   return buildDocument({ org: o, title: "FICHE DE SUIVI APPRENTI(E)", extraHtml: `
     <p style="margin-bottom:20px">Afin de suivre au mieux votre apprenti et assurer un lien constant entre l'école et l'entreprise, nous vous proposons cette fiche d'évaluation permettant d'évaluer le jeune que vous accueillez dans votre établissement.</p>
     <p>Merci de nous retourner cette fiche remplie à notre chargé de pédagogie professionnelle à l'adresse suivante : <strong>${o.email}</strong></p>
@@ -603,12 +618,12 @@ export function genEnquetePartenaireEmployeurCFA(o: OrganismeInfo, f: FormationI
     </table>
     <table style="width:100%;border-collapse:collapse;margin-top:20px">
       <tr style="background:#1e3a7b;color:white"><th style="padding:8px;border:1px solid #ccc;text-align:left">Critère</th><th style="padding:8px;border:1px solid #ccc">Très satisfaisant</th><th style="padding:8px;border:1px solid #ccc">Satisfaisant</th><th style="padding:8px;border:1px solid #ccc">À améliorer</th></tr>
-      <tr><td style="padding:8px;border:1px solid #ccc">Montée en compétence de votre apprenti(e)</td><td style="padding:8px;border:1px solid #ccc;text-align:center">☑</td><td style="padding:8px;border:1px solid #ccc;text-align:center">☐</td><td style="padding:8px;border:1px solid #ccc;text-align:center">☐</td></tr>
-      <tr><td style="padding:8px;border:1px solid #ccc">Implication de votre apprenti(e)</td><td style="padding:8px;border:1px solid #ccc;text-align:center">☐</td><td style="padding:8px;border:1px solid #ccc;text-align:center">☑</td><td style="padding:8px;border:1px solid #ccc;text-align:center">☐</td></tr>
-      <tr><td style="padding:8px;border:1px solid #ccc">Ponctualité de votre apprenti(e)</td><td style="padding:8px;border:1px solid #ccc;text-align:center">☑</td><td style="padding:8px;border:1px solid #ccc;text-align:center">☐</td><td style="padding:8px;border:1px solid #ccc;text-align:center">☐</td></tr>
+      <tr><td style="padding:8px;border:1px solid #ccc">Montée en compétence de votre apprenti(e)</td><td style="padding:8px;border:1px solid #ccc;text-align:center">${termine ? '☑' : '☐'}</td><td style="padding:8px;border:1px solid #ccc;text-align:center">☐</td><td style="padding:8px;border:1px solid #ccc;text-align:center">☐</td></tr>
+      <tr><td style="padding:8px;border:1px solid #ccc">Implication de votre apprenti(e)</td><td style="padding:8px;border:1px solid #ccc;text-align:center">☐</td><td style="padding:8px;border:1px solid #ccc;text-align:center">${termine ? '☑' : '☐'}</td><td style="padding:8px;border:1px solid #ccc;text-align:center">☐</td></tr>
+      <tr><td style="padding:8px;border:1px solid #ccc">Ponctualité de votre apprenti(e)</td><td style="padding:8px;border:1px solid #ccc;text-align:center">${termine ? '☑' : '☐'}</td><td style="padding:8px;border:1px solid #ccc;text-align:center">☐</td><td style="padding:8px;border:1px solid #ccc;text-align:center">☐</td></tr>
     </table>
     <p style="margin-top:20px"><strong>Commentaires (optionnel) :</strong></p>
-    <div style="border:1px solid #ccc;min-height:60px;padding:10px;margin-top:5px">Bon apprenti, motivé et impliqué dans les missions confiées.</div>
+    <div style="border:1px solid #ccc;min-height:60px;padding:10px;margin-top:5px">${termine ? 'Bon apprenti, motivé et impliqué dans les missions confiées.' : ''}</div>
   ` });
 }
 
