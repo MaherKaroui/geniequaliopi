@@ -1,6 +1,6 @@
 // CFA (Centre de Formation d'Apprentis) template generators
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
-import { buildDocument, formatDate, tableHTML, signatureBlock2, signatureBlock3, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireDuree } from "./docBuilder";
+import { buildDocument, formatDate, tableHTML, signatureBlock2, signatureBlock3, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireDuree, isFormationTerminee } from "./docBuilder";
 import { EVAL_SCORES } from "./sampleData";
 import { getEvalContent } from "./evalContent";
 
@@ -280,17 +280,32 @@ export function genCompteRenduVisiteEntreprise(o: OrganismeInfo, f: FormationInf
 }
 
 export function genBilanIntermediaireApprenti(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
+  const termine = isFormationTerminee(f);
   let extra = "";
-  stagiaires.slice(0, 10).forEach((s, i) => {
-    const sc = EVAL_SCORES[i] || [7, 8, 7, 8, 7];
-    const avg = Math.round(sc.map(v => Math.min(10, v + 1)).reduce((a, b) => a + b, 0) / sc.length * 10) / 10;
-    extra += `<div class="section"><h3>${s.prenom} ${s.nom} – ${s.entreprise}</h3>
-      <p><strong>Note intermédiaire :</strong> ${avg}/10<br><strong>Assiduité CFA :</strong> ${95 + (i % 5)}%<br><strong>Appréciation MA :</strong> ${avg >= 8 ? "Très satisfaisant" : avg >= 6 ? "Satisfaisant" : "En progression"}<br><strong>Appréciation CFA :</strong> ${avg >= 8 ? "Excellent parcours" : "Bonne progression"}</p></div>`;
-  });
+  if (!termine) {
+    extra += `<div class="section section-green"><p><em>La formation est en cours. Les bilans intermédiaires seront complétés au fur et à mesure de l'avancement de la formation.</em></p></div>`;
+    stagiaires.slice(0, 10).forEach((s) => {
+      extra += `<div class="section"><h3>${s.prenom} ${s.nom} – ${s.entreprise}</h3>
+        <p><strong>Note intermédiaire :</strong> ___/10<br><strong>Assiduité CFA :</strong> ___%<br><strong>Appréciation MA :</strong> ___<br><strong>Appréciation CFA :</strong> ___</p></div>`;
+    });
+  } else {
+    stagiaires.slice(0, 10).forEach((s, i) => {
+      const sc = EVAL_SCORES[i] || [7, 8, 7, 8, 7];
+      const avg = Math.round(sc.map(v => Math.min(10, v + 1)).reduce((a, b) => a + b, 0) / sc.length * 10) / 10;
+      extra += `<div class="section"><h3>${s.prenom} ${s.nom} – ${s.entreprise}</h3>
+        <p><strong>Note intermédiaire :</strong> ${avg}/10<br><strong>Assiduité CFA :</strong> ${95 + (i % 5)}%<br><strong>Appréciation MA :</strong> ${avg >= 8 ? "Très satisfaisant" : avg >= 6 ? "Satisfaisant" : "En progression"}<br><strong>Appréciation CFA :</strong> ${avg >= 8 ? "Excellent parcours" : "Bonne progression"}</p></div>`;
+    });
+  }
   return buildDocument({ org: o, title: "BILANS INTERMÉDIAIRES DES APPRENTIS", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra });
 }
 
 export function genBilanFinalApprenti(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
+  const termine = isFormationTerminee(f);
+  if (!termine) {
+    return buildDocument({ org: o, title: "BILANS FINAUX DES APPRENTIS", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires,
+      extraHtml: `<div class="section section-green"><p><em>La formation est en cours. Les bilans finaux seront réalisés à l'issue de la formation.</em></p></div>`,
+      signatures: { type: "2", labels: ["Le Coordinateur CFA", "Le Directeur"], names: [o.responsablePedagogique, o.dirigeant] } });
+  }
   let extra = "";
   stagiaires.slice(0, 10).forEach((s, i) => {
     const sc = EVAL_SCORES[i] || [7, 8, 7, 8, 7];
@@ -304,6 +319,15 @@ export function genBilanFinalApprenti(o: OrganismeInfo, f: FormationInfo, stagia
 
 export function genEvaluationAcquisCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const evalData = getEvalContent(f.intitule);
+  const termine = isFormationTerminee(f);
+  if (!termine) {
+    const rows = stagiaires.slice(0, 10).map((s) => {
+      return [s.prenom + " " + s.nom, ...evalData.competences.map(() => ""), "", ""];
+    });
+    return buildDocument({ org: o, title: "ÉVALUATION DES ACQUIS – CFA", subtitle: f.intitule, table: {
+      headers: ["Apprenti(e)", ...evalData.competences.map((_, i) => `C${i+1}`), "Moyenne", "Validé"], rows
+    } });
+  }
   const rows = stagiaires.slice(0, 10).map((s, i) => {
     const sc = EVAL_SCORES[i] || [7, 8, 7, 8, 7];
     const finalSc = sc.map(v => Math.min(10, v + 2));
@@ -317,7 +341,11 @@ export function genEvaluationAcquisCFA(o: OrganismeInfo, f: FormationInfo, stagi
 
 export function genGrilleValidationCompetences(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const competences = ["Compétence métier 1", "Compétence métier 2", "Compétence transversale", "Autonomie", "Communication pro"];
+  const termine = isFormationTerminee(f);
   const rows = stagiaires.slice(0, 10).map((s, i) => {
+    if (!termine) {
+      return [s.prenom + " " + s.nom, ...competences.map(() => "")];
+    }
     const sc = EVAL_SCORES[i] || [7, 8, 7, 8, 7];
     return [s.prenom + " " + s.nom, ...competences.map((_, ci) => {
       const v = Math.min(10, sc[ci % sc.length] + 2);

@@ -770,3 +770,32 @@ export function applyGender(html: string, s: { civilite?: string } | undefined |
   result = result.replace(/Il\/Elle/g, isFem ? "Elle" : "Il");
   return result;
 }
+
+/** Check if a formation's end date is in the past (= formation terminée) */
+export function isFormationTerminee(f: FormationInfo): boolean {
+  if (!f.dateFin) return false;
+  try {
+    const parts = f.dateFin.split('/');
+    if (parts.length === 3) {
+      const d = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+      return d < new Date();
+    }
+    const d = new Date(f.dateFin);
+    return !isNaN(d.getTime()) && d < new Date();
+  } catch { return false; }
+}
+
+/** Check if a specific stagiaire's formation is finished (uses individual dates first) */
+export function isStagiaireFormationTerminee(s: StagiaireInfo, f: FormationInfo): boolean {
+  const dateFin = s.dateFinFormation || f.dateFin;
+  if (!dateFin) return false;
+  try {
+    const parts = dateFin.split('/');
+    if (parts.length === 3) {
+      const d = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+      return d < new Date();
+    }
+    const d = new Date(dateFin);
+    return !isNaN(d.getTime()) && d < new Date();
+  } catch { return false; }
+}

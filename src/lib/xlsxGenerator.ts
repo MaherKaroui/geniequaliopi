@@ -2,7 +2,7 @@
 // This generates HTML tables that open correctly in Excel with formatting
 
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
-import { formatDate } from "./docBuilder";
+import { formatDate, isFormationTerminee } from "./docBuilder";
 import { EVAL_SCORES, getFormationDays } from "./sampleData";
 import { getEvalContent } from "./evalContent";
 import { getEvalBesoinsFinancement } from "./documentGenerator";
@@ -71,27 +71,39 @@ export function generateExcelAssiduite(o: OrganismeInfo, f: FormationInfo, stagi
 
 export function generateExcelEvaluations(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]): string {
   const evalData = getEvalContent(f.intitule);
+  const termine = isFormationTerminee(f);
   let html = tableRow(["Stagiaire", "Positionnement", "Intermédiaire", "Finale", "Moyenne", "Progression", "Résultat"], true);
   stagiaires.slice(0, 10).forEach((s, i) => {
-    const sc = EVAL_SCORES[i] || [7, 8, 7, 8, 7];
-    const pos = Math.round(sc.reduce((a, b) => a + b, 0) / sc.length * 10) / 10;
-    const inter = Math.round((pos * 10 + 10) / 10 * 10) / 10;
-    const fin = Math.round((pos * 10 + 20) / 10 * 10) / 10;
-    const avg = Math.round((pos + inter + fin) / 3 * 10) / 10;
-    html += tableRow([s.prenom + " " + s.nom, `${pos}/10`, `${Math.min(10, inter)}/10`, `${Math.min(10, fin)}/10`, `${Math.min(10, avg)}/10`, `+${Math.round((fin - pos) * 10) / 10}`, fin >= 6 ? "✅ Validé" : "⚠️"]);
+    if (termine) {
+      const sc = EVAL_SCORES[i] || [7, 8, 7, 8, 7];
+      const pos = Math.round(sc.reduce((a, b) => a + b, 0) / sc.length * 10) / 10;
+      const inter = Math.round((pos * 10 + 10) / 10 * 10) / 10;
+      const fin = Math.round((pos * 10 + 20) / 10 * 10) / 10;
+      const avg = Math.round((pos + inter + fin) / 3 * 10) / 10;
+      html += tableRow([s.prenom + " " + s.nom, `${pos}/10`, `${Math.min(10, inter)}/10`, `${Math.min(10, fin)}/10`, `${Math.min(10, avg)}/10`, `+${Math.round((fin - pos) * 10) / 10}`, fin >= 6 ? "✅ Validé" : "⚠️"]);
+    } else {
+      html += tableRow([s.prenom + " " + s.nom, "", "", "", "", "", ""]);
+    }
   });
   return excelWrap(`Évaluations – ${f.intitule}`, [{ name: "Évaluations", html }]);
 }
 
 export function generateExcelSatisfaction(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]): string {
+  const termine = isFormationTerminee(f);
   const criteres = ["Accueil", "Objectifs", "Contenu", "Pédagogie", "Formateur", "Supports", "Durée", "Recommandation"];
   let html = tableRow(["Stagiaire", ...criteres, "Moyenne"], true);
   stagiaires.slice(0, 10).forEach((s, i) => {
-    const scores = criteres.map((_, ci) => 4 + ((i + ci) % 2));
-    const avg = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length * 10) / 10;
-    html += tableRow([s.prenom + " " + s.nom, ...scores.map(v => `${v}/5`), `${avg}/5`]);
+    if (termine) {
+      const scores = criteres.map((_, ci) => 4 + ((i + ci) % 2));
+      const avg = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length * 10) / 10;
+      html += tableRow([s.prenom + " " + s.nom, ...scores.map(v => `${v}/5`), `${avg}/5`]);
+    } else {
+      html += tableRow([s.prenom + " " + s.nom, ...criteres.map(() => ""), ""]);
+    }
   });
-  html += tableRow(["MOYENNE", ...criteres.map((_, ci) => { const vals = stagiaires.slice(0,10).map((_, i) => 4 + ((i + ci) % 2)); return `${(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1)}/5`; }), "4.5/5"]);
+  if (termine) {
+    html += tableRow(["MOYENNE", ...criteres.map((_, ci) => { const vals = stagiaires.slice(0,10).map((_, i) => 4 + ((i + ci) % 2)); return `${(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1)}/5`; }), "4.5/5"]);
+  }
   return excelWrap(`Satisfaction – ${f.intitule}`, [{ name: "Satisfaction", html }]);
 }
 

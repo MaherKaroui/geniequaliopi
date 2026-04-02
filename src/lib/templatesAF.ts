@@ -1,6 +1,6 @@
 // Additional AF (Action de Formation) template generators
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
-import { buildDocument, formatDate, tableHTML, signatureBlock2, signatureBlock3, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif, linkUrl } from "./docBuilder";
+import { buildDocument, formatDate, tableHTML, signatureBlock2, signatureBlock3, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif, linkUrl, isFormationTerminee } from "./docBuilder";
 import { FormateurInfo, EVAL_SCORES } from "./sampleData";
 import { getEvalContent, generateStagiaireAnswers, computeQCMScore } from "./evalContent";
 
@@ -477,12 +477,16 @@ export function genTestFinal(o: OrganismeInfo, f: FormationInfo, stagiaires: Sta
 
 export function genGrilleAcquisitionCompetences(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const evalData = getEvalContent(f.intitule);
+  const termine = isFormationTerminee(f);
   let extra = `<h2>Grille d'acquisition des compétences – Suivi individuel</h2>`;
   stagiaires.slice(0, 10).forEach((s, i) => {
     const sc = EVAL_SCORES[i] || [7, 8, 7, 8, 7];
     extra += `<h3>${s.prenom} ${s.nom} – ${s.entreprise}</h3>`;
     const rows = evalData.competences.map((comp) => {
-      return [comp, "10/10", "10/10", "✅ Acquis", "+0 pts"];
+      if (termine) {
+        return [comp, "10/10", "10/10", "✅ Acquis", "+0 pts"];
+      }
+      return [comp, "", "", "", ""];
     });
     extra += tableHTML(["Compétence", "Entrée", "Sortie", "Statut", "Progression"], rows);
   });
@@ -492,27 +496,44 @@ export function genGrilleAcquisitionCompetences(o: OrganismeInfo, f: FormationIn
 
 export function genBilanPedagogiqueIndividuel(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const evalData = getEvalContent(f.intitule);
+  const termine = isFormationTerminee(f);
   let extra = "";
-  stagiaires.slice(0, 10).forEach((s, i) => {
-    const sc = EVAL_SCORES[i] || [7, 8, 7, 8, 7];
-    const avg = Math.round(sc.map(v => Math.min(10, v + 2)).reduce((a, b) => a + b, 0) / sc.length * 10) / 10;
-    extra += `<div class="page-break"></div><h2>Bilan pédagogique – ${s.prenom} ${s.nom}</h2>`;
-    extra += `<div class="section"><p><strong>Entreprise :</strong> ${s.entreprise}<br><strong>Poste :</strong> ${s.poste}<br><strong>Note finale :</strong> ${avg}/10<br><strong>Résultat :</strong> ${avg >= 7 ? '✅ Objectifs atteints' : '⚠️ Objectifs partiellement atteints'}</p></div>`;
-    extra += `<div class="section section-green"><p><strong>Appréciation du formateur :</strong> ${evalData.appreciations[i] || "Formation terminée avec un résultat satisfaisant."}</p></div>`;
-    extra += `<p><strong>Points forts :</strong> ${avg >= 8 ? "Excellente maîtrise des compétences clés. Autonomie remarquable." : "Bonne compréhension des fondamentaux. Progression régulière."}</p>`;
-    extra += `<p><strong>Axes d'amélioration :</strong> ${avg >= 8 ? "Approfondir les cas complexes. Partager les acquis avec les collègues." : "Consolider les acquis par la pratique. Revoir les points théoriques."}</p>`;
-    extra += `<p><strong>Recommandations :</strong> ${avg >= 8 ? "Formation complémentaire de niveau expert recommandée." : "Mise en pratique régulière et suivi à 3 mois."}</p>`;
-  });
+  if (!termine) {
+    extra += `<div class="section section-green"><p><em>La formation est en cours. Les bilans pédagogiques individuels seront complétés à l'issue de la formation.</em></p></div>`;
+    stagiaires.slice(0, 10).forEach((s) => {
+      extra += `<div class="page-break"></div><h2>Bilan pédagogique – ${s.prenom} ${s.nom}</h2>`;
+      extra += `<div class="section"><p><strong>Entreprise :</strong> ${s.entreprise}<br><strong>Poste :</strong> ${s.poste}<br><strong>Note finale :</strong> ___/10<br><strong>Résultat :</strong> ___</p></div>`;
+      extra += `<p><strong>Appréciation du formateur :</strong> ___</p>`;
+      extra += `<p><strong>Points forts :</strong> ___</p>`;
+      extra += `<p><strong>Axes d'amélioration :</strong> ___</p>`;
+      extra += `<p><strong>Recommandations :</strong> ___</p>`;
+    });
+  } else {
+    stagiaires.slice(0, 10).forEach((s, i) => {
+      const sc = EVAL_SCORES[i] || [7, 8, 7, 8, 7];
+      const avg = Math.round(sc.map(v => Math.min(10, v + 2)).reduce((a, b) => a + b, 0) / sc.length * 10) / 10;
+      extra += `<div class="page-break"></div><h2>Bilan pédagogique – ${s.prenom} ${s.nom}</h2>`;
+      extra += `<div class="section"><p><strong>Entreprise :</strong> ${s.entreprise}<br><strong>Poste :</strong> ${s.poste}<br><strong>Note finale :</strong> ${avg}/10<br><strong>Résultat :</strong> ${avg >= 7 ? '✅ Objectifs atteints' : '⚠️ Objectifs partiellement atteints'}</p></div>`;
+      extra += `<div class="section section-green"><p><strong>Appréciation du formateur :</strong> ${evalData.appreciations[i] || "Formation terminée avec un résultat satisfaisant."}</p></div>`;
+      extra += `<p><strong>Points forts :</strong> ${avg >= 8 ? "Excellente maîtrise des compétences clés. Autonomie remarquable." : "Bonne compréhension des fondamentaux. Progression régulière."}</p>`;
+      extra += `<p><strong>Axes d'amélioration :</strong> ${avg >= 8 ? "Approfondir les cas complexes. Partager les acquis avec les collègues." : "Consolider les acquis par la pratique. Revoir les points théoriques."}</p>`;
+      extra += `<p><strong>Recommandations :</strong> ${avg >= 8 ? "Formation complémentaire de niveau expert recommandée." : "Mise en pratique régulière et suivi à 3 mois."}</p>`;
+    });
+  }
   return buildDocument({ org: o, title: "BILANS PÉDAGOGIQUES INDIVIDUELS", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra,
     signatures: { type: "2", labels: ["Le Formateur", "Le Resp. Pédagogique"], names: [f.formateur, o.responsablePedagogique] } });
 }
 
 export function genRapportFinFormation(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const nbStag = Math.min(stagiaires.length, 10);
+  const termine = isFormationTerminee(f);
+  const resultatsContent = termine
+    ? `<p>• Taux de réussite : 90%<br>• Note moyenne du groupe : 8.2/10<br>• Taux de présence : 98%<br>• Satisfaction globale : 4.7/5 (94%)</p>`
+    : `<p><em>Formation en cours – Les résultats seront disponibles à l'issue de la formation.</em></p>`;
   return buildDocument({ org: o, title: "RAPPORT DE FIN DE FORMATION", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, sections: [
     { heading: "Synthèse de la formation", content: `<p>La formation « ${f.intitule} » d'une durée de ${f.duree} s'est déroulée en modalité ${f.modalites} à ${f.lieu}.<br>Nombre de stagiaires : ${nbStag}<br>Formateur : ${f.formateur}</p>` },
-    { heading: "Déroulement", content: "<p>La formation s'est déroulée conformément au programme prévu. L'ensemble des modules a été couvert. Les stagiaires ont été actifs et participatifs tout au long de la formation.</p>" },
-    { heading: "Résultats pédagogiques", content: `<p>• Taux de réussite : 90%<br>• Note moyenne du groupe : 8.2/10<br>• Taux de présence : 98%<br>• Satisfaction globale : 4.7/5 (94%)</p>`, variant: "green" },
+    { heading: "Déroulement", content: termine ? "<p>La formation s'est déroulée conformément au programme prévu. L'ensemble des modules a été couvert. Les stagiaires ont été actifs et participatifs tout au long de la formation.</p>" : "<p>La formation est actuellement en cours de réalisation conformément au programme prévu.</p>" },
+    { heading: "Résultats pédagogiques", content: resultatsContent, variant: "green" },
     { heading: "Adaptations réalisées", content: "<p>• Rythme adapté pour 2 stagiaires de niveau débutant<br>• Exercices supplémentaires proposés aux stagiaires avancés<br>• Support de synthèse complémentaire distribué</p>" },
     { heading: "Recommandations", content: "<p>• Proposer un module complémentaire de perfectionnement<br>• Prévoir un suivi à 3 mois pour évaluer le transfert des acquis<br>• Mettre à jour le module 2 avec les dernières évolutions</p>" },
     { heading: "Incidents et remarques", content: "<p>Aucun incident à signaler. Formation conforme aux attentes.</p>" },
@@ -522,6 +543,11 @@ export function genRapportFinFormation(o: OrganismeInfo, f: FormationInfo, stagi
 // ========== DOCUMENTS QUALITÉ AF ==========
 
 export function genSatisfactionFroid(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
+  const termine = isFormationTerminee(f);
+  if (!termine) {
+    return buildDocument({ org: o, title: "QUESTIONNAIRE DE SATISFACTION À FROID", subtitle: `${f.intitule} – 3 mois après`, formation: f, showFormationInfo: true, stagiaires,
+      extraHtml: `<div class="section section-green"><p><em>La formation est en cours. L'enquête de satisfaction à froid sera réalisée 3 mois après la fin de la formation.</em></p></div>` });
+  }
   const questions = ["Utilisation des acquis au quotidien", "Impact sur la performance", "Compétences encore utiles", "Besoins complémentaires identifiés", "Recommanderiez-vous cette formation"];
   let extra = `<p><em>Enquête réalisée 3 mois après la formation – Taux de réponse : ${Math.min(stagiaires.length, 10) > 5 ? "85" : "90"}%</em></p>`;
   stagiaires.slice(0, 8).forEach((s, si) => {
@@ -549,6 +575,11 @@ export function genSatisfactionFroid(o: OrganismeInfo, f: FormationInfo, stagiai
 }
 
 export function genSatisfactionEntreprise(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
+  const termine = isFormationTerminee(f);
+  if (!termine) {
+    return buildDocument({ org: o, title: "QUESTIONNAIRE DE SATISFACTION ENTREPRISE", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires,
+      extraHtml: `<div class="section section-green"><p><em>La formation est en cours. L'enquête de satisfaction entreprise sera réalisée à l'issue de la formation.</em></p></div>` });
+  }
   const entreprises = [...new Set(stagiaires.slice(0, 10).map(s => s.entreprise).filter(Boolean))];
   let extra = "";
   entreprises.forEach((ent, i) => {

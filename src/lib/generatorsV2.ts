@@ -1,6 +1,6 @@
 // Improved generators for IND 9, 10, 11 - Qualiopi compliant (reference: Select Formation docs)
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
-import { buildDocument, tableHTML, formatDate, subtractBusinessDays, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif, getStagiaireDuree } from "./docBuilder";
+import { buildDocument, tableHTML, formatDate, subtractBusinessDays, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif, getStagiaireDuree, isFormationTerminee } from "./docBuilder";
 import { EVAL_SCORES, getFormationDays, CONNECTION_TIMES_6H, CONNECTION_TIMES_7H, parseDuree } from "./sampleData";
 
 function getHoraireFin(f: FormationInfo): string {
@@ -527,6 +527,7 @@ export function genProcedureAdaptation_V2(o: OrganismeInfo, f: FormationInfo) {
 
 export function genTableauSuiviParcours_V2(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const days = getFormationDays(f);
+  const termine = isFormationTerminee(f);
   const headers = [
     "Nom", "Prénom", "Sexe", "Prise en charge", "Nature", "Handicap", "Observations",
     "Date entrée", "Date sortie",
@@ -548,7 +549,7 @@ export function genTableauSuiviParcours_V2(o: OrganismeInfo, f: FormationInfo, s
       formatDate(getStagiaireDateDebut(s, f)), formatDate(getStagiaireDateFin(s, f)),
       formatDate(getStagiaireDateDebut(s, f)), 'aucune', 'aucune', 'aucune',
       ...presences,
-      '', `${avg}/10`, avg >= 6 ? 'oui' : 'non', 'oui'
+      '', termine ? `${avg}/10` : '', termine ? (avg >= 6 ? 'oui' : 'non') : '', termine ? 'oui' : ''
     ];
   });
 
@@ -561,6 +562,20 @@ export function genTableauSuiviParcours_V2(o: OrganismeInfo, f: FormationInfo, s
 
 export function genEvaluationFinaleStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], stagiaireIdx: number) {
   const s = stagiaires[stagiaireIdx] || stagiaires[0];
+  const termine = isFormationTerminee(f);
+  
+  if (!termine) {
+    let extra = `
+      <h2>Évaluation Finale – ${f.intitule}</h2>
+      <p><strong>Nom du stagiaire :</strong> ${s.prenom} ${s.nom}</p>
+      <p><strong>Date :</strong> ${formatDate(getStagiaireDateFin(s, f))}</p>
+      <p><strong>Organisme :</strong> ${o.nom}</p>
+      <p><strong>Formation :</strong> ${f.intitule}</p>
+      <div class="section section-green"><p><em>La formation est en cours. L'évaluation finale sera complétée à l'issue de la formation.</em></p></div>
+    `;
+    return buildDocument({ org: o, title: "ÉVALUATION FINALE", subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, extraHtml: extra });
+  }
+  
   const evalData = getEvalContent(f.intitule);
   const questions = evalData.qcmFinal.slice(0, 5); // 5 QCM questions
   const answers = generateStagiaireAnswers(questions, stagiaireIdx + 100);
@@ -669,6 +684,11 @@ export function genExercicesTrame(o: OrganismeInfo, f: FormationInfo) {
 
 export function genExercicesStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], stagiaireIdx: number, exerciceIdx?: number) {
   const s = stagiaires[stagiaireIdx] || stagiaires[0];
+  const termine = isFormationTerminee(f);
+  if (!termine) {
+    return buildDocument({ org: o, title: `ÉVALUATION FINALE – EXERCICES & JEUX – FORMATION ${f.intitule.toUpperCase()}`, subtitle: `${s.prenom} ${s.nom}`,
+      extraHtml: `<p><strong>Nom et prénom :</strong> ${s.prenom} ${s.nom}</p><div class="section section-green"><p><em>La formation est en cours. Les exercices seront complétés et évalués à l'issue de la formation.</em></p></div>` });
+  }
   const evalData = getEvalContent(f.intitule);
   const allExercices = evalData.exercices;
   const sc = EVAL_SCORES[stagiaireIdx] || [7, 8, 7, 8, 7];
@@ -1013,8 +1033,9 @@ export function genGrilleAcquisitionStagiaire(o: OrganismeInfo, f: FormationInfo
 
   const headers = ["", "NIVEAU", "", ""];
   const subHeaders = ["COMPÉTENCES PROFESSIONNELLES", "ACQUIS", "NON ACQUIS", "EN COURS D'ACQUISITION"];
+  const termine = isFormationTerminee(f);
   const rows = evalData.competences.map((comp) => {
-    return [comp, 'X', '', ''];
+    return termine ? [comp, 'X', '', ''] : [comp, '', '', ''];
   });
 
   extra += tableHTML(subHeaders, rows);
@@ -1031,6 +1052,11 @@ export function genGrilleAcquisitionStagiaire(o: OrganismeInfo, f: FormationInfo
 
 export function genAttestationReussiteStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], stagiaireIdx: number) {
   const s = stagiaires[stagiaireIdx] || stagiaires[0];
+  const termine = isFormationTerminee(f);
+  if (!termine) {
+    return buildDocument({ org: o, title: "ATTESTATION DE RÉUSSITE", subtitle: `${s.prenom} ${s.nom} – ${f.intitule}`, stagiaires: [s],
+      extraHtml: `<div class="section section-green"><p><em>La formation est en cours. L'attestation de réussite sera délivrée à l'issue de la formation.</em></p></div>` });
+  }
   const stagDuree = getStagiaireDuree(s, f);
   const dureeHeures = parseInt(stagDuree) || (getFormationDays(f).length * 7);
   const tauxRealisation = 100; // Default to 100%
@@ -1070,6 +1096,11 @@ function getDocStyleColor(): string {
 
 // Évaluation finale par exercices et jeux (group format)
 export function genExercicesPratiques_V2(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
+  const termine = isFormationTerminee(f);
+  if (!termine) {
+    return buildDocument({ org: o, title: "ÉVALUATION FINALE – EXERCICES & JEUX", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, 
+      extraHtml: `<div class="section section-green"><p><em>La formation est en cours. Les résultats des exercices et jeux pédagogiques seront disponibles à l'issue de la formation.</em></p></div>` });
+  }
   const evalData = getEvalContent(f.intitule);
   const exercices = evalData.exercices;
   let extra = `<h2>ÉVALUATION FINALE – EXERCICES & JEUX</h2>`;
@@ -1161,6 +1192,11 @@ export function genExercicesPratiques_V2(o: OrganismeInfo, f: FormationInfo, sta
 
 // Improved QCM Final (2-part format: QCM + cas pratique) - removes signatures
 export function genQCMFinal_V2(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
+  const termine = isFormationTerminee(f);
+  if (!termine) {
+    return buildDocument({ org: o, title: "ÉVALUATION FINALE – RÉSULTATS", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires,
+      extraHtml: `<div class="section section-green"><p><em>La formation est en cours. Les résultats de l'évaluation finale seront disponibles à l'issue de la formation.</em></p></div>` });
+  }
   const evalData = getEvalContent(f.intitule);
   const questions = evalData.qcmFinal.slice(0, 5);
   let extra = `<h2>ÉVALUATION FINALE</h2>`;
@@ -1210,6 +1246,7 @@ export function genQCMFinal_V2(o: OrganismeInfo, f: FormationInfo, stagiaires: S
 // Improved grille acquisition (group format) - removes signatures
 export function genGrilleAcquisition_V2(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const evalData = getEvalContent(f.intitule);
+  const termine = isFormationTerminee(f);
   let extra = '';
   stagiaires.slice(0, 10).forEach((s, si) => {
     if (si > 0) extra += '<div class="page-break"></div>';
@@ -1219,7 +1256,7 @@ export function genGrilleAcquisition_V2(o: OrganismeInfo, f: FormationInfo, stag
     extra += `<p><strong>NOM / PRÉNOM :</strong> ${s.prenom} ${s.nom}</p>`;
     extra += `<p><strong>FORMATION :</strong> ${f.intitule}</p>`;
     const rows = evalData.competences.map((comp) => {
-      return [comp, 'X', '', ''];
+      return termine ? [comp, 'X', '', ''] : [comp, '', '', ''];
     });
     extra += tableHTML(["COMPÉTENCES PROFESSIONNELLES", "ACQUIS", "NON ACQUIS", "EN COURS D'ACQUISITION"], rows);
     extra += `<p>${formatDate(getStagiaireDateFin(s, f))}, par le Formateur : ${f.formateur}</p>`;
@@ -1231,6 +1268,11 @@ export function genGrilleAcquisition_V2(o: OrganismeInfo, f: FormationInfo, stag
 
 // Improved certificat_reussite (group format) with assiduité - signature organisme only
 export function genCertificatReussite_V2(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
+  const termine = isFormationTerminee(f);
+  if (!termine) {
+    return buildDocument({ org: o, title: "ATTESTATIONS DE RÉUSSITE", subtitle: f.intitule, stagiaires,
+      extraHtml: `<div class="section section-green"><p><em>La formation est en cours. Les attestations de réussite seront délivrées à l'issue de la formation.</em></p></div>` });
+  }
   let extra = '';
   stagiaires.slice(0, 10).forEach((s, si) => {
     if (si > 0) extra += '<div class="page-break"></div>';
