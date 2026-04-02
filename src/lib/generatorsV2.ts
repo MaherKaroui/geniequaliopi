@@ -684,6 +684,11 @@ export function genExercicesTrame(o: OrganismeInfo, f: FormationInfo) {
 
 export function genExercicesStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], stagiaireIdx: number, exerciceIdx?: number) {
   const s = stagiaires[stagiaireIdx] || stagiaires[0];
+  const termine = isFormationTerminee(f);
+  if (!termine) {
+    return buildDocument({ org: o, title: `ÉVALUATION FINALE – EXERCICES & JEUX – FORMATION ${f.intitule.toUpperCase()}`, subtitle: `${s.prenom} ${s.nom}`,
+      extraHtml: `<p><strong>Nom et prénom :</strong> ${s.prenom} ${s.nom}</p><div class="section section-green"><p><em>La formation est en cours. Les exercices seront complétés et évalués à l'issue de la formation.</em></p></div>` });
+  }
   const evalData = getEvalContent(f.intitule);
   const allExercices = evalData.exercices;
   const sc = EVAL_SCORES[stagiaireIdx] || [7, 8, 7, 8, 7];
