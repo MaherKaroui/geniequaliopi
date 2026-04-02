@@ -2507,6 +2507,16 @@ function genCertificat(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiaire
 }
 
 function genSuivi3Mois(o: OrganismeInfo, f: FormationInfo) {
+  const termine = isFormationTerminee(f);
+  // Le suivi à 3 mois ne peut être rempli que 3 mois après la fin de formation
+  const dateFin = f.dateFin ? new Date(f.dateFin) : null;
+  const troisMoisApres = dateFin ? new Date(dateFin.getTime() + 90 * 24 * 60 * 60 * 1000) <= new Date() : false;
+  if (!termine || !troisMoisApres) {
+    return buildDocument({ org: o, title: "QUESTIONNAIRE DE SUIVI À 3 MOIS", subtitle: f.intitule, sections: [
+      { heading: "Utilisation des acquis", content: "<p>Les compétences acquises sont-elles utilisées dans votre poste ? ___<br>Impact sur votre performance : ___/10<br>Compétences les plus utiles : ___</p>" },
+      { heading: "Situation professionnelle", content: "<p>Évolution depuis la formation : ___<br>La formation a-t-elle contribué ? ___</p>" },
+    ] });
+  }
   return buildDocument({ org: o, title: "QUESTIONNAIRE DE SUIVI À 3 MOIS", subtitle: f.intitule, sections: [
     { heading: "Utilisation des acquis", content: "<p>Les compétences acquises sont-elles utilisées dans votre poste ? <strong class='check'>✅ Oui, quotidiennement</strong><br>Impact sur votre performance : <strong class='check'>8/10</strong><br>Compétences les plus utiles : Maîtrise des outils, méthodologie, autonomie</p>" },
     { heading: "Situation professionnelle", content: "<p>Évolution depuis la formation : <strong>Promotion / Nouvelles responsabilités</strong><br>La formation a-t-elle contribué ? <strong class='check'>✅ Oui</strong></p>" },
