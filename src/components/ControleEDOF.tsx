@@ -420,6 +420,12 @@ export default function ControleEDOF({ organisme, formation, stagiaires }: Contr
                   return (
                     <div key={eyDoc.code} className="p-4 flex flex-col sm:flex-row items-start gap-3 bg-background">
                       <div className="flex items-start gap-3 flex-1 min-w-0">
+                        <input
+                          type="checkbox"
+                          checked={selectedDocs.has(eyDoc.code)}
+                          onChange={() => toggleSelectDoc(eyDoc.code)}
+                          className="w-4 h-4 mt-0.5 rounded border-border accent-primary cursor-pointer shrink-0"
+                        />
                         {cfg.icon}
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
