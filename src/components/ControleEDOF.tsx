@@ -228,6 +228,16 @@ export default function ControleEDOF({ organisme, formation, stagiaires }: Contr
     }
   }, [organisme, formation, stagiaires]);
 
+  // Inject signature into HTML before PDF export
+  const injectSignatureIntoHtml = useCallback((html: string, sigDataUrl: string): string => {
+    // Find empty signature placeholders and inject the signature image
+    // Look for sig-box divs that have "Signature :" and inject after it
+    return html.replace(
+      /(Signature\s*:?\s*<\/p>)(\s*(?:<p[^>]*style="min-height:\d+px"[^>]*><\/p>)?)/gi,
+      `$1<img src="${sigDataUrl}" alt="Signature" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px" />`
+    );
+  }, []);
+
   // Download single preview document as PDF
   const handleDownloadPreview = useCallback(async () => {
     if (!previewHtml || !previewDoc) return;
@@ -240,6 +250,20 @@ export default function ControleEDOF({ organisme, formation, stagiaires }: Contr
       toast.error("Erreur : " + (e.message || "Erreur inconnue"));
     }
   }, [previewHtml, previewDoc, orgName]);
+
+  // Download with signature
+  const handleSignAndDownload = useCallback(async () => {
+    if (!previewHtml || !previewDoc || !savedSignature) return;
+    try {
+      const signedHtml = injectSignatureIntoHtml(previewHtml, savedSignature);
+      const blob = await htmlToPdfBlob(signedHtml);
+      const safeName = orgName.replace(/[^a-zA-Z0-9_-]/g, "_");
+      saveAs(blob, `${safeName}_${previewDoc.code}_signe.pdf`);
+      toast.success("Document signé et téléchargé !");
+    } catch (e: any) {
+      toast.error("Erreur : " + (e.message || "Erreur inconnue"));
+    }
+  }, [previewHtml, previewDoc, orgName, savedSignature, injectSignatureIntoHtml]);
 
   const downloadZip = useCallback(async () => {
     setGenerating(true);
