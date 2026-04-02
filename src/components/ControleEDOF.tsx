@@ -22,6 +22,7 @@ interface ControleEDOFProps {
   stagiaires: StagiaireInfo[];
   criteres: CritereData[];
   docStyle?: DocStyleConfig;
+  signature?: string;
 }
 
 const STATUS_CONFIG: Record<EYDocStatus, { label: string; icon: React.ReactNode; color: string }> = {
