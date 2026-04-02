@@ -3105,20 +3105,23 @@ function genCompetencesAlternance(o: OrganismeInfo, f: FormationInfo, stagiaires
 
 function genPlaquetteCommercialeCFA(o: OrganismeInfo, f: FormationInfo) {
   const termine = isFormationTerminee(f);
+  const mc = getModaliteContent(f, o);
   const indicateursContent = termine
     ? `<p>• Taux de réussite aux examens : 89%<br>• Taux de satisfaction des apprentis : 94%<br>• Taux d'insertion professionnelle à 6 mois : 85%<br>• Taux de rupture de contrat : 8%</p>`
     : `<p><em>Nouvel entrant – Phase de lancement</em><br><br>La formation <strong>${f.intitule}</strong> est en cours de déploiement. Les indicateurs de résultats seront disponibles à l'issue de la première promotion.<br><br><strong>Objectifs prévisionnels :</strong><br>• Taux de réussite aux examens visé : ≥ 80%<br>• Taux de satisfaction des apprentis visé : ≥ 90%<br>• Taux d'insertion professionnelle à 6 mois visé : ≥ 75%<br>• Taux de rupture de contrat visé : &lt; 10%</p>`;
 
   return buildDocument({ org: o, title: "PLAQUETTE COMMERCIALE", subtitle: `${f.intitule}`, sections: [
     { heading: "Présentation de l'organisme", content: `<p><strong>${o.nom}</strong> est un Centre de Formation d'Apprentis (CFA) spécialisé dans la formation en alternance. Notre mission : accompagner les apprenants vers l'obtention de leur diplôme tout en développant des compétences opérationnelles en entreprise.</p><p><strong>Adresse :</strong> ${o.adresse}, ${o.codePostal} ${o.ville}<br><strong>Contact :</strong> ${o.email} – ${o.telephone}${o.siteWeb ? `<br><strong>Site web :</strong> ${linkUrl(o.siteWeb)}` : ''}</p>` },
-    { heading: "Formation proposée", content: `<p><strong>Intitulé :</strong> ${f.intitule}<br><strong>Certification visée :</strong> ${f.intitule}<br><strong>Durée :</strong> ${f.duree}<br><strong>Modalités :</strong> ${f.modalites || "Alternance entreprise / centre de formation"}<br><strong>Rythme :</strong> Alternance selon calendrier défini</p>` },
+    { heading: "Formation proposée", content: `<p><strong>Intitulé :</strong> ${f.intitule}<br><strong>Certification visée :</strong> ${f.intitule}<br><strong>Durée :</strong> ${f.duree}<br><strong>Modalités :</strong> ${mc.modaliteLabel}<br><strong>Lieu :</strong> ${mc.lieuFormation}<br><strong>Rythme :</strong> Alternance selon calendrier défini</p>` },
     { heading: "Objectifs de la formation", content: `<p>${f.objectifs || "Former des professionnels qualifiés, capables d'évoluer dans leur métier et d'obtenir la certification visée."}</p>` },
     { heading: "Public visé et prérequis", content: `<p><strong>Public :</strong> ${f.publicVise || "Jeunes de 16 à 29 ans révolus, demandeurs d'emploi, salariés en reconversion"}<br><strong>Prérequis :</strong> ${f.prerequis || "Niveau Bac ou équivalent, motivation pour le métier visé"}</p>` },
-    { heading: "Moyens pédagogiques", content: `<p>• Plateforme de contenu en ligne (supports de cours, vidéos, exercices)<br>• Salle de formation équipée : tables, chaises, télévision, tableau<br>• Formateurs experts issus du monde professionnel<br>• Suivi individualisé par un formateur référent<br>• Accompagnement vers l'emploi et l'insertion professionnelle</p>` },
-    { heading: "Modalités d'évaluation", content: `<p>• Évaluations continues en centre de formation<br>• Examens blancs et mises en situation professionnelle<br>• Évaluation en entreprise par le maître d'apprentissage<br>• Passage des épreuves de certification</p>`, variant: "green" },
+    { heading: "Moyens pédagogiques", content: mc.moyensPedagogiques },
+    { heading: "Moyens techniques", content: mc.moyensTechniques },
+    { heading: "Modalités d'évaluation", content: `<p>• Évaluations continues ${mc.isDist ? 'en ligne' : 'en centre de formation'}<br>• Examens blancs et mises en situation professionnelle<br>• Évaluation en entreprise par le maître d'apprentissage<br>• Passage des épreuves de certification</p>`, variant: "green" },
     { heading: "Financement", content: `<p>La formation en apprentissage est <strong>gratuite pour l'apprenti</strong>. Le coût de la formation est pris en charge par l'OPCO de l'entreprise d'accueil.<br><br><strong>Coût de la formation :</strong> ${f.tarif || "Selon barème OPCO"}</p>` },
     { heading: "Accessibilité", content: `<p>Le CFA ${o.nom} s'engage à accueillir les personnes en situation de handicap. Un référent handicap est disponible pour étudier les aménagements nécessaires.<br><strong>Référent handicap :</strong> ${o.referentHandicap}<br><strong>Contact :</strong> ${o.email}</p>` },
     { heading: "Indicateurs de résultats", content: indicateursContent },
+    ...(mc.isDist ? [{ heading: "Matériel nécessaire pour le stagiaire", content: mc.materielNecessaire }] : []),
   ] });
 }
 
