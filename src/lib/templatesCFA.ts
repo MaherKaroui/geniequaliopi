@@ -446,7 +446,8 @@ export function genTableauSuiviInsertion(o: OrganismeInfo) {
 }
 
 export function genTableauSuiviAssiduite(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
-  const rows = stagiaires.slice(0, 10).map((s, i) => [s.prenom + " " + s.nom, s.entreprise, `${95 + (i % 5)}%`, `${i % 10 < 8 ? 0 : 1}`, `${i % 10 < 7 ? 0 : 1}`, i < 8 ? "✅ Bon" : "⚠️ À suivre"]);
+  const termine = isFormationTerminee(f);
+  const rows = stagiaires.slice(0, 10).map((s, i) => [s.prenom + " " + s.nom, s.entreprise, termine ? `${95 + (i % 5)}%` : "", termine ? `${i % 10 < 8 ? 0 : 1}` : "", termine ? `${i % 10 < 7 ? 0 : 1}` : "", termine ? (i < 8 ? "✅ Bon" : "⚠️ À suivre") : ""]);
   return buildDocument({ org: o, title: "TABLEAU DE SUIVI DE L'ASSIDUITÉ – CFA", subtitle: f.intitule, table: {
     headers: ["Apprenti(e)", "Entreprise", "Taux présence", "Abs justifiées", "Abs injustifiées", "Statut"], rows
   } });
