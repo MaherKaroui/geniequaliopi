@@ -24,7 +24,7 @@ interface StagiairesFormProps {
 
 const emptyStagiaire: StagiaireInfo = {
   civilite: "", nom: "", prenom: "", email: "", telephone: "", entreprise: "", responsableEntreprise: "", signatureResponsableUrl: "", poste: "", dateNaissance: "", dateDebutFormation: "", dateFinFormation: "", tarifFormation: "", signatureUrl: "",
-  adresse: "", codePostal: "", commune: "", nationalite: "", nir: "", departementNaissance: "", communeNaissance: "", diplome: "", rqth: "", formateur: "", formateurSignatureUrl: "",
+  adresse: "", codePostal: "", commune: "", nationalite: "", nir: "", departementNaissance: "", communeNaissance: "", diplome: "", rqth: "", formateur: "", formateurSignatureUrl: "", adresseEntreprise: "", siretEntreprise: "",
 };
 
 const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
@@ -163,6 +163,14 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
             <div>
               <Label>Entreprise</Label>
               <Input value={stagiaire.entreprise} onChange={e => updateStagiaire(index, 'entreprise', e.target.value)} placeholder="Entreprise" />
+            </div>
+            <div>
+              <Label>Adresse entreprise</Label>
+              <Input value={stagiaire.adresseEntreprise || ""} onChange={e => updateStagiaire(index, 'adresseEntreprise', e.target.value)} placeholder="Adresse de l'entreprise" />
+            </div>
+            <div>
+              <Label>SIRET entreprise</Label>
+              <Input value={stagiaire.siretEntreprise || ""} onChange={e => updateStagiaire(index, 'siretEntreprise', e.target.value)} placeholder="SIRET de l'entreprise" />
             </div>
             <div>
               <Label>Responsable entreprise</Label>
