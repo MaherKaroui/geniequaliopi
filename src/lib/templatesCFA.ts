@@ -356,7 +356,8 @@ export function genEvaluationAcquisCFA(o: OrganismeInfo, f: FormationInfo, stagi
 }
 
 export function genGrilleValidationCompetences(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
-  const competences = ["Compétence métier 1", "Compétence métier 2", "Compétence transversale", "Autonomie", "Communication pro"];
+  const evalData = getEvalContent(f.intitule);
+  const competences = evalData.competences.length > 0 ? evalData.competences.slice(0, 5) : ["Compétence métier 1", "Compétence métier 2", "Compétence transversale", "Autonomie", "Communication pro"];
   const termine = isFormationTerminee(f);
   const rows = stagiaires.slice(0, 10).map((s, i) => {
     if (!termine) {
