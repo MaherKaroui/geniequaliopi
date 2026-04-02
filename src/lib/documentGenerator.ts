@@ -10849,18 +10849,7 @@ function genContratFormationParBloc(o: OrganismeInfo, f: FormationInfo, stagiair
   const numeroAction = s.numeroAction || "—";
 
   const rncp = getRNCPByCode(f.codeRNCP || '');
-  let blocsHtml = '';
-  if (rncp && rncp.blocsCompetences.length > 0) {
-    blocsHtml += '<h3>Détail des blocs de compétences</h3>';
-    blocsHtml += '<table><tr><th>N° Bloc</th><th>Intitulé du bloc</th><th>N° Action</th><th>Volume horaire</th></tr>';
-    rncp.blocsCompetences.forEach((bloc, i) => {
-      const volume = bloc.matieres.reduce((s, m) => s + (parseInt(m.volume) || 0), 0);
-      blocsHtml += `<tr><td>Bloc ${i + 1}</td><td>${bloc.titre}</td><td>${numeroAction}</td><td>${volume}h</td></tr>`;
-    });
-    blocsHtml += '</table>';
-  } else {
-    blocsHtml += `<p><strong>Numéro d'action :</strong> ${numeroAction}</p>`;
-  }
+  const blocsHtml = `<p><strong>Numéro d'action :</strong> ${numeroAction}</p>`;
 
   const body = buildDocument({ org: o, title: "CONTRAT DE FORMATION PAR BLOC DE COMPÉTENCES", subtitle: f.intitule, formation: f, showFormationInfo: false, sections: [
     { heading: "Entre les soussignés", content: `<h3>1. L'organisme de formation ${o.nom}</h3><p>Adresse : ${o.adresse}, ${o.codePostal} ${o.ville}<br>SIRET : ${o.siret}<br>NDA : ${o.nda}<br>Représenté par ${o.dirigeant}</p><h3>2. Le/La stagiaire</h3><p>Nom et prénom : ${s.prenom} ${s.nom}${s.email ? `<br>Email : ${s.email}` : ''}${s.telephone ? `<br>Téléphone : ${s.telephone}` : ''}${s.adresse ? `<br>Adresse : ${s.adresse}` : ''}</p><p><strong>N° Action :</strong> ${numeroAction}</p>` },
