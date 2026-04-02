@@ -9145,7 +9145,7 @@ function getCFAWeekDates(f: FormationInfo): { cfaWeekNum: number; weekStart: Dat
 }
 
 function genExercicesCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number, exerciceIdx: number, extraParams?: Record<string, any>) {
-  const termine = isFormationTerminee(f);
+  const formationTerminee = isFormationTerminee(f);
   const s = stagiaires[si] || stagiaires[0] || { nom: 'Dupont', prenom: 'Marie', email: '', telephone: '', entreprise: '', poste: '' } as StagiaireInfo;
   const rncp = getRNCPByCode(f.codeRNCP || '');
   const { totalHours } = parseDuree(f.duree);
@@ -9405,6 +9405,18 @@ const FALLBACK_STAGIAIRE: StagiaireInfo = { prenom: "Martin", nom: "Dupont", civ
   ];
   const obsIdx = (hash + si + exerciceIdx) % observations.length;
   const observation = observations[obsIdx];
+
+  // Determine if this specific exercise's date has passed (not just formation end)
+  let exerciseDatePassed = formationTerminee;
+  if (!formationTerminee && dateStr !== '___/___/______') {
+    // Parse dd/mm/yyyy
+    const parts = dateStr.split('/');
+    if (parts.length === 3) {
+      const exDate = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+      exerciseDatePassed = exDate <= new Date();
+    }
+  }
+  const termine = exerciseDatePassed;
 
   const studentText = termine ? buildStudentResponse() : '';
 
