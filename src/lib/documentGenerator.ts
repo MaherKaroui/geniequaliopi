@@ -3412,6 +3412,7 @@ function genSuiviChiffreFormationExcel(o: OrganismeInfo, f: FormationInfo, stagi
   const effectiveTotal = totalHours > 0 ? totalHours : 420;
   const isCFA = !!(f.rythmeAlternance && f.rythmeAlternance.trim().length > 0);
   const totalCFAWeeks = Math.max(1, Math.ceil(effectiveTotal / 35));
+  const termine = isFormationTerminee(f);
 
   const tr = (cells: string[], isHeader = false) => {
     const tag = isHeader ? 'th' : 'td';
@@ -3431,24 +3432,32 @@ function genSuiviChiffreFormationExcel(o: OrganismeInfo, f: FormationInfo, stagi
   sheet1 += tr(["Formation", f.intitule, "", "", ""]);
   sheet1 += tr(["Code certification", f.codeRNCP || "Non certifiante", "", "", ""]);
   sheet1 += tr(["Période", `${fmtD(startDate)} – ${fmtD(endDate)}`, "", "", ""]);
+  sheet1 += tr(["Statut", termine ? "Formation terminée" : "Formation en cours", "", "", ""]);
   sheet1 += tr(["Volume horaire total", `${effectiveTotal}h`, `${effectiveTotal}h`, "0", ""]);
   if (isCFA) {
     sheet1 += tr(["Rythme alternance", f.rythmeAlternance || "", "", "", ""]);
     sheet1 += tr(["Semaines CFA", `${totalCFAWeeks}`, "", "", ""]);
   }
   sheet1 += tr(["Nombre d'inscrits", `${stagiaires.length}`, "", "", ""]);
-  sheet1 += tr(["Nombre de présents", `${stagiaires.length}`, `${stagiaires.length}`, "0", ""]);
-  sheet1 += tr(["Taux de présence", "100%", "≥ 90%", "", "À compléter"]);
-  sheet1 += tr(["Taux d'abandon", "0%", "< 5%", "", "À compléter"]);
-  sheet1 += tr(["Taux de satisfaction global", "", "≥ 80%", "", "À compléter"]);
+  if (termine) {
+    sheet1 += tr(["Nombre de présents", "", `${stagiaires.length}`, "", "À compléter"]);
+    sheet1 += tr(["Taux de présence", "", "≥ 90%", "", "À compléter"]);
+    sheet1 += tr(["Taux d'abandon", "", "< 5%", "", "À compléter"]);
+    sheet1 += tr(["Taux de satisfaction global", "", "≥ 80%", "", "À compléter"]);
+  } else {
+    sheet1 += tr(["Nombre de présents", `${stagiaires.length}`, `${stagiaires.length}`, "", "En cours – à actualiser"]);
+    sheet1 += tr(["Taux de présence", "—", "≥ 90%", "", "Formation en cours"]);
+    sheet1 += tr(["Taux d'abandon", "—", "< 5%", "", "Formation en cours"]);
+    sheet1 += tr(["Taux de satisfaction global", "—", "≥ 80%", "", "Enquête à réaliser en fin de formation"]);
+  }
   if (rncp) {
-    sheet1 += tr(["Taux de réussite certification", "", "≥ 70%", "", "À compléter"]);
-    sheet1 += tr(["Taux de présentation à l'examen", "", "≥ 90%", "", "À compléter"]);
-    sheet1 += tr(["Taux d'insertion professionnelle", "", "≥ 60%", "", "À compléter à 6 mois"]);
+    sheet1 += tr(["Taux de réussite certification", termine ? "" : "—", "≥ 70%", "", termine ? "À compléter" : "Formation en cours"]);
+    sheet1 += tr(["Taux de présentation à l'examen", termine ? "" : "—", "≥ 90%", "", termine ? "À compléter" : "Formation en cours"]);
+    sheet1 += tr(["Taux d'insertion professionnelle", termine ? "" : "—", "≥ 60%", "", termine ? "À compléter à 6 mois" : "Formation en cours"]);
   }
   if (isCFA) {
-    sheet1 += tr(["Taux de rupture de contrat", "", "< 10%", "", "À compléter"]);
-    sheet1 += tr(["Nombre de visites entreprise", "", `≥ ${stagiaires.length * 2}`, "", "À compléter"]);
+    sheet1 += tr(["Taux de rupture de contrat", termine ? "" : "—", "< 10%", "", termine ? "À compléter" : "Formation en cours"]);
+    sheet1 += tr(["Nombre de visites entreprise", termine ? "" : "—", `≥ ${stagiaires.length * 2}`, "", termine ? "À compléter" : "Formation en cours"]);
   }
   sheets.push({ name: "Indicateurs globaux", html: `<table>${sheet1}</table>` });
 
@@ -3457,7 +3466,7 @@ function genSuiviChiffreFormationExcel(o: OrganismeInfo, f: FormationInfo, stagi
   if (isCFA) stagHeaders.push("Entreprise");
   stagHeaders.push("Date début", "Date fin", "Heures prévues", "Heures réalisées", "Taux présence", "Absences (h)");
   if (rncp) stagHeaders.push("Résultat certification");
-  stagHeaders.push("Satisfaction", "Observations");
+  stagHeaders.push("Satisfaction", "Statut", "Observations");
 
   let sheet2 = tr(stagHeaders, true);
   stagiaires.forEach((s, si) => {
@@ -3467,12 +3476,16 @@ function genSuiviChiffreFormationExcel(o: OrganismeInfo, f: FormationInfo, stagi
       s.dateDebutFormation || f.dateDebut || "",
       s.dateFinFormation || f.dateFin || "",
       `${effectiveTotal}h`,
-      "", // heures réalisées to fill
-      "", // taux presence to fill
-      ""  // absences to fill
+      termine ? "" : "—", // heures réalisées
+      termine ? "" : "—", // taux presence
+      termine ? "" : "—"  // absences
     );
-    if (rncp) cells.push(""); // résultat certification
-    cells.push("", ""); // satisfaction, observations
+    if (rncp) cells.push(termine ? "" : "—"); // résultat certification
+    cells.push(
+      termine ? "" : "—", // satisfaction
+      termine ? "À compléter" : "En cours de formation",
+      "" // observations
+    );
     sheet2 += tr(cells);
   });
   // Add 5 empty rows for future additions
