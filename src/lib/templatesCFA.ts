@@ -454,7 +454,8 @@ export function genTableauSuiviAssiduite(o: OrganismeInfo, f: FormationInfo, sta
 }
 
 export function genTableauSuiviAccompagnement(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
-  const rows = stagiaires.slice(0, 10).map((s, i) => [s.prenom + " " + s.nom, i % 3 === 0 ? "Renforcé" : "Standard", `${1 + (i % 3)} visites`, i < 7 ? "✅" : "🔄", ""]);
+  const termine = isFormationTerminee(f);
+  const rows = stagiaires.slice(0, 10).map((s, i) => [s.prenom + " " + s.nom, termine ? (i % 3 === 0 ? "Renforcé" : "Standard") : "", termine ? `${1 + (i % 3)} visites` : "", termine ? (i < 7 ? "✅" : "🔄") : "", ""]);
   return buildDocument({ org: o, title: "TABLEAU DE SUIVI DE L'ACCOMPAGNEMENT", subtitle: f.intitule, table: {
     headers: ["Apprenti(e)", "Niveau accompagnement", "Visites réalisées", "Objectif atteint", "Remarques"], rows
   } });
