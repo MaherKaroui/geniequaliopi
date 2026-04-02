@@ -2557,7 +2557,7 @@ function genSupportsCours(o: OrganismeInfo, f: FormationInfo) {
 
 function genGuideElearning(o: OrganismeInfo, f: FormationInfo) {
   return buildDocument({ org: o, title: "GUIDE PLATEFORME E-LEARNING", subtitle: f.intitule, sections: [
-    { heading: "Connexion", content: "<p>1. Rendez-vous sur https://moodle.formapro-excellence.fr<br>2. Saisissez votre identifiant (email) et mot de passe<br>3. Accédez à votre tableau de bord</p>" },
+    { heading: "Connexion", content: `<p>1. Rendez-vous sur ${o.siteWeb && o.siteWeb.trim() ? `https://moodle.${o.siteWeb.replace(/^https?:\/\//, '').replace(/^www\./, '')}` : 'la plateforme e-learning de votre organisme'}<br>2. Saisissez votre identifiant (email) et mot de passe<br>3. Accédez à votre tableau de bord</p>` },
     { heading: "Navigation", content: "<p>• Mes formations : accès aux cours en cours<br>• Ressources : documents et vidéos<br>• Évaluations : tests et QCM<br>• Forum : échanges avec le formateur et les autres stagiaires</p>" },
     { heading: "Support technique", content: `<p>En cas de difficulté : ${o.email} ou ${o.telephone}</p>` },
   ] });
