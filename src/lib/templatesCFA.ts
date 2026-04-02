@@ -380,8 +380,16 @@ export function genGrilleAccompagnementIndividualise(o: OrganismeInfo, f: Format
 // ========== C. DOCUMENTS QUALITÉ CFA ==========
 
 export function genSatisfactionApprenti(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
+  const termine = isFormationTerminee(f);
   let extra = "";
   const criteres = ["Accueil au CFA", "Qualité des cours", "Lien CFA/Entreprise", "Accompagnement", "Supports", "Préparation examen"];
+  if (!termine) {
+    stagiaires.slice(0, 8).forEach((s) => {
+      extra += `<h3>${s.prenom} ${s.nom}</h3>` + tableHTML(["Critère", "Note /5"], criteres.map((c) => [c, ""]));
+    });
+    return buildDocument({ org: o, title: "QUESTIONNAIRE SATISFACTION APPRENTI", subtitle: f.intitule, extraHtml: extra,
+      sections: [{ heading: "Moyenne", content: "<p><em>Formation en cours – questionnaire à compléter à l'issue de la formation.</em></p>", variant: "green" }] });
+  }
   stagiaires.slice(0, 8).forEach((s, si) => {
     const scores = criteres.map((_, ci) => 4 + ((si + ci) % 2));
     extra += `<h3>${s.prenom} ${s.nom}</h3>` + tableHTML(["Critère", "Note /5"], criteres.map((c, i) => [c, `${scores[i]}/5`]));
