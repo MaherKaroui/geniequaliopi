@@ -101,12 +101,12 @@ tr:nth-child(even){background:#f8f9fa}
   // === PAGE 2: PRÉSENTATION / SITE INTERNET ===
   html += `<div class="page">
     <h1 class="section-title">PRÉSENTATION</h1>
-    <h2>Site Internet</h2>
+    ${org.siteWeb ? `<h2>Site Internet</h2>
     <div class="info-card">
       <p><strong>URL site internet :</strong> ${org.siteWeb}</p>
       <p><strong>URL pages formations :</strong> ${org.siteWeb}/formations</p>
       <p><strong>Lien catalogue :</strong> ${org.siteWeb}/catalogue</p>
-    </div>
+    </div>` : ''}
     <h2>Informations</h2>
     <div class="info-card">
       <p><strong>Raison sociale :</strong> ${org.nom}</p>
