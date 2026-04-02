@@ -2095,6 +2095,25 @@ function genTestPositionnementIndividuel(o: OrganismeInfo, f: FormationInfo, s: 
   const label = type === "debut" ? "début" : "fin";
   const labelCap = type === "debut" ? "Début" : "Fin";
   const isDebut = type === "debut";
+  const termine = isFormationTerminee(f);
+
+  // For "fin" tests: leave blank if the formation end date hasn't passed
+  if (!isDebut && !termine) {
+    let extra = `<h2>Test de positionnement en ${label} de formation – ${f.intitule}</h2>`;
+    extra += `<p><strong>Nom du stagiaire :</strong> ${s.prenom} ${s.nom}</p>`;
+    extra += `<p><strong>Date prévue :</strong> ${formatDate(getStagiaireDateFin(s, f))}</p>`;
+    extra += `<p><strong>Durée estimée :</strong> 20 minutes</p>`;
+    extra += `<p><em>Ce test sera complété en fin de formation.</em></p>`;
+    extra += `<h3>Questions</h3>`;
+    questions.forEach((q, qi) => {
+      extra += `<p><strong>${qi + 1}.</strong> ${q.question}</p>`;
+      extra += `<p style="border-bottom:1px dotted #999;padding-bottom:30px">&nbsp;</p>`;
+    });
+    extra += `<h3>Note : ___ /10</h3>`;
+    extra += `<h3>Commentaire du formateur :</h3>`;
+    extra += `<p style="border-bottom:1px dotted #999;padding-bottom:50px">&nbsp;</p>`;
+    return buildDocument({ org: o, title: `TEST DE POSITIONNEMENT ${labelCap.toUpperCase()} DE FORMATION`, subtitle: `${s.prenom} ${s.nom} – ${f.intitule}`, formation: f, showFormationInfo: false, extraHtml: extra });
+  }
 
   const answers = generateStagiaireOpenAnswers(questions, si, isDebut, { nom: s.nom, prenom: s.prenom, entreprise: s.entreprise, poste: s.poste });
   const totalScore = answers.reduce((sum, a) => sum + a.score, 0);
