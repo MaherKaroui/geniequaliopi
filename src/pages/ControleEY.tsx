@@ -333,6 +333,53 @@ const ControleEY = () => {
                   />
                 )}
                 {key === "stagiaires" && <StagiairesForm data={stagiaires} onChange={handleStagChange} />}
+                {key === "signature" && (
+                  <div className="space-y-4">
+                    {signature ? (
+                      <div className="flex items-center gap-4">
+                        <div className="border rounded-lg p-2 bg-white">
+                          <img src={signature} alt="Signature" className="h-16" />
+                        </div>
+                        <div className="flex flex-col gap-2">
+                          <span className="text-sm text-muted-foreground">Votre signature sera appliquée sur tous les documents téléchargés</span>
+                          <div className="flex gap-2">
+                            <Button variant="outline" size="sm" onClick={() => setShowSigPad(true)}>Modifier</Button>
+                            <Button variant="ghost" size="sm" className="text-destructive" onClick={() => { setSignature(''); sessionStorage.removeItem('ey_signature'); }}>Supprimer</Button>
+                          </div>
+                        </div>
+                      </div>
+                    ) : showSigPad ? (
+                      <SignaturePad
+                        label="✍️ Dessinez votre signature"
+                        onSave={(dataUrl) => {
+                          setSignature(dataUrl);
+                          sessionStorage.setItem('ey_signature', dataUrl);
+                          setShowSigPad(false);
+                        }}
+                        onCancel={() => setShowSigPad(false)}
+                      />
+                    ) : (
+                      <div className="text-center py-6">
+                        <p className="text-sm text-muted-foreground mb-3">Aucune signature enregistrée</p>
+                        <Button onClick={() => setShowSigPad(true)} className="gap-2">
+                          <PenTool className="w-4 h-4" />
+                          Dessiner ma signature
+                        </Button>
+                      </div>
+                    )}
+                    {signature && showSigPad && (
+                      <SignaturePad
+                        label="✍️ Nouvelle signature"
+                        onSave={(dataUrl) => {
+                          setSignature(dataUrl);
+                          sessionStorage.setItem('ey_signature', dataUrl);
+                          setShowSigPad(false);
+                        }}
+                        onCancel={() => setShowSigPad(false)}
+                      />
+                    )}
+                  </div>
+                )}
                 {key === "design" && <DocStyleConfigPanel style={docStyle} onChange={handleStyleChange} />}
               </div>
             )}
