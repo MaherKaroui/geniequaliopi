@@ -54,7 +54,10 @@ export default function ControleEDOF({ organisme, formation, stagiaires }: Contr
   const [previewTitle, setPreviewTitle] = useState("");
   const [previewLoading, setPreviewLoading] = useState(false);
   const [previewDoc, setPreviewDoc] = useState<EYDocumentItem | null>(null);
-
+  const [showSignaturePad, setShowSignaturePad] = useState(false);
+  const [savedSignature, setSavedSignature] = useState<string>(() => {
+    try { return sessionStorage.getItem('ey_signature') || ''; } catch { return ''; }
+  });
   const orgName = organisme.nom || "Organisme";
 
   const stats = useMemo(() => {
