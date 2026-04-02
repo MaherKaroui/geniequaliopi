@@ -392,28 +392,31 @@ export function generateExcelSuiviInscriptions(o: OrganismeInfo, f: FormationInf
 
 // ===== TABLEAU DE SUIVI DU PARCOURS BÉNÉFICIAIRES ET ADAPTATION (CFA IND 10) =====
 export function generateExcelSuiviParcoursBeneficiairesCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]): string {
-  const today = "31/03/2026";
+  const now = new Date();
+  const today = now.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
   const stags = stagiaires.length > 0 ? stagiaires : [{ prenom: "Martin", nom: "Dupont", civilite: "M." as const, email: "", telephone: "", entreprise: "", poste: "", dateNaissance: "" }];
+  const termine = isFormationTerminee(f);
 
-  // Calculate number of weeks from formation dates (default 52)
-  let nbWeeks = 52;
-  if (f.dateDebut && f.dateFin) {
-    const start = new Date(f.dateDebut);
-    const end = new Date(f.dateFin);
-    const diffMs = end.getTime() - start.getTime();
-    nbWeeks = Math.max(1, Math.ceil(diffMs / (7 * 24 * 60 * 60 * 1000)));
-  }
+  // Synchronized: use CFA week dates from alternance calendar
+  const isCFA = !!(f.rythmeAlternance && f.rythmeAlternance.trim().length > 0);
+  const cfaWeekDates = isCFA ? getCFAWeekDates(f) : [];
+  const nbWeeks = cfaWeekDates.length > 0 ? cfaWeekDates.length : (() => {
+    let w = 52;
+    if (f.dateDebut && f.dateFin) {
+      const start = new Date(f.dateDebut);
+      const end = new Date(f.dateFin);
+      w = Math.max(1, Math.ceil((end.getTime() - start.getTime()) / (7 * 24 * 60 * 60 * 1000)));
+    }
+    return w;
+  })();
 
-  // Generate week headers (S1, S2, ... Sn)
+  // Generate week headers
   const weekHeaders = Array.from({ length: nbWeeks }, (_, i) => `<th>S${i + 1}</th>`).join("");
-  const weekCells = Array.from({ length: nbWeeks }, () => `<td>P</td>`).join("");
 
   let html = `<table>`;
-  // Title row
   const totalCols = 16 + nbWeeks + 10;
   html += `<tr><td class="title" colspan="8">${o.nom}</td><td colspan="5"></td><td>Version à jour au :</td><td colspan="2">${today}</td></tr>`;
   html += `<tr><td colspan="${totalCols}"></td></tr>`;
-  // Section headers
   html += `<tr class="header-row">
     <td colspan="4" style="text-align:center;font-weight:bold">FICHE D'IDENTITÉ DES BÉNÉFICIAIRES</td>
     <td></td>
@@ -426,7 +429,6 @@ export function generateExcelSuiviParcoursBeneficiairesCFA(o: OrganismeInfo, f: 
     <td colspan="2" style="text-align:center;font-weight:bold">Questionnaire satisfaction</td>
     <td colspan="4" style="text-align:center;font-weight:bold">GRILLE D'ÉVALUATION</td>
   </tr>`;
-  // Column headers
   html += `<tr>
     <th>Nom</th><th>Nom de jeune fille</th><th>Prénom</th><th>Sexe</th><th>Date de naissance</th><th>Lieu de naissance</th><th>Adresse</th>
     <th>Prise en charge</th><th>Nature</th><th>Observations</th>
@@ -438,17 +440,29 @@ export function generateExcelSuiviParcoursBeneficiairesCFA(o: OrganismeInfo, f: 
     <th>À chaud</th><th>Relance</th><th>À froid</th><th>Relance</th>
   </tr>`;
 
-  stags.forEach(s => {
+  stags.forEach((s, si) => {
+    // Synchronized: mark past CFA weeks as "P", future as empty
+    const pastWeeks = cfaWeekDates.filter(w => w.weekEnd < now).length;
+    const weekCells = Array.from({ length: nbWeeks }, (_, i) => {
+      if (i < pastWeeks || termine) return `<td>P</td>`;
+      return `<td></td>`;
+    }).join("");
+    const totalPresent = termine ? nbWeeks : pastWeeks;
+
+    // Synchronized: use EVAL_SCORES for QCM results
+    const sc = EVAL_SCORES[si] || [7, 8, 7, 8, 7];
+    const avg = Math.round(sc.reduce((a, b) => a + b, 0) / sc.length * 10) / 10;
+
     html += `<tr>
       <td>${s.nom}</td><td></td><td>${s.prenom}</td><td>${s.civilite === 'M.' ? 'M' : 'F'}</td>
       <td>${s.dateNaissance || ''}</td><td></td><td></td>
       <td>OPCO</td><td>Apprentissage</td><td></td>
       <td>${f.dateDebut ? formatDate(f.dateDebut) : ''}</td><td>${f.dateFin ? formatDate(f.dateFin) : ''}</td>
       <td></td><td></td><td></td><td></td>
-      ${weekCells}<td>${nbWeeks}/${nbWeeks}</td>
+      ${weekCells}<td>${totalPresent}/${nbWeeks}</td>
       <td>Non</td><td></td>
-      <td class="green">Validé</td><td>Oui</td>
-      <td>Oui</td><td></td><td>Oui</td><td></td>
+      <td class="green">${termine ? `${avg}/10 – Validé` : pastWeeks > 0 ? "En cours" : ""}</td><td>${termine ? "Oui" : ""}</td>
+      <td>${termine ? "Oui" : ""}</td><td></td><td>${termine ? "Oui" : ""}</td><td></td>
     </tr>`;
   });
 
