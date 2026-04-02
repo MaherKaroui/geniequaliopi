@@ -562,6 +562,20 @@ export function genTableauSuiviParcours_V2(o: OrganismeInfo, f: FormationInfo, s
 
 export function genEvaluationFinaleStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], stagiaireIdx: number) {
   const s = stagiaires[stagiaireIdx] || stagiaires[0];
+  const termine = isFormationTerminee(f);
+  
+  if (!termine) {
+    let extra = `
+      <h2>Évaluation Finale – ${f.intitule}</h2>
+      <p><strong>Nom du stagiaire :</strong> ${s.prenom} ${s.nom}</p>
+      <p><strong>Date :</strong> ${formatDate(getStagiaireDateFin(s, f))}</p>
+      <p><strong>Organisme :</strong> ${o.nom}</p>
+      <p><strong>Formation :</strong> ${f.intitule}</p>
+      <div class="section section-green"><p><em>La formation est en cours. L'évaluation finale sera complétée à l'issue de la formation.</em></p></div>
+    `;
+    return buildDocument({ org: o, title: "ÉVALUATION FINALE", subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, extraHtml: extra });
+  }
+  
   const evalData = getEvalContent(f.intitule);
   const questions = evalData.qcmFinal.slice(0, 5); // 5 QCM questions
   const answers = generateStagiaireAnswers(questions, stagiaireIdx + 100);
