@@ -638,7 +638,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
 
 function genFicheIdentite(o: OrganismeInfo) {
   return buildDocument({ org: o, title: "FICHE D'IDENTITÉ DE L'ORGANISME", sections: [
-    { heading: "Informations générales", content: `<p><strong>Raison sociale :</strong> ${o.nom}</p><p><strong>SIRET :</strong> ${o.siret}</p><p><strong>NDA :</strong> ${o.nda}</p><p><strong>Adresse :</strong> ${o.adresse}, ${o.codePostal} ${o.ville}</p><p><strong>Téléphone :</strong> ${o.telephone}</p><p><strong>Email :</strong> ${o.email}</p><p><strong>Site web :</strong> ${linkUrl(o.siteWeb)}</p>` },
+    { heading: "Informations générales", content: `<p><strong>Raison sociale :</strong> ${o.nom}</p><p><strong>SIRET :</strong> ${o.siret}</p><p><strong>NDA :</strong> ${o.nda}</p><p><strong>Adresse :</strong> ${o.adresse}, ${o.codePostal} ${o.ville}</p><p><strong>Téléphone :</strong> ${o.telephone}</p><p><strong>Email :</strong> ${o.email}</p>${optSiteWeb(o)}` },
     { heading: "Direction", content: `<p><strong>Dirigeant :</strong> ${o.dirigeant}</p><p><strong>Resp. pédagogique :</strong> ${o.responsablePedagogique}</p><p><strong>Réf. handicap :</strong> ${o.referentHandicap}</p><p><strong>Réf. qualité :</strong> ${o.referentQualite}</p>` },
     { heading: "Activité", content: `<p><strong>Domaines :</strong> ${o.domainesFormation}</p><p><strong>Types d'actions :</strong> ${o.typesActions.join(", ")}</p><p><strong>Certifications :</strong> ${o.certifications}</p><p><strong>Outils :</strong> ${o.outilsUtilises}</p>` },
   ]});
