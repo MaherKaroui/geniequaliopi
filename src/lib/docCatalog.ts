@@ -428,7 +428,14 @@ export function buildFullCatalog(
     });
     // ===== IND 10 — Adaptation de la prestation et accompagnement (CFA) =====
     add("cfa_c3i10_procedure_abandon_reorientation", "CT3 - IND 10 PROCÉDURE EN CAS D'ABANDON OU RÉORIENTATION", 3, 10, "procedure_abandon_reorientation_cfa");
-    add("cfa_c3i10_accompagnement_distanciel", "CT3 - IND 10 ACCOMPAGNEMENT DISTANCIEL", 3, 10, "accompagnement_distanciel_cfa");
+    // Accompagnement distanciel uniquement si la modalité inclut du distanciel
+    {
+      const moda = (formations[0]?.modalites || '').toLowerCase();
+      const hasDistComp = moda.includes('distanciel') || moda.includes('e-learning') || moda.includes('foad') || moda.includes('mixte');
+      if (hasDistComp) {
+        add("cfa_c3i10_accompagnement_distanciel", "CT3 - IND 10 ACCOMPAGNEMENT DISTANCIEL", 3, 10, "accompagnement_distanciel_cfa");
+      }
+    }
     stagiaires.forEach((s, si) => {
       add(`cfa_c3i10_enquete_partenaire_${si}`, `CT3 - IND 10 FICHE DE SUIVI APPRENTI – ${s.prenom} ${s.nom}`, 3, 10, "enquete_partenaire_employeur_cfa", { stagiaireIdx: si });
     });
