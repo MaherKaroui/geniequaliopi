@@ -10919,14 +10919,6 @@ function genDossierInscriptionCFA(o: OrganismeInfo, f: FormationInfo, stagiaires
     ["Dernier diplôme obtenu", s.diplome || "______"],
   ];
 
-  const entrepriseRows = [
-    ["Entreprise", s.entreprise || "______"],
-    ["Adresse entreprise", s.adresseEntreprise || "______"],
-    ["SIRET entreprise", s.siretEntreprise || "______"],
-    ["Responsable / Maître d'apprentissage", (s as any).responsableEntreprise || "______"],
-    ["Poste / Fonction", s.poste || "______"],
-  ];
-
   const formationRows = [
     ["Intitulé de la formation", f.intitule],
     ["Code RNCP", f.codeRNCP || "—"],
@@ -10935,41 +10927,38 @@ function genDossierInscriptionCFA(o: OrganismeInfo, f: FormationInfo, stagiaires
     ["Date de début", dateDebut],
     ["Date de fin", dateFin],
     ["Modalité", f.modalites || "Présentiel"],
-    ["Rythme d'alternance", f.rythmeAlternance || "1 sem. CFA / 3 sem. entreprise"],
     ["Lieu de formation", f.lieu || `${o.adresse}, ${o.codePostal} ${o.ville}`],
   ];
 
   return buildDocument({ org: o, title: "DOSSIER D'INSCRIPTION", subtitle: `${s.prenom} ${s.nom} – ${f.intitule}`, formation: f, showFormationInfo: false, sections: [
-    { heading: "1. Identité de l'apprenant(e)", content: tableHTML(["Champ", "Valeur"], identiteRows) },
-    { heading: "2. Informations entreprise", content: tableHTML(["Champ", "Valeur"], entrepriseRows) },
-    { heading: "3. Informations formation", content: tableHTML(["Champ", "Valeur"], formationRows) },
-    { heading: "4. Pièces justificatives à fournir", content: `<ul>
+    { heading: "1. Identité du/de la stagiaire", content: tableHTML(["Champ", "Valeur"], identiteRows) },
+    { heading: "2. Informations formation", content: tableHTML(["Champ", "Valeur"], formationRows) },
+    { heading: "3. Pièces justificatives à fournir", content: `<ul>
       <li>☐ Copie de la carte d'identité ou du passeport</li>
       <li>☐ Copie de l'attestation de Sécurité sociale</li>
       <li>☐ Copie du dernier diplôme obtenu</li>
       <li>☐ Photo d'identité</li>
       <li>☐ RIB</li>
-      <li>☐ Copie du contrat d'apprentissage (CERFA)</li>
       <li>☐ Attestation de domicile (moins de 3 mois)</li>
       ${s.rqth === 'oui' ? '<li>☐ Notification RQTH</li>' : ''}
     </ul>` },
-    { heading: "5. Engagement de l'apprenant(e)", content: `<p>Je soussigné(e) <strong>${s.prenom} ${s.nom}</strong> déclare :</p>
+    { heading: "4. Engagement du/de la stagiaire", content: `<p>Je soussigné(e) <strong>${s.prenom} ${s.nom}</strong> déclare :</p>
       <ul>
         <li>Avoir pris connaissance du programme de formation, du règlement intérieur et des conditions générales de vente.</li>
-        <li>M'engager à suivre la formation avec assiduité et à respecter le règlement intérieur du CFA ${o.nom}.</li>
+        <li>M'engager à suivre la formation avec assiduité et à respecter le règlement intérieur de ${o.nom}.</li>
         <li>Certifier l'exactitude des renseignements fournis ci-dessus.</li>
       </ul>` },
   ], extraHtml: `
     <p><strong>Fait à ${o.ville}, le ${dateConvention}</strong></p>
     <div class="signature-block">
       <div class="sig-box">
-        <p class="sig-label">L'Apprenant(e)</p>
+        <p class="sig-label">Le/La Stagiaire</p>
         <p>${s.prenom} ${s.nom}</p>
         <p style="margin-top:10px">Signature précédée de « Lu et approuvé » :</p>
         ${s.signatureUrl ? `<img src="${s.signatureUrl}" alt="Signature" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : '<p style="min-height:60px"></p>'}
       </div>
       <div class="sig-box">
-        <p class="sig-label">Le CFA ${o.nom}</p>
+        <p class="sig-label">${o.nom}</p>
         <p>${o.poleAdministratif || o.dirigeant}</p>
         ${o.tamponUrl ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />` : ''}
       </div>
