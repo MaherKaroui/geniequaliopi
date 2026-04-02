@@ -3512,8 +3512,6 @@ function genSuiviChiffreFormationExcel(o: OrganismeInfo, f: FormationInfo, stagi
     const sTermine = sFin < now;
     const sPastWeeks = cfaWeekDates.filter(w => w.weekEnd < now && w.weekStart >= sDebut);
     const sHeuresRealisees = sTermine ? effectiveTotal : sPastWeeks.length * 35;
-    const sTaux = sHeuresRealisees > 0 ? (91 + (si * 3 + 7) % 9) : 0; // 91-99% varied per stagiaire
-    const sAbsences = sHeuresRealisees > 0 ? Math.round(sHeuresRealisees * (100 - sTaux) / 100) : 0;
 
     // Synchronized: use EVAL_SCORES for notes, 100% attendance
     const sc = EVAL_SCORES[si] || [7, 8, 7, 8, 7];
