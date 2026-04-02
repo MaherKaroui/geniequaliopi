@@ -633,7 +633,7 @@ export function genCompteRenduRevueQualite(o: OrganismeInfo) {
 
 export function genPreuveDiffusionProgramme(o: OrganismeInfo, f: FormationInfo) {
   return buildDocument({ org: o, title: "PREUVE DE DIFFUSION DU PROGRAMME", subtitle: f.intitule, sections: [
-    { heading: "Canaux de diffusion", content: `<p>Le programme de la formation « ${f.intitule} » est diffusé via les canaux suivants :</p><p>• <strong>Site internet :</strong> ${linkUrl(o.siteWeb)}/formations/${f.intitule.toLowerCase().replace(/\s/g,'-')}<br>• <strong>Catalogue PDF :</strong> envoyé sur demande par email<br>• <strong>OPCO :</strong> programme transmis pour toute demande de prise en charge<br>• <strong>Kairos/EDOF :</strong> référencé sur les plateformes officielles<br>• <strong>Email :</strong> programme joint à chaque devis et convocation</p>` },
+    { heading: "Canaux de diffusion", content: `<p>Le programme de la formation « ${f.intitule} » est diffusé via les canaux suivants :</p><p>${o.siteWeb ? `• <strong>Site internet :</strong> ${linkUrl(o.siteWeb)}/formations/${f.intitule.toLowerCase().replace(/\s/g,'-')}<br>` : ''}• <strong>Catalogue PDF :</strong> envoyé sur demande par email<br>• <strong>OPCO :</strong> programme transmis pour toute demande de prise en charge<br>• <strong>Kairos/EDOF :</strong> référencé sur les plateformes officielles<br>• <strong>Email :</strong> programme joint à chaque devis et convocation</p>` },
     { heading: "Dates de mise à jour", content: `<p>• Dernière mise à jour du programme : ${formatDate(f.dateDebut)}<br>• Prochaine revue prévue : Janvier 2025<br>• Version actuelle : V3.2</p>`, variant: "green" },
     { heading: "Traçabilité", content: `<p>Emails de diffusion archivés dans le CRM.<br>Historique des modifications conservé sur le drive partagé.<br>Accusés de réception des OPCO archivés.</p>` },
   ] });
@@ -641,7 +641,7 @@ export function genPreuveDiffusionProgramme(o: OrganismeInfo, f: FormationInfo) 
 
 export function genPreuveDelaisAcces(o: OrganismeInfo) {
   return buildDocument({ org: o, title: "PREUVE D'INFORMATION SUR LES DÉLAIS D'ACCÈS", sections: [
-    { heading: "Information diffusée", content: `<p>Les délais d'accès sont communiqués sur :<br>• Le site internet (${linkUrl(o.siteWeb)}/modalites-acces)<br>• Le catalogue de formation<br>• Chaque fiche programme<br>• Les CGV<br>• Les devis</p>` },
+    { heading: "Information diffusée", content: `<p>Les délais d'accès sont communiqués sur :<br>${o.siteWeb ? `• Le site internet (${linkUrl(o.siteWeb)}/modalites-acces)<br>` : ''}• Le catalogue de formation<br>• Chaque fiche programme<br>• Les CGV<br>• Les devis</p>` },
     { heading: "Délais appliqués", content: "<p>• Inter-entreprises : 7 jours minimum<br>• Intra-entreprise : 14 jours minimum<br>• Sur mesure : 30 jours minimum<br>• E-learning : 48h après inscription</p>", variant: "green" },
     { heading: "Traçabilité", content: "<p>Capture d'écran du site à jour, CGV signées avec mention des délais, devis avec délais indiqués.</p>" },
   ] });
