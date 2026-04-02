@@ -210,15 +210,20 @@ export function genAnalyseBesoinsApprenti(o: OrganismeInfo, f: FormationInfo, st
 }
 
 export function genPlanIndividuelFormation(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
+  const evalData = getEvalContent(f.intitule);
+  const termine = isFormationTerminee(f);
+  const comps = evalData.competences.length >= 4
+    ? evalData.competences.slice(0, 4)
+    : [...evalData.competences, ...Array(4 - evalData.competences.length).fill("Compétence complémentaire")].slice(0, 4);
   let extra = "";
   stagiaires.slice(0, 5).forEach((s, i) => {
     extra += `<div class="page-break"></div><h2>Plan individuel – ${s.prenom} ${s.nom}</h2>
       <div class="section"><p><strong>Entreprise :</strong> ${s.entreprise}<br><strong>Maître d'apprentissage :</strong> ${f.formateur}<br><strong>Formateur référent :</strong> ${o.responsablePedagogique}</p></div>`;
     extra += tableHTML(["Compétence", "CFA", "Entreprise", "Échéance", "Statut"], [
-      ["Compétence 1 – Fondamentaux", "Module théorique", "Observation + pratique guidée", "T1", i < 3 ? "✅" : "🔄"],
-      ["Compétence 2 – Spécialisation", "Module avancé", "Mission autonome", "T2", i < 2 ? "✅" : "🔄"],
-      ["Compétence 3 – Projet", "Projet tutoré", "Projet en entreprise", "T3", "🔄"],
-      ["Compétence 4 – Certification", "Préparation examen", "Mise en situation professionnelle", "T4", "📋"],
+      [comps[0], "Module théorique", "Observation + pratique guidée", "T1", termine ? (i < 3 ? "✅" : "🔄") : ""],
+      [comps[1], "Module avancé", "Mission autonome", "T2", termine ? (i < 2 ? "✅" : "🔄") : ""],
+      [comps[2], "Projet tutoré", "Projet en entreprise", "T3", termine ? "🔄" : ""],
+      [comps[3], "Préparation examen", "Mise en situation professionnelle", "T4", termine ? "📋" : ""],
     ]);
   });
   return buildDocument({ org: o, title: "PLANS INDIVIDUELS DE FORMATION", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra });
