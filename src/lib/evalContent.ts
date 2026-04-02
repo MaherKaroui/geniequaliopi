@@ -657,11 +657,76 @@ EVAL_CONTENT["SAMS"] = {
   ],
 };
 
+EVAL_CONTENT["NTC"] = {
+  qcmPositionnement: [
+    { question: "Qu'est-ce qu'un persona en marketing ?", options: ["Un logiciel CRM", "Un profil fictif représentant un segment de clientèle cible", "Un concurrent direct", "Un type de contrat commercial"], correctIndex: 1 },
+    { question: "Que signifie le sigle CRM ?", options: ["Centre de Recherche Marketing", "Customer Relationship Management", "Compte Rendu Mensuel", "Certification Relations Métier"], correctIndex: 1 },
+    { question: "Qu'est-ce que la prospection B2B ?", options: ["La vente aux particuliers", "La recherche de clients professionnels (entreprise à entreprise)", "La publicité à la télévision", "Le service après-vente"], correctIndex: 1 },
+    { question: "Que signifie un objectif SMART ?", options: ["Simple, Motivant, Accessible, Rapide, Tangible", "Spécifique, Mesurable, Atteignable, Réaliste, Temporellement défini", "Stratégique, Marketing, Automatisé, Rentable, Technique", "Standard, Modifiable, Adaptable, Raisonnable, Testé"], correctIndex: 1 },
+    { question: "Qu'est-ce que le social selling ?", options: ["Vendre sur les marchés", "Utiliser les réseaux sociaux pour prospecter et vendre", "Vendre des produits sociaux", "Faire du bénévolat commercial"], correctIndex: 1 },
+    { question: "Que représente le taux de conversion en vente ?", options: ["Le nombre de prospects contactés", "Le pourcentage de prospects transformés en clients", "Le chiffre d'affaires mensuel", "Le nombre de visites sur le site web"], correctIndex: 1 },
+    { question: "Qu'est-ce qu'un argumentaire de vente ?", options: ["Un contrat de vente", "Un ensemble structuré d'arguments pour convaincre un prospect", "Un devis commercial", "Un bon de commande"], correctIndex: 1 },
+    { question: "Que signifie le sigle KPI ?", options: ["Key Performance Indicator (indicateur clé de performance)", "Knowledge Process Integration", "Key Product Innovation", "Keen Profit Index"], correctIndex: 0 },
+    { question: "Qu'est-ce que le closing en négociation ?", options: ["L'ouverture d'un compte client", "La phase de conclusion de la vente", "La fermeture d'un magasin", "L'envoi d'un devis"], correctIndex: 1 },
+    { question: "Qu'est-ce qu'une veille concurrentielle ?", options: ["Surveiller ses collègues", "Analyser les produits, prix et stratégies des concurrents", "Faire des heures supplémentaires", "Rédiger des rapports internes"], correctIndex: 1 },
+  ],
+  qcmFinal: [
+    { question: "Quelle est la différence entre stratégie inbound et outbound ?", options: ["Inbound = prospection directe, Outbound = attirer les clients", "Inbound = attirer les clients par le contenu, Outbound = prospection directe", "Ce sont des synonymes", "Inbound = vente en ligne, Outbound = vente en magasin"], correctIndex: 1 },
+    { question: "Quel outil permet d'automatiser les campagnes de prospection ?", options: ["Un tableur Excel", "Une plateforme d'automatisation marketing (HubSpot, Make, etc.)", "Un téléphone fixe", "Un agenda papier"], correctIndex: 1 },
+    { question: "Qu'est-ce que le SONCAS en technique de vente ?", options: ["Un logiciel CRM", "Un modèle identifiant les motivations d'achat (Sécurité, Orgueil, Nouveauté, Confort, Argent, Sympathie)", "Un type de contrat", "Une certification commerciale"], correctIndex: 1 },
+    { question: "Comment traiter une objection prix ?", options: ["Baisser le prix immédiatement", "Reformuler, valoriser le rapport qualité/prix et démontrer le ROI", "Ignorer l'objection", "Proposer un produit moins cher"], correctIndex: 1 },
+    { question: "Qu'est-ce que l'upselling ?", options: ["Vendre un produit moins cher", "Proposer un produit ou service de gamme supérieure au client", "Annuler une vente", "Faire une remise commerciale"], correctIndex: 1 },
+    { question: "Que mesure le pipe commercial (pipeline) ?", options: ["Le nombre de réclamations", "L'ensemble des opportunités commerciales en cours à différents stades de maturité", "Le chiffre d'affaires passé", "Le nombre d'employés"], correctIndex: 1 },
+    { question: "Qu'est-ce que la méthode SPIN selling ?", options: ["Situation, Problème, Implication, Need-payoff : une technique de questionnement en vente consultative", "Speed, Precision, Innovation, Networking", "Un logiciel de gestion commerciale", "Une méthode de recrutement"], correctIndex: 0 },
+    { question: "Que signifie le cross-selling ?", options: ["Vendre à l'international", "Proposer des produits complémentaires à un client existant", "Vendre en équipe", "Changer de secteur commercial"], correctIndex: 1 },
+    { question: "Qu'est-ce que le RGPD dans le contexte de la prospection commerciale ?", options: ["Un logiciel de comptabilité", "Le Règlement Général sur la Protection des Données encadrant la collecte et l'utilisation des données personnelles", "Un réseau de vente", "Un certificat de qualité"], correctIndex: 1 },
+    { question: "Comment calculer un seuil de rentabilité ?", options: ["Chiffre d'affaires ÷ nombre de clients", "Charges fixes ÷ taux de marge sur coûts variables", "Bénéfice net × 100", "Prix de vente - prix d'achat"], correctIndex: 1 },
+  ],
+  exercices: [
+    { titre: "Veille concurrentielle et analyse de marché", consigne: "Vous êtes NTC chez IndustrieTech, fournisseur de solutions d'automatisation industrielle. Réalisez une analyse concurrentielle complète : identifiez 5 concurrents directs, comparez leurs offres (prix, services, délais), et proposez 3 axes de différenciation pour votre entreprise.", reponseAttendue: "Analyse SWOT des concurrents, tableau comparatif prix/services/délais, identification des avantages concurrentiels (SAV réactif, solutions sur-mesure, expertise technique), recommandations stratégiques argumentées." },
+    { titre: "Élaboration d'un plan d'actions commerciales", consigne: "Votre direction fixe un objectif de +15% de CA sur le semestre 2. Votre portefeuille compte 60 clients actifs et 25 prospects qualifiés. Élaborez un plan d'actions commerciales SMART avec rétroplanning, budget prévisionnel et KPIs de suivi.", reponseAttendue: "Objectifs SMART quantifiés, actions planifiées (prospection terrain, emailing, salons, social selling), rétroplanning semaine par semaine, budget par action, tableau de bord avec KPIs (nb RDV, taux transformation, CA généré, pipe)." },
+    { titre: "Prospection multicanale", consigne: "Vous devez prospecter 30 PME industrielles en Région Auvergne-Rhône-Alpes. Créez un fichier de prospection qualifié, rédigez un script de phoning, un email de prospection et un message LinkedIn personnalisé.", reponseAttendue: "Fichier avec critères de segmentation (secteur, taille, CA), script phoning avec accroche/découverte/traitement objections/closing, email professionnel avec objet accrocheur et call-to-action, approche LinkedIn personnalisée." },
+    { titre: "Conception d'une proposition technique et commerciale", consigne: "L'entreprise MECANORD (50 salariés, usinage de précision) a besoin d'un système de contrôle qualité automatisé. Budget estimé : 45 000€ HT. Concevez une proposition technique et commerciale complète incluant l'argumentaire.", reponseAttendue: "Analyse des besoins MECANORD, solution technique détaillée, chiffrage (matériel + installation + formation + maintenance), argumentaire CAP (Caractéristiques-Avantages-Preuves), ROI démontré, planning de déploiement, CGV." },
+    { titre: "Simulation de négociation commerciale", consigne: "Le directeur de production de MECANORD vous annonce que votre concurrent propose la même solution à 38 000€. Préparez votre stratégie de négociation : arguments, concessions possibles, points non négociables, technique de closing.", reponseAttendue: "Préparation : analyse de l'offre concurrente (différences techniques, services inclus), arguments de valeur ajoutée, matrice de concessions (remise max 5%, facilités de paiement, extension garantie), technique SPIN pour recentrer sur les besoins, closing par alternative." },
+    { titre: "Analyse de performance et actions correctives", consigne: "À mi-parcours (fin T2), votre tableau de bord affiche : CA réalisé 180K€ (objectif 250K€), 45 RDV (objectif 60), taux de transformation 22% (objectif 30%). Analysez les écarts et proposez un plan d'actions correctives pour le S2.", reponseAttendue: "Analyse des écarts par KPI, identification des causes (cible mal segmentée, argumentaire à revoir, suivi insuffisant), plan correctif avec actions prioritaires, nouveaux objectifs intermédiaires, reporting hebdomadaire proposé." },
+    { titre: "Représentation de l'entreprise et e-réputation", consigne: "Votre entreprise participe au salon Industrie Lyon dans 3 semaines. Préparez : votre elevator pitch (2 min), un plan de communication LinkedIn avant/pendant/après le salon, et un plan de suivi des contacts.", reponseAttendue: "Elevator pitch structuré (problème/solution/preuve/appel à l'action), planning LinkedIn (teasing avant, posts live pendant, récap après), template de suivi contacts (relance J+2, qualification, proposition RDV)." },
+    { titre: "Gestion de la relation client et fidélisation", consigne: "Le client AEROTECH (CA annuel 120K€) menace de résilier son contrat suite à 2 retards de livraison. Préparez votre plan de reconquête : entretien de médiation, geste commercial, plan de fidélisation sur 12 mois.", reponseAttendue: "Plan d'entretien de médiation (écoute, reconnaissance du problème, solutions concrètes), geste commercial calibré (avoir, extension service, livraison prioritaire), plan de fidélisation (point mensuel, comité de pilotage, offre privilégiée, enquête satisfaction trimestrielle)." },
+    { titre: "Utilisation du CRM et reporting", consigne: "Votre direction vous demande un rapport d'activité trimestriel exploitable. À partir des données CRM (75 contacts, 30 RDV, 8 propositions, 5 ventes), créez un tableau de bord avec analyse et recommandations.", reponseAttendue: "Tableau de bord visuel avec KPIs (taux de contact, taux de RDV, taux de proposition, taux de closing), analyse des ratios, identification des goulots d'étranglement, comparaison N/N-1, recommandations opérationnelles." },
+    { titre: "Intégration de la dimension RSE dans la vente", consigne: "Un prospect vous demande comment votre solution contribue au développement durable. Construisez un argumentaire RSE intégrant : impact environnemental, économie circulaire, empreinte carbone, et engagements éco-responsables de votre entreprise.", reponseAttendue: "Argumentaire structuré : réduction empreinte carbone (chiffres), conformité loi AGEC et loi Climat et Résilience, politique d'économie circulaire (recyclage, reconditionnement), certifications environnementales, impact social (emploi local, insertion)." },
+  ],
+  competences: [
+    "Veille commerciale et concurrentielle",
+    "Élaboration de stratégies de prospection",
+    "Conception de plans d'actions commerciales",
+    "Prospection multicanale (phoning, emailing, social selling)",
+    "Création et exploitation de personas",
+    "Conception de propositions techniques et commerciales",
+    "Techniques de négociation et closing",
+    "Traitement des objections",
+    "Analyse de performances et KPIs commerciaux",
+    "Gestion de la relation client (CRM/e-CRM)",
+    "Fidélisation et optimisation du portefeuille client",
+    "Communication professionnelle et e-réputation",
+    "Reporting et bilan d'activité commerciale",
+    "Intégration RSE et développement durable dans la démarche commerciale",
+  ],
+  appreciations: [
+    "Excellente maîtrise des techniques de prospection et de négociation. L'analyse concurrentielle est pertinente et les propositions commerciales sont très bien construites.",
+    "Bonne progression sur l'utilisation du CRM et le social selling. Les plans d'actions sont structurés et les KPIs bien suivis.",
+    "Très bon sens commercial. La préparation des entretiens de vente est rigoureuse et l'argumentaire est convaincant. Le traitement des objections est efficace.",
+    "Niveau satisfaisant. Les fondamentaux de la prospection sont acquis. Doit encore approfondir les techniques de closing et la négociation complexe.",
+    "Stagiaire impliqué(e) et motivé(e). La veille concurrentielle est bien structurée. Les compétences en reporting progressent rapidement.",
+    "Bonne compréhension de la démarche commerciale B2B. L'intégration de la dimension RSE dans les propositions est pertinente.",
+  ],
+};
+
 // Map formation intitulé to content key
 function getContentKey(intitule: string): string {
   const lower = intitule.toLowerCase();
   if (lower.includes("ecsr") || lower.includes("enseignant de la conduite") || lower.includes("sécurité routière")) return "ECSR";
   if (lower.includes("vtest") || lower.includes("v-test") || lower.includes("rs6905")) return "VTest";
+  // NTC must be checked before generic "commercial"
+  if (lower.includes("ntc") || lower.includes("rncp39063") || lower.includes("négociateur technico-commercial") || lower.includes("negociateur technico-commercial")) return "NTC";
   // SAMA / SAMS must be checked BEFORE generic "médico-social" / "social"
   if (lower.includes("sama") || lower.includes("rncp40800") || lower.includes("secrétaire assistant médico-administratif") || lower.includes("secretaire assistant medico-administratif")) return "SAMA";
   if (lower.includes("sams") || lower.includes("rncp36805") || lower.includes("secrétaire assistant médico-social") || lower.includes("secretaire assistant medico-social")) return "SAMS";
