@@ -210,44 +210,59 @@ export function genAnalyseBesoinsApprenti(o: OrganismeInfo, f: FormationInfo, st
 }
 
 export function genPlanIndividuelFormation(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
+  const evalData = getEvalContent(f.intitule);
+  const termine = isFormationTerminee(f);
+  const comps = evalData.competences.length >= 4
+    ? evalData.competences.slice(0, 4)
+    : [...evalData.competences, ...Array(4 - evalData.competences.length).fill("Compétence complémentaire")].slice(0, 4);
   let extra = "";
   stagiaires.slice(0, 5).forEach((s, i) => {
     extra += `<div class="page-break"></div><h2>Plan individuel – ${s.prenom} ${s.nom}</h2>
       <div class="section"><p><strong>Entreprise :</strong> ${s.entreprise}<br><strong>Maître d'apprentissage :</strong> ${f.formateur}<br><strong>Formateur référent :</strong> ${o.responsablePedagogique}</p></div>`;
     extra += tableHTML(["Compétence", "CFA", "Entreprise", "Échéance", "Statut"], [
-      ["Compétence 1 – Fondamentaux", "Module théorique", "Observation + pratique guidée", "T1", i < 3 ? "✅" : "🔄"],
-      ["Compétence 2 – Spécialisation", "Module avancé", "Mission autonome", "T2", i < 2 ? "✅" : "🔄"],
-      ["Compétence 3 – Projet", "Projet tutoré", "Projet en entreprise", "T3", "🔄"],
-      ["Compétence 4 – Certification", "Préparation examen", "Mise en situation professionnelle", "T4", "📋"],
+      [comps[0], "Module théorique", "Observation + pratique guidée", "T1", termine ? (i < 3 ? "✅" : "🔄") : ""],
+      [comps[1], "Module avancé", "Mission autonome", "T2", termine ? (i < 2 ? "✅" : "🔄") : ""],
+      [comps[2], "Projet tutoré", "Projet en entreprise", "T3", termine ? "🔄" : ""],
+      [comps[3], "Préparation examen", "Mise en situation professionnelle", "T4", termine ? "📋" : ""],
     ]);
   });
   return buildDocument({ org: o, title: "PLANS INDIVIDUELS DE FORMATION", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra });
 }
 
 export function genProgressionPedagogique(o: OrganismeInfo, f: FormationInfo) {
+  const evalData = getEvalContent(f.intitule);
+  const comps = evalData.competences.length >= 5
+    ? evalData.competences.slice(0, 5)
+    : [...evalData.competences, ...["Approfondissement", "Spécialisation", "Projet professionnel", "Préparation certification"].slice(0, 5 - evalData.competences.length)];
+  const periodes = ["Sept-Oct", "Nov-Déc", "Jan-Fév", "Mars-Avr", "Mai-Juin"];
+  const evaluations = ["QCM positionnement", "Exercices pratiques", "Cas pratiques", "Soutenance projet", "Examen blanc + final"];
+  const liens = ["Observation en entreprise", "Pratique guidée", "Missions autonomes", "Projet en entreprise", "Bilan de compétences"];
   return buildDocument({ org: o, title: "PROGRESSION PÉDAGOGIQUE", subtitle: f.intitule, table: {
     headers: ["Période", "Module CFA", "Objectifs", "Évaluation", "Lien entreprise"],
-    rows: [
-      ["Sept-Oct", "Module 1 – Fondamentaux", "Acquérir les bases théoriques", "QCM positionnement", "Observation en entreprise"],
-      ["Nov-Déc", "Module 2 – Approfondissement", "Maîtriser les techniques essentielles", "Exercices pratiques", "Pratique guidée"],
-      ["Jan-Fév", "Module 3 – Spécialisation", "Développer une expertise métier", "Cas pratiques", "Missions autonomes"],
-      ["Mars-Avr", "Module 4 – Projet", "Réaliser un projet complet", "Soutenance projet", "Projet en entreprise"],
-      ["Mai-Juin", "Module 5 – Certification", "Préparer et réussir l'examen", "Examen blanc + final", "Bilan de compétences"],
-    ]
+    rows: comps.map((comp, i) => [periodes[i] || `Période ${i+1}`, comp, `Acquérir les compétences liées à : ${comp}`, evaluations[i] || "Évaluation continue", liens[i] || "Pratique en entreprise"])
   } });
 }
 
 export function genDeroulePedagogiqueCFA(o: OrganismeInfo, f: FormationInfo) {
+  const evalData = getEvalContent(f.intitule);
+  const comps = evalData.competences;
+  const half = Math.ceil(comps.length / 2);
+  const sem1Content = comps.slice(0, half).map((c, i) => `<strong>Module ${i+1} :</strong> ${c}`).join('<br>') || `<strong>Module 1 :</strong> ${f.programme.split("\n")[0] || "Fondamentaux"}`;
+  const sem2Content = comps.slice(half).map((c, i) => `<strong>Module ${half+i+1} :</strong> ${c}`).join('<br>') || `<strong>Module 2 :</strong> ${f.programme.split("\n")[1] || "Approfondissement"}`;
   return buildDocument({ org: o, title: "DÉROULÉ PÉDAGOGIQUE – CFA", subtitle: f.intitule, formation: f, showFormationInfo: true, sections: [
-    { heading: "Semestre 1", content: `<p><strong>Module 1 :</strong> ${f.programme.split("\n")[0] || "Fondamentaux"}<br><strong>Module 2 :</strong> ${f.programme.split("\n")[1] || "Approfondissement"}<br><strong>Évaluation :</strong> Contrôle continu + examen de mi-parcours</p>` },
-    { heading: "Semestre 2", content: `<p><strong>Module 3 :</strong> ${f.programme.split("\n")[2] || "Spécialisation"}<br><strong>Module 4 :</strong> ${f.programme.split("\n")[3] || "Projet professionnel"}<br><strong>Évaluation :</strong> Soutenance de projet + examen final</p>` },
+    { heading: "Semestre 1", content: `<p>${sem1Content}<br><strong>Évaluation :</strong> Contrôle continu + examen de mi-parcours</p>` },
+    { heading: "Semestre 2", content: `<p>${sem2Content}<br><strong>Évaluation :</strong> Soutenance de projet + examen final</p>` },
     { heading: "Méthodes pédagogiques", content: "<p>• Cours magistraux et travaux dirigés (30%)<br>• Travaux pratiques et ateliers (40%)<br>• Projets tutorés (20%)<br>• Accompagnement individualisé (10%)</p>", variant: "green" },
   ] });
 }
 
 export function genGrilleSuiviCompetences(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const evalData = getEvalContent(f.intitule);
+  const termine = isFormationTerminee(f);
   const rows = stagiaires.slice(0, 10).map((s, i) => {
+    if (!termine) {
+      return [s.prenom + " " + s.nom, ...evalData.competences.map(() => "")];
+    }
     const sc = EVAL_SCORES[i] || [7, 8, 7, 8, 7];
     return [s.prenom + " " + s.nom, ...evalData.competences.map((_, ci) => {
       const v = Math.min(10, sc[ci % sc.length] + 1);
@@ -256,16 +271,22 @@ export function genGrilleSuiviCompetences(o: OrganismeInfo, f: FormationInfo, st
   });
   return buildDocument({ org: o, title: "GRILLE DE SUIVI DES COMPÉTENCES", subtitle: f.intitule, table: {
     headers: ["Apprenti(e)", ...evalData.competences.map((_, i) => `C${i+1}`)], rows
-  }, sections: [{ heading: "Légende", content: evalData.competences.map((c, i) => `<p><strong>C${i+1} :</strong> ${c}</p>`).join("") }] });
+  }, sections: [{ heading: "Légende", content: evalData.competences.map((c, i) => `<p><strong>C${i+1} :</strong> ${c}</p>`).join("") + (!termine ? '<p><em>Formation en cours – grille à compléter au fur et à mesure.</em></p>' : '') }] });
 }
 
 export function genCarnetLiaison(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const s = stagiaires[0] || { prenom: "___", nom: "___", entreprise: "___" };
+  const termine = isFormationTerminee(f);
+  const evalData = getEvalContent(f.intitule);
+  const modules = evalData.competences.length > 0 ? evalData.competences : ["Module 1", "Module 2", "Module 3", "Module 4"];
   return buildDocument({ org: o, title: "CARNET DE LIAISON", subtitle: `${s.prenom} ${s.nom} – ${f.intitule}`, sections: [
     { heading: "Apprenti(e)", content: `<p><strong>Nom :</strong> ${s.prenom} ${s.nom}<br><strong>Entreprise :</strong> ${s.entreprise}<br><strong>Formation :</strong> ${f.intitule}</p>` },
   ], table: {
     headers: ["Semaine", "Activités CFA", "Activités Entreprise", "Observations MA", "Signature"],
-    rows: Array.from({length: 8}, (_, i) => [`S${i+1}`, `Module ${Math.floor(i/2)+1}`, "Missions en cours", i < 4 ? "Bonne progression" : "Autonomie en développement", `Signé`])
+    rows: Array.from({length: 8}, (_, i) => {
+      const modLabel = modules[Math.floor(i / Math.max(1, Math.ceil(8 / modules.length))) % modules.length];
+      return [`S${i+1}`, modLabel, termine ? "Missions en cours" : "", termine ? (i < 4 ? "Bonne progression" : "Autonomie en développement") : "", termine ? "Signé" : ""];
+    })
   } });
 }
 
@@ -341,7 +362,8 @@ export function genEvaluationAcquisCFA(o: OrganismeInfo, f: FormationInfo, stagi
 }
 
 export function genGrilleValidationCompetences(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
-  const competences = ["Compétence métier 1", "Compétence métier 2", "Compétence transversale", "Autonomie", "Communication pro"];
+  const evalData = getEvalContent(f.intitule);
+  const competences = evalData.competences.length > 0 ? evalData.competences.slice(0, 5) : ["Compétence métier 1", "Compétence métier 2", "Compétence transversale", "Autonomie", "Communication pro"];
   const termine = isFormationTerminee(f);
   const rows = stagiaires.slice(0, 10).map((s, i) => {
     if (!termine) {
