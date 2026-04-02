@@ -3584,7 +3584,14 @@ function genSuiviChiffreFormationExcel(o: OrganismeInfo, f: FormationInfo, stagi
         const matPartial = !matDone && cumulHours + matCumul < heuresRealisees;
         const matReal = matDone ? vol : matPartial ? Math.min(vol, heuresRealisees - cumulHours - matCumul) : 0;
         const matTaux = vol > 0 ? Math.round(matReal / vol * 100) : 0;
-        const matNote = matReal > 0 ? `${(12.5 + ((bi + matCumul) * 1.7) % 5).toFixed(1)}/20` : "";
+        // Synchronized note per matière with EVAL_SCORES
+        const matScoreAvg = stagiaires.length > 0
+          ? Math.round(stagiaires.slice(0, 10).reduce((sum, _, si) => {
+              const sc = EVAL_SCORES[si] || [7, 8, 7, 8, 7];
+              return sum + Math.min(10, sc[(bi + matCumul) % sc.length] + 1);
+            }, 0) / Math.min(stagiaires.length, 10) * 2 * 10) / 10
+          : 0;
+        const matNote = matReal > 0 ? `${matScoreAvg.toFixed(1)}/20` : "";
         sheet3 += tr([`  └ ${mat.competence}`, `${vol}h`, `${matReal}h`, `${vol - matReal}h`, `${matTaux}%`, "1", matReal > 0 ? "1" : "0", matNote, ""]);
         matCumul += vol;
       });
