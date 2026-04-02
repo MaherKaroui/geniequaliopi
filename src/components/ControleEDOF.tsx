@@ -540,7 +540,7 @@ export default function ControleEDOF({ organisme, formation, stagiaires }: Contr
       </div>
 
       {/* Preview Dialog */}
-      <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
+      <Dialog open={previewOpen} onOpenChange={(open) => { setPreviewOpen(open); if (!open) setShowSignaturePad(false); }}>
         <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
@@ -557,20 +557,64 @@ export default function ControleEDOF({ organisme, formation, stagiaires }: Contr
             ) : (
               <iframe
                 srcDoc={previewHtml}
-                className="w-full h-[60vh] border-0"
+                className="w-full h-[50vh] border-0"
                 title="Aperçu du document"
                 sandbox="allow-same-origin"
               />
             )}
           </div>
-          <div className="flex justify-end gap-2 pt-2">
-            <Button variant="outline" onClick={() => setPreviewOpen(false)}>
-              Fermer
-            </Button>
-            <Button onClick={handleDownloadPreview} className="gap-1">
-              <Download className="w-4 h-4" />
-              Télécharger en PDF
-            </Button>
+
+          {/* Signature section */}
+          {showSignaturePad ? (
+            <div className="border rounded-lg p-4 bg-muted/30">
+              <SignaturePad
+                label="✍️ Dessinez votre signature"
+                onSave={(dataUrl) => {
+                  setSavedSignature(dataUrl);
+                  sessionStorage.setItem('ey_signature', dataUrl);
+                  setShowSignaturePad(false);
+                  toast.success("Signature enregistrée !");
+                }}
+                onCancel={() => setShowSignaturePad(false)}
+              />
+            </div>
+          ) : savedSignature ? (
+            <div className="flex items-center gap-3 border rounded-lg p-3 bg-muted/30">
+              <img src={savedSignature} alt="Signature" className="h-12 border rounded bg-white p-1" />
+              <span className="text-sm text-muted-foreground flex-1">Signature enregistrée</span>
+              <Button variant="ghost" size="sm" className="text-xs" onClick={() => setShowSignaturePad(true)}>
+                Modifier
+              </Button>
+              <Button variant="ghost" size="sm" className="text-xs text-destructive" onClick={() => { setSavedSignature(''); sessionStorage.removeItem('ey_signature'); }}>
+                Supprimer
+              </Button>
+            </div>
+          ) : null}
+
+          <div className="flex justify-between gap-2 pt-2">
+            <div>
+              {!showSignaturePad && !savedSignature && (
+                <Button variant="outline" size="sm" onClick={() => setShowSignaturePad(true)} className="gap-1">
+                  <PenTool className="w-4 h-4" />
+                  Ajouter une signature
+                </Button>
+              )}
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={() => setPreviewOpen(false)}>
+                Fermer
+              </Button>
+              <Button onClick={handleDownloadPreview} variant="secondary" className="gap-1">
+                <Download className="w-4 h-4" />
+                PDF sans signature
+              </Button>
+              {savedSignature && (
+                <Button onClick={handleSignAndDownload} className="gap-1">
+                  <PenTool className="w-4 h-4" />
+                  Signer &amp; télécharger
+                </Button>
+              )}
+            </div>
           </div>
         </DialogContent>
       </Dialog>
