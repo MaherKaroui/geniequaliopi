@@ -550,7 +550,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "titre_rncp_cfa": return genTitreRNCPCFA(o, f);
     case "matiere_titre_cfa": return genMatiereTitreCFA(o, f);
     case "tableau_croise_cfa": return genTableauCroiseCFA(o, f);
-    case "matrice_competences_excel": return genMatriceCompetencesExcel(o, f);
+    case "matrice_competences_excel": return genMatriceCompetencesExcel(o, f, stagiaires);
     case "suivi_chiffre_formation_excel": return genSuiviChiffreFormationExcel(o, f, stagiaires);
     case "fiche_certification_rs": return genFicheCertificationRS(o, f);
     case "procedure_presentation_certification": return genProcedurePresentationCertification(o, f);
@@ -3304,10 +3304,17 @@ function genTableauCroiseCFA(o: OrganismeInfo, f: FormationInfo) {
 
 // ============== CT2 IND 7 — MATRICE COMPÉTENCES EXCEL ==============
 
-function genMatriceCompetencesExcel(o: OrganismeInfo, f: FormationInfo) {
+function genMatriceCompetencesExcel(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const rncp = getRNCPByCode(f.codeRNCP || '');
   const { totalHours } = parseDuree(f.duree);
   const effectiveTotal = totalHours > 0 ? totalHours : 420;
+  const termine = isFormationTerminee(f);
+  const isCFA = !!(f.rythmeAlternance && f.rythmeAlternance.trim().length > 0);
+  const cfaWeekDates = isCFA ? getCFAWeekDates(f) : [];
+  const now = new Date();
+  const pastCFAWeeks = cfaWeekDates.filter(w => w.weekEnd < now).length;
+  const pastCFAHours = pastCFAWeeks * 35;
+  const heuresRealisees = termine ? effectiveTotal : pastCFAHours;
 
   const tr = (cells: string[], isHeader = false) => {
     const tag = isHeader ? 'th' : 'td';
@@ -3323,9 +3330,21 @@ function genMatriceCompetencesExcel(o: OrganismeInfo, f: FormationInfo) {
       sum + bloc.matieres.reduce((s, m) => s + (parseInt(m.volume) || 0), 0), 0);
     const scale = rncpTotalVolume > 0 ? blocHoursTotal / rncpTotalVolume : 1;
 
-    // Sheet 1: Vue d'ensemble
-    let sheet1 = tr(["CCP / Bloc", "Compétence", "Module de formation", "Volume horaire", "Modalités d'évaluation", "Niveau attendu", "Couverture"], true);
+    // Calculate cumulative hours per bloc to determine status
+    let cumulHours = 0;
+    const blocStatus: { done: boolean; partial: boolean }[] = [];
+    rncp.blocsCompetences.forEach(bloc => {
+      const blocVol = Math.round(bloc.matieres.reduce((s, m) => s + (parseInt(m.volume) || 0), 0) * scale);
+      const done = cumulHours + blocVol <= heuresRealisees;
+      const partial = !done && cumulHours < heuresRealisees;
+      blocStatus.push({ done, partial });
+      cumulHours += blocVol;
+    });
+
+    // Sheet 1: Vue d'ensemble — with status column synchronized
+    let sheet1 = tr(["CCP / Bloc", "Compétence", "Module de formation", "Volume horaire", "Modalités d'évaluation", "Niveau attendu", "Couverture", "Statut"], true);
     rncp.blocsCompetences.forEach((bloc, bi) => {
+      const status = blocStatus[bi];
       bloc.matieres.forEach((mat, mi) => {
         const vol = Math.round((parseInt(mat.volume) || 0) * scale);
         sheet1 += tr([
@@ -3335,16 +3354,18 @@ function genMatriceCompetencesExcel(o: OrganismeInfo, f: FormationInfo) {
           `${vol}h`,
           mi === 0 ? bloc.modalitesEval : "Évaluation continue",
           "Maîtrise opérationnelle",
-          "✓ 100%"
+          "✓ 100%",
+          status.done ? "✅ Terminé" : status.partial ? "🔄 En cours" : "📋 À venir"
         ]);
       });
     });
-    sheet1 += tr(["", "", "Accompagnement + Examens blancs", `${accompHours}h`, "Examens blancs + jury", "", "✓"]);
-    sheet1 += tr(["TOTAL", "", "", `${effectiveTotal}h`, "", "", "100%"], true);
+    sheet1 += tr(["", "", "Accompagnement + Examens blancs", `${accompHours}h`, "Examens blancs + jury", "", "✓", termine ? "✅ Terminé" : "📋 À venir"]);
+    sheet1 += tr(["TOTAL", "", "", `${effectiveTotal}h`, "", "", "100%", `${Math.round(heuresRealisees / effectiveTotal * 100)}% réalisé`], true);
     sheets.push({ name: "Matrice compétences", html: `<table>${sheet1}</table>` });
 
     // Sheet 2: Détail par bloc
     rncp.blocsCompetences.forEach((bloc, bi) => {
+      const status = blocStatus[bi];
       let sheetHtml = tr(["Compétence", "Savoirs associés", "Savoir-faire", "Critères d'évaluation", "Moyens pédagogiques", "Indicateurs de réussite", "Volume", "Statut"], true);
       bloc.matieres.forEach(mat => {
         const vol = Math.round((parseInt(mat.volume) || 0) * scale);
@@ -3357,20 +3378,45 @@ function genMatriceCompetencesExcel(o: OrganismeInfo, f: FormationInfo) {
           "• Cours magistraux\n• Travaux pratiques\n• Études de cas\n• Mises en situation",
           "• Compétence validée lors de l'évaluation\n• Application en entreprise vérifiée\n• Dossier professionnel complété",
           `${vol}h`,
-          "À évaluer"
+          status.done ? "✅ Terminé" : status.partial ? "🔄 En cours" : "📋 À venir"
         ]);
       });
       const sheetName = `CCP${bi + 1} ${bloc.titre}`.substring(0, 31).replace(/[\/\\?*\[\]]/g, '');
       sheets.push({ name: sheetName, html: `<table>${sheetHtml}</table>` });
     });
 
-    // Sheet 3: Suivi acquisition par stagiaire (vide pour saisie)
-    let sheetSuivi = tr(["Apprenti", ...rncp.blocsCompetences.flatMap((b, bi) => b.competences.map((c, ci) => `C${bi + 1}.${ci + 1}`)), "% Global", "Observations"], true);
-    // 10 empty rows for manual entry
-    for (let i = 0; i < 10; i++) {
-      sheetSuivi += tr(["", ...rncp.blocsCompetences.flatMap(b => b.competences.map(() => "")), "", ""]);
+    // Sheet 3: Suivi acquisition par stagiaire — synchronized with EVAL_SCORES
+    const allCompCodes = rncp.blocsCompetences.flatMap((b, bi) => b.competences.map((c, ci) => `C${bi + 1}.${ci + 1}`));
+    let sheetSuivi = tr(["Apprenti", ...allCompCodes, "% Global", "Observations"], true);
+
+    // Pre-fill with stagiaire data using EVAL_SCORES
+    stagiaires.slice(0, 10).forEach((s, si) => {
+      const sc = EVAL_SCORES[si] || [7, 8, 7, 8, 7];
+      const levels = allCompCodes.map((_, ci) => {
+        if (!termine && !blocStatus[Math.floor(ci / Math.max(1, rncp.blocsCompetences[0]?.competences.length || 1))]?.done) return "";
+        const score = sc[ci % sc.length];
+        if (score >= 9) return "M"; // Maîtrisé
+        if (score >= 7) return "A"; // Acquis
+        if (score >= 5) return "EA"; // En cours
+        return "NA";
+      });
+      const filled = levels.filter(l => l !== "");
+      const acquired = filled.filter(l => l === "A" || l === "M").length;
+      const pct = filled.length > 0 ? Math.round(acquired / allCompCodes.length * 100) : 0;
+      const avg = Math.round(sc.reduce((a, b) => a + b, 0) / sc.length * 10) / 10;
+      sheetSuivi += tr([
+        `${s.prenom} ${s.nom}`,
+        ...levels,
+        termine ? `${pct}%` : filled.length > 0 ? `${pct}% (en cours)` : "—",
+        termine ? (avg >= 7 ? "Certification obtenue" : "En cours de validation") : filled.length > 0 ? "Formation en cours" : ""
+      ]);
+    });
+
+    // Add empty rows for additional manual entry
+    for (let i = stagiaires.length; i < Math.max(stagiaires.length, 5); i++) {
+      sheetSuivi += tr(["", ...allCompCodes.map(() => ""), "", ""]);
     }
-    sheetSuivi += tr(["Légende", ...rncp.blocsCompetences.flatMap(b => b.competences.map(() => "")), "", "NA = Non Acquis / EA = En cours / A = Acquis / M = Maîtrisé"], true);
+    sheetSuivi += tr(["Légende", ...allCompCodes.map(() => ""), "", "NA = Non Acquis / EA = En cours / A = Acquis / M = Maîtrisé"], true);
     sheets.push({ name: "Suivi acquisition", html: `<table>${sheetSuivi}</table>` });
 
   } else {
