@@ -265,11 +265,17 @@ export function genGrilleSuiviCompetences(o: OrganismeInfo, f: FormationInfo, st
 
 export function genCarnetLiaison(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const s = stagiaires[0] || { prenom: "___", nom: "___", entreprise: "___" };
+  const termine = isFormationTerminee(f);
+  const evalData = getEvalContent(f.intitule);
+  const modules = evalData.competences.length > 0 ? evalData.competences : ["Module 1", "Module 2", "Module 3", "Module 4"];
   return buildDocument({ org: o, title: "CARNET DE LIAISON", subtitle: `${s.prenom} ${s.nom} – ${f.intitule}`, sections: [
     { heading: "Apprenti(e)", content: `<p><strong>Nom :</strong> ${s.prenom} ${s.nom}<br><strong>Entreprise :</strong> ${s.entreprise}<br><strong>Formation :</strong> ${f.intitule}</p>` },
   ], table: {
     headers: ["Semaine", "Activités CFA", "Activités Entreprise", "Observations MA", "Signature"],
-    rows: Array.from({length: 8}, (_, i) => [`S${i+1}`, `Module ${Math.floor(i/2)+1}`, "Missions en cours", i < 4 ? "Bonne progression" : "Autonomie en développement", `Signé`])
+    rows: Array.from({length: 8}, (_, i) => {
+      const modLabel = modules[Math.floor(i / Math.max(1, Math.ceil(8 / modules.length))) % modules.length];
+      return [`S${i+1}`, modLabel, termine ? "Missions en cours" : "", termine ? (i < 4 ? "Bonne progression" : "Autonomie en développement") : "", termine ? "Signé" : ""];
+    })
   } });
 }
 
