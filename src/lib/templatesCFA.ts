@@ -183,14 +183,27 @@ export function genFicheLiaisonCFAEntreprise(o: OrganismeInfo, f: FormationInfo)
 }
 
 export function genAttestationPresenceCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
-  let extra = stagiaires.slice(0, 10).map(s => `
-    <div class="section"><p>Je soussigné, <strong>${o.dirigeant}</strong>, directeur du CFA ${o.nom}, atteste que <strong>${s.prenom} ${s.nom}</strong>, apprenti(e) dans l'entreprise <strong>${s.entreprise}</strong>, a été présent(e) aux cours du CFA pour la période du ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)}.</p>
-    <p><strong>Taux de présence au CFA :</strong> 95%</p>
-    <p>Fait à ${o.ville}, le ${formatDate(f.dateFin)}</p></div><div class="page-break"></div>`).join("");
+  const termine = isFormationTerminee(f);
+  const progress = getFormationProgress(f);
+  const allDays = getFormationDays(f);
+  const passedDays = getPassedFormationDays(f);
+  const today = new Date().toLocaleDateString('fr-FR');
+  let extra = stagiaires.slice(0, 10).map((s, i) => {
+    const taux = termine ? `${95 + (i % 5)}%` : (progress > 0 ? `${Math.round((passedDays.length / Math.max(1, allDays.length)) * (95 + (i % 5)))}% (provisoire – ${passedDays.length}/${allDays.length} jours)` : "___");
+    return `
+    <div class="section"><p>Je soussigné, <strong>${o.dirigeant}</strong>, directeur du CFA ${o.nom}, atteste que <strong>${s.prenom} ${s.nom}</strong>, apprenti(e) dans l'entreprise <strong>${s.entreprise}</strong>, a été présent(e) aux cours du CFA pour la période du ${formatDate(f.dateDebut)} au ${termine ? formatDate(f.dateFin) : today}.</p>
+    <p><strong>Taux de présence au CFA :</strong> ${taux}</p>
+    <p>Fait à ${o.ville}, le ${termine ? formatDate(f.dateFin) : today}</p></div><div class="page-break"></div>`;
+  }).join("");
   return buildDocument({ org: o, title: "ATTESTATION DE PRÉSENCE – CFA", subtitle: f.intitule, extraHtml: extra });
 }
 
 export function genAttestationFinParcours(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
+  const termine = isFormationTerminee(f);
+  if (!termine) {
+    return buildDocument({ org: o, title: "ATTESTATIONS DE FIN DE PARCOURS", subtitle: f.intitule,
+      extraHtml: `<div class="section section-green"><p><em>La formation est en cours. Les attestations de fin de parcours seront délivrées à l'issue de la formation.</em></p></div>` });
+  }
   let extra = stagiaires.slice(0, 10).map((s, i) => {
     const sc = EVAL_SCORES[i] || [8, 8, 8, 8, 8];
     const avg = Math.round(sc.reduce((a, b) => a + b, 0) / sc.length * 10) / 10;
