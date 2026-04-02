@@ -366,10 +366,11 @@ export function genSupportCoursCFA(o: OrganismeInfo, f: FormationInfo) {
 }
 
 export function genGrilleAccompagnementIndividualise(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
+  const termine = isFormationTerminee(f);
   const rows = stagiaires.slice(0, 10).map((s, i) => [
     s.prenom + " " + s.nom, s.entreprise,
-    i % 3 === 0 ? "Soutien scolaire" : i % 3 === 1 ? "Méthodologie" : "Aucun",
-    `${2 + (i % 3)}h/mois`, i < 7 ? "✅ En place" : "📋 Planifié"
+    termine ? (i % 3 === 0 ? "Soutien scolaire" : i % 3 === 1 ? "Méthodologie" : "Aucun") : "",
+    termine ? `${2 + (i % 3)}h/mois` : "", termine ? (i < 7 ? "✅ En place" : "📋 Planifié") : ""
   ]);
   return buildDocument({ org: o, title: "GRILLE D'ACCOMPAGNEMENT INDIVIDUALISÉ", subtitle: f.intitule, table: {
     headers: ["Apprenti(e)", "Entreprise", "Type d'accompagnement", "Fréquence", "Statut"], rows
