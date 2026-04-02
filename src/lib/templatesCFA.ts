@@ -518,7 +518,18 @@ export function genTableauSuiviInsertion(o: OrganismeInfo) {
 
 export function genTableauSuiviAssiduite(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const termine = isFormationTerminee(f);
-  const rows = stagiaires.slice(0, 10).map((s, i) => [s.prenom + " " + s.nom, s.entreprise, termine ? `${95 + (i % 5)}%` : "", termine ? `${i % 10 < 8 ? 0 : 1}` : "", termine ? `${i % 10 < 7 ? 0 : 1}` : "", termine ? (i < 8 ? "✅ Bon" : "⚠️ À suivre") : ""]);
+  const progress = getFormationProgress(f);
+  const enCours = !termine && progress > 0;
+  const rows = stagiaires.slice(0, 10).map((s, i) => {
+    if (termine) {
+      return [s.prenom + " " + s.nom, s.entreprise, `${95 + (i % 5)}%`, `${i % 10 < 8 ? 0 : 1}`, `${i % 10 < 7 ? 0 : 1}`, i < 8 ? "✅ Bon" : "⚠️ À suivre"];
+    }
+    if (enCours) {
+      const tauxPartiel = Math.round(progress * (95 + (i % 5)));
+      return [s.prenom + " " + s.nom, s.entreprise, `${tauxPartiel}% (provisoire)`, "0", "0", "🔄 En cours"];
+    }
+    return [s.prenom + " " + s.nom, s.entreprise, "", "", "", ""];
+  });
   return buildDocument({ org: o, title: "TABLEAU DE SUIVI DE L'ASSIDUITÉ – CFA", subtitle: f.intitule, table: {
     headers: ["Apprenti(e)", "Entreprise", "Taux présence", "Abs justifiées", "Abs injustifiées", "Statut"], rows
   } });
@@ -526,7 +537,18 @@ export function genTableauSuiviAssiduite(o: OrganismeInfo, f: FormationInfo, sta
 
 export function genTableauSuiviAccompagnement(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const termine = isFormationTerminee(f);
-  const rows = stagiaires.slice(0, 10).map((s, i) => [s.prenom + " " + s.nom, termine ? (i % 3 === 0 ? "Renforcé" : "Standard") : "", termine ? `${1 + (i % 3)} visites` : "", termine ? (i < 7 ? "✅" : "🔄") : "", ""]);
+  const progress = getFormationProgress(f);
+  const enCours = !termine && progress > 0;
+  const rows = stagiaires.slice(0, 10).map((s, i) => {
+    if (termine) {
+      return [s.prenom + " " + s.nom, i % 3 === 0 ? "Renforcé" : "Standard", `${1 + (i % 3)} visites`, i < 7 ? "✅" : "🔄", ""];
+    }
+    if (enCours) {
+      const visitesRealisees = progress > 0.5 ? 1 : 0;
+      return [s.prenom + " " + s.nom, i % 3 === 0 ? "Renforcé" : "Standard", visitesRealisees > 0 ? `${visitesRealisees} visite` : "Planifiée", "🔄 En cours", ""];
+    }
+    return [s.prenom + " " + s.nom, "", "", "", ""];
+  });
   return buildDocument({ org: o, title: "TABLEAU DE SUIVI DE L'ACCOMPAGNEMENT", subtitle: f.intitule, table: {
     headers: ["Apprenti(e)", "Niveau accompagnement", "Visites réalisées", "Objectif atteint", "Remarques"], rows
   } });
