@@ -277,6 +277,24 @@ export const EY_DOCUMENTS: EYDocumentItem[] = [
     category: "formateurs",
   },
 
+  // === BLOC / INSCRIPTION ===
+  {
+    code: "CONTRAT_BLOC",
+    label: "Contrat de formation par bloc (N° action)",
+    description: "Contrat tripartite listant les blocs de compétences avec le numéro d'action EDOF correspondant",
+    autoTemplates: ["contrat_formation_par_bloc"],
+    perStagiaire: true,
+    category: "administratif",
+  },
+  {
+    code: "DOSSIER_INSCRIPTION",
+    label: "Dossier d'inscription stagiaire",
+    description: "Dossier d'inscription comprenant les informations personnelles, entreprise et pièces justificatives",
+    autoTemplates: ["dossier_inscription_cfa"],
+    perStagiaire: true,
+    category: "administratif",
+  },
+
   // === ADMINISTRATIF ===
   {
     code: "BAIL",
