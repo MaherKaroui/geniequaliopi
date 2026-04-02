@@ -5475,6 +5475,7 @@ ${tableHTML(["Champ", "Réponse"], [
 }
 
 function genLivretAccueilCFA(o: OrganismeInfo, f: FormationInfo) {
+  const mc = getModaliteContent(f, o);
   return buildDocument({ org: o, title: "LIVRET D'ACCUEIL", subtitle: f.intitule, sections: [
     { heading: "Bienvenue !", content: `<p>Nous sommes heureux de vous accueillir au sein de <strong>${o.nom}</strong> pour la formation <strong>« ${f.intitule} »</strong>. Ce livret contient toutes les informations nécessaires au bon déroulement de votre parcours.</p>` },
     { heading: "Présentation de l'organisme", content: `
@@ -5487,19 +5488,13 @@ function genLivretAccueilCFA(o: OrganismeInfo, f: FormationInfo) {
 ${tableHTML(["Information", "Détail"], [
   ["Intitulé", f.intitule],
   ["Durée", f.duree],
-  ["Modalités", f.modalites || "Présentiel"],
-  ["Lieu", f.lieu || o.adresse || "___"],
+  ["Modalités", mc.modaliteLabel],
+  ["Lieu", mc.lieuFormation],
   ["Dates", "Du " + formatDate(f.dateDebut) + " au " + formatDate(f.dateFin)],
-  ["Horaires", (f as any).horaires || "9h00 – 12h30 / 13h30 – 17h00"],
+  ["Horaires", mc.horaires],
 ])}` },
-    { heading: "Règles de vie", content: `
-<ul>
-<li>Respecter les horaires et signaler toute absence au préalable</li>
-<li>Adopter un comportement respectueux envers les formateurs, les autres apprenants et le personnel</li>
-<li>Respecter le matériel mis à disposition</li>
-<li>Les téléphones portables doivent être éteints ou en mode silencieux pendant les cours</li>
-<li>Toute forme de discrimination ou de harcèlement est strictement interdite</li>
-</ul>` },
+    { heading: "Moyens pédagogiques", content: mc.moyensPedagogiques },
+    { heading: "Règles de vie", content: mc.reglesSalle },
     { heading: "Accompagnement et référents", content: `
 <p><strong>Référent pédagogique :</strong> ${o.responsablePedagogique || o.dirigeant || "___"}</p>
 <p><strong>Référent administratif :</strong> ${o.dirigeant || "___"}</p>
@@ -5507,6 +5502,7 @@ ${tableHTML(["Information", "Détail"], [
 <p>N'hésitez pas à les contacter pour toute question ou besoin d'accompagnement spécifique.</p>` },
     { heading: "Accessibilité et handicap", content: `
 <p>${o.nom} s'engage à accueillir les personnes en situation de handicap et à adapter les conditions de formation. Pour tout besoin, contactez notre référent handicap : <strong>${o.referentHandicap || o.dirigeant || "___"}</strong>.</p>` },
+    ...(mc.isDist ? [{ heading: "Matériel nécessaire", content: mc.materielNecessaire }] : []),
     { heading: "Contacts utiles", content: `
 ${tableHTML(["Service", "Contact"], [
   ["Accueil / Secrétariat", (o.telephone || "___") + " – " + (o.email || "___")],
