@@ -145,21 +145,39 @@ export function genConvocationApprenti(o: OrganismeInfo, f: FormationInfo, stagi
 
 export function genFicheMissionEntreprise(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const s = stagiaires[0] || { prenom: "___", nom: "___", entreprise: "___", poste: "___" };
+  const evalData = getEvalContent(f.intitule);
+  const missions = evalData.competences.length >= 4
+    ? evalData.competences.slice(0, 4).map((c, i) => `${i + 1}. ${c} – application en situation professionnelle`)
+    : [`1. Participation aux activités courantes du service`, `2. Réalisation de projets en lien avec la formation « ${f.intitule} »`, `3. Prise en charge progressive de responsabilités`, `4. Travail en équipe et communication professionnelle`];
+  const compChecks = evalData.competences.length > 0
+    ? evalData.competences.slice(0, 5).map(c => `☐ ${c}`)
+    : ["☐ Autonomie dans les tâches courantes", "☐ Application des méthodes apprises au CFA", "☐ Communication professionnelle", "☐ Respect des consignes de sécurité", "☐ Initiative et proactivité"];
   return buildDocument({ org: o, title: "FICHE DE MISSION EN ENTREPRISE", subtitle: `${s.prenom} ${s.nom} – ${s.entreprise}`, sections: [
     { heading: "Apprenti(e)", content: `<p><strong>Nom :</strong> ${s.prenom} ${s.nom}<br><strong>Entreprise :</strong> ${s.entreprise}<br><strong>Poste :</strong> ${s.poste}<br><strong>Maître d'apprentissage :</strong> ${f.formateur}</p>` },
-    { heading: "Missions confiées", content: "<p>1. Participation aux activités courantes du service<br>2. Réalisation de projets en lien avec la formation<br>3. Prise en charge progressive de responsabilités<br>4. Travail en équipe et communication professionnelle</p>" },
-    { heading: "Compétences visées en entreprise", content: "<p>☐ Autonomie dans les tâches courantes<br>☐ Application des méthodes apprises au CFA<br>☐ Communication professionnelle<br>☐ Respect des consignes de sécurité<br>☐ Initiative et proactivité</p>" },
+    { heading: "Missions confiées", content: `<p>${missions.join('<br>')}</p>` },
+    { heading: "Compétences visées en entreprise", content: `<p>${compChecks.join('<br>')}</p>` },
   ], signatures: { type: "2", labels: ["Le Maître d'apprentissage", "L'Apprenti(e)"], names: [f.formateur, s.prenom + " " + s.nom] } });
 }
 
 export function genFicheLiaisonCFAEntreprise(o: OrganismeInfo, f: FormationInfo) {
+  const debut = f.dateDebut ? new Date(f.dateDebut.split('/').reverse().join('-')) : new Date();
+  const termine = isFormationTerminee(f);
+  const progress = getFormationProgress(f);
+  const makeDate = (monthsAfter: number) => {
+    const d = new Date(debut.getFullYear(), debut.getMonth() + monthsAfter, 15);
+    return d.toLocaleDateString('fr-FR');
+  };
+  const isPastDate = (monthsAfter: number) => {
+    const d = new Date(debut.getFullYear(), debut.getMonth() + monthsAfter, 15);
+    return d <= new Date();
+  };
   return buildDocument({ org: o, title: "FICHE DE LIAISON CFA / ENTREPRISE", subtitle: f.intitule, table: {
     headers: ["Date", "Objet", "Interlocuteur CFA", "Interlocuteur Entreprise", "Suite donnée"],
     rows: [
-      ["15/09/2024", "Présentation du parcours", o.responsablePedagogique, "RH entreprise", "Convention signée"],
-      ["15/11/2024", "1ère visite en entreprise", o.responsablePedagogique, "Maître d'apprentissage", "RAS – Bonne intégration"],
-      ["15/02/2025", "2ème visite – point mi-parcours", o.responsablePedagogique, "Maître d'apprentissage", "Progression satisfaisante"],
-      ["15/05/2025", "Préparation examen", o.responsablePedagogique, "Maître d'apprentissage", "Évaluation finale planifiée"],
+      [makeDate(0), "Présentation du parcours", o.responsablePedagogique, "RH entreprise", isPastDate(0) ? "Convention signée" : ""],
+      [makeDate(2), "1ère visite en entreprise", o.responsablePedagogique, "Maître d'apprentissage", isPastDate(2) ? "RAS – Bonne intégration" : ""],
+      [makeDate(5), "2ème visite – point mi-parcours", o.responsablePedagogique, "Maître d'apprentissage", isPastDate(5) ? "Progression satisfaisante" : ""],
+      [makeDate(8), "Préparation examen", o.responsablePedagogique, "Maître d'apprentissage", isPastDate(8) ? "Évaluation finale planifiée" : ""],
     ]
   } });
 }
