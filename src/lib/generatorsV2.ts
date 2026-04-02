@@ -527,6 +527,7 @@ export function genProcedureAdaptation_V2(o: OrganismeInfo, f: FormationInfo) {
 
 export function genTableauSuiviParcours_V2(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const days = getFormationDays(f);
+  const termine = isFormationTerminee(f);
   const headers = [
     "Nom", "Prénom", "Sexe", "Prise en charge", "Nature", "Handicap", "Observations",
     "Date entrée", "Date sortie",
