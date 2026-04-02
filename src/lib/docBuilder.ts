@@ -1,4 +1,5 @@
 import { OrganismeInfo, FormationInfo, StagiaireInfo, DocStyleConfig, DEFAULT_DOC_STYLE } from "@/types/qualiopi";
+import { getFormationDays } from "./sampleData";
 
 /** Ensure a URL has a protocol prefix and return a clickable <a> tag */
 export function linkUrl(url: string | undefined | null, label?: string): string {
