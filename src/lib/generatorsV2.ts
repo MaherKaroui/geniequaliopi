@@ -528,6 +528,19 @@ export function genProcedureAdaptation_V2(o: OrganismeInfo, f: FormationInfo) {
 export function genTableauSuiviParcours_V2(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const days = getFormationDays(f);
   const termine = isFormationTerminee(f);
+  const now = new Date();
+  now.setHours(23, 59, 59, 999);
+  // Determine which days have passed
+  const daysPassed = days.map(dayStr => {
+    try {
+      const parts = dayStr.split('/');
+      if (parts.length === 3) {
+        const d = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+        return d <= now;
+      }
+      return false;
+    } catch { return false; }
+  });
   const headers = [
     "Nom", "Prénom", "Sexe", "Prise en charge", "Nature", "Handicap", "Observations",
     "Date entrée", "Date sortie",
@@ -541,7 +554,8 @@ export function genTableauSuiviParcours_V2(o: OrganismeInfo, f: FormationInfo, s
     const sc = EVAL_SCORES[si] || [7, 8, 7, 8, 7];
     const avg = Math.round(sc.reduce((a, b) => a + b, 0) / sc.length * 10) / 10;
     const sexe = s.prenom?.endsWith('a') || s.prenom?.endsWith('e') ? 'F' : 'H';
-    const presences = days.slice(0, 12).map(() => 'X');
+    // Only mark presence for days that have passed
+    const presences = days.slice(0, 12).map((_, i) => daysPassed[i] ? 'X' : '');
     return [
       s.nom?.toUpperCase(), s.prenom?.toUpperCase(), sexe,
       si % 3 === 0 ? 'autofinancement' : si % 3 === 1 ? 'OPCO' : 'CPF',
