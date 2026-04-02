@@ -227,13 +227,18 @@ export function genPositionnementInitialApprenti(o: OrganismeInfo, f: FormationI
 }
 
 export function genEntretienPositionnement(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
+  const evalData = getEvalContent(f.intitule);
+  const comps = evalData.competences.slice(0, 3);
   let extra = "";
   stagiaires.slice(0, 5).forEach(s => {
+    const besoins = comps.length > 0
+      ? comps.map(c => `Renforcement en ${c.toLowerCase()}`).join(', ')
+      : "Renforcement des bases théoriques, accompagnement pratique";
     extra += `<div class="section"><h3>Entretien – ${s.prenom} ${s.nom}</h3>
       <p><strong>Entreprise :</strong> ${s.entreprise} | <strong>Poste :</strong> ${s.poste}</p>
-      <p><strong>Parcours antérieur :</strong> Diplôme ${s.poste ? 'en lien avec le poste actuel' : 'à préciser'}</p>
-      <p><strong>Motivations :</strong> Développer des compétences professionnelles en alternance</p>
-      <p><strong>Besoins identifiés :</strong> Renforcement des bases théoriques, accompagnement pratique</p>
+      <p><strong>Parcours antérieur :</strong> ${s.poste ? `Expérience en ${s.poste}` : 'À préciser lors de l\'entretien'}</p>
+      <p><strong>Motivations :</strong> Développer des compétences professionnelles en ${f.intitule.toLowerCase()}</p>
+      <p><strong>Besoins identifiés :</strong> ${besoins}</p>
       <p><strong>Aménagements nécessaires :</strong> ${s.entreprise ? "Aucun" : "À évaluer"}</p>
     </div>`;
   });
