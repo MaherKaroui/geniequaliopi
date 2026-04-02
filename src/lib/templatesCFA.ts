@@ -1,7 +1,7 @@
 // CFA (Centre de Formation d'Apprentis) template generators
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
-import { buildDocument, formatDate, tableHTML, signatureBlock2, signatureBlock3, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireDuree, isFormationTerminee } from "./docBuilder";
-import { EVAL_SCORES } from "./sampleData";
+import { buildDocument, formatDate, tableHTML, signatureBlock2, signatureBlock3, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireDuree, isFormationTerminee, getFormationProgress, getPassedFormationDays } from "./docBuilder";
+import { EVAL_SCORES, getFormationDays } from "./sampleData";
 import { getEvalContent } from "./evalContent";
 
 const apprentiLabel = (s: StagiaireInfo) => `${s.prenom} ${s.nom}`;
@@ -103,10 +103,15 @@ export function genConventionPedagogiqueCFA(o: OrganismeInfo, f: FormationInfo, 
 }
 
 export function genPlanningAlternance(o: OrganismeInfo, f: FormationInfo) {
+  const debut = f.dateDebut ? new Date(f.dateDebut.split('/').reverse().join('-')) : new Date();
   const rows = [];
-  for (let m = 1; m <= 12; m++) {
-    const mois = new Date(2024, m - 1).toLocaleDateString('fr-FR', { month: 'long' });
-    rows.push([mois.charAt(0).toUpperCase() + mois.slice(1), "Sem 1-2 : Entreprise", "Sem 3 : CFA", "Sem 4 : Entreprise", m === 6 ? "Bilan intermédiaire" : m === 12 ? "Examen final" : ""]);
+  for (let m = 0; m < 12; m++) {
+    const d = new Date(debut.getFullYear(), debut.getMonth() + m, 1);
+    const mois = d.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+    const now = new Date();
+    const isPast = d < now;
+    const termine = isFormationTerminee(f);
+    rows.push([mois.charAt(0).toUpperCase() + mois.slice(1), "Sem 1-2 : Entreprise", "Sem 3 : CFA", "Sem 4 : Entreprise", m === 5 ? "Bilan intermédiaire" : m === 11 ? "Examen final" : ""]);
   }
   return buildDocument({ org: o, title: "PLANNING D'ALTERNANCE", subtitle: f.intitule, table: {
     headers: ["Mois", "Période 1", "Période 2", "Période 3", "Événement"], rows
@@ -114,18 +119,21 @@ export function genPlanningAlternance(o: OrganismeInfo, f: FormationInfo) {
 }
 
 export function genCalendrierCFA(o: OrganismeInfo, f: FormationInfo) {
-  return buildDocument({ org: o, title: "CALENDRIER DU CFA – ANNÉE 2024", table: {
+  const debut = f.dateDebut ? new Date(f.dateDebut.split('/').reverse().join('-')) : new Date();
+  const year = debut.getFullYear();
+  const moisDebut = debut.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+  return buildDocument({ org: o, title: `CALENDRIER DU CFA – ANNÉE ${year}`, table: {
     headers: ["Période", "Événement", "Date", "Participants"],
     rows: [
-      ["Rentrée", "Journée d'intégration", "02/09/2024", "Tous les apprentis"],
-      ["T1", "Conseil de classe", "15/11/2024", "Formateurs + direction"],
-      ["T1", "Visite entreprise 1", "Oct-Nov 2024", "Formateurs référents"],
-      ["T2", "Examens blancs", "15/01/2025", "Tous les apprentis"],
-      ["T2", "Conseil de classe", "07/02/2025", "Formateurs + direction"],
-      ["T2", "Visite entreprise 2", "Fév-Mars 2025", "Formateurs référents"],
-      ["T3", "Révisions intensives", "Mai 2025", "Apprentis en certification"],
-      ["T3", "Examens finaux", "Juin 2025", "Apprentis en certification"],
-      ["Fin", "Cérémonie de remise des diplômes", "Juil 2025", "Tous"],
+      ["Rentrée", "Journée d'intégration", formatDate(f.dateDebut), "Tous les apprentis"],
+      ["T1", "Conseil de classe", `${new Date(year, debut.getMonth() + 2, 15).toLocaleDateString('fr-FR')}`, "Formateurs + direction"],
+      ["T1", "Visite entreprise 1", `${new Date(year, debut.getMonth() + 1, 1).toLocaleDateString('fr-FR', { month: 'long' })} ${year}`, "Formateurs référents"],
+      ["T2", "Examens blancs", `${new Date(year, debut.getMonth() + 4, 15).toLocaleDateString('fr-FR')}`, "Tous les apprentis"],
+      ["T2", "Conseil de classe", `${new Date(year, debut.getMonth() + 5, 7).toLocaleDateString('fr-FR')}`, "Formateurs + direction"],
+      ["T2", "Visite entreprise 2", `${new Date(year, debut.getMonth() + 5, 1).toLocaleDateString('fr-FR', { month: 'long' })} ${year}`, "Formateurs référents"],
+      ["T3", "Révisions intensives", `${new Date(year, debut.getMonth() + 8, 1).toLocaleDateString('fr-FR', { month: 'long' })} ${year + 1}`, "Apprentis en certification"],
+      ["T3", "Examens finaux", f.dateFin ? formatDate(f.dateFin) : `Juin ${year + 1}`, "Apprentis en certification"],
+      ["Fin", "Cérémonie de remise des diplômes", f.dateFin ? formatDate(f.dateFin) : `Juil ${year + 1}`, "Tous"],
     ]
   } });
 }
@@ -137,34 +145,65 @@ export function genConvocationApprenti(o: OrganismeInfo, f: FormationInfo, stagi
 
 export function genFicheMissionEntreprise(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const s = stagiaires[0] || { prenom: "___", nom: "___", entreprise: "___", poste: "___" };
+  const evalData = getEvalContent(f.intitule);
+  const missions = evalData.competences.length >= 4
+    ? evalData.competences.slice(0, 4).map((c, i) => `${i + 1}. ${c} – application en situation professionnelle`)
+    : [`1. Participation aux activités courantes du service`, `2. Réalisation de projets en lien avec la formation « ${f.intitule} »`, `3. Prise en charge progressive de responsabilités`, `4. Travail en équipe et communication professionnelle`];
+  const compChecks = evalData.competences.length > 0
+    ? evalData.competences.slice(0, 5).map(c => `☐ ${c}`)
+    : ["☐ Autonomie dans les tâches courantes", "☐ Application des méthodes apprises au CFA", "☐ Communication professionnelle", "☐ Respect des consignes de sécurité", "☐ Initiative et proactivité"];
   return buildDocument({ org: o, title: "FICHE DE MISSION EN ENTREPRISE", subtitle: `${s.prenom} ${s.nom} – ${s.entreprise}`, sections: [
     { heading: "Apprenti(e)", content: `<p><strong>Nom :</strong> ${s.prenom} ${s.nom}<br><strong>Entreprise :</strong> ${s.entreprise}<br><strong>Poste :</strong> ${s.poste}<br><strong>Maître d'apprentissage :</strong> ${f.formateur}</p>` },
-    { heading: "Missions confiées", content: "<p>1. Participation aux activités courantes du service<br>2. Réalisation de projets en lien avec la formation<br>3. Prise en charge progressive de responsabilités<br>4. Travail en équipe et communication professionnelle</p>" },
-    { heading: "Compétences visées en entreprise", content: "<p>☐ Autonomie dans les tâches courantes<br>☐ Application des méthodes apprises au CFA<br>☐ Communication professionnelle<br>☐ Respect des consignes de sécurité<br>☐ Initiative et proactivité</p>" },
+    { heading: "Missions confiées", content: `<p>${missions.join('<br>')}</p>` },
+    { heading: "Compétences visées en entreprise", content: `<p>${compChecks.join('<br>')}</p>` },
   ], signatures: { type: "2", labels: ["Le Maître d'apprentissage", "L'Apprenti(e)"], names: [f.formateur, s.prenom + " " + s.nom] } });
 }
 
 export function genFicheLiaisonCFAEntreprise(o: OrganismeInfo, f: FormationInfo) {
+  const debut = f.dateDebut ? new Date(f.dateDebut.split('/').reverse().join('-')) : new Date();
+  const termine = isFormationTerminee(f);
+  const progress = getFormationProgress(f);
+  const makeDate = (monthsAfter: number) => {
+    const d = new Date(debut.getFullYear(), debut.getMonth() + monthsAfter, 15);
+    return d.toLocaleDateString('fr-FR');
+  };
+  const isPastDate = (monthsAfter: number) => {
+    const d = new Date(debut.getFullYear(), debut.getMonth() + monthsAfter, 15);
+    return d <= new Date();
+  };
   return buildDocument({ org: o, title: "FICHE DE LIAISON CFA / ENTREPRISE", subtitle: f.intitule, table: {
     headers: ["Date", "Objet", "Interlocuteur CFA", "Interlocuteur Entreprise", "Suite donnée"],
     rows: [
-      ["15/09/2024", "Présentation du parcours", o.responsablePedagogique, "RH entreprise", "Convention signée"],
-      ["15/11/2024", "1ère visite en entreprise", o.responsablePedagogique, "Maître d'apprentissage", "RAS – Bonne intégration"],
-      ["15/02/2025", "2ème visite – point mi-parcours", o.responsablePedagogique, "Maître d'apprentissage", "Progression satisfaisante"],
-      ["15/05/2025", "Préparation examen", o.responsablePedagogique, "Maître d'apprentissage", "Évaluation finale planifiée"],
+      [makeDate(0), "Présentation du parcours", o.responsablePedagogique, "RH entreprise", isPastDate(0) ? "Convention signée" : ""],
+      [makeDate(2), "1ère visite en entreprise", o.responsablePedagogique, "Maître d'apprentissage", isPastDate(2) ? "RAS – Bonne intégration" : ""],
+      [makeDate(5), "2ème visite – point mi-parcours", o.responsablePedagogique, "Maître d'apprentissage", isPastDate(5) ? "Progression satisfaisante" : ""],
+      [makeDate(8), "Préparation examen", o.responsablePedagogique, "Maître d'apprentissage", isPastDate(8) ? "Évaluation finale planifiée" : ""],
     ]
   } });
 }
 
 export function genAttestationPresenceCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
-  let extra = stagiaires.slice(0, 10).map(s => `
-    <div class="section"><p>Je soussigné, <strong>${o.dirigeant}</strong>, directeur du CFA ${o.nom}, atteste que <strong>${s.prenom} ${s.nom}</strong>, apprenti(e) dans l'entreprise <strong>${s.entreprise}</strong>, a été présent(e) aux cours du CFA pour la période du ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)}.</p>
-    <p><strong>Taux de présence au CFA :</strong> 95%</p>
-    <p>Fait à ${o.ville}, le ${formatDate(f.dateFin)}</p></div><div class="page-break"></div>`).join("");
+  const termine = isFormationTerminee(f);
+  const progress = getFormationProgress(f);
+  const allDays = getFormationDays(f);
+  const passedDays = getPassedFormationDays(f);
+  const today = new Date().toLocaleDateString('fr-FR');
+  let extra = stagiaires.slice(0, 10).map((s, i) => {
+    const taux = termine ? `${95 + (i % 5)}%` : (progress > 0 ? `${Math.round((passedDays.length / Math.max(1, allDays.length)) * (95 + (i % 5)))}% (provisoire – ${passedDays.length}/${allDays.length} jours)` : "___");
+    return `
+    <div class="section"><p>Je soussigné, <strong>${o.dirigeant}</strong>, directeur du CFA ${o.nom}, atteste que <strong>${s.prenom} ${s.nom}</strong>, apprenti(e) dans l'entreprise <strong>${s.entreprise}</strong>, a été présent(e) aux cours du CFA pour la période du ${formatDate(f.dateDebut)} au ${termine ? formatDate(f.dateFin) : today}.</p>
+    <p><strong>Taux de présence au CFA :</strong> ${taux}</p>
+    <p>Fait à ${o.ville}, le ${termine ? formatDate(f.dateFin) : today}</p></div><div class="page-break"></div>`;
+  }).join("");
   return buildDocument({ org: o, title: "ATTESTATION DE PRÉSENCE – CFA", subtitle: f.intitule, extraHtml: extra });
 }
 
 export function genAttestationFinParcours(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
+  const termine = isFormationTerminee(f);
+  if (!termine) {
+    return buildDocument({ org: o, title: "ATTESTATIONS DE FIN DE PARCOURS", subtitle: f.intitule,
+      extraHtml: `<div class="section section-green"><p><em>La formation est en cours. Les attestations de fin de parcours seront délivrées à l'issue de la formation.</em></p></div>` });
+  }
   let extra = stagiaires.slice(0, 10).map((s, i) => {
     const sc = EVAL_SCORES[i] || [8, 8, 8, 8, 8];
     const avg = Math.round(sc.reduce((a, b) => a + b, 0) / sc.length * 10) / 10;
@@ -188,13 +227,18 @@ export function genPositionnementInitialApprenti(o: OrganismeInfo, f: FormationI
 }
 
 export function genEntretienPositionnement(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
+  const evalData = getEvalContent(f.intitule);
+  const comps = evalData.competences.slice(0, 3);
   let extra = "";
   stagiaires.slice(0, 5).forEach(s => {
+    const besoins = comps.length > 0
+      ? comps.map(c => `Renforcement en ${c.toLowerCase()}`).join(', ')
+      : "Renforcement des bases théoriques, accompagnement pratique";
     extra += `<div class="section"><h3>Entretien – ${s.prenom} ${s.nom}</h3>
       <p><strong>Entreprise :</strong> ${s.entreprise} | <strong>Poste :</strong> ${s.poste}</p>
-      <p><strong>Parcours antérieur :</strong> Diplôme ${s.poste ? 'en lien avec le poste actuel' : 'à préciser'}</p>
-      <p><strong>Motivations :</strong> Développer des compétences professionnelles en alternance</p>
-      <p><strong>Besoins identifiés :</strong> Renforcement des bases théoriques, accompagnement pratique</p>
+      <p><strong>Parcours antérieur :</strong> ${s.poste ? `Expérience en ${s.poste}` : 'À préciser lors de l\'entretien'}</p>
+      <p><strong>Motivations :</strong> Développer des compétences professionnelles en ${f.intitule.toLowerCase()}</p>
+      <p><strong>Besoins identifiés :</strong> ${besoins}</p>
       <p><strong>Aménagements nécessaires :</strong> ${s.entreprise ? "Aucun" : "À évaluer"}</p>
     </div>`;
   });
@@ -202,8 +246,13 @@ export function genEntretienPositionnement(o: OrganismeInfo, f: FormationInfo, s
 }
 
 export function genAnalyseBesoinsApprenti(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
+  const evalData = getEvalContent(f.intitule);
+  const compsList = evalData.competences.length > 0
+    ? evalData.competences.slice(0, 4).map(c => `• ${c}`).join('<br>')
+    : "• Compétences techniques métier<br>• Compétences transversales<br>• Communication professionnelle<br>• Autonomie";
   return buildDocument({ org: o, title: "ANALYSE DES BESOINS – APPRENTIS", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, sections: [
     { heading: "Méthodologie", content: `<p>L'analyse des besoins des ${Math.min(stagiaires.length, 10)} apprentis a été réalisée via :<br>• Entretiens individuels de positionnement<br>• Questionnaire en ligne<br>• Échange avec les maîtres d'apprentissage<br>• Tests de niveau</p>` },
+    { heading: "Compétences visées", content: `<p>Formation « ${f.intitule} » :<br>${compsList}</p>` },
     { heading: "Besoins identifiés", content: "<p>• 70% souhaitent un accompagnement renforcé en entreprise<br>• 60% ont besoin de consolider les bases théoriques<br>• 40% demandent un suivi personnalisé<br>• 20% nécessitent des aménagements spécifiques</p>" },
     { heading: "Plan de formation individualisé", content: "<p>Chaque apprenti bénéficie d'un plan de formation individualisé intégrant :<br>• Les compétences à acquérir au CFA<br>• Les missions en entreprise<br>• Les modalités d'évaluation<br>• Le calendrier d'alternance adapté</p>", variant: "green" },
   ] });
@@ -277,15 +326,19 @@ export function genGrilleSuiviCompetences(o: OrganismeInfo, f: FormationInfo, st
 export function genCarnetLiaison(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const s = stagiaires[0] || { prenom: "___", nom: "___", entreprise: "___" };
   const termine = isFormationTerminee(f);
+  const progress = getFormationProgress(f);
   const evalData = getEvalContent(f.intitule);
   const modules = evalData.competences.length > 0 ? evalData.competences : ["Module 1", "Module 2", "Module 3", "Module 4"];
+  const totalWeeks = 8;
+  const weeksPassed = termine ? totalWeeks : Math.floor(progress * totalWeeks);
   return buildDocument({ org: o, title: "CARNET DE LIAISON", subtitle: `${s.prenom} ${s.nom} – ${f.intitule}`, sections: [
     { heading: "Apprenti(e)", content: `<p><strong>Nom :</strong> ${s.prenom} ${s.nom}<br><strong>Entreprise :</strong> ${s.entreprise}<br><strong>Formation :</strong> ${f.intitule}</p>` },
   ], table: {
     headers: ["Semaine", "Activités CFA", "Activités Entreprise", "Observations MA", "Signature"],
-    rows: Array.from({length: 8}, (_, i) => {
-      const modLabel = modules[Math.floor(i / Math.max(1, Math.ceil(8 / modules.length))) % modules.length];
-      return [`S${i+1}`, modLabel, termine ? "Missions en cours" : "", termine ? (i < 4 ? "Bonne progression" : "Autonomie en développement") : "", termine ? "Signé" : ""];
+    rows: Array.from({length: totalWeeks}, (_, i) => {
+      const modLabel = modules[Math.floor(i / Math.max(1, Math.ceil(totalWeeks / modules.length))) % modules.length];
+      const isPast = i < weeksPassed;
+      return [`S${i+1}`, modLabel, isPast ? "Missions en cours" : "", isPast ? (i < 4 ? "Bonne progression" : "Autonomie en développement") : "", isPast ? "Signé" : ""];
     })
   } });
 }
@@ -293,11 +346,17 @@ export function genCarnetLiaison(o: OrganismeInfo, f: FormationInfo, stagiaires:
 export function genCompteRenduVisiteEntreprise(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const s = stagiaires[0] || { prenom: "___", nom: "___", entreprise: "___" };
   const termine = isFormationTerminee(f);
+  const progress = getFormationProgress(f);
+  const enCours = !termine && progress > 0;
+  // Date de visite: 2 months after debut for first visit
+  const debut = f.dateDebut ? new Date(f.dateDebut.split('/').reverse().join('-')) : new Date();
+  const dateVisite = new Date(debut.getFullYear(), debut.getMonth() + 2, 15);
+  const visiteFaite = dateVisite <= new Date();
   return buildDocument({ org: o, title: "COMPTE-RENDU DE VISITE EN ENTREPRISE", subtitle: `${s.prenom} ${s.nom} – ${s.entreprise}`, sections: [
-    { heading: "Informations", content: `<p><strong>Date de visite :</strong> ${formatDate(f.dateDebut)}<br><strong>Apprenti(e) :</strong> ${s.prenom} ${s.nom}<br><strong>Entreprise :</strong> ${s.entreprise}<br><strong>Maître d'apprentissage :</strong> ${f.formateur}<br><strong>Visiteur CFA :</strong> ${o.responsablePedagogique}</p>` },
-    { heading: "Intégration dans l'entreprise", content: termine ? "<p>☑ Bonne intégration dans l'équipe<br>☑ Missions en adéquation avec la formation<br>☑ Maître d'apprentissage disponible et impliqué<br>☑ Conditions de travail satisfaisantes</p>" : "<p>☐ Intégration dans l'équipe : ___<br>☐ Missions en adéquation avec la formation : ___<br>☐ Maître d'apprentissage disponible : ___<br>☐ Conditions de travail : ___</p>", variant: "green" },
-    { heading: "Progression des compétences", content: termine ? "<p>• Compétences techniques : En bonne voie d'acquisition<br>• Autonomie : En progression<br>• Communication : Satisfaisante<br>• Initiative : À développer</p>" : "<p>• Compétences techniques : ___<br>• Autonomie : ___<br>• Communication : ___<br>• Initiative : ___</p>" },
-    { heading: "Points d'attention", content: termine ? "<p>Aucun point bloquant identifié. L'apprenti est encouragé à prendre davantage d'initiative.</p>" : "<p>___</p>" },
+    { heading: "Informations", content: `<p><strong>Date de visite :</strong> ${visiteFaite ? dateVisite.toLocaleDateString('fr-FR') : '___'}<br><strong>Apprenti(e) :</strong> ${s.prenom} ${s.nom}<br><strong>Entreprise :</strong> ${s.entreprise}<br><strong>Maître d'apprentissage :</strong> ${f.formateur}<br><strong>Visiteur CFA :</strong> ${o.responsablePedagogique}</p>` },
+    { heading: "Intégration dans l'entreprise", content: (termine || visiteFaite) ? "<p>☑ Bonne intégration dans l'équipe<br>☑ Missions en adéquation avec la formation<br>☑ Maître d'apprentissage disponible et impliqué<br>☑ Conditions de travail satisfaisantes</p>" : "<p>☐ Intégration dans l'équipe : ___<br>☐ Missions en adéquation avec la formation : ___<br>☐ Maître d'apprentissage disponible : ___<br>☐ Conditions de travail : ___</p>", variant: "green" },
+    { heading: "Progression des compétences", content: (termine || visiteFaite) ? "<p>• Compétences techniques : En bonne voie d'acquisition<br>• Autonomie : En progression<br>• Communication : Satisfaisante<br>• Initiative : À développer</p>" : "<p>• Compétences techniques : ___<br>• Autonomie : ___<br>• Communication : ___<br>• Initiative : ___</p>" },
+    { heading: "Points d'attention", content: (termine || visiteFaite) ? "<p>Aucun point bloquant identifié. L'apprenti est encouragé à prendre davantage d'initiative.</p>" : "<p>___</p>" },
   ], signatures: { type: "3", names: [s.prenom + " " + s.nom, f.formateur] } });
 }
 
@@ -389,11 +448,17 @@ export function genSupportCoursCFA(o: OrganismeInfo, f: FormationInfo) {
 
 export function genGrilleAccompagnementIndividualise(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const termine = isFormationTerminee(f);
-  const rows = stagiaires.slice(0, 10).map((s, i) => [
-    s.prenom + " " + s.nom, s.entreprise,
-    termine ? (i % 3 === 0 ? "Soutien scolaire" : i % 3 === 1 ? "Méthodologie" : "Aucun") : "",
-    termine ? `${2 + (i % 3)}h/mois` : "", termine ? (i < 7 ? "✅ En place" : "📋 Planifié") : ""
-  ]);
+  const progress = getFormationProgress(f);
+  const enCours = !termine && progress > 0;
+  const rows = stagiaires.slice(0, 10).map((s, i) => {
+    if (termine) {
+      return [s.prenom + " " + s.nom, s.entreprise, i % 3 === 0 ? "Soutien scolaire" : i % 3 === 1 ? "Méthodologie" : "Aucun", `${2 + (i % 3)}h/mois`, i < 7 ? "✅ En place" : "📋 Planifié"];
+    }
+    if (enCours) {
+      return [s.prenom + " " + s.nom, s.entreprise, i % 3 === 0 ? "Soutien scolaire" : i % 3 === 1 ? "Méthodologie" : "Aucun", `${2 + (i % 3)}h/mois`, "🔄 En cours"];
+    }
+    return [s.prenom + " " + s.nom, s.entreprise, "", "", ""];
+  });
   return buildDocument({ org: o, title: "GRILLE D'ACCOMPAGNEMENT INDIVIDUALISÉ", subtitle: f.intitule, table: {
     headers: ["Apprenti(e)", "Entreprise", "Type d'accompagnement", "Fréquence", "Statut"], rows
   } });
@@ -469,7 +534,18 @@ export function genTableauSuiviInsertion(o: OrganismeInfo) {
 
 export function genTableauSuiviAssiduite(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const termine = isFormationTerminee(f);
-  const rows = stagiaires.slice(0, 10).map((s, i) => [s.prenom + " " + s.nom, s.entreprise, termine ? `${95 + (i % 5)}%` : "", termine ? `${i % 10 < 8 ? 0 : 1}` : "", termine ? `${i % 10 < 7 ? 0 : 1}` : "", termine ? (i < 8 ? "✅ Bon" : "⚠️ À suivre") : ""]);
+  const progress = getFormationProgress(f);
+  const enCours = !termine && progress > 0;
+  const rows = stagiaires.slice(0, 10).map((s, i) => {
+    if (termine) {
+      return [s.prenom + " " + s.nom, s.entreprise, `${95 + (i % 5)}%`, `${i % 10 < 8 ? 0 : 1}`, `${i % 10 < 7 ? 0 : 1}`, i < 8 ? "✅ Bon" : "⚠️ À suivre"];
+    }
+    if (enCours) {
+      const tauxPartiel = Math.round(progress * (95 + (i % 5)));
+      return [s.prenom + " " + s.nom, s.entreprise, `${tauxPartiel}% (provisoire)`, "0", "0", "🔄 En cours"];
+    }
+    return [s.prenom + " " + s.nom, s.entreprise, "", "", "", ""];
+  });
   return buildDocument({ org: o, title: "TABLEAU DE SUIVI DE L'ASSIDUITÉ – CFA", subtitle: f.intitule, table: {
     headers: ["Apprenti(e)", "Entreprise", "Taux présence", "Abs justifiées", "Abs injustifiées", "Statut"], rows
   } });
@@ -477,7 +553,18 @@ export function genTableauSuiviAssiduite(o: OrganismeInfo, f: FormationInfo, sta
 
 export function genTableauSuiviAccompagnement(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const termine = isFormationTerminee(f);
-  const rows = stagiaires.slice(0, 10).map((s, i) => [s.prenom + " " + s.nom, termine ? (i % 3 === 0 ? "Renforcé" : "Standard") : "", termine ? `${1 + (i % 3)} visites` : "", termine ? (i < 7 ? "✅" : "🔄") : "", ""]);
+  const progress = getFormationProgress(f);
+  const enCours = !termine && progress > 0;
+  const rows = stagiaires.slice(0, 10).map((s, i) => {
+    if (termine) {
+      return [s.prenom + " " + s.nom, i % 3 === 0 ? "Renforcé" : "Standard", `${1 + (i % 3)} visites`, i < 7 ? "✅" : "🔄", ""];
+    }
+    if (enCours) {
+      const visitesRealisees = progress > 0.5 ? 1 : 0;
+      return [s.prenom + " " + s.nom, i % 3 === 0 ? "Renforcé" : "Standard", visitesRealisees > 0 ? `${visitesRealisees} visite` : "Planifiée", "🔄 En cours", ""];
+    }
+    return [s.prenom + " " + s.nom, "", "", "", ""];
+  });
   return buildDocument({ org: o, title: "TABLEAU DE SUIVI DE L'ACCOMPAGNEMENT", subtitle: f.intitule, table: {
     headers: ["Apprenti(e)", "Niveau accompagnement", "Visites réalisées", "Objectif atteint", "Remarques"], rows
   } });

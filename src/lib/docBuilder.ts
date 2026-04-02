@@ -1,4 +1,5 @@
 import { OrganismeInfo, FormationInfo, StagiaireInfo, DocStyleConfig, DEFAULT_DOC_STYLE } from "@/types/qualiopi";
+import { getFormationDays } from "./sampleData";
 
 /** Ensure a URL has a protocol prefix and return a clickable <a> tag */
 export function linkUrl(url: string | undefined | null, label?: string): string {
@@ -798,4 +799,41 @@ export function isStagiaireFormationTerminee(s: StagiaireInfo, f: FormationInfo)
     const d = new Date(dateFin);
     return !isNaN(d.getTime()) && d < new Date();
   } catch { return false; }
+}
+
+/** Get formation progress ratio (0 to 1) based on today vs dateDebut/dateFin */
+export function getFormationProgress(f: FormationInfo): number {
+  if (!f.dateDebut || !f.dateFin) return 0;
+  const parseD = (s: string): Date | null => {
+    try {
+      const parts = s.split('/');
+      if (parts.length === 3) return new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+      const d = new Date(s);
+      return isNaN(d.getTime()) ? null : d;
+    } catch { return null; }
+  };
+  const debut = parseD(f.dateDebut);
+  const fin = parseD(f.dateFin);
+  if (!debut || !fin) return 0;
+  const now = new Date();
+  if (now >= fin) return 1;
+  if (now <= debut) return 0;
+  return (now.getTime() - debut.getTime()) / (fin.getTime() - debut.getTime());
+}
+
+/** Get formation days that have already passed (up to today) */
+export function getPassedFormationDays(f: FormationInfo): string[] {
+  const allDays = getFormationDays(f);
+  const now = new Date();
+  now.setHours(23, 59, 59, 999);
+  return allDays.filter(dayStr => {
+    try {
+      const parts = dayStr.split('/');
+      if (parts.length === 3) {
+        const d = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+        return d <= now;
+      }
+      return false;
+    } catch { return false; }
+  });
 }
