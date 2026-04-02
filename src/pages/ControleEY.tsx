@@ -387,7 +387,7 @@ const ControleEY = () => {
         ))}
 
         {/* Checklist */}
-        <ControleEDOF organisme={organisme} formation={formation} stagiaires={stagiaires} criteres={criteres} docStyle={docStyle} />
+        <ControleEDOF organisme={organisme} formation={formation} stagiaires={stagiaires} criteres={criteres} docStyle={docStyle} signature={signature} />
       </main>
     </div>
   );
