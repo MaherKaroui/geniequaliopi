@@ -1122,6 +1122,38 @@ const QUESTIONS_OUVERTES: Record<string, QuestionsOuvertesFormation> = {
   },
 };
 
+QUESTIONS_OUVERTES["SAMA"] = {
+  debut: [
+    { question: "Avez-vous déjà travaillé dans un environnement médical ou médico-administratif ?", reponseAttendue: "Oui/Non avec description de l'expérience : type de structure (hôpital, clinique, cabinet), durée et fonctions exercées." },
+    { question: "Que signifie pour vous le secret médical ?", reponseAttendue: "Le secret médical est l'obligation de confidentialité sur toutes les informations relatives au patient : état de santé, traitements, vie privée." },
+    { question: "Quels logiciels bureautiques ou médicaux connaissez-vous ?", reponseAttendue: "Word, Excel, Doctolib, logiciels de gestion de cabinet, DPI, messagerie sécurisée de santé." },
+    { question: "Comment accueillez-vous une personne en situation de stress ou d'angoisse ?", reponseAttendue: "Écoute active, ton calme et rassurant, reformulation, proposer de l'aide concrète, orienter si nécessaire." },
+    { question: "Que savez-vous de la carte Vitale et de son utilisation ?", reponseAttendue: "La carte Vitale contient les informations d'assurance maladie du patient et permet la télétransmission des feuilles de soins à la CPAM." },
+    { question: "Pourquoi avez-vous choisi la formation de secrétaire assistant médico-administratif ?", reponseAttendue: "Motivation personnelle liée au secteur médical, envie d'aider les patients, intérêt pour l'organisation administrative." },
+    { question: "Connaissez-vous la différence entre un hôpital public et une clinique privée ?", reponseAttendue: "L'hôpital public est géré par l'État et accueille tous les patients. La clinique privée est un établissement à but lucratif ou non lucratif avec des tarifs pouvant différer." },
+    { question: "Qu'est-ce qu'un dossier patient selon vous ?", reponseAttendue: "Le dossier patient regroupe toutes les informations administratives et médicales d'un patient : identité, antécédents, examens, comptes rendus, prescriptions." },
+    { question: "Comment organisez-vous votre travail au quotidien ?", reponseAttendue: "Planification des tâches par priorité, utilisation d'un agenda, gestion des urgences, suivi des dossiers en cours." },
+    { question: "Que feriez-vous si un patient vous demande des informations sur son diagnostic ?", reponseAttendue: "Je l'orienterais vers le médecin car le secrétaire médical ne peut pas communiquer d'informations médicales au patient." },
+  ],
+  fin: [
+    { question: "Décrivez la procédure d'accueil d'un nouveau patient dans une structure médicale.", reponseAttendue: "Vérification d'identité (identitovigilance), collecte des documents (carte Vitale, mutuelle, ordonnance), création du dossier administratif, orientation vers le service concerné." },
+    { question: "Expliquez le processus de facturation d'un acte médical.", reponseAttendue: "Saisie de l'acte avec le code CCAM/NGAP, vérification des droits du patient, application du tiers payant si applicable, télétransmission à la CPAM et à la mutuelle." },
+    { question: "Quelles sont les règles de conservation d'un dossier médical ?", reponseAttendue: "Conservation de 20 ans minimum à compter de la dernière consultation, 28 ans pour les mineurs. Archivage sécurisé conforme au RGPD." },
+    { question: "Comment gérez-vous un conflit entre un patient et un professionnel de santé ?", reponseAttendue: "Rester neutre, écouter les deux parties, proposer une médiation, orienter si besoin vers le service des relations avec les usagers." },
+    { question: "Décrivez les étapes de transcription d'un compte rendu médical.", reponseAttendue: "Écoute de la dictée, transcription avec mise en forme normée, vérification de la terminologie médicale, relecture, transmission au médecin pour validation." },
+    { question: "Quels sont vos acquis les plus importants de cette formation ?", reponseAttendue: "Maîtrise de la terminologie médicale, gestion du DPI, accueil patient, facturation et télétransmission, respect du cadre réglementaire." },
+    { question: "Comment utilisez-vous la messagerie sécurisée de santé (MSSanté) ?", reponseAttendue: "Connexion via identifiant professionnel, envoi de documents médicaux uniquement via MSSanté, vérification du destinataire dans l'annuaire, conservation des traces d'envoi." },
+    { question: "Expliquez la procédure de communication d'un dossier médical à un ayant droit.", reponseAttendue: "Vérification de la qualité d'ayant droit (acte de décès, filiation), vérification de l'absence d'opposition du patient de son vivant, communication des éléments hors notes personnelles du médecin, respect du délai de 8 jours." },
+    { question: "Qu'est-ce que le parcours de soins coordonnés et quel est son impact sur la facturation ?", reponseAttendue: "Le parcours de soins coordonnés passe par le médecin traitant qui oriente vers les spécialistes. Hors parcours, le remboursement est réduit (30% au lieu de 70%)." },
+    { question: "Qu'avez-vous appris pendant cette formation ?", reponseAttendue: "J'ai appris l'accueil patient, la gestion administrative et financière, la transcription médicale, la terminologie, le cadre réglementaire, la gestion du DPI et l'utilisation des outils numériques de santé." },
+  ],
+};
+
+QUESTIONS_OUVERTES["SAMS"] = {
+  debut: QUESTIONS_OUVERTES["SAMA"].debut,
+  fin: QUESTIONS_OUVERTES["SAMA"].fin,
+};
+
 const DEFAULT_QUESTIONS_OUVERTES: QuestionsOuvertesFormation = {
   debut: [
     { question: "Que savez-vous déjà sur le sujet de cette formation ?", reponseAttendue: "Le stagiaire exprime ses connaissances préalables sur le domaine de la formation." },
