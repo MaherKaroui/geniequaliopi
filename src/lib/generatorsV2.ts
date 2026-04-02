@@ -548,7 +548,7 @@ export function genTableauSuiviParcours_V2(o: OrganismeInfo, f: FormationInfo, s
       formatDate(getStagiaireDateDebut(s, f)), formatDate(getStagiaireDateFin(s, f)),
       formatDate(getStagiaireDateDebut(s, f)), 'aucune', 'aucune', 'aucune',
       ...presences,
-      '', `${avg}/10`, avg >= 6 ? 'oui' : 'non', 'oui'
+      '', termine ? `${avg}/10` : '', termine ? (avg >= 6 ? 'oui' : 'non') : '', termine ? 'oui' : ''
     ];
   });
 
