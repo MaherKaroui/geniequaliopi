@@ -3104,6 +3104,11 @@ function genCompetencesAlternance(o: OrganismeInfo, f: FormationInfo, stagiaires
 // ============== CFA CT1 IND 1 — Documents d'information ==============
 
 function genPlaquetteCommercialeCFA(o: OrganismeInfo, f: FormationInfo) {
+  const termine = isFormationTerminee(f);
+  const indicateursContent = termine
+    ? `<p>• Taux de réussite aux examens : 89%<br>• Taux de satisfaction des apprentis : 94%<br>• Taux d'insertion professionnelle à 6 mois : 85%<br>• Taux de rupture de contrat : 8%</p>`
+    : `<p><em>Nouvel entrant – Phase de lancement</em><br><br>La formation <strong>${f.intitule}</strong> est en cours de déploiement. Les indicateurs de résultats seront disponibles à l'issue de la première promotion.<br><br><strong>Objectifs prévisionnels :</strong><br>• Taux de réussite aux examens visé : ≥ 80%<br>• Taux de satisfaction des apprentis visé : ≥ 90%<br>• Taux d'insertion professionnelle à 6 mois visé : ≥ 75%<br>• Taux de rupture de contrat visé : &lt; 10%</p>`;
+
   return buildDocument({ org: o, title: "PLAQUETTE COMMERCIALE", subtitle: `${f.intitule}`, sections: [
     { heading: "Présentation de l'organisme", content: `<p><strong>${o.nom}</strong> est un Centre de Formation d'Apprentis (CFA) spécialisé dans la formation en alternance. Notre mission : accompagner les apprenants vers l'obtention de leur diplôme tout en développant des compétences opérationnelles en entreprise.</p><p><strong>Adresse :</strong> ${o.adresse}, ${o.codePostal} ${o.ville}<br><strong>Contact :</strong> ${o.email} – ${o.telephone}${o.siteWeb ? `<br><strong>Site web :</strong> ${linkUrl(o.siteWeb)}` : ''}</p>` },
     { heading: "Formation proposée", content: `<p><strong>Intitulé :</strong> ${f.intitule}<br><strong>Certification visée :</strong> ${f.intitule}<br><strong>Durée :</strong> ${f.duree}<br><strong>Modalités :</strong> ${f.modalites || "Alternance entreprise / centre de formation"}<br><strong>Rythme :</strong> Alternance selon calendrier défini</p>` },
@@ -3113,7 +3118,7 @@ function genPlaquetteCommercialeCFA(o: OrganismeInfo, f: FormationInfo) {
     { heading: "Modalités d'évaluation", content: `<p>• Évaluations continues en centre de formation<br>• Examens blancs et mises en situation professionnelle<br>• Évaluation en entreprise par le maître d'apprentissage<br>• Passage des épreuves de certification</p>`, variant: "green" },
     { heading: "Financement", content: `<p>La formation en apprentissage est <strong>gratuite pour l'apprenti</strong>. Le coût de la formation est pris en charge par l'OPCO de l'entreprise d'accueil.<br><br><strong>Coût de la formation :</strong> ${f.tarif || "Selon barème OPCO"}</p>` },
     { heading: "Accessibilité", content: `<p>Le CFA ${o.nom} s'engage à accueillir les personnes en situation de handicap. Un référent handicap est disponible pour étudier les aménagements nécessaires.<br><strong>Référent handicap :</strong> ${o.referentHandicap}<br><strong>Contact :</strong> ${o.email}</p>` },
-    { heading: "Indicateurs de résultats", content: `<p>• Taux de réussite aux examens : 89%<br>• Taux de satisfaction des apprentis : 94%<br>• Taux d'insertion professionnelle à 6 mois : 85%<br>• Taux de rupture de contrat : 8%</p>` },
+    { heading: "Indicateurs de résultats", content: indicateursContent },
   ] });
 }
 
