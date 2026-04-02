@@ -9406,6 +9406,18 @@ const FALLBACK_STAGIAIRE: StagiaireInfo = { prenom: "Martin", nom: "Dupont", civ
   const obsIdx = (hash + si + exerciceIdx) % observations.length;
   const observation = observations[obsIdx];
 
+  // Determine if this specific exercise's date has passed (not just formation end)
+  let exerciseDatePassed = formationTerminee;
+  if (!formationTerminee && dateStr !== '___/___/______') {
+    // Parse dd/mm/yyyy
+    const parts = dateStr.split('/');
+    if (parts.length === 3) {
+      const exDate = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+      exerciseDatePassed = exDate <= new Date();
+    }
+  }
+  const termine = exerciseDatePassed;
+
   const studentText = termine ? buildStudentResponse() : '';
 
   const responseBlock = termine
