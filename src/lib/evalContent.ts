@@ -1219,6 +1219,33 @@ QUESTIONS_OUVERTES["SAMS"] = {
   fin: QUESTIONS_OUVERTES["SAMA"].fin,
 };
 
+QUESTIONS_OUVERTES["NTC"] = {
+  debut: [
+    { question: "Avez-vous déjà exercé une activité commerciale ou de prospection ?", reponseAttendue: "Oui/Non avec description : type de produits/services vendus, secteur B2B ou B2C, durée d'expérience." },
+    { question: "Que signifie pour vous le terme 'négociation technico-commerciale' ?", reponseAttendue: "C'est une démarche de vente qui combine la maîtrise technique des produits/services avec des compétences de négociation pour proposer des solutions adaptées aux besoins du client professionnel." },
+    { question: "Quels outils numériques avez-vous déjà utilisés dans un contexte professionnel ?", reponseAttendue: "Pack Office (Word, Excel, PowerPoint), CRM (Salesforce, HubSpot), réseaux sociaux professionnels (LinkedIn), outils de messagerie." },
+    { question: "Connaissez-vous la différence entre la vente B2B et B2C ?", reponseAttendue: "B2B = vente entre entreprises, cycles de vente plus longs, interlocuteurs multiples, décision collective. B2C = vente aux particuliers, cycle court, décision individuelle." },
+    { question: "Que savez-vous de la veille commerciale ?", reponseAttendue: "La veille commerciale consiste à surveiller en continu l'environnement concurrentiel, les évolutions du marché, les tendances et les changements réglementaires pour adapter sa stratégie." },
+    { question: "Comment définiriez-vous un bon argumentaire de vente ?", reponseAttendue: "Un argumentaire structuré qui met en avant les caractéristiques, avantages et preuves (CAP) du produit/service en réponse aux besoins identifiés du client." },
+    { question: "Qu'est-ce qu'un CRM selon vous ?", reponseAttendue: "Un CRM (Customer Relationship Management) est un outil de gestion de la relation client qui permet de centraliser les données clients, suivre les interactions et piloter l'activité commerciale." },
+    { question: "Pourquoi avez-vous choisi la formation de Négociateur Technico-Commercial ?", reponseAttendue: "Motivation liée au commerce B2B, envie de développer des compétences en négociation, intérêt pour la dimension technique et stratégique de la vente." },
+    { question: "Que savez-vous du développement durable dans le contexte commercial ?", reponseAttendue: "Intégration de la RSE dans la démarche commerciale : économie circulaire, réduction de l'empreinte carbone, loi AGEC, valorisation des produits éco-responsables." },
+    { question: "Comment organisez-vous votre travail et vos priorités ?", reponseAttendue: "Planification des tâches par importance/urgence, utilisation d'un agenda, suivi des objectifs, gestion du temps entre prospection, rendez-vous et administratif." },
+  ],
+  fin: [
+    { question: "Décrivez votre démarche complète de prospection d'un nouveau secteur.", reponseAttendue: "Analyse du marché cible, création de personas, constitution d'un fichier qualifié, approche multicanale (phoning, emailing, LinkedIn, terrain), qualification des leads, prise de RDV, suivi CRM, analyse des résultats." },
+    { question: "Comment concevez-vous une proposition technique et commerciale personnalisée ?", reponseAttendue: "Analyse approfondie des besoins du prospect, étude de l'offre concurrente, conception de la solution technique adaptée, chiffrage détaillé, argumentaire CAP, anticipation des objections, présentation avec supports adaptés." },
+    { question: "Expliquez la méthode SONCAS et son utilisation en négociation.", reponseAttendue: "SONCAS identifie les motivations d'achat : Sécurité, Orgueil, Nouveauté, Confort, Argent, Sympathie. On adapte l'argumentaire en fonction du profil motivationnel dominant du client." },
+    { question: "Comment analysez-vous vos performances commerciales et quelles actions correctives proposez-vous ?", reponseAttendue: "Suivi des KPIs (CA, nb RDV, taux de conversion, pipe), analyse des écarts vs objectifs, identification des causes, proposition d'actions correctives (revoir la segmentation, renforcer le suivi, ajuster l'argumentaire), reporting à la hiérarchie." },
+    { question: "Qu'est-ce que le social selling et comment l'utilisez-vous ?", reponseAttendue: "Utilisation des réseaux sociaux (LinkedIn principalement) pour prospecter, partager du contenu à valeur ajoutée, interagir avec les prospects, développer son personal branding et sa crédibilité d'expert." },
+    { question: "Comment intégrez-vous la dimension RSE dans votre activité commerciale ?", reponseAttendue: "Veille sur les technologies vertes, intégration des arguments éco-responsables dans les propositions, sensibilisation des clients aux impacts environnementaux, conformité loi AGEC et loi Climat, valorisation de l'économie circulaire." },
+    { question: "Décrivez une situation de négociation complexe et comment vous la gérez.", reponseAttendue: "Préparation (analyse du client, arguments, concessions, points non négociables), écoute active, reformulation, traitement des objections (prix, délai, concurrence), technique de closing, suivi post-négociation." },
+    { question: "Comment gérez-vous la fidélisation d'un client stratégique ?", reponseAttendue: "Communication régulière et transparente, point trimestriel, anticipation des besoins, propositions d'upselling/cross-selling, gestion proactive des réclamations, enquêtes de satisfaction, programme de fidélisation." },
+    { question: "Quels sont les principaux indicateurs que vous suivez dans votre CRM ?", reponseAttendue: "Nombre de contacts/prospects, taux de prise de RDV, taux de conversion, CA réalisé vs objectif, pipe commercial, durée du cycle de vente, taux de fidélisation, NPS." },
+    { question: "Qu'avez-vous appris pendant cette formation de NTC ?", reponseAttendue: "J'ai appris à structurer une démarche de prospection, concevoir des propositions commerciales personnalisées, maîtriser les techniques de négociation, analyser mes performances via les KPIs, utiliser un CRM, intégrer la RSE et gérer un portefeuille client B2B." },
+  ],
+};
+
 const DEFAULT_QUESTIONS_OUVERTES: QuestionsOuvertesFormation = {
   debut: [
     { question: "Que savez-vous déjà sur le sujet de cette formation ?", reponseAttendue: "Le stagiaire exprime ses connaissances préalables sur le domaine de la formation." },
