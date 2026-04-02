@@ -1534,7 +1534,7 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
     <div class="section">
       <p><strong>Étapes d'inscription :</strong></p>
       <ol>
-        <li>Préinscription via le site internet, les réseaux sociaux ou par téléphone auprès de ${o.nom}</li>
+        <li>Préinscription ${o.siteWeb && o.siteWeb.trim() ? `via le site internet (${linkUrl(o.siteWeb)}), ` : ''}par téléphone ou par email auprès de ${o.nom}</li>
         <li>Analyse de la demande et validation de l'adéquation formation / projet professionnel</li>
         <li>Entretien de positionnement (si nécessaire) pour adapter le parcours</li>
         <li>Envoi des documents administratifs :
