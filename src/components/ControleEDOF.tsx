@@ -137,6 +137,24 @@ export default function ControleEDOF({ organisme, formation, stagiaires }: Contr
     }
   }, [organisme, formation, stagiaires, orgName]);
 
+  const generateAutoDoc = useCallback(async (eyDoc: EYDocumentItem): Promise<{ blob: Blob; fileName: string } | null> => {
+    if (eyDoc.autoTemplates.length === 0) return null;
+    const template = eyDoc.autoTemplates[0];
+    try {
+      const o = mergeOrganisme(organisme);
+      const s = mergeStagiaires(stagiaires);
+      const params = eyDoc.perStagiaire && s.length > 0 ? { stagiaireIdx: 0, fi: 0 } : { fi: 0 };
+      const html = generateDocumentById(`ey_${eyDoc.code}`, template, params, o, formation, s);
+      if (!html) return null;
+      const blob = await htmlToPdfBlob(html);
+      const safeName = orgName.replace(/[^a-zA-Z0-9_-]/g, "_");
+      return { blob, fileName: `${safeName}_${eyDoc.code}.pdf` };
+    } catch (e) {
+      console.error(`Error generating ${eyDoc.code}:`, e);
+      return null;
+    }
+  }, [organisme, formation, stagiaires, orgName]);
+
   const downloadSelectedZip = useCallback(async () => {
     if (selectedDocs.size === 0) {
       toast.error("Sélectionnez au moins un document");
@@ -191,24 +209,6 @@ export default function ControleEDOF({ organisme, formation, stagiaires }: Contr
       setProgressText("");
     }
   }, [selectedDocs, docStates, orgName, stagiaires, generateAutoDoc, generateAutoDocForStagiaire]);
-
-  const generateAutoDoc = useCallback(async (eyDoc: EYDocumentItem): Promise<{ blob: Blob; fileName: string } | null> => {
-    if (eyDoc.autoTemplates.length === 0) return null;
-    const template = eyDoc.autoTemplates[0];
-    try {
-      const o = mergeOrganisme(organisme);
-      const s = mergeStagiaires(stagiaires);
-      const params = eyDoc.perStagiaire && s.length > 0 ? { stagiaireIdx: 0, fi: 0 } : { fi: 0 };
-      const html = generateDocumentById(`ey_${eyDoc.code}`, template, params, o, formation, s);
-      if (!html) return null;
-      const blob = await htmlToPdfBlob(html);
-      const safeName = orgName.replace(/[^a-zA-Z0-9_-]/g, "_");
-      return { blob, fileName: `${safeName}_${eyDoc.code}.pdf` };
-    } catch (e) {
-      console.error(`Error generating ${eyDoc.code}:`, e);
-      return null;
-    }
-  }, [organisme, formation, stagiaires, orgName]);
 
   // Preview a document
   const handlePreview = useCallback(async (eyDoc: EYDocumentItem) => {
