@@ -641,7 +641,7 @@ export function genPreuveDiffusionProgramme(o: OrganismeInfo, f: FormationInfo) 
 
 export function genPreuveDelaisAcces(o: OrganismeInfo) {
   return buildDocument({ org: o, title: "PREUVE D'INFORMATION SUR LES DÉLAIS D'ACCÈS", sections: [
-    { heading: "Information diffusée", content: `<p>Les délais d'accès sont communiqués sur :<br>• Le site internet (${linkUrl(o.siteWeb)}/modalites-acces)<br>• Le catalogue de formation<br>• Chaque fiche programme<br>• Les CGV<br>• Les devis</p>` },
+    { heading: "Information diffusée", content: `<p>Les délais d'accès sont communiqués sur :<br>${o.siteWeb ? `• Le site internet (${linkUrl(o.siteWeb)}/modalites-acces)<br>` : ''}• Le catalogue de formation<br>• Chaque fiche programme<br>• Les CGV<br>• Les devis</p>` },
     { heading: "Délais appliqués", content: "<p>• Inter-entreprises : 7 jours minimum<br>• Intra-entreprise : 14 jours minimum<br>• Sur mesure : 30 jours minimum<br>• E-learning : 48h après inscription</p>", variant: "green" },
     { heading: "Traçabilité", content: "<p>Capture d'écran du site à jour, CGV signées avec mention des délais, devis avec délais indiqués.</p>" },
   ] });
