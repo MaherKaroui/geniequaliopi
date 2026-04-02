@@ -10838,3 +10838,151 @@ tr:nth-child(even) { background-color: #f5f7fa; }
 ${sheets.map((s, i) => `<div id="sheet${i}" style="${i > 0 ? 'page-break-before:always' : ''}">${s.html}</div>`).join('')}
 </body></html>`;
 }
+
+function genContratFormationParBloc(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
+  const s = stagiaires[si] || stagiaires[0] || { prenom: "Martin", nom: "Dupont", entreprise: "Entreprise", email: "", numeroAction: "" } as StagiaireInfo;
+  const entreprise = s.entreprise || "Entreprise partenaire";
+  const respEntreprise = (s as any).responsableEntreprise || "Le responsable désigné";
+  const dateDebut = formatDate(getStagiaireDateDebut(s, f));
+  const dateFin = formatDate(getStagiaireDateFin(s, f));
+  const duree = getStagiaireDuree(s, f);
+  const dateConvention = f.dateDebut ? formatDate(subtractBusinessDays(f.dateDebut, 15)) : "________________________";
+  const montant = getStagiaireTarif(s, f);
+  const numeroAction = s.numeroAction || "—";
+
+  const rncp = getRNCPByCode(f.codeRNCP || '');
+  let blocsHtml = '';
+  if (rncp && rncp.blocsCompetences.length > 0) {
+    blocsHtml += '<h3>Détail des blocs de compétences</h3>';
+    blocsHtml += '<table><tr><th>N° Bloc</th><th>Intitulé du bloc</th><th>N° Action</th><th>Volume horaire</th></tr>';
+    rncp.blocsCompetences.forEach((bloc, i) => {
+      const volume = bloc.matieres.reduce((s, m) => s + (parseInt(m.volume) || 0), 0);
+      blocsHtml += `<tr><td>Bloc ${i + 1}</td><td>${bloc.titre}</td><td>${numeroAction}</td><td>${volume}h</td></tr>`;
+    });
+    blocsHtml += '</table>';
+  } else {
+    blocsHtml += `<p><strong>Numéro d'action :</strong> ${numeroAction}</p>`;
+  }
+
+  const body = buildDocument({ org: o, title: "CONTRAT DE FORMATION PAR BLOC DE COMPÉTENCES", subtitle: f.intitule, formation: f, showFormationInfo: false, sections: [
+    { heading: "Entre les soussignés", content: `<h3>1. Le CFA ${o.nom}</h3><p>Adresse : ${o.adresse}, ${o.codePostal} ${o.ville}<br>SIRET : ${o.siret}<br>NDA : ${o.nda}<br>Représenté par ${o.dirigeant}</p><h3>2. L'entreprise</h3><p>Raison sociale : ${entreprise}${s.adresseEntreprise ? `<br>Adresse : ${s.adresseEntreprise}` : ''}${s.siretEntreprise ? `<br>SIRET : ${s.siretEntreprise}` : ''}<br>Représentée par <strong>${respEntreprise}</strong></p><h3>3. L'apprenant(e)</h3><p>Nom et prénom : ${s.prenom} ${s.nom}${s.email ? `<br>Email : ${s.email}` : ''}${s.telephone ? `<br>Téléphone : ${s.telephone}` : ''}</p><p><strong>N° Action :</strong> ${numeroAction}</p>` },
+    { heading: "Article 1 – Objet du contrat", content: `<p>Le présent contrat a pour objet l'organisation d'une formation par bloc de compétences dans le cadre de l'apprentissage.</p><p><strong>Intitulé :</strong> ${f.intitule}<br><strong>Code RNCP :</strong> ${f.codeRNCP || '—'}</p>${blocsHtml}` },
+    { heading: "Article 2 – Organisation de la formation", content: `<p><strong>Durée totale :</strong> ${duree}<br><strong>Dates :</strong> du ${dateDebut} au ${dateFin}<br><strong>Modalité :</strong> ${f.modalites || 'Présentiel'}<br><strong>Rythme d'alternance :</strong> ${f.rythmeAlternance || '1 semaine CFA / 3 semaines entreprise'}<br><strong>Lieu :</strong> ${o.adresse}, ${o.codePostal} ${o.ville}</p>` },
+    { heading: "Article 3 – Objectifs de la formation", content: `<p>À l'issue de la formation, l'apprenant(e) sera capable de :</p><p>${f.objectifs.split('\n').map(o => `• ${o}`).join('<br>')}</p>` },
+    { heading: "Article 4 – Moyens pédagogiques et techniques", content: `<p>${f.moyensPedagogiques || 'Supports numériques, plateforme en ligne, ateliers pratiques, mises en situation professionnelle.'}</p>` },
+    { heading: "Article 5 – Modalités d'évaluation", content: `<p>${f.methodesEvaluation || 'Évaluations formatives et sommatives par bloc de compétences. Examen final conforme au référentiel RNCP.'}</p>` },
+    { heading: "Article 6 – Dispositions financières", content: `<p><strong>Coût total :</strong> ${montant}</p><p>Gratuité pour l'apprenti. Prise en charge par l'OPCO de l'entreprise.</p>${tableHTML(["", "Montant", "Prise en charge OPCO", "Reste à charge"], [["Formation complète", montant, montant, "0 €"]])}` },
+    { heading: "Article 7 – Accessibilité", content: `<p>La formation est accessible aux personnes en situation de handicap.</p><p><strong>Référent handicap :</strong> ${o.referentHandicap}<br>${o.email}</p>`, variant: "green" },
+    { heading: "Article 8 – Résiliation", content: `<p>Le contrat prend fin à l'issue de la formation ou en cas de rupture du contrat d'apprentissage (art. L.6222-18 du Code du travail).</p>` },
+    { heading: "Article 9 – Litiges", content: `<p>Règlement amiable. À défaut, juridictions compétentes.</p>` },
+  ], extraHtml: `
+    <p><strong>Fait le ${dateConvention}</strong></p>
+    <div class="signature-block">
+      <div class="sig-box">
+        <p class="sig-label">L'Apprenant(e)</p>
+        <p>Nom : ${s.prenom} ${s.nom}</p>
+        <p>Date : ${dateConvention}</p>
+        <p style="margin-top:20px">Signature :</p>
+        ${s.signatureUrl ? `<img src="${s.signatureUrl}" alt="Signature" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : ''}
+      </div>
+      <div class="sig-box">
+        <p class="sig-label">Le CFA ${o.nom}</p>
+        <p>Date : ${dateConvention}</p>
+        <p style="margin-top:20px">Cachet :</p>
+        ${o.tamponUrl ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />` : ''}
+      </div>
+      <div class="sig-box">
+        <p class="sig-label">Le Responsable d'entreprise</p>
+        <p>Nom : ${respEntreprise}</p>
+        <p>Entreprise : ${entreprise}</p>
+        <p>Date : ${dateConvention}</p>
+        <p style="margin-top:20px">Signature :</p>
+        ${s.signatureResponsableUrl ? `<img src="${s.signatureResponsableUrl}" alt="Signature" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : ''}
+      </div>
+    </div>
+  `, stagiaires: [s] });
+  return body;
+}
+
+function genDossierInscriptionCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
+  const s = stagiaires[si] || stagiaires[0] || { prenom: "Martin", nom: "Dupont" } as StagiaireInfo;
+  const dateDebut = formatDate(getStagiaireDateDebut(s, f));
+  const dateFin = formatDate(getStagiaireDateFin(s, f));
+  const duree = getStagiaireDuree(s, f);
+  const dateConvention = f.dateDebut ? formatDate(subtractBusinessDays(f.dateDebut, 15)) : "________________________";
+  const numeroAction = s.numeroAction || "—";
+
+  const identiteRows = [
+    ["Civilité", s.civilite || "______"],
+    ["Nom", s.nom || "______"],
+    ["Prénom", s.prenom || "______"],
+    ["Date de naissance", s.dateNaissance ? formatDate(s.dateNaissance) : "______"],
+    ["Lieu de naissance", [s.communeNaissance, s.departementNaissance].filter(Boolean).join(', ') || "______"],
+    ["Nationalité", s.nationalite || "______"],
+    ["N° NIR (Sécurité sociale)", s.nir || "______"],
+    ["Adresse", s.adresse || "______"],
+    ["Code postal", s.codePostal || "______"],
+    ["Commune", s.commune || "______"],
+    ["Téléphone", s.telephone || "______"],
+    ["Email", s.email || "______"],
+    ["RQTH", s.rqth || "Non"],
+    ["Dernier diplôme obtenu", s.diplome || "______"],
+  ];
+
+  const entrepriseRows = [
+    ["Entreprise", s.entreprise || "______"],
+    ["Adresse entreprise", s.adresseEntreprise || "______"],
+    ["SIRET entreprise", s.siretEntreprise || "______"],
+    ["Responsable / Maître d'apprentissage", (s as any).responsableEntreprise || "______"],
+    ["Poste / Fonction", s.poste || "______"],
+  ];
+
+  const formationRows = [
+    ["Intitulé de la formation", f.intitule],
+    ["Code RNCP", f.codeRNCP || "—"],
+    ["N° Action", numeroAction],
+    ["Durée totale", duree],
+    ["Date de début", dateDebut],
+    ["Date de fin", dateFin],
+    ["Modalité", f.modalites || "Présentiel"],
+    ["Rythme d'alternance", f.rythmeAlternance || "1 sem. CFA / 3 sem. entreprise"],
+    ["Lieu de formation", f.lieu || `${o.adresse}, ${o.codePostal} ${o.ville}`],
+  ];
+
+  return buildDocument({ org: o, title: "DOSSIER D'INSCRIPTION", subtitle: `${s.prenom} ${s.nom} – ${f.intitule}`, formation: f, showFormationInfo: false, sections: [
+    { heading: "1. Identité de l'apprenant(e)", content: tableHTML(["Champ", "Valeur"], identiteRows) },
+    { heading: "2. Informations entreprise", content: tableHTML(["Champ", "Valeur"], entrepriseRows) },
+    { heading: "3. Informations formation", content: tableHTML(["Champ", "Valeur"], formationRows) },
+    { heading: "4. Pièces justificatives à fournir", content: `<ul>
+      <li>☐ Copie de la carte d'identité ou du passeport</li>
+      <li>☐ Copie de l'attestation de Sécurité sociale</li>
+      <li>☐ Copie du dernier diplôme obtenu</li>
+      <li>☐ Photo d'identité</li>
+      <li>☐ RIB</li>
+      <li>☐ Copie du contrat d'apprentissage (CERFA)</li>
+      <li>☐ Attestation de domicile (moins de 3 mois)</li>
+      ${s.rqth === 'oui' ? '<li>☐ Notification RQTH</li>' : ''}
+    </ul>` },
+    { heading: "5. Engagement de l'apprenant(e)", content: `<p>Je soussigné(e) <strong>${s.prenom} ${s.nom}</strong> déclare :</p>
+      <ul>
+        <li>Avoir pris connaissance du programme de formation, du règlement intérieur et des conditions générales de vente.</li>
+        <li>M'engager à suivre la formation avec assiduité et à respecter le règlement intérieur du CFA ${o.nom}.</li>
+        <li>Certifier l'exactitude des renseignements fournis ci-dessus.</li>
+      </ul>` },
+  ], extraHtml: `
+    <p><strong>Fait à ${o.ville}, le ${dateConvention}</strong></p>
+    <div class="signature-block">
+      <div class="sig-box">
+        <p class="sig-label">L'Apprenant(e)</p>
+        <p>${s.prenom} ${s.nom}</p>
+        <p style="margin-top:10px">Signature précédée de « Lu et approuvé » :</p>
+        ${s.signatureUrl ? `<img src="${s.signatureUrl}" alt="Signature" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : '<p style="min-height:60px"></p>'}
+      </div>
+      <div class="sig-box">
+        <p class="sig-label">Le CFA ${o.nom}</p>
+        <p>${o.poleAdministratif || o.dirigeant}</p>
+        ${o.tamponUrl ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />` : ''}
+      </div>
+    </div>
+  `, stagiaires: [s] });
+}
