@@ -480,6 +480,42 @@ export default function ControleEDOF({ organisme, formation, stagiaires, signatu
                             Aperçu
                           </Button>
                         )}
+                        {/* Download single doc */}
+                        {(eyDoc.autoTemplates.length > 0 || state.status === "uploaded") && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="gap-1 text-xs"
+                            onClick={async () => {
+                              if (state.status === "uploaded" && state.uploadedFile) {
+                                saveAs(state.uploadedFile, state.uploadedFileName || `${eyDoc.code}.pdf`);
+                                return;
+                              }
+                              if (eyDoc.autoTemplates.length > 0) {
+                                toast.info(`Génération de ${eyDoc.code}...`);
+                                if (eyDoc.perStagiaire && stagiaires.length > 0) {
+                                  const zip = new JSZip();
+                                  const s = mergeStagiaires(stagiaires);
+                                  for (let si = 0; si < s.length; si++) {
+                                    const result = await generateAutoDocForStagiaire(eyDoc, si);
+                                    if (result) zip.file(result.fileName, result.blob);
+                                  }
+                                  const content = await zip.generateAsync({ type: "blob" });
+                                  const safeName = orgName.replace(/[^a-zA-Z0-9_-]/g, "_");
+                                  saveAs(content, `${safeName}_${eyDoc.code}.zip`);
+                                } else {
+                                  const result = await generateAutoDoc(eyDoc);
+                                  if (result) saveAs(result.blob, result.fileName);
+                                  else toast.error("Impossible de générer ce document");
+                                }
+                                toast.success(`${eyDoc.code} téléchargé !`);
+                              }
+                            }}
+                          >
+                            <Download className="w-3 h-3" />
+                            PDF
+                          </Button>
+                        )}
                         {/* Upload button */}
                         <input
                           type="file"
