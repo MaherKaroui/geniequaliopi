@@ -45,6 +45,7 @@ export default function ControleEDOF({ organisme, formation, stagiaires }: Contr
   const [progress, setProgress] = useState(0);
   const [progressText, setProgressText] = useState("");
   const fileInputRefs = useRef<Map<string, HTMLInputElement>>(new Map());
+  const [selectedDocs, setSelectedDocs] = useState<Set<string>>(new Set());
 
   // Preview state
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -101,6 +102,33 @@ export default function ControleEDOF({ organisme, formation, stagiaires }: Contr
     }
   }, [docStates, updateDocState]);
 
+  const toggleSelectDoc = useCallback((code: string) => {
+    setSelectedDocs(prev => {
+      const next = new Set(prev);
+      if (next.has(code)) next.delete(code); else next.add(code);
+      return next;
+    });
+  }, []);
+
+  const generateAutoDocForStagiaire = useCallback(async (eyDoc: EYDocumentItem, stagiaireIdx: number): Promise<{ blob: Blob; fileName: string } | null> => {
+    if (eyDoc.autoTemplates.length === 0) return null;
+    const template = eyDoc.autoTemplates[0];
+    try {
+      const o = mergeOrganisme(organisme);
+      const s = mergeStagiaires(stagiaires);
+      const params = { stagiaireIdx, fi: 0 };
+      const html = generateDocumentById(`ey_${eyDoc.code}`, template, params, o, formation, s);
+      if (!html) return null;
+      const blob = await htmlToPdfBlob(html);
+      const safeName = orgName.replace(/[^a-zA-Z0-9_-]/g, "_");
+      const stagName = s[stagiaireIdx] ? `${s[stagiaireIdx].nom}_${s[stagiaireIdx].prenom}`.replace(/[^a-zA-Z0-9_-]/g, "_") : `stagiaire_${stagiaireIdx + 1}`;
+      return { blob, fileName: `${safeName}_${eyDoc.code}_${stagName}.pdf` };
+    } catch (e) {
+      console.error(`Error generating ${eyDoc.code} for stagiaire ${stagiaireIdx}:`, e);
+      return null;
+    }
+  }, [organisme, formation, stagiaires, orgName]);
+
   const generateAutoDoc = useCallback(async (eyDoc: EYDocumentItem): Promise<{ blob: Blob; fileName: string } | null> => {
     if (eyDoc.autoTemplates.length === 0) return null;
     const template = eyDoc.autoTemplates[0];
@@ -118,6 +146,61 @@ export default function ControleEDOF({ organisme, formation, stagiaires }: Contr
       return null;
     }
   }, [organisme, formation, stagiaires, orgName]);
+
+  const downloadSelectedZip = useCallback(async () => {
+    if (selectedDocs.size === 0) {
+      toast.error("Sélectionnez au moins un document");
+      return;
+    }
+    setGenerating(true);
+    setProgress(0);
+    setProgressText("Préparation des documents sélectionnés...");
+    try {
+      const zip = new JSZip();
+      const safeName = orgName.replace(/[^a-zA-Z0-9_-]/g, "_");
+      const docsToProcess = EY_DOCUMENTS.filter(d => selectedDocs.has(d.code));
+      const total = docsToProcess.length;
+      let step = 0;
+
+      for (const eyDoc of docsToProcess) {
+        const state = docStates.get(eyDoc.code);
+        step++;
+        setProgress(Math.round((step / total) * 100));
+        setProgressText(`${eyDoc.code} — ${eyDoc.label}`);
+
+        if (state?.status === "uploaded" && state.uploadedFile) {
+          const buf = await state.uploadedFile.arrayBuffer();
+          const ext = state.uploadedFileName?.split(".").pop() || "pdf";
+          zip.file(`${safeName}_${eyDoc.code}.${ext}`, buf);
+        } else if (eyDoc.autoTemplates.length > 0) {
+          if (eyDoc.perStagiaire) {
+            const s = mergeStagiaires(stagiaires);
+            const count = Math.max(s.length, 1);
+            for (let si = 0; si < count; si++) {
+              const result = await generateAutoDocForStagiaire(eyDoc, si);
+              if (result) zip.file(result.fileName, result.blob);
+              if (si % 2 === 0) await yieldToBrowser(5);
+            }
+          } else {
+            const result = await generateAutoDoc(eyDoc);
+            if (result) zip.file(result.fileName, result.blob);
+          }
+        }
+        if (step % 3 === 0) await yieldToBrowser(5);
+      }
+
+      const content = await zip.generateAsync({ type: "blob" });
+      saveAs(content, `${safeName}_Selection_EY.zip`);
+      toast.success(`${docsToProcess.length} document(s) exporté(s) !`);
+    } catch (e: any) {
+      console.error(e);
+      toast.error("Erreur : " + (e.message || "Erreur inconnue"));
+    } finally {
+      setGenerating(false);
+      setProgress(0);
+      setProgressText("");
+    }
+  }, [selectedDocs, docStates, orgName, stagiaires, generateAutoDoc, generateAutoDocForStagiaire]);
 
   // Preview a document
   const handlePreview = useCallback(async (eyDoc: EYDocumentItem) => {
@@ -228,10 +311,18 @@ export default function ControleEDOF({ organisme, formation, stagiaires }: Contr
             Liste exhaustive des éléments probants (contrôle EY/Sauléa — RNCP/RS)
           </p>
         </div>
-        <Button onClick={downloadZip} disabled={generating} className="gap-2">
-          {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Archive className="w-4 h-4" />}
-          {generating ? "Export en cours..." : "Exporter ZIP EY"}
-        </Button>
+        <div className="flex items-center gap-2">
+          {selectedDocs.size > 0 && (
+            <Button onClick={downloadSelectedZip} disabled={generating} variant="default" className="gap-2">
+              {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+              {generating ? "Export..." : `Télécharger ${selectedDocs.size} sélectionné(s)`}
+            </Button>
+          )}
+          <Button onClick={downloadZip} disabled={generating} variant="outline" className="gap-2">
+            {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Archive className="w-4 h-4" />}
+            {generating ? "Export en cours..." : "Exporter tout ZIP"}
+          </Button>
+        </div>
       </div>
 
       {/* Progress */}
@@ -282,18 +373,36 @@ export default function ControleEDOF({ organisme, formation, stagiaires }: Contr
           const s = docStates.get(d.code);
           return s && (s.status === "auto" || s.status === "uploaded" || s.status === "not_applicable");
         }).length;
+        const allCatSelected = docs.every(d => selectedDocs.has(d.code));
+        const someCatSelected = docs.some(d => selectedDocs.has(d.code));
         return (
           <div key={cat} className="border rounded-xl overflow-hidden">
-            <button
-              onClick={() => toggleCategory(cat)}
-              className="w-full flex items-center justify-between p-4 bg-card hover:bg-muted/50 transition-colors text-left"
-            >
+            <div className="w-full flex items-center justify-between p-4 bg-card hover:bg-muted/50 transition-colors">
               <div className="flex items-center gap-3">
-                {expanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-                <span className="font-semibold">{EY_CATEGORIES[cat]}</span>
-                <Badge variant="secondary" className="text-xs">{catDone}/{docs.length}</Badge>
+                <input
+                  type="checkbox"
+                  checked={allCatSelected}
+                  ref={el => { if (el) el.indeterminate = someCatSelected && !allCatSelected; }}
+                  onChange={() => {
+                    setSelectedDocs(prev => {
+                      const next = new Set(prev);
+                      if (allCatSelected) {
+                        docs.forEach(d => next.delete(d.code));
+                      } else {
+                        docs.forEach(d => next.add(d.code));
+                      }
+                      return next;
+                    });
+                  }}
+                  className="w-4 h-4 rounded border-border accent-primary cursor-pointer"
+                />
+                <button onClick={() => toggleCategory(cat)} className="flex items-center gap-3 flex-1 text-left">
+                  {expanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+                  <span className="font-semibold">{EY_CATEGORIES[cat]}</span>
+                  <Badge variant="secondary" className="text-xs">{catDone}/{docs.length}</Badge>
+                </button>
               </div>
-            </button>
+            </div>
 
             {expanded && (
               <div className="divide-y">
@@ -303,6 +412,12 @@ export default function ControleEDOF({ organisme, formation, stagiaires }: Contr
                   return (
                     <div key={eyDoc.code} className="p-4 flex flex-col sm:flex-row items-start gap-3 bg-background">
                       <div className="flex items-start gap-3 flex-1 min-w-0">
+                        <input
+                          type="checkbox"
+                          checked={selectedDocs.has(eyDoc.code)}
+                          onChange={() => toggleSelectDoc(eyDoc.code)}
+                          className="w-4 h-4 mt-0.5 rounded border-border accent-primary cursor-pointer shrink-0"
+                        />
                         {cfg.icon}
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
