@@ -6539,7 +6539,7 @@ function genDocumentsCertificateursCFA(o: OrganismeInfo, f: FormationInfo) {
 }
 
 /** Parse rythme alternance string to get CFA weeks and enterprise weeks per cycle */
-function parseRythmeAlternance(rythme: string): { cfaWeeks: number; entrepriseWeeks: number } {
+export function parseRythmeAlternance(rythme: string): { cfaWeeks: number; entrepriseWeeks: number } {
   const match = rythme.match(/(\d+)\s*sem.*?\/\s*(\d+)\s*sem/i);
   if (match) return { cfaWeeks: parseInt(match[1]), entrepriseWeeks: parseInt(match[2]) };
   return { cfaWeeks: 1, entrepriseWeeks: 3 };
