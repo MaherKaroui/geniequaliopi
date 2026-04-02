@@ -1534,7 +1534,7 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
     <div class="section">
       <p><strong>Étapes d'inscription :</strong></p>
       <ol>
-        <li>Préinscription via le site internet, les réseaux sociaux ou par téléphone auprès de ${o.nom}</li>
+        <li>Préinscription ${o.siteWeb && o.siteWeb.trim() ? `via le site internet (${linkUrl(o.siteWeb)}), ` : ''}par téléphone ou par email auprès de ${o.nom}</li>
         <li>Analyse de la demande et validation de l'adéquation formation / projet professionnel</li>
         <li>Entretien de positionnement (si nécessaire) pour adapter le parcours</li>
         <li>Envoi des documents administratifs :
@@ -1613,7 +1613,7 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
         <tr><td>Taux d'abandon</td><td>0 %</td></tr>
         <tr><td>Taux de recommandation</td><td>100 %</td></tr>
       </table>
-      <p style="margin-top:8px"><em>Ces indicateurs sont mis à jour annuellement et consultables sur le site internet de ${o.nom}.</em></p>
+      <p style="margin-top:8px"><em>Ces indicateurs sont mis à jour annuellement${o.siteWeb && o.siteWeb.trim() ? ` et consultables sur le site internet de ${o.nom}` : ''}.</em></p>
     </div>
 
     <h2>15. Déroulé pédagogique de la formation${!isBlocFormation ? ` (${heuresTotal})` : ""}</h2>
@@ -2557,7 +2557,7 @@ function genSupportsCours(o: OrganismeInfo, f: FormationInfo) {
 
 function genGuideElearning(o: OrganismeInfo, f: FormationInfo) {
   return buildDocument({ org: o, title: "GUIDE PLATEFORME E-LEARNING", subtitle: f.intitule, sections: [
-    { heading: "Connexion", content: "<p>1. Rendez-vous sur https://moodle.formapro-excellence.fr<br>2. Saisissez votre identifiant (email) et mot de passe<br>3. Accédez à votre tableau de bord</p>" },
+    { heading: "Connexion", content: `<p>1. Rendez-vous sur ${o.siteWeb && o.siteWeb.trim() ? `https://moodle.${o.siteWeb.replace(/^https?:\/\//, '').replace(/^www\./, '')}` : 'la plateforme e-learning de votre organisme'}<br>2. Saisissez votre identifiant (email) et mot de passe<br>3. Accédez à votre tableau de bord</p>` },
     { heading: "Navigation", content: "<p>• Mes formations : accès aux cours en cours<br>• Ressources : documents et vidéos<br>• Évaluations : tests et QCM<br>• Forum : échanges avec le formateur et les autres stagiaires</p>" },
     { heading: "Support technique", content: `<p>En cas de difficulté : ${o.email} ou ${o.telephone}</p>` },
   ] });
