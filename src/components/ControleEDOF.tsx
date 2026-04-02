@@ -381,18 +381,36 @@ export default function ControleEDOF({ organisme, formation, stagiaires }: Contr
           const s = docStates.get(d.code);
           return s && (s.status === "auto" || s.status === "uploaded" || s.status === "not_applicable");
         }).length;
+        const allCatSelected = docs.every(d => selectedDocs.has(d.code));
+        const someCatSelected = docs.some(d => selectedDocs.has(d.code));
         return (
           <div key={cat} className="border rounded-xl overflow-hidden">
-            <button
-              onClick={() => toggleCategory(cat)}
-              className="w-full flex items-center justify-between p-4 bg-card hover:bg-muted/50 transition-colors text-left"
-            >
+            <div className="w-full flex items-center justify-between p-4 bg-card hover:bg-muted/50 transition-colors">
               <div className="flex items-center gap-3">
-                {expanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-                <span className="font-semibold">{EY_CATEGORIES[cat]}</span>
-                <Badge variant="secondary" className="text-xs">{catDone}/{docs.length}</Badge>
+                <input
+                  type="checkbox"
+                  checked={allCatSelected}
+                  ref={el => { if (el) el.indeterminate = someCatSelected && !allCatSelected; }}
+                  onChange={() => {
+                    setSelectedDocs(prev => {
+                      const next = new Set(prev);
+                      if (allCatSelected) {
+                        docs.forEach(d => next.delete(d.code));
+                      } else {
+                        docs.forEach(d => next.add(d.code));
+                      }
+                      return next;
+                    });
+                  }}
+                  className="w-4 h-4 rounded border-border accent-primary cursor-pointer"
+                />
+                <button onClick={() => toggleCategory(cat)} className="flex items-center gap-3 flex-1 text-left">
+                  {expanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+                  <span className="font-semibold">{EY_CATEGORIES[cat]}</span>
+                  <Badge variant="secondary" className="text-xs">{catDone}/{docs.length}</Badge>
+                </button>
               </div>
-            </button>
+            </div>
 
             {expanded && (
               <div className="divide-y">
