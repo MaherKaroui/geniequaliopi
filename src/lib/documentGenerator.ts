@@ -3434,10 +3434,19 @@ function genSuiviChiffreFormationExcel(o: OrganismeInfo, f: FormationInfo, stagi
   const pastCFAHours = pastCFAWeeks.length * 35;
   const progressRatio = termine ? 1 : Math.min(1, pastCFAHours / effectiveTotal);
 
-  // Sheet 1: Indicateurs globaux — fill past data
+  // Sheet 1: Indicateurs globaux — synchronized with other documents
+  // Attendance = 100% (matches émargement sheets where all students are ✅ Présent)
   const heuresRealisees = termine ? effectiveTotal : pastCFAHours;
-  const tauxPresence = heuresRealisees > 0 ? (92 + Math.round(Math.random() * 6)) : 0; // realistic 92-98%
-  const absencesGlobales = heuresRealisees > 0 ? Math.round(heuresRealisees * (100 - tauxPresence) / 100) : 0;
+  const tauxPresence = heuresRealisees > 0 ? 100 : 0;
+  const absencesGlobales = 0; // 100% présence = 0 absence (synchronized with émargement)
+
+  // Notes synchronized with EVAL_SCORES (used in exercises, grilles, QCM, etc.)
+  const globalAvgNote = stagiaires.length > 0
+    ? Math.round(stagiaires.slice(0, 10).reduce((sum, _, si) => {
+        const sc = EVAL_SCORES[si] || [7, 8, 7, 8, 7];
+        return sum + sc.reduce((a, b) => a + b, 0) / sc.length;
+      }, 0) / Math.min(stagiaires.length, 10) * 2 * 10) / 10 // *2 to convert /10 → /20
+    : 0;
 
   let sheet1 = tr(["Indicateur", "Valeur", "Objectif", "Écart", "Observations"], true);
   sheet1 += tr(["Formation", f.intitule, "", "", ""]);
@@ -3453,9 +3462,12 @@ function genSuiviChiffreFormationExcel(o: OrganismeInfo, f: FormationInfo, stagi
   sheet1 += tr(["Nombre d'inscrits", `${stagiaires.length}`, "", "", ""]);
   if (heuresRealisees > 0) {
     sheet1 += tr(["Nombre de présents", `${stagiaires.length}`, `${stagiaires.length}`, "0", ""]);
-    sheet1 += tr(["Taux de présence moyen", `${tauxPresence}%`, "≥ 90%", `+${tauxPresence - 90}%`, ""]);
-    sheet1 += tr(["Volume d'absences cumulé", `${absencesGlobales}h`, "", "", ""]);
+    sheet1 += tr(["Taux de présence moyen", "100%", "≥ 90%", "+10%", "Conforme aux feuilles d'émargement"]);
+    sheet1 += tr(["Volume d'absences cumulé", "0h", "", "", "Aucune absence enregistrée"]);
     sheet1 += tr(["Taux d'abandon", "0%", "< 5%", "", "Aucun abandon à date"]);
+    if (globalAvgNote > 0) {
+      sheet1 += tr(["Note moyenne aux évaluations", `${globalAvgNote.toFixed(1)}/20`, "≥ 12/20", globalAvgNote >= 12 ? `+${(globalAvgNote - 12).toFixed(1)}` : `${(globalAvgNote - 12).toFixed(1)}`, "Synchronisé avec les exercices et évaluations"]);
+    }
   } else {
     sheet1 += tr(["Nombre de présents", "—", `${stagiaires.length}`, "", "Formation non démarrée"]);
     sheet1 += tr(["Taux de présence moyen", "—", "≥ 90%", "", "Formation non démarrée"]);
@@ -3463,9 +3475,21 @@ function genSuiviChiffreFormationExcel(o: OrganismeInfo, f: FormationInfo, stagi
   }
   sheet1 += tr(["Taux de satisfaction global", termine ? "" : "—", "≥ 80%", "", termine ? "À compléter" : "Enquête à réaliser en fin de formation"]);
   if (rncp) {
-    sheet1 += tr(["Taux de réussite certification", termine ? "" : "—", "≥ 70%", "", termine ? "À compléter" : "Formation en cours"]);
-    sheet1 += tr(["Taux de présentation à l'examen", termine ? "" : "—", "≥ 90%", "", termine ? "À compléter" : "Formation en cours"]);
-    sheet1 += tr(["Taux d'insertion professionnelle", termine ? "" : "—", "≥ 60%", "", termine ? "À compléter à 6 mois" : "Formation en cours"]);
+    if (termine) {
+      // Synchronized: count students with avg >= 7/10 as certified
+      const nbReussis = stagiaires.slice(0, 10).filter((_, si) => {
+        const sc = EVAL_SCORES[si] || [7, 8, 7, 8, 7];
+        return sc.reduce((a, b) => a + b, 0) / sc.length >= 7;
+      }).length;
+      const tauxReussite = Math.round(nbReussis / Math.min(stagiaires.length, 10) * 100);
+      sheet1 += tr(["Taux de réussite certification", `${tauxReussite}%`, "≥ 70%", `${tauxReussite >= 70 ? '+' : ''}${tauxReussite - 70}%`, `${nbReussis}/${Math.min(stagiaires.length, 10)} certifiés`]);
+      sheet1 += tr(["Taux de présentation à l'examen", "100%", "≥ 90%", "+10%", ""]);
+      sheet1 += tr(["Taux d'insertion professionnelle", "", "≥ 60%", "", "À compléter à 6 mois"]);
+    } else {
+      sheet1 += tr(["Taux de réussite certification", "—", "≥ 70%", "", "Formation en cours"]);
+      sheet1 += tr(["Taux de présentation à l'examen", "—", "≥ 90%", "", "Formation en cours"]);
+      sheet1 += tr(["Taux d'insertion professionnelle", "—", "≥ 60%", "", "Formation en cours"]);
+    }
   }
   if (isCFA) {
     sheet1 += tr(["Taux de rupture de contrat", termine ? "" : "0%", "< 10%", "", termine ? "À compléter" : "Aucune rupture à date"]);
