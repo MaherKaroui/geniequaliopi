@@ -137,12 +137,17 @@ export function generateExcelIndicateursQualite(o: OrganismeInfo): string {
 
 export function generateExcelSuiviCompetences(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]): string {
   const evalData = getEvalContent(f.intitule);
+  const termine = isFormationTerminee(f);
   let html = tableRow(["Stagiaire", ...evalData.competences, "Moyenne", "Statut"], true);
   stagiaires.slice(0, 10).forEach((s, i) => {
-    const sc = EVAL_SCORES[i] || [7, 8, 7, 8, 7];
-    const scores = evalData.competences.map((_, ci) => Math.min(10, sc[ci % sc.length] + 2));
-    const avg = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length * 10) / 10;
-    html += tableRow([s.prenom + " " + s.nom, ...scores.map(v => `${v}/10`), `${avg}/10`, avg >= 7 ? "✅ Acquis" : "🔄 En cours"]);
+    if (termine) {
+      const sc = EVAL_SCORES[i] || [7, 8, 7, 8, 7];
+      const scores = evalData.competences.map((_, ci) => Math.min(10, sc[ci % sc.length] + 2));
+      const avg = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length * 10) / 10;
+      html += tableRow([s.prenom + " " + s.nom, ...scores.map(v => `${v}/10`), `${avg}/10`, avg >= 7 ? "✅ Acquis" : "🔄 En cours"]);
+    } else {
+      html += tableRow([s.prenom + " " + s.nom, ...evalData.competences.map(() => "—"), "—", "📋 En cours de formation"]);
+    }
   });
   return excelWrap(`Suivi compétences – ${f.intitule}`, [{ name: "Compétences", html }]);
 }
