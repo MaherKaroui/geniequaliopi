@@ -250,9 +250,9 @@ export default function ControleEDOF({ organisme, formation, stagiaires, signatu
 
   // Download with signature
   const handleSignAndDownload = useCallback(async () => {
-    if (!previewHtml || !previewDoc || !savedSignature) return;
+    if (!previewHtml || !previewDoc || !signature) return;
     try {
-      const signedHtml = injectSignatureIntoHtml(previewHtml, savedSignature);
+      const signedHtml = injectSignatureIntoHtml(previewHtml, signature);
       const blob = await htmlToPdfBlob(signedHtml);
       const safeName = orgName.replace(/[^a-zA-Z0-9_-]/g, "_");
       saveAs(blob, `${safeName}_${previewDoc.code}_signe.pdf`);
@@ -260,7 +260,7 @@ export default function ControleEDOF({ organisme, formation, stagiaires, signatu
     } catch (e: any) {
       toast.error("Erreur : " + (e.message || "Erreur inconnue"));
     }
-  }, [previewHtml, previewDoc, orgName, savedSignature, injectSignatureIntoHtml]);
+  }, [previewHtml, previewDoc, orgName, signature, injectSignatureIntoHtml]);
 
   const downloadZip = useCallback(async () => {
     setGenerating(true);
