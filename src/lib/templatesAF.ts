@@ -477,12 +477,16 @@ export function genTestFinal(o: OrganismeInfo, f: FormationInfo, stagiaires: Sta
 
 export function genGrilleAcquisitionCompetences(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const evalData = getEvalContent(f.intitule);
+  const termine = isFormationTerminee(f);
   let extra = `<h2>Grille d'acquisition des compétences – Suivi individuel</h2>`;
   stagiaires.slice(0, 10).forEach((s, i) => {
     const sc = EVAL_SCORES[i] || [7, 8, 7, 8, 7];
     extra += `<h3>${s.prenom} ${s.nom} – ${s.entreprise}</h3>`;
     const rows = evalData.competences.map((comp) => {
-      return [comp, "10/10", "10/10", "✅ Acquis", "+0 pts"];
+      if (termine) {
+        return [comp, "10/10", "10/10", "✅ Acquis", "+0 pts"];
+      }
+      return [comp, "", "", "", ""];
     });
     extra += tableHTML(["Compétence", "Entrée", "Sortie", "Statut", "Progression"], rows);
   });
