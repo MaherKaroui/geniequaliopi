@@ -2,10 +2,11 @@
 // This generates HTML tables that open correctly in Excel with formatting
 
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
-import { formatDate, isFormationTerminee } from "./docBuilder";
-import { EVAL_SCORES, getFormationDays } from "./sampleData";
+import { formatDate, isFormationTerminee, getStagiaireDateDebut, getStagiaireDateFin } from "./docBuilder";
+import { EVAL_SCORES, getFormationDays, parseDuree } from "./sampleData";
 import { getEvalContent } from "./evalContent";
-import { getEvalBesoinsFinancement } from "./documentGenerator";
+import { getEvalBesoinsFinancement, getCFAWeekDates, parseRythmeAlternance } from "./documentGenerator";
+import { getRNCPByCode } from "./rncpData";
 
 function excelWrap(title: string, sheets: { name: string; html: string }[]): string {
   // Multi-sheet Excel HTML workbook
@@ -61,10 +62,10 @@ export function generateExcelAssiduite(o: OrganismeInfo, f: FormationInfo, stagi
   const jours = ["Jour 1", "Jour 2", "Jour 3", "Jour 4", "Jour 5"];
   let html = tableRow(["Stagiaire", ...jours, "Total heures", "Taux présence"], true);
   stagiaires.slice(0, 10).forEach((s, i) => {
-    const presences = jours.map(() => i % 10 < 9 ? "P" : "A");
-    const total = presences.filter(p => p === "P").length * 7;
-    const taux = Math.round(total / (jours.length * 7) * 100);
-    html += tableRow([s.prenom + " " + s.nom, ...presences, `${total}h`, `${taux}%`]);
+    // Synchronized: 100% attendance for all (matches émargement)
+    const presences = jours.map(() => "P");
+    const total = jours.length * 7;
+    html += tableRow([s.prenom + " " + s.nom, ...presences, `${total}h`, "100%"]);
   });
   return excelWrap(`Assiduité – ${f.intitule}`, [{ name: "Assiduité", html }]);
 }
@@ -183,9 +184,13 @@ export function generateExcelPlanActions(o: OrganismeInfo): string {
 }
 
 export function generateExcelSuiviApprentis(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]): string {
+  const termine = isFormationTerminee(f);
   let html = tableRow(["N°", "Apprenti", "Entreprise", "MA", "Assiduité CFA", "Assiduité Ent.", "Note CFA", "Éval MA", "Visite 1", "Visite 2", "Statut"], true);
   stagiaires.slice(0, 10).forEach((s, i) => {
-    html += tableRow([`${i+1}`, s.prenom + " " + s.nom, s.entreprise, f.formateur, `${95+(i%5)}%`, `${97+(i%3)}%`, `${7+(i%3)}/10`, `${8+(i%2)}/10`, "✅", i < 7 ? "✅" : "📋", "✅ En cours"]);
+    const sc = EVAL_SCORES[i] || [7, 8, 7, 8, 7];
+    const avg = Math.round(sc.reduce((a, b) => a + b, 0) / sc.length * 10) / 10;
+    const avgMA = Math.round(sc.map(v => Math.min(10, v + 1)).reduce((a, b) => a + b, 0) / sc.length * 10) / 10;
+    html += tableRow([`${i+1}`, s.prenom + " " + s.nom, s.entreprise, f.formateur, "100%", "100%", `${avg}/10`, `${avgMA}/10`, "✅", termine ? "✅" : "📋", termine ? "✅ Terminé" : "✅ En cours"]);
   });
   return excelWrap(`Suivi apprentis – ${f.intitule}`, [{ name: "Apprentis", html }]);
 }
@@ -350,9 +355,16 @@ export function generateExcelIndicateursPrevisionnelsVAE(o: OrganismeInfo, f: Fo
 export function generateExcelSuiviInscriptions(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]): string {
   const headers = ["SITUATION AVANT DÉMARRAGE FORMATION", "CIVILITÉ", "NOM", "PRÉNOM", "DATE DE NAISSANCE", "PAYS DE NAISSANCE", "INSCRIT SOUS QUEL STATUT", "COMMUNE", "ADRESSE", "CODE POSTAL", "TÉLÉPHONE", "MAIL", "INTITULÉ DE LA FORMATION", "DIPLÔME VISÉ", "DATE DÉBUT DE FORMATION", "DATE DE FIN DE FORMATION", "COMMENTAIRE OBSERVATION"];
   let html = tableRow(headers, true);
+  const now = new Date();
   stagiaires.slice(0, 15).forEach((s, i) => {
+    // Synchronized: use individual stagiaire dates
+    const dateDebut = s.dateDebutFormation || f.dateDebut || "";
+    const dateFin = s.dateFinFormation || f.dateFin || "";
+    const debutDate = dateDebut ? new Date(dateDebut.split('/').reverse().join('-')) : null;
+    const isPast = debutDate && debutDate < now;
+    const situation = isPast ? "En formation" : "Inscrit";
     html += tableRow([
-      i === 0 ? "Demandeur d'emploi" : i === 1 ? "Salarié" : "",
+      situation,
       s.civilite || "",
       s.nom,
       s.prenom,
@@ -366,9 +378,9 @@ export function generateExcelSuiviInscriptions(o: OrganismeInfo, f: FormationInf
       s.email || "",
       f.intitule || "",
       f.intitule || "",
-      formatDate(f.dateDebut),
-      formatDate(f.dateFin),
-      ""
+      formatDate(dateDebut),
+      formatDate(dateFin),
+      isPast ? "Formation démarrée" : ""
     ]);
   });
   // Add empty rows for manual entry
@@ -380,28 +392,31 @@ export function generateExcelSuiviInscriptions(o: OrganismeInfo, f: FormationInf
 
 // ===== TABLEAU DE SUIVI DU PARCOURS BÉNÉFICIAIRES ET ADAPTATION (CFA IND 10) =====
 export function generateExcelSuiviParcoursBeneficiairesCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]): string {
-  const today = "31/03/2026";
+  const now = new Date();
+  const today = now.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
   const stags = stagiaires.length > 0 ? stagiaires : [{ prenom: "Martin", nom: "Dupont", civilite: "M." as const, email: "", telephone: "", entreprise: "", poste: "", dateNaissance: "" }];
+  const termine = isFormationTerminee(f);
 
-  // Calculate number of weeks from formation dates (default 52)
-  let nbWeeks = 52;
-  if (f.dateDebut && f.dateFin) {
-    const start = new Date(f.dateDebut);
-    const end = new Date(f.dateFin);
-    const diffMs = end.getTime() - start.getTime();
-    nbWeeks = Math.max(1, Math.ceil(diffMs / (7 * 24 * 60 * 60 * 1000)));
-  }
+  // Synchronized: use CFA week dates from alternance calendar
+  const isCFA = !!(f.rythmeAlternance && f.rythmeAlternance.trim().length > 0);
+  const cfaWeekDates = isCFA ? getCFAWeekDates(f) : [];
+  const nbWeeks = cfaWeekDates.length > 0 ? cfaWeekDates.length : (() => {
+    let w = 52;
+    if (f.dateDebut && f.dateFin) {
+      const start = new Date(f.dateDebut);
+      const end = new Date(f.dateFin);
+      w = Math.max(1, Math.ceil((end.getTime() - start.getTime()) / (7 * 24 * 60 * 60 * 1000)));
+    }
+    return w;
+  })();
 
-  // Generate week headers (S1, S2, ... Sn)
+  // Generate week headers
   const weekHeaders = Array.from({ length: nbWeeks }, (_, i) => `<th>S${i + 1}</th>`).join("");
-  const weekCells = Array.from({ length: nbWeeks }, () => `<td>P</td>`).join("");
 
   let html = `<table>`;
-  // Title row
   const totalCols = 16 + nbWeeks + 10;
   html += `<tr><td class="title" colspan="8">${o.nom}</td><td colspan="5"></td><td>Version à jour au :</td><td colspan="2">${today}</td></tr>`;
   html += `<tr><td colspan="${totalCols}"></td></tr>`;
-  // Section headers
   html += `<tr class="header-row">
     <td colspan="4" style="text-align:center;font-weight:bold">FICHE D'IDENTITÉ DES BÉNÉFICIAIRES</td>
     <td></td>
@@ -414,7 +429,6 @@ export function generateExcelSuiviParcoursBeneficiairesCFA(o: OrganismeInfo, f: 
     <td colspan="2" style="text-align:center;font-weight:bold">Questionnaire satisfaction</td>
     <td colspan="4" style="text-align:center;font-weight:bold">GRILLE D'ÉVALUATION</td>
   </tr>`;
-  // Column headers
   html += `<tr>
     <th>Nom</th><th>Nom de jeune fille</th><th>Prénom</th><th>Sexe</th><th>Date de naissance</th><th>Lieu de naissance</th><th>Adresse</th>
     <th>Prise en charge</th><th>Nature</th><th>Observations</th>
@@ -426,17 +440,29 @@ export function generateExcelSuiviParcoursBeneficiairesCFA(o: OrganismeInfo, f: 
     <th>À chaud</th><th>Relance</th><th>À froid</th><th>Relance</th>
   </tr>`;
 
-  stags.forEach(s => {
+  stags.forEach((s, si) => {
+    // Synchronized: mark past CFA weeks as "P", future as empty
+    const pastWeeks = cfaWeekDates.filter(w => w.weekEnd < now).length;
+    const weekCells = Array.from({ length: nbWeeks }, (_, i) => {
+      if (i < pastWeeks || termine) return `<td>P</td>`;
+      return `<td></td>`;
+    }).join("");
+    const totalPresent = termine ? nbWeeks : pastWeeks;
+
+    // Synchronized: use EVAL_SCORES for QCM results
+    const sc = EVAL_SCORES[si] || [7, 8, 7, 8, 7];
+    const avg = Math.round(sc.reduce((a, b) => a + b, 0) / sc.length * 10) / 10;
+
     html += `<tr>
       <td>${s.nom}</td><td></td><td>${s.prenom}</td><td>${s.civilite === 'M.' ? 'M' : 'F'}</td>
       <td>${s.dateNaissance || ''}</td><td></td><td></td>
       <td>OPCO</td><td>Apprentissage</td><td></td>
       <td>${f.dateDebut ? formatDate(f.dateDebut) : ''}</td><td>${f.dateFin ? formatDate(f.dateFin) : ''}</td>
       <td></td><td></td><td></td><td></td>
-      ${weekCells}<td>${nbWeeks}/${nbWeeks}</td>
+      ${weekCells}<td>${totalPresent}/${nbWeeks}</td>
       <td>Non</td><td></td>
-      <td class="green">Validé</td><td>Oui</td>
-      <td>Oui</td><td></td><td>Oui</td><td></td>
+      <td class="green">${termine ? `${avg}/10 – Validé` : pastWeeks > 0 ? "En cours" : ""}</td><td>${termine ? "Oui" : ""}</td>
+      <td>${termine ? "Oui" : ""}</td><td></td><td>${termine ? "Oui" : ""}</td><td></td>
     </tr>`;
   });
 
@@ -476,42 +502,76 @@ export function generateExcelSuiviPFMP(o: OrganismeInfo, f: FormationInfo, stagi
 
 // ========== IND 13 — Outils de suivi alternance (Excel) ==========
 export function generateExcelOutilsSuiviAlternance(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]): string {
+  const now = new Date();
+  const termine = isFormationTerminee(f);
+  const isCFA = !!(f.rythmeAlternance && f.rythmeAlternance.trim().length > 0);
+  const cfaWeekDates = isCFA ? getCFAWeekDates(f) : [];
+  const pastWeeks = cfaWeekDates.filter(w => w.weekEnd < now).length;
+  const rncp = getRNCPByCode(f.codeRNCP || '');
+  const s0 = stagiaires[0];
+  const sc0 = EVAL_SCORES[0] || [7, 8, 7, 8, 7];
+
   // Sheet 1 - Informations générales
   let infoHtml = `<table border="1" cellspacing="0" cellpadding="4">`;
   infoHtml += `<tr><td colspan="6" style="font-size:14pt;font-weight:bold;background:#1e3a7b;color:#fff;padding:10px">INFORMATIONS GÉNÉRALES</td></tr>`;
   infoHtml += `<tr><td colspan="6" style="padding:6px;border:1px solid #999;font-style:italic">Document à compléter à la fin de chaque période (à l'école ou en entreprise)</td></tr>`;
-  const s0 = stagiaires[0];
   infoHtml += `<tr><td colspan="2" style="padding:6px;border:1px solid #999"><strong>Nom de l'entreprise :</strong></td><td colspan="4" style="padding:6px;border:1px solid #999">${s0?.entreprise || ''}</td></tr>`;
   infoHtml += `<tr><td colspan="2" style="padding:6px;border:1px solid #999"><strong>Nom de l'apprenti :</strong></td><td colspan="4" style="padding:6px;border:1px solid #999">${s0 ? s0.prenom + ' ' + s0.nom : ''}</td></tr>`;
   infoHtml += `<tr><td colspan="2" style="padding:6px;border:1px solid #999"><strong>Nom du tuteur :</strong></td><td colspan="4" style="padding:6px;border:1px solid #999">${o.responsablePedagogique}</td></tr>`;
   infoHtml += `<tr><td colspan="2" style="padding:6px;border:1px solid #999"><strong>Nom de l'organisme :</strong></td><td colspan="4" style="padding:6px;border:1px solid #999">${o.nom}</td></tr>`;
   infoHtml += `<tr><td colspan="2" style="padding:6px;border:1px solid #999"><strong>Référent pédagogique :</strong></td><td colspan="4" style="padding:6px;border:1px solid #999">${o.responsablePedagogique}</td></tr>`;
+  infoHtml += `<tr><td colspan="2" style="padding:6px;border:1px solid #999"><strong>Rythme d'alternance :</strong></td><td colspan="4" style="padding:6px;border:1px solid #999">${f.rythmeAlternance || '1 semaine CFA / 3 semaines entreprise'}</td></tr>`;
+  infoHtml += `<tr><td colspan="2" style="padding:6px;border:1px solid #999"><strong>Semaines CFA réalisées :</strong></td><td colspan="4" style="padding:6px;border:1px solid #999">${pastWeeks} / ${cfaWeekDates.length}</td></tr>`;
+  infoHtml += `<tr><td colspan="2" style="padding:6px;border:1px solid #999"><strong>Taux de présence :</strong></td><td colspan="4" style="padding:6px;border:1px solid #999">100%</td></tr>`;
   infoHtml += `</table>`;
 
-  // Sheet 2 - Entretien fin de période d'essai
+  // Sheet 2 - Entretien fin de période d'essai (pre-filled if past)
   let entretienHtml = `<table border="1" cellspacing="0" cellpadding="4">`;
   entretienHtml += `<tr><td colspan="6" style="font-size:14pt;font-weight:bold;background:#1e3a7b;color:#fff;padding:10px">ENTRETIEN DE FIN DE PÉRIODE D'ESSAI</td></tr>`;
   entretienHtml += `<tr><td colspan="6" style="padding:6px;border:1px solid #999;font-style:italic">Se référer aux compétences visées par la qualification</td></tr>`;
   entretienHtml += `<tr style="background:#e8f0fe;font-weight:bold"><th style="border:1px solid #999;padding:6px">Compétences à développer</th><th style="border:1px solid #999;padding:6px">Activités à réaliser</th><th style="border:1px solid #999;padding:6px">Lieu</th><th style="border:1px solid #999;padding:6px">Date entretien</th><th style="border:1px solid #999;padding:6px">Évaluation</th><th style="border:1px solid #999;padding:6px">Observations</th></tr>`;
-  for (let i = 0; i < 10; i++) {
+
+  // Pre-fill with RNCP blocs if available and past
+  const competences = rncp ? rncp.blocsCompetences.slice(0, 5).map(b => b.titre) : ["Compétence 1", "Compétence 2", "Compétence 3"];
+  const entretienDate = pastWeeks >= 4 && cfaWeekDates.length >= 4
+    ? cfaWeekDates[3].weekEnd.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })
+    : "";
+  competences.forEach((comp, ci) => {
+    const evalNote = pastWeeks >= 4 ? `${Math.min(10, sc0[ci % sc0.length] + 1)}/10` : "";
+    entretienHtml += `<tr><td style="border:1px solid #999;padding:6px">${comp}</td><td style="border:1px solid #999;padding:6px">${pastWeeks >= 4 ? "Mise en situation professionnelle" : ""}</td><td style="border:1px solid #999;padding:6px">${pastWeeks >= 4 ? "CFA + Entreprise" : ""}</td><td style="border:1px solid #999;padding:6px">${entretienDate}</td><td style="border:1px solid #999;padding:6px">${evalNote}</td><td style="border:1px solid #999;padding:6px">${pastWeeks >= 4 ? "Acquis en cours" : ""}</td></tr>`;
+  });
+  for (let i = competences.length; i < 10; i++) {
     entretienHtml += `<tr>${Array.from({length:6}, () => '<td style="border:1px solid #999;padding:6px">&nbsp;</td>').join('')}</tr>`;
   }
   entretienHtml += `</table>`;
 
-  // Sheet 3 - Bilan intermédiaire
+  // Sheet 3 - Bilan intermédiaire (pre-filled if enough weeks passed)
+  const midPoint = Math.floor(cfaWeekDates.length / 2);
+  const bilanIntermediaireDone = pastWeeks >= midPoint && midPoint > 0;
   let bilanHtml = `<table border="1" cellspacing="0" cellpadding="4">`;
   bilanHtml += `<tr><td colspan="6" style="font-size:14pt;font-weight:bold;background:#1e3a7b;color:#fff;padding:10px">BILAN INTERMÉDIAIRE</td></tr>`;
   bilanHtml += `<tr style="background:#e8f0fe;font-weight:bold"><th style="border:1px solid #999;padding:6px">Compétences</th><th style="border:1px solid #999;padding:6px">Activités</th><th style="border:1px solid #999;padding:6px">Lieu</th><th style="border:1px solid #999;padding:6px">Date</th><th style="border:1px solid #999;padding:6px">Évaluation</th><th style="border:1px solid #999;padding:6px">Observations</th></tr>`;
-  for (let i = 0; i < 10; i++) {
+  const bilanDate = bilanIntermediaireDone && cfaWeekDates[midPoint - 1]
+    ? cfaWeekDates[midPoint - 1].weekEnd.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })
+    : "";
+  competences.forEach((comp, ci) => {
+    const evalNote = bilanIntermediaireDone ? `${Math.min(10, sc0[ci % sc0.length] + 1)}/10` : "";
+    bilanHtml += `<tr><td style="border:1px solid #999;padding:6px">${comp}</td><td style="border:1px solid #999;padding:6px">${bilanIntermediaireDone ? "Évaluation en situation" : ""}</td><td style="border:1px solid #999;padding:6px">${bilanIntermediaireDone ? "CFA + Entreprise" : ""}</td><td style="border:1px solid #999;padding:6px">${bilanDate}</td><td style="border:1px solid #999;padding:6px">${evalNote}</td><td style="border:1px solid #999;padding:6px">${bilanIntermediaireDone ? "Progression satisfaisante" : ""}</td></tr>`;
+  });
+  for (let i = competences.length; i < 10; i++) {
     bilanHtml += `<tr>${Array.from({length:6}, () => '<td style="border:1px solid #999;padding:6px">&nbsp;</td>').join('')}</tr>`;
   }
   bilanHtml += `</table>`;
 
-  // Sheet 4 - Bilan final
+  // Sheet 4 - Bilan final (pre-filled only if formation terminée)
   let finalHtml = `<table border="1" cellspacing="0" cellpadding="4">`;
   finalHtml += `<tr><td colspan="6" style="font-size:14pt;font-weight:bold;background:#1e3a7b;color:#fff;padding:10px">BILAN FINAL</td></tr>`;
   finalHtml += `<tr style="background:#e8f0fe;font-weight:bold"><th style="border:1px solid #999;padding:6px">Compétences</th><th style="border:1px solid #999;padding:6px">Activités</th><th style="border:1px solid #999;padding:6px">Lieu</th><th style="border:1px solid #999;padding:6px">Date</th><th style="border:1px solid #999;padding:6px">Évaluation</th><th style="border:1px solid #999;padding:6px">Observations</th></tr>`;
-  for (let i = 0; i < 10; i++) {
+  competences.forEach((comp, ci) => {
+    const evalNote = termine ? `${Math.min(10, sc0[ci % sc0.length] + 2)}/10` : "";
+    finalHtml += `<tr><td style="border:1px solid #999;padding:6px">${comp}</td><td style="border:1px solid #999;padding:6px">${termine ? "Évaluation finale" : ""}</td><td style="border:1px solid #999;padding:6px">${termine ? "CFA + Entreprise" : ""}</td><td style="border:1px solid #999;padding:6px">${termine ? formatDate(f.dateFin) : ""}</td><td style="border:1px solid #999;padding:6px">${evalNote}</td><td style="border:1px solid #999;padding:6px">${termine ? "Compétence acquise" : ""}</td></tr>`;
+  });
+  for (let i = competences.length; i < 10; i++) {
     finalHtml += `<tr>${Array.from({length:6}, () => '<td style="border:1px solid #999;padding:6px">&nbsp;</td>').join('')}</tr>`;
   }
   finalHtml += `</table>`;

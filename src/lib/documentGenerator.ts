@@ -6539,7 +6539,7 @@ function genDocumentsCertificateursCFA(o: OrganismeInfo, f: FormationInfo) {
 }
 
 /** Parse rythme alternance string to get CFA weeks and enterprise weeks per cycle */
-function parseRythmeAlternance(rythme: string): { cfaWeeks: number; entrepriseWeeks: number } {
+export function parseRythmeAlternance(rythme: string): { cfaWeeks: number; entrepriseWeeks: number } {
   const match = rythme.match(/(\d+)\s*sem.*?\/\s*(\d+)\s*sem/i);
   if (match) return { cfaWeeks: parseInt(match[1]), entrepriseWeeks: parseInt(match[2]) };
   return { cfaWeeks: 1, entrepriseWeeks: 3 };
@@ -9317,7 +9317,7 @@ function genTestCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: Sta
  * Pattern: S1 CFA → S2-S4 Entreprise → S5 CFA → etc.
  * Returns array of { cfaWeekNum, weekStartDate } for each CFA week.
  */
-function getCFAWeekDates(f: FormationInfo): { cfaWeekNum: number; weekStart: Date; weekEnd: Date }[] {
+export function getCFAWeekDates(f: FormationInfo): { cfaWeekNum: number; weekStart: Date; weekEnd: Date }[] {
   const { cfaWeeks: cfaPerCycle, entrepriseWeeks } = parseRythmeAlternance(f.rythmeAlternance || '1 semaine CFA / 3 semaines entreprise');
   const { totalHours } = parseDuree(f.duree);
   const effectiveTotal = totalHours > 0 ? totalHours : 420;
