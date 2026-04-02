@@ -399,15 +399,16 @@ export function genSatisfactionApprenti(o: OrganismeInfo, f: FormationInfo, stag
 }
 
 export function genSatisfactionEntrepriseCFA(o: OrganismeInfo, f: FormationInfo) {
+  const termine = isFormationTerminee(f);
   return buildDocument({ org: o, title: "QUESTIONNAIRE SATISFACTION ENTREPRISE – CFA", subtitle: f.intitule, table: {
     headers: ["Critère", "Note /5"],
     rows: [
-      ["Qualité de la coordination CFA/entreprise", "4.5/5"],
-      ["Compétences acquises par l'apprenti", "4.3/5"],
-      ["Disponibilité du formateur référent", "4.7/5"],
-      ["Qualité des visites en entreprise", "4.4/5"],
-      ["Adéquation formation/besoins métier", "4.6/5"],
-      ["Satisfaction globale", "4.5/5"],
+      ["Qualité de la coordination CFA/entreprise", termine ? "4.5/5" : ""],
+      ["Compétences acquises par l'apprenti", termine ? "4.3/5" : ""],
+      ["Disponibilité du formateur référent", termine ? "4.7/5" : ""],
+      ["Qualité des visites en entreprise", termine ? "4.4/5" : ""],
+      ["Adéquation formation/besoins métier", termine ? "4.6/5" : ""],
+      ["Satisfaction globale", termine ? "4.5/5" : ""],
     ]
   } });
 }
