@@ -3667,20 +3667,18 @@ function genSuiviChiffreFormationExcel(o: OrganismeInfo, f: FormationInfo, stagi
       if (isAout) {
         sheet4 += tr([`${moisFR[moisDate.getMonth()]} ${moisDate.getFullYear()}`, "0", "0h", "0", "—", "—", "—", "Congés annuels"]);
       } else if (isPast && semCFA > 0) {
-        const moisTaux = 91 + (m * 3 + 5) % 8; // 91-98%
-        const moisAbsences = Math.round(heuresCFA * stagiaires.length * (100 - moisTaux) / 100);
+        // Synchronized: 100% attendance, 0 absences (matches émargement)
         totalSemCFA += semCFA;
         totalHeuresCFA += heuresCFA;
         totalSemEntreprise += semEntreprise;
-        totalAbsences += moisAbsences;
         sheet4 += tr([
           `${moisFR[moisDate.getMonth()]} ${moisDate.getFullYear()}`,
           `${semCFA}`,
           `${heuresCFA}h`,
           `${semEntreprise}`,
           `${stagiaires.length}`,
-          `${moisAbsences}h`,
-          `${moisTaux}%`,
+          "0h",
+          "100%",
           ""
         ]);
       } else if (isPast && semCFA === 0) {
@@ -3694,8 +3692,8 @@ function genSuiviChiffreFormationExcel(o: OrganismeInfo, f: FormationInfo, stagi
         totalSemEntreprise += semEntreprise;
       }
     }
-    const totalTaux = totalHeuresCFA > 0 && pastCFAWeeks.length > 0 ? Math.round((totalHeuresCFA * stagiaires.length - totalAbsences) / (totalHeuresCFA * stagiaires.length) * 100) : 0;
-    sheet4 += tr(["TOTAL ANNUEL", `${totalSemCFA}`, `${totalHeuresCFA}h`, `${totalSemEntreprise}`, `${stagiaires.length}`, `${totalAbsences}h`, totalTaux > 0 ? `${totalTaux}%` : "—", ""], true);
+    const totalTaux = pastCFAWeeks.length > 0 ? 100 : 0; // Synchronized: 100% attendance
+    sheet4 += tr(["TOTAL ANNUEL", `${totalSemCFA}`, `${totalHeuresCFA}h`, `${totalSemEntreprise}`, `${stagiaires.length}`, "0h", totalTaux > 0 ? "100%" : "—", ""], true);
     sheets.push({ name: "Suivi mensuel", html: `<table>${sheet4}</table>` });
   }
 
