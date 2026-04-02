@@ -2,10 +2,11 @@
 // This generates HTML tables that open correctly in Excel with formatting
 
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
-import { formatDate, isFormationTerminee } from "./docBuilder";
-import { EVAL_SCORES, getFormationDays } from "./sampleData";
+import { formatDate, isFormationTerminee, getStagiaireDateDebut, getStagiaireDateFin } from "./docBuilder";
+import { EVAL_SCORES, getFormationDays, parseDuree } from "./sampleData";
 import { getEvalContent } from "./evalContent";
-import { getEvalBesoinsFinancement } from "./documentGenerator";
+import { getEvalBesoinsFinancement, getCFAWeekDates, parseRythmeAlternance } from "./documentGenerator";
+import { getRNCPByCode } from "./rncpData";
 
 function excelWrap(title: string, sheets: { name: string; html: string }[]): string {
   // Multi-sheet Excel HTML workbook
