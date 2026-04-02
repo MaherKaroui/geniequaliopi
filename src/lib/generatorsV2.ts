@@ -1028,8 +1028,9 @@ export function genGrilleAcquisitionStagiaire(o: OrganismeInfo, f: FormationInfo
 
   const headers = ["", "NIVEAU", "", ""];
   const subHeaders = ["COMPÉTENCES PROFESSIONNELLES", "ACQUIS", "NON ACQUIS", "EN COURS D'ACQUISITION"];
+  const termine = isFormationTerminee(f);
   const rows = evalData.competences.map((comp) => {
-    return [comp, 'X', '', ''];
+    return termine ? [comp, 'X', '', ''] : [comp, '', '', ''];
   });
 
   extra += tableHTML(subHeaders, rows);
