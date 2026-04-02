@@ -62,10 +62,10 @@ export function generateExcelAssiduite(o: OrganismeInfo, f: FormationInfo, stagi
   const jours = ["Jour 1", "Jour 2", "Jour 3", "Jour 4", "Jour 5"];
   let html = tableRow(["Stagiaire", ...jours, "Total heures", "Taux présence"], true);
   stagiaires.slice(0, 10).forEach((s, i) => {
-    const presences = jours.map(() => i % 10 < 9 ? "P" : "A");
-    const total = presences.filter(p => p === "P").length * 7;
-    const taux = Math.round(total / (jours.length * 7) * 100);
-    html += tableRow([s.prenom + " " + s.nom, ...presences, `${total}h`, `${taux}%`]);
+    // Synchronized: 100% attendance for all (matches émargement)
+    const presences = jours.map(() => "P");
+    const total = jours.length * 7;
+    html += tableRow([s.prenom + " " + s.nom, ...presences, `${total}h`, "100%"]);
   });
   return excelWrap(`Assiduité – ${f.intitule}`, [{ name: "Assiduité", html }]);
 }
