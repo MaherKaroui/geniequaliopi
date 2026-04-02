@@ -1467,7 +1467,7 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
       <p><strong>NDA :</strong> ${o.nda}</p>
       <p><strong>Téléphone :</strong> ${o.telephone}</p>
       <p><strong>Email :</strong> ${o.email}</p>
-      <p><strong>Site web :</strong> ${linkUrl(o.siteWeb)}</p>
+      ${optSiteWeb(o)}
       <p><strong>Dirigeant – Formateur – Référent pédagogique – Référent handicap :</strong><br>Monsieur/Madame ${o.dirigeant}</p>
     </div>
 
