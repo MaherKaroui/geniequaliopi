@@ -1,7 +1,7 @@
 // CFA (Centre de Formation d'Apprentis) template generators
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
-import { buildDocument, formatDate, tableHTML, signatureBlock2, signatureBlock3, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireDuree, isFormationTerminee } from "./docBuilder";
-import { EVAL_SCORES } from "./sampleData";
+import { buildDocument, formatDate, tableHTML, signatureBlock2, signatureBlock3, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireDuree, isFormationTerminee, getFormationProgress, getPassedFormationDays } from "./docBuilder";
+import { EVAL_SCORES, getFormationDays } from "./sampleData";
 import { getEvalContent } from "./evalContent";
 
 const apprentiLabel = (s: StagiaireInfo) => `${s.prenom} ${s.nom}`;
