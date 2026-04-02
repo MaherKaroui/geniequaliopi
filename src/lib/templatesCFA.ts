@@ -247,7 +247,11 @@ export function genDeroulePedagogiqueCFA(o: OrganismeInfo, f: FormationInfo) {
 
 export function genGrilleSuiviCompetences(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const evalData = getEvalContent(f.intitule);
+  const termine = isFormationTerminee(f);
   const rows = stagiaires.slice(0, 10).map((s, i) => {
+    if (!termine) {
+      return [s.prenom + " " + s.nom, ...evalData.competences.map(() => "")];
+    }
     const sc = EVAL_SCORES[i] || [7, 8, 7, 8, 7];
     return [s.prenom + " " + s.nom, ...evalData.competences.map((_, ci) => {
       const v = Math.min(10, sc[ci % sc.length] + 1);
@@ -256,7 +260,7 @@ export function genGrilleSuiviCompetences(o: OrganismeInfo, f: FormationInfo, st
   });
   return buildDocument({ org: o, title: "GRILLE DE SUIVI DES COMPÉTENCES", subtitle: f.intitule, table: {
     headers: ["Apprenti(e)", ...evalData.competences.map((_, i) => `C${i+1}`)], rows
-  }, sections: [{ heading: "Légende", content: evalData.competences.map((c, i) => `<p><strong>C${i+1} :</strong> ${c}</p>`).join("") }] });
+  }, sections: [{ heading: "Légende", content: evalData.competences.map((c, i) => `<p><strong>C${i+1} :</strong> ${c}</p>`).join("") + (!termine ? '<p><em>Formation en cours – grille à compléter au fur et à mesure.</em></p>' : '') }] });
 }
 
 export function genCarnetLiaison(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
