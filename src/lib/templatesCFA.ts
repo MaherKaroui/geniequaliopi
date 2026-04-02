@@ -246,8 +246,13 @@ export function genEntretienPositionnement(o: OrganismeInfo, f: FormationInfo, s
 }
 
 export function genAnalyseBesoinsApprenti(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
+  const evalData = getEvalContent(f.intitule);
+  const compsList = evalData.competences.length > 0
+    ? evalData.competences.slice(0, 4).map(c => `• ${c}`).join('<br>')
+    : "• Compétences techniques métier<br>• Compétences transversales<br>• Communication professionnelle<br>• Autonomie";
   return buildDocument({ org: o, title: "ANALYSE DES BESOINS – APPRENTIS", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, sections: [
     { heading: "Méthodologie", content: `<p>L'analyse des besoins des ${Math.min(stagiaires.length, 10)} apprentis a été réalisée via :<br>• Entretiens individuels de positionnement<br>• Questionnaire en ligne<br>• Échange avec les maîtres d'apprentissage<br>• Tests de niveau</p>` },
+    { heading: "Compétences visées", content: `<p>Formation « ${f.intitule} » :<br>${compsList}</p>` },
     { heading: "Besoins identifiés", content: "<p>• 70% souhaitent un accompagnement renforcé en entreprise<br>• 60% ont besoin de consolider les bases théoriques<br>• 40% demandent un suivi personnalisé<br>• 20% nécessitent des aménagements spécifiques</p>" },
     { heading: "Plan de formation individualisé", content: "<p>Chaque apprenti bénéficie d'un plan de formation individualisé intégrant :<br>• Les compétences à acquérir au CFA<br>• Les missions en entreprise<br>• Les modalités d'évaluation<br>• Le calendrier d'alternance adapté</p>", variant: "green" },
   ] });
