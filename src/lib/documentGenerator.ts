@@ -3466,7 +3466,7 @@ function genSuiviChiffreFormationExcel(o: OrganismeInfo, f: FormationInfo, stagi
   if (isCFA) stagHeaders.push("Entreprise");
   stagHeaders.push("Date début", "Date fin", "Heures prévues", "Heures réalisées", "Taux présence", "Absences (h)");
   if (rncp) stagHeaders.push("Résultat certification");
-  stagHeaders.push("Satisfaction", "Observations");
+  stagHeaders.push("Satisfaction", "Statut", "Observations");
 
   let sheet2 = tr(stagHeaders, true);
   stagiaires.forEach((s, si) => {
@@ -3476,12 +3476,16 @@ function genSuiviChiffreFormationExcel(o: OrganismeInfo, f: FormationInfo, stagi
       s.dateDebutFormation || f.dateDebut || "",
       s.dateFinFormation || f.dateFin || "",
       `${effectiveTotal}h`,
-      "", // heures réalisées to fill
-      "", // taux presence to fill
-      ""  // absences to fill
+      termine ? "" : "—", // heures réalisées
+      termine ? "" : "—", // taux presence
+      termine ? "" : "—"  // absences
     );
-    if (rncp) cells.push(""); // résultat certification
-    cells.push("", ""); // satisfaction, observations
+    if (rncp) cells.push(termine ? "" : "—"); // résultat certification
+    cells.push(
+      termine ? "" : "—", // satisfaction
+      termine ? "À compléter" : "En cours de formation",
+      "" // observations
+    );
     sheet2 += tr(cells);
   });
   // Add 5 empty rows for future additions
