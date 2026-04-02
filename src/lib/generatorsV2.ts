@@ -1181,10 +1181,14 @@ export function genExercicesPratiques_V2(o: OrganismeInfo, f: FormationInfo, sta
 
 // Improved QCM Final (2-part format: QCM + cas pratique) - removes signatures
 export function genQCMFinal_V2(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
+  const termine = isFormationTerminee(f);
+  if (!termine) {
+    return buildDocument({ org: o, title: "ÉVALUATION FINALE – RÉSULTATS", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires,
+      extraHtml: `<div class="section section-green"><p><em>La formation est en cours. Les résultats de l'évaluation finale seront disponibles à l'issue de la formation.</em></p></div>` });
+  }
   const evalData = getEvalContent(f.intitule);
   const questions = evalData.qcmFinal.slice(0, 5);
   let extra = `<h2>ÉVALUATION FINALE</h2>`;
-  extra += `<p><strong>Formation :</strong> ${f.intitule}<br><strong>Date :</strong> ${formatDate(f.dateFin)}<br><strong>Nombre de questions QCM :</strong> ${questions.length}<br><strong>Structure :</strong> QCM (5 points) + Cas pratique (5 points)<br><strong>Note totale :</strong> /10</p>`;
 
   // Show QCM with correct answers
   extra += `<h3>Partie 1 – QCM (5 points) – Corrigé</h3>`;
