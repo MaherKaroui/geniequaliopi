@@ -413,12 +413,13 @@ export function genSatisfactionEntrepriseCFA(o: OrganismeInfo, f: FormationInfo)
   } });
 }
 
-export function genSatisfactionFormateurCFA(o: OrganismeInfo) {
+export function genSatisfactionFormateurCFA(o: OrganismeInfo, f: FormationInfo) {
+  const termine = isFormationTerminee(f);
   return buildDocument({ org: o, title: "QUESTIONNAIRE SATISFACTION FORMATEUR – CFA", table: {
     headers: ["Critère", "Note /5"],
     rows: [
-      ["Conditions de travail", "4.5/5"], ["Moyens pédagogiques", "4.3/5"], ["Accompagnement direction", "4.7/5"],
-      ["Relations avec les entreprises", "4.4/5"], ["Niveau des apprentis", "4.2/5"], ["Satisfaction globale", "4.5/5"],
+      ["Conditions de travail", termine ? "4.5/5" : ""], ["Moyens pédagogiques", termine ? "4.3/5" : ""], ["Accompagnement direction", termine ? "4.7/5" : ""],
+      ["Relations avec les entreprises", termine ? "4.4/5" : ""], ["Niveau des apprentis", termine ? "4.2/5" : ""], ["Satisfaction globale", termine ? "4.5/5" : ""],
     ]
   } });
 }
