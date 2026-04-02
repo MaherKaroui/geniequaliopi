@@ -32,7 +32,7 @@ const STATUS_CONFIG: Record<EYDocStatus, { label: string; icon: React.ReactNode;
   not_applicable: { label: "N/A", icon: <XCircle className="w-4 h-4 text-muted-foreground" />, color: "bg-muted text-muted-foreground" },
 };
 
-export default function ControleEDOF({ organisme, formation, stagiaires }: ControleEDOFProps) {
+export default function ControleEDOF({ organisme, formation, stagiaires, signature }: ControleEDOFProps) {
   const [docStates, setDocStates] = useState<Map<string, EYDocState>>(() => {
     const m = new Map<string, EYDocState>();
     EY_DOCUMENTS.forEach(d => {
@@ -55,10 +55,6 @@ export default function ControleEDOF({ organisme, formation, stagiaires }: Contr
   const [previewTitle, setPreviewTitle] = useState("");
   const [previewLoading, setPreviewLoading] = useState(false);
   const [previewDoc, setPreviewDoc] = useState<EYDocumentItem | null>(null);
-  const [showSignaturePad, setShowSignaturePad] = useState(false);
-  const [savedSignature, setSavedSignature] = useState<string>(() => {
-    try { return sessionStorage.getItem('ey_signature') || ''; } catch { return ''; }
-  });
   const orgName = organisme.nom || "Organisme";
 
   const stats = useMemo(() => {
