@@ -103,10 +103,15 @@ export function genConventionPedagogiqueCFA(o: OrganismeInfo, f: FormationInfo, 
 }
 
 export function genPlanningAlternance(o: OrganismeInfo, f: FormationInfo) {
+  const debut = f.dateDebut ? new Date(f.dateDebut.split('/').reverse().join('-')) : new Date();
   const rows = [];
-  for (let m = 1; m <= 12; m++) {
-    const mois = new Date(2024, m - 1).toLocaleDateString('fr-FR', { month: 'long' });
-    rows.push([mois.charAt(0).toUpperCase() + mois.slice(1), "Sem 1-2 : Entreprise", "Sem 3 : CFA", "Sem 4 : Entreprise", m === 6 ? "Bilan intermédiaire" : m === 12 ? "Examen final" : ""]);
+  for (let m = 0; m < 12; m++) {
+    const d = new Date(debut.getFullYear(), debut.getMonth() + m, 1);
+    const mois = d.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+    const now = new Date();
+    const isPast = d < now;
+    const termine = isFormationTerminee(f);
+    rows.push([mois.charAt(0).toUpperCase() + mois.slice(1), "Sem 1-2 : Entreprise", "Sem 3 : CFA", "Sem 4 : Entreprise", m === 5 ? "Bilan intermédiaire" : m === 11 ? "Examen final" : ""]);
   }
   return buildDocument({ org: o, title: "PLANNING D'ALTERNANCE", subtitle: f.intitule, table: {
     headers: ["Mois", "Période 1", "Période 2", "Période 3", "Événement"], rows
@@ -114,18 +119,21 @@ export function genPlanningAlternance(o: OrganismeInfo, f: FormationInfo) {
 }
 
 export function genCalendrierCFA(o: OrganismeInfo, f: FormationInfo) {
-  return buildDocument({ org: o, title: "CALENDRIER DU CFA – ANNÉE 2024", table: {
+  const debut = f.dateDebut ? new Date(f.dateDebut.split('/').reverse().join('-')) : new Date();
+  const year = debut.getFullYear();
+  const moisDebut = debut.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+  return buildDocument({ org: o, title: `CALENDRIER DU CFA – ANNÉE ${year}`, table: {
     headers: ["Période", "Événement", "Date", "Participants"],
     rows: [
-      ["Rentrée", "Journée d'intégration", "02/09/2024", "Tous les apprentis"],
-      ["T1", "Conseil de classe", "15/11/2024", "Formateurs + direction"],
-      ["T1", "Visite entreprise 1", "Oct-Nov 2024", "Formateurs référents"],
-      ["T2", "Examens blancs", "15/01/2025", "Tous les apprentis"],
-      ["T2", "Conseil de classe", "07/02/2025", "Formateurs + direction"],
-      ["T2", "Visite entreprise 2", "Fév-Mars 2025", "Formateurs référents"],
-      ["T3", "Révisions intensives", "Mai 2025", "Apprentis en certification"],
-      ["T3", "Examens finaux", "Juin 2025", "Apprentis en certification"],
-      ["Fin", "Cérémonie de remise des diplômes", "Juil 2025", "Tous"],
+      ["Rentrée", "Journée d'intégration", formatDate(f.dateDebut), "Tous les apprentis"],
+      ["T1", "Conseil de classe", `${new Date(year, debut.getMonth() + 2, 15).toLocaleDateString('fr-FR')}`, "Formateurs + direction"],
+      ["T1", "Visite entreprise 1", `${new Date(year, debut.getMonth() + 1, 1).toLocaleDateString('fr-FR', { month: 'long' })} ${year}`, "Formateurs référents"],
+      ["T2", "Examens blancs", `${new Date(year, debut.getMonth() + 4, 15).toLocaleDateString('fr-FR')}`, "Tous les apprentis"],
+      ["T2", "Conseil de classe", `${new Date(year, debut.getMonth() + 5, 7).toLocaleDateString('fr-FR')}`, "Formateurs + direction"],
+      ["T2", "Visite entreprise 2", `${new Date(year, debut.getMonth() + 5, 1).toLocaleDateString('fr-FR', { month: 'long' })} ${year}`, "Formateurs référents"],
+      ["T3", "Révisions intensives", `${new Date(year, debut.getMonth() + 8, 1).toLocaleDateString('fr-FR', { month: 'long' })} ${year + 1}`, "Apprentis en certification"],
+      ["T3", "Examens finaux", f.dateFin ? formatDate(f.dateFin) : `Juin ${year + 1}`, "Apprentis en certification"],
+      ["Fin", "Cérémonie de remise des diplômes", f.dateFin ? formatDate(f.dateFin) : `Juil ${year + 1}`, "Tous"],
     ]
   } });
 }
