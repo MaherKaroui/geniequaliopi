@@ -3152,21 +3152,36 @@ function genProcedureFormationCFA(o: OrganismeInfo, f: FormationInfo) {
 function genIndicateursResultatsCFA(o: OrganismeInfo, f: FormationInfo) {
   const year = new Date().getFullYear();
   const prevYear = year - 1;
-  return buildDocument({ org: o, title: "INDICATEURS DE RÉSULTATS CFA", subtitle: `${f.intitule} – Année ${prevYear}`, sections: [
+  const termine = isFormationTerminee(f);
+
+  const indicateursSection = termine
+    ? { heading: "2. Indicateurs de résultats", content: tableHTML(
+        ["Indicateur", `Résultat ${prevYear}`, `Objectif ${year}`, "Commentaire"],
+        [
+          ["Taux de réussite aux examens", "89%", "92%", "En progression constante"],
+          ["Taux de satisfaction global des apprentis", "94%", "95%", "Enquête de fin de formation"],
+          ["Taux d'insertion professionnelle à 6 mois", "85%", "88%", "Suivi post-formation"],
+          ["Taux de rupture de contrat d'apprentissage", "8%", "< 7%", "Accompagnement renforcé"],
+          ["Taux de poursuite d'études", "32%", "35%", "Orientation post-diplôme"],
+          ["Nombre d'apprentis formés", "45", "55", "Capacité d'accueil en hausse"],
+          ["Taux de présence moyen", "92%", "94%", "Suivi assiduité renforcé"],
+          ["Note moyenne aux évaluations continues", "14.2/20", "14.5/20", "Résultats satisfaisants"],
+        ]
+      ) }
+    : { heading: "2. Indicateurs de résultats – Nouvel entrant", content: `<p><em>Formation en cours – Phase de lancement</em></p><p>La première session de la formation <strong>${f.intitule}</strong> est actuellement en cours (du ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)}). Les indicateurs de résultats définitifs seront disponibles à l'issue de cette première promotion.</p>` + tableHTML(
+        ["Indicateur", `Objectif prévisionnel ${year}`, "Modalité de suivi"],
+        [
+          ["Taux de réussite aux examens", "≥ 80%", "Résultats certification"],
+          ["Taux de satisfaction des apprentis", "≥ 90%", "Enquête fin de formation"],
+          ["Taux d'insertion professionnelle à 6 mois", "≥ 75%", "Enquête post-formation"],
+          ["Taux de rupture de contrat", "< 10%", "Suivi administratif"],
+          ["Taux de présence moyen", "≥ 90%", "Émargements"],
+        ]
+      ) };
+
+  return buildDocument({ org: o, title: "INDICATEURS DE RÉSULTATS CFA", subtitle: `${f.intitule} – Année ${termine ? prevYear : year}`, sections: [
     { heading: "1. Objet", content: `<p>Ce document présente les indicateurs de résultats du CFA <strong>${o.nom}</strong> pour la formation <strong>${f.intitule}</strong>, conformément aux exigences du Référentiel National Qualité (indicateur 2).</p>` },
-    { heading: "2. Indicateurs de résultats", content: tableHTML(
-      ["Indicateur", `Résultat ${prevYear}`, `Objectif ${year}`, "Commentaire"],
-      [
-        ["Taux de réussite aux examens", "89%", "92%", "En progression constante"],
-        ["Taux de satisfaction global des apprentis", "94%", "95%", "Enquête de fin de formation"],
-        ["Taux d'insertion professionnelle à 6 mois", "85%", "88%", "Suivi post-formation"],
-        ["Taux de rupture de contrat d'apprentissage", "8%", "< 7%", "Accompagnement renforcé"],
-        ["Taux de poursuite d'études", "32%", "35%", "Orientation post-diplôme"],
-        ["Nombre d'apprentis formés", "45", "55", "Capacité d'accueil en hausse"],
-        ["Taux de présence moyen", "92%", "94%", "Suivi assiduité renforcé"],
-        ["Note moyenne aux évaluations continues", "14.2/20", "14.5/20", "Résultats satisfaisants"],
-      ]
-    ) },
+    indicateursSection,
     { heading: "3. Méthodologie de collecte", content: `<p>Les données sont collectées via :<br>• <strong>Enquêtes de satisfaction</strong> : questionnaires envoyés aux apprentis à la fin de chaque session<br>• <strong>Suivi de l'insertion</strong> : enquête à 3 mois et 6 mois après la fin de la formation<br>• <strong>Données administratives</strong> : résultats aux examens, émargements, absences<br>• <strong>Suivi des ruptures</strong> : registre des ruptures de contrat avec motifs</p>` },
     { heading: "4. Actions d'amélioration engagées", content: `<p>• Renforcement de l'accompagnement individuel pour réduire les ruptures<br>• Mise en place d'examens blancs supplémentaires pour améliorer le taux de réussite<br>• Développement du réseau d'entreprises partenaires pour favoriser l'insertion<br>• Amélioration de la plateforme pédagogique en ligne</p>`, variant: "green" },
     { heading: "5. Diffusion des résultats", content: `<p>Ces indicateurs sont diffusés sur :<br>${o.siteWeb ? `• Le site internet du CFA : <strong>${linkUrl(o.siteWeb)}</strong><br>` : ''}• Les supports de communication (plaquettes, fiches formation)<br>• Les documents contractuels remis aux entreprises et aux apprentis</p>` },
