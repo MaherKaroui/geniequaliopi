@@ -447,6 +447,26 @@ export const SAMPLE_FORMATIONS: FormationInfo[] = [
     codeRNCP: "RS6905",
     rythmeAlternance: "",
   },
+  {
+    intitule: "Conseiller en Insertion Professionnelle (CIP)",
+    objectifs: "Accueillir et diagnostiquer les publics en insertion. Accompagner les parcours d'insertion sociale et professionnelle. Développer et entretenir des relations avec les employeurs et les partenaires du territoire.",
+    prerequis: "Niveau Bac ou équivalent, expérience dans le domaine social ou de l'accompagnement souhaitée",
+    duree: "497 heures (71 jours)",
+    modalites: "présentiel",
+    tarif: "6 500 € HT",
+    programme: "CCP 1 – Accueillir pour analyser la demande des personnes et poser les bases d'un diagnostic partagé\n• Informer une personne ou un groupe sur les ressources en matière d'insertion\n• Analyser la demande de la personne et poser les bases d'un diagnostic partagé\n• Exercer une veille informationnelle, technique et prospective\n• Travailler en équipe, en réseau et en partenariat\n\nCCP 2 – Accompagner les personnes dans leur parcours d'insertion sociale et professionnelle\n• Contractualiser et suivre avec la personne son parcours d'insertion professionnelle\n• Accompagner une personne à l'élaboration de son projet professionnel\n• Accompagner la réalisation des projets professionnels\n• Concevoir des ateliers thématiques favorisant l'insertion professionnelle\n• Préparer et animer des ateliers de technique de recherche d'emploi\n• Analyser sa pratique professionnelle\n\nCCP 3 – Mettre en œuvre une offre de services auprès des employeurs pour favoriser l'insertion professionnelle\n• Déployer, dans une démarche projet, des actions de prospection avec les employeurs\n• Apporter un appui technique aux employeurs en matière de recrutement\n• Faciliter l'intégration et le maintien du salarié dans son environnement professionnel\n• Inscrire ses actes professionnels dans une démarche de développement durable et inclusive",
+    methodesEvaluation: "Évaluations en cours de formation (ECF) par CCP, mise en situation professionnelle (MSP), dossier professionnel (DP), entretien avec le jury, évaluation par le tuteur en entreprise",
+    moyensPedagogiques: "Salle de formation équipée, plateforme LMS, outils de simulation d'entretien, fiches techniques ROME/IMT, accès aux bases Pôle emploi et partenaires institutionnels, études de cas réels",
+    publicVise: "Demandeurs d'emploi, salariés en reconversion, travailleurs sociaux souhaitant se spécialiser dans l'insertion professionnelle",
+    delaiAcces: "30 jours avant le début de la session",
+    dateDebut: "2026-09-01",
+    dateFin: "2027-06-30",
+    lieu: "25 avenue de la Formation Professionnelle, 75008 Paris",
+    nombreParticipants: "12",
+    formateur: "Sophie Laurent",
+    codeRNCP: "RNCP37274",
+    rythmeAlternance: "1 semaine CFA / 3 semaines entreprise",
+  },
 ];
 
 // Satisfaction scores (pre-filled realistic data)
