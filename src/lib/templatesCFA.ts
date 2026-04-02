@@ -230,15 +230,16 @@ export function genPlanIndividuelFormation(o: OrganismeInfo, f: FormationInfo, s
 }
 
 export function genProgressionPedagogique(o: OrganismeInfo, f: FormationInfo) {
+  const evalData = getEvalContent(f.intitule);
+  const comps = evalData.competences.length >= 5
+    ? evalData.competences.slice(0, 5)
+    : [...evalData.competences, ...["Approfondissement", "Spécialisation", "Projet professionnel", "Préparation certification"].slice(0, 5 - evalData.competences.length)];
+  const periodes = ["Sept-Oct", "Nov-Déc", "Jan-Fév", "Mars-Avr", "Mai-Juin"];
+  const evaluations = ["QCM positionnement", "Exercices pratiques", "Cas pratiques", "Soutenance projet", "Examen blanc + final"];
+  const liens = ["Observation en entreprise", "Pratique guidée", "Missions autonomes", "Projet en entreprise", "Bilan de compétences"];
   return buildDocument({ org: o, title: "PROGRESSION PÉDAGOGIQUE", subtitle: f.intitule, table: {
     headers: ["Période", "Module CFA", "Objectifs", "Évaluation", "Lien entreprise"],
-    rows: [
-      ["Sept-Oct", "Module 1 – Fondamentaux", "Acquérir les bases théoriques", "QCM positionnement", "Observation en entreprise"],
-      ["Nov-Déc", "Module 2 – Approfondissement", "Maîtriser les techniques essentielles", "Exercices pratiques", "Pratique guidée"],
-      ["Jan-Fév", "Module 3 – Spécialisation", "Développer une expertise métier", "Cas pratiques", "Missions autonomes"],
-      ["Mars-Avr", "Module 4 – Projet", "Réaliser un projet complet", "Soutenance projet", "Projet en entreprise"],
-      ["Mai-Juin", "Module 5 – Certification", "Préparer et réussir l'examen", "Examen blanc + final", "Bilan de compétences"],
-    ]
+    rows: comps.map((comp, i) => [periodes[i] || `Période ${i+1}`, comp, `Acquérir les compétences liées à : ${comp}`, evaluations[i] || "Évaluation continue", liens[i] || "Pratique en entreprise"])
   } });
 }
 
