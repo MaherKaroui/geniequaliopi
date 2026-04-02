@@ -1085,6 +1085,11 @@ function getDocStyleColor(): string {
 
 // Évaluation finale par exercices et jeux (group format)
 export function genExercicesPratiques_V2(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
+  const termine = isFormationTerminee(f);
+  if (!termine) {
+    return buildDocument({ org: o, title: "ÉVALUATION FINALE – EXERCICES & JEUX", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, 
+      extraHtml: `<div class="section section-green"><p><em>La formation est en cours. Les résultats des exercices et jeux pédagogiques seront disponibles à l'issue de la formation.</em></p></div>` });
+  }
   const evalData = getEvalContent(f.intitule);
   const exercices = evalData.exercices;
   let extra = `<h2>ÉVALUATION FINALE – EXERCICES & JEUX</h2>`;
