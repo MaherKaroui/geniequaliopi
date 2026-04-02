@@ -496,17 +496,30 @@ export function genGrilleAcquisitionCompetences(o: OrganismeInfo, f: FormationIn
 
 export function genBilanPedagogiqueIndividuel(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const evalData = getEvalContent(f.intitule);
+  const termine = isFormationTerminee(f);
   let extra = "";
-  stagiaires.slice(0, 10).forEach((s, i) => {
-    const sc = EVAL_SCORES[i] || [7, 8, 7, 8, 7];
-    const avg = Math.round(sc.map(v => Math.min(10, v + 2)).reduce((a, b) => a + b, 0) / sc.length * 10) / 10;
-    extra += `<div class="page-break"></div><h2>Bilan pédagogique – ${s.prenom} ${s.nom}</h2>`;
-    extra += `<div class="section"><p><strong>Entreprise :</strong> ${s.entreprise}<br><strong>Poste :</strong> ${s.poste}<br><strong>Note finale :</strong> ${avg}/10<br><strong>Résultat :</strong> ${avg >= 7 ? '✅ Objectifs atteints' : '⚠️ Objectifs partiellement atteints'}</p></div>`;
-    extra += `<div class="section section-green"><p><strong>Appréciation du formateur :</strong> ${evalData.appreciations[i] || "Formation terminée avec un résultat satisfaisant."}</p></div>`;
-    extra += `<p><strong>Points forts :</strong> ${avg >= 8 ? "Excellente maîtrise des compétences clés. Autonomie remarquable." : "Bonne compréhension des fondamentaux. Progression régulière."}</p>`;
-    extra += `<p><strong>Axes d'amélioration :</strong> ${avg >= 8 ? "Approfondir les cas complexes. Partager les acquis avec les collègues." : "Consolider les acquis par la pratique. Revoir les points théoriques."}</p>`;
-    extra += `<p><strong>Recommandations :</strong> ${avg >= 8 ? "Formation complémentaire de niveau expert recommandée." : "Mise en pratique régulière et suivi à 3 mois."}</p>`;
-  });
+  if (!termine) {
+    extra += `<div class="section section-green"><p><em>La formation est en cours. Les bilans pédagogiques individuels seront complétés à l'issue de la formation.</em></p></div>`;
+    stagiaires.slice(0, 10).forEach((s) => {
+      extra += `<div class="page-break"></div><h2>Bilan pédagogique – ${s.prenom} ${s.nom}</h2>`;
+      extra += `<div class="section"><p><strong>Entreprise :</strong> ${s.entreprise}<br><strong>Poste :</strong> ${s.poste}<br><strong>Note finale :</strong> ___/10<br><strong>Résultat :</strong> ___</p></div>`;
+      extra += `<p><strong>Appréciation du formateur :</strong> ___</p>`;
+      extra += `<p><strong>Points forts :</strong> ___</p>`;
+      extra += `<p><strong>Axes d'amélioration :</strong> ___</p>`;
+      extra += `<p><strong>Recommandations :</strong> ___</p>`;
+    });
+  } else {
+    stagiaires.slice(0, 10).forEach((s, i) => {
+      const sc = EVAL_SCORES[i] || [7, 8, 7, 8, 7];
+      const avg = Math.round(sc.map(v => Math.min(10, v + 2)).reduce((a, b) => a + b, 0) / sc.length * 10) / 10;
+      extra += `<div class="page-break"></div><h2>Bilan pédagogique – ${s.prenom} ${s.nom}</h2>`;
+      extra += `<div class="section"><p><strong>Entreprise :</strong> ${s.entreprise}<br><strong>Poste :</strong> ${s.poste}<br><strong>Note finale :</strong> ${avg}/10<br><strong>Résultat :</strong> ${avg >= 7 ? '✅ Objectifs atteints' : '⚠️ Objectifs partiellement atteints'}</p></div>`;
+      extra += `<div class="section section-green"><p><strong>Appréciation du formateur :</strong> ${evalData.appreciations[i] || "Formation terminée avec un résultat satisfaisant."}</p></div>`;
+      extra += `<p><strong>Points forts :</strong> ${avg >= 8 ? "Excellente maîtrise des compétences clés. Autonomie remarquable." : "Bonne compréhension des fondamentaux. Progression régulière."}</p>`;
+      extra += `<p><strong>Axes d'amélioration :</strong> ${avg >= 8 ? "Approfondir les cas complexes. Partager les acquis avec les collègues." : "Consolider les acquis par la pratique. Revoir les points théoriques."}</p>`;
+      extra += `<p><strong>Recommandations :</strong> ${avg >= 8 ? "Formation complémentaire de niveau expert recommandée." : "Mise en pratique régulière et suivi à 3 mois."}</p>`;
+    });
+  }
   return buildDocument({ org: o, title: "BILANS PÉDAGOGIQUES INDIVIDUELS", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra,
     signatures: { type: "2", labels: ["Le Formateur", "Le Resp. Pédagogique"], names: [f.formateur, o.responsablePedagogique] } });
 }
