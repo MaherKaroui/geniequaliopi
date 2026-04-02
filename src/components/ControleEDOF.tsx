@@ -319,10 +319,18 @@ export default function ControleEDOF({ organisme, formation, stagiaires }: Contr
             Liste exhaustive des éléments probants (contrôle EY/Sauléa — RNCP/RS)
           </p>
         </div>
-        <Button onClick={downloadZip} disabled={generating} className="gap-2">
-          {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Archive className="w-4 h-4" />}
-          {generating ? "Export en cours..." : "Exporter ZIP EY"}
-        </Button>
+        <div className="flex items-center gap-2">
+          {selectedDocs.size > 0 && (
+            <Button onClick={downloadSelectedZip} disabled={generating} variant="default" className="gap-2">
+              {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+              {generating ? "Export..." : `Télécharger ${selectedDocs.size} sélectionné(s)`}
+            </Button>
+          )}
+          <Button onClick={downloadZip} disabled={generating} variant="outline" className="gap-2">
+            {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Archive className="w-4 h-4" />}
+            {generating ? "Export en cours..." : "Exporter tout ZIP"}
+          </Button>
+        </div>
       </div>
 
       {/* Progress */}
