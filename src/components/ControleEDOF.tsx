@@ -6,7 +6,6 @@ import { mergeStagiaires, mergeOrganisme } from "@/lib/sampleData";
 import { htmlToPdfBlob } from "@/lib/pdfExport";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Progress } from "@/components/ui/progress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { CheckCircle2, Circle, Upload, Archive, Loader2, FileText, AlertTriangle, Sparkles, XCircle, ChevronDown, ChevronRight, Eye, Download } from "lucide-react";
