@@ -774,6 +774,11 @@ export function buildFullCatalog(
     add("cfa_c6i27_mandat_qualiopi", "CT6 - IND 27 MANDAT DE PRÉSENTATION ET DE GESTION QUALIOPI", 6, 27, "mandat_qualiopi");
     add("cfa_c6i27_pdf_guide_qualiopi", "CT6 - IND 27 V9 GUIDE DE LECTURE QUALIOPI", 6, 27, "pdf_static", { pdfFile: "v9_guide_lecture_qualiopi.pdf" });
 
+    // IND 28 — Mobilisation des acteurs économiques et sociaux
+    add("cfa_c6i28_orientation_pour_tous", "CT6 - IND 28 📁 ORIENTATION POUR TOUS", 6, 28, "pdf_static", { pdfUrl: "/pdfs/citoyennete/orientation_pour_tous.png" });
+    add("cfa_c6i28_maitre_apprentissage_fiche", "CT6 - IND 28 📁 FICHE MAÎTRE D'APPRENTISSAGE 2025", 6, 28, "pdf_static", { pdfUrl: "/pdfs/citoyennete/maitre_apprentissage_fiche_2025.pdf" });
+    add("cfa_c6i28_reseau_partenaires", "CT6 - IND 28 📁 RÉSEAU DE PARTENAIRES SOCIO-ÉCONOMIQUES", 6, 28, "pdf_static", { pdfUrl: "/pdfs/citoyennete/reseau_partenaires_socio_economiques.pdf" });
+
     // ===== CRITÈRE 7 — AMÉLIORATION CONTINUE (CFA) =====
 
     // IND 30 — Appréciations et amélioration continue
