@@ -9281,6 +9281,12 @@ function genAppreciationsFinanceurs(o: OrganismeInfo, f: FormationInfo) {
 
 function genBilanFroid(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const dureeH = parseInt(f.duree) || 14;
+  const termine = isFormationTerminee(f);
+  if (!termine) {
+    return buildDocument({ org: o, title: "BILAN À FROID", subtitle: `${f.intitule} – 3 à 6 mois après`, sections: [
+      { heading: "Informations", content: `<p><strong>Organisme de formation :</strong> ${o.nom}<br><strong>Formation :</strong> ${f.intitule}<br><strong>Durée :</strong> ${dureeH} heures – ${f.lieu?.toLowerCase().includes('distance') ? 'Distanciel' : 'Présentiel'}</p>` },
+    ], extraHtml: `<div class="section section-green"><p><em>La formation est en cours. Les bilans à froid seront réalisés 3 à 6 mois après la fin de la formation.</em></p></div>` });
+  }
   let extra = `<p><em>Bilan réalisé 3 à 6 mois après la formation</em></p>`;
   stagiaires.slice(0, 8).forEach((s, i) => {
     extra += `<h3>Stagiaire : ${s.prenom} ${s.nom}</h3>`;
@@ -9295,7 +9301,6 @@ function genBilanFroid(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiaire
       "La durée de la formation était-elle adaptée ?",
       "Recommanderiez-vous cette formation avec du recul ?",
     ];
-    // Pattern: mostly 0 (Tout à fait) with some 1 (Plutôt oui), varying per stagiaire
     const patterns = [
       [0,0,1,0,0,0,1,0,0],
       [0,1,0,0,1,0,0,0,0],
