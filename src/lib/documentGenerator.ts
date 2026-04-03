@@ -9611,13 +9611,12 @@ function genAppreciationsBeneficiairesStagiaire(o: OrganismeInfo, f: FormationIn
   const s = stagiaires[si] || stagiaires[0];
   const dureeH = parseInt(f.duree) || 14;
   const termine = isFormationTerminee(f);
-  if (!termine) {
-    return buildDocument({ org: o, title: "QUESTIONNAIRE DE SATISFACTION DU BÉNÉFICIAIRE", subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, formation: f, showFormationInfo: true, stagiaires: [s],
-      extraHtml: `<div class="section section-green"><p><em>La formation est en cours. Le questionnaire de satisfaction sera complété à l'issue de la formation.</em></p></div>` });
-  }
   const rng = seededRandom(si * 59 + 23);
 
   let extra = `<p><em>Fréquence : fin de formation. En cas de non-retour, l'enquête est renvoyée dans un délai d'une semaine.</em></p>`;
+  if (!termine) {
+    extra += `<div class="section section-green"><p><em>La formation est en cours. Ce document sera complété à l'issue de la formation.</em></p></div>`;
+  }
   const dateFinStag = getStagiaireDateFin(s, f);
   extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td><strong>Intitulé de la formation :</strong></td><td>${f.intitule}</td></tr><tr><td><strong>Date :</strong></td><td>${formatDate(dateFinStag)}</td></tr><tr><td><strong>Nom/prénom des intervenants :</strong></td><td>${f.formateur}</td></tr><tr><td><strong>Nom/prénom du participant :</strong></td><td>${s.prenom} ${s.nom}</td></tr><tr><td><strong>Entreprise :</strong></td><td>${s.entreprise || "—"}</td></tr></table>`;
 
@@ -9626,56 +9625,64 @@ function genAppreciationsBeneficiairesStagiaire(o: OrganismeInfo, f: FormationIn
     return r < 0.55 ? 4 : 3;
   };
 
-  const criteres: [string, number | null][] = [
-    ["1. Avant l'entrée en formation", null],
-    ["Échanges avec le conseiller formation, le formateur", generateNote()],
-    ["Descriptif de la formation", generateNote()],
-    ["Descriptif de l'organisation de la formation (horaires, plan d'accès, etc.)", generateNote()],
-    ["Aide à la constitution du dossier de financement", generateNote()],
-    ["2. Pendant la formation", null],
-    ["Confort et équipement, services proposés", generateNote()],
-    ["Durée et rythme", generateNote()],
-    ["Qualité des supports pédagogiques", generateNote()],
-    ["3. Pédagogie", null],
-    ["Qualité de l'animation pédagogique", generateNote()],
-    ["Maîtrise des contenus du formateur", generateNote()],
-    ["Écoute et réponses aux attentes personnelles", generateNote()],
-    ["4. Évolution de vos connaissances : le programme vous a-t-il permis :", null],
-    ["D'actualiser vos connaissances ?", generateNote()],
-    ["D'acquérir des compétences nouvelles ?", generateNote()],
-    ["De repérer des points faibles à combler ?", generateNote()],
-    ["De mieux appréhender votre rôle dans l'entreprise ?", generateNote()],
-    ["La mise en pratique vous paraît-elle facile ?", generateNote()],
-    ["Le programme était-il suffisant pour répondre à vos besoins ?", generateNote()],
+  const criteresLabels: [string, boolean][] = [
+    ["1. Avant l'entrée en formation", true],
+    ["Échanges avec le conseiller formation, le formateur", false],
+    ["Descriptif de la formation", false],
+    ["Descriptif de l'organisation de la formation (horaires, plan d'accès, etc.)", false],
+    ["Aide à la constitution du dossier de financement", false],
+    ["2. Pendant la formation", true],
+    ["Confort et équipement, services proposés", false],
+    ["Durée et rythme", false],
+    ["Qualité des supports pédagogiques", false],
+    ["3. Pédagogie", true],
+    ["Qualité de l'animation pédagogique", false],
+    ["Maîtrise des contenus du formateur", false],
+    ["Écoute et réponses aux attentes personnelles", false],
+    ["4. Évolution de vos connaissances : le programme vous a-t-il permis :", true],
+    ["D'actualiser vos connaissances ?", false],
+    ["D'acquérir des compétences nouvelles ?", false],
+    ["De repérer des points faibles à combler ?", false],
+    ["De mieux appréhender votre rôle dans l'entreprise ?", false],
+    ["La mise en pratique vous paraît-elle facile ?", false],
+    ["Le programme était-il suffisant pour répondre à vos besoins ?", false],
   ];
 
   extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%"><tr style="background:#1e3a7b;color:#fff"><th></th><th>Non concerné</th><th>- -<br>1</th><th>-<br>2</th><th>+<br>3</th><th>++<br>4</th></tr>`;
-  criteres.forEach(([label, note]) => {
-    if (note === null) {
+  criteresLabels.forEach(([label, isHeader]) => {
+    if (isHeader) {
       extra += `<tr style="background:#e8edf5;font-weight:bold"><td colspan="6">${label}</td></tr>`;
-    } else {
+    } else if (termine) {
+      const note = generateNote();
       extra += `<tr><td>${label}</td><td>${note === 0 ? 'X' : ''}</td><td>${note === 1 ? 'X' : ''}</td><td>${note === 2 ? 'X' : ''}</td><td>${note === 3 ? 'X' : ''}</td><td>${note === 4 ? 'X' : ''}</td></tr>`;
+    } else {
+      extra += `<tr><td>${label}</td><td></td><td></td><td></td><td></td><td></td></tr>`;
     }
   });
   extra += `</table>`;
 
-  const globalNotes = ["10/10", "9/10", "8/10", "7/10", "10/10", "9/10", "8/10", "10/10", "9/10", "8/10"];
-  const globalNote = globalNotes[si % globalNotes.length];
-  extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%"><tr style="background:#1e3a7b;color:#fff"><th></th><th>1/10</th><th>3/10</th><th>7/10</th><th>10/10</th></tr><tr><td>Niveau de satisfaction général</td><td></td><td></td><td>${globalNote === '7/10' ? 'X' : ''}</td><td>${['10/10', '9/10', '8/10'].includes(globalNote) ? 'X' : ''}</td></tr></table>`;
+  if (termine) {
+    const globalNotes = ["10/10", "9/10", "8/10", "7/10", "10/10", "9/10", "8/10", "10/10", "9/10", "8/10"];
+    const globalNote = globalNotes[si % globalNotes.length];
+    extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%"><tr style="background:#1e3a7b;color:#fff"><th></th><th>1/10</th><th>3/10</th><th>7/10</th><th>10/10</th></tr><tr><td>Niveau de satisfaction général</td><td></td><td></td><td>${globalNote === '7/10' ? 'X' : ''}</td><td>${['10/10', '9/10', '8/10'].includes(globalNote) ? 'X' : ''}</td></tr></table>`;
 
-  const commentsPool = [
-    `La formation s'est globalement bien déroulée. Les explications étaient claires et progressives. Le formateur était disponible et prenait le temps de répondre aux questions.`,
-    `Formation enrichissante. Les exercices pratiques ont été utiles pour mettre en application les notions vues. Je me sens plus à l'aise pour utiliser les outils dans un cadre professionnel.`,
-    `Très satisfait(e) de cette formation. Le contenu était bien structuré et le formateur pédagogue. Les supports de cours sont de qualité et je les conserverai comme référence.`,
-    `Bonne formation, le rythme était adapté à notre niveau. J'aurais aimé approfondir certains points mais la durée ne le permettait pas. Dans l'ensemble, formation recommandée.`,
-    `Le formateur maîtrise parfaitement son sujet et sait le transmettre avec clarté. Les mises en situation pratiques étaient particulièrement utiles et réalistes.`,
-    `Formation très complète qui a répondu à mes attentes. Les méthodes pédagogiques étaient variées et l'ambiance propice à l'apprentissage. Je repars avec de vrais outils concrets.`,
-    `J'ai beaucoup apprécié cette formation. Le contenu correspondait exactement à ce dont j'avais besoin dans mon poste actuel. Le formateur était dynamique et les échanges enrichissants.`,
-    `Formation de bonne qualité. Les exercices progressifs m'ont permis de monter en compétence graduellement. Le formateur a su répondre à toutes mes questions avec précision.`,
-    `Très bonne formation tant sur le fond que sur la forme. L'organisation logistique était impeccable. Je me sens désormais beaucoup plus confiant(e) dans l'utilisation des outils présentés.`,
-    `La formation a dépassé mes attentes. Le formateur a su s'adapter au groupe et proposer des exemples concrets issus du terrain. Je recommande vivement cette formation.`,
-  ];
-  extra += `<p><strong>Commentaire :</strong> ${commentsPool[si % commentsPool.length]}</p>`;
+    const commentsPool = [
+      `La formation s'est globalement bien déroulée. Les explications étaient claires et progressives. Le formateur était disponible et prenait le temps de répondre aux questions.`,
+      `Formation enrichissante. Les exercices pratiques ont été utiles pour mettre en application les notions vues. Je me sens plus à l'aise pour utiliser les outils dans un cadre professionnel.`,
+      `Très satisfait(e) de cette formation. Le contenu était bien structuré et le formateur pédagogue. Les supports de cours sont de qualité et je les conserverai comme référence.`,
+      `Bonne formation, le rythme était adapté à notre niveau. J'aurais aimé approfondir certains points mais la durée ne le permettait pas. Dans l'ensemble, formation recommandée.`,
+      `Le formateur maîtrise parfaitement son sujet et sait le transmettre avec clarté. Les mises en situation pratiques étaient particulièrement utiles et réalistes.`,
+      `Formation très complète qui a répondu à mes attentes. Les méthodes pédagogiques étaient variées et l'ambiance propice à l'apprentissage. Je repars avec de vrais outils concrets.`,
+      `J'ai beaucoup apprécié cette formation. Le contenu correspondait exactement à ce dont j'avais besoin dans mon poste actuel. Le formateur était dynamique et les échanges enrichissants.`,
+      `Formation de bonne qualité. Les exercices progressifs m'ont permis de monter en compétence graduellement. Le formateur a su répondre à toutes mes questions avec précision.`,
+      `Très bonne formation tant sur le fond que sur la forme. L'organisation logistique était impeccable. Je me sens désormais beaucoup plus confiant(e) dans l'utilisation des outils présentés.`,
+      `La formation a dépassé mes attentes. Le formateur a su s'adapter au groupe et proposer des exemples concrets issus du terrain. Je recommande vivement cette formation.`,
+    ];
+    extra += `<p><strong>Commentaire :</strong> ${commentsPool[si % commentsPool.length]}</p>`;
+  } else {
+    extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%"><tr style="background:#1e3a7b;color:#fff"><th></th><th>1/10</th><th>3/10</th><th>7/10</th><th>10/10</th></tr><tr><td>Niveau de satisfaction général</td><td></td><td></td><td></td><td></td></tr></table>`;
+    extra += `<p><strong>Commentaire :</strong> _______________________________________________</p>`;
+  }
 
   return buildDocument({ org: o, title: "QUESTIONNAIRE DE SATISFACTION DU BÉNÉFICIAIRE", subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra });
 }
