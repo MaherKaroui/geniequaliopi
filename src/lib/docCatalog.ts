@@ -708,6 +708,12 @@ export function buildFullCatalog(
 
     // IND 18 — Coordination des intervenants
     add("cfa_c4i18_organigramme", "CT4 - IND 18 ORGANIGRAMME", 4, 18, "organigramme");
+    add("cfa_c4i18_fiche_poste_dirigeant", "CT4 - IND 18 FICHE DE POSTE – RESPONSABLE PÉDAGOGIQUE", 4, 18, "fiche_poste_formateur", { role: "dirigeant" });
+    if (uniqueFormateursCFA.length === 0) {
+      add("cfa_c4i18_fiche_poste_formateur", "CT4 - IND 18 FICHE DE POSTE – FORMATEUR", 4, 18, "fiche_poste_formateur", { role: "formateur" });
+    }
+    add("cfa_c4i18_fiche_poste_ref_admin", "CT4 - IND 18 FICHE DE POSTE – RÉFÉRENT ADMINISTRATIF", 4, 18, "fiche_poste_formateur", { role: "referent_administratif" });
+    add("cfa_c4i18_fiche_poste_ref_handicap", "CT4 - IND 18 FICHE DE POSTE – RÉFÉRENT HANDICAP", 4, 18, "fiche_poste_formateur", { role: "referent_handicap" });
 
     // IND 19 — Ressources pédagogiques mises à disposition
     formations.forEach((f, fi) => {
