@@ -5344,6 +5344,7 @@ function genVAESequencage(o: OrganismeInfo, f: FormationInfo) {
 }
 
 
+function genVAEPositionnementDebut(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = stagiaires[si] || stagiaires[0] || FALLBACK_STAGIAIRE;
   const dateDebut = getStagiaireDateDebut(s, f);
   return buildDocument({ org: o, title: "QUESTIONNAIRE DE POSITIONNEMENT – DÉBUT D'ACCOMPAGNEMENT VAE", subtitle: `${s.prenom} ${s.nom}`, sections: [
