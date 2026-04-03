@@ -31,7 +31,8 @@ const ZIP_EXPORT_OPTIONS = {
 
 const hasStagiaireIdentity = (stagiaire: StagiaireInfo | null | undefined): stagiaire is StagiaireInfo => {
   if (!stagiaire) return false;
-  return [stagiaire.nom, stagiaire.prenom, stagiaire.email, stagiaire.telephone].some(
+  // Check any non-empty string field on the stagiaire object
+  return Object.values(stagiaire).some(
     (value) => typeof value === "string" && value.trim().length > 0
   );
 };
