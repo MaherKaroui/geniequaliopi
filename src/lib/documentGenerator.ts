@@ -1,5 +1,5 @@
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
-import { buildDocument, htmlWrap, orgHeader, formationInfoBlock, formationInfoBlockStagiaire, tableHTML, signatureBlock3, signatureBlock2, footer, section, formatDate, infoGrid, getDocStyle, subtractBusinessDays, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif, getStagiaireDuree, applyGender, g, getDisplayDuree, linkUrl, optSiteWeb, isFormationTerminee, getModaliteContent, hasDistanciel, hasPresentiel } from "./docBuilder";
+import { buildDocument, htmlWrap, orgHeader, formationInfoBlock, formationInfoBlockStagiaire, tableHTML, signatureBlock3, signatureBlock2, footer, section, formatDate, infoGrid, getDocStyle, subtractBusinessDays, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif, getStagiaireDuree, applyGender, g, getDisplayDuree, linkUrl, optSiteWeb, isFormationTerminee, getModaliteContent, hasDistanciel, hasPresentiel, isFacebookPage, getSiteWebLabel } from "./docBuilder";
 import { FormateurInfo, SAMPLE_FORMATIONS, SAMPLE_STAGIAIRES, SAMPLE_FORMATEURS, SAMPLE_ORGANISME, EVAL_SCORES, SATISFACTION_SCORES, CONNECTION_TIMES, getFormationDays, mergeOrganisme, mergeStagiaires, getConnectionTimes, parseDuree } from "./sampleData";
 import { buildFullCatalog } from "./docCatalog";
 import { generateBookQualiopi } from "./bookQualiopi";
@@ -1540,7 +1540,7 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
     <div class="section">
       <p><strong>Étapes d'inscription :</strong></p>
       <ol>
-        <li>Préinscription ${o.siteWeb && o.siteWeb.trim() ? `via le site internet (${linkUrl(o.siteWeb)}), ` : ''}par téléphone ou par email auprès de ${o.nom}</li>
+        <li>Préinscription ${o.siteWeb && o.siteWeb.trim() ? `via ${isFacebookPage(o.siteWeb) ? 'la page Facebook' : 'le site internet'} (${linkUrl(o.siteWeb)}), ` : ''}par téléphone ou par email auprès de ${o.nom}</li>
         <li>Analyse de la demande et validation de l'adéquation formation / projet professionnel</li>
         <li>Entretien de positionnement (si nécessaire) pour adapter le parcours</li>
         <li>Envoi des documents administratifs :
@@ -1619,7 +1619,7 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
         <tr><td>Taux d'abandon</td><td>0 %</td></tr>
         <tr><td>Taux de recommandation</td><td>100 %</td></tr>
       </table>
-      <p style="margin-top:8px"><em>Ces indicateurs sont mis à jour annuellement${o.siteWeb && o.siteWeb.trim() ? ` et consultables sur le site internet de ${o.nom}` : ''}.</em></p>
+      <p style="margin-top:8px"><em>Ces indicateurs sont mis à jour annuellement${o.siteWeb && o.siteWeb.trim() ? ` et consultables sur ${isFacebookPage(o.siteWeb) ? 'la page Facebook' : 'le site internet'} de ${o.nom}` : ''}.</em></p>
     </div>
 
     <h2>15. Déroulé pédagogique de la formation${!isBlocFormation ? ` (${heuresTotal})` : ""}</h2>
@@ -3182,7 +3182,7 @@ function genProcedureInscriptionCFA(o: OrganismeInfo, f: FormationInfo) {
   return buildDocument({ org: o, title: "PROCÉDURE D'INSCRIPTION CFA", subtitle: `${f.intitule}`, sections: [
     { heading: "1. Objet", content: `<p>La présente procédure décrit les étapes d'inscription au sein du CFA <strong>${o.nom}</strong> pour la formation <strong>${f.intitule}</strong>.</p>` },
     { heading: "2. Conditions d'admission", content: `<p>• Avoir entre 16 et 29 ans révolus (dérogations possibles selon les cas prévus par la loi)<br>• Satisfaire aux prérequis de la formation : ${f.prerequis || "Niveau Bac ou équivalent"}<br>• Disposer d'un contrat d'apprentissage ou être en recherche active d'une entreprise d'accueil<br>• Fournir l'ensemble des pièces justificatives demandées</p>` },
-    { heading: "3. Étapes d'inscription", content: `<p><strong>Étape 1 – Demande d'information</strong><br>Le candidat prend contact avec le CFA par téléphone (${o.telephone}), par email (${o.email})${o.siteWeb ? ` ou via le site internet (${linkUrl(o.siteWeb)})` : ''}.<br><br><strong>Étape 2 – Entretien de positionnement</strong><br>Un entretien individuel est organisé avec le responsable pédagogique pour évaluer la motivation, le projet professionnel et le niveau du candidat.<br><br><strong>Étape 3 – Constitution du dossier</strong><br>Le candidat fournit les pièces suivantes :<br>• Pièce d'identité en cours de validité<br>• CV actualisé<br>• Lettre de motivation<br>• Derniers diplômes obtenus<br>• Attestation de domicile<br>• Photo d'identité<br><br><strong>Étape 4 – Recherche d'entreprise</strong><br>Le CFA accompagne le candidat dans sa recherche d'entreprise d'accueil.<br><br><strong>Étape 5 – Signature du contrat</strong><br>Le contrat d'apprentissage est établi et transmis à l'OPCO pour enregistrement.<br><br><strong>Étape 6 – Inscription définitive</strong><br>L'inscription est validée à réception de la confirmation d'enregistrement du contrat par l'OPCO.</p>` },
+    { heading: "3. Étapes d'inscription", content: `<p><strong>Étape 1 – Demande d'information</strong><br>Le candidat prend contact avec le CFA par téléphone (${o.telephone}), par email (${o.email})${o.siteWeb ? ` ou via ${isFacebookPage(o.siteWeb) ? 'la page Facebook' : 'le site internet'} (${linkUrl(o.siteWeb)})` : ''}.<br><br><strong>Étape 2 – Entretien de positionnement</strong><br>Un entretien individuel est organisé avec le responsable pédagogique pour évaluer la motivation, le projet professionnel et le niveau du candidat.<br><br><strong>Étape 3 – Constitution du dossier</strong><br>Le candidat fournit les pièces suivantes :<br>• Pièce d'identité en cours de validité<br>• CV actualisé<br>• Lettre de motivation<br>• Derniers diplômes obtenus<br>• Attestation de domicile<br>• Photo d'identité<br><br><strong>Étape 4 – Recherche d'entreprise</strong><br>Le CFA accompagne le candidat dans sa recherche d'entreprise d'accueil.<br><br><strong>Étape 5 – Signature du contrat</strong><br>Le contrat d'apprentissage est établi et transmis à l'OPCO pour enregistrement.<br><br><strong>Étape 6 – Inscription définitive</strong><br>L'inscription est validée à réception de la confirmation d'enregistrement du contrat par l'OPCO.</p>` },
     { heading: "4. Délais d'accès", content: `<p>L'inscription est possible tout au long de l'année, sous réserve de places disponibles. Le délai moyen entre le premier contact et l'entrée en formation est de <strong>15 jours à 3 mois</strong>.</p>` },
     { heading: "5. Accessibilité handicap", content: `<p>Le CFA ${o.nom} accueille les personnes en situation de handicap. Le référent handicap (${o.referentHandicap}) étudie les aménagements possibles.</p>` },
     { heading: "6. Contact", content: `<p><strong>${o.nom}</strong><br>${o.adresse}, ${o.codePostal} ${o.ville}<br>Téléphone : ${o.telephone}<br>Email : ${o.email}<br>Responsable pédagogique : ${o.responsablePedagogique}</p>` },
@@ -3242,7 +3242,7 @@ function genIndicateursResultatsCFA(o: OrganismeInfo, f: FormationInfo) {
     indicateursSection,
     { heading: "3. Méthodologie de collecte", content: `<p>Les données sont collectées via :<br>• <strong>Enquêtes de satisfaction</strong> : questionnaires envoyés aux apprentis à la fin de chaque session<br>• <strong>Suivi de l'insertion</strong> : enquête à 3 mois et 6 mois après la fin de la formation<br>• <strong>Données administratives</strong> : résultats aux examens, émargements, absences<br>• <strong>Suivi des ruptures</strong> : registre des ruptures de contrat avec motifs</p>` },
     { heading: "4. Actions d'amélioration engagées", content: `<p>• Renforcement de l'accompagnement individuel pour réduire les ruptures<br>• Mise en place d'examens blancs supplémentaires pour améliorer le taux de réussite<br>• Développement du réseau d'entreprises partenaires pour favoriser l'insertion<br>• Amélioration de la plateforme pédagogique en ligne</p>`, variant: "green" },
-    { heading: "5. Diffusion des résultats", content: `<p>Ces indicateurs sont diffusés sur :<br>${o.siteWeb ? `• Le site internet du CFA : <strong>${linkUrl(o.siteWeb)}</strong><br>` : ''}• Les supports de communication (plaquettes, fiches formation)<br>• Les documents contractuels remis aux entreprises et aux apprentis</p>` },
+    { heading: "5. Diffusion des résultats", content: `<p>Ces indicateurs sont diffusés sur :<br>${o.siteWeb ? `• ${isFacebookPage(o.siteWeb) ? 'La page Facebook' : 'Le site internet'} du CFA : <strong>${linkUrl(o.siteWeb)}</strong><br>` : ''}• Les supports de communication (plaquettes, fiches formation)<br>• Les documents contractuels remis aux entreprises et aux apprentis</p>` },
   ] });
 }
 
@@ -4306,7 +4306,7 @@ function genVAEPlaquetteInfo(o: OrganismeInfo) {
 function genVAEProcedureInfo(o: OrganismeInfo) {
   return buildDocument({ org: o, title: "PROCÉDURE D'INFORMATION DU PUBLIC – VAE", sections: [
     { heading: "Objet", content: `<p>Cette procédure décrit les modalités de diffusion de l'information relative à l'offre d'accompagnement VAE de ${o.nom}, conformément à l'indicateur 1 du Référentiel National Qualité.</p>` },
-    { heading: "Canaux de diffusion", content: `<p>${o.siteWeb ? `• <strong>Site internet :</strong> ${linkUrl(o.siteWeb)} – Page dédiée VAE avec informations complètes<br>` : ''}• <strong>Plaquette d'information</strong> remise lors de l'entretien de faisabilité<br>• <strong>Réseaux sociaux et annuaires professionnels</strong><br>• <strong>Partenaires institutionnels</strong> : Pôle emploi, OPCO, Transitions Pro, CEP</p>` },
+    { heading: "Canaux de diffusion", content: `<p>${o.siteWeb ? `• <strong>${isFacebookPage(o.siteWeb) ? 'Page Facebook' : 'Site internet'} :</strong> ${linkUrl(o.siteWeb)} – Page dédiée VAE avec informations complètes<br>` : ''}• <strong>Plaquette d'information</strong> remise lors de l'entretien de faisabilité<br>• <strong>Réseaux sociaux et annuaires professionnels</strong><br>• <strong>Partenaires institutionnels</strong> : Pôle emploi, OPCO, Transitions Pro, CEP</p>` },
     { heading: "Informations diffusées", content: `<p>Conformément au RNQ, les informations suivantes sont systématiquement communiquées :<br>• Prérequis (1 an d'expérience minimum)<br>• Objectifs de l'accompagnement<br>• Durée (24 heures sur 3 à 6 mois)<br>• Modalités d'accès et délais<br>• Tarifs et financements possibles<br>• Méthodes mobilisées<br>• Modalités d'évaluation (passage devant le jury)<br>• Accessibilité aux personnes handicapées<br>• Contact du référent VAE et du référent handicap</p>`, variant: "green" },
     { heading: "Mise à jour", content: `<p>Les informations sont actualisées au minimum une fois par an et à chaque évolution réglementaire. La dernière mise à jour date du ${formatDate(o.dateMaj)}.</p>` },
   ] });
@@ -5382,7 +5382,7 @@ function genVAEDroitImage(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
   return buildDocument({ org: o, title: "CONTRAT DE CESSION DE DROIT D'IMAGE", sections: [
     { heading: "Entre les parties", content: `<p><strong>Le Participant :</strong> ${s.prenom} ${s.nom}, demeurant au ${s.adresse || "___"}, ${s.codePostal || ""} ${s.commune || ""}<br><br><strong>Et :</strong><br>${o.nom}<br>${o.adresse}, ${o.codePostal} ${o.ville}<br>Représenté par ${o.dirigeant}</p>` },
     { heading: "Article 1 : Objet du contrat", content: `<p>Le présent contrat a pour but de préciser les conditions dans lesquelles le cédant autorise le cessionnaire à exploiter son droit à l'image, qui sera captée à l'occasion de l'accompagnement VAE.</p>` },
-    { heading: "Article 2 : Autorisation", content: `<p>Le Participant autorise ${o.nom} à fixer, reproduire et communiquer au public les photographies et/ou vidéos prises dans le cadre de l'accompagnement VAE, sur les supports suivants :<br>• Site internet de ${o.nom}<br>• Réseaux sociaux<br>• Supports de communication print et digital<br>• Rapports d'activité et documents internes</p>` },
+    { heading: "Article 2 : Autorisation", content: `<p>Le Participant autorise ${o.nom} à fixer, reproduire et communiquer au public les photographies et/ou vidéos prises dans le cadre de l'accompagnement VAE, sur les supports suivants :<br>• ${isFacebookPage(o.siteWeb) ? 'Page Facebook' : 'Site internet'} de ${o.nom}<br>• Réseaux sociaux<br>• Supports de communication print et digital<br>• Rapports d'activité et documents internes</p>` },
     { heading: "Article 3 : Durée et territoire", content: `<p>La présente autorisation est consentie pour une durée de 5 ans à compter de la signature, pour le territoire mondial.</p>` },
     { heading: "Article 4 : Droit de retrait", content: `<p>Le Participant peut à tout moment retirer son autorisation par courrier recommandé. Le retrait prendra effet dans un délai de 30 jours, sans remettre en cause les utilisations antérieures.</p><p>Fait à ${o.ville}, le ${formatDate(dateSignature)}</p>`, variant: "green" },
   ], signatures: { type: "2", labels: ["Le Participant", "Pour l'organisme"], names: [`${s.prenom} ${s.nom}`, o.dirigeant], stagiaireSignatureUrl: s.signatureUrl, dates: [formatDate(dateSignature), formatDate(dateSignature)] } });
@@ -7236,8 +7236,15 @@ function genSynopsisCFA(o: OrganismeInfo, f: FormationInfo) {
 
 function genLienSiteInternet(o: OrganismeInfo) {
   const dateMaj = o.dateMaj ? new Date(o.dateMaj).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) : new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
-  return buildDocument({ org: o, title: "LIEN DU SITE INTERNET", sections: [
-    { heading: "Site internet", content: o.siteWeb ? '<p><strong>URL :</strong> ' + linkUrl(o.siteWeb) + '</p><p>Le site diffuse l\'ensemble des informations obligatoires : intitulés, objectifs, durées, modalités, tarifs, prérequis, contacts, indicateurs de résultats et accessibilité handicap.</p>' : '<p>Aucun site internet renseigné.</p>' },
+  const isFb = isFacebookPage(o.siteWeb);
+  const label = isFb ? "PAGE FACEBOOK" : "LIEN DU SITE INTERNET";
+  const headingLabel = isFb ? "Page Facebook" : "Site internet";
+  const description = isFb
+    ? `La page Facebook diffuse l'ensemble des informations relatives aux formations : intitulés, objectifs, durées, modalités, tarifs, contacts, indicateurs de résultats et accessibilité handicap.`
+    : `Le site diffuse l'ensemble des informations obligatoires : intitulés, objectifs, durées, modalités, tarifs, prérequis, contacts, indicateurs de résultats et accessibilité handicap.`;
+  const noContent = isFb ? 'Aucune page Facebook renseignée.' : 'Aucun site internet renseigné.';
+  return buildDocument({ org: o, title: label, sections: [
+    { heading: headingLabel, content: o.siteWeb ? '<p><strong>URL :</strong> ' + linkUrl(o.siteWeb) + '</p><p>' + description + '</p>' : '<p>' + noContent + '</p>' },
     { heading: "Mise à jour", content: '<p>Dernière mise à jour : ' + dateMaj + '</p>', variant: "green" },
   ] });
 }
@@ -7262,7 +7269,7 @@ function genProcedureEvalBesoins(o: OrganismeInfo) {
   return buildDocument({ org: o, title: "PROCÉDURE D'ÉVALUATION DES BESOINS DES STAGIAIRES", sections: [
     { heading: "Objectif", content: `<p>Identifier les besoins, attentes et niveaux des stagiaires avant leur entrée en formation afin d'adapter le parcours pédagogique et de garantir l'atteinte des objectifs de la formation.</p>` },
     { heading: "Étapes de la procédure", content: `<p><strong>1. Demande d'inscription</strong></p>
-<ul><li>Le candidat contacte ${o.nom} sur le site internet, ou par mail et/ou téléphone.</li>
+<ul><li>Le candidat contacte ${o.nom} ${o.siteWeb && o.siteWeb.trim() ? `sur ${isFacebookPage(o.siteWeb) ? 'la page Facebook' : 'le site internet'}, ou ` : ''}par mail et/ou téléphone.</li>
 <li>Une première analyse du projet et de la motivation est effectuée.</li></ul>
 <p><strong>2. Recueil des besoins</strong></p>
 <ul><li>Envoi d'un formulaire de positionnement ou questionnaire de préformation (niveau, attentes, difficultés, objectifs professionnels).</li>

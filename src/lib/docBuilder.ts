@@ -8,10 +8,22 @@ export function linkUrl(url: string | undefined | null, label?: string): string 
   return `<a href="${href}" target="_blank" style="color:#1a56db;text-decoration:underline">${label || url}</a>`;
 }
 
+/** Detect if a siteWeb URL is a Facebook page */
+export function isFacebookPage(url: string | undefined | null): boolean {
+  if (!url) return false;
+  const lower = url.toLowerCase();
+  return lower.includes("facebook.com") || lower.includes("fb.com") || lower.includes("fb.me");
+}
+
+/** Get the appropriate label for the siteWeb field */
+export function getSiteWebLabel(o: { siteWeb?: string }): string {
+  return isFacebookPage(o.siteWeb) ? "Page Facebook" : "Site web";
+}
+
 /** Returns an HTML line for site web only if the value is non-empty */
 export function optSiteWeb(o: { siteWeb?: string }, labelPrefix?: string): string {
   if (!o.siteWeb || !o.siteWeb.trim()) return "";
-  const label = labelPrefix || "Site web";
+  const label = labelPrefix || getSiteWebLabel(o);
   return `<p><strong>${label} :</strong> ${linkUrl(o.siteWeb)}</p>`;
 }
 

@@ -131,8 +131,8 @@ const OrganismeForm = ({ data, onChange }: OrganismeFormProps) => {
           <Input id="email" type="email" value={data.email} onChange={e => update('email', e.target.value)} placeholder="contact@formation.fr" />
         </div>
         <div>
-          <Label htmlFor="siteWeb">Site internet</Label>
-          <Input id="siteWeb" value={data.siteWeb} onChange={e => update('siteWeb', e.target.value)} placeholder="https://www.formation.fr" />
+          <Label htmlFor="siteWeb">Site internet / Page Facebook</Label>
+          <Input id="siteWeb" value={data.siteWeb} onChange={e => update('siteWeb', e.target.value)} placeholder="https://www.facebook.com/monorganisme" />
         </div>
         <div>
           <Label htmlFor="dirigeant">Dirigeant *</Label>
