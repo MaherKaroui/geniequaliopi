@@ -298,6 +298,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "vae_engagements_respectifs": return genVAEEngagementsRespectifs(o, f, stagiaires);
     case "vae_programme_accompagnement": return genVAEProgrammeAccompagnement(o, f);
     case "vae_livret2": return genVAELivret2(o, f);
+    case "vae_sequencage": return genVAESequencage(o, f);
     case "vae_positionnement_debut": {
       const si = params?.stagiaireIdx ?? 0;
       return genVAEPositionnementDebut(o, f, stagiaires, si);
