@@ -11252,6 +11252,12 @@ function genContratFormationParBloc(o: OrganismeInfo, f: FormationInfo, stagiair
     { heading: "Article 8 – Droit de rétractation", content: `<p>Le stagiaire dispose d'un délai de rétractation de 10 jours à compter de la signature du contrat (art. L.6353-5 du Code du travail).</p>` },
     { heading: "Article 9 – Litiges", content: `<p>Règlement amiable. À défaut, juridictions compétentes.</p>` },
   ], extraHtml: `
+    <h2 style="margin-top:30px">CONDITIONS FINANCIÈRES</h2>
+    <div style="margin-bottom:20px">
+      <p>Le prix de la formation est celui affiché sur la plateforme Mon Compte Formation.</p>
+      <p style="margin-top:8px">Le paiement est effectué exclusivement par la Caisse des Dépôts, selon la procédure EDOF.</p>
+      <p style="margin-top:8px">Aucun paiement direct ne peut être exigé du stagiaire hors reste à charge affiché sur la plateforme.</p>
+    </div>
     <p><strong>Fait le ${dateConvention}</strong></p>
     <div class="signature-block">
       <div class="sig-box">
