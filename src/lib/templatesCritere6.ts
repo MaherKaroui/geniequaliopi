@@ -863,46 +863,46 @@ function veilleMetierRows(f: FormationInfo, type: FormationType): string[][] {
   // Default: word/bureautique
   return [
     [
-      `<a href="https://propulsandgo.com/blog/top-5-formations-bureautique-paris-2025">propulsandgo.com</a>`,
-      "Top 5 des formations bureautiques à Paris",
+      `<a href="https://support.microsoft.com/fr-fr/word">support.microsoft.com – Word</a>`,
+      "Microsoft – Centre d'aide et nouveautés Word",
       veilleMonthYear(f, 8),
-      "Montre que Word et Pack Office restent des compétences clés en entreprise. Forte demande CPF.",
-      "Preuve : lien + capture écran. Action : positionnement de la formation Word comme compétence métier indispensable."
+      "Page officielle Microsoft sur les fonctionnalités Word : mise en forme avancée, styles, publipostage, collaboration en temps réel, Copilot intégré.",
+      "Preuve : capture écran + lien. Action : mise à jour du programme avec les dernières fonctionnalités Word (dictée vocale, traduction, Copilot)."
     ],
     [
-      `<a href="https://nouvelle-donne-formation.org/et-si-vous-vous-formiez-en-bureautique">nouvelle-donne-formation.org</a>`,
-      "Se former en bureautique : Word, Excel, PowerPoint",
+      `<a href="https://propulsandgo.com/blog/top-5-formations-bureautique-paris-2025">propulsandgo.com</a>`,
+      "Top 5 des formations bureautiques – Word reste incontournable",
       veilleMonthYear(f, 7),
-      "Confirme la pertinence des formations bureautiques pour l'employabilité et la reconversion professionnelle.",
-      "Action Qualiopi : ajustement du public visé et des objectifs pédagogiques en lien avec l'emploi (critère 2)."
+      "Word et le Pack Office restent les compétences bureautiques les plus demandées par les employeurs. La maîtrise de Word est un prérequis dans 85% des offres d'emploi administratif.",
+      "Preuve : article + statistiques. Action : positionnement de la formation Word comme compétence métier indispensable pour l'employabilité."
     ],
     [
       `<a href="https://capcours-abdformations.com/formation-word-pack-office">capcours-abdformations.com</a>`,
-      "Pourquoi apprendre Word aujourd'hui ?",
+      "Pourquoi maîtriser Word en entreprise ?",
       veilleYear(f, 6),
-      "Met en avant l'usage professionnel réel de Word : mise en page, documents normés, efficacité.",
-      "Action : renforcement des cas pratiques professionnels (courrier, rapport, document administratif)."
+      "Usage professionnel de Word : création de courriers normés, rapports avec sommaire automatique, modèles de documents, publipostage pour les mailings.",
+      "Action : renforcement des cas pratiques professionnels (courrier commercial, rapport avec styles, publipostage, document administratif normé)."
     ],
     [
       `<a href="https://www.microsoft.com/ignite">microsoft.com/ignite</a>`,
-      "Microsoft Ignite (événement officiel)",
+      "Microsoft Ignite – Nouveautés Word et Microsoft 365",
       veilleMonthYear(f, 4),
-      "Conférence majeure Microsoft : intégration massive de l'IA (Copilot) dans Word et Office 365.",
-      "Preuve : programme Ignite + vidéos. Action : ajout d'un module « Découverte IA dans Word »."
+      "Conférence Microsoft : intégration de Copilot dans Word (aide à la rédaction, reformulation, résumé automatique), collaboration en temps réel améliorée, nouveaux modèles.",
+      "Preuve : programme Ignite + vidéos. Action : ajout d'un module « Découverte des fonctionnalités IA dans Word (Copilot) »."
     ],
     [
-      `<a href="https://www.youtube.com/watch?v=sBkfzCiD0BI">YouTube – Ignite Highlights</a>`,
-      "Microsoft Ignite – Highlights & Copilot",
-      veilleYear(f, 4),
-      "Présentation des nouveautés Word : aide à la rédaction, reformulation, automatisation.",
-      "Action Qualiopi : adaptation du contenu pédagogique Word aux nouvelles fonctionnalités (critère 6)."
+      `<a href="https://www.icdlfrance.org/">ICDL France – Certification bureautique</a>`,
+      "ICDL – Référentiel de compétences en traitement de texte",
+      veilleMonthYear(f, 5),
+      "L'ICDL (ex-PCIE) est la certification de référence pour valider les compétences bureautiques. Le module Traitement de texte couvre : mise en forme, tableaux, images, publipostage, styles et sommaires.",
+      "Preuve : référentiel ICDL traitement de texte. Action : aligner les exercices pratiques sur les compétences évaluées par la certification ICDL Word."
     ],
     [
-      `<a href="https://www.edutech.com">edutech.com</a>`,
-      "Salon EduTECH (Formation & digital)",
+      `<a href="https://www.youtube.com/watch?v=sBkfzCiD0BI">YouTube – Word astuces professionnelles</a>`,
+      "Astuces Word pour les professionnels – Mise en page et productivité",
       veilleYear(f, 3),
-      "Salon international sur l'évolution des outils pédagogiques et numériques.",
-      "Preuve : site événement. Action : réflexion sur pédagogie active et outils numériques."
+      "Tutoriel sur les fonctionnalités avancées de Word : raccourcis clavier, styles personnalisés, en-têtes/pieds de page, numérotation, table des matières automatique.",
+      "Action Qualiopi : enrichir les exercices de la formation avec les astuces de productivité Word les plus recherchées."
     ],
   ];
 }
