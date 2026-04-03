@@ -9282,12 +9282,10 @@ function genAppreciationsFinanceurs(o: OrganismeInfo, f: FormationInfo) {
 function genBilanFroid(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const dureeH = parseInt(f.duree) || 14;
   const termine = isFormationTerminee(f);
-  if (!termine) {
-    return buildDocument({ org: o, title: "BILAN À FROID", subtitle: `${f.intitule} – 3 à 6 mois après`, sections: [
-      { heading: "Informations", content: `<p><strong>Organisme de formation :</strong> ${o.nom}<br><strong>Formation :</strong> ${f.intitule}<br><strong>Durée :</strong> ${dureeH} heures – ${f.lieu?.toLowerCase().includes('distance') ? 'Distanciel' : 'Présentiel'}</p>` },
-    ], extraHtml: `<div class="section section-green"><p><em>La formation est en cours. Les bilans à froid seront réalisés 3 à 6 mois après la fin de la formation.</em></p></div>` });
-  }
   let extra = `<p><em>Bilan réalisé 3 à 6 mois après la formation</em></p>`;
+  if (!termine) {
+    extra += `<div class="section section-green"><p><em>La formation est en cours. Ce document sera complété après la fin de la formation.</em></p></div>`;
+  }
   stagiaires.slice(0, 8).forEach((s, i) => {
     extra += `<h3>Stagiaire : ${s.prenom} ${s.nom}</h3>`;
     const criteres = [
@@ -9314,15 +9312,24 @@ function genBilanFroid(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiaire
     const pat = patterns[i % patterns.length];
     extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%"><thead><tr style="background:#1e3a7b;color:#fff"><th>Critères évalués</th><th>Tout à fait</th><th>Plutôt oui</th><th>Plutôt non</th><th>Non</th></tr></thead><tbody>`;
     criteres.forEach((label, idx) => {
-      const note = pat[idx];
-      extra += `<tr><td>${label}</td><td style="text-align:center;font-weight:700">${note === 0 ? "X" : ""}</td><td style="text-align:center;font-weight:700">${note === 1 ? "X" : ""}</td><td></td><td></td></tr>`;
+      if (termine) {
+        const note = pat[idx];
+        extra += `<tr><td>${label}</td><td style="text-align:center;font-weight:700">${note === 0 ? "X" : ""}</td><td style="text-align:center;font-weight:700">${note === 1 ? "X" : ""}</td><td></td><td></td></tr>`;
+      } else {
+        extra += `<tr><td>${label}</td><td></td><td></td><td></td><td></td></tr>`;
+      }
     });
     extra += `</tbody></table>`;
-    const comments = [
-      `Avec du recul, la formation ${f.intitule} m'a été réellement utile. J'utilise encore les outils régulièrement, notamment pour rédiger et mettre en forme des documents simples dans un cadre professionnel. Les bases vues pendant la formation me permettent aujourd'hui de travailler de manière plus autonome et plus rapide.`,
-      `La formation correspondait bien à mon niveau au moment où je l'ai suivie. Les méthodes expliquées restent claires et faciles à réutiliser lorsque j'en ai besoin. Les supports fournis sont pratiques et me servent encore de rappel.`,
-    ];
-    extra += `<p><strong>Commentaire global :</strong> ${comments[i % comments.length]}</p><hr/>`;
+    if (termine) {
+      const comments = [
+        `Avec du recul, la formation ${f.intitule} m'a été réellement utile. J'utilise encore les outils régulièrement, notamment pour rédiger et mettre en forme des documents simples dans un cadre professionnel. Les bases vues pendant la formation me permettent aujourd'hui de travailler de manière plus autonome et plus rapide.`,
+        `La formation correspondait bien à mon niveau au moment où je l'ai suivie. Les méthodes expliquées restent claires et faciles à réutiliser lorsque j'en ai besoin. Les supports fournis sont pratiques et me servent encore de rappel.`,
+      ];
+      extra += `<p><strong>Commentaire global :</strong> ${comments[i % comments.length]}</p>`;
+    } else {
+      extra += `<p><strong>Commentaire global :</strong> _______________________________________________</p>`;
+    }
+    extra += `<hr/>`;
   });
   return buildDocument({ org: o, title: "BILAN À FROID", subtitle: `${f.intitule} – 3 à 6 mois après`, sections: [
     { heading: "Informations", content: `<p><strong>Organisme de formation :</strong> ${o.nom}<br><strong>Formation :</strong> ${f.intitule}<br><strong>Durée :</strong> ${dureeH} heures – ${f.lieu?.toLowerCase().includes('distance') ? 'Distanciel' : 'Présentiel'}</p>` },
