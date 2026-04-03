@@ -7242,9 +7242,8 @@ function genLienSiteInternet(o: OrganismeInfo) {
   const description = isFb
     ? `La page Facebook diffuse l'ensemble des informations relatives aux formations : intitulés, objectifs, durées, modalités, tarifs, contacts, indicateurs de résultats et accessibilité handicap.`
     : `Le site diffuse l'ensemble des informations obligatoires : intitulés, objectifs, durées, modalités, tarifs, prérequis, contacts, indicateurs de résultats et accessibilité handicap.`;
-  const noContent = isFb ? 'Aucune page Facebook renseignée.' : 'Aucun site internet renseigné.';
   return buildDocument({ org: o, title: label, sections: [
-    { heading: headingLabel, content: o.siteWeb ? '<p><strong>URL :</strong> ' + linkUrl(o.siteWeb) + '</p><p>' + description + '</p>' : '<p>' + noContent + '</p>' },
+    ...(o.siteWeb && o.siteWeb.trim() ? [{ heading: headingLabel, content: '<p><strong>URL :</strong> ' + linkUrl(o.siteWeb) + '</p><p>' + description + '</p>' }] : []),
     { heading: "Mise à jour", content: '<p>Dernière mise à jour : ' + dateMaj + '</p>', variant: "green" },
   ] });
 }
