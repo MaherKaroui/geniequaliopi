@@ -247,6 +247,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "indicateurs_performance": return genIndicateursPerformance(o, formations, stagiaires);
     case "rapport_amelioration": return genRapportAmelioration(o);
     // Type d'action spécifiques
+    case "pv_conseil_perfectionnement": return genPVConseilPerfectionnement(o, f, stagiaires);
     case "contrat_apprentissage": return genContratApprentissage(o, f, stagiaires);
     case "livret_apprentissage_cfa": return genLivretApprentissageCFA(o, f, stagiaires);
     case "fiche_maitre_apprentissage": return genFicheMaitreApprentissage(o, f);
@@ -3032,6 +3033,22 @@ function genRapportAmelioration(o: OrganismeInfo) {
 }
 
 // ============== CFA / APPRENTISSAGE ==============
+
+function genPVConseilPerfectionnement(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
+  const now = new Date();
+  const dateReunion = f.dateDebut ? (() => {
+    const d = new Date(f.dateDebut);
+    d.setMonth(d.getMonth() + 3);
+    return formatDate(d.toISOString().slice(0, 10));
+  })() : formatDate(new Date(now.getFullYear(), 9, 13).toISOString().slice(0, 10));
+
+  return buildDocument({ org: o, title: "PROCÈS-VERBAL – CONSEIL DE PERFECTIONNEMENT", subtitle: o.nom, sections: [
+    { heading: "1. Objet", content: `<p>Le présent document constate la <strong>programmation du Conseil de Perfectionnement</strong> du CFA ${o.nom}, fixé au <strong>${dateReunion}</strong>.</p>` },
+    { heading: "2. Participants pressentis", content: `<ul><li>${o.dirigeant || "M. le Directeur"} – Directeur du CFA</li>${o.responsablePedagogique ? `<li>${o.responsablePedagogique} – Responsable pédagogique</li>` : ""}${o.referentHandicap ? `<li>${o.referentHandicap} – Référent Handicap</li>` : ""}${o.referentQualite ? `<li>${o.referentQualite} – Référent Qualité</li>` : ""}${stagiaires.filter(s => s.nom).slice(0, 2).map(s => `<li>${s.prenom || ""} ${s.nom} – Représentant des apprenants</li>`).join("")}</ul>` },
+    { heading: "3. Ordre du jour prévisionnel", content: `<ol><li>Bilan de rentrée ${now.getFullYear()} (effectifs, intégration des apprentis).</li><li>Analyse du suivi pédagogique et administratif.</li><li>Taux d'assiduité et suivi qualité.</li><li>Prévention des abandons et accompagnement.</li><li>Suivi des apprentis en situation de handicap.</li><li>Relations CFA – entreprises d'accueil.</li><li>Préparation des examens et certification.</li><li>Questions diverses.</li></ol>` },
+    { heading: "4. Conclusion", content: `<p>Le Conseil de Perfectionnement est <strong>prévu à la date du ${dateReunion}</strong>.<br>Un <strong>procès-verbal détaillé des échanges et décisions</strong> sera rédigé et validé à l'issue de la réunion.</p>` },
+  ], signatures: { type: "2", labels: ["Le Directeur du CFA", "Le Secrétaire de séance"], names: [o.dirigeant || o.nom, o.responsablePedagogique || ""] } });
+}
 
 function genContratApprentissage(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const s = stagiaires[0] || { prenom: "Martin", nom: "Dupont", entreprise: "Tech Solutions SAS" };
