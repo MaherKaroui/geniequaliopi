@@ -8,7 +8,7 @@ export const SAMPLE_ORGANISME: OrganismeInfo = {
   ville: "Paris",
   telephone: "01 42 68 93 14",
   email: "contact@formapro-excellence.fr",
-  siteWeb: "www.formapro-excellence.fr",
+  siteWeb: "",
   nda: "11 75 123456 75",
   dirigeant: "Jean-Marc Beaumont",
   responsablePedagogique: "Dr. Catherine Moreau",
