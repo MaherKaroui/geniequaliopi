@@ -7236,8 +7236,15 @@ function genSynopsisCFA(o: OrganismeInfo, f: FormationInfo) {
 
 function genLienSiteInternet(o: OrganismeInfo) {
   const dateMaj = o.dateMaj ? new Date(o.dateMaj).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) : new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
-  return buildDocument({ org: o, title: "LIEN DU SITE INTERNET", sections: [
-    { heading: "Site internet", content: o.siteWeb ? '<p><strong>URL :</strong> ' + linkUrl(o.siteWeb) + '</p><p>Le site diffuse l\'ensemble des informations obligatoires : intitulés, objectifs, durées, modalités, tarifs, prérequis, contacts, indicateurs de résultats et accessibilité handicap.</p>' : '<p>Aucun site internet renseigné.</p>' },
+  const isFb = isFacebookPage(o.siteWeb);
+  const label = isFb ? "PAGE FACEBOOK" : "LIEN DU SITE INTERNET";
+  const headingLabel = isFb ? "Page Facebook" : "Site internet";
+  const description = isFb
+    ? `La page Facebook diffuse l'ensemble des informations relatives aux formations : intitulés, objectifs, durées, modalités, tarifs, contacts, indicateurs de résultats et accessibilité handicap.`
+    : `Le site diffuse l'ensemble des informations obligatoires : intitulés, objectifs, durées, modalités, tarifs, prérequis, contacts, indicateurs de résultats et accessibilité handicap.`;
+  const noContent = isFb ? 'Aucune page Facebook renseignée.' : 'Aucun site internet renseigné.';
+  return buildDocument({ org: o, title: label, sections: [
+    { heading: headingLabel, content: o.siteWeb ? '<p><strong>URL :</strong> ' + linkUrl(o.siteWeb) + '</p><p>' + description + '</p>' : '<p>' + noContent + '</p>' },
     { heading: "Mise à jour", content: '<p>Dernière mise à jour : ' + dateMaj + '</p>', variant: "green" },
   ] });
 }
