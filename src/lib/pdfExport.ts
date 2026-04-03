@@ -24,6 +24,12 @@ type PdfExportOptions = {
   pageYieldMs?: number;
 };
 
+const loadedGoogleFontHrefs = new Set<string>();
+
+function yieldToBrowser(ms = 0): Promise<void> {
+  return new Promise((resolve) => requestAnimationFrame(() => setTimeout(resolve, ms)));
+}
+
 function extractCssAndBody(htmlContent: string): { cssText: string; bodyContent: string } {
   const styleMatches = htmlContent.match(/<style[^>]*>([\s\S]*?)<\/style>/gi) || [];
   const bodyMatch = htmlContent.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
@@ -62,7 +68,8 @@ async function ensureGoogleFontsLoaded(htmlContent: string): Promise<void> {
   if (!match) return;
 
   const href = match[1];
-  const alreadyPresent = document.querySelector(`link[href=\"${href}\"]`) || document.querySelector("link[href*='fonts.googleapis.com']");
+  const alreadyPresent = document.querySelector(`link[href="${href}"]`);
+  const firstLoad = !loadedGoogleFontHrefs.has(href);
 
   if (!alreadyPresent) {
     const link = document.createElement("link");
@@ -70,6 +77,10 @@ async function ensureGoogleFontsLoaded(htmlContent: string): Promise<void> {
     link.href = href;
     document.head.appendChild(link);
   }
+
+  if (!firstLoad && alreadyPresent) return;
+
+  loadedGoogleFontHrefs.add(href);
 
   if ("fonts" in document) {
     try {
@@ -79,7 +90,7 @@ async function ensureGoogleFontsLoaded(htmlContent: string): Promise<void> {
     }
   }
 
-  await new Promise((r) => setTimeout(r, 250));
+  await yieldToBrowser(120);
 }
 
 function isForcedPageBreak(node: ChildNode): boolean {
@@ -271,6 +282,10 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
     const pxToMm = A4_WIDTH_MM / A4_WIDTH_PX;
 
     for (let i = 0; i < pages.length; i++) {
+      if (pageYieldMs > 0) {
+        await yieldToBrowser(pageYieldMs);
+      }
+
       if (i > 0) pdf.addPage();
 
       const canvas = await html2canvas(pages[i], {
@@ -303,9 +318,8 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
         }
       });
 
-      if (pageYieldMs > 0 && i < pages.length - 1) {
-        await new Promise((resolve) => setTimeout(resolve, pageYieldMs));
-      }
+      canvas.width = 0;
+      canvas.height = 0;
     }
 
     return pdf.output("blob");
