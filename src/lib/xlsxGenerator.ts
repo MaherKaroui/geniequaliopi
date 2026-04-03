@@ -2,7 +2,7 @@
 // This generates HTML tables that open correctly in Excel with formatting
 
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
-import { formatDate, isFormationTerminee, getStagiaireDateDebut, getStagiaireDateFin } from "./docBuilder";
+import { formatDate, isFormationTerminee, getStagiaireDateDebut, getStagiaireDateFin, isFacebookPage } from "./docBuilder";
 import { EVAL_SCORES, getFormationDays, parseDuree } from "./sampleData";
 import { getEvalContent } from "./evalContent";
 import { getEvalBesoinsFinancement, getCFAWeekDates, parseRythmeAlternance } from "./documentGenerator";
