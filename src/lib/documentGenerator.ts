@@ -9536,11 +9536,6 @@ function genBilanFroidStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: 
   const s = stagiaires[si] || stagiaires[0];
   const dureeH = parseInt(f.duree) || 14;
   const termine = isFormationTerminee(f);
-  if (!termine) {
-    return buildDocument({ org: o, title: "BILAN À FROID", subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, stagiaires: [s], sections: [
-      { heading: "Informations", content: `<p><strong>Organisme :</strong> ${o.nom}<br><strong>Formation :</strong> ${f.intitule}<br><strong>Durée :</strong> ${dureeH} heures</p>` },
-    ], extraHtml: `<div class="section section-green"><p><em>La formation est en cours. Le bilan à froid sera réalisé 3 à 6 mois après la fin de la formation.</em></p></div>` });
-  }
 
   const allCriteres = [
     "Utilisez-vous encore les outils depuis la formation ?",
@@ -9569,6 +9564,9 @@ function genBilanFroidStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: 
   const pat = patterns[si % patterns.length];
 
   let extra = `<p><em>Bilan réalisé 3 à 6 mois après la formation</em></p>`;
+  if (!termine) {
+    extra += `<div class="section section-green"><p><em>La formation est en cours. Ce document sera complété 3 à 6 mois après la fin de la formation.</em></p></div>`;
+  }
   extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%">
     <tr><td><strong>Nom/prénom du participant :</strong></td><td>${s.prenom} ${s.nom}</td></tr>
     <tr><td><strong>Entreprise :</strong></td><td>${s.entreprise || "—"}</td></tr>
@@ -9577,24 +9575,32 @@ function genBilanFroidStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: 
 
   extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%"><thead><tr style="background:#1e3a7b;color:#fff"><th>Critères évalués</th><th>Tout à fait</th><th>Plutôt oui</th><th>Plutôt non</th><th>Non</th></tr></thead><tbody>`;
   allCriteres.forEach((label, idx) => {
-    const n = pat[idx];
-    extra += `<tr><td>${label}</td><td style="text-align:center;font-weight:700">${n === 0 ? "X" : ""}</td><td style="text-align:center;font-weight:700">${n === 1 ? "X" : ""}</td><td></td><td></td></tr>`;
+    if (termine) {
+      const n = pat[idx];
+      extra += `<tr><td>${label}</td><td style="text-align:center;font-weight:700">${n === 0 ? "X" : ""}</td><td style="text-align:center;font-weight:700">${n === 1 ? "X" : ""}</td><td></td><td></td></tr>`;
+    } else {
+      extra += `<tr><td>${label}</td><td></td><td></td><td></td><td></td></tr>`;
+    }
   });
   extra += `</tbody></table>`;
 
-  const commentsPool = [
-    `Avec du recul, la formation ${f.intitule} m'a été réellement utile. J'utilise encore les outils régulièrement dans mon travail quotidien. Les bases vues pendant la formation me permettent de travailler de manière plus autonome.`,
-    `La formation correspondait bien à mon niveau. Les méthodes expliquées restent claires et faciles à réutiliser. Les supports fournis sont pratiques et me servent encore de rappel au quotidien.`,
-    `Plusieurs mois après, je constate que les compétences acquises me sont indispensables. J'ai pu les transmettre en partie à mes collègues. La formation a vraiment répondu à un besoin concret.`,
-    `J'applique régulièrement ce que j'ai appris. Certains aspects auraient mérité plus d'approfondissement, mais globalement la formation a eu un impact positif sur mon efficacité professionnelle.`,
-    `Les acquis de la formation sont toujours d'actualité dans mon travail. Je consulte encore les supports de temps en temps. Cette formation m'a donné confiance dans l'utilisation des outils au quotidien.`,
-    `La formation a eu un impact durable sur ma façon de travailler. Je me sens beaucoup plus à l'aise qu'avant et j'ai gagné en productivité. Je recommanderais cette formation sans hésiter.`,
-    `Avec le recul, certains modules étaient plus utiles que d'autres, mais l'ensemble était cohérent. Les exercices pratiques m'ont particulièrement aidé à ancrer les apprentissages.`,
-    `Je suis globalement satisfait(e) de cette formation. Les compétences acquises sont régulièrement mobilisées dans mon poste actuel et m'ont permis de prendre en charge de nouvelles responsabilités.`,
-    `La formation a répondu à mes attentes. J'utilise les méthodes apprises presque quotidiennement et mes collègues ont remarqué ma progression. C'est un investissement que je ne regrette pas.`,
-    `Bonne formation dont les bénéfices se ressentent encore aujourd'hui. J'ai pu mettre en pratique la majorité des enseignements et cela a contribué à améliorer la qualité de mon travail.`,
-  ];
-  extra += `<p><strong>Commentaire global :</strong> ${commentsPool[si % commentsPool.length]}</p>`;
+  if (termine) {
+    const commentsPool = [
+      `Avec du recul, la formation ${f.intitule} m'a été réellement utile. J'utilise encore les outils régulièrement dans mon travail quotidien. Les bases vues pendant la formation me permettent de travailler de manière plus autonome.`,
+      `La formation correspondait bien à mon niveau. Les méthodes expliquées restent claires et faciles à réutiliser. Les supports fournis sont pratiques et me servent encore de rappel au quotidien.`,
+      `Plusieurs mois après, je constate que les compétences acquises me sont indispensables. J'ai pu les transmettre en partie à mes collègues. La formation a vraiment répondu à un besoin concret.`,
+      `J'applique régulièrement ce que j'ai appris. Certains aspects auraient mérité plus d'approfondissement, mais globalement la formation a eu un impact positif sur mon efficacité professionnelle.`,
+      `Les acquis de la formation sont toujours d'actualité dans mon travail. Je consulte encore les supports de temps en temps. Cette formation m'a donné confiance dans l'utilisation des outils au quotidien.`,
+      `La formation a eu un impact durable sur ma façon de travailler. Je me sens beaucoup plus à l'aise qu'avant et j'ai gagné en productivité. Je recommanderais cette formation sans hésiter.`,
+      `Avec le recul, certains modules étaient plus utiles que d'autres, mais l'ensemble était cohérent. Les exercices pratiques m'ont particulièrement aidé à ancrer les apprentissages.`,
+      `Je suis globalement satisfait(e) de cette formation. Les compétences acquises sont régulièrement mobilisées dans mon poste actuel et m'ont permis de prendre en charge de nouvelles responsabilités.`,
+      `La formation a répondu à mes attentes. J'utilise les méthodes apprises presque quotidiennement et mes collègues ont remarqué ma progression. C'est un investissement que je ne regrette pas.`,
+      `Bonne formation dont les bénéfices se ressentent encore aujourd'hui. J'ai pu mettre en pratique la majorité des enseignements et cela a contribué à améliorer la qualité de mon travail.`,
+    ];
+    extra += `<p><strong>Commentaire global :</strong> ${commentsPool[si % commentsPool.length]}</p>`;
+  } else {
+    extra += `<p><strong>Commentaire global :</strong> _______________________________________________</p>`;
+  }
 
   return buildDocument({ org: o, title: "BILAN À FROID", subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, stagiaires: [s], sections: [
     { heading: "Informations", content: `<p><strong>Organisme :</strong> ${o.nom}<br><strong>Formation :</strong> ${f.intitule}<br><strong>Durée :</strong> ${dureeH} heures</p>` },
