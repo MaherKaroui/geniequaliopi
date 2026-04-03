@@ -269,7 +269,7 @@ export function generateExcelTableauBordPerformance(o: OrganismeInfo, f: Formati
   mois.forEach((_, i) => { html += `<td>${countPerMonth[i] > 0 ? "100%" : ""}</td>`; });
   html += `<td>${isVAE 
     ? `${o.nom} est nouvel entrant sur l'activité VAE. ${nbStagiaires} ${nbStagiaires > 1 ? labelBeneficiaires : labelBeneficiaire} accompagné${nbStagiaires > 1 ? "s" : ""} pour l'année ${annee}. Les indicateurs seront renseignés au fur et à mesure de l'activité et diffusés dès qu'ils seront significatifs.`
-    : `${f.intitule || o.nom} a reçu ${nbStagiaires} ${nbStagiaires > 1 ? labelBeneficiaires : labelBeneficiaire} pour l'année ${annee}. Nous avons été noté 10/10 sur le taux de satisfaction pour l'année ${annee} au critère 7.30. Nous communiquerons cet élément de diffusion sur notre programme de formation${o.siteWeb && o.siteWeb.trim() ? ` et sur notre site internet (${o.siteWeb})` : ''}.`}</td></tr>`;
+    : `${f.intitule || o.nom} a reçu ${nbStagiaires} ${nbStagiaires > 1 ? labelBeneficiaires : labelBeneficiaire} pour l'année ${annee}. Nous avons été noté 10/10 sur le taux de satisfaction pour l'année ${annee} au critère 7.30. Nous communiquerons cet élément de diffusion sur notre programme de formation${o.siteWeb && o.siteWeb.trim() ? ` et sur ${isFacebookPage(o.siteWeb) ? 'notre page Facebook' : 'notre site internet'} (${o.siteWeb})` : ''}.`}</td></tr>`;
 
   // Nombre de bénéficiaires row
   html += `<tr><td>Nombre de ${labelBeneficiaires}</td><td>${isVAE ? "0 – Nouvel entrant" : "0"}</td>`;
