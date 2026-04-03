@@ -9455,11 +9455,6 @@ function genBilanChaudStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: 
   const s = stagiaires[si] || stagiaires[0];
   const dureeH = parseInt(f.duree) || 14;
   const termine = isFormationTerminee(f);
-  if (!termine) {
-    return buildDocument({ org: o, title: "BILAN À CHAUD", subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, stagiaires: [s], sections: [
-      { heading: "Informations", content: `<p><strong>Organisme :</strong> ${o.nom}<br><strong>Formation :</strong> ${f.intitule}<br><strong>Durée :</strong> ${dureeH} heures</p>` },
-    ], extraHtml: `<div class="section section-green"><p><em>La formation est en cours. Le bilan à chaud sera réalisé à l'issue de la formation.</em></p></div>` });
-  }
 
   const allCriteres = [
     "Satisfaction globale de la formation",
@@ -9491,7 +9486,11 @@ function genBilanChaudStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: 
   const pat = patterns[si % patterns.length];
 
   const dateFin = getStagiaireDateFin(s, f);
-  let extra = `<p><strong>Date du bilan :</strong> ${formatDate(dateFin)} (dernier jour de formation)</p>`;
+  let extra = '';
+  if (!termine) {
+    extra += `<div class="section section-green"><p><em>La formation est en cours. Ce document sera complété après la fin de la formation.</em></p></div>`;
+  }
+  extra += `<p><strong>Date du bilan :</strong> ${formatDate(dateFin)} (dernier jour de formation)</p>`;
   extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%">
     <tr><td><strong>Nom/prénom du participant :</strong></td><td>${s.prenom} ${s.nom}</td></tr>
     <tr><td><strong>Entreprise :</strong></td><td>${s.entreprise || "—"}</td></tr>
@@ -9501,24 +9500,32 @@ function genBilanChaudStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: 
 
   extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%"><thead><tr style="background:#1e3a7b;color:#fff"><th>Critères évalués</th><th>Très satisfaisant</th><th>Satisfaisant</th><th>Peu satisfaisant</th><th>Insuffisant</th></tr></thead><tbody>`;
   allCriteres.forEach((label, idx) => {
-    const n = pat[idx];
-    extra += `<tr><td>${label}</td><td style="text-align:center;font-weight:700">${n === 0 ? "X" : ""}</td><td style="text-align:center;font-weight:700">${n === 1 ? "X" : ""}</td><td></td><td></td></tr>`;
+    if (termine) {
+      const n = pat[idx];
+      extra += `<tr><td>${label}</td><td style="text-align:center;font-weight:700">${n === 0 ? "X" : ""}</td><td style="text-align:center;font-weight:700">${n === 1 ? "X" : ""}</td><td></td><td></td></tr>`;
+    } else {
+      extra += `<tr><td>${label}</td><td></td><td></td><td></td><td></td></tr>`;
+    }
   });
   extra += `</tbody></table>`;
 
-  const commentsPool = [
-    `La formation ${f.intitule} était très enrichissante. Le formateur a su rendre le contenu accessible et les exercices pratiques étaient bien conçus. Je repars avec des outils concrets que je pourrai utiliser dès demain.`,
-    `Formation de qualité, les objectifs annoncés ont été atteints. Le rythme était adapté et les supports clairs. J'aurais aimé un peu plus de temps sur les cas pratiques mais globalement très satisfait(e).`,
-    `Très bonne formation. Les explications étaient claires et progressives, ce qui m'a permis de comprendre les bases sans difficulté. Le formateur était disponible et prenait le temps de répondre aux questions.`,
-    `Les exercices pratiques ont été utiles pour mettre en application les notions vues. L'organisation et les conditions matérielles étaient satisfaisantes. À l'issue de la formation, je me sens plus à l'aise.`,
-    `J'ai apprécié la pédagogie du formateur et l'alternance entre théorie et pratique. Le contenu était dense mais bien structuré. Les supports fournis seront utiles pour la suite.`,
-    `Formation intéressante et bien organisée. Le formateur maîtrise parfaitement son sujet et sait le transmettre. Les échanges avec les autres participants étaient aussi enrichissants.`,
-    `Bonne formation dans l'ensemble. Le contenu correspondait à mes attentes. J'aurais souhaité approfondir certains points mais la durée ne le permettait pas. Le formateur était à l'écoute.`,
-    `Formation très complète et bien structurée. Les cas pratiques étaient réalistes et m'ont permis de progresser rapidement. Je recommande cette formation à mes collègues.`,
-    `Le formateur a su adapter son discours au niveau du groupe. Les exemples concrets ont facilité la compréhension. Je suis satisfait(e) de cette formation et je me sens prêt(e) à appliquer les acquis.`,
-    `Très satisfait(e) de cette formation. Le programme était complet et le formateur dynamique. Les méthodes pédagogiques variées ont rendu l'apprentissage agréable.`,
-  ];
-  extra += `<p><strong>Commentaire :</strong> ${commentsPool[si % commentsPool.length]}</p>`;
+  if (termine) {
+    const commentsPool = [
+      `La formation ${f.intitule} était très enrichissante. Le formateur a su rendre le contenu accessible et les exercices pratiques étaient bien conçus. Je repars avec des outils concrets que je pourrai utiliser dès demain.`,
+      `Formation de qualité, les objectifs annoncés ont été atteints. Le rythme était adapté et les supports clairs. J'aurais aimé un peu plus de temps sur les cas pratiques mais globalement très satisfait(e).`,
+      `Très bonne formation. Les explications étaient claires et progressives, ce qui m'a permis de comprendre les bases sans difficulté. Le formateur était disponible et prenait le temps de répondre aux questions.`,
+      `Les exercices pratiques ont été utiles pour mettre en application les notions vues. L'organisation et les conditions matérielles étaient satisfaisantes. À l'issue de la formation, je me sens plus à l'aise.`,
+      `J'ai apprécié la pédagogie du formateur et l'alternance entre théorie et pratique. Le contenu était dense mais bien structuré. Les supports fournis seront utiles pour la suite.`,
+      `Formation intéressante et bien organisée. Le formateur maîtrise parfaitement son sujet et sait le transmettre. Les échanges avec les autres participants étaient aussi enrichissants.`,
+      `Bonne formation dans l'ensemble. Le contenu correspondait à mes attentes. J'aurais souhaité approfondir certains points mais la durée ne le permettait pas. Le formateur était à l'écoute.`,
+      `Formation très complète et bien structurée. Les cas pratiques étaient réalistes et m'ont permis de progresser rapidement. Je recommande cette formation à mes collègues.`,
+      `Le formateur a su adapter son discours au niveau du groupe. Les exemples concrets ont facilité la compréhension. Je suis satisfait(e) de cette formation et je me sens prêt(e) à appliquer les acquis.`,
+      `Très satisfait(e) de cette formation. Le programme était complet et le formateur dynamique. Les méthodes pédagogiques variées ont rendu l'apprentissage agréable.`,
+    ];
+    extra += `<p><strong>Commentaire :</strong> ${commentsPool[si % commentsPool.length]}</p>`;
+  } else {
+    extra += `<p><strong>Commentaire :</strong> _______________________________________________</p>`;
+  }
 
   return buildDocument({ org: o, title: "BILAN À CHAUD", subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, stagiaires: [s], sections: [
     { heading: "Informations", content: `<p><strong>Organisme :</strong> ${o.nom}<br><strong>Formation :</strong> ${f.intitule}<br><strong>Durée :</strong> ${dureeH} heures</p>` },
