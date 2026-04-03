@@ -5260,7 +5260,90 @@ ${answer4}
   ] });
 }
 
-function genVAEPositionnementDebut(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
+function genVAESequencage(o: OrganismeInfo, f: FormationInfo) {
+  const td = 'style="border:1px solid #999;padding:8px;vertical-align:top;"';
+  const th = 'style="border:1px solid #999;padding:8px;background:#e8e8e8;font-weight:bold;text-align:center;"';
+  const thSeq = 'style="border:1px solid #999;padding:8px;background:#d0d8e8;font-weight:bold;"';
+
+  return buildDocument({ org: o, title: "SÉQUENÇAGE DE LA VAE", subtitle: f.intitule, sections: [
+    { heading: "Déroulé pédagogique de l'accompagnement VAE", content: `
+<table style="width:100%;border-collapse:collapse;">
+<tr>
+<th ${th}></th>
+<th ${th}>Activités</th>
+<th ${th}>Objectifs pédagogiques</th>
+<th ${th}>Durée</th>
+<th ${th}>Modalité pédagogique</th>
+<th ${th}>Calendrier</th>
+</tr>
+
+<tr>
+<td ${thSeq} rowspan="2"><strong>Séquence 1 :<br>Présentation des modalités d'accompagnement</strong></td>
+<td ${td}>Présentation des plateformes de formation (Microsoft Teams et plateforme LMS)</td>
+<td ${td}>S'approprier les outils numériques</td>
+<td ${td}>1h00</td>
+<td ${td}>Collectif<br>Distanciel</td>
+<td ${td}></td>
+</tr>
+<tr>
+<td ${td}>Présentation du dispositif et des prestations d'accompagnement</td>
+<td ${td}>Se situer dans son parcours d'accompagnement</td>
+<td ${td}>1h00</td>
+<td ${td}>Collectif<br>Distanciel<br>(Module FOAD)</td>
+<td ${td}></td>
+</tr>
+
+<tr>
+<td ${thSeq} rowspan="2"><strong>Séquence 2 :<br>Appui à la démarche VAE</strong></td>
+<td ${td}>Présentation du dispositif de certification et de ses principaux outils (livret 2 et référentiel professionnel : fonctions/activités et domaines de compétences)</td>
+<td ${td}>Appréhender et s'approprier le livret 2</td>
+<td ${td}>2h00</td>
+<td ${td}>Collectif<br>Distanciel<br>(Module FOAD)</td>
+<td ${td}></td>
+</tr>
+<tr>
+<td ${td}>Exploration et analyse des situations professionnelles (bénévoles…) pertinentes</td>
+<td ${td}>Identifier les situations professionnelles pertinentes</td>
+<td ${td}>6h00<br><em>3 séances de 2h00</em></td>
+<td ${td}>Collectif<br>Distanciel<br>en visio sur Microsoft Teams</td>
+<td ${td}></td>
+</tr>
+
+<tr>
+<td ${thSeq}><strong>Séquence 3 :<br>Rédaction du livret 2</strong></td>
+<td ${td}>Échanges sur les écrits du candidat</td>
+<td ${td}>Guider la rédaction du livret 2</td>
+<td ${td}>10h00<br><em>5 séances de 2h00</em></td>
+<td ${td}>Individuel<br>Distanciel<br>(en visio)</td>
+<td ${td}></td>
+</tr>
+
+<tr>
+<td ${thSeq} rowspan="2"><strong>Séquence 4 :<br>Soutenance orale</strong></td>
+<td ${td}>Préparation à la soutenance orale</td>
+<td ${td}>Préparer la soutenance de son livret 2</td>
+<td ${td}>3h00</td>
+<td ${td}>Collectif<br>Distanciel<br>(en visio)</td>
+<td ${td}></td>
+</tr>
+<tr>
+<td ${td}>Mise en situation d'entretien de validation (Jury blanc)</td>
+<td ${td}>S'exercer à communiquer sur son livret 2 face à un jury VAE</td>
+<td ${td}>1h00</td>
+<td ${td}>Individuel<br>Présentiel ou distanciel</td>
+<td ${td}></td>
+</tr>
+
+<tr style="background:#f0f0f0;font-weight:bold;">
+<td ${td} colspan="3" style="text-align:right;border:1px solid #999;padding:8px;"><strong>Durée totale</strong></td>
+<td ${td}><strong>24h00</strong></td>
+<td ${td} colspan="2"></td>
+</tr>
+</table>` },
+  ] });
+}
+
+
   const s = stagiaires[si] || stagiaires[0] || FALLBACK_STAGIAIRE;
   const dateDebut = getStagiaireDateDebut(s, f);
   return buildDocument({ org: o, title: "QUESTIONNAIRE DE POSITIONNEMENT – DÉBUT D'ACCOMPAGNEMENT VAE", subtitle: `${s.prenom} ${s.nom}`, sections: [
