@@ -526,6 +526,14 @@ export const EY_DOCUMENTS: EYDocumentItem[] = [
     perStagiaire: false,
     category: "communication",
   },
+  {
+    code: "FACTURE",
+    label: "Facture de formation",
+    description: "Facture individuelle par stagiaire avec échéancier de paiement en 3 fois",
+    autoTemplates: ["facture_edof"],
+    perStagiaire: true,
+    category: "administratif",
+  },
 ];
 
 export type EYDocStatus = "pending" | "auto" | "uploaded" | "not_applicable";

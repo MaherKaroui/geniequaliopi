@@ -542,6 +542,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "guide_aide_connexion_cfa": return genMailAideConnexion(o, f);
     case "convention_formation_apprentissage": return genConventionFormationApprentissage(o, f, stagiaires, params?.stagiaireIdx ?? 0);
     case "contrat_formation_par_bloc": return genContratFormationParBloc(o, f, stagiaires, params?.stagiaireIdx ?? 0);
+    case "facture_edof": return genFactureEDOF(o, f, stagiaires, params?.stagiaireIdx ?? 0);
     case "dossier_inscription_cfa": return genDossierInscriptionCFA(o, f, stagiaires, params?.stagiaireIdx ?? 0);
     case "livre_apprentissage_cfa": return genLivreApprentissageCFA(o, f, stagiaires, params?.stagiaireIdx ?? 0);
     case "convocation_cfa": return genConvocationCFA(o, f, stagiaires, params?.stagiaireIdx ?? 0);
