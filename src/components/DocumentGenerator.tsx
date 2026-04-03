@@ -1038,157 +1038,101 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
       </div>
 
       <div className="space-y-2">
-        {/* === PRIORITY DOCS (Contrat par bloc, Émargement, Dossier inscription) === */}
-        {(() => {
-          const priorityDocs = catalog.filter((doc) => doc.params?.priority);
-          if (priorityDocs.length === 0) return null;
-          return (
-            <div className="bg-card border-2 border-primary/30 rounded-xl overflow-hidden shadow-card mb-4">
-              <div className="p-3 bg-primary/10">
-                <span className="text-sm font-bold text-primary">Documents prioritaires</span>
-                <span className="text-xs text-muted-foreground ml-2">({priorityDocs.length} docs)</span>
-              </div>
-              <div className="px-3 pb-3 space-y-0.5 mt-1">
-                {priorityDocs.map((doc) => {
-                  const isPerStagiaire = PER_STAGIAIRE_TEMPLATES.has(doc.template);
-                  return (
-                    <div key={doc.id} className={`flex items-center gap-2 p-1.5 rounded-md text-xs hover:bg-secondary/30 transition-colors ${generated.has(doc.id) ? "bg-accent/5" : ""}`}>
-                      <span className={`shrink-0 ${generated.has(doc.id) ? "text-accent font-bold" : "text-muted-foreground"}`}>
-                        {generated.has(doc.id) ? "✓" : "•"}
-                      </span>
-                      <span className="flex-1 truncate">{doc.nom}</span>
-                      {isPerStagiaire && <span title="1 fichier par stagiaire" className="text-xs text-primary shrink-0">👤</span>}
-                      <button onClick={() => handlePreview(doc)} className="p-1 hover:bg-secondary rounded text-muted-foreground hover:text-foreground">Voir</button>
-                      <button onClick={() => handleDownload(doc)} className="p-1 hover:bg-secondary rounded text-muted-foreground hover:text-foreground">DL</button>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          );
-        })()}
+        {/* === ALL DOCUMENTS BY CRITÈRE === */}
+        <div className="space-y-2">
+          {CRITERES_INFO.map((critere) => {
+            const isExpanded = expandedCriteres.has(critere.numero);
+            const critereDocs = catalog.filter((doc) => doc.critere === critere.numero);
+            if (critereDocs.length === 0) return null;
+            const critereGenerated = critereDocs.filter((doc) => generated.has(doc.id)).length;
 
-        {/* === ARCHIVED SECTION (collapsible) === */}
-        {(() => {
-          const hasPriority = catalog.some((doc) => doc.params?.priority);
-          const archivedDocs = hasPriority ? catalog.filter((doc) => !doc.params?.priority) : catalog;
-          const isArchiveMode = hasPriority;
-
-          const content = (
-            <div className="space-y-2">
-              {CRITERES_INFO.map((critere) => {
-                const isExpanded = expandedCriteres.has(critere.numero);
-                const critereDocs = archivedDocs.filter((doc) => doc.critere === critere.numero);
-                if (critereDocs.length === 0) return null;
-                const critereGenerated = critereDocs.filter((doc) => generated.has(doc.id)).length;
-
-                return (
-                  <div key={critere.numero} className="bg-card border rounded-xl overflow-hidden shadow-card">
-                    <div className="flex items-center">
-                      <button
-                        onClick={() => toggleCritere(critere.numero)}
-                        className="flex-1 p-3 flex items-center gap-3 hover:bg-secondary/50 transition-colors text-left"
-                      >
-                        {isExpanded ? <ChevronDown className="w-4 h-4 text-primary shrink-0" /> : <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />}
-                        <span className="text-sm font-semibold">Critère {critere.numero} – {critere.titre}</span>
-                        <span className="text-xs text-muted-foreground ml-2">
-                          ({critereDocs.length} docs, {critereGenerated} générés)
-                        </span>
-                      </button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="mr-2 text-xs gap-1 shrink-0"
-                        disabled={generating}
-                        onClick={(e) => { e.stopPropagation(); handleDownloadCritere(critere.numero); }}
-                      >
-                        <Archive className="w-3 h-3" /> ZIP
-                      </Button>
-                    </div>
-
-                    {isExpanded && (
-                      <div className="border-t px-3 pb-3 space-y-1">
-                        {critere.indicateurs.map((indicateur) => {
-                          const isIndExpanded = expandedIndicateurs.has(indicateur.numero);
-                          const indDocs = archivedDocs.filter((doc) => doc.critere === critere.numero && doc.indicateur === indicateur.numero);
-                          if (indDocs.length === 0) return null;
-                          const indGenerated = indDocs.filter((doc) => generated.has(doc.id)).length;
-
-                          return (
-                            <div key={indicateur.numero}>
-                              <button
-                                onClick={() => toggleIndicateur(indicateur.numero)}
-                                className="w-full p-2 flex items-center gap-2 hover:bg-secondary/30 rounded-lg transition-colors text-left"
-                              >
-                                {isIndExpanded ? <ChevronDown className="w-3 h-3 text-primary shrink-0" /> : <ChevronRight className="w-3 h-3 text-muted-foreground shrink-0" />}
-                                <span className="text-xs font-semibold text-primary">I{indicateur.numero}</span>
-                                <span className="text-xs truncate flex-1">{indicateur.titre}</span>
-                                <span className="text-xs text-muted-foreground shrink-0">{indDocs.length} docs</span>
-                                {indGenerated === indDocs.length && indDocs.length > 0 && <span className="text-xs text-accent font-bold shrink-0">✓</span>}
-                                {critere.numero === 3 && indDocs.length > 0 && (
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="text-xs gap-1 shrink-0 h-6 px-1.5"
-                                    disabled={generating}
-                                    onClick={(e) => { e.stopPropagation(); handleDownloadIndicateur(critere.numero, indicateur.numero); }}
-                                  >
-                                    <Archive className="w-3 h-3" /> ZIP
-                                  </Button>
-                                )}
-                              </button>
-
-                              {isIndExpanded && (
-                                <div className="ml-8 space-y-0.5 mt-1">
-                                  {indDocs.map((doc) => {
-                                    const isPerStagiaire = PER_STAGIAIRE_TEMPLATES.has(doc.template);
-                                    return (
-                                      <div key={doc.id} className={`flex items-center gap-2 p-1.5 rounded-md text-xs hover:bg-secondary/30 transition-colors ${generated.has(doc.id) ? "bg-accent/5" : ""}`}>
-                                        <span className={`shrink-0 ${generated.has(doc.id) ? "text-accent font-bold" : "text-muted-foreground"}`}>
-                                          {generated.has(doc.id) ? "✓" : "•"}
-                                        </span>
-                                        <span className="flex-1 truncate">{doc.nom}</span>
-                                        {isPerStagiaire && <span title="1 fichier par stagiaire" className="text-xs text-primary shrink-0">👤</span>}
-                                        <button onClick={() => handlePreview(doc)} className="p-1 hover:bg-secondary rounded text-muted-foreground hover:text-foreground" title="Aperçu">
-                                          Voir
-                                        </button>
-                                        <button onClick={() => handleDownload(doc)} className="p-1 hover:bg-secondary rounded text-muted-foreground hover:text-foreground" title="Télécharger">
-                                          DL
-                                        </button>
-                                      </div>
-                                    );
-                                  })}
-                                </div>
-                              )}
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          );
-
-          if (isArchiveMode) {
             return (
-              <div className="border rounded-xl overflow-hidden">
-                <button
-                  onClick={() => setShowArchived(!showArchived)}
-                  className="w-full p-3 flex items-center gap-3 bg-muted/50 hover:bg-muted transition-colors text-left"
-                >
-                  {showArchived ? <ChevronDown className="w-4 h-4 text-muted-foreground" /> : <ChevronRight className="w-4 h-4 text-muted-foreground" />}
-                  <Archive className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-sm font-semibold text-muted-foreground">Documents archivés</span>
-                  <span className="text-xs text-muted-foreground">({archivedDocs.length} docs)</span>
-                </button>
-                {showArchived && <div className="p-3">{content}</div>}
+              <div key={critere.numero} className="bg-card border rounded-xl overflow-hidden shadow-card">
+                <div className="flex items-center">
+                  <button
+                    onClick={() => toggleCritere(critere.numero)}
+                    className="flex-1 p-3 flex items-center gap-3 hover:bg-secondary/50 transition-colors text-left"
+                  >
+                    {isExpanded ? <ChevronDown className="w-4 h-4 text-primary shrink-0" /> : <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />}
+                    <span className="text-sm font-semibold">Critère {critere.numero} – {critere.titre}</span>
+                    <span className="text-xs text-muted-foreground ml-2">
+                      ({critereDocs.length} docs, {critereGenerated} générés)
+                    </span>
+                  </button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="mr-2 text-xs gap-1 shrink-0"
+                    disabled={generating}
+                    onClick={(e) => { e.stopPropagation(); handleDownloadCritere(critere.numero); }}
+                  >
+                    <Archive className="w-3 h-3" /> ZIP
+                  </Button>
+                </div>
+
+                {isExpanded && (
+                  <div className="border-t px-3 pb-3 space-y-1">
+                    {critere.indicateurs.map((indicateur) => {
+                      const isIndExpanded = expandedIndicateurs.has(indicateur.numero);
+                      const indDocs = catalog.filter((doc) => doc.critere === critere.numero && doc.indicateur === indicateur.numero);
+                      if (indDocs.length === 0) return null;
+                      const indGenerated = indDocs.filter((doc) => generated.has(doc.id)).length;
+
+                      return (
+                        <div key={indicateur.numero}>
+                          <button
+                            onClick={() => toggleIndicateur(indicateur.numero)}
+                            className="w-full p-2 flex items-center gap-2 hover:bg-secondary/30 rounded-lg transition-colors text-left"
+                          >
+                            {isIndExpanded ? <ChevronDown className="w-3 h-3 text-primary shrink-0" /> : <ChevronRight className="w-3 h-3 text-muted-foreground shrink-0" />}
+                            <span className="text-xs font-semibold text-primary">I{indicateur.numero}</span>
+                            <span className="text-xs truncate flex-1">{indicateur.titre}</span>
+                            <span className="text-xs text-muted-foreground shrink-0">{indDocs.length} docs</span>
+                            {indGenerated === indDocs.length && indDocs.length > 0 && <span className="text-xs text-accent font-bold shrink-0">✓</span>}
+                            {critere.numero === 3 && indDocs.length > 0 && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="text-xs gap-1 shrink-0 h-6 px-1.5"
+                                disabled={generating}
+                                onClick={(e) => { e.stopPropagation(); handleDownloadIndicateur(critere.numero, indicateur.numero); }}
+                              >
+                                <Archive className="w-3 h-3" /> ZIP
+                              </Button>
+                            )}
+                          </button>
+
+                          {isIndExpanded && (
+                            <div className="ml-8 space-y-0.5 mt-1">
+                              {indDocs.map((doc) => {
+                                const isPerStagiaire = PER_STAGIAIRE_TEMPLATES.has(doc.template);
+                                return (
+                                  <div key={doc.id} className={`flex items-center gap-2 p-1.5 rounded-md text-xs hover:bg-secondary/30 transition-colors ${generated.has(doc.id) ? "bg-accent/5" : ""}`}>
+                                    <span className={`shrink-0 ${generated.has(doc.id) ? "text-accent font-bold" : "text-muted-foreground"}`}>
+                                      {generated.has(doc.id) ? "✓" : "•"}
+                                    </span>
+                                    <span className="flex-1 truncate">{doc.nom}</span>
+                                    {isPerStagiaire && <span title="1 fichier par stagiaire" className="text-xs text-primary shrink-0">👤</span>}
+                                    <button onClick={() => handlePreview(doc)} className="p-1 hover:bg-secondary rounded text-muted-foreground hover:text-foreground" title="Aperçu">
+                                      Voir
+                                    </button>
+                                    <button onClick={() => handleDownload(doc)} className="p-1 hover:bg-secondary rounded text-muted-foreground hover:text-foreground" title="Télécharger">
+                                      DL
+                                    </button>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             );
-          }
-          return content;
-        })()}
+          })}
+        </div>
       </div>
 
       {previewContent && (
