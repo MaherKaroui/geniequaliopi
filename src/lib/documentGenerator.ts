@@ -14,6 +14,7 @@ import { getRNCPByCode } from "./rncpData";
 import { generateExcelSuiviInscriptions, generateExcelSuiviParcoursBeneficiairesCFA, generateExcelSuiviPublicBeneficiaire, generateExcelSuiviPFMP, generateExcelOutilsSuiviAlternance } from "./xlsxGenerator";
 import { getModuleSpecificConsigne } from "./cfaExerciseContent";
 import { genProcedureAbandonReorientationCFA, genAccompagnementDistancielCFA, genEnquetePartenaireEmployeurCFA, genFicheRenseignementsCommanditaireCFA, genContratApprentissageModeEmploiCFA, genProcedureAccueilBeneficiairesCFA, genProcedureAdaptationPedagogiqueCFA, genProcedureGestionAnnulationsCFA, genProcedureRuptureContratApprentissageCFA, genLivretApprentissageCFA as genLivretApprentissageInd10, genLivretMaitreApprentissageCFA, genMesuresEngagementBeneficiairesCFA, genPreventionGestionAbandonsCFA, genGuideEntretienAbandonsCFA, genEviterSituationsEchecCFA, genProcedureAnnulationsAbandonsCFA, genFichierGestionAnnulationsCFA, genAccompagnementRechercheContratCFA, genListeAideSocialCFA, genCertificatRealisationCFA, genWebinaireFormationCompetencesCFA, genWebinaireNTCCFA, genDroitsDevoirsApprentiCFA, genReglesSSMilieuProCFA } from "./templatesCFA";
+import { getYearFromDateCandidates } from "./eyExport";
 
 const FALLBACK_STAGIAIRE: StagiaireInfo = { prenom: "Martin", nom: "Dupont", civilite: "" as "M." | "Mme" | "", email: "", telephone: "", entreprise: "", poste: "", dateNaissance: "" };
 export function getFullCatalog(org: OrganismeInfo, userFormation: FormationInfo, userStagiaires: StagiaireInfo[]): DocEntry[] {
@@ -11280,7 +11281,8 @@ function genFactureEDOF(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiair
   const tarifStr = tarifNum.toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " €";
   const acompte30 = (tarifNum * 0.3).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " €";
   const tranche35 = (tarifNum * 0.35).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " €";
-  const numFacture = `FAC-${new Date().getFullYear()}-${String(si + 1).padStart(3, "0")}`;
+  const factureYear = getYearFromDateCandidates(dateDebut, f.dateDebut, dateFin, f.dateFin);
+  const numFacture = `FAC-${factureYear}-${String(si + 1).padStart(3, "0")}`;
   const numDossier = s.numeroAction || "N/A";
   const stagNom = `${s.civilite ? s.civilite + " " : ""}${s.prenom} ${s.nom}`;
   const stagAdresse = [s.adresse, s.codePostal, s.commune].filter(Boolean).join(", ") || "—";

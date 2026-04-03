@@ -2,6 +2,7 @@ import { useState, useMemo, useCallback, useRef } from "react";
 import { OrganismeInfo, FormationInfo, StagiaireInfo, CritereData, DocStyleConfig } from "@/types/qualiopi";
 import { EY_DOCUMENTS, EY_CATEGORIES, EYCategory, EYDocState, EYDocStatus, EYDocumentItem } from "@/lib/eyControlData";
 import { generateDocumentById } from "@/lib/documentGenerator";
+import { buildPerStagiairePdfFileName } from "@/lib/eyExport";
 import { mergeStagiaires, mergeOrganisme } from "@/lib/sampleData";
 import { htmlToPdfBlob } from "@/lib/pdfExport";
 import { Button } from "@/components/ui/button";
@@ -157,8 +158,10 @@ export default function ControleEDOF({ organisme, formation, stagiaires, signatu
       const html = generateDocumentById(`ey_${eyDoc.code}`, template, params, o, formation, sourceStagiaires);
       if (!html) return null;
       const blob = await htmlToPdfBlob(html, options?.pdfOptions);
-      const stagName = `${currentStagiaire.nom}_${currentStagiaire.prenom}`.replace(/[^a-zA-Z0-9_-]/g, "_") || `stagiaire_${stagiaireIdx + 1}`;
-      return { blob, fileName: `${safeName}_${eyDoc.code}_${stagName}.pdf` };
+      return {
+        blob,
+        fileName: buildPerStagiairePdfFileName(safeName, eyDoc.code, currentStagiaire, stagiaireIdx),
+      };
     } catch (e) {
       console.error(`Error generating ${eyDoc.code} for stagiaire ${stagiaireIdx}:`, e);
       return null;
@@ -388,34 +391,50 @@ export default function ControleEDOF({ organisme, formation, stagiaires, signatu
 
     try {
       const zip = new JSZip();
-      const safeName = orgName.replace(/[^a-zA-Z0-9_-]/g, "_");
       const docsToProcess = EY_DOCUMENTS.filter(d => {
         const state = docStates.get(d.code);
         return state && state.status !== "not_applicable";
       });
-      const total = docsToProcess.length;
+      const totalItems = docsToProcess.reduce((count, eyDoc) => {
+        const state = docStates.get(eyDoc.code);
+        if (!state) return count;
+        if (state.status === "uploaded" || state.status === "pending" || eyDoc.autoTemplates.length === 0 || !eyDoc.perStagiaire || exportStagiaires.length === 0) {
+          return count + 1;
+        }
+        return count + exportStagiaires.length;
+      }, 0);
+      let completedItems = 0;
+
+      const advanceProgress = (label: string) => {
+        completedItems += 1;
+        setProgress(Math.round((completedItems / Math.max(totalItems, 1)) * 100));
+        setProgressText(label);
+      };
 
       for (let i = 0; i < docsToProcess.length; i++) {
         const eyDoc = docsToProcess[i];
         const state = docStates.get(eyDoc.code)!;
-        setProgress(Math.round(((i + 1) / total) * 100));
-        setProgressText(`${eyDoc.code} — ${eyDoc.label}`);
 
         if (state.status === "uploaded" && state.uploadedFile) {
           const buf = await state.uploadedFile.arrayBuffer();
           const ext = state.uploadedFileName?.split(".").pop() || "pdf";
           zip.file(`${safeName}_${eyDoc.code}.${ext}`, buf);
+          advanceProgress(`${eyDoc.code} — fichier fourni`);
         } else if (state.status === "auto") {
-          const result = await generateAutoDoc(eyDoc);
-          if (result) {
-            zip.file(result.fileName, result.blob);
-          }
+          await appendAutoDocToZip(zip, eyDoc, {
+            pdfOptions: MASS_EXPORT_PDF_OPTIONS,
+            sourceStagiaires: exportStagiaires,
+            onItemDone: (current, total) => {
+              advanceProgress(total > 1 ? `${eyDoc.code} — ${current}/${total}` : `${eyDoc.code} — ${eyDoc.label}`);
+            },
+          });
         }
         // pending docs → add a placeholder text file
         else if (state.status === "pending") {
           zip.file(`${safeName}_${eyDoc.code}_A_FOURNIR.txt`,
             `Document à fournir :\nCode : ${eyDoc.code}\nLibellé : ${eyDoc.label}\nDescription : ${eyDoc.description}\n\nNote : ${state.note || "Aucune"}`
           );
+          advanceProgress(`${eyDoc.code} — à fournir`);
         }
 
         if (i % 3 === 0) await yieldToBrowser(5);
@@ -432,7 +451,7 @@ export default function ControleEDOF({ organisme, formation, stagiaires, signatu
       setProgress(0);
       setProgressText("");
     }
-  }, [docStates, orgName, generateAutoDoc]);
+  }, [appendAutoDocToZip, docStates, exportStagiaires, safeName]);
 
   const groupedDocs = useMemo(() => {
     const groups = new Map<EYCategory, EYDocumentItem[]>();
