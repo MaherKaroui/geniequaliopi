@@ -5383,7 +5383,7 @@ function genVAEDroitImage(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
     { heading: "Article 2 : Autorisation", content: `<p>Le Participant autorise ${o.nom} à fixer, reproduire et communiquer au public les photographies et/ou vidéos prises dans le cadre de l'accompagnement VAE, sur les supports suivants :<br>• Site internet de ${o.nom}<br>• Réseaux sociaux<br>• Supports de communication print et digital<br>• Rapports d'activité et documents internes</p>` },
     { heading: "Article 3 : Durée et territoire", content: `<p>La présente autorisation est consentie pour une durée de 5 ans à compter de la signature, pour le territoire mondial.</p>` },
     { heading: "Article 4 : Droit de retrait", content: `<p>Le Participant peut à tout moment retirer son autorisation par courrier recommandé. Le retrait prendra effet dans un délai de 30 jours, sans remettre en cause les utilisations antérieures.</p><p>Fait à ${o.ville}, le ${formatDate(dateSignature)}</p>`, variant: "green" },
-  ], signatures: { type: "2", labels: ["Le Participant", "Pour l'organisme"], names: [`${s.prenom} ${s.nom}`, o.dirigeant], stagiaireSignatureUrl: s.signatureUrl, noOrgSignature: true, dates: [formatDate(dateSignature), formatDate(dateSignature)] } });
+  ], signatures: { type: "2", labels: ["Le Participant", "Pour l'organisme"], names: [`${s.prenom} ${s.nom}`, o.dirigeant], stagiaireSignatureUrl: s.signatureUrl, dates: [formatDate(dateSignature), formatDate(dateSignature)] } });
 }
 
 function genVAEInfosPeripheriques(o: OrganismeInfo) {
