@@ -5004,7 +5004,7 @@ function genVAEConventionTripartite(o: OrganismeInfo, f: FormationInfo, stagiair
     { heading: "Article 2 : Modalités", content: `<p><strong>Durée :</strong> 24 heures<br><strong>Période :</strong> du ${formatDate(dateDebut)} au ${formatDate(dateFin)}<br><strong>Format :</strong> Séances individuelles en présentiel et/ou à distance<br><strong>Lieu :</strong> ${f.lieu || o.adresse + ", " + o.codePostal + " " + o.ville}</p>` },
     { heading: "Article 3 : Dispositions financières", content: `<p><strong>Coût total :</strong> ${getStagiaireTarif(s, f)}<br><strong>Prise en charge :</strong> Plan de développement des compétences de l'employeur<br><br>La facturation sera adressée à l'employeur. En cas d'abandon, seules les heures réalisées seront facturées.</p>`, variant: "green" },
     { heading: "Article 4 : Obligations des parties", content: `<p><strong>L'organisme s'engage à :</strong> fournir un accompagnement de qualité, respecter la confidentialité, remettre une attestation de fin d'accompagnement.<br><br><strong>L'employeur s'engage à :</strong> libérer le(la) candidat(e) sur son temps de travail, financer la prestation, faciliter l'accès aux preuves professionnelles.<br><br><strong>Le(la) candidat(e) s'engage à :</strong> être assidu(e), fournir les documents nécessaires, réaliser le travail personnel entre les séances.</p><p>Fait à ${o.ville}, le ${formatDate(dateSignature)}</p>` },
-  ], signatures: { type: "3", labels: ["Pour l'organisme (Cachet)", "Pour l'employeur", "Le Candidat"], names: [o.dirigeant, responsableEnt, `${s.prenom} ${s.nom}`], stagiaireSignatureUrl: s.signatureUrl, responsableEntrepriseSignatureUrl: s.signatureResponsableUrl, noOrgSignature: true, dates: [formatDate(dateSignature), formatDate(dateSignature), formatDate(dateSignature)] } });
+  ], signatures: { type: "3", labels: ["Le/La Stagiaire", "Le/La Formateur(trice)", "Le Responsable"], names: [`${s.prenom} ${s.nom}`, o.responsablePedagogique, responsableEnt], stagiaireSignatureUrl: s.signatureUrl, formateurSignatureUrl: s.formateurSignatureUrl || f.formateurSignatureUrl, responsableEntrepriseSignatureUrl: s.signatureResponsableUrl, dates: [formatDate(dateSignature), formatDate(dateSignature), formatDate(dateSignature)] } });
 }
 
 function genVAEHandicapEntretien(o: OrganismeInfo) {
@@ -5022,7 +5022,7 @@ function genVAEHandicapFormalisation(o: OrganismeInfo) {
     { heading: "Objet", content: `<p>Ce document formalise les aménagements mis en place pour le candidat en situation de handicap dans le cadre de son accompagnement VAE au sein de ${o.nom}.</p>` },
     { heading: "Aménagements validés", content: `<p><strong>1. Modalités d'accompagnement :</strong><br>☐ Séances plus courtes et plus fréquentes<br>☐ Accompagnement exclusivement à distance<br>☐ Tiers temps pour les évaluations<br>☐ Support de communication adapté<br><br><strong>2. Outils adaptés :</strong><br>☐ Documents en police agrandie<br>☐ Supports audio ou vidéo complémentaires<br>☐ Logiciel d'aide à la rédaction<br>☐ Autre : ___</p>` },
     { heading: "Suivi", content: `<p>Un bilan intermédiaire sera réalisé à mi-parcours pour évaluer l'adéquation des aménagements mis en place et les ajuster si nécessaire.</p>`, variant: "green" },
-  ], signatures: { type: "2", labels: ["Le Référent handicap", "Le Candidat"], names: [o.referentHandicap, ""] } });
+  ], signatures: { type: "2", labels: ["Le Dirigeant", "Le Référent handicap"], names: [o.dirigeant, o.referentHandicap] } });
 }
 
 function genVAEHandicapBilan(o: OrganismeInfo) {
@@ -5031,13 +5031,13 @@ function genVAEHandicapBilan(o: OrganismeInfo) {
     { heading: "Évaluation des aménagements", content: `<p>Les aménagements mis en place ont-ils été suffisants ? ☐ Oui ☐ Non ☐ Partiellement<br><br>Le candidat a-t-il pu suivre l'accompagnement dans de bonnes conditions ? ☐ Oui ☐ Non<br><br>Des ajustements ont-ils été nécessaires en cours de parcours ? ☐ Oui ☐ Non<br>Si oui, lesquels : ___</p>` },
     { heading: "Satisfaction du candidat", content: `<p>Le candidat est-il satisfait de la prise en charge de sa situation de handicap ? ☐ Très satisfait ☐ Satisfait ☐ Moyennement satisfait ☐ Insatisfait<br><br>Commentaires du candidat : ___</p>`, variant: "green" },
     { heading: "Axes d'amélioration", content: `<p>Améliorations à apporter pour les prochains candidats en situation de handicap : ___</p>` },
-  ], signatures: { type: "2", labels: ["Le Référent handicap", "Le Candidat"], names: [o.referentHandicap, ""] } });
+  ], signatures: { type: "2", labels: ["Le Dirigeant", "Le Référent handicap"], names: [o.dirigeant, o.referentHandicap] } });
 }
 
 function genVAEMailHandicap(o: OrganismeInfo) {
   return buildDocument({ org: o, title: "MAIL TYPE HANDICAP – VAE", sections: [
     { heading: "", content: `<p><strong>Objet :</strong> Prise en compte de votre situation de handicap</p><p>Bonjour,</p><p>Nous avons bien pris note de votre situation et souhaitons vous assurer que ${o.nom} met tout en œuvre pour vous accompagner dans les meilleures conditions.</p><p>Notre référent handicap, ${o.referentHandicap}, est à votre disposition pour échanger sur les aménagements à mettre en place pour votre accompagnement VAE.</p><p>N'hésitez pas à nous contacter par téléphone au ${o.telephone} ou par mail à ${o.email} pour convenir d'un rendez-vous.</p><p>Nous pouvons notamment vous orienter vers nos partenaires spécialisés (Agefiph, Cap Emploi, MDPH) si nécessaire.</p><p>Cordialement,</p><p>${o.responsablePedagogique}<br>L'équipe VAE de ${o.nom}</p>` },
-  ] });
+  ], signatures: { type: "2", labels: ["Le Dirigeant", "Le Référent handicap"], names: [o.dirigeant, o.referentHandicap] } });
 }
 
 function genVAEEngagementsRespectifs(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
@@ -5383,7 +5383,7 @@ function genVAEDroitImage(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
     { heading: "Article 2 : Autorisation", content: `<p>Le Participant autorise ${o.nom} à fixer, reproduire et communiquer au public les photographies et/ou vidéos prises dans le cadre de l'accompagnement VAE, sur les supports suivants :<br>• Site internet de ${o.nom}<br>• Réseaux sociaux<br>• Supports de communication print et digital<br>• Rapports d'activité et documents internes</p>` },
     { heading: "Article 3 : Durée et territoire", content: `<p>La présente autorisation est consentie pour une durée de 5 ans à compter de la signature, pour le territoire mondial.</p>` },
     { heading: "Article 4 : Droit de retrait", content: `<p>Le Participant peut à tout moment retirer son autorisation par courrier recommandé. Le retrait prendra effet dans un délai de 30 jours, sans remettre en cause les utilisations antérieures.</p><p>Fait à ${o.ville}, le ${formatDate(dateSignature)}</p>`, variant: "green" },
-  ], signatures: { type: "2", labels: ["Le Participant", "Pour l'organisme"], names: [`${s.prenom} ${s.nom}`, o.dirigeant], stagiaireSignatureUrl: s.signatureUrl, noOrgSignature: true, dates: [formatDate(dateSignature), formatDate(dateSignature)] } });
+  ], signatures: { type: "2", labels: ["Le Participant", "Pour l'organisme"], names: [`${s.prenom} ${s.nom}`, o.dirigeant], stagiaireSignatureUrl: s.signatureUrl, dates: [formatDate(dateSignature), formatDate(dateSignature)] } });
 }
 
 function genVAEInfosPeripheriques(o: OrganismeInfo) {
