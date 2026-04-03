@@ -9582,6 +9582,12 @@ function genBilanFroidStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: 
 
 function genAppreciationsBeneficiairesStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = stagiaires[si] || stagiaires[0];
+  const dureeH = parseInt(f.duree) || 14;
+  const termine = isFormationTerminee(f);
+  if (!termine) {
+    return buildDocument({ org: o, title: "QUESTIONNAIRE DE SATISFACTION DU BÉNÉFICIAIRE", subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, formation: f, showFormationInfo: true, stagiaires: [s],
+      extraHtml: `<div class="section section-green"><p><em>La formation est en cours. Le questionnaire de satisfaction sera complété à l'issue de la formation.</em></p></div>` });
+  }
   const rng = seededRandom(si * 59 + 23);
 
   let extra = `<p><em>Fréquence : fin de formation. En cas de non-retour, l'enquête est renvoyée dans un délai d'une semaine.</em></p>`;
