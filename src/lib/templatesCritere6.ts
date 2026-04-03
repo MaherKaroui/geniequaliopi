@@ -391,18 +391,25 @@ function veilleReglementaireRows(f: FormationInfo, type: FormationType): string[
   // Default: word/bureautique
   return [...common,
     [
+      `<a href="https://www.francecompetences.fr/recherche/rs/6159/">France Compétences – RS6159 ICDL</a>`,
+      "Certification ICDL – Traitement de texte (Word)",
+      veilleDate(f, 6),
+      "La certification ICDL (ex-PCIE) est enregistrée au Répertoire Spécifique. Elle valide les compétences en traitement de texte (Word) selon un référentiel international reconnu par les employeurs.",
+      "Preuve : fiche France Compétences RS6159 + référentiel ICDL. Action : aligner le programme de formation Word sur les compétences du référentiel ICDL (mise en forme, tableaux, publipostage, styles)."
+    ],
+    [
       `<a href="https://www.dendreo.com/blog/veille-legale-et-reglementaire-de-la-formation-professionnelle-recap-des-actualites-2025">Dendreo – Décret RNCP/RS</a>`,
       "Modification des critères d'enregistrement au RNCP et au RS",
       veilleDate(f, 5),
-      "Décret — Obligation d'intégrer dans les référentiels les compétences liées aux transitions écologique et numérique.",
-      "Preuve: Nous veillerons à être conforme suite au décret. Nous nous sommes rapprochés du certificateur ICDL pour une formation Word."
+      "Décret — Obligation d'intégrer dans les référentiels les compétences liées aux transitions écologique et numérique. Impact direct sur les certifications bureautiques.",
+      "Preuve : version consolidée du décret. Action : nous nous sommes rapprochés du certificateur ICDL pour vérifier la conformité de notre formation Word."
     ],
     [
       `<a href="https://www.centre-inffo.fr/site-droit-formation/actualites-droit/cpf-hausse-du-montant-de-la-participation-forfaitaire">Centre Inffo – CPF</a>`,
       "CPF : Hausse du montant de la participation forfaitaire",
       veilleDate(f, 3),
-      "La participation financière obligatoire pour l'achat d'une formation mobilisant le CPF s'élève à 103,20 euros.",
-      "Preuve: Informer les futurs apprenants de la hausse du ticket modérateur à 103,20 euros."
+      "La participation financière obligatoire pour l'achat d'une formation CPF s'élève à 103,20 euros. Impact sur les inscriptions en formation bureautique Word.",
+      "Preuve : article Centre Inffo. Action : informer les futurs stagiaires du reste à charge CPF pour leur formation Word."
     ],
   ];
 }
