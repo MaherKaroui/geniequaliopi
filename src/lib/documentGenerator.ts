@@ -11409,6 +11409,13 @@ function genFactureEDOF100(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
       <p style="font-size:11px;color:#666;margin-top:4px">À compter de la date de signature du présent contrat, le stagiaire dispose d'un délai de quatorze jours pour se rétracter. Le stagiaire souhaitant se rétracter en informe l'organisme de formation par lettre recommandée avec accusé de réception. Dans ce cas, aucune somme ne peut être exigée du stagiaire.</p>
     </div>
 
+    <h2 style="margin-top:30px">CONDITIONS FINANCIÈRES</h2>
+    <div style="margin-bottom:20px">
+      <p>Le prix de la formation est celui affiché sur la plateforme Mon Compte Formation.</p>
+      <p style="margin-top:8px">Le paiement est effectué exclusivement par la Caisse des Dépôts, selon la procédure EDOF.</p>
+      <p style="margin-top:8px">Aucun paiement direct ne peut être exigé du stagiaire hors reste à charge affiché sur la plateforme.</p>
+    </div>
+
     <p style="margin-top:20px">Fait à ${o.ville || "—"}, Le <strong>${dateSignature}</strong></p>
 
     <div style="display:flex;justify-content:space-between;margin-top:30px;gap:40px">
@@ -11497,6 +11504,13 @@ function genFactureEDOF(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiair
       <p style="font-size:11px;color:#666;margin-top:4px">À compter de la date de signature du présent contrat, le stagiaire dispose d'un délai de quatorze jours pour se rétracter. Le stagiaire souhaitant se rétracter en informe l'organisme de formation par lettre recommandée avec accusé de réception. Dans ce cas, aucune somme ne peut être exigée du stagiaire.</p>
       <p style="margin-top:10px"><strong>2ème paiement :</strong> 35% à verser pour le <strong>${formatDate(date14jApres.toISOString().split("T")[0])}</strong> — <strong>${tranche35}</strong></p>
       <p style="margin-top:10px"><strong>3ème paiement :</strong> 35% à verser pour le <strong>${formatDate(date28jApres.toISOString().split("T")[0])}</strong> — <strong>${tranche35}</strong></p>
+    </div>
+
+    <h2 style="margin-top:30px">CONDITIONS FINANCIÈRES</h2>
+    <div style="margin-bottom:20px">
+      <p>Le prix de la formation est celui affiché sur la plateforme Mon Compte Formation.</p>
+      <p style="margin-top:8px">Le paiement est effectué exclusivement par la Caisse des Dépôts, selon la procédure EDOF.</p>
+      <p style="margin-top:8px">Aucun paiement direct ne peut être exigé du stagiaire hors reste à charge affiché sur la plateforme.</p>
     </div>
 
     <p style="margin-top:20px">Fait à ${o.ville || "—"}, Le <strong>${dateSignature}</strong></p>
