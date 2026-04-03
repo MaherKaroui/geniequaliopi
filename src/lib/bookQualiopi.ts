@@ -99,13 +99,14 @@ tr:nth-child(even){background:#f8f9fa}
   html += `<div class="page-break"></div>`;
 
   // === PAGE 2: PRÉSENTATION / SITE INTERNET ===
+  const isFb = isFacebookPage(org.siteWeb);
   html += `<div class="page">
     <h1 class="section-title">PRÉSENTATION</h1>
-    ${org.siteWeb ? `<h2>Site Internet</h2>
+    ${org.siteWeb ? `<h2>${isFb ? 'Page Facebook' : 'Site Internet'}</h2>
     <div class="info-card">
-      <p><strong>URL site internet :</strong> ${org.siteWeb}</p>
-      <p><strong>URL pages formations :</strong> ${org.siteWeb}/formations</p>
-      <p><strong>Lien catalogue :</strong> ${org.siteWeb}/catalogue</p>
+      <p><strong>URL ${isFb ? 'Page Facebook' : 'site internet'} :</strong> ${org.siteWeb}</p>
+      ${!isFb ? `<p><strong>URL pages formations :</strong> ${org.siteWeb}/formations</p>
+      <p><strong>Lien catalogue :</strong> ${org.siteWeb}/catalogue</p>` : ''}
     </div>` : ''}
     <h2>Informations</h2>
     <div class="info-card">
