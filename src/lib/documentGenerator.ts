@@ -9899,7 +9899,7 @@ function genFactureEDOF(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiair
 
   const dateSignature = formatDate(date14jAvant.toISOString().split("T")[0]);
 
-  return buildDocument({ org: o, title: `Facture n°${numFacture}`, stagiaires: [s], sections: [], customContent: `
+  return buildDocument({ org: o, title: `Facture n°${numFacture}`, stagiaires: [s], sections: [], extraHtml: `
     <div style="margin-bottom:20px;padding:12px;border:1px solid #ddd;border-radius:6px">
       <p><strong>${stagNom}</strong></p>
       <p><strong>Adresse :</strong> ${stagAdresse}</p>
