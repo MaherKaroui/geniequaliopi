@@ -7269,7 +7269,7 @@ function genProcedureEvalBesoins(o: OrganismeInfo) {
   return buildDocument({ org: o, title: "PROCÉDURE D'ÉVALUATION DES BESOINS DES STAGIAIRES", sections: [
     { heading: "Objectif", content: `<p>Identifier les besoins, attentes et niveaux des stagiaires avant leur entrée en formation afin d'adapter le parcours pédagogique et de garantir l'atteinte des objectifs de la formation.</p>` },
     { heading: "Étapes de la procédure", content: `<p><strong>1. Demande d'inscription</strong></p>
-<ul><li>Le candidat contacte ${o.nom} sur le site internet, ou par mail et/ou téléphone.</li>
+<ul><li>Le candidat contacte ${o.nom} ${o.siteWeb && o.siteWeb.trim() ? `sur ${isFacebookPage(o.siteWeb) ? 'la page Facebook' : 'le site internet'}, ou ` : ''}par mail et/ou téléphone.</li>
 <li>Une première analyse du projet et de la motivation est effectuée.</li></ul>
 <p><strong>2. Recueil des besoins</strong></p>
 <ul><li>Envoi d'un formulaire de positionnement ou questionnaire de préformation (niveau, attentes, difficultés, objectifs professionnels).</li>
