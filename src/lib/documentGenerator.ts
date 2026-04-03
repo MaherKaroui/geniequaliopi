@@ -3242,7 +3242,7 @@ function genIndicateursResultatsCFA(o: OrganismeInfo, f: FormationInfo) {
     indicateursSection,
     { heading: "3. Méthodologie de collecte", content: `<p>Les données sont collectées via :<br>• <strong>Enquêtes de satisfaction</strong> : questionnaires envoyés aux apprentis à la fin de chaque session<br>• <strong>Suivi de l'insertion</strong> : enquête à 3 mois et 6 mois après la fin de la formation<br>• <strong>Données administratives</strong> : résultats aux examens, émargements, absences<br>• <strong>Suivi des ruptures</strong> : registre des ruptures de contrat avec motifs</p>` },
     { heading: "4. Actions d'amélioration engagées", content: `<p>• Renforcement de l'accompagnement individuel pour réduire les ruptures<br>• Mise en place d'examens blancs supplémentaires pour améliorer le taux de réussite<br>• Développement du réseau d'entreprises partenaires pour favoriser l'insertion<br>• Amélioration de la plateforme pédagogique en ligne</p>`, variant: "green" },
-    { heading: "5. Diffusion des résultats", content: `<p>Ces indicateurs sont diffusés sur :<br>${o.siteWeb ? `• Le site internet du CFA : <strong>${linkUrl(o.siteWeb)}</strong><br>` : ''}• Les supports de communication (plaquettes, fiches formation)<br>• Les documents contractuels remis aux entreprises et aux apprentis</p>` },
+    { heading: "5. Diffusion des résultats", content: `<p>Ces indicateurs sont diffusés sur :<br>${o.siteWeb ? `• ${isFacebookPage(o.siteWeb) ? 'La page Facebook' : 'Le site internet'} du CFA : <strong>${linkUrl(o.siteWeb)}</strong><br>` : ''}• Les supports de communication (plaquettes, fiches formation)<br>• Les documents contractuels remis aux entreprises et aux apprentis</p>` },
   ] });
 }
 
