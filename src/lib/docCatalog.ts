@@ -706,8 +706,16 @@ export function buildFullCatalog(
     // IND 17 — Moyens humains, techniques et environnement
     add("cfa_c4i17_bail", "CT4 - IND 17 BAIL DE SOUS-LOCATION", 4, 17, "bail_sous_location");
 
+    const uniqueFormateursCFA = Array.from(new Set(stagiaires.map(s => (s as any).formateur).filter((f: any) => f && String(f).trim())));
+
     // IND 18 — Coordination des intervenants
     add("cfa_c4i18_organigramme", "CT4 - IND 18 ORGANIGRAMME", 4, 18, "organigramme");
+    add("cfa_c4i18_fiche_poste_dirigeant", "CT4 - IND 18 FICHE DE POSTE – RESPONSABLE PÉDAGOGIQUE", 4, 18, "fiche_poste_formateur", { role: "dirigeant" });
+    if (uniqueFormateursCFA.length === 0) {
+      add("cfa_c4i18_fiche_poste_formateur", "CT4 - IND 18 FICHE DE POSTE – FORMATEUR", 4, 18, "fiche_poste_formateur", { role: "formateur" });
+    }
+    add("cfa_c4i18_fiche_poste_ref_admin", "CT4 - IND 18 FICHE DE POSTE – RÉFÉRENT ADMINISTRATIF", 4, 18, "fiche_poste_formateur", { role: "referent_administratif" });
+    add("cfa_c4i18_fiche_poste_ref_handicap", "CT4 - IND 18 FICHE DE POSTE – RÉFÉRENT HANDICAP", 4, 18, "fiche_poste_formateur", { role: "referent_handicap" });
 
     // IND 19 — Ressources pédagogiques mises à disposition
     formations.forEach((f, fi) => {
@@ -720,15 +728,7 @@ export function buildFullCatalog(
 
     // ===== CRITÈRE 5 — QUALIFICATION DU PERSONNEL (CFA) =====
 
-    const uniqueFormateursCFA = Array.from(new Set(stagiaires.map(s => (s as any).formateur).filter((f: any) => f && String(f).trim())));
-
     // IND 21 — Compétences des intervenants
-    add("cfa_c5i21_fiche_poste_dirigeant", "CT5 - IND 21 FICHE DE POSTE – RESPONSABLE PÉDAGOGIQUE", 5, 21, "fiche_poste_formateur", { role: "dirigeant" });
-    if (uniqueFormateursCFA.length === 0) {
-      add("cfa_c5i21_fiche_poste_formateur", "CT5 - IND 21 FICHE DE POSTE – FORMATEUR", 5, 21, "fiche_poste_formateur", { role: "formateur" });
-    }
-    add("cfa_c5i21_fiche_poste_ref_admin", "CT5 - IND 21 FICHE DE POSTE – RÉFÉRENT ADMINISTRATIF", 5, 21, "fiche_poste_formateur", { role: "referent_administratif" });
-    add("cfa_c5i21_fiche_poste_ref_handicap", "CT5 - IND 21 FICHE DE POSTE – RÉFÉRENT HANDICAP", 5, 21, "fiche_poste_formateur", { role: "referent_handicap" });
     add("cfa_c5i21_autoevaluation_0", `CT5 - IND 21 AUTO-ÉVALUATION FORMATEUR`, 5, 21, "autoevaluation_formateur", { formateurIdx: 0 });
     add("cfa_c5i21_processus_recrutement", "CT5 - IND 21 DESCRIPTION DU PROCESSUS DE RECRUTEMENT", 5, 21, "procedure_recrutement_formateur");
 
@@ -740,7 +740,7 @@ export function buildFullCatalog(
       const fname = String(fName).trim();
       const slug = fname.replace(/\s+/g, '_').toUpperCase();
       add(`cfa_c5i22_fiche_entretien_${slug}`, `CT5 - IND 22 FICHE D'ENTRETIEN ANNUEL – ${fname}`, 5, 22, "fiche_entretien_annuel_formateur", { formateurNom: fname });
-      add(`cfa_c5i21_fiche_poste_formateur_${slug}`, `CT5 - IND 21 FICHE DE POSTE – ${fname}`, 5, 21, "fiche_poste_formateur", { role: "formateur", formateurNom: fname });
+      add(`cfa_c4i18_fiche_poste_formateur_${slug}`, `CT4 - IND 18 FICHE DE POSTE – ${fname}`, 4, 18, "fiche_poste_formateur", { role: "formateur", formateurNom: fname });
       add(`cfa_c5i21_autoevaluation_${slug}`, `CT5 - IND 21 AUTO-ÉVALUATION – ${fname}`, 5, 21, "autoevaluation_formateur", { formateurNom: fname });
       add(`cfa_c6i27_contrat_soustraitance_${slug}`, `CT6 - IND 27 CONTRAT DE SOUS-TRAITANCE – ${fname}`, 6, 27, "contrat_sous_traitance_v2", { formateurNom: fname });
     });
