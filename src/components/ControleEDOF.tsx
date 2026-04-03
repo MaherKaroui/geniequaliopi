@@ -15,6 +15,21 @@ import { toast } from "sonner";
 
 const yieldToBrowser = (ms = 0) => new Promise<void>(r => requestAnimationFrame(() => setTimeout(r, ms)));
 
+type PdfBlobOptions = NonNullable<Parameters<typeof htmlToPdfBlob>[1]>;
+
+const MASS_EXPORT_PDF_OPTIONS = {
+  scale: 1.35,
+  imageQuality: 0.84,
+  pageYieldMs: 8,
+} satisfies PdfBlobOptions;
+
+const hasStagiaireIdentity = (stagiaire: StagiaireInfo | null | undefined): stagiaire is StagiaireInfo => {
+  if (!stagiaire) return false;
+  return [stagiaire.nom, stagiaire.prenom, stagiaire.email, stagiaire.telephone].some(
+    (value) => typeof value === "string" && value.trim().length > 0
+  );
+};
+
 interface ControleEDOFProps {
   organisme: OrganismeInfo;
   formation: FormationInfo;
@@ -55,6 +70,15 @@ export default function ControleEDOF({ organisme, formation, stagiaires, signatu
   const [previewLoading, setPreviewLoading] = useState(false);
   const [previewDoc, setPreviewDoc] = useState<EYDocumentItem | null>(null);
   const orgName = organisme.nom || "Organisme";
+  const safeName = useMemo(() => orgName.replace(/[^a-zA-Z0-9_-]/g, "_"), [orgName]);
+  const mergedStagiaires = useMemo(
+    () => mergeStagiaires(stagiaires).filter((stagiaire): stagiaire is StagiaireInfo => Boolean(stagiaire)),
+    [stagiaires]
+  );
+  const exportStagiaires = useMemo(() => {
+    const identified = mergedStagiaires.filter(hasStagiaireIdentity);
+    return identified.length > 0 ? identified : mergedStagiaires;
+  }, [mergedStagiaires]);
 
   const stats = useMemo(() => {
     let total = 0, auto = 0, uploaded = 0, pending = 0, na = 0;
@@ -110,42 +134,132 @@ export default function ControleEDOF({ organisme, formation, stagiaires, signatu
     });
   }, []);
 
-  const generateAutoDocForStagiaire = useCallback(async (eyDoc: EYDocumentItem, stagiaireIdx: number): Promise<{ blob: Blob; fileName: string } | null> => {
+  const generateAutoDocForStagiaire = useCallback(async (
+    eyDoc: EYDocumentItem,
+    stagiaireIdx: number,
+    options?: { pdfOptions?: PdfBlobOptions; sourceStagiaires?: StagiaireInfo[] }
+  ): Promise<{ blob: Blob; fileName: string } | null> => {
     if (eyDoc.autoTemplates.length === 0) return null;
     const template = eyDoc.autoTemplates[0];
+    const sourceStagiaires = options?.sourceStagiaires ?? exportStagiaires;
+    const currentStagiaire = sourceStagiaires[stagiaireIdx];
+    if (!currentStagiaire) return null;
     try {
       const o = mergeOrganisme(organisme);
-      const s = mergeStagiaires(stagiaires);
       const params = { stagiaireIdx, fi: 0 };
-      const html = generateDocumentById(`ey_${eyDoc.code}`, template, params, o, formation, s);
+      const html = generateDocumentById(`ey_${eyDoc.code}`, template, params, o, formation, sourceStagiaires);
       if (!html) return null;
-      const blob = await htmlToPdfBlob(html);
-      const safeName = orgName.replace(/[^a-zA-Z0-9_-]/g, "_");
-      const stagName = s[stagiaireIdx] ? `${s[stagiaireIdx].nom}_${s[stagiaireIdx].prenom}`.replace(/[^a-zA-Z0-9_-]/g, "_") : `stagiaire_${stagiaireIdx + 1}`;
+      const blob = await htmlToPdfBlob(html, options?.pdfOptions);
+      const stagName = `${currentStagiaire.nom}_${currentStagiaire.prenom}`.replace(/[^a-zA-Z0-9_-]/g, "_") || `stagiaire_${stagiaireIdx + 1}`;
       return { blob, fileName: `${safeName}_${eyDoc.code}_${stagName}.pdf` };
     } catch (e) {
       console.error(`Error generating ${eyDoc.code} for stagiaire ${stagiaireIdx}:`, e);
       return null;
     }
-  }, [organisme, formation, stagiaires, orgName]);
+  }, [organisme, formation, exportStagiaires, safeName]);
 
-  const generateAutoDoc = useCallback(async (eyDoc: EYDocumentItem): Promise<{ blob: Blob; fileName: string } | null> => {
+  const generateAutoDoc = useCallback(async (
+    eyDoc: EYDocumentItem,
+    options?: { pdfOptions?: PdfBlobOptions; sourceStagiaires?: StagiaireInfo[] }
+  ): Promise<{ blob: Blob; fileName: string } | null> => {
     if (eyDoc.autoTemplates.length === 0) return null;
     const template = eyDoc.autoTemplates[0];
+    const sourceStagiaires = options?.sourceStagiaires ?? exportStagiaires;
     try {
       const o = mergeOrganisme(organisme);
-      const s = mergeStagiaires(stagiaires);
-      const params = eyDoc.perStagiaire && s.length > 0 ? { stagiaireIdx: 0, fi: 0 } : { fi: 0 };
-      const html = generateDocumentById(`ey_${eyDoc.code}`, template, params, o, formation, s);
+      const params = eyDoc.perStagiaire && sourceStagiaires.length > 0 ? { stagiaireIdx: 0, fi: 0 } : { fi: 0 };
+      const html = generateDocumentById(`ey_${eyDoc.code}`, template, params, o, formation, sourceStagiaires);
       if (!html) return null;
-      const blob = await htmlToPdfBlob(html);
-      const safeName = orgName.replace(/[^a-zA-Z0-9_-]/g, "_");
+      const blob = await htmlToPdfBlob(html, options?.pdfOptions);
       return { blob, fileName: `${safeName}_${eyDoc.code}.pdf` };
     } catch (e) {
       console.error(`Error generating ${eyDoc.code}:`, e);
       return null;
     }
-  }, [organisme, formation, stagiaires, orgName]);
+  }, [organisme, formation, exportStagiaires, safeName]);
+
+  const appendAutoDocToZip = useCallback(async (
+    zip: JSZip,
+    eyDoc: EYDocumentItem,
+    options?: {
+      pdfOptions?: PdfBlobOptions;
+      sourceStagiaires?: StagiaireInfo[];
+      onItemDone?: (current: number, total: number) => void;
+    }
+  ) => {
+    const sourceStagiaires = options?.sourceStagiaires ?? exportStagiaires;
+
+    if (eyDoc.perStagiaire && sourceStagiaires.length > 0) {
+      for (let si = 0; si < sourceStagiaires.length; si++) {
+        const result = await generateAutoDocForStagiaire(eyDoc, si, {
+          pdfOptions: options?.pdfOptions,
+          sourceStagiaires,
+        });
+        if (result) zip.file(result.fileName, result.blob);
+        options?.onItemDone?.(si + 1, sourceStagiaires.length);
+        await yieldToBrowser(16);
+      }
+      return;
+    }
+
+    const result = await generateAutoDoc(eyDoc, {
+      pdfOptions: options?.pdfOptions,
+      sourceStagiaires,
+    });
+
+    if (result) zip.file(result.fileName, result.blob);
+    options?.onItemDone?.(1, 1);
+  }, [exportStagiaires, generateAutoDoc, generateAutoDocForStagiaire]);
+
+  const handleDownloadDoc = useCallback(async (eyDoc: EYDocumentItem, state: EYDocState) => {
+    if (state.status === "uploaded" && state.uploadedFile) {
+      saveAs(state.uploadedFile, state.uploadedFileName || `${eyDoc.code}.pdf`);
+      return;
+    }
+
+    if (eyDoc.autoTemplates.length === 0) return;
+
+    toast.info(`Génération de ${eyDoc.code}...`);
+
+    try {
+      if (eyDoc.perStagiaire && exportStagiaires.length > 0) {
+        setGenerating(true);
+        setProgress(0);
+        setProgressText(`Préparation de ${eyDoc.code}...`);
+
+        const zip = new JSZip();
+        await appendAutoDocToZip(zip, eyDoc, {
+          pdfOptions: MASS_EXPORT_PDF_OPTIONS,
+          onItemDone: (current, total) => {
+            setProgress(Math.round((current / Math.max(total, 1)) * 100));
+            setProgressText(`${eyDoc.code} — ${current}/${total}`);
+          },
+        });
+
+        const content = await zip.generateAsync({
+          type: "blob",
+          compression: "DEFLATE",
+          compressionOptions: { level: 3 },
+        });
+        saveAs(content, `${safeName}_${eyDoc.code}.zip`);
+      } else {
+        const result = await generateAutoDoc(eyDoc, { sourceStagiaires: exportStagiaires });
+        if (!result) {
+          toast.error("Impossible de générer ce document");
+          return;
+        }
+        saveAs(result.blob, result.fileName);
+      }
+
+      toast.success(`${eyDoc.code} téléchargé !`);
+    } catch (e: any) {
+      toast.error("Erreur : " + (e.message || "Erreur inconnue"));
+    } finally {
+      setGenerating(false);
+      setProgress(0);
+      setProgressText("");
+    }
+  }, [appendAutoDocToZip, exportStagiaires, generateAutoDoc, safeName]);
 
   const downloadSelectedZip = useCallback(async () => {
     if (selectedDocs.size === 0) {
@@ -157,39 +271,48 @@ export default function ControleEDOF({ organisme, formation, stagiaires, signatu
     setProgressText("Préparation des documents sélectionnés...");
     try {
       const zip = new JSZip();
-      const safeName = orgName.replace(/[^a-zA-Z0-9_-]/g, "_");
       const docsToProcess = EY_DOCUMENTS.filter(d => selectedDocs.has(d.code));
-      const total = docsToProcess.length;
-      let step = 0;
+      const totalItems = docsToProcess.reduce((count, eyDoc) => {
+        const state = docStates.get(eyDoc.code);
+        if (state?.status === "uploaded" || eyDoc.autoTemplates.length === 0 || !eyDoc.perStagiaire || exportStagiaires.length === 0) {
+          return count + 1;
+        }
+        return count + exportStagiaires.length;
+      }, 0);
+      let completedItems = 0;
+
+      const advanceProgress = (label: string) => {
+        completedItems += 1;
+        setProgress(Math.round((completedItems / Math.max(totalItems, 1)) * 100));
+        setProgressText(label);
+      };
 
       for (const eyDoc of docsToProcess) {
         const state = docStates.get(eyDoc.code);
-        step++;
-        setProgress(Math.round((step / total) * 100));
-        setProgressText(`${eyDoc.code} — ${eyDoc.label}`);
 
         if (state?.status === "uploaded" && state.uploadedFile) {
           const buf = await state.uploadedFile.arrayBuffer();
           const ext = state.uploadedFileName?.split(".").pop() || "pdf";
           zip.file(`${safeName}_${eyDoc.code}.${ext}`, buf);
+          advanceProgress(`${eyDoc.code} — fichier fourni`);
         } else if (eyDoc.autoTemplates.length > 0) {
-          if (eyDoc.perStagiaire) {
-            const s = mergeStagiaires(stagiaires);
-            const count = Math.max(s.length, 1);
-            for (let si = 0; si < count; si++) {
-              const result = await generateAutoDocForStagiaire(eyDoc, si);
-              if (result) zip.file(result.fileName, result.blob);
-              if (si % 2 === 0) await yieldToBrowser(5);
-            }
-          } else {
-            const result = await generateAutoDoc(eyDoc);
-            if (result) zip.file(result.fileName, result.blob);
-          }
+          await appendAutoDocToZip(zip, eyDoc, {
+            pdfOptions: MASS_EXPORT_PDF_OPTIONS,
+            sourceStagiaires: exportStagiaires,
+            onItemDone: (current, total) => {
+              advanceProgress(total > 1 ? `${eyDoc.code} — ${current}/${total}` : `${eyDoc.code} — ${eyDoc.label}`);
+            },
+          });
+        } else {
+          advanceProgress(`${eyDoc.code} — aucun fichier à ajouter`);
         }
-        if (step % 3 === 0) await yieldToBrowser(5);
       }
 
-      const content = await zip.generateAsync({ type: "blob" });
+      const content = await zip.generateAsync({
+        type: "blob",
+        compression: "DEFLATE",
+        compressionOptions: { level: 3 },
+      });
       saveAs(content, `${safeName}_Selection_EY.zip`);
       toast.success(`${docsToProcess.length} document(s) exporté(s) !`);
     } catch (e: any) {
@@ -200,7 +323,7 @@ export default function ControleEDOF({ organisme, formation, stagiaires, signatu
       setProgress(0);
       setProgressText("");
     }
-  }, [selectedDocs, docStates, orgName, stagiaires, generateAutoDoc, generateAutoDocForStagiaire]);
+  }, [selectedDocs, docStates, safeName, exportStagiaires, appendAutoDocToZip]);
 
   // Preview a document
   const handlePreview = useCallback(async (eyDoc: EYDocumentItem) => {
@@ -212,7 +335,7 @@ export default function ControleEDOF({ organisme, formation, stagiaires, signatu
     try {
       const template = eyDoc.autoTemplates[0];
       const o = mergeOrganisme(organisme);
-      const s = mergeStagiaires(stagiaires);
+      const s = exportStagiaires;
       const params = eyDoc.perStagiaire && s.length > 0 ? { stagiaireIdx: 0, fi: 0 } : { fi: 0 };
       const html = generateDocumentById(`ey_${eyDoc.code}`, template, params, o, formation, s);
       setPreviewHtml(html || "<p>Impossible de générer l'aperçu</p>");
@@ -222,7 +345,7 @@ export default function ControleEDOF({ organisme, formation, stagiaires, signatu
     } finally {
       setPreviewLoading(false);
     }
-  }, [organisme, formation, stagiaires]);
+  }, [organisme, formation, exportStagiaires]);
 
   // Inject signature into HTML before PDF export
   const injectSignatureIntoHtml = useCallback((html: string, sigDataUrl: string): string => {
@@ -239,13 +362,12 @@ export default function ControleEDOF({ organisme, formation, stagiaires, signatu
     if (!previewHtml || !previewDoc) return;
     try {
       const blob = await htmlToPdfBlob(previewHtml);
-      const safeName = orgName.replace(/[^a-zA-Z0-9_-]/g, "_");
       saveAs(blob, `${safeName}_${previewDoc.code}.pdf`);
       toast.success("Document téléchargé !");
     } catch (e: any) {
       toast.error("Erreur : " + (e.message || "Erreur inconnue"));
     }
-  }, [previewHtml, previewDoc, orgName]);
+  }, [previewHtml, previewDoc, safeName]);
 
   // Download with signature
   const handleSignAndDownload = useCallback(async () => {
@@ -253,13 +375,12 @@ export default function ControleEDOF({ organisme, formation, stagiaires, signatu
     try {
       const signedHtml = injectSignatureIntoHtml(previewHtml, signature);
       const blob = await htmlToPdfBlob(signedHtml);
-      const safeName = orgName.replace(/[^a-zA-Z0-9_-]/g, "_");
       saveAs(blob, `${safeName}_${previewDoc.code}_signe.pdf`);
       toast.success("Document signé et téléchargé !");
     } catch (e: any) {
       toast.error("Erreur : " + (e.message || "Erreur inconnue"));
     }
-  }, [previewHtml, previewDoc, orgName, signature, injectSignatureIntoHtml]);
+  }, [previewHtml, previewDoc, safeName, signature, injectSignatureIntoHtml]);
 
   const downloadZip = useCallback(async () => {
     setGenerating(true);
@@ -486,31 +607,8 @@ export default function ControleEDOF({ organisme, formation, stagiaires, signatu
                             variant="outline"
                             size="sm"
                             className="gap-1 text-xs"
-                            onClick={async () => {
-                              if (state.status === "uploaded" && state.uploadedFile) {
-                                saveAs(state.uploadedFile, state.uploadedFileName || `${eyDoc.code}.pdf`);
-                                return;
-                              }
-                              if (eyDoc.autoTemplates.length > 0) {
-                                toast.info(`Génération de ${eyDoc.code}...`);
-                                if (eyDoc.perStagiaire && stagiaires.length > 0) {
-                                  const zip = new JSZip();
-                                  const s = mergeStagiaires(stagiaires);
-                                  for (let si = 0; si < s.length; si++) {
-                                    const result = await generateAutoDocForStagiaire(eyDoc, si);
-                                    if (result) zip.file(result.fileName, result.blob);
-                                  }
-                                  const content = await zip.generateAsync({ type: "blob" });
-                                  const safeName = orgName.replace(/[^a-zA-Z0-9_-]/g, "_");
-                                  saveAs(content, `${safeName}_${eyDoc.code}.zip`);
-                                } else {
-                                  const result = await generateAutoDoc(eyDoc);
-                                  if (result) saveAs(result.blob, result.fileName);
-                                  else toast.error("Impossible de générer ce document");
-                                }
-                                toast.success(`${eyDoc.code} téléchargé !`);
-                              }
-                            }}
+                            disabled={generating}
+                            onClick={() => handleDownloadDoc(eyDoc, state)}
                           >
                             <Download className="w-3 h-3" />
                             PDF
