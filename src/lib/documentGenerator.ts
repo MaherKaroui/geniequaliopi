@@ -1809,7 +1809,17 @@ function genEmargementJour(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
 }
 
 function genEmargementStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], stagiaireIdx: number) {
-  const s = stagiaires[stagiaireIdx] || stagiaires[0];
+  const fallbackStagiaire = stagiaires.find((stagiaire): stagiaire is StagiaireInfo => Boolean(stagiaire)) || {
+    civilite: "" as "M." | "Mme" | "",
+    prenom: "Martin",
+    nom: "Dupont",
+    email: "",
+    telephone: "",
+    entreprise: "",
+    poste: "",
+    dateNaissance: "",
+  };
+  const s = stagiaires[stagiaireIdx] || fallbackStagiaire;
   const dateDebut = s.dateDebutFormation || f.dateDebut || "";
   const dateFin = s.dateFinFormation || f.dateFin || "";
   let days: string[] = [];
@@ -1825,8 +1835,10 @@ function genEmargementStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: 
     }
   }
   if (days.length === 0) days = getFormationDays(f);
-  const stagName = `${s.civilite ? s.civilite + " " : ""}${s.prenom} ${s.nom.toUpperCase()}`;
-  const stagSigHtml = s.signatureUrl ? `<br><img src="${s.signatureUrl}" alt="Sig" style="max-height:40px;max-width:90px;object-fit:contain;margin-top:4px" />` : `<br><span style="font-style:italic;color:#999;font-size:10px">Signé ${s.prenom[0]}.${s.nom}</span>`;
+  const stagName = `${s.civilite ? s.civilite + " " : ""}${s.prenom} ${(s.nom || "").toUpperCase()}`.trim();
+  const stagiaireInitiale = s.prenom?.trim().charAt(0) || "S";
+  const stagiaireNom = s.nom?.trim() || "Stagiaire";
+  const stagSigHtml = s.signatureUrl ? `<br><img src="${s.signatureUrl}" alt="Sig" style="max-height:40px;max-width:90px;object-fit:contain;margin-top:4px" />` : `<br><span style="font-style:italic;color:#999;font-size:10px">Signé ${stagiaireInitiale}.${stagiaireNom}</span>`;
   const fmtSigUrl = s.formateurSignatureUrl || f.formateurSignatureUrl;
   const formateurSigHtml = fmtSigUrl ? `<br><img src="${fmtSigUrl}" alt="Sig formateur" style="max-height:40px;max-width:90px;object-fit:contain;margin-top:4px" />` : '';
   let extra = `<p><strong>Stagiaire :</strong> ${stagName}</p>`;
