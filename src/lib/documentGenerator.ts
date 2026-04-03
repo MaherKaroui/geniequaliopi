@@ -5031,7 +5031,7 @@ function genVAEHandicapBilan(o: OrganismeInfo) {
     { heading: "Évaluation des aménagements", content: `<p>Les aménagements mis en place ont-ils été suffisants ? ☐ Oui ☐ Non ☐ Partiellement<br><br>Le candidat a-t-il pu suivre l'accompagnement dans de bonnes conditions ? ☐ Oui ☐ Non<br><br>Des ajustements ont-ils été nécessaires en cours de parcours ? ☐ Oui ☐ Non<br>Si oui, lesquels : ___</p>` },
     { heading: "Satisfaction du candidat", content: `<p>Le candidat est-il satisfait de la prise en charge de sa situation de handicap ? ☐ Très satisfait ☐ Satisfait ☐ Moyennement satisfait ☐ Insatisfait<br><br>Commentaires du candidat : ___</p>`, variant: "green" },
     { heading: "Axes d'amélioration", content: `<p>Améliorations à apporter pour les prochains candidats en situation de handicap : ___</p>` },
-  ], signatures: { type: "2", labels: ["Le Référent handicap", "Le Candidat"], names: [o.referentHandicap, ""] } });
+  ], signatures: { type: "2", labels: ["Le Dirigeant", "Le Référent handicap"], names: [o.dirigeant, o.referentHandicap] } });
 }
 
 function genVAEMailHandicap(o: OrganismeInfo) {
