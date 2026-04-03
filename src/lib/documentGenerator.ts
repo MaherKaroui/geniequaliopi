@@ -5022,7 +5022,7 @@ function genVAEHandicapFormalisation(o: OrganismeInfo) {
     { heading: "Objet", content: `<p>Ce document formalise les aménagements mis en place pour le candidat en situation de handicap dans le cadre de son accompagnement VAE au sein de ${o.nom}.</p>` },
     { heading: "Aménagements validés", content: `<p><strong>1. Modalités d'accompagnement :</strong><br>☐ Séances plus courtes et plus fréquentes<br>☐ Accompagnement exclusivement à distance<br>☐ Tiers temps pour les évaluations<br>☐ Support de communication adapté<br><br><strong>2. Outils adaptés :</strong><br>☐ Documents en police agrandie<br>☐ Supports audio ou vidéo complémentaires<br>☐ Logiciel d'aide à la rédaction<br>☐ Autre : ___</p>` },
     { heading: "Suivi", content: `<p>Un bilan intermédiaire sera réalisé à mi-parcours pour évaluer l'adéquation des aménagements mis en place et les ajuster si nécessaire.</p>`, variant: "green" },
-  ], signatures: { type: "2", labels: ["Le Référent handicap", "Le Candidat"], names: [o.referentHandicap, ""] } });
+  ], signatures: { type: "2", labels: ["Le Dirigeant", "Le Référent handicap"], names: [o.dirigeant, o.referentHandicap] } });
 }
 
 function genVAEHandicapBilan(o: OrganismeInfo) {
