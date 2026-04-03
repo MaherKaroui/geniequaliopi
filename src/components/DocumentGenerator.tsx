@@ -42,7 +42,7 @@ interface DocumentGeneratorProps {
 
 const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGeneratorProps) => {
   const [expandedCriteres, setExpandedCriteres] = useState<Set<number>>(new Set());
-  const [showArchived, setShowArchived] = useState(false);
+  
   const [expandedIndicateurs, setExpandedIndicateurs] = useState<Set<number>>(new Set());
   const [previewContent, setPreviewContent] = useState<string | null>(null);
   const [previewTitle, setPreviewTitle] = useState("");
