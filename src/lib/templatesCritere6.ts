@@ -1274,39 +1274,39 @@ function veilleTechnoRows(f: FormationInfo, type: FormationType): string[][] {
   // Default: word/bureautique
   return [...commonDigitalLearning,
     [
-      `<a href="https://www.learningtechnologiesfrance.com/">learningtechnologiesfrance.com</a>`,
-      "Learning Technologies France – Événement technologie & formation",
-      veilleYear(f, 7),
-      "Principal salon français des technologies pour la formation (IA, EdTech, plateformes, LMS).",
-      "Preuve : programme + certificat de participation. Action Qualiopi : participer au salon / CR + plan adoption tech."
+      `<a href="https://www.microsoft.com/fr-fr/microsoft-365/word">Microsoft – Word Online et Microsoft 365</a>`,
+      "Microsoft 365 – Évolutions de Word (cloud, collaboration, Copilot)",
+      veilleMonthYear(f, 7),
+      "Word évolue vers le cloud avec Microsoft 365 : co-édition en temps réel, enregistrement automatique sur OneDrive, intégration de Copilot pour l'aide à la rédaction et la mise en forme.",
+      "Preuve : captures des nouvelles fonctionnalités Word 365. Action : intégrer la collaboration en ligne et les fonctionnalités cloud dans le programme de formation Word."
     ],
     [
-      `<a href="https://www.centre-inffo.fr/site-centre-inffo/actualites-centre-inffo/6e-edition-du-barom%C3%A8tre-de-la-formation-et-de-l%E2%80%99emploi-2025">Centre Inffo – Baromètre</a>`,
-      "Baromètre formation & emploi – IA et compétences",
-      veilleDate(f, 8),
-      "Indique que l'IA est un levier majeur intégré dans les attentes des actifs, avec implications sur les compétences & E-learning.",
-      "Preuve : infographie / PDF baromètre. Action Qualiopi : intégrer résultats dans analyse des besoins."
+      `<a href="https://www.microsoft.com/fr-fr/microsoft-365/copilot">Microsoft Copilot – IA dans Word</a>`,
+      "Microsoft Copilot – Assistant IA intégré à Word",
+      veilleMonthYear(f, 6),
+      "Copilot dans Word : rédaction assistée par IA, reformulation, résumé de documents longs, génération de contenu à partir de prompts. Changement majeur dans l'utilisation de Word en entreprise.",
+      "Action : ajout d'un module de sensibilisation à Copilot dans Word (découverte, limites, bonnes pratiques d'utilisation de l'IA dans le traitement de texte)."
     ],
     [
-      `<a href="https://fr.linkedin.com/posts/centre-inffo_lia-en-formation-professionnelle-innovation-activity-7316747080062951424-7ws1">LinkedIn – Centre Inffo IA</a>`,
-      "Post Centre Inffo – IA & innovation en formation",
-      veilleYear(f, 5),
-      "Publication LinkedIn sur l'intégration de l'IA dans les pratiques de formation.",
-      "Preuve : capture écran + URL. Action Qualiopi : preuve de veille mensuelle."
-    ],
-    [
-      `<a href="https://www.centre-inffo.fr/site-centre-inffo/actualites-centre-inffo/articles-2025/lia-dans-la-formation-professionnelle-opportunite-ou-revolution">Centre Inffo – Article IA</a>`,
-      "L'IA dans la formation professionnelle : opportunité ou révolution ?",
+      `<a href="https://www.icdlfrance.org/">ICDL France – Plateforme de certification en ligne</a>`,
+      "ICDL – Plateforme de passage de certification bureautique",
       veilleDate(f, 5),
-      "Article Centre Inffo sur place de l'IA (personnalisation, automatisation des parcours).",
-      "Preuve : PDF article + note interne. Action Qualiopi : mise à jour de la politique pédagogique."
+      "Plateforme officielle ICDL pour le passage de la certification Traitement de texte. Interface en ligne avec exercices pratiques simulant l'environnement Word réel.",
+      "Preuve : captures de la plateforme ICDL. Action : familiariser les stagiaires avec l'interface de certification et les types d'exercices évalués."
+    ],
+    [
+      `<a href="https://www.learningtechnologiesfrance.com/">learningtechnologiesfrance.com</a>`,
+      "Learning Technologies France – Outils bureautiques et e-learning",
+      veilleYear(f, 4),
+      "Salon des technologies de formation : évolutions des outils bureautiques en e-learning, simulateurs Word, exercices interactifs, LMS spécialisés bureautique.",
+      "Preuve : programme + notes de veille. Action Qualiopi : benchmark des outils pédagogiques pour la formation bureautique Word."
     ],
     [
       `<a href="https://www.talenco.com/nos-publications/barometre-formation-professionnelle-tendances-pratiques-2025/">TalenCo – Baromètre</a>`,
-      "Baromètre formation professionnelle tendances",
+      "Baromètre formation professionnelle – Bureautique et compétences numériques",
       veilleDate(f, 3),
-      "Synthèse des pratiques et attentes digitales dans la formation.",
-      "Preuve : PDF baromètre + résumés. Action Qualiopi : alignement offre/compétences sur tendances numériques."
+      "La formation bureautique (Word, Excel) reste dans le top 5 des formations les plus demandées en CPF. L'intégration de l'IA dans les outils Office transforme les compétences attendues.",
+      "Preuve : PDF baromètre. Action Qualiopi : adapter le programme Word aux nouvelles attentes (IA, collaboration cloud, productivité)."
     ],
   ];
 }
