@@ -247,6 +247,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "indicateurs_performance": return genIndicateursPerformance(o, formations, stagiaires);
     case "rapport_amelioration": return genRapportAmelioration(o);
     // Type d'action spécifiques
+    case "pv_conseil_perfectionnement": return genPVConseilPerfectionnement(o, f, stagiaires);
     case "contrat_apprentissage": return genContratApprentissage(o, f, stagiaires);
     case "livret_apprentissage_cfa": return genLivretApprentissageCFA(o, f, stagiaires);
     case "fiche_maitre_apprentissage": return genFicheMaitreApprentissage(o, f);

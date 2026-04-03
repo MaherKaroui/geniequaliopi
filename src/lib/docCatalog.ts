@@ -715,6 +715,9 @@ export function buildFullCatalog(
     });
     add("cfa_c4i19_ressources_pedagogiques", "CT4 - IND 19 RESSOURCES PÉDAGOGIQUES", 4, 19, "ressources_pedagogiques");
 
+    // IND 20 — Conseil de perfectionnement
+    add("cfa_c4i20_pv_conseil_perfectionnement", "CT4 - IND 20 PROCÈS-VERBAL – CONSEIL DE PERFECTIONNEMENT", 4, 20, "pv_conseil_perfectionnement");
+
     // ===== CRITÈRE 5 — QUALIFICATION DU PERSONNEL (CFA) =====
 
     const uniqueFormateursCFA = Array.from(new Set(stagiaires.map(s => (s as any).formateur).filter((f: any) => f && String(f).trim())));
