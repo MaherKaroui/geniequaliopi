@@ -706,6 +706,8 @@ export function buildFullCatalog(
     // IND 17 — Moyens humains, techniques et environnement
     add("cfa_c4i17_bail", "CT4 - IND 17 BAIL DE SOUS-LOCATION", 4, 17, "bail_sous_location");
 
+    const uniqueFormateursCFA = Array.from(new Set(stagiaires.map(s => (s as any).formateur).filter((f: any) => f && String(f).trim())));
+
     // IND 18 — Coordination des intervenants
     add("cfa_c4i18_organigramme", "CT4 - IND 18 ORGANIGRAMME", 4, 18, "organigramme");
     add("cfa_c4i18_fiche_poste_dirigeant", "CT4 - IND 18 FICHE DE POSTE – RESPONSABLE PÉDAGOGIQUE", 4, 18, "fiche_poste_formateur", { role: "dirigeant" });
