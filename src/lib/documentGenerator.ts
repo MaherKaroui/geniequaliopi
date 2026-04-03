@@ -9339,12 +9339,10 @@ function genBilanFroid(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiaire
 function genBilanChaud(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const dureeH = parseInt(f.duree) || 14;
   const termine = isFormationTerminee(f);
-  if (!termine) {
-    return buildDocument({ org: o, title: "BILAN À CHAUD", subtitle: f.intitule, sections: [
-      { heading: "Informations", content: `<p><strong>Organisme de formation :</strong> ${o.nom}<br><strong>Formation :</strong> ${f.intitule}<br><strong>Durée :</strong> ${dureeH} heures – ${f.lieu?.toLowerCase().includes('distance') ? 'Distanciel' : 'Présentiel'}</p>` },
-    ], extraHtml: `<div class="section section-green"><p><em>La formation est en cours. Les bilans à chaud seront réalisés à l'issue de la formation.</em></p></div>` });
-  }
   let extra = '';
+  if (!termine) {
+    extra += `<div class="section section-green"><p><em>La formation est en cours. Ce document sera complété après la fin de la formation.</em></p></div>`;
+  }
   stagiaires.slice(0, 10).forEach((s, i) => {
     const dateFin = getStagiaireDateFin(s, f);
     extra += `<h3>Stagiaire : ${s.prenom} ${s.nom}</h3>`;
@@ -9378,15 +9376,24 @@ function genBilanChaud(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiaire
     const pat = patterns[i % patterns.length];
     extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%"><thead><tr style="background:#1e3a7b;color:#fff"><th>Critères évalués</th><th>Très satisfaisant</th><th>Satisfaisant</th><th>Peu satisfaisant</th><th>Insuffisant</th></tr></thead><tbody>`;
     criteres.forEach((label, idx) => {
-      const note = pat[idx];
-      extra += `<tr><td>${label}</td><td style="text-align:center;font-weight:700">${note === 0 ? "X" : ""}</td><td style="text-align:center;font-weight:700">${note === 1 ? "X" : ""}</td><td></td><td></td></tr>`;
+      if (termine) {
+        const note = pat[idx];
+        extra += `<tr><td>${label}</td><td style="text-align:center;font-weight:700">${note === 0 ? "X" : ""}</td><td style="text-align:center;font-weight:700">${note === 1 ? "X" : ""}</td><td></td><td></td></tr>`;
+      } else {
+        extra += `<tr><td>${label}</td><td></td><td></td><td></td><td></td></tr>`;
+      }
     });
     extra += `</tbody></table>`;
-    const comments = [
-      `La formation ${f.intitule} s'est globalement bien déroulée. Les explications étaient claires et progressives, ce qui m'a permis de comprendre les bases sans difficulté. Le formateur était disponible et prenait le temps de répondre aux questions.`,
-      `Les exercices pratiques ont été utiles pour mettre en application les notions vues. L'organisation et les conditions matérielles étaient satisfaisantes. À l'issue de la formation, je me sens plus à l'aise pour travailler dans un cadre professionnel.`,
-    ];
-    extra += `<p><strong>Commentaire global :</strong> ${comments[i % comments.length]}</p><hr/>`;
+    if (termine) {
+      const comments = [
+        `La formation ${f.intitule} s'est globalement bien déroulée. Les explications étaient claires et progressives, ce qui m'a permis de comprendre les bases sans difficulté. Le formateur était disponible et prenait le temps de répondre aux questions.`,
+        `Les exercices pratiques ont été utiles pour mettre en application les notions vues. L'organisation et les conditions matérielles étaient satisfaisantes. À l'issue de la formation, je me sens plus à l'aise pour travailler dans un cadre professionnel.`,
+      ];
+      extra += `<p><strong>Commentaire global :</strong> ${comments[i % comments.length]}</p>`;
+    } else {
+      extra += `<p><strong>Commentaire global :</strong> _______________________________________________</p>`;
+    }
+    extra += `<hr/>`;
   });
   return buildDocument({ org: o, title: "BILAN À CHAUD", subtitle: f.intitule, sections: [
     { heading: "Informations", content: `<p><strong>Organisme de formation :</strong> ${o.nom}<br><strong>Formation :</strong> ${f.intitule}<br><strong>Durée :</strong> ${dureeH} heures – ${f.lieu?.toLowerCase().includes('distance') ? 'Distanciel' : 'Présentiel'}</p>` },
