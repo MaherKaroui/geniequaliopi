@@ -1,5 +1,5 @@
 import { OrganismeInfo, FormationInfo, StagiaireInfo, DocEntry, CRITERES_INFO } from "@/types/qualiopi";
-import { baseStyle, formatDate, orgHeader, footer } from "./docBuilder";
+import { baseStyle, formatDate, orgHeader, footer, isFacebookPage } from "./docBuilder";
 import { INDICATEURS_REFERENCE, CRITERES_TITLES } from "./qualiopiReference";
 
 // Generate the full "Book Qualiopi" as a single HTML document matching the Reltim PDF structure
