@@ -18,10 +18,16 @@ const yieldToBrowser = (ms = 0) => new Promise<void>(r => requestAnimationFrame(
 type PdfBlobOptions = NonNullable<Parameters<typeof htmlToPdfBlob>[1]>;
 
 const MASS_EXPORT_PDF_OPTIONS = {
-  scale: 1.35,
-  imageQuality: 0.84,
-  pageYieldMs: 8,
+  scale: 1,
+  imageQuality: 0.72,
+  pageYieldMs: 20,
 } satisfies PdfBlobOptions;
+
+const ZIP_EXPORT_OPTIONS = {
+  type: "blob" as const,
+  compression: "STORE" as const,
+  streamFiles: true,
+};
 
 const hasStagiaireIdentity = (stagiaire: StagiaireInfo | null | undefined): stagiaire is StagiaireInfo => {
   if (!stagiaire) return false;
@@ -197,7 +203,7 @@ export default function ControleEDOF({ organisme, formation, stagiaires, signatu
         });
         if (result) zip.file(result.fileName, result.blob);
         options?.onItemDone?.(si + 1, sourceStagiaires.length);
-        await yieldToBrowser(16);
+        await yieldToBrowser(32);
       }
       return;
     }
@@ -236,11 +242,7 @@ export default function ControleEDOF({ organisme, formation, stagiaires, signatu
           },
         });
 
-        const content = await zip.generateAsync({
-          type: "blob",
-          compression: "DEFLATE",
-          compressionOptions: { level: 3 },
-        });
+        const content = await zip.generateAsync(ZIP_EXPORT_OPTIONS);
         saveAs(content, `${safeName}_${eyDoc.code}.zip`);
       } else {
         const result = await generateAutoDoc(eyDoc, { sourceStagiaires: exportStagiaires });
@@ -308,11 +310,7 @@ export default function ControleEDOF({ organisme, formation, stagiaires, signatu
         }
       }
 
-      const content = await zip.generateAsync({
-        type: "blob",
-        compression: "DEFLATE",
-        compressionOptions: { level: 3 },
-      });
+      const content = await zip.generateAsync(ZIP_EXPORT_OPTIONS);
       saveAs(content, `${safeName}_Selection_EY.zip`);
       toast.success(`${docsToProcess.length} document(s) exporté(s) !`);
     } catch (e: any) {
@@ -422,7 +420,7 @@ export default function ControleEDOF({ organisme, formation, stagiaires, signatu
         if (i % 3 === 0) await yieldToBrowser(5);
       }
 
-      const content = await zip.generateAsync({ type: "blob" });
+      const content = await zip.generateAsync(ZIP_EXPORT_OPTIONS);
       saveAs(content, `${safeName}_Controle_EDOF_EY.zip`);
       toast.success("Dossier de contrôle EY exporté !");
     } catch (e: any) {
