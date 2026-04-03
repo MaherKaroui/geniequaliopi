@@ -9331,6 +9331,12 @@ function genBilanFroid(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiaire
 
 function genBilanChaud(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const dureeH = parseInt(f.duree) || 14;
+  const termine = isFormationTerminee(f);
+  if (!termine) {
+    return buildDocument({ org: o, title: "BILAN À CHAUD", subtitle: f.intitule, sections: [
+      { heading: "Informations", content: `<p><strong>Organisme de formation :</strong> ${o.nom}<br><strong>Formation :</strong> ${f.intitule}<br><strong>Durée :</strong> ${dureeH} heures – ${f.lieu?.toLowerCase().includes('distance') ? 'Distanciel' : 'Présentiel'}</p>` },
+    ], extraHtml: `<div class="section section-green"><p><em>La formation est en cours. Les bilans à chaud seront réalisés à l'issue de la formation.</em></p></div>` });
+  }
   let extra = '';
   stagiaires.slice(0, 10).forEach((s, i) => {
     const dateFin = getStagiaireDateFin(s, f);
@@ -9350,7 +9356,6 @@ function genBilanChaud(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiaire
       "Utilité professionnelle de la formation",
       "Recommandation de la formation",
     ];
-    // Patterns: mostly 0 (Très satisfaisant) with some 1 (Satisfaisant), different per stagiaire
     const patterns = [
       [0,0,0,1,0,0,0,0,1,0,0,0],
       [0,1,0,0,0,1,0,0,0,0,0,1],
