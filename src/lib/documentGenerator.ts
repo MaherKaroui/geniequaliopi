@@ -542,6 +542,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "guide_aide_connexion_cfa": return genMailAideConnexion(o, f);
     case "convention_formation_apprentissage": return genConventionFormationApprentissage(o, f, stagiaires, params?.stagiaireIdx ?? 0);
     case "contrat_formation_par_bloc": return genContratFormationParBloc(o, f, stagiaires, params?.stagiaireIdx ?? 0);
+    case "facture_edof": return genFactureEDOF(o, f, stagiaires, params?.stagiaireIdx ?? 0);
     case "dossier_inscription_cfa": return genDossierInscriptionCFA(o, f, stagiaires, params?.stagiaireIdx ?? 0);
     case "livre_apprentissage_cfa": return genLivreApprentissageCFA(o, f, stagiaires, params?.stagiaireIdx ?? 0);
     case "convocation_cfa": return genConvocationCFA(o, f, stagiaires, params?.stagiaireIdx ?? 0);
@@ -9874,7 +9875,6 @@ function genExercicesCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires
 
 const FALLBACK_STAGIAIRE: StagiaireInfo = { prenom: "Martin", nom: "Dupont", civilite: "" as const, email: "", telephone: "", entreprise: "", poste: "", dateNaissance: "" };
 
-
   const exerciceTitre = matiereTitle
     ? `Exercice ${exerciceIdx + 1} : ${matiereTitle}`
     : `Exercice ${exerciceIdx + 1} : Cas pratique`;
@@ -11268,4 +11268,93 @@ function genDossierInscriptionCFA(o: OrganismeInfo, f: FormationInfo, stagiaires
       </div>
     </div>
   `, stagiaires: [s] });
+}
+
+function genFactureEDOF(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number): string {
+  const s = stagiaires[si] || stagiaires[0];
+  if (!s) return "";
+  const dateDebut = getStagiaireDateDebut(s, f);
+  const dateFin = getStagiaireDateFin(s, f);
+  const tarif = getStagiaireTarif(s, f) || f.tarif || "1 500,00 €";
+  const tarifNum = parseFloat(tarif.replace(/[^\d.,]/g, "").replace(",", ".")) || 1500;
+  const tarifStr = tarifNum.toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " €";
+  const acompte30 = (tarifNum * 0.3).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " €";
+  const tranche35 = (tarifNum * 0.35).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " €";
+  const numFacture = `FAC-${new Date().getFullYear()}-${String(si + 1).padStart(3, "0")}`;
+  const numDossier = s.numeroAction || "N/A";
+  const stagNom = `${s.civilite ? s.civilite + " " : ""}${s.prenom} ${s.nom}`;
+  const stagAdresse = [s.adresse, s.codePostal, s.commune].filter(Boolean).join(", ") || "—";
+
+  const finDate = dateFin ? new Date(dateFin) : new Date();
+  const date14jApres = new Date(finDate); date14jApres.setDate(date14jApres.getDate() + 14);
+  const date28jApres = new Date(finDate); date28jApres.setDate(date28jApres.getDate() + 28);
+  const debutDate = dateDebut ? new Date(dateDebut) : new Date();
+  const date14jAvant = new Date(debutDate); date14jAvant.setDate(date14jAvant.getDate() - 14);
+  const dateSignature = formatDate(date14jAvant.toISOString().split("T")[0]);
+
+  return buildDocument({ org: o, title: `Facture n°${numFacture}`, stagiaires: [s], sections: [], extraHtml: `
+    <div style="margin-bottom:20px;padding:12px;border:1px solid #ddd;border-radius:6px">
+      <p><strong>${stagNom}</strong></p>
+      <p><strong>Adresse :</strong> ${stagAdresse}</p>
+      <p><strong>Mail :</strong> ${s.email || "—"} &nbsp; <strong>Tél :</strong> ${s.telephone || "—"}</p>
+    </div>
+
+    <table style="width:100%;border-collapse:collapse;margin-bottom:20px">
+      <thead>
+        <tr style="background:#f5f5f5">
+          <th style="border:1px solid #ddd;padding:8px;text-align:left">Référence</th>
+          <th style="border:1px solid #ddd;padding:8px;text-align:left">Désignation</th>
+          <th style="border:1px solid #ddd;padding:8px;text-align:center">Quantité</th>
+          <th style="border:1px solid #ddd;padding:8px;text-align:center">TVA</th>
+          <th style="border:1px solid #ddd;padding:8px;text-align:right">Montant HT</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="border:1px solid #ddd;padding:8px">${numDossier}</td>
+          <td style="border:1px solid #ddd;padding:8px">
+            <strong>Nom de la formation :</strong><br>
+            • ${f.intitule}<br>
+            <strong>Date de formation prévue :</strong> du ${formatDate(dateDebut)} au ${formatDate(dateFin)}<br>
+            <strong>Nom du stagiaire :</strong> ${stagNom}<br>
+            <strong>Numéro d'action :</strong> ${numDossier}<br>
+            <strong>Lieu de la Formation :</strong> ${o.adresse || "—"}, ${o.ville || ""}
+          </td>
+          <td style="border:1px solid #ddd;padding:8px;text-align:center">1</td>
+          <td style="border:1px solid #ddd;padding:8px;text-align:center">0%</td>
+          <td style="border:1px solid #ddd;padding:8px;text-align:right">${tarifStr}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div style="text-align:right;margin-bottom:30px;padding:12px;border:1px solid #ddd;border-radius:6px;display:inline-block;float:right">
+      <p><strong>TOTAL HT :</strong> ${tarifStr}</p>
+      <p><strong>TVA (0%) :</strong> 0,00 €</p>
+      <p style="font-size:15px"><strong>TOTAL TTC : ${tarifStr}</strong></p>
+    </div>
+    <div style="clear:both"></div>
+
+    <h2 style="margin-top:30px">Le Paiement</h2>
+    <div style="margin-bottom:20px">
+      <p><strong>1er paiement :</strong> 30% d'acompte à verser après les 14 jours de rétractation — <strong>${acompte30}</strong> pour le <strong>${formatDate(dateDebut)}</strong></p>
+      <p style="font-size:11px;color:#666;margin-top:4px">À compter de la date de signature du présent contrat, le stagiaire dispose d'un délai de quatorze jours pour se rétracter. Le stagiaire souhaitant se rétracter en informe l'organisme de formation par lettre recommandée avec accusé de réception. Dans ce cas, aucune somme ne peut être exigée du stagiaire.</p>
+      <p style="margin-top:10px"><strong>2ème paiement :</strong> 35% à verser pour le <strong>${formatDate(date14jApres.toISOString().split("T")[0])}</strong> — <strong>${tranche35}</strong></p>
+      <p style="margin-top:10px"><strong>3ème paiement :</strong> 35% à verser pour le <strong>${formatDate(date28jApres.toISOString().split("T")[0])}</strong> — <strong>${tranche35}</strong></p>
+    </div>
+
+    <p style="margin-top:20px">Fait à ${o.ville || "—"}, Le <strong>${dateSignature}</strong></p>
+
+    <div style="display:flex;justify-content:space-between;margin-top:30px;gap:40px">
+      <div class="sig-box" style="flex:1">
+        <p class="sig-label"><strong>Signature Stagiaire :</strong></p>
+        <p>${stagNom}</p>
+        ${s.signatureUrl ? `<img src="${s.signatureUrl}" alt="Signature" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : '<p style="min-height:60px"></p>'}
+      </div>
+      <div class="sig-box" style="flex:1">
+        <p class="sig-label"><strong>Signature ${o.nom} :</strong></p>
+        <p>${o.dirigeant}</p>
+        ${o.tamponUrl ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />` : ''}
+      </div>
+    </div>
+  ` });
 }
