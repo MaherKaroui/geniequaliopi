@@ -9514,6 +9514,12 @@ function genBilanChaudStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: 
 function genBilanFroidStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = stagiaires[si] || stagiaires[0];
   const dureeH = parseInt(f.duree) || 14;
+  const termine = isFormationTerminee(f);
+  if (!termine) {
+    return buildDocument({ org: o, title: "BILAN À FROID", subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, stagiaires: [s], sections: [
+      { heading: "Informations", content: `<p><strong>Organisme :</strong> ${o.nom}<br><strong>Formation :</strong> ${f.intitule}<br><strong>Durée :</strong> ${dureeH} heures</p>` },
+    ], extraHtml: `<div class="section section-green"><p><em>La formation est en cours. Le bilan à froid sera réalisé 3 à 6 mois après la fin de la formation.</em></p></div>` });
+  }
 
   const allCriteres = [
     "Utilisez-vous encore les outils depuis la formation ?",
