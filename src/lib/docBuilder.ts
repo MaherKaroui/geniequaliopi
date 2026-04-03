@@ -521,7 +521,7 @@ function resolveSignature(label: string, nom: string, urls: SignatureUrls): stri
     return tamponImg(urls.tamponUrl);
   }
   // Stagiaire / Apprenant / Apprenti / Candidat / Bénéficiaire
-  if (/stagiaire|apprenant|apprenti|candidat|bénéficiaire/i.test(l)) {
+  if (/stagiaire|apprenant|apprenti|candidat|bénéficiaire|participant/i.test(l)) {
     return urls.stagiaireSignatureUrl
       ? sigImg(urls.stagiaireSignatureUrl, "Signature stagiaire")
       : `<p style="font-style:italic;color:#999;margin-top:15px">${nom ? `Signé par ${nom}` : ""}</p>`;
