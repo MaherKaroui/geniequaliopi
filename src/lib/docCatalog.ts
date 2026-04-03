@@ -729,12 +729,10 @@ export function buildFullCatalog(
     // ===== CRITÈRE 5 — QUALIFICATION DU PERSONNEL (CFA) =====
 
     // IND 21 — Compétences des intervenants
-    add("cfa_c5i21_autoevaluation_0", `CT5 - IND 21 AUTO-ÉVALUATION FORMATEUR`, 5, 21, "autoevaluation_formateur", { formateurIdx: 0 });
     add("cfa_c5i21_processus_recrutement", "CT5 - IND 21 DESCRIPTION DU PROCESSUS DE RECRUTEMENT", 5, 21, "procedure_recrutement_formateur");
 
     // IND 22 — Entretien et développement des compétences
     add("cfa_c5i22_plan_dev_competences", "CT5 - IND 22 PLAN DE DÉVELOPPEMENT DES COMPÉTENCES", 5, 22, "plan_dev_competences_excel");
-    add("cfa_c5i22_fiche_entretien_annuel", "CT5 - IND 22 FICHE D'ENTRETIEN ANNUEL FORMATEUR", 5, 22, "fiche_entretien_annuel_formateur");
 
     uniqueFormateursCFA.forEach((fName) => {
       const fname = String(fName).trim();
