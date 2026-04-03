@@ -5037,7 +5037,7 @@ function genVAEHandicapBilan(o: OrganismeInfo) {
 function genVAEMailHandicap(o: OrganismeInfo) {
   return buildDocument({ org: o, title: "MAIL TYPE HANDICAP – VAE", sections: [
     { heading: "", content: `<p><strong>Objet :</strong> Prise en compte de votre situation de handicap</p><p>Bonjour,</p><p>Nous avons bien pris note de votre situation et souhaitons vous assurer que ${o.nom} met tout en œuvre pour vous accompagner dans les meilleures conditions.</p><p>Notre référent handicap, ${o.referentHandicap}, est à votre disposition pour échanger sur les aménagements à mettre en place pour votre accompagnement VAE.</p><p>N'hésitez pas à nous contacter par téléphone au ${o.telephone} ou par mail à ${o.email} pour convenir d'un rendez-vous.</p><p>Nous pouvons notamment vous orienter vers nos partenaires spécialisés (Agefiph, Cap Emploi, MDPH) si nécessaire.</p><p>Cordialement,</p><p>${o.responsablePedagogique}<br>L'équipe VAE de ${o.nom}</p>` },
-  ] });
+  ], signatures: { type: "2", labels: ["Le Dirigeant", "Le Référent handicap"], names: [o.dirigeant, o.referentHandicap] } });
 }
 
 function genVAEEngagementsRespectifs(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
