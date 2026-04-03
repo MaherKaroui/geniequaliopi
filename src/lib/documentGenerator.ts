@@ -5050,11 +5050,212 @@ function genVAEEngagementsRespectifs(o: OrganismeInfo, f: FormationInfo, stagiai
 }
 
 function genVAELivret2(o: OrganismeInfo, f: FormationInfo) {
-  return buildDocument({ org: o, title: "LIVRET 2 – DOSSIER DE VALIDATION VAE", subtitle: f.intitule, sections: [
-    { heading: "Présentation du Livret 2", content: `<p>Le Livret 2 constitue le cœur de votre démarche VAE. C'est lui qui va convaincre le jury que vous maîtrisez les compétences requises pour la délivrance de la certification visée.</p><p><strong>Objectifs :</strong><br>• Vous inciter à faire le point sur votre vécu professionnel<br>• Découvrir des savoir-faire et compétences acquis<br>• Avoir une vision claire de votre parcours et de vos acquis</p><p><strong>Forme :</strong><br>Ce livret est votre meilleur outil de communication. Il doit être factuel, précis, synthétique et étayé. Personnalisez-le, appropriez-le-vous.</p>` },
-    { heading: "Le référentiel de compétences", content: `<p>Le référentiel est le cadre que vous devez suivre pour rédiger votre livret. Il regroupe l'ensemble des compétences évaluées pour l'obtention de la certification. Les compétences sont regroupées en unités/blocs de compétences.</p>` },
-    { heading: "Structure du dossier", content: `<p><strong>Partie 1 – Présentation du candidat</strong><br>• Parcours professionnel détaillé<br>• Formations suivies<br>• Activités bénévoles en lien avec la certification<br><br><strong>Partie 2 – Description des activités par bloc de compétences</strong><br>• Pour chaque bloc : description détaillée d'une ou plusieurs situations professionnelles<br>• Contexte, activités réalisées, compétences mobilisées<br>• Résultats obtenus et enseignements tirés<br><br><strong>Partie 3 – Portefeuille de preuves</strong><br>• Documents attestant des compétences décrites<br>• Attestations, rapports, productions, témoignages</p>`, variant: "green" },
-    { heading: "Conseils de rédaction", content: `<p>• Soyez concret et précis : décrivez des situations réelles<br>• Utilisez le « je » : c'est votre expérience<br>• Montrez votre analyse : que faites-vous ? pourquoi ? comment ?<br>• Reliez vos activités aux compétences du référentiel<br>• Illustrez avec des exemples concrets et des résultats mesurables<br>• Relisez et faites relire votre dossier</p>` },
+  const dots = "……………………………………………………………………………………………………………………….";
+  const dotsLong = "……………………………………………………………………………………………………………………………………………………………….";
+  const answer4 = `<p>${dots}</p><p>${dots}</p><p>${dots}</p><p>${dots}</p>`;
+
+  return buildDocument({ org: o, title: `${f.intitule.toUpperCase()}`, subtitle: "Dossier de demande de certification des acquis de l'expérience", sections: [
+    // ===== PRÉSENTATION =====
+    { heading: "PRÉSENTATION", content: `
+<h3>Objectifs</h3>
+<p>Le livret 2 constitue le cœur de votre démarche V.A.E. En effet, c'est lui qui va convaincre le jury que vous maîtrisez les compétences requises pour la délivrance de la certification visée : <strong>${f.intitule}</strong>.</p>
+<p>Il a pour objectif de vous inciter à faire le point sur votre vécu professionnel. Au cours de cette réflexion, vous découvrirez des savoir-faire, des compétences que vous aviez perdus de vue, mais qui font partie de vos acquis et qui, peut-être, serviront pour votre démarche actuelle.</p>
+<p>À l'issue de la rédaction de ce livret, vous aurez une vision plus claire de votre parcours et de vos acquis et cela sera un atout pour aborder la suite de votre formation ou de votre carrière.</p>
+<h3>Forme</h3>
+<p>Ce livret est votre meilleur outil de communication.</p>
+<p>Son objectif est de convaincre le jury qu'il a toutes les raisons de valider le titre que vous visez. Il doit donc être factuel, précis, synthétique et étayé.</p>
+<p>Ce livret doit mettre en relief vos compétences personnelles. Le jury a besoin que vous lui parliez de vous-même. Personnalisez-le, appropriez-le-vous.</p>
+<h3>Le référentiel de compétences</h3>
+<p>Le référentiel est le cadre que vous devez suivre pour rédiger votre livret. Il regroupe l'ensemble des compétences qui sont évaluées pour l'obtention de la certification. Les compétences sont regroupées en unités de compétences, correspondant aux grandes activités de la fonction visée.</p>
+<p>Ce référentiel correspond au descriptif des tâches effectuées dans le cadre de la fonction décrite ainsi qu'aux compétences évaluées, tel qu'il a été présenté au R.N.C.P.</p>` },
+
+    // ===== PARTIE ADMINISTRATIVE =====
+    { heading: "PARTIE ADMINISTRATIVE", content: `
+<table style="width:100%;border-collapse:collapse;">
+<tr><td style="border:1px solid #999;padding:6px;width:40%;"><strong>Nom :</strong></td><td style="border:1px solid #999;padding:6px;"></td></tr>
+<tr><td style="border:1px solid #999;padding:6px;"><strong>Nom d'épouse :</strong></td><td style="border:1px solid #999;padding:6px;"></td></tr>
+<tr><td style="border:1px solid #999;padding:6px;"><strong>Prénoms :</strong></td><td style="border:1px solid #999;padding:6px;"></td></tr>
+<tr><td style="border:1px solid #999;padding:6px;"><strong>NIR (10 premiers chiffres n° SS) :</strong></td><td style="border:1px solid #999;padding:6px;"></td></tr>
+<tr><td style="border:1px solid #999;padding:6px;"><strong>Adresse :</strong></td><td style="border:1px solid #999;padding:6px;"></td></tr>
+<tr><td style="border:1px solid #999;padding:6px;"><strong>Complément :</strong></td><td style="border:1px solid #999;padding:6px;"></td></tr>
+<tr><td style="border:1px solid #999;padding:6px;"><strong>Code postal :</strong></td><td style="border:1px solid #999;padding:6px;"></td></tr>
+<tr><td style="border:1px solid #999;padding:6px;"><strong>Ville :</strong></td><td style="border:1px solid #999;padding:6px;"></td></tr>
+<tr><td style="border:1px solid #999;padding:6px;"><strong>Tél. domicile :</strong></td><td style="border:1px solid #999;padding:6px;"></td></tr>
+<tr><td style="border:1px solid #999;padding:6px;"><strong>Autre (travail, portable) :</strong></td><td style="border:1px solid #999;padding:6px;"></td></tr>
+<tr><td style="border:1px solid #999;padding:6px;"><strong>Courriel :</strong></td><td style="border:1px solid #999;padding:6px;"></td></tr>
+<tr><td style="border:1px solid #999;padding:6px;"><strong>Situation actuelle :</strong></td><td style="border:1px solid #999;padding:6px;">☐ Salarié &nbsp; ☐ Travailleur indépendant &nbsp; ☐ Demandeur d'emploi</td></tr>
+<tr><td style="border:1px solid #999;padding:6px;"><strong>Dispositif de financement :</strong></td><td style="border:1px solid #999;padding:6px;">☐ CPF &nbsp; ☐ Autre (à préciser) :</td></tr>
+</table>` },
+
+    // ===== EXPÉRIENCE PROFESSIONNELLE =====
+    { heading: "INFORMATIONS RELATIVES À L'EXPÉRIENCE PROFESSIONNELLE", content: `
+<p><em>Commencer par la plus récente</em></p>
+<table style="width:100%;border-collapse:collapse;">
+<tr style="background:#e8e8e8;">
+<th style="border:1px solid #999;padding:6px;">Emploi occupé</th>
+<th style="border:1px solid #999;padding:6px;">Nom et adresse de l'entreprise</th>
+<th style="border:1px solid #999;padding:6px;">Statut</th>
+<th style="border:1px solid #999;padding:6px;">Temps complet / partiel</th>
+<th style="border:1px solid #999;padding:6px;">Date de début</th>
+<th style="border:1px solid #999;padding:6px;">Date de fin</th>
+<th style="border:1px solid #999;padding:6px;">Principales activités exercées</th>
+</tr>
+<tr><td style="border:1px solid #999;padding:6px;">&nbsp;</td><td style="border:1px solid #999;padding:6px;">&nbsp;</td><td style="border:1px solid #999;padding:6px;">&nbsp;</td><td style="border:1px solid #999;padding:6px;">&nbsp;</td><td style="border:1px solid #999;padding:6px;">&nbsp;</td><td style="border:1px solid #999;padding:6px;">&nbsp;</td><td style="border:1px solid #999;padding:6px;">&nbsp;</td></tr>
+<tr><td style="border:1px solid #999;padding:6px;">&nbsp;</td><td style="border:1px solid #999;padding:6px;">&nbsp;</td><td style="border:1px solid #999;padding:6px;">&nbsp;</td><td style="border:1px solid #999;padding:6px;">&nbsp;</td><td style="border:1px solid #999;padding:6px;">&nbsp;</td><td style="border:1px solid #999;padding:6px;">&nbsp;</td><td style="border:1px solid #999;padding:6px;">&nbsp;</td></tr>
+<tr><td style="border:1px solid #999;padding:6px;">&nbsp;</td><td style="border:1px solid #999;padding:6px;">&nbsp;</td><td style="border:1px solid #999;padding:6px;">&nbsp;</td><td style="border:1px solid #999;padding:6px;">&nbsp;</td><td style="border:1px solid #999;padding:6px;">&nbsp;</td><td style="border:1px solid #999;padding:6px;">&nbsp;</td><td style="border:1px solid #999;padding:6px;">&nbsp;</td></tr>
+</table>`, variant: "green" },
+
+    // ===== INFORMATIONS RELATIVES À LA FORMATION =====
+    { heading: "INFORMATIONS RELATIVES À LA FORMATION", content: `
+<h3>Diplômes obtenus ou dernière classe suivie</h3>
+<p>${dots}</p><p>${dots}</p><p>${dots}</p><p>${dots}</p>
+<h3>Stages de formation professionnelle effectués</h3>
+<p>${dots}</p><p>${dots}</p><p>${dots}</p><p>${dots}</p>
+<h3>PIÈCES À FOURNIR (photocopies)</h3>
+<ul>
+<li><strong>Pour les activités salariées :</strong>
+  <ul>
+    <li>Contrat de travail en cours</li>
+    <li>Certificats de travail, à défaut bulletins de salaire</li>
+  </ul>
+</li>
+<li><strong>Pour les activités non salariées :</strong>
+  <ul><li>Tout document pouvant en attester</li></ul>
+</li>
+<li>Curriculum vitae</li>
+<li>Diplômes et/ou attestations de formation</li>
+<li>Toute autre pièce que vous jugez utile à l'appui de votre demande</li>
+</ul>
+<p><strong>Dossier à retourner à :</strong><br>${o.dirigeant}<br>${o.adresse}<br>${o.codePostal} ${o.ville}</p>` },
+
+    // ===== RÉFÉRENTIEL DE COMPÉTENCES =====
+    { heading: "RÉFÉRENTIEL DE COMPÉTENCES", content: `
+<p><strong>${f.intitule.toUpperCase()}</strong></p>
+<p><strong>Dossier de demande de certification des acquis de l'expérience</strong></p>
+<p>Le document qui suit décrit les compétences nécessaires pour obtenir la certification.</p>
+<p>Il doit vous servir à faire le point sur ce que vous estimez savoir-faire (autoévaluation).</p>
+<p>Vous pouvez également l'utiliser pour que votre employeur par exemple donne son point de vue.</p>
+<p>Ce document ferait alors partie des pièces que vous pourriez décider – ou non – de mettre dans votre dossier à l'appui de votre demande de certification.</p>` },
+
+    // ===== AUTO-ÉVALUATION DES COMPÉTENCES =====
+    { heading: "AUTO-ÉVALUATION DES COMPÉTENCES", content: `
+<h3>Savoir-être</h3>
+<table style="width:100%;border-collapse:collapse;">
+<tr style="background:#e8e8e8;">
+<th style="border:1px solid #999;padding:6px;">Compétence</th>
+<th style="border:1px solid #999;padding:6px;">L'emploi actuel</th>
+<th style="border:1px solid #999;padding:6px;">Un emploi antérieur</th>
+<th style="border:1px solid #999;padding:6px;">Savoir-faire</th>
+<th style="border:1px solid #999;padding:6px;">Avoir besoin d'une formation</th>
+</tr>
+<tr><td style="border:1px solid #999;padding:6px;">Savoir accueillir</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td></tr>
+<tr><td style="border:1px solid #999;padding:6px;">Gérer le stress</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td></tr>
+<tr><td style="border:1px solid #999;padding:6px;">Renseigner le client / bénéficiaire</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td></tr>
+<tr><td style="border:1px solid #999;padding:6px;">Travailler en équipe</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td></tr>
+<tr><td style="border:1px solid #999;padding:6px;">Respecter la réglementation</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td></tr>
+<tr><td style="border:1px solid #999;padding:6px;">Faire preuve d'éthique professionnelle</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td></tr>
+</table>
+
+<h3>Compétences techniques liées à la certification</h3>
+<table style="width:100%;border-collapse:collapse;">
+<tr style="background:#e8e8e8;">
+<th style="border:1px solid #999;padding:6px;">Activité / Compétence</th>
+<th style="border:1px solid #999;padding:6px;">L'emploi actuel</th>
+<th style="border:1px solid #999;padding:6px;">Un emploi antérieur</th>
+<th style="border:1px solid #999;padding:6px;">Savoir-faire</th>
+<th style="border:1px solid #999;padding:6px;">Avoir besoin d'une formation</th>
+</tr>
+<tr><td style="border:1px solid #999;padding:6px;">Maîtrise des techniques de base du métier</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td></tr>
+<tr><td style="border:1px solid #999;padding:6px;">Application des procédures réglementaires</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td></tr>
+<tr><td style="border:1px solid #999;padding:6px;">Gestion des situations courantes</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td></tr>
+<tr><td style="border:1px solid #999;padding:6px;">Gestion des situations complexes</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td></tr>
+<tr><td style="border:1px solid #999;padding:6px;">Utilisation des outils professionnels</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td></tr>
+<tr><td style="border:1px solid #999;padding:6px;">Communication professionnelle</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td></tr>
+</table>` },
+
+    // ===== GUIDE D'ENTRETIEN =====
+    { heading: "GUIDE D'ENTRETIEN", content: `
+<p><em>Le présent document a été complété par le candidat seul</em></p>
+
+<h3>COMPÉTENCES TECHNIQUES</h3>
+
+<h4>Préparation et organisation de l'activité</h4>
+<p>□ Décrivez comment vous préparez votre journée de travail / votre activité :</p>
+${answer4}
+<p>□ Quelles sont les procédures que vous suivez au quotidien ?</p>
+${answer4}
+<p>□ Comment organisez-vous votre poste de travail ?</p>
+${answer4}
+
+<h4>Gestion technique de l'activité</h4>
+<p>□ Décrivez une situation professionnelle type en prenant soin de décrire les procédures qui s'y rattachent :</p>
+<p>${dotsLong}</p><p>${dotsLong}</p><p>${dotsLong}</p><p>${dotsLong}</p>
+
+<p>□ Quelles sont les règles essentielles de sécurité et de réglementation liées à votre activité ?</p>
+<p>${dotsLong}</p><p>${dotsLong}</p><p>${dotsLong}</p><p>${dotsLong}</p>
+
+<h4>Animation et relation</h4>
+<p>□ Comment accueillez-vous un client / bénéficiaire ?</p>
+${answer4}
+<p>□ Comment gérez-vous un conflit ou une situation difficile ?</p>
+${answer4}
+<p>□ Quelles informations essentielles communiquez-vous aux clients / bénéficiaires ?</p>
+${answer4}
+
+<h4>Accueil et relation clientèle / bénéficiaire</h4>
+<p>□ De quelle manière travaillez-vous la qualité de service ?</p>
+${answer4}
+<p>□ Comment gérez-vous une dispute ou un désaccord ?</p>
+${answer4}
+<p>□ Dans la relation avec les clients/bénéficiaires, qu'est-ce qui vous paraît :</p>
+<p><strong>- le plus difficile ?</strong></p>
+${answer4}
+<p><strong>- le plus facile ?</strong></p>
+${answer4}
+<p>□ Un nouveau collègue arrive dans l'équipe, de quelle manière l'aidez-vous ?</p>
+${answer4}` },
+
+    // ===== APTITUDES =====
+    { heading: "APTITUDES", content: `
+<p>□ Comment gérez-vous votre stress ?</p>
+${answer4}
+
+<h3>Questionnaire</h3>
+<p><strong>1. Quelle est, à votre avis, la première des qualités (la plus essentielle, la plus importante) pour effectuer votre travail correctement ?</strong></p>
+${answer4}
+<p><strong>2. Comment détectez-vous une situation à risque ou un comportement inhabituel ?</strong></p>
+${answer4}
+<p><strong>3. La communication entre collègues vous semble-t-elle importante ? Donnez un exemple d'information pertinente à faire passer.</strong></p>
+${answer4}
+
+<h3>CONNAISSANCES</h3>
+<p><strong>4. Quelles connaissances estimez-vous indispensables pour exercer correctement votre métier (limitez-vous aux trois principales) ?</strong></p>
+${answer4}
+<p><strong>□ Comment faites-vous pour savoir si vos connaissances sont à jour ?</strong></p>
+<p>${dotsLong}</p><p>${dotsLong}</p><p>${dotsLong}</p><p>${dotsLong}</p>
+<p><strong>□ Souhaitez-vous ajouter quelque chose ?</strong></p>
+<p>${dotsLong}</p><p>${dotsLong}</p><p>${dotsLong}</p><p>${dotsLong}</p>` },
+
+    // ===== DÉCISION FINALE =====
+    { heading: "DÉCISION FINALE", content: `
+<p>À l'issue du rendu de ce dossier, le jury délibère. 3 cas sont possibles :</p>
+<ul>
+<li><strong>La validation de la totalité</strong> des compétences requises pour l'obtention de la certification : vous serez alors proposé(e) pour l'obtention au Jury de validation du Titre.</li>
+<li><strong>La validation partielle</strong> des compétences requises : le jury de validation des acquis indique les compétences ou expériences que vous devrez acquérir pour valider totalement le titre ; il donne les préconisations et les indications sur la manière de les acquérir – par exemple, une expérience professionnelle complémentaire, le suivi d'une formation concernant un domaine particulier, la réalisation d'un travail d'investigation sur un thème particulier… d'autres recommandations pourront être émises selon le profil du candidat.</li>
+<li><strong>La non-validation</strong> : le jury doit alors en motiver les raisons.</li>
+</ul>
+<p>Nous vous rappelons que le jury de VAE est souverain dans ses décisions.</p>`, variant: "green" },
+
+    // ===== DÉCLARATION SUR L'HONNEUR =====
+    { heading: "DÉCLARATION SUR L'HONNEUR", content: `
+<p>Je soussigné(e) :</p>
+<p>${dots}</p>
+<p>déclare sur l'honneur que les éléments figurant dans ce livret sont le reflet de mes expériences, en vue de valider la certification <strong>${f.intitule}</strong>.</p>
+<p>Je confirme l'exactitude et la véracité des informations figurant dans le présent livret.</p>
+<br>
+<p><strong>Fait à :</strong> ${o.ville}</p>
+<p><strong>Date :</strong></p>
+<p><strong>Signature :</strong></p>` },
   ] });
 }
 
