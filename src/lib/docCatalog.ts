@@ -817,11 +817,91 @@ export function buildFullCatalog(
 
   // ===== Bilan de compétences =====
   if (isBDC) {
-    formations.slice(0, 2).forEach((f, fi) => {
-      add(`bdc_analyse_parcours_${fi}`, `Analyse parcours professionnel`, 2, 4, "analyse_parcours_pro", { fi });
-      add(`bdc_plan_action_${fi}`, `Plan d'action professionnel`, 3, 14, "plan_action_bilan", { fi });
-      add(`bdc_synthese_${fi}`, `Synthèse bilan de compétences`, 3, 12, "synthese_bilan", { fi });
+    // CT1 - IND 1 : Programme
+    add("bdc_c1i1_programme", "CT1 - IND 1 Programme du bilan de compétences", 1, 1, "bdc_programme");
+    // CT1 - IND 2 : Indicateurs (Excel existant)
+    add("bdc_c1i2_indicateurs", "CT1 - IND 2 Indicateurs de performance (Excel)", 1, 2, "indicateurs_performance");
+
+    // CT2 - IND 4 : Évaluation des besoins (per bénéficiaire)
+    stagiaires.forEach((s, si) => {
+      add(`bdc_c2i4_eval_besoins_${si}`, `CT2 - IND 4 Évaluation des besoins – ${s.prenom} ${s.nom}`, 2, 4, "bdc_eval_besoins", { stagiaireIdx: si });
     });
+
+    // CT2 - IND 5 : Document de synthèse (per bénéficiaire) - PIÈCE CENTRALE
+    stagiaires.forEach((s, si) => {
+      add(`bdc_c2i5_synthese_${si}`, `CT2 - IND 5 Document de synthèse – ${s.prenom} ${s.nom}`, 2, 5, "bdc_document_synthese", { stagiaireIdx: si });
+    });
+
+    // CT2 - IND 6 : Déroulé et modalités + Enquête métier
+    add("bdc_c2i6_deroule", "CT2 - IND 6 Déroulé et modalités du bilan de compétences", 2, 6, "bdc_deroule_modalites");
+    stagiaires.forEach((s, si) => {
+      add(`bdc_c2i6_enquete_metier_${si}`, `CT2 - IND 6 Enquête métier – ${s.prenom} ${s.nom}`, 2, 6, "bdc_enquete_metier", { stagiaireIdx: si });
+    });
+
+    // CT3 - IND 9 : CGV, Contrat, Convention, Formulaire attentes
+    add("bdc_c3i9_cgv", "CT3 - IND 9 CGV – Bilan de compétences", 3, 9, "bdc_cgv");
+    stagiaires.forEach((s, si) => {
+      add(`bdc_c3i9_contrat_${si}`, `CT3 - IND 9 Contrat de bilan – ${s.prenom} ${s.nom}`, 3, 9, "bdc_contrat", { stagiaireIdx: si });
+      add(`bdc_c3i9_convention_${si}`, `CT3 - IND 9 Convention de bilan – ${s.prenom} ${s.nom}`, 3, 9, "bdc_convention", { stagiaireIdx: si });
+      add(`bdc_c3i9_attentes_${si}`, `CT3 - IND 9 Formulaire d'attentes et objectifs – ${s.prenom} ${s.nom}`, 3, 9, "bdc_formulaire_attentes", { stagiaireIdx: si });
+    });
+
+    // CT3 - IND 10 : Convocation + Synopsis
+    stagiaires.forEach((s, si) => {
+      add(`bdc_c3i10_convocation_${si}`, `CT3 - IND 10 Convocation au bilan – ${s.prenom} ${s.nom}`, 3, 10, "bdc_convocation", { stagiaireIdx: si });
+      add(`bdc_c3i10_synopsis_${si}`, `CT3 - IND 10 Synopsis – ${s.prenom} ${s.nom}`, 3, 10, "bdc_synopsis", { stagiaireIdx: si });
+    });
+
+    // CT3 - IND 11 : Grille de suivi + Suivi post-bilan
+    stagiaires.forEach((s, si) => {
+      add(`bdc_c3i11_grille_suivi_${si}`, `CT3 - IND 11 Grille de suivi – ${s.prenom} ${s.nom}`, 3, 11, "bdc_grille_suivi", { stagiaireIdx: si });
+      add(`bdc_c3i11_suivi_post_${si}`, `CT3 - IND 11 Questionnaire suivi post-bilan – ${s.prenom} ${s.nom}`, 3, 11, "bdc_suivi_post_bilan", { stagiaireIdx: si });
+    });
+
+    // CT3 - IND 12 : Procédure d'adaptation
+    add("bdc_c3i12_procedure_adaptation", "CT3 - IND 12 Procédure d'adaptation de l'accompagnement", 3, 12, "bdc_procedure_adaptation");
+
+    // CT4 - IND 18 : Organigramme (existant)
+    add("bdc_c4i18_organigramme", "CT4 - IND 18 Organigramme", 4, 18, "organigramme");
+
+    // CT4 - IND 19 : Exploration métier
+    stagiaires.forEach((s, si) => {
+      add(`bdc_c4i19_exploration_metier_${si}`, `CT4 - IND 19 Exploration métier – ${s.prenom} ${s.nom}`, 4, 19, "bdc_exploration_metier", { stagiaireIdx: si });
+    });
+
+    // CT5 - IND 21 : Fiche de poste consultant + Compte rendu fin + Fiche intervenant
+    add("bdc_c5i21_fiche_poste", "CT5 - IND 21 Fiche de poste consultant bilan", 5, 21, "bdc_fiche_poste_consultant");
+    stagiaires.forEach((s, si) => {
+      add(`bdc_c5i21_compte_rendu_${si}`, `CT5 - IND 21 Compte rendu de fin de bilan – ${s.prenom} ${s.nom}`, 5, 21, "bdc_compte_rendu_fin", { stagiaireIdx: si });
+    });
+    add("bdc_c5i21_fiche_intervenant", "CT5 - IND 21 Fiche intervenant externe", 5, 21, "bdc_fiche_intervenant");
+
+    // CT6 - IND 23/24/25 : Veille (existants)
+    add("bdc_c6i23_veille_reglementaire", "CT6 - IND 23 Veille réglementaire", 6, 23, "veille_reglementaire");
+    add("bdc_c6i24_veille_metier", "CT6 - IND 24 Veille métier", 6, 24, "veille_metier");
+    add("bdc_c6i25_veille_technologique", "CT6 - IND 25 Veille technologique", 6, 25, "veille_technologique");
+
+    // CT6 - IND 26 : Handicap + Partenaires (existants)
+    add("bdc_c6i26_veille_handicap", "CT6 - IND 26 Veille handicap", 6, 26, "veille_handicap");
+    add("bdc_c6i26_liste_partenaires", "CT6 - IND 26 Liste des partenaires locaux", 6, 26, "liste_partenaires");
+
+    // CT6 - IND 27 : Sous-traitance (existant)
+    add("bdc_c6i27_contrat_sous_traitance", "CT6 - IND 27 Contrat de sous-traitance", 6, 27, "contrat_sous_traitance");
+
+    // CT7 - IND 30 : Satisfaction à chaud (per bénéficiaire) + Relances Excel
+    stagiaires.forEach((s, si) => {
+      add(`bdc_c7i30_satisfaction_${si}`, `CT7 - IND 30 Satisfaction à chaud – ${s.prenom} ${s.nom}`, 7, 30, "bdc_satisfaction_chaud", { stagiaireIdx: si });
+    });
+    add("bdc_c7i30_relances_excel", "CT7 - IND 30 Tableau de relance des appréciations (Excel)", 7, 30, "relances_appreciations_excel");
+
+    // CT7 - IND 31 : Réclamations
+    add("bdc_c7i31_formulaire_reclamation", "CT7 - IND 31 Formulaire de dépôt de réclamation", 7, 31, "bdc_formulaire_reclamation");
+    add("bdc_c7i31_gestion_reclamations", "CT7 - IND 31 Gestion des réclamations et dysfonctionnements", 7, 31, "bdc_gestion_reclamations");
+    add("bdc_c7i31_suivi_dysfonctionnements", "CT7 - IND 31 Suivi de dysfonctionnements (Excel)", 7, 31, "suivi_dysfonctionnements_excel");
+
+    // CT7 - IND 32 : Amélioration continue
+    add("bdc_c7i32_actions_correctives", "CT7 - IND 32 Tableau actions correctives", 7, 32, "bdc_actions_correctives");
+    add("bdc_c7i32_amelioration_excel", "CT7 - IND 32 Tableau d'amélioration continue (Excel)", 7, 32, "tableau_amelioration_continue_excel");
   }
 
   // ===== VAE — VALIDATION DES ACQUIS DE L'EXPÉRIENCE =====
