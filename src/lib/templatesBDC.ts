@@ -572,3 +572,99 @@ ${veillTable("Exploitation", "Sensibilisation à l'évolution technologique des 
     ],
   });
 }
+
+// ===== CT6 - IND 27 : Contrat de sous-traitance BDC (style IZIBUSINESS) =====
+export function genContratSousTraitanceBDC(o: OrganismeInfo, f: FormationInfo) {
+  const today = new Date();
+  const dateContrat = formatDate(today.toISOString().slice(0, 10));
+  const dateFinContrat = formatDate(new Date(today.getFullYear() + 1, today.getMonth(), today.getDate()).toISOString().slice(0, 10));
+
+  return buildDocument({
+    org: o,
+    title: "CONTRAT DE SOUS-TRAITANCE",
+    sections: [
+      {
+        heading: "",
+        content: `<p>Entre les soussignés :</p>
+<p><strong>IZIBUSINESS</strong>,<br>
+SASU au capital de 100 €, immatriculée au RCS de Créteil sous le numéro <strong>892 035 320 00019</strong>,<br>
+ayant son siège social au <strong>1 Place des Alliés, 94600 Choisy-le-Roi</strong>,<br>
+détentrice d'un numéro d'activité en cours (déclaration d'activité enregistrée auprès du préfet de région),<br>
+représentée par <strong>Madame DENDANI Nadine</strong>, en sa qualité de <strong>Dirigeante</strong>,<br>
+ci-après dénommée "le Sous-traitant",</p>
+
+<p>ET :</p>
+
+<p><strong>${o.nom}</strong>,<br>
+Organisme de formation déclaré,<br>
+ayant son siège au <strong>${o.adresse || ""}</strong>,<br>
+${o.siret ? `immatriculé sous le SIRET <strong>${o.siret}</strong>,<br>` : ""}
+représenté par <strong>${o.dirigeant || "Le/la dirigeant(e)"}</strong>,<br>
+ci-après dénommé "le Donneur d'ordre",</p>`,
+      },
+      {
+        heading: "Article 1 – Objet du contrat",
+        content: `<p>Le présent contrat a pour objet de définir les modalités de <strong>sous-traitance des démarches Qualiopi</strong> confiées par <strong>${o.nom}</strong> à <strong>IZIBUSINESS</strong>, en qualité de prestataire externe.</p>
+<p>IZIBUSINESS s'engage à réaliser pour le compte de ${o.nom} :</p>
+<ul>
+<li>La constitution et la mise à jour du <strong>dossier qualité</strong> (indicateurs du Référentiel National Qualité) ;</li>
+<li>L'accompagnement aux <strong>audits Qualiopi</strong> (initial, surveillance ou renouvellement) ;</li>
+<li>La mise à disposition de <strong>documents types</strong> (procédures, fiches, modèles conformes) ;</li>
+<li>Le suivi mensuel des actions de mise en conformité et d'archivage ;</li>
+<li>Tout autre acte administratif lié à la certification qualité.</li>
+</ul>`,
+      },
+      {
+        heading: "Article 2 – Durée du contrat",
+        content: `<p>Le présent contrat est conclu pour une <strong>durée de 1 an</strong>, à compter du <strong>${dateContrat}</strong>, jusqu'au <strong>${dateFinContrat}</strong> inclus.<br>
+Il est renouvelable par tacite reconduction sauf dénonciation par lettre recommandée avec préavis de 30 jours.</p>`,
+      },
+      {
+        heading: "Article 3 – Conditions financières",
+        content: `<p>Les modalités de rémunération et le montant total de la prestation seront fixés <strong>par un acte ultérieur</strong> (devis ou convention spécifique), signé par les deux parties.<br>
+Le présent contrat reconnaît uniquement le <strong>principe de sous-traitance exclusive à IZIBUSINESS</strong> pour les actions Qualiopi pendant la durée mentionnée.</p>`,
+      },
+      {
+        heading: "Article 4 – Obligations du Sous-traitant",
+        content: `<p>IZIBUSINESS s'engage à :</p>
+<ul>
+<li>Respecter la confidentialité des informations transmises par ${o.nom} ;</li>
+<li>Utiliser des documents et procédures conformes aux exigences du Référentiel Qualiopi ;</li>
+<li>Tenir à disposition les justificatifs nécessaires en cas d'audit ou de contrôle ;</li>
+<li>Conserver les documents dans un espace partagé sécurisé, selon les instructions du donneur d'ordre.</li>
+</ul>`,
+      },
+      {
+        heading: "Article 5 – Obligations du Donneur d'ordre",
+        content: `<p>${o.nom} s'engage à :</p>
+<ul>
+<li>Fournir à IZIBUSINESS tous les documents nécessaires à l'accomplissement de sa mission ;</li>
+<li>Prévenir IZIBUSINESS de tout changement d'activité ou de coordonnées ;</li>
+<li>Respecter les délais et modalités convenus dans les éventuelles annexes financières ;</li>
+<li>Mentionner IZIBUSINESS comme partenaire sous-traitant en cas de demande du certificateur.</li>
+</ul>`,
+      },
+      {
+        heading: "Article 6 – Résiliation",
+        content: `<p>Le contrat pourra être résilié de plein droit par l'une ou l'autre des parties, en cas de manquement grave aux obligations contractuelles, et ce, après mise en demeure restée infructueuse pendant <strong>15 jours</strong>.</p>`,
+      },
+      {
+        heading: "Article 7 – Juridiction compétente",
+        content: `<p>En cas de litige, les parties s'engagent à rechercher une solution amiable.<br>
+À défaut d'accord, le litige relèvera de la compétence exclusive des tribunaux du ressort de <strong>Créteil</strong>.</p>`,
+      },
+      {
+        heading: "",
+        content: `<p><strong>Fait à Choisy-le-Roi,</strong><br>
+Le <strong>${dateContrat}</strong>,<br>
+En <strong>deux exemplaires originaux</strong>.</p>`,
+      },
+    ],
+    signatures: {
+      type: "2",
+      labels: ["Pour IZIBUSINESS\nMadame DENDANI Nadine\nDirigeante", `Pour ${o.nom}\n${o.dirigeant || "Le/la dirigeant(e)"}`],
+      names: ["", ""],
+      dates: ["", ""],
+    },
+  });
+}
