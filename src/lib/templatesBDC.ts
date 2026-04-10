@@ -276,14 +276,14 @@ export function genQuestionnaireEnqueteMetiersBDC(o: OrganismeInfo, f: Formation
 export function genSuiviPostBilanBDC(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = stagiaires[si] || stagiaires[0];
   return buildDocument({ org: o, title: "QUESTIONNAIRE DE SUIVI POST BILAN DE COMPÉTENCES", subtitle: "À remplir 6 mois après la fin du bilan", stagiaires: [s], sections: [
-    { heading: "Identification", content: `<p><strong>Bénéficiaire :</strong> ${beneficiaireLabel(s)}<br><strong>Consultant(e) :</strong> ${consultantName(o)}<br><strong>Date du bilan :</strong> du ${startDate(s, f)} au ${endDate(s, f)}<br><strong>Date du questionnaire :</strong> ____/____/________</p>` },
+    { heading: "Identification", content: `<p><strong>Bénéficiaire :</strong> <br><strong>Consultant(e) :</strong> <br><strong>Date du bilan :</strong> du ____/____/________ au ____/____/________<br><strong>Date du questionnaire :</strong> ____/____/________</p>` },
     { heading: "1. Avez-vous mis en œuvre votre plan d'action ?", content: "<p>☐ Oui, intégralement<br>☐ Oui, partiellement<br>☐ Non, pas encore<br>Précisions : _______________________________</p>" },
     { heading: "2. Votre projet professionnel a-t-il évolué ?", content: "<p>☐ Je poursuis le même projet<br>☐ J'ai modifié mon projet<br>☐ J'ai abandonné mon projet<br>Précisions : _______________________________</p>" },
     { heading: "3. Avez-vous suivi une formation complémentaire ?", content: "<p>☐ Oui – Laquelle : _______________________________<br>☐ Non</p>" },
     { heading: "4. Votre situation professionnelle actuelle", content: "<p>☐ En poste (même employeur)<br>☐ En poste (nouvel employeur)<br>☐ En recherche d'emploi<br>☐ En formation<br>☐ Création d'entreprise<br>☐ Autre : _______________________________</p>" },
     { heading: "5. Le bilan vous a-t-il aidé dans vos démarches ?", content: "<p>☐ Très utile<br>☐ Assez utile<br>☐ Peu utile<br>☐ Pas utile</p>" },
     { heading: "6. Commentaires libres", content: "<p>_______________________________<br>_______________________________<br>_______________________________</p>" },
-  ], signatures: { type: "2", labels: [`${g(s, "Le Consultant", "La Consultante")}`, `${g(s, "Le Bénéficiaire", "La Bénéficiaire")}`], names: [consultantName(o), beneficiaireLabel(s)], dates: [endDate(s, f), endDate(s, f)] } });
+  ] });
 }
 
 // ===== CR3 - IND 12 : Procédure d'adaptation =====
