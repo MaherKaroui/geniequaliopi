@@ -575,9 +575,10 @@ ${veillTable("Exploitation", "Sensibilisation à l'évolution technologique des 
 
 // ===== CT6 - IND 27 : Contrat de sous-traitance BDC (style IZIBUSINESS) =====
 export function genContratSousTraitanceBDC(o: OrganismeInfo, f: FormationInfo) {
-  const today = new Date();
-  const dateContrat = formatDate(today.toISOString().slice(0, 10));
-  const dateFinContrat = formatDate(new Date(today.getFullYear() + 1, today.getMonth(), today.getDate()).toISOString().slice(0, 10));
+  const majDate = o.dateMaj || new Date().toISOString().slice(0, 10);
+  const dateContrat = formatDate(majDate);
+  const oneYearLater = (() => { const d = new Date(majDate); d.setFullYear(d.getFullYear() + 1); return d.toISOString().slice(0, 10); })();
+  const dateFinContrat = formatDate(oneYearLater);
 
   return buildDocument({
     org: o,
