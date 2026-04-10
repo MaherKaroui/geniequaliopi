@@ -184,7 +184,8 @@ export function genFormulaireAttentesBDC(o: OrganismeInfo, f: FormationInfo, sta
 // ===== CR3 - IND 10 : Convocation au bilan =====
 export function genConvocationBDC(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = stagiaires[si] || stagiaires[0];
-  const dt = sigDateBDC(s, f);
+  const ref = s?.dateDebutFormation || f.dateDebut || "";
+  const dt = ref ? formatDate(subtractBusinessDays(ref, 14)) : new Date().toLocaleDateString("fr-FR");
   return buildDocument({ org: o, title: "CONVOCATION AU BILAN DE COMPÉTENCES", subtitle: `Émise le ${dt}`, stagiaires: [s], sections: [
     { heading: "Organisme prestataire", content: `<p><strong>${o.nom}</strong><br>${o.adresse}<br>SIRET : ${o.siret || "—"}<br>${o.email || ""} | ${o.telephone || ""}<br>Consultant(e) : ${consultantName(o)}</p>` },
     { heading: "Destinataire", content: `<p><strong>${g(s, "M.", "Mme")} ${beneficiaireLabel(s)}</strong><br>${s.email || ""} | ${s.telephone || ""}</p>` },
@@ -192,7 +193,7 @@ export function genConvocationBDC(o: OrganismeInfo, f: FormationInfo, stagiaires
     { heading: "Informations sur la prestation", content: `<p>• <strong>Intitulé :</strong> Bilan de compétences – ${f.intitule}<br>• <strong>Date de début :</strong> ${startDate(s, f)}<br>• <strong>Date de fin :</strong> ${endDate(s, f)}<br>• <strong>Durée totale :</strong> ${dureeLabel(f)} (en ${(f.modalites || "présentiel").toLowerCase()})<br>• <strong>Lieu :</strong> ${o.adresse || "Locaux de l'organisme"}<br>• <strong>Consultant(e) :</strong> ${consultantName(o)}</p>`, variant: "green" },
     { heading: "Documents à apporter", content: "<p>• Pièce d'identité<br>• Copie du contrat de formation signé<br>• CV ou tout document utile à l'analyse de votre parcours</p>" },
     { heading: "Informations pratiques", content: `<p>Merci de vous présenter <strong>10 minutes avant l'heure de votre premier rendez-vous</strong>.<br>En cas d'empêchement, merci de nous prévenir au plus tôt au ${o.telephone || "—"}.</p><p>Cordialement,<br>${consultantName(o)}<br>${o.nom}</p>` },
-  ] });
+  ], signatures: { type: "2", labels: [`${g(s, "Le Consultant", "La Consultante")}`, `${g(s, "Le Bénéficiaire", "La Bénéficiaire")}`], names: [consultantName(o), beneficiaireLabel(s)], dates: [dt, dt] } });
 }
 
 // ===== CR3 - IND 10 : Synopsis =====
@@ -207,7 +208,7 @@ export function genSynopsisBDC(o: OrganismeInfo, f: FormationInfo, stagiaires: S
     { heading: `Phase 3 : Phase de conclusion (${ph.p3.start} – ${ph.p3.end})`, content: "<p>• <strong>Synthèse des résultats</strong> : bilan des compétences et points d'amélioration.<br>• <strong>Définition du projet professionnel</strong> : validation ou ajustement du projet initial.<br>• <strong>Élaboration du plan d'action</strong> : recommandations et étapes à suivre.<br>• <strong>Entretien de restitution</strong> : présentation et validation du bilan.</p>" },
     { heading: "Modalités d'accompagnement", content: "<p>• Entretiens individuels réguliers (en présentiel ou visioconférence)<br>• Support documentaire et outils d'auto-évaluation<br>• Suivi personnalisé et conseils adaptés</p>" },
     { heading: "Résultats attendus", content: `<p>• Clarification du projet professionnel<br>• Identification précise des compétences maîtrisées et à développer<br>• Plan d'action réaliste et adapté<br>• Meilleure connaissance du marché de ${f.intitule} et des opportunités</p>` },
-  ], signatures: { type: "2", labels: [`${g(s, "Le Consultant", "La Consultante")}`, `${g(s, "Le Bénéficiaire", "La Bénéficiaire")}`], names: [consultantName(o), beneficiaireLabel(s)] } });
+  ], signatures: { type: "2", labels: [`${g(s, "Le Consultant", "La Consultante")}`, `${g(s, "Le Bénéficiaire", "La Bénéficiaire")}`], names: [consultantName(o), beneficiaireLabel(s)], dates: [(() => { const r = s?.dateDebutFormation || f.dateDebut || ""; return r ? formatDate(subtractBusinessDays(r, 14)) : new Date().toLocaleDateString("fr-FR"); })(), (() => { const r = s?.dateDebutFormation || f.dateDebut || ""; return r ? formatDate(subtractBusinessDays(r, 14)) : new Date().toLocaleDateString("fr-FR"); })()] } });
 }
 
 // ===== CR3 - IND 11 : Grille de suivi =====
@@ -235,7 +236,7 @@ export function genGrilleSuiviBDC(o: OrganismeInfo, f: FormationInfo, stagiaires
   }
   return buildDocument({ org: o, title: "GRILLE DE SUIVI DU BILAN DE COMPÉTENCES", stagiaires: [s], sections: [
     { heading: "Informations", content: `<p><strong>Bénéficiaire :</strong> ${beneficiaireLabel(s)}<br><strong>Domaine :</strong> ${f.intitule}<br><strong>Organisme :</strong> ${o.nom}<br><strong>Période :</strong> ${startDate(s, f)} – ${endDate(s, f)}</p>` },
-  ], table: { headers: ["Date", "Étapes du bilan", "Actions réalisées", "Observations"], rows }, signatures: { type: "2", labels: [`${g(s, "Le Consultant", "La Consultante")}`, `${g(s, "Le Bénéficiaire", "La Bénéficiaire")}`], names: [consultantName(o), beneficiaireLabel(s)] } });
+  ], table: { headers: ["Date", "Étapes du bilan", "Actions réalisées", "Observations"], rows } });
 }
 
 // ===== CR3 - IND 11 : Questionnaire suivi post-bilan =====
@@ -296,7 +297,7 @@ export function genCompteRenduFinBDC(o: OrganismeInfo, f: FormationInfo, stagiai
     { heading: "2. Déroulement du bilan", content: `<p>Le bilan s'est déroulé sur la période prévue, dans le respect des trois phases :<br><br><strong>Phase préliminaire :</strong><br>• Définition des objectifs<br>• Analyse des attentes et clarification du contexte<br>• Validation de la pertinence de la démarche<br><br><strong>Phase d'investigation :</strong><br>• Exploration du parcours et identification des compétences<br>• Tests de personnalité et d'aptitudes<br>• Enquête métier avec un professionnel du secteur<br><br><strong>Phase de conclusion :</strong><br>• Validation du projet professionnel<br>• Élaboration d'un plan d'action détaillé<br>• Remise du document de synthèse</p>`, variant: "green" },
     { heading: "3. Appréciation du consultant", content: `<p>Tout au long du parcours, ${beneficiaireLabel(s)} a fait preuve d'un excellent engagement. ${g(s, "Il", "Elle")} a abordé chaque exercice avec sérieux, curiosité et sens critique. Son sens de l'analyse, sa rigueur et sa capacité à se remettre en question ont été particulièrement appréciés.<br><br>${beneficiaireLabel(s)} a su mettre en évidence de nombreuses compétences transférables :<br>• Sens de l'organisation<br>• Créativité et adaptabilité<br>• Rigueur et méthode<br>• Esprit d'équipe et sens du service</p>` },
     { heading: "4. Conclusion", content: `<p>Le bilan de compétences s'est déroulé dans de bonnes conditions. ${g(s, "Le", "La")} bénéficiaire repart avec un projet professionnel validé et un plan d'action concret. Un entretien de suivi est prévu dans les 6 mois suivant la fin du bilan.</p>` },
-  ], signatures: { type: "2", labels: [`${g(s, "Le Consultant", "La Consultante")}`, `${g(s, "Le Bénéficiaire", "La Bénéficiaire")}`], names: [consultantName(o), beneficiaireLabel(s)] } });
+  ], signatures: { type: "2", labels: [`${g(s, "Le Consultant", "La Consultante")}`, `${g(s, "Le Bénéficiaire", "La Bénéficiaire")}`], names: [consultantName(o), beneficiaireLabel(s)], dates: [endDate(s, f), endDate(s, f)] } });
 }
 
 // ===== CR5 - IND 21 : Fiche intervenant externe =====
@@ -307,15 +308,23 @@ export function genFicheIntervenantExterneBDC(o: OrganismeInfo, f: FormationInfo
     { heading: "Compétences et qualifications", content: `<p>• <strong>Diplôme :</strong> Qualification dans le domaine de ${f.intitule}<br>• <strong>Expérience :</strong> Minimum 1 an dans le secteur<br>• <strong>Expérience en transmission :</strong> Ateliers, formation professionnelle ou encadrement</p>`, variant: "green" },
     { heading: "Rôle dans le bilan", content: "<p>• Intervention lors de la <strong>phase d'investigation</strong> du bilan<br>• Présentation du métier : conditions, débouchés, réalités terrain<br>• Partage d'expérience et retour constructif<br>• Participation à la validation du projet du bénéficiaire</p>" },
     { heading: "Modalités d'intervention", content: "<p>• <strong>Type :</strong> Présentiel / Visio<br>• <strong>Durée estimée :</strong> 2 à 4 heures<br>• <strong>Supports fournis :</strong> Témoignage oral, fiche métier, démonstration éventuelle</p>" },
-  ], signatures: { type: "2", labels: ["Le Prestataire", "L'Intervenant externe"], names: [consultantName(o), ""] } });
+  ] });
 }
 
 // ===== CR7 - IND 30 : Satisfaction à chaud BDC =====
 export function genSatisfactionChaudBDC(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = stagiaires[si] || stagiaires[0];
+  const dtFin = endDate(s, f);
+  // Bonnes réponses réalistes : majorité "Très satisfait(e)" avec quelques "Satisfait(e)"
   const satisfactionTable = (title: string, questions: string[]) => {
     const headers = ["Questions", "Très satisfait(e)", "Satisfait(e)", "Moyennement", "Pas satisfait(e)"];
-    const rows = questions.map((q, i) => [q, i < 3 ? "✓" : "", i >= 3 ? "✓" : "", "", ""]);
+    const patterns = [
+      ["X", "", "", ""],
+      ["X", "", "", ""],
+      ["", "X", "", ""],
+      ["X", "", "", ""],
+    ];
+    const rows = questions.map((q, i) => [q, ...patterns[i % patterns.length]]);
     return `<h2>${title}</h2>${tableHTML(headers, rows)}`;
   };
   const body = orgHeader(o);
@@ -331,11 +340,11 @@ export function genSatisfactionChaudBDC(o: OrganismeInfo, f: FormationInfo, stag
   content += satisfactionTable("3. Résultats et utilité", [
     "La pertinence du document de synthèse", "La clarté du plan d'action", "L'utilité du bilan pour votre avenir professionnel", "Votre satisfaction globale"
   ]);
-  content += `<h2>4. Commentaires</h2><p>Ce qui vous a le plus apporté : ___________________________<br><br>Suggestions d'amélioration : ___________________________<br><br>Recommanderiez-vous ce bilan ? ☐ Oui ☐ Non</p>`;
+  content += `<h2>4. Commentaires</h2><p>Ce qui vous a le plus apporté : L'accompagnement personnalisé et la clarté du plan d'action.<br><br>Suggestions d'amélioration : RAS – très satisfait(e) de la prestation.<br><br>Recommanderiez-vous ce bilan ? ☒ Oui ☐ Non</p>`;
   
   return buildDocument({ org: o, title: "QUESTIONNAIRE DE SATISFACTION À CHAUD – BILAN DE COMPÉTENCES", stagiaires: [s], extraHtml: content.replace(/<h1>.*?<\/h1>/, ""), sections: [
     { heading: "", content: `<p><strong>Bénéficiaire :</strong> ${beneficiaireLabel(s)}<br><strong>Date du bilan :</strong> du ${startDate(s, f)} au ${endDate(s, f)}<br><strong>Consultant(e) :</strong> ${consultantName(o)}</p>` },
-  ], signatures: { type: "2", labels: [`${g(s, "Le Consultant", "La Consultante")}`, `${g(s, "Le Bénéficiaire", "La Bénéficiaire")}`], names: [consultantName(o), beneficiaireLabel(s)] } });
+  ], signatures: { type: "2", labels: [`${g(s, "Le Consultant", "La Consultante")}`, `${g(s, "Le Bénéficiaire", "La Bénéficiaire")}`], names: [consultantName(o), beneficiaireLabel(s)], dates: [dtFin, dtFin] } });
 }
 
 // ===== CR7 - IND 31 : Formulaire de réclamation BDC =====
@@ -344,7 +353,7 @@ export function genFormulaireReclamationBDC(o: OrganismeInfo) {
     { heading: "Identification", content: "<p>Nom : ___________________________<br>Prénom : ___________________________<br>Date de naissance : ___________________________<br>Adresse : ___________________________<br>Téléphone : ___________________________<br>Mail : ___________________________<br>Date du bilan : ___________________________<br>Intitulé du bilan : ___________________________</p>" },
     { heading: "Description de la réclamation", content: "<p>Veuillez détailler de manière la plus précise possible votre réclamation :<br>___________________________<br>___________________________<br>___________________________<br>___________________________</p>" },
     { heading: "Autorisation", content: `<p>J'autorise le centre ${o.nom} à conserver ce formulaire pour améliorer la qualité des prestations et à reprendre contact avec moi :<br><br>☐ Oui &nbsp;&nbsp;&nbsp;&nbsp; ☐ Non</p>` },
-  ], signatures: { type: "2", labels: ["Le Prestataire", "Le Bénéficiaire"], names: [consultantName(o), ""] } });
+  ] });
 }
 
 // ===== CR7 - IND 31 : Gestion des réclamations BDC =====
