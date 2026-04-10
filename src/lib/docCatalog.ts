@@ -868,10 +868,12 @@ export function buildFullCatalog(
     // CT4 - IND 18 : Organigramme (existant)
     add("bdc_c4i18_organigramme", "CT4 - IND 18 Organigramme", 4, 18, "organigramme");
 
-    // CT4 - IND 19 : Exploration métier
+    // CT4 - IND 19 : Exploration métier + Ressources pédagogiques
     stagiaires.forEach((s, si) => {
       add(`bdc_c4i19_exploration_metier_${si}`, `CT4 - IND 19 Exploration métier – ${s.prenom} ${s.nom}`, 4, 19, "bdc_exploration_metier", { stagiaireIdx: si });
     });
+    add(`bdc_c4i19_guide_protocoles`, `CT4 - IND 19 Guide des protocoles métier`, 4, 19, "bdc_guide_protocoles");
+    add(`bdc_c4i19_tableau_bases`, `CT4 - IND 19 Tableau des bases métier`, 4, 19, "bdc_tableau_bases");
 
     // CT5 - IND 21 : Fiche de poste consultant + Compte rendu fin + Fiche intervenant
     add("bdc_c5i21_fiche_poste", "CT5 - IND 21 Fiche de poste consultant bilan", 5, 21, "bdc_fiche_poste_consultant");

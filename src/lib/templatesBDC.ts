@@ -308,6 +308,55 @@ export function genExplorationMetierBDC(o: OrganismeInfo, f: FormationInfo, stag
   ], signatures: { type: "2", labels: [`${g(s, "Le Consultant", "La Consultante")}`, `${g(s, "Le Bénéficiaire", "La Bénéficiaire")}`], names: [consultantName(o), beneficiaireLabel(s)] } });
 }
 
+// ===== CR4 - IND 19 : Guide des protocoles métier =====
+export function genGuideProtocolesBDC(o: OrganismeInfo, f: FormationInfo) {
+  const domain = f.intitule || "Esthétique";
+  const style = getDocStyle();
+  const imgStyle = `width:100%;max-height:220px;object-fit:cover;border-radius:8px;margin:10px 0;`;
+  return buildDocument({ org: o, title: `GUIDE DES PROTOCOLES – ${domain.toUpperCase()}`, subtitle: `Ressource pédagogique – Bilan de compétences`, sections: [
+    { heading: "Introduction", content: `<p>Ce guide recense les protocoles essentiels du domaine de <strong>${domain}</strong>. Il constitue une ressource pédagogique mise à disposition du bénéficiaire dans le cadre de son bilan de compétences, pour l'aider à identifier, consolider et valoriser ses compétences techniques.</p>` },
+    { heading: "PROTOCOLE 1 – Soin du visage classique", content: `<img src="https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=800&q=80" alt="Soin du visage" style="${imgStyle}"/><p><strong>Objectif :</strong> Nettoyer, purifier et hydrater la peau du visage.<br><br><strong>Matériel nécessaire :</strong><br>• Lait démaquillant ou eau micellaire<br>• Lotion tonique<br>• Gommage doux (grains fins)<br>• Vapeur d'ozone ou serviette chaude<br>• Masque adapté au type de peau<br>• Crème hydratante de finition<br>• Cotons, compresses, spatule<br><br><strong>Déroulé :</strong><br>1. <strong>Démaquillage</strong> (5 min) – Appliquer le lait démaquillant en mouvements circulaires, rincer à la lotion tonique.<br>2. <strong>Analyse de peau</strong> (3 min) – Observer sous lampe loupe : type de peau, imperfections, zones de sécheresse.<br>3. <strong>Gommage</strong> (5 min) – Appliquer le gommage en évitant le contour des yeux, masser doucement.<br>4. <strong>Vapozone / Serviette chaude</strong> (8 min) – Ouvrir les pores pour faciliter l'extraction.<br>5. <strong>Extraction</strong> (10 min) – Retirer les comédons avec précaution à l'aide de cotons.<br>6. <strong>Masque</strong> (15 min) – Appliquer le masque adapté, laisser poser.<br>7. <strong>Hydratation finale</strong> (5 min) – Crème hydratante + protection solaire si nécessaire.</p>`, variant: "green" },
+    { heading: "PROTOCOLE 2 – Épilation à la cire", content: `<img src="https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=800&q=80" alt="Épilation professionnelle" style="${imgStyle}"/><p><strong>Objectif :</strong> Retirer les poils de manière durable et hygiénique.<br><br><strong>Matériel nécessaire :</strong><br>• Cire tiède ou chaude (pot ou cartouche)<br>• Chauffe-cire<br>• Bandes non-tissées (si cire tiède)<br>• Huile post-épilation<br>• Talc, spatules, gants<br><br><strong>Déroulé :</strong><br>1. <strong>Préparation</strong> (3 min) – Désinfecter la zone, appliquer du talc pour absorber l'humidité.<br>2. <strong>Test de température</strong> – Vérifier sur le poignet avant application.<br>3. <strong>Application</strong> – Dans le sens de la pousse du poil, couche fine et régulière.<br>4. <strong>Retrait</strong> – D'un geste sec, dans le sens inverse de la pousse.<br>5. <strong>Finition</strong> – Appliquer l'huile post-épilation pour apaiser et retirer les résidus.</p><p><strong>Précautions :</strong><br>• Vérifier les contre-indications (varices, traitements médicamenteux, coups de soleil)<br>• Respecter les règles d'hygiène strictes (spatule à usage unique)</p>` },
+    { heading: "PROTOCOLE 3 – Manucure complète", content: `<img src="https://images.unsplash.com/photo-1604654894610-df63bc536371?w=800&q=80" alt="Manucure professionnelle" style="${imgStyle}"/><p><strong>Objectif :</strong> Embellir les mains et les ongles, traiter les cuticules.<br><br><strong>Matériel nécessaire :</strong><br>• Dissolvant, cotons<br>• Lime à ongles (grain 180/240)<br>• Bâtonnet de buis ou repousse-cuticules<br>• Bol d'eau tiède + savon doux<br>• Coupe-ongles, pince à envies<br>• Base coat, vernis, top coat<br>• Crème hydratante mains<br><br><strong>Déroulé :</strong><br>1. <strong>Retrait du vernis</strong> (3 min)<br>2. <strong>Limage</strong> (5 min) – Forme choisie par la cliente (ronde, carrée, amande)<br>3. <strong>Trempage</strong> (5 min) – Ramollir les cuticules dans l'eau tiède.<br>4. <strong>Soin des cuticules</strong> (5 min) – Repousser et retirer les envies.<br>5. <strong>Massage des mains</strong> (5 min) – Crème hydratante.<br>6. <strong>Pose du vernis</strong> (10 min) – Base, 2 couches de couleur, top coat.</p>` },
+    { heading: "PROTOCOLE 4 – Maquillage jour / naturel", content: `<img src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=800&q=80" alt="Maquillage professionnel" style="${imgStyle}"/><p><strong>Objectif :</strong> Sublimer le visage de manière naturelle pour un rendu quotidien.<br><br><strong>Déroulé :</strong><br>1. <strong>Préparation</strong> – Hydrater la peau, appliquer un primer si nécessaire.<br>2. <strong>Teint</strong> – Fond de teint adapté à la carnation, estomper au pinceau ou à l'éponge. Correcteur sous les yeux si nécessaire.<br>3. <strong>Poudre</strong> – Fixer légèrement avec une poudre libre translucide.<br>4. <strong>Sourcils</strong> – Structurer avec un crayon ou gel teinté.<br>5. <strong>Yeux</strong> – Ombre à paupières neutre, trait de crayon discret, mascara.<br>6. <strong>Blush</strong> – Touche de couleur sur les pommettes.<br>7. <strong>Lèvres</strong> – Baume teinté ou rouge à lèvres nude.</p>` },
+    { heading: "PROTOCOLE 5 – Soin des pieds / Beauté des pieds", content: `<img src="https://images.unsplash.com/photo-1519415510236-718bdfcd89c8?w=800&q=80" alt="Soin des pieds" style="${imgStyle}"/><p><strong>Objectif :</strong> Traiter les callosités, embellir les ongles des pieds.<br><br><strong>Déroulé :</strong><br>1. <strong>Bain de pieds</strong> (10 min) – Eau tiède + sel ou huile essentielle.<br>2. <strong>Gommage</strong> (5 min) – Gommage mécanique sur les callosités.<br>3. <strong>Râpe / Pierre ponce</strong> (5 min) – Éliminer les peaux mortes sur les talons.<br>4. <strong>Soin des ongles</strong> (10 min) – Coupe, limage, cuticules.<br>5. <strong>Masque hydratant</strong> (10 min) – Envelopper les pieds dans une serviette chaude.<br>6. <strong>Massage + Vernis</strong> (10 min) – Hydratation et pose de vernis.</p>` },
+    { heading: "Références et normes", content: `<p>• Code de la santé publique – Normes d'hygiène en esthétique<br>• Référentiel CAP Esthétique Cosmétique Parfumerie<br>• Fiche ROME D1208 – Soins esthétiques et corporels<br>• Guide INRS – Prévention des risques en institut de beauté</p>` },
+  ] });
+}
+
+// ===== CR4 - IND 19 : Tableau des bases métier =====
+export function genTableauBasesBDC(o: OrganismeInfo, f: FormationInfo) {
+  const domain = f.intitule || "Esthétique";
+  return buildDocument({ org: o, title: `TABLEAU DES BASES – ${domain.toUpperCase()}`, subtitle: `Référentiel technique – Bilan de compétences`, sections: [
+    { heading: "Introduction", content: `<p>Ce tableau récapitulatif présente les bases techniques essentielles du domaine de <strong>${domain}</strong>. Il est remis au bénéficiaire en tant que ressource d'appui lors de la phase d'investigation du bilan de compétences.</p>` },
+  ], table: { headers: ["Catégorie", "Technique / Produit", "Ingrédients / Composants clés", "Dosage / Application", "Précautions"], rows: [
+    ["SOINS VISAGE", "Démaquillage", "Lait démaquillant, eau micellaire", "Appliquer au coton, mouvements circulaires", "Éviter le contour des yeux avec produits agressifs"],
+    ["", "Gommage mécanique", "Grains de jojoba, poudre de noyau", "1 noisette, masser 3-5 min", "Peau sensible : grains fins uniquement"],
+    ["", "Gommage enzymatique", "Enzymes de papaye / ananas", "Poser 10 min sans frotter", "Contre-indiqué sur peau lésée"],
+    ["", "Masque purifiant", "Argile verte, kaolin", "Couche épaisse, poser 15 min", "Ne pas laisser sécher complètement"],
+    ["", "Masque hydratant", "Acide hyaluronique, aloe vera", "Couche fine, poser 15-20 min", "Adapter au type de peau"],
+    ["", "Modelage facial", "Huile d'amande douce, jojoba", "Pressions douces, 15 min", "Attention zones fragiles"],
+    ["ÉPILATION", "Cire tiède", "Résine, colophane, huile", "Chauffer 40-45°C, bandes", "Test température obligatoire"],
+    ["", "Cire chaude", "Cire d'abeille, résine", "Chauffer 55-60°C, sans bande", "Contre-indiqué : varices, irritations"],
+    ["", "Cire orientale", "Sucre, citron, eau", "Tiède, à la main ou spatule", "Naturelle, hypoallergénique"],
+    ["", "Post-épilation", "Huile végétale, bisabolol", "Appliquer en massage doux", "Pas d'exposition solaire 24h"],
+    ["MAQUILLAGE", "Base / Primer", "Silicone, acide hyaluronique", "Noisette, estomper au doigt", "Laisser sécher avant fond de teint"],
+    ["", "Fond de teint", "Pigments, émollients", "Adapter à la carnation", "Choisir texture selon type de peau"],
+    ["", "Poudre libre", "Talc, silice, amidon", "Pinceau large, tapotements", "Éviter excès sur peaux sèches"],
+    ["", "Contouring", "Poudre bronzante, highlighter", "Creux des joues, arête du nez", "Estomper impérativement"],
+    ["MANUCURE", "Limage", "Lime 180/240 grains", "Un seul sens, forme choisie", "Ne pas limer en va-et-vient"],
+    ["", "Soin cuticules", "Huile de ricin, bâtonnet buis", "Repousser après trempage", "Ne jamais couper les cuticules"],
+    ["", "Base coat", "Résine, nitrocellulose", "1 couche fine et uniforme", "Protège l'ongle de la coloration"],
+    ["", "Vernis semi-permanent", "Gel UV, photoinitiateurs", "2 couches, catalyser 60s UV", "Dépose à l'acétone, ne pas arracher"],
+    ["SOINS CORPS", "Gommage corporel", "Sel marin, sucre, huile coco", "Mouvements circulaires, rincer", "Éviter sur peau irritée"],
+    ["", "Enveloppement", "Algues, argile, boue thermale", "Couvrir 20-30 min, film alimentaire", "Vérifier allergies"],
+    ["", "Massage relaxant", "Huile d'argan, lavande", "Pressions moyennes, 30-45 min", "Contre-indications médicales"],
+    ["HYGIÈNE / SÉCURITÉ", "Stérilisation outils", "Autoclave, UV", "Après chaque client", "Norme NF EN ISO 15883"],
+    ["", "Désinfection surfaces", "Bactéricide virucide", "Spray + essuyage", "Porter des gants"],
+    ["", "Lavage des mains", "Savon antiseptique, SHA", "30 sec min, entre chaque soin", "Obligatoire avant/après tout soin"],
+  ] } });
+}
+
 // ===== CR5 - IND 21 : Fiche de poste consultant bilan =====
 export function genFichePosteConsultantBDC(o: OrganismeInfo) {
   return buildDocument({ org: o, title: "FICHE DE POSTE – CONSULTANT(E) BILAN DE COMPÉTENCES", sections: [
