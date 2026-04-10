@@ -657,14 +657,19 @@ Le présent contrat reconnaît uniquement le <strong>principe de sous-traitance 
         heading: "",
         content: `<p><strong>Fait à Choisy-le-Roi,</strong><br>
 Le <strong>${dateContrat}</strong>,<br>
-En <strong>deux exemplaires originaux</strong>.</p>`,
+En <strong>deux exemplaires originaux</strong>.</p>
+
+<div style="display:flex;justify-content:space-between;margin-top:40px">
+  <div style="width:45%;text-align:center">
+    <p><strong>Pour IZIBUSINESS</strong><br>Madame DENDANI Nadine<br>Dirigeante<br><em>(Lu et approuvé)</em></p>
+    <img src="/images/izibusiness_tampon.png" alt="Tampon IZIBUSINESS" style="max-width:200px;margin:10px auto" />
+  </div>
+  <div style="width:45%;text-align:center">
+    <p><strong>Pour ${o.nom}</strong><br>${o.dirigeant || "Le/la dirigeant(e)"}<br><em>(Lu et approuvé)</em></p>
+    ${o.cachet ? `<img src="${o.cachet}" alt="Tampon" style="max-width:200px;margin:10px auto" />` : '<p style="margin-top:40px">Tampon :</p>'}
+  </div>
+</div>`,
       },
     ],
-    signatures: {
-      type: "2",
-      labels: ["Pour IZIBUSINESS\nMadame DENDANI Nadine\nDirigeante", `Pour ${o.nom}\n${o.dirigeant || "Le/la dirigeant(e)"}`],
-      names: ["", ""],
-      dates: ["", ""],
-    },
   });
 }
