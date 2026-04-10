@@ -60,7 +60,8 @@ export function genProgrammeBDC(o: OrganismeInfo, f: FormationInfo) {
 // ===== CR2 - IND 4 : Évaluation des besoins (per bénéficiaire) =====
 export function genEvaluationBesoins(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = stagiaires[si] || stagiaires[0];
-  const dt = sigDateBDC(s, f);
+  const ref = s?.dateDebutFormation || f.dateDebut || "";
+  const dt = ref ? formatDate(subtractBusinessDays(ref, 20)) : new Date().toLocaleDateString("fr-FR");
   return buildDocument({ org: o, title: "ÉVALUATION DES BESOINS", subtitle: `Bilan de compétences – ${f.intitule}`, stagiaires: [s], sections: [
     { heading: "Identification", content: `<p><strong>Date :</strong> ${dt}<br><strong>Nom :</strong> ${s.nom}<br><strong>Prénom :</strong> ${s.prenom}<br><strong>E-mail :</strong> ${s.email || "—"}<br><strong>Formation souhaitée :</strong> Bilan de compétences – ${f.intitule}</p>` },
     { heading: "1) Éléments à prendre en considération (handicap, problème de santé, besoin particulier)", content: "<p>Aucun besoin particulier signalé.</p>" },
@@ -70,7 +71,7 @@ export function genEvaluationBesoins(o: OrganismeInfo, f: FormationInfo, stagiai
     { heading: "5) Format préféré ?", content: `<p>${f.modalites || "Présentiel"}</p>` },
     { heading: "6) Préférences horaires ?", content: "<p>En journée</p>" },
     { heading: "7) Moyens de financement envisagés ?", content: "<p>CPF / Autofinancement</p>" },
-  ], signatures: { type: "2", labels: [`${g(s, "Le Consultant", "La Consultante")}`, `${g(s, "Le Bénéficiaire", "La Bénéficiaire")}`], names: [consultantName(o), beneficiaireLabel(s)] } });
+  ], signatures: { type: "2", labels: [`${g(s, "Le Consultant", "La Consultante")}`, `${g(s, "Le Bénéficiaire", "La Bénéficiaire")}`], names: [consultantName(o), beneficiaireLabel(s)], dates: [dt, dt] } });
 }
 
 // ===== CR2 - IND 5 : Document de synthèse (pièce centrale!) =====
