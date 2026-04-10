@@ -666,7 +666,7 @@ En <strong>deux exemplaires originaux</strong>.</p>
   </div>
   <div style="width:45%;text-align:center">
     <p><strong>Pour ${o.nom}</strong><br>${o.dirigeant || "Le/la dirigeant(e)"}<br><em>(Lu et approuvé)</em></p>
-    ${o.cachet ? `<img src="${o.cachet}" alt="Tampon" style="max-width:200px;margin:10px auto" />` : '<p style="margin-top:40px">Tampon :</p>'}
+    ${(o as any).cachet ? `<img src="${(o as any).cachet}" alt="Tampon" style="max-width:200px;margin:10px auto" />` : (o.tamponUrl ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-width:200px;margin:10px auto" />` : '<p style="margin-top:40px">Tampon :</p>')}
   </div>
 </div>`,
       },
