@@ -826,6 +826,8 @@ export function buildFullCatalog(
     stagiaires.forEach((s, si) => {
       add(`bdc_c2i4_eval_besoins_${si}`, `CT2 - IND 4 Évaluation des besoins – ${s.prenom} ${s.nom}`, 2, 4, "bdc_eval_besoins", { stagiaireIdx: si });
     });
+    add("bdc_c2i4_bilan_abandons", "CT2 - IND 4 Bilan mensuel des abandons / ruptures", 2, 4, "bdc_bilan_abandons_ruptures");
+    add("bdc_c2i4_bilan_mensuel", "CT2 - IND 4 Bilan mensuel", 2, 4, "bdc_bilan_mensuel");
 
     // CT2 - IND 5 : Document de synthèse (per bénéficiaire) - PIÈCE CENTRALE
     stagiaires.forEach((s, si) => {
