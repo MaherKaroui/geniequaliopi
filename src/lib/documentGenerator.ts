@@ -287,6 +287,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "bdc_gestion_reclamations": return genGestionReclamationsBDC_imported(o);
     case "bdc_actions_correctives": return genActionsCorrectivesBDC_imported(o);
     case "bdc_fiche_veille": return genFicheVeilleBDC_imported(o, f);
+    case "bdc_contrat_sous_traitance": return genContratSousTraitanceBDC_imported(o, f);
     case "livret_recevabilite_vae": return genLivretRecevabilite(o, f, stagiaires);
     case "dossier_validation_vae": return genDossierValidation(o, f, stagiaires);
     case "accompagnement_vae": return genAccompagnementVAE(o, f, stagiaires);
