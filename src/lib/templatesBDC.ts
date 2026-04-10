@@ -364,3 +364,69 @@ export function genActionsCorrectivesBDC(o: OrganismeInfo) {
   ];
   return buildDocument({ org: o, title: "TABLEAU ACTIONS CORRECTIVES – TRAITEMENT DES RÉCLAMATIONS", table: { headers: ["Réclamation", "Date", "Action corrective", "Responsable", "Statut", "Date clôture"], rows } });
 }
+
+// ===== CT2 - IND 4 : Bilan mensuel des abandons / ruptures =====
+export function genBilanAbandonsRupturesBDC(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
+  const period = `${formatDate(f.dateDebut || "")} – ${formatDate(f.dateFin || "")}`;
+  const rows = stagiaires.map((s, i) => [
+    String(i + 1),
+    beneficiaireLabel(s),
+    "",
+    "",
+    "",
+    "",
+  ]);
+  return buildDocument({
+    org: o,
+    title: "BILAN MENSUEL DES ABANDONS / RUPTURES",
+    sections: [
+      { heading: "Informations générales", content: `
+        <p><strong>Période :</strong> ${period}</p>
+        <p><strong>Nombre de bénéficiaires :</strong> ${stagiaires.length}</p>
+        <p><strong>Nombre d'abandons :</strong> 0</p>
+        <p><strong>Nombre d'interruptions en cours de prestation :</strong> 0</p>
+      ` },
+      { heading: "Analyse suivi des abandons et d'interruptions en cours de prestation", content: "" },
+    ],
+    table: {
+      headers: ["N°", "Nom et prénom du bénéficiaire", "Abandon", "Rupture", "Date", "Motif"],
+      rows,
+    },
+  });
+}
+
+// ===== CT2 - IND 4 : Bilan mensuel =====
+export function genBilanMensuelBDC(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
+  const period = `${formatDate(f.dateDebut || "")} – ${formatDate(f.dateFin || "")}`;
+  const tarif = stagiaires[0] ? getStagiaireTarif(stagiaires[0], f) : (f.tarif || "0");
+  const rows: string[][] = [
+    ["Intitulé de la formation", f.intitule || "", "", "", ""],
+    ["Date de la formation", `${formatDate(f.dateDebut || "")} au ${formatDate(f.dateFin || "")}`, "", "", ""],
+    ["Nombre de bénéficiaires", String(stagiaires.length), "", "", ""],
+    ["Formation particulier", "", "", "", ""],
+    ["Formation entreprise", "", "", "", ""],
+    ["Financement", "", "", "", ""],
+    ["Opco CPF", "", "", "", ""],
+    ["Personnel", "", "", "", ""],
+    ["Tarif", tarif + " €", "", "", ""],
+    ["", "", "", "", ""],
+    ["Nombre total bénéficiaires", String(stagiaires.length), "", "", ""],
+    ["[CPF] Nombre total", "", "", "", ""],
+    ["[OPCO] Nombre total", "", "", "", ""],
+    ["Financement Pôle emploi", "", "", "", ""],
+    ["[Financement personnel] Nombre total", "", "", "", ""],
+    ["Autre (employeur)", "", "", "", ""],
+    ["Tarif total", tarif + " €", "", "", ""],
+  ];
+  return buildDocument({
+    org: o,
+    title: "BILAN MENSUEL",
+    sections: [
+      { heading: "Période", content: `<p>${period}</p>` },
+    ],
+    table: {
+      headers: ["", "Formation 1", "Formation 2", "Formation 3", "Formation 4"],
+      rows,
+    },
+  });
+}
