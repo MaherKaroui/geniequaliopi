@@ -118,8 +118,7 @@ export function genEnqueteMetierBDC(o: OrganismeInfo, f: FormationInfo, stagiair
     { heading: "6. Formations recommandées", content: `<p>• Certifications et diplômes du secteur de ${f.intitule}<br>• Stages de perfectionnement<br>• Formation continue et mise à jour des compétences</p>` },
     { heading: "7. Perspectives d'emploi", content: `<p>• Secteur dynamique avec des opportunités variées<br>• Évolutions possibles : spécialisation, management, création d'entreprise<br>• Cohérence avec le projet du bénéficiaire validée</p>` },
     { heading: "8. Conclusion", content: `<p>Le métier est en cohérence avec le projet de reconversion ou d'évolution exprimé par ${g(s, "le", "la")} bénéficiaire. Les compétences identifiées et les formations recommandées sont documentées dans le plan d'action.</p>` },
-  ], signatures: { type: "2", labels: [`${g(s, "Le Consultant", "La Consultante")}`, `${g(s, "Le Bénéficiaire", "La Bénéficiaire")}`], names: [consultantName(o), beneficiaireLabel(s)] } });
-}
+  ], signatures: { type: "2", labels: [`${g(s, "Le Consultant", "La Consultante")}`, `${g(s, "Le Bénéficiaire", "La Bénéficiaire")}`], names: [consultantName(o), beneficiaireLabel(s)], dates: [sigDateBDC(s, f), sigDateBDC(s, f)] } });
 
 // ===== CR3 - IND 9 : CGV Bilan =====
 export function genCGVBilanCompetences(o: OrganismeInfo, f: FormationInfo) {
@@ -281,8 +280,7 @@ export function genSuiviPostBilanBDC(o: OrganismeInfo, f: FormationInfo, stagiai
     { heading: "4. Votre situation professionnelle actuelle", content: "<p>☐ En poste (même employeur)<br>☐ En poste (nouvel employeur)<br>☐ En recherche d'emploi<br>☐ En formation<br>☐ Création d'entreprise<br>☐ Autre : _______________________________</p>" },
     { heading: "5. Le bilan vous a-t-il aidé dans vos démarches ?", content: "<p>☐ Très utile<br>☐ Assez utile<br>☐ Peu utile<br>☐ Pas utile</p>" },
     { heading: "6. Commentaires libres", content: "<p>_______________________________<br>_______________________________<br>_______________________________</p>" },
-  ], signatures: { type: "2", labels: [`${g(s, "Le Consultant", "La Consultante")}`, `${g(s, "Le Bénéficiaire", "La Bénéficiaire")}`], names: [consultantName(o), beneficiaireLabel(s)] } });
-}
+  ], signatures: { type: "2", labels: [`${g(s, "Le Consultant", "La Consultante")}`, `${g(s, "Le Bénéficiaire", "La Bénéficiaire")}`], names: [consultantName(o), beneficiaireLabel(s)], dates: [endDate(s, f), endDate(s, f)] } });
 
 // ===== CR3 - IND 12 : Procédure d'adaptation =====
 export function genProcedureAdaptationBDC(o: OrganismeInfo) {
@@ -305,8 +303,7 @@ export function genExplorationMetierBDC(o: OrganismeInfo, f: FormationInfo, stag
     { heading: "3. Formations recommandées", content: `<p>• Certifications et diplômes spécifiques au secteur de ${f.intitule}<br>• Stages de perfectionnement<br>• Formation continue et mise à jour des compétences réglementaires</p>`, variant: "green" },
     { heading: "4. Perspectives d'emploi", content: `<p>• Secteur dynamique avec des opportunités variées<br>• Évolutions possibles : spécialisation, management, création d'entreprise<br>• Le métier est en cohérence avec le projet de ${g(s, "le", "la")} bénéficiaire</p>` },
     { heading: "5. Formalisation pour l'audit", content: "<p>Preuves archivées :<br>• Formulaire d'attentes complété en début de bilan<br>• Résultats de l'enquête métier (entretien, fiches ROME)<br>• Plan d'action incluant contacts avec des centres de formation<br>• Synthèse intégrée dans le dossier final<br>• Questionnaire de satisfaction renseigné</p>" },
-  ], signatures: { type: "2", labels: [`${g(s, "Le Consultant", "La Consultante")}`, `${g(s, "Le Bénéficiaire", "La Bénéficiaire")}`], names: [consultantName(o), beneficiaireLabel(s)] } });
-}
+  ], signatures: { type: "2", labels: [`${g(s, "Le Consultant", "La Consultante")}`, `${g(s, "Le Bénéficiaire", "La Bénéficiaire")}`], names: [consultantName(o), beneficiaireLabel(s)], dates: [sigDateBDC(s, f), sigDateBDC(s, f)] } });
 
 // ===== CR4 - IND 19 : Guide des protocoles métier =====
 export function genGuideProtocolesBDC(o: OrganismeInfo, f: FormationInfo) {
