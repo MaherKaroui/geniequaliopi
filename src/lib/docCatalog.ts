@@ -854,7 +854,8 @@ export function buildFullCatalog(
       add(`bdc_c3i10_synopsis_${si}`, `CT3 - IND 10 Synopsis – ${s.prenom} ${s.nom}`, 3, 10, "bdc_synopsis", { stagiaireIdx: si });
     });
 
-    // CT3 - IND 11 : Grille de suivi + Suivi post-bilan
+    // CT3 - IND 11 : Grille de suivi + Enquête métiers + Suivi post-bilan
+    add(`bdc_c3i11_questionnaire_enquete_metiers`, `CT3 - IND 11 Questionnaire enquête métiers`, 3, 11, "bdc_questionnaire_enquete_metiers");
     stagiaires.forEach((s, si) => {
       add(`bdc_c3i11_grille_suivi_${si}`, `CT3 - IND 11 Grille de suivi – ${s.prenom} ${s.nom}`, 3, 11, "bdc_grille_suivi", { stagiaireIdx: si });
       add(`bdc_c3i11_suivi_post_${si}`, `CT3 - IND 11 Questionnaire suivi post-bilan – ${s.prenom} ${s.nom}`, 3, 11, "bdc_suivi_post_bilan", { stagiaireIdx: si });
