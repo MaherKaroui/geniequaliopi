@@ -307,7 +307,7 @@ export function genExplorationMetierBDC(o: OrganismeInfo, f: FormationInfo, stag
     { heading: "3. Formations recommandées", content: `<p>• Certifications et diplômes spécifiques au secteur de ${f.intitule}<br>• Stages de perfectionnement<br>• Formation continue et mise à jour des compétences réglementaires</p>`, variant: "green" },
     { heading: "4. Perspectives d'emploi", content: `<p>• Secteur dynamique avec des opportunités variées<br>• Évolutions possibles : spécialisation, management, création d'entreprise<br>• Le métier est en cohérence avec le projet de ${g(s, "le", "la")} bénéficiaire</p>` },
     { heading: "5. Formalisation pour l'audit", content: "<p>Preuves archivées :<br>• Formulaire d'attentes complété en début de bilan<br>• Résultats de l'enquête métier (entretien, fiches ROME)<br>• Plan d'action incluant contacts avec des centres de formation<br>• Synthèse intégrée dans le dossier final<br>• Questionnaire de satisfaction renseigné</p>" },
-  ], signatures: { type: "2", labels: [`${g(s, "Le Consultant", "La Consultante")}`, `${g(s, "Le Bénéficiaire", "La Bénéficiaire")}`], names: [consultantName(o), beneficiaireLabel(s)], dates: [sigDateBDC(s, f), sigDateBDC(s, f)] } });
+  ] });
 }
 
 // ===== CR4 - IND 19 : Guide des protocoles métier =====
