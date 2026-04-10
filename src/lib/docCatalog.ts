@@ -861,7 +861,8 @@ export function buildFullCatalog(
       add(`bdc_c3i11_suivi_post_${si}`, `CT3 - IND 11 Questionnaire suivi post-bilan – ${s.prenom} ${s.nom}`, 3, 11, "bdc_suivi_post_bilan", { stagiaireIdx: si });
     });
 
-    // CT3 - IND 12 : Procédure d'adaptation
+    // CT3 - IND 12 : Déroulé et modalités + Procédure d'adaptation
+    add("bdc_c3i12_deroule_modalites", "CT3 - IND 12 Déroulé et modalités du bilan", 3, 12, "bdc_deroule_modalites");
     add("bdc_c3i12_procedure_adaptation", "CT3 - IND 12 Procédure d'adaptation de l'accompagnement", 3, 12, "bdc_procedure_adaptation");
 
     // CT4 - IND 18 : Organigramme (existant)
