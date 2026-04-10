@@ -239,6 +239,37 @@ export function genGrilleSuiviBDC(o: OrganismeInfo, f: FormationInfo, stagiaires
   ], table: { headers: ["Date", "Étapes du bilan", "Actions réalisées", "Observations"], rows } });
 }
 
+// ===== CR3 - IND 11 : Questionnaire enquête métiers (vide) =====
+export function genQuestionnaireEnqueteMetiersBDC(o: OrganismeInfo, f: FormationInfo) {
+  return buildDocument({ org: o, title: "QUESTIONNAIRE ENQUÊTE MÉTIERS", subtitle: `Bilan de compétences – ${f.intitule}`, sections: [
+    { heading: "CIBLER LES ACTIVITÉS", content: "" },
+    { heading: "Pouvez-vous me décrire votre métier ?", content: "<p>_______________________________________________</p>" },
+    { heading: "Au quotidien quelles sont vos activités ?", content: "<p>_______________________________________________</p>" },
+    { heading: "Quels types d'outils ou machines utilisez-vous ?", content: "<p>_______________________________________________</p>" },
+    { heading: "Utilisez-vous des matières premières ? Lesquelles ?", content: "<p>_______________________________________________</p>" },
+    { heading: "Quelle est la part d'initiative dans votre métier ?", content: "<p>_______________________________________________</p>" },
+    { heading: "Conditions de travail", content: "" },
+    { heading: "Où travaillez-vous ?", content: "<p>_______________________________________________</p>" },
+    { heading: "Travaillez-vous en intérieur ou extérieur ?", content: "<p>_______________________________________________</p>" },
+    { heading: "Êtes-vous sédentaire ou travaillez-vous sur des sites différents ?", content: "<p>_______________________________________________</p>" },
+    { heading: "Travaillez-vous en équipe ou seul ?", content: "<p>_______________________________________________</p>" },
+    { heading: "Avez-vous un supérieur hiérarchique ? Où se trouve-t-il ? Comment intervient-il ?", content: "<p>_______________________________________________</p>" },
+    { heading: "Quels sont vos horaires. Sont-ils réguliers ?", content: "<p>_______________________________________________</p>" },
+    { heading: "Qualités", content: "" },
+    { heading: "Les principales qualités demandées dans cette profession sont :", content: "<p>_______________________________________________</p>" },
+    { heading: "Celui qui choisit cette profession doit montrer de l'intérêt pour :", content: "<p>_______________________________________________</p>" },
+    { heading: "Existe-t-il des exigences physiques particulières ? Si oui, lesquelles ?", content: "<p>_______________________________________________</p>" },
+    { heading: "Débouchés", content: "" },
+    { heading: "Est-il facile de trouver un emploi dans votre branche ? Pourquoi ?", content: "<p>_______________________________________________</p>" },
+    { heading: "Carrière", content: "" },
+    { heading: "Quel est votre salaire ?", content: "<p>_______________________________________________</p>" },
+    { heading: "Quelles sont vos perspectives de promotion ?", content: "<p>_______________________________________________</p>" },
+    { heading: "Formation", content: "" },
+    { heading: "Quels sont les diplômes qui préparent à ce métier ?", content: "<p>_______________________________________________</p>" },
+    { heading: "Quels sont les avantages, les inconvénients de votre métier ?", content: "<p>_______________________________________________</p>" },
+  ] });
+}
+
 // ===== CR3 - IND 11 : Questionnaire suivi post-bilan =====
 export function genSuiviPostBilanBDC(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = stagiaires[si] || stagiaires[0];
