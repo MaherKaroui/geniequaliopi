@@ -841,7 +841,9 @@ export function buildFullCatalog(
     });
 
     // CT3 - IND 9 : CGV, Contrat, Convention, Formulaire attentes
-    add("bdc_c3i9_cgv", "CT3 - IND 9 CGV – Bilan de compétences", 3, 9, "bdc_cgv");
+    stagiaires.forEach((s, si) => {
+      add(`bdc_c3i9_cgv_${si}`, `CT3 - IND 9 CGV – Bilan de compétences – ${s.prenom} ${s.nom}`, 3, 9, "bdc_cgv", { stagiaireIdx: si });
+    });
     stagiaires.forEach((s, si) => {
       add(`bdc_c3i9_contrat_${si}`, `CT3 - IND 9 Contrat de bilan – ${s.prenom} ${s.nom}`, 3, 9, "bdc_contrat", { stagiaireIdx: si });
       add(`bdc_c3i9_convention_${si}`, `CT3 - IND 9 Convention de bilan – ${s.prenom} ${s.nom}`, 3, 9, "bdc_convention", { stagiaireIdx: si });

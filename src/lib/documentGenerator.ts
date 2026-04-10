@@ -266,7 +266,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "bdc_document_synthese": { const si = params?.stagiaireIdx ?? 0; return genDocumentSynthese_imported(o, f, stagiaires, si); }
     case "bdc_deroule_modalites": return genDerouleModalitesBDC_imported(o, f);
     case "bdc_enquete_metier": { const si = params?.stagiaireIdx ?? 0; return genEnqueteMetierBDC_imported(o, f, stagiaires, si); }
-    case "bdc_cgv": return genCGVBilanCompetences_imported(o, f);
+    case "bdc_cgv": { const si = params?.stagiaireIdx ?? 0; return genCGVBilanCompetences_imported(o, f, stagiaires, si); }
     case "bdc_contrat": { const si = params?.stagiaireIdx ?? 0; return genContratBilanCompetences_imported(o, f, stagiaires, si); }
     case "bdc_convention": { const si = params?.stagiaireIdx ?? 0; return genConventionBilanCompetences_imported(o, f, stagiaires, si); }
     case "bdc_formulaire_attentes": { const si = params?.stagiaireIdx ?? 0; return genFormulaireAttentesBDC_imported(o, f, stagiaires, si); }
