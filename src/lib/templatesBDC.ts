@@ -122,9 +122,11 @@ export function genEnqueteMetierBDC(o: OrganismeInfo, f: FormationInfo, stagiair
 }
 
 // ===== CR3 - IND 9 : CGV Bilan =====
-export function genCGVBilanCompetences(o: OrganismeInfo, f: FormationInfo) {
+export function genCGVBilanCompetences(o: OrganismeInfo, f: FormationInfo, stagiaires?: StagiaireInfo[], si?: number) {
+  const s = stagiaires && stagiaires.length > 0 ? (stagiaires[si ?? 0] || stagiaires[0]) : undefined;
   const tarif = f.tarif ? `${f.tarif} € TTC` : "1 500 € TTC";
-  return buildDocument({ org: o, title: "CONDITIONS GÉNÉRALES DE VENTE – BILAN DE COMPÉTENCES", sections: [
+  const sigDate = (() => { const r = f.dateDebut || ""; return r ? formatDate(subtractBusinessDays(r, 14)) : new Date().toLocaleDateString("fr-FR"); })();
+  return buildDocument({ org: o, title: "CONDITIONS GÉNÉRALES DE VENTE – BILAN DE COMPÉTENCES", stagiaires: s ? [s] : undefined, sections: [
     { heading: "Article 1 – Objet", content: `<p>Les présentes conditions générales ont pour objet de définir les modalités et conditions dans lesquelles l'organisme <strong>${o.nom}</strong> fournit une prestation de <strong>bilan de compétences</strong> à ses clients.</p>` },
     { heading: "Article 2 – Nature de la prestation", content: "<p>La prestation entre dans le champ d'application des <strong>articles L6313-1 à L6313-12</strong> du Code du travail. Elle se compose de 3 phases (préliminaire, investigation, conclusion) et donne lieu à la remise d'un <strong>document de synthèse confidentiel</strong> au bénéficiaire.</p>" },
     { heading: "Article 3 – Modalités d'inscription", content: "<p>L'inscription devient définitive à réception :<br>• du contrat de formation signé,<br>• de l'éventuel accord de financement,<br>• et/ou du règlement de la prestation en cas d'autofinancement.</p>" },
@@ -135,7 +137,7 @@ export function genCGVBilanCompetences(o: OrganismeInfo, f: FormationInfo) {
     { heading: "Article 8 – Confidentialité", content: "<p>Le contenu des entretiens, des tests et du document de synthèse est <strong>strictement confidentiel</strong>. Aucune information ne peut être transmise à un tiers sans l'accord écrit du bénéficiaire.</p>" },
     { heading: "Article 9 – Données personnelles", content: `<p>Les données personnelles sont traitées conformément au RGPD. Elles sont conservées pendant la durée légale de conservation et ne sont pas transmises à des tiers sauf obligation légale.</p>` },
     { heading: "Article 10 – Litiges", content: `<p>En cas de litige, les parties s'engagent à rechercher une solution amiable. À défaut, le tribunal compétent sera celui du ressort du siège de l'organisme.</p>` },
-  ], signatures: { type: "2", labels: ["Le Prestataire", "Le Bénéficiaire"], names: [consultantName(o), ""], dates: [(() => { const r = f.dateDebut || ""; return r ? formatDate(subtractBusinessDays(r, 14)) : new Date().toLocaleDateString("fr-FR"); })(), (() => { const r = f.dateDebut || ""; return r ? formatDate(subtractBusinessDays(r, 14)) : new Date().toLocaleDateString("fr-FR"); })()] } });
+  ], signatures: { type: "2", labels: ["Le Prestataire", s ? `${g(s, "Le Bénéficiaire", "La Bénéficiaire")}` : "Le Bénéficiaire"], names: [consultantName(o), s ? beneficiaireLabel(s) : ""], dates: [sigDate, sigDate] } });
 }
 
 // ===== CR3 - IND 9 : Contrat de bilan =====
