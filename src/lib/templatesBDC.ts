@@ -119,6 +119,7 @@ export function genEnqueteMetierBDC(o: OrganismeInfo, f: FormationInfo, stagiair
     { heading: "7. Perspectives d'emploi", content: `<p>• Secteur dynamique avec des opportunités variées<br>• Évolutions possibles : spécialisation, management, création d'entreprise<br>• Cohérence avec le projet du bénéficiaire validée</p>` },
     { heading: "8. Conclusion", content: `<p>Le métier est en cohérence avec le projet de reconversion ou d'évolution exprimé par ${g(s, "le", "la")} bénéficiaire. Les compétences identifiées et les formations recommandées sont documentées dans le plan d'action.</p>` },
   ], signatures: { type: "2", labels: [`${g(s, "Le Consultant", "La Consultante")}`, `${g(s, "Le Bénéficiaire", "La Bénéficiaire")}`], names: [consultantName(o), beneficiaireLabel(s)], dates: [sigDateBDC(s, f), sigDateBDC(s, f)] } });
+}
 
 // ===== CR3 - IND 9 : CGV Bilan =====
 export function genCGVBilanCompetences(o: OrganismeInfo, f: FormationInfo) {
