@@ -523,3 +523,52 @@ export function genBilanMensuelBDC(o: OrganismeInfo, f: FormationInfo, stagiaire
     },
   });
 }
+
+// ===== CT6 - IND 23/24/25 : Fiche de veille combinée =====
+export function genFicheVeilleBDC(o: OrganismeInfo, f: FormationInfo) {
+  const domain = f.intitule || "Esthétique";
+  const tableStyle = `style="width:100%;border-collapse:collapse;margin-bottom:10px"`;
+  const cellStyle = `style="border:1px solid #999;padding:8px;vertical-align:top"`;
+  const headerCell = `style="border:1px solid #999;padding:8px;background:#f0f0f0;font-weight:bold;width:160px;vertical-align:top"`;
+
+  function veillTable(label: string, value: string) {
+    return `<tr><td ${headerCell}>${label}</td><td ${cellStyle}>${value}</td></tr>`;
+  }
+
+  return buildDocument({
+    org: o,
+    title: `FICHE DE VEILLE – ${domain.toUpperCase()}`,
+    sections: [
+      {
+        heading: "1. Veille Réglementaire",
+        content: `<table ${tableStyle}>
+${veillTable("Intitulé", `<strong>Mise à jour des normes d'hygiène et sécurité – Instituts de beauté et soins esthétiques</strong>`)}
+${veillTable("Source", "Arrêté du 12 décembre 2024 relatif aux règles d'hygiène et de salubrité applicables aux établissements pratiquant des soins esthétiques")}
+${veillTable("Lien", '<a href="https://www.legifrance.gouv.fr">www.legifrance.gouv.fr</a>')}
+${veillTable("Date de publication", "12/12/2024")}
+${veillTable("Exploitation", "Intégré dans les échanges avec les bénéficiaires sur les obligations sanitaires en institut. Mentionné dans la fiche métier. Orientations vers les formations hygiène et salubrité recommandées. Mise à jour des protocoles d'hygiène pour les soins du visage et du corps.")}
+</table>`,
+      },
+      {
+        heading: "2. Veille Métiers",
+        content: `<table ${tableStyle}>
+${veillTable("Intitulé", `<strong>Évolution des métiers de l'esthétique et de la cosmétique en 2025</strong>`)}
+${veillTable("Source", "CIDJ – Fiche métier Esthéticien(ne)-Cosméticien(ne)")}
+${veillTable("Lien", '<a href="https://www.cidj.com">www.cidj.com</a>')}
+${veillTable("Date de mise à jour", "Janvier 2025")}
+${veillTable("Exploitation", "Présentation des nouvelles tendances métiers en phase d'exploration : soins bio et naturels, dermopigmentation, extension de cils, montée de la vente en ligne de cosmétiques, importance de l'image de marque (Instagram, TikTok). Permet une personnalisation du plan d'action pour les bénéficiaires souhaitant se reconvertir dans le secteur esthétique.")}
+</table>`,
+      },
+      {
+        heading: "3. Veille Technologique",
+        content: `<table ${tableStyle}>
+${veillTable("Intitulé", `<strong>Nouveaux équipements et innovations en esthétique</strong>`)}
+${veillTable("Source", "Revue <em>Esthétique Pro</em> – n°42")}
+${veillTable("Lien", '<a href="https://www.esthetique-pro.fr">www.esthetique-pro.fr</a>')}
+${veillTable("Date de publication", "06/02/2025")}
+${veillTable("Exploitation", "Sensibilisation à l'évolution technologique des outils professionnels : appareils de photorajeunissement LED, machines à microdermabrasion, appareils d'électrostimulation faciale, imprimante 3D pour ongles. Présenté lors des échanges individuels pour les porteurs de projet de création d'institut ou reconversion dans le secteur beauté et bien-être.")}
+</table>`,
+      },
+    ],
+  });
+}
