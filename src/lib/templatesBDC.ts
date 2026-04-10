@@ -281,6 +281,7 @@ export function genSuiviPostBilanBDC(o: OrganismeInfo, f: FormationInfo, stagiai
     { heading: "5. Le bilan vous a-t-il aidé dans vos démarches ?", content: "<p>☐ Très utile<br>☐ Assez utile<br>☐ Peu utile<br>☐ Pas utile</p>" },
     { heading: "6. Commentaires libres", content: "<p>_______________________________<br>_______________________________<br>_______________________________</p>" },
   ], signatures: { type: "2", labels: [`${g(s, "Le Consultant", "La Consultante")}`, `${g(s, "Le Bénéficiaire", "La Bénéficiaire")}`], names: [consultantName(o), beneficiaireLabel(s)], dates: [endDate(s, f), endDate(s, f)] } });
+}
 
 // ===== CR3 - IND 12 : Procédure d'adaptation =====
 export function genProcedureAdaptationBDC(o: OrganismeInfo) {
