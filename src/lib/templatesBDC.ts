@@ -135,7 +135,7 @@ export function genCGVBilanCompetences(o: OrganismeInfo, f: FormationInfo) {
     { heading: "Article 8 – Confidentialité", content: "<p>Le contenu des entretiens, des tests et du document de synthèse est <strong>strictement confidentiel</strong>. Aucune information ne peut être transmise à un tiers sans l'accord écrit du bénéficiaire.</p>" },
     { heading: "Article 9 – Données personnelles", content: `<p>Les données personnelles sont traitées conformément au RGPD. Elles sont conservées pendant la durée légale de conservation et ne sont pas transmises à des tiers sauf obligation légale.</p>` },
     { heading: "Article 10 – Litiges", content: `<p>En cas de litige, les parties s'engagent à rechercher une solution amiable. À défaut, le tribunal compétent sera celui du ressort du siège de l'organisme.</p>` },
-  ], signatures: { type: "2", labels: ["Le Prestataire", "Le Bénéficiaire"], names: [consultantName(o), ""] } });
+  ], signatures: { type: "2", labels: ["Le Prestataire", "Le Bénéficiaire"], names: [consultantName(o), ""], dates: [(() => { const r = f.dateDebut || ""; return r ? formatDate(subtractBusinessDays(r, 14)) : new Date().toLocaleDateString("fr-FR"); })(), (() => { const r = f.dateDebut || ""; return r ? formatDate(subtractBusinessDays(r, 14)) : new Date().toLocaleDateString("fr-FR"); })()] } });
 }
 
 // ===== CR3 - IND 9 : Contrat de bilan =====
@@ -151,7 +151,7 @@ export function genContratBilanCompetences(o: OrganismeInfo, f: FormationInfo, s
     { heading: "Article 5 – Confidentialité", content: `<p>Les informations communiquées par ${g(s, "le", "la")} Bénéficiaire sont strictement confidentielles. Le Prestataire s'engage à ne divulguer aucune information sans accord écrit.</p>` },
     { heading: "Article 6 – Restitution", content: `<p>À l'issue du bilan, un <strong>document de synthèse</strong> sera remis ${g(s, "au Bénéficiaire", "à la Bénéficiaire")}. Ce document ne pourra être transmis à un tiers qu'avec son consentement écrit.</p>` },
     { heading: "Article 7 – Modalités financières", content: `<p>Le coût total du bilan est de <strong>${tarif} € TTC</strong>.</p>` },
-  ], signatures: { type: "2", labels: ["Le Prestataire", `${g(s, "Le Bénéficiaire", "La Bénéficiaire")}`], names: [consultantName(o), beneficiaireLabel(s)] } });
+  ], signatures: { type: "2", labels: ["Le Prestataire", `${g(s, "Le Bénéficiaire", "La Bénéficiaire")}`], names: [consultantName(o), beneficiaireLabel(s)], dates: [sigDateBDC(s, f), sigDateBDC(s, f)] } });
 }
 
 // ===== CR3 - IND 9 : Convention de bilan =====
@@ -165,7 +165,7 @@ export function genConventionBilanCompetences(o: OrganismeInfo, f: FormationInfo
     { heading: "Article 3 – Durée et calendrier", content: `<p>Durée : ${dureeLabel(f)}<br>Du ${startDate(s, f)} au ${endDate(s, f)}</p>` },
     { heading: "Article 4 – Coût et financement", content: `<p>Coût total : ${tarif} € TTC<br>Financement : CPF / Autofinancement / Employeur / OPCO</p>` },
     { heading: "Article 5 – Confidentialité", content: "<p>Le document de synthèse est la propriété exclusive du bénéficiaire et ne peut être communiqué à un tiers qu'avec son accord écrit.</p>" },
-  ], signatures: { type: "2", labels: ["Le Prestataire", `${g(s, "Le Bénéficiaire", "La Bénéficiaire")}`], names: [consultantName(o), beneficiaireLabel(s)] } });
+  ], signatures: { type: "2", labels: ["Le Prestataire", `${g(s, "Le Bénéficiaire", "La Bénéficiaire")}`], names: [consultantName(o), beneficiaireLabel(s)], dates: [sigDateBDC(s, f), sigDateBDC(s, f)] } });
 }
 
 // ===== CR3 - IND 9 : Formulaire d'attentes et objectifs =====
@@ -178,7 +178,7 @@ export function genFormulaireAttentesBDC(o: OrganismeInfo, f: FormationInfo, sta
     { heading: "4. Compétences à développer", content: `<p><strong>Q4 : Compétences techniques à renforcer ?</strong><br>Approfondir les compétences spécifiques au domaine de ${f.intitule}.<br><br><strong>Q5 : Compétences transversales ?</strong><br>Améliorer la gestion du temps, la communication et les compétences en management.</p>` },
     { heading: "5. Conditions et contraintes", content: `<p><strong>Q6 : Contraintes à prendre en compte ?</strong><br>Formation en journée, organisation flexible.<br><br><strong>Q7 : Préférences pédagogiques ?</strong><br>Entretiens individuels et mises en situation, complétés par des apports théoriques.</p>` },
     { heading: "6. Perspectives professionnelles", content: `<p><strong>Q8 : Quel poste ou secteur visez-vous ?</strong><br>Poste à responsabilités dans le secteur de ${f.intitule} ou création d'entreprise.<br><br><strong>Q9 : Entreprises identifiées ?</strong><br>Recherches en cours dans le secteur.</p>` },
-  ], signatures: { type: "2", labels: [`${g(s, "Le Consultant", "La Consultante")}`, `${g(s, "Le Bénéficiaire", "La Bénéficiaire")}`], names: [consultantName(o), beneficiaireLabel(s)] } });
+  ], signatures: { type: "2", labels: [`${g(s, "Le Consultant", "La Consultante")}`, `${g(s, "Le Bénéficiaire", "La Bénéficiaire")}`], names: [consultantName(o), beneficiaireLabel(s)], dates: [sigDateBDC(s, f), sigDateBDC(s, f)] } });
 }
 
 // ===== CR3 - IND 10 : Convocation au bilan =====
