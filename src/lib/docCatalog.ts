@@ -891,8 +891,8 @@ export function buildFullCatalog(
     add("bdc_c6i26_veille_handicap", "CT6 - IND 26 Veille handicap", 6, 26, "veille_handicap");
     add("bdc_c6i26_liste_partenaires", "CT6 - IND 26 Liste des partenaires locaux", 6, 26, "liste_partenaires");
 
-    // CT6 - IND 27 : Sous-traitance (existant)
-    add("bdc_c6i27_contrat_sous_traitance", "CT6 - IND 27 Contrat de sous-traitance", 6, 27, "contrat_sous_traitance");
+    // CT6 - IND 27 : Sous-traitance
+    add("bdc_c6i27_contrat_sous_traitance", "CT6 - IND 27 Contrat de sous-traitance", 6, 27, "bdc_contrat_sous_traitance");
 
     // CT7 - IND 30 : Satisfaction à chaud (per bénéficiaire) + Relances Excel
     stagiaires.forEach((s, si) => {
