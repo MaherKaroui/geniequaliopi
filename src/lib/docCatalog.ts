@@ -884,10 +884,8 @@ export function buildFullCatalog(
     });
     add("bdc_c5i21_fiche_intervenant", "CT5 - IND 21 Fiche intervenant externe", 5, 21, "bdc_fiche_intervenant");
 
-    // CT6 - IND 23/24/25 : Veille (existants)
-    add("bdc_c6i23_veille_reglementaire", "CT6 - IND 23 Veille réglementaire", 6, 23, "veille_reglementaire");
-    add("bdc_c6i24_veille_metier", "CT6 - IND 24 Veille métier", 6, 24, "veille_metier");
-    add("bdc_c6i25_veille_technologique", "CT6 - IND 25 Veille technologique", 6, 25, "veille_technologique");
+    // CT6 - IND 23/24/25 : Fiche de veille combinée
+    add("bdc_c6_fiche_veille", "CT6 - IND 23/24/25 Fiche de veille", 6, 23, "bdc_fiche_veille");
 
     // CT6 - IND 26 : Handicap + Partenaires (existants)
     add("bdc_c6i26_veille_handicap", "CT6 - IND 26 Veille handicap", 6, 26, "veille_handicap");
