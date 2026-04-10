@@ -261,6 +261,8 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     // ===== Bilan de compétences =====
     case "bdc_programme": return genProgrammeBDC_imported(o, f);
     case "bdc_eval_besoins": { const si = params?.stagiaireIdx ?? 0; return genEvaluationBesoins_imported(o, f, stagiaires, si); }
+    case "bdc_bilan_abandons_ruptures": return genBilanAbandonsRupturesBDC_imported(o, f, stagiaires);
+    case "bdc_bilan_mensuel": return genBilanMensuelBDC_imported(o, f, stagiaires);
     case "bdc_document_synthese": { const si = params?.stagiaireIdx ?? 0; return genDocumentSynthese_imported(o, f, stagiaires, si); }
     case "bdc_deroule_modalites": return genDerouleModalitesBDC_imported(o, f);
     case "bdc_enquete_metier": { const si = params?.stagiaireIdx ?? 0; return genEnqueteMetierBDC_imported(o, f, stagiaires, si); }
