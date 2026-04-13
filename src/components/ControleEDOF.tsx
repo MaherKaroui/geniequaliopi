@@ -20,8 +20,8 @@ type PdfBlobOptions = NonNullable<Parameters<typeof htmlToPdfBlob>[1]>;
 
 const MASS_EXPORT_PDF_OPTIONS = {
   scale: 1,
-  imageQuality: 0.72,
-  pageYieldMs: 20,
+  imageQuality: 0.65,
+  pageYieldMs: 15,
 } satisfies PdfBlobOptions;
 
 const ZIP_EXPORT_OPTIONS = {
