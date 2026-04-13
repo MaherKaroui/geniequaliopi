@@ -784,16 +784,30 @@ export function applyGender(html: string, s: { civilite?: string } | undefined |
   return result;
 }
 
-/** Check if a formation's end date is in the past (= formation terminée) */
-export function isFormationTerminee(f: FormationInfo): boolean {
+/** Check if a formation's end date is in the past (= formation terminée).
+ *  When stagiaires are provided and have individual dates, those take priority. */
+export function isFormationTerminee(f: FormationInfo, stagiaires?: StagiaireInfo[]): boolean {
+  // Priority: check stagiaire individual dates first
+  if (stagiaires && stagiaires.length > 0) {
+    const stagDates = stagiaires.map(s => s.dateFinFormation).filter(Boolean);
+    if (stagDates.length > 0) {
+      // Use the latest stagiaire end date
+      const latestEnd = stagDates.sort().pop()!;
+      return isDatePast(latestEnd);
+    }
+  }
   if (!f.dateFin) return false;
+  return isDatePast(f.dateFin);
+}
+
+function isDatePast(dateStr: string): boolean {
   try {
-    const parts = f.dateFin.split('/');
+    const parts = dateStr.split('/');
     if (parts.length === 3) {
       const d = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
       return d < new Date();
     }
-    const d = new Date(f.dateFin);
+    const d = new Date(dateStr);
     return !isNaN(d.getTime()) && d < new Date();
   } catch { return false; }
 }
