@@ -263,14 +263,22 @@ import { getMassagePrenatalChapters } from "./courseContentMassagePrenatal";
 import { getECSRChapters } from "./courseContentECSR";
 import { getVTestChapters } from "./courseContentVTest";
 import { getCIPChapters } from "./courseContentCIP";
+import { getRPMSChapters } from "./courseContentRPMS";
+import { getAssistantDirectionChapters } from "./courseContentAssistantDirection";
+import { getInfographisteChapters } from "./courseContentInfographiste";
+import { getRestaurationChapters } from "./courseContentRestauration";
 
-export { getWordChapters, getAnglaisChapters, getAnglaisA1Chapters, getManagementChapters, getGenericChapters, getFLEChapters, getIAChapters, getWebmarketingChapters, getCRMChapters, getMassagePrenatalChapters, getECSRChapters, getVTestChapters, getCIPChapters };
+export { getWordChapters, getAnglaisChapters, getAnglaisA1Chapters, getManagementChapters, getGenericChapters, getFLEChapters, getIAChapters, getWebmarketingChapters, getCRMChapters, getMassagePrenatalChapters, getECSRChapters, getVTestChapters, getCIPChapters, getRPMSChapters, getAssistantDirectionChapters, getInfographisteChapters, getRestaurationChapters };
 
 export function getCourseChapters(formationIntitule: string): CourseChapter[] {
   const t = formationIntitule.toLowerCase();
   if (t.includes('ecsr') || t.includes('enseignant de la conduite') || t.includes('sécurité routière')) return getECSRChapters();
   if (t.includes('vtest') || t.includes('v-test') || t.includes('rs6905')) return getVTestChapters();
   if (t.includes('conseiller en insertion') || t.includes('insertion professionnelle') || t.includes('cip') || t.includes('rncp37274')) return getCIPChapters();
+  if (t.includes('responsable de petite') || t.includes('rpms') || t.includes('petite et moyenne structure')) return getRPMSChapters();
+  if (t.includes('assistant') && t.includes('direction')) return getAssistantDirectionChapters();
+  if (t.includes('infographiste') || t.includes('infographie')) return getInfographisteChapters();
+  if (t.includes('restauration') || t.includes('employé polyvalent en restauration')) return getRestaurationChapters();
   if (t.includes('excel')) return getExcelChapters();
   if (t.includes('word')) return getWordChapters();
   if ((t.includes('anglais') || t.includes('english')) && (t.includes('a1') || t.includes('débutant') || t.includes('niveau a1'))) return getAnglaisA1Chapters();
