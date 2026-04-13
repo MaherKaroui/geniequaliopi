@@ -207,7 +207,9 @@ export default function ControleEDOF({ organisme, formation, stagiaires, signatu
         });
         if (result) zip.file(result.fileName, result.blob);
         options?.onItemDone?.(si + 1, sourceStagiaires.length);
-        await yieldToBrowser(32);
+        // Longer yield every 10 docs to let GC reclaim memory
+        const yieldMs = (si + 1) % 10 === 0 ? 200 : 50;
+        await yieldToBrowser(yieldMs);
       }
       return;
     }
