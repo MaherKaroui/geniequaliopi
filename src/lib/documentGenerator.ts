@@ -3393,7 +3393,7 @@ function genMatriceCompetencesExcel(o: OrganismeInfo, f: FormationInfo, stagiair
   const rncp = getRNCPByCode(f.codeRNCP || '');
   const { totalHours } = parseDuree(f.duree);
   const effectiveTotal = totalHours > 0 ? totalHours : 420;
-  const termine = isFormationTerminee(f);
+  const termine = isFormationTerminee(f, stagiaires);
   const isCFA = !!(f.rythmeAlternance && f.rythmeAlternance.trim().length > 0);
   const cfaWeekDates = isCFA ? getCFAWeekDates(f) : [];
   const now = new Date();
@@ -3543,7 +3543,7 @@ function genSuiviChiffreFormationExcel(o: OrganismeInfo, f: FormationInfo, stagi
   const effectiveTotal = totalHours > 0 ? totalHours : 420;
   const isCFA = !!(f.rythmeAlternance && f.rythmeAlternance.trim().length > 0);
   const totalCFAWeeks = Math.max(1, Math.ceil(effectiveTotal / 35));
-  const termine = isFormationTerminee(f);
+  const termine = isFormationTerminee(f, stagiaires);
 
   const tr = (cells: string[], isHeader = false) => {
     const tag = isHeader ? 'th' : 'td';
@@ -9323,7 +9323,7 @@ function genAppreciationsFinanceurs(o: OrganismeInfo, f: FormationInfo) {
 
 function genBilanFroid(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const dureeH = parseInt(f.duree) || 14;
-  const termine = isFormationTerminee(f);
+  const termine = isFormationTerminee(f, stagiaires);
   let extra = `<p><em>Bilan réalisé 3 à 6 mois après la formation</em></p>`;
   if (!termine) {
     extra += `<div class="section section-green"><p><em>La formation est en cours. Ce document sera complété après la fin de la formation.</em></p></div>`;
@@ -9380,7 +9380,7 @@ function genBilanFroid(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiaire
 
 function genBilanChaud(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const dureeH = parseInt(f.duree) || 14;
-  const termine = isFormationTerminee(f);
+  const termine = isFormationTerminee(f, stagiaires);
   let extra = '';
   if (!termine) {
     extra += `<div class="section section-green"><p><em>La formation est en cours. Ce document sera complété après la fin de la formation.</em></p></div>`;
@@ -9496,7 +9496,7 @@ function seededRandom(seed: number): () => number {
 function genBilanChaudStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = stagiaires[si] || stagiaires[0];
   const dureeH = parseInt(f.duree) || 14;
-  const termine = isFormationTerminee(f);
+  const termine = isFormationTerminee(f, stagiaires);
 
   const allCriteres = [
     "Satisfaction globale de la formation",
@@ -9577,7 +9577,7 @@ function genBilanChaudStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: 
 function genBilanFroidStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = stagiaires[si] || stagiaires[0];
   const dureeH = parseInt(f.duree) || 14;
-  const termine = isFormationTerminee(f);
+  const termine = isFormationTerminee(f, stagiaires);
 
   const allCriteres = [
     "Utilisez-vous encore les outils depuis la formation ?",
@@ -9652,7 +9652,7 @@ function genBilanFroidStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: 
 function genAppreciationsBeneficiairesStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = stagiaires[si] || stagiaires[0];
   const dureeH = parseInt(f.duree) || 14;
-  const termine = isFormationTerminee(f);
+  const termine = isFormationTerminee(f, stagiaires);
   const rng = seededRandom(si * 59 + 23);
 
   let extra = `<p><em>Fréquence : fin de formation. En cas de non-retour, l'enquête est renvoyée dans un délai d'une semaine.</em></p>`;
@@ -9737,7 +9737,7 @@ function genAppreciationsBeneficiairesStagiaire(o: OrganismeInfo, f: FormationIn
 
 function genTestCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number, phase: string) {
   const s = stagiaires[si] || stagiaires[0];
-  const termine = isFormationTerminee(f);
+  const termine = isFormationTerminee(f, stagiaires);
   const isDebut = phase === "debut";
   const evalData = getEvalContent(f.intitule);
   const rncp = getRNCPByCode(f.codeRNCP || '');
@@ -9844,7 +9844,7 @@ export function getCFAWeekDates(f: FormationInfo): { cfaWeekNum: number; weekSta
 }
 
 function genExercicesCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number, exerciceIdx: number, extraParams?: Record<string, any>) {
-  const formationTerminee = isFormationTerminee(f);
+  const formationTerminee = isFormationTerminee(f, stagiaires);
   const s = stagiaires[si] || stagiaires[0] || { nom: 'Dupont', prenom: 'Marie', email: '', telephone: '', entreprise: '', poste: '' } as StagiaireInfo;
   const rncp = getRNCPByCode(f.codeRNCP || '');
   const { totalHours } = parseDuree(f.duree);
@@ -10155,7 +10155,7 @@ const FALLBACK_STAGIAIRE: StagiaireInfo = { prenom: "Martin", nom: "Dupont", civ
 
 function genExamenBlancCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = stagiaires[si] || stagiaires[0];
-  const termine = isFormationTerminee(f);
+  const termine = isFormationTerminee(f, stagiaires);
   const rncp = getRNCPByCode(f.codeRNCP || '');
   const evalData = getEvalContent(f.intitule);
   const { totalHours } = parseDuree(f.duree);
@@ -10261,7 +10261,7 @@ function genExamenBlancCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiair
 }
 
 function genGrilleAcquisitionCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
-  const termine = isFormationTerminee(f);
+  const termine = isFormationTerminee(f, stagiaires);
   if (termine) {
     return genGrilleAcquisitionStagiaire(o, f, stagiaires, si);
   }
@@ -10298,7 +10298,7 @@ function genGrilleAcquisitionCFAStagiaire(o: OrganismeInfo, f: FormationInfo, st
 }
 
 function genAttestationReussiteCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
-  const termine = isFormationTerminee(f);
+  const termine = isFormationTerminee(f, stagiaires);
   if (termine) {
     return genAttestationReussiteStagiaire(o, f, stagiaires, si);
   }

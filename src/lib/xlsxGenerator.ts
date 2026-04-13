@@ -72,7 +72,7 @@ export function generateExcelAssiduite(o: OrganismeInfo, f: FormationInfo, stagi
 
 export function generateExcelEvaluations(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]): string {
   const evalData = getEvalContent(f.intitule);
-  const termine = isFormationTerminee(f);
+  const termine = isFormationTerminee(f, stagiaires);
   let html = tableRow(["Stagiaire", "Positionnement", "Intermédiaire", "Finale", "Moyenne", "Progression", "Résultat"], true);
   stagiaires.slice(0, 10).forEach((s, i) => {
     if (termine) {
@@ -90,7 +90,7 @@ export function generateExcelEvaluations(o: OrganismeInfo, f: FormationInfo, sta
 }
 
 export function generateExcelSatisfaction(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]): string {
-  const termine = isFormationTerminee(f);
+  const termine = isFormationTerminee(f, stagiaires);
   const criteres = ["Accueil", "Objectifs", "Contenu", "Pédagogie", "Formateur", "Supports", "Durée", "Recommandation"];
   let html = tableRow(["Stagiaire", ...criteres, "Moyenne"], true);
   stagiaires.slice(0, 10).forEach((s, i) => {
@@ -138,7 +138,7 @@ export function generateExcelIndicateursQualite(o: OrganismeInfo): string {
 
 export function generateExcelSuiviCompetences(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]): string {
   const evalData = getEvalContent(f.intitule);
-  const termine = isFormationTerminee(f);
+  const termine = isFormationTerminee(f, stagiaires);
   let html = tableRow(["Stagiaire", ...evalData.competences, "Moyenne", "Statut"], true);
   stagiaires.slice(0, 10).forEach((s, i) => {
     if (termine) {
@@ -184,7 +184,7 @@ export function generateExcelPlanActions(o: OrganismeInfo): string {
 }
 
 export function generateExcelSuiviApprentis(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]): string {
-  const termine = isFormationTerminee(f);
+  const termine = isFormationTerminee(f, stagiaires);
   let html = tableRow(["N°", "Apprenti", "Entreprise", "MA", "Assiduité CFA", "Assiduité Ent.", "Note CFA", "Éval MA", "Visite 1", "Visite 2", "Statut"], true);
   stagiaires.slice(0, 10).forEach((s, i) => {
     const sc = EVAL_SCORES[i] || [7, 8, 7, 8, 7];
@@ -395,7 +395,7 @@ export function generateExcelSuiviParcoursBeneficiairesCFA(o: OrganismeInfo, f: 
   const now = new Date();
   const today = now.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
   const stags = stagiaires.length > 0 ? stagiaires : [{ prenom: "Martin", nom: "Dupont", civilite: "M." as const, email: "", telephone: "", entreprise: "", poste: "", dateNaissance: "" }];
-  const termine = isFormationTerminee(f);
+  const termine = isFormationTerminee(f, stagiaires);
 
   // Synchronized: use CFA week dates from alternance calendar
   const isCFA = !!(f.rythmeAlternance && f.rythmeAlternance.trim().length > 0);
@@ -503,7 +503,7 @@ export function generateExcelSuiviPFMP(o: OrganismeInfo, f: FormationInfo, stagi
 // ========== IND 13 — Outils de suivi alternance (Excel) ==========
 export function generateExcelOutilsSuiviAlternance(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]): string {
   const now = new Date();
-  const termine = isFormationTerminee(f);
+  const termine = isFormationTerminee(f, stagiaires);
   const isCFA = !!(f.rythmeAlternance && f.rythmeAlternance.trim().length > 0);
   const cfaWeekDates = isCFA ? getCFAWeekDates(f) : [];
   const pastWeeks = cfaWeekDates.filter(w => w.weekEnd < now).length;
