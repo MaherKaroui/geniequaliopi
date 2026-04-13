@@ -318,8 +318,18 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
         }
       });
 
+      // Aggressive canvas cleanup to free GPU/CPU memory
+      const ctx = canvas.getContext("2d");
+      if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+      canvas.width = 1;
+      canvas.height = 1;
       canvas.width = 0;
       canvas.height = 0;
+
+      // Remove rendered page from DOM immediately to free memory
+      if (pages[i].parentNode) {
+        pages[i].parentNode.removeChild(pages[i]);
+      }
     }
 
     return pdf.output("blob");
