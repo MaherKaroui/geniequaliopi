@@ -439,12 +439,12 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "test_positionnement_debut_stagiaire": {
       const si = params?.stagiaireIdx ?? 0;
       const s = stagiaires[si] || stagiaires[0];
-      return genTestPositionnementIndividuel(o, f, s, si, "debut");
+      return genTestPositionnementIndividuel(o, f, s, si, "debut", stagiaires);
     }
     case "test_positionnement_fin_stagiaire": {
       const si = params?.stagiaireIdx ?? 0;
       const s = stagiaires[si] || stagiaires[0];
-      return genTestPositionnementIndividuel(o, f, s, si, "fin");
+      return genTestPositionnementIndividuel(o, f, s, si, "fin", stagiaires);
     }
     case "procedure_eval_debut": return genProcedureEvaluation(o, f, "debut");
     case "procedure_eval_fin": return genProcedureEvaluation(o, f, "fin");
@@ -2139,13 +2139,13 @@ function genTestPositionnementTrame(o: OrganismeInfo, f: FormationInfo, type: "d
   return buildDocument({ org: o, title: `TEST DE POSITIONNEMENT ${labelCap.toUpperCase()} DE FORMATION`, subtitle: f.intitule, formation: f, showFormationInfo: false, extraHtml: extra });
 }
 
-function genTestPositionnementIndividuel(o: OrganismeInfo, f: FormationInfo, s: StagiaireInfo, si: number, type: "debut" | "fin") {
+function genTestPositionnementIndividuel(o: OrganismeInfo, f: FormationInfo, s: StagiaireInfo, si: number, type: "debut" | "fin", stagiaires?: StagiaireInfo[]) {
   const qo = getQuestionsOuvertes(f.intitule);
   const questions = type === "debut" ? qo.debut : qo.fin;
   const label = type === "debut" ? "début" : "fin";
   const labelCap = type === "debut" ? "Début" : "Fin";
   const isDebut = type === "debut";
-  const termine = isFormationTerminee(f);
+  const termine = isFormationTerminee(f, stagiaires);
 
   // For "fin" tests: leave blank if the formation end date hasn't passed
   if (!isDebut && !termine) {
