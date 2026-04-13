@@ -802,6 +802,178 @@ const CIP_CONTENT: FormationEvalContent = {
 };
 EVAL_CONTENT["CIP"] = CIP_CONTENT;
 
+// ===== RPMS =====
+EVAL_CONTENT["RPMS"] = {
+  qcmPositionnement: [
+    { question: "Que signifie SWOT ?", options: ["Système de Workflow Opérationnel", "Strengths, Weaknesses, Opportunities, Threats", "Stratégie Webmarketing et Outils", "Suivi Workload et Organisation"], correctIndex: 1 },
+    { question: "Qu'est-ce que le BFR ?", options: ["Le Bénéfice Financier Résiduel", "Le Besoin en Fonds de Roulement", "Le Budget Fonctionnel de Recettes", "Le Bilan Financier Restructuré"], correctIndex: 1 },
+    { question: "Quel document résume le patrimoine d'une entreprise ?", options: ["Le compte de résultat", "Le bilan", "Le business plan", "Le prévisionnel"], correctIndex: 1 },
+    { question: "Que signifie EBE ?", options: ["Excédent Brut d'Exploitation", "Évaluation du Budget d'Entreprise", "État des Bénéfices", "Estimation du Bilan"], correctIndex: 0 },
+    { question: "Combien de styles de management (Hersey & Blanchard) ?", options: ["2", "3", "4", "6"], correctIndex: 2 },
+    { question: "Fréquence de l'entretien professionnel obligatoire ?", options: ["Tous les ans", "Tous les 2 ans", "Tous les 3 ans", "Tous les 5 ans"], correctIndex: 1 },
+    { question: "Que signifie PESTEL ?", options: ["Politique, Économique, Social, Technologique, Environnemental, Légal", "Production, Évaluation, Stratégie, Technique, Engagement, Leadership", "Planification, Exécution, Suivi, Test, Évaluation, Livraison", "Prix, Efficacité, Service, Technologie, Éthique, Logistique"], correctIndex: 0 },
+    { question: "Qu'est-ce qu'un tableau de bord de gestion ?", options: ["Un outil comptable obligatoire", "Un document fiscal", "Un outil de pilotage avec indicateurs clés", "Un logiciel de paie"], correctIndex: 2 },
+    { question: "Seuil pour l'obligation de mettre en place un CSE ?", options: ["5 salariés", "11 salariés", "20 salariés", "50 salariés"], correctIndex: 1 },
+    { question: "Qu'est-ce que le point mort ?", options: ["Le CA minimum pour couvrir les charges", "Le moment où l'entreprise ferme", "Le bénéfice net maximal", "Le taux d'endettement critique"], correctIndex: 0 },
+  ],
+  qcmFinal: [
+    { question: "Comment calcule-t-on la marge brute ?", options: ["CA − Charges fixes", "(CA − Coût des ventes) / CA", "Résultat net / CA", "EBE / CA"], correctIndex: 1 },
+    { question: "Quels sont les 4P du mix marketing ?", options: ["Produit, Prix, Place, Promotion", "Plan, Politique, Performance, Profit", "Prévision, Production, Pilotage, Performance", "Positionnement, Prospection, Promotion, Partenariat"], correctIndex: 0 },
+    { question: "Qu'est-ce que la méthode PDCA ?", options: ["Plan-Do-Check-Act", "Planifier-Développer-Contrôler-Améliorer", "Les deux sont correctes", "Aucune des réponses"], correctIndex: 2 },
+    { question: "Quelle forme juridique offre une responsabilité limitée ?", options: ["Entreprise individuelle", "SARL", "Auto-entrepreneur", "SNC"], correctIndex: 1 },
+    { question: "Qu'est-ce que la GEPP ?", options: ["Gestion des Emplois et des Parcours Professionnels", "Guide d'Évaluation du Personnel", "Gestion Économique du Plan de Production", "Grille d'Évaluation du Potentiel"], correctIndex: 0 },
+    { question: "Quel outil analyse les 5 forces concurrentielles ?", options: ["La matrice BCG", "Le modèle de Porter", "L'analyse PESTEL", "Le Business Model Canvas"], correctIndex: 1 },
+    { question: "Délai moyen de paiement clients ?", options: ["(Créances / CA TTC) × 360", "Créances / Dettes × 100", "CA / Nombre de clients", "Trésorerie / CA × 360"], correctIndex: 0 },
+    { question: "Qu'est-ce que le Balanced Scorecard ?", options: ["Un logiciel de comptabilité", "Un outil de pilotage à 4 perspectives", "Un tableau Excel RH", "Un indicateur boursier"], correctIndex: 1 },
+    { question: "Quel document formalise la stratégie ?", options: ["Le bilan comptable", "Le business plan", "La fiche de paie", "L'organigramme"], correctIndex: 1 },
+    { question: "Durée légale du travail en France ?", options: ["32h/semaine", "35h/semaine", "37h/semaine", "39h/semaine"], correctIndex: 1 },
+  ],
+  exercices: [
+    { titre: "Cas 1 : Plan d'actions commerciales", consigne: "Vous êtes RPMS d'une PME de 15 salariés. Le CA a baissé de 12%. Élaborez un PAC sur 6 mois.", reponseAttendue: "Diagnostic, objectifs SMART (+15% CA), actions (prospection, fidélisation, partenariats), budget 5000€, KPIs (taux conversion, CA mensuel, NPS)." },
+    { titre: "Cas 2 : Gestion d'un conflit", consigne: "Deux collaborateurs sont en conflit. Décrivez votre démarche de résolution.", reponseAttendue: "Entretiens individuels, identification des causes, médiation avec méthode DESC, solutions (redistribution tâches, outils de partage), suivi J+15 et M+1." },
+    { titre: "Cas 3 : Analyse financière", consigne: "CA=800k€, Achats=320k€, Personnel=280k€, Charges ext.=120k€, Amort.=30k€. Calculez marge brute, VA, EBE, résultat.", reponseAttendue: "Marge brute=480k€ (60%), VA=360k€, EBE=80k€, Résultat exploitation=50k€." },
+    { titre: "Cas 4 : Recrutement", consigne: "Recrutez un commercial. Fiche de poste, processus et parcours d'intégration 3 mois.", reponseAttendue: "Fiche de poste, processus multi-canal, entretien structuré, intégration : formation produit, accompagnement terrain, bilan période d'essai." },
+  ],
+  competences: ["Pilotage stratégie commerciale", "Management d'équipe", "Gestion budgétaire et financière", "Analyse comptable", "GRH", "Conduite de projet", "Communication managériale", "Relation client", "Droit du travail", "Pilotage par indicateurs"],
+  appreciations: [
+    "Excellente capacité d'analyse financière et de pilotage. Leadership naturel dans les travaux de groupe.",
+    "Bonne maîtrise du management et de la gestion. PAC bien structuré. Progression notable en analyse financière.",
+    "Très bonne implication. Compétences RH solides. Doit approfondir les ratios financiers.",
+    "Niveau satisfaisant. Gestion de projet bien maîtrisée. Cas pratiques de management bien traités.",
+    "Stagiaire motivé(e) et rigoureux(se). Business plan de qualité professionnelle.",
+    "Bonne progression. Gestion de trésorerie et pilotage budgétaire bien compris.",
+  ],
+};
+
+// ===== ASSISTANT DE DIRECTION =====
+EVAL_CONTENT["Assistant de Direction"] = {
+  qcmPositionnement: [
+    { question: "Quels sont les 4 quadrants de la matrice d'Eisenhower ?", options: ["Important/Urgent, Important/Non urgent, Non important/Urgent, Non important/Non urgent", "Stratégique/Opérationnel, Court/Long terme", "Prioritaire/Secondaire/Tertiaire/Optionnel", "Planifier/Organiser/Diriger/Contrôler"], correctIndex: 0 },
+    { question: "Que signifie GED ?", options: ["Gestion des Effectifs", "Gestion Électronique des Documents", "Guide d'Évaluation", "Gestion des Emplois"], correctIndex: 1 },
+    { question: "Durée légale de conservation des factures ?", options: ["5 ans", "10 ans", "3 ans", "30 ans"], correctIndex: 1 },
+    { question: "Quel outil planifie visuellement un projet ?", options: ["La matrice SWOT", "Le diagramme de Gantt", "L'organigramme", "Le PERT"], correctIndex: 1 },
+    { question: "Formule de politesse appropriée en courrier formel ?", options: ["Cordialement", "Veuillez agréer l'expression de mes salutations distinguées", "À bientôt", "Bien à vous"], correctIndex: 1 },
+    { question: "Que signifie RGPD ?", options: ["Planification Documentaire", "Protection des Données", "Personnel et Droits", "Procédures Documentaires"], correctIndex: 1 },
+    { question: "Logiciel pour gestion d'agendas partagés ?", options: ["Excel", "Outlook", "PowerPoint", "Word"], correctIndex: 1 },
+    { question: "Qu'est-ce qu'une note de synthèse ?", options: ["Note de service", "Résumé structuré d'un dossier complexe", "Note d'information", "Mémorandum"], correctIndex: 1 },
+    { question: "Rôle principal d'un(e) assistant(e) de direction ?", options: ["Remplacer le directeur", "Faciliter les décisions et organiser le quotidien", "Gérer la comptabilité", "Recruter"], correctIndex: 1 },
+    { question: "Méthode de gestion du temps efficace ?", options: ["AIDA", "NERAC", "SONCAS", "QQOQCP"], correctIndex: 1 },
+  ],
+  qcmFinal: [
+    { question: "Étapes d'organisation d'une réunion ?", options: ["OJ → Convocations → Salle → Dossier → Notes → CR → Suivi", "Invitation → Discussion → Conclusion", "Planning → Exécution → Contrôle", "Brief → Validation → Envoi"], correctIndex: 0 },
+    { question: "Comment rédiger un CR de réunion efficace ?", options: ["Retranscrire mot à mot", "Structurer par thème avec décisions et actions", "Résumé libre de 2 lignes", "Enregistrer l'audio"], correctIndex: 1 },
+    { question: "Différence entre PV et compte rendu ?", options: ["Le PV est juridiquement engageant, le CR informatif", "Le PV est plus court", "Le CR est obligatoire", "Aucune différence"], correctIndex: 0 },
+    { question: "Comment gérer un interlocuteur agressif ?", options: ["Raccrocher", "Écouter, reformuler, proposer une solution", "Transférer sans prévenir", "Ignorer"], correctIndex: 1 },
+    { question: "Qu'est-ce qu'un rétro-planning ?", options: ["Un planning qui part de la fin", "Un planning de vacances", "Un historique", "Un plan de sauvegarde"], correctIndex: 0 },
+    { question: "Règle des 2 minutes ?", options: ["Pause toutes les 2 min", "Si <2 min, faire immédiatement", "Réunions de 2 min", "Emails en 2 min"], correctIndex: 1 },
+    { question: "Organisation d'un déplacement ?", options: ["Transport → Hébergement → Ordre de mission → Notes de frais", "Acheter un billet", "Demander au directeur", "Appeler l'agence"], correctIndex: 0 },
+    { question: "Outil collaboratif pour le partage de docs ?", options: ["Fax", "SharePoint / Google Drive", "Courrier postal", "Photocopieur"], correctIndex: 1 },
+    { question: "Contenu d'un ordre du jour ?", options: ["Thèmes, temps alloué, intervenants, documents à préparer", "Date et heure uniquement", "CR de la précédente", "Coordonnées des participants"], correctIndex: 0 },
+    { question: "Qu'est-ce que le time blocking ?", options: ["Bloquer des sites web", "Bloquer des créneaux dédiés dans l'agenda", "Limiter le temps de pause", "Un logiciel de gestion"], correctIndex: 1 },
+  ],
+  exercices: [
+    { titre: "Cas 1 : Organisation d'un séminaire", consigne: "Organisez un séminaire de 2 jours pour 30 personnes. Rétro-planning, budget et logistique.", reponseAttendue: "Rétro-planning J-60 à J+7. Budget : salle 2000€, restauration 3000€, hébergement 4500€, transport 1500€. Documents : programme, convocations, évaluation." },
+    { titre: "Cas 2 : Note de synthèse", consigne: "Rédigez une note de synthèse sur la mise en place du télétravail (points clés, avantages/inconvénients, recommandations).", reponseAttendue: "Contexte, cadre juridique (ANI 2020), avantages (productivité, bien-être), risques (isolement, sécurité IT), recommandations (2j/semaine, charte, formation managers)." },
+    { titre: "Cas 3 : Gestion d'agendas conflictuels", consigne: "3 RDV au même moment : client, CODIR, entretien RH. Proposez un arbitrage.", reponseAttendue: "Client prioritaire (enjeu commercial), CODIR décalé à 16h, entretien reporté au lendemain. Informer et confirmer les nouveaux créneaux." },
+    { titre: "Cas 4 : Système de veille", consigne: "Mettez en place un système de veille pour votre directeur.", reponseAttendue: "Sources : presse, newsletters, LinkedIn. Outils : Google Alerts, Feedly, Notion. Format revue de presse : titre, résumé, impact. Diffusion hebdomadaire." },
+  ],
+  competences: ["Gestion de l'agenda et des priorités", "Communication écrite", "Communication orale et accueil", "Organisation de réunions", "Rédaction de CR et notes", "Classement et archivage (GED)", "Gestion des déplacements", "Outils bureautiques avancés", "Veille informationnelle", "Coordination de projets"],
+  appreciations: [
+    "Excellente organisation et rigueur. CR clairs et structurés. Parfaite maîtrise des outils bureautiques.",
+    "Bonne progression en rédaction. Organisation des réunions efficace. Veille à approfondir.",
+    "Très bonne communication écrite et orale. Gestion des agendas conflictuels bien maîtrisée.",
+    "Niveau satisfaisant. Fondamentaux acquis. Gestion de projet et rétro-planning à consolider.",
+    "Stagiaire impliqué(e). Notes de synthèse de qualité. Accueil téléphonique irréprochable.",
+    "Bonne maîtrise générale. Organisation d'événements efficace. Communication fluide et diplomatique.",
+  ],
+};
+
+// ===== INFOGRAPHISTE =====
+EVAL_CONTENT["Infographiste"] = {
+  qcmPositionnement: [
+    { question: "Différence vectoriel / bitmap ?", options: ["Vectoriel plus lourd", "Bitmap sans perte", "Vectoriel = courbes mathématiques, bitmap = pixels", "Aucune"], correctIndex: 2 },
+    { question: "Mode colorimétrique pour l'impression ?", options: ["RVB", "CMJN", "Pantone uniquement", "HSL"], correctIndex: 1 },
+    { question: "Résolution pour l'impression ?", options: ["72 dpi", "150 dpi", "300 dpi", "600 dpi"], correctIndex: 2 },
+    { question: "Logiciel Adobe pour la retouche photo ?", options: ["Illustrator", "InDesign", "Photoshop", "Premiere Pro"], correctIndex: 2 },
+    { question: "Qu'est-ce que le fond perdu ?", options: ["La zone de texte", "La marge au-delà du format de coupe", "L'espace entre colonnes", "Le dos d'une brochure"], correctIndex: 1 },
+    { question: "Couleurs primaires en CMJN ?", options: ["3", "4", "5", "6"], correctIndex: 1 },
+    { question: "Outil pour les courbes de Bézier dans Illustrator ?", options: ["Pinceau", "Plume", "Crayon", "Gomme"], correctIndex: 1 },
+    { question: "Qu'est-ce qu'une charte graphique ?", options: ["Un contrat", "Les règles d'utilisation de l'identité visuelle", "Un logiciel", "Un type de police"], correctIndex: 1 },
+    { question: "Format logo web avec transparence ?", options: ["JPEG", "BMP", "PNG", "TIFF"], correctIndex: 2 },
+    { question: "Que signifie PAO ?", options: ["Publication Assistée par Ordinateur", "Programmation Avancée", "Production Automatisée", "Plateforme d'Aide"], correctIndex: 0 },
+  ],
+  qcmFinal: [
+    { question: "Différence Illustrator / Photoshop ?", options: ["Illustrator = vectoriel, Photoshop = bitmap", "Illustrator = photos", "Aucune différence", "Illustrator = mise en page"], correctIndex: 0 },
+    { question: "Qu'est-ce que le PDF/X ?", options: ["Format présentation", "Standard d'échange pour l'impression", "Format vidéo", "Logiciel de conversion"], correctIndex: 1 },
+    { question: "Couleur complémentaire du rouge ?", options: ["Orange", "Vert", "Violet", "Jaune"], correctIndex: 1 },
+    { question: "Qu'est-ce qu'un gabarit InDesign ?", options: ["Modèle de couleur", "Page type réutilisable", "Outil de dessin", "Format d'export"], correctIndex: 1 },
+    { question: "Nombre max de polices par projet ?", options: ["1", "2-3", "5-6", "Illimité"], correctIndex: 1 },
+    { question: "Que fait le Pathfinder ?", options: ["Dégradés", "Combine/soustrait des formes vectorielles", "Effets photo", "Gère les calques"], correctIndex: 1 },
+    { question: "Typographie sans-serif ?", options: ["Avec empattements", "Sans empattements, épurée", "Manuscrite", "Monospace"], correctIndex: 1 },
+    { question: "Format vectoriel pour le web ?", options: ["PSD", "TIFF", "SVG", "RAW"], correctIndex: 2 },
+    { question: "Droit de cession ?", options: ["Copier librement", "Transfert contractuel des droits d'exploitation", "Modifier sans autorisation", "Abandon du droit moral"], correctIndex: 1 },
+    { question: "Qu'est-ce qu'un moodboard ?", options: ["Planning", "Tableau d'inspiration visuelle", "Outil retouche", "Format impression"], correctIndex: 1 },
+  ],
+  exercices: [
+    { titre: "Cas 1 : Création d'un logo", consigne: "Créez le logo d'une boulangerie 'La Mie Dorée'. Brief, 3 pistes graphiques, justification.", reponseAttendue: "Brief (valeurs, cible, concurrents). 3 pistes : épi de blé, calligraphie, pictogramme pain+soleil. Choix justifié, déclinable en monochrome et favicon." },
+    { titre: "Cas 2 : Charte graphique", consigne: "Élaborez la charte graphique d'une start-up 'NovaTech'.", reponseAttendue: "Couleurs : bleu nuit #1A2E4A, orange #FF6B35, gris #F5F5F5. Typos : Poppins Bold + Inter Regular. Logo : zone protection, taille min, versions. Applications." },
+    { titre: "Cas 3 : Maquette InDesign", consigne: "Maquettez un catalogue de 8 pages pour une marque de vêtements.", reponseAttendue: "Format A4, fond perdu 3mm, grille 3 colonnes, gabarits (couverture, produit, texte), styles de paragraphe, nuancier." },
+    { titre: "Cas 4 : Retouche photo", consigne: "Décrivez le workflow de retouche de 5 photos produit sous Photoshop.", reponseAttendue: "Analyse, développement RAW, correction niveaux/courbes, détourage, retouche tampon, harmonisation, export 300dpi + 72dpi." },
+  ],
+  competences: ["Composition et design graphique", "Couleur et typographie", "Adobe Photoshop", "Adobe Illustrator", "Adobe InDesign", "Logos et identité visuelle", "Charte graphique", "Prépresse", "Gestion de projet créatif", "Droit d'auteur"],
+  appreciations: [
+    "Excellente créativité et maîtrise technique Adobe. Portfolio professionnel. Sens aigu de la composition.",
+    "Bonne progression sur Illustrator et InDesign. Logos originaux. Prépresse à approfondir.",
+    "Très bon sens esthétique. Retouche photo maîtrisée. Chartes graphiques complètes.",
+    "Niveau satisfaisant. Fondamentaux acquis. Créativité bien exprimée dans les exercices de logo.",
+    "Stagiaire motivé(e) et créatif(ve). Maquette InDesign professionnelle.",
+    "Bonne maîtrise de la suite Adobe. Typographie et couleur bien intégrées.",
+  ],
+};
+
+// ===== RESTAURATION =====
+EVAL_CONTENT["Restauration"] = {
+  qcmPositionnement: [
+    { question: "Principes de la méthode HACCP ?", options: ["3", "5", "7", "10"], correctIndex: 2 },
+    { question: "Température de la zone de danger ?", options: ["0 à 3°C", "3 à 63°C", "63 à 100°C", "< 0°C"], correctIndex: 1 },
+    { question: "Que signifie FIFO ?", options: ["First In, First Out", "Food Inspection For Operators", "Formation Initiale", "Fiches d'Inspection"], correctIndex: 0 },
+    { question: "Allergènes à déclaration obligatoire ?", options: ["8", "10", "14", "20"], correctIndex: 2 },
+    { question: "Qu'est-ce que la marche en avant ?", options: ["Exercice de gym", "Progression du sale vers le propre", "Mode de cuisson", "Type de service"], correctIndex: 1 },
+    { question: "Température minimale de cuisson à cœur ?", options: ["45°C", "55°C", "63°C", "75°C"], correctIndex: 2 },
+    { question: "Qu'est-ce qu'une brunoise ?", options: ["Sauce", "Dés très fins (1-2 mm)", "Type de cuisson", "Dessert"], correctIndex: 1 },
+    { question: "Document pour la traçabilité ?", options: ["Le menu", "La fiche technique", "Le bon de livraison avec lots", "Le planning"], correctIndex: 2 },
+    { question: "Tenue du personnel en cuisine ?", options: ["Tenue de ville", "Charlotte, tablier, chaussures de sécurité", "Uniquement tablier", "Tenue libre"], correctIndex: 1 },
+    { question: "Les 5 sauces mères ?", options: ["Ketchup, moutarde, mayo, BBQ, soja", "Béchamel, velouté, espagnole, tomate, hollandaise", "Vinaigrette, aïoli, pesto, rouille, gribiche", "Beurre blanc, noisette, coulis, jus, fumet"], correctIndex: 1 },
+  ],
+  qcmFinal: [
+    { question: "7 principes HACCP dans l'ordre ?", options: ["Analyse dangers, CCP, limites, surveillance, actions correctives, vérification, documentation", "Nettoyage, cuisson, service, stockage, livraison, contrôle, archivage", "Réception, stockage, préparation, cuisson, dressage, service, plonge", "Hygiène, qualité, traçabilité, formation, contrôle, audit, amélioration"], correctIndex: 0 },
+    { question: "Température de conservation surgelés ?", options: ["-10°C", "-15°C", "-18°C", "-25°C"], correctIndex: 2 },
+    { question: "Service à l'anglaise ?", options: ["Client se sert", "Serveur sert depuis le plat", "Plats dressés en cuisine", "Service au guéridon"], correctIndex: 1 },
+    { question: "Durée max en zone de danger ?", options: ["30 min", "1h", "2h", "4h"], correctIndex: 2 },
+    { question: "Qu'est-ce qu'un roux ?", options: ["Salade", "Beurre + farine cuit", "Viande marinée", "Dessert chocolat"], correctIndex: 1 },
+    { question: "Lavage fruits et légumes ?", options: ["Eau claire", "Eau + vinaigre ou eau javellisée", "Pas de lavage", "Eau chaude"], correctIndex: 1 },
+    { question: "Que signifie DLC ?", options: ["Date Limite de Conservation", "Date Limite de Consommation", "Durée Légale de Commercialisation", "Délai de Conditionnement"], correctIndex: 1 },
+    { question: "Plan de nettoyage et désinfection ?", options: ["Plan architectural", "Document quoi/quand/comment nettoyer", "Plan de menus", "Organigramme"], correctIndex: 1 },
+    { question: "Certification NF525 ?", options: ["Norme alimentaire", "Obligation certification logiciels de caisse", "Label bio", "Norme incendie"], correctIndex: 1 },
+    { question: "Viande fraîche de qualité ?", options: ["Couleur vive, ferme, odeur neutre", "Brune, molle, forte odeur", "Grise, brillante", "Sèche, croûte épaisse"], correctIndex: 0 },
+  ],
+  exercices: [
+    { titre: "Cas 1 : Plan HACCP simplifié", consigne: "Établissez un plan HACCP pour une salade composée froide.", reponseAttendue: "Dangers (biologiques, chimiques, physiques). CCP : réception T°, stockage FIFO, lavage légumes, assemblage <30min zone danger. Documentation : bons, relevés T°, fiches nettoyage." },
+    { titre: "Cas 2 : Organisation d'un service", consigne: "Organisez un service de 50 couverts : mise en place, déroulement, nettoyage.", reponseAttendue: "Mise en place (dressage, postes, briefing). Service (accueil, commandes, synchronisation, encaissement). Après-service (débarrassage, nettoyage, comptabilité caisse)." },
+    { titre: "Cas 3 : Réception marchandises", consigne: "Décrivez la procédure de contrôle à la réception (viandes, légumes, laitiers).", reponseAttendue: "Conformité bon commande/livraison. T° : viandes ≤3°C, laitiers ≤6°C. DLC, aspect, emballage. Refus si non-conforme. Rangement immédiat. Fiche de réception." },
+    { titre: "Cas 4 : Gestion des allergènes", consigne: "Client allergique gluten et fruits à coque. Votre démarche ?", reponseAttendue: "Consulter fiches allergènes, identifier plats compatibles, informer cuisine (étiquette), vérifier contaminations croisées, confirmer au client, documenter." },
+  ],
+  competences: ["Hygiène et HACCP", "Chaîne du froid/chaud", "Techniques de découpe", "Modes de cuisson", "Préparations froides/chaudes", "Service en salle", "Accueil client", "Gestion de caisse", "Traçabilité et stocks", "Nettoyage et désinfection"],
+  appreciations: [
+    "Excellente maîtrise de l'hygiène et sécurité alimentaire. Techniques culinaires acquises. Service irréprochable.",
+    "Bonne progression. Traçabilité et stocks bien compris. Gestes de découpe en bonne voie.",
+    "Très bonne implication en cuisine et en salle. Accueil chaleureux. Protocoles HACCP respectés.",
+    "Niveau satisfaisant. Bases culinaires acquises. Service fluide. Cuissons avancées à approfondir.",
+    "Stagiaire motivé(e) et ponctuel(le). Travail en équipe apprécié. Allergènes bien maîtrisés.",
+    "Bonne polyvalence cuisine/salle. Plan de nettoyage rigoureusement appliqué. Caisse acquise.",
+  ],
+};
+
 // Map formation intitulé to content key
 function getContentKey(intitule: string): string {
   const lower = intitule.toLowerCase();
@@ -814,6 +986,11 @@ function getContentKey(intitule: string): string {
   // SAMA / SAMS must be checked BEFORE generic "médico-social" / "social"
   if (lower.includes("sama") || lower.includes("rncp40800") || lower.includes("secrétaire assistant médico-administratif") || lower.includes("secretaire assistant medico-administratif")) return "SAMA";
   if (lower.includes("sams") || lower.includes("rncp36805") || lower.includes("secrétaire assistant médico-social") || lower.includes("secretaire assistant medico-social")) return "SAMS";
+  // New formations
+  if (lower.includes("responsable de petite") || lower.includes("rpms") || lower.includes("petite et moyenne structure")) return "RPMS";
+  if (lower.includes("assistant") && lower.includes("direction")) return "Assistant de Direction";
+  if (lower.includes("infographiste") || lower.includes("infographie") || lower.includes("metteur en page")) return "Infographiste";
+  if (lower.includes("restauration") || lower.includes("employé polyvalent en restauration")) return "Restauration";
   if (lower.includes("excel")) return "Excel Professionnel";
   if ((lower.includes("anglais") || lower.includes("english")) && (lower.includes("a1") || lower.includes("débutant"))) return "Anglais A1";
   if (lower.includes("anglais")) return "Anglais Professionnel";

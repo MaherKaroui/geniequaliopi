@@ -1,0 +1,51 @@
+import { CourseChapter } from "./courseContent";
+
+export function getAssistantDirectionChapters(): CourseChapter[] {
+  return [
+    {
+      title: "Le rôle et les missions de l'assistant(e) de direction",
+      description: "Comprendre le positionnement stratégique de l'assistant(e) de direction et ses responsabilités au sein de l'organisation.",
+      sections: [
+        { title: "Positionnement et missions", content: `<p>L'assistant(e) de direction est le bras droit du dirigeant ou du cadre supérieur. Ses missions couvrent :</p><ul><li><strong>Gestion de l'agenda :</strong> Planification des rendez-vous, réunions, déplacements, arbitrage des priorités</li><li><strong>Communication :</strong> Interface avec les interlocuteurs internes et externes, filtrage des demandes</li><li><strong>Organisation :</strong> Préparation de dossiers, coordination de projets, suivi des échéances</li><li><strong>Confidentialité :</strong> Gestion d'informations sensibles, discrétion absolue</li></ul><p><strong>Compétences clés :</strong> Organisation, anticipation, diplomatie, polyvalence, maîtrise des outils numériques.</p>` },
+        { title: "L'environnement professionnel", content: `<p>L'assistant(e) de direction évolue dans un environnement exigeant :</p><ul><li><strong>Types de structures :</strong> PME, grandes entreprises, associations, collectivités, cabinets</li><li><strong>Relations hiérarchiques :</strong> Rattachement direct à la direction générale ou à un directeur de pôle</li><li><strong>Travail collaboratif :</strong> Coordination avec les services (RH, comptabilité, commercial, juridique)</li><li><strong>Dimensions internationales :</strong> Correspondance multilingue, gestion de fuseaux horaires</li></ul>` },
+      ]
+    },
+    {
+      title: "Gestion administrative et organisationnelle",
+      description: "Maîtriser les techniques d'organisation administrative : classement, archivage, gestion du temps et gestion des priorités.",
+      sections: [
+        { title: "Gestion du temps et des priorités", content: `<p>Méthodes et outils pour une organisation optimale :</p><ul><li><strong>Matrice d'Eisenhower :</strong> Classer les tâches en 4 quadrants (urgent/important)</li><li><strong>Méthode NERAC :</strong> Noter, Estimer, Réserver, Arbitrer, Contrôler</li><li><strong>Time blocking :</strong> Bloquer des créneaux dédiés dans l'agenda</li><li><strong>Outils :</strong> Outlook, Google Calendar, Trello, Notion, Microsoft To Do</li></ul><p><strong>Règle des 2 minutes :</strong> Si une tâche prend moins de 2 minutes, la faire immédiatement.</p>` },
+        { title: "Classement et archivage", content: `<p>Système de classement efficace :</p><ul><li><strong>Plan de classement :</strong> Organisation logique (chronologique, thématique, alphabétique)</li><li><strong>GED (Gestion Électronique des Documents) :</strong> Dématérialisation, indexation, recherche</li><li><strong>Archivage :</strong> Durées légales de conservation, destruction sécurisée</li><li><strong>RGPD :</strong> Protection des données personnelles, droit à l'oubli</li></ul>` },
+        { title: "Organisation des réunions et événements", content: `<p>De la préparation au compte rendu :</p><ol><li><strong>Avant :</strong> Ordre du jour, convocations, réservation de salle/visio, dossier préparatoire</li><li><strong>Pendant :</strong> Prise de notes, gestion du temps, relevé de décisions</li><li><strong>Après :</strong> Compte rendu, diffusion, suivi des actions décidées</li></ol><p><strong>Séminaires et événements :</strong> Logistique, budget, prestataires, coordination, évaluation post-événement.</p>` },
+        { title: "Gestion des déplacements professionnels", content: `<p>Organisation des voyages d'affaires :</p><ul><li>Réservation de transports et hébergements</li><li>Ordre de mission et feuille de route</li><li>Notes de frais : justificatifs, barèmes, remboursement</li><li>Gestion des imprévus : annulations, modifications, assurances</li><li>Outils : plateformes de réservation, politique voyage de l'entreprise</li></ul>` },
+      ]
+    },
+    {
+      title: "Communication professionnelle écrite et orale",
+      description: "Maîtriser les techniques de communication professionnelle pour assurer une interface efficace avec les interlocuteurs.",
+      sections: [
+        { title: "Rédaction professionnelle", content: `<p>Les écrits professionnels de l'assistant(e) de direction :</p><ul><li><strong>Courriers et emails :</strong> Structure, registre de langue, formules de politesse</li><li><strong>Notes de synthèse :</strong> Résumé structuré de dossiers complexes</li><li><strong>Comptes rendus :</strong> Fidélité, clarté, hiérarchisation des informations</li><li><strong>Rapports :</strong> Introduction, développement, recommandations, annexes</li><li><strong>PV de réunion :</strong> Décisions, actions, responsables, délais</li></ul>` },
+        { title: "Communication orale et accueil", content: `<p>Techniques de communication orale professionnelle :</p><ul><li><strong>Accueil téléphonique :</strong> Décrocher avant 3 sonneries, formule d'accueil, filtrage, prise de message</li><li><strong>Accueil physique :</strong> Sourire, posture, langage corporel, orientation des visiteurs</li><li><strong>Prise de parole :</strong> Présentations, synthèses orales, reporting au dirigeant</li><li><strong>Gestion des situations délicates :</strong> Interlocuteurs difficiles, réclamations, urgences</li></ul>` },
+        { title: "Outils bureautiques avancés", content: `<p>Maîtrise approfondie des outils de productivité :</p><ul><li><strong>Word :</strong> Modèles, styles, publipostage, documents longs (table des matières, index)</li><li><strong>Excel :</strong> Tableaux de bord, TCD, graphiques, suivi budgétaire</li><li><strong>PowerPoint :</strong> Présentations professionnelles, charte graphique</li><li><strong>Outlook :</strong> Gestion multi-agendas, règles de tri, signatures</li><li><strong>Outils collaboratifs :</strong> Teams, SharePoint, Google Workspace, Slack</li></ul>` },
+      ]
+    },
+    {
+      title: "Gestion de projets et veille informationnelle",
+      description: "Contribuer à la gestion de projets transversaux et assurer une veille informationnelle pour la direction.",
+      sections: [
+        { title: "Assister la direction dans la gestion de projets", content: `<p>L'assistant(e) de direction contribue au pilotage des projets :</p><ul><li><strong>Planification :</strong> Rétro-planning, diagramme de Gantt, jalons</li><li><strong>Coordination :</strong> Interface entre les parties prenantes, relances, suivi des livrables</li><li><strong>Reporting :</strong> Tableaux de bord projet, indicateurs d'avancement, alertes</li><li><strong>Documentation :</strong> Centralisation des documents projet, versioning</li></ul>` },
+        { title: "Veille informationnelle et analyse", content: `<p>La veille est une mission stratégique :</p><ul><li><strong>Types de veille :</strong> Concurrentielle, juridique, technologique, sectorielle</li><li><strong>Sources :</strong> Presse spécialisée, newsletters, réseaux professionnels, sites institutionnels</li><li><strong>Outils :</strong> Google Alerts, Feedly, Netvibes, curation de contenu</li><li><strong>Diffusion :</strong> Notes de synthèse, revue de presse, alertes ciblées à la direction</li></ul>` },
+        { title: "Gestion budgétaire et suivi administratif", content: `<p>Contribution à la gestion financière :</p><ul><li><strong>Suivi des budgets :</strong> Saisie des dépenses, rapprochement, alertes dépassements</li><li><strong>Facturation :</strong> Émission de factures, relances, suivi des paiements</li><li><strong>Contrats :</strong> Suivi des échéances contractuelles, renouvellements, résiliations</li><li><strong>Tableaux de bord :</strong> Indicateurs RH, financiers, commerciaux pour la direction</li></ul>` },
+      ]
+    },
+    {
+      title: "Quiz et auto-évaluation",
+      description: "Testez vos connaissances acquises tout au long de la formation.",
+      sections: [
+        { title: "Quiz – Organisation et communication", content: `<div style="background:#f8f9fa;padding:15px;border-radius:8px;margin-bottom:15px"><p><strong>Question 1 :</strong> Quels sont les 4 quadrants de la matrice d'Eisenhower ?</p><p style="color:#28a745">✅ Réponse : Urgent/Important (faire), Non urgent/Important (planifier), Urgent/Non important (déléguer), Non urgent/Non important (éliminer)</p></div><div style="background:#f8f9fa;padding:15px;border-radius:8px;margin-bottom:15px"><p><strong>Question 2 :</strong> Quelles sont les étapes de l'organisation d'une réunion ?</p><p style="color:#28a745">✅ Réponse : Ordre du jour → Convocations → Réservation → Dossier préparatoire → Prise de notes → Compte rendu → Suivi des actions</p></div>` },
+        { title: "Quiz – Gestion de projets et veille", content: `<div style="background:#f8f9fa;padding:15px;border-radius:8px;margin-bottom:15px"><p><strong>Question 3 :</strong> Qu'est-ce qu'un diagramme de Gantt ?</p><p style="color:#28a745">✅ Réponse : Un outil de planification visuel qui représente les tâches d'un projet sur un axe temporel, avec leurs durées, dépendances et jalons.</p></div><div style="background:#f8f9fa;padding:15px;border-radius:8px;margin-bottom:15px"><p><strong>Question 4 :</strong> Citez 3 outils de veille informationnelle.</p><p style="color:#28a745">✅ Réponse : Google Alerts, Feedly, Netvibes (ou Talkwalker, Mention, LinkedIn)</p></div>` },
+        { title: "Grille d'auto-évaluation", content: `<table border="1" cellpadding="8" style="width:100%;border-collapse:collapse"><tr style="background:#f0f0f0"><th>Compétence</th><th>1</th><th>2</th><th>3</th><th>4</th></tr><tr><td>Gestion de l'agenda et des priorités</td><td>☐</td><td>☐</td><td>☐</td><td>☐</td></tr><tr><td>Rédaction de comptes rendus et notes</td><td>☐</td><td>☐</td><td>☐</td><td>☐</td></tr><tr><td>Organisation de réunions/événements</td><td>☐</td><td>☐</td><td>☐</td><td>☐</td></tr><tr><td>Communication orale et accueil</td><td>☐</td><td>☐</td><td>☐</td><td>☐</td></tr><tr><td>Outils bureautiques avancés</td><td>☐</td><td>☐</td><td>☐</td><td>☐</td></tr><tr><td>Veille et gestion de projets</td><td>☐</td><td>☐</td><td>☐</td><td>☐</td></tr></table>` },
+      ]
+    },
+  ];
+}
