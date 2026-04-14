@@ -342,9 +342,11 @@ export default function ControleEDOF({ organisme, formation, stagiaires, signatu
           }
           advanceProgress(`${eyDoc.code} — fichier pré-fourni`);
         } else if (eyDoc.autoTemplates.length > 0) {
+          const isBacPro = eyDoc.category === "controle_bac_pro";
           await appendAutoDocToZip(zip, eyDoc, {
             pdfOptions: MASS_EXPORT_PDF_OPTIONS,
             sourceStagiaires: exportStagiaires,
+            folderByStagiaire: isBacPro,
             onItemDone: (current, total) => {
               advanceProgress(total > 1 ? `${eyDoc.code} — ${current}/${total}` : `${eyDoc.code} — ${eyDoc.label}`);
             },
