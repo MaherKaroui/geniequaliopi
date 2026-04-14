@@ -343,11 +343,22 @@ export function genBilanIntermediaire(o: OrganismeInfo, f: FormationInfo, stagia
   const debut = f.dateDebut || "";
   const fin = f.dateFin || "";
 
-  // Compute formation days for display
-  const days = getFormationDays(f);
-  const nbJours = days.length || 4;
+  // Compute formation days as ISO dates for the bilan date calculation
+  const isoBusinessDays: string[] = [];
+  if (debut && fin) {
+    const sd = new Date(debut);
+    const ed = new Date(fin);
+    const cur = new Date(sd);
+    while (cur <= ed) {
+      if (cur.getDay() !== 0 && cur.getDay() !== 6) {
+        isoBusinessDays.push(cur.toISOString().slice(0, 10));
+      }
+      cur.setDate(cur.getDate() + 1);
+    }
+  }
+  const nbJours = isoBusinessDays.length || 4;
   const midPoint = Math.ceil(nbJours / 2);
-  const dateBilan = days.length >= midPoint ? fmtDate(days[midPoint - 1]) : fmtDate(today());
+  const dateBilan = isoBusinessDays.length >= midPoint ? fmtDate(isoBusinessDays[midPoint - 1]) : fmtDate(today());
 
   return buildDocument({ org: o, formation: f, stagiaires: [s], title: `Bilan intermédiaire de formation`, subtitle: `${s.civilite} ${s.prenom} ${s.nom}`, sections: [
     { heading: "Informations", content: `<table style="width:100%;border-collapse:collapse;">
