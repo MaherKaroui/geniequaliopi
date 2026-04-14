@@ -3,7 +3,7 @@
  * These produce HTML strings ready for PDF export.
  */
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
-import { buildDocument, formatDate, getDocStyle, linkUrl, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif, getDisplayDuree } from "./docBuilder";
+import { buildDocument, formatDate, getDocStyle, linkUrl, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif, getStagiaireDuree } from "./docBuilder";
 import { SAMPLE_FORMATEURS, FormateurInfo, parseDuree, getFormationDays } from "./sampleData";
 
 function today(): string { return new Date().toISOString().slice(0, 10); }
