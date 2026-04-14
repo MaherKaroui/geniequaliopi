@@ -77,6 +77,16 @@ export function genCahierMaintenance(o: OrganismeInfo): string {
 
 /* ═══ CODE 20 – CV Formateur ═══ */
 export function genCVFormateur(o: OrganismeInfo, f: FormationInfo): string {
+  if (isSocioEsthetique(f)) {
+    const socioFmt: FormateurInfo = {
+      nom: "Fontaine", prenom: "Marie",
+      specialite: "Socio-esthétique, Soins adaptés aux publics fragilisés, Maquillage correcteur en oncologie, Massage de bien-être en gériatrie",
+      diplomes: "CAP Esthétique Cosmétique Parfumerie – Académie de Paris\nBTS Esthétique Cosmétique – Option Management\nDU Socio-esthétique – Hôpital Rothschild / Université Paris-Est Créteil\nCertification RS5992 – Réaliser des soins socio-esthétiques",
+      experience: "18 ans d'expérience dans le secteur esthétique dont 10 ans en socio-esthétique\n• Socio-esthéticienne en oncologie – Centre Hospitalier de Villejuif (5 ans)\n• Intervenante bien-être en EHPAD – Groupe Korian (3 ans)\n• Formatrice en socio-esthétique – GENIUS FORM / FormaPro Excellence (depuis 2019)\n• Animation d'ateliers socio-esthétiques en structures d'insertion sociale\n• Intervenante auprès de femmes victimes de violences – Association SOS Femmes",
+      email: "m.fontaine@formapro-excellence.fr"
+    };
+    return _buildCV(o, socioFmt, "Formatrice en socio-esthétique");
+  }
   return _buildCV(o, SAMPLE_FORMATEURS[0], "Formateur");
 }
 
