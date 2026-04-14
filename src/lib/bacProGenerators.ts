@@ -151,9 +151,7 @@ function varyTestResponse(fullAnswer: string, si: number, qIdx: number): string 
 
 function gradeLevel(si: number, compIdx: number): string {
   const seed = ((si + 1) * 11 + compIdx * 7) % 100;
-  if (seed < 5) return "NA";
-  if (seed < 15) return "ECA";
-  if (seed < 50) return "A";
+  if (seed < 30) return "A";
   return "MA";
 }
 function gradeObs(level: string): string {
