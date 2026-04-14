@@ -1,6 +1,6 @@
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { genContratBacPro, genConvocationBacPro, genConvocationExamenBacPro, genTestPositionnementBacPro, genGrilleAcquisitionBacPro, genSatisfactionBacPro, genBilanFormationBacPro, genEval01, genEval02, genEval03, genEval04, genEval05, genEval06, genEval07, genEval08, genEval09, genEval10, genEval11, genEval12, genEval13, genEval14, genEval15 } from "./bacProGenerators";
-import { genObjectifsMethodesSequence, genDossierStagiaire, genDescriptifMoyensMateriels, genCahierMaintenance, genCVFormateur as genCVFormateurEY, genFichierFormateursStatut, genBilanIntermediaire, genTauxReussiteEY, genGrilleTarifaire, genFactureHorsMCF, genDevisEY, genCommunicationReport, genPreuveCreationSession, genPlaquettePresentation, genPlanningIntervenants, genPlanningSessionsEY, genCVResponsablePedagogique, genActionsEngagement, genActionsPassageExamen, genAccompagnementFOAD } from "./eyGenerators";
+import { genObjectifsMethodesSequence, genDossierStagiaire, genDescriptifMoyensMateriels, genCahierMaintenance, genCVFormateur as genCVFormateurEY, genFichierFormateursStatut, genBilanIntermediaire, genTauxReussiteEY, genGrilleTarifaire, genFactureHorsMCF, genDevisEY, genCommunicationReport, genPreuveCreationSession, genPlaquettePresentation, genPlanningIntervenants, genPlanningSessionsEY, genCVResponsablePedagogique, genActionsEngagement, genActionsPassageExamen, genAccompagnementFOAD, genInventaireMateriels, genContratsProprieteSupports, genAttestationDiplomesFormateurs, genCertificatQualiopiModele, genAutorisationsCertificateur, genAgrementsMinisteriels, genIndicateursPerformanceEY, genInfosCertifications, genPreuveReprogrammation, genProcessusAnalyseDemandes } from "./eyGenerators";
 import { buildDocument, htmlWrap, orgHeader, formationInfoBlock, formationInfoBlockStagiaire, tableHTML, signatureBlock3, signatureBlock2, footer, section, formatDate, infoGrid, getDocStyle, subtractBusinessDays, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif, getStagiaireDuree, applyGender, g, getDisplayDuree, linkUrl, optSiteWeb, isFormationTerminee, getModaliteContent, hasDistanciel, hasPresentiel, isFacebookPage, getSiteWebLabel } from "./docBuilder";
 import { FormateurInfo, SAMPLE_FORMATIONS, SAMPLE_STAGIAIRES, SAMPLE_FORMATEURS, SAMPLE_ORGANISME, EVAL_SCORES, SATISFACTION_SCORES, CONNECTION_TIMES, getFormationDays, mergeOrganisme, mergeStagiaires, getConnectionTimes, parseDuree } from "./sampleData";
 import { buildFullCatalog } from "./docCatalog";
@@ -605,7 +605,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
      case "ey_objectifs_methodes_sequence": return genObjectifsMethodesSequence(o, f);
      case "ey_dossier_stagiaire": return genDossierStagiaire(o, f, stagiaires, params?.stagiaireIdx ?? 0);
      case "ey_descriptif_moyens_materiels": return genDescriptifMoyensMateriels(o, f);
-     case "ey_cahier_maintenance": return genCahierMaintenance(o);
+     case "ey_cahier_maintenance": return genCahierMaintenance(o, f);
      case "ey_cv_formateur": return genCVFormateurEY(o, f);
      case "ey_fichier_formateurs_statut": return genFichierFormateursStatut(o, f);
      case "ey_bilan_intermediaire": return genBilanIntermediaire(o, f, stagiaires, params?.stagiaireIdx ?? 0);
@@ -622,6 +622,16 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
      case "ey_actions_engagement": return genActionsEngagement(o, f);
      case "ey_actions_passage_examen": return genActionsPassageExamen(o, f);
      case "ey_accompagnement_foad": return genAccompagnementFOAD(o, f);
+     case "ey_inventaire_materiels": return genInventaireMateriels(o, f);
+     case "ey_contrats_propriete_supports": return genContratsProprieteSupports(o, f);
+     case "ey_attestation_diplomes_formateurs": return genAttestationDiplomesFormateurs(o, f);
+     case "ey_certificat_qualiopi": return genCertificatQualiopiModele(o);
+     case "ey_autorisations_certificateur": return genAutorisationsCertificateur(o, f);
+     case "ey_agrements_ministeriels": return genAgrementsMinisteriels(o, f);
+     case "ey_indicateurs_performance": return genIndicateursPerformanceEY(o, f, stagiaires);
+     case "ey_infos_certifications": return genInfosCertifications(o, f);
+     case "ey_preuve_reprogrammation": return genPreuveReprogrammation(o, f);
+     case "ey_processus_analyse_demandes": return genProcessusAnalyseDemandes(o, f);
      case "dossier_inscription_cfa": return genDossierInscriptionCFA(o, f, stagiaires, params?.stagiaireIdx ?? 0);
     case "livre_apprentissage_cfa": return genLivreApprentissageCFA(o, f, stagiaires, params?.stagiaireIdx ?? 0);
     case "convocation_cfa": return genConvocationCFA(o, f, stagiaires, params?.stagiaireIdx ?? 0);
