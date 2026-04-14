@@ -196,6 +196,7 @@ export default function ControleEDOF({ organisme, formation, stagiaires, signatu
       pdfOptions?: PdfBlobOptions;
       sourceStagiaires?: StagiaireInfo[];
       onItemDone?: (current: number, total: number) => void;
+      folderByStagiaire?: boolean;
     }
   ) => {
     const sourceStagiaires = options?.sourceStagiaires ?? exportStagiaires;
@@ -206,9 +207,19 @@ export default function ControleEDOF({ organisme, formation, stagiaires, signatu
           pdfOptions: options?.pdfOptions,
           sourceStagiaires,
         });
-        if (result) zip.file(result.fileName, result.blob);
+        if (result) {
+          if (options?.folderByStagiaire) {
+            const s = sourceStagiaires[si];
+            const folderName = sanitizeFileSegment(
+              [s.prenom, s.nom].filter(v => typeof v === "string" && v.trim()).join("_"),
+              `Stagiaire_${String(si + 1).padStart(2, "0")}`
+            );
+            zip.file(`${folderName}/${result.fileName}`, result.blob);
+          } else {
+            zip.file(result.fileName, result.blob);
+          }
+        }
         options?.onItemDone?.(si + 1, sourceStagiaires.length);
-        // Longer yield every 10 docs to let GC reclaim memory
         const yieldMs = (si + 1) % 10 === 0 ? 200 : 50;
         await yieldToBrowser(yieldMs);
       }
