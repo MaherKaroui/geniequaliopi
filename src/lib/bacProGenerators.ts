@@ -96,10 +96,59 @@ function appreciation(note20: number): string {
   if (note20 >= 8) return "Travail satisfaisant. Des lacunes subsistent sur certains points. Un renforcement est recommandé.";
   return "Des difficultés importantes ont été constatées. Un accompagnement renforcé est nécessaire.";
 }
-function gradeLevel(si: number, compIdx: number): string {
-  const seed = ((si + 1) * 11 + compIdx * 7) % 100;
-  if (seed < 5) return "NA";
-  if (seed < 15) return "ECA";
+
+/** Vary a stagiaire's open-ended response based on their index + question index.
+ *  Returns a slightly modified version of the correction to simulate different answers. */
+function varyStagResponse(correction: string, si: number, qIdx: number, score: number, maxPoints: number): string {
+  const ratio = score / maxPoints;
+  const seed = ((si + 1) * 11 + qIdx * 7) % 10;
+
+  // Perfect score → full answer with slight personal phrasing
+  if (ratio >= 1) {
+    const prefixes = [
+      "", "Selon moi, ", "D'après mes connaissances, ", "Je pense que ",
+      "Il me semble que ", "En formation, j'ai appris que ", "À mon avis, ",
+      "D'après ce que j'ai étudié, ", "Comme vu en cours, ", "En pratique, "
+    ];
+    return prefixes[seed] + correction.charAt(0).toLowerCase() + correction.slice(1);
+  }
+
+  // Partial score → truncated/incomplete answer
+  if (ratio >= 0.5) {
+    const sentences = correction.split(/[.!]\s+/).filter(Boolean);
+    // Keep ~60% of the sentences
+    const keep = Math.max(1, Math.ceil(sentences.length * 0.6));
+    const kept = sentences.slice(0, keep).join(". ") + ".";
+    const additions = [
+      "", " Je ne suis pas sûr(e) pour le reste.", " (réponse incomplète)",
+      " Le reste m'échappe.", " Je n'ai pas pu développer davantage.",
+      "", " J'hésite sur les autres points.", " Il me manque des éléments.",
+      " Je dois approfondir ce sujet.", ""
+    ];
+    return kept + additions[seed];
+  }
+
+  // Low score → vague/wrong answer
+  const vagues = [
+    "Je ne suis pas sûr(e) mais je pense qu'il faut vérifier les documents.",
+    "Il faut respecter les consignes et suivre les procédures en place.",
+    "On doit s'assurer que tout est conforme aux normes de sécurité.",
+    "Il faut communiquer avec l'équipe et signaler les problèmes.",
+    "Je pense qu'il faut organiser le travail de manière efficace.",
+    "Il est important de suivre les règles et de bien s'organiser.",
+    "On doit vérifier la conformité et noter les anomalies.",
+    "Il faut être rigoureux et respecter les étapes.",
+    "Je crois qu'il faut informer le responsable et agir vite.",
+  ];
+  return vagues[si % vagues.length];
+}
+
+/** Vary test de positionnement response */
+function varyTestResponse(fullAnswer: string, si: number, qIdx: number): string {
+  const note = getNote20(si, 4, 20);
+  const quality = note >= 14 ? 2 : note >= 10 ? 1 : 0; // 2=good, 1=partial, 0=weak
+  return varyStagResponse(fullAnswer, si, qIdx, quality, 2);
+}
   if (seed < 50) return "A";
   return "MA";
 }
