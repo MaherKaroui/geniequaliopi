@@ -5,6 +5,28 @@
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { htmlWrap, formatDate, getDocStyle } from "./docBuilder";
 
+/** Render signature image or empty placeholder */
+function sigImg(url?: string, height = 60): string {
+  if (!url) return `<p style="height:${height}px"></p>`;
+  return `<img src="${url}" alt="Signature" style="max-height:${height}px;max-width:200px;object-fit:contain;" />`;
+}
+
+/** Render tampon (stamp) image */
+function tamponImg(url?: string, height = 70): string {
+  if (!url) return "";
+  return `<img src="${url}" alt="Tampon" style="max-height:${height}px;max-width:200px;object-fit:contain;margin-top:4px;" />`;
+}
+
+/** Org signature block with tampon */
+function orgSigBlock(o: OrganismeInfo): string {
+  return `${sigImg(o.signatureUrl)}${tamponImg(o.tamponUrl)}`;
+}
+
+/** Stagiaire signature block */
+function stagSigImg(s: StagiaireInfo): string {
+  return sigImg(s.signatureUrl);
+}
+
 const ORG_NAME = "LA MAISON DE L'APPRENTISSAGE";
 const ORG_ADDR = "32 RUE GUY MOQUET, 92240 MALAKOFF";
 const ORG_SIRET = "93535008200035";
