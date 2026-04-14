@@ -166,7 +166,7 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
       const blob = await htmlToPdfBlob(html, options?.pdfOptions);
       return {
         blob,
-        fileName: buildPerStagiairePdfFileName(safeName, eyDoc.code, currentStagiaire, stagiaireIdx),
+        fileName: buildPerStagiairePdfFileName(safeName, eyDoc.code, eyDoc.label, currentStagiaire, stagiaireIdx, "1", formation.dateDebut),
       };
     } catch (e) {
       console.error(`Error generating ${eyDoc.code} for stagiaire ${stagiaireIdx}:`, e);
