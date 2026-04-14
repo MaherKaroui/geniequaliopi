@@ -613,11 +613,11 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
      case "ey_grille_tarifaire": return genGrilleTarifaire(o, f);
      case "ey_facture_hors_mcf": return genFactureHorsMCF(o, f);
      case "ey_devis": return genDevisEY(o, f, stagiaires, params?.stagiaireIdx ?? 0);
-     case "ey_communication_report": return genCommunicationReport(o, f);
-     case "ey_preuve_creation_session": return genPreuveCreationSession(o, f);
+     case "ey_communication_report": return genCommunicationReport(o, f, stagiaires);
+     case "ey_preuve_creation_session": return genPreuveCreationSession(o, f, stagiaires);
      case "ey_plaquette_presentation": return genPlaquettePresentation(o, f);
      case "ey_planning_intervenants": return genPlanningIntervenants(o, f);
-     case "ey_planning_sessions": return genPlanningSessionsEY(o, f);
+     case "ey_planning_sessions": return genPlanningSessionsEY(o, f, stagiaires);
      case "ey_cv_responsable_pedagogique": return genCVResponsablePedagogique(o);
      case "ey_actions_engagement": return genActionsEngagement(o, f);
      case "ey_actions_passage_examen": return genActionsPassageExamen(o, f);
@@ -630,7 +630,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
      case "ey_agrements_ministeriels": return genAgrementsMinisteriels(o, f);
      case "ey_indicateurs_performance": return genIndicateursPerformanceEY(o, f, stagiaires);
      case "ey_infos_certifications": return genInfosCertifications(o, f);
-     case "ey_preuve_reprogrammation": return genPreuveReprogrammation(o, f);
+     case "ey_preuve_reprogrammation": return genPreuveReprogrammation(o, f, stagiaires);
       case "ey_processus_analyse_demandes": return genProcessusAnalyseDemandes(o, f);
       case "ey_ressources_pedagogiques": return genRessourcesPedagogiquesEY(o, f);
       case "ey_bail_locaux": return genBailLocaux(o, f);
