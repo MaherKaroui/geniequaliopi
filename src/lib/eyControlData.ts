@@ -13,6 +13,8 @@ export interface EYDocumentItem {
   perStagiaire: boolean;
   /** Category for grouping */
   category: EYCategory;
+  /** Optional path to a static file in public/ that is pre-provided */
+  staticFile?: string;
 }
 
 export type EYCategory =
@@ -23,7 +25,8 @@ export type EYCategory =
   | "materiel"
   | "certification"
   | "qualite"
-  | "communication";
+  | "communication"
+  | "controle_bac_pro";
 
 export const EY_CATEGORIES: Record<EYCategory, string> = {
   pedagogique: "📚 Documents pédagogiques",
@@ -34,6 +37,7 @@ export const EY_CATEGORIES: Record<EYCategory, string> = {
   certification: "🎓 Certification & Examens",
   qualite: "✅ Qualité & Suivi",
   communication: "📣 Communication & Information",
+  controle_bac_pro: "📦 Contrôle – Bac Pro Logistique (La Maison d'Apprentissage)",
 };
 
 export const EY_DOCUMENTS: EYDocumentItem[] = [
@@ -541,6 +545,224 @@ export const EY_DOCUMENTS: EYDocumentItem[] = [
     autoTemplates: ["facture_edof_100"],
     perStagiaire: true,
     category: "administratif",
+  },
+
+  // === CONTRÔLE – BAC PRO LOGISTIQUE (LA MAISON D'APPRENTISSAGE) ===
+  {
+    code: "BPL_01",
+    label: "Déroulé Pédagogique",
+    description: "Déroulé pédagogique détaillé – Bac Pro Logistique RNCP 38302 (589h)",
+    autoTemplates: [],
+    perStagiaire: false,
+    category: "controle_bac_pro",
+    staticFile: "/pdfs/bac_pro_logistique/Deroule_Pedagogique.docx",
+  },
+  {
+    code: "BPL_02",
+    label: "Planning de Formation",
+    description: "Planning complet du 08/09/2025 au 15/05/2026 – rythme 2 sem. école / 2 sem. entreprise",
+    autoTemplates: [],
+    perStagiaire: false,
+    category: "controle_bac_pro",
+    staticFile: "/pdfs/bac_pro_logistique/Planning_Formation_Bac_Pro_Logistique.docx",
+  },
+  {
+    code: "BPL_03",
+    label: "Contrat de Formation Professionnelle",
+    description: "Contrat de formation professionnelle – La Maison d'Apprentissage",
+    autoTemplates: [],
+    perStagiaire: false,
+    category: "controle_bac_pro",
+    staticFile: "/pdfs/bac_pro_logistique/CONTRAT_DE_FORMATION_PROFESSIONNELLE_-_LA_MAISON_D_APPRENTISSAGE_-_MAJ_27_03_2025.docx",
+  },
+  {
+    code: "BPL_04",
+    label: "Convocation à la Formation",
+    description: "Convocation officielle à la formation",
+    autoTemplates: [],
+    perStagiaire: false,
+    category: "controle_bac_pro",
+    staticFile: "/pdfs/bac_pro_logistique/CONVOCATION_A_LA_FORMATION_-_LA_MAISON_D_APPRENTISSAGE_-_MAJ_27_03_2025.docx",
+  },
+  {
+    code: "BPL_05",
+    label: "Convocation à l'Examen",
+    description: "Convocation officielle à l'examen",
+    autoTemplates: [],
+    perStagiaire: false,
+    category: "controle_bac_pro",
+    staticFile: "/pdfs/bac_pro_logistique/_CONVOCATION_A_L_EXAMEN-_LA_MAISON_D_APPRENTISSAGE_-_MAJ_27_03_2025.docx",
+  },
+  {
+    code: "BPL_06",
+    label: "Test de Positionnement",
+    description: "Test de positionnement initial – évaluation des acquis",
+    autoTemplates: [],
+    perStagiaire: false,
+    category: "controle_bac_pro",
+    staticFile: "/pdfs/bac_pro_logistique/Test_de_Positionnement_-_LA_MAISON_D_APPRENTISSAGE.docx",
+  },
+  {
+    code: "BPL_07",
+    label: "Grille d'acquisition",
+    description: "Grille d'acquisition des compétences",
+    autoTemplates: [],
+    perStagiaire: false,
+    category: "controle_bac_pro",
+    staticFile: "/pdfs/bac_pro_logistique/Grille_d_acquisition_-_LA_MAISON_D_APPRENTISSAGE.docx",
+  },
+  {
+    code: "BPL_08",
+    label: "Questionnaire de Satisfaction",
+    description: "Questionnaire de satisfaction fin de formation",
+    autoTemplates: [],
+    perStagiaire: false,
+    category: "controle_bac_pro",
+    staticFile: "/pdfs/bac_pro_logistique/Questionnaire_Satisfaction_-_LA_MAISON_D_APPRENTISSAGE.docx",
+  },
+  {
+    code: "BPL_09",
+    label: "Bilan de Formation",
+    description: "Bilan global de la formation",
+    autoTemplates: [],
+    perStagiaire: false,
+    category: "controle_bac_pro",
+    staticFile: "/pdfs/bac_pro_logistique/Bilan_de_Formation_-_LA_MAISON_D_APPRENTISSAGE.docx",
+  },
+  {
+    code: "BPL_E01",
+    label: "Éval 1 – QCM Introduction à la logistique",
+    description: "QCM d'évaluation – Module 1 : Introduction à la chaîne logistique",
+    autoTemplates: [],
+    perStagiaire: false,
+    category: "controle_bac_pro",
+    staticFile: "/pdfs/bac_pro_logistique/Evale_1-_QCM-Introduction__U00e0_la_logistique-_LA_MAISON_D_APPRENTISSAGE.docx",
+  },
+  {
+    code: "BPL_E02",
+    label: "Éval 2 – QCM Réception des marchandises",
+    description: "QCM d'évaluation – Réception des marchandises",
+    autoTemplates: [],
+    perStagiaire: false,
+    category: "controle_bac_pro",
+    staticFile: "/pdfs/bac_pro_logistique/Evale_2-_QCM-Reception_des_marchandises_-_LA_MAISON_D_APPRENTISSAGE.docx",
+  },
+  {
+    code: "BPL_E03",
+    label: "Éval 3 – Cas pratique Réception",
+    description: "Cas pratique – Réception des marchandises",
+    autoTemplates: [],
+    perStagiaire: false,
+    category: "controle_bac_pro",
+    staticFile: "/pdfs/bac_pro_logistique/Evale_3-_CAS_PRATIQUE-Reception_des_marchandises_-_LA_MAISON_D_APPRENTISSAGE.docx",
+  },
+  {
+    code: "BPL_E04",
+    label: "Éval 4 – Cas pratique Stockage",
+    description: "Cas pratique – Stockage des marchandises",
+    autoTemplates: [],
+    perStagiaire: false,
+    category: "controle_bac_pro",
+    staticFile: "/pdfs/bac_pro_logistique/Evale_4-_CAS_PRATIQUE-Stockage_des_marchandises_-_LA_MAISON_D_APPRENTISSAGE.docx",
+  },
+  {
+    code: "BPL_E05",
+    label: "Éval 5 – QCM Préparation de commandes",
+    description: "QCM d'évaluation – Préparation de commandes",
+    autoTemplates: [],
+    perStagiaire: false,
+    category: "controle_bac_pro",
+    staticFile: "/pdfs/bac_pro_logistique/Evale_5-_QCM-Preparation_de_commandes_-_LA_MAISON_D_APPRENTISSAGE.docx",
+  },
+  {
+    code: "BPL_E06",
+    label: "Éval 6 – Exercice Stockage",
+    description: "Exercice pratique – Stockage des marchandises",
+    autoTemplates: [],
+    perStagiaire: false,
+    category: "controle_bac_pro",
+    staticFile: "/pdfs/bac_pro_logistique/Evale_6-_EXERCICE-Stockage_des_marchandises_-_LA_MAISON_D_APPRENTISSAGE.docx",
+  },
+  {
+    code: "BPL_E07",
+    label: "Éval 7 – Étude de cas Expédition",
+    description: "Étude de cas – Expédition",
+    autoTemplates: [],
+    perStagiaire: false,
+    category: "controle_bac_pro",
+    staticFile: "/pdfs/bac_pro_logistique/Evale_7-_Etude_de_cas_-_Expedition_-_LA_MAISON_D_APPRENTISSAGE.docx",
+  },
+  {
+    code: "BPL_E08",
+    label: "Éval 8 – QCM Organisation des flux",
+    description: "QCM d'évaluation – Organisation des flux",
+    autoTemplates: [],
+    perStagiaire: false,
+    category: "controle_bac_pro",
+    staticFile: "/pdfs/bac_pro_logistique/Evale_8-_QCM_-_Organisation_des_flux-_LA_MAISON_D_APPRENTISSAGE.docx",
+  },
+  {
+    code: "BPL_E09",
+    label: "Éval 9 – Cas pratique Organisation des flux",
+    description: "Cas pratique – Organisation des flux logistiques",
+    autoTemplates: [],
+    perStagiaire: false,
+    category: "controle_bac_pro",
+    staticFile: "/pdfs/bac_pro_logistique/Evale_9-_CAS_PRATIQUE-_Organisation_des_flux_-_LA_MAISON_D_APPRENTISSAGE.docx",
+  },
+  {
+    code: "BPL_E10",
+    label: "Éval 10 – Exercice Gestion des stocks",
+    description: "Exercice pratique – Gestion des stocks",
+    autoTemplates: [],
+    perStagiaire: false,
+    category: "controle_bac_pro",
+    staticFile: "/pdfs/bac_pro_logistique/Evale_10-_EXERCICE-Gestion_des_stocks_-_LA_MAISON_D_APPRENTISSAGE.docx",
+  },
+  {
+    code: "BPL_E11",
+    label: "Éval 11 – QCM Gestion des stocks",
+    description: "QCM d'évaluation – Gestion des stocks",
+    autoTemplates: [],
+    perStagiaire: false,
+    category: "controle_bac_pro",
+    staticFile: "/pdfs/bac_pro_logistique/Evale_11-_QCM-Gestion_des_stocks_-_LA_MAISON_D_APPRENTISSAGE.docx",
+  },
+  {
+    code: "BPL_E12",
+    label: "Éval 12 – QCM Sécurité Conduite d'engins",
+    description: "QCM sécurité – Conduite d'engins (CACES)",
+    autoTemplates: [],
+    perStagiaire: false,
+    category: "controle_bac_pro",
+    staticFile: "/pdfs/bac_pro_logistique/Evale_12-_QCM_securite-_Conduite_d'engins_-_LA_MAISON_D_APPRENTISSAGE.docx",
+  },
+  {
+    code: "BPL_E13",
+    label: "Éval 13 – Mise en situation Communication",
+    description: "Mise en situation – Communication professionnelle",
+    autoTemplates: [],
+    perStagiaire: false,
+    category: "controle_bac_pro",
+    staticFile: "/pdfs/bac_pro_logistique/Evale_13-_Mise_en_situation_-_Communication_professionnelle-_LA_MAISON_D_APPRENTISSAGE.docx",
+  },
+  {
+    code: "BPL_E14",
+    label: "Éval 14 – Révisions globales / Examen blanc",
+    description: "Révisions globales – Examen blanc",
+    autoTemplates: [],
+    perStagiaire: false,
+    category: "controle_bac_pro",
+    staticFile: "/pdfs/bac_pro_logistique/Evale_14-_REVISIONS_GLOBALES_-_Examen_blanc-_LA_MAISON_D_APPRENTISSAGE.docx",
+  },
+  {
+    code: "BPL_E15",
+    label: "Éval 15 – Examen blanc final / Certification",
+    description: "Examen blanc final – Préparation certification",
+    autoTemplates: [],
+    perStagiaire: false,
+    category: "controle_bac_pro",
+    staticFile: "/pdfs/bac_pro_logistique/Evale_15-_Examen_blanc_final_-_Preparation_certification_-_LA_MAISON_D_APPRENTISSAGE.docx",
   },
 ];
 
