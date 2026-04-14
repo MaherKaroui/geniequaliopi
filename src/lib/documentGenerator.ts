@@ -99,6 +99,17 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     f = { ...f, formateur: params.formateurNom };
   }
 
+  // CRITICAL: Override formation dates with stagiaire-specific dates when available
+  // This ensures ALL documents prioritize individual trainee dates over global formation dates
+  if (targetStagiaire) {
+    if (targetStagiaire.dateDebutFormation && targetStagiaire.dateDebutFormation.trim()) {
+      f = { ...f, dateDebut: targetStagiaire.dateDebutFormation };
+    }
+    if (targetStagiaire.dateFinFormation && targetStagiaire.dateFinFormation.trim()) {
+      f = { ...f, dateFin: targetStagiaire.dateFinFormation };
+    }
+  }
+
   switch (template) {
     case "fiche_identite": return genFicheIdentite(o);
     case "presentation_organisme": return genPresentation(o);
