@@ -338,11 +338,23 @@ export function genBilanIntermediaire(o: OrganismeInfo, f: FormationInfo, stagia
     const niv = ["En cours d'acquisition", "Acquis", "Acquis", "En cours d'acquisition", "Non évalué à ce stade"];
     return `<tr><td ${td}>${c}</td><td ${td}>${niv[i%niv.length]}</td><td ${td}>${i<3?"Satisfaisant":"À approfondir"}</td></tr>`;
   }).join("");
-  return buildDocument({ org: o, formation: f, title: `Bilan intermédiaire de formation`, subtitle: `${s.civilite} ${s.prenom} ${s.nom}`, sections: [
+
+  // Use individual trainee dates (already overridden by documentGenerator)
+  const debut = f.dateDebut || "";
+  const fin = f.dateFin || "";
+
+  // Compute formation days for display
+  const days = getFormationDays(f);
+  const nbJours = days.length || 4;
+  const midPoint = Math.ceil(nbJours / 2);
+  const dateBilan = days.length >= midPoint ? fmtDate(days[midPoint - 1]) : fmtDate(today());
+
+  return buildDocument({ org: o, formation: f, stagiaires: [s], title: `Bilan intermédiaire de formation`, subtitle: `${s.civilite} ${s.prenom} ${s.nom}`, sections: [
     { heading: "Informations", content: `<table style="width:100%;border-collapse:collapse;">
       <tr><td ${tdb} style="width:35%;">Stagiaire</td><td ${td}>${s.civilite} ${s.prenom} ${s.nom}</td></tr>
       <tr><td ${tdb}>Formation</td><td ${td}>${f.intitule||"—"}</td></tr>
-      <tr><td ${tdb}>Date du bilan</td><td ${td}>${fmtDate(today())}</td></tr>
+      <tr><td ${tdb}>Période de formation</td><td ${td}>Du ${fmtDate(debut)} au ${fmtDate(fin)} (${nbJours} jours)</td></tr>
+      <tr><td ${tdb}>Date du bilan</td><td ${td}>${dateBilan}</td></tr>
       <tr><td ${tdb}>Formateur</td><td ${td}>${f.formateur||SAMPLE_FORMATEURS[0].prenom+" "+SAMPLE_FORMATEURS[0].nom}</td></tr>
     </table>` },
     { heading: "Progression à mi-parcours", content: `<table style="width:100%;border-collapse:collapse;">
