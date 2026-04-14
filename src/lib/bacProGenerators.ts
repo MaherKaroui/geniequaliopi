@@ -96,6 +96,60 @@ function appreciation(note20: number): string {
   if (note20 >= 8) return "Travail satisfaisant. Des lacunes subsistent sur certains points. Un renforcement est recommandé.";
   return "Des difficultés importantes ont été constatées. Un accompagnement renforcé est nécessaire.";
 }
+
+/** Vary a stagiaire's open-ended response based on their index + question index.
+ *  Returns a slightly modified version of the correction to simulate different answers. */
+function varyStagResponse(correction: string, si: number, qIdx: number, score: number, maxPoints: number): string {
+  const ratio = score / maxPoints;
+  const seed = ((si + 1) * 11 + qIdx * 7) % 10;
+
+  // Perfect score → full answer with slight personal phrasing
+  if (ratio >= 1) {
+    const prefixes = [
+      "", "Selon moi, ", "D'après mes connaissances, ", "Je pense que ",
+      "Il me semble que ", "En formation, j'ai appris que ", "À mon avis, ",
+      "D'après ce que j'ai étudié, ", "Comme vu en cours, ", "En pratique, "
+    ];
+    return prefixes[seed] + correction.charAt(0).toLowerCase() + correction.slice(1);
+  }
+
+  // Partial score → truncated/incomplete answer
+  if (ratio >= 0.5) {
+    const sentences = correction.split(/[.!]\s+/).filter(Boolean);
+    // Keep ~60% of the sentences
+    const keep = Math.max(1, Math.ceil(sentences.length * 0.6));
+    const kept = sentences.slice(0, keep).join(". ") + ".";
+    const additions = [
+      "", " Je ne suis pas sûr(e) pour le reste.", " (réponse incomplète)",
+      " Le reste m'échappe.", " Je n'ai pas pu développer davantage.",
+      "", " J'hésite sur les autres points.", " Il me manque des éléments.",
+      " Je dois approfondir ce sujet.", ""
+    ];
+    return kept + additions[seed];
+  }
+
+  // Low score → vague/wrong answer
+  const vagues = [
+    "Je ne suis pas sûr(e) mais je pense qu'il faut vérifier les documents.",
+    "Il faut respecter les consignes et suivre les procédures en place.",
+    "On doit s'assurer que tout est conforme aux normes de sécurité.",
+    "Il faut communiquer avec l'équipe et signaler les problèmes.",
+    "Je pense qu'il faut organiser le travail de manière efficace.",
+    "Il est important de suivre les règles et de bien s'organiser.",
+    "On doit vérifier la conformité et noter les anomalies.",
+    "Il faut être rigoureux et respecter les étapes.",
+    "Je crois qu'il faut informer le responsable et agir vite.",
+  ];
+  return vagues[si % vagues.length];
+}
+
+/** Vary test de positionnement response */
+function varyTestResponse(fullAnswer: string, si: number, qIdx: number): string {
+  const note = getNote20(si, 4, 20);
+  const quality = note >= 14 ? 2 : note >= 10 ? 1 : 0; // 2=good, 1=partial, 0=weak
+  return varyStagResponse(fullAnswer, si, qIdx, quality, 2);
+}
+
 function gradeLevel(si: number, compIdx: number): string {
   const seed = ((si + 1) * 11 + compIdx * 7) % 100;
   if (seed < 5) return "NA";
@@ -303,7 +357,7 @@ export function genTestPositionnementBacPro(o: OrganismeInfo, f: FormationInfo, 
       <h3 style="margin-top:16px">Question ${i + 1} :</h3>
       <p>${q.q}</p>
       <p><strong>Réponse du stagiaire :</strong></p>
-      <p style="border:1px solid #ccc;padding:8px;min-height:40px;background:#fafafa">${q.r}</p>
+      <p style="border:1px solid #ccc;padding:8px;min-height:40px;background:#fafafa">${varyTestResponse(q.r, si, i)}</p>
     `).join("")}
 
     <h2 style="margin-top:24px">Résultat Final</h2>
@@ -557,12 +611,13 @@ function genQCMEval(title: string, questions: QCMQuestion[], s: StagiaireInfo, f
     totalScore += sc;
     const letters = ["A", "B", "C", "D"];
     const correctIdx = letters.indexOf(q.answer);
-    // Stagiaire answer: if score=1, correct answer; otherwise a wrong one
-    const stagAnswer = sc === 1 ? q.answer : letters[(correctIdx + 1) % q.options.length];
+    const stagAnswer = sc === 1 ? q.answer : letters[((correctIdx + 1 + si) % (q.options.length - 1)) + (((correctIdx + 1 + si) % (q.options.length - 1)) >= correctIdx ? 1 : 0)];
+    // Ensure wrong answer is never the correct one
+    const safeAnswer = stagAnswer === q.answer ? letters[(correctIdx + 1) % q.options.length] : stagAnswer;
     return `<h3>Question ${i + 1}</h3>
       <p>${q.question}</p>
       ${q.options.map((o, oi) => `<p>${letters[oi]}. ${o}</p>`).join("")}
-      <p><strong>Réponse du stagiaire :</strong> ${stagAnswer}</p>
+      <p><strong>Réponse du stagiaire :</strong> ${safeAnswer}</p>
       <p><strong>Bonne réponse :</strong> ${q.answer}</p>
       <p><strong>Note :</strong> <span style="background:#fff3cd;padding:2px 6px">${sc}</span> / 1</p>`;
   }).join("");
@@ -615,10 +670,11 @@ function genOpenEval(title: string, context: string, questions: OpenQuestion[], 
   const qHtml = questions.map((q, i) => {
     const sc = getScore(si, i, q.points);
     totalScore += sc;
+    const stagResponse = varyStagResponse(q.correction, si, i, sc, q.points);
     return `<h3>Question ${i + 1} (${q.points} points)</h3>
       <p>${q.question}</p>
       <p><strong>Réponse du stagiaire :</strong></p>
-      <p style="border:1px solid #ccc;padding:8px;background:#fafafa">${q.correction}</p>
+      <p style="border:1px solid #ccc;padding:8px;background:#fafafa">${stagResponse}</p>
       <p><strong>Correction :</strong></p>
       <p><strong>${q.correction}</strong></p>
       <p><strong>Note :</strong> <span style="background:#fff3cd;padding:2px 6px">${sc}</span> / ${q.points}</p>`;
