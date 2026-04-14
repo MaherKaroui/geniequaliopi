@@ -220,7 +220,8 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
           zip.file(filePath, result.blob);
         }
         options?.onItemDone?.(si + 1, sourceStagiaires.length);
-        const yieldMs = (si + 1) % 10 === 0 ? 200 : 50;
+        // More aggressive GC pauses for mass export
+        const yieldMs = (si + 1) % 5 === 0 ? 400 : 100;
         await yieldToBrowser(yieldMs);
       }
       return;
