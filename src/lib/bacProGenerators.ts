@@ -5,6 +5,28 @@
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { htmlWrap, formatDate, getDocStyle } from "./docBuilder";
 
+/** Render signature image or empty placeholder */
+function sigImg(url?: string, height = 60): string {
+  if (!url) return `<p style="height:${height}px"></p>`;
+  return `<img src="${url}" alt="Signature" style="max-height:${height}px;max-width:200px;object-fit:contain;" />`;
+}
+
+/** Render tampon (stamp) image */
+function tamponImg(url?: string, height = 70): string {
+  if (!url) return "";
+  return `<img src="${url}" alt="Tampon" style="max-height:${height}px;max-width:200px;object-fit:contain;margin-top:4px;" />`;
+}
+
+/** Org signature block with tampon */
+function orgSigBlock(o: OrganismeInfo): string {
+  return `${sigImg(o.signatureUrl)}${tamponImg(o.tamponUrl)}`;
+}
+
+/** Stagiaire signature block */
+function stagSigImg(s: StagiaireInfo): string {
+  return sigImg(s.signatureUrl);
+}
+
 const ORG_NAME = "LA MAISON DE L'APPRENTISSAGE";
 const ORG_ADDR = "32 RUE GUY MOQUET, 92240 MALAKOFF";
 const ORG_SIRET = "93535008200035";
@@ -164,12 +186,12 @@ export function genContratBacPro(o: OrganismeInfo, f: FormationInfo, stagiaires:
     <table style="width:100%;margin-top:20px"><tr>
       <td style="width:50%;vertical-align:top">
         <p><strong>Signature de l'organisme de formation</strong><br/>${ORG_NAME}<br/>Président: Mr ${ORG_PRESIDENT}</p>
-        <p style="height:60px"></p>
+        ${orgSigBlock(o)}
       </td>
       <td style="width:50%;vertical-align:top">
         <p><strong>Signature du stagiaire :</strong> ${stagName(s)}</p>
         <p><em>Fait précédé de la mention "Lu et approuvé"</em></p>
-        <p style="height:60px"></p>
+        ${stagSigImg(s)}
       </td>
     </tr></table>
   `);
@@ -215,7 +237,7 @@ export function genConvocationBacPro(o: OrganismeInfo, f: FormationInfo, stagiai
     <p>Nous vous prions d'agréer, ${civilite}, l'expression de nos salutations distinguées.</p>
     <p style="margin-top:20px"><strong>Fait à MALAKOFF</strong>, le : ${dateDebut}</p>
     <p>${ORG_NAME}<br/>Président: <strong>Mr ${ORG_PRESIDENT}</strong></p>
-    <p>Signature :</p><p style="height:60px"></p>
+    <p>Signature :</p>${orgSigBlock(o)}
   `);
 }
 
@@ -244,7 +266,7 @@ export function genConvocationExamenBacPro(o: OrganismeInfo, f: FormationInfo, s
     <p>Veuillez agréer, ${civilite}, l'expression de nos salutations distinguées.</p>
     <p style="margin-top:20px"><strong>Fait à MALAKOFF</strong>, le : ${dateFin}</p>
     <p>${ORG_NAME}<br/>Président: <strong>Mr ${ORG_PRESIDENT}</strong></p>
-    <p>Signature :</p><p style="height:60px"></p>
+    <p>Signature :</p>${orgSigBlock(o)}
   `);
 }
 
@@ -288,6 +310,18 @@ export function genTestPositionnementBacPro(o: OrganismeInfo, f: FormationInfo, 
     <p><strong>Note :</strong> <span style="background:#fff3cd;padding:2px 8px;font-weight:bold">${note} / 20</span></p>
     <p><strong>Observations du formateur :</strong> ${formateur}</p>
     <p style="background:#fff3cd;padding:8px">${appreciation(note)}</p>
+    <table style="width:100%;margin-top:24px"><tr>
+      <td style="width:50%;vertical-align:top">
+        <p><strong>Signature du formateur :</strong></p>
+        ${sigImg(f.formateurSignatureUrl)}
+      </td>
+      <td style="width:50%;vertical-align:top">
+        <p><strong>Signature du stagiaire :</strong></p>
+        ${stagSigImg(s)}
+      </td>
+    </tr></table>
+    <p style="margin-top:12px"><strong>Cachet de l'organisme :</strong></p>
+    ${orgSigBlock(o)}
   `);
 }
 
@@ -368,7 +402,7 @@ export function genGrilleAcquisitionBacPro(o: OrganismeInfo, f: FormationInfo, s
     <p><strong>Axes de progression :</strong> Renforcer l'utilisation des outils numériques et la communication professionnelle.</p>
     <p><strong>Avis global du formateur :</strong> [X] ${hasGoodLevel ? "Bon niveau professionnel" : "Progression satisfaisante"}</p>
     <p style="margin-top:20px"><strong>Signature du formateur :</strong> ${formateur}</p>
-    <p style="height:60px"></p>
+    ${sigImg(f.formateurSignatureUrl)}
   `);
 }
 
@@ -445,6 +479,7 @@ export function genSatisfactionBacPro(o: OrganismeInfo, f: FormationInfo, stagia
 
     <p style="margin-top:20px"><strong>Signature de l'apprenant :</strong> ${stagName(s)}<br/>
     <strong>Date :</strong> ${dateFin}</p>
+    ${stagSigImg(s)}
   `);
 }
 
@@ -495,7 +530,9 @@ export function genBilanFormationBacPro(o: OrganismeInfo, f: FormationInfo, stag
     <p style="margin-top:30px"><strong>Fait à MALAKOFF, le ${dateFin}</strong></p>
     <p><strong>Nom du formateur :</strong> ${formateur}<br/>
     <strong>Fonction :</strong> Formateur référent logistique</p>
-    <p>Signature :</p><p style="height:60px"></p>
+    <p>Signature :</p>${sigImg(f.formateurSignatureUrl)}
+    <p style="margin-top:16px"><strong>Signature de l'organisme :</strong></p>
+    ${orgSigBlock(o)}
   `);
 }
 
@@ -508,7 +545,7 @@ interface QCMQuestion {
   answer: string;
 }
 
-function genQCMEval(title: string, questions: QCMQuestion[], s: StagiaireInfo, f: FormationInfo, si: number): string {
+function genQCMEval(title: string, questions: QCMQuestion[], s: StagiaireInfo, f: FormationInfo, si: number, o?: OrganismeInfo): string {
   const dateDebut = stagDateDebut(s, f);
   const dateFin = stagDateFin(s, f);
   const formateur = stagFormateur(s);
@@ -546,6 +583,17 @@ function genQCMEval(title: string, questions: QCMQuestion[], s: StagiaireInfo, f
     <p><strong>Note finale :</strong> <span style="background:#fff3cd;padding:2px 6px">${note20}</span> / 20</p>
     <h3>APPRÉCIATION DU FORMATEUR</h3>
     <p style="background:#fff3cd;padding:8px">${appreciation(note20)}</p>
+    <table style="width:100%;margin-top:24px"><tr>
+      <td style="width:50%;vertical-align:top">
+        <p><strong>Signature du formateur :</strong></p>
+        ${sigImg(f.formateurSignatureUrl)}
+      </td>
+      <td style="width:50%;vertical-align:top">
+        <p><strong>Signature du stagiaire :</strong></p>
+        ${stagSigImg(s)}
+      </td>
+    </tr></table>
+    ${o ? `<p style="margin-top:12px"><strong>Cachet de l'organisme :</strong></p>${orgSigBlock(o)}` : ""}
   `);
 }
 
@@ -558,7 +606,7 @@ interface OpenQuestion {
   correction: string;
 }
 
-function genOpenEval(title: string, context: string, questions: OpenQuestion[], s: StagiaireInfo, f: FormationInfo, si: number, totalPoints: number): string {
+function genOpenEval(title: string, context: string, questions: OpenQuestion[], s: StagiaireInfo, f: FormationInfo, si: number, totalPoints: number, o?: OrganismeInfo): string {
   const dateDebut = stagDateDebut(s, f);
   const dateFin = stagDateFin(s, f);
   const formateur = stagFormateur(s);
@@ -592,6 +640,17 @@ function genOpenEval(title: string, context: string, questions: OpenQuestion[], 
     <p><strong>Note finale :</strong> <span style="background:#fff3cd;padding:2px 6px">${note20}</span> / 20</p>
     <h3>Appréciation du formateur</h3>
     <p style="background:#fff3cd;padding:8px">${appreciation(note20)}</p>
+    <table style="width:100%;margin-top:24px"><tr>
+      <td style="width:50%;vertical-align:top">
+        <p><strong>Signature du formateur :</strong></p>
+        ${sigImg(f.formateurSignatureUrl)}
+      </td>
+      <td style="width:50%;vertical-align:top">
+        <p><strong>Signature du stagiaire :</strong></p>
+        ${stagSigImg(s)}
+      </td>
+    </tr></table>
+    ${o ? `<p style="margin-top:12px"><strong>Cachet de l'organisme :</strong></p>${orgSigBlock(o)}` : ""}
   `);
 }
 
@@ -606,7 +665,7 @@ export function genEval01(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
     { question: "Parmi ces éléments, lequel est un flux logistique ?", options: ["Flux physique", "Flux administratif uniquement", "Flux marketing", "Flux commercial"], answer: "A" },
     { question: "Quel acteur fait partie de la chaîne logistique ?", options: ["Le client", "Le comptable uniquement", "Le designer", "Le juriste"], answer: "A" },
     { question: "La logistique permet principalement de :", options: ["Décorer les produits", "Optimiser les opérations", "Faire de la publicité", "Créer des marques"], answer: "B" },
-  ], s, f, si);
+  ], s, f, si, o);
 }
 
 // EVAL 2 – QCM Réception des marchandises
@@ -618,7 +677,7 @@ export function genEval02(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
     { question: "Que doit-on vérifier lors du contrôle physique ?", options: ["Le prix du produit", "La quantité et l'état des marchandises", "Le nom du client", "La publicité"], answer: "B" },
     { question: "Que faut-il faire en cas de marchandise abîmée ?", options: ["Rien dire", "Refuser de travailler", "Faire des réserves sur le bon de livraison", "Vendre quand même"], answer: "C" },
     { question: "Pourquoi la traçabilité est-elle importante ?", options: ["Pour décorer les produits", "Pour suivre les marchandises", "Pour faire de la publicité", "Pour ralentir le travail"], answer: "B" },
-  ], s, f, si);
+  ], s, f, si, o);
 }
 
 // EVAL 3 – CAS PRATIQUE Réception
@@ -635,7 +694,7 @@ export function genEval03(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
       { question: "Quels documents devez-vous vérifier lors de la réception ?", points: 2, correction: "Le bon de livraison, le bon de commande, la lettre de voiture CMR et vérifier la correspondance entre ces documents." },
       { question: "Quelle procédure devez-vous appliquer face aux anomalies constatées ?", points: 3, correction: "Émettre des réserves précises sur le bon de livraison, photographier les dommages, informer le responsable, refuser les produits non conformes et saisir les anomalies dans le WMS." },
       { question: "Pourquoi la traçabilité est-elle essentielle dans cette situation ?", points: 3, correction: "La traçabilité permet de suivre les marchandises, d'identifier l'origine des anomalies, de faciliter les réclamations et d'assurer la qualité du service." },
-    ], s, f, si, 10);
+    ], s, f, si, 10, o);
 }
 
 // EVAL 4 – CAS PRATIQUE Stockage
@@ -651,7 +710,7 @@ export function genEval04(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
       { question: "Comment organiser efficacement les palettes dans l'entrepôt ?", points: 2, correction: "Regrouper par famille de produits, placer les produits à DLC courte en zone accessible, utiliser le WMS pour affecter les emplacements." },
       { question: "Quelles actions mettre en place face aux problèmes rencontrés ?", points: 3, correction: "Trier les palettes mixtes, alerter sur la saturation, réorganiser les emplacements sous-utilisés, signaler les produits à DLC courte." },
       { question: "Quels sont les enjeux d'un bon stockage ?", points: 3, correction: "Optimiser l'espace, garantir la sécurité, faciliter la préparation de commandes, éviter les ruptures et les pertes." },
-    ], s, f, si, 10);
+    ], s, f, si, 10, o);
 }
 
 // EVAL 5 – QCM Préparation de commandes
@@ -668,7 +727,7 @@ export function genEval05(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
     { question: "Quel équipement est obligatoire pour la sécurité ?", options: ["Téléphone", "EPI (équipements de protection individuelle)", "Ordinateur", "Stylo"], answer: "B" },
     { question: "Que signifie étiqueter un colis ?", options: ["Le peser", "Ajouter une information d'identification", "Le stocker", "Le déplacer"], answer: "B" },
     { question: "Où transfère-t-on les commandes préparées ?", options: ["Zone de stockage", "Zone d'expédition", "Bureau", "Quai de réception"], answer: "B" },
-  ], s, f, si);
+  ], s, f, si, o);
 }
 
 // EVAL 6 – EXERCICE Préparation de commandes
@@ -686,7 +745,7 @@ export function genEval06(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
       { question: "Quel élément est essentiel pour votre sécurité ?", points: 1, correction: "Le port des EPI : chaussures de sécurité, gilet haute visibilité, gants de manutention." },
       { question: "Où déposer une commande terminée ?", points: 1, correction: "En zone d'expédition, dans la zone correspondant au transporteur ou à la destination prévue." },
       { question: "Pourquoi respecter les procédures de préparation ?", points: 1, correction: "Pour garantir la qualité, éviter les erreurs, assurer la traçabilité et la satisfaction client." },
-    ], s, f, si, 10);
+    ], s, f, si, 10, o);
 }
 
 // EVAL 7 – Étude de cas Expédition
@@ -701,7 +760,7 @@ export function genEval07(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
       { question: "Indiquez les règles à respecter lors du chargement.", points: 4, correction: "Respecter le plan de chargement, fixer les palettes, vérifier le poids total, ne pas dépasser la charge utile, caler les marchandises." },
       { question: "Quelle procédure en cas de colis endommagé avant expédition ?", points: 4, correction: "Isoler le colis, prévenir le responsable, remplacer si possible, enregistrer l'incident et ne pas expédier en l'état." },
       { question: "Expliquez l'importance du suivi des expéditions.", points: 4, correction: "Le suivi permet de garantir la livraison, d'informer le client, de gérer les litiges et d'améliorer la qualité de service." },
-    ], s, f, si, 20);
+    ], s, f, si, 20, o);
 }
 
 // EVAL 8 – QCM Organisation des flux
@@ -713,7 +772,7 @@ export function genEval08(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
     { question: "Le flux entrant correspond :", options: ["Aux expéditions", "Aux réceptions de marchandises", "Aux retours clients", "Aux inventaires"], answer: "B" },
     { question: "Le flux sortant correspond :", options: ["À la réception", "Au stockage", "À l'expédition des marchandises", "Au contrôle qualité"], answer: "C" },
     { question: "L'organisation des flux permet :", options: ["D'améliorer la circulation des marchandises", "De désorganiser l'entrepôt", "D'augmenter les erreurs", "De ralentir les préparations"], answer: "A" },
-  ], s, f, si);
+  ], s, f, si, o);
 }
 
 // EVAL 9 – CAS PRATIQUE Organisation des flux
@@ -729,7 +788,7 @@ export function genEval09(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
       { question: "Proposez des solutions pour améliorer la circulation interne.", points: 4, correction: "Définir des circuits de circulation, séparer les flux entrants et sortants, utiliser le cross-docking pour les urgences." },
       { question: "Comment gérer la commande urgente ?", points: 4, correction: "La traiter en priorité, dédier un préparateur, vérifier la disponibilité des produits et organiser l'expédition en express." },
       { question: "Proposez des actions pour assurer les expéditions dans les délais.", points: 4, correction: "Anticiper les préparations, prioriser les commandes par heure de départ, vérifier les documents et communiquer avec les transporteurs." },
-    ], s, f, si, 20);
+    ], s, f, si, 20, o);
 }
 
 // EVAL 10 – EXERCICE Gestion des stocks
@@ -745,7 +804,7 @@ export function genEval10(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
       { question: "Expliquez ce qu'est une rupture de stock.", points: 4, correction: "C'est l'absence totale d'un produit en stock, empêchant de satisfaire les commandes clients." },
       { question: "Pourquoi définir un stock minimum ?", points: 4, correction: "Pour éviter les ruptures, garantir la continuité du service, anticiper les délais de réapprovisionnement." },
       { question: "Expliquez l'utilité de l'inventaire.", points: 4, correction: "L'inventaire permet de vérifier la cohérence entre le stock physique et le stock informatique, de détecter les écarts et d'ajuster les données." },
-    ], s, f, si, 20);
+    ], s, f, si, 20, o);
 }
 
 // EVAL 11 – QCM Gestion des stocks
@@ -757,7 +816,7 @@ export function genEval11(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
     { question: "Une sortie de stock correspond :", options: ["À une réception fournisseur", "À une entrée en stock", "À une expédition ou consommation", "À un inventaire"], answer: "C" },
     { question: "L'inventaire permet :", options: ["De supprimer les stocks", "De vérifier le stock réel", "D'augmenter les commandes", "De transporter les marchandises"], answer: "B" },
     { question: "La rupture de stock signifie :", options: ["Trop de stock", "Pas assez de commandes", "Absence de produit en stock", "Inventaire terminé"], answer: "C" },
-  ], s, f, si);
+  ], s, f, si, o);
 }
 
 // EVAL 12 – QCM Sécurité Conduite d'engins
@@ -769,7 +828,7 @@ export function genEval12(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
     { question: "En cas de charge instable, vous devez :", options: ["Continuer à rouler", "Accélérer", "Stabiliser la charge", "Ignorer le problème"], answer: "C" },
     { question: "La circulation dans un entrepôt doit :", options: ["Être libre sans règles", "Respecter un plan de circulation", "Être rapide uniquement", "Être désorganisée"], answer: "B" },
     { question: "En cas d'accident, vous devez :", options: ["Partir", "Ne rien dire", "Prévenir immédiatement", "Continuer à travailler"], answer: "C" },
-  ], s, f, si);
+  ], s, f, si, o);
 }
 
 // EVAL 13 – Mise en situation Communication
@@ -784,7 +843,7 @@ export function genEval13(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
       { question: "Rédigez le message au client pour l'informer du retard.", points: 4, correction: "Objet : Retard de livraison - Commande [réf]. Bonjour, nous vous informons d'un retard de livraison. Nous mettons tout en œuvre pour résoudre la situation et vous tiendrons informé. Cordialement." },
       { question: "Pourquoi enregistrer l'information dans le logiciel ?", points: 4, correction: "Pour assurer la traçabilité, permettre le suivi de l'incident, faciliter l'analyse des causes et prévenir les récurrences." },
       { question: "Citez des règles de communication en entreprise.", points: 4, correction: "Être clair et concis, utiliser un langage professionnel, respecter la hiérarchie, confirmer les informations par écrit, écouter activement." },
-    ], s, f, si, 20);
+    ], s, f, si, 20, o);
 }
 
 // EVAL 14 – Révisions globales / Examen blanc
@@ -800,7 +859,7 @@ export function genEval14(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
       { question: "Partie 5 – Organisation des flux : Objectif de l'organisation des flux.", points: 4, correction: "Optimiser la circulation des marchandises et des informations, réduire les délais et les coûts, améliorer la productivité." },
       { question: "Partie 6 – Sécurité : Règles de sécurité pour la conduite d'engins.", points: 4, correction: "Vérification quotidienne de l'engin, port des EPI, respect du plan de circulation, charge maximale, klaxonner aux intersections." },
       { question: "Partie 7 – Communication : Importance de la communication professionnelle.", points: 4, correction: "Assurer la coordination des équipes, éviter les erreurs, transmettre les informations importantes, faciliter la résolution des problèmes." },
-    ], s, f, si, 28);
+    ], s, f, si, 28, o);
 }
 
 // EVAL 15 – Examen blanc final
@@ -817,5 +876,5 @@ export function genEval15(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
       { question: "Partie 6 – Organisation des flux : Objectif des flux logistiques.", points: 4, correction: "Assurer la fluidité de la chaîne logistique, de la réception à l'expédition, en minimisant les temps d'attente et les manipulations." },
       { question: "Partie 7 – Sécurité : Règles lors de la conduite d'engins.", points: 4, correction: "Contrôle préalable, port EPI, respect vitesse et plan de circulation, stabilité de la charge, signalisation, formation obligatoire (CACES)." },
       { question: "Partie 8 – Communication : Importance de la communication.", points: 4, correction: "Coordonner les équipes, transmettre les consignes, signaler les anomalies, informer les clients et les partenaires, assurer la traçabilité." },
-    ], s, f, si, 32);
+    ], s, f, si, 32, o);
 }
