@@ -1175,7 +1175,7 @@ export function genQuestionnaireSatisfactionEY(o: OrganismeInfo, f: FormationInf
     { heading: "Informations", content: `<table style="width:100%;border-collapse:collapse;">
       <tr><td ${tdb}>Formation</td><td ${td}>${titre}</td></tr>
       <tr><td ${tdb}>Stagiaire</td><td ${td}>${s.prenom} ${s.nom}</td></tr>
-      <tr><td ${tdb}>Dates</td><td ${td}>Du ${fmtDate(getStagiaireDateDebut(s, f))} au ${fmtDate(getStagiaireDateFin(s, f))}</td></tr>
+      <tr><td ${tdb}>Dates</td><td ${td}>Du ${fmtDate((s as StagiaireInfo).dateDebutFormation || f.dateDebut)} au ${fmtDate((s as StagiaireInfo).dateFinFormation || f.dateFin)}</td></tr>
       <tr><td ${tdb}>Formateur</td><td ${td}>${f.formateur || "—"}</td></tr>
     </table>` },
     { heading: "Évaluation (1 = Pas du tout satisfait, 5 = Très satisfait)", content: `<table style="width:100%;border-collapse:collapse;">${tableHtml}
@@ -1188,8 +1188,8 @@ export function genQuestionnaireSatisfactionEY(o: OrganismeInfo, f: FormationInf
       <p><strong>Recommanderiez-vous cette formation à un collègue ?</strong></p>
       <p style="padding:8px;background:#f9f9f9;border-left:3px solid ${pc()};margin:8px 0;"><em>"Oui, sans hésitation. Cette formation est très complète et adaptée aux besoins du terrain."</em></p>` },
     { heading: "Signature", content: `<table style="width:100%;margin-top:16px;"><tr>
-      <td style="width:50%;padding:16px;"><p>Date : ${fmtDate(getStagiaireDateFin(s, f))}</p><p style="margin-top:30px;">Signature du stagiaire :</p><br/><br/></td>
-      <td style="width:50%;padding:16px;"><p>Date : ${fmtDate(getStagiaireDateFin(s, f))}</p><p style="margin-top:30px;">Visa du formateur :</p><br/><br/></td>
+      <td style="width:50%;padding:16px;"><p>Date : ${fmtDate((s as StagiaireInfo).dateFinFormation || f.dateFin)}</p><p style="margin-top:30px;">Signature du stagiaire :</p><br/><br/></td>
+      <td style="width:50%;padding:16px;"><p>Date : ${fmtDate((s as StagiaireInfo).dateFinFormation || f.dateFin)}</p><p style="margin-top:30px;">Visa du formateur :</p><br/><br/></td>
     </tr></table>` },
   ]});
 }
