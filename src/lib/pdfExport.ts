@@ -184,9 +184,8 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
     `width:${A4_WIDTH_PX}px`,
     "z-index:-9999",
     "background:#fff",
-    "visibility:hidden",
     "pointer-events:none",
-    "overflow:hidden",
+    "contain:strict",
   ].join(";");
 
   const styleEl = document.createElement("style");
