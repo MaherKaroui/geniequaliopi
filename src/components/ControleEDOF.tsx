@@ -482,7 +482,8 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
           advanceProgress(`${eyDoc.code} — à fournir`);
         }
 
-        if (i % 3 === 0) await yieldToBrowser(5);
+        // Longer pause between document types for GC
+        await yieldToBrowser(i % 3 === 0 ? 300 : 50);
       }
 
       const content = await zip.generateAsync(ZIP_EXPORT_OPTIONS);
