@@ -201,28 +201,22 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
       pdfOptions?: PdfBlobOptions;
       sourceStagiaires?: StagiaireInfo[];
       onItemDone?: (current: number, total: number) => void;
-      folderByStagiaire?: boolean;
+      folderByDocument?: boolean;
     }
   ) => {
     const sourceStagiaires = options?.sourceStagiaires ?? exportStagiaires;
 
     if (eyDoc.perStagiaire && sourceStagiaires.length > 0) {
+      const docFolder = options?.folderByDocument ? buildDocFolderName(eyDoc.label) : "";
+
       for (let si = 0; si < sourceStagiaires.length; si++) {
         const result = await generateAutoDocForStagiaire(eyDoc, si, {
           pdfOptions: options?.pdfOptions,
           sourceStagiaires,
         });
         if (result) {
-          if (options?.folderByStagiaire) {
-            const s = sourceStagiaires[si];
-            const folderName = sanitizeFileSegment(
-              [s.prenom, s.nom].filter(v => typeof v === "string" && v.trim()).join("_"),
-              `Stagiaire_${String(si + 1).padStart(2, "0")}`
-            );
-            zip.file(`${folderName}/${result.fileName}`, result.blob);
-          } else {
-            zip.file(result.fileName, result.blob);
-          }
+          const filePath = docFolder ? `${docFolder}/${result.fileName}` : result.fileName;
+          zip.file(filePath, result.blob);
         }
         options?.onItemDone?.(si + 1, sourceStagiaires.length);
         const yieldMs = (si + 1) % 10 === 0 ? 200 : 50;
