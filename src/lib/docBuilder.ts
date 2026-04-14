@@ -414,6 +414,21 @@ export function getStagiaireDateFin(s: StagiaireInfo, f: FormationInfo): string 
   return normalizeDate(s.dateFinFormation || f.dateFin || "");
 }
 
+/** Get the best session-level start/end dates, prioritizing stagiaire individual dates over formation-level */
+export function getSessionDates(f: FormationInfo, stagiaires?: StagiaireInfo[]): { debut: string; fin: string } {
+  if (stagiaires && stagiaires.length > 0) {
+    const starts = stagiaires.map(s => s.dateDebutFormation).filter(Boolean).sort();
+    const ends = stagiaires.map(s => s.dateFinFormation).filter(Boolean).sort();
+    if (starts.length > 0 || ends.length > 0) {
+      return {
+        debut: starts[0] || f.dateDebut || "",
+        fin: ends[ends.length - 1] || f.dateFin || "",
+      };
+    }
+  }
+  return { debut: f.dateDebut || "", fin: f.dateFin || "" };
+}
+
 /** Get per-stagiaire tarif (prioritizes stagiaire-specific, then formation-level) */
 export function getStagiaireTarif(s: StagiaireInfo, f: FormationInfo): string {
   return s.tarifFormation || f.tarif || "";
