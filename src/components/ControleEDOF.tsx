@@ -318,6 +318,16 @@ export default function ControleEDOF({ organisme, formation, stagiaires, signatu
           const ext = state.uploadedFileName?.split(".").pop() || "pdf";
           zip.file(`${safeName}_${eyDoc.code}.${ext}`, buf);
           advanceProgress(`${eyDoc.code} — fichier fourni`);
+        } else if (eyDoc.staticFile) {
+          try {
+            const response = await fetch(eyDoc.staticFile);
+            const blob = await response.blob();
+            const fileName = eyDoc.staticFile.split("/").pop() || `${eyDoc.code}.docx`;
+            zip.file(fileName, blob);
+          } catch (e) {
+            console.error(`Error fetching static file ${eyDoc.staticFile}:`, e);
+          }
+          advanceProgress(`${eyDoc.code} — fichier pré-fourni`);
         } else if (eyDoc.autoTemplates.length > 0) {
           await appendAutoDocToZip(zip, eyDoc, {
             pdfOptions: MASS_EXPORT_PDF_OPTIONS,
