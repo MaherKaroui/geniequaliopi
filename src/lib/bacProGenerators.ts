@@ -3,7 +3,7 @@
  * Each function returns HTML with stagiaire data filled in, ready for PDF export.
  */
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
-import { htmlWrap, formatDate, getDocStyle } from "./docBuilder";
+import { htmlWrap, formatDate, getDocStyle, baseStyle } from "./docBuilder";
 
 /** Render signature image or empty placeholder */
 function sigImg(url?: string, height = 60): string {
@@ -36,7 +36,8 @@ const ORG_TEL = "07.53.35.57.34";
 const ORG_PRESIDENT = "Halouane Hacene";
 
 function header() {
-  return `<div style="border-bottom:2px solid #1a56db;padding-bottom:8px;margin-bottom:16px;">
+  const color = getDocStyle().primaryColor || "#1a56db";
+  return `<div style="border-bottom:2px solid ${color};padding-bottom:8px;margin-bottom:16px;">
     <p style="font-weight:bold;font-size:14px;margin:0">${ORG_NAME}</p>
     <p style="font-size:11px;margin:2px 0">Adresse : ${ORG_ADDR}</p>
     <p style="font-size:11px;margin:2px 0">SIRET : ${ORG_SIRET} / NDA: ${ORG_NDA}</p>
