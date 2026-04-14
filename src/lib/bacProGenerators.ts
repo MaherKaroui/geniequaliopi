@@ -545,7 +545,7 @@ interface QCMQuestion {
   answer: string;
 }
 
-function genQCMEval(title: string, questions: QCMQuestion[], s: StagiaireInfo, f: FormationInfo, si: number): string {
+function genQCMEval(title: string, questions: QCMQuestion[], s: StagiaireInfo, f: FormationInfo, si: number, o?: OrganismeInfo): string {
   const dateDebut = stagDateDebut(s, f);
   const dateFin = stagDateFin(s, f);
   const formateur = stagFormateur(s);
@@ -583,6 +583,17 @@ function genQCMEval(title: string, questions: QCMQuestion[], s: StagiaireInfo, f
     <p><strong>Note finale :</strong> <span style="background:#fff3cd;padding:2px 6px">${note20}</span> / 20</p>
     <h3>APPRÉCIATION DU FORMATEUR</h3>
     <p style="background:#fff3cd;padding:8px">${appreciation(note20)}</p>
+    <table style="width:100%;margin-top:24px"><tr>
+      <td style="width:50%;vertical-align:top">
+        <p><strong>Signature du formateur :</strong></p>
+        ${sigImg(f.formateurSignatureUrl)}
+      </td>
+      <td style="width:50%;vertical-align:top">
+        <p><strong>Signature du stagiaire :</strong></p>
+        ${stagSigImg(s)}
+      </td>
+    </tr></table>
+    ${o ? `<p style="margin-top:12px"><strong>Cachet de l'organisme :</strong></p>${orgSigBlock(o)}` : ""}
   `);
 }
 
@@ -595,7 +606,7 @@ interface OpenQuestion {
   correction: string;
 }
 
-function genOpenEval(title: string, context: string, questions: OpenQuestion[], s: StagiaireInfo, f: FormationInfo, si: number, totalPoints: number): string {
+function genOpenEval(title: string, context: string, questions: OpenQuestion[], s: StagiaireInfo, f: FormationInfo, si: number, totalPoints: number, o?: OrganismeInfo): string {
   const dateDebut = stagDateDebut(s, f);
   const dateFin = stagDateFin(s, f);
   const formateur = stagFormateur(s);
@@ -629,6 +640,17 @@ function genOpenEval(title: string, context: string, questions: OpenQuestion[], 
     <p><strong>Note finale :</strong> <span style="background:#fff3cd;padding:2px 6px">${note20}</span> / 20</p>
     <h3>Appréciation du formateur</h3>
     <p style="background:#fff3cd;padding:8px">${appreciation(note20)}</p>
+    <table style="width:100%;margin-top:24px"><tr>
+      <td style="width:50%;vertical-align:top">
+        <p><strong>Signature du formateur :</strong></p>
+        ${sigImg(f.formateurSignatureUrl)}
+      </td>
+      <td style="width:50%;vertical-align:top">
+        <p><strong>Signature du stagiaire :</strong></p>
+        ${stagSigImg(s)}
+      </td>
+    </tr></table>
+    ${o ? `<p style="margin-top:12px"><strong>Cachet de l'organisme :</strong></p>${orgSigBlock(o)}` : ""}
   `);
 }
 
