@@ -670,10 +670,11 @@ function genOpenEval(title: string, context: string, questions: OpenQuestion[], 
   const qHtml = questions.map((q, i) => {
     const sc = getScore(si, i, q.points);
     totalScore += sc;
+    const stagResponse = varyStagResponse(q.correction, si, i, sc, q.points);
     return `<h3>Question ${i + 1} (${q.points} points)</h3>
       <p>${q.question}</p>
       <p><strong>Réponse du stagiaire :</strong></p>
-      <p style="border:1px solid #ccc;padding:8px;background:#fafafa">${q.correction}</p>
+      <p style="border:1px solid #ccc;padding:8px;background:#fafafa">${stagResponse}</p>
       <p><strong>Correction :</strong></p>
       <p><strong>${q.correction}</strong></p>
       <p><strong>Note :</strong> <span style="background:#fff3cd;padding:2px 6px">${sc}</span> / ${q.points}</p>`;
