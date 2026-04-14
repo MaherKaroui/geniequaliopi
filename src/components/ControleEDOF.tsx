@@ -266,8 +266,10 @@ export default function ControleEDOF({ organisme, formation, stagiaires, signatu
         setProgressText(`Préparation de ${eyDoc.code}...`);
 
         const zip = new JSZip();
+        const isBacPro = eyDoc.category === "controle_bac_pro";
         await appendAutoDocToZip(zip, eyDoc, {
           pdfOptions: MASS_EXPORT_PDF_OPTIONS,
+          folderByStagiaire: isBacPro,
           onItemDone: (current, total) => {
             setProgress(Math.round((current / Math.max(total, 1)) * 100));
             setProgressText(`${eyDoc.code} — ${current}/${total}`);
