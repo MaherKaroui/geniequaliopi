@@ -268,7 +268,7 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
         const isBacPro = eyDoc.category === "controle_bac_pro";
         await appendAutoDocToZip(zip, eyDoc, {
           pdfOptions: MASS_EXPORT_PDF_OPTIONS,
-          folderByStagiaire: isBacPro,
+          folderByDocument: isBacPro,
           onItemDone: (current, total) => {
             setProgress(Math.round((current / Math.max(total, 1)) * 100));
             setProgressText(`${eyDoc.code} — ${current}/${total}`);
@@ -345,7 +345,7 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
           await appendAutoDocToZip(zip, eyDoc, {
             pdfOptions: MASS_EXPORT_PDF_OPTIONS,
             sourceStagiaires: exportStagiaires,
-            folderByStagiaire: isBacPro,
+            folderByDocument: isBacPro,
             onItemDone: (current, total) => {
               advanceProgress(total > 1 ? `${eyDoc.code} — ${current}/${total}` : `${eyDoc.code} — ${eyDoc.label}`);
             },
@@ -466,7 +466,7 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
           await appendAutoDocToZip(zip, eyDoc, {
             pdfOptions: MASS_EXPORT_PDF_OPTIONS,
             sourceStagiaires: exportStagiaires,
-            folderByStagiaire: isBacPro,
+            folderByDocument: isBacPro,
             onItemDone: (current, total) => {
               advanceProgress(total > 1 ? `${eyDoc.code} — ${current}/${total}` : `${eyDoc.code} — ${eyDoc.label}`);
             },
