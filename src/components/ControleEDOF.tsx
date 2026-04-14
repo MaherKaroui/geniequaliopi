@@ -229,6 +229,20 @@ export default function ControleEDOF({ organisme, formation, stagiaires, signatu
       return;
     }
 
+    // Handle static file download
+    if (eyDoc.staticFile) {
+      try {
+        const response = await fetch(eyDoc.staticFile);
+        const blob = await response.blob();
+        const fileName = eyDoc.staticFile.split("/").pop() || `${eyDoc.code}.docx`;
+        saveAs(blob, fileName);
+        toast.success(`${eyDoc.label} téléchargé !`);
+      } catch (e: any) {
+        toast.error("Erreur de téléchargement : " + (e.message || "Erreur inconnue"));
+      }
+      return;
+    }
+
     if (eyDoc.autoTemplates.length === 0) return;
 
     toast.info(`Génération de ${eyDoc.code}...`);
