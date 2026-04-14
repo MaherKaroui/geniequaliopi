@@ -38,10 +38,10 @@ function stagName(s: StagiaireInfo) {
 }
 
 function stagDateDebut(s: StagiaireInfo, f: FormationInfo) {
-  return formatDate(s.dateDebut || f.dateDebut || "") || "N/A";
+  return formatDate((s as any).dateDebutFormation || (s as any).dateDebut || f.dateDebut || "") || "N/A";
 }
 function stagDateFin(s: StagiaireInfo, f: FormationInfo) {
-  return formatDate(s.dateFin || f.dateFin || "") || "N/A";
+  return formatDate((s as any).dateFinFormation || (s as any).dateFin || f.dateFin || "") || "N/A";
 }
 function stagFormateur(s: StagiaireInfo) {
   return s.formateur || "Le formateur";
@@ -95,7 +95,7 @@ export function genContratBacPro(o: OrganismeInfo, f: FormationInfo, stagiaires:
   const s = stagiaires[si] || stagiaires[0];
   const dateDebut = stagDateDebut(s, f);
   const dateFin = stagDateFin(s, f);
-  const tarif = s.tarif || f.tarif || "8200";
+  const tarif = (s as any).tarifFormation || f.tarif || "8200";
   const tarifNum = parseFloat(tarif.replace(/[^\d.]/g, "")) || 8200;
   const part30 = Math.round(tarifNum * 0.3);
   const part35 = Math.round(tarifNum * 0.35);
@@ -182,7 +182,7 @@ export function genConvocationBacPro(o: OrganismeInfo, f: FormationInfo, stagiai
   const s = stagiaires[si] || stagiaires[0];
   const dateDebut = stagDateDebut(s, f);
   const dateFin = stagDateFin(s, f);
-  const duree = s.duree || f.duree || "589";
+  const duree = f.duree || "589";
   const civilite = stagCivilite(s);
 
   return wrap(`
