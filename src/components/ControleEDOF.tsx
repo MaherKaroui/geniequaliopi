@@ -2,7 +2,7 @@ import { useState, useMemo, useCallback, useRef } from "react";
 import { OrganismeInfo, FormationInfo, StagiaireInfo, CritereData, DocStyleConfig } from "@/types/qualiopi";
 import { EY_DOCUMENTS, EY_CATEGORIES, EYCategory, EYDocState, EYDocStatus, EYDocumentItem } from "@/lib/eyControlData";
 import { generateDocumentById } from "@/lib/documentGenerator";
-import { buildPerStagiairePdfFileName } from "@/lib/eyExport";
+import { buildPerStagiairePdfFileName, sanitizeFileSegment } from "@/lib/eyExport";
 import { mergeStagiaires, mergeOrganisme } from "@/lib/sampleData";
 import { htmlToPdfBlob } from "@/lib/pdfExport";
 import { Button } from "@/components/ui/button";
