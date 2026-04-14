@@ -364,11 +364,12 @@ export function genTauxReussiteEY(o: OrganismeInfo, f: FormationInfo, stagiaires
   const yr = new Date().getFullYear();
   const certifies = Math.round(n * 0.89);
   const abandons = Math.round(n * 0.02);
+  const sd = getSessionDates(f, stagiaires);
   return buildDocument({ org: o, formation: f, title: "Taux de réussite aux certifications professionnelles", subtitle: `Année ${yr} – ${f.intitule||"Formation"}`, sections: [
     { heading: "Résultats de la certification", content: `<table style="width:100%;border-collapse:collapse;">
       <tr><td ${tdb} style="width:45%;">Formation</td><td ${td}>${f.intitule||"Formation"}</td></tr>
       <tr><td ${tdb}>Code certification</td><td ${td}>${f.codeRNCP||"—"}</td></tr>
-      <tr><td ${tdb}>Période</td><td ${td}>Du ${fmtDate(f.dateDebut)} au ${fmtDate(f.dateFin)}</td></tr>
+      <tr><td ${tdb}>Période</td><td ${td}>Du ${fmtDate(sd.debut)} au ${fmtDate(sd.fin)}</td></tr>
       <tr><td ${tdb}>Nombre de candidats inscrits</td><td ${td}>${n}</td></tr>
       <tr><td ${tdb}>Nombre de candidats présentés</td><td ${td}>${n - abandons}</td></tr>
       <tr><td ${tdb}>Nombre de candidats certifiés</td><td ${td}>${certifies}</td></tr>
@@ -540,8 +541,9 @@ export function genAgrementsMinisteriels(o: OrganismeInfo, f: FormationInfo): st
 }
 
 /* ═══ CODE 48/49 – Communication report/reprogrammation ═══ */
-export function genCommunicationReport(o: OrganismeInfo, f: FormationInfo): string {
+export function genCommunicationReport(o: OrganismeInfo, f: FormationInfo, stagiaires?: StagiaireInfo[]): string {
   const yr = new Date().getFullYear();
+  const sd = getSessionDates(f, stagiaires);
   return buildDocument({ org: o, formation: f, title: "Communication de report / reprogrammation de session", subtitle: "Exemples de communications aux stagiaires", sections: [
     { heading: "Email type – Report de session", content: `<div style="border:1px solid #ddd;border-radius:8px;padding:16px;background:#fafafa;font-family:Arial,sans-serif;">
       <p style="margin:0 0 4px;font-size:0.85em;color:${sc()};">De : ${o.email||"contact@organisme.fr"}</p>
@@ -550,7 +552,7 @@ export function genCommunicationReport(o: OrganismeInfo, f: FormationInfo): stri
       <hr style="border:none;border-top:1px solid #ddd;margin:12px 0;"/>
       <p>Bonjour [Prénom],</p>
       <p>Nous vous informons que votre session de formation <strong>« ${f.intitule||"Formation"} »</strong> initialement prévue du [date initiale] au [date initiale fin] est reportée aux dates suivantes :</p>
-      <p><strong>Nouvelles dates :</strong> Du ${fmtDate(f.dateDebut)} au ${fmtDate(f.dateFin)}<br/>
+      <p><strong>Nouvelles dates :</strong> Du ${fmtDate(sd.debut)} au ${fmtDate(sd.fin)}<br/>
       <strong>Lieu :</strong> ${f.lieu||o.ville||"Inchangé"}<br/>
       <strong>Horaires :</strong> 9h00 – 12h30 / 13h30 – 17h00</p>
       <p><strong>Motif du report :</strong> Réorganisation du planning pédagogique afin d'optimiser les conditions d'accueil.</p>
@@ -564,7 +566,7 @@ export function genCommunicationReport(o: OrganismeInfo, f: FormationInfo): stri
       <hr style="border:none;border-top:1px solid #ddd;margin:12px 0;"/>
       <p>Bonjour [Prénom],</p>
       <p>Suite à notre échange, nous avons le plaisir de vous confirmer votre inscription sur la nouvelle session :</p>
-      <ul><li><strong>Formation :</strong> ${f.intitule||"Formation"}</li><li><strong>Dates :</strong> Du ${fmtDate(f.dateDebut)} au ${fmtDate(f.dateFin)}</li><li><strong>Formateur :</strong> ${f.formateur||SAMPLE_FORMATEURS[0].prenom+" "+SAMPLE_FORMATEURS[0].nom}</li></ul>
+      <ul><li><strong>Formation :</strong> ${f.intitule||"Formation"}</li><li><strong>Dates :</strong> Du ${fmtDate(sd.debut)} au ${fmtDate(sd.fin)}</li><li><strong>Formateur :</strong> ${f.formateur||SAMPLE_FORMATEURS[0].prenom+" "+SAMPLE_FORMATEURS[0].nom}</li></ul>
       <p>Vous recevrez une convocation officielle 7 jours avant le démarrage.</p>
       <p>Cordialement,<br/><strong>${o.nom||""}</strong></p>
     </div>` },
@@ -573,15 +575,16 @@ export function genCommunicationReport(o: OrganismeInfo, f: FormationInfo): stri
 }
 
 /* ═══ CODE 50 – Preuve création session ═══ */
-export function genPreuveCreationSession(o: OrganismeInfo, f: FormationInfo): string {
+export function genPreuveCreationSession(o: OrganismeInfo, f: FormationInfo, stagiaires?: StagiaireInfo[]): string {
   const yr = new Date().getFullYear();
+  const sd = getSessionDates(f, stagiaires);
   return buildDocument({ org: o, formation: f, title: "Preuve de création de session de formation", subtitle: `Session : ${f.intitule||"Formation"}`, sections: [
     { heading: "Informations de la session créée", content: `<table style="width:100%;border-collapse:collapse;">
       <tr><td ${tdb} style="width:35%;">Intitulé de la formation</td><td ${td}>${f.intitule||"Formation"}</td></tr>
       <tr><td ${tdb}>Code certification</td><td ${td}>${f.codeRNCP||"—"}</td></tr>
       <tr><td ${tdb}>N° de session</td><td ${td}>SESS-${yr}-${String(Math.floor(Math.random()*900)+100).padStart(3,"0")}</td></tr>
       <tr><td ${tdb}>Date de création</td><td ${td}>${fmtDate(today())}</td></tr>
-      <tr><td ${tdb}>Dates de la session</td><td ${td}>Du ${fmtDate(f.dateDebut)} au ${fmtDate(f.dateFin)}</td></tr>
+      <tr><td ${tdb}>Dates de la session</td><td ${td}>Du ${fmtDate(sd.debut)} au ${fmtDate(sd.fin)}</td></tr>
       <tr><td ${tdb}>Durée</td><td ${td}>${f.duree||"52 heures"}</td></tr>
       <tr><td ${tdb}>Lieu</td><td ${td}>${f.lieu||o.adresse||o.ville||"—"}</td></tr>
       <tr><td ${tdb}>Nombre de places</td><td ${td}>${f.nombreParticipants||"12"}</td></tr>
@@ -599,12 +602,13 @@ export function genPreuveCreationSession(o: OrganismeInfo, f: FormationInfo): st
 }
 
 /* ═══ CODE 51 – Preuve reprogrammation de session ═══ */
-export function genPreuveReprogrammation(o: OrganismeInfo, f: FormationInfo): string {
+export function genPreuveReprogrammation(o: OrganismeInfo, f: FormationInfo, stagiaires?: StagiaireInfo[]): string {
+  const sd = getSessionDates(f, stagiaires);
   return buildDocument({ org: o, formation: f, title: "Preuve de reprogrammation de session", sections: [
     { heading: "Session reprogrammée", content: `<table style="width:100%;border-collapse:collapse;">
       <tr><td ${tdb} style="width:35%;">Formation</td><td ${td}>${f.intitule||"Formation"}</td></tr>
       <tr><td ${tdb}>Session initiale</td><td ${td}>Du [date initiale] au [date initiale fin]</td></tr>
-      <tr><td ${tdb}>Nouvelle session</td><td ${td}>Du ${fmtDate(f.dateDebut)} au ${fmtDate(f.dateFin)}</td></tr>
+      <tr><td ${tdb}>Nouvelle session</td><td ${td}>Du ${fmtDate(sd.debut)} au ${fmtDate(sd.fin)}</td></tr>
       <tr><td ${tdb}>Motif</td><td ${td}>Réorganisation pédagogique / Demande stagiaire(s)</td></tr>
       <tr><td ${tdb}>Stagiaires concernés</td><td ${td}>Tous les inscrits – informés par email</td></tr>
       <tr><td ${tdb}>Impact financier</td><td ${td}>Aucun – Conditions inchangées</td></tr>
@@ -729,7 +733,8 @@ export function genPlanningIntervenants(o: OrganismeInfo, f: FormationInfo): str
     const module = modules[i%modules.length] || "Formation";
     return `<tr><td ${td}>${fmtDate(d)}</td><td ${td}>${intervenant}</td><td ${td}>09h00 – 12h30 / 13h30 – 17h00</td><td ${td}>${module}</td><td ${td}>${f.lieu||o.ville||"Salle de formation"}</td></tr>`;
   }).join("");
-  return buildDocument({ org: o, formation: f, title: "Planning des intervenants", subtitle: `Session : ${fmtDate(f.dateDebut)} – ${fmtDate(f.dateFin)}`, sections: [
+  const sd = getSessionDates(f);
+  return buildDocument({ org: o, formation: f, title: "Planning des intervenants", subtitle: `Session : ${fmtDate(sd.debut)} – ${fmtDate(sd.fin)}`, sections: [
     { heading: "Calendrier détaillé", content: `<table style="width:100%;border-collapse:collapse;font-size:0.9em;"><thead><tr style="background:${pc()};color:#fff;"><th ${td}>Date</th><th ${td}>Intervenant</th><th ${td}>Horaires</th><th ${td}>Module</th><th ${td}>Lieu</th></tr></thead><tbody>${rows}</tbody></table>` },
     { heading: "Intervenants", content: `<table style="width:100%;border-collapse:collapse;">
       <tr><td ${tdb}>${fmt1}</td><td ${td}>${socio?"Formatrice principale – Socio-esthétique (CDI)":"Formateur principal"}</td></tr>
@@ -739,12 +744,13 @@ export function genPlanningIntervenants(o: OrganismeInfo, f: FormationInfo): str
 }
 
 /* ═══ CODE 61 – Planning sessions ═══ */
-export function genPlanningSessionsEY(o: OrganismeInfo, f: FormationInfo): string {
+export function genPlanningSessionsEY(o: OrganismeInfo, f: FormationInfo, stagiaires?: StagiaireInfo[]): string {
   const yr = new Date().getFullYear();
   const socio = isSocioEsthetique(f);
+  const sd = getSessionDates(f, stagiaires);
   return buildDocument({ org: o, formation: f, title: "Planning des sessions de formation", subtitle: `Année ${yr} – ${f.intitule||"Formation"}`, sections: [
     { heading: "Sessions programmées", content: `<table style="width:100%;border-collapse:collapse;"><thead><tr style="background:${pc()};color:#fff;"><th ${td}>Session</th><th ${td}>Dates</th><th ${td}>Durée</th><th ${td}>Lieu</th><th ${td}>Places</th><th ${td}>Inscrits</th><th ${td}>Statut</th></tr></thead><tbody>
-      <tr style="background:#f0f7ff;"><td ${td}><strong>Session 1 (en cours)</strong></td><td ${td}>Du ${fmtDate(f.dateDebut)} au ${fmtDate(f.dateFin)}</td><td ${td}>${f.duree||"52h"}</td><td ${td}>${f.lieu||o.ville||"Présentiel"}</td><td ${td}>${f.nombreParticipants||"12"}</td><td ${td}>${f.nombreParticipants||"10"}</td><td ${td}><strong>En cours</strong></td></tr>
+      <tr style="background:#f0f7ff;"><td ${td}><strong>Session 1 (en cours)</strong></td><td ${td}>Du ${fmtDate(sd.debut)} au ${fmtDate(sd.fin)}</td><td ${td}>${f.duree||"52h"}</td><td ${td}>${f.lieu||o.ville||"Présentiel"}</td><td ${td}>${f.nombreParticipants||"12"}</td><td ${td}>${f.nombreParticipants||"10"}</td><td ${td}><strong>En cours</strong></td></tr>
       <tr><td ${td}>Session 2</td><td ${td}>${socio?`Du 02/06/${yr} au 12/06/${yr}`:`Du 01/09/${yr} au 30/09/${yr}`}</td><td ${td}>${f.duree||"52h"}</td><td ${td}>${f.lieu||o.ville||"Présentiel"}</td><td ${td}>12</td><td ${td}>4</td><td ${td}>Inscriptions ouvertes</td></tr>
       <tr><td ${td}>Session 3</td><td ${td}>${socio?`Du 14/10/${yr} au 24/10/${yr}`:`Du 04/11/${yr} au 29/11/${yr}`}</td><td ${td}>${f.duree||"52h"}</td><td ${td}>${f.lieu||o.ville||"Présentiel"}</td><td ${td}>12</td><td ${td}>0</td><td ${td}>Planifiée</td></tr>
     </tbody></table>` },
