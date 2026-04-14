@@ -79,22 +79,38 @@ function wrap(body: string) {
   return htmlWrap(`${header()}${body}${footerBlock()}`);
 }
 
-// Deterministic scores — always good (15-20/20 range)
+// Deterministic scores — always good but VARIED per stagiaire (15-20/20 range)
 function getScore(si: number, qIdx: number, max: number): number {
-  const seed = ((si + 1) * 7 + qIdx * 13) % 100;
-  if (seed < 15) return Math.max(1, max - 1); // occasionally lose 1 point
-  return max; // full marks most of the time
+  // Use a richer seed so each stagiaire × question combo gives a distinct result
+  const seed = ((si + 1) * 17 + qIdx * 31 + si * qIdx * 3) % 100;
+  if (seed < 8) return Math.max(1, max - 2);   // rare: lose 2 points
+  if (seed < 25) return Math.max(1, max - 1);  // sometimes: lose 1 point
+  return max; // full marks otherwise
 }
 function getNote20(si: number, nbQ: number, total: number): number {
   let sum = 0;
   for (let i = 0; i < nbQ; i++) sum += getScore(si, i, Math.round(total / nbQ));
-  return Math.max(15, Math.min(20, Math.round((sum / total) * 20)));
+  const raw = Math.round((sum / total) * 20);
+  // Per-stagiaire floor varies between 15 and 17 so notes look different
+  const floor = 15 + ((si * 3) % 3); // 15, 16, 17 rotating
+  return Math.max(floor, Math.min(20, raw));
 }
-function appreciation(note20: number): string {
-  if (note20 >= 16) return "Excellent travail. L'apprenant démontre une maîtrise solide des compétences évaluées. Continuez ainsi.";
-  if (note20 >= 12) return "Bon travail dans l'ensemble. Quelques axes d'amélioration identifiés mais les compétences fondamentales sont acquises.";
-  if (note20 >= 8) return "Travail satisfaisant. Des lacunes subsistent sur certains points. Un renforcement est recommandé.";
-  return "Des difficultés importantes ont été constatées. Un accompagnement renforcé est nécessaire.";
+
+const APPRECIATIONS_POOL = [
+  "Excellent travail. L'apprenant démontre une maîtrise solide des compétences évaluées.",
+  "Très bon niveau. Les notions sont bien assimilées et appliquées avec rigueur.",
+  "Travail sérieux et appliqué. Les compétences clés sont parfaitement maîtrisées.",
+  "Résultats très satisfaisants. L'apprenant fait preuve d'une bonne compréhension globale.",
+  "Bon travail d'ensemble. Les fondamentaux sont acquis, quelques points de détail à approfondir.",
+  "Bonne progression. Les compétences principales sont bien acquises.",
+  "L'apprenant a su démontrer une compréhension approfondie des concepts abordés.",
+  "Solide prestation. Le stagiaire maîtrise les aspects théoriques et pratiques.",
+  "Résultats encourageants. L'apprenant est autonome sur la majorité des tâches évaluées.",
+];
+
+function appreciation(note20: number, si = 0): string {
+  if (note20 >= 16) return APPRECIATIONS_POOL[si % APPRECIATIONS_POOL.length];
+  return "Bon travail dans l'ensemble. Les compétences fondamentales sont acquises.";
 }
 
 /** Vary a stagiaire's open-ended response based on their index + question index.
@@ -116,7 +132,6 @@ function varyStagResponse(correction: string, si: number, qIdx: number, score: n
   // Partial score → truncated/incomplete answer
   if (ratio >= 0.5) {
     const sentences = correction.split(/[.!]\s+/).filter(Boolean);
-    // Keep ~60% of the sentences
     const keep = Math.max(1, Math.ceil(sentences.length * 0.6));
     const kept = sentences.slice(0, keep).join(". ") + ".";
     const additions = [
@@ -146,18 +161,36 @@ function varyStagResponse(correction: string, si: number, qIdx: number, score: n
 /** Vary test de positionnement response */
 function varyTestResponse(fullAnswer: string, si: number, qIdx: number): string {
   const note = getNote20(si, 4, 20);
-  const quality = note >= 14 ? 2 : note >= 10 ? 1 : 0; // 2=good, 1=partial, 0=weak
+  const quality = note >= 14 ? 2 : note >= 10 ? 1 : 0;
   return varyStagResponse(fullAnswer, si, qIdx, quality, 2);
 }
 
 function gradeLevel(si: number, compIdx: number): string {
-  const seed = ((si + 1) * 11 + compIdx * 7) % 100;
-  if (seed < 30) return "A";
-  return "MA";
+  // More varied: uses a richer seed so each stagiaire gets a different pattern
+  const seed = ((si + 1) * 13 + compIdx * 19 + si * compIdx * 5) % 100;
+  if (seed < 40) return "A";   // ~40% Acquis
+  return "MA";                  // ~60% Maîtrisé
 }
-function gradeObs(level: string): string {
-  if (level === "MA") return "Autonome et efficace";
-  if (level === "A") return "Compétence acquise";
+
+const GRADE_OBS_MA = [
+  "Autonome et efficace",
+  "Très bonne maîtrise",
+  "Compétence pleinement maîtrisée",
+  "Applique avec aisance",
+  "Niveau avancé confirmé",
+];
+const GRADE_OBS_A = [
+  "Compétence acquise",
+  "Bonne maîtrise des fondamentaux",
+  "Objectif atteint",
+  "Acquis conforme aux attentes",
+  "Compétence validée",
+];
+
+function gradeObs(level: string, si = 0, compIdx = 0): string {
+  const pick = ((si + 1) * 7 + compIdx * 3) % 5;
+  if (level === "MA") return GRADE_OBS_MA[pick];
+  if (level === "A") return GRADE_OBS_A[pick];
   if (level === "ECA") return "En progression";
   return "À renforcer";
 }
