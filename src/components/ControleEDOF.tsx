@@ -59,7 +59,8 @@ export default function ControleEDOF({ organisme, formation, stagiaires, signatu
     const m = new Map<string, EYDocState>();
     EY_DOCUMENTS.forEach(d => {
       const canAuto = d.autoTemplates.length > 0;
-      m.set(d.code, { code: d.code, status: canAuto ? "auto" : "pending" });
+      const hasStatic = !!d.staticFile;
+      m.set(d.code, { code: d.code, status: hasStatic ? "uploaded" : canAuto ? "auto" : "pending", uploadedFileName: hasStatic ? d.staticFile?.split("/").pop() : undefined });
     });
     return m;
   });
