@@ -447,7 +447,7 @@ export function genGrilleAcquisitionBacPro(o: OrganismeInfo, f: FormationInfo, s
     <strong>Date :</strong> ${dateFin}<br/>
     <strong>Formateur :</strong> ${formateur}</p>
     <p><strong>Échelle :</strong> NA = Non acquis | ECA = En cours d'acquisition | A = Acquis | MA = Maîtrisé / Autonome</p>
-    ${activities.map(a => `<h3 style="margin-top:16px;color:#1a56db">${a.title}</h3>${renderTable(a.comps)}`).join("")}
+    ${activities.map(a => `<h3 style="margin-top:16px;color:${getDocStyle().primaryColor || "#1a56db"}">${a.title}</h3>${renderTable(a.comps)}`).join("")}
 
     <h3 style="margin-top:16px">Synthèse pédagogique</h3>
     <p><strong>Points forts :</strong> ${hasGoodLevel ? "Bonne maîtrise des opérations de réception et de stockage. Rigueur dans le suivi des procédures." : "Volontaire et assidu(e). Respect des consignes de sécurité."}</p>
