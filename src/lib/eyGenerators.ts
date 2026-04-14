@@ -9,6 +9,10 @@ import { SAMPLE_FORMATEURS, FormateurInfo, parseDuree, getFormationDays } from "
 function today(): string { return new Date().toISOString().slice(0, 10); }
 function fmtDate(d?: string): string { return formatDate(d || today()); }
 function pc(): string { return getDocStyle()?.primaryColor || "#1a56db"; }
+function isSocioEsthetique(f: FormationInfo): boolean {
+  const t = (f.intitule||"").toLowerCase() + " " + (f.codeRNCP||"").toLowerCase();
+  return t.includes("socio-esthéti") || t.includes("socio esthéti") || t.includes("rs5992") || t.includes("soins socio");
+}
 
 /* ═══ CODE 4 – Objectifs et méthodes par séquence ═══ */
 export function genObjectifsMethodesSequence(o: OrganismeInfo, f: FormationInfo): string {
@@ -39,11 +43,27 @@ export function genDossierStagiaire(o: OrganismeInfo, f: FormationInfo, stagiair
 /* ═══ CODE 12 – Descriptif des moyens matériels ═══ */
 export function genDescriptifMoyensMateriels(o: OrganismeInfo, f: FormationInfo): string {
   const isFOAD = (f.modalites||"").toLowerCase().includes("distance");
-  const sections = [
-    { heading: "Locaux et équipements", content: `<table style="width:100%;border-collapse:collapse;"><thead><tr style="background:${pc()};color:#fff;"><th style="padding:8px;border:1px solid #ddd;">Équipement</th><th style="padding:8px;border:1px solid #ddd;">Qté</th><th style="padding:8px;border:1px solid #ddd;">État</th></tr></thead><tbody><tr><td style="padding:6px;border:1px solid #ddd;">Salle de formation équipée</td><td style="padding:6px;border:1px solid #ddd;">1</td><td style="padding:6px;border:1px solid #ddd;">Fonctionnel</td></tr><tr><td style="padding:6px;border:1px solid #ddd;">Vidéoprojecteur / Écran interactif</td><td style="padding:6px;border:1px solid #ddd;">1</td><td style="padding:6px;border:1px solid #ddd;">Fonctionnel</td></tr><tr><td style="padding:6px;border:1px solid #ddd;">Ordinateurs portables</td><td style="padding:6px;border:1px solid #ddd;">15</td><td style="padding:6px;border:1px solid #ddd;">Fonctionnel</td></tr><tr><td style="padding:6px;border:1px solid #ddd;">Connexion internet haut débit</td><td style="padding:6px;border:1px solid #ddd;">1</td><td style="padding:6px;border:1px solid #ddd;">Fonctionnel</td></tr><tr><td style="padding:6px;border:1px solid #ddd;">Imprimante multifonction</td><td style="padding:6px;border:1px solid #ddd;">1</td><td style="padding:6px;border:1px solid #ddd;">Fonctionnel</td></tr></tbody></table>` },
-  ];
+  const isSocioEsth = isSocioEsthetique(f);
+  const sections = [];
+
+  if (isSocioEsth) {
+    sections.push({ heading: "Locaux et équipements spécialisés", content: `<table style="width:100%;border-collapse:collapse;"><thead><tr style="background:${pc()};color:#fff;"><th style="padding:8px;border:1px solid #ddd;">Équipement</th><th style="padding:8px;border:1px solid #ddd;">Qté</th><th style="padding:8px;border:1px solid #ddd;">État</th></tr></thead><tbody>
+<tr><td style="padding:6px;border:1px solid #ddd;">Tables de massage professionnelles</td><td style="padding:6px;border:1px solid #ddd;">4</td><td style="padding:6px;border:1px solid #ddd;">Fonctionnel</td></tr>
+<tr><td style="padding:6px;border:1px solid #ddd;">Fauteuils de soins réglables</td><td style="padding:6px;border:1px solid #ddd;">4</td><td style="padding:6px;border:1px solid #ddd;">Fonctionnel</td></tr>
+<tr><td style="padding:6px;border:1px solid #ddd;">Miroirs éclairés pour maquillage</td><td style="padding:6px;border:1px solid #ddd;">8</td><td style="padding:6px;border:1px solid #ddd;">Fonctionnel</td></tr>
+<tr><td style="padding:6px;border:1px solid #ddd;">Kit de maquillage correcteur (pinceaux, prothèses, palettes)</td><td style="padding:6px;border:1px solid #ddd;">8</td><td style="padding:6px;border:1px solid #ddd;">Fonctionnel</td></tr>
+<tr><td style="padding:6px;border:1px solid #ddd;">Produits dermo-cosmétiques hypoallergéniques</td><td style="padding:6px;border:1px solid #ddd;">Lot</td><td style="padding:6px;border:1px solid #ddd;">Conforme (DLUO vérifiée)</td></tr>
+<tr><td style="padding:6px;border:1px solid #ddd;">Huiles de massage neutres (amande douce, jojoba)</td><td style="padding:6px;border:1px solid #ddd;">Lot</td><td style="padding:6px;border:1px solid #ddd;">Conforme</td></tr>
+<tr><td style="padding:6px;border:1px solid #ddd;">Matériel d'hygiène (gants, désinfectants, consommables)</td><td style="padding:6px;border:1px solid #ddd;">Stock</td><td style="padding:6px;border:1px solid #ddd;">Conforme</td></tr>
+<tr><td style="padding:6px;border:1px solid #ddd;">Prothèses capillaires et mammaires (démonstration)</td><td style="padding:6px;border:1px solid #ddd;">2</td><td style="padding:6px;border:1px solid #ddd;">Fonctionnel</td></tr>
+<tr><td style="padding:6px;border:1px solid #ddd;">Vidéoprojecteur / Écran interactif</td><td style="padding:6px;border:1px solid #ddd;">1</td><td style="padding:6px;border:1px solid #ddd;">Fonctionnel</td></tr>
+</tbody></table>` });
+    sections.push({ heading: "Supports pédagogiques spécialisés", content: `<ul><li>Protocoles professionnels de soins socio-esthétiques (fiches techniques)</li><li>Documents d'analyse des types de peaux fragilisées</li><li>Guides de maquillage correcteur en oncologie et gériatrie</li><li>Référentiel de compétences RS5992 complet</li><li>Supports vidéo : démonstrations de soins adaptés</li><li>Fiches de suivi socio-esthétique</li></ul>` });
+  } else {
+    sections.push({ heading: "Locaux et équipements", content: `<table style="width:100%;border-collapse:collapse;"><thead><tr style="background:${pc()};color:#fff;"><th style="padding:8px;border:1px solid #ddd;">Équipement</th><th style="padding:8px;border:1px solid #ddd;">Qté</th><th style="padding:8px;border:1px solid #ddd;">État</th></tr></thead><tbody><tr><td style="padding:6px;border:1px solid #ddd;">Salle de formation équipée</td><td style="padding:6px;border:1px solid #ddd;">1</td><td style="padding:6px;border:1px solid #ddd;">Fonctionnel</td></tr><tr><td style="padding:6px;border:1px solid #ddd;">Vidéoprojecteur / Écran interactif</td><td style="padding:6px;border:1px solid #ddd;">1</td><td style="padding:6px;border:1px solid #ddd;">Fonctionnel</td></tr><tr><td style="padding:6px;border:1px solid #ddd;">Ordinateurs portables</td><td style="padding:6px;border:1px solid #ddd;">15</td><td style="padding:6px;border:1px solid #ddd;">Fonctionnel</td></tr><tr><td style="padding:6px;border:1px solid #ddd;">Connexion internet haut débit</td><td style="padding:6px;border:1px solid #ddd;">1</td><td style="padding:6px;border:1px solid #ddd;">Fonctionnel</td></tr><tr><td style="padding:6px;border:1px solid #ddd;">Imprimante multifonction</td><td style="padding:6px;border:1px solid #ddd;">1</td><td style="padding:6px;border:1px solid #ddd;">Fonctionnel</td></tr></tbody></table>` });
+  }
   if (isFOAD) sections.push({ heading: "Outils numériques et plateforme LMS", content: `<table style="width:100%;border-collapse:collapse;"><thead><tr style="background:${pc()};color:#fff;"><th style="padding:8px;border:1px solid #ddd;">Outil</th><th style="padding:8px;border:1px solid #ddd;">Usage</th></tr></thead><tbody><tr><td style="padding:6px;border:1px solid #ddd;">Plateforme LMS</td><td style="padding:6px;border:1px solid #ddd;">Contenus et suivi progression</td></tr><tr><td style="padding:6px;border:1px solid #ddd;">Visioconférence</td><td style="padding:6px;border:1px solid #ddd;">Classes virtuelles synchrones</td></tr><tr><td style="padding:6px;border:1px solid #ddd;">Espace documentaire</td><td style="padding:6px;border:1px solid #ddd;">Partage de ressources</td></tr></tbody></table>` });
-  sections.push({ heading: "Conformité et accessibilité", content: `<p>Les locaux sont conformes aux normes ERP et accessibles aux personnes à mobilité réduite.</p>` });
+  sections.push({ heading: "Conformité et accessibilité", content: `<p>Les locaux sont conformes aux normes ERP et accessibles aux personnes à mobilité réduite.${isSocioEsth ? " Aménagements spécifiques pour l'accueil de modèles en situation de fragilité (fauteuil roulant, brancardage)." : ""}</p>` });
   return buildDocument({ org: o, formation: f, title: "Descriptif des moyens matériels et techniques", sections });
 }
 
@@ -57,6 +77,16 @@ export function genCahierMaintenance(o: OrganismeInfo): string {
 
 /* ═══ CODE 20 – CV Formateur ═══ */
 export function genCVFormateur(o: OrganismeInfo, f: FormationInfo): string {
+  if (isSocioEsthetique(f)) {
+    const socioFmt: FormateurInfo = {
+      nom: "Fontaine", prenom: "Marie",
+      specialite: "Socio-esthétique, Soins adaptés aux publics fragilisés, Maquillage correcteur en oncologie, Massage de bien-être en gériatrie",
+      diplomes: "CAP Esthétique Cosmétique Parfumerie – Académie de Paris\nBTS Esthétique Cosmétique – Option Management\nDU Socio-esthétique – Hôpital Rothschild / Université Paris-Est Créteil\nCertification RS5992 – Réaliser des soins socio-esthétiques",
+      experience: "18 ans d'expérience dans le secteur esthétique dont 10 ans en socio-esthétique\n• Socio-esthéticienne en oncologie – Centre Hospitalier de Villejuif (5 ans)\n• Intervenante bien-être en EHPAD – Groupe Korian (3 ans)\n• Formatrice en socio-esthétique – GENIUS FORM / FormaPro Excellence (depuis 2019)\n• Animation d'ateliers socio-esthétiques en structures d'insertion sociale\n• Intervenante auprès de femmes victimes de violences – Association SOS Femmes",
+      email: "m.fontaine@formapro-excellence.fr"
+    };
+    return _buildCV(o, socioFmt, "Formatrice en socio-esthétique");
+  }
   return _buildCV(o, SAMPLE_FORMATEURS[0], "Formateur");
 }
 
