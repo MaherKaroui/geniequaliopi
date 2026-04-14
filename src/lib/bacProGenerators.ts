@@ -186,12 +186,12 @@ export function genContratBacPro(o: OrganismeInfo, f: FormationInfo, stagiaires:
     <table style="width:100%;margin-top:20px"><tr>
       <td style="width:50%;vertical-align:top">
         <p><strong>Signature de l'organisme de formation</strong><br/>${ORG_NAME}<br/>Président: Mr ${ORG_PRESIDENT}</p>
-        <p style="height:60px"></p>
+        ${orgSigBlock(o)}
       </td>
       <td style="width:50%;vertical-align:top">
         <p><strong>Signature du stagiaire :</strong> ${stagName(s)}</p>
         <p><em>Fait précédé de la mention "Lu et approuvé"</em></p>
-        <p style="height:60px"></p>
+        ${stagSigImg(s)}
       </td>
     </tr></table>
   `);
@@ -237,7 +237,7 @@ export function genConvocationBacPro(o: OrganismeInfo, f: FormationInfo, stagiai
     <p>Nous vous prions d'agréer, ${civilite}, l'expression de nos salutations distinguées.</p>
     <p style="margin-top:20px"><strong>Fait à MALAKOFF</strong>, le : ${dateDebut}</p>
     <p>${ORG_NAME}<br/>Président: <strong>Mr ${ORG_PRESIDENT}</strong></p>
-    <p>Signature :</p><p style="height:60px"></p>
+    <p>Signature :</p>${orgSigBlock(o)}
   `);
 }
 
@@ -266,7 +266,7 @@ export function genConvocationExamenBacPro(o: OrganismeInfo, f: FormationInfo, s
     <p>Veuillez agréer, ${civilite}, l'expression de nos salutations distinguées.</p>
     <p style="margin-top:20px"><strong>Fait à MALAKOFF</strong>, le : ${dateFin}</p>
     <p>${ORG_NAME}<br/>Président: <strong>Mr ${ORG_PRESIDENT}</strong></p>
-    <p>Signature :</p><p style="height:60px"></p>
+    <p>Signature :</p>${orgSigBlock(o)}
   `);
 }
 
@@ -390,7 +390,7 @@ export function genGrilleAcquisitionBacPro(o: OrganismeInfo, f: FormationInfo, s
     <p><strong>Axes de progression :</strong> Renforcer l'utilisation des outils numériques et la communication professionnelle.</p>
     <p><strong>Avis global du formateur :</strong> [X] ${hasGoodLevel ? "Bon niveau professionnel" : "Progression satisfaisante"}</p>
     <p style="margin-top:20px"><strong>Signature du formateur :</strong> ${formateur}</p>
-    <p style="height:60px"></p>
+    ${sigImg(f.formateurSignatureUrl)}
   `);
 }
 
@@ -467,6 +467,7 @@ export function genSatisfactionBacPro(o: OrganismeInfo, f: FormationInfo, stagia
 
     <p style="margin-top:20px"><strong>Signature de l'apprenant :</strong> ${stagName(s)}<br/>
     <strong>Date :</strong> ${dateFin}</p>
+    ${stagSigImg(s)}
   `);
 }
 
@@ -517,7 +518,9 @@ export function genBilanFormationBacPro(o: OrganismeInfo, f: FormationInfo, stag
     <p style="margin-top:30px"><strong>Fait à MALAKOFF, le ${dateFin}</strong></p>
     <p><strong>Nom du formateur :</strong> ${formateur}<br/>
     <strong>Fonction :</strong> Formateur référent logistique</p>
-    <p>Signature :</p><p style="height:60px"></p>
+    <p>Signature :</p>${sigImg(f.formateurSignatureUrl)}
+    <p style="margin-top:16px"><strong>Signature de l'organisme :</strong></p>
+    ${orgSigBlock(o)}
   `);
 }
 
