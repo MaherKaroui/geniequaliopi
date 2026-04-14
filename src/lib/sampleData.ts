@@ -543,6 +543,25 @@ export const SAMPLE_FORMATIONS: FormationInfo[] = [
     formateur: "Marie Fontaine",
     codeRNCP: "RNCP35650",
   },
+  {
+    intitule: "Bac Professionnel Logistique – RNCP 38302",
+    objectifs: "Préparer au Bac Professionnel Logistique : maîtriser la réception, le stockage, la préparation et l'expédition des marchandises, organiser les flux logistiques, gérer les stocks et conduire des engins en sécurité.",
+    prerequis: "Niveau 3ème minimum, motivation pour le secteur logistique",
+    duree: "589 heures (sur 9 mois)",
+    modalites: "distanciel",
+    tarif: "5 900 € HT",
+    programme: "Module 1 : Introduction à la chaîne logistique (40h)\nModule 2 : Réception et transfert des marchandises – G1 (90h)\nModule 3 : Préparation et expédition des commandes – G2 (90h)\nModule 4 : Organisation des flux logistiques – G3 (85h)\nModule 5 : Gestion des stocks et optimisation – G4 (85h)\nModule 6 : Conduite en sécurité des engins – G5 (70h)\nModule 7 : Communication professionnelle logistique – G6 (45h)\nModule 8 : Préparation aux épreuves professionnelles (44h)",
+    methodesEvaluation: "QCM diagnostic, cas pratiques, études de situation professionnelle, mises en situation, exercices chronométrés, examens blancs, évaluation tuteur entreprise",
+    moyensPedagogiques: "Plateforme LMS, classes virtuelles, supports PDF, vidéos pédagogiques, fiches métiers, tableaux Excel, logiciel de gestion simulé, dossiers professionnels",
+    publicVise: "Apprentis, jeunes en alternance, personnes en reconversion dans le secteur logistique",
+    delaiAcces: "14 jours après inscription",
+    dateDebut: "2025-09-01",
+    dateFin: "2026-05-15",
+    lieu: "Formation à distance (FOAD) – La Maison de l'Apprentissage, 32 rue Guy Môquet, 92240 Malakoff",
+    nombreParticipants: "9",
+    formateur: "David Rosenberg",
+    codeRNCP: "RNCP38302",
+  },
 ];
 
 // Satisfaction scores (pre-filled realistic data)
