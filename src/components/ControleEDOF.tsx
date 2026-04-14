@@ -1,9 +1,10 @@
-import { useState, useMemo, useCallback, useRef } from "react";
+import { useState, useMemo, useCallback, useRef, useEffect } from "react";
 import { OrganismeInfo, FormationInfo, StagiaireInfo, CritereData, DocStyleConfig } from "@/types/qualiopi";
 import { EY_DOCUMENTS, EY_CATEGORIES, EYCategory, EYDocState, EYDocStatus, EYDocumentItem } from "@/lib/eyControlData";
 import { generateDocumentById } from "@/lib/documentGenerator";
 import { buildPerStagiairePdfFileName, sanitizeFileSegment } from "@/lib/eyExport";
 import { mergeStagiaires, mergeOrganisme } from "@/lib/sampleData";
+import { setDocStyle } from "@/lib/docBuilder";
 import { htmlToPdfBlob } from "@/lib/pdfExport";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -54,7 +55,11 @@ const STATUS_CONFIG: Record<EYDocStatus, { label: string; icon: React.ReactNode;
   not_applicable: { label: "N/A", icon: <XCircle className="w-4 h-4 text-muted-foreground" />, color: "bg-muted text-muted-foreground" },
 };
 
-export default function ControleEDOF({ organisme, formation, stagiaires, signature }: ControleEDOFProps) {
+export default function ControleEDOF({ organisme, formation, stagiaires, docStyle, signature }: ControleEDOFProps) {
+  // Apply docStyle to the document builder whenever it changes
+  useEffect(() => {
+    if (docStyle) setDocStyle(docStyle);
+  }, [docStyle]);
   const [docStates, setDocStates] = useState<Map<string, EYDocState>>(() => {
     const m = new Map<string, EYDocState>();
     EY_DOCUMENTS.forEach(d => {
