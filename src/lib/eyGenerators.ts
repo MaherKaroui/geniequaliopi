@@ -1012,7 +1012,7 @@ export function genRessourcesPedagogiques(o: OrganismeInfo, f: FormationInfo): s
     <tr><td ${td}><strong>Bibliothèque de documents</strong></td><td ${td}>Supports PDF, fiches techniques, référentiels</td><td ${td}>Téléchargement depuis la plateforme</td></tr>
   </table>`;
 
-  return buildDocument({ org: o, formation: f, title: "RESSOURCES PÉDAGOGIQUES COMPLÉMENTAIRES", reference: `RES-PED-${fmtDate(f.dateDebut).replace(/\//g, "")}`, sections: [
+  return buildDocument({ org: o, formation: f, title: "RESSOURCES PÉDAGOGIQUES COMPLÉMENTAIRES", sections: [
     { heading: "Objet", content: `<p>Ce document recense l'ensemble des ressources pédagogiques complémentaires mobilisées dans le cadre de la formation <strong>« ${titre} »</strong> (${f.duree || duree.totalHours + " heures"}).</p><p>Ces ressources viennent enrichir les supports de cours principaux et sont mises à disposition des stagiaires tout au long de leur parcours.</p>` },
     { heading: "Inventaire des ressources", content: html },
     { heading: "Modalités d'accès", content: `<p>Les ressources sont accessibles :</p><ul><li><strong>Pendant la formation</strong> : via la plateforme LMS de l'organisme, accessible 24h/24</li><li><strong>Post-formation</strong> : les accès sont maintenus pendant <strong>3 mois</strong> après la fin de la prestation</li><li><strong>Support technique</strong> : en cas de difficulté d'accès, contacter ${o.poleAdministratif || "le service administratif"} à ${o.email}</li></ul>` },
@@ -1023,7 +1023,7 @@ export function genRessourcesPedagogiques(o: OrganismeInfo, f: FormationInfo): s
 export function genBailLocaux(o: OrganismeInfo, f: FormationInfo): string {
   const year = new Date().getFullYear();
   const adresse = o.adresse ? `${o.adresse}, ${o.codePostal} ${o.ville}` : "Adresse des locaux de formation";
-  return buildDocument({ org: o, title: "CONTRAT DE MISE À DISPOSITION DES LOCAUX DE FORMATION", reference: `BAIL-${year}-001`, sections: [
+  return buildDocument({ org: o, title: "CONTRAT DE MISE À DISPOSITION DES LOCAUX DE FORMATION", sections: [
     { heading: "Objet du contrat", content: `<p>Le présent contrat a pour objet la mise à disposition de locaux à usage de <strong>centre de formation professionnelle</strong>, situés au :</p><p style="text-align:center;font-size:1.1em;font-weight:600;margin:16px 0;padding:12px;background:#f5f7fa;border-radius:8px;">${adresse}</p><p>Les locaux sont mis à disposition de <strong>${o.nom || "l'organisme de formation"}</strong> (SIRET : ${o.siret || "_______________"}, NDA : ${o.nda || "_______________"}) pour l'exercice d'activités de formation professionnelle continue.</p>` },
     { heading: "Description des locaux", content: `<table style="width:100%;border-collapse:collapse;">
       <tr><th ${thStyle(pc())} colspan="4">DESCRIPTIF DES ESPACES</th></tr>
@@ -1066,7 +1066,7 @@ export function genBilanPedagogiqueFinancier(o: OrganismeInfo, f: FormationInfo,
   const resultat = ca - charges;
   const heuresFormation = nbStag * (parseDuree(f.duree || "52 heures").totalHours || 52);
 
-  return buildDocument({ org: o, title: `BILAN PÉDAGOGIQUE ET FINANCIER – Année ${year}`, reference: `BPF-${year}`, sections: [
+  return buildDocument({ org: o, title: `BILAN PÉDAGOGIQUE ET FINANCIER – Année ${year}`, sections: [
     { heading: "Identification de l'organisme", content: `<table style="width:100%;border-collapse:collapse;">
       <tr><td ${tdb}>Raison sociale</td><td ${td}>${o.nom || "—"}</td></tr>
       <tr><td ${tdb}>SIRET</td><td ${td}>${o.siret || "—"}</td></tr>
@@ -1165,7 +1165,7 @@ export function genQuestionnaireSatisfactionEY(o: OrganismeInfo, f: FormationInf
 
   const avg = (notes.reduce((a, b) => a + b, 0) / notes.length).toFixed(1);
 
-  return buildDocument({ org: o, formation: f, title: "QUESTIONNAIRE DE SATISFACTION – FIN DE FORMATION", reference: `SAT-${fmtDate(f.dateFin).replace(/\//g, "")}`, sections: [
+  return buildDocument({ org: o, formation: f, title: "QUESTIONNAIRE DE SATISFACTION – FIN DE FORMATION", sections: [
     { heading: "Informations", content: `<table style="width:100%;border-collapse:collapse;">
       <tr><td ${tdb}>Formation</td><td ${td}>${titre}</td></tr>
       <tr><td ${tdb}>Stagiaire</td><td ${td}>${s.prenom} ${s.nom}</td></tr>
