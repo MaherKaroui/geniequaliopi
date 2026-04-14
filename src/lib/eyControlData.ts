@@ -561,6 +561,14 @@ export const EY_DOCUMENTS: EYDocumentItem[] = [
     category: "communication",
   },
   {
+    code: "51",
+    label: "Preuve de reprogrammation de session",
+    description: "Preuve de la reprogrammation d'une session de formation",
+    autoTemplates: ["ey_preuve_reprogrammation"],
+    perStagiaire: false,
+    category: "communication",
+  },
+  {
     code: "55",
     label: "Plaquette / supports de communication",
     description: "Exemples de supports de communication, plaquette de présentation transmis au stagiaire",
