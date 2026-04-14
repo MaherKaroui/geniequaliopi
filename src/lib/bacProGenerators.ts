@@ -78,17 +78,16 @@ function wrap(body: string) {
   return htmlWrap(`${header()}${body}${footerBlock()}`);
 }
 
-// Randomized but deterministic scores based on stagiaire index
+// Deterministic scores — always good (15-20/20 range)
 function getScore(si: number, qIdx: number, max: number): number {
   const seed = ((si + 1) * 7 + qIdx * 13) % 100;
-  if (seed < 10) return Math.max(0, max - 2);
-  if (seed < 30) return Math.max(0, max - 1);
-  return max;
+  if (seed < 15) return Math.max(1, max - 1); // occasionally lose 1 point
+  return max; // full marks most of the time
 }
 function getNote20(si: number, nbQ: number, total: number): number {
   let sum = 0;
   for (let i = 0; i < nbQ; i++) sum += getScore(si, i, Math.round(total / nbQ));
-  return Math.min(20, Math.round((sum / total) * 20));
+  return Math.max(15, Math.min(20, Math.round((sum / total) * 20)));
 }
 function appreciation(note20: number): string {
   if (note20 >= 16) return "Excellent travail. L'apprenant démontre une maîtrise solide des compétences évaluées. Continuez ainsi.";
@@ -152,9 +151,7 @@ function varyTestResponse(fullAnswer: string, si: number, qIdx: number): string 
 
 function gradeLevel(si: number, compIdx: number): string {
   const seed = ((si + 1) * 11 + compIdx * 7) % 100;
-  if (seed < 5) return "NA";
-  if (seed < 15) return "ECA";
-  if (seed < 50) return "A";
+  if (seed < 30) return "A";
   return "MA";
 }
 function gradeObs(level: string): string {
