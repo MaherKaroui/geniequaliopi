@@ -1,5 +1,6 @@
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { genContratBacPro, genConvocationBacPro, genConvocationExamenBacPro, genTestPositionnementBacPro, genGrilleAcquisitionBacPro, genSatisfactionBacPro, genBilanFormationBacPro, genEval01, genEval02, genEval03, genEval04, genEval05, genEval06, genEval07, genEval08, genEval09, genEval10, genEval11, genEval12, genEval13, genEval14, genEval15 } from "./bacProGenerators";
+import { genObjectifsMethodesSequence, genDossierStagiaire, genDescriptifMoyensMateriels, genCahierMaintenance, genCVFormateur as genCVFormateurEY, genFichierFormateursStatut, genBilanIntermediaire, genTauxReussiteEY, genGrilleTarifaire, genFactureHorsMCF, genDevisEY, genCommunicationReport, genPreuveCreationSession, genPlaquettePresentation, genPlanningIntervenants, genPlanningSessionsEY, genCVResponsablePedagogique, genActionsEngagement, genActionsPassageExamen, genAccompagnementFOAD } from "./eyGenerators";
 import { buildDocument, htmlWrap, orgHeader, formationInfoBlock, formationInfoBlockStagiaire, tableHTML, signatureBlock3, signatureBlock2, footer, section, formatDate, infoGrid, getDocStyle, subtractBusinessDays, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif, getStagiaireDuree, applyGender, g, getDisplayDuree, linkUrl, optSiteWeb, isFormationTerminee, getModaliteContent, hasDistanciel, hasPresentiel, isFacebookPage, getSiteWebLabel } from "./docBuilder";
 import { FormateurInfo, SAMPLE_FORMATIONS, SAMPLE_STAGIAIRES, SAMPLE_FORMATEURS, SAMPLE_ORGANISME, EVAL_SCORES, SATISFACTION_SCORES, CONNECTION_TIMES, getFormationDays, mergeOrganisme, mergeStagiaires, getConnectionTimes, parseDuree } from "./sampleData";
 import { buildFullCatalog } from "./docCatalog";
@@ -599,8 +600,29 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "bpl_eval12": return genEval12(o, f, stagiaires, params?.stagiaireIdx ?? 0);
     case "bpl_eval13": return genEval13(o, f, stagiaires, params?.stagiaireIdx ?? 0);
     case "bpl_eval14": return genEval14(o, f, stagiaires, params?.stagiaireIdx ?? 0);
-    case "bpl_eval15": return genEval15(o, f, stagiaires, params?.stagiaireIdx ?? 0);
-    case "dossier_inscription_cfa": return genDossierInscriptionCFA(o, f, stagiaires, params?.stagiaireIdx ?? 0);
+     case "bpl_eval15": return genEval15(o, f, stagiaires, params?.stagiaireIdx ?? 0);
+     // === EY-specific generators ===
+     case "ey_objectifs_methodes_sequence": return genObjectifsMethodesSequence(o, f);
+     case "ey_dossier_stagiaire": return genDossierStagiaire(o, f, stagiaires, params?.stagiaireIdx ?? 0);
+     case "ey_descriptif_moyens_materiels": return genDescriptifMoyensMateriels(o, f);
+     case "ey_cahier_maintenance": return genCahierMaintenance(o);
+     case "ey_cv_formateur": return genCVFormateurEY(o, f);
+     case "ey_fichier_formateurs_statut": return genFichierFormateursStatut(o, f);
+     case "ey_bilan_intermediaire": return genBilanIntermediaire(o, f, stagiaires, params?.stagiaireIdx ?? 0);
+     case "ey_taux_reussite": return genTauxReussiteEY(o, f, stagiaires);
+     case "ey_grille_tarifaire": return genGrilleTarifaire(o, f);
+     case "ey_facture_hors_mcf": return genFactureHorsMCF(o, f);
+     case "ey_devis": return genDevisEY(o, f, stagiaires, params?.stagiaireIdx ?? 0);
+     case "ey_communication_report": return genCommunicationReport(o, f);
+     case "ey_preuve_creation_session": return genPreuveCreationSession(o, f);
+     case "ey_plaquette_presentation": return genPlaquettePresentation(o, f);
+     case "ey_planning_intervenants": return genPlanningIntervenants(o, f);
+     case "ey_planning_sessions": return genPlanningSessionsEY(o, f);
+     case "ey_cv_responsable_pedagogique": return genCVResponsablePedagogique(o);
+     case "ey_actions_engagement": return genActionsEngagement(o, f);
+     case "ey_actions_passage_examen": return genActionsPassageExamen(o, f);
+     case "ey_accompagnement_foad": return genAccompagnementFOAD(o, f);
+     case "dossier_inscription_cfa": return genDossierInscriptionCFA(o, f, stagiaires, params?.stagiaireIdx ?? 0);
     case "livre_apprentissage_cfa": return genLivreApprentissageCFA(o, f, stagiaires, params?.stagiaireIdx ?? 0);
     case "convocation_cfa": return genConvocationCFA(o, f, stagiaires, params?.stagiaireIdx ?? 0);
     case "cgv_cfa": return genCGVCFA(o, f, stagiaires, params?.stagiaireIdx ?? 0);
