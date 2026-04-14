@@ -178,12 +178,15 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
 
   const host = document.createElement("div");
   host.style.cssText = [
-    "position:fixed",
-    "left:-20000px",
-    "top:0",
+    "position:absolute",
+    "left:-99999px",
+    "top:-99999px",
     `width:${A4_WIDTH_PX}px`,
-    "z-index:-1",
+    "z-index:-9999",
     "background:#fff",
+    "visibility:hidden",
+    "pointer-events:none",
+    "overflow:hidden",
   ].join(";");
 
   const styleEl = document.createElement("style");
