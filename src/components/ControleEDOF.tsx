@@ -619,6 +619,11 @@ export default function ControleEDOF({ organisme, formation, stagiaires, signatu
                               <Sparkles className="w-3 h-3" /> Généré automatiquement par l'application
                             </p>
                           )}
+                          {eyDoc.staticFile && state.status !== "uploaded" && (
+                            <p className="text-xs text-blue-600 mt-1 flex items-center gap-1">
+                              <FileText className="w-3 h-3" /> Fichier pré-fourni (DOCX)
+                            </p>
+                          )}
                         </div>
                       </div>
 
@@ -636,7 +641,7 @@ export default function ControleEDOF({ organisme, formation, stagiaires, signatu
                           </Button>
                         )}
                         {/* Download single doc */}
-                        {(eyDoc.autoTemplates.length > 0 || state.status === "uploaded") && (
+                        {(eyDoc.autoTemplates.length > 0 || state.status === "uploaded" || eyDoc.staticFile) && (
                           <Button
                             variant="outline"
                             size="sm"
@@ -645,7 +650,7 @@ export default function ControleEDOF({ organisme, formation, stagiaires, signatu
                             onClick={() => handleDownloadDoc(eyDoc, state)}
                           >
                             <Download className="w-3 h-3" />
-                            PDF
+                            {eyDoc.staticFile ? "DOCX" : "PDF"}
                           </Button>
                         )}
                         {/* Upload button */}
