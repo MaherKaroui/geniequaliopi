@@ -2,7 +2,7 @@ import { useState, useMemo, useCallback, useRef } from "react";
 import { OrganismeInfo, FormationInfo, StagiaireInfo, CritereData, DocStyleConfig } from "@/types/qualiopi";
 import { EY_DOCUMENTS, EY_CATEGORIES, EYCategory, EYDocState, EYDocStatus, EYDocumentItem } from "@/lib/eyControlData";
 import { generateDocumentById } from "@/lib/documentGenerator";
-import { buildPerStagiairePdfFileName } from "@/lib/eyExport";
+import { buildPerStagiairePdfFileName, sanitizeFileSegment } from "@/lib/eyExport";
 import { mergeStagiaires, mergeOrganisme } from "@/lib/sampleData";
 import { htmlToPdfBlob } from "@/lib/pdfExport";
 import { Button } from "@/components/ui/button";
@@ -196,6 +196,7 @@ export default function ControleEDOF({ organisme, formation, stagiaires, signatu
       pdfOptions?: PdfBlobOptions;
       sourceStagiaires?: StagiaireInfo[];
       onItemDone?: (current: number, total: number) => void;
+      folderByStagiaire?: boolean;
     }
   ) => {
     const sourceStagiaires = options?.sourceStagiaires ?? exportStagiaires;
@@ -206,9 +207,19 @@ export default function ControleEDOF({ organisme, formation, stagiaires, signatu
           pdfOptions: options?.pdfOptions,
           sourceStagiaires,
         });
-        if (result) zip.file(result.fileName, result.blob);
+        if (result) {
+          if (options?.folderByStagiaire) {
+            const s = sourceStagiaires[si];
+            const folderName = sanitizeFileSegment(
+              [s.prenom, s.nom].filter(v => typeof v === "string" && v.trim()).join("_"),
+              `Stagiaire_${String(si + 1).padStart(2, "0")}`
+            );
+            zip.file(`${folderName}/${result.fileName}`, result.blob);
+          } else {
+            zip.file(result.fileName, result.blob);
+          }
+        }
         options?.onItemDone?.(si + 1, sourceStagiaires.length);
-        // Longer yield every 10 docs to let GC reclaim memory
         const yieldMs = (si + 1) % 10 === 0 ? 200 : 50;
         await yieldToBrowser(yieldMs);
       }
@@ -255,8 +266,10 @@ export default function ControleEDOF({ organisme, formation, stagiaires, signatu
         setProgressText(`Préparation de ${eyDoc.code}...`);
 
         const zip = new JSZip();
+        const isBacPro = eyDoc.category === "controle_bac_pro";
         await appendAutoDocToZip(zip, eyDoc, {
           pdfOptions: MASS_EXPORT_PDF_OPTIONS,
+          folderByStagiaire: isBacPro,
           onItemDone: (current, total) => {
             setProgress(Math.round((current / Math.max(total, 1)) * 100));
             setProgressText(`${eyDoc.code} — ${current}/${total}`);
@@ -329,9 +342,11 @@ export default function ControleEDOF({ organisme, formation, stagiaires, signatu
           }
           advanceProgress(`${eyDoc.code} — fichier pré-fourni`);
         } else if (eyDoc.autoTemplates.length > 0) {
+          const isBacPro = eyDoc.category === "controle_bac_pro";
           await appendAutoDocToZip(zip, eyDoc, {
             pdfOptions: MASS_EXPORT_PDF_OPTIONS,
             sourceStagiaires: exportStagiaires,
+            folderByStagiaire: isBacPro,
             onItemDone: (current, total) => {
               advanceProgress(total > 1 ? `${eyDoc.code} — ${current}/${total}` : `${eyDoc.code} — ${eyDoc.label}`);
             },
@@ -448,9 +463,11 @@ export default function ControleEDOF({ organisme, formation, stagiaires, signatu
           zip.file(`${safeName}_${eyDoc.code}.${ext}`, buf);
           advanceProgress(`${eyDoc.code} — fichier fourni`);
         } else if (state.status === "auto") {
+          const isBacPro = eyDoc.category === "controle_bac_pro";
           await appendAutoDocToZip(zip, eyDoc, {
             pdfOptions: MASS_EXPORT_PDF_OPTIONS,
             sourceStagiaires: exportStagiaires,
+            folderByStagiaire: isBacPro,
             onItemDone: (current, total) => {
               advanceProgress(total > 1 ? `${eyDoc.code} — ${current}/${total}` : `${eyDoc.code} — ${eyDoc.label}`);
             },
