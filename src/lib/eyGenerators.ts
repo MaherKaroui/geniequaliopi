@@ -124,9 +124,27 @@ export function genTauxReussiteEY(o: OrganismeInfo, f: FormationInfo, stagiaires
 
 /* ═══ CODE 39 – Grille tarifaire ═══ */
 export function genGrilleTarifaire(o: OrganismeInfo, f: FormationInfo): string {
-  const tarif = parseFloat(f.tarif||"2500")||2500;
-  return buildDocument({ org: o, title: "Grille tarifaire des prestations", sections: [
-    { heading: "Tarifs en vigueur", content: `<table style="width:100%;border-collapse:collapse;"><thead><tr style="background:${pc()};color:#fff;"><th style="padding:8px;border:1px solid #ddd;">Prestation</th><th style="padding:8px;border:1px solid #ddd;">Durée</th><th style="padding:8px;border:1px solid #ddd;">Tarif MCF</th><th style="padding:8px;border:1px solid #ddd;">Tarif public</th></tr></thead><tbody><tr><td style="padding:6px;border:1px solid #ddd;">${f.intitule||"Formation certifiante"}</td><td style="padding:6px;border:1px solid #ddd;">${f.duree||"35h"}</td><td style="padding:6px;border:1px solid #ddd;">${tarif.toFixed(2)} €</td><td style="padding:6px;border:1px solid #ddd;">${(tarif*1.1).toFixed(2)} €</td></tr><tr><td style="padding:6px;border:1px solid #ddd;">Bilan de compétences</td><td style="padding:6px;border:1px solid #ddd;">24h</td><td style="padding:6px;border:1px solid #ddd;">1 800,00 €</td><td style="padding:6px;border:1px solid #ddd;">2 200,00 €</td></tr></tbody></table><p style="font-size:0.85em;">Exonération de TVA – Art. 261-4-4°a du CGI</p>` },
+  const socio = isSocioEsthetique(f);
+  const c = pc();
+  const th = `style="padding:8px;border:1px solid #ddd;"`;
+  const td = `style="padding:6px;border:1px solid #ddd;"`;
+
+  let rows = "";
+  if (socio) {
+    rows = `
+      <tr><td ${td}><strong>Module 1 – Initiation</strong><br><em>Analyse de la situation, diagnostic socio-esthétique, élaboration de protocoles adaptés (C1-C2)</em></td><td ${td}>20 heures (3 jours)</td><td ${td}>2 100,00 € TTC</td><td ${td}>2 310,00 € TTC</td></tr>
+      <tr><td ${td}><strong>Module 2 – Approfondissement</strong><br><em>Accueil bienveillant, soins corporels, massages adaptés, conseil en image, ateliers collectifs (C3-C11)</em></td><td ${td}>32 heures (5 jours)</td><td ${td}>3 100,00 € TTC</td><td ${td}>3 410,00 € TTC</td></tr>
+      <tr style="background:#f0f7ff;"><td ${td}><strong>Module 3 – Parcours complet</strong><br><em>Intégralité du référentiel RS5992 – Modules 1 + 2</em></td><td ${td}>52 heures (8 jours)</td><td ${td}>4 100,00 € TTC</td><td ${td}>4 510,00 € TTC</td></tr>`;
+  } else {
+    const tarif = parseFloat(f.tarif||"2500")||2500;
+    rows = `
+      <tr><td ${td}>${f.intitule||"Formation certifiante"}</td><td ${td}>${f.duree||"35h"}</td><td ${td}>${tarif.toFixed(2)} €</td><td ${td}>${(tarif*1.1).toFixed(2)} €</td></tr>
+      <tr><td ${td}>Bilan de compétences</td><td ${td}>24h</td><td ${td}>1 800,00 €</td><td ${td}>2 200,00 €</td></tr>`;
+  }
+
+  return buildDocument({ org: o, formation: f, title: "Grille tarifaire des prestations", sections: [
+    { heading: "Tarifs en vigueur", content: `<table style="width:100%;border-collapse:collapse;"><thead><tr style="background:${c};color:#fff;"><th ${th}>Prestation</th><th ${th}>Durée</th><th ${th}>Tarif MCF (CPF)</th><th ${th}>Tarif public</th></tr></thead><tbody>${rows}</tbody></table><p style="font-size:0.85em;margin-top:12px;">Exonération de TVA – Art. 261-4-4°a du CGI<br>Tarifs valables pour l'année ${new Date().getFullYear()}. Organisme certifié Qualiopi.</p>` },
+    ...(socio ? [{ heading: "Conditions particulières", content: `<ul><li>Le Module 3 (parcours complet) correspond à l'inscription au parcours intégral menant à la certification RS5992.</li><li>Les modules 1 et 2 peuvent être suivis séparément mais seul le parcours complet (52h) permet le passage de la certification.</li><li>Possibilité de prise en charge CPF (Mon Compte Formation).</li><li>Acompte de 30 % à l'inscription, solde au démarrage de la formation.</li></ul>` }] : []),
   ]});
 }
 
