@@ -45,7 +45,7 @@ export function genObjectifsMethodesSequence(o: OrganismeInfo, f: FormationInfo)
   let rows = "";
   chapters.forEach((ch, i) => {
     const label = ch.replace(/^Module\s*\d+\s*[:–-]\s*/i,"");
-    const dureeSeq = socio ? (i===0?"8h":"8-10h") : `${Math.round((parseDuree(f.duree||"35h") as number)/chapters.length)}h`;
+    const dureeSeq = socio ? (i===0?"8h":"8-10h") : `${Math.round(parseDuree(f.duree||"35h").totalHours/chapters.length)}h`;
     rows += `<tr><td ${td}><strong>Séquence ${i+1}</strong></td><td ${td}>${label}</td><td ${td}>${dureeSeq}</td><td ${td}>${objectifs[i]||""}</td><td ${td}>${methodes[i%methodes.length]}</td></tr>`;
   });
 
@@ -309,7 +309,7 @@ export function genFichierFormateursStatut(o: OrganismeInfo, f: FormationInfo): 
     juridique: i>=2?"Micro-entreprise":"—",
     nda: i>=2?`NDA-${7500000+i*100}`:(o.nda||"NDA-XXXX"),
     qualiopi: i>=2?"Non":"—",
-    heures: `${Math.round((parseDuree(f.duree||"35h") as number)/(i+1))}h`
+    heures: `${Math.round(parseDuree(f.duree||"35h").totalHours/(i+1))}h`
   }));
   let rows = formateurs.map(fmt => `<tr><td ${td}>${fmt.nom}</td><td ${td}>${fmt.specialite}</td><td ${td}><strong>${fmt.statut}</strong></td><td ${td}>${fmt.juridique}</td><td ${td}>${fmt.nda}</td><td ${td}>${fmt.qualiopi}</td><td ${td}>${fmt.heures}</td></tr>`).join("");
   return buildDocument({ org: o, formation: f, title: "Fichier des formateurs / intervenants", subtitle: `Action contrôlée : ${f.intitule||"Formation"}`, sections: [
@@ -657,7 +657,7 @@ export function genIndicateursPerformanceEY(o: OrganismeInfo, f: FormationInfo, 
     { heading: "1. Indicateurs d'activité", content: `<table style="width:100%;border-collapse:collapse;">
       <tr><td ${tdb} style="width:50%;">Nombre de sessions réalisées (${yr})</td><td ${td}>${Math.max(Math.ceil(n/8), 3)}</td></tr>
       <tr><td ${tdb}>Nombre total de stagiaires formés</td><td ${td}>${n}</td></tr>
-      <tr><td ${tdb}>Volume horaire total dispensé</td><td ${td}>${n * (parseDuree(f.duree||"52h") as number)}h</td></tr>
+      <tr><td ${tdb}>Volume horaire total dispensé</td><td ${td}>${n * parseDuree(f.duree||"52h").totalHours}h</td></tr>
       <tr><td ${tdb}>Chiffre d'affaires formation</td><td ${td}>${(n * (parseFloat(f.tarif||"4100")||4100)).toLocaleString("fr-FR")} € TTC</td></tr>
     </table>` },
     { heading: "2. Indicateurs de résultat", content: `<table style="width:100%;border-collapse:collapse;">
