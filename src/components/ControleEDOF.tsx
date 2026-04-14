@@ -59,7 +59,8 @@ export default function ControleEDOF({ organisme, formation, stagiaires, signatu
     const m = new Map<string, EYDocState>();
     EY_DOCUMENTS.forEach(d => {
       const canAuto = d.autoTemplates.length > 0;
-      m.set(d.code, { code: d.code, status: canAuto ? "auto" : "pending" });
+      const hasStatic = !!d.staticFile;
+      m.set(d.code, { code: d.code, status: hasStatic ? "uploaded" : canAuto ? "auto" : "pending", uploadedFileName: hasStatic ? d.staticFile?.split("/").pop() : undefined });
     });
     return m;
   });
@@ -229,6 +230,20 @@ export default function ControleEDOF({ organisme, formation, stagiaires, signatu
       return;
     }
 
+    // Handle static file download
+    if (eyDoc.staticFile) {
+      try {
+        const response = await fetch(eyDoc.staticFile);
+        const blob = await response.blob();
+        const fileName = eyDoc.staticFile.split("/").pop() || `${eyDoc.code}.docx`;
+        saveAs(blob, fileName);
+        toast.success(`${eyDoc.label} téléchargé !`);
+      } catch (e: any) {
+        toast.error("Erreur de téléchargement : " + (e.message || "Erreur inconnue"));
+      }
+      return;
+    }
+
     if (eyDoc.autoTemplates.length === 0) return;
 
     toast.info(`Génération de ${eyDoc.code}...`);
@@ -303,6 +318,16 @@ export default function ControleEDOF({ organisme, formation, stagiaires, signatu
           const ext = state.uploadedFileName?.split(".").pop() || "pdf";
           zip.file(`${safeName}_${eyDoc.code}.${ext}`, buf);
           advanceProgress(`${eyDoc.code} — fichier fourni`);
+        } else if (eyDoc.staticFile) {
+          try {
+            const response = await fetch(eyDoc.staticFile);
+            const blob = await response.blob();
+            const fileName = eyDoc.staticFile.split("/").pop() || `${eyDoc.code}.docx`;
+            zip.file(fileName, blob);
+          } catch (e) {
+            console.error(`Error fetching static file ${eyDoc.staticFile}:`, e);
+          }
+          advanceProgress(`${eyDoc.code} — fichier pré-fourni`);
         } else if (eyDoc.autoTemplates.length > 0) {
           await appendAutoDocToZip(zip, eyDoc, {
             pdfOptions: MASS_EXPORT_PDF_OPTIONS,
@@ -605,6 +630,11 @@ export default function ControleEDOF({ organisme, formation, stagiaires, signatu
                               <Sparkles className="w-3 h-3" /> Généré automatiquement par l'application
                             </p>
                           )}
+                          {eyDoc.staticFile && state.status !== "uploaded" && (
+                            <p className="text-xs text-blue-600 mt-1 flex items-center gap-1">
+                              <FileText className="w-3 h-3" /> Fichier pré-fourni (DOCX)
+                            </p>
+                          )}
                         </div>
                       </div>
 
@@ -622,7 +652,7 @@ export default function ControleEDOF({ organisme, formation, stagiaires, signatu
                           </Button>
                         )}
                         {/* Download single doc */}
-                        {(eyDoc.autoTemplates.length > 0 || state.status === "uploaded") && (
+                        {(eyDoc.autoTemplates.length > 0 || state.status === "uploaded" || eyDoc.staticFile) && (
                           <Button
                             variant="outline"
                             size="sm"
@@ -631,7 +661,7 @@ export default function ControleEDOF({ organisme, formation, stagiaires, signatu
                             onClick={() => handleDownloadDoc(eyDoc, state)}
                           >
                             <Download className="w-3 h-3" />
-                            PDF
+                            {eyDoc.staticFile ? "DOCX" : "PDF"}
                           </Button>
                         )}
                         {/* Upload button */}

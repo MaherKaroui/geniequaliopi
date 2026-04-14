@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { SAMPLE_FORMATIONS } from "@/lib/sampleData";
+import { SAMPLE_FORMATIONS, STAGIAIRES_BAC_PRO_LOGISTIQUE } from "@/lib/sampleData";
 import { parseEdofXlsx, EdofSession } from "@/lib/edofParser";
 import { RNCP_FICHES } from "@/lib/rncpData";
 import { toast } from "sonner";
@@ -39,6 +39,11 @@ const FormationForm = ({ data, onChange, onImportStagiaires }: FormationFormProp
     const selected = SAMPLE_FORMATIONS[parseInt(index)];
     if (selected) {
       onChange({ ...selected });
+      // Auto-import stagiaires for Bac Pro Logistique
+      if (selected.intitule.includes("Bac Professionnel Logistique") && onImportStagiaires) {
+        onImportStagiaires([...STAGIAIRES_BAC_PRO_LOGISTIQUE]);
+        toast.success(`9 stagiaires Bac Pro Logistique importés automatiquement`);
+      }
     }
   };
 

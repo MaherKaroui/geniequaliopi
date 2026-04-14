@@ -38,6 +38,18 @@ export const SAMPLE_STAGIAIRES: StagiaireInfo[] = [
   { civilite: "Mme", nom: "Haddad", prenom: "Leïla", email: "leila.haddad@beautyspa.fr", telephone: "06 55 66 77 88", entreprise: "Beauty Spa Paris", poste: "Esthéticienne", dateNaissance: "1991-11-02" },
 ];
 
+export const STAGIAIRES_BAC_PRO_LOGISTIQUE: StagiaireInfo[] = [
+  { civilite: "Mme", nom: "FELTZ", prenom: "Lili", email: "f.lili94@yahoo.fr", telephone: "07 77 95 44 36", entreprise: "AFRICA TRADE COMMODITIES", poste: "", dateNaissance: "2000-05-03", adresse: "9 RUE DU 11 NOVEMBRE", codePostal: "94460", commune: "94460", dateDebutFormation: "2025-09-01", dateFinFormation: "2026-05-15" },
+  { civilite: "Mme", nom: "CETINKAYA", prenom: "Zeyno", email: "cetinkaya.zeyno93@gmail.com", telephone: "07 80 18 70 46", entreprise: "AMS TRADERS", poste: "", dateNaissance: "2000-06-08", adresse: "21 AVENUE DES VIOLETTES", codePostal: "93270", commune: "SEVRAN", dateDebutFormation: "2025-09-01", dateFinFormation: "2026-05-15" },
+  { civilite: "Mme", nom: "LTAILLEUR", prenom: "Sarah", email: "letailleur.sarah9@icloud.com", telephone: "07 65 34 28 12", entreprise: "LA FEE TAHIRA", poste: "", dateNaissance: "2000-04-20", adresse: "4 RUE VOLTAIRE", codePostal: "92300", commune: "LEVALLOIS PERRET", dateDebutFormation: "2025-09-01", dateFinFormation: "2026-05-15" },
+  { civilite: "M.", nom: "MATTON", prenom: "Damien", email: "matton94damien@outlook.com", telephone: "07 98 45 93 12", entreprise: "PARTHENOPE DISTRIBUTION", poste: "", dateNaissance: "2001-11-17", adresse: "5 ALLES DES CAMELIAS", codePostal: "94700", commune: "MAISONS-ALFORT", dateDebutFormation: "2025-09-01", dateFinFormation: "2026-05-15" },
+  { civilite: "M.", nom: "HAMELET", prenom: "Kevin", email: "hamelet.kevin94@gmail.com", telephone: "06 33 06 50 24", entreprise: "POP TRANSFERT", poste: "", dateNaissance: "2001-05-11", adresse: "3 PLACE AUGUSTE DELAUNE", codePostal: "94800", commune: "VILLEJUIF", dateDebutFormation: "2025-03-04", dateFinFormation: "2025-09-15" },
+  { civilite: "M.", nom: "EYBRALY", prenom: "Samuel", email: "sam.eybraly@gmail.com", telephone: "06 53 45 67 56", entreprise: "POP TRANSFERT", poste: "", dateNaissance: "2001-06-29", adresse: "11 RUE DE LA REPUBLIQUE", codePostal: "93200", commune: "SAINT-DENIS", dateDebutFormation: "2025-03-10", dateFinFormation: "2025-09-22" },
+  { civilite: "Mme", nom: "POTIER", prenom: "Emmanuelle", email: "manu.potier31@hotmail.com", telephone: "06 78 98 56 34", entreprise: "POP TRANSFERT", poste: "", dateNaissance: "2000-01-11", adresse: "24 RUE DES PARADOUX", codePostal: "31000", commune: "ESQUIROL", dateDebutFormation: "2025-04-11", dateFinFormation: "2025-12-11" },
+  { civilite: "Mme", nom: "JOSSE", prenom: "Valentine", email: "v.josse95@icloud.com", telephone: "07 65 34 65 80", entreprise: "TROPIDO", poste: "", dateNaissance: "2000-05-14", adresse: "3 BD GABRIEL PÉRI", codePostal: "95110", commune: "SANNOIS", dateDebutFormation: "2025-09-01", dateFinFormation: "2026-05-15" },
+  { civilite: "Mme", nom: "LAUNAY", prenom: "Juliette", email: "juju9lau@gmail.com", telephone: "07 23 89 24 10", entreprise: "TROPIDO", poste: "", dateNaissance: "2000-12-28", adresse: "1 RUE D'ORMESSON", codePostal: "93800", commune: "EPINAY-SUR-SEINE", dateDebutFormation: "2025-09-01", dateFinFormation: "2026-05-15" },
+];
+
 export interface FormateurInfo {
   nom: string;
   prenom: string;
@@ -542,6 +554,25 @@ export const SAMPLE_FORMATIONS: FormationInfo[] = [
     nombreParticipants: "12",
     formateur: "Marie Fontaine",
     codeRNCP: "RNCP35650",
+  },
+  {
+    intitule: "Bac Professionnel Logistique – RNCP 38302",
+    objectifs: "Préparer au Bac Professionnel Logistique : maîtriser la réception, le stockage, la préparation et l'expédition des marchandises, organiser les flux logistiques, gérer les stocks et conduire des engins en sécurité.",
+    prerequis: "Niveau 3ème minimum, motivation pour le secteur logistique",
+    duree: "589 heures (sur 9 mois)",
+    modalites: "distanciel",
+    tarif: "5 900 € HT",
+    programme: "Module 1 : Introduction à la chaîne logistique (40h)\nModule 2 : Réception et transfert des marchandises – G1 (90h)\nModule 3 : Préparation et expédition des commandes – G2 (90h)\nModule 4 : Organisation des flux logistiques – G3 (85h)\nModule 5 : Gestion des stocks et optimisation – G4 (85h)\nModule 6 : Conduite en sécurité des engins – G5 (70h)\nModule 7 : Communication professionnelle logistique – G6 (45h)\nModule 8 : Préparation aux épreuves professionnelles (44h)",
+    methodesEvaluation: "QCM diagnostic, cas pratiques, études de situation professionnelle, mises en situation, exercices chronométrés, examens blancs, évaluation tuteur entreprise",
+    moyensPedagogiques: "Plateforme LMS, classes virtuelles, supports PDF, vidéos pédagogiques, fiches métiers, tableaux Excel, logiciel de gestion simulé, dossiers professionnels",
+    publicVise: "Apprentis, jeunes en alternance, personnes en reconversion dans le secteur logistique",
+    delaiAcces: "14 jours après inscription",
+    dateDebut: "2025-09-01",
+    dateFin: "2026-05-15",
+    lieu: "Formation à distance (FOAD) – La Maison de l'Apprentissage, 32 rue Guy Môquet, 92240 Malakoff",
+    nombreParticipants: "9",
+    formateur: "David Rosenberg",
+    codeRNCP: "RNCP38302",
   },
 ];
 
