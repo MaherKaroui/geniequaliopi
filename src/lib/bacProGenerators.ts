@@ -149,6 +149,11 @@ function varyTestResponse(fullAnswer: string, si: number, qIdx: number): string 
   const quality = note >= 14 ? 2 : note >= 10 ? 1 : 0; // 2=good, 1=partial, 0=weak
   return varyStagResponse(fullAnswer, si, qIdx, quality, 2);
 }
+
+function gradeLevel(si: number, compIdx: number): string {
+  const seed = ((si + 1) * 11 + compIdx * 7) % 100;
+  if (seed < 5) return "NA";
+  if (seed < 15) return "ECA";
   if (seed < 50) return "A";
   return "MA";
 }
