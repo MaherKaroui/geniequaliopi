@@ -21,9 +21,9 @@ const yieldToBrowser = (ms = 0) => new Promise<void>(r => requestAnimationFrame(
 type PdfBlobOptions = NonNullable<Parameters<typeof htmlToPdfBlob>[1]>;
 
 const MASS_EXPORT_PDF_OPTIONS = {
-  scale: 1,
-  imageQuality: 0.65,
-  pageYieldMs: 15,
+  scale: 0.85,
+  imageQuality: 0.55,
+  pageYieldMs: 25,
 } satisfies PdfBlobOptions;
 
 const ZIP_EXPORT_OPTIONS = {
