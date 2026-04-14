@@ -394,7 +394,7 @@ export function genTestPositionnementBacPro(o: OrganismeInfo, f: FormationInfo, 
     <h2 style="margin-top:24px">Résultat Final</h2>
     <p><strong>Note :</strong> <span style="background:#fff3cd;padding:2px 8px;font-weight:bold">${note} / 20</span></p>
     <p><strong>Observations du formateur :</strong> ${formateur}</p>
-    <p style="background:#fff3cd;padding:8px">${appreciation(note)}</p>
+    <p style="background:#fff3cd;padding:8px">${appreciation(note, si)}</p>
     <table style="width:100%;margin-top:24px"><tr>
       <td style="width:50%;vertical-align:top">
         <p><strong>Signature du formateur :</strong></p>
@@ -447,7 +447,7 @@ export function genGrilleAcquisitionBacPro(o: OrganismeInfo, f: FormationInfo, s
   const renderTable = (comps: string[]) => {
     const rows = comps.map(c => {
       const level = gradeLevel(si, compIdx);
-      const obs = gradeObs(level);
+      const obs = gradeObs(level, si, compIdx);
       compIdx++;
       return `<tr>
         <td style="padding:6px;border:1px solid #ccc">${c}</td>
@@ -668,7 +668,7 @@ function genQCMEval(title: string, questions: QCMQuestion[], s: StagiaireInfo, f
     <p><strong>Score total :</strong> <span style="background:#fff3cd;padding:2px 6px">${totalScore}</span> / ${nbQ}</p>
     <p><strong>Note finale :</strong> <span style="background:#fff3cd;padding:2px 6px">${note20}</span> / 20</p>
     <h3>APPRÉCIATION DU FORMATEUR</h3>
-    <p style="background:#fff3cd;padding:8px">${appreciation(note20)}</p>
+    <p style="background:#fff3cd;padding:8px">${appreciation(note20, si)}</p>
     <table style="width:100%;margin-top:24px"><tr>
       <td style="width:50%;vertical-align:top">
         <p><strong>Signature du formateur :</strong></p>
@@ -726,7 +726,7 @@ function genOpenEval(title: string, context: string, questions: OpenQuestion[], 
     <p><strong>Score total :</strong> <span style="background:#fff3cd;padding:2px 6px">${totalScore}</span> / ${totalPoints}</p>
     <p><strong>Note finale :</strong> <span style="background:#fff3cd;padding:2px 6px">${note20}</span> / 20</p>
     <h3>Appréciation du formateur</h3>
-    <p style="background:#fff3cd;padding:8px">${appreciation(note20)}</p>
+    <p style="background:#fff3cd;padding:8px">${appreciation(note20, si)}</p>
     <table style="width:100%;margin-top:24px"><tr>
       <td style="width:50%;vertical-align:top">
         <p><strong>Signature du formateur :</strong></p>
