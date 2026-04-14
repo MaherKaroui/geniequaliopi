@@ -357,7 +357,7 @@ export function genTestPositionnementBacPro(o: OrganismeInfo, f: FormationInfo, 
       <h3 style="margin-top:16px">Question ${i + 1} :</h3>
       <p>${q.q}</p>
       <p><strong>Réponse du stagiaire :</strong></p>
-      <p style="border:1px solid #ccc;padding:8px;min-height:40px;background:#fafafa">${q.r}</p>
+      <p style="border:1px solid #ccc;padding:8px;min-height:40px;background:#fafafa">${varyTestResponse(q.r, si, i)}</p>
     `).join("")}
 
     <h2 style="margin-top:24px">Résultat Final</h2>
@@ -611,12 +611,13 @@ function genQCMEval(title: string, questions: QCMQuestion[], s: StagiaireInfo, f
     totalScore += sc;
     const letters = ["A", "B", "C", "D"];
     const correctIdx = letters.indexOf(q.answer);
-    // Stagiaire answer: if score=1, correct answer; otherwise a wrong one
-    const stagAnswer = sc === 1 ? q.answer : letters[(correctIdx + 1) % q.options.length];
+    const stagAnswer = sc === 1 ? q.answer : letters[((correctIdx + 1 + si) % (q.options.length - 1)) + (((correctIdx + 1 + si) % (q.options.length - 1)) >= correctIdx ? 1 : 0)];
+    // Ensure wrong answer is never the correct one
+    const safeAnswer = stagAnswer === q.answer ? letters[(correctIdx + 1) % q.options.length] : stagAnswer;
     return `<h3>Question ${i + 1}</h3>
       <p>${q.question}</p>
       ${q.options.map((o, oi) => `<p>${letters[oi]}. ${o}</p>`).join("")}
-      <p><strong>Réponse du stagiaire :</strong> ${stagAnswer}</p>
+      <p><strong>Réponse du stagiaire :</strong> ${safeAnswer}</p>
       <p><strong>Bonne réponse :</strong> ${q.answer}</p>
       <p><strong>Note :</strong> <span style="background:#fff3cd;padding:2px 6px">${sc}</span> / 1</p>`;
   }).join("");
