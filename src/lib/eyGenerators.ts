@@ -9,6 +9,10 @@ import { SAMPLE_FORMATEURS, FormateurInfo, parseDuree, getFormationDays } from "
 function today(): string { return new Date().toISOString().slice(0, 10); }
 function fmtDate(d?: string): string { return formatDate(d || today()); }
 function pc(): string { return getDocStyle()?.primaryColor || "#1a56db"; }
+function isSocioEsthetique(f: FormationInfo): boolean {
+  const t = (f.intitule||"").toLowerCase() + " " + (f.codeRNCP||"").toLowerCase();
+  return t.includes("socio-esthéti") || t.includes("socio esthéti") || t.includes("rs5992") || t.includes("soins socio");
+}
 
 /* ═══ CODE 4 – Objectifs et méthodes par séquence ═══ */
 export function genObjectifsMethodesSequence(o: OrganismeInfo, f: FormationInfo): string {
