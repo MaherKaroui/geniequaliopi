@@ -21,9 +21,9 @@ const yieldToBrowser = (ms = 0) => new Promise<void>(r => requestAnimationFrame(
 type PdfBlobOptions = NonNullable<Parameters<typeof htmlToPdfBlob>[1]>;
 
 const MASS_EXPORT_PDF_OPTIONS = {
-  scale: 1,
-  imageQuality: 0.65,
-  pageYieldMs: 15,
+  scale: 0.85,
+  imageQuality: 0.55,
+  pageYieldMs: 25,
 } satisfies PdfBlobOptions;
 
 const ZIP_EXPORT_OPTIONS = {
@@ -220,7 +220,8 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
           zip.file(filePath, result.blob);
         }
         options?.onItemDone?.(si + 1, sourceStagiaires.length);
-        const yieldMs = (si + 1) % 10 === 0 ? 200 : 50;
+        // More aggressive GC pauses for mass export
+        const yieldMs = (si + 1) % 5 === 0 ? 400 : 100;
         await yieldToBrowser(yieldMs);
       }
       return;
@@ -481,7 +482,8 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
           advanceProgress(`${eyDoc.code} — à fournir`);
         }
 
-        if (i % 3 === 0) await yieldToBrowser(5);
+        // Longer pause between document types for GC
+        await yieldToBrowser(i % 3 === 0 ? 300 : 50);
       }
 
       const content = await zip.generateAsync(ZIP_EXPORT_OPTIONS);
