@@ -45,7 +45,7 @@ export function genObjectifsMethodesSequence(o: OrganismeInfo, f: FormationInfo)
   let rows = "";
   chapters.forEach((ch, i) => {
     const label = ch.replace(/^Module\s*\d+\s*[:–-]\s*/i,"");
-    const dureeSeq = socio ? (i===0?"8h":"8-10h") : `${Math.round(parseDuree(f.duree||"35h")/chapters.length)}h`;
+    const dureeSeq = socio ? (i===0?"8h":"8-10h") : `${Math.round((parseDuree(f.duree||"35h") as number)/chapters.length)}h`;
     rows += `<tr><td ${td}><strong>Séquence ${i+1}</strong></td><td ${td}>${label}</td><td ${td}>${dureeSeq}</td><td ${td}>${objectifs[i]||""}</td><td ${td}>${methodes[i%methodes.length]}</td></tr>`;
   });
 
@@ -309,7 +309,7 @@ export function genFichierFormateursStatut(o: OrganismeInfo, f: FormationInfo): 
     juridique: i>=2?"Micro-entreprise":"—",
     nda: i>=2?`NDA-${7500000+i*100}`:(o.nda||"NDA-XXXX"),
     qualiopi: i>=2?"Non":"—",
-    heures: `${Math.round(parseDuree(f.duree||"35h")/(i+1))}h`
+    heures: `${Math.round((parseDuree(f.duree||"35h") as number)/(i+1))}h`
   }));
   let rows = formateurs.map(fmt => `<tr><td ${td}>${fmt.nom}</td><td ${td}>${fmt.specialite}</td><td ${td}><strong>${fmt.statut}</strong></td><td ${td}>${fmt.juridique}</td><td ${td}>${fmt.nda}</td><td ${td}>${fmt.qualiopi}</td><td ${td}>${fmt.heures}</td></tr>`).join("");
   return buildDocument({ org: o, formation: f, title: "Fichier des formateurs / intervenants", subtitle: `Action contrôlée : ${f.intitule||"Formation"}`, sections: [
@@ -484,7 +484,7 @@ export function genCertificatQualiopiModele(o: OrganismeInfo): string {
       <tr><td ${tdb}>Organisme certificateur</td><td ${td}>AFNOR Certification / Bureau Veritas</td></tr>
       <tr><td ${tdb}>Date de délivrance</td><td ${td}>${fmtDate(`${yr-1}-03-15`)}</td></tr>
       <tr><td ${tdb}>Date d'expiration</td><td ${td}>${fmtDate(`${yr+2}-03-14`)}</td></tr>
-      <tr><td ${tdb}>Catégories d'actions certifiées</td><td ${td}><ul style="margin:0;padding-left:18px;"><li>Actions de formation</li>${o.typesActions?.includes("CFA")?"<li>Actions de formation par apprentissage</li>":""}${o.typesActions?.includes("BDC")?"<li>Bilans de compétences</li>":""}</ul></td></tr>
+      <tr><td ${tdb}>Catégories d'actions certifiées</td><td ${td}><ul style="margin:0;padding-left:18px;"><li>Actions de formation</li>${o.typesActions?.includes("apprentissage" as any)?"<li>Actions de formation par apprentissage</li>":""}${o.typesActions?.includes("bilans-competences" as any)?"<li>Bilans de compétences</li>":""}</ul></td></tr>
     </table>` },
     { heading: "Article 3.1.1 des CGU de la plateforme MCF", content: `<p>Conformément à l'article 3.1.1 des Conditions Générales d'Utilisation de la plateforme Mon Compte Formation, l'organisme de formation <strong>${o.nom||"—"}</strong> est titulaire d'une certification qualité délivrée par un organisme certificateur accrédité par le COFRAC.</p><p>Cette certification est une condition nécessaire au référencement sur la plateforme Mon Compte Formation et à l'éligibilité au financement CPF des actions de formation proposées.</p>` },
     { heading: "Note", content: `<p style="font-style:italic;font-size:0.9em;">Ce document est un récapitulatif. Le certificat Qualiopi original est disponible sur demande et téléchargeable sur le site de l'organisme certificateur. En cas de contrôle, l'original sera transmis.</p>` },
@@ -657,7 +657,7 @@ export function genIndicateursPerformanceEY(o: OrganismeInfo, f: FormationInfo, 
     { heading: "1. Indicateurs d'activité", content: `<table style="width:100%;border-collapse:collapse;">
       <tr><td ${tdb} style="width:50%;">Nombre de sessions réalisées (${yr})</td><td ${td}>${Math.max(Math.ceil(n/8), 3)}</td></tr>
       <tr><td ${tdb}>Nombre total de stagiaires formés</td><td ${td}>${n}</td></tr>
-      <tr><td ${tdb}>Volume horaire total dispensé</td><td ${td}>${n * parseDuree(f.duree||"52h")}h</td></tr>
+      <tr><td ${tdb}>Volume horaire total dispensé</td><td ${td}>${n * (parseDuree(f.duree||"52h") as number)}h</td></tr>
       <tr><td ${tdb}>Chiffre d'affaires formation</td><td ${td}>${(n * (parseFloat(f.tarif||"4100")||4100)).toLocaleString("fr-FR")} € TTC</td></tr>
     </table>` },
     { heading: "2. Indicateurs de résultat", content: `<table style="width:100%;border-collapse:collapse;">
