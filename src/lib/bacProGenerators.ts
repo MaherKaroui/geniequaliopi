@@ -310,6 +310,18 @@ export function genTestPositionnementBacPro(o: OrganismeInfo, f: FormationInfo, 
     <p><strong>Note :</strong> <span style="background:#fff3cd;padding:2px 8px;font-weight:bold">${note} / 20</span></p>
     <p><strong>Observations du formateur :</strong> ${formateur}</p>
     <p style="background:#fff3cd;padding:8px">${appreciation(note)}</p>
+    <table style="width:100%;margin-top:24px"><tr>
+      <td style="width:50%;vertical-align:top">
+        <p><strong>Signature du formateur :</strong></p>
+        ${sigImg(f.formateurSignatureUrl)}
+      </td>
+      <td style="width:50%;vertical-align:top">
+        <p><strong>Signature du stagiaire :</strong></p>
+        ${stagSigImg(s)}
+      </td>
+    </tr></table>
+    <p style="margin-top:12px"><strong>Cachet de l'organisme :</strong></p>
+    ${orgSigBlock(o)}
   `);
 }
 
