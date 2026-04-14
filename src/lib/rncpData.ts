@@ -887,6 +887,69 @@ export const RNCP_FICHES: RNCPFiche[] = [
     voiesAcces: ["Après un parcours de formation continue", "En contrat d'apprentissage", "Par expérience (VAE)"],
     dureeIndicative: "497h",
   },
+  {
+    code: "RS5992",
+    intitule: "Réaliser des soins socio-esthétiques",
+    niveau: "Sans niveau spécifique",
+    certificateur: "PARIS BEAUTY ACADEMY",
+    dateEnregistrement: "22/04/2022",
+    dateEcheance: "22/04/2025",
+    codeNSF: "336 – Coiffure, esthétique",
+    formacodes: "42040 – Esthétique soin corporel / 44028 – Aide médico-sociale",
+    resume: "Cette certification permet aux titulaires d'acquérir un ensemble de soins et de conseils socio-esthétiques adaptés aux besoins des publics en situation de fragilité (handicap, maladie, isolement, vieillissement).",
+    activitesVisees: "Analyse de la situation de personnes fragilisées. Élaboration de protocoles de soins adaptés. Accueil bienveillant et recueil du consentement. Réalisation de soins d'entretien corporel et d'embellissement adaptés. Pratique de massages de bien-être adaptés. Conseil en image de soi. Transmission de techniques d'auto-soin. Évaluation des interventions. Transmission à l'équipe pluridisciplinaire. Conception et animation d'ateliers socio-esthétiques.",
+    blocsCompetences: [
+      {
+        titre: "Analyser et concevoir l'intervention socio-esthétique",
+        competences: [
+          "C1 – Analyser la situation d'une personne fragilisée en tenant compte du contexte d'intervention, du projet d'établissement et des problématiques corporelles et relationnelles",
+          "C2 – Élaborer un protocole de soins adaptés à partir du diagnostic établi, des objectifs visés et des aspects biologiques, psychologiques et sociaux",
+        ],
+        matieres: [
+          { competence: "C1 – Analyse de situation", contenu: "Contexte d'intervention (oncologie, gériatrie, insertion), projet d'établissement, diagnostic socio-esthétique, problématiques corporelles et relationnelles", volume: "8h" },
+          { competence: "C2 – Protocole de soins", contenu: "Diagnostic cutané et des phanères, tensions musculaires, image de soi, estime de soi, schéma corporel, recommandations pluridisciplinaires", volume: "6h" },
+        ],
+        modalitesEval: "Étude de cas écrite (30 min) + entretien oral avec le jury (20 min) portant sur l'analyse de situation et l'élaboration du protocole de soins.",
+      },
+      {
+        titre: "Réaliser des soins socio-esthétiques adaptés",
+        competences: [
+          "C3 – Accueillir la personne en adoptant une attitude d'écoute et de bienveillance",
+          "C4 – Informer la personne du déroulement de la séance afin d'obtenir son consentement",
+          "C5 – Réaliser des soins d'entretien corporel et d'embellissement adaptés aux peaux fragilisées",
+          "C6 – Pratiquer des massages de bien-être contenants et relaxants adaptés",
+          "C7 – Conseiller la personne sur la mise en valeur de son image personnelle",
+          "C8 – Expliquer des techniques d'auto-soin pour accompagner la personne dans son autonomie",
+        ],
+        matieres: [
+          { competence: "C3-C4 – Accueil et consentement", contenu: "Communication verbale et non-verbale, écoute active, relation d'aide, consentement éclairé", volume: "4h" },
+          { competence: "C5 – Soins d'entretien", contenu: "Hygiène, sécurité, soins cutanés, phanères, produits dermo-cosmétiques pour peaux fragilisées", volume: "8h" },
+          { competence: "C6 – Massages adaptés", contenu: "Gestuelle adaptée, manœuvres relaxantes, limites corporelles, adaptations aux fragilités", volume: "8h" },
+          { competence: "C7-C8 – Image et auto-soin", contenu: "Maquillage correcteur, morphologie, couleurs, prothèses, transmission des gestes d'auto-soin", volume: "6h" },
+        ],
+        modalitesEval: "Mise en situation professionnelle reconstituée (1h15) : prise en charge (C3-C4), soins adaptés (C5-C6), conseils en image (C7), guidage auto-soin (C8). Analyse avec le jury (15 min).",
+      },
+      {
+        titre: "Évaluer et transmettre – Concevoir des ateliers",
+        competences: [
+          "C9 – Évaluer le déroulement du soin socio-esthétique",
+          "C10 – Transmettre à l'équipe pluridisciplinaire les informations liées aux séances",
+          "C11 – Concevoir des ateliers de soins socio-esthétiques",
+        ],
+        matieres: [
+          { competence: "C9 – Évaluation du soin", contenu: "Critères d'évaluation, entretien, observation, identification des améliorations", volume: "4h" },
+          { competence: "C10 – Transmission", contenu: "Synthèse, écrits professionnels, continuité des soins, communication pluridisciplinaire", volume: "4h" },
+          { competence: "C11 – Ateliers collectifs", contenu: "Conception d'atelier, thématique, objectifs, fiche technique, méthodes et outils d'animation", volume: "4h" },
+        ],
+        modalitesEval: "Étude de cas (1h30) : production d'une fiche technique d'atelier socio-esthétique.",
+      },
+    ],
+    secteursActivite: "Sanitaire, médico-social, social, médical, paramédical",
+    typesEmplois: ["Socio-esthéticien(ne)", "Esthéticien(ne) en milieu hospitalier", "Esthéticien(ne) en EHPAD", "Animateur(trice) d'ateliers socio-esthétiques"],
+    codesROME: ["D1208", "K1302"],
+    voiesAcces: ["Après un parcours de formation continue", "Par expérience (VAE)"],
+    dureeIndicative: "52h",
+  },
 ];
 
 export function getRNCPByCode(code: string): RNCPFiche | undefined {
