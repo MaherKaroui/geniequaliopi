@@ -33,6 +33,15 @@ const yieldToBrowser = (delayMs = 0) =>
     });
   });
 
+/** Build preview title without duplicating stagiaire name already in doc.nom */
+function docTitle(docNom: string, s?: StagiaireInfo | null): string {
+  if (!s) return docNom;
+  const fullName = `${s.prenom} ${s.nom}`.trim();
+  if (!fullName) return docNom;
+  if (docNom.includes(fullName)) return docNom;
+  return `${docNom} – ${fullName}`;
+}
+
 interface DocumentGeneratorProps {
   organisme: OrganismeInfo;
   formation: FormationInfo;
@@ -200,7 +209,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
       const content = generateDocumentById(doc.id, doc.template, doc.params, organisme, formation, allStagiaires);
       const currentStagiaire = allStagiaires[doc.params!.stagiaireIdx as number] || null;
       setPreviewContent(content);
-      setPreviewTitle(doc.nom + (currentStagiaire ? ` – ${currentStagiaire.prenom} ${currentStagiaire.nom}` : ""));
+      setPreviewTitle(docTitle(doc.nom, currentStagiaire));
     } else if (isPerStagiaire && selectedStagiaire === -1) {
       const allContent = allStagiaires.map((_, index) => generateContent(doc, index)).join("<hr style='border:2px solid #1e3a7b;margin:30px 0'>");
       setPreviewContent(allContent);
@@ -209,7 +218,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
       const content = generateContent(doc, isPerStagiaire ? selectedStagiaire : undefined);
       const currentStagiaire = getDocStagiaire(doc, isPerStagiaire ? selectedStagiaire : undefined);
       setPreviewContent(content);
-      setPreviewTitle(doc.nom + (currentStagiaire ? ` – ${currentStagiaire.prenom} ${currentStagiaire.nom}` : ""));
+      setPreviewTitle(docTitle(doc.nom, currentStagiaire));
     }
     setCurrentDocId(doc.id);
     setEditing(false);
@@ -315,7 +324,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
           const index = parseInt(val, 10);
           const content = generateContent(doc, index);
           setPreviewContent(content);
-          setPreviewTitle(`${doc.nom} – ${allStagiaires[index]?.prenom} ${allStagiaires[index]?.nom}`);
+          setPreviewTitle(docTitle(doc.nom, allStagiaires[index]));
         }
         setEditing(false);
       }
