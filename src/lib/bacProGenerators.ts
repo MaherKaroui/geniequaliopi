@@ -1140,9 +1140,6 @@ export function genRapportConnexionBacPro(o: OrganismeInfo, f: FormationInfo, st
         <td style="padding:4px 8px;font-size:11px;"><strong>Adresse IP habituelle :</strong> ${ip}</td>
         <td style="padding:4px 8px;font-size:11px;"><strong>Total jours :</strong> ${dayCount} jours</td>
       </tr>
-      <tr>
-        <td style="padding:4px 8px;font-size:11px;" colspan="2"><strong>Durée totale de connexion :</strong> ${totalStr}</td>
-      </tr>
     </table>
 
     <table style="width:100%;border-collapse:collapse;margin-bottom:16px;">
