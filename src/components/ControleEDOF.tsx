@@ -785,15 +785,36 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
         </div>
       </div>
 
-      {/* Preview Dialog */}
-      <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
+      {/* Preview / Edit Dialog */}
+      <Dialog open={previewOpen} onOpenChange={(open) => {
+        if (!open && isEditing) {
+          // Save edits from iframe before closing
+          const iframe = previewIframeRef.current;
+          if (iframe?.contentDocument?.body) {
+            setEditedHtml(`<!DOCTYPE html><html>${iframe.contentDocument.documentElement.innerHTML}</html>`);
+          }
+          setIsEditing(false);
+        }
+        setPreviewOpen(open);
+      }}>
         <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Eye className="w-5 h-5" />
               {previewTitle}
+              {isEditing && (
+                <Badge variant="secondary" className="text-xs ml-2">Mode édition</Badge>
+              )}
             </DialogTitle>
           </DialogHeader>
+
+          {isEditing && (
+            <div className="flex items-center gap-2 px-1 py-1 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-700">
+              <Edit3 className="w-3.5 h-3.5 shrink-0" />
+              <span>Cliquez directement dans le document pour modifier le texte. Les modifications seront conservées pour l'export.</span>
+            </div>
+          )}
+
           <div className="flex-1 overflow-auto border rounded-lg bg-white">
             {previewLoading ? (
               <div className="flex items-center justify-center p-12">
@@ -802,10 +823,12 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
               </div>
             ) : (
               <iframe
-                srcDoc={previewHtml}
+                ref={previewIframeRef}
+                srcDoc={editedHtml}
                 className="w-full h-[60vh] border-0"
                 title="Aperçu du document"
                 sandbox="allow-same-origin"
+                onLoad={handleIframeLoad}
               />
             )}
           </div>
@@ -817,21 +840,52 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
             </div>
           )}
 
-          <div className="flex justify-end gap-2 pt-2">
-            <Button variant="outline" onClick={() => setPreviewOpen(false)}>
-              Fermer
-            </Button>
-            {signature ? (
-              <Button onClick={handleSignAndDownload} className="gap-1">
-                <PenTool className="w-4 h-4" />
-                Télécharger signé
+          <div className="flex justify-between gap-2 pt-2">
+            <div className="flex gap-2">
+              {/* Edit toggle */}
+              <Button
+                variant={isEditing ? "default" : "outline"}
+                size="sm"
+                onClick={toggleEditMode}
+                className="gap-1"
+              >
+                <Edit3 className="w-4 h-4" />
+                {isEditing ? "Terminer l'édition" : "Éditer"}
               </Button>
-            ) : (
-              <Button onClick={handleDownloadPreview} className="gap-1">
-                <Download className="w-4 h-4" />
-                Télécharger en PDF
+
+              {/* Reset to original */}
+              {editedHtml !== previewHtml && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setEditedHtml(previewHtml);
+                    setIsEditing(false);
+                  }}
+                  className="gap-1 text-muted-foreground"
+                >
+                  <RotateCcw className="w-4 h-4" />
+                  Réinitialiser
+                </Button>
+              )}
+            </div>
+
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={() => setPreviewOpen(false)}>
+                Fermer
               </Button>
-            )}
+              {signature ? (
+                <Button onClick={handleSignAndDownload} className="gap-1">
+                  <PenTool className="w-4 h-4" />
+                  Télécharger signé
+                </Button>
+              ) : (
+                <Button onClick={handleDownloadPreview} className="gap-1">
+                  <Download className="w-4 h-4" />
+                  Télécharger en PDF
+                </Button>
+              )}
+            </div>
           </div>
         </DialogContent>
       </Dialog>
