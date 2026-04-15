@@ -81,9 +81,12 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
   // Preview state
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewHtml, setPreviewHtml] = useState("");
+  const [editedHtml, setEditedHtml] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
   const [previewTitle, setPreviewTitle] = useState("");
   const [previewLoading, setPreviewLoading] = useState(false);
   const [previewDoc, setPreviewDoc] = useState<EYDocumentItem | null>(null);
+  const previewIframeRef = useRef<HTMLIFrameElement>(null);
   const orgName = organisme.nom || "Organisme";
   const safeName = useMemo(() => orgName.replace(/[^a-zA-Z0-9_-]/g, "_"), [orgName]);
   const mergedStagiaires = useMemo(
