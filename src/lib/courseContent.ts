@@ -137,7 +137,7 @@ const YOUTUBE_COMMERCIAL: CourseData['youtubeVideos'] = [
 
 export function getYoutubeVideos(formationIntitule: string): CourseData['youtubeVideos'] {
   const t = formationIntitule.toLowerCase();
-  if (t.includes('massage') || t.includes('prénatal') || t.includes('prenatal') || t.includes('relaxation') || t.includes('bien-être')) return YOUTUBE_MASSAGE;
+  if (t.includes('massage') || t.includes('prénatal') || t.includes('prenatal') || t.includes('relaxation') || t.includes('bien-être') || t.includes('postpartum') || t.includes('post-partum')) return YOUTUBE_MASSAGE;
   if (t.includes('excel')) return YOUTUBE_EXCEL;
   if (t.includes('word')) return YOUTUBE_WORD;
   if (t.includes('powerpoint') || t.includes('ppt')) return YOUTUBE_POWERPOINT;
