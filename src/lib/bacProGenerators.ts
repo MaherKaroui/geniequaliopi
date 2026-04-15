@@ -1039,22 +1039,24 @@ function getStagIP(si: number): string {
   return `${base}.${last}`;
 }
 
-/** Generate realistic connection times for each school day */
+/** Generate realistic connection times for each school day (7h00-7h30 max per day) */
 function genSchoolDayConnections(si: number, weekOffset: number, dayOfWeek: number): {
   loginH: number; loginM: number; logoutH: number; logoutM: number; duration: string;
 } {
   const seed = ((si + 1) * 13 + weekOffset * 7 + dayOfWeek * 31) % 100;
-  // Login between 8:30 and 9:15
-  const loginH = 8 + (seed % 2 === 0 ? 0 : 1);
-  const loginM = loginH === 8 ? 30 + (seed % 30) : (seed % 15);
-  // Logout between 16:30 and 17:30
-  const seed2 = ((si + 1) * 19 + weekOffset * 11 + dayOfWeek * 23) % 100;
-  const logoutH = 16 + (seed2 % 3 === 0 ? 1 : 0);
-  const logoutM = 30 + (seed2 % 30);
-  const totalMin = (logoutH * 60 + logoutM) - (loginH * 60 + loginM);
-  const h = Math.floor(totalMin / 60);
-  const m = totalMin % 60;
-  return { loginH, loginM, logoutH, logoutM, duration: `${h}h${String(m).padStart(2, "0")}` };
+  // Target duration: 420-450 min (7h00-7h30)
+  const targetMin = 420 + (seed % 31); // 420..450
+  // Login between 8:45 and 9:10
+  const loginM = 45 + (seed % 26); // 45..70 → wraps to next hour if >=60
+  const loginH = 8 + Math.floor(loginM / 60);
+  const realLoginM = loginM % 60;
+  // Compute logout from login + target duration
+  const logoutTotalMin = loginH * 60 + realLoginM + targetMin;
+  const logoutH = Math.floor(logoutTotalMin / 60);
+  const logoutM = logoutTotalMin % 60;
+  const h = Math.floor(targetMin / 60);
+  const m = targetMin % 60;
+  return { loginH, loginM: realLoginM, logoutH, logoutM, duration: `${h}h${String(m).padStart(2, "0")}` };
 }
 
 export function genRapportConnexionBacPro(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number): string {
