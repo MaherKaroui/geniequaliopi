@@ -137,7 +137,7 @@ const YOUTUBE_COMMERCIAL: CourseData['youtubeVideos'] = [
 
 export function getYoutubeVideos(formationIntitule: string): CourseData['youtubeVideos'] {
   const t = formationIntitule.toLowerCase();
-  if (t.includes('massage') || t.includes('prénatal') || t.includes('prenatal') || t.includes('relaxation') || t.includes('bien-être')) return YOUTUBE_MASSAGE;
+  if (t.includes('massage') || t.includes('prénatal') || t.includes('prenatal') || t.includes('relaxation') || t.includes('bien-être') || t.includes('postpartum') || t.includes('post-partum')) return YOUTUBE_MASSAGE;
   if (t.includes('excel')) return YOUTUBE_EXCEL;
   if (t.includes('word')) return YOUTUBE_WORD;
   if (t.includes('powerpoint') || t.includes('ppt')) return YOUTUBE_POWERPOINT;
@@ -260,6 +260,7 @@ import { getIAChapters } from "./courseContentIA";
 import { getWebmarketingChapters } from "./courseContentWebmarketing";
 import { getCRMChapters } from "./courseContentCRM";
 import { getMassagePrenatalChapters } from "./courseContentMassagePrenatal";
+import { getMassagePostpartumChapters } from "./courseContentMassagePostpartum";
 import { getECSRChapters } from "./courseContentECSR";
 import { getVTestChapters } from "./courseContentVTest";
 import { getCIPChapters } from "./courseContentCIP";
@@ -269,7 +270,7 @@ import { getInfographisteChapters } from "./courseContentInfographiste";
 import { getRestaurationChapters } from "./courseContentRestauration";
 import { getSocioEsthetiqueChapters } from "./courseContentSocioEsthetique";
 
-export { getWordChapters, getAnglaisChapters, getAnglaisA1Chapters, getManagementChapters, getGenericChapters, getFLEChapters, getIAChapters, getWebmarketingChapters, getCRMChapters, getMassagePrenatalChapters, getECSRChapters, getVTestChapters, getCIPChapters, getRPMSChapters, getAssistantDirectionChapters, getInfographisteChapters, getRestaurationChapters, getSocioEsthetiqueChapters };
+export { getWordChapters, getAnglaisChapters, getAnglaisA1Chapters, getManagementChapters, getGenericChapters, getFLEChapters, getIAChapters, getWebmarketingChapters, getCRMChapters, getMassagePrenatalChapters, getMassagePostpartumChapters, getECSRChapters, getVTestChapters, getCIPChapters, getRPMSChapters, getAssistantDirectionChapters, getInfographisteChapters, getRestaurationChapters, getSocioEsthetiqueChapters };
 
 export function getCourseChapters(formationIntitule: string): CourseChapter[] {
   const t = formationIntitule.toLowerCase();
@@ -290,6 +291,7 @@ export function getCourseChapters(formationIntitule: string): CourseChapter[] {
   if (t.includes('intelligence artificielle') || t.includes('ia générative') || t.includes('contenus rédactionnels')) return getIAChapters();
   if (t.includes('webmarketing') || t.includes('marketing de contenus') || t.includes('réseaux sociaux') || t.includes('marketing digital')) return getWebmarketingChapters();
   if (t.includes('crm') || t.includes('automation') || t.includes('automatisation')) return getCRMChapters();
+  if (t.includes('postpartum') || t.includes('post-partum') || t.includes('post partum')) return getMassagePostpartumChapters();
   if (t.includes('massage') || t.includes('prénatal') || t.includes('prenatal')) return getMassagePrenatalChapters();
   return getGenericChapters(formationIntitule);
 }

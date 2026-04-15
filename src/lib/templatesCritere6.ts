@@ -35,7 +35,7 @@ function detectFormationType(f: FormationInfo): FormationType {
   const code = (f.codeRNCP || "").toLowerCase();
   if (title.includes("conduite") || title.includes("ecsr") || title.includes("enseignant de la conduite") || code.includes("35329")) return "ecsr";
   if (title.includes("français") || title.includes("fle") || title.includes("social") || title.includes("médico") || title.includes("medico") || title.includes("communiquer en français")) return "fle";
-  if (title.includes("massage") || title.includes("prénatal") || title.includes("prenatal") || title.includes("relaxation") || title.includes("bien-être") || title.includes("bien être")) return "massage";
+  if (title.includes("massage") || title.includes("prénatal") || title.includes("prenatal") || title.includes("relaxation") || title.includes("bien-être") || title.includes("bien être") || title.includes("postpartum") || title.includes("post-partum") || title.includes("post partum")) return "massage";
   if (title.includes("esthéti") || title.includes("cosmétique") || title.includes("parfumerie") || title.includes("beauté")) return "esthetique";
   if (title.includes("secrétaire") || title.includes("assistant") || title.includes("médico-admin")) return "secretaire";
   if (title.includes("management") || title.includes("encadrement") || title.includes("leadership") || title.includes("manager")) return "management";
