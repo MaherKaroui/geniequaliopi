@@ -374,8 +374,8 @@ export const EY_DOCUMENTS: EYDocumentItem[] = [
   },
   {
     code: "57",
-    label: "Supports contractuels et précontractuels",
-    description: "Supports contractuels et précontractuels pour la prestation vendue au stagiaire",
+    label: "Contrat de formation",
+    description: "Contrat de formation pour la prestation vendue au stagiaire",
     autoTemplates: ["cgv_stagiaire"],
     perStagiaire: true,
     category: "administratif",
