@@ -16,6 +16,104 @@ function isSocioEsthetique(f: FormationInfo): boolean {
   return t.includes("socio-esthéti") || t.includes("socio esthéti") || t.includes("rs5992") || t.includes("soins socio");
 }
 
+/** Détection domaine esthétique / beauté (extension cils, maquillage, onglerie, etc.) */
+function isEsthetique(f: FormationInfo): boolean {
+  const t = (f.intitule||"").toLowerCase() + " " + (f.codeRNCP||"").toLowerCase() + " " + (f.programme||"").toLowerCase();
+  return t.includes("esthéti") || t.includes("cil") || t.includes("maquill") || t.includes("ongle") || t.includes("beauté") ||
+    t.includes("manucure") || t.includes("prothésiste") || t.includes("nail") || t.includes("rehaussement") || t.includes("extension") ||
+    t.includes("microblading") || t.includes("dermographe") || t.includes("rs6147") || t.includes("rs5867") || t.includes("rs6299") ||
+    t.includes("cosmétique") || t.includes("epilation") || t.includes("brow") || t.includes("lash");
+}
+
+/** Détection domaine informatique / digital */
+function isInformatique(f: FormationInfo): boolean {
+  const t = (f.intitule||"").toLowerCase() + " " + (f.codeRNCP||"").toLowerCase();
+  return t.includes("informatique") || t.includes("développe") || t.includes("web") || t.includes("digital") ||
+    t.includes("ia ") || t.includes("intelligence artificielle") || t.includes("data") || t.includes("cybersécurité") ||
+    t.includes("cloud") || t.includes("devops") || t.includes("crm") || t.includes("webmarketing");
+}
+
+/** Détection domaine restauration / cuisine */
+function isRestauration(f: FormationInfo): boolean {
+  const t = (f.intitule||"").toLowerCase();
+  return t.includes("restaura") || t.includes("cuisi") || t.includes("pâtiss") || t.includes("boulang") || t.includes("haccp") || t.includes("hygiène alimentaire");
+}
+
+/** Détection domaine management / commerce */
+function isManagement(f: FormationInfo): boolean {
+  const t = (f.intitule||"").toLowerCase();
+  return t.includes("management") || t.includes("commercial") || t.includes("vente") || t.includes("négociation") || t.includes("conseiller") || t.includes("cip") || t.includes("assistant") || t.includes("direction");
+}
+
+/** Retourne le domaine détecté pour personnaliser le contenu */
+type FormationDomain = "socio_esthetique" | "esthetique" | "informatique" | "restauration" | "management" | "generique";
+function detectDomain(f: FormationInfo): FormationDomain {
+  if (isSocioEsthetique(f)) return "socio_esthetique";
+  if (isEsthetique(f)) return "esthetique";
+  if (isInformatique(f)) return "informatique";
+  if (isRestauration(f)) return "restauration";
+  if (isManagement(f)) return "management";
+  return "generique";
+}
+
+/** Contenu des équipements par domaine */
+function getDomainEquipements(domain: FormationDomain, yr: number): { equipement: string; qte: string; marque: string; etat: string }[] {
+  switch(domain) {
+    case "esthetique": return [
+      { equipement: "Lit de soins réglable multiposition", qte: "4", marque: "Beauty Star / BS-PRO", etat: "Excellent" },
+      { equipement: "Lampe loupe LED professionnelle", qte: "4", marque: "Daylight / D25050", etat: "Fonctionnel" },
+      { equipement: "Kit complet extension de cils (soie, vison, synthétique)", qte: "8", marque: "Noble Lashes / Premium", etat: "Neuf" },
+      { equipement: "Mannequin tête entraînement cils", qte: "8", marque: "Training Head Pro", etat: "Fonctionnel" },
+      { equipement: "Micro-brosses, colles pro, remover, patchs silicone", qte: "Stock", marque: "Lash Professional / Biosmetics", etat: "Renouvelé mensuellement" },
+      { equipement: "Stérilisateur UV pour instruments", qte: "2", marque: "Sterilux / ST-200", etat: "Fonctionnel" },
+      { equipement: "Kit rehaussement de cils (lotions, bigoudis, teinture)", qte: "8", marque: "RefectoCil / InLei", etat: "DLUO vérifiée" },
+      { equipement: "Miroirs grossissants éclairés LED x10", qte: "8", marque: "Simplehuman / ST3028", etat: "Fonctionnel" },
+      { equipement: "Vidéoprojecteur HD", qte: "1", marque: "Epson EB-FH06", etat: "Fonctionnel" },
+      { equipement: "Connexion internet fibre", qte: "1", marque: "Orange Pro / 1 Gbps", etat: "Fonctionnel" },
+      { equipement: "Ordinateur portable formateur", qte: "1", marque: "HP ProBook 450 G10", etat: "Fonctionnel" },
+      { equipement: "Imprimante couleur multifonction", qte: "1", marque: "HP Color LaserJet Pro", etat: "Fonctionnel" },
+    ];
+    case "informatique": return [
+      { equipement: "Postes informatiques haute performance", qte: "15", marque: "Dell Latitude 5540 / i7 16Go RAM", etat: "Fonctionnel" },
+      { equipement: "Écrans doubles 24\"", qte: "15", marque: "Dell P2422H", etat: "Fonctionnel" },
+      { equipement: "Vidéoprojecteur interactif", qte: "1", marque: "Epson EB-695Wi", etat: "Fonctionnel" },
+      { equipement: "Serveur de développement local", qte: "1", marque: "Dell PowerEdge T40", etat: "Fonctionnel" },
+      { equipement: "Switch réseau manageable + câblage Cat6", qte: "1", marque: "Cisco SG350", etat: "Fonctionnel" },
+      { equipement: "Connexion internet fibre dédiée", qte: "1", marque: "Orange Pro Fibre / 1 Gbps symétrique", etat: "Fonctionnel" },
+      { equipement: "Licences logicielles (Office 365, Adobe CC, IDE)", qte: "15", marque: "Microsoft / Adobe / JetBrains", etat: "À jour" },
+      { equipement: "Imprimante laser multifonction", qte: "1", marque: "HP LaserJet Pro M428", etat: "Fonctionnel" },
+    ];
+    case "restauration": return [
+      { equipement: "Fourneaux professionnels 6 feux", qte: "2", marque: "Bonnet / Thirode", etat: "Fonctionnel" },
+      { equipement: "Four mixte vapeur/convection", qte: "1", marque: "Rational SCC 61", etat: "Fonctionnel" },
+      { equipement: "Plans de travail inox professionnels", qte: "8", marque: "Sur mesure inox 304", etat: "Excellent" },
+      { equipement: "Batterie de cuisine complète", qte: "8 sets", marque: "De Buyer / Matfer", etat: "Fonctionnel" },
+      { equipement: "Réfrigérateur professionnel 2 portes", qte: "2", marque: "Liebherr GKPv", etat: "Fonctionnel" },
+      { equipement: "Thermomètres HACCP et sondes", qte: "8", marque: "Testo 104-IR", etat: "Calibrés" },
+      { equipement: "Vidéoprojecteur HD", qte: "1", marque: "Epson EB-FH06", etat: "Fonctionnel" },
+    ];
+    case "management": return [
+      { equipement: "Salle de formation équipée (tables modulables)", qte: "1", marque: "Steelcase / Mobilier modulaire", etat: "Fonctionnel" },
+      { equipement: "Vidéoprojecteur HD + écran motorisé", qte: "1", marque: "Epson EB-FH06 + Oray 240cm", etat: "Fonctionnel" },
+      { equipement: "Ordinateurs portables stagiaires", qte: "15", marque: "HP ProBook 450 G10", etat: "Fonctionnel" },
+      { equipement: "Connexion internet haut débit", qte: "1", marque: "Fibre 1 Gbps", etat: "Fonctionnel" },
+      { equipement: "Paperboard + marqueurs", qte: "2", marque: "—", etat: "Fonctionnel" },
+      { equipement: "Matériel pour jeux de rôle et simulations", qte: "Lot", marque: "Cartes scénarios, supports visuels", etat: "À jour" },
+      { equipement: "Imprimante couleur multifonction", qte: "1", marque: "HP Color LaserJet Pro", etat: "Fonctionnel" },
+    ];
+    default: return [
+      { equipement: "Salle de formation équipée (tables, chaises ergonomiques)", qte: "1", marque: "Mobilier professionnel", etat: "Fonctionnel" },
+      { equipement: "Vidéoprojecteur HD", qte: "1", marque: "Epson EB-FH06", etat: "Fonctionnel" },
+      { equipement: "Écran de projection mural 200x150cm", qte: "1", marque: "Oray", etat: "Fonctionnel" },
+      { equipement: "Ordinateurs portables", qte: "15", marque: "HP ProBook 450", etat: "Fonctionnel" },
+      { equipement: "Connexion internet fibre", qte: "1", marque: "Fibre 1 Gbps", etat: "Fonctionnel" },
+      { equipement: "Imprimante multifonction", qte: "1", marque: "HP LaserJet Pro", etat: "Fonctionnel" },
+      { equipement: "Tableau blanc / Paperboard", qte: "2", marque: "—", etat: "Fonctionnel" },
+      { equipement: "Matériel pédagogique spécifique", qte: "Lot", marque: "Adapté au domaine", etat: "Fonctionnel" },
+    ];
+  }
+}
+
 const td = `style="padding:8px;border:1px solid #ddd;"`;
 const tdb = `style="padding:8px;border:1px solid #ddd;font-weight:600;"`;
 const thStyle = (c: string) => `style="padding:10px;border:1px solid #ddd;background:${c};color:#fff;font-weight:600;"`;
