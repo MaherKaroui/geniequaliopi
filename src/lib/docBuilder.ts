@@ -408,7 +408,7 @@ export function orgHeader(org: OrganismeInfo, subtitle?: string): string {
       <div style="flex-shrink:0;text-align:right;font-size:${s.fontSize - 2}px;color:#666;line-height:1.8">
         <div>NDA : ${org.nda}</div>
         <div>SIRET : ${org.siret}</div>
-        <div>${org.telephone}</div>
+        ${org.telephone?.trim() ? `<div>${org.telephone}</div>` : ""}
       </div>
     </div>`;
   }
