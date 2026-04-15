@@ -1064,22 +1064,54 @@ export function genPlanningIntervenants(o: OrganismeInfo, f: FormationInfo): str
   ]});
 }
 
-/* ═══ CODE 61 – Planning sessions ═══ */
+/* ═══ CODE 61 – Planning sessions (détail jour par jour comme Academy) ═══ */
 export function genPlanningSessionsEY(o: OrganismeInfo, f: FormationInfo, stagiaires?: StagiaireInfo[]): string {
-  const socio = isSocioEsthetique(f);
+  const days = getFormationDays(f);
+  const totalDays = Math.max(days.length, 3);
   const sd = getSessionDates(f, stagiaires);
-  const yr = sd.debut ? new Date(sd.debut).getFullYear() : new Date().getFullYear();
-  return buildDocument({ org: o, formation: f, title: "Planning des sessions de formation", subtitle: `Année ${yr} – ${f.intitule||"Formation"}`, sections: [
-    { heading: "Sessions programmées", content: `<table style="width:100%;border-collapse:collapse;"><thead><tr style="background:${pc()};color:#fff;"><th ${td}>Session</th><th ${td}>Dates</th><th ${td}>Durée</th><th ${td}>Lieu</th><th ${td}>Places</th><th ${td}>Inscrits</th><th ${td}>Statut</th></tr></thead><tbody>
-      <tr style="background:#f0f7ff;"><td ${td}><strong>Session 1 (en cours)</strong></td><td ${td}>Du ${fmtDate(sd.debut)} au ${fmtDate(sd.fin)}</td><td ${td}>${f.duree||"52h"}</td><td ${td}>${f.lieu||o.ville||"Présentiel"}</td><td ${td}>${f.nombreParticipants||"12"}</td><td ${td}>${f.nombreParticipants||"10"}</td><td ${td}><strong>En cours</strong></td></tr>
-      <tr><td ${td}>Session 2</td><td ${td}>${socio?`Du 02/06/${yr} au 12/06/${yr}`:`Du 01/09/${yr} au 30/09/${yr}`}</td><td ${td}>${f.duree||"52h"}</td><td ${td}>${f.lieu||o.ville||"Présentiel"}</td><td ${td}>12</td><td ${td}>4</td><td ${td}>Inscriptions ouvertes</td></tr>
-      <tr><td ${td}>Session 3</td><td ${td}>${socio?`Du 14/10/${yr} au 24/10/${yr}`:`Du 04/11/${yr} au 29/11/${yr}`}</td><td ${td}>${f.duree||"52h"}</td><td ${td}>${f.lieu||o.ville||"Présentiel"}</td><td ${td}>12</td><td ${td}>0</td><td ${td}>Planifiée</td></tr>
-    </tbody></table>` },
-    { heading: "Historique des sessions passées", content: `<table style="width:100%;border-collapse:collapse;"><thead><tr style="background:${sc()};color:#fff;"><th ${td}>Session</th><th ${td}>Dates</th><th ${td}>Stagiaires</th><th ${td}>Taux réussite</th><th ${td}>Satisfaction</th></tr></thead><tbody>
-      <tr><td ${td}>Session ${yr-1}-S1</td><td ${td}>Mars ${yr-1}</td><td ${td}>10</td><td ${td}>90%</td><td ${td}>4.8/5</td></tr>
-      <tr><td ${td}>Session ${yr-1}-S2</td><td ${td}>Juin ${yr-1}</td><td ${td}>8</td><td ${td}>88%</td><td ${td}>4.6/5</td></tr>
-      <tr><td ${td}>Session ${yr-1}-S3</td><td ${td}>Oct. ${yr-1}</td><td ${td}>11</td><td ${td}>91%</td><td ${td}>4.7/5</td></tr>
-    </tbody></table>` },
+  const dureeH = parseDuree(f.duree || "21h").totalHours;
+  const titre = f.intitule || "Formation";
+
+  /* Créneaux types */
+  const creneauxJ1 = [
+    { h: "09h00 – 10h30", d: "1h30", act: "Accueil, présentation, objectifs, certification " + (f.codeRNCP||""), mod: "Échanges + présentation" },
+    { h: "10h30 – 12h30", d: "2h00", act: "Analyse morphologique, besoins client, choix technique", mod: "Apports théoriques + études de cas" },
+    { h: "12h30 – 13h30", d: "1h00", act: "Pause déjeuner", mod: "—" },
+    { h: "13h30 – 15h00", d: "1h30", act: "Hygiène, sécurité, contre-indications", mod: "Apports théoriques" },
+    { h: "15h00 – 17h00", d: "2h00", act: "Matériel, produits, préparation plateau technique", mod: "Démonstration formatrice" },
+  ];
+  const creneauxJ2 = [
+    { h: "09h00 – 10h00", d: "1h00", act: "Préparation des éléments (nettoyage, mise en place)", mod: "Démonstration + pratique" },
+    { h: "10h00 – 12h30", d: "2h30", act: "Techniques spécifiques – Mise en pratique", mod: "Mise en pratique" },
+    { h: "12h30 – 13h30", d: "1h00", act: "Pause déjeuner", mod: "—" },
+    { h: "13h30 – 16h00", d: "2h30", act: "Pratique sur modèle réel", mod: "Mise en situation professionnelle" },
+    { h: "16h00 – 17h00", d: "1h00", act: "Correction, suivi pédagogique", mod: "Accompagnement individualisé" },
+  ];
+  const creneauxJDernier = [
+    { h: "09h00 – 10h30", d: "1h30", act: "Révision, préparation matériel", mod: "Coaching" },
+    { h: "10h30 – 12h00", d: "1h30", act: "Réalisation complète sur modèle", mod: "Mise en situation" },
+    { h: "12h00 – 13h00", d: "1h00", act: "Pause déjeuner", mod: "—" },
+    { h: "13h00 – 14h30", d: "1h30", act: "Épreuve pratique (type certification)", mod: "Évaluation" },
+    { h: "14h30 – 15h00", d: "0h30", act: "Entretien technique", mod: "Évaluation orale" },
+    { h: "15h00 – 16h00", d: "1h00", act: "Entretien final (conseils client)", mod: "Évaluation" },
+    { h: "16h00 – 17h00", d: "1h00", act: "Débriefing + préparation certification", mod: "Feedback individualisé" },
+  ];
+
+  let tables = "";
+  for (let d = 0; d < Math.min(totalDays, 10); d++) {
+    const jourLabel = `Jour ${d + 1}`;
+    const slots = d === 0 ? creneauxJ1 : (d === Math.min(totalDays, 10) - 1 ? creneauxJDernier : creneauxJ2);
+    let rows = slots.map((sl, si) => {
+      const jourCell = si === 0 ? `<td ${td} rowspan="${slots.length}" style="font-weight:700;vertical-align:top;">${jourLabel}</td>` : "";
+      return `<tr>${jourCell}<td ${td}>${sl.h}</td><td ${td}>${sl.d}</td><td ${td}>${sl.act}</td><td ${td}>${sl.mod}</td></tr>`;
+    }).join("");
+    const totalJour = "7h00";
+    rows += `<tr style="background:#f0f0f0;"><td ${td} colspan="2"><strong>TOTAL ${jourLabel.toUpperCase()}</strong></td><td ${td} colspan="3"><strong>${totalJour}</strong></td></tr>`;
+    tables += `<table style="width:100%;border-collapse:collapse;font-size:0.85em;margin-bottom:16px;"><thead><tr style="background:${pc()};color:#fff;"><th ${td}>Jour</th><th ${td}>Horaires</th><th ${td}>Durée</th><th ${td}>Activités</th><th ${td}>Modalités pédagogiques</th></tr></thead><tbody>${rows}</tbody></table>`;
+  }
+
+  return buildDocument({ org: o, formation: f, title: `PLANNING DE SESSION – ${titre.toUpperCase()}`, subtitle: `(${totalDays} jours - ${dureeH} heures)`, sections: [
+    { heading: "Déroulement détaillé", content: tables },
   ]});
 }
 
