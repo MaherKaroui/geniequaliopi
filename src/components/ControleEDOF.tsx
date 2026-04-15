@@ -778,11 +778,6 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
           })}
         </div>
       </div>
-              </div>
-            )}
-          </div>
-        );
-      })}
 
       {/* Naming convention reminder */}
       <div className="bg-muted/50 border rounded-lg p-4 text-sm">
