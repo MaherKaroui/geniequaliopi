@@ -808,7 +808,7 @@ export function genEval02(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
     { question: "Que doit-on vérifier lors du contrôle physique ?", options: ["Le prix du produit", "La quantité et l'état des marchandises", "Le nom du client", "La publicité"], answer: "B" },
     { question: "Que faut-il faire en cas de marchandise abîmée ?", options: ["Rien dire", "Refuser de travailler", "Faire des réserves sur le bon de livraison", "Vendre quand même"], answer: "C" },
     { question: "Pourquoi la traçabilité est-elle importante ?", options: ["Pour décorer les produits", "Pour suivre les marchandises", "Pour faire de la publicité", "Pour ralentir le travail"], answer: "B" },
-  ], s, f, si, o, 1);
+  ], s, f, si, o, 2);
 }
 
 // EVAL 3 – CAS PRATIQUE Réception
@@ -858,7 +858,7 @@ export function genEval05(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
     { question: "Quel équipement est obligatoire pour la sécurité ?", options: ["Téléphone", "EPI (équipements de protection individuelle)", "Ordinateur", "Stylo"], answer: "B" },
     { question: "Que signifie étiqueter un colis ?", options: ["Le peser", "Ajouter une information d'identification", "Le stocker", "Le déplacer"], answer: "B" },
     { question: "Où transfère-t-on les commandes préparées ?", options: ["Zone de stockage", "Zone d'expédition", "Bureau", "Quai de réception"], answer: "B" },
-  ], s, f, si, o, 1);
+  ], s, f, si, o, 5);
 }
 
 // EVAL 6 – EXERCICE Préparation de commandes
@@ -903,7 +903,7 @@ export function genEval08(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
     { question: "Le flux entrant correspond :", options: ["Aux expéditions", "Aux réceptions de marchandises", "Aux retours clients", "Aux inventaires"], answer: "B" },
     { question: "Le flux sortant correspond :", options: ["À la réception", "Au stockage", "À l'expédition des marchandises", "Au contrôle qualité"], answer: "C" },
     { question: "L'organisation des flux permet :", options: ["D'améliorer la circulation des marchandises", "De désorganiser l'entrepôt", "D'augmenter les erreurs", "De ralentir les préparations"], answer: "A" },
-  ], s, f, si, o, 1);
+  ], s, f, si, o, 8);
 }
 
 // EVAL 9 – CAS PRATIQUE Organisation des flux
@@ -947,7 +947,7 @@ export function genEval11(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
     { question: "Une sortie de stock correspond :", options: ["À une réception fournisseur", "À une entrée en stock", "À une expédition ou consommation", "À un inventaire"], answer: "C" },
     { question: "L'inventaire permet :", options: ["De supprimer les stocks", "De vérifier le stock réel", "D'augmenter les commandes", "De transporter les marchandises"], answer: "B" },
     { question: "La rupture de stock signifie :", options: ["Trop de stock", "Pas assez de commandes", "Absence de produit en stock", "Inventaire terminé"], answer: "C" },
-  ], s, f, si, o, 1);
+  ], s, f, si, o, 11);
 }
 
 // EVAL 12 – QCM Sécurité Conduite d'engins
@@ -959,7 +959,7 @@ export function genEval12(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
     { question: "En cas de charge instable, vous devez :", options: ["Continuer à rouler", "Accélérer", "Stabiliser la charge", "Ignorer le problème"], answer: "C" },
     { question: "La circulation dans un entrepôt doit :", options: ["Être libre sans règles", "Respecter un plan de circulation", "Être rapide uniquement", "Être désorganisée"], answer: "B" },
     { question: "En cas d'accident, vous devez :", options: ["Partir", "Ne rien dire", "Prévenir immédiatement", "Continuer à travailler"], answer: "C" },
-  ], s, f, si, o, 1);
+  ], s, f, si, o, 12);
 }
 
 // EVAL 13 – Mise en situation Communication
