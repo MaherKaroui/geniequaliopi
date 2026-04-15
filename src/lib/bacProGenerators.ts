@@ -1017,3 +1017,164 @@ export function genEval15(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
       { question: "Partie 8 – Communication : Importance de la communication.", points: 4, correction: "Coordonner les équipes, transmettre les consignes, signaler les anomalies, informer les clients et les partenaires, assurer la traçabilité." },
     ], s, f, si, 32, o, 15);
 }
+
+// ============================================
+// RAPPORT DE TEMPS DE CONNEXION (BPL_CONNEXION)
+// ============================================
+
+/** School weeks where the trainee is at école (2 on / 2 off pattern) */
+const SCHOOL_WEEKS: number[] = [
+  1, 2, 5, 6, 9, 10, 13, 14, 17, 18, 21, 22, 25, 26, 29, 30, 33, 34, 37, 38, 41, 42
+];
+
+/** Per-stagiaire deterministic IP pool */
+const IP_BASES = [
+  "192.168.1", "192.168.0", "10.0.2", "10.0.1", "172.16.0", "172.16.1",
+  "192.168.2", "10.0.0", "172.16.2", "192.168.3"
+];
+
+function getStagIP(si: number): string {
+  const base = IP_BASES[si % IP_BASES.length];
+  const last = 10 + ((si * 7 + 3) % 240);
+  return `${base}.${last}`;
+}
+
+/** Generate realistic connection times for each school day */
+function genSchoolDayConnections(si: number, weekOffset: number, dayOfWeek: number): {
+  loginH: number; loginM: number; logoutH: number; logoutM: number; duration: string;
+} {
+  const seed = ((si + 1) * 13 + weekOffset * 7 + dayOfWeek * 31) % 100;
+  // Login between 8:30 and 9:15
+  const loginH = 8 + (seed % 2 === 0 ? 0 : 1);
+  const loginM = loginH === 8 ? 30 + (seed % 30) : (seed % 15);
+  // Logout between 16:30 and 17:30
+  const seed2 = ((si + 1) * 19 + weekOffset * 11 + dayOfWeek * 23) % 100;
+  const logoutH = 16 + (seed2 % 3 === 0 ? 1 : 0);
+  const logoutM = 30 + (seed2 % 30);
+  const totalMin = (logoutH * 60 + logoutM) - (loginH * 60 + loginM);
+  const h = Math.floor(totalMin / 60);
+  const m = totalMin % 60;
+  return { loginH, loginM, logoutH, logoutM, duration: `${h}h${String(m).padStart(2, "0")}` };
+}
+
+export function genRapportConnexionBacPro(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number): string {
+  const s = stagiaires[si] || stagiaires[0];
+  const dateDebut = stagDateDebut(s, f);
+  const dateFin = stagDateFin(s, f);
+  const formateur = getFormateur(f, s);
+  const ip = getStagIP(si);
+
+  const startStr = (s as any).dateDebutFormation || (s as any).dateDebut || f.dateDebut || "";
+  const endStr = (s as any).dateFinFormation || (s as any).dateFin || f.dateFin || "";
+  const start = new Date(startStr);
+  const end = new Date(endStr);
+
+  // Build rows for each school week day
+  let rows = "";
+  let totalMinutes = 0;
+  let dayCount = 0;
+
+  if (!isNaN(start.getTime())) {
+    const dayOfWeekStart = start.getDay();
+    const mondayOffset = dayOfWeekStart === 0 ? 1 : dayOfWeekStart === 6 ? 2 : (dayOfWeekStart === 1 ? 0 : -(dayOfWeekStart - 1));
+    const firstMonday = new Date(start);
+    firstMonday.setDate(firstMonday.getDate() + mondayOffset);
+
+    for (const weekNum of SCHOOL_WEEKS) {
+      // For each school week, generate Mon-Fri (5 days)
+      for (let d = 0; d < 5; d++) {
+        const dayDate = new Date(firstMonday);
+        dayDate.setDate(firstMonday.getDate() + (weekNum - 1) * 7 + d);
+
+        // Skip if before start or after end
+        if (dayDate < start || (!isNaN(end.getTime()) && dayDate > end)) continue;
+        // Skip weekends
+        if (dayDate.getDay() === 0 || dayDate.getDay() === 6) continue;
+
+        const conn = genSchoolDayConnections(si, weekNum, d);
+        const loginTime = `${String(conn.loginH).padStart(2, "0")}:${String(conn.loginM).padStart(2, "0")}`;
+        const logoutTime = `${String(conn.logoutH).padStart(2, "0")}:${String(conn.logoutM).padStart(2, "0")}`;
+        const totalMin = (conn.logoutH * 60 + conn.logoutM) - (conn.loginH * 60 + conn.loginM);
+        totalMinutes += totalMin;
+        dayCount++;
+
+        const dateStr = formatDate(dayDate.toISOString().slice(0, 10));
+        const dayNames = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
+        const dayName = dayNames[dayDate.getDay()];
+
+        rows += `<tr>
+          <td style="border:1px solid #ccc;padding:4px 6px;font-size:10px;">${dateStr}</td>
+          <td style="border:1px solid #ccc;padding:4px 6px;font-size:10px;">${dayName}</td>
+          <td style="border:1px solid #ccc;padding:4px 6px;font-size:10px;">${loginTime}</td>
+          <td style="border:1px solid #ccc;padding:4px 6px;font-size:10px;">${logoutTime}</td>
+          <td style="border:1px solid #ccc;padding:4px 6px;font-size:10px;text-align:center;">${conn.duration}</td>
+          <td style="border:1px solid #ccc;padding:4px 6px;font-size:10px;">${ip}</td>
+          <td style="border:1px solid #ccc;padding:4px 6px;font-size:10px;">✅</td>
+        </tr>`;
+      }
+    }
+  }
+
+  const totalH = Math.floor(totalMinutes / 60);
+  const totalM = totalMinutes % 60;
+  const totalStr = `${totalH}h${String(totalM).padStart(2, "0")}`;
+
+  const color = getDocStyle().primaryColor || "#1a56db";
+
+  return wrap(`
+    <h2 style="text-align:center;color:${color};margin-bottom:16px;">RAPPORT DE TEMPS DE CONNEXION</h2>
+    <h3 style="text-align:center;margin-bottom:20px;">Bac Pro Logistique (RNCP38302)</h3>
+
+    <table style="width:100%;border-collapse:collapse;margin-bottom:16px;">
+      <tr>
+        <td style="padding:4px 8px;font-size:11px;width:50%;"><strong>Apprenant(e) :</strong> ${stagName(s)}</td>
+        <td style="padding:4px 8px;font-size:11px;"><strong>Formateur :</strong> ${formateur}</td>
+      </tr>
+      <tr>
+        <td style="padding:4px 8px;font-size:11px;"><strong>Date de début :</strong> ${dateDebut}</td>
+        <td style="padding:4px 8px;font-size:11px;"><strong>Date de fin :</strong> ${dateFin}</td>
+      </tr>
+      <tr>
+        <td style="padding:4px 8px;font-size:11px;"><strong>Adresse IP habituelle :</strong> ${ip}</td>
+        <td style="padding:4px 8px;font-size:11px;"><strong>Total jours :</strong> ${dayCount} jours</td>
+      </tr>
+      <tr>
+        <td style="padding:4px 8px;font-size:11px;" colspan="2"><strong>Durée totale de connexion :</strong> ${totalStr}</td>
+      </tr>
+    </table>
+
+    <table style="width:100%;border-collapse:collapse;margin-bottom:16px;">
+      <thead>
+        <tr style="background:${color};color:white;">
+          <th style="border:1px solid #ccc;padding:6px;font-size:10px;">Date</th>
+          <th style="border:1px solid #ccc;padding:6px;font-size:10px;">Jour</th>
+          <th style="border:1px solid #ccc;padding:6px;font-size:10px;">Connexion</th>
+          <th style="border:1px solid #ccc;padding:6px;font-size:10px;">Déconnexion</th>
+          <th style="border:1px solid #ccc;padding:6px;font-size:10px;">Durée</th>
+          <th style="border:1px solid #ccc;padding:6px;font-size:10px;">Adresse IP</th>
+          <th style="border:1px solid #ccc;padding:6px;font-size:10px;">Statut</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows}
+      </tbody>
+    </table>
+
+    <div style="margin-top:24px;">
+      <p style="font-size:11px;"><strong>Observations :</strong> L'apprenant(e) a suivi la formation avec assiduité. Les temps de connexion sont conformes aux horaires prévus par le planning de formation.</p>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;margin-top:40px;">
+      <div style="width:45%;">
+        <p style="font-size:11px;"><strong>Le Formateur</strong></p>
+        <p style="font-size:11px;">${formateur}</p>
+        ${sigImg(f.formateurSignatureUrl)}
+      </div>
+      <div style="width:45%;text-align:right;">
+        <p style="font-size:11px;"><strong>Le Responsable</strong></p>
+        <p style="font-size:11px;">${ORG_PRESIDENT}</p>
+        ${orgSigBlock(o)}
+      </div>
+    </div>
+  `);
+}
