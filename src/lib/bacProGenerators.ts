@@ -735,10 +735,11 @@ interface OpenQuestion {
   correction: string;
 }
 
-function genOpenEval(title: string, context: string, questions: OpenQuestion[], s: StagiaireInfo, f: FormationInfo, si: number, totalPoints: number, o?: OrganismeInfo): string {
+function genOpenEval(title: string, context: string, questions: OpenQuestion[], s: StagiaireInfo, f: FormationInfo, si: number, totalPoints: number, o?: OrganismeInfo, evalNum?: number): string {
   const dateDebut = stagDateDebut(s, f);
   const dateFin = stagDateFin(s, f);
   const formateur = getFormateur(f, s);
+  const dateEval = evalNum ? getEvalDate(evalNum, s, f) : dateFin;
   let totalScore = 0;
 
   const qHtml = questions.map((q, i) => {
@@ -761,7 +762,7 @@ function genOpenEval(title: string, context: string, questions: OpenQuestion[], 
     <p><strong>Formation :</strong> Bac Pro logistique<br/>
     <strong>Nom et prénom :</strong> ${stagName(s)}<br/>
     <strong>Session :</strong> du ${dateDebut} au ${dateFin}<br/>
-    <strong>Date :</strong> ${dateFin}<br/>
+    <strong>Date de l'évaluation :</strong> ${dateEval}<br/>
     <strong>Formateur(ce) :</strong> ${formateur}</p>
     ${context ? `<h3>Situation professionnelle</h3>${context}` : ""}
     ${qHtml}
