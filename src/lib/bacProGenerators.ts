@@ -673,10 +673,11 @@ interface QCMQuestion {
   answer: string;
 }
 
-function genQCMEval(title: string, questions: QCMQuestion[], s: StagiaireInfo, f: FormationInfo, si: number, o?: OrganismeInfo): string {
+function genQCMEval(title: string, questions: QCMQuestion[], s: StagiaireInfo, f: FormationInfo, si: number, o?: OrganismeInfo, evalNum?: number): string {
   const dateDebut = stagDateDebut(s, f);
   const dateFin = stagDateFin(s, f);
   const formateur = getFormateur(f, s);
+  const dateEval = evalNum ? getEvalDate(evalNum, s, f) : dateFin;
   const nbQ = questions.length;
   let totalScore = 0;
 
@@ -686,7 +687,6 @@ function genQCMEval(title: string, questions: QCMQuestion[], s: StagiaireInfo, f
     const letters = ["A", "B", "C", "D"];
     const correctIdx = letters.indexOf(q.answer);
     const stagAnswer = sc === 1 ? q.answer : letters[((correctIdx + 1 + si) % (q.options.length - 1)) + (((correctIdx + 1 + si) % (q.options.length - 1)) >= correctIdx ? 1 : 0)];
-    // Ensure wrong answer is never the correct one
     const safeAnswer = stagAnswer === q.answer ? letters[(correctIdx + 1) % q.options.length] : stagAnswer;
     return `<h3>Question ${i + 1}</h3>
       <p>${q.question}</p>
@@ -703,7 +703,7 @@ function genQCMEval(title: string, questions: QCMQuestion[], s: StagiaireInfo, f
     <p><strong>Formation :</strong> Bac Pro logistique<br/>
     <strong>Nom et prénom :</strong> ${stagName(s)}<br/>
     <strong>Session :</strong> du ${dateDebut} au ${dateFin}<br/>
-    <strong>Date :</strong> ${dateFin}<br/>
+    <strong>Date de l'évaluation :</strong> ${dateEval}<br/>
     <strong>Formateur(ce) :</strong> ${formateur}</p>
     ${qHtml}
     <h2 style="margin-top:20px">RÉSULTAT FINAL</h2>
