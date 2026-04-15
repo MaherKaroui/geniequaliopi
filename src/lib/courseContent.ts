@@ -260,6 +260,7 @@ import { getIAChapters } from "./courseContentIA";
 import { getWebmarketingChapters } from "./courseContentWebmarketing";
 import { getCRMChapters } from "./courseContentCRM";
 import { getMassagePrenatalChapters } from "./courseContentMassagePrenatal";
+import { getMassagePostpartumChapters } from "./courseContentMassagePostpartum";
 import { getECSRChapters } from "./courseContentECSR";
 import { getVTestChapters } from "./courseContentVTest";
 import { getCIPChapters } from "./courseContentCIP";
