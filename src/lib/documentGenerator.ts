@@ -2730,7 +2730,7 @@ function genGuideElearning(o: OrganismeInfo, f: FormationInfo) {
 
 function genCRReunion(o: OrganismeInfo, mois: string) {
   return buildDocument({ org: o, title: "COMPTE-RENDU RÉUNION PÉDAGOGIQUE", subtitle: mois, sections: [
-    { heading: "Participants", content: `<p>${o.responsablePedagogique} (resp. pédagogique), Philippe Martin, Catherine Dubois, Marie Fontaine, Jean-Pierre Blanc, Alexandre Petit</p>` },
+    { heading: "Participants", content: `<p>${o.responsablePedagogique||"Responsable pédagogique"} (resp. pédagogique), membres de l'équipe pédagogique</p>` },
     { heading: "Ordre du jour", content: "<p>1. Bilan des formations du mois<br>2. Retours stagiaires et points d'amélioration<br>3. Mise à jour des supports pédagogiques<br>4. Planification du mois suivant</p>" },
     { heading: "Décisions prises", content: "<p>• Mise à jour du module Excel (ajout Power Query)<br>• Création d'un nouveau support pour le module Management à distance<br>• Réorganisation des créneaux de formation anglais<br>• Acquisition de 3 licences logicielles supplémentaires</p>", variant: "green" },
     { heading: "Actions à mener", content: "<p>• Philippe Martin : mettre à jour les supports Excel avant le 15 du mois<br>• Catherine Dubois : préparer le nouveau test TOEIC blanc<br>• Alexandre Petit : installer les environnements virtuels pour la formation IT</p>" },
