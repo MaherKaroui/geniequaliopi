@@ -1,6 +1,24 @@
 import { OrganismeInfo, FormationInfo, StagiaireInfo, DocStyleConfig, DEFAULT_DOC_STYLE } from "@/types/qualiopi";
 import { getFormationDays } from "./sampleData";
 
+/** Return telephone string only if non-empty, otherwise "" */
+export function optTel(o: { telephone?: string }, prefix = "Tél : ", suffix = ""): string {
+  if (!o.telephone || !o.telephone.trim()) return "";
+  return `${prefix}${o.telephone}${suffix}`;
+}
+
+/** Return a table row for telephone only if non-empty */
+export function telRow(entity: { telephone?: string }, tdStyle: string, tdbStyle?: string): string {
+  if (!entity.telephone || !entity.telephone.trim()) return "";
+  return `<tr><td ${tdbStyle || tdStyle}>Téléphone</td><td ${tdStyle}>${entity.telephone}</td></tr>`;
+}
+
+/** Return telephone inline (e.g. "– 0612345678") only if non-empty */
+export function optTelInline(o: { telephone?: string }, before = " – ", after = ""): string {
+  if (!o.telephone || !o.telephone.trim()) return "";
+  return `${before}${o.telephone}${after}`;
+}
+
 /** Ensure a URL has a protocol prefix and return a clickable <a> tag */
 export function linkUrl(url: string | undefined | null, label?: string): string {
   if (!url || !url.trim()) return "";
@@ -390,7 +408,7 @@ export function orgHeader(org: OrganismeInfo, subtitle?: string): string {
       <div style="flex-shrink:0;text-align:right;font-size:${s.fontSize - 2}px;color:#666;line-height:1.8">
         <div>NDA : ${org.nda}</div>
         <div>SIRET : ${org.siret}</div>
-        <div>${org.telephone}</div>
+        ${org.telephone?.trim() ? `<div>${org.telephone}</div>` : ""}
       </div>
     </div>`;
   }

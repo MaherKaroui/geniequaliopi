@@ -239,7 +239,7 @@ export function genDossierStagiaire(o: OrganismeInfo, f: FormationInfo, stagiair
       <tr><td ${tdb}>Prénom</td><td ${td}>${s.prenom}</td></tr>
       <tr><td ${tdb}>Date de naissance</td><td ${td}>${s.dateNaissance?fmtDate(s.dateNaissance):"—"}</td></tr>
       <tr><td ${tdb}>Email</td><td ${td}>${s.email||"—"}</td></tr>
-      <tr><td ${tdb}>Téléphone</td><td ${td}>${s.telephone||"—"}</td></tr>
+      ${s.telephone?.trim() ? `<tr><td ${tdb}>Téléphone</td><td ${td}>${s.telephone}</td></tr>` : ""}
       <tr><td ${tdb}>Situation professionnelle</td><td ${td}>${s.poste||"Demandeur d'emploi"}</td></tr>
       <tr><td ${tdb}>Entreprise</td><td ${td}>${s.entreprise||"—"}</td></tr>
       <tr><td ${tdb}>NIR</td><td ${td}>${(s as any).nir||"—"}</td></tr>
@@ -676,7 +676,7 @@ export function genDevisEY(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
       <tr><td ${tdb} style="width:30%;">Civilité</td><td ${td}>${s.civilite||"—"}</td></tr>
       <tr><td ${tdb}>Nom Prénom</td><td ${td}>${s.prenom} ${s.nom}</td></tr>
       <tr><td ${tdb}>Email</td><td ${td}>${s.email||"—"}</td></tr>
-      <tr><td ${tdb}>Téléphone</td><td ${td}>${s.telephone||"—"}</td></tr>
+      ${s.telephone?.trim() ? `<tr><td ${tdb}>Téléphone</td><td ${td}>${s.telephone}</td></tr>` : ""}
     </table>` },
     { heading: "Prestation proposée", content: `<table style="width:100%;border-collapse:collapse;">
       <tr><td ${tdb} style="width:30%;">Intitulé</td><td ${td}>${f.intitule||"Formation"}</td></tr>
@@ -780,7 +780,7 @@ export function genCommunicationReport(o: OrganismeInfo, f: FormationInfo, stagi
       <p><strong>Motif du report :</strong> Réorganisation du planning pédagogique afin d'optimiser les conditions d'accueil.</p>
       <p>Ce report n'entraîne aucun changement sur les conditions financières de votre inscription. Votre place est maintenue.</p>
       <p>Si ces nouvelles dates ne vous conviennent pas, merci de nous contacter dans les plus brefs délais afin que nous puissions vous proposer une solution alternative.</p>
-      <p>Bien cordialement,<br/><strong>${o.responsablePedagogique||o.dirigeant||"L'équipe pédagogique"}</strong><br/>${o.nom||""}<br/>Tél : ${o.telephone||"—"} | Email : ${o.email||"—"}</p>
+      <p>Bien cordialement,<br/><strong>${o.responsablePedagogique||o.dirigeant||"L'équipe pédagogique"}</strong><br/>${o.nom||""}<br/>${o.telephone?.trim() ? `Tél : ${o.telephone} | ` : ""}Email : ${o.email||"—"}</p>
     </div>` },
     { heading: "Email type – Confirmation de reprogrammation", content: `<div style="border:1px solid #ddd;border-radius:8px;padding:16px;background:#fafafa;font-family:Arial,sans-serif;">
       <p style="margin:0 0 4px;font-size:0.85em;color:${sc()};">De : ${o.email||"contact@organisme.fr"}</p>
@@ -867,7 +867,7 @@ export function genPlaquettePresentation(o: OrganismeInfo, f: FormationInfo): st
     </ul>` },
     { heading: "Nous contacter", content: `<table style="width:100%;border-collapse:collapse;">
       <tr><td ${tdb} style="width:20%;">Adresse</td><td ${td}>${o.adresse?`${o.adresse}, ${o.codePostal} ${o.ville}`:o.ville||"—"}</td></tr>
-      <tr><td ${tdb}>Téléphone</td><td ${td}>${o.telephone||"—"}</td></tr>
+      ${o.telephone?.trim() ? `<tr><td ${tdb}>Téléphone</td><td ${td}>${o.telephone}</td></tr>` : ""}
       <tr><td ${tdb}>Email</td><td ${td}>${o.email||"—"}</td></tr>
       ${o.siteWeb?`<tr><td ${tdb}>Site web</td><td ${td}>${linkUrl(o.siteWeb)}</td></tr>`:""}
       <tr><td ${tdb}>Référent handicap</td><td ${td}>${o.referentHandicap||o.responsablePedagogique||"—"}</td></tr>
@@ -1264,7 +1264,7 @@ export function genProcessusAnalyseDemandes(o: OrganismeInfo, f: FormationInfo):
       <tr><td ${tdb}>Référent handicap</td><td ${td}>${o.referentHandicap||o.responsablePedagogique||"—"}</td></tr>
       <tr><td ${tdb}>Référent qualité</td><td ${td}>${o.referentQualite||o.responsablePedagogique||"—"}</td></tr>
       <tr><td ${tdb}>Email</td><td ${td}>${o.email||"—"}</td></tr>
-      <tr><td ${tdb}>Téléphone</td><td ${td}>${o.telephone||"—"}</td></tr>
+      ${o.telephone?.trim() ? `<tr><td ${tdb}>Téléphone</td><td ${td}>${o.telephone}</td></tr>` : ""}
     </table>` },
   ]});
 }
@@ -1560,7 +1560,7 @@ export function genAdaptationsHandicapEY(o: OrganismeInfo, f: FormationInfo): st
   let rows = adaptationsSpecifiques.map(a => `<tr><td ${td}>${a.handicap}</td><td ${td}>${a.adaptation}</td><td ${td}>${a.materiel}</td></tr>`).join("");
 
   return buildDocument({ org: o, formation: f, title: "ORDRE TECHNIQUE – ADAPTATIONS POUR PERSONNES EN SITUATION DE HANDICAP", subtitle: `Code 17 – ${f.intitule||"Formation"} – ${o.nom||"Organisme"}`, sections: [
-    { heading: "1. Engagement et politique d'accessibilité", content: `<p><strong>${o.nom||"L'organisme"}</strong> s'engage à favoriser l'accès à la formation pour toute personne en situation de handicap, conformément à la loi du 11 février 2005 pour l'égalité des droits et des chances.</p><p><strong>Référent handicap :</strong> ${o.referentHandicap||o.responsablePedagogique||"Le responsable pédagogique"}<br/><strong>Contact :</strong> ${o.email||"—"} | ${o.telephone||"—"}</p>` },
+    { heading: "1. Engagement et politique d'accessibilité", content: `<p><strong>${o.nom||"L'organisme"}</strong> s'engage à favoriser l'accès à la formation pour toute personne en situation de handicap, conformément à la loi du 11 février 2005 pour l'égalité des droits et des chances.</p><p><strong>Référent handicap :</strong> ${o.referentHandicap||o.responsablePedagogique||"Le responsable pédagogique"}<br/><strong>Contact :</strong> ${o.email||"—"}${o.telephone?.trim() ? ` | ${o.telephone}` : ""}</p>` },
     { heading: "2. Accessibilité des locaux", content: `<table style="width:100%;border-collapse:collapse;">
       <tr><td ${tdb} style="width:40%;">Adresse</td><td ${td}>${o.adresse||"—"}, ${o.codePostal||""} ${o.ville||""}</td></tr>
       <tr><td ${tdb}>Accès PMR</td><td ${td}>Conforme – Accès de plain-pied ou rampe d'accès (pente < 5%)</td></tr>
@@ -2133,7 +2133,7 @@ export function genEvaluationDesBesoinsEY(o: OrganismeInfo, f: FormationInfo, st
       <tr><td ${tdb}>Nom</td><td ${td}>${s.nom}</td></tr>
       <tr><td ${tdb}>Prénom</td><td ${td}>${s.prenom}</td></tr>
       <tr><td ${tdb}>Email</td><td ${td}>${s.email||"—"}</td></tr>
-      <tr><td ${tdb}>Téléphone</td><td ${td}>${s.telephone||"—"}</td></tr>
+      ${s.telephone?.trim() ? `<tr><td ${tdb}>Téléphone</td><td ${td}>${s.telephone}</td></tr>` : ""}
       <tr><td ${tdb}>Formation suivie</td><td ${td}>${intitule}</td></tr>
       <tr><td ${tdb}>Session</td><td ${td}>${fmtDate(deb)} au ${fmtDate(fin)}</td></tr>
       <tr><td ${tdb}>Durée</td><td ${td}>${duree} – ${modalite}</td></tr>

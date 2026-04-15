@@ -274,7 +274,7 @@ export function genContratBacPro(o: OrganismeInfo, f: FormationInfo, stagiaires:
     <p><strong>Nom du stagiaire :</strong> ${stagName(s)}<br/>
     <strong>Date de naissance :</strong> ${formatDate(s.dateNaissance || "") || "N/A"}<br/>
     <strong>Adresse :</strong> ${s.adresse || "N/A"}<br/>
-    <strong>Téléphone :</strong> ${s.telephone || "N/A"}<br/>
+    ${s.telephone?.trim() ? `<strong>Téléphone :</strong> ${s.telephone}<br/>` : ""}
     <strong>E-mail :</strong> ${s.email || "N/A"}<br/>
     Ci-après dénommé "le Stagiaire",</p>
 

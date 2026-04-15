@@ -28,7 +28,7 @@ export function genDevis(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiai
 export function genContratFormationParticulier(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const s = stagiaires[0] || { prenom: "___", nom: "___", email: "", telephone: "" };
   return buildDocument({ org: o, title: "CONTRAT DE FORMATION PROFESSIONNELLE", subtitle: "Article L.6353-3 du Code du travail – Particulier", formation: f, showFormationInfo: true, stagiaires, sections: [
-    { heading: "Entre les parties", content: `<p><strong>L'organisme de formation :</strong> ${o.nom}, ${o.adresse}, ${o.codePostal} ${o.ville}<br>SIRET : ${o.siret} – NDA : ${o.nda}<br>Représenté par : ${o.dirigeant}</p><p><strong>Et le stagiaire :</strong> ${s.prenom} ${s.nom}<br>Email : ${s.email}<br>Téléphone : ${s.telephone}</p>` },
+    { heading: "Entre les parties", content: `<p><strong>L'organisme de formation :</strong> ${o.nom}, ${o.adresse}, ${o.codePostal} ${o.ville}<br>SIRET : ${o.siret} – NDA : ${o.nda}<br>Représenté par : ${o.dirigeant}</p><p><strong>Et le stagiaire :</strong> ${s.prenom} ${s.nom}<br>Email : ${s.email}${s.telephone?.trim() ? `${s.telephone?.trim() ? `<br>Téléphone : ${s.telephone}` : ""}` : ""}</p>` },
     { heading: "Article 1 – Objet du contrat", content: `<p>Le présent contrat a pour objet la réalisation de l'action de formation « ${f.intitule} » selon le programme annexé.</p>` },
     { heading: "Article 2 – Nature et caractéristiques", content: `<p><strong>Intitulé :</strong> ${f.intitule}<br><strong>Objectifs :</strong> ${f.objectifs}<br><strong>Durée :</strong> ${f.duree}<br><strong>Dates :</strong> Du ${formatDate(getStagiaireDateDebut(s as StagiaireInfo, f))} au ${formatDate(getStagiaireDateFin(s as StagiaireInfo, f))}<br><strong>Modalité :</strong> ${f.modalites}<br><strong>Lieu :</strong> ${f.lieu}</p>` },
     { heading: "Article 3 – Prix et conditions de paiement", content: `<p>Le prix de la formation est fixé à ${f.tarif}.<br>TVA non applicable (art. 261-4-4° du CGI).<br>Le règlement s'effectue à la signature ou en 3 mensualités.</p>` },
@@ -688,7 +688,7 @@ export function genPreuveAdaptationPublic(o: OrganismeInfo, f: FormationInfo) {
 
 export function genPreuveAccessibiliteHandicap(o: OrganismeInfo) {
   return buildDocument({ org: o, title: "PREUVE D'ACCESSIBILITÉ HANDICAP", sections: [
-    { heading: "Référent handicap", content: `<p>${o.referentHandicap}<br>Contact : ${o.email} – ${o.telephone}</p>` },
+    { heading: "Référent handicap", content: `<p>${o.referentHandicap}<br>Contact : ${o.email}${o.telephone?.trim() ? ` ${o.telephone?.trim() ? `– ${o.telephone}` : ""}` : ""}</p>` },
     { heading: "Aménagements disponibles", content: "<p>• Locaux accessibles PMR (ascenseur, rampes, toilettes adaptées)<br>• Supports en police agrandie ou contrastée<br>• Temps supplémentaire pour les évaluations (+1/3)<br>• Interprète LSF sur demande<br>• Adaptation des contenus et rythmes pédagogiques<br>• Matériel adapté (souris ergonomique, écran agrandi)</p>", variant: "green" },
     { heading: "Partenaires mobilisés", content: "<p>• Agefiph<br>• Cap Emploi<br>• MDPH<br>• Ressource Handicap Formation (RHF)<br>• FIPHFP</p>" },
     { heading: "Historique des aménagements", content: "<p>• 2024 : 4 stagiaires accueillis en situation de handicap<br>• 100% des aménagements mis en place avec succès<br>• Satisfaction des stagiaires concernés : 5/5</p>" },
