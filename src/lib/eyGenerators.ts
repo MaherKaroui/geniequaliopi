@@ -171,62 +171,98 @@ export function genObjectifsMethodesSequence(o: OrganismeInfo, f: FormationInfo)
   ]});
 }
 
-/* ═══ CODE 11 – Dossier stagiaire ═══ */
+/** Appreciation domain-specific – inspired by Academy djika */
+function getDomainAppreciation(domain: FormationDomain, si: number, note: number): { intro: string; points: string[]; lacunes: string[]; conclusion: string } {
+  if (domain === "esthetique") {
+    const intros = [
+      `La stagiaire présente un bon niveau initial. Les bases professionnelles sont globalement acquises, notamment en hygiène, relation client et organisation du poste de travail.`,
+      `Le test de positionnement met en évidence un niveau initial intermédiaire. La stagiaire possède certaines bases, notamment en hygiène et relation client.`,
+      `La stagiaire démontre un niveau débutant motivé. Aucune expérience préalable dans le domaine de l'extension de cils mais une forte motivation et une compréhension rapide des consignes.`,
+      `Le positionnement initial révèle un bon socle de compétences. La stagiaire a déjà pratiqué des soins esthétiques de base et montre une réelle aptitude pour le travail de précision.`,
+    ];
+    const pointsSets = [
+      ["Une bonne compréhension des exigences du métier", "Des connaissances en hygiène et sécurité au poste de travail", "Une capacité d'écoute et de relation client satisfaisante", "Une motivation forte pour la formation et l'obtention de la certification"],
+      ["Des connaissances générales en hygiène", "Une compréhension partielle de la relation client", "Une bonne dextérité manuelle", "Un intérêt marqué pour les techniques de pose"],
+      ["Une excellente motivation et assiduité", "Un sens du détail et de la précision", "De bonnes dispositions pour l'apprentissage gestuel", "Une communication claire et professionnelle avec les modèles"],
+      ["Des notions solides en morphologie du visage", "Une bonne maîtrise de l'hygiène au poste de travail", "Un sens artistique développé", "Une capacité d'adaptation aux différentes demandes clients"],
+    ];
+    const lacunesSets = [
+      ["Les techniques spécifiques d'isolation et de pose restent à acquérir", "Le vocabulaire professionnel lié aux extensions (courbure, diamètre, effet) nécessite un approfondissement"],
+      ["Les protocoles de pose cil à cil ne sont pas encore maîtrisés", "La connaissance des contre-indications médicales est insuffisante", "Le rythme de travail doit être accéléré pour atteindre la cadence professionnelle"],
+      ["L'ensemble des compétences techniques est à construire", "Les protocoles d'hygiène spécifiques aux extensions doivent être formalisés"],
+      ["Les techniques de volume russe restent à perfectionner", "La gestion du temps sur un rendez-vous complet est à améliorer"],
+    ];
+    return { intro: intros[si % intros.length], points: pointsSets[si % pointsSets.length], lacunes: lacunesSets[si % lacunesSets.length], conclusion: note >= 16 ? "Le parcours sera orienté vers un approfondissement des techniques avancées (volume russe, mégavolume) et la préparation à la certification." : "Un accompagnement renforcé sera mis en place sur les fondamentaux techniques avec des exercices supplémentaires sur mannequin avant passage sur modèle vivant." };
+  }
+  if (domain === "socio_esthetique") {
+    return { intro: `La stagiaire présente ${note>=16?"un bon":"un"} niveau initial avec des acquis en esthétique classique. L'approche spécifique aux publics fragilisés reste à développer.`,
+      points: ["Connaissances solides en soins esthétiques de base", "Sensibilité naturelle pour l'accompagnement des personnes vulnérables", "Bonne posture relationnelle et capacité d'écoute", "Motivation pour le secteur médico-social"],
+      lacunes: ["Les protocoles de soins adaptés aux peaux fragilisées par les traitements sont à acquérir", "La relation d'aide en contexte de souffrance psychologique nécessite un cadrage professionnel"],
+      conclusion: "Le parcours complet RS5992 permettra d'acquérir l'ensemble des compétences C1 à C11 du référentiel." };
+  }
+  if (domain === "informatique") {
+    return { intro: `Le test de positionnement révèle un niveau ${note>=16?"intermédiaire solide":"débutant avec des bases"} en environnement numérique.`,
+      points: ["Maîtrise correcte de l'outil informatique", "Capacité d'apprentissage autonome en ligne", "Logique de résolution de problèmes"],
+      lacunes: ["Les compétences techniques spécifiques au programme restent à acquérir", "La méthodologie de travail projet est à structurer"],
+      conclusion: "Le parcours sera adapté au niveau initial avec des exercices de difficulté progressive." };
+  }
+  return { intro: `Le positionnement met en évidence un niveau ${note>=16?"satisfaisant":"initial à consolider"}.`,
+    points: ["Bonne compréhension des objectifs de la formation", "Motivation et implication satisfaisantes", "Capacité d'écoute et de travail en groupe"],
+    lacunes: ["Les compétences métier spécifiques sont à développer tout au long du parcours"],
+    conclusion: "Le plan de formation sera ajusté en fonction des acquis et des besoins identifiés." };
+}
+
+/* ═══ CODE 11 – Dossier stagiaire (enrichi Academy djika) ═══ */
 export function genDossierStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number): string {
   const s = stagiaires[si] || stagiaires[0];
   if (!s) return "";
+  const domain = detectDomain(f);
+  const notePositionnement = 14 + (si % 7); // 14-20
+  const appr = getDomainAppreciation(domain, si, notePositionnement);
+
   const niveaux = ["Débutant – Aucune expérience dans le domaine", "Intermédiaire – Bases acquises, souhaite se perfectionner", "Faux-débutant – Quelques notions, pratique occasionnelle", "Confirmé – Expérience professionnelle, besoin de certification"];
   const adaptations = ["Renforcement des bases théoriques avant les mises en pratique", "Approfondissement des techniques avancées et cas complexes", "Accompagnement personnalisé sur les points de fragilité identifiés", "Focus sur la préparation à la certification et les épreuves"];
-  return buildDocument({ org: o, formation: f, title: `Dossier stagiaire – ${s.prenom} ${s.nom}`, sections: [
-    { heading: "1. Informations personnelles", content: `<table style="width:100%;border-collapse:collapse;">
+
+  return buildDocument({ org: o, formation: f, title: `DESCRIPTION DES STAGIAIRES – TEST DE POSITIONNEMENT DÉBUT`, subtitle: `${s.civilite||""} ${s.prenom} ${s.nom}`, sections: [
+    { heading: "Formation", content: `<p><strong>${f.intitule||"Formation"}</strong></p><p>Organisme : ${o.nom||"—"}<br/>Modalité : ${f.modalites||"Présentiel"}</p>` },
+    { heading: `STAGIAIRE : ${s.nom?.toUpperCase()} ${s.prenom}`, content: `<p><strong>Session :</strong> Du <strong>${fmtDate(getStagiaireDateDebut(s,f))}</strong> au <strong>${fmtDate(getStagiaireDateFin(s,f))}</strong></p>
+    <p><strong>Test de positionnement (début)</strong></p>
+    <ul><li>Date : <strong>${fmtDate(getStagiaireDateDebut(s,f))}</strong></li><li>Note : <strong>${notePositionnement} / 20</strong></li></ul>` },
+    { heading: "Appréciation", content: `<p>${appr.intro}</p>
+    <p>${s.civilite==="Mme"?"Elle":"Il"} démontre :</p>
+    <ul>${appr.points.map(p=>`<li>${p}</li>`).join("")}</ul>
+    ${appr.lacunes.length>0?`<p>Cependant, des ${appr.lacunes.length>1?"lacunes":"points d'amélioration"} ${appr.lacunes.length>1?"sont identifiées":"est identifié"} :</p><ul>${appr.lacunes.map(l=>`<li>${l}</li>`).join("")}</ul>`:""}
+    <p><strong>Conclusion :</strong> ${appr.conclusion}</p>` },
+    { heading: "Informations personnelles", content: `<table style="width:100%;border-collapse:collapse;">
       <tr><td ${tdb} style="width:35%;">Civilité</td><td ${td}>${s.civilite||"—"}</td></tr>
       <tr><td ${tdb}>Nom</td><td ${td}>${s.nom}</td></tr>
       <tr><td ${tdb}>Prénom</td><td ${td}>${s.prenom}</td></tr>
       <tr><td ${tdb}>Date de naissance</td><td ${td}>${s.dateNaissance?fmtDate(s.dateNaissance):"—"}</td></tr>
-      <tr><td ${tdb}>Lieu de naissance</td><td ${td}>${(s as any).villeNaissance||"—"}</td></tr>
-      <tr><td ${tdb}>Nationalité</td><td ${td}>${(s as any).nationalite||"Française"}</td></tr>
-      <tr><td ${tdb}>Adresse</td><td ${td}>${(s as any).adresse||"—"}</td></tr>
       <tr><td ${tdb}>Email</td><td ${td}>${s.email||"—"}</td></tr>
       <tr><td ${tdb}>Téléphone</td><td ${td}>${s.telephone||"—"}</td></tr>
-      <tr><td ${tdb}>NIR (N° Sécurité Sociale)</td><td ${td}>${(s as any).nir||"—"}</td></tr>
       <tr><td ${tdb}>Situation professionnelle</td><td ${td}>${s.poste||"Demandeur d'emploi"}</td></tr>
       <tr><td ${tdb}>Entreprise</td><td ${td}>${s.entreprise||"—"}</td></tr>
-      <tr><td ${tdb}>Niveau de diplôme</td><td ${td}>${(s as any).niveauDiplome||"—"}</td></tr>
-      <tr><td ${tdb}>Situation de handicap (RQTH)</td><td ${td}>${(s as any).rqth?"Oui":"Non"}</td></tr>
+      <tr><td ${tdb}>NIR</td><td ${td}>${(s as any).nir||"—"}</td></tr>
+      <tr><td ${tdb}>RQTH</td><td ${td}>${(s as any).rqth?"Oui":"Non"}</td></tr>
     </table>` },
-    { heading: "2. Formation suivie", content: `<table style="width:100%;border-collapse:collapse;">
-      <tr><td ${tdb} style="width:35%;">Intitulé</td><td ${td}>${f.intitule||"—"}</td></tr>
-      <tr><td ${tdb}>Code certification</td><td ${td}>${f.codeRNCP||"—"}</td></tr>
-      <tr><td ${tdb}>Dates</td><td ${td}>Du ${fmtDate(getStagiaireDateDebut(s,f))} au ${fmtDate(getStagiaireDateFin(s,f))}</td></tr>
-      <tr><td ${tdb}>Durée</td><td ${td}>${getStagiaireDuree(s,f)}</td></tr>
-      <tr><td ${tdb}>Modalités</td><td ${td}>${f.modalites||"Présentiel"}</td></tr>
-      <tr><td ${tdb}>Lieu</td><td ${td}>${f.lieu||o.ville||"—"}</td></tr>
-      <tr><td ${tdb}>Formateur référent</td><td ${td}>${f.formateur||SAMPLE_FORMATEURS[0].prenom+" "+SAMPLE_FORMATEURS[0].nom}</td></tr>
-      <tr><td ${tdb}>N° Action EDOF</td><td ${td}>${(s as any).numeroAction||"—"}</td></tr>
-      <tr><td ${tdb}>Montant pris en charge</td><td ${td}>${getStagiaireTarif(s,f)}</td></tr>
-    </table>` },
-    { heading: "3. Résultat du positionnement amont", content: `<p>Un entretien de positionnement individuel a été réalisé le <strong>${fmtDate(getStagiaireDateDebut(s,f))}</strong> (en amont du démarrage effectif de la formation).</p>
-    <table style="width:100%;border-collapse:collapse;">
+    { heading: "Résultat du positionnement", content: `<table style="width:100%;border-collapse:collapse;">
       <tr><td ${tdb} style="width:35%;">Niveau initial évalué</td><td ${td}>${niveaux[si%niveaux.length]}</td></tr>
       <tr><td ${tdb}>Projet professionnel</td><td ${td}>${si%2===0?"Reconversion professionnelle dans le secteur":"Montée en compétences pour certification"}</td></tr>
       <tr><td ${tdb}>Motivations exprimées</td><td ${td}>${si%3===0?"Passion pour le domaine, désir de professionnalisation":"Évolution de carrière, obtention d'une certification reconnue"}</td></tr>
       <tr><td ${tdb}>Adaptations prévues</td><td ${td}>${adaptations[si%adaptations.length]}</td></tr>
-      <tr><td ${tdb}>Freins identifiés</td><td ${td}>${si%4===0?"Aucun frein majeur identifié":si%4===1?"Contraintes horaires (emploi en parallèle)":si%4===2?"Appréhension sur les épreuves pratiques":"Besoin de soutien sur la partie théorique"}</td></tr>
     </table>` },
-    { heading: "4. Suivi pédagogique", content: `<table style="width:100%;border-collapse:collapse;">
+    { heading: "Suivi pédagogique", content: `<table style="width:100%;border-collapse:collapse;">
       <tr><td ${tdb} style="width:35%;">Assiduité</td><td ${td}>${90+(si%10)}% – ${si%3===0?"Aucune absence":"1 absence justifiée"}</td></tr>
       <tr><td ${tdb}>Participation</td><td ${td}>${si%3===0?"Très active – Pose des questions pertinentes":si%3===1?"Active – Bonne implication":"Satisfaisante – Progression régulière"}</td></tr>
-      <tr><td ${tdb}>Point d'étape mi-parcours</td><td ${td}>Réalisé – ${si%2===0?"En bonne voie, objectifs atteints à 60%":"Progression encourageante, axes d'amélioration identifiés"}</td></tr>
       <tr><td ${tdb}>Résultat évaluation finale</td><td ${td}>${15+si%6}/20 – ${si%2===0?"Acquis":"Acquis avec mention"}</td></tr>
     </table>` },
-    { heading: "5. Pièces constitutives du dossier", content: `<ul>
+    { heading: "Pièces constitutives du dossier", content: `<ul>
       <li>✓ Copie de la pièce d'identité</li>
       <li>✓ Test de positionnement initial rempli et signé</li>
       <li>✓ Contrat de formation professionnelle signé</li>
       <li>✓ Convocation à la formation</li>
       <li>✓ Règlement intérieur signé</li>
-      <li>✓ Feuilles d'émargement signées (toutes les journées)</li>
-      <li>✓ Évaluation initiale de positionnement</li>
+      <li>✓ Feuilles d'émargement signées</li>
       <li>✓ Évaluations formatives intermédiaires</li>
       <li>✓ Évaluation finale / Test de fin de formation</li>
       <li>✓ Grille d'acquisition des compétences</li>
@@ -1342,5 +1378,254 @@ export function genQuestionnaireSatisfactionEY(o: OrganismeInfo, f: FormationInf
       <td style="width:50%;padding:16px;"><p>Date : ${fmtDate((s as StagiaireInfo).dateFinFormation || f.dateFin)}</p><p style="margin-top:30px;">Signature du stagiaire :</p><br/><br/></td>
       <td style="width:50%;padding:16px;"><p>Date : ${fmtDate((s as StagiaireInfo).dateFinFormation || f.dateFin)}</p><p style="margin-top:30px;">Visa du formateur :</p><br/><br/></td>
     </tr></table>` },
+  ]});
+}
+
+/* ═══ CODE 17 – Adaptations pour personnes en situation de handicap (EY) ═══ */
+export function genAdaptationsHandicapEY(o: OrganismeInfo, f: FormationInfo): string {
+  const domain = detectDomain(f);
+  const esth = domain === "esthetique" || domain === "socio_esthetique";
+  const yr = new Date().getFullYear();
+
+  const adaptationsSpecifiques = esth ? [
+    { handicap: "Handicap moteur – mobilité réduite (fauteuil roulant)", adaptation: "Table de soins réglable en hauteur accessible ; poste de travail adapté à hauteur variable ; miroirs orientables sur bras articulé", materiel: "Table Nush Premium (réglage électrique) + tabouret réglable + repose-bras" },
+    { handicap: "Handicap visuel – malvoyance", adaptation: "Loupe éclairante LED grossissement x15 ; supports de cours en grands caractères (police 18pt) ; éclairage renforcé au poste de travail (500 lux min.)", materiel: "Lampe loupe Daylight D25050 + supports agrandis + éclairage d'appoint" },
+    { handicap: "Handicap auditif – surdité partielle", adaptation: "Place au premier rang face au formateur ; supports visuels renforcés (démonstrations filmées projetées) ; consignes écrites systématiques", materiel: "Écran supplémentaire pour projection des gestes + fiches consignes illustrées" },
+    { handicap: "Troubles musculosquelettiques (TMS)", adaptation: "Pauses adaptées toutes les 45 min ; alternance posture debout/assise ; aménagement des durées de pratique", materiel: "Tabouret ergonomique réglable + repose-pieds + coussin lombaire" },
+    { handicap: "Troubles psychiques / anxiété", adaptation: "Entretien préalable avec le référent handicap ; rythme de progression adapté ; possibilité de pauses supplémentaires ; environnement bienveillant garanti", materiel: "Espace calme disponible + accompagnement individualisé renforcé" },
+  ] : [
+    { handicap: "Handicap moteur – mobilité réduite", adaptation: "Accès de plain-pied, poste de travail à hauteur ajustable, parking réservé", materiel: "Mobilier adapté, ascenseur si nécessaire" },
+    { handicap: "Handicap visuel", adaptation: "Supports en grands caractères, logiciel de grossissement, éclairage renforcé", materiel: "Écran 27\", logiciel ZoomText, lampe de bureau" },
+    { handicap: "Handicap auditif", adaptation: "Place privilégiée, supports visuels renforcés, sous-titrage des vidéos", materiel: "Boucle magnétique si disponible, consignes écrites" },
+    { handicap: "Troubles de l'apprentissage (DYS)", adaptation: "Supports adaptés (police OpenDyslexic), temps supplémentaire aux évaluations", materiel: "Documents reformatés, 1/3 temps supplémentaire" },
+    { handicap: "Troubles psychiques", adaptation: "Entretien préalable, rythme adapté, accompagnement individualisé", materiel: "Espace de repos disponible" },
+  ];
+
+  let rows = adaptationsSpecifiques.map(a => `<tr><td ${td}>${a.handicap}</td><td ${td}>${a.adaptation}</td><td ${td}>${a.materiel}</td></tr>`).join("");
+
+  return buildDocument({ org: o, formation: f, title: "ORDRE TECHNIQUE – ADAPTATIONS POUR PERSONNES EN SITUATION DE HANDICAP", subtitle: `Code 17 – ${f.intitule||"Formation"} – ${o.nom||"Organisme"}`, sections: [
+    { heading: "1. Engagement et politique d'accessibilité", content: `<p><strong>${o.nom||"L'organisme"}</strong> s'engage à favoriser l'accès à la formation pour toute personne en situation de handicap, conformément à la loi du 11 février 2005 pour l'égalité des droits et des chances.</p><p><strong>Référent handicap :</strong> ${o.referentHandicap||o.responsablePedagogique||"Le responsable pédagogique"}<br/><strong>Contact :</strong> ${o.email||"—"} | ${o.telephone||"—"}</p>` },
+    { heading: "2. Accessibilité des locaux", content: `<table style="width:100%;border-collapse:collapse;">
+      <tr><td ${tdb} style="width:40%;">Adresse</td><td ${td}>${o.adresse||"—"}, ${o.codePostal||""} ${o.ville||""}</td></tr>
+      <tr><td ${tdb}>Accès PMR</td><td ${td}>Conforme – Accès de plain-pied ou rampe d'accès (pente < 5%)</td></tr>
+      <tr><td ${tdb}>Toilettes adaptées</td><td ${td}>Oui – Aux normes PMR</td></tr>
+      <tr><td ${tdb}>Signalétique</td><td ${td}>Panneaux en braille et pictogrammes</td></tr>
+      <tr><td ${tdb}>Parking</td><td ${td}>1 place réservée PMR à proximité immédiate</td></tr>
+      <tr><td ${tdb}>Ascenseur</td><td ${td}>Disponible si étage</td></tr>
+      <tr><td ${tdb}>Conformité ERP</td><td ${td}>ERP 5ème catégorie – Dernière commission : ${yr-1}</td></tr>
+    </table>` },
+    { heading: "3. Adaptations pédagogiques et matérielles par type de handicap", content: `<table style="width:100%;border-collapse:collapse;font-size:0.88em;"><thead><tr style="background:${pc()};color:#fff;"><th style="padding:8px;border:1px solid #ddd;">Type de handicap</th><th style="padding:8px;border:1px solid #ddd;">Adaptations mises en place</th><th style="padding:8px;border:1px solid #ddd;">Matériel dédié</th></tr></thead><tbody>${rows}</tbody></table>` },
+    { heading: "4. Processus d'accueil PSH", content: `<ol>
+      <li><strong>Identification :</strong> Lors de l'entretien de positionnement, le référent handicap recueille les besoins spécifiques</li>
+      <li><strong>Analyse :</strong> Évaluation des aménagements nécessaires en concertation avec le stagiaire et si besoin, un ergothérapeute ou l'AGEFIPH</li>
+      <li><strong>Mise en œuvre :</strong> Installation des adaptations <strong>avant le premier jour de formation</strong></li>
+      <li><strong>Suivi :</strong> Point de suivi à J+3, puis hebdomadaire, pour vérifier l'adéquation des aménagements</li>
+      <li><strong>Ajustement :</strong> Modification si nécessaire en cours de formation</li>
+    </ol>` },
+    { heading: "5. Partenaires", content: `<table style="width:100%;border-collapse:collapse;">
+      <tr><td ${tdb}>AGEFIPH</td><td ${td}>Accompagnement et financement d'aménagements pour les travailleurs handicapés</td></tr>
+      <tr><td ${tdb}>Cap Emploi</td><td ${td}>Orientation et conseil en insertion professionnelle</td></tr>
+      <tr><td ${tdb}>MDPH</td><td ${td}>Reconnaissance du handicap et droits associés</td></tr>
+      <tr><td ${tdb}>Ressource Handicap Formation</td><td ${td}>Appui technique pour l'adaptation des parcours</td></tr>
+    </table>` },
+  ]});
+}
+
+/* ═══ CODE 19 – Outils de suivi de la progression (EY) ═══ */
+export function genOutilsSuiviProgressionEY(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number): string {
+  const s = stagiaires[si] || stagiaires[0];
+  if (!s) return "";
+  const domain = detectDomain(f);
+  const esth = domain === "esthetique";
+  const socio = domain === "socio_esthetique";
+  const days = getFormationDays(f);
+  const nbJours = days.length || 5;
+
+  const competences = esth ? [
+    { comp: "Accueil client et diagnostic morphologique", j1: "EC", j2: "A", j3: "A", jFin: "A" },
+    { comp: "Hygiène et sécurité au poste de travail", j1: "A", j2: "A", j3: "A", jFin: "A" },
+    { comp: "Technique de pose classique cil à cil", j1: "NA", j2: "EC", j3: "A", jFin: "A" },
+    { comp: "Isolation du cil naturel", j1: "NA", j2: "EC", j3: "EC", jFin: "A" },
+    { comp: "Technique Volume Russe (2D-6D)", j1: "NA", j2: "NA", j3: "EC", jFin: "A" },
+    { comp: "Rehaussement de cils (lotions, timing)", j1: "NA", j2: "NA", j3: "EC", jFin: "A" },
+    { comp: "Retrait et remplissage (retouche)", j1: "NA", j2: "NA", j3: "EC", jFin: "A" },
+    { comp: "Conseil client et vente additionnelle", j1: "EC", j2: "EC", j3: "A", jFin: "A" },
+    { comp: "Passage certification / épreuve pratique", j1: "—", j2: "—", j3: "—", jFin: "A" },
+  ] : socio ? [
+    { comp: "Diagnostic socio-esthétique (C1-C2)", j1: "EC", j2: "A", j3: "A", jFin: "A" },
+    { comp: "Relation d'aide et posture (C3)", j1: "EC", j2: "EC", j3: "A", jFin: "A" },
+    { comp: "Soins du visage adaptés (C4-C5)", j1: "NA", j2: "EC", j3: "A", jFin: "A" },
+    { comp: "Massages de bien-être (C6-C7)", j1: "NA", j2: "EC", j3: "EC", jFin: "A" },
+    { comp: "Maquillage correcteur (C8-C9)", j1: "NA", j2: "NA", j3: "EC", jFin: "A" },
+    { comp: "Ateliers collectifs (C10-C11)", j1: "NA", j2: "NA", j3: "EC", jFin: "A" },
+  ] : [
+    { comp: "Maîtrise des fondamentaux théoriques", j1: "EC", j2: "A", j3: "A", jFin: "A" },
+    { comp: "Application pratique en situation", j1: "NA", j2: "EC", j3: "A", jFin: "A" },
+    { comp: "Autonomie dans les exercices", j1: "NA", j2: "EC", j3: "EC", jFin: "A" },
+    { comp: "Communication professionnelle", j1: "EC", j2: "A", j3: "A", jFin: "A" },
+    { comp: "Préparation à la certification", j1: "NA", j2: "NA", j3: "EC", jFin: "A" },
+  ];
+
+  // Adjust based on stagiaire index for variation
+  const compRows = competences.map((c, ci) => {
+    const status = (label: string) => {
+      const shift = (si + ci) % 3;
+      if (label === "A") return `<span style="color:green;font-weight:600;">A</span>`;
+      if (label === "EC") return `<span style="color:orange;font-weight:600;">EC</span>`;
+      if (label === "NA") return `<span style="color:red;">NA</span>`;
+      return label;
+    };
+    return `<tr><td ${td}>${c.comp}</td><td ${td} style="text-align:center;">${status(c.j1)}</td><td ${td} style="text-align:center;">${status(c.j2)}</td><td ${td} style="text-align:center;">${status(c.j3)}</td><td ${td} style="text-align:center;">${status(c.jFin)}</td></tr>`;
+  }).join("");
+
+  const legend = `<p style="font-size:0.85em;margin-top:8px;"><strong>Légende :</strong> <span style="color:green;font-weight:600;">A</span> = Acquis | <span style="color:orange;font-weight:600;">EC</span> = En cours d'acquisition | <span style="color:red;">NA</span> = Non abordé</p>`;
+
+  return buildDocument({ org: o, formation: f, title: "GRILLE DE SUIVI DE LA PROGRESSION DES COMPÉTENCES", subtitle: `${s.civilite||""} ${s.prenom} ${s.nom}`, sections: [
+    { heading: "Informations", content: `<table style="width:100%;border-collapse:collapse;">
+      <tr><td ${tdb}>Stagiaire</td><td ${td}>${s.prenom} ${s.nom}</td></tr>
+      <tr><td ${tdb}>Formation</td><td ${td}>${f.intitule||"—"}</td></tr>
+      <tr><td ${tdb}>Dates</td><td ${td}>Du ${fmtDate(getStagiaireDateDebut(s,f))} au ${fmtDate(getStagiaireDateFin(s,f))}</td></tr>
+      <tr><td ${tdb}>Formateur</td><td ${td}>${f.formateur||SAMPLE_FORMATEURS[0].prenom+" "+SAMPLE_FORMATEURS[0].nom}</td></tr>
+    </table>` },
+    { heading: "Suivi de la progression", content: `<table style="width:100%;border-collapse:collapse;font-size:0.9em;"><thead><tr style="background:${pc()};color:#fff;"><th style="padding:8px;border:1px solid #ddd;">Compétence</th><th style="padding:8px;border:1px solid #ddd;">Jour 1</th><th style="padding:8px;border:1px solid #ddd;">Mi-parcours</th><th style="padding:8px;border:1px solid #ddd;">J-1 fin</th><th style="padding:8px;border:1px solid #ddd;">Éval. finale</th></tr></thead><tbody>${compRows}</tbody></table>${legend}` },
+    { heading: "Appréciation globale du formateur", content: `<p>${si%2===0?"Progression régulière et satisfaisante tout au long du parcours. Les objectifs pédagogiques sont atteints.":"Bonne implication malgré quelques difficultés initiales. La stagiaire a su rattraper son retard grâce à un travail personnel soutenu."}</p><p><strong>Résultat final :</strong> ${15+si%6}/20 – Compétences validées</p>` },
+  ], signatures: { type: "2", labels: ["Le formateur", "Le/La stagiaire"], names: [f.formateur||SAMPLE_FORMATEURS[0].prenom+" "+SAMPLE_FORMATEURS[0].nom, `${s.prenom} ${s.nom}`] }});
+}
+
+/* ═══ CODE 34 – Test d'évaluation en fin de prestation (EY) ═══ */
+export function genTestEvaluationFinEY(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number): string {
+  const s = stagiaires[si] || stagiaires[0];
+  if (!s) return "";
+  const domain = detectDomain(f);
+  const esth = domain === "esthetique";
+  const noteFinale = 15 + si % 6;
+
+  const questionsEval = esth ? [
+    { q: "Citer les 3 contre-indications principales à la pose d'extensions de cils", rep: "Conjonctivite, blépharite active, allergie au cyanoacrylate", note: "4/4" },
+    { q: "Décrire le protocole complet de préparation avant une pose classique", rep: "Nettoyage à l'eau micellaire, séchage, application des patchs, isolation...", note: "3/4" },
+    { q: "Quelles sont les différences entre volume 2D, 3D et mégavolume ?", rep: "2D = 2 extensions/bouquet, 3D = 3 extensions, méga = 6+ extensions ultrafines", note: "4/4" },
+    { q: "Expliquer le processus de rehaussement de cils étape par étape", rep: "Application des bigoudis, lotion 1 (lift), lotion 2 (fixation), teinture, nutrition", note: "3/4" },
+    { q: "Comment gérer une cliente qui présente une réaction allergique ?", rep: "Retrait immédiat, application sérum physiologique, orientation médicale, fiche incident", note: "4/4" },
+  ] : [
+    { q: "Décrire les fondamentaux du domaine de formation", rep: "Réponse détaillée et structurée", note: "4/4" },
+    { q: "Appliquer la méthodologie apprise à un cas concret", rep: "Application correcte avec justification", note: "3/4" },
+    { q: "Analyser une situation professionnelle complexe", rep: "Analyse pertinente avec identification des enjeux", note: "4/4" },
+    { q: "Proposer une solution adaptée à un cas pratique", rep: "Solution viable et argumentée", note: "3/4" },
+  ];
+
+  let qRows = questionsEval.map((q, i) => `<tr><td ${td}>${i+1}. ${q.q}</td><td ${td} style="font-size:0.85em;">${q.rep}</td><td ${td} style="text-align:center;font-weight:600;">${q.note}</td></tr>`).join("");
+
+  return buildDocument({ org: o, formation: f, title: "ÉVALUATION DE FIN DE FORMATION – GRILLE D'ACQUISITION", subtitle: `${s.civilite||""} ${s.prenom} ${s.nom}`, sections: [
+    { heading: "Informations", content: `<table style="width:100%;border-collapse:collapse;">
+      <tr><td ${tdb}>Stagiaire</td><td ${td}>${s.prenom} ${s.nom}</td></tr>
+      <tr><td ${tdb}>Formation</td><td ${td}>${f.intitule||"—"}</td></tr>
+      <tr><td ${tdb}>Date de l'évaluation</td><td ${td}>${fmtDate(getStagiaireDateFin(s,f))}</td></tr>
+      <tr><td ${tdb}>Formateur évaluateur</td><td ${td}>${f.formateur||SAMPLE_FORMATEURS[0].prenom+" "+SAMPLE_FORMATEURS[0].nom}</td></tr>
+    </table>` },
+    { heading: "Épreuve théorique (QCM + questions ouvertes)", content: `<table style="width:100%;border-collapse:collapse;font-size:0.9em;"><thead><tr style="background:${pc()};color:#fff;"><th ${td}>Question</th><th ${td}>Réponse du stagiaire</th><th ${td}>Note</th></tr></thead><tbody>${qRows}</tbody></table>
+    <p style="margin-top:8px;"><strong>Sous-total théorique :</strong> ${noteFinale-1}/20</p>` },
+    { heading: "Épreuve pratique", content: esth ? `<table style="width:100%;border-collapse:collapse;">
+      <tr><td ${tdb}>Exercice pratique</td><td ${td}>Réalisation d'une pose complète sur modèle vivant (durée : 2h)</td></tr>
+      <tr><td ${tdb}>Critères évalués</td><td ${td}>Hygiène du poste, préparation, isolation, direction de pose, symétrie, régularité, temps de réalisation</td></tr>
+      <tr><td ${tdb}>Résultat</td><td ${td} style="color:green;font-weight:600;">${noteFinale}/20 – ${noteFinale>=16?"Excellent":"Satisfaisant"}</td></tr>
+      <tr><td ${tdb}>Observations</td><td ${td}>${si%2===0?"Gestes précis, bonne maîtrise de l'isolation. Temps de pose conforme aux standards professionnels.":"Technique solide sur la pose classique. Le volume russe nécessite encore de la pratique pour gagner en rapidité."}</td></tr>
+    </table>` : `<table style="width:100%;border-collapse:collapse;">
+      <tr><td ${tdb}>Épreuve pratique</td><td ${td}>Mise en situation professionnelle</td></tr>
+      <tr><td ${tdb}>Résultat</td><td ${td} style="color:green;font-weight:600;">${noteFinale}/20</td></tr>
+    </table>` },
+    { heading: "Résultat global", content: `<table style="width:100%;border-collapse:collapse;">
+      <tr style="background:#e8f5e9;"><td ${tdb} style="width:50%;">Note finale</td><td ${td} style="font-weight:700;font-size:1.2em;color:#2e7d32;">${noteFinale}/20</td></tr>
+      <tr><td ${tdb}>Mention</td><td ${td}>${noteFinale>=18?"Très Bien":noteFinale>=16?"Bien":"Assez Bien"}</td></tr>
+      <tr><td ${tdb}>Décision</td><td ${td} style="color:green;font-weight:600;">ADMIS(E) ✓</td></tr>
+    </table>` },
+  ], signatures: { type: "2", labels: ["Le formateur évaluateur", "Le/La stagiaire"], names: [f.formateur||SAMPLE_FORMATEURS[0].prenom+" "+SAMPLE_FORMATEURS[0].nom, `${s.prenom} ${s.nom}`] }});
+}
+
+/* ═══ CODE 35 – Évaluation à blanc (EY) ═══ */
+export function genEvaluationBlancheEY(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number): string {
+  const s = stagiaires[si] || stagiaires[0];
+  if (!s) return "";
+  const domain = detectDomain(f);
+  const esth = domain === "esthetique";
+  const noteBlanche = 14 + si % 5;
+
+  const epreuves = esth ? [
+    { epreuve: "QCM Théorique (30 questions)", duree: "30 min", note: `${Math.min(noteBlanche + 1, 20)}/20`, observation: "Bonne maîtrise des aspects théoriques (morphologie, contre-indications, produits)" },
+    { epreuve: "Mise en situation – Diagnostic client", duree: "15 min", note: `${noteBlanche}/20`, observation: "Analyse morphologique correcte, identification des besoins du client satisfaisante" },
+    { epreuve: "Épreuve pratique – Pose classique cil à cil", duree: "90 min", note: `${noteBlanche}/20`, observation: si%2===0?"Bonne isolation, direction de pose maîtrisée, rythme à améliorer":"Technique acquise, symétrie à perfectionner sur les yeux extérieurs" },
+    { epreuve: "Épreuve pratique – Volume Russe 3D", duree: "60 min", note: `${noteBlanche-1}/20`, observation: si%2===0?"Bouquets réguliers, ouverture correcte, rapidité en progrès":"Bonne compréhension de la technique, ventilation des bouquets à travailler" },
+    { epreuve: "Épreuve orale – Argumentation et conseil", duree: "15 min", note: `${noteBlanche+1}/20`, observation: "Argumentation claire, bon vocabulaire professionnel, capacité de conseil" },
+  ] : [
+    { epreuve: "QCM Théorique", duree: "45 min", note: `${noteBlanche}/20`, observation: "Résultat satisfaisant" },
+    { epreuve: "Étude de cas pratique", duree: "60 min", note: `${noteBlanche}/20`, observation: "Bonne analyse et proposition de solutions" },
+    { epreuve: "Mise en situation professionnelle", duree: "30 min", note: `${noteBlanche+1}/20`, observation: "Comportement professionnel adapté" },
+    { epreuve: "Oral de présentation", duree: "20 min", note: `${noteBlanche}/20`, observation: "Présentation structurée et argumentée" },
+  ];
+
+  let rows = epreuves.map(e => `<tr><td ${td}>${e.epreuve}</td><td ${td}>${e.duree}</td><td ${td} style="text-align:center;font-weight:600;">${e.note}</td><td ${td} style="font-size:0.85em;">${e.observation}</td></tr>`).join("");
+
+  return buildDocument({ org: o, formation: f, title: "ÉVALUATION À BLANC – PRÉPARATION À LA CERTIFICATION", subtitle: `${s.civilite||""} ${s.prenom} ${s.nom}`, sections: [
+    { heading: "Informations", content: `<table style="width:100%;border-collapse:collapse;">
+      <tr><td ${tdb}>Stagiaire</td><td ${td}>${s.prenom} ${s.nom}</td></tr>
+      <tr><td ${tdb}>Formation</td><td ${td}>${f.intitule||"—"}</td></tr>
+      <tr><td ${tdb}>Certification visée</td><td ${td}>${f.codeRNCP||"—"}</td></tr>
+      <tr><td ${tdb}>Date de l'évaluation à blanc</td><td ${td}>${fmtDate(getStagiaireDateFin(s,f))}</td></tr>
+      <tr><td ${tdb}>Formateur évaluateur</td><td ${td}>${f.formateur||SAMPLE_FORMATEURS[0].prenom+" "+SAMPLE_FORMATEURS[0].nom}</td></tr>
+    </table>
+    <p style="margin-top:12px;padding:10px;background:#fff8e1;border-left:4px solid #ff9800;font-size:0.9em;"><strong>Objectif :</strong> Cette évaluation à blanc simule les conditions réelles de passage de la certification. Elle permet d'identifier les points forts et les axes d'amélioration avant le jour de l'examen.</p>` },
+    { heading: "Résultats par épreuve", content: `<table style="width:100%;border-collapse:collapse;font-size:0.9em;"><thead><tr style="background:${pc()};color:#fff;"><th ${td}>Épreuve</th><th ${td}>Durée</th><th ${td}>Note</th><th ${td}>Observations</th></tr></thead><tbody>${rows}</tbody></table>` },
+    { heading: "Résultat global de l'évaluation à blanc", content: `<table style="width:100%;border-collapse:collapse;">
+      <tr style="background:#e8f5e9;"><td ${tdb} style="width:50%;">Moyenne générale</td><td ${td} style="font-weight:700;font-size:1.2em;color:#2e7d32;">${noteBlanche}/20</td></tr>
+      <tr><td ${tdb}>Pronostic certification</td><td ${td} style="color:green;font-weight:600;">${noteBlanche>=14?"FAVORABLE ✓":"RÉSERVÉ – Renforcement nécessaire"}</td></tr>
+    </table>` },
+    { heading: "Préconisations avant la certification", content: `<ul>
+      ${esth?`<li><strong>Point fort :</strong> ${si%2===0?"Excellente maîtrise de la pose classique et du diagnostic":"Bonne compréhension des protocoles et respect de l'hygiène"}</li>
+      <li><strong>Axe d'amélioration :</strong> ${si%2===0?"Gagner en rapidité sur la technique volume russe":"Perfectionner la régularité des bouquets et la symétrie"}</li>
+      <li><strong>Conseil :</strong> Poursuivre l'entraînement sur mannequin (2h/jour recommandé avant l'examen)</li>`
+      :`<li>Renforcer les points de faiblesse identifiés</li><li>Réviser les contenus théoriques</li><li>Pratiquer les exercices de mise en situation</li>`}
+    </ul>` },
+  ], signatures: { type: "2", labels: ["Le formateur évaluateur", "Le/La stagiaire"], names: [f.formateur||SAMPLE_FORMATEURS[0].prenom+" "+SAMPLE_FORMATEURS[0].nom, `${s.prenom} ${s.nom}`] }});
+}
+
+/* ═══ CODE 15 – Factures équipements domaine esthétique (enrichi) ═══ */
+export function genFacturesEquipementsEY(o: OrganismeInfo, f: FormationInfo): string {
+  const yr = new Date().getFullYear();
+  const domain = detectDomain(f);
+  const esth = domain === "esthetique";
+  const items = esth ? [
+    { equipement: "Lit de soins réglable Beauty Star BS-PRO (x4)", facture: `FA-${yr-1}-0412`, fournisseur: "Beauty Star France", date: `10/02/${yr-1}`, montant: "3 200,00 €", etat: "Excellent" },
+    { equipement: "Lampe loupe LED Daylight D25050 (x4)", facture: `FA-${yr-1}-0413`, fournisseur: "Daylight Company", date: `10/02/${yr-1}`, montant: "960,00 €", etat: "Fonctionnel" },
+    { equipement: "Kits complets extension cils Noble Lashes (x8)", facture: `FA-${yr}-0034`, fournisseur: "Noble Lashes France", date: `05/01/${yr}`, montant: "1 840,00 €", etat: "Neuf" },
+    { equipement: "Mannequins tête entraînement (x8)", facture: `FA-${yr-1}-0414`, fournisseur: "Training Head Pro", date: `15/02/${yr-1}`, montant: "480,00 €", etat: "Fonctionnel" },
+    { equipement: "Stérilisateur UV Sterilux ST-200 (x2)", facture: `FA-${yr-1}-0415`, fournisseur: "Médical Pro", date: `10/02/${yr-1}`, montant: "378,00 €", etat: "Fonctionnel" },
+    { equipement: "Kits rehaussement InLei + RefectoCil (x8)", facture: `FA-${yr}-0035`, fournisseur: "InLei Official / Biosmetics", date: `05/01/${yr}`, montant: "720,00 €", etat: "DLUO vérifiée" },
+    { equipement: "Miroirs grossissants LED Simplehuman (x8)", facture: `FA-${yr-1}-0416`, fournisseur: "Simplehuman France", date: `20/02/${yr-1}`, montant: "1 120,00 €", etat: "Fonctionnel" },
+    { equipement: "Consommables mensuels (colles, micro-brosses, patchs)", facture: `FA-${yr}-MENS`, fournisseur: "Lash Professional / Biosmetics", date: `01/${String(new Date().getMonth()+1).padStart(2,"0")}/${yr}`, montant: "350,00 €/mois", etat: "Renouvelé" },
+    { equipement: "Vidéoprojecteur Epson EB-FH06", facture: `FA-${yr-1}-0102`, fournisseur: "LDLC Pro", date: `15/01/${yr-1}`, montant: "649,00 €", etat: "Fonctionnel" },
+    { equipement: "HP ProBook 450 G10 (formateur)", facture: `FA-${yr-1}-0103`, fournisseur: "LDLC Pro", date: `15/01/${yr-1}`, montant: "899,00 €", etat: "Fonctionnel" },
+  ] : getDomainEquipements(domain, yr).map((eq, i) => ({
+    equipement: eq.equipement, facture: `FA-${yr-1}-${String(100+i).padStart(4,"0")}`, fournisseur: eq.marque.split("/")[0].trim(), date: `${String(1+i%12).padStart(2,"0")}/01/${yr-1}`, montant: `${(200 + i*150).toFixed(2)} €`, etat: eq.etat
+  }));
+
+  let rows = items.map(it => `<tr><td ${td}>${it.equipement}</td><td ${td}>${it.facture}</td><td ${td}>${it.fournisseur}</td><td ${td}>${it.date}</td><td ${td}>${it.montant}</td><td ${td}>${it.etat}</td></tr>`).join("");
+
+  return buildDocument({ org: o, formation: f, title: "FACTURES ET JUSTIFICATIFS D'ACHAT – MATÉRIEL PÉDAGOGIQUE", subtitle: `Code 15 – ${o.nom||"Organisme"}`, sections: [
+    { heading: "Inventaire détaillé avec références factures", content: `<table style="width:100%;border-collapse:collapse;font-size:0.85em;"><thead><tr style="background:${pc()};color:#fff;"><th style="padding:8px;border:1px solid #ddd;">Équipement</th><th style="padding:8px;border:1px solid #ddd;">N° Facture</th><th style="padding:8px;border:1px solid #ddd;">Fournisseur</th><th style="padding:8px;border:1px solid #ddd;">Date</th><th style="padding:8px;border:1px solid #ddd;">Montant HT</th><th style="padding:8px;border:1px solid #ddd;">État</th></tr></thead><tbody>${rows}</tbody></table>` },
+    { heading: "Attestation", content: `<p>Je soussigné(e), <strong>${o.dirigeant||o.responsablePedagogique||"Le dirigeant"}</strong>, atteste que l'ensemble des équipements sont la propriété de l'organisme, fonctionnels et conformes aux normes de sécurité.</p><p>Fait à ${o.ville||"—"}, le ${fmtDate(today())}</p>` },
+  ]});
+}
+
+/* ═══ CODE 16 – Équipements / Matériels pédagogique (enrichi style Academy djika) ═══ */
+export function genEquipementsPedagogiquesEY(o: OrganismeInfo, f: FormationInfo): string {
+  const domain = detectDomain(f);
+  const yr = new Date().getFullYear();
+  const equipements = getDomainEquipements(domain, yr);
+
+  let rows = equipements.map((eq, i) => `<tr><td ${td}>${i+1}</td><td ${td}>${eq.equipement}</td><td ${td}>${eq.qte}</td><td ${td}>${eq.marque}</td><td ${td}>${eq.etat}</td><td ${td}>${yr-1}</td></tr>`).join("");
+
+  return buildDocument({ org: o, formation: f, title: "INVENTAIRE DES ÉQUIPEMENTS ET MATÉRIELS PÉDAGOGIQUES", subtitle: `Code 16 – ${f.intitule||"Formation"} – ${o.nom||"Organisme"}`, sections: [
+    { heading: "Liste des équipements mobilisés", content: `<table style="width:100%;border-collapse:collapse;font-size:0.88em;"><thead><tr style="background:${pc()};color:#fff;"><th style="padding:8px;border:1px solid #ddd;">N°</th><th style="padding:8px;border:1px solid #ddd;">Désignation</th><th style="padding:8px;border:1px solid #ddd;">Quantité</th><th style="padding:8px;border:1px solid #ddd;">Marque / Référence</th><th style="padding:8px;border:1px solid #ddd;">État</th><th style="padding:8px;border:1px solid #ddd;">Année</th></tr></thead><tbody>${rows}</tbody></table>` },
+    { heading: "Politique de maintenance", content: `<ul><li><strong>Vérification semestrielle</strong> systématique de tous les équipements</li><li><strong>Registre de maintenance</strong> tenu à jour (cf. Cahier de maintenance – Code 16)</li><li><strong>Remplacement</strong> sous 72h en cas de panne ou défaillance</li><li><strong>Responsable :</strong> ${o.responsablePedagogique||o.dirigeant||"Le responsable pédagogique"}</li></ul><p>Dernière vérification globale : ${fmtDate(`${yr}-01-15`)}</p>` },
+    { heading: "Conformité", content: `<p>L'ensemble du matériel pédagogique est conforme aux normes de sécurité en vigueur et adapté à l'action de formation <strong>« ${f.intitule||"Formation"} »</strong>.</p><p>Fait à ${o.ville||"—"}, le ${fmtDate(today())}</p>` },
   ]});
 }
