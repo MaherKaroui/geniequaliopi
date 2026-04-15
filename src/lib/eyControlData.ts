@@ -854,6 +854,14 @@ export const EY_DOCUMENTS: EYDocumentItem[] = [
     perStagiaire: true,
     category: "controle_bac_pro",
   },
+  {
+    code: "BPL_CONNEXION",
+    label: "Rapport de temps de connexion",
+    description: "Relevé détaillé des connexions par jour avec IP, horaires et durées",
+    autoTemplates: ["bpl_connexion"],
+    perStagiaire: true,
+    category: "controle_bac_pro",
+  },
 ];
 
 export type EYDocStatus = "pending" | "auto" | "uploaded" | "not_applicable";
