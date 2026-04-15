@@ -2013,7 +2013,7 @@ export function genCompteRenduPositionnementEY(o: OrganismeInfo, f: FormationInf
   const deb = getStagiaireDateDebut(s, f);
   const fin = getStagiaireDateFin(s, f);
   const duree = getStagiaireDuree(s, f) || f.duree || "35h";
-  const niveau = s.niveau || (si % 2 === 0 ? "CAP / BEP – Niveau 3" : "Baccalauréat – Niveau 4");
+  const niveau = (s as any).niveau || (si % 2 === 0 ? "CAP / BEP – Niveau 3" : "Baccalauréat – Niveau 4");
 
   const competences = esth ? [
     { comp: "Hygiène, désinfection, sécurité", niv: si%3===0?"Correct":"Débutant", comment: si%3===0?"Maîtrise satisfaisante des règles essentielles":"Notions de base à approfondir" },
@@ -2051,7 +2051,7 @@ export function genCompteRenduPositionnementEY(o: OrganismeInfo, f: FormationInf
   return buildDocument({ org: o, formation: f, title: "COMPTE RENDU DE POSITIONNEMENT", subtitle: `${s.civilite||""} ${s.prenom} ${s.nom}`, sections: [
     { heading: "Informations", content: `<table style="width:100%;border-collapse:collapse;">
       <tr><td ${tdb}>Stagiaire</td><td ${td}>${s.prenom} ${s.nom}</td></tr>
-      ${s.dossierNumber ? `<tr><td ${tdb}>Dossier EDOF n°</td><td ${td}>${s.dossierNumber}</td></tr>` : ""}
+      ${(s as any).dossierNumber ? `<tr><td ${tdb}>Dossier EDOF n°</td><td ${td}>${(s as any).dossierNumber}</td></tr>` : ""}
       <tr><td ${tdb}>Formation</td><td ${td}>${f.intitule||"—"}</td></tr>
       <tr><td ${tdb}>Organisme</td><td ${td}>${o.nom||"—"}</td></tr>
       <tr><td ${tdb}>Session</td><td ${td}>${fmtDate(deb)} au ${fmtDate(fin)} (${duree})</td></tr>
@@ -2073,10 +2073,10 @@ export function genCompteRenduPositionnementEY(o: OrganismeInfo, f: FormationInf
       <td ${td}><ul style="margin:0;padding-left:16px;"><li>${si%2===0?"Bonne capacité d'apprentissage":"Niveau de base satisfaisant"}</li><li>Grande motivation</li><li>Projet professionnel clair</li></ul></td>
       <td ${td}><ul style="margin:0;padding-left:16px;"><li>${esth?"Aucune expérience en extension de cils":"Expérience pratique limitée"}</li><li>Nécessité d'un accompagnement renforcé</li></ul></td>
     </tr></tbody></table>` },
-    { heading: "Section 6 : Conclusion du formateur", content: `<p>Le positionnement confirme que ${s.civilite==="Madame"?"Mme":"M."} ${s.nom} ${s.prenom} :</p>
+    { heading: "Section 6 : Conclusion du formateur", content: `<p>Le positionnement confirme que ${s.civilite==="Mme"?"Mme":"M."} ${s.nom} ${s.prenom} :</p>
     <ul><li>Dispose des prérequis pour suivre la formation</li><li>Bénéficiera d'un parcours individualisé</li><li>Nécessite un suivi renforcé lors des séquences pratiques</li></ul>
     <p style="background:#e8f5e9;padding:10px;border-radius:4px;font-weight:600;">AVIS PÉDAGOGIQUE FINAL : ADMIS(E) – PARCOURS ADAPTÉ</p>` },
-  ], signatures: { type: "1", labels: ["Le formateur"], names: [formateur] }});
+  ], signatures: { type: "2", labels: ["Le formateur", ""], names: [formateur, ""] }});
 }
 
 /* ═══ CODE 29 – Évaluation des besoins (Academy style 10 questions per stagiaire) ═══ */
@@ -2104,7 +2104,7 @@ export function genEvaluationDesBesoinsEY(o: OrganismeInfo, f: FormationInfo, st
     { q: "Quelles difficultés pensez-vous pouvoir rencontrer pendant la formation ?", r: si%2===0
       ? `Je pense que la précision des gestes et la régularité dans les poses, notamment pour les techniques plus avancées comme le volume russe, peuvent représenter une difficulté au départ.`
       : `La gestion du temps de pose et la coordination des gestes techniques seront probablement mes principaux défis au début.` },
-    { q: "Quel est votre niveau de motivation pour suivre cette formation ?", r: `Je suis très motivé${s.civilite==="Madame"?"e":""}. Cette formation correspond parfaitement à mon projet professionnel et à mon envie d'évoluer dans le secteur de l'esthétique et de la beauté du regard.` },
+    { q: "Quel est votre niveau de motivation pour suivre cette formation ?", r: `Je suis très motivé${s.civilite==="Mme"?"e":""}. Cette formation correspond parfaitement à mon projet professionnel et à mon envie d'évoluer dans le secteur de l'esthétique et de la beauté du regard.` },
     { q: "Avez-vous des attentes particulières concernant l'accompagnement pédagogique ?", r: `J'attends un accompagnement structuré, des explications détaillées et des retours réguliers sur ma pratique afin de progresser rapidement et de corriger mes erreurs.` },
     { q: "Êtes-vous en situation de handicap nécessitant un aménagement particulier ?", r: s.rqth ? "Oui, un aménagement spécifique a été mis en place avec le référent handicap." : "Non, je ne suis pas en situation de handicap et je ne nécessite pas d'aménagement spécifique." },
     { q: "Souhaitez-vous ajouter un commentaire complémentaire ?", r: si%2===0
@@ -2139,7 +2139,7 @@ export function genEvaluationDesBesoinsEY(o: OrganismeInfo, f: FormationInfo, st
       <tr><td ${tdb}>Durée</td><td ${td}>${duree} – ${modalite}</td></tr>
     </table>` },
     { heading: "Questionnaire", content: qHtml },
-  ], signatures: { type: "1", labels: ["Le/La stagiaire"], names: [`${s.prenom} ${s.nom}`] }});
+  ], signatures: { type: "2", labels: ["Le/La stagiaire", ""], names: [`${s.prenom} ${s.nom}`, ""] }});
 }
 
 /* ═══ CODE 34 – Grille d'acquisition des compétences + QCM (Academy style) ═══ */
@@ -2212,9 +2212,9 @@ export function genGrilleAcquisitionCompetencesEY(o: OrganismeInfo, f: Formation
     { heading: "1. Évaluation des compétences du référentiel", content: `<table style="width:100%;border-collapse:collapse;font-size:0.88em;"><thead><tr style="background:${pc()};color:#fff;"><th ${td}>Compétences du référentiel ${code}</th><th ${td}>Description</th><th ${td}>Niveau d'acquisition</th><th ${td}>Observations formatrice – ${formateur}</th></tr></thead><tbody>${compRows}</tbody></table>` },
     { heading: `2. QCM – ${f.intitule||"Formation"} (Rempli par l'élève)`, content: `<p><strong>QCM – ${qcm.length} questions</strong></p>${qcmHtml}
     <p style="margin-top:16px;padding:10px;background:#e8f5e9;border-radius:4px;font-weight:700;font-size:1.1em;">Score final du QCM : ${noteQCM} / ${qcm.length}</p>` },
-    { heading: "Analyse du formateur", content: `<p>${s.civilite==="Madame"?"L'élève":"L'élève"} <strong>${s.nom} ${s.prenom}</strong> démontre une ${noteQCM>=9?"excellente":"bonne"} compréhension des notions ${esth?"théoriques fondamentales liées à la prestation":"clés du domaine de formation"}. Le score de ${noteQCM}/${qcm.length} reflète :</p>
+    { heading: "Analyse du formateur", content: `<p>L'élève <strong>${s.nom} ${s.prenom}</strong> démontre une ${noteQCM>=9?"excellente":"bonne"} compréhension des notions ${esth?"théoriques fondamentales liées à la prestation":"clés du domaine de formation"}. Le score de ${noteQCM}/${qcm.length} reflète :</p>
     <ul><li>Une ${noteQCM>=9?"parfaite":"bonne"} assimilation des règles ${esth?"d'hygiène":"fondamentales"}</li><li>Une ${noteQCM>=9?"parfaite":"solide"} connaissance des ${esth?"contre-indications":"principes essentiels"}</li><li>Une maîtrise ${noteQCM>=9?"claire":"satisfaisante"} des ${esth?"gestes préparatoires et des principes techniques":"méthodologies professionnelles"}</li></ul>
-    <p>${s.civilite==="Madame"?"L'élève":"L'élève"} est <strong>sur la bonne voie pour réussir la certification ${code}</strong>${noteQCM<10?", sous réserve de poursuivre l'entraînement pour affiner la précision.":"."}</p>
+    <p>L'élève est <strong>sur la bonne voie pour réussir la certification ${code}</strong>${noteQCM<10?", sous réserve de poursuivre l'entraînement pour affiner la précision.":"."}</p>
     <p style="margin-top:12px;"><em>${formateur} – Formateur${f.formateur?.includes("Mme")?"rice":""} ${o.nom||""}</em></p>` },
   ]});
 }
