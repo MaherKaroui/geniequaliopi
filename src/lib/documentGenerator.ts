@@ -1900,9 +1900,9 @@ function genReglement(o: OrganismeInfo) {
 function genLivretAccueil(o: OrganismeInfo, f: FormationInfo) {
   return buildDocument({ org: o, title: "LIVRET D'ACCUEIL", subtitle: f.intitule, sections: [
     { heading: "Bienvenue !", content: `<p>Nous sommes heureux de vous accueillir pour la formation « ${f.intitule} ». Ce livret contient les informations essentielles.</p>` },
-    { heading: "Vos contacts", content: `<p><strong>Direction :</strong> ${o.dirigeant}<br><strong>Pédagogie :</strong> ${o.responsablePedagogique}<br><strong>Handicap :</strong> ${o.referentHandicap}<br><strong>Qualité :</strong> ${o.referentQualite}<br><strong>Tél :</strong> ${o.telephone}<br><strong>Email :</strong> ${o.email}</p>` },
+    { heading: "Vos contacts", content: `<p><strong>Direction :</strong> ${o.dirigeant}<br><strong>Pédagogie :</strong> ${o.responsablePedagogique}<br><strong>Handicap :</strong> ${o.referentHandicap}<br><strong>Qualité :</strong> ${o.referentQualite}<br>${o.telephone?.trim() ? `<strong>Tél :</strong> ${o.telephone}<br>` : ""}<strong>Email :</strong> ${o.email}</p>` },
     { heading: "Votre formation", content: `<p><strong>Durée :</strong> À définir selon le groupe<br><strong>Lieu :</strong> ${f.lieu}<br><strong>Formateur :</strong> ${f.formateur}<br><strong>Horaires :</strong> 9h00-12h30 / 13h30-17h00</p>` },
-    { heading: "Informations pratiques", content: "<p>• Merci de vous munir de cette convocation<br>• En cas d'absence, prévenir au " + o.telephone + "<br>• Le règlement intérieur vous sera remis le premier jour</p>" },
+    { heading: "Informations pratiques", content: "<p>• Merci de vous munir de cette convocation<br>• En cas d'absence, prévenir" + (o.telephone?.trim() ? ` au ${o.telephone}` : "") + "<br>• Le règlement intérieur vous sera remis le premier jour</p>" },
   ] });
 }
 
@@ -5159,7 +5159,7 @@ function genVAEHandicapBilan(o: OrganismeInfo) {
 
 function genVAEMailHandicap(o: OrganismeInfo) {
   return buildDocument({ org: o, title: "MAIL TYPE HANDICAP – VAE", sections: [
-    { heading: "", content: `<p><strong>Objet :</strong> Prise en compte de votre situation de handicap</p><p>Bonjour,</p><p>Nous avons bien pris note de votre situation et souhaitons vous assurer que ${o.nom} met tout en œuvre pour vous accompagner dans les meilleures conditions.</p><p>Notre référent handicap, ${o.referentHandicap}, est à votre disposition pour échanger sur les aménagements à mettre en place pour votre accompagnement VAE.</p><p>N'hésitez pas à nous contacter par téléphone au ${o.telephone} ou par mail à ${o.email} pour convenir d'un rendez-vous.</p><p>Nous pouvons notamment vous orienter vers nos partenaires spécialisés (Agefiph, Cap Emploi, MDPH) si nécessaire.</p><p>Cordialement,</p><p>${o.responsablePedagogique}<br>L'équipe VAE de ${o.nom}</p>` },
+    { heading: "", content: `<p><strong>Objet :</strong> Prise en compte de votre situation de handicap</p><p>Bonjour,</p><p>Nous avons bien pris note de votre situation et souhaitons vous assurer que ${o.nom} met tout en œuvre pour vous accompagner dans les meilleures conditions.</p><p>Notre référent handicap, ${o.referentHandicap}, est à votre disposition pour échanger sur les aménagements à mettre en place pour votre accompagnement VAE.</p><p>N'hésitez pas à nous contacter par ${o.telephone?.trim() ? `téléphone au ${o.telephone} ou par` : ""} mail à ${o.email} pour convenir d'un rendez-vous.</p><p>Nous pouvons notamment vous orienter vers nos partenaires spécialisés (Agefiph, Cap Emploi, MDPH) si nécessaire.</p><p>Cordialement,</p><p>${o.responsablePedagogique}<br>L'équipe VAE de ${o.nom}</p>` },
   ], signatures: { type: "2", labels: ["Le Dirigeant", "Le Référent handicap"], names: [o.dirigeant, o.referentHandicap] } });
 }
 
@@ -5530,43 +5530,43 @@ function genVAECertificatRealisation(o: OrganismeInfo, f: FormationInfo, stagiai
 
 function genVAEMailIntroduction(o: OrganismeInfo) {
   return buildDocument({ org: o, title: "MAIL INTRODUCTION AU PROCESSUS VAE", sections: [
-    { heading: "", content: `<p><strong>Objet :</strong> Bienvenue dans le processus de VAE !</p><p>Cher(e) [Nom du candidat],</p><p>Je suis ravi(e) de vous accueillir dans le processus de Validation des Acquis de l'Expérience (VAE). En tant qu'accompagnateur, mon rôle est de vous guider tout au long de cette démarche.</p><p>Dans cette première étape, je vous propose de planifier une séance pour discuter de votre parcours professionnel et des compétences que vous souhaitez valider. Nous pourrons également clarifier les attentes et le déroulement du processus de VAE.</p><p>N'hésitez pas à me proposer quelques créneaux horaires qui vous conviennent pour notre première rencontre.</p><p>À très bientôt !</p><p>${o.responsablePedagogique}<br>L'équipe VAE de ${o.nom}<br>Tél : ${o.telephone}<br>Mail : ${o.email}</p>` },
+    { heading: "", content: `<p><strong>Objet :</strong> Bienvenue dans le processus de VAE !</p><p>Cher(e) [Nom du candidat],</p><p>Je suis ravi(e) de vous accueillir dans le processus de Validation des Acquis de l'Expérience (VAE). En tant qu'accompagnateur, mon rôle est de vous guider tout au long de cette démarche.</p><p>Dans cette première étape, je vous propose de planifier une séance pour discuter de votre parcours professionnel et des compétences que vous souhaitez valider. Nous pourrons également clarifier les attentes et le déroulement du processus de VAE.</p><p>N'hésitez pas à me proposer quelques créneaux horaires qui vous conviennent pour notre première rencontre.</p><p>À très bientôt !</p><p>${o.responsablePedagogique}<br>L'équipe VAE de ${o.nom}<br>${o.telephone?.trim() ? `Tél : ${o.telephone}<br>` : ""}Mail : ${o.email}</p>` },
   ] });
 }
 
 function genVAEMailPreparationDossier(o: OrganismeInfo) {
   return buildDocument({ org: o, title: "MAIL PRÉPARATION À LA RÉDACTION DU DOSSIER", sections: [
-    { heading: "", content: `<p><strong>Objet :</strong> Préparez-vous à valoriser votre expérience !</p><p>Cher(e) [Nom du candidat],</p><p>Maintenant que nous avons identifié ensemble la certification visée et analysé votre parcours, il est temps de préparer la rédaction de votre dossier de validation (Livret 2).</p><p>Pour notre prochaine séance, je vous invite à :<br>• Rassembler vos attestations d'emploi et certificats de travail<br>• Lister les principales activités professionnelles en lien avec la certification<br>• Identifier les preuves disponibles (rapports, productions, témoignages…)<br>• Relire attentivement le référentiel de la certification</p><p>N'hésitez pas à me contacter si vous avez des questions.</p><p>Cordialement,</p><p>${o.responsablePedagogique}<br>L'équipe VAE de ${o.nom}<br>Tél : ${o.telephone}<br>Mail : ${o.email}</p>` },
+    { heading: "", content: `<p><strong>Objet :</strong> Préparez-vous à valoriser votre expérience !</p><p>Cher(e) [Nom du candidat],</p><p>Maintenant que nous avons identifié ensemble la certification visée et analysé votre parcours, il est temps de préparer la rédaction de votre dossier de validation (Livret 2).</p><p>Pour notre prochaine séance, je vous invite à :<br>• Rassembler vos attestations d'emploi et certificats de travail<br>• Lister les principales activités professionnelles en lien avec la certification<br>• Identifier les preuves disponibles (rapports, productions, témoignages…)<br>• Relire attentivement le référentiel de la certification</p><p>N'hésitez pas à me contacter si vous avez des questions.</p><p>Cordialement,</p><p>${o.responsablePedagogique}<br>L'équipe VAE de ${o.nom}<br>${o.telephone?.trim() ? `Tél : ${o.telephone}<br>` : ""}Mail : ${o.email}</p>` },
   ] });
 }
 
 function genVAEMailRecap(o: OrganismeInfo, f: FormationInfo) {
   return buildDocument({ org: o, title: "MAIL RÉCAPITULATIF VAE", sections: [
-    { heading: "", content: `<p><strong>Objet :</strong> Récapitulatif de votre accompagnement VAE</p><p>Cher(e) [Nom du candidat],</p><p>Suite à notre premier entretien, voici un récapitulatif de votre démarche VAE :</p><p><strong>Certification visée :</strong> ${f.intitule}<br><strong>Durée de l'accompagnement :</strong> 24 heures sur 10 séances<br><strong>Format :</strong> Séances individuelles (présentiel et/ou distanciel)<br><strong>Accompagnateur :</strong> ${o.responsablePedagogique}</p><p><strong>Prochaines étapes :</strong><br>1. Finalisation du Livret 1 (dossier de recevabilité)<br>2. Début de la rédaction du Livret 2<br>3. Analyse du référentiel de certification<br>4. Identification des activités et compétences clés</p><p>Je reste à votre disposition pour toute question.</p><p>Cordialement,</p><p>${o.responsablePedagogique}<br>L'équipe VAE de ${o.nom}<br>Tél : ${o.telephone}<br>Mail : ${o.email}</p>` },
+    { heading: "", content: `<p><strong>Objet :</strong> Récapitulatif de votre accompagnement VAE</p><p>Cher(e) [Nom du candidat],</p><p>Suite à notre premier entretien, voici un récapitulatif de votre démarche VAE :</p><p><strong>Certification visée :</strong> ${f.intitule}<br><strong>Durée de l'accompagnement :</strong> 24 heures sur 10 séances<br><strong>Format :</strong> Séances individuelles (présentiel et/ou distanciel)<br><strong>Accompagnateur :</strong> ${o.responsablePedagogique}</p><p><strong>Prochaines étapes :</strong><br>1. Finalisation du Livret 1 (dossier de recevabilité)<br>2. Début de la rédaction du Livret 2<br>3. Analyse du référentiel de certification<br>4. Identification des activités et compétences clés</p><p>Je reste à votre disposition pour toute question.</p><p>Cordialement,</p><p>${o.responsablePedagogique}<br>L'équipe VAE de ${o.nom}<br>${o.telephone?.trim() ? `Tél : ${o.telephone}<br>` : ""}Mail : ${o.email}</p>` },
   ] });
 }
 
 function genVAEMailSuiviEvolution(o: OrganismeInfo) {
   return buildDocument({ org: o, title: "MAIL SUIVI DE L'ÉVOLUTION DU DOSSIER", sections: [
-    { heading: "", content: `<p><strong>Objet :</strong> Avancement de votre dossier de VAE</p><p>Cher(e) [Nom du candidat],</p><p>Je tiens à prendre des nouvelles de votre avancement dans la rédaction du dossier. N'hésitez pas à me solliciter si vous avez des questions ou des préoccupations. Nous pourrions organiser une séance de suivi pour discuter des points sur lesquels vous pourriez avoir besoin d'aide supplémentaire.</p><p>Prenez votre temps, et assurez-vous de me tenir informé(e) de vos progrès.</p><p>Cordialement,</p><p>${o.responsablePedagogique}<br>L'équipe VAE de ${o.nom}<br>Tél : ${o.telephone}<br>Mail : ${o.email}</p>` },
+    { heading: "", content: `<p><strong>Objet :</strong> Avancement de votre dossier de VAE</p><p>Cher(e) [Nom du candidat],</p><p>Je tiens à prendre des nouvelles de votre avancement dans la rédaction du dossier. N'hésitez pas à me solliciter si vous avez des questions ou des préoccupations. Nous pourrions organiser une séance de suivi pour discuter des points sur lesquels vous pourriez avoir besoin d'aide supplémentaire.</p><p>Prenez votre temps, et assurez-vous de me tenir informé(e) de vos progrès.</p><p>Cordialement,</p><p>${o.responsablePedagogique}<br>L'équipe VAE de ${o.nom}<br>${o.telephone?.trim() ? `Tél : ${o.telephone}<br>` : ""}Mail : ${o.email}</p>` },
   ] });
 }
 
 function genVAEMailPreparationEntretien(o: OrganismeInfo) {
   return buildDocument({ org: o, title: "MAIL PRÉPARATION À L'ENTRETIEN DE VALIDATION", sections: [
-    { heading: "", content: `<p><strong>Objet :</strong> Préparation à l'entretien de validation</p><p>Cher(e) [Nom du candidat],</p><p>Félicitations pour la finalisation de votre dossier de VAE ! Nous devrions maintenant nous concentrer sur la préparation de l'entretien de validation. Au cours de notre prochaine séance, nous simulerons l'entretien afin de vous préparer au mieux.</p><p>Veuillez me faire part de vos disponibilités pour cette séance cruciale.</p><p>Cordialement,</p><p>${o.responsablePedagogique}<br>L'équipe VAE de ${o.nom}<br>Tél : ${o.telephone}<br>Mail : ${o.email}</p>` },
+    { heading: "", content: `<p><strong>Objet :</strong> Préparation à l'entretien de validation</p><p>Cher(e) [Nom du candidat],</p><p>Félicitations pour la finalisation de votre dossier de VAE ! Nous devrions maintenant nous concentrer sur la préparation de l'entretien de validation. Au cours de notre prochaine séance, nous simulerons l'entretien afin de vous préparer au mieux.</p><p>Veuillez me faire part de vos disponibilités pour cette séance cruciale.</p><p>Cordialement,</p><p>${o.responsablePedagogique}<br>L'équipe VAE de ${o.nom}<br>${o.telephone?.trim() ? `Tél : ${o.telephone}<br>` : ""}Mail : ${o.email}</p>` },
   ] });
 }
 
 function genVAEMailPostValidation(o: OrganismeInfo) {
   return buildDocument({ org: o, title: "MAIL SUIVI POST-VALIDATION ET BILAN", sections: [
-    { heading: "", content: `<p><strong>Objet :</strong> Bilan post-validation et prochaines étapes</p><p>Cher(e) [Nom du candidat],</p><p>Félicitations à nouveau pour la validation de votre VAE ! Après cette réussite, nous pourrions planifier une séance pour discuter de votre ressenti sur le processus et évoquer vos perspectives. Que ce soit pour envisager de nouvelles opportunités professionnelles ou pour explorer des pistes de formation complémentaire, je suis là pour vous accompagner.</p><p>Pourriez-vous me faire part de vos disponibilités pour cette séance de bilan ?</p><p>Au plaisir d'échanger avec vous,</p><p>${o.responsablePedagogique}<br>L'équipe VAE de ${o.nom}<br>Tél : ${o.telephone}<br>Mail : ${o.email}</p>` },
+    { heading: "", content: `<p><strong>Objet :</strong> Bilan post-validation et prochaines étapes</p><p>Cher(e) [Nom du candidat],</p><p>Félicitations à nouveau pour la validation de votre VAE ! Après cette réussite, nous pourrions planifier une séance pour discuter de votre ressenti sur le processus et évoquer vos perspectives. Que ce soit pour envisager de nouvelles opportunités professionnelles ou pour explorer des pistes de formation complémentaire, je suis là pour vous accompagner.</p><p>Pourriez-vous me faire part de vos disponibilités pour cette séance de bilan ?</p><p>Au plaisir d'échanger avec vous,</p><p>${o.responsablePedagogique}<br>L'équipe VAE de ${o.nom}<br>${o.telephone?.trim() ? `Tél : ${o.telephone}<br>` : ""}Mail : ${o.email}</p>` },
   ] });
 }
 
 function genVAEMailEnvoiCertificat(o: OrganismeInfo) {
   return buildDocument({ org: o, title: "MAIL TYPE ENVOI DU CERTIFICAT DE RÉALISATION", sections: [
-    { heading: "", content: `<p><strong>Objet :</strong> Envoi de votre certificat de réalisation</p><p>Cher(e) [Nom du candidat],</p><p>Vous trouverez ci-joint le certificat de réalisation de votre accompagnement VAE au sein de ${o.nom}.</p><p>Ce document atteste de la réalisation effective de votre parcours d'accompagnement. Vous pouvez le transmettre à votre employeur et/ou à votre organisme financeur.</p><p>Nous vous souhaitons le meilleur pour la suite de votre parcours professionnel.</p><p>Cordialement,</p><p>${o.responsablePedagogique}<br>L'équipe VAE de ${o.nom}<br>Tél : ${o.telephone}<br>Mail : ${o.email}</p>` },
+    { heading: "", content: `<p><strong>Objet :</strong> Envoi de votre certificat de réalisation</p><p>Cher(e) [Nom du candidat],</p><p>Vous trouverez ci-joint le certificat de réalisation de votre accompagnement VAE au sein de ${o.nom}.</p><p>Ce document atteste de la réalisation effective de votre parcours d'accompagnement. Vous pouvez le transmettre à votre employeur et/ou à votre organisme financeur.</p><p>Nous vous souhaitons le meilleur pour la suite de votre parcours professionnel.</p><p>Cordialement,</p><p>${o.responsablePedagogique}<br>L'équipe VAE de ${o.nom}<br>${o.telephone?.trim() ? `Tél : ${o.telephone}<br>` : ""}Mail : ${o.email}</p>` },
   ] });
 }
 
@@ -5647,13 +5647,13 @@ function genVAEGuideEntretienAbandons(o: OrganismeInfo) {
 
 function genVAEMailRelanceAbandon(o: OrganismeInfo) {
   return buildDocument({ org: o, title: "MAIL TYPE RELANCE ABANDON – VAE", sections: [
-    { heading: "", content: `<p><strong>Objet :</strong> Nous prenons de vos nouvelles</p><p>Bonjour [Nom du candidat],</p><p>Nous avons remarqué que vous n'étiez pas présent(e) lors de la dernière séance d'accompagnement. Avez-vous eu un imprévu ?</p><p>N'hésitez pas à nous contacter par téléphone au ${o.telephone} ou par mail à ${o.email} si vous avez le moindre problème à nous faire remonter.</p><p>Nous sommes là pour vous accompagner et trouver ensemble des solutions si vous rencontrez des difficultés.</p><p>Cordialement,</p><p>${o.responsablePedagogique}<br>L'équipe VAE de ${o.nom}</p>` },
+    { heading: "", content: `<p><strong>Objet :</strong> Nous prenons de vos nouvelles</p><p>Bonjour [Nom du candidat],</p><p>Nous avons remarqué que vous n'étiez pas présent(e) lors de la dernière séance d'accompagnement. Avez-vous eu un imprévu ?</p><p>N'hésitez pas à nous contacter par ${o.telephone?.trim() ? `téléphone au ${o.telephone} ou par` : ""} mail à ${o.email} si vous avez le moindre problème à nous faire remonter.</p><p>Nous sommes là pour vous accompagner et trouver ensemble des solutions si vous rencontrez des difficultés.</p><p>Cordialement,</p><p>${o.responsablePedagogique}<br>L'équipe VAE de ${o.nom}</p>` },
   ] });
 }
 
 function genVAEMailConditionsCertification(o: OrganismeInfo, f: FormationInfo) {
   return buildDocument({ org: o, title: "MAIL CONDITIONS DE PRÉSENTATION AUX CERTIFICATIONS", sections: [
-    { heading: "", content: `<p><strong>Objet :</strong> Conditions de présentation à la certification</p><p>Cher(e) [Nom du candidat],</p><p>Votre dossier de validation (Livret 2) pour la certification <strong>« ${f.intitule} »</strong> est finalisé et prêt à être envoyé à l'organisme certificateur.</p><p>Voici les informations importantes concernant les conditions de présentation :<br><br><strong>Documents à transmettre :</strong><br>• Le Livret 2 complet (version numérique et papier)<br>• Le portefeuille de preuves (annexes numérotées)<br>• La copie de la notification de recevabilité<br>• Une copie de votre pièce d'identité<br><br><strong>Modalités du jury :</strong><br>• Durée : 45 minutes à 1 heure (présentation + questions)<br>• Format : Présentiel ou visioconférence selon l'organisme certificateur<br>• Composition : Jury composé de professionnels du secteur et de représentants du certificateur<br><br><strong>Décisions possibles :</strong><br>• Validation totale : délivrance de la certification<br>• Validation partielle : délivrance de certains blocs de compétences (5 ans pour compléter)<br>• Refus : possibilité de redéposer un dossier enrichi</p><p>Nous planifierons une dernière séance de simulation d'entretien avant le jour J.</p><p>Cordialement,</p><p>${o.responsablePedagogique}<br>L'équipe VAE de ${o.nom}<br>Tél : ${o.telephone}<br>Mail : ${o.email}</p>` },
+    { heading: "", content: `<p><strong>Objet :</strong> Conditions de présentation à la certification</p><p>Cher(e) [Nom du candidat],</p><p>Votre dossier de validation (Livret 2) pour la certification <strong>« ${f.intitule} »</strong> est finalisé et prêt à être envoyé à l'organisme certificateur.</p><p>Voici les informations importantes concernant les conditions de présentation :<br><br><strong>Documents à transmettre :</strong><br>• Le Livret 2 complet (version numérique et papier)<br>• Le portefeuille de preuves (annexes numérotées)<br>• La copie de la notification de recevabilité<br>• Une copie de votre pièce d'identité<br><br><strong>Modalités du jury :</strong><br>• Durée : 45 minutes à 1 heure (présentation + questions)<br>• Format : Présentiel ou visioconférence selon l'organisme certificateur<br>• Composition : Jury composé de professionnels du secteur et de représentants du certificateur<br><br><strong>Décisions possibles :</strong><br>• Validation totale : délivrance de la certification<br>• Validation partielle : délivrance de certains blocs de compétences (5 ans pour compléter)<br>• Refus : possibilité de redéposer un dossier enrichi</p><p>Nous planifierons une dernière séance de simulation d'entretien avant le jour J.</p><p>Cordialement,</p><p>${o.responsablePedagogique}<br>L'équipe VAE de ${o.nom}<br>${o.telephone?.trim() ? `Tél : ${o.telephone}<br>` : ""}Mail : ${o.email}</p>` },
   ] });
 }
 
@@ -6724,7 +6724,7 @@ function genAttestationInscriptionCFA(o: OrganismeInfo, f: FormationInfo, stagia
 function genFicheRenseignement(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const s = (stagiaires[0] || { prenom: "___", nom: "___", entreprise: "___", poste: "___" }) as StagiaireInfo;
   return buildDocument({ org: o, title: "FICHE DE RENSEIGNEMENT", subtitle: f.intitule, sections: [
-    { heading: "Identité du candidat", content: `<p><strong>Nom :</strong> ${s.nom}<br><strong>Prénom :</strong> ${s.prenom}<br><strong>Date de naissance :</strong> ${s.dateNaissance ? formatDate(s.dateNaissance) : "___/___/______"}<br><strong>Adresse :</strong> ${s.adresse ? `${s.adresse}, ${s.codePostal || ""} ${s.commune || ""}`.trim() : "________________________________"}<br><strong>Téléphone :</strong> ${s.telephone || "________________________________"}<br><strong>Email :</strong> ${s.email || "________________________________"}</p>` },
+    { heading: "Identité du candidat", content: `<p><strong>Nom :</strong> ${s.nom}<br><strong>Prénom :</strong> ${s.prenom}<br><strong>Date de naissance :</strong> ${s.dateNaissance ? formatDate(s.dateNaissance) : "___/___/______"}<br><strong>Adresse :</strong> ${s.adresse ? `${s.adresse}, ${s.codePostal || ""} ${s.commune || ""}`.trim() : "________________________________"}<br>${s.telephone?.trim() ? `<strong>Téléphone :</strong> ${s.telephone}` : ""}<br><strong>Email :</strong> ${s.email || "________________________________"}</p>` },
     { heading: "Situation professionnelle", content: `<p><strong>Statut :</strong> ☐ Salarié(e) ☐ Demandeur d'emploi ☐ Indépendant(e) ☐ Autre<br><strong>Entreprise :</strong> ${s.entreprise}<br><strong>Poste occupé :</strong> ${s.poste}<br><strong>Ancienneté :</strong> ________________________________</p>` },
     { heading: "Formation souhaitée", content: `<p><strong>Intitulé :</strong> ${f.intitule}<br><strong>Objectifs personnels :</strong> ________________________________<br><strong>Comment avez-vous connu ${o.nom} ?</strong> ☐ Internet ☐ Bouche à oreille ☐ Pôle Emploi ☐ OPCO ☐ Autre</p>` },
     { heading: "Situation de handicap", content: `<p>☐ Oui ☐ Non<br>Si oui, nature de l'aménagement souhaité : ________________________________<br><strong>Référent handicap :</strong> ${o.referentHandicap} – ${o.email}</p>` },
@@ -7426,7 +7426,7 @@ function genTrameEvalBesoins(o: OrganismeInfo, f: FormationInfo, stagiaires: Sta
 <strong>Civilité :</strong> ${answers.civilite}<br>
 <strong>Nom :</strong> ${s.nom}<br>
 <strong>Prénom :</strong> ${s.prenom}<br>
-<strong>Téléphone :</strong> ${s.telephone || "___"}<br>
+${s.telephone?.trim() ? `<strong>Téléphone :</strong> ${s.telephone}` : ""}<br>
 <strong>Mail :</strong> ${s.email || "___"}<br>
 <strong>Date :</strong> du ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)}<br>
 <strong>Formation souhaitée :</strong> ${f.intitule}
@@ -7480,7 +7480,7 @@ function genTrameEvalBesoinsStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
 <strong>Civilité :</strong> ${answers.civilite}<br>
 <strong>Nom :</strong> ${s.nom}<br>
 <strong>Prénom :</strong> ${s.prenom}<br>
-<strong>Téléphone :</strong> ${s.telephone || "___"}<br>
+${s.telephone?.trim() ? `<strong>Téléphone :</strong> ${s.telephone}` : ""}<br>
 <strong>Mail :</strong> ${s.email || "___"}<br>
 <strong>Date :</strong> du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}<br>
 <strong>Formation souhaitée :</strong> ${f.intitule}
@@ -11344,7 +11344,7 @@ function genDossierInscriptionCFA(o: OrganismeInfo, f: FormationInfo, stagiaires
     ["Adresse", s.adresse || "______"],
     ["Code postal", s.codePostal || "______"],
     ["Commune", s.commune || "______"],
-    ["Téléphone", s.telephone || "______"],
+    ...(s.telephone?.trim() ? [["Téléphone", s.telephone]] : []),
     ["Email", s.email || "______"],
     ["RQTH", s.rqth || "Non"],
     ["Dernier diplôme obtenu", s.diplome || "______"],
@@ -11418,7 +11418,7 @@ function genFactureEDOF100(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
     <div style="margin-bottom:20px;padding:12px;border:1px solid #ddd;border-radius:6px">
       <p><strong>${stagNom}</strong></p>
       <p><strong>Adresse :</strong> ${stagAdresse}</p>
-      <p><strong>Mail :</strong> ${s.email || "—"} &nbsp; <strong>Tél :</strong> ${s.telephone || "—"}</p>
+      <p><strong>Mail :</strong> ${s.email || "—"} &nbsp; ${s.telephone?.trim() ? `<strong>Tél :</strong> ${s.telephone}` : ""}</p>
     </div>
 
     <table style="width:100%;border-collapse:collapse;margin-bottom:20px">
@@ -11513,7 +11513,7 @@ function genFactureEDOF(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiair
     <div style="margin-bottom:20px;padding:12px;border:1px solid #ddd;border-radius:6px">
       <p><strong>${stagNom}</strong></p>
       <p><strong>Adresse :</strong> ${stagAdresse}</p>
-      <p><strong>Mail :</strong> ${s.email || "—"} &nbsp; <strong>Tél :</strong> ${s.telephone || "—"}</p>
+      <p><strong>Mail :</strong> ${s.email || "—"} &nbsp; ${s.telephone?.trim() ? `<strong>Tél :</strong> ${s.telephone}` : ""}</p>
     </div>
 
     <table style="width:100%;border-collapse:collapse;margin-bottom:20px">
