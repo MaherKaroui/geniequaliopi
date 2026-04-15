@@ -16,6 +16,104 @@ function isSocioEsthetique(f: FormationInfo): boolean {
   return t.includes("socio-esthéti") || t.includes("socio esthéti") || t.includes("rs5992") || t.includes("soins socio");
 }
 
+/** Détection domaine esthétique / beauté (extension cils, maquillage, onglerie, etc.) */
+function isEsthetique(f: FormationInfo): boolean {
+  const t = (f.intitule||"").toLowerCase() + " " + (f.codeRNCP||"").toLowerCase() + " " + (f.programme||"").toLowerCase();
+  return t.includes("esthéti") || t.includes("cil") || t.includes("maquill") || t.includes("ongle") || t.includes("beauté") ||
+    t.includes("manucure") || t.includes("prothésiste") || t.includes("nail") || t.includes("rehaussement") || t.includes("extension") ||
+    t.includes("microblading") || t.includes("dermographe") || t.includes("rs6147") || t.includes("rs5867") || t.includes("rs6299") ||
+    t.includes("cosmétique") || t.includes("epilation") || t.includes("brow") || t.includes("lash");
+}
+
+/** Détection domaine informatique / digital */
+function isInformatique(f: FormationInfo): boolean {
+  const t = (f.intitule||"").toLowerCase() + " " + (f.codeRNCP||"").toLowerCase();
+  return t.includes("informatique") || t.includes("développe") || t.includes("web") || t.includes("digital") ||
+    t.includes("ia ") || t.includes("intelligence artificielle") || t.includes("data") || t.includes("cybersécurité") ||
+    t.includes("cloud") || t.includes("devops") || t.includes("crm") || t.includes("webmarketing");
+}
+
+/** Détection domaine restauration / cuisine */
+function isRestauration(f: FormationInfo): boolean {
+  const t = (f.intitule||"").toLowerCase();
+  return t.includes("restaura") || t.includes("cuisi") || t.includes("pâtiss") || t.includes("boulang") || t.includes("haccp") || t.includes("hygiène alimentaire");
+}
+
+/** Détection domaine management / commerce */
+function isManagement(f: FormationInfo): boolean {
+  const t = (f.intitule||"").toLowerCase();
+  return t.includes("management") || t.includes("commercial") || t.includes("vente") || t.includes("négociation") || t.includes("conseiller") || t.includes("cip") || t.includes("assistant") || t.includes("direction");
+}
+
+/** Retourne le domaine détecté pour personnaliser le contenu */
+type FormationDomain = "socio_esthetique" | "esthetique" | "informatique" | "restauration" | "management" | "generique";
+function detectDomain(f: FormationInfo): FormationDomain {
+  if (isSocioEsthetique(f)) return "socio_esthetique";
+  if (isEsthetique(f)) return "esthetique";
+  if (isInformatique(f)) return "informatique";
+  if (isRestauration(f)) return "restauration";
+  if (isManagement(f)) return "management";
+  return "generique";
+}
+
+/** Contenu des équipements par domaine */
+function getDomainEquipements(domain: FormationDomain, yr: number): { equipement: string; qte: string; marque: string; etat: string }[] {
+  switch(domain) {
+    case "esthetique": return [
+      { equipement: "Lit de soins réglable multiposition", qte: "4", marque: "Beauty Star / BS-PRO", etat: "Excellent" },
+      { equipement: "Lampe loupe LED professionnelle", qte: "4", marque: "Daylight / D25050", etat: "Fonctionnel" },
+      { equipement: "Kit complet extension de cils (soie, vison, synthétique)", qte: "8", marque: "Noble Lashes / Premium", etat: "Neuf" },
+      { equipement: "Mannequin tête entraînement cils", qte: "8", marque: "Training Head Pro", etat: "Fonctionnel" },
+      { equipement: "Micro-brosses, colles pro, remover, patchs silicone", qte: "Stock", marque: "Lash Professional / Biosmetics", etat: "Renouvelé mensuellement" },
+      { equipement: "Stérilisateur UV pour instruments", qte: "2", marque: "Sterilux / ST-200", etat: "Fonctionnel" },
+      { equipement: "Kit rehaussement de cils (lotions, bigoudis, teinture)", qte: "8", marque: "RefectoCil / InLei", etat: "DLUO vérifiée" },
+      { equipement: "Miroirs grossissants éclairés LED x10", qte: "8", marque: "Simplehuman / ST3028", etat: "Fonctionnel" },
+      { equipement: "Vidéoprojecteur HD", qte: "1", marque: "Epson EB-FH06", etat: "Fonctionnel" },
+      { equipement: "Connexion internet fibre", qte: "1", marque: "Orange Pro / 1 Gbps", etat: "Fonctionnel" },
+      { equipement: "Ordinateur portable formateur", qte: "1", marque: "HP ProBook 450 G10", etat: "Fonctionnel" },
+      { equipement: "Imprimante couleur multifonction", qte: "1", marque: "HP Color LaserJet Pro", etat: "Fonctionnel" },
+    ];
+    case "informatique": return [
+      { equipement: "Postes informatiques haute performance", qte: "15", marque: "Dell Latitude 5540 / i7 16Go RAM", etat: "Fonctionnel" },
+      { equipement: "Écrans doubles 24\"", qte: "15", marque: "Dell P2422H", etat: "Fonctionnel" },
+      { equipement: "Vidéoprojecteur interactif", qte: "1", marque: "Epson EB-695Wi", etat: "Fonctionnel" },
+      { equipement: "Serveur de développement local", qte: "1", marque: "Dell PowerEdge T40", etat: "Fonctionnel" },
+      { equipement: "Switch réseau manageable + câblage Cat6", qte: "1", marque: "Cisco SG350", etat: "Fonctionnel" },
+      { equipement: "Connexion internet fibre dédiée", qte: "1", marque: "Orange Pro Fibre / 1 Gbps symétrique", etat: "Fonctionnel" },
+      { equipement: "Licences logicielles (Office 365, Adobe CC, IDE)", qte: "15", marque: "Microsoft / Adobe / JetBrains", etat: "À jour" },
+      { equipement: "Imprimante laser multifonction", qte: "1", marque: "HP LaserJet Pro M428", etat: "Fonctionnel" },
+    ];
+    case "restauration": return [
+      { equipement: "Fourneaux professionnels 6 feux", qte: "2", marque: "Bonnet / Thirode", etat: "Fonctionnel" },
+      { equipement: "Four mixte vapeur/convection", qte: "1", marque: "Rational SCC 61", etat: "Fonctionnel" },
+      { equipement: "Plans de travail inox professionnels", qte: "8", marque: "Sur mesure inox 304", etat: "Excellent" },
+      { equipement: "Batterie de cuisine complète", qte: "8 sets", marque: "De Buyer / Matfer", etat: "Fonctionnel" },
+      { equipement: "Réfrigérateur professionnel 2 portes", qte: "2", marque: "Liebherr GKPv", etat: "Fonctionnel" },
+      { equipement: "Thermomètres HACCP et sondes", qte: "8", marque: "Testo 104-IR", etat: "Calibrés" },
+      { equipement: "Vidéoprojecteur HD", qte: "1", marque: "Epson EB-FH06", etat: "Fonctionnel" },
+    ];
+    case "management": return [
+      { equipement: "Salle de formation équipée (tables modulables)", qte: "1", marque: "Steelcase / Mobilier modulaire", etat: "Fonctionnel" },
+      { equipement: "Vidéoprojecteur HD + écran motorisé", qte: "1", marque: "Epson EB-FH06 + Oray 240cm", etat: "Fonctionnel" },
+      { equipement: "Ordinateurs portables stagiaires", qte: "15", marque: "HP ProBook 450 G10", etat: "Fonctionnel" },
+      { equipement: "Connexion internet haut débit", qte: "1", marque: "Fibre 1 Gbps", etat: "Fonctionnel" },
+      { equipement: "Paperboard + marqueurs", qte: "2", marque: "—", etat: "Fonctionnel" },
+      { equipement: "Matériel pour jeux de rôle et simulations", qte: "Lot", marque: "Cartes scénarios, supports visuels", etat: "À jour" },
+      { equipement: "Imprimante couleur multifonction", qte: "1", marque: "HP Color LaserJet Pro", etat: "Fonctionnel" },
+    ];
+    default: return [
+      { equipement: "Salle de formation équipée (tables, chaises ergonomiques)", qte: "1", marque: "Mobilier professionnel", etat: "Fonctionnel" },
+      { equipement: "Vidéoprojecteur HD", qte: "1", marque: "Epson EB-FH06", etat: "Fonctionnel" },
+      { equipement: "Écran de projection mural 200x150cm", qte: "1", marque: "Oray", etat: "Fonctionnel" },
+      { equipement: "Ordinateurs portables", qte: "15", marque: "HP ProBook 450", etat: "Fonctionnel" },
+      { equipement: "Connexion internet fibre", qte: "1", marque: "Fibre 1 Gbps", etat: "Fonctionnel" },
+      { equipement: "Imprimante multifonction", qte: "1", marque: "HP LaserJet Pro", etat: "Fonctionnel" },
+      { equipement: "Tableau blanc / Paperboard", qte: "2", marque: "—", etat: "Fonctionnel" },
+      { equipement: "Matériel pédagogique spécifique", qte: "Lot", marque: "Adapté au domaine", etat: "Fonctionnel" },
+    ];
+  }
+}
+
 const td = `style="padding:8px;border:1px solid #ddd;"`;
 const tdb = `style="padding:8px;border:1px solid #ddd;font-weight:600;"`;
 const thStyle = (c: string) => `style="padding:10px;border:1px solid #ddd;background:${c};color:#fff;font-weight:600;"`;
@@ -23,13 +121,19 @@ const thStyle = (c: string) => `style="padding:10px;border:1px solid #ddd;backgr
 /* ═══ CODE 4 – Objectifs et méthodes par séquence ═══ */
 export function genObjectifsMethodesSequence(o: OrganismeInfo, f: FormationInfo): string {
   const socio = isSocioEsthetique(f);
+  const domain = detectDomain(f);
+  const esth = domain === "esthetique";
   const chapters = socio
     ? ["Module 1 : Analyse de la situation et diagnostic socio-esthétique", "Module 2 : Accueil bienveillant et relation d'aide", "Module 3 : Soins du visage adaptés aux peaux fragilisées", "Module 4 : Massages de bien-être adaptés", "Module 5 : Conseil en image et maquillage correcteur", "Module 6 : Évaluation, transmission et ateliers collectifs"]
-    : (f.programme || "Module 1 : Introduction\nModule 2 : Approfondissement\nModule 3 : Mise en pratique\nModule 4 : Évaluation").split("\n").filter(l => l.trim());
+    : esth
+    ? ["Module 1 : Accueil – Présentation – Hygiène et sécurité", "Module 2 : Théorie – Morphologie de l'œil et types de cils", "Module 3 : Technique – Pose classique cil à cil", "Module 4 : Technique – Volume russe et mégavolume", "Module 5 : Technique – Rehaussement et teinture de cils", "Module 6 : Pratique sur modèle – Mise en situation professionnelle", "Module 7 : Évaluation finale et passage de certification"]
+    : (f.programme || "Module 1 : Introduction et fondamentaux\nModule 2 : Approfondissement théorique\nModule 3 : Mise en pratique professionnelle\nModule 4 : Évaluation et certification").split("\n").filter(l => l.trim());
 
   const methodes = socio
     ? ["Démonstration technique sur modèle", "Mise en situation professionnelle reconstituée", "Jeux de rôle sur la relation d'aide", "Analyse de cas cliniques (photos, vidéos)", "Travaux pratiques sur mannequin et entre pairs", "Supervision individualisée par la formatrice"]
-    : ["Pédagogie active et participative", "Alternance théorie / pratique", "Supports numériques interactifs", "Évaluations formatives continues", "Accompagnement individualisé", "Études de cas professionnels"];
+    : esth
+    ? ["Cours théorique illustré (diaporama, planches morphologiques)", "Démonstration technique en direct par la formatrice", "Pratique sur mannequin tête d'entraînement", "Mise en situation professionnelle sur modèle vivant", "Correction individualisée poste par poste", "Analyse vidéo de la gestuelle et de la posture", "Exercice de conseil client et diagnostic visuel"]
+    : ["Pédagogie active et participative", "Alternance théorie / pratique", "Supports numériques interactifs", "Études de cas professionnels", "Mises en situation et jeux de rôle", "Accompagnement individualisé", "Travaux collaboratifs en sous-groupes"];
 
   const objectifs = socio
     ? [
@@ -40,7 +144,17 @@ export function genObjectifsMethodesSequence(o: OrganismeInfo, f: FormationInfo)
       "Conseiller en image et réaliser un maquillage correcteur (C8-C9)",
       "Évaluer les acquis, transmettre aux équipes et animer des ateliers collectifs (C10-C11)"
     ]
-    : chapters.map((_, i) => i===0?"Comprendre les fondamentaux":i===chapters.length-1?"Valider les acquis":"Maîtriser les techniques");
+    : esth
+    ? [
+      "S'approprier le cadre de la formation, les règles d'hygiène et de sécurité, identifier les compétences visées",
+      "Analyser la morphologie du visage, la forme des yeux, la densité et l'orientation des cils naturels",
+      "Maîtriser la technique de pose classique cil à cil : isolation, préhension, collage, direction",
+      "Réaliser des bouquets en volume russe (2D-6D) et mégavolume avec rapidité et précision",
+      "Pratiquer le rehaussement de cils (lotions, timing, teinture) dans le respect des protocoles",
+      "Réaliser des prestations complètes sur modèle vivant en conditions professionnelles réelles",
+      "Passer l'épreuve de certification : épreuve pratique + questionnaire théorique"
+    ]
+    : chapters.map((_, i) => i===0?"Acquérir les fondamentaux théoriques et le cadre réglementaire":i===chapters.length-1?"Valider les acquis par une évaluation certificative":"Maîtriser les techniques professionnelles par la mise en pratique");
 
   let rows = "";
   chapters.forEach((ch, i) => {
@@ -165,21 +279,33 @@ export function genDescriptifMoyensMateriels(o: OrganismeInfo, f: FormationInfo)
       <li><strong>Bibliographie professionnelle :</strong> Ouvrages de référence en socio-esthétique accessibles en salle</li>
     </ul>` });
   } else {
+    const domain = detectDomain(f);
+    const isEsth = domain === "esthetique";
+    const surface = isEsth ? "100 m² (1 salle théorique + 1 atelier pratique)" : domain === "restauration" ? "150 m² (1 salle + 1 cuisine pédagogique)" : domain === "informatique" ? "90 m² (1 salle informatique + 1 salle de réunion)" : "80 m² (1 salle de formation principale)";
+    const capacite = isEsth ? "8 personnes (atelier pratique)" : "15 personnes";
     sections.push({ heading: "1. Locaux de formation", content: `<table style="width:100%;border-collapse:collapse;">
       <tr><td ${tdb} style="width:35%;">Adresse</td><td ${td}>${o.adresse||"—"}, ${o.codePostal||""} ${o.ville||""}</td></tr>
-      <tr><td ${tdb}>Surface</td><td ${td}>80 m²</td></tr>
-      <tr><td ${tdb}>Capacité</td><td ${td}>15 personnes</td></tr>
-      <tr><td ${tdb}>Accessibilité PMR</td><td ${td}>Conforme</td></tr>
-      <tr><td ${tdb}>Conformité ERP</td><td ${td}>5ème catégorie</td></tr>
+      <tr><td ${tdb}>Surface totale</td><td ${td}>${surface}</td></tr>
+      <tr><td ${tdb}>Capacité d'accueil</td><td ${td}>${capacite}</td></tr>
+      <tr><td ${tdb}>Accessibilité PMR</td><td ${td}>Conforme – Accès de plain-pied ou rampe, toilettes adaptées</td></tr>
+      <tr><td ${tdb}>Conformité ERP</td><td ${td}>ERP de 5ème catégorie – Dernière visite : ${yr-1}</td></tr>
+      <tr><td ${tdb}>Climatisation</td><td ${td}>Salle climatisée – Température contrôlée${isEsth?" (important pour le confort des modèles)":""}</td></tr>
+      <tr><td ${tdb}>Sécurité</td><td ${td}>Extincteurs vérifiés, plan d'évacuation affiché, issues de secours balisées</td></tr>
     </table>` });
-    sections.push({ heading: "2. Équipements pédagogiques", content: `<table style="width:100%;border-collapse:collapse;font-size:0.9em;"><thead><tr style="background:${pc()};color:#fff;"><th style="padding:10px;border:1px solid #ddd;">Équipement</th><th style="padding:10px;border:1px solid #ddd;">Qté</th><th style="padding:10px;border:1px solid #ddd;">Marque</th><th style="padding:10px;border:1px solid #ddd;">État</th></tr></thead><tbody>
-      <tr><td ${td}>Salle de formation équipée (tables, chaises)</td><td ${td}>1</td><td ${td}>—</td><td ${td}>Fonctionnel</td></tr>
-      <tr><td ${td}>Vidéoprojecteur HD</td><td ${td}>1</td><td ${td}>Epson EB-FH06</td><td ${td}>Fonctionnel</td></tr>
-      <tr><td ${td}>Ordinateurs portables</td><td ${td}>15</td><td ${td}>HP ProBook 450</td><td ${td}>Fonctionnel</td></tr>
-      <tr><td ${td}>Connexion internet haut débit</td><td ${td}>1</td><td ${td}>Fibre 1 Gbps</td><td ${td}>Fonctionnel</td></tr>
-      <tr><td ${td}>Imprimante multifonction</td><td ${td}>1</td><td ${td}>HP LaserJet Pro</td><td ${td}>Fonctionnel</td></tr>
-      <tr><td ${td}>Tableau blanc / Paperboard</td><td ${td}>2</td><td ${td}>—</td><td ${td}>Fonctionnel</td></tr>
-    </tbody></table>` });
+    const equipements = getDomainEquipements(domain, yr);
+    let eqRows = equipements.map(eq => `<tr><td ${td}>${eq.equipement}</td><td ${td}>${eq.qte}</td><td ${td}>${eq.marque}</td><td ${td}>${eq.etat}</td></tr>`).join("");
+    sections.push({ heading: "2. Équipements pédagogiques", content: `<table style="width:100%;border-collapse:collapse;font-size:0.9em;"><thead><tr style="background:${pc()};color:#fff;"><th style="padding:10px;border:1px solid #ddd;">Équipement</th><th style="padding:10px;border:1px solid #ddd;">Qté</th><th style="padding:10px;border:1px solid #ddd;">Marque / Réf.</th><th style="padding:10px;border:1px solid #ddd;">État</th></tr></thead><tbody>${eqRows}</tbody></table>` });
+    if (isEsth) {
+      sections.push({ heading: "3. Supports pédagogiques spécialisés", content: `<ul>
+        <li><strong>Fiches techniques :</strong> Protocoles détaillés pour chaque type de pose (classique, volume russe, mixte, mégavolume)</li>
+        <li><strong>Supports visuels :</strong> Planches de morphologie oculaire, nuanciers de courbures et diamètres</li>
+        <li><strong>Vidéos tutorielles :</strong> Démonstrations filmées par la formatrice (accès plateforme sécurisée)</li>
+        <li><strong>Kits d'entraînement :</strong> Mannequins tête + cils d'exercice pour chaque stagiaire</li>
+        <li><strong>Référentiel certification :</strong> ${f.codeRNCP||"RS6147"} – Version complète imprimée et numérique</li>
+        <li><strong>Guide des contre-indications :</strong> Tableau récapitulatif des pathologies oculaires incompatibles</li>
+        <li><strong>Fiches produits :</strong> Caractéristiques techniques des colles, fibres et accessoires professionnels</li>
+      </ul>` });
+    }
   }
   if (isFOAD) sections.push({ heading: "3. Outils numériques et plateforme LMS", content: `<table style="width:100%;border-collapse:collapse;"><thead><tr style="background:${pc()};color:#fff;"><th style="padding:10px;border:1px solid #ddd;">Outil</th><th style="padding:10px;border:1px solid #ddd;">Éditeur</th><th style="padding:10px;border:1px solid #ddd;">Usage</th></tr></thead><tbody>
     <tr><td ${td}>Plateforme LMS</td><td ${td}>Moodle / 360Learning</td><td ${td}>Contenus, suivi progression, évaluations en ligne</td></tr>
