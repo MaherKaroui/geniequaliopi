@@ -713,10 +713,15 @@ export function getFormationDays(f: FormationInfo): string[] {
 
 export function mergeOrganisme(userOrg: OrganismeInfo): OrganismeInfo {
   const merged = { ...SAMPLE_ORGANISME };
+  // Fields that should NOT fallback to sample data when left empty by user
+  const noFallbackFields: (keyof OrganismeInfo)[] = ["telephone", "siteWeb"];
   for (const key of Object.keys(userOrg) as (keyof OrganismeInfo)[]) {
     const val = userOrg[key];
     if (val && ((typeof val === "string" && val.trim() !== "") || (Array.isArray(val) && val.length > 0))) {
       (merged as any)[key] = val;
+    } else if (noFallbackFields.includes(key)) {
+      // If user left these fields empty, keep them empty (don't use sample data)
+      (merged as any)[key] = "";
     }
   }
   return merged;
