@@ -121,13 +121,19 @@ const thStyle = (c: string) => `style="padding:10px;border:1px solid #ddd;backgr
 /* ═══ CODE 4 – Objectifs et méthodes par séquence ═══ */
 export function genObjectifsMethodesSequence(o: OrganismeInfo, f: FormationInfo): string {
   const socio = isSocioEsthetique(f);
+  const domain = detectDomain(f);
+  const esth = domain === "esthetique";
   const chapters = socio
     ? ["Module 1 : Analyse de la situation et diagnostic socio-esthétique", "Module 2 : Accueil bienveillant et relation d'aide", "Module 3 : Soins du visage adaptés aux peaux fragilisées", "Module 4 : Massages de bien-être adaptés", "Module 5 : Conseil en image et maquillage correcteur", "Module 6 : Évaluation, transmission et ateliers collectifs"]
-    : (f.programme || "Module 1 : Introduction\nModule 2 : Approfondissement\nModule 3 : Mise en pratique\nModule 4 : Évaluation").split("\n").filter(l => l.trim());
+    : esth
+    ? ["Module 1 : Accueil – Présentation – Hygiène et sécurité", "Module 2 : Théorie – Morphologie de l'œil et types de cils", "Module 3 : Technique – Pose classique cil à cil", "Module 4 : Technique – Volume russe et mégavolume", "Module 5 : Technique – Rehaussement et teinture de cils", "Module 6 : Pratique sur modèle – Mise en situation professionnelle", "Module 7 : Évaluation finale et passage de certification"]
+    : (f.programme || "Module 1 : Introduction et fondamentaux\nModule 2 : Approfondissement théorique\nModule 3 : Mise en pratique professionnelle\nModule 4 : Évaluation et certification").split("\n").filter(l => l.trim());
 
   const methodes = socio
     ? ["Démonstration technique sur modèle", "Mise en situation professionnelle reconstituée", "Jeux de rôle sur la relation d'aide", "Analyse de cas cliniques (photos, vidéos)", "Travaux pratiques sur mannequin et entre pairs", "Supervision individualisée par la formatrice"]
-    : ["Pédagogie active et participative", "Alternance théorie / pratique", "Supports numériques interactifs", "Évaluations formatives continues", "Accompagnement individualisé", "Études de cas professionnels"];
+    : esth
+    ? ["Cours théorique illustré (diaporama, planches morphologiques)", "Démonstration technique en direct par la formatrice", "Pratique sur mannequin tête d'entraînement", "Mise en situation professionnelle sur modèle vivant", "Correction individualisée poste par poste", "Analyse vidéo de la gestuelle et de la posture", "Exercice de conseil client et diagnostic visuel"]
+    : ["Pédagogie active et participative", "Alternance théorie / pratique", "Supports numériques interactifs", "Études de cas professionnels", "Mises en situation et jeux de rôle", "Accompagnement individualisé", "Travaux collaboratifs en sous-groupes"];
 
   const objectifs = socio
     ? [
