@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { CheckCircle2, Circle, Upload, Archive, Loader2, FileText, AlertTriangle, Sparkles, XCircle, ChevronDown, ChevronRight, Eye, Download, PenTool } from "lucide-react";
+import { CheckCircle2, Circle, Upload, Archive, Loader2, FileText, AlertTriangle, Sparkles, XCircle, ChevronDown, ChevronRight, Eye, Download, PenTool, Edit3, RotateCcw } from "lucide-react";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import { toast } from "sonner";
@@ -81,9 +81,12 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
   // Preview state
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewHtml, setPreviewHtml] = useState("");
+  const [editedHtml, setEditedHtml] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
   const [previewTitle, setPreviewTitle] = useState("");
   const [previewLoading, setPreviewLoading] = useState(false);
   const [previewDoc, setPreviewDoc] = useState<EYDocumentItem | null>(null);
+  const previewIframeRef = useRef<HTMLIFrameElement>(null);
   const orgName = organisme.nom || "Organisme";
   const safeName = useMemo(() => orgName.replace(/[^a-zA-Z0-9_-]/g, "_"), [orgName]);
   const mergedStagiaires = useMemo(
@@ -377,20 +380,60 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
     setPreviewTitle(`${eyDoc.code} — ${eyDoc.label}`);
     setPreviewDoc(eyDoc);
     setPreviewOpen(true);
+    setIsEditing(false);
     try {
       const template = eyDoc.autoTemplates[0];
       const o = mergeOrganisme(organisme);
       const s = exportStagiaires;
       const params = eyDoc.perStagiaire && s.length > 0 ? { stagiaireIdx: 0, fi: 0 } : { fi: 0 };
       const html = generateDocumentById(`ey_${eyDoc.code}`, template, params, o, formation, s);
-      setPreviewHtml(html || "<p>Impossible de générer l'aperçu</p>");
+      const content = html || "<p>Impossible de générer l'aperçu</p>";
+      setPreviewHtml(content);
+      setEditedHtml(content);
     } catch (e) {
       console.error("Preview error:", e);
-      setPreviewHtml("<p>Erreur lors de la génération de l'aperçu</p>");
+      const err = "<p>Erreur lors de la génération de l'aperçu</p>";
+      setPreviewHtml(err);
+      setEditedHtml(err);
     } finally {
       setPreviewLoading(false);
     }
   }, [organisme, formation, exportStagiaires]);
+
+  // Toggle edit mode — sync content from iframe when entering/exiting
+  const toggleEditMode = useCallback(() => {
+    if (isEditing) {
+      // Exiting edit mode — read content from iframe
+      const iframe = previewIframeRef.current;
+      if (iframe?.contentDocument?.body) {
+        const updatedHtml = iframe.contentDocument.documentElement.outerHTML;
+        setEditedHtml(`<!DOCTYPE html><html>${updatedHtml.slice(updatedHtml.indexOf('<html') + updatedHtml.match(/<html[^>]*>/)?.[0]?.length! || 6)}`);
+      }
+      setIsEditing(false);
+    } else {
+      setIsEditing(true);
+    }
+  }, [isEditing]);
+
+  // Enable contentEditable on iframe load
+  const handleIframeLoad = useCallback(() => {
+    if (!isEditing) return;
+    const iframe = previewIframeRef.current;
+    if (iframe?.contentDocument?.body) {
+      iframe.contentDocument.designMode = "on";
+    }
+  }, [isEditing]);
+
+  // Get the current HTML for export (edited or original)
+  const getCurrentHtml = useCallback((): string => {
+    if (isEditing) {
+      const iframe = previewIframeRef.current;
+      if (iframe?.contentDocument?.body) {
+        return `<!DOCTYPE html><html>${iframe.contentDocument.documentElement.innerHTML}</html>`;
+      }
+    }
+    return editedHtml;
+  }, [isEditing, editedHtml]);
 
   // Inject signature into HTML before PDF export
   const injectSignatureIntoHtml = useCallback((html: string, sigDataUrl: string): string => {
@@ -404,28 +447,32 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
 
   // Download single preview document as PDF
   const handleDownloadPreview = useCallback(async () => {
-    if (!previewHtml || !previewDoc) return;
+    if (!previewDoc) return;
+    const html = getCurrentHtml();
+    if (!html) return;
     try {
-      const blob = await htmlToPdfBlob(previewHtml);
+      const blob = await htmlToPdfBlob(html);
       saveAs(blob, `${safeName}_${previewDoc.code}.pdf`);
       toast.success("Document téléchargé !");
     } catch (e: any) {
       toast.error("Erreur : " + (e.message || "Erreur inconnue"));
     }
-  }, [previewHtml, previewDoc, safeName]);
+  }, [getCurrentHtml, previewDoc, safeName]);
 
   // Download with signature
   const handleSignAndDownload = useCallback(async () => {
-    if (!previewHtml || !previewDoc || !signature) return;
+    if (!previewDoc || !signature) return;
+    const html = getCurrentHtml();
+    if (!html) return;
     try {
-      const signedHtml = injectSignatureIntoHtml(previewHtml, signature);
+      const signedHtml = injectSignatureIntoHtml(html, signature);
       const blob = await htmlToPdfBlob(signedHtml);
       saveAs(blob, `${safeName}_${previewDoc.code}_signe.pdf`);
       toast.success("Document signé et téléchargé !");
     } catch (e: any) {
       toast.error("Erreur : " + (e.message || "Erreur inconnue"));
     }
-  }, [previewHtml, previewDoc, safeName, signature, injectSignatureIntoHtml]);
+  }, [getCurrentHtml, previewDoc, safeName, signature, injectSignatureIntoHtml]);
 
   const downloadZip = useCallback(async () => {
     setGenerating(true);
@@ -738,15 +785,36 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
         </div>
       </div>
 
-      {/* Preview Dialog */}
-      <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
+      {/* Preview / Edit Dialog */}
+      <Dialog open={previewOpen} onOpenChange={(open) => {
+        if (!open && isEditing) {
+          // Save edits from iframe before closing
+          const iframe = previewIframeRef.current;
+          if (iframe?.contentDocument?.body) {
+            setEditedHtml(`<!DOCTYPE html><html>${iframe.contentDocument.documentElement.innerHTML}</html>`);
+          }
+          setIsEditing(false);
+        }
+        setPreviewOpen(open);
+      }}>
         <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Eye className="w-5 h-5" />
               {previewTitle}
+              {isEditing && (
+                <Badge variant="secondary" className="text-xs ml-2">Mode édition</Badge>
+              )}
             </DialogTitle>
           </DialogHeader>
+
+          {isEditing && (
+            <div className="flex items-center gap-2 px-1 py-1 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-700">
+              <Edit3 className="w-3.5 h-3.5 shrink-0" />
+              <span>Cliquez directement dans le document pour modifier le texte. Les modifications seront conservées pour l'export.</span>
+            </div>
+          )}
+
           <div className="flex-1 overflow-auto border rounded-lg bg-white">
             {previewLoading ? (
               <div className="flex items-center justify-center p-12">
@@ -755,10 +823,12 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
               </div>
             ) : (
               <iframe
-                srcDoc={previewHtml}
+                ref={previewIframeRef}
+                srcDoc={editedHtml}
                 className="w-full h-[60vh] border-0"
                 title="Aperçu du document"
                 sandbox="allow-same-origin"
+                onLoad={handleIframeLoad}
               />
             )}
           </div>
@@ -770,21 +840,52 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
             </div>
           )}
 
-          <div className="flex justify-end gap-2 pt-2">
-            <Button variant="outline" onClick={() => setPreviewOpen(false)}>
-              Fermer
-            </Button>
-            {signature ? (
-              <Button onClick={handleSignAndDownload} className="gap-1">
-                <PenTool className="w-4 h-4" />
-                Télécharger signé
+          <div className="flex justify-between gap-2 pt-2">
+            <div className="flex gap-2">
+              {/* Edit toggle */}
+              <Button
+                variant={isEditing ? "default" : "outline"}
+                size="sm"
+                onClick={toggleEditMode}
+                className="gap-1"
+              >
+                <Edit3 className="w-4 h-4" />
+                {isEditing ? "Terminer l'édition" : "Éditer"}
               </Button>
-            ) : (
-              <Button onClick={handleDownloadPreview} className="gap-1">
-                <Download className="w-4 h-4" />
-                Télécharger en PDF
+
+              {/* Reset to original */}
+              {editedHtml !== previewHtml && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setEditedHtml(previewHtml);
+                    setIsEditing(false);
+                  }}
+                  className="gap-1 text-muted-foreground"
+                >
+                  <RotateCcw className="w-4 h-4" />
+                  Réinitialiser
+                </Button>
+              )}
+            </div>
+
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={() => setPreviewOpen(false)}>
+                Fermer
               </Button>
-            )}
+              {signature ? (
+                <Button onClick={handleSignAndDownload} className="gap-1">
+                  <PenTool className="w-4 h-4" />
+                  Télécharger signé
+                </Button>
+              ) : (
+                <Button onClick={handleDownloadPreview} className="gap-1">
+                  <Download className="w-4 h-4" />
+                  Télécharger en PDF
+                </Button>
+              )}
+            </div>
           </div>
         </DialogContent>
       </Dialog>
