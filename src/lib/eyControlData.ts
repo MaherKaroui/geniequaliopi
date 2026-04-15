@@ -297,6 +297,14 @@ export const EY_DOCUMENTS: EYDocumentItem[] = [
     category: "formateurs",
   },
   {
+    code: "23",
+    label: "Attestations de formation continue des formateurs",
+    description: "Éléments probants de la formation continue des formateurs (attestations, certificats, justificatifs)",
+    autoTemplates: ["ey_formation_continue_formateurs"],
+    perStagiaire: false,
+    category: "formateurs",
+  },
+  {
     code: "24",
     label: "Contrats des sous-traitants pédagogiques",
     description: "Contrats de prestations de service pour les sous-traitants pédagogiques",
