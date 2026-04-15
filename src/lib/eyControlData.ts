@@ -601,6 +601,13 @@ export const EY_DOCUMENTS: EYDocumentItem[] = [
     category: "communication",
   },
   {
+    code: "52",
+    label: "Règlement intérieur de l'OF",
+    description: "Règlement intérieur applicable aux stagiaires, signé au début de la prestation",
+    autoTemplates: ["reglement_interieur_stagiaire"],
+    perStagiaire: true,
+    category: "communication",
+  },
     code: "55",
     label: "Plaquette / supports de communication",
     description: "Exemples de supports de communication, plaquette de présentation transmis au stagiaire",
