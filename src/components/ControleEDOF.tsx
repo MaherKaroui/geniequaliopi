@@ -567,6 +567,13 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
     return groups;
   }, []);
 
+  // Flat list sorted numerically 1-68 for sequential display
+  const sequentialDocs = useMemo(() => {
+    return [...EY_DOCUMENTS]
+      .filter(d => /^\d+$/.test(d.code))
+      .sort((a, b) => parseInt(a.code) - parseInt(b.code));
+  }, []);
+
   return (
     <div className="space-y-6">
       {/* Header */}
