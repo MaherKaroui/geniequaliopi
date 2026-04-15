@@ -423,7 +423,7 @@ export function genContratsProprieteSupports(o: OrganismeInfo, f: FormationInfo)
       <tr><td ${td}>Supports de cours (${socio?"protocoles de soins, fiches techniques":"diaporamas, exercices"})</td><td ${td}>${f.formateur||SAMPLE_FORMATEURS[0].prenom+" "+SAMPLE_FORMATEURS[0].nom}</td><td ${td}>${yr-1}</td><td ${td}>PowerPoint / Word</td></tr>
       <tr><td ${td}>Évaluations (QCM, grilles, exercices pratiques)</td><td ${td}>${f.formateur||SAMPLE_FORMATEURS[0].prenom+" "+SAMPLE_FORMATEURS[0].nom}</td><td ${td}>${yr-1}</td><td ${td}>Word</td></tr>
       <tr><td ${td}>Livret d'accueil stagiaire</td><td ${td}>${o.responsablePedagogique||"Direction"}</td><td ${td}>${yr-1}</td><td ${td}>PDF</td></tr>
-      ${socio?`<tr><td ${td}>Protocoles de soins socio-esthétiques (12 fiches)</td><td ${td}>Marie Fontaine (formatrice)</td><td ${td}>${yr-1}</td><td ${td}>PDF illustré</td></tr>`:""}
+      ${socio?`<tr><td ${td}>Protocoles de soins socio-esthétiques (12 fiches)</td><td ${td}>${f.formateur||"Formateur principal"} (formatrice)</td><td ${td}>${yr-1}</td><td ${td}>PDF illustré</td></tr>`:""}
     </tbody></table>` },
     { heading: "2. Supports acquis auprès de tiers", content: `<table style="width:100%;border-collapse:collapse;"><thead><tr style="background:${pc()};color:#fff;"><th ${td}>Support</th><th ${td}>Éditeur / Auteur</th><th ${td}>Licence</th><th ${td}>N° contrat</th><th ${td}>Validité</th></tr></thead><tbody>
       ${socio?`<tr><td ${td}>Référentiel RS5992 – Réaliser des soins socio-esthétiques</td><td ${td}>France Compétences</td><td ${td}>Libre de droits (public)</td><td ${td}>—</td><td ${td}>Permanent</td></tr>
@@ -440,7 +440,7 @@ export function genContratsProprieteSupports(o: OrganismeInfo, f: FormationInfo)
 export function genAttestationDiplomesFormateurs(o: OrganismeInfo, f: FormationInfo): string {
   const socio = isSocioEsthetique(f);
   const formateurs = socio ? [
-    { nom: "Marie Fontaine", diplomes: ["CAP Esthétique Cosmétique Parfumerie – Académie de Paris (2005)", "BTS Esthétique Cosmétique – Option Management (2007)", "DU Socio-esthétique – Hôpital Rothschild / Université Paris-Est Créteil (2012)", "Certification RS5992 – Réaliser des soins socio-esthétiques (2019)", "Formation continue « Accompagnement des publics fragilisés » – CODES (2022)"], role: "Formatrice principale – Socio-esthétique" },
+    { nom: f.formateur||"Formateur principal", diplomes: ["CAP Esthétique Cosmétique Parfumerie – Académie de Paris (2005)", "BTS Esthétique Cosmétique – Option Management (2007)", "DU Socio-esthétique – Hôpital Rothschild / Université Paris-Est Créteil (2012)", "Certification RS5992 – Réaliser des soins socio-esthétiques (2019)", "Formation continue « Accompagnement des publics fragilisés » – CODES (2022)"], role: "Formatrice principale – Socio-esthétique" },
   ] : SAMPLE_FORMATEURS.slice(0,2).map((fmt, i) => ({
     nom: `${fmt.prenom} ${fmt.nom}`,
     diplomes: [fmt.diplomes, `Certification ${f.codeRNCP||"professionnelle"} – ${new Date().getFullYear()-3}`].filter(Boolean),
@@ -463,8 +463,8 @@ export function genAttestationDiplomesFormateurs(o: OrganismeInfo, f: FormationI
 export function genFichierFormateursStatut(o: OrganismeInfo, f: FormationInfo): string {
   const socio = isSocioEsthetique(f);
   const formateurs = socio ? [
-    { nom: "Marie Fontaine", specialite: "Socio-esthétique, maquillage correcteur, massage adapté", statut: "CDI", juridique: "—", nda: o.nda||"NDA-XXXX", qualiopi: "—", heures: "52h (parcours complet)" },
-    { nom: "Dr Sophie Laurent", specialite: "Psychologie, relation d'aide, publics fragilisés", statut: "Sous-traitant", juridique: "Micro-entreprise", nda: "NDA-7544892", qualiopi: "Non", heures: "8h (Module relation d'aide)" },
+    { nom: f.formateur||"Formateur principal", specialite: "Socio-esthétique, maquillage correcteur, massage adapté", statut: "CDI", juridique: "—", nda: o.nda||"NDA-XXXX", qualiopi: "—", heures: "52h (parcours complet)" },
+    { nom: o.responsablePedagogique||"Intervenant externe", specialite: "Psychologie, relation d'aide, publics fragilisés", statut: "Sous-traitant", juridique: "Micro-entreprise", nda: "NDA-7544892", qualiopi: "Non", heures: "8h (Module relation d'aide)" },
   ] : SAMPLE_FORMATEURS.map((fmt, i) => ({
     nom: `${fmt.prenom} ${fmt.nom}`, specialite: fmt.specialite,
     statut: i===0?"CDI":i===1?"CDD":"Sous-traitant",
@@ -493,12 +493,12 @@ export function genFormationContinueFormateurs(o: OrganismeInfo, f: FormationInf
   const socio = isSocioEsthetique(f);
   const domain = detectDomain(f);
   const formateurs = socio ? [
-    { nom: "Marie Fontaine", formations: [
+    { nom: f.formateur||"Formateur principal", formations: [
       { intitule: "Maquillage correcteur avancé – Oncologie", organisme: "Kryolan Academy Paris", date: `15/03/${yr-1}`, duree: "16h", attestation: "Oui" },
       { intitule: "Accompagnement psychologique des publics vulnérables", organisme: "CODES – Paris", date: `10/06/${yr-1}`, duree: "14h", attestation: "Oui" },
       { intitule: "Actualisation des protocoles d'hygiène en esthétique", organisme: "CMA Île-de-France", date: `20/01/${yr}`, duree: "7h", attestation: "Oui" },
     ]},
-    { nom: "Dr Sophie Laurent", formations: [
+    { nom: o.responsablePedagogique||"Intervenant externe", formations: [
       { intitule: "Supervision clinique – Pratiques d'écoute", organisme: "Institut de Psychologie – Paris", date: `05/09/${yr-1}`, duree: "21h", attestation: "Oui" },
     ]},
   ] : SAMPLE_FORMATEURS.slice(0, 3).map((fmt, i) => ({
