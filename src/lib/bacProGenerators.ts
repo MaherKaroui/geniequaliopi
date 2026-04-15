@@ -1018,6 +1018,36 @@ export function genEval15(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
     ], s, f, si, 32, o, 15);
 }
 
+/** French public holidays (fixed + Easter-based) */
+function getEasterSunday(year: number): Date {
+  const a = year % 19, b = Math.floor(year / 100), c = year % 100;
+  const d = Math.floor(b / 4), e = b % 4, ff = Math.floor((b + 8) / 25);
+  const gg = Math.floor((b - ff + 1) / 3), h = (19 * a + b - d - gg + 15) % 30;
+  const i = Math.floor(c / 4), k = c % 4;
+  const l = (32 + 2 * e + 2 * i - h - k) % 7;
+  const m = Math.floor((a + 11 * h + 22 * l) / 451);
+  const month = Math.floor((h + l - 7 * m + 114) / 31);
+  const day = ((h + l - 7 * m + 114) % 31) + 1;
+  return new Date(year, month - 1, day);
+}
+function isFrenchHoliday(dt: Date): boolean {
+  const y = dt.getFullYear(), mo = dt.getMonth(), dy = dt.getDate();
+  if (mo === 0 && dy === 1) return true;
+  if (mo === 4 && dy === 1) return true;
+  if (mo === 4 && dy === 8) return true;
+  if (mo === 6 && dy === 14) return true;
+  if (mo === 7 && dy === 15) return true;
+  if (mo === 10 && dy === 1) return true;
+  if (mo === 10 && dy === 11) return true;
+  if (mo === 11 && dy === 25) return true;
+  const es = getEasterSunday(y);
+  const check = (off: number) => { const t = new Date(es); t.setDate(es.getDate() + off); return dt.toDateString() === t.toDateString(); };
+  if (check(1)) return true;  // Lundi de Pâques
+  if (check(39)) return true; // Ascension
+  if (check(50)) return true; // Lundi de Pentecôte
+  return false;
+}
+
 // ============================================
 // RAPPORT DE TEMPS DE CONNEXION (BPL_CONNEXION)
 // ============================================
