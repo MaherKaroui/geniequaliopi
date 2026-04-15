@@ -1944,12 +1944,14 @@ function genEmargementStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: 
   const dateDebut = s.dateDebutFormation || f.dateDebut || "";
   const dateFin = s.dateFinFormation || f.dateFin || "";
   let days: string[] = [];
+  const includeSat = formationIncludesSaturday(f);
   if (dateDebut && dateFin) {
     const start = new Date(dateDebut + "T00:00:00");
     const end = new Date(dateFin + "T00:00:00");
     const current = new Date(start);
     while (current <= end) {
-      if (current.getDay() !== 0 && current.getDay() !== 6) {
+      const dow = current.getDay();
+      if (dow !== 0 && (includeSat || dow !== 6)) {
         days.push(current.toLocaleDateString("fr-FR", { weekday: "long", year: "numeric", month: "long", day: "numeric" }));
       }
       current.setDate(current.getDate() + 1);
@@ -1983,8 +1985,10 @@ function getStagiaireDays(s: StagiaireInfo, f: FormationInfo): string[] {
   const end = new Date(fin);
   const days: string[] = [];
   const current = new Date(start);
+  const includeSat = formationIncludesSaturday(f);
   while (current <= end) {
-    if (current.getDay() !== 0 && current.getDay() !== 6) {
+    const dow = current.getDay();
+    if (dow !== 0 && (includeSat || dow !== 6)) {
       days.push(current.toLocaleDateString("fr-FR", { weekday: "long", year: "numeric", month: "long", day: "numeric" }));
     }
     current.setDate(current.getDate() + 1);
