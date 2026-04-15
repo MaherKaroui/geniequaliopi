@@ -447,15 +447,17 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
 
   // Download single preview document as PDF
   const handleDownloadPreview = useCallback(async () => {
-    if (!previewHtml || !previewDoc) return;
+    if (!previewDoc) return;
+    const html = getCurrentHtml();
+    if (!html) return;
     try {
-      const blob = await htmlToPdfBlob(previewHtml);
+      const blob = await htmlToPdfBlob(html);
       saveAs(blob, `${safeName}_${previewDoc.code}.pdf`);
       toast.success("Document téléchargé !");
     } catch (e: any) {
       toast.error("Erreur : " + (e.message || "Erreur inconnue"));
     }
-  }, [previewHtml, previewDoc, safeName]);
+  }, [getCurrentHtml, previewDoc, safeName]);
 
   // Download with signature
   const handleSignAndDownload = useCallback(async () => {
