@@ -376,7 +376,7 @@ export const EY_DOCUMENTS: EYDocumentItem[] = [
     code: "57",
     label: "Contrat de formation",
     description: "Contrat de formation pour la prestation vendue au stagiaire",
-    autoTemplates: ["cgv_stagiaire"],
+    autoTemplates: ["contrat_formation_pro_stagiaire"],
     perStagiaire: true,
     category: "administratif",
   },
