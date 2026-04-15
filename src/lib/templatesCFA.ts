@@ -32,7 +32,7 @@ export function genOrganigrammeCFA(o: OrganismeInfo) {
 export function genLivretAccueilApprenti(o: OrganismeInfo, f: FormationInfo) {
   return buildDocument({ org: o, title: "LIVRET D'ACCUEIL DE L'APPRENTI", subtitle: f.intitule, sections: [
     { heading: "Bienvenue au CFA !", content: `<p>Nous sommes heureux de vous accueillir en tant qu'apprenti(e) pour la formation « ${f.intitule} ». Ce livret contient toutes les informations nécessaires au bon déroulement de votre parcours d'alternance.</p>` },
-    { heading: "Vos contacts", content: `<p><strong>Direction :</strong> ${o.dirigeant}<br><strong>Coord. pédagogique :</strong> ${o.responsablePedagogique}<br><strong>Référent handicap :</strong> ${o.referentHandicap}<br><strong>Référent qualité :</strong> ${o.referentQualite}<br><strong>Tél :</strong> ${o.telephone} | <strong>Email :</strong> ${o.email}</p>` },
+    { heading: "Vos contacts", content: `<p><strong>Direction :</strong> ${o.dirigeant}<br><strong>Coord. pédagogique :</strong> ${o.responsablePedagogique}<br><strong>Référent handicap :</strong> ${o.referentHandicap}<br><strong>Référent qualité :</strong> ${o.referentQualite}<br>${o.telephone?.trim() ? `<strong>Tél :</strong> ${o.telephone} | ` : ""}<strong>Email :</strong> ${o.email}</p>` },
     { heading: "Votre alternance", content: `<p><strong>Rythme :</strong> 3 jours entreprise / 2 jours CFA<br><strong>Durée :</strong> À définir selon le groupe<br><strong>Lieu CFA :</strong> ${f.lieu}<br><strong>Horaires :</strong> 8h30-12h30 / 13h30-16h30</p>` },
     { heading: "Vos droits et devoirs", content: "<p>• Suivre avec assiduité la formation au CFA et en entreprise<br>• Respecter le règlement intérieur<br>• Tenir à jour votre carnet de liaison<br>• Prévenir en cas d'absence (CFA ET entreprise)<br>• Participer aux évaluations et examens</p>" },
     { heading: "Aides et accompagnement", content: "<p>• Aide au permis de conduire<br>• Aide au premier équipement<br>• Aide à la mobilité<br>• Accompagnement social (logement, santé)<br>• Soutien scolaire individualisé</p>", variant: "green" },
@@ -53,7 +53,7 @@ export function genReglementInterieurCFA(o: OrganismeInfo) {
 export function genCharteHandicapCFA(o: OrganismeInfo) {
   return buildDocument({ org: o, title: "CHARTE HANDICAP DU CFA", sections: [
     { heading: "Engagement", content: `<p>Le CFA ${o.nom} s'engage à accueillir et accompagner tout apprenti en situation de handicap, en mettant en place les aménagements nécessaires à la réussite de son parcours.</p>` },
-    { heading: "Référent handicap", content: `<p>${o.referentHandicap} – ${o.email} – ${o.telephone}</p>` },
+    { heading: "Référent handicap", content: `<p>${o.referentHandicap} – ${o.email} ${o.telephone?.trim() ? `– ${o.telephone}` : ""}</p>` },
     { heading: "Aménagements possibles", content: "<p>• Aménagement des rythmes d'alternance<br>• Supports pédagogiques adaptés<br>• Temps supplémentaire aux examens (1/3 temps)<br>• Tutorat renforcé<br>• Accompagnement personnalisé<br>• Accessibilité des locaux</p>", variant: "green" },
     { heading: "Partenaires", content: "<p>• Agefiph<br>• FIPHFP<br>• MDPH<br>• Cap Emploi<br>• Ressource Handicap Formation</p>" },
   ], signatures: { type: "2", labels: ["Le Directeur", "Le Référent Handicap"], names: [o.dirigeant, o.referentHandicap] } });
@@ -867,7 +867,7 @@ export function genLivretApprentissageCFA(o: OrganismeInfo, f: FormationInfo, st
       <tr><td style="padding:8px;border:1px solid #ccc;font-weight:bold">Prénom</td><td style="padding:8px;border:1px solid #ccc">${s.prenom}</td></tr>
       <tr><td style="padding:8px;border:1px solid #ccc;font-weight:bold">Date de naissance</td><td style="padding:8px;border:1px solid #ccc">${s.dateNaissance || '___/___/______'}</td></tr>
       <tr><td style="padding:8px;border:1px solid #ccc;font-weight:bold">Adresse</td><td style="padding:8px;border:1px solid #ccc">${s.email || '___________________'}</td></tr>
-      <tr><td style="padding:8px;border:1px solid #ccc;font-weight:bold">Téléphone</td><td style="padding:8px;border:1px solid #ccc">${s.telephone || '___________________'}</td></tr>
+      ${s.telephone?.trim() ? `<tr><td style="padding:8px;border:1px solid #ccc;font-weight:bold">Téléphone</td><td style="padding:8px;border:1px solid #ccc">${s.telephone}</td></tr>` : ""}
       <tr><td style="padding:8px;border:1px solid #ccc;font-weight:bold">Entreprise</td><td style="padding:8px;border:1px solid #ccc">${s.entreprise || '___________________'}</td></tr>
     </table>
 
@@ -1119,8 +1119,8 @@ export function genListeAideSocialCFA(o: OrganismeInfo) {
   return buildDocument({ org: o, title: "LISTE AIDE SOCIAL", extraHtml: `
     <table style="width:100%;border-collapse:collapse;margin:20px 0">
       <tr style="background:#1e3a7b;color:white"><th style="padding:10px;border:1px solid #ccc;text-align:left">Structure</th><th style="padding:10px;border:1px solid #ccc;text-align:left">Horaires</th><th style="padding:10px;border:1px solid #ccc;text-align:left">Contact</th></tr>
-      <tr><td style="padding:8px;border:1px solid #ccc"><strong>MISSION LOCALE</strong></td><td style="padding:8px;border:1px solid #ccc">Lundi-Jeudi : 08:30–12:30, 13:30–17:00<br>Vendredi : 08:30–12:30</td><td style="padding:8px;border:1px solid #ccc">${o.telephone}</td></tr>
-      <tr><td style="padding:8px;border:1px solid #ccc"><strong>SERVICE JEUNESSE</strong></td><td style="padding:8px;border:1px solid #ccc">Lundi-Jeudi : 13:30–18:00<br>Mercredi : 10:30–18:00<br>Vendredi : 13:30–17:00</td><td style="padding:8px;border:1px solid #ccc">${o.telephone}</td></tr>
+      <tr><td style="padding:8px;border:1px solid #ccc"><strong>MISSION LOCALE</strong></td><td style="padding:8px;border:1px solid #ccc">Lundi-Jeudi : 08:30–12:30, 13:30–17:00<br>Vendredi : 08:30–12:30</td><td style="padding:8px;border:1px solid #ccc">${o.telephone?.trim() ? o.telephone : ""}</td></tr>
+      <tr><td style="padding:8px;border:1px solid #ccc"><strong>SERVICE JEUNESSE</strong></td><td style="padding:8px;border:1px solid #ccc">Lundi-Jeudi : 13:30–18:00<br>Mercredi : 10:30–18:00<br>Vendredi : 13:30–17:00</td><td style="padding:8px;border:1px solid #ccc">${o.telephone?.trim() ? o.telephone : ""}</td></tr>
       <tr><td style="padding:8px;border:1px solid #ccc"><strong>ASSISTANTE SOCIALE</strong></td><td style="padding:8px;border:1px solid #ccc">Sur rendez-vous</td><td style="padding:8px;border:1px solid #ccc">${o.adresse}, ${o.codePostal} ${o.ville}<br>${o.telephone}</td></tr>
       <tr><td style="padding:8px;border:1px solid #ccc"><strong>PÔLE EMPLOI</strong></td><td style="padding:8px;border:1px solid #ccc">Lundi-Vendredi : 09:00–16:30</td><td style="padding:8px;border:1px solid #ccc">3949</td></tr>
       <tr><td style="padding:8px;border:1px solid #ccc"><strong>CAF</strong></td><td style="padding:8px;border:1px solid #ccc">Lundi-Vendredi : 09:00–16:00</td><td style="padding:8px;border:1px solid #ccc">www.caf.fr</td></tr>

@@ -207,7 +207,7 @@ export function genContratFormationPro_V2(o: OrganismeInfo, f: FormationInfo, st
       <p>${o.nom}<br>Adresse : ${o.adresse}, ${o.codePostal} ${o.ville}<br>SIRET : ${o.siret}<br>Email : ${o.email}<br>Représenté par : ${o.dirigeant}</p>
       <p>Ci-après dénommé « l'Organisme de formation »,</p>
       <h4>Et le stagiaire</h4>
-      <p>Nom et prénom : ${s.prenom} ${s.nom}${s.email ? `<br>Email : ${s.email}` : ''}${s.telephone ? `<br>Téléphone : ${s.telephone}` : ''}</p>
+      <p>Nom et prénom : ${s.prenom} ${s.nom}${s.email ? `<br>Email : ${s.email}` : ''}${s.telephone ? `${s.telephone?.trim() ? `${s.telephone?.trim() ? `<br>Téléphone : ${s.telephone}` : ""}` : ""}` : ''}</p>
       <p>Ci-après dénommé « le Stagiaire »,</p>
       <h3>Article 1 – Objet du contrat</h3>
       <p>Le présent contrat a pour objet la participation du stagiaire à l'action de formation suivante :</p>
@@ -308,7 +308,7 @@ export function genContratFormationProStagiaire(o: OrganismeInfo, f: FormationIn
     <p>${o.nom}<br>Adresse : ${o.adresse}, ${o.codePostal} ${o.ville}<br>SIRET : ${o.siret}<br>Email : ${o.email}<br>Représenté par : ${o.dirigeant}</p>
     <p>Ci-après dénommé « l'Organisme de formation »,</p>
     <h4>Et le stagiaire</h4>
-    <p>Nom et prénom : ${s.prenom} ${s.nom}${s.email ? `<br>Email : ${s.email}` : ''}${s.telephone ? `<br>Téléphone : ${s.telephone}` : ''}</p>
+    <p>Nom et prénom : ${s.prenom} ${s.nom}${s.email ? `<br>Email : ${s.email}` : ''}${s.telephone ? `${s.telephone?.trim() ? `${s.telephone?.trim() ? `<br>Téléphone : ${s.telephone}` : ""}` : ""}` : ''}</p>
     <p>Ci-après dénommé « le Stagiaire »,</p>
     <h3>Article 1 – Objet du contrat</h3>
     <p>Le présent contrat a pour objet la participation du stagiaire à l'action de formation suivante :</p>
@@ -382,7 +382,7 @@ export function genConventionFormationTripartite(o: OrganismeInfo, f: FormationI
     <p><strong>${entrepriseNom}</strong><br>Représentée par : ${respEntreprise}${poste !== "_______________" ? `, en qualité de ${poste}` : ""}</p>
     <p>Ci-après dénommée « l'Entreprise »,</p>
     <h4>3. Le/La Stagiaire</h4>
-    <p><strong>${s.prenom} ${s.nom}</strong>${s.poste ? `<br>Poste occupé : ${s.poste}` : ""}${s.email ? `<br>Email : ${s.email}` : ""}${s.telephone ? `<br>Téléphone : ${s.telephone}` : ""}</p>
+    <p><strong>${s.prenom} ${s.nom}</strong>${s.poste ? `<br>Poste occupé : ${s.poste}` : ""}${s.email ? `<br>Email : ${s.email}` : ""}${s.telephone ? `${s.telephone?.trim() ? `${s.telephone?.trim() ? `<br>Téléphone : ${s.telephone}` : ""}` : ""}` : ""}</p>
     <p>Ci-après dénommé(e) « le/la Stagiaire »,</p>
     <h3>Article 1 – Objet de la convention</h3>
     <p>La présente convention définit les conditions de l'action de formation au bénéfice du/de la Stagiaire, salarié(e) de l'Entreprise :</p>
