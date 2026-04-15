@@ -144,7 +144,17 @@ export function genObjectifsMethodesSequence(o: OrganismeInfo, f: FormationInfo)
       "Conseiller en image et réaliser un maquillage correcteur (C8-C9)",
       "Évaluer les acquis, transmettre aux équipes et animer des ateliers collectifs (C10-C11)"
     ]
-    : chapters.map((_, i) => i===0?"Comprendre les fondamentaux":i===chapters.length-1?"Valider les acquis":"Maîtriser les techniques");
+    : esth
+    ? [
+      "S'approprier le cadre de la formation, les règles d'hygiène et de sécurité, identifier les compétences visées",
+      "Analyser la morphologie du visage, la forme des yeux, la densité et l'orientation des cils naturels",
+      "Maîtriser la technique de pose classique cil à cil : isolation, préhension, collage, direction",
+      "Réaliser des bouquets en volume russe (2D-6D) et mégavolume avec rapidité et précision",
+      "Pratiquer le rehaussement de cils (lotions, timing, teinture) dans le respect des protocoles",
+      "Réaliser des prestations complètes sur modèle vivant en conditions professionnelles réelles",
+      "Passer l'épreuve de certification : épreuve pratique + questionnaire théorique"
+    ]
+    : chapters.map((_, i) => i===0?"Acquérir les fondamentaux théoriques et le cadre réglementaire":i===chapters.length-1?"Valider les acquis par une évaluation certificative":"Maîtriser les techniques professionnelles par la mise en pratique");
 
   let rows = "";
   chapters.forEach((ch, i) => {
