@@ -110,6 +110,14 @@ function getEvalDate(evalNum: number, s: StagiaireInfo, f: FormationInfo): strin
   if (!weekNum) return formatDate(f.dateFin || "") || "N/A";
   const evalDate = new Date(monday);
   evalDate.setDate(evalDate.getDate() + (weekNum - 1) * 7 + 4);
+  // Cap: never exceed dateFin
+  const endStr = (s as any).dateFinFormation || (s as any).dateFin || f.dateFin || "";
+  if (endStr) {
+    const endDate = new Date(endStr);
+    if (!isNaN(endDate.getTime()) && evalDate > endDate) {
+      return formatDate(endDate.toISOString().slice(0, 10));
+    }
+  }
   return formatDate(evalDate.toISOString().slice(0, 10));
 }
 function stagCivilite(s: StagiaireInfo) {
