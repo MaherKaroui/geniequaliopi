@@ -608,6 +608,7 @@ export const EY_DOCUMENTS: EYDocumentItem[] = [
     perStagiaire: true,
     category: "communication",
   },
+  {
     code: "55",
     label: "Plaquette / supports de communication",
     description: "Exemples de supports de communication, plaquette de présentation transmis au stagiaire",
