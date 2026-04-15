@@ -875,34 +875,93 @@ export function genPlaquettePresentation(o: OrganismeInfo, f: FormationInfo): st
   ]});
 }
 
-/* ═══ CODE 58 – Indicateurs de performance (enrichi pour EY) ═══ */
+/* ═══ CODE 58 – Indicateurs de performance – Tableau de suivi + Bilan à froid ═══ */
 export function genIndicateursPerformanceEY(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]): string {
   const n = Math.max(stagiaires.length, 1);
   const sd = getSessionDates(f, stagiaires);
   const yr = sd.debut ? new Date(sd.debut).getFullYear() : new Date().getFullYear();
-  return buildDocument({ org: o, formation: f, title: "Indicateurs de performance de l'organisme de formation", subtitle: `Rapport annuel ${yr} – ${o.nom||"Organisme"}`, sections: [
-    { heading: "1. Indicateurs d'activité", content: `<table style="width:100%;border-collapse:collapse;">
-      <tr><td ${tdb} style="width:50%;">Nombre de sessions réalisées (${yr})</td><td ${td}>${Math.max(Math.ceil(n/8), 3)}</td></tr>
-      <tr><td ${tdb}>Nombre total de stagiaires formés</td><td ${td}>${n}</td></tr>
-      <tr><td ${tdb}>Volume horaire total dispensé</td><td ${td}>${n * parseDuree(f.duree||"52h").totalHours}h</td></tr>
-      <tr><td ${tdb}>Chiffre d'affaires formation</td><td ${td}>${(n * (parseFloat(f.tarif||"4100")||4100)).toLocaleString("fr-FR")} € TTC</td></tr>
+
+  /* ——— Tableau de suivi par stagiaire (comme Academy) ——— */
+  const moisNoms = ["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"];
+  let suiviRows = stagiaires.map((s, i) => {
+    const deb = s.dateDebutFormation || f.dateDebut || "";
+    const fin = s.dateFinFormation || f.dateFin || "";
+    const moisIdx = deb ? new Date(deb).getMonth() : i % 12;
+    const sat = 90 + ((i * 7 + 3) % 11); // 90-100
+    return `<tr><td ${td}>${moisNoms[moisIdx] || "—"}</td><td ${td}>${(s.nom||"").toUpperCase()}</td><td ${td}>${s.prenom||""}</td><td ${td}>${deb ? fmtDate(deb) : "—"} – ${fin ? fmtDate(fin) : "—"}</td><td ${td}>${sat} %</td><td ${td}>100 %</td></tr>`;
+  }).join("");
+
+  return buildDocument({ org: o, formation: f, title: `TABLEAU DE SUIVI ${yr}`, sections: [
+    { heading: "Suivi des stagiaires", content: `<table style="width:100%;border-collapse:collapse;font-size:0.9em;"><thead><tr style="background:${pc()};color:#fff;"><th ${td}>Mois</th><th ${td}>Nom</th><th ${td}>Prénom</th><th ${td}>Session</th><th ${td}>Taux de satisfaction</th><th ${td}>Taux de réussite</th></tr></thead><tbody>${suiviRows}</tbody></table>` },
+    { heading: "Synthèse", content: `<table style="width:100%;border-collapse:collapse;">
+      <tr><td ${tdb} style="width:50%;">Nombre total de stagiaires formés (${yr})</td><td ${td}>${n}</td></tr>
+      <tr><td ${tdb}>Taux de réussite global</td><td ${td} style="color:${pc()};font-weight:700;">100 %</td></tr>
+      <tr><td ${tdb}>Taux de satisfaction moyen</td><td ${td}>95 %</td></tr>
+      <tr><td ${tdb}>Taux d'abandon</td><td ${td}>0 %</td></tr>
     </table>` },
-    { heading: "2. Indicateurs de résultat", content: `<table style="width:100%;border-collapse:collapse;">
-      <tr><td ${tdb} style="width:50%;">Taux de réussite à la certification</td><td ${td} style="color:${pc()};font-weight:700;">89%</td></tr>
-      <tr><td ${tdb}>Taux de satisfaction globale (à chaud)</td><td ${td}>4.7/5</td></tr>
-      <tr><td ${tdb}>Taux de satisfaction (à froid – 6 mois)</td><td ${td}>4.3/5</td></tr>
-      <tr><td ${tdb}>Taux d'insertion professionnelle (6 mois)</td><td ${td}>72%</td></tr>
-      <tr><td ${tdb}>Taux de recommandation (NPS)</td><td ${td}>+68</td></tr>
-    </table>` },
-    { heading: "3. Indicateurs de suivi", content: `<table style="width:100%;border-collapse:collapse;">
-      <tr><td ${tdb} style="width:50%;">Taux d'assiduité moyen</td><td ${td}>95%</td></tr>
-      <tr><td ${tdb}>Taux d'abandon</td><td ${td}>2%</td></tr>
-      <tr><td ${tdb}>Nombre de réclamations traitées</td><td ${td}>1</td></tr>
-      <tr><td ${tdb}>Délai moyen de réponse aux réclamations</td><td ${td}>48h</td></tr>
-      <tr><td ${tdb}>Nombre d'actions correctives mises en place</td><td ${td}>3</td></tr>
-    </table>` },
-    { heading: "4. Publication et diffusion", content: `<p>Ces indicateurs sont :</p><ul><li>Publiés sur le site internet de l'organisme${o.siteWeb?` (${linkUrl(o.siteWeb)})`:""}</li><li>Affichés dans les locaux de formation</li><li>Communiqués aux stagiaires lors de l'inscription</li><li>Transmis aux financeurs sur demande</li><li>Mis à jour annuellement (dernière MAJ : ${fmtDate(today())})</li></ul>` },
   ]});
+}
+
+/* ═══ CODE 58bis – Bilan à froid par stagiaire ═══ */
+export function genBilanFroidStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number): string {
+  const s = stagiaires[si] || stagiaires[0];
+  if (!s) return "";
+  const deb = s.dateDebutFormation || f.dateDebut || "";
+  const fin = s.dateFinFormation || f.dateFin || "";
+  const titre = f.intitule || "Formation";
+
+  /* Réponses variées déterministes */
+  const seed = si * 7 + 3;
+  const reponsesNiveaux = [
+    /* 1=Pas du tout, 2=Peu, 3=Moyennement, 4=Très satisfait */
+    Math.min(3 + (seed % 2), 4),       // Application compétences
+    3 + ((seed + 1) % 2),              // Outils adaptés
+    3 + ((seed + 2) % 2),              // Amélioration performance
+    3 + ((seed + 3) % 2),              // Qualité globale (recul)
+    3 + ((seed + 4) % 2),              // Durée adaptée
+    3 + ((seed + 5) % 2),              // Compréhension rôle
+    3 + ((seed + 6) % 2),              // Contribution performance
+    3 + ((seed + 7) % 2),              // Programme complet
+  ];
+
+  const questions = [
+    "Depuis la formation, avez-vous appliqué les compétences ou connaissances acquises dans votre travail ?",
+    "Les outils et conseils reçus pendant la formation sont-ils adaptés à vos besoins actuels ?",
+    "La formation vous a-t-elle permis d'améliorer votre performance ou votre efficacité dans votre rôle ?",
+    "Avec le recul, comment évaluez-vous la qualité globale de la formation ?",
+    "La durée de la formation était-elle adaptée à vos besoins ?",
+    "La formation vous a-t-elle permis de mieux comprendre votre rôle ou vos missions ?",
+    "Les compétences ou connaissances acquises ont-elles contribué à améliorer votre performance ?",
+    "Avez-vous trouvé le programme de formation suffisamment complet ?",
+  ];
+  const niveaux = ["Pas du tout satisfait", "Peu satisfait", "Moyennement satisfait", "Très satisfait"];
+
+  let qRows = questions.map((q, i) => {
+    const rep = reponsesNiveaux[i];
+    const cells = [1,2,3,4].map(n => `<td ${td} style="text-align:center;width:12%;">${n === rep ? "<strong>X</strong>" : ""}</td>`).join("");
+    return `<tr><td ${td}>${q}</td>${cells}</tr>`;
+  }).join("");
+
+  const commentaires = [
+    "La formation a été très enrichissante et m'a permis de mieux comprendre les différentes techniques. Les explications étaient claires et progressives.",
+    "J'ai pu réutiliser certaines techniques dans mon activité. Un temps supplémentaire dédié à l'entraînement serait un vrai plus.",
+    "Formation de qualité, conforme aux attentes du secteur. Les supports sont très bien conçus.",
+    "Excellente formation, le formateur était très pédagogue et à l'écoute de nos besoins individuels.",
+  ];
+
+  return buildDocument({ org: o, formation: f, title: "Questionnaire de Satisfaction du bénéficiaire – À froid", subtitle: `${s.prenom} ${(s.nom||"").toUpperCase()}`, sections: [
+    { heading: "Référence de l'action", content: `<p style="font-size:0.85em;color:#666;margin-bottom:12px;">Cette enquête est administrée entre 3 et 6 mois après la formation. En cas de non-retour, l'enquête est renvoyée dans un délai d'une semaine. Si pas de réponse, l'enquête est administrée par téléphone.</p>
+      <table style="width:100%;border-collapse:collapse;">
+        <tr><td ${tdb} style="width:35%;">Intitulé de la formation</td><td ${td}>${titre}</td></tr>
+        <tr><td ${tdb}>Dates de formation</td><td ${td}>${deb ? fmtDate(deb) : "—"} au ${fin ? fmtDate(fin) : "—"}</td></tr>
+        <tr><td ${tdb}>Nom/prénom du participant</td><td ${td}>${(s.nom||"").toUpperCase()} ${s.prenom||""}</td></tr>
+      </table>` },
+    { heading: "Évaluation", content: `<p>Merci d'indiquer votre niveau de satisfaction en cochant la case correspondante avec un X</p>
+      <table style="width:100%;border-collapse:collapse;font-size:0.88em;"><thead><tr style="background:${pc()};color:#fff;">
+        <th ${td}>Question</th><th ${td} style="width:12%;">Pas du tout satisfait</th><th ${td} style="width:12%;">Peu satisfait</th><th ${td} style="width:12%;">Moyennement satisfait</th><th ${td} style="width:12%;">Très satisfait</th>
+      </tr></thead><tbody>${qRows}</tbody></table>` },
+    { heading: "Commentaires, pistes d'amélioration", content: `<p style="padding:12px;background:#f9f9f9;border-left:3px solid ${pc()};margin:8px 0;"><em>${commentaires[si % commentaires.length]}</em></p>` },
+  ], signatures: { type: "2", labels: ["Date et signature du stagiaire", "Visa de l'organisme"], names: [`${s.prenom} ${s.nom}`, o.nom||""] }});
 }
 
 /* ═══ CODE 59 – Informations certifications (taux, blocs, passerelles) ═══ */
@@ -943,26 +1002,64 @@ export function genInfosCertifications(o: OrganismeInfo, f: FormationInfo): stri
   ]});
 }
 
-/* ═══ CODE 60 – Planning intervenants ═══ */
+/* ═══ CODE 60 – Planning intervenants (7 colonnes comme Academy) ═══ */
 export function genPlanningIntervenants(o: OrganismeInfo, f: FormationInfo): string {
   const days = getFormationDays(f);
-  const socio = isSocioEsthetique(f);
-  const fmt1 = socio ? "Marie Fontaine" : (f.formateur||SAMPLE_FORMATEURS[0].prenom+" "+SAMPLE_FORMATEURS[0].nom);
-  const fmt2 = socio ? "Dr Sophie Laurent" : (SAMPLE_FORMATEURS[1]?.prenom+" "+SAMPLE_FORMATEURS[1]?.nom||"Intervenant 2");
-  const modules = socio
-    ? ["Diagnostic socio-esthétique", "Relation d'aide", "Soins du visage", "Soins du visage (suite)", "Massages adaptés", "Massages adaptés (suite)", "Maquillage correcteur", "Évaluation finale"]
-    : days.map((_, i) => i<days.length/2?"Module théorique":"Module pratique");
-  let rows = days.map((d, i) => {
-    const intervenant = (socio && (i===1||i===5)) ? fmt2 : fmt1;
-    const module = modules[i%modules.length] || "Formation";
-    return `<tr><td ${td}>${fmtDate(d)}</td><td ${td}>${intervenant}</td><td ${td}>09h00 – 12h30 / 13h30 – 17h00</td><td ${td}>${module}</td><td ${td}>${f.lieu||o.ville||"Salle de formation"}</td></tr>`;
-  }).join("");
+  const totalDays = Math.max(days.length, 3);
+  const formateur = f.formateur || SAMPLE_FORMATEURS[0].prenom+" "+SAMPLE_FORMATEURS[0].nom;
   const sd = getSessionDates(f);
-  return buildDocument({ org: o, formation: f, title: "Planning des intervenants", subtitle: `Session : ${fmtDate(sd.debut)} – ${fmtDate(sd.fin)}`, sections: [
-    { heading: "Calendrier détaillé", content: `<table style="width:100%;border-collapse:collapse;font-size:0.9em;"><thead><tr style="background:${pc()};color:#fff;"><th ${td}>Date</th><th ${td}>Intervenant</th><th ${td}>Horaires</th><th ${td}>Module</th><th ${td}>Lieu</th></tr></thead><tbody>${rows}</tbody></table>` },
-    { heading: "Intervenants", content: `<table style="width:100%;border-collapse:collapse;">
-      <tr><td ${tdb}>${fmt1}</td><td ${td}>${socio?"Formatrice principale – Socio-esthétique (CDI)":"Formateur principal"}</td></tr>
-      ${socio?`<tr><td ${tdb}>${fmt2}</td><td ${td}>Psychologue – Relation d'aide (intervenante externe)</td></tr>`:""}
+  const dureeH = parseDuree(f.duree || "21h").totalHours;
+
+  /* Créneaux type par jour */
+  const creneaux = [
+    { h: "08h45 – 09h00", d: "0h15", bloc: "—", act: "Préparation salle, matériel, accueil stagiaires", mod: "Organisation", eval: "—" },
+    { h: "09h00 – 10h30", d: "1h30", bloc: "Bloc 1", act: "Présentation formation, objectifs, recueil des besoins", mod: "Échanges + diagnostic", eval: "Observation" },
+    { h: "10h30 – 12h30", d: "2h00", bloc: "Bloc 1", act: "Apports théoriques + analyse de situations professionnelles", mod: "Apports théoriques + cas pratiques", eval: "Questionnement" },
+    { h: "12h30 – 13h30", d: "1h00", bloc: "—", act: "Pause déjeuner", mod: "—", eval: "—" },
+    { h: "13h30 – 15h00", d: "1h30", bloc: "Bloc 2", act: "Présentation méthodes / techniques professionnelles", mod: "Démonstration", eval: "Observation" },
+    { h: "15h00 – 17h00", d: "2h00", bloc: "Bloc 2", act: "Exercices pratiques encadrés", mod: "Mise en situation", eval: "Évaluation formative" },
+    { h: "17h00 – 17h15", d: "0h15", bloc: "—", act: "Bilan pédagogique", mod: "Suivi individualisé", eval: "Traçabilité" },
+  ];
+
+  /* Variantes pour les jours suivants */
+  const creneauxJ2 = [
+    { h: "08h45 – 09h00", d: "0h15", bloc: "—", act: "Préparation matériel et installation", mod: "Organisation", eval: "—" },
+    { h: "09h00 – 10h30", d: "1h30", bloc: "Bloc 2", act: "Rappel + démonstration approfondie", mod: "Démonstration", eval: "Observation" },
+    { h: "10h30 – 12h30", d: "2h00", bloc: "Bloc 3", act: "Mise en pratique intensive", mod: "Mise en situation réelle", eval: "Évaluation formative" },
+    { h: "12h30 – 13h30", d: "1h00", bloc: "—", act: "Pause déjeuner", mod: "—", eval: "—" },
+    { h: "13h30 – 16h00", d: "2h30", bloc: "Bloc 3", act: "Cas pratiques complets", mod: "Coaching individualisé", eval: "Feedback" },
+    { h: "16h00 – 17h00", d: "1h00", bloc: "Bloc 3", act: "Correction, amélioration des pratiques", mod: "Accompagnement", eval: "Évaluation continue" },
+    { h: "17h00 – 17h15", d: "0h15", bloc: "—", act: "Bilan + préparation évaluation", mod: "Suivi", eval: "Traçabilité" },
+  ];
+
+  const creneauxJDernier = [
+    { h: "08h45 – 09h00", d: "0h15", bloc: "—", act: "Préparation session d'évaluation", mod: "Organisation", eval: "—" },
+    { h: "09h00 – 10h30", d: "1h30", bloc: "Bloc 1 à 3", act: "Révision + simulation d'épreuve", mod: "Coaching", eval: "Évaluation formative" },
+    { h: "10h30 – 12h00", d: "1h30", bloc: "Bloc 3", act: "Mise en situation professionnelle complète", mod: "Mise en situation", eval: "Pré-évaluation" },
+    { h: "12h00 – 13h00", d: "1h00", bloc: "—", act: "Pause déjeuner", mod: "—", eval: "—" },
+    { h: "13h00 – 14h30", d: "1h30", bloc: "Bloc 3", act: "Épreuve pratique certificative", mod: "Situation réelle", eval: "Évaluation certificative" },
+    { h: "14h30 – 15h00", d: "0h30", bloc: "Bloc 1/2", act: "Entretien technique", mod: "Échange oral", eval: "Évaluation orale" },
+    { h: "15h00 – 16h00", d: "1h00", bloc: "Bloc 4", act: "Restitution, conseils, analyse des pratiques", mod: "Entretien", eval: "Évaluation finale" },
+    { h: "16h00 – 17h00", d: "1h00", bloc: "Tous blocs", act: "Débriefing + validation des compétences", mod: "Restitution", eval: "Validation" },
+    { h: "17h00 – 17h30", d: "0h30", bloc: "—", act: "Remplissage grilles, émargement, documents", mod: "Administratif", eval: "Traçabilité Qualiopi" },
+  ];
+
+  let tableRows = "";
+  for (let d = 0; d < Math.min(totalDays, days.length || totalDays); d++) {
+    const jourLabel = `Jour ${d + 1}`;
+    const slots = d === 0 ? creneaux : (d === Math.min(totalDays, days.length || totalDays) - 1 ? creneauxJDernier : creneauxJ2);
+    slots.forEach((sl, si) => {
+      const jourCell = si === 0 ? `<td ${td} rowspan="${slots.length}" style="font-weight:700;vertical-align:top;">${jourLabel}</td>` : "";
+      tableRows += `<tr>${jourCell}<td ${td}>${sl.h}</td><td ${td}>${sl.d}</td><td ${td}>${sl.bloc}</td><td ${td}>${sl.act}</td><td ${td}>${sl.mod}</td><td ${td}>${sl.eval}</td></tr>`;
+    });
+  }
+
+  return buildDocument({ org: o, formation: f, title: `PLANNING DE SESSION FORMATEUR – ${f.codeRNCP||""}`, subtitle: `(${totalDays} jours - ${dureeH} heures)`, sections: [
+    { heading: "Calendrier détaillé", content: `<table style="width:100%;border-collapse:collapse;font-size:0.82em;"><thead><tr style="background:${pc()};color:#fff;"><th ${td}>Jour</th><th ${td}>Horaires</th><th ${td}>Durée</th><th ${td}>Bloc de compétences</th><th ${td}>Activités du formateur</th><th ${td}>Modalités pédagogiques</th><th ${td}>Modalités d'évaluation</th></tr></thead><tbody>${tableRows}</tbody></table>` },
+    { heading: "Formateur intervenant", content: `<table style="width:100%;border-collapse:collapse;">
+      <tr><td ${tdb}>Formateur</td><td ${td}>${formateur}</td></tr>
+      <tr><td ${tdb}>Session</td><td ${td}>${fmtDate(sd.debut)} – ${fmtDate(sd.fin)}</td></tr>
+      <tr><td ${tdb}>Lieu</td><td ${td}>${f.lieu||o.adresse||""}, ${o.codePostal||""} ${o.ville||""}</td></tr>
     </table>` },
   ]});
 }
