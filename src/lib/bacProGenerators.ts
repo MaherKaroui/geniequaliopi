@@ -405,7 +405,7 @@ export function genTestPositionnementBacPro(o: OrganismeInfo, f: FormationInfo, 
   const s = stagiaires[si] || stagiaires[0];
   const dateDebut = stagDateDebut(s, f);
   const dateFin = stagDateFin(s, f);
-  const formateur = stagFormateur(s);
+  const formateur = getFormateur(f, s);
 
   const questions = [
     { q: "Citez trois éléments à vérifier avant l'arrivée d'une livraison de marchandises dans un entrepôt. Expliquez brièvement l'importance de chacun.", r: "Vérifier le bon de commande, préparer la zone de réception et s'assurer de la disponibilité du personnel. Cela permet d'anticiper et de garantir une réception efficace." },
@@ -460,7 +460,7 @@ export function genGrilleAcquisitionBacPro(o: OrganismeInfo, f: FormationInfo, s
   const s = stagiaires[si] || stagiaires[0];
   const dateDebut = stagDateDebut(s, f);
   const dateFin = stagDateFin(s, f);
-  const formateur = stagFormateur(s);
+  const formateur = getFormateur(f, s);
 
   const activities = [
     { title: "Activité 1 – Réception et stockage des marchandises", comps: [
@@ -618,7 +618,7 @@ export function genBilanFormationBacPro(o: OrganismeInfo, f: FormationInfo, stag
   const s = stagiaires[si] || stagiaires[0];
   const dateDebut = stagDateDebut(s, f);
   const dateFin = stagDateFin(s, f);
-  const formateur = stagFormateur(s);
+  const formateur = getFormateur(f, s);
   const good = ((si + 1) * 7) % 3 === 0;
 
   return wrap(`
@@ -676,7 +676,7 @@ interface QCMQuestion {
 function genQCMEval(title: string, questions: QCMQuestion[], s: StagiaireInfo, f: FormationInfo, si: number, o?: OrganismeInfo): string {
   const dateDebut = stagDateDebut(s, f);
   const dateFin = stagDateFin(s, f);
-  const formateur = stagFormateur(s);
+  const formateur = getFormateur(f, s);
   const nbQ = questions.length;
   let totalScore = 0;
 
@@ -738,7 +738,7 @@ interface OpenQuestion {
 function genOpenEval(title: string, context: string, questions: OpenQuestion[], s: StagiaireInfo, f: FormationInfo, si: number, totalPoints: number, o?: OrganismeInfo): string {
   const dateDebut = stagDateDebut(s, f);
   const dateFin = stagDateFin(s, f);
-  const formateur = stagFormateur(s);
+  const formateur = getFormateur(f, s);
   let totalScore = 0;
 
   const qHtml = questions.map((q, i) => {
