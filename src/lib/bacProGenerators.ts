@@ -66,8 +66,51 @@ function stagDateDebut(s: StagiaireInfo, f: FormationInfo) {
 function stagDateFin(s: StagiaireInfo, f: FormationInfo) {
   return formatDate((s as any).dateFinFormation || (s as any).dateFin || f.dateFin || "") || "N/A";
 }
-function stagFormateur(s: StagiaireInfo) {
-  return s.formateur || "Le formateur";
+function getFormateur(f: FormationInfo, s?: StagiaireInfo) {
+  return f.formateur || s?.formateur || "Le formateur";
+}
+
+/**
+ * Planning Bac Pro Logistique — mapping eval number → school week (last week of pair).
+ * 2 semaines école / 2 semaines entreprise alternance.
+ * Eval date = Friday of the corresponding school week.
+ */
+const EVAL_WEEK_MAP: Record<number, number> = {
+  1: 2,    // S1+S2 École – QCM diagnostic
+  2: 6,    // S5+S6 École – QCM Réception
+  3: 6,    // S5+S6 École – Cas pratique Réception
+  4: 10,   // S9+S10 École – Cas pratique Stockage
+  5: 14,   // S13+S14 École – QCM Préparation commandes
+  6: 14,   // S13+S14 École – Exercice Préparation commandes
+  7: 18,   // S17+S18 École – Étude de cas Expédition
+  8: 22,   // S21+S22 École – QCM Organisation des flux
+  9: 22,   // S21+S22 École – Cas pratique Organisation des flux
+  10: 26,  // S25+S26 École – Exercice Gestion des stocks
+  11: 26,  // S25+S26 École – QCM Gestion des stocks
+  12: 30,  // S29+S30 École – QCM sécurité Conduite d'engins
+  13: 34,  // S33+S34 École – Mise en situation Communication
+  14: 38,  // S37+S38 École – Examen blanc (Révisions globales)
+  15: 42,  // S41+S42 École – Examen blanc final
+};
+
+/**
+ * Compute the exact evaluation date (Friday of the school week) from formation start date.
+ */
+function getEvalDate(evalNum: number, s: StagiaireInfo, f: FormationInfo): string {
+  const startStr = (s as any).dateDebutFormation || (s as any).dateDebut || f.dateDebut || "";
+  if (!startStr) return formatDate(f.dateFin || "") || "N/A";
+  const start = new Date(startStr);
+  if (isNaN(start.getTime())) return formatDate(startStr) || "N/A";
+  const dayOfWeek = start.getDay();
+  const mondayOffset = dayOfWeek === 0 ? 1 : dayOfWeek === 6 ? 2 : (dayOfWeek === 1 ? 0 : -(dayOfWeek - 1));
+  const monday = new Date(start);
+  monday.setDate(monday.getDate() + mondayOffset);
+
+  const weekNum = EVAL_WEEK_MAP[evalNum];
+  if (!weekNum) return formatDate(f.dateFin || "") || "N/A";
+  const evalDate = new Date(monday);
+  evalDate.setDate(evalDate.getDate() + (weekNum - 1) * 7 + 4);
+  return formatDate(evalDate.toISOString().slice(0, 10));
 }
 function stagCivilite(s: StagiaireInfo) {
   if (s.civilite === "Mme") return "Madame";
@@ -362,7 +405,7 @@ export function genTestPositionnementBacPro(o: OrganismeInfo, f: FormationInfo, 
   const s = stagiaires[si] || stagiaires[0];
   const dateDebut = stagDateDebut(s, f);
   const dateFin = stagDateFin(s, f);
-  const formateur = stagFormateur(s);
+  const formateur = getFormateur(f, s);
 
   const questions = [
     { q: "Citez trois éléments à vérifier avant l'arrivée d'une livraison de marchandises dans un entrepôt. Expliquez brièvement l'importance de chacun.", r: "Vérifier le bon de commande, préparer la zone de réception et s'assurer de la disponibilité du personnel. Cela permet d'anticiper et de garantir une réception efficace." },
@@ -417,7 +460,7 @@ export function genGrilleAcquisitionBacPro(o: OrganismeInfo, f: FormationInfo, s
   const s = stagiaires[si] || stagiaires[0];
   const dateDebut = stagDateDebut(s, f);
   const dateFin = stagDateFin(s, f);
-  const formateur = stagFormateur(s);
+  const formateur = getFormateur(f, s);
 
   const activities = [
     { title: "Activité 1 – Réception et stockage des marchandises", comps: [
@@ -575,7 +618,7 @@ export function genBilanFormationBacPro(o: OrganismeInfo, f: FormationInfo, stag
   const s = stagiaires[si] || stagiaires[0];
   const dateDebut = stagDateDebut(s, f);
   const dateFin = stagDateFin(s, f);
-  const formateur = stagFormateur(s);
+  const formateur = getFormateur(f, s);
   const good = ((si + 1) * 7) % 3 === 0;
 
   return wrap(`
@@ -630,10 +673,11 @@ interface QCMQuestion {
   answer: string;
 }
 
-function genQCMEval(title: string, questions: QCMQuestion[], s: StagiaireInfo, f: FormationInfo, si: number, o?: OrganismeInfo): string {
+function genQCMEval(title: string, questions: QCMQuestion[], s: StagiaireInfo, f: FormationInfo, si: number, o?: OrganismeInfo, evalNum?: number): string {
   const dateDebut = stagDateDebut(s, f);
   const dateFin = stagDateFin(s, f);
-  const formateur = stagFormateur(s);
+  const formateur = getFormateur(f, s);
+  const dateEval = evalNum ? getEvalDate(evalNum, s, f) : dateFin;
   const nbQ = questions.length;
   let totalScore = 0;
 
@@ -643,7 +687,6 @@ function genQCMEval(title: string, questions: QCMQuestion[], s: StagiaireInfo, f
     const letters = ["A", "B", "C", "D"];
     const correctIdx = letters.indexOf(q.answer);
     const stagAnswer = sc === 1 ? q.answer : letters[((correctIdx + 1 + si) % (q.options.length - 1)) + (((correctIdx + 1 + si) % (q.options.length - 1)) >= correctIdx ? 1 : 0)];
-    // Ensure wrong answer is never the correct one
     const safeAnswer = stagAnswer === q.answer ? letters[(correctIdx + 1) % q.options.length] : stagAnswer;
     return `<h3>Question ${i + 1}</h3>
       <p>${q.question}</p>
@@ -660,7 +703,7 @@ function genQCMEval(title: string, questions: QCMQuestion[], s: StagiaireInfo, f
     <p><strong>Formation :</strong> Bac Pro logistique<br/>
     <strong>Nom et prénom :</strong> ${stagName(s)}<br/>
     <strong>Session :</strong> du ${dateDebut} au ${dateFin}<br/>
-    <strong>Date :</strong> ${dateFin}<br/>
+    <strong>Date de l'évaluation :</strong> ${dateEval}<br/>
     <strong>Formateur(ce) :</strong> ${formateur}</p>
     ${qHtml}
     <h2 style="margin-top:20px">RÉSULTAT FINAL</h2>
@@ -692,10 +735,11 @@ interface OpenQuestion {
   correction: string;
 }
 
-function genOpenEval(title: string, context: string, questions: OpenQuestion[], s: StagiaireInfo, f: FormationInfo, si: number, totalPoints: number, o?: OrganismeInfo): string {
+function genOpenEval(title: string, context: string, questions: OpenQuestion[], s: StagiaireInfo, f: FormationInfo, si: number, totalPoints: number, o?: OrganismeInfo, evalNum?: number): string {
   const dateDebut = stagDateDebut(s, f);
   const dateFin = stagDateFin(s, f);
-  const formateur = stagFormateur(s);
+  const formateur = getFormateur(f, s);
+  const dateEval = evalNum ? getEvalDate(evalNum, s, f) : dateFin;
   let totalScore = 0;
 
   const qHtml = questions.map((q, i) => {
@@ -718,7 +762,7 @@ function genOpenEval(title: string, context: string, questions: OpenQuestion[], 
     <p><strong>Formation :</strong> Bac Pro logistique<br/>
     <strong>Nom et prénom :</strong> ${stagName(s)}<br/>
     <strong>Session :</strong> du ${dateDebut} au ${dateFin}<br/>
-    <strong>Date :</strong> ${dateFin}<br/>
+    <strong>Date de l'évaluation :</strong> ${dateEval}<br/>
     <strong>Formateur(ce) :</strong> ${formateur}</p>
     ${context ? `<h3>Situation professionnelle</h3>${context}` : ""}
     ${qHtml}
@@ -752,7 +796,7 @@ export function genEval01(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
     { question: "Parmi ces éléments, lequel est un flux logistique ?", options: ["Flux physique", "Flux administratif uniquement", "Flux marketing", "Flux commercial"], answer: "A" },
     { question: "Quel acteur fait partie de la chaîne logistique ?", options: ["Le client", "Le comptable uniquement", "Le designer", "Le juriste"], answer: "A" },
     { question: "La logistique permet principalement de :", options: ["Décorer les produits", "Optimiser les opérations", "Faire de la publicité", "Créer des marques"], answer: "B" },
-  ], s, f, si, o);
+  ], s, f, si, o, 1);
 }
 
 // EVAL 2 – QCM Réception des marchandises
@@ -764,7 +808,7 @@ export function genEval02(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
     { question: "Que doit-on vérifier lors du contrôle physique ?", options: ["Le prix du produit", "La quantité et l'état des marchandises", "Le nom du client", "La publicité"], answer: "B" },
     { question: "Que faut-il faire en cas de marchandise abîmée ?", options: ["Rien dire", "Refuser de travailler", "Faire des réserves sur le bon de livraison", "Vendre quand même"], answer: "C" },
     { question: "Pourquoi la traçabilité est-elle importante ?", options: ["Pour décorer les produits", "Pour suivre les marchandises", "Pour faire de la publicité", "Pour ralentir le travail"], answer: "B" },
-  ], s, f, si, o);
+  ], s, f, si, o, 2);
 }
 
 // EVAL 3 – CAS PRATIQUE Réception
@@ -781,7 +825,7 @@ export function genEval03(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
       { question: "Quels documents devez-vous vérifier lors de la réception ?", points: 2, correction: "Le bon de livraison, le bon de commande, la lettre de voiture CMR et vérifier la correspondance entre ces documents." },
       { question: "Quelle procédure devez-vous appliquer face aux anomalies constatées ?", points: 3, correction: "Émettre des réserves précises sur le bon de livraison, photographier les dommages, informer le responsable, refuser les produits non conformes et saisir les anomalies dans le WMS." },
       { question: "Pourquoi la traçabilité est-elle essentielle dans cette situation ?", points: 3, correction: "La traçabilité permet de suivre les marchandises, d'identifier l'origine des anomalies, de faciliter les réclamations et d'assurer la qualité du service." },
-    ], s, f, si, 10, o);
+    ], s, f, si, 10, o, 3);
 }
 
 // EVAL 4 – CAS PRATIQUE Stockage
@@ -797,7 +841,7 @@ export function genEval04(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
       { question: "Comment organiser efficacement les palettes dans l'entrepôt ?", points: 2, correction: "Regrouper par famille de produits, placer les produits à DLC courte en zone accessible, utiliser le WMS pour affecter les emplacements." },
       { question: "Quelles actions mettre en place face aux problèmes rencontrés ?", points: 3, correction: "Trier les palettes mixtes, alerter sur la saturation, réorganiser les emplacements sous-utilisés, signaler les produits à DLC courte." },
       { question: "Quels sont les enjeux d'un bon stockage ?", points: 3, correction: "Optimiser l'espace, garantir la sécurité, faciliter la préparation de commandes, éviter les ruptures et les pertes." },
-    ], s, f, si, 10, o);
+    ], s, f, si, 10, o, 4);
 }
 
 // EVAL 5 – QCM Préparation de commandes
@@ -814,7 +858,7 @@ export function genEval05(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
     { question: "Quel équipement est obligatoire pour la sécurité ?", options: ["Téléphone", "EPI (équipements de protection individuelle)", "Ordinateur", "Stylo"], answer: "B" },
     { question: "Que signifie étiqueter un colis ?", options: ["Le peser", "Ajouter une information d'identification", "Le stocker", "Le déplacer"], answer: "B" },
     { question: "Où transfère-t-on les commandes préparées ?", options: ["Zone de stockage", "Zone d'expédition", "Bureau", "Quai de réception"], answer: "B" },
-  ], s, f, si, o);
+  ], s, f, si, o, 5);
 }
 
 // EVAL 6 – EXERCICE Préparation de commandes
@@ -832,7 +876,7 @@ export function genEval06(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
       { question: "Quel élément est essentiel pour votre sécurité ?", points: 1, correction: "Le port des EPI : chaussures de sécurité, gilet haute visibilité, gants de manutention." },
       { question: "Où déposer une commande terminée ?", points: 1, correction: "En zone d'expédition, dans la zone correspondant au transporteur ou à la destination prévue." },
       { question: "Pourquoi respecter les procédures de préparation ?", points: 1, correction: "Pour garantir la qualité, éviter les erreurs, assurer la traçabilité et la satisfaction client." },
-    ], s, f, si, 10, o);
+    ], s, f, si, 10, o, 6);
 }
 
 // EVAL 7 – Étude de cas Expédition
@@ -847,7 +891,7 @@ export function genEval07(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
       { question: "Indiquez les règles à respecter lors du chargement.", points: 4, correction: "Respecter le plan de chargement, fixer les palettes, vérifier le poids total, ne pas dépasser la charge utile, caler les marchandises." },
       { question: "Quelle procédure en cas de colis endommagé avant expédition ?", points: 4, correction: "Isoler le colis, prévenir le responsable, remplacer si possible, enregistrer l'incident et ne pas expédier en l'état." },
       { question: "Expliquez l'importance du suivi des expéditions.", points: 4, correction: "Le suivi permet de garantir la livraison, d'informer le client, de gérer les litiges et d'améliorer la qualité de service." },
-    ], s, f, si, 20, o);
+    ], s, f, si, 20, o, 7);
 }
 
 // EVAL 8 – QCM Organisation des flux
@@ -859,7 +903,7 @@ export function genEval08(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
     { question: "Le flux entrant correspond :", options: ["Aux expéditions", "Aux réceptions de marchandises", "Aux retours clients", "Aux inventaires"], answer: "B" },
     { question: "Le flux sortant correspond :", options: ["À la réception", "Au stockage", "À l'expédition des marchandises", "Au contrôle qualité"], answer: "C" },
     { question: "L'organisation des flux permet :", options: ["D'améliorer la circulation des marchandises", "De désorganiser l'entrepôt", "D'augmenter les erreurs", "De ralentir les préparations"], answer: "A" },
-  ], s, f, si, o);
+  ], s, f, si, o, 8);
 }
 
 // EVAL 9 – CAS PRATIQUE Organisation des flux
@@ -875,7 +919,7 @@ export function genEval09(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
       { question: "Proposez des solutions pour améliorer la circulation interne.", points: 4, correction: "Définir des circuits de circulation, séparer les flux entrants et sortants, utiliser le cross-docking pour les urgences." },
       { question: "Comment gérer la commande urgente ?", points: 4, correction: "La traiter en priorité, dédier un préparateur, vérifier la disponibilité des produits et organiser l'expédition en express." },
       { question: "Proposez des actions pour assurer les expéditions dans les délais.", points: 4, correction: "Anticiper les préparations, prioriser les commandes par heure de départ, vérifier les documents et communiquer avec les transporteurs." },
-    ], s, f, si, 20, o);
+    ], s, f, si, 20, o, 9);
 }
 
 // EVAL 10 – EXERCICE Gestion des stocks
@@ -891,7 +935,7 @@ export function genEval10(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
       { question: "Expliquez ce qu'est une rupture de stock.", points: 4, correction: "C'est l'absence totale d'un produit en stock, empêchant de satisfaire les commandes clients." },
       { question: "Pourquoi définir un stock minimum ?", points: 4, correction: "Pour éviter les ruptures, garantir la continuité du service, anticiper les délais de réapprovisionnement." },
       { question: "Expliquez l'utilité de l'inventaire.", points: 4, correction: "L'inventaire permet de vérifier la cohérence entre le stock physique et le stock informatique, de détecter les écarts et d'ajuster les données." },
-    ], s, f, si, 20, o);
+    ], s, f, si, 20, o, 10);
 }
 
 // EVAL 11 – QCM Gestion des stocks
@@ -903,7 +947,7 @@ export function genEval11(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
     { question: "Une sortie de stock correspond :", options: ["À une réception fournisseur", "À une entrée en stock", "À une expédition ou consommation", "À un inventaire"], answer: "C" },
     { question: "L'inventaire permet :", options: ["De supprimer les stocks", "De vérifier le stock réel", "D'augmenter les commandes", "De transporter les marchandises"], answer: "B" },
     { question: "La rupture de stock signifie :", options: ["Trop de stock", "Pas assez de commandes", "Absence de produit en stock", "Inventaire terminé"], answer: "C" },
-  ], s, f, si, o);
+  ], s, f, si, o, 11);
 }
 
 // EVAL 12 – QCM Sécurité Conduite d'engins
@@ -915,7 +959,7 @@ export function genEval12(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
     { question: "En cas de charge instable, vous devez :", options: ["Continuer à rouler", "Accélérer", "Stabiliser la charge", "Ignorer le problème"], answer: "C" },
     { question: "La circulation dans un entrepôt doit :", options: ["Être libre sans règles", "Respecter un plan de circulation", "Être rapide uniquement", "Être désorganisée"], answer: "B" },
     { question: "En cas d'accident, vous devez :", options: ["Partir", "Ne rien dire", "Prévenir immédiatement", "Continuer à travailler"], answer: "C" },
-  ], s, f, si, o);
+  ], s, f, si, o, 12);
 }
 
 // EVAL 13 – Mise en situation Communication
@@ -930,7 +974,7 @@ export function genEval13(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
       { question: "Rédigez le message au client pour l'informer du retard.", points: 4, correction: "Objet : Retard de livraison - Commande [réf]. Bonjour, nous vous informons d'un retard de livraison. Nous mettons tout en œuvre pour résoudre la situation et vous tiendrons informé. Cordialement." },
       { question: "Pourquoi enregistrer l'information dans le logiciel ?", points: 4, correction: "Pour assurer la traçabilité, permettre le suivi de l'incident, faciliter l'analyse des causes et prévenir les récurrences." },
       { question: "Citez des règles de communication en entreprise.", points: 4, correction: "Être clair et concis, utiliser un langage professionnel, respecter la hiérarchie, confirmer les informations par écrit, écouter activement." },
-    ], s, f, si, 20, o);
+    ], s, f, si, 20, o, 13);
 }
 
 // EVAL 14 – Révisions globales / Examen blanc
@@ -946,7 +990,7 @@ export function genEval14(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
       { question: "Partie 5 – Organisation des flux : Objectif de l'organisation des flux.", points: 4, correction: "Optimiser la circulation des marchandises et des informations, réduire les délais et les coûts, améliorer la productivité." },
       { question: "Partie 6 – Sécurité : Règles de sécurité pour la conduite d'engins.", points: 4, correction: "Vérification quotidienne de l'engin, port des EPI, respect du plan de circulation, charge maximale, klaxonner aux intersections." },
       { question: "Partie 7 – Communication : Importance de la communication professionnelle.", points: 4, correction: "Assurer la coordination des équipes, éviter les erreurs, transmettre les informations importantes, faciliter la résolution des problèmes." },
-    ], s, f, si, 28, o);
+    ], s, f, si, 28, o, 14);
 }
 
 // EVAL 15 – Examen blanc final
@@ -963,5 +1007,5 @@ export function genEval15(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
       { question: "Partie 6 – Organisation des flux : Objectif des flux logistiques.", points: 4, correction: "Assurer la fluidité de la chaîne logistique, de la réception à l'expédition, en minimisant les temps d'attente et les manipulations." },
       { question: "Partie 7 – Sécurité : Règles lors de la conduite d'engins.", points: 4, correction: "Contrôle préalable, port EPI, respect vitesse et plan de circulation, stabilité de la charge, signalisation, formation obligatoire (CACES)." },
       { question: "Partie 8 – Communication : Importance de la communication.", points: 4, correction: "Coordonner les équipes, transmettre les consignes, signaler les anomalies, informer les clients et les partenaires, assurer la traçabilité." },
-    ], s, f, si, 32, o);
+    ], s, f, si, 32, o, 15);
 }
