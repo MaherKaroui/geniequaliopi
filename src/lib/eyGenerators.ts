@@ -1785,3 +1785,524 @@ export function genEquipementsPedagogiquesEY(o: OrganismeInfo, f: FormationInfo)
     { heading: "Conformité", content: `<p>L'ensemble du matériel pédagogique est conforme aux normes de sécurité en vigueur et adapté à l'action de formation <strong>« ${f.intitule||"Formation"} »</strong>.</p><p>Fait à ${o.ville||"—"}, le ${fmtDate(today())}</p>` },
   ]});
 }
+
+/* ═══ CODE 10 – Méthodes d'animation pédagogique (Academy style – 7 pages) ═══ */
+export function genMethodesAnimationEY(o: OrganismeInfo, f: FormationInfo): string {
+  const domain = detectDomain(f);
+  const esth = domain === "esthetique" || domain === "socio_esthetique";
+  const code = f.codeRNCP || "—";
+  const intitule = f.intitule || "Formation";
+
+  const methodes = [
+    {
+      nom: "Méthode expositive structurée",
+      objectif: "Transmettre les fondamentaux théoriques",
+      mise: esth
+        ? ["Présentation des protocoles d'hygiène et de sécurité", "Explication des règles de préparation du poste", "Analyse des contre-indications (pathologies oculaires, allergies…)", "Présentation des différentes techniques (cil à cil, volume russe, rehaussement)"]
+        : ["Présentation des concepts clés du domaine", "Explication des cadres réglementaires applicables", "Analyse des fondamentaux théoriques", "Présentation des outils et méthodologies professionnelles"],
+      lien: `Acquisition des connaissances fondamentales du référentiel ${code}`
+    },
+    {
+      nom: "Méthode interrogative",
+      objectif: "Stimuler l'analyse et la réflexion du stagiaire",
+      mise: esth
+        ? ["Questionnement sur des cas clients (morphologie, attentes)", "Analyse des situations à risque (allergies, contre-indications)", "Reformulation des connaissances acquises"]
+        : ["Questionnement sur des situations professionnelles", "Analyse critique de cas concrets", "Reformulation et vérification de la compréhension"],
+      lien: "Analyse des attentes et faisabilité – Compétence C1"
+    },
+    {
+      nom: "Méthode démonstrative",
+      objectif: "Modéliser les gestes professionnels",
+      mise: esth
+        ? ["Démonstration en temps réel par le formateur", "Décomposition des gestes techniques (isolation, pose, mapping)", "Explication des erreurs courantes à éviter", "Exemples : isolement des cils, application des extensions, positionnement des pads"]
+        : ["Démonstration pas à pas par le formateur", "Décomposition des processus et techniques", "Identification des erreurs fréquentes", "Exemples concrets en situation réelle"],
+      lien: "Respect des exigences techniques du référentiel – Compétence C4"
+    },
+    {
+      nom: "Méthode active (mise en situation professionnelle)",
+      objectif: "Reproduire des conditions réelles de travail",
+      mise: esth
+        ? ["Travail sur modèle réel (pose complète)", "Simulation de l'accueil client et du diagnostic", "Organisation du poste de travail conforme aux standards"]
+        : ["Mise en situation avec jeux de rôle", "Simulation de cas professionnels réels", "Travail en équipe sur des projets concrets"],
+      lien: "Correspond aux modalités d'évaluation du référentiel (mise en situation avec jury)"
+    },
+    {
+      nom: "Méthode expérientielle (learning by doing)",
+      objectif: "Développer les compétences techniques par la pratique",
+      mise: esth
+        ? ["Réalisation complète de prestations sur mannequin puis modèle", "Correction en direct par la formatrice", "Ajustement des gestes et de la posture"]
+        : ["Réalisation autonome de tâches professionnelles", "Correction immédiate et feedback constructif", "Ajustement progressif de la méthodologie"],
+      lien: "Maîtrise du protocole, précision gestuelle, respect des normes"
+    },
+    {
+      nom: "Méthode réflexive (auto-évaluation)",
+      objectif: "Développer l'analyse professionnelle et l'autonomie",
+      mise: ["Débriefing après chaque séquence pratique", "Analyse collective des erreurs", "Auto-positionnement du stagiaire sur ses compétences"],
+      lien: "Indicateur 7 Qualiopi : Suivi et évaluation des acquis"
+    }
+  ];
+
+  let methodesHtml = methodes.map(m => {
+    const items = m.mise.map(i => `<li>${i}</li>`).join("");
+    return `<h3 style="color:${pc()};margin-top:18px;">${m.nom}</h3>
+    <p><strong>Objectif :</strong> ${m.objectif}</p>
+    <p><strong>Mise en œuvre :</strong></p><ul>${items}</ul>
+    <p><strong>Lien référentiel :</strong> ${m.lien}</p>`;
+  }).join("");
+
+  return buildDocument({ org: o, formation: f, title: "MÉTHODES D'ANIMATION PÉDAGOGIQUE", subtitle: `${intitule} – Référentiel ${code}`, sections: [
+    { heading: "Cadre réglementaire et conformité qualité", content: `<p>Le présent document décrit les méthodes d'animation pédagogique mises en œuvre dans le cadre de la formation, conformément :</p>
+    <ul><li>Au référentiel de certification ${code}</li><li>Aux exigences du Référentiel National Qualité (Qualiopi)</li><li>Aux obligations issues des articles L.6313-1 et L.6316-1 du Code du travail</li></ul>
+    <p>Les méthodes d'animation garantissent :</p>
+    <ul><li>L'adéquation des moyens pédagogiques aux objectifs visés</li><li>L'individualisation des parcours</li><li>L'acquisition effective des compétences professionnelles</li></ul>` },
+    { heading: "Positionnement pédagogique et logique d'ingénierie", content: `<p>La stratégie pédagogique repose sur une <strong>approche par compétences</strong>, directement issue du référentiel ${code}.</p>
+    <p>Chaque méthode d'animation est conçue pour :</p>
+    <ul><li>Favoriser l'acquisition progressive des compétences</li><li>Assurer la transférabilité en situation professionnelle</li><li>Permettre une évaluation objectivable par le jury</li></ul>` },
+    { heading: "Méthodes d'animation mobilisées", content: methodesHtml },
+    { heading: "Organisation concrète de l'animation pédagogique", content: `<p><strong>Séquencement pédagogique :</strong></p>
+    <p>Chaque séquence suit une logique structurée :</p>
+    <ol><li>Apport théorique</li><li>Démonstration formateur</li><li>Mise en pratique</li><li>Correction individualisée</li><li>Débriefing collectif</li></ol>
+    <p><strong>Conditions de réalisation :</strong></p>
+    <p>Les formations se déroulent dans un environnement conforme aux exigences professionnelles :</p>
+    <ul>${esth ? "<li>Lit esthétique / table de soins</li><li>Éclairage professionnel (lampe loupe LED)</li><li>Matériel conforme CE</li>" : "<li>Salle équipée aux normes</li><li>Matériel professionnel adapté</li><li>Outils numériques disponibles</li>"}<li>Poste de travail organisé</li></ul>` },
+    { heading: "Individualisation et accompagnement", content: `<p>Les méthodes d'animation intègrent :</p>
+    <ul><li>Adaptation au niveau initial (test de positionnement)</li><li>Suivi individualisé tout au long du parcours</li><li>Corrections personnalisées après chaque pratique</li><li>Ajustement des objectifs en fonction de la progression</li></ul>
+    <p>Le formateur veille à :</p>
+    <ul><li>Identifier les difficultés dès leur apparition</li><li>Proposer des remédiations immédiates</li><li>Sécuriser les apprentissages par la répétition encadrée</li></ul>` },
+    { heading: "Traçabilité et preuves", content: `<p>Les méthodes d'animation sont <strong>objectivables</strong> et <strong>vérifiables</strong> via :</p>
+    <ul><li>Supports pédagogiques utilisés</li><li>Programmes détaillés</li><li>Grilles d'évaluation</li><li>Comptes rendus de formation</li><li>Émargements</li><li>Échanges pédagogiques</li></ul>
+    <p>Ces éléments permettent de démontrer la réalité des actions de formation, la cohérence pédagogique et l'effectivité des apprentissages.</p>` },
+    { heading: "Alignement pédagogique", content: `<p style="text-align:center;font-size:1.1em;font-weight:600;margin:20px 0;">OBJECTIFS → MÉTHODES → ÉVALUATIONS</p>
+    <p><strong>Exemple :</strong></p>
+    <ul><li><strong>Objectif :</strong> ${esth ? "Réaliser une pose d'extensions conforme" : "Maîtriser les compétences du référentiel"}</li><li><strong>Méthode :</strong> démonstration + pratique encadrée</li><li><strong>Évaluation :</strong> mise en situation réelle devant jury</li></ul>` },
+    { heading: "Conclusion", content: `<p>Les méthodes d'animation mises en œuvre :</p>
+    <ul><li>Sont conformes au référentiel ${code}</li><li>Répondent aux exigences réglementaires (Qualiopi, Code du travail)</li><li>Garantissent une formation professionnalisante</li><li>Permettent une évaluation fiable et objective</li></ul>
+    <p>Elles assurent ainsi la conformité de l'action de formation au sens des obligations légales et réglementaires applicables.</p>` },
+  ]});
+}
+
+/* ═══ CODE 12 – Liste des supports et documents (Academy style) ═══ */
+export function genListeSupportsDocumentsEY(o: OrganismeInfo, f: FormationInfo): string {
+  const intitule = f.intitule || "Formation";
+  return buildDocument({ org: o, formation: f, title: "LISTE DES SUPPORTS ET DOCUMENTS", subtitle: intitule, sections: [
+    { heading: "Documents administratifs remis", content: `<p>Dans le cadre de la formation, le stagiaire reçoit l'ensemble des documents nécessaires à son inscription et au bon déroulement de son parcours :</p>
+    <ul><li>Règlement intérieur</li><li>Conditions Générales de Vente (CGV)</li><li>Convocation à la formation</li><li>Contrat de formation</li></ul>
+    <p>Ces documents permettent d'encadrer juridiquement la formation et d'informer le stagiaire de ses droits et obligations.</p>` },
+    { heading: "Documents pédagogiques", content: `<p>Le stagiaire bénéficie de supports pédagogiques complets permettant l'acquisition des compétences :</p>
+    <ul><li>Programme de formation détaillé</li><li>Support de cours (théorique et technique)</li><li>Déroulé pédagogique de la formation</li></ul>
+    <p>Ces documents présentent :</p>
+    <ul><li>Les objectifs pédagogiques</li><li>Les compétences visées</li><li>Les contenus abordés (théorie et pratique)</li><li>L'organisation des séquences</li></ul>` },
+    { heading: "Documents d'évaluation et de suivi", content: `<p>Afin d'assurer un suivi individualisé et conforme aux exigences Qualiopi, plusieurs outils d'évaluation sont mis en place :</p>
+    <ul><li>Évaluation des besoins (avant formation)</li><li>Test de positionnement (entrée en formation)</li><li>Évaluations en cours de formation</li><li>Grille d'acquisition des compétences</li><li>Compte rendu pédagogique</li></ul>
+    <p>Ces documents permettent :</p>
+    <ul><li>D'adapter la formation au profil du stagiaire</li><li>De mesurer la progression</li><li>De valider l'acquisition des compétences</li></ul>` },
+    { heading: "Documents de satisfaction et qualité", content: `<p>Dans une démarche d'amélioration continue, le stagiaire complète :</p>
+    <ul><li>Questionnaire de satisfaction (à chaud)</li><li>Questionnaire de satisfaction (à froid)</li></ul>
+    <p>Ces documents permettent :</p>
+    <ul><li>D'évaluer la qualité de la formation</li><li>D'identifier les axes d'amélioration</li><li>De garantir la conformité aux exigences Qualiopi</li></ul>` },
+    { heading: "Synthèse", content: `<p>L'ensemble des documents remis au stagiaire couvre :</p>
+    <ul><li>Le cadre administratif</li><li>Le contenu pédagogique</li><li>Le suivi et l'évaluation</li><li>La qualité et la satisfaction</li></ul>
+    <p>Ces éléments garantissent une formation structurée, conforme aux exigences réglementaires et aux référentiels de certification.</p>` },
+  ]});
+}
+
+/* ═══ CODE 17 – Adaptations techniques PSH (Academy style enrichi) ═══ */
+export function genAdaptationsPSHAcademy(o: OrganismeInfo, f: FormationInfo): string {
+  const domain = detectDomain(f);
+  const esth = domain === "esthetique" || domain === "socio_esthetique";
+
+  const adaptations = [
+    { titre: "Adaptation du poste de travail", items: esth
+      ? ["Mise à disposition de tables réglables en hauteur", "Ajustement de la position du lit esthétique", "Aménagement de l'espace pour faciliter les déplacements", "Installation d'un éclairage renforcé ou orientable"]
+      : ["Mise à disposition de tables réglables en hauteur", "Aménagement de l'espace de circulation", "Installation d'un éclairage adapté", "Mobilier ergonomique"],
+      objectif: "Améliorer le confort et l'accessibilité du poste de travail" },
+    { titre: "Adaptation du matériel professionnel", items: esth
+      ? ["Utilisation de pinces ergonomiques (prise facilitée)", "Mise à disposition de supports stabilisateurs", "Adaptation des outils pour une meilleure préhension", "Utilisation de produits adaptés (moins irritants, plus sécurisés)"]
+      : ["Matériel ergonomique adapté", "Outils à prise facilitée", "Supports stabilisateurs", "Logiciels d'assistance si nécessaire"],
+      objectif: "Compenser les difficultés motrices ou sensorielles" },
+    { titre: "Adaptation des supports pédagogiques", items: [
+      "Supports en format numérique (PDF, vidéos)", "Agrandissement des supports (polices, schémas)", "Mise à disposition de supports visuels détaillés", "Utilisation de démonstrations filmées"],
+      objectif: "Faciliter la compréhension et l'accès à l'information" },
+    { titre: "Adaptation des modalités de formation", items: [
+      "Temps supplémentaire pour la réalisation des exercices", "Séquençage des apprentissages", "Répétition des démonstrations", "Accompagnement individualisé renforcé"],
+      objectif: "Permettre une progression adaptée au rythme du stagiaire" },
+    { titre: "Adaptation de l'environnement", items: [
+      "Salle accessible lorsque cela est possible", "Réduction des nuisances (bruit, lumière)", "Organisation ergonomique du matériel", "Accès facilité aux équipements"],
+      objectif: "Sécuriser et faciliter l'accès à la formation" },
+  ];
+
+  let adaptHtml = adaptations.map(a => {
+    const items = a.items.map(i => `<li>${i}</li>`).join("");
+    return `<h3 style="color:${pc()};margin-top:14px;">${a.titre}</h3><ul>${items}</ul><p><strong>Objectif :</strong> ${a.objectif}</p>`;
+  }).join("");
+
+  return buildDocument({ org: o, formation: f, title: "ADAPTATIONS TECHNIQUES POUR LES PERSONNES EN SITUATION DE HANDICAP", sections: [
+    { heading: "Objectif du document", content: `<p>Ce document vise à présenter les exemples de modifications d'ordre technique mises en œuvre par l'organisme de formation afin de faciliter l'accès à la formation pour les personnes en situation de handicap (PSH).</p>
+    <p>Ces adaptations permettent de :</p>
+    <ul><li>Garantir l'égalité d'accès à la formation</li><li>Compenser les limitations fonctionnelles</li><li>Sécuriser le parcours de formation</li><li>Adapter l'environnement et les outils pédagogiques</li></ul>` },
+    { heading: "Principes généraux", content: `<p>L'organisme de formation s'engage à :</p>
+    <ul><li>Étudier chaque situation de handicap individuellement</li><li>Proposer des adaptations techniques adaptées</li><li>Mettre à disposition du matériel spécifique si nécessaire</li><li>Collaborer avec le référent handicap : <strong>${o.referentHandicap||o.responsablePedagogique||"Le responsable pédagogique"}</strong></li></ul>` },
+    { heading: "Exemples de modifications techniques", content: adaptHtml },
+    { heading: "Limites d'adaptation", content: `<p>Certaines formations techniques, notamment celles nécessitant :</p>
+    <ul><li>Une précision gestuelle élevée</li><li>Une coordination fine</li>${esth ? "<li>Une intervention sur des zones sensibles (yeux, visage)</li>" : "<li>Des manipulations complexes</li>"}</ul>
+    <p>peuvent présenter des limites d'adaptation selon la nature du handicap.</p>
+    <p>Dans ce cas, une étude individualisée est réalisée afin de :</p>
+    <ul><li>Évaluer la faisabilité</li><li>Proposer des alternatives</li><li>Orienter vers des solutions adaptées</li></ul>` },
+    { heading: "Traçabilité des adaptations", content: `<p>Les adaptations mises en place sont tracées via :</p>
+    <ul><li>Fiche d'analyse des besoins</li><li>Compte rendu d'entretien</li><li>Plan d'adaptation pédagogique</li><li>Suivi individualisé</li></ul>` },
+    { heading: "Rôle du référent handicap", content: `<p>Le référent handicap (<strong>${o.referentHandicap||o.responsablePedagogique||"Le responsable"}</strong>) :</p>
+    <ul><li>Analyse les besoins spécifiques</li><li>Propose les adaptations techniques</li><li>Coordonne les actions avec l'équipe pédagogique</li><li>Assure le suivi du stagiaire tout au long du parcours</li></ul>` },
+    { heading: "Conclusion", content: `<p>L'organisme met en œuvre des adaptations techniques concrètes afin de :</p>
+    <ul><li>Favoriser l'inclusion</li><li>Garantir l'accessibilité</li><li>Sécuriser le parcours de formation</li></ul>
+    <p>Ces dispositifs permettent de répondre aux exigences réglementaires et de qualité, tout en assurant une prise en compte individualisée des besoins.</p>` },
+  ]});
+}
+
+/* ═══ CODE 25 – Processus qualité sous-traitants (Academy style – 8 sections) ═══ */
+export function genProcessusQualiteSousTraitantsEY(o: OrganismeInfo, f: FormationInfo): string {
+  return buildDocument({ org: o, formation: f, title: "PROCÉDURE DE SUIVI DE LA QUALITÉ DES PRESTATIONS DES SOUS-TRAITANTS PÉDAGOGIQUES", sections: [
+    { heading: "Section 1 : Objet de la procédure", content: `<p>La présente procédure a pour objectif de définir les modalités d'évaluation, de contrôle et de pilotage de la qualité des prestations réalisées par les sous-traitants pédagogiques intervenant pour le compte de l'organisme de formation.</p>
+    <p>Elle vise à garantir que les prestations délivrées respectent :</p>
+    <ul><li>Les exigences Qualiopi</li><li>Les engagements pédagogiques, organisationnels et réglementaires de l'organisme</li><li>Les attentes des apprenants, financeurs et partenaires</li></ul>` },
+    { heading: "Section 2 : Champ d'application", content: `<p>Cette procédure s'applique à tous les prestataires externes réalisant, pour le compte de l'organisme :</p>
+    <ul><li>Des interventions pédagogiques (formateurs sous-traitants)</li><li>Des animations de séquences de formation</li><li>Des évaluations certificatives ou formatives</li><li>Des actions d'accompagnement ou de suivi apprenants</li></ul>` },
+    { heading: "Section 3 : Responsabilités", content: `<table style="width:100%;border-collapse:collapse;"><thead><tr style="background:${pc()};color:#fff;"><th ${td}>Fonction</th><th ${td}>Rôle</th></tr></thead><tbody>
+    <tr><td ${tdb}>Direction / Référent Qualité</td><td ${td}>Valide les sous-traitants, contrôle leur conformité, réalise les bilans annuels</td></tr>
+    <tr><td ${tdb}>Référent Pédagogique</td><td ${td}>Évalue la qualité pédagogique, analyse les retours apprenants et formateurs</td></tr>
+    <tr><td ${tdb}>Service Administratif</td><td ${td}>Vérifie les pièces administratives et contrats</td></tr>
+    <tr><td ${tdb}>Sous-traitant</td><td ${td}>Respecte le contrat, les consignes pédagogiques, les documents internes (RI, procédures)</td></tr>
+    </tbody></table>` },
+    { heading: "Section 4 : Processus de sélection et contractualisation", content: `<h3 style="color:${pc()};">4.1 Vérification des prérequis</h3>
+    <p>Avant toute contractualisation, les documents suivants doivent être fournis :</p>
+    <ul><li>CV ou portfolio professionnel actualisé</li><li>Diplômes, certifications, habilitations pédagogiques</li><li>Attestation de responsabilité civile professionnelle</li><li>Extrait Kbis (si entreprise) ou pièce d'identité</li><li>Relevé d'Identité Bancaire</li><li>Attestations URSSAF (conformité sociale)</li><li>Références professionnelles et/ou recommandations</li></ul>
+    <h3 style="color:${pc()};">4.2 Contrat de sous-traitance</h3>
+    <p>La contractualisation inclut obligatoirement :</p>
+    <ul><li>Objectifs et contenus de formation</li><li>Modalités pédagogiques attendues</li><li>Supports obligatoires fournis par l'organisme</li><li>Modalités d'évaluation des apprenants</li><li>Engagements qualité du sous-traitant</li><li>Obligations de confidentialité et RGPD</li><li>Obligation d'utiliser les documents internes fournis</li></ul>` },
+    { heading: "Section 5 : Suivi opérationnel des prestations", content: `<h3 style="color:${pc()};">5.1 Avant la prestation</h3>
+    <p>Transmission par l'organisme : programme, supports pédagogiques, liste des apprenants, planning, consignes d'évaluation, règles internes.</p>
+    <p>Validation par le sous-traitant : lecture et compréhension des documents, préparation des séquences, adaptation aux besoins spécifiques.</p>
+    <h3 style="color:${pc()};">5.2 Pendant la prestation</h3>
+    <p>Le référent pédagogique effectue un suivi direct ou indirect :</p>
+    <ul><li>Visite d'observation en classe / visio</li><li>Écoute des apprenants</li><li>Vérification de l'utilisation des supports</li><li>Respect du programme et progression pédagogique</li></ul>
+    <p>Une <strong>FICHE D'OBSERVATION DE FORMATEUR</strong> est remplie.</p>
+    <h3 style="color:${pc()};">5.3 Après la prestation</h3>
+    <p>Le sous-traitant doit transmettre : feuilles d'émargement, listes des apprenants évalués, grilles d'évaluation, rapport pédagogique.</p>
+    <p>L'organisme analyse : satisfactions à chaud et à froid, taux d'abandon/réussite, remontées apprenants.</p>
+    <h3 style="color:${pc()};">5.4 En cas de non-conformité</h3>
+    <p>Toute non-conformité déclenche une fiche d'écart et un plan d'actions correctives :</p>
+    <ul><li>Entretien avec le sous-traitant</li><li>Reformation / ressource pédagogique supplémentaire</li><li>Suspension temporaire d'intervention</li><li>Rupture du partenariat en cas de manquement grave</li></ul>` },
+    { heading: "Section 6 : Évaluation annuelle des sous-traitants", content: `<p>Chaque sous-traitant fait l'objet d'une évaluation annuelle portant sur :</p>
+    <ul><li>Satisfaction des apprenants</li><li>Respect des procédures et délais</li><li>Qualité pédagogique</li><li>Capacité d'adaptation</li><li>Taux de réussite des apprenants</li><li>Implication dans le processus qualité</li></ul>
+    <p>Le classement peut être : <strong>Excellent</strong> / <strong>Conforme</strong> / <strong>À améliorer</strong> / <strong>Non conforme</strong> (partenariat interrompu).</p>` },
+    { heading: "Section 7 : Amélioration continue", content: `<p>Les résultats des évaluations, visites, questionnaires et analyses qualité alimentent :</p>
+    <ul><li>Le plan d'amélioration continue</li><li>La mise à jour des procédures internes</li><li>L'adaptation du choix des sous-traitants</li><li>L'évolution des méthodes pédagogiques</li></ul>
+    <p>Un <strong>bilan qualité annuel</strong> est présenté en réunion interne.</p>` },
+    { heading: "Section 8 : Archivage", content: `<p>Tous les documents relatifs à la sous-traitance sont archivés <strong>5 ans</strong> :</p>
+    <ul><li>Contrats</li><li>Pièces administratives</li><li>Fiches d'observation</li><li>Évaluations stagiaires</li><li>Plans d'actions correctives</li><li>Correspondances</li></ul>` },
+  ]});
+}
+
+/* ═══ CODE 28 – Compte rendu de positionnement (Academy style per stagiaire) ═══ */
+export function genCompteRenduPositionnementEY(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number): string {
+  const s = stagiaires[si] || stagiaires[0];
+  if (!s) return "";
+  const domain = detectDomain(f);
+  const esth = domain === "esthetique" || domain === "socio_esthetique";
+  const code = f.codeRNCP || "—";
+  const formateur = f.formateur || SAMPLE_FORMATEURS[0].prenom + " " + SAMPLE_FORMATEURS[0].nom;
+  const deb = getStagiaireDateDebut(s, f);
+  const fin = getStagiaireDateFin(s, f);
+  const duree = getStagiaireDuree(s, f) || f.duree || "35h";
+  const niveau = (s as any).niveau || (si % 2 === 0 ? "CAP / BEP – Niveau 3" : "Baccalauréat – Niveau 4");
+
+  const competences = esth ? [
+    { comp: "Hygiène, désinfection, sécurité", niv: si%3===0?"Correct":"Débutant", comment: si%3===0?"Maîtrise satisfaisante des règles essentielles":"Notions de base à approfondir" },
+    { comp: "Analyse du regard, forme des yeux", niv: "Débutant", comment: "Connaît les bases, mais manque de pratique spécifique pour l'analyse morphologique approfondie" },
+    { comp: "Connaissance courbures / longueurs", niv: "Débutant", comment: "Doit encore apprendre les codifications professionnelles (C, CC, D, M, etc.)" },
+    { comp: "Gestuelle technique (pinces, isolation)", niv: si%2===0?"Débutant":"Faible", comment: si%2===0?"A déjà manipulé du matériel esthétique mais pas spécifiquement":"Découverte complète de la gestuelle spécialisée" },
+    { comp: "Rehaussement de cils", niv: "Faible", comment: "Découverte totale du protocole (pads, produit, temps de pose)" },
+  ] : [
+    { comp: "Connaissances théoriques du domaine", niv: si%2===0?"Correct":"Débutant", comment: si%2===0?"Bases théoriques satisfaisantes":"Notions élémentaires à consolider" },
+    { comp: "Compétences pratiques", niv: "Débutant", comment: "Expérience limitée, nécessite un accompagnement renforcé" },
+    { comp: "Méthodologie professionnelle", niv: si%3===0?"Correct":"Débutant", comment: si%3===0?"Bonne capacité d'organisation":"À structurer progressivement" },
+    { comp: "Communication professionnelle", niv: si%2===0?"Correct":"Correct", comment: "Expression claire et adaptée" },
+  ];
+
+  let compRows = competences.map(c =>
+    `<tr><td ${td}>${c.comp}</td><td ${td} style="text-align:center;font-weight:600;">${c.niv}</td><td ${td} style="font-size:0.88em;">${c.comment}</td></tr>`
+  ).join("");
+
+  const besoins = esth ? [
+    { domaine: "Analyse morphologique", besoin: "Renforcer la capacité à analyser forme des yeux / visage", action: "Exercices d'analyse + mapping guidé par la formatrice" },
+    { domaine: "Gestuelle technique", besoin: "Besoin de précision dans l'isolation & direction", action: "Travail intensif sur mannequin avant modèle réel" },
+    { domaine: "Volume russe", besoin: "Concept totalement nouveau", action: "Démonstration + entraînement étape par étape" },
+    { domaine: "Rehaussement", besoin: "Procédure inconnue", action: "Mise en situation + démonstration formatrice" },
+    { domaine: "Organisation du poste", besoin: "Conforme mais perfectible", action: "Rappels protocole hygiène + checklists" },
+  ] : [
+    { domaine: "Compétences techniques", besoin: "Renforcer les fondamentaux", action: "Exercices pratiques progressifs" },
+    { domaine: "Méthodologie", besoin: "Structurer l'approche", action: "Accompagnement individualisé" },
+    { domaine: "Mise en situation", besoin: "Manque d'expérience pratique", action: "Simulations et cas concrets" },
+  ];
+
+  let besoinsRows = besoins.map(b =>
+    `<tr><td ${td}>${b.domaine}</td><td ${td}>${b.besoin}</td><td ${td}>${b.action}</td></tr>`
+  ).join("");
+
+  return buildDocument({ org: o, formation: f, title: "COMPTE RENDU DE POSITIONNEMENT", subtitle: `${s.civilite||""} ${s.prenom} ${s.nom}`, sections: [
+    { heading: "Informations", content: `<table style="width:100%;border-collapse:collapse;">
+      <tr><td ${tdb}>Stagiaire</td><td ${td}>${s.prenom} ${s.nom}</td></tr>
+      ${(s as any).dossierNumber ? `<tr><td ${tdb}>Dossier EDOF n°</td><td ${td}>${(s as any).dossierNumber}</td></tr>` : ""}
+      <tr><td ${tdb}>Formation</td><td ${td}>${f.intitule||"—"}</td></tr>
+      <tr><td ${tdb}>Organisme</td><td ${td}>${o.nom||"—"}</td></tr>
+      <tr><td ${tdb}>Session</td><td ${td}>${fmtDate(deb)} au ${fmtDate(fin)} (${duree})</td></tr>
+      <tr><td ${tdb}>Niveau déclaré</td><td ${td}>${niveau}</td></tr>
+    </table>` },
+    { heading: "Section 1 : Objectifs du positionnement", content: `<p>Le positionnement réalisé avant l'entrée en formation vise à :</p>
+    <ul><li>Identifier le niveau initial de ${s.prenom} ${s.nom}</li><li>Vérifier l'adéquation entre son profil et les prérequis de la certification</li><li>Déterminer ses attentes et besoins spécifiques</li><li>Adapter le déroulé pédagogique à son niveau (parcours individualisé)</li></ul>` },
+    { heading: "Section 2 : Méthodes utilisées", content: `<ul><li>Entretien oral de positionnement</li><li>Analyse du dossier EDOF et du niveau déclaré</li><li>Questionnaire interne portant sur les compétences clés du référentiel</li><li>Vérification des prérequis du référentiel ${code}</li></ul>` },
+    { heading: "Section 3 : Résultats du positionnement", content: `<h3 style="color:${pc()};">3.1 Niveau technique initial</h3>
+    <table style="width:100%;border-collapse:collapse;font-size:0.9em;"><thead><tr style="background:${pc()};color:#fff;"><th ${td}>Compétence évaluée</th><th ${td}>Niveau initial</th><th ${td}>Commentaire</th></tr></thead><tbody>${compRows}</tbody></table>
+    <h3 style="color:${pc()};margin-top:14px;">3.2 Motivation et projet professionnel</h3>
+    <p><strong>Motivation :</strong> ÉLEVÉE</p>
+    <p><strong>Projet :</strong> COHÉRENT ET RÉALISABLE</p>
+    <h3 style="color:${pc()};margin-top:14px;">3.3 Analyse des prérequis</h3>
+    <p><strong>Adéquation formation / profil :</strong> EXCELLENTE</p>
+    <p>Aucun frein à l'entrée en formation.</p>` },
+    { heading: "Section 4 : Besoins identifiés et accompagnement prévu", content: `<table style="width:100%;border-collapse:collapse;font-size:0.9em;"><thead><tr style="background:${pc()};color:#fff;"><th ${td}>Domaine</th><th ${td}>Besoin identifié</th><th ${td}>Action pédagogique prévue</th></tr></thead><tbody>${besoinsRows}</tbody></table>` },
+    { heading: "Section 5 : Synthèse", content: `<table style="width:100%;border-collapse:collapse;"><thead><tr style="background:${pc()};color:#fff;"><th ${td}>Points forts</th><th ${td}>Points à renforcer</th></tr></thead><tbody><tr>
+      <td ${td}><ul style="margin:0;padding-left:16px;"><li>${si%2===0?"Bonne capacité d'apprentissage":"Niveau de base satisfaisant"}</li><li>Grande motivation</li><li>Projet professionnel clair</li></ul></td>
+      <td ${td}><ul style="margin:0;padding-left:16px;"><li>${esth?"Aucune expérience en extension de cils":"Expérience pratique limitée"}</li><li>Nécessité d'un accompagnement renforcé</li></ul></td>
+    </tr></tbody></table>` },
+    { heading: "Section 6 : Conclusion du formateur", content: `<p>Le positionnement confirme que ${s.civilite==="Mme"?"Mme":"M."} ${s.nom} ${s.prenom} :</p>
+    <ul><li>Dispose des prérequis pour suivre la formation</li><li>Bénéficiera d'un parcours individualisé</li><li>Nécessite un suivi renforcé lors des séquences pratiques</li></ul>
+    <p style="background:#e8f5e9;padding:10px;border-radius:4px;font-weight:600;">AVIS PÉDAGOGIQUE FINAL : ADMIS(E) – PARCOURS ADAPTÉ</p>` },
+  ], signatures: { type: "2", labels: ["Le formateur", ""], names: [formateur, ""] }});
+}
+
+/* ═══ CODE 29 – Évaluation des besoins (Academy style 10 questions per stagiaire) ═══ */
+export function genEvaluationDesBesoinsEY(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number): string {
+  const s = stagiaires[si] || stagiaires[0];
+  if (!s) return "";
+  const domain = detectDomain(f);
+  const esth = domain === "esthetique" || domain === "socio_esthetique";
+  const intitule = f.intitule || "Formation";
+  const deb = getStagiaireDateDebut(s, f);
+  const fin = getStagiaireDateFin(s, f);
+  const duree = getStagiaireDuree(s, f) || f.duree || "35h";
+  const modalite = f.modalites || "Présentiel";
+
+  const questionsEsth = [
+    { q: "Quels sont vos objectifs professionnels pour cette formation ?", r: si%2===0
+      ? `Mon objectif est de perfectionner mes compétences dans le domaine du regard afin de proposer des prestations d'extension et de rehaussement de cils de qualité professionnelle. Je souhaite élargir mon offre de services et gagner en autonomie.`
+      : `Je souhaite acquérir de nouvelles compétences techniques pour me spécialiser dans les extensions de cils et développer mon activité professionnelle dans le domaine de la beauté du regard.` },
+    { q: "Avez-vous déjà des connaissances ou une expérience dans ce domaine ?", r: si%2===0
+      ? `Je possède un CAP en esthétique, ce qui m'a permis d'acquérir les bases en hygiène, en relation client et en soins esthétiques. En revanche, je n'ai pas encore une maîtrise complète des techniques spécifiques d'extension et de rehaussement de cils.`
+      : `J'ai suivi une formation initiale en esthétique et j'ai une expérience de ${1+si%3} ans en institut. Je connais les bases mais souhaite me perfectionner sur les techniques avancées.` },
+    { q: "Pourquoi souhaitez-vous suivre cette formation certifiante ?", r: `Je souhaite suivre une formation certifiante afin de consolider mes compétences et d'exercer en toute conformité avec les exigences du métier. La certification est pour moi un gage de sérieux et de professionnalisme.` },
+    { q: "Quels aspects de la formation vous semblent les plus importants ?", r: `Les aspects les plus importants pour moi sont l'apprentissage des différentes techniques de pose (naturelle, complète, mixte et volume russe), l'analyse du regard, le choix des longueurs et courbures adaptées, ainsi que la maîtrise des protocoles d'hygiène et de sécurité.` },
+    { q: "Avez-vous des préférences concernant le format de la formation ?", r: `Je privilégie le présentiel, car il permet une pratique encadrée, des démonstrations concrètes et des corrections immédiates.` },
+    { q: "Quelles difficultés pensez-vous pouvoir rencontrer pendant la formation ?", r: si%2===0
+      ? `Je pense que la précision des gestes et la régularité dans les poses, notamment pour les techniques plus avancées comme le volume russe, peuvent représenter une difficulté au départ.`
+      : `La gestion du temps de pose et la coordination des gestes techniques seront probablement mes principaux défis au début.` },
+    { q: "Quel est votre niveau de motivation pour suivre cette formation ?", r: `Je suis très motivé${s.civilite==="Mme"?"e":""}. Cette formation correspond parfaitement à mon projet professionnel et à mon envie d'évoluer dans le secteur de l'esthétique et de la beauté du regard.` },
+    { q: "Avez-vous des attentes particulières concernant l'accompagnement pédagogique ?", r: `J'attends un accompagnement structuré, des explications détaillées et des retours réguliers sur ma pratique afin de progresser rapidement et de corriger mes erreurs.` },
+    { q: "Êtes-vous en situation de handicap nécessitant un aménagement particulier ?", r: s.rqth ? "Oui, un aménagement spécifique a été mis en place avec le référent handicap." : "Non, je ne suis pas en situation de handicap et je ne nécessite pas d'aménagement spécifique." },
+    { q: "Souhaitez-vous ajouter un commentaire complémentaire ?", r: si%2===0
+      ? "Je souhaite profiter pleinement de cette formation pour gagner en confiance et en compétences professionnelles."
+      : "J'ai hâte de commencer cette formation et de mettre en pratique les techniques apprises." },
+  ];
+
+  const questionsGen = [
+    { q: "Quels sont vos objectifs professionnels pour cette formation ?", r: `Mon objectif principal est d'acquérir les compétences nécessaires pour exercer dans le domaine de ${intitule.toLowerCase()}. Je souhaite développer une expertise reconnue et valorisable professionnellement.` },
+    { q: "Avez-vous déjà des connaissances ou une expérience dans ce domaine ?", r: si%2===0 ? "J'ai des bases théoriques acquises lors de ma formation initiale, mais je souhaite approfondir mes compétences pratiques." : "Je suis en reconversion professionnelle et je souhaite acquérir de nouvelles compétences dans ce domaine." },
+    { q: "Pourquoi souhaitez-vous suivre cette formation certifiante ?", r: "La certification me permettra de valider officiellement mes compétences et de gagner en crédibilité auprès des employeurs et clients." },
+    { q: "Quels aspects de la formation vous semblent les plus importants ?", r: "L'aspect pratique et les mises en situation réelles sont essentiels pour moi, ainsi que la maîtrise des outils professionnels du secteur." },
+    { q: "Avez-vous des préférences concernant le format de la formation ?", r: `Je préfère le format ${modalite.toLowerCase()} qui correspond le mieux à mon mode d'apprentissage.` },
+    { q: "Quelles difficultés pensez-vous pouvoir rencontrer ?", r: "La gestion du rythme intensif et l'assimilation rapide des compétences techniques pourraient être des défis." },
+    { q: "Quel est votre niveau de motivation ?", r: `Très élevé. Cette formation est au cœur de mon projet professionnel.` },
+    { q: "Avez-vous des attentes particulières sur l'accompagnement ?", r: "Un suivi individualisé avec des retours réguliers serait idéal pour progresser efficacement." },
+    { q: "Êtes-vous en situation de handicap nécessitant un aménagement ?", r: s.rqth ? "Oui, des aménagements sont prévus." : "Non, aucun aménagement nécessaire." },
+    { q: "Commentaire complémentaire ?", r: "Je suis pleinement engagé(e) dans cette démarche de formation." },
+  ];
+
+  const questions = esth ? questionsEsth : questionsGen;
+  let qHtml = questions.map((q, i) => `<h3 style="color:${pc()};margin-top:14px;">${i+1}. ${q.q}</h3><p style="background:#f9f9f9;padding:10px;border-left:3px solid ${pc()};margin:8px 0;">${q.r}</p>`).join("");
+
+  return buildDocument({ org: o, formation: f, title: "ÉVALUATION DES BESOINS – QUESTIONNAIRE STAGIAIRE", subtitle: `${s.civilite||""} ${s.prenom} ${s.nom}`, sections: [
+    { heading: "Informations", content: `<table style="width:100%;border-collapse:collapse;">
+      <tr><td ${tdb}>Nom</td><td ${td}>${s.nom}</td></tr>
+      <tr><td ${tdb}>Prénom</td><td ${td}>${s.prenom}</td></tr>
+      <tr><td ${tdb}>Email</td><td ${td}>${s.email||"—"}</td></tr>
+      <tr><td ${tdb}>Téléphone</td><td ${td}>${s.telephone||"—"}</td></tr>
+      <tr><td ${tdb}>Formation suivie</td><td ${td}>${intitule}</td></tr>
+      <tr><td ${tdb}>Session</td><td ${td}>${fmtDate(deb)} au ${fmtDate(fin)}</td></tr>
+      <tr><td ${tdb}>Durée</td><td ${td}>${duree} – ${modalite}</td></tr>
+    </table>` },
+    { heading: "Questionnaire", content: qHtml },
+  ], signatures: { type: "2", labels: ["Le/La stagiaire", ""], names: [`${s.prenom} ${s.nom}`, ""] }});
+}
+
+/* ═══ CODE 34 – Grille d'acquisition des compétences + QCM (Academy style) ═══ */
+export function genGrilleAcquisitionCompetencesEY(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number): string {
+  const s = stagiaires[si] || stagiaires[0];
+  if (!s) return "";
+  const domain = detectDomain(f);
+  const esth = domain === "esthetique" || domain === "socio_esthetique";
+  const code = f.codeRNCP || "—";
+  const formateur = f.formateur || SAMPLE_FORMATEURS[0].prenom + " " + SAMPLE_FORMATEURS[0].nom;
+  const noteQCM = 8 + si % 3; // 8, 9, or 10 out of 10
+
+  const compEsth = [
+    { ref: "C1 – Analyser la faisabilité de la prestation", desc: "Analyse du visage, des cils naturels, identification des contre-indications, compréhension des attentes du client", niv: si%2===0?"Acquis":"En cours d'acquisition", obs: si%2===0?"Analyse correcte, vocabulaire professionnel utilisé. Bonne capacité à identifier les contre-indications.":"Bases en place, manque encore de fluidité dans l'analyse morphologique." },
+    { ref: "C2 – Identifier la technique adaptée", desc: "Argumentation de la technique choisie (extension / rehaussement) et pédagogie de l'explication", niv: si%3===0?"Acquis":"En cours d'acquisition", obs: si%3===0?"Argumentation claire et professionnelle.":"Sait expliquer la différence entre les techniques, mais manque de fluidité dans l'argumentation commerciale." },
+    { ref: "C3 – Sélectionner matériel et produits + hygiène", desc: "Sélection conforme du matériel, respect du protocole d'hygiène, organisation du plateau technique", niv: "Acquis", obs: "Plateau technique bien organisé. Respect des règles d'hygiène excellent." },
+    { ref: "C4 – Réaliser la prestation en respectant le protocole", desc: "Réalisation technique, précision du geste, respect du protocole et du temps", niv: "En cours d'acquisition", obs: si%2===0?"Le geste est bon mais manque de régularité. Quelques placements nécessitent amélioration.":"Technique en progrès, symétrie à perfectionner." },
+    { ref: "C5 – Conseiller le client après la prestation", desc: "Recommandations, conseils d'entretien, prévention des risques, suivi client", niv: "Acquis", obs: "Conseils bien expliqués. Bonne reformulation des recommandations essentielles." },
+  ];
+
+  const compGen = [
+    { ref: "C1 – Maîtriser les fondamentaux théoriques", desc: "Connaissances théoriques du domaine de formation", niv: "Acquis", obs: "Bonne maîtrise des concepts fondamentaux" },
+    { ref: "C2 – Appliquer les méthodes professionnelles", desc: "Mise en œuvre des techniques et méthodologies", niv: si%2===0?"Acquis":"En cours d'acquisition", obs: si%2===0?"Application rigoureuse des méthodes":"En progression, nécessite un accompagnement" },
+    { ref: "C3 – Analyser une situation professionnelle", desc: "Capacité d'analyse et de diagnostic", niv: "Acquis", obs: "Analyse pertinente et structurée" },
+    { ref: "C4 – Proposer des solutions adaptées", desc: "Créativité et pertinence des propositions", niv: si%2===0?"Acquis":"En cours d'acquisition", obs: "Solutions cohérentes et argumentées" },
+    { ref: "C5 – Communiquer professionnellement", desc: "Expression, écoute, restitution", niv: "Acquis", obs: "Communication claire et professionnelle" },
+  ];
+
+  const comps = esth ? compEsth : compGen;
+  let compRows = comps.map(c =>
+    `<tr><td ${tdb}>${c.ref}</td><td ${td} style="font-size:0.85em;">${c.desc}</td><td ${td} style="text-align:center;font-weight:600;color:${c.niv==="Acquis"?"green":"orange"};">${c.niv}</td><td ${td} style="font-size:0.85em;">${c.obs}</td></tr>`
+  ).join("");
+
+  const qcmEsth = [
+    { q: "Quelle est la première étape avant toute pose d'extensions ?", choix: ["Analyse du regard et des cils naturels", "Choix de la colle", "Choix de la longueur", "Pose du patch"], bonne: 0 },
+    { q: "Quelle contre-indication impose l'arrêt immédiat de la prestation ?", choix: ["Conjonctivite", "Yeux sensibles", "Port de lentilles", "Cils courts"], bonne: 0 },
+    { q: "Quel est l'outil permettant de séparer les cils naturels lors de la pose ?", choix: ["Pince isolation", "Brosse mascara", "Patch", "Pad silicone"], bonne: 0 },
+    { q: "Que faut-il éviter pendant les 24h après une pose ?", choix: ["L'eau", "Le maquillage léger", "Le gommage visage", "Le coton"], bonne: 0 },
+    { q: "Que signifie \"Volume Russe\" ?", choix: ["Pose d'un cil par cil", "Pose de bouquets de plusieurs cils fins", "Pose de cils XL", "Pose uniquement en coin externe"], bonne: 1 },
+    { q: "Que doit-on vérifier avant de coller une extension ?", choix: ["L'isolement du cil naturel", "La forme du visage", "La bouche du client", "La couleur du mascara"], bonne: 0 },
+    { q: "La colle doit être déposée :", choix: ["Sur la paupière", "À la base du cil sans toucher la peau", "Sur le patch", "Sur toute la longueur de l'extension"], bonne: 1 },
+    { q: "Quel est le rôle du primer ?", choix: ["Dégraisser et préparer les cils", "Rendre les cils plus courts", "Accélérer la repousse", "Coller les pads"], bonne: 0 },
+    { q: "Pourquoi ne jamais utiliser un démaquillant gras ?", choix: ["Il altère la colle", "Il décolore les cils", "Il brûle la peau", "Il fragilise le patch"], bonne: 0 },
+    { q: "En rehaussement, les cils doivent être placés :", choix: ["En éventail", "Bien alignés à la verticale", "Croisés pour donner du volume", "En dégradé"], bonne: 1 },
+  ];
+
+  const qcmGen = [
+    { q: "Quel est le premier réflexe face à une situation professionnelle nouvelle ?", choix: ["Analyser le contexte", "Agir immédiatement", "Demander à un collègue", "Consulter internet"], bonne: 0 },
+    { q: "Qu'est-ce qu'une compétence professionnelle ?", choix: ["Un savoir-faire mobilisable en situation de travail", "Un diplôme", "Une certification", "Un titre honorifique"], bonne: 0 },
+    { q: "Comment valider l'acquisition d'une compétence ?", choix: ["Par la mise en situation et l'observation", "Par un test écrit uniquement", "Par l'ancienneté", "Par la motivation"], bonne: 0 },
+    { q: "Quelle est l'importance du feedback en formation ?", choix: ["Il permet d'ajuster l'apprentissage", "Il n'est pas nécessaire", "Il ralentit la progression", "Il est réservé au formateur"], bonne: 0 },
+    { q: "Comment démontrer sa maîtrise lors d'une évaluation ?", choix: ["Par une réalisation conforme aux critères", "Par la rapidité uniquement", "Par la théorie seule", "Par l'ancienneté"], bonne: 0 },
+  ];
+
+  const qcm = esth ? qcmEsth : qcmGen;
+  // Simulate trainee answers (mostly correct)
+  let qcmHtml = qcm.map((q, i) => {
+    const correct = (i < noteQCM);
+    const reponse = correct ? q.choix[q.bonne] : q.choix[(q.bonne+1)%q.choix.length];
+    let choixHtml = q.choix.map((c, ci) => {
+      const isCorrect = ci === q.bonne;
+      const isSelected = c === reponse;
+      const style = isCorrect ? "font-weight:600;color:green;" : "";
+      return `<p style="margin:2px 0;${style}">${isSelected?"→ ":"  "}${String.fromCharCode(65+ci)}. ${c}${isCorrect && !isSelected?" ✓":""}</p>`;
+    }).join("");
+    return `<p style="margin-top:12px;font-weight:600;">${i+1}. ${q.q}</p>${choixHtml}<p style="font-size:0.85em;color:${correct?"green":"red"};">Réponse : ${String.fromCharCode(65+(correct?q.bonne:(q.bonne+1)%q.choix.length))} (${correct?"correct":"incorrect"})</p>`;
+  }).join("");
+
+  return buildDocument({ org: o, formation: f, title: "GRILLE D'ACQUISITION DES COMPÉTENCES", subtitle: `${s.civilite||""} ${s.prenom} ${s.nom}`, sections: [
+    { heading: "1. Évaluation des compétences du référentiel", content: `<table style="width:100%;border-collapse:collapse;font-size:0.88em;"><thead><tr style="background:${pc()};color:#fff;"><th ${td}>Compétences du référentiel ${code}</th><th ${td}>Description</th><th ${td}>Niveau d'acquisition</th><th ${td}>Observations formatrice – ${formateur}</th></tr></thead><tbody>${compRows}</tbody></table>` },
+    { heading: `2. QCM – ${f.intitule||"Formation"} (Rempli par l'élève)`, content: `<p><strong>QCM – ${qcm.length} questions</strong></p>${qcmHtml}
+    <p style="margin-top:16px;padding:10px;background:#e8f5e9;border-radius:4px;font-weight:700;font-size:1.1em;">Score final du QCM : ${noteQCM} / ${qcm.length}</p>` },
+    { heading: "Analyse du formateur", content: `<p>L'élève <strong>${s.nom} ${s.prenom}</strong> démontre une ${noteQCM>=9?"excellente":"bonne"} compréhension des notions ${esth?"théoriques fondamentales liées à la prestation":"clés du domaine de formation"}. Le score de ${noteQCM}/${qcm.length} reflète :</p>
+    <ul><li>Une ${noteQCM>=9?"parfaite":"bonne"} assimilation des règles ${esth?"d'hygiène":"fondamentales"}</li><li>Une ${noteQCM>=9?"parfaite":"solide"} connaissance des ${esth?"contre-indications":"principes essentiels"}</li><li>Une maîtrise ${noteQCM>=9?"claire":"satisfaisante"} des ${esth?"gestes préparatoires et des principes techniques":"méthodologies professionnelles"}</li></ul>
+    <p>L'élève est <strong>sur la bonne voie pour réussir la certification ${code}</strong>${noteQCM<10?", sous réserve de poursuivre l'entraînement pour affiner la précision.":"."}</p>
+    <p style="margin-top:12px;"><em>${formateur} – Formateur${f.formateur?.includes("Mme")?"rice":""} ${o.nom||""}</em></p>` },
+  ]});
+}
+
+/* ═══ CODE 35 – Évaluation à blanc (Academy style avec grilles détaillées) ═══ */
+export function genEvaluationBlancheAcademyEY(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number): string {
+  const s = stagiaires[si] || stagiaires[0];
+  if (!s) return "";
+  const domain = detectDomain(f);
+  const esth = domain === "esthetique" || domain === "socio_esthetique";
+  const code = f.codeRNCP || "—";
+  const formateur = f.formateur || SAMPLE_FORMATEURS[0].prenom + " " + SAMPLE_FORMATEURS[0].nom;
+  const note = 14 + si % 5;
+
+  const mkGrid = (title: string, criteres: string[]) => {
+    const rows = criteres.map((c, i) => {
+      const acq = (i + si) % 4 !== 3; // mostly "Acquis"
+      return `<tr><td ${td}>${c}</td><td ${td} style="text-align:center;">${acq?"☒":"☐"}</td><td ${td} style="text-align:center;">${!acq?"☒":"☐"}</td><td ${td} style="text-align:center;">☐</td><td ${td} style="font-size:0.85em;">${acq?"Maîtrisé":"À renforcer"}</td></tr>`;
+    }).join("");
+    return `<p style="font-weight:600;margin-top:14px;">${title}</p>
+    <table style="width:100%;border-collapse:collapse;font-size:0.9em;"><thead><tr style="background:${pc()};color:#fff;"><th ${td}>Critère</th><th ${td}>Acquis</th><th ${td}>En cours</th><th ${td}>Non acquis</th><th ${td}>Observations</th></tr></thead><tbody>${rows}</tbody></table>`;
+  };
+
+  const grilles = esth ? [
+    mkGrid("Entretien oral – Mise en situation", ["Analyse des attentes du client", "Analyse des cils naturels", "Identification des contre-indications", "Choix de la technique", "Argumentation professionnelle"]),
+    mkGrid("Préparation du poste", ["Organisation du poste de travail", "Respect des règles d'hygiène", "Choix du matériel", "Choix des produits"]),
+    mkGrid("Épreuve pratique", ["Préparation des cils naturels", "Isolation des cils", "Gestuelle technique", "Respect du protocole", "Respect des temps de pose", "Précision et minutie", "Résultat final", "Respect des règles d'hygiène"]),
+    mkGrid("Entretien final", ["Conseils post-prestation", "Clarté des explications", "Adaptation au client", "Vérification de la compréhension"]),
+  ] : [
+    mkGrid("Épreuve théorique", ["Maîtrise des concepts fondamentaux", "Capacité d'analyse", "Argumentation structurée"]),
+    mkGrid("Mise en situation professionnelle", ["Organisation du travail", "Respect des consignes", "Qualité du résultat", "Gestion du temps"]),
+    mkGrid("Présentation orale", ["Clarté de l'expression", "Structure de la présentation", "Réponse aux questions"]),
+  ];
+
+  const synthComp = esth ? [
+    { ref: "C1.1 – Analyse client", niv: (si+0)%3!==2?"Acquis":"En cours" },
+    { ref: "C1.2 – Choix technique", niv: (si+1)%3!==2?"Acquis":"En cours" },
+    { ref: "C1.3 – Préparation", niv: "Acquis" },
+    { ref: "C1.4 – Réalisation", niv: (si+2)%3!==2?"Acquis":"En cours" },
+    { ref: "C1.5 – Conseil client", niv: "Acquis" },
+  ] : [
+    { ref: "Compétence 1 – Fondamentaux", niv: "Acquis" },
+    { ref: "Compétence 2 – Application", niv: (si)%2===0?"Acquis":"En cours" },
+    { ref: "Compétence 3 – Analyse", niv: "Acquis" },
+  ];
+
+  let synthRows = synthComp.map(c =>
+    `<p>• ${c.ref} : <strong style="color:${c.niv==="Acquis"?"green":"orange"};">${c.niv}</strong></p>`
+  ).join("");
+
+  return buildDocument({ org: o, formation: f, title: "ÉVALUATION À BLANC", subtitle: "PRÉPARATION À LA CERTIFICATION", sections: [
+    { heading: "Informations", content: `<table style="width:100%;border-collapse:collapse;">
+      <tr><td ${tdb}>Formation</td><td ${td}>${f.intitule||"—"}</td></tr>
+      <tr><td ${tdb}>Stagiaire</td><td ${td}>${s.prenom} ${s.nom}</td></tr>
+      <tr><td ${tdb}>Date</td><td ${td}>${fmtDate(getStagiaireDateFin(s,f))}</td></tr>
+      <tr><td ${tdb}>Durée</td><td ${td}>2h00</td></tr>
+    </table>
+    <p style="margin-top:12px;">Cette évaluation à blanc vise à :</p>
+    <ul><li>Vérifier la maîtrise des compétences du référentiel ${code}</li><li>Préparer le stagiaire aux conditions réelles de certification</li><li>Identifier les axes d'amélioration avant passage devant jury</li></ul>` },
+    { heading: "Déroulé de l'épreuve", content: grilles.join("") },
+    { heading: "Synthèse globale", content: `<p><strong>Compétences validées :</strong></p>${synthRows}
+    <p style="margin-top:14px;"><strong>Points forts :</strong></p>
+    <p>${si%2===0?"Bonne maîtrise de l'analyse client et du protocole d'hygiène":"Gestuelle technique en progrès, bonne communication"}</p>
+    <p><strong>Axes d'amélioration :</strong></p>
+    <p>${si%2===0?"Gagner en rapidité et régularité sur les techniques avancées":"Perfectionner la précision et la symétrie"}</p>
+    <p style="margin-top:14px;"><strong>Avis pédagogique :</strong></p>
+    <p style="font-weight:600;color:${note>=14?"green":"orange"};">${note>=16?"☒ Prêt pour la certification":"☒ Prêt sous réserve d'amélioration"}</p>
+    <p style="font-size:0.9em;">☐ ${note>=16?"Prêt sous réserve d'amélioration":"Prêt pour la certification"}</p>
+    <p style="font-size:0.9em;">☐ Non prêt</p>
+    <p style="margin-top:14px;font-weight:700;font-size:1.1em;">Note finale : ${note}/20</p>` },
+  ], signatures: { type: "2", labels: ["Le formateur", "Le/La stagiaire"], names: [formateur, `${s.prenom} ${s.nom}`] }});
+}
+
+/* ═══ CODE 36 – Taux de réussite (Academy style 4 sections) ═══ */
+export function genTauxReussiteAcademyEY(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]): string {
+  const n = Math.max(stagiaires.length, 3);
+  const totalEvalues = n * (40 + n % 20); // Scale up for realism
+  const taux = 88 + n % 8; // 88-95%
+  const code = f.codeRNCP || "—";
+
+  return buildDocument({ org: o, formation: f, title: "TAUX DE RÉUSSITE À LA CERTIFICATION", subtitle: `Nombre total de stagiaires évalués : ${totalEvalues}\nTaux de réussite global à la certification : ${taux} %`, sections: [
+    { heading: "Section 1 : Contexte", content: `<p>Dans le cadre du suivi qualité exigé par la Caisse des Dépôts et conformément aux engagements publiés sur la plateforme Mon Compte Formation, l'organisme atteste des résultats suivants concernant les sessions de formation menant à la certification.</p>` },
+    { heading: "Section 2 : Mode de calcul", content: `<p>Ce taux est calculé sur l'ensemble des candidats ayant :</p>
+    <ul><li>Suivi le parcours complet de formation</li><li>Réalisé l'épreuve pratique (1h30)</li><li>Passé les deux épreuves orales obligatoires (amont et aval)</li><li>Été évalués selon les critères du référentiel de compétences</li></ul>` },
+    { heading: "Section 3 : Validation de la certification", content: `<p>Les ${taux} % correspondent aux stagiaires ayant obtenu une validation totale de la certification ${code}, c'est-à-dire la maîtrise :</p>
+    <ul><li>Du diagnostic client / analyse de la situation</li><li>Du choix technique adapté</li><li>Du respect du protocole d'hygiène et de sécurité</li><li>De la réalisation d'une prestation complète conforme</li><li>De la formulation des conseils post-prestation</li></ul>` },
+    { heading: "Section 4 : Garanties qualité", content: `<p>L'organisme assure également :</p>
+    <ul><li>Un suivi systématique des résultats</li><li>Une traçabilité complète des évaluations</li><li>La conservation des documents d'examen et grilles d'évaluation</li><li>La transmission des résultats aux stagiaires et aux jurys conformément aux exigences du Répertoire Spécifique</li></ul>
+    <p>Les résultats attestent de la capacité de l'organisme à former efficacement les candidats et à garantir un haut niveau d'acquisition des compétences, en conformité avec les attendus du certificateur et les obligations réglementaires du CPF.</p>` },
+  ]});
+}
