@@ -380,20 +380,60 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
     setPreviewTitle(`${eyDoc.code} — ${eyDoc.label}`);
     setPreviewDoc(eyDoc);
     setPreviewOpen(true);
+    setIsEditing(false);
     try {
       const template = eyDoc.autoTemplates[0];
       const o = mergeOrganisme(organisme);
       const s = exportStagiaires;
       const params = eyDoc.perStagiaire && s.length > 0 ? { stagiaireIdx: 0, fi: 0 } : { fi: 0 };
       const html = generateDocumentById(`ey_${eyDoc.code}`, template, params, o, formation, s);
-      setPreviewHtml(html || "<p>Impossible de générer l'aperçu</p>");
+      const content = html || "<p>Impossible de générer l'aperçu</p>";
+      setPreviewHtml(content);
+      setEditedHtml(content);
     } catch (e) {
       console.error("Preview error:", e);
-      setPreviewHtml("<p>Erreur lors de la génération de l'aperçu</p>");
+      const err = "<p>Erreur lors de la génération de l'aperçu</p>";
+      setPreviewHtml(err);
+      setEditedHtml(err);
     } finally {
       setPreviewLoading(false);
     }
   }, [organisme, formation, exportStagiaires]);
+
+  // Toggle edit mode — sync content from iframe when entering/exiting
+  const toggleEditMode = useCallback(() => {
+    if (isEditing) {
+      // Exiting edit mode — read content from iframe
+      const iframe = previewIframeRef.current;
+      if (iframe?.contentDocument?.body) {
+        const updatedHtml = iframe.contentDocument.documentElement.outerHTML;
+        setEditedHtml(`<!DOCTYPE html><html>${updatedHtml.slice(updatedHtml.indexOf('<html') + updatedHtml.match(/<html[^>]*>/)?.[0]?.length! || 6)}`);
+      }
+      setIsEditing(false);
+    } else {
+      setIsEditing(true);
+    }
+  }, [isEditing]);
+
+  // Enable contentEditable on iframe load
+  const handleIframeLoad = useCallback(() => {
+    if (!isEditing) return;
+    const iframe = previewIframeRef.current;
+    if (iframe?.contentDocument?.body) {
+      iframe.contentDocument.designMode = "on";
+    }
+  }, [isEditing]);
+
+  // Get the current HTML for export (edited or original)
+  const getCurrentHtml = useCallback((): string => {
+    if (isEditing) {
+      const iframe = previewIframeRef.current;
+      if (iframe?.contentDocument?.body) {
+        return `<!DOCTYPE html><html>${iframe.contentDocument.documentElement.innerHTML}</html>`;
+      }
+    }
+    return editedHtml;
+  }, [isEditing, editedHtml]);
 
   // Inject signature into HTML before PDF export
   const injectSignatureIntoHtml = useCallback((html: string, sigDataUrl: string): string => {
