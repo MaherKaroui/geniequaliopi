@@ -171,62 +171,98 @@ export function genObjectifsMethodesSequence(o: OrganismeInfo, f: FormationInfo)
   ]});
 }
 
-/* ═══ CODE 11 – Dossier stagiaire ═══ */
+/** Appreciation domain-specific – inspired by Academy djika */
+function getDomainAppreciation(domain: FormationDomain, si: number, note: number): { intro: string; points: string[]; lacunes: string[]; conclusion: string } {
+  if (domain === "esthetique") {
+    const intros = [
+      `La stagiaire présente un bon niveau initial. Les bases professionnelles sont globalement acquises, notamment en hygiène, relation client et organisation du poste de travail.`,
+      `Le test de positionnement met en évidence un niveau initial intermédiaire. La stagiaire possède certaines bases, notamment en hygiène et relation client.`,
+      `La stagiaire démontre un niveau débutant motivé. Aucune expérience préalable dans le domaine de l'extension de cils mais une forte motivation et une compréhension rapide des consignes.`,
+      `Le positionnement initial révèle un bon socle de compétences. La stagiaire a déjà pratiqué des soins esthétiques de base et montre une réelle aptitude pour le travail de précision.`,
+    ];
+    const pointsSets = [
+      ["Une bonne compréhension des exigences du métier", "Des connaissances en hygiène et sécurité au poste de travail", "Une capacité d'écoute et de relation client satisfaisante", "Une motivation forte pour la formation et l'obtention de la certification"],
+      ["Des connaissances générales en hygiène", "Une compréhension partielle de la relation client", "Une bonne dextérité manuelle", "Un intérêt marqué pour les techniques de pose"],
+      ["Une excellente motivation et assiduité", "Un sens du détail et de la précision", "De bonnes dispositions pour l'apprentissage gestuel", "Une communication claire et professionnelle avec les modèles"],
+      ["Des notions solides en morphologie du visage", "Une bonne maîtrise de l'hygiène au poste de travail", "Un sens artistique développé", "Une capacité d'adaptation aux différentes demandes clients"],
+    ];
+    const lacunesSets = [
+      ["Les techniques spécifiques d'isolation et de pose restent à acquérir", "Le vocabulaire professionnel lié aux extensions (courbure, diamètre, effet) nécessite un approfondissement"],
+      ["Les protocoles de pose cil à cil ne sont pas encore maîtrisés", "La connaissance des contre-indications médicales est insuffisante", "Le rythme de travail doit être accéléré pour atteindre la cadence professionnelle"],
+      ["L'ensemble des compétences techniques est à construire", "Les protocoles d'hygiène spécifiques aux extensions doivent être formalisés"],
+      ["Les techniques de volume russe restent à perfectionner", "La gestion du temps sur un rendez-vous complet est à améliorer"],
+    ];
+    return { intro: intros[si % intros.length], points: pointsSets[si % pointsSets.length], lacunes: lacunesSets[si % lacunesSets.length], conclusion: note >= 16 ? "Le parcours sera orienté vers un approfondissement des techniques avancées (volume russe, mégavolume) et la préparation à la certification." : "Un accompagnement renforcé sera mis en place sur les fondamentaux techniques avec des exercices supplémentaires sur mannequin avant passage sur modèle vivant." };
+  }
+  if (domain === "socio_esthetique") {
+    return { intro: `La stagiaire présente ${note>=16?"un bon":"un"} niveau initial avec des acquis en esthétique classique. L'approche spécifique aux publics fragilisés reste à développer.`,
+      points: ["Connaissances solides en soins esthétiques de base", "Sensibilité naturelle pour l'accompagnement des personnes vulnérables", "Bonne posture relationnelle et capacité d'écoute", "Motivation pour le secteur médico-social"],
+      lacunes: ["Les protocoles de soins adaptés aux peaux fragilisées par les traitements sont à acquérir", "La relation d'aide en contexte de souffrance psychologique nécessite un cadrage professionnel"],
+      conclusion: "Le parcours complet RS5992 permettra d'acquérir l'ensemble des compétences C1 à C11 du référentiel." };
+  }
+  if (domain === "informatique") {
+    return { intro: `Le test de positionnement révèle un niveau ${note>=16?"intermédiaire solide":"débutant avec des bases"} en environnement numérique.`,
+      points: ["Maîtrise correcte de l'outil informatique", "Capacité d'apprentissage autonome en ligne", "Logique de résolution de problèmes"],
+      lacunes: ["Les compétences techniques spécifiques au programme restent à acquérir", "La méthodologie de travail projet est à structurer"],
+      conclusion: "Le parcours sera adapté au niveau initial avec des exercices de difficulté progressive." };
+  }
+  return { intro: `Le positionnement met en évidence un niveau ${note>=16?"satisfaisant":"initial à consolider"}.`,
+    points: ["Bonne compréhension des objectifs de la formation", "Motivation et implication satisfaisantes", "Capacité d'écoute et de travail en groupe"],
+    lacunes: ["Les compétences métier spécifiques sont à développer tout au long du parcours"],
+    conclusion: "Le plan de formation sera ajusté en fonction des acquis et des besoins identifiés." };
+}
+
+/* ═══ CODE 11 – Dossier stagiaire (enrichi Academy djika) ═══ */
 export function genDossierStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number): string {
   const s = stagiaires[si] || stagiaires[0];
   if (!s) return "";
+  const domain = detectDomain(f);
+  const notePositionnement = 14 + (si % 7); // 14-20
+  const appr = getDomainAppreciation(domain, si, notePositionnement);
+
   const niveaux = ["Débutant – Aucune expérience dans le domaine", "Intermédiaire – Bases acquises, souhaite se perfectionner", "Faux-débutant – Quelques notions, pratique occasionnelle", "Confirmé – Expérience professionnelle, besoin de certification"];
   const adaptations = ["Renforcement des bases théoriques avant les mises en pratique", "Approfondissement des techniques avancées et cas complexes", "Accompagnement personnalisé sur les points de fragilité identifiés", "Focus sur la préparation à la certification et les épreuves"];
-  return buildDocument({ org: o, formation: f, title: `Dossier stagiaire – ${s.prenom} ${s.nom}`, sections: [
-    { heading: "1. Informations personnelles", content: `<table style="width:100%;border-collapse:collapse;">
+
+  return buildDocument({ org: o, formation: f, title: `DESCRIPTION DES STAGIAIRES – TEST DE POSITIONNEMENT DÉBUT`, subtitle: `${s.civilite||""} ${s.prenom} ${s.nom}`, sections: [
+    { heading: "Formation", content: `<p><strong>${f.intitule||"Formation"}</strong></p><p>Organisme : ${o.nom||"—"}<br/>Modalité : ${f.modalites||"Présentiel"}</p>` },
+    { heading: `STAGIAIRE : ${s.nom?.toUpperCase()} ${s.prenom}`, content: `<p><strong>Session :</strong> Du <strong>${fmtDate(getStagiaireDateDebut(s,f))}</strong> au <strong>${fmtDate(getStagiaireDateFin(s,f))}</strong></p>
+    <p><strong>Test de positionnement (début)</strong></p>
+    <ul><li>Date : <strong>${fmtDate(getStagiaireDateDebut(s,f))}</strong></li><li>Note : <strong>${notePositionnement} / 20</strong></li></ul>` },
+    { heading: "Appréciation", content: `<p>${appr.intro}</p>
+    <p>${s.civilite==="Monsieur"?"Il":"Elle"} démontre :</p>
+    <ul>${appr.points.map(p=>`<li>${p}</li>`).join("")}</ul>
+    ${appr.lacunes.length>0?`<p>Cependant, des ${appr.lacunes.length>1?"lacunes":"points d'amélioration"} ${appr.lacunes.length>1?"sont identifiées":"est identifié"} :</p><ul>${appr.lacunes.map(l=>`<li>${l}</li>`).join("")}</ul>`:""}
+    <p><strong>Conclusion :</strong> ${appr.conclusion}</p>` },
+    { heading: "Informations personnelles", content: `<table style="width:100%;border-collapse:collapse;">
       <tr><td ${tdb} style="width:35%;">Civilité</td><td ${td}>${s.civilite||"—"}</td></tr>
       <tr><td ${tdb}>Nom</td><td ${td}>${s.nom}</td></tr>
       <tr><td ${tdb}>Prénom</td><td ${td}>${s.prenom}</td></tr>
       <tr><td ${tdb}>Date de naissance</td><td ${td}>${s.dateNaissance?fmtDate(s.dateNaissance):"—"}</td></tr>
-      <tr><td ${tdb}>Lieu de naissance</td><td ${td}>${(s as any).villeNaissance||"—"}</td></tr>
-      <tr><td ${tdb}>Nationalité</td><td ${td}>${(s as any).nationalite||"Française"}</td></tr>
-      <tr><td ${tdb}>Adresse</td><td ${td}>${(s as any).adresse||"—"}</td></tr>
       <tr><td ${tdb}>Email</td><td ${td}>${s.email||"—"}</td></tr>
       <tr><td ${tdb}>Téléphone</td><td ${td}>${s.telephone||"—"}</td></tr>
-      <tr><td ${tdb}>NIR (N° Sécurité Sociale)</td><td ${td}>${(s as any).nir||"—"}</td></tr>
       <tr><td ${tdb}>Situation professionnelle</td><td ${td}>${s.poste||"Demandeur d'emploi"}</td></tr>
       <tr><td ${tdb}>Entreprise</td><td ${td}>${s.entreprise||"—"}</td></tr>
-      <tr><td ${tdb}>Niveau de diplôme</td><td ${td}>${(s as any).niveauDiplome||"—"}</td></tr>
-      <tr><td ${tdb}>Situation de handicap (RQTH)</td><td ${td}>${(s as any).rqth?"Oui":"Non"}</td></tr>
+      <tr><td ${tdb}>NIR</td><td ${td}>${(s as any).nir||"—"}</td></tr>
+      <tr><td ${tdb}>RQTH</td><td ${td}>${(s as any).rqth?"Oui":"Non"}</td></tr>
     </table>` },
-    { heading: "2. Formation suivie", content: `<table style="width:100%;border-collapse:collapse;">
-      <tr><td ${tdb} style="width:35%;">Intitulé</td><td ${td}>${f.intitule||"—"}</td></tr>
-      <tr><td ${tdb}>Code certification</td><td ${td}>${f.codeRNCP||"—"}</td></tr>
-      <tr><td ${tdb}>Dates</td><td ${td}>Du ${fmtDate(getStagiaireDateDebut(s,f))} au ${fmtDate(getStagiaireDateFin(s,f))}</td></tr>
-      <tr><td ${tdb}>Durée</td><td ${td}>${getStagiaireDuree(s,f)}</td></tr>
-      <tr><td ${tdb}>Modalités</td><td ${td}>${f.modalites||"Présentiel"}</td></tr>
-      <tr><td ${tdb}>Lieu</td><td ${td}>${f.lieu||o.ville||"—"}</td></tr>
-      <tr><td ${tdb}>Formateur référent</td><td ${td}>${f.formateur||SAMPLE_FORMATEURS[0].prenom+" "+SAMPLE_FORMATEURS[0].nom}</td></tr>
-      <tr><td ${tdb}>N° Action EDOF</td><td ${td}>${(s as any).numeroAction||"—"}</td></tr>
-      <tr><td ${tdb}>Montant pris en charge</td><td ${td}>${getStagiaireTarif(s,f)}</td></tr>
-    </table>` },
-    { heading: "3. Résultat du positionnement amont", content: `<p>Un entretien de positionnement individuel a été réalisé le <strong>${fmtDate(getStagiaireDateDebut(s,f))}</strong> (en amont du démarrage effectif de la formation).</p>
-    <table style="width:100%;border-collapse:collapse;">
+    { heading: "Résultat du positionnement", content: `<table style="width:100%;border-collapse:collapse;">
       <tr><td ${tdb} style="width:35%;">Niveau initial évalué</td><td ${td}>${niveaux[si%niveaux.length]}</td></tr>
       <tr><td ${tdb}>Projet professionnel</td><td ${td}>${si%2===0?"Reconversion professionnelle dans le secteur":"Montée en compétences pour certification"}</td></tr>
       <tr><td ${tdb}>Motivations exprimées</td><td ${td}>${si%3===0?"Passion pour le domaine, désir de professionnalisation":"Évolution de carrière, obtention d'une certification reconnue"}</td></tr>
       <tr><td ${tdb}>Adaptations prévues</td><td ${td}>${adaptations[si%adaptations.length]}</td></tr>
-      <tr><td ${tdb}>Freins identifiés</td><td ${td}>${si%4===0?"Aucun frein majeur identifié":si%4===1?"Contraintes horaires (emploi en parallèle)":si%4===2?"Appréhension sur les épreuves pratiques":"Besoin de soutien sur la partie théorique"}</td></tr>
     </table>` },
-    { heading: "4. Suivi pédagogique", content: `<table style="width:100%;border-collapse:collapse;">
+    { heading: "Suivi pédagogique", content: `<table style="width:100%;border-collapse:collapse;">
       <tr><td ${tdb} style="width:35%;">Assiduité</td><td ${td}>${90+(si%10)}% – ${si%3===0?"Aucune absence":"1 absence justifiée"}</td></tr>
       <tr><td ${tdb}>Participation</td><td ${td}>${si%3===0?"Très active – Pose des questions pertinentes":si%3===1?"Active – Bonne implication":"Satisfaisante – Progression régulière"}</td></tr>
-      <tr><td ${tdb}>Point d'étape mi-parcours</td><td ${td}>Réalisé – ${si%2===0?"En bonne voie, objectifs atteints à 60%":"Progression encourageante, axes d'amélioration identifiés"}</td></tr>
       <tr><td ${tdb}>Résultat évaluation finale</td><td ${td}>${15+si%6}/20 – ${si%2===0?"Acquis":"Acquis avec mention"}</td></tr>
     </table>` },
-    { heading: "5. Pièces constitutives du dossier", content: `<ul>
+    { heading: "Pièces constitutives du dossier", content: `<ul>
       <li>✓ Copie de la pièce d'identité</li>
       <li>✓ Test de positionnement initial rempli et signé</li>
       <li>✓ Contrat de formation professionnelle signé</li>
       <li>✓ Convocation à la formation</li>
       <li>✓ Règlement intérieur signé</li>
-      <li>✓ Feuilles d'émargement signées (toutes les journées)</li>
-      <li>✓ Évaluation initiale de positionnement</li>
+      <li>✓ Feuilles d'émargement signées</li>
       <li>✓ Évaluations formatives intermédiaires</li>
       <li>✓ Évaluation finale / Test de fin de formation</li>
       <li>✓ Grille d'acquisition des compétences</li>
