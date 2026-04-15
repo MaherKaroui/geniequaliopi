@@ -89,8 +89,8 @@ const EVAL_WEEK_MAP: Record<number, number> = {
   11: 26,  // S25+S26 École – QCM Gestion des stocks
   12: 30,  // S29+S30 École – QCM sécurité Conduite d'engins
   13: 34,  // S33+S34 École – Mise en situation Communication
-  14: 38,  // S37+S38 École – Examen blanc (Révisions globales)
-  15: 42,  // S41+S42 École – Examen blanc final
+  14: 34,  // S33+S34 École – Examen blanc (Révisions globales)
+  15: 36,  // S35+S36 École – Examen blanc final
 };
 
 /**
@@ -110,6 +110,14 @@ function getEvalDate(evalNum: number, s: StagiaireInfo, f: FormationInfo): strin
   if (!weekNum) return formatDate(f.dateFin || "") || "N/A";
   const evalDate = new Date(monday);
   evalDate.setDate(evalDate.getDate() + (weekNum - 1) * 7 + 4);
+  // Cap: never exceed dateFin
+  const endStr = (s as any).dateFinFormation || (s as any).dateFin || f.dateFin || "";
+  if (endStr) {
+    const endDate = new Date(endStr);
+    if (!isNaN(endDate.getTime()) && evalDate > endDate) {
+      return formatDate(endDate.toISOString().slice(0, 10));
+    }
+  }
   return formatDate(evalDate.toISOString().slice(0, 10));
 }
 function stagCivilite(s: StagiaireInfo) {
