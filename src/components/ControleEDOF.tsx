@@ -784,7 +784,142 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
         </div>
       </div>
 
-      {/* Naming convention reminder */}
+      {/* Bac Pro Logistique section */}
+      {bacProDocs.length > 0 && (
+        <div className="border rounded-xl overflow-hidden">
+          <div className="w-full flex items-center justify-between p-4 bg-card">
+            <div className="flex items-center gap-3">
+              <input
+                type="checkbox"
+                checked={bacProDocs.length > 0 && bacProDocs.every(d => selectedDocs.has(d.code))}
+                ref={el => { if (el) el.indeterminate = bacProDocs.some(d => selectedDocs.has(d.code)) && !bacProDocs.every(d => selectedDocs.has(d.code)); }}
+                onChange={() => {
+                  setSelectedDocs(prev => {
+                    const next = new Set(prev);
+                    const allSelected = bacProDocs.every(d => next.has(d.code));
+                    if (allSelected) {
+                      bacProDocs.forEach(d => next.delete(d.code));
+                    } else {
+                      bacProDocs.forEach(d => next.add(d.code));
+                    }
+                    return next;
+                  });
+                }}
+                className="w-4 h-4 rounded border-border accent-primary cursor-pointer"
+              />
+              <span className="font-semibold">{EY_CATEGORIES["controle_bac_pro"]}</span>
+              <Badge variant="secondary" className="text-xs">
+                {bacProDocs.filter(d => {
+                  const s = docStates.get(d.code);
+                  return s && (s.status === "auto" || s.status === "uploaded" || s.status === "not_applicable");
+                }).length}/{bacProDocs.length}
+              </Badge>
+            </div>
+          </div>
+
+          <div className="divide-y">
+            {bacProDocs.map(eyDoc => {
+              const state = docStates.get(eyDoc.code) || { code: eyDoc.code, status: "pending" as EYDocStatus };
+              const cfg = STATUS_CONFIG[state.status];
+              return (
+                <div key={eyDoc.code} className="p-4 flex flex-col sm:flex-row items-start gap-3 bg-background">
+                  <div className="flex items-start gap-3 flex-1 min-w-0">
+                    <input
+                      type="checkbox"
+                      checked={selectedDocs.has(eyDoc.code)}
+                      onChange={() => toggleSelectDoc(eyDoc.code)}
+                      className="w-4 h-4 mt-0.5 rounded border-border accent-primary cursor-pointer shrink-0"
+                    />
+                    {cfg.icon}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <Badge variant="outline" className="text-xs font-mono shrink-0">
+                          {eyDoc.code}
+                        </Badge>
+                        <span className="font-medium text-sm">{eyDoc.label}</span>
+                        {eyDoc.perStagiaire && (
+                          <Badge variant="secondary" className="text-xs">Par stagiaire</Badge>
+                        )}
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{eyDoc.description}</p>
+                      {state.uploadedFileName && (
+                        <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
+                          <CheckCircle2 className="w-3 h-3" /> {state.uploadedFileName}
+                        </p>
+                      )}
+                      {state.status === "auto" && eyDoc.autoTemplates.length > 0 && (
+                        <p className="text-xs text-primary mt-1 flex items-center gap-1">
+                          <Sparkles className="w-3 h-3" /> Généré automatiquement par l'application
+                        </p>
+                      )}
+                      {eyDoc.staticFile && state.status !== "uploaded" && (
+                        <p className="text-xs text-blue-600 mt-1 flex items-center gap-1">
+                          <FileText className="w-3 h-3" /> Fichier pré-fourni (DOCX)
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 shrink-0">
+                    {eyDoc.autoTemplates.length > 0 && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="gap-1 text-xs"
+                        onClick={() => handlePreview(eyDoc)}
+                      >
+                        <Eye className="w-3 h-3" />
+                        Aperçu
+                      </Button>
+                    )}
+                    {(eyDoc.autoTemplates.length > 0 || state.status === "uploaded" || eyDoc.staticFile) && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="gap-1 text-xs"
+                        disabled={generating}
+                        onClick={() => handleDownloadDoc(eyDoc, state)}
+                      >
+                        <Download className="w-3 h-3" />
+                        {eyDoc.staticFile ? "DOCX" : "PDF"}
+                      </Button>
+                    )}
+                    <input
+                      type="file"
+                      className="hidden"
+                      ref={el => { if (el) fileInputRefs.current.set(eyDoc.code, el); }}
+                      onChange={e => {
+                        const f = e.target.files?.[0];
+                        if (f) handleFileUpload(eyDoc.code, f);
+                        e.target.value = "";
+                      }}
+                    />
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="gap-1 text-xs"
+                      onClick={() => fileInputRefs.current.get(eyDoc.code)?.click()}
+                    >
+                      <Upload className="w-3 h-3" />
+                      Fournir
+                    </Button>
+                    <Button
+                      variant={state.status === "not_applicable" ? "secondary" : "ghost"}
+                      size="sm"
+                      className="text-xs"
+                      onClick={() => toggleNA(eyDoc.code)}
+                    >
+                      N/A
+                    </Button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+
       <div className="bg-muted/50 border rounded-lg p-4 text-sm">
         <div className="flex items-start gap-2">
           <AlertTriangle className="w-4 h-4 text-amber-500 mt-0.5 shrink-0" />
