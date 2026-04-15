@@ -653,6 +653,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
       case "ey_evaluation_blanche": return genEvaluationBlancheEY(o, f, stagiaires, params?.stagiaireIdx ?? 0);
       case "ey_factures_equipements": return genFacturesEquipementsEY(o, f);
       case "ey_equipements_pedagogiques": return genEquipementsPedagogiquesEY(o, f);
+      case "ey_formation_continue_formateurs": return genFormationContinueFormateurs(o, f);
      case "dossier_inscription_cfa": return genDossierInscriptionCFA(o, f, stagiaires, params?.stagiaireIdx ?? 0);
     case "livre_apprentissage_cfa": return genLivreApprentissageCFA(o, f, stagiaires, params?.stagiaireIdx ?? 0);
     case "convocation_cfa": return genConvocationCFA(o, f, stagiaires, params?.stagiaireIdx ?? 0);
