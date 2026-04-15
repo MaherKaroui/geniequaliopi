@@ -229,7 +229,7 @@ export function genDossierStagiaire(o: OrganismeInfo, f: FormationInfo, stagiair
     <p><strong>Test de positionnement (début)</strong></p>
     <ul><li>Date : <strong>${fmtDate(getStagiaireDateDebut(s,f))}</strong></li><li>Note : <strong>${notePositionnement} / 20</strong></li></ul>` },
     { heading: "Appréciation", content: `<p>${appr.intro}</p>
-    <p>${s.civilite==="Monsieur"?"Il":"Elle"} démontre :</p>
+    <p>${s.civilite==="Mme"?"Elle":"Il"} démontre :</p>
     <ul>${appr.points.map(p=>`<li>${p}</li>`).join("")}</ul>
     ${appr.lacunes.length>0?`<p>Cependant, des ${appr.lacunes.length>1?"lacunes":"points d'amélioration"} ${appr.lacunes.length>1?"sont identifiées":"est identifié"} :</p><ul>${appr.lacunes.map(l=>`<li>${l}</li>`).join("")}</ul>`:""}
     <p><strong>Conclusion :</strong> ${appr.conclusion}</p>` },
