@@ -574,6 +574,11 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
       .sort((a, b) => parseInt(a.code) - parseInt(b.code));
   }, []);
 
+  // Bac Pro Logistique documents (BPL codes)
+  const bacProDocs = useMemo(() => {
+    return EY_DOCUMENTS.filter(d => d.category === "controle_bac_pro");
+  }, []);
+
   return (
     <div className="space-y-6">
       {/* Header */}
