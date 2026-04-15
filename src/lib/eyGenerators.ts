@@ -487,7 +487,44 @@ export function genFichierFormateursStatut(o: OrganismeInfo, f: FormationInfo): 
   ]});
 }
 
-/* ═══ CODE 33 – Bilan intermédiaire ═══ */
+/* ═══ CODE 23 – Formation continue des formateurs ═══ */
+export function genFormationContinueFormateurs(o: OrganismeInfo, f: FormationInfo): string {
+  const yr = new Date().getFullYear();
+  const socio = isSocioEsthetique(f);
+  const domain = detectDomain(f);
+  const formateurs = socio ? [
+    { nom: "Marie Fontaine", formations: [
+      { intitule: "Maquillage correcteur avancé – Oncologie", organisme: "Kryolan Academy Paris", date: `15/03/${yr-1}`, duree: "16h", attestation: "Oui" },
+      { intitule: "Accompagnement psychologique des publics vulnérables", organisme: "CODES – Paris", date: `10/06/${yr-1}`, duree: "14h", attestation: "Oui" },
+      { intitule: "Actualisation des protocoles d'hygiène en esthétique", organisme: "CMA Île-de-France", date: `20/01/${yr}`, duree: "7h", attestation: "Oui" },
+    ]},
+    { nom: "Dr Sophie Laurent", formations: [
+      { intitule: "Supervision clinique – Pratiques d'écoute", organisme: "Institut de Psychologie – Paris", date: `05/09/${yr-1}`, duree: "21h", attestation: "Oui" },
+    ]},
+  ] : SAMPLE_FORMATEURS.slice(0, 3).map((fmt, i) => ({
+    nom: `${fmt.prenom} ${fmt.nom}`,
+    formations: [
+      { intitule: domain === "esthetique" ? "Nouvelles techniques de pose volume" : domain === "informatique" ? "Certification AWS Cloud Practitioner" : "Formation de formateurs – Techniques d'animation", organisme: domain === "esthetique" ? "Noble Lashes Academy" : domain === "informatique" ? "Amazon Web Services" : "Cegos", date: `${String(3+i*3).padStart(2,"0")}/03/${yr-1}`, duree: `${14+i*7}h`, attestation: "Oui" },
+      { intitule: "Actualisation pédagogique et ingénierie de formation", organisme: "AFPA / Cnam", date: `10/10/${yr-1}`, duree: "14h", attestation: "Oui" },
+    ],
+  }));
+
+  let allRows = "";
+  for (const fmt of formateurs) {
+    allRows += `<tr style="background:${pc()}22;"><td ${tdb} colspan="5">${fmt.nom}</td></tr>`;
+    for (const fc of fmt.formations) {
+      allRows += `<tr><td ${td}>${fc.intitule}</td><td ${td}>${fc.organisme}</td><td ${td}>${fc.date}</td><td ${td}>${fc.duree}</td><td ${td} style="text-align:center;color:green;font-weight:600;">${fc.attestation}</td></tr>`;
+    }
+  }
+
+  return buildDocument({ org: o, formation: f, title: "FORMATION CONTINUE DES FORMATEURS / INTERVENANTS", subtitle: `Code 23 – ${o.nom||"Organisme"} – Année ${yr}`, sections: [
+    { heading: "Politique de formation continue", content: `<p><strong>${o.nom||"L'organisme"}</strong> met en œuvre une politique active de formation continue pour l'ensemble de ses formateurs et intervenants, conformément aux exigences du référentiel Qualiopi (Critère 6 – Indicateur 21).</p><p>Chaque formateur bénéficie d'un minimum de <strong>14 heures de formation continue par an</strong>, dans son domaine d'expertise et/ou en ingénierie pédagogique.</p>` },
+    { heading: "Détail des formations suivies", content: `<table style="width:100%;border-collapse:collapse;font-size:0.88em;"><thead><tr style="background:${pc()};color:#fff;"><th style="padding:8px;border:1px solid #ddd;">Intitulé de la formation</th><th style="padding:8px;border:1px solid #ddd;">Organisme</th><th style="padding:8px;border:1px solid #ddd;">Date</th><th style="padding:8px;border:1px solid #ddd;">Durée</th><th style="padding:8px;border:1px solid #ddd;">Attestation</th></tr></thead><tbody>${allRows}</tbody></table>` },
+    { heading: "Justificatifs disponibles", content: `<ul><li>Attestations de formation / certificats</li><li>Conventions de formation professionnelle</li><li>Factures acquittées</li><li>Programmes détaillés des formations suivies</li></ul><p>Ces documents sont archivés dans le dossier individuel de chaque formateur et disponibles sur demande lors d'un contrôle.</p>` },
+  ]});
+}
+
+
 export function genBilanIntermediaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number): string {
   const s = stagiaires[si] || stagiaires[0];
   if (!s) return "";
