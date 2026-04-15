@@ -1092,6 +1092,8 @@ export function genRapportConnexionBacPro(o: OrganismeInfo, f: FormationInfo, st
         if (dayDate < start || (!isNaN(end.getTime()) && dayDate > end)) continue;
         // Skip weekends
         if (dayDate.getDay() === 0 || dayDate.getDay() === 6) continue;
+        // Skip French public holidays
+        if (isFrenchHoliday(dayDate)) continue;
 
         const conn = genSchoolDayConnections(si, weekNum, d);
         const loginTime = `${String(conn.loginH).padStart(2, "0")}:${String(conn.loginM).padStart(2, "0")}`;
