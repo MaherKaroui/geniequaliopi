@@ -825,7 +825,7 @@ export function genEval03(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
       { question: "Quels documents devez-vous vérifier lors de la réception ?", points: 2, correction: "Le bon de livraison, le bon de commande, la lettre de voiture CMR et vérifier la correspondance entre ces documents." },
       { question: "Quelle procédure devez-vous appliquer face aux anomalies constatées ?", points: 3, correction: "Émettre des réserves précises sur le bon de livraison, photographier les dommages, informer le responsable, refuser les produits non conformes et saisir les anomalies dans le WMS." },
       { question: "Pourquoi la traçabilité est-elle essentielle dans cette situation ?", points: 3, correction: "La traçabilité permet de suivre les marchandises, d'identifier l'origine des anomalies, de faciliter les réclamations et d'assurer la qualité du service." },
-    ], s, f, si, 10, o);
+    ], s, f, si, 10, o, 3);
 }
 
 // EVAL 4 – CAS PRATIQUE Stockage
@@ -841,7 +841,7 @@ export function genEval04(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
       { question: "Comment organiser efficacement les palettes dans l'entrepôt ?", points: 2, correction: "Regrouper par famille de produits, placer les produits à DLC courte en zone accessible, utiliser le WMS pour affecter les emplacements." },
       { question: "Quelles actions mettre en place face aux problèmes rencontrés ?", points: 3, correction: "Trier les palettes mixtes, alerter sur la saturation, réorganiser les emplacements sous-utilisés, signaler les produits à DLC courte." },
       { question: "Quels sont les enjeux d'un bon stockage ?", points: 3, correction: "Optimiser l'espace, garantir la sécurité, faciliter la préparation de commandes, éviter les ruptures et les pertes." },
-    ], s, f, si, 10, o);
+    ], s, f, si, 10, o, 4);
 }
 
 // EVAL 5 – QCM Préparation de commandes
@@ -876,7 +876,7 @@ export function genEval06(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
       { question: "Quel élément est essentiel pour votre sécurité ?", points: 1, correction: "Le port des EPI : chaussures de sécurité, gilet haute visibilité, gants de manutention." },
       { question: "Où déposer une commande terminée ?", points: 1, correction: "En zone d'expédition, dans la zone correspondant au transporteur ou à la destination prévue." },
       { question: "Pourquoi respecter les procédures de préparation ?", points: 1, correction: "Pour garantir la qualité, éviter les erreurs, assurer la traçabilité et la satisfaction client." },
-    ], s, f, si, 10, o);
+    ], s, f, si, 10, o, 6);
 }
 
 // EVAL 7 – Étude de cas Expédition
@@ -891,7 +891,7 @@ export function genEval07(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
       { question: "Indiquez les règles à respecter lors du chargement.", points: 4, correction: "Respecter le plan de chargement, fixer les palettes, vérifier le poids total, ne pas dépasser la charge utile, caler les marchandises." },
       { question: "Quelle procédure en cas de colis endommagé avant expédition ?", points: 4, correction: "Isoler le colis, prévenir le responsable, remplacer si possible, enregistrer l'incident et ne pas expédier en l'état." },
       { question: "Expliquez l'importance du suivi des expéditions.", points: 4, correction: "Le suivi permet de garantir la livraison, d'informer le client, de gérer les litiges et d'améliorer la qualité de service." },
-    ], s, f, si, 20, o);
+    ], s, f, si, 20, o, 7);
 }
 
 // EVAL 8 – QCM Organisation des flux
@@ -919,7 +919,7 @@ export function genEval09(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
       { question: "Proposez des solutions pour améliorer la circulation interne.", points: 4, correction: "Définir des circuits de circulation, séparer les flux entrants et sortants, utiliser le cross-docking pour les urgences." },
       { question: "Comment gérer la commande urgente ?", points: 4, correction: "La traiter en priorité, dédier un préparateur, vérifier la disponibilité des produits et organiser l'expédition en express." },
       { question: "Proposez des actions pour assurer les expéditions dans les délais.", points: 4, correction: "Anticiper les préparations, prioriser les commandes par heure de départ, vérifier les documents et communiquer avec les transporteurs." },
-    ], s, f, si, 20, o);
+    ], s, f, si, 20, o, 9);
 }
 
 // EVAL 10 – EXERCICE Gestion des stocks
@@ -935,7 +935,7 @@ export function genEval10(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
       { question: "Expliquez ce qu'est une rupture de stock.", points: 4, correction: "C'est l'absence totale d'un produit en stock, empêchant de satisfaire les commandes clients." },
       { question: "Pourquoi définir un stock minimum ?", points: 4, correction: "Pour éviter les ruptures, garantir la continuité du service, anticiper les délais de réapprovisionnement." },
       { question: "Expliquez l'utilité de l'inventaire.", points: 4, correction: "L'inventaire permet de vérifier la cohérence entre le stock physique et le stock informatique, de détecter les écarts et d'ajuster les données." },
-    ], s, f, si, 20, o);
+    ], s, f, si, 20, o, 10);
 }
 
 // EVAL 11 – QCM Gestion des stocks
@@ -974,7 +974,7 @@ export function genEval13(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
       { question: "Rédigez le message au client pour l'informer du retard.", points: 4, correction: "Objet : Retard de livraison - Commande [réf]. Bonjour, nous vous informons d'un retard de livraison. Nous mettons tout en œuvre pour résoudre la situation et vous tiendrons informé. Cordialement." },
       { question: "Pourquoi enregistrer l'information dans le logiciel ?", points: 4, correction: "Pour assurer la traçabilité, permettre le suivi de l'incident, faciliter l'analyse des causes et prévenir les récurrences." },
       { question: "Citez des règles de communication en entreprise.", points: 4, correction: "Être clair et concis, utiliser un langage professionnel, respecter la hiérarchie, confirmer les informations par écrit, écouter activement." },
-    ], s, f, si, 20, o);
+    ], s, f, si, 20, o, 13);
 }
 
 // EVAL 14 – Révisions globales / Examen blanc
@@ -990,7 +990,7 @@ export function genEval14(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
       { question: "Partie 5 – Organisation des flux : Objectif de l'organisation des flux.", points: 4, correction: "Optimiser la circulation des marchandises et des informations, réduire les délais et les coûts, améliorer la productivité." },
       { question: "Partie 6 – Sécurité : Règles de sécurité pour la conduite d'engins.", points: 4, correction: "Vérification quotidienne de l'engin, port des EPI, respect du plan de circulation, charge maximale, klaxonner aux intersections." },
       { question: "Partie 7 – Communication : Importance de la communication professionnelle.", points: 4, correction: "Assurer la coordination des équipes, éviter les erreurs, transmettre les informations importantes, faciliter la résolution des problèmes." },
-    ], s, f, si, 28, o);
+    ], s, f, si, 28, o, 14);
 }
 
 // EVAL 15 – Examen blanc final
@@ -1007,5 +1007,5 @@ export function genEval15(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
       { question: "Partie 6 – Organisation des flux : Objectif des flux logistiques.", points: 4, correction: "Assurer la fluidité de la chaîne logistique, de la réception à l'expédition, en minimisant les temps d'attente et les manipulations." },
       { question: "Partie 7 – Sécurité : Règles lors de la conduite d'engins.", points: 4, correction: "Contrôle préalable, port EPI, respect vitesse et plan de circulation, stabilité de la charge, signalisation, formation obligatoire (CACES)." },
       { question: "Partie 8 – Communication : Importance de la communication.", points: 4, correction: "Coordonner les équipes, transmettre les consignes, signaler les anomalies, informer les clients et les partenaires, assurer la traçabilité." },
-    ], s, f, si, 32, o);
+    ], s, f, si, 32, o, 15);
 }
