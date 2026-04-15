@@ -33,6 +33,15 @@ const yieldToBrowser = (delayMs = 0) =>
     });
   });
 
+/** Build preview title without duplicating stagiaire name already in doc.nom */
+function docTitle(docNom: string, s?: StagiaireInfo | null): string {
+  if (!s) return docNom;
+  const fullName = `${s.prenom} ${s.nom}`.trim();
+  if (!fullName) return docNom;
+  if (docNom.includes(fullName)) return docNom;
+  return `${docNom} – ${fullName}`;
+}
+
 interface DocumentGeneratorProps {
   organisme: OrganismeInfo;
   formation: FormationInfo;
