@@ -406,22 +406,35 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
       // Exiting edit mode — read content from iframe
       const iframe = previewIframeRef.current;
       if (iframe?.contentDocument?.body) {
-        const updatedHtml = iframe.contentDocument.documentElement.outerHTML;
-        setEditedHtml(`<!DOCTYPE html><html>${updatedHtml.slice(updatedHtml.indexOf('<html') + updatedHtml.match(/<html[^>]*>/)?.[0]?.length! || 6)}`);
+        iframe.contentDocument.body.contentEditable = "false";
+        const updatedHtml = `<!DOCTYPE html><html>${iframe.contentDocument.documentElement.innerHTML}</html>`;
+        setEditedHtml(updatedHtml);
       }
       setIsEditing(false);
     } else {
       setIsEditing(true);
+      // Activate editing on current iframe
+      requestAnimationFrame(() => {
+        const iframe = previewIframeRef.current;
+        if (iframe?.contentDocument?.body) {
+          iframe.contentDocument.body.contentEditable = "true";
+          iframe.contentDocument.body.style.outline = "none";
+          iframe.contentDocument.body.focus();
+        }
+      });
     }
   }, [isEditing]);
 
-  // Enable contentEditable on iframe load
+  // Enable contentEditable on iframe load when in edit mode
   const handleIframeLoad = useCallback(() => {
     if (!isEditing) return;
-    const iframe = previewIframeRef.current;
-    if (iframe?.contentDocument?.body) {
-      iframe.contentDocument.designMode = "on";
-    }
+    requestAnimationFrame(() => {
+      const iframe = previewIframeRef.current;
+      if (iframe?.contentDocument?.body) {
+        iframe.contentDocument.body.contentEditable = "true";
+        iframe.contentDocument.body.style.outline = "none";
+      }
+    });
   }, [isEditing]);
 
   // Get the current HTML for export (edited or original)
