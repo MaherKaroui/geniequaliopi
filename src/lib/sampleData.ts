@@ -593,6 +593,24 @@ export const SAMPLE_FORMATIONS: FormationInfo[] = [
     formateur: "Marie Fontaine",
     codeRNCP: "RS5992",
   },
+  {
+    intitule: "Massage Postpartum – Accompagnement maternel",
+    objectifs: "Maîtriser les techniques de massage adaptées à la période postpartum. Accompagner la récupération physique et émotionnelle de la mère après l'accouchement. Identifier les contre-indications et adapter les protocoles. Développer une pratique professionnelle éthique et sécurisée du massage postnatal.",
+    prerequis: "Diplôme ou certification en massage bien-être, kinésithérapie, ou équivalent. Connaissance de base en anatomie et physiologie.",
+    duree: "38 heures (6 jours)",
+    modalites: "présentiel",
+    tarif: "2 800 € HT par stagiaire",
+    programme: "Jour 1 : Fondamentaux du massage postpartum (6h30)\n- Anatomie et physiologie post-accouchement\n- Contre-indications absolues et relatives\n- Produits et huiles adaptés\n- Positionnement sécurisé de la patiente\n\nJour 2 : Techniques de recentrage et respiration (6h30)\n- Respiration abdominale guidée\n- Body scan et relaxation profonde\n- Connexion mère-bébé par le toucher\n\nJour 3 : Massage du dos et des épaules (6h30)\n- Effleurage et pétrissage adaptés\n- Glissées profondes sur les paravertébraux\n- Soulagement des tensions cervicales\n\nJour 4 : Drainage des jambes et massage des pieds (6h30)\n- Drainage lymphatique doux\n- Réflexologie plantaire adaptée\n- Mobilité articulaire douce\n\nJour 5 : Conscience du bassin et préparation périnéale (6h30)\n- Exercices de conscience pelvienne\n- Préparation au travail périnéal\n- Étirements sécurisés\n\nJour 6 : Protocole de séance et pratique professionnelle (5h30)\n- Construction d'un protocole complet\n- Anamnèse et bilan initial\n- Éthique et déontologie\n- Évaluation finale pratique",
+    methodesEvaluation: "QCM de positionnement initial, mises en situation pratiques quotidiennes, évaluation continue par observation, examen final théorique (QCM) et pratique (protocole complet sur modèle)",
+    moyensPedagogiques: "Tables de massage professionnelles, huiles et produits bio adaptés, coussins de positionnement, mannequins anatomiques, supports pédagogiques illustrés, vidéos démonstratives",
+    publicVise: "Masseurs/masseuses bien-être, kinésithérapeutes, sages-femmes, professionnels de la périnatalité souhaitant se spécialiser",
+    delaiAcces: "14 jours avant le début de la session",
+    dateDebut: "2025-11-03",
+    dateFin: "2025-11-08",
+    lieu: "25 avenue de la Formation Professionnelle, 75008 Paris",
+    nombreParticipants: "8",
+    formateur: "Marie Fontaine",
+  },
 ];
 
 // Satisfaction scores (pre-filled realistic data)
