@@ -688,14 +688,22 @@ export function getConnectionTimes(f: FormationInfo): typeof CONNECTION_TIMES_7H
   return hoursPerDay <= 6 ? CONNECTION_TIMES_6H : CONNECTION_TIMES_7H;
 }
 
+/** Detect if formation includes Saturdays (e.g. massage postpartum/prénatal 6-day intensive) */
+export function formationIncludesSaturday(f: FormationInfo): boolean {
+  const t = (f.intitule || "").toLowerCase();
+  return t.includes("massage") || t.includes("postpartum") || t.includes("post-partum") || t.includes("prénatal") || t.includes("prenatal");
+}
+
 export function getFormationDays(f: FormationInfo): string[] {
   if (!f.dateDebut || !f.dateFin) return ["Jour 1", "Jour 2", "Jour 3"];
   const start = new Date(f.dateDebut);
   const end = new Date(f.dateFin);
   const days: string[] = [];
   const current = new Date(start);
+  const includeSat = formationIncludesSaturday(f);
   while (current <= end) {
-    if (current.getDay() !== 0 && current.getDay() !== 6) {
+    const dow = current.getDay();
+    if (dow !== 0 && (includeSat || dow !== 6)) {
       days.push(current.toLocaleDateString("fr-FR", { weekday: "long", year: "numeric", month: "long", day: "numeric" }));
     }
     current.setDate(current.getDate() + 1);

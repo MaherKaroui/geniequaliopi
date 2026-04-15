@@ -2,7 +2,7 @@ import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { genContratBacPro, genConvocationBacPro, genConvocationExamenBacPro, genTestPositionnementBacPro, genGrilleAcquisitionBacPro, genSatisfactionBacPro, genBilanFormationBacPro, genEval01, genEval02, genEval03, genEval04, genEval05, genEval06, genEval07, genEval08, genEval09, genEval10, genEval11, genEval12, genEval13, genEval14, genEval15, genRapportConnexionBacPro } from "./bacProGenerators";
 import { genObjectifsMethodesSequence, genDossierStagiaire, genDescriptifMoyensMateriels, genCahierMaintenance, genCVFormateur as genCVFormateurEY, genFichierFormateursStatut, genBilanIntermediaire, genTauxReussiteEY, genGrilleTarifaire, genFactureHorsMCF, genDevisEY, genCommunicationReport, genPreuveCreationSession, genPlaquettePresentation, genPlanningIntervenants, genPlanningSessionsEY, genCVResponsablePedagogique, genActionsEngagement, genActionsPassageExamen, genAccompagnementFOAD, genInventaireMateriels, genContratsProprieteSupports, genAttestationDiplomesFormateurs, genCertificatQualiopiModele, genAutorisationsCertificateur, genAgrementsMinisteriels, genIndicateursPerformanceEY, genInfosCertifications, genPreuveReprogrammation, genProcessusAnalyseDemandes, genRessourcesPedagogiques as genRessourcesPedagogiquesEY, genBailLocaux, genBilanPedagogiqueFinancier, genQuestionnaireSatisfactionEY, genAdaptationsHandicapEY, genOutilsSuiviProgressionEY, genTestEvaluationFinEY, genEvaluationBlancheEY, genFacturesEquipementsEY, genEquipementsPedagogiquesEY, genFormationContinueFormateurs, genBilanFroidStagiaire, genMethodesAnimationEY, genListeSupportsDocumentsEY, genAdaptationsPSHAcademy, genProcessusQualiteSousTraitantsEY, genCompteRenduPositionnementEY, genEvaluationDesBesoinsEY, genGrilleAcquisitionCompetencesEY, genEvaluationBlancheAcademyEY, genTauxReussiteAcademyEY } from "./eyGenerators";
 import { buildDocument, htmlWrap, orgHeader, formationInfoBlock, formationInfoBlockStagiaire, tableHTML, signatureBlock3, signatureBlock2, footer, section, formatDate, infoGrid, getDocStyle, subtractBusinessDays, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif, getStagiaireDuree, applyGender, g, getDisplayDuree, linkUrl, optSiteWeb, isFormationTerminee, getModaliteContent, hasDistanciel, hasPresentiel, isFacebookPage, getSiteWebLabel } from "./docBuilder";
-import { FormateurInfo, SAMPLE_FORMATIONS, SAMPLE_STAGIAIRES, SAMPLE_FORMATEURS, SAMPLE_ORGANISME, EVAL_SCORES, SATISFACTION_SCORES, CONNECTION_TIMES, getFormationDays, mergeOrganisme, mergeStagiaires, getConnectionTimes, parseDuree } from "./sampleData";
+import { FormateurInfo, SAMPLE_FORMATIONS, SAMPLE_STAGIAIRES, SAMPLE_FORMATEURS, SAMPLE_ORGANISME, EVAL_SCORES, SATISFACTION_SCORES, CONNECTION_TIMES, getFormationDays, formationIncludesSaturday, mergeOrganisme, mergeStagiaires, getConnectionTimes, parseDuree } from "./sampleData";
 import { buildFullCatalog } from "./docCatalog";
 import { generateBookQualiopi } from "./bookQualiopi";
 import { getEvalContent, generateStagiaireAnswers, computeQCMScore, getQuestionsOuvertes, generateStagiaireOpenAnswers, QuestionOuverte } from "./evalContent";
@@ -1944,12 +1944,14 @@ function genEmargementStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: 
   const dateDebut = s.dateDebutFormation || f.dateDebut || "";
   const dateFin = s.dateFinFormation || f.dateFin || "";
   let days: string[] = [];
+  const includeSat = formationIncludesSaturday(f);
   if (dateDebut && dateFin) {
     const start = new Date(dateDebut + "T00:00:00");
     const end = new Date(dateFin + "T00:00:00");
     const current = new Date(start);
     while (current <= end) {
-      if (current.getDay() !== 0 && current.getDay() !== 6) {
+      const dow = current.getDay();
+      if (dow !== 0 && (includeSat || dow !== 6)) {
         days.push(current.toLocaleDateString("fr-FR", { weekday: "long", year: "numeric", month: "long", day: "numeric" }));
       }
       current.setDate(current.getDate() + 1);
@@ -1983,8 +1985,10 @@ function getStagiaireDays(s: StagiaireInfo, f: FormationInfo): string[] {
   const end = new Date(fin);
   const days: string[] = [];
   const current = new Date(start);
+  const includeSat = formationIncludesSaturday(f);
   while (current <= end) {
-    if (current.getDay() !== 0 && current.getDay() !== 6) {
+    const dow = current.getDay();
+    if (dow !== 0 && (includeSat || dow !== 6)) {
       days.push(current.toLocaleDateString("fr-FR", { weekday: "long", year: "numeric", month: "long", day: "numeric" }));
     }
     current.setDate(current.getDate() + 1);
