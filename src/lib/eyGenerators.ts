@@ -263,21 +263,33 @@ export function genDescriptifMoyensMateriels(o: OrganismeInfo, f: FormationInfo)
       <li><strong>Bibliographie professionnelle :</strong> Ouvrages de référence en socio-esthétique accessibles en salle</li>
     </ul>` });
   } else {
+    const domain = detectDomain(f);
+    const isEsth = domain === "esthetique";
+    const surface = isEsth ? "100 m² (1 salle théorique + 1 atelier pratique)" : domain === "restauration" ? "150 m² (1 salle + 1 cuisine pédagogique)" : domain === "informatique" ? "90 m² (1 salle informatique + 1 salle de réunion)" : "80 m² (1 salle de formation principale)";
+    const capacite = isEsth ? "8 personnes (atelier pratique)" : "15 personnes";
     sections.push({ heading: "1. Locaux de formation", content: `<table style="width:100%;border-collapse:collapse;">
       <tr><td ${tdb} style="width:35%;">Adresse</td><td ${td}>${o.adresse||"—"}, ${o.codePostal||""} ${o.ville||""}</td></tr>
-      <tr><td ${tdb}>Surface</td><td ${td}>80 m²</td></tr>
-      <tr><td ${tdb}>Capacité</td><td ${td}>15 personnes</td></tr>
-      <tr><td ${tdb}>Accessibilité PMR</td><td ${td}>Conforme</td></tr>
-      <tr><td ${tdb}>Conformité ERP</td><td ${td}>5ème catégorie</td></tr>
+      <tr><td ${tdb}>Surface totale</td><td ${td}>${surface}</td></tr>
+      <tr><td ${tdb}>Capacité d'accueil</td><td ${td}>${capacite}</td></tr>
+      <tr><td ${tdb}>Accessibilité PMR</td><td ${td}>Conforme – Accès de plain-pied ou rampe, toilettes adaptées</td></tr>
+      <tr><td ${tdb}>Conformité ERP</td><td ${td}>ERP de 5ème catégorie – Dernière visite : ${yr-1}</td></tr>
+      <tr><td ${tdb}>Climatisation</td><td ${td}>Salle climatisée – Température contrôlée${isEsth?" (important pour le confort des modèles)":""}</td></tr>
+      <tr><td ${tdb}>Sécurité</td><td ${td}>Extincteurs vérifiés, plan d'évacuation affiché, issues de secours balisées</td></tr>
     </table>` });
-    sections.push({ heading: "2. Équipements pédagogiques", content: `<table style="width:100%;border-collapse:collapse;font-size:0.9em;"><thead><tr style="background:${pc()};color:#fff;"><th style="padding:10px;border:1px solid #ddd;">Équipement</th><th style="padding:10px;border:1px solid #ddd;">Qté</th><th style="padding:10px;border:1px solid #ddd;">Marque</th><th style="padding:10px;border:1px solid #ddd;">État</th></tr></thead><tbody>
-      <tr><td ${td}>Salle de formation équipée (tables, chaises)</td><td ${td}>1</td><td ${td}>—</td><td ${td}>Fonctionnel</td></tr>
-      <tr><td ${td}>Vidéoprojecteur HD</td><td ${td}>1</td><td ${td}>Epson EB-FH06</td><td ${td}>Fonctionnel</td></tr>
-      <tr><td ${td}>Ordinateurs portables</td><td ${td}>15</td><td ${td}>HP ProBook 450</td><td ${td}>Fonctionnel</td></tr>
-      <tr><td ${td}>Connexion internet haut débit</td><td ${td}>1</td><td ${td}>Fibre 1 Gbps</td><td ${td}>Fonctionnel</td></tr>
-      <tr><td ${td}>Imprimante multifonction</td><td ${td}>1</td><td ${td}>HP LaserJet Pro</td><td ${td}>Fonctionnel</td></tr>
-      <tr><td ${td}>Tableau blanc / Paperboard</td><td ${td}>2</td><td ${td}>—</td><td ${td}>Fonctionnel</td></tr>
-    </tbody></table>` });
+    const equipements = getDomainEquipements(domain, yr);
+    let eqRows = equipements.map(eq => `<tr><td ${td}>${eq.equipement}</td><td ${td}>${eq.qte}</td><td ${td}>${eq.marque}</td><td ${td}>${eq.etat}</td></tr>`).join("");
+    sections.push({ heading: "2. Équipements pédagogiques", content: `<table style="width:100%;border-collapse:collapse;font-size:0.9em;"><thead><tr style="background:${pc()};color:#fff;"><th style="padding:10px;border:1px solid #ddd;">Équipement</th><th style="padding:10px;border:1px solid #ddd;">Qté</th><th style="padding:10px;border:1px solid #ddd;">Marque / Réf.</th><th style="padding:10px;border:1px solid #ddd;">État</th></tr></thead><tbody>${eqRows}</tbody></table>` });
+    if (isEsth) {
+      sections.push({ heading: "3. Supports pédagogiques spécialisés", content: `<ul>
+        <li><strong>Fiches techniques :</strong> Protocoles détaillés pour chaque type de pose (classique, volume russe, mixte, mégavolume)</li>
+        <li><strong>Supports visuels :</strong> Planches de morphologie oculaire, nuanciers de courbures et diamètres</li>
+        <li><strong>Vidéos tutorielles :</strong> Démonstrations filmées par la formatrice (accès plateforme sécurisée)</li>
+        <li><strong>Kits d'entraînement :</strong> Mannequins tête + cils d'exercice pour chaque stagiaire</li>
+        <li><strong>Référentiel certification :</strong> ${f.codeRNCP||"RS6147"} – Version complète imprimée et numérique</li>
+        <li><strong>Guide des contre-indications :</strong> Tableau récapitulatif des pathologies oculaires incompatibles</li>
+        <li><strong>Fiches produits :</strong> Caractéristiques techniques des colles, fibres et accessoires professionnels</li>
+      </ul>` });
+    }
   }
   if (isFOAD) sections.push({ heading: "3. Outils numériques et plateforme LMS", content: `<table style="width:100%;border-collapse:collapse;"><thead><tr style="background:${pc()};color:#fff;"><th style="padding:10px;border:1px solid #ddd;">Outil</th><th style="padding:10px;border:1px solid #ddd;">Éditeur</th><th style="padding:10px;border:1px solid #ddd;">Usage</th></tr></thead><tbody>
     <tr><td ${td}>Plateforme LMS</td><td ${td}>Moodle / 360Learning</td><td ${td}>Contenus, suivi progression, évaluations en ligne</td></tr>
