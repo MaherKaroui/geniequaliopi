@@ -461,16 +461,18 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
 
   // Download with signature
   const handleSignAndDownload = useCallback(async () => {
-    if (!previewHtml || !previewDoc || !signature) return;
+    if (!previewDoc || !signature) return;
+    const html = getCurrentHtml();
+    if (!html) return;
     try {
-      const signedHtml = injectSignatureIntoHtml(previewHtml, signature);
+      const signedHtml = injectSignatureIntoHtml(html, signature);
       const blob = await htmlToPdfBlob(signedHtml);
       saveAs(blob, `${safeName}_${previewDoc.code}_signe.pdf`);
       toast.success("Document signé et téléchargé !");
     } catch (e: any) {
       toast.error("Erreur : " + (e.message || "Erreur inconnue"));
     }
-  }, [previewHtml, previewDoc, safeName, signature, injectSignatureIntoHtml]);
+  }, [getCurrentHtml, previewDoc, safeName, signature, injectSignatureIntoHtml]);
 
   const downloadZip = useCallback(async () => {
     setGenerating(true);
