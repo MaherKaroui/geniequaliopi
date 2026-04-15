@@ -232,7 +232,7 @@ export const EY_DOCUMENTS: EYDocumentItem[] = [
     code: "15",
     label: "Photos / factures matériel pédagogique",
     description: "Photos, vidéos ou factures démontrant que les équipements mobilisés sont fonctionnels et performants",
-    autoTemplates: ["ey_inventaire_materiels"],
+    autoTemplates: ["ey_factures_equipements"],
     perStagiaire: false,
     category: "materiel",
   },
@@ -240,7 +240,7 @@ export const EY_DOCUMENTS: EYDocumentItem[] = [
     code: "16",
     label: "Cahier de maintenance du matériel",
     description: "Cahier de maintenance ou autres documents probants portant sur le matériel pédagogique",
-    autoTemplates: ["ey_cahier_maintenance"],
+    autoTemplates: ["ey_equipements_pedagogiques"],
     perStagiaire: false,
     category: "materiel",
   },
@@ -248,7 +248,7 @@ export const EY_DOCUMENTS: EYDocumentItem[] = [
     code: "17",
     label: "Adaptations pour personnes handicapées",
     description: "Exemples de modifications d'ordre technique pour mise à disposition de matériel adapté aux PSH",
-    autoTemplates: ["fiche_eval_besoins_psh"],
+    autoTemplates: ["ey_adaptations_handicap"],
     perStagiaire: false,
     category: "materiel",
   },
@@ -262,8 +262,16 @@ export const EY_DOCUMENTS: EYDocumentItem[] = [
   },
 
   // ═══════════════════════════════════════════════
-  // FORMATEURS (codes 20–26, 64)
+  // FORMATEURS (codes 5, 20–26, 64)
   // ═══════════════════════════════════════════════
+  {
+    code: "5",
+    label: "Fiches de poste des formateurs",
+    description: "Fiches de poste des formateurs / intervenants mobilisés sur l'action de formation",
+    autoTemplates: ["fiche_poste_formateur"],
+    perStagiaire: false,
+    category: "formateurs",
+  },
   {
     code: "20",
     label: "CV des formateurs / intervenants",
