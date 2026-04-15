@@ -1099,7 +1099,17 @@ export function genRapportConnexionBacPro(o: OrganismeInfo, f: FormationInfo, st
   const startStr = (s as any).dateDebutFormation || (s as any).dateDebut || f.dateDebut || "";
   const endStr = (s as any).dateFinFormation || (s as any).dateFin || f.dateFin || "";
   const start = new Date(startStr);
-  const end = new Date(endStr);
+  let end = new Date(endStr);
+
+  // For unfinished formations, cap connection report at end of March
+  const terminee = isFormationTerminee(f, stagiaires);
+  if (!terminee) {
+    const now = new Date();
+    const capDate = new Date(now.getFullYear(), 2, 31); // 31 mars de l'année en cours
+    if (isNaN(end.getTime()) || end > capDate) {
+      end = capDate;
+    }
+  }
 
   // Build rows for each school week day
   let rows = "";
