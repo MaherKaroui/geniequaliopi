@@ -66,8 +66,51 @@ function stagDateDebut(s: StagiaireInfo, f: FormationInfo) {
 function stagDateFin(s: StagiaireInfo, f: FormationInfo) {
   return formatDate((s as any).dateFinFormation || (s as any).dateFin || f.dateFin || "") || "N/A";
 }
-function stagFormateur(s: StagiaireInfo) {
-  return s.formateur || "Le formateur";
+function getFormateur(f: FormationInfo, s?: StagiaireInfo) {
+  return f.formateur || s?.formateur || "Le formateur";
+}
+
+/**
+ * Planning Bac Pro Logistique — mapping eval number → school week (last week of pair).
+ * 2 semaines école / 2 semaines entreprise alternance.
+ * Eval date = Friday of the corresponding school week.
+ */
+const EVAL_WEEK_MAP: Record<number, number> = {
+  1: 2,    // S1+S2 École – QCM diagnostic
+  2: 6,    // S5+S6 École – QCM Réception
+  3: 6,    // S5+S6 École – Cas pratique Réception
+  4: 10,   // S9+S10 École – Cas pratique Stockage
+  5: 14,   // S13+S14 École – QCM Préparation commandes
+  6: 14,   // S13+S14 École – Exercice Préparation commandes
+  7: 18,   // S17+S18 École – Étude de cas Expédition
+  8: 22,   // S21+S22 École – QCM Organisation des flux
+  9: 22,   // S21+S22 École – Cas pratique Organisation des flux
+  10: 26,  // S25+S26 École – Exercice Gestion des stocks
+  11: 26,  // S25+S26 École – QCM Gestion des stocks
+  12: 30,  // S29+S30 École – QCM sécurité Conduite d'engins
+  13: 34,  // S33+S34 École – Mise en situation Communication
+  14: 38,  // S37+S38 École – Examen blanc (Révisions globales)
+  15: 42,  // S41+S42 École – Examen blanc final
+};
+
+/**
+ * Compute the exact evaluation date (Friday of the school week) from formation start date.
+ */
+function getEvalDate(evalNum: number, s: StagiaireInfo, f: FormationInfo): string {
+  const startStr = (s as any).dateDebutFormation || (s as any).dateDebut || f.dateDebut || "";
+  if (!startStr) return formatDate(f.dateFin || "") || "N/A";
+  const start = new Date(startStr);
+  if (isNaN(start.getTime())) return formatDate(startStr) || "N/A";
+  const dayOfWeek = start.getDay();
+  const mondayOffset = dayOfWeek === 0 ? 1 : dayOfWeek === 6 ? 2 : (dayOfWeek === 1 ? 0 : -(dayOfWeek - 1));
+  const monday = new Date(start);
+  monday.setDate(monday.getDate() + mondayOffset);
+
+  const weekNum = EVAL_WEEK_MAP[evalNum];
+  if (!weekNum) return formatDate(f.dateFin || "") || "N/A";
+  const evalDate = new Date(monday);
+  evalDate.setDate(evalDate.getDate() + (weekNum - 1) * 7 + 4);
+  return formatDate(evalDate.toISOString().slice(0, 10));
 }
 function stagCivilite(s: StagiaireInfo) {
   if (s.civilite === "Mme") return "Madame";
