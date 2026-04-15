@@ -1485,65 +1485,55 @@ export function genBilanPedagogiqueFinancier(o: OrganismeInfo, f: FormationInfo,
   ]});
 }
 
-/* ═══ CODE 65 (bis) – Questionnaire de satisfaction stagiaire ═══ */
+/* ═══ CODE 65 (bis) – Questionnaire de satisfaction stagiaire (style Academy – étoiles ★) ═══ */
 export function genQuestionnaireSatisfactionEY(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number = 0): string {
   const s = stagiaires[si] || stagiaires[0] || { prenom: "Martin", nom: "DUPONT", civilite: "" };
   const titre = f.intitule || "Formation";
-  const notes = [4, 5, 4, 5, 3, 4, 5, 4, 5, 4]; // réponses simulées réalistes
+  const certif = f.codeRNCP || "";
 
-  const questions = [
-    { cat: "ORGANISATION GÉNÉRALE", items: [
-      { q: "L'accueil et les conditions matérielles (locaux, équipements)", note: notes[0] },
-      { q: "Le respect du programme annoncé", note: notes[1] },
-      { q: "Le rythme de la formation était adapté", note: notes[2] },
-    ]},
-    { cat: "CONTENU PÉDAGOGIQUE", items: [
-      { q: "Les objectifs de la formation étaient clairement définis", note: notes[3] },
-      { q: "Le contenu correspondait à vos attentes", note: notes[4] },
-      { q: "Les supports pédagogiques étaient de qualité", note: notes[5] },
-    ]},
-    { cat: "FORMATEUR / INTERVENANT", items: [
-      { q: "La maîtrise du sujet par le formateur", note: notes[6] },
-      { q: "La clarté des explications", note: notes[7] },
-      { q: "La disponibilité et l'écoute du formateur", note: notes[8] },
-    ]},
-    { cat: "BILAN GLOBAL", items: [
-      { q: "Satisfaction globale de la formation", note: notes[9] },
-    ]},
+  /* Notes variées par stagiaire (déterministe) */
+  const seed = si * 7 + 5;
+  const noteFor = (base: number, offset: number) => Math.min(Math.max(base + ((seed + offset) % 3) - 1, 3), 5);
+
+  const items = [
+    { q: "La qualité des renseignements apportés au moment de l'inscription ?", note: noteFor(4, 0) },
+    { q: "La qualité des produits mis à disposition ?", note: noteFor(4, 1) },
+    { q: "Les supports de cours remis lors de la formation ?", note: noteFor(5, 2) },
+    { q: "La qualité du cadre dans lequel se déroule la formation ?", note: noteFor(5, 3) },
+    { q: "Le déroulement de la formation ?", note: noteFor(5, 4) },
+    { q: "La qualité de l'enseignement ?", note: noteFor(5, 5) },
+    { q: "L'encadrement lors de votre formation ?", note: noteFor(4, 6) },
+    { q: "L'ambiance de la session ?", note: noteFor(5, 7) },
+    { q: "Satisfaction par rapport aux objectifs annoncés ?", note: noteFor(5, 8) },
+    { q: "Satisfaction par rapport aux besoins personnels ?", note: noteFor(5, 9) },
+    { q: "Relation formateur / stagiaire ?", note: noteFor(4, 10) },
   ];
 
-  let tableHtml = "";
-  for (const cat of questions) {
-    tableHtml += `<tr><th ${thStyle(pc())} colspan="7">${cat.cat}</th></tr>`;
-    tableHtml += `<tr style="background:#f5f7fa;"><td ${td}><strong>Question</strong></td><td ${td} style="text-align:center;">1<br/><small>Pas du tout</small></td><td ${td} style="text-align:center;">2<br/><small>Peu</small></td><td ${td} style="text-align:center;">3<br/><small>Moyen</small></td><td ${td} style="text-align:center;">4<br/><small>Satisfait</small></td><td ${td} style="text-align:center;">5<br/><small>Très satisfait</small></td><td ${td} style="text-align:center;"><strong>Note</strong></td></tr>`;
-    for (const item of cat.items) {
-      const cells = [1,2,3,4,5].map(n => `<td ${td} style="text-align:center;">${n === item.note ? `<strong style="color:${pc()};font-size:1.2em;">X</strong>` : "○"}</td>`).join("");
-      tableHtml += `<tr><td ${td}>${item.q}</td>${cells}<td ${td} style="text-align:center;font-weight:600;">${item.note}/5</td></tr>`;
-    }
-  }
+  const stars = (n: number) => "★".repeat(n) + "☆".repeat(5 - n);
+  const globalNote = Math.round(items.reduce((a, b) => a + b.note, 0) / items.length);
 
-  const avg = (notes.reduce((a, b) => a + b, 0) / notes.length).toFixed(1);
+  let rows = items.map(it => `<tr><td ${td}>${it.q}</td><td ${td} style="text-align:center;font-size:1.1em;color:#f5a623;letter-spacing:2px;">${stars(it.note)} /5</td></tr>`).join("");
 
-  return buildDocument({ org: o, formation: f, title: "QUESTIONNAIRE DE SATISFACTION – FIN DE FORMATION", sections: [
-    { heading: "Informations", content: `<table style="width:100%;border-collapse:collapse;">
-      <tr><td ${tdb}>Formation</td><td ${td}>${titre}</td></tr>
-      <tr><td ${tdb}>Stagiaire</td><td ${td}>${s.prenom} ${s.nom}</td></tr>
-      <tr><td ${tdb}>Dates</td><td ${td}>Du ${fmtDate((s as StagiaireInfo).dateDebutFormation || f.dateDebut)} au ${fmtDate((s as StagiaireInfo).dateFinFormation || f.dateFin)}</td></tr>
-      <tr><td ${tdb}>Formateur</td><td ${td}>${f.formateur || "—"}</td></tr>
-    </table>` },
-    { heading: "Évaluation (1 = Pas du tout satisfait, 5 = Très satisfait)", content: `<table style="width:100%;border-collapse:collapse;">${tableHtml}
-      <tr style="background:#e8f5e9;"><td ${tdb} colspan="6">MOYENNE GÉNÉRALE</td><td ${td} style="text-align:center;font-weight:700;font-size:1.2em;color:#2e7d32;">${avg}/5</td></tr>
-    </table>` },
-    { heading: "Questions ouvertes", content: `<p><strong>Qu'avez-vous le plus apprécié dans cette formation ?</strong></p>
-      <p style="padding:8px;background:#f9f9f9;border-left:3px solid ${pc()};margin:8px 0;"><em>"La qualité des échanges avec le formateur et les mises en pratique concrètes. Les supports pédagogiques sont très complets et bien structurés."</em></p>
-      <p><strong>Quels points pourraient être améliorés ?</strong></p>
-      <p style="padding:8px;background:#f9f9f9;border-left:3px solid ${pc()};margin:8px 0;"><em>"Un peu plus de temps pour la partie pratique serait appréciable. Peut-être prévoir une journée supplémentaire sur les cas complexes."</em></p>
-      <p><strong>Recommanderiez-vous cette formation à un collègue ?</strong></p>
-      <p style="padding:8px;background:#f9f9f9;border-left:3px solid ${pc()};margin:8px 0;"><em>"Oui, sans hésitation. Cette formation est très complète et adaptée aux besoins du terrain."</em></p>` },
-    { heading: "Signature", content: `<table style="width:100%;margin-top:16px;"><tr>
-      <td style="width:50%;padding:16px;"><p>Date : ${fmtDate((s as StagiaireInfo).dateFinFormation || f.dateFin)}</p><p style="margin-top:30px;">Signature du stagiaire :</p><br/><br/></td>
-      <td style="width:50%;padding:16px;"><p>Date : ${fmtDate((s as StagiaireInfo).dateFinFormation || f.dateFin)}</p><p style="margin-top:30px;">Visa du formateur :</p><br/><br/></td>
-    </tr></table>` },
+  /* Questions OUI/NON */
+  rows += `<tr><td ${td}>Suite à la formation, vous sentez-vous prêt(e) à travailler ?</td><td ${td} style="text-align:center;"><strong>[x] OUI</strong> &nbsp; [ ] NON</td></tr>`;
+  rows += `<tr><td ${td}>Recommandez-vous ce centre de formation ?</td><td ${td} style="text-align:center;"><strong>[x] OUI</strong> &nbsp; [ ] NON</td></tr>`;
+
+  const commentaires = [
+    "La formation a été très enrichissante et conforme à mes attentes. Les explications étaient claires, complètes et adaptées à mon niveau. Je n'ai pas de suggestions particulières, tout s'est très bien déroulé.",
+    "Excellente formation ! Le formateur était très pédagogue et à l'écoute. Les mises en pratique sur modèle réel sont un vrai plus. J'aurais aimé un peu plus de temps sur les techniques avancées.",
+    "Formation complète et bien structurée. Les supports sont de qualité. Le rythme était bien adapté et l'ambiance très agréable. Je recommande vivement.",
+    "Très satisfaite de cette formation. J'ai acquis de nouvelles compétences que j'ai pu appliquer immédiatement dans mon activité professionnelle.",
+  ];
+
+  return buildDocument({ org: o, formation: f, title: `Questionnaire de satisfaction`, subtitle: `NOTE GLOBALE ${stars(globalNote)} / 5`, sections: [
+    { heading: "", content: `<p style="text-align:center;font-size:0.9em;color:#666;margin-bottom:4px;">${certif ? certif + " : " : ""}${titre.toUpperCase()}</p>` },
+    { heading: "Évaluation", content: `<table style="width:100%;border-collapse:collapse;">${rows}</table>` },
+    { heading: "Commentaires et suggestions", content: `<p style="padding:12px;background:#f9f9f9;border-left:3px solid ${pc()};margin:8px 0;font-style:italic;">${commentaires[si % commentaires.length]}</p>` },
+    { heading: "", content: `<table style="width:100%;border-collapse:collapse;margin-top:16px;">
+      <tr><td ${td}>Nom du Centre de Formation : <strong>${o.nom||"—"}</strong></td></tr>
+      <tr><td ${td}>Nom: ${(s.nom||"").toUpperCase()} &nbsp;&nbsp; Prénom : ${s.prenom||""}</td></tr>
+      <tr><td ${td}>Email : ${(s as StagiaireInfo).email||"—"} &nbsp;&nbsp; Date : ${fmtDate((s as StagiaireInfo).dateFinFormation || f.dateFin)}</td></tr>
+    </table><p style="text-align:center;margin-top:16px;color:#666;">Merci d'avoir répondu à notre questionnaire !</p>` },
   ]});
 }
 
