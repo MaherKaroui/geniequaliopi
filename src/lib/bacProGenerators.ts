@@ -3,7 +3,7 @@
  * Each function returns HTML with stagiaire data filled in, ready for PDF export.
  */
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
-import { htmlWrap, formatDate, getDocStyle, baseStyle } from "./docBuilder";
+import { htmlWrap, formatDate, getDocStyle, baseStyle, isFormationTerminee } from "./docBuilder";
 
 /** Render signature image or empty placeholder */
 function sigImg(url?: string, height = 60): string {
