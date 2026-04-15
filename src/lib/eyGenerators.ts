@@ -679,7 +679,8 @@ export function genPlaquettePresentation(o: OrganismeInfo, f: FormationInfo): st
 /* ═══ CODE 58 – Indicateurs de performance (enrichi pour EY) ═══ */
 export function genIndicateursPerformanceEY(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]): string {
   const n = Math.max(stagiaires.length, 1);
-  const yr = new Date().getFullYear();
+  const sd = getSessionDates(f, stagiaires);
+  const yr = sd.debut ? new Date(sd.debut).getFullYear() : new Date().getFullYear();
   return buildDocument({ org: o, formation: f, title: "Indicateurs de performance de l'organisme de formation", subtitle: `Rapport annuel ${yr} – ${o.nom||"Organisme"}`, sections: [
     { heading: "1. Indicateurs d'activité", content: `<table style="width:100%;border-collapse:collapse;">
       <tr><td ${tdb} style="width:50%;">Nombre de sessions réalisées (${yr})</td><td ${td}>${Math.max(Math.ceil(n/8), 3)}</td></tr>
@@ -708,7 +709,8 @@ export function genIndicateursPerformanceEY(o: OrganismeInfo, f: FormationInfo, 
 /* ═══ CODE 59 – Informations certifications (taux, blocs, passerelles) ═══ */
 export function genInfosCertifications(o: OrganismeInfo, f: FormationInfo): string {
   const socio = isSocioEsthetique(f);
-  const yr = new Date().getFullYear();
+  const sdInfo = getSessionDates(f);
+  const yr = sdInfo.debut ? new Date(sdInfo.debut).getFullYear() : new Date().getFullYear();
   return buildDocument({ org: o, formation: f, title: "Information sur les certifications – Taux, blocs, passerelles et débouchés", subtitle: `${f.intitule||"Formation"} – ${f.codeRNCP||"RS5992"}`, sections: [
     { heading: "1. Certification préparée", content: `<table style="width:100%;border-collapse:collapse;">
       <tr><td ${tdb} style="width:40%;">Code</td><td ${td}>${f.codeRNCP||"RS5992"}</td></tr>
@@ -768,9 +770,9 @@ export function genPlanningIntervenants(o: OrganismeInfo, f: FormationInfo): str
 
 /* ═══ CODE 61 – Planning sessions ═══ */
 export function genPlanningSessionsEY(o: OrganismeInfo, f: FormationInfo, stagiaires?: StagiaireInfo[]): string {
-  const yr = new Date().getFullYear();
   const socio = isSocioEsthetique(f);
   const sd = getSessionDates(f, stagiaires);
+  const yr = sd.debut ? new Date(sd.debut).getFullYear() : new Date().getFullYear();
   return buildDocument({ org: o, formation: f, title: "Planning des sessions de formation", subtitle: `Année ${yr} – ${f.intitule||"Formation"}`, sections: [
     { heading: "Sessions programmées", content: `<table style="width:100%;border-collapse:collapse;"><thead><tr style="background:${pc()};color:#fff;"><th ${td}>Session</th><th ${td}>Dates</th><th ${td}>Durée</th><th ${td}>Lieu</th><th ${td}>Places</th><th ${td}>Inscrits</th><th ${td}>Statut</th></tr></thead><tbody>
       <tr style="background:#f0f7ff;"><td ${td}><strong>Session 1 (en cours)</strong></td><td ${td}>Du ${fmtDate(sd.debut)} au ${fmtDate(sd.fin)}</td><td ${td}>${f.duree||"52h"}</td><td ${td}>${f.lieu||o.ville||"Présentiel"}</td><td ${td}>${f.nombreParticipants||"12"}</td><td ${td}>${f.nombreParticipants||"10"}</td><td ${td}><strong>En cours</strong></td></tr>
