@@ -318,14 +318,14 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
         useCORS: true,
         logging: false,
         backgroundColor: "#ffffff",
-        width: A4_WIDTH_PX,
-        height: A4_HEIGHT_PX,
-        windowWidth: A4_WIDTH_PX,
-        windowHeight: A4_HEIGHT_PX,
+        width: PAGE_W_PX,
+        height: PAGE_H_PX,
+        windowWidth: PAGE_W_PX,
+        windowHeight: PAGE_H_PX,
       });
 
       const imgData = canvas.toDataURL("image/jpeg", imageQuality);
-      pdf.addImage(imgData, "JPEG", 0, 0, A4_WIDTH_MM, A4_HEIGHT_MM);
+      pdf.addImage(imgData, "JPEG", 0, 0, PAGE_W_MM, PAGE_H_MM);
 
       // Add clickable link annotations over the rasterized image
       const anchors = pages[i].querySelectorAll("a[href]");
