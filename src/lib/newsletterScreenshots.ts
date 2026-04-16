@@ -401,5 +401,5 @@ export function genCertificatCoursera(o: OrganismeInfo, f: FormationInfo): strin
     title: "CERTIFICAT DE FORMATION – COURSERA / DUKE UNIVERSITY",
     sections: [{ heading: "", content: `<p>Certificat de réussite Coursera / Duke University pour <strong>${o.dirigeant || "le dirigeant"}</strong> – formation « ${f.intitule || "Formation"} ».</p>` }],
     extraHtml: `<div style="box-shadow:0 2px 12px rgba(0,0,0,0.12);border-radius:8px;overflow:hidden">${courseCertificateHtml(o, f)}</div>`
-  });
+  }).replace("</head>", '<meta name="pdf-page-size" content="280x430"></head>');
 }
