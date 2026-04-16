@@ -264,7 +264,8 @@ const GenerateurCV = () => {
     } finally {
       setAiLoading(false);
     }
-  };
+  const previewHTML = generateCVHTML(cv, selectedDesign);
+
 
   return (
     <div className="min-h-screen bg-background">
