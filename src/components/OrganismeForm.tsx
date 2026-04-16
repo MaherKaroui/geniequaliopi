@@ -108,10 +108,12 @@ const OrganismeForm = ({ data, onChange, hideFields = [] }: OrganismeFormProps) 
           <Label htmlFor="siret">SIRET *</Label>
           <Input id="siret" value={data.siret} onChange={e => update('siret', e.target.value)} placeholder="Ex: 123 456 789 00012" />
         </div>
+        {!hidden('nda') && (
         <div>
           <Label htmlFor="nda">N° Déclaration d'activité *</Label>
           <Input id="nda" value={data.nda} onChange={e => update('nda', e.target.value)} placeholder="Ex: 11755555555" />
         </div>
+        )}
         <div className="md:col-span-2">
           <Label htmlFor="adresse">Adresse</Label>
           <Input id="adresse" value={data.adresse} onChange={e => update('adresse', e.target.value)} placeholder="Ex: 12 rue de la Formation" />
