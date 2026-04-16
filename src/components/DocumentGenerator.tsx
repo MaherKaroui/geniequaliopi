@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback, useRef, useEffect } from "react";
+import mammoth from "mammoth";
 import { OrganismeInfo, FormationInfo, StagiaireInfo, CritereData, CRITERES_INFO, DocEntry, DocStyleConfig, DEFAULT_DOC_STYLE } from "@/types/qualiopi";
 import { getFullCatalog, generateDocumentById } from "@/lib/documentGenerator";
 import { generateBookQualiopi } from "@/lib/bookQualiopi";
@@ -56,6 +57,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
   const [expandedIndicateurs, setExpandedIndicateurs] = useState<Set<number>>(new Set());
   const [previewContent, setPreviewContent] = useState<string | null>(null);
   const [previewTitle, setPreviewTitle] = useState("");
+  const [previewBlobUrl, setPreviewBlobUrl] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
   const [generated, setGenerated] = useState<Set<string>>(new Set());
   const [editing, setEditing] = useState(false);
