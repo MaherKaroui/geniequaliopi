@@ -149,3 +149,22 @@ export const DOCX_TEMPLATE_FILES: Record<string, string> = {
   facture_make_docx: "/templates/factures/FACTURE MAKE.docx",
   facture_genspark_docx: "/templates/factures/FACTURE GENSPARK.docx",
 };
+
+/**
+ * Process a .docx template and convert the result to PDF.
+ */
+export async function processDocxTemplateToPdf(
+  templateUrl: string,
+  organisme: OrganismeInfo
+): Promise<Blob> {
+  const docxBlob = await processDocxTemplate(templateUrl, organisme);
+  const arrayBuffer = await docxBlob.arrayBuffer();
+  const result = await mammoth.convertToHtml({ arrayBuffer });
+  const html = `<html><head><style>
+    body { font-family: Arial, sans-serif; font-size: 11pt; margin: 40px; }
+    table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+    td, th { border: 1px solid #ccc; padding: 6px 8px; }
+    p { margin: 4px 0; }
+  </style></head><body>${result.value}</body></html>`;
+  return htmlToPdfBlob(html);
+}
