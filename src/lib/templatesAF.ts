@@ -22,6 +22,25 @@ export function genDevis(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiai
   });
 }
 
+export function genFacture(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
+  const nbParticipants = parseInt(f.nombreParticipants || "1") || stagiaires.length || 1;
+  const tarifUnit = f.tarif || "1 500 € HT";
+  const today = new Date();
+  const factNum = `FAC-${today.getFullYear()}-${String(Math.floor(Math.random()*999)+1).padStart(3,'0')}`;
+  const dateFacture = today.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
+  return buildDocument({ org: o, title: "FACTURE DE FORMATION", subtitle: `N° ${factNum}`, formation: f, showFormationInfo: true, stagiaires, sections: [
+    { heading: "Client", content: `<p><strong>Entreprise :</strong> ${stagiaires[0]?.entreprise || "_______________"}<br><strong>Contact :</strong> ${stagiaires[0]?.prenom || ""} ${stagiaires[0]?.nom || ""}<br><strong>Email :</strong> ${stagiaires[0]?.email || ""}</p>` },
+    { heading: "Prestation réalisée", content: `<p><strong>Formation :</strong> ${f.intitule}<br><strong>Durée :</strong> ${f.duree}<br><strong>Modalité :</strong> ${f.modalites}<br><strong>Lieu :</strong> ${f.lieu}<br><strong>Nombre de participants :</strong> ${nbParticipants}<br><strong>Date de la facture :</strong> ${dateFacture}</p>` },
+  ], table: {
+    headers: ["Désignation", "Quantité", "Prix unitaire HT", "Total HT"],
+    rows: [
+      [`Formation "${f.intitule}" – ${f.duree}`, `${nbParticipants}`, tarifUnit, `${nbParticipants} × ${tarifUnit}`],
+    ]
+  }, extraHtml: `<div class="section section-green"><p><strong>TVA non applicable, art. 261-4-4° du CGI</strong><br>Date d'échéance : 30 jours à compter de la date de facture.<br>En cas de retard de paiement, une pénalité de 3 fois le taux d'intérêt légal sera appliquée, ainsi qu'une indemnité forfaitaire de 40 € pour frais de recouvrement.</p></div>`,
+    signatures: { type: "2", labels: ["Pour l'organisme", "Le Client"], names: [o.nom || o.dirigeant, `${stagiaires[0]?.prenom || ""} ${stagiaires[0]?.nom || ""}`.trim()], noOrgSignature: true, stagiaireSignatureUrl: stagiaires[0]?.signatureUrl }
+  });
+}
+
 export function genContratFormationParticulier(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const s = stagiaires[0] || { prenom: "___", nom: "___", email: "", telephone: "" };
   return buildDocument({ org: o, title: "CONTRAT DE FORMATION PROFESSIONNELLE", subtitle: "Article L.6353-3 du Code du travail – Particulier", formation: f, showFormationInfo: true, stagiaires, sections: [
