@@ -653,7 +653,7 @@ export function footer(org: OrganismeInfo): string {
     <p style="font-weight:700;font-size:inherit;margin:0 0 4px">${org.nom}</p>
     <p style="margin:0 0 8px">Adresse: ${org.adresse}, ${org.codePostal} ${org.ville}</p>
     <p style="margin:0 0 8px">Siret: ${org.siret}</p>
-    <p style="margin:0 0 8px">Nda: ${org.nda} cet enregistrement ne vaut pas agrément de l'état</p>
+    ${org.nda ? `<p style="margin:0 0 8px">Nda: ${org.nda} cet enregistrement ne vaut pas agrément de l'état</p>` : ""}
     <p style="margin:4px 0 0">V${version} ${dateMaj}</p>
   </div>`;
 }
