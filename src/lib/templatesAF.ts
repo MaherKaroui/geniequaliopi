@@ -36,7 +36,9 @@ export function genFacture(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
     rows: [
       [`Formation "${f.intitule}" – ${f.duree}`, `${nbParticipants}`, tarifUnit, `${nbParticipants} × ${tarifUnit}`],
     ]
-  }, extraHtml: `<div class="section section-green"><p><strong>TVA non applicable, art. 261-4-4° du CGI</strong><br>Date d'échéance : 30 jours à compter de la date de facture.<br>En cas de retard de paiement, une pénalité de 3 fois le taux d'intérêt légal sera appliquée, ainsi qu'une indemnité forfaitaire de 40 € pour frais de recouvrement.</p></div>`,
+  }, extraHtml: `<div class="section section-green"><p><strong>TVA non applicable, art. 261-4-4° du CGI</strong><br>En cas de retard de paiement, une pénalité de 3 fois le taux d'intérêt légal sera appliquée, ainsi qu'une indemnité forfaitaire de 40 € pour frais de recouvrement.</p></div>
+    <h2>Modalités de paiement</h2>
+    <div class="section">${buildEcheancierPaiement(f, stagiaires[0])}</div>`,
     signatures: { type: "2", labels: ["Pour l'organisme", "Le Client"], names: [o.nom || o.dirigeant, `${stagiaires[0]?.prenom || ""} ${stagiaires[0]?.nom || ""}`.trim()], noOrgSignature: true, stagiaireSignatureUrl: stagiaires[0]?.signatureUrl }
   });
 }
