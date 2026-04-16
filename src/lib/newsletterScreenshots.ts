@@ -349,28 +349,33 @@ export function courseCertificateHtml(o: OrganismeInfo, f: FormationInfo): strin
   const verifyCode = Math.random().toString(36).substring(2, 14).toUpperCase();
 
   return `
-<div style="width:100%;max-width:860px;margin:20px auto;font-family:Georgia,'Times New Roman',serif;position:relative;background:#fff;aspect-ratio:1.29/1;overflow:hidden">
+<div style="width:100%;max-width:860px;margin:20px auto;font-family:Georgia,'Times New Roman',serif;position:relative;background:#fff;aspect-ratio:1.29/1;overflow:hidden;border:1px solid #e0e0e0">
 
   <!-- Right ribbon -->
-  <div style="position:absolute;top:0;right:0;width:230px;height:100%;z-index:1;overflow:hidden">
+  <div style="position:absolute;top:0;right:0;width:200px;height:100%;z-index:1;overflow:hidden">
     <img src="/images/coursera-ribbon.png" alt="Coursera Course Certificate" style="width:100%;height:100%;object-fit:cover;object-position:top center" />
   </div>
 
+  <!-- Coursera seal -->
+  <div style="position:absolute;right:30px;top:55%;transform:translateY(-50%);z-index:2;width:130px;height:130px">
+    <img src="/images/coursera-seal.png" alt="Coursera" style="width:100%;height:100%;object-fit:contain;opacity:0.85" />
+  </div>
+
   <!-- Main content -->
-  <div style="padding:55px 50px 35px 55px;margin-right:230px;position:relative;z-index:1">
-    <div style="margin-bottom:55px">
-      <img src="/images/duke-logo.jpg" alt="Duke University" style="height:100px;object-fit:contain" />
+  <div style="padding:50px 50px 30px 55px;margin-right:200px;position:relative;z-index:1">
+    <div style="margin-bottom:50px">
+      <img src="/images/duke-logo.jpg" alt="Duke University" style="height:90px;object-fit:contain" />
     </div>
-    <div style="font-size:11px;color:#555;margin-bottom:22px;font-family:Arial,sans-serif;letter-spacing:2px;text-transform:uppercase">${certDate}</div>
-    <div style="font-size:36px;font-weight:400;color:#111;margin-bottom:10px;letter-spacing:0.3px;line-height:1.2">${displayName}</div>
-    <div style="font-size:12px;color:#777;margin-bottom:22px;font-family:Arial,sans-serif">has successfully completed</div>
-    <div style="font-size:19px;font-weight:600;color:#222;margin-bottom:14px;line-height:1.4;font-style:italic">${formationTitle}</div>
-    <div style="font-size:11px;color:#666;margin-bottom:90px;line-height:1.7;max-width:460px;font-family:Arial,sans-serif">
+    <div style="font-size:11px;color:#555;margin-bottom:28px;font-family:Arial,sans-serif;letter-spacing:2px;text-transform:uppercase">${certDate}</div>
+    <div style="font-size:34px;font-weight:400;color:#111;margin-bottom:8px;letter-spacing:0.3px;line-height:1.2">${displayName}</div>
+    <div style="font-size:12px;color:#777;margin-bottom:28px;font-family:Arial,sans-serif">has successfully completed</div>
+    <div style="font-size:18px;font-weight:600;color:#222;margin-bottom:12px;line-height:1.4;font-style:italic">${formationTitle}</div>
+    <div style="font-size:11px;color:#666;margin-bottom:80px;line-height:1.7;max-width:420px;font-family:Arial,sans-serif">
       an online non-credit course authorized by Duke University and offered through Coursera
     </div>
-    <div style="display:flex;gap:50px;margin-top:10px">
+    <div style="display:flex;gap:60px;margin-top:10px">
       <div style="flex:1">
-        <div style="font-family:'Brush Script MT','Segoe Script',cursive;font-size:24px;color:#1a1a4e;margin-bottom:6px;transform:rotate(-2deg)">Dr. Jana Schaich Borg</div>
+        <div style="font-family:'Brush Script MT','Segoe Script',cursive;font-size:22px;color:#1a1a4e;margin-bottom:6px;transform:rotate(-2deg)">Dr. Jana Schaich Borg</div>
         <div style="border-top:1px dotted #aaa;padding-top:5px">
           <div style="font-size:10px;color:#555;font-family:Arial,sans-serif">Jana Schaich Borg</div>
           <div style="font-size:9px;color:#777;font-family:Arial,sans-serif">Post-doctoral Fellow</div>
@@ -378,7 +383,7 @@ export function courseCertificateHtml(o: OrganismeInfo, f: FormationInfo): strin
         </div>
       </div>
       <div style="flex:1">
-        <div style="font-family:'Brush Script MT','Segoe Script',cursive;font-size:24px;color:#1a1a4e;margin-bottom:6px;transform:rotate(-1deg)">Daniel Egger</div>
+        <div style="font-family:'Brush Script MT','Segoe Script',cursive;font-size:22px;color:#1a1a4e;margin-bottom:6px;transform:rotate(-1deg)">Daniel Egger</div>
         <div style="border-top:1px dotted #aaa;padding-top:5px">
           <div style="font-size:10px;color:#555;font-family:Arial,sans-serif">Daniel Egger</div>
           <div style="font-size:9px;color:#777;font-family:Arial,sans-serif">Executive in Residence and Director,</div>
@@ -387,7 +392,7 @@ export function courseCertificateHtml(o: OrganismeInfo, f: FormationInfo): strin
         </div>
       </div>
     </div>
-    <div style="margin-top:35px;text-align:right">
+    <div style="margin-top:30px;text-align:right">
       <div style="font-size:11px;color:#333;font-family:Arial,sans-serif">Verify at coursera.org/verify/${verifyCode}</div>
       <div style="font-size:9px;color:#777;font-family:Arial,sans-serif;margin-top:3px;font-style:italic">Coursera has confirmed the identity of this individual and<br>their participation in the course.</div>
     </div>
