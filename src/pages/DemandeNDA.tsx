@@ -51,7 +51,7 @@ const emptyFormation: FormationInfo = {
   rythmeAlternance: "",
 };
 
-function generateListeFormateursHTML(o: OrganismeInfo, cv: CVData): string {
+function generateListeFormateursHTML(o: OrganismeInfo, cv: CVData, stagiaires: StagiaireInfo[] = []): string {
   const fullName = `${cv.prenom} ${cv.nom}`.trim() || "Nom du formateur";
   const exps = cv.experiences.filter(e => e.poste || e.entreprise);
   const forms = cv.formations.filter(f => f.diplome || f.etablissement);
@@ -109,17 +109,28 @@ function generateListeFormateursHTML(o: OrganismeInfo, cv: CVData): string {
       </tbody>
     </table>
 
-    <p style="margin-top:30px;font-size:12px;">Fait à ${o.ville || "___________"} le ${dateStr}</p>
-    <div style="margin-top:20px;display:flex;justify-content:space-between;">
-      <div>
-        <p style="font-size:11px;color:#666;">Cachet de l'organisme :</p>
-        ${o.tamponUrl ? `<img src="${o.tamponUrl}" style="max-height:80px;margin-top:5px;" />` : ""}
-      </div>
-      <div>
-        <p style="font-size:11px;color:#666;">${o.dirigeant || ""}</p>
-        ${o.signatureUrl ? `<img src="${o.signatureUrl}" style="max-height:60px;margin-top:5px;" />` : ""}
-      </div>
-    </div>
+    ${stagiaires.map((st, i) => {
+      const clientName = `${st.prenom || ""} ${st.nom || ""}`.trim() || "Nom du client";
+      return `<div style="margin-top:${i === 0 ? 30 : 50}px;${i > 0 ? "page-break-before:always;" : ""}">
+        <p style="font-size:12px;margin-bottom:15px;">Fait à ${o.ville || "___________"} le ${dateStr}</p>
+        <div style="display:flex;justify-content:space-between;">
+          <div style="width:45%;">
+            <p style="font-size:12px;font-weight:bold;margin-bottom:4px;">Pour l'organisme</p>
+            <p style="font-size:11px;margin:2px 0;">Nom : <strong>${o.nom || ""}</strong></p>
+            <p style="font-size:11px;margin:2px 0;">Date : ${dateStr}</p>
+            <p style="font-size:11px;margin:2px 0;">Signature :</p>
+            ${o.tamponUrl ? `<img src="${o.tamponUrl}" style="max-height:80px;margin-top:5px;" />` : ""}
+          </div>
+          <div style="width:45%;">
+            <p style="font-size:12px;font-weight:bold;margin-bottom:4px;">Bon pour accord – Le Client</p>
+            <p style="font-size:11px;margin:2px 0;">Nom : <strong>${clientName}</strong></p>
+            <p style="font-size:11px;margin:2px 0;">Date : ${dateStr}</p>
+            <p style="font-size:11px;margin:2px 0;">Signature :</p>
+            ${st.signatureUrl ? `<img src="${st.signatureUrl}" style="max-height:60px;margin-top:5px;" />` : ""}
+          </div>
+        </div>
+      </div>`;
+    }).join("")}
 
     <div style="margin-top:40px;border-top:1px solid #ccc;padding-top:8px;font-size:9px;color:#888;text-align:center;">
       <strong>${o.nom || ""}</strong>${o.siret ? ` – SIRET : ${o.siret}` : ""}${o.nda ? ` – NDA : ${o.nda}` : ""}
@@ -148,7 +159,7 @@ function generateDocumentHTML(docId: string, o: OrganismeInfo, f: FormationInfo,
     case "liste_formateurs": {
       const hasCV = cvData.prenom || cvData.nom || cvData.experiences.some(e => e.poste);
       if (!hasCV) return null;
-      return generateListeFormateursHTML(o, cvData);
+      return generateListeFormateursHTML(o, cvData, s);
     }
     default: return null;
   }
