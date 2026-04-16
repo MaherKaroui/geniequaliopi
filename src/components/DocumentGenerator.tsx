@@ -242,10 +242,10 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
       return;
     }
 
-    // Handle .docx template files (factures IND 17)
+    // Handle .docx template files (factures IND 17) → PDF
     if (DOCX_TEMPLATE_FILES[doc.template]) {
-      const blob = await processDocxTemplate(DOCX_TEMPLATE_FILES[doc.template], mergedOrganisme);
-      saveAs(blob, buildCatalogFileName(doc, undefined, ".docx"));
+      const blob = await processDocxTemplateToPdf(DOCX_TEMPLATE_FILES[doc.template], mergedOrganisme);
+      saveAs(blob, buildCatalogFileName(doc, undefined, ".pdf"));
       return;
     }
 
@@ -527,8 +527,8 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
           addFileToZip(`${basePath}/${buildCatalogFileName(doc)}`, fileBlob);
           await updateProgress();
         } else if (DOCX_TEMPLATE_FILES[doc.template]) {
-          const docxBlob = await processDocxTemplate(DOCX_TEMPLATE_FILES[doc.template], mergedOrganisme);
-          addFileToZip(`${basePath}/${buildCatalogFileName(doc, null, ".docx")}`, docxBlob);
+          const pdfBlob = await processDocxTemplateToPdf(DOCX_TEMPLATE_FILES[doc.template], mergedOrganisme);
+          addFileToZip(`${basePath}/${buildCatalogFileName(doc, null, ".pdf")}`, pdfBlob);
           await updateProgress();
         } else if (
           doc.template === "indicateurs_performance"
@@ -659,8 +659,8 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
           zip.file(`${basePath}/${buildCatalogFileName(doc)}`, await resp.blob());
           await updateProgress();
         } else if (DOCX_TEMPLATE_FILES[doc.template]) {
-          const docxBlob = await processDocxTemplate(DOCX_TEMPLATE_FILES[doc.template], mergedOrganisme);
-          zip.file(`${basePath}/${buildCatalogFileName(doc, null, ".docx")}`, docxBlob);
+          const pdfBlob = await processDocxTemplateToPdf(DOCX_TEMPLATE_FILES[doc.template], mergedOrganisme);
+          zip.file(`${basePath}/${buildCatalogFileName(doc, null, ".pdf")}`, pdfBlob);
           await updateProgress();
         } else if (["indicateurs_performance", "tableau_suivi_parcours_excel", "plan_dev_competences_excel", "tableau_amelioration_continue_excel", "suivi_dysfonctionnements_excel", "relances_appreciations_excel", "vae_indicateurs_previsionnels"].includes(doc.template)) {
           const excelContent = doc.template === "indicateurs_performance"
@@ -778,8 +778,8 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
           zip.file(`${basePath}/${buildCatalogFileName(doc)}`, await resp.blob());
           await updateProgress();
         } else if (DOCX_TEMPLATE_FILES[doc.template]) {
-          const docxBlob = await processDocxTemplate(DOCX_TEMPLATE_FILES[doc.template], mergedOrganisme);
-          zip.file(`${basePath}/${buildCatalogFileName(doc, null, ".docx")}`, docxBlob);
+          const pdfBlob = await processDocxTemplateToPdf(DOCX_TEMPLATE_FILES[doc.template], mergedOrganisme);
+          zip.file(`${basePath}/${buildCatalogFileName(doc, null, ".pdf")}`, pdfBlob);
           await updateProgress();
         } else if (["indicateurs_performance", "tableau_suivi_parcours_excel", "plan_dev_competences_excel", "tableau_amelioration_continue_excel", "suivi_dysfonctionnements_excel", "relances_appreciations_excel", "vae_indicateurs_previsionnels", "decoupage_formation_cfa_excel", "matrice_competences_excel", "suivi_chiffre_formation_excel"].includes(doc.template)) {
           const excelContent = doc.template === "indicateurs_performance"
