@@ -1694,9 +1694,40 @@ const DEFAULT_QUESTIONS_OUVERTES: QuestionsOuvertesFormation = {
   ],
 };
 
+function ensureMinimumQuestions(
+  questions: QuestionOuverte[],
+  fallbackQuestions: QuestionOuverte[],
+  min = 10
+): QuestionOuverte[] {
+  const merged: QuestionOuverte[] = [];
+  const seen = new Set<string>();
+
+  for (const question of [...questions, ...fallbackQuestions]) {
+    const key = question.question.trim().toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    merged.push(question);
+    if (merged.length >= min) break;
+  }
+
+  return merged;
+}
+
 export function getQuestionsOuvertes(formationIntitule: string): QuestionsOuvertesFormation {
   const key = getContentKey(formationIntitule);
-  return QUESTIONS_OUVERTES[key] || DEFAULT_QUESTIONS_OUVERTES;
+  const source = QUESTIONS_OUVERTES[key] || DEFAULT_QUESTIONS_OUVERTES;
+  const wordFallback = key === "Initiation Word" ? QUESTIONS_OUVERTES["Bureautique"] : undefined;
+
+  return {
+    debut: ensureMinimumQuestions(
+      source.debut,
+      [...(wordFallback?.debut ?? []), ...DEFAULT_QUESTIONS_OUVERTES.debut]
+    ),
+    fin: ensureMinimumQuestions(
+      source.fin,
+      [...(wordFallback?.fin ?? []), ...DEFAULT_QUESTIONS_OUVERTES.fin]
+    ),
+  };
 }
 
 // ===== GENERATE STAGIAIRE OPEN-ENDED ANSWERS =====
@@ -1800,6 +1831,24 @@ export function generateStagiaireOpenAnswers(
       continue;
     }
     break;
+  }
+
+  if (!isDebut) {
+    const targetFullCount = Math.max(8, Math.min(10, Math.round(target)));
+    const prioritized = adjustedQualities
+      .map((quality, i) => ({
+        i,
+        priority: quality === 'full' ? 2 : quality === 'partial' ? 1 : 0,
+        seed: rawAnswers[i].seed,
+      }))
+      .sort((a, b) => (b.priority - a.priority) || (a.seed - b.seed));
+
+    const normalizedQualities: Array<'full' | 'partial' | 'wrong' | 'empty'> = rawAnswers.map(() => 'wrong');
+    prioritized.slice(0, targetFullCount).forEach(({ i }) => {
+      normalizedQualities[i] = 'full';
+    });
+
+    adjustedQualities.splice(0, adjustedQualities.length, ...normalizedQualities);
   }
 
   // Detect if questions are in English
