@@ -287,6 +287,35 @@ const GenerateurCV = () => {
       <main className="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* LEFT: Form */}
         <div className="space-y-4 overflow-y-auto" style={{ maxHeight: "calc(100vh - 100px)" }}>
+          {/* AI Generation */}
+          <Card className="border-primary/30 bg-primary/5">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-primary" /> Génération IA rapide
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <Textarea
+                value={aiPrompt}
+                onChange={e => setAiPrompt(e.target.value)}
+                rows={3}
+                placeholder="Décrivez votre profil en quelques mots... Ex: Formateur en management et leadership, 12 ans d'expérience, certifié TOSA et Qualiopi, basé à Lyon"
+                className="resize-none"
+              />
+              <Button
+                onClick={handleAIGenerate}
+                disabled={aiLoading}
+                className="w-full gap-2 bg-gradient-hero border-0 text-primary-foreground"
+              >
+                {aiLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                {aiLoading ? "Génération en cours..." : "Générer mon CV avec l'IA"}
+              </Button>
+              <p className="text-xs text-muted-foreground text-center">
+                L'IA remplit tous les champs automatiquement. Vous pourrez ensuite modifier les détails.
+              </p>
+            </CardContent>
+          </Card>
+
           {/* Design picker */}
           <Card>
             <CardHeader className="pb-3"><CardTitle className="text-base">Design du CV</CardTitle></CardHeader>
