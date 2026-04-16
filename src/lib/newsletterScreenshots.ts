@@ -349,10 +349,18 @@ function courseCertificateHtml(o: OrganismeInfo, f: FormationInfo): string {
   const verifyCode = Math.random().toString(36).substring(2, 14).toUpperCase();
 
   return `
-<div style="width:100%;max-width:860px;margin:20px auto;font-family:Georgia,'Times New Roman',serif;position:relative;background:#fff;aspect-ratio:1.29/1;overflow:hidden">
+<div style="width:100%;max-width:860px;margin:20px auto;font-family:Georgia,'Times New Roman',serif;position:relative;aspect-ratio:1.29/1;overflow:hidden;background:linear-gradient(135deg,#f0f1f5 0%,#e8eaef 25%,#f2f3f7 50%,#e9ebf0 75%,#f0f1f5 100%)">
+
+  <!-- Decorative border frame -->
+  <div style="position:absolute;top:8px;left:8px;right:8px;bottom:8px;border:1px solid #c8cad0;pointer-events:none;z-index:0"></div>
+  <div style="position:absolute;top:14px;left:14px;right:14px;bottom:14px;border:1px solid #d5d7dc;pointer-events:none;z-index:0"></div>
+  <div style="position:absolute;top:20px;left:20px;right:20px;bottom:20px;border:1px solid #e0e2e7;pointer-events:none;z-index:0"></div>
+
+  <!-- Subtle wave texture -->
+  <div style="position:absolute;top:0;left:0;right:0;bottom:0;opacity:0.04;background:repeating-linear-gradient(160deg,transparent,transparent 8px,#8090a0 8px,#8090a0 9px);z-index:0;pointer-events:none"></div>
 
   <!-- Right ribbon -->
-  <div style="position:absolute;top:0;right:0;width:230px;height:100%;z-index:1;overflow:hidden">
+  <div style="position:absolute;top:0;right:0;width:230px;height:100%;z-index:2;overflow:hidden">
     <img src="/images/coursera-ribbon.png" alt="Coursera Course Certificate" style="width:100%;height:100%;object-fit:cover;object-position:top center" />
   </div>
 
