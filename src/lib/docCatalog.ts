@@ -264,7 +264,7 @@ export function buildFullCatalog(
     add("af_c6i26_pdf_referentiel_defi", "CT6 - IND 26 RÉFÉRENTIEL HANDICAP DÉFI MÉTIER", 6, 26, "pdf_static", { pdfFile: "referentiel_handicap_defi_metier.pdf" });
     add("af_c6i26_pdf_agefiph_fiche", "CT6 - IND 26 AGEFIPH FICHE PRATIQUE QUALITÉ", 6, 26, "pdf_static", { pdfFile: "agefiph_fiche_pratique_qualite.pdf" });
     add("af_c6i26_pdf_agefiph_contacts", "CT6 - IND 26 AGEFIPH RHF CONTACTS", 6, 26, "pdf_static", { pdfFile: "agefiph_rhf_contacts.pdf" });
-    add("af_c6i26_pdf_diplome_rhf", "CT6 - IND 26 DIPLÔME RÉFÉRENT HANDICAP", 6, 26, "pdf_static", { pdfFile: "diplome_referent_handicap.pdf" });
+    add("af_c6i26_pdf_diplome_rhf", "CT6 - IND 26 DIPLÔME RÉFÉRENT HANDICAP", 6, 26, "diplome_referent_handicap_docx");
     add("af_c6i26_pdf_fiche_rhf_idf", "CT6 - IND 26 FICHE TECHNIQUE RHF IDF", 6, 26, "pdf_static", { pdfFile: "fiche_technique_rhf_idf.pdf" });
     add("af_c6i26_pdf_recruter_handicap", "CT6 - IND 26 COMMENT RECRUTER UNE PERSONNE HANDICAPÉE", 6, 26, "pdf_static", { pdfFile: "handicap_comment_recruter.pdf" });
     add("af_c6i26_pdf_procedure_communiquer", "CT6 - IND 26 PROCÉDURE COMMUNIQUER AVEC DES PERSONNES HANDICAPÉES", 6, 26, "pdf_static", { pdfFile: "procedure_communiquer_handicap.pptx" });
@@ -759,7 +759,7 @@ export function buildFullCatalog(
     add("cfa_c6i26_pdf_referentiel_defi", "CT6 - IND 26 RÉFÉRENTIEL HANDICAP DÉFI MÉTIER", 6, 26, "pdf_static", { pdfFile: "referentiel_handicap_defi_metier.pdf" });
     add("cfa_c6i26_pdf_agefiph_fiche", "CT6 - IND 26 AGEFIPH FICHE PRATIQUE QUALITÉ", 6, 26, "pdf_static", { pdfFile: "agefiph_fiche_pratique_qualite.pdf" });
     add("cfa_c6i26_pdf_agefiph_contacts", "CT6 - IND 26 AGEFIPH RHF CONTACTS", 6, 26, "pdf_static", { pdfFile: "agefiph_rhf_contacts.pdf" });
-    add("cfa_c6i26_pdf_diplome_rhf", "CT6 - IND 26 DIPLÔME RÉFÉRENT HANDICAP", 6, 26, "pdf_static", { pdfFile: "diplome_referent_handicap.pdf" });
+    add("cfa_c6i26_pdf_diplome_rhf", "CT6 - IND 26 DIPLÔME RÉFÉRENT HANDICAP", 6, 26, "diplome_referent_handicap_docx");
     add("cfa_c6i26_pdf_fiche_rhf_idf", "CT6 - IND 26 FICHE TECHNIQUE RHF IDF", 6, 26, "pdf_static", { pdfFile: "fiche_technique_rhf_idf.pdf" });
     add("cfa_c6i26_pdf_recruter_handicap", "CT6 - IND 26 COMMENT RECRUTER UNE PERSONNE HANDICAPÉE", 6, 26, "pdf_static", { pdfFile: "handicap_comment_recruter.pdf" });
     add("cfa_c6i26_pdf_procedure_communiquer", "CT6 - IND 26 PROCÉDURE COMMUNIQUER AVEC DES PERSONNES HANDICAPÉES", 6, 26, "pdf_static", { pdfFile: "procedure_communiquer_handicap.pptx" });
