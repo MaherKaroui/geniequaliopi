@@ -13,6 +13,16 @@ const A4_HEIGHT_MM = 297;
 const FOOTER_OFFSET_PX = 40;
 const FOOTER_BUFFER_PX = 20;
 
+/** Parse optional <meta name="pdf-page-size" content="WIDTHxHEIGHT"> (mm) from HTML */
+function detectPageSizeMm(htmlContent: string): { wMm: number; hMm: number } | null {
+  const m = htmlContent.match(/<meta\s+name=["']pdf-page-size["']\s+content=["'](\d+(?:\.\d+)?)x(\d+(?:\.\d+)?)["']/i);
+  if (!m) return null;
+  const wMm = parseFloat(m[1]);
+  const hMm = parseFloat(m[2]);
+  if (wMm > 0 && hMm > 0) return { wMm, hMm };
+  return null;
+}
+
 type PageParts = {
   page: HTMLDivElement;
   content: HTMLDivElement;
