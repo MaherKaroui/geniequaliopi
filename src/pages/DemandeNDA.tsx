@@ -144,8 +144,8 @@ function generateDocumentHTML(docId: string, o: OrganismeInfo, f: FormationInfo,
       return generateDocumentById("programme_formation", "programme_formation", undefined, o, f, s) || null;
     case "reglement":
       return genReglement_V2(o, f, s);
-    case "devis":
-      return genDevis(o, f, s);
+    case "devis_facture":
+      return isFormationTerminee(f, s) ? genFacture(o, f, s) : genDevis(o, f, s);
     case "logo":
       if (o.logoUrl) return `<div style="text-align:center;padding:60px;"><img src="${o.logoUrl}" style="max-width:400px;" /><p style="margin-top:20px;color:#666;">Logo de l'organisme</p></div>`;
       return null;
