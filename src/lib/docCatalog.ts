@@ -1038,7 +1038,7 @@ export function buildFullCatalog(
   // =============================================
   // ===== MAIL — MAILS D'ENVOI (per stagiaire) =====
   // =============================================
-  if (isAF) {
+  if (isAF || isCFA) {
     stagiaires.forEach((s, si) => {
       add(`mail_pre_inscription_${si}`, `MAIL - PRÉ-INSCRIPTION – ${s.prenom} ${s.nom}`, 0, 0, "mail_pre_inscription", { stagiaireIdx: si });
       add(`mail_inscription_${si}`, `MAIL - CONFIRMATION INSCRIPTION – ${s.prenom} ${s.nom}`, 0, 0, "mail_inscription", { stagiaireIdx: si });
