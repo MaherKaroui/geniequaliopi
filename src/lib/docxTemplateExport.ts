@@ -28,9 +28,10 @@ function subtractBizDays(dateStr: string, n: number): string {
 /** Build the replacement map from organisme data */
 function buildReplacements(o: OrganismeInfo): Record<string, string> {
   const refDate = (o as any).dateMaj || new Date().toISOString().slice(0, 10);
-  const datePaiement = formatDateLong(subtractBizDays(refDate, 30));
-  const dateFacture = formatDateLong(subtractBizDays(refDate, 45));
+  // date_paiement and date_facture = date de mise à jour
+  const dateMajFormatted = formatDateLong(refDate);
   const siren = o.siret ? o.siret.replace(/\s/g, "").slice(0, 9) : "";
+  const annee = new Date(refDate).getFullYear().toString();
 
   // Google Workspace billing period
   const d = new Date(subtractBizDays(refDate, 60));
@@ -48,8 +49,9 @@ function buildReplacements(o: OrganismeInfo): Record<string, string> {
     president: o.dirigeant || "",
     siren,
     siret: o.siret || "",
-    date_facture: dateFacture,
-    date_paiement: datePaiement,
+    date_facture: dateMajFormatted,
+    date_paiement: dateMajFormatted,
+    "année de formtion": annee,
     datedebutdefacture: d1Start.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" }),
     dateFindefacture: d2End.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" }),
     "mois1-jours1": fmt(d1Start),
