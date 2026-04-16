@@ -349,49 +349,78 @@ export function courseCertificateHtml(o: OrganismeInfo, f: FormationInfo): strin
   const verifyCode = Math.random().toString(36).substring(2, 14).toUpperCase();
 
   return `
-<div style="width:100%;max-width:860px;margin:20px auto;font-family:Georgia,'Times New Roman',serif;position:relative;background:#fff;aspect-ratio:1.29/1;overflow:hidden">
+<div style="width:794px;height:1123px;margin:0 auto;font-family:Georgia,'Times New Roman',serif;position:relative;background:#fff;overflow:hidden;box-sizing:border-box">
 
-  <!-- Right ribbon -->
-  <div style="position:absolute;top:0;right:0;width:230px;height:100%;z-index:1;overflow:hidden">
-    <img src="/images/coursera-ribbon.png" alt="Coursera Course Certificate" style="width:100%;height:100%;object-fit:cover;object-position:top center" />
+  <!-- Right ribbon banner -->
+  <div style="position:absolute;top:0;right:0;width:200px;height:100%;background:linear-gradient(180deg,#e8e8e8 0%,#d0d0d0 30%,#c8c8c8 60%,#e0e0e0 100%);z-index:2;display:flex;flex-direction:column;align-items:center;padding-top:40px;">
+    <div style="font-family:Arial,sans-serif;font-size:16px;font-weight:700;color:#555;letter-spacing:4px;text-transform:uppercase;text-align:center;line-height:1.4;">COURSE<br>CERTIFICATE</div>
+    <!-- Coursera seal -->
+    <div style="margin-top:80px;width:140px;height:140px;border-radius:50%;border:3px solid #888;display:flex;align-items:center;justify-content:center;position:relative;background:#e8e8e8;">
+      <div style="width:120px;height:120px;border-radius:50%;border:2px dotted #999;display:flex;align-items:center;justify-content:center;flex-direction:column;">
+        <div style="font-size:7px;color:#666;font-family:Arial,sans-serif;letter-spacing:2px;text-transform:uppercase;margin-bottom:2px;">EDUCATION FOR EVERYONE</div>
+        <div style="font-family:'Georgia',serif;font-size:18px;font-weight:bold;color:#555;letter-spacing:1px;">coursera</div>
+        <div style="font-size:7px;color:#666;font-family:Arial,sans-serif;letter-spacing:2px;text-transform:uppercase;margin-top:2px;">COURSE CERTIFICATE</div>
+      </div>
+    </div>
+    <!-- Ribbon tail -->
+    <div style="position:absolute;bottom:0;left:0;width:100%;height:120px;overflow:hidden;">
+      <div style="position:absolute;bottom:0;left:0;width:0;height:0;border-left:100px solid #d4d0c8;border-right:100px solid #d4d0c8;border-bottom:60px solid transparent;"></div>
+    </div>
   </div>
 
-  <!-- Main content -->
-  <div style="padding:55px 50px 35px 55px;margin-right:230px;position:relative;z-index:1">
-    <div style="margin-bottom:55px">
-      <img src="/images/duke-logo.jpg" alt="Duke University" style="height:100px;object-fit:contain" />
+  <!-- Main content area -->
+  <div style="padding:60px 55px 40px 60px;margin-right:200px;position:relative;z-index:1;height:100%;box-sizing:border-box;display:flex;flex-direction:column;">
+
+    <!-- Duke University logo (text-based) -->
+    <div style="margin-bottom:50px;">
+      <div style="font-family:'Georgia',serif;font-size:52px;font-weight:400;color:#00249c;letter-spacing:1px;line-height:1;">Duke</div>
+      <div style="font-family:Arial,sans-serif;font-size:14px;color:#00249c;letter-spacing:12px;text-transform:uppercase;margin-top:2px;">UNIVERSITY</div>
     </div>
-    <div style="font-size:11px;color:#555;margin-bottom:22px;font-family:Arial,sans-serif;letter-spacing:2px;text-transform:uppercase">${certDate}</div>
-    <div style="font-size:36px;font-weight:400;color:#111;margin-bottom:10px;letter-spacing:0.3px;line-height:1.2">${displayName}</div>
-    <div style="font-size:12px;color:#777;margin-bottom:22px;font-family:Arial,sans-serif">has successfully completed</div>
-    <div style="font-size:19px;font-weight:600;color:#222;margin-bottom:14px;line-height:1.4;font-style:italic">${formationTitle}</div>
-    <div style="font-size:11px;color:#666;margin-bottom:90px;line-height:1.7;max-width:460px;font-family:Arial,sans-serif">
+
+    <!-- Date -->
+    <div style="font-size:11px;color:#555;font-family:Arial,sans-serif;letter-spacing:2px;text-transform:uppercase;margin-bottom:35px;">${certDate}</div>
+
+    <!-- Name -->
+    <div style="font-size:38px;font-weight:400;color:#111;letter-spacing:0.3px;line-height:1.2;margin-bottom:8px;">${displayName}</div>
+    <div style="font-size:12px;color:#777;font-family:Arial,sans-serif;margin-bottom:30px;">has successfully completed</div>
+
+    <!-- Course title -->
+    <div style="font-size:20px;font-weight:600;color:#222;line-height:1.4;font-style:italic;margin-bottom:16px;">${formationTitle}</div>
+    <div style="font-size:11px;color:#666;line-height:1.7;max-width:460px;font-family:Arial,sans-serif;margin-bottom:auto;">
       an online non-credit course authorized by Duke University and offered through Coursera
     </div>
-    <div style="display:flex;gap:50px;margin-top:10px">
-      <div style="flex:1">
-        <div style="font-family:'Brush Script MT','Segoe Script',cursive;font-size:24px;color:#1a1a4e;margin-bottom:6px;transform:rotate(-2deg)">Dr. Jana Schaich Borg</div>
-        <div style="border-top:1px dotted #aaa;padding-top:5px">
-          <div style="font-size:10px;color:#555;font-family:Arial,sans-serif">Jana Schaich Borg</div>
-          <div style="font-size:9px;color:#777;font-family:Arial,sans-serif">Post-doctoral Fellow</div>
-          <div style="font-size:9px;color:#777;font-family:Arial,sans-serif">Psychiatry and Behavioral Sciences</div>
+
+    <!-- Signatures -->
+    <div style="display:flex;gap:50px;margin-top:40px;">
+      <div style="flex:1;">
+        <div style="font-family:'Brush Script MT','Segoe Script',cursive;font-size:26px;color:#1a1a4e;margin-bottom:6px;transform:rotate(-2deg);">Dr. Jana Schaich Borg</div>
+        <div style="border-top:1px dotted #aaa;padding-top:6px;">
+          <div style="font-size:10px;color:#555;font-family:Arial,sans-serif;">Jana Schaich Borg</div>
+          <div style="font-size:9px;color:#777;font-family:Arial,sans-serif;">Post-doctoral Fellow</div>
+          <div style="font-size:9px;color:#777;font-family:Arial,sans-serif;">Psychiatry and Behavioral Sciences</div>
         </div>
       </div>
-      <div style="flex:1">
-        <div style="font-family:'Brush Script MT','Segoe Script',cursive;font-size:24px;color:#1a1a4e;margin-bottom:6px;transform:rotate(-1deg)">Daniel Egger</div>
-        <div style="border-top:1px dotted #aaa;padding-top:5px">
-          <div style="font-size:10px;color:#555;font-family:Arial,sans-serif">Daniel Egger</div>
-          <div style="font-size:9px;color:#777;font-family:Arial,sans-serif">Executive in Residence and Director,</div>
-          <div style="font-size:9px;color:#777;font-family:Arial,sans-serif">Center for Quantitative Modeling</div>
-          <div style="font-size:9px;color:#777;font-family:Arial,sans-serif">Pratt School of Engineering</div>
+      <div style="flex:1;">
+        <div style="font-family:'Brush Script MT','Segoe Script',cursive;font-size:26px;color:#1a1a4e;margin-bottom:6px;transform:rotate(-1deg);">Daniel Egger</div>
+        <div style="border-top:1px dotted #aaa;padding-top:6px;">
+          <div style="font-size:10px;color:#555;font-family:Arial,sans-serif;">Daniel Egger</div>
+          <div style="font-size:9px;color:#777;font-family:Arial,sans-serif;">Executive in Residence and Director,</div>
+          <div style="font-size:9px;color:#777;font-family:Arial,sans-serif;">Center for Quantitative Modeling</div>
+          <div style="font-size:9px;color:#777;font-family:Arial,sans-serif;">Pratt School of Engineering</div>
         </div>
       </div>
     </div>
-    <div style="margin-top:35px;text-align:right">
-      <div style="font-size:11px;color:#333;font-family:Arial,sans-serif">Verify at coursera.org/verify/${verifyCode}</div>
-      <div style="font-size:9px;color:#777;font-family:Arial,sans-serif;margin-top:3px;font-style:italic">Coursera has confirmed the identity of this individual and<br>their participation in the course.</div>
+
+    <!-- Verify -->
+    <div style="margin-top:30px;text-align:right;padding-bottom:10px;">
+      <div style="font-size:11px;color:#333;font-family:Arial,sans-serif;">Verify at coursera.org/verify/${verifyCode}</div>
+      <div style="font-size:9px;color:#777;font-family:Arial,sans-serif;margin-top:3px;font-style:italic;">Coursera has confirmed the identity of this individual and<br>their participation in the course.</div>
     </div>
   </div>
+
+  <!-- Bottom ornamental border -->
+  <div style="position:absolute;bottom:0;left:0;width:100%;height:45px;z-index:3;background:repeating-linear-gradient(90deg,transparent,transparent 10px,#d4c5a0 10px,#d4c5a0 11px);opacity:0.4;"></div>
+  <div style="position:absolute;bottom:0;left:0;width:calc(100% - 200px);height:3px;background:linear-gradient(90deg,#c9b97a,#d4c5a0,#c9b97a);z-index:4;"></div>
 </div>`;
 }
 
