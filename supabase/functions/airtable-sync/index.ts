@@ -3,7 +3,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const META_URL = 'https://api.airtable.com/v0/meta/bases';
+const META_URL = 'https://api.airtable.com/v0/meta';
 
 interface AirtableField {
   name: string;
@@ -103,17 +103,6 @@ const safeJsonParse = (text: string) => {
   }
 };
 
-const extractBaseId = (rawValue: string) => {
-  const trimmed = rawValue.trim();
-  const match = trimmed.match(/app[a-zA-Z0-9]{10,}/);
-
-  if (match) {
-    return match[0];
-  }
-
-  throw new Error('AIRTABLE_BASE_ID must contain a valid Airtable base id like `app...` or a full Airtable base URL.');
-};
-
 const getErrorDetails = (error: unknown) => {
   if (error instanceof AirtableHttpError) {
     return safeJsonParse(error.body) ?? error.body ?? error.message;
@@ -137,33 +126,47 @@ async function airtableRequest(url: string, options: RequestInit, errorLabel: st
   return text ? safeJsonParse(text) : null;
 }
 
-async function getAccessibleBaseIds(headers: Record<string, string>) {
+async function getWorkspaceId(headers: Record<string, string>): Promise<string | null> {
   try {
-    const data = await airtableRequest(META_URL, { headers }, 'Failed to list accessible bases') as { bases?: Array<{ id: string }> } | null;
-    return Array.isArray(data?.bases) ? data.bases.map((base) => base.id) : [];
+    const data = await airtableRequest(
+      `${META_URL}/workspaces`,
+      { headers },
+      'Failed to list workspaces',
+    ) as { workspaces?: Array<{ id: string; name: string }> } | null;
+
+    if (Array.isArray(data?.workspaces) && data.workspaces.length > 0) {
+      return data.workspaces[0].id;
+    }
+    return null;
   } catch {
     return null;
   }
 }
 
-async function getExistingTables(baseId: string, headers: Record<string, string>) {
-  const data = await airtableRequest(`${META_URL}/${baseId}/tables`, { headers }, 'Failed to list tables') as { tables?: Array<{ name: string }> } | null;
-  return Array.isArray(data?.tables) ? data.tables.map((table) => table.name) : [];
-}
-
-async function createTable(baseId: string, name: string, fields: AirtableField[], headers: Record<string, string>) {
-  return await airtableRequest(
-    `${META_URL}/${baseId}/tables`,
+async function createBase(
+  name: string,
+  workspaceId: string,
+  headers: Record<string, string>,
+): Promise<{ id: string; tables: Array<{ id: string; name: string }> }> {
+  const data = await airtableRequest(
+    `${META_URL}/bases`,
     {
       method: 'POST',
       headers: { ...headers, 'Content-Type': 'application/json' },
       body: JSON.stringify({
         name,
-        fields: fields.map((field) => ({ name: field.name, type: field.type })),
+        workspaceId,
+        tables: [
+          { name: 'Organisme', fields: ORGANISME_FIELDS },
+          { name: 'Formation', fields: FORMATION_FIELDS },
+          { name: 'Stagiaires', fields: STAGIAIRES_FIELDS },
+        ],
       }),
     },
-    `Failed to create table "${name}"`,
+    'Failed to create base',
   );
+
+  return data as { id: string; tables: Array<{ id: string; name: string }> };
 }
 
 Deno.serve(async (req) => {
@@ -172,26 +175,12 @@ Deno.serve(async (req) => {
   }
 
   const airtableApiKey = Deno.env.get('AIRTABLE_API_KEY')?.trim();
-  const rawAirtableBaseId = Deno.env.get('AIRTABLE_BASE_ID');
 
   if (!airtableApiKey) {
     return jsonResponse({ success: false, error: 'AIRTABLE_API_KEY not configured' });
   }
 
-  if (!rawAirtableBaseId) {
-    return jsonResponse({ success: false, error: 'AIRTABLE_BASE_ID not configured' });
-  }
-
-  let airtableBaseId = '';
-
-  try {
-    airtableBaseId = extractBaseId(rawAirtableBaseId);
-  } catch (error: unknown) {
-    return jsonResponse({ success: false, error: getErrorDetails(error) });
-  }
-
   const authHeaders = { Authorization: `Bearer ${airtableApiKey}` };
-  const baseUrl = `https://api.airtable.com/v0/${airtableBaseId}`;
 
   try {
     const payload = await req.json().catch(() => ({}));
@@ -201,50 +190,38 @@ Deno.serve(async (req) => {
       stagiaires?: Array<Record<string, any>>;
     };
 
-    const results: Record<string, unknown> = {};
-    const warnings: string[] = [];
-    let hasFailures = false;
-    let existingTables: string[] | null = null;
+    // Determine base name from organisme
+    const baseName = organisme?.nom?.trim() || `Dossier ${new Date().toISOString().slice(0, 10)}`;
 
-    try {
-      existingTables = await getExistingTables(airtableBaseId, authHeaders);
-    } catch (error: unknown) {
-      const accessibleBaseIds = await getAccessibleBaseIds(authHeaders);
-      const baseAccessMessage = Array.isArray(accessibleBaseIds)
-        ? accessibleBaseIds.includes(airtableBaseId)
-          ? `Airtable metadata is unavailable for base ${airtableBaseId}.`
-          : `The current Airtable token does not seem to have access to base ${airtableBaseId}.`
-        : `Airtable metadata could not be verified for base ${airtableBaseId}.`;
+    // Get workspace ID
+    const workspaceId = Deno.env.get('AIRTABLE_WORKSPACE_ID')?.trim()
+      || Deno.env.get('AIRTABLE_BASE_ID')?.trim()
+      || null;
 
-      warnings.push(`${baseAccessMessage} The sync will continue without auto-creating missing tables.`);
-      results.meta = { error: getErrorDetails(error) };
+    let resolvedWorkspaceId = workspaceId;
+
+    // If no workspace ID in env, try to fetch from API
+    if (!resolvedWorkspaceId || !resolvedWorkspaceId.startsWith('wsp')) {
+      const fetched = await getWorkspaceId(authHeaders);
+      if (!fetched) {
+        return jsonResponse({
+          success: false,
+          error: 'Impossible de trouver le workspace Airtable. Vérifiez que votre token a les permissions "schema:bases:write" et accès aux workspaces.',
+        });
+      }
+      resolvedWorkspaceId = fetched;
     }
 
-    if (existingTables) {
-      const tablesToCreate: Array<[string, AirtableField[]]> = [];
-      const createdTables: string[] = [];
-
-      if (!existingTables.includes('Organisme')) tablesToCreate.push(['Organisme', ORGANISME_FIELDS]);
-      if (!existingTables.includes('Formation')) tablesToCreate.push(['Formation', FORMATION_FIELDS]);
-      if (!existingTables.includes('Stagiaires')) tablesToCreate.push(['Stagiaires', STAGIAIRES_FIELDS]);
-
-      for (const [name, fields] of tablesToCreate) {
-        try {
-          await createTable(airtableBaseId, name, fields, authHeaders);
-          createdTables.push(name);
-        } catch (error: unknown) {
-          hasFailures = true;
-          results[`create_${name}`] = { error: getErrorDetails(error) };
-        }
-      }
-
-      if (createdTables.length > 0) {
-        results.tablesCreated = createdTables;
-      }
-    }
-
+    // Create a new base
+    const newBase = await createBase(baseName, resolvedWorkspaceId, authHeaders);
+    const newBaseId = newBase.id;
+    const baseUrl = `https://api.airtable.com/v0/${newBaseId}`;
     const postHeaders = { ...authHeaders, 'Content-Type': 'application/json' };
 
+    const results: Record<string, unknown> = {};
+    let hasFailures = false;
+
+    // Insert organisme
     if (organisme) {
       const orgFields: Record<string, string> = {
         'Nom': organisme.nom || '',
@@ -285,6 +262,7 @@ Deno.serve(async (req) => {
       }
     }
 
+    // Insert formation
     if (formation) {
       const formFields: Record<string, string> = {
         'Intitule': formation.intitule || '',
@@ -324,6 +302,7 @@ Deno.serve(async (req) => {
       }
     }
 
+    // Insert stagiaires
     if (stagiaires && stagiaires.length > 0) {
       const stagRecords = stagiaires.map((stagiaire) => ({
         fields: {
@@ -382,15 +361,14 @@ Deno.serve(async (req) => {
     return jsonResponse({
       success: !hasFailures,
       error: hasFailures ? 'Airtable sync failed.' : null,
-      warnings,
-      baseId: airtableBaseId,
+      baseName,
+      baseId: newBaseId,
       results,
     });
   } catch (error: unknown) {
     return jsonResponse({
       success: false,
       error: getErrorDetails(error),
-      baseId: airtableBaseId,
     });
   }
 });
