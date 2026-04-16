@@ -244,8 +244,8 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
 
     // Handle .docx template files (factures IND 17) → PDF
     if (DOCX_TEMPLATE_FILES[doc.template]) {
-      const blob = await processDocxTemplateToPdf(DOCX_TEMPLATE_FILES[doc.template], mergedOrganisme);
-      saveAs(blob, buildCatalogFileName(doc, undefined, ".pdf"));
+      const blob = await processDocxTemplate(DOCX_TEMPLATE_FILES[doc.template], mergedOrganisme);
+      saveAs(blob, buildCatalogFileName(doc, undefined, ".docx"));
       return;
     }
 
@@ -527,8 +527,8 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
           addFileToZip(`${basePath}/${buildCatalogFileName(doc)}`, fileBlob);
           await updateProgress();
         } else if (DOCX_TEMPLATE_FILES[doc.template]) {
-          const pdfBlob = await processDocxTemplateToPdf(DOCX_TEMPLATE_FILES[doc.template], mergedOrganisme);
-          addFileToZip(`${basePath}/${buildCatalogFileName(doc, null, ".pdf")}`, pdfBlob);
+          const pdfBlob = await processDocxTemplate(DOCX_TEMPLATE_FILES[doc.template], mergedOrganisme);
+          addFileToZip(`${basePath}/${buildCatalogFileName(doc, null, ".docx")}`, pdfBlob);
           await updateProgress();
         } else if (
           doc.template === "indicateurs_performance"
@@ -554,7 +554,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
         } else {
           const content = generateContent(doc);
           if (exportFormat === "pdf") {
-            addFileToZip(`${basePath}/${buildCatalogFileName(doc, null, ".pdf")}`, await htmlToPdfBlob(content, bulkPdfOptions));
+            addFileToZip(`${basePath}/${buildCatalogFileName(doc, null, ".docx")}`, await htmlToPdfBlob(content, bulkPdfOptions));
           } else {
             const wordBlob = await toWordBlob(content);
             addFileToZip(`${basePath}/${buildCatalogFileName(doc, null, wordBlob.extension)}`, wordBlob.blob);
@@ -659,8 +659,8 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
           zip.file(`${basePath}/${buildCatalogFileName(doc)}`, await resp.blob());
           await updateProgress();
         } else if (DOCX_TEMPLATE_FILES[doc.template]) {
-          const pdfBlob = await processDocxTemplateToPdf(DOCX_TEMPLATE_FILES[doc.template], mergedOrganisme);
-          zip.file(`${basePath}/${buildCatalogFileName(doc, null, ".pdf")}`, pdfBlob);
+          const pdfBlob = await processDocxTemplate(DOCX_TEMPLATE_FILES[doc.template], mergedOrganisme);
+          zip.file(`${basePath}/${buildCatalogFileName(doc, null, ".docx")}`, pdfBlob);
           await updateProgress();
         } else if (["indicateurs_performance", "tableau_suivi_parcours_excel", "plan_dev_competences_excel", "tableau_amelioration_continue_excel", "suivi_dysfonctionnements_excel", "relances_appreciations_excel", "vae_indicateurs_previsionnels"].includes(doc.template)) {
           const excelContent = doc.template === "indicateurs_performance"
@@ -675,7 +675,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
         } else {
           const content = generateContent(doc);
           if (exportFormat === "pdf") {
-            zip.file(`${basePath}/${buildCatalogFileName(doc, null, ".pdf")}`, await htmlToPdfBlob(content, bulkPdfOptions));
+            zip.file(`${basePath}/${buildCatalogFileName(doc, null, ".docx")}`, await htmlToPdfBlob(content, bulkPdfOptions));
           } else {
             const wordBlob = await toWordBlob(content);
             zip.file(`${basePath}/${buildCatalogFileName(doc, null, wordBlob.extension)}`, wordBlob.blob);
@@ -778,8 +778,8 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
           zip.file(`${basePath}/${buildCatalogFileName(doc)}`, await resp.blob());
           await updateProgress();
         } else if (DOCX_TEMPLATE_FILES[doc.template]) {
-          const pdfBlob = await processDocxTemplateToPdf(DOCX_TEMPLATE_FILES[doc.template], mergedOrganisme);
-          zip.file(`${basePath}/${buildCatalogFileName(doc, null, ".pdf")}`, pdfBlob);
+          const pdfBlob = await processDocxTemplate(DOCX_TEMPLATE_FILES[doc.template], mergedOrganisme);
+          zip.file(`${basePath}/${buildCatalogFileName(doc, null, ".docx")}`, pdfBlob);
           await updateProgress();
         } else if (["indicateurs_performance", "tableau_suivi_parcours_excel", "plan_dev_competences_excel", "tableau_amelioration_continue_excel", "suivi_dysfonctionnements_excel", "relances_appreciations_excel", "vae_indicateurs_previsionnels", "decoupage_formation_cfa_excel", "matrice_competences_excel", "suivi_chiffre_formation_excel"].includes(doc.template)) {
           const excelContent = doc.template === "indicateurs_performance"
@@ -794,7 +794,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
         } else {
           const content = generateContent(doc);
           if (exportFormat === "pdf") {
-            zip.file(`${basePath}/${buildCatalogFileName(doc, null, ".pdf")}`, await htmlToPdfBlob(content, bulkPdfOptions));
+            zip.file(`${basePath}/${buildCatalogFileName(doc, null, ".docx")}`, await htmlToPdfBlob(content, bulkPdfOptions));
           } else {
             const wordBlob = await toWordBlob(content);
             zip.file(`${basePath}/${buildCatalogFileName(doc, null, wordBlob.extension)}`, wordBlob.blob);
@@ -870,7 +870,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
             } else {
               const content = generateContent(doc);
               if (exportFormat === "pdf") {
-                zip.file(`${basePath}/${buildCatalogFileName(doc, null, ".pdf")}`, await htmlToPdfBlob(content));
+                zip.file(`${basePath}/${buildCatalogFileName(doc, null, ".docx")}`, await htmlToPdfBlob(content));
               } else {
                 const wordBlob = await toWordBlob(content);
                 zip.file(`${basePath}/${buildCatalogFileName(doc, null, wordBlob.extension)}`, wordBlob.blob);
