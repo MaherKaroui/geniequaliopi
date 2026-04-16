@@ -1,6 +1,6 @@
 // Additional AF (Action de Formation) template generators
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
-import { buildDocument, formatDate, tableHTML, signatureBlock2, signatureBlock3, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif, linkUrl, isFormationTerminee, isFacebookPage } from "./docBuilder";
+import { buildDocument, formatDate, tableHTML, signatureBlock2, signatureBlock3, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif, linkUrl, isFormationTerminee, isFacebookPage, buildEcheancierPaiement } from "./docBuilder";
 import { FormateurInfo, EVAL_SCORES } from "./sampleData";
 import { getEvalContent, generateStagiaireAnswers, computeQCMScore } from "./evalContent";
 
@@ -47,7 +47,7 @@ export function genContratFormationParticulier(o: OrganismeInfo, f: FormationInf
     { heading: "Entre les parties", content: `<p><strong>L'organisme de formation :</strong> ${o.nom}, ${o.adresse}, ${o.codePostal} ${o.ville}<br>SIRET : ${o.siret}${o.nda ? ` – NDA : ${o.nda}` : ""}<br>Représenté par : ${o.dirigeant}</p><p><strong>Et le stagiaire :</strong> ${s.prenom} ${s.nom}<br>Email : ${s.email}${s.telephone?.trim() ? `${s.telephone?.trim() ? `<br>Téléphone : ${s.telephone}` : ""}` : ""}</p>` },
     { heading: "Article 1 – Objet du contrat", content: `<p>Le présent contrat a pour objet la réalisation de l'action de formation « ${f.intitule} » selon le programme annexé.</p>` },
     { heading: "Article 2 – Nature et caractéristiques", content: `<p><strong>Intitulé :</strong> ${f.intitule}<br><strong>Objectifs :</strong> ${f.objectifs}<br><strong>Durée :</strong> ${f.duree}<br><strong>Dates :</strong> Du ${formatDate(getStagiaireDateDebut(s as StagiaireInfo, f))} au ${formatDate(getStagiaireDateFin(s as StagiaireInfo, f))}<br><strong>Modalité :</strong> ${f.modalites}<br><strong>Lieu :</strong> ${f.lieu}</p>` },
-    { heading: "Article 3 – Prix et conditions de paiement", content: `<p>Le prix de la formation est fixé à ${f.tarif}.<br>TVA non applicable (art. 261-4-4° du CGI).<br>Le règlement s'effectue à la signature ou en 3 mensualités.</p>` },
+    { heading: "Article 3 – Prix et conditions de paiement", content: buildEcheancierPaiement(f, s as StagiaireInfo) },
     { heading: "Article 4 – Droit de rétractation", content: "<p>Conformément à l'article L.6353-5 du Code du travail, le stagiaire dispose d'un délai de rétractation de 10 jours à compter de la signature du présent contrat. Aucune somme ne peut être exigée avant l'expiration de ce délai.</p>" },
     { heading: "Article 5 – Interruption", content: "<p>En cas d'interruption de la formation, seules les heures réalisées seront facturées au prorata.</p>" },
   ], signatures: { type: "2", labels: ["Pour l'organisme", "Le Stagiaire (lu et approuvé)"], names: [o.dirigeant, s.prenom + " " + s.nom] } });

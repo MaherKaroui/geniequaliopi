@@ -988,3 +988,55 @@ export function getModaliteContent(f: FormationInfo, o: OrganismeInfo) {
     isMixte: mixte,
   };
 }
+
+/**
+ * Generate a payment schedule HTML block (30% acompte + remaining in equal installments).
+ * Uses formation dates to space out payment deadlines.
+ */
+export function buildEcheancierPaiement(
+  f: FormationInfo,
+  s?: StagiaireInfo
+): string {
+  const tarifStr = (s as any)?.tarif || f.tarif || "0";
+  const totalNum = parseFloat(tarifStr.replace(/[^\d.,]/g, "").replace(",", ".")) || 0;
+  if (totalNum <= 0) return `<p>Le prix de la formation est fixé à ${f.tarif}.<br>TVA non applicable (art. 261-4-4° du CGI).</p>`;
+
+  const acompte = Math.round(totalNum * 0.30 * 100) / 100;
+  const reste = Math.round((totalNum - acompte) * 100) / 100;
+  const nbVersements = 3;
+  const montantVersement = Math.round((reste / nbVersements) * 100) / 100;
+  // Adjust last installment for rounding
+  const lastVersement = Math.round((reste - montantVersement * (nbVersements - 1)) * 100) / 100;
+
+  const dateDebut = (s as any)?.dateDebutFormation || f.dateDebut || "";
+  const dateFin = (s as any)?.dateFinFormation || f.dateFin || "";
+
+  // Calculate installment dates: evenly spaced between dateDebut and dateFin
+  const echeances: string[] = [];
+  if (dateDebut && dateFin) {
+    const dStart = new Date(dateDebut);
+    const dEnd = new Date(dateFin);
+    if (!isNaN(dStart.getTime()) && !isNaN(dEnd.getTime())) {
+      const totalMs = dEnd.getTime() - dStart.getTime();
+      for (let i = 0; i < nbVersements; i++) {
+        const d = new Date(dStart.getTime() + (totalMs * (i + 1)) / (nbVersements + 1));
+        echeances.push(d.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" }));
+      }
+    }
+  }
+
+  const fmtEuro = (n: number) => n.toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " €";
+
+  let html = `<p>Le prix de la formation est fixé à <strong>${f.tarif}</strong>.<br>TVA non applicable (art. 261-4-4° du CGI).</p>`;
+  html += `<p>Le paiement est échelonné en ${nbVersements + 1} versements, selon l'échéancier suivant :</p>`;
+  html += `<ul>`;
+  html += `<li><strong>1<sup>er</sup> versement – Acompte (30% = ${fmtEuro(acompte)}) :</strong> à la signature du contrat</li>`;
+  for (let i = 0; i < nbVersements; i++) {
+    const montant = i === nbVersements - 1 ? lastVersement : montantVersement;
+    const dateLimite = echeances[i] ? `au plus tard le ${echeances[i]}` : `à l'échéance convenue`;
+    html += `<li><strong>${i + 2}<sup>e</sup> versement (${fmtEuro(montant)}) :</strong> ${dateLimite}</li>`;
+  }
+  html += `</ul>`;
+  html += `<p>En cas de non-paiement à l'échéance, des pénalités de retard pourront être appliquées conformément aux dispositions légales en vigueur.</p>`;
+  return html;
+}
