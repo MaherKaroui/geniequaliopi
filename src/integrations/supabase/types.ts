@@ -107,6 +107,42 @@ export type Database = {
         }
         Relationships: []
       }
+      saved_nda_dossiers: {
+        Row: {
+          created_at: string
+          cv_formateur: string
+          formation: Json
+          id: string
+          name: string
+          organisme: Json
+          stagiaires: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          cv_formateur?: string
+          formation: Json
+          id?: string
+          name?: string
+          organisme: Json
+          stagiaires?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          cv_formateur?: string
+          formation?: Json
+          id?: string
+          name?: string
+          organisme?: Json
+          stagiaires?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       saved_themes: {
         Row: {
           config: Json
