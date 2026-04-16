@@ -34,6 +34,7 @@ const NDA_DOCUMENTS = [
   { id: "devis", label: "Devis", icon: "💰" },
   { id: "logo", label: "Logo de l'organisme", icon: "🖼️" },
   { id: "cv", label: "CV du Formateur", icon: "👤" },
+  { id: "liste_formateurs", label: "Liste des Formateurs", icon: "👥" },
 ];
 
 const emptyOrganisme: OrganismeInfo = {
@@ -67,6 +68,11 @@ function generateDocumentHTML(docId: string, o: OrganismeInfo, f: FormationInfo,
       const hasContent = cvData.prenom || cvData.nom || cvData.profil || cvData.experiences.some(e => e.poste);
       if (hasContent) return generateCVHTML(cvData, cvDesign);
       return null;
+    }
+    case "liste_formateurs": {
+      const hasCV = cvData.prenom || cvData.nom || cvData.experiences.some(e => e.poste);
+      if (!hasCV) return null;
+      return generateListeFormateursHTML(o, cvData);
     }
     default: return null;
   }
