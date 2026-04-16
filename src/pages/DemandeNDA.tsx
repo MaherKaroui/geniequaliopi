@@ -55,20 +55,10 @@ function generateListeFormateursHTML(o: OrganismeInfo, cv: CVData, stagiaires: S
   const fullName = `${cv.prenom} ${cv.nom}`.trim() || "Nom du formateur";
   const exps = cv.experiences.filter(e => e.poste || e.entreprise);
   const forms = cv.formations.filter(f => f.diplome || f.etablissement);
+  const comps = cv.competences.filter(c => c.nom);
+  const certs = cv.certifications.filter(c => c.nom);
   const today = new Date();
   const dateStr = today.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
-
-  const expRows = exps.map(e =>
-    `<p style="margin:2px 0;"><strong>${e.poste || ""}</strong>${e.entreprise ? ` – ${e.entreprise}` : ""}${e.dateDebut ? ` (${e.dateDebut}${e.dateFin ? ` – ${e.dateFin}` : " – Présent"})` : ""}</p>${e.description ? `<p style="margin:0 0 6px 0;font-size:11px;color:#444;">${e.description}</p>` : ""}`
-  ).join("");
-
-  const formRows = forms.map(f =>
-    `<p style="margin:2px 0;">${f.diplome || ""}${f.etablissement ? ` – ${f.etablissement}` : ""}${f.annee ? ` (${f.annee})` : ""}</p>`
-  ).join("");
-
-  const certs = cv.certifications.filter(c => c.nom).map(c =>
-    `<p style="margin:2px 0;">${c.nom}${c.annee ? ` (${c.annee})` : ""}</p>`
-  ).join("");
 
   return `<div style="font-family:Arial,sans-serif;max-width:800px;margin:0 auto;padding:30px;font-size:12px;line-height:1.5;">
     <div style="text-align:center;margin-bottom:10px;">
