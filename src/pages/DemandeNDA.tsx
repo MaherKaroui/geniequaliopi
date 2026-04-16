@@ -32,7 +32,7 @@ const NDA_DOCUMENTS = [
   { id: "contrat", label: "Contrat de Formation", icon: "📄" },
   { id: "programme", label: "Programme de Formation", icon: "📋" },
   { id: "reglement", label: "Règlement Intérieur", icon: "📜" },
-  { id: "devis", label: "Devis", icon: "💰" },
+  { id: "devis_facture", label: "Devis / Facture", icon: "💰" },
   { id: "logo", label: "Logo de l'organisme", icon: "🖼️" },
   { id: "cv", label: "CV du Formateur", icon: "👤" },
   { id: "liste_formateurs", label: "Liste des Formateurs", icon: "👥" },
