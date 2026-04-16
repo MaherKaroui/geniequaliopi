@@ -15,6 +15,7 @@ import DocStyleConfigPanel from "./DocStyleConfigPanel";
 import { downloadAsWord, htmlToWordBlob } from "@/lib/wordExport";
 import { generateExcelTableauBordPerformance, generateExcelTableauSuiviParcours, generateExcelIndicateursPrevisionnelsVAE, excelToBlob } from "@/lib/xlsxGenerator";
 import { downloadAsPdf, htmlToPdfBlob } from "@/lib/pdfExport";
+import { processDocxTemplate, DOCX_TEMPLATE_FILES } from "@/lib/docxTemplateExport";
 import { auditImportedFolder, ImportAuditResult } from "@/lib/importInspector";
 import {
   buildDocumentFileName,
@@ -238,6 +239,13 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
       const resp = await fetch(getStaticFileUrl(doc)!);
       const blob = await resp.blob();
       saveAs(blob, buildCatalogFileName(doc));
+      return;
+    }
+
+    // Handle .docx template files (factures IND 17)
+    if (DOCX_TEMPLATE_FILES[doc.template]) {
+      const blob = await processDocxTemplate(DOCX_TEMPLATE_FILES[doc.template], mergedOrganisme);
+      saveAs(blob, buildCatalogFileName(doc, undefined, ".docx"));
       return;
     }
 
@@ -518,6 +526,10 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
           const fileBlob = await resp.blob();
           addFileToZip(`${basePath}/${buildCatalogFileName(doc)}`, fileBlob);
           await updateProgress();
+        } else if (DOCX_TEMPLATE_FILES[doc.template]) {
+          const docxBlob = await processDocxTemplate(DOCX_TEMPLATE_FILES[doc.template], mergedOrganisme);
+          addFileToZip(`${basePath}/${buildCatalogFileName(doc, null, ".docx")}`, docxBlob);
+          await updateProgress();
         } else if (
           doc.template === "indicateurs_performance"
           || doc.template === "tableau_suivi_parcours_excel"
@@ -646,6 +658,10 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
           const resp = await fetch(getStaticFileUrl(doc)!);
           zip.file(`${basePath}/${buildCatalogFileName(doc)}`, await resp.blob());
           await updateProgress();
+        } else if (DOCX_TEMPLATE_FILES[doc.template]) {
+          const docxBlob = await processDocxTemplate(DOCX_TEMPLATE_FILES[doc.template], mergedOrganisme);
+          zip.file(`${basePath}/${buildCatalogFileName(doc, null, ".docx")}`, docxBlob);
+          await updateProgress();
         } else if (["indicateurs_performance", "tableau_suivi_parcours_excel", "plan_dev_competences_excel", "tableau_amelioration_continue_excel", "suivi_dysfonctionnements_excel", "relances_appreciations_excel", "vae_indicateurs_previsionnels"].includes(doc.template)) {
           const excelContent = doc.template === "indicateurs_performance"
             ? generateExcelTableauBordPerformance(mergedOrganisme, selectedFormation, allStagiaires)
@@ -760,6 +776,10 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
         } else if (doc.template === "pdf_static" && getStaticFileUrl(doc)) {
           const resp = await fetch(getStaticFileUrl(doc)!);
           zip.file(`${basePath}/${buildCatalogFileName(doc)}`, await resp.blob());
+          await updateProgress();
+        } else if (DOCX_TEMPLATE_FILES[doc.template]) {
+          const docxBlob = await processDocxTemplate(DOCX_TEMPLATE_FILES[doc.template], mergedOrganisme);
+          zip.file(`${basePath}/${buildCatalogFileName(doc, null, ".docx")}`, docxBlob);
           await updateProgress();
         } else if (["indicateurs_performance", "tableau_suivi_parcours_excel", "plan_dev_competences_excel", "tableau_amelioration_continue_excel", "suivi_dysfonctionnements_excel", "relances_appreciations_excel", "vae_indicateurs_previsionnels", "decoupage_formation_cfa_excel", "matrice_competences_excel", "suivi_chiffre_formation_excel"].includes(doc.template)) {
           const excelContent = doc.template === "indicateurs_performance"
