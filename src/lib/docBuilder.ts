@@ -1018,7 +1018,7 @@ export function buildEcheancierPaiement(
     if (!isNaN(dStart.getTime())) {
       for (let i = 0; i < nbVersements; i++) {
         const d = new Date(dStart);
-        d.setMonth(d.getMonth() + i + 1);
+        d.setDate(d.getDate() + 7 * (i + 1));
         echeances.push(d.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" }));
       }
     }
