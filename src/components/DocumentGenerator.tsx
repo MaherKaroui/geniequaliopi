@@ -537,8 +537,15 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
           addFileToZip(`${basePath}/${buildCatalogFileName(doc)}`, fileBlob);
           await updateProgress();
         } else if (DOCX_TEMPLATE_FILES[doc.template]) {
-          const pdfBlob = await processDocxTemplate(DOCX_TEMPLATE_FILES[doc.template], mergedOrganisme);
-          addFileToZip(`${basePath}/${buildCatalogFileName(doc, null, ".docx")}`, pdfBlob);
+          const docxBlob = await processDocxTemplate(DOCX_TEMPLATE_FILES[doc.template], mergedOrganisme);
+          addFileToZip(`${basePath}/${buildCatalogFileName(doc, null, ".docx")}`, docxBlob);
+          await updateProgress();
+        } else if (MAIL_TEMPLATE_FILES[doc.template] && typeof doc.params?.stagiaireIdx === "number") {
+          const s = allStagiaires[doc.params.stagiaireIdx];
+          if (s) {
+            const mailBlob = await processMailDocxTemplate(MAIL_TEMPLATE_FILES[doc.template], mergedOrganisme, selectedFormation, s);
+            addFileToZip(`${basePath}/${buildCatalogFileName(doc, s, ".docx")}`, mailBlob);
+          }
           await updateProgress();
         } else if (
           doc.template === "indicateurs_performance"
@@ -669,8 +676,15 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
           zip.file(`${basePath}/${buildCatalogFileName(doc)}`, await resp.blob());
           await updateProgress();
         } else if (DOCX_TEMPLATE_FILES[doc.template]) {
-          const pdfBlob = await processDocxTemplate(DOCX_TEMPLATE_FILES[doc.template], mergedOrganisme);
-          zip.file(`${basePath}/${buildCatalogFileName(doc, null, ".docx")}`, pdfBlob);
+          const docxBlob = await processDocxTemplate(DOCX_TEMPLATE_FILES[doc.template], mergedOrganisme);
+          zip.file(`${basePath}/${buildCatalogFileName(doc, null, ".docx")}`, docxBlob);
+          await updateProgress();
+        } else if (MAIL_TEMPLATE_FILES[doc.template] && typeof doc.params?.stagiaireIdx === "number") {
+          const s = allStagiaires[doc.params.stagiaireIdx];
+          if (s) {
+            const mailBlob = await processMailDocxTemplate(MAIL_TEMPLATE_FILES[doc.template], mergedOrganisme, selectedFormation, s);
+            zip.file(`${basePath}/${buildCatalogFileName(doc, s, ".docx")}`, mailBlob);
+          }
           await updateProgress();
         } else if (["indicateurs_performance", "tableau_suivi_parcours_excel", "plan_dev_competences_excel", "tableau_amelioration_continue_excel", "suivi_dysfonctionnements_excel", "relances_appreciations_excel", "vae_indicateurs_previsionnels"].includes(doc.template)) {
           const excelContent = doc.template === "indicateurs_performance"
@@ -788,8 +802,15 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
           zip.file(`${basePath}/${buildCatalogFileName(doc)}`, await resp.blob());
           await updateProgress();
         } else if (DOCX_TEMPLATE_FILES[doc.template]) {
-          const pdfBlob = await processDocxTemplate(DOCX_TEMPLATE_FILES[doc.template], mergedOrganisme);
-          zip.file(`${basePath}/${buildCatalogFileName(doc, null, ".docx")}`, pdfBlob);
+          const docxBlob = await processDocxTemplate(DOCX_TEMPLATE_FILES[doc.template], mergedOrganisme);
+          zip.file(`${basePath}/${buildCatalogFileName(doc, null, ".docx")}`, docxBlob);
+          await updateProgress();
+        } else if (MAIL_TEMPLATE_FILES[doc.template] && typeof doc.params?.stagiaireIdx === "number") {
+          const s = allStagiaires[doc.params.stagiaireIdx];
+          if (s) {
+            const mailBlob = await processMailDocxTemplate(MAIL_TEMPLATE_FILES[doc.template], mergedOrganisme, selectedFormation, s);
+            zip.file(`MAIL/${buildCatalogFileName(doc, s, ".docx")}`, mailBlob);
+          }
           await updateProgress();
         } else if (["indicateurs_performance", "tableau_suivi_parcours_excel", "plan_dev_competences_excel", "tableau_amelioration_continue_excel", "suivi_dysfonctionnements_excel", "relances_appreciations_excel", "vae_indicateurs_previsionnels", "decoupage_formation_cfa_excel", "matrice_competences_excel", "suivi_chiffre_formation_excel"].includes(doc.template)) {
           const excelContent = doc.template === "indicateurs_performance"
