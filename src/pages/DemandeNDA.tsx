@@ -13,11 +13,13 @@ import StepIndicator from "@/components/StepIndicator";
 import CVGeneratorEmbed from "@/components/CVGeneratorEmbed";
 import { genContratFormationParticulier, genDevis, genFacture } from "@/lib/templatesAF";
 import { courseCertificateHtml } from "@/lib/newsletterScreenshots";
-import { isFormationTerminee } from "@/lib/docBuilder";
+import { isFormationTerminee, setDocStyle } from "@/lib/docBuilder";
 import { genReglement_V2 } from "@/lib/generatorsV2";
 import { generateDocumentById } from "@/lib/documentGenerator";
 import { htmlToPdfBlob } from "@/lib/pdfExport";
 import { CVData, CVDesign, emptyCV, generateCVHTML } from "@/lib/cvGenerator";
+import { DocStyleConfig, DEFAULT_DOC_STYLE } from "@/types/qualiopi";
+import DocStyleConfigPanel from "@/components/DocStyleConfigPanel";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -195,6 +197,12 @@ const DemandeNDA = () => {
   const [previewHTML, setPreviewHTML] = useState("");
   const [generating, setGenerating] = useState(false);
   const [exportFormat, setExportFormat] = useState<"pdf" | "doc">("pdf");
+  const [docStyle, setDocStyleState] = useState<DocStyleConfig>({ ...DEFAULT_DOC_STYLE });
+
+  const handleStyleChange = (newStyle: DocStyleConfig) => {
+    setDocStyleState(newStyle);
+    setDocStyle(newStyle);
+  };
 
   // Save/load state
   const [dossiers, setDossiers] = useState<SavedNDADossier[]>([]);
@@ -437,6 +445,9 @@ const DemandeNDA = () => {
           {currentStep === 3 && <StagiairesForm data={stagiaires} onChange={setStagiaires} />}
           {currentStep === 4 && (
             <div className="space-y-8">
+              {/* Style Panel */}
+              <DocStyleConfigPanel style={docStyle} onChange={handleStyleChange} />
+
               {/* CV Generator */}
               <div>
                 <h2 className="text-lg font-semibold mb-4">CV du Formateur</h2>
