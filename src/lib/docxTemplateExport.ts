@@ -33,8 +33,9 @@ function buildReplacements(o: OrganismeInfo): Record<string, string> {
   const siren = o.siret ? o.siret.replace(/\s/g, "").slice(0, 9) : "";
   const annee = new Date(refDate).getFullYear().toString();
 
-  // Google Workspace billing period
-  const d = new Date(subtractBizDays(refDate, 60));
+  // Google Workspace billing period: dateMaj + 1 month
+  const ref = new Date(refDate);
+  const d = new Date(ref.getFullYear(), ref.getMonth() + 1, 1); // 1st of next month
   const d1Start = new Date(d); d1Start.setDate(1);
   const d1End = new Date(d); d1End.setDate(15);
   const d2Start = new Date(d); d2Start.setDate(16);
