@@ -255,15 +255,21 @@ export function buildFullCatalog(
     // IND 23 — Veille légale et réglementaire
     add("af_c6i23_veille_reglementaire", "CT6 - IND 23 VEILLE RÉGLEMENTAIRE", 6, 23, "tableau_veille", { type: "réglementaire" });
     add("af_c6i23_pdf_guide_qualiopi", "CT6 - IND 23 V9 GUIDE DE LECTURE QUALIOPI", 6, 23, "pdf_static", { pdfFile: "v9_guide_lecture_qualiopi.pdf" });
+    add("af_c6i23_screenshot_france_competences", "CT6 - IND 23 INSCRIPTION NEWSLETTER FRANCE COMPÉTENCES", 6, 23, "screenshot_france_competences");
+    add("af_c6i23_screenshot_drieets", "CT6 - IND 23 INSCRIPTION NEWSLETTER DRIEETS", 6, 23, "screenshot_drieets");
+    add("af_c6i23_screenshot_centre_inffo", "CT6 - IND 23 INSCRIPTION NEWSLETTER CENTRE INFFO", 6, 23, "screenshot_centre_inffo");
 
     // IND 24 — Veille métiers et emplois
     add("af_c6i24_tableau_veille_metier", "CT6 - IND 24 TABLEAU DE VEILLE MÉTIER", 6, 24, "tableau_veille", { type: "métier" });
 
     // IND 25 — Veille innovations pédagogiques et technologiques
     add("af_c6i25_tableau_veille_techno", "CT6 - IND 25 TABLEAU DE VEILLE TECHNOLOGIQUE", 6, 25, "tableau_veille", { type: "technologique" });
+    add("af_c6i25_screenshot_microsoft", "CT6 - IND 25 INSCRIPTION NEWSLETTER MICROSOFT ADVERTISING", 6, 25, "screenshot_microsoft");
+    add("af_c6i25_screenshot_openai", "CT6 - IND 25 INSCRIPTION NEWSLETTER OPEN AI DIGEST", 6, 25, "screenshot_openai");
 
     // IND 26 — Accueil et accompagnement handicap
     add("af_c6i26_veille_handicap", "CT6 - IND 26 VEILLE HANDICAP", 6, 26, "tableau_veille", { type: "handicap" });
+    add("af_c6i26_screenshot_agefiph", "CT6 - IND 26 INSCRIPTION NEWSLETTER AGEFIPH", 6, 26, "screenshot_agefiph");
     // PDFs statiques IND 26
     add("af_c6i26_pdf_referentiel_defi", "CT6 - IND 26 RÉFÉRENTIEL HANDICAP DÉFI MÉTIER", 6, 26, "pdf_static", { pdfFile: "referentiel_handicap_defi_metier.pdf" });
     add("af_c6i26_pdf_agefiph_fiche", "CT6 - IND 26 AGEFIPH FICHE PRATIQUE QUALITÉ", 6, 26, "pdf_static", { pdfFile: "agefiph_fiche_pratique_qualite.pdf" });
