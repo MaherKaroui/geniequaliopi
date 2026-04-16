@@ -54,6 +54,18 @@ const emptyFormation: FormationInfo = {
   rythmeAlternance: "",
 };
 
+const stripNdaText = (value: string) => value
+  .replace(/\bNDA\b/gi, "")
+  .replace(/\s*[–-]\s*(?=$)/g, "")
+  .replace(/^(\s*[–-]\s*)+/g, "")
+  .replace(/\s{2,}/g, " ")
+  .trim();
+
+const sanitizeOrganismeForDocuments = (o: OrganismeInfo): OrganismeInfo => ({
+  ...o,
+  nda: "",
+});
+
 function generateListeFormateursHTML(o: OrganismeInfo, cv: CVData, stagiaires: StagiaireInfo[] = []): string {
   const fullName = `${cv.prenom} ${cv.nom}`.trim() || "Nom du formateur";
   const exps = cv.experiences.filter(e => e.poste || e.entreprise);
@@ -121,23 +133,25 @@ function generateListeFormateursHTML(o: OrganismeInfo, cv: CVData, stagiaires: S
     </div>
 
     <div style="margin-top:40px;border-top:1px solid #ccc;padding-top:8px;font-size:9px;color:#888;text-align:center;">
-      <strong>${o.nom || ""}</strong>${o.siret ? ` – SIRET : ${o.siret}` : ""}${o.nda ? ` – NDA : ${o.nda}` : ""}
+      <strong>${o.nom || ""}</strong>${o.siret ? ` – SIRET : ${o.siret}` : ""}
     </div>
   </div>`;
 }
 
 function generateDocumentHTML(docId: string, o: OrganismeInfo, f: FormationInfo, s: StagiaireInfo[], cvData: CVData, cvDesign: CVDesign): string | null {
+  const cleanOrganisme = sanitizeOrganismeForDocuments(o);
+
   switch (docId) {
     case "contrat":
-      return genContratFormationParticulier(o, f, s);
+      return genContratFormationParticulier(cleanOrganisme, f, s);
     case "programme":
-      return generateDocumentById("programme_formation", "programme_formation", undefined, o, f, s) || null;
+      return generateDocumentById("programme_formation", "programme_formation", undefined, cleanOrganisme, f, s) || null;
     case "reglement":
-      return genReglement_V2(o, f, s);
+      return genReglement_V2(cleanOrganisme, f, s);
     case "devis_facture":
-      return isFormationTerminee(f, s) ? genFacture(o, f, s) : genDevis(o, f, s);
+      return isFormationTerminee(f, s) ? genFacture(cleanOrganisme, f, s) : genDevis(cleanOrganisme, f, s);
     case "logo":
-      if (o.logoUrl) return `<div style="text-align:center;padding:60px;"><img src="${o.logoUrl}" style="max-width:400px;" /><p style="margin-top:20px;color:#666;">Logo de l'organisme</p></div>`;
+      if (cleanOrganisme.logoUrl) return `<div style="text-align:center;padding:60px;"><img src="${cleanOrganisme.logoUrl}" style="max-width:400px;" /><p style="margin-top:20px;color:#666;">Logo de l'organisme</p></div>`;
       return null;
     case "cv": {
       const hasContent = cvData.prenom || cvData.nom || cvData.profil || cvData.experiences.some(e => e.poste);
@@ -147,10 +161,10 @@ function generateDocumentHTML(docId: string, o: OrganismeInfo, f: FormationInfo,
     case "liste_formateurs": {
       const hasCV = cvData.prenom || cvData.nom || cvData.experiences.some(e => e.poste);
       if (!hasCV) return null;
-      return generateListeFormateursHTML(o, cvData, s);
+      return generateListeFormateursHTML(cleanOrganisme, cvData, s);
     }
     case "certificat_coursera":
-      return `<div style="font-family:Arial,sans-serif;max-width:860px;margin:0 auto;padding:0;">${courseCertificateHtml(o, f)}</div>`;
+      return `<div style="font-family:Arial,sans-serif;max-width:860px;margin:0 auto;padding:0;">${courseCertificateHtml(cleanOrganisme, f)}</div>`;
     default: return null;
   }
 }
@@ -209,7 +223,9 @@ const DemandeNDA = () => {
     if (!user) { toast.error("Connectez-vous pour sauvegarder"); return; }
     if (!organisme.nom) { toast.error("Remplissez au moins le nom de l'organisme"); return; }
     setSaving(true);
-    const name = saveName.trim() || `${organisme.nom} – ${formation.intitule || "NDA"}`;
+    const manualName = stripNdaText(saveName.trim());
+    const fallbackName = stripNdaText(`${organisme.nom} – ${formation.intitule || "Dossier"}`);
+    const name = manualName || fallbackName;
     const { error } = await supabase.from("saved_nda_dossiers").insert({
       user_id: user.id,
       name,
@@ -219,7 +235,7 @@ const DemandeNDA = () => {
       cv_formateur: JSON.stringify(cvData),
     });
     if (error) toast.error(error.message);
-    else { toast.success("Dossier NDA sauvegardé !"); fetchDossiers(); setSaveName(""); }
+    else { toast.success("Dossier sauvegardé !"); fetchDossiers(); setSaveName(""); }
     setSaving(false);
   };
 
@@ -234,7 +250,7 @@ const DemandeNDA = () => {
     } catch { /* legacy text format, ignore */ }
     setCurrentStep(1);
     setShowHistory(false);
-    toast.success(`Dossier "${d.name}" chargé`);
+    toast.success(`Dossier "${stripNdaText(d.name)}" chargé`);
   };
 
   const handleDelete = async (id: string) => {
@@ -315,10 +331,10 @@ const DemandeNDA = () => {
       const url = URL.createObjectURL(content);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `Demande_NDA_${organisme.nom || "Organisme"}.zip`;
+      a.download = `Dossier_${organisme.nom || "Organisme"}.zip`;
       a.click();
       URL.revokeObjectURL(url);
-      toast.success("Dossier NDA téléchargé !");
+      toast.success("Dossier téléchargé !");
     } catch (err) {
       toast.error("Erreur lors de la génération du ZIP");
       console.error(err);
@@ -335,7 +351,7 @@ const DemandeNDA = () => {
             <Button variant="ghost" size="sm" onClick={() => navigate("/")} className="gap-1">
               <ChevronLeft className="w-4 h-4" /> Accueil
             </Button>
-            <span className="font-bold text-lg">Demande NDA</span>
+            <span className="font-bold text-lg">Dossier administratif</span>
           </div>
           <div className="flex items-center gap-2">
             {user && (
@@ -384,7 +400,7 @@ const DemandeNDA = () => {
         {showHistory && user && (
           <Card className="mb-6">
             <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center gap-2"><Clock className="w-4 h-4" /> Dossiers NDA sauvegardés</CardTitle>
+              <CardTitle className="text-base flex items-center gap-2"><Clock className="w-4 h-4" /> Dossiers sauvegardés</CardTitle>
             </CardHeader>
             <CardContent>
               {dossiers.length === 0 ? (
@@ -394,7 +410,7 @@ const DemandeNDA = () => {
                   {dossiers.map(d => (
                     <div key={d.id} className="flex items-center justify-between p-3 border rounded-lg">
                       <div>
-                        <p className="font-medium text-sm">{d.name}</p>
+                        <p className="font-medium text-sm">{stripNdaText(d.name)}</p>
                         <p className="text-xs text-muted-foreground">{new Date(d.updated_at).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" })}</p>
                       </div>
                       <div className="flex gap-2">
@@ -416,7 +432,7 @@ const DemandeNDA = () => {
         <StepIndicator steps={NDA_STEPS} currentStep={currentStep} onStepClick={setCurrentStep} />
 
         <div className="bg-card rounded-2xl border shadow-card p-6 md:p-8">
-          {currentStep === 1 && <OrganismeForm data={organisme} onChange={setOrganisme} hideFields={['domainesFormation', 'certifications', 'outilsUtilises', 'version', 'typesActions']} />}
+          {currentStep === 1 && <OrganismeForm data={organisme} onChange={setOrganisme} hideFields={['nda', 'domainesFormation', 'certifications', 'outilsUtilises', 'version', 'typesActions']} />}
           {currentStep === 2 && <FormationForm data={formation} onChange={setFormation} onImportStagiaires={setStagiaires} />}
           {currentStep === 3 && <StagiairesForm data={stagiaires} onChange={setStagiaires} />}
           {currentStep === 4 && (
@@ -429,7 +445,7 @@ const DemandeNDA = () => {
 
               {/* Documents */}
               <Card>
-                <CardHeader><CardTitle className="text-lg">Documents du dossier NDA</CardTitle></CardHeader>
+                <CardHeader><CardTitle className="text-lg">Documents du dossier</CardTitle></CardHeader>
                 <CardContent className="space-y-3">
                   {NDA_DOCUMENTS.map(doc => {
                     const cvHasContent = cvData.prenom || cvData.nom || cvData.profil || cvData.experiences.some(e => e.poste);
