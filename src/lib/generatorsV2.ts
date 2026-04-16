@@ -376,7 +376,7 @@ export function genConventionFormationTripartite(o: OrganismeInfo, f: FormationI
     <p style="font-style:italic">(Articles L.6353-1 et L.6353-2 du Code du travail)</p>
     <h3>Entre les soussignés</h3>
     <h4>1. L'Organisme de formation</h4>
-    <p><strong>${o.nom}</strong><br>Adresse : ${o.adresse}, ${o.codePostal} ${o.ville}<br>SIRET : ${o.siret} – NDA : ${o.nda}<br>Représenté par : ${o.dirigeant}, en qualité de Dirigeant<br>Email : ${o.email}</p>
+    <p><strong>${o.nom}</strong><br>Adresse : ${o.adresse}, ${o.codePostal} ${o.ville}<br>SIRET : ${o.siret}${o.nda ? ` – NDA : ${o.nda}` : ""}<br>Représenté par : ${o.dirigeant}, en qualité de Dirigeant<br>Email : ${o.email}</p>
     <p>Ci-après dénommé « l'Organisme de formation »,</p>
     <h4>2. L'Entreprise</h4>
     <p><strong>${entrepriseNom}</strong><br>Représentée par : ${respEntreprise}${poste !== "_______________" ? `, en qualité de ${poste}` : ""}</p>
