@@ -484,6 +484,10 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "moyens_materiels": return genMoyensMateriels(o);
     case "bail_sous_location": return genBailSousLocation(o);
     case "facture_materiel": return genFactureMateriel(o, params);
+    case "facture_pack_office": return genFacturePackOffice(o);
+    case "facture_google_workspace": return genFactureGoogleWorkspace(o);
+    case "facture_make": return genFactureMake(o);
+    case "facture_genspark": return genFactureGenspark(o);
     case "autoevaluation_formateur": {
       // Use formateurNom from params if provided (per-session formateur), else from formation
       const formateurName = params?.formateurNom || f.formateur || fmt.prenom + " " + fmt.nom;
