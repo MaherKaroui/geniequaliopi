@@ -334,74 +334,63 @@ const DemandeNDA = () => {
           {currentStep === 2 && <FormationForm data={formation} onChange={setFormation} onImportStagiaires={setStagiaires} />}
           {currentStep === 3 && <StagiairesForm data={stagiaires} onChange={setStagiaires} />}
           {currentStep === 4 && (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* Left: CV */}
-              <div className="space-y-6">
-                <Card>
-                  <CardHeader><CardTitle className="text-lg">CV du Formateur</CardTitle></CardHeader>
-                  <CardContent>
-                    <Label>CV du formateur (texte)</Label>
-                    <Textarea
-                      value={cvFormateur}
-                      onChange={e => setCvFormateur(e.target.value)}
-                      rows={8}
-                      placeholder="Expérience, diplômes, compétences du formateur..."
-                    />
-                  </CardContent>
-                </Card>
+            <div className="space-y-8">
+              {/* CV Generator */}
+              <div>
+                <h2 className="text-lg font-semibold mb-4">CV du Formateur</h2>
+                <CVGeneratorEmbed cvData={cvData} onCVChange={setCvData} selectedDesign={cvDesign} onDesignChange={setCvDesign} />
               </div>
 
-              {/* Right: Documents */}
-              <div className="space-y-6">
-                <Card>
-                  <CardHeader><CardTitle className="text-lg">Documents du dossier NDA</CardTitle></CardHeader>
-                  <CardContent className="space-y-3">
-                    {NDA_DOCUMENTS.map(doc => {
-                      const ready = doc.id === "contrat" || doc.id === "programme" || doc.id === "reglement" || doc.id === "devis" || (doc.id === "logo" && !!organisme.logoUrl) || (doc.id === "cv" && !!cvFormateur);
-                      return (
-                        <div key={doc.id} className="flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors">
-                          <div className="flex items-center gap-3">
-                            <span className="text-xl">{doc.icon}</span>
-                            <div>
-                              <p className="font-medium text-sm">{doc.label}</p>
-                              <p className="text-xs text-muted-foreground">{ready ? "Prêt" : "À compléter"}</p>
-                            </div>
-                            {ready && <CheckCircle2 className="w-4 h-4 text-green-500" />}
+              {/* Documents */}
+              <Card>
+                <CardHeader><CardTitle className="text-lg">Documents du dossier NDA</CardTitle></CardHeader>
+                <CardContent className="space-y-3">
+                  {NDA_DOCUMENTS.map(doc => {
+                    const cvHasContent = cvData.prenom || cvData.nom || cvData.profil || cvData.experiences.some(e => e.poste);
+                    const ready = doc.id === "contrat" || doc.id === "programme" || doc.id === "reglement" || doc.id === "devis" || (doc.id === "logo" && !!organisme.logoUrl) || (doc.id === "cv" && !!cvHasContent);
+                    return (
+                      <div key={doc.id} className="flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors">
+                        <div className="flex items-center gap-3">
+                          <span className="text-xl">{doc.icon}</span>
+                          <div>
+                            <p className="font-medium text-sm">{doc.label}</p>
+                            <p className="text-xs text-muted-foreground">{ready ? "Prêt" : "À compléter"}</p>
                           </div>
-                          <div className="flex gap-2">
-                            <Button variant="outline" size="sm" onClick={() => handlePreview(doc.id)} className="gap-1">
-                              <FileText className="w-3.5 h-3.5" /> Aperçu
-                            </Button>
-                            <Button variant="outline" size="sm" onClick={() => handleDownload(doc.id)} className="gap-1">
-                              <Download className="w-3.5 h-3.5" /> {exportFormat.toUpperCase()}
-                            </Button>
-                          </div>
+                          {ready && <CheckCircle2 className="w-4 h-4 text-emerald-500" />}
                         </div>
-                      );
-                    })}
+                        <div className="flex gap-2">
+                          <Button variant="outline" size="sm" onClick={() => handlePreview(doc.id)} className="gap-1">
+                            <FileText className="w-3.5 h-3.5" /> Aperçu
+                          </Button>
+                          <Button variant="outline" size="sm" onClick={() => handleDownload(doc.id)} className="gap-1">
+                            <Download className="w-3.5 h-3.5" /> {exportFormat.toUpperCase()}
+                          </Button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </CardContent>
+              </Card>
+
+              {previewDoc && (
+                <Card>
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-lg">Aperçu : {NDA_DOCUMENTS.find(d => d.id === previewDoc)?.label}</CardTitle>
+                      <Button variant="ghost" size="sm" onClick={() => setPreviewDoc(null)}>Fermer</Button>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="border rounded-lg overflow-hidden bg-white" style={{ maxHeight: "600px", overflowY: "auto" }}>
+                      <iframe
+                        srcDoc={`<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{margin:0;padding:0;}</style></head><body>${previewHTML}</body></html>`}
+                        style={{ width: "100%", minHeight: "500px", border: "none" }}
+                        title="Aperçu document"
+                      />
+                    </div>
                   </CardContent>
                 </Card>
-
-                {previewDoc && (
-                  <Card>
-                    <CardHeader>
-                      <div className="flex items-center justify-between">
-                        <CardTitle className="text-lg">Aperçu : {NDA_DOCUMENTS.find(d => d.id === previewDoc)?.label}</CardTitle>
-                        <Button variant="ghost" size="sm" onClick={() => setPreviewDoc(null)}>Fermer</Button>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="border rounded-lg overflow-hidden bg-white" style={{ maxHeight: "600px", overflowY: "auto" }}>
-                        <iframe
-                          srcDoc={`<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{margin:0;padding:0;}</style></head><body>${previewHTML}</body></html>`}
-                          style={{ width: "100%", minHeight: "500px", border: "none" }}
-                          title="Aperçu document"
-                        />
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
-              </div>
+              )}
             </div>
           )}
         </div>
