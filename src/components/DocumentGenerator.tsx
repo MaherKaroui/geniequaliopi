@@ -199,16 +199,66 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
     return lines.join("\n");
   }, []);
 
-  const handlePreview = (doc: DocEntry) => {
+  const handlePreview = async (doc: DocEntry) => {
+    // Clean up previous blob URL
+    if (previewBlobUrl) { URL.revokeObjectURL(previewBlobUrl); setPreviewBlobUrl(null); }
+
+    // Static PDF → embed in iframe
     if (doc.template === "pdf_static" && getStaticFileUrl(doc)) {
-      window.open(getStaticFileUrl(doc)!, "_blank");
+      const pdfUrl = getStaticFileUrl(doc)!;
+      setPreviewContent(null);
+      setPreviewBlobUrl(pdfUrl);
+      setPreviewTitle(doc.nom);
+      setCurrentDocId(doc.id);
+      setEditing(false);
       setGenerated((prev) => new Set(prev).add(doc.id));
       return;
     }
+
+    // DOCX template files (factures, diplôme) → convert to HTML via mammoth
+    if (DOCX_TEMPLATE_FILES[doc.template]) {
+      try {
+        const blob = await processDocxTemplate(DOCX_TEMPLATE_FILES[doc.template], mergedOrganisme);
+        const arrayBuffer = await blob.arrayBuffer();
+        const result = await mammoth.convertToHtml({ arrayBuffer });
+        setPreviewBlobUrl(null);
+        setPreviewContent(`<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><style>body{font-family:Arial,sans-serif;padding:24px;max-width:800px;margin:auto}table{border-collapse:collapse;width:100%}td,th{border:1px solid #ccc;padding:6px 10px}img{max-width:100%}</style></head><body>${result.value}</body></html>`);
+        setPreviewTitle(doc.nom);
+        setCurrentDocId(doc.id);
+        setEditing(false);
+        setGenerated((prev) => new Set(prev).add(doc.id));
+      } catch (e) {
+        toast.error("Impossible de prévisualiser ce fichier DOCX");
+      }
+      return;
+    }
+
+    // Mail DOCX templates → convert to HTML via mammoth
+    if (MAIL_TEMPLATE_FILES[doc.template] && typeof doc.params?.stagiaireIdx === "number") {
+      const s = allStagiaires[doc.params.stagiaireIdx];
+      if (s) {
+        try {
+          const blob = await processMailDocxTemplate(MAIL_TEMPLATE_FILES[doc.template], mergedOrganisme, selectedFormation, s);
+          const arrayBuffer = await blob.arrayBuffer();
+          const result = await mammoth.convertToHtml({ arrayBuffer });
+          setPreviewBlobUrl(null);
+          setPreviewContent(`<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><style>body{font-family:Arial,sans-serif;padding:24px;max-width:800px;margin:auto}table{border-collapse:collapse;width:100%}td,th{border:1px solid #ccc;padding:6px 10px}img{max-width:100%}</style></head><body>${result.value}</body></html>`);
+          setPreviewTitle(doc.nom);
+          setCurrentDocId(doc.id);
+          setEditing(false);
+          setGenerated((prev) => new Set(prev).add(doc.id));
+        } catch (e) {
+          toast.error("Impossible de prévisualiser ce fichier DOCX");
+        }
+      }
+      return;
+    }
+
+    // Standard HTML-generated documents
+    setPreviewBlobUrl(null);
     const isPerStagiaire = PER_STAGIAIRE_TEMPLATES.has(doc.template);
     const hasOwnStagiaire = typeof doc.params?.stagiaireIdx === "number";
     if (hasOwnStagiaire) {
-      // Doc already bound to a specific stagiaire — use params directly, pass all stagiaires
       const content = generateDocumentById(doc.id, doc.template, doc.params, organisme, formation, allStagiaires);
       const currentStagiaire = allStagiaires[doc.params!.stagiaireIdx as number] || null;
       setPreviewContent(content);
