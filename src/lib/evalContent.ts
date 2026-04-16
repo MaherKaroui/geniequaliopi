@@ -1833,6 +1833,24 @@ export function generateStagiaireOpenAnswers(
     break;
   }
 
+  if (!isDebut) {
+    const targetFullCount = Math.max(8, Math.min(10, Math.round(target)));
+    const prioritized = adjustedQualities
+      .map((quality, i) => ({
+        i,
+        priority: quality === 'full' ? 2 : quality === 'partial' ? 1 : 0,
+        seed: rawAnswers[i].seed,
+      }))
+      .sort((a, b) => (b.priority - a.priority) || (a.seed - b.seed));
+
+    const normalizedQualities: Array<'full' | 'partial' | 'wrong' | 'empty'> = rawAnswers.map(() => 'wrong');
+    prioritized.slice(0, targetFullCount).forEach(({ i }) => {
+      normalizedQualities[i] = 'full';
+    });
+
+    adjustedQualities.splice(0, adjustedQualities.length, ...normalizedQualities);
+  }
+
   // Detect if questions are in English
   const isEnglish = questions.some(q => /^(how|what|why|where|when|who|which|do |does |can |could |complete|count|put |name |write |ask |describe |translate |introduce)/i.test(q.question));
 
