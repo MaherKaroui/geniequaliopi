@@ -183,7 +183,19 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
     imageQuality = 0.95,
     pageYieldMs = 0,
   } = options;
-  const { cssText, bodyContent } = extractCssAndBody(htmlContent);
+
+  // Detect custom page size from meta tag, fallback to A4
+  const customSize = detectPageSizeMm(htmlContent);
+  const PAGE_W_MM = customSize?.wMm ?? A4_WIDTH_MM;
+  const PAGE_H_MM = customSize?.hMm ?? A4_HEIGHT_MM;
+  const PAGE_W_PX = Math.round(PAGE_W_MM * 96 / 25.4);
+  const PAGE_H_PX = Math.round(PAGE_H_MM * 96 / 25.4);
+
+  const { cssText: rawCss, bodyContent } = extractCssAndBody(htmlContent);
+  // Override page dimensions in injected CSS
+  const cssText = rawCss
+    .replace(new RegExp(`${A4_WIDTH_PX}px`, "g"), `${PAGE_W_PX}px`)
+    .replace(new RegExp(`${A4_HEIGHT_PX}px`, "g"), `${PAGE_H_PX}px`);
   await ensureGoogleFontsLoaded(htmlContent);
 
   const host = document.createElement("div");
@@ -191,7 +203,7 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
     "position:absolute",
     "left:-99999px",
     "top:-99999px",
-    `width:${A4_WIDTH_PX}px`,
+    `width:${PAGE_W_PX}px`,
     "z-index:-9999",
     "background:#fff",
     "pointer-events:none",
