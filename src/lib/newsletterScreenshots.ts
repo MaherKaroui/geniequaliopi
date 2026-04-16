@@ -357,9 +357,8 @@ function courseCertificateHtml(o: OrganismeInfo, f: FormationInfo): string {
   <div style="position:absolute;top:0;left:0;right:0;bottom:0;opacity:0.025;background:repeating-linear-gradient(135deg,#8888aa 0px,#8888aa 1px,transparent 1px,transparent 6px),repeating-linear-gradient(45deg,#8888aa 0px,#8888aa 1px,transparent 1px,transparent 6px)"></div>
 
   <!-- Right ribbon -->
-  <div style="position:absolute;top:0;right:0;width:230px;height:100%;background:linear-gradient(180deg,#eae5dc 0%,#e0dbd2 40%,#d8d3ca 100%);border-left:1px solid #c5bfb5;display:flex;flex-direction:column;align-items:center;padding-top:45px;z-index:1">
-    <div style="font-family:Arial,Helvetica,sans-serif;font-weight:800;font-size:17px;letter-spacing:4px;color:#2a2a2a;text-align:center;line-height:1.6">COURSE<br>CERTIFICATE</div>
-    <div style="margin-top:100px"><img src="/images/coursera-seal.png" alt="Coursera Seal" style="width:170px;height:170px;object-fit:contain" /></div>
+  <div style="position:absolute;top:0;right:0;width:230px;height:100%;z-index:1;overflow:hidden">
+    <img src="/images/coursera-ribbon.png" alt="Coursera Course Certificate" style="width:100%;height:100%;object-fit:cover;object-position:top center" />
   </div>
 
   <!-- Main content -->
