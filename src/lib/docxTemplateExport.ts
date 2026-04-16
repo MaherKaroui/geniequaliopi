@@ -3,7 +3,8 @@
  * Keeps the original design intact — only swaps placeholder text in the XML.
  */
 import JSZip from "jszip";
-import type { OrganismeInfo } from "@/types/qualiopi";
+import type { OrganismeInfo, StagiaireInfo, FormationInfo } from "@/types/qualiopi";
+import { subtractBusinessDays, formatDate } from "@/lib/docBuilder";
 
 /** Long French date format */
 function formatDateLong(dateStr: string): string {
@@ -13,29 +14,24 @@ function formatDateLong(dateStr: string): string {
   return d.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
 }
 
-/** Subtract N business days from a date string */
-function subtractBizDays(dateStr: string, n: number): string {
+/** Short French date "4 nov. 2025" */
+function formatDateShort(dateStr: string): string {
+  if (!dateStr) return "";
   const d = new Date(dateStr);
-  let count = 0;
-  while (count < n) {
-    d.setDate(d.getDate() - 1);
-    const day = d.getDay();
-    if (day !== 0 && day !== 6) count++;
-  }
-  return d.toISOString().slice(0, 10);
+  if (isNaN(d.getTime())) return dateStr;
+  return d.toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" });
 }
 
-/** Build the replacement map from organisme data */
+/** Build the replacement map from organisme data (for factures) */
 function buildReplacements(o: OrganismeInfo): Record<string, string> {
   const refDate = (o as any).dateMaj || new Date().toISOString().slice(0, 10);
-  // date_paiement and date_facture = date de mise à jour
   const dateMajFormatted = formatDateLong(refDate);
   const siren = o.siret ? o.siret.replace(/\s/g, "").slice(0, 9) : "";
   const annee = new Date(refDate).getFullYear().toString();
 
   // Google Workspace billing period: dateMaj + 1 month
   const ref = new Date(refDate);
-  const d = new Date(ref.getFullYear(), ref.getMonth() + 1, 1); // 1st of next month
+  const d = new Date(ref.getFullYear(), ref.getMonth() + 1, 1);
   const d1Start = new Date(d); d1Start.setDate(1);
   const d1End = new Date(d); d1End.setDate(15);
   const d2Start = new Date(d); d2Start.setDate(16);
@@ -62,29 +58,60 @@ function buildReplacements(o: OrganismeInfo): Record<string, string> {
   };
 }
 
+/** Build replacement map for mail templates (per-stagiaire) */
+function buildMailReplacements(
+  o: OrganismeInfo,
+  f: FormationInfo,
+  s: StagiaireInfo
+): Record<string, string> {
+  const refDate = (o as any).dateMaj || new Date().toISOString().slice(0, 10);
+  const dateDebut = s.dateDebutFormation || f.dateDebut || "";
+  const dateFin = s.dateFinFormation || f.dateFin || "";
+
+  // Dates d'envoi calculées à partir des dates de formation
+  const dateEnvoiePreInscrit = dateDebut ? formatDateShort(subtractBusinessDays(dateDebut, 20)) : formatDateShort(refDate);
+  const dateInscrit = dateDebut ? formatDateShort(subtractBusinessDays(dateDebut, 14)) : formatDateShort(refDate);
+  const dateEnvoieConvocation = dateDebut ? formatDateShort(subtractBusinessDays(dateDebut, 7)) : formatDateShort(refDate);
+  const dateEnvoie = dateDebut ? formatDateShort(dateDebut) : formatDateShort(refDate);
+  const dateEnvoieBilan = dateFin ? formatDateShort(dateFin) : formatDateShort(refDate);
+  // date_repond: stagiaire répond 2 jours après pré-inscription
+  const dateRepond = dateDebut ? formatDateShort(subtractBusinessDays(dateDebut, 18)) : formatDateShort(refDate);
+
+  return {
+    // Organisme
+    nom_organisme: o.nom || "",
+    mail_organisme: o.email || "",
+    "tél_organisme": o.telephone || "",
+    tel_organisme: o.telephone || "",
+    mail: o.email || "",
+    // Stagiaire
+    nom: s.nom || "",
+    prenom: s.prenom || "",
+    nom_stagiaire: s.nom || "",
+    prenom_stagiaire: s.prenom || "",
+    mail_stagiaire: s.email || "",
+    // Formation
+    formation_intitule: f.intitule || "",
+    date_debut: dateDebut ? formatDateLong(dateDebut) : "",
+    date_fin: dateFin ? formatDateLong(dateFin) : "",
+    // Dates d'envoi
+    date_envoie_pre_inscrit: dateEnvoiePreInscrit,
+    date_inscrit: dateInscrit,
+    date_envoie_convocation: dateEnvoieConvocation,
+    date_envoie: dateEnvoie,
+    date_envoie_blian: dateEnvoieBilan,
+    date_repond: dateRepond,
+  };
+}
+
 /**
- * Fetch a .docx template, replace all {{placeholders}}, return a Blob.
+ * Replace placeholders in a docx ZIP and return blob.
  */
-export async function processDocxTemplate(
-  templateUrl: string,
-  organisme: OrganismeInfo
-): Promise<Blob> {
-  const resp = await fetch(templateUrl);
-  if (!resp.ok) throw new Error(`Template introuvable: ${templateUrl}`);
-  const arrayBuf = await resp.arrayBuffer();
-
-  const zip = await JSZip.loadAsync(arrayBuf);
-  const replacements = buildReplacements(organisme);
-
-  // XML files that may contain placeholders
+async function replaceInZip(zip: JSZip, replacements: Record<string, string>): Promise<Blob> {
   const xmlPaths = [
     "word/document.xml",
-    "word/header1.xml",
-    "word/header2.xml",
-    "word/header3.xml",
-    "word/footer1.xml",
-    "word/footer2.xml",
-    "word/footer3.xml",
+    "word/header1.xml", "word/header2.xml", "word/header3.xml",
+    "word/footer1.xml", "word/footer2.xml", "word/footer3.xml",
   ];
 
   for (const path of xmlPaths) {
@@ -101,37 +128,58 @@ export async function processDocxTemplate(
         changed = true;
       }
 
-      // Handle placeholders split across XML tags (e.g. <w:t>{{</w:t><w:t>mail}}</w:t>)
       const splitPattern = buildSplitRegex(key);
       if (splitPattern && splitPattern.test(xml)) {
-        xml = xml.replace(splitPattern, (_match) => {
+        xml = xml.replace(splitPattern, () => {
           changed = true;
-          // Replace the entire matched section with just the first <w:t> containing the value
           return `<w:t xml:space="preserve">${escapeXml(val)}</w:t>`;
         });
       }
     }
 
-    if (changed) {
-      zip.file(path, xml);
-    }
+    if (changed) zip.file(path, xml);
   }
 
-  return await zip.generateAsync({ type: "blob", mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
+  return zip.generateAsync({
+    type: "blob",
+    mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  });
+}
+
+/**
+ * Fetch a .docx template, replace all {{placeholders}} with organisme data, return a Blob.
+ */
+export async function processDocxTemplate(
+  templateUrl: string,
+  organisme: OrganismeInfo
+): Promise<Blob> {
+  const resp = await fetch(templateUrl);
+  if (!resp.ok) throw new Error(`Template introuvable: ${templateUrl}`);
+  const zip = await JSZip.loadAsync(await resp.arrayBuffer());
+  return replaceInZip(zip, buildReplacements(organisme));
+}
+
+/**
+ * Fetch a mail .docx template, replace placeholders with organisme + formation + stagiaire data.
+ */
+export async function processMailDocxTemplate(
+  templateUrl: string,
+  organisme: OrganismeInfo,
+  formation: FormationInfo,
+  stagiaire: StagiaireInfo
+): Promise<Blob> {
+  const resp = await fetch(templateUrl);
+  if (!resp.ok) throw new Error(`Template introuvable: ${templateUrl}`);
+  const zip = await JSZip.loadAsync(await resp.arrayBuffer());
+  return replaceInZip(zip, buildMailReplacements(organisme, formation, stagiaire));
 }
 
 function escapeXml(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&apos;");
 }
 
-/**
- * Build a regex that matches a placeholder potentially split across multiple <w:t> elements.
- * E.g. {{mail}} might appear as: <w:t>{{</w:t></w:r><w:r><w:t>mail}}</w:t>
- */
 function buildSplitRegex(key: string): RegExp | null {
-  // Build pattern: {{ possibly separated from key by XML tags, then }}
   const chars = `\\{\\{${key.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')}\\}\\}`;
-  // Insert optional XML noise between each character
   const xmlNoise = "(?:</w:t>(?:<[^>]*>)*<w:t[^>]*>)?";
   const pattern = chars.split("").join(xmlNoise);
   try {
@@ -141,10 +189,19 @@ function buildSplitRegex(key: string): RegExp | null {
   }
 }
 
-/** Template file mapping */
+/** Template file mapping — factures IND 17 */
 export const DOCX_TEMPLATE_FILES: Record<string, string> = {
   facture_pack_office_docx: "/templates/factures/Facture_pack_office.docx",
   facture_google_workspace_docx: "/templates/factures/Facture google.docx",
   facture_make_docx: "/templates/factures/FACTURE MAKE.docx",
   facture_genspark_docx: "/templates/factures/FACTURE GENSPARK.docx",
+};
+
+/** Template file mapping — mails (per-stagiaire) */
+export const MAIL_TEMPLATE_FILES: Record<string, string> = {
+  mail_pre_inscription: "/templates/mails/mail_pre_inscription.docx",
+  mail_inscription: "/templates/mails/mail_inscription.docx",
+  mail_convocation: "/templates/mails/mail_convocation.docx",
+  mail_envoie_sc_ressources: "/templates/mails/mail_envoie_sc_ressources.docx",
+  mail_fin_formation: "/templates/mails/mail_fin_formation.docx",
 };
