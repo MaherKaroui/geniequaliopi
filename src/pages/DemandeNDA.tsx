@@ -308,12 +308,15 @@ const DemandeNDA = () => {
         }
         const html = generateDocumentHTML(doc.id, organisme, formation, stagiaires, cvData, cvDesign);
         if (html) {
+          const wrappedHtml = doc.id === "cv"
+            ? `<div style="width:794px;margin:0;padding:0;background:#fff;"><div class="pdf-single-block">${html}</div></div>`
+            : html;
           if (exportFormat === "pdf") {
-            const blob = await htmlToPdfBlob(html);
+            const blob = await htmlToPdfBlob(wrappedHtml);
             zip.file(`${doc.label}.pdf`, blob);
           } else {
             const { htmlToWordBlob } = await import("@/lib/wordExport");
-            const blob = await htmlToWordBlob(html);
+            const blob = await htmlToWordBlob(wrappedHtml);
             const ext = blob.type.includes("docx") ? "docx" : "doc";
             zip.file(`${doc.label}.${ext}`, blob);
           }
