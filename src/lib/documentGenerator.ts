@@ -8605,7 +8605,7 @@ function genContratFormationPro(o: OrganismeInfo, f: FormationInfo, stagiaires: 
     { heading: "Entre les parties", content: `<p><strong>L'organisme :</strong> ${o.nom}, ${o.adresse}, ${o.codePostal} ${o.ville}<br>SIRET : ${o.siret}${o.nda ? ` – NDA : ${o.nda}` : ""}<br>Représenté par : ${o.dirigeant}</p><p><strong>Le stagiaire :</strong> ${s.prenom} ${s.nom}<br>Email : ${s.email}</p>` },
     { heading: "Article 1 – Objet", content: `<p>Réalisation de l'action de formation « ${f.intitule} ».</p>` },
     { heading: "Article 2 – Caractéristiques", content: `<p><strong>Durée :</strong> ${f.duree}<br><strong>Dates :</strong> Du ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)}<br><strong>Modalité :</strong> ${f.modalites}<br><strong>Lieu :</strong> ${f.lieu}</p>` },
-    { heading: "Article 3 – Prix", content: `<p>Prix : ${f.tarif}. TVA non applicable (art. 261-4-4° du CGI).</p>` },
+    { heading: "Article 3 – Prix et conditions de paiement", content: buildEcheancierPaiement(f) },
     { heading: "Article 4 – Rétractation", content: "<p>Délai de rétractation de 10 jours à compter de la signature.</p>" },
   ], signatures: { type: "2", labels: ["Pour l'organisme", "Le Stagiaire"], names: [o.dirigeant, `${s.prenom} ${s.nom}`] } });
 }
