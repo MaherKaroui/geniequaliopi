@@ -3,7 +3,9 @@
  * Keeps the original design intact — only swaps placeholder text in the XML.
  */
 import JSZip from "jszip";
+import mammoth from "mammoth";
 import type { OrganismeInfo } from "@/types/qualiopi";
+import { htmlToPdfBlob } from "@/lib/pdfExport";
 
 /** Long French date format */
 function formatDateLong(dateStr: string): string {
@@ -28,9 +30,10 @@ function subtractBizDays(dateStr: string, n: number): string {
 /** Build the replacement map from organisme data */
 function buildReplacements(o: OrganismeInfo): Record<string, string> {
   const refDate = (o as any).dateMaj || new Date().toISOString().slice(0, 10);
-  const datePaiement = formatDateLong(subtractBizDays(refDate, 30));
-  const dateFacture = formatDateLong(subtractBizDays(refDate, 45));
+  // date_paiement and date_facture = date de mise à jour
+  const dateMajFormatted = formatDateLong(refDate);
   const siren = o.siret ? o.siret.replace(/\s/g, "").slice(0, 9) : "";
+  const annee = new Date(refDate).getFullYear().toString();
 
   // Google Workspace billing period
   const d = new Date(subtractBizDays(refDate, 60));
@@ -48,8 +51,9 @@ function buildReplacements(o: OrganismeInfo): Record<string, string> {
     president: o.dirigeant || "",
     siren,
     siret: o.siret || "",
-    date_facture: dateFacture,
-    date_paiement: datePaiement,
+    date_facture: dateMajFormatted,
+    date_paiement: dateMajFormatted,
+    "année de formtion": annee,
     datedebutdefacture: d1Start.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" }),
     dateFindefacture: d2End.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" }),
     "mois1-jours1": fmt(d1Start),
@@ -145,3 +149,22 @@ export const DOCX_TEMPLATE_FILES: Record<string, string> = {
   facture_make_docx: "/templates/factures/FACTURE MAKE.docx",
   facture_genspark_docx: "/templates/factures/FACTURE GENSPARK.docx",
 };
+
+/**
+ * Process a .docx template and convert the result to PDF.
+ */
+export async function processDocxTemplateToPdf(
+  templateUrl: string,
+  organisme: OrganismeInfo
+): Promise<Blob> {
+  const docxBlob = await processDocxTemplate(templateUrl, organisme);
+  const arrayBuffer = await docxBlob.arrayBuffer();
+  const result = await mammoth.convertToHtml({ arrayBuffer });
+  const html = `<html><head><style>
+    body { font-family: Arial, sans-serif; font-size: 11pt; margin: 40px; }
+    table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+    td, th { border: 1px solid #ccc; padding: 6px 8px; }
+    p { margin: 4px 0; }
+  </style></head><body>${result.value}</body></html>`;
+  return htmlToPdfBlob(html);
+}
