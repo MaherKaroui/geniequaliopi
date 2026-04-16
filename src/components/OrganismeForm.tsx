@@ -156,22 +156,30 @@ const OrganismeForm = ({ data, onChange, hideFields = [] }: OrganismeFormProps) 
           <Label htmlFor="poleAdministratif">Pôle Administratif</Label>
           <Input id="poleAdministratif" value={data.poleAdministratif} onChange={e => update('poleAdministratif', e.target.value)} placeholder="Nom du responsable administratif" />
         </div>
+        {!hidden('domainesFormation') && (
         <div className="md:col-span-2">
           <Label htmlFor="domainesFormation">Domaines de formation</Label>
           <Textarea id="domainesFormation" value={data.domainesFormation} onChange={e => update('domainesFormation', e.target.value)} placeholder="Ex: Management, RH, Digital, Langues..." rows={2} />
         </div>
+        )}
+        {!hidden('certifications') && (
         <div className="md:col-span-2">
           <Label htmlFor="certifications">Certifications déjà obtenues</Label>
           <Input id="certifications" value={data.certifications} onChange={e => update('certifications', e.target.value)} placeholder="Ex: Qualiopi (valide jusqu'au...)" />
         </div>
+        )}
+        {!hidden('outilsUtilises') && (
         <div className="md:col-span-2">
           <Label htmlFor="outilsUtilises">Outils utilisés</Label>
           <Textarea id="outilsUtilises" value={data.outilsUtilises} onChange={e => update('outilsUtilises', e.target.value)} placeholder="Ex: Zoom, Moodle, Google Drive..." rows={2} />
         </div>
+        )}
+        {!hidden('version') && (
         <div>
           <Label htmlFor="version">Version du dossier</Label>
           <Input id="version" value={data.version} onChange={e => update('version', e.target.value)} placeholder="1" />
         </div>
+        )}
         <div>
           <Label htmlFor="dateMaj">Date de mise à jour (MAJ)</Label>
           <Input id="dateMaj" type="date" value={data.dateMaj} onChange={e => update('dateMaj', e.target.value)} />
