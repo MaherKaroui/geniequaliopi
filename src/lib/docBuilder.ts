@@ -357,7 +357,7 @@ export function orgHeader(org: OrganismeInfo, subtitle?: string): string {
   const logoAlign = s.logoPosition === 'left' ? 'text-align:left' : s.logoPosition === 'right' ? 'text-align:right' : 'text-align:center';
   const logoHtml = org.logoUrl ? `<img src="${org.logoUrl}" alt="Logo ${org.nom}" style="max-height:80px;max-width:200px;object-fit:contain" />` : "";
   const subtitleHtml = subtitle ? `<div style="margin-top:8px;font-weight:600;font-size:${s.fontSize + 3}px;font-family:${s.headingFont}">${subtitle}</div>` : "";
-  const ndaLine = `Organisme de formation – NDA : ${org.nda} – SIRET : ${org.siret}`;
+  const ndaLine = org.nda ? `Organisme de formation – NDA : ${org.nda} – SIRET : ${org.siret}` : `Organisme de formation – SIRET : ${org.siret}`;
 
   if (hs === 'banner') {
     return `<div style="background:${s.primaryColor};color:white;padding:20px 24px;border-radius:8px;margin-bottom:24px;${logoAlign}">
@@ -406,7 +406,7 @@ export function orgHeader(org: OrganismeInfo, subtitle?: string): string {
         ${subtitleHtml}
       </div>
       <div style="flex-shrink:0;text-align:right;font-size:${s.fontSize - 2}px;color:#666;line-height:1.8">
-        <div>NDA : ${org.nda}</div>
+        ${org.nda ? `<div>NDA : ${org.nda}</div>` : ""}
         <div>SIRET : ${org.siret}</div>
         ${org.telephone?.trim() ? `<div>${org.telephone}</div>` : ""}
       </div>
