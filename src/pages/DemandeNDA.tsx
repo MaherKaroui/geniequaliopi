@@ -149,6 +149,8 @@ function generateDocumentHTML(docId: string, o: OrganismeInfo, f: FormationInfo,
       if (!hasCV) return null;
       return generateListeFormateursHTML(o, cvData, s);
     }
+    case "certificat_coursera":
+      return genCertificatCoursera(o, f);
     default: return null;
   }
 }
