@@ -1011,15 +1011,14 @@ export function buildEcheancierPaiement(
   const dateDebut = (s as any)?.dateDebutFormation || f.dateDebut || "";
   const dateFin = (s as any)?.dateFinFormation || f.dateFin || "";
 
-  // Calculate installment dates: evenly spaced between dateDebut and dateFin
+  // Calculate installment dates: spaced ~1 month apart starting from dateDebut
   const echeances: string[] = [];
-  if (dateDebut && dateFin) {
+  if (dateDebut) {
     const dStart = new Date(dateDebut);
-    const dEnd = new Date(dateFin);
-    if (!isNaN(dStart.getTime()) && !isNaN(dEnd.getTime())) {
-      const totalMs = dEnd.getTime() - dStart.getTime();
+    if (!isNaN(dStart.getTime())) {
       for (let i = 0; i < nbVersements; i++) {
-        const d = new Date(dStart.getTime() + (totalMs * (i + 1)) / (nbVersements + 1));
+        const d = new Date(dStart);
+        d.setMonth(d.getMonth() + i + 1);
         echeances.push(d.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" }));
       }
     }
