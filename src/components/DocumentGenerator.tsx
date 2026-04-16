@@ -526,6 +526,10 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
           const fileBlob = await resp.blob();
           addFileToZip(`${basePath}/${buildCatalogFileName(doc)}`, fileBlob);
           await updateProgress();
+        } else if (DOCX_TEMPLATE_FILES[doc.template]) {
+          const docxBlob = await processDocxTemplate(DOCX_TEMPLATE_FILES[doc.template], mergedOrganisme);
+          addFileToZip(`${basePath}/${buildCatalogFileName(doc, null, ".docx")}`, docxBlob);
+          await updateProgress();
         } else if (
           doc.template === "indicateurs_performance"
           || doc.template === "tableau_suivi_parcours_excel"
