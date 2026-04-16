@@ -352,13 +352,7 @@ function courseCertificateHtml(o: OrganismeInfo, f: FormationInfo): string {
   <div style="position:absolute;top:0;right:0;width:200px;height:100%;background:linear-gradient(180deg,#f5f0e8 0%,#ece6d8 100%);border-left:1px solid #ddd;display:flex;flex-direction:column;align-items:center;padding-top:40px">
     <div style="font-family:Arial,sans-serif;font-weight:700;font-size:14px;letter-spacing:2px;color:#333;text-align:center;line-height:1.4">COURSE<br>CERTIFICATE</div>
     <!-- Coursera seal -->
-    <div style="margin-top:60px;width:140px;height:140px;border-radius:50%;border:3px solid #333;display:flex;align-items:center;justify-content:center;position:relative">
-      <div style="width:120px;height:120px;border-radius:50%;border:2px dotted #555;display:flex;align-items:center;justify-content:center;flex-direction:column">
-        <div style="font-size:7px;letter-spacing:1.5px;color:#444;font-family:Arial,sans-serif;text-transform:uppercase;margin-bottom:2px">· Education for Everyone ·</div>
-        <div style="font-family:'Palatino Linotype',Georgia,serif;font-size:18px;font-weight:700;color:#222;letter-spacing:1px">coursera</div>
-        <div style="font-size:7px;letter-spacing:1px;color:#555;font-family:Arial,sans-serif;text-transform:uppercase;margin-top:2px">· Course Certificate ·</div>
-      </div>
-    </div>
+    <div style="margin-top:60px"><img src="/images/coursera-seal.png" alt="Coursera Seal" style="width:140px;height:140px;object-fit:contain" /></div>
     <!-- Hexagon watermark -->
     <div style="margin-top:40px;width:80px;height:90px;opacity:0.08">
       <svg viewBox="0 0 80 90" xmlns="http://www.w3.org/2000/svg"><polygon points="40,0 80,22 80,68 40,90 0,68 0,22" fill="#333"/></svg>
