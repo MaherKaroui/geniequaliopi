@@ -10,11 +10,12 @@ import OrganismeForm from "@/components/OrganismeForm";
 import FormationForm from "@/components/FormationForm";
 import StagiairesForm from "@/components/StagiairesForm";
 import StepIndicator from "@/components/StepIndicator";
+import CVGeneratorEmbed from "@/components/CVGeneratorEmbed";
 import { genContratFormationParticulier, genDevis } from "@/lib/templatesAF";
 import { genReglement_V2 } from "@/lib/generatorsV2";
 import { generateDocumentById } from "@/lib/documentGenerator";
 import { htmlToPdfBlob } from "@/lib/pdfExport";
-import { Textarea } from "@/components/ui/textarea";
+import { CVData, CVDesign, emptyCV, generateCVHTML } from "@/lib/cvGenerator";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -49,7 +50,7 @@ const emptyFormation: FormationInfo = {
   rythmeAlternance: "",
 };
 
-function generateDocumentHTML(docId: string, o: OrganismeInfo, f: FormationInfo, s: StagiaireInfo[], cvFormateur: string): string | null {
+function generateDocumentHTML(docId: string, o: OrganismeInfo, f: FormationInfo, s: StagiaireInfo[], cvData: CVData, cvDesign: CVDesign): string | null {
   switch (docId) {
     case "contrat":
       return genContratFormationParticulier(o, f, s);
@@ -62,9 +63,11 @@ function generateDocumentHTML(docId: string, o: OrganismeInfo, f: FormationInfo,
     case "logo":
       if (o.logoUrl) return `<div style="text-align:center;padding:60px;"><img src="${o.logoUrl}" style="max-width:400px;" /><p style="margin-top:20px;color:#666;">Logo de l'organisme</p></div>`;
       return null;
-    case "cv":
-      if (cvFormateur) return `<div style="font-family:Arial,sans-serif;max-width:800px;margin:0 auto;padding:40px;white-space:pre-wrap;">${cvFormateur}</div>`;
+    case "cv": {
+      const hasContent = cvData.prenom || cvData.nom || cvData.profil || cvData.experiences.some(e => e.poste);
+      if (hasContent) return generateCVHTML(cvData, cvDesign);
       return null;
+    }
     default: return null;
   }
 }
