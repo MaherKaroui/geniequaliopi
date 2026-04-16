@@ -18,7 +18,7 @@ export function genDevis(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiai
       [`Formation "${f.intitule}" – ${f.duree}`, `${nbParticipants}`, tarifUnit, `${nbParticipants} × ${tarifUnit}`],
     ]
   }, extraHtml: `<div class="section section-green"><p><strong>TVA non applicable, art. 261-4-4° du CGI</strong><br>Devis valable 30 jours.<br>Prise en charge OPCO possible sur demande.</p></div><p style="margin-top:20px"><em>Ce devis doit être retourné signé avec la mention « Bon pour accord » pour validation de l'inscription.</em></p>`,
-    signatures: { type: "2", labels: ["Pour l'organisme", "Bon pour accord – Le Client"], names: [o.dirigeant, ""] }
+    signatures: { type: "2", labels: ["Pour l'organisme", "Bon pour accord – Le Client"], names: [o.nom || o.dirigeant, `${stagiaires[0]?.prenom || ""} ${stagiaires[0]?.nom || ""}`.trim()], noOrgSignature: true, stagiaireSignatureUrl: stagiaires[0]?.signatureUrl }
   });
 }
 
