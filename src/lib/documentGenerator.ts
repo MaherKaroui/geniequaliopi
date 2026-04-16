@@ -11,7 +11,7 @@ import { DocEntry } from "@/types/qualiopi";
 import { genCGV_V2, genReglement_V2, genConvocation_V2, genContratFormationPro_V2, genProcedureAccueil_V2, genEmargementJour_V2, genProcedureAdaptation_V2, genTableauSuiviParcours_V2, genEvaluationFinaleStagiaire, genExercicesStagiaire, genGrilleAcquisitionStagiaire, genAttestationReussiteStagiaire, genExercicesPratiques_V2, genQCMFinal_V2, genGrilleAcquisition_V2, genCertificatReussite_V2, genConvocationStagiaire, genContratFormationProStagiaire, genCGVStagiaire, genReglementStagiaire, genConventionFormationTripartite } from "./generatorsV2";
 import { genFichePosteRole, genAutoEvaluationFormateurV2, genProcessusRecrutementV2, genPlanDevCompetencesExcel } from "./templatesCritere5";
 import { genVeilleReglementaireV2, genVeilleMetierV2, genVeilleTechnologiqueV2, genVeilleHandicap, genListePartenairesV2, genContratSousTraitanceV2, genCharteQualiteFormateurExterne } from "./templatesCritere6";
-import { genNewsletterScreenshots, genScreenshotFranceCompetences, genScreenshotDRIEETS, genScreenshotCentreInfoo, genScreenshotMicrosoft, genScreenshotOpenAI, genScreenshotAgefiph } from "./newsletterScreenshots";
+import { genNewsletterScreenshots, genScreenshotFranceCompetences, genScreenshotDRIEETS, genScreenshotCentreInfoo, genScreenshotMicrosoft, genScreenshotOpenAI, genScreenshotAgefiph, genCertificatCoursera } from "./newsletterScreenshots";
 import { genDeroulePedagogique } from "./templatesAF";
 import { getRNCPByCode } from "./rncpData";
 import { generateExcelSuiviInscriptions, generateExcelSuiviParcoursBeneficiairesCFA, generateExcelSuiviPublicBeneficiaire, generateExcelSuiviPFMP, generateExcelOutilsSuiviAlternance } from "./xlsxGenerator";
@@ -242,6 +242,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "screenshot_microsoft": return genScreenshotMicrosoft(o, f);
     case "screenshot_openai": return genScreenshotOpenAI(o, f);
     case "screenshot_agefiph": return genScreenshotAgefiph(o, f);
+    case "certificat_coursera": return genCertificatCoursera(o, f);
     case "fiche_innovation": return genFicheInnovation(o, params?.sujet ?? "");
     case "benchmark_outils": return genBenchmark(o);
     case "analyse_sectorielle": return genAnalyseSectorielle(o, params?.secteur ?? "");
