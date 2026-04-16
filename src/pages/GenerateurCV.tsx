@@ -5,9 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChevronLeft, Download, Plus, Trash2, Eye, Sparkles, Loader2 } from "lucide-react";
+import { ChevronLeft, Download, Plus, Trash2, Eye, Sparkles, Loader2, FileText } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { htmlToPdfBlob } from "@/lib/pdfExport";
 
 // ===== CV Data Types =====
 interface CVExperience {
@@ -237,11 +238,30 @@ const GenerateurCV = () => {
     update(field, arr as any);
   };
 
-  const handleDownload = async () => {
+  const handleDownloadDoc = async () => {
     const html = generateCVHTML(cv, selectedDesign);
     const { downloadAsWord } = await import("@/lib/wordExport");
     await downloadAsWord(html, `CV_${cv.prenom}_${cv.nom || "Formateur"}`);
-    toast.success("CV téléchargé !");
+    toast.success("CV téléchargé en DOC !");
+  };
+
+  const handleDownloadPdf = async () => {
+    const html = generateCVHTML(cv, selectedDesign);
+    try {
+      const blob = await htmlToPdfBlob(html);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `CV_${cv.prenom}_${cv.nom || "Formateur"}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toast.success("CV téléchargé en PDF !");
+    } catch (e) {
+      console.error(e);
+      toast.error("Erreur lors de la génération PDF");
+    }
   };
 
   const handleAIGenerate = async () => {
@@ -278,9 +298,14 @@ const GenerateurCV = () => {
             </Button>
             <span className="font-bold text-lg">Générateur de CV Formateur</span>
           </div>
-          <Button onClick={handleDownload} className="gap-2 bg-gradient-hero border-0 text-primary-foreground">
-            <Download className="w-4 h-4" /> Télécharger DOC
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button onClick={handleDownloadPdf} className="gap-2 bg-gradient-hero border-0 text-primary-foreground">
+              <FileText className="w-4 h-4" /> PDF
+            </Button>
+            <Button onClick={handleDownloadDoc} variant="outline" className="gap-2">
+              <Download className="w-4 h-4" /> DOC
+            </Button>
+          </div>
         </div>
       </header>
 
