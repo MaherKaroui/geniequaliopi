@@ -16,9 +16,6 @@ export function genDevis(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiai
     headers: ["Désignation", "Quantité", "Prix unitaire HT", "Total HT"],
     rows: [
       [`Formation "${f.intitule}" – ${f.duree}`, `${nbParticipants}`, tarifUnit, `${nbParticipants} × ${tarifUnit}`],
-      ["Supports pédagogiques", `${nbParticipants}`, "Inclus", "Inclus"],
-      ["Accès plateforme e-learning (6 mois)", `${nbParticipants}`, "Inclus", "Inclus"],
-      ["Évaluation et certification", `${nbParticipants}`, "Inclus", "Inclus"],
     ]
   }, extraHtml: `<div class="section section-green"><p><strong>TVA non applicable, art. 261-4-4° du CGI</strong><br>Devis valable 30 jours.<br>Prise en charge OPCO possible sur demande.</p></div><p style="margin-top:20px"><em>Ce devis doit être retourné signé avec la mention « Bon pour accord » pour validation de l'inscription.</em></p>`,
     signatures: { type: "2", labels: ["Pour l'organisme", "Bon pour accord – Le Client"], names: [o.dirigeant, ""] }
