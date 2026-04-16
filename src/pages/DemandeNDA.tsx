@@ -273,15 +273,20 @@ const DemandeNDA = () => {
     const label = NDA_DOCUMENTS.find(d => d.id === docId)?.label || docId;
     const filename = `${label} - ${organisme.nom || "Organisme"}`;
 
+    // CV needs special wrapping to preserve flex/sidebar layout in PDF
+    const wrappedHtml = docId === "cv"
+      ? `<div style="width:794px;margin:0;padding:0;background:#fff;"><div class="pdf-single-block">${html}</div></div>`
+      : html;
+
     if (exportFormat === "pdf") {
-      const blob = await htmlToPdfBlob(html);
+      const blob = await htmlToPdfBlob(wrappedHtml);
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url; a.download = `${filename}.pdf`; a.click();
       URL.revokeObjectURL(url);
     } else {
       const { downloadAsWord } = await import("@/lib/wordExport");
-      await downloadAsWord(html, filename);
+      await downloadAsWord(wrappedHtml, filename);
     }
     toast.success(`${label} téléchargé !`);
   };
@@ -303,12 +308,15 @@ const DemandeNDA = () => {
         }
         const html = generateDocumentHTML(doc.id, organisme, formation, stagiaires, cvData, cvDesign);
         if (html) {
+          const wrappedHtml = doc.id === "cv"
+            ? `<div style="width:794px;margin:0;padding:0;background:#fff;"><div class="pdf-single-block">${html}</div></div>`
+            : html;
           if (exportFormat === "pdf") {
-            const blob = await htmlToPdfBlob(html);
+            const blob = await htmlToPdfBlob(wrappedHtml);
             zip.file(`${doc.label}.pdf`, blob);
           } else {
             const { htmlToWordBlob } = await import("@/lib/wordExport");
-            const blob = await htmlToWordBlob(html);
+            const blob = await htmlToWordBlob(wrappedHtml);
             const ext = blob.type.includes("docx") ? "docx" : "doc";
             zip.file(`${doc.label}.${ext}`, blob);
           }
