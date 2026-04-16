@@ -15,7 +15,7 @@ import DocStyleConfigPanel from "./DocStyleConfigPanel";
 import { downloadAsWord, htmlToWordBlob } from "@/lib/wordExport";
 import { generateExcelTableauBordPerformance, generateExcelTableauSuiviParcours, generateExcelIndicateursPrevisionnelsVAE, excelToBlob } from "@/lib/xlsxGenerator";
 import { downloadAsPdf, htmlToPdfBlob } from "@/lib/pdfExport";
-import { processDocxTemplate, DOCX_TEMPLATE_FILES } from "@/lib/docxTemplateExport";
+import { processDocxTemplate, processMailDocxTemplate, DOCX_TEMPLATE_FILES, MAIL_TEMPLATE_FILES } from "@/lib/docxTemplateExport";
 import { auditImportedFolder, ImportAuditResult } from "@/lib/importInspector";
 import {
   buildDocumentFileName,
@@ -242,10 +242,20 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
       return;
     }
 
-    // Handle .docx template files (factures IND 17) → PDF
+    // Handle .docx template files (factures IND 17)
     if (DOCX_TEMPLATE_FILES[doc.template]) {
       const blob = await processDocxTemplate(DOCX_TEMPLATE_FILES[doc.template], mergedOrganisme);
       saveAs(blob, buildCatalogFileName(doc, undefined, ".docx"));
+      return;
+    }
+
+    // Handle mail .docx templates (per-stagiaire)
+    if (MAIL_TEMPLATE_FILES[doc.template] && typeof doc.params?.stagiaireIdx === "number") {
+      const s = allStagiaires[doc.params.stagiaireIdx];
+      if (s) {
+        const blob = await processMailDocxTemplate(MAIL_TEMPLATE_FILES[doc.template], mergedOrganisme, selectedFormation, s);
+        saveAs(blob, buildCatalogFileName(doc, s, ".docx"));
+      }
       return;
     }
 
@@ -527,8 +537,15 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
           addFileToZip(`${basePath}/${buildCatalogFileName(doc)}`, fileBlob);
           await updateProgress();
         } else if (DOCX_TEMPLATE_FILES[doc.template]) {
-          const pdfBlob = await processDocxTemplate(DOCX_TEMPLATE_FILES[doc.template], mergedOrganisme);
-          addFileToZip(`${basePath}/${buildCatalogFileName(doc, null, ".docx")}`, pdfBlob);
+          const docxBlob = await processDocxTemplate(DOCX_TEMPLATE_FILES[doc.template], mergedOrganisme);
+          addFileToZip(`${basePath}/${buildCatalogFileName(doc, null, ".docx")}`, docxBlob);
+          await updateProgress();
+        } else if (MAIL_TEMPLATE_FILES[doc.template] && typeof doc.params?.stagiaireIdx === "number") {
+          const s = allStagiaires[doc.params.stagiaireIdx];
+          if (s) {
+            const mailBlob = await processMailDocxTemplate(MAIL_TEMPLATE_FILES[doc.template], mergedOrganisme, selectedFormation, s);
+            addFileToZip(`${basePath}/${buildCatalogFileName(doc, s, ".docx")}`, mailBlob);
+          }
           await updateProgress();
         } else if (
           doc.template === "indicateurs_performance"
@@ -659,8 +676,15 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
           zip.file(`${basePath}/${buildCatalogFileName(doc)}`, await resp.blob());
           await updateProgress();
         } else if (DOCX_TEMPLATE_FILES[doc.template]) {
-          const pdfBlob = await processDocxTemplate(DOCX_TEMPLATE_FILES[doc.template], mergedOrganisme);
-          zip.file(`${basePath}/${buildCatalogFileName(doc, null, ".docx")}`, pdfBlob);
+          const docxBlob = await processDocxTemplate(DOCX_TEMPLATE_FILES[doc.template], mergedOrganisme);
+          zip.file(`${basePath}/${buildCatalogFileName(doc, null, ".docx")}`, docxBlob);
+          await updateProgress();
+        } else if (MAIL_TEMPLATE_FILES[doc.template] && typeof doc.params?.stagiaireIdx === "number") {
+          const s = allStagiaires[doc.params.stagiaireIdx];
+          if (s) {
+            const mailBlob = await processMailDocxTemplate(MAIL_TEMPLATE_FILES[doc.template], mergedOrganisme, selectedFormation, s);
+            zip.file(`${basePath}/${buildCatalogFileName(doc, s, ".docx")}`, mailBlob);
+          }
           await updateProgress();
         } else if (["indicateurs_performance", "tableau_suivi_parcours_excel", "plan_dev_competences_excel", "tableau_amelioration_continue_excel", "suivi_dysfonctionnements_excel", "relances_appreciations_excel", "vae_indicateurs_previsionnels"].includes(doc.template)) {
           const excelContent = doc.template === "indicateurs_performance"
@@ -778,8 +802,15 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
           zip.file(`${basePath}/${buildCatalogFileName(doc)}`, await resp.blob());
           await updateProgress();
         } else if (DOCX_TEMPLATE_FILES[doc.template]) {
-          const pdfBlob = await processDocxTemplate(DOCX_TEMPLATE_FILES[doc.template], mergedOrganisme);
-          zip.file(`${basePath}/${buildCatalogFileName(doc, null, ".docx")}`, pdfBlob);
+          const docxBlob = await processDocxTemplate(DOCX_TEMPLATE_FILES[doc.template], mergedOrganisme);
+          zip.file(`${basePath}/${buildCatalogFileName(doc, null, ".docx")}`, docxBlob);
+          await updateProgress();
+        } else if (MAIL_TEMPLATE_FILES[doc.template] && typeof doc.params?.stagiaireIdx === "number") {
+          const s = allStagiaires[doc.params.stagiaireIdx];
+          if (s) {
+            const mailBlob = await processMailDocxTemplate(MAIL_TEMPLATE_FILES[doc.template], mergedOrganisme, selectedFormation, s);
+            zip.file(`MAIL/${buildCatalogFileName(doc, s, ".docx")}`, mailBlob);
+          }
           await updateProgress();
         } else if (["indicateurs_performance", "tableau_suivi_parcours_excel", "plan_dev_competences_excel", "tableau_amelioration_continue_excel", "suivi_dysfonctionnements_excel", "relances_appreciations_excel", "vae_indicateurs_previsionnels", "decoupage_formation_cfa_excel", "matrice_competences_excel", "suivi_chiffre_formation_excel"].includes(doc.template)) {
           const excelContent = doc.template === "indicateurs_performance"
@@ -1163,6 +1194,80 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
           })}
         </div>
       </div>
+
+      {/* === MAIL SECTION (outside critères) === */}
+      {(() => {
+        const mailDocs = catalog.filter((doc) => doc.critere === 0 && MAIL_TEMPLATE_FILES[doc.template]);
+        if (mailDocs.length === 0) return null;
+        const isMailExpanded = expandedCriteres.has(99);
+        const mailGenerated = mailDocs.filter((doc) => generated.has(doc.id)).length;
+
+        return (
+          <div className="bg-card border rounded-xl overflow-hidden shadow-card">
+            <div className="flex items-center">
+              <button
+                onClick={() => toggleCritere(99)}
+                className="flex-1 p-3 flex items-center gap-3 hover:bg-secondary/50 transition-colors text-left"
+              >
+                {isMailExpanded ? <ChevronDown className="w-4 h-4 text-primary shrink-0" /> : <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />}
+                <span className="text-sm font-semibold">📧 MAIL – Mails d'envoi</span>
+                <span className="text-xs text-muted-foreground ml-2">
+                  ({mailDocs.length} docs, {mailGenerated} générés)
+                </span>
+              </button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="mr-2 text-xs gap-1 shrink-0"
+                disabled={generating}
+                onClick={async (e) => {
+                  e.stopPropagation();
+                  setGenerating(true);
+                  try {
+                    const zip = new JSZip();
+                    for (const doc of mailDocs) {
+                      if (MAIL_TEMPLATE_FILES[doc.template] && typeof doc.params?.stagiaireIdx === "number") {
+                        const s = allStagiaires[doc.params.stagiaireIdx];
+                        if (s) {
+                          const blob = await processMailDocxTemplate(MAIL_TEMPLATE_FILES[doc.template], mergedOrganisme, selectedFormation, s);
+                          zip.file(buildCatalogFileName(doc, s, ".docx"), blob);
+                        }
+                      }
+                    }
+                    const blob = await zip.generateAsync({ type: "blob" });
+                    saveAs(blob, buildGenericFileName("MAIL", mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, ".zip"));
+                    toast.success("ZIP MAIL téléchargé.");
+                  } catch (err) {
+                    console.error(err);
+                    toast.error("Erreur pendant la génération du ZIP MAIL.");
+                  } finally {
+                    setGenerating(false);
+                  }
+                }}
+              >
+                <Archive className="w-3 h-3" /> ZIP
+              </Button>
+            </div>
+
+            {isMailExpanded && (
+              <div className="border-t px-3 pb-3 space-y-0.5">
+                {mailDocs.map((doc) => (
+                  <div key={doc.id} className={`flex items-center gap-2 p-1.5 rounded-md text-xs hover:bg-secondary/30 transition-colors ${generated.has(doc.id) ? "bg-accent/5" : ""}`}>
+                    <span className={`shrink-0 ${generated.has(doc.id) ? "text-accent font-bold" : "text-muted-foreground"}`}>
+                      {generated.has(doc.id) ? "✓" : "•"}
+                    </span>
+                    <span className="flex-1 truncate">{doc.nom}</span>
+                    <span title="1 fichier par stagiaire" className="text-xs text-primary shrink-0">👤</span>
+                    <button onClick={() => handleDownload(doc)} className="p-1 hover:bg-secondary rounded text-muted-foreground hover:text-foreground" title="Télécharger">
+                      DL
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      })()}
 
       {previewContent && (
         <div className="mt-6">

@@ -1035,5 +1035,18 @@ export function buildFullCatalog(
     add("vae_c7i32_plan_amelioration", "CT7 - IND 32 Plan d'amélioration continue VAE", 7, 32, "vae_plan_amelioration");
   }
 
+  // =============================================
+  // ===== MAIL — MAILS D'ENVOI (per stagiaire) =====
+  // =============================================
+  if (isAF) {
+    stagiaires.forEach((s, si) => {
+      add(`mail_pre_inscription_${si}`, `MAIL - PRÉ-INSCRIPTION – ${s.prenom} ${s.nom}`, 0, 0, "mail_pre_inscription", { stagiaireIdx: si });
+      add(`mail_inscription_${si}`, `MAIL - CONFIRMATION INSCRIPTION – ${s.prenom} ${s.nom}`, 0, 0, "mail_inscription", { stagiaireIdx: si });
+      add(`mail_convocation_${si}`, `MAIL - CONVOCATION – ${s.prenom} ${s.nom}`, 0, 0, "mail_convocation", { stagiaireIdx: si });
+      add(`mail_envoie_sc_${si}`, `MAIL - ENVOI SC ET RESSOURCES – ${s.prenom} ${s.nom}`, 0, 0, "mail_envoie_sc_ressources", { stagiaireIdx: si });
+      add(`mail_fin_formation_${si}`, `MAIL - BILAN À CHAUD – ${s.prenom} ${s.nom}`, 0, 0, "mail_fin_formation", { stagiaireIdx: si });
+    });
+  }
+
   return d;
 }
