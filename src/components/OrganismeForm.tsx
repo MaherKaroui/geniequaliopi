@@ -13,6 +13,7 @@ import LogoSignatureUpload from "./LogoSignatureUpload";
 interface OrganismeFormProps {
   data: OrganismeInfo;
   onChange: (data: OrganismeInfo) => void;
+  hideFields?: string[];
 }
 
 const OrganismeForm = ({ data, onChange }: OrganismeFormProps) => {
