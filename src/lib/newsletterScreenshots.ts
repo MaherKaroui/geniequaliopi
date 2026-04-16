@@ -332,65 +332,85 @@ export function genScreenshotAgefiph(o: OrganismeInfo, f: FormationInfo): string
 
 // ===== CERTIFICAT COURSERA / UCI =====
 
-function certificateMonthYear(f: FormationInfo): string {
+function certificateDateLong(f: FormationInfo): string {
   const base = f.dateDebut ? new Date(f.dateDebut) : new Date();
   const d = new Date(base);
   d.setMonth(d.getMonth() - 2);
-  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  return `${months[d.getMonth()]} ${d.getFullYear()}`;
+  const months = ["JANUARY","FEBRUARY","MARCH","APRIL","MAY","JUNE","JULY","AUGUST","SEPTEMBER","OCTOBER","NOVEMBER","DECEMBER"];
+  return `${months[d.getMonth()]} ${d.getDate() < 10 ? "0" : ""}${d.getDate()}, ${d.getFullYear()}`;
 }
 
 function courseCertificateHtml(o: OrganismeInfo, f: FormationInfo): string {
   const dirigeant = o.dirigeant || "Le Dirigeant";
-  const nameUpper = dirigeant.toUpperCase();
+  const nameParts = dirigeant.split(" ");
+  const displayName = nameParts.map(p => p.charAt(0).toUpperCase() + p.slice(1).toLowerCase()).join(" ");
   const formationTitle = f.intitule || "Formation professionnelle";
-  const monthYear = certificateMonthYear(f);
+  const certDate = certificateDateLong(f);
+  const verifyCode = Math.random().toString(36).substring(2, 14).toUpperCase();
 
   return `
-<div style="width:100%;max-width:780px;margin:20px auto;font-family:Georgia,'Times New Roman',serif;position:relative;background:#fff;border:1px solid #ddd;box-shadow:0 4px 20px rgba(0,0,0,0.1)">
+<div style="width:100%;max-width:820px;margin:20px auto;font-family:Georgia,'Times New Roman',serif;position:relative;background:#fff;border:2px solid #c8c0b4;box-shadow:0 4px 20px rgba(0,0,0,0.08)">
+  <!-- Decorative inner border -->
+  <div style="position:absolute;top:8px;left:8px;right:8px;bottom:8px;border:1px solid #d5cfc5;pointer-events:none"></div>
+  <!-- Subtle background pattern -->
+  <div style="position:absolute;top:0;left:0;right:0;bottom:0;opacity:0.03;background:repeating-linear-gradient(45deg,#666 0px,#666 1px,transparent 1px,transparent 8px)"></div>
+
   <!-- Right ribbon -->
-  <div style="position:absolute;top:0;right:0;width:200px;height:100%;background:linear-gradient(180deg,#f5f0e8 0%,#ece6d8 100%);border-left:1px solid #ddd;display:flex;flex-direction:column;align-items:center;padding-top:40px">
-    <div style="font-family:Arial,sans-serif;font-weight:700;font-size:14px;letter-spacing:2px;color:#333;text-align:center;line-height:1.4">COURSE<br>CERTIFICATE</div>
-    <!-- Coursera seal -->
-    <div style="margin-top:60px"><img src="/images/coursera-seal.png" alt="Coursera Seal" style="width:140px;height:140px;object-fit:contain" /></div>
-    <!-- Hexagon watermark -->
-    <div style="margin-top:40px;width:80px;height:90px;opacity:0.08">
-      <svg viewBox="0 0 80 90" xmlns="http://www.w3.org/2000/svg"><polygon points="40,0 80,22 80,68 40,90 0,68 0,22" fill="#333"/></svg>
-    </div>
+  <div style="position:absolute;top:0;right:0;width:220px;height:100%;background:linear-gradient(180deg,#e8e2d8 0%,#ddd7cd 50%,#d5cfc5 100%);border-left:1px solid #c8c0b4;display:flex;flex-direction:column;align-items:center;padding-top:50px;z-index:1">
+    <div style="font-family:Arial,Helvetica,sans-serif;font-weight:700;font-size:16px;letter-spacing:3px;color:#333;text-align:center;line-height:1.5">COURSE<br>CERTIFICATE</div>
+    <!-- Coursera seal image -->
+    <div style="margin-top:80px"><img src="/images/coursera-seal.png" alt="Coursera Seal" style="width:160px;height:160px;object-fit:contain" /></div>
   </div>
+
   <!-- Main content -->
-  <div style="padding:50px 60px 40px 50px;margin-right:200px">
-    <!-- UCI Header -->
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:40px">
-      <div style="font-family:Arial,Helvetica,sans-serif">
-        <span style="font-size:42px;font-weight:900;color:#555;letter-spacing:-1px">UCI</span>
-        <span style="font-size:22px;color:#333;margin-left:8px;font-weight:300">Division of<br><span style="margin-left:58px">Continuing Education</span></span>
+  <div style="padding:50px 60px 40px 55px;margin-right:220px;position:relative;z-index:1">
+    <!-- Duke University Logo -->
+    <div style="margin-bottom:50px">
+      <img src="/images/duke-logo.jpg" alt="Duke University" style="height:90px;object-fit:contain" />
+    </div>
+
+    <!-- Date -->
+    <div style="font-size:12px;color:#555;margin-bottom:18px;font-family:Arial,sans-serif;letter-spacing:1.5px">${certDate}</div>
+
+    <!-- Name -->
+    <div style="font-size:34px;font-weight:400;color:#111;margin-bottom:8px;letter-spacing:0.5px;line-height:1.2">${displayName}</div>
+
+    <!-- "has successfully completed" -->
+    <div style="font-size:12px;color:#888;margin-bottom:18px;font-family:Arial,sans-serif">has successfully completed</div>
+
+    <!-- Course title -->
+    <div style="font-size:18px;font-weight:700;color:#222;margin-bottom:12px;line-height:1.4;font-style:italic">${formationTitle}</div>
+
+    <!-- Disclaimer -->
+    <div style="font-size:11px;color:#777;margin-bottom:80px;line-height:1.7;max-width:440px;font-family:Arial,sans-serif">
+      an online non-credit course authorized by Duke University and offered through Coursera
+    </div>
+
+    <!-- Two signatures side by side -->
+    <div style="display:flex;gap:60px;margin-top:20px">
+      <div style="flex:1">
+        <div style="font-family:'Brush Script MT','Segoe Script',cursive;font-size:26px;color:#1a1a4e;margin-bottom:4px;transform:rotate(-2deg)">Dr. Jana Schaich Borg</div>
+        <div style="border-top:1px dotted #aaa;padding-top:6px">
+          <div style="font-size:11px;color:#555;font-family:Arial,sans-serif">Jana Schaich Borg</div>
+          <div style="font-size:10px;color:#777;font-family:Arial,sans-serif">Post-doctoral Fellow</div>
+          <div style="font-size:10px;color:#777;font-family:Arial,sans-serif">Psychiatry and Behavioral Sciences</div>
+        </div>
+      </div>
+      <div style="flex:1">
+        <div style="font-family:'Brush Script MT','Segoe Script',cursive;font-size:26px;color:#1a1a4e;margin-bottom:4px;transform:rotate(-1deg)">Daniel Egger</div>
+        <div style="border-top:1px dotted #aaa;padding-top:6px">
+          <div style="font-size:11px;color:#555;font-family:Arial,sans-serif">Daniel Egger</div>
+          <div style="font-size:10px;color:#777;font-family:Arial,sans-serif">Executive in Residence and Director,</div>
+          <div style="font-size:10px;color:#777;font-family:Arial,sans-serif">Center for Quantitative Modeling</div>
+          <div style="font-size:10px;color:#777;font-family:Arial,sans-serif">Pratt School of Engineering</div>
+        </div>
       </div>
     </div>
-    <!-- Date -->
-    <div style="font-size:13px;color:#666;margin-bottom:20px;font-family:Arial,sans-serif">${monthYear}</div>
-    <!-- Name -->
-    <div style="font-size:32px;font-weight:400;color:#111;margin-bottom:10px;letter-spacing:0.5px">${nameUpper}</div>
-    <!-- "a réussi" -->
-    <div style="font-size:13px;color:#888;font-style:italic;margin-bottom:15px">a réussi</div>
-    <!-- Course title -->
-    <div style="font-size:16px;color:#222;margin-bottom:15px;line-height:1.5">${formationTitle}</div>
-    <!-- Disclaimer -->
-    <div style="font-size:10px;color:#999;margin-bottom:60px;line-height:1.6;max-width:420px">
-      Cours en ligne sans crédit académique proposé par l'Université de Californie à Irvine via une plateforme intermédiaire.
-    </div>
-    <!-- Signature -->
-    <div style="margin-top:30px">
-      <div style="font-family:'Brush Script MT','Segoe Script',cursive;font-size:28px;color:#1a1a4e;margin-bottom:5px;transform:rotate(-2deg)">Roger D. Stone</div>
-      <div style="font-size:11px;color:#666;font-family:Arial,sans-serif">Instructor</div>
-      <div style="font-size:11px;color:#666;font-family:Arial,sans-serif">University of California Irvine</div>
-      <div style="font-size:11px;color:#666;font-family:Arial,sans-serif">Extension</div>
-    </div>
+
     <!-- Verify -->
-    <div style="margin-top:50px;text-align:right">
-      <div style="font-size:10px;color:#0066cc;font-family:Arial,sans-serif">Verify at</div>
-      <div style="font-size:9px;color:#0066cc;font-family:Arial,sans-serif;text-decoration:underline">coursera.org/verify/${Math.random().toString(36).substring(2, 14).toUpperCase()}</div>
-      <div style="font-size:8px;color:#999;font-family:Arial,sans-serif;margin-top:4px">Coursera a confirmé l'identité de cette personne et sa<br>participation au cours</div>
+    <div style="margin-top:40px;text-align:right">
+      <div style="font-size:11px;color:#444;font-family:Arial,sans-serif">Verify at coursera.org/verify/${verifyCode}</div>
+      <div style="font-size:9px;color:#888;font-family:Arial,sans-serif;margin-top:4px;font-style:italic">Coursera has confirmed the identity of this individual and<br>their participation in the course.</div>
     </div>
   </div>
 </div>`;
@@ -399,8 +419,8 @@ function courseCertificateHtml(o: OrganismeInfo, f: FormationInfo): string {
 export function genCertificatCoursera(o: OrganismeInfo, f: FormationInfo): string {
   return buildDocument({
     org: o,
-    title: "CERTIFICAT DE FORMATION – COURSERA / UCI",
-    sections: [{ heading: "", content: `<p>Certificat de réussite Coursera/UCI pour <strong>${o.dirigeant || "le dirigeant"}</strong> – formation « ${f.intitule || "Formation"} ».</p>` }],
+    title: "CERTIFICAT DE FORMATION – COURSERA / DUKE UNIVERSITY",
+    sections: [{ heading: "", content: `<p>Certificat de réussite Coursera / Duke University pour <strong>${o.dirigeant || "le dirigeant"}</strong> – formation « ${f.intitule || "Formation"} ».</p>` }],
     extraHtml: `<div style="box-shadow:0 2px 12px rgba(0,0,0,0.12);border-radius:8px;overflow:hidden">${courseCertificateHtml(o, f)}</div>`
   });
 }
