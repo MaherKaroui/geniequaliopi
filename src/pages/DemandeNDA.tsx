@@ -12,6 +12,7 @@ import StagiairesForm from "@/components/StagiairesForm";
 import StepIndicator from "@/components/StepIndicator";
 import CVGeneratorEmbed from "@/components/CVGeneratorEmbed";
 import { genContratFormationParticulier, genDevis, genFacture } from "@/lib/templatesAF";
+import { genCertificatCoursera } from "@/lib/newsletterScreenshots";
 import { isFormationTerminee } from "@/lib/docBuilder";
 import { genReglement_V2 } from "@/lib/generatorsV2";
 import { generateDocumentById } from "@/lib/documentGenerator";
@@ -36,6 +37,7 @@ const NDA_DOCUMENTS = [
   { id: "logo", label: "Logo de l'organisme", icon: "🖼️" },
   { id: "cv", label: "CV du Formateur", icon: "👤" },
   { id: "liste_formateurs", label: "Liste des Formateurs", icon: "👥" },
+  { id: "certificat_coursera", label: "Certificat Coursera / UCI", icon: "🎓" },
 ];
 
 const emptyOrganisme: OrganismeInfo = {
@@ -147,6 +149,8 @@ function generateDocumentHTML(docId: string, o: OrganismeInfo, f: FormationInfo,
       if (!hasCV) return null;
       return generateListeFormateursHTML(o, cvData, s);
     }
+    case "certificat_coursera":
+      return genCertificatCoursera(o, f);
     default: return null;
   }
 }
