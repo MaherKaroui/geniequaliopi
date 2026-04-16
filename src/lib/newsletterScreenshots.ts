@@ -349,12 +349,7 @@ function courseCertificateHtml(o: OrganismeInfo, f: FormationInfo): string {
   const verifyCode = Math.random().toString(36).substring(2, 14).toUpperCase();
 
   return `
-<div style="width:100%;max-width:860px;margin:20px auto;font-family:Georgia,'Times New Roman',serif;position:relative;background:#fff;border:1px solid #bbb;box-shadow:0 2px 10px rgba(0,0,0,0.06);aspect-ratio:1.29/1">
-  <!-- Outer decorative border -->
-  <div style="position:absolute;top:6px;left:6px;right:6px;bottom:6px;border:1px solid #ccc;pointer-events:none"></div>
-  <div style="position:absolute;top:12px;left:12px;right:12px;bottom:12px;border:1px solid #d8d2c8;pointer-events:none"></div>
-  <!-- Watermark pattern -->
-  <div style="position:absolute;top:0;left:0;right:0;bottom:0;opacity:0.025;background:repeating-linear-gradient(135deg,#8888aa 0px,#8888aa 1px,transparent 1px,transparent 6px),repeating-linear-gradient(45deg,#8888aa 0px,#8888aa 1px,transparent 1px,transparent 6px)"></div>
+<div style="width:100%;max-width:860px;margin:20px auto;font-family:Georgia,'Times New Roman',serif;position:relative;background:#fff;aspect-ratio:1.29/1;overflow:hidden">
 
   <!-- Right ribbon -->
   <div style="position:absolute;top:0;right:0;width:230px;height:100%;z-index:1;overflow:hidden">
