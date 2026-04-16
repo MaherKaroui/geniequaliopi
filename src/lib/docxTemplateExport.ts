@@ -189,9 +189,11 @@ function escapeXml(s: string): string {
 }
 
 function buildSplitRegex(key: string): RegExp | null {
-  const chars = `\\{\\{${key.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')}\\}\\}`;
-  const xmlNoise = "(?:</w:t>(?:<[^>]*>)*<w:t[^>]*>)?";
-  const pattern = chars.split("").join(xmlNoise);
+  const placeholder = `{{${key}}}`;
+  const xmlNoise = "(?:<[^>]+>)*";
+  const pattern = Array.from(placeholder)
+    .map((char) => char.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&"))
+    .join(xmlNoise);
   try {
     return new RegExp(pattern, "g");
   } catch {
