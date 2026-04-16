@@ -11,7 +11,8 @@ import FormationForm from "@/components/FormationForm";
 import StagiairesForm from "@/components/StagiairesForm";
 import StepIndicator from "@/components/StepIndicator";
 import CVGeneratorEmbed from "@/components/CVGeneratorEmbed";
-import { genContratFormationParticulier, genDevis } from "@/lib/templatesAF";
+import { genContratFormationParticulier, genDevis, genFacture } from "@/lib/templatesAF";
+import { isFormationTerminee } from "@/lib/docBuilder";
 import { genReglement_V2 } from "@/lib/generatorsV2";
 import { generateDocumentById } from "@/lib/documentGenerator";
 import { htmlToPdfBlob } from "@/lib/pdfExport";
@@ -31,7 +32,7 @@ const NDA_DOCUMENTS = [
   { id: "contrat", label: "Contrat de Formation", icon: "📄" },
   { id: "programme", label: "Programme de Formation", icon: "📋" },
   { id: "reglement", label: "Règlement Intérieur", icon: "📜" },
-  { id: "devis", label: "Devis", icon: "💰" },
+  { id: "devis_facture", label: "Devis / Facture", icon: "💰" },
   { id: "logo", label: "Logo de l'organisme", icon: "🖼️" },
   { id: "cv", label: "CV du Formateur", icon: "👤" },
   { id: "liste_formateurs", label: "Liste des Formateurs", icon: "👥" },
@@ -143,8 +144,8 @@ function generateDocumentHTML(docId: string, o: OrganismeInfo, f: FormationInfo,
       return generateDocumentById("programme_formation", "programme_formation", undefined, o, f, s) || null;
     case "reglement":
       return genReglement_V2(o, f, s);
-    case "devis":
-      return genDevis(o, f, s);
+    case "devis_facture":
+      return isFormationTerminee(f, s) ? genFacture(o, f, s) : genDevis(o, f, s);
     case "logo":
       if (o.logoUrl) return `<div style="text-align:center;padding:60px;"><img src="${o.logoUrl}" style="max-width:400px;" /><p style="margin-top:20px;color:#666;">Logo de l'organisme</p></div>`;
       return null;
@@ -445,13 +446,13 @@ const DemandeNDA = () => {
                 <CardContent className="space-y-3">
                   {NDA_DOCUMENTS.map(doc => {
                     const cvHasContent = cvData.prenom || cvData.nom || cvData.profil || cvData.experiences.some(e => e.poste);
-                    const ready = doc.id === "contrat" || doc.id === "programme" || doc.id === "reglement" || doc.id === "devis" || (doc.id === "logo" && !!organisme.logoUrl) || (doc.id === "cv" && !!cvHasContent);
+                    const ready = doc.id === "contrat" || doc.id === "programme" || doc.id === "reglement" || doc.id === "devis_facture" || (doc.id === "logo" && !!organisme.logoUrl) || (doc.id === "cv" && !!cvHasContent);
                     return (
                       <div key={doc.id} className="flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors">
                         <div className="flex items-center gap-3">
                           <span className="text-xl">{doc.icon}</span>
                           <div>
-                            <p className="font-medium text-sm">{doc.label}</p>
+                            <p className="font-medium text-sm">{doc.id === "devis_facture" ? (isFormationTerminee(formation, stagiaires) ? "Facture" : "Devis") : doc.label}</p>
                             <p className="text-xs text-muted-foreground">{ready ? "Prêt" : "À compléter"}</p>
                           </div>
                           {ready && <CheckCircle2 className="w-4 h-4 text-emerald-500" />}
