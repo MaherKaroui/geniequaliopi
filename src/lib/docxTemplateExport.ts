@@ -3,7 +3,9 @@
  * Keeps the original design intact — only swaps placeholder text in the XML.
  */
 import JSZip from "jszip";
+import mammoth from "mammoth";
 import type { OrganismeInfo } from "@/types/qualiopi";
+import { htmlToPdfBlob } from "@/lib/pdfExport";
 
 /** Long French date format */
 function formatDateLong(dateStr: string): string {
