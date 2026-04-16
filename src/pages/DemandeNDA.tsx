@@ -51,6 +51,82 @@ const emptyFormation: FormationInfo = {
   rythmeAlternance: "",
 };
 
+function generateListeFormateursHTML(o: OrganismeInfo, cv: CVData): string {
+  const fullName = `${cv.prenom} ${cv.nom}`.trim() || "Nom du formateur";
+  const exps = cv.experiences.filter(e => e.poste || e.entreprise);
+  const forms = cv.formations.filter(f => f.diplome || f.etablissement);
+  const today = new Date();
+  const dateStr = today.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
+
+  const expRows = exps.map(e =>
+    `<p style="margin:2px 0;"><strong>${e.poste || ""}</strong>${e.entreprise ? ` – ${e.entreprise}` : ""}${e.dateDebut ? ` (${e.dateDebut}${e.dateFin ? ` – ${e.dateFin}` : " – Présent"})` : ""}</p>${e.description ? `<p style="margin:0 0 6px 0;font-size:11px;color:#444;">${e.description}</p>` : ""}`
+  ).join("");
+
+  const formRows = forms.map(f =>
+    `<p style="margin:2px 0;">${f.diplome || ""}${f.etablissement ? ` – ${f.etablissement}` : ""}${f.annee ? ` (${f.annee})` : ""}</p>`
+  ).join("");
+
+  const certs = cv.certifications.filter(c => c.nom).map(c =>
+    `<p style="margin:2px 0;">${c.nom}${c.annee ? ` (${c.annee})` : ""}</p>`
+  ).join("");
+
+  return `<div style="font-family:Arial,sans-serif;max-width:800px;margin:0 auto;padding:30px;font-size:12px;line-height:1.5;">
+    <div style="text-align:center;margin-bottom:10px;">
+      ${o.logoUrl ? `<img src="${o.logoUrl}" style="max-height:60px;margin-bottom:8px;" />` : ""}
+      <p style="font-size:11px;color:#555;margin:2px 0;"><strong>${o.nom || ""}</strong></p>
+      <p style="font-size:10px;color:#666;margin:2px 0;">${o.adresse || ""} ${o.codePostal || ""} ${o.ville || ""}</p>
+      ${o.siret ? `<p style="font-size:10px;color:#666;margin:2px 0;">SIRET : ${o.siret}</p>` : ""}
+      ${o.email ? `<p style="font-size:10px;color:#666;margin:2px 0;">Mail : ${o.email}</p>` : ""}
+      ${o.dirigeant ? `<p style="font-size:10px;color:#666;margin:2px 0;">Dirigeant : ${o.dirigeant}</p>` : ""}
+    </div>
+
+    <h1 style="text-align:center;font-size:18px;margin:25px 0 15px 0;text-transform:uppercase;letter-spacing:1px;">Liste des Formateurs</h1>
+
+    <p style="font-size:11px;color:#444;margin-bottom:5px;">• INTERVENANT DANS L'ORGANISME DE FORMATION À LA DATE DE LA DÉCLARATION D'ACTIVITÉ</p>
+    <p style="font-size:11px;color:#444;margin-bottom:20px;">• Dénomination et adresse de l'organisme de formation : <strong>${o.nom || ""}</strong></p>
+
+    <h2 style="font-size:14px;border-bottom:2px solid #1e3a7b;padding-bottom:4px;margin-bottom:15px;">1. Formateurs employés ou associés</h2>
+
+    <table style="width:100%;border-collapse:collapse;margin-bottom:20px;">
+      <thead>
+        <tr style="background:#1e3a7b;color:#fff;">
+          <th style="padding:8px 10px;text-align:left;width:200px;border:1px solid #1e3a7b;">Nom et prénom</th>
+          <th style="padding:8px 10px;text-align:left;border:1px solid #1e3a7b;">${cv.titre || "Formateur Professionnel"}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="padding:8px 10px;border:1px solid #ddd;vertical-align:top;font-weight:bold;">${fullName}</td>
+          <td style="padding:8px 10px;border:1px solid #ddd;">
+            <p style="font-weight:bold;margin:0 0 8px 0;text-decoration:underline;">Expérience professionnelle</p>
+            ${expRows || "<p style='color:#999;'>—</p>"}
+            <p style="font-weight:bold;margin:15px 0 8px 0;text-decoration:underline;">Parcours académique</p>
+            ${formRows || "<p style='color:#999;'>—</p>"}
+            ${certs ? `<p style="font-weight:bold;margin:15px 0 8px 0;text-decoration:underline;">Certifications</p>${certs}` : ""}
+            ${cv.experiencePedagogique ? `<p style="font-weight:bold;margin:15px 0 8px 0;text-decoration:underline;">Expérience pédagogique</p><p style="font-size:11px;">${cv.experiencePedagogique}</p>` : ""}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p style="margin-top:30px;font-size:12px;">Fait à ${o.ville || "___________"} le ${dateStr}</p>
+    <div style="margin-top:20px;display:flex;justify-content:space-between;">
+      <div>
+        <p style="font-size:11px;color:#666;">Cachet de l'organisme :</p>
+        ${o.tamponUrl ? `<img src="${o.tamponUrl}" style="max-height:80px;margin-top:5px;" />` : ""}
+      </div>
+      <div>
+        <p style="font-size:11px;color:#666;">${o.dirigeant || ""}</p>
+        ${o.signatureUrl ? `<img src="${o.signatureUrl}" style="max-height:60px;margin-top:5px;" />` : ""}
+      </div>
+    </div>
+
+    <div style="margin-top:40px;border-top:1px solid #ccc;padding-top:8px;font-size:9px;color:#888;text-align:center;">
+      <strong>${o.nom || ""}</strong>${o.siret ? ` – SIRET : ${o.siret}` : ""}${o.nda ? ` – NDA : ${o.nda}` : ""}
+    </div>
+  </div>`;
+}
+
 function generateDocumentHTML(docId: string, o: OrganismeInfo, f: FormationInfo, s: StagiaireInfo[], cvData: CVData, cvDesign: CVDesign): string | null {
   switch (docId) {
     case "contrat":
