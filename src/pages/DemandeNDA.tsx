@@ -130,22 +130,14 @@ function generateDocumentHTML(docId: string, data: NDAFormData): string | null {
   const s = formToStagiaires();
 
   switch (docId) {
-    case "contrat": {
-      const doc = genContratFormationParticulier(o, f, s);
-      return buildDocument(doc);
-    }
-    case "programme": {
-      const doc = generateDocumentById("programme", o, f, s, []);
-      return doc || null;
-    }
-    case "reglement": {
-      const doc = genReglement_V2(o, f, s);
-      return buildDocument(doc);
-    }
-    case "devis": {
-      const doc = genDevis(o, f, s);
-      return buildDocument(doc);
-    }
+    case "contrat":
+      return genContratFormationParticulier(o, f, s);
+    case "programme":
+      return generateDocumentById("programme_formation", "programme_formation", undefined, o, f, s) || null;
+    case "reglement":
+      return genReglement_V2(o, f, s);
+    case "devis":
+      return genDevis(o, f, s);
     case "logo":
       if (data.logoUrl) return `<div style="text-align:center;padding:60px;"><img src="${data.logoUrl}" style="max-width:400px;" /><p style="margin-top:20px;color:#666;">Logo de l'organisme</p></div>`;
       return null;
