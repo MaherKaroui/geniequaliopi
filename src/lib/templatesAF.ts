@@ -44,7 +44,7 @@ export function genFacture(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
 export function genContratFormationParticulier(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const s = stagiaires[0] || { prenom: "___", nom: "___", email: "", telephone: "" };
   return buildDocument({ org: o, title: "CONTRAT DE FORMATION PROFESSIONNELLE", subtitle: "Article L.6353-3 du Code du travail – Particulier", formation: f, showFormationInfo: true, stagiaires, sections: [
-    { heading: "Entre les parties", content: `<p><strong>L'organisme de formation :</strong> ${o.nom}, ${o.adresse}, ${o.codePostal} ${o.ville}<br>SIRET : ${o.siret} – NDA : ${o.nda}<br>Représenté par : ${o.dirigeant}</p><p><strong>Et le stagiaire :</strong> ${s.prenom} ${s.nom}<br>Email : ${s.email}${s.telephone?.trim() ? `${s.telephone?.trim() ? `<br>Téléphone : ${s.telephone}` : ""}` : ""}</p>` },
+    { heading: "Entre les parties", content: `<p><strong>L'organisme de formation :</strong> ${o.nom}, ${o.adresse}, ${o.codePostal} ${o.ville}<br>SIRET : ${o.siret}${o.nda ? ` – NDA : ${o.nda}` : ""}<br>Représenté par : ${o.dirigeant}</p><p><strong>Et le stagiaire :</strong> ${s.prenom} ${s.nom}<br>Email : ${s.email}${s.telephone?.trim() ? `${s.telephone?.trim() ? `<br>Téléphone : ${s.telephone}` : ""}` : ""}</p>` },
     { heading: "Article 1 – Objet du contrat", content: `<p>Le présent contrat a pour objet la réalisation de l'action de formation « ${f.intitule} » selon le programme annexé.</p>` },
     { heading: "Article 2 – Nature et caractéristiques", content: `<p><strong>Intitulé :</strong> ${f.intitule}<br><strong>Objectifs :</strong> ${f.objectifs}<br><strong>Durée :</strong> ${f.duree}<br><strong>Dates :</strong> Du ${formatDate(getStagiaireDateDebut(s as StagiaireInfo, f))} au ${formatDate(getStagiaireDateFin(s as StagiaireInfo, f))}<br><strong>Modalité :</strong> ${f.modalites}<br><strong>Lieu :</strong> ${f.lieu}</p>` },
     { heading: "Article 3 – Prix et conditions de paiement", content: `<p>Le prix de la formation est fixé à ${f.tarif}.<br>TVA non applicable (art. 261-4-4° du CGI).<br>Le règlement s'effectue à la signature ou en 3 mensualités.</p>` },
@@ -66,7 +66,7 @@ export function genAttestationAssiduite(o: OrganismeInfo, f: FormationInfo, stag
 export function genCertificatRealisation(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   let extra = stagiaires.slice(0, 10).map(s => `
     <div class="section" style="padding:25px"><p style="text-align:center;font-size:16px;margin-bottom:15px"><strong>CERTIFICAT DE RÉALISATION</strong></p>
-    <p>Je soussigné(e), <strong>${o.dirigeant}</strong>, représentant l'organisme de formation <strong>${o.nom}</strong> (NDA : ${o.nda}),</p>
+    <p>Je soussigné(e), <strong>${o.dirigeant}</strong>, représentant l'organisme de formation <strong>${o.nom}</strong>${o.nda ? ` (NDA : ${o.nda})` : ""},</p>
     <p>atteste que <strong>${s.prenom} ${s.nom}</strong></p>
     <p>a bien suivi l'action de formation ci-dessous :</p>
     <p><strong>Intitulé :</strong> ${f.intitule}<br><strong>Objectif :</strong> ${f.objectifs}<br><strong>Durée :</strong> ${f.duree}<br><strong>Du :</strong> ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}<br><strong>Modalité :</strong> ${f.modalites}<br><strong>Lieu :</strong> ${f.lieu}</p>
