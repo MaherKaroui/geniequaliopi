@@ -8,6 +8,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChevronLeft, Download, FileText, Loader2, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import LogoSignatureUpload from "@/components/LogoSignatureUpload";
+import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
+import { genContratFormationParticulier, genDevis } from "@/lib/templatesAF";
+import { genReglement_V2 } from "@/lib/generatorsV2";
+import { buildDocument } from "@/lib/docBuilder";
+import { generateDocumentById } from "@/lib/documentGenerator";
 
 interface NDAFormData {
   nomOrganisme: string;
@@ -30,6 +35,13 @@ interface NDAFormData {
   objectifsFormation: string;
   tarifFormation: string;
   programmeFormation: string;
+  formateur: string;
+  dateDebut: string;
+  dateFin: string;
+  lieu: string;
+  modalites: string;
+  prerequis: string;
+  methodesEvaluation: string;
 }
 
 const emptyForm: NDAFormData = {
@@ -38,7 +50,9 @@ const emptyForm: NDAFormData = {
   domainesFormation: "", publicVise: "", moyensPedagogiques: "",
   logoUrl: "", signatureUrl: "", cvFormateur: "",
   intituleFormation: "", dureeFormation: "", objectifsFormation: "",
-  tarifFormation: "", programmeFormation: "",
+  tarifFormation: "", programmeFormation: "", formateur: "",
+  dateDebut: "", dateFin: "", lieu: "", modalites: "Présentiel",
+  prerequis: "", methodesEvaluation: "",
 };
 
 const NDA_DOCUMENTS = [
@@ -50,190 +64,89 @@ const NDA_DOCUMENTS = [
   { id: "cv", label: "CV du Formateur", icon: "👤" },
 ];
 
-function generateContrat(data: NDAFormData): string {
-  const today = new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
-  return `
-    <div style="font-family:Arial,sans-serif;max-width:800px;margin:0 auto;padding:40px;">
-      ${data.logoUrl ? `<img src="${data.logoUrl}" style="max-height:80px;margin-bottom:20px;" />` : ""}
-      <h1 style="text-align:center;font-size:22px;margin-bottom:30px;text-transform:uppercase;border-bottom:2px solid #2563eb;padding-bottom:10px;">Contrat de Formation Professionnelle</h1>
-      <p style="text-align:right;margin-bottom:20px;">Fait à ${data.ville || "___________"}, le ${today}</p>
-      <h3 style="margin-top:25px;">ENTRE LES SOUSSIGNÉS :</h3>
-      <p><strong>L'organisme de formation :</strong><br/>
-      ${data.nomOrganisme || "___________"}<br/>
-      SIRET : ${data.siret || "___________"}<br/>
-      ${data.adresse || "___________"}, ${data.codePostal || ""} ${data.ville || ""}<br/>
-      ${data.telephone ? `Tél : ${data.telephone}<br/>` : ""}
-      Email : ${data.email || "___________"}<br/>
-      Représenté(e) par : ${data.dirigeant || "___________"}</p>
-      <p><strong>ET</strong></p>
-      <p><strong>Le Client :</strong><br/>
-      Nom / Raison sociale : ___________<br/>
-      Adresse : ___________<br/>
-      Représenté(e) par : ___________</p>
-      <h3>ARTICLE 1 – OBJET</h3>
-      <p>Le présent contrat a pour objet la réalisation de l'action de formation suivante :</p>
-      <table style="width:100%;border-collapse:collapse;margin:15px 0;">
-        <tr><td style="border:1px solid #ddd;padding:8px;background:#f8fafc;width:200px;"><strong>Intitulé</strong></td><td style="border:1px solid #ddd;padding:8px;">${data.intituleFormation || "___________"}</td></tr>
-        <tr><td style="border:1px solid #ddd;padding:8px;background:#f8fafc;"><strong>Durée</strong></td><td style="border:1px solid #ddd;padding:8px;">${data.dureeFormation || "___________"}</td></tr>
-        <tr><td style="border:1px solid #ddd;padding:8px;background:#f8fafc;"><strong>Objectifs</strong></td><td style="border:1px solid #ddd;padding:8px;">${data.objectifsFormation || "___________"}</td></tr>
-        <tr><td style="border:1px solid #ddd;padding:8px;background:#f8fafc;"><strong>Public visé</strong></td><td style="border:1px solid #ddd;padding:8px;">${data.publicVise || "Tout public"}</td></tr>
-      </table>
-      <h3>ARTICLE 2 – TARIF ET MODALITÉS DE PAIEMENT</h3>
-      <p>Le coût de la formation est fixé à <strong>${data.tarifFormation || "___________"} €</strong> net de taxes.</p>
-      <p>Le règlement s'effectue selon les modalités suivantes : paiement à réception de facture, sous 30 jours.</p>
-      <h3>ARTICLE 3 – MOYENS PÉDAGOGIQUES</h3>
-      <p>${data.moyensPedagogiques || "Supports de cours, exercices pratiques, évaluations."}</p>
-      <h3>ARTICLE 4 – SANCTIONS</h3>
-      <p>À l'issue de la formation, une attestation de fin de formation sera remise au stagiaire.</p>
-      <h3>ARTICLE 5 – DÉDIT ET ANNULATION</h3>
-      <p>En cas de renoncement par le Client, celui-ci s'engage à en informer l'organisme de formation par écrit au moins 15 jours avant le début de la formation.</p>
-      <div style="display:flex;justify-content:space-between;margin-top:50px;">
-        <div style="text-align:center;width:45%;">
-          <p><strong>L'Organisme de Formation</strong></p>
-          <p>${data.dirigeant || "___________"}</p>
-          ${data.signatureUrl ? `<img src="${data.signatureUrl}" style="max-height:60px;" />` : '<p style="margin-top:40px;border-top:1px solid #999;width:200px;margin-left:auto;margin-right:auto;">Signature</p>'}
-        </div>
-        <div style="text-align:center;width:45%;">
-          <p><strong>Le Client</strong></p>
-          <p>___________</p>
-          <p style="margin-top:40px;border-top:1px solid #999;width:200px;margin-left:auto;margin-right:auto;">Signature</p>
-        </div>
-      </div>
-    </div>`;
+function formToOrganisme(data: NDAFormData): OrganismeInfo {
+  return {
+    nom: data.nomOrganisme || "___________",
+    siret: data.siret || "___________",
+    adresse: data.adresse || "___________",
+    codePostal: data.codePostal || "",
+    ville: data.ville || "",
+    telephone: data.telephone || "",
+    email: data.email || "___________",
+    siteWeb: "",
+    nda: "",
+    dirigeant: data.dirigeant || "___________",
+    responsablePedagogique: data.dirigeant || "",
+    referentHandicap: data.dirigeant || "",
+    referentQualite: "",
+    poleAdministratif: "",
+    domainesFormation: data.domainesFormation || "",
+    typesActions: ['actions-formation'],
+    certifications: "",
+    outilsUtilises: "",
+    version: "1.0",
+    dateMaj: new Date().toISOString().slice(0, 10),
+    logoUrl: data.logoUrl || undefined,
+    signatureUrl: data.signatureUrl || undefined,
+  };
 }
 
-function generateProgramme(data: NDAFormData): string {
-  return `
-    <div style="font-family:Arial,sans-serif;max-width:800px;margin:0 auto;padding:40px;">
-      ${data.logoUrl ? `<img src="${data.logoUrl}" style="max-height:80px;margin-bottom:20px;" />` : ""}
-      <h1 style="text-align:center;font-size:22px;margin-bottom:30px;text-transform:uppercase;border-bottom:2px solid #2563eb;padding-bottom:10px;">Programme de Formation</h1>
-      <table style="width:100%;border-collapse:collapse;margin:15px 0;">
-        <tr><td style="border:1px solid #ddd;padding:8px;background:#f8fafc;width:200px;"><strong>Intitulé</strong></td><td style="border:1px solid #ddd;padding:8px;">${data.intituleFormation || "___________"}</td></tr>
-        <tr><td style="border:1px solid #ddd;padding:8px;background:#f8fafc;"><strong>Durée</strong></td><td style="border:1px solid #ddd;padding:8px;">${data.dureeFormation || "___________"}</td></tr>
-        <tr><td style="border:1px solid #ddd;padding:8px;background:#f8fafc;"><strong>Public visé</strong></td><td style="border:1px solid #ddd;padding:8px;">${data.publicVise || "Tout public"}</td></tr>
-        <tr><td style="border:1px solid #ddd;padding:8px;background:#f8fafc;"><strong>Prérequis</strong></td><td style="border:1px solid #ddd;padding:8px;">Aucun prérequis particulier</td></tr>
-      </table>
-      <h3>Objectifs pédagogiques</h3>
-      <p>${data.objectifsFormation || "À l'issue de la formation, le stagiaire sera capable de maîtriser les compétences visées."}</p>
-      <h3>Contenu détaillé</h3>
-      <div style="white-space:pre-wrap;">${data.programmeFormation || `Module 1 : Introduction et fondamentaux\n- Présentation du contexte\n- Définitions et concepts clés\n- Cadre réglementaire\n\nModule 2 : Approfondissement\n- Mise en pratique\n- Études de cas\n- Exercices d'application\n\nModule 3 : Évaluation et bilan\n- QCM de validation\n- Exercices pratiques\n- Bilan de formation`}</div>
-      <h3>Moyens pédagogiques et techniques</h3>
-      <p>${data.moyensPedagogiques || "Supports de cours projetés, exercices pratiques, mises en situation."}</p>
-      <h3>Modalités d'évaluation</h3>
-      <p>Évaluations formatives en cours de formation. Évaluation sommative en fin de formation (QCM, mise en situation).</p>
-      <h3>Sanction de la formation</h3>
-      <p>Attestation de fin de formation remise au stagiaire.</p>
-      <div style="margin-top:40px;text-align:right;">
-        <p>${data.nomOrganisme || "___________"}</p>
-        ${data.signatureUrl ? `<img src="${data.signatureUrl}" style="max-height:60px;" />` : ""}
-      </div>
-    </div>`;
+function formToFormation(data: NDAFormData): FormationInfo {
+  return {
+    intitule: data.intituleFormation || "Formation professionnelle",
+    objectifs: data.objectifsFormation || "Maîtriser les compétences visées",
+    prerequis: data.prerequis || "Aucun prérequis particulier",
+    duree: data.dureeFormation || "14 heures",
+    modalites: data.modalites || "Présentiel",
+    tarif: data.tarifFormation || "",
+    programme: data.programmeFormation || "",
+    methodesEvaluation: data.methodesEvaluation || "QCM, exercices pratiques, mise en situation",
+    moyensPedagogiques: data.moyensPedagogiques || "Supports de cours, exercices pratiques",
+    publicVise: data.publicVise || "Tout public",
+    delaiAcces: "15 jours",
+    dateDebut: data.dateDebut || "",
+    dateFin: data.dateFin || "",
+    lieu: data.lieu || data.ville || "",
+    nombreParticipants: "1",
+    formateur: data.formateur || "",
+  };
 }
 
-function generateReglement(data: NDAFormData): string {
-  return `
-    <div style="font-family:Arial,sans-serif;max-width:800px;margin:0 auto;padding:40px;">
-      ${data.logoUrl ? `<img src="${data.logoUrl}" style="max-height:80px;margin-bottom:20px;" />` : ""}
-      <h1 style="text-align:center;font-size:22px;margin-bottom:30px;text-transform:uppercase;border-bottom:2px solid #2563eb;padding-bottom:10px;">Règlement Intérieur</h1>
-      <p style="text-align:center;margin-bottom:20px;"><strong>${data.nomOrganisme || "___________"}</strong><br/>SIRET : ${data.siret || "___________"}</p>
-      
-      <h3>ARTICLE 1 – OBJET ET CHAMP D'APPLICATION</h3>
-      <p>Le présent règlement intérieur s'applique à tous les stagiaires inscrits à une session de formation dispensée par ${data.nomOrganisme || "l'organisme"}, et ce pour la durée de la formation suivie.</p>
-      
-      <h3>ARTICLE 2 – DISCIPLINE GÉNÉRALE</h3>
-      <p>Les stagiaires doivent se conformer aux horaires fixés et communiqués en début de formation. Toute absence ou retard doit être signalé et justifié auprès du responsable de la formation.</p>
-      
-      <h3>ARTICLE 3 – HYGIÈNE ET SÉCURITÉ</h3>
-      <p>Les consignes d'hygiène et de sécurité, propres à chaque lieu de formation, doivent être strictement respectées. Il est interdit de fumer dans les locaux de formation. L'introduction de boissons alcoolisées est interdite.</p>
-      
-      <h3>ARTICLE 4 – COMPORTEMENT</h3>
-      <p>Il est demandé à chaque stagiaire d'avoir un comportement respectueux envers les autres stagiaires et le personnel de l'organisme. Tout comportement contraire aux règles de bienséance pourra faire l'objet d'une exclusion.</p>
-      
-      <h3>ARTICLE 5 – SANCTIONS</h3>
-      <p>Tout manquement du stagiaire à l'une des dispositions du présent règlement pourra donner lieu à une sanction. Les sanctions applicables sont : avertissement écrit, exclusion temporaire, exclusion définitive.</p>
-      
-      <h3>ARTICLE 6 – REPRÉSENTATION DES STAGIAIRES</h3>
-      <p>Pour les formations d'une durée supérieure à 500 heures, il est procédé à l'élection d'un délégué titulaire et d'un délégué suppléant.</p>
-      
-      <h3>ARTICLE 7 – RÉCLAMATIONS</h3>
-      <p>Toute réclamation peut être adressée à : ${data.email || "___________"}</p>
-      
-      <div style="margin-top:40px;">
-        <p>Fait à ${data.ville || "___________"}, le ${new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}</p>
-        <p><strong>${data.dirigeant || "Le Directeur"}</strong></p>
-        ${data.signatureUrl ? `<img src="${data.signatureUrl}" style="max-height:60px;" />` : ""}
-      </div>
-    </div>`;
-}
-
-function generateDevis(data: NDAFormData): string {
-  const today = new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
-  const numDevis = `DEV-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 9000 + 1000))}`;
-  return `
-    <div style="font-family:Arial,sans-serif;max-width:800px;margin:0 auto;padding:40px;">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:30px;">
-        <div>
-          ${data.logoUrl ? `<img src="${data.logoUrl}" style="max-height:80px;margin-bottom:10px;" />` : ""}
-          <p><strong>${data.nomOrganisme || "___________"}</strong><br/>
-          ${data.adresse || "___________"}<br/>
-          ${data.codePostal || ""} ${data.ville || ""}<br/>
-          ${data.telephone ? `Tél : ${data.telephone}<br/>` : ""}
-          ${data.email || "___________"}<br/>
-          SIRET : ${data.siret || "___________"}</p>
-        </div>
-        <div style="text-align:right;">
-          <h2 style="font-size:24px;color:#2563eb;margin:0;">DEVIS</h2>
-          <p>N° ${numDevis}<br/>Date : ${today}</p>
-        </div>
-      </div>
-      <div style="background:#f8fafc;padding:15px;border:1px solid #e2e8f0;border-radius:6px;margin-bottom:25px;">
-        <p><strong>Client :</strong><br/>
-        Nom / Raison sociale : ___________<br/>
-        Adresse : ___________</p>
-      </div>
-      <table style="width:100%;border-collapse:collapse;margin:20px 0;">
-        <thead>
-          <tr style="background:#2563eb;color:#fff;">
-            <th style="padding:10px;text-align:left;border:1px solid #1d4ed8;">Désignation</th>
-            <th style="padding:10px;text-align:center;border:1px solid #1d4ed8;">Durée</th>
-            <th style="padding:10px;text-align:right;border:1px solid #1d4ed8;">Prix unitaire</th>
-            <th style="padding:10px;text-align:right;border:1px solid #1d4ed8;">Total</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td style="padding:10px;border:1px solid #ddd;">${data.intituleFormation || "Formation professionnelle"}</td>
-            <td style="padding:10px;text-align:center;border:1px solid #ddd;">${data.dureeFormation || "___"}</td>
-            <td style="padding:10px;text-align:right;border:1px solid #ddd;">${data.tarifFormation || "___"} €</td>
-            <td style="padding:10px;text-align:right;border:1px solid #ddd;"><strong>${data.tarifFormation || "___"} €</strong></td>
-          </tr>
-        </tbody>
-      </table>
-      <div style="text-align:right;margin:20px 0;">
-        <p>TVA non applicable, art. 261 du CGI</p>
-        <p style="font-size:18px;"><strong>Total net : ${data.tarifFormation || "___"} €</strong></p>
-      </div>
-      <p style="font-size:11px;color:#666;margin-top:20px;">Validité du devis : 30 jours. Conditions de règlement : paiement à réception de facture sous 30 jours.</p>
-      <div style="display:flex;justify-content:space-between;margin-top:40px;">
-        <div>
-          <p><strong>Bon pour accord :</strong></p>
-          <p>Date : ___________</p>
-          <p style="margin-top:30px;border-top:1px solid #999;width:200px;">Signature du Client</p>
-        </div>
-        <div style="text-align:right;">
-          <p><strong>${data.dirigeant || "___________"}</strong></p>
-          ${data.signatureUrl ? `<img src="${data.signatureUrl}" style="max-height:60px;" />` : ""}
-        </div>
-      </div>
-    </div>`;
+function formToStagiaires(): StagiaireInfo[] {
+  return [{
+    civilite: "",
+    nom: "___________",
+    prenom: "___________",
+    email: "___________",
+    telephone: "",
+    entreprise: "___________",
+    poste: "___________",
+    dateNaissance: "",
+  }];
 }
 
 function generateDocumentHTML(docId: string, data: NDAFormData): string | null {
+  const o = formToOrganisme(data);
+  const f = formToFormation(data);
+  const s = formToStagiaires();
+
   switch (docId) {
-    case "contrat": return generateContrat(data);
-    case "programme": return generateProgramme(data);
-    case "reglement": return generateReglement(data);
-    case "devis": return generateDevis(data);
+    case "contrat": {
+      const doc = genContratFormationParticulier(o, f, s);
+      return buildDocument(doc);
+    }
+    case "programme": {
+      const doc = generateDocumentById("programme", o, f, s, []);
+      return doc || null;
+    }
+    case "reglement": {
+      const doc = genReglement_V2(o, f, s);
+      return buildDocument(doc);
+    }
+    case "devis": {
+      const doc = genDevis(o, f, s);
+      return buildDocument(doc);
+    }
     case "logo":
       if (data.logoUrl) return `<div style="text-align:center;padding:60px;"><img src="${data.logoUrl}" style="max-width:400px;" /><p style="margin-top:20px;color:#666;">Logo de l'organisme</p></div>`;
       return null;
