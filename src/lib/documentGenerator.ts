@@ -774,7 +774,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
 
 function genFicheIdentite(o: OrganismeInfo) {
   return buildDocument({ org: o, title: "FICHE D'IDENTITÉ DE L'ORGANISME", sections: [
-    { heading: "Informations générales", content: `<p><strong>Raison sociale :</strong> ${o.nom}</p><p><strong>SIRET :</strong> ${o.siret}</p><p><strong>NDA :</strong> ${o.nda}</p><p><strong>Adresse :</strong> ${o.adresse}, ${o.codePostal} ${o.ville}</p><p>${o.telephone?.trim() ? `<strong>Téléphone :</strong> ${o.telephone}` : ""}</p><p><strong>Email :</strong> ${o.email}</p>${optSiteWeb(o)}` },
+    { heading: "Informations générales", content: `<p><strong>Raison sociale :</strong> ${o.nom}</p><p><strong>SIRET :</strong> ${o.siret}</p>${o.nda ? `<p><strong>NDA :</strong> ${o.nda}</p>` : ""}<p><strong>Adresse :</strong> ${o.adresse}, ${o.codePostal} ${o.ville}</p><p>${o.telephone?.trim() ? `<strong>Téléphone :</strong> ${o.telephone}` : ""}</p><p><strong>Email :</strong> ${o.email}</p>${optSiteWeb(o)}` },
     { heading: "Direction", content: `<p><strong>Dirigeant :</strong> ${o.dirigeant}</p><p><strong>Resp. pédagogique :</strong> ${o.responsablePedagogique}</p><p><strong>Réf. handicap :</strong> ${o.referentHandicap}</p><p><strong>Réf. qualité :</strong> ${o.referentQualite}</p>` },
     { heading: "Activité", content: `<p><strong>Domaines :</strong> ${o.domainesFormation}</p><p><strong>Types d'actions :</strong> ${o.typesActions.join(", ")}</p><p><strong>Certifications :</strong> ${o.certifications}</p><p><strong>Outils :</strong> ${o.outilsUtilises}</p>` },
   ]});
@@ -833,7 +833,7 @@ function genCGV(o: OrganismeInfo) {
 
 function genMentionsLegales(o: OrganismeInfo) {
   return buildDocument({ org: o, title: "MENTIONS LÉGALES", sections: [
-    { heading: "Éditeur du site", content: `<p>${o.nom}<br>${o.adresse}, ${o.codePostal} ${o.ville}<br>SIRET : ${o.siret}<br>NDA : ${o.nda}<br>Directeur de la publication : ${o.dirigeant}</p>` },
+    { heading: "Éditeur du site", content: `<p>${o.nom}<br>${o.adresse}, ${o.codePostal} ${o.ville}<br>SIRET : ${o.siret}${o.nda ? `<br>NDA : ${o.nda}` : ""}<br>Directeur de la publication : ${o.dirigeant}</p>` },
     { heading: "Hébergeur", content: "<p>OVH SAS – 2 rue Kellermann, 59100 Roubaix – France</p>" },
     { heading: "Protection des données", content: `<p>Conformément au RGPD, vous disposez d'un droit d'accès, de rectification et de suppression de vos données. Contact : ${o.email}</p>` },
   ] });
@@ -1926,7 +1926,7 @@ function genConvocation(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiair
 
 function genConvention(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   return buildDocument({ org: o, title: "CONVENTION DE FORMATION PROFESSIONNELLE", subtitle: "Article L.6353-1 du Code du travail", formation: f, showFormationInfo: true, stagiaires, sections: [
-    { heading: "Entre les soussignés", content: `<p><strong>L'organisme :</strong> ${o.nom}, ${o.adresse}, ${o.codePostal} ${o.ville}<br>SIRET : ${o.siret} – NDA : ${o.nda}<br>Représenté par : ${o.dirigeant}</p><p><strong>Et :</strong> ${stagiaires.slice(0, 3).map(s => s.prenom + " " + s.nom + " (" + s.entreprise + ")").join(", ")}</p>` },
+    { heading: "Entre les soussignés", content: `<p><strong>L'organisme :</strong> ${o.nom}, ${o.adresse}, ${o.codePostal} ${o.ville}<br>SIRET : ${o.siret}${o.nda ? ` – NDA : ${o.nda}` : ""}<br>Représenté par : ${o.dirigeant}</p><p><strong>Et :</strong> ${stagiaires.slice(0, 3).map(s => s.prenom + " " + s.nom + " (" + s.entreprise + ")").join(", ")}</p>` },
     { heading: "Article 1 – Objet", content: `<p>Réalisation de la formation « ${f.intitule} »</p>` },
     { heading: "Article 2 – Tarif", content: `<p>Coût : ${f.tarif}</p>` },
     { heading: "Article 3 – Modalités", content: `<p>${f.methodesEvaluation}</p>` },
