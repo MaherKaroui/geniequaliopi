@@ -12,7 +12,7 @@ import StagiairesForm from "@/components/StagiairesForm";
 import StepIndicator from "@/components/StepIndicator";
 import CVGeneratorEmbed from "@/components/CVGeneratorEmbed";
 import { genContratFormationParticulier, genDevis, genFacture } from "@/lib/templatesAF";
-import { genCertificatCoursera } from "@/lib/newsletterScreenshots";
+import { courseCertificateHtml } from "@/lib/newsletterScreenshots";
 import { isFormationTerminee } from "@/lib/docBuilder";
 import { genReglement_V2 } from "@/lib/generatorsV2";
 import { generateDocumentById } from "@/lib/documentGenerator";
@@ -150,7 +150,7 @@ function generateDocumentHTML(docId: string, o: OrganismeInfo, f: FormationInfo,
       return generateListeFormateursHTML(o, cvData, s);
     }
     case "certificat_coursera":
-      return genCertificatCoursera(o, f);
+      return `<div style="font-family:Arial,sans-serif;max-width:860px;margin:0 auto;padding:0;">${courseCertificateHtml(o, f)}</div>`;
     default: return null;
   }
 }
