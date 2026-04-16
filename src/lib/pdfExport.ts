@@ -216,7 +216,7 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
 
   const source = document.createElement("div");
   source.className = "pdf-root";
-  source.style.cssText = `width:${A4_WIDTH_PX}px;background:#fff;`;
+  source.style.cssText = `width:${PAGE_W_PX}px;background:#fff;`;
   source.innerHTML = bodyContent;
 
   // Extract original footer and repeat it on each generated page (always bottom)
