@@ -589,9 +589,11 @@ function resolveSignature(label: string, nom: string, urls: SignatureUrls): stri
   if (/dirigeant|responsable|directeur/i.test(l)) {
     return tamponImg(urls.tamponUrl);
   }
-  // Client / other → no auto signature
+  // Client / Bon pour accord → stagiaire signature
   if (/client|accord/i.test(l)) {
-    return `<p style="font-style:italic;color:#999;margin-top:15px">${nom ? `Signé par ${nom}` : ""}</p>`;
+    return urls.stagiaireSignatureUrl
+      ? sigImg(urls.stagiaireSignatureUrl, "Signature client")
+      : `<p style="font-style:italic;color:#999;margin-top:15px">${nom ? `Signé par ${nom}` : ""}</p>`;
   }
   // Default: tampon only
   return tamponImg(urls.tamponUrl);
