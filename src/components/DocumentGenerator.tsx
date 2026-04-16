@@ -242,6 +242,13 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
       return;
     }
 
+    // Handle .docx template files (factures IND 17)
+    if (DOCX_TEMPLATE_FILES[doc.template]) {
+      const blob = await processDocxTemplate(DOCX_TEMPLATE_FILES[doc.template], mergedOrganisme);
+      saveAs(blob, buildCatalogFileName(doc, undefined, ".docx"));
+      return;
+    }
+
     const isPerStagiaire = PER_STAGIAIRE_TEMPLATES.has(doc.template);
     const hasOwnStagiaire = typeof doc.params?.stagiaireIdx === "number";
     if (hasOwnStagiaire) {
