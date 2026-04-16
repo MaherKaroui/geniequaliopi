@@ -184,6 +184,7 @@ const OrganismeForm = ({ data, onChange, hideFields = [] }: OrganismeFormProps) 
           <Label htmlFor="dateMaj">Date de mise à jour (MAJ)</Label>
           <Input id="dateMaj" type="date" value={data.dateMaj} onChange={e => update('dateMaj', e.target.value)} />
         </div>
+        {!hidden('typesActions') && (
         <div className="md:col-span-2">
           <Label className="mb-3 block">Types d'actions *</Label>
           <div className="flex flex-wrap gap-4">
@@ -198,6 +199,7 @@ const OrganismeForm = ({ data, onChange, hideFields = [] }: OrganismeFormProps) 
             ))}
           </div>
         </div>
+        )}
 
         {/* Logo & Signature Upload */}
         <LogoSignatureUpload
