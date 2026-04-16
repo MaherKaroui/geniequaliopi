@@ -6,6 +6,7 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import ControleEY from "./pages/ControleEY";
 import DemandeNDA from "./pages/DemandeNDA";
+import GenerateurCV from "./pages/GenerateurCV";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -20,6 +21,7 @@ const App = () => (
           <Route path="/auth" element={<Auth />} />
           <Route path="/controle-ey" element={<ControleEY />} />
           <Route path="/demande-nda" element={<DemandeNDA />} />
+          <Route path="/generateur-cv" element={<GenerateurCV />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
