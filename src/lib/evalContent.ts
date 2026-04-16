@@ -1694,9 +1694,40 @@ const DEFAULT_QUESTIONS_OUVERTES: QuestionsOuvertesFormation = {
   ],
 };
 
+function ensureMinimumQuestions(
+  questions: QuestionOuverte[],
+  fallbackQuestions: QuestionOuverte[],
+  min = 10
+): QuestionOuverte[] {
+  const merged: QuestionOuverte[] = [];
+  const seen = new Set<string>();
+
+  for (const question of [...questions, ...fallbackQuestions]) {
+    const key = question.question.trim().toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    merged.push(question);
+    if (merged.length >= min) break;
+  }
+
+  return merged;
+}
+
 export function getQuestionsOuvertes(formationIntitule: string): QuestionsOuvertesFormation {
   const key = getContentKey(formationIntitule);
-  return QUESTIONS_OUVERTES[key] || DEFAULT_QUESTIONS_OUVERTES;
+  const source = QUESTIONS_OUVERTES[key] || DEFAULT_QUESTIONS_OUVERTES;
+  const wordFallback = key === "Initiation Word" ? QUESTIONS_OUVERTES["Bureautique"] : undefined;
+
+  return {
+    debut: ensureMinimumQuestions(
+      source.debut,
+      [...(wordFallback?.debut ?? []), ...DEFAULT_QUESTIONS_OUVERTES.debut]
+    ),
+    fin: ensureMinimumQuestions(
+      source.fin,
+      [...(wordFallback?.fin ?? []), ...DEFAULT_QUESTIONS_OUVERTES.fin]
+    ),
+  };
 }
 
 // ===== GENERATE STAGIAIRE OPEN-ENDED ANSWERS =====
@@ -1755,8 +1786,8 @@ export function generateStagiaireOpenAnswers(
   
   // Target: each stagiaire gets a unique score
   // Début: 5-7 range, Fin: 8-10 range (good scores after training)
-  const targetScoresDebut = [5, 5.5, 6, 6.5, 7, 5.5, 6, 7, 6.5, 5];
-  const targetScoresFin = [8, 8.5, 9, 9.5, 10, 8.5, 9, 10, 9.5, 8];
+  const targetScoresDebut = [5, 6, 6, 7, 7, 5, 6, 7, 6, 5];
+  const targetScoresFin = [8, 9, 9, 10, 10, 9, 9, 10, 10, 8];
   const targetScores = isDebut ? targetScoresDebut : targetScoresFin;
   const target = targetScores[stagiaireIndex % targetScores.length];
   
@@ -1800,6 +1831,24 @@ export function generateStagiaireOpenAnswers(
       continue;
     }
     break;
+  }
+
+  if (!isDebut) {
+    const targetFullCount = Math.max(8, Math.min(10, Math.round(target)));
+    const prioritized = adjustedQualities
+      .map((quality, i) => ({
+        i,
+        priority: quality === 'full' ? 2 : quality === 'partial' ? 1 : 0,
+        seed: rawAnswers[i].seed,
+      }))
+      .sort((a, b) => (b.priority - a.priority) || (a.seed - b.seed));
+
+    const normalizedQualities: Array<'full' | 'partial' | 'wrong' | 'empty'> = rawAnswers.map(() => 'wrong');
+    prioritized.slice(0, targetFullCount).forEach(({ i }) => {
+      normalizedQualities[i] = 'full';
+    });
+
+    adjustedQualities.splice(0, adjustedQualities.length, ...normalizedQualities);
   }
 
   // Detect if questions are in English
