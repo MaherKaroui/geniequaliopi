@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback, useRef, useEffect } from "react";
+import mammoth from "mammoth";
 import { OrganismeInfo, FormationInfo, StagiaireInfo, CritereData, CRITERES_INFO, DocEntry, DocStyleConfig, DEFAULT_DOC_STYLE } from "@/types/qualiopi";
 import { getFullCatalog, generateDocumentById } from "@/lib/documentGenerator";
 import { generateBookQualiopi } from "@/lib/bookQualiopi";
@@ -56,6 +57,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
   const [expandedIndicateurs, setExpandedIndicateurs] = useState<Set<number>>(new Set());
   const [previewContent, setPreviewContent] = useState<string | null>(null);
   const [previewTitle, setPreviewTitle] = useState("");
+  const [previewBlobUrl, setPreviewBlobUrl] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
   const [generated, setGenerated] = useState<Set<string>>(new Set());
   const [editing, setEditing] = useState(false);
@@ -197,16 +199,66 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
     return lines.join("\n");
   }, []);
 
-  const handlePreview = (doc: DocEntry) => {
+  const handlePreview = async (doc: DocEntry) => {
+    // Clean up previous blob URL
+    if (previewBlobUrl) { URL.revokeObjectURL(previewBlobUrl); setPreviewBlobUrl(null); }
+
+    // Static PDF → embed in iframe
     if (doc.template === "pdf_static" && getStaticFileUrl(doc)) {
-      window.open(getStaticFileUrl(doc)!, "_blank");
+      const pdfUrl = getStaticFileUrl(doc)!;
+      setPreviewContent(null);
+      setPreviewBlobUrl(pdfUrl);
+      setPreviewTitle(doc.nom);
+      setCurrentDocId(doc.id);
+      setEditing(false);
       setGenerated((prev) => new Set(prev).add(doc.id));
       return;
     }
+
+    // DOCX template files (factures, diplôme) → convert to HTML via mammoth
+    if (DOCX_TEMPLATE_FILES[doc.template]) {
+      try {
+        const blob = await processDocxTemplate(DOCX_TEMPLATE_FILES[doc.template], mergedOrganisme);
+        const arrayBuffer = await blob.arrayBuffer();
+        const result = await mammoth.convertToHtml({ arrayBuffer });
+        setPreviewBlobUrl(null);
+        setPreviewContent(`<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><style>body{font-family:Arial,sans-serif;padding:24px;max-width:800px;margin:auto}table{border-collapse:collapse;width:100%}td,th{border:1px solid #ccc;padding:6px 10px}img{max-width:100%}</style></head><body>${result.value}</body></html>`);
+        setPreviewTitle(doc.nom);
+        setCurrentDocId(doc.id);
+        setEditing(false);
+        setGenerated((prev) => new Set(prev).add(doc.id));
+      } catch (e) {
+        toast.error("Impossible de prévisualiser ce fichier DOCX");
+      }
+      return;
+    }
+
+    // Mail DOCX templates → convert to HTML via mammoth
+    if (MAIL_TEMPLATE_FILES[doc.template] && typeof doc.params?.stagiaireIdx === "number") {
+      const s = allStagiaires[doc.params.stagiaireIdx];
+      if (s) {
+        try {
+          const blob = await processMailDocxTemplate(MAIL_TEMPLATE_FILES[doc.template], mergedOrganisme, selectedFormation, s);
+          const arrayBuffer = await blob.arrayBuffer();
+          const result = await mammoth.convertToHtml({ arrayBuffer });
+          setPreviewBlobUrl(null);
+          setPreviewContent(`<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><style>body{font-family:Arial,sans-serif;padding:24px;max-width:800px;margin:auto}table{border-collapse:collapse;width:100%}td,th{border:1px solid #ccc;padding:6px 10px}img{max-width:100%}</style></head><body>${result.value}</body></html>`);
+          setPreviewTitle(doc.nom);
+          setCurrentDocId(doc.id);
+          setEditing(false);
+          setGenerated((prev) => new Set(prev).add(doc.id));
+        } catch (e) {
+          toast.error("Impossible de prévisualiser ce fichier DOCX");
+        }
+      }
+      return;
+    }
+
+    // Standard HTML-generated documents
+    setPreviewBlobUrl(null);
     const isPerStagiaire = PER_STAGIAIRE_TEMPLATES.has(doc.template);
     const hasOwnStagiaire = typeof doc.params?.stagiaireIdx === "number";
     if (hasOwnStagiaire) {
-      // Doc already bound to a specific stagiaire — use params directly, pass all stagiaires
       const content = generateDocumentById(doc.id, doc.template, doc.params, organisme, formation, allStagiaires);
       const currentStagiaire = allStagiaires[doc.params!.stagiaireIdx as number] || null;
       setPreviewContent(content);
@@ -1269,19 +1321,21 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
         );
       })()}
 
-      {previewContent && (
+      {(previewContent || previewBlobUrl) && (
         <div className="mt-6">
           <div className="flex items-center justify-between mb-3 gap-2 flex-wrap">
             <h3 className="text-lg font-bold truncate flex-1">{previewTitle}</h3>
             <div className="flex gap-2 shrink-0">
-              <Button
-                variant={editing ? "default" : "outline"}
-                size="sm"
-                onClick={handleToggleEdit}
-              >
-                {editing ? "Enregistrer" : "Modifier"}
-              </Button>
-              <Button variant="ghost" size="sm" onClick={() => { setPreviewContent(null); setEditing(false); }}>
+              {!previewBlobUrl && (
+                <Button
+                  variant={editing ? "default" : "outline"}
+                  size="sm"
+                  onClick={handleToggleEdit}
+                >
+                  {editing ? "Enregistrer" : "Modifier"}
+                </Button>
+              )}
+              <Button variant="ghost" size="sm" onClick={() => { setPreviewContent(null); setPreviewBlobUrl(null); setEditing(false); }}>
                 <X className="w-4 h-4 mr-1" /> Fermer
               </Button>
             </div>
@@ -1292,17 +1346,25 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
             </div>
           )}
           <div className="bg-card border rounded-xl shadow-elevated overflow-hidden">
-            <iframe
-              ref={iframeRef}
-              srcDoc={previewContent}
-              className="w-full h-[600px] border-0"
-              title="Aperçu"
-              onLoad={() => {
-                if (editing && iframeRef.current?.contentDocument) {
-                  iframeRef.current.contentDocument.designMode = "on";
-                }
-              }}
-            />
+            {previewBlobUrl ? (
+              <iframe
+                src={previewBlobUrl}
+                className="w-full h-[700px] border-0"
+                title="Aperçu PDF"
+              />
+            ) : (
+              <iframe
+                ref={iframeRef}
+                srcDoc={previewContent!}
+                className="w-full h-[600px] border-0"
+                title="Aperçu"
+                onLoad={() => {
+                  if (editing && iframeRef.current?.contentDocument) {
+                    iframeRef.current.contentDocument.designMode = "on";
+                  }
+                }}
+              />
+            )}
           </div>
         </div>
       )}
