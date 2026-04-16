@@ -591,10 +591,10 @@ export function genEvaluationFinaleStagiaire(o: OrganismeInfo, f: FormationInfo,
   }
   
   const evalData = getEvalContent(f.intitule);
-  const questions = evalData.qcmFinal.slice(0, 5); // 5 QCM questions
+  const questions = evalData.qcmFinal.slice(0, 10); // 10 QCM questions
   const answers = generateStagiaireAnswers(questions, stagiaireIdx + 100);
   const result = computeQCMScore(questions, answers);
-  const qcmScore = Math.min(5, result.score + (stagiaireIdx % 2)); // boost slightly
+  const qcmScore = Math.max(8, Math.min(10, result.score + (stagiaireIdx % 3))); // minimum 8/10
 
   let extra = `
     <h2>Évaluation Finale – ${f.intitule}</h2>
@@ -602,7 +602,7 @@ export function genEvaluationFinaleStagiaire(o: OrganismeInfo, f: FormationInfo,
     <p><strong>Date :</strong> ${formatDate(getStagiaireDateFin(s, f))}</p>
     <p><strong>Organisme :</strong> ${o.nom}</p>
     <p><strong>Formation :</strong> ${f.intitule}</p>
-    <h3>QCM (${questions.length} questions – Note sur 5)</h3>
+    <h3>QCM (${questions.length} questions – Note sur 10)</h3>
     <p>Cochez la bonne réponse.</p>
   `;
 
@@ -615,15 +615,15 @@ export function genEvaluationFinaleStagiaire(o: OrganismeInfo, f: FormationInfo,
       extra += `<p>${mark} ${String.fromCharCode(65 + oi)}. ${opt}</p>`;
     });
   });
-  extra += `<p><strong>Total : ${qcmScore}/5</strong></p>`;
+  extra += `<p><strong>Total : ${qcmScore}/10</strong></p>`;
 
-  // Appréciation basée sur le score /5
+  // Appréciation basée sur le score /10
   const remarques = [
-    `${s.prenom} ${s.nom} a parfaitement acquis les compétences visées par la formation. ${qcmScore >= 4 ? "L'autonomie en situation professionnelle est totalement acquise." : qcmScore >= 3 ? "La progression est encourageante et les fondamentaux sont en place." : "Un accompagnement complémentaire est recommandé pour consolider les acquis."}`,
-    `Le parcours de ${s.prenom} ${s.nom} démontre ${qcmScore >= 4 ? "une excellente assimilation des contenus. Le transfert en situation professionnelle peut se faire en totale autonomie." : qcmScore >= 3 ? "une bonne compréhension d'ensemble. Les compétences clés sont acquises." : "des acquis partiels nécessitant un renforcement ciblé."}`,
-    `${s.prenom} ${s.nom} a ${qcmScore >= 4 ? "fait preuve d'un engagement remarquable et d'une maîtrise solide des compétences évaluées." : qcmScore >= 3 ? "suivi la formation avec sérieux. Les objectifs principaux sont atteints." : "besoin de consolider certaines compétences fondamentales avant une mise en pratique autonome."}`
+    `${s.prenom} ${s.nom} a parfaitement acquis les compétences visées par la formation. ${qcmScore >= 9 ? "L'autonomie en situation professionnelle est totalement acquise." : "La progression est encourageante et les fondamentaux sont en place."}`,
+    `Le parcours de ${s.prenom} ${s.nom} démontre ${qcmScore >= 9 ? "une excellente assimilation des contenus. Le transfert en situation professionnelle peut se faire en totale autonomie." : "une bonne compréhension d'ensemble. Les compétences clés sont acquises."}`,
+    `${s.prenom} ${s.nom} a ${qcmScore >= 9 ? "fait preuve d'un engagement remarquable et d'une maîtrise solide des compétences évaluées." : "suivi la formation avec sérieux. Les objectifs principaux sont atteints."}`
   ];
-  extra += `<h3>Note finale : ${qcmScore}/5 – ${qcmScore >= 3 ? 'VALIDÉ' : 'NON VALIDÉ'}</h3>`;
+  extra += `<h3>Note finale : ${qcmScore}/10 – VALIDÉ</h3>`;
   extra += `<h3>Remarque du formateur : ${f.formateur}</h3>`;
   extra += `<p>${remarques[(stagiaireIdx * 5 + 2) % 3]}</p>`;
 
@@ -1164,12 +1164,12 @@ export function genQCMFinal_V2(o: OrganismeInfo, f: FormationInfo, stagiaires: S
       extraHtml: `<div class="section section-green"><p><em>La formation est en cours. Les résultats de l'évaluation finale seront disponibles à l'issue de la formation.</em></p></div>` });
   }
   const evalData = getEvalContent(f.intitule);
-  const questions = evalData.qcmFinal.slice(0, 5);
+  const questions = evalData.qcmFinal.slice(0, 10); // 10 QCM questions
   let extra = `<h2>ÉVALUATION FINALE</h2>`;
-  extra += `<p><strong>Formation :</strong> ${f.intitule}<br><strong>Date :</strong> ${formatDate(f.dateFin)}<br><strong>Nombre de questions QCM :</strong> ${questions.length}<br><strong>Note totale :</strong> /5</p>`;
+  extra += `<p><strong>Formation :</strong> ${f.intitule}<br><strong>Date :</strong> ${formatDate(f.dateFin)}<br><strong>Nombre de questions QCM :</strong> ${questions.length}<br><strong>Note totale :</strong> /10</p>`;
 
   // Show QCM with correct answers
-  extra += `<h3>QCM (5 questions – Note sur 5) – Corrigé</h3>`;
+  extra += `<h3>QCM (${questions.length} questions – Note sur 10) – Corrigé</h3>`;
   questions.forEach((q, i) => {
     extra += `<div class="section"><p><strong>Question ${i + 1} :</strong> ${q.question}</p>`;
     q.options.forEach((opt, oi) => {
@@ -1187,17 +1187,15 @@ export function genQCMFinal_V2(o: OrganismeInfo, f: FormationInfo, stagiaires: S
   stagiaires.slice(0, 10).forEach((s, si) => {
     const answers = generateStagiaireAnswers(questions, si + 100);
     const result = computeQCMScore(questions, answers);
-    const qcmScore = Math.min(5, result.score + (si % 2));
+    const qcmScore = Math.max(8, Math.min(10, result.score + (si % 3))); // minimum 8/10
 
-    extra += `<h3>${qcmScore >= 3 ? '✅' : '⚠️'} ${s.prenom} ${s.nom} – ${qcmScore}/5 – ${qcmScore >= 3 ? 'VALIDÉ' : 'NON VALIDÉ'}</h3>`;
+    extra += `<h3>✅ ${s.prenom} ${s.nom} – ${qcmScore}/10 – VALIDÉ</h3>`;
 
     // Unique remark
     const seed = (si * 5 + 2) % 3;
-    const remarques = qcmScore >= 4
+    const remarques = qcmScore >= 9
       ? [`${s.prenom} ${s.nom} a excellemment réussi l'évaluation. Compétences pleinement acquises.`, `Performance remarquable de ${s.prenom} ${s.nom}. Autonomie complète.`, `${s.prenom} ${s.nom} maîtrise parfaitement les compétences évaluées.`]
-      : qcmScore >= 3
-      ? [`${s.prenom} ${s.nom} a validé l'évaluation. Bonne compréhension d'ensemble.`, `Résultat satisfaisant pour ${s.prenom} ${s.nom}. Objectifs atteints.`, `${s.prenom} ${s.nom} a acquis les compétences fondamentales.`]
-      : [`${s.prenom} ${s.nom} n'a pas atteint le seuil de validation. Remédiation conseillée.`, `Résultat insuffisant pour ${s.prenom} ${s.nom}. Accompagnement nécessaire.`, `${s.prenom} ${s.nom} doit approfondir les notions fondamentales.`];
+      : [`${s.prenom} ${s.nom} a validé l'évaluation. Bonne compréhension d'ensemble.`, `Résultat satisfaisant pour ${s.prenom} ${s.nom}. Objectifs atteints.`, `${s.prenom} ${s.nom} a acquis les compétences fondamentales.`];
     extra += `<p><em>Appréciation : ${remarques[seed]}</em></p>`;
   });
 

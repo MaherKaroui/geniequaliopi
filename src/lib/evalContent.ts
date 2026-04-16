@@ -1755,8 +1755,8 @@ export function generateStagiaireOpenAnswers(
   
   // Target: each stagiaire gets a unique score
   // Début: 5-7 range, Fin: 8-10 range (good scores after training)
-  const targetScoresDebut = [5, 5.5, 6, 6.5, 7, 5.5, 6, 7, 6.5, 5];
-  const targetScoresFin = [8, 8.5, 9, 9.5, 10, 8.5, 9, 10, 9.5, 8];
+  const targetScoresDebut = [5, 6, 6, 7, 7, 5, 6, 7, 6, 5];
+  const targetScoresFin = [8, 9, 9, 10, 10, 9, 9, 10, 10, 8];
   const targetScores = isDebut ? targetScoresDebut : targetScoresFin;
   const target = targetScores[stagiaireIndex % targetScores.length];
   
