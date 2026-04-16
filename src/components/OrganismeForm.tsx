@@ -16,7 +16,8 @@ interface OrganismeFormProps {
   hideFields?: string[];
 }
 
-const OrganismeForm = ({ data, onChange }: OrganismeFormProps) => {
+const OrganismeForm = ({ data, onChange, hideFields = [] }: OrganismeFormProps) => {
+  const hidden = (field: string) => hideFields.includes(field);
   const [pappersUrl, setPappersUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
