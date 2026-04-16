@@ -361,6 +361,11 @@ function courseCertificateHtml(o: OrganismeInfo, f: FormationInfo): string {
     <img src="/images/coursera-ribbon.png" alt="Coursera Course Certificate" style="width:100%;height:100%;object-fit:cover;object-position:top center" />
   </div>
 
+  <!-- Coursera seal - overlapping main area and ribbon -->
+  <div style="position:absolute;top:38%;right:100px;z-index:2">
+    <img src="/images/coursera-seal.png" alt="Coursera Seal" style="width:190px;height:190px;object-fit:contain" />
+  </div>
+
   <!-- Main content -->
   <div style="padding:55px 50px 35px 55px;margin-right:230px;position:relative;z-index:1">
     <div style="margin-bottom:55px">
@@ -398,7 +403,6 @@ function courseCertificateHtml(o: OrganismeInfo, f: FormationInfo): string {
     </div>
   </div>
 </div>`;
-}
 
 export function genCertificatCoursera(o: OrganismeInfo, f: FormationInfo): string {
   return buildDocument({
