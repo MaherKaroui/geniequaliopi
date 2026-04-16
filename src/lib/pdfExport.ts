@@ -219,6 +219,12 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
         continue;
       }
 
+      // Keep single-block elements intact (e.g. CV with flex/sidebar layout)
+      if (node instanceof HTMLElement && node.classList.contains("pdf-single-block")) {
+        current.content.appendChild(node.cloneNode(true));
+        continue;
+      }
+
       // Special handling for tables: split row by row, repeat thead
       if (node instanceof HTMLElement && node.tagName === "TABLE") {
         const thead = node.querySelector("thead");
