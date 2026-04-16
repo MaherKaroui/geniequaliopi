@@ -37,6 +37,7 @@ const NDA_DOCUMENTS = [
   { id: "logo", label: "Logo de l'organisme", icon: "🖼️" },
   { id: "cv", label: "CV du Formateur", icon: "👤" },
   { id: "liste_formateurs", label: "Liste des Formateurs", icon: "👥" },
+  { id: "certificat_coursera", label: "Certificat Coursera / UCI", icon: "🎓" },
 ];
 
 const emptyOrganisme: OrganismeInfo = {
