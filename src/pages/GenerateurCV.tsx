@@ -298,11 +298,14 @@ const GenerateurCV = () => {
             </Button>
             <span className="font-bold text-lg">Générateur de CV Formateur</span>
           </div>
-          <Button onClick={handleDownload} className="gap-2 bg-gradient-hero border-0 text-primary-foreground">
-            <Download className="w-4 h-4" /> Télécharger DOC
-          </Button>
-        </div>
-      </header>
+          <div className="flex items-center gap-2">
+            <Button onClick={handleDownloadPdf} className="gap-2 bg-gradient-hero border-0 text-primary-foreground">
+              <FileText className="w-4 h-4" /> PDF
+            </Button>
+            <Button onClick={handleDownloadDoc} variant="outline" className="gap-2">
+              <Download className="w-4 h-4" /> DOC
+            </Button>
+          </div>
 
       <main className="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* LEFT: Form */}
