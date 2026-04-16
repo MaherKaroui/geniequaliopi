@@ -349,25 +349,32 @@ function courseCertificateHtml(o: OrganismeInfo, f: FormationInfo): string {
   const verifyCode = Math.random().toString(36).substring(2, 14).toUpperCase();
 
   return `
-<div style="width:100%;max-width:860px;margin:20px auto;font-family:Georgia,'Times New Roman',serif;position:relative;background:#fff;border:1px solid #bbb;box-shadow:0 2px 10px rgba(0,0,0,0.06);aspect-ratio:1.29/1">
+<div style="width:100%;max-width:860px;margin:20px auto;font-family:Georgia,'Times New Roman',serif;position:relative;background:#fff;border:1px solid #bbb;box-shadow:0 2px 10px rgba(0,0,0,0.06);aspect-ratio:1.29/1;overflow:hidden">
   <!-- Outer decorative border -->
-  <div style="position:absolute;top:6px;left:6px;right:6px;bottom:6px;border:1px solid #ccc;pointer-events:none"></div>
-  <div style="position:absolute;top:12px;left:12px;right:12px;bottom:12px;border:1px solid #d8d2c8;pointer-events:none"></div>
+  <div style="position:absolute;top:6px;left:6px;right:6px;bottom:6px;border:1px solid #ccc;pointer-events:none;z-index:0"></div>
+  <div style="position:absolute;top:12px;left:12px;right:12px;bottom:12px;border:1px solid #d8d2c8;pointer-events:none;z-index:0"></div>
   <!-- Watermark pattern -->
-  <div style="position:absolute;top:0;left:0;right:0;bottom:0;opacity:0.025;background:repeating-linear-gradient(135deg,#8888aa 0px,#8888aa 1px,transparent 1px,transparent 6px),repeating-linear-gradient(45deg,#8888aa 0px,#8888aa 1px,transparent 1px,transparent 6px)"></div>
+  <div style="position:absolute;top:0;left:0;right:0;bottom:0;opacity:0.025;background:repeating-linear-gradient(135deg,#8888aa 0px,#8888aa 1px,transparent 1px,transparent 6px),repeating-linear-gradient(45deg,#8888aa 0px,#8888aa 1px,transparent 1px,transparent 6px);z-index:0"></div>
 
-  <!-- Right ribbon -->
-  <div style="position:absolute;top:0;right:0;width:230px;height:100%;z-index:1;overflow:hidden">
-    <img src="/images/coursera-ribbon.png" alt="Coursera Course Certificate" style="width:100%;height:100%;object-fit:cover;object-position:top center" />
-  </div>
-
-  <!-- Coursera seal - overlapping main area and ribbon -->
-  <div style="position:absolute;top:38%;right:100px;z-index:2">
-    <img src="/images/coursera-seal.png" alt="Coursera Seal" style="width:190px;height:190px;object-fit:contain" />
+  <!-- Right ribbon pennant -->
+  <div style="position:absolute;top:0;right:50px;width:200px;z-index:3;display:flex;flex-direction:column;align-items:center">
+    <!-- Ribbon body -->
+    <div style="width:100%;background:linear-gradient(180deg,#e8e4dd 0%,#ddd9d1 50%,#d5d1c9 100%);border-left:1px solid #c5bfb5;border-right:1px solid #c5bfb5;display:flex;flex-direction:column;align-items:center;padding:40px 20px 0 20px;box-sizing:border-box">
+      <!-- Subtle diagonal pattern on ribbon -->
+      <div style="position:absolute;top:0;left:0;right:0;bottom:0;opacity:0.04;background:repeating-linear-gradient(135deg,#888 0px,#888 1px,transparent 1px,transparent 5px)"></div>
+      <!-- COURSE CERTIFICATE text -->
+      <div style="font-family:Arial,Helvetica,sans-serif;font-weight:800;font-size:18px;letter-spacing:5px;color:#2a2a2a;text-align:center;line-height:1.7;position:relative;z-index:1">COURSE<br>CERTIFICATE</div>
+      <!-- Coursera seal -->
+      <div style="margin-top:80px;margin-bottom:80px;position:relative;z-index:1">
+        <img src="/images/coursera-seal.png" alt="Coursera Seal" style="width:170px;height:170px;object-fit:contain" />
+      </div>
+    </div>
+    <!-- V-notch at bottom -->
+    <div style="width:0;height:0;border-left:100px solid #d5d1c9;border-right:100px solid #d5d1c9;border-bottom:40px solid transparent"></div>
   </div>
 
   <!-- Main content -->
-  <div style="padding:55px 50px 35px 55px;margin-right:230px;position:relative;z-index:1">
+  <div style="padding:55px 50px 35px 55px;margin-right:270px;position:relative;z-index:1">
     <div style="margin-bottom:55px">
       <img src="/images/duke-logo.jpg" alt="Duke University" style="height:100px;object-fit:contain" />
     </div>
@@ -375,7 +382,7 @@ function courseCertificateHtml(o: OrganismeInfo, f: FormationInfo): string {
     <div style="font-size:36px;font-weight:400;color:#111;margin-bottom:10px;letter-spacing:0.3px;line-height:1.2">${displayName}</div>
     <div style="font-size:12px;color:#777;margin-bottom:22px;font-family:Arial,sans-serif">has successfully completed</div>
     <div style="font-size:19px;font-weight:600;color:#222;margin-bottom:14px;line-height:1.4;font-style:italic">${formationTitle}</div>
-    <div style="font-size:11px;color:#666;margin-bottom:90px;line-height:1.7;max-width:460px;font-family:Arial,sans-serif">
+    <div style="font-size:11px;color:#666;margin-bottom:90px;line-height:1.7;max-width:420px;font-family:Arial,sans-serif">
       an online non-credit course authorized by Duke University and offered through Coursera
     </div>
     <div style="display:flex;gap:50px;margin-top:10px">
@@ -397,7 +404,7 @@ function courseCertificateHtml(o: OrganismeInfo, f: FormationInfo): string {
         </div>
       </div>
     </div>
-    <div style="margin-top:35px;text-align:right">
+    <div style="margin-top:35px;text-align:right;margin-right:-220px">
       <div style="font-size:11px;color:#333;font-family:Arial,sans-serif">Verify at coursera.org/verify/${verifyCode}</div>
       <div style="font-size:9px;color:#777;font-family:Arial,sans-serif;margin-top:3px;font-style:italic">Coursera has confirmed the identity of this individual and<br>their participation in the course.</div>
     </div>
