@@ -169,7 +169,7 @@ const DemandeNDA = () => {
         <StepIndicator steps={NDA_STEPS} currentStep={currentStep} onStepClick={setCurrentStep} />
 
         <div className="bg-card rounded-2xl border shadow-card p-6 md:p-8">
-          {currentStep === 1 && <OrganismeForm data={organisme} onChange={setOrganisme} />}
+          {currentStep === 1 && <OrganismeForm data={organisme} onChange={setOrganisme} hideFields={['domainesFormation', 'certifications', 'outilsUtilises', 'version']} />}
           {currentStep === 2 && <FormationForm data={formation} onChange={setFormation} onImportStagiaires={setStagiaires} />}
           {currentStep === 3 && <StagiairesForm data={stagiaires} onChange={setStagiaires} />}
           {currentStep === 4 && (
