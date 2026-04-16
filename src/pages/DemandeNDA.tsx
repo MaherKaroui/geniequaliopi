@@ -10,11 +10,12 @@ import OrganismeForm from "@/components/OrganismeForm";
 import FormationForm from "@/components/FormationForm";
 import StagiairesForm from "@/components/StagiairesForm";
 import StepIndicator from "@/components/StepIndicator";
+import CVGeneratorEmbed from "@/components/CVGeneratorEmbed";
 import { genContratFormationParticulier, genDevis } from "@/lib/templatesAF";
 import { genReglement_V2 } from "@/lib/generatorsV2";
 import { generateDocumentById } from "@/lib/documentGenerator";
 import { htmlToPdfBlob } from "@/lib/pdfExport";
-import { Textarea } from "@/components/ui/textarea";
+import { CVData, CVDesign, emptyCV, generateCVHTML } from "@/lib/cvGenerator";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -49,7 +50,7 @@ const emptyFormation: FormationInfo = {
   rythmeAlternance: "",
 };
 
-function generateDocumentHTML(docId: string, o: OrganismeInfo, f: FormationInfo, s: StagiaireInfo[], cvFormateur: string): string | null {
+function generateDocumentHTML(docId: string, o: OrganismeInfo, f: FormationInfo, s: StagiaireInfo[], cvData: CVData, cvDesign: CVDesign): string | null {
   switch (docId) {
     case "contrat":
       return genContratFormationParticulier(o, f, s);
@@ -62,9 +63,11 @@ function generateDocumentHTML(docId: string, o: OrganismeInfo, f: FormationInfo,
     case "logo":
       if (o.logoUrl) return `<div style="text-align:center;padding:60px;"><img src="${o.logoUrl}" style="max-width:400px;" /><p style="margin-top:20px;color:#666;">Logo de l'organisme</p></div>`;
       return null;
-    case "cv":
-      if (cvFormateur) return `<div style="font-family:Arial,sans-serif;max-width:800px;margin:0 auto;padding:40px;white-space:pre-wrap;">${cvFormateur}</div>`;
+    case "cv": {
+      const hasContent = cvData.prenom || cvData.nom || cvData.profil || cvData.experiences.some(e => e.poste);
+      if (hasContent) return generateCVHTML(cvData, cvDesign);
       return null;
+    }
     default: return null;
   }
 }
@@ -76,6 +79,8 @@ interface SavedNDADossier {
   formation: FormationInfo;
   stagiaires: StagiaireInfo[];
   cv_formateur: string;
+  cv_data?: CVData;
+  cv_design?: CVDesign;
   created_at: string;
   updated_at: string;
 }
@@ -87,7 +92,8 @@ const DemandeNDA = () => {
   const [organisme, setOrganisme] = useState<OrganismeInfo>(emptyOrganisme);
   const [formation, setFormation] = useState<FormationInfo>(emptyFormation);
   const [stagiaires, setStagiaires] = useState<StagiaireInfo[]>([]);
-  const [cvFormateur, setCvFormateur] = useState("");
+  const [cvData, setCvData] = useState<CVData>(emptyCV);
+  const [cvDesign, setCvDesign] = useState<CVDesign>("classique");
   const [previewDoc, setPreviewDoc] = useState<string | null>(null);
   const [previewHTML, setPreviewHTML] = useState("");
   const [generating, setGenerating] = useState(false);
@@ -127,7 +133,7 @@ const DemandeNDA = () => {
       organisme: organisme as any,
       formation: formation as any,
       stagiaires: stagiaires as any,
-      cv_formateur: cvFormateur,
+      cv_formateur: JSON.stringify(cvData),
     });
     if (error) toast.error(error.message);
     else { toast.success("Dossier NDA sauvegardé !"); fetchDossiers(); setSaveName(""); }
@@ -138,7 +144,11 @@ const DemandeNDA = () => {
     setOrganisme(d.organisme);
     setFormation(d.formation);
     setStagiaires(d.stagiaires);
-    setCvFormateur(d.cv_formateur || "");
+    // Try to parse CV data from saved string
+    try {
+      const parsed = JSON.parse(d.cv_formateur || "{}");
+      if (parsed.prenom !== undefined) setCvData(parsed);
+    } catch { /* legacy text format, ignore */ }
     setCurrentStep(1);
     setShowHistory(false);
     toast.success(`Dossier "${d.name}" chargé`);
@@ -151,7 +161,7 @@ const DemandeNDA = () => {
   };
 
   const handlePreview = (docId: string) => {
-    const html = generateDocumentHTML(docId, organisme, formation, stagiaires, cvFormateur);
+    const html = generateDocumentHTML(docId, organisme, formation, stagiaires, cvData, cvDesign);
     if (!html) {
       toast.error(docId === "logo" ? "Veuillez d'abord importer un logo" : "Veuillez remplir le CV du formateur");
       return;
@@ -161,7 +171,7 @@ const DemandeNDA = () => {
   };
 
   const handleDownload = async (docId: string) => {
-    const html = generateDocumentHTML(docId, organisme, formation, stagiaires, cvFormateur);
+    const html = generateDocumentHTML(docId, organisme, formation, stagiaires, cvData, cvDesign);
     if (!html) { toast.error("Document non disponible."); return; }
     if (docId === "logo" && organisme.logoUrl) {
       const a = document.createElement("a");
@@ -201,7 +211,7 @@ const DemandeNDA = () => {
           } catch { /* skip */ }
           continue;
         }
-        const html = generateDocumentHTML(doc.id, organisme, formation, stagiaires, cvFormateur);
+        const html = generateDocumentHTML(doc.id, organisme, formation, stagiaires, cvData, cvDesign);
         if (html) {
           if (exportFormat === "pdf") {
             const blob = await htmlToPdfBlob(html);
@@ -324,74 +334,63 @@ const DemandeNDA = () => {
           {currentStep === 2 && <FormationForm data={formation} onChange={setFormation} onImportStagiaires={setStagiaires} />}
           {currentStep === 3 && <StagiairesForm data={stagiaires} onChange={setStagiaires} />}
           {currentStep === 4 && (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* Left: CV */}
-              <div className="space-y-6">
-                <Card>
-                  <CardHeader><CardTitle className="text-lg">CV du Formateur</CardTitle></CardHeader>
-                  <CardContent>
-                    <Label>CV du formateur (texte)</Label>
-                    <Textarea
-                      value={cvFormateur}
-                      onChange={e => setCvFormateur(e.target.value)}
-                      rows={8}
-                      placeholder="Expérience, diplômes, compétences du formateur..."
-                    />
-                  </CardContent>
-                </Card>
+            <div className="space-y-8">
+              {/* CV Generator */}
+              <div>
+                <h2 className="text-lg font-semibold mb-4">CV du Formateur</h2>
+                <CVGeneratorEmbed cvData={cvData} onCVChange={setCvData} selectedDesign={cvDesign} onDesignChange={setCvDesign} />
               </div>
 
-              {/* Right: Documents */}
-              <div className="space-y-6">
-                <Card>
-                  <CardHeader><CardTitle className="text-lg">Documents du dossier NDA</CardTitle></CardHeader>
-                  <CardContent className="space-y-3">
-                    {NDA_DOCUMENTS.map(doc => {
-                      const ready = doc.id === "contrat" || doc.id === "programme" || doc.id === "reglement" || doc.id === "devis" || (doc.id === "logo" && !!organisme.logoUrl) || (doc.id === "cv" && !!cvFormateur);
-                      return (
-                        <div key={doc.id} className="flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors">
-                          <div className="flex items-center gap-3">
-                            <span className="text-xl">{doc.icon}</span>
-                            <div>
-                              <p className="font-medium text-sm">{doc.label}</p>
-                              <p className="text-xs text-muted-foreground">{ready ? "Prêt" : "À compléter"}</p>
-                            </div>
-                            {ready && <CheckCircle2 className="w-4 h-4 text-green-500" />}
+              {/* Documents */}
+              <Card>
+                <CardHeader><CardTitle className="text-lg">Documents du dossier NDA</CardTitle></CardHeader>
+                <CardContent className="space-y-3">
+                  {NDA_DOCUMENTS.map(doc => {
+                    const cvHasContent = cvData.prenom || cvData.nom || cvData.profil || cvData.experiences.some(e => e.poste);
+                    const ready = doc.id === "contrat" || doc.id === "programme" || doc.id === "reglement" || doc.id === "devis" || (doc.id === "logo" && !!organisme.logoUrl) || (doc.id === "cv" && !!cvHasContent);
+                    return (
+                      <div key={doc.id} className="flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors">
+                        <div className="flex items-center gap-3">
+                          <span className="text-xl">{doc.icon}</span>
+                          <div>
+                            <p className="font-medium text-sm">{doc.label}</p>
+                            <p className="text-xs text-muted-foreground">{ready ? "Prêt" : "À compléter"}</p>
                           </div>
-                          <div className="flex gap-2">
-                            <Button variant="outline" size="sm" onClick={() => handlePreview(doc.id)} className="gap-1">
-                              <FileText className="w-3.5 h-3.5" /> Aperçu
-                            </Button>
-                            <Button variant="outline" size="sm" onClick={() => handleDownload(doc.id)} className="gap-1">
-                              <Download className="w-3.5 h-3.5" /> {exportFormat.toUpperCase()}
-                            </Button>
-                          </div>
+                          {ready && <CheckCircle2 className="w-4 h-4 text-emerald-500" />}
                         </div>
-                      );
-                    })}
+                        <div className="flex gap-2">
+                          <Button variant="outline" size="sm" onClick={() => handlePreview(doc.id)} className="gap-1">
+                            <FileText className="w-3.5 h-3.5" /> Aperçu
+                          </Button>
+                          <Button variant="outline" size="sm" onClick={() => handleDownload(doc.id)} className="gap-1">
+                            <Download className="w-3.5 h-3.5" /> {exportFormat.toUpperCase()}
+                          </Button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </CardContent>
+              </Card>
+
+              {previewDoc && (
+                <Card>
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-lg">Aperçu : {NDA_DOCUMENTS.find(d => d.id === previewDoc)?.label}</CardTitle>
+                      <Button variant="ghost" size="sm" onClick={() => setPreviewDoc(null)}>Fermer</Button>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="border rounded-lg overflow-hidden bg-white" style={{ maxHeight: "600px", overflowY: "auto" }}>
+                      <iframe
+                        srcDoc={`<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{margin:0;padding:0;}</style></head><body>${previewHTML}</body></html>`}
+                        style={{ width: "100%", minHeight: "500px", border: "none" }}
+                        title="Aperçu document"
+                      />
+                    </div>
                   </CardContent>
                 </Card>
-
-                {previewDoc && (
-                  <Card>
-                    <CardHeader>
-                      <div className="flex items-center justify-between">
-                        <CardTitle className="text-lg">Aperçu : {NDA_DOCUMENTS.find(d => d.id === previewDoc)?.label}</CardTitle>
-                        <Button variant="ghost" size="sm" onClick={() => setPreviewDoc(null)}>Fermer</Button>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="border rounded-lg overflow-hidden bg-white" style={{ maxHeight: "600px", overflowY: "auto" }}>
-                        <iframe
-                          srcDoc={`<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{margin:0;padding:0;}</style></head><body>${previewHTML}</body></html>`}
-                          style={{ width: "100%", minHeight: "500px", border: "none" }}
-                          title="Aperçu document"
-                        />
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
-              </div>
+              )}
             </div>
           )}
         </div>
