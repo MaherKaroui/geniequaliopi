@@ -1,20 +1,23 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChevronLeft, ChevronRight, Download, FileText, Loader2, CheckCircle2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Download, FileText, Loader2, CheckCircle2, Save, FolderOpen, Trash2, Clock } from "lucide-react";
 import { toast } from "sonner";
 import { OrganismeInfo, FormationInfo, StagiaireInfo, CritereData, CRITERES } from "@/types/qualiopi";
 import OrganismeForm from "@/components/OrganismeForm";
 import FormationForm from "@/components/FormationForm";
 import StagiairesForm from "@/components/StagiairesForm";
 import StepIndicator from "@/components/StepIndicator";
-import LogoSignatureUpload from "@/components/LogoSignatureUpload";
 import { genContratFormationParticulier, genDevis } from "@/lib/templatesAF";
 import { genReglement_V2 } from "@/lib/generatorsV2";
 import { generateDocumentById } from "@/lib/documentGenerator";
+import { htmlToPdfBlob } from "@/lib/pdfExport";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 
 const NDA_STEPS = [
   { id: 1, label: "Organisme" },
@@ -66,8 +69,20 @@ function generateDocumentHTML(docId: string, o: OrganismeInfo, f: FormationInfo,
   }
 }
 
+interface SavedNDADossier {
+  id: string;
+  name: string;
+  organisme: OrganismeInfo;
+  formation: FormationInfo;
+  stagiaires: StagiaireInfo[];
+  cv_formateur: string;
+  created_at: string;
+  updated_at: string;
+}
+
 const DemandeNDA = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
   const [organisme, setOrganisme] = useState<OrganismeInfo>(emptyOrganisme);
   const [formation, setFormation] = useState<FormationInfo>(emptyFormation);
@@ -76,6 +91,64 @@ const DemandeNDA = () => {
   const [previewDoc, setPreviewDoc] = useState<string | null>(null);
   const [previewHTML, setPreviewHTML] = useState("");
   const [generating, setGenerating] = useState(false);
+  const [exportFormat, setExportFormat] = useState<"pdf" | "doc">("pdf");
+
+  // Save/load state
+  const [dossiers, setDossiers] = useState<SavedNDADossier[]>([]);
+  const [saving, setSaving] = useState(false);
+  const [saveName, setSaveName] = useState("");
+  const [showHistory, setShowHistory] = useState(false);
+
+  // Fetch saved dossiers
+  const fetchDossiers = async () => {
+    if (!user) return;
+    const { data, error } = await supabase
+      .from("saved_nda_dossiers")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("updated_at", { ascending: false });
+    if (!error && data) {
+      setDossiers(data as unknown as SavedNDADossier[]);
+    }
+  };
+
+  useEffect(() => {
+    if (user) fetchDossiers();
+  }, [user]);
+
+  const handleSave = async () => {
+    if (!user) { toast.error("Connectez-vous pour sauvegarder"); return; }
+    if (!organisme.nom) { toast.error("Remplissez au moins le nom de l'organisme"); return; }
+    setSaving(true);
+    const name = saveName.trim() || `${organisme.nom} – ${formation.intitule || "NDA"}`;
+    const { error } = await supabase.from("saved_nda_dossiers").insert({
+      user_id: user.id,
+      name,
+      organisme: organisme as any,
+      formation: formation as any,
+      stagiaires: stagiaires as any,
+      cv_formateur: cvFormateur,
+    });
+    if (error) toast.error(error.message);
+    else { toast.success("Dossier NDA sauvegardé !"); fetchDossiers(); setSaveName(""); }
+    setSaving(false);
+  };
+
+  const handleLoad = (d: SavedNDADossier) => {
+    setOrganisme(d.organisme);
+    setFormation(d.formation);
+    setStagiaires(d.stagiaires);
+    setCvFormateur(d.cv_formateur || "");
+    setCurrentStep(1);
+    setShowHistory(false);
+    toast.success(`Dossier "${d.name}" chargé`);
+  };
+
+  const handleDelete = async (id: string) => {
+    const { error } = await supabase.from("saved_nda_dossiers").delete().eq("id", id);
+    if (error) toast.error(error.message);
+    else { toast.success("Dossier supprimé"); fetchDossiers(); }
+  };
 
   const handlePreview = (docId: string) => {
     const html = generateDocumentHTML(docId, organisme, formation, stagiaires, cvFormateur);
@@ -89,10 +162,7 @@ const DemandeNDA = () => {
 
   const handleDownload = async (docId: string) => {
     const html = generateDocumentHTML(docId, organisme, formation, stagiaires, cvFormateur);
-    if (!html) {
-      toast.error("Document non disponible. Remplissez les champs requis.");
-      return;
-    }
+    if (!html) { toast.error("Document non disponible."); return; }
     if (docId === "logo" && organisme.logoUrl) {
       const a = document.createElement("a");
       a.href = organisme.logoUrl;
@@ -100,9 +170,19 @@ const DemandeNDA = () => {
       a.click();
       return;
     }
-    const { downloadAsWord } = await import("@/lib/wordExport");
     const label = NDA_DOCUMENTS.find(d => d.id === docId)?.label || docId;
-    await downloadAsWord(html, `${label} - ${organisme.nom || "Organisme"}`);
+    const filename = `${label} - ${organisme.nom || "Organisme"}`;
+
+    if (exportFormat === "pdf") {
+      const blob = await htmlToPdfBlob(html);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url; a.download = `${filename}.pdf`; a.click();
+      URL.revokeObjectURL(url);
+    } else {
+      const { downloadAsWord } = await import("@/lib/wordExport");
+      await downloadAsWord(html, filename);
+    }
     toast.success(`${label} téléchargé !`);
   };
 
@@ -111,7 +191,6 @@ const DemandeNDA = () => {
     try {
       const JSZip = (await import("jszip")).default;
       const zip = new JSZip();
-      const { htmlToWordBlob } = await import("@/lib/wordExport");
 
       for (const doc of NDA_DOCUMENTS) {
         if (doc.id === "logo" && organisme.logoUrl) {
@@ -124,9 +203,15 @@ const DemandeNDA = () => {
         }
         const html = generateDocumentHTML(doc.id, organisme, formation, stagiaires, cvFormateur);
         if (html) {
-          const blob = await htmlToWordBlob(html);
-          const ext = blob.type.includes("docx") ? "docx" : "doc";
-          zip.file(`${doc.label}.${ext}`, blob);
+          if (exportFormat === "pdf") {
+            const blob = await htmlToPdfBlob(html);
+            zip.file(`${doc.label}.pdf`, blob);
+          } else {
+            const { htmlToWordBlob } = await import("@/lib/wordExport");
+            const blob = await htmlToWordBlob(html);
+            const ext = blob.type.includes("docx") ? "docx" : "doc";
+            zip.file(`${doc.label}.${ext}`, blob);
+          }
         }
       }
 
@@ -156,16 +241,82 @@ const DemandeNDA = () => {
             </Button>
             <span className="font-bold text-lg">Demande NDA</span>
           </div>
-          {currentStep === 4 && (
-            <Button onClick={handleDownloadAll} disabled={generating} className="gap-2 bg-gradient-hero border-0 text-primary-foreground">
-              {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
-              {generating ? "Génération..." : "Télécharger tout (ZIP)"}
-            </Button>
-          )}
+          <div className="flex items-center gap-2">
+            {user && (
+              <>
+                <Button variant="outline" size="sm" onClick={() => setShowHistory(!showHistory)} className="gap-1">
+                  <FolderOpen className="w-4 h-4" /> Mes dossiers
+                </Button>
+                <div className="flex items-center gap-1">
+                  <Input
+                    value={saveName}
+                    onChange={e => setSaveName(e.target.value)}
+                    placeholder="Nom du dossier"
+                    className="w-36 h-8 text-xs"
+                  />
+                  <Button variant="outline" size="sm" onClick={handleSave} disabled={saving} className="gap-1">
+                    {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
+                    Sauver
+                  </Button>
+                </div>
+              </>
+            )}
+            {currentStep === 4 && (
+              <>
+                <div className="flex border rounded-md overflow-hidden">
+                  <button
+                    onClick={() => setExportFormat("pdf")}
+                    className={`px-3 py-1 text-xs font-medium transition-colors ${exportFormat === "pdf" ? "bg-primary text-primary-foreground" : "bg-card hover:bg-accent"}`}
+                  >PDF</button>
+                  <button
+                    onClick={() => setExportFormat("doc")}
+                    className={`px-3 py-1 text-xs font-medium transition-colors ${exportFormat === "doc" ? "bg-primary text-primary-foreground" : "bg-card hover:bg-accent"}`}
+                  >DOC</button>
+                </div>
+                <Button onClick={handleDownloadAll} disabled={generating} className="gap-2 bg-gradient-hero border-0 text-primary-foreground">
+                  {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+                  {generating ? "Génération..." : "Télécharger tout (ZIP)"}
+                </Button>
+              </>
+            )}
+          </div>
         </div>
       </header>
 
       <main className="max-w-5xl mx-auto px-4 py-8">
+        {/* Saved dossiers panel */}
+        {showHistory && user && (
+          <Card className="mb-6">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base flex items-center gap-2"><Clock className="w-4 h-4" /> Dossiers NDA sauvegardés</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {dossiers.length === 0 ? (
+                <p className="text-sm text-muted-foreground">Aucun dossier sauvegardé.</p>
+              ) : (
+                <div className="space-y-2">
+                  {dossiers.map(d => (
+                    <div key={d.id} className="flex items-center justify-between p-3 border rounded-lg">
+                      <div>
+                        <p className="font-medium text-sm">{d.name}</p>
+                        <p className="text-xs text-muted-foreground">{new Date(d.updated_at).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" })}</p>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button variant="outline" size="sm" onClick={() => handleLoad(d)} className="gap-1">
+                          <FolderOpen className="w-3.5 h-3.5" /> Charger
+                        </Button>
+                        <Button variant="ghost" size="sm" onClick={() => handleDelete(d.id)} className="text-destructive">
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
         <StepIndicator steps={NDA_STEPS} currentStep={currentStep} onStepClick={setCurrentStep} />
 
         <div className="bg-card rounded-2xl border shadow-card p-6 md:p-8">
@@ -174,7 +325,7 @@ const DemandeNDA = () => {
           {currentStep === 3 && <StagiairesForm data={stagiaires} onChange={setStagiaires} />}
           {currentStep === 4 && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* Left: CV + extras */}
+              {/* Left: CV */}
               <div className="space-y-6">
                 <Card>
                   <CardHeader><CardTitle className="text-lg">CV du Formateur</CardTitle></CardHeader>
@@ -190,7 +341,7 @@ const DemandeNDA = () => {
                 </Card>
               </div>
 
-              {/* Right: Documents list + preview */}
+              {/* Right: Documents */}
               <div className="space-y-6">
                 <Card>
                   <CardHeader><CardTitle className="text-lg">Documents du dossier NDA</CardTitle></CardHeader>
@@ -212,7 +363,7 @@ const DemandeNDA = () => {
                               <FileText className="w-3.5 h-3.5" /> Aperçu
                             </Button>
                             <Button variant="outline" size="sm" onClick={() => handleDownload(doc.id)} className="gap-1">
-                              <Download className="w-3.5 h-3.5" /> DOC
+                              <Download className="w-3.5 h-3.5" /> {exportFormat.toUpperCase()}
                             </Button>
                           </div>
                         </div>
