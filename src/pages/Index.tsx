@@ -66,12 +66,7 @@ const Index = () => {
       if (error) throw error;
       if (!data?.success) throw new Error(getAirtableErrorMessage(data));
 
-      const baseName = data?.baseName || '';
-      toast.success(
-        baseName
-          ? `Nouvelle base "${baseName}" créée sur Airtable avec succès !`
-          : "Données synchronisées vers Airtable !"
-      );
+      toast.success("Données synchronisées vers Airtable !");
     } catch (err: any) {
       console.error('Airtable sync error:', err);
       toast.error("Erreur Airtable : " + (err.message || 'Erreur inconnue'));
