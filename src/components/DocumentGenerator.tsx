@@ -1321,19 +1321,21 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
         );
       })()}
 
-      {previewContent && (
+      {(previewContent || previewBlobUrl) && (
         <div className="mt-6">
           <div className="flex items-center justify-between mb-3 gap-2 flex-wrap">
             <h3 className="text-lg font-bold truncate flex-1">{previewTitle}</h3>
             <div className="flex gap-2 shrink-0">
-              <Button
-                variant={editing ? "default" : "outline"}
-                size="sm"
-                onClick={handleToggleEdit}
-              >
-                {editing ? "Enregistrer" : "Modifier"}
-              </Button>
-              <Button variant="ghost" size="sm" onClick={() => { setPreviewContent(null); setEditing(false); }}>
+              {!previewBlobUrl && (
+                <Button
+                  variant={editing ? "default" : "outline"}
+                  size="sm"
+                  onClick={handleToggleEdit}
+                >
+                  {editing ? "Enregistrer" : "Modifier"}
+                </Button>
+              )}
+              <Button variant="ghost" size="sm" onClick={() => { setPreviewContent(null); setPreviewBlobUrl(null); setEditing(false); }}>
                 <X className="w-4 h-4 mr-1" /> Fermer
               </Button>
             </div>
@@ -1344,17 +1346,25 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
             </div>
           )}
           <div className="bg-card border rounded-xl shadow-elevated overflow-hidden">
-            <iframe
-              ref={iframeRef}
-              srcDoc={previewContent}
-              className="w-full h-[600px] border-0"
-              title="Aperçu"
-              onLoad={() => {
-                if (editing && iframeRef.current?.contentDocument) {
-                  iframeRef.current.contentDocument.designMode = "on";
-                }
-              }}
-            />
+            {previewBlobUrl ? (
+              <iframe
+                src={previewBlobUrl}
+                className="w-full h-[700px] border-0"
+                title="Aperçu PDF"
+              />
+            ) : (
+              <iframe
+                ref={iframeRef}
+                srcDoc={previewContent!}
+                className="w-full h-[600px] border-0"
+                title="Aperçu"
+                onLoad={() => {
+                  if (editing && iframeRef.current?.contentDocument) {
+                    iframeRef.current.contentDocument.designMode = "on";
+                  }
+                }}
+              />
+            )}
           </div>
         </div>
       )}
