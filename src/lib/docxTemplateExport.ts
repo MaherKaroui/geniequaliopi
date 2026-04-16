@@ -56,7 +56,7 @@ function buildReplacements(o: OrganismeInfo): Record<string, string> {
     "mois3-jours3": fmt(d2Start),
     "mois4-jours4": fmt(d2End, { day: "numeric", month: "short", year: "numeric" }),
     // Diplôme Référent Handicap: dateMaj - 1 mois (2 jours consécutifs)
-    "nom et prenom de referent handicap": o.dirigeant || "",
+    "nom et prenom de referent handicap": o.referentHandicap || o.dirigeant || "",
     datedebut: (() => {
       const dd = new Date(ref.getFullYear(), ref.getMonth() - 1, ref.getDate());
       return dd.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
