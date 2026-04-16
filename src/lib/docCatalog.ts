@@ -700,6 +700,10 @@ export function buildFullCatalog(
 
     // IND 17 — Moyens humains, techniques et environnement
     add("cfa_c4i17_bail", "CT4 - IND 17 BAIL DE SOUS-LOCATION", 4, 17, "bail_sous_location");
+    add("cfa_c4i17_facture_pack_office", "CT4 - IND 17 FACTURE PACK OFFICE", 4, 17, "facture_pack_office");
+    add("cfa_c4i17_facture_google", "CT4 - IND 17 FACTURE GOOGLE WORKSPACE", 4, 17, "facture_google_workspace");
+    add("cfa_c4i17_facture_make", "CT4 - IND 17 FACTURE MAKE", 4, 17, "facture_make");
+    add("cfa_c4i17_facture_genspark", "CT4 - IND 17 FACTURE GENSPARK", 4, 17, "facture_genspark");
 
     const uniqueFormateursCFA = Array.from(new Set(stagiaires.map(s => (s as any).formateur).filter((f: any) => f && String(f).trim())));
 
