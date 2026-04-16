@@ -210,6 +210,8 @@ const GenerateurCV = () => {
   const [cv, setCv] = useState<CVData>(emptyCV);
   const [selectedDesign, setSelectedDesign] = useState<CVDesign>("classique");
   const photoInputRef = useRef<HTMLInputElement>(null);
+  const [aiPrompt, setAiPrompt] = useState("");
+  const [aiLoading, setAiLoading] = useState(false);
 
   const update = <K extends keyof CVData>(field: K, value: CVData[K]) =>
     setCv(prev => ({ ...prev, [field]: value }));
