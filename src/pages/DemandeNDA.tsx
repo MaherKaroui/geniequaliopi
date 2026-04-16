@@ -150,7 +150,7 @@ function generateDocumentHTML(docId: string, o: OrganismeInfo, f: FormationInfo,
       return generateListeFormateursHTML(o, cvData, s);
     }
     case "certificat_coursera":
-      return genCertificatCoursera(o, f);
+      return `<div style="font-family:Arial,sans-serif;max-width:860px;margin:0 auto;padding:0;">${courseCertificateHtml(o, f)}</div>`;
     default: return null;
   }
 }
