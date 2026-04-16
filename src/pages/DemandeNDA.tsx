@@ -79,6 +79,8 @@ interface SavedNDADossier {
   formation: FormationInfo;
   stagiaires: StagiaireInfo[];
   cv_formateur: string;
+  cv_data?: CVData;
+  cv_design?: CVDesign;
   created_at: string;
   updated_at: string;
 }
@@ -90,7 +92,8 @@ const DemandeNDA = () => {
   const [organisme, setOrganisme] = useState<OrganismeInfo>(emptyOrganisme);
   const [formation, setFormation] = useState<FormationInfo>(emptyFormation);
   const [stagiaires, setStagiaires] = useState<StagiaireInfo[]>([]);
-  const [cvFormateur, setCvFormateur] = useState("");
+  const [cvData, setCvData] = useState<CVData>(emptyCV);
+  const [cvDesign, setCvDesign] = useState<CVDesign>("classique");
   const [previewDoc, setPreviewDoc] = useState<string | null>(null);
   const [previewHTML, setPreviewHTML] = useState("");
   const [generating, setGenerating] = useState(false);
@@ -130,7 +133,7 @@ const DemandeNDA = () => {
       organisme: organisme as any,
       formation: formation as any,
       stagiaires: stagiaires as any,
-      cv_formateur: cvFormateur,
+      cv_formateur: JSON.stringify(cvData),
     });
     if (error) toast.error(error.message);
     else { toast.success("Dossier NDA sauvegardé !"); fetchDossiers(); setSaveName(""); }
@@ -141,7 +144,11 @@ const DemandeNDA = () => {
     setOrganisme(d.organisme);
     setFormation(d.formation);
     setStagiaires(d.stagiaires);
-    setCvFormateur(d.cv_formateur || "");
+    // Try to parse CV data from saved string
+    try {
+      const parsed = JSON.parse(d.cv_formateur || "{}");
+      if (parsed.prenom !== undefined) setCvData(parsed);
+    } catch { /* legacy text format, ignore */ }
     setCurrentStep(1);
     setShowHistory(false);
     toast.success(`Dossier "${d.name}" chargé`);
@@ -154,7 +161,7 @@ const DemandeNDA = () => {
   };
 
   const handlePreview = (docId: string) => {
-    const html = generateDocumentHTML(docId, organisme, formation, stagiaires, cvFormateur);
+    const html = generateDocumentHTML(docId, organisme, formation, stagiaires, cvData, cvDesign);
     if (!html) {
       toast.error(docId === "logo" ? "Veuillez d'abord importer un logo" : "Veuillez remplir le CV du formateur");
       return;
@@ -164,7 +171,7 @@ const DemandeNDA = () => {
   };
 
   const handleDownload = async (docId: string) => {
-    const html = generateDocumentHTML(docId, organisme, formation, stagiaires, cvFormateur);
+    const html = generateDocumentHTML(docId, organisme, formation, stagiaires, cvData, cvDesign);
     if (!html) { toast.error("Document non disponible."); return; }
     if (docId === "logo" && organisme.logoUrl) {
       const a = document.createElement("a");
@@ -204,7 +211,7 @@ const DemandeNDA = () => {
           } catch { /* skip */ }
           continue;
         }
-        const html = generateDocumentHTML(doc.id, organisme, formation, stagiaires, cvFormateur);
+        const html = generateDocumentHTML(doc.id, organisme, formation, stagiaires, cvData, cvDesign);
         if (html) {
           if (exportFormat === "pdf") {
             const blob = await htmlToPdfBlob(html);
