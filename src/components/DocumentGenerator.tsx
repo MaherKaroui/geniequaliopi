@@ -15,6 +15,7 @@ import DocStyleConfigPanel from "./DocStyleConfigPanel";
 import { downloadAsWord, htmlToWordBlob } from "@/lib/wordExport";
 import { generateExcelTableauBordPerformance, generateExcelTableauSuiviParcours, generateExcelIndicateursPrevisionnelsVAE, excelToBlob } from "@/lib/xlsxGenerator";
 import { downloadAsPdf, htmlToPdfBlob } from "@/lib/pdfExport";
+import { processDocxTemplate, DOCX_TEMPLATE_FILES } from "@/lib/docxTemplateExport";
 import { auditImportedFolder, ImportAuditResult } from "@/lib/importInspector";
 import {
   buildDocumentFileName,
