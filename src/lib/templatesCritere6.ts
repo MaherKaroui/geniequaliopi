@@ -1441,7 +1441,7 @@ export function genContratSousTraitanceV2(o: OrganismeInfo, f: FormationInfo, st
       <p><strong>${o.nom}</strong></p>
       <p>Forme juridique : Organisme de formation</p>
       <p>SIRET : ${o.siret}</p>
-      <p>Numéro de Déclaration d'Activité (NDA) : ${o.nda}</p>
+      ${o.nda ? `<p>Numéro de Déclaration d'Activité (NDA) : ${o.nda}</p>` : ""}
       <p>Siège social : ${o.adresse}, ${o.codePostal} ${o.ville}</p>
       <p>Représenté par : <strong>${o.dirigeant}</strong>, en qualité de Dirigeant</p>
       <p>Ci-après dénommé <strong>« le Donneur d'ordre »</strong></p>
@@ -1452,7 +1452,7 @@ export function genContratSousTraitanceV2(o: OrganismeInfo, f: FormationInfo, st
       <p style="font-style:italic">Ci-après désignés ensemble « les Parties ».</p>
     ` },
     { heading: "PRÉAMBULE", content: `
-      <p>Le Donneur d'ordre, <strong>${o.nom}</strong>, est un organisme de formation professionnelle déclaré auprès de la DREETS sous le numéro ${o.nda}.</p>
+      <p>Le Donneur d'ordre, <strong>${o.nom}</strong>, est un organisme de formation professionnelle${o.nda ? ` déclaré auprès de la DREETS sous le numéro ${o.nda}` : ""}.</p>
       <p>${preambuleSousTraitant}</p>
       <p>Le Donneur d'ordre souhaite confier au Sous-traitant, qui l'accepte, la réalisation de prestations de formation en sous-traitance, dans les conditions définies ci-après.</p>
       ${preambuleFormateur}
