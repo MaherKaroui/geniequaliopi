@@ -185,9 +185,18 @@ export function generateCVHTML(data: CVData, design: CVDesign): string {
     </div>`;
   }
 
-  const body = `${profilSection}${speSection}${expSection}${pedSection}${formSection}${certSection}${compSection}${langSection}${pubSection}`;
+  const fontFamily = design === "elegant" ? "Georgia,'Times New Roman',serif" : "'Segoe UI',Arial,sans-serif";
+  const baseStyle = `font-family:${fontFamily};color:#222;font-size:12px;line-height:1.5;`;
 
-  return `<div style="font-family:${design === "elegant" ? "Georgia,'Times New Roman',serif" : "'Segoe UI',Arial,sans-serif"};max-width:800px;margin:0 auto;padding:30px;color:#222;font-size:12px;line-height:1.5;">
-    ${header}${body}
-  </div>`;
+  // Return header + each section as separate top-level divs for proper PDF pagination
+  return `<div style="${baseStyle}padding:30px 30px 0 30px;">${header}</div>
+    <div style="${baseStyle}padding:0 30px;">${profilSection}</div>
+    <div style="${baseStyle}padding:0 30px;">${speSection}</div>
+    <div style="${baseStyle}padding:0 30px;">${expSection}</div>
+    <div style="${baseStyle}padding:0 30px;">${pedSection}</div>
+    <div style="${baseStyle}padding:0 30px;">${formSection}</div>
+    <div style="${baseStyle}padding:0 30px;">${certSection}</div>
+    <div style="${baseStyle}padding:0 30px;">${compSection}</div>
+    <div style="${baseStyle}padding:0 30px;">${langSection}</div>
+    <div style="${baseStyle}padding:0 30px 30px 30px;">${pubSection}</div>`;
 }
