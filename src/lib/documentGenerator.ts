@@ -11624,11 +11624,10 @@ function genFactureEDOF(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiair
   const stagAdresse = [s.adresse, s.codePostal, s.commune].filter(Boolean).join(", ") || "—";
 
   const finDate = dateFin ? new Date(dateFin) : new Date();
-  const date14jApres = new Date(finDate); date14jApres.setDate(date14jApres.getDate() + 14);
-  const date28jApres = new Date(finDate); date28jApres.setDate(date28jApres.getDate() + 28);
   const debutDate = dateDebut ? new Date(dateDebut) : new Date();
-  const date14jAvant = new Date(debutDate); date14jAvant.setDate(date14jAvant.getDate() - 14);
-  const dateSignature = formatDate(date14jAvant.toISOString().split("T")[0]);
+  // Date de la facture : 3 jours après la fin de formation
+  const dateFacture = new Date(finDate); dateFacture.setDate(dateFacture.getDate() + 3);
+  const dateSignature = formatDate(dateFacture.toISOString().split("T")[0]);
 
   return buildDocument({ org: o, title: `Facture n°${numFacture}`, stagiaires: [s], sections: [], extraHtml: `
     <div style="margin-bottom:20px;padding:12px;border:1px solid #ddd;border-radius:6px">
