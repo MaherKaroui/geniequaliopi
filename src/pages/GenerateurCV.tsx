@@ -238,11 +238,30 @@ const GenerateurCV = () => {
     update(field, arr as any);
   };
 
-  const handleDownload = async () => {
+  const handleDownloadDoc = async () => {
     const html = generateCVHTML(cv, selectedDesign);
     const { downloadAsWord } = await import("@/lib/wordExport");
     await downloadAsWord(html, `CV_${cv.prenom}_${cv.nom || "Formateur"}`);
-    toast.success("CV téléchargé !");
+    toast.success("CV téléchargé en DOC !");
+  };
+
+  const handleDownloadPdf = async () => {
+    const html = generateCVHTML(cv, selectedDesign);
+    try {
+      const blob = await htmlToPdfBlob(html);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `CV_${cv.prenom}_${cv.nom || "Formateur"}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toast.success("CV téléchargé en PDF !");
+    } catch (e) {
+      console.error(e);
+      toast.error("Erreur lors de la génération PDF");
+    }
   };
 
   const handleAIGenerate = async () => {
