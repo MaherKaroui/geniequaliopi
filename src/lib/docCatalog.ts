@@ -197,7 +197,11 @@ export function buildFullCatalog(
     // ===== CRITÈRE 4 — ADÉQUATION DES MOYENS =====
 
     // IND 17 — Moyens humains, techniques et environnement
-    add("af_c4i17_bail", "CT4 - IND 17 BAIL DE SOUS-LOCATION", 4, 17, "bail_sous_location");
+    const afModaLower = (formations[0]?.modalites || '').toLowerCase();
+    const afIsPureDistanciel = afModaLower.includes('distanciel') && !afModaLower.includes('mixte') && !afModaLower.includes('présentiel') && !afModaLower.includes('presentiel');
+    if (!afIsPureDistanciel) {
+      add("af_c4i17_bail", "CT4 - IND 17 BAIL DE SOUS-LOCATION", 4, 17, "bail_sous_location");
+    }
     add("af_c4i17_facture_pack_office", "CT4 - IND 17 FACTURE PACK OFFICE", 4, 17, "facture_pack_office_docx");
     add("af_c4i17_facture_google", "CT4 - IND 17 FACTURE GOOGLE WORKSPACE", 4, 17, "facture_google_workspace_docx");
     add("af_c4i17_facture_make", "CT4 - IND 17 FACTURE MAKE", 4, 17, "facture_make_docx");
@@ -699,7 +703,11 @@ export function buildFullCatalog(
     // ===== CRITÈRE 4 — ADÉQUATION DES MOYENS (CFA) =====
 
     // IND 17 — Moyens humains, techniques et environnement
-    add("cfa_c4i17_bail", "CT4 - IND 17 BAIL DE SOUS-LOCATION", 4, 17, "bail_sous_location");
+    const cfaModaLower = (formations[0]?.modalites || '').toLowerCase();
+    const cfaIsPureDistanciel = cfaModaLower.includes('distanciel') && !cfaModaLower.includes('mixte') && !cfaModaLower.includes('présentiel') && !cfaModaLower.includes('presentiel');
+    if (!cfaIsPureDistanciel) {
+      add("cfa_c4i17_bail", "CT4 - IND 17 BAIL DE SOUS-LOCATION", 4, 17, "bail_sous_location");
+    }
     add("cfa_c4i17_facture_pack_office", "CT4 - IND 17 FACTURE PACK OFFICE", 4, 17, "facture_pack_office_docx");
     add("cfa_c4i17_facture_google", "CT4 - IND 17 FACTURE GOOGLE WORKSPACE", 4, 17, "facture_google_workspace_docx");
     add("cfa_c4i17_facture_make", "CT4 - IND 17 FACTURE MAKE", 4, 17, "facture_make_docx");
