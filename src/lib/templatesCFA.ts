@@ -1149,7 +1149,7 @@ export function genCertificatRealisationCFA(o: OrganismeInfo, f: FormationInfo, 
     <p style="margin-top:30px">Fait à <strong>${o.ville}</strong>, le <strong>${formatDate(f.dateFin)}</strong></p>
     <p>Cachet et signature du responsable du dispensateur de formation</p>
     <p style="margin-top:40px"><strong>${o.dirigeant}</strong></p>
-  ` });
+  ` }).replace("</head>", '<meta name="pdf-page-size" content="280x430"></head>');
 }
 
 // ========== IND 14 — WEBINAIRES (CFA) ==========
