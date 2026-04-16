@@ -244,7 +244,27 @@ const GenerateurCV = () => {
     toast.success("CV téléchargé !");
   };
 
-  const previewHTML = generateCVHTML(cv, selectedDesign);
+  const handleAIGenerate = async () => {
+    if (!aiPrompt.trim()) {
+      toast.error("Décrivez brièvement votre profil (ex: formateur en management, 10 ans d'expérience, Paris)");
+      return;
+    }
+    setAiLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("generate-cv", {
+        body: { description: aiPrompt },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      setCv(prev => ({ ...prev, ...data, photoUrl: prev.photoUrl }));
+      toast.success("CV généré par IA ! Vous pouvez ajuster les détails.");
+    } catch (e: any) {
+      console.error(e);
+      toast.error(e.message || "Erreur lors de la génération IA");
+    } finally {
+      setAiLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
