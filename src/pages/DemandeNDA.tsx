@@ -274,10 +274,7 @@ const DemandeNDA = () => {
     const label = NDA_DOCUMENTS.find(d => d.id === docId)?.label || docId;
     const filename = `${label} - ${organisme.nom || "Organisme"}`;
 
-    // CV needs special wrapping to preserve flex/sidebar layout in PDF
-    const wrappedHtml = docId === "cv"
-      ? `<div style="width:794px;margin:0;padding:0;background:#fff;"><div class="pdf-single-block">${html}</div></div>`
-      : html;
+    const wrappedHtml = html;
 
     if (exportFormat === "pdf") {
       const blob = await htmlToPdfBlob(wrappedHtml);
@@ -309,9 +306,7 @@ const DemandeNDA = () => {
         }
         const html = generateDocumentHTML(doc.id, organisme, formation, stagiaires, cvData, cvDesign);
         if (html) {
-          const wrappedHtml = doc.id === "cv"
-            ? `<div style="width:794px;margin:0;padding:0;background:#fff;"><div class="pdf-single-block">${html}</div></div>`
-            : html;
+          const wrappedHtml = html;
           if (exportFormat === "pdf") {
             const blob = await htmlToPdfBlob(wrappedHtml);
             zip.file(`${doc.label}.pdf`, blob);
