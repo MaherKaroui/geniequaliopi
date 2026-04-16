@@ -228,16 +228,16 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
   document.body.appendChild(host);
 
   try {
-    const footerHeightPx = measureFooterHeight(host, footerHtml);
+    const footerHeightPx = measureFooterHeight(host, footerHtml, PAGE_W_PX);
     const nodes = getRenderableNodes(source);
 
     const pages: HTMLDivElement[] = [];
-    let current = createPage(host, footerHtml, footerHeightPx);
+    let current = createPage(host, footerHtml, footerHeightPx, PAGE_W_PX, PAGE_H_PX);
     pages.push(current.page);
 
     for (const node of nodes) {
       if (isForcedPageBreak(node)) {
-        current = createPage(host, footerHtml, footerHeightPx);
+        current = createPage(host, footerHtml, footerHeightPx, PAGE_W_PX, PAGE_H_PX);
         pages.push(current.page);
         continue;
       }
@@ -276,7 +276,7 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
           if (current.content.scrollHeight > current.content.clientHeight + 1) {
             tbody.removeChild(rowClone);
             // Start new page with a fresh table (with thead)
-            current = createPage(host, footerHtml, footerHeightPx);
+            current = createPage(host, footerHtml, footerHeightPx, PAGE_W_PX, PAGE_H_PX);
             pages.push(current.page);
             currentTable = createTableShell();
             current.content.appendChild(currentTable);
@@ -293,7 +293,7 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
       // If current block overflows, move the whole block to next page
       if (current.content.scrollHeight > current.content.clientHeight + 1) {
         current.content.removeChild(clone);
-        current = createPage(host, footerHtml, footerHeightPx);
+        current = createPage(host, footerHtml, footerHeightPx, PAGE_W_PX, PAGE_H_PX);
         pages.push(current.page);
         current.content.appendChild(clone);
       }
@@ -301,7 +301,7 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
 
     // Keep a single empty page if nothing was added
     if (pages.length === 0) {
-      pages.push(createPage(host, footerHtml, footerHeightPx).page);
+      pages.push(createPage(host, footerHtml, footerHeightPx, PAGE_W_PX, PAGE_H_PX).page);
     }
 
     const pdf = new jsPDF({ unit: "mm", format: [PAGE_W_MM, PAGE_H_MM], orientation: "portrait" });
