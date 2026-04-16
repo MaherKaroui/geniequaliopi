@@ -55,14 +55,14 @@ function buildReplacements(o: OrganismeInfo): Record<string, string> {
     "mois2-jours2": fmt(d1End, { day: "numeric", month: "short", year: "numeric" }),
     "mois3-jours3": fmt(d2Start),
     "mois4-jours4": fmt(d2End, { day: "numeric", month: "short", year: "numeric" }),
-    // Diplôme Référent Handicap: dateMaj + 1 mois (2 jours consécutifs)
+    // Diplôme Référent Handicap: dateMaj - 1 mois (2 jours consécutifs)
     "nom et prenom de referent handicap": o.dirigeant || "",
     datedebut: (() => {
-      const dd = new Date(ref.getFullYear(), ref.getMonth() + 1, ref.getDate());
+      const dd = new Date(ref.getFullYear(), ref.getMonth() - 1, ref.getDate());
       return dd.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
     })(),
     datefin: (() => {
-      const dd = new Date(ref.getFullYear(), ref.getMonth() + 1, ref.getDate() + 1);
+      const dd = new Date(ref.getFullYear(), ref.getMonth() - 1, ref.getDate() + 1);
       return dd.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
     })(),
   };
