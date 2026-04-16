@@ -2665,7 +2665,8 @@ function genAttestation(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiair
     <p>Fait à ${o.ville}, le ${formatDate(getStagiaireDateFin(s, f))}</p>
     ${signatureBlock2("Le Responsable", o.dirigeant, "Le Stagiaire", s.prenom + " " + s.nom, o.signatureUrl, o.tamponUrl, s.signatureUrl)}
     </div><div class="page-break"></div>`).join("");
-  return buildDocument({ org: o, title: "ATTESTATIONS DE FIN DE FORMATION", subtitle: f.intitule, extraHtml: extra });
+  return buildDocument({ org: o, title: "ATTESTATIONS DE FIN DE FORMATION", subtitle: f.intitule, extraHtml: extra })
+    .replace("</head>", '<meta name="pdf-page-size" content="280x430"></head>');
 }
 
 function genCertificat(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
@@ -2674,7 +2675,8 @@ function genCertificat(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiaire
     const note = Math.round(sc.reduce((a, b) => a + b, 0) / sc.length * 10) / 10;
     return `<div class="section" style="text-align:center;padding:30px"><h2 style="color:#1e3a7b">CERTIFICAT DE RÉUSSITE</h2><p style="font-size:16px;margin:20px 0"><strong>${s.prenom} ${s.nom}</strong></p><p>a validé avec succès la formation</p><p style="font-size:15px;font-weight:700;color:#1e3a7b">${f.intitule}</p><p>Note obtenue : <strong>${note}/10</strong></p><p style="margin-top:20px">Fait à ${o.ville}, le ${formatDate(getStagiaireDateFin(s, f))}</p><p><em>Signé par ${o.dirigeant}</em></p></div><div class="page-break"></div>`;
   }).join("");
-  return buildDocument({ org: o, title: "CERTIFICATS DE RÉUSSITE", subtitle: f.intitule, extraHtml: extra });
+  return buildDocument({ org: o, title: "CERTIFICATS DE RÉUSSITE", subtitle: f.intitule, extraHtml: extra })
+    .replace("</head>", '<meta name="pdf-page-size" content="280x430"></head>');
 }
 
 function genSuivi3Mois(o: OrganismeInfo, f: FormationInfo) {
@@ -6797,7 +6799,8 @@ function genCertificatRealisation(o: OrganismeInfo, f: FormationInfo, stagiaires
     { heading: "Informations de la formation", content: `<p><strong>Bénéficiaire :</strong> ${s.prenom} ${s.nom}<br><strong>Entreprise :</strong> ${s.entreprise}<br><strong>Durée prévue :</strong> ${f.duree}<br><strong>Durée réalisée :</strong> ${f.duree}<br><strong>Dates :</strong> Du ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)}<br><strong>Lieu :</strong> ${f.lieu}<br><strong>Modalité :</strong> ${f.modalites}<br><strong>Formateur :</strong> ${f.formateur}</p>` },
     { heading: "Nature de l'action", content: "<p>☐ Action de formation ☐ Bilan de compétences ☐ VAE ☐ Action d'apprentissage</p>" },
     { heading: "", content: `<p style="text-align:center;margin-top:20px;font-style:italic">Ce certificat est délivré conformément aux dispositions de l'article L.6353-1 du Code du travail.</p>` },
-  ], signatures: { type: "2", labels: ["Le Responsable de l'organisme", "Le/La Bénéficiaire"], names: [o.dirigeant, `${s.prenom} ${s.nom}`] } });
+  ], signatures: { type: "2", labels: ["Le Responsable de l'organisme", "Le/La Bénéficiaire"], names: [o.dirigeant, `${s.prenom} ${s.nom}`] } })
+    .replace("</head>", '<meta name="pdf-page-size" content="280x430"></head>');
 }
 
 function genSuiviAbsences(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
