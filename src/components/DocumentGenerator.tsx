@@ -242,10 +242,20 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
       return;
     }
 
-    // Handle .docx template files (factures IND 17) → PDF
+    // Handle .docx template files (factures IND 17)
     if (DOCX_TEMPLATE_FILES[doc.template]) {
       const blob = await processDocxTemplate(DOCX_TEMPLATE_FILES[doc.template], mergedOrganisme);
       saveAs(blob, buildCatalogFileName(doc, undefined, ".docx"));
+      return;
+    }
+
+    // Handle mail .docx templates (per-stagiaire)
+    if (MAIL_TEMPLATE_FILES[doc.template] && typeof doc.params?.stagiaireIdx === "number") {
+      const s = allStagiaires[doc.params.stagiaireIdx];
+      if (s) {
+        const blob = await processMailDocxTemplate(MAIL_TEMPLATE_FILES[doc.template], mergedOrganisme, selectedFormation, s);
+        saveAs(blob, buildCatalogFileName(doc, s, ".docx"));
+      }
       return;
     }
 
