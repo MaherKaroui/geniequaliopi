@@ -11671,10 +11671,7 @@ function genFactureEDOF(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiair
 
     <h2 style="margin-top:30px">Le Paiement</h2>
     <div style="margin-bottom:20px">
-      <p><strong>1er paiement :</strong> 30% d'acompte à verser après les 14 jours de rétractation — <strong>${acompte30}</strong> pour le <strong>${formatDate(dateDebut)}</strong></p>
-      <p style="font-size:11px;color:#666;margin-top:4px">À compter de la date de signature du présent contrat, le stagiaire dispose d'un délai de quatorze jours pour se rétracter. Le stagiaire souhaitant se rétracter en informe l'organisme de formation par lettre recommandée avec accusé de réception. Dans ce cas, aucune somme ne peut être exigée du stagiaire.</p>
-      <p style="margin-top:10px"><strong>2ème paiement :</strong> 35% à verser pour le <strong>${formatDate(date14jApres.toISOString().split("T")[0])}</strong> — <strong>${tranche35}</strong></p>
-      <p style="margin-top:10px"><strong>3ème paiement :</strong> 35% à verser pour le <strong>${formatDate(date28jApres.toISOString().split("T")[0])}</strong> — <strong>${tranche35}</strong></p>
+      ${buildEcheancierPaiement(f, s)}
     </div>
 
     <h2 style="margin-top:30px">CONDITIONS FINANCIÈRES</h2>
