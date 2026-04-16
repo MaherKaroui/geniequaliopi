@@ -206,7 +206,6 @@ export function buildFullCatalog(
     add("af_c4i17_facture_google", "CT4 - IND 17 FACTURE GOOGLE WORKSPACE", 4, 17, "facture_google_workspace_docx");
     add("af_c4i17_facture_make", "CT4 - IND 17 FACTURE MAKE", 4, 17, "facture_make_docx");
     add("af_c4i17_facture_genspark", "CT4 - IND 17 FACTURE GENSPARK", 4, 17, "facture_genspark_docx");
-    add("af_c4i17_certificat_coursera", "CT4 - IND 17 CERTIFICAT COURSERA / UCI", 4, 17, "certificat_coursera");
     // IND 18 — Coordination des intervenants
     add("af_c4i18_organigramme", "CT4 - IND 18 ORGANIGRAMME", 4, 18, "organigramme");
 
@@ -256,21 +255,15 @@ export function buildFullCatalog(
     // IND 23 — Veille légale et réglementaire
     add("af_c6i23_veille_reglementaire", "CT6 - IND 23 VEILLE RÉGLEMENTAIRE", 6, 23, "tableau_veille", { type: "réglementaire" });
     add("af_c6i23_pdf_guide_qualiopi", "CT6 - IND 23 V9 GUIDE DE LECTURE QUALIOPI", 6, 23, "pdf_static", { pdfFile: "v9_guide_lecture_qualiopi.pdf" });
-    add("af_c6i23_screenshot_france_competences", "CT6 - IND 23 INSCRIPTION NEWSLETTER FRANCE COMPÉTENCES", 6, 23, "screenshot_france_competences");
-    add("af_c6i23_screenshot_drieets", "CT6 - IND 23 INSCRIPTION NEWSLETTER DRIEETS", 6, 23, "screenshot_drieets");
-    add("af_c6i23_screenshot_centre_inffo", "CT6 - IND 23 INSCRIPTION NEWSLETTER CENTRE INFFO", 6, 23, "screenshot_centre_inffo");
 
     // IND 24 — Veille métiers et emplois
     add("af_c6i24_tableau_veille_metier", "CT6 - IND 24 TABLEAU DE VEILLE MÉTIER", 6, 24, "tableau_veille", { type: "métier" });
 
     // IND 25 — Veille innovations pédagogiques et technologiques
     add("af_c6i25_tableau_veille_techno", "CT6 - IND 25 TABLEAU DE VEILLE TECHNOLOGIQUE", 6, 25, "tableau_veille", { type: "technologique" });
-    add("af_c6i25_screenshot_microsoft", "CT6 - IND 25 INSCRIPTION NEWSLETTER MICROSOFT ADVERTISING", 6, 25, "screenshot_microsoft");
-    add("af_c6i25_screenshot_openai", "CT6 - IND 25 INSCRIPTION NEWSLETTER OPEN AI DIGEST", 6, 25, "screenshot_openai");
 
     // IND 26 — Accueil et accompagnement handicap
     add("af_c6i26_veille_handicap", "CT6 - IND 26 VEILLE HANDICAP", 6, 26, "tableau_veille", { type: "handicap" });
-    add("af_c6i26_screenshot_agefiph", "CT6 - IND 26 INSCRIPTION NEWSLETTER AGEFIPH", 6, 26, "screenshot_agefiph");
     // PDFs statiques IND 26
     add("af_c6i26_pdf_referentiel_defi", "CT6 - IND 26 RÉFÉRENTIEL HANDICAP DÉFI MÉTIER", 6, 26, "pdf_static", { pdfFile: "referentiel_handicap_defi_metier.pdf" });
     add("af_c6i26_pdf_agefiph_fiche", "CT6 - IND 26 AGEFIPH FICHE PRATIQUE QUALITÉ", 6, 26, "pdf_static", { pdfFile: "agefiph_fiche_pratique_qualite.pdf" });
@@ -719,7 +712,6 @@ export function buildFullCatalog(
     add("cfa_c4i17_facture_google", "CT4 - IND 17 FACTURE GOOGLE WORKSPACE", 4, 17, "facture_google_workspace_docx");
     add("cfa_c4i17_facture_make", "CT4 - IND 17 FACTURE MAKE", 4, 17, "facture_make_docx");
     add("cfa_c4i17_facture_genspark", "CT4 - IND 17 FACTURE GENSPARK", 4, 17, "facture_genspark_docx");
-    add("cfa_c4i17_certificat_coursera", "CT4 - IND 17 CERTIFICAT COURSERA / UCI", 4, 17, "certificat_coursera");
 
     const uniqueFormateursCFA = Array.from(new Set(stagiaires.map(s => (s as any).formateur).filter((f: any) => f && String(f).trim())));
 
@@ -763,21 +755,15 @@ export function buildFullCatalog(
     // IND 23 — Veille légale et réglementaire
     add("cfa_c6i23_veille_reglementaire", "CT6 - IND 23 VEILLE RÉGLEMENTAIRE", 6, 23, "tableau_veille", { type: "réglementaire" });
     add("cfa_c6i23_pdf_guide_qualiopi", "CT6 - IND 23 V9 GUIDE DE LECTURE QUALIOPI", 6, 23, "pdf_static", { pdfFile: "v9_guide_lecture_qualiopi.pdf" });
-    add("cfa_c6i23_screenshot_france_competences", "CT6 - IND 23 INSCRIPTION NEWSLETTER FRANCE COMPÉTENCES", 6, 23, "screenshot_france_competences");
-    add("cfa_c6i23_screenshot_drieets", "CT6 - IND 23 INSCRIPTION NEWSLETTER DRIEETS", 6, 23, "screenshot_drieets");
-    add("cfa_c6i23_screenshot_centre_inffo", "CT6 - IND 23 INSCRIPTION NEWSLETTER CENTRE INFFO", 6, 23, "screenshot_centre_inffo");
 
     // IND 24 — Veille métiers et emplois
     add("cfa_c6i24_tableau_veille_metier", "CT6 - IND 24 TABLEAU DE VEILLE MÉTIER", 6, 24, "tableau_veille", { type: "métier" });
 
     // IND 25 — Veille innovations pédagogiques et technologiques
     add("cfa_c6i25_tableau_veille_techno", "CT6 - IND 25 TABLEAU DE VEILLE TECHNOLOGIQUE", 6, 25, "tableau_veille", { type: "technologique" });
-    add("cfa_c6i25_screenshot_microsoft", "CT6 - IND 25 INSCRIPTION NEWSLETTER MICROSOFT ADVERTISING", 6, 25, "screenshot_microsoft");
-    add("cfa_c6i25_screenshot_openai", "CT6 - IND 25 INSCRIPTION NEWSLETTER OPEN AI DIGEST", 6, 25, "screenshot_openai");
 
     // IND 26 — Accueil et accompagnement handicap
     add("cfa_c6i26_veille_handicap", "CT6 - IND 26 VEILLE HANDICAP", 6, 26, "tableau_veille", { type: "handicap" });
-    add("cfa_c6i26_screenshot_agefiph", "CT6 - IND 26 INSCRIPTION NEWSLETTER AGEFIPH", 6, 26, "screenshot_agefiph");
     add("cfa_c6i26_pdf_referentiel_defi", "CT6 - IND 26 RÉFÉRENTIEL HANDICAP DÉFI MÉTIER", 6, 26, "pdf_static", { pdfFile: "referentiel_handicap_defi_metier.pdf" });
     add("cfa_c6i26_pdf_agefiph_fiche", "CT6 - IND 26 AGEFIPH FICHE PRATIQUE QUALITÉ", 6, 26, "pdf_static", { pdfFile: "agefiph_fiche_pratique_qualite.pdf" });
     add("cfa_c6i26_pdf_agefiph_contacts", "CT6 - IND 26 AGEFIPH RHF CONTACTS", 6, 26, "pdf_static", { pdfFile: "agefiph_rhf_contacts.pdf" });
