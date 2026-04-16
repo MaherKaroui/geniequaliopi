@@ -403,6 +403,7 @@ function courseCertificateHtml(o: OrganismeInfo, f: FormationInfo): string {
     </div>
   </div>
 </div>`;
+}
 
 export function genCertificatCoursera(o: OrganismeInfo, f: FormationInfo): string {
   return buildDocument({
