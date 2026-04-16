@@ -340,7 +340,7 @@ function certificateDateLong(f: FormationInfo): string {
   return `${months[d.getMonth()]} ${d.getDate() < 10 ? "0" : ""}${d.getDate()}, ${d.getFullYear()}`;
 }
 
-function courseCertificateHtml(o: OrganismeInfo, f: FormationInfo): string {
+export function courseCertificateHtml(o: OrganismeInfo, f: FormationInfo): string {
   const dirigeant = o.dirigeant || "Le Dirigeant";
   const nameParts = dirigeant.split(" ");
   const displayName = nameParts.map(p => p.charAt(0).toUpperCase() + p.slice(1).toLowerCase()).join(" ");
