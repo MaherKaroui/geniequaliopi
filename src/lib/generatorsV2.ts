@@ -1257,8 +1257,8 @@ export function genCertificatReussite_V2(o: OrganismeInfo, f: FormationInfo, sta
         ${dirigeantSig(o)}
       </div>`;
   });
-  return buildDocument({ org: o, title: "ATTESTATIONS DE RÉUSSITE", subtitle: f.intitule, stagiaires, extraHtml: extra });
-  // Signatures inline per stagiaire (organisme only with tampon)
+  return buildDocument({ org: o, title: "ATTESTATIONS DE RÉUSSITE", subtitle: f.intitule, stagiaires, extraHtml: extra })
+    .replace("</head>", '<meta name="pdf-page-size" content="280x430"></head>');
 }
 
 // ========== PER-STAGIAIRE CGV ==========
