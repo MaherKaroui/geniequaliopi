@@ -306,6 +306,8 @@ const GenerateurCV = () => {
               <Download className="w-4 h-4" /> DOC
             </Button>
           </div>
+        </div>
+      </header>
 
       <main className="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* LEFT: Form */}
