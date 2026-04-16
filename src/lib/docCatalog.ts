@@ -206,6 +206,7 @@ export function buildFullCatalog(
     add("af_c4i17_facture_google", "CT4 - IND 17 FACTURE GOOGLE WORKSPACE", 4, 17, "facture_google_workspace_docx");
     add("af_c4i17_facture_make", "CT4 - IND 17 FACTURE MAKE", 4, 17, "facture_make_docx");
     add("af_c4i17_facture_genspark", "CT4 - IND 17 FACTURE GENSPARK", 4, 17, "facture_genspark_docx");
+    add("af_c4i17_certificat_coursera", "CT4 - IND 17 CERTIFICAT COURSERA / UCI", 4, 17, "certificat_coursera");
     // IND 18 — Coordination des intervenants
     add("af_c4i18_organigramme", "CT4 - IND 18 ORGANIGRAMME", 4, 18, "organigramme");
 
@@ -718,6 +719,7 @@ export function buildFullCatalog(
     add("cfa_c4i17_facture_google", "CT4 - IND 17 FACTURE GOOGLE WORKSPACE", 4, 17, "facture_google_workspace_docx");
     add("cfa_c4i17_facture_make", "CT4 - IND 17 FACTURE MAKE", 4, 17, "facture_make_docx");
     add("cfa_c4i17_facture_genspark", "CT4 - IND 17 FACTURE GENSPARK", 4, 17, "facture_genspark_docx");
+    add("cfa_c4i17_certificat_coursera", "CT4 - IND 17 CERTIFICAT COURSERA / UCI", 4, 17, "certificat_coursera");
 
     const uniqueFormateursCFA = Array.from(new Set(stagiaires.map(s => (s as any).formateur).filter((f: any) => f && String(f).trim())));
 
