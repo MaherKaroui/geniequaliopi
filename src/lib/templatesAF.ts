@@ -74,7 +74,8 @@ export function genCertificatRealisation(o: OrganismeInfo, f: FormationInfo, sta
     <p>Fait à ${o.ville}, le ${formatDate(getStagiaireDateFin(s, f))}</p>
     </div><div class="page-break"></div>`).join("");
   return buildDocument({ org: o, title: "CERTIFICATS DE RÉALISATION", subtitle: f.intitule, extraHtml: extra,
-    signatures: { type: "2", labels: ["Le Responsable de l'organisme", "Cachet"], names: [o.dirigeant, ""] } });
+    signatures: { type: "2", labels: ["Le Responsable de l'organisme", "Cachet"], names: [o.dirigeant, ""] } })
+    .replace("</head>", '<meta name="pdf-page-size" content="280x430"></head>');
 }
 
 // ========== DOCUMENTS PÉDAGOGIQUES AF ==========

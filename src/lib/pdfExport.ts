@@ -13,6 +13,16 @@ const A4_HEIGHT_MM = 297;
 const FOOTER_OFFSET_PX = 40;
 const FOOTER_BUFFER_PX = 20;
 
+/** Parse optional <meta name="pdf-page-size" content="WIDTHxHEIGHT"> (mm) from HTML */
+function detectPageSizeMm(htmlContent: string): { wMm: number; hMm: number } | null {
+  const m = htmlContent.match(/<meta\s+name=["']pdf-page-size["']\s+content=["'](\d+(?:\.\d+)?)x(\d+(?:\.\d+)?)["']/i);
+  if (!m) return null;
+  const wMm = parseFloat(m[1]);
+  const hMm = parseFloat(m[2]);
+  if (wMm > 0 && hMm > 0) return { wMm, hMm };
+  return null;
+}
+
 type PageParts = {
   page: HTMLDivElement;
   content: HTMLDivElement;
@@ -106,9 +116,10 @@ function isForcedPageBreak(node: ChildNode): boolean {
   );
 }
 
-function createPage(host: HTMLDivElement, footerHtml: string, footerHeightPx: number): PageParts {
+function createPage(host: HTMLDivElement, footerHtml: string, footerHeightPx: number, pageWPx = A4_WIDTH_PX, pageHPx = A4_HEIGHT_PX): PageParts {
   const page = document.createElement("div");
   page.className = "pdf-page";
+  page.style.cssText = `width:${pageWPx}px;height:${pageHPx}px;position:relative;overflow:hidden;background:#fff;`;
 
   const content = document.createElement("div");
   content.className = "pdf-root";
@@ -116,8 +127,8 @@ function createPage(host: HTMLDivElement, footerHtml: string, footerHeightPx: nu
     "position:absolute",
     "left:0",
     "top:0",
-    `width:${A4_WIDTH_PX}px`,
-    `height:${A4_HEIGHT_PX - footerHeightPx - FOOTER_OFFSET_PX - 8}px`,
+    `width:${pageWPx}px`,
+    `height:${pageHPx - footerHeightPx - FOOTER_OFFSET_PX - 8}px`,
     "overflow:hidden",
     "background:#fff",
   ].join(";");
@@ -131,7 +142,7 @@ function createPage(host: HTMLDivElement, footerHtml: string, footerHeightPx: nu
       "position:absolute",
       "left:0",
       `bottom:${FOOTER_OFFSET_PX}px`,
-      `width:${A4_WIDTH_PX}px`,
+      `width:${pageWPx}px`,
       `height:${footerHeightPx}px`,
       "overflow:visible",
       "background:#fff",
@@ -144,12 +155,12 @@ function createPage(host: HTMLDivElement, footerHtml: string, footerHeightPx: nu
   return { page, content };
 }
 
-function measureFooterHeight(host: HTMLDivElement, footerHtml: string): number {
+function measureFooterHeight(host: HTMLDivElement, footerHtml: string, pageWPx = A4_WIDTH_PX): number {
   if (!footerHtml) return 0;
 
   const measure = document.createElement("div");
   measure.className = "pdf-root";
-  measure.style.cssText = `width:${A4_WIDTH_PX}px;background:#fff;position:absolute;left:0;top:0;`;
+  measure.style.cssText = `width:${pageWPx}px;background:#fff;position:absolute;left:0;top:0;`;
   measure.innerHTML = footerHtml;
   host.appendChild(measure);
 
@@ -173,7 +184,19 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
     imageQuality = 0.95,
     pageYieldMs = 0,
   } = options;
-  const { cssText, bodyContent } = extractCssAndBody(htmlContent);
+
+  // Detect custom page size from meta tag, fallback to A4
+  const customSize = detectPageSizeMm(htmlContent);
+  const PAGE_W_MM = customSize?.wMm ?? A4_WIDTH_MM;
+  const PAGE_H_MM = customSize?.hMm ?? A4_HEIGHT_MM;
+  const PAGE_W_PX = Math.round(PAGE_W_MM * 96 / 25.4);
+  const PAGE_H_PX = Math.round(PAGE_H_MM * 96 / 25.4);
+
+  const { cssText: rawCss, bodyContent } = extractCssAndBody(htmlContent);
+  // Override page dimensions in injected CSS
+  const cssText = rawCss
+    .replace(new RegExp(`${A4_WIDTH_PX}px`, "g"), `${PAGE_W_PX}px`)
+    .replace(new RegExp(`${A4_HEIGHT_PX}px`, "g"), `${PAGE_H_PX}px`);
   await ensureGoogleFontsLoaded(htmlContent);
 
   const host = document.createElement("div");
@@ -181,7 +204,7 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
     "position:absolute",
     "left:-99999px",
     "top:-99999px",
-    `width:${A4_WIDTH_PX}px`,
+    `width:${PAGE_W_PX}px`,
     "z-index:-9999",
     "background:#fff",
     "pointer-events:none",
@@ -194,7 +217,7 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
 
   const source = document.createElement("div");
   source.className = "pdf-root";
-  source.style.cssText = `width:${A4_WIDTH_PX}px;background:#fff;`;
+  source.style.cssText = `width:${PAGE_W_PX}px;background:#fff;`;
   source.innerHTML = bodyContent;
 
   // Extract original footer and repeat it on each generated page (always bottom)
@@ -205,16 +228,16 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
   document.body.appendChild(host);
 
   try {
-    const footerHeightPx = measureFooterHeight(host, footerHtml);
+    const footerHeightPx = measureFooterHeight(host, footerHtml, PAGE_W_PX);
     const nodes = getRenderableNodes(source);
 
     const pages: HTMLDivElement[] = [];
-    let current = createPage(host, footerHtml, footerHeightPx);
+    let current = createPage(host, footerHtml, footerHeightPx, PAGE_W_PX, PAGE_H_PX);
     pages.push(current.page);
 
     for (const node of nodes) {
       if (isForcedPageBreak(node)) {
-        current = createPage(host, footerHtml, footerHeightPx);
+        current = createPage(host, footerHtml, footerHeightPx, PAGE_W_PX, PAGE_H_PX);
         pages.push(current.page);
         continue;
       }
@@ -253,7 +276,7 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
           if (current.content.scrollHeight > current.content.clientHeight + 1) {
             tbody.removeChild(rowClone);
             // Start new page with a fresh table (with thead)
-            current = createPage(host, footerHtml, footerHeightPx);
+            current = createPage(host, footerHtml, footerHeightPx, PAGE_W_PX, PAGE_H_PX);
             pages.push(current.page);
             currentTable = createTableShell();
             current.content.appendChild(currentTable);
@@ -270,7 +293,7 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
       // If current block overflows, move the whole block to next page
       if (current.content.scrollHeight > current.content.clientHeight + 1) {
         current.content.removeChild(clone);
-        current = createPage(host, footerHtml, footerHeightPx);
+        current = createPage(host, footerHtml, footerHeightPx, PAGE_W_PX, PAGE_H_PX);
         pages.push(current.page);
         current.content.appendChild(clone);
       }
@@ -278,11 +301,11 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
 
     // Keep a single empty page if nothing was added
     if (pages.length === 0) {
-      pages.push(createPage(host, footerHtml, footerHeightPx).page);
+      pages.push(createPage(host, footerHtml, footerHeightPx, PAGE_W_PX, PAGE_H_PX).page);
     }
 
-    const pdf = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
-    const pxToMm = A4_WIDTH_MM / A4_WIDTH_PX;
+    const pdf = new jsPDF({ unit: "mm", format: [PAGE_W_MM, PAGE_H_MM], orientation: "portrait" });
+    const pxToMm = PAGE_W_MM / PAGE_W_PX;
 
     for (let i = 0; i < pages.length; i++) {
       if (pageYieldMs > 0) {
@@ -296,14 +319,14 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
         useCORS: true,
         logging: false,
         backgroundColor: "#ffffff",
-        width: A4_WIDTH_PX,
-        height: A4_HEIGHT_PX,
-        windowWidth: A4_WIDTH_PX,
-        windowHeight: A4_HEIGHT_PX,
+        width: PAGE_W_PX,
+        height: PAGE_H_PX,
+        windowWidth: PAGE_W_PX,
+        windowHeight: PAGE_H_PX,
       });
 
       const imgData = canvas.toDataURL("image/jpeg", imageQuality);
-      pdf.addImage(imgData, "JPEG", 0, 0, A4_WIDTH_MM, A4_HEIGHT_MM);
+      pdf.addImage(imgData, "JPEG", 0, 0, PAGE_W_MM, PAGE_H_MM);
 
       // Add clickable link annotations over the rasterized image
       const anchors = pages[i].querySelectorAll("a[href]");
