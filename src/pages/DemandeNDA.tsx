@@ -75,28 +75,35 @@ function generateListeFormateursHTML(o: OrganismeInfo, cv: CVData, stagiaires: S
     <p style="font-size:11px;color:#444;margin-bottom:5px;">• INTERVENANT DANS L'ORGANISME DE FORMATION À LA DATE DE LA DÉCLARATION D'ACTIVITÉ</p>
     <p style="font-size:11px;color:#444;margin-bottom:20px;">• Dénomination et adresse de l'organisme de formation : <strong>${o.nom || ""}</strong></p>
 
-    <h2 style="font-size:14px;border-bottom:2px solid #1e3a7b;padding-bottom:4px;margin-bottom:15px;">1. Formateurs employés ou associés</h2>
-
     <table style="width:100%;border-collapse:collapse;margin-bottom:20px;">
-      <thead>
-        <tr style="background:#1e3a7b;color:#fff;">
-          <th style="padding:8px 10px;text-align:left;width:200px;border:1px solid #1e3a7b;">Nom et prénom</th>
-          <th style="padding:8px 10px;text-align:left;border:1px solid #1e3a7b;">${cv.titre || "Formateur Professionnel"}</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td style="padding:8px 10px;border:1px solid #ddd;vertical-align:top;font-weight:bold;">${fullName}</td>
-          <td style="padding:8px 10px;border:1px solid #ddd;">
-            <p style="font-weight:bold;margin:0 0 8px 0;text-decoration:underline;">Expérience professionnelle</p>
-            ${expRows || "<p style='color:#999;'>—</p>"}
-            <p style="font-weight:bold;margin:15px 0 8px 0;text-decoration:underline;">Parcours académique</p>
-            ${formRows || "<p style='color:#999;'>—</p>"}
-            ${certs ? `<p style="font-weight:bold;margin:15px 0 8px 0;text-decoration:underline;">Certifications</p>${certs}` : ""}
-            ${cv.experiencePedagogique ? `<p style="font-weight:bold;margin:15px 0 8px 0;text-decoration:underline;">Expérience pédagogique</p><p style="font-size:11px;">${cv.experiencePedagogique}</p>` : ""}
-          </td>
-        </tr>
-      </tbody>
+      <tr style="background:#1e3a7b;color:#fff;">
+        <th style="padding:8px 10px;text-align:left;width:200px;border:1px solid #1e3a7b;">Nom et prénom de l'intervenant</th>
+        <th style="padding:8px 10px;text-align:left;border:1px solid #1e3a7b;">${fullName}</th>
+      </tr>
+      <tr>
+        <td style="padding:8px 10px;border:1px solid #ddd;vertical-align:top;font-weight:bold;">Expérience professionnelle</td>
+        <td style="padding:8px 10px;border:1px solid #ddd;">
+          ${exps.map(e =>
+            `<p style="margin:2px 0;"><strong>${e.poste || ""}</strong></p>${e.entreprise ? `<p style="margin:0 0 2px 0;font-size:11px;">${e.entreprise}</p>` : ""}${e.description ? `<p style="margin:0 0 6px 0;font-size:11px;color:#444;">${e.description}</p>` : ""}`
+          ).join("") || "<p style='color:#999;'>—</p>"}
+          ${cv.experiencePedagogique ? `<p style="font-weight:bold;margin:10px 0 4px 0;">Expérience pédagogique</p><p style="font-size:11px;">${cv.experiencePedagogique}</p>` : ""}
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:8px 10px;border:1px solid #ddd;vertical-align:top;font-weight:bold;">Parcours académique</td>
+        <td style="padding:8px 10px;border:1px solid #ddd;">
+          ${forms.map(f =>
+            `<p style="margin:2px 0;"><strong>${f.diplome || ""}</strong></p>${f.etablissement ? `<p style="margin:0 0 6px 0;font-size:11px;">${f.etablissement}${f.annee ? ` (${f.annee})` : ""}</p>` : ""}`
+          ).join("") || "<p style='color:#999;'>—</p>"}
+          ${certs.length ? `<p style="font-weight:bold;margin:10px 0 4px 0;">Certifications</p>${certs.map(c => `<p style="margin:2px 0;font-size:11px;">${c.nom}${c.annee ? ` (${c.annee})` : ""}</p>`).join("")}` : ""}
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:8px 10px;border:1px solid #ddd;vertical-align:top;font-weight:bold;">Compétences</td>
+        <td style="padding:8px 10px;border:1px solid #ddd;">
+          ${comps.map(c => `<p style="margin:2px 0;font-size:11px;">${c.nom}</p>`).join("") || "<p style='color:#999;'>—</p>"}
+        </td>
+      </tr>
     </table>
 
     ${stagiaires.map((st, i) => {
