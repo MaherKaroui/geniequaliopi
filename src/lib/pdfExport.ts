@@ -303,8 +303,8 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
       pages.push(createPage(host, footerHtml, footerHeightPx).page);
     }
 
-    const pdf = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
-    const pxToMm = A4_WIDTH_MM / A4_WIDTH_PX;
+    const pdf = new jsPDF({ unit: "mm", format: [PAGE_W_MM, PAGE_H_MM], orientation: "portrait" });
+    const pxToMm = PAGE_W_MM / PAGE_W_PX;
 
     for (let i = 0; i < pages.length; i++) {
       if (pageYieldMs > 0) {
