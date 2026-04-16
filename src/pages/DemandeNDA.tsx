@@ -51,7 +51,7 @@ const emptyFormation: FormationInfo = {
   rythmeAlternance: "",
 };
 
-function generateListeFormateursHTML(o: OrganismeInfo, cv: CVData): string {
+function generateListeFormateursHTML(o: OrganismeInfo, cv: CVData, stagiaires: StagiaireInfo[] = []): string {
   const fullName = `${cv.prenom} ${cv.nom}`.trim() || "Nom du formateur";
   const exps = cv.experiences.filter(e => e.poste || e.entreprise);
   const forms = cv.formations.filter(f => f.diplome || f.etablissement);
