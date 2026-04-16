@@ -1600,7 +1600,7 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
       <p><strong>Nom :</strong> ${o.nom}</p>
       <p><strong>Adresse :</strong> ${o.adresse}, ${o.codePostal} ${o.ville}</p>
       <p><strong>SIRET :</strong> ${o.siret}</p>
-      <p><strong>NDA :</strong> ${o.nda}</p>
+      ${o.nda ? `<p><strong>NDA :</strong> ${o.nda}</p>` : ""}
       <p>${o.telephone?.trim() ? `<strong>Téléphone :</strong> ${o.telephone}` : ""}</p>
       <p><strong>Email :</strong> ${o.email}</p>
       ${optSiteWeb(o)}
