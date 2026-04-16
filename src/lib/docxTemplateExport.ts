@@ -190,7 +190,7 @@ function escapeXml(s: string): string {
 
 function buildSplitRegex(key: string): RegExp | null {
   const chars = `\\{\\{${key.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')}\\}\\}`;
-  const xmlNoise = "(?:</w:t>(?:<[^>]*>)*<w:t[^>]*>)?";
+  const xmlNoise = "(?:<[^>]+>)*";
   const pattern = chars.split("").join(xmlNoise);
   try {
     return new RegExp(pattern, "g");
