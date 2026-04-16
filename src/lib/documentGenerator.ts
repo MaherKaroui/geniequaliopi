@@ -8921,6 +8921,111 @@ function genFactureMateriel(o: OrganismeInfo, params: Record<string, any>) {
   ] });
 }
 
+function genFacturePackOffice(o: OrganismeInfo) {
+  const dateFacture = formatDate(subtractBusinessDays(new Date().toISOString(), 45));
+  const factureNum = `00${Math.floor(700000 + Math.random() * 99999)}`;
+  const commandeNum = `#${Math.floor(700000000 + Math.random() * 99999999)}`;
+
+  return buildDocument({ org: o, title: `FACTURE n°${factureNum}`, subtitle: `Commande ${commandeNum} via RAKUTEN`, sections: [
+    { heading: "Acheteur", content: `<p>${o.nom}<br>${o.email}<br>${o.adresse}, ${o.codePostal} ${o.ville}<br>France</p><p><strong>Date de la commande</strong><br>${dateFacture}</p><p>Via Rakuten</p>` },
+    { heading: "Client (fournisseur)", content: `<p><strong>DA-LICENCES</strong><br>13 rue du verger<br>60590 Sérifontaine<br>France<br><br>SIRET 98197071800012 TVA<br>FR56980367213</p>` },
+    { heading: "Details", content: `
+      <table style="width:100%;border-collapse:collapse">
+        <tr style="background:#f5f5f5"><th style="padding:10px;border:1px solid #ddd;text-align:left">Produit</th><th style="padding:10px;border:1px solid #ddd;text-align:right;width:100px">Prix</th></tr>
+        <tr><td style="padding:10px;border:1px solid #ddd">Pack Office 2025 Pour Pc – Livraison 2h Max – Facture Fournie</td><td style="padding:10px;border:1px solid #ddd;text-align:right">0,90 €</td></tr>
+      </table>
+      <table style="width:40%;margin-left:auto;margin-top:20px;border-collapse:collapse">
+        <tr><td style="padding:8px">Montant HT</td><td style="padding:8px;text-align:right">0,75 €</td></tr>
+        <tr><td style="padding:8px">TVA 20%</td><td style="padding:8px;text-align:right">0,15 €</td></tr>
+        <tr style="font-weight:bold"><td style="padding:8px">Total</td><td style="padding:8px;text-align:right">0,90 €</td></tr>
+      </table>` },
+  ], extraHtml: `<p style="text-align:center;margin-top:40px;font-size:11px;color:#888">© ${new Date().getFullYear()} – DA-LICENCES<br>(v1.22.4)</p>` });
+}
+
+function genFactureGoogleWorkspace(o: OrganismeInfo) {
+  const refDate = o.dateMaj || new Date().toISOString().slice(0, 10);
+  const datePaiement = formatDate(subtractBusinessDays(refDate, 30));
+  const d = new Date(subtractBusinessDays(refDate, 60));
+  const moisFin = new Date(d.getFullYear(), d.getMonth() + 1, 0).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+  const dateDebutFacture = d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+  const siren = o.siret ? o.siret.replace(/\s/g, '').slice(0, 9) : '';
+
+  const d1Start = new Date(d); d1Start.setDate(1);
+  const d1End = new Date(d); d1End.setDate(15);
+  const d2Start = new Date(d); d2Start.setDate(16);
+  const d2End = new Date(d.getFullYear(), d.getMonth() + 1, 0);
+
+  const interval1 = `${d1Start.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })} – ${d1End.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })}`;
+  const interval2 = `${d2Start.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })} – ${d2End.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })}`;
+
+  return buildDocument({ org: o, title: "INVOICE – Google Workspace", subtitle: "Google Cloud France SARL", sections: [
+    { heading: "Invoice Details", content: `<p><strong>Invoice number:</strong> GCFRD00${Math.floor(10000000 + Math.random() * 9999999)}</p><p><strong>Google Cloud France SARL</strong><br>8 Rue de Londres<br>75009 Paris<br>France<br>VAT number: FR78881721583<br>SIREN: 981970718<br>RCS: 981970718</p>` },
+    { heading: "Bill to", content: `<p><strong>${o.dirigeant}</strong><br><strong>${o.nom}</strong><br>${o.adresse}, ${o.codePostal} ${o.ville}<br>France<br>VAT number: FR 87922670815<br>SIREN: ${siren}<br>SIRET: ${o.siret}</p>` },
+    { heading: "Summary", content: `<p><strong>Période :</strong> ${dateDebutFacture} – ${moisFin}</p><p>You will be automatically charged for any amount due.</p>
+      <table style="width:100%;border-collapse:collapse;margin-top:10px">
+        <tr style="background:#f5f5f5"><th style="padding:8px;border:1px solid #ddd;text-align:left">Subscription</th><th style="padding:8px;border:1px solid #ddd">Description</th><th style="padding:8px;border:1px solid #ddd">Interval</th><th style="padding:8px;border:1px solid #ddd;text-align:center;width:50px">Qty</th><th style="padding:8px;border:1px solid #ddd;text-align:right;width:90px">Amount (€)</th></tr>
+        <tr><td style="padding:8px;border:1px solid #ddd">Google Workspace Business Standard</td><td style="padding:8px;border:1px solid #ddd">Usage</td><td style="padding:8px;border:1px solid #ddd">${interval1}</td><td style="padding:8px;border:1px solid #ddd;text-align:center">9</td><td style="padding:8px;border:1px solid #ddd;text-align:right">23,51</td></tr>
+        <tr><td style="padding:8px;border:1px solid #ddd">Google Workspace Business Standard</td><td style="padding:8px;border:1px solid #ddd">Usage</td><td style="padding:8px;border:1px solid #ddd">${interval2}</td><td style="padding:8px;border:1px solid #ddd;text-align:center">9</td><td style="padding:8px;border:1px solid #ddd;text-align:right">117,58</td></tr>
+      </table>
+      <table style="width:40%;margin-left:auto;margin-top:15px;border-collapse:collapse">
+        <tr><td style="padding:8px">Subtotal in EUR</td><td style="padding:8px;text-align:right">€141,09</td></tr>
+        <tr><td style="padding:8px">VAT (20%)</td><td style="padding:8px;text-align:right">€28,22</td></tr>
+        <tr style="font-weight:bold"><td style="padding:8px">Total in EUR</td><td style="padding:8px;text-align:right">€169,31</td></tr>
+      </table>` },
+  ], extraHtml: `<p style="margin-top:15px;font-size:10px;color:#888">9629-3125-3201<br>${o.email}<br>VAT on debits.</p>` });
+}
+
+function genFactureMake(o: OrganismeInfo) {
+  const datePaiement = formatDate(subtractBusinessDays(o.dateMaj || new Date().toISOString().slice(0, 10), 25));
+  const invoiceNum = `E6563CDC-${String(Math.floor(Math.random() * 9999)).padStart(4, '0')}`;
+
+  return buildDocument({ org: o, title: "Receipt – Make", subtitle: `Invoice number ${invoiceNum}`, sections: [
+    { heading: "Fournisseur", content: `<p><strong>Celonis Inc.</strong><br>One World Trade Center 70th Floor<br>New York, New York 10007 United States<br>billing@make.com<br>US EIN 61-1797223</p>` },
+    { heading: "Bill to", content: `<p><strong>${o.nom}</strong><br>France<br>${o.email}</p>` },
+    { heading: "Details", content: `<p style="font-size:16px;font-weight:bold">$34.12 paid on ${datePaiement}</p>
+      <table style="width:100%;border-collapse:collapse;margin-top:10px">
+        <tr style="background:#f5f5f5"><th style="padding:8px;border:1px solid #ddd;text-align:left">Description</th><th style="padding:8px;border:1px solid #ddd;text-align:center;width:40px">Qty</th><th style="padding:8px;border:1px solid #ddd;text-align:right;width:90px">Unit price</th><th style="padding:8px;border:1px solid #ddd;text-align:right;width:90px">Amount</th></tr>
+        <tr><td style="padding:8px;border:1px solid #ddd">Make Teams plan (10000 operations / month) – monthly subscription (organization ID: 2025028)</td><td style="padding:8px;border:1px solid #ddd;text-align:center">1</td><td style="padding:8px;border:1px solid #ddd;text-align:right">$34.12</td><td style="padding:8px;border:1px solid #ddd;text-align:right">$34.12</td></tr>
+      </table>
+      <table style="width:40%;margin-left:auto;margin-top:15px;border-collapse:collapse">
+        <tr><td style="padding:8px">Subtotal</td><td style="padding:8px;text-align:right">$34.12</td></tr>
+        <tr><td style="padding:8px">Total</td><td style="padding:8px;text-align:right">$34.12</td></tr>
+        <tr style="font-weight:bold"><td style="padding:8px">Amount paid</td><td style="padding:8px;text-align:right">$34.12</td></tr>
+      </table>` },
+    { heading: "Payment history", content: `
+      <table style="width:100%;border-collapse:collapse">
+        <tr style="background:#f5f5f5"><th style="padding:8px;border:1px solid #ddd;text-align:left">Payment method</th><th style="padding:8px;border:1px solid #ddd">Date</th><th style="padding:8px;border:1px solid #ddd;text-align:right">Amount paid</th><th style="padding:8px;border:1px solid #ddd;text-align:right">Receipt number</th></tr>
+        <tr><td style="padding:8px;border:1px solid #ddd">Mastercard – 1675</td><td style="padding:8px;border:1px solid #ddd">${datePaiement}</td><td style="padding:8px;border:1px solid #ddd;text-align:right">$34.12</td><td style="padding:8px;border:1px solid #ddd;text-align:right">2986-5025</td></tr>
+      </table>` },
+  ] });
+}
+
+function genFactureGenspark(o: OrganismeInfo) {
+  const datePaiement = formatDate(subtractBusinessDays(o.dateMaj || new Date().toISOString().slice(0, 10), 20));
+  const invoiceNum = `NF61TY1F-${String(Math.floor(Math.random() * 9999)).padStart(4, '0')}`;
+
+  return buildDocument({ org: o, title: "Reçu – Genspark", subtitle: `Numéro de facture ${invoiceNum}`, sections: [
+    { heading: "Fournisseur", content: `<p><strong>MainFunc PTE. LTD.</strong><br>987 SERANGOON ROAD<br>SINGAPORE 328147<br>Singapour<br>support@genspark.ai</p>` },
+    { heading: "Facturer à", content: `<p><strong>${o.nom}</strong><br>${o.adresse}, ${o.codePostal} ${o.ville}<br>France<br>${o.email}<br>FR VAT FR85750237471</p>` },
+    { heading: "Details", content: `<p style="font-size:16px;font-weight:bold">40,00 $US payés le ${datePaiement}</p>
+      <table style="width:100%;border-collapse:collapse;margin-top:10px">
+        <tr style="background:#f5f5f5"><th style="padding:8px;border:1px solid #ddd;text-align:left">Description</th><th style="padding:8px;border:1px solid #ddd;text-align:center;width:40px">Qté</th><th style="padding:8px;border:1px solid #ddd;text-align:right;width:90px">Prix unitaire</th><th style="padding:8px;border:1px solid #ddd;text-align:right;width:50px">Taxe</th><th style="padding:8px;border:1px solid #ddd;text-align:right;width:90px">Montant</th></tr>
+        <tr><td style="padding:8px;border:1px solid #ddd">Genspark Credits Mega Pack</td><td style="padding:8px;border:1px solid #ddd;text-align:center">1</td><td style="padding:8px;border:1px solid #ddd;text-align:right">40,00 $US</td><td style="padding:8px;border:1px solid #ddd;text-align:right;font-size:10px">0 %<sup>[1]</sup></td><td style="padding:8px;border:1px solid #ddd;text-align:right">40,00 $US</td></tr>
+      </table>
+      <table style="width:40%;margin-left:auto;margin-top:15px;border-collapse:collapse">
+        <tr><td style="padding:8px">Sous-total</td><td style="padding:8px;text-align:right">40,00 $US</td></tr>
+        <tr><td style="padding:8px">Total</td><td style="padding:8px;text-align:right">40,00 $US</td></tr>
+        <tr style="font-weight:bold"><td style="padding:8px">Montant payé</td><td style="padding:8px;text-align:right">40,00 $US</td></tr>
+      </table>` },
+    { heading: "Historique des paiements", content: `
+      <table style="width:100%;border-collapse:collapse">
+        <tr style="background:#f5f5f5"><th style="padding:8px;border:1px solid #ddd;text-align:left">Moyen de paiement</th><th style="padding:8px;border:1px solid #ddd">Date</th><th style="padding:8px;border:1px solid #ddd;text-align:right">Montant payé</th><th style="padding:8px;border:1px solid #ddd;text-align:right">Numéro de reçu</th></tr>
+        <tr><td style="padding:8px;border:1px solid #ddd">Link</td><td style="padding:8px;border:1px solid #ddd">${datePaiement}</td><td style="padding:8px;border:1px solid #ddd;text-align:right">40,00 $US</td><td style="padding:8px;border:1px solid #ddd;text-align:right">2515-0324</td></tr>
+      </table>
+      <p style="margin-top:15px;font-size:10px;color:#888">[1] TVA soumise à autoliquidation</p>` },
+  ] });
+}
+
 function genAutoEvaluationFormateur(o: OrganismeInfo, fmt: FormateurInfo) {
   return buildDocument({ org: o, title: "AUTO-ÉVALUATION FORMATEUR", subtitle: `${fmt.prenom} ${fmt.nom}`, sections: [
     { heading: "Formateur", content: `<p><strong>Nom :</strong> ${fmt.nom} ${fmt.prenom}<br><strong>Spécialité :</strong> ${fmt.specialite}<br><strong>Expérience :</strong> ${fmt.experience}</p>` },
