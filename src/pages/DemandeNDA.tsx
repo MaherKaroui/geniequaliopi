@@ -452,7 +452,7 @@ const DemandeNDA = () => {
                         <div className="flex items-center gap-3">
                           <span className="text-xl">{doc.icon}</span>
                           <div>
-                            <p className="font-medium text-sm">{doc.label}</p>
+                            <p className="font-medium text-sm">{doc.id === "devis_facture" ? (isFormationTerminee(formation, stagiaires) ? "Facture" : "Devis") : doc.label}</p>
                             <p className="text-xs text-muted-foreground">{ready ? "Prêt" : "À compléter"}</p>
                           </div>
                           {ready && <CheckCircle2 className="w-4 h-4 text-emerald-500" />}
