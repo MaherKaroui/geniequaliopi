@@ -116,9 +116,10 @@ function isForcedPageBreak(node: ChildNode): boolean {
   );
 }
 
-function createPage(host: HTMLDivElement, footerHtml: string, footerHeightPx: number): PageParts {
+function createPage(host: HTMLDivElement, footerHtml: string, footerHeightPx: number, pageWPx = A4_WIDTH_PX, pageHPx = A4_HEIGHT_PX): PageParts {
   const page = document.createElement("div");
   page.className = "pdf-page";
+  page.style.cssText = `width:${pageWPx}px;height:${pageHPx}px;position:relative;overflow:hidden;background:#fff;`;
 
   const content = document.createElement("div");
   content.className = "pdf-root";
@@ -126,8 +127,8 @@ function createPage(host: HTMLDivElement, footerHtml: string, footerHeightPx: nu
     "position:absolute",
     "left:0",
     "top:0",
-    `width:${A4_WIDTH_PX}px`,
-    `height:${A4_HEIGHT_PX - footerHeightPx - FOOTER_OFFSET_PX - 8}px`,
+    `width:${pageWPx}px`,
+    `height:${pageHPx - footerHeightPx - FOOTER_OFFSET_PX - 8}px`,
     "overflow:hidden",
     "background:#fff",
   ].join(";");
@@ -141,7 +142,7 @@ function createPage(host: HTMLDivElement, footerHtml: string, footerHeightPx: nu
       "position:absolute",
       "left:0",
       `bottom:${FOOTER_OFFSET_PX}px`,
-      `width:${A4_WIDTH_PX}px`,
+      `width:${pageWPx}px`,
       `height:${footerHeightPx}px`,
       "overflow:visible",
       "background:#fff",
@@ -154,12 +155,12 @@ function createPage(host: HTMLDivElement, footerHtml: string, footerHeightPx: nu
   return { page, content };
 }
 
-function measureFooterHeight(host: HTMLDivElement, footerHtml: string): number {
+function measureFooterHeight(host: HTMLDivElement, footerHtml: string, pageWPx = A4_WIDTH_PX): number {
   if (!footerHtml) return 0;
 
   const measure = document.createElement("div");
   measure.className = "pdf-root";
-  measure.style.cssText = `width:${A4_WIDTH_PX}px;background:#fff;position:absolute;left:0;top:0;`;
+  measure.style.cssText = `width:${pageWPx}px;background:#fff;position:absolute;left:0;top:0;`;
   measure.innerHTML = footerHtml;
   host.appendChild(measure);
 
