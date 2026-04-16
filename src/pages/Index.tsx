@@ -66,13 +66,10 @@ const Index = () => {
       if (error) throw error;
       if (!data?.success) throw new Error(getAirtableErrorMessage(data));
 
-      const createdTables = Array.isArray(data?.results?.tablesCreated)
-        ? data.results.tablesCreated.join(', ')
-        : '';
-
+      const baseName = data?.baseName || '';
       toast.success(
-        createdTables
-          ? `Données synchronisées. Tables créées : ${createdTables}`
+        baseName
+          ? `Nouvelle base "${baseName}" créée sur Airtable avec succès !`
           : "Données synchronisées vers Airtable !"
       );
     } catch (err: any) {
