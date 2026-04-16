@@ -11,7 +11,6 @@ import LogoSignatureUpload from "@/components/LogoSignatureUpload";
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { genContratFormationParticulier, genDevis } from "@/lib/templatesAF";
 import { genReglement_V2 } from "@/lib/generatorsV2";
-import { buildDocument } from "@/lib/docBuilder";
 import { generateDocumentById } from "@/lib/documentGenerator";
 
 interface NDAFormData {
