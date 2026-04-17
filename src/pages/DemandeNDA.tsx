@@ -200,6 +200,19 @@ function generateDocumentHTML(docId: string, o: OrganismeInfo, f: FormationInfo,
     }
     case "liste_formateurs": {
       const hasCV = cvData.prenom || cvData.nom || cvData.experiences.some(e => e.poste);
+      // If a CV file has been uploaded but no generated CV data, build a minimal CVData
+      // from organisme info so the list document can still be produced.
+      if (!hasCV && uploadedCV) {
+        const dirig = (cleanOrganisme.dirigeant || "").trim();
+        const [prenom, ...rest] = dirig.split(/\s+/);
+        const fallbackCV: CVData = {
+          ...cvData,
+          prenom: prenom || "Formateur",
+          nom: rest.join(" ") || cleanOrganisme.nom || "",
+          profil: cvData.profil || `Voir CV joint (${uploadedCV.name})`,
+        };
+        return generateListeFormateursHTML(cleanOrganisme, fallbackCV, s);
+      }
       if (!hasCV) return null;
       return generateListeFormateursHTML(cleanOrganisme, cvData, s);
     }
@@ -582,7 +595,7 @@ const DemandeNDA = () => {
                 <CardContent className="space-y-3">
                   {NDA_DOCUMENTS.map(doc => {
                     const cvHasContent = cvData.prenom || cvData.nom || cvData.profil || cvData.experiences.some(e => e.poste);
-                    const ready = doc.id === "contrat" || doc.id === "programme" || doc.id === "reglement" || doc.id === "devis_facture" || (doc.id === "logo" && !!organisme.logoUrl) || (doc.id === "cv" && (!!uploadedCV || !!cvHasContent)) || (doc.id === "liste_formateurs" && !!cvHasContent);
+                    const ready = doc.id === "contrat" || doc.id === "programme" || doc.id === "reglement" || doc.id === "devis_facture" || (doc.id === "logo" && !!organisme.logoUrl) || (doc.id === "cv" && (!!uploadedCV || !!cvHasContent)) || (doc.id === "liste_formateurs" && (!!cvHasContent || !!uploadedCV));
                     return (
                       <div key={doc.id} className="flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors">
                         <div className="flex items-center gap-3">
