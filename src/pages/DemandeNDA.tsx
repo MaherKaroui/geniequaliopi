@@ -595,7 +595,7 @@ const DemandeNDA = () => {
                 <CardContent className="space-y-3">
                   {NDA_DOCUMENTS.map(doc => {
                     const cvHasContent = cvData.prenom || cvData.nom || cvData.profil || cvData.experiences.some(e => e.poste);
-                    const ready = doc.id === "contrat" || doc.id === "programme" || doc.id === "reglement" || doc.id === "devis_facture" || (doc.id === "logo" && !!organisme.logoUrl) || (doc.id === "cv" && (!!uploadedCV || !!cvHasContent)) || (doc.id === "liste_formateurs" && !!cvHasContent);
+                    const ready = doc.id === "contrat" || doc.id === "programme" || doc.id === "reglement" || doc.id === "devis_facture" || (doc.id === "logo" && !!organisme.logoUrl) || (doc.id === "cv" && (!!uploadedCV || !!cvHasContent)) || (doc.id === "liste_formateurs" && (!!cvHasContent || !!uploadedCV));
                     return (
                       <div key={doc.id} className="flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors">
                         <div className="flex items-center gap-3">
