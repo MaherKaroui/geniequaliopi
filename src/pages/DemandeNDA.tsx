@@ -568,18 +568,54 @@ const DemandeNDA = () => {
                             return;
                           }
                           const reader = new FileReader();
-                          reader.onload = () => {
+                          reader.onload = async () => {
+                            const dataUrl = reader.result as string;
                             setUploadedCV({
-                              dataUrl: reader.result as string,
+                              dataUrl,
                               name: file.name,
                               type: file.type,
                             });
-                            toast.success("CV importé !");
+                            toast.success("CV importé ! Extraction des données…");
+
+                            // Auto-extract structured data via AI so the
+                            // "Liste des Formateurs" gets real content.
+                            setExtractingCV(true);
+                            try {
+                              const { data: extracted, error } = await supabase.functions.invoke("generate-cv", {
+                                body: { fileDataUrl: dataUrl, fileType: file.type },
+                              });
+                              if (error) throw error;
+                              if (extracted && !extracted.error) {
+                                setCvData({
+                                  ...emptyCV,
+                                  ...extracted,
+                                  experiences: extracted.experiences || [],
+                                  formations: extracted.formations || [],
+                                  competences: extracted.competences || [],
+                                  langues: extracted.langues || [],
+                                  certifications: extracted.certifications || [],
+                                  photoUrl: cvData.photoUrl || "",
+                                });
+                                toast.success("Données du CV extraites avec succès");
+                              } else {
+                                toast.error(extracted?.error || "Extraction impossible");
+                              }
+                            } catch (err: any) {
+                              console.error("CV extraction error:", err);
+                              toast.error("Extraction automatique échouée");
+                            } finally {
+                              setExtractingCV(false);
+                            }
                           };
                           reader.readAsDataURL(file);
                         }}
                       />
                     </Label>
+                  )}
+                  {extractingCV && (
+                    <p className="text-xs text-muted-foreground mt-2 flex items-center gap-2">
+                      <Loader2 className="w-3 h-3 animate-spin" /> Extraction des données du CV en cours…
+                    </p>
                   )}
                 </CardContent>
               </Card>
