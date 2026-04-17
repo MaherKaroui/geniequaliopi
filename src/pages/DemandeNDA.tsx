@@ -329,6 +329,15 @@ const DemandeNDA = () => {
   };
 
   const handleDownload = async (docId: string) => {
+    // For "cv" with an uploaded file, download the original file as-is
+    if (docId === "cv" && uploadedCV) {
+      const a = document.createElement("a");
+      a.href = uploadedCV.dataUrl;
+      a.download = uploadedCV.name || "CV_Formateur";
+      a.click();
+      toast.success("CV téléchargé !");
+      return;
+    }
     const html = generateDocumentHTML(docId, organisme, formation, stagiaires, cvData, cvDesign, uploadedCV);
     if (!html) { toast.error("Document non disponible."); return; }
     if (docId === "logo" && organisme.logoUrl) {
