@@ -950,6 +950,67 @@ export const RNCP_FICHES: RNCPFiche[] = [
     voiesAcces: ["Après un parcours de formation continue", "Par expérience (VAE)"],
     dureeIndicative: "52h",
   },
+  {
+    code: "RS5637",
+    intitule: "Conduite d'une voiture de transport avec chauffeur (VTC)",
+    niveau: "Sans niveau spécifique",
+    certificateur: "CHAMBRE DES MÉTIERS ET DE L'ARTISANAT (CMA France)",
+    dateEnregistrement: "20/12/2021",
+    dateEcheance: "31/12/2026",
+    codeNSF: "311 – Transports, manutention, magasinage",
+    formacodes: "31845 – Conduite voiture transport avec chauffeur / 31854 – Transport personne",
+    resume: "L'examen VTC vise à habiliter les candidats à exercer la profession de chauffeur de voiture de transport avec chauffeur. Il évalue les compétences réglementaires, sécuritaires, linguistiques, commerciales et de gestion d'entreprise nécessaires à l'exercice de l'activité, conformément à l'arrêté du 11 août 2017 modifié.",
+    activitesVisees: "Le titulaire de la carte professionnelle VTC assure le transport de personnes à titre onéreux avec un véhicule de moins de 10 places. Il accueille la clientèle, sécurise le déplacement, gère sa relation commerciale, facture la prestation, tient sa comptabilité, respecte la réglementation T3P (transport public particulier de personnes) et le Code de la route.",
+    blocsCompetences: [
+      {
+        titre: "Épreuves communes T3P (Taxi, VTC, Voitures de petite remise)",
+        competences: [
+          "Maîtriser la réglementation des transports publics particuliers de personnes (T3P)",
+          "Gérer une entreprise de VTC (statut juridique, fiscalité, comptabilité)",
+          "Appliquer la réglementation routière (Code de la route, sécurité)",
+          "Pratiquer la sécurité et le secourisme adapté au transport de personnes",
+          "Communiquer en français à l'oral et à l'écrit avec la clientèle",
+        ],
+        matieres: [
+          { competence: "Réglementation T3P", contenu: "Loi Thévenoud, décret 2017-483, arrêté 11/08/2017, distinction Taxi/VTC, registre VTC, carte professionnelle, signalétique macaron, contrôles, sanctions", volume: "14h" },
+          { competence: "Gestion d'entreprise VTC", contenu: "Statuts juridiques (micro-entrepreneur, EURL, SASU), URSSAF, TVA, comptabilité simplifiée, assurance RC pro, prévoyance, fiscalité", volume: "14h" },
+          { competence: "Sécurité routière", contenu: "Code de la route, conduite préventive, gestion fatigue, vitesse, alcool/stupéfiants, distances de sécurité, éco-conduite", volume: "10h" },
+          { competence: "Sécurité et secourisme", contenu: "PSC1, gestes de premiers secours, gestion d'accident, équipements de sécurité du véhicule, alerte des secours", volume: "7h" },
+          { competence: "Français à l'oral et à l'écrit", contenu: "Compréhension orale/écrite, expression orale, rédaction professionnelle (facture, courriel client), communication interculturelle", volume: "7h" },
+        ],
+        modalitesEval: "Examens écrits (QCM ou questions à réponse courte) – durée totale 3h30. Note ≥ 10/20 par épreuve, sans note éliminatoire (< 6/20).",
+      },
+      {
+        titre: "Épreuves spécifiques VTC",
+        competences: [
+          "Maîtriser la réglementation spécifique à l'activité VTC",
+          "Développer la relation client et l'activité commerciale d'un VTC",
+        ],
+        matieres: [
+          { competence: "Réglementation VTC", contenu: "Obligations spécifiques VTC (réservation préalable, retour à la base, interdiction de la maraude, tarification libre), Code des transports articles L3122-1 et suivants", volume: "7h" },
+          { competence: "Développement commercial VTC", contenu: "Plateformes de réservation (Uber, Bolt, Heetch, Marcel), tarification (course, kilométrage, attente), facturation, fidélisation, gestion des avis client, image de marque", volume: "7h" },
+        ],
+        modalitesEval: "Examens écrits (QCM) – durée 1h00. Note ≥ 10/20 par épreuve.",
+      },
+      {
+        titre: "Épreuve d'admission – Conduite et accueil clientèle",
+        competences: [
+          "Conduire un véhicule de transport de personnes en sécurité et confort",
+          "Accueillir et prendre en charge un client dans des conditions professionnelles",
+        ],
+        matieres: [
+          { competence: "Conduite professionnelle VTC", contenu: "Conduite souple et confortable, anticipation, itinéraires (GPS, applications), gestion du stress, respect du Code de la route en situation réelle", volume: "10h pratique" },
+          { competence: "Accueil et prise en charge client", contenu: "Tenue professionnelle, accueil verbal et non verbal, aide aux bagages, gestion des demandes spéciales, confidentialité, paiement, remise de facture", volume: "5h pratique" },
+        ],
+        modalitesEval: "Épreuve pratique de conduite et d'accueil – durée 1h00. Évaluation par un examinateur agréé sur grille critériée. Réussite : aucune erreur éliminatoire + note ≥ 12/20.",
+      },
+    ],
+    secteursActivite: "Transport public particulier de personnes (T3P) – Voitures de Transport avec Chauffeur (VTC) – Plateformes numériques de mise en relation (Uber, Bolt, Heetch, Marcel, Allocab) – Sociétés de transport haut de gamme – Conciergerie privée",
+    typesEmplois: ["Chauffeur VTC indépendant", "Chauffeur VTC salarié", "Capacitaire VTC (gérant d'exploitation)", "Conducteur de transport de personnes (T3P)"],
+    codesROME: ["N4102 – Conduite de transport de particuliers"],
+    voiesAcces: ["Après un parcours de formation continue auprès d'un organisme habilité par la CMA France", "Inscription libre à l'examen via le site de la CMA"],
+    dureeIndicative: "140h (épreuves communes + spécifiques + pratique)",
+  },
 ];
 
 export function getRNCPByCode(code: string): RNCPFiche | undefined {
