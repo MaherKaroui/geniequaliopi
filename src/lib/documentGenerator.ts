@@ -8686,7 +8686,7 @@ function genSupportCoursRef(o: OrganismeInfo, f: FormationInfo) {
   chapters.forEach((ch, ci) => {
     // Chapter title page
     chaptersHtml += `<div class="page-break"></div>`;
-    chaptersHtml += `<div style="background:linear-gradient(135deg,hsl(220,60%,50%),hsl(240,50%,40%));color:white;padding:40px;border-radius:12px;margin-bottom:30px">`;
+    chaptersHtml += `<div style="background:linear-gradient(135deg,${theme.primary},${theme.dark});color:white;padding:40px;border-radius:12px;margin-bottom:30px">`;
     chaptersHtml += `<h2 style="color:white;font-size:28px;margin:0">CHAPITRE ${ci + 1}</h2>`;
     chaptersHtml += `<h3 style="color:white;font-size:20px;margin-top:10px">${ch.title}</h3>`;
     chaptersHtml += `<p style="color:rgba(255,255,255,0.85);margin-top:10px">${ch.description}</p>`;
@@ -8695,14 +8695,14 @@ function genSupportCoursRef(o: OrganismeInfo, f: FormationInfo) {
     ch.sections.forEach((sec, si) => {
       if (si > 0 && si % 2 === 0) chaptersHtml += `<div class="page-break"></div>`;
       chaptersHtml += `<div style="margin-bottom:25px">`;
-      chaptersHtml += `<h3 style="color:hsl(220,60%,50%);font-size:16px;border-bottom:2px solid hsl(220,60%,50%);padding-bottom:5px;margin-bottom:12px">Section ${ci + 1}.${si + 1} — ${sec.title}</h3>`;
+      chaptersHtml += `<h3 style="color:${theme.primary};font-size:16px;border-bottom:2px solid ${theme.primary};padding-bottom:5px;margin-bottom:12px">Section ${ci + 1}.${si + 1} — ${sec.title}</h3>`;
       chaptersHtml += sec.content;
       chaptersHtml += `</div>`;
     });
   });
 
   // Table des matières
-  let tocHtml = '<div style="margin-bottom:30px"><h2 style="text-align:center;color:hsl(220,60%,50%)">SOMMAIRE</h2>';
+  let tocHtml = `<div style="margin-bottom:30px"><h2 style="text-align:center;color:${theme.primary}">SOMMAIRE</h2>`;
   chapters.forEach((ch, ci) => {
     tocHtml += `<div style="margin:10px 0;font-weight:bold;font-size:14px">CHAPITRE ${ci + 1} — ${ch.title}</div>`;
     ch.sections.forEach((sec, si) => {
@@ -8714,7 +8714,7 @@ function genSupportCoursRef(o: OrganismeInfo, f: FormationInfo) {
   // Closing page
   const closingHtml = `<div class="page-break"></div>
     <div style="text-align:center;padding:60px 20px">
-      <h2 style="color:hsl(220,60%,50%);font-size:24px">Merci de votre attention</h2>
+      <h2 style="color:${theme.primary};font-size:24px">Merci de votre attention</h2>
       <p style="color:#666;margin-top:15px">Nous espérons que ce support de cours vous a apporté les clés nécessaires pour maîtriser les compétences visées.</p>
       <div style="margin-top:40px">
         <p><strong>${o.dirigeant}</strong></p>
