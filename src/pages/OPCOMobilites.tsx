@@ -240,6 +240,35 @@ export default function OPCOMobilites() {
     return null;
   };
 
+  /** Pour C6 : libellés courts par sous-template (positionnement début/fin, exercice intermédiaire, évaluation finale) */
+  const TEMPLATE_LABELS: Record<string, string> = {
+    ai_test_positionnement_debut: "QCM_Positionnement_Debut",
+    ai_test_positionnement_fin: "QCM_Positionnement_Fin",
+    ai_exercice_intermediaire: "Exercice_Intermediaire",
+    ai_evaluation_finale: "Evaluation_Finale",
+  };
+
+  /** Génère TOUS les sous-templates d'un doc (utile pour C6 qui regroupe 4 évaluations distinctes) */
+  const generateAllTemplateBlobs = async (
+    doc: OpcoDocumentItem,
+    stagiaireIdx?: number
+  ): Promise<Array<{ template: string; blob: Blob }>> => {
+    const out: Array<{ template: string; blob: Blob }> = [];
+    for (const template of doc.autoTemplates) {
+      try {
+        const params = stagiaireIdx !== undefined ? { stagiaireIdx, fi: 0, forceFilled: true } : { fi: 0, forceFilled: true };
+        const html = generateDocumentById(`opco_${doc.code}`, template, params, mergedOrganisme, formation, mergedStagiaires);
+        if (html) {
+          const blob = await htmlToPdfBlob(html);
+          out.push({ template, blob });
+        }
+      } catch (e) {
+        console.warn(`Template ${template} failed for ${doc.code}:`, e);
+      }
+    }
+    return out;
+  };
+
   // ─────────── Aperçu + Édition ───────────
   const handlePreview = async (doc: OpcoDocumentItem) => {
     if (doc.autoTemplates.length === 0) {
