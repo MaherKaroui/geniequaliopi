@@ -375,7 +375,7 @@ export default function OPCOMobilites() {
             </div>
             <div className="flex gap-2 text-xs">
               <Badge variant="outline" className="gap-1">{stats.auto} auto</Badge>
-              <Badge variant="outline" className="gap-1 border-emerald-300">{stats.uploaded} uploadés</Badge>
+              <Badge variant="outline" className="gap-1 border-primary/40">{stats.uploaded} uploadés</Badge>
               <Badge variant="outline" className="gap-1">{stats.pending} en attente</Badge>
               {stats.na > 0 && <Badge variant="outline" className="gap-1">{stats.na} N/A</Badge>}
             </div>
@@ -446,7 +446,7 @@ export default function OPCOMobilites() {
                           </div>
                           <p className="text-xs text-muted-foreground mt-1">{doc.description}</p>
                           {state.uploadedFileName && (
-                            <p className="text-xs text-emerald-600 mt-1 flex items-center gap-1">
+                            <p className="text-xs text-primary mt-1 flex items-center gap-1">
                               <FileText className="w-3 h-3" /> {state.uploadedFileName}
                             </p>
                           )}
