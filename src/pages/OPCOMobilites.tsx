@@ -441,7 +441,19 @@ export default function OPCOMobilites() {
           const ext = state.uploadedFileName?.split(".").pop() || "pdf";
           zip.file(`${folder}/${buildOpcoFileName(namingCtx, doc.label, ext)}`, state.uploadedFile);
         } else if (doc.autoTemplates.length > 0) {
-          if (doc.perStagiaire && mergedStagiaires.length > 0) {
+          if (doc.code === "C6" && mergedStagiaires.length > 0) {
+            // C6 : 4 sous-évaluations IA par stagiaire (QCM début/fin, exercice intermédiaire, éval finale)
+            for (let i = 0; i < mergedStagiaires.length; i++) {
+              const s = mergedStagiaires[i];
+              const stagFolder = `${s.prenom || ""}_${s.nom || ""}`.trim() || `Stagiaire_${i + 1}`;
+              const blobs = await generateAllTemplateBlobs(doc, i);
+              for (const { template, blob } of blobs) {
+                const subLabel = TEMPLATE_LABELS[template] || template;
+                zip.file(`${folder}/C6_Evaluations_IA/${stagFolder}/${buildOpcoFileName(namingCtx, subLabel, "pdf", stagFolder)}`, blob);
+              }
+              await new Promise((r) => setTimeout(r, 50));
+            }
+          } else if (doc.perStagiaire && mergedStagiaires.length > 0) {
             for (let i = 0; i < mergedStagiaires.length; i++) {
               const blob = await generateAutoBlob(doc, i);
               if (blob) {
