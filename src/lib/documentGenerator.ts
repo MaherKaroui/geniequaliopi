@@ -530,7 +530,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "bilan_chaud": return genBilanChaud(o, f, stagiaires);
     case "bilan_chaud_stagiaire": {
       const si = params?.stagiaireIdx ?? 0;
-      return genBilanChaudStagiaire(o, f, stagiaires, si);
+      return genBilanChaudStagiaire(o, f, stagiaires, si, !!params?.forceFilled);
     }
     case "compte_rendu_formateur": return genCompteRenduFormateur(o, f);
     case "bilan_fin_formation_formateur": return genBilanFinFormationFormateur(o, f, stagiaires, params?.formateurNom);
@@ -9724,10 +9724,10 @@ function seededRandom(seed: number): () => number {
   return () => { s = (s * 9301 + 49297) % 233280; return s / 233280; };
 }
 
-function genBilanChaudStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
+function genBilanChaudStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number, forceFilled = false) {
   const s = stagiaires[si] || stagiaires[0];
   const dureeH = parseInt(f.duree) || 14;
-  const termine = isFormationTerminee(f, stagiaires);
+  const termine = forceFilled || isFormationTerminee(f, stagiaires);
 
   const allCriteres = [
     "Satisfaction globale de la formation",
