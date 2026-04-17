@@ -27,6 +27,7 @@ import { buildOpcoFileName, buildOpcoZipFolder, buildOpcoRootName, type OpcoNami
 import type { OrganismeInfo, FormationInfo, StagiaireInfo, CritereData } from "@/types/qualiopi";
 import { CRITERES } from "@/types/qualiopi";
 import { generateDocumentById } from "@/lib/documentGenerator";
+import { generateExcelCalendrierOPCO, excelToBlob } from "@/lib/xlsxGenerator";
 import { mergeOrganisme, mergeStagiaires } from "@/lib/sampleData";
 import { htmlToPdfBlob } from "@/lib/pdfExport";
 import { supabase } from "@/integrations/supabase/client";
