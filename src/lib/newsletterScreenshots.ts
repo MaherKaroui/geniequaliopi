@@ -352,9 +352,9 @@ export function courseCertificateHtml(o: OrganismeInfo, f: FormationInfo): strin
   return `
 <div style="width:1100px;height:850px;margin:0 auto;font-family:Georgia,'Times New Roman',serif;position:relative;background:#fff;overflow:hidden;border:1px solid #c8c8c8;box-sizing:border-box">
 
-  <!-- Bande verticale Coursera à droite (drapeau) -->
-  <div style="position:absolute;top:0;right:60px;width:200px;height:100%;z-index:1;overflow:hidden;pointer-events:none">
-    <img src="/images/coursera-ribbon.png" alt="Coursera Course Certificate" style="display:block;width:100%;height:100%;object-fit:contain;object-position:top center" />
+  <!-- Bande verticale Coursera à droite (drapeau) — collée au bord droit comme l'original -->
+  <div style="position:absolute;top:0;right:80px;width:170px;height:100%;z-index:1;overflow:hidden;pointer-events:none">
+    <img src="/images/coursera-ribbon.png" alt="Coursera Course Certificate" style="display:block;width:100%;height:auto;object-fit:contain;object-position:top center" />
   </div>
 
   <!-- Logo Duke en haut à gauche -->
