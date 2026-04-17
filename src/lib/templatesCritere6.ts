@@ -1374,6 +1374,9 @@ function veilleTechnoRows(f: FormationInfo, type: FormationType): string[][] {
   }
 
   if (type === "ecsr") {
+    return [...commonDigitalLearning,
+      [
+        `<a href="https://www.securite-routiere.gouv.fr/">Sécurité Routière – Simulateurs</a>`,
         "Simulateurs de conduite et outils numériques pédagogiques",
         veilleMonthYear(f, 7),
         "Évolutions des simulateurs de conduite pour la formation : réalité virtuelle, scénarios de conduite en conditions dégradées, éco-conduite.",
