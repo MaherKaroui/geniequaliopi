@@ -183,6 +183,22 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "eval_positionnement_remplie": return genEvalPositionnement(o, f, stagiaires);
     case "eval_intermediaire_remplie": return genEvalIntermediaire(o, f, stagiaires);
     case "eval_finale_remplie": return genEvalFinale(o, f, stagiaires);
+    case "ai_test_positionnement_debut": {
+      const si = params?.stagiaireIdx ?? 0;
+      return genAITestPositionnement(o, f, stagiaires, si, "debut");
+    }
+    case "ai_test_positionnement_fin": {
+      const si = params?.stagiaireIdx ?? 0;
+      return genAITestPositionnement(o, f, stagiaires, si, "fin");
+    }
+    case "ai_exercice_intermediaire": {
+      const si = params?.stagiaireIdx ?? 0;
+      return genAIExerciceIntermediaire(o, f, stagiaires, si);
+    }
+    case "ai_evaluation_finale": {
+      const si = params?.stagiaireIdx ?? 0;
+      return genAIEvaluationFinale(o, f, stagiaires, si);
+    }
     case "attestation_formation": return genAttestation(o, f, stagiaires);
     case "certificat_reussite": return genCertificatReussite_V2(o, f, stagiaires);
     case "evaluation_finale_stagiaire": {
