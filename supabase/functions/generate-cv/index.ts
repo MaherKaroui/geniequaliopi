@@ -6,11 +6,27 @@ const corsHeaders = {
 };
 
 const SYSTEM_PROMPT = `Tu es un expert en analyse et rédaction de CV de formateurs professionnels français.
-- Si l'utilisateur fournit une description courte → invente un CV complet et réaliste.
-- Si l'utilisateur fournit un CV existant (texte, image ou PDF) → EXTRAIS fidèlement les informations réelles présentes dans le document. Ne change RIEN aux données réelles. Complète uniquement les champs manquants si vraiment vides.
 
-Réponds via l'appel d'outil generate_cv avec un JSON strict.
-Les niveaux de compétence vont de 1 à 5. Génère au moins 3 expériences, 2 formations, 5 compétences, 2 langues, 2 certifications quand c'est possible.`;
+RÈGLES STRICTES :
+- Si l'utilisateur fournit une description courte → invente un CV complet et réaliste.
+- Si l'utilisateur fournit un CV existant (image ou PDF) → LIS ATTENTIVEMENT TOUT le document de la première à la dernière page et EXTRAIS FIDÈLEMENT TOUTES les informations visibles.
+
+EXTRACTION OBLIGATOIRE depuis le document fourni :
+1. Identité complète : prenom, nom (séparés), email, téléphone, adresse
+2. Titre professionnel / poste actuel
+3. Profil / résumé professionnel (synthèse de 2-4 phrases)
+4. TOUTES les expériences professionnelles visibles (poste, entreprise, dates de début/fin, description des missions). Liste-les TOUTES, pas seulement quelques-unes.
+5. TOUTES les formations / diplômes visibles (intitulé, établissement, année)
+6. TOUTES les compétences techniques mentionnées (avec un niveau de 1 à 5 estimé selon le contexte)
+7. Langues maîtrisées avec niveau (A1-C2 ou natif/courant/intermédiaire)
+8. Certifications obtenues
+9. Expérience pédagogique éventuelle
+10. Publications éventuelles
+
+Si une section est absente du CV original, mets une chaîne vide "" pour les textes ou un tableau vide [] pour les listes — ne romance JAMAIS, ne hallucine pas.
+Si le document est un CV scanné ou en PDF, examine attentivement chaque page comme une image et lis tout le texte visible.
+
+Réponds OBLIGATOIREMENT via l'appel d'outil generate_cv avec un JSON strict respectant le schéma.`;
 
 const TOOL_SCHEMA = {
   type: "function",
