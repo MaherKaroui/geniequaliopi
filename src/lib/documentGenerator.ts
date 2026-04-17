@@ -8658,7 +8658,28 @@ function genGrilleAcquisitionCompetencesSF(o: OrganismeInfo, f: FormationInfo, s
     signatures: { type: "2", labels: ["Le Formateur", "Le Resp. Pédagogique"], names: [f.formateur, o.responsablePedagogique] } });
 }
 
+// ============== Thèmes variés pour les supports de cours ==============
+const SUPPORT_COURS_THEMES = [
+  { primary: 'hsl(220,60%,50%)', dark: 'hsl(240,50%,40%)', accent: 'hsl(220,50%,35%)', soft: '#f0f7ff', primaryHex: '#1e3a7b', name: 'Bleu océan' },
+  { primary: 'hsl(150,55%,40%)', dark: 'hsl(170,50%,30%)', accent: 'hsl(150,50%,28%)', soft: '#f0faf3', primaryHex: '#1f6b3a', name: 'Vert nature' },
+  { primary: 'hsl(15,75%,50%)', dark: 'hsl(0,65%,40%)', accent: 'hsl(15,65%,38%)', soft: '#fff4f0', primaryHex: '#c0392b', name: 'Terracotta' },
+  { primary: 'hsl(280,50%,45%)', dark: 'hsl(300,45%,35%)', accent: 'hsl(280,45%,32%)', soft: '#f8f0ff', primaryHex: '#6a1b9a', name: 'Violet royal' },
+  { primary: 'hsl(35,85%,45%)', dark: 'hsl(20,75%,38%)', accent: 'hsl(35,70%,35%)', soft: '#fff8e7', primaryHex: '#b8731e', name: 'Ambre doré' },
+  { primary: 'hsl(195,70%,40%)', dark: 'hsl(210,60%,32%)', accent: 'hsl(195,60%,30%)', soft: '#e8f5fa', primaryHex: '#1e7a99', name: 'Cyan profond' },
+  { primary: 'hsl(340,60%,45%)', dark: 'hsl(355,55%,38%)', accent: 'hsl(340,50%,32%)', soft: '#fdf0f5', primaryHex: '#a91e5a', name: 'Magenta' },
+  { primary: 'hsl(85,45%,38%)', dark: 'hsl(100,40%,30%)', accent: 'hsl(85,40%,28%)', soft: '#f4f8e8', primaryHex: '#5a7a1e', name: 'Olive' },
+  { primary: 'hsl(255,55%,50%)', dark: 'hsl(270,45%,38%)', accent: 'hsl(255,45%,35%)', soft: '#f1eeff', primaryHex: '#4527a0', name: 'Indigo' },
+  { primary: 'hsl(180,55%,35%)', dark: 'hsl(190,50%,28%)', accent: 'hsl(180,50%,25%)', soft: '#e6f5f5', primaryHex: '#1e7a7a', name: 'Sarcelle' },
+];
+
+function pickSupportTheme(seed: string) {
+  let h = 0;
+  for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) >>> 0;
+  return SUPPORT_COURS_THEMES[h % SUPPORT_COURS_THEMES.length];
+}
+
 function genSupportCoursRef(o: OrganismeInfo, f: FormationInfo) {
+  const theme = pickSupportTheme(`${f.intitule}|${f.codeRNCP || ''}|${o.nom}`);
   const chapters = getCourseChapters(f.intitule);
   
   let chaptersHtml = '';
