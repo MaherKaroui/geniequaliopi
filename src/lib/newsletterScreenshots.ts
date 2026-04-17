@@ -348,49 +348,56 @@ export function courseCertificateHtml(o: OrganismeInfo, f: FormationInfo): strin
   const certDate = certificateDateLong(f);
   const verifyCode = Math.random().toString(36).substring(2, 14).toUpperCase();
 
+  // Format certificat Coursera/Duke — paysage 1100x850 (ratio ~1.29) — fond blanc avec bordure fine
   return `
-<div style="width:100%;max-width:860px;margin:20px auto;font-family:Georgia,'Times New Roman',serif;position:relative;background:#fff;aspect-ratio:1.29/1;overflow:hidden;border:1px solid #e0e0e0">
+<div style="width:1100px;height:850px;margin:0 auto;font-family:Georgia,'Times New Roman',serif;position:relative;background:#fff;overflow:hidden;border:1px solid #c8c8c8;box-sizing:border-box">
 
-  <!-- Right ribbon -->
-  <div style="position:absolute;top:0;right:0;width:200px;height:100%;z-index:1;overflow:hidden">
-    <img src="/images/coursera-ribbon.png" alt="Coursera Course Certificate" style="width:100%;height:100%;object-fit:cover;object-position:top center" />
+  <!-- Bande verticale Coursera à droite (drapeau) -->
+  <div style="position:absolute;top:0;right:60px;width:200px;height:100%;z-index:1;overflow:hidden;pointer-events:none">
+    <img src="/images/coursera-ribbon.png" alt="Coursera Course Certificate" style="display:block;width:100%;height:100%;object-fit:contain;object-position:top center" />
   </div>
 
-  <!-- Coursera seal removed -->
+  <!-- Logo Duke en haut à gauche -->
+  <div style="position:absolute;top:70px;left:80px;z-index:2">
+    <img src="/images/duke-logo.jpg" alt="Duke University" style="display:block;height:90px;width:auto" />
+  </div>
 
-
-  <!-- Main content -->
-  <div style="padding:70px 50px 30px 55px;margin-right:200px;position:relative;z-index:1">
-    <div style="font-size:11px;color:#555;margin-bottom:28px;font-family:Arial,sans-serif;letter-spacing:2px;text-transform:uppercase">${certDate}</div>
-    <div style="font-size:34px;font-weight:400;color:#111;margin-bottom:8px;letter-spacing:0.3px;line-height:1.2">${displayName}</div>
-    <div style="font-size:12px;color:#777;margin-bottom:28px;font-family:Arial,sans-serif">has successfully completed</div>
-    <div style="font-size:18px;font-weight:600;color:#222;margin-bottom:12px;line-height:1.4;font-style:italic">${formationTitle}</div>
-    <div style="font-size:11px;color:#666;margin-bottom:80px;line-height:1.7;max-width:420px;font-family:Arial,sans-serif">
+  <!-- Contenu principal (zone centre/gauche, marge droite pour la bande) -->
+  <div style="position:absolute;top:200px;left:80px;right:300px;z-index:2">
+    <div style="font-size:13px;color:#555;letter-spacing:2px;text-transform:uppercase;font-family:Arial,sans-serif;margin-bottom:30px">${certDate}</div>
+    <div style="font-size:48px;font-weight:400;color:#111;line-height:1.1;margin-bottom:18px;letter-spacing:0.3px">${displayName}</div>
+    <div style="font-size:14px;color:#777;font-family:Arial,sans-serif;margin-bottom:32px">has successfully completed</div>
+    <div style="font-size:22px;font-weight:600;color:#222;font-style:italic;line-height:1.35;margin-bottom:14px">${formationTitle}</div>
+    <div style="font-size:13px;color:#666;line-height:1.7;font-family:Arial,sans-serif;max-width:540px">
       an online non-credit course authorized by Duke University and offered through Coursera
     </div>
-    <div style="display:flex;gap:60px;margin-top:10px">
-      <div style="flex:1">
-        <div style="font-family:'Brush Script MT','Segoe Script',cursive;font-size:22px;color:#1a1a4e;margin-bottom:6px;transform:rotate(-2deg)">Dr. Jana Schaich Borg</div>
-        <div style="border-top:1px dotted #aaa;padding-top:5px">
-          <div style="font-size:10px;color:#555;font-family:Arial,sans-serif">Jana Schaich Borg</div>
-          <div style="font-size:9px;color:#777;font-family:Arial,sans-serif">Post-doctoral Fellow</div>
-          <div style="font-size:9px;color:#777;font-family:Arial,sans-serif">Psychiatry and Behavioral Sciences</div>
-        </div>
-      </div>
-      <div style="flex:1">
-        <div style="font-family:'Brush Script MT','Segoe Script',cursive;font-size:22px;color:#1a1a4e;margin-bottom:6px;transform:rotate(-1deg)">Daniel Egger</div>
-        <div style="border-top:1px dotted #aaa;padding-top:5px">
-          <div style="font-size:10px;color:#555;font-family:Arial,sans-serif">Daniel Egger</div>
-          <div style="font-size:9px;color:#777;font-family:Arial,sans-serif">Executive in Residence and Director,</div>
-          <div style="font-size:9px;color:#777;font-family:Arial,sans-serif">Center for Quantitative Modeling</div>
-          <div style="font-size:9px;color:#777;font-family:Arial,sans-serif">Pratt School of Engineering</div>
-        </div>
+  </div>
+
+  <!-- Signatures (bas gauche, deux colonnes) -->
+  <div style="position:absolute;bottom:130px;left:80px;right:300px;z-index:2;display:flex;gap:60px">
+    <div style="flex:1;max-width:320px">
+      <div style="font-family:'Brush Script MT','Segoe Script',cursive;font-size:26px;color:#1a1a4e;margin-bottom:6px;transform:rotate(-2deg)">Dr. Jana Schaich Borg</div>
+      <div style="border-top:1px dotted #aaa;padding-top:6px">
+        <div style="font-size:12px;color:#444;font-family:Arial,sans-serif">Jana Schaich Borg</div>
+        <div style="font-size:11px;color:#777;font-family:Arial,sans-serif">Post-doctoral Fellow</div>
+        <div style="font-size:11px;color:#777;font-family:Arial,sans-serif">Psychiatry and Behavioral Sciences</div>
       </div>
     </div>
-    <div style="margin-top:30px;text-align:right">
-      <div style="font-size:11px;color:#333;font-family:Arial,sans-serif">Verify at coursera.org/verify/${verifyCode}</div>
-      <div style="font-size:9px;color:#777;font-family:Arial,sans-serif;margin-top:3px;font-style:italic">Coursera has confirmed the identity of this individual and<br>their participation in the course.</div>
+    <div style="flex:1;max-width:320px">
+      <div style="font-family:'Brush Script MT','Segoe Script',cursive;font-size:26px;color:#1a1a4e;margin-bottom:6px;transform:rotate(-1deg)">Daniel Egger</div>
+      <div style="border-top:1px dotted #aaa;padding-top:6px">
+        <div style="font-size:12px;color:#444;font-family:Arial,sans-serif">Daniel Egger</div>
+        <div style="font-size:11px;color:#777;font-family:Arial,sans-serif">Executive in Residence and Director,</div>
+        <div style="font-size:11px;color:#777;font-family:Arial,sans-serif">Center for Quantitative Modeling</div>
+        <div style="font-size:11px;color:#777;font-family:Arial,sans-serif">Pratt School of Engineering</div>
+      </div>
     </div>
+  </div>
+
+  <!-- Verify (bas droite) -->
+  <div style="position:absolute;bottom:60px;right:90px;z-index:2;text-align:right;max-width:340px">
+    <div style="font-size:12px;color:#333;font-family:Arial,sans-serif">Verify at coursera.org/verify/${verifyCode}</div>
+    <div style="font-size:10px;color:#888;font-family:Arial,sans-serif;margin-top:4px;font-style:italic;line-height:1.5">Coursera has confirmed the identity of this individual and<br>their participation in the course.</div>
   </div>
 </div>`;
 }
@@ -401,5 +408,5 @@ export function genCertificatCoursera(o: OrganismeInfo, f: FormationInfo): strin
     title: "CERTIFICAT DE FORMATION – COURSERA / DUKE UNIVERSITY",
     sections: [{ heading: "", content: `<p>Certificat de réussite Coursera / Duke University pour <strong>${o.dirigeant || "le dirigeant"}</strong> – formation « ${f.intitule || "Formation"} ».</p>` }],
     extraHtml: `<div style="box-shadow:0 2px 12px rgba(0,0,0,0.12);border-radius:8px;overflow:hidden">${courseCertificateHtml(o, f)}</div>`
-  }).replace("</head>", '<meta name="pdf-page-size" content="280x430"></head>');
+  }).replace("</head>", '<meta name="pdf-page-size" content="297x210"></head>');
 }
