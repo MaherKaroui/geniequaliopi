@@ -972,6 +972,29 @@ export default function OPCOMobilites() {
               </div>
             </div>
           </DialogHeader>
+          {previewDoc?.code === "C6" && (
+            <div className="flex flex-wrap gap-2 px-1 pb-2 border-b">
+              {previewDoc.autoTemplates.map((tpl, idx) => {
+                const labels: Record<string, string> = {
+                  ai_test_positionnement_debut: "QCM Positionnement Début",
+                  ai_test_positionnement_fin: "QCM Positionnement Fin",
+                  ai_exercice_intermediaire: "Exercice Intermédiaire",
+                  ai_evaluation_finale: "Évaluation Finale",
+                };
+                return (
+                  <Button
+                    key={tpl}
+                    size="sm"
+                    variant={previewTemplateIdx === idx ? "default" : "outline"}
+                    onClick={() => handleSelectPreviewTemplate(idx)}
+                    disabled={previewLoading}
+                  >
+                    {labels[tpl] || tpl}
+                  </Button>
+                );
+              })}
+            </div>
+          )}
           <div className="flex-1 overflow-hidden bg-muted/20 rounded">
             {previewLoading ? (
               <div className="h-full flex items-center justify-center text-muted-foreground gap-2">
