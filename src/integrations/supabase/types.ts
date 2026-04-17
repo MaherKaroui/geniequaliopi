@@ -143,6 +143,48 @@ export type Database = {
         }
         Relationships: []
       }
+      saved_opco_dossiers: {
+        Row: {
+          annee_controle: string
+          created_at: string
+          doc_states: Json
+          formation: Json
+          id: string
+          name: string
+          organisme: Json
+          ref_dossier: string
+          stagiaires: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          annee_controle?: string
+          created_at?: string
+          doc_states?: Json
+          formation: Json
+          id?: string
+          name?: string
+          organisme: Json
+          ref_dossier?: string
+          stagiaires?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          annee_controle?: string
+          created_at?: string
+          doc_states?: Json
+          formation?: Json
+          id?: string
+          name?: string
+          organisme?: Json
+          ref_dossier?: string
+          stagiaires?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       saved_themes: {
         Row: {
           config: Json
