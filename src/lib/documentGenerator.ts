@@ -12019,9 +12019,17 @@ function genAIExerciceIntermediaire(o: OrganismeInfo, f: FormationInfo, stagiair
   if (!pack) return aiPackPlaceholder(o, f, "EXERCICE INTERMÉDIAIRE", s);
   const ex = pack.exerciceIntermediaire;
 
+  // Date de l'exercice intermédiaire = jour médian de la formation du stagiaire
+  const stagDays = getStagiaireDays(s, f);
+  const midIdx = stagDays.length > 0 ? Math.floor(stagDays.length / 2) : -1;
+  const dateExercice = midIdx >= 0 && stagDays[midIdx]
+    ? stagDays[midIdx]
+    : formatDate(getStagiaireDateDebut(s, f));
+
   let extra = `<h2>${ex.titre}</h2>`;
   extra += `<p><strong>Stagiaire :</strong> ${s.civilite ? s.civilite + " " : ""}${s.prenom} ${s.nom}<br>
-    <strong>Formation :</strong> ${f.intitule} — <strong>Mi-parcours</strong></p>`;
+    <strong>Formation :</strong> ${f.intitule}<br>
+    <strong>Date de l'exercice :</strong> ${dateExercice} <em>(mi-parcours)</em></p>`;
   extra += `<div class="section"><p><strong>Mise en situation :</strong></p><p>${ex.contexte}</p></div>`;
 
   let totalObtained = 0;
