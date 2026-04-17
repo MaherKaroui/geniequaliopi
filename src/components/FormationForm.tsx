@@ -12,6 +12,7 @@ import { RNCP_FICHES } from "@/lib/rncpData";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { generateAIEvalPack, clearCachedPack } from "@/lib/aiEvalPack";
+import { generateAIVeillePack, clearCachedVeillePack } from "@/lib/aiVeillePack";
 
 interface FormationFormProps {
   data: FormationInfo;
@@ -46,19 +47,34 @@ const FormationForm = ({ data, onChange, onImportStagiaires }: FormationFormProp
       const f = data?.formation as FormationInfo | undefined;
       if (!f?.intitule) throw new Error("Réponse IA vide");
       onChange({ ...f });
-      toast.success("✅ Formation générée — génération des QCM/exercices…", { id: t });
+      toast.success("✅ Formation générée — génération des QCM, exercices et veilles…", { id: t });
 
-      // Génère immédiatement les QCM + exercices + évaluation finale cohérents avec la formation
+      // Génère en parallèle : pack QCM/exercices ET pack veilles, tous cohérents avec la formation
       try {
         clearCachedPack(f);
-        await generateAIEvalPack(f, true);
-        toast.success("✅ QCM, exercices et évaluation finale générés (cohérents avec la formation)", { id: t });
-      } catch (evalErr: any) {
-        console.error("Eval pack generation error:", evalErr);
-        toast.warning(
-          "Formation OK mais génération des exercices échouée : " + (evalErr?.message || "réessayez via l'étape 5"),
-          { id: t },
-        );
+        clearCachedVeillePack(f);
+        const [evalRes, veilleRes] = await Promise.allSettled([
+          generateAIEvalPack(f, true),
+          generateAIVeillePack(f, true),
+        ]);
+        const evalOk = evalRes.status === "fulfilled";
+        const veilleOk = veilleRes.status === "fulfilled";
+        if (evalOk && veilleOk) {
+          toast.success("✅ QCM, exercices, évaluation finale et veilles (réglementaire/métier/techno) générés", { id: t });
+        } else {
+          const failures: string[] = [];
+          if (!evalOk) failures.push("QCM/exercices");
+          if (!veilleOk) failures.push("veilles");
+          toast.warning(
+            `Formation OK. Échec partiel : ${failures.join(" + ")}. Réessayez via l'étape 5.`,
+            { id: t },
+          );
+          if (!evalOk) console.error("Eval pack error:", (evalRes as PromiseRejectedResult).reason);
+          if (!veilleOk) console.error("Veille pack error:", (veilleRes as PromiseRejectedResult).reason);
+        }
+      } catch (extraErr: any) {
+        console.error("Extra IA generation error:", extraErr);
+        toast.warning("Formation OK mais génération des packs IA échouée : " + (extraErr?.message || ""), { id: t });
       }
     } catch (err: any) {
       console.error("AI generation error:", err);
