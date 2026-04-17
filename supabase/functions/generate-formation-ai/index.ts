@@ -103,7 +103,7 @@ const FORMATION_TOOL = {
         programme: {
           type: "string",
           description:
-            "Programme DÉTAILLÉ jour par jour ou module par module, avec horaires (09h00-12h00 / 13h30-17h30) et thèmes précis. Utiliser des sauts de ligne (\\n). Très complet : minimum 800 caractères.",
+            "Programme DÉTAILLÉ ventilé JOUR PAR JOUR avec créneaux horaires PRÉCIS au format EXACT 'Jour N – Titre (7h) :' suivi de créneaux 'HHhMM–HHhMM : activité' (tiret demi-cadratin –, h minuscule). Pause déjeuner 13h00–14h00 non comptée. Le 1er jour commence par accueil + test de positionnement. Le dernier jour finit par test de positionnement fin, évaluation finale, bilan, grille d'acquisition. Séparer chaque jour par une ligne vide (\\n\\n).",
         },
         methodesEvaluation: {
           type: "string",
