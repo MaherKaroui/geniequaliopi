@@ -14,7 +14,7 @@ import CVGeneratorEmbed from "@/components/CVGeneratorEmbed";
 import { genContratFormationParticulier, genDevis, genFacture } from "@/lib/templatesAF";
 import { courseCertificateHtml } from "@/lib/newsletterScreenshots";
 import { isFormationTerminee, setDocStyle } from "@/lib/docBuilder";
-import { genReglement_V2 } from "@/lib/generatorsV2";
+import { genReglement_V2, genEmargementJour_V2 } from "@/lib/generatorsV2";
 import { generateDocumentById } from "@/lib/documentGenerator";
 import { htmlToPdfBlob } from "@/lib/pdfExport";
 import { CVData, CVDesign, emptyCV, generateCVHTML } from "@/lib/cvGenerator";
@@ -40,6 +40,7 @@ const NDA_DOCUMENTS = [
   { id: "cv", label: "CV du Formateur", icon: "👤" },
   { id: "liste_formateurs", label: "Liste des Formateurs", icon: "👥" },
   { id: "certificat_coursera", label: "Certificat Coursera / UCI", icon: "🎓" },
+  { id: "emargement", label: "Feuille d'émargement / Rapport de connexion", icon: "✍️" },
 ];
 
 const emptyOrganisme: OrganismeInfo = {
@@ -186,6 +187,8 @@ function generateDocumentHTML(docId: string, o: OrganismeInfo, f: FormationInfo,
       if (!hasCV) return null;
       return generateListeFormateursHTML(cleanOrganisme, cvData, s);
     }
+    case "emargement":
+      return genEmargementJour_V2(cleanOrganisme, f, s, 0, "");
     case "certificat_coursera": {
       // Format A4 paysage 297x210mm (~1123x794px @96dpi).
       // Certificat source: 1100x850px (ratio 1.294). Scale ≈ 0.847 → 932x720 final.
