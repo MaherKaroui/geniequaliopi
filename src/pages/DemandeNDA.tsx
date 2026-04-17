@@ -517,9 +517,62 @@ const DemandeNDA = () => {
               {/* Style Panel */}
               <DocStyleConfigPanel style={docStyle} onChange={handleStyleChange} />
 
+              {/* CV Upload (optional) */}
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base">CV existant (optionnel)</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-xs text-muted-foreground mb-3">
+                    Si vous avez déjà un CV (PDF ou image), uploadez-le ici. Il sera utilisé en priorité dans le dossier. Sinon, le CV généré ci-dessous sera utilisé.
+                  </p>
+                  {uploadedCV ? (
+                    <div className="flex items-center justify-between p-3 border rounded-lg bg-accent/30">
+                      <div className="flex items-center gap-2">
+                        <FileText className="w-4 h-4 text-primary" />
+                        <span className="text-sm font-medium">{uploadedCV.name}</span>
+                        <span className="text-xs text-muted-foreground">({uploadedCV.type})</span>
+                      </div>
+                      <Button variant="ghost" size="sm" onClick={() => setUploadedCV(null)} className="text-destructive gap-1">
+                        <X className="w-3.5 h-3.5" /> Retirer
+                      </Button>
+                    </div>
+                  ) : (
+                    <Label htmlFor="cv-upload" className="flex items-center gap-2 cursor-pointer p-3 border border-dashed rounded-lg hover:bg-accent/30 transition-colors">
+                      <Upload className="w-4 h-4" />
+                      <span className="text-sm">Cliquez pour uploader un CV (PDF, JPG, PNG)</span>
+                      <Input
+                        id="cv-upload"
+                        type="file"
+                        accept="application/pdf,image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+                          if (file.size > 10 * 1024 * 1024) {
+                            toast.error("Fichier trop volumineux (max 10 MB)");
+                            return;
+                          }
+                          const reader = new FileReader();
+                          reader.onload = () => {
+                            setUploadedCV({
+                              dataUrl: reader.result as string,
+                              name: file.name,
+                              type: file.type,
+                            });
+                            toast.success("CV importé !");
+                          };
+                          reader.readAsDataURL(file);
+                        }}
+                      />
+                    </Label>
+                  )}
+                </CardContent>
+              </Card>
+
               {/* CV Generator */}
               <div>
-                <h2 className="text-lg font-semibold mb-4">CV du Formateur</h2>
+                <h2 className="text-lg font-semibold mb-4">Ou générer un CV</h2>
                 <CVGeneratorEmbed cvData={cvData} onCVChange={setCvData} selectedDesign={cvDesign} onDesignChange={setCvDesign} />
               </div>
 
@@ -529,7 +582,7 @@ const DemandeNDA = () => {
                 <CardContent className="space-y-3">
                   {NDA_DOCUMENTS.map(doc => {
                     const cvHasContent = cvData.prenom || cvData.nom || cvData.profil || cvData.experiences.some(e => e.poste);
-                    const ready = doc.id === "contrat" || doc.id === "programme" || doc.id === "reglement" || doc.id === "devis_facture" || (doc.id === "logo" && !!organisme.logoUrl) || (doc.id === "cv" && !!cvHasContent);
+                    const ready = doc.id === "contrat" || doc.id === "programme" || doc.id === "reglement" || doc.id === "devis_facture" || (doc.id === "logo" && !!organisme.logoUrl) || (doc.id === "cv" && (!!uploadedCV || !!cvHasContent)) || (doc.id === "liste_formateurs" && !!cvHasContent);
                     return (
                       <div key={doc.id} className="flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors">
                         <div className="flex items-center gap-3">
