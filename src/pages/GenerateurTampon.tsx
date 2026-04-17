@@ -165,9 +165,10 @@ const GenerateurTampon = () => {
 
     ctx.restore();
 
-    // Signature overlay (not rotated with stamp - drawn on top)
+    // Signature overlay - dessinée comme PNG net dans le tampon
     if (signatureUrl) {
       const img = new Image();
+      img.crossOrigin = "anonymous";
       img.onload = () => {
         const sigW = (size * signatureSize) / 100;
         const ratio = img.height / img.width;
@@ -175,7 +176,9 @@ const GenerateurTampon = () => {
         const sx = (size - sigW) / 2;
         const sy = (size * signatureY) / 100 - sigH / 2;
         ctx.save();
-        ctx.globalAlpha = (opacity / 100) * 0.9;
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = "high";
+        ctx.globalAlpha = opacity / 100;
         ctx.drawImage(img, sx, sy, sigW, sigH);
         ctx.restore();
 
