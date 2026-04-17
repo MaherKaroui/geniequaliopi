@@ -356,10 +356,8 @@ export function courseCertificateHtml(o: OrganismeInfo, f: FormationInfo): strin
     <img src="/images/coursera-ribbon.png" alt="Coursera Course Certificate" style="width:100%;height:100%;object-fit:cover;object-position:top center" />
   </div>
 
-  <!-- Coursera seal -->
-  <div style="position:absolute;right:30px;top:55%;transform:translateY(-50%);z-index:2;width:130px;height:130px">
-    <img src="/images/coursera-seal.png" alt="Coursera" style="width:100%;height:100%;object-fit:contain;opacity:0.85" />
-  </div>
+  <!-- Coursera seal removed -->
+
 
   <!-- Main content -->
   <div style="padding:70px 50px 30px 55px;margin-right:200px;position:relative;z-index:1">
