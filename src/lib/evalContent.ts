@@ -546,6 +546,71 @@ const ECSR_CONTENT: FormationEvalContent = {
 
 EVAL_CONTENT["ECSR"] = ECSR_CONTENT;
 
+const VTC_CONTENT: FormationEvalContent = {
+  qcmPositionnement: [
+    { question: "Quelle est la durée minimale de détention du permis B pour s'inscrire à l'examen VTC ?", options: ["1 an", "2 ans", "3 ans", "5 ans"], correctIndex: 2 },
+    { question: "Un VTC peut-il prendre en charge un client qui le hèle dans la rue ?", options: ["Oui, comme un taxi", "Non, jamais (réservation préalable obligatoire)", "Oui, hors agglomération", "Oui, si le compteur est éteint"], correctIndex: 1 },
+    { question: "Quel taux de TVA s'applique aux courses VTC en France métropolitaine ?", options: ["5,5%", "10%", "20%", "Exonération"], correctIndex: 1 },
+    { question: "Quelle est l'ancienneté maximale d'un véhicule pour exercer en VTC ?", options: ["3 ans", "5 ans", "6 ans", "10 ans"], correctIndex: 2 },
+    { question: "Un VTC peut-il être équipé d'un compteur horokilométrique (taximètre) ?", options: ["Oui, obligatoirement", "Oui, en option", "Non, c'est strictement interdit", "Uniquement à l'aéroport"], correctIndex: 2 },
+    { question: "Quelle est la durée de validité de la carte professionnelle VTC ?", options: ["1 an", "3 ans", "5 ans", "10 ans"], correctIndex: 2 },
+    { question: "Le numéro d'urgence européen unique est :", options: ["15", "17", "18", "112"], correctIndex: 3 },
+    { question: "Quel est le taux légal d'alcoolémie pour un conducteur expérimenté ?", options: ["0,2 g/L", "0,5 g/L", "0,8 g/L", "Aucune limite"], correctIndex: 1 },
+    { question: "Au-delà de quel montant un devis écrit est-il obligatoire ?", options: ["50 €", "100 €", "150 €", "200 €"], correctIndex: 1 },
+    { question: "Combien de places maximum peut comporter un véhicule VTC (conducteur compris) ?", options: ["5", "7", "9", "12"], correctIndex: 2 },
+  ],
+  qcmFinal: [
+    { question: "Quelle note minimale faut-il à l'épreuve d'anglais pour être admissible ?", options: ["2/20", "4/20", "6/20", "10/20"], correctIndex: 1 },
+    { question: "Quelle est la durée minimale de la conduite en circulation lors de l'épreuve d'admission ?", options: ["10 minutes", "15 minutes", "20 minutes", "30 minutes"], correctIndex: 2 },
+    { question: "Quel est le revenu minimum garanti par course en Île-de-France (loi LOM) ?", options: ["5,00 €", "7,65 €", "9,50 €", "12,00 €"], correctIndex: 2 },
+    { question: "Combien de fois un candidat admissible peut-il se présenter à l'épreuve d'admission ?", options: ["1 fois", "2 fois", "3 fois", "5 fois"], correctIndex: 2 },
+    { question: "La distance d'arrêt à 90 km/h sur sol sec est d'environ :", options: ["50 m", "80 m", "108 m", "150 m"], correctIndex: 2 },
+    { question: "Combien d'années faut-il conserver les factures émises ?", options: ["3 ans", "5 ans", "10 ans", "Indéfiniment"], correctIndex: 2 },
+    { question: "Quel est le seuil maximal de paiement en espèces pour un résident fiscal français ?", options: ["300 €", "1 000 €", "3 000 €", "15 000 €"], correctIndex: 1 },
+    { question: "Combien de points peut comporter le bloc 'qualité de service' lors de l'admission ?", options: ["2 points", "3 points", "5 points", "10 points"], correctIndex: 2 },
+    { question: "Quelle commission moyenne prélèvent les plateformes VTC type Uber ?", options: ["5-10%", "20-30%", "40-50%", "Aucune"], correctIndex: 1 },
+    { question: "Le tarif d'une course VTC est :", options: ["Réglementé par la préfecture", "Calculé par compteur", "Libre, convenu à l'avance", "Identique au taxi"], correctIndex: 2 },
+  ],
+  exercices: [
+    { titre: "Calcul du prix de revient kilométrique", consigne: "Vous parcourez 50 000 km/an. Vos charges fixes annuelles s'élèvent à 15 000 € (assurance, amortissement véhicule, cotisations) et vos charges variables à 11 000 € (carburant, entretien, péages). Calculez votre prix de revient au km et le tarif minimal client pour dégager 35% de marge.", reponseAttendue: "Prix de revient = (15 000 + 11 000) / 50 000 = 0,52 €/km. Pour 35% de marge : 0,52 / 0,65 = 0,80 €/km minimum. Le tarif client conseillé se situe autour de 1,20 à 1,80 €/km selon la zone." },
+    { titre: "Rédaction d'une facture VTC conforme", consigne: "Rédigez la facture d'une course Paris (Hôtel Le Meurice) → Aéroport CDG T2E pour M. Smith, britannique, le 12 mars 2025 à 16h30. Tarif convenu : 85 € TTC. Distance : 35 km. Listez l'ensemble des mentions obligatoires.", reponseAttendue: "Facture VTC n°[unique], date émission, identité exploitant (nom, SIREN, n° registre VTC), identité client (M. Smith), date/heure prise en charge (12/03/25 16h30) et dépose, lieu départ (Hôtel Le Meurice, Paris 1) et arrivée (CDG T2E), distance 35 km, montant HT 77,27 €, TVA 10% = 7,73 €, montant TTC 85 €, mode de paiement, conservation 10 ans." },
+    { titre: "Mise en situation : conduite anglaise A2", consigne: "Un client britannique monte dans votre véhicule. Rédigez le dialogue d'accueil, de mi-trajet (signalement bouchon) et de fin de course en anglais professionnel niveau A2.", reponseAttendue: "Accueil : 'Good afternoon Mr. [Name], I'm [Driver]. Welcome on board. May I take your luggage?' / Confirmation : 'We are heading to [destination], is that correct?' / Mi-trajet : 'There is some traffic on the A1, the journey may take a little longer. Is the temperature comfortable?' / Fin : 'We have arrived at your destination. That will be [X] euros, please. Here is your receipt. Have a wonderful day.'" },
+    { titre: "Analyse d'un cas de maraude électronique", consigne: "Un confrère VTC vous explique qu'il stationne en double file devant un grand hôtel parisien en attente d'une réservation immédiate via son application. Analysez la situation au regard de la réglementation et proposez la conduite à tenir.", reponseAttendue: "Pratique illégale : maraude électronique passible de 15 000 € + 1 an emprisonnement (art. L.3122-9). De plus, stationnement en double file sanctionné (135 €). Conduite à tenir : se garer dans une zone légale (parking, place de stationnement gratuit/payant), patienter sans tourner en rond, accepter les courses uniquement après réservation préalable confirmée par l'application." },
+    { titre: "Préparation d'un parcours examen", consigne: "Lors de l'épreuve, vous devez aller de la gare Montparnasse à l'aéroport d'Orly Sud, vendredi 17h. Décrivez votre méthode de préparation en 3 minutes et justifiez l'itinéraire choisi.", reponseAttendue: "1) Saisie GPS Montparnasse → Orly Sud. 2) Comparaison itinéraires : A6a directe (16 km, 30 min) vs périphérique sud + A6 (22 km, 35 min). 3) Choix : A6a directe car plus courte et heure de pointe vendredi soir – le périphérique est saturé à cette heure. 4) Visualisation des 3 premiers points : sortie Montparnasse direction Porte d'Orléans, prise de l'A6a, sortie Orly Sud aérogare." },
+    { titre: "Conduite à tenir en cas d'accident léger", consigne: "Pendant une course, vous êtes percuté à l'arrière par un autre véhicule à un feu rouge. Votre client est légèrement secoué mais sans blessure apparente. Détaillez la procédure complète à appliquer en respectant la méthode PAS et les obligations professionnelles.", reponseAttendue: "PROTÉGER : warnings, sortie sécurisée avec gilet, triangle à 30 m, faire descendre le client côté trottoir. ALERTER : appel 112 si doute médical, sinon constat amiable. SECOURIR : rassurer le client, proposer eau, vérifier qu'il ne ressent pas de douleur cervicale (whiplash). PROFESSIONNEL : prévenir la plateforme, prévenir l'assurance dans les 5 jours ouvrés, organiser le transport du client (taxi pris en charge ou fin de course remboursée), remplir constat avec circonstances claires (responsabilité du véhicule arrière à 100%)." },
+  ],
+  competences: [
+    "Maîtriser la réglementation T3P et les spécificités VTC",
+    "Connaître les conditions d'obtention et de renouvellement de la carte professionnelle",
+    "Vérifier la conformité du véhicule et de sa signalétique",
+    "Choisir un statut juridique et fiscal adapté à son activité",
+    "Calculer un prix de revient et fixer des tarifs rentables",
+    "Émettre une facture conforme et gérer l'encaissement",
+    "Appliquer le Code de la route en conduite professionnelle",
+    "Adopter une conduite souple, sécurisée et économique",
+    "Gérer une situation d'urgence ou d'accident (méthode PAS)",
+    "Communiquer en anglais niveau A2 avec une clientèle internationale",
+    "Préparer un parcours et utiliser efficacement le GPS",
+    "Offrir un service commercial de qualité (accueil, prise de congé)",
+    "Distinguer maraude légale et illégale (taxi vs VTC)",
+    "Comprendre les enjeux des plateformes et préserver son indépendance",
+  ],
+  appreciations: [
+    "Excellente maîtrise réglementaire. Distinctions taxi/VTC parfaitement assimilées. Prêt(e) pour l'examen théorique.",
+    "Bonne progression sur la gestion d'entreprise. Le calcul du prix de revient est acquis. Doit consolider les régimes fiscaux.",
+    "Très bon niveau en sécurité routière. Les distances de sécurité et l'écoconduite sont bien comprises.",
+    "Niveau correct en anglais. Les phrases d'accueil et de fin de course sont maîtrisées. Doit étoffer le vocabulaire technique.",
+    "Excellente capacité d'analyse des situations de conduite. La méthode PAS est parfaitement intégrée.",
+    "Bonne implication tout au long de la formation. Les mises en situation pratiques sont concluantes. Prêt(e) pour l'admission.",
+    "Solide acquisition des fondamentaux commerciaux et tarifaires. La facturation est conforme aux obligations légales.",
+    "Très bonne préparation à l'examen pratique. Le parcours est préparé avec méthode et la conduite est souple.",
+    "Maîtrise de la réglementation spécifique VTC (maraude, plateformes). Les pièges juridiques sont identifiés.",
+    "Excellent profil commercial. L'accueil et la qualité de service sont au rendez-vous. Réussite à l'examen prévisible.",
+  ],
+};
+
+EVAL_CONTENT["VTC"] = VTC_CONTENT;
+
 const VTEST_CONTENT: FormationEvalContent = {
   qcmPositionnement: [
     { question: "What does 'ROI' stand for in a business context?", options: ["Return on Investment", "Rate of Interest", "Report on Income", "Review of Inventory"], correctIndex: 0 },
@@ -1030,6 +1095,7 @@ EVAL_CONTENT["Restauration"] = {
 // Map formation intitulé to content key
 function getContentKey(intitule: string): string {
   const lower = intitule.toLowerCase();
+  if (lower.includes("vtc") || lower.includes("voiture de transport avec chauffeur") || lower.includes("rs5637") || lower.includes("chauffeur vtc")) return "VTC";
   if (lower.includes("ecsr") || lower.includes("enseignant de la conduite") || lower.includes("sécurité routière")) return "ECSR";
   if (lower.includes("vtest") || lower.includes("v-test") || lower.includes("rs6905")) return "VTest";
   // CIP must be checked before generic "social"
