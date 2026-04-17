@@ -53,8 +53,16 @@ const GenerateurTampon = () => {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    canvas.width = size;
-    canvas.height = size;
+    // Haute résolution x3 pour des écritures ultra-nettes
+    const SCALE = 3;
+    canvas.width = size * SCALE;
+    canvas.height = size * SCALE;
+    canvas.style.width = `${size}px`;
+    canvas.style.height = `${size}px`;
+    ctx.setTransform(SCALE, 0, 0, SCALE, 0, 0);
+    (ctx as any).textRendering = "geometricPrecision";
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = "high";
     ctx.clearRect(0, 0, size, size);
 
     ctx.save();
@@ -180,7 +188,8 @@ const GenerateurTampon = () => {
   };
 
   const applyWornEffect = (ctx: CanvasRenderingContext2D) => {
-    const imageData = ctx.getImageData(0, 0, size, size);
+    const canvas = ctx.canvas;
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     const data = imageData.data;
     for (let i = 0; i < data.length; i += 4) {
       if (data[i + 3] > 0) {
