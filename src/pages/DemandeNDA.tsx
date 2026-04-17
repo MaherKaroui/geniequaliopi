@@ -257,6 +257,7 @@ const DemandeNDA = () => {
   const [cvData, setCvData] = useState<CVData>(emptyCV);
   const [cvDesign, setCvDesign] = useState<CVDesign>("classique");
   const [uploadedCV, setUploadedCV] = useState<UploadedCV | null>(null);
+  const [extractingCV, setExtractingCV] = useState(false);
   const [previewDoc, setPreviewDoc] = useState<string | null>(null);
   const [previewHTML, setPreviewHTML] = useState("");
   const [generating, setGenerating] = useState(false);
