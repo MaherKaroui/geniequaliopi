@@ -127,6 +127,17 @@ const YOUTUBE_SECRETAIRE: CourseData['youtubeVideos'] = [
   { title: "Le DPI – Dossier Patient Informatisé", url: "https://www.youtube.com/watch?v=KzNPxMgRX7Q", description: "Gestion du dossier patient informatisé : saisie, archivage, confidentialité et réglementation." },
 ];
 
+const YOUTUBE_VTC: CourseData['youtubeVideos'] = [
+  { title: "Examen VTC – Tout ce qu'il faut savoir pour réussir", url: "https://www.youtube.com/watch?v=Ae8x1lhGJ4U", description: "Présentation complète de l'examen d'accès à la profession de VTC : épreuves d'admissibilité et d'admission." },
+  { title: "Réglementation VTC – Différences avec le taxi", url: "https://www.youtube.com/watch?v=q1m_z-Yq3Z4", description: "Comprendre les différences réglementaires entre taxi, VTC et VMDTR : maraude, tarifs, voies réservées." },
+  { title: "Devenir VTC en 2025 – Statut, démarches, examen", url: "https://www.youtube.com/watch?v=KkNhKpWqXTk", description: "Guide complet pour devenir chauffeur VTC : conditions, examens, statut juridique, fiscalité." },
+  { title: "Calcul du prix de revient kilométrique VTC", url: "https://www.youtube.com/watch?v=bJsM6kV4Hhc", description: "Apprendre à calculer son coût d'exploitation et fixer ses tarifs pour être rentable en VTC." },
+  { title: "Sécurité routière professionnelle – Conduite VTC", url: "https://www.youtube.com/watch?v=VrAyzh3lNi8", description: "Bonnes pratiques de conduite professionnelle pour le transport de personnes : sécurité, confort, anticipation." },
+  { title: "Anglais professionnel pour VTC et taxi", url: "https://www.youtube.com/watch?v=oVSqR3k_YlQ", description: "Vocabulaire et phrases types pour accueillir une clientèle internationale niveau A2." },
+  { title: "Comment réussir l'épreuve pratique VTC ?", url: "https://www.youtube.com/watch?v=8W5B-0tbPYQ", description: "Préparation à la mise en situation pratique : parcours, conduite, accueil client et facturation." },
+  { title: "Plateformes VTC – Uber, Bolt, Heetch comparées", url: "https://www.youtube.com/watch?v=jWgMm5EjXE0", description: "Analyse des principales plateformes VTC : commissions, conditions, droits du chauffeur." },
+];
+
 const YOUTUBE_COMMERCIAL: CourseData['youtubeVideos'] = [
   { title: "Techniques de prospection commerciale – Guide complet", url: "https://www.youtube.com/watch?v=uQk8PaFQ5ZQ", description: "Stratégies de prospection B2B et B2C : téléphone, email, réseaux sociaux et terrain." },
   { title: "La négociation commerciale – Méthodes et astuces", url: "https://www.youtube.com/watch?v=vGkk3rFGeHE", description: "Techniques de négociation : découverte des besoins, argumentation, traitement des objections et closing." },
@@ -151,6 +162,7 @@ export function getYoutubeVideos(formationIntitule: string): CourseData['youtube
   if (t.includes('crm') || t.includes('automation') || t.includes('automatisation')) return YOUTUBE_CRM;
   if (t.includes('esthéti') || t.includes('cosmétique') || t.includes('beauté')) return YOUTUBE_ESTHETIQUE;
   if (t.includes('secrétaire') || t.includes('assistant') || t.includes('médico-admin')) return YOUTUBE_SECRETAIRE;
+  if (t.includes('vtc') || t.includes('voiture de transport avec chauffeur') || t.includes('rs5637') || t.includes('chauffeur vtc')) return YOUTUBE_VTC;
   if (t.includes('négociat') || t.includes('technico') || t.includes('ntc') || t.includes('commercial') || t.includes('vente')) return YOUTUBE_COMMERCIAL;
   return YOUTUBE_GENERIC;
 }
@@ -269,12 +281,14 @@ import { getAssistantDirectionChapters } from "./courseContentAssistantDirection
 import { getInfographisteChapters } from "./courseContentInfographiste";
 import { getRestaurationChapters } from "./courseContentRestauration";
 import { getSocioEsthetiqueChapters } from "./courseContentSocioEsthetique";
+import { getVTCChapters } from "./courseContentVTC";
 
-export { getWordChapters, getAnglaisChapters, getAnglaisA1Chapters, getManagementChapters, getGenericChapters, getFLEChapters, getIAChapters, getWebmarketingChapters, getCRMChapters, getMassagePrenatalChapters, getMassagePostpartumChapters, getECSRChapters, getVTestChapters, getCIPChapters, getRPMSChapters, getAssistantDirectionChapters, getInfographisteChapters, getRestaurationChapters, getSocioEsthetiqueChapters };
+export { getWordChapters, getAnglaisChapters, getAnglaisA1Chapters, getManagementChapters, getGenericChapters, getFLEChapters, getIAChapters, getWebmarketingChapters, getCRMChapters, getMassagePrenatalChapters, getMassagePostpartumChapters, getECSRChapters, getVTestChapters, getCIPChapters, getRPMSChapters, getAssistantDirectionChapters, getInfographisteChapters, getRestaurationChapters, getSocioEsthetiqueChapters, getVTCChapters };
 
 export function getCourseChapters(formationIntitule: string): CourseChapter[] {
   const t = formationIntitule.toLowerCase();
   if (t.includes('socio-esthéti') || t.includes('socio esthéti') || t.includes('rs5992') || t.includes('soins socio')) return getSocioEsthetiqueChapters();
+  if (t.includes('vtc') || t.includes('voiture de transport avec chauffeur') || t.includes('rs5637') || t.includes('chauffeur vtc')) return getVTCChapters();
   if (t.includes('ecsr') || t.includes('enseignant de la conduite') || t.includes('sécurité routière')) return getECSRChapters();
   if (t.includes('vtest') || t.includes('v-test') || t.includes('rs6905')) return getVTestChapters();
   if (t.includes('conseiller en insertion') || t.includes('insertion professionnelle') || t.includes('cip') || t.includes('rncp37274')) return getCIPChapters();
