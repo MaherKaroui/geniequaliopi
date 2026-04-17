@@ -385,6 +385,11 @@ export default function OPCOMobilites() {
           } else {
             const blob = await generateAutoBlob(doc);
             if (blob) zip.file(`${folder}/${buildOpcoFileName(namingCtx, doc.label, "pdf")}`, blob);
+            // B9 : ajouter aussi le calendrier Excel multi-onglets
+            if (doc.code === "B9") {
+              const xlsHtml = generateExcelCalendrierOPCO(mergedOrganisme, formation, mergedStagiaires);
+              zip.file(`${folder}/${buildOpcoFileName(namingCtx, doc.label, "xls")}`, excelToBlob(xlsHtml));
+            }
           }
         } else {
           zip.file(`${folder}/MANQUANT_${doc.code}_${doc.label}.txt`,
