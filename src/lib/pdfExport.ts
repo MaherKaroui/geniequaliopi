@@ -304,7 +304,8 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
       pages.push(createPage(host, footerHtml, footerHeightPx, PAGE_W_PX, PAGE_H_PX).page);
     }
 
-    const pdf = new jsPDF({ unit: "mm", format: [PAGE_W_MM, PAGE_H_MM], orientation: "portrait" });
+    const orientation = PAGE_W_MM > PAGE_H_MM ? "landscape" : "portrait";
+    const pdf = new jsPDF({ unit: "mm", format: [PAGE_W_MM, PAGE_H_MM], orientation });
     const pxToMm = PAGE_W_MM / PAGE_W_PX;
 
     for (let i = 0; i < pages.length; i++) {
