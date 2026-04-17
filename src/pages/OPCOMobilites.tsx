@@ -148,6 +148,7 @@ export default function OPCOMobilites() {
   const [previewTitle, setPreviewTitle] = useState("");
   const [previewLoading, setPreviewLoading] = useState(false);
   const [previewDoc, setPreviewDoc] = useState<OpcoDocumentItem | null>(null);
+  const [previewTemplateIdx, setPreviewTemplateIdx] = useState(0);
   const [isEditing, setIsEditing] = useState(false);
   const previewIframeRef = useRef<HTMLIFrameElement>(null);
 
@@ -240,28 +241,73 @@ export default function OPCOMobilites() {
     return null;
   };
 
+  /** Pour C6 : libellés courts par sous-template (positionnement début/fin, exercice intermédiaire, évaluation finale) */
+  const TEMPLATE_LABELS: Record<string, string> = {
+    ai_test_positionnement_debut: "QCM_Positionnement_Debut",
+    ai_test_positionnement_fin: "QCM_Positionnement_Fin",
+    ai_exercice_intermediaire: "Exercice_Intermediaire",
+    ai_evaluation_finale: "Evaluation_Finale",
+  };
+
+  /** Génère TOUS les sous-templates d'un doc (utile pour C6 qui regroupe 4 évaluations distinctes) */
+  const generateAllTemplateBlobs = async (
+    doc: OpcoDocumentItem,
+    stagiaireIdx?: number
+  ): Promise<Array<{ template: string; blob: Blob }>> => {
+    const out: Array<{ template: string; blob: Blob }> = [];
+    for (const template of doc.autoTemplates) {
+      try {
+        const params = stagiaireIdx !== undefined ? { stagiaireIdx, fi: 0, forceFilled: true } : { fi: 0, forceFilled: true };
+        const html = generateDocumentById(`opco_${doc.code}`, template, params, mergedOrganisme, formation, mergedStagiaires);
+        if (html) {
+          const blob = await htmlToPdfBlob(html);
+          out.push({ template, blob });
+        }
+      } catch (e) {
+        console.warn(`Template ${template} failed for ${doc.code}:`, e);
+      }
+    }
+    return out;
+  };
+
   // ─────────── Aperçu + Édition ───────────
+  const renderPreviewForTemplate = (doc: OpcoDocumentItem, templateIdx: number): string | null => {
+    const params = doc.perStagiaire && mergedStagiaires.length > 0 ? { stagiaireIdx: 0, fi: 0, forceFilled: true } : { fi: 0, forceFilled: true };
+    // C6 : on respecte le template choisi par l'utilisateur
+    if (doc.code === "C6") {
+      const tpl = doc.autoTemplates[templateIdx] || doc.autoTemplates[0];
+      try {
+        return generateDocumentById(`opco_${doc.code}`, tpl, params, mergedOrganisme, formation, mergedStagiaires);
+      } catch (e) {
+        console.warn(`Preview template ${tpl} failed for ${doc.code}:`, e);
+        return null;
+      }
+    }
+    // Cas général : premier template qui marche
+    for (const template of doc.autoTemplates) {
+      try {
+        const html = generateDocumentById(`opco_${doc.code}`, template, params, mergedOrganisme, formation, mergedStagiaires);
+        if (html) return html;
+      } catch (e) {
+        console.warn(`Preview template ${template} failed for ${doc.code}:`, e);
+      }
+    }
+    return null;
+  };
+
   const handlePreview = async (doc: OpcoDocumentItem) => {
     if (doc.autoTemplates.length === 0) {
       toast.error("Ce document doit être uploadé manuellement");
       return;
     }
     setPreviewDoc(doc);
+    setPreviewTemplateIdx(0);
     setIsEditing(false);
     setPreviewTitle(`${doc.code} — ${doc.longLabel}`);
     setPreviewHtml("");
     setPreviewOpen(true);
     setPreviewLoading(true);
-    let html: string | null = null;
-    for (const template of doc.autoTemplates) {
-      try {
-        const params = doc.perStagiaire && mergedStagiaires.length > 0 ? { stagiaireIdx: 0, fi: 0, forceFilled: true } : { fi: 0, forceFilled: true };
-        html = generateDocumentById(`opco_${doc.code}`, template, params, mergedOrganisme, formation, mergedStagiaires);
-        if (html) break;
-      } catch (e) {
-        console.warn(`Preview template ${template} failed for ${doc.code}:`, e);
-      }
-    }
+    const html = renderPreviewForTemplate(doc, 0);
     setPreviewLoading(false);
     if (!html) {
       toast.error(`Aucun aperçu disponible pour ${doc.code}`);
@@ -269,6 +315,16 @@ export default function OPCOMobilites() {
       return;
     }
     setPreviewHtml(html);
+  };
+
+  const handleSelectPreviewTemplate = (idx: number) => {
+    if (!previewDoc) return;
+    setPreviewTemplateIdx(idx);
+    setIsEditing(false);
+    setPreviewLoading(true);
+    const html = renderPreviewForTemplate(previewDoc, idx);
+    setPreviewLoading(false);
+    setPreviewHtml(html || "");
   };
 
   // Toggle edit mode on iframe body
@@ -339,7 +395,21 @@ export default function OPCOMobilites() {
     }
 
     try {
-      if (doc.perStagiaire && mergedStagiaires.length > 0) {
+      // C6 spécial : 4 sous-évaluations par stagiaire (QCM début, QCM fin, exercice intermédiaire, éval finale)
+      if (doc.code === "C6" && mergedStagiaires.length > 0) {
+        const zip = new JSZip();
+        for (let i = 0; i < mergedStagiaires.length; i++) {
+          const s = mergedStagiaires[i];
+          const stagFolder = `${s.prenom || ""}_${s.nom || ""}`.trim() || `Stagiaire_${i + 1}`;
+          const blobs = await generateAllTemplateBlobs(doc, i);
+          for (const { template, blob } of blobs) {
+            const subLabel = TEMPLATE_LABELS[template] || template;
+            zip.file(`${stagFolder}/${buildOpcoFileName(namingCtx, subLabel, "pdf", stagFolder)}`, blob);
+          }
+        }
+        const z = await zip.generateAsync({ type: "blob" });
+        saveAs(z, buildOpcoFileName(namingCtx, doc.label, "zip"));
+      } else if (doc.perStagiaire && mergedStagiaires.length > 0) {
         const zip = new JSZip();
         for (let i = 0; i < mergedStagiaires.length; i++) {
           const blob = await generateAutoBlob(doc, i);
@@ -398,7 +468,19 @@ export default function OPCOMobilites() {
           const ext = state.uploadedFileName?.split(".").pop() || "pdf";
           zip.file(`${folder}/${buildOpcoFileName(namingCtx, doc.label, ext)}`, state.uploadedFile);
         } else if (doc.autoTemplates.length > 0) {
-          if (doc.perStagiaire && mergedStagiaires.length > 0) {
+          if (doc.code === "C6" && mergedStagiaires.length > 0) {
+            // C6 : 4 sous-évaluations IA par stagiaire (QCM début/fin, exercice intermédiaire, éval finale)
+            for (let i = 0; i < mergedStagiaires.length; i++) {
+              const s = mergedStagiaires[i];
+              const stagFolder = `${s.prenom || ""}_${s.nom || ""}`.trim() || `Stagiaire_${i + 1}`;
+              const blobs = await generateAllTemplateBlobs(doc, i);
+              for (const { template, blob } of blobs) {
+                const subLabel = TEMPLATE_LABELS[template] || template;
+                zip.file(`${folder}/C6_Evaluations_IA/${stagFolder}/${buildOpcoFileName(namingCtx, subLabel, "pdf", stagFolder)}`, blob);
+              }
+              await new Promise((r) => setTimeout(r, 50));
+            }
+          } else if (doc.perStagiaire && mergedStagiaires.length > 0) {
             for (let i = 0; i < mergedStagiaires.length; i++) {
               const blob = await generateAutoBlob(doc, i);
               if (blob) {
@@ -890,6 +972,29 @@ export default function OPCOMobilites() {
               </div>
             </div>
           </DialogHeader>
+          {previewDoc?.code === "C6" && (
+            <div className="flex flex-wrap gap-2 px-1 pb-2 border-b">
+              {previewDoc.autoTemplates.map((tpl, idx) => {
+                const labels: Record<string, string> = {
+                  ai_test_positionnement_debut: "QCM Positionnement Début",
+                  ai_test_positionnement_fin: "QCM Positionnement Fin",
+                  ai_exercice_intermediaire: "Exercice Intermédiaire",
+                  ai_evaluation_finale: "Évaluation Finale",
+                };
+                return (
+                  <Button
+                    key={tpl}
+                    size="sm"
+                    variant={previewTemplateIdx === idx ? "default" : "outline"}
+                    onClick={() => handleSelectPreviewTemplate(idx)}
+                    disabled={previewLoading}
+                  >
+                    {labels[tpl] || tpl}
+                  </Button>
+                );
+              })}
+            </div>
+          )}
           <div className="flex-1 overflow-hidden bg-muted/20 rounded">
             {previewLoading ? (
               <div className="h-full flex items-center justify-center text-muted-foreground gap-2">
