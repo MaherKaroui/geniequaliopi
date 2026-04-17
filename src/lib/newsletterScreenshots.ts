@@ -419,10 +419,13 @@ export function courseCertificateHtml(o: OrganismeInfo, f: FormationInfo): strin
 }
 
 export function genCertificatCoursera(o: OrganismeInfo, f: FormationInfo): string {
-  return buildDocument({
-    org: o,
-    title: "CERTIFICAT DE FORMATION – COURSERA / DUKE UNIVERSITY",
-    sections: [{ heading: "", content: `<p>Certificat de réussite Coursera / Duke University pour <strong>${o.dirigeant || "le dirigeant"}</strong> – formation « ${f.intitule || "Formation"} ».</p>` }],
-    extraHtml: `<div style="box-shadow:0 2px 12px rgba(0,0,0,0.12);border-radius:8px;overflow:hidden">${courseCertificateHtml(o, f)}</div>`
-  }).replace("</head>", '<meta name="pdf-page-size" content="297x210"></head>');
+  // Format A4 paysage 297x210mm — certificat plein page sans entête/pied de page Qualiopi
+  const inner = courseCertificateHtml(o, f);
+  return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="pdf-page-size" content="297x210"><style>
+@page { size: 297mm 210mm; margin: 0; }
+html,body { margin:0; padding:0; background:#fff; }
+.cert-page { width:297mm; height:210mm; box-sizing:border-box; background:#fff; position:relative; overflow:hidden; }
+.cert-wrap { position:absolute; top:50%; left:50%; width:932px; height:720px; margin-left:-466px; margin-top:-360px; }
+.cert-scale { width:1100px; height:850px; transform: scale(0.847); transform-origin: top left; }
+</style></head><body><div class="cert-page"><div class="cert-wrap"><div class="cert-scale">${inner}</div></div></div></body></html>`;
 }
