@@ -7,12 +7,13 @@ import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import {
   Home, Truck, ChevronDown, ChevronRight, Upload, CheckCircle2, Circle,
-  XCircle, Download, FileText, Loader2, FolderArchive,
+  XCircle, Download, FileText, Loader2, FolderArchive, Eye,
 } from "lucide-react";
 import OrganismeForm from "@/components/OrganismeForm";
 import FormationForm from "@/components/FormationForm";
