@@ -164,9 +164,11 @@ const GenerateurTampon = () => {
 
     if (shape === "round") {
       const r = (size - padding * 2) / 2;
-      ctx.beginPath();
-      ctx.arc(cx, cy, r, 0, Math.PI * 2);
-      ctx.stroke();
+      if (borderWidth > 0) {
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.stroke();
+      }
 
       if (innerBorder) {
         ctx.beginPath();
@@ -188,15 +190,17 @@ const GenerateurTampon = () => {
       ctx.font = `${Math.floor(size / 22)}px ${font}`;
       ctx.fillText(subCenterText, cx, cy + size / 12);
 
-      ctx.beginPath();
-      ctx.moveTo(cx - r * 0.5, cy - size / 9);
-      ctx.lineTo(cx + r * 0.5, cy - size / 9);
-      ctx.lineWidth = 2;
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.moveTo(cx - r * 0.5, cy + size / 9);
-      ctx.lineTo(cx + r * 0.5, cy + size / 9);
-      ctx.stroke();
+      if (borderWidth > 0) {
+        ctx.beginPath();
+        ctx.moveTo(cx - r * 0.5, cy - size / 9);
+        ctx.lineTo(cx + r * 0.5, cy - size / 9);
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(cx - r * 0.5, cy + size / 9);
+        ctx.lineTo(cx + r * 0.5, cy + size / 9);
+        ctx.stroke();
+      }
 
       if (stars) {
         drawStar(ctx, cx - r + 18, cy, 6);
@@ -205,9 +209,11 @@ const GenerateurTampon = () => {
     } else if (shape === "oval") {
       const rx = (size - padding * 2) / 2;
       const ry = rx * 0.65;
-      ctx.beginPath();
-      ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
-      ctx.stroke();
+      if (borderWidth > 0) {
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
+        ctx.stroke();
+      }
 
       if (innerBorder) {
         ctx.beginPath();
@@ -231,7 +237,9 @@ const GenerateurTampon = () => {
       const h = w * 0.65;
       const x = (size - w) / 2;
       const y = (size - h) / 2;
-      ctx.strokeRect(x, y, w, h);
+      if (borderWidth > 0) {
+        ctx.strokeRect(x, y, w, h);
+      }
 
       if (innerBorder) {
         ctx.lineWidth = 2;
@@ -535,6 +543,10 @@ const GenerateurTampon = () => {
                 <Slider value={[opacity]} onValueChange={(values) => setOpacity(values[0])} min={20} max={100} step={5} />
               </div>
 
+              <div className="flex items-center justify-between">
+                <Label>Bordure extérieure</Label>
+                <Switch checked={borderWidth > 0} onCheckedChange={(v) => setBorderWidth(v ? 6 : 0)} />
+              </div>
               <div className="flex items-center justify-between">
                 <Label>Bordure intérieure</Label>
                 <Switch checked={innerBorder} onCheckedChange={setInnerBorder} />
