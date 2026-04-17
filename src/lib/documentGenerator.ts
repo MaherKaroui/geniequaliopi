@@ -1315,6 +1315,35 @@ function genAnalyseBesoins(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
           + `• Plan d'action commercial individuel post-formation`,
       };
     }
+    if (lower.includes("vtc") || lower.includes("conducteur") || lower.includes("transport de personnes") || lower.includes("t3p") || lower.includes("chauffeur")) {
+      return {
+        besoins: [
+          "Maîtriser la réglementation T3P (transport public particulier de personnes) et les obligations du conducteur VTC",
+          "Connaître les règles de la carte professionnelle VTC, du registre EVTC et des contrôles préfectoraux",
+          "Acquérir les techniques de conduite préventive, économique et adaptée au transport de passagers",
+          "Maîtriser la sécurité routière, la gestion des situations d'urgence et la conduite défensive en zone urbaine",
+          "Comprendre la gestion d'une activité VTC : statut juridique (micro-entreprise, EURL), TVA, charges sociales",
+          "Maîtriser l'utilisation des plateformes (Uber, Bolt, Heetch, Marcel) : commissions, notation, optimisation des courses",
+          "Développer un anglais professionnel A2 pour l'accueil et l'échange courant avec une clientèle étrangère",
+          "Acquérir les bases du français professionnel pour la rédaction de factures et la communication client",
+          "Maîtriser la relation client haut de gamme : accueil, discrétion, ponctualité, présentation du véhicule",
+          "Préparer l'examen pratique VTC (conduite + admission) et les 5 épreuves théoriques communes T3P + 2 spécifiques VTC",
+        ],
+        synthese: `• ${Math.round(stagiaires.length * 0.9)} stagiaires souhaitent obtenir leur carte professionnelle VTC pour démarrer rapidement leur activité<br>`
+          + `• ${Math.round(stagiaires.length * 0.8)} stagiaires ont besoin de maîtriser la réglementation T3P et les obligations du conducteur<br>`
+          + `• ${Math.round(stagiaires.length * 0.7)} stagiaires veulent comprendre la gestion d'une micro-entreprise VTC (statut, TVA, charges)<br>`
+          + `• ${Math.round(stagiaires.length * 0.6)} stagiaires recherchent des compétences en anglais A2 pour la clientèle internationale (aéroports, hôtels)<br>`
+          + `• ${Math.round(stagiaires.length * 0.5)} stagiaires demandent un accompagnement sur l'optimisation des courses via les plateformes (Uber, Bolt)<br>`
+          + `• ${Math.round(stagiaires.length * 0.4)} stagiaires veulent perfectionner la relation client haut de gamme et la conduite premium`,
+        adaptations: `• Cours théoriques sur la réglementation T3P avec QCM blancs des 5 épreuves communes + 2 épreuves VTC<br>`
+          + `• Mises en situation de conduite avec véhicule école dédié (catégorie B + 5 ans permis)<br>`
+          + `• Ateliers pratiques sur la prise en charge clientèle (accueil, bagages, itinéraire, paiement)<br>`
+          + `• Sessions d'anglais A2 contextualisées : accueil aéroport, hôtel, demande d'itinéraire, conversation courte<br>`
+          + `• Exercices de gestion administrative : facturation, déclaration URSSAF, suivi recettes/dépenses<br>`
+          + `• Démonstration et prise en main des applications chauffeur (Uber Driver, Bolt Driver) avec cas concrets<br>`
+          + `• Examen blanc d'admission (épreuve pratique de conduite + entretien) avec correction individualisée`,
+      };
+    }
     // Fallback: extract from objectives
     const objItems = f.objectifs.split(/\n|[.;]/).map(l => l.trim().replace(/^[-•*]\s*/, '')).filter(l => l.length > 10);
     const domainBesoins = objItems.length >= 5
