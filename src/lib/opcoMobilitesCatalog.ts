@@ -200,6 +200,15 @@ export const OPCO_DOCUMENTS: OpcoDocumentItem[] = [
     perStagiaire: false,
     category: "pedagogique",
   },
+  {
+    code: "B9",
+    label: "Calendrier Formation",
+    longLabel: "Calendrier précisant dates exactes, horaires et lieu",
+    description: "Calendrier détaillé (dates exactes, horaires précis et lieu de déroulement) pour l'ensemble des dossiers ayant fait l'objet d'une demande de financement",
+    autoTemplates: ["calendrier_formation_opco"],
+    perStagiaire: false,
+    category: "pedagogique",
+  },
 
   // ════════════════════════════════════════════════
   // C. CONTRÔLE DU SERVICE RENDU AUX APPRENANTS

@@ -203,7 +203,7 @@ export default function OPCOMobilites() {
     if (doc.autoTemplates.length === 0) return null;
     for (const template of doc.autoTemplates) {
       try {
-        const params = stagiaireIdx !== undefined ? { stagiaireIdx, fi: 0 } : { fi: 0 };
+        const params = stagiaireIdx !== undefined ? { stagiaireIdx, fi: 0, forceFilled: true } : { fi: 0, forceFilled: true };
         const html = generateDocumentById(`opco_${doc.code}`, template, params, mergedOrganisme, formation, mergedStagiaires);
         if (html) return await htmlToPdfBlob(html);
       } catch (e) {
@@ -228,7 +228,7 @@ export default function OPCOMobilites() {
     let html: string | null = null;
     for (const template of doc.autoTemplates) {
       try {
-        const params = doc.perStagiaire && mergedStagiaires.length > 0 ? { stagiaireIdx: 0, fi: 0 } : { fi: 0 };
+        const params = doc.perStagiaire && mergedStagiaires.length > 0 ? { stagiaireIdx: 0, fi: 0, forceFilled: true } : { fi: 0, forceFilled: true };
         html = generateDocumentById(`opco_${doc.code}`, template, params, mergedOrganisme, formation, mergedStagiaires);
         if (html) break;
       } catch (e) {
