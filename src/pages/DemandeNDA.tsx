@@ -78,8 +78,9 @@ function generateListeFormateursHTML(o: OrganismeInfo, cv: CVData, stagiaires: S
   const today = new Date();
   const dateStr = today.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
 
-  return `<div style="font-family:Arial,sans-serif;max-width:800px;margin:0 auto;padding:30px;font-size:12px;line-height:1.5;">
-    <div style="text-align:center;margin-bottom:10px;">
+  // IMPORTANT: do NOT wrap in a single root <div> — the PDF paginator splits at top-level nodes.
+  // A single oversized root would push everything to page 2 and leave page 1 blank.
+  return `<div style="text-align:center;margin:0 0 10px 0;font-family:Arial,sans-serif;font-size:12px;">
       ${o.logoUrl ? `<img src="${o.logoUrl}" style="max-height:60px;margin-bottom:8px;" />` : ""}
       <p style="font-size:11px;color:#555;margin:2px 0;"><strong>${o.nom || ""}</strong></p>
       <p style="font-size:10px;color:#666;margin:2px 0;">${o.adresse || ""} ${o.codePostal || ""} ${o.ville || ""}</p>
@@ -88,12 +89,12 @@ function generateListeFormateursHTML(o: OrganismeInfo, cv: CVData, stagiaires: S
       ${o.dirigeant ? `<p style="font-size:10px;color:#666;margin:2px 0;">Dirigeant : ${o.dirigeant}</p>` : ""}
     </div>
 
-    <h1 style="text-align:center;font-size:18px;margin:25px 0 15px 0;text-transform:uppercase;letter-spacing:1px;">Liste des Formateurs</h1>
+    <h1 style="text-align:center;font-family:Arial,sans-serif;font-size:18px;margin:25px 0 15px 0;text-transform:uppercase;letter-spacing:1px;">Liste des Formateurs</h1>
 
-    <p style="font-size:11px;color:#444;margin-bottom:5px;">• INTERVENANT DANS L'ORGANISME DE FORMATION À LA DATE DE LA DÉCLARATION D'ACTIVITÉ</p>
-    <p style="font-size:11px;color:#444;margin-bottom:20px;">• Dénomination et adresse de l'organisme de formation : <strong>${o.nom || ""}</strong></p>
+    <p style="font-family:Arial,sans-serif;font-size:11px;color:#444;margin:0 0 5px 0;">• INTERVENANT DANS L'ORGANISME DE FORMATION À LA DATE DE LA DÉCLARATION D'ACTIVITÉ</p>
+    <p style="font-family:Arial,sans-serif;font-size:11px;color:#444;margin:0 0 20px 0;">• Dénomination et adresse de l'organisme de formation : <strong>${o.nom || ""}</strong></p>
 
-    <table style="width:100%;border-collapse:collapse;margin-bottom:20px;">
+    <table style="width:100%;border-collapse:collapse;margin-bottom:20px;font-family:Arial,sans-serif;font-size:12px;line-height:1.5;">
       <tr style="background:#1e3a7b;color:#fff;">
         <th style="padding:8px 10px;text-align:left;width:200px;border:1px solid #1e3a7b;">Nom et prénom de l'intervenant</th>
         <th style="padding:8px 10px;text-align:left;border:1px solid #1e3a7b;">${fullName}</th>
@@ -124,21 +125,18 @@ function generateListeFormateursHTML(o: OrganismeInfo, cv: CVData, stagiaires: S
       </tr>
     </table>
 
-    <div style="margin-top:30px;">
+    <div style="margin-top:30px;font-family:Arial,sans-serif;">
       <p style="font-size:12px;margin-bottom:15px;">Fait à ${o.ville || "___________"} le ${dateStr}</p>
-      <div>
-        <p style="font-size:12px;font-weight:bold;margin-bottom:4px;">Pour l'organisme</p>
-        <p style="font-size:11px;margin:2px 0;">Nom : <strong>${o.nom || ""}</strong></p>
-        <p style="font-size:11px;margin:2px 0;">Date : ${dateStr}</p>
-        <p style="font-size:11px;margin:2px 0;">Signature :</p>
-        ${o.tamponUrl ? `<img src="${o.tamponUrl}" style="max-height:80px;margin-top:5px;" />` : ""}
-      </div>
+      <p style="font-size:12px;font-weight:bold;margin-bottom:4px;">Pour l'organisme</p>
+      <p style="font-size:11px;margin:2px 0;">Nom : <strong>${o.nom || ""}</strong></p>
+      <p style="font-size:11px;margin:2px 0;">Date : ${dateStr}</p>
+      <p style="font-size:11px;margin:2px 0;">Signature :</p>
+      ${o.tamponUrl ? `<img src="${o.tamponUrl}" style="max-height:80px;margin-top:5px;" />` : ""}
     </div>
 
-    <div style="margin-top:40px;border-top:1px solid #ccc;padding-top:8px;font-size:9px;color:#888;text-align:center;">
+    <div class="footer" style="margin-top:40px;border-top:1px solid #ccc;padding-top:8px;font-family:Arial,sans-serif;font-size:9px;color:#888;text-align:center;">
       <strong>${o.nom || ""}</strong>${o.siret ? ` – SIRET : ${o.siret}` : ""}
-    </div>
-  </div>`;
+    </div>`;
 }
 
 function generateProgrammeNDA(o: OrganismeInfo, f: FormationInfo, s: StagiaireInfo[]): string {
