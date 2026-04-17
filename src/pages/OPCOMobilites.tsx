@@ -328,7 +328,17 @@ export default function OPCOMobilites() {
       } else {
         const blob = await generateAutoBlob(doc);
         if (!blob) { toast.error(`Génération impossible pour ${doc.code}`); return; }
-        saveAs(blob, buildOpcoFileName(namingCtx, doc.label, "pdf"));
+        // B9 : on livre PDF + Excel multi-onglets dans un ZIP
+        if (doc.code === "B9") {
+          const zip = new JSZip();
+          zip.file(buildOpcoFileName(namingCtx, doc.label, "pdf"), blob);
+          const xlsHtml = generateExcelCalendrierOPCO(mergedOrganisme, formation, mergedStagiaires);
+          zip.file(buildOpcoFileName(namingCtx, doc.label, "xls"), excelToBlob(xlsHtml));
+          const z = await zip.generateAsync({ type: "blob" });
+          saveAs(z, buildOpcoFileName(namingCtx, doc.label, "zip"));
+        } else {
+          saveAs(blob, buildOpcoFileName(namingCtx, doc.label, "pdf"));
+        }
       }
       toast.success(`${doc.label} téléchargé`);
     } catch (e: any) {
