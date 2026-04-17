@@ -380,7 +380,16 @@ const DemandeNDA = () => {
           } catch { /* skip */ }
           continue;
         }
-        const html = generateDocumentHTML(doc.id, organisme, formation, stagiaires, cvData, cvDesign);
+        // Uploaded CV → include original file as-is in the ZIP
+        if (doc.id === "cv" && uploadedCV) {
+          try {
+            const resp = await fetch(uploadedCV.dataUrl);
+            const blob = await resp.blob();
+            zip.file(uploadedCV.name || `CV_Formateur`, blob);
+          } catch { /* skip */ }
+          continue;
+        }
+        const html = generateDocumentHTML(doc.id, organisme, formation, stagiaires, cvData, cvDesign, uploadedCV);
         if (html) {
           const wrappedHtml = html;
           if (exportFormat === "pdf") {
