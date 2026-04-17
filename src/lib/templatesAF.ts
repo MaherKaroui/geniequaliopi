@@ -27,7 +27,12 @@ export function genFacture(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
   const tarifUnit = f.tarif || "1 500 € HT";
   const today = new Date();
   const factNum = `FAC-${today.getFullYear()}-${String(Math.floor(Math.random()*999)+1).padStart(3,'0')}`;
-  const dateFacture = today.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
+  // Date de la facture : 3 jours ouvrés AVANT la date de début de formation
+  // (skip weekends + jours fériés français)
+  const s0 = stagiaires[0];
+  const dateDebutISO = s0 ? getStagiaireDateDebut(s0, f) : (f.dateDebut || "");
+  const dateFactureISO = dateDebutISO ? subtractBusinessDays(dateDebutISO, 3) : today.toISOString().slice(0, 10);
+  const dateFacture = formatDate(dateFactureISO);
   return buildDocument({ org: o, title: "FACTURE DE FORMATION", subtitle: `N° ${factNum}`, formation: f, showFormationInfo: true, stagiaires, sections: [
     { heading: "Client", content: `<p><strong>Entreprise :</strong> ${stagiaires[0]?.entreprise || "_______________"}<br><strong>Contact :</strong> ${stagiaires[0]?.prenom || ""} ${stagiaires[0]?.nom || ""}<br><strong>Email :</strong> ${stagiaires[0]?.email || ""}</p>` },
     { heading: "Prestation réalisée", content: `<p><strong>Formation :</strong> ${f.intitule}<br><strong>Durée :</strong> ${f.duree}<br><strong>Modalité :</strong> ${f.modalites}<br><strong>Lieu :</strong> ${f.lieu}<br><strong>Nombre de participants :</strong> ${nbParticipants}<br><strong>Date de la facture :</strong> ${dateFacture}</p>` },
