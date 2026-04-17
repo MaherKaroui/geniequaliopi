@@ -271,7 +271,9 @@ export function buildFullCatalog(
 
     // IND 25 — Veille innovations pédagogiques et technologiques
     add("af_c6i25_tableau_veille_techno", "CT6 - IND 25 TABLEAU DE VEILLE TECHNOLOGIQUE", 6, 25, "tableau_veille", { type: "technologique" });
-    add("af_c6i25_screenshot_microsoft", "CT6 - IND 25 INSCRIPTION NEWSLETTER MICROSOFT ADVERTISING", 6, 25, "screenshot_microsoft");
+    if (formations.some(f => /excel|word|powerpoint/i.test(f.intitule || ''))) {
+      add("af_c6i25_screenshot_microsoft", "CT6 - IND 25 INSCRIPTION NEWSLETTER MICROSOFT ADVERTISING", 6, 25, "screenshot_microsoft");
+    }
     add("af_c6i25_screenshot_openai", "CT6 - IND 25 INSCRIPTION NEWSLETTER OPEN AI DIGEST", 6, 25, "screenshot_openai");
 
     // IND 26 — Accueil et accompagnement handicap
@@ -778,7 +780,9 @@ export function buildFullCatalog(
 
     // IND 25 — Veille innovations pédagogiques et technologiques
     add("cfa_c6i25_tableau_veille_techno", "CT6 - IND 25 TABLEAU DE VEILLE TECHNOLOGIQUE", 6, 25, "tableau_veille", { type: "technologique" });
-    add("cfa_c6i25_screenshot_microsoft", "CT6 - IND 25 INSCRIPTION NEWSLETTER MICROSOFT ADVERTISING", 6, 25, "screenshot_microsoft");
+    if (formations.some(f => /excel|word|powerpoint/i.test(f.intitule || ''))) {
+      add("cfa_c6i25_screenshot_microsoft", "CT6 - IND 25 INSCRIPTION NEWSLETTER MICROSOFT ADVERTISING", 6, 25, "screenshot_microsoft");
+    }
     add("cfa_c6i25_screenshot_openai", "CT6 - IND 25 INSCRIPTION NEWSLETTER OPEN AI DIGEST", 6, 25, "screenshot_openai");
 
     // IND 26 — Accueil et accompagnement handicap
