@@ -1,6 +1,7 @@
 // Critère 6 — IND 23-27 generators (based on real SELECT FORMATION documents)
 import { OrganismeInfo, FormationInfo } from "@/types/qualiopi";
 import { buildDocument, formatDate, subtractBusinessDays } from "./docBuilder";
+import { getCachedVeillePack, veilleRowsToTable } from "./aiVeillePack";
 
 /**
  * Helper: generates realistic veille dates BEFORE the formation start date.
@@ -464,9 +465,13 @@ function veilleReglementaireRows(f: FormationInfo, type: FormationType): string[
 
 export function genVeilleReglementaireV2(o: OrganismeInfo, f: FormationInfo) {
   const type = detectFormationType(f);
+  const aiPack = getCachedVeillePack(f);
+  const rows = aiPack?.reglementaire?.length
+    ? veilleRowsToTable(aiPack.reglementaire)
+    : veilleReglementaireRows(f, type);
   return buildDocument({ org: o, title: "Veille réglementaire", table: {
     headers: ["Liens", "Nom de l'article / Texte", "Date du texte", "Commentaire", "Exploitation de veille (preuve + action Qualiopi)"],
-    rows: veilleReglementaireRows(f, type)
+    rows,
   } });
 }
 
@@ -1004,9 +1009,13 @@ function veilleMetierRows(f: FormationInfo, type: FormationType): string[][] {
 
 export function genVeilleMetierV2(o: OrganismeInfo, f: FormationInfo) {
   const type = detectFormationType(f);
+  const aiPack = getCachedVeillePack(f);
+  const rows = aiPack?.metier?.length
+    ? veilleRowsToTable(aiPack.metier)
+    : veilleMetierRows(f, type);
   return buildDocument({ org: o, title: "Tableau de veille métier", table: {
     headers: ["Lien (article / vidéo / événement)", "Nom de l'article / Vidéo / Événement", "Date", "Commentaire – Analyse métier", "Exploitation de veille (preuve + action Qualiopi)"],
-    rows: veilleMetierRows(f, type)
+    rows,
   } });
 }
 
@@ -1448,9 +1457,13 @@ function veilleTechnoRows(f: FormationInfo, type: FormationType): string[][] {
 
 export function genVeilleTechnologiqueV2(o: OrganismeInfo, f: FormationInfo) {
   const type = detectFormationType(f);
+  const aiPack = getCachedVeillePack(f);
+  const rows = aiPack?.technologique?.length
+    ? veilleRowsToTable(aiPack.technologique)
+    : veilleTechnoRows(f, type);
   return buildDocument({ org: o, title: "Tableau de veille technologique", table: {
     headers: ["Lien (vrai)", "Nom / Titre de l'article", "Date", "Commentaire (veille technologique)", "Exploitation de veille vérifiable (preuve + action Qualiopi)"],
-    rows: veilleTechnoRows(f, type)
+    rows,
   } });
 }
 
