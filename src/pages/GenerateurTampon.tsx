@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ChevronLeft, Download, Stamp, Upload, Pen, Trash2 } from "lucide-react";
+import { ChevronLeft, Download, Stamp, Upload, Pen, Trash2, Check } from "lucide-react";
 import { toast } from "sonner";
 import SignaturePad from "@/components/SignaturePad";
 
@@ -334,6 +334,19 @@ const GenerateurTampon = () => {
     }, "image/png");
   };
 
+  const handleUseInOrganisme = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const dataUrl = canvas.toDataURL("image/png");
+    try {
+      localStorage.setItem("generated_tampon_url", dataUrl);
+      toast.success("Tampon enregistré ! Retour au formulaire...");
+      setTimeout(() => navigate(-1), 600);
+    } catch (e) {
+      toast.error("Impossible d'enregistrer le tampon (taille trop grande)");
+    }
+  };
+
   const removeWhiteBackgroundFromDataUrl = (dataUrl: string): Promise<string> =>
     new Promise((resolve) => {
       const image = new Image();
@@ -614,6 +627,9 @@ const GenerateurTampon = () => {
 
           <Button onClick={handleDownload} className="w-full gap-2 mt-6" size="lg">
             <Download className="w-4 h-4" /> Télécharger PNG (transparent)
+          </Button>
+          <Button onClick={handleUseInOrganisme} variant="secondary" className="w-full gap-2 mt-2" size="lg">
+            <Check className="w-4 h-4" /> Utiliser ce tampon dans l'organisme
           </Button>
         </Card>
 

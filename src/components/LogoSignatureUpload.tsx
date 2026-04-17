@@ -1,7 +1,8 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { X, PenTool } from "lucide-react";
+import { X, PenTool, Stamp } from "lucide-react";
 import SignaturePad from "@/components/SignaturePad";
 
 interface LogoSignatureUploadProps {
@@ -21,6 +22,8 @@ const UploadCard = ({
   onClear,
   onUpload,
   onDraw,
+  onGenerate,
+  generateLabel,
 }: {
   label: string;
   imageUrl?: string;
@@ -29,6 +32,8 @@ const UploadCard = ({
   onClear: () => void;
   onUpload: () => void;
   onDraw?: () => void;
+  onGenerate?: () => void;
+  generateLabel?: string;
 }) => (
   <div className="flex flex-col items-center gap-3 p-4 rounded-lg border border-border bg-background">
     <Label className="font-semibold text-sm text-foreground">{label}</Label>
@@ -51,13 +56,18 @@ const UploadCard = ({
         <span className="text-xs text-muted-foreground">{placeholder}</span>
       )}
     </div>
-    <div className="flex gap-2 w-full">
-      <Button variant="outline" size="sm" className="flex-1" onClick={onUpload}>
+    <div className="flex flex-wrap gap-2 w-full">
+      <Button variant="outline" size="sm" className="flex-1 min-w-[80px]" onClick={onUpload}>
         {imageUrl ? "Changer" : "Charger"}
       </Button>
       {onDraw && (
-        <Button variant="outline" size="sm" className="flex-1 gap-1" onClick={onDraw}>
+        <Button variant="outline" size="sm" className="flex-1 min-w-[80px] gap-1" onClick={onDraw}>
           <PenTool className="w-3 h-3" /> Dessiner
+        </Button>
+      )}
+      {onGenerate && (
+        <Button variant="default" size="sm" className="flex-1 min-w-[80px] gap-1" onClick={onGenerate}>
+          <Stamp className="w-3 h-3" /> {generateLabel || "Générer"}
         </Button>
       )}
     </div>
@@ -69,6 +79,17 @@ const LogoSignatureUpload = ({ logoUrl, signatureUrl, tamponUrl, onLogoChange, o
   const sigRef = useRef<HTMLInputElement>(null);
   const tamponRef = useRef<HTMLInputElement>(null);
   const [drawingPad, setDrawingPad] = useState<string | null>(null);
+  const navigate = useNavigate();
+
+  // Récupère un tampon généré au retour du générateur
+  useEffect(() => {
+    if (!onTamponChange) return;
+    const stored = localStorage.getItem("generated_tampon_url");
+    if (stored) {
+      onTamponChange(stored);
+      localStorage.removeItem("generated_tampon_url");
+    }
+  }, [onTamponChange]);
 
   const handleFile = (file: File, callback: (url: string) => void) => {
     const reader = new FileReader();
@@ -119,6 +140,8 @@ const LogoSignatureUpload = ({ logoUrl, signatureUrl, tamponUrl, onLogoChange, o
             altText="Tampon"
             onClear={() => onTamponChange("")}
             onUpload={() => tamponRef.current?.click()}
+            onGenerate={() => navigate("/generateur-tampon")}
+            generateLabel="Générer"
           />
         )}
       </div>
