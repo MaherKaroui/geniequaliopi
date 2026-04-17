@@ -10988,7 +10988,7 @@ function genCalendrierFormationOPCO(o: OrganismeInfo, f: FormationInfo, stagiair
   let extra = `<p><em>Calendrier précisant les dates exactes, les horaires et le lieu de déroulement de la formation pour l'ensemble des dossiers ayant fait l'objet d'une demande de financement.</em></p>`;
   extra += `<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%;margin-bottom:18px">
     <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold;width:30%">Intitulé de la formation</td><td>${f.intitule}</td></tr>
-    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Organisme</td><td>${o.nom}${o.numeroDeclaration ? ` – NDA ${o.numeroDeclaration}` : ""}</td></tr>
+    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Organisme</td><td>${o.nom}${o.nda ? ` – NDA ${o.nda}` : ""}</td></tr>
     <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Modalité</td><td>${isDistance ? "Distanciel synchrone (classe virtuelle)" : "Présentiel"}</td></tr>
     <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Lieu de déroulement</td><td>${lieu}</td></tr>
     <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Durée totale</td><td>${dureeH} heures réparties sur ${totalDays} journée${totalDays > 1 ? "s" : ""}</td></tr>
