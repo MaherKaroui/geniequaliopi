@@ -107,7 +107,31 @@ export default function OPCOMobilites() {
     new Set(Object.keys(OPCO_CATEGORIES) as OpcoCategory[])
   );
   const [generating, setGenerating] = useState(false);
+  const [generatingAI, setGeneratingAI] = useState(false);
+  const [aiPackReady, setAiPackReady] = useState<boolean>(false);
   const [progress, setProgress] = useState(0);
+
+  // Detect cached AI pack on formation change
+  useEffect(() => {
+    setAiPackReady(!!getCachedPack(formation));
+  }, [formation]);
+
+  const handleGenerateAIPack = async () => {
+    if (!formation.intitule?.trim()) {
+      toast.error("Renseignez d'abord l'intitulé de la formation");
+      return;
+    }
+    setGeneratingAI(true);
+    try {
+      await generateAIEvalPack(formation, true);
+      setAiPackReady(true);
+      toast.success("Pack d'évaluation IA généré avec succès — les documents C6 sont maintenant remplis.");
+    } catch (e: any) {
+      toast.error(e?.message || "Erreur génération IA");
+    } finally {
+      setGeneratingAI(false);
+    }
+  };
   const [progressText, setProgressText] = useState("");
   const fileInputRefs = useRef<Map<string, HTMLInputElement>>(new Map());
 
