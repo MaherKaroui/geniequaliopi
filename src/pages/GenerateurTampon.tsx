@@ -188,7 +188,8 @@ const GenerateurTampon = () => {
   };
 
   const applyWornEffect = (ctx: CanvasRenderingContext2D) => {
-    const imageData = ctx.getImageData(0, 0, size, size);
+    const canvas = ctx.canvas;
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     const data = imageData.data;
     for (let i = 0; i < data.length; i += 4) {
       if (data[i + 3] > 0) {
