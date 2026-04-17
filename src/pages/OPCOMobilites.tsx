@@ -7,12 +7,13 @@ import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import {
   Home, Truck, ChevronDown, ChevronRight, Upload, CheckCircle2, Circle,
-  XCircle, Download, FileText, Loader2, FolderArchive,
+  XCircle, Download, FileText, Loader2, FolderArchive, Eye,
 } from "lucide-react";
 import OrganismeForm from "@/components/OrganismeForm";
 import FormationForm from "@/components/FormationForm";
@@ -98,6 +99,12 @@ export default function OPCOMobilites() {
   useEffect(() => { sessionStorage.setItem("opco_ref", refDossier); }, [refDossier]);
   useEffect(() => { sessionStorage.setItem("opco_annee", anneeControle); }, [anneeControle]);
 
+  // Preview dialog
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewHtml, setPreviewHtml] = useState("");
+  const [previewTitle, setPreviewTitle] = useState("");
+  const [previewLoading, setPreviewLoading] = useState(false);
+
   const mergedStagiaires = useMemo(
     () => mergeStagiaires(stagiaires).filter((s): s is StagiaireInfo => Boolean(s)),
     [stagiaires]
@@ -178,6 +185,34 @@ export default function OPCOMobilites() {
       }
     }
     return null;
+  };
+
+  const handlePreview = async (doc: OpcoDocumentItem) => {
+    if (doc.autoTemplates.length === 0) {
+      toast.error("Ce document doit être uploadé manuellement");
+      return;
+    }
+    setPreviewTitle(`${doc.code} — ${doc.longLabel}`);
+    setPreviewHtml("");
+    setPreviewOpen(true);
+    setPreviewLoading(true);
+    let html: string | null = null;
+    for (const template of doc.autoTemplates) {
+      try {
+        const params = doc.perStagiaire && mergedStagiaires.length > 0 ? { stagiaireIdx: 0, fi: 0 } : { fi: 0 };
+        html = generateDocumentById(`opco_${doc.code}`, template, params, mergedOrganisme, formation, mergedStagiaires);
+        if (html) break;
+      } catch (e) {
+        console.warn(`Preview template ${template} failed for ${doc.code}:`, e);
+      }
+    }
+    setPreviewLoading(false);
+    if (!html) {
+      toast.error(`Aucun aperçu disponible pour ${doc.code}`);
+      setPreviewOpen(false);
+      return;
+    }
+    setPreviewHtml(html);
   };
 
   const handleDownloadSingle = async (doc: OpcoDocumentItem) => {
@@ -470,13 +505,22 @@ export default function OPCOMobilites() {
                             <Upload className="w-4 h-4" />
                           </Button>
                           {doc.autoTemplates.length > 0 && (
-                            <Button
-                              variant="ghost" size="sm"
-                              onClick={() => handleDownloadSingle(doc)}
-                              title="Télécharger"
-                            >
-                              <Download className="w-4 h-4" />
-                            </Button>
+                            <>
+                              <Button
+                                variant="ghost" size="sm"
+                                onClick={() => handlePreview(doc)}
+                                title="Aperçu du document auto-généré"
+                              >
+                                <Eye className="w-4 h-4" />
+                              </Button>
+                              <Button
+                                variant="ghost" size="sm"
+                                onClick={() => handleDownloadSingle(doc)}
+                                title="Télécharger"
+                              >
+                                <Download className="w-4 h-4" />
+                              </Button>
+                            </>
                           )}
                           <div className="flex items-center gap-1 text-xs">
                             <Checkbox
@@ -496,6 +540,27 @@ export default function OPCOMobilites() {
           );
         })}
       </main>
+
+      <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
+        <DialogContent className="max-w-6xl h-[90vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="text-base">{previewTitle}</DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 overflow-hidden bg-muted/20 rounded">
+            {previewLoading ? (
+              <div className="h-full flex items-center justify-center text-muted-foreground gap-2">
+                <Loader2 className="w-5 h-5 animate-spin" /> Génération de l'aperçu...
+              </div>
+            ) : (
+              <iframe
+                srcDoc={previewHtml}
+                className="w-full h-full bg-background"
+                title="Aperçu OPCO"
+              />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
