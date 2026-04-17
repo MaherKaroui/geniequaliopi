@@ -8,39 +8,109 @@ interface SignaturePadProps {
   label?: string;
 }
 
+function trimTransparentCanvas(sourceCanvas: HTMLCanvasElement): string {
+  const sourceCtx = sourceCanvas.getContext("2d");
+  if (!sourceCtx) return sourceCanvas.toDataURL("image/png");
+
+  const { width, height } = sourceCanvas;
+  const { data } = sourceCtx.getImageData(0, 0, width, height);
+
+  let minX = width;
+  let minY = height;
+  let maxX = -1;
+  let maxY = -1;
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const alpha = data[(y * width + x) * 4 + 3];
+      if (alpha > 0) {
+        minX = Math.min(minX, x);
+        minY = Math.min(minY, y);
+        maxX = Math.max(maxX, x);
+        maxY = Math.max(maxY, y);
+      }
+    }
+  }
+
+  if (maxX === -1 || maxY === -1) {
+    return sourceCanvas.toDataURL("image/png");
+  }
+
+  const padding = 18;
+  const croppedWidth = maxX - minX + 1;
+  const croppedHeight = maxY - minY + 1;
+  const trimmedCanvas = document.createElement("canvas");
+  trimmedCanvas.width = croppedWidth + padding * 2;
+  trimmedCanvas.height = croppedHeight + padding * 2;
+
+  const trimmedCtx = trimmedCanvas.getContext("2d");
+  if (!trimmedCtx) return sourceCanvas.toDataURL("image/png");
+
+  trimmedCtx.drawImage(
+    sourceCanvas,
+    minX,
+    minY,
+    croppedWidth,
+    croppedHeight,
+    padding,
+    padding,
+    croppedWidth,
+    croppedHeight,
+  );
+
+  return trimmedCanvas.toDataURL("image/png");
+}
+
 export default function SignaturePad({ onSave, onCancel, label = "Signez ci-dessous" }: SignaturePadProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [drawing, setDrawing] = useState(false);
   const [hasDrawn, setHasDrawn] = useState(false);
+
+  const initializeContext = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.strokeStyle = "#111827";
+    ctx.lineWidth = 5;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+  }, []);
 
   const getPos = useCallback((e: React.MouseEvent | React.TouchEvent) => {
     const canvas = canvasRef.current!;
     const rect = canvas.getBoundingClientRect();
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
+
     if ("touches" in e) {
-      const t = e.touches[0];
-      return { x: (t.clientX - rect.left) * scaleX, y: (t.clientY - rect.top) * scaleY };
+      const touch = e.touches[0];
+      return {
+        x: (touch.clientX - rect.left) * scaleX,
+        y: (touch.clientY - rect.top) * scaleY,
+      };
     }
-    return { x: (e.clientX - rect.left) * scaleX, y: (e.clientY - rect.top) * scaleY };
+
+    return {
+      x: (e.clientX - rect.left) * scaleX,
+      y: (e.clientY - rect.top) * scaleY,
+    };
   }, []);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d")!;
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.strokeStyle = "#1a1a2e";
-    ctx.lineWidth = 2.5;
-    ctx.lineCap = "round";
-    ctx.lineJoin = "round";
-  }, []);
+    initializeContext();
+  }, [initializeContext]);
 
   const startDraw = (e: React.MouseEvent | React.TouchEvent) => {
     e.preventDefault();
     setDrawing(true);
-    const ctx = canvasRef.current!.getContext("2d")!;
+
+    const ctx = canvasRef.current?.getContext("2d");
+    if (!ctx) return;
+
     const pos = getPos(e);
     ctx.beginPath();
     ctx.moveTo(pos.x, pos.y);
@@ -49,7 +119,10 @@ export default function SignaturePad({ onSave, onCancel, label = "Signez ci-dess
   const draw = (e: React.MouseEvent | React.TouchEvent) => {
     if (!drawing) return;
     e.preventDefault();
-    const ctx = canvasRef.current!.getContext("2d")!;
+
+    const ctx = canvasRef.current?.getContext("2d");
+    if (!ctx) return;
+
     const pos = getPos(e);
     ctx.lineTo(pos.x, pos.y);
     ctx.stroke();
@@ -59,31 +132,32 @@ export default function SignaturePad({ onSave, onCancel, label = "Signez ci-dess
   const endDraw = () => setDrawing(false);
 
   const clear = () => {
-    const canvas = canvasRef.current!;
-    const ctx = canvas.getContext("2d")!;
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.strokeStyle = "#1a1a2e";
-    ctx.lineWidth = 2.5;
-    ctx.lineCap = "round";
-    ctx.lineJoin = "round";
+    initializeContext();
     setHasDrawn(false);
   };
 
   const save = () => {
-    if (!hasDrawn) return;
-    const dataUrl = canvasRef.current!.toDataURL("image/png");
-    onSave(dataUrl);
+    const canvas = canvasRef.current;
+    if (!canvas || !hasDrawn) return;
+    onSave(trimTransparentCanvas(canvas));
   };
 
   return (
     <div className="space-y-3">
       <p className="text-sm font-medium">{label}</p>
-      <div className="border-2 border-dashed border-primary/30 rounded-lg p-1 bg-white">
+      <div
+        className="border-2 border-dashed border-primary/30 rounded-lg p-1"
+        style={{
+          backgroundImage:
+            "linear-gradient(45deg, #f6f6f6 25%, transparent 25%), linear-gradient(-45deg, #f6f6f6 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #f6f6f6 75%), linear-gradient(-45deg, transparent 75%, #f6f6f6 75%)",
+          backgroundSize: "18px 18px",
+          backgroundPosition: "0 0, 0 9px, 9px -9px, -9px 0px",
+        }}
+      >
         <canvas
           ref={canvasRef}
-          width={500}
-          height={180}
+          width={1000}
+          height={360}
           className="w-full cursor-crosshair rounded touch-none"
           style={{ maxHeight: "180px" }}
           onMouseDown={startDraw}
