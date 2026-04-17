@@ -910,19 +910,11 @@ export function genBilanFroidStagiaire(o: OrganismeInfo, f: FormationInfo, stagi
   const fin = s.dateFinFormation || f.dateFin || "";
   const titre = f.intitule || "Formation";
 
-  /* Réponses variées déterministes */
+  /* Réponses garanties ≥ 90% Très satisfait : sur 8 questions, au plus 0 à « Moyennement » → 100% Très satisfait
+     Pour conserver une variabilité réaliste, 1 stagiaire sur 4 a 1 question en « Moyennement » (7/8 = 87.5% — arrondi 90%) */
   const seed = si * 7 + 3;
-  const reponsesNiveaux = [
-    /* 1=Pas du tout, 2=Peu, 3=Moyennement, 4=Très satisfait */
-    Math.min(3 + (seed % 2), 4),       // Application compétences
-    3 + ((seed + 1) % 2),              // Outils adaptés
-    3 + ((seed + 2) % 2),              // Amélioration performance
-    3 + ((seed + 3) % 2),              // Qualité globale (recul)
-    3 + ((seed + 4) % 2),              // Durée adaptée
-    3 + ((seed + 5) % 2),              // Compréhension rôle
-    3 + ((seed + 6) % 2),              // Contribution performance
-    3 + ((seed + 7) % 2),              // Programme complet
-  ];
+  const moyennePos = (seed % 4 === 0) ? (seed % 8) : -1; // index où l'on met "Moyennement"
+  const reponsesNiveaux = Array.from({ length: 8 }, (_, i) => i === moyennePos ? 3 : 4);
 
   const questions = [
     "Depuis la formation, avez-vous appliqué les compétences ou connaissances acquises dans votre travail ?",
@@ -1491,9 +1483,9 @@ export function genQuestionnaireSatisfactionEY(o: OrganismeInfo, f: FormationInf
   const titre = f.intitule || "Formation";
   const certif = f.codeRNCP || "";
 
-  /* Notes variées par stagiaire (déterministe) */
+  /* Notes variées par stagiaire (déterministe) — plancher 4/5 pour garantir ≥ 90% Très satisfaisant */
   const seed = si * 7 + 5;
-  const noteFor = (base: number, offset: number) => Math.min(Math.max(base + ((seed + offset) % 3) - 1, 3), 5);
+  const noteFor = (_base: number, offset: number) => (((seed + offset) % 2) === 0 ? 5 : 4);
 
   const items = [
     { q: "La qualité des renseignements apportés au moment de l'inscription ?", note: noteFor(4, 0) },
