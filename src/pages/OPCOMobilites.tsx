@@ -187,6 +187,34 @@ export default function OPCOMobilites() {
     return null;
   };
 
+  const handlePreview = async (doc: OpcoDocumentItem) => {
+    if (doc.autoTemplates.length === 0) {
+      toast.error("Ce document doit être uploadé manuellement");
+      return;
+    }
+    setPreviewTitle(`${doc.code} — ${doc.longLabel}`);
+    setPreviewHtml("");
+    setPreviewOpen(true);
+    setPreviewLoading(true);
+    let html: string | null = null;
+    for (const template of doc.autoTemplates) {
+      try {
+        const params = doc.perStagiaire && mergedStagiaires.length > 0 ? { stagiaireIdx: 0, fi: 0 } : { fi: 0 };
+        html = generateDocumentById(`opco_${doc.code}`, template, params, mergedOrganisme, formation, mergedStagiaires);
+        if (html) break;
+      } catch (e) {
+        console.warn(`Preview template ${template} failed for ${doc.code}:`, e);
+      }
+    }
+    setPreviewLoading(false);
+    if (!html) {
+      toast.error(`Aucun aperçu disponible pour ${doc.code}`);
+      setPreviewOpen(false);
+      return;
+    }
+    setPreviewHtml(html);
+  };
+
   const handleDownloadSingle = async (doc: OpcoDocumentItem) => {
     const state = docStates.get(doc.code);
     if (!state) return;
