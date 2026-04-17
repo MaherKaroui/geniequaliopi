@@ -122,7 +122,64 @@ const FormationForm = ({ data, onChange, onImportStagiaires }: FormationFormProp
     <div className="space-y-6">
       <div className="mb-6">
         <h2 className="text-xl font-bold">Informations de la formation</h2>
-        <p className="text-sm text-muted-foreground">Choisissez une formation exemple, importez un fichier EDOF ou remplissez manuellement</p>
+        <p className="text-sm text-muted-foreground">Générez tout via IA, choisissez un exemple, importez EDOF, ou remplissez manuellement</p>
+      </div>
+
+      {/* AI Generator */}
+      <div className="p-5 bg-gradient-to-br from-primary/10 via-accent/5 to-primary/5 border-2 border-primary/30 rounded-xl space-y-3">
+        <div className="flex items-start gap-2">
+          <Sparkles className="w-5 h-5 text-primary mt-0.5 shrink-0" />
+          <div className="flex-1">
+            <Label className="font-semibold text-primary text-base">Générateur IA — Formation complète en 1 clic</Label>
+            <p className="text-xs text-muted-foreground">
+              Donnez juste l'intitulé (et le code RNCP/RS si certification). L'IA remplit tous les champs : objectifs, programme détaillé jour par jour, prérequis, méthodes d'évaluation, moyens pédagogiques, public, durée, tarif… Les exercices, QCM, support de cours, veilles et plan de développement seront ensuite générés automatiquement à partir de ces données.
+            </p>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-2">
+          <Input
+            className="md:col-span-6 bg-card"
+            placeholder="Ex: Conducteur VTC, Bac Pro Logistique, Excel avancé…"
+            value={aiNom}
+            onChange={(e) => setAiNom(e.target.value)}
+            disabled={aiLoading}
+          />
+          <Input
+            className="md:col-span-3 bg-card"
+            placeholder="RNCP/RS (optionnel)"
+            value={aiCodeRNCP}
+            onChange={(e) => setAiCodeRNCP(e.target.value.toUpperCase())}
+            disabled={aiLoading}
+          />
+          <Select value={aiModel} onValueChange={setAiModel} disabled={aiLoading}>
+            <SelectTrigger className="md:col-span-3 bg-card">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="google/gemini-2.5-flash">Rapide (Flash)</SelectItem>
+              <SelectItem value="google/gemini-2.5-pro">Qualité max (Pro)</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <Button
+          type="button"
+          onClick={handleAIGenerate}
+          disabled={aiLoading || aiNom.trim().length < 3}
+          className="w-full gap-2"
+          size="lg"
+        >
+          {aiLoading ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              Génération IA en cours…
+            </>
+          ) : (
+            <>
+              <Sparkles className="w-4 h-4" />
+              Générer toute la formation avec l'IA
+            </>
+          )}
+        </Button>
       </div>
 
       {/* EDOF Import */}
