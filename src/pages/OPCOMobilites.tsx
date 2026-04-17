@@ -271,27 +271,43 @@ export default function OPCOMobilites() {
   };
 
   // ─────────── Aperçu + Édition ───────────
+  const renderPreviewForTemplate = (doc: OpcoDocumentItem, templateIdx: number): string | null => {
+    const params = doc.perStagiaire && mergedStagiaires.length > 0 ? { stagiaireIdx: 0, fi: 0, forceFilled: true } : { fi: 0, forceFilled: true };
+    // C6 : on respecte le template choisi par l'utilisateur
+    if (doc.code === "C6") {
+      const tpl = doc.autoTemplates[templateIdx] || doc.autoTemplates[0];
+      try {
+        return generateDocumentById(`opco_${doc.code}`, tpl, params, mergedOrganisme, formation, mergedStagiaires);
+      } catch (e) {
+        console.warn(`Preview template ${tpl} failed for ${doc.code}:`, e);
+        return null;
+      }
+    }
+    // Cas général : premier template qui marche
+    for (const template of doc.autoTemplates) {
+      try {
+        const html = generateDocumentById(`opco_${doc.code}`, template, params, mergedOrganisme, formation, mergedStagiaires);
+        if (html) return html;
+      } catch (e) {
+        console.warn(`Preview template ${template} failed for ${doc.code}:`, e);
+      }
+    }
+    return null;
+  };
+
   const handlePreview = async (doc: OpcoDocumentItem) => {
     if (doc.autoTemplates.length === 0) {
       toast.error("Ce document doit être uploadé manuellement");
       return;
     }
     setPreviewDoc(doc);
+    setPreviewTemplateIdx(0);
     setIsEditing(false);
     setPreviewTitle(`${doc.code} — ${doc.longLabel}`);
     setPreviewHtml("");
     setPreviewOpen(true);
     setPreviewLoading(true);
-    let html: string | null = null;
-    for (const template of doc.autoTemplates) {
-      try {
-        const params = doc.perStagiaire && mergedStagiaires.length > 0 ? { stagiaireIdx: 0, fi: 0, forceFilled: true } : { fi: 0, forceFilled: true };
-        html = generateDocumentById(`opco_${doc.code}`, template, params, mergedOrganisme, formation, mergedStagiaires);
-        if (html) break;
-      } catch (e) {
-        console.warn(`Preview template ${template} failed for ${doc.code}:`, e);
-      }
-    }
+    const html = renderPreviewForTemplate(doc, 0);
     setPreviewLoading(false);
     if (!html) {
       toast.error(`Aucun aperçu disponible pour ${doc.code}`);
@@ -299,6 +315,16 @@ export default function OPCOMobilites() {
       return;
     }
     setPreviewHtml(html);
+  };
+
+  const handleSelectPreviewTemplate = (idx: number) => {
+    if (!previewDoc) return;
+    setPreviewTemplateIdx(idx);
+    setIsEditing(false);
+    setPreviewLoading(true);
+    const html = renderPreviewForTemplate(previewDoc, idx);
+    setPreviewLoading(false);
+    setPreviewHtml(html || "");
   };
 
   // Toggle edit mode on iframe body
