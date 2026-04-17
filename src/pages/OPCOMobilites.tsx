@@ -148,6 +148,7 @@ export default function OPCOMobilites() {
   const [previewTitle, setPreviewTitle] = useState("");
   const [previewLoading, setPreviewLoading] = useState(false);
   const [previewDoc, setPreviewDoc] = useState<OpcoDocumentItem | null>(null);
+  const [previewTemplateIdx, setPreviewTemplateIdx] = useState(0);
   const [isEditing, setIsEditing] = useState(false);
   const previewIframeRef = useRef<HTMLIFrameElement>(null);
 
