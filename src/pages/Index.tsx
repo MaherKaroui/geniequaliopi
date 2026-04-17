@@ -176,7 +176,7 @@ const Index = () => {
               <ShieldCheck className="w-5 h-5" /> Contrôle EDOF / EY
             </Button>
             <Button size="lg" variant="outline" className="px-8 py-6 text-base gap-2" onClick={() => navigate("/demande-nda")}>
-              <FileCheck className="w-5 h-5" /> Dossier administratif
+              <FileCheck className="w-5 h-5" /> DemandeNDA
             </Button>
             <Button size="lg" variant="outline" className="px-8 py-6 text-base gap-2" onClick={() => navigate("/generateur-cv")}>
               <UserCircle className="w-5 h-5" /> Générateur CV
