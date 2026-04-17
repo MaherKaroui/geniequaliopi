@@ -162,7 +162,13 @@ function generateProgrammeNDA(o: OrganismeInfo, f: FormationInfo, s: StagiaireIn
     .replace(/cet enregistrement ne vaut pas agrément de l'état/gi, "");
 }
 
-function generateDocumentHTML(docId: string, o: OrganismeInfo, f: FormationInfo, s: StagiaireInfo[], cvData: CVData, cvDesign: CVDesign): string | null {
+interface UploadedCV {
+  dataUrl: string;
+  name: string;
+  type: string; // mime type
+}
+
+function generateDocumentHTML(docId: string, o: OrganismeInfo, f: FormationInfo, s: StagiaireInfo[], cvData: CVData, cvDesign: CVDesign, uploadedCV?: UploadedCV | null): string | null {
   const cleanOrganisme = sanitizeOrganismeForDocuments(o);
 
   switch (docId) {
@@ -178,6 +184,16 @@ function generateDocumentHTML(docId: string, o: OrganismeInfo, f: FormationInfo,
       if (cleanOrganisme.logoUrl) return `<div style="text-align:center;padding:60px;"><img src="${cleanOrganisme.logoUrl}" style="max-width:400px;" /><p style="margin-top:20px;color:#666;">Logo de l'organisme</p></div>`;
       return null;
     case "cv": {
+      // Priority 1: uploaded CV file (image rendered, PDF embedded)
+      if (uploadedCV) {
+        if (uploadedCV.type.startsWith("image/")) {
+          return `<div style="text-align:center;padding:20px;"><img src="${uploadedCV.dataUrl}" style="max-width:100%;height:auto;" /></div>`;
+        }
+        if (uploadedCV.type === "application/pdf") {
+          return `<div style="width:100%;height:100vh;"><embed src="${uploadedCV.dataUrl}" type="application/pdf" style="width:100%;height:100%;min-height:800px;" /></div>`;
+        }
+      }
+      // Priority 2: generated CV
       const hasContent = cvData.prenom || cvData.nom || cvData.profil || cvData.experiences.some(e => e.poste);
       if (hasContent) return generateCVHTML(cvData, cvDesign);
       return null;
