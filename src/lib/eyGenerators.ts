@@ -1491,9 +1491,9 @@ export function genQuestionnaireSatisfactionEY(o: OrganismeInfo, f: FormationInf
   const titre = f.intitule || "Formation";
   const certif = f.codeRNCP || "";
 
-  /* Notes variées par stagiaire (déterministe) */
+  /* Notes variées par stagiaire (déterministe) — plancher 4/5 pour garantir ≥ 90% Très satisfaisant */
   const seed = si * 7 + 5;
-  const noteFor = (base: number, offset: number) => Math.min(Math.max(base + ((seed + offset) % 3) - 1, 3), 5);
+  const noteFor = (_base: number, offset: number) => (((seed + offset) % 2) === 0 ? 5 : 4);
 
   const items = [
     { q: "La qualité des renseignements apportés au moment de l'inscription ?", note: noteFor(4, 0) },
