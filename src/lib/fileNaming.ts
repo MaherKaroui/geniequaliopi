@@ -5,6 +5,8 @@ export type ExportFormat = "doc" | "pdf";
 export const PER_STAGIAIRE_TEMPLATES = new Set([
   "qcm_positionnement", "qcm_final", "exercices_pratiques",
   "eval_positionnement_remplie", "eval_intermediaire_remplie", "eval_finale_remplie",
+  "ai_test_positionnement_debut", "ai_test_positionnement_fin",
+  "ai_exercice_intermediaire", "ai_evaluation_finale",
   "attestation_formation", "certificat_reussite", "convocation",
   "attestation_entree_formation", "attestation_assiduite", "certificat_realisation",
   "fiche_autoevaluation", "fiche_renseignement", "trame_eval_besoins",
