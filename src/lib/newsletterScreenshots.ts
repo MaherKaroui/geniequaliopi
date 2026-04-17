@@ -362,10 +362,7 @@ export function courseCertificateHtml(o: OrganismeInfo, f: FormationInfo): strin
   </div>
 
   <!-- Main content -->
-  <div style="padding:50px 50px 30px 55px;margin-right:200px;position:relative;z-index:1">
-    <div style="margin-bottom:50px">
-      <img src="/images/duke-logo.jpg" alt="Duke University" style="height:90px;object-fit:contain" />
-    </div>
+  <div style="padding:70px 50px 30px 55px;margin-right:200px;position:relative;z-index:1">
     <div style="font-size:11px;color:#555;margin-bottom:28px;font-family:Arial,sans-serif;letter-spacing:2px;text-transform:uppercase">${certDate}</div>
     <div style="font-size:34px;font-weight:400;color:#111;margin-bottom:8px;letter-spacing:0.3px;line-height:1.2">${displayName}</div>
     <div style="font-size:12px;color:#777;margin-bottom:28px;font-family:Arial,sans-serif">has successfully completed</div>
