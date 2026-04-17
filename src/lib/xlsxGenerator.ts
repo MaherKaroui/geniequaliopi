@@ -584,6 +584,144 @@ export function generateExcelOutilsSuiviAlternance(o: OrganismeInfo, f: Formatio
   ]);
 }
 
+// ─── Calendrier OPCO Mobilités (B9) — un onglet par session ───
+export function generateExcelCalendrierOPCO(
+  o: OrganismeInfo,
+  f: FormationInfo,
+  stagiaires: StagiaireInfo[],
+): string {
+  const dureeH = parseInt(f.duree) || 14;
+  const totalDays = Math.max(1, Math.ceil(dureeH / 7));
+  const lieu = f.lieu?.trim() || o.adresse || "À préciser";
+  const isDistance = lieu.toLowerCase().includes("distance") || lieu.toLowerCase().includes("distanciel");
+  const horairesMatin = "09h00 – 12h30";
+  const horairesAprem = "13h30 – 17h00";
+
+  const buildDays = (startStr: string, count: number): Date[] => {
+    const out: Date[] = [];
+    if (!startStr) return out;
+    const cur = new Date(startStr);
+    if (isNaN(cur.getTime())) return out;
+    while (out.length < count) {
+      const dow = cur.getDay();
+      if (dow !== 0 && dow !== 6) out.push(new Date(cur));
+      cur.setDate(cur.getDate() + 1);
+    }
+    return out;
+  };
+
+  const fmtJour = (d: Date) => {
+    const jours = ["dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"];
+    return jours[d.getDay()];
+  };
+  const fmtDateLong = (d: Date) => {
+    const mois = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"];
+    return `${d.getDate()} ${mois[d.getMonth()]} ${d.getFullYear()}`;
+  };
+  const fmtDateISO = (d: Date) => {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
+  };
+  const sanitizeSheet = (s: string) => s.replace(/[\\\/\?\*\[\]:]/g, " ").slice(0, 28).trim() || "Session";
+
+  // Regroupement par couple (dateDebut, dateFin)
+  const groupes = new Map<string, { debut: string; fin: string; stagiaires: StagiaireInfo[] }>();
+  stagiaires.forEach((s) => {
+    const deb = s.dateDebutFormation || f.dateDebut || "";
+    const fin = s.dateFinFormation || f.dateFin || "";
+    const key = `${deb}__${fin}`;
+    if (!groupes.has(key)) groupes.set(key, { debut: deb, fin, stagiaires: [] });
+    groupes.get(key)!.stagiaires.push(s);
+  });
+  if (groupes.size === 0) {
+    groupes.set("__default__", { debut: f.dateDebut, fin: f.dateFin, stagiaires: [] });
+  }
+
+  // ── Onglet 1 : Synthèse ──
+  let synthHtml = tableRow(["Champ", "Valeur"], true);
+  synthHtml += tableRow(["Intitulé de la formation", f.intitule]);
+  synthHtml += tableRow(["Organisme", `${o.nom}${o.nda ? ` – NDA ${o.nda}` : ""}`]);
+  synthHtml += tableRow(["Modalité", isDistance ? "Distanciel synchrone (classe virtuelle)" : "Présentiel"]);
+  synthHtml += tableRow(["Lieu de déroulement", lieu]);
+  synthHtml += tableRow(["Durée totale", `${dureeH} heures (${totalDays} jour${totalDays > 1 ? "s" : ""})`]);
+  synthHtml += tableRow(["Horaires types", `Matin : ${horairesMatin} | Après-midi : ${horairesAprem}`]);
+  synthHtml += tableRow(["Formateur", f.formateur || "—"]);
+  synthHtml += tableRow(["Nombre de sessions", String(groupes.size)]);
+  synthHtml += tableRow(["Nombre d'apprenants", String(stagiaires.length)]);
+
+  // ── Onglet 2 : Toutes sessions consolidées (filtrable) ──
+  let consolHtml = tableRow(
+    ["Session", "Apprenants", "N° jour", "Date", "Jour de la semaine", "Horaires matin", "Horaires après-midi", "Volume (h)", "Lieu", "Formateur"],
+    true,
+  );
+  const sheets: { name: string; html: string }[] = [
+    { name: "Synthèse", html: synthHtml },
+    { name: "Toutes sessions", html: "" }, // rempli après
+  ];
+
+  let sessionIdx = 0;
+  for (const [, grp] of groupes) {
+    sessionIdx++;
+    const sessionLabel = groupes.size > 1 ? `Session ${sessionIdx}` : "Session unique";
+    const apprenants = grp.stagiaires.length
+      ? grp.stagiaires.map((s) => `${s.prenom} ${s.nom}`).join(", ")
+      : "—";
+    const days = buildDays(grp.debut, totalDays);
+
+    // Onglet par session
+    let sheetHtml = tableRow(["Champ", "Valeur"], true);
+    sheetHtml += tableRow(["Session", sessionLabel]);
+    sheetHtml += tableRow(["Apprenants", apprenants]);
+    sheetHtml += tableRow(["Période", `Du ${formatDate(grp.debut)} au ${formatDate(grp.fin)}`]);
+    sheetHtml += tableRow(["Volume", `${dureeH} h sur ${totalDays} jour${totalDays > 1 ? "s" : ""}`]);
+    sheetHtml += tableRow(["Lieu", lieu]);
+    sheetHtml += tableRow(["Formateur", f.formateur || "—"]);
+    sheetHtml += `<tr><td colspan="2" style="height:8px"></td></tr>`;
+    sheetHtml += tableRow(
+      ["N° jour", "Date", "Date (ISO)", "Jour de la semaine", "Horaires matin", "Horaires après-midi", "Volume (h)", "Lieu"],
+      true,
+    );
+    if (days.length === 0) {
+      sheetHtml += `<tr><td colspan="8" style="text-align:center;color:#888">Dates à renseigner dans la fiche formation.</td></tr>`;
+    } else {
+      days.forEach((d, i) => {
+        const jourLabel = fmtJour(d);
+        const jourCap = jourLabel.charAt(0).toUpperCase() + jourLabel.slice(1);
+        sheetHtml += tableRow([
+          `J${i + 1}`,
+          fmtDateLong(d),
+          fmtDateISO(d),
+          jourCap,
+          horairesMatin,
+          horairesAprem,
+          "7",
+          lieu,
+        ]);
+        consolHtml += tableRow([
+          sessionLabel,
+          apprenants,
+          `J${i + 1}`,
+          fmtDateLong(d),
+          jourCap,
+          horairesMatin,
+          horairesAprem,
+          "7",
+          lieu,
+          f.formateur || "—",
+        ]);
+      });
+    }
+    sheets.push({ name: sanitizeSheet(sessionLabel), html: sheetHtml });
+  }
+
+  // injecte le contenu consolidé maintenant que toutes les sessions ont été traitées
+  sheets[1].html = consolHtml;
+
+  return excelWrap(`Calendrier OPCO – ${f.intitule}`, sheets);
+}
+
 // Helper to generate Excel blob
 export function excelToBlob(htmlContent: string): Blob {
   return new Blob(["\ufeff", htmlContent], { type: "application/vnd.ms-excel" });

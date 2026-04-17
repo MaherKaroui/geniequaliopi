@@ -27,6 +27,7 @@ import { buildOpcoFileName, buildOpcoZipFolder, buildOpcoRootName, type OpcoNami
 import type { OrganismeInfo, FormationInfo, StagiaireInfo, CritereData } from "@/types/qualiopi";
 import { CRITERES } from "@/types/qualiopi";
 import { generateDocumentById } from "@/lib/documentGenerator";
+import { generateExcelCalendrierOPCO, excelToBlob } from "@/lib/xlsxGenerator";
 import { mergeOrganisme, mergeStagiaires } from "@/lib/sampleData";
 import { htmlToPdfBlob } from "@/lib/pdfExport";
 import { supabase } from "@/integrations/supabase/client";
@@ -327,7 +328,17 @@ export default function OPCOMobilites() {
       } else {
         const blob = await generateAutoBlob(doc);
         if (!blob) { toast.error(`Génération impossible pour ${doc.code}`); return; }
-        saveAs(blob, buildOpcoFileName(namingCtx, doc.label, "pdf"));
+        // B9 : on livre PDF + Excel multi-onglets dans un ZIP
+        if (doc.code === "B9") {
+          const zip = new JSZip();
+          zip.file(buildOpcoFileName(namingCtx, doc.label, "pdf"), blob);
+          const xlsHtml = generateExcelCalendrierOPCO(mergedOrganisme, formation, mergedStagiaires);
+          zip.file(buildOpcoFileName(namingCtx, doc.label, "xls"), excelToBlob(xlsHtml));
+          const z = await zip.generateAsync({ type: "blob" });
+          saveAs(z, buildOpcoFileName(namingCtx, doc.label, "zip"));
+        } else {
+          saveAs(blob, buildOpcoFileName(namingCtx, doc.label, "pdf"));
+        }
       }
       toast.success(`${doc.label} téléchargé`);
     } catch (e: any) {
@@ -374,6 +385,11 @@ export default function OPCOMobilites() {
           } else {
             const blob = await generateAutoBlob(doc);
             if (blob) zip.file(`${folder}/${buildOpcoFileName(namingCtx, doc.label, "pdf")}`, blob);
+            // B9 : ajouter aussi le calendrier Excel multi-onglets
+            if (doc.code === "B9") {
+              const xlsHtml = generateExcelCalendrierOPCO(mergedOrganisme, formation, mergedStagiaires);
+              zip.file(`${folder}/${buildOpcoFileName(namingCtx, doc.label, "xls")}`, excelToBlob(xlsHtml));
+            }
           }
         } else {
           zip.file(`${folder}/MANQUANT_${doc.code}_${doc.label}.txt`,
