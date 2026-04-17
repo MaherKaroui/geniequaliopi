@@ -1,4 +1,5 @@
 import { StagiaireInfo } from "@/types/qualiopi";
+import { REGIONS, RegionKey, CommuneEntry, getAllCommunes } from "./fakeStagiaireRegions";
 
 // Prénoms réalistes Île-de-France (mix culturel représentatif)
 const PRENOMS_M = [
@@ -188,20 +189,24 @@ export interface FakeStagiaireOptions {
   count: number;
   seed?: number;
   genderRatio?: number; // 0-1 probabilité d'être Mme (default 0.5)
+  region?: RegionKey | "all"; // région française ciblée, "all" = toute la France
 }
 
 export function generateFakeStagiairesIDF(options: FakeStagiaireOptions): StagiaireInfo[] {
-  const { count, seed, genderRatio = 0.5 } = options;
+  const { count, seed, genderRatio = 0.5, region = "ile-de-france" } = options;
   const rng = makeRng(seed);
   const result: StagiaireInfo[] = [];
   const usedEmails = new Set<string>();
+
+  const communePool: CommuneEntry[] =
+    region === "all" ? getAllCommunes() : (REGIONS[region]?.communes ?? COMMUNES_IDF);
 
   for (let i = 0; i < count; i++) {
     const isFemme = rng() < genderRatio;
     const civilite = isFemme ? "Mme" : "M.";
     const prenom = pick(isFemme ? PRENOMS_F : PRENOMS_M, rng);
     const nom = pick(NOMS, rng);
-    const loc = pick(COMMUNES_IDF, rng);
+    const loc = pick(communePool, rng);
     const numRue = generateStreetNumber(rng);
     const rue = pick(RUES, rng);
     const adresse = `${numRue} ${rue}`;
