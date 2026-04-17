@@ -86,7 +86,7 @@ export async function generateAIEvalPack(f: FormationInfo, force = false): Promi
     body: {
       intitule: f.intitule,
       objectifs: f.objectifs,
-      contenu: f.contenu,
+      contenu: f.programme,
       publicVise: f.publicVise,
       prerequis: f.prerequis,
     },
