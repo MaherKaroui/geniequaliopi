@@ -140,6 +140,62 @@ function generateListeFormateursHTML(o: OrganismeInfo, cv: CVData, stagiaires: S
   </div>`;
 }
 
+function generateProgrammeNDA(o: OrganismeInfo, f: FormationInfo, _s: StagiaireInfo[]): string {
+  const today = new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
+  const objectifs = (f.objectifs || "").split(/\n|•|-/).map(x => x.trim()).filter(Boolean);
+  const moyens = (f.moyensPedagogiques || "").split(/\n|•|-/).map(x => x.trim()).filter(Boolean);
+  const evals = (f.methodesEvaluation || "").split(/\n|•|-/).map(x => x.trim()).filter(Boolean);
+  const programme = (f.programme || "").split(/\n/).map(x => x.trim()).filter(Boolean);
+
+  return `<div style="font-family:Arial,sans-serif;max-width:820px;margin:0 auto;padding:30px;font-size:12px;line-height:1.55;color:#222;">
+    <div style="text-align:center;margin-bottom:18px;">
+      ${o.logoUrl ? `<img src="${o.logoUrl}" style="max-height:70px;margin-bottom:8px;" />` : ""}
+      <p style="font-size:11px;color:#555;margin:2px 0;"><strong>${o.nom || ""}</strong></p>
+      <p style="font-size:10px;color:#666;margin:2px 0;">${o.adresse || ""} ${o.codePostal || ""} ${o.ville || ""}</p>
+      ${o.siret ? `<p style="font-size:10px;color:#666;margin:2px 0;">SIRET : ${o.siret}</p>` : ""}
+      ${o.email ? `<p style="font-size:10px;color:#666;margin:2px 0;">Mail : ${o.email}</p>` : ""}
+    </div>
+
+    <h1 style="text-align:center;font-size:20px;margin:25px 0 6px 0;text-transform:uppercase;letter-spacing:1.5px;color:#1e3a7b;">Programme de Formation</h1>
+    <p style="text-align:center;font-size:13px;font-weight:600;margin:0 0 25px 0;color:#333;">« ${f.intitule || "Intitulé de la formation"} »</p>
+
+    <table style="width:100%;border-collapse:collapse;margin-bottom:20px;font-size:11px;">
+      <tr style="background:#f3f6fb;"><td style="padding:8px;border:1px solid #d8dde6;width:35%;font-weight:600;">Public visé</td><td style="padding:8px;border:1px solid #d8dde6;">${f.publicVise || "—"}</td></tr>
+      <tr><td style="padding:8px;border:1px solid #d8dde6;font-weight:600;">Prérequis</td><td style="padding:8px;border:1px solid #d8dde6;">${f.prerequis || "Aucun"}</td></tr>
+      <tr style="background:#f3f6fb;"><td style="padding:8px;border:1px solid #d8dde6;font-weight:600;">Durée</td><td style="padding:8px;border:1px solid #d8dde6;">${f.duree || "—"}</td></tr>
+      <tr><td style="padding:8px;border:1px solid #d8dde6;font-weight:600;">Modalités</td><td style="padding:8px;border:1px solid #d8dde6;">${f.modalites || "—"}</td></tr>
+      <tr style="background:#f3f6fb;"><td style="padding:8px;border:1px solid #d8dde6;font-weight:600;">Lieu</td><td style="padding:8px;border:1px solid #d8dde6;">${f.lieu || "—"}</td></tr>
+      <tr><td style="padding:8px;border:1px solid #d8dde6;font-weight:600;">Tarif</td><td style="padding:8px;border:1px solid #d8dde6;">${f.tarif || "—"}</td></tr>
+      <tr style="background:#f3f6fb;"><td style="padding:8px;border:1px solid #d8dde6;font-weight:600;">Délai d'accès</td><td style="padding:8px;border:1px solid #d8dde6;">${f.delaiAcces || "Sous 15 jours après acceptation du devis"}</td></tr>
+      <tr><td style="padding:8px;border:1px solid #d8dde6;font-weight:600;">Formateur</td><td style="padding:8px;border:1px solid #d8dde6;">${f.formateur || "—"}</td></tr>
+    </table>
+
+    <h2 style="font-size:14px;color:#1e3a7b;margin:18px 0 8px 0;border-bottom:2px solid #1e3a7b;padding-bottom:4px;">Objectifs pédagogiques</h2>
+    ${objectifs.length ? `<ul style="margin:6px 0 14px 18px;padding:0;">${objectifs.map(o2 => `<li style="margin:3px 0;">${o2}</li>`).join("")}</ul>` : `<p>${f.objectifs || "—"}</p>`}
+
+    <h2 style="font-size:14px;color:#1e3a7b;margin:18px 0 8px 0;border-bottom:2px solid #1e3a7b;padding-bottom:4px;">Contenu du programme</h2>
+    ${programme.length ? `<div style="background:#fafbfd;border-left:3px solid #1e3a7b;padding:10px 14px;margin:6px 0 14px 0;">${programme.map(p => `<p style="margin:4px 0;">${p}</p>`).join("")}</div>` : `<p>${f.programme || "—"}</p>`}
+
+    <h2 style="font-size:14px;color:#1e3a7b;margin:18px 0 8px 0;border-bottom:2px solid #1e3a7b;padding-bottom:4px;">Moyens pédagogiques et techniques</h2>
+    ${moyens.length ? `<ul style="margin:6px 0 14px 18px;padding:0;">${moyens.map(m => `<li style="margin:3px 0;">${m}</li>`).join("")}</ul>` : `<p>${f.moyensPedagogiques || "Supports pédagogiques, exercices pratiques, mises en situation."}</p>`}
+
+    <h2 style="font-size:14px;color:#1e3a7b;margin:18px 0 8px 0;border-bottom:2px solid #1e3a7b;padding-bottom:4px;">Modalités d'évaluation</h2>
+    ${evals.length ? `<ul style="margin:6px 0 14px 18px;padding:0;">${evals.map(e => `<li style="margin:3px 0;">${e}</li>`).join("")}</ul>` : `<p>${f.methodesEvaluation || "Évaluation continue, exercices pratiques, attestation de fin de formation."}</p>`}
+
+    <h2 style="font-size:14px;color:#1e3a7b;margin:18px 0 8px 0;border-bottom:2px solid #1e3a7b;padding-bottom:4px;">Accessibilité aux personnes en situation de handicap</h2>
+    <p>Nos formations sont accessibles aux personnes en situation de handicap. Pour toute demande d'aménagement, contactez notre référent handicap${o.referentHandicap ? ` : <strong>${o.referentHandicap}</strong>` : ""}${o.email ? ` (${o.email})` : ""}.</p>
+
+    <div style="margin-top:30px;text-align:right;font-size:11px;color:#555;">
+      <p>Fait à ${o.ville || "___________"}, le ${today}</p>
+    </div>
+
+    <div style="margin-top:30px;border-top:1px solid #ccc;padding-top:8px;font-size:9px;color:#888;text-align:center;">
+      <strong>${o.nom || ""}</strong>${o.siret ? ` – SIRET : ${o.siret}` : ""}${o.email ? ` – ${o.email}` : ""}
+      <br>Programme version ${o.version || "1"} – Mis à jour le ${today}
+    </div>
+  </div>`;
+}
+
 function generateDocumentHTML(docId: string, o: OrganismeInfo, f: FormationInfo, s: StagiaireInfo[], cvData: CVData, cvDesign: CVDesign): string | null {
   const cleanOrganisme = sanitizeOrganismeForDocuments(o);
 
@@ -147,7 +203,7 @@ function generateDocumentHTML(docId: string, o: OrganismeInfo, f: FormationInfo,
     case "contrat":
       return genContratFormationParticulier(cleanOrganisme, f, s);
     case "programme":
-      return generateDocumentById("programme_formation", "programme_formation", undefined, cleanOrganisme, f, s) || null;
+      return generateProgrammeNDA(cleanOrganisme, f, s);
     case "reglement":
       return genReglement_V2(cleanOrganisme, f, s);
     case "devis_facture":
