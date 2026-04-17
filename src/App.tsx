@@ -8,6 +8,7 @@ import ControleEY from "./pages/ControleEY";
 import DemandeNDA from "./pages/DemandeNDA";
 import GenerateurCV from "./pages/GenerateurCV";
 import GenerateurTampon from "./pages/GenerateurTampon";
+import OPCOMobilites from "./pages/OPCOMobilites";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,6 +25,7 @@ const App = () => (
           <Route path="/demande-nda" element={<DemandeNDA />} />
           <Route path="/generateur-cv" element={<GenerateurCV />} />
           <Route path="/generateur-tampon" element={<GenerateurTampon />} />
+          <Route path="/opco-mobilites" element={<OPCOMobilites />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
