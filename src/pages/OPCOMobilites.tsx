@@ -715,10 +715,22 @@ export default function OPCOMobilites() {
               <code className="bg-background px-1 rounded">{anneeControle}_{(organisme.nom || "ETAB").replace(/\s+/g, "_")}_[Pièce]_AAAA.MM.JJ</code>
             </p>
           </div>
-          <Button onClick={handleExportFullZip} disabled={generating} className="gap-2">
-            {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <FolderArchive className="w-4 h-4" />}
-            {generating ? "Export en cours..." : "Exporter le dossier ZIP"}
-          </Button>
+          <div className="flex gap-2 flex-wrap">
+            <Button
+              onClick={handleGenerateAIPack}
+              disabled={generatingAI}
+              variant={aiPackReady ? "outline" : "secondary"}
+              className="gap-2"
+              title="Génère via IA un pack C6 cohérent avec la formation"
+            >
+              {generatingAI ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+              {generatingAI ? "Génération IA..." : aiPackReady ? "Régénérer pack IA C6" : "Générer évaluations IA (C6)"}
+            </Button>
+            <Button onClick={handleExportFullZip} disabled={generating} className="gap-2">
+              {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <FolderArchive className="w-4 h-4" />}
+              {generating ? "Export en cours..." : "Exporter le dossier ZIP"}
+            </Button>
+          </div>
         </Card>
 
         {generating && (
