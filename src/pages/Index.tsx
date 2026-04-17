@@ -10,7 +10,7 @@ import DocumentGenerator from "@/components/DocumentGenerator";
 import DossierHistory from "@/components/DossierHistory";
 
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, LogIn, LogOut, User, FileSpreadsheet, Upload, Loader2, ShieldCheck, FileCheck, UserCircle, Stamp } from "lucide-react";
+import { ChevronLeft, ChevronRight, LogIn, LogOut, User, FileSpreadsheet, Upload, Loader2, ShieldCheck, FileCheck, UserCircle, Stamp, Truck } from "lucide-react";
 import { exportFormDataToExcel } from "@/lib/exportFormData";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -183,6 +183,9 @@ const Index = () => {
             </Button>
             <Button size="lg" variant="outline" className="px-8 py-6 text-base gap-2" onClick={() => navigate("/generateur-tampon")}>
               <Stamp className="w-5 h-5" /> Générateur Tampon
+            </Button>
+            <Button size="lg" variant="outline" className="px-8 py-6 text-base gap-2" onClick={() => navigate("/opco-mobilites")}>
+              <Truck className="w-5 h-5" /> OPCO Mobilités
             </Button>
           </div>
         </div>
