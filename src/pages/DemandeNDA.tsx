@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChevronLeft, ChevronRight, Download, FileText, Loader2, CheckCircle2, Save, FolderOpen, Trash2, Clock } from "lucide-react";
+import { ChevronLeft, ChevronRight, Download, FileText, Loader2, CheckCircle2, Save, FolderOpen, Trash2, Clock, Upload, X } from "lucide-react";
 import { toast } from "sonner";
 import { OrganismeInfo, FormationInfo, StagiaireInfo, CritereData, CRITERES } from "@/types/qualiopi";
 import OrganismeForm from "@/components/OrganismeForm";
@@ -162,7 +162,13 @@ function generateProgrammeNDA(o: OrganismeInfo, f: FormationInfo, s: StagiaireIn
     .replace(/cet enregistrement ne vaut pas agrément de l'état/gi, "");
 }
 
-function generateDocumentHTML(docId: string, o: OrganismeInfo, f: FormationInfo, s: StagiaireInfo[], cvData: CVData, cvDesign: CVDesign): string | null {
+interface UploadedCV {
+  dataUrl: string;
+  name: string;
+  type: string; // mime type
+}
+
+function generateDocumentHTML(docId: string, o: OrganismeInfo, f: FormationInfo, s: StagiaireInfo[], cvData: CVData, cvDesign: CVDesign, uploadedCV?: UploadedCV | null): string | null {
   const cleanOrganisme = sanitizeOrganismeForDocuments(o);
 
   switch (docId) {
@@ -178,6 +184,16 @@ function generateDocumentHTML(docId: string, o: OrganismeInfo, f: FormationInfo,
       if (cleanOrganisme.logoUrl) return `<div style="text-align:center;padding:60px;"><img src="${cleanOrganisme.logoUrl}" style="max-width:400px;" /><p style="margin-top:20px;color:#666;">Logo de l'organisme</p></div>`;
       return null;
     case "cv": {
+      // Priority 1: uploaded CV file (image rendered, PDF embedded)
+      if (uploadedCV) {
+        if (uploadedCV.type.startsWith("image/")) {
+          return `<div style="text-align:center;padding:20px;"><img src="${uploadedCV.dataUrl}" style="max-width:100%;height:auto;" /></div>`;
+        }
+        if (uploadedCV.type === "application/pdf") {
+          return `<div style="width:100%;height:100vh;"><embed src="${uploadedCV.dataUrl}" type="application/pdf" style="width:100%;height:100%;min-height:800px;" /></div>`;
+        }
+      }
+      // Priority 2: generated CV
       const hasContent = cvData.prenom || cvData.nom || cvData.profil || cvData.experiences.some(e => e.poste);
       if (hasContent) return generateCVHTML(cvData, cvDesign);
       return null;
@@ -227,6 +243,7 @@ const DemandeNDA = () => {
   const [stagiaires, setStagiaires] = useState<StagiaireInfo[]>([]);
   const [cvData, setCvData] = useState<CVData>(emptyCV);
   const [cvDesign, setCvDesign] = useState<CVDesign>("classique");
+  const [uploadedCV, setUploadedCV] = useState<UploadedCV | null>(null);
   const [previewDoc, setPreviewDoc] = useState<string | null>(null);
   const [previewHTML, setPreviewHTML] = useState("");
   const [generating, setGenerating] = useState(false);
@@ -302,9 +319,9 @@ const DemandeNDA = () => {
   };
 
   const handlePreview = (docId: string) => {
-    const html = generateDocumentHTML(docId, organisme, formation, stagiaires, cvData, cvDesign);
+    const html = generateDocumentHTML(docId, organisme, formation, stagiaires, cvData, cvDesign, uploadedCV);
     if (!html) {
-      toast.error(docId === "logo" ? "Veuillez d'abord importer un logo" : "Veuillez remplir le CV du formateur");
+      toast.error(docId === "logo" ? "Veuillez d'abord importer un logo" : "Veuillez remplir le CV du formateur ou en uploader un");
       return;
     }
     setPreviewDoc(docId);
@@ -312,7 +329,16 @@ const DemandeNDA = () => {
   };
 
   const handleDownload = async (docId: string) => {
-    const html = generateDocumentHTML(docId, organisme, formation, stagiaires, cvData, cvDesign);
+    // For "cv" with an uploaded file, download the original file as-is
+    if (docId === "cv" && uploadedCV) {
+      const a = document.createElement("a");
+      a.href = uploadedCV.dataUrl;
+      a.download = uploadedCV.name || "CV_Formateur";
+      a.click();
+      toast.success("CV téléchargé !");
+      return;
+    }
+    const html = generateDocumentHTML(docId, organisme, formation, stagiaires, cvData, cvDesign, uploadedCV);
     if (!html) { toast.error("Document non disponible."); return; }
     if (docId === "logo" && organisme.logoUrl) {
       const a = document.createElement("a");
@@ -354,7 +380,16 @@ const DemandeNDA = () => {
           } catch { /* skip */ }
           continue;
         }
-        const html = generateDocumentHTML(doc.id, organisme, formation, stagiaires, cvData, cvDesign);
+        // Uploaded CV → include original file as-is in the ZIP
+        if (doc.id === "cv" && uploadedCV) {
+          try {
+            const resp = await fetch(uploadedCV.dataUrl);
+            const blob = await resp.blob();
+            zip.file(uploadedCV.name || `CV_Formateur`, blob);
+          } catch { /* skip */ }
+          continue;
+        }
+        const html = generateDocumentHTML(doc.id, organisme, formation, stagiaires, cvData, cvDesign, uploadedCV);
         if (html) {
           const wrappedHtml = html;
           if (exportFormat === "pdf") {
@@ -482,9 +517,62 @@ const DemandeNDA = () => {
               {/* Style Panel */}
               <DocStyleConfigPanel style={docStyle} onChange={handleStyleChange} />
 
+              {/* CV Upload (optional) */}
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base">CV existant (optionnel)</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-xs text-muted-foreground mb-3">
+                    Si vous avez déjà un CV (PDF ou image), uploadez-le ici. Il sera utilisé en priorité dans le dossier. Sinon, le CV généré ci-dessous sera utilisé.
+                  </p>
+                  {uploadedCV ? (
+                    <div className="flex items-center justify-between p-3 border rounded-lg bg-accent/30">
+                      <div className="flex items-center gap-2">
+                        <FileText className="w-4 h-4 text-primary" />
+                        <span className="text-sm font-medium">{uploadedCV.name}</span>
+                        <span className="text-xs text-muted-foreground">({uploadedCV.type})</span>
+                      </div>
+                      <Button variant="ghost" size="sm" onClick={() => setUploadedCV(null)} className="text-destructive gap-1">
+                        <X className="w-3.5 h-3.5" /> Retirer
+                      </Button>
+                    </div>
+                  ) : (
+                    <Label htmlFor="cv-upload" className="flex items-center gap-2 cursor-pointer p-3 border border-dashed rounded-lg hover:bg-accent/30 transition-colors">
+                      <Upload className="w-4 h-4" />
+                      <span className="text-sm">Cliquez pour uploader un CV (PDF, JPG, PNG)</span>
+                      <Input
+                        id="cv-upload"
+                        type="file"
+                        accept="application/pdf,image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+                          if (file.size > 10 * 1024 * 1024) {
+                            toast.error("Fichier trop volumineux (max 10 MB)");
+                            return;
+                          }
+                          const reader = new FileReader();
+                          reader.onload = () => {
+                            setUploadedCV({
+                              dataUrl: reader.result as string,
+                              name: file.name,
+                              type: file.type,
+                            });
+                            toast.success("CV importé !");
+                          };
+                          reader.readAsDataURL(file);
+                        }}
+                      />
+                    </Label>
+                  )}
+                </CardContent>
+              </Card>
+
               {/* CV Generator */}
               <div>
-                <h2 className="text-lg font-semibold mb-4">CV du Formateur</h2>
+                <h2 className="text-lg font-semibold mb-4">Ou générer un CV</h2>
                 <CVGeneratorEmbed cvData={cvData} onCVChange={setCvData} selectedDesign={cvDesign} onDesignChange={setCvDesign} />
               </div>
 
@@ -494,7 +582,7 @@ const DemandeNDA = () => {
                 <CardContent className="space-y-3">
                   {NDA_DOCUMENTS.map(doc => {
                     const cvHasContent = cvData.prenom || cvData.nom || cvData.profil || cvData.experiences.some(e => e.poste);
-                    const ready = doc.id === "contrat" || doc.id === "programme" || doc.id === "reglement" || doc.id === "devis_facture" || (doc.id === "logo" && !!organisme.logoUrl) || (doc.id === "cv" && !!cvHasContent);
+                    const ready = doc.id === "contrat" || doc.id === "programme" || doc.id === "reglement" || doc.id === "devis_facture" || (doc.id === "logo" && !!organisme.logoUrl) || (doc.id === "cv" && (!!uploadedCV || !!cvHasContent)) || (doc.id === "liste_formateurs" && !!cvHasContent);
                     return (
                       <div key={doc.id} className="flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors">
                         <div className="flex items-center gap-3">
