@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef, useEffect } from "react";
+import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,7 +13,8 @@ import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import {
   Home, Truck, ChevronDown, ChevronRight, Upload, CheckCircle2, Circle,
-  XCircle, Download, FileText, Loader2, FolderArchive, Eye,
+  XCircle, Download, FileText, Loader2, FolderArchive, Eye, Pencil, Save,
+  LogIn, LogOut, FolderOpen, Trash2, Plus,
 } from "lucide-react";
 import OrganismeForm from "@/components/OrganismeForm";
 import FormationForm from "@/components/FormationForm";
@@ -28,6 +29,8 @@ import { CRITERES } from "@/types/qualiopi";
 import { generateDocumentById } from "@/lib/documentGenerator";
 import { mergeOrganisme, mergeStagiaires } from "@/lib/sampleData";
 import { htmlToPdfBlob } from "@/lib/pdfExport";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 const emptyOrganisme: OrganismeInfo = {
   nom: "", siret: "", adresse: "", codePostal: "", ville: "", telephone: "", email: "",
@@ -53,8 +56,21 @@ const STATUS_CONFIG: Record<OpcoDocStatus, { label: string; icon: any; className
 
 type Step = "setup" | "documents";
 
+interface SavedOpcoDossier {
+  id: string;
+  name: string;
+  ref_dossier: string;
+  annee_controle: string;
+  organisme: OrganismeInfo;
+  formation: FormationInfo;
+  stagiaires: StagiaireInfo[];
+  doc_states: Record<string, Pick<OpcoDocState, "code" | "status" | "uploadedFileName" | "note">>;
+  updated_at: string;
+}
+
 export default function OPCOMobilites() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [step, setStep] = useState<Step>("setup");
 
   // Restore from session
@@ -99,11 +115,20 @@ export default function OPCOMobilites() {
   useEffect(() => { sessionStorage.setItem("opco_ref", refDossier); }, [refDossier]);
   useEffect(() => { sessionStorage.setItem("opco_annee", anneeControle); }, [anneeControle]);
 
-  // Preview dialog
+  // Preview / edit dialog
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewHtml, setPreviewHtml] = useState("");
   const [previewTitle, setPreviewTitle] = useState("");
   const [previewLoading, setPreviewLoading] = useState(false);
+  const [previewDoc, setPreviewDoc] = useState<OpcoDocumentItem | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const previewIframeRef = useRef<HTMLIFrameElement>(null);
+
+  // Saved dossiers
+  const [dossierName, setDossierName] = useState("");
+  const [currentDossierId, setCurrentDossierId] = useState<string | null>(null);
+  const [savedList, setSavedList] = useState<SavedOpcoDossier[]>([]);
+  const [savingDossier, setSavingDossier] = useState(false);
 
   const mergedStagiaires = useMemo(
     () => mergeStagiaires(stagiaires).filter((s): s is StagiaireInfo => Boolean(s)),
@@ -173,6 +198,7 @@ export default function OPCOMobilites() {
     return true;
   };
 
+  // ─────────── Génération ───────────
   const generateAutoBlob = async (doc: OpcoDocumentItem, stagiaireIdx?: number): Promise<Blob | null> => {
     if (doc.autoTemplates.length === 0) return null;
     for (const template of doc.autoTemplates) {
@@ -187,11 +213,14 @@ export default function OPCOMobilites() {
     return null;
   };
 
+  // ─────────── Aperçu + Édition ───────────
   const handlePreview = async (doc: OpcoDocumentItem) => {
     if (doc.autoTemplates.length === 0) {
       toast.error("Ce document doit être uploadé manuellement");
       return;
     }
+    setPreviewDoc(doc);
+    setIsEditing(false);
     setPreviewTitle(`${doc.code} — ${doc.longLabel}`);
     setPreviewHtml("");
     setPreviewOpen(true);
@@ -215,6 +244,57 @@ export default function OPCOMobilites() {
     setPreviewHtml(html);
   };
 
+  // Toggle edit mode on iframe body
+  useEffect(() => {
+    const iframe = previewIframeRef.current;
+    if (!iframe?.contentDocument?.body) return;
+    if (isEditing) {
+      requestAnimationFrame(() => {
+        const body = previewIframeRef.current?.contentDocument?.body;
+        if (body) {
+          body.contentEditable = "true";
+          body.style.outline = "none";
+          body.focus();
+        }
+      });
+    } else {
+      const body = iframe.contentDocument.body;
+      body.contentEditable = "false";
+    }
+  }, [isEditing, previewHtml]);
+
+  const handleIframeLoad = useCallback(() => {
+    if (!isEditing) return;
+    requestAnimationFrame(() => {
+      const body = previewIframeRef.current?.contentDocument?.body;
+      if (body) {
+        body.contentEditable = "true";
+        body.style.outline = "none";
+      }
+    });
+  }, [isEditing]);
+
+  const getCurrentEditedHtml = (): string => {
+    const iframe = previewIframeRef.current;
+    if (iframe?.contentDocument?.documentElement) {
+      return `<!DOCTYPE html><html>${iframe.contentDocument.documentElement.innerHTML}</html>`;
+    }
+    return previewHtml;
+  };
+
+  const handleDownloadEdited = async () => {
+    if (!previewDoc) return;
+    try {
+      const html = getCurrentEditedHtml();
+      const blob = await htmlToPdfBlob(html);
+      saveAs(blob, buildOpcoFileName(namingCtx, previewDoc.label, "pdf", "edite"));
+      toast.success("Version éditée téléchargée");
+    } catch (e: any) {
+      toast.error(`Erreur : ${e.message || "Inconnue"}`);
+    }
+  };
+
+  // ─────────── Téléchargement direct ───────────
   const handleDownloadSingle = async (doc: OpcoDocumentItem) => {
     const state = docStates.get(doc.code);
     if (!state) return;
@@ -277,7 +357,6 @@ export default function OPCOMobilites() {
 
         setProgressText(`${doc.code} — ${doc.label}`);
 
-        // Manual upload OR uploaded file
         if (state.uploadedFile) {
           const ext = state.uploadedFileName?.split(".").pop() || "pdf";
           zip.file(`${folder}/${buildOpcoFileName(namingCtx, doc.label, ext)}`, state.uploadedFile);
@@ -297,7 +376,6 @@ export default function OPCOMobilites() {
             if (blob) zip.file(`${folder}/${buildOpcoFileName(namingCtx, doc.label, "pdf")}`, blob);
           }
         } else {
-          // Missing manual doc - add placeholder note
           zip.file(`${folder}/MANQUANT_${doc.code}_${doc.label}.txt`,
             `Document à fournir manuellement : ${doc.longLabel}\n\n${doc.description}`);
         }
@@ -323,6 +401,105 @@ export default function OPCOMobilites() {
     }
   };
 
+  // ─────────── Sauvegarde dossier ───────────
+  const loadSavedList = useCallback(async () => {
+    if (!user) { setSavedList([]); return; }
+    const { data, error } = await supabase
+      .from("saved_opco_dossiers")
+      .select("*")
+      .order("updated_at", { ascending: false });
+    if (error) { console.error(error); return; }
+    setSavedList((data || []) as unknown as SavedOpcoDossier[]);
+  }, [user]);
+
+  useEffect(() => { loadSavedList(); }, [loadSavedList]);
+
+  const serializeDocStates = (): Record<string, any> => {
+    const obj: Record<string, any> = {};
+    docStates.forEach((s, code) => {
+      // On ne sérialise pas le File (binaire)
+      obj[code] = { code: s.code, status: s.status, uploadedFileName: s.uploadedFileName, note: s.note };
+    });
+    return obj;
+  };
+
+  const handleSaveDossier = async () => {
+    if (!user) { toast.error("Connectez-vous pour sauvegarder"); navigate("/auth"); return; }
+    if (!organisme.nom?.trim()) { toast.error("Nom de l'organisme requis"); return; }
+    setSavingDossier(true);
+    const payload = {
+      user_id: user.id,
+      name: dossierName.trim() || `${organisme.nom} — ${formation.intitule || "OPCO"}`,
+      ref_dossier: refDossier,
+      annee_controle: anneeControle,
+      organisme: organisme as any,
+      formation: formation as any,
+      stagiaires: stagiaires as any,
+      doc_states: serializeDocStates() as any,
+    };
+    let res;
+    if (currentDossierId) {
+      res = await supabase.from("saved_opco_dossiers").update(payload).eq("id", currentDossierId).select().single();
+    } else {
+      res = await supabase.from("saved_opco_dossiers").insert(payload).select().single();
+    }
+    setSavingDossier(false);
+    if (res.error) { toast.error(`Erreur : ${res.error.message}`); return; }
+    setCurrentDossierId((res.data as any).id);
+    toast.success(currentDossierId ? "Dossier mis à jour" : "Dossier sauvegardé");
+    loadSavedList();
+  };
+
+  const handleLoadDossier = (d: SavedOpcoDossier) => {
+    setOrganisme(d.organisme);
+    setFormation(d.formation);
+    setStagiaires(d.stagiaires || []);
+    setRefDossier(d.ref_dossier || "");
+    setAnneeControle(d.annee_controle || String(new Date().getFullYear()));
+    setDossierName(d.name);
+    setCurrentDossierId(d.id);
+    // Restore doc states (sans les fichiers binaires)
+    const m = new Map<string, OpcoDocState>();
+    OPCO_DOCUMENTS.forEach((doc) => {
+      const saved = d.doc_states?.[doc.code];
+      const defaultStatus: OpcoDocStatus = doc.manualUpload ? "pending" : doc.autoTemplates.length > 0 ? "auto" : "pending";
+      m.set(doc.code, {
+        code: doc.code,
+        status: (saved?.status as OpcoDocStatus) || defaultStatus,
+        uploadedFileName: saved?.uploadedFileName,
+        note: saved?.note,
+      });
+    });
+    setDocStates(m);
+    toast.success(`Dossier "${d.name}" chargé`);
+  };
+
+  const handleDeleteDossier = async (id: string) => {
+    if (!confirm("Supprimer ce dossier OPCO ?")) return;
+    const { error } = await supabase.from("saved_opco_dossiers").delete().eq("id", id);
+    if (error) { toast.error(error.message); return; }
+    if (currentDossierId === id) setCurrentDossierId(null);
+    toast.success("Dossier supprimé");
+    loadSavedList();
+  };
+
+  const handleNewDossier = () => {
+    setCurrentDossierId(null);
+    setDossierName("");
+    setOrganisme(emptyOrganisme);
+    setFormation(emptyFormation);
+    setStagiaires([]);
+    setRefDossier("");
+    setAnneeControle(String(new Date().getFullYear()));
+    const m = new Map<string, OpcoDocState>();
+    OPCO_DOCUMENTS.forEach((d) => {
+      m.set(d.code, { code: d.code, status: d.manualUpload ? "pending" : d.autoTemplates.length > 0 ? "auto" : "pending" });
+    });
+    setDocStates(m);
+    setStep("setup");
+    toast.success("Nouveau dossier OPCO");
+  };
+
   // ─────────── SETUP STEP ───────────
   if (step === "setup") {
     return (
@@ -333,13 +510,78 @@ export default function OPCOMobilites() {
               <Truck className="w-5 h-5 text-primary" />
               <span className="font-bold text-lg">OPCO Mobilités — Contrôle de service fait</span>
             </div>
-            <Button variant="ghost" size="sm" onClick={() => navigate("/")}>
-              <Home className="w-4 h-4 mr-1" /> Accueil
-            </Button>
+            <div className="flex items-center gap-2">
+              {user ? (
+                <Button variant="ghost" size="sm" onClick={async () => { await supabase.auth.signOut(); }}>
+                  <LogOut className="w-4 h-4 mr-1" /> Déconnexion
+                </Button>
+              ) : (
+                <Button variant="ghost" size="sm" onClick={() => navigate("/auth")}>
+                  <LogIn className="w-4 h-4 mr-1" /> Connexion
+                </Button>
+              )}
+              <Button variant="ghost" size="sm" onClick={() => navigate("/")}>
+                <Home className="w-4 h-4 mr-1" /> Accueil
+              </Button>
+            </div>
           </div>
         </header>
 
         <main className="max-w-5xl mx-auto px-4 py-8 space-y-6">
+          {/* Sauvegarde */}
+          <Card className="p-5 space-y-3">
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <h2 className="text-lg font-semibold flex items-center gap-2">
+                <FolderOpen className="w-5 h-5" /> Mes dossiers OPCO
+              </h2>
+              {currentDossierId && (
+                <Badge variant="secondary" className="text-xs">Édition d'un dossier sauvegardé</Badge>
+              )}
+            </div>
+            <div className="flex flex-wrap gap-2 items-end">
+              <div className="flex-1 min-w-[220px]">
+                <Label htmlFor="dname" className="text-xs">Nom du dossier</Label>
+                <Input id="dname" value={dossierName} onChange={(e) => setDossierName(e.target.value)}
+                  placeholder="ex : OPCO Mob - 2026 - SELECT FORMATION" />
+              </div>
+              <Button onClick={handleSaveDossier} disabled={savingDossier} className="gap-2">
+                {savingDossier ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                {currentDossierId ? "Mettre à jour" : "Sauvegarder"}
+              </Button>
+              <Button variant="outline" onClick={handleNewDossier} className="gap-2">
+                <Plus className="w-4 h-4" /> Nouveau
+              </Button>
+            </div>
+            {!user && (
+              <p className="text-xs text-muted-foreground">
+                Connectez-vous pour sauvegarder vos dossiers OPCO.
+              </p>
+            )}
+            {user && savedList.length > 0 && (
+              <div className="border-t pt-3 space-y-1.5 max-h-56 overflow-y-auto">
+                {savedList.map((d) => (
+                  <div key={d.id} className={`flex items-center justify-between gap-2 px-3 py-2 rounded hover:bg-muted/50 ${currentDossierId === d.id ? "bg-muted" : ""}`}>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium truncate">{d.name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {d.ref_dossier && <span>Réf. {d.ref_dossier} • </span>}
+                        Maj : {new Date(d.updated_at).toLocaleDateString("fr-FR")}
+                      </p>
+                    </div>
+                    <div className="flex gap-1">
+                      <Button size="sm" variant="ghost" onClick={() => handleLoadDossier(d)}>
+                        <FolderOpen className="w-4 h-4" />
+                      </Button>
+                      <Button size="sm" variant="ghost" onClick={() => handleDeleteDossier(d.id)}>
+                        <Trash2 className="w-4 h-4 text-destructive" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </Card>
+
           <Card className="p-6 space-y-4">
             <h2 className="text-xl font-semibold">Référence du contrôle OPCO</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -388,6 +630,10 @@ export default function OPCOMobilites() {
             {refDossier && <Badge variant="outline" className="ml-2">Réf. {refDossier}</Badge>}
           </div>
           <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={handleSaveDossier} disabled={savingDossier} className="gap-1">
+              {savingDossier ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+              Sauvegarder
+            </Button>
             <Button variant="outline" size="sm" onClick={() => setStep("setup")}>
               Modifier les infos
             </Button>
@@ -509,7 +755,7 @@ export default function OPCOMobilites() {
                               <Button
                                 variant="ghost" size="sm"
                                 onClick={() => handlePreview(doc)}
-                                title="Aperçu du document auto-généré"
+                                title="Aperçu / Édition"
                               >
                                 <Eye className="w-4 h-4" />
                               </Button>
@@ -541,10 +787,54 @@ export default function OPCOMobilites() {
         })}
       </main>
 
-      <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
+      {/* Preview / Edit Dialog */}
+      <Dialog
+        open={previewOpen}
+        onOpenChange={(open) => {
+          if (!open && isEditing) {
+            // Conserver les modifications en mémoire avant fermeture
+            setPreviewHtml(getCurrentEditedHtml());
+            setIsEditing(false);
+          }
+          setPreviewOpen(open);
+        }}
+      >
         <DialogContent className="max-w-6xl h-[90vh] flex flex-col">
           <DialogHeader>
-            <DialogTitle className="text-base">{previewTitle}</DialogTitle>
+            <div className="flex items-center justify-between gap-2 pr-8">
+              <DialogTitle className="text-base truncate">{previewTitle}</DialogTitle>
+              <div className="flex items-center gap-2 flex-shrink-0">
+                {isEditing && (
+                  <Badge variant="secondary" className="text-xs gap-1">
+                    <Pencil className="w-3 h-3" /> Mode édition
+                  </Badge>
+                )}
+                <Button
+                  variant={isEditing ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => {
+                    if (isEditing) {
+                      // Sauvegarder les modifs avant de quitter
+                      setPreviewHtml(getCurrentEditedHtml());
+                    }
+                    setIsEditing(!isEditing);
+                  }}
+                  disabled={previewLoading}
+                  className="gap-1"
+                >
+                  <Pencil className="w-4 h-4" />
+                  {isEditing ? "Terminer" : "Éditer"}
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={handleDownloadEdited}
+                  disabled={previewLoading || !previewDoc}
+                  className="gap-1"
+                >
+                  <Download className="w-4 h-4" /> Télécharger {isEditing ? "édité" : "PDF"}
+                </Button>
+              </div>
+            </div>
           </DialogHeader>
           <div className="flex-1 overflow-hidden bg-muted/20 rounded">
             {previewLoading ? (
@@ -553,12 +843,19 @@ export default function OPCOMobilites() {
               </div>
             ) : (
               <iframe
+                ref={previewIframeRef}
                 srcDoc={previewHtml}
+                onLoad={handleIframeLoad}
                 className="w-full h-full bg-background"
                 title="Aperçu OPCO"
               />
             )}
           </div>
+          {isEditing && (
+            <p className="text-xs text-muted-foreground px-1">
+              Cliquez dans le document pour modifier le texte. Cliquez sur "Télécharger édité" pour exporter votre version.
+            </p>
+          )}
         </DialogContent>
       </Dialog>
     </div>
