@@ -266,9 +266,9 @@ export const OPCO_DOCUMENTS: OpcoDocumentItem[] = [
   {
     code: "C6",
     label: "Evaluations",
-    longLabel: "Évaluations (positionnement, intermédiaire, finale)",
-    description: "Tests de positionnement et évaluations réalisées (corrigés et notés)",
-    autoTemplates: ["eval_positionnement_remplie", "eval_intermediaire_remplie", "eval_finale_remplie", "qcm_positionnement", "qcm_final"],
+    longLabel: "Évaluations IA (positionnement début/fin, intermédiaire, finale)",
+    description: "Pack d'évaluation 100% personnalisé par IA et adapté à la formation : QCM positionnement début (10 Q), QCM positionnement fin (10 Q), exercice intermédiaire (4 questions ouvertes), évaluation finale (5 exercices pratiques). Réponses différentes par stagiaire.",
+    autoTemplates: ["ai_test_positionnement_debut", "ai_test_positionnement_fin", "ai_exercice_intermediaire", "ai_evaluation_finale"],
     perStagiaire: true,
     category: "service_apprenant",
     forAllApprentis: true,
