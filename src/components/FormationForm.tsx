@@ -11,6 +11,7 @@ import { parseEdofXlsx, EdofSession } from "@/lib/edofParser";
 import { RNCP_FICHES } from "@/lib/rncpData";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { generateAIEvalPack, clearCachedPack } from "@/lib/aiEvalPack";
 
 interface FormationFormProps {
   data: FormationInfo;
