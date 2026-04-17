@@ -11,6 +11,7 @@ import { parseEdofXlsx, EdofSession } from "@/lib/edofParser";
 import { RNCP_FICHES } from "@/lib/rncpData";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { generateAIEvalPack, clearCachedPack } from "@/lib/aiEvalPack";
 
 interface FormationFormProps {
   data: FormationInfo;
@@ -44,8 +45,21 @@ const FormationForm = ({ data, onChange, onImportStagiaires }: FormationFormProp
       if (data?.error) throw new Error(data.error);
       const f = data?.formation as FormationInfo | undefined;
       if (!f?.intitule) throw new Error("Réponse IA vide");
-      onChange({ ...data.formation });
-      toast.success("✅ Formation générée — tous les champs remplis", { id: t });
+      onChange({ ...f });
+      toast.success("✅ Formation générée — génération des QCM/exercices…", { id: t });
+
+      // Génère immédiatement les QCM + exercices + évaluation finale cohérents avec la formation
+      try {
+        clearCachedPack(f);
+        await generateAIEvalPack(f, true);
+        toast.success("✅ QCM, exercices et évaluation finale générés (cohérents avec la formation)", { id: t });
+      } catch (evalErr: any) {
+        console.error("Eval pack generation error:", evalErr);
+        toast.warning(
+          "Formation OK mais génération des exercices échouée : " + (evalErr?.message || "réessayez via l'étape 5"),
+          { id: t },
+        );
+      }
     } catch (err: any) {
       console.error("AI generation error:", err);
       toast.error(err?.message || "Échec de la génération IA", { id: t });
