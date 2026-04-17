@@ -7613,6 +7613,79 @@ function generateEvalBesoinsAnswers(s: StagiaireInfo, f: FormationInfo, o: Organ
   const isEsthetique = t.includes("esthétique") || t.includes("cosmétique");
   const isInfo = t.includes("informatique") || t.includes("systèmes") || t.includes("réseaux");
   const isBureautique = t.includes("bureautique") || t.includes("pack office");
+  const isVTC = t.includes("vtc") || t.includes("conducteur") || t.includes("transport de personnes") || t.includes("t3p") || t.includes("chauffeur");
+
+  // === Early return : VTC (cohérent avec le métier de conducteur VTC) ===
+  if (isVTC) {
+    const vtcDiplomes = [
+      "Permis B en cours de validité (depuis plus de 5 ans)",
+      "CAP Conduite Routière",
+      "Baccalauréat professionnel Logistique et Transport",
+      "BEP Conduite et services dans le transport routier",
+      "Brevet des collèges + Permis B (8 ans)",
+      "Titre professionnel Conducteur de transport en commun sur route",
+      "CAP Agent d'accueil et de conduite routière, transport de voyageurs",
+      "Permis B (12 ans) + ancienne carte taxi (non renouvelée)",
+      "Baccalauréat général + Permis B (6 ans)",
+      "BEP Vente action marchande + Permis B (10 ans)",
+    ];
+    const vtcAttentes = [
+      `Obtenir la carte professionnelle VTC dans les meilleurs délais pour démarrer mon activité de conducteur indépendant et être opérationnel sur les plateformes Uber, Bolt et Heetch dès la fin de la formation.`,
+      `Maîtriser l'ensemble des 5 épreuves théoriques communes T3P et des 2 épreuves spécifiques VTC, ainsi que l'épreuve pratique d'admission, afin de réussir l'examen du premier coup.`,
+      `Comprendre la réglementation VTC (loi Grandguillaume, registre EVTC, obligations préfectorales) pour exercer en toute conformité dès le premier jour.`,
+      `Acquérir les bonnes pratiques de conduite premium et de relation client haut de gamme pour me différencier sur les plateformes et générer un chiffre d'affaires confortable.`,
+      `Comprendre les aspects gestion (statut micro-entreprise, TVA, URSSAF, charges) pour éviter les erreurs administratives qui pénalisent beaucoup de chauffeurs débutants.`,
+    ];
+    const vtcMissions = [
+      `Effectuer des courses de transport de personnes via les plateformes Uber et Bolt en région parisienne, principalement transferts aéroports (CDG, Orly) et courses urbaines.`,
+      `Assurer du transport haut de gamme pour une clientèle d'affaires : prises en charge en hôtels, transferts gares, déplacements professionnels en journée.`,
+      `Développer une clientèle de particuliers et d'entreprises en complément des plateformes, avec un véhicule premium (Mercedes Classe E ou équivalent).`,
+      `Travailler en flotte VTC partenaire avec un véhicule fourni, sur des plages horaires nuit/week-end pour optimiser les revenus.`,
+      `Démarrer en tant que chauffeur affilié sur Uber et Bolt, puis développer une activité d'autoentrepreneur indépendant à terme.`,
+    ];
+    const vtcContribution = [
+      `Cette formation me permet de structurer une nouvelle activité génératrice de revenus complémentaires ou principaux, dans un secteur en demande continue (mobilité urbaine, aéroports).`,
+      `L'obtention de la carte VTC ouvre la possibilité de créer une micro-entreprise immatriculée au registre EVTC, qui sera mon outil de travail principal pour les 5 prochaines années.`,
+      `Cette formation s'inscrit dans un projet de reconversion professionnelle vers une activité indépendante, où je serai maître de mon emploi du temps et de mes revenus.`,
+      `Devenir conducteur VTC me permet de combiner mon goût pour la conduite, le contact client et la liberté d'organisation, tout en sécurisant un revenu régulier via les plateformes.`,
+      `Le secteur VTC est en forte croissance (+12% par an en Île-de-France) et cette formation me positionne sur un marché porteur avec des perspectives stables.`,
+    ];
+    const vtcObjectif = [
+      `Obtenir ma carte professionnelle VTC et démarrer une activité de conducteur indépendant à temps plein dans les 60 jours suivant la fin de la formation.`,
+      `Réussir l'examen VTC du premier coup (théorie + pratique) et m'inscrire au registre EVTC pour commencer à conduire sur Uber et Bolt dès la délivrance de la carte.`,
+      `Devenir chauffeur VTC indépendant avec un objectif de chiffre d'affaires de 4 000 à 6 000 € HT/mois en travaillant 50 heures/semaine sur les plateformes.`,
+      `Créer ma micro-entreprise VTC, acquérir un véhicule conforme (moins de 6 ans, 4 portes, 4 places passagers minimum) et m'installer durablement comme chauffeur sur la zone aéroports/Paris.`,
+      `Compléter mes revenus actuels par une activité de chauffeur VTC le soir et le week-end, avec un objectif de 1 500 €/mois avant de basculer à temps plein dans 6 à 12 mois.`,
+    ];
+    const vtcProjetPro = [
+      `Cette formation me donnera la carte professionnelle VTC, sésame indispensable pour exercer légalement. Sans elle, impossible de m'inscrire sur les plateformes ni au registre EVTC.`,
+      `La maîtrise de la réglementation T3P et de la gestion micro-entreprise me permettra d'éviter les pièges administratifs qui font échouer beaucoup de chauffeurs débutants (URSSAF, TVA, contrôles préfectoraux).`,
+      `Grâce à la formation à l'anglais A2 et à la relation client haut de gamme, je pourrai cibler la clientèle aéroport et hôtels, qui est la plus rémunératrice du marché VTC.`,
+      `Cette formation est la première étape concrète de ma reconversion : carte VTC obtenue → immatriculation EVTC → équipement véhicule → mise en ligne sur Uber et Bolt → premières courses.`,
+      `Au-delà de la carte, l'apprentissage des bonnes pratiques (conduite premium, gestion plateformes, optimisation fiscale) me permettra de durer dans le métier et de générer un revenu pérenne.`,
+    ];
+    const vtcHandicap = [
+      "Non, je ne suis pas en situation de handicap. J'ai un permis B valide sans restriction médicale, indispensable pour exercer comme conducteur VTC.",
+      "Non, aucune situation de handicap. Ma visite médicale auprès d'un médecin agréé préfecture est à jour, condition obligatoire pour la carte VTC.",
+      "Non. Je suis en bonne santé et apte à la conduite professionnelle de longue durée (vérifié par mon médecin agréé).",
+      "Non, pas de handicap déclaré. Mon aptitude médicale à la conduite professionnelle a été récemment confirmée.",
+      "Non. Aucune restriction sur mon permis B et aucune contre-indication médicale à la conduite professionnelle.",
+    ];
+    return {
+      civilite,
+      raisonSociale: hasEntreprise ? s.entreprise : "/",
+      attentes: hasEntreprise ? vtcAttentes[h(4) % vtcAttentes.length] : "/",
+      missions: hasEntreprise ? vtcMissions[h(5) % vtcMissions.length] : "/",
+      contribution: hasEntreprise ? vtcContribution[h(6) % vtcContribution.length] : "/",
+      diplome: vtcDiplomes[h(2) % vtcDiplomes.length],
+      objectif: vtcObjectif[h(7) % vtcObjectif.length],
+      budget: hasEntreprise
+        ? "Formation prise en charge par l'OPCO Mobilités au titre du plan de développement des compétences."
+        : "Financement personnel via le CPF (compte personnel de formation) – environ 1 800 € TTC, complété si besoin par un abondement Pôle Emploi/France Travail.",
+      projetPro: vtcProjetPro[h(8) % vtcProjetPro.length],
+      handicap: vtcHandicap[h(9) % vtcHandicap.length],
+    };
+  }
 
   // === DIPLÔMES (10+ options par type) ===
   let diplomes: string[];
