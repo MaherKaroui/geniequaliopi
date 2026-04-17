@@ -505,13 +505,22 @@ export default function OPCOMobilites() {
                             <Upload className="w-4 h-4" />
                           </Button>
                           {doc.autoTemplates.length > 0 && (
-                            <Button
-                              variant="ghost" size="sm"
-                              onClick={() => handleDownloadSingle(doc)}
-                              title="Télécharger"
-                            >
-                              <Download className="w-4 h-4" />
-                            </Button>
+                            <>
+                              <Button
+                                variant="ghost" size="sm"
+                                onClick={() => handlePreview(doc)}
+                                title="Aperçu du document auto-généré"
+                              >
+                                <Eye className="w-4 h-4" />
+                              </Button>
+                              <Button
+                                variant="ghost" size="sm"
+                                onClick={() => handleDownloadSingle(doc)}
+                                title="Télécharger"
+                              >
+                                <Download className="w-4 h-4" />
+                              </Button>
+                            </>
                           )}
                           <div className="flex items-center gap-1 text-xs">
                             <Checkbox
@@ -531,6 +540,27 @@ export default function OPCOMobilites() {
           );
         })}
       </main>
+
+      <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
+        <DialogContent className="max-w-6xl h-[90vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="text-base">{previewTitle}</DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 overflow-hidden bg-muted/20 rounded">
+            {previewLoading ? (
+              <div className="h-full flex items-center justify-center text-muted-foreground gap-2">
+                <Loader2 className="w-5 h-5 animate-spin" /> Génération de l'aperçu...
+              </div>
+            ) : (
+              <iframe
+                srcDoc={previewHtml}
+                className="w-full h-full bg-background"
+                title="Aperçu OPCO"
+              />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
