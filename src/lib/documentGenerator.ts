@@ -10573,13 +10573,14 @@ function genBilanFinFormationFormateur(o: OrganismeInfo, f: FormationInfo, stagi
 // ============ CFA CT2 - IND 6 GENERATORS ============
 
 function genSupportCoursCFA(o: OrganismeInfo, f: FormationInfo) {
+  const theme = pickSupportTheme(`${f.intitule}|${f.codeRNCP || ''}|${o.nom}`);
   const chapters = getCourseChapters(f.intitule);
   const rncp = getRNCPByCode(f.codeRNCP || '');
   const { totalHours } = parseDuree(f.duree);
   const effectiveTotal = totalHours > 0 ? totalHours : 420;
 
   let chaptersHtml = '';
-  let tocHtml = '<div style="margin-bottom:30px"><h2 style="text-align:center;color:hsl(220,60%,50%)">SOMMAIRE</h2>';
+  let tocHtml = `<div style="margin-bottom:30px"><h2 style="text-align:center;color:${theme.primary}">SOMMAIRE</h2>`;
 
   if (rncp && rncp.blocsCompetences.length > 0) {
     // ===== RNCP-based rich support de cours =====
@@ -10591,19 +10592,19 @@ function genSupportCoursCFA(o: OrganismeInfo, f: FormationInfo) {
 
     // TOC for RNCP blocs
     rncp.blocsCompetences.forEach((bloc, bi) => {
-      tocHtml += `<div style="margin:12px 0;font-weight:bold;font-size:15px;color:hsl(220,60%,50%)">PARTIE ${bi + 1} — ${bloc.titre}</div>`;
+      tocHtml += `<div style="margin:12px 0;font-weight:bold;font-size:15px;color:${theme.primary}">PARTIE ${bi + 1} — ${bloc.titre}</div>`;
       bloc.matieres.forEach((mat, mi) => {
         const vol = Math.round((parseInt(mat.volume) || 0) * scale);
         tocHtml += `<div style="margin-left:20px;font-size:12px;color:#555">${bi + 1}.${mi + 1} ${mat.competence} <span style="color:#999">(${vol}h)</span></div>`;
       });
     });
-    tocHtml += `<div style="margin:12px 0;font-weight:bold;font-size:15px;color:hsl(220,60%,50%)">PARTIE ${rncp.blocsCompetences.length + 1} — Accompagnement et préparation à la certification</div>`;
+    tocHtml += `<div style="margin:12px 0;font-weight:bold;font-size:15px;color:${theme.primary}">PARTIE ${rncp.blocsCompetences.length + 1} — Accompagnement et préparation à la certification</div>`;
     tocHtml += '</div>';
 
     // Generate rich content per bloc
     rncp.blocsCompetences.forEach((bloc, bi) => {
       chaptersHtml += `<div class="page-break"></div>`;
-      chaptersHtml += `<div style="background:linear-gradient(135deg,hsl(220,60%,50%),hsl(240,50%,40%));color:white;padding:40px;border-radius:12px;margin-bottom:30px">`;
+      chaptersHtml += `<div style="background:linear-gradient(135deg,${theme.primary},${theme.dark});color:white;padding:40px;border-radius:12px;margin-bottom:30px">`;
       chaptersHtml += `<h2 style="color:white;font-size:28px;margin:0">PARTIE ${bi + 1}</h2>`;
       chaptersHtml += `<h3 style="color:white;font-size:20px;margin-top:10px">${bloc.titre}</h3>`;
       chaptersHtml += `<p style="color:rgba(255,255,255,0.85);margin-top:10px">Durée : ${Math.round(bloc.matieres.reduce((s, m) => s + (parseInt(m.volume) || 0), 0) * scale)}h &nbsp;|&nbsp; ${bloc.matieres.length} compétences professionnelles</p>`;
@@ -10611,8 +10612,8 @@ function genSupportCoursCFA(o: OrganismeInfo, f: FormationInfo) {
 
       // Overview table for this bloc
       chaptersHtml += `<div style="margin-bottom:25px">`;
-      chaptersHtml += `<h3 style="color:hsl(220,60%,50%);border-bottom:2px solid hsl(220,60%,50%);padding-bottom:5px;margin-bottom:12px">Vue d'ensemble du bloc</h3>`;
-      chaptersHtml += `<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%;font-size:12px"><thead><tr style="background:#1e3a7b;color:#fff"><th>Compétence</th><th>Contenu</th><th>Volume</th></tr></thead><tbody>`;
+      chaptersHtml += `<h3 style="color:${theme.primary};border-bottom:2px solid ${theme.primary};padding-bottom:5px;margin-bottom:12px">Vue d'ensemble du bloc</h3>`;
+      chaptersHtml += `<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%;font-size:12px"><thead><tr style="background:${theme.primaryHex};color:#fff"><th>Compétence</th><th>Contenu</th><th>Volume</th></tr></thead><tbody>`;
       bloc.matieres.forEach(mat => {
         const vol = Math.round((parseInt(mat.volume) || 0) * scale);
         chaptersHtml += `<tr><td style="font-weight:bold">${mat.competence}</td><td>${mat.contenu}</td><td style="text-align:center">${vol}h</td></tr>`;
@@ -10625,12 +10626,12 @@ function genSupportCoursCFA(o: OrganismeInfo, f: FormationInfo) {
         const contenuItems = mat.contenu.split(',').map(s => s.trim()).filter(Boolean);
         chaptersHtml += `<div class="page-break"></div>`;
         chaptersHtml += `<div style="margin-bottom:25px">`;
-        chaptersHtml += `<h3 style="color:hsl(220,60%,50%);font-size:16px;border-bottom:2px solid hsl(220,60%,50%);padding-bottom:5px;margin-bottom:12px">Module ${bi + 1}.${mi + 1} — ${mat.competence}</h3>`;
+        chaptersHtml += `<h3 style="color:${theme.primary};font-size:16px;border-bottom:2px solid ${theme.primary};padding-bottom:5px;margin-bottom:12px">Module ${bi + 1}.${mi + 1} — ${mat.competence}</h3>`;
         chaptersHtml += `<p><strong>Volume horaire :</strong> ${vol}h &nbsp;|&nbsp; <strong>Bloc :</strong> ${bloc.titre}</p>`;
 
         // 1. Objectifs pédagogiques
-        chaptersHtml += `<div style="background:#f0f7ff;border-left:4px solid hsl(220,60%,50%);padding:15px;border-radius:6px;margin:15px 0">`;
-        chaptersHtml += `<h4 style="margin:0 0 8px 0;color:hsl(220,60%,50%)">🎯 Objectifs pédagogiques</h4>`;
+        chaptersHtml += `<div style="background:${theme.soft};border-left:4px solid ${theme.primary};padding:15px;border-radius:6px;margin:15px 0">`;
+        chaptersHtml += `<h4 style="margin:0 0 8px 0;color:${theme.primary}">🎯 Objectifs pédagogiques</h4>`;
         chaptersHtml += `<p>À l'issue de ce module, l'apprenant sera capable de :</p><ul>`;
         contenuItems.forEach(item => {
           chaptersHtml += `<li>Maîtriser : ${item}</li>`;
@@ -10640,10 +10641,10 @@ function genSupportCoursCFA(o: OrganismeInfo, f: FormationInfo) {
         chaptersHtml += `</ul></div>`;
 
         // 2. Contenu détaillé par thème
-        chaptersHtml += `<h4 style="color:hsl(220,50%,35%);margin-top:20px">📚 Contenu détaillé</h4>`;
+        chaptersHtml += `<h4 style="color:${theme.accent};margin-top:20px">📚 Contenu détaillé</h4>`;
         contenuItems.forEach((item, ii) => {
           chaptersHtml += `<div style="background:${ii % 2 === 0 ? '#fafbfc' : '#fff'};border:1px solid #e0e0e0;border-radius:8px;padding:15px;margin:10px 0">`;
-          chaptersHtml += `<h5 style="margin:0 0 8px 0;color:hsl(220,50%,35%)">${bi + 1}.${mi + 1}.${ii + 1} — ${item}</h5>`;
+          chaptersHtml += `<h5 style="margin:0 0 8px 0;color:${theme.accent}">${bi + 1}.${mi + 1}.${ii + 1} — ${item}</h5>`;
           chaptersHtml += `<p><strong>Définition :</strong> ${item} constitue un ensemble de savoirs et de savoir-faire essentiels dans le cadre de la compétence « ${mat.competence} ». Ce thème couvre les aspects théoriques et pratiques nécessaires à la maîtrise professionnelle.</p>`;
           chaptersHtml += `<p><strong>Points clés à retenir :</strong></p><ul>`;
           chaptersHtml += `<li>Comprendre les fondamentaux de ${item.toLowerCase()}</li>`;
@@ -10685,14 +10686,14 @@ function genSupportCoursCFA(o: OrganismeInfo, f: FormationInfo) {
 
     // Partie accompagnement
     chaptersHtml += `<div class="page-break"></div>`;
-    chaptersHtml += `<div style="background:linear-gradient(135deg,hsl(150,50%,40%),hsl(170,40%,35%));color:white;padding:40px;border-radius:12px;margin-bottom:30px">`;
+    chaptersHtml += `<div style="background:linear-gradient(135deg,${theme.primary},${theme.dark});color:white;padding:40px;border-radius:12px;margin-bottom:30px">`;
     chaptersHtml += `<h2 style="color:white;font-size:28px;margin:0">PARTIE ${rncp.blocsCompetences.length + 1}</h2>`;
     chaptersHtml += `<h3 style="color:white;font-size:20px;margin-top:10px">Accompagnement et préparation à la certification</h3>`;
     chaptersHtml += `<p style="color:rgba(255,255,255,0.85);margin-top:10px">Durée : ${accompHours}h</p>`;
     chaptersHtml += `</div>`;
 
     chaptersHtml += `<div style="margin-bottom:25px">`;
-    chaptersHtml += `<h3 style="color:hsl(150,50%,35%);border-bottom:2px solid hsl(150,50%,35%);padding-bottom:5px;margin-bottom:12px">Contenu de l'accompagnement</h3>`;
+    chaptersHtml += `<h3 style="color:${theme.primary};border-bottom:2px solid ${theme.primary};padding-bottom:5px;margin-bottom:12px">Contenu de l'accompagnement</h3>`;
     chaptersHtml += `<div style="background:#f0faf0;padding:15px;border-radius:8px;margin:10px 0">`;
     chaptersHtml += `<h4>1. Accompagnement individuel</h4>`;
     chaptersHtml += `<ul><li>Entretiens individuels de suivi réguliers</li><li>Aide à la rédaction du dossier professionnel</li><li>Points d'avancement sur les compétences acquises</li><li>Soutien méthodologique et orientation</li></ul>`;
@@ -10705,9 +10706,9 @@ function genSupportCoursCFA(o: OrganismeInfo, f: FormationInfo) {
     // Fiche résumé certification
     chaptersHtml += `<div class="page-break"></div>`;
     chaptersHtml += `<div style="margin-bottom:25px">`;
-    chaptersHtml += `<h3 style="color:hsl(220,60%,50%);border-bottom:2px solid hsl(220,60%,50%);padding-bottom:5px;margin-bottom:12px">Fiche résumé de la certification</h3>`;
+    chaptersHtml += `<h3 style="color:${theme.primary};border-bottom:2px solid ${theme.primary};padding-bottom:5px;margin-bottom:12px">Fiche résumé de la certification</h3>`;
     chaptersHtml += `<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse;width:100%;font-size:12px">`;
-    chaptersHtml += `<tr><th style="background:#1e3a7b;color:#fff;width:35%">Information</th><th style="background:#1e3a7b;color:#fff">Détail</th></tr>`;
+    chaptersHtml += `<tr><th style="background:${theme.primaryHex};color:#fff;width:35%">Information</th><th style="background:${theme.primaryHex};color:#fff">Détail</th></tr>`;
     chaptersHtml += `<tr><td><strong>Titre</strong></td><td>${rncp.intitule}</td></tr>`;
     chaptersHtml += `<tr><td><strong>Code RNCP</strong></td><td>${rncp.code}</td></tr>`;
     chaptersHtml += `<tr><td><strong>Niveau</strong></td><td>${rncp.niveau}</td></tr>`;
@@ -10722,14 +10723,14 @@ function genSupportCoursCFA(o: OrganismeInfo, f: FormationInfo) {
 
     // Blocs de compétences summary
     chaptersHtml += `<div style="margin-bottom:25px">`;
-    chaptersHtml += `<h3 style="color:hsl(220,60%,50%);border-bottom:2px solid hsl(220,60%,50%);padding-bottom:5px;margin-bottom:12px">Synthèse des blocs de compétences</h3>`;
-    chaptersHtml += `<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%;font-size:12px"><thead><tr style="background:#1e3a7b;color:#fff"><th>Bloc</th><th>Intitulé</th><th>Compétences</th><th>Volume</th><th>Modalités d'évaluation</th></tr></thead><tbody>`;
+    chaptersHtml += `<h3 style="color:${theme.primary};border-bottom:2px solid ${theme.primary};padding-bottom:5px;margin-bottom:12px">Synthèse des blocs de compétences</h3>`;
+    chaptersHtml += `<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%;font-size:12px"><thead><tr style="background:${theme.primaryHex};color:#fff"><th>Bloc</th><th>Intitulé</th><th>Compétences</th><th>Volume</th><th>Modalités d'évaluation</th></tr></thead><tbody>`;
     rncp.blocsCompetences.forEach((bloc, bi) => {
       const vol = Math.round(bloc.matieres.reduce((s, m) => s + (parseInt(m.volume) || 0), 0) * scale);
       chaptersHtml += `<tr><td style="text-align:center;font-weight:bold">BC${bi + 1}</td><td>${bloc.titre}</td><td>${bloc.competences.join('<br>')}</td><td style="text-align:center">${vol}h</td><td style="font-size:11px">${bloc.modalitesEval}</td></tr>`;
     });
     chaptersHtml += `<tr style="background:#f5f5f5;font-weight:bold"><td></td><td>Accompagnement + Certification</td><td></td><td style="text-align:center">${accompHours}h</td><td></td></tr>`;
-    chaptersHtml += `<tr style="background:#1e3a7b;color:#fff;font-weight:bold"><td></td><td>TOTAL</td><td></td><td style="text-align:center">${effectiveTotal}h</td><td></td></tr>`;
+    chaptersHtml += `<tr style="background:${theme.primaryHex};color:#fff;font-weight:bold"><td></td><td>TOTAL</td><td></td><td style="text-align:center">${effectiveTotal}h</td><td></td></tr>`;
     chaptersHtml += `</tbody></table></div>`;
 
   } else {
@@ -10744,7 +10745,7 @@ function genSupportCoursCFA(o: OrganismeInfo, f: FormationInfo) {
 
     chapters.forEach((ch, ci) => {
       chaptersHtml += `<div class="page-break"></div>`;
-      chaptersHtml += `<div style="background:linear-gradient(135deg,hsl(220,60%,50%),hsl(240,50%,40%));color:white;padding:40px;border-radius:12px;margin-bottom:30px">`;
+      chaptersHtml += `<div style="background:linear-gradient(135deg,${theme.primary},${theme.dark});color:white;padding:40px;border-radius:12px;margin-bottom:30px">`;
       chaptersHtml += `<h2 style="color:white;font-size:28px;margin:0">CHAPITRE ${ci + 1}</h2>`;
       chaptersHtml += `<h3 style="color:white;font-size:20px;margin-top:10px">${ch.title}</h3>`;
       chaptersHtml += `<p style="color:rgba(255,255,255,0.85);margin-top:10px">${ch.description}</p>`;
@@ -10753,7 +10754,7 @@ function genSupportCoursCFA(o: OrganismeInfo, f: FormationInfo) {
       ch.sections.forEach((sec, si) => {
         if (si > 0 && si % 2 === 0) chaptersHtml += `<div class="page-break"></div>`;
         chaptersHtml += `<div style="margin-bottom:25px">`;
-        chaptersHtml += `<h3 style="color:hsl(220,60%,50%);font-size:16px;border-bottom:2px solid hsl(220,60%,50%);padding-bottom:5px;margin-bottom:12px">Section ${ci + 1}.${si + 1} — ${sec.title}</h3>`;
+        chaptersHtml += `<h3 style="color:${theme.primary};font-size:16px;border-bottom:2px solid ${theme.primary};padding-bottom:5px;margin-bottom:12px">Section ${ci + 1}.${si + 1} — ${sec.title}</h3>`;
         chaptersHtml += sec.content;
         chaptersHtml += `</div>`;
       });
@@ -10764,7 +10765,7 @@ function genSupportCoursCFA(o: OrganismeInfo, f: FormationInfo) {
 
   const closingHtml = `<div class="page-break"></div>
     <div style="text-align:center;padding:60px 20px">
-      <h2 style="color:hsl(220,60%,50%);font-size:24px">Merci de votre attention</h2>
+      <h2 style="color:${theme.primary};font-size:24px">Merci de votre attention</h2>
       <p style="color:#666;margin-top:15px">Nous espérons que ce support de cours vous a apporté les clés nécessaires pour maîtriser les compétences visées.</p>
       <div style="margin-top:40px">
         <p><strong>${o.dirigeant}</strong></p>
