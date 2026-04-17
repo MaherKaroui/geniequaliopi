@@ -176,8 +176,17 @@ function generateDocumentHTML(docId: string, o: OrganismeInfo, f: FormationInfo,
       if (!hasCV) return null;
       return generateListeFormateursHTML(cleanOrganisme, cvData, s);
     }
-    case "certificat_coursera":
-      return `<div style="font-family:Arial,sans-serif;max-width:860px;margin:0 auto;padding:0;">${courseCertificateHtml(cleanOrganisme, f)}</div>`;
+    case "certificat_coursera": {
+      // Format A4 paysage (297 x 210 mm) – marges ~15mm – certificat centré, ratio préservé (1.29/1)
+      const inner = courseCertificateHtml(cleanOrganisme, f);
+      return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="pdf-page-size" content="297x210"><style>
+@page { size: 297mm 210mm; margin: 0; }
+html,body { margin:0; padding:0; background:#fff; }
+.cert-page { width: 297mm; height: 210mm; box-sizing:border-box; padding: 15mm; display:flex; align-items:center; justify-content:center; background:#fff; }
+.cert-frame { width:100%; height:100%; max-width: 100%; max-height: 100%; aspect-ratio: 1.29 / 1; margin:0 auto; }
+.cert-frame > div { width:100% !important; max-width:100% !important; height:100% !important; margin:0 !important; aspect-ratio: 1.29 / 1 !important; }
+</style></head><body><div class="cert-page"><div class="cert-frame">${inner}</div></div></body></html>`;
+    }
     default: return null;
   }
 }
