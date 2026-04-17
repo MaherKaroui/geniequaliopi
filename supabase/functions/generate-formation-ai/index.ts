@@ -16,7 +16,35 @@ RÈGLES STRICTES :
 - Tout le contenu est rédigé en français professionnel impeccable.
 - Si un code RNCP/RS est fourni : tu structures le programme par BLOCS DE COMPÉTENCES officiels du référentiel et tu cites le code dans le titre.
 - Si pas de code : tu construis un programme générique mais détaillé jour par jour.
-- Le PROGRAMME doit être ventilé jour par jour ou module par module, avec horaires (09h00-12h00 / 13h30-17h30) et thèmes précis.
+- Le PROGRAMME doit OBLIGATOIREMENT être ventilé JOUR PAR JOUR avec créneaux horaires PRÉCIS au format suivant (à reproduire EXACTEMENT) :
+
+  Jour 1 – [Titre du jour] (7h) :
+  09h00–09h30 : [Activité courte d'accueil ou intro]
+  09h30–10h30 : [Activité 1]
+  10h30–11h30 : [Activité 2]
+  11h30–13h00 : [Activité 3]
+  14h00–15h30 : [Activité 4 après pause déjeuner]
+  15h30–16h00 : [Activité 5 courte]
+  16h00–17h00 : [Exercices pratiques guidés]
+
+  Jour 2 – [Titre du jour] (7h) :
+  09h00–11h00 : [Activité 1]
+  11h00–12h00 : [Activité 2]
+  13h00–14h30 : [Activité 3]
+  14h30–15h30 : [Activité 4 + test de positionnement fin si dernier jour]
+  15h30–16h30 : [Évaluation finale et bilan si dernier jour]
+  16h30–17h00 : [Grille d'acquisition si dernier jour]
+
+  RÈGLES STRICTES DU PROGRAMME :
+  * Chaque jour fait 7h effectives (pause déjeuner 13h00-14h00 NON comptée).
+  * Les créneaux utilisent le tiret demi-cadratin "–" (PAS le tiret simple "-") entre les heures.
+  * Le format horaire est OBLIGATOIREMENT "09h00–10h30" (avec "h" minuscule, sans espace).
+  * Le PREMIER jour commence par "Accueil, présentation de la formation et des objectifs" (09h00–09h30) puis "test de positionnement" dans le créneau suivant.
+  * Le DERNIER jour finit par : test de positionnement fin de formation, évaluation finale et bilan de formation, grille d'acquisition.
+  * Chaque jour a un titre thématique cohérent avec la progression pédagogique.
+  * Le nombre de jours doit correspondre à la durée totale (ex: 14h = 2 jours, 21h = 3 jours, 35h = 5 jours, 140h VTC = 20 jours).
+  * Sépare chaque jour par une LIGNE VIDE (\\n\\n).
+  * Sépare chaque créneau par un saut de ligne simple (\\n).
 - Les OBJECTIFS PÉDAGOGIQUES sont formulés avec des verbes opérationnels (Bloom : maîtriser, identifier, analyser, mettre en œuvre, évaluer...).
 - Les PRÉREQUIS sont concrets (niveau scolaire, expérience, prérequis techniques, médicaux, juridiques selon le métier).
 - Les MÉTHODES D'ÉVALUATION incluent : QCM de positionnement initial, évaluations formatives intermédiaires, évaluation finale (pratique + théorique selon métier), grille d'acquisition, bilan à chaud / à froid.
@@ -75,7 +103,7 @@ const FORMATION_TOOL = {
         programme: {
           type: "string",
           description:
-            "Programme DÉTAILLÉ jour par jour ou module par module, avec horaires (09h00-12h00 / 13h30-17h30) et thèmes précis. Utiliser des sauts de ligne (\\n). Très complet : minimum 800 caractères.",
+            "Programme DÉTAILLÉ ventilé JOUR PAR JOUR avec créneaux horaires PRÉCIS au format EXACT 'Jour N – Titre (7h) :' suivi de créneaux 'HHhMM–HHhMM : activité' (tiret demi-cadratin –, h minuscule). Pause déjeuner 13h00–14h00 non comptée. Le 1er jour commence par accueil + test de positionnement. Le dernier jour finit par test de positionnement fin, évaluation finale, bilan, grille d'acquisition. Séparer chaque jour par une ligne vide (\\n\\n).",
         },
         methodesEvaluation: {
           type: "string",
