@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { X, PenTool, Sparkles } from "lucide-react";
 import SignaturePad from "@/components/SignaturePad";
 import { generateFakeStagiairesIDF } from "@/lib/fakeStagiaireIDF";
+import { REGIONS, RegionKey } from "@/lib/fakeStagiaireRegions";
 import { toast } from "sonner";
 
 const FORMATEURS_PREDIFINIS = [
@@ -37,12 +38,14 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
   // Track which signature pad is open: "sig-0", "resp-1", "formateur-2", etc.
   const [drawingPad, setDrawingPad] = useState<string | null>(null);
   const [fakeCount, setFakeCount] = useState<number>(5);
+  const [fakeRegion, setFakeRegion] = useState<RegionKey | "all">("ile-de-france");
   const addStagiaire = () => onChange([...data, { ...emptyStagiaire }]);
   const generateFakes = (replace: boolean) => {
     const n = Math.max(1, Math.min(100, Math.floor(fakeCount) || 1));
-    const fakes = generateFakeStagiairesIDF({ count: n });
+    const fakes = generateFakeStagiairesIDF({ count: n, region: fakeRegion });
     onChange(replace ? fakes : [...data, ...fakes]);
-    toast.success(`${n} stagiaire(s) fictif(s) IDF généré(s)`);
+    const regionLabel = fakeRegion === "all" ? "France entière" : REGIONS[fakeRegion].label;
+    toast.success(`${n} stagiaire(s) fictif(s) généré(s) – ${regionLabel}`);
   };
   const removeStagiaire = (index: number) => onChange(data.filter((_, i) => i !== index));
   const updateStagiaire = (index: number, field: keyof StagiaireInfo, value: string) => {
@@ -75,12 +78,25 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
         </div>
         <div className="flex flex-wrap items-end gap-2">
           <div className="flex flex-col">
-            <Label className="text-xs">Nb fictifs IDF</Label>
+            <Label className="text-xs">Région</Label>
+            <select
+              className="flex h-9 rounded-md border border-input bg-background px-2 text-sm"
+              value={fakeRegion}
+              onChange={e => setFakeRegion(e.target.value as RegionKey | "all")}
+            >
+              <option value="all">France entière</option>
+              {Object.entries(REGIONS).map(([key, r]) => (
+                <option key={key} value={key}>{r.label}</option>
+              ))}
+            </select>
+          </div>
+          <div className="flex flex-col">
+            <Label className="text-xs">Nb fictifs</Label>
             <Input
               type="number" min={1} max={100}
               value={fakeCount}
               onChange={e => setFakeCount(parseInt(e.target.value) || 1)}
-              className="h-9 w-24"
+              className="h-9 w-20"
             />
           </div>
           <Button onClick={() => generateFakes(false)} size="sm" variant="outline" className="gap-1 h-9">
