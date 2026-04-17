@@ -32,11 +32,36 @@ const GenerateurTampon = () => {
   const [showSignaturePad, setShowSignaturePad] = useState(false);
   const [isDraggingSignature, setIsDraggingSignature] = useState(false);
 
-  const [topText, setTopText] = useState("SELECT FORMATION");
-  const [middleText, setMiddleText] = useState("Organisme de Formation");
-  const [bottomText, setBottomText] = useState("SIRET 123 456 789 00012");
-  const [centerText, setCenterText] = useState("VILLIERS-LE-BEL");
-  const [subCenterText, setSubCenterText] = useState("NDA 11 95 12345 95");
+  // Pré-remplissage depuis le formulaire Organisme (via localStorage)
+  const prefill = (() => {
+    try {
+      const raw = localStorage.getItem("tampon_prefill_organisme");
+      if (!raw) return null;
+      const o = JSON.parse(raw);
+      const ville = [o.codePostal, o.ville].filter(Boolean).join(" ").trim();
+      return {
+        top: (o.nom || "SELECT FORMATION").toUpperCase(),
+        middle: "Organisme de Formation",
+        bottom: o.siret ? `SIRET ${o.siret}` : "SIRET 123 456 789 00012",
+        center: (ville || o.ville || "VILLIERS-LE-BEL").toUpperCase(),
+        sub: o.nda ? `NDA ${o.nda}` : "NDA 11 95 12345 95",
+      };
+    } catch { return null; }
+  })();
+
+  const [topText, setTopText] = useState(prefill?.top ?? "SELECT FORMATION");
+  const [middleText, setMiddleText] = useState(prefill?.middle ?? "Organisme de Formation");
+  const [bottomText, setBottomText] = useState(prefill?.bottom ?? "SIRET 123 456 789 00012");
+  const [centerText, setCenterText] = useState(prefill?.center ?? "VILLIERS-LE-BEL");
+  const [subCenterText, setSubCenterText] = useState(prefill?.sub ?? "NDA 11 95 12345 95");
+
+  useEffect(() => {
+    if (prefill) {
+      localStorage.removeItem("tampon_prefill_organisme");
+      toast.success("Champs pré-remplis depuis l'organisme");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const [shape, setShape] = useState<StampShape>("round");
   const [color, setColor] = useState("#1e40af");

@@ -12,6 +12,7 @@ interface LogoSignatureUploadProps {
   onLogoChange: (url: string) => void;
   onSignatureChange: (url: string) => void;
   onTamponChange?: (url: string) => void;
+  organismePrefill?: { nom?: string; siret?: string; ville?: string; codePostal?: string; nda?: string };
 }
 
 const UploadCard = ({
@@ -74,7 +75,7 @@ const UploadCard = ({
   </div>
 );
 
-const LogoSignatureUpload = ({ logoUrl, signatureUrl, tamponUrl, onLogoChange, onSignatureChange, onTamponChange }: LogoSignatureUploadProps) => {
+const LogoSignatureUpload = ({ logoUrl, signatureUrl, tamponUrl, onLogoChange, onSignatureChange, onTamponChange, organismePrefill }: LogoSignatureUploadProps) => {
   const logoRef = useRef<HTMLInputElement>(null);
   const sigRef = useRef<HTMLInputElement>(null);
   const tamponRef = useRef<HTMLInputElement>(null);
@@ -140,7 +141,14 @@ const LogoSignatureUpload = ({ logoUrl, signatureUrl, tamponUrl, onLogoChange, o
             altText="Tampon"
             onClear={() => onTamponChange("")}
             onUpload={() => tamponRef.current?.click()}
-            onGenerate={() => navigate("/generateur-tampon")}
+            onGenerate={() => {
+              if (organismePrefill) {
+                try {
+                  localStorage.setItem("tampon_prefill_organisme", JSON.stringify(organismePrefill));
+                } catch {}
+              }
+              navigate("/generateur-tampon");
+            }}
             generateLabel="Générer"
           />
         )}

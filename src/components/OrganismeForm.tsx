@@ -211,6 +211,13 @@ const OrganismeForm = ({ data, onChange, hideFields = [] }: OrganismeFormProps) 
           onLogoChange={(url) => onChange({ ...data, logoUrl: url })}
           onSignatureChange={(url) => onChange({ ...data, signatureUrl: url })}
           onTamponChange={(url) => onChange({ ...data, tamponUrl: url })}
+          organismePrefill={{
+            nom: data.nom,
+            siret: data.siret,
+            ville: data.ville,
+            codePostal: data.codePostal,
+            nda: data.nda,
+          }}
         />
       </div>
     </div>
