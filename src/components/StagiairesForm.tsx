@@ -3,8 +3,10 @@ import { StagiaireInfo } from "@/types/qualiopi";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { X, PenTool } from "lucide-react";
+import { X, PenTool, Sparkles } from "lucide-react";
 import SignaturePad from "@/components/SignaturePad";
+import { generateFakeStagiairesIDF } from "@/lib/fakeStagiaireIDF";
+import { toast } from "sonner";
 
 const FORMATEURS_PREDIFINIS = [
   "AHMED EL HILALI",
@@ -34,7 +36,14 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
   const sigFormateurRefs = useRef<Record<number, HTMLInputElement | null>>({});
   // Track which signature pad is open: "sig-0", "resp-1", "formateur-2", etc.
   const [drawingPad, setDrawingPad] = useState<string | null>(null);
+  const [fakeCount, setFakeCount] = useState<number>(5);
   const addStagiaire = () => onChange([...data, { ...emptyStagiaire }]);
+  const generateFakes = (replace: boolean) => {
+    const n = Math.max(1, Math.min(100, Math.floor(fakeCount) || 1));
+    const fakes = generateFakeStagiairesIDF({ count: n });
+    onChange(replace ? fakes : [...data, ...fakes]);
+    toast.success(`${n} stagiaire(s) fictif(s) IDF généré(s)`);
+  };
   const removeStagiaire = (index: number) => onChange(data.filter((_, i) => i !== index));
   const updateStagiaire = (index: number, field: keyof StagiaireInfo, value: string) => {
     const updated = [...data];
@@ -59,14 +68,31 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-6">
         <div>
           <h2 className="text-xl font-bold">Stagiaires</h2>
           <p className="text-sm text-muted-foreground">{data.length} stagiaire(s) ajouté(s)</p>
         </div>
-        <Button onClick={addStagiaire} size="sm">
-          + Ajouter
-        </Button>
+        <div className="flex flex-wrap items-end gap-2">
+          <div className="flex flex-col">
+            <Label className="text-xs">Nb fictifs IDF</Label>
+            <Input
+              type="number" min={1} max={100}
+              value={fakeCount}
+              onChange={e => setFakeCount(parseInt(e.target.value) || 1)}
+              className="h-9 w-24"
+            />
+          </div>
+          <Button onClick={() => generateFakes(false)} size="sm" variant="outline" className="gap-1 h-9">
+            <Sparkles className="w-4 h-4" /> Générer (ajouter)
+          </Button>
+          <Button onClick={() => generateFakes(true)} size="sm" variant="outline" className="gap-1 h-9">
+            <Sparkles className="w-4 h-4" /> Générer (remplacer)
+          </Button>
+          <Button onClick={addStagiaire} size="sm" className="h-9">
+            + Ajouter
+          </Button>
+        </div>
       </div>
 
       {data.length === 0 && (
