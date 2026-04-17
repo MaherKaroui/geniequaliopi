@@ -319,9 +319,9 @@ const DemandeNDA = () => {
   };
 
   const handlePreview = (docId: string) => {
-    const html = generateDocumentHTML(docId, organisme, formation, stagiaires, cvData, cvDesign);
+    const html = generateDocumentHTML(docId, organisme, formation, stagiaires, cvData, cvDesign, uploadedCV);
     if (!html) {
-      toast.error(docId === "logo" ? "Veuillez d'abord importer un logo" : "Veuillez remplir le CV du formateur");
+      toast.error(docId === "logo" ? "Veuillez d'abord importer un logo" : "Veuillez remplir le CV du formateur ou en uploader un");
       return;
     }
     setPreviewDoc(docId);
@@ -329,7 +329,7 @@ const DemandeNDA = () => {
   };
 
   const handleDownload = async (docId: string) => {
-    const html = generateDocumentHTML(docId, organisme, formation, stagiaires, cvData, cvDesign);
+    const html = generateDocumentHTML(docId, organisme, formation, stagiaires, cvData, cvDesign, uploadedCV);
     if (!html) { toast.error("Document non disponible."); return; }
     if (docId === "logo" && organisme.logoUrl) {
       const a = document.createElement("a");
