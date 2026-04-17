@@ -356,6 +356,53 @@ function veilleReglementaireRows(f: FormationInfo, type: FormationType): string[
     ];
   }
 
+  if (type === "vtc") {
+    return [...common,
+      [
+        `<a href="https://www.legifrance.gouv.fr/loda/id/JORFTEXT000035419744/">Légifrance – Arrêté du 11/08/2017</a>`,
+        "Arrêté du 11 août 2017 modifié relatif à l'examen pour l'obtention de la carte professionnelle VTC",
+        veilleDate(f, 8),
+        "Définit les épreuves d'examen VTC : 5 épreuves communes T3P (réglementation, gestion, sécurité routière, secourisme, français) + 2 épreuves spécifiques VTC + 1 épreuve d'admission pratique. Note ≥ 10/20 sans note < 6/20.",
+        "Preuve : arrêté consolidé + référentiel d'évaluation CMA. Action : aligner intégralement le programme sur les 8 épreuves et les modalités d'évaluation."
+      ],
+      [
+        `<a href="https://www.legifrance.gouv.fr/loda/id/JORFTEXT000029434679/">Légifrance – Loi Thévenoud</a>`,
+        "Loi n° 2014-1104 du 1er octobre 2014 relative aux taxis et VTC",
+        veilleDate(f, 7),
+        "Cadre juridique fondateur du VTC : distinction Taxi/VTC, interdiction de la maraude, obligation de réservation préalable, retour à la base après course, registre national VTC.",
+        "Preuve : version consolidée. Action : module dédié sur les obligations spécifiques VTC vs Taxi (épreuve spécifique 1)."
+      ],
+      [
+        `<a href="https://www.legifrance.gouv.fr/codes/section_lc/LEGITEXT000023086525/LEGISCTA000028538027/">Légifrance – Code des transports L3122</a>`,
+        "Code des transports – Articles L3122-1 à L3122-12 (VTC)",
+        veilleDate(f, 6),
+        "Réglementation VTC : conditions d'exercice, signalétique (macaron rouge), tarification libre, obligations du conducteur, sanctions pénales en cas d'infraction.",
+        "Preuve : extrait du code. Action : intégrer les sanctions et le contrôle (DREAL, police) dans le module réglementation."
+      ],
+      [
+        `<a href="https://www.cma-france.fr/examen-vtc">CMA France – Examen VTC</a>`,
+        "CMA France – Modalités officielles de l'examen VTC (certificateur RS5637)",
+        veilleDate(f, 5),
+        "Calendrier des sessions, droits d'inscription (221€), centres d'examen, programme officiel des 8 épreuves, taux de réussite national.",
+        "Preuve : page CMA + convocations stagiaires. Action : informer les stagiaires des dates de sessions et préparer aux modalités exactes."
+      ],
+      [
+        `<a href="https://www.legifrance.gouv.fr/codes/section_lc/LEGITEXT000006074228/LEGISCTA000006159515/">Légifrance – Code de la route</a>`,
+        "Code de la route – Évolutions applicables aux conducteurs professionnels",
+        veilleDate(f, 4),
+        "Évolutions du Code de la route : abaissement vitesses, ZFE-m (Zones à Faibles Émissions mobilité), permis à points, alcoolémie professionnelle (0,2 g/L pour transport public).",
+        "Preuve : textes consolidés. Action : actualiser le module sécurité routière avec les ZFE-m (impact direct sur l'activité VTC en agglomération)."
+      ],
+      [
+        `<a href="https://www.economie.gouv.fr/entreprises/auto-entrepreneur-creation">economie.gouv.fr – Micro-entrepreneur</a>`,
+        "Statut micro-entrepreneur – Plafonds et obligations 2025 pour VTC",
+        veilleMonthYear(f, 3),
+        "Plafond CA micro-BIC services : 77 700€ (2025). TVA franchise en base sous 36 800€. Cotisations URSSAF 21,2% pour prestations de services. Obligations comptables simplifiées.",
+        "Preuve : page officielle. Action : module gestion d'entreprise actualisé avec les plafonds en vigueur."
+      ],
+    ];
+  }
+
   if (type === "ecsr") {
     return [...common,
       [
@@ -814,11 +861,54 @@ function veilleMetierRows(f: FormationInfo, type: FormationType): string[][] {
     ];
   }
 
-  if (type === "ecsr") {
+  if (type === "vtc") {
     return [
       [
-        `<a href="https://www.securite-routiere.gouv.fr/">securite-routiere.gouv.fr</a>`,
-        "Délégation à la Sécurité Routière – Statistiques et prévention",
+        `<a href="https://www.uber.com/fr/fr/drive/">Uber Drivers – Plateforme VTC</a>`,
+        "Uber – Plateforme leader de mise en relation VTC (commissions, conditions)",
+        veilleMonthYear(f, 8),
+        "Uber : commission 25%, paiement hebdomadaire, système de notation client (4,7/5 minimum), exigences véhicule (4 portes, climatisation, < 7 ans).",
+        "Preuve : capture conditions Uber. Action : module développement commercial – choix de la plateforme et optimisation des courses."
+      ],
+      [
+        `<a href="https://drivers.bolt.eu/fr/">Bolt – Devenir chauffeur VTC</a>`,
+        "Bolt – Plateforme VTC alternative (Estonie, présence FR)",
+        veilleMonthYear(f, 7),
+        "Bolt : commission 15-20% (plus avantageuse qu'Uber), positionnement prix bas, croissance rapide en France. Multi-plateforme recommandée.",
+        "Preuve : page chauffeurs Bolt. Action : intégrer le multi-plateforme dans la stratégie commerciale du futur VTC."
+      ],
+      [
+        `<a href="https://drivers.heetch.com/fr">Heetch – Plateforme VTC française</a>`,
+        "Heetch – VTC français positionné jeunes/nightlife",
+        veilleMonthYear(f, 6),
+        "Heetch : plateforme française, positionnement nightlife (sorties, festivals), commission 10%, clientèle jeune urbaine. Niche commerciale intéressante.",
+        "Preuve : page partenaires. Action : présenter aux stagiaires les positionnements différenciants des plateformes."
+      ],
+      [
+        `<a href="https://www.fnam.fr/">FNAM – Fédération Nationale des Auto-Entrepreneurs et Micro-entrepreneurs</a>`,
+        "FNAM – Représentation des chauffeurs VTC indépendants",
+        veilleMonthYear(f, 5),
+        "Syndicat représentatif. Veille sur les conditions d'exercice, négociations avec les plateformes, défense des chauffeurs.",
+        "Preuve : actualités FNAM. Action : sensibiliser les futurs VTC aux droits et représentation collective."
+      ],
+      [
+        `<a href="https://www.urssaf.fr/portail/home/independant/mes-cotisations/comment-sont-calculees-mes-cotisat/microentrepreneur--auto-entrepre.html">URSSAF – Cotisations VTC</a>`,
+        "URSSAF – Cotisations sociales du chauffeur VTC indépendant",
+        veilleMonthYear(f, 4),
+        "Taux cotisations services BIC : 21,2% du CA. Versement libératoire impôt sur le revenu : 1,7% supplémentaire. Déclaration mensuelle ou trimestrielle.",
+        "Preuve : simulateur URSSAF. Action : exercices pratiques de calcul de cotisations dans le module gestion."
+      ],
+      [
+        `<a href="https://www.youtube.com/results?search_query=devenir+chauffeur+vtc+2025">YouTube – Témoignages chauffeurs VTC</a>`,
+        "YouTube – Retours d'expérience de chauffeurs VTC en activité",
+        veilleYear(f, 3),
+        "Vidéos de chauffeurs VTC : revenus réels (1800-3500€/mois), conditions de travail, choix du véhicule (Peugeot 508, Mercedes Classe E), conseils débutants.",
+        "Preuve : playlist vidéos. Action : enrichir le module développement commercial avec des cas concrets de réussite/difficulté."
+      ],
+    ];
+  }
+
+  if (type === "ecsr") {
         veilleMonthYear(f, 8),
         "Données officielles sur l'accidentalité routière, les comportements à risque et les campagnes de prévention. Référence pour les modules de sensibilisation.",
         "Preuve : rapport annuel accidentalité. Action : actualiser les données statistiques dans le module sécurité routière (CCP2)."
@@ -1239,10 +1329,47 @@ function veilleTechnoRows(f: FormationInfo, type: FormationType): string[][] {
     ];
   }
 
-  if (type === "ecsr") {
+  if (type === "vtc") {
     return [...commonDigitalLearning,
       [
-        `<a href="https://www.securite-routiere.gouv.fr/">Sécurité Routière – Simulateurs</a>`,
+        `<a href="https://www.waze.com/fr/">Waze – Navigation GPS communautaire</a>`,
+        "Waze – Outil GPS de référence pour les VTC",
+        veilleMonthYear(f, 7),
+        "Waze : navigation GPS gratuite avec données de trafic en temps réel, signalements communautaires (radars, accidents), itinéraires optimisés. Outil quotidien du VTC.",
+        "Preuve : capture interface. Action : module pratique sur la maîtrise de Waze (paramétrage, itinéraires bis, gestion des alertes)."
+      ],
+      [
+        `<a href="https://maps.google.com/">Google Maps – Navigation et estimation course</a>`,
+        "Google Maps – Estimation prix et durée pour devis VTC",
+        veilleMonthYear(f, 6),
+        "Google Maps Distance Matrix API : calcul automatique de distance et durée pour devis client. Intégration possible dans une appli de réservation propre.",
+        "Action : présenter aux stagiaires l'utilisation de Google Maps pour établir des devis fiables (épreuve relation client)."
+      ],
+      [
+        `<a href="https://www.uber.com/fr/fr/drive/driver-app/">Uber Driver App – Application chauffeur</a>`,
+        "Uber Driver – Application mobile dédiée aux VTC",
+        veilleMonthYear(f, 5),
+        "Application Uber Driver : acceptation course, navigation intégrée, gestion paiement, statistiques performance, programme Uber Pro (niveaux Bleu/Or/Platine/Diamant avec avantages).",
+        "Preuve : captures app. Action : démonstration en formation de l'app et du programme de fidélité chauffeur."
+      ],
+      [
+        `<a href="https://www.tesla.com/fr_fr/modely">Véhicules électriques pour VTC – Tesla, Hyundai Ioniq</a>`,
+        "Mobilité électrique – Véhicules adaptés à l'activité VTC",
+        veilleMonthYear(f, 4),
+        "Véhicules électriques (Tesla Model 3, Hyundai Ioniq 5, Kia EV6) : autonomie 400-500 km, coût/km divisé par 3, accès ZFE-m garanti, image premium pour le client.",
+        "Preuve : comparatif TCO. Action : module gestion d'entreprise – choix du véhicule (thermique vs électrique, location longue durée)."
+      ],
+      [
+        `<a href="https://www.zenpark.com/">Zenpark, Onepark – Stationnement urbain</a>`,
+        "Applications de stationnement intelligent pour VTC",
+        veilleMonthYear(f, 3),
+        "Solutions de stationnement (Zenpark, Onepark, Yespark) : réservation à l'avance, parkings disponibles en temps réel. Indispensable pour les VTC en attente de course.",
+        "Action : ressource pratique pour optimiser les temps morts entre courses (épreuve gestion d'activité)."
+      ],
+    ];
+  }
+
+  if (type === "ecsr") {
         "Simulateurs de conduite et outils numériques pédagogiques",
         veilleMonthYear(f, 7),
         "Évolutions des simulateurs de conduite pour la formation : réalité virtuelle, scénarios de conduite en conditions dégradées, éco-conduite.",
