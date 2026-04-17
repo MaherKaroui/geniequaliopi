@@ -611,6 +611,25 @@ export const SAMPLE_FORMATIONS: FormationInfo[] = [
     nombreParticipants: "8",
     formateur: "Marie Fontaine",
   },
+  {
+    intitule: "Habilitation VTC – Préparation à l'examen (RS5637)",
+    objectifs: "Préparer l'examen d'aptitude professionnelle de chauffeur VTC délivré par les CMA France : maîtriser la réglementation T3P, la sécurité routière, la gestion d'entreprise (micro-entrepreneur, fiscalité, facturation), la réglementation spécifique VTC (tarification, mise à disposition, statut), le français (compréhension écrite/orale) et l'anglais niveau A2, et préparer l'épreuve pratique d'admission (conduite, accueil client, itinéraire).",
+    prerequis: "Permis B en cours de validité depuis plus de 3 ans (2 ans en conduite accompagnée), casier judiciaire compatible (B2), aptitude médicale délivrée par un médecin agréé préfecture, certificat PSC1 ou équivalent",
+    duree: "140 heures (20 jours)",
+    modalites: "mixte",
+    tarif: "1 990 € HT par stagiaire",
+    programme: "Module 1 – Réglementation T3P (21h) :\nCadre juridique du transport public particulier de personnes (loi Thévenoud, Code des transports), différences VTC/Taxi/LOTI, carte professionnelle, registre VTC, sanctions et contrôles\n\nModule 2 – Gestion d'entreprise (21h) :\nStatut micro-entrepreneur, régime fiscal et social, URSSAF, TVA, comptabilité simplifiée, business plan, financement, assurance flotte, choix du véhicule (achat/LLD/LOA)\n\nModule 3 – Sécurité routière (14h) :\nRappel du Code de la route, conduite défensive et économique, gestion de la fatigue, alcool/stupéfiants, premiers secours (PSC1), gestion des situations d'urgence (méthode PAS)\n\nModule 4 – Français (14h) :\nCompréhension écrite (consignes, contrats, documents administratifs), expression orale professionnelle, communication client, gestion des réclamations\n\nModule 5 – Anglais A2 (14h) :\nVocabulaire de l'accueil client, indications d'itinéraire, situations courantes (aéroport, hôtel, paiement), expressions de courtoisie\n\nModule 6 – Réglementation spécifique VTC (21h) :\nTarification (forfait/horokilométrique), interdictions (maraude, station de taxi), mise à disposition préalable, plateformes numériques (Uber, Bolt, Heetch), commissions, statut juridique du chauffeur de plateforme\n\nModule 7 – Développement commercial et qualité de service (14h) :\nRelation client, gestion des avis, fidélisation, image professionnelle, tenue vestimentaire, propreté du véhicule, ZFE-m\n\nModule 8 – Préparation à l'épreuve pratique d'admission (21h) :\nMises en situation : prise en charge client (aéroport, hôtel, gare), conduite avec client à bord, gestion d'itinéraire avec GPS, facturation embarquée, accueil multilingue, examens blancs",
+    methodesEvaluation: "QCM de positionnement initial (10 questions), QCM intermédiaires par module, examens blancs CMA France (5 épreuves communes T3P + 2 épreuves spécifiques VTC), évaluation pratique sur véhicule école (épreuve d'admission), grille d'acquisition des compétences, bilan à chaud et à froid",
+    moyensPedagogiques: "Salle équipée de PC, vidéoprojecteur, plateforme LMS Moodle (modules e-learning Code de la route VTC, QCM auto-corrigés), véhicule école climatisé équipé GPS et terminal de paiement, supports de cours réglementation T3P (CMA France), Code des transports à jour, simulateur de conduite, classeur stagiaire avec annales d'examens",
+    publicVise: "Demandeurs d'emploi en reconversion, salariés souhaitant changer de métier, micro-entrepreneurs en création d'activité VTC, conducteurs souhaitant régulariser leur activité",
+    delaiAcces: "14 jours avant le début de la session",
+    dateDebut: "2025-10-06",
+    dateFin: "2025-12-12",
+    lieu: "25 avenue de la Formation Professionnelle, 75008 Paris – Salle B2 + véhicule école",
+    nombreParticipants: "8",
+    formateur: "Alexandre Petit",
+    codeRNCP: "RS5637",
+  },
 ];
 
 // Satisfaction scores (pre-filled realistic data)
