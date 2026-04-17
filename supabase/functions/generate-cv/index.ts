@@ -199,10 +199,3 @@ serve(async (req) => {
     });
   }
 });
-  } catch (e) {
-    console.error("generate-cv error:", e);
-    return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Erreur inconnue" }), {
-      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
-  }
-});
