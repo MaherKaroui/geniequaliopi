@@ -131,7 +131,7 @@ serve(async (req) => {
         type: "text",
         text: hasDesc
           ? "Extrait fidèlement les infos du CV ci-joint, complète avec la description ci-dessus si besoin."
-          : "Extrait fidèlement TOUTES les informations de ce CV (nom, prénom, expériences, formations, compétences, langues, certifications, contact). Ne romance pas, garde les vraies données.",
+          : "Voici le CV à analyser. Lis CHAQUE PAGE attentivement et extrais TOUT le contenu : nom, prénom, email, téléphone, TOUTES les expériences professionnelles avec leurs descriptions, TOUTES les formations/diplômes, TOUTES les compétences techniques, langues, certifications. Ne saute aucune section. Appelle ensuite l'outil generate_cv avec le JSON complet.",
       });
       // Gemini supports image_url with data URLs (image/* and application/pdf).
       userContent.push({
@@ -140,6 +140,7 @@ serve(async (req) => {
       });
     }
 
+    // Use gemini-2.5-pro for stronger multimodal extraction (better PDF reading).
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -147,7 +148,7 @@ serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: hasFile ? "google/gemini-2.5-pro" : "google/gemini-2.5-flash",
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
           { role: "user", content: userContent },
@@ -175,13 +176,29 @@ serve(async (req) => {
 
     const data = await response.json();
     const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
-    if (!toolCall) throw new Error("No tool call in response");
+    if (!toolCall) {
+      console.error("No tool call. Raw response:", JSON.stringify(data).slice(0, 2000));
+      throw new Error("No tool call in response");
+    }
 
     const cvData = JSON.parse(toolCall.function.arguments);
+    console.log("Extracted CV summary:", {
+      prenom: cvData.prenom, nom: cvData.nom,
+      experiences: cvData.experiences?.length || 0,
+      formations: cvData.formations?.length || 0,
+      competences: cvData.competences?.length || 0,
+    });
 
     return new Response(JSON.stringify(cvData), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
+  } catch (e) {
+    console.error("generate-cv error:", e);
+    return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Erreur inconnue" }), {
+      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+});
   } catch (e) {
     console.error("generate-cv error:", e);
     return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Erreur inconnue" }), {
