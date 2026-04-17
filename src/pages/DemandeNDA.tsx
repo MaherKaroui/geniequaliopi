@@ -200,6 +200,19 @@ function generateDocumentHTML(docId: string, o: OrganismeInfo, f: FormationInfo,
     }
     case "liste_formateurs": {
       const hasCV = cvData.prenom || cvData.nom || cvData.experiences.some(e => e.poste);
+      // If a CV file has been uploaded but no generated CV data, build a minimal CVData
+      // from organisme info so the list document can still be produced.
+      if (!hasCV && uploadedCV) {
+        const dirig = (cleanOrganisme.dirigeant || "").trim();
+        const [prenom, ...rest] = dirig.split(/\s+/);
+        const fallbackCV: CVData = {
+          ...cvData,
+          prenom: prenom || "Formateur",
+          nom: rest.join(" ") || cleanOrganisme.nom || "",
+          profil: cvData.profil || `Voir CV joint (${uploadedCV.name})`,
+        };
+        return generateListeFormateursHTML(cleanOrganisme, fallbackCV, s);
+      }
       if (!hasCV) return null;
       return generateListeFormateursHTML(cleanOrganisme, cvData, s);
     }
