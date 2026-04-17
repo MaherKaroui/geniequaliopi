@@ -99,6 +99,12 @@ export default function OPCOMobilites() {
   useEffect(() => { sessionStorage.setItem("opco_ref", refDossier); }, [refDossier]);
   useEffect(() => { sessionStorage.setItem("opco_annee", anneeControle); }, [anneeControle]);
 
+  // Preview dialog
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewHtml, setPreviewHtml] = useState("");
+  const [previewTitle, setPreviewTitle] = useState("");
+  const [previewLoading, setPreviewLoading] = useState(false);
+
   const mergedStagiaires = useMemo(
     () => mergeStagiaires(stagiaires).filter((s): s is StagiaireInfo => Boolean(s)),
     [stagiaires]
