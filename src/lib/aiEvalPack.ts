@@ -1,0 +1,148 @@
+/**
+ * AI evaluation pack client (C6 OPCO / EDOF EY / Qualiopi IND 11)
+ * - Calls edge function `generate-eval-c6` to get a formation-coherent pack
+ * - Caches per formation in sessionStorage
+ * - Provides deterministic per-stagiaire variation
+ */
+import { supabase } from "@/integrations/supabase/client";
+import { FormationInfo, StagiaireInfo } from "@/types/qualiopi";
+
+export interface AIQCMQuestion {
+  question: string;
+  options: string[];
+  correctIndex: number;
+}
+
+export interface AIOpenQuestion {
+  question: string;
+  reponseAttendue: string;
+  points: number;
+}
+
+export interface AIExerciceIntermediaire {
+  titre: string;
+  contexte: string;
+  questions: AIOpenQuestion[]; // 4
+}
+
+export interface AIExercicePratique {
+  titre: string;
+  consigne: string;
+  reponseAttendue: string;
+  points: number;
+}
+
+export interface AIEvaluationFinale {
+  titre: string;
+  exercices: AIExercicePratique[]; // 5
+}
+
+export interface AIEvalPack {
+  qcmDebut: AIQCMQuestion[];      // 10
+  qcmFin: AIQCMQuestion[];        // 10
+  exerciceIntermediaire: AIExerciceIntermediaire;
+  evaluationFinale: AIEvaluationFinale;
+}
+
+const CACHE_PREFIX = "ai_eval_pack__";
+
+function cacheKey(f: FormationInfo): string {
+  const sig = (f.intitule || "").trim().toLowerCase().slice(0, 80);
+  return CACHE_PREFIX + sig;
+}
+
+export function getCachedPack(f: FormationInfo): AIEvalPack | null {
+  try {
+    const raw = sessionStorage.getItem(cacheKey(f));
+    if (!raw) return null;
+    return JSON.parse(raw) as AIEvalPack;
+  } catch {
+    return null;
+  }
+}
+
+export function setCachedPack(f: FormationInfo, pack: AIEvalPack): void {
+  try {
+    sessionStorage.setItem(cacheKey(f), JSON.stringify(pack));
+  } catch {
+    /* quota: silently ignore */
+  }
+}
+
+export function clearCachedPack(f: FormationInfo): void {
+  try {
+    sessionStorage.removeItem(cacheKey(f));
+  } catch {
+    /* ignore */
+  }
+}
+
+export async function generateAIEvalPack(f: FormationInfo, force = false): Promise<AIEvalPack> {
+  if (!force) {
+    const cached = getCachedPack(f);
+    if (cached) return cached;
+  }
+  const { data, error } = await supabase.functions.invoke("generate-eval-c6", {
+    body: {
+      intitule: f.intitule,
+      objectifs: f.objectifs,
+      contenu: f.programme,
+      publicVise: f.publicVise,
+      prerequis: f.prerequis,
+    },
+  });
+  if (error) throw new Error(error.message || "Erreur appel IA");
+  if (!data || (data as any).error) throw new Error((data as any)?.error || "Réponse IA vide");
+  const pack = data as AIEvalPack;
+  setCachedPack(f, pack);
+  return pack;
+}
+
+// ---- Per-stagiaire deterministic variation ----
+
+/** Returns a small int seed derived from stagiaire info + offset */
+function stagSeed(s: StagiaireInfo, si: number, offset = 0): number {
+  const base = `${s?.prenom || ""}${s?.nom || ""}${si}`;
+  let h = 0;
+  for (let i = 0; i < base.length; i++) h = (h * 31 + base.charCodeAt(i)) | 0;
+  return Math.abs(h + offset);
+}
+
+/**
+ * For each QCM question, return the index chosen by stagiaire si.
+ * Strategy : ~80–90% correct (debut), ~90–95% correct (fin).
+ * Variation is deterministic per stagiaire.
+ */
+export function answersForQCM(qcm: AIQCMQuestion[], si: number, s: StagiaireInfo, mode: "debut" | "fin"): number[] {
+  const correctRate = mode === "fin" ? 0.92 : 0.78;
+  return qcm.map((q, qi) => {
+    const seed = stagSeed(s, si, qi * 7 + (mode === "fin" ? 1000 : 0));
+    const rand = ((seed * 9301 + 49297) % 233280) / 233280;
+    if (rand < correctRate) return q.correctIndex;
+    // wrong: choose another option deterministically
+    const wrongOptions = [0, 1, 2, 3].filter((i) => i !== q.correctIndex);
+    return wrongOptions[seed % wrongOptions.length];
+  });
+}
+
+/** Returns a per-stagiaire student answer derived from corrected response, slightly varied. */
+export function studentAnswerFromCorrection(reponseAttendue: string, s: StagiaireInfo, si: number, qIdx: number): string {
+  // Simple variations: paraphrase prefix + sometimes truncate
+  const variants = [
+    `${s?.prenom || ""} ${s?.nom || ""} – Réponse :\n${reponseAttendue}`,
+    `D'après mon analyse :\n${reponseAttendue}`,
+    `Je propose la solution suivante :\n${reponseAttendue}`,
+    `Voici ma proposition :\n${reponseAttendue}`,
+  ];
+  const seed = stagSeed(s, si, qIdx * 13);
+  return variants[seed % variants.length];
+}
+
+/** Note /points pour une question ouverte (selon stagiaire). 70% des cas = max - 1, 30% = max. */
+export function noteForOpenQuestion(maxPoints: number, s: StagiaireInfo, si: number, qIdx: number): number {
+  const seed = stagSeed(s, si, qIdx * 17 + 5);
+  const rand = ((seed * 9301 + 49297) % 233280) / 233280;
+  if (rand < 0.4) return maxPoints; // top
+  if (rand < 0.85) return Math.max(maxPoints - 1, Math.ceil(maxPoints * 0.8));
+  return Math.max(Math.ceil(maxPoints * 0.7), 1);
+}

@@ -19,6 +19,7 @@ import { getModuleSpecificConsigne } from "./cfaExerciseContent";
 import { genProcedureAbandonReorientationCFA, genAccompagnementDistancielCFA, genEnquetePartenaireEmployeurCFA, genFicheRenseignementsCommanditaireCFA, genContratApprentissageModeEmploiCFA, genProcedureAccueilBeneficiairesCFA, genProcedureAdaptationPedagogiqueCFA, genProcedureGestionAnnulationsCFA, genProcedureRuptureContratApprentissageCFA, genLivretApprentissageCFA as genLivretApprentissageInd10, genLivretMaitreApprentissageCFA, genMesuresEngagementBeneficiairesCFA, genPreventionGestionAbandonsCFA, genGuideEntretienAbandonsCFA, genEviterSituationsEchecCFA, genProcedureAnnulationsAbandonsCFA, genFichierGestionAnnulationsCFA, genAccompagnementRechercheContratCFA, genListeAideSocialCFA, genCertificatRealisationCFA, genWebinaireFormationCompetencesCFA, genWebinaireNTCCFA, genDroitsDevoirsApprentiCFA, genReglesSSMilieuProCFA } from "./templatesCFA";
 import { getYearFromDateCandidates } from "./eyExport";
 import { genProgrammeBDC as genProgrammeBDC_imported, genEvaluationBesoins as genEvaluationBesoins_imported, genDocumentSynthese as genDocumentSynthese_imported, genDerouleModalitesBDC as genDerouleModalitesBDC_imported, genEnqueteMetierBDC as genEnqueteMetierBDC_imported, genCGVBilanCompetences as genCGVBilanCompetences_imported, genContratBilanCompetences as genContratBilanCompetences_imported, genConventionBilanCompetences as genConventionBilanCompetences_imported, genFormulaireAttentesBDC as genFormulaireAttentesBDC_imported, genConvocationBDC as genConvocationBDC_imported, genSynopsisBDC as genSynopsisBDC_imported, genGrilleSuiviBDC as genGrilleSuiviBDC_imported, genSuiviPostBilanBDC as genSuiviPostBilanBDC_imported, genProcedureAdaptationBDC as genProcedureAdaptationBDC_imported, genExplorationMetierBDC as genExplorationMetierBDC_imported, genFichePosteConsultantBDC as genFichePosteConsultantBDC_imported, genCompteRenduFinBDC as genCompteRenduFinBDC_imported, genFicheIntervenantExterneBDC as genFicheIntervenantExterneBDC_imported, genSatisfactionChaudBDC as genSatisfactionChaudBDC_imported, genFormulaireReclamationBDC as genFormulaireReclamationBDC_imported, genGestionReclamationsBDC as genGestionReclamationsBDC_imported, genActionsCorrectivesBDC as genActionsCorrectivesBDC_imported, genBilanAbandonsRupturesBDC as genBilanAbandonsRupturesBDC_imported, genBilanMensuelBDC as genBilanMensuelBDC_imported, genQuestionnaireEnqueteMetiersBDC as genQuestionnaireEnqueteMetiersBDC_imported, genGuideProtocolesBDC as genGuideProtocolesBDC_imported, genTableauBasesBDC as genTableauBasesBDC_imported, genFicheVeilleBDC as genFicheVeilleBDC_imported, genContratSousTraitanceBDC as genContratSousTraitanceBDC_imported } from "./templatesBDC";
+import { getCachedPack, answersForQCM, studentAnswerFromCorrection, noteForOpenQuestion, type AIEvalPack } from "./aiEvalPack";
 
 const FALLBACK_STAGIAIRE: StagiaireInfo = { prenom: "Martin", nom: "Dupont", civilite: "" as "M." | "Mme" | "", email: "", telephone: "", entreprise: "", poste: "", dateNaissance: "" };
 export function getFullCatalog(org: OrganismeInfo, userFormation: FormationInfo, userStagiaires: StagiaireInfo[]): DocEntry[] {
@@ -182,6 +183,22 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "eval_positionnement_remplie": return genEvalPositionnement(o, f, stagiaires);
     case "eval_intermediaire_remplie": return genEvalIntermediaire(o, f, stagiaires);
     case "eval_finale_remplie": return genEvalFinale(o, f, stagiaires);
+    case "ai_test_positionnement_debut": {
+      const si = params?.stagiaireIdx ?? 0;
+      return genAITestPositionnement(o, f, stagiaires, si, "debut");
+    }
+    case "ai_test_positionnement_fin": {
+      const si = params?.stagiaireIdx ?? 0;
+      return genAITestPositionnement(o, f, stagiaires, si, "fin");
+    }
+    case "ai_exercice_intermediaire": {
+      const si = params?.stagiaireIdx ?? 0;
+      return genAIExerciceIntermediaire(o, f, stagiaires, si);
+    }
+    case "ai_evaluation_finale": {
+      const si = params?.stagiaireIdx ?? 0;
+      return genAIEvaluationFinale(o, f, stagiaires, si);
+    }
     case "attestation_formation": return genAttestation(o, f, stagiaires);
     case "certificat_reussite": return genCertificatReussite_V2(o, f, stagiaires);
     case "evaluation_finale_stagiaire": {
@@ -11832,4 +11849,140 @@ function genFactureEDOF(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiair
       </div>
     </div>
   ` });
+}
+
+// ════════════════════════════════════════════════════════════════════
+// ===== AI EVALUATION PACK (C6 OPCO / EDOF EY / Qualiopi IND 11) =====
+// ════════════════════════════════════════════════════════════════════
+
+function aiPackPlaceholder(o: OrganismeInfo, f: FormationInfo, title: string, s?: StagiaireInfo): string {
+  const stag = s ? ` – ${s.prenom} ${s.nom}` : "";
+  return buildDocument({
+    org: o, title: `${title}${stag}`, subtitle: f.intitule, formation: f, showFormationInfo: true,
+    extraHtml: `<div class="section section-yellow" style="padding:20px;border-left:4px solid #f59e0b">
+      <h3>Pack d'évaluation IA non encore généré</h3>
+      <p>Pour personnaliser ce document avec un contenu 100% adapté à la formation <strong>« ${f.intitule} »</strong>,
+      cliquez sur le bouton <strong>« Générer évaluations IA »</strong> dans le module (OPCO, EDOF EY ou Qualiopi).</p>
+      <p>L'IA produira alors un pack cohérent : 10 QCM positionnement début, 10 QCM positionnement fin,
+      1 exercice intermédiaire (4 questions), 1 évaluation finale (5 exercices).</p>
+    </div>`,
+  });
+}
+
+function genAITestPositionnement(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number, mode: "debut" | "fin"): string {
+  const pack: AIEvalPack | null = getCachedPack(f);
+  const s = stagiaires[si] || stagiaires[0];
+  const title = mode === "debut" ? "TEST DE POSITIONNEMENT — DÉBUT DE FORMATION" : "TEST DE POSITIONNEMENT — FIN DE FORMATION";
+  if (!pack) return aiPackPlaceholder(o, f, title, s);
+
+  const qcm = mode === "debut" ? pack.qcmDebut : pack.qcmFin;
+  const answers = answersForQCM(qcm, si, s, mode);
+  let correct = 0;
+  const rows = qcm.map((q, qi) => {
+    const chosen = answers[qi];
+    const ok = chosen === q.correctIndex;
+    if (ok) correct++;
+    return [
+      `Q${qi + 1}`,
+      q.question,
+      `${String.fromCharCode(65 + chosen)}) ${q.options[chosen]}`,
+      `${String.fromCharCode(65 + q.correctIndex)}) ${q.options[q.correctIndex]}`,
+      ok ? "Correct" : "Incorrect",
+    ];
+  });
+  const score = correct;
+  const pct = Math.round((score / qcm.length) * 100);
+  const niveau = mode === "debut"
+    ? (pct >= 70 ? "Bon niveau initial" : pct >= 40 ? "Niveau intermédiaire" : "Niveau débutant")
+    : (pct >= 80 ? "Objectifs atteints — Excellent" : pct >= 60 ? "Objectifs atteints" : "Objectifs partiellement atteints");
+
+  let extra = `<h2>${title}</h2>`;
+  extra += `<p><strong>Stagiaire :</strong> ${s.civilite ? s.civilite + " " : ""}${s.prenom} ${s.nom}<br>
+    <strong>Formation :</strong> ${f.intitule}<br>
+    <strong>Date :</strong> ${formatDate(mode === "debut" ? getStagiaireDateDebut(s, f) : getStagiaireDateFin(s, f))}<br>
+    <strong>Nombre de questions :</strong> ${qcm.length} — <strong>Durée :</strong> 30 minutes — <strong>Barème :</strong> 1 pt / réponse</p>`;
+  extra += tableHTML(["N°", "Question", "Réponse du stagiaire", "Bonne réponse", "Résultat"], rows);
+  extra += `<div class="section section-green"><p><strong>Score : ${score}/${qcm.length} (${pct}%)</strong></p>
+    <p><strong>Appréciation :</strong> ${niveau}.</p></div>`;
+
+  return buildDocument({
+    org: o, title, subtitle: f.intitule, formation: f, showFormationInfo: false, stagiaires: [s], extraHtml: extra,
+    signatures: { type: "2", labels: ["Le Stagiaire", "Le Formateur"], names: [`${s.prenom} ${s.nom}`, f.formateur] },
+  });
+}
+
+function genAIExerciceIntermediaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number): string {
+  const pack: AIEvalPack | null = getCachedPack(f);
+  const s = stagiaires[si] || stagiaires[0];
+  if (!pack) return aiPackPlaceholder(o, f, "EXERCICE INTERMÉDIAIRE", s);
+  const ex = pack.exerciceIntermediaire;
+
+  let extra = `<h2>${ex.titre}</h2>`;
+  extra += `<p><strong>Stagiaire :</strong> ${s.civilite ? s.civilite + " " : ""}${s.prenom} ${s.nom}<br>
+    <strong>Formation :</strong> ${f.intitule} — <strong>Mi-parcours</strong></p>`;
+  extra += `<div class="section"><p><strong>Mise en situation :</strong></p><p>${ex.contexte}</p></div>`;
+
+  let totalObtained = 0;
+  let totalMax = 0;
+  ex.questions.forEach((q, qi) => {
+    const note = noteForOpenQuestion(q.points, s, si, qi);
+    totalObtained += note;
+    totalMax += q.points;
+    const studentAnswer = studentAnswerFromCorrection(q.reponseAttendue, s, si, qi);
+    extra += `<div class="section" style="margin-top:15px"><p><strong>Question ${qi + 1} (${q.points} pts) :</strong> ${q.question}</p>
+      <p style="background:#f8fafc;padding:10px;border-left:3px solid #3b82f6"><em>Réponse du stagiaire :</em><br>${studentAnswer.replace(/\n/g, "<br>")}</p>
+      <p style="background:#f0fdf4;padding:10px;border-left:3px solid #16a34a"><em>Corrigé attendu :</em><br>${q.reponseAttendue}</p>
+      <p><strong>Note attribuée : ${note}/${q.points}</strong></p></div>`;
+  });
+
+  const pct = Math.round((totalObtained / totalMax) * 100);
+  extra += `<div class="section section-green"><p><strong>Note globale : ${totalObtained}/${totalMax} (${pct}%)</strong></p>
+    <p><strong>Appréciation formateur :</strong> ${pct >= 80 ? "Excellente progression à mi-parcours." : pct >= 60 ? "Bonne progression, à confirmer en évaluation finale." : "Progression à consolider sur la 2e moitié de formation."}</p></div>`;
+
+  return buildDocument({
+    org: o, title: "EXERCICE INTERMÉDIAIRE — RÉSULTATS DÉTAILLÉS", subtitle: f.intitule, formation: f, showFormationInfo: false, stagiaires: [s], extraHtml: extra,
+    signatures: { type: "2", labels: ["Le Stagiaire", "Le Formateur"], names: [`${s.prenom} ${s.nom}`, f.formateur] },
+  });
+}
+
+function genAIEvaluationFinale(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number): string {
+  const pack: AIEvalPack | null = getCachedPack(f);
+  const s = stagiaires[si] || stagiaires[0];
+  if (!pack) return aiPackPlaceholder(o, f, "ÉVALUATION FINALE", s);
+  const ev = pack.evaluationFinale;
+
+  let extra = `<h2>${ev.titre}</h2>`;
+  extra += `<p><strong>Stagiaire :</strong> ${s.civilite ? s.civilite + " " : ""}${s.prenom} ${s.nom}<br>
+    <strong>Formation :</strong> ${f.intitule}<br>
+    <strong>Date :</strong> ${formatDate(getStagiaireDateFin(s, f))}<br>
+    <strong>Nombre d'exercices :</strong> ${ev.exercices.length}</p>`;
+
+  let totalObtained = 0;
+  let totalMax = 0;
+  ev.exercices.forEach((exo, ei) => {
+    const note = noteForOpenQuestion(exo.points, s, si, ei + 100);
+    totalObtained += note;
+    totalMax += exo.points;
+    const studentAnswer = studentAnswerFromCorrection(exo.reponseAttendue, s, si, ei + 100);
+    extra += `<div class="page-break"></div>`;
+    extra += `<h3>Exercice ${ei + 1} : ${exo.titre} (${exo.points} pts)</h3>`;
+    extra += `<div class="section"><p><strong>Consigne :</strong></p><p>${exo.consigne}</p></div>`;
+    extra += `<div class="section" style="background:#f8fafc;border-left:3px solid #3b82f6"><p><strong>Production du stagiaire :</strong></p><p>${studentAnswer.replace(/\n/g, "<br>")}</p></div>`;
+    extra += `<div class="section" style="background:#f0fdf4;border-left:3px solid #16a34a"><p><strong>Corrigé / Critères de réussite :</strong></p><p>${exo.reponseAttendue}</p></div>`;
+    extra += `<p><strong>Note attribuée : ${note}/${exo.points}</strong> — ${note >= exo.points * 0.9 ? "Excellent" : note >= exo.points * 0.75 ? "Très satisfaisant" : "Satisfaisant"}</p>`;
+  });
+
+  const pct = Math.round((totalObtained / totalMax) * 100);
+  const valide = pct >= 60;
+  extra += `<div class="page-break"></div>`;
+  extra += `<div class="section section-green"><h3>Synthèse de l'évaluation finale</h3>
+    <p><strong>Note globale : ${totalObtained}/${totalMax} (${pct}%)</strong></p>
+    <p><strong>Résultat : ${valide ? "VALIDÉ" : "À REPRENDRE"}</strong></p>
+    <p><strong>Appréciation du formateur :</strong> ${valide ? `${s.prenom} ${s.nom} a démontré une bonne maîtrise des compétences attendues à l'issue de la formation « ${f.intitule} ». Les objectifs pédagogiques sont atteints.` : "Acquis partiels, un complément de formation est recommandé."}</p>
+  </div>`;
+
+  return buildDocument({
+    org: o, title: "ÉVALUATION FINALE — RÉSULTATS DÉTAILLÉS", subtitle: f.intitule, formation: f, showFormationInfo: false, stagiaires: [s], extraHtml: extra,
+    signatures: { type: "2", labels: ["Le Stagiaire", "Le Formateur"], names: [`${s.prenom} ${s.nom}`, f.formateur] },
+  });
 }

@@ -27,6 +27,8 @@ import { buildOpcoFileName, buildOpcoZipFolder, buildOpcoRootName, type OpcoNami
 import type { OrganismeInfo, FormationInfo, StagiaireInfo, CritereData } from "@/types/qualiopi";
 import { CRITERES } from "@/types/qualiopi";
 import { generateDocumentById } from "@/lib/documentGenerator";
+import { generateAIEvalPack, getCachedPack, clearCachedPack } from "@/lib/aiEvalPack";
+import { Sparkles } from "lucide-react";
 import { generateExcelCalendrierOPCO, excelToBlob } from "@/lib/xlsxGenerator";
 import { mergeOrganisme, mergeStagiaires } from "@/lib/sampleData";
 import { htmlToPdfBlob } from "@/lib/pdfExport";
@@ -105,7 +107,31 @@ export default function OPCOMobilites() {
     new Set(Object.keys(OPCO_CATEGORIES) as OpcoCategory[])
   );
   const [generating, setGenerating] = useState(false);
+  const [generatingAI, setGeneratingAI] = useState(false);
+  const [aiPackReady, setAiPackReady] = useState<boolean>(false);
   const [progress, setProgress] = useState(0);
+
+  // Detect cached AI pack on formation change
+  useEffect(() => {
+    setAiPackReady(!!getCachedPack(formation));
+  }, [formation]);
+
+  const handleGenerateAIPack = async () => {
+    if (!formation.intitule?.trim()) {
+      toast.error("Renseignez d'abord l'intitulé de la formation");
+      return;
+    }
+    setGeneratingAI(true);
+    try {
+      await generateAIEvalPack(formation, true);
+      setAiPackReady(true);
+      toast.success("Pack d'évaluation IA généré avec succès — les documents C6 sont maintenant remplis.");
+    } catch (e: any) {
+      toast.error(e?.message || "Erreur génération IA");
+    } finally {
+      setGeneratingAI(false);
+    }
+  };
   const [progressText, setProgressText] = useState("");
   const fileInputRefs = useRef<Map<string, HTMLInputElement>>(new Map());
 
@@ -689,10 +715,22 @@ export default function OPCOMobilites() {
               <code className="bg-background px-1 rounded">{anneeControle}_{(organisme.nom || "ETAB").replace(/\s+/g, "_")}_[Pièce]_AAAA.MM.JJ</code>
             </p>
           </div>
-          <Button onClick={handleExportFullZip} disabled={generating} className="gap-2">
-            {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <FolderArchive className="w-4 h-4" />}
-            {generating ? "Export en cours..." : "Exporter le dossier ZIP"}
-          </Button>
+          <div className="flex gap-2 flex-wrap">
+            <Button
+              onClick={handleGenerateAIPack}
+              disabled={generatingAI}
+              variant={aiPackReady ? "outline" : "secondary"}
+              className="gap-2"
+              title="Génère via IA un pack C6 cohérent avec la formation"
+            >
+              {generatingAI ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+              {generatingAI ? "Génération IA..." : aiPackReady ? "Régénérer pack IA C6" : "Générer évaluations IA (C6)"}
+            </Button>
+            <Button onClick={handleExportFullZip} disabled={generating} className="gap-2">
+              {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <FolderArchive className="w-4 h-4" />}
+              {generating ? "Export en cours..." : "Exporter le dossier ZIP"}
+            </Button>
+          </div>
         </Card>
 
         {generating && (
