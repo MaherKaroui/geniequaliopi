@@ -909,6 +909,10 @@ function veilleMetierRows(f: FormationInfo, type: FormationType): string[][] {
   }
 
   if (type === "ecsr") {
+    return [
+      [
+        `<a href="https://www.securite-routiere.gouv.fr/">securite-routiere.gouv.fr</a>`,
+        "Délégation à la Sécurité Routière – Statistiques et prévention",
         veilleMonthYear(f, 8),
         "Données officielles sur l'accidentalité routière, les comportements à risque et les campagnes de prévention. Référence pour les modules de sensibilisation.",
         "Preuve : rapport annuel accidentalité. Action : actualiser les données statistiques dans le module sécurité routière (CCP2)."
