@@ -25,30 +25,28 @@ import { buildOpcoFileName, buildOpcoZipFolder, buildOpcoRootName, type OpcoNami
 import type { OrganismeInfo, FormationInfo, StagiaireInfo, CritereData } from "@/types/qualiopi";
 import { CRITERES } from "@/types/qualiopi";
 import { generateDocumentById } from "@/lib/documentGenerator";
-import { mergeOrganisme } from "@/lib/sampleData";
-import { mergeStagiaires } from "@/lib/fakeStagiaireIDF";
+import { mergeOrganisme, mergeStagiaires } from "@/lib/sampleData";
 import { htmlToPdfBlob } from "@/lib/pdfExport";
 
 const emptyOrganisme: OrganismeInfo = {
-  nom: "", siret: "", nda: "", adresse: "", codePostal: "", ville: "",
-  email: "", telephone: "", siteWeb: "", dirigeant: "", referentPedagogique: "",
-  referentHandicap: "", referentAdministratif: "", certifications: "",
-  domainesFormation: "", anneeCreation: "", effectif: "", logo: "", tampon: "",
-  signature: "", dateMaj: new Date().toISOString().slice(0, 10), version: "1",
-} as OrganismeInfo;
+  nom: "", siret: "", adresse: "", codePostal: "", ville: "", telephone: "", email: "",
+  siteWeb: "", nda: "", dirigeant: "", responsablePedagogique: "", referentHandicap: "",
+  referentQualite: "", poleAdministratif: "", domainesFormation: "", typesActions: [],
+  certifications: "", outilsUtilises: "",
+  version: "1", dateMaj: new Date().toISOString().slice(0, 10),
+};
 
 const emptyFormation: FormationInfo = {
-  intitule: "", typeFormation: "", duree: "", dureeHeures: 0, modalites: "",
-  prerequis: "", publicVise: "", objectifs: "", contenuProgramme: "",
-  methodes: "", evaluation: "", tarif: "", lieu: "", dateDebut: "", dateFin: "",
-  rythme: "", effectifMin: 1, effectifMax: 12, certificateur: "", codeRncp: "",
-  codeRs: "", financement: "", accessibilite: "",
-} as FormationInfo;
+  intitule: "", objectifs: "", prerequis: "", duree: "", modalites: "", tarif: "",
+  programme: "", methodesEvaluation: "", moyensPedagogiques: "", publicVise: "",
+  delaiAcces: "", dateDebut: "", dateFin: "", lieu: "", nombreParticipants: "", formateur: "",
+  rythmeAlternance: "",
+};
 
 const STATUS_CONFIG: Record<OpcoDocStatus, { label: string; icon: any; className: string }> = {
   pending: { label: "À fournir", icon: Circle, className: "text-muted-foreground" },
   auto: { label: "Auto-généré", icon: CheckCircle2, className: "text-primary" },
-  uploaded: { label: "Uploadé", icon: CheckCircle2, className: "text-emerald-600" },
+  uploaded: { label: "Uploadé", icon: CheckCircle2, className: "text-primary" },
   not_applicable: { label: "Non applicable", icon: XCircle, className: "text-muted-foreground" },
 };
 
