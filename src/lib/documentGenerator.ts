@@ -530,7 +530,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "bilan_chaud": return genBilanChaud(o, f, stagiaires);
     case "bilan_chaud_stagiaire": {
       const si = params?.stagiaireIdx ?? 0;
-      return genBilanChaudStagiaire(o, f, stagiaires, si);
+      return genBilanChaudStagiaire(o, f, stagiaires, si, !!params?.forceFilled);
     }
     case "compte_rendu_formateur": return genCompteRenduFormateur(o, f);
     case "bilan_fin_formation_formateur": return genBilanFinFormationFormateur(o, f, stagiaires, params?.formateurNom);
@@ -758,6 +758,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "synopsis_cfa": return genSynopsisCFA(o, f);
     case "support_cours_cfa": return genSupportCoursCFA(o, f);
     case "calendrier_annuel_cfa": return genCalendrierAnnuelCFA(o, f);
+    case "calendrier_formation_opco": return genCalendrierFormationOPCO(o, f, stagiaires);
     case "decoupage_formation_cfa_excel": return genDecoupageFormationCFAExcel(o, f);
     case "suivi_inscriptions_excel": return generateExcelSuiviInscriptions(o, f, stagiaires);
     case "book_qualiopi": {
@@ -9724,10 +9725,10 @@ function seededRandom(seed: number): () => number {
   return () => { s = (s * 9301 + 49297) % 233280; return s / 233280; };
 }
 
-function genBilanChaudStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
+function genBilanChaudStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number, forceFilled = false) {
   const s = stagiaires[si] || stagiaires[0];
   const dureeH = parseInt(f.duree) || 14;
-  const termine = isFormationTerminee(f, stagiaires);
+  const termine = forceFilled || isFormationTerminee(f, stagiaires);
 
   const allCriteres = [
     "Satisfaction globale de la formation",
@@ -10932,6 +10933,115 @@ function genCalendrierAnnuelCFA(o: OrganismeInfo, f: FormationInfo) {
       { heading: "Calendrier détaillé – Année complète", content: tableHtml },
       { heading: "Légende", content: `<p><span style="background:#e8f0fe;padding:2px 8px;border-radius:4px">CFA</span> = Semaine en centre &nbsp;&nbsp; <span style="background:#f0f8f0;padding:2px 8px;border-radius:4px">Entreprise</span> = Semaine en entreprise &nbsp;&nbsp; <span style="background:#fff3cd;padding:2px 8px;border-radius:4px">🏖 Congés</span> = Vacances</p><p><strong>Total semaines CFA :</strong> ${cfaWeekNum} &nbsp;|&nbsp; <strong>Heures en centre :</strong> ${cfaWeekNum * 35}h</p>`, variant: "green" },
     ],
+  });
+}
+
+function genCalendrierFormationOPCO(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
+  // Calendrier OPCO : dates exactes, horaires précis et lieu de déroulement
+  const { totalHours, days: nbJours } = parseDuree(f.duree);
+  const dureeH = totalHours || parseInt(f.duree) || 14;
+  const totalDays = nbJours || Math.max(1, Math.ceil(dureeH / 7));
+  const lieu = f.lieu?.trim() || o.adresse || "À préciser";
+  const isDistance = lieu.toLowerCase().includes("distance") || lieu.toLowerCase().includes("distanciel");
+
+  // Construit la liste des jours ouvrés à partir de dateDebut, en sautant samedi/dimanche
+  const buildDays = (startStr: string, count: number): Date[] => {
+    const out: Date[] = [];
+    if (!startStr) return out;
+    const cur = new Date(startStr);
+    if (isNaN(cur.getTime())) return out;
+    while (out.length < count) {
+      const dow = cur.getDay();
+      if (dow !== 0 && dow !== 6) out.push(new Date(cur));
+      cur.setDate(cur.getDate() + 1);
+    }
+    return out;
+  };
+
+  const fmtJour = (d: Date) => {
+    const jours = ["dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"];
+    return jours[d.getDay()];
+  };
+  const fmtDateLong = (d: Date) => {
+    const mois = ["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
+    return `${d.getDate()} ${mois[d.getMonth()]} ${d.getFullYear()}`;
+  };
+
+  // Si stagiaires ont des dates individuelles différentes, on les liste séparément
+  const groupes = new Map<string, { debut: string; fin: string; nbH: number; stagiaires: string[] }>();
+  stagiaires.forEach((s) => {
+    const deb = s.dateDebutFormation || f.dateDebut || "";
+    const fin = s.dateFinFormation || f.dateFin || "";
+    const key = `${deb}__${fin}`;
+    if (!groupes.has(key)) {
+      groupes.set(key, { debut: deb, fin: fin, nbH: dureeH, stagiaires: [] });
+    }
+    groupes.get(key)!.stagiaires.push(`${s.prenom} ${s.nom}`);
+  });
+  if (groupes.size === 0) {
+    groupes.set("__default__", { debut: f.dateDebut, fin: f.dateFin, nbH: dureeH, stagiaires: ["—"] });
+  }
+
+  const horairesMatin = "09h00 – 12h30";
+  const horairesAprem = "13h30 – 17h00";
+
+  let extra = `<p><em>Calendrier précisant les dates exactes, les horaires et le lieu de déroulement de la formation pour l'ensemble des dossiers ayant fait l'objet d'une demande de financement.</em></p>`;
+  extra += `<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%;margin-bottom:18px">
+    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold;width:30%">Intitulé de la formation</td><td>${f.intitule}</td></tr>
+    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Organisme</td><td>${o.nom}${o.nda ? ` – NDA ${o.nda}` : ""}</td></tr>
+    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Modalité</td><td>${isDistance ? "Distanciel synchrone (classe virtuelle)" : "Présentiel"}</td></tr>
+    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Lieu de déroulement</td><td>${lieu}</td></tr>
+    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Durée totale</td><td>${dureeH} heures réparties sur ${totalDays} journée${totalDays > 1 ? "s" : ""}</td></tr>
+    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Horaires types</td><td>Matin : ${horairesMatin} &nbsp;|&nbsp; Après-midi : ${horairesAprem} (pause déjeuner 12h30 – 13h30)</td></tr>
+    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Formateur</td><td>${f.formateur || "—"}</td></tr>
+  </table>`;
+
+  let groupIdx = 0;
+  for (const [, g] of groupes) {
+    groupIdx++;
+    const days = buildDays(g.debut, totalDays);
+    const titreGroupe = groupes.size > 1
+      ? `Session ${groupIdx} — ${g.stagiaires.join(", ")}`
+      : `Sessions programmées`;
+    extra += `<h3 style="margin-top:18px">${titreGroupe}</h3>`;
+    extra += `<p><strong>Période :</strong> du ${formatDate(g.debut)} au ${formatDate(g.fin)} &nbsp;|&nbsp; <strong>Volume :</strong> ${g.nbH} h</p>`;
+    extra += `<table border="1" cellpadding="5" cellspacing="0" style="border-collapse:collapse;width:100%">
+      <thead><tr style="background:#1e3a7b;color:#fff">
+        <th style="width:6%">Jour</th>
+        <th style="width:14%">Date</th>
+        <th style="width:13%">Jour de la semaine</th>
+        <th style="width:14%">Horaires matin</th>
+        <th style="width:14%">Horaires après-midi</th>
+        <th style="width:8%">Volume</th>
+        <th>Lieu</th>
+      </tr></thead><tbody>`;
+    if (days.length === 0) {
+      extra += `<tr><td colspan="7" style="text-align:center;color:#888">Dates à renseigner dans la fiche formation.</td></tr>`;
+    } else {
+      days.forEach((d, i) => {
+        extra += `<tr>
+          <td style="text-align:center">J${i + 1}</td>
+          <td>${fmtDateLong(d)}</td>
+          <td style="text-transform:capitalize">${fmtJour(d)}</td>
+          <td style="text-align:center">${horairesMatin}</td>
+          <td style="text-align:center">${horairesAprem}</td>
+          <td style="text-align:center">7 h</td>
+          <td>${lieu}</td>
+        </tr>`;
+      });
+    }
+    extra += `</tbody></table>`;
+  }
+
+  extra += `<p style="margin-top:14px;font-size:0.9em"><em>Ce calendrier est communiqué aux apprenants à l'inscription, à l'employeur et à l'OPCO financeur. Toute modification fait l'objet d'une convocation rectificative au moins 7 jours avant le démarrage.</em></p>`;
+  extra += `<p style="margin-top:18px"><strong>Fait à</strong> ${o.ville || "—"}, <strong>le</strong> ${formatDate(new Date().toISOString())}</p>`;
+  extra += `<p><strong>${o.dirigeant || o.responsablePedagogique || "Le responsable pédagogique"}</strong><br>${o.nom}</p>`;
+
+  return buildDocument({
+    org: o,
+    title: "CALENDRIER DE FORMATION",
+    subtitle: f.intitule,
+    extraHtml: extra,
   });
 }
 
