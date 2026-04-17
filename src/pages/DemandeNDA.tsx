@@ -141,13 +141,23 @@ function generateListeFormateursHTML(o: OrganismeInfo, cv: CVData, stagiaires: S
 }
 
 function generateProgrammeNDA(o: OrganismeInfo, f: FormationInfo, s: StagiaireInfo[]): string {
-  // Use the rich Qualiopi program but with NDA already stripped via sanitizeOrganismeForDocuments.
-  // Also defensively strip any remaining "NDA" mentions from the rendered HTML.
-  const html = generateDocumentById("programme_formation", "programme_formation", undefined, o, f, s);
+  // Use the rich Qualiopi program but force NDA empty so footer/header omit it.
+  const cleanOrg = sanitizeOrganismeForDocuments(o);
+  const html = generateDocumentById("programme_formation", "programme_formation", undefined, cleanOrg, f, s);
+  // Defensive cleanup: remove any residual NDA mentions (mergeOrganisme may inject sample defaults).
   return html
-    .replace(/<p>\s*<strong>\s*NDA\s*:?\s*<\/strong>[^<]*<\/p>/gi, "")
-    .replace(/–\s*NDA\s*:\s*[^–<\n]+/gi, "")
+    // Remove full <p>…Nda: …</p> footer line (case-insensitive)
+    .replace(/<p[^>]*>\s*Nda\s*:[^<]*<\/p>/gi, "")
+    // Remove full <p><strong>NDA :</strong> …</p> body line
+    .replace(/<p[^>]*>\s*<strong>\s*NDA\s*:?\s*<\/strong>[^<]*<\/p>/gi, "")
+    // Inline " – NDA : xxx"
+    .replace(/[–-]\s*NDA\s*:\s*[^–<\n]+/gi, "")
+    // Bare NDA mention
     .replace(/\bNDA\s*:\s*[^\s<–]+/gi, "")
+    // Standalone NDA number pattern e.g. "11 75 123456 75" or "75 123456 75"
+    .replace(/\b\d{2}\s+\d{2}\s+\d{6}\s+\d{2}\b/g, "")
+    .replace(/\b\d{2}\s+\d{6}\s+\d{2}\b/g, "")
+    // Residual mention
     .replace(/cet enregistrement ne vaut pas agrément de l'état/gi, "");
 }
 
