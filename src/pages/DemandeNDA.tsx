@@ -188,33 +188,15 @@ function generateDocumentHTML(docId: string, o: OrganismeInfo, f: FormationInfo,
     }
     case "certificat_coursera": {
       // Format A4 paysage 297x210mm. Le certificat fait 1100x850px (ratio 1.294).
-      // On le scale pour remplir la page A4 paysage avec des marges propres.
+      // A4 paysage @ 96dpi ≈ 1123x794px. On scale pour rentrer avec marges propres.
       const inner = courseCertificateHtml(cleanOrganisme, f);
+      // Disponible avec ~10mm de marge: ~1048x720px. Scale = min(1048/1100, 720/850) ≈ 0.847
       return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="pdf-page-size" content="297x210"><style>
 @page { size: 297mm 210mm; margin: 0; }
-html,body { margin:0; padding:0; background:#fff; width:297mm; height:210mm; }
-.cert-page { width:297mm; height:210mm; box-sizing:border-box; padding:8mm; display:flex; align-items:center; justify-content:center; background:#fff; overflow:hidden; }
-.cert-scale { width:1100px; height:850px; transform-origin: top left; }
-</style></head><body><div class="cert-page"><div class="cert-scale" id="cs">${inner}</div></div>
-<script>
-(function(){
-  var page = document.querySelector('.cert-page');
-  var el = document.getElementById('cs');
-  if(!page||!el) return;
-  var pad = 8 * 3.78; // 8mm in px @ ~96dpi
-  var availW = page.clientWidth - pad*2;
-  var availH = page.clientHeight - pad*2;
-  var scale = Math.min(availW/1100, availH/850);
-  el.style.transform = 'scale(' + scale + ')';
-  // Center horizontally after scaling
-  var scaledW = 1100 * scale;
-  var scaledH = 850 * scale;
-  el.style.position = 'absolute';
-  el.style.left = ((page.clientWidth - scaledW)/2) + 'px';
-  el.style.top = ((page.clientHeight - scaledH)/2) + 'px';
-})();
-</script>
-</body></html>`;
+html,body { margin:0; padding:0; background:#fff; }
+.cert-page { width:297mm; height:210mm; box-sizing:border-box; padding:10mm; background:#fff; position:relative; overflow:hidden; }
+.cert-scale { width:1100px; height:850px; transform: scale(0.847); transform-origin: top left; position:absolute; top:50%; left:50%; margin-left:-466px; margin-top:-360px; }
+</style></head><body><div class="cert-page"><div class="cert-scale">${inner}</div></div></body></html>`;
     }
     default: return null;
   }
