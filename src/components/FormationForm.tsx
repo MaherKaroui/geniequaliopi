@@ -23,6 +23,36 @@ const FormationForm = ({ data, onChange, onImportStagiaires }: FormationFormProp
   const formateurSigRef = useRef<HTMLInputElement>(null);
   const [importedSessions, setImportedSessions] = useState<EdofSession[]>([]);
   const [importing, setImporting] = useState(false);
+  const [aiNom, setAiNom] = useState("");
+  const [aiCodeRNCP, setAiCodeRNCP] = useState("");
+  const [aiModel, setAiModel] = useState<string>("google/gemini-2.5-flash");
+  const [aiLoading, setAiLoading] = useState(false);
+
+  const handleAIGenerate = async () => {
+    const nom = aiNom.trim();
+    if (nom.length < 3) {
+      toast.error("Donnez un nom de formation (3 caractères min)");
+      return;
+    }
+    setAiLoading(true);
+    const t = toast.loading("Génération IA en cours… (10-30s)");
+    try {
+      const { data, error } = await supabase.functions.invoke("generate-formation-ai", {
+        body: { nom, codeRNCP: aiCodeRNCP.trim(), model: aiModel },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      const f = data?.formation as FormationInfo | undefined;
+      if (!f?.intitule) throw new Error("Réponse IA vide");
+      onChange({ ...data.formation });
+      toast.success("✅ Formation générée — tous les champs remplis", { id: t });
+    } catch (err: any) {
+      console.error("AI generation error:", err);
+      toast.error(err?.message || "Échec de la génération IA", { id: t });
+    } finally {
+      setAiLoading(false);
+    }
+  };
 
   const handleFormateurSigFile = (file: File) => {
     const reader = new FileReader();
