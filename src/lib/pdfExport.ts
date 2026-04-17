@@ -121,6 +121,10 @@ function createPage(host: HTMLDivElement, footerHtml: string, footerHeightPx: nu
   page.className = "pdf-page";
   page.style.cssText = `width:${pageWPx}px;height:${pageHPx}px;position:relative;overflow:hidden;background:#fff;`;
 
+  const contentHeightPx = footerHeightPx > 0
+    ? pageHPx - footerHeightPx - FOOTER_OFFSET_PX - 8
+    : pageHPx;
+
   const content = document.createElement("div");
   content.className = "pdf-root";
   content.style.cssText = [
@@ -128,7 +132,7 @@ function createPage(host: HTMLDivElement, footerHtml: string, footerHeightPx: nu
     "left:0",
     "top:0",
     `width:${pageWPx}px`,
-    `height:${pageHPx - footerHeightPx - FOOTER_OFFSET_PX - 8}px`,
+    `height:${contentHeightPx}px`,
     "overflow:hidden",
     "background:#fff",
   ].join(";");
