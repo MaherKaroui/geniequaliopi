@@ -39,6 +39,14 @@ const EXCEL_TEMPLATES = new Set([
   "suivi_inscriptions_excel",
 ]);
 
+export const MAIL_DOCX_TEMPLATES = new Set([
+  "mail_pre_inscription",
+  "mail_inscription",
+  "mail_convocation",
+  "mail_envoie_sc_ressources",
+  "mail_fin_formation",
+]);
+
 function stripDiacritics(value: string): string {
   return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
@@ -118,6 +126,7 @@ export function normalizeLooseFileName(fileNameOrPath: string): string {
 export function getPreferredExtension(template: string, exportFormat: ExportFormat): string {
   if (template === "pdf_static") return ".pdf";
   if (EXCEL_TEMPLATES.has(template)) return ".xls";
+  if (MAIL_DOCX_TEMPLATES.has(template)) return ".docx";
   return exportFormat === "pdf" ? ".pdf" : ".doc";
 }
 
