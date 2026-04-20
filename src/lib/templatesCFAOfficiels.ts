@@ -616,7 +616,7 @@ export function genECFOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
       <tr><th style="width:50%">Intitulé de l'activité-type</th><th>Activité maîtrisée</th></tr>
       ${activites.map((act, ai) => `<tr>
         <td><strong>${act.titre}</strong></td>
-        <td>L'activité ${ai + 1} est maîtrisée : <span class="check-box ck"></span> OUI &nbsp;&nbsp; <span class="check-box"></span> NON</td>
+        <td>L'activité ${ai + 1} est maîtrisée : <span class="check-box${termine ? " ck" : ""}"></span> OUI &nbsp;&nbsp; <span class="check-box"></span> NON</td>
       </tr>`).join("")}
     </table>
 
