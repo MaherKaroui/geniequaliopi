@@ -653,27 +653,36 @@ export function genPVSessionGlobal(o: OrganismeInfo, f: FormationInfo, stagiaire
   const codeTitre = getCodeTitre(f);
   const mil = getMillesime(f);
   const dateJo = getDateJO(f);
+  const dateMaj = getDateMajOrg(o);
   const sigle = "PV";
   const typeDoc = "Procès-verbal global de session";
   const activites = getActivitesTypes(f);
   const intituleTitre = f.intitule || "Titre professionnel";
   const sessionNum = String(hashStr(`${o.nom}-${f.intitule}-${f.dateDebut || ""}`)).slice(0, 6);
 
-  const dateDebutSession = fmtDateFR(f.dateFin || f.dateDebut) || todayCompact();
-  const dateFinSession = (() => {
-    if (f.dateFin) {
-      const d = new Date(f.dateFin);
-      d.setDate(d.getDate() + 1);
-      return fmtDateFR(d.toISOString().slice(0, 10));
-    }
-    return todayCompact();
-  })();
+  // Statut de la formation : si non terminée, dates de session, observations et résultats restent vides
+  const termine = isFormationTerminee(f, stagiaires);
+
+  const dateDebutSession = termine ? (fmtDateFR(f.dateFin || f.dateDebut) || todayCompact()) : "";
+  const dateFinSession = termine
+    ? (() => {
+        if (f.dateFin) {
+          const d = new Date(f.dateFin);
+          d.setDate(d.getDate() + 1);
+          return fmtDateFR(d.toISOString().slice(0, 10));
+        }
+        return todayCompact();
+      })()
+    : "";
 
   const responsable = o.dirigeant || o.responsablePedagogique || "Responsable de session";
 
-  // Jury déterministe
+  // Composition du jury : le formateur du formulaire formation est intégré comme 1er membre du jury
   const seed = hashStr(`jury-${o.nom}-${f.intitule}`);
-  const jury = [
+  const formateurFormation = (f.formateur || "").trim();
+  const formateurSplit = splitFormateur(formateurFormation);
+
+  const juryBank = [
     { nom: "BOUALAOUI", prenom: "Karima" },
     { nom: "EL AMRAOUI", prenom: "Mourad" },
     { nom: "HAMDOUN", prenom: "Nadia" },
@@ -681,7 +690,10 @@ export function genPVSessionGlobal(o: OrganismeInfo, f: FormationInfo, stagiaire
     { nom: "RIVIÈRE", prenom: "Catherine" },
     { nom: "VINCENT", prenom: "Patrick" },
   ];
-  const juryRotated = [...jury.slice(seed % jury.length), ...jury.slice(0, seed % jury.length)].slice(0, 4);
+  const rotated = [...juryBank.slice(seed % juryBank.length), ...juryBank.slice(0, seed % juryBank.length)];
+  const juryRotated = formateurFormation
+    ? [{ nom: formateurSplit.nom.toUpperCase(), prenom: formateurSplit.prenom }, ...rotated.filter(j => j.nom.toUpperCase() !== formateurSplit.nom.toUpperCase()).slice(0, 3)]
+    : rotated.slice(0, 4);
 
   let html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">${ministereStyle()}</head><body>`;
 
