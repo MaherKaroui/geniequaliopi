@@ -7,6 +7,7 @@
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { getRNCPByCode, RNCPFiche } from "./rncpData";
 import { formatDate } from "./docBuilder";
+import { generateAIDPPack, getCachedDPPack, AIDPExemple } from "./aiDPPack";
 
 // -----------------------------------------------------------------------------
 // Helpers communs
