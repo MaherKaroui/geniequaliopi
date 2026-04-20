@@ -761,12 +761,23 @@ export function genPVSessionGlobal(o: OrganismeInfo, f: FormationInfo, stagiaire
     <h2 class="section-title">Composition du jury</h2>
     <table class="officiel">
       <tr><th>Nom</th><th>Prénom</th><th>Qualité</th><th>Signature</th></tr>
-      ${juryMembers.map(m => `<tr>
+      ${juryMembers.map(m => {
+        const isFormateur = m.role === "Formateur évaluateur";
+        const sigUrl = isFormateur ? f.formateurSignatureUrl : o.signatureUrl;
+        const stampUrl = !isFormateur ? o.tamponUrl : null;
+        return `<tr>
         <td>${m.nom}</td>
         <td>${m.prenom}</td>
         <td>${m.role}</td>
-        <td style="height:50px"><em>(signature)</em></td>
-      </tr>`).join("")}
+        <td style="height:60px;text-align:center;vertical-align:middle">
+          ${termine && (sigUrl || stampUrl) ? `
+            <div style="display:inline-flex;align-items:center;justify-content:center;gap:4px">
+              ${sigUrl ? `<img src="${sigUrl}" alt="Signature" style="max-height:50px;max-width:110px;object-fit:contain" />` : ""}
+              ${stampUrl ? `<img src="${stampUrl}" alt="Tampon" style="max-height:55px;max-width:75px;object-fit:contain" />` : ""}
+            </div>` : `<em>(signature)</em>`}
+        </td>
+      </tr>`;
+      }).join("")}
     </table>
 
     <h2 class="section-title">Identité des candidats inscrits à la session</h2>
