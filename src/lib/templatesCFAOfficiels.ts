@@ -182,9 +182,6 @@ function ministereStyle(): string {
 
 function ministereHeader(centerTitle: string, subTitle?: string): string {
   return `
-    <div class="ministere-header">
-      <img class="ministere-logo-img" src="/images/ministere-travail-logo.png" alt="Ministère du Travail, de la Santé, des Solidarités et des Familles" />
-    </div>
     <h1 class="dp-title">${centerTitle}</h1>
     ${subTitle ? `<p style="text-align:center;font-style:italic;margin-bottom:20px;color:#555">${subTitle}</p>` : ""}
   `;
