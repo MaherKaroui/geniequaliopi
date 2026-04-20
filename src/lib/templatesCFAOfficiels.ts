@@ -396,7 +396,7 @@ export function genDPOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: St
     <h3 class="subsection">MODALITÉ D'ACCÈS :</h3>
     <p class="check-line"><span class="check-box ck"></span>Parcours de formation</p>
     <p class="check-line"><span class="check-box"></span>Validation des Acquis de l'Expérience (VAE)</p>
-    ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, "1")}
+    ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, "1", dateMaj)}
   </div><div class="page-break"></div>`;
 
   // ===== PAGE 2 - Présentation =====
@@ -421,7 +421,7 @@ export function genDPOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: St
       <li>des documents illustrant la pratique professionnelle du candidat (facultatif) ;</li>
       <li>des annexes, si nécessaire.</li>
     </ul>
-    ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, "2")}
+    ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, "2", dateMaj)}
   </div><div class="page-break"></div>`;
 
   // ===== PAGES Activités-types & Exemples =====
@@ -459,7 +459,7 @@ export function genDPOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: St
           <div class="q">5. Informations complémentaires <em>(facultatif)</em></div>
           <div class="a">Cette mission s'inscrit dans la continuité de mon parcours professionnel et illustre ma capacité à mobiliser les compétences attendues par le référentiel.</div>
         </div>
-        ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, String(pageNum))}
+        ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, String(pageNum), dateMaj)}
       </div><div class="page-break"></div>`;
       pageNum++;
     });
@@ -479,7 +479,7 @@ export function genDPOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: St
     </div>
     <div style="margin-top:30px"><strong>Signature :</strong></div>
     <div style="height:80px;border:1px dashed #999;margin-top:10px"></div>
-    ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, String(pageNum))}
+    ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, String(pageNum), dateMaj)}
   </div>`;
 
   html += `</body></html>`;
@@ -538,7 +538,7 @@ export function genECFOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
       <tr><th>Prénom</th><td>${s.prenom || ""}</td></tr>
       <tr><th>Date de naissance</th><td>${getStagDateNaissance(s)}</td></tr>
     </table>
-    ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, "1")}
+    ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, "1", dateMaj)}
   </div><div class="page-break"></div>`;
 
   // ===== PAGE 2 - Présentation =====
@@ -546,7 +546,7 @@ export function genECFOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
     <h2 class="section-title">Présentation du dossier</h2>
     <p class="justify">Les évaluations passées en cours de formation décrites dans les fiches qui suivent ont été mises en œuvre en référence aux critères issus des référentiels du titre professionnel, pour les sessions d'examen « Titre », « CCP » et « CCS » telles que prévues par l'arrêté du 22 décembre 2015 relatif aux conditions de délivrance du titre professionnel du ministère chargé de l'emploi.</p>
     <p class="justify" style="margin-top:12px">Le <em>Guide de mise en œuvre</em> des Évaluations passées en cours de formation est à télécharger sur le site du ministère de l'emploi : http://travail-emploi.gouv.fr/ (rubrique <em>Documents techniques</em>). Il comporte un mode d'emploi du présent Livret d'évaluations passées en cours de formation.</p>
-    ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, "2")}
+    ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, "2", dateMaj)}
   </div><div class="page-break"></div>`;
 
   // ===== Pages Fiches de résultats =====
@@ -597,7 +597,7 @@ export function genECFOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
         <tr><td>${formateur1}</td><td>${dateEval}</td><td style="height:30px"></td></tr>
         <tr><td>${formateur2}</td><td>${dateEval}</td><td style="height:30px"></td></tr>
       </table>
-      ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, `${pageNum}/${activites.length + 4}`)}
+      ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, `${pageNum}/${activites.length + 4}`, dateMaj)}
     </div><div class="page-break"></div>`;
     pageNum++;
   });
@@ -631,7 +631,7 @@ export function genECFOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
 
     <p style="margin-top:18px"><strong>Signature du candidat pour information :</strong></p>
     <div style="height:60px;border:1px dashed #999;margin-top:8px"></div>
-    ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, `${pageNum}/${activites.length + 4}`)}
+    ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, `${pageNum}/${activites.length + 4}`, dateMaj)}
   </div>`;
 
   html += `</body></html>`;
@@ -755,7 +755,7 @@ export function genPVSessionGlobal(o: OrganismeInfo, f: FormationInfo, stagiaire
         <div style="height:60px;border:1px dashed #999;margin-top:8px"></div>
       </div>
     </div>
-    ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, "1/1")}
+    ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, "1/1", dateMaj)}
   </div>`;
 
   html += `</body></html>`;
