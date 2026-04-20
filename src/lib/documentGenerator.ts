@@ -254,7 +254,11 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "cr_reunion": return genCRReunion(o, params?.mois ?? "");
     case "planning_formateurs": return genPlanningFormateurs(o, formateurs, formations);
     case "coordination_pedagogique": return genCoordination(o, f);
-    case "livret_apprentissage": return genLivretApprentissage(o, f);
+    case "livret_apprentissage": {
+      const si = params?.stagiaireIdx;
+      const s = (typeof si === "number" && stagiaires[si]) ? stagiaires[si] : stagiaires[0];
+      return genLivretApprentissage(o, f, s);
+    }
     case "fiche_suivi_tuteur": {
       const si = params?.stagiaireIdx;
       const list = (typeof si === "number" && stagiaires[si]) ? [stagiaires[si]] : stagiaires;
