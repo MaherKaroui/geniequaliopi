@@ -255,7 +255,11 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "planning_formateurs": return genPlanningFormateurs(o, formateurs, formations);
     case "coordination_pedagogique": return genCoordination(o, f);
     case "livret_apprentissage": return genLivretApprentissage(o, f);
-    case "fiche_suivi_tuteur": return genFicheSuiviTuteur(o, f, stagiaires);
+    case "fiche_suivi_tuteur": {
+      const si = params?.stagiaireIdx;
+      const list = (typeof si === "number" && stagiaires[si]) ? [stagiaires[si]] : stagiaires;
+      return genFicheSuiviTuteur(o, f, list);
+    }
     case "cv_formateur": return genCV(o, fmt);
     case "fiche_competences_formateur": return genFicheCompetences(o, fmt);
     case "evaluation_formateur": return genEvalFormateur(o, fmt);
