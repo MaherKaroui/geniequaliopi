@@ -368,7 +368,23 @@ export function genAttestationFormationMaitreApprentissageCFA(o: OrganismeInfo, 
   const s = stagiaires[0] || { prenom: "Apprenti", nom: "Modèle", entreprise: "Entreprise d'accueil" } as StagiaireInfo;
   const terminee = isFormationTerminee(f, stagiaires);
   const today = new Date().toISOString().slice(0, 10);
-  const dateModule = f.dateDebut ? formatDate(f.dateDebut) : formatDate(today);
+  const baseDate = f.dateDebut || today;
+  // Étaler les 5 modules (21h) sur 5 jours ouvrés distincts pour rester réaliste
+  const addBusinessDays = (dateStr: string, days: number): string => {
+    const d = new Date(dateStr);
+    let added = 0;
+    while (added < days) {
+      d.setDate(d.getDate() + 1);
+      const dow = d.getDay();
+      if (dow !== 0 && dow !== 6) added++;
+    }
+    return d.toISOString().slice(0, 10);
+  };
+  const dateJ1 = formatDate(baseDate);
+  const dateJ2 = formatDate(addBusinessDays(baseDate, 1));
+  const dateJ3 = formatDate(addBusinessDays(baseDate, 2));
+  const dateJ4 = formatDate(addBusinessDays(baseDate, 3));
+  const dateJ5 = formatDate(addBusinessDays(baseDate, 4));
 
   return buildDocument({
     org: o,
