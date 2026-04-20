@@ -6,7 +6,7 @@
 
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { getRNCPByCode, RNCPFiche } from "./rncpData";
-import { formatDate } from "./docBuilder";
+import { formatDate, isFormationTerminee, isStagiaireFormationTerminee } from "./docBuilder";
 import { generateAIDPPack, getCachedDPPack, AIDPExemple } from "./aiDPPack";
 
 // -----------------------------------------------------------------------------
@@ -66,6 +66,38 @@ function getDateJO(f: FormationInfo): string {
 function todayCompact(): string {
   const d = new Date();
   return `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
+}
+
+/**
+ * Date de mise à jour à afficher dans le footer officiel.
+ * Toujours basée sur la date de MAJ du formulaire organisme (o.dateMaj).
+ * Si non renseignée, fallback sur la date du jour.
+ */
+function getDateMajOrg(o: OrganismeInfo): string {
+  if (o?.dateMaj) {
+    const d = new Date(o.dateMaj);
+    if (!isNaN(d.getTime())) {
+      return `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
+    }
+  }
+  return todayCompact();
+}
+
+/**
+ * Sépare un nom complet "Prénom NOM" ou "PRÉNOM Nom" en { prenom, nom }.
+ */
+function splitFormateur(full: string): { prenom: string; nom: string } {
+  if (!full) return { prenom: "", nom: "" };
+  const parts = full.trim().split(/\s+/);
+  if (parts.length === 1) return { prenom: "", nom: parts[0] };
+  // On considère que le dernier token est le nom de famille,
+  // sauf s'il est en MAJUSCULES (cas "AHMED EL FATHI" => nom = "EL FATHI")
+  const upperTokens = parts.filter(p => p === p.toUpperCase() && p.length > 1);
+  if (upperTokens.length >= 1 && upperTokens.length < parts.length) {
+    const prenomTokens = parts.filter(p => !(p === p.toUpperCase() && p.length > 1));
+    return { prenom: prenomTokens.join(" "), nom: upperTokens.join(" ") };
+  }
+  return { prenom: parts.slice(0, -1).join(" "), nom: parts.slice(-1)[0] };
 }
 
 function getStagDateNaissance(s: StagiaireInfo): string {
@@ -158,10 +190,10 @@ function ministereHeader(centerTitle: string, subTitle?: string): string {
   `;
 }
 
-function footerOfficiel(sigle: string, typeDoc: string, codeTitre: string, mil: string, dateJo: string, page: string): string {
+function footerOfficiel(sigle: string, typeDoc: string, codeTitre: string, mil: string, dateJo: string, page: string, dateMaj: string): string {
   return `<div class="footer-table"><table>
     <tr><th>SIGLE</th><th>Type de document</th><th>Code titre</th><th>Millésime</th><th>Date JO</th><th>Date de mise à jour</th><th>Page</th></tr>
-    <tr><td>${sigle}</td><td>${typeDoc}</td><td>${codeTitre}</td><td>${mil}</td><td>${dateJo}</td><td>${todayCompact()}</td><td>${page}</td></tr>
+    <tr><td>${sigle}</td><td>${typeDoc}</td><td>${codeTitre}</td><td>${mil}</td><td>${dateJo}</td><td>${dateMaj}</td><td>${page}</td></tr>
   </table></div>`;
 }
 
@@ -341,6 +373,7 @@ export function genDPOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: St
   const codeTitre = getCodeTitre(f);
   const mil = getMillesime(f);
   const dateJo = getDateJO(f);
+  const dateMaj = getDateMajOrg(o);
   const sigle = "DP";
   const typeDoc = "Dossier professionnel";
   const activites = getActivitesTypes(f);
@@ -364,7 +397,7 @@ export function genDPOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: St
     <h3 class="subsection">MODALITÉ D'ACCÈS :</h3>
     <p class="check-line"><span class="check-box ck"></span>Parcours de formation</p>
     <p class="check-line"><span class="check-box"></span>Validation des Acquis de l'Expérience (VAE)</p>
-    ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, "1")}
+    ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, "1", dateMaj)}
   </div><div class="page-break"></div>`;
 
   // ===== PAGE 2 - Présentation =====
@@ -389,7 +422,7 @@ export function genDPOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: St
       <li>des documents illustrant la pratique professionnelle du candidat (facultatif) ;</li>
       <li>des annexes, si nécessaire.</li>
     </ul>
-    ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, "2")}
+    ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, "2", dateMaj)}
   </div><div class="page-break"></div>`;
 
   // ===== PAGES Activités-types & Exemples =====
@@ -427,7 +460,7 @@ export function genDPOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: St
           <div class="q">5. Informations complémentaires <em>(facultatif)</em></div>
           <div class="a">Cette mission s'inscrit dans la continuité de mon parcours professionnel et illustre ma capacité à mobiliser les compétences attendues par le référentiel.</div>
         </div>
-        ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, String(pageNum))}
+        ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, String(pageNum), dateMaj)}
       </div><div class="page-break"></div>`;
       pageNum++;
     });
@@ -447,7 +480,7 @@ export function genDPOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: St
     </div>
     <div style="margin-top:30px"><strong>Signature :</strong></div>
     <div style="height:80px;border:1px dashed #999;margin-top:10px"></div>
-    ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, String(pageNum))}
+    ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, String(pageNum), dateMaj)}
   </div>`;
 
   html += `</body></html>`;
@@ -465,18 +498,24 @@ export function genECFOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
   const codeTitre = getCodeTitre(f);
   const mil = getMillesime(f);
   const dateJo = getDateJO(f);
+  const dateMaj = getDateMajOrg(o);
   const sigle = "ECF";
   const typeDoc = "Livret d'évaluations passées en cours de formation";
   const activites = getActivitesTypes(f);
   const intituleTitre = f.intitule || "Titre professionnel";
   const niveau = getRNCP(f)?.niveau || "Niveau 5";
 
-  // Évaluations déterministes par stagiaire
+  // Statut de la formation : si non terminée, on n'affiche pas de date d'éval définitive
+  const termine = isStagiaireFormationTerminee(s, f);
+
+  // Formateur évaluateur principal = formateur saisi sur le formulaire Formation
   const seed = hashStr(`${s.prenom}-${s.nom}`);
-  const formateur1 = pick(["GUEBLI Ghizlan", "MARTIN Sophie", "DUBOIS Pierre", "LEROY Marie", "ROUSSEAU Karim"], seed);
+  const formateurPrincipal = (f.formateur || "").trim()
+    || pick(["GUEBLI Ghizlan", "MARTIN Sophie", "DUBOIS Pierre", "LEROY Marie", "ROUSSEAU Karim"], seed);
+  const formateur1 = formateurPrincipal;
   const formateur2 = pick(["GASPAR Edouard", "BERNARD Anne", "PETIT Julien", "MOREAU Camille", "GIRARD Sami"], seed + 5);
   const responsable = o.dirigeant || o.responsablePedagogique || "OUACHEK Hakim";
-  const dateEval = fmtDateFR(getDateFin(f, s)) || todayCompact();
+  const dateEval = termine ? (fmtDateFR(getDateFin(f, s)) || todayCompact()) : "";
 
   let html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">${ministereStyle()}</head><body>`;
 
@@ -506,7 +545,7 @@ export function genECFOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
       <tr><th>Prénom</th><td>${s.prenom || ""}</td></tr>
       <tr><th>Date de naissance</th><td>${getStagDateNaissance(s)}</td></tr>
     </table>
-    ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, "1")}
+    ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, "1", dateMaj)}
   </div><div class="page-break"></div>`;
 
   // ===== PAGE 2 - Présentation =====
@@ -514,7 +553,7 @@ export function genECFOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
     <h2 class="section-title">Présentation du dossier</h2>
     <p class="justify">Les évaluations passées en cours de formation décrites dans les fiches qui suivent ont été mises en œuvre en référence aux critères issus des référentiels du titre professionnel, pour les sessions d'examen « Titre », « CCP » et « CCS » telles que prévues par l'arrêté du 22 décembre 2015 relatif aux conditions de délivrance du titre professionnel du ministère chargé de l'emploi.</p>
     <p class="justify" style="margin-top:12px">Le <em>Guide de mise en œuvre</em> des Évaluations passées en cours de formation est à télécharger sur le site du ministère de l'emploi : http://travail-emploi.gouv.fr/ (rubrique <em>Documents techniques</em>). Il comporte un mode d'emploi du présent Livret d'évaluations passées en cours de formation.</p>
-    ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, "2")}
+    ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, "2", dateMaj)}
   </div><div class="page-break"></div>`;
 
   // ===== Pages Fiches de résultats =====
@@ -533,27 +572,27 @@ export function genECFOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
         <tr><th>Description des évaluations mises en œuvre</th><th>Dates</th><th>Compétences évaluées</th></tr>
         <tr>
           <td><strong>1.</strong> Évaluation formative en situation professionnelle reconstituée — étude de cas écrite</td>
-          <td>${fmtDateFR(getDateDebut(f, s))}</td>
-          <td>${act.competences.map((_, i) => `${i + 1} <span class="check-box ck"></span>`).join(" ")}</td>
+          <td>${termine ? fmtDateFR(getDateDebut(f, s)) : ""}</td>
+          <td>${act.competences.map((_, i) => `${i + 1} <span class="check-box${termine ? " ck" : ""}"></span>`).join(" ")}</td>
         </tr>
         <tr>
           <td><strong>2.</strong> Mise en situation professionnelle reconstituée — oral devant jury de formation</td>
-          <td>${fmtDateFR(getDateDebut(f, s))}</td>
-          <td>${act.competences.map((_, i) => `${i + 1} <span class="check-box ck"></span>`).join(" ")}</td>
+          <td>${termine ? fmtDateFR(getDateDebut(f, s)) : ""}</td>
+          <td>${act.competences.map((_, i) => `${i + 1} <span class="check-box${termine ? " ck" : ""}"></span>`).join(" ")}</td>
         </tr>
         <tr>
           <td><strong>3.</strong> Évaluation pratique en entreprise — observation sur poste de travail</td>
-          <td>${fmtDateFR(getDateFin(f, s))}</td>
-          <td>${act.competences.map((_, i) => `${i + 1} <span class="check-box ck"></span>`).join(" ")}</td>
+          <td>${termine ? fmtDateFR(getDateFin(f, s)) : ""}</td>
+          <td>${act.competences.map((_, i) => `${i + 1} <span class="check-box${termine ? " ck" : ""}"></span>`).join(" ")}</td>
         </tr>
         <tr>
           <td><strong>4.</strong> Questionnement à partir de productions professionnelles</td>
           <td>${dateEval}</td>
-          <td>${act.competences.map((_, i) => `${i + 1} <span class="check-box ck"></span>`).join(" ")}</td>
+          <td>${act.competences.map((_, i) => `${i + 1} <span class="check-box${termine ? " ck" : ""}"></span>`).join(" ")}</td>
         </tr>
       </table>
       <p style="margin-top:14px;font-weight:bold">Lors de l'évaluation ou des évaluations passée(s) en cours de formation, le/la candidat(e) est considéré(e) :</p>
-      <p class="check-line"><span class="check-box ck"></span>Avoir satisfait aux critères issus des référentiels du titre professionnel attendus pour la réalisation de cette activité-type.</p>
+      <p class="check-line"><span class="check-box${termine ? " ck" : ""}"></span>Avoir satisfait aux critères issus des référentiels du titre professionnel attendus pour la réalisation de cette activité-type.</p>
       <p class="check-line"><span class="check-box"></span>Ne pas avoir satisfait aux critères issus des référentiels du titre professionnel.</p>
 
       <h3 class="subsection">Observations</h3>
@@ -565,7 +604,7 @@ export function genECFOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
         <tr><td>${formateur1}</td><td>${dateEval}</td><td style="height:30px"></td></tr>
         <tr><td>${formateur2}</td><td>${dateEval}</td><td style="height:30px"></td></tr>
       </table>
-      ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, `${pageNum}/${activites.length + 4}`)}
+      ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, `${pageNum}/${activites.length + 4}`, dateMaj)}
     </div><div class="page-break"></div>`;
     pageNum++;
   });
@@ -577,12 +616,12 @@ export function genECFOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
       <tr><th style="width:50%">Intitulé de l'activité-type</th><th>Activité maîtrisée</th></tr>
       ${activites.map((act, ai) => `<tr>
         <td><strong>${act.titre}</strong></td>
-        <td>L'activité ${ai + 1} est maîtrisée : <span class="check-box ck"></span> OUI &nbsp;&nbsp; <span class="check-box"></span> NON</td>
+        <td>L'activité ${ai + 1} est maîtrisée : <span class="check-box${termine ? " ck" : ""}"></span> OUI &nbsp;&nbsp; <span class="check-box"></span> NON</td>
       </tr>`).join("")}
     </table>
 
     <h3 class="subsection">Observations</h3>
-    <div class="obs-box">Le candidat a satisfait à l'ensemble des évaluations prévues au référentiel du titre professionnel. Les acquis pédagogiques et professionnels sont conformes aux attendus.</div>
+    <div class="obs-box">${termine ? "Le candidat a satisfait à l'ensemble des évaluations prévues au référentiel du titre professionnel. Les acquis pédagogiques et professionnels sont conformes aux attendus." : "&nbsp;"}</div>
 
     <h3 class="subsection">Formateur(s) / Évaluateur(s)</h3>
     <table class="eval-table">
@@ -599,7 +638,7 @@ export function genECFOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
 
     <p style="margin-top:18px"><strong>Signature du candidat pour information :</strong></p>
     <div style="height:60px;border:1px dashed #999;margin-top:8px"></div>
-    ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, `${pageNum}/${activites.length + 4}`)}
+    ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, `${pageNum}/${activites.length + 4}`, dateMaj)}
   </div>`;
 
   html += `</body></html>`;
@@ -614,27 +653,36 @@ export function genPVSessionGlobal(o: OrganismeInfo, f: FormationInfo, stagiaire
   const codeTitre = getCodeTitre(f);
   const mil = getMillesime(f);
   const dateJo = getDateJO(f);
+  const dateMaj = getDateMajOrg(o);
   const sigle = "PV";
   const typeDoc = "Procès-verbal global de session";
   const activites = getActivitesTypes(f);
   const intituleTitre = f.intitule || "Titre professionnel";
   const sessionNum = String(hashStr(`${o.nom}-${f.intitule}-${f.dateDebut || ""}`)).slice(0, 6);
 
-  const dateDebutSession = fmtDateFR(f.dateFin || f.dateDebut) || todayCompact();
-  const dateFinSession = (() => {
-    if (f.dateFin) {
-      const d = new Date(f.dateFin);
-      d.setDate(d.getDate() + 1);
-      return fmtDateFR(d.toISOString().slice(0, 10));
-    }
-    return todayCompact();
-  })();
+  // Statut de la formation : si non terminée, dates de session, observations et résultats restent vides
+  const termine = isFormationTerminee(f, stagiaires);
+
+  const dateDebutSession = termine ? (fmtDateFR(f.dateFin || f.dateDebut) || todayCompact()) : "";
+  const dateFinSession = termine
+    ? (() => {
+        if (f.dateFin) {
+          const d = new Date(f.dateFin);
+          d.setDate(d.getDate() + 1);
+          return fmtDateFR(d.toISOString().slice(0, 10));
+        }
+        return todayCompact();
+      })()
+    : "";
 
   const responsable = o.dirigeant || o.responsablePedagogique || "Responsable de session";
 
-  // Jury déterministe
+  // Composition du jury : le formateur du formulaire formation est intégré comme 1er membre du jury
   const seed = hashStr(`jury-${o.nom}-${f.intitule}`);
-  const jury = [
+  const formateurFormation = (f.formateur || "").trim();
+  const formateurSplit = splitFormateur(formateurFormation);
+
+  const juryBank = [
     { nom: "BOUALAOUI", prenom: "Karima" },
     { nom: "EL AMRAOUI", prenom: "Mourad" },
     { nom: "HAMDOUN", prenom: "Nadia" },
@@ -642,7 +690,10 @@ export function genPVSessionGlobal(o: OrganismeInfo, f: FormationInfo, stagiaire
     { nom: "RIVIÈRE", prenom: "Catherine" },
     { nom: "VINCENT", prenom: "Patrick" },
   ];
-  const juryRotated = [...jury.slice(seed % jury.length), ...jury.slice(0, seed % jury.length)].slice(0, 4);
+  const rotated = [...juryBank.slice(seed % juryBank.length), ...juryBank.slice(0, seed % juryBank.length)];
+  const juryRotated = formateurFormation
+    ? [{ nom: formateurSplit.nom.toUpperCase(), prenom: formateurSplit.prenom }, ...rotated.filter(j => j.nom.toUpperCase() !== formateurSplit.nom.toUpperCase()).slice(0, 3)]
+    : rotated.slice(0, 4);
 
   let html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">${ministereStyle()}</head><body>`;
 
@@ -663,7 +714,7 @@ export function genPVSessionGlobal(o: OrganismeInfo, f: FormationInfo, stagiaire
     </table>
 
     <h2 class="section-title">Observations du jury sur le déroulement de la session d'examen</h2>
-    <div class="obs-box">La session s'est déroulée dans des conditions conformes aux exigences du référentiel. Tous les candidats inscrits étaient présents (sauf mention contraire). Les épreuves ont été conduites selon les modalités prévues : mise en situation professionnelle, entretien technique et questionnement à partir de productions. Le jury salue la qualité globale des prestations présentées.</div>
+    <div class="obs-box">${termine ? "La session s'est déroulée dans des conditions conformes aux exigences du référentiel. Tous les candidats inscrits étaient présents (sauf mention contraire). Les épreuves ont été conduites selon les modalités prévues : mise en situation professionnelle, entretien technique et questionnement à partir de productions. Le jury salue la qualité globale des prestations présentées." : "&nbsp;"}</div>
 
     <h2 class="section-title">Composition du jury</h2>
     <table class="officiel">
@@ -692,9 +743,10 @@ export function genPVSessionGlobal(o: OrganismeInfo, f: FormationInfo, stagiaire
         <th>Formation</th><th>VAE</th>
         <th>Absent</th><th>Réussite</th><th>Échec</th>
       </tr>
-      ${stagiaires.map((s, i) => {
+      ${stagiaires.map((s) => {
         const ident = String(2597000 + (hashStr(`${s.nom}-${s.prenom}`) % 999)).padStart(7, "0");
-        // Tous en réussite (audit-realism)
+        const sTermine = isStagiaireFormationTerminee(s, f);
+        // Si la formation du stagiaire n'est pas terminée → résultats vides (en attente de session)
         return `<tr>
           <td>${(s.nom || "").toUpperCase()}</td>
           <td></td>
@@ -703,13 +755,13 @@ export function genPVSessionGlobal(o: OrganismeInfo, f: FormationInfo, stagiaire
           <td style="text-align:center;font-weight:bold">X</td>
           <td></td>
           <td></td>
-          <td style="text-align:center;font-weight:bold">X</td>
+          <td style="text-align:center;font-weight:bold">${sTermine ? "X" : ""}</td>
           <td></td>
         </tr>`;
       }).join("")}
     </table>
 
-    <p style="margin-top:20px;font-size:9pt;font-style:italic">Le présent procès-verbal a été établi le ${todayCompact()} et certifie l'exactitude des informations portées ci-dessus relatives à la session d'examen mentionnée en référence.</p>
+    <p style="margin-top:20px;font-size:9pt;font-style:italic">${termine ? `Le présent procès-verbal a été établi le ${todayCompact()} et certifie l'exactitude des informations portées ci-dessus relatives à la session d'examen mentionnée en référence.` : "Document préparatoire — la session d'examen n'a pas encore eu lieu. Le procès-verbal définitif sera établi à l'issue de la session."}</p>
 
     <div style="margin-top:30px;display:flex;justify-content:space-between;gap:30px">
       <div style="flex:1">
@@ -723,7 +775,7 @@ export function genPVSessionGlobal(o: OrganismeInfo, f: FormationInfo, stagiaire
         <div style="height:60px;border:1px dashed #999;margin-top:8px"></div>
       </div>
     </div>
-    ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, "1/1")}
+    ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, "1/1", dateMaj)}
   </div>`;
 
   html += `</body></html>`;
