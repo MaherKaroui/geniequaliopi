@@ -3,11 +3,12 @@ import { StagiaireInfo } from "@/types/qualiopi";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { X, PenTool, Sparkles } from "lucide-react";
+import { X, PenTool, Sparkles, FileUp, Loader2 } from "lucide-react";
 import SignaturePad from "@/components/SignaturePad";
 import { generateFakeStagiairesIDF } from "@/lib/fakeStagiaireIDF";
 import { REGIONS, RegionKey } from "@/lib/fakeStagiaireRegions";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const FORMATEURS_PREDIFINIS = [
   "AHMED EL HILALI",
