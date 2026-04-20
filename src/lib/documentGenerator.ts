@@ -104,7 +104,21 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     ? { ...SAMPLE_FORMATIONS[0], ...Object.fromEntries(Object.entries(userFormation).filter(([, v]) => v && String(v).trim())) }
     : SAMPLE_FORMATIONS[0];
   const formations = [selectedFormation];
-  const stagiaires = mergeStagiaires(userStagiaires);
+  let stagiaires = mergeStagiaires(userStagiaires);
+  // SITE WEB / SPÉCIMEN : injecte un stagiaire-modèle vierge (sans nom/prénom)
+  // pour générer une version générique du document publiable sur le site web.
+  if (params?.genericStagiaire) {
+    const blank: StagiaireInfo = {
+      civilite: "", prenom: "", nom: "", dateNaissance: "", lieuNaissance: "",
+      adresse: "", codePostal: "", ville: "", telephone: "", email: "",
+      situation: "", niveau: "", financement: "", entreprise: "", fonction: "",
+      tuteur: "", emailTuteur: "", siretEntreprise: "", adresseEntreprise: "",
+      formateur: "", signatureUrl: "", formateurSignatureUrl: "",
+      dateDebutFormation: "", dateFinFormation: "", tarifIndividuel: "",
+      numeroAction: "", nir: "", rqth: "",
+    } as unknown as StagiaireInfo;
+    stagiaires = [blank];
+  }
   const realStagiairesCount = userStagiaires.filter(s => s.nom && s.nom.trim()).length || 1;
   const formateurs = SAMPLE_FORMATEURS;
   const fi = params?.fi ?? 0;
