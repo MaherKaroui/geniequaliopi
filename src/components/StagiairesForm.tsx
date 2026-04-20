@@ -3,11 +3,12 @@ import { StagiaireInfo } from "@/types/qualiopi";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { X, PenTool, Sparkles } from "lucide-react";
+import { X, PenTool, Sparkles, FileUp, Loader2 } from "lucide-react";
 import SignaturePad from "@/components/SignaturePad";
 import { generateFakeStagiairesIDF } from "@/lib/fakeStagiaireIDF";
 import { REGIONS, RegionKey } from "@/lib/fakeStagiaireRegions";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const FORMATEURS_PREDIFINIS = [
   "AHMED EL HILALI",
@@ -35,10 +36,12 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
   const sigRefs = useRef<Record<number, HTMLInputElement | null>>({});
   const sigRespRefs = useRef<Record<number, HTMLInputElement | null>>({});
   const sigFormateurRefs = useRef<Record<number, HTMLInputElement | null>>({});
+  const cerfaInputRef = useRef<HTMLInputElement | null>(null);
   // Track which signature pad is open: "sig-0", "resp-1", "formateur-2", etc.
   const [drawingPad, setDrawingPad] = useState<string | null>(null);
   const [fakeCount, setFakeCount] = useState<number>(5);
   const [fakeRegion, setFakeRegion] = useState<RegionKey | "all">("ile-de-france");
+  const [importingCerfa, setImportingCerfa] = useState(false);
   const addStagiaire = () => onChange([...data, { ...emptyStagiaire }]);
   const generateFakes = (replace: boolean) => {
     const n = Math.max(1, Math.min(100, Math.floor(fakeCount) || 1));
@@ -67,6 +70,57 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
     const reader = new FileReader();
     reader.onload = () => updateStagiaire(index, 'formateurSignatureUrl', reader.result as string);
     reader.readAsDataURL(file);
+  };
+
+  const handleCerfaImport = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    setImportingCerfa(true);
+    const newStagiaires: StagiaireInfo[] = [];
+    let successCount = 0;
+    let errorCount = 0;
+
+    try {
+      for (const file of Array.from(files)) {
+        try {
+          const dataUrl: string = await new Promise((resolve, reject) => {
+            const r = new FileReader();
+            r.onload = () => resolve(r.result as string);
+            r.onerror = reject;
+            r.readAsDataURL(file);
+          });
+
+          const { data: extracted, error } = await supabase.functions.invoke("extract-cerfa", {
+            body: { fileDataUrl: dataUrl },
+          });
+
+          if (error || !extracted || extracted.error) {
+            console.error("CERFA extraction error:", error || extracted?.error);
+            errorCount++;
+            continue;
+          }
+
+          newStagiaires.push({
+            ...emptyStagiaire,
+            ...extracted,
+            nom: String(extracted.nom || "").toUpperCase(),
+            prenom: String(extracted.prenom || "").charAt(0).toUpperCase() + String(extracted.prenom || "").slice(1).toLowerCase(),
+          });
+          successCount++;
+        } catch (e) {
+          console.error("Erreur fichier CERFA:", e);
+          errorCount++;
+        }
+      }
+
+      if (newStagiaires.length > 0) {
+        onChange([...data, ...newStagiaires]);
+      }
+      if (successCount > 0) toast.success(`${successCount} CERFA importé(s) avec succès`);
+      if (errorCount > 0) toast.error(`${errorCount} CERFA n'ont pas pu être lus`);
+    } finally {
+      setImportingCerfa(false);
+      if (cerfaInputRef.current) cerfaInputRef.current.value = "";
+    }
   };
 
   return (
@@ -104,6 +158,24 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
           </Button>
           <Button onClick={() => generateFakes(true)} size="sm" variant="outline" className="gap-1 h-9">
             <Sparkles className="w-4 h-4" /> Générer (remplacer)
+          </Button>
+          <input
+            ref={cerfaInputRef}
+            type="file"
+            accept="application/pdf"
+            multiple
+            className="hidden"
+            onChange={(e) => handleCerfaImport(e.target.files)}
+          />
+          <Button
+            onClick={() => cerfaInputRef.current?.click()}
+            size="sm"
+            variant="outline"
+            disabled={importingCerfa}
+            className="gap-1 h-9"
+          >
+            {importingCerfa ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileUp className="w-4 h-4" />}
+            {importingCerfa ? "Extraction..." : "Importer CERFA"}
           </Button>
           <Button onClick={addStagiaire} size="sm" className="h-9">
             + Ajouter
