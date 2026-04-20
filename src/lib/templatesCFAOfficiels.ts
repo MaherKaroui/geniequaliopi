@@ -630,7 +630,7 @@ export function genECFOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
     <h3 class="subsection">Observations</h3>
     <div class="obs-box">${termine ? "Le candidat a satisfait à l'ensemble des évaluations prévues au référentiel du titre professionnel. Les acquis pédagogiques et professionnels sont conformes aux attendus." : "&nbsp;"}</div>
 
-    <h3 class="subsection">Formateur(s) / Évaluateur(s)</h3>
+    <h3 class="subsection">Formateur évaluateur</h3>
     <table class="eval-table">
       <tr><th>Nom</th><th>Date</th><th>Visa</th></tr>
       <tr>
