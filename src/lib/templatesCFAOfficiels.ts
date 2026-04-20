@@ -6,7 +6,7 @@
 
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { getRNCPByCode, RNCPFiche } from "./rncpData";
-import { formatDate, isFormationTermine, isStagiaireFormationTermine } from "./docBuilder";
+import { formatDate, isFormationTerminee, isStagiaireFormationTerminee } from "./docBuilder";
 import { generateAIDPPack, getCachedDPPack, AIDPExemple } from "./aiDPPack";
 
 // -----------------------------------------------------------------------------
