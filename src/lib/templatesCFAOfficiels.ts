@@ -629,18 +629,42 @@ export function genECFOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
     <h3 class="subsection">Formateur(s) / Évaluateur(s)</h3>
     <table class="eval-table">
       <tr><th>Nom</th><th>Date</th><th>Visa</th></tr>
-      <tr><td>${formateur1}</td><td>${dateEval}</td><td style="height:30px"></td></tr>
-      <tr><td>${formateur2}</td><td>${dateEval}</td><td style="height:30px"></td></tr>
+      <tr>
+        <td>${formateur1}</td>
+        <td>${dateEval}</td>
+        <td style="height:50px;text-align:center;vertical-align:middle">
+          ${termine && f.formateurSignatureUrl ? `<img src="${f.formateurSignatureUrl}" alt="Signature formateur" style="max-height:42px;max-width:120px;object-fit:contain" />` : ""}
+        </td>
+      </tr>
+      <tr>
+        <td>${formateur2}</td>
+        <td>${dateEval}</td>
+        <td style="height:50px;text-align:center;vertical-align:middle">
+          ${termine && f.formateurSignatureUrl ? `<img src="${f.formateurSignatureUrl}" alt="Signature formateur" style="max-height:42px;max-width:120px;object-fit:contain;opacity:0.85" />` : ""}
+        </td>
+      </tr>
     </table>
 
     <h3 class="subsection">Représentant de l'organisme de formation</h3>
     <table class="eval-table">
       <tr><th>Nom</th><th>Date</th><th>Visa</th></tr>
-      <tr><td>${responsable}</td><td>${dateEval}</td><td style="height:30px"></td></tr>
+      <tr>
+        <td>${responsable}</td>
+        <td>${dateEval}</td>
+        <td style="height:60px;text-align:center;vertical-align:middle">
+          ${termine && (o.signatureUrl || o.tamponUrl) ? `
+            <div style="display:flex;align-items:center;justify-content:center;gap:6px">
+              ${o.signatureUrl ? `<img src="${o.signatureUrl}" alt="Signature dirigeant" style="max-height:50px;max-width:110px;object-fit:contain" />` : ""}
+              ${o.tamponUrl ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:90px;object-fit:contain" />` : ""}
+            </div>` : ""}
+        </td>
+      </tr>
     </table>
 
     <p style="margin-top:18px"><strong>Signature du candidat pour information :</strong></p>
-    <div style="height:60px;border:1px dashed #999;margin-top:8px"></div>
+    <div style="height:70px;border:1px dashed #999;margin-top:8px;display:flex;align-items:center;justify-content:center;background:#fff">
+      ${termine && s.signatureUrl ? `<img src="${s.signatureUrl}" alt="Signature candidat" style="max-height:60px;max-width:200px;object-fit:contain" />` : ""}
+    </div>
     ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, `${pageNum}/${activites.length + 4}`, dateMaj)}
   </div>`;
 
