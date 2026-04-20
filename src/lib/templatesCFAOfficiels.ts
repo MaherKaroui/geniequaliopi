@@ -112,11 +112,8 @@ function ministereStyle(): string {
     body{font-family:'Calibri','Arial',sans-serif;color:#000;font-size:11pt;line-height:1.4}
     .page{max-width:780px;margin:0 auto;padding:30px 40px;background:#fff;position:relative;min-height:1100px}
     .page-break{page-break-after:always;break-after:page}
-    .ministere-header{display:flex;align-items:flex-start;gap:20px;margin-bottom:20px}
-    .ministere-logo{width:80px;height:80px;background:#0055A4;color:white;font-size:9pt;text-align:center;padding:8px;line-height:1.2;font-weight:bold;border-radius:4px}
-    .ministere-title{flex:1;font-size:9pt;line-height:1.3}
-    .ministere-title strong{display:block;font-size:10pt;text-transform:uppercase}
-    .devise{font-style:italic;font-size:9pt;text-align:right;color:#333;margin-top:8px}
+    .ministere-header{margin-bottom:20px}
+    .ministere-header img.ministere-logo-img{display:block;max-height:110px;width:auto}
     h1.dp-title{text-align:center;font-size:18pt;font-weight:bold;margin:30px 0 20px;letter-spacing:1px;color:#0055A4}
     h2.section-title{font-size:13pt;font-weight:bold;margin:25px 0 12px;color:#0055A4;border-bottom:1px solid #0055A4;padding-bottom:4px}
     h3.subsection{font-size:11pt;font-weight:bold;margin:18px 0 8px}
@@ -154,14 +151,7 @@ function ministereStyle(): string {
 function ministereHeader(centerTitle: string, subTitle?: string): string {
   return `
     <div class="ministere-header">
-      <div class="ministere-logo">RÉPUBLIQUE<br>FRANÇAISE</div>
-      <div class="ministere-title">
-        <strong>Ministère du Travail,</strong>
-        <strong>de la Santé,</strong>
-        <strong>des Solidarités</strong>
-        <strong>et des Familles</strong>
-        <div class="devise">Liberté · Égalité · Fraternité</div>
-      </div>
+      <img class="ministere-logo-img" src="/images/ministere-travail-logo.png" alt="Ministère du Travail, de la Santé, des Solidarités et des Familles" />
     </div>
     <h1 class="dp-title">${centerTitle}</h1>
     ${subTitle ? `<p style="text-align:center;font-style:italic;margin-bottom:20px;color:#555">${subTitle}</p>` : ""}
