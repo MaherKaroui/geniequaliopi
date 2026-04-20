@@ -1839,6 +1839,7 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
 
     <h2>14. Indicateurs de performance – Année ${anneeFormation}</h2>
     <div class="section">
+      ${isFormationTerminee(f, stagiaires) ? `
       <table>
         <tr><th>Indicateur</th><th>Résultat</th></tr>
         <tr><td>Taux de satisfaction globale</td><td>100 / 100</td></tr>
@@ -1848,6 +1849,17 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
         <tr><td>Taux de recommandation</td><td>100 %</td></tr>
       </table>
       <p style="margin-top:8px"><em>Ces indicateurs sont mis à jour annuellement${o.siteWeb && o.siteWeb.trim() ? ` et consultables sur ${isFacebookPage(o.siteWeb) ? 'la page Facebook' : 'le site internet'} de ${o.nom}` : ''}.</em></p>
+      ` : `
+      <table>
+        <tr><th>Indicateur</th><th>Statut</th></tr>
+        <tr><td>Taux de satisfaction globale</td><td><em>En cours – disponible à l'issue de la formation</em></td></tr>
+        <tr><td>Taux de réussite aux évaluations</td><td><em>En cours – disponible à l'issue de la formation</em></td></tr>
+        <tr><td>Nombre de stagiaires inscrits</td><td>${nbStagiaires}</td></tr>
+        <tr><td>Taux d'abandon</td><td><em>En cours – disponible à l'issue de la formation</em></td></tr>
+        <tr><td>Taux de recommandation</td><td><em>En cours – disponible à l'issue de la formation</em></td></tr>
+      </table>
+      <p style="margin-top:8px"><em>Formation en cours : les indicateurs définitifs seront publiés à l'issue de la session${o.siteWeb && o.siteWeb.trim() ? ` sur ${isFacebookPage(o.siteWeb) ? 'la page Facebook' : 'le site internet'} de ${o.nom}` : ''}.</em></p>
+      `}
     </div>
 
     <h2>15. Déroulé pédagogique de la formation${!isBlocFormation ? ` (${heuresTotal})` : ""}</h2>
