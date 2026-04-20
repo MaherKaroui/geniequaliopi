@@ -147,9 +147,9 @@ function ministereStyle(): string {
     .ministere-header{margin-bottom:20px}
     .ministere-header img.ministere-logo-img{display:block;max-height:110px;width:auto}
     h1.dp-title{text-align:center;font-size:18pt;font-weight:bold;margin:30px 0 20px;letter-spacing:1px;color:#0055A4}
-    h2.section-title{font-size:13pt;font-weight:bold;margin:25px 0 12px;color:#0055A4;border-bottom:1px solid #0055A4;padding-bottom:4px}
+    h2.section-title{font-size:13pt;font-weight:bold;margin:25px 0 12px;color:#fff;background:#C2185B;padding:8px 14px;border-radius:0}
     h3.subsection{font-size:11pt;font-weight:bold;margin:18px 0 8px}
-    .activite-type{background:#0055A4;color:white;padding:8px 14px;font-weight:bold;font-size:11pt;margin:18px 0 10px;border-radius:2px}
+    .activite-type{background:#C2185B;color:white;padding:8px 14px;font-weight:bold;font-size:11pt;margin:18px 0 10px;border-radius:2px}
     .exemple-titre{font-weight:bold;font-style:italic;margin:10px 0;color:#333}
     .info-block{margin:10px 0;padding:8px 0}
     .info-block strong{display:inline-block;min-width:160px}
