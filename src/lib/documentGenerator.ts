@@ -10,6 +10,7 @@ import { getCourseChapters, getYoutubeVideos } from "./courseContent";
 import { DocEntry } from "@/types/qualiopi";
 import { genCGV_V2, genReglement_V2, genConvocation_V2, genContratFormationPro_V2, genProcedureAccueil_V2, genEmargementJour_V2, genProcedureAdaptation_V2, genTableauSuiviParcours_V2, genEvaluationFinaleStagiaire, genExercicesStagiaire, genGrilleAcquisitionStagiaire, genAttestationReussiteStagiaire, genExercicesPratiques_V2, genQCMFinal_V2, genGrilleAcquisition_V2, genCertificatReussite_V2, genConvocationStagiaire, genContratFormationProStagiaire, genCGVStagiaire, genReglementStagiaire, genConventionFormationTripartite } from "./generatorsV2";
 import { genFichePosteRole, genAutoEvaluationFormateurV2, genProcessusRecrutementV2, genPlanDevCompetencesExcel } from "./templatesCritere5";
+import { genPlanDevPreuvesInscription } from "./planDevPreuvesInscription";
 import { genVeilleReglementaireV2, genVeilleMetierV2, genVeilleTechnologiqueV2, genVeilleHandicap, genListePartenairesV2, genContratSousTraitanceV2, genCharteQualiteFormateurExterne } from "./templatesCritere6";
 import { genNewsletterScreenshots, genScreenshotFranceCompetences, genScreenshotDRIEETS, genScreenshotCentreInfoo, genScreenshotMicrosoft, genScreenshotOpenAI, genScreenshotAgefiph, genCertificatCoursera } from "./newsletterScreenshots";
 import { genPreuvesVeilleReglementaire } from "./veillePreuvesScreenshots";
@@ -590,6 +591,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     }
     case "charte_qualite_formateur_externe": return genCharteQualiteFormateurExterne(o);
     case "plan_dev_competences_excel": return genPlanDevCompetencesExcel(o, f, formateurs, stagiaires);
+    case "plan_dev_preuves_inscription": return genPlanDevPreuvesInscription(o, f, formateurs);
     case "grille_entretien_annuel": return genGrilleEntretienAnnuel(o, fmt);
     case "fiche_entretien_annuel_formateur": {
       // If a specific formateur name is passed, create a mock FormateurInfo
