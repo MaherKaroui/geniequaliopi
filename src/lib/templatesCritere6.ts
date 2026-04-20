@@ -469,81 +469,10 @@ export function genVeilleReglementaireV2(o: OrganismeInfo, f: FormationInfo) {
   const rows = aiPack?.reglementaire?.length
     ? veilleRowsToTable(aiPack.reglementaire)
     : veilleReglementaireRows(f, type);
-  const preuvesHtml = buildPreuvesExploitationHtml(o, f, rows, { type: "réglementaire", indicateur: 23 });
-  return buildDocument({
-    org: o,
-    title: "Veille réglementaire",
-    table: {
-      headers: ["Liens", "Nom de l'article / Texte", "Date du texte", "Commentaire", "Exploitation de veille (preuve + action Qualiopi)"],
-      rows,
-    },
-    extraHtml: preuvesHtml,
-  });
-}
-
-/**
- * Construit le bloc "Preuves d'exploitation" affiché sous le tableau de veille.
- * Pour chaque ligne de veille : une preuve concrète (capture archivée, synthèse interne,
- * mise à jour procédure) datée et reliée à l'organisme — exploitable en audit Qualiopi (Ind 23).
- */
-function buildPreuvesExploitationHtml(
-  o: OrganismeInfo,
-  f: FormationInfo,
-  rows: string[][],
-  opts: { type: "réglementaire" | "métier" | "technologique"; indicateur: number },
-): string {
-  const stripHtml = (s: string) => (s || "").replace(/<[^>]+>/g, "").trim();
-  const splitPreuveAction = (exploitation: string): { preuve: string; action: string } => {
-    const txt = stripHtml(exploitation);
-    const m = txt.match(/preuve\s*[:\-]?\s*(.+?)(?:\s*action\s*[:\-]?\s*(.+))?$/i);
-    if (m) return { preuve: (m[1] || "").trim().replace(/\s+action$/i, ""), action: (m[2] || "").trim() };
-    return { preuve: txt, action: "" };
-  };
-  const archiveDate = formatDate(subtractBusinessDays(f.dateDebut || new Date().toISOString().split("T")[0], 14));
-  const subFolder = opts.type === "réglementaire" ? "Réglementaire" : opts.type === "métier" ? "Métier" : "Technologique";
-  const titreSection =
-    opts.type === "réglementaire"
-      ? "Preuves d'exploitation de la veille réglementaire"
-      : opts.type === "métier"
-        ? "Preuves d'exploitation de la veille métier"
-        : "Preuves d'exploitation de la veille technologique";
-
-  const items = rows.map((r, idx) => {
-    const titre = stripHtml(r[1] || `Source ${idx + 1}`);
-    const dateTexte = stripHtml(r[2] || "");
-    const lien = stripHtml(r[0] || "");
-    const { preuve, action } = splitPreuveAction(r[4] || "");
-    return `
-      <div style="border:1px solid #d1d5db;border-radius:6px;padding:10px 14px;margin:8px 0;background:#f9fafb;">
-        <div style="font-weight:600;color:#1e3a8a;font-size:11pt;margin-bottom:4px;">
-          Preuve n°${idx + 1} — ${titre}
-        </div>
-        <div style="font-size:10pt;line-height:1.5;">
-          <div><strong>Source :</strong> ${lien || "—"} ${dateTexte ? `<span style="color:#6b7280">(${dateTexte})</span>` : ""}</div>
-          <div><strong>Pièce conservée :</strong> ${preuve || "Capture d'écran horodatée + PDF du document source"}</div>
-          <div><strong>Lieu d'archivage :</strong> Dossier qualité interne « ${o.nom} » → /Veille/${subFolder}/${(f.intitule || "").slice(0, 40)}</div>
-          <div><strong>Date d'archivage :</strong> ${archiveDate}</div>
-          <div><strong>Responsable :</strong> ${o.referentQualite || o.responsablePedagogique || o.dirigeant || "Référent qualité"}</div>
-          ${action ? `<div><strong>Action engagée :</strong> ${action}</div>` : ""}
-          <div><strong>Diffusion :</strong> Présentée en réunion qualité, intégrée au plan d'amélioration continue (Critère 7 — Ind 32).</div>
-        </div>
-      </div>`;
-  }).join("");
-
-  return `
-    <h2 style="color:#1e3a8a;border-bottom:2px solid #1e3a8a;padding-bottom:4px;margin-top:24px;font-size:13pt;">
-      ${titreSection} (Indicateur ${opts.indicateur})
-    </h2>
-    <p style="font-size:10pt;color:#374151;margin:8px 0;">
-      Conformément au Référentiel National Qualité (Critère 6 – Indicateur ${opts.indicateur}), chaque source de veille
-      ci-dessus fait l'objet d'une <strong>preuve d'exploitation traçable</strong> : archivage horodaté,
-      analyse d'impact sur l'organisme « ${o.nom} » et action corrective intégrée à nos procédures.
-    </p>
-    ${items}
-    <p style="font-size:9pt;color:#6b7280;font-style:italic;margin-top:12px;">
-      L'ensemble des pièces (PDF, captures, comptes rendus de réunion qualité) est conservé pendant
-      la durée légale et tenu à disposition de l'auditeur Qualiopi.
-    </p>`;
+  return buildDocument({ org: o, title: "Veille réglementaire", table: {
+    headers: ["Liens", "Nom de l'article / Texte", "Date du texte", "Commentaire", "Exploitation de veille (preuve + action Qualiopi)"],
+    rows,
+  } });
 }
 
 // ===== IND 24 — TABLEAU DE VEILLE MÉTIER =====
@@ -1084,16 +1013,10 @@ export function genVeilleMetierV2(o: OrganismeInfo, f: FormationInfo) {
   const rows = aiPack?.metier?.length
     ? veilleRowsToTable(aiPack.metier)
     : veilleMetierRows(f, type);
-  const preuvesHtml = buildPreuvesExploitationHtml(o, f, rows, { type: "métier", indicateur: 24 });
-  return buildDocument({
-    org: o,
-    title: "Tableau de veille métier",
-    table: {
-      headers: ["Lien (article / vidéo / événement)", "Nom de l'article / Vidéo / Événement", "Date", "Commentaire – Analyse métier", "Exploitation de veille (preuve + action Qualiopi)"],
-      rows,
-    },
-    extraHtml: preuvesHtml,
-  });
+  return buildDocument({ org: o, title: "Tableau de veille métier", table: {
+    headers: ["Lien (article / vidéo / événement)", "Nom de l'article / Vidéo / Événement", "Date", "Commentaire – Analyse métier", "Exploitation de veille (preuve + action Qualiopi)"],
+    rows,
+  } });
 }
 
 // ===== IND 25 — TABLEAU DE VEILLE TECHNOLOGIQUE =====
@@ -1538,16 +1461,10 @@ export function genVeilleTechnologiqueV2(o: OrganismeInfo, f: FormationInfo) {
   const rows = aiPack?.technologique?.length
     ? veilleRowsToTable(aiPack.technologique)
     : veilleTechnoRows(f, type);
-  const preuvesHtml = buildPreuvesExploitationHtml(o, f, rows, { type: "technologique", indicateur: 25 });
-  return buildDocument({
-    org: o,
-    title: "Tableau de veille technologique",
-    table: {
-      headers: ["Lien (vrai)", "Nom / Titre de l'article", "Date", "Commentaire (veille technologique)", "Exploitation de veille vérifiable (preuve + action Qualiopi)"],
-      rows,
-    },
-    extraHtml: preuvesHtml,
-  });
+  return buildDocument({ org: o, title: "Tableau de veille technologique", table: {
+    headers: ["Lien (vrai)", "Nom / Titre de l'article", "Date", "Commentaire (veille technologique)", "Exploitation de veille vérifiable (preuve + action Qualiopi)"],
+    rows,
+  } });
 }
 
 // ===== IND 26 — VEILLE HANDICAP =====

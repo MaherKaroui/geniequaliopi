@@ -265,6 +265,7 @@ export function buildFullCatalog(
     add("af_c6i23_screenshot_france_competences", "CT6 - IND 23 INSCRIPTION NEWSLETTER FRANCE COMPÉTENCES", 6, 23, "screenshot_france_competences");
     add("af_c6i23_screenshot_drieets", "CT6 - IND 23 INSCRIPTION NEWSLETTER DRIEETS", 6, 23, "screenshot_drieets");
     add("af_c6i23_screenshot_centre_inffo", "CT6 - IND 23 INSCRIPTION NEWSLETTER CENTRE INFFO", 6, 23, "screenshot_centre_inffo");
+    add("af_c6i23_preuves_veille", "CT6 - IND 23 PREUVES DE VEILLE RÉGLEMENTAIRE", 6, 23, "preuves_veille_reglementaire");
 
     // IND 24 — Veille métiers et emplois
     add("af_c6i24_tableau_veille_metier", "CT6 - IND 24 TABLEAU DE VEILLE MÉTIER", 6, 24, "tableau_veille", { type: "métier" });
@@ -774,6 +775,7 @@ export function buildFullCatalog(
     add("cfa_c6i23_screenshot_france_competences", "CT6 - IND 23 INSCRIPTION NEWSLETTER FRANCE COMPÉTENCES", 6, 23, "screenshot_france_competences");
     add("cfa_c6i23_screenshot_drieets", "CT6 - IND 23 INSCRIPTION NEWSLETTER DRIEETS", 6, 23, "screenshot_drieets");
     add("cfa_c6i23_screenshot_centre_inffo", "CT6 - IND 23 INSCRIPTION NEWSLETTER CENTRE INFFO", 6, 23, "screenshot_centre_inffo");
+    add("cfa_c6i23_preuves_veille", "CT6 - IND 23 PREUVES DE VEILLE RÉGLEMENTAIRE", 6, 23, "preuves_veille_reglementaire");
 
     // IND 24 — Veille métiers et emplois
     add("cfa_c6i24_tableau_veille_metier", "CT6 - IND 24 TABLEAU DE VEILLE MÉTIER", 6, 24, "tableau_veille", { type: "métier" });
