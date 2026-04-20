@@ -687,17 +687,9 @@ export function genPVSessionGlobal(o: OrganismeInfo, f: FormationInfo, stagiaire
   // Statut de la formation : si non terminée, dates de session, observations et résultats restent vides
   const termine = isFormationTerminee(f, stagiaires);
 
-  const dateDebutSession = termine ? (fmtDateFR(f.dateFin || f.dateDebut) || todayCompact()) : "";
-  const dateFinSession = termine
-    ? (() => {
-        if (f.dateFin) {
-          const d = new Date(f.dateFin);
-          d.setDate(d.getDate() + 1);
-          return fmtDateFR(d.toISOString().slice(0, 10));
-        }
-        return todayCompact();
-      })()
-    : "";
+  // Dates de session : toujours afficher si disponibles dans la formation
+  const dateDebutSession = fmtDateFR(f.dateDebut) || "";
+  const dateFinSession = fmtDateFR(f.dateFin) || "";
 
   const responsable = o.dirigeant || o.responsablePedagogique || "Responsable de session";
 
@@ -734,13 +726,23 @@ export function genPVSessionGlobal(o: OrganismeInfo, f: FormationInfo, stagiaire
   }
   const presidentJury = juryMembers[0];
 
-  let html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">${ministereStyle()}</head><body>`;
+  let html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">${ministereStyle()}<style>
+    .page-pv{min-height:auto !important;padding:20px 30px !important}
+    .page-pv .ministere-header{margin-bottom:8px}
+    .page-pv .ministere-header img.ministere-logo-img{max-height:70px}
+    .page-pv h1.dp-title{font-size:13pt;margin:8px 0 6px}
+    .page-pv h2.section-title{font-size:11pt;margin:10px 0 6px;padding:5px 10px}
+    .page-pv table.officiel{margin:6px 0;font-size:9pt}
+    .page-pv table.officiel th,.page-pv table.officiel td{padding:4px 6px}
+    .page-pv .obs-box{min-height:30px;padding:5px;margin:4px 0;font-size:9pt}
+    .page-pv p{font-size:10pt}
+  </style></head><body>`;
 
   // Page unique principale
-  html += `<div class="page">
+  html += `<div class="page page-pv">
     ${ministereHeader("PROCÈS-VERBAL GÉNÉRAL RELATIF À UNE SESSION D'EXAMEN<br>POUR L'OBTENTION DU TITRE PROFESSIONNEL")}
-    <p style="text-align:center;font-style:italic;color:#555;margin-bottom:8px">Session n° ${sessionNum}</p>
-    <p style="text-align:center;font-weight:bold;font-size:11pt;margin-bottom:20px">${codeTitre} — ${intituleTitre}</p>
+    <p style="text-align:center;font-style:italic;color:#555;margin-bottom:4px;font-size:9pt">Session n° ${sessionNum}</p>
+    <p style="text-align:center;font-weight:bold;font-size:10pt;margin-bottom:10px">${codeTitre} — ${intituleTitre}</p>
 
     <h2 class="section-title">Informations sur la session d'examen</h2>
     <table class="officiel">
