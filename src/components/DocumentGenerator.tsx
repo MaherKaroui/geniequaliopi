@@ -530,7 +530,15 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
         const isMail = doc.critere === 0 && !!MAIL_TEMPLATE_FILES[doc.template];
         const basePath = isMail ? "MAILS" : shortCriterePath(doc.critere, doc.indicateur);
 
-        if (hasStagiaireIdx) {
+        if (MAIL_TEMPLATE_FILES[doc.template] && typeof doc.params?.stagiaireIdx === "number") {
+          const s = allStagiaires[doc.params.stagiaireIdx];
+          const mailFolder = s ? `${basePath}/${s.nom}_${s.prenom}`.substring(0, 80) : basePath;
+          if (s) {
+            const mailBlob = await processMailDocxTemplate(MAIL_TEMPLATE_FILES[doc.template], mergedOrganisme, selectedFormation, s);
+            addFileToZip(`${mailFolder}/${buildCatalogFileName(doc, s, ".docx")}`, mailBlob);
+          }
+          await updateProgress();
+        } else if (hasStagiaireIdx) {
           const si = doc.params!.stagiaireIdx as number;
           const stagiaire = allStagiaires[si] || allStagiaires[0];
           const stagFolder = `${basePath}/${stagiaire.nom}_${stagiaire.prenom}`.substring(0, 80);
@@ -592,13 +600,6 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
         } else if (DOCX_TEMPLATE_FILES[doc.template]) {
           const docxBlob = await processDocxTemplate(DOCX_TEMPLATE_FILES[doc.template], mergedOrganisme);
           addFileToZip(`${basePath}/${buildCatalogFileName(doc, null, ".docx")}`, docxBlob);
-          await updateProgress();
-        } else if (MAIL_TEMPLATE_FILES[doc.template] && typeof doc.params?.stagiaireIdx === "number") {
-          const s = allStagiaires[doc.params.stagiaireIdx];
-          if (s) {
-            const mailBlob = await processMailDocxTemplate(MAIL_TEMPLATE_FILES[doc.template], mergedOrganisme, selectedFormation, s);
-            addFileToZip(`${basePath}/${buildCatalogFileName(doc, s, ".docx")}`, mailBlob);
-          }
           await updateProgress();
         } else if (
           doc.template === "indicateurs_performance"
