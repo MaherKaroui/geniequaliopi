@@ -68,6 +68,38 @@ function todayCompact(): string {
   return `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
 }
 
+/**
+ * Date de mise à jour à afficher dans le footer officiel.
+ * Toujours basée sur la date de MAJ du formulaire organisme (o.dateMaj).
+ * Si non renseignée, fallback sur la date du jour.
+ */
+function getDateMajOrg(o: OrganismeInfo): string {
+  if (o?.dateMaj) {
+    const d = new Date(o.dateMaj);
+    if (!isNaN(d.getTime())) {
+      return `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
+    }
+  }
+  return todayCompact();
+}
+
+/**
+ * Sépare un nom complet "Prénom NOM" ou "PRÉNOM Nom" en { prenom, nom }.
+ */
+function splitFormateur(full: string): { prenom: string; nom: string } {
+  if (!full) return { prenom: "", nom: "" };
+  const parts = full.trim().split(/\s+/);
+  if (parts.length === 1) return { prenom: "", nom: parts[0] };
+  // On considère que le dernier token est le nom de famille,
+  // sauf s'il est en MAJUSCULES (cas "AHMED EL FATHI" => nom = "EL FATHI")
+  const upperTokens = parts.filter(p => p === p.toUpperCase() && p.length > 1);
+  if (upperTokens.length >= 1 && upperTokens.length < parts.length) {
+    const prenomTokens = parts.filter(p => !(p === p.toUpperCase() && p.length > 1));
+    return { prenom: prenomTokens.join(" "), nom: upperTokens.join(" ") };
+  }
+  return { prenom: parts.slice(0, -1).join(" "), nom: parts.slice(-1)[0] };
+}
+
 function getStagDateNaissance(s: StagiaireInfo): string {
   if (s.dateNaissance) {
     const d = new Date(s.dateNaissance);
