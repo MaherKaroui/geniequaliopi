@@ -406,7 +406,9 @@ export function buildFullCatalog(
     // Indicateur 16 - Présentation certification
     formations.forEach((f, fi) => {
       add(`cfa_c3i16_livret_${fi}`, `Livret d'apprentissage`, 3, 16, "livret_apprentissage", { fi });
-      add(`cfa_c3i16_suivi_tuteur_${fi}`, `Fiche suivi tuteur`, 3, 16, "fiche_suivi_tuteur", { fi });
+      stagiaires.forEach((s, si) => {
+        add(`cfa_c3i16_suivi_tuteur_${fi}_${si}`, `Fiche suivi tuteur – ${s.prenom} ${s.nom}`, 3, 16, "fiche_suivi_tuteur", { fi, stagiaireIdx: si });
+      });
     });
 
     // ===== CRITÈRE 3 — IND 9 — CONDITIONS DE DÉROULEMENT (CFA) =====

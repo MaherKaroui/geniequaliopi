@@ -255,7 +255,11 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "planning_formateurs": return genPlanningFormateurs(o, formateurs, formations);
     case "coordination_pedagogique": return genCoordination(o, f);
     case "livret_apprentissage": return genLivretApprentissage(o, f);
-    case "fiche_suivi_tuteur": return genFicheSuiviTuteur(o, f);
+    case "fiche_suivi_tuteur": {
+      const si = params?.stagiaireIdx;
+      const list = (typeof si === "number" && stagiaires[si]) ? [stagiaires[si]] : stagiaires;
+      return genFicheSuiviTuteur(o, f, list);
+    }
     case "cv_formateur": return genCV(o, fmt);
     case "fiche_competences_formateur": return genFicheCompetences(o, fmt);
     case "evaluation_formateur": return genEvalFormateur(o, fmt);
@@ -2862,11 +2866,31 @@ function genLivretApprentissage(o: OrganismeInfo, f: FormationInfo) {
   ], signatures: { type: "3", names: ["", f.formateur] } });
 }
 
-function genFicheSuiviTuteur(o: OrganismeInfo, f: FormationInfo) {
-  return buildDocument({ org: o, title: "FICHE DE SUIVI TUTEUR", subtitle: f.intitule, formation: f, showFormationInfo: true, table: {
-    headers: ["Date", "Activité réalisée", "Compétences travaillées", "Évaluation"],
-    rows: [["Semaine 1", "Observation et découverte", "Compétences de base", "Satisfaisant"], ["Semaine 2", "Pratique guidée", "Compétences intermédiaires", "Bien"], ["Semaine 3", "Pratique autonome", "Compétences avancées", "Très bien"], ["Semaine 4", "Mise en situation réelle", "Compétences transversales", "Excellent"]]
-  }, signatures: { type: "2", labels: ["Le Tuteur", "Le Stagiaire"], names: [f.formateur, ""] } });
+function genFicheSuiviTuteur(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[] = []) {
+  const s = stagiaires[0];
+  const stagiaireNom = s ? `${s.prenom || ""} ${s.nom || ""}`.trim() : "";
+  const subtitle = stagiaireNom ? `${f.intitule} – ${stagiaireNom}` : f.intitule;
+  return buildDocument({
+    org: o,
+    title: "FICHE DE SUIVI TUTEUR",
+    subtitle,
+    formation: f,
+    showFormationInfo: true,
+    stagiaires: s ? [s] : undefined,
+    sections: stagiaireNom
+      ? [{ heading: "Identité de l'apprenti suivi", content: `<p><strong>Nom et prénom :</strong> ${stagiaireNom}${s?.entreprise ? `<br><strong>Entreprise d'accueil :</strong> ${s.entreprise}` : ""}${s?.email ? `<br><strong>Email :</strong> ${s.email}` : ""}</p>` }]
+      : undefined,
+    table: {
+      headers: ["Date", "Activité réalisée", "Compétences travaillées", "Évaluation"],
+      rows: [["Semaine 1", "Observation et découverte", "Compétences de base", "Satisfaisant"], ["Semaine 2", "Pratique guidée", "Compétences intermédiaires", "Bien"], ["Semaine 3", "Pratique autonome", "Compétences avancées", "Très bien"], ["Semaine 4", "Mise en situation réelle", "Compétences transversales", "Excellent"]]
+    },
+    signatures: {
+      type: "2",
+      labels: ["Le Tuteur", `Le Stagiaire${stagiaireNom ? ` – ${stagiaireNom}` : ""}`],
+      names: [f.formateur, stagiaireNom],
+      stagiaireSignatureUrl: s?.signatureUrl,
+    },
+  });
 }
 
 function genCV(o: OrganismeInfo, fmt: FormateurInfo) {
