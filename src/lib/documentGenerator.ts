@@ -591,6 +591,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     }
     case "charte_qualite_formateur_externe": return genCharteQualiteFormateurExterne(o);
     case "plan_dev_competences_excel": return genPlanDevCompetencesExcel(o, f, formateurs, stagiaires);
+    case "plan_dev_preuves_inscription": return genPlanDevPreuvesInscription(o, f, formateurs);
     case "grille_entretien_annuel": return genGrilleEntretienAnnuel(o, fmt);
     case "fiche_entretien_annuel_formateur": {
       // If a specific formateur name is passed, create a mock FormateurInfo
