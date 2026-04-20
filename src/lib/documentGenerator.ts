@@ -5981,7 +5981,11 @@ function genFicheAutoevaluation(o: OrganismeInfo, f: FormationInfo, stagiaires: 
   const commentaire = termine
     ? `<p>« Cette formation m'a permis de progresser significativement sur les aspects pratiques. Je me sens plus confiant(e) pour appliquer ces compétences dans mon poste. »</p>`
     : `<p style="color:#888;font-style:italic">Commentaire à compléter à l'issue de la formation.</p>`;
-  return buildDocument({ org: o, title: "FICHE D'AUTOÉVALUATION", subtitle: `${s.prenom} ${s.nom} – ${f.intitule}`, formation: f, showFormationInfo: true, stagiaires, table: {
+  // Si non terminée, on neutralise la signature du stagiaire (et celle du formateur côté visa stagiaire)
+  const stagiairesForDoc = termine
+    ? stagiaires
+    : stagiaires.map(st => ({ ...st, signatureUrl: undefined, formateurSignatureUrl: undefined }));
+  return buildDocument({ org: o, title: "FICHE D'AUTOÉVALUATION", subtitle: `${s.prenom} ${s.nom} – ${f.intitule}`, formation: f, showFormationInfo: true, stagiaires: stagiairesForDoc, table: {
     headers: ["Compétence / Objectif", "Avant formation (1-5)", "Après formation (1-5)", "Progression"],
     rows,
   }, sections: [
