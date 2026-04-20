@@ -83,15 +83,15 @@ function getStagDateNaissance(s: StagiaireInfo): string {
 }
 
 function getStagAdresse(s: StagiaireInfo): string {
-  return s.adresse ? `${s.adresse}${s.codePostal ? `<br>${s.codePostal} ${s.ville || ""}` : ""}` : "Adresse non renseignée";
+  return s.adresse ? `${s.adresse}${s.codePostal ? `<br>${s.codePostal} ${s.commune || ""}` : ""}` : "Adresse non renseignée";
 }
 
 function getDateDebut(f: FormationInfo, s?: StagiaireInfo): string {
-  return s?.dateDebut || f.dateDebut || "";
+  return s?.dateDebutFormation || f.dateDebut || "";
 }
 
 function getDateFin(f: FormationInfo, s?: StagiaireInfo): string {
-  return s?.dateFin || f.dateFin || "";
+  return s?.dateFinFormation || f.dateFin || "";
 }
 
 function fmtDateFR(d: string): string {
