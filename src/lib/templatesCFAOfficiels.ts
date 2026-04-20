@@ -811,19 +811,19 @@ export function genPVSessionGlobal(o: OrganismeInfo, f: FormationInfo, stagiaire
 
     <p style="margin-top:20px;font-size:9pt;font-style:italic">${termine ? `Le présent procès-verbal a été établi le ${dateMaj} et certifie l'exactitude des informations portées ci-dessus relatives à la session d'examen mentionnée en référence.` : "Document préparatoire — la session d'examen n'a pas encore eu lieu. Le procès-verbal définitif sera établi à l'issue de la session."}</p>
 
-    <div style="margin-top:30px;display:flex;justify-content:space-between;gap:30px">
+    <div style="margin-top:20px;margin-bottom:90px;display:flex;justify-content:space-between;gap:30px">
       <div style="flex:1">
-        <p><strong>Le Président du jury (Formateur évaluateur)</strong></p>
-        <p style="margin-top:4px;font-size:10pt">${(f.formateur || `${presidentJury.prenom} ${presidentJury.nom}`).trim()}</p>
-        <div style="height:90px;border:1px dashed #999;margin-top:8px;display:flex;align-items:center;justify-content:center;background:#fff;gap:8px">
-          ${f.formateurSignatureUrl ? `<img src="${f.formateurSignatureUrl}" alt="Signature formateur" style="max-height:75px;max-width:160px;object-fit:contain" />` : ""}
+        <p style="margin:0"><strong>Le Président du jury (Formateur évaluateur)</strong></p>
+        <p style="margin:4px 0 0;font-size:10pt">${(f.formateur || `${presidentJury.prenom} ${presidentJury.nom}`).trim()}</p>
+        <div style="height:70px;border:1px dashed #999;margin-top:6px;display:flex;align-items:center;justify-content:center;background:#fff;gap:8px">
+          ${f.formateurSignatureUrl ? `<img src="${f.formateurSignatureUrl}" alt="Signature formateur" style="max-height:60px;max-width:160px;object-fit:contain" />` : ""}
         </div>
       </div>
       <div style="flex:1">
-        <p><strong>Le Responsable de session (Direction)</strong></p>
-        <p style="margin-top:4px;font-size:10pt">${responsable}</p>
-        <div style="height:90px;border:1px dashed #999;margin-top:8px;display:flex;align-items:center;justify-content:center;background:#fff">
-          ${o.signatureUrl ? `<img src="${o.signatureUrl}" alt="Signature dirigeant" style="max-height:75px;max-width:160px;object-fit:contain" />` : ""}
+        <p style="margin:0"><strong>Le Responsable de session (Direction)</strong></p>
+        <p style="margin:4px 0 0;font-size:10pt">${responsable}</p>
+        <div style="height:70px;border:1px dashed #999;margin-top:6px;display:flex;align-items:center;justify-content:center;background:#fff">
+          ${o.signatureUrl ? `<img src="${o.signatureUrl}" alt="Signature dirigeant" style="max-height:60px;max-width:160px;object-fit:contain" />` : ""}
         </div>
       </div>
     </div>
