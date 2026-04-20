@@ -51,6 +51,12 @@ function detectFormationType(f: FormationInfo): FormationType {
 
 // ===== IND 23 — VEILLE RÉGLEMENTAIRE =====
 
+/** Public helper: récupère les lignes hardcodées de veille réglementaire d'une formation
+ *  (utilisé par le générateur de preuves visuelles IND 23). */
+export function getVeilleReglementaireRowsForFormation(f: FormationInfo): string[][] {
+  return veilleReglementaireRows(f, detectFormationType(f));
+}
+
 function veilleReglementaireRows(f: FormationInfo, type: FormationType): string[][] {
   const common = [
     [
