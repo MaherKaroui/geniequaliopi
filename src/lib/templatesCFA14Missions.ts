@@ -411,7 +411,7 @@ export function genAttestationFormationMaitreApprentissageCFA(o: OrganismeInfo, 
         variant: "green",
       },
       {
-        heading: `Fait à ${o.ville}, le ${formatDate(today)}`,
+        heading: `Fait à ${o.ville}, le ${formatDate(o.dateMaj || today)}`,
         content: `<p style="margin-top:30px"><strong>Pour le CFA</strong><br>${o.dirigeant}<br>Directeur(trice) du CFA</p>`,
       },
     ],
