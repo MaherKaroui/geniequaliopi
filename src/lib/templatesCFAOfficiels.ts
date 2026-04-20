@@ -677,23 +677,38 @@ export function genPVSessionGlobal(o: OrganismeInfo, f: FormationInfo, stagiaire
 
   const responsable = o.dirigeant || o.responsablePedagogique || "Responsable de session";
 
-  // Composition du jury : le formateur du formulaire formation est intégré comme 1er membre du jury
-  const seed = hashStr(`jury-${o.nom}-${f.intitule}`);
+  // Composition du jury : uniquement le formateur (formulaire Formation) + le dirigeant (formulaire Organisme).
+  // Si les deux désignent la même personne, on n'affiche qu'une seule ligne.
   const formateurFormation = (f.formateur || "").trim();
+  const dirigeantOrg = (o.dirigeant || "").trim();
   const formateurSplit = splitFormateur(formateurFormation);
+  const dirigeantSplit = splitFormateur(dirigeantOrg);
 
-  const juryBank = [
-    { nom: "BOUALAOUI", prenom: "Karima" },
-    { nom: "EL AMRAOUI", prenom: "Mourad" },
-    { nom: "HAMDOUN", prenom: "Nadia" },
-    { nom: "TOQUET", prenom: "Marie Jeanne" },
-    { nom: "RIVIÈRE", prenom: "Catherine" },
-    { nom: "VINCENT", prenom: "Patrick" },
-  ];
-  const rotated = [...juryBank.slice(seed % juryBank.length), ...juryBank.slice(0, seed % juryBank.length)];
-  const juryRotated = formateurFormation
-    ? [{ nom: formateurSplit.nom.toUpperCase(), prenom: formateurSplit.prenom }, ...rotated.filter(j => j.nom.toUpperCase() !== formateurSplit.nom.toUpperCase()).slice(0, 3)]
-    : rotated.slice(0, 4);
+  type JuryMember = { nom: string; prenom: string; role: string };
+  const juryMembers: JuryMember[] = [];
+  if (formateurFormation) {
+    juryMembers.push({
+      nom: formateurSplit.nom.toUpperCase(),
+      prenom: formateurSplit.prenom,
+      role: "Formateur évaluateur",
+    });
+  }
+  if (dirigeantOrg) {
+    const sameAsFormateur = formateurFormation
+      && formateurFormation.toLowerCase().replace(/\s+/g, " ") === dirigeantOrg.toLowerCase().replace(/\s+/g, " ");
+    if (!sameAsFormateur) {
+      juryMembers.push({
+        nom: dirigeantSplit.nom.toUpperCase(),
+        prenom: dirigeantSplit.prenom,
+        role: "Représentant de l'organisme",
+      });
+    }
+  }
+  // Fallback si rien n'est saisi
+  if (juryMembers.length === 0) {
+    juryMembers.push({ nom: "FORMATEUR", prenom: "", role: "Formateur évaluateur" });
+  }
+  const presidentJury = juryMembers[0];
 
   let html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">${ministereStyle()}</head><body>`;
 
