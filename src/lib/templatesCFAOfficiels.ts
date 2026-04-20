@@ -743,9 +743,10 @@ export function genPVSessionGlobal(o: OrganismeInfo, f: FormationInfo, stagiaire
         <th>Formation</th><th>VAE</th>
         <th>Absent</th><th>Réussite</th><th>Échec</th>
       </tr>
-      ${stagiaires.map((s, i) => {
+      ${stagiaires.map((s) => {
         const ident = String(2597000 + (hashStr(`${s.nom}-${s.prenom}`) % 999)).padStart(7, "0");
-        // Tous en réussite (audit-realism)
+        const sTermine = isStagiaireFormationTerminee(s, f);
+        // Si la formation du stagiaire n'est pas terminée → résultats vides (en attente de session)
         return `<tr>
           <td>${(s.nom || "").toUpperCase()}</td>
           <td></td>
@@ -754,13 +755,13 @@ export function genPVSessionGlobal(o: OrganismeInfo, f: FormationInfo, stagiaire
           <td style="text-align:center;font-weight:bold">X</td>
           <td></td>
           <td></td>
-          <td style="text-align:center;font-weight:bold">X</td>
+          <td style="text-align:center;font-weight:bold">${sTermine ? "X" : ""}</td>
           <td></td>
         </tr>`;
       }).join("")}
     </table>
 
-    <p style="margin-top:20px;font-size:9pt;font-style:italic">Le présent procès-verbal a été établi le ${todayCompact()} et certifie l'exactitude des informations portées ci-dessus relatives à la session d'examen mentionnée en référence.</p>
+    <p style="margin-top:20px;font-size:9pt;font-style:italic">${termine ? `Le présent procès-verbal a été établi le ${todayCompact()} et certifie l'exactitude des informations portées ci-dessus relatives à la session d'examen mentionnée en référence.` : "Document préparatoire — la session d'examen n'a pas encore eu lieu. Le procès-verbal définitif sera établi à l'issue de la session."}</p>
 
     <div style="margin-top:30px;display:flex;justify-content:space-between;gap:30px">
       <div style="flex:1">
