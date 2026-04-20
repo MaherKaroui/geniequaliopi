@@ -342,9 +342,6 @@ export function buildFullCatalog(
     stagiaires.forEach((s, si) => {
       add(`cfa_priority_contrat_bloc_${si}`, `CONTRAT DE FORMATION PAR BLOC – ${s.prenom} ${s.nom}`, 3, 9, "contrat_formation_par_bloc", { stagiaireIdx: si, priority: true });
     });
-    formations.forEach((f, fi) => {
-      add(`cfa_priority_emargement_${fi}`, `FEUILLE D'ÉMARGEMENT CFA`, 3, 11, "emargement_cfa", { fi, priority: true });
-    });
     stagiaires.forEach((s, si) => {
       add(`cfa_priority_dossier_inscription_${si}`, `DOSSIER D'INSCRIPTION – ${s.prenom} ${s.nom}`, 3, 9, "dossier_inscription_cfa", { stagiaireIdx: si, priority: true });
     });
