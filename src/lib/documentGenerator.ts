@@ -254,7 +254,11 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "cr_reunion": return genCRReunion(o, params?.mois ?? "");
     case "planning_formateurs": return genPlanningFormateurs(o, formateurs, formations);
     case "coordination_pedagogique": return genCoordination(o, f);
-    case "livret_apprentissage": return genLivretApprentissage(o, f);
+    case "livret_apprentissage": {
+      const si = params?.stagiaireIdx;
+      const s = (typeof si === "number" && stagiaires[si]) ? stagiaires[si] : stagiaires[0];
+      return genLivretApprentissage(o, f, s);
+    }
     case "fiche_suivi_tuteur": {
       const si = params?.stagiaireIdx;
       const list = (typeof si === "number" && stagiaires[si]) ? [stagiaires[si]] : stagiaires;
@@ -2862,12 +2866,29 @@ function genCoordination(o: OrganismeInfo, f: FormationInfo) {
   ] });
 }
 
-function genLivretApprentissage(o: OrganismeInfo, f: FormationInfo) {
-  return buildDocument({ org: o, title: "LIVRET D'APPRENTISSAGE", subtitle: f.intitule, formation: f, showFormationInfo: true, sections: [
-    { heading: "Objectifs de la période", content: `<p>${f.objectifs}</p>` },
-    { heading: "Compétences à développer", content: "<p>☐ Compétence 1 : Acquise<br>☐ Compétence 2 : En cours<br>☐ Compétence 3 : À développer</p>" },
-    { heading: "Observations du tuteur", content: "<p>Le stagiaire fait preuve de motivation et d'assiduité. Les compétences se développent de manière satisfaisante.</p>" },
-  ], signatures: { type: "3", names: ["", f.formateur] } });
+function genLivretApprentissage(o: OrganismeInfo, f: FormationInfo, s?: StagiaireInfo) {
+  const stagiaireNom = s ? `${s.prenom || ""} ${s.nom || ""}`.trim() : "";
+  const subtitle = stagiaireNom ? `${f.intitule} – ${stagiaireNom}` : f.intitule;
+  return buildDocument({
+    org: o,
+    title: "LIVRET D'APPRENTISSAGE",
+    subtitle,
+    formation: f,
+    showFormationInfo: true,
+    stagiaires: s ? [s] : undefined,
+    sections: [
+      ...(stagiaireNom ? [{ heading: "Identité de l'apprenti", content: `<p><strong>Nom et prénom :</strong> ${stagiaireNom}${s?.entreprise ? `<br><strong>Entreprise d'accueil :</strong> ${s.entreprise}` : ""}${s?.email ? `<br><strong>Email :</strong> ${s.email}` : ""}</p>` }] : []),
+      { heading: "Objectifs de la période", content: `<p>${f.objectifs}</p>` },
+      { heading: "Compétences à développer", content: "<p>☐ Compétence 1 : Acquise<br>☐ Compétence 2 : En cours<br>☐ Compétence 3 : À développer</p>" },
+      { heading: "Observations du tuteur", content: "<p>L'apprenti fait preuve de motivation et d'assiduité. Les compétences se développent de manière satisfaisante.</p>" },
+    ],
+    signatures: {
+      type: "2",
+      labels: ["Le Tuteur / Maître d'apprentissage", `L'Apprenti${stagiaireNom ? ` – ${stagiaireNom}` : ""}`],
+      names: [f.formateur, stagiaireNom],
+      stagiaireSignatureUrl: s?.signatureUrl,
+    },
+  });
 }
 
 function genFicheSuiviTuteur(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[] = []) {
