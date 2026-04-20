@@ -498,18 +498,24 @@ export function genECFOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
   const codeTitre = getCodeTitre(f);
   const mil = getMillesime(f);
   const dateJo = getDateJO(f);
+  const dateMaj = getDateMajOrg(o);
   const sigle = "ECF";
   const typeDoc = "Livret d'évaluations passées en cours de formation";
   const activites = getActivitesTypes(f);
   const intituleTitre = f.intitule || "Titre professionnel";
   const niveau = getRNCP(f)?.niveau || "Niveau 5";
 
-  // Évaluations déterministes par stagiaire
+  // Statut de la formation : si non terminée, on n'affiche pas de date d'éval définitive
+  const termine = isStagiaireFormationTerminee(s, f);
+
+  // Formateur évaluateur principal = formateur saisi sur le formulaire Formation
   const seed = hashStr(`${s.prenom}-${s.nom}`);
-  const formateur1 = pick(["GUEBLI Ghizlan", "MARTIN Sophie", "DUBOIS Pierre", "LEROY Marie", "ROUSSEAU Karim"], seed);
+  const formateurPrincipal = (f.formateur || "").trim()
+    || pick(["GUEBLI Ghizlan", "MARTIN Sophie", "DUBOIS Pierre", "LEROY Marie", "ROUSSEAU Karim"], seed);
+  const formateur1 = formateurPrincipal;
   const formateur2 = pick(["GASPAR Edouard", "BERNARD Anne", "PETIT Julien", "MOREAU Camille", "GIRARD Sami"], seed + 5);
   const responsable = o.dirigeant || o.responsablePedagogique || "OUACHEK Hakim";
-  const dateEval = fmtDateFR(getDateFin(f, s)) || todayCompact();
+  const dateEval = termine ? (fmtDateFR(getDateFin(f, s)) || todayCompact()) : "";
 
   let html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">${ministereStyle()}</head><body>`;
 
