@@ -889,6 +889,25 @@ export function buildFullCatalog(
     // IND 32 — Amélioration continue
     add("cfa_c7i32_tableau_amelioration_excel", "CT7 - IND 32 TABLEAU D'AMÉLIORATION CONTINUE", 7, 32, "tableau_amelioration_continue_excel");
     add("cfa_c7i32_procedure_amelioration", "CT7 - IND 32 PROCÉDURE AMÉLIORATION CONTINUE", 7, 32, "procedure_amelioration_continue");
+
+    // ===========================================================
+    // ===== 📁 SITE WEB — Documents publics (sans stagiaire) =====
+    // ===========================================================
+    // Versions vierges signées/tamponnées, prêtes à être publiées sur le site internet du CFA.
+    // Toutes utilisent { genericStagiaire: true } pour neutraliser les noms/prénoms stagiaires.
+    add("cfa_siteweb_navigations", "📁 SITE WEB – Navigations (Plan du site)", 1, 1, "pdf_static", { pdfUrl: "/pdfs/site_web/navigations.pdf" });
+    add("cfa_siteweb_mentions_legales", "📁 SITE WEB – Mentions légales", 1, 1, "mentions_legales", { genericStagiaire: true });
+    add("cfa_siteweb_cgv", "📁 SITE WEB – Conditions Générales de Vente (CGV)", 1, 1, "cgv_cfa", { genericStagiaire: true, stagiaireIdx: 0 });
+    add("cfa_siteweb_reglement_interieur", "📁 SITE WEB – Règlement intérieur", 3, 9, "reglement_interieur_cfa_v2", { genericStagiaire: true, stagiaireIdx: 0 });
+    add("cfa_siteweb_annexes_reglement", "📁 SITE WEB – Annexes du règlement intérieur", 3, 9, "pdf_static", { pdfUrl: "/pdfs/site_web/annexes_reglement_interieur.pdf" });
+    add("cfa_siteweb_droits_devoirs", "📁 SITE WEB – Droits et devoirs de l'apprenti", 3, 9, "droits_devoirs_apprenti_cfa", { genericStagiaire: true });
+    add("cfa_siteweb_14_missions", "📁 SITE WEB – Les 14 missions du CFA", 3, 10, "pdf_static", { pdfUrl: "/pdfs/site_web/14_missions_cfa.pdf" });
+    add("cfa_siteweb_livret_accueil", "📁 SITE WEB – Livret d'accueil de l'apprenti", 3, 9, "livret_accueil_cfa_v2", { genericStagiaire: true, stagiaireIdx: 0 });
+    add("cfa_siteweb_livret_apprentissage", "📁 SITE WEB – Livret d'apprentissage", 2, 5, "livret_apprentissage_cfa_v2", { genericStagiaire: true, stagiaireIdx: 0 });
+    add("cfa_siteweb_aide_permis", "📁 SITE WEB – L'aide au permis B", 3, 14, "pdf_static", { pdfUrl: "/pdfs/aide_financement_permis_b.pdf" });
+    add("cfa_siteweb_aides_sociales", "📁 SITE WEB – Aides sociales (ARA, équipement, santé psy, Imagine R)", 3, 14, "pdf_static", { pdfUrl: "/pdfs/site_web/aides_sociales.pdf" });
+    add("cfa_siteweb_atelier_entretien", "📁 SITE WEB – Atelier préparation entretien", 3, 14, "pdf_static", { pdfUrl: "/pdfs/site_web/atelier_entretien.pdf" });
+    add("cfa_siteweb_atelier_cv", "📁 SITE WEB – Atelier CV", 3, 14, "pdf_static", { pdfUrl: "/pdfs/site_web/atelier_cv.pdf" });
   }
 
   // ===== Bilan de compétences =====
