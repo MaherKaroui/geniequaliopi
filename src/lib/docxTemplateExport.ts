@@ -159,13 +159,32 @@ async function replaceInZip(zip: JSZip, replacements: Record<string, string>): P
 /**
  * Fetch a .docx template, replace all {{placeholders}} with organisme data, return a Blob.
  */
+function encodeTemplateUrl(url: string): string {
+  // Encode spaces and special chars in path segments while preserving slashes
+  return url.split("/").map((seg, i) => (i === 0 && seg === "" ? "" : encodeURIComponent(seg))).join("/");
+}
+
+async function fetchTemplate(templateUrl: string): Promise<ArrayBuffer> {
+  const tryUrls = [encodeTemplateUrl(templateUrl), templateUrl];
+  let lastErr = "";
+  for (const url of tryUrls) {
+    try {
+      const resp = await fetch(url);
+      if (resp.ok) return await resp.arrayBuffer();
+      lastErr = `HTTP ${resp.status} sur ${url}`;
+    } catch (e) {
+      lastErr = (e as Error).message;
+    }
+  }
+  throw new Error(`Template introuvable: ${templateUrl} (${lastErr})`);
+}
+
 export async function processDocxTemplate(
   templateUrl: string,
   organisme: OrganismeInfo
 ): Promise<Blob> {
-  const resp = await fetch(templateUrl);
-  if (!resp.ok) throw new Error(`Template introuvable: ${templateUrl}`);
-  const zip = await JSZip.loadAsync(await resp.arrayBuffer());
+  const buffer = await fetchTemplate(templateUrl);
+  const zip = await JSZip.loadAsync(buffer);
   return replaceInZip(zip, buildReplacements(organisme));
 }
 
