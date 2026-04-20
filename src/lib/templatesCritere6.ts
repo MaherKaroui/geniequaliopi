@@ -1013,16 +1013,10 @@ export function genVeilleMetierV2(o: OrganismeInfo, f: FormationInfo) {
   const rows = aiPack?.metier?.length
     ? veilleRowsToTable(aiPack.metier)
     : veilleMetierRows(f, type);
-  const preuvesHtml = buildPreuvesExploitationHtml(o, f, rows, { type: "métier", indicateur: 24 });
-  return buildDocument({
-    org: o,
-    title: "Tableau de veille métier",
-    table: {
-      headers: ["Lien (article / vidéo / événement)", "Nom de l'article / Vidéo / Événement", "Date", "Commentaire – Analyse métier", "Exploitation de veille (preuve + action Qualiopi)"],
-      rows,
-    },
-    extraHtml: preuvesHtml,
-  });
+  return buildDocument({ org: o, title: "Tableau de veille métier", table: {
+    headers: ["Lien (article / vidéo / événement)", "Nom de l'article / Vidéo / Événement", "Date", "Commentaire – Analyse métier", "Exploitation de veille (preuve + action Qualiopi)"],
+    rows,
+  } });
 }
 
 // ===== IND 25 — TABLEAU DE VEILLE TECHNOLOGIQUE =====
@@ -1467,16 +1461,10 @@ export function genVeilleTechnologiqueV2(o: OrganismeInfo, f: FormationInfo) {
   const rows = aiPack?.technologique?.length
     ? veilleRowsToTable(aiPack.technologique)
     : veilleTechnoRows(f, type);
-  const preuvesHtml = buildPreuvesExploitationHtml(o, f, rows, { type: "technologique", indicateur: 25 });
-  return buildDocument({
-    org: o,
-    title: "Tableau de veille technologique",
-    table: {
-      headers: ["Lien (vrai)", "Nom / Titre de l'article", "Date", "Commentaire (veille technologique)", "Exploitation de veille vérifiable (preuve + action Qualiopi)"],
-      rows,
-    },
-    extraHtml: preuvesHtml,
-  });
+  return buildDocument({ org: o, title: "Tableau de veille technologique", table: {
+    headers: ["Lien (vrai)", "Nom / Titre de l'article", "Date", "Commentaire (veille technologique)", "Exploitation de veille vérifiable (preuve + action Qualiopi)"],
+    rows,
+  } });
 }
 
 // ===== IND 26 — VEILLE HANDICAP =====
