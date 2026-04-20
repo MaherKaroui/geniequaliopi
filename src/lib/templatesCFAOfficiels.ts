@@ -714,7 +714,7 @@ export function genPVSessionGlobal(o: OrganismeInfo, f: FormationInfo, stagiaire
     </table>
 
     <h2 class="section-title">Observations du jury sur le déroulement de la session d'examen</h2>
-    <div class="obs-box">La session s'est déroulée dans des conditions conformes aux exigences du référentiel. Tous les candidats inscrits étaient présents (sauf mention contraire). Les épreuves ont été conduites selon les modalités prévues : mise en situation professionnelle, entretien technique et questionnement à partir de productions. Le jury salue la qualité globale des prestations présentées.</div>
+    <div class="obs-box">${termine ? "La session s'est déroulée dans des conditions conformes aux exigences du référentiel. Tous les candidats inscrits étaient présents (sauf mention contraire). Les épreuves ont été conduites selon les modalités prévues : mise en situation professionnelle, entretien technique et questionnement à partir de productions. Le jury salue la qualité globale des prestations présentées." : "&nbsp;"}</div>
 
     <h2 class="section-title">Composition du jury</h2>
     <table class="officiel">
