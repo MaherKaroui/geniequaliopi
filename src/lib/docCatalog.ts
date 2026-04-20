@@ -522,6 +522,14 @@ export function buildFullCatalog(
     add("cfa_mission11_tableau_candidats_sans_contrat", "CT3 - IND 10 📁 MISSION 11 – Tableau de suivi des candidats sans contrat", 3, 10, "tableau_suivi_candidats_sans_contrat_cfa");
     // Mission 13 — Formation du Maître d'Apprentissage
     add("cfa_mission13_attestation_formation_ma", "CT3 - IND 10 📁 MISSION 13 – Attestation de formation du Maître d'Apprentissage", 3, 10, "attestation_formation_maitre_apprentissage_cfa");
+    // Mission 3 (L6231-2) — Cohérence CFA / Entreprise
+    add("cfa_mission3_cooperation_cfa_entreprise", "CT3 - IND 10 📁 MISSION 3 – Coopération CFA / Entreprise (Formateurs & MA)", 3, 10, "cooperation_cfa_entreprise_cfa");
+    // Mission 9 (L6231-2) — Diversité et lutte contre les discriminations
+    add("cfa_mission9bis_plan_diversite", "CT3 - IND 10 📁 MISSION 9 – Plan diversité & lutte contre les discriminations", 3, 10, "plan_diversite_lutte_discriminations_cfa");
+    // Mission 10 (L6231-2) — Mobilité nationale
+    add("cfa_mission10_plan_mobilite_nationale", "CT3 - IND 10 📁 MISSION 10 – Plan de mobilité nationale des apprentis", 3, 10, "plan_mobilite_nationale_cfa");
+    // Mission 13 (L6231-2) — Accompagnement post-formation (interruption / non-diplômés)
+    add("cfa_mission13bis_accompagnement_post_formation", "CT3 - IND 10 📁 MISSION 13 – Procédure d'accompagnement post-formation (interruption / sans diplôme)", 3, 10, "procedure_accompagnement_post_formation_cfa");
 
     // Documents CFA complémentaires (autres critères)
     add("cfa_c1i1_livret_accueil", "CT1 - IND 1 LIVRET D'ACCUEIL CFA", 1, 1, "livret_accueil_cfa");
