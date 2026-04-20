@@ -256,15 +256,123 @@ const BRANDS: Brand[] = [
   },
 ];
 
+// Palettes réalistes utilisées en rotation pour les organismes inconnus
+const GENERIC_PALETTES = [
+  { primary: "#1e3a7b", accent: "#f59e0b" },
+  { primary: "#0f5132", accent: "#fcbf49" },
+  { primary: "#7c2d12", accent: "#fb923c" },
+  { primary: "#1e40af", accent: "#22d3ee" },
+  { primary: "#581c87", accent: "#e879f9" },
+  { primary: "#0c4a6e", accent: "#38bdf8" },
+  { primary: "#7f1d1d", accent: "#fca5a5" },
+  { primary: "#134e4a", accent: "#5eead4" },
+  { primary: "#3f3f46", accent: "#facc15" },
+  { primary: "#9a3412", accent: "#fde68a" },
+];
+
+const GENERIC_FIRSTNAMES_F = ["Sophie", "Aurélie", "Camille", "Élodie", "Nathalie", "Sandrine", "Caroline", "Isabelle", "Marie", "Julie", "Pauline", "Hélène"];
+const GENERIC_FIRSTNAMES_M = ["Thomas", "Julien", "Olivier", "Sébastien", "Nicolas", "Pierre", "Antoine", "Frédéric", "Laurent", "Vincent", "Benoît", "Mathieu"];
+const GENERIC_LASTNAMES = ["MARTIN", "BERNARD", "DUBOIS", "ROUSSEAU", "LAURENT", "MOREAU", "LEFEBVRE", "GIRARD", "BONNET", "FONTAINE", "CHEVALIER", "ROBERT", "RICHARD", "PETIT", "DURAND", "LEROY", "MORIN", "FOURNIER", "MERCIER", "BLANC"];
+const GENERIC_ROLES = [
+  "Responsable inscriptions formation",
+  "Conseiller(ère) formation entreprises",
+  "Coordinateur(trice) pédagogique",
+  "Chargé(e) de relations clients",
+  "Gestionnaire administratif formation",
+];
+const GENERIC_CITIES = [
+  { city: "Paris", cp: "75009", street: "rue de Châteaudun" },
+  { city: "Lyon", cp: "69003", street: "rue de la République" },
+  { city: "Marseille", cp: "13008", street: "avenue du Prado" },
+  { city: "Toulouse", cp: "31000", street: "allée Jean Jaurès" },
+  { city: "Nantes", cp: "44000", street: "rue Crébillon" },
+  { city: "Bordeaux", cp: "33000", street: "cours de l'Intendance" },
+  { city: "Lille", cp: "59000", street: "rue Faidherbe" },
+  { city: "Strasbourg", cp: "67000", street: "rue du Vieux Marché aux Vins" },
+  { city: "Nice", cp: "06000", street: "boulevard Victor Hugo" },
+  { city: "Rennes", cp: "35000", street: "rue Saint-Hélier" },
+];
+const GENERIC_PHONE_PREFIXES: Record<string, string> = {
+  Paris: "+33 1", Lyon: "+33 4", Marseille: "+33 4", Toulouse: "+33 5",
+  Nantes: "+33 2", Bordeaux: "+33 5", Lille: "+33 3", Strasbourg: "+33 3",
+  Nice: "+33 4", Rennes: "+33 2",
+};
+
+function hashStr(s: string): number {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0;
+  return Math.abs(h);
+}
+
+function slugify(s: string): string {
+  return s
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+function detectTLD(label: string): string {
+  const l = label.toLowerCase();
+  if (/(academy|institute|college|university|english|school)/.test(l)) return "com";
+  if (/\.org\b/.test(l)) return "org";
+  return "fr";
+}
+
+function buildGenericBrand(label: string): Brand {
+  const seed = hashStr(label);
+  const palette = GENERIC_PALETTES[seed % GENERIC_PALETTES.length];
+  const slug = slugify(label).split("-").slice(0, 3).join("-") || "organisme";
+  const tld = detectTLD(label);
+  const domain = `${slug}.${tld}`;
+  const words = label.split(/\s+/).filter(Boolean);
+  const shortName = words.length >= 2
+    ? words.slice(0, 2).map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(" ")
+    : (words[0] || "OF");
+
+  const phoneSeed = (seed * 31) % 1000000;
+  const formatPhone = (prefix: string, n: number) => {
+    const digits = (10000000 + n).toString().slice(0, 8);
+    return `${prefix} ${digits.slice(0, 2)} ${digits.slice(2, 4)} ${digits.slice(4, 6)} ${digits.slice(6, 8)}`;
+  };
+
+  const contacts = [0, 1, 2].map(i => {
+    const isFem = (seed + i) % 2 === 0;
+    const first = isFem ? GENERIC_FIRSTNAMES_F[(seed + i * 7) % GENERIC_FIRSTNAMES_F.length] : GENERIC_FIRSTNAMES_M[(seed + i * 7) % GENERIC_FIRSTNAMES_M.length];
+    const last = GENERIC_LASTNAMES[(seed + i * 13) % GENERIC_LASTNAMES.length];
+    const role = GENERIC_ROLES[(seed + i * 5) % GENERIC_ROLES.length];
+    const cityIdx = (seed + i * 3) % GENERIC_CITIES.length;
+    const prefix = GENERIC_PHONE_PREFIXES[GENERIC_CITIES[cityIdx].city] || "+33 1";
+    return {
+      name: `${first} ${last}`,
+      role,
+      email: `${first.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")}.${last.toLowerCase()}`,
+      phone: formatPhone(prefix, phoneSeed + i * 1234),
+    };
+  });
+
+  const cityInfo = GENERIC_CITIES[seed % GENERIC_CITIES.length];
+  const streetNum = (seed % 199) + 1;
+  const address = `${streetNum} ${cityInfo.street}, ${cityInfo.cp} ${cityInfo.city}`;
+
+  return {
+    key: `generic-${slug}`,
+    matcher: /./,
+    primary: palette.primary,
+    accent: palette.accent,
+    domain,
+    fullName: label,
+    shortName,
+    contacts,
+    address,
+    signoff: ["Cordialement", "Bien cordialement", "Sincères salutations", "Bien à vous"],
+  };
+}
+
 function detectBrand(label: string): Brand {
   for (const b of BRANDS) if (b.matcher.test(label)) return b;
-  return {
-    key: "generic", matcher: /./, primary: "#1e3a7b", accent: "#f59e0b",
-    domain: "organisme-formation.fr", fullName: label, shortName: label.split(" ")[0] || "OF",
-    contacts: [{ name: "Service Inscriptions", role: "Conseiller formation", email: "inscription", phone: "+33 1 00 00 00 00" }],
-    address: "—",
-    signoff: ["Cordialement"],
-  };
+  return buildGenericBrand(label);
 }
 
 function refNumber(seed: number, brand: Brand, year: number): string {
