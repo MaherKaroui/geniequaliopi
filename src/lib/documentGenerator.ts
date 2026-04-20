@@ -2866,15 +2866,27 @@ function genFicheSuiviTuteur(o: OrganismeInfo, f: FormationInfo, stagiaires: Sta
   const s = stagiaires[0];
   const stagiaireNom = s ? `${s.prenom || ""} ${s.nom || ""}`.trim() : "";
   const subtitle = stagiaireNom ? `${f.intitule} – ${stagiaireNom}` : f.intitule;
-  const sigStagiaire = s?.signatureUrl
-    ? `<img src="${s.signatureUrl}" alt="Signature stagiaire" style="max-height:60px;max-width:180px;" />`
-    : "";
-  return buildDocument({ org: o, title: "FICHE DE SUIVI TUTEUR", subtitle, formation: f, showFormationInfo: true,
-    sections: stagiaireNom ? [{ heading: "Identité de l'apprenti suivi", content: `<p><strong>Nom et prénom :</strong> ${stagiaireNom}${s?.entreprise ? `<br><strong>Entreprise d'accueil :</strong> ${s.entreprise}` : ""}${s?.email ? `<br><strong>Email :</strong> ${s.email}` : ""}</p>` }] : undefined,
+  return buildDocument({
+    org: o,
+    title: "FICHE DE SUIVI TUTEUR",
+    subtitle,
+    formation: f,
+    showFormationInfo: true,
+    stagiaires: s ? [s] : undefined,
+    sections: stagiaireNom
+      ? [{ heading: "Identité de l'apprenti suivi", content: `<p><strong>Nom et prénom :</strong> ${stagiaireNom}${s?.entreprise ? `<br><strong>Entreprise d'accueil :</strong> ${s.entreprise}` : ""}${s?.email ? `<br><strong>Email :</strong> ${s.email}` : ""}</p>` }]
+      : undefined,
     table: {
       headers: ["Date", "Activité réalisée", "Compétences travaillées", "Évaluation"],
       rows: [["Semaine 1", "Observation et découverte", "Compétences de base", "Satisfaisant"], ["Semaine 2", "Pratique guidée", "Compétences intermédiaires", "Bien"], ["Semaine 3", "Pratique autonome", "Compétences avancées", "Très bien"], ["Semaine 4", "Mise en situation réelle", "Compétences transversales", "Excellent"]]
-    }, signatures: { type: "2", labels: ["Le Tuteur", `Le Stagiaire${stagiaireNom ? ` – ${stagiaireNom}` : ""}`], names: [f.formateur, stagiaireNom], images: ["", sigStagiaire] } as any });
+    },
+    signatures: {
+      type: "2",
+      labels: ["Le Tuteur", `Le Stagiaire${stagiaireNom ? ` – ${stagiaireNom}` : ""}`],
+      names: [f.formateur, stagiaireNom],
+      stagiaireSignatureUrl: s?.signatureUrl,
+    },
+  });
 }
 
 function genCV(o: OrganismeInfo, fmt: FormateurInfo) {
