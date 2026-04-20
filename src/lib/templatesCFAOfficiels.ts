@@ -7,6 +7,7 @@
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { getRNCPByCode, RNCPFiche } from "./rncpData";
 import { formatDate } from "./docBuilder";
+import { generateAIDPPack, getCachedDPPack, AIDPExemple } from "./aiDPPack";
 
 // -----------------------------------------------------------------------------
 // Helpers communs
@@ -298,6 +299,51 @@ function genererExemplePratique(
 // 1) DOSSIER PROFESSIONNEL (DP)
 // =============================================================================
 
+/**
+ * Précharge le contenu IA pour le DP d'un stagiaire.
+ * À appeler AVANT genDPOfficiel pour bénéficier de la génération Lovable AI.
+ * Si l'appel IA échoue, on retombe sur le moteur déterministe local.
+ */
+export async function preloadDPAIPack(f: FormationInfo, s: StagiaireInfo): Promise<void> {
+  try {
+    const activites = getActivitesTypes(f);
+    const domaine = detectDomaine(f);
+    const debut = getDateDebut(f, s) || "";
+    const fin = getDateFin(f, s) || "";
+    const periode = `Du ${fmtDateFR(debut) || "—"} au ${fmtDateFR(fin) || "—"}`;
+    await generateAIDPPack(f, s, activites, domaine, periode);
+  } catch (err) {
+    console.warn("[preloadDPAIPack] IA indisponible, fallback déterministe :", err);
+  }
+}
+
+function buildDPExemple(
+  f: FormationInfo,
+  s: StagiaireInfo,
+  activite: { titre: string; competences: string[] },
+  ai: number,
+  exNum: number,
+  aiPack: AIDPExemple | null,
+): { intitule: string; tache: string; moyens: string; collegues: string; entreprise: string; periode: string } {
+  // 1 exemple IA par activité ; le 2ème reste local pour rester unique et varié
+  if (aiPack && exNum === 1) {
+    const dom = detectDomaine(f);
+    const seedE = hashStr(`${s.prenom}-${s.nom}-${ai}`);
+    const entreprise = s.entreprise || pick(SCENARIOS_PAR_DOMAINE[dom].entreprises, seedE);
+    const debut = getDateDebut(f, s) || "01/10/2024";
+    const fin = getDateFin(f, s) || "30/09/2025";
+    return {
+      intitule: aiPack.intitule,
+      tache: aiPack.tache,
+      moyens: aiPack.moyens,
+      collegues: aiPack.collegues,
+      entreprise,
+      periode: `Du ${fmtDateFR(debut)} au ${fmtDateFR(fin)}`,
+    };
+  }
+  return genererExemplePratique(f, s, activite, ai * 10 + exNum);
+}
+
 export function genDPOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], stagiaireIdx: number = 0): string {
   const s = stagiaires[stagiaireIdx];
   if (!s) return "<p>Stagiaire introuvable</p>";
@@ -309,6 +355,7 @@ export function genDPOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: St
   const typeDoc = "Dossier professionnel";
   const activites = getActivitesTypes(f);
   const intituleTitre = f.intitule || "Titre professionnel";
+  const aiPack = getCachedDPPack(f, s); // null si pas préchargé
 
   let html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">${ministereStyle()}</head><body>`;
 
@@ -358,9 +405,9 @@ export function genDPOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: St
   // ===== PAGES Activités-types & Exemples =====
   let pageNum = 3;
   activites.forEach((act, ai) => {
-    // 2 exemples par activité-type
+    const aiExemple = aiPack?.exemples?.[ai] || null;
     [1, 2].forEach((exNum) => {
-      const ex = genererExemplePratique(f, s, act, ai * 10 + exNum);
+      const ex = buildDPExemple(f, s, act, ai, exNum, aiExemple);
       html += `<div class="page">
         <h2 class="section-title">DOSSIER PROFESSIONNEL (DP)</h2>
         <div class="activite-type">Activité-type ${ai + 1} · ${act.titre.toUpperCase()}</div>

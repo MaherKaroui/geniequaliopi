@@ -21,7 +21,7 @@ import { getModuleSpecificConsigne } from "./cfaExerciseContent";
 import { genProcedureAbandonReorientationCFA, genAccompagnementDistancielCFA, genEnquetePartenaireEmployeurCFA, genFicheRenseignementsCommanditaireCFA, genContratApprentissageModeEmploiCFA, genProcedureAccueilBeneficiairesCFA, genProcedureAdaptationPedagogiqueCFA, genProcedureGestionAnnulationsCFA, genProcedureRuptureContratApprentissageCFA, genLivretApprentissageCFA as genLivretApprentissageInd10, genLivretMaitreApprentissageCFA, genMesuresEngagementBeneficiairesCFA, genPreventionGestionAbandonsCFA, genGuideEntretienAbandonsCFA, genEviterSituationsEchecCFA, genProcedureAnnulationsAbandonsCFA, genFichierGestionAnnulationsCFA, genAccompagnementRechercheContratCFA, genListeAideSocialCFA, genCertificatRealisationCFA, genWebinaireFormationCompetencesCFA, genWebinaireNTCCFA, genDroitsDevoirsApprentiCFA, genReglesSSMilieuProCFA } from "./templatesCFA";
 import { getYearFromDateCandidates } from "./eyExport";
 import { genProgrammeBDC as genProgrammeBDC_imported, genEvaluationBesoins as genEvaluationBesoins_imported, genDocumentSynthese as genDocumentSynthese_imported, genDerouleModalitesBDC as genDerouleModalitesBDC_imported, genEnqueteMetierBDC as genEnqueteMetierBDC_imported, genCGVBilanCompetences as genCGVBilanCompetences_imported, genContratBilanCompetences as genContratBilanCompetences_imported, genConventionBilanCompetences as genConventionBilanCompetences_imported, genFormulaireAttentesBDC as genFormulaireAttentesBDC_imported, genConvocationBDC as genConvocationBDC_imported, genSynopsisBDC as genSynopsisBDC_imported, genGrilleSuiviBDC as genGrilleSuiviBDC_imported, genSuiviPostBilanBDC as genSuiviPostBilanBDC_imported, genProcedureAdaptationBDC as genProcedureAdaptationBDC_imported, genExplorationMetierBDC as genExplorationMetierBDC_imported, genFichePosteConsultantBDC as genFichePosteConsultantBDC_imported, genCompteRenduFinBDC as genCompteRenduFinBDC_imported, genFicheIntervenantExterneBDC as genFicheIntervenantExterneBDC_imported, genSatisfactionChaudBDC as genSatisfactionChaudBDC_imported, genFormulaireReclamationBDC as genFormulaireReclamationBDC_imported, genGestionReclamationsBDC as genGestionReclamationsBDC_imported, genActionsCorrectivesBDC as genActionsCorrectivesBDC_imported, genBilanAbandonsRupturesBDC as genBilanAbandonsRupturesBDC_imported, genBilanMensuelBDC as genBilanMensuelBDC_imported, genQuestionnaireEnqueteMetiersBDC as genQuestionnaireEnqueteMetiersBDC_imported, genGuideProtocolesBDC as genGuideProtocolesBDC_imported, genTableauBasesBDC as genTableauBasesBDC_imported, genFicheVeilleBDC as genFicheVeilleBDC_imported, genContratSousTraitanceBDC as genContratSousTraitanceBDC_imported } from "./templatesBDC";
-import { genDPOfficiel, genECFOfficiel, genPVSessionGlobal } from "./templatesCFAOfficiels";
+import { genDPOfficiel, genECFOfficiel, genPVSessionGlobal, preloadDPAIPack } from "./templatesCFAOfficiels";
 import { getCachedPack, answersForQCM, studentAnswerFromCorrection, noteForOpenQuestion, type AIEvalPack } from "./aiEvalPack";
 
 const FALLBACK_STAGIAIRE: StagiaireInfo = { prenom: "Martin", nom: "Dupont", civilite: "" as "M." | "Mme" | "", email: "", telephone: "", entreprise: "", poste: "", dateNaissance: "" };
@@ -43,6 +43,27 @@ export function generateDocumentById(docId: string, template: string, params: Re
   // Remove all emoji icons and replace with plain text equivalents
   result = stripEmojis(result);
   return result;
+}
+
+/**
+ * Précharge en parallèle le contenu IA Lovable pour le DP de tous les stagiaires.
+ * À appeler AVANT un export ZIP / téléchargement de masse pour bénéficier du contenu unique IA.
+ * En cas d'erreur (rate limit, crédits, réseau) : fallback transparent sur le moteur déterministe.
+ */
+export async function preloadAIDPForAllStagiaires(
+  userFormation: FormationInfo,
+  userStagiaires: StagiaireInfo[],
+): Promise<void> {
+  const selectedFormation = userFormation.intitule
+    ? { ...SAMPLE_FORMATIONS[0], ...Object.fromEntries(Object.entries(userFormation).filter(([, v]) => v && String(v).trim())) }
+    : SAMPLE_FORMATIONS[0];
+  const stagiaires = mergeStagiaires(userStagiaires);
+  // Limit concurrency to 3 to éviter rate limit
+  const BATCH = 3;
+  for (let i = 0; i < stagiaires.length; i += BATCH) {
+    const slice = stagiaires.slice(i, i + BATCH);
+    await Promise.all(slice.map(s => preloadDPAIPack(selectedFormation, s)));
+  }
 }
 
 function stripEmojis(html: string): string {
