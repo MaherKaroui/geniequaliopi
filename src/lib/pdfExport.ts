@@ -103,17 +103,34 @@ async function ensureGoogleFontsLoaded(htmlContent: string): Promise<void> {
   await yieldToBrowser(120);
 }
 
-function isForcedPageBreak(node: ChildNode): boolean {
-  if (!(node instanceof HTMLElement)) return false;
-  const className = node.className?.toString() || "";
-  const inlineStyle = (node.getAttribute("style") || "").toLowerCase();
+type PageBreakBehavior = {
+  before: boolean;
+  after: boolean;
+  markerOnly: boolean;
+};
 
-  return (
+function getPageBreakBehavior(node: ChildNode): PageBreakBehavior {
+  if (!(node instanceof HTMLElement)) {
+    return { before: false, after: false, markerOnly: false };
+  }
+
+  const className = node.className?.toString().toLowerCase() || "";
+  const inlineStyle = (node.getAttribute("style") || "").toLowerCase().replace(/\s+/g, "");
+
+  const before =
+    className.includes("page-break-before") ||
+    inlineStyle.includes("page-break-before:always") ||
+    inlineStyle.includes("break-before:page");
+
+  const after =
     className.includes("page-break") ||
+    className.includes("page-break-after") ||
     inlineStyle.includes("page-break-after:always") ||
-    inlineStyle.includes("break-after: page") ||
-    inlineStyle.includes("break-before: page")
-  );
+    inlineStyle.includes("break-after:page");
+
+  const markerOnly = !node.children.length && !node.textContent?.trim();
+
+  return { before, after, markerOnly };
 }
 
 function createPage(host: HTMLDivElement, footerHtml: string, footerHeightPx: number, pageWPx = A4_WIDTH_PX, pageHPx = A4_HEIGHT_PX): PageParts {
@@ -239,10 +256,21 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
     let current = createPage(host, footerHtml, footerHeightPx, PAGE_W_PX, PAGE_H_PX);
     pages.push(current.page);
 
-    for (const node of nodes) {
-      if (isForcedPageBreak(node)) {
+    for (let index = 0; index < nodes.length; index++) {
+      const node = nodes[index];
+      const pageBreak = getPageBreakBehavior(node);
+      const hasMoreNodes = index < nodes.length - 1;
+
+      if (pageBreak.before && current.content.childNodes.length > 0) {
         current = createPage(host, footerHtml, footerHeightPx, PAGE_W_PX, PAGE_H_PX);
         pages.push(current.page);
+      }
+
+      if (pageBreak.markerOnly) {
+        if (pageBreak.after && hasMoreNodes && current.content.childNodes.length > 0) {
+          current = createPage(host, footerHtml, footerHeightPx, PAGE_W_PX, PAGE_H_PX);
+          pages.push(current.page);
+        }
         continue;
       }
 
@@ -288,6 +316,10 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
             newTbody.appendChild(rowClone);
           }
         }
+        if (pageBreak.after && hasMoreNodes) {
+          current = createPage(host, footerHtml, footerHeightPx, PAGE_W_PX, PAGE_H_PX);
+          pages.push(current.page);
+        }
         continue;
       }
 
@@ -300,6 +332,11 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
         current = createPage(host, footerHtml, footerHeightPx, PAGE_W_PX, PAGE_H_PX);
         pages.push(current.page);
         current.content.appendChild(clone);
+      }
+
+      if (pageBreak.after && hasMoreNodes) {
+        current = createPage(host, footerHtml, footerHeightPx, PAGE_W_PX, PAGE_H_PX);
+        pages.push(current.page);
       }
     }
 
