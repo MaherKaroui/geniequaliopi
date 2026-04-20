@@ -779,7 +779,7 @@ export function genPVSessionGlobal(o: OrganismeInfo, f: FormationInfo, stagiaire
     <div style="margin-top:30px;display:flex;justify-content:space-between;gap:30px">
       <div style="flex:1">
         <p><strong>Le Président du jury</strong></p>
-        <p style="margin-top:4px;font-size:10pt">${juryRotated[0].prenom} ${juryRotated[0].nom}</p>
+        <p style="margin-top:4px;font-size:10pt">${presidentJury.prenom} ${presidentJury.nom}</p>
         <div style="height:60px;border:1px dashed #999;margin-top:8px"></div>
       </div>
       <div style="flex:1">
