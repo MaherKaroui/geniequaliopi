@@ -72,6 +72,57 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
     reader.readAsDataURL(file);
   };
 
+  const handleCerfaImport = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    setImportingCerfa(true);
+    const newStagiaires: StagiaireInfo[] = [];
+    let successCount = 0;
+    let errorCount = 0;
+
+    try {
+      for (const file of Array.from(files)) {
+        try {
+          const dataUrl: string = await new Promise((resolve, reject) => {
+            const r = new FileReader();
+            r.onload = () => resolve(r.result as string);
+            r.onerror = reject;
+            r.readAsDataURL(file);
+          });
+
+          const { data: extracted, error } = await supabase.functions.invoke("extract-cerfa", {
+            body: { fileDataUrl: dataUrl },
+          });
+
+          if (error || !extracted || extracted.error) {
+            console.error("CERFA extraction error:", error || extracted?.error);
+            errorCount++;
+            continue;
+          }
+
+          newStagiaires.push({
+            ...emptyStagiaire,
+            ...extracted,
+            nom: String(extracted.nom || "").toUpperCase(),
+            prenom: String(extracted.prenom || "").charAt(0).toUpperCase() + String(extracted.prenom || "").slice(1).toLowerCase(),
+          });
+          successCount++;
+        } catch (e) {
+          console.error("Erreur fichier CERFA:", e);
+          errorCount++;
+        }
+      }
+
+      if (newStagiaires.length > 0) {
+        onChange([...data, ...newStagiaires]);
+      }
+      if (successCount > 0) toast.success(`${successCount} CERFA importé(s) avec succès`);
+      if (errorCount > 0) toast.error(`${errorCount} CERFA n'ont pas pu être lus`);
+    } finally {
+      setImportingCerfa(false);
+      if (cerfaInputRef.current) cerfaInputRef.current.value = "";
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-6">
