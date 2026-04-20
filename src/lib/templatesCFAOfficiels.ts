@@ -379,6 +379,7 @@ export function genDPOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: St
   const activites = getActivitesTypes(f);
   const intituleTitre = f.intitule || "Titre professionnel";
   const aiPack = getCachedDPPack(f, s); // null si pas préchargé
+  const termineDP = isStagiaireFormationTerminee(s, f);
 
   let html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">${ministereStyle()}</head><body>`;
 
@@ -479,7 +480,9 @@ export function genDPOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: St
       <div><strong>Le :</strong> ${dateMaj}</div>
     </div>
     <div style="margin-top:30px"><strong>Signature :</strong></div>
-    <div style="height:80px;border:1px dashed #999;margin-top:10px"></div>
+    <div style="height:80px;border:1px dashed #999;margin-top:10px;display:flex;align-items:center;justify-content:center;background:#fff">
+      ${termineDP && s.signatureUrl ? `<img src="${s.signatureUrl}" alt="Signature candidat" style="max-height:70px;max-width:200px;object-fit:contain" />` : ""}
+    </div>
     ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, String(pageNum), dateMaj)}
   </div>`;
 
@@ -626,18 +629,42 @@ export function genECFOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
     <h3 class="subsection">Formateur(s) / Évaluateur(s)</h3>
     <table class="eval-table">
       <tr><th>Nom</th><th>Date</th><th>Visa</th></tr>
-      <tr><td>${formateur1}</td><td>${dateEval}</td><td style="height:30px"></td></tr>
-      <tr><td>${formateur2}</td><td>${dateEval}</td><td style="height:30px"></td></tr>
+      <tr>
+        <td>${formateur1}</td>
+        <td>${dateEval}</td>
+        <td style="height:50px;text-align:center;vertical-align:middle">
+          ${termine && f.formateurSignatureUrl ? `<img src="${f.formateurSignatureUrl}" alt="Signature formateur" style="max-height:42px;max-width:120px;object-fit:contain" />` : ""}
+        </td>
+      </tr>
+      <tr>
+        <td>${formateur2}</td>
+        <td>${dateEval}</td>
+        <td style="height:50px;text-align:center;vertical-align:middle">
+          ${termine && f.formateurSignatureUrl ? `<img src="${f.formateurSignatureUrl}" alt="Signature formateur" style="max-height:42px;max-width:120px;object-fit:contain;opacity:0.85" />` : ""}
+        </td>
+      </tr>
     </table>
 
     <h3 class="subsection">Représentant de l'organisme de formation</h3>
     <table class="eval-table">
       <tr><th>Nom</th><th>Date</th><th>Visa</th></tr>
-      <tr><td>${responsable}</td><td>${dateEval}</td><td style="height:30px"></td></tr>
+      <tr>
+        <td>${responsable}</td>
+        <td>${dateEval}</td>
+        <td style="height:60px;text-align:center;vertical-align:middle">
+          ${termine && (o.signatureUrl || o.tamponUrl) ? `
+            <div style="display:flex;align-items:center;justify-content:center;gap:6px">
+              ${o.signatureUrl ? `<img src="${o.signatureUrl}" alt="Signature dirigeant" style="max-height:50px;max-width:110px;object-fit:contain" />` : ""}
+              ${o.tamponUrl ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:90px;object-fit:contain" />` : ""}
+            </div>` : ""}
+        </td>
+      </tr>
     </table>
 
     <p style="margin-top:18px"><strong>Signature du candidat pour information :</strong></p>
-    <div style="height:60px;border:1px dashed #999;margin-top:8px"></div>
+    <div style="height:70px;border:1px dashed #999;margin-top:8px;display:flex;align-items:center;justify-content:center;background:#fff">
+      ${termine && s.signatureUrl ? `<img src="${s.signatureUrl}" alt="Signature candidat" style="max-height:60px;max-width:200px;object-fit:contain" />` : ""}
+    </div>
     ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, `${pageNum}/${activites.length + 4}`, dateMaj)}
   </div>`;
 
@@ -725,7 +752,7 @@ export function genPVSessionGlobal(o: OrganismeInfo, f: FormationInfo, stagiaire
       <tr><th>Adresse :</th><td>${o.adresse || ""}<br>${o.codePostal || ""} ${o.ville || ""} — FRANCE</td></tr>
       <tr><th>Date de début de la session :</th><td>${dateDebutSession}</td></tr>
       <tr><th>Date de fin de la session :</th><td>${dateFinSession}</td></tr>
-      <tr><th>Responsable de session :</th><td>Nom : <strong>${responsable.split(" ").slice(-1)[0] || responsable}</strong><br>Prénom : ${responsable.split(" ").slice(0, -1).join(" ") || ""}<br>Signature : <em>(signature manuscrite)</em></td></tr>
+      <tr><th>Responsable de session :</th><td>Nom : <strong>${responsable.split(" ").slice(-1)[0] || responsable}</strong><br>Prénom : ${responsable.split(" ").slice(0, -1).join(" ") || ""}<br>Signature : ${termine && (o.signatureUrl || o.tamponUrl) ? `<span style="display:inline-flex;align-items:center;gap:6px;vertical-align:middle">${o.signatureUrl ? `<img src="${o.signatureUrl}" alt="Signature" style="max-height:40px;max-width:110px;object-fit:contain;vertical-align:middle" />` : ""}${o.tamponUrl ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:50px;max-width:80px;object-fit:contain;vertical-align:middle" />` : ""}</span>` : `<em>(signature manuscrite)</em>`}</td></tr>
     </table>
 
     <h2 class="section-title">Observations du jury sur le déroulement de la session d'examen</h2>
@@ -734,12 +761,23 @@ export function genPVSessionGlobal(o: OrganismeInfo, f: FormationInfo, stagiaire
     <h2 class="section-title">Composition du jury</h2>
     <table class="officiel">
       <tr><th>Nom</th><th>Prénom</th><th>Qualité</th><th>Signature</th></tr>
-      ${juryMembers.map(m => `<tr>
+      ${juryMembers.map(m => {
+        const isFormateur = m.role === "Formateur évaluateur";
+        const sigUrl = isFormateur ? f.formateurSignatureUrl : o.signatureUrl;
+        const stampUrl = !isFormateur ? o.tamponUrl : null;
+        return `<tr>
         <td>${m.nom}</td>
         <td>${m.prenom}</td>
         <td>${m.role}</td>
-        <td style="height:50px"><em>(signature)</em></td>
-      </tr>`).join("")}
+        <td style="height:60px;text-align:center;vertical-align:middle">
+          ${termine && (sigUrl || stampUrl) ? `
+            <div style="display:inline-flex;align-items:center;justify-content:center;gap:4px">
+              ${sigUrl ? `<img src="${sigUrl}" alt="Signature" style="max-height:50px;max-width:110px;object-fit:contain" />` : ""}
+              ${stampUrl ? `<img src="${stampUrl}" alt="Tampon" style="max-height:55px;max-width:75px;object-fit:contain" />` : ""}
+            </div>` : `<em>(signature)</em>`}
+        </td>
+      </tr>`;
+      }).join("")}
     </table>
 
     <h2 class="section-title">Identité des candidats inscrits à la session</h2>
@@ -780,12 +818,21 @@ export function genPVSessionGlobal(o: OrganismeInfo, f: FormationInfo, stagiaire
       <div style="flex:1">
         <p><strong>Le Président du jury</strong></p>
         <p style="margin-top:4px;font-size:10pt">${presidentJury.prenom} ${presidentJury.nom}</p>
-        <div style="height:60px;border:1px dashed #999;margin-top:8px"></div>
+        <div style="height:80px;border:1px dashed #999;margin-top:8px;display:flex;align-items:center;justify-content:center;background:#fff;gap:6px">
+          ${termine ? (() => {
+            const isForm = presidentJury.role === "Formateur évaluateur";
+            const sigUrl = isForm ? f.formateurSignatureUrl : o.signatureUrl;
+            const stampUrl = !isForm ? o.tamponUrl : null;
+            return `${sigUrl ? `<img src="${sigUrl}" alt="Signature" style="max-height:65px;max-width:150px;object-fit:contain" />` : ""}${stampUrl ? `<img src="${stampUrl}" alt="Tampon" style="max-height:75px;max-width:100px;object-fit:contain" />` : ""}`;
+          })() : ""}
+        </div>
       </div>
       <div style="flex:1">
         <p><strong>Le Responsable de session</strong></p>
         <p style="margin-top:4px;font-size:10pt">${responsable}</p>
-        <div style="height:60px;border:1px dashed #999;margin-top:8px"></div>
+        <div style="height:80px;border:1px dashed #999;margin-top:8px;display:flex;align-items:center;justify-content:center;background:#fff;gap:6px">
+          ${termine && (o.signatureUrl || o.tamponUrl) ? `${o.signatureUrl ? `<img src="${o.signatureUrl}" alt="Signature" style="max-height:65px;max-width:150px;object-fit:contain" />` : ""}${o.tamponUrl ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:75px;max-width:100px;object-fit:contain" />` : ""}` : ""}
+        </div>
       </div>
     </div>
     ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, "1/1", dateMaj)}
