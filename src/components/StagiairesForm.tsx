@@ -159,6 +159,24 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
           <Button onClick={() => generateFakes(true)} size="sm" variant="outline" className="gap-1 h-9">
             <Sparkles className="w-4 h-4" /> Générer (remplacer)
           </Button>
+          <input
+            ref={cerfaInputRef}
+            type="file"
+            accept="application/pdf"
+            multiple
+            className="hidden"
+            onChange={(e) => handleCerfaImport(e.target.files)}
+          />
+          <Button
+            onClick={() => cerfaInputRef.current?.click()}
+            size="sm"
+            variant="outline"
+            disabled={importingCerfa}
+            className="gap-1 h-9"
+          >
+            {importingCerfa ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileUp className="w-4 h-4" />}
+            {importingCerfa ? "Extraction..." : "Importer CERFA"}
+          </Button>
           <Button onClick={addStagiaire} size="sm" className="h-9">
             + Ajouter
           </Button>
