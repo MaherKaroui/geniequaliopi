@@ -476,7 +476,7 @@ export function genDPOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: St
     <p class="declaration">Pour faire valoir ce que de droit.</p>
     <div style="margin-top:40px;display:flex;justify-content:space-between;font-size:10pt">
       <div><strong>Fait à :</strong> ${o.ville || "Paris"}</div>
-      <div><strong>Le :</strong> ${todayCompact()}</div>
+      <div><strong>Le :</strong> ${dateMaj}</div>
     </div>
     <div style="margin-top:30px"><strong>Signature :</strong></div>
     <div style="height:80px;border:1px dashed #999;margin-top:10px"></div>
