@@ -738,8 +738,7 @@ export function genPVSessionGlobal(o: OrganismeInfo, f: FormationInfo, stagiaire
 
   // Page unique principale
   html += `<div class="page">
-    <div style="text-align:left;margin-bottom:10px;font-size:9pt;font-weight:bold">MINISTÈRE DU TRAVAIL, DE LA SANTÉ, DES SOLIDARITÉS ET DES FAMILLES</div>
-    <h1 class="dp-title" style="font-size:14pt">PROCÈS-VERBAL GÉNÉRAL RELATIF À UNE SESSION D'EXAMEN<br>POUR L'OBTENTION DU TITRE PROFESSIONNEL</h1>
+    ${ministereHeader("PROCÈS-VERBAL GÉNÉRAL RELATIF À UNE SESSION D'EXAMEN<br>POUR L'OBTENTION DU TITRE PROFESSIONNEL")}
     <p style="text-align:center;font-style:italic;color:#555;margin-bottom:8px">Session n° ${sessionNum}</p>
     <p style="text-align:center;font-weight:bold;font-size:11pt;margin-bottom:20px">${codeTitre} — ${intituleTitre}</p>
 
