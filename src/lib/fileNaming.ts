@@ -19,6 +19,8 @@ export const PER_STAGIAIRE_TEMPLATES = new Set([
   "convention_formation_apprentissage", "livre_apprentissage_cfa", "convocation_cfa", "cgv_cfa",
   "convocation_certification",
   "livret_accueil_cfa_v2",
+  "dp_officiel",
+  "ecf_officiel",
   "droit_image_cfa",
   "reglement_interieur_cfa_v2",
   "contrat_formation_par_bloc",
