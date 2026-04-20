@@ -12,6 +12,7 @@ import StagiairesForm from "@/components/StagiairesForm";
 import StepIndicator from "@/components/StepIndicator";
 import CVGeneratorEmbed from "@/components/CVGeneratorEmbed";
 import { genContratFormationParticulier, genDevis, genFacture } from "@/lib/templatesAF";
+import { genContratFormationNDA } from "@/lib/contratNDA";
 import { courseCertificateHtml } from "@/lib/newsletterScreenshots";
 import { isFormationTerminee, setDocStyle } from "@/lib/docBuilder";
 import { genReglement_V2, genEmargementJour_V2 } from "@/lib/generatorsV2";
@@ -171,7 +172,7 @@ function generateDocumentHTML(docId: string, o: OrganismeInfo, f: FormationInfo,
 
   switch (docId) {
     case "contrat":
-      return genContratFormationParticulier(cleanOrganisme, f, s);
+      return genContratFormationNDA(cleanOrganisme, f, s);
     case "programme":
       return generateProgrammeNDA(cleanOrganisme, f, s);
     case "reglement":
