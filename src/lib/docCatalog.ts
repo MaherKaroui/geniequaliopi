@@ -505,6 +505,22 @@ export function buildFullCatalog(
     add("cfa_c3i10_handicap_eval_besoins_agefiph", "CT3 - IND 10 📁 HANDICAP – Évaluation Besoins Apprenants AGEFIPH (Excel)", 3, 10, "pdf_static", { pdfUrl: "/pdfs/evaluation_besoins_handicap_agefiph.xlsx" });
     add("cfa_c3i10_handicap_types_moyens", "CT3 - IND 10 📁 HANDICAP – Types de Handicap, Moyens et Partenaires (Excel)", 3, 10, "pdf_static", { pdfUrl: "/pdfs/handicap_types_moyens_partenaires.xlsx" });
 
+    // ===== 14 MISSIONS OFFICIELLES DU CFA (Art. L6231-2) =====
+    // Mission 4 — Activités citoyennes, culturelles, sportives
+    add("cfa_mission4_plan_activites", "CT3 - IND 10 📁 MISSION 4 – Plan d'activités citoyennes, culturelles et sportives", 3, 10, "plan_activites_citoyennes_cfa");
+    // Mission 6 — Mixité et Égalité Femmes / Hommes
+    add("cfa_mission6_plan_mixite_egalite", "CT3 - IND 10 📁 MISSION 6 – Plan d'actions Mixité & Égalité F/H", 3, 10, "plan_mixite_egalite_fh_cfa");
+    // Mission 8 — Insertion professionnelle
+    add("cfa_mission8_suivi_insertion", "CT7 - IND 30 📁 MISSION 8 – Suivi de l'insertion professionnelle à 6 mois", 7, 30, "suivi_insertion_pro_cfa");
+    // Mission 9 — Mobilité internationale Erasmus+
+    add("cfa_mission9_convention_erasmus", "CT3 - IND 10 📁 MISSION 9 – Convention de mobilité internationale Erasmus+", 3, 10, "convention_mobilite_erasmus_cfa");
+    add("cfa_mission9_procedure_erasmus", "CT3 - IND 10 📁 MISSION 9 – Procédure de mobilité internationale Erasmus+", 3, 10, "procedure_mobilite_erasmus_cfa");
+    // Mission 11 — Aide à la recherche d'employeur
+    add("cfa_mission11_procedure_aide_employeur", "CT3 - IND 10 📁 MISSION 11 – Procédure d'aide à la recherche d'employeur", 3, 10, "procedure_aide_recherche_employeur_cfa");
+    add("cfa_mission11_tableau_candidats_sans_contrat", "CT3 - IND 10 📁 MISSION 11 – Tableau de suivi des candidats sans contrat", 3, 10, "tableau_suivi_candidats_sans_contrat_cfa");
+    // Mission 13 — Formation du Maître d'Apprentissage
+    add("cfa_mission13_attestation_formation_ma", "CT3 - IND 10 📁 MISSION 13 – Attestation de formation du Maître d'Apprentissage", 3, 10, "attestation_formation_maitre_apprentissage_cfa");
+
     // Documents CFA complémentaires (autres critères)
     add("cfa_c1i1_livret_accueil", "CT1 - IND 1 LIVRET D'ACCUEIL CFA", 1, 1, "livret_accueil_cfa");
     add("cfa_procedure_psh", "Procédure PSH CFA", 6, 26, "procedure_psh_cfa");
