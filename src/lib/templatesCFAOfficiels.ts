@@ -816,9 +816,8 @@ export function genPVSessionGlobal(o: OrganismeInfo, f: FormationInfo, stagiaire
       <div style="flex:1">
         <p><strong>Le Responsable de session (Direction)</strong></p>
         <p style="margin-top:4px;font-size:10pt">${responsable}</p>
-        <div style="height:90px;border:1px dashed #999;margin-top:8px;display:flex;align-items:center;justify-content:center;background:#fff;gap:8px">
-          ${o.signatureUrl ? `<img src="${o.signatureUrl}" alt="Signature dirigeant" style="max-height:75px;max-width:140px;object-fit:contain" />` : ""}
-          ${o.tamponUrl ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:80px;max-width:100px;object-fit:contain" />` : ""}
+        <div style="height:90px;border:1px dashed #999;margin-top:8px;display:flex;align-items:center;justify-content:center;background:#fff">
+          ${o.signatureUrl ? `<img src="${o.signatureUrl}" alt="Signature dirigeant" style="max-height:75px;max-width:160px;object-fit:contain" />` : ""}
         </div>
       </div>
     </div>
