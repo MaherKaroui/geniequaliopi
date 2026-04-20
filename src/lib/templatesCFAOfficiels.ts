@@ -190,10 +190,10 @@ function ministereHeader(centerTitle: string, subTitle?: string): string {
   `;
 }
 
-function footerOfficiel(sigle: string, typeDoc: string, codeTitre: string, mil: string, dateJo: string, page: string): string {
+function footerOfficiel(sigle: string, typeDoc: string, codeTitre: string, mil: string, dateJo: string, page: string, dateMaj: string): string {
   return `<div class="footer-table"><table>
     <tr><th>SIGLE</th><th>Type de document</th><th>Code titre</th><th>Millésime</th><th>Date JO</th><th>Date de mise à jour</th><th>Page</th></tr>
-    <tr><td>${sigle}</td><td>${typeDoc}</td><td>${codeTitre}</td><td>${mil}</td><td>${dateJo}</td><td>${todayCompact()}</td><td>${page}</td></tr>
+    <tr><td>${sigle}</td><td>${typeDoc}</td><td>${codeTitre}</td><td>${mil}</td><td>${dateJo}</td><td>${dateMaj}</td><td>${page}</td></tr>
   </table></div>`;
 }
 
