@@ -197,9 +197,8 @@ export async function processMailDocxTemplate(
   formation: FormationInfo,
   stagiaire: StagiaireInfo
 ): Promise<Blob> {
-  const resp = await fetch(templateUrl);
-  if (!resp.ok) throw new Error(`Template introuvable: ${templateUrl}`);
-  const zip = await JSZip.loadAsync(await resp.arrayBuffer());
+  const buffer = await fetchTemplate(templateUrl);
+  const zip = await JSZip.loadAsync(buffer);
   return replaceInZip(zip, buildMailReplacements(organisme, formation, stagiaire));
 }
 
