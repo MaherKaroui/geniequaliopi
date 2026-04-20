@@ -346,8 +346,7 @@ export function buildFullCatalog(
       add(`cfa_priority_emargement_${fi}`, `FEUILLE D'ÉMARGEMENT CFA`, 3, 11, "emargement_cfa", { fi, priority: true });
     });
     stagiaires.forEach((s, si) => {
-      const numAction = s.numeroAction?.trim() || `${s.prenom} ${s.nom}`;
-      add(`cfa_priority_dossier_inscription_${si}`, `DOSSIER D'INSCRIPTION – N° ${numAction}`, 3, 9, "dossier_inscription_cfa", { stagiaireIdx: si, priority: true });
+      add(`cfa_priority_dossier_inscription_${si}`, `DOSSIER D'INSCRIPTION – ${s.prenom} ${s.nom}`, 3, 9, "dossier_inscription_cfa", { stagiaireIdx: si, priority: true });
     });
 
     // ===== CRITÈRE 1 — INFORMATION DU PUBLIC (CFA) =====
