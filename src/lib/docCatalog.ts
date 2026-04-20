@@ -405,8 +405,8 @@ export function buildFullCatalog(
 
     // Indicateur 16 - Présentation certification
     formations.forEach((f, fi) => {
-      add(`cfa_c3i16_livret_${fi}`, `Livret d'apprentissage`, 3, 16, "livret_apprentissage", { fi });
       stagiaires.forEach((s, si) => {
+        add(`cfa_c3i16_livret_${fi}_${si}`, `Livret d'apprentissage – ${s.prenom} ${s.nom}`, 3, 16, "livret_apprentissage", { fi, stagiaireIdx: si });
         add(`cfa_c3i16_suivi_tuteur_${fi}_${si}`, `Fiche suivi tuteur – ${s.prenom} ${s.nom}`, 3, 16, "fiche_suivi_tuteur", { fi, stagiaireIdx: si });
       });
     });
