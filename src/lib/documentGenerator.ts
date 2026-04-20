@@ -5959,17 +5959,33 @@ function genContratSousTraitance(o: OrganismeInfo) {
 
 function genFicheAutoevaluation(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const s = stagiaires[0] || { prenom: "___", nom: "___" };
+  const termine = isFormationTerminee(f, stagiaires);
+  const competences = [
+    "Maîtrise des concepts fondamentaux",
+    "Application pratique en situation de travail",
+    "Autonomie dans la réalisation des tâches",
+    "Capacité à transmettre les connaissances",
+    "Confiance dans l'utilisation des outils",
+  ];
+  const filledRows: string[][] = [
+    [competences[0], "2", "4", "+2 ↑"],
+    [competences[1], "1", "3", "+2 ↑"],
+    [competences[2], "2", "4", "+2 ↑"],
+    [competences[3], "1", "3", "+2 ↑"],
+    [competences[4], "2", "5", "+3 ↑"],
+  ];
+  // Formation non terminée → seul le niveau "Avant formation" est renseigné, le reste reste vide
+  const rows = termine
+    ? filledRows
+    : filledRows.map(([comp, avant]) => [comp, avant, "", ""]);
+  const commentaire = termine
+    ? `<p>« Cette formation m'a permis de progresser significativement sur les aspects pratiques. Je me sens plus confiant(e) pour appliquer ces compétences dans mon poste. »</p>`
+    : `<p style="color:#888;font-style:italic">Commentaire à compléter à l'issue de la formation.</p>`;
   return buildDocument({ org: o, title: "FICHE D'AUTOÉVALUATION", subtitle: `${s.prenom} ${s.nom} – ${f.intitule}`, formation: f, showFormationInfo: true, stagiaires, table: {
     headers: ["Compétence / Objectif", "Avant formation (1-5)", "Après formation (1-5)", "Progression"],
-    rows: [
-      ["Maîtrise des concepts fondamentaux", "2", "4", "+2 ↑"],
-      ["Application pratique en situation de travail", "1", "3", "+2 ↑"],
-      ["Autonomie dans la réalisation des tâches", "2", "4", "+2 ↑"],
-      ["Capacité à transmettre les connaissances", "1", "3", "+2 ↑"],
-      ["Confiance dans l'utilisation des outils", "2", "5", "+3 ↑"],
-    ]
+    rows,
   }, sections: [
-    { heading: "Commentaires du stagiaire", content: `<p>« Cette formation m'a permis de progresser significativement sur les aspects pratiques. Je me sens plus confiant(e) pour appliquer ces compétences dans mon poste. »</p>`, variant: "green" },
+    { heading: "Commentaires du stagiaire", content: commentaire, variant: "green" },
   ], signatures: { type: "2", labels: ["Le/La Stagiaire", "Le/La Formateur(trice)"], names: [`${s.prenom} ${s.nom}`, f.formateur] } });
 }
 
