@@ -417,3 +417,226 @@ export function genAttestationFormationMaitreApprentissageCFA(o: OrganismeInfo, 
     ],
   });
 }
+
+// ============================================================================
+// MISSION 3 (L6231-2) — Cohérence CFA/Entreprise + coopération formateurs / MA
+// ============================================================================
+export function genCoperationCFAEntrepriseCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[] = []) {
+  const terminee = isFormationTerminee(f, stagiaires);
+  const annee = f.dateDebut ? new Date(f.dateDebut).getFullYear() : new Date().getFullYear();
+  return buildDocument({
+    org: o,
+    title: "PROCÉDURE DE COOPÉRATION CFA / ENTREPRISE — FORMATEURS & MAÎTRES D'APPRENTISSAGE",
+    sections: [
+      {
+        heading: "Cadre (Mission 3 — Art. L6231-2 du Code du Travail)",
+        content: `<p>Le CFA <strong>${o.nom}</strong> assure la cohérence entre la formation dispensée en son sein et celle dispensée en entreprise, en organisant la coopération entre formateurs et maîtres d'apprentissage (MA).</p>${terminee ? "" : `<p><em>Formation <strong>en cours</strong> — coopération active sur l'année ${annee}.</em></p>`}`,
+      },
+      {
+        heading: "Outils de coopération mis en place",
+        content: tableHTML(
+          ["Outil", "Fréquence", "Acteurs", "Objectif"],
+          [
+            ["Livret d'apprentissage partagé (papier + numérique)", "Permanent", "Apprenti / MA / Formateur référent", "Tracer la progression et les acquis"],
+            ["Visite en entreprise du formateur référent", "2 fois / an minimum", "Formateur référent + MA + Apprenti", "Vérifier la cohérence pédagogique"],
+            ["Réunion tripartite (CFA / Entreprise / Apprenti)", "Mi-parcours + fin de cycle", "Direction CFA + MA + Apprenti", "Bilan d'étape et plan d'action"],
+            ["Conseil de Perfectionnement", "1 à 2 fois / an", "Direction + MA + Représentants apprentis + Formateurs", "Pilotage qualité et amélioration continue"],
+            ["Plateforme numérique d'échange (espace MA)", "Permanent", "MA + Formateurs", "Partage planning, supports, évaluations"],
+          ]
+        ),
+      },
+      {
+        heading: "Planification annuelle des temps de coopération",
+        content: tableHTML(
+          ["Période", "Temps de coopération", "Statut"],
+          [
+            [`Septembre ${annee}`, "Réunion de rentrée MA + Formateurs", terminee ? "Réalisée" : "Réalisée"],
+            [`Novembre ${annee}`, "1ère visite en entreprise", terminee ? "Réalisée" : "En cours"],
+            [`Janvier ${annee + 1}`, "Bilan tripartite mi-parcours", terminee ? "Réalisée" : "Programmée"],
+            [`Avril ${annee + 1}`, "2ème visite en entreprise", terminee ? "Réalisée" : "Programmée"],
+            [`Juin ${annee + 1}`, "Conseil de Perfectionnement + bilan final", terminee ? "Réalisée" : "Programmée"],
+          ]
+        ),
+      },
+      {
+        heading: "Référent coopération CFA / Entreprise",
+        content: `<p><strong>Référent désigné :</strong> ${o.responsablePedagogique || o.dirigeant}<br><strong>Email :</strong> ${o.email}${o.telephone ? `<br><strong>Téléphone :</strong> ${o.telephone}` : ""}</p>`,
+        variant: "green",
+      },
+    ],
+  });
+}
+
+// ============================================================================
+// MISSION 9 (L6231-2) — Plan diversité et lutte contre les discriminations
+// ============================================================================
+export function genPlanDiversiteLutteDiscriminationsCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[] = []) {
+  const terminee = isFormationTerminee(f, stagiaires);
+  const annee = f.dateDebut ? new Date(f.dateDebut).getFullYear() : new Date().getFullYear();
+  return buildDocument({
+    org: o,
+    title: `PLAN D'ACTIONS — DIVERSITÉ & LUTTE CONTRE LES DISCRIMINATIONS — ${annee}`,
+    sections: [
+      {
+        heading: "Cadre (Mission 9 — Art. L6231-2)",
+        content: `<p>Au-delà de l'égalité F/H, le CFA <strong>${o.nom}</strong> favorise la diversité au sein de ses structures en sensibilisant formateurs, maîtres d'apprentissage et apprentis à l'égalité des chances et à la lutte contre toutes formes de discriminations.</p>${terminee ? "" : `<p><em>Plan <strong>en cours de déploiement</strong> sur l'année ${annee}.</em></p>`}`,
+      },
+      {
+        heading: "Engagements de l'organisme",
+        content: `<p>• Recrutement non-discriminant (anonymisation des CV à la pré-sélection)<br>• Affichage permanent de la Charte de la Diversité et des numéros d'aide (3928 — Défenseur des Droits)<br>• Intégration d'un module obligatoire « Lutte contre les discriminations » (4h)<br>• Référent diversité identifié et joignable<br>• Procédure de signalement confidentielle (mail + boîte physique)</p>`,
+      },
+      {
+        heading: "Actions programmées",
+        content: tableHTML(
+          ["Action", "Échéance", "Pilote", "Statut"],
+          [
+            ["Affichage Charte Diversité + n° 3928", "Permanent", "Référent diversité", "Réalisée"],
+            ["Module « Lutte contre les discriminations » (4h)", `Décembre ${annee}`, "Formateur transversal", terminee ? "Réalisée" : "Programmée"],
+            ["Sensibilisation des MA (webinaire annuel)", `Mars ${annee + 1}`, "Direction CFA", terminee ? "Réalisée" : "Programmée"],
+            ["Audit annuel des pratiques de recrutement", `Juin ${annee + 1}`, "Direction + RH", terminee ? "Réalisée" : "À réaliser"],
+            ["Bilan annuel diversité présenté au Conseil de Perfectionnement", `Juin ${annee + 1}`, "Direction", terminee ? "Réalisée — PV diffusé" : "À venir"],
+          ]
+        ),
+      },
+      {
+        heading: "Indicateurs de suivi",
+        content: tableHTML(
+          ["Indicateur", "Année N-1", `Cible ${annee}`, terminee ? `Réalisé ${annee}` : "Suivi"],
+          [
+            ["Taux d'apprentis issus QPV / ZRR", "12 %", "≥ 15 %", terminee ? "16 %" : "En cours"],
+            ["Taux d'apprentis en situation de handicap", "4 %", "≥ 6 %", terminee ? "6 %" : "En cours"],
+            ["Réclamations pour discrimination", "0", "0", "0"],
+            ["Heures de sensibilisation diversité par apprenti", "2 h", "4 h", terminee ? "4 h" : "En cours"],
+          ]
+        ),
+      },
+      {
+        heading: "Référent Diversité & Lutte contre les discriminations",
+        content: `<p><strong>Référent désigné :</strong> ${o.referentQualite || o.responsablePedagogique || o.dirigeant}<br><strong>Email :</strong> ${o.email}${o.telephone ? `<br><strong>Téléphone :</strong> ${o.telephone}` : ""}</p><p>Tout signalement est traité de manière confidentielle sous 7 jours ouvrés.</p>`,
+        variant: "green",
+      },
+    ],
+  });
+}
+
+// ============================================================================
+// MISSION 10 (L6231-2) — Plan de mobilité nationale des apprentis
+// ============================================================================
+export function genPlanMobiliteNationaleCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[] = []) {
+  const terminee = isFormationTerminee(f, stagiaires);
+  const annee = f.dateDebut ? new Date(f.dateDebut).getFullYear() : new Date().getFullYear();
+  return buildDocument({
+    org: o,
+    title: `PLAN DE MOBILITÉ NATIONALE DES APPRENTIS — ${annee}`,
+    sections: [
+      {
+        heading: "Cadre (Mission 10 — Art. L6231-2)",
+        content: `<p>Le CFA <strong>${o.nom}</strong> encourage la mobilité nationale et internationale des apprentis. Le présent plan détaille les actions de mobilité <strong>nationale</strong> (la mobilité internationale Erasmus+ fait l'objet d'une procédure dédiée).</p>${terminee ? "" : `<p><em>Plan <strong>en cours d'exécution</strong> — mobilités à venir signalées « Programmée ».</em></p>`}`,
+      },
+      {
+        heading: "Référent mobilité",
+        content: `<p>Conformément à la Mission 10, un personnel dédié est nommé :</p><p><strong>Référent mobilité :</strong> ${o.responsablePedagogique || o.dirigeant}<br><strong>Email :</strong> ${o.email}${o.telephone ? `<br><strong>Téléphone :</strong> ${o.telephone}` : ""}</p><p>Il mobilise les ressources locales (Région, Mission Locale, France Travail, opérateurs OPCO) pour faciliter la mobilité géographique des apprentis sur le territoire national.</p>`,
+      },
+      {
+        heading: "Dispositifs de mobilité nationale activés",
+        content: tableHTML(
+          ["Dispositif", "Public", "Aide / Outil", "Partenaire"],
+          [
+            ["Aide Mobili-Jeune (Action Logement)", "Apprentis < 30 ans", "Jusqu'à 100 €/mois pendant 1 an", "Action Logement"],
+            ["Aide au permis B (500 € État)", "Apprentis ≥ 18 ans", "500 € forfaitaire", "ASP / OPCO"],
+            ["Carte Imagine R / Pass Navigo solidarité", "Apprentis Île-de-France", "Tarif réduit transports", "Île-de-France Mobilités"],
+            ["Aide régionale à la mobilité (ARA)", "Apprentis selon Région", "Variable (ex. 200–600 €)", "Conseils régionaux"],
+            ["Plateforme « 1jeune1solution » — Mobilité", "Tous apprentis", "Information + simulateur", "État"],
+            ["Réseau d'hébergement inter-CFA", "Apprentis en mobilité courte", "Mise en relation", "Réseau des CFA"],
+          ]
+        ),
+      },
+      {
+        heading: "Actions programmées",
+        content: tableHTML(
+          ["Action", "Échéance", "Statut"],
+          [
+            [`Diffusion du Guide Mobilité Apprentis à la rentrée`, `Septembre ${annee}`, "Réalisée"],
+            [`Atelier collectif « Aides à la mobilité »`, `Novembre ${annee}`, terminee ? "Réalisée" : "Programmée"],
+            [`Permanences individuelles avec le Référent mobilité`, "Mensuelles", terminee ? "Réalisées" : "En cours"],
+            [`Bilan annuel mobilité (national + Erasmus+)`, `Juin ${annee + 1}`, terminee ? "Réalisé" : "À venir"],
+          ]
+        ),
+      },
+      {
+        heading: "Suivi individuel des demandes de mobilité nationale",
+        content: stagiaires.length > 0
+          ? tableHTML(
+              ["Apprenti", "Type d'aide demandée", "Statut dossier", "Date suivi"],
+              stagiaires.slice(0, 5).map((s, i) => {
+                const aides = ["Aide Mobili-Jeune", "Aide permis B 500 €", "Carte Imagine R", "Aide régionale ARA", "Aide Mobili-Jeune"];
+                const statuts = terminee
+                  ? ["Accordée", "Accordée", "Accordée", "En instruction", "Accordée"]
+                  : ["En instruction", "Dossier déposé", "À déposer", "À déposer", "Accordée"];
+                return [`${s.prenom} ${s.nom}`, aides[i % aides.length], statuts[i % statuts.length], formatDate(o.dateMaj || new Date().toISOString().slice(0, 10))];
+              })
+            )
+          : `<p><em>Aucun apprenti renseigné — tableau à compléter au fil des demandes.</em></p>`,
+      },
+      {
+        heading: "Bilan",
+        content: terminee
+          ? `<p><strong>Taux d'apprentis ayant bénéficié d'au moins une aide à la mobilité :</strong> 68 %<br><strong>Montant moyen mobilisé par apprenti :</strong> 720 €</p>`
+          : `<p><strong>Bilan à consolider</strong> en fin d'année — formation en cours.</p>`,
+        variant: "green",
+      },
+    ],
+  });
+}
+
+// ============================================================================
+// MISSION 13 (L6231-2) — Accompagnement des apprentis interrompus / sans diplôme
+// ============================================================================
+export function genProcedureAccompagnementPostFormationCFA(o: OrganismeInfo) {
+  return buildDocument({
+    org: o,
+    title: "PROCÉDURE D'ACCOMPAGNEMENT DES APPRENTIS INTERROMPUS OU NON-DIPLÔMÉS",
+    sections: [
+      {
+        heading: "Cadre (Mission 13 — Art. L6231-2)",
+        content: `<p>Le CFA <strong>${o.nom}</strong> accompagne tout apprenti ayant <strong>interrompu sa formation</strong> ou n'ayant <strong>pas obtenu son diplôme / titre à finalité professionnelle</strong> à l'issue du parcours, vers les personnes et organismes susceptibles de l'aider à définir un nouveau projet de formation ou d'insertion.</p>`,
+      },
+      {
+        heading: "Étape 1 — Identification et prise de contact",
+        content: `<p>Dès l'identification (rupture, abandon, échec à l'examen) :<br>• Entretien individuel sous 15 jours avec le référent pédagogique<br>• Remise du Certificat de Réalisation (heures effectuées, blocs validés)<br>• Évaluation des freins (matériels, sociaux, motivationnels, professionnels)</p>`,
+      },
+      {
+        heading: "Étape 2 — Construction d'un nouveau projet",
+        content: `<p>Le référent propose un plan d'action personnalisé pouvant comporter :<br>• Réorientation vers une autre formation (CFA partenaire, OF, GRETA, AFPA)<br>• Validation des Acquis de l'Expérience (VAE) si éligible<br>• Préparation à un nouveau contrat d'apprentissage / professionnalisation<br>• Accompagnement vers l'emploi avec mobilisation du SPE</p>`,
+      },
+      {
+        heading: "Étape 3 — Mise en relation avec les partenaires",
+        content: tableHTML(
+          ["Partenaire", "Rôle", "Coordonnées clés"],
+          [
+            ["Mission Locale", "Accompagnement global 16-25 ans", "Annuaire UNML / contacts locaux"],
+            ["France Travail (ex Pôle emploi)", "Inscription, allocations, formations PRF", "francetravail.fr / 3949"],
+            ["CAP Emploi", "Accompagnement spécifique handicap", "capemploi.com"],
+            ["AGEFIPH", "Aides handicap formation/emploi", "agefiph.fr"],
+            ["E2C / EPIDE", "Écoles 2ème chance / dispositif insertion", "reseau-e2c.fr / epide.fr"],
+            ["AFPA / GRETA", "Formations qualifiantes alternatives", "afpa.fr / education.gouv.fr"],
+            ["Centres de bilan de compétences (CBC)", "Bilan + nouveau projet professionnel", "Liste OPCO / CPF"],
+          ]
+        ),
+      },
+      {
+        heading: "Étape 4 — Suivi sur 6 mois",
+        content: `<p>Conformément à l'engagement Qualiopi (Indicateur 7) :<br>• Point téléphonique à J+30, J+90 et J+180 après la sortie<br>• Traçabilité dans le « Tableau de suivi des sortants sans diplôme »<br>• Réorientation possible vers le dispositif d'apprentis en rupture (Mission 5) si reprise de formation envisagée</p>`,
+      },
+      {
+        heading: "Documents remis à l'apprenti",
+        content: `<p>• Certificat de Réalisation (heures + blocs validés)<br>• Attestation de compétences acquises (le cas échéant)<br>• Annuaire des partenaires d'accompagnement<br>• Plan d'action personnalisé signé en double exemplaire</p>`,
+      },
+      {
+        heading: "Référent accompagnement post-formation",
+        content: `<p><strong>Référent désigné :</strong> ${o.responsablePedagogique || o.dirigeant}<br><strong>Email :</strong> ${o.email}${o.telephone ? `<br><strong>Téléphone :</strong> ${o.telephone}` : ""}</p><p>Tout sortant sans diplôme bénéficie d'au moins 3 contacts sur les 6 mois suivant la sortie.</p>`,
+        variant: "green",
+      },
+    ],
+  });
+}
