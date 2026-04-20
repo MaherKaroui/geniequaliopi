@@ -566,6 +566,12 @@ export function buildFullCatalog(
     });
     add("cfa_fiche_autoevaluation", "CT3 - IND 11 FICHE AUTOÉVALUATION APPRENTI", 3, 11, "fiche_autoevaluation_apprenti");
 
+    // ===== IND 11 — DOCUMENTS OFFICIELS MINISTÈRE (Suivi) =====
+    stagiaires.forEach((s, si) => {
+      add(`cfa_c3i11_dp_officiel_${si}`, `CT3 - IND 11 DOSSIER PROFESSIONNEL (DP) – ${s.prenom} ${s.nom}`, 3, 11, "dp_officiel", { stagiaireIdx: si });
+      add(`cfa_c3i11_ecf_officiel_${si}`, `CT3 - IND 11 LIVRET ECF – ${s.prenom} ${s.nom}`, 3, 11, "ecf_officiel", { stagiaireIdx: si });
+    });
+
     // ===== IND 12 — ENGAGEMENT DES BÉNÉFICIAIRES (CFA) =====
     add("cfa_procedure_abandon", "CT3 - IND 12 PROCÉDURE D'ABANDON CFA", 3, 12, "procedure_abandon_cfa");
     add("cfa_procedure_absences", "CT3 - IND 12 PROCÉDURE DES ABSENCES CFA", 3, 12, "procedure_absences_cfa");
@@ -581,6 +587,12 @@ export function buildFullCatalog(
     add("cfa_c3i12_certificat_realisation", "CT3 - IND 12 CERTIFICAT DE RÉALISATION", 3, 12, "certificat_realisation_cfa");
     add("cfa_c3i12_suivi_public_excel", "CT3 - IND 12 SUIVI DU PUBLIC ET DU BÉNÉFICIAIRE (Excel)", 3, 12, "suivi_public_beneficiaire_excel");
     add("cfa_c3i12_suivi_pfmp_excel", "CT3 - IND 12 TABLEAU DE SUIVI PFMP (Excel)", 3, 12, "suivi_pfmp_excel");
+
+    // ===== IND 12 — DOCUMENTS OFFICIELS MINISTÈRE (Évaluation) =====
+    stagiaires.forEach((s, si) => {
+      add(`cfa_c3i12_ecf_officiel_${si}`, `CT3 - IND 12 LIVRET ECF – ${s.prenom} ${s.nom}`, 3, 12, "ecf_officiel", { stagiaireIdx: si });
+      add(`cfa_c3i12_dp_officiel_${si}`, `CT3 - IND 12 DOSSIER PROFESSIONNEL (DP) – ${s.prenom} ${s.nom}`, 3, 12, "dp_officiel", { stagiaireIdx: si });
+    });
 
     // ===== IND 13 — COORDINATION ALTERNANCE (CFA) =====
     formations.forEach((f, fi) => {
@@ -839,6 +851,12 @@ export function buildFullCatalog(
     add("cfa_c7i30_appreciations_entreprises", "CT7 - IND 30 QUESTIONNAIRE DE SATISFACTION CLIENT COMMANDITAIRE", 7, 30, "appreciations_entreprises");
     add("cfa_c7i30_appreciations_financeurs", "CT7 - IND 30 ENQUÊTE SATISFACTION FINANCEUR", 7, 30, "appreciations_financeurs");
     add("cfa_c7i30_relances_appreciations_excel", "CT7 - IND 30 TABLEAU DE RELANCES DES APPRÉCIATIONS", 7, 30, "relances_appreciations_excel");
+
+    // ===== IND 30 — DOCUMENTS OFFICIELS MINISTÈRE (Certification) =====
+    stagiaires.forEach((s, si) => {
+      add(`cfa_c7i30_dp_officiel_${si}`, `CT7 - IND 30 DOSSIER PROFESSIONNEL (DP) – ${s.prenom} ${s.nom}`, 7, 30, "dp_officiel", { stagiaireIdx: si });
+    });
+    add("cfa_c7i30_pv_session_global", "CT7 - IND 30 PROCÈS-VERBAL GLOBAL DE SESSION", 7, 30, "pv_session_global");
 
     // IND 31 — Réclamations et dysfonctionnements
     add("cfa_c7i31_formulaire_reclamation", "CT7 - IND 31 FORMULAIRE DE DÉPÔT DE RÉCLAMATION", 7, 31, "formulaire_reclamation");
