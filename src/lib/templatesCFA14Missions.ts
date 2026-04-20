@@ -405,11 +405,11 @@ export function genAttestationFormationMaitreApprentissageCFA(o: OrganismeInfo, 
         content: tableHTML(
           ["Module", "Durée", "Date", "Modalité", "Statut"],
           [
-            ["Cadre légal de l'apprentissage et rôle du MA", "3 h 30", dateModule, "Présentiel", terminee ? "Validé" : "Réalisé"],
-            ["Pédagogie de l'alternance et transmission des savoir-faire", "7 h 00", dateModule, "Présentiel", terminee ? "Validé" : "Réalisé"],
-            ["Évaluation des compétences et utilisation du livret apprentissage", "3 h 30", dateModule, "Présentiel", terminee ? "Validé" : "En cours"],
-            ["Communication, posture et gestion des conflits", "3 h 30", dateModule, "Présentiel", terminee ? "Validé" : "À venir"],
-            ["Articulation CFA / Entreprise / Apprenti", "3 h 30", dateModule, "Distanciel", terminee ? "Validé" : "À venir"],
+            ["Cadre légal de l'apprentissage et rôle du MA", "3 h 30", dateJ1, "Présentiel", terminee ? "Validé" : "Réalisé"],
+            ["Pédagogie de l'alternance et transmission des savoir-faire", "7 h 00", dateJ2, "Présentiel", terminee ? "Validé" : "Réalisé"],
+            ["Évaluation des compétences et utilisation du livret apprentissage", "3 h 30", dateJ3, "Présentiel", terminee ? "Validé" : "En cours"],
+            ["Communication, posture et gestion des conflits", "3 h 30", dateJ4, "Présentiel", terminee ? "Validé" : "À venir"],
+            ["Articulation CFA / Entreprise / Apprenti", "3 h 30", dateJ5, "Distanciel", terminee ? "Validé" : "À venir"],
           ]
         ),
       },
