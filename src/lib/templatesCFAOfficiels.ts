@@ -687,17 +687,9 @@ export function genPVSessionGlobal(o: OrganismeInfo, f: FormationInfo, stagiaire
   // Statut de la formation : si non terminée, dates de session, observations et résultats restent vides
   const termine = isFormationTerminee(f, stagiaires);
 
-  const dateDebutSession = termine ? (fmtDateFR(f.dateFin || f.dateDebut) || todayCompact()) : "";
-  const dateFinSession = termine
-    ? (() => {
-        if (f.dateFin) {
-          const d = new Date(f.dateFin);
-          d.setDate(d.getDate() + 1);
-          return fmtDateFR(d.toISOString().slice(0, 10));
-        }
-        return todayCompact();
-      })()
-    : "";
+  // Dates de session : toujours afficher si disponibles dans la formation
+  const dateDebutSession = fmtDateFR(f.dateDebut) || "";
+  const dateFinSession = fmtDateFR(f.dateFin) || "";
 
   const responsable = o.dirigeant || o.responsablePedagogique || "Responsable de session";
 
