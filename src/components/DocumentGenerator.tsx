@@ -623,7 +623,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
         } else {
           const content = generateContent(doc);
           if (exportFormat === "pdf") {
-            addFileToZip(`${basePath}/${buildCatalogFileName(doc, null, ".docx")}`, await htmlToPdfBlob(content, bulkPdfOptions));
+            addFileToZip(`${basePath}/${buildCatalogFileName(doc, null, ".pdf")}`, await htmlToPdfBlob(content, bulkPdfOptions));
           } else {
             const wordBlob = await toWordBlob(content);
             addFileToZip(`${basePath}/${buildCatalogFileName(doc, null, wordBlob.extension)}`, wordBlob.blob);
@@ -751,7 +751,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
         } else {
           const content = generateContent(doc);
           if (exportFormat === "pdf") {
-            zip.file(`${basePath}/${buildCatalogFileName(doc, null, ".docx")}`, await htmlToPdfBlob(content, bulkPdfOptions));
+            zip.file(`${basePath}/${buildCatalogFileName(doc, null, ".pdf")}`, await htmlToPdfBlob(content, bulkPdfOptions));
           } else {
             const wordBlob = await toWordBlob(content);
             zip.file(`${basePath}/${buildCatalogFileName(doc, null, wordBlob.extension)}`, wordBlob.blob);
@@ -877,7 +877,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
         } else {
           const content = generateContent(doc);
           if (exportFormat === "pdf") {
-            zip.file(`${basePath}/${buildCatalogFileName(doc, null, ".docx")}`, await htmlToPdfBlob(content, bulkPdfOptions));
+            zip.file(`${basePath}/${buildCatalogFileName(doc, null, ".pdf")}`, await htmlToPdfBlob(content, bulkPdfOptions));
           } else {
             const wordBlob = await toWordBlob(content);
             zip.file(`${basePath}/${buildCatalogFileName(doc, null, wordBlob.extension)}`, wordBlob.blob);
