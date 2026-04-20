@@ -16,7 +16,7 @@ import { genNewsletterScreenshots, genScreenshotFranceCompetences, genScreenshot
 import { genPreuvesVeilleReglementaire } from "./veillePreuvesScreenshots";
 import { genDeroulePedagogique } from "./templatesAF";
 import { getRNCPByCode } from "./rncpData";
-import { generateExcelSuiviInscriptions, generateExcelSuiviParcoursBeneficiairesCFA, generateExcelSuiviPublicBeneficiaire, generateExcelSuiviPFMP, generateExcelOutilsSuiviAlternance } from "./xlsxGenerator";
+import { generateExcelSuiviInscriptions, generateExcelSuiviParcoursBeneficiairesCFA, generateExcelSuiviPublicBeneficiaire, generateExcelSuiviPFMP, generateExcelOutilsSuiviAlternance, generateExcelTableauSuiviParcours } from "./xlsxGenerator";
 import { getModuleSpecificConsigne } from "./cfaExerciseContent";
 import { genProcedureAbandonReorientationCFA, genAccompagnementDistancielCFA, genEnquetePartenaireEmployeurCFA, genFicheRenseignementsCommanditaireCFA, genContratApprentissageModeEmploiCFA, genProcedureAccueilBeneficiairesCFA, genProcedureAdaptationPedagogiqueCFA, genProcedureGestionAnnulationsCFA, genProcedureRuptureContratApprentissageCFA, genLivretApprentissageCFA as genLivretApprentissageInd10, genLivretMaitreApprentissageCFA, genMesuresEngagementBeneficiairesCFA, genPreventionGestionAbandonsCFA, genGuideEntretienAbandonsCFA, genEviterSituationsEchecCFA, genProcedureAnnulationsAbandonsCFA, genFichierGestionAnnulationsCFA, genAccompagnementRechercheContratCFA, genListeAideSocialCFA, genCertificatRealisationCFA, genWebinaireFormationCompetencesCFA, genWebinaireNTCCFA, genDroitsDevoirsApprentiCFA, genReglesSSMilieuProCFA } from "./templatesCFA";
 import { genPlanActivitesCitoyennesCFA, genPlanMixiteEgaliteFHCFA, genSuiviInsertionProCFA, genConventionMobiliteErasmusCFA, genProcedureMobiliteErasmusCFA, genProcedureAideRechercheEmployeurCFA, genTableauSuiviCandidatsSansContratCFA, genAttestationFormationMaitreApprentissageCFA, genCoperationCFAEntrepriseCFA, genPlanDiversiteLutteDiscriminationsCFA, genPlanMobiliteNationaleCFA, genProcedureAccompagnementPostFormationCFA } from "./templatesCFA14Missions";
@@ -577,7 +577,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "referentiel_handicap": return genReferentielHandicap(o);
     case "procedure_adaptation": return genProcedureAdaptation_V2(o, f);
     case "tableau_suivi_parcours": return genTableauSuiviParcours_V2(o, f, stagiaires);
-    case "tableau_suivi_parcours_excel": return genTableauSuiviParcours_V2(o, f, stagiaires);
+    case "tableau_suivi_parcours_excel": return generateExcelTableauSuiviParcours(o, f, stagiaires);
     case "tableau_amelioration_continue": return genTableauAmeliorationContinue(o, f);
     case "tableau_amelioration_continue_excel": return genTableauAmeliorationContinueExcel(o, f, formations, stagiaires);
     case "suivi_dysfonctionnements_excel": return genSuiviDysfonctionnementsExcel(o, f, stagiaires);
