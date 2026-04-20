@@ -379,6 +379,7 @@ export function genDPOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: St
   const activites = getActivitesTypes(f);
   const intituleTitre = f.intitule || "Titre professionnel";
   const aiPack = getCachedDPPack(f, s); // null si pas préchargé
+  const termineDP = isStagiaireFormationTerminee(s, f);
 
   let html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">${ministereStyle()}</head><body>`;
 
