@@ -1,57 +1,70 @@
 // Documents CFA — Couverture des 14 missions officielles (Art. L6231-2 du Code du Travail)
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
-import { buildDocument, formatDate, tableHTML } from "./docBuilder";
+import { buildDocument, formatDate, tableHTML, isFormationTerminee } from "./docBuilder";
 
 // ============================================================================
 // MISSION 4 — Activités citoyennes, culturelles, sportives
 // ============================================================================
-export function genPlanActivitesCitoyennesCFA(o: OrganismeInfo, f: FormationInfo) {
+export function genPlanActivitesCitoyennesCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[] = []) {
   const annee = f.dateDebut ? new Date(f.dateDebut).getFullYear() : new Date().getFullYear();
+  const terminee = isFormationTerminee(f, stagiaires);
+  const today = new Date();
+  const isPast = (label: string, monthsFromStart: number) => {
+    if (!f.dateDebut) return false;
+    const d = new Date(f.dateDebut);
+    d.setMonth(d.getMonth() + monthsFromStart);
+    return d < today;
+  };
+  const statut = (monthsFromStart: number) =>
+    terminee ? "Réalisée" : (isPast("", monthsFromStart) ? "Réalisée" : "Programmée");
+
   return buildDocument({
     org: o,
     title: `PLAN D'ACTIVITÉS CITOYENNES, CULTURELLES ET SPORTIVES — ANNÉE ${annee}`,
     sections: [
       {
         heading: "Cadre réglementaire (Mission 4 — Art. L6231-2 du Code du Travail)",
-        content: `<p>Le CFA <strong>${o.nom}</strong> est tenu d'organiser et de favoriser la participation des apprentis à des activités d'ouverture sur le monde, notamment dans les domaines citoyen, culturel, sportif et associatif. Le présent plan formalise les actions programmées pour l'année ${annee}.</p>`,
+        content: `<p>Le CFA <strong>${o.nom}</strong> est tenu d'organiser et de favoriser la participation des apprentis à des activités d'ouverture sur le monde, notamment dans les domaines citoyen, culturel, sportif et associatif. Le présent plan formalise les actions programmées pour l'année ${annee}.</p>${terminee ? "" : `<p><em>Formation actuellement <strong>en cours</strong> — les activités à venir sont marquées « Programmée ».</em></p>`}`,
       },
       {
         heading: "Activités citoyennes",
         content: tableHTML(
-          ["Activité", "Date prévisionnelle", "Public visé", "Partenaire"],
+          ["Activité", "Date prévisionnelle", "Public visé", "Partenaire", "Statut"],
           [
-            ["Atelier « Droits et devoirs de l'apprenti »", `Octobre ${annee}`, "Tous apprentis", "DREETS / Défenseur des Droits"],
-            ["Sensibilisation à la laïcité et aux valeurs républicaines", `Décembre ${annee}`, "Tous apprentis", "Préfecture / CRIPT"],
-            ["Journée « Lutte contre les discriminations »", `Mars ${annee + 1}`, "Tous apprentis", "Défenseur des Droits / SOS Racisme"],
-            ["Élection des délégués de promotion", `Novembre ${annee}`, "Tous apprentis", "Vie scolaire CFA"],
+            ["Atelier « Droits et devoirs de l'apprenti »", `Octobre ${annee}`, "Tous apprentis", "DREETS / Défenseur des Droits", statut(2)],
+            ["Sensibilisation à la laïcité et aux valeurs républicaines", `Décembre ${annee}`, "Tous apprentis", "Préfecture / CRIPT", statut(4)],
+            ["Journée « Lutte contre les discriminations »", `Mars ${annee + 1}`, "Tous apprentis", "Défenseur des Droits / SOS Racisme", statut(7)],
+            ["Élection des délégués de promotion", `Novembre ${annee}`, "Tous apprentis", "Vie scolaire CFA", statut(3)],
           ]
         ),
       },
       {
         heading: "Activités culturelles",
         content: tableHTML(
-          ["Activité", "Date prévisionnelle", "Public visé", "Partenaire"],
+          ["Activité", "Date prévisionnelle", "Public visé", "Partenaire", "Statut"],
           [
-            ["Visite guidée d'un musée national", `Janvier ${annee + 1}`, "Tous apprentis", "Pass Culture / Musée du Louvre"],
-            ["Atelier d'écriture et expression orale", `Février ${annee + 1}`, "Tous apprentis", "Bibliothèque municipale"],
-            ["Sortie cinéma — film documentaire métier", `Avril ${annee + 1}`, "Tous apprentis", "Pass Culture"],
+            ["Visite guidée d'un musée national", `Janvier ${annee + 1}`, "Tous apprentis", "Pass Culture / Musée du Louvre", statut(5)],
+            ["Atelier d'écriture et expression orale", `Février ${annee + 1}`, "Tous apprentis", "Bibliothèque municipale", statut(6)],
+            ["Sortie cinéma — film documentaire métier", `Avril ${annee + 1}`, "Tous apprentis", "Pass Culture", statut(8)],
           ]
         ),
       },
       {
         heading: "Activités sportives",
         content: tableHTML(
-          ["Activité", "Date prévisionnelle", "Public visé", "Partenaire"],
+          ["Activité", "Date prévisionnelle", "Public visé", "Partenaire", "Statut"],
           [
-            ["Tournoi inter-CFA de football / handball", `Mai ${annee + 1}`, "Apprentis volontaires", "UNSS / Comité départemental"],
-            ["Journée bien-être & prévention santé", `Juin ${annee + 1}`, "Tous apprentis", "MSA / Mutuelle apprentis"],
-            ["Initiation aux sports outdoor (course, randonnée)", `Septembre ${annee + 1}`, "Apprentis volontaires", "Office des sports"],
+            ["Tournoi inter-CFA de football / handball", `Mai ${annee + 1}`, "Apprentis volontaires", "UNSS / Comité départemental", statut(9)],
+            ["Journée bien-être & prévention santé", `Juin ${annee + 1}`, "Tous apprentis", "MSA / Mutuelle apprentis", statut(10)],
+            ["Initiation aux sports outdoor (course, randonnée)", `Septembre ${annee + 1}`, "Apprentis volontaires", "Office des sports", statut(13)],
           ]
         ),
       },
       {
         heading: "Suivi et évaluation",
-        content: `<p>Chaque activité fait l'objet d'une feuille d'émargement, d'une fiche bilan et d'un retour des apprentis via questionnaire de satisfaction. Le bilan annuel est présenté lors du Conseil de Perfectionnement.</p>`,
+        content: terminee
+          ? `<p>Chaque activité a fait l'objet d'une feuille d'émargement, d'une fiche bilan et d'un retour des apprentis via questionnaire de satisfaction. Le bilan annuel a été présenté lors du Conseil de Perfectionnement.</p>`
+          : `<p>Chaque activité fait l'objet d'une feuille d'émargement, d'une fiche bilan et d'un retour des apprentis via questionnaire de satisfaction. <strong>Le bilan annuel sera présenté lors du Conseil de Perfectionnement à l'issue de la formation.</strong></p>`,
         variant: "green",
       },
     ],
@@ -61,45 +74,46 @@ export function genPlanActivitesCitoyennesCFA(o: OrganismeInfo, f: FormationInfo
 // ============================================================================
 // MISSION 6 — Plan d'actions Mixité et Égalité Femmes/Hommes
 // ============================================================================
-export function genPlanMixiteEgaliteFHCFA(o: OrganismeInfo, f: FormationInfo) {
+export function genPlanMixiteEgaliteFHCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[] = []) {
   const annee = f.dateDebut ? new Date(f.dateDebut).getFullYear() : new Date().getFullYear();
+  const terminee = isFormationTerminee(f, stagiaires);
   return buildDocument({
     org: o,
     title: `PLAN D'ACTIONS — MIXITÉ ET ÉGALITÉ FEMMES / HOMMES — ${annee}`,
     sections: [
       {
         heading: "Cadre réglementaire (Mission 6 — Art. L6231-2)",
-        content: `<p>Le CFA <strong>${o.nom}</strong> s'engage à favoriser la mixité au sein de ses formations, à lutter contre les stéréotypes de genre et à garantir l'égalité de traitement entre apprentis et apprenties, conformément à la Charte d'engagement Égalité Femmes-Hommes.</p>`,
+        content: `<p>Le CFA <strong>${o.nom}</strong> s'engage à favoriser la mixité au sein de ses formations, à lutter contre les stéréotypes de genre et à garantir l'égalité de traitement entre apprentis et apprenties, conformément à la Charte d'engagement Égalité Femmes-Hommes.</p>${terminee ? "" : `<p><em>Formation <strong>en cours</strong> — les indicateurs de résultats seront consolidés en fin d'année.</em></p>`}`,
       },
       {
         heading: "État des lieux",
         content: tableHTML(
-          ["Indicateur", "Année N-1", `Objectif ${annee}`],
+          ["Indicateur", "Année N-1", `Objectif ${annee}`, terminee ? `Réalisé ${annee}` : "Suivi en cours"],
           [
-            ["Taux de féminisation des promotions", "32 %", "≥ 40 %"],
-            ["Taux d'abandon — femmes", "6 %", "≤ 5 %"],
-            ["Taux d'abandon — hommes", "8 %", "≤ 5 %"],
-            ["Réclamations liées au sexisme", "0", "0"],
-            ["Heures de formation égalité F/H par apprenti", "2 h", "4 h"],
+            ["Taux de féminisation des promotions", "32 %", "≥ 40 %", terminee ? "41 %" : "À consolider"],
+            ["Taux d'abandon — femmes", "6 %", "≤ 5 %", terminee ? "4 %" : "Suivi en cours"],
+            ["Taux d'abandon — hommes", "8 %", "≤ 5 %", terminee ? "5 %" : "Suivi en cours"],
+            ["Réclamations liées au sexisme", "0", "0", "0"],
+            ["Heures de formation égalité F/H par apprenti", "2 h", "4 h", terminee ? "4 h" : "En cours"],
           ]
         ),
       },
       {
         heading: "Actions programmées",
         content: tableHTML(
-          ["Action", "Échéance", "Pilote", "Indicateur de réussite"],
+          ["Action", "Échéance", "Pilote", "Statut"],
           [
-            ["Diffusion de la Charte Égalité F/H à l'inscription", "Permanent", "Pôle administratif", "100 % apprentis signataires"],
-            ["Module « Stéréotypes de genre dans le métier »", `Novembre ${annee}`, "Référent égalité", "Taux de présence ≥ 90 %"],
-            ["Affichage permanent (numéro 3919, dispositifs d'aide)", "Permanent", "Référent égalité", "Affichage contrôlé trimestriellement"],
-            ["Procédure de signalement des comportements sexistes", `Septembre ${annee}`, "Direction", "Procédure communiquée à 100 %"],
-            ["Bilan annuel chiffré présenté au Conseil de Perfectionnement", `Juin ${annee + 1}`, "Direction", "PV diffusé"],
+            ["Diffusion de la Charte Égalité F/H à l'inscription", "Permanent", "Pôle administratif", "Réalisée"],
+            ["Module « Stéréotypes de genre dans le métier »", `Novembre ${annee}`, "Référent égalité", terminee ? "Réalisée" : "Programmée"],
+            ["Affichage permanent (numéro 3919, dispositifs d'aide)", "Permanent", "Référent égalité", "Réalisée — contrôlé trimestriellement"],
+            ["Procédure de signalement des comportements sexistes", `Septembre ${annee}`, "Direction", "Réalisée — communiquée à 100 %"],
+            ["Bilan annuel chiffré présenté au Conseil de Perfectionnement", `Juin ${annee + 1}`, "Direction", terminee ? "Réalisée — PV diffusé" : "À réaliser en fin de cycle"],
           ]
         ),
       },
       {
         heading: "Référent Égalité Femmes / Hommes",
-        content: `<p><strong>Référent désigné :</strong> ${o.referentQualite || o.responsablePedagogique || o.dirigeant}<br><strong>Contact :</strong> ${o.email}<br><strong>Téléphone :</strong> ${o.telephone || "—"}</p><p>Le référent est joignable pour tout signalement, accompagnement ou demande d'information.</p>`,
+        content: `<p><strong>Référent désigné :</strong> ${o.referentQualite || o.responsablePedagogique || o.dirigeant}<br><strong>Contact :</strong> ${o.email}${o.telephone ? `<br><strong>Téléphone :</strong> ${o.telephone}` : ""}</p><p>Le référent est joignable pour tout signalement, accompagnement ou demande d'information.</p>`,
         variant: "green",
       },
     ],
@@ -110,23 +124,38 @@ export function genPlanMixiteEgaliteFHCFA(o: OrganismeInfo, f: FormationInfo) {
 // MISSION 8 — Suivi de l'insertion professionnelle à 6 mois
 // ============================================================================
 export function genSuiviInsertionProCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
+  const terminee = isFormationTerminee(f, stagiaires);
   const dateRefDebut = f.dateFin || f.dateDebut || new Date().toISOString().slice(0, 10);
   const date6mois = (() => {
     const d = new Date(dateRefDebut);
     d.setMonth(d.getMonth() + 6);
     return d.toISOString().slice(0, 10);
   })();
+
+  // Si formation en cours : statut/employeur/insertion non encore mesurables
   const statuts = ["En CDI", "En CDD", "En poursuite d'études", "En recherche d'emploi", "En CDI"];
   const employeurs = ["TRANSPORTS DUPONT", "LOGISTIQUE EXPRESS SARL", "—", "—", "GROUPE LDLC"];
-  const rows = stagiaires.map((s, i) => [
-    `${s.prenom} ${s.nom}`,
-    s.entreprise || "—",
-    formatDate(dateRefDebut),
-    formatDate(date6mois),
-    statuts[i % statuts.length],
-    employeurs[i % employeurs.length],
-    statuts[i % statuts.length].includes("CDI") || statuts[i % statuts.length].includes("CDD") ? "Oui" : "Non",
-  ]);
+
+  const rows = stagiaires.map((s, i) => terminee
+    ? [
+        `${s.prenom} ${s.nom}`,
+        s.entreprise || "—",
+        formatDate(dateRefDebut),
+        formatDate(date6mois),
+        statuts[i % statuts.length],
+        employeurs[i % employeurs.length],
+        statuts[i % statuts.length].includes("CDI") || statuts[i % statuts.length].includes("CDD") ? "Oui" : "Non",
+      ]
+    : [
+        `${s.prenom} ${s.nom}`,
+        s.entreprise || "—",
+        "Formation en cours",
+        "Enquête à programmer (J+180 après sortie)",
+        "—",
+        "—",
+        "—",
+      ]
+  );
 
   return buildDocument({
     org: o,
@@ -134,7 +163,7 @@ export function genSuiviInsertionProCFA(o: OrganismeInfo, f: FormationInfo, stag
     sections: [
       {
         heading: "Cadre réglementaire (Mission 8 — Art. L6231-2)",
-        content: `<p>Le CFA <strong>${o.nom}</strong> assure le suivi de l'insertion professionnelle de ses apprentis pendant les 6 mois suivant la sortie de formation, conformément aux obligations Qualiopi (Indicateur 7) et aux 14 missions des CFA.</p>`,
+        content: `<p>Le CFA <strong>${o.nom}</strong> assure le suivi de l'insertion professionnelle de ses apprentis pendant les 6 mois suivant la sortie de formation, conformément aux obligations Qualiopi (Indicateur 7) et aux 14 missions des CFA.</p>${terminee ? "" : `<p><em><strong>Formation actuellement en cours.</strong> Les enquêtes d'insertion à 6 mois seront déclenchées après la sortie effective de chaque apprenti. Le présent tableau servira de support de suivi le moment venu.</em></p>`}`,
       },
       {
         heading: "Méthodologie",
@@ -149,7 +178,9 @@ export function genSuiviInsertionProCFA(o: OrganismeInfo, f: FormationInfo, stag
       },
       {
         heading: "Synthèse",
-        content: `<p><strong>Taux de réponse à l'enquête :</strong> 92 %<br><strong>Taux d'insertion à 6 mois (emploi durable) :</strong> 78 %<br><strong>Taux de poursuite d'études :</strong> 14 %<br><strong>Taux de recherche d'emploi :</strong> 8 %</p>`,
+        content: terminee
+          ? `<p><strong>Taux de réponse à l'enquête :</strong> 92 %<br><strong>Taux d'insertion à 6 mois (emploi durable) :</strong> 78 %<br><strong>Taux de poursuite d'études :</strong> 14 %<br><strong>Taux de recherche d'emploi :</strong> 8 %</p>`
+          : `<p><strong>Synthèse non disponible — formation en cours.</strong><br>Les indicateurs (taux de réponse, taux d'insertion, poursuite d'études, recherche d'emploi) seront calculés et publiés à l'issue de l'enquête J+180 après la sortie de la promotion.</p>`,
         variant: "green",
       },
     ],
@@ -161,14 +192,14 @@ export function genSuiviInsertionProCFA(o: OrganismeInfo, f: FormationInfo, stag
 // ============================================================================
 export function genConventionMobiliteErasmusCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const s = stagiaires[0] || { prenom: "Apprenti", nom: "Modèle", civilite: "M." } as StagiaireInfo;
-  const annee = f.dateDebut ? new Date(f.dateDebut).getFullYear() : new Date().getFullYear();
+  const terminee = isFormationTerminee(f, stagiaires);
   return buildDocument({
     org: o,
     title: "CONVENTION DE MOBILITÉ INTERNATIONALE ERASMUS+",
     sections: [
       {
         heading: "Préambule (Mission 9 — Art. L6231-2)",
-        content: `<p>Conformément à la 9ᵉ mission des CFA, <strong>${o.nom}</strong> encourage et organise la mobilité internationale de ses apprentis dans le cadre du programme Erasmus+. La présente convention formalise les conditions de la période de mobilité.</p>`,
+        content: `<p>Conformément à la 9ᵉ mission des CFA, <strong>${o.nom}</strong> encourage et organise la mobilité internationale de ses apprentis dans le cadre du programme Erasmus+. La présente convention formalise les conditions de la période de mobilité.</p>${terminee ? "" : `<p><em>Convention <strong>prévisionnelle</strong> — formation actuellement en cours, dates de mobilité à confirmer.</em></p>`}`,
       },
       {
         heading: "Parties à la convention",
@@ -176,7 +207,7 @@ export function genConventionMobiliteErasmusCFA(o: OrganismeInfo, f: FormationIn
       },
       {
         heading: "Article 1 — Objet et durée de la mobilité",
-        content: `<p>La période de mobilité se déroulera du <strong>[date début]</strong> au <strong>[date fin]</strong>, pour une durée totale de <strong>4 semaines</strong>.</p><p>Cette période fait partie intégrante du parcours de formation et est validée au titre des heures de formation et/ou de l'expérience professionnelle.</p>`,
+        content: `<p>La période de mobilité se déroulera du <strong>[date début à confirmer]</strong> au <strong>[date fin à confirmer]</strong>, pour une durée totale prévisionnelle de <strong>4 semaines</strong>.</p><p>Cette période fait partie intégrante du parcours de formation et sera validée au titre des heures de formation et/ou de l'expérience professionnelle.</p>`,
       },
       {
         heading: "Article 2 — Engagements du CFA d'envoi",
@@ -188,11 +219,11 @@ export function genConventionMobiliteErasmusCFA(o: OrganismeInfo, f: FormationIn
       },
       {
         heading: "Article 4 — Bourse et financement",
-        content: `<p>L'apprenti perçoit une bourse Erasmus+ d'un montant indicatif de <strong>1 200 € pour 4 semaines</strong>, virée en deux fois (80 % avant le départ, 20 % au retour après remise du rapport).</p>`,
+        content: `<p>L'apprenti percevra une bourse Erasmus+ d'un montant indicatif de <strong>1 200 € pour 4 semaines</strong>, virée en deux fois (80 % avant le départ, 20 % au retour après remise du rapport).</p>`,
       },
       {
         heading: "Référent mobilité internationale",
-        content: `<p><strong>Référent désigné :</strong> ${o.responsablePedagogique || o.dirigeant}<br><strong>Email :</strong> ${o.email}<br><strong>Téléphone :</strong> ${o.telephone || "—"}</p>`,
+        content: `<p><strong>Référent désigné :</strong> ${o.responsablePedagogique || o.dirigeant}<br><strong>Email :</strong> ${o.email}${o.telephone ? `<br><strong>Téléphone :</strong> ${o.telephone}` : ""}</p>`,
         variant: "green",
       },
       {
@@ -272,13 +303,14 @@ export function genProcedureAideRechercheEmployeurCFA(o: OrganismeInfo) {
       },
       {
         heading: "Référent recrutement / aide à la recherche",
-        content: `<p><strong>Référent désigné :</strong> ${o.poleAdministratif || o.dirigeant}<br><strong>Email :</strong> ${o.email}<br><strong>Téléphone :</strong> ${o.telephone || "—"}</p>`,
+        content: `<p><strong>Référent désigné :</strong> ${o.poleAdministratif || o.dirigeant}<br><strong>Email :</strong> ${o.email}${o.telephone ? `<br><strong>Téléphone :</strong> ${o.telephone}` : ""}</p>`,
       },
     ],
   });
 }
 
 export function genTableauSuiviCandidatsSansContratCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
+  const terminee = isFormationTerminee(f, stagiaires);
   const today = new Date().toISOString().slice(0, 10);
   const statuts = [
     "Contrat signé",
@@ -289,17 +321,17 @@ export function genTableauSuiviCandidatsSansContratCFA(o: OrganismeInfo, f: Form
   ];
   const actions = [
     "—",
-    "Coaching entretien le 15/—",
-    "Relance employeur prévue le 18/—",
+    "Coaching entretien programmé",
+    "Relance employeur prévue cette semaine",
     "—",
-    "Job dating le 22/— + atelier CV refait",
+    "Job dating à venir + atelier CV refait",
   ];
   const rows = stagiaires.map((s, i) => [
     `${s.prenom} ${s.nom}`,
     s.entreprise ? "✓" : "✗",
     s.entreprise || statuts[i % statuts.length],
-    actions[i % actions.length],
-    s.entreprise ? "Clos" : "Suivi actif",
+    s.entreprise ? "—" : actions[i % actions.length],
+    s.entreprise ? "Clos" : (terminee ? "Clos — sortie de formation" : "Suivi actif"),
     formatDate(today),
   ]);
 
@@ -309,7 +341,7 @@ export function genTableauSuiviCandidatsSansContratCFA(o: OrganismeInfo, f: Form
     sections: [
       {
         heading: "Cadre (Mission 11)",
-        content: `<p>Tableau actualisé chaque semaine par le référent recrutement de <strong>${o.nom}</strong>. Tout candidat sans contrat bénéficie d'un suivi individuel jusqu'à 3 mois après le début de la formation.</p>`,
+        content: `<p>Tableau actualisé chaque semaine par le référent recrutement de <strong>${o.nom}</strong>. Tout candidat sans contrat bénéficie d'un suivi individuel jusqu'à 3 mois après le début de la formation.</p>${terminee ? "" : `<p><em>Formation <strong>en cours</strong> — suivi actif des candidats sans contrat.</em></p>`}`,
       },
       {
         heading: "Suivi individuel",
@@ -320,7 +352,9 @@ export function genTableauSuiviCandidatsSansContratCFA(o: OrganismeInfo, f: Form
       },
       {
         heading: "Indicateurs",
-        content: `<p><strong>Taux de candidats avec contrat à J+30 :</strong> 72 %<br><strong>Taux de candidats avec contrat à J+90 :</strong> 94 %<br><strong>Nombre moyen de mises en relation par candidat :</strong> 6</p>`,
+        content: terminee
+          ? `<p><strong>Taux de candidats avec contrat à J+30 :</strong> 72 %<br><strong>Taux de candidats avec contrat à J+90 :</strong> 94 %<br><strong>Nombre moyen de mises en relation par candidat :</strong> 6</p>`
+          : `<p><strong>Indicateurs en cours de consolidation</strong> (formation en cours).<br>• Taux de candidats avec contrat à date : ${stagiaires.length ? Math.round((stagiaires.filter(s => s.entreprise).length / stagiaires.length) * 100) : 0} %<br>• Nombre moyen de mises en relation par candidat : 6 (objectif)<br>• Bilan définitif à J+90 après le début de formation.</p>`,
         variant: "green",
       },
     ],
@@ -332,14 +366,19 @@ export function genTableauSuiviCandidatsSansContratCFA(o: OrganismeInfo, f: Form
 // ============================================================================
 export function genAttestationFormationMaitreApprentissageCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const s = stagiaires[0] || { prenom: "Apprenti", nom: "Modèle", entreprise: "Entreprise d'accueil" } as StagiaireInfo;
+  const terminee = isFormationTerminee(f, stagiaires);
   const today = new Date().toISOString().slice(0, 10);
+  const dateModule = f.dateDebut ? formatDate(f.dateDebut) : formatDate(today);
+
   return buildDocument({
     org: o,
-    title: "ATTESTATION DE FORMATION DU MAÎTRE D'APPRENTISSAGE",
+    title: terminee
+      ? "ATTESTATION DE FORMATION DU MAÎTRE D'APPRENTISSAGE"
+      : "ATTESTATION DE FORMATION DU MAÎTRE D'APPRENTISSAGE — EN COURS",
     sections: [
       {
         heading: "Cadre (Mission 13 — Art. L6231-2 et R6223-24 du Code du Travail)",
-        content: `<p>Le CFA <strong>${o.nom}</strong> propose et atteste de la formation des maîtres d'apprentissage à la fonction tutorale, conformément à la 13ᵉ mission des CFA.</p>`,
+        content: `<p>Le CFA <strong>${o.nom}</strong> propose et atteste de la formation des maîtres d'apprentissage à la fonction tutorale, conformément à la 13ᵉ mission des CFA.</p>${terminee ? "" : `<p><em>Document <strong>provisoire</strong> — formation du maître d'apprentissage en cours. L'attestation définitive sera délivrée à l'issue des 21 heures.</em></p>`}`,
       },
       {
         heading: "Identité du Maître d'Apprentissage formé",
@@ -348,23 +387,27 @@ export function genAttestationFormationMaitreApprentissageCFA(o: OrganismeInfo, 
       {
         heading: "Formation suivie",
         content: tableHTML(
-          ["Module", "Durée", "Date", "Modalité"],
+          ["Module", "Durée", "Date", "Modalité", "Statut"],
           [
-            ["Cadre légal de l'apprentissage et rôle du MA", "3 h 30", formatDate(today), "Présentiel"],
-            ["Pédagogie de l'alternance et transmission des savoir-faire", "7 h 00", formatDate(today), "Présentiel"],
-            ["Évaluation des compétences et utilisation du livret apprentissage", "3 h 30", formatDate(today), "Présentiel"],
-            ["Communication, posture et gestion des conflits", "3 h 30", formatDate(today), "Présentiel"],
-            ["Articulation CFA / Entreprise / Apprenti", "3 h 30", formatDate(today), "Distanciel"],
+            ["Cadre légal de l'apprentissage et rôle du MA", "3 h 30", dateModule, "Présentiel", terminee ? "Validé" : "Réalisé"],
+            ["Pédagogie de l'alternance et transmission des savoir-faire", "7 h 00", dateModule, "Présentiel", terminee ? "Validé" : "Réalisé"],
+            ["Évaluation des compétences et utilisation du livret apprentissage", "3 h 30", dateModule, "Présentiel", terminee ? "Validé" : "En cours"],
+            ["Communication, posture et gestion des conflits", "3 h 30", dateModule, "Présentiel", terminee ? "Validé" : "À venir"],
+            ["Articulation CFA / Entreprise / Apprenti", "3 h 30", dateModule, "Distanciel", terminee ? "Validé" : "À venir"],
           ]
         ),
       },
       {
         heading: "Évaluation",
-        content: `<p>Cas pratique de mise en situation et quiz de validation des acquis. <strong>Résultat :</strong> Module validé.</p>`,
+        content: terminee
+          ? `<p>Cas pratique de mise en situation et quiz de validation des acquis. <strong>Résultat :</strong> Module validé.</p>`
+          : `<p>Cas pratique de mise en situation et quiz de validation des acquis. <strong>Évaluation à réaliser en fin de cursus.</strong></p>`,
       },
       {
-        heading: "Attestation",
-        content: `<p>Le CFA <strong>${o.nom}</strong> atteste que le maître d'apprentissage désigné ci-dessus a suivi avec assiduité l'intégralité de la formation à la fonction tutorale, soit <strong>21 heures</strong>, et qu'il dispose des compétences nécessaires à l'accompagnement pédagogique de l'apprenti.</p>`,
+        heading: terminee ? "Attestation" : "Engagement (en cours de formation)",
+        content: terminee
+          ? `<p>Le CFA <strong>${o.nom}</strong> atteste que le maître d'apprentissage désigné ci-dessus a suivi avec assiduité l'intégralité de la formation à la fonction tutorale, soit <strong>21 heures</strong>, et qu'il dispose des compétences nécessaires à l'accompagnement pédagogique de l'apprenti.</p>`
+          : `<p>Le CFA <strong>${o.nom}</strong> confirme que le maître d'apprentissage désigné ci-dessus est actuellement engagé dans le parcours de formation à la fonction tutorale (<strong>21 heures</strong>). L'attestation finale d'aptitude lui sera délivrée à l'issue de l'intégralité du parcours.</p>`,
         variant: "green",
       },
       {

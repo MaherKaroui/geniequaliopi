@@ -781,8 +781,8 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "livret_maitre_apprentissage_cfa": return genLivretMaitreApprentissageCFA(o);
     case "tableau_suivi_parcours_beneficiaires_cfa_excel": return generateExcelSuiviParcoursBeneficiairesCFA(o, f, stagiaires);
     // === 14 Missions CFA — Templates dédiés ===
-    case "plan_activites_citoyennes_cfa": return genPlanActivitesCitoyennesCFA(o, f);
-    case "plan_mixite_egalite_fh_cfa": return genPlanMixiteEgaliteFHCFA(o, f);
+    case "plan_activites_citoyennes_cfa": return genPlanActivitesCitoyennesCFA(o, f, stagiaires);
+    case "plan_mixite_egalite_fh_cfa": return genPlanMixiteEgaliteFHCFA(o, f, stagiaires);
     case "suivi_insertion_pro_cfa": return genSuiviInsertionProCFA(o, f, stagiaires);
     case "convention_mobilite_erasmus_cfa": return genConventionMobiliteErasmusCFA(o, f, stagiaires);
     case "procedure_mobilite_erasmus_cfa": return genProcedureMobiliteErasmusCFA(o);
