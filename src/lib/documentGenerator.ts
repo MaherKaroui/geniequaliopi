@@ -45,6 +45,27 @@ export function generateDocumentById(docId: string, template: string, params: Re
   return result;
 }
 
+/**
+ * Précharge en parallèle le contenu IA Lovable pour le DP de tous les stagiaires.
+ * À appeler AVANT un export ZIP / téléchargement de masse pour bénéficier du contenu unique IA.
+ * En cas d'erreur (rate limit, crédits, réseau) : fallback transparent sur le moteur déterministe.
+ */
+export async function preloadAIDPForAllStagiaires(
+  userFormation: FormationInfo,
+  userStagiaires: StagiaireInfo[],
+): Promise<void> {
+  const selectedFormation = userFormation.intitule
+    ? { ...SAMPLE_FORMATIONS[0], ...Object.fromEntries(Object.entries(userFormation).filter(([, v]) => v && String(v).trim())) }
+    : SAMPLE_FORMATIONS[0];
+  const stagiaires = mergeStagiaires(userStagiaires);
+  // Limit concurrency to 3 to éviter rate limit
+  const BATCH = 3;
+  for (let i = 0; i < stagiaires.length; i += BATCH) {
+    const slice = stagiaires.slice(i, i + BATCH);
+    await Promise.all(slice.map(s => preloadDPAIPack(selectedFormation, s)));
+  }
+}
+
 function stripEmojis(html: string): string {
   // Replace common status emojis with plain text
   html = html.replace(/✅\s*/g, '');
