@@ -227,7 +227,7 @@ export function genConventionMobiliteErasmusCFA(o: OrganismeInfo, f: FormationIn
         variant: "green",
       },
       {
-        heading: `Fait à ${o.ville}, le ${formatDate(new Date().toISOString().slice(0, 10))}`,
+        heading: `Fait à ${o.ville}, le ${formatDate(o.dateMaj || new Date().toISOString().slice(0, 10))}`,
         content: `<p style="margin-top:30px"><strong>Signature du CFA</strong><br>${o.dirigeant}</p><p style="margin-top:30px"><strong>Signature de l'apprenti</strong><br>${s.prenom} ${s.nom}</p><p style="margin-top:30px"><strong>Signature de l'organisme d'accueil</strong></p>`,
       },
     ],
@@ -411,7 +411,7 @@ export function genAttestationFormationMaitreApprentissageCFA(o: OrganismeInfo, 
         variant: "green",
       },
       {
-        heading: `Fait à ${o.ville}, le ${formatDate(today)}`,
+        heading: `Fait à ${o.ville}, le ${formatDate(o.dateMaj || today)}`,
         content: `<p style="margin-top:30px"><strong>Pour le CFA</strong><br>${o.dirigeant}<br>Directeur(trice) du CFA</p>`,
       },
     ],
