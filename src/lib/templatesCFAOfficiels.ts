@@ -572,27 +572,27 @@ export function genECFOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
         <tr><th>Description des évaluations mises en œuvre</th><th>Dates</th><th>Compétences évaluées</th></tr>
         <tr>
           <td><strong>1.</strong> Évaluation formative en situation professionnelle reconstituée — étude de cas écrite</td>
-          <td>${fmtDateFR(getDateDebut(f, s))}</td>
-          <td>${act.competences.map((_, i) => `${i + 1} <span class="check-box ck"></span>`).join(" ")}</td>
+          <td>${termine ? fmtDateFR(getDateDebut(f, s)) : ""}</td>
+          <td>${act.competences.map((_, i) => `${i + 1} <span class="check-box${termine ? " ck" : ""}"></span>`).join(" ")}</td>
         </tr>
         <tr>
           <td><strong>2.</strong> Mise en situation professionnelle reconstituée — oral devant jury de formation</td>
-          <td>${fmtDateFR(getDateDebut(f, s))}</td>
-          <td>${act.competences.map((_, i) => `${i + 1} <span class="check-box ck"></span>`).join(" ")}</td>
+          <td>${termine ? fmtDateFR(getDateDebut(f, s)) : ""}</td>
+          <td>${act.competences.map((_, i) => `${i + 1} <span class="check-box${termine ? " ck" : ""}"></span>`).join(" ")}</td>
         </tr>
         <tr>
           <td><strong>3.</strong> Évaluation pratique en entreprise — observation sur poste de travail</td>
-          <td>${fmtDateFR(getDateFin(f, s))}</td>
-          <td>${act.competences.map((_, i) => `${i + 1} <span class="check-box ck"></span>`).join(" ")}</td>
+          <td>${termine ? fmtDateFR(getDateFin(f, s)) : ""}</td>
+          <td>${act.competences.map((_, i) => `${i + 1} <span class="check-box${termine ? " ck" : ""}"></span>`).join(" ")}</td>
         </tr>
         <tr>
           <td><strong>4.</strong> Questionnement à partir de productions professionnelles</td>
           <td>${dateEval}</td>
-          <td>${act.competences.map((_, i) => `${i + 1} <span class="check-box ck"></span>`).join(" ")}</td>
+          <td>${act.competences.map((_, i) => `${i + 1} <span class="check-box${termine ? " ck" : ""}"></span>`).join(" ")}</td>
         </tr>
       </table>
       <p style="margin-top:14px;font-weight:bold">Lors de l'évaluation ou des évaluations passée(s) en cours de formation, le/la candidat(e) est considéré(e) :</p>
-      <p class="check-line"><span class="check-box ck"></span>Avoir satisfait aux critères issus des référentiels du titre professionnel attendus pour la réalisation de cette activité-type.</p>
+      <p class="check-line"><span class="check-box${termine ? " ck" : ""}"></span>Avoir satisfait aux critères issus des référentiels du titre professionnel attendus pour la réalisation de cette activité-type.</p>
       <p class="check-line"><span class="check-box"></span>Ne pas avoir satisfait aux critères issus des référentiels du titre professionnel.</p>
 
       <h3 class="subsection">Observations</h3>
