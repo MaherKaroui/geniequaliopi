@@ -368,7 +368,23 @@ export function genAttestationFormationMaitreApprentissageCFA(o: OrganismeInfo, 
   const s = stagiaires[0] || { prenom: "Apprenti", nom: "Modèle", entreprise: "Entreprise d'accueil" } as StagiaireInfo;
   const terminee = isFormationTerminee(f, stagiaires);
   const today = new Date().toISOString().slice(0, 10);
-  const dateModule = f.dateDebut ? formatDate(f.dateDebut) : formatDate(today);
+  const baseDate = f.dateDebut || today;
+  // Étaler les 5 modules (21h) sur 5 jours ouvrés distincts pour rester réaliste
+  const addBusinessDays = (dateStr: string, days: number): string => {
+    const d = new Date(dateStr);
+    let added = 0;
+    while (added < days) {
+      d.setDate(d.getDate() + 1);
+      const dow = d.getDay();
+      if (dow !== 0 && dow !== 6) added++;
+    }
+    return d.toISOString().slice(0, 10);
+  };
+  const dateJ1 = formatDate(baseDate);
+  const dateJ2 = formatDate(addBusinessDays(baseDate, 1));
+  const dateJ3 = formatDate(addBusinessDays(baseDate, 2));
+  const dateJ4 = formatDate(addBusinessDays(baseDate, 3));
+  const dateJ5 = formatDate(addBusinessDays(baseDate, 4));
 
   return buildDocument({
     org: o,
@@ -389,11 +405,11 @@ export function genAttestationFormationMaitreApprentissageCFA(o: OrganismeInfo, 
         content: tableHTML(
           ["Module", "Durée", "Date", "Modalité", "Statut"],
           [
-            ["Cadre légal de l'apprentissage et rôle du MA", "3 h 30", dateModule, "Présentiel", terminee ? "Validé" : "Réalisé"],
-            ["Pédagogie de l'alternance et transmission des savoir-faire", "7 h 00", dateModule, "Présentiel", terminee ? "Validé" : "Réalisé"],
-            ["Évaluation des compétences et utilisation du livret apprentissage", "3 h 30", dateModule, "Présentiel", terminee ? "Validé" : "En cours"],
-            ["Communication, posture et gestion des conflits", "3 h 30", dateModule, "Présentiel", terminee ? "Validé" : "À venir"],
-            ["Articulation CFA / Entreprise / Apprenti", "3 h 30", dateModule, "Distanciel", terminee ? "Validé" : "À venir"],
+            ["Cadre légal de l'apprentissage et rôle du MA", "3 h 30", dateJ1, "Présentiel", terminee ? "Validé" : "Réalisé"],
+            ["Pédagogie de l'alternance et transmission des savoir-faire", "7 h 00", dateJ2, "Présentiel", terminee ? "Validé" : "Réalisé"],
+            ["Évaluation des compétences et utilisation du livret apprentissage", "3 h 30", dateJ3, "Présentiel", terminee ? "Validé" : "En cours"],
+            ["Communication, posture et gestion des conflits", "3 h 30", dateJ4, "Présentiel", terminee ? "Validé" : "À venir"],
+            ["Articulation CFA / Entreprise / Apprenti", "3 h 30", dateJ5, "Distanciel", terminee ? "Validé" : "À venir"],
           ]
         ),
       },
