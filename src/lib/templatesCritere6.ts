@@ -469,10 +469,69 @@ export function genVeilleReglementaireV2(o: OrganismeInfo, f: FormationInfo) {
   const rows = aiPack?.reglementaire?.length
     ? veilleRowsToTable(aiPack.reglementaire)
     : veilleReglementaireRows(f, type);
-  return buildDocument({ org: o, title: "Veille réglementaire", table: {
-    headers: ["Liens", "Nom de l'article / Texte", "Date du texte", "Commentaire", "Exploitation de veille (preuve + action Qualiopi)"],
-    rows,
-  } });
+  const preuvesHtml = buildPreuvesExploitationHtml(o, f, rows);
+  return buildDocument({
+    org: o,
+    title: "Veille réglementaire",
+    table: {
+      headers: ["Liens", "Nom de l'article / Texte", "Date du texte", "Commentaire", "Exploitation de veille (preuve + action Qualiopi)"],
+      rows,
+    },
+    extraHtml: preuvesHtml,
+  });
+}
+
+/**
+ * Construit le bloc "Preuves d'exploitation" affiché sous le tableau de veille.
+ * Pour chaque ligne de veille : une preuve concrète (capture archivée, synthèse interne,
+ * mise à jour procédure) datée et reliée à l'organisme — exploitable en audit Qualiopi (Ind 23).
+ */
+function buildPreuvesExploitationHtml(o: OrganismeInfo, f: FormationInfo, rows: string[][]): string {
+  const stripHtml = (s: string) => (s || "").replace(/<[^>]+>/g, "").trim();
+  const splitPreuveAction = (exploitation: string): { preuve: string; action: string } => {
+    const txt = stripHtml(exploitation);
+    const m = txt.match(/preuve\s*[:\-]?\s*(.+?)(?:\s*action\s*[:\-]?\s*(.+))?$/i);
+    if (m) return { preuve: (m[1] || "").trim().replace(/\s+action$/i, ""), action: (m[2] || "").trim() };
+    return { preuve: txt, action: "" };
+  };
+  const archiveDate = formatDate(subtractBusinessDays(f.dateDebut || new Date().toISOString().split("T")[0], 14));
+
+  const items = rows.map((r, idx) => {
+    const titre = stripHtml(r[1] || `Texte ${idx + 1}`);
+    const dateTexte = stripHtml(r[2] || "");
+    const lien = stripHtml(r[0] || "");
+    const { preuve, action } = splitPreuveAction(r[4] || "");
+    return `
+      <div style="border:1px solid #d1d5db;border-radius:6px;padding:10px 14px;margin:8px 0;background:#f9fafb;">
+        <div style="font-weight:600;color:#1e3a8a;font-size:11pt;margin-bottom:4px;">
+          Preuve n°${idx + 1} — ${titre}
+        </div>
+        <div style="font-size:10pt;line-height:1.5;">
+          <div><strong>Source :</strong> ${lien || "—"} ${dateTexte ? `<span style="color:#6b7280">(${dateTexte})</span>` : ""}</div>
+          <div><strong>Pièce conservée :</strong> ${preuve || "Capture d'écran horodatée + PDF du texte source"}</div>
+          <div><strong>Lieu d'archivage :</strong> Dossier qualité interne « ${o.nom} » → /Veille/Réglementaire/${(f.intitule || "").slice(0, 40)}</div>
+          <div><strong>Date d'archivage :</strong> ${archiveDate}</div>
+          <div><strong>Responsable :</strong> ${o.referentQualite || o.responsablePedagogique || o.dirigeant || "Référent qualité"}</div>
+          ${action ? `<div><strong>Action engagée :</strong> ${action}</div>` : ""}
+          <div><strong>Diffusion :</strong> Présentée en réunion qualité, intégrée au plan d'amélioration continue (Critère 7 — Ind 32).</div>
+        </div>
+      </div>`;
+  }).join("");
+
+  return `
+    <h2 style="color:#1e3a8a;border-bottom:2px solid #1e3a8a;padding-bottom:4px;margin-top:24px;font-size:13pt;">
+      Preuves d'exploitation de la veille réglementaire (Indicateur 23)
+    </h2>
+    <p style="font-size:10pt;color:#374151;margin:8px 0;">
+      Conformément au Référentiel National Qualité (Critère 6 – Indicateur 23), chaque texte de veille
+      ci-dessus fait l'objet d'une <strong>preuve d'exploitation traçable</strong> : archivage horodaté,
+      analyse d'impact sur l'organisme « ${o.nom} » et action corrective intégrée à nos procédures.
+    </p>
+    ${items}
+    <p style="font-size:9pt;color:#6b7280;font-style:italic;margin-top:12px;">
+      L'ensemble des pièces (PDF, captures, comptes rendus de réunion qualité) est conservé pendant
+      la durée légale et tenu à disposition de l'auditeur Qualiopi.
+    </p>`;
 }
 
 // ===== IND 24 — TABLEAU DE VEILLE MÉTIER =====
