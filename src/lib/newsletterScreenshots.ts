@@ -244,35 +244,13 @@ export function genNewsletterScreenshots(
       case "openai": screenshotHtml = screenshotOpenAI(o, f); break;
       case "agefiph": screenshotHtml = screenshotAgefiph(o, f); break;
     }
-    return `
-      <div style="margin-bottom:30px">
-        <h3 style="font-size:14px;color:#333;margin-bottom:10px;text-align:center;font-family:Arial,sans-serif">
-          ✅ Inscription newsletter – ${n.orgName}
-        </h3>
-        <div style="box-shadow:0 2px 12px rgba(0,0,0,0.12);border-radius:8px;overflow:hidden">
-          ${screenshotHtml}
-        </div>
-      </div>`;
+    return `<div style="page-break-after:always;margin:0;padding:0">${screenshotHtml}</div>`;
   }).join("\n");
 
-  const categoryLabel = category === "all" ? "Veille réglementaire, technologique et handicap"
-    : category === "réglementaire" ? "Veille réglementaire"
-    : category === "technologique" ? "Veille technologique et innovation"
-    : category === "handicap" ? "Veille handicap"
-    : "Veille métier";
-
-  return buildDocument({
-    org: o,
-    title: `PREUVES D'INSCRIPTION AUX NEWSLETTERS – ${categoryLabel.toUpperCase()}`,
-    sections: [
-      {
-        heading: "Objet",
-        content: `<p>Le présent document atteste de l'inscription de <strong>${o.nom}</strong> aux newsletters professionnelles ci-dessous, dans le cadre de sa démarche de veille ${category === "all" ? "réglementaire, technologique et handicap" : category}.</p>
-        <p>Ces inscriptions permettent de suivre l'actualité du secteur de la formation professionnelle et de garantir la conformité aux exigences Qualiopi (Critère 6).</p>`
-      }
-    ],
-    extraHtml: screenshots
-  });
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"><style>
+    body{margin:0;padding:0;background:#fff;font-family:Arial,sans-serif}
+    @page{margin:0}
+  </style></head><body>${screenshots}</body></html>`;
 }
 
 // Individual generators for each newsletter (for standalone docs)
