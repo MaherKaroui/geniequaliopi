@@ -253,59 +253,32 @@ export function genNewsletterScreenshots(
   </style></head><body>${screenshots}</body></html>`;
 }
 
-// Individual generators for each newsletter (for standalone docs)
+// Individual generators for each newsletter (raw screenshot only, no header/footer)
+const wrapRaw = (inner: string) =>
+  `<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{margin:0;padding:0;background:#fff;font-family:Arial,sans-serif}@page{margin:0}</style></head><body>${inner}</body></html>`;
+
 export function genScreenshotFranceCompetences(o: OrganismeInfo, f: FormationInfo): string {
-  return buildDocument({
-    org: o,
-    title: "PREUVE D'INSCRIPTION NEWSLETTER – FRANCE COMPÉTENCES",
-    sections: [{ heading: "", content: `<p>Capture d'écran de l'inscription à la newsletter France Compétences par <strong>${o.nom}</strong>.</p>` }],
-    extraHtml: `<div style="box-shadow:0 2px 12px rgba(0,0,0,0.12);border-radius:8px;overflow:hidden">${screenshotFranceCompetences(o, f)}</div>`
-  });
+  return wrapRaw(screenshotFranceCompetences(o, f));
 }
 
 export function genScreenshotDRIEETS(o: OrganismeInfo, f: FormationInfo): string {
-  return buildDocument({
-    org: o,
-    title: "PREUVE D'INSCRIPTION NEWSLETTER – DRIEETS",
-    sections: [{ heading: "", content: `<p>Capture d'écran de l'inscription à la newsletter DRIEETS par <strong>${o.nom}</strong>.</p>` }],
-    extraHtml: `<div style="box-shadow:0 2px 12px rgba(0,0,0,0.12);border-radius:8px;overflow:hidden">${screenshotDRIEETS(o, f)}</div>`
-  });
+  return wrapRaw(screenshotDRIEETS(o, f));
 }
 
 export function genScreenshotCentreInfoo(o: OrganismeInfo, f: FormationInfo): string {
-  return buildDocument({
-    org: o,
-    title: "PREUVE D'INSCRIPTION NEWSLETTER – CENTRE INFFO",
-    sections: [{ heading: "", content: `<p>Capture d'écran de l'inscription à la newsletter Centre Inffo par <strong>${o.nom}</strong>.</p>` }],
-    extraHtml: `<div style="box-shadow:0 2px 12px rgba(0,0,0,0.12);border-radius:8px;overflow:hidden">${screenshotCentreInfoo(o, f)}</div>`
-  });
+  return wrapRaw(screenshotCentreInfoo(o, f));
 }
 
 export function genScreenshotMicrosoft(o: OrganismeInfo, f: FormationInfo): string {
-  return buildDocument({
-    org: o,
-    title: "PREUVE D'INSCRIPTION NEWSLETTER – MICROSOFT ADVERTISING",
-    sections: [{ heading: "", content: `<p>Capture d'écran de l'inscription à la newsletter Microsoft Advertising Insider par <strong>${o.nom}</strong>.</p>` }],
-    extraHtml: `<div style="box-shadow:0 2px 12px rgba(0,0,0,0.12);border-radius:8px;overflow:hidden">${screenshotMicrosoft(o, f)}</div>`
-  });
+  return wrapRaw(screenshotMicrosoft(o, f));
 }
 
 export function genScreenshotOpenAI(o: OrganismeInfo, f: FormationInfo): string {
-  return buildDocument({
-    org: o,
-    title: "PREUVE D'INSCRIPTION NEWSLETTER – OPEN AI DIGEST",
-    sections: [{ heading: "", content: `<p>Capture d'écran de l'inscription à la newsletter Open AI Digest par <strong>${o.nom}</strong>.</p>` }],
-    extraHtml: `<div style="box-shadow:0 2px 12px rgba(0,0,0,0.12);border-radius:8px;overflow:hidden">${screenshotOpenAI(o, f)}</div>`
-  });
+  return wrapRaw(screenshotOpenAI(o, f));
 }
 
 export function genScreenshotAgefiph(o: OrganismeInfo, f: FormationInfo): string {
-  return buildDocument({
-    org: o,
-    title: "PREUVE D'INSCRIPTION NEWSLETTER – AGEFIPH",
-    sections: [{ heading: "", content: `<p>Capture d'écran de l'inscription à la newsletter AGEFIPH par <strong>${o.nom}</strong>.</p>` }],
-    extraHtml: `<div style="box-shadow:0 2px 12px rgba(0,0,0,0.12);border-radius:8px;overflow:hidden">${screenshotAgefiph(o, f)}</div>`
-  });
+  return wrapRaw(screenshotAgefiph(o, f));
 }
 
 // ===== CERTIFICAT COURSERA / UCI =====
