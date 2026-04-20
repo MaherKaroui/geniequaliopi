@@ -133,9 +133,19 @@ export function genContratFormationNDA(
   f: FormationInfo,
   stagiaires: StagiaireInfo[]
 ): string {
-  const s = stagiaires[0] || ({ prenom: "___", nom: "___", adresse: "", codePostal: "", ville: "", civilite: "" } as StagiaireInfo);
+  const s = (stagiaires[0] || {
+    civilite: "",
+    nom: "___",
+    prenom: "___",
+    email: "",
+    telephone: "",
+    entreprise: "",
+    poste: "",
+    dateNaissance: "",
+  }) as StagiaireInfo;
   const civilite = (s.civilite || "").toLowerCase().startsWith("mme") || (s.civilite || "").toLowerCase().startsWith("mad") ? "Mme" : "M.";
-  const stagAdresse = [s.adresse, [s.codePostal, s.ville].filter(Boolean).join(" ")].filter(Boolean).join(", ");
+  const stagVille = (s as any).commune || (s as any).ville || "";
+  const stagAdresse = [s.adresse, [s.codePostal, stagVille].filter(Boolean).join(" ")].filter(Boolean).join(", ");
 
   const dirigeantPrefix = (o.dirigeant || "").toLowerCase().startsWith("mme") ? "sa Présidente " : "son Président ";
   const dirigeantNom = (o.dirigeant || "").replace(/^(M\.|Mme|Madame|Monsieur)\s+/i, "");
