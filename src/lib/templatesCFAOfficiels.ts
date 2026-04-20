@@ -733,15 +733,13 @@ export function genPVSessionGlobal(o: OrganismeInfo, f: FormationInfo, stagiaire
 
     <h2 class="section-title">Composition du jury</h2>
     <table class="officiel">
-      <tr><th>Nom</th><th>Prénom</th><th>Signature</th><th>Nom</th><th>Prénom</th><th>Signature</th></tr>
-      <tr>
-        <td>${juryRotated[0].nom}</td><td>${juryRotated[0].prenom}</td><td><em>(signature)</em></td>
-        <td>${juryRotated[1].nom}</td><td>${juryRotated[1].prenom}</td><td><em>(signature)</em></td>
-      </tr>
-      <tr>
-        <td>${juryRotated[2].nom}</td><td>${juryRotated[2].prenom}</td><td><em>(signature)</em></td>
-        <td>${juryRotated[3].nom}</td><td>${juryRotated[3].prenom}</td><td><em>(signature)</em></td>
-      </tr>
+      <tr><th>Nom</th><th>Prénom</th><th>Qualité</th><th>Signature</th></tr>
+      ${juryMembers.map(m => `<tr>
+        <td>${m.nom}</td>
+        <td>${m.prenom}</td>
+        <td>${m.role}</td>
+        <td style="height:50px"><em>(signature)</em></td>
+      </tr>`).join("")}
     </table>
 
     <h2 class="section-title">Identité des candidats inscrits à la session</h2>
