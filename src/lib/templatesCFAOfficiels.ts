@@ -373,6 +373,7 @@ export function genDPOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: St
   const codeTitre = getCodeTitre(f);
   const mil = getMillesime(f);
   const dateJo = getDateJO(f);
+  const dateMaj = getDateMajOrg(o);
   const sigle = "DP";
   const typeDoc = "Dossier professionnel";
   const activites = getActivitesTypes(f);
