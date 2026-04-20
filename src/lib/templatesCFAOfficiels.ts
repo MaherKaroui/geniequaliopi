@@ -600,11 +600,16 @@ export function genECFOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
       <h3 class="subsection">Observations</h3>
       <div class="obs-box">Le/la candidat(e) a fait preuve d'une bonne maîtrise des compétences attendues sur cette activité-type. Les productions présentées sont de qualité et témoignent d'une réelle compréhension des enjeux professionnels.</div>
 
-      <h3 class="subsection">Formateur(s) évaluateur(s)</h3>
+      <h3 class="subsection">Formateur évaluateur</h3>
       <table class="eval-table">
         <tr><th>Nom</th><th>Date</th><th>Visa</th></tr>
-        <tr><td>${formateur1}</td><td>${dateEval}</td><td style="height:30px"></td></tr>
-        <tr><td>${formateur2}</td><td>${dateEval}</td><td style="height:30px"></td></tr>
+        <tr>
+          <td>${formateur1}</td>
+          <td>${dateEval}</td>
+          <td style="height:50px;text-align:center;vertical-align:middle">
+            ${termine && f.formateurSignatureUrl ? `<img src="${f.formateurSignatureUrl}" alt="Signature formateur" style="max-height:42px;max-width:120px;object-fit:contain" />` : ""}
+          </td>
+        </tr>
       </table>
       ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, `${pageNum}/${activites.length + 4}`, dateMaj)}
     </div><div class="page-break"></div>`;
