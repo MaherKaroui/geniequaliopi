@@ -1,13 +1,13 @@
 // Documents CFA — Couverture des 14 missions officielles (Art. L6231-2 du Code du Travail)
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
-import { buildDocument, formatDate, tableHTML, isFormationTermine } from "./docBuilder";
+import { buildDocument, formatDate, tableHTML, isFormationTerminee } from "./docBuilder";
 
 // ============================================================================
 // MISSION 4 — Activités citoyennes, culturelles, sportives
 // ============================================================================
 export function genPlanActivitesCitoyennesCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[] = []) {
   const annee = f.dateDebut ? new Date(f.dateDebut).getFullYear() : new Date().getFullYear();
-  const terminee = isFormationTermine(f, stagiaires);
+  const terminee = isFormationTerminee(f, stagiaires);
   const today = new Date();
   const isPast = (label: string, monthsFromStart: number) => {
     if (!f.dateDebut) return false;
@@ -76,7 +76,7 @@ export function genPlanActivitesCitoyennesCFA(o: OrganismeInfo, f: FormationInfo
 // ============================================================================
 export function genPlanMixiteEgaliteFHCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[] = []) {
   const annee = f.dateDebut ? new Date(f.dateDebut).getFullYear() : new Date().getFullYear();
-  const terminee = isFormationTermine(f, stagiaires);
+  const terminee = isFormationTerminee(f, stagiaires);
   return buildDocument({
     org: o,
     title: `PLAN D'ACTIONS — MIXITÉ ET ÉGALITÉ FEMMES / HOMMES — ${annee}`,
@@ -124,7 +124,7 @@ export function genPlanMixiteEgaliteFHCFA(o: OrganismeInfo, f: FormationInfo, st
 // MISSION 8 — Suivi de l'insertion professionnelle à 6 mois
 // ============================================================================
 export function genSuiviInsertionProCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
-  const terminee = isFormationTermine(f, stagiaires);
+  const terminee = isFormationTerminee(f, stagiaires);
   const dateRefDebut = f.dateFin || f.dateDebut || new Date().toISOString().slice(0, 10);
   const date6mois = (() => {
     const d = new Date(dateRefDebut);
@@ -192,7 +192,7 @@ export function genSuiviInsertionProCFA(o: OrganismeInfo, f: FormationInfo, stag
 // ============================================================================
 export function genConventionMobiliteErasmusCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const s = stagiaires[0] || { prenom: "Apprenti", nom: "Modèle", civilite: "M." } as StagiaireInfo;
-  const terminee = isFormationTermine(f, stagiaires);
+  const terminee = isFormationTerminee(f, stagiaires);
   return buildDocument({
     org: o,
     title: "CONVENTION DE MOBILITÉ INTERNATIONALE ERASMUS+",
@@ -310,7 +310,7 @@ export function genProcedureAideRechercheEmployeurCFA(o: OrganismeInfo) {
 }
 
 export function genTableauSuiviCandidatsSansContratCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
-  const terminee = isFormationTermine(f, stagiaires);
+  const terminee = isFormationTerminee(f, stagiaires);
   const today = new Date().toISOString().slice(0, 10);
   const statuts = [
     "Contrat signé",
@@ -366,7 +366,7 @@ export function genTableauSuiviCandidatsSansContratCFA(o: OrganismeInfo, f: Form
 // ============================================================================
 export function genAttestationFormationMaitreApprentissageCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const s = stagiaires[0] || { prenom: "Apprenti", nom: "Modèle", entreprise: "Entreprise d'accueil" } as StagiaireInfo;
-  const terminee = isFormationTermine(f, stagiaires);
+  const terminee = isFormationTerminee(f, stagiaires);
   const today = new Date().toISOString().slice(0, 10);
   const dateModule = f.dateDebut ? formatDate(f.dateDebut) : formatDate(today);
 
