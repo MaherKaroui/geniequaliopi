@@ -636,13 +636,6 @@ export function genECFOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
           ${termine && f.formateurSignatureUrl ? `<img src="${f.formateurSignatureUrl}" alt="Signature formateur" style="max-height:42px;max-width:120px;object-fit:contain" />` : ""}
         </td>
       </tr>
-      <tr>
-        <td>${formateur2}</td>
-        <td>${dateEval}</td>
-        <td style="height:50px;text-align:center;vertical-align:middle">
-          ${termine && f.formateurSignatureUrl ? `<img src="${f.formateurSignatureUrl}" alt="Signature formateur" style="max-height:42px;max-width:120px;object-fit:contain;opacity:0.85" />` : ""}
-        </td>
-      </tr>
     </table>
 
     <h3 class="subsection">Représentant de l'organisme de formation</h3>
