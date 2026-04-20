@@ -511,12 +511,11 @@ export function genECFOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
   // Statut de la formation : si non terminée, on n'affiche pas de date d'éval définitive
   const termine = isStagiaireFormationTerminee(s, f);
 
-  // Formateur évaluateur principal = formateur saisi sur le formulaire Formation
+  // Formateur évaluateur unique = formateur saisi sur le formulaire Formation
   const seed = hashStr(`${s.prenom}-${s.nom}`);
   const formateurPrincipal = (f.formateur || "").trim()
     || pick(["GUEBLI Ghizlan", "MARTIN Sophie", "DUBOIS Pierre", "LEROY Marie", "ROUSSEAU Karim"], seed);
   const formateur1 = formateurPrincipal;
-  const formateur2 = pick(["GASPAR Edouard", "BERNARD Anne", "PETIT Julien", "MOREAU Camille", "GIRARD Sami"], seed + 5);
   const responsable = o.dirigeant || o.responsablePedagogique || "OUACHEK Hakim";
   const dateEval = termine ? (fmtDateFR(getDateFin(f, s)) || todayCompact()) : "";
 
