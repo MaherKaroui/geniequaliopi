@@ -761,7 +761,7 @@ export function genPVSessionGlobal(o: OrganismeInfo, f: FormationInfo, stagiaire
       }).join("")}
     </table>
 
-    <p style="margin-top:20px;font-size:9pt;font-style:italic">${termine ? `Le présent procès-verbal a été établi le ${todayCompact()} et certifie l'exactitude des informations portées ci-dessus relatives à la session d'examen mentionnée en référence.` : "Document préparatoire — la session d'examen n'a pas encore eu lieu. Le procès-verbal définitif sera établi à l'issue de la session."}</p>
+    <p style="margin-top:20px;font-size:9pt;font-style:italic">${termine ? `Le présent procès-verbal a été établi le ${dateMaj} et certifie l'exactitude des informations portées ci-dessus relatives à la session d'examen mentionnée en référence.` : "Document préparatoire — la session d'examen n'a pas encore eu lieu. Le procès-verbal définitif sera établi à l'issue de la session."}</p>
 
     <div style="margin-top:30px;display:flex;justify-content:space-between;gap:30px">
       <div style="flex:1">
