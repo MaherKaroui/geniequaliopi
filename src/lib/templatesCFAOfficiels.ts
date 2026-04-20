@@ -479,7 +479,9 @@ export function genDPOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: St
       <div><strong>Le :</strong> ${dateMaj}</div>
     </div>
     <div style="margin-top:30px"><strong>Signature :</strong></div>
-    <div style="height:80px;border:1px dashed #999;margin-top:10px"></div>
+    <div style="height:80px;border:1px dashed #999;margin-top:10px;display:flex;align-items:center;justify-content:center;background:#fff">
+      ${termineDP && s.signatureUrl ? `<img src="${s.signatureUrl}" alt="Signature candidat" style="max-height:70px;max-width:200px;object-fit:contain" />` : ""}
+    </div>
     ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, String(pageNum), dateMaj)}
   </div>`;
 
