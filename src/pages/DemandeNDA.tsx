@@ -171,7 +171,7 @@ function generateDocumentHTML(docId: string, o: OrganismeInfo, f: FormationInfo,
 
   switch (docId) {
     case "contrat":
-      return genContratFormationNDA(cleanOrganisme, f, s);
+      return genContratFormationParticulier(cleanOrganisme, f, s);
     case "programme":
       return generateProgrammeNDA(cleanOrganisme, f, s);
     case "reglement":
