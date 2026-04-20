@@ -767,7 +767,7 @@ export function genPVSessionGlobal(o: OrganismeInfo, f: FormationInfo, stagiaire
         <td>${m.prenom}</td>
         <td>${m.role}</td>
         <td style="height:60px;text-align:center;vertical-align:middle">
-          ${termine && (sigUrl || stampUrl) ? `
+          ${(sigUrl || stampUrl) ? `
             <div style="display:inline-flex;align-items:center;justify-content:center;gap:4px">
               ${sigUrl ? `<img src="${sigUrl}" alt="Signature" style="max-height:50px;max-width:110px;object-fit:contain" />` : ""}
               ${stampUrl ? `<img src="${stampUrl}" alt="Tampon" style="max-height:55px;max-width:75px;object-fit:contain" />` : ""}
