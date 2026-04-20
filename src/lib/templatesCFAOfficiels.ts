@@ -760,17 +760,12 @@ export function genPVSessionGlobal(o: OrganismeInfo, f: FormationInfo, stagiaire
       ${juryMembers.map(m => {
         const isFormateur = m.role === "Formateur évaluateur";
         const sigUrl = isFormateur ? f.formateurSignatureUrl : o.signatureUrl;
-        const stampUrl = !isFormateur ? o.tamponUrl : null;
         return `<tr>
         <td>${m.nom}</td>
         <td>${m.prenom}</td>
         <td>${m.role}</td>
         <td style="height:60px;text-align:center;vertical-align:middle">
-          ${(sigUrl || stampUrl) ? `
-            <div style="display:inline-flex;align-items:center;justify-content:center;gap:4px">
-              ${sigUrl ? `<img src="${sigUrl}" alt="Signature" style="max-height:50px;max-width:110px;object-fit:contain" />` : ""}
-              ${stampUrl ? `<img src="${stampUrl}" alt="Tampon" style="max-height:55px;max-width:75px;object-fit:contain" />` : ""}
-            </div>` : `<em>(signature)</em>`}
+          ${sigUrl ? `<img src="${sigUrl}" alt="Signature" style="max-height:50px;max-width:110px;object-fit:contain" />` : `<em>(signature)</em>`}
         </td>
       </tr>`;
       }).join("")}
