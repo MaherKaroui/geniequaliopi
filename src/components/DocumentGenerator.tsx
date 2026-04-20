@@ -527,7 +527,8 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
       for (const doc of catalog) {
         const isPerStagiaire = PER_STAGIAIRE_TEMPLATES.has(doc.template);
         const hasStagiaireIdx = doc.params?.stagiaireIdx !== undefined;
-        const basePath = shortCriterePath(doc.critere, doc.indicateur);
+        const isMail = doc.critere === 0 && !!MAIL_TEMPLATE_FILES[doc.template];
+        const basePath = isMail ? "MAILS" : shortCriterePath(doc.critere, doc.indicateur);
 
         if (hasStagiaireIdx) {
           const si = doc.params!.stagiaireIdx as number;
