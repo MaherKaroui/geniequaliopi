@@ -677,23 +677,38 @@ export function genPVSessionGlobal(o: OrganismeInfo, f: FormationInfo, stagiaire
 
   const responsable = o.dirigeant || o.responsablePedagogique || "Responsable de session";
 
-  // Composition du jury : le formateur du formulaire formation est intégré comme 1er membre du jury
-  const seed = hashStr(`jury-${o.nom}-${f.intitule}`);
+  // Composition du jury : uniquement le formateur (formulaire Formation) + le dirigeant (formulaire Organisme).
+  // Si les deux désignent la même personne, on n'affiche qu'une seule ligne.
   const formateurFormation = (f.formateur || "").trim();
+  const dirigeantOrg = (o.dirigeant || "").trim();
   const formateurSplit = splitFormateur(formateurFormation);
+  const dirigeantSplit = splitFormateur(dirigeantOrg);
 
-  const juryBank = [
-    { nom: "BOUALAOUI", prenom: "Karima" },
-    { nom: "EL AMRAOUI", prenom: "Mourad" },
-    { nom: "HAMDOUN", prenom: "Nadia" },
-    { nom: "TOQUET", prenom: "Marie Jeanne" },
-    { nom: "RIVIÈRE", prenom: "Catherine" },
-    { nom: "VINCENT", prenom: "Patrick" },
-  ];
-  const rotated = [...juryBank.slice(seed % juryBank.length), ...juryBank.slice(0, seed % juryBank.length)];
-  const juryRotated = formateurFormation
-    ? [{ nom: formateurSplit.nom.toUpperCase(), prenom: formateurSplit.prenom }, ...rotated.filter(j => j.nom.toUpperCase() !== formateurSplit.nom.toUpperCase()).slice(0, 3)]
-    : rotated.slice(0, 4);
+  type JuryMember = { nom: string; prenom: string; role: string };
+  const juryMembers: JuryMember[] = [];
+  if (formateurFormation) {
+    juryMembers.push({
+      nom: formateurSplit.nom.toUpperCase(),
+      prenom: formateurSplit.prenom,
+      role: "Formateur évaluateur",
+    });
+  }
+  if (dirigeantOrg) {
+    const sameAsFormateur = formateurFormation
+      && formateurFormation.toLowerCase().replace(/\s+/g, " ") === dirigeantOrg.toLowerCase().replace(/\s+/g, " ");
+    if (!sameAsFormateur) {
+      juryMembers.push({
+        nom: dirigeantSplit.nom.toUpperCase(),
+        prenom: dirigeantSplit.prenom,
+        role: "Représentant de l'organisme",
+      });
+    }
+  }
+  // Fallback si rien n'est saisi
+  if (juryMembers.length === 0) {
+    juryMembers.push({ nom: "FORMATEUR", prenom: "", role: "Formateur évaluateur" });
+  }
+  const presidentJury = juryMembers[0];
 
   let html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">${ministereStyle()}</head><body>`;
 
@@ -718,15 +733,13 @@ export function genPVSessionGlobal(o: OrganismeInfo, f: FormationInfo, stagiaire
 
     <h2 class="section-title">Composition du jury</h2>
     <table class="officiel">
-      <tr><th>Nom</th><th>Prénom</th><th>Signature</th><th>Nom</th><th>Prénom</th><th>Signature</th></tr>
-      <tr>
-        <td>${juryRotated[0].nom}</td><td>${juryRotated[0].prenom}</td><td><em>(signature)</em></td>
-        <td>${juryRotated[1].nom}</td><td>${juryRotated[1].prenom}</td><td><em>(signature)</em></td>
-      </tr>
-      <tr>
-        <td>${juryRotated[2].nom}</td><td>${juryRotated[2].prenom}</td><td><em>(signature)</em></td>
-        <td>${juryRotated[3].nom}</td><td>${juryRotated[3].prenom}</td><td><em>(signature)</em></td>
-      </tr>
+      <tr><th>Nom</th><th>Prénom</th><th>Qualité</th><th>Signature</th></tr>
+      ${juryMembers.map(m => `<tr>
+        <td>${m.nom}</td>
+        <td>${m.prenom}</td>
+        <td>${m.role}</td>
+        <td style="height:50px"><em>(signature)</em></td>
+      </tr>`).join("")}
     </table>
 
     <h2 class="section-title">Identité des candidats inscrits à la session</h2>
@@ -766,7 +779,7 @@ export function genPVSessionGlobal(o: OrganismeInfo, f: FormationInfo, stagiaire
     <div style="margin-top:30px;display:flex;justify-content:space-between;gap:30px">
       <div style="flex:1">
         <p><strong>Le Président du jury</strong></p>
-        <p style="margin-top:4px;font-size:10pt">${juryRotated[0].prenom} ${juryRotated[0].nom}</p>
+        <p style="margin-top:4px;font-size:10pt">${presidentJury.prenom} ${presidentJury.nom}</p>
         <div style="height:60px;border:1px dashed #999;margin-top:8px"></div>
       </div>
       <div style="flex:1">
