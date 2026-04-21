@@ -28,6 +28,7 @@ import {
   replaceFileExtension,
   shortCriterePath,
 } from "@/lib/fileNaming";
+import { useBackgroundJobs } from "@/lib/backgroundJobs";
 
 const yieldToBrowser = (delayMs = 0) =>
   new Promise<void>((resolve) => {
@@ -53,6 +54,7 @@ interface DocumentGeneratorProps {
 }
 
 const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGeneratorProps) => {
+  const { runJob, hasActive } = useBackgroundJobs();
   const [expandedCriteres, setExpandedCriteres] = useState<Set<number>>(new Set());
   
   const [expandedIndicateurs, setExpandedIndicateurs] = useState<Set<number>>(new Set());
