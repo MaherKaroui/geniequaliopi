@@ -459,20 +459,29 @@ export default function OPCOMobilites() {
       return;
     }
 
+    setGenerating(true);
+    setProgress(0);
+    setProgressText(`Préparation : ${doc.label}...`);
+
     try {
       // C6 spécial : 4 sous-évaluations par stagiaire (QCM début, QCM fin, exercice intermédiaire, éval finale)
       if (doc.code === "C6" && mergedStagiaires.length > 0) {
         const zip = new JSZip();
+        const total = mergedStagiaires.length;
         for (let i = 0; i < mergedStagiaires.length; i++) {
           const s = mergedStagiaires[i];
           const stagFolder = `${s.prenom || ""}_${s.nom || ""}`.trim() || `Stagiaire_${i + 1}`;
+          setProgressText(`C6 — Évaluations IA : ${stagFolder} (${i + 1}/${total})`);
           const blobs = await generateAllTemplateBlobs(doc, i);
           for (const { template, blob } of blobs) {
             const subLabel = TEMPLATE_LABELS[template] || template;
             zip.file(`${stagFolder}/${buildOpcoFileName(namingCtx, subLabel, "pdf", stagFolder)}`, blob);
           }
+          setProgress(((i + 1) / total) * 90);
+          await new Promise((r) => setTimeout(r, 0));
         }
-        const z = await zip.generateAsync({ type: "blob" });
+        setProgressText("Compression du ZIP...");
+        const z = await zip.generateAsync({ type: "blob" }, (meta) => setProgress(90 + meta.percent * 0.1));
         saveAs(z, buildOpcoFileName(namingCtx, doc.label, "zip"));
       } else if (PER_SESSION_DOCS.has(doc.code) && mergedStagiaires.length > 0) {
         // B9 / C11 / C12 : ZIP regroupé par session (dossier = session)
@@ -480,6 +489,8 @@ export default function OPCOMobilites() {
         // → B9 / C11 : trame vierge par session également
         const sessions = groupStagiairesBySession();
         const zip = new JSZip();
+        const totalUnits = sessions.reduce((acc, g) => acc + g.stagiaires.length + (doc.code !== "C12" ? 1 : 0), 0) || 1;
+        let processedUnits = 0;
         for (let i = 0; i < sessions.length; i++) {
           const g = sessions[i];
           const suffix = formatSessionSuffix(g, i);
@@ -487,48 +498,71 @@ export default function OPCOMobilites() {
 
           // 1 PDF par stagiaire à l'intérieur du dossier de session
           for (const s of g.stagiaires) {
+            setProgressText(`${doc.code} — Session ${i + 1}/${sessions.length} : ${s.prenom} ${s.nom}`);
             const blob = await generateAutoBlobForSession(doc, [s]);
             if (blob) {
               const stagSuffix = `${s.prenom || ""}_${s.nom || ""}`.trim() || "Stagiaire";
               folder.file(buildOpcoFileName(namingCtx, doc.label, "pdf", stagSuffix), blob);
             }
+            processedUnits++;
+            setProgress((processedUnits / totalUnits) * 90);
+            await new Promise((r) => setTimeout(r, 0));
           }
 
           // B9 / C11 : trame vierge par session
           if (doc.code !== "C12") {
+            setProgressText(`${doc.code} — Trame vierge session ${i + 1}/${sessions.length}`);
             const viergeBlob = await generateViergeBlobForSession(doc.code, g.stagiaires);
             if (viergeBlob) {
               folder.file(buildOpcoFileName(namingCtx, `${doc.label} (Trame vierge)`, "pdf", suffix), viergeBlob);
             }
+            processedUnits++;
+            setProgress((processedUnits / totalUnits) * 90);
+            await new Promise((r) => setTimeout(r, 0));
           }
         }
         // B9 : on joint aussi le calendrier Excel multi-onglets (à la racine du ZIP)
         if (doc.code === "B9") {
+          setProgressText("B9 — Calendrier Excel consolidé...");
           const xlsHtml = generateExcelCalendrierOPCO(mergedOrganisme, formation, mergedStagiaires);
           zip.file(buildOpcoFileName(namingCtx, doc.label, "xls"), excelToBlob(xlsHtml));
         }
-        const z = await zip.generateAsync({ type: "blob" });
+        setProgressText("Compression du ZIP...");
+        const z = await zip.generateAsync({ type: "blob" }, (meta) => setProgress(90 + meta.percent * 0.1));
         saveAs(z, buildOpcoFileName(namingCtx, doc.label, "zip"));
       } else if (doc.perStagiaire && mergedStagiaires.length > 0) {
         const zip = new JSZip();
+        const total = mergedStagiaires.length;
         for (let i = 0; i < mergedStagiaires.length; i++) {
+          const s = mergedStagiaires[i];
+          setProgressText(`${doc.label} : ${s.prenom} ${s.nom} (${i + 1}/${total})`);
           const blob = await generateAutoBlob(doc, i);
           if (blob) {
-            const s = mergedStagiaires[i];
             const suffix = `${s.prenom || ""}_${s.nom || ""}`;
             zip.file(buildOpcoFileName(namingCtx, doc.label, "pdf", suffix), blob);
           }
+          setProgress(((i + 1) / total) * 90);
+          await new Promise((r) => setTimeout(r, 0));
         }
-        const z = await zip.generateAsync({ type: "blob" });
+        setProgressText("Compression du ZIP...");
+        const z = await zip.generateAsync({ type: "blob" }, (meta) => setProgress(90 + meta.percent * 0.1));
         saveAs(z, `${buildOpcoFileName(namingCtx, doc.label, "zip")}`);
       } else {
+        setProgressText(`Génération : ${doc.label}...`);
+        setProgress(30);
         const blob = await generateAutoBlob(doc);
         if (!blob) { toast.error(`Génération impossible pour ${doc.code}`); return; }
+        setProgress(90);
         saveAs(blob, buildOpcoFileName(namingCtx, doc.label, "pdf"));
+        setProgress(100);
       }
       toast.success(`${doc.label} téléchargé`);
     } catch (e: any) {
       toast.error(`Erreur : ${e.message || "Inconnue"}`);
+    } finally {
+      setGenerating(false);
+      setProgress(0);
+      setProgressText("");
     }
   };
 
