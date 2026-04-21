@@ -2115,13 +2115,14 @@ function genEmargementStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: 
     const start = parseDateSafe(dateDebut);
     const end = parseDateSafe(dateFin);
     if (start && end) {
-    const current = new Date(start);
-    while (current <= end) {
-      const dow = current.getDay();
-      if (dow !== 0 && (includeSat || dow !== 6)) {
-        days.push(current.toLocaleDateString("fr-FR", { weekday: "long", year: "numeric", month: "long", day: "numeric" }));
+      const current = new Date(start);
+      while (current <= end) {
+        const dow = current.getDay();
+        if (dow !== 0 && (includeSat || dow !== 6)) {
+          days.push(current.toLocaleDateString("fr-FR", { weekday: "long", year: "numeric", month: "long", day: "numeric" }));
+        }
+        current.setDate(current.getDate() + 1);
       }
-      current.setDate(current.getDate() + 1);
     }
   }
   if (days.length === 0) days = getFormationDays(f);
