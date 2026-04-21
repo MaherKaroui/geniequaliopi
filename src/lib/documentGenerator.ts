@@ -11462,6 +11462,7 @@ function genCalendrierFormationOPCO(o: OrganismeInfo, f: FormationInfo, stagiair
   </table>`;
 
   let groupIdx = 0;
+  const envoiDatesISO: string[] = [];
   for (const [, g] of groupes) {
     groupIdx++;
     // Construit TOUS les jours ouvrés de la période (école + entreprise) pour montrer l'alternance complète
@@ -11471,6 +11472,9 @@ function genCalendrierFormationOPCO(o: OrganismeInfo, f: FormationInfo, stagiair
     const ecoleDays = refDate ? allDays.filter((d) => isEcoleWeek(weekIndex(d, refDate), shift)) : [];
     const nbEcoleDays = ecoleDays.length;
     const volumeEcole = nbEcoleDays * 7;
+    const envoiISO = computeEnvoiDate(g.debut);
+    if (envoiISO) envoiDatesISO.push(envoiISO);
+    const envoiLabel = envoiISO ? formatDate(envoiISO) : "—";
     const titreGroupe = groupes.size > 1
       ? `Session ${groupIdx} — ${g.stagiaires.join(", ")}`
       : `Session — ${g.stagiaires.join(", ")}`;
@@ -11480,6 +11484,7 @@ function genCalendrierFormationOPCO(o: OrganismeInfo, f: FormationInfo, stagiair
     }
     extra += `<h3 style="margin-top:18px;page-break-after:avoid">${titreGroupe}</h3>`;
     extra += `<p><strong>Période :</strong> du ${formatDate(g.debut)} au ${formatDate(g.fin)} &nbsp;|&nbsp; <strong>Rythme :</strong> ${rythmeLabel} &nbsp;|&nbsp; <strong>Volume centre :</strong> ${volumeEcole} h sur ${nbEcoleDays} jour${nbEcoleDays > 1 ? "s" : ""} école (7 h/jour)</p>`;
+    extra += `<p style="margin:4px 0;font-size:0.9em;color:#1e3a7b"><strong>Date d'envoi du calendrier :</strong> ${envoiLabel} <em>(7 jours ouvrés avant le démarrage — hors week-end et jours fériés)</em></p>`;
     extra += `<table border="1" cellpadding="5" cellspacing="0" style="border-collapse:collapse;width:100%">
       <thead><tr style="background:#1e3a7b;color:#fff">
         <th style="width:5%">N°</th>
