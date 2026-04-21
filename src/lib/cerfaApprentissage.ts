@@ -305,6 +305,25 @@ export async function genCerfaApprentissagePdf(
   setText(form, "Zone de texte 8_55", clean(o.ville));
 
   pdf.getForm().updateFieldAppearances();
+
+  // ---------- SIGNATURES & TAMPON (page 2, bas) ----------
+  // Page 2 du PDF = index 1. Hauteur A4 ≈ 842pt. Coords JSON sont en top-down.
+  // Zone signatures située sous "Fait à" (y top ≈ 788) → on place autour de y=730-780 (top)
+  const page2 = pdf.getPages()[1];
+  if (page2) {
+    const [tamponImg, sigStagImg, sigRespImg] = await Promise.all([
+      embedImage(pdf, o.tamponUrl),
+      embedImage(pdf, s.signatureUrl),
+      embedImage(pdf, s.signatureResponsableUrl),
+    ]);
+    // Tampon organisme (gauche)
+    if (tamponImg) drawFitted(page2, tamponImg, 30, 740, 110, 70);
+    // Signature stagiaire (centre)
+    if (sigStagImg) drawFitted(page2, sigStagImg, 220, 740, 130, 60);
+    // Signature responsable entreprise (droite)
+    if (sigRespImg) drawFitted(page2, sigRespImg, 410, 740, 150, 60);
+  }
+
   const out = await pdf.save();
   const ab = out.buffer.slice(out.byteOffset, out.byteOffset + out.byteLength) as ArrayBuffer;
   return new Blob([ab], { type: "application/pdf" });
