@@ -1,7 +1,7 @@
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { genContratBacPro, genConvocationBacPro, genConvocationExamenBacPro, genTestPositionnementBacPro, genGrilleAcquisitionBacPro, genSatisfactionBacPro, genBilanFormationBacPro, genEval01, genEval02, genEval03, genEval04, genEval05, genEval06, genEval07, genEval08, genEval09, genEval10, genEval11, genEval12, genEval13, genEval14, genEval15, genRapportConnexionBacPro } from "./bacProGenerators";
 import { genObjectifsMethodesSequence, genDossierStagiaire, genDescriptifMoyensMateriels, genCahierMaintenance, genCVFormateur as genCVFormateurEY, genFichierFormateursStatut, genBilanIntermediaire, genTauxReussiteEY, genGrilleTarifaire, genFactureHorsMCF, genDevisEY, genCommunicationReport, genPreuveCreationSession, genPlaquettePresentation, genPlanningIntervenants, genPlanningSessionsEY, genCVResponsablePedagogique, genActionsEngagement, genActionsPassageExamen, genAccompagnementFOAD, genInventaireMateriels, genContratsProprieteSupports, genAttestationDiplomesFormateurs, genCertificatQualiopiModele, genAutorisationsCertificateur, genAgrementsMinisteriels, genIndicateursPerformanceEY, genInfosCertifications, genPreuveReprogrammation, genProcessusAnalyseDemandes, genRessourcesPedagogiques as genRessourcesPedagogiquesEY, genBailLocaux, genBilanPedagogiqueFinancier, genQuestionnaireSatisfactionEY, genAdaptationsHandicapEY, genOutilsSuiviProgressionEY, genTestEvaluationFinEY, genEvaluationBlancheEY, genFacturesEquipementsEY, genEquipementsPedagogiquesEY, genFormationContinueFormateurs, genBilanFroidStagiaire, genMethodesAnimationEY, genListeSupportsDocumentsEY, genAdaptationsPSHAcademy, genProcessusQualiteSousTraitantsEY, genCompteRenduPositionnementEY, genEvaluationDesBesoinsEY, genGrilleAcquisitionCompetencesEY, genEvaluationBlancheAcademyEY, genTauxReussiteAcademyEY } from "./eyGenerators";
-import { buildDocument, htmlWrap, orgHeader, formationInfoBlock, formationInfoBlockStagiaire, tableHTML, signatureBlock3, signatureBlock2, footer, section, formatDate, infoGrid, getDocStyle, subtractBusinessDays, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif, getStagiaireDuree, applyGender, g, getDisplayDuree, linkUrl, optSiteWeb, isFormationTerminee, getModaliteContent, hasDistanciel, hasPresentiel, isFacebookPage, getSiteWebLabel, buildEcheancierPaiement } from "./docBuilder";
+import { buildDocument, htmlWrap, orgHeader, formationInfoBlock, formationInfoBlockStagiaire, tableHTML, signatureBlock3, signatureBlock2, footer, section, formatDate, infoGrid, getDocStyle, subtractBusinessDays, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif, getStagiaireDuree, applyGender, g, getDisplayDuree, linkUrl, optSiteWeb, isFormationTerminee, isStagiaireFormationTerminee, getModaliteContent, hasDistanciel, hasPresentiel, isMixte, isFacebookPage, getSiteWebLabel, buildEcheancierPaiement } from "./docBuilder";
 import { FormateurInfo, SAMPLE_FORMATIONS, SAMPLE_STAGIAIRES, SAMPLE_FORMATEURS, SAMPLE_ORGANISME, EVAL_SCORES, SATISFACTION_SCORES, CONNECTION_TIMES, getFormationDays, formationIncludesSaturday, mergeOrganisme, mergeStagiaires, getConnectionTimes, parseDuree } from "./sampleData";
 import { buildFullCatalog } from "./docCatalog";
 import { generateBookQualiopi } from "./bookQualiopi";
@@ -2058,10 +2058,39 @@ function genConvention(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiaire
   ], signatures: { type: "2", labels: ["Pour l'organisme", "Pour le bénéficiaire"], names: [o.dirigeant, stagiaires[0]?.prenom + " " + stagiaires[0]?.nom] } });
 }
 
+/** Check if a French long-format day string ("lundi 4 novembre 2024") is in the past (<=today) */
+function isFrLongDayPast(dayStr: string): boolean {
+  try {
+    const months: Record<string, number> = { "janvier":0,"février":1,"fevrier":1,"mars":2,"avril":3,"mai":4,"juin":5,"juillet":6,"août":7,"aout":7,"septembre":8,"octobre":9,"novembre":10,"décembre":11,"decembre":11 };
+    const m = dayStr.toLowerCase().match(/(\d{1,2})\s+([a-zéèêûôîçà]+)\s+(\d{4})/);
+    if (!m) return false;
+    const day = parseInt(m[1]);
+    const month = months[m[2]];
+    const year = parseInt(m[3]);
+    if (month === undefined) return false;
+    const d = new Date(year, month, day);
+    const today = new Date();
+    today.setHours(23, 59, 59, 999);
+    return d <= today;
+  } catch { return false; }
+}
+
+/** Determine the modalité (présentiel/distanciel) for a given day index based on formation modalités.
+ * For mixte: alternates day by day (even=Présentiel, odd=Distanciel). */
+function getDayModalite(f: FormationInfo, dayIdx: number): 'P' | 'D' {
+  if (isMixte(f)) return dayIdx % 2 === 0 ? 'P' : 'D';
+  if (hasDistanciel(f) && !hasPresentiel(f)) return 'D';
+  return 'P';
+}
+
 function genEmargementJour(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], jour: number, jourLabel: string) {
+  const mixte = isMixte(f);
+  const modalite = getDayModalite(f, jour);
+  const modaliteLabel = modalite === 'P' ? 'Présentiel' : 'Distanciel';
   const rows = stagiaires.slice(0, 10).map(s => [s.nom, s.prenom, s.entreprise, `Signé ${s.prenom[0]}.${s.nom}`, `Signé ${s.prenom[0]}.${s.nom}`]);
   if (rows.length < 5) { for (let i = rows.length; i < 5; i++) rows.push(["", "", "", "", ""]); }
-  return buildDocument({ org: o, title: "FEUILLE D'ÉMARGEMENT", subtitle: `${f.intitule} – ${jourLabel}`, formation: f, showFormationInfo: true, stagiaires, table: {
+  const subtitle = mixte ? `${f.intitule} – ${jourLabel} (${modaliteLabel})` : `${f.intitule} – ${jourLabel}`;
+  return buildDocument({ org: o, title: "FEUILLE D'ÉMARGEMENT", subtitle, formation: f, showFormationInfo: true, stagiaires, table: {
     headers: ["Nom", "Prénom", "Entreprise", "Signature Matin", "Signature Après-midi"], rows
   }, signatures: { type: "2", labels: ["Le Formateur", "Le Responsable"], names: [f.formateur, o.dirigeant] } });
 }
@@ -2095,20 +2124,30 @@ function genEmargementStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: 
     }
   }
   if (days.length === 0) days = getFormationDays(f);
+  const mixte = isMixte(f);
   const stagName = `${s.civilite ? s.civilite + " " : ""}${s.prenom} ${(s.nom || "").toUpperCase()}`.trim();
   const stagiaireInitiale = s.prenom?.trim().charAt(0) || "S";
   const stagiaireNom = s.nom?.trim() || "Stagiaire";
   const stagSigHtml = s.signatureUrl ? `<br><img src="${s.signatureUrl}" alt="Sig" style="max-height:40px;max-width:90px;object-fit:contain;margin-top:4px" />` : `<br><span style="font-style:italic;color:#999;font-size:10px">Signé ${stagiaireInitiale}.${stagiaireNom}</span>`;
   const fmtSigUrl = s.formateurSignatureUrl || f.formateurSignatureUrl;
   const formateurSigHtml = fmtSigUrl ? `<br><img src="${fmtSigUrl}" alt="Sig formateur" style="max-height:40px;max-width:90px;object-fit:contain;margin-top:4px" />` : '';
+  const blankSigHtml = `<br><span style="color:#bbb;font-size:10px;font-style:italic">— en attente —</span>`;
   let extra = `<p><strong>Stagiaire :</strong> ${stagName}</p>`;
   extra += `<p><strong>Session :</strong> Du ${formatDate(dateDebut)} au ${formatDate(dateFin)}</p>`;
   extra += `<p><strong>Formateur :</strong> ${f.formateur}</p>`;
+  if (mixte) extra += `<p><strong>Modalité :</strong> Mixte (alternance Présentiel / Distanciel)</p>`;
   days.forEach((day, di) => {
     if (di > 0 && di % 5 === 0) extra += '<div class="page-break"></div>';
+    const isPast = isFrLongDayPast(day);
+    const modalite = getDayModalite(f, di);
+    const modaliteLabel = mixte ? ` <span style="color:#1e3a7b;font-weight:600">(${modalite === 'P' ? 'Présentiel' : 'Distanciel'})</span>` : '';
+    const sigStag = isPast ? stagSigHtml : blankSigHtml;
+    const sigForm = isPast ? formateurSigHtml : blankSigHtml;
+    const stagDisplay = isPast ? stagName : '';
+    const formDisplay = isPast ? f.formateur : '';
     let tableRows = '';
-    tableRows += `<tr style="background:#fff;border-bottom:1px solid #ddd"><td>${day}</td><td>Matin</td><td style="padding:10px 6px">${stagName}${stagSigHtml}</td><td style="padding:10px 6px">${f.formateur}${formateurSigHtml}</td></tr>`;
-    tableRows += `<tr style="background:#fff;border-bottom:1px solid #ccc"><td></td><td>Après-midi</td><td style="padding:10px 6px">${stagName}${stagSigHtml}</td><td style="padding:10px 6px">${f.formateur}${formateurSigHtml}</td></tr>`;
+    tableRows += `<tr style="background:#fff;border-bottom:1px solid #ddd"><td>${day}${modaliteLabel}</td><td>Matin</td><td style="padding:10px 6px">${stagDisplay}${sigStag}</td><td style="padding:10px 6px">${formDisplay}${sigForm}</td></tr>`;
+    tableRows += `<tr style="background:#fff;border-bottom:1px solid #ccc"><td></td><td>Après-midi</td><td style="padding:10px 6px">${stagDisplay}${sigStag}</td><td style="padding:10px 6px">${formDisplay}${sigForm}</td></tr>`;
     extra += `<table><tr><th>Date</th><th>Horaires</th><th>Signature du Stagiaire</th><th>Signature du Formateur</th></tr>${tableRows}</table>`;
   });
   return buildDocument({ org: o, title: "FEUILLE D'ÉMARGEMENT", subtitle: `${f.intitule} – ${stagName}`, extraHtml: extra });
@@ -2135,7 +2174,9 @@ function getStagiaireDays(s: StagiaireInfo, f: FormationInfo): string[] {
 
 function genRapportConnexion(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const ct = getConnectionTimes(f);
+  const mixte = isMixte(f);
   let extra = '';
+  if (mixte) extra += `<p><em>Modalité mixte : seuls les jours en distanciel sont reportés ci-dessous.</em></p>`;
   stagiaires.slice(0, 10).forEach((s, si) => {
     const days = getStagiaireDays(s, f);
     if (si > 0) extra += '<div class="page-break"></div>';
@@ -2143,10 +2184,21 @@ function genRapportConnexion(o: OrganismeInfo, f: FormationInfo, stagiaires: Sta
     extra += `<p><strong>Période :</strong> ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}</p>`;
     const rows: string[][] = [];
     days.forEach((day, di) => {
+      // Skip présentiel days in mixte mode (no LMS connection)
+      if (mixte && getDayModalite(f, di) === 'P') return;
+      // Future days → blank entry
+      if (!isFrLongDayPast(day)) {
+        rows.push([day, '—', '—', '— en attente —']);
+        return;
+      }
       rows.push([day, ct[di * 2 % ct.length].heureConnexion, ct[di * 2 % ct.length].heureDeconnexion, ct[di * 2 % ct.length].duree]);
       rows.push(['', ct[(di * 2 + 1) % ct.length].heureConnexion, ct[(di * 2 + 1) % ct.length].heureDeconnexion, ct[(di * 2 + 1) % ct.length].duree]);
     });
-    extra += tableHTML(["Date", "Heure connexion", "Heure déconnexion", "Durée"], rows);
+    if (rows.length === 0) {
+      extra += `<p style="color:#888;font-style:italic">Aucun jour distanciel passé à ce jour.</p>`;
+    } else {
+      extra += tableHTML(["Date", "Heure connexion", "Heure déconnexion", "Durée"], rows);
+    }
   });
   return buildDocument({ org: o, title: "RAPPORT DE CONNEXION LMS", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra });
 }
@@ -2157,7 +2209,10 @@ function genTempsConnexion(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
     const totalH = parseInt(stagDuree) || (getStagiaireDays(s, f).length * 7);
     const dateDebut = formatDate(getStagiaireDateDebut(s, f));
     const dateFin = formatDate(getStagiaireDateFin(s, f));
-    return [s.prenom + " " + s.nom, `${dateDebut} - ${dateFin}`, `${totalH}h`, stagDuree, `100%`, "✅ Validé"];
+    const termine = isStagiaireFormationTerminee(s, f);
+    const tauxAffiche = termine ? "100%" : "En cours";
+    const statut = termine ? "✅ Validé" : "⏳ En cours";
+    return [s.prenom + " " + s.nom, `${dateDebut} - ${dateFin}`, termine ? `${totalH}h` : "—", stagDuree, tauxAffiche, statut];
   });
   return buildDocument({ org: o, title: "TEMPS DE CONNEXION PAR STAGIAIRE", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, table: {
     headers: ["Stagiaire", "Période", "Temps total", "Durée formation", "Taux présence", "Statut"], rows
@@ -2165,7 +2220,9 @@ function genTempsConnexion(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
 }
 
 function genTempsConnexionReel(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
+  const mixte = isMixte(f);
   let extra = '';
+  if (mixte) extra += `<p><em>Modalité mixte : seuls les jours réalisés en distanciel apparaissent dans le relevé ci-dessous.</em></p>`;
 
   stagiaires.slice(0, 10).forEach((s, si) => {
     const days = getStagiaireDays(s, f);
@@ -2173,9 +2230,23 @@ function genTempsConnexionReel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
     extra += `<h3>📋 ${s.prenom} ${s.nom}</h3>`;
     extra += `<p><strong>Période :</strong> ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}<br><strong>Plateforme :</strong> ${o.outilsUtilises || 'Zoom / Teams'}</p>`;
 
+    let renderedDays = 0;
+    let totalMinutes = 0;
     days.forEach((day, di) => {
-      if (di > 0 && di % 5 === 0) extra += '<div class="page-break"></div>';
+      // Skip présentiel days in mixte mode
+      if (mixte && getDayModalite(f, di) === 'P') return;
+      if (renderedDays > 0 && renderedDays % 5 === 0) extra += '<div class="page-break"></div>';
       extra += `<h4>📅 ${day}</h4>`;
+
+      // Future day → blank row
+      if (!isFrLongDayPast(day)) {
+        extra += tableHTML(
+          ["Adresse IP", "Connexion matin", "Déconnexion midi", "Reconnexion", "Déconnexion soir", "Durée totale", "Statut"],
+          [["—", "—", "—", "—", "—", "—", "⏳ À venir"]]
+        );
+        renderedDays++;
+        return;
+      }
 
       const seed = (s.nom.charCodeAt(0) * 7 + di * 13 + si * 3) % 256;
       const ip = `${80 + (seed % 120)}.${(seed * 3 + si * 17) % 256}.${(seed * 7 + di * 31) % 256}.${(seed * 11 + si * 23 + di * 5) % 256}`;
@@ -2190,6 +2261,7 @@ function genTempsConnexionReel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
       const dureeMatin = (hDeconnexion - hConnexion) * 60 + mDeconnexion - mConnexion;
       const dureeApresMidi = (hFinale - hReconnexion) * 60 + mFinale - mReconnexion;
       const dureeTotal = dureeMatin + dureeApresMidi;
+      totalMinutes += dureeTotal;
       const hTotal = Math.floor(dureeTotal / 60);
       const mTotal = dureeTotal % 60;
 
@@ -2205,24 +2277,23 @@ function genTempsConnexionReel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
           '✅ Connecté'
         ]]
       );
+      renderedDays++;
     });
 
-    // Récap individuel
-    let totalMinutes = 0;
-    days.forEach((_, di) => {
-      const seed = (s.nom.charCodeAt(0) * 7 + di * 13 + si * 3) % 256;
-      const hC = 8 + (seed % 2); const mC = (seed * 3) % 30;
-      const hD = 12 + (seed % 2); const mD = (seed * 5) % 30;
-      const hR = 13 + (seed % 2); const mR = (seed * 7) % 20;
-      const hF = 16 + (seed % 2); const mF = 30 + (seed * 2) % 30;
-      totalMinutes += (hD - hC) * 60 + mD - mC + (hF - hR) * 60 + mF - mR;
-    });
+    if (renderedDays === 0) {
+      extra += `<p style="color:#888;font-style:italic">Aucun jour distanciel réalisé à ce jour.</p>`;
+      return;
+    }
+
+    // Récap individuel basé sur les jours distanciel passés
     const hT = Math.floor(totalMinutes / 60);
     const mT = totalMinutes % 60;
     const stagDuree = getStagiaireDuree(s, f);
     const dureeFormationH = parseInt(stagDuree) || days.length * 7;
-    const taux = Math.min(100, Math.round((totalMinutes / (dureeFormationH * 60)) * 100));
-    extra += `<p style="margin-top:10px"><strong>Total connecté :</strong> ${hT}h${String(mT).padStart(2, '0')}min | <strong>Durée formation :</strong> ${stagDuree} | <strong>Taux :</strong> ${taux}% | ${taux >= 80 ? '✅ Validé' : '⚠️ Insuffisant'}</p>`;
+    const taux = dureeFormationH > 0 ? Math.min(100, Math.round((totalMinutes / (dureeFormationH * 60)) * 100)) : 0;
+    const termine = isStagiaireFormationTerminee(s, f);
+    const tauxLabel = termine ? `${taux}%` : `${taux}% (en cours)`;
+    extra += `<p style="margin-top:10px"><strong>Total connecté :</strong> ${hT}h${String(mT).padStart(2, '0')}min | <strong>Durée formation :</strong> ${stagDuree} | <strong>Taux :</strong> ${tauxLabel} | ${termine ? (taux >= 80 ? '✅ Validé' : '⚠️ Insuffisant') : '⏳ Formation en cours'}</p>`;
   });
 
   return buildDocument({ org: o, title: "RELEVÉ DES TEMPS DE CONNEXION RÉELS", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra });
@@ -7258,8 +7329,12 @@ function getCFAWeeks(f: FormationInfo): number {
 function genEmargementCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const cfaWeekDates = getCFAWeekDates(f);
   const joursFR = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+  const mixte = isMixte(f);
+  const today = new Date();
+  today.setHours(23, 59, 59, 999);
 
   let extra = '';
+  if (mixte) extra += `<p><em>Modalité mixte : alternance Présentiel / Distanciel jour par jour.</em></p>`;
   cfaWeekDates.forEach((week, wi) => {
     if (wi > 0) extra += '<div class="page-break"></div>';
     const weekStartStr = week.weekStart.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
@@ -7274,7 +7349,13 @@ function genEmargementCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
       const dayStr = dayDate.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
       const dayName = joursFR[dayDate.getDay()];
 
-      extra += `<p style="margin-top:12px"><strong>${dayName} ${dayStr}</strong></p>`;
+      // Global day index (continuous across all CFA weeks) for modality alternation
+      const globalDayIdx = wi * 5 + d;
+      const modalite = getDayModalite(f, globalDayIdx);
+      const modaliteLabel = mixte ? ` <span style="color:#1e3a7b;font-weight:600">(${modalite === 'P' ? 'Présentiel' : 'Distanciel'})</span>` : '';
+      const isPast = dayDate <= today;
+
+      extra += `<p style="margin-top:12px"><strong>${dayName} ${dayStr}</strong>${modaliteLabel}</p>`;
       extra += `<p><strong>Formateur :</strong> ${f.formateur}<br><strong>Formation :</strong> ${f.intitule}</p>`;
 
       let tableRows = '';
@@ -7287,8 +7368,13 @@ function genEmargementCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
         const formateurSigHtml = fmtSigUrl
           ? `<br><img src="${fmtSigUrl}" alt="Sig formateur" style="max-height:40px;max-width:90px;object-fit:contain;margin-top:4px" />`
           : '';
-        tableRows += `<tr style="background:#fff;border-bottom:1px solid #ddd"><td>${dayStr}</td><td>Matin<br><small>09h00–12h30</small></td><td style="padding:10px 6px">${stagName}${stagSigHtml}</td><td style="padding:10px 6px">${f.formateur}${formateurSigHtml}</td></tr>`;
-        tableRows += `<tr style="background:#fff;border-bottom:1px solid #ccc"><td></td><td>Après-midi<br><small>13h30–17h00</small></td><td style="padding:10px 6px">${stagName}${stagSigHtml}</td><td style="padding:10px 6px">${f.formateur}${formateurSigHtml}</td></tr>`;
+        const blankSig = `<br><span style="color:#bbb;font-size:10px;font-style:italic">— en attente —</span>`;
+        const sigStag = isPast ? stagSigHtml : blankSig;
+        const sigForm = isPast ? formateurSigHtml : blankSig;
+        const stagDisplay = isPast ? stagName : '';
+        const formDisplay = isPast ? f.formateur : '';
+        tableRows += `<tr style="background:#fff;border-bottom:1px solid #ddd"><td>${dayStr}</td><td>Matin<br><small>09h00–12h30</small></td><td style="padding:10px 6px">${stagDisplay}${sigStag}</td><td style="padding:10px 6px">${formDisplay}${sigForm}</td></tr>`;
+        tableRows += `<tr style="background:#fff;border-bottom:1px solid #ccc"><td></td><td>Après-midi<br><small>13h30–17h00</small></td><td style="padding:10px 6px">${stagDisplay}${sigStag}</td><td style="padding:10px 6px">${formDisplay}${sigForm}</td></tr>`;
       });
       extra += `<table><tr><th>Date</th><th>Horaires</th><th>Prénom et nom, Signature Du Stagiaire</th><th>Prénom et nom du Formateur</th></tr>${tableRows}</table>`;
     }
