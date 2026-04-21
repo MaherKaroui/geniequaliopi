@@ -139,7 +139,7 @@ export function genCalendrierCFA(o: OrganismeInfo, f: FormationInfo) {
 }
 
 export function genConvocationApprenti(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
-  let extra = stagiaires.slice(0, 5).map(s => `<div class="section"><p><strong>Destinataire :</strong> ${s.prenom} ${s.nom}</p><p><strong>Entreprise d'accueil :</strong> ${s.entreprise}</p><p><strong>Formation :</strong> ${f.intitule}</p><p><strong>Période CFA :</strong> Du ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)}</p></div>`).join("");
+  let extra = stagiaires.slice(0, 5).map(s => `<div class="section"><p><strong>Destinataire :</strong> ${s.prenom} ${s.nom}</p><p><strong>Adresse :</strong> ${(s as any).adresse || "________________________"}</p><p><strong>Entreprise d'accueil :</strong> ${s.entreprise}</p><p><strong>Adresse entreprise :</strong> ${(s as any).adresseEntreprise || "________________________"}</p><p><strong>Formation :</strong> ${f.intitule}</p><p><strong>Période CFA :</strong> Du ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)}</p></div>`).join("");
   return buildDocument({ org: o, title: "CONVOCATION APPRENTI AU CFA", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra + `<p>Merci de vous présenter muni(e) de cette convocation et de votre carnet de liaison.</p>` });
 }
 
