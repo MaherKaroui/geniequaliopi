@@ -657,8 +657,19 @@ export function generateExcelCalendrierOPCO(
     const b = startOfWeek(ref).getTime();
     return Math.round((a - b) / (7 * 24 * 3600 * 1000));
   };
-  const isEcoleWeek = (wIdx: number): boolean => {
-    const pos = ((wIdx % cycleWeeks) + cycleWeeks) % cycleWeeks;
+  // Décalage : si la 1ʳᵉ semaine est partielle (<3 jours école), on prolonge l'école
+  // sur la semaine suivante pour avoir une vraie semaine pleine.
+  const computeWeekShift = (startStr: string): number => {
+    const d = parseD(startStr);
+    if (!d) return 0;
+    const dow = d.getDay();
+    const remaining = dow === 0 ? 0 : Math.max(0, 6 - Math.max(dow, 1));
+    return remaining < 3 ? 1 : 0;
+  };
+  const isEcoleWeek = (wIdx: number, shift = 0): boolean => {
+    const adjusted = wIdx - shift;
+    if (adjusted < 0) return true;
+    const pos = ((adjusted % cycleWeeks) + cycleWeeks) % cycleWeeks;
     return pos < rythme.ecole;
   };
 
