@@ -11295,11 +11295,23 @@ function genCalendrierAnnuelCFA(o: OrganismeInfo, f: FormationInfo) {
 function genCalendrierFormationOPCO(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   // Calendrier OPCO : dates exactes, horaires précis et lieu de déroulement
   // PRIORITÉ : dates individuelles de chaque stagiaire (formulaire) sur les dates globales formation
+  // RYTHME ALTERNANCE : on commence TOUJOURS par 1 semaine école, puis 3 semaines entreprise (par défaut)
+  // Lecture du rythme depuis f.rythmeAlternance (ex: "1 semaine CFA / 3 semaines entreprise")
   const { totalHours, days: nbJours } = parseDuree(f.duree);
   const dureeH = totalHours || parseInt(f.duree) || 14;
   const defaultTotalDays = nbJours || Math.max(1, Math.ceil(dureeH / 7));
   const lieu = f.lieu?.trim() || o.adresse || "À préciser";
   const isDistance = lieu.toLowerCase().includes("distance") || lieu.toLowerCase().includes("distanciel");
+
+  // Parse du rythme d'alternance — défaut 1 sem école / 3 sem entreprise
+  const parseRythme = (txt?: string): { ecole: number; entreprise: number } => {
+    if (!txt) return { ecole: 1, entreprise: 3 };
+    const m = txt.match(/(\d+)\s*sem[^0-9]*?(\d+)\s*sem/i);
+    if (m) return { ecole: Math.max(1, parseInt(m[1])), entreprise: Math.max(0, parseInt(m[2])) };
+    return { ecole: 1, entreprise: 3 };
+  };
+  const rythme = parseRythme(f.rythmeAlternance);
+  const cycleWeeks = rythme.ecole + rythme.entreprise;
 
   // Parse robuste des dates (DD/MM/YYYY ou YYYY-MM-DD)
   const parseD = (s: string): Date | null => {
