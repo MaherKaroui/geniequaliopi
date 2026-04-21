@@ -597,6 +597,17 @@ export function generateExcelCalendrierOPCO(
   const horairesMatin = "09h00 – 12h30";
   const horairesAprem = "13h30 – 17h00";
 
+  // Parse rythme alternance — défaut 1 sem école / 3 sem entreprise (toujours commencer par école)
+  const parseRythme = (txt?: string): { ecole: number; entreprise: number } => {
+    if (!txt) return { ecole: 1, entreprise: 3 };
+    const m = txt.match(/(\d+)\s*sem[^0-9]*?(\d+)\s*sem/i);
+    if (m) return { ecole: Math.max(1, parseInt(m[1])), entreprise: Math.max(0, parseInt(m[2])) };
+    return { ecole: 1, entreprise: 3 };
+  };
+  const rythme = parseRythme(f.rythmeAlternance);
+  const cycleWeeks = rythme.ecole + rythme.entreprise;
+  const rythmeLabel = `${rythme.ecole} sem école / ${rythme.entreprise} sem entreprise`;
+
   const parseD = (s: string): Date | null => {
     if (!s) return null;
     const t = s.trim();
@@ -620,16 +631,35 @@ export function generateExcelCalendrierOPCO(
     return Math.max(1, count);
   };
 
-  const buildDays = (startStr: string, count: number): Date[] => {
+  const buildAllWorkdays = (startStr: string, endStr: string): Date[] => {
     const out: Date[] = [];
     const cur = parseD(startStr);
-    if (!cur) return out;
-    while (out.length < count) {
+    const end = parseD(endStr);
+    if (!cur || !end) return out;
+    while (cur <= end) {
       const dow = cur.getDay();
       if (dow !== 0 && dow !== 6) out.push(new Date(cur));
       cur.setDate(cur.getDate() + 1);
     }
     return out;
+  };
+
+  const startOfWeek = (d: Date): Date => {
+    const r = new Date(d);
+    const dow = r.getDay();
+    const diff = dow === 0 ? -6 : 1 - dow;
+    r.setDate(r.getDate() + diff);
+    r.setHours(0, 0, 0, 0);
+    return r;
+  };
+  const weekIndex = (d: Date, ref: Date): number => {
+    const a = startOfWeek(d).getTime();
+    const b = startOfWeek(ref).getTime();
+    return Math.round((a - b) / (7 * 24 * 3600 * 1000));
+  };
+  const isEcoleWeek = (wIdx: number): boolean => {
+    const pos = ((wIdx % cycleWeeks) + cycleWeeks) % cycleWeeks;
+    return pos < rythme.ecole;
   };
 
   const fmtJour = (d: Date) => {
@@ -668,22 +698,23 @@ export function generateExcelCalendrierOPCO(
   let synthHtml = tableRow(["Champ", "Valeur"], true);
   synthHtml += tableRow(["Intitulé de la formation", f.intitule]);
   synthHtml += tableRow(["Organisme", `${o.nom}${o.nda ? ` – NDA ${o.nda}` : ""}`]);
-  synthHtml += tableRow(["Modalité", isDistance ? "Distanciel synchrone (classe virtuelle)" : "Présentiel"]);
+  synthHtml += tableRow(["Modalité", `${isDistance ? "Distanciel synchrone (classe virtuelle)" : "Présentiel"} — Apprentissage en alternance`]);
   synthHtml += tableRow(["Lieu de déroulement", lieu]);
-  synthHtml += tableRow(["Durée", `${dureeH} heures`]);
-  synthHtml += tableRow(["Horaires types", `Matin : ${horairesMatin} | Après-midi : ${horairesAprem}`]);
+  synthHtml += tableRow(["Durée centre", `${dureeH} heures (7 h/jour)`]);
+  synthHtml += tableRow(["Rythme d'alternance", `${rythmeLabel} — démarrage en semaine école`]);
+  synthHtml += tableRow(["Horaires (jours école)", `Matin : ${horairesMatin} | Après-midi : ${horairesAprem} — 7 h/jour`]);
   synthHtml += tableRow(["Formateur", f.formateur || "—"]);
   synthHtml += tableRow(["Nombre de sessions", String(groupes.size)]);
   synthHtml += tableRow(["Nombre d'apprenants", String(stagiaires.length)]);
 
   // ── Onglet 2 : Toutes sessions consolidées (filtrable) ──
   let consolHtml = tableRow(
-    ["Session", "Apprenants", "N° jour", "Date", "Jour de la semaine", "Horaires matin", "Horaires après-midi", "Volume (h)", "Lieu", "Formateur"],
+    ["Session", "Apprenants", "N°", "Sem.", "Type", "Date", "Date (ISO)", "Jour", "Horaires matin", "Horaires après-midi", "Volume (h)", "Lieu", "Formateur"],
     true,
   );
   const sheets: { name: string; html: string }[] = [
     { name: "Synthèse", html: synthHtml },
-    { name: "Toutes sessions", html: "" }, // rempli après
+    { name: "Toutes sessions", html: "" },
   ];
 
   let sessionIdx = 0;
@@ -693,48 +724,68 @@ export function generateExcelCalendrierOPCO(
     const apprenants = grp.stagiaires.length
       ? grp.stagiaires.map((s) => `${s.prenom} ${s.nom}`).join(", ")
       : "—";
-    const days = buildDays(grp.debut, grp.nbDays);
-    const hPerDay = (Math.round((dureeH / grp.nbDays) * 10) / 10).toString();
+    const allDays = buildAllWorkdays(grp.debut, grp.fin);
+    const refDate = parseD(grp.debut);
+    const ecoleDays = refDate ? allDays.filter((d) => isEcoleWeek(weekIndex(d, refDate))) : [];
+    const nbEcoleDays = ecoleDays.length;
+    const volumeEcole = nbEcoleDays * 7;
 
     // Onglet par session
     let sheetHtml = tableRow(["Champ", "Valeur"], true);
     sheetHtml += tableRow(["Session", sessionLabel]);
     sheetHtml += tableRow(["Apprenants", apprenants]);
     sheetHtml += tableRow(["Période", `Du ${formatDate(grp.debut)} au ${formatDate(grp.fin)}`]);
-    sheetHtml += tableRow(["Volume", `${dureeH} h sur ${grp.nbDays} jour${grp.nbDays > 1 ? "s" : ""}`]);
+    sheetHtml += tableRow(["Rythme", rythmeLabel]);
+    sheetHtml += tableRow(["Volume centre", `${volumeEcole} h sur ${nbEcoleDays} jour${nbEcoleDays > 1 ? "s" : ""} école (7 h/jour)`]);
     sheetHtml += tableRow(["Lieu", lieu]);
     sheetHtml += tableRow(["Formateur", f.formateur || "—"]);
     sheetHtml += `<tr><td colspan="2" style="height:8px"></td></tr>`;
     sheetHtml += tableRow(
-      ["N° jour", "Date", "Date (ISO)", "Jour de la semaine", "Horaires matin", "Horaires après-midi", "Volume (h)", "Lieu"],
+      ["N°", "Sem.", "Type", "Date", "Date (ISO)", "Jour", "Horaires matin", "Horaires après-midi", "Volume (h)", "Lieu"],
       true,
     );
-    if (days.length === 0) {
-      sheetHtml += `<tr><td colspan="8" style="text-align:center;color:#888">Dates à renseigner dans la fiche stagiaire.</td></tr>`;
+    if (allDays.length === 0 || !refDate) {
+      sheetHtml += `<tr><td colspan="10" style="text-align:center;color:#888">Dates à renseigner dans la fiche stagiaire.</td></tr>`;
     } else {
-      days.forEach((d, i) => {
+      let ecoleCounter = 0;
+      let entrepriseCounter = 0;
+      allDays.forEach((d) => {
+        const wIdx = weekIndex(d, refDate);
+        const ecole = isEcoleWeek(wIdx);
+        if (ecole) ecoleCounter++; else entrepriseCounter++;
+        const numLabel = ecole ? `É${ecoleCounter}` : `E${entrepriseCounter}`;
+        const typeLabel = ecole ? "École" : "Entreprise";
+        const matin = ecole ? horairesMatin : "—";
+        const aprem = ecole ? horairesAprem : "—";
+        const vol = ecole ? "7" : "0";
+        const lieuJour = ecole ? lieu : "Entreprise d'accueil";
         const jourLabel = fmtJour(d);
         const jourCap = jourLabel.charAt(0).toUpperCase() + jourLabel.slice(1);
         sheetHtml += tableRow([
-          `J${i + 1}`,
+          numLabel,
+          `S${wIdx + 1}`,
+          typeLabel,
           fmtDateLong(d),
           fmtDateISO(d),
           jourCap,
-          horairesMatin,
-          horairesAprem,
-          hPerDay,
-          lieu,
+          matin,
+          aprem,
+          vol,
+          lieuJour,
         ]);
         consolHtml += tableRow([
           sessionLabel,
           apprenants,
-          `J${i + 1}`,
+          numLabel,
+          `S${wIdx + 1}`,
+          typeLabel,
           fmtDateLong(d),
+          fmtDateISO(d),
           jourCap,
-          horairesMatin,
-          horairesAprem,
-          hPerDay,
-          lieu,
+          matin,
+          aprem,
+          vol,
+          lieuJour,
           f.formateur || "—",
         ]);
       });
