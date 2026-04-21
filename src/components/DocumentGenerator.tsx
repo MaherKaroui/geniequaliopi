@@ -1341,10 +1341,11 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
                         } else {
                           const content = generateContent(doc);
                           if (exportFormat === "pdf") {
-                            zip.file(buildCatalogFileName(doc, null, ".pdf"), await htmlToPdfBlob(content, bulkPdfOptions));
+                            zip.file(buildCatalogFileName(doc, null, ".pdf"), await htmlToPdfBlob(content));
                           } else {
-                            const wordBlob = await toWordBlob(content);
-                            zip.file(buildCatalogFileName(doc, null, wordBlob.extension), wordBlob.blob);
+                            const wBlob = await htmlToWordBlob(content);
+                            const ext = wBlob.type.includes("officedocument") ? ".docx" : ".doc";
+                            zip.file(buildCatalogFileName(doc, null, ext), wBlob);
                           }
                         }
                       } catch (err) {
