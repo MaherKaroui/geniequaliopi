@@ -11459,7 +11459,7 @@ function genCalendrierFormationOPCO(o: OrganismeInfo, f: FormationInfo, stagiair
       : `Session — ${g.stagiaires.join(", ")}`;
     // Saut de page avant chaque session (sauf la première) pour avoir une session par page
     if (groupIdx > 1) {
-      extra += `<div class="page-break" style="page-break-before:always;break-before:page"></div>`;
+      extra += `<div class="page-break-before" style="page-break-before:always;break-before:page;height:0px;overflow:hidden"></div>`;
     }
     extra += `<h3 style="margin-top:18px;page-break-after:avoid">${titreGroupe}</h3>`;
     extra += `<p><strong>Période :</strong> du ${formatDate(g.debut)} au ${formatDate(g.fin)} &nbsp;|&nbsp; <strong>Rythme :</strong> ${rythmeLabel} &nbsp;|&nbsp; <strong>Volume centre :</strong> ${volumeEcole} h sur ${nbEcoleDays} jour${nbEcoleDays > 1 ? "s" : ""} école (7 h/jour)</p>`;
