@@ -951,19 +951,13 @@ export default function OPCOMobilites() {
               {generatingAI ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
               {generatingAI ? "Génération IA..." : aiPackReady ? "Régénérer pack IA C6" : "Générer évaluations IA (C6)"}
             </Button>
-            <Button onClick={handleExportFullZip} disabled={generating} className="gap-2">
-              {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <FolderArchive className="w-4 h-4" />}
-              {generating ? "Export en cours..." : "Exporter le dossier ZIP"}
+            <Button onClick={handleExportFullZip} disabled={hasActive} className="gap-2">
+              {hasActive ? <Loader2 className="w-4 h-4 animate-spin" /> : <FolderArchive className="w-4 h-4" />}
+              {hasActive ? "Export en arrière-plan..." : "Exporter le dossier ZIP"}
             </Button>
           </div>
         </Card>
 
-        {generating && (
-          <Card className="p-4">
-            <p className="text-sm mb-2">{progressText}</p>
-            <Progress value={progress} />
-          </Card>
-        )}
 
         {/* Documents par section */}
         {(Object.keys(OPCO_CATEGORIES) as OpcoCategory[]).map((cat) => {
