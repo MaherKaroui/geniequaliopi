@@ -566,115 +566,108 @@ export default function OPCOMobilites() {
     }
   };
 
-  const handleExportFullZip = async () => {
-    setGenerating(true);
-    setProgress(0);
-    setProgressText("Préparation du dossier OPCO Mobilités...");
+  const handleExportFullZip = () => {
+    // Snapshot des données pour que le job survive au démontage du composant
+    const eligible = OPCO_DOCUMENTS.filter((d) => {
+      const s = docStates.get(d.code);
+      return s && s.status !== "not_applicable";
+    });
+    const statesSnapshot = new Map(docStates);
+    const stagiairesSnap = mergedStagiaires;
+    const sessionsSnap = groupStagiairesBySession();
+    const ctxSnap = namingCtx;
+    const orgSnap = mergedOrganisme;
+    const formSnap = formation;
 
-    try {
-      const zip = new JSZip();
-      const eligible = OPCO_DOCUMENTS.filter((d) => {
-        const s = docStates.get(d.code);
-        return s && s.status !== "not_applicable";
-      });
+    runJob({
+      label: "Export dossier OPCO Mobilités",
+      fileName: `${buildOpcoRootName(ctxSnap)}.zip`,
+      run: async (reporter) => {
+        const zip = new JSZip();
+        let processed = 0;
+        const total = eligible.length;
 
-      let processed = 0;
-      const total = eligible.length;
+        for (const doc of eligible) {
+          const state = statesSnapshot.get(doc.code)!;
+          const sectionLabel = OPCO_CATEGORIES[doc.category];
+          const folder = buildOpcoZipFolder(ctxSnap, sectionLabel);
 
-      for (const doc of eligible) {
-        const state = docStates.get(doc.code)!;
-        const sectionLabel = OPCO_CATEGORIES[doc.category];
-        const folder = buildOpcoZipFolder(namingCtx, sectionLabel);
+          reporter.setMessage(`${doc.code} — ${doc.label}`);
 
-        setProgressText(`${doc.code} — ${doc.label}`);
-
-        if (state.uploadedFile) {
-          const ext = state.uploadedFileName?.split(".").pop() || "pdf";
-          zip.file(`${folder}/${buildOpcoFileName(namingCtx, doc.label, ext)}`, state.uploadedFile);
-        } else if (doc.autoTemplates.length > 0) {
-          if (doc.code === "C6" && mergedStagiaires.length > 0) {
-            // C6 : 4 sous-évaluations IA par stagiaire (QCM début/fin, exercice intermédiaire, éval finale)
-            for (let i = 0; i < mergedStagiaires.length; i++) {
-              const s = mergedStagiaires[i];
-              const stagFolder = `${s.prenom || ""}_${s.nom || ""}`.trim() || `Stagiaire_${i + 1}`;
-              const blobs = await generateAllTemplateBlobs(doc, i);
-              for (const { template, blob } of blobs) {
-                const subLabel = TEMPLATE_LABELS[template] || template;
-                zip.file(`${folder}/C6_Evaluations_IA/${stagFolder}/${buildOpcoFileName(namingCtx, subLabel, "pdf", stagFolder)}`, blob);
+          if (state.uploadedFile) {
+            const ext = state.uploadedFileName?.split(".").pop() || "pdf";
+            zip.file(`${folder}/${buildOpcoFileName(ctxSnap, doc.label, ext)}`, state.uploadedFile);
+          } else if (doc.autoTemplates.length > 0) {
+            if (doc.code === "C6" && stagiairesSnap.length > 0) {
+              for (let i = 0; i < stagiairesSnap.length; i++) {
+                const s = stagiairesSnap[i];
+                const stagFolder = `${s.prenom || ""}_${s.nom || ""}`.trim() || `Stagiaire_${i + 1}`;
+                const blobs = await generateAllTemplateBlobs(doc, i);
+                for (const { template, blob } of blobs) {
+                  const subLabel = TEMPLATE_LABELS[template] || template;
+                  zip.file(`${folder}/C6_Evaluations_IA/${stagFolder}/${buildOpcoFileName(ctxSnap, subLabel, "pdf", stagFolder)}`, blob);
+                }
+                await new Promise((r) => setTimeout(r, 50));
               }
-              await new Promise((r) => setTimeout(r, 50));
-            }
-          } else if (PER_SESSION_DOCS.has(doc.code) && mergedStagiaires.length > 0) {
-            // B9 / C11 / C12 : sous-dossier dédié, regroupé par session
-            // → 1 PDF PAR STAGIAIRE dans le dossier de sa session
-            // → B9 / C11 : trame vierge par session également
-            const sessions = groupStagiairesBySession();
-            const subFolder = `${folder}/${doc.code}_${doc.label.replace(/\s+/g, "_")}`;
-            for (let i = 0; i < sessions.length; i++) {
-              const g = sessions[i];
-              const suffix = formatSessionSuffix(g, i);
-              const sessionFolder = `${subFolder}/${suffix}`;
+            } else if (PER_SESSION_DOCS.has(doc.code) && stagiairesSnap.length > 0) {
+              const subFolder = `${folder}/${doc.code}_${doc.label.replace(/\s+/g, "_")}`;
+              for (let i = 0; i < sessionsSnap.length; i++) {
+                const g = sessionsSnap[i];
+                const suffix = formatSessionSuffix(g, i);
+                const sessionFolder = `${subFolder}/${suffix}`;
 
-              for (const s of g.stagiaires) {
-                const blob = await generateAutoBlobForSession(doc, [s]);
+                for (const s of g.stagiaires) {
+                  const blob = await generateAutoBlobForSession(doc, [s]);
+                  if (blob) {
+                    const stagSuffix = `${s.prenom || ""}_${s.nom || ""}`.trim() || "Stagiaire";
+                    zip.file(`${sessionFolder}/${buildOpcoFileName(ctxSnap, doc.label, "pdf", stagSuffix)}`, blob);
+                  }
+                  await new Promise((r) => setTimeout(r, 30));
+                }
+
+                if (doc.code !== "C12") {
+                  const viergeBlob = await generateViergeBlobForSession(doc.code, g.stagiaires);
+                  if (viergeBlob) {
+                    zip.file(`${sessionFolder}/${buildOpcoFileName(ctxSnap, `${doc.label} (Trame vierge)`, "pdf", suffix)}`, viergeBlob);
+                  }
+                }
+                await new Promise((r) => setTimeout(r, 50));
+              }
+              if (doc.code === "B9") {
+                const xlsHtml = generateExcelCalendrierOPCO(orgSnap, formSnap, stagiairesSnap);
+                zip.file(`${subFolder}/${buildOpcoFileName(ctxSnap, doc.label, "xls")}`, excelToBlob(xlsHtml));
+              }
+            } else if (doc.perStagiaire && stagiairesSnap.length > 0) {
+              for (let i = 0; i < stagiairesSnap.length; i++) {
+                const blob = await generateAutoBlob(doc, i);
                 if (blob) {
-                  const stagSuffix = `${s.prenom || ""}_${s.nom || ""}`.trim() || "Stagiaire";
-                  zip.file(`${sessionFolder}/${buildOpcoFileName(namingCtx, doc.label, "pdf", stagSuffix)}`, blob);
+                  const s = stagiairesSnap[i];
+                  const suffix = `${s.prenom || ""}_${s.nom || ""}`;
+                  zip.file(`${folder}/${buildOpcoFileName(ctxSnap, doc.label, "pdf", suffix)}`, blob);
                 }
-                await new Promise((r) => setTimeout(r, 30));
+                await new Promise((r) => setTimeout(r, 50));
               }
-
-              if (doc.code !== "C12") {
-                const viergeBlob = await generateViergeBlobForSession(doc.code, g.stagiaires);
-                if (viergeBlob) {
-                  zip.file(`${sessionFolder}/${buildOpcoFileName(namingCtx, `${doc.label} (Trame vierge)`, "pdf", suffix)}`, viergeBlob);
-                }
-              }
-              await new Promise((r) => setTimeout(r, 50));
-            }
-            // B9 : on ajoute aussi le calendrier Excel multi-onglets (consolidé toutes sessions)
-            if (doc.code === "B9") {
-              const xlsHtml = generateExcelCalendrierOPCO(mergedOrganisme, formation, mergedStagiaires);
-              zip.file(`${subFolder}/${buildOpcoFileName(namingCtx, doc.label, "xls")}`, excelToBlob(xlsHtml));
-            }
-          } else if (doc.perStagiaire && mergedStagiaires.length > 0) {
-            for (let i = 0; i < mergedStagiaires.length; i++) {
-              const blob = await generateAutoBlob(doc, i);
-              if (blob) {
-                const s = mergedStagiaires[i];
-                const suffix = `${s.prenom || ""}_${s.nom || ""}`;
-                zip.file(`${folder}/${buildOpcoFileName(namingCtx, doc.label, "pdf", suffix)}`, blob);
-              }
-              await new Promise((r) => setTimeout(r, 50));
+            } else {
+              const blob = await generateAutoBlob(doc);
+              if (blob) zip.file(`${folder}/${buildOpcoFileName(ctxSnap, doc.label, "pdf")}`, blob);
             }
           } else {
-            const blob = await generateAutoBlob(doc);
-            if (blob) zip.file(`${folder}/${buildOpcoFileName(namingCtx, doc.label, "pdf")}`, blob);
+            zip.file(`${folder}/MANQUANT_${doc.code}_${doc.label}.txt`,
+              `Document à fournir manuellement : ${doc.longLabel}\n\n${doc.description}`);
           }
-        } else {
-          zip.file(`${folder}/MANQUANT_${doc.code}_${doc.label}.txt`,
-            `Document à fournir manuellement : ${doc.longLabel}\n\n${doc.description}`);
+
+          processed++;
+          reporter.setProgress((processed / total) * 90);
+          await new Promise((r) => setTimeout(r, 0));
         }
 
-        processed++;
-        setProgress((processed / total) * 100);
-        await new Promise((r) => setTimeout(r, 0));
-      }
-
-      setProgressText("Compression du ZIP...");
-      const blob = await zip.generateAsync({ type: "blob" }, (meta) => {
-        setProgress(meta.percent);
-      });
-
-      saveAs(blob, `${buildOpcoRootName(namingCtx)}.zip`);
-      toast.success("Dossier OPCO Mobilités exporté !");
-    } catch (e: any) {
-      toast.error(`Erreur d'export : ${e.message || "Inconnue"}`);
-    } finally {
-      setGenerating(false);
-      setProgress(0);
-      setProgressText("");
-    }
+        reporter.setMessage("Compression du ZIP...");
+        const blob = await zip.generateAsync({ type: "blob" }, (meta) => {
+          reporter.setProgress(90 + meta.percent * 0.1);
+        });
+        return blob;
+      },
+    });
   };
 
   // ─────────── Sauvegarde dossier ───────────
