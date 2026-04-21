@@ -28,6 +28,7 @@ import {
   replaceFileExtension,
   shortCriterePath,
 } from "@/lib/fileNaming";
+import { useBackgroundJobs } from "@/lib/backgroundJobs";
 
 const yieldToBrowser = (delayMs = 0) =>
   new Promise<void>((resolve) => {
@@ -53,6 +54,7 @@ interface DocumentGeneratorProps {
 }
 
 const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGeneratorProps) => {
+  const { runJob, hasActive } = useBackgroundJobs();
   const [expandedCriteres, setExpandedCriteres] = useState<Set<number>>(new Set());
   
   const [expandedIndicateurs, setExpandedIndicateurs] = useState<Set<number>>(new Set());
@@ -521,35 +523,46 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
     await downloadFile(content, buildGenericFileName("BOOK_QUALIOPI_COMPLET", mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, ".doc"));
   };
 
-  const handleDownloadAll = async () => {
-    setGenerating(true);
-    setGenerationProgressText("");
+  const handleDownloadAll = () => {
+    runJob({
+      label: "Dossier Qualiopi complet (ZIP)",
+      fileName: buildGenericFileName("DOSSIER_QUALIOPI_COMPLET", mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, ".zip"),
+      autoDownload: true,
+      run: async (reporter) => {
+        return await buildFullDossierZip(reporter);
+      },
+    });
+  };
+
+  /** Construit le ZIP complet ; retourne le Blob (ne déclenche pas le saveAs). */
+  const buildFullDossierZip = async (reporter?: { setProgress: (n: number) => void; setMessage: (s: string) => void }): Promise<Blob> => {
     const failures: { name: string; reason: string }[] = [];
-    try {
-      const generatedIds = new Set(generated);
-      const totalFiles = 1 + catalog.reduce((count, doc) => {
-        const isPerStagiaire = PER_STAGIAIRE_TEMPLATES.has(doc.template);
-        const hasStagiaireIdx = doc.params?.stagiaireIdx !== undefined;
-        return count + (isPerStagiaire && !hasStagiaireIdx ? allStagiaires.length : 1);
-      }, 0);
+    const generatedIds = new Set(generated);
+    const totalFiles = 1 + catalog.reduce((count, doc) => {
+      const isPerStagiaire = PER_STAGIAIRE_TEMPLATES.has(doc.template);
+      const hasStagiaireIdx = doc.params?.stagiaireIdx !== undefined;
+      return count + (isPerStagiaire && !hasStagiaireIdx ? allStagiaires.length : 1);
+    }, 0);
 
-      const bulkPdfOptions = { scale: 1.35, imageQuality: 0.84, pageYieldMs: 8 };
-      const zip = new JSZip();
+    const bulkPdfOptions = { scale: 1.35, imageQuality: 0.84, pageYieldMs: 8 };
+    const zip = new JSZip();
 
-      const addFileToZip = (path: string, payload: Blob | ArrayBuffer | string) => {
-        zip.file(path, payload);
-      };
+    const addFileToZip = (path: string, payload: Blob | ArrayBuffer | string) => {
+      zip.file(path, payload);
+    };
 
-      let processedFiles = 0;
-      const updateProgress = async () => {
-        processedFiles += 1;
-        if (processedFiles % (exportFormat === "pdf" ? 1 : 4) === 0 || processedFiles === totalFiles) {
-          setGenerationProgressText(`${processedFiles}/${totalFiles}`);
-          await yieldToBrowser(exportFormat === "pdf" ? 24 : 0);
-        }
-      };
+    let processedFiles = 0;
+    const updateProgress = async () => {
+      processedFiles += 1;
+      const pct = totalFiles > 0 ? (processedFiles / totalFiles) * 95 : 0;
+      reporter?.setProgress(pct);
+      if (processedFiles % (exportFormat === "pdf" ? 1 : 4) === 0 || processedFiles === totalFiles) {
+        reporter?.setMessage(`${processedFiles}/${totalFiles}`);
+        await yieldToBrowser(exportFormat === "pdf" ? 24 : 0);
+      }
+    };
 
-      const safeRun = async (label: string, fn: () => Promise<void>) => {
+    const safeRun = async (label: string, fn: () => Promise<void>) => {
         try {
           await fn();
         } catch (err) {
@@ -712,22 +725,15 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
         zip.file("_ECHECS_GENERATION.txt", reportLines.join("\n"));
       }
 
-      const blob = await zip.generateAsync({ type: "blob" });
-      saveAs(blob, buildGenericFileName("DOSSIER_QUALIOPI_COMPLET", mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, ".zip"));
-      setGenerated(generatedIds);
-      if (failures.length === 0) {
-        toast.success("ZIP généré avec la convention de nommage compatible import.");
-      } else {
-        toast.warning(`ZIP généré avec ${failures.length} document(s) en échec. Voir _ECHECS_GENERATION.txt dans le ZIP.`);
-      }
-    } catch (error) {
-      console.error("[ZIP] erreur fatale", error);
-      const reason = error instanceof Error ? `${error.message}` : String(error);
-      toast.error(`Erreur pendant la génération du ZIP : ${reason.substring(0, 200)}`);
-    } finally {
-      setGenerating(false);
-      setGenerationProgressText("");
+    reporter?.setMessage("Compression du ZIP...");
+    const blob = await zip.generateAsync({ type: "blob" }, (meta) => {
+      reporter?.setProgress(95 + meta.percent * 0.05);
+    });
+    setGenerated(generatedIds);
+    if (failures.length > 0) {
+      toast.warning(`${failures.length} document(s) en échec. Voir _ECHECS_GENERATION.txt dans le ZIP.`);
     }
+    return blob;
   };
 
   const handleDownloadCritere = async (critereNum: number) => {
