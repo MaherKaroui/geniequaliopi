@@ -995,7 +995,7 @@ export default function OPCOMobilites() {
                               <Button
                                 variant="ghost" size="sm"
                                 onClick={() => handleDownloadSingle(doc)}
-                                title="Télécharger"
+                                title={PER_SESSION_DOCS.has(doc.code) ? "Télécharger (ZIP : 1 fichier par session)" : "Télécharger"}
                               >
                                 <Download className="w-4 h-4" />
                               </Button>
