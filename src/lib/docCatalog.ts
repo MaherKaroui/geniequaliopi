@@ -338,13 +338,7 @@ export function buildFullCatalog(
   // ===== CFA — APPRENTISSAGE (placeholder) =====
   // =============================================
   if (isCFA) {
-    // ===== DOCUMENTS PRIORITAIRES CFA (par bloc) =====
-    stagiaires.forEach((s, si) => {
-      add(`cfa_priority_contrat_bloc_${si}`, `CONTRAT DE FORMATION PAR BLOC – ${s.prenom} ${s.nom}`, 3, 9, "contrat_formation_par_bloc", { stagiaireIdx: si, priority: true });
-    });
-    stagiaires.forEach((s, si) => {
-      add(`cfa_priority_dossier_inscription_${si}`, `DOSSIER D'INSCRIPTION – ${s.prenom} ${s.nom}`, 3, 9, "dossier_inscription_cfa", { stagiaireIdx: si, priority: true });
-    });
+    // (Bloc 'DOCUMENTS PRIORITAIRES CFA' retiré : Contrat par bloc + Dossier d'inscription doublons)
 
     // ===== CRITÈRE 1 — INFORMATION DU PUBLIC (CFA) =====
 
