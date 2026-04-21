@@ -1,22 +1,23 @@
 ---
-name: OPCO un fichier par session (B9, C11, C12)
-description: Téléchargement OPCO Mobilités - les documents B9 (calendrier), C11 (temps connexion) et C12 (exercices) génèrent 1 fichier PDF par session dans un ZIP, suffixé par les dates de session
+name: OPCO un fichier par stagiaire dans dossier de session (B9, C11, C12)
+description: Téléchargement OPCO Mobilités - les documents B9 (calendrier), C11 (temps connexion) et C12 (exercices) génèrent 1 fichier PDF PAR STAGIAIRE dans un sous-dossier de session, regroupés par dates communes
 type: feature
 ---
 Pour les 3 documents OPCO Mobilités groupés par session (B9 Calendrier, C11 Temps de connexion, C12 Exercices) :
 
 - **Constante** `PER_SESSION_DOCS = new Set(["B9", "C11", "C12"])` dans `src/pages/OPCOMobilites.tsx`.
 - **Helper** `groupStagiairesBySession()` regroupe les stagiaires par couple `(dateDebutFormation, dateFinFormation)` (priorité dates individuelles > dates globales formation).
-- **Helper** `generateAutoBlobForSession(doc, sessionStagiaires)` appelle `generateDocumentById` avec UNIQUEMENT les stagiaires de la session → le PDF généré ne contient qu'1 session.
-- **Helper** `formatSessionSuffix(g, idx)` produit le suffixe de fichier `Session_{idx+1}_{YYYY-MM-DD}_au_{YYYY-MM-DD}`.
+- **Helper** `generateAutoBlobForSession(doc, sessionStagiaires)` appelle `generateDocumentById` avec les stagiaires passés en paramètre.
+- **Helper** `formatSessionSuffix(g, idx)` produit le suffixe de dossier `Session_{idx+1}_{YYYY-MM-DD}_au_{YYYY-MM-DD}`.
 
-**Téléchargement individuel** (`handleDownloadSingle`) :
-- Si doc ∈ PER_SESSION_DOCS → ZIP avec 1 PDF par session, nommé `{nom_doc}_{Session_X_dates}.pdf`.
-- Pour B9 : on ajoute aussi le calendrier Excel multi-onglets consolidé.
+**Structure ZIP** (téléchargement individuel ET export global) :
+- 1 dossier par session (nommé `Session_X_{date_debut}_au_{date_fin}`).
+- À l'intérieur : **1 PDF PAR STAGIAIRE** (suffixé `Prenom_Nom`).
+- Pour B9 et C11 : ajout d'une trame vierge par session dans le même dossier.
+- Pour B9 : Excel calendrier consolidé multi-onglets ajouté à la racine du ZIP (téléchargement individuel) ou du sous-dossier (export global).
 
-**Export ZIP global** (`handleExportFullZip`) :
-- Crée un sous-dossier dédié `{folder}/{code}_{label}/` pour chaque doc PER_SESSION.
-- 1 PDF par session dans ce sous-dossier.
-- B9 : Excel consolidé ajouté dans le même sous-dossier.
+**Téléchargement individuel** (`handleDownloadSingle`) : ZIP avec arborescence ci-dessus.
 
-**Fonctions sources inchangées** : `genCalendrierFormationOPCO`, `genTempsConnexionOPCO`, `genExercicesOPCO` dans `src/lib/documentGenerator.ts` continuent de gérer la pagination "1 session par page" si on leur passe plusieurs stagiaires (utile pour preview unique).
+**Export ZIP global** (`handleExportFullZip`) : sous-dossier dédié `{folder}/{code}_{label}/` contenant l'arborescence par session.
+
+**Fonctions sources inchangées** : `genCalendrierFormationOPCO`, `genTempsConnexionOPCO`, `genExercicesOPCO` dans `src/lib/documentGenerator.ts`.
