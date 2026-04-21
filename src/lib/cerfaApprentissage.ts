@@ -8,8 +8,60 @@
  *
  * Les champs non essentiels (RQTH, dérogations, retraite, etc.) restent vides.
  */
-import { PDFDocument, PDFTextField, PDFCheckBox } from "pdf-lib";
+import { PDFDocument, PDFTextField, PDFCheckBox, PDFImage } from "pdf-lib";
 import type { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
+
+/** Embed une image (data URL ou URL) dans le PDF, retourne null si échec */
+async function embedImage(pdf: PDFDocument, src: string | undefined): Promise<PDFImage | null> {
+  if (!src) return null;
+  try {
+    let bytes: ArrayBuffer;
+    let mime = "";
+    if (src.startsWith("data:")) {
+      const m = src.match(/^data:([^;]+);base64,(.+)$/);
+      if (!m) return null;
+      mime = m[1];
+      const bin = atob(m[2]);
+      const arr = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+      bytes = arr.buffer;
+    } else {
+      const r = await fetch(src);
+      if (!r.ok) return null;
+      mime = r.headers.get("content-type") || "";
+      bytes = await r.arrayBuffer();
+    }
+    if (mime.includes("png") || src.toLowerCase().includes(".png")) {
+      return await pdf.embedPng(bytes);
+    }
+    return await pdf.embedJpg(bytes);
+  } catch {
+    return null;
+  }
+}
+
+/** Dessine une image dans une zone donnée (bottom-left origin pdf-lib), conserve le ratio */
+function drawFitted(
+  page: ReturnType<PDFDocument["getPage"]>,
+  img: PDFImage,
+  x: number,
+  y: number,
+  maxW: number,
+  maxH: number,
+) {
+  const ratio = img.width / img.height;
+  let w = maxW;
+  let h = w / ratio;
+  if (h > maxH) {
+    h = maxH;
+    w = h * ratio;
+  }
+  // pdf-lib: y est depuis le bas. Notre coords JSON est top-based (y=788 sur page A4 595x842).
+  // Conversion : yPdf = pageHeight - yTop - h
+  const pageHeight = page.getHeight();
+  const yPdf = pageHeight - y - h;
+  page.drawImage(img, { x, y: yPdf, width: w, height: h });
+}
 
 const TEMPLATE_URL = "/pdfs/cerfa/cerfa_10103-14.pdf";
 
