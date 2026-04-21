@@ -735,40 +735,57 @@ export function generateExcelCalendrierOPCO(
     sheetHtml += tableRow(["Session", sessionLabel]);
     sheetHtml += tableRow(["Apprenants", apprenants]);
     sheetHtml += tableRow(["Période", `Du ${formatDate(grp.debut)} au ${formatDate(grp.fin)}`]);
-    sheetHtml += tableRow(["Volume", `${dureeH} h sur ${grp.nbDays} jour${grp.nbDays > 1 ? "s" : ""}`]);
+    sheetHtml += tableRow(["Rythme", rythmeLabel]);
+    sheetHtml += tableRow(["Volume centre", `${volumeEcole} h sur ${nbEcoleDays} jour${nbEcoleDays > 1 ? "s" : ""} école (7 h/jour)`]);
     sheetHtml += tableRow(["Lieu", lieu]);
     sheetHtml += tableRow(["Formateur", f.formateur || "—"]);
     sheetHtml += `<tr><td colspan="2" style="height:8px"></td></tr>`;
     sheetHtml += tableRow(
-      ["N° jour", "Date", "Date (ISO)", "Jour de la semaine", "Horaires matin", "Horaires après-midi", "Volume (h)", "Lieu"],
+      ["N°", "Sem.", "Type", "Date", "Date (ISO)", "Jour", "Horaires matin", "Horaires après-midi", "Volume (h)", "Lieu"],
       true,
     );
-    if (days.length === 0) {
-      sheetHtml += `<tr><td colspan="8" style="text-align:center;color:#888">Dates à renseigner dans la fiche stagiaire.</td></tr>`;
+    if (allDays.length === 0 || !refDate) {
+      sheetHtml += `<tr><td colspan="10" style="text-align:center;color:#888">Dates à renseigner dans la fiche stagiaire.</td></tr>`;
     } else {
-      days.forEach((d, i) => {
+      let ecoleCounter = 0;
+      let entrepriseCounter = 0;
+      allDays.forEach((d) => {
+        const wIdx = weekIndex(d, refDate);
+        const ecole = isEcoleWeek(wIdx);
+        if (ecole) ecoleCounter++; else entrepriseCounter++;
+        const numLabel = ecole ? `É${ecoleCounter}` : `E${entrepriseCounter}`;
+        const typeLabel = ecole ? "École" : "Entreprise";
+        const matin = ecole ? horairesMatin : "—";
+        const aprem = ecole ? horairesAprem : "—";
+        const vol = ecole ? "7" : "0";
+        const lieuJour = ecole ? lieu : "Entreprise d'accueil";
         const jourLabel = fmtJour(d);
         const jourCap = jourLabel.charAt(0).toUpperCase() + jourLabel.slice(1);
         sheetHtml += tableRow([
-          `J${i + 1}`,
+          numLabel,
+          `S${wIdx + 1}`,
+          typeLabel,
           fmtDateLong(d),
           fmtDateISO(d),
           jourCap,
-          horairesMatin,
-          horairesAprem,
-          hPerDay,
-          lieu,
+          matin,
+          aprem,
+          vol,
+          lieuJour,
         ]);
         consolHtml += tableRow([
           sessionLabel,
           apprenants,
-          `J${i + 1}`,
+          numLabel,
+          `S${wIdx + 1}`,
+          typeLabel,
           fmtDateLong(d),
+          fmtDateISO(d),
           jourCap,
-          horairesMatin,
-          horairesAprem,
-          hPerDay,
-          lieu,
+          matin,
+          aprem,
+          vol,
+          lieuJour,
           f.formateur || "—",
         ]);
       });
