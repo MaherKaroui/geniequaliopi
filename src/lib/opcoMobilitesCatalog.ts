@@ -313,6 +313,15 @@ export const OPCO_DOCUMENTS: OpcoDocumentItem[] = [
     category: "service_apprenant",
     forAllApprentis: true,
   },
+  {
+    code: "C11",
+    label: "Temps de Connexion",
+    longLabel: "Relevé des temps de connexion par session",
+    description: "Relevé des temps de connexion réels par session (groupement par dates), une session par page. Affiche uniquement les jours école écoulés (formation en cours = jours futurs vierges). Tient compte du rythme d'alternance.",
+    autoTemplates: ["temps_connexion_opco"],
+    perStagiaire: false,
+    category: "service_apprenant",
+  },
 ];
 
 export type OpcoDocStatus = "pending" | "auto" | "uploaded" | "not_applicable";
