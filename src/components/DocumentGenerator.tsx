@@ -723,22 +723,15 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
         zip.file("_ECHECS_GENERATION.txt", reportLines.join("\n"));
       }
 
-      const blob = await zip.generateAsync({ type: "blob" });
-      saveAs(blob, buildGenericFileName("DOSSIER_QUALIOPI_COMPLET", mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, ".zip"));
-      setGenerated(generatedIds);
-      if (failures.length === 0) {
-        toast.success("ZIP généré avec la convention de nommage compatible import.");
-      } else {
-        toast.warning(`ZIP généré avec ${failures.length} document(s) en échec. Voir _ECHECS_GENERATION.txt dans le ZIP.`);
-      }
-    } catch (error) {
-      console.error("[ZIP] erreur fatale", error);
-      const reason = error instanceof Error ? `${error.message}` : String(error);
-      toast.error(`Erreur pendant la génération du ZIP : ${reason.substring(0, 200)}`);
-    } finally {
-      setGenerating(false);
-      setGenerationProgressText("");
+    reporter?.setMessage("Compression du ZIP...");
+    const blob = await zip.generateAsync({ type: "blob" }, (meta) => {
+      reporter?.setProgress(95 + meta.percent * 0.05);
+    });
+    setGenerated(generatedIds);
+    if (failures.length > 0) {
+      toast.warning(`${failures.length} document(s) en échec. Voir _ECHECS_GENERATION.txt dans le ZIP.`);
     }
+    return blob;
   };
 
   const handleDownloadCritere = async (critereNum: number) => {
