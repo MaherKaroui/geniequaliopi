@@ -2112,15 +2112,17 @@ function genEmargementStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: 
   let days: string[] = [];
   const includeSat = formationIncludesSaturday(f);
   if (dateDebut && dateFin) {
-    const start = new Date(dateDebut + "T00:00:00");
-    const end = new Date(dateFin + "T00:00:00");
-    const current = new Date(start);
-    while (current <= end) {
-      const dow = current.getDay();
-      if (dow !== 0 && (includeSat || dow !== 6)) {
-        days.push(current.toLocaleDateString("fr-FR", { weekday: "long", year: "numeric", month: "long", day: "numeric" }));
+    const start = parseDateSafe(dateDebut);
+    const end = parseDateSafe(dateFin);
+    if (start && end) {
+      const current = new Date(start);
+      while (current <= end) {
+        const dow = current.getDay();
+        if (dow !== 0 && (includeSat || dow !== 6)) {
+          days.push(current.toLocaleDateString("fr-FR", { weekday: "long", year: "numeric", month: "long", day: "numeric" }));
+        }
+        current.setDate(current.getDate() + 1);
       }
-      current.setDate(current.getDate() + 1);
     }
   }
   if (days.length === 0) days = getFormationDays(f);
@@ -2153,12 +2155,27 @@ function genEmargementStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: 
   return buildDocument({ org: o, title: "FEUILLE D'ÉMARGEMENT", subtitle: `${f.intitule} – ${stagName}`, extraHtml: extra });
 }
 
+/** Parse a date string in DD/MM/YYYY, YYYY-MM-DD or ISO format → Date (locale-safe) */
+function parseDateSafe(dateStr: string): Date | null {
+  if (!dateStr) return null;
+  const s = dateStr.trim();
+  // DD/MM/YYYY
+  const fr = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (fr) return new Date(parseInt(fr[3]), parseInt(fr[2]) - 1, parseInt(fr[1]));
+  // YYYY-MM-DD (ISO short)
+  const iso = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+  if (iso) return new Date(parseInt(iso[1]), parseInt(iso[2]) - 1, parseInt(iso[3]));
+  const d = new Date(s);
+  return isNaN(d.getTime()) ? null : d;
+}
+
 function getStagiaireDays(s: StagiaireInfo, f: FormationInfo): string[] {
   const debut = getStagiaireDateDebut(s, f);
   const fin = getStagiaireDateFin(s, f);
   if (!debut || !fin) return getFormationDays(f);
-  const start = new Date(debut);
-  const end = new Date(fin);
+  const start = parseDateSafe(debut);
+  const end = parseDateSafe(fin);
+  if (!start || !end) return getFormationDays(f);
   const days: string[] = [];
   const current = new Date(start);
   const includeSat = formationIncludesSaturday(f);
