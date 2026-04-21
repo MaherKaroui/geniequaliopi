@@ -11294,18 +11294,43 @@ function genCalendrierAnnuelCFA(o: OrganismeInfo, f: FormationInfo) {
 
 function genCalendrierFormationOPCO(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   // Calendrier OPCO : dates exactes, horaires précis et lieu de déroulement
+  // PRIORITÉ : dates individuelles de chaque stagiaire (formulaire) sur les dates globales formation
   const { totalHours, days: nbJours } = parseDuree(f.duree);
   const dureeH = totalHours || parseInt(f.duree) || 14;
-  const totalDays = nbJours || Math.max(1, Math.ceil(dureeH / 7));
+  const defaultTotalDays = nbJours || Math.max(1, Math.ceil(dureeH / 7));
   const lieu = f.lieu?.trim() || o.adresse || "À préciser";
   const isDistance = lieu.toLowerCase().includes("distance") || lieu.toLowerCase().includes("distanciel");
+
+  // Parse robuste des dates (DD/MM/YYYY ou YYYY-MM-DD)
+  const parseD = (s: string): Date | null => {
+    if (!s) return null;
+    const t = s.trim();
+    const fr = t.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if (fr) return new Date(parseInt(fr[3]), parseInt(fr[2]) - 1, parseInt(fr[1]));
+    const d = new Date(t);
+    return isNaN(d.getTime()) ? null : d;
+  };
+
+  // Calcule le nombre de jours ouvrés entre deux dates (incluses)
+  const workdaysBetween = (debut: string, fin: string): number => {
+    const d1 = parseD(debut);
+    const d2 = parseD(fin);
+    if (!d1 || !d2) return defaultTotalDays;
+    let count = 0;
+    const cur = new Date(d1);
+    while (cur <= d2) {
+      const dow = cur.getDay();
+      if (dow !== 0 && dow !== 6) count++;
+      cur.setDate(cur.getDate() + 1);
+    }
+    return Math.max(1, count);
+  };
 
   // Construit la liste des jours ouvrés à partir de dateDebut, en sautant samedi/dimanche
   const buildDays = (startStr: string, count: number): Date[] => {
     const out: Date[] = [];
-    if (!startStr) return out;
-    const cur = new Date(startStr);
-    if (isNaN(cur.getTime())) return out;
+    const cur = parseD(startStr);
+    if (!cur) return out;
     while (out.length < count) {
       const dow = cur.getDay();
       if (dow !== 0 && dow !== 6) out.push(new Date(cur));
