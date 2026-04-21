@@ -11731,6 +11731,8 @@ function genTempsConnexionOPCO(o: OrganismeInfo, f: FormationInfo, stagiaires: S
     extraHtml: extra,
   });
 }
+
+function genDecoupageFormationCFAExcel(o: OrganismeInfo, f: FormationInfo) {
   const rncp = getRNCPByCode(f.codeRNCP || '');
   const { totalHours } = parseDuree(f.duree);
   const effectiveTotal = totalHours > 0 ? totalHours : 420;
