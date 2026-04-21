@@ -1012,7 +1012,9 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
         for (const ind of critere.indicateurs) {
           const docs = catalog.filter((d) => d.indicateur === ind.numero);
           for (const doc of docs) {
-            const basePath = shortCriterePath(critere.numero, ind.numero);
+            // Utilise getDocBasePath pour respecter les sous-dossiers (ex: 14_MISSIONS_CFA/Mission_X)
+            // Évite les collisions de noms de fichiers (notamment dans IND 10 qui a 50+ documents)
+            const basePath = getDocBasePath(doc);
             const isPerStagiaire = PER_STAGIAIRE_TEMPLATES.has(doc.template);
 
             if (isPerStagiaire) {
