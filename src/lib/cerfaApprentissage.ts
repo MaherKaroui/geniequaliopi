@@ -40,12 +40,12 @@ async function embedImage(pdf: PDFDocument, src: string | undefined): Promise<PD
   }
 }
 
-/** Dessine une image dans une zone donnée (bottom-left origin pdf-lib), conserve le ratio */
+/** Dessine une image dans une zone donnée (bottom-left origin, comme pdf-lib & coords JSON), conserve le ratio */
 function drawFitted(
   page: ReturnType<PDFDocument["getPage"]>,
   img: PDFImage,
   x: number,
-  y: number,
+  yBottom: number,
   maxW: number,
   maxH: number,
 ) {
@@ -56,11 +56,28 @@ function drawFitted(
     h = maxH;
     w = h * ratio;
   }
-  // pdf-lib: y est depuis le bas. Notre coords JSON est top-based (y=788 sur page A4 595x842).
-  // Conversion : yPdf = pageHeight - yTop - h
-  const pageHeight = page.getHeight();
-  const yPdf = pageHeight - y - h;
-  page.drawImage(img, { x, y: yPdf, width: w, height: h });
+  // Coords JSON et pdf-lib utilisent le même système bottom-up
+  page.drawImage(img, { x, y: yBottom, width: w, height: h });
+}
+
+/** Calcule l'âge à une date donnée (string YYYY-MM-DD) */
+function ageAt(birthIso: string | undefined, refIso: string | undefined): number | null {
+  if (!birthIso || !refIso) return null;
+  const b = new Date(birthIso);
+  const r = new Date(refIso);
+  if (isNaN(b.getTime()) || isNaN(r.getTime())) return null;
+  let age = r.getFullYear() - b.getFullYear();
+  const m = r.getMonth() - b.getMonth();
+  if (m < 0 || (m === 0 && r.getDate() < b.getDate())) age--;
+  return age;
+}
+
+/** Tarif (% du SMIC) selon l'âge de l'apprenti — barème légal 2024 */
+function tarifApprenti(age: number): { y1: number; y2: number } {
+  if (age < 18) return { y1: 27, y2: 39 };
+  if (age < 21) return { y1: 43, y2: 51 };
+  if (age < 26) return { y1: 53, y2: 61 };
+  return { y1: 100, y2: 100 }; // 26+ : 100% SMIC
 }
 
 const TEMPLATE_URL = "/pdfs/cerfa/cerfa_10103-14.pdf";
@@ -304,11 +321,35 @@ export async function genCerfaApprentissagePdf(
   // Fait à
   setText(form, "Zone de texte 8_55", clean(o.ville));
 
+  // ---------- RÉMUNÉRATION (selon âge apprenti à date début contrat) ----------
+  const age = ageAt(s.dateNaissance, dateDebut) ?? 20;
+  const tarif = tarifApprenti(age);
+  // 1ère année : période complète début → fin (utilise les zones du haut : y=596/627)
+  setText(form, "Zone de texte 8_72", String(tarif.y1)); // % du SMIC
+  setText(form, "Zone de texte 21_73", "SMIC");
+  // Dates période 1ère année (gauche) : 21_61..63 (du), 21_64..66 (au)
+  setText(form, "Zone de texte 21_61", ddJ);
+  setText(form, "Zone de texte 21_62", ddM);
+  setText(form, "Zone de texte 21_63", ddA);
+  setText(form, "Zone de texte 21_64", dfJ);
+  setText(form, "Zone de texte 21_65", dfM);
+  setText(form, "Zone de texte 21_66", dfA);
+  setText(form, "Zone de texte 8_64", String(tarif.y1));
+  setText(form, "Zone de texte 8_65", "SMIC");
+
+  // ---------- CADRE RÉSERVÉ ORGANISME (bas page 2) ----------
+  // Ligne ADEPROS : 8_91 (gauche = nom organisme), 8_92 (droite = SIRET)
+  setText(form, "Zone de texte 8_91", clean(o.nom));
+  setText(form, "Zone de texte 8_92", clean(o.siret));
+  // Ligne adresse + N° SIRET organisme
+  setText(form, "Zone de texte 8_93", `${clean(o.adresse)} ${clean(o.codePostal)} ${clean(o.ville)}`.trim());
+  setText(form, "Zone de texte 8_94", clean(o.siret));
+
   pdf.getForm().updateFieldAppearances();
 
-  // ---------- SIGNATURES & TAMPON (page 2, bas) ----------
-  // Page 2 du PDF = index 1. Hauteur A4 ≈ 842pt. Coords JSON sont en top-down.
-  // Zone signatures située sous "Fait à" (y top ≈ 788) → on place autour de y=730-780 (top)
+  // ---------- SIGNATURES & TAMPON (page 2, zone "Fait à") ----------
+  // Coords JSON sont en bottom-up (même système que pdf-lib).
+  // "Fait à" est à y=234 (bottom). La ligne signatures est juste en-dessous (y≈170-220).
   const page2 = pdf.getPages()[1];
   if (page2) {
     const [tamponImg, sigStagImg, sigRespImg] = await Promise.all([
@@ -316,12 +357,11 @@ export async function genCerfaApprentissagePdf(
       embedImage(pdf, s.signatureUrl),
       embedImage(pdf, s.signatureResponsableUrl),
     ]);
-    // Tampon organisme (gauche)
-    if (tamponImg) drawFitted(page2, tamponImg, 30, 740, 110, 70);
-    // Signature stagiaire (centre)
-    if (sigStagImg) drawFitted(page2, sigStagImg, 220, 740, 130, 60);
-    // Signature responsable entreprise (droite)
-    if (sigRespImg) drawFitted(page2, sigRespImg, 410, 740, 150, 60);
+    // Signature employeur (gauche) + tampon organisme superposé
+    if (sigRespImg) drawFitted(page2, sigRespImg, 30, 150, 140, 60);
+    if (tamponImg) drawFitted(page2, tamponImg, 50, 145, 110, 70);
+    // Signature apprenti (centre)
+    if (sigStagImg) drawFitted(page2, sigStagImg, 240, 150, 130, 60);
   }
 
   const out = await pdf.save();
