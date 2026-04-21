@@ -11434,6 +11434,19 @@ function genCalendrierFormationOPCO(o: OrganismeInfo, f: FormationInfo, stagiair
   const horairesAprem = "13h30 – 17h00";
   const rythmeLabel = `${rythme.ecole} semaine${rythme.ecole > 1 ? "s" : ""} école / ${rythme.entreprise} semaine${rythme.entreprise > 1 ? "s" : ""} entreprise`;
 
+  // Date d'envoi du calendrier = début de session - 7 jours ouvrés (hors WE + jours fériés FR)
+  // Priorité aux dates individuelles stagiaire (déjà appliquée via groupes par couple debut/fin)
+  const toISO = (s: string): string => {
+    const d = parseD(s);
+    if (!d) return "";
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  };
+  const computeEnvoiDate = (debutStr: string): string => {
+    const iso = toISO(debutStr);
+    if (!iso) return "";
+    return subtractBusinessDays(iso, 7);
+  };
+
   let extra = `<p><em>Calendrier précisant les dates exactes, les horaires et le lieu de déroulement de la formation pour l'ensemble des dossiers ayant fait l'objet d'une demande de financement.</em></p>`;
   extra += `<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%;margin-bottom:18px">
     <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold;width:30%">Intitulé de la formation</td><td>${f.intitule}</td></tr>
@@ -11449,6 +11462,7 @@ function genCalendrierFormationOPCO(o: OrganismeInfo, f: FormationInfo, stagiair
   </table>`;
 
   let groupIdx = 0;
+  const envoiDatesISO: string[] = [];
   for (const [, g] of groupes) {
     groupIdx++;
     // Construit TOUS les jours ouvrés de la période (école + entreprise) pour montrer l'alternance complète
@@ -11458,6 +11472,9 @@ function genCalendrierFormationOPCO(o: OrganismeInfo, f: FormationInfo, stagiair
     const ecoleDays = refDate ? allDays.filter((d) => isEcoleWeek(weekIndex(d, refDate), shift)) : [];
     const nbEcoleDays = ecoleDays.length;
     const volumeEcole = nbEcoleDays * 7;
+    const envoiISO = computeEnvoiDate(g.debut);
+    if (envoiISO) envoiDatesISO.push(envoiISO);
+    const envoiLabel = envoiISO ? formatDate(envoiISO) : "—";
     const titreGroupe = groupes.size > 1
       ? `Session ${groupIdx} — ${g.stagiaires.join(", ")}`
       : `Session — ${g.stagiaires.join(", ")}`;
@@ -11467,6 +11484,7 @@ function genCalendrierFormationOPCO(o: OrganismeInfo, f: FormationInfo, stagiair
     }
     extra += `<h3 style="margin-top:18px;page-break-after:avoid">${titreGroupe}</h3>`;
     extra += `<p><strong>Période :</strong> du ${formatDate(g.debut)} au ${formatDate(g.fin)} &nbsp;|&nbsp; <strong>Rythme :</strong> ${rythmeLabel} &nbsp;|&nbsp; <strong>Volume centre :</strong> ${volumeEcole} h sur ${nbEcoleDays} jour${nbEcoleDays > 1 ? "s" : ""} école (7 h/jour)</p>`;
+    extra += `<p style="margin:4px 0;font-size:0.9em;color:#1e3a7b"><strong>Date d'envoi du calendrier :</strong> ${envoiLabel} <em>(7 jours ouvrés avant le démarrage — hors week-end et jours fériés)</em></p>`;
     extra += `<table border="1" cellpadding="5" cellspacing="0" style="border-collapse:collapse;width:100%">
       <thead><tr style="background:#1e3a7b;color:#fff">
         <th style="width:5%">N°</th>
@@ -11514,7 +11532,9 @@ function genCalendrierFormationOPCO(o: OrganismeInfo, f: FormationInfo, stagiair
   }
 
   extra += `<p style="margin-top:14px;font-size:0.9em"><em>Ce calendrier est communiqué aux apprenants à l'inscription, à l'employeur et à l'OPCO financeur. Toute modification fait l'objet d'une convocation rectificative au moins 7 jours avant le démarrage. Le rythme d'alternance commence systématiquement par une semaine en centre de formation.</em></p>`;
-  extra += `<p style="margin-top:18px"><strong>Fait à</strong> ${o.ville || "—"}, <strong>le</strong> ${formatDate(new Date().toISOString())}</p>`;
+  // Date d'envoi globale = la plus précoce des dates d'envoi de session (premier départ - 7 j ouvrés)
+  const envoiGlobalISO = envoiDatesISO.sort()[0] || new Date().toISOString().slice(0, 10);
+  extra += `<p style="margin-top:18px"><strong>Fait à</strong> ${o.ville || "—"}, <strong>le</strong> ${formatDate(envoiGlobalISO)}</p>`;
   extra += `<p><strong>${o.dirigeant || o.responsablePedagogique || "Le responsable pédagogique"}</strong><br>${o.nom}</p>`;
 
   return buildDocument({
