@@ -12112,12 +12112,24 @@ function genExercicesOPCO(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
             const resultMark = isWrong
               ? `<span style="color:#c0392b;font-weight:bold">✗</span>`
               : `<span style="color:#1e7b3a;font-weight:bold">✓</span>`;
+            const optionsHtml = q.options
+              .map((opt, oi) => {
+                const lett = letters[oi]?.toUpperCase() || "?";
+                const isCorrect = oi === q.correctIndex;
+                const isChosen = oi === chosenIdx;
+                let style = "color:#555";
+                if (isCorrect) style = "color:#1e7b3a;font-weight:bold";
+                if (isChosen && !isCorrect) style = "color:#c0392b;text-decoration:underline";
+                if (isChosen && isCorrect) style = "color:#1e7b3a;font-weight:bold;text-decoration:underline";
+                return `<div style="${style};margin:1px 0">${lett}) ${opt}</div>`;
+              })
+              .join("");
             extra += `<tr${isWrong ? ' style="background:#fdecec"' : ""}>
-              <td style="text-align:center">${qi + 1}</td>
-              <td>${q.question}</td>
-              <td>${letters[chosenIdx]?.toUpperCase() || "?"}) ${reponseTxt}</td>
-              <td style="text-align:center">${bonneTxt}</td>
-              <td style="text-align:center">${resultMark}</td>
+              <td style="text-align:center;vertical-align:top">${qi + 1}</td>
+              <td style="vertical-align:top"><div style="margin-bottom:4px">${q.question}</div><div style="font-size:0.92em">${optionsHtml}</div></td>
+              <td style="vertical-align:top">${letters[chosenIdx]?.toUpperCase() || "?"}) ${reponseTxt}</td>
+              <td style="text-align:center;vertical-align:top">${bonneTxt}</td>
+              <td style="text-align:center;vertical-align:top">${resultMark}</td>
             </tr>`;
           });
           extra += `</tbody></table>`;
