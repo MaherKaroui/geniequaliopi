@@ -573,19 +573,31 @@ export default function OPCOMobilites() {
               await new Promise((r) => setTimeout(r, 50));
             }
           } else if (PER_SESSION_DOCS.has(doc.code) && mergedStagiaires.length > 0) {
-            // B9 / C11 / C12 : 1 fichier PDF par session dans un sous-dossier dédié
+            // B9 / C11 / C12 : sous-dossier dédié, regroupé par session
+            // - C12 : 1 PDF PAR STAGIAIRE dans le dossier de sa session
+            // - B9 / C11 : 1 PDF par session + trame vierge
             const sessions = groupStagiairesBySession();
             const subFolder = `${folder}/${doc.code}_${doc.label.replace(/\s+/g, "_")}`;
             for (let i = 0; i < sessions.length; i++) {
               const g = sessions[i];
               const suffix = formatSessionSuffix(g, i);
-              const blob = await generateAutoBlobForSession(doc, g.stagiaires);
-              if (blob) zip.file(`${subFolder}/${buildOpcoFileName(namingCtx, doc.label, "pdf", suffix)}`, blob);
-              // Trames vierges pour B9 et C11 : 1 trame par session
-              if (doc.code === "B9" || doc.code === "C11") {
+              const sessionFolder = `${subFolder}/${suffix}`;
+
+              if (doc.code === "C12") {
+                for (const s of g.stagiaires) {
+                  const blob = await generateAutoBlobForSession(doc, [s]);
+                  if (blob) {
+                    const stagSuffix = `${s.prenom || ""}_${s.nom || ""}`.trim() || "Stagiaire";
+                    zip.file(`${sessionFolder}/${buildOpcoFileName(namingCtx, doc.label, "pdf", stagSuffix)}`, blob);
+                  }
+                  await new Promise((r) => setTimeout(r, 30));
+                }
+              } else {
+                const blob = await generateAutoBlobForSession(doc, g.stagiaires);
+                if (blob) zip.file(`${sessionFolder}/${buildOpcoFileName(namingCtx, doc.label, "pdf", suffix)}`, blob);
                 const viergeBlob = await generateViergeBlobForSession(doc.code, g.stagiaires);
                 if (viergeBlob) {
-                  zip.file(`${subFolder}/${buildOpcoFileName(namingCtx, `${doc.label} (Trame vierge)`, "pdf", suffix)}`, viergeBlob);
+                  zip.file(`${sessionFolder}/${buildOpcoFileName(namingCtx, `${doc.label} (Trame vierge)`, "pdf", suffix)}`, viergeBlob);
                 }
               }
               await new Promise((r) => setTimeout(r, 50));
