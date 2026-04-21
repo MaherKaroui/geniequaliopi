@@ -737,7 +737,8 @@ export function generateExcelCalendrierOPCO(
       : "—";
     const allDays = buildAllWorkdays(grp.debut, grp.fin);
     const refDate = parseD(grp.debut);
-    const ecoleDays = refDate ? allDays.filter((d) => isEcoleWeek(weekIndex(d, refDate))) : [];
+    const shift = computeWeekShift(grp.debut);
+    const ecoleDays = refDate ? allDays.filter((d) => isEcoleWeek(weekIndex(d, refDate), shift)) : [];
     const nbEcoleDays = ecoleDays.length;
     const volumeEcole = nbEcoleDays * 7;
 
