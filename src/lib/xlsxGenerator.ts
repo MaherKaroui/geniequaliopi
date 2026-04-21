@@ -693,14 +693,15 @@ export function generateExcelCalendrierOPCO(
     const apprenants = grp.stagiaires.length
       ? grp.stagiaires.map((s) => `${s.prenom} ${s.nom}`).join(", ")
       : "—";
-    const days = buildDays(grp.debut, totalDays);
+    const days = buildDays(grp.debut, grp.nbDays);
+    const hPerDay = (Math.round((dureeH / grp.nbDays) * 10) / 10).toString();
 
     // Onglet par session
     let sheetHtml = tableRow(["Champ", "Valeur"], true);
     sheetHtml += tableRow(["Session", sessionLabel]);
     sheetHtml += tableRow(["Apprenants", apprenants]);
     sheetHtml += tableRow(["Période", `Du ${formatDate(grp.debut)} au ${formatDate(grp.fin)}`]);
-    sheetHtml += tableRow(["Volume", `${dureeH} h sur ${totalDays} jour${totalDays > 1 ? "s" : ""}`]);
+    sheetHtml += tableRow(["Volume", `${dureeH} h sur ${grp.nbDays} jour${grp.nbDays > 1 ? "s" : ""}`]);
     sheetHtml += tableRow(["Lieu", lieu]);
     sheetHtml += tableRow(["Formateur", f.formateur || "—"]);
     sheetHtml += `<tr><td colspan="2" style="height:8px"></td></tr>`;
@@ -709,7 +710,7 @@ export function generateExcelCalendrierOPCO(
       true,
     );
     if (days.length === 0) {
-      sheetHtml += `<tr><td colspan="8" style="text-align:center;color:#888">Dates à renseigner dans la fiche formation.</td></tr>`;
+      sheetHtml += `<tr><td colspan="8" style="text-align:center;color:#888">Dates à renseigner dans la fiche stagiaire.</td></tr>`;
     } else {
       days.forEach((d, i) => {
         const jourLabel = fmtJour(d);
@@ -721,7 +722,7 @@ export function generateExcelCalendrierOPCO(
           jourCap,
           horairesMatin,
           horairesAprem,
-          "7",
+          hPerDay,
           lieu,
         ]);
         consolHtml += tableRow([
@@ -732,7 +733,7 @@ export function generateExcelCalendrierOPCO(
           jourCap,
           horairesMatin,
           horairesAprem,
-          "7",
+          hPerDay,
           lieu,
           f.formateur || "—",
         ]);
