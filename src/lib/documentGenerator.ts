@@ -11450,7 +11450,8 @@ function genCalendrierFormationOPCO(o: OrganismeInfo, f: FormationInfo, stagiair
     // Construit TOUS les jours ouvrés de la période (école + entreprise) pour montrer l'alternance complète
     const allDays = buildAllWorkdays(g.debut, g.fin);
     const refDate = parseD(g.debut);
-    const ecoleDays = refDate ? allDays.filter((d) => isEcoleWeek(weekIndex(d, refDate))) : [];
+    const shift = computeWeekShift(g.debut);
+    const ecoleDays = refDate ? allDays.filter((d) => isEcoleWeek(weekIndex(d, refDate), shift)) : [];
     const nbEcoleDays = ecoleDays.length;
     const volumeEcole = nbEcoleDays * 7;
     const titreGroupe = groupes.size > 1
