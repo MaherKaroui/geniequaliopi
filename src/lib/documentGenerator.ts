@@ -12125,23 +12125,31 @@ function genExercicesOPCO(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
           extra += `</div>`;
         });
       } else if (!isPast && selectedQuestions.length > 0) {
-        // Trame vierge du QCM pour les semaines à venir
+        // Trame vierge du QCM pour les semaines à venir — une trame par apprenant
         extra += `<p style="margin:6px 0;color:#888;font-style:italic">QCM à compléter par les apprenants à l'issue de la semaine école du ${fmtDateLong(lastDay)}.</p>`;
-        extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%;font-size:0.88em;margin-top:4px">
-          <thead><tr style="background:#fff8e8">
-            <th style="width:5%">N°</th>
-            <th style="width:55%">Question</th>
-            <th style="width:40%">Réponse</th>
-          </tr></thead><tbody>`;
-        selectedQuestions.forEach(({ q }, qi) => {
-          const optionsLine = q.options.map((opt, oi) => `${["a","b","c","d","e","f"][oi]?.toUpperCase()}) ${opt}`).join(" &nbsp;•&nbsp; ");
-          extra += `<tr>
-            <td style="text-align:center">${qi + 1}</td>
-            <td>${q.question}<br><span style="font-size:0.9em;color:#666">${optionsLine}</span></td>
-            <td>&nbsp;</td>
-          </tr>`;
+        g.stagiaires.forEach((s) => {
+          extra += `<div style="margin-top:10px;padding:8px;background:#fffaf0;border-left:3px solid #d4a017">`;
+          extra += `<p style="margin:0 0 6px 0"><strong>Apprenant :</strong> ${s.prenom} ${s.nom}${s.entreprise ? ` — ${s.entreprise}` : ""} &nbsp;|&nbsp; <strong>Date prévue :</strong> ${fmtDateLong(lastDay)}</p>`;
+          extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%;font-size:0.88em;margin-top:4px">
+            <thead><tr style="background:#fff8e8">
+              <th style="width:5%">N°</th>
+              <th style="width:55%">Question</th>
+              <th style="width:30%">Réponse de l'apprenant</th>
+              <th style="width:10%">Résultat</th>
+            </tr></thead><tbody>`;
+          selectedQuestions.forEach(({ q }, qi) => {
+            const optionsLine = q.options.map((opt, oi) => `${["a","b","c","d","e","f"][oi]?.toUpperCase()}) ${opt}`).join(" &nbsp;•&nbsp; ");
+            extra += `<tr>
+              <td style="text-align:center">${qi + 1}</td>
+              <td>${q.question}<br><span style="font-size:0.9em;color:#666">${optionsLine}</span></td>
+              <td>&nbsp;</td>
+              <td style="text-align:center">&nbsp;</td>
+            </tr>`;
+          });
+          extra += `</tbody></table>`;
+          extra += `<p style="margin:6px 0 0 0"><strong>Score :</strong> _____ /10 &nbsp;|&nbsp; <strong>Mention :</strong> _________________ &nbsp;|&nbsp; <strong>Observation formateur :</strong> _____________________________________________</p>`;
+          extra += `</div>`;
         });
-        extra += `</tbody></table>`;
       } else if (isPast) {
         extra += `<p style="color:#888;font-style:italic">Aucune banque de QCM disponible pour cette formation. Exercice à formaliser manuellement par le formateur.</p>`;
       }
