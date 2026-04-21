@@ -309,6 +309,16 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
   };
 
   const handleDownload = async (doc: DocEntry) => {
+    // CERFA Apprentissage rempli (PDF par stagiaire)
+    if (doc.template === "cerfa_apprentissage" && typeof doc.params?.stagiaireIdx === "number") {
+      const s = allStagiaires[doc.params.stagiaireIdx];
+      if (s) {
+        const blob = await genCerfaApprentissagePdf(mergedOrganisme, selectedFormation, s);
+        saveAs(blob, buildCatalogFileName(doc, s, ".pdf"));
+      }
+      return;
+    }
+
     if (doc.template === "pdf_static" && getStaticFileUrl(doc)) {
       const resp = await fetch(getStaticFileUrl(doc)!);
       const blob = await resp.blob();
