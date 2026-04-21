@@ -15,6 +15,7 @@ import { CheckCircle2, Circle, Upload, Archive, Loader2, FileText, AlertTriangle
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import { toast } from "sonner";
+import { useBackgroundJobs } from "@/lib/backgroundJobs";
 
 const yieldToBrowser = (ms = 0) => new Promise<void>(r => requestAnimationFrame(() => setTimeout(r, ms)));
 
@@ -57,6 +58,7 @@ const STATUS_CONFIG: Record<EYDocStatus, { label: string; icon: React.ReactNode;
 };
 
 export default function ControleEDOF({ organisme, formation, stagiaires, docStyle, signature }: ControleEDOFProps) {
+  const { runJob, hasActive } = useBackgroundJobs();
   // Apply docStyle to the document builder whenever it changes
   useEffect(() => {
     if (docStyle) setDocStyle(docStyle);
