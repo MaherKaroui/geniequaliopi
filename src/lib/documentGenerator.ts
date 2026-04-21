@@ -842,6 +842,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "calendrier_annuel_cfa": return genCalendrierAnnuelCFA(o, f);
     case "calendrier_formation_opco": return genCalendrierFormationOPCO(o, f, stagiaires);
     case "temps_connexion_opco": return genTempsConnexionOPCO(o, f, stagiaires);
+    case "exercices_opco": return genExercicesOPCO(o, f, stagiaires);
     case "decoupage_formation_cfa_excel": return genDecoupageFormationCFAExcel(o, f);
     case "suivi_inscriptions_excel": return generateExcelSuiviInscriptions(o, f, stagiaires);
     case "book_qualiopi": {

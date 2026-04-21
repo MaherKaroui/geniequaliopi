@@ -322,6 +322,15 @@ export const OPCO_DOCUMENTS: OpcoDocumentItem[] = [
     perStagiaire: false,
     category: "service_apprenant",
   },
+  {
+    code: "C12",
+    label: "Exercices Pratiques",
+    longLabel: "Exercices pratiques par semaine en centre de formation",
+    description: "1 exercice par semaine en centre de formation, daté du dernier jour école de la semaine concernée. Une session par page. Les exercices passés sont remplis (note + corrigé), les semaines futures sont listées vides et seront complétées au fur et à mesure.",
+    autoTemplates: ["exercices_opco"],
+    perStagiaire: false,
+    category: "service_apprenant",
+  },
 ];
 
 export type OpcoDocStatus = "pending" | "auto" | "uploaded" | "not_applicable";
