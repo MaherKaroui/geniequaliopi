@@ -11532,7 +11532,9 @@ function genCalendrierFormationOPCO(o: OrganismeInfo, f: FormationInfo, stagiair
   }
 
   extra += `<p style="margin-top:14px;font-size:0.9em"><em>Ce calendrier est communiqué aux apprenants à l'inscription, à l'employeur et à l'OPCO financeur. Toute modification fait l'objet d'une convocation rectificative au moins 7 jours avant le démarrage. Le rythme d'alternance commence systématiquement par une semaine en centre de formation.</em></p>`;
-  extra += `<p style="margin-top:18px"><strong>Fait à</strong> ${o.ville || "—"}, <strong>le</strong> ${formatDate(new Date().toISOString())}</p>`;
+  // Date d'envoi globale = la plus précoce des dates d'envoi de session (premier départ - 7 j ouvrés)
+  const envoiGlobalISO = envoiDatesISO.sort()[0] || new Date().toISOString().slice(0, 10);
+  extra += `<p style="margin-top:18px"><strong>Fait à</strong> ${o.ville || "—"}, <strong>le</strong> ${formatDate(envoiGlobalISO)}</p>`;
   extra += `<p><strong>${o.dirigeant || o.responsablePedagogique || "Le responsable pédagogique"}</strong><br>${o.nom}</p>`;
 
   return buildDocument({
