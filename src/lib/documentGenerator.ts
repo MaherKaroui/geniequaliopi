@@ -11413,15 +11413,17 @@ function genCalendrierFormationOPCO(o: OrganismeInfo, f: FormationInfo, stagiair
 
   const horairesMatin = "09h00 – 12h30";
   const horairesAprem = "13h30 – 17h00";
+  const rythmeLabel = `${rythme.ecole} semaine${rythme.ecole > 1 ? "s" : ""} école / ${rythme.entreprise} semaine${rythme.entreprise > 1 ? "s" : ""} entreprise`;
 
   let extra = `<p><em>Calendrier précisant les dates exactes, les horaires et le lieu de déroulement de la formation pour l'ensemble des dossiers ayant fait l'objet d'une demande de financement.</em></p>`;
   extra += `<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%;margin-bottom:18px">
     <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold;width:30%">Intitulé de la formation</td><td>${f.intitule}</td></tr>
     <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Organisme</td><td>${o.nom}${o.nda ? ` – NDA ${o.nda}` : ""}</td></tr>
-    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Modalité</td><td>${isDistance ? "Distanciel synchrone (classe virtuelle)" : "Présentiel"}</td></tr>
+    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Modalité</td><td>${isDistance ? "Distanciel synchrone (classe virtuelle)" : "Présentiel"} — Apprentissage en alternance</td></tr>
     <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Lieu de déroulement</td><td>${lieu}</td></tr>
-    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Durée</td><td>${dureeH} heures</td></tr>
-    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Horaires types</td><td>Matin : ${horairesMatin} &nbsp;|&nbsp; Après-midi : ${horairesAprem} (pause déjeuner 12h30 – 13h30)</td></tr>
+    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Durée centre de formation</td><td>${dureeH} heures (7 h/jour)</td></tr>
+    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Rythme d'alternance</td><td>${rythmeLabel} — démarrage en semaine école</td></tr>
+    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Horaires (jours école)</td><td>Matin : ${horairesMatin} &nbsp;|&nbsp; Après-midi : ${horairesAprem} (pause déjeuner 12h30 – 13h30) — 7 h/jour</td></tr>
     <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Formateur</td><td>${f.formateur || "—"}</td></tr>
     <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Nombre de sessions</td><td>${groupes.size}</td></tr>
     <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Nombre d'apprenants</td><td>${stagiaires.length}</td></tr>
@@ -11430,42 +11432,64 @@ function genCalendrierFormationOPCO(o: OrganismeInfo, f: FormationInfo, stagiair
   let groupIdx = 0;
   for (const [, g] of groupes) {
     groupIdx++;
-    const days = buildDays(g.debut, g.nbDays);
+    // Construit TOUS les jours ouvrés de la période (école + entreprise) pour montrer l'alternance complète
+    const allDays = buildAllWorkdays(g.debut, g.fin);
+    const refDate = parseD(g.debut);
+    const ecoleDays = refDate ? allDays.filter((d) => isEcoleWeek(weekIndex(d, refDate))) : [];
+    const nbEcoleDays = ecoleDays.length;
+    const volumeEcole = nbEcoleDays * 7;
     const titreGroupe = groupes.size > 1
       ? `Session ${groupIdx} — ${g.stagiaires.join(", ")}`
       : `Session — ${g.stagiaires.join(", ")}`;
     extra += `<h3 style="margin-top:18px;page-break-after:avoid">${titreGroupe}</h3>`;
-    extra += `<p><strong>Période :</strong> du ${formatDate(g.debut)} au ${formatDate(g.fin)} &nbsp;|&nbsp; <strong>Volume :</strong> ${g.nbH} h sur ${g.nbDays} jour${g.nbDays > 1 ? "s" : ""}</p>`;
+    extra += `<p><strong>Période :</strong> du ${formatDate(g.debut)} au ${formatDate(g.fin)} &nbsp;|&nbsp; <strong>Rythme :</strong> ${rythmeLabel} &nbsp;|&nbsp; <strong>Volume centre :</strong> ${volumeEcole} h sur ${nbEcoleDays} jour${nbEcoleDays > 1 ? "s" : ""} école (7 h/jour)</p>`;
     extra += `<table border="1" cellpadding="5" cellspacing="0" style="border-collapse:collapse;width:100%">
       <thead><tr style="background:#1e3a7b;color:#fff">
-        <th style="width:6%">Jour</th>
-        <th style="width:18%">Date</th>
-        <th style="width:13%">Jour de la semaine</th>
-        <th style="width:14%">Horaires matin</th>
-        <th style="width:14%">Horaires après-midi</th>
-        <th style="width:8%">Volume</th>
+        <th style="width:5%">N°</th>
+        <th style="width:7%">Sem.</th>
+        <th style="width:11%">Type</th>
+        <th style="width:17%">Date</th>
+        <th style="width:11%">Jour</th>
+        <th style="width:13%">Horaires matin</th>
+        <th style="width:13%">Horaires après-midi</th>
+        <th style="width:7%">Volume</th>
         <th>Lieu</th>
       </tr></thead><tbody>`;
-    if (days.length === 0) {
-      extra += `<tr><td colspan="7" style="text-align:center;color:#888">Dates à renseigner dans la fiche stagiaire.</td></tr>`;
+    if (allDays.length === 0 || !refDate) {
+      extra += `<tr><td colspan="9" style="text-align:center;color:#888">Dates à renseigner dans la fiche stagiaire.</td></tr>`;
     } else {
-      const hPerDay = Math.round((g.nbH / g.nbDays) * 10) / 10;
-      days.forEach((d, i) => {
-        extra += `<tr>
-          <td style="text-align:center">J${i + 1}</td>
+      let ecoleCounter = 0;
+      let entrepriseCounter = 0;
+      allDays.forEach((d) => {
+        const wIdx = weekIndex(d, refDate);
+        const ecole = isEcoleWeek(wIdx);
+        if (ecole) ecoleCounter++; else entrepriseCounter++;
+        const numLabel = ecole ? `É${ecoleCounter}` : `E${entrepriseCounter}`;
+        const bg = ecole ? "#eaf2ff" : "#fff8e8";
+        const typeLabel = ecole
+          ? `<span style="color:#1e3a7b;font-weight:bold">École</span>`
+          : `<span style="color:#9a6300;font-weight:bold">Entreprise</span>`;
+        const matin = ecole ? horairesMatin : "—";
+        const aprem = ecole ? horairesAprem : "—";
+        const vol = ecole ? "7 h" : "—";
+        const lieuJour = ecole ? lieu : "Entreprise d'accueil";
+        extra += `<tr style="background:${bg}">
+          <td style="text-align:center">${numLabel}</td>
+          <td style="text-align:center">S${wIdx + 1}</td>
+          <td style="text-align:center">${typeLabel}</td>
           <td>${fmtDateLong(d)}</td>
           <td style="text-transform:capitalize">${fmtJour(d)}</td>
-          <td style="text-align:center">${horairesMatin}</td>
-          <td style="text-align:center">${horairesAprem}</td>
-          <td style="text-align:center">${hPerDay} h</td>
-          <td>${lieu}</td>
+          <td style="text-align:center">${matin}</td>
+          <td style="text-align:center">${aprem}</td>
+          <td style="text-align:center">${vol}</td>
+          <td>${lieuJour}</td>
         </tr>`;
       });
     }
     extra += `</tbody></table>`;
   }
 
-  extra += `<p style="margin-top:14px;font-size:0.9em"><em>Ce calendrier est communiqué aux apprenants à l'inscription, à l'employeur et à l'OPCO financeur. Toute modification fait l'objet d'une convocation rectificative au moins 7 jours avant le démarrage.</em></p>`;
+  extra += `<p style="margin-top:14px;font-size:0.9em"><em>Ce calendrier est communiqué aux apprenants à l'inscription, à l'employeur et à l'OPCO financeur. Toute modification fait l'objet d'une convocation rectificative au moins 7 jours avant le démarrage. Le rythme d'alternance commence systématiquement par une semaine en centre de formation.</em></p>`;
   extra += `<p style="margin-top:18px"><strong>Fait à</strong> ${o.ville || "—"}, <strong>le</strong> ${formatDate(new Date().toISOString())}</p>`;
   extra += `<p><strong>${o.dirigeant || o.responsablePedagogique || "Le responsable pédagogique"}</strong><br>${o.nom}</p>`;
 
