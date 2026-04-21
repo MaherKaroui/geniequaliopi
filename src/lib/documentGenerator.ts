@@ -2112,8 +2112,9 @@ function genEmargementStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: 
   let days: string[] = [];
   const includeSat = formationIncludesSaturday(f);
   if (dateDebut && dateFin) {
-    const start = new Date(dateDebut + "T00:00:00");
-    const end = new Date(dateFin + "T00:00:00");
+    const start = parseDateSafe(dateDebut);
+    const end = parseDateSafe(dateFin);
+    if (start && end) {
     const current = new Date(start);
     while (current <= end) {
       const dow = current.getDay();
