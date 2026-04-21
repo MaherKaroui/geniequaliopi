@@ -691,7 +691,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
     setGenerating(true);
     setGenerationProgressText("");
     try {
-      const critereDocs = catalog.filter((doc) => doc.critere === critereNum);
+      const critereDocs = catalog.filter((doc) => doc.critere === critereNum && !doc.id.startsWith("cfa_siteweb_"));
       const totalFiles = critereDocs.reduce((count, doc) => {
         const isPerStagiaire = PER_STAGIAIRE_TEMPLATES.has(doc.template);
         const hasStagiaireIdx = doc.params?.stagiaireIdx !== undefined;
@@ -819,7 +819,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
     setGenerating(true);
     setGenerationProgressText("");
     try {
-      const indDocs = catalog.filter((doc) => doc.critere === critereNum && doc.indicateur === indicateurNum);
+      const indDocs = catalog.filter((doc) => doc.critere === critereNum && doc.indicateur === indicateurNum && !doc.id.startsWith("cfa_siteweb_"));
       const totalFiles = indDocs.reduce((count, doc) => {
         const isPerStagiaire = PER_STAGIAIRE_TEMPLATES.has(doc.template);
         const hasStagiaireIdx = doc.params?.stagiaireIdx !== undefined;
