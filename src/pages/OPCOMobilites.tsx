@@ -534,6 +534,22 @@ export default function OPCOMobilites() {
               }
               await new Promise((r) => setTimeout(r, 50));
             }
+          } else if (PER_SESSION_DOCS.has(doc.code) && mergedStagiaires.length > 0) {
+            // B9 / C11 / C12 : 1 fichier PDF par session dans un sous-dossier dédié
+            const sessions = groupStagiairesBySession();
+            const subFolder = `${folder}/${doc.code}_${doc.label.replace(/\s+/g, "_")}`;
+            for (let i = 0; i < sessions.length; i++) {
+              const g = sessions[i];
+              const suffix = formatSessionSuffix(g, i);
+              const blob = await generateAutoBlobForSession(doc, g.stagiaires);
+              if (blob) zip.file(`${subFolder}/${buildOpcoFileName(namingCtx, doc.label, "pdf", suffix)}`, blob);
+              await new Promise((r) => setTimeout(r, 50));
+            }
+            // B9 : on ajoute aussi le calendrier Excel multi-onglets (consolidé toutes sessions)
+            if (doc.code === "B9") {
+              const xlsHtml = generateExcelCalendrierOPCO(mergedOrganisme, formation, mergedStagiaires);
+              zip.file(`${subFolder}/${buildOpcoFileName(namingCtx, doc.label, "xls")}`, excelToBlob(xlsHtml));
+            }
           } else if (doc.perStagiaire && mergedStagiaires.length > 0) {
             for (let i = 0; i < mergedStagiaires.length; i++) {
               const blob = await generateAutoBlob(doc, i);
@@ -547,11 +563,6 @@ export default function OPCOMobilites() {
           } else {
             const blob = await generateAutoBlob(doc);
             if (blob) zip.file(`${folder}/${buildOpcoFileName(namingCtx, doc.label, "pdf")}`, blob);
-            // B9 : ajouter aussi le calendrier Excel multi-onglets
-            if (doc.code === "B9") {
-              const xlsHtml = generateExcelCalendrierOPCO(mergedOrganisme, formation, mergedStagiaires);
-              zip.file(`${folder}/${buildOpcoFileName(namingCtx, doc.label, "xls")}`, excelToBlob(xlsHtml));
-            }
           }
         } else {
           zip.file(`${folder}/MANQUANT_${doc.code}_${doc.label}.txt`,
