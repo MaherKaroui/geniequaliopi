@@ -597,6 +597,17 @@ export function generateExcelCalendrierOPCO(
   const horairesMatin = "09h00 – 12h30";
   const horairesAprem = "13h30 – 17h00";
 
+  // Parse rythme alternance — défaut 1 sem école / 3 sem entreprise (toujours commencer par école)
+  const parseRythme = (txt?: string): { ecole: number; entreprise: number } => {
+    if (!txt) return { ecole: 1, entreprise: 3 };
+    const m = txt.match(/(\d+)\s*sem[^0-9]*?(\d+)\s*sem/i);
+    if (m) return { ecole: Math.max(1, parseInt(m[1])), entreprise: Math.max(0, parseInt(m[2])) };
+    return { ecole: 1, entreprise: 3 };
+  };
+  const rythme = parseRythme(f.rythmeAlternance);
+  const cycleWeeks = rythme.ecole + rythme.entreprise;
+  const rythmeLabel = `${rythme.ecole} sem école / ${rythme.entreprise} sem entreprise`;
+
   const parseD = (s: string): Date | null => {
     if (!s) return null;
     const t = s.trim();
