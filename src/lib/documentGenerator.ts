@@ -11482,7 +11482,7 @@ function genCalendrierFormationOPCO(o: OrganismeInfo, f: FormationInfo, stagiair
       let entrepriseCounter = 0;
       allDays.forEach((d) => {
         const wIdx = weekIndex(d, refDate);
-        const ecole = isEcoleWeek(wIdx);
+        const ecole = isEcoleWeek(wIdx, shift);
         if (ecole) ecoleCounter++; else entrepriseCounter++;
         const numLabel = ecole ? `É${ecoleCounter}` : `E${entrepriseCounter}`;
         const bg = ecole ? "#eaf2ff" : "#fff8e8";
