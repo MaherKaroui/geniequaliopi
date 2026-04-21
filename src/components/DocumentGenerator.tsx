@@ -17,6 +17,7 @@ import { downloadAsWord, htmlToWordBlob } from "@/lib/wordExport";
 import { generateExcelTableauBordPerformance, generateExcelTableauSuiviParcours, generateExcelIndicateursPrevisionnelsVAE, excelToBlob } from "@/lib/xlsxGenerator";
 import { downloadAsPdf, htmlToPdfBlob } from "@/lib/pdfExport";
 import { processDocxTemplate, processMailDocxTemplate, DOCX_TEMPLATE_FILES, MAIL_TEMPLATE_FILES } from "@/lib/docxTemplateExport";
+import { genCerfaApprentissagePdf } from "@/lib/cerfaApprentissage";
 import { auditImportedFolder, ImportAuditResult } from "@/lib/importInspector";
 import {
   buildDocumentFileName,
