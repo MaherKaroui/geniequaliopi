@@ -476,8 +476,8 @@ export default function OPCOMobilites() {
         saveAs(z, buildOpcoFileName(namingCtx, doc.label, "zip"));
       } else if (PER_SESSION_DOCS.has(doc.code) && mergedStagiaires.length > 0) {
         // B9 / C11 / C12 : ZIP regroupé par session (dossier = session)
-        // - C12 (exercices) : 1 PDF PAR STAGIAIRE dans le dossier de sa session
-        // - B9 / C11 : 1 PDF par session + trame vierge
+        // → 1 PDF PAR STAGIAIRE dans le dossier de sa session
+        // → B9 / C11 : trame vierge par session également
         const sessions = groupStagiairesBySession();
         const zip = new JSZip();
         for (let i = 0; i < sessions.length; i++) {
@@ -485,19 +485,17 @@ export default function OPCOMobilites() {
           const suffix = formatSessionSuffix(g, i);
           const folder = zip.folder(suffix)!;
 
-          if (doc.code === "C12") {
-            // 1 PDF par stagiaire à l'intérieur du dossier de session
-            for (const s of g.stagiaires) {
-              const blob = await generateAutoBlobForSession(doc, [s]);
-              if (blob) {
-                const stagSuffix = `${s.prenom || ""}_${s.nom || ""}`.trim() || "Stagiaire";
-                folder.file(buildOpcoFileName(namingCtx, doc.label, "pdf", stagSuffix), blob);
-              }
+          // 1 PDF par stagiaire à l'intérieur du dossier de session
+          for (const s of g.stagiaires) {
+            const blob = await generateAutoBlobForSession(doc, [s]);
+            if (blob) {
+              const stagSuffix = `${s.prenom || ""}_${s.nom || ""}`.trim() || "Stagiaire";
+              folder.file(buildOpcoFileName(namingCtx, doc.label, "pdf", stagSuffix), blob);
             }
-          } else {
-            // B9 / C11 : 1 PDF par session
-            const blob = await generateAutoBlobForSession(doc, g.stagiaires);
-            if (blob) folder.file(buildOpcoFileName(namingCtx, doc.label, "pdf", suffix), blob);
+          }
+
+          // B9 / C11 : trame vierge par session
+          if (doc.code !== "C12") {
             const viergeBlob = await generateViergeBlobForSession(doc.code, g.stagiaires);
             if (viergeBlob) {
               folder.file(buildOpcoFileName(namingCtx, `${doc.label} (Trame vierge)`, "pdf", suffix), viergeBlob);
