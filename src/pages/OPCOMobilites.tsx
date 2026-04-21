@@ -34,6 +34,7 @@ import { mergeOrganisme, mergeStagiaires } from "@/lib/sampleData";
 import { htmlToPdfBlob } from "@/lib/pdfExport";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useBackgroundJobs } from "@/lib/backgroundJobs";
 
 const emptyOrganisme: OrganismeInfo = {
   nom: "", siret: "", adresse: "", codePostal: "", ville: "", telephone: "", email: "",
@@ -74,6 +75,7 @@ interface SavedOpcoDossier {
 export default function OPCOMobilites() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { runJob, hasActive } = useBackgroundJobs();
   const [step, setStep] = useState<Step>("setup");
 
   // Restore from session
