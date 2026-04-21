@@ -145,7 +145,7 @@ export function genConvocationApprenti(o: OrganismeInfo, f: FormationInfo, stagi
     const adresseFull = `${(s as any).adresse || "________________________"}${cp || commune ? `, ${cp} ${commune}`.trim() : ""}`;
     return `<div class="section"><p><strong>Destinataire :</strong> ${s.prenom} ${s.nom}</p><p><strong>Adresse :</strong> ${adresseFull}</p><p><strong>Entreprise d'accueil :</strong> ${s.entreprise}</p><p><strong>Adresse entreprise :</strong> ${(s as any).adresseEntreprise || "________________________"}</p><p><strong>Formation :</strong> ${f.intitule}</p><p><strong>Période CFA :</strong> Du ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)}</p></div>`;
   }).join("");
-  return buildDocument({ org: o, title: "CONVOCATION APPRENTI AU CFA", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra + `<p>Merci de vous présenter muni(e) de cette convocation et de votre carnet de liaison.</p>` });
+  return buildDocument({ org: o, title: "CONVOCATION APPRENTI AU CFA", subtitle: f.intitule, extraHtml: extra + `<p style="margin-top:15px">Merci de vous présenter muni(e) de cette convocation et de votre carnet de liaison.</p>` });
 }
 
 export function genFicheMissionEntreprise(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
