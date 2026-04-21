@@ -321,35 +321,32 @@ export async function genCerfaApprentissagePdf(
   // Fait à
   setText(form, "Zone de texte 8_55", clean(o.ville));
 
-  // ---------- RÉMUNÉRATION (selon âge apprenti à date début contrat) ----------
+  // ---------- RÉMUNÉRATION (1ère année — selon âge apprenti à date début contrat) ----------
   const age = ageAt(s.dateNaissance, dateDebut) ?? 20;
   const tarif = tarifApprenti(age);
-  // 1ère année : période complète début → fin (utilise les zones du haut : y=596/627)
-  setText(form, "Zone de texte 8_72", String(tarif.y1)); // % du SMIC
-  setText(form, "Zone de texte 21_73", "SMIC");
-  // Dates période 1ère année (gauche) : 21_61..63 (du), 21_64..66 (au)
-  setText(form, "Zone de texte 21_61", ddJ);
-  setText(form, "Zone de texte 21_62", ddM);
-  setText(form, "Zone de texte 21_63", ddA);
-  setText(form, "Zone de texte 21_64", dfJ);
-  setText(form, "Zone de texte 21_65", dfM);
-  setText(form, "Zone de texte 21_66", dfA);
-  setText(form, "Zone de texte 8_64", String(tarif.y1));
-  setText(form, "Zone de texte 8_65", "SMIC");
+  // 1ère année = ligne du HAUT (y=655) : 21_43..48 (dates du/au) + 8_58 (%) + 8_59 (SMIC)
+  setText(form, "Zone de texte 21_43", ddJ);
+  setText(form, "Zone de texte 21_44", ddM);
+  setText(form, "Zone de texte 21_45", ddA);
+  setText(form, "Zone de texte 21_46", dfJ);
+  setText(form, "Zone de texte 21_47", dfM);
+  setText(form, "Zone de texte 21_48", dfA);
+  setText(form, "Zone de texte 8_58", String(tarif.y1));
+  setText(form, "Zone de texte 8_59", "SMIC");
 
   // ---------- CADRE RÉSERVÉ ORGANISME (bas page 2) ----------
-  // Ligne ADEPROS : 8_91 (gauche = nom organisme), 8_92 (droite = SIRET)
+  // Seules les zones "Nom" (8_91) et "N° SIRET organisme" (8_92) sont à remplir.
+  // 8_93 (N° de dépôt) et 8_94 (Numéro d'avenant) restent vides → remplis par l'organisme dépositaire.
   setText(form, "Zone de texte 8_91", clean(o.nom));
   setText(form, "Zone de texte 8_92", clean(o.siret));
-  // Ligne adresse + N° SIRET organisme
-  setText(form, "Zone de texte 8_93", `${clean(o.adresse)} ${clean(o.codePostal)} ${clean(o.ville)}`.trim());
-  setText(form, "Zone de texte 8_94", clean(o.siret));
+  setText(form, "Zone de texte 8_93", "");
+  setText(form, "Zone de texte 8_94", "");
 
   pdf.getForm().updateFieldAppearances();
 
-  // ---------- SIGNATURES & TAMPON (page 2, zone "Fait à") ----------
-  // Coords JSON sont en bottom-up (même système que pdf-lib).
-  // "Fait à" est à y=234 (bottom). La ligne signatures est juste en-dessous (y≈170-220).
+  // ---------- SIGNATURES & TAMPON (page 2, sous "Fait à") ----------
+  // Coords bottom-up. "Fait à" label = y≈234. Signatures juste en-dessous : y≈170-220.
+  // 3 colonnes : Employeur (~x=20-180), Apprenti (~x=200-360), Représentant légal (~x=380-560)
   const page2 = pdf.getPages()[1];
   if (page2) {
     const [tamponImg, sigStagImg, sigRespImg] = await Promise.all([
@@ -357,11 +354,13 @@ export async function genCerfaApprentissagePdf(
       embedImage(pdf, s.signatureUrl),
       embedImage(pdf, s.signatureResponsableUrl),
     ]);
-    // Signature employeur (gauche) + tampon organisme superposé
-    if (sigRespImg) drawFitted(page2, sigRespImg, 30, 150, 140, 60);
-    if (tamponImg) drawFitted(page2, tamponImg, 50, 145, 110, 70);
-    // Signature apprenti (centre)
-    if (sigStagImg) drawFitted(page2, sigStagImg, 240, 150, 130, 60);
+    // Signature employeur (gauche, sous "Signature de l'employeur")
+    if (sigRespImg) drawFitted(page2, sigRespImg, 25, 175, 130, 50);
+    // Signature apprenti (centre, sous "Signature de l'apprenti(e)")
+    if (sigStagImg) drawFitted(page2, sigStagImg, 215, 175, 130, 50);
+    // Tampon organisme : à droite ("Visa du CFA cachet et signature du directeur") — zone y≈300-400 à gauche
+    // Ou superposé à la signature employeur. On le met dans la zone Visa CFA (gauche, sous "Visa du CFA")
+    if (tamponImg) drawFitted(page2, tamponImg, 30, 350, 110, 70);
   }
 
   const out = await pdf.save();
