@@ -1167,7 +1167,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
                   <div className="border-t px-3 pb-3 space-y-1">
                     {critere.indicateurs.map((indicateur) => {
                       const isIndExpanded = expandedIndicateurs.has(indicateur.numero);
-                      const indDocs = catalog.filter((doc) => doc.critere === critere.numero && doc.indicateur === indicateur.numero);
+                      const indDocs = catalog.filter((doc) => doc.critere === critere.numero && doc.indicateur === indicateur.numero && !doc.id.startsWith("cfa_siteweb_"));
                       if (indDocs.length === 0) return null;
                       const indGenerated = indDocs.filter((doc) => generated.has(doc.id)).length;
 
