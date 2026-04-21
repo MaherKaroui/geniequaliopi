@@ -40,12 +40,12 @@ async function embedImage(pdf: PDFDocument, src: string | undefined): Promise<PD
   }
 }
 
-/** Dessine une image dans une zone donnée (bottom-left origin pdf-lib), conserve le ratio */
+/** Dessine une image dans une zone donnée (bottom-left origin, comme pdf-lib & coords JSON), conserve le ratio */
 function drawFitted(
   page: ReturnType<PDFDocument["getPage"]>,
   img: PDFImage,
   x: number,
-  y: number,
+  yBottom: number,
   maxW: number,
   maxH: number,
 ) {
@@ -56,11 +56,28 @@ function drawFitted(
     h = maxH;
     w = h * ratio;
   }
-  // pdf-lib: y est depuis le bas. Notre coords JSON est top-based (y=788 sur page A4 595x842).
-  // Conversion : yPdf = pageHeight - yTop - h
-  const pageHeight = page.getHeight();
-  const yPdf = pageHeight - y - h;
-  page.drawImage(img, { x, y: yPdf, width: w, height: h });
+  // Coords JSON et pdf-lib utilisent le même système bottom-up
+  page.drawImage(img, { x, y: yBottom, width: w, height: h });
+}
+
+/** Calcule l'âge à une date donnée (string YYYY-MM-DD) */
+function ageAt(birthIso: string | undefined, refIso: string | undefined): number | null {
+  if (!birthIso || !refIso) return null;
+  const b = new Date(birthIso);
+  const r = new Date(refIso);
+  if (isNaN(b.getTime()) || isNaN(r.getTime())) return null;
+  let age = r.getFullYear() - b.getFullYear();
+  const m = r.getMonth() - b.getMonth();
+  if (m < 0 || (m === 0 && r.getDate() < b.getDate())) age--;
+  return age;
+}
+
+/** Tarif (% du SMIC) selon l'âge de l'apprenti — barème légal 2024 */
+function tarifApprenti(age: number): { y1: number; y2: number } {
+  if (age < 18) return { y1: 27, y2: 39 };
+  if (age < 21) return { y1: 43, y2: 51 };
+  if (age < 26) return { y1: 53, y2: 61 };
+  return { y1: 100, y2: 100 }; // 26+ : 100% SMIC
 }
 
 const TEMPLATE_URL = "/pdfs/cerfa/cerfa_10103-14.pdf";
