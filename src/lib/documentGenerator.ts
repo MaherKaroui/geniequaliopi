@@ -7329,8 +7329,12 @@ function getCFAWeeks(f: FormationInfo): number {
 function genEmargementCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const cfaWeekDates = getCFAWeekDates(f);
   const joursFR = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+  const mixte = isMixte(f);
+  const today = new Date();
+  today.setHours(23, 59, 59, 999);
 
   let extra = '';
+  if (mixte) extra += `<p><em>Modalité mixte : alternance Présentiel / Distanciel jour par jour.</em></p>`;
   cfaWeekDates.forEach((week, wi) => {
     if (wi > 0) extra += '<div class="page-break"></div>';
     const weekStartStr = week.weekStart.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
@@ -7345,7 +7349,13 @@ function genEmargementCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
       const dayStr = dayDate.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
       const dayName = joursFR[dayDate.getDay()];
 
-      extra += `<p style="margin-top:12px"><strong>${dayName} ${dayStr}</strong></p>`;
+      // Global day index (continuous across all CFA weeks) for modality alternation
+      const globalDayIdx = wi * 5 + d;
+      const modalite = getDayModalite(f, globalDayIdx);
+      const modaliteLabel = mixte ? ` <span style="color:#1e3a7b;font-weight:600">(${modalite === 'P' ? 'Présentiel' : 'Distanciel'})</span>` : '';
+      const isPast = dayDate <= today;
+
+      extra += `<p style="margin-top:12px"><strong>${dayName} ${dayStr}</strong>${modaliteLabel}</p>`;
       extra += `<p><strong>Formateur :</strong> ${f.formateur}<br><strong>Formation :</strong> ${f.intitule}</p>`;
 
       let tableRows = '';
@@ -7358,8 +7368,13 @@ function genEmargementCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
         const formateurSigHtml = fmtSigUrl
           ? `<br><img src="${fmtSigUrl}" alt="Sig formateur" style="max-height:40px;max-width:90px;object-fit:contain;margin-top:4px" />`
           : '';
-        tableRows += `<tr style="background:#fff;border-bottom:1px solid #ddd"><td>${dayStr}</td><td>Matin<br><small>09h00–12h30</small></td><td style="padding:10px 6px">${stagName}${stagSigHtml}</td><td style="padding:10px 6px">${f.formateur}${formateurSigHtml}</td></tr>`;
-        tableRows += `<tr style="background:#fff;border-bottom:1px solid #ccc"><td></td><td>Après-midi<br><small>13h30–17h00</small></td><td style="padding:10px 6px">${stagName}${stagSigHtml}</td><td style="padding:10px 6px">${f.formateur}${formateurSigHtml}</td></tr>`;
+        const blankSig = `<br><span style="color:#bbb;font-size:10px;font-style:italic">— en attente —</span>`;
+        const sigStag = isPast ? stagSigHtml : blankSig;
+        const sigForm = isPast ? formateurSigHtml : blankSig;
+        const stagDisplay = isPast ? stagName : '';
+        const formDisplay = isPast ? f.formateur : '';
+        tableRows += `<tr style="background:#fff;border-bottom:1px solid #ddd"><td>${dayStr}</td><td>Matin<br><small>09h00–12h30</small></td><td style="padding:10px 6px">${stagDisplay}${sigStag}</td><td style="padding:10px 6px">${formDisplay}${sigForm}</td></tr>`;
+        tableRows += `<tr style="background:#fff;border-bottom:1px solid #ccc"><td></td><td>Après-midi<br><small>13h30–17h00</small></td><td style="padding:10px 6px">${stagDisplay}${sigStag}</td><td style="padding:10px 6px">${formDisplay}${sigForm}</td></tr>`;
       });
       extra += `<table><tr><th>Date</th><th>Horaires</th><th>Prénom et nom, Signature Du Stagiaire</th><th>Prénom et nom du Formateur</th></tr>${tableRows}</table>`;
     }
