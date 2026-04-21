@@ -241,6 +241,53 @@ export default function OPCOMobilites() {
     return null;
   };
 
+  // ─────────── Documents générés UN FICHIER PAR SESSION ───────────
+  // Pour B9 (calendrier), C11 (temps connexion), C12 (exercices) :
+  // → 1 fichier PDF par session (= groupe de stagiaires partageant les mêmes dates).
+  const PER_SESSION_DOCS = new Set(["B9", "C11", "C12"]);
+
+  type SessionGroup = { key: string; debut: string; fin: string; stagiaires: StagiaireInfo[] };
+
+  const groupStagiairesBySession = (): SessionGroup[] => {
+    const map = new Map<string, SessionGroup>();
+    mergedStagiaires.forEach((s) => {
+      const deb = s.dateDebutFormation || formation.dateDebut || "";
+      const fin = s.dateFinFormation || formation.dateFin || "";
+      const key = `${deb}__${fin}`;
+      if (!map.has(key)) map.set(key, { key, debut: deb, fin, stagiaires: [] });
+      map.get(key)!.stagiaires.push(s);
+    });
+    return Array.from(map.values());
+  };
+
+  const formatSessionSuffix = (g: SessionGroup, idx: number): string => {
+    const fmt = (s: string) => {
+      if (!s) return "";
+      const t = s.trim();
+      const fr = t.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+      if (fr) return `${fr[3]}-${fr[2].padStart(2, "0")}-${fr[1].padStart(2, "0")}`;
+      const d = new Date(t);
+      if (isNaN(d.getTime())) return "";
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    };
+    const a = fmt(g.debut), b = fmt(g.fin);
+    return a && b ? `Session_${idx + 1}_${a}_au_${b}` : `Session_${idx + 1}`;
+  };
+
+  const generateAutoBlobForSession = async (doc: OpcoDocumentItem, sessionStagiaires: StagiaireInfo[]): Promise<Blob | null> => {
+    if (doc.autoTemplates.length === 0) return null;
+    for (const template of doc.autoTemplates) {
+      try {
+        // On passe UNIQUEMENT les stagiaires de cette session → le doc ne contiendra qu'1 session
+        const html = generateDocumentById(`opco_${doc.code}`, template, { fi: 0, forceFilled: true }, mergedOrganisme, formation, sessionStagiaires);
+        if (html) return await htmlToPdfBlob(html);
+      } catch (e) {
+        console.warn(`Template ${template} failed for ${doc.code} (session):`, e);
+      }
+    }
+    return null;
+  };
+
   /** Pour C6 : libellés courts par sous-template (positionnement début/fin, exercice intermédiaire, évaluation finale) */
   const TEMPLATE_LABELS: Record<string, string> = {
     ai_test_positionnement_debut: "QCM_Positionnement_Debut",
