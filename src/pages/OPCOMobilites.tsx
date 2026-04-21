@@ -456,6 +456,23 @@ export default function OPCOMobilites() {
         }
         const z = await zip.generateAsync({ type: "blob" });
         saveAs(z, buildOpcoFileName(namingCtx, doc.label, "zip"));
+      } else if (PER_SESSION_DOCS.has(doc.code) && mergedStagiaires.length > 0) {
+        // B9 / C11 / C12 : 1 fichier PDF par session (groupe de stagiaires partageant les mêmes dates)
+        const sessions = groupStagiairesBySession();
+        const zip = new JSZip();
+        for (let i = 0; i < sessions.length; i++) {
+          const g = sessions[i];
+          const suffix = formatSessionSuffix(g, i);
+          const blob = await generateAutoBlobForSession(doc, g.stagiaires);
+          if (blob) zip.file(buildOpcoFileName(namingCtx, doc.label, "pdf", suffix), blob);
+        }
+        // B9 : on joint aussi le calendrier Excel multi-onglets (1 onglet par session déjà géré par generateExcelCalendrierOPCO)
+        if (doc.code === "B9") {
+          const xlsHtml = generateExcelCalendrierOPCO(mergedOrganisme, formation, mergedStagiaires);
+          zip.file(buildOpcoFileName(namingCtx, doc.label, "xls"), excelToBlob(xlsHtml));
+        }
+        const z = await zip.generateAsync({ type: "blob" });
+        saveAs(z, buildOpcoFileName(namingCtx, doc.label, "zip"));
       } else if (doc.perStagiaire && mergedStagiaires.length > 0) {
         const zip = new JSZip();
         for (let i = 0; i < mergedStagiaires.length; i++) {
@@ -471,17 +488,7 @@ export default function OPCOMobilites() {
       } else {
         const blob = await generateAutoBlob(doc);
         if (!blob) { toast.error(`Génération impossible pour ${doc.code}`); return; }
-        // B9 : on livre PDF + Excel multi-onglets dans un ZIP
-        if (doc.code === "B9") {
-          const zip = new JSZip();
-          zip.file(buildOpcoFileName(namingCtx, doc.label, "pdf"), blob);
-          const xlsHtml = generateExcelCalendrierOPCO(mergedOrganisme, formation, mergedStagiaires);
-          zip.file(buildOpcoFileName(namingCtx, doc.label, "xls"), excelToBlob(xlsHtml));
-          const z = await zip.generateAsync({ type: "blob" });
-          saveAs(z, buildOpcoFileName(namingCtx, doc.label, "zip"));
-        } else {
-          saveAs(blob, buildOpcoFileName(namingCtx, doc.label, "pdf"));
-        }
+        saveAs(blob, buildOpcoFileName(namingCtx, doc.label, "pdf"));
       }
       toast.success(`${doc.label} téléchargé`);
     } catch (e: any) {
