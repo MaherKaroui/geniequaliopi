@@ -241,6 +241,53 @@ export default function OPCOMobilites() {
     return null;
   };
 
+  // ─────────── Documents générés UN FICHIER PAR SESSION ───────────
+  // Pour B9 (calendrier), C11 (temps connexion), C12 (exercices) :
+  // → 1 fichier PDF par session (= groupe de stagiaires partageant les mêmes dates).
+  const PER_SESSION_DOCS = new Set(["B9", "C11", "C12"]);
+
+  type SessionGroup = { key: string; debut: string; fin: string; stagiaires: StagiaireInfo[] };
+
+  const groupStagiairesBySession = (): SessionGroup[] => {
+    const map = new Map<string, SessionGroup>();
+    mergedStagiaires.forEach((s) => {
+      const deb = s.dateDebutFormation || formation.dateDebut || "";
+      const fin = s.dateFinFormation || formation.dateFin || "";
+      const key = `${deb}__${fin}`;
+      if (!map.has(key)) map.set(key, { key, debut: deb, fin, stagiaires: [] });
+      map.get(key)!.stagiaires.push(s);
+    });
+    return Array.from(map.values());
+  };
+
+  const formatSessionSuffix = (g: SessionGroup, idx: number): string => {
+    const fmt = (s: string) => {
+      if (!s) return "";
+      const t = s.trim();
+      const fr = t.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+      if (fr) return `${fr[3]}-${fr[2].padStart(2, "0")}-${fr[1].padStart(2, "0")}`;
+      const d = new Date(t);
+      if (isNaN(d.getTime())) return "";
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    };
+    const a = fmt(g.debut), b = fmt(g.fin);
+    return a && b ? `Session_${idx + 1}_${a}_au_${b}` : `Session_${idx + 1}`;
+  };
+
+  const generateAutoBlobForSession = async (doc: OpcoDocumentItem, sessionStagiaires: StagiaireInfo[]): Promise<Blob | null> => {
+    if (doc.autoTemplates.length === 0) return null;
+    for (const template of doc.autoTemplates) {
+      try {
+        // On passe UNIQUEMENT les stagiaires de cette session → le doc ne contiendra qu'1 session
+        const html = generateDocumentById(`opco_${doc.code}`, template, { fi: 0, forceFilled: true }, mergedOrganisme, formation, sessionStagiaires);
+        if (html) return await htmlToPdfBlob(html);
+      } catch (e) {
+        console.warn(`Template ${template} failed for ${doc.code} (session):`, e);
+      }
+    }
+    return null;
+  };
+
   /** Pour C6 : libellés courts par sous-template (positionnement début/fin, exercice intermédiaire, évaluation finale) */
   const TEMPLATE_LABELS: Record<string, string> = {
     ai_test_positionnement_debut: "QCM_Positionnement_Debut",
@@ -409,6 +456,23 @@ export default function OPCOMobilites() {
         }
         const z = await zip.generateAsync({ type: "blob" });
         saveAs(z, buildOpcoFileName(namingCtx, doc.label, "zip"));
+      } else if (PER_SESSION_DOCS.has(doc.code) && mergedStagiaires.length > 0) {
+        // B9 / C11 / C12 : 1 fichier PDF par session (groupe de stagiaires partageant les mêmes dates)
+        const sessions = groupStagiairesBySession();
+        const zip = new JSZip();
+        for (let i = 0; i < sessions.length; i++) {
+          const g = sessions[i];
+          const suffix = formatSessionSuffix(g, i);
+          const blob = await generateAutoBlobForSession(doc, g.stagiaires);
+          if (blob) zip.file(buildOpcoFileName(namingCtx, doc.label, "pdf", suffix), blob);
+        }
+        // B9 : on joint aussi le calendrier Excel multi-onglets (1 onglet par session déjà géré par generateExcelCalendrierOPCO)
+        if (doc.code === "B9") {
+          const xlsHtml = generateExcelCalendrierOPCO(mergedOrganisme, formation, mergedStagiaires);
+          zip.file(buildOpcoFileName(namingCtx, doc.label, "xls"), excelToBlob(xlsHtml));
+        }
+        const z = await zip.generateAsync({ type: "blob" });
+        saveAs(z, buildOpcoFileName(namingCtx, doc.label, "zip"));
       } else if (doc.perStagiaire && mergedStagiaires.length > 0) {
         const zip = new JSZip();
         for (let i = 0; i < mergedStagiaires.length; i++) {
@@ -424,17 +488,7 @@ export default function OPCOMobilites() {
       } else {
         const blob = await generateAutoBlob(doc);
         if (!blob) { toast.error(`Génération impossible pour ${doc.code}`); return; }
-        // B9 : on livre PDF + Excel multi-onglets dans un ZIP
-        if (doc.code === "B9") {
-          const zip = new JSZip();
-          zip.file(buildOpcoFileName(namingCtx, doc.label, "pdf"), blob);
-          const xlsHtml = generateExcelCalendrierOPCO(mergedOrganisme, formation, mergedStagiaires);
-          zip.file(buildOpcoFileName(namingCtx, doc.label, "xls"), excelToBlob(xlsHtml));
-          const z = await zip.generateAsync({ type: "blob" });
-          saveAs(z, buildOpcoFileName(namingCtx, doc.label, "zip"));
-        } else {
-          saveAs(blob, buildOpcoFileName(namingCtx, doc.label, "pdf"));
-        }
+        saveAs(blob, buildOpcoFileName(namingCtx, doc.label, "pdf"));
       }
       toast.success(`${doc.label} téléchargé`);
     } catch (e: any) {
@@ -480,6 +534,22 @@ export default function OPCOMobilites() {
               }
               await new Promise((r) => setTimeout(r, 50));
             }
+          } else if (PER_SESSION_DOCS.has(doc.code) && mergedStagiaires.length > 0) {
+            // B9 / C11 / C12 : 1 fichier PDF par session dans un sous-dossier dédié
+            const sessions = groupStagiairesBySession();
+            const subFolder = `${folder}/${doc.code}_${doc.label.replace(/\s+/g, "_")}`;
+            for (let i = 0; i < sessions.length; i++) {
+              const g = sessions[i];
+              const suffix = formatSessionSuffix(g, i);
+              const blob = await generateAutoBlobForSession(doc, g.stagiaires);
+              if (blob) zip.file(`${subFolder}/${buildOpcoFileName(namingCtx, doc.label, "pdf", suffix)}`, blob);
+              await new Promise((r) => setTimeout(r, 50));
+            }
+            // B9 : on ajoute aussi le calendrier Excel multi-onglets (consolidé toutes sessions)
+            if (doc.code === "B9") {
+              const xlsHtml = generateExcelCalendrierOPCO(mergedOrganisme, formation, mergedStagiaires);
+              zip.file(`${subFolder}/${buildOpcoFileName(namingCtx, doc.label, "xls")}`, excelToBlob(xlsHtml));
+            }
           } else if (doc.perStagiaire && mergedStagiaires.length > 0) {
             for (let i = 0; i < mergedStagiaires.length; i++) {
               const blob = await generateAutoBlob(doc, i);
@@ -493,11 +563,6 @@ export default function OPCOMobilites() {
           } else {
             const blob = await generateAutoBlob(doc);
             if (blob) zip.file(`${folder}/${buildOpcoFileName(namingCtx, doc.label, "pdf")}`, blob);
-            // B9 : ajouter aussi le calendrier Excel multi-onglets
-            if (doc.code === "B9") {
-              const xlsHtml = generateExcelCalendrierOPCO(mergedOrganisme, formation, mergedStagiaires);
-              zip.file(`${folder}/${buildOpcoFileName(namingCtx, doc.label, "xls")}`, excelToBlob(xlsHtml));
-            }
           }
         } else {
           zip.file(`${folder}/MANQUANT_${doc.code}_${doc.label}.txt`,
