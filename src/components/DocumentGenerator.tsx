@@ -140,6 +140,19 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
     );
   }, [mergedOrganisme, getDocExtension]);
 
+  /**
+   * Calcule le chemin de base d'un document dans le ZIP.
+   * Si `doc.params.folder` est défini (ex: "14_MISSIONS_CFA/Mission_4_..."),
+   * le document est placé dans CT{c}_IND_{i}/{folder}/ pour regrouper les missions.
+   */
+  const getDocBasePath = useCallback((doc: DocEntry): string => {
+    const isMail = doc.critere === 0 && !!MAIL_TEMPLATE_FILES[doc.template];
+    const isSiteWeb = doc.id.startsWith("cfa_siteweb_");
+    const root = isSiteWeb ? "Documents site web" : (isMail ? "MAILS" : shortCriterePath(doc.critere, doc.indicateur));
+    const subFolder = typeof doc.params?.folder === "string" ? doc.params.folder : null;
+    return subFolder ? `${root}/${subFolder}` : root;
+  }, []);
+
   const toggleCritere = (num: number) => {
     setExpandedCriteres((prev) => {
       const next = new Set(prev);
@@ -573,9 +586,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
       for (const doc of catalog) {
         const isPerStagiaire = PER_STAGIAIRE_TEMPLATES.has(doc.template);
         const hasStagiaireIdx = doc.params?.stagiaireIdx !== undefined;
-        const isMail = doc.critere === 0 && !!MAIL_TEMPLATE_FILES[doc.template];
-        const isSiteWeb = doc.id.startsWith("cfa_siteweb_");
-        const basePath = isSiteWeb ? "Documents site web" : (isMail ? "MAILS" : shortCriterePath(doc.critere, doc.indicateur));
+        const basePath = getDocBasePath(doc);
 
         if (MAIL_TEMPLATE_FILES[doc.template] && typeof doc.params?.stagiaireIdx === "number") {
           const s = allStagiaires[doc.params.stagiaireIdx];
@@ -754,8 +765,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
       for (const doc of critereDocs) {
         const isPerStagiaire = PER_STAGIAIRE_TEMPLATES.has(doc.template);
         const hasStagiaireIdx = doc.params?.stagiaireIdx !== undefined;
-        const isSiteWeb = doc.id.startsWith("cfa_siteweb_");
-        const basePath = isSiteWeb ? "Documents site web" : shortCriterePath(doc.critere, doc.indicateur);
+        const basePath = getDocBasePath(doc);
 
         if (MAIL_TEMPLATE_FILES[doc.template] && typeof doc.params?.stagiaireIdx === "number") {
           const s = allStagiaires[doc.params.stagiaireIdx];
@@ -882,8 +892,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
       for (const doc of indDocs) {
         const isPerStagiaire = PER_STAGIAIRE_TEMPLATES.has(doc.template);
         const hasStagiaireIdx = doc.params?.stagiaireIdx !== undefined;
-        const isSiteWeb = doc.id.startsWith("cfa_siteweb_");
-        const basePath = isSiteWeb ? "Documents site web" : shortCriterePath(doc.critere, doc.indicateur);
+        const basePath = getDocBasePath(doc);
 
         if (MAIL_TEMPLATE_FILES[doc.template] && typeof doc.params?.stagiaireIdx === "number") {
           const s = allStagiaires[doc.params.stagiaireIdx];
