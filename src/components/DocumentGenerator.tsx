@@ -521,7 +521,38 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
     await downloadFile(content, buildGenericFileName("BOOK_QUALIOPI_COMPLET", mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, ".doc"));
   };
 
-  const handleDownloadAll = async () => {
+  const handleDownloadAll = () => {
+    // Snapshot pour survie au démontage
+    const catalogSnap = catalog;
+    const orgSnap = mergedOrganisme;
+    const formSnap = selectedFormation;
+    const stagSnap = allStagiaires;
+    const formatSnap = exportFormat;
+    const generatedIdsCopy = new Set(generated);
+
+    runJob({
+      label: "Dossier Qualiopi complet (ZIP)",
+      fileName: buildGenericFileName("DOSSIER_QUALIOPI_COMPLET", orgSnap.nom, orgSnap.version, orgSnap.dateMaj, ".zip"),
+      run: (reporter) => runDownloadAllJob({
+        catalog: catalogSnap,
+        organisme: orgSnap,
+        formation: formSnap,
+        stagiaires: stagSnap,
+        exportFormat: formatSnap,
+        getDocBasePath,
+        generateContent,
+        getStaticFileUrl,
+        reporter,
+      }).then((blob) => {
+        // Marque les docs comme générés une fois le job terminé
+        catalogSnap.forEach((d) => generatedIdsCopy.add(d.id));
+        setGenerated(generatedIdsCopy);
+        return blob;
+      }),
+    });
+  };
+
+  const handleDownloadAll_OLD = async () => {
     setGenerating(true);
     setGenerationProgressText("");
     const failures: { name: string; reason: string }[] = [];
