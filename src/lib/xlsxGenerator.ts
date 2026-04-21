@@ -631,16 +631,35 @@ export function generateExcelCalendrierOPCO(
     return Math.max(1, count);
   };
 
-  const buildDays = (startStr: string, count: number): Date[] => {
+  const buildAllWorkdays = (startStr: string, endStr: string): Date[] => {
     const out: Date[] = [];
     const cur = parseD(startStr);
-    if (!cur) return out;
-    while (out.length < count) {
+    const end = parseD(endStr);
+    if (!cur || !end) return out;
+    while (cur <= end) {
       const dow = cur.getDay();
       if (dow !== 0 && dow !== 6) out.push(new Date(cur));
       cur.setDate(cur.getDate() + 1);
     }
     return out;
+  };
+
+  const startOfWeek = (d: Date): Date => {
+    const r = new Date(d);
+    const dow = r.getDay();
+    const diff = dow === 0 ? -6 : 1 - dow;
+    r.setDate(r.getDate() + diff);
+    r.setHours(0, 0, 0, 0);
+    return r;
+  };
+  const weekIndex = (d: Date, ref: Date): number => {
+    const a = startOfWeek(d).getTime();
+    const b = startOfWeek(ref).getTime();
+    return Math.round((a - b) / (7 * 24 * 3600 * 1000));
+  };
+  const isEcoleWeek = (wIdx: number): boolean => {
+    const pos = ((wIdx % cycleWeeks) + cycleWeeks) % cycleWeeks;
+    return pos < rythme.ecole;
   };
 
   const fmtJour = (d: Date) => {
