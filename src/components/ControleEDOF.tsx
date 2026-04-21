@@ -301,77 +301,74 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
     }
   }, [appendAutoDocToZip, exportStagiaires, generateAutoDoc, safeName]);
 
-  const downloadSelectedZip = useCallback(async () => {
+  const downloadSelectedZip = useCallback(() => {
     if (selectedDocs.size === 0) {
       toast.error("Sélectionnez au moins un document");
       return;
     }
-    setGenerating(true);
-    setProgress(0);
-    setProgressText("Préparation des documents sélectionnés...");
-    try {
-      const zip = new JSZip();
-      const docsToProcess = EY_DOCUMENTS.filter(d => selectedDocs.has(d.code));
-      const totalItems = docsToProcess.reduce((count, eyDoc) => {
-        const state = docStates.get(eyDoc.code);
-        if (state?.status === "uploaded" || eyDoc.autoTemplates.length === 0 || !eyDoc.perStagiaire || exportStagiaires.length === 0) {
-          return count + 1;
-        }
-        return count + exportStagiaires.length;
-      }, 0);
-      let completedItems = 0;
+    const docsToProcess = EY_DOCUMENTS.filter(d => selectedDocs.has(d.code));
+    const statesSnap = new Map(docStates);
+    const stagSnap = exportStagiaires;
+    const safeNameSnap = safeName;
 
-      const advanceProgress = (label: string) => {
-        completedItems += 1;
-        setProgress(Math.round((completedItems / Math.max(totalItems, 1)) * 100));
-        setProgressText(label);
-      };
-
-      for (const eyDoc of docsToProcess) {
-        const state = docStates.get(eyDoc.code);
-
-        if (state?.status === "uploaded" && state.uploadedFile) {
-          const buf = await state.uploadedFile.arrayBuffer();
-          const ext = state.uploadedFileName?.split(".").pop() || "pdf";
-          zip.file(`${safeName}_${eyDoc.code}.${ext}`, buf);
-          advanceProgress(`${eyDoc.code} — fichier fourni`);
-        } else if (eyDoc.staticFile) {
-          try {
-            const response = await fetch(eyDoc.staticFile);
-            const blob = await response.blob();
-            const fileName = eyDoc.staticFile.split("/").pop() || `${eyDoc.code}.docx`;
-            zip.file(fileName, blob);
-          } catch (e) {
-            console.error(`Error fetching static file ${eyDoc.staticFile}:`, e);
+    runJob({
+      label: `Sélection EY (${docsToProcess.length} docs)`,
+      fileName: `${safeNameSnap}_Selection_EY.zip`,
+      run: async (reporter) => {
+        const zip = new JSZip();
+        const totalItems = docsToProcess.reduce((count, eyDoc) => {
+          const state = statesSnap.get(eyDoc.code);
+          if (state?.status === "uploaded" || eyDoc.autoTemplates.length === 0 || !eyDoc.perStagiaire || stagSnap.length === 0) {
+            return count + 1;
           }
-          advanceProgress(`${eyDoc.code} — fichier pré-fourni`);
-        } else if (eyDoc.autoTemplates.length > 0) {
-          const isBacPro = eyDoc.category === "controle_bac_pro";
-          await appendAutoDocToZip(zip, eyDoc, {
-            pdfOptions: MASS_EXPORT_PDF_OPTIONS,
-            sourceStagiaires: exportStagiaires,
-            folderByDocument: isBacPro,
-            onItemDone: (current, total) => {
-              advanceProgress(total > 1 ? `${eyDoc.code} — ${current}/${total}` : `${eyDoc.code} — ${eyDoc.label}`);
-            },
-          });
-        } else {
-          advanceProgress(`${eyDoc.code} — aucun fichier à ajouter`);
-        }
-      }
+          return count + stagSnap.length;
+        }, 0);
+        let completedItems = 0;
 
-      const content = await zip.generateAsync(ZIP_EXPORT_OPTIONS);
-      saveAs(content, `${safeName}_Selection_EY.zip`);
-      toast.success(`${docsToProcess.length} document(s) exporté(s) !`);
-    } catch (e: any) {
-      console.error(e);
-      toast.error("Erreur : " + (e.message || "Erreur inconnue"));
-    } finally {
-      setGenerating(false);
-      setProgress(0);
-      setProgressText("");
-    }
-  }, [selectedDocs, docStates, safeName, exportStagiaires, appendAutoDocToZip]);
+        const advanceProgress = (label: string) => {
+          completedItems += 1;
+          reporter.setProgress((completedItems / Math.max(totalItems, 1)) * 95);
+          reporter.setMessage(label);
+        };
+
+        for (const eyDoc of docsToProcess) {
+          const state = statesSnap.get(eyDoc.code);
+
+          if (state?.status === "uploaded" && state.uploadedFile) {
+            const buf = await state.uploadedFile.arrayBuffer();
+            const ext = state.uploadedFileName?.split(".").pop() || "pdf";
+            zip.file(`${safeNameSnap}_${eyDoc.code}.${ext}`, buf);
+            advanceProgress(`${eyDoc.code} — fichier fourni`);
+          } else if (eyDoc.staticFile) {
+            try {
+              const response = await fetch(eyDoc.staticFile);
+              const blob = await response.blob();
+              const fileName = eyDoc.staticFile.split("/").pop() || `${eyDoc.code}.docx`;
+              zip.file(fileName, blob);
+            } catch (e) {
+              console.error(`Error fetching static file ${eyDoc.staticFile}:`, e);
+            }
+            advanceProgress(`${eyDoc.code} — fichier pré-fourni`);
+          } else if (eyDoc.autoTemplates.length > 0) {
+            const isBacPro = eyDoc.category === "controle_bac_pro";
+            await appendAutoDocToZip(zip, eyDoc, {
+              pdfOptions: MASS_EXPORT_PDF_OPTIONS,
+              sourceStagiaires: stagSnap,
+              folderByDocument: isBacPro,
+              onItemDone: (current, total) => {
+                advanceProgress(total > 1 ? `${eyDoc.code} — ${current}/${total}` : `${eyDoc.code} — ${eyDoc.label}`);
+              },
+            });
+          } else {
+            advanceProgress(`${eyDoc.code} — aucun fichier à ajouter`);
+          }
+        }
+
+        reporter.setMessage("Compression du ZIP...");
+        return await zip.generateAsync(ZIP_EXPORT_OPTIONS);
+      },
+    });
+  }, [selectedDocs, docStates, safeName, exportStagiaires, appendAutoDocToZip, runJob]);
 
   // Preview a document
   const handlePreview = useCallback(async (eyDoc: EYDocumentItem) => {
