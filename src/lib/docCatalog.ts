@@ -530,6 +530,14 @@ export function buildFullCatalog(
     add("cfa_mission13_attestation_formation_ma", "CT3 - IND 10 📁 14 MISSIONS / Mission 13 – Attestation de formation du Maître d'Apprentissage", 3, 10, "attestation_formation_maitre_apprentissage_cfa", { folder: "14_MISSIONS_CFA/Mission_13_Formation_Maitre_Apprentissage" });
     // Mission 13bis — Accompagnement post-formation
     add("cfa_mission13bis_accompagnement_post_formation", "CT3 - IND 10 📁 14 MISSIONS / Mission 13 – Procédure d'accompagnement post-formation (interruption / sans diplôme)", 3, 10, "procedure_accompagnement_post_formation_cfa", { folder: "14_MISSIONS_CFA/Mission_13_Formation_Maitre_Apprentissage" });
+    // Mission 2 — Encourager la mixité au sein des métiers
+    add("cfa_mission2_plan_mixite_metiers", "CT3 - IND 10 📁 14 MISSIONS / Mission 2 – Plan d'actions Mixité dans les métiers préparés", 3, 10, "plan_mixite_metiers_cfa", { folder: "14_MISSIONS_CFA/Mission_2_Mixite_Metiers" });
+    // Mission 7 — Accompagnement éducatif, social et professionnel
+    add("cfa_mission7_accompagnement_educatif_social", "CT3 - IND 10 📁 14 MISSIONS / Mission 7 – Procédure accompagnement éducatif, social et professionnel", 3, 10, "procedure_accompagnement_educatif_social_cfa", { folder: "14_MISSIONS_CFA/Mission_7_Accompagnement_Educatif_Social" });
+    // Mission 12 — Accueil à tout moment de l'année
+    add("cfa_mission12_accueil_tout_moment", "CT3 - IND 10 📁 14 MISSIONS / Mission 12 – Procédure d'accueil à tout moment de l'année", 3, 10, "procedure_accueil_tout_moment_cfa", { folder: "14_MISSIONS_CFA/Mission_12_Accueil_Tout_Moment" });
+    // Mission 14 — Conseil de perfectionnement
+    add("cfa_mission14_conseil_perfectionnement", "CT3 - IND 10 📁 14 MISSIONS / Mission 14 – Compte-rendu Conseil de perfectionnement", 3, 10, "conseil_perfectionnement_cfa", { folder: "14_MISSIONS_CFA/Mission_14_Conseil_Perfectionnement" });
 
     // Documents CFA complémentaires (autres critères)
     add("cfa_c1i1_livret_accueil", "CT1 - IND 1 LIVRET D'ACCUEIL CFA", 1, 1, "livret_accueil_cfa");
