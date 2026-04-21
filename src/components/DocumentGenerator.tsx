@@ -1135,7 +1135,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
         <div className="space-y-2">
           {CRITERES_INFO.map((critere) => {
             const isExpanded = expandedCriteres.has(critere.numero);
-            const critereDocs = catalog.filter((doc) => doc.critere === critere.numero);
+            const critereDocs = catalog.filter((doc) => doc.critere === critere.numero && !doc.id.startsWith("cfa_siteweb_"));
             if (critereDocs.length === 0) return null;
             const critereGenerated = critereDocs.filter((doc) => generated.has(doc.id)).length;
 
