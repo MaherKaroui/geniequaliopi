@@ -522,65 +522,45 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
   };
 
   const handleDownloadAll = () => {
-    // Snapshot pour survie au démontage
-    const catalogSnap = catalog;
-    const orgSnap = mergedOrganisme;
-    const formSnap = selectedFormation;
-    const stagSnap = allStagiaires;
-    const formatSnap = exportFormat;
-    const generatedIdsCopy = new Set(generated);
-
     runJob({
       label: "Dossier Qualiopi complet (ZIP)",
-      fileName: buildGenericFileName("DOSSIER_QUALIOPI_COMPLET", orgSnap.nom, orgSnap.version, orgSnap.dateMaj, ".zip"),
-      run: (reporter) => runDownloadAllJob({
-        catalog: catalogSnap,
-        organisme: orgSnap,
-        formation: formSnap,
-        stagiaires: stagSnap,
-        exportFormat: formatSnap,
-        getDocBasePath,
-        generateContent,
-        getStaticFileUrl,
-        reporter,
-      }).then((blob) => {
-        // Marque les docs comme générés une fois le job terminé
-        catalogSnap.forEach((d) => generatedIdsCopy.add(d.id));
-        setGenerated(generatedIdsCopy);
-        return blob;
-      }),
+      fileName: buildGenericFileName("DOSSIER_QUALIOPI_COMPLET", mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, ".zip"),
+      autoDownload: true,
+      run: async (reporter) => {
+        return await buildFullDossierZip(reporter);
+      },
     });
   };
 
-  const handleDownloadAll_OLD = async () => {
-    setGenerating(true);
-    setGenerationProgressText("");
+  /** Construit le ZIP complet ; retourne le Blob (ne déclenche pas le saveAs). */
+  const buildFullDossierZip = async (reporter?: { setProgress: (n: number) => void; setMessage: (s: string) => void }): Promise<Blob> => {
     const failures: { name: string; reason: string }[] = [];
-    try {
-      const generatedIds = new Set(generated);
-      const totalFiles = 1 + catalog.reduce((count, doc) => {
-        const isPerStagiaire = PER_STAGIAIRE_TEMPLATES.has(doc.template);
-        const hasStagiaireIdx = doc.params?.stagiaireIdx !== undefined;
-        return count + (isPerStagiaire && !hasStagiaireIdx ? allStagiaires.length : 1);
-      }, 0);
+    const generatedIds = new Set(generated);
+    const totalFiles = 1 + catalog.reduce((count, doc) => {
+      const isPerStagiaire = PER_STAGIAIRE_TEMPLATES.has(doc.template);
+      const hasStagiaireIdx = doc.params?.stagiaireIdx !== undefined;
+      return count + (isPerStagiaire && !hasStagiaireIdx ? allStagiaires.length : 1);
+    }, 0);
 
-      const bulkPdfOptions = { scale: 1.35, imageQuality: 0.84, pageYieldMs: 8 };
-      const zip = new JSZip();
+    const bulkPdfOptions = { scale: 1.35, imageQuality: 0.84, pageYieldMs: 8 };
+    const zip = new JSZip();
 
-      const addFileToZip = (path: string, payload: Blob | ArrayBuffer | string) => {
-        zip.file(path, payload);
-      };
+    const addFileToZip = (path: string, payload: Blob | ArrayBuffer | string) => {
+      zip.file(path, payload);
+    };
 
-      let processedFiles = 0;
-      const updateProgress = async () => {
-        processedFiles += 1;
-        if (processedFiles % (exportFormat === "pdf" ? 1 : 4) === 0 || processedFiles === totalFiles) {
-          setGenerationProgressText(`${processedFiles}/${totalFiles}`);
-          await yieldToBrowser(exportFormat === "pdf" ? 24 : 0);
-        }
-      };
+    let processedFiles = 0;
+    const updateProgress = async () => {
+      processedFiles += 1;
+      const pct = totalFiles > 0 ? (processedFiles / totalFiles) * 95 : 0;
+      reporter?.setProgress(pct);
+      if (processedFiles % (exportFormat === "pdf" ? 1 : 4) === 0 || processedFiles === totalFiles) {
+        reporter?.setMessage(`${processedFiles}/${totalFiles}`);
+        await yieldToBrowser(exportFormat === "pdf" ? 24 : 0);
+      }
+    };
 
-      const safeRun = async (label: string, fn: () => Promise<void>) => {
+    const safeRun = async (label: string, fn: () => Promise<void>) => {
         try {
           await fn();
         } catch (err) {
