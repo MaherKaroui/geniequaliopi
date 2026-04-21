@@ -656,3 +656,208 @@ export function genProcedureAccompagnementPostFormationCFA(o: OrganismeInfo) {
     ],
   });
 }
+
+// ============================================================================
+// MISSION 2 (L6231-2) — Encourager la mixité au sein des métiers
+// ============================================================================
+export function genPlanMixiteMetiersCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[] = []) {
+  const annee = f.dateDebut ? new Date(f.dateDebut).getFullYear() : new Date().getFullYear();
+  const terminee = isFormationTerminee(f, stagiaires);
+  return buildDocument({
+    org: o,
+    title: `PLAN D'ACTIONS — ENCOURAGER LA MIXITÉ AU SEIN DES MÉTIERS PRÉPARÉS — ${annee}`,
+    sections: [
+      {
+        heading: "Cadre réglementaire (Mission 2 — Art. L6231-2)",
+        content: `<p>Le CFA <strong>${o.nom}</strong> a pour mission d'<strong>encourager la mixité</strong> au sein des métiers auxquels il prépare ses apprentis, en favorisant notamment la mixité entre les femmes et les hommes par des actions de sensibilisation à la lutte contre les stéréotypes sexués.</p>`,
+      },
+      {
+        heading: "Diagnostic de la mixité dans les métiers préparés",
+        content: tableHTML(
+          ["Métier / Diplôme préparé", "% Femmes (national)", "% Hommes (national)", "Niveau de mixité"],
+          [
+            [f.intitule || "Formation préparée", "32 %", "68 %", "Métier à dominante masculine"],
+            ["Métiers connexes du secteur", "28 %", "72 %", "Métier non-mixte"],
+          ]
+        ),
+      },
+      {
+        heading: "Actions de sensibilisation programmées",
+        content: tableHTML(
+          ["Action", "Public ciblé", "Période", "Statut"],
+          [
+            ["Atelier « Lutte contre les stéréotypes de genre »", "Tous les apprentis", `Septembre ${annee}`, terminee ? "Réalisé" : "Programmé"],
+            ["Témoignage de professionnel·le·s en métier non-mixte", "Apprentis 1ère année", `Novembre ${annee}`, terminee ? "Réalisé" : "Programmé"],
+            ["Participation à la Journée internationale des droits des femmes", "Tous les apprentis", `Mars ${annee + 1}`, terminee ? "Réalisé" : "À programmer"],
+            ["Forum « Métiers sans frontières de genre » (partenariat Mission Locale)", "Apprentis + candidats", `Avril ${annee + 1}`, terminee ? "Réalisé" : "À programmer"],
+            ["Communication non-sexiste dans les supports de recrutement", "Équipe pédagogique", "Permanent", "En cours"],
+          ]
+        ),
+      },
+      {
+        heading: "Engagement du CFA",
+        content: `<p>• Communication systématiquement épicène (« apprenti·e », « formateur·rice »)<br>• Visuels de promotion représentant la mixité<br>• Lutte contre toute forme de discrimination ou harcèlement (Cf. Plan diversité Mission 9)<br>• Référent égalité F/H désigné : <strong>${o.responsablePedagogique || o.dirigeant}</strong></p>`,
+        variant: "green",
+      },
+    ],
+  });
+}
+
+// ============================================================================
+// MISSION 7 (L6231-2) — Accompagnement éducatif, social et professionnel
+// ============================================================================
+export function genProcedureAccompagnementEducatifSocialCFA(o: OrganismeInfo) {
+  return buildDocument({
+    org: o,
+    title: "PROCÉDURE D'ACCOMPAGNEMENT ÉDUCATIF, SOCIAL ET PROFESSIONNEL DES APPRENTIS",
+    sections: [
+      {
+        heading: "Cadre (Mission 7 — Art. L6231-2)",
+        content: `<p>Le CFA <strong>${o.nom}</strong> assure un accompagnement <strong>éducatif, social et professionnel</strong> de ses apprentis, en lien avec les acteurs sociaux et médico-sociaux du territoire.</p>`,
+      },
+      {
+        heading: "Volet éducatif",
+        content: `<p>• Soutien méthodologique (organisation, prise de notes, révisions)<br>• Tutorat individualisé pour apprentis en difficulté<br>• Cellule d'écoute psychologique (référent + partenariat psychologue externe)<br>• Médiation en cas de conflit avec le maître d'apprentissage</p>`,
+      },
+      {
+        heading: "Volet social",
+        content: tableHTML(
+          ["Difficulté identifiée", "Partenaire mobilisé", "Aide possible"],
+          [
+            ["Logement", "Action Logement / CROUS / Mobili-Jeune", "Aide jusqu'à 100 €/mois (- 30 ans)"],
+            ["Restauration", "Carte étudiante des métiers", "Tarifs réduits restauration"],
+            ["Mobilité", "Région / Aide permis B (500 €)", "Aide au permis pour apprentis - 30 ans"],
+            ["Santé", "CPAM / PASS Santé Jeunes", "Couverture santé + accès aux soins"],
+            ["Précarité financière", "FSL / Mission Locale / CCAS", "Aides d'urgence ponctuelles"],
+            ["Handicap", "AGEFIPH / Référent handicap CFA", "Aménagements, aides techniques"],
+            ["Soutien psychologique", "Santé Psy Étudiant / 3114", "8 séances gratuites + écoute 24/7"],
+          ]
+        ),
+      },
+      {
+        heading: "Volet professionnel",
+        content: `<p>• Préparation à l'entretien d'embauche, ateliers CV/lettre<br>• Accompagnement à la recherche d'employeur (Cf. Mission 11)<br>• Suivi en entreprise (visites, entretiens tripartites)<br>• Aide à la définition du projet professionnel post-apprentissage</p>`,
+      },
+      {
+        heading: "Référents désignés",
+        content: `<p><strong>Référent pédagogique :</strong> ${o.responsablePedagogique || o.dirigeant}<br><strong>Référent handicap :</strong> ${(o as any).referentHandicap || o.responsablePedagogique || o.dirigeant}<br><strong>Email :</strong> ${o.email}${o.telephone ? `<br><strong>Téléphone :</strong> ${o.telephone}` : ""}</p>`,
+        variant: "green",
+      },
+    ],
+  });
+}
+
+// ============================================================================
+// MISSION 12 (L6231-2) — Accueil à tout moment de l'année
+// ============================================================================
+export function genProcedureAccueilToutMomentCFA(o: OrganismeInfo) {
+  return buildDocument({
+    org: o,
+    title: "PROCÉDURE D'ACCUEIL DES APPRENTIS À TOUT MOMENT DE L'ANNÉE",
+    sections: [
+      {
+        heading: "Cadre (Mission 12 — Art. L6231-2)",
+        content: `<p>Le CFA <strong>${o.nom}</strong> permet l'<strong>accueil des apprentis à tout moment de l'année</strong>, conformément à l'obligation légale d'entrée et sortie permanentes du dispositif d'apprentissage.</p>`,
+      },
+      {
+        heading: "Modalités d'entrée permanente",
+        content: `<p>• Inscription possible <strong>tout au long de l'année</strong>, sous réserve de la signature d'un contrat d'apprentissage avec un employeur<br>• Délai de positionnement : <strong>5 jours ouvrés</strong> entre la prise de contact et l'entretien de positionnement<br>• Démarrage effectif sous <strong>15 jours maximum</strong> après signature du contrat<br>• Période de mise à niveau possible si entrée en cours de cycle</p>`,
+      },
+      {
+        heading: "Étapes du processus d'accueil",
+        content: tableHTML(
+          ["Étape", "Délai", "Responsable", "Livrable"],
+          [
+            ["1. Premier contact (téléphone/email/web)", "J", "Pôle administratif", "Fiche prospect"],
+            ["2. Entretien de positionnement", "J+5 ouvrés", "Référent pédagogique", "Fiche d'analyse des besoins"],
+            ["3. Test de positionnement (pré-requis)", "J+5 ouvrés", "Formateur référent", "Grille de positionnement"],
+            ["4. Aide à la recherche d'employeur (si besoin)", "J+5 à J+90", "Pôle relations entreprises", "Tableau de suivi candidat"],
+            ["5. Signature du contrat d'apprentissage", "Variable", "Apprenti + Employeur + CFA", "CERFA 10103*14"],
+            ["6. Démarrage de la formation", "J+15 max", "Référent pédagogique", "Convention + Livret d'accueil"],
+            ["7. Parcours individualisé (positionnement)", "1ère semaine", "Équipe pédagogique", "Plan individuel de formation"],
+          ]
+        ),
+      },
+      {
+        heading: "Adaptation pédagogique pour entrée en cours de cycle",
+        content: `<p>• Évaluation des acquis antérieurs (diplômes, expérience, VAE partielle)<br>• Construction d'un parcours individualisé (allègements, modules complémentaires)<br>• Tutorat renforcé les 4 premières semaines<br>• Bilan de positionnement à 1 mois pour ajuster le parcours</p>`,
+      },
+      {
+        heading: "Communication sur l'entrée permanente",
+        content: `<p>L'information sur l'accueil à tout moment de l'année est diffusée :<br>• Sur le site internet du CFA<br>• Dans la plaquette de présentation<br>• Auprès des partenaires (Missions Locales, France Travail, CIO)<br>• Lors des forums et journées portes ouvertes</p>`,
+        variant: "green",
+      },
+    ],
+  });
+}
+
+// ============================================================================
+// MISSION 14 (L6231-3 / R6233-1) — Conseil de perfectionnement
+// ============================================================================
+export function genConseilPerfectionnementCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[] = []) {
+  const annee = f.dateDebut ? new Date(f.dateDebut).getFullYear() : new Date().getFullYear();
+  const terminee = isFormationTerminee(f, stagiaires);
+  const now = new Date();
+  return buildDocument({
+    org: o,
+    title: `COMPTE-RENDU DU CONSEIL DE PERFECTIONNEMENT — ANNÉE ${annee}`,
+    sections: [
+      {
+        heading: "Cadre réglementaire (Mission 14 — Art. L6231-3 et R6233-1)",
+        content: `<p>Le CFA <strong>${o.nom}</strong> a mis en place un <strong>Conseil de Perfectionnement</strong> conformément aux articles L6231-3 et R6233-1 du Code du Travail. Cette instance veille à l'organisation et au fonctionnement du CFA et se réunit au moins <strong>une fois par an</strong>.</p>`,
+      },
+      {
+        heading: "Composition du Conseil de Perfectionnement",
+        content: tableHTML(
+          ["Collège", "Membre", "Qualité"],
+          [
+            ["Direction CFA", o.dirigeant || "Direction", "Président du Conseil"],
+            ["Équipe pédagogique", o.responsablePedagogique || "Responsable pédagogique", "Membre permanent"],
+            ["Représentant formateurs", "Désigné par l'équipe", "Membre permanent"],
+            ["Représentant employeurs", "Maître d'apprentissage référent", "Membre permanent"],
+            ["Représentant apprentis", "Délégué élu par les apprentis", "Membre permanent"],
+            ["Représentant parents (si mineurs)", "Parent volontaire", "Membre invité"],
+            ["Représentant OPCO", "Conseiller OPCO de référence", "Membre invité"],
+            ["Représentant branche professionnelle", "Représentant syndical patronal/salarial", "Membre invité"],
+          ]
+        ),
+      },
+      {
+        heading: `Réunions tenues en ${annee}`,
+        content: tableHTML(
+          ["Date", "Type", "Principaux sujets traités", "Statut"],
+          [
+            [`15 janvier ${annee}`, "Réunion annuelle", "Bilan année N-1, programme pédagogique, indicateurs de performance, plan d'amélioration", (terminee || new Date(`${annee}-01-15`) < now) ? "Tenue" : "Programmée"],
+            [`12 juin ${annee}`, "Réunion intermédiaire", "Suivi insertion, ruptures de contrat, mobilité internationale, projets pédagogiques", (terminee || new Date(`${annee}-06-12`) < now) ? "Tenue" : "Programmée"],
+          ]
+        ),
+      },
+      {
+        heading: "Sujets délibérés (extraits)",
+        content: `<p>Conformément à l'article R6233-1, le Conseil est consulté sur :<br>• Le projet pédagogique du CFA<br>• Les conditions générales d'accueil, d'accompagnement (notamment Mission 7) et de promotion sociale et professionnelle des apprentis<br>• L'organisation et le déroulement des formations<br>• Les modalités des relations entre les entreprises accueillant les apprentis et le CFA<br>• Les projets de conventions à conclure avec les organismes extérieurs<br>• Les informations sur le statut de l'apprenti et l'évolution des techniques et qualifications professionnelles</p>`,
+      },
+      {
+        heading: "Décisions et plan d'amélioration",
+        content: tableHTML(
+          ["Action décidée", "Pilote", "Échéance", "Statut"],
+          [
+            ["Renforcer le suivi en entreprise (visites trimestrielles)", o.responsablePedagogique || "Resp. pédagogique", `Septembre ${annee}`, "En cours"],
+            ["Étendre le partenariat Erasmus+ à 2 nouveaux pays", "Référent mobilité", `Décembre ${annee}`, "En cours"],
+            ["Mettre à jour les supports pédagogiques (réglementaire)", "Équipe formateurs", `Juin ${annee}`, "Réalisé"],
+            ["Améliorer la communication sur les aides sociales (Mission 7)", "Pôle administratif", `Mars ${annee}`, "Réalisé"],
+          ]
+        ),
+      },
+      {
+        heading: "Diffusion du compte-rendu",
+        content: `<p>Le présent compte-rendu est :<br>• Communiqué à l'ensemble des membres du Conseil<br>• Affiché au CFA pour information des apprentis<br>• Transmis à l'OPCO et tenu à disposition de France Compétences<br>• Archivé pendant 5 ans minimum</p>`,
+        variant: "green",
+      },
+      {
+        heading: "Signataire",
+        content: `<p><strong>${o.dirigeant || "Direction"}</strong><br>Président du Conseil de Perfectionnement<br>${o.nom}<br>Fait à ${o.ville || ""}, le ${formatDate(o.dateMaj || new Date().toISOString().slice(0, 10))}</p>`,
+      },
+    ],
+  });
+}
+
