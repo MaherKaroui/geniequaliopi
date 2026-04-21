@@ -11351,6 +11351,40 @@ function genCalendrierFormationOPCO(o: OrganismeInfo, f: FormationInfo, stagiair
     return out;
   };
 
+  // Construit la liste des jours ouvrés du début à la fin (alternance complète)
+  const buildAllWorkdays = (startStr: string, endStr: string): Date[] => {
+    const out: Date[] = [];
+    const cur = parseD(startStr);
+    const end = parseD(endStr);
+    if (!cur || !end) return out;
+    while (cur <= end) {
+      const dow = cur.getDay();
+      if (dow !== 0 && dow !== 6) out.push(new Date(cur));
+      cur.setDate(cur.getDate() + 1);
+    }
+    return out;
+  };
+
+  // Calcule l'index de semaine (0 = première semaine de la formation) — semaine du lundi
+  const startOfWeek = (d: Date): Date => {
+    const r = new Date(d);
+    const dow = r.getDay();
+    const diff = dow === 0 ? -6 : 1 - dow; // recule au lundi
+    r.setDate(r.getDate() + diff);
+    r.setHours(0, 0, 0, 0);
+    return r;
+  };
+  const weekIndex = (d: Date, ref: Date): number => {
+    const a = startOfWeek(d).getTime();
+    const b = startOfWeek(ref).getTime();
+    return Math.round((a - b) / (7 * 24 * 3600 * 1000));
+  };
+  // Type de semaine : on commence TOUJOURS par école
+  const isEcoleWeek = (wIdx: number): boolean => {
+    const pos = ((wIdx % cycleWeeks) + cycleWeeks) % cycleWeeks;
+    return pos < rythme.ecole;
+  };
+
   const fmtJour = (d: Date) => {
     const jours = ["dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"];
     return jours[d.getDay()];
