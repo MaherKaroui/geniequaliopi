@@ -11379,9 +11379,24 @@ function genCalendrierFormationOPCO(o: OrganismeInfo, f: FormationInfo, stagiair
     const b = startOfWeek(ref).getTime();
     return Math.round((a - b) / (7 * 24 * 3600 * 1000));
   };
-  // Type de semaine : on commence TOUJOURS par école
-  const isEcoleWeek = (wIdx: number): boolean => {
-    const pos = ((wIdx % cycleWeeks) + cycleWeeks) % cycleWeeks;
+  // Type de semaine : on commence TOUJOURS par école.
+  // Si la 1ʳᵉ semaine est partielle (<3 jours ouvrés), on la considère comme école
+  // ET on prolonge l'école sur la semaine suivante pour garantir une vraie semaine pleine.
+  const computeWeekShift = (startStr: string): number => {
+    const d = parseD(startStr);
+    if (!d) return 0;
+    const dow = d.getDay(); // 1=lundi ... 5=vendredi
+    // jours ouvrés restants dans la 1ʳᵉ semaine (lundi→vendredi)
+    const remaining = dow === 0 ? 0 : Math.max(0, 6 - Math.max(dow, 1));
+    // si <3 jours école dans cette semaine partielle, on décale d'1 semaine le cycle
+    // → la semaine suivante reste école (2 sem école d'affilée pour compenser)
+    return remaining < 3 ? 1 : 0;
+  };
+  const isEcoleWeek = (wIdx: number, shift = 0): boolean => {
+    const adjusted = wIdx - shift;
+    // Avant le décalage : forcément école (semaine partielle de démarrage)
+    if (adjusted < 0) return true;
+    const pos = ((adjusted % cycleWeeks) + cycleWeeks) % cycleWeeks;
     return pos < rythme.ecole;
   };
 
