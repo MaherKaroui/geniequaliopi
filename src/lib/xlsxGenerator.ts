@@ -698,22 +698,23 @@ export function generateExcelCalendrierOPCO(
   let synthHtml = tableRow(["Champ", "Valeur"], true);
   synthHtml += tableRow(["Intitulé de la formation", f.intitule]);
   synthHtml += tableRow(["Organisme", `${o.nom}${o.nda ? ` – NDA ${o.nda}` : ""}`]);
-  synthHtml += tableRow(["Modalité", isDistance ? "Distanciel synchrone (classe virtuelle)" : "Présentiel"]);
+  synthHtml += tableRow(["Modalité", `${isDistance ? "Distanciel synchrone (classe virtuelle)" : "Présentiel"} — Apprentissage en alternance`]);
   synthHtml += tableRow(["Lieu de déroulement", lieu]);
-  synthHtml += tableRow(["Durée", `${dureeH} heures`]);
-  synthHtml += tableRow(["Horaires types", `Matin : ${horairesMatin} | Après-midi : ${horairesAprem}`]);
+  synthHtml += tableRow(["Durée centre", `${dureeH} heures (7 h/jour)`]);
+  synthHtml += tableRow(["Rythme d'alternance", `${rythmeLabel} — démarrage en semaine école`]);
+  synthHtml += tableRow(["Horaires (jours école)", `Matin : ${horairesMatin} | Après-midi : ${horairesAprem} — 7 h/jour`]);
   synthHtml += tableRow(["Formateur", f.formateur || "—"]);
   synthHtml += tableRow(["Nombre de sessions", String(groupes.size)]);
   synthHtml += tableRow(["Nombre d'apprenants", String(stagiaires.length)]);
 
   // ── Onglet 2 : Toutes sessions consolidées (filtrable) ──
   let consolHtml = tableRow(
-    ["Session", "Apprenants", "N° jour", "Date", "Jour de la semaine", "Horaires matin", "Horaires après-midi", "Volume (h)", "Lieu", "Formateur"],
+    ["Session", "Apprenants", "N°", "Sem.", "Type", "Date", "Date (ISO)", "Jour", "Horaires matin", "Horaires après-midi", "Volume (h)", "Lieu", "Formateur"],
     true,
   );
   const sheets: { name: string; html: string }[] = [
     { name: "Synthèse", html: synthHtml },
-    { name: "Toutes sessions", html: "" }, // rempli après
+    { name: "Toutes sessions", html: "" },
   ];
 
   let sessionIdx = 0;
@@ -723,8 +724,11 @@ export function generateExcelCalendrierOPCO(
     const apprenants = grp.stagiaires.length
       ? grp.stagiaires.map((s) => `${s.prenom} ${s.nom}`).join(", ")
       : "—";
-    const days = buildDays(grp.debut, grp.nbDays);
-    const hPerDay = (Math.round((dureeH / grp.nbDays) * 10) / 10).toString();
+    const allDays = buildAllWorkdays(grp.debut, grp.fin);
+    const refDate = parseD(grp.debut);
+    const ecoleDays = refDate ? allDays.filter((d) => isEcoleWeek(weekIndex(d, refDate))) : [];
+    const nbEcoleDays = ecoleDays.length;
+    const volumeEcole = nbEcoleDays * 7;
 
     // Onglet par session
     let sheetHtml = tableRow(["Champ", "Valeur"], true);
