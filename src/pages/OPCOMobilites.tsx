@@ -288,6 +288,24 @@ export default function OPCOMobilites() {
     return null;
   };
 
+  /** Génère la trame VIERGE pour B9 (calendrier) ou C11 (temps de connexion). Retourne null si non applicable. */
+  const generateViergeBlobForSession = async (
+    docCode: string,
+    sessionStagiaires: StagiaireInfo[]
+  ): Promise<Blob | null> => {
+    const template =
+      docCode === "B9" ? "calendrier_formation_opco_vierge" :
+      docCode === "C11" ? "temps_connexion_opco_vierge" : null;
+    if (!template) return null;
+    try {
+      const html = generateDocumentById(`opco_${docCode}_vierge`, template, { fi: 0, forceFilled: true }, mergedOrganisme, formation, sessionStagiaires);
+      if (html) return await htmlToPdfBlob(html);
+    } catch (e) {
+      console.warn(`Trame vierge ${template} failed for ${docCode}:`, e);
+    }
+    return null;
+  };
+
   /** Pour C6 : libellés courts par sous-template (positionnement début/fin, exercice intermédiaire, évaluation finale) */
   const TEMPLATE_LABELS: Record<string, string> = {
     ai_test_positionnement_debut: "QCM_Positionnement_Debut",
