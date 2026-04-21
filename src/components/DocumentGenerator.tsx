@@ -17,6 +17,7 @@ import { downloadAsWord, htmlToWordBlob } from "@/lib/wordExport";
 import { generateExcelTableauBordPerformance, generateExcelTableauSuiviParcours, generateExcelIndicateursPrevisionnelsVAE, excelToBlob } from "@/lib/xlsxGenerator";
 import { downloadAsPdf, htmlToPdfBlob } from "@/lib/pdfExport";
 import { processDocxTemplate, processMailDocxTemplate, DOCX_TEMPLATE_FILES, MAIL_TEMPLATE_FILES } from "@/lib/docxTemplateExport";
+import { genCerfaApprentissagePdf } from "@/lib/cerfaApprentissage";
 import { auditImportedFolder, ImportAuditResult } from "@/lib/importInspector";
 import {
   buildDocumentFileName,
@@ -203,6 +204,27 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
     // Clean up previous blob URL
     if (previewBlobUrl) { URL.revokeObjectURL(previewBlobUrl); setPreviewBlobUrl(null); }
 
+    // CERFA Apprentissage rempli → PDF dans iframe
+    if (doc.template === "cerfa_apprentissage" && typeof doc.params?.stagiaireIdx === "number") {
+      const s = allStagiaires[doc.params.stagiaireIdx];
+      if (s) {
+        try {
+          const blob = await genCerfaApprentissagePdf(mergedOrganisme, selectedFormation, s);
+          const url = URL.createObjectURL(blob);
+          setPreviewContent(null);
+          setPreviewBlobUrl(url);
+          setPreviewTitle(docTitle(doc.nom, s));
+          setCurrentDocId(doc.id);
+          setEditing(false);
+          setGenerated((prev) => new Set(prev).add(doc.id));
+        } catch (e) {
+          console.error(e);
+          toast.error("Erreur lors de la génération du CERFA");
+        }
+      }
+      return;
+    }
+
     // Static PDF → embed in iframe
     if (doc.template === "pdf_static" && getStaticFileUrl(doc)) {
       const pdfUrl = getStaticFileUrl(doc)!;
@@ -287,6 +309,16 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
   };
 
   const handleDownload = async (doc: DocEntry) => {
+    // CERFA Apprentissage rempli (PDF par stagiaire)
+    if (doc.template === "cerfa_apprentissage" && typeof doc.params?.stagiaireIdx === "number") {
+      const s = allStagiaires[doc.params.stagiaireIdx];
+      if (s) {
+        const blob = await genCerfaApprentissagePdf(mergedOrganisme, selectedFormation, s);
+        saveAs(blob, buildCatalogFileName(doc, s, ".pdf"));
+      }
+      return;
+    }
+
     if (doc.template === "pdf_static" && getStaticFileUrl(doc)) {
       const resp = await fetch(getStaticFileUrl(doc)!);
       const blob = await resp.blob();

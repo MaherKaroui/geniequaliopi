@@ -438,6 +438,10 @@ export function buildFullCatalog(
     stagiaires.forEach((s, si) => {
       add(`cfa_c3i9_convention_${si}`, `CT3 - IND 9 CONVENTION DE FORMATION PAR APPRENTISSAGE – ${s.prenom} ${s.nom}`, 3, 9, "convention_formation_apprentissage", { stagiaireIdx: si });
     });
+    // CERFA 10103*14 — Contrat d'apprentissage rempli (un par stagiaire)
+    stagiaires.forEach((s, si) => {
+      add(`cfa_c3i9_cerfa_${si}`, `CT3 - IND 9 CERFA 10103*14 CONTRAT D'APPRENTISSAGE – ${s.prenom} ${s.nom}`, 3, 9, "cerfa_apprentissage", { stagiaireIdx: si });
+    });
     // Guide connexion uniquement si distanciel
     formations.forEach((f) => {
       const moda = (f.modalites || '').toLowerCase();
