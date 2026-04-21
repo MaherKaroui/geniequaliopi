@@ -11979,6 +11979,8 @@ function genExercicesOPCO(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
 
   const evalData = getEvalContent(f.intitule);
   const baseExercices = evalData.exercices || [];
+  // Pool de questions QCM cohérentes avec la formation (positionnement + final fusionnés)
+  const qcmPool = [...(evalData.qcmPositionnement || []), ...(evalData.qcmFinal || [])];
 
   // PRIORITÉ aux dates individuelles : groupement par couple (debut, fin)
   type Sess = { debut: string; fin: string; stagiaires: StagiaireInfo[] };
