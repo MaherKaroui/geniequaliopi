@@ -568,6 +568,13 @@ export default function OPCOMobilites() {
               const suffix = formatSessionSuffix(g, i);
               const blob = await generateAutoBlobForSession(doc, g.stagiaires);
               if (blob) zip.file(`${subFolder}/${buildOpcoFileName(namingCtx, doc.label, "pdf", suffix)}`, blob);
+              // Trames vierges pour B9 et C11 : 1 trame par session
+              if (doc.code === "B9" || doc.code === "C11") {
+                const viergeBlob = await generateViergeBlobForSession(doc.code, g.stagiaires);
+                if (viergeBlob) {
+                  zip.file(`${subFolder}/${buildOpcoFileName(namingCtx, `${doc.label} (Trame vierge)`, "pdf", suffix)}`, viergeBlob);
+                }
+              }
               await new Promise((r) => setTimeout(r, 50));
             }
             // B9 : on ajoute aussi le calendrier Excel multi-onglets (consolidé toutes sessions)
