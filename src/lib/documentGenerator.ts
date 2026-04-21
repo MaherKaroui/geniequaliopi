@@ -11434,6 +11434,19 @@ function genCalendrierFormationOPCO(o: OrganismeInfo, f: FormationInfo, stagiair
   const horairesAprem = "13h30 – 17h00";
   const rythmeLabel = `${rythme.ecole} semaine${rythme.ecole > 1 ? "s" : ""} école / ${rythme.entreprise} semaine${rythme.entreprise > 1 ? "s" : ""} entreprise`;
 
+  // Date d'envoi du calendrier = début de session - 7 jours ouvrés (hors WE + jours fériés FR)
+  // Priorité aux dates individuelles stagiaire (déjà appliquée via groupes par couple debut/fin)
+  const toISO = (s: string): string => {
+    const d = parseD(s);
+    if (!d) return "";
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  };
+  const computeEnvoiDate = (debutStr: string): string => {
+    const iso = toISO(debutStr);
+    if (!iso) return "";
+    return subtractBusinessDays(iso, 7);
+  };
+
   let extra = `<p><em>Calendrier précisant les dates exactes, les horaires et le lieu de déroulement de la formation pour l'ensemble des dossiers ayant fait l'objet d'une demande de financement.</em></p>`;
   extra += `<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%;margin-bottom:18px">
     <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold;width:30%">Intitulé de la formation</td><td>${f.intitule}</td></tr>
