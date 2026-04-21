@@ -542,7 +542,8 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
         const isPerStagiaire = PER_STAGIAIRE_TEMPLATES.has(doc.template);
         const hasStagiaireIdx = doc.params?.stagiaireIdx !== undefined;
         const isMail = doc.critere === 0 && !!MAIL_TEMPLATE_FILES[doc.template];
-        const basePath = isMail ? "MAILS" : shortCriterePath(doc.critere, doc.indicateur);
+        const isSiteWeb = doc.id.startsWith("cfa_siteweb_");
+        const basePath = isSiteWeb ? "Documents site web" : (isMail ? "MAILS" : shortCriterePath(doc.critere, doc.indicateur));
 
         if (MAIL_TEMPLATE_FILES[doc.template] && typeof doc.params?.stagiaireIdx === "number") {
           const s = allStagiaires[doc.params.stagiaireIdx];
@@ -721,7 +722,8 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
       for (const doc of critereDocs) {
         const isPerStagiaire = PER_STAGIAIRE_TEMPLATES.has(doc.template);
         const hasStagiaireIdx = doc.params?.stagiaireIdx !== undefined;
-        const basePath = shortCriterePath(doc.critere, doc.indicateur);
+        const isSiteWeb = doc.id.startsWith("cfa_siteweb_");
+        const basePath = isSiteWeb ? "Documents site web" : shortCriterePath(doc.critere, doc.indicateur);
 
         if (MAIL_TEMPLATE_FILES[doc.template] && typeof doc.params?.stagiaireIdx === "number") {
           const s = allStagiaires[doc.params.stagiaireIdx];
@@ -848,7 +850,8 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
       for (const doc of indDocs) {
         const isPerStagiaire = PER_STAGIAIRE_TEMPLATES.has(doc.template);
         const hasStagiaireIdx = doc.params?.stagiaireIdx !== undefined;
-        const basePath = shortCriterePath(doc.critere, doc.indicateur);
+        const isSiteWeb = doc.id.startsWith("cfa_siteweb_");
+        const basePath = isSiteWeb ? "Documents site web" : shortCriterePath(doc.critere, doc.indicateur);
 
         if (MAIL_TEMPLATE_FILES[doc.template] && typeof doc.params?.stagiaireIdx === "number") {
           const s = allStagiaires[doc.params.stagiaireIdx];
