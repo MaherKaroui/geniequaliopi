@@ -11348,19 +11348,21 @@ function genCalendrierFormationOPCO(o: OrganismeInfo, f: FormationInfo, stagiair
     return `${d.getDate()} ${mois[d.getMonth()]} ${d.getFullYear()}`;
   };
 
-  // Si stagiaires ont des dates individuelles différentes, on les liste séparément
-  const groupes = new Map<string, { debut: string; fin: string; nbH: number; stagiaires: string[] }>();
+  // PRIORITÉ aux dates individuelles : on regroupe par couple (debut, fin) — ceux qui ont les mêmes dates partagent une session
+  type Sess = { debut: string; fin: string; nbH: number; nbDays: number; stagiaires: string[] };
+  const groupes = new Map<string, Sess>();
   stagiaires.forEach((s) => {
     const deb = s.dateDebutFormation || f.dateDebut || "";
     const fin = s.dateFinFormation || f.dateFin || "";
     const key = `${deb}__${fin}`;
     if (!groupes.has(key)) {
-      groupes.set(key, { debut: deb, fin: fin, nbH: dureeH, stagiaires: [] });
+      const nbDays = workdaysBetween(deb, fin);
+      groupes.set(key, { debut: deb, fin, nbH: dureeH, nbDays, stagiaires: [] });
     }
     groupes.get(key)!.stagiaires.push(`${s.prenom} ${s.nom}`);
   });
   if (groupes.size === 0) {
-    groupes.set("__default__", { debut: f.dateDebut, fin: f.dateFin, nbH: dureeH, stagiaires: ["—"] });
+    groupes.set("__default__", { debut: f.dateDebut, fin: f.dateFin, nbH: dureeH, nbDays: defaultTotalDays, stagiaires: ["—"] });
   }
 
   const horairesMatin = "09h00 – 12h30";
@@ -11372,24 +11374,26 @@ function genCalendrierFormationOPCO(o: OrganismeInfo, f: FormationInfo, stagiair
     <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Organisme</td><td>${o.nom}${o.nda ? ` – NDA ${o.nda}` : ""}</td></tr>
     <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Modalité</td><td>${isDistance ? "Distanciel synchrone (classe virtuelle)" : "Présentiel"}</td></tr>
     <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Lieu de déroulement</td><td>${lieu}</td></tr>
-    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Durée totale</td><td>${dureeH} heures réparties sur ${totalDays} journée${totalDays > 1 ? "s" : ""}</td></tr>
+    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Durée</td><td>${dureeH} heures</td></tr>
     <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Horaires types</td><td>Matin : ${horairesMatin} &nbsp;|&nbsp; Après-midi : ${horairesAprem} (pause déjeuner 12h30 – 13h30)</td></tr>
     <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Formateur</td><td>${f.formateur || "—"}</td></tr>
+    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Nombre de sessions</td><td>${groupes.size}</td></tr>
+    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Nombre d'apprenants</td><td>${stagiaires.length}</td></tr>
   </table>`;
 
   let groupIdx = 0;
   for (const [, g] of groupes) {
     groupIdx++;
-    const days = buildDays(g.debut, totalDays);
+    const days = buildDays(g.debut, g.nbDays);
     const titreGroupe = groupes.size > 1
       ? `Session ${groupIdx} — ${g.stagiaires.join(", ")}`
-      : `Sessions programmées`;
-    extra += `<h3 style="margin-top:18px">${titreGroupe}</h3>`;
-    extra += `<p><strong>Période :</strong> du ${formatDate(g.debut)} au ${formatDate(g.fin)} &nbsp;|&nbsp; <strong>Volume :</strong> ${g.nbH} h</p>`;
+      : `Session — ${g.stagiaires.join(", ")}`;
+    extra += `<h3 style="margin-top:18px;page-break-after:avoid">${titreGroupe}</h3>`;
+    extra += `<p><strong>Période :</strong> du ${formatDate(g.debut)} au ${formatDate(g.fin)} &nbsp;|&nbsp; <strong>Volume :</strong> ${g.nbH} h sur ${g.nbDays} jour${g.nbDays > 1 ? "s" : ""}</p>`;
     extra += `<table border="1" cellpadding="5" cellspacing="0" style="border-collapse:collapse;width:100%">
       <thead><tr style="background:#1e3a7b;color:#fff">
         <th style="width:6%">Jour</th>
-        <th style="width:14%">Date</th>
+        <th style="width:18%">Date</th>
         <th style="width:13%">Jour de la semaine</th>
         <th style="width:14%">Horaires matin</th>
         <th style="width:14%">Horaires après-midi</th>
@@ -11397,8 +11401,9 @@ function genCalendrierFormationOPCO(o: OrganismeInfo, f: FormationInfo, stagiair
         <th>Lieu</th>
       </tr></thead><tbody>`;
     if (days.length === 0) {
-      extra += `<tr><td colspan="7" style="text-align:center;color:#888">Dates à renseigner dans la fiche formation.</td></tr>`;
+      extra += `<tr><td colspan="7" style="text-align:center;color:#888">Dates à renseigner dans la fiche stagiaire.</td></tr>`;
     } else {
+      const hPerDay = Math.round((g.nbH / g.nbDays) * 10) / 10;
       days.forEach((d, i) => {
         extra += `<tr>
           <td style="text-align:center">J${i + 1}</td>
@@ -11406,7 +11411,7 @@ function genCalendrierFormationOPCO(o: OrganismeInfo, f: FormationInfo, stagiair
           <td style="text-transform:capitalize">${fmtJour(d)}</td>
           <td style="text-align:center">${horairesMatin}</td>
           <td style="text-align:center">${horairesAprem}</td>
-          <td style="text-align:center">7 h</td>
+          <td style="text-align:center">${hPerDay} h</td>
           <td>${lieu}</td>
         </tr>`;
       });
