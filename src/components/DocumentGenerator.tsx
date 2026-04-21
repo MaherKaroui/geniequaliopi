@@ -586,9 +586,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
       for (const doc of catalog) {
         const isPerStagiaire = PER_STAGIAIRE_TEMPLATES.has(doc.template);
         const hasStagiaireIdx = doc.params?.stagiaireIdx !== undefined;
-        const isMail = doc.critere === 0 && !!MAIL_TEMPLATE_FILES[doc.template];
-        const isSiteWeb = doc.id.startsWith("cfa_siteweb_");
-        const basePath = isSiteWeb ? "Documents site web" : (isMail ? "MAILS" : shortCriterePath(doc.critere, doc.indicateur));
+        const basePath = getDocBasePath(doc);
 
         if (MAIL_TEMPLATE_FILES[doc.template] && typeof doc.params?.stagiaireIdx === "number") {
           const s = allStagiaires[doc.params.stagiaireIdx];
