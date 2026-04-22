@@ -1706,7 +1706,127 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
   const lower = f.intitule.toLowerCase();
   const isFLEOrCertif = lower.includes("français") || lower.includes("fle") || lower.includes("médico-social") || lower.includes("communiquer");
   const isIACertif = lower.includes("ia générative") || lower.includes("intelligence artificielle");
+  const isNTCProg = lower.includes("négociateur") || lower.includes("technico-commercial") || lower.includes("technico commercial") || (f.codeRNCP || "").toUpperCase().includes("39063");
   const isBlocFormation = isFLEOrCertif || isIACertif;
+
+  // NTC : blocs de compétences détaillés en articles (référentiel REAC RNCP 39063)
+  const ntcBlocsHtml = isNTCProg ? `
+    <h2>Blocs de compétences – Détail par articles (Référentiel REAC RNCP 39063)</h2>
+    <div class="section">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:30%">BLOCS DE COMPÉTENCES</th>
+            <th>CONTENUS DE LA FORMATION</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td rowspan="4"><strong>BLOC 1</strong><br>Élaborer une stratégie de prospection et la mettre en œuvre</td>
+            <td>
+              <p><strong>Article 1. Assurer une veille commerciale :</strong></p>
+              <ul>
+                <li>Analyse du marché, tendances, concurrence, offres, innovations.</li>
+                <li>Suivi des réglementations, appels d'offres, évolutions technologiques.</li>
+                <li>Utilisation des outils numériques, CRM, IA et bases de données sectorielles.</li>
+                <li>Synthèse et diffusion des informations stratégiques en interne.</li>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <p><strong>Article 2. Concevoir et organiser un plan d'actions commerciales :</strong></p>
+              <ul>
+                <li>Définition des objectifs SMART et des indicateurs de pilotage (KPI).</li>
+                <li>Segmentation du portefeuille, ciblage et construction de personas.</li>
+                <li>Choix des canaux (téléphone, e-mailing, réseaux sociaux, terrain).</li>
+                <li>Planification, budgétisation et coordination des actions.</li>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <p><strong>Article 3. Mettre en œuvre un plan de prospection :</strong></p>
+              <ul>
+                <li>Prospection téléphonique (méthode CROC) et prise de rendez-vous.</li>
+                <li>Prospection digitale : e-mailing, social selling (LinkedIn), inbound marketing.</li>
+                <li>Prospection terrain et participation à des salons professionnels.</li>
+                <li>Respect du RGPD et des règles de sobriété numérique.</li>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <p><strong>Article 4. Analyser ses performances et mettre en œuvre des actions correctives :</strong></p>
+              <ul>
+                <li>Suivi du tableau de bord commercial et calcul des écarts.</li>
+                <li>Analyse des taux de transformation et de la rentabilité des actions.</li>
+                <li>Reporting auprès de la hiérarchie et propositions d'ajustement.</li>
+                <li>Mise à jour du CRM et capitalisation des bonnes pratiques.</li>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <td rowspan="5"><strong>BLOC 2</strong><br>Négocier une solution technique et commerciale et consolider l'expérience client</td>
+            <td>
+              <p><strong>Article 5. Représenter l'entreprise et valoriser son image :</strong></p>
+              <ul>
+                <li>Maîtrise de la communication professionnelle (écrite, orale, digitale).</li>
+                <li>Présentation de l'entreprise, des produits, des valeurs et engagements RSE.</li>
+                <li>Gestion de l'e-réputation et présence sur les réseaux professionnels (LinkedIn).</li>
+                <li>Posture commerciale, écoute active et conseil expert.</li>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <p><strong>Article 6. Concevoir une proposition technique et commerciale :</strong></p>
+              <ul>
+                <li>Analyse du besoin client (technique, fonctionnel, budgétaire).</li>
+                <li>Élaboration d'une offre sur mesure (devis, solution technique, configuration).</li>
+                <li>Étude de faisabilité, rentabilité et contraintes technico-commerciales.</li>
+                <li>Intégration des enjeux de durabilité écologique dans l'offre.</li>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <p><strong>Article 7. Négocier une solution technique et commerciale :</strong></p>
+              <ul>
+                <li>Conduite d'entretien de vente en présentiel et à distance (visioconférence).</li>
+                <li>Argumentation CAP/SONCAS, traitement des objections et reformulation.</li>
+                <li>Techniques de closing et finalisation du contrat.</li>
+                <li>Adaptation du discours aux interlocuteurs (acheteur, prescripteur, décideur).</li>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <p><strong>Article 8. Réaliser le bilan de son activité et rendre compte :</strong></p>
+              <ul>
+                <li>Retour sur les rendez-vous et analyse de la relation client.</li>
+                <li>Mise à jour du CRM et suivi des actions engagées.</li>
+                <li>Calcul de la marge, de la rentabilité et des prévisions commerciales.</li>
+                <li>Reporting régulier et réajustement du plan commercial.</li>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <p><strong>Article 9. Optimiser la gestion de la relation client :</strong></p>
+              <ul>
+                <li>Suivi post-vente, fidélisation et stratégie long terme.</li>
+                <li>Résolution des problèmes clients et communication proactive.</li>
+                <li>Mise en œuvre d'actions de satisfaction, rétention, upsell et cross-sell.</li>
+                <li>Coordination avec les équipes internes (technique, support, SAV).</li>
+              </ul>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p style="margin-top:10px;font-style:italic">Contenus conformes au Référentiel d'Activités, de Compétences et d'Évaluation (REAC) du Titre Professionnel Négociateur Technico-Commercial – RNCP 39063, certifié par le Ministère du Travail, du Plein Emploi et de l'Insertion.</p>
+    </div>
+  ` : "";
 
   // For bloc-based formations, override duration display
   const displayDuree = isBlocFormation ? "À définir selon le groupe" : heuresTotal;
@@ -1859,6 +1979,8 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
       ${evalHtml}
       <p style="margin-top:10px"><em>Une attestation de fin de formation et un certificat de réalisation seront remis à chaque stagiaire ayant suivi l'intégralité de la formation.</em></p>
     </div>
+
+    ${ntcBlocsHtml}
 
     <h2>13. Accessibilité aux personnes en situation de handicap</h2>
     <div class="section section-green">
