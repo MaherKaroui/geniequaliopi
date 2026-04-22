@@ -501,26 +501,40 @@ export default function OPCOMobilites() {
         }
         if (isPerSession) {
           const zip = new JSZip();
-          const totalUnits = sessionsSnap.reduce((acc, g) => acc + g.stagiaires.length + (doc.code !== "C12" ? 1 : 0), 0) || 1;
+          // C12 : 1 PDF par session (l'exercice est partagé). Autres : 1 PDF par stagiaire + 1 trame vierge par session.
+          const isC12 = doc.code === "C12";
+          const totalUnits = sessionsSnap.reduce(
+            (acc, g) => acc + (isC12 ? 1 : g.stagiaires.length + 1),
+            0,
+          ) || 1;
           let processedUnits = 0;
           for (let i = 0; i < sessionsSnap.length; i++) {
             const g = sessionsSnap[i];
             const suffix = formatSessionSuffix(g, i);
             const folder = zip.folder(suffix)!;
 
-            for (const s of g.stagiaires) {
-              reporter.setMessage(`${doc.code} — Session ${i + 1}/${sessionsSnap.length} : ${s.prenom} ${s.nom}`);
-              const blob = await generateAutoBlobForSession(doc, [s]);
+            if (isC12) {
+              reporter.setMessage(`${doc.code} — Session ${i + 1}/${sessionsSnap.length}`);
+              const blob = await generateAutoBlobForSession(doc, g.stagiaires);
               if (blob) {
-                const stagSuffix = `${s.prenom || ""}_${s.nom || ""}`.trim() || "Stagiaire";
-                folder.file(buildOpcoFileName(ctxSnap, doc.label, "pdf", stagSuffix), blob);
+                folder.file(buildOpcoFileName(ctxSnap, doc.label, "pdf", suffix), blob);
               }
               processedUnits++;
               reporter.setProgress((processedUnits / totalUnits) * 90);
               await new Promise((r) => setTimeout(r, 0));
-            }
+            } else {
+              for (const s of g.stagiaires) {
+                reporter.setMessage(`${doc.code} — Session ${i + 1}/${sessionsSnap.length} : ${s.prenom} ${s.nom}`);
+                const blob = await generateAutoBlobForSession(doc, [s]);
+                if (blob) {
+                  const stagSuffix = `${s.prenom || ""}_${s.nom || ""}`.trim() || "Stagiaire";
+                  folder.file(buildOpcoFileName(ctxSnap, doc.label, "pdf", stagSuffix), blob);
+                }
+                processedUnits++;
+                reporter.setProgress((processedUnits / totalUnits) * 90);
+                await new Promise((r) => setTimeout(r, 0));
+              }
 
-            if (doc.code !== "C12") {
               reporter.setMessage(`${doc.code} — Trame vierge session ${i + 1}/${sessionsSnap.length}`);
               const viergeBlob = await generateViergeBlobForSession(doc.code, g.stagiaires);
               if (viergeBlob) {
@@ -611,21 +625,28 @@ export default function OPCOMobilites() {
               }
             } else if (PER_SESSION_DOCS.has(doc.code) && stagiairesSnap.length > 0) {
               const subFolder = `${folder}/${doc.code}_${doc.label.replace(/\s+/g, "_")}`;
+              const isC12 = doc.code === "C12";
               for (let i = 0; i < sessionsSnap.length; i++) {
                 const g = sessionsSnap[i];
                 const suffix = formatSessionSuffix(g, i);
                 const sessionFolder = `${subFolder}/${suffix}`;
 
-                for (const s of g.stagiaires) {
-                  const blob = await generateAutoBlobForSession(doc, [s]);
+                if (isC12) {
+                  const blob = await generateAutoBlobForSession(doc, g.stagiaires);
                   if (blob) {
-                    const stagSuffix = `${s.prenom || ""}_${s.nom || ""}`.trim() || "Stagiaire";
-                    zip.file(`${sessionFolder}/${buildOpcoFileName(ctxSnap, doc.label, "pdf", stagSuffix)}`, blob);
+                    zip.file(`${sessionFolder}/${buildOpcoFileName(ctxSnap, doc.label, "pdf", suffix)}`, blob);
                   }
                   await new Promise((r) => setTimeout(r, 30));
-                }
+                } else {
+                  for (const s of g.stagiaires) {
+                    const blob = await generateAutoBlobForSession(doc, [s]);
+                    if (blob) {
+                      const stagSuffix = `${s.prenom || ""}_${s.nom || ""}`.trim() || "Stagiaire";
+                      zip.file(`${sessionFolder}/${buildOpcoFileName(ctxSnap, doc.label, "pdf", stagSuffix)}`, blob);
+                    }
+                    await new Promise((r) => setTimeout(r, 30));
+                  }
 
-                if (doc.code !== "C12") {
                   const viergeBlob = await generateViergeBlobForSession(doc.code, g.stagiaires);
                   if (viergeBlob) {
                     zip.file(`${sessionFolder}/${buildOpcoFileName(ctxSnap, `${doc.label} (Trame vierge)`, "pdf", suffix)}`, viergeBlob);
