@@ -567,15 +567,6 @@ export function buildFullCatalog(
           "qcm_mission_cfa",
           { folder: m.folder, stagiaireIdx: si, missionNumero: m.num },
         );
-        // Mail hebdomadaire d'envoi du QCM (1 par mission, par stagiaire, daté semaine école N)
-        add(
-          `cfa_mail_mission${m.num}_${si}`,
-          `CT${m.critere} - IND ${m.ind} 📁 14 MISSIONS / ${m.titre} – ✉️ Mail Envoi QCM (Semaine ${m.num}) – ${s.prenom} ${s.nom}`,
-          m.critere,
-          m.ind,
-          "mail_mission_cfa",
-          { folder: m.folder, stagiaireIdx: si, missionNumero: m.num },
-        );
       });
     });
 
@@ -1189,6 +1180,38 @@ export function buildFullCatalog(
       add(`mail_convocation_${si}`, `MAIL - CONVOCATION – ${s.prenom} ${s.nom}`, 0, 0, "mail_convocation", { stagiaireIdx: si });
       add(`mail_envoie_sc_${si}`, `MAIL - ENVOI SC ET RESSOURCES – ${s.prenom} ${s.nom}`, 0, 0, "mail_envoie_sc_ressources", { stagiaireIdx: si });
       add(`mail_fin_formation_${si}`, `MAIL - BILAN À CHAUD – ${s.prenom} ${s.nom}`, 0, 0, "mail_fin_formation", { stagiaireIdx: si });
+    });
+  }
+
+  // ===== MAIL — Envois hebdomadaires QCM 14 missions (CFA uniquement) =====
+  if (isCFA) {
+    const MISSIONS_TITRES: { num: number; titre: string }[] = [
+      { num: 1, titre: "Handicap" },
+      { num: 2, titre: "Mixité des métiers" },
+      { num: 3, titre: "Coopération CFA/Entreprise" },
+      { num: 4, titre: "Activités citoyennes" },
+      { num: 5, titre: "Rupture de contrat" },
+      { num: 6, titre: "Mixité & Égalité F/H" },
+      { num: 7, titre: "Accompagnement éducatif & social" },
+      { num: 8, titre: "Insertion professionnelle" },
+      { num: 9, titre: "Mobilité Erasmus+" },
+      { num: 10, titre: "Mobilité nationale" },
+      { num: 11, titre: "Aide recherche employeur" },
+      { num: 12, titre: "Accueil à tout moment" },
+      { num: 13, titre: "Formation du Maître d'Apprentissage" },
+      { num: 14, titre: "Conseil de perfectionnement" },
+    ];
+    stagiaires.forEach((s, si) => {
+      MISSIONS_TITRES.forEach((m) => {
+        add(
+          `mail_mission${m.num}_${si}`,
+          `MAIL - ✉️ Envoi QCM Semaine ${String(m.num).padStart(2, "0")} – Mission ${m.num} ${m.titre} – ${s.prenom} ${s.nom}`,
+          0,
+          0,
+          "mail_mission_cfa",
+          { stagiaireIdx: si, missionNumero: m.num },
+        );
+      });
     });
   }
 

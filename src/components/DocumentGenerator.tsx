@@ -148,7 +148,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
    * le document est placé dans CT{c}_IND_{i}/{folder}/ pour regrouper les missions.
    */
   const getDocBasePath = useCallback((doc: DocEntry): string => {
-    const isMail = doc.critere === 0 && !!MAIL_TEMPLATE_FILES[doc.template];
+    const isMail = doc.critere === 0 && (!!MAIL_TEMPLATE_FILES[doc.template] || doc.template === "mail_mission_cfa");
     const isSiteWeb = doc.id.startsWith("cfa_siteweb_");
     const root = isSiteWeb ? "Documents site web" : (isMail ? "MAILS" : shortCriterePath(doc.critere, doc.indicateur));
     const subFolder = typeof doc.params?.folder === "string" ? doc.params.folder : null;
@@ -1279,7 +1279,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
 
       {/* === MAIL SECTION (outside critères) === */}
       {(() => {
-        const mailDocs = catalog.filter((doc) => doc.critere === 0 && MAIL_TEMPLATE_FILES[doc.template]);
+        const mailDocs = catalog.filter((doc) => doc.critere === 0 && (MAIL_TEMPLATE_FILES[doc.template] || doc.template === "mail_mission_cfa"));
         if (mailDocs.length === 0) return null;
         const isMailExpanded = expandedCriteres.has(99);
         const mailGenerated = mailDocs.filter((doc) => generated.has(doc.id)).length;
@@ -1313,6 +1313,16 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
                         if (s) {
                           const blob = await processMailDocxTemplate(MAIL_TEMPLATE_FILES[doc.template], mergedOrganisme, selectedFormation, s);
                           zip.file(buildCatalogFileName(doc, s, ".docx"), blob);
+                        }
+                      } else if (doc.template === "mail_mission_cfa" && typeof doc.params?.stagiaireIdx === "number") {
+                        const s = allStagiaires[doc.params.stagiaireIdx];
+                        if (s) {
+                          const html = generateContent(doc, doc.params.stagiaireIdx);
+                          const ext = exportFormat === "pdf" ? ".pdf" : ".doc";
+                          const blob = exportFormat === "pdf"
+                            ? await htmlToPdfBlob(html)
+                            : new Blob([html], { type: "application/msword" });
+                          zip.file(buildCatalogFileName(doc, s, ext), blob);
                         }
                       }
                     }
