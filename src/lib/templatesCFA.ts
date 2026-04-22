@@ -21,7 +21,7 @@ export function genOrganigrammeCFA(o: OrganismeInfo) {
   const qual = o.referentQualite || o.poleAdministratif || o.dirigeant;
   const admin = o.poleAdministratif || o.dirigeant;
   const handi = o.referentHandicap || o.dirigeant;
-  const mob = o.referentMobilite || o.dirigeant;
+  const mob = (o as any).referentMobilite || o.dirigeant;
 
   const cell = (titre: string, lignes: string) => `
     <td style="border:1px solid #1e3a7b;padding:14px 16px;vertical-align:top;width:50%;background:#ffffff">
