@@ -1980,6 +1980,8 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
       <p style="margin-top:10px"><em>Une attestation de fin de formation et un certificat de réalisation seront remis à chaque stagiaire ayant suivi l'intégralité de la formation.</em></p>
     </div>
 
+    ${ntcBlocsHtml}
+
     <h2>13. Accessibilité aux personnes en situation de handicap</h2>
     <div class="section section-green">
       <p>La formation est accessible aux personnes à mobilité réduite (PMR) et aux personnes en situation de handicap (PSH).</p>
