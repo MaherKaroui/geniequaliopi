@@ -37,7 +37,13 @@ Templates dédiés dans `src/lib/templatesCFA14Missions.ts` :
 Libellés affichés en UI préfixés par `📁 14 MISSIONS / Mission X – …` pour identification visuelle.
 
 **Exercices (QCM) par mission, par stagiaire** :
-- Template `qcm_mission_cfa` (dans `templatesCFA14Missions.ts` → `genQCMMissionCFA`) génère pour chaque mission un QCM de 10 questions thématiquement dédiées (handicap, mixité, coopération CFA/entreprise, citoyenneté, rupture, égalité F/H, accompagnement éducatif, insertion, Erasmus+, mobilité nationale, recherche d'employeur, accueil permanent, formation MA, conseil de perfectionnement).
+- Template `qcm_mission_cfa` (dans `templatesCFA14Missions.ts` → `genQCMMissionCFA`) génère pour chaque mission un QCM de 10 questions thématiquement dédiées.
 - 1 entrée catalogue par mission × par stagiaire (`cfa_qcm_missionX_si`), placée dans le sous-dossier `14_MISSIONS_CFA/Mission_X_…`.
 - Réponses stagiaire générées de façon déterministe (~80% de bonnes réponses), avec corrigé en vert et résultat /20.
 - Mission 8 (insertion) reste en CT7 IND 30 ; toutes les autres en CT3 IND 10.
+
+**Mails hebdomadaires d'envoi QCM** :
+- Template `mail_mission_cfa` (dans `mailsMissionsCFA.ts`), 14 mails × stagiaire.
+- Placés dans la **section MAIL** (critère 0, indicateur 0) → dossier `MAILS/` du ZIP, et **non plus** dans les sous-dossiers de mission.
+- Datés du lundi de la N-ième semaine école (rythme 1 sem école / 3 sem entreprise → +28j × (N-1)).
+- Aperçu des 3 premières questions du QCM avec bonnes réponses surlignées.
