@@ -6529,9 +6529,10 @@ ${s.signatureUrl ? `<p><img src="${s.signatureUrl}" alt="Signature" style="max-h
 <p><strong>Dossier complet :</strong> ☒ Oui &nbsp;&nbsp; ☐ Non</p>
 <p><strong>Avis du CFA :</strong> ☒ Favorable &nbsp;&nbsp; ☐ Réservé &nbsp;&nbsp; ☐ Défavorable</p>
 <p><strong>Observations du CFA :</strong> Candidature complète et conforme aux prérequis de la formation. Profil cohérent avec le métier visé. Admission validée sous réserve de signature du contrat d'apprentissage.</p>
-<p><br/></p>
-<p><strong>Signature et cachet du CFA :</strong></p>
-<p><br/><br/></p>` },
+<p style="margin-top:18px"><strong>Signature et cachet du CFA :</strong></p>
+${o.tamponUrl
+  ? `<div style="margin-top:8px"><img src="${o.tamponUrl}" alt="Tampon ${o.nom}" style="max-height:130px;max-width:230px;"/></div>`
+  : `<p style="color:#888;font-style:italic">[Tampon de l'organisme non renseigné]</p>`}` },
   ] });
 }
 
