@@ -203,9 +203,9 @@ export const EY_DOCUMENTS: EYDocumentItem[] = [
   {
     code: "34B",
     label: "Grille d'acquisition des compétences (exemple)",
-    description: "Exemple type Genius Form / Academy : grille d'acquisition du référentiel + QCM rempli + analyse formateur (un seul fichier)",
+    description: "Exemple type Genius Form / Academy : grille d'acquisition du référentiel + QCM rempli + analyse formateur (un fichier par stagiaire)",
     autoTemplates: ["ey_test_evaluation_fin"],
-    perStagiaire: false,
+    perStagiaire: true,
     category: "evaluation",
   },
   {
