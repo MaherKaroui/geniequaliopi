@@ -792,7 +792,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "procedure_abandon_reorientation_cfa": return genProcedureAbandonReorientationCFA(o);
     case "accompagnement_distanciel_cfa": return genAccompagnementDistancielCFA(o);
     case "enquete_partenaire_employeur_cfa": return genEnquetePartenaireEmployeurCFA(o, f, stagiaires, params?.stagiaireIdx ?? 0);
-    case "fiche_renseignements_commanditaire_cfa": return genFicheRenseignementsCommanditaireCFA(o, f);
+    case "fiche_renseignements_commanditaire_cfa": return genFicheRenseignementsCommanditaireCFA(o, f, stagiaires);
     case "contrat_apprentissage_mode_emploi_cfa": return genContratApprentissageModeEmploiCFA(o);
     case "procedure_accueil_beneficiaires_cfa": return genProcedureAccueilBeneficiairesCFA(o, f);
     case "procedure_adaptation_pedagogique_cfa": return genProcedureAdaptationPedagogiqueCFA(o);
