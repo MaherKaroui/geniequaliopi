@@ -1314,6 +1314,16 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
                           const blob = await processMailDocxTemplate(MAIL_TEMPLATE_FILES[doc.template], mergedOrganisme, selectedFormation, s);
                           zip.file(buildCatalogFileName(doc, s, ".docx"), blob);
                         }
+                      } else if (doc.template === "mail_mission_cfa" && typeof doc.params?.stagiaireIdx === "number") {
+                        const s = allStagiaires[doc.params.stagiaireIdx];
+                        if (s) {
+                          const html = generateContent(doc, doc.params.stagiaireIdx);
+                          const ext = exportFormat === "pdf" ? ".pdf" : ".doc";
+                          const blob = exportFormat === "pdf"
+                            ? await htmlToPdfBlob(html)
+                            : new Blob([html], { type: "application/msword" });
+                          zip.file(buildCatalogFileName(doc, s, ext), blob);
+                        }
                       }
                     }
                     const blob = await zip.generateAsync({ type: "blob" });
