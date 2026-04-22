@@ -1279,7 +1279,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
 
       {/* === MAIL SECTION (outside critères) === */}
       {(() => {
-        const mailDocs = catalog.filter((doc) => doc.critere === 0 && MAIL_TEMPLATE_FILES[doc.template]);
+        const mailDocs = catalog.filter((doc) => doc.critere === 0 && (MAIL_TEMPLATE_FILES[doc.template] || doc.template === "mail_mission_cfa"));
         if (mailDocs.length === 0) return null;
         const isMailExpanded = expandedCriteres.has(99);
         const mailGenerated = mailDocs.filter((doc) => generated.has(doc.id)).length;
