@@ -283,7 +283,8 @@ import { getRestaurationChapters } from "./courseContentRestauration";
 import { getSocioEsthetiqueChapters } from "./courseContentSocioEsthetique";
 import { getVTCChapters } from "./courseContentVTC";
 
-export { getWordChapters, getAnglaisChapters, getAnglaisA1Chapters, getManagementChapters, getGenericChapters, getFLEChapters, getIAChapters, getWebmarketingChapters, getCRMChapters, getMassagePrenatalChapters, getMassagePostpartumChapters, getECSRChapters, getVTestChapters, getCIPChapters, getRPMSChapters, getAssistantDirectionChapters, getInfographisteChapters, getRestaurationChapters, getSocioEsthetiqueChapters, getVTCChapters };
+import { getNTCChapters } from "./courseContentNTC";
+export { getWordChapters, getAnglaisChapters, getAnglaisA1Chapters, getManagementChapters, getGenericChapters, getFLEChapters, getIAChapters, getWebmarketingChapters, getCRMChapters, getMassagePrenatalChapters, getMassagePostpartumChapters, getECSRChapters, getVTestChapters, getCIPChapters, getRPMSChapters, getAssistantDirectionChapters, getInfographisteChapters, getRestaurationChapters, getSocioEsthetiqueChapters, getVTCChapters, getNTCChapters };
 
 export function getCourseChapters(formationIntitule: string): CourseChapter[] {
   const t = formationIntitule.toLowerCase();
