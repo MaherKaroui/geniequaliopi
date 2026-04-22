@@ -89,25 +89,22 @@ export function genMailMissionCFA(
 
   const sujet = `[Semaine ${missionNumero}/14 — CFA] QCM Mission ${missionNumero} : ${mission.titre.replace(/^Mission \d+ — /, "")}`;
 
-  const qcmHtml = renderQCMExemple(mission.questions);
+  const pjHtml = renderPieceJointe(missionNumero, mission.titre);
 
   return `<!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8"><title>${escapeHtml(sujet)}</title></head>
 <body style="margin:0;padding:24px;background:#f6f8fa;font-family:'Google Sans','Segoe UI',Roboto,Arial,sans-serif;color:#202124;">
 <div style="max-width:780px;margin:0 auto;background:#ffffff;border:1px solid #dadce0;border-radius:8px;overflow:hidden;">
 
-  <!-- Barre Gmail -->
   <div style="background:#f1f3f4;padding:10px 16px;border-bottom:1px solid #dadce0;font-size:13px;color:#5f6368;">
     <span style="color:#d93025;font-weight:700;">M</span> Gmail &nbsp;·&nbsp; Boîte de réception
   </div>
 
-  <!-- Sujet -->
   <div style="padding:18px 24px 8px;border-bottom:1px solid #f1f3f4;">
     <div style="font-size:20px;font-weight:500;color:#202124;line-height:1.3;">${escapeHtml(sujet)}</div>
     <div style="margin-top:6px;display:inline-block;background:#e8f0fe;color:#1967d2;font-size:11px;font-weight:600;padding:2px 8px;border-radius:10px;">Boîte de réception</div>
   </div>
 
-  <!-- En-tête expéditeur -->
   <div style="padding:14px 24px;display:flex;align-items:flex-start;gap:12px;border-bottom:1px solid #f1f3f4;">
     <div style="width:40px;height:40px;border-radius:50%;background:#1a73e8;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;flex-shrink:0;">
       ${escapeHtml((o.nom || "C")[0].toUpperCase())}
@@ -119,41 +116,37 @@ export function genMailMissionCFA(
     </div>
   </div>
 
-  <!-- Corps du mail -->
   <div style="padding:24px;font-size:14px;line-height:1.65;color:#202124;">
     <p style="margin:0 0 14px;">Bonjour ${escapeHtml(civilite)} <strong>${escapeHtml(s.nom || "")}</strong>,</p>
 
     <p style="margin:0 0 14px;">
-      Dans le cadre de votre formation <strong>${escapeHtml(f.intitule || "")}</strong> au sein du CFA <strong>${escapeHtml(o.nom || "")}</strong>,
-      cette semaine est consacrée à la <strong>${escapeHtml(mission.titre)}</strong> — l'une des
-      <strong>14 missions officielles</strong> du CFA (article L.6231-2 du Code du Travail).
+      J'espère que vous allez bien. Cette semaine, nous vous accueillons en centre pour la
+      <strong>semaine école n°${missionNumero}</strong> de votre formation
+      <strong>${escapeHtml(f.intitule || "")}</strong>.
     </p>
 
-    <div style="margin:14px 0;padding:12px 14px;background:#fff8e1;border-left:4px solid #fbbc04;border-radius:4px;font-size:13px;">
-      📅 <strong>Semaine école n°${missionNumero}</strong> — du <strong>${escapeHtml(dateCourte)}</strong> au <strong>${escapeHtml(fmtShort(finSemaine))}</strong><br>
-      ⏰ Horaires : 09h00–12h30 / 13h30–17h00 (7 h / jour)<br>
-      📍 En centre de formation
+    <p style="margin:0 0 14px;">
+      Le thème pédagogique de la semaine porte sur la <strong>${escapeHtml(mission.titre)}</strong>,
+      qui s'inscrit dans le cadre des 14 missions du CFA (article L.6231-2 du Code du Travail).
+    </p>
+
+    <div style="margin:14px 0;padding:12px 14px;background:#f1f3f4;border-left:3px solid #1a73e8;border-radius:4px;font-size:13px;line-height:1.6;">
+      <strong>Semaine du ${escapeHtml(dateCourte)} au ${escapeHtml(fmtShort(finSemaine))}</strong><br>
+      Horaires : 09h00 – 12h30 / 13h30 – 17h00 (7h / jour)<br>
+      Lieu : centre de formation
     </div>
 
     <p style="margin:14px 0;">
-      Vous trouverez ci-dessous un <strong>QCM de 10 questions</strong> à réaliser avant
-      <strong>${escapeHtml(fmtShort(finSemaine))}</strong>. Ce questionnaire valide les acquis pédagogiques de la mission
-      et constitue une <em>preuve d'évaluation</em> dans votre dossier Qualiopi.
+      Vous trouverez en pièce jointe le <strong>QCM de la semaine</strong> (10 questions, durée ≈ 15 min).
+      Merci de le compléter et de me le retourner avant le <strong>vendredi ${escapeHtml(fmtShort(finSemaine))} à 17h00</strong>.
+      Nous reviendrons ensemble sur la correction lors du bilan du vendredi après-midi.
     </p>
 
-    ${qcmHtml}
+    ${pjHtml}
 
-    <p style="margin:18px 0 14px;">
-      <strong>Modalités :</strong><br>
-      • Durée estimée : 15 minutes<br>
-      • Note de passage : 12/20<br>
-      • Tentatives : illimitées jusqu'au vendredi de la semaine école<br>
-      • Correction & restitution : pendant le bilan hebdomadaire le vendredi
-    </p>
-
-    <p style="margin:14px 0;">
-      En cas de difficulté, n'hésitez pas à solliciter votre formateur référent
-      ou à répondre directement à ce mail.
+    <p style="margin:20px 0 14px;">
+      En cas de difficulté pour ouvrir le document ou pour répondre, n'hésitez pas à me le
+      signaler par retour de mail.
     </p>
 
     <p style="margin:18px 0 4px;">Bonne semaine de formation,</p>
