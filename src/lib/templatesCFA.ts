@@ -18,12 +18,13 @@ export function genPresentationCFA(o: OrganismeInfo) {
 
 export function genOrganigrammeCFA(o: OrganismeInfo) {
   const ped = o.responsablePedagogique || o.dirigeant;
-  const qual = o.referentQualite || o.poleAdministratif || o.dirigeant;
+  const qual = o.referentQualite || o.dirigeant;
   const admin = o.poleAdministratif || o.dirigeant;
   const handi = o.referentHandicap || o.dirigeant;
-  // Référent Mobilité : prestataire EXTERNE par défaut (Erasmus+ / Mobi'Jeunes)
-  const mobRaw = (o as any).referentMobilite;
-  const mob = mobRaw && mobRaw.trim() ? mobRaw : "Prestataire externe – Mobi'Jeunes / Erasmus+ France";
+  // Référent Mobilité : externalisé par défaut si non renseigné
+  const mob = o.referentMobilite?.trim() ? o.referentMobilite : "Prestataire externe – Mobi'Jeunes / Erasmus+ France";
+  // Relation Entreprises
+  const relEnt = o.relationEntreprises?.trim() ? o.relationEntreprises : o.dirigeant;
 
   // Boîte bleu clair (style ADEPROS) — titre bleu foncé en gras + nom + sous-titre italique
   const box = (titre: string, nom: string, soustitre?: string) => `
@@ -56,7 +57,7 @@ export function genOrganigrammeCFA(o: OrganismeInfo) {
     <!-- Ligne 2 : 3 pôles complémentaires -->
     <table style="width:100%;border-collapse:separate;border-spacing:0">
       <tr>
-        ${box("PÔLE RELATION ENTREPRISES", o.dirigeant, "Partenariats – Insertion")}
+        ${box("PÔLE RELATION ENTREPRISES", relEnt, "Partenariats – Insertion")}
         ${box("Pôle Administratif", admin, "Inscriptions, facturation")}
         ${box("Référent Mobilité<br>nationale et internationale", mob, "Mission externalisée")}
       </tr>
