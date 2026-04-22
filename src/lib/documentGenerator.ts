@@ -6281,29 +6281,92 @@ function genAttestationInscriptionCFAV2(o: OrganismeInfo, f: FormationInfo, stag
 }
 
 function genFicheRenseignementCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
-  const blank = "________________________";
-  return buildDocument({ org: o, title: "FICHE DE RENSEIGNEMENT CANDIDAT", sections: [
-    { heading: "", content: `
-${tableHTML(["Champ", "Information"], [
-  ["Nom de naissance", blank],
-  ["Prénom", blank],
-  ["Date de naissance", blank],
-  ["NIR", blank],
-  ["Sexe", "☐ M  ☐ F"],
-  ["Nationalité", blank],
-  ["Adresse", blank],
-  ["Code postal", blank],
-  ["Commune", blank],
-  ["Département de naissance", blank],
-  ["Commune de naissance", blank],
-  ["Téléphone", blank],
-  ["Mail", blank],
-  ["Diplôme le plus élevé obtenu", blank],
-  ["RQTH", "☐ Oui  ☐ Non"],
-])}
-<p style="margin-top:15px"><strong>Formation visée :</strong> ${f.intitule}</p>
-<p><strong>Entreprise d'accueil :</strong> ${blank}</p>` },
-  ] });
+  const s = stagiaires[si];
+  if (!s) {
+    return buildDocument({ org: o, title: "FICHE DE RENSEIGNEMENT COMMANDITAIRE", sections: [
+      { heading: "Aucun stagiaire", content: `<p>Aucun stagiaire renseigné — impossible de pré-remplir la fiche.</p>` },
+    ]});
+  }
+
+  // Date du contact = J-15 avant début de formation du stagiaire
+  const dDeb = s.dateDebutFormation || f.dateDebut;
+  const dFin = s.dateFinFormation || f.dateFin;
+  const dateContactStr = dDeb ? (() => {
+    const d = new Date(dDeb); d.setDate(d.getDate() - 15); return d.toISOString().slice(0, 10);
+  })() : "";
+  const dc = dateContactStr ? new Date(dateContactStr) : new Date();
+  const dd = String(dc.getDate()).padStart(2, "0");
+  const mm = String(dc.getMonth() + 1).padStart(2, "0");
+  const yyyy = dc.getFullYear();
+
+  // Données entreprise (commanditaire) du stagiaire
+  const nomEntreprise = s.entreprise || "";
+  const responsable = s.responsableEntreprise || "";
+  const adresseEnt = s.adresseEntreprise || "";
+  const telEnt = s.telephone || "";
+  const emailEnt = s.email || "";
+  const siret = s.siretEntreprise || "";
+  const activite = "Formation professionnelle continue";
+  const codeNAF = "8559A";
+  const nbSalaries = "";
+  const opco = "OPCO EP";
+
+  const tdL = "padding:8px;border:1px solid #ccc;width:35%;font-weight:bold;background:#f4f7fb";
+  const tdR = "padding:8px;border:1px solid #ccc";
+
+  const lieu = f.lieu || `${o.adresse}, ${o.codePostal} ${o.ville}`;
+  const surSite = "Oui, locaux conformes (espace adapté, accès, sécurité)";
+  const rqthOui = s.rqth === "oui";
+  const besoinHandicap = rqthOui
+    ? `Oui – ${s.prenom} ${s.nom} (RQTH). Aménagement à étudier avec le référent handicap.`
+    : "Aucun besoin spécifique signalé à ce jour";
+  const adaptations = rqthOui
+    ? `Adaptations envisagées : aménagement du temps d'évaluation (+1/3), supports accessibles (police agrandie, contraste renforcé), pauses fractionnées, accompagnement renforcé du formateur référent.`
+    : `Aucune adaptation particulière à prévoir. Pédagogie active standard adaptée au public apprenti.`;
+
+  return buildDocument({ org: o, title: "FICHE DE RENSEIGNEMENT COMMANDITAIRE", subtitle: `${s.prenom} ${s.nom}`, extraHtml: `
+    <p style="text-align:right;margin-top:0"><strong>Date du contact :</strong> ${dd} / ${mm} / ${yyyy}</p>
+
+    <h3 style="margin-top:20px;color:#1e3a7b">L'entreprise (ou « le demandeur » si votre client est un particulier)</h3>
+    <table style="width:100%;border-collapse:collapse;margin-top:10px">
+      <tr><td style="${tdL}">Nom de l'entreprise</td><td style="${tdR}">${nomEntreprise}</td></tr>
+      <tr><td style="${tdL}">Nom et prénom du responsable</td><td style="${tdR}">${responsable}</td></tr>
+      <tr><td style="${tdL}">Nom et prénom du contact</td><td style="${tdR}">${responsable}</td></tr>
+      <tr><td style="${tdL}">Adresse</td><td style="${tdR}">${adresseEnt}</td></tr>
+      <tr><td style="${tdL}">Téléphone</td><td style="${tdR}">${telEnt}</td></tr>
+      <tr><td style="${tdL}">E-mail</td><td style="${tdR}">${emailEnt}</td></tr>
+      <tr><td style="${tdL}">Activité</td><td style="${tdR}">${activite}</td></tr>
+      <tr><td style="${tdL}">Code NAF</td><td style="${tdR}">${codeNAF}</td></tr>
+      <tr><td style="${tdL}">Numéro SIRET</td><td style="${tdR}">${siret}</td></tr>
+      <tr><td style="${tdL}">Nombre de salariés</td><td style="${tdR}">${nbSalaries}</td></tr>
+      <tr><td style="${tdL}">OPCO</td><td style="${tdR}">${opco}</td></tr>
+    </table>
+
+    <h3 style="margin-top:20px;color:#1e3a7b">Les stagiaires et les formations</h3>
+    <table style="width:100%;border-collapse:collapse;margin-top:10px">
+      <tr style="background:#1e3a7b;color:white">
+        <th style="padding:8px;border:1px solid #ccc">Nom et prénom des stagiaires</th>
+        <th style="padding:8px;border:1px solid #ccc">Leur fonction dans l'entreprise</th>
+        <th style="padding:8px;border:1px solid #ccc">Intitulé de la formation</th>
+        <th style="padding:8px;border:1px solid #ccc">Durée de la formation</th>
+        <th style="padding:8px;border:1px solid #ccc">Dates prévisionnelles</th>
+      </tr>
+      <tr>
+        <td style="${tdR}">${s.prenom} ${s.nom}</td>
+        <td style="${tdR}">${s.poste || "Apprenti(e)"}</td>
+        <td style="${tdR}">${f.intitule}</td>
+        <td style="${tdR}">${f.duree}</td>
+        <td style="${tdR}">${formatDate(dDeb)} – ${formatDate(dFin)}</td>
+      </tr>
+    </table>
+
+    <p style="margin-top:15px"><strong>Lieu de la formation :</strong> ${lieu}</p>
+    <p><strong>Si formation sur site :</strong> Les locaux de l'entreprise sont-ils appropriés ? ${surSite}</p>
+    <p><strong>Besoin spécifique lié à une situation de handicap d'un salarié ?</strong> ${besoinHandicap}</p>
+
+    <h3 style="margin-top:20px;color:#1e3a7b">Les adaptations à prévoir :</h3>
+    <div style="border:1px solid #ccc;min-height:60px;padding:10px;margin-top:5px">${adaptations}</div>
+  ` });
 }
 
 function genGrilleEntretienCandidatCFA(o: OrganismeInfo, f: FormationInfo) {
