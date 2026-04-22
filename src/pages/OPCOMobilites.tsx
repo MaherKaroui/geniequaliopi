@@ -30,6 +30,7 @@ import { generateDocumentById } from "@/lib/documentGenerator";
 import { generateAIEvalPack, getCachedPack, clearCachedPack } from "@/lib/aiEvalPack";
 import { Sparkles } from "lucide-react";
 import { generateExcelCalendrierOPCO, excelToBlob } from "@/lib/xlsxGenerator";
+import { exportFormDataToExcel } from "@/lib/exportFormData";
 import { mergeOrganisme, mergeStagiaires } from "@/lib/sampleData";
 import { htmlToPdfBlob } from "@/lib/pdfExport";
 import { supabase } from "@/integrations/supabase/client";
@@ -950,6 +951,18 @@ export default function OPCOMobilites() {
             >
               {generatingAI ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
               {generatingAI ? "Génération IA..." : aiPackReady ? "Régénérer pack IA C6" : "Générer évaluations IA (C6)"}
+            </Button>
+            <Button
+              onClick={() => {
+                exportFormDataToExcel(organisme, formation, stagiaires);
+                toast.success("Export Excel lancé (3 fichiers)");
+              }}
+              variant="outline"
+              className="gap-2"
+              title="Exporter Organisme, Formation et Stagiaires au format Excel"
+            >
+              <FileText className="w-4 h-4" />
+              Export Excel
             </Button>
             <Button onClick={handleExportFullZip} disabled={hasActive} className="gap-2">
               {hasActive ? <Loader2 className="w-4 h-4 animate-spin" /> : <FolderArchive className="w-4 h-4" />}
