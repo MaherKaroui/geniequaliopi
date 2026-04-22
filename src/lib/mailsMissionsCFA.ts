@@ -45,22 +45,21 @@ function escapeHtml(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
-function renderQCMExemple(qcm: { q: string; options: string[]; correctIndex: number }[]): string {
-  const rows = qcm.slice(0, 3).map((q, i) => {
-    const opts = q.options.map((o, oi) => {
-      const isCorrect = oi === q.correctIndex;
-      return `<li style="margin:2px 0;${isCorrect ? "color:#0b8043;font-weight:600;" : "color:#444;"}">${escapeHtml(o)}${isCorrect ? " ✅" : ""}</li>`;
-    }).join("");
-    return `
-      <div style="margin:10px 0 14px;padding:10px 12px;background:#f8f9fa;border-left:3px solid #1a73e8;border-radius:4px;">
-        <div style="font-weight:600;color:#202124;margin-bottom:6px;">Question ${i + 1}. ${escapeHtml(q.q)}</div>
-        <ol type="a" style="margin:4px 0 0 18px;padding:0;font-size:13px;">${opts}</ol>
-      </div>`;
-  }).join("");
+function renderPieceJointe(missionNumero: number, missionTitre: string): string {
+  // Représentation visuelle d'une pièce jointe Gmail (PDF QCM, non corrigé)
+  const cleanTitre = missionTitre.replace(/^Mission \d+ — /, "");
+  const fileName = `QCM_Mission_${String(missionNumero).padStart(2, "0")}_${cleanTitre.replace(/[^a-zA-Z0-9]+/g, "_").substring(0, 40)}.pdf`;
   return `
-    <p style="margin:14px 0 6px;color:#202124;font-size:14px;"><strong>Aperçu du QCM</strong> (3 premières questions sur 10) :</p>
-    ${rows}
-    <p style="margin:8px 0 0;font-size:13px;color:#5f6368;font-style:italic;">→ Le QCM complet (10 questions) est joint en pièce jointe et accessible dans votre espace apprenant.</p>
+    <div style="margin:18px 0 8px;font-size:13px;color:#5f6368;">1 pièce jointe</div>
+    <div style="display:inline-block;border:1px solid #dadce0;border-radius:8px;padding:10px 14px;background:#fff;min-width:260px;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:32px;height:40px;background:#d93025;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;border-radius:3px;flex-shrink:0;">PDF</div>
+        <div style="font-size:13px;line-height:1.3;">
+          <div style="color:#202124;font-weight:500;">${escapeHtml(fileName)}</div>
+          <div style="color:#5f6368;font-size:11px;margin-top:2px;">PDF · ~180 Ko</div>
+        </div>
+      </div>
+    </div>
   `;
 }
 
