@@ -25,34 +25,45 @@ export function genOrganigrammeCFA(o: OrganismeInfo) {
   const mobRaw = (o as any).referentMobilite;
   const mob = mobRaw && mobRaw.trim() ? mobRaw : "Prestataire externe – Mobi'Jeunes / Erasmus+ France";
 
-  const cell = (titre: string, lignes: string) => `
-    <td style="border:1px solid #1e3a7b;padding:14px 16px;vertical-align:top;width:50%;background:#ffffff">
-      <div style="background:#1e3a7b;color:white;padding:6px 10px;font-weight:bold;text-align:center;margin:-14px -16px 10px -16px">${titre}</div>
-      ${lignes}
+  // Boîte bleu clair (style ADEPROS) — titre bleu foncé en gras + nom + sous-titre italique
+  const box = (titre: string, nom: string, soustitre?: string) => `
+    <td style="width:33.33%;padding:10px;vertical-align:top;text-align:center;border:none">
+      <div style="background:#e8f0fb;border-radius:14px;padding:18px 14px;min-height:110px;display:flex;flex-direction:column;justify-content:center;border:1px solid #d6e4f5">
+        <div style="color:#1e3a7b;font-weight:bold;font-size:14px;line-height:1.3">${titre}</div>
+        <div style="color:#1e3a7b;font-size:13px;margin-top:6px">${nom}</div>
+        ${soustitre ? `<div style="color:#5a6d8a;font-style:italic;font-size:11px;margin-top:4px">${soustitre}</div>` : ""}
+      </div>
     </td>`;
 
   return buildDocument({ org: o, title: "ORGANIGRAMME DE L'ORGANISME", subtitle: o.nom, extraHtml: `
-    <div style="text-align:center;margin:20px 0 30px 0">
-      <div style="background:#1e3a7b;color:white;padding:14px 40px;border-radius:6px;display:inline-block">
-        <div style="font-size:14px;font-weight:bold;letter-spacing:1px">DIRECTION GÉNÉRALE</div>
-        <div style="font-size:13px;margin-top:4px">${o.dirigeant}</div>
+    <!-- Direction Générale (encadré bleu foncé centré) -->
+    <div style="text-align:center;margin:30px 0 35px 0">
+      <div style="background:#1e3a7b;color:white;padding:16px 50px;border-radius:10px;display:inline-block;min-width:280px">
+        <div style="font-size:15px;font-weight:bold">Direction Générale</div>
+        <div style="font-size:13px;margin-top:6px;font-weight:normal">${o.dirigeant}</div>
       </div>
     </div>
-    <table style="width:100%;border-collapse:collapse;margin-top:10px">
+
+    <!-- Ligne 1 : 3 pôles principaux -->
+    <table style="width:100%;border-collapse:separate;border-spacing:0;margin-bottom:6px">
       <tr>
-        ${cell("PÔLE PÉDAGOGIQUE", `<p style="margin:4px 0"><strong>Responsable :</strong> ${ped}</p><p style="margin:4px 0"><strong>Missions :</strong> Encadrement pédagogique – Coordination des formateurs</p><p style="margin:4px 0"><strong>Formateurs</strong></p>`)}
-        ${cell("PÔLE QUALITÉ", `<p style="margin:4px 0"><strong>Responsable :</strong> ${qual}</p><p style="margin:4px 0"><strong>Missions :</strong> Amélioration continue</p><p style="margin:4px 0"><strong>Référent administratif et qualité :</strong> ${qual}</p>`)}
-      </tr>
-      <tr>
-        ${cell("PÔLE HANDICAP", `<p style="margin:4px 0"><strong>Référent handicap :</strong> ${handi}</p><p style="margin:4px 0"><strong>Missions :</strong> Accessibilité – Accompagnement des apprenants en situation de handicap</p>`)}
-        ${cell("PÔLE ADMINISTRATIF", `<p style="margin:4px 0"><strong>Responsable :</strong> ${admin}</p><p style="margin:4px 0"><strong>Missions :</strong> Inscriptions – Facturation</p>`)}
-      </tr>
-      <tr>
-        ${cell("PÔLE RELATION ENTREPRISES", `<p style="margin:4px 0"><strong>Directeur relation entreprises :</strong> ${o.dirigeant}</p><p style="margin:4px 0"><strong>Missions :</strong> Développement des partenariats – Insertion professionnelle</p>`)}
-        ${cell("RÉFÉRENT MOBILITÉ NATIONALE ET INTERNATIONALE", `<p style="margin:4px 0"><strong>Prestataire externe :</strong> ${mob}</p><p style="margin:4px 0"><strong>Statut :</strong> <em>Mission externalisée</em></p><p style="margin:4px 0"><strong>Missions :</strong> Accompagnement des mobilités nationales et internationales des apprentis (Erasmus+, conventions inter-CFA, partenariats européens)</p>`)}
+        ${box("Pôle Pédagogique", ped, "Formateurs")}
+        ${box("Pôle Qualité", qual, "Amélioration continue")}
+        ${box("Pôle Handicap", handi, "Accessibilité")}
       </tr>
     </table>
-    <p style="text-align:center;font-size:11px;color:#666;margin-top:20px"><em>Document de présentation interne – ${o.nom} — La fonction de Référent Mobilité nationale et internationale est externalisée auprès d'un prestataire spécialisé.</em></p>` });
+
+    <!-- Ligne 2 : 3 pôles complémentaires -->
+    <table style="width:100%;border-collapse:separate;border-spacing:0">
+      <tr>
+        ${box("PÔLE RELATION ENTREPRISES", o.dirigeant, "Partenariats – Insertion")}
+        ${box("Pôle Administratif", admin, "Inscriptions, facturation")}
+        ${box("Référent Mobilité<br>nationale et internationale", mob, "Mission externalisée")}
+      </tr>
+    </table>
+
+    <p style="text-align:center;font-size:11px;color:#666;margin-top:30px"><em>La fonction de Référent Mobilité nationale et internationale est externalisée auprès d'un prestataire spécialisé (Erasmus+ / Mobi'Jeunes).</em></p>
+  ` });
 }
 
 export function genLivretAccueilApprenti(o: OrganismeInfo, f: FormationInfo) {
