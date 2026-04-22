@@ -349,6 +349,14 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
       return;
     }
 
+    // Handle real .xlsx (SheetJS) templates
+    if (doc.template === "outils_suivi_alternance_excel") {
+      const { generateOutilsSuiviAlternanceXlsxBlob } = await import("@/lib/outilsSuiviAlternanceXlsx");
+      const blob = generateOutilsSuiviAlternanceXlsxBlob(mergedOrganisme, selectedFormation, allStagiaires);
+      saveAs(blob, buildCatalogFileName(doc, undefined, ".xlsx"));
+      return;
+    }
+
     // Handle mail .docx templates (per-stagiaire)
     if (MAIL_TEMPLATE_FILES[doc.template] && typeof doc.params?.stagiaireIdx === "number") {
       const s = allStagiaires[doc.params.stagiaireIdx];
