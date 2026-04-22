@@ -17,7 +17,8 @@ import { toast } from "sonner";
 const emptyOrganisme: OrganismeInfo = {
   nom: "", siret: "", adresse: "", codePostal: "", ville: "", telephone: "", email: "",
   siteWeb: "", nda: "", dirigeant: "", responsablePedagogique: "", referentHandicap: "",
-  referentQualite: "", poleAdministratif: "", domainesFormation: "", typesActions: [], certifications: "", outilsUtilises: "",
+  referentQualite: "", poleAdministratif: "", relationEntreprises: "", referentMobilite: "",
+  domainesFormation: "", typesActions: [], certifications: "", outilsUtilises: "",
   version: "1", dateMaj: new Date().toISOString().slice(0, 10)
 };
 

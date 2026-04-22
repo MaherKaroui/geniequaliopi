@@ -15,6 +15,8 @@ export const SAMPLE_ORGANISME: OrganismeInfo = {
   referentHandicap: "Isabelle Fontaine",
   referentQualite: "Laurent Vasseur",
   poleAdministratif: "Marie Lecomte",
+  relationEntreprises: "",
+  referentMobilite: "",
   domainesFormation: "Bureautique, Langues, Management, Digital, Esthétique, Informatique",
   typesActions: ["actions-formation", "bilans-competences"],
   certifications: "Qualiopi, RS, RNCP",

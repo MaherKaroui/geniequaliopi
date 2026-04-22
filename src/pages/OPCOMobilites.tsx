@@ -40,7 +40,8 @@ import { useBackgroundJobs } from "@/lib/backgroundJobs";
 const emptyOrganisme: OrganismeInfo = {
   nom: "", siret: "", adresse: "", codePostal: "", ville: "", telephone: "", email: "",
   siteWeb: "", nda: "", dirigeant: "", responsablePedagogique: "", referentHandicap: "",
-  referentQualite: "", poleAdministratif: "", domainesFormation: "", typesActions: [],
+  referentQualite: "", poleAdministratif: "", relationEntreprises: "", referentMobilite: "",
+  domainesFormation: "", typesActions: [],
   certifications: "", outilsUtilises: "",
   version: "1", dateMaj: new Date().toISOString().slice(0, 10),
 };
