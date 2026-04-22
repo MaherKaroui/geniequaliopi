@@ -741,33 +741,91 @@ export function genEnquetePartenaireEmployeurCFA(o: OrganismeInfo, f: FormationI
   ` });
 }
 
-export function genFicheRenseignementsCommanditaireCFA(o: OrganismeInfo, f: FormationInfo) {
+export function genFicheRenseignementsCommanditaireCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[] = []) {
+  // Date du contact = J-15 avant le début de formation
+  const dateContact = subtractBusinessDays(f.dateDebut, 15);
+  const dc = dateContact ? new Date(dateContact) : new Date();
+  const dd = String(dc.getDate()).padStart(2, "0");
+  const mm = String(dc.getMonth() + 1).padStart(2, "0");
+  const yyyy = dc.getFullYear();
+
+  // Commanditaire = entreprise du 1er stagiaire (apprenti)
+  const sRef = stagiaires[0];
+  const nomEntreprise = sRef?.entreprise || "";
+  const responsable = sRef?.responsableEntreprise || "";
+  const adresseEnt = sRef?.adresseEntreprise || "";
+  const telEnt = sRef?.telephone || "";
+  const emailEnt = sRef?.email || "";
+  const siret = sRef?.siretEntreprise || "";
+
+  // Activité / Code NAF / OPCO basés sur l'organisme par défaut (formation pro)
+  const activite = "Formation professionnelle continue";
+  const codeNAF = "8559A";
+  const nbSalaries = "";
+  const opco = "OPCO EP";
+
+  const tdL = "padding:8px;border:1px solid #ccc;width:35%;font-weight:bold;background:#f4f7fb";
+  const tdR = "padding:8px;border:1px solid #ccc";
+
+  // Lignes stagiaires
+  const stagRows = stagiaires.length > 0
+    ? stagiaires.map((s) => {
+        const dDeb = s.dateDebutFormation || f.dateDebut;
+        const dFin = s.dateFinFormation || f.dateFin;
+        return `<tr>
+          <td style="${tdR}">${s.prenom} ${s.nom}</td>
+          <td style="${tdR}">${s.poste || "Apprenti(e)"}</td>
+          <td style="${tdR}">${f.intitule}</td>
+          <td style="${tdR}">${f.duree}</td>
+          <td style="${tdR}">${formatDate(dDeb)} – ${formatDate(dFin)}</td>
+        </tr>`;
+      }).join("")
+    : `<tr><td style="${tdR}">&nbsp;</td><td style="${tdR}"></td><td style="${tdR}">${f.intitule}</td><td style="${tdR}">${f.duree}</td><td style="${tdR}">${formatDate(f.dateDebut)} – ${formatDate(f.dateFin)}</td></tr>`;
+
+  const lieu = f.lieu || `${o.adresse}, ${o.codePostal} ${o.ville}`;
+  const surSite = lieu.toLowerCase().includes(o.ville.toLowerCase()) && lieu.includes(o.adresse) ? "Non concerné – formation dans les locaux de l'organisme" : "Oui, locaux conformes (espace adapté, accès, sécurité)";
+  const rqthStag = stagiaires.find(s => s.rqth === "oui");
+  const besoinHandicap = rqthStag ? `Oui – ${rqthStag.prenom} ${rqthStag.nom} (RQTH). Aménagement à étudier avec le référent handicap.` : "Aucun besoin spécifique signalé à ce jour";
+  const adaptations = rqthStag
+    ? `Adaptations envisagées : aménagement du temps d'évaluation (+1/3), supports accessibles (police agrandie, contraste renforcé), pauses fractionnées, accompagnement renforcé du formateur référent.`
+    : `Aucune adaptation particulière à prévoir. Pédagogie active standard adaptée au public apprenti.`;
+
   return buildDocument({ org: o, title: "FICHE DE RENSEIGNEMENT COMMANDITAIRE", extraHtml: `
-    <p><strong>Date du contact :</strong> ____ / ____ / ________</p>
-    <h3 style="margin-top:20px">1. L'entreprise (ou « le demandeur » si votre client est un particulier)</h3>
+    <p style="text-align:right;margin-top:0"><strong>Date du contact :</strong> ${dd} / ${mm} / ${yyyy}</p>
+
+    <h3 style="margin-top:20px;color:#1e3a7b">L'entreprise (ou « le demandeur » si votre client est un particulier)</h3>
     <table style="width:100%;border-collapse:collapse;margin-top:10px">
-      <tr><td style="padding:8px;border:1px solid #ccc;width:35%;font-weight:bold">Nom de l'entreprise</td><td style="padding:8px;border:1px solid #ccc"></td></tr>
-      <tr><td style="padding:8px;border:1px solid #ccc;font-weight:bold">Nom et prénom du responsable</td><td style="padding:8px;border:1px solid #ccc"></td></tr>
-      <tr><td style="padding:8px;border:1px solid #ccc;font-weight:bold">Nom et prénom du contact</td><td style="padding:8px;border:1px solid #ccc"></td></tr>
-      <tr><td style="padding:8px;border:1px solid #ccc;font-weight:bold">Adresse</td><td style="padding:8px;border:1px solid #ccc"></td></tr>
-      <tr><td style="padding:8px;border:1px solid #ccc;font-weight:bold">Téléphone</td><td style="padding:8px;border:1px solid #ccc"></td></tr>
-      <tr><td style="padding:8px;border:1px solid #ccc;font-weight:bold">E-mail</td><td style="padding:8px;border:1px solid #ccc"></td></tr>
-      <tr><td style="padding:8px;border:1px solid #ccc;font-weight:bold">Activité</td><td style="padding:8px;border:1px solid #ccc"></td></tr>
-      <tr><td style="padding:8px;border:1px solid #ccc;font-weight:bold">Code NAF</td><td style="padding:8px;border:1px solid #ccc"></td></tr>
-      <tr><td style="padding:8px;border:1px solid #ccc;font-weight:bold">Numéro SIRET</td><td style="padding:8px;border:1px solid #ccc"></td></tr>
-      <tr><td style="padding:8px;border:1px solid #ccc;font-weight:bold">Nombre de salariés</td><td style="padding:8px;border:1px solid #ccc"></td></tr>
-      <tr><td style="padding:8px;border:1px solid #ccc;font-weight:bold">OPCO</td><td style="padding:8px;border:1px solid #ccc"></td></tr>
+      <tr><td style="${tdL}">Nom de l'entreprise</td><td style="${tdR}">${nomEntreprise}</td></tr>
+      <tr><td style="${tdL}">Nom et prénom du responsable</td><td style="${tdR}">${responsable}</td></tr>
+      <tr><td style="${tdL}">Nom et prénom du contact</td><td style="${tdR}">${responsable}</td></tr>
+      <tr><td style="${tdL}">Adresse</td><td style="${tdR}">${adresseEnt}</td></tr>
+      <tr><td style="${tdL}">Téléphone</td><td style="${tdR}">${telEnt}</td></tr>
+      <tr><td style="${tdL}">E-mail</td><td style="${tdR}">${emailEnt}</td></tr>
+      <tr><td style="${tdL}">Activité</td><td style="${tdR}">${activite}</td></tr>
+      <tr><td style="${tdL}">Code NAF</td><td style="${tdR}">${codeNAF}</td></tr>
+      <tr><td style="${tdL}">Numéro SIRET</td><td style="${tdR}">${siret}</td></tr>
+      <tr><td style="${tdL}">Nombre de salariés</td><td style="${tdR}">${nbSalaries}</td></tr>
+      <tr><td style="${tdL}">OPCO</td><td style="${tdR}">${opco}</td></tr>
     </table>
-    <h3 style="margin-top:20px">2. Les stagiaires et les formations</h3>
+
+    <h3 style="margin-top:20px;color:#1e3a7b">Les stagiaires et les formations</h3>
     <table style="width:100%;border-collapse:collapse;margin-top:10px">
-      <tr style="background:#1e3a7b;color:white"><th style="padding:8px;border:1px solid #ccc">Nom et prénom</th><th style="padding:8px;border:1px solid #ccc">Fonction dans l'entreprise</th><th style="padding:8px;border:1px solid #ccc">Intitulé de la formation</th><th style="padding:8px;border:1px solid #ccc">Durée</th><th style="padding:8px;border:1px solid #ccc">Dates prévisionnelles</th></tr>
-      <tr><td style="padding:8px;border:1px solid #ccc"></td><td style="padding:8px;border:1px solid #ccc"></td><td style="padding:8px;border:1px solid #ccc">${f.intitule}</td><td style="padding:8px;border:1px solid #ccc">${f.duree}</td><td style="padding:8px;border:1px solid #ccc">${formatDate(f.dateDebut)} – ${formatDate(f.dateFin)}</td></tr>
+      <tr style="background:#1e3a7b;color:white">
+        <th style="padding:8px;border:1px solid #ccc">Nom et prénom des stagiaires</th>
+        <th style="padding:8px;border:1px solid #ccc">Leur fonction dans l'entreprise</th>
+        <th style="padding:8px;border:1px solid #ccc">Intitulé de la formation</th>
+        <th style="padding:8px;border:1px solid #ccc">Durée de la formation</th>
+        <th style="padding:8px;border:1px solid #ccc">Dates prévisionnelles</th>
+      </tr>
+      ${stagRows}
     </table>
-    <p style="margin-top:10px"><strong>Lieu de la formation :</strong> ${f.lieu || o.adresse + ', ' + o.codePostal + ' ' + o.ville}</p>
-    <p><strong>Si formation sur site :</strong> Les locaux de l'entreprise sont-ils appropriés ? _______________</p>
-    <p><strong>Besoin spécifique lié à une situation de handicap d'un salarié ?</strong> _______________</p>
-    <h3 style="margin-top:20px">3. Les adaptations à prévoir :</h3>
-    <div style="border:1px solid #ccc;min-height:60px;padding:10px;margin-top:5px"></div>
+
+    <p style="margin-top:15px"><strong>Lieu de la formation :</strong> ${lieu}</p>
+    <p><strong>Si formation sur site :</strong> Les locaux de l'entreprise sont-ils appropriés ? ${surSite}</p>
+    <p><strong>Besoin spécifique lié à une situation de handicap d'un salarié ?</strong> ${besoinHandicap}</p>
+
+    <h3 style="margin-top:20px;color:#1e3a7b">Les adaptations à prévoir :</h3>
+    <div style="border:1px solid #ccc;min-height:60px;padding:10px;margin-top:5px">${adaptations}</div>
   ` });
 }
 
