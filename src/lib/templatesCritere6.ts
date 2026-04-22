@@ -49,12 +49,160 @@ function detectFormationType(f: FormationInfo): FormationType {
   return "word";
 }
 
+// ===== Fallback générique cohérent avec l'intitulé (utilisé tant que l'IA n'a pas régénéré) =====
+function genericVeilleRows(
+  f: FormationInfo,
+  kind: "reglementaire" | "metier" | "technologique",
+): string[][] {
+  const sujet = (f.intitule || "votre formation").trim();
+  const rncp = f.codeRNCP ? ` (${f.codeRNCP})` : "";
+  if (kind === "reglementaire") {
+    return [
+      [
+        `<a href="https://travail-emploi.gouv.fr/referentiel-national-qualite-guide-de-lecture-qualiopi" target="_blank" rel="noopener">Ministère du Travail – Guide Qualiopi V9</a>`,
+        `Référentiel National Qualité — Guide de lecture Qualiopi V9 appliqué à « ${sujet} »${rncp}`,
+        veilleMonthYear(f, 8),
+        `Cadre obligatoire pour les organismes dispensant la formation « ${sujet} ». Détaille les 32 indicateurs et leurs preuves attendues.`,
+        `Preuve : guide Qualiopi V9 archivé. Action : revue interne des 32 indicateurs adaptée au contenu de « ${sujet} ».`,
+      ],
+      [
+        `<a href="https://www.legifrance.gouv.fr/codes/section_lc/LEGITEXT000006072050/LEGISCTA000006195856" target="_blank" rel="noopener">Légifrance – Code du travail (Formation pro.)</a>`,
+        `Articles L.6111-1 et suivants — droit à la formation professionnelle continue`,
+        veilleDate(f, 6),
+        `Encadre les obligations de l'employeur et les droits du stagiaire pour les actions concourant au développement des compétences telles que « ${sujet} ».`,
+        `Preuve : extrait Légifrance. Action : intégration dans le programme et le règlement intérieur de « ${sujet} ».`,
+      ],
+      [
+        `<a href="https://www.francecompetences.fr/" target="_blank" rel="noopener">France Compétences – Répertoires nationaux</a>`,
+        `Mises à jour des fiches RNCP/RS du domaine « ${sujet} »`,
+        veilleMonthYear(f, 5),
+        `Veille sur les évolutions des certifications et blocs de compétences en lien avec le métier visé par « ${sujet} ».`,
+        `Preuve : capture fiche RNCP/RS. Action : alignement du référentiel pédagogique de « ${sujet} » sur la dernière version.`,
+      ],
+      [
+        `<a href="https://www.legifrance.gouv.fr/eli/arrete/2025/2/18/TSSD2501626A/jo/texte" target="_blank" rel="noopener">Légifrance – Arrêté du 18/02/2025</a>`,
+        `Arrêté du 18 février 2025 — modalités d'audit Qualiopi`,
+        veilleDate(f, 4),
+        `Modifie les modalités d'audit (durée, indicateurs) pour les organismes dispensant des actions comme « ${sujet} ».`,
+        `Preuve : version consolidée JO. Action : mise à jour des procédures d'audit interne.`,
+      ],
+      [
+        `<a href="https://www.centre-inffo.fr/site-droit-formation/actualites-droit/cpf-hausse-du-montant-de-la-participation-forfaitaire" target="_blank" rel="noopener">Centre Inffo – CPF</a>`,
+        `CPF : participation forfaitaire 103,20 € — impact sur « ${sujet} »`,
+        veilleDate(f, 3),
+        `La participation obligatoire CPF s'applique aux inscriptions en « ${sujet} » sauf exonérations (DE, abondement employeur).`,
+        `Preuve : article Centre Inffo. Action : information préalable des candidats à « ${sujet} ».`,
+      ],
+      [
+        `<a href="https://www.dendreo.com/blog/veille-legale-et-reglementaire-de-la-formation-professionnelle-recap-des-actualites-2025" target="_blank" rel="noopener">Dendreo – Veille formation pro</a>`,
+        `Synthèse réglementaire ${veilleYear(f, 2)} — secteur formation`,
+        veilleMonthYear(f, 2),
+        `Recensement des évolutions ${veilleYear(f, 2)} applicables à « ${sujet} » : CPF, financement, qualité, RGPD.`,
+        `Preuve : synthèse archivée. Action : revue annuelle interne intégrée à « ${sujet} ».`,
+      ],
+    ];
+  }
+  if (kind === "metier") {
+    return [
+      [
+        `<a href="https://www.francetravail.fr/statistiques-analyses/marche-du-travail.html" target="_blank" rel="noopener">France Travail – Statistiques métiers</a>`,
+        `Tendances du marché du travail pour le métier visé par « ${sujet} »`,
+        veilleMonthYear(f, 7),
+        `Données officielles sur les besoins de recrutement, salaires et perspectives du métier ciblé par « ${sujet} ».`,
+        `Preuve : extrait statistique. Action : adaptation du contenu de « ${sujet} » aux attentes du marché.`,
+      ],
+      [
+        `<a href="https://www.apec.fr/tous-nos-metiers.html" target="_blank" rel="noopener">APEC – Référentiel métiers</a>`,
+        `Fiche métier APEC liée à « ${sujet} »`,
+        veilleMonthYear(f, 6),
+        `Référentiel des compétences attendues, missions et évolutions du métier ciblé par « ${sujet} ».`,
+        `Preuve : capture fiche APEC. Action : alignement des objectifs pédagogiques de « ${sujet} ».`,
+      ],
+      [
+        `<a href="https://www.centre-inffo.fr/" target="_blank" rel="noopener">Centre Inffo – Actualités sectorielles</a>`,
+        `Évolutions du secteur professionnel de « ${sujet} »`,
+        veilleMonthYear(f, 5),
+        `Veille sur les conventions collectives, accords de branche et compétences émergentes du secteur de « ${sujet} ».`,
+        `Preuve : article archivé. Action : intégration des évolutions dans le programme de « ${sujet} ».`,
+      ],
+      [
+        `<a href="https://www.observatoire-metiers.org/" target="_blank" rel="noopener">Observatoire des métiers de la branche</a>`,
+        `Études prospectives sur les métiers liés à « ${sujet} »`,
+        veilleMonthYear(f, 4),
+        `Études quantitatives et qualitatives sur l'évolution des compétences pour les métiers visés par « ${sujet} ».`,
+        `Preuve : étude téléchargée. Action : ajustement des modules de « ${sujet} ».`,
+      ],
+      [
+        `<a href="https://www.linkedin.com/" target="_blank" rel="noopener">LinkedIn – Communautés professionnelles</a>`,
+        `Discussions et tendances métier autour de « ${sujet} »`,
+        veilleMonthYear(f, 3),
+        `Veille communautaire sur les pratiques émergentes, outils et retours d'expérience des professionnels de « ${sujet} ».`,
+        `Preuve : capture posts/articles. Action : enrichissement des cas pratiques de « ${sujet} ».`,
+      ],
+      [
+        `<a href="https://www.francecompetences.fr/recherche_certificationprofessionnelle/" target="_blank" rel="noopener">France Compétences – Fiche RNCP/RS</a>`,
+        `Fiche officielle des compétences attendues pour « ${sujet} »${rncp}`,
+        veilleMonthYear(f, 2),
+        `Référentiel d'activités, compétences et évaluation officiel à respecter dans « ${sujet} ».`,
+        `Preuve : fiche archivée. Action : conformité du programme de « ${sujet} ».`,
+      ],
+    ];
+  }
+  // technologique
+  return [
+    [
+      `<a href="https://www.youtube.com/results?search_query=${encodeURIComponent(sujet + " 2025 nouveautés")}" target="_blank" rel="noopener">YouTube – Nouveautés ${sujet}</a>`,
+      `Vidéos professionnelles récentes sur « ${sujet} »`,
+      veilleMonthYear(f, 7),
+      `Tutoriels et démonstrations des dernières évolutions techniques et outils dans « ${sujet} ».`,
+      `Preuve : playlist visionnée. Action : intégration des bonnes pratiques actualisées dans « ${sujet} ».`,
+    ],
+    [
+      `<a href="https://www.usine-digitale.fr/" target="_blank" rel="noopener">L'Usine Digitale</a>`,
+      `Innovations technologiques applicables à « ${sujet} »`,
+      veilleMonthYear(f, 6),
+      `Veille sur les outils numériques, plateformes et SaaS qui transforment la pratique du métier visé par « ${sujet} ».`,
+      `Preuve : article archivé. Action : présentation des outils en formation « ${sujet} ».`,
+    ],
+    [
+      `<a href="https://www.frandroid.com/" target="_blank" rel="noopener">Presse spécialisée tech</a>`,
+      `Outils et logiciels récents pour « ${sujet} »`,
+      veilleMonthYear(f, 5),
+      `Comparatifs et tests des outils numériques utilisés dans le métier ciblé par « ${sujet} ».`,
+      `Preuve : article comparatif. Action : sélection des outils enseignés dans « ${sujet} ».`,
+    ],
+    [
+      `<a href="https://www.cnil.fr/fr/professionnels" target="_blank" rel="noopener">CNIL – Espace professionnels</a>`,
+      `RGPD et numérique appliqués au métier de « ${sujet} »`,
+      veilleMonthYear(f, 4),
+      `Recommandations CNIL sur l'usage des outils numériques et la protection des données dans « ${sujet} ».`,
+      `Preuve : guide CNIL. Action : module RGPD intégré à « ${sujet} ».`,
+    ],
+    [
+      `<a href="https://openai.com/blog" target="_blank" rel="noopener">OpenAI Blog</a>`,
+      `IA générative au service du métier de « ${sujet} »`,
+      veilleMonthYear(f, 3),
+      `Veille sur les apports de l'IA générative pour automatiser ou enrichir les tâches de « ${sujet} ».`,
+      `Preuve : article archivé. Action : démonstration d'usages IA appliqués à « ${sujet} ».`,
+    ],
+    [
+      `<a href="https://www.youtube.com/results?search_query=${encodeURIComponent(sujet + " tutoriel pro")}" target="_blank" rel="noopener">YouTube – Tutoriels ${sujet}</a>`,
+      `Tutoriels professionnels sur les outils de « ${sujet} »`,
+      veilleMonthYear(f, 2),
+      `Démonstrations pratiques des outils numériques utilisés dans « ${sujet} ».`,
+      `Preuve : tutoriels visionnés. Action : ressources partagées aux stagiaires de « ${sujet} ».`,
+    ],
+  ];
+}
+
 // ===== IND 23 — VEILLE RÉGLEMENTAIRE =====
 
 /** Public helper: récupère les lignes hardcodées de veille réglementaire d'une formation
  *  (utilisé par le générateur de preuves visuelles IND 23). */
 export function getVeilleReglementaireRowsForFormation(f: FormationInfo): string[][] {
-  return veilleReglementaireRows(f, detectFormationType(f));
+  const aiPack = getCachedVeillePack(f);
+  if (aiPack?.reglementaire?.length) return veilleRowsToTable(aiPack.reglementaire);
+  return genericVeilleRows(f, "reglementaire");
 }
 
 function veilleReglementaireRows(f: FormationInfo, type: FormationType): string[][] {
