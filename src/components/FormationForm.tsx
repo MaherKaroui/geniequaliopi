@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Upload, Sparkles, Loader2 } from "lucide-react";
+import { Upload, Sparkles, Loader2, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SAMPLE_FORMATIONS, STAGIAIRES_BAC_PRO_LOGISTIQUE } from "@/lib/sampleData";
 import { parseEdofXlsx, EdofSession } from "@/lib/edofParser";
@@ -29,6 +29,26 @@ const FormationForm = ({ data, onChange, onImportStagiaires }: FormationFormProp
   const [aiCodeRNCP, setAiCodeRNCP] = useState("");
   const [aiModel, setAiModel] = useState<string>("google/gemini-2.5-flash");
   const [aiLoading, setAiLoading] = useState(false);
+  const [veilleLoading, setVeilleLoading] = useState(false);
+
+  const handleRegenerateVeilles = async () => {
+    if (!data.intitule || data.intitule.trim().length < 3) {
+      toast.error("Renseignez d'abord l'intitulé de la formation");
+      return;
+    }
+    setVeilleLoading(true);
+    const t = toast.loading("Génération des veilles cohérentes avec la formation…");
+    try {
+      clearCachedVeillePack(data);
+      await generateAIVeillePack(data, true);
+      toast.success("✅ Veilles (réglementaire / métier / techno) régénérées et adaptées à la formation", { id: t });
+    } catch (err: any) {
+      console.error("Veille regen error:", err);
+      toast.error(err?.message || "Échec de la régénération des veilles", { id: t });
+    } finally {
+      setVeilleLoading(false);
+    }
+  };
 
   const handleAIGenerate = async () => {
     const nom = aiNom.trim();
@@ -209,6 +229,26 @@ const FormationForm = ({ data, onChange, onImportStagiaires }: FormationFormProp
               Générer toute la formation avec l'IA
             </>
           )}
+        </Button>
+      </div>
+
+      {/* Régénération des veilles cohérentes */}
+      <div className="p-4 bg-secondary/30 border-2 border-secondary rounded-xl flex items-center justify-between gap-3">
+        <div className="flex-1">
+          <Label className="font-semibold">Veilles cohérentes avec la formation</Label>
+          <p className="text-xs text-muted-foreground">
+            Régénère les 3 tableaux (réglementaire / métier / technologique) parfaitement adaptés à « {data.intitule || "votre formation"} ». Cohérence garantie pour tous les documents IND 23/24/25.
+          </p>
+        </div>
+        <Button
+          type="button"
+          variant="default"
+          onClick={handleRegenerateVeilles}
+          disabled={veilleLoading || !data.intitule}
+          className="gap-2 shrink-0"
+        >
+          {veilleLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+          {veilleLoading ? "Génération…" : "Régénérer les veilles"}
         </Button>
       </div>
 
