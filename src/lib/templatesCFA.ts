@@ -21,7 +21,9 @@ export function genOrganigrammeCFA(o: OrganismeInfo) {
   const qual = o.referentQualite || o.poleAdministratif || o.dirigeant;
   const admin = o.poleAdministratif || o.dirigeant;
   const handi = o.referentHandicap || o.dirigeant;
-  const mob = (o as any).referentMobilite || o.dirigeant;
+  // Référent Mobilité : prestataire EXTERNE par défaut (Erasmus+ / Mobi'Jeunes)
+  const mobRaw = (o as any).referentMobilite;
+  const mob = mobRaw && mobRaw.trim() ? mobRaw : "Prestataire externe – Mobi'Jeunes / Erasmus+ France";
 
   const cell = (titre: string, lignes: string) => `
     <td style="border:1px solid #1e3a7b;padding:14px 16px;vertical-align:top;width:50%;background:#ffffff">
@@ -47,10 +49,10 @@ export function genOrganigrammeCFA(o: OrganismeInfo) {
       </tr>
       <tr>
         ${cell("PÔLE RELATION ENTREPRISES", `<p style="margin:4px 0"><strong>Directeur relation entreprises :</strong> ${o.dirigeant}</p><p style="margin:4px 0"><strong>Missions :</strong> Développement des partenariats – Insertion professionnelle</p>`)}
-        ${cell("RÉFÉRENT MOBILITÉ", `<p style="margin:4px 0"><strong>Responsable :</strong> ${mob}</p><p style="margin:4px 0"><strong>Missions :</strong> Accompagnement des mobilités des apprenants (nationales et internationales)</p>`)}
+        ${cell("RÉFÉRENT MOBILITÉ NATIONALE ET INTERNATIONALE", `<p style="margin:4px 0"><strong>Prestataire externe :</strong> ${mob}</p><p style="margin:4px 0"><strong>Statut :</strong> <em>Mission externalisée</em></p><p style="margin:4px 0"><strong>Missions :</strong> Accompagnement des mobilités nationales et internationales des apprentis (Erasmus+, conventions inter-CFA, partenariats européens)</p>`)}
       </tr>
     </table>
-    <p style="text-align:center;font-size:11px;color:#666;margin-top:20px"><em>Document de présentation interne – ${o.nom}</em></p>` });
+    <p style="text-align:center;font-size:11px;color:#666;margin-top:20px"><em>Document de présentation interne – ${o.nom} — La fonction de Référent Mobilité nationale et internationale est externalisée auprès d'un prestataire spécialisé.</em></p>` });
 }
 
 export function genLivretAccueilApprenti(o: OrganismeInfo, f: FormationInfo) {
