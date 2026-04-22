@@ -158,6 +158,14 @@ const OrganismeForm = ({ data, onChange, hideFields = [] }: OrganismeFormProps) 
           <Label htmlFor="poleAdministratif">Pôle Administratif</Label>
           <Input id="poleAdministratif" value={data.poleAdministratif} onChange={e => update('poleAdministratif', e.target.value)} placeholder="Nom du responsable administratif" />
         </div>
+        <div>
+          <Label htmlFor="relationEntreprises">Relation Entreprises</Label>
+          <Input id="relationEntreprises" value={data.relationEntreprises} onChange={e => update('relationEntreprises', e.target.value)} placeholder="Nom du responsable relation entreprises" />
+        </div>
+        <div>
+          <Label htmlFor="referentMobilite">Référent Mobilité (externalisé)</Label>
+          <Input id="referentMobilite" value={data.referentMobilite} onChange={e => update('referentMobilite', e.target.value)} placeholder="Nom du référent mobilité (Mobi'Jeunes/Erasmus+)" />
+        </div>
         {!hidden('domainesFormation') && (
         <div className="md:col-span-2">
           <Label htmlFor="domainesFormation">Domaines de formation</Label>
