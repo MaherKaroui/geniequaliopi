@@ -6567,8 +6567,8 @@ ${tableHTML(["Champ", "Réponse"], [
 
     { heading: "7. Situation administrative", content: `
 <p><strong>Statut actuel :</strong> Apprenti</p>
-<p><strong>Reconnaissance travailleur handicapé (le cas échéant) :</strong> ${rqthOui ? "☒ Oui &nbsp;&nbsp; ☐ Non" : "☐ Oui &nbsp;&nbsp; ☒ Non"}</p>
-<p><strong>Si oui, souhaitez-vous un aménagement du parcours ?</strong> ${rqthOui ? "☒ Oui &nbsp;&nbsp; ☐ Non" : "☐ Oui &nbsp;&nbsp; ☒ Non"}</p>` },
+<p><strong>Reconnaissance travailleur handicapé (le cas échéant) :</strong> ${rqthOui ? "<strong>Oui</strong>" : "<strong>Non</strong>"}</p>
+<p><strong>Si oui, souhaitez-vous un aménagement du parcours ?</strong> ${rqthOui ? "<strong>Oui</strong>" : "<strong>Non</strong>"}</p>` },
 
     { heading: "8. Pièces à fournir", content: `
 <ul>
