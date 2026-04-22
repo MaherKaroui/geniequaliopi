@@ -539,6 +539,37 @@ export function buildFullCatalog(
     // Mission 14 — Conseil de perfectionnement
     add("cfa_mission14_conseil_perfectionnement", "CT3 - IND 10 📁 14 MISSIONS / Mission 14 – Compte-rendu Conseil de perfectionnement", 3, 10, "conseil_perfectionnement_cfa", { folder: "14_MISSIONS_CFA/Mission_14_Conseil_Perfectionnement" });
 
+    // ===== EXERCICES — QCM 10 questions par mission, par stagiaire =====
+    // Chaque QCM est placé dans le sous-dossier de la mission correspondante.
+    const MISSIONS_FOLDERS: { num: number; folder: string; titre: string; critere: number; ind: number }[] = [
+      { num: 1, folder: "14_MISSIONS_CFA/Mission_1_Handicap", titre: "Mission 1 – Handicap", critere: 3, ind: 10 },
+      { num: 2, folder: "14_MISSIONS_CFA/Mission_2_Mixite_Metiers", titre: "Mission 2 – Mixité des métiers", critere: 3, ind: 10 },
+      { num: 3, folder: "14_MISSIONS_CFA/Mission_3_Cooperation_CFA_Entreprise", titre: "Mission 3 – Coopération CFA/Entreprise", critere: 3, ind: 10 },
+      { num: 4, folder: "14_MISSIONS_CFA/Mission_4_Activites_Citoyennes", titre: "Mission 4 – Activités citoyennes", critere: 3, ind: 10 },
+      { num: 5, folder: "14_MISSIONS_CFA/Mission_5_Rupture_Contrat", titre: "Mission 5 – Rupture de contrat", critere: 3, ind: 10 },
+      { num: 6, folder: "14_MISSIONS_CFA/Mission_6_Mixite_Egalite_FH", titre: "Mission 6 – Mixité & Égalité F/H", critere: 3, ind: 10 },
+      { num: 7, folder: "14_MISSIONS_CFA/Mission_7_Accompagnement_Educatif_Social", titre: "Mission 7 – Accompagnement éducatif & social", critere: 3, ind: 10 },
+      { num: 8, folder: "14_MISSIONS_CFA/Mission_8_Insertion_Professionnelle", titre: "Mission 8 – Insertion professionnelle", critere: 7, ind: 30 },
+      { num: 9, folder: "14_MISSIONS_CFA/Mission_9_Mobilite_Erasmus", titre: "Mission 9 – Mobilité Erasmus+", critere: 3, ind: 10 },
+      { num: 10, folder: "14_MISSIONS_CFA/Mission_10_Mobilite_Nationale", titre: "Mission 10 – Mobilité nationale", critere: 3, ind: 10 },
+      { num: 11, folder: "14_MISSIONS_CFA/Mission_11_Aide_Recherche_Employeur", titre: "Mission 11 – Aide recherche employeur", critere: 3, ind: 10 },
+      { num: 12, folder: "14_MISSIONS_CFA/Mission_12_Accueil_Tout_Moment", titre: "Mission 12 – Accueil à tout moment", critere: 3, ind: 10 },
+      { num: 13, folder: "14_MISSIONS_CFA/Mission_13_Formation_Maitre_Apprentissage", titre: "Mission 13 – Formation du Maître d'Apprentissage", critere: 3, ind: 10 },
+      { num: 14, folder: "14_MISSIONS_CFA/Mission_14_Conseil_Perfectionnement", titre: "Mission 14 – Conseil de perfectionnement", critere: 3, ind: 10 },
+    ];
+    MISSIONS_FOLDERS.forEach((m) => {
+      stagiaires.forEach((s, si) => {
+        add(
+          `cfa_qcm_mission${m.num}_${si}`,
+          `CT${m.critere} - IND ${m.ind} 📁 14 MISSIONS / ${m.titre} – QCM Exercice – ${s.prenom} ${s.nom}`,
+          m.critere,
+          m.ind,
+          "qcm_mission_cfa",
+          { folder: m.folder, stagiaireIdx: si, missionNumero: m.num },
+        );
+      });
+    });
+
     // Documents CFA complémentaires (autres critères)
     add("cfa_c1i1_livret_accueil", "CT1 - IND 1 LIVRET D'ACCUEIL CFA", 1, 1, "livret_accueil_cfa");
     add("cfa_procedure_psh", "Procédure PSH CFA", 6, 26, "procedure_psh_cfa");
