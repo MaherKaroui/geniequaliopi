@@ -17,16 +17,40 @@ export function genPresentationCFA(o: OrganismeInfo) {
 }
 
 export function genOrganigrammeCFA(o: OrganismeInfo) {
-  return buildDocument({ org: o, title: "ORGANIGRAMME DU CFA", extraHtml: `
-    <div style="text-align:center;margin:30px 0">
-      <div style="background:#1e3a7b;color:white;padding:15px 30px;border-radius:8px;display:inline-block;margin-bottom:20px"><strong>Direction du CFA</strong><br>${o.dirigeant}</div>
-      <div style="display:flex;justify-content:center;gap:20px;flex-wrap:wrap;margin-top:20px">
-        <div style="background:#e8f0fe;padding:12px 20px;border-radius:8px;min-width:180px"><strong>Coordination Pédagogique</strong><br>${o.responsablePedagogique}<br><em style="font-size:11px">Formateurs CFA</em></div>
-        <div style="background:#e8f0fe;padding:12px 20px;border-radius:8px;min-width:180px"><strong>Relations Entreprises</strong><br>${o.poleAdministratif}<br><em style="font-size:11px">Maîtres d'apprentissage</em></div>
-        <div style="background:#e8f0fe;padding:12px 20px;border-radius:8px;min-width:180px"><strong>Référent Handicap</strong><br>${o.referentHandicap}<br><em style="font-size:11px">Accessibilité</em></div>
-        <div style="background:#e8f0fe;padding:12px 20px;border-radius:8px;min-width:180px"><strong>Vie Scolaire</strong><br>${o.referentQualite}<br><em style="font-size:11px">Suivi apprentis</em></div>
+  const ped = o.responsablePedagogique || o.dirigeant;
+  const qual = o.referentQualite || o.poleAdministratif || o.dirigeant;
+  const admin = o.poleAdministratif || o.dirigeant;
+  const handi = o.referentHandicap || o.dirigeant;
+  const mob = (o as any).referentMobilite || o.dirigeant;
+
+  const cell = (titre: string, lignes: string) => `
+    <td style="border:1px solid #1e3a7b;padding:14px 16px;vertical-align:top;width:50%;background:#ffffff">
+      <div style="background:#1e3a7b;color:white;padding:6px 10px;font-weight:bold;text-align:center;margin:-14px -16px 10px -16px">${titre}</div>
+      ${lignes}
+    </td>`;
+
+  return buildDocument({ org: o, title: "ORGANIGRAMME DE L'ORGANISME", subtitle: o.nom, extraHtml: `
+    <div style="text-align:center;margin:20px 0 30px 0">
+      <div style="background:#1e3a7b;color:white;padding:14px 40px;border-radius:6px;display:inline-block">
+        <div style="font-size:14px;font-weight:bold;letter-spacing:1px">DIRECTION GÉNÉRALE</div>
+        <div style="font-size:13px;margin-top:4px">${o.dirigeant}</div>
       </div>
-    </div>` });
+    </div>
+    <table style="width:100%;border-collapse:collapse;margin-top:10px">
+      <tr>
+        ${cell("PÔLE PÉDAGOGIQUE", `<p style="margin:4px 0"><strong>Responsable :</strong> ${ped}</p><p style="margin:4px 0"><strong>Missions :</strong> Encadrement pédagogique – Coordination des formateurs</p><p style="margin:4px 0"><strong>Formateurs</strong></p>`)}
+        ${cell("PÔLE QUALITÉ", `<p style="margin:4px 0"><strong>Responsable :</strong> ${qual}</p><p style="margin:4px 0"><strong>Missions :</strong> Amélioration continue</p><p style="margin:4px 0"><strong>Référent administratif et qualité :</strong> ${qual}</p>`)}
+      </tr>
+      <tr>
+        ${cell("PÔLE HANDICAP", `<p style="margin:4px 0"><strong>Référent handicap :</strong> ${handi}</p><p style="margin:4px 0"><strong>Missions :</strong> Accessibilité – Accompagnement des apprenants en situation de handicap</p>`)}
+        ${cell("PÔLE ADMINISTRATIF", `<p style="margin:4px 0"><strong>Responsable :</strong> ${admin}</p><p style="margin:4px 0"><strong>Missions :</strong> Inscriptions – Facturation</p>`)}
+      </tr>
+      <tr>
+        ${cell("PÔLE RELATION ENTREPRISES", `<p style="margin:4px 0"><strong>Directeur relation entreprises :</strong> ${o.dirigeant}</p><p style="margin:4px 0"><strong>Missions :</strong> Développement des partenariats – Insertion professionnelle</p>`)}
+        ${cell("RÉFÉRENT MOBILITÉ", `<p style="margin:4px 0"><strong>Responsable :</strong> ${mob}</p><p style="margin:4px 0"><strong>Missions :</strong> Accompagnement des mobilités des apprenants (nationales et internationales)</p>`)}
+      </tr>
+    </table>
+    <p style="text-align:center;font-size:11px;color:#666;margin-top:20px"><em>Document de présentation interne – ${o.nom}</em></p>` });
 }
 
 export function genLivretAccueilApprenti(o: OrganismeInfo, f: FormationInfo) {
