@@ -567,15 +567,6 @@ export function buildFullCatalog(
           "qcm_mission_cfa",
           { folder: m.folder, stagiaireIdx: si, missionNumero: m.num },
         );
-        // Mail hebdomadaire d'envoi du QCM (1 par mission, par stagiaire, daté semaine école N)
-        add(
-          `cfa_mail_mission${m.num}_${si}`,
-          `CT${m.critere} - IND ${m.ind} 📁 14 MISSIONS / ${m.titre} – ✉️ Mail Envoi QCM (Semaine ${m.num}) – ${s.prenom} ${s.nom}`,
-          m.critere,
-          m.ind,
-          "mail_mission_cfa",
-          { folder: m.folder, stagiaireIdx: si, missionNumero: m.num },
-        );
       });
     });
 
