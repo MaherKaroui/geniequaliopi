@@ -625,21 +625,28 @@ export default function OPCOMobilites() {
               }
             } else if (PER_SESSION_DOCS.has(doc.code) && stagiairesSnap.length > 0) {
               const subFolder = `${folder}/${doc.code}_${doc.label.replace(/\s+/g, "_")}`;
+              const isC12 = doc.code === "C12";
               for (let i = 0; i < sessionsSnap.length; i++) {
                 const g = sessionsSnap[i];
                 const suffix = formatSessionSuffix(g, i);
                 const sessionFolder = `${subFolder}/${suffix}`;
 
-                for (const s of g.stagiaires) {
-                  const blob = await generateAutoBlobForSession(doc, [s]);
+                if (isC12) {
+                  const blob = await generateAutoBlobForSession(doc, g.stagiaires);
                   if (blob) {
-                    const stagSuffix = `${s.prenom || ""}_${s.nom || ""}`.trim() || "Stagiaire";
-                    zip.file(`${sessionFolder}/${buildOpcoFileName(ctxSnap, doc.label, "pdf", stagSuffix)}`, blob);
+                    zip.file(`${sessionFolder}/${buildOpcoFileName(ctxSnap, doc.label, "pdf", suffix)}`, blob);
                   }
                   await new Promise((r) => setTimeout(r, 30));
-                }
+                } else {
+                  for (const s of g.stagiaires) {
+                    const blob = await generateAutoBlobForSession(doc, [s]);
+                    if (blob) {
+                      const stagSuffix = `${s.prenom || ""}_${s.nom || ""}`.trim() || "Stagiaire";
+                      zip.file(`${sessionFolder}/${buildOpcoFileName(ctxSnap, doc.label, "pdf", stagSuffix)}`, blob);
+                    }
+                    await new Promise((r) => setTimeout(r, 30));
+                  }
 
-                if (doc.code !== "C12") {
                   const viergeBlob = await generateViergeBlobForSession(doc.code, g.stagiaires);
                   if (viergeBlob) {
                     zip.file(`${sessionFolder}/${buildOpcoFileName(ctxSnap, `${doc.label} (Trame vierge)`, "pdf", suffix)}`, viergeBlob);
