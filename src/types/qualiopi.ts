@@ -43,6 +43,8 @@ export interface OrganismeInfo {
   referentHandicap: string;
   referentQualite: string;
   poleAdministratif: string;
+  relationEntreprises: string;
+  referentMobilite: string;
   domainesFormation: string;
   typesActions: ('actions-formation' | 'bilans-competences' | 'vae' | 'apprentissage')[];
   certifications: string;
