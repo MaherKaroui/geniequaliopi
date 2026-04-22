@@ -290,6 +290,7 @@ export function getCourseChapters(formationIntitule: string): CourseChapter[] {
   const t = formationIntitule.toLowerCase();
   if (t.includes('socio-esthéti') || t.includes('socio esthéti') || t.includes('rs5992') || t.includes('soins socio')) return getSocioEsthetiqueChapters();
   if (t.includes('vtc') || t.includes('voiture de transport avec chauffeur') || t.includes('rs5637') || t.includes('chauffeur vtc')) return getVTCChapters();
+  if (t.includes('négociateur') || t.includes('technico-commercial') || t.includes('technico commercial') || t.includes(' ntc') || t.startsWith('ntc') || t.includes('rncp39063')) return getNTCChapters();
   if (t.includes('ecsr') || t.includes('enseignant de la conduite') || t.includes('sécurité routière')) return getECSRChapters();
   if (t.includes('vtest') || t.includes('v-test') || t.includes('rs6905')) return getVTestChapters();
   if (t.includes('conseiller en insertion') || t.includes('insertion professionnelle') || t.includes('cip') || t.includes('rncp37274')) return getCIPChapters();
