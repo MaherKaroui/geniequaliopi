@@ -680,43 +680,34 @@ export function buildFullCatalog(
     });
 
     // ===== IND 14 — VISUELS / AFFICHES DES 14 MISSIONS DU CFA =====
-    // Affiches HD (posters) à diffuser dans les locaux pour chaque mission
+    // Affiches modernes avec illustration + nom d'organisme dynamique
     const visuels14 = [
-      { num: 1, titre: "Mission 1 – Orientation & Handicap", file: "mission_1_HD.png" },
-      { num: 2, titre: "Mission 2 – Mixité des Métiers", file: "mission_2_HD.png" },
-      { num: 3, titre: "Mission 3 – Coopération CFA / Entreprise", file: "mission_3_HD.png" },
-      { num: 4, titre: "Mission 4 – Activités Citoyennes, Culturelles & Sportives", file: "mission_4_HD.png" },
-      { num: 5, titre: "Mission 5 – Rupture du Contrat d'Apprentissage", file: "mission_5_HD.png" },
-      { num: 6, titre: "Mission 6 – Aides Sociales / Mixité & Égalité F-H", file: "mission_6_HD.png" },
-      { num: 7, titre: "Mission 7 – Accompagnement Éducatif, Social & Professionnel", file: "mission_7_HD.png" },
-      { num: 8, titre: "Mission 8 – Insertion Professionnelle", file: "mission_8_HD.png" },
-      { num: 9, titre: "Mission 9 – Mobilité Internationale Erasmus+", file: "mission_9_HD.png" },
-      { num: 10, titre: "Mission 10 – Mobilité Nationale", file: "mission_10.pdf" },
-      { num: 11, titre: "Mission 11 – Aide à la Recherche d'Employeur", file: "mission_11_HD.png" },
-      { num: 12, titre: "Mission 12 – Accueil à Tout Moment de l'Année", file: "mission_12_HD.png" },
-      { num: 13, titre: "Mission 13 – Formation des Maîtres d'Apprentissage", file: "mission_13_HD.png" },
-      { num: 14, titre: "Mission 14 – Conseil de Perfectionnement", file: "mission_14_HD.png" },
+      { num: 1,  titre: "Mission 1 – Orientation & Handicap" },
+      { num: 2,  titre: "Mission 2 – Mixité des Métiers" },
+      { num: 3,  titre: "Mission 3 – Coopération CFA / Entreprise" },
+      { num: 4,  titre: "Mission 4 – Activités Citoyennes, Culturelles & Sportives" },
+      { num: 5,  titre: "Mission 5 – Rupture du Contrat d'Apprentissage" },
+      { num: 6,  titre: "Mission 6 – Aides Sociales / Mixité & Égalité F-H" },
+      { num: 7,  titre: "Mission 7 – Accompagnement Éducatif, Social & Professionnel" },
+      { num: 8,  titre: "Mission 8 – Insertion Professionnelle" },
+      { num: 9,  titre: "Mission 9 – Mobilité Internationale Erasmus+" },
+      { num: 10, titre: "Mission 10 – Mobilité Nationale" },
+      { num: 11, titre: "Mission 11 – Aide à la Recherche d'Employeur" },
+      { num: 12, titre: "Mission 12 – Accueil à Tout Moment de l'Année" },
+      { num: 13, titre: "Mission 13 – Formation des Maîtres d'Apprentissage" },
+      { num: 14, titre: "Mission 14 – Conseil de Perfectionnement" },
     ];
     visuels14.forEach((v) => {
-      const isPdf = v.file.toLowerCase().endsWith(".pdf");
-      const url = `/pdfs/visuels_14_missions/${v.file}`;
-      if (isPdf) {
-        // PDF natif → conservé tel quel (pas de réécriture du nom)
-        add(
-          `cfa_c3i14_visuel_mission_${v.num}`,
-          `CT3 - IND 14 📁 VISUELS 14 MISSIONS / ${v.titre}`,
-          3, 14, "pdf_static",
-          { pdfUrl: url, folder: "VISUELS_14_MISSIONS" }
-        );
-      } else {
-        // Image PNG → template HTML qui injecte le nom de l'organisme
-        add(
-          `cfa_c3i14_visuel_mission_${v.num}`,
-          `CT3 - IND 14 📁 VISUELS 14 MISSIONS / ${v.titre}`,
-          3, 14, "visuel_mission_cfa",
-          { imageUrl: url, missionTitre: v.titre, folder: "VISUELS_14_MISSIONS" }
-        );
-      }
+      add(
+        `cfa_c3i14_visuel_mission_${v.num}`,
+        `CT3 - IND 14 📁 VISUELS 14 MISSIONS / ${v.titre}`,
+        3, 14, "visuel_mission_cfa",
+        {
+          imageUrl: `/pdfs/visuels_14_missions/illu_m${v.num}.jpg`,
+          missionTitre: v.titre,
+          folder: "VISUELS_14_MISSIONS",
+        }
+      );
     });
 
     // ===== IND 14 — DOSSIER PERMIS B =====
