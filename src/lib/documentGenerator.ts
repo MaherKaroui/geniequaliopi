@@ -6589,8 +6589,8 @@ ${s.signatureUrl ? `<p><img src="${s.signatureUrl}" alt="Signature" style="max-h
 
     { heading: "10. Cadre réservé au CFA", content: `
 <p><strong>Dossier reçu le :</strong> ${recuLe}</p>
-<p><strong>Dossier complet :</strong> ☒ Oui &nbsp;&nbsp; ☐ Non</p>
-<p><strong>Avis du CFA :</strong> ☒ Favorable &nbsp;&nbsp; ☐ Réservé &nbsp;&nbsp; ☐ Défavorable</p>
+<p><strong>Dossier complet :</strong> <strong>Oui</strong></p>
+<p><strong>Avis du CFA :</strong> <strong>Favorable</strong></p>
 <p><strong>Observations du CFA :</strong> Candidature complète et conforme aux prérequis de la formation. Profil cohérent avec le métier visé. Admission validée sous réserve de signature du contrat d'apprentissage.</p>
 <p style="margin-top:18px"><strong>Signature et cachet du CFA :</strong></p>
 ${o.tamponUrl
