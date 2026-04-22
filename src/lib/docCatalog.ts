@@ -698,14 +698,25 @@ export function buildFullCatalog(
       { num: 14, titre: "Mission 14 – Conseil de Perfectionnement", file: "mission_14_HD.png" },
     ];
     visuels14.forEach((v) => {
-      add(
-        `cfa_c3i14_visuel_mission_${v.num}`,
-        `CT3 - IND 14 📁 VISUELS 14 MISSIONS / ${v.titre}`,
-        3,
-        14,
-        "pdf_static",
-        { pdfUrl: `/pdfs/visuels_14_missions/${v.file}`, folder: "VISUELS_14_MISSIONS" }
-      );
+      const isPdf = v.file.toLowerCase().endsWith(".pdf");
+      const url = `/pdfs/visuels_14_missions/${v.file}`;
+      if (isPdf) {
+        // PDF natif → conservé tel quel (pas de réécriture du nom)
+        add(
+          `cfa_c3i14_visuel_mission_${v.num}`,
+          `CT3 - IND 14 📁 VISUELS 14 MISSIONS / ${v.titre}`,
+          3, 14, "pdf_static",
+          { pdfUrl: url, folder: "VISUELS_14_MISSIONS" }
+        );
+      } else {
+        // Image PNG → template HTML qui injecte le nom de l'organisme
+        add(
+          `cfa_c3i14_visuel_mission_${v.num}`,
+          `CT3 - IND 14 📁 VISUELS 14 MISSIONS / ${v.titre}`,
+          3, 14, "visuel_mission_cfa",
+          { imageUrl: url, missionTitre: v.titre, folder: "VISUELS_14_MISSIONS" }
+        );
+      }
     });
 
     // ===== IND 14 — DOSSIER PERMIS B =====
