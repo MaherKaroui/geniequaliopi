@@ -659,7 +659,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "grille_entretien_candidat_cfa": return genGrilleEntretienCandidatCFA(o, f);
     case "procedure_missions_entreprise_cfa": return genProcedureMissionsEntrepriseCFA(o, f);
     case "mail_type_candidat_cfa": return genMailTypeCandidatCFA(o, f);
-    case "dossier_candidature_cfa": return genDossierCandidatureCFA(o, f);
+    case "dossier_candidature_cfa": return genDossierCandidatureCFA(o, f, stagiaires, params?.stagiaireIdx ?? 0);
     case "livret_accueil_cfa": return genLivretAccueilCFA(o, f);
     case "livret_accueil_cfa_v2": return genLivretAccueilCFA_V2(o, f, stagiaires, params?.stagiaireIdx ?? 0);
     case "reglement_interieur_cfa_v2": return genReglementInterieurCFA_V2(o, f, stagiaires, params?.stagiaireIdx ?? 0);
@@ -6411,49 +6411,127 @@ function genMailTypeCandidatCFA(o: OrganismeInfo, f: FormationInfo) {
   ] });
 }
 
-function genDossierCandidatureCFA(o: OrganismeInfo, f: FormationInfo) {
-  const blank = "________________________";
-  return buildDocument({ org: o, title: "DOSSIER DE CANDIDATURE", subtitle: f.intitule, sections: [
-    { heading: "Informations personnelles", content: `
+function genDossierCandidatureCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[] = [], si: number = 0) {
+  const s = stagiaires[si];
+  if (!s) {
+    return buildDocument({ org: o, title: "DOSSIER DE CANDIDATURE", subtitle: f.intitule, sections: [
+      { heading: "Aucun candidat", content: `<p>Aucun stagiaire renseigné — impossible de pré-remplir le dossier.</p>` },
+    ]});
+  }
+
+  // Données candidat
+  const civ = s.civilite || "";
+  const nomComplet = `${s.prenom || ""} ${s.nom || ""}`.trim();
+  const adresseComplete = [s.adresse, s.codePostal, s.commune].filter(Boolean).join(", ") || "—";
+  const dateNaiss = s.dateNaissance ? formatDate(s.dateNaissance) : "—";
+
+  // Année scolaire à partir des dates de formation
+  const dDeb = s.dateDebutFormation || f.dateDebut;
+  const dFin = s.dateFinFormation || f.dateFin;
+  const anneeFormation = dDeb && dFin
+    ? `${new Date(dDeb).getFullYear()} / ${new Date(dFin).getFullYear()}`
+    : "—";
+
+  // Rythme alternance (déduit des modalités CFA standard)
+  const rythme = "1 semaine en école / 3 semaines en entreprise";
+
+  // Disponibilité = date de début de formation
+  const dispo = dDeb ? formatDate(dDeb) : "—";
+
+  // Statut RQTH
+  const rqthOui = s.rqth === "oui";
+  const rqthNon = s.rqth === "non" || !s.rqth;
+
+  // Dates dossier (réception J-15 avant début, signature candidat J-10)
+  const recuLe = (() => {
+    if (!dDeb) return "—";
+    const d = new Date(dDeb); d.setDate(d.getDate() - 15); return formatDate(d.toISOString().slice(0,10));
+  })();
+  const signeLe = (() => {
+    if (!dDeb) return "—";
+    const d = new Date(dDeb); d.setDate(d.getDate() - 10); return formatDate(d.toISOString().slice(0,10));
+  })();
+
+  // Diplôme
+  const dernierDiplome = s.diplome || "Baccalauréat";
+
+  return buildDocument({ org: o, title: "DOSSIER DE CANDIDATURE – APPRENTISSAGE", subtitle: f.intitule, sections: [
+    { heading: "1. Identité du candidat", content: `
 ${tableHTML(["Champ", "Réponse"], [
-  ["Nom", blank], ["Prénom", blank], ["Date de naissance", blank],
-  ["Adresse", blank], ["Code postal", blank], ["Ville", blank],
-  ["Téléphone", blank], ["Email", blank],
-  ["Nationalité", blank], ["NIR (Sécurité sociale)", blank],
+  ["Civilité", civ === "Mme" ? "Madame" : civ === "M." ? "Monsieur" : "—"],
+  ["Nom", s.nom || "—"],
+  ["Prénom", s.prenom || "—"],
+  ["Date de naissance", dateNaiss],
+  ["Adresse", adresseComplete],
+  ["Téléphone", s.telephone?.trim() ? s.telephone : "—"],
+  ["Adresse électronique", s.email || "—"],
+  ...(s.nationalite ? [["Nationalité", s.nationalite]] : []),
 ])}` },
-    { heading: "Situation actuelle", content: `
-<p><strong>Statut :</strong></p>
-<p>☐ Demandeur d'emploi &nbsp; ☐ Salarié(e) &nbsp; ☐ Étudiant(e) &nbsp; ☐ Autre : ${blank}</p>
-<p><strong>Dernier diplôme obtenu :</strong> ${blank}</p>
-<p><strong>Établissement :</strong> ${blank}</p>
-<p><strong>Année d'obtention :</strong> ${blank}</p>` },
-    { heading: "Projet professionnel", content: `
-<p><strong>Formation souhaitée :</strong> ${f.intitule}</p>
-<p><strong>Motivations :</strong></p>
-<p>${blank}</p><p>${blank}</p>
-<p><strong>Projet professionnel après la formation :</strong></p>
-<p>${blank}</p><p>${blank}</p>` },
-    { heading: "Entreprise d'accueil (si déjà trouvée)", content: `
+
+    { heading: "2. Formation souhaitée", content: `
 ${tableHTML(["Champ", "Réponse"], [
-  ["Nom de l'entreprise", blank], ["Adresse", blank],
-  ["Nom du tuteur / maître d'apprentissage", blank],
-  ["Fonction du tuteur", blank], ["Téléphone", blank], ["Email", blank],
+  ["Intitulé de la formation", (f.intitule || "—").toUpperCase()],
+  ["CFA choisi", o.nom || "—"],
+  ["Année de formation", anneeFormation],
+  ["Rythme de l'alternance", rythme],
 ])}` },
-    { heading: "Pièces à fournir", content: `
+
+    { heading: "3. Projet professionnel", content: `
+<p>Le/la candidat(e) expose ci-dessous son projet professionnel, ses motivations pour le métier préparé et les raisons de son choix pour la formation en apprentissage.</p>
+<p>L'objectif est d'acquérir une qualification reconnue dans le domaine <strong>${(f.intitule || "professionnel").toLowerCase()}</strong> afin de renforcer l'employabilité du bénéficiaire, d'évoluer vers des fonctions à responsabilités et de maîtriser les techniques métiers attendues sur le terrain.</p>
+<p>Le choix de l'apprentissage repose sur la volonté d'allier acquisition de compétences théoriques et mise en pratique en entreprise, dans une logique d'insertion professionnelle durable.</p>` },
+
+    { heading: "4. Parcours scolaire et professionnel", content: `
+${tableHTML(["Champ", "Réponse"], [
+  ["Dernier diplôme obtenu ou niveau de formation", dernierDiplome],
+  ["Établissement fréquenté", "—"],
+  ["Expériences professionnelles ou stages", s.poste ? s.poste : "—"],
+])}` },
+
+    { heading: "5. Compétences et qualités", content: `
+<p>Le/la candidat(e) peut indiquer ses compétences, savoir-faire, savoir-être et qualités personnelles utiles pour la formation et le métier visé.</p>
+<p><strong>Compétences techniques :</strong> compétences professionnelles attendues pour la formation <em>${f.intitule || "—"}</em>, conformément au référentiel d'activités et de compétences (RAC) du titre préparé.</p>
+<p><strong>Savoir-être professionnels :</strong> sens du contact, écoute active, communication claire et professionnelle, esprit d'équipe, respect des consignes et des engagements, adaptabilité et posture professionnelle.</p>
+<p><strong>Qualités personnelles :</strong> motivation, rigueur, autonomie, sens de l'organisation, persévérance, réactivité, capacité à atteindre des objectifs.</p>
+<p>Le candidat présente des compétences et qualités compatibles avec les exigences du métier visé. Son profil démontre une motivation réelle pour la fonction et une capacité à s'intégrer dans un environnement professionnel orienté résultats.</p>` },
+
+    { heading: "6. Disponibilité et mobilité", content: `
+${tableHTML(["Champ", "Réponse"], [
+  ["Disponibilité pour entrer en formation", dispo],
+  ["Moyen de transport", "Transports en commun"],
+  ["Zone géographique de recherche d'entreprise", "Île-de-France"],
+])}` },
+
+    { heading: "7. Situation administrative", content: `
+<p><strong>Statut actuel :</strong> Apprenti</p>
+<p><strong>Reconnaissance travailleur handicapé (le cas échéant) :</strong> ${rqthOui ? "☒ Oui &nbsp;&nbsp; ☐ Non" : "☐ Oui &nbsp;&nbsp; ☒ Non"}</p>
+<p><strong>Si oui, souhaitez-vous un aménagement du parcours ?</strong> ${rqthOui ? "☒ Oui &nbsp;&nbsp; ☐ Non" : "☐ Oui &nbsp;&nbsp; ☒ Non"}</p>` },
+
+    { heading: "8. Pièces à fournir", content: `
 <ul>
-<li>☐ Copie de la pièce d'identité</li>
-<li>☐ CV à jour</li>
-<li>☐ Lettre de motivation</li>
-<li>☐ Copie du dernier diplôme obtenu</li>
-<li>☐ Justificatif de domicile</li>
-<li>☐ Photo d'identité</li>
-<li>☐ Attestation de Sécurité sociale</li>
+<li>☒ Curriculum vitae</li>
+<li>☒ Lettre de motivation</li>
+<li>☒ Copie de la pièce d'identité</li>
+<li>☒ Dernier diplôme ou relevé de notes</li>
+<li>☒ Attestation de droits (si applicable)</li>
 </ul>` },
-    { heading: "Engagement du candidat", content: `
-<p>Je soussigné(e), certifie que les renseignements fournis dans ce dossier sont exacts. Je m'engage à fournir les pièces justificatives demandées dans les délais impartis.</p>
+
+    { heading: "9. Engagement du candidat", content: `
+<p>Je soussigné(e), <strong>${nomComplet}</strong>, déclare que les informations fournies dans le présent dossier de candidature sont exactes. Je m'engage à informer le CFA de toute modification de situation.</p>
+<p><strong>Fait à :</strong> ${s.commune || o.ville || "Paris"}</p>
+<p><strong>Date :</strong> ${signeLe}</p>
 <p><br/></p>
-<p>Fait à ${blank}, le ${blank}</p>
-<p><br/></p><p>Signature du candidat :</p><p><br/><br/></p>` },
+<p><strong>Signature du/de la candidat(e) :</strong></p>
+${s.signatureUrl ? `<p><img src="${s.signatureUrl}" alt="Signature" style="max-height:70px;"/></p>` : `<p><br/><br/></p>`}` },
+
+    { heading: "10. Cadre réservé au CFA", content: `
+<p><strong>Dossier reçu le :</strong> ${recuLe}</p>
+<p><strong>Dossier complet :</strong> ☒ Oui &nbsp;&nbsp; ☐ Non</p>
+<p><strong>Avis du CFA :</strong> ☒ Favorable &nbsp;&nbsp; ☐ Réservé &nbsp;&nbsp; ☐ Défavorable</p>
+<p><strong>Observations du CFA :</strong> Candidature complète et conforme aux prérequis de la formation. Profil cohérent avec le métier visé. Admission validée sous réserve de signature du contrat d'apprentissage.</p>
+<p><br/></p>
+<p><strong>Signature et cachet du CFA :</strong></p>
+<p><br/><br/></p>` },
   ] });
 }
 
