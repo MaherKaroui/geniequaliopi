@@ -1185,6 +1185,18 @@ export function buildFullCatalog(
 
   // ===== MAIL — Envois hebdomadaires QCM 14 missions (CFA uniquement) =====
   if (isCFA) {
+    // Mail CFA → Entreprise pour planifier la visite de suivi en entreprise
+    stagiaires.forEach((s, si) => {
+      add(
+        `mail_visite_entreprise_${si}`,
+        `MAIL - 🏢 CFA → Entreprise : Planification visite de suivi – ${s.prenom} ${s.nom}`,
+        0,
+        0,
+        "mail_visite_entreprise_cfa",
+        { stagiaireIdx: si },
+      );
+    });
+
     const MISSIONS_TITRES: { num: number; titre: string }[] = [
       { num: 1, titre: "Handicap" },
       { num: 2, titre: "Mixité des métiers" },
