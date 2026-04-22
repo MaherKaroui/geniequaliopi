@@ -1124,8 +1124,8 @@ export function genQCMMissionCFA(
   if (!stagiaire || !mission) {
     return buildDocument({
       title: `QCM Mission ${missionNumero}`,
-      organisme: o,
-      blocks: [{ heading: "Erreur", content: "<p>Données manquantes.</p>" }],
+      org: o,
+      sections: [{ heading: "Erreur", content: "<p>Données manquantes.</p>" }],
     });
   }
 
@@ -1135,7 +1135,7 @@ export function genQCMMissionCFA(
   const score = answers.reduce((acc, a, i) => acc + (a === mission.questions[i].correctIndex ? 1 : 0), 0);
 
   const rows = mission.questions.map((q, qi) => [
-    `<strong>Q${qi + 1}.</strong> ${q.question || (q as any).q || ""}`,
+    `<strong>Q${qi + 1}.</strong> ${q.q}`,
     q.options
       .map((opt, oi) => {
         const isCorrect = oi === q.correctIndex;
@@ -1150,8 +1150,8 @@ export function genQCMMissionCFA(
 
   return buildDocument({
     title: `QCM — ${mission.titre}`,
-    organisme: o,
-    blocks: [
+    org: o,
+    sections: [
       {
         heading: "Identification",
         content: `<table style="width:100%;border-collapse:collapse;">
