@@ -6342,6 +6342,11 @@ function genFicheRenseignementCFA(o: OrganismeInfo, f: FormationInfo, stagiaires
       <tr><td style="${tdL}">OPCO</td><td style="${tdR}">${opco}</td></tr>
     </table>
 
+    <h3 style="margin-top:20px;color:#1e3a7b">Les besoins de l'entreprise</h3>
+    <div style="border:1px solid #ccc;padding:10px;margin-top:5px;background:#f9fafb">
+      Montée en compétences d'un(e) collaborateur(trice) en alternance sur le métier de <strong>${f.intitule}</strong> afin de répondre aux besoins opérationnels de l'entreprise (${activite.toLowerCase()}). Objectifs visés : ${f.objectifs ? f.objectifs.split(/[\.\n]/).slice(0, 2).join('. ').trim() : "professionnaliser le collaborateur, sécuriser sa pratique métier et préparer la certification visée"}. Acquisition des compétences clés du référentiel ${f.codeRNCP ? `(${f.codeRNCP})` : ""} avec mise en application directe sur les missions confiées en entreprise.
+    </div>
+
     <h3 style="margin-top:20px;color:#1e3a7b">Les stagiaires et les formations</h3>
     <table style="width:100%;border-collapse:collapse;margin-top:10px">
       <tr style="background:#1e3a7b;color:white">
