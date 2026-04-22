@@ -865,13 +865,13 @@ export function genConseilPerfectionnementCFA(o: OrganismeInfo, f: FormationInfo
 // EXERCICES — QCM 10 questions par mission, par stagiaire
 // ============================================================================
 
-interface MissionQCM {
+export interface MissionQCM {
   numero: number;
   titre: string;
   questions: { q: string; options: string[]; correctIndex: number }[];
 }
 
-const MISSIONS_QCM: MissionQCM[] = [
+export const MISSIONS_QCM: MissionQCM[] = [
   {
     numero: 1,
     titre: "Mission 1 — Accompagnement des apprentis en situation de handicap",
