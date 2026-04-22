@@ -566,11 +566,16 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
     return groups;
   }, []);
 
-  // Flat list sorted numerically 1-68 for sequential display
+  // Flat list sorted numerically 1-68 for sequential display (supports suffixes like "34B")
   const sequentialDocs = useMemo(() => {
     return [...EY_DOCUMENTS]
-      .filter(d => /^\d+$/.test(d.code))
-      .sort((a, b) => parseInt(a.code) - parseInt(b.code));
+      .filter(d => /^\d+[A-Z]?$/.test(d.code))
+      .sort((a, b) => {
+        const na = parseInt(a.code);
+        const nb = parseInt(b.code);
+        if (na !== nb) return na - nb;
+        return a.code.localeCompare(b.code);
+      });
   }, []);
 
   // Bac Pro Logistique documents (BPL codes)
