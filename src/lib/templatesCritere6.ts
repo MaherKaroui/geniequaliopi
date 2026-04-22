@@ -622,7 +622,7 @@ export function genVeilleReglementaireV2(o: OrganismeInfo, f: FormationInfo) {
   const aiPack = getCachedVeillePack(f);
   const rows = aiPack?.reglementaire?.length
     ? veilleRowsToTable(aiPack.reglementaire)
-    : veilleReglementaireRows(f, type);
+    : genericVeilleRows(f, "reglementaire");
   return buildDocument({ org: o, title: "Veille réglementaire", table: {
     headers: ["Liens", "Nom de l'article / Texte", "Date du texte", "Commentaire", "Exploitation de veille (preuve + action Qualiopi)"],
     rows,
@@ -1166,7 +1166,7 @@ export function genVeilleMetierV2(o: OrganismeInfo, f: FormationInfo) {
   const aiPack = getCachedVeillePack(f);
   const rows = aiPack?.metier?.length
     ? veilleRowsToTable(aiPack.metier)
-    : veilleMetierRows(f, type);
+    : genericVeilleRows(f, "metier");
   return buildDocument({ org: o, title: "Tableau de veille métier", table: {
     headers: ["Lien (article / vidéo / événement)", "Nom de l'article / Vidéo / Événement", "Date", "Commentaire – Analyse métier", "Exploitation de veille (preuve + action Qualiopi)"],
     rows,
@@ -1614,7 +1614,7 @@ export function genVeilleTechnologiqueV2(o: OrganismeInfo, f: FormationInfo) {
   const aiPack = getCachedVeillePack(f);
   const rows = aiPack?.technologique?.length
     ? veilleRowsToTable(aiPack.technologique)
-    : veilleTechnoRows(f, type);
+    : genericVeilleRows(f, "technologique");
   return buildDocument({ org: o, title: "Tableau de veille technologique", table: {
     headers: ["Lien (vrai)", "Nom / Titre de l'article", "Date", "Commentaire (veille technologique)", "Exploitation de veille vérifiable (preuve + action Qualiopi)"],
     rows,
