@@ -861,3 +861,329 @@ export function genConseilPerfectionnementCFA(o: OrganismeInfo, f: FormationInfo
   });
 }
 
+// ============================================================================
+// EXERCICES — QCM 10 questions par mission, par stagiaire
+// ============================================================================
+
+interface MissionQCM {
+  numero: number;
+  titre: string;
+  questions: { q: string; options: string[]; correctIndex: number }[];
+}
+
+const MISSIONS_QCM: MissionQCM[] = [
+  {
+    numero: 1,
+    titre: "Mission 1 — Accompagnement des apprentis en situation de handicap",
+    questions: [
+      { q: "Qui est le référent handicap dans un CFA ?", options: ["Un apprenti désigné", "Un professionnel chargé d'accompagner les apprentis en situation de handicap", "Le maître d'apprentissage", "L'employeur"], correctIndex: 1 },
+      { q: "Quel organisme finance principalement les aménagements de poste ?", options: ["Pôle Emploi", "AGEFIPH / FIPHFP", "URSSAF", "DREETS"], correctIndex: 1 },
+      { q: "La RQTH est délivrée par :", options: ["Le médecin traitant", "La MDPH (CDAPH)", "Le CFA", "L'employeur"], correctIndex: 1 },
+      { q: "Un aménagement de formation peut consister à :", options: ["Réduire les compétences exigées", "Adapter les supports et le rythme sans baisser le niveau", "Supprimer les évaluations", "Allonger automatiquement le contrat de 2 ans"], correctIndex: 1 },
+      { q: "Le référent handicap doit :", options: ["Diagnostiquer le handicap", "Informer, orienter et coordonner les acteurs", "Délivrer la RQTH", "Décider seul de l'aménagement"], correctIndex: 1 },
+      { q: "L'apprenti en situation de handicap bénéficie-t-il d'un contrat plus long ?", options: ["Non, jamais", "Oui, prolongation possible jusqu'à 1 an", "Oui, doublement automatique", "Oui, sans limite"], correctIndex: 1 },
+      { q: "La confidentialité de la situation de handicap est :", options: ["Optionnelle", "Obligatoire (secret professionnel)", "Publique", "Réservée à l'employeur"], correctIndex: 1 },
+      { q: "Quelle aide finance la majoration des coûts de formation ?", options: ["AGEFIPH", "OPCO + branche", "CAF", "CARSAT"], correctIndex: 1 },
+      { q: "Quel document recense les aménagements proposés à l'apprenti ?", options: ["Le bulletin de salaire", "Le plan d'accompagnement individualisé / fiche d'aménagement", "Le règlement intérieur", "Le contrat d'apprentissage"], correctIndex: 1 },
+      { q: "Le référent handicap doit-il rencontrer l'employeur ?", options: ["Non", "Oui, pour coordonner l'accueil et le suivi", "Seulement à la rupture", "Uniquement par mail"], correctIndex: 1 },
+    ],
+  },
+  {
+    numero: 2,
+    titre: "Mission 2 — Encourager la mixité au sein des métiers préparés",
+    questions: [
+      { q: "La mixité professionnelle vise à :", options: ["Imposer 50/50 partout", "Favoriser la représentation des deux sexes dans tous les métiers", "Réserver des places aux femmes", "Exclure les hommes de certains métiers"], correctIndex: 1 },
+      { q: "Un métier est dit \"mixte\" lorsque :", options: ["Chaque sexe représente entre 40 % et 60 % des effectifs", "Il y a au moins une femme", "Les salaires sont identiques", "Il existe depuis 50 ans"], correctIndex: 0 },
+      { q: "Le CFA peut promouvoir la mixité par :", options: ["Des stéréotypes valorisants", "Des actions de communication et témoignages de pairs", "L'interdiction d'inscription pour un sexe", "L'augmentation des frais"], correctIndex: 1 },
+      { q: "Quel partenaire institutionnel agit pour la mixité ?", options: ["AFPA", "Délégation aux droits des femmes / Région", "URSSAF", "Pôle Emploi seul"], correctIndex: 1 },
+      { q: "Les stéréotypes de genre dans l'orientation :", options: ["N'existent plus", "Constituent un frein à la mixité", "Sont sans impact", "Sont encouragés"], correctIndex: 1 },
+      { q: "Une bonne pratique pour favoriser la mixité :", options: ["Visites d'entreprises mixtes", "Photos uniquement d'hommes", "Annonces genrées", "Quotas cachés"], correctIndex: 0 },
+      { q: "Le rôle du CFA est de :", options: ["Sélectionner sur le sexe", "Accueillir tous les profils sans discrimination", "Privilégier les locaux", "Refuser les apprentis isolés"], correctIndex: 1 },
+      { q: "L'égalité salariale F/H est :", options: ["Une option", "Une obligation légale", "Réservée aux cadres", "Décidée par le CFA"], correctIndex: 1 },
+      { q: "Le CFA doit-il publier des indicateurs de mixité ?", options: ["Non", "Oui, dans son bilan pédagogique", "Uniquement en interne", "Seulement à la demande"], correctIndex: 1 },
+      { q: "Une action efficace de mixité est :", options: ["Le mentorat par un pair du sexe sous-représenté", "L'augmentation des effectifs", "La réduction du programme", "L'absence de communication"], correctIndex: 0 },
+    ],
+  },
+  {
+    numero: 3,
+    titre: "Mission 3 — Coopération entre CFA et entreprise",
+    questions: [
+      { q: "Le maître d'apprentissage est désigné par :", options: ["Le CFA", "L'employeur", "L'OPCO", "L'apprenti"], correctIndex: 1 },
+      { q: "La convention pédagogique tripartite lie :", options: ["CFA, apprenti, OPCO", "CFA, apprenti, employeur", "CFA, employeur, Région", "CFA, employeur, URSSAF"], correctIndex: 1 },
+      { q: "La fréquence minimale des visites en entreprise est :", options: ["Aucune obligation", "Au moins 1 visite par cycle", "1 par mois", "1 par semaine"], correctIndex: 1 },
+      { q: "Le carnet/livret de liaison sert à :", options: ["Suivre la paie", "Coordonner CFA / entreprise / apprenti", "Calculer les congés", "Évaluer le maître d'apprentissage"], correctIndex: 1 },
+      { q: "Le maître d'apprentissage doit justifier :", options: ["D'un diplôme + 1 an OU 2 ans d'expérience dans le métier", "D'un BTS", "De 10 ans d'expérience", "D'aucune compétence"], correctIndex: 0 },
+      { q: "En cas de difficulté de l'apprenti, le CFA :", options: ["Rompt le contrat", "Alerte le maître d'apprentissage et propose un plan", "Ne fait rien", "Sanctionne l'apprenti"], correctIndex: 1 },
+      { q: "Le bilan intermédiaire associe :", options: ["L'apprenti seul", "Apprenti + CFA + maître d'apprentissage", "Le formateur seul", "L'OPCO"], correctIndex: 1 },
+      { q: "Les missions confiées en entreprise doivent être :", options: ["En cohérence avec le référentiel", "Choisies au hasard", "Limitées au ménage", "Sans rapport avec le diplôme"], correctIndex: 0 },
+      { q: "Le formateur référent du CFA :", options: ["N'a pas de rôle", "Coordonne le parcours alterné", "Remplace le maître d'apprentissage", "Choisit l'employeur"], correctIndex: 1 },
+      { q: "La coopération CFA/entreprise est évaluée par :", options: ["Aucune enquête", "Une enquête annuelle de satisfaction des employeurs", "L'URSSAF", "La DREETS"], correctIndex: 1 },
+    ],
+  },
+  {
+    numero: 4,
+    titre: "Mission 4 — Activités citoyennes, culturelles et sportives",
+    questions: [
+      { q: "L'objectif des activités citoyennes est de :", options: ["Occuper les apprentis", "Former à la citoyenneté et au vivre-ensemble", "Remplacer la formation pro", "Réduire les heures de cours"], correctIndex: 1 },
+      { q: "Une action citoyenne peut être :", options: ["Une journée de solidarité / sensibilisation", "Une fête", "Une vente", "Une réunion d'équipe"], correctIndex: 0 },
+      { q: "Les activités sportives en CFA :", options: ["Sont interdites", "Favorisent la cohésion et la santé", "Remplacent la pause", "Sont uniquement individuelles"], correctIndex: 1 },
+      { q: "La laïcité s'applique :", options: ["Au CFA et aux apprentis", "À personne", "Aux seuls formateurs", "À l'extérieur uniquement"], correctIndex: 0 },
+      { q: "Une sortie culturelle vise à :", options: ["Distraire", "Développer l'ouverture culturelle et l'esprit critique", "Tester les apprentis", "Remplir un quota"], correctIndex: 1 },
+      { q: "Les activités citoyennes sont :", options: ["Optionnelles et hors suivi", "Tracées dans le plan d'activités annuel", "Sans planification", "Confidentielles"], correctIndex: 1 },
+      { q: "L'engagement bénévole d'un apprenti est :", options: ["Interdit", "Encouragé et valorisable", "Obligatoire", "Rémunéré par le CFA"], correctIndex: 1 },
+      { q: "La sensibilisation au harcèlement fait partie :", options: ["Des activités citoyennes", "Du programme technique uniquement", "Des cours d'EPS", "D'aucune mission"], correctIndex: 0 },
+      { q: "Qui peut animer une activité citoyenne ?", options: ["Uniquement le directeur", "Un partenaire associatif, un formateur, un intervenant", "Un seul apprenti", "Le maître d'apprentissage seul"], correctIndex: 1 },
+      { q: "Le bilan des activités est :", options: ["Inutile", "Présenté en conseil de perfectionnement", "Confidentiel", "Adressé à l'URSSAF"], correctIndex: 1 },
+    ],
+  },
+  {
+    numero: 5,
+    titre: "Mission 5 — Procédure de rupture du contrat d'apprentissage",
+    questions: [
+      { q: "La rupture pendant les 45 premiers jours en entreprise est :", options: ["Interdite", "Libre, sans motif, par l'une ou l'autre partie", "Soumise à l'OPCO", "Soumise au juge"], correctIndex: 1 },
+      { q: "Au-delà des 45 jours, la rupture peut intervenir par :", options: ["Décision unilatérale du CFA", "Accord amiable, démission, force majeure, faute grave, inaptitude", "L'apprenti seul sans formalité", "L'employeur seul sans motif"], correctIndex: 1 },
+      { q: "L'apprenti qui démissionne doit :", options: ["Saisir le médiateur de l'apprentissage 5 jours avant + préavis", "Partir sans prévenir", "Attendre 6 mois", "Demander à l'OPCO"], correctIndex: 0 },
+      { q: "Le médiateur de l'apprentissage est désigné par :", options: ["L'apprenti", "Les chambres consulaires (CCI, CMA, CA)", "Le CFA", "L'employeur"], correctIndex: 1 },
+      { q: "Le CFA, en cas de rupture, doit :", options: ["Refuser de garder l'apprenti", "Maintenir l'apprenti en formation 6 mois maximum", "Rompre la formation immédiatement", "Demander remboursement"], correctIndex: 1 },
+      { q: "L'OPCO est informé :", options: ["Jamais", "De toute rupture, par formulaire dédié", "Uniquement si l'apprenti le demande", "Par le tribunal"], correctIndex: 1 },
+      { q: "La fin anticipée du contrat ouvre droit pour l'apprenti à :", options: ["Aucune aide", "ARE / accompagnement Pôle Emploi selon situation", "Un nouveau contrat automatique", "Une indemnité du CFA"], correctIndex: 1 },
+      { q: "Une faute grave doit être :", options: ["Constatée et notifiée", "Supposée", "Tue", "Réservée à l'apprenti"], correctIndex: 0 },
+      { q: "Le maintien en formation après rupture vise à :", options: ["Pénaliser l'apprenti", "Permettre la recherche d'un nouvel employeur", "Allonger la formation", "Réduire les coûts"], correctIndex: 1 },
+      { q: "Le CFA doit tracer les ruptures dans :", options: ["Aucun registre", "Un tableau de suivi des ruptures", "La paie", "Le bilan financier seul"], correctIndex: 1 },
+    ],
+  },
+  {
+    numero: 6,
+    titre: "Mission 6 — Mixité et égalité entre les femmes et les hommes",
+    questions: [
+      { q: "Le principe d'égalité F/H est :", options: ["Constitutionnel", "Optionnel", "Réservé au public", "Lié au CFA seul"], correctIndex: 0 },
+      { q: "Une discrimination est :", options: ["Une opinion", "Un traitement défavorable fondé sur un critère prohibé", "Un compliment", "Un classement"], correctIndex: 1 },
+      { q: "Le CFA doit afficher :", options: ["Les sanctions disciplinaires", "Les coordonnées de la défenseure des droits / dispositifs de signalement", "Les notes des apprentis", "Les salaires"], correctIndex: 1 },
+      { q: "L'index égalité concerne :", options: ["Les CFA de moins de 50 salariés", "Les entreprises de 50 salariés et plus", "Les apprentis", "Les fournisseurs"], correctIndex: 1 },
+      { q: "Le harcèlement sexuel est :", options: ["Toléré entre majeurs", "Un délit pénal", "Une plaisanterie", "Une simple incivilité"], correctIndex: 1 },
+      { q: "Le référent égalité a pour rôle :", options: ["De juger", "D'informer, prévenir, recueillir les signalements", "De licencier", "De remplacer le directeur"], correctIndex: 1 },
+      { q: "Une action concrète pour l'égalité :", options: ["Mentorat croisé", "Affichage des notes", "Suppression des pauses", "Quotas de notes"], correctIndex: 0 },
+      { q: "Les écarts de rémunération à compétence égale sont :", options: ["Légaux", "Interdits par la loi", "Acceptés en CDD", "Réservés aux cadres"], correctIndex: 1 },
+      { q: "L'apprenti victime de discrimination peut saisir :", options: ["Personne", "Le défenseur des droits / Conseil de prud'hommes", "Le CFA seul", "L'URSSAF seule"], correctIndex: 1 },
+      { q: "Le bilan égalité est présenté :", options: ["Au conseil de perfectionnement", "À l'URSSAF", "Aux apprentis seuls", "À personne"], correctIndex: 0 },
+    ],
+  },
+  {
+    numero: 7,
+    titre: "Mission 7 — Accompagnement éducatif, social et professionnel",
+    questions: [
+      { q: "L'accompagnement éducatif comprend :", options: ["Soutien scolaire / méthodologie", "La paie", "Les sanctions", "Les achats"], correctIndex: 0 },
+      { q: "Une difficulté sociale relève :", options: ["Du seul apprenti", "D'une orientation vers les partenaires sociaux compétents", "D'un licenciement", "D'une exclusion"], correctIndex: 1 },
+      { q: "Les aides au logement passent par :", options: ["URSSAF", "Action Logement / CAF", "DREETS", "OPCO"], correctIndex: 1 },
+      { q: "Le secret professionnel s'impose :", options: ["Au seul directeur", "À tous les intervenants accompagnant l'apprenti", "Aux apprentis", "À personne"], correctIndex: 1 },
+      { q: "Une procédure d'accompagnement doit être :", options: ["Orale", "Formalisée et tracée", "Confidentielle au point de ne rien tracer", "Optionnelle"], correctIndex: 1 },
+      { q: "L'accompagnement professionnel comprend :", options: ["Aide à la recherche d'employeur, posture pro", "Le calcul de paie", "La sanction", "Les achats"], correctIndex: 0 },
+      { q: "Le CFA peut orienter vers :", options: ["Mission Locale, assistante sociale, CMP, CAF", "L'URSSAF uniquement", "L'employeur seul", "Personne"], correctIndex: 0 },
+      { q: "Le suivi individualisé est :", options: ["Un luxe", "Une obligation pour la qualité du parcours", "Réservé aux cas graves", "Inutile"], correctIndex: 1 },
+      { q: "La fiche de suivi de l'apprenti doit comporter :", options: ["Date, nature de l'entretien, plan d'action, signature", "Le salaire", "Les notes seules", "Rien"], correctIndex: 0 },
+      { q: "Un signal d'alerte (décrochage) impose :", options: ["L'inaction", "Une réaction rapide CFA + entreprise + famille", "Une exclusion", "Une sanction financière"], correctIndex: 1 },
+    ],
+  },
+  {
+    numero: 8,
+    titre: "Mission 8 — Suivi de l'insertion professionnelle des sortants",
+    questions: [
+      { q: "Le taux d'insertion à 6 mois mesure :", options: ["La satisfaction", "La part des sortants en emploi 6 mois après la fin", "Le taux de réussite", "Le taux d'abandon"], correctIndex: 1 },
+      { q: "Cet indicateur est publié sur :", options: ["Aucun site", "InserJeunes / CFA Carif-Oref", "URSSAF", "Pôle Emploi seul"], correctIndex: 1 },
+      { q: "L'enquête est menée :", options: ["Auprès des employeurs", "Auprès des sortants 6 mois après", "Auprès des apprentis en cours", "Auprès des familles"], correctIndex: 1 },
+      { q: "L'insertion durable distingue :", options: ["CDI / CDD ≥ 6 mois / autres", "Stage / vacances", "École / vacances", "Aucune catégorie"], correctIndex: 0 },
+      { q: "La poursuite d'études est :", options: ["Comptée comme insertion", "Comptée séparément", "Interdite", "Sans suivi"], correctIndex: 1 },
+      { q: "Le faible taux d'insertion doit déclencher :", options: ["Rien", "Un plan d'amélioration", "Une fermeture", "Une sanction"], correctIndex: 1 },
+      { q: "Les sortants sans emploi sont orientés vers :", options: ["URSSAF", "Pôle Emploi / Mission Locale", "L'OPCO seul", "Le tribunal"], correctIndex: 1 },
+      { q: "Le suivi à 6 mois fait partie de :", options: ["L'évaluation Qualiopi (IND 30)", "L'index égalité", "La paie", "Le RGPD"], correctIndex: 0 },
+      { q: "Le taux de rupture est suivi :", options: ["Avec le taux d'insertion", "Indépendamment", "Pas du tout", "Tous les 5 ans"], correctIndex: 0 },
+      { q: "Le bilan d'insertion est présenté :", options: ["Au conseil de perfectionnement", "À personne", "À l'apprenti seul", "Aux familles seules"], correctIndex: 0 },
+    ],
+  },
+  {
+    numero: 9,
+    titre: "Mission 9 — Mobilité internationale (Erasmus+) et lutte contre les discriminations",
+    questions: [
+      { q: "Erasmus+ permet :", options: ["Une mobilité dans un pays partenaire de l'UE", "Un voyage personnel", "Un stage payé par l'apprenti", "Une formation à distance seule"], correctIndex: 0 },
+      { q: "Durée minimale d'une mobilité courte Erasmus+ apprenti :", options: ["1 jour", "2 semaines", "6 mois", "1 an"], correctIndex: 1 },
+      { q: "La convention de mobilité lie :", options: ["CFA, entreprise française, structure d'accueil étrangère, apprenti", "CFA seul", "Apprenti seul", "OPCO uniquement"], correctIndex: 0 },
+      { q: "Pendant la mobilité longue, le contrat français est :", options: ["Rompu", "Mis en veille (statut spécifique mobilité)", "Remplacé par un CDD", "Inchangé"], correctIndex: 1 },
+      { q: "L'agence française Erasmus+ s'appelle :", options: ["Pôle Emploi", "Agence Erasmus+ France / Éducation Formation", "URSSAF", "DREETS"], correctIndex: 1 },
+      { q: "Une discrimination à l'embauche est :", options: ["Légale en stage", "Interdite et sanctionnée pénalement", "Tolérée si justifiée", "Réservée au privé"], correctIndex: 1 },
+      { q: "L'apprenti en mobilité est couvert par :", options: ["Aucune assurance", "Une assurance responsabilité civile + accident travail dédiée", "Sa famille seule", "L'État du pays d'accueil"], correctIndex: 1 },
+      { q: "L'Europass Mobilité atteste :", options: ["Du diplôme", "Des compétences acquises lors de la mobilité", "De l'identité", "Du salaire"], correctIndex: 1 },
+      { q: "Le CFA doit :", options: ["Refuser la mobilité", "Encourager et organiser la mobilité européenne", "Faire payer l'apprenti", "Limiter à un pays"], correctIndex: 1 },
+      { q: "La diversité au CFA doit être :", options: ["Évitée", "Promue par des actions concrètes", "Confidentielle", "Sans suivi"], correctIndex: 1 },
+    ],
+  },
+  {
+    numero: 10,
+    titre: "Mission 10 — Mobilité nationale des apprentis",
+    questions: [
+      { q: "La mobilité nationale permet :", options: ["Un séjour dans un autre CFA en France", "Un voyage personnel", "Un changement de diplôme", "Une rupture"], correctIndex: 0 },
+      { q: "Elle s'organise par :", options: ["Convention de mobilité nationale entre CFA et entreprise(s)", "Décision orale", "Demande URSSAF", "Demande Pôle Emploi"], correctIndex: 0 },
+      { q: "Pendant la mobilité, l'apprenti reste :", options: ["Inscrit dans son CFA d'origine", "Désinscrit", "Salarié de l'autre CFA", "Stagiaire"], correctIndex: 0 },
+      { q: "L'objectif est de :", options: ["Élargir les compétences et la connaissance des territoires", "Réduire les coûts", "Tester l'apprenti", "Le sanctionner"], correctIndex: 0 },
+      { q: "La durée de la mobilité nationale est :", options: ["Limitée à 1 jour", "Variable, prévue dans la convention", "Toujours 1 an", "Toujours 6 mois"], correctIndex: 1 },
+      { q: "L'apprenti perçoit son salaire :", options: ["De l'employeur d'origine", "De personne", "Du CFA d'accueil", "De l'État"], correctIndex: 0 },
+      { q: "Le CFA d'accueil :", options: ["Refuse l'apprenti", "Assure la formation et le suivi pendant la période", "Rompt le contrat", "Recrute l'apprenti"], correctIndex: 1 },
+      { q: "Le bilan de la mobilité est :", options: ["Inutile", "Tracé et restitué à l'apprenti et à l'employeur", "Confidentiel", "Réservé au CFA d'accueil"], correctIndex: 1 },
+      { q: "Une convention de mobilité nationale doit être :", options: ["Orale", "Signée par toutes les parties", "Tacite", "Postérieure"], correctIndex: 1 },
+      { q: "La mobilité nationale est :", options: ["Encouragée par France Compétences", "Interdite", "Réservée aux Bac+5", "Optionnelle pour les seuls majeurs"], correctIndex: 0 },
+    ],
+  },
+  {
+    numero: 11,
+    titre: "Mission 11 — Aide à la recherche d'employeur",
+    questions: [
+      { q: "Le CFA accompagne le candidat :", options: ["Dans la recherche d'un employeur", "Dans la rédaction de son contrat seul", "Dans le calcul de paie", "Dans la déclaration URSSAF"], correctIndex: 0 },
+      { q: "Délai pour signer le contrat après l'entrée en formation sans contrat :", options: ["3 mois maximum", "1 an", "1 semaine", "Pas de délai"], correctIndex: 0 },
+      { q: "Un atelier CV vise à :", options: ["Sélectionner les apprentis", "Préparer la candidature", "Évaluer les compétences techniques", "Sanctionner"], correctIndex: 1 },
+      { q: "La simulation d'entretien :", options: ["Est inutile", "Prépare à l'entretien d'embauche", "Remplace l'évaluation", "Est obligatoire pour réussir le diplôme"], correctIndex: 1 },
+      { q: "Le candidat sans contrat est :", options: ["Refusé", "Accueilli dans la limite de 3 mois (statut spécifique)", "Salarié du CFA", "Stagiaire de la formation pro"], correctIndex: 1 },
+      { q: "Le tableau de suivi des candidats permet :", options: ["De tracer les contacts et résultats", "De calculer les salaires", "D'imposer un employeur", "De sanctionner"], correctIndex: 0 },
+      { q: "Les partenaires de la recherche d'employeur sont :", options: ["CCI, CMA, Pôle Emploi, branches", "URSSAF seul", "Tribunaux", "État seul"], correctIndex: 0 },
+      { q: "La bourse aux contrats est :", options: ["Une aide financière", "Une mise en relation candidats / entreprises", "Un concours", "Un examen"], correctIndex: 1 },
+      { q: "L'accompagnement est :", options: ["Individualisé", "Standardisé sans suivi", "Réservé aux mineurs", "Optionnel"], correctIndex: 0 },
+      { q: "Sans contrat au-delà du délai légal, l'apprenti :", options: ["Continue indéfiniment", "Sort du dispositif et est réorienté", "Est embauché par le CFA", "Reçoit une aide à vie"], correctIndex: 1 },
+    ],
+  },
+  {
+    numero: 12,
+    titre: "Mission 12 — Accueil à tout moment de l'année",
+    questions: [
+      { q: "L'apprentissage permet une entrée :", options: ["Uniquement en septembre", "À tout moment de l'année (entrées et sorties permanentes)", "Une fois par trimestre", "Tous les 2 ans"], correctIndex: 1 },
+      { q: "Cela suppose une organisation :", options: ["Modulaire / individualisée", "Figée", "Annuelle uniquement", "Aucune"], correctIndex: 0 },
+      { q: "Le positionnement à l'entrée vise à :", options: ["Sanctionner", "Identifier les acquis et adapter le parcours", "Filtrer", "Retarder l'entrée"], correctIndex: 1 },
+      { q: "L'apprenti entré en cours d'année :", options: ["Doit attendre la rentrée", "Bénéficie d'un parcours individualisé", "Refait l'année complète", "Est exclu"], correctIndex: 1 },
+      { q: "La procédure d'accueil doit être :", options: ["Formalisée et tracée", "Orale", "Inutile", "Confidentielle"], correctIndex: 0 },
+      { q: "Un livret d'accueil est :", options: ["Optionnel", "Remis à chaque entrée", "Réservé aux majeurs", "Payant"], correctIndex: 1 },
+      { q: "L'accueil intègre :", options: ["Présentation du CFA, règlement, sécurité, référents", "La paie", "Les sanctions seules", "L'URSSAF"], correctIndex: 0 },
+      { q: "L'individualisation est :", options: ["Une obligation Qualiopi (IND 11)", "Un luxe", "Optionnelle", "Réservée au handicap"], correctIndex: 0 },
+      { q: "L'entrée permanente impose un suivi :", options: ["Calendaire individuel", "Collectif uniquement", "Aucun", "Annuel"], correctIndex: 0 },
+      { q: "La traçabilité des entrées/sorties est :", options: ["Obligatoire", "Optionnelle", "Réservée aux contrôles", "Confidentielle"], correctIndex: 0 },
+    ],
+  },
+  {
+    numero: 13,
+    titre: "Mission 13 — Formation du maître d'apprentissage",
+    questions: [
+      { q: "Le maître d'apprentissage doit :", options: ["Être désigné et formé", "Être l'apprenti", "Être un client", "Être anonyme"], correctIndex: 0 },
+      { q: "La formation MA porte sur :", options: ["La pédagogie, la posture, la transmission", "La paie", "Le marketing", "La fiscalité"], correctIndex: 0 },
+      { q: "L'OPCO peut financer :", options: ["La formation du maître d'apprentissage", "Les vacances", "Les achats personnels", "Le matériel"], correctIndex: 0 },
+      { q: "Une attestation de formation MA est :", options: ["Délivrée à l'issue", "Inutile", "Réservée aux cadres", "Payante par l'apprenti"], correctIndex: 0 },
+      { q: "Le MA doit justifier :", options: ["Diplôme + 1 an OU 2 ans d'expérience", "10 ans d'expérience", "Aucune compétence", "Bac+5"], correctIndex: 0 },
+      { q: "Le nombre maximum d'apprentis par MA est :", options: ["2 (ou 3 selon dérogation/branche)", "10", "Illimité", "1 seul à vie"], correctIndex: 0 },
+      { q: "Le MA est référent :", options: ["Sécurité, qualité du travail, accompagnement", "Paie uniquement", "Hiérarchie seule", "Communication"], correctIndex: 0 },
+      { q: "Le MA participe :", options: ["Aux bilans intermédiaires et finaux", "À aucun rendez-vous", "À la paie seule", "Aux RH uniquement"], correctIndex: 0 },
+      { q: "En cas d'interruption / sortie sans diplôme, le CFA :", options: ["Met en place un accompagnement post-formation", "Abandonne", "Sanctionne", "Facture"], correctIndex: 0 },
+      { q: "La formation continue du MA :", options: ["Est encouragée", "Est interdite", "Est réservée à 1 fois", "Est inutile"], correctIndex: 0 },
+    ],
+  },
+  {
+    numero: 14,
+    titre: "Mission 14 — Conseil de perfectionnement",
+    questions: [
+      { q: "Le conseil de perfectionnement est obligatoire pour :", options: ["Tout CFA (Art. L6231-3 / R6233-1)", "Les seuls CFA publics", "Les CFA > 100 apprentis", "Personne"], correctIndex: 0 },
+      { q: "Il se réunit au moins :", options: ["1 fois par an", "1 fois par mois", "Jamais", "Tous les 5 ans"], correctIndex: 0 },
+      { q: "Sa composition inclut :", options: ["Direction CFA, formateurs, apprentis, employeurs, parents si mineurs, partenaires", "Direction seule", "Apprentis seuls", "OPCO seul"], correctIndex: 0 },
+      { q: "Il examine notamment :", options: ["L'organisation, la qualité, l'évolution des effectifs et résultats", "La paie", "Les achats", "La fiscalité"], correctIndex: 0 },
+      { q: "Un compte-rendu est :", options: ["Rédigé et diffusé", "Optionnel", "Confidentiel à vie", "Oral"], correctIndex: 0 },
+      { q: "Le conseil émet :", options: ["Des avis et recommandations", "Des sanctions", "Des amendes", "Des bulletins"], correctIndex: 0 },
+      { q: "Le bilan d'insertion est :", options: ["Présenté en conseil de perfectionnement", "Caché", "Réservé au directeur", "Confidentiel"], correctIndex: 0 },
+      { q: "Les enquêtes de satisfaction sont :", options: ["Restituées en conseil de perfectionnement", "Détruites", "Réservées à l'OPCO", "Sans suite"], correctIndex: 0 },
+      { q: "Le règlement intérieur :", options: ["Est révisé en conseil de perfectionnement", "N'est jamais modifié", "Est secret", "Est rédigé par les apprentis seuls"], correctIndex: 0 },
+      { q: "Le conseil de perfectionnement contribue à :", options: ["L'amélioration continue (Qualiopi IND 32)", "La paie", "La fiscalité", "Le RGPD"], correctIndex: 0 },
+    ],
+  },
+];
+
+function pickStudentAnswers(stagiaire: StagiaireInfo, missionNumero: number, questions: { correctIndex: number; options: string[] }[]): number[] {
+  // Deterministic per stagiaire + mission. ~80% correct.
+  const base = `${stagiaire?.prenom || ""}${stagiaire?.nom || ""}M${missionNumero}`;
+  let h = 0;
+  for (let i = 0; i < base.length; i++) h = (h * 31 + base.charCodeAt(i)) | 0;
+  return questions.map((q, qi) => {
+    const seed = Math.abs(h + qi * 7);
+    const rand = ((seed * 9301 + 49297) % 233280) / 233280;
+    if (rand < 0.8) return q.correctIndex;
+    const wrong = q.options.map((_, i) => i).filter((i) => i !== q.correctIndex);
+    return wrong[seed % wrong.length];
+  });
+}
+
+export function genQCMMissionCFA(
+  o: OrganismeInfo,
+  f: FormationInfo,
+  stagiaires: StagiaireInfo[],
+  stagiaireIdx: number,
+  missionNumero: number,
+) {
+  const stagiaire = stagiaires[stagiaireIdx];
+  const mission = MISSIONS_QCM.find((m) => m.numero === missionNumero);
+  if (!stagiaire || !mission) {
+    return buildDocument({
+      title: `QCM Mission ${missionNumero}`,
+      organisme: o,
+      blocks: [{ heading: "Erreur", content: "<p>Données manquantes.</p>" }],
+    });
+  }
+
+  const terminee = isFormationTerminee(f, stagiaires);
+  const dateRef = terminee && f.dateFin ? f.dateFin : (f.dateDebut || new Date().toISOString().slice(0, 10));
+  const answers = pickStudentAnswers(stagiaire, missionNumero, mission.questions);
+  const score = answers.reduce((acc, a, i) => acc + (a === mission.questions[i].correctIndex ? 1 : 0), 0);
+
+  const rows = mission.questions.map((q, qi) => [
+    `<strong>Q${qi + 1}.</strong> ${q.question || (q as any).q || ""}`,
+    q.options
+      .map((opt, oi) => {
+        const isCorrect = oi === q.correctIndex;
+        const isPicked = oi === answers[qi];
+        const mark = isPicked ? "☒" : "☐";
+        const style = isCorrect ? "color:#0a7d3a;font-weight:600;" : isPicked && !isCorrect ? "color:#c0392b;" : "";
+        return `<div style="${style}">${mark} ${String.fromCharCode(65 + oi)}. ${opt}</div>`;
+      })
+      .join(""),
+    answers[qi] === q.correctIndex ? "<span style='color:#0a7d3a;font-weight:600;'>✔ Correct</span>" : "<span style='color:#c0392b;'>✘ Incorrect</span>",
+  ]);
+
+  return buildDocument({
+    title: `QCM — ${mission.titre}`,
+    organisme: o,
+    blocks: [
+      {
+        heading: "Identification",
+        content: `<table style="width:100%;border-collapse:collapse;">
+          <tr><td style="padding:4px 8px;"><strong>Apprenti·e</strong></td><td>${stagiaire.prenom} ${stagiaire.nom}</td></tr>
+          <tr><td style="padding:4px 8px;"><strong>Formation</strong></td><td>${f.intitule || ""}</td></tr>
+          <tr><td style="padding:4px 8px;"><strong>Mission évaluée</strong></td><td>${mission.titre}</td></tr>
+          <tr><td style="padding:4px 8px;"><strong>Date</strong></td><td>${formatDate(dateRef)}</td></tr>
+          <tr><td style="padding:4px 8px;"><strong>Durée</strong></td><td>20 minutes</td></tr>
+          <tr><td style="padding:4px 8px;"><strong>Modalité</strong></td><td>QCM individuel — 1 réponse correcte par question</td></tr>
+        </table>`,
+      },
+      {
+        heading: "Consignes",
+        content: `<p>Pour chaque question, cochez la <strong>seule</strong> bonne réponse. La case ☒ correspond à la réponse retenue par l'apprenti·e ; les bonnes réponses apparaissent en vert pour la correction.</p>`,
+      },
+      {
+        heading: "Questionnaire et corrigé",
+        content: tableHTML(["Question", "Propositions (☒ = réponse de l'apprenti·e)", "Résultat"], rows),
+      },
+      {
+        heading: "Résultat global",
+        content: `<p style="font-size:1.05em;"><strong>Score : ${score} / ${mission.questions.length}</strong> — Note : <strong>${Math.round((score / mission.questions.length) * 20)}/20</strong></p>
+        <p>Appréciation : ${score >= 8 ? "Acquis — bonne maîtrise des notions de la mission." : score >= 6 ? "Partiellement acquis — quelques notions à revoir." : "À retravailler — un point pédagogique sera proposé."}</p>`,
+      },
+      {
+        heading: "Signatures",
+        content: `<table style="width:100%;margin-top:20px;"><tr>
+          <td style="width:50%;padding:10px;border:1px solid #ccc;"><strong>Apprenti·e</strong><br>${stagiaire.prenom} ${stagiaire.nom}<br>Fait le ${formatDate(dateRef)}<br><br><br></td>
+          <td style="width:50%;padding:10px;border:1px solid #ccc;"><strong>Formateur·rice / Référent CFA</strong><br>${o.nom}<br>Fait le ${formatDate(dateRef)}<br><br><br></td>
+        </tr></table>`,
+      },
+    ],
+  });
+}
+
