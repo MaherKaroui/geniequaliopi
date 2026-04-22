@@ -30,6 +30,7 @@ import { generateDocumentById } from "@/lib/documentGenerator";
 import { generateAIEvalPack, getCachedPack, clearCachedPack } from "@/lib/aiEvalPack";
 import { Sparkles } from "lucide-react";
 import { generateExcelCalendrierOPCO, excelToBlob } from "@/lib/xlsxGenerator";
+import { exportFormDataToExcel } from "@/lib/exportFormData";
 import { mergeOrganisme, mergeStagiaires } from "@/lib/sampleData";
 import { htmlToPdfBlob } from "@/lib/pdfExport";
 import { supabase } from "@/integrations/supabase/client";
