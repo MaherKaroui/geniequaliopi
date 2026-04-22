@@ -148,7 +148,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
    * le document est placé dans CT{c}_IND_{i}/{folder}/ pour regrouper les missions.
    */
   const getDocBasePath = useCallback((doc: DocEntry): string => {
-    const isMail = doc.critere === 0 && !!MAIL_TEMPLATE_FILES[doc.template];
+    const isMail = doc.critere === 0 && (!!MAIL_TEMPLATE_FILES[doc.template] || doc.template === "mail_mission_cfa");
     const isSiteWeb = doc.id.startsWith("cfa_siteweb_");
     const root = isSiteWeb ? "Documents site web" : (isMail ? "MAILS" : shortCriterePath(doc.critere, doc.indicateur));
     const subFolder = typeof doc.params?.folder === "string" ? doc.params.folder : null;
