@@ -646,7 +646,7 @@ export function generateExcelOutilsSuiviAlternance(o: OrganismeInfo, f: Formatio
   const now = new Date();
   const s0 = stagiaires[0];
   const apprentiNom = s0 ? `${s0.prenom} ${s0.nom}` : "";
-  const tuteurNom = s0?.tuteur || "Tuteur entreprise";
+  const tuteurNom = (s0 as any)?.tuteur || o.responsablePedagogique || "Tuteur entreprise";
   const entrepriseNom = s0?.entreprise || "";
   const rncp = getRNCPByCode(f.codeRNCP || "");
   const sc0 = EVAL_SCORES[0] || [8, 7, 8, 7, 8, 7, 8];
@@ -678,8 +678,8 @@ export function generateExcelOutilsSuiviAlternance(o: OrganismeInfo, f: Formatio
   infoHtml += `<tr><td style="${tdLabel}">Nom de l'apprenti(e)</td><td style="${tdb}">${apprentiNom}</td></tr>`;
   infoHtml += `<tr><td style="${tdLabel}">Nom de l'entreprise</td><td style="${tdb}">${entrepriseNom}</td></tr>`;
   infoHtml += `<tr><td style="${tdLabel}">Nom du tuteur</td><td style="${tdb}">${tuteurNom}</td></tr>`;
-  infoHtml += `<tr><td style="${tdLabel}">Poste occupé</td><td style="${tdb}">${s0?.posteOccupe || ""}</td></tr>`;
-  infoHtml += `<tr><td style="${tdLabel}">Service</td><td style="${tdb}">${s0?.service || ""}</td></tr>`;
+  infoHtml += `<tr><td style="${tdLabel}">Poste occupé</td><td style="${tdb}">${s0?.poste || ""}</td></tr>`;
+  infoHtml += `<tr><td style="${tdLabel}">Service</td><td style="${tdb}">${(s0 as any)?.service || ""}</td></tr>`;
   infoHtml += `<tr><td style="${tdLabel}">Nom de l'organisme de formation</td><td style="${tdb}">${o.nom}</td></tr>`;
   infoHtml += `<tr><td style="${tdLabel}">Référent pédagogique</td><td style="${tdb}">${o.responsablePedagogique || ""}</td></tr>`;
   infoHtml += `<tr><td style="${tdLabel}">Certification / Titre visé</td><td style="${tdb}">${f.intitule}${f.codeRNCP ? ` (${f.codeRNCP})` : ""}</td></tr>`;
