@@ -18,20 +18,20 @@ interface MissionPalette {
 }
 
 const PALETTES: Record<number, MissionPalette> = {
-  1:  { num: 1,  titrePrincipal: "ORIENTATION",      sousTitre: "& HANDICAP",                        bg: "#1E3A8A", bgSoft: "#EFF4FF", accent: "#60A5FA", textOnBg: "#FFFFFF" },
-  2:  { num: 2,  titrePrincipal: "MIXITÉ",           sousTitre: "DES MÉTIERS",                       bg: "#7C3AED", bgSoft: "#F3EEFE", accent: "#C4B5FD", textOnBg: "#FFFFFF" },
-  3:  { num: 3,  titrePrincipal: "COOPÉRATION",      sousTitre: "CFA / ENTREPRISE",                  bg: "#0E7490", bgSoft: "#ECFEFF", accent: "#67E8F9", textOnBg: "#FFFFFF" },
-  4:  { num: 4,  titrePrincipal: "ACTIVITÉS",        sousTitre: "CITOYENNES & CULTURELLES",          bg: "#B45309", bgSoft: "#FEF6E7", accent: "#FCD34D", textOnBg: "#FFFFFF" },
-  5:  { num: 5,  titrePrincipal: "RUPTURE",          sousTitre: "DE CONTRAT",                        bg: "#B91C1C", bgSoft: "#FEF2F2", accent: "#FCA5A5", textOnBg: "#FFFFFF" },
-  6:  { num: 6,  titrePrincipal: "AIDES",            sousTitre: "SOCIALES",                          bg: "#15803D", bgSoft: "#F0FDF4", accent: "#86EFAC", textOnBg: "#FFFFFF" },
-  7:  { num: 7,  titrePrincipal: "ACCOMPAGNEMENT",   sousTitre: "ÉDUCATIF & SOCIAL",                 bg: "#C2410C", bgSoft: "#FFF7ED", accent: "#FDBA74", textOnBg: "#FFFFFF" },
-  8:  { num: 8,  titrePrincipal: "INSERTION",        sousTitre: "PROFESSIONNELLE",                   bg: "#1D4ED8", bgSoft: "#EFF6FF", accent: "#93C5FD", textOnBg: "#FFFFFF" },
-  9:  { num: 9,  titrePrincipal: "MOBILITÉ",         sousTitre: "INTERNATIONALE — ERASMUS+",         bg: "#1E40AF", bgSoft: "#FEFCE8", accent: "#FACC15", textOnBg: "#FFFFFF" },
-  10: { num: 10, titrePrincipal: "MOBILITÉ",         sousTitre: "NATIONALE",                         bg: "#0F766E", bgSoft: "#F0FDFA", accent: "#5EEAD4", textOnBg: "#FFFFFF" },
-  11: { num: 11, titrePrincipal: "AIDE À LA",        sousTitre: "RECHERCHE D'EMPLOYEUR",             bg: "#EA580C", bgSoft: "#FFF7ED", accent: "#FDBA74", textOnBg: "#FFFFFF" },
-  12: { num: 12, titrePrincipal: "ACCUEIL",          sousTitre: "TOUTE L'ANNÉE",                     bg: "#16A34A", bgSoft: "#F0FDF4", accent: "#86EFAC", textOnBg: "#FFFFFF" },
-  13: { num: 13, titrePrincipal: "FORMATION",        sousTitre: "DES MAÎTRES D'APPRENTISSAGE",       bg: "#9A3412", bgSoft: "#FFFBEB", accent: "#FCD34D", textOnBg: "#FFFFFF" },
-  14: { num: 14, titrePrincipal: "CONSEIL DE",       sousTitre: "PERFECTIONNEMENT",                  bg: "#6D28D9", bgSoft: "#FAF5FF", accent: "#C4B5FD", textOnBg: "#FFFFFF" },
+  1:  { num: 1,  titrePrincipal: "ORIENTATION",       sousTitre: "& HANDICAP",                    bg: "#1E3A8A", bgSoft: "#EFF4FF", accent: "#60A5FA", textOnBg: "#FFFFFF" },
+  2:  { num: 2,  titrePrincipal: "RECHERCHE",         sousTitre: "D'UN EMPLOYEUR",                bg: "#EA580C", bgSoft: "#FFF7ED", accent: "#FDBA74", textOnBg: "#FFFFFF" },
+  3:  { num: 3,  titrePrincipal: "COHÉRENCE",         sousTitre: "CFA / ENTREPRISE",              bg: "#0E7490", bgSoft: "#ECFEFF", accent: "#67E8F9", textOnBg: "#FFFFFF" },
+  4:  { num: 4,  titrePrincipal: "DROITS, DEVOIRS",   sousTitre: "& SANTÉ — SÉCURITÉ AU TRAVAIL", bg: "#B45309", bgSoft: "#FEF6E7", accent: "#FCD34D", textOnBg: "#FFFFFF" },
+  5:  { num: 5,  titrePrincipal: "RUPTURE",           sousTitre: "DE CONTRAT",                    bg: "#B91C1C", bgSoft: "#FEF2F2", accent: "#FCA5A5", textOnBg: "#FFFFFF" },
+  6:  { num: 6,  titrePrincipal: "ACCOMPAGNEMENT",    sousTitre: "SOCIAL & MATÉRIEL",             bg: "#15803D", bgSoft: "#F0FDF4", accent: "#86EFAC", textOnBg: "#FFFFFF" },
+  7:  { num: 7,  titrePrincipal: "MIXITÉ",            sousTitre: "FEMMES — HOMMES",               bg: "#7C3AED", bgSoft: "#F3EEFE", accent: "#C4B5FD", textOnBg: "#FFFFFF" },
+  8:  { num: 8,  titrePrincipal: "ÉGALITÉ",           sousTitre: "PROFESSIONNELLE & MIXITÉ DES MÉTIERS", bg: "#DB2777", bgSoft: "#FDF2F8", accent: "#F9A8D4", textOnBg: "#FFFFFF" },
+  9:  { num: 9,  titrePrincipal: "DIVERSITÉ",         sousTitre: "& LUTTE CONTRE LES DISCRIMINATIONS", bg: "#1D4ED8", bgSoft: "#EFF6FF", accent: "#93C5FD", textOnBg: "#FFFFFF" },
+  10: { num: 10, titrePrincipal: "MOBILITÉ",          sousTitre: "NATIONALE & INTERNATIONALE",    bg: "#0F766E", bgSoft: "#F0FDFA", accent: "#5EEAD4", textOnBg: "#FFFFFF" },
+  11: { num: 11, titrePrincipal: "SUIVI",             sousTitre: "DE LA FORMATION À DISTANCE",    bg: "#4338CA", bgSoft: "#EEF2FF", accent: "#A5B4FC", textOnBg: "#FFFFFF" },
+  12: { num: 12, titrePrincipal: "ÉVALUATION",        sousTitre: "DES COMPÉTENCES ACQUISES",      bg: "#16A34A", bgSoft: "#F0FDF4", accent: "#86EFAC", textOnBg: "#FFFFFF" },
+  13: { num: 13, titrePrincipal: "ACCOMPAGNEMENT",    sousTitre: "POST-FORMATION",                bg: "#9A3412", bgSoft: "#FFFBEB", accent: "#FCD34D", textOnBg: "#FFFFFF" },
+  14: { num: 14, titrePrincipal: "ACCÈS",             sousTitre: "AUX AIDES DES APPRENTIS",       bg: "#6D28D9", bgSoft: "#FAF5FF", accent: "#C4B5FD", textOnBg: "#FFFFFF" },
 };
 
 export function genVisuelMissionCFA(

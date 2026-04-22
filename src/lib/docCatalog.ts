@@ -683,19 +683,19 @@ export function buildFullCatalog(
     // Affiches modernes avec illustration + nom d'organisme dynamique
     const visuels14 = [
       { num: 1,  titre: "Mission 1 – Orientation & Handicap" },
-      { num: 2,  titre: "Mission 2 – Mixité des Métiers" },
-      { num: 3,  titre: "Mission 3 – Coopération CFA / Entreprise" },
-      { num: 4,  titre: "Mission 4 – Activités Citoyennes, Culturelles & Sportives" },
-      { num: 5,  titre: "Mission 5 – Rupture du Contrat d'Apprentissage" },
-      { num: 6,  titre: "Mission 6 – Aides Sociales / Mixité & Égalité F-H" },
-      { num: 7,  titre: "Mission 7 – Accompagnement Éducatif, Social & Professionnel" },
-      { num: 8,  titre: "Mission 8 – Insertion Professionnelle" },
-      { num: 9,  titre: "Mission 9 – Mobilité Internationale Erasmus+" },
-      { num: 10, titre: "Mission 10 – Mobilité Nationale" },
-      { num: 11, titre: "Mission 11 – Aide à la Recherche d'Employeur" },
-      { num: 12, titre: "Mission 12 – Accueil à Tout Moment de l'Année" },
-      { num: 13, titre: "Mission 13 – Formation des Maîtres d'Apprentissage" },
-      { num: 14, titre: "Mission 14 – Conseil de Perfectionnement" },
+      { num: 2,  titre: "Mission 2 – Recherche d'un Employeur" },
+      { num: 3,  titre: "Mission 3 – Cohérence CFA / Entreprise" },
+      { num: 4,  titre: "Mission 4 – Droits, Devoirs & Santé-Sécurité au Travail" },
+      { num: 5,  titre: "Mission 5 – Rupture de Contrat" },
+      { num: 6,  titre: "Mission 6 – Accompagnement Social & Matériel" },
+      { num: 7,  titre: "Mission 7 – Mixité Femmes-Hommes" },
+      { num: 8,  titre: "Mission 8 – Égalité Professionnelle & Mixité des Métiers" },
+      { num: 9,  titre: "Mission 9 – Diversité & Lutte contre les Discriminations" },
+      { num: 10, titre: "Mission 10 – Mobilité Nationale & Internationale" },
+      { num: 11, titre: "Mission 11 – Suivi de la Formation à Distance" },
+      { num: 12, titre: "Mission 12 – Évaluation des Compétences Acquises" },
+      { num: 13, titre: "Mission 13 – Accompagnement Post-Formation" },
+      { num: 14, titre: "Mission 14 – Accès aux Aides des Apprentis" },
     ];
     visuels14.forEach((v) => {
       add(
