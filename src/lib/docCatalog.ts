@@ -679,6 +679,35 @@ export function buildFullCatalog(
       }
     });
 
+    // ===== IND 14 — VISUELS / AFFICHES DES 14 MISSIONS DU CFA =====
+    // Affiches HD (posters) à diffuser dans les locaux pour chaque mission
+    const visuels14 = [
+      { num: 1, titre: "Mission 1 – Orientation & Handicap", file: "mission_1_HD.png" },
+      { num: 2, titre: "Mission 2 – Mixité des Métiers", file: "mission_2_HD.png" },
+      { num: 3, titre: "Mission 3 – Coopération CFA / Entreprise", file: "mission_3_HD.png" },
+      { num: 4, titre: "Mission 4 – Activités Citoyennes, Culturelles & Sportives", file: "mission_4_HD.png" },
+      { num: 5, titre: "Mission 5 – Rupture du Contrat d'Apprentissage", file: "mission_5_HD.png" },
+      { num: 6, titre: "Mission 6 – Aides Sociales / Mixité & Égalité F-H", file: "mission_6_HD.png" },
+      { num: 7, titre: "Mission 7 – Accompagnement Éducatif, Social & Professionnel", file: "mission_7_HD.png" },
+      { num: 8, titre: "Mission 8 – Insertion Professionnelle", file: "mission_8_HD.png" },
+      { num: 9, titre: "Mission 9 – Mobilité Internationale Erasmus+", file: "mission_9_HD.png" },
+      { num: 10, titre: "Mission 10 – Mobilité Nationale", file: "mission_10.pdf" },
+      { num: 11, titre: "Mission 11 – Aide à la Recherche d'Employeur", file: "mission_11_HD.png" },
+      { num: 12, titre: "Mission 12 – Accueil à Tout Moment de l'Année", file: "mission_12_HD.png" },
+      { num: 13, titre: "Mission 13 – Formation des Maîtres d'Apprentissage", file: "mission_13_HD.png" },
+      { num: 14, titre: "Mission 14 – Conseil de Perfectionnement", file: "mission_14_HD.png" },
+    ];
+    visuels14.forEach((v) => {
+      add(
+        `cfa_c3i14_visuel_mission_${v.num}`,
+        `CT3 - IND 14 📁 VISUELS 14 MISSIONS / ${v.titre}`,
+        3,
+        14,
+        "pdf_static",
+        { pdfUrl: `/pdfs/visuels_14_missions/${v.file}`, folder: "VISUELS_14_MISSIONS" }
+      );
+    });
+
     // ===== IND 14 — DOSSIER PERMIS B =====
     add("cfa_c3i14_permisb_aide_financement", "CT3 - IND 14 📁 PERMIS B – Aide au Financement Permis B", 3, 14, "pdf_static", { pdfUrl: "/pdfs/aide_financement_permis_b.pdf" });
     add("cfa_c3i14_permisb_bordereau_transmission", "CT3 - IND 14 📁 PERMIS B – Bordereau de Transmission", 3, 14, "pdf_static", { pdfUrl: "/pdfs/bordereau_transmission_permis_b.pdf" });
