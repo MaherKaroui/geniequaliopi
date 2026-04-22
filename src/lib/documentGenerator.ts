@@ -1826,6 +1826,109 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
       </table>
       <p style="margin-top:10px;font-style:italic">Contenus conformes au Référentiel d'Activités, de Compétences et d'Évaluation (REAC) du Titre Professionnel Négociateur Technico-Commercial – RNCP 39063, certifié par le Ministère du Travail, du Plein Emploi et de l'Insertion.</p>
     </div>
+
+    <h2>Modalités de certification (Titre Professionnel NTC – RNCP 39063)</h2>
+    <div class="section">
+      <p><strong>La certification s'obtient par deux voies complémentaires :</strong></p>
+
+      <h3>A. Évaluation Passée en Cours de Formation (ECF)</h3>
+      <ul>
+        <li>Mise en situation professionnelle</li>
+        <li>Entretien technique</li>
+        <li>Questionnement à partir du dossier professionnel (DP)</li>
+        <li>Entretien final avec le jury</li>
+      </ul>
+
+      <h3>B. Inscription à l'examen final</h3>
+      <ul>
+        <li>Inscription sur la plateforme <strong>CERES</strong> réalisée par le centre d'examen habilité</li>
+        <li>Envoi de la convocation officielle au candidat</li>
+        <li>Passage dans un centre agréé du Ministère du Travail</li>
+        <li>Certificateur officiel : <strong>Ministère du Travail, du Plein Emploi et de l'Insertion</strong></li>
+      </ul>
+
+      <h3>Détail des épreuves de certification (durée totale : 8 h 30 min)</h3>
+      <table>
+        <thead>
+          <tr><th style="width:30%">Épreuve</th><th style="width:15%">Durée</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Mise en situation professionnelle</strong></td>
+            <td>6 h 30 min</td>
+            <td>
+              <p><em>Partie 1 – Écrite (4 h)</em> : étude de cas en entreprise fictive, renseignement d'un tableau de bord, analyse des résultats, conception d'un diaporama de 10 à 12 slides, rédaction d'une proposition technique et commerciale.</p>
+              <p><em>Partie 2 – Orale (2 h 30 min)</em> : 30 min de préparation, 15 min de présentation du tableau de bord, 15 min d'échange avec le jury, 15 min de prospection téléphonique (jury jouant le rôle des interlocuteurs), 60 min de présentation et négociation de la proposition technique et commerciale en face à face, 15 min d'échange avec le jury sur la négociation.</p>
+            </td>
+          </tr>
+          <tr>
+            <td><strong>Entretien technique</strong></td>
+            <td>50 min</td>
+            <td>20 min de préparation à partir d'une matrice SWOT fournie par le jury, 15 min de présentation des éléments repérés et suggestions, 15 min d'échange avec le jury (guide d'entretien).</td>
+          </tr>
+          <tr>
+            <td><strong>Questionnement à partir de productions</strong></td>
+            <td>1 h 00 min</td>
+            <td>Le candidat réalise en amont un document et un diaporama portant sur la veille commerciale, le plan d'actions commerciales et l'optimisation de la relation client. 30 min de présentation puis 30 min de questionnement par le jury.</td>
+          </tr>
+          <tr>
+            <td><strong>Entretien final</strong></td>
+            <td>10 min</td>
+            <td>Échange avec le candidat sur les principales actions mentionnées dans le Dossier Professionnel (DP).</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Voies d'accès à la certification (France Compétences)</h3>
+      <ul>
+        <li>Formation continue</li>
+        <li>Apprentissage</li>
+        <li>VAE (Validation des Acquis de l'Expérience)</li>
+        <li>Contrat de professionnalisation</li>
+        <li>Formation hors parcours certifiant + passage de l'examen</li>
+      </ul>
+
+      <h3>Acquisition par capitalisation</h3>
+      <ul>
+        <li>Le titre professionnel est composé de <strong>2 blocs de compétences</strong> (CCP – Certificats de Compétences Professionnelles) correspondant aux activités précédemment énumérées.</li>
+        <li>Il peut être complété par un ou plusieurs blocs sanctionnés par des Certificats Complémentaires de Spécialisation (CCS).</li>
+        <li>Accessible par capitalisation des CCP ou suite à un parcours de formation, conformément à l'arrêté du 22 décembre 2015 modifié relatif aux conditions de délivrance du titre professionnel du ministère chargé de l'emploi.</li>
+      </ul>
+
+      <h3>Taux de réussite</h3>
+      <table>
+        <tr><th>Indicateur</th><th>Valeur</th></tr>
+        <tr><td>Taux de réussite national (France Compétences – RNCP 39063)</td><td>48 % (moyenne constatée sur les résultats publiés)</td></tr>
+        <tr><td>Taux du centre ${o.nom}</td><td>3 stagiaires formés – 1 présenté – 1 reçu → <strong>100 % de réussite parmi les présentés</strong></td></tr>
+      </table>
+    </div>
+
+    <h2>Débouchés professionnels (extraits du RNCP 39063)</h2>
+    <div class="section section-green">
+      <ul>
+        <li>Technico-commercial</li>
+        <li>Chargé d'affaires</li>
+        <li>Responsable grand compte</li>
+        <li>Chargé de développement commercial</li>
+        <li>Commercial B2B</li>
+        <li>Key Account Manager</li>
+        <li>Business Developer</li>
+        <li>Sales Account Executive</li>
+      </ul>
+    </div>
+
+    <h2>Contact du centre</h2>
+    <div class="section">
+      <p><strong>${o.nom}</strong></p>
+      <p>${o.adresse}, ${o.codePostal} ${o.ville}</p>
+      <p><strong>Email :</strong> ${o.email}</p>
+      ${o.telephone?.trim() ? `<p><strong>Téléphone :</strong> ${o.telephone}</p>` : ""}
+      <p><strong>Président / Dirigeant :</strong> ${o.dirigeant}</p>
+      ${o.nda ? `<p><strong>N° de Déclaration d'Activité :</strong> ${o.nda} <em>(ce numéro ne vaut pas agrément de l'État)</em></p>` : ""}
+      ${o.siret ? `<p><strong>SIREN / SIRET :</strong> ${o.siret}</p>` : ""}
+      ${f.codeRNCP ? `<p><strong>Lien de la certification :</strong> <a href="https://www.francecompetences.fr/recherche/rncp/${(f.codeRNCP||"").replace(/\D/g,"")}/" target="_blank">https://www.francecompetences.fr/recherche/rncp/${(f.codeRNCP||"").replace(/\D/g,"")}/</a></p>` : ""}
+      <p><strong>Certificateur :</strong> Ministère du Travail, du Plein Emploi et de l'Insertion</p>
+    </div>
   ` : "";
 
   // For bloc-based formations, override duration display
