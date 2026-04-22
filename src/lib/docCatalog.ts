@@ -488,74 +488,82 @@ export function buildFullCatalog(
     add("cfa_c3i10_permisb_formulaire_aide", "CT3 - IND 10 📁 PERMIS B – Formulaire Aide au Financement", 3, 10, "pdf_static", { pdfUrl: "/pdfs/formulaire_aide_financement_permis_b.pdf" });
     add("cfa_c3i10_permisb_permis", "CT3 - IND 10 📁 PERMIS B – Permis B", 3, 10, "pdf_static", { pdfUrl: "/pdfs/permis_b.pdf" });
     add("cfa_c3i10_permisb_aide_financement", "CT3 - IND 10 📁 PERMIS B – Aide au Financement Permis B", 3, 10, "pdf_static", { pdfUrl: "/pdfs/aide_financement_permis_b.pdf" });
-    // --- IND 10 — Dossier Mission N°5 Charte Qualité CFA (14 Missions) ---
-    add("cfa_c3i10_mission5_rupture_contrat", "CT3 - IND 10 📁 14 MISSIONS / Mission 5 – Procédure de Rupture du Contrat d'Apprentissage", 3, 10, "procedure_rupture_contrat_apprentissage_cfa", { folder: "14_MISSIONS_CFA/Mission_5_Rupture_Contrat" });
-    // --- IND 10 — Dossier Mission N°6 Charte Qualité CFA (Aides régionales) ---
-    add("cfa_c3i10_mission6_aide_ara", "CT3 - IND 10 📁 14 MISSIONS / Mission 6 – Aide Régionale à l'Apprentissage (ARA)", 3, 10, "pdf_static", { pdfUrl: "/pdfs/aide_ara.png", folder: "14_MISSIONS_CFA/Mission_6_Mixite_Egalite_FH" });
-    add("cfa_c3i10_mission6_aide_equipement", "CT3 - IND 10 📁 14 MISSIONS / Mission 6 – Aide Régionale Équipement Individuel", 3, 10, "pdf_static", { pdfUrl: "/pdfs/aide_regionale_equipement.png", folder: "14_MISSIONS_CFA/Mission_6_Mixite_Egalite_FH" });
-    add("cfa_c3i10_mission6_sante_psy", "CT3 - IND 10 📁 14 MISSIONS / Mission 6 – Santé Psy Étudiant", 3, 10, "pdf_static", { pdfUrl: "/pdfs/sante_psy_etudiant.png", folder: "14_MISSIONS_CFA/Mission_6_Mixite_Egalite_FH" });
-    add("cfa_c3i10_mission6_carte_imagine_r", "CT3 - IND 10 📁 14 MISSIONS / Mission 6 – Carte Imagine R Scolaire", 3, 10, "pdf_static", { pdfUrl: "/pdfs/carte_imagine_r.png", folder: "14_MISSIONS_CFA/Mission_6_Mixite_Egalite_FH" });
+    // --- IND 10 — Mission 5 : maintien en formation 6 mois (rupture de contrat) ---
+    add("cfa_c3i10_mission5_rupture_contrat", "CT3 - IND 10 📁 14 MISSIONS / Mission 5 – Maintien en formation 6 mois (rupture de contrat)", 3, 10, "procedure_rupture_contrat_apprentissage_cfa", { folder: "14_MISSIONS_CFA/Mission_5_Rupture_Contrat" });
+    // --- IND 10 — Mission 6 : aides sociales et matérielles aux apprentis ---
+    add("cfa_c3i10_mission6_aide_ara", "CT3 - IND 10 📁 14 MISSIONS / Mission 6 – Aide Régionale à l'Apprentissage (ARA)", 3, 10, "pdf_static", { pdfUrl: "/pdfs/aide_ara.png", folder: "14_MISSIONS_CFA/Mission_6_Accompagnement_Social_Materiel" });
+    add("cfa_c3i10_mission6_aide_equipement", "CT3 - IND 10 📁 14 MISSIONS / Mission 6 – Aide Régionale Équipement Individuel", 3, 10, "pdf_static", { pdfUrl: "/pdfs/aide_regionale_equipement.png", folder: "14_MISSIONS_CFA/Mission_6_Accompagnement_Social_Materiel" });
+    add("cfa_c3i10_mission6_sante_psy", "CT3 - IND 10 📁 14 MISSIONS / Mission 6 – Santé Psy Étudiant", 3, 10, "pdf_static", { pdfUrl: "/pdfs/sante_psy_etudiant.png", folder: "14_MISSIONS_CFA/Mission_6_Accompagnement_Social_Materiel" });
+    add("cfa_c3i10_mission6_carte_imagine_r", "CT3 - IND 10 📁 14 MISSIONS / Mission 6 – Carte Imagine R Scolaire", 3, 10, "pdf_static", { pdfUrl: "/pdfs/carte_imagine_r.png", folder: "14_MISSIONS_CFA/Mission_6_Accompagnement_Social_Materiel" });
     // --- IND 10 — Dossier Livret d'Apprentissage et Maître d'Apprentissage ---
     stagiaires.forEach((s, si) => {
       add(`cfa_c3i10_livret_apprentissage_${si}`, `CT3 - IND 10 📁 LIVRETS – Livret d'Apprentissage – ${s.prenom} ${s.nom}`, 3, 10, "livret_apprentissage_ind10_cfa", { stagiaireIdx: si });
     });
     add("cfa_c3i10_livret_maitre_apprentissage", "CT3 - IND 10 📁 LIVRETS – Livret du Maître d'Apprentissage", 3, 10, "livret_maitre_apprentissage_cfa");
-    // --- IND 10 — Dossier N°1 Handicap (regroupé dans 14_MISSIONS_CFA/Mission_1_Handicap) ---
-    add("cfa_c3i10_handicap_livret_referent", "CT3 - IND 10 📁 14 MISSIONS / Mission 1 HANDICAP – Livret Référent Handicap", 3, 10, "pdf_static", { pdfUrl: "/pdfs/livret_referent_handicap.docx", folder: "14_MISSIONS_CFA/Mission_1_Handicap" });
-    add("cfa_c3i10_handicap_eval_besoins_agefiph", "CT3 - IND 10 📁 14 MISSIONS / Mission 1 HANDICAP – Évaluation Besoins Apprenants AGEFIPH (Excel)", 3, 10, "pdf_static", { pdfUrl: "/pdfs/evaluation_besoins_handicap_agefiph.xlsx", folder: "14_MISSIONS_CFA/Mission_1_Handicap" });
-    add("cfa_c3i10_handicap_types_moyens", "CT3 - IND 10 📁 14 MISSIONS / Mission 1 HANDICAP – Types de Handicap, Moyens et Partenaires (Excel)", 3, 10, "pdf_static", { pdfUrl: "/pdfs/handicap_types_moyens_partenaires.xlsx", folder: "14_MISSIONS_CFA/Mission_1_Handicap" });
+    // --- IND 10 — Mission 1 : Orientation & Handicap ---
+    add("cfa_c3i10_handicap_livret_referent", "CT3 - IND 10 📁 14 MISSIONS / Mission 1 – Livret Référent Handicap (orientation/réorientation)", 3, 10, "pdf_static", { pdfUrl: "/pdfs/livret_referent_handicap.docx", folder: "14_MISSIONS_CFA/Mission_1_Orientation_Handicap" });
+    add("cfa_c3i10_handicap_eval_besoins_agefiph", "CT3 - IND 10 📁 14 MISSIONS / Mission 1 – Évaluation Besoins Apprenants AGEFIPH (Excel)", 3, 10, "pdf_static", { pdfUrl: "/pdfs/evaluation_besoins_handicap_agefiph.xlsx", folder: "14_MISSIONS_CFA/Mission_1_Orientation_Handicap" });
+    add("cfa_c3i10_handicap_types_moyens", "CT3 - IND 10 📁 14 MISSIONS / Mission 1 – Types de Handicap, Moyens et Partenaires (Excel)", 3, 10, "pdf_static", { pdfUrl: "/pdfs/handicap_types_moyens_partenaires.xlsx", folder: "14_MISSIONS_CFA/Mission_1_Orientation_Handicap" });
 
-    // ===== 14 MISSIONS OFFICIELLES DU CFA (Art. L6231-2) =====
-    // Toutes les missions sont regroupées dans le sous-dossier 14_MISSIONS_CFA/Mission_X
+    // ===== 14 MISSIONS OFFICIELLES DU CFA (Art. L.6231-2) =====
+    // Numérotation alignée sur le texte officiel ; chaque mission = 1 sous-dossier.
+
+    // Mission 2 — Appui à la recherche d'un employeur
+    add("cfa_mission2_procedure_aide_employeur", "CT3 - IND 10 📁 14 MISSIONS / Mission 2 – Procédure d'aide à la recherche d'employeur", 3, 10, "procedure_aide_recherche_employeur_cfa", { folder: "14_MISSIONS_CFA/Mission_2_Recherche_Employeur" });
+    add("cfa_mission2_tableau_candidats_sans_contrat", "CT3 - IND 10 📁 14 MISSIONS / Mission 2 – Tableau de suivi des candidats sans contrat", 3, 10, "tableau_suivi_candidats_sans_contrat_cfa", { folder: "14_MISSIONS_CFA/Mission_2_Recherche_Employeur" });
+
     // Mission 3 — Cohérence CFA / Entreprise
-    add("cfa_mission3_cooperation_cfa_entreprise", "CT3 - IND 10 📁 14 MISSIONS / Mission 3 – Coopération CFA / Entreprise (Formateurs & MA)", 3, 10, "cooperation_cfa_entreprise_cfa", { folder: "14_MISSIONS_CFA/Mission_3_Cooperation_CFA_Entreprise" });
-    // Mission 4 — Activités citoyennes, culturelles, sportives
-    add("cfa_mission4_plan_activites", "CT3 - IND 10 📁 14 MISSIONS / Mission 4 – Plan d'activités citoyennes, culturelles et sportives", 3, 10, "plan_activites_citoyennes_cfa", { folder: "14_MISSIONS_CFA/Mission_4_Activites_Citoyennes" });
-    // Mission 5 — Procédure de Rupture du Contrat (déjà ajouté plus haut)
-    // Mission 6 — Mixité et Égalité Femmes / Hommes
-    add("cfa_mission6_plan_mixite_egalite", "CT3 - IND 10 📁 14 MISSIONS / Mission 6 – Plan d'actions Mixité & Égalité F/H", 3, 10, "plan_mixite_egalite_fh_cfa", { folder: "14_MISSIONS_CFA/Mission_6_Mixite_Egalite_FH" });
-    // Mission 8 — Insertion professionnelle (placée en CT7 IND 30 mais regroupée dans le dossier 14 missions)
-    add("cfa_mission8_suivi_insertion", "CT7 - IND 30 📁 14 MISSIONS / Mission 8 – Suivi de l'insertion professionnelle à 6 mois", 7, 30, "suivi_insertion_pro_cfa", { folder: "14_MISSIONS_CFA/Mission_8_Insertion_Professionnelle" });
-    // Mission 9 — Mobilité internationale Erasmus+
-    add("cfa_mission9_convention_erasmus", "CT3 - IND 10 📁 14 MISSIONS / Mission 9 – Convention de mobilité internationale Erasmus+", 3, 10, "convention_mobilite_erasmus_cfa", { folder: "14_MISSIONS_CFA/Mission_9_Mobilite_Erasmus" });
-    add("cfa_mission9_procedure_erasmus", "CT3 - IND 10 📁 14 MISSIONS / Mission 9 – Procédure de mobilité internationale Erasmus+", 3, 10, "procedure_mobilite_erasmus_cfa", { folder: "14_MISSIONS_CFA/Mission_9_Mobilite_Erasmus" });
-    // Mission 9bis — Diversité et lutte contre les discriminations
-    add("cfa_mission9bis_plan_diversite", "CT3 - IND 10 📁 14 MISSIONS / Mission 9 – Plan diversité & lutte contre les discriminations", 3, 10, "plan_diversite_lutte_discriminations_cfa", { folder: "14_MISSIONS_CFA/Mission_9_Mobilite_Erasmus" });
-    // Mission 10 — Mobilité nationale
-    add("cfa_mission10_plan_mobilite_nationale", "CT3 - IND 10 📁 14 MISSIONS / Mission 10 – Plan de mobilité nationale des apprentis", 3, 10, "plan_mobilite_nationale_cfa", { folder: "14_MISSIONS_CFA/Mission_10_Mobilite_Nationale" });
-    // Mission 11 — Aide à la recherche d'employeur
-    add("cfa_mission11_procedure_aide_employeur", "CT3 - IND 10 📁 14 MISSIONS / Mission 11 – Procédure d'aide à la recherche d'employeur", 3, 10, "procedure_aide_recherche_employeur_cfa", { folder: "14_MISSIONS_CFA/Mission_11_Aide_Recherche_Employeur" });
-    add("cfa_mission11_tableau_candidats_sans_contrat", "CT3 - IND 10 📁 14 MISSIONS / Mission 11 – Tableau de suivi des candidats sans contrat", 3, 10, "tableau_suivi_candidats_sans_contrat_cfa", { folder: "14_MISSIONS_CFA/Mission_11_Aide_Recherche_Employeur" });
-    // Mission 13 — Formation du Maître d'Apprentissage
-    add("cfa_mission13_attestation_formation_ma", "CT3 - IND 10 📁 14 MISSIONS / Mission 13 – Attestation de formation du Maître d'Apprentissage", 3, 10, "attestation_formation_maitre_apprentissage_cfa", { folder: "14_MISSIONS_CFA/Mission_13_Formation_Maitre_Apprentissage" });
-    // Mission 13bis — Accompagnement post-formation
-    add("cfa_mission13bis_accompagnement_post_formation", "CT3 - IND 10 📁 14 MISSIONS / Mission 13 – Procédure d'accompagnement post-formation (interruption / sans diplôme)", 3, 10, "procedure_accompagnement_post_formation_cfa", { folder: "14_MISSIONS_CFA/Mission_13_Formation_Maitre_Apprentissage" });
-    // Mission 2 — Encourager la mixité au sein des métiers
-    add("cfa_mission2_plan_mixite_metiers", "CT3 - IND 10 📁 14 MISSIONS / Mission 2 – Plan d'actions Mixité dans les métiers préparés", 3, 10, "plan_mixite_metiers_cfa", { folder: "14_MISSIONS_CFA/Mission_2_Mixite_Metiers" });
-    // Mission 7 — Accompagnement éducatif, social et professionnel
-    add("cfa_mission7_accompagnement_educatif_social", "CT3 - IND 10 📁 14 MISSIONS / Mission 7 – Procédure accompagnement éducatif, social et professionnel", 3, 10, "procedure_accompagnement_educatif_social_cfa", { folder: "14_MISSIONS_CFA/Mission_7_Accompagnement_Educatif_Social" });
-    // Mission 12 — Accueil à tout moment de l'année
-    add("cfa_mission12_accueil_tout_moment", "CT3 - IND 10 📁 14 MISSIONS / Mission 12 – Procédure d'accueil à tout moment de l'année", 3, 10, "procedure_accueil_tout_moment_cfa", { folder: "14_MISSIONS_CFA/Mission_12_Accueil_Tout_Moment" });
-    // Mission 14 — Conseil de perfectionnement
-    add("cfa_mission14_conseil_perfectionnement", "CT3 - IND 10 📁 14 MISSIONS / Mission 14 – Compte-rendu Conseil de perfectionnement", 3, 10, "conseil_perfectionnement_cfa", { folder: "14_MISSIONS_CFA/Mission_14_Conseil_Perfectionnement" });
+    add("cfa_mission3_cooperation_cfa_entreprise", "CT3 - IND 10 📁 14 MISSIONS / Mission 3 – Coopération CFA / Entreprise (Formateurs & MA)", 3, 10, "cooperation_cfa_entreprise_cfa", { folder: "14_MISSIONS_CFA/Mission_3_Coherence_CFA_Entreprise" });
 
-    // ===== EXERCICES — QCM 10 questions par mission, par stagiaire =====
-    // Chaque QCM est placé dans le sous-dossier de la mission correspondante.
+    // Mission 4 — Droits, devoirs & santé-sécurité au travail
+    add("cfa_mission4_droits_devoirs_sst", "CT3 - IND 10 📁 14 MISSIONS / Mission 4 – Information droits/devoirs & santé-sécurité au travail", 3, 10, "plan_activites_citoyennes_cfa", { folder: "14_MISSIONS_CFA/Mission_4_Droits_Devoirs_Sante_Securite" });
+
+    // Mission 5 — déjà ajoutée plus haut (rupture / 6 mois)
+
+    // Mission 7 — Mixité & égalité F/H (sensibilisation, harcèlement)
+    add("cfa_mission7_plan_mixite_egalite", "CT3 - IND 10 📁 14 MISSIONS / Mission 7 – Plan d'actions Mixité & Égalité F/H", 3, 10, "plan_mixite_egalite_fh_cfa", { folder: "14_MISSIONS_CFA/Mission_7_Mixite_Egalite_FH" });
+
+    // Mission 8 — Égalité professionnelle & mixité des métiers
+    add("cfa_mission8_plan_mixite_metiers", "CT3 - IND 10 📁 14 MISSIONS / Mission 8 – Plan d'actions Mixité dans les métiers préparés", 3, 10, "plan_mixite_metiers_cfa", { folder: "14_MISSIONS_CFA/Mission_8_Egalite_Pro_Mixite_Metiers" });
+
+    // Mission 9 — Diversité & lutte contre les discriminations
+    add("cfa_mission9_plan_diversite", "CT3 - IND 10 📁 14 MISSIONS / Mission 9 – Plan diversité & lutte contre les discriminations", 3, 10, "plan_diversite_lutte_discriminations_cfa", { folder: "14_MISSIONS_CFA/Mission_9_Diversite_Discriminations" });
+
+    // Mission 10 — Mobilité nationale & internationale (Erasmus+)
+    add("cfa_mission10_convention_erasmus", "CT3 - IND 10 📁 14 MISSIONS / Mission 10 – Convention de mobilité internationale Erasmus+", 3, 10, "convention_mobilite_erasmus_cfa", { folder: "14_MISSIONS_CFA/Mission_10_Mobilite_Nationale_Internationale" });
+    add("cfa_mission10_procedure_erasmus", "CT3 - IND 10 📁 14 MISSIONS / Mission 10 – Procédure de mobilité internationale Erasmus+", 3, 10, "procedure_mobilite_erasmus_cfa", { folder: "14_MISSIONS_CFA/Mission_10_Mobilite_Nationale_Internationale" });
+    add("cfa_mission10_plan_mobilite_nationale", "CT3 - IND 10 📁 14 MISSIONS / Mission 10 – Plan de mobilité nationale des apprentis", 3, 10, "plan_mobilite_nationale_cfa", { folder: "14_MISSIONS_CFA/Mission_10_Mobilite_Nationale_Internationale" });
+
+    // Mission 11 — Suivi & accompagnement de la formation à distance
+    add("cfa_mission11_suivi_distance", "CT3 - IND 10 📁 14 MISSIONS / Mission 11 – Procédure de suivi & accompagnement à distance", 3, 10, "procedure_accueil_tout_moment_cfa", { folder: "14_MISSIONS_CFA/Mission_11_Formation_Distance" });
+
+    // Mission 12 — Évaluation des compétences acquises (contrôle continu)
+    add("cfa_mission12_attestation_formation_ma", "CT3 - IND 10 📁 14 MISSIONS / Mission 12 – Attestation de formation du Maître d'Apprentissage (évaluation)", 3, 10, "attestation_formation_maitre_apprentissage_cfa", { folder: "14_MISSIONS_CFA/Mission_12_Evaluation_Competences" });
+
+    // Mission 13 — Accompagnement post-formation (interruption / non-diplômés)
+    add("cfa_mission13_accompagnement_post_formation", "CT3 - IND 10 📁 14 MISSIONS / Mission 13 – Procédure d'accompagnement post-formation", 3, 10, "procedure_accompagnement_post_formation_cfa", { folder: "14_MISSIONS_CFA/Mission_13_Accompagnement_Post_Formation" });
+    add("cfa_mission13_suivi_insertion", "CT7 - IND 30 📁 14 MISSIONS / Mission 13 – Suivi insertion / poursuite parcours à 6 mois", 7, 30, "suivi_insertion_pro_cfa", { folder: "14_MISSIONS_CFA/Mission_13_Accompagnement_Post_Formation" });
+
+    // Mission 14 — Accès aux aides des apprentis
+    add("cfa_mission14_acces_aides", "CT3 - IND 10 📁 14 MISSIONS / Mission 14 – Procédure d'accompagnement à l'accès aux aides", 3, 10, "procedure_accompagnement_educatif_social_cfa", { folder: "14_MISSIONS_CFA/Mission_14_Acces_Aides" });
+    add("cfa_mission14_conseil_perfectionnement", "CT3 - IND 10 📁 14 MISSIONS / Mission 14 – Compte-rendu Conseil de perfectionnement (suivi des aides)", 3, 10, "conseil_perfectionnement_cfa", { folder: "14_MISSIONS_CFA/Mission_14_Acces_Aides" });
+
+    // ===== EXERCICES — QCM 10 questions par mission, par stagiaire (L.6231-2) =====
     const MISSIONS_FOLDERS: { num: number; folder: string; titre: string; critere: number; ind: number }[] = [
-      { num: 1, folder: "14_MISSIONS_CFA/Mission_1_Handicap", titre: "Mission 1 – Handicap", critere: 3, ind: 10 },
-      { num: 2, folder: "14_MISSIONS_CFA/Mission_2_Mixite_Metiers", titre: "Mission 2 – Mixité des métiers", critere: 3, ind: 10 },
-      { num: 3, folder: "14_MISSIONS_CFA/Mission_3_Cooperation_CFA_Entreprise", titre: "Mission 3 – Coopération CFA/Entreprise", critere: 3, ind: 10 },
-      { num: 4, folder: "14_MISSIONS_CFA/Mission_4_Activites_Citoyennes", titre: "Mission 4 – Activités citoyennes", critere: 3, ind: 10 },
-      { num: 5, folder: "14_MISSIONS_CFA/Mission_5_Rupture_Contrat", titre: "Mission 5 – Rupture de contrat", critere: 3, ind: 10 },
-      { num: 6, folder: "14_MISSIONS_CFA/Mission_6_Mixite_Egalite_FH", titre: "Mission 6 – Mixité & Égalité F/H", critere: 3, ind: 10 },
-      { num: 7, folder: "14_MISSIONS_CFA/Mission_7_Accompagnement_Educatif_Social", titre: "Mission 7 – Accompagnement éducatif & social", critere: 3, ind: 10 },
-      { num: 8, folder: "14_MISSIONS_CFA/Mission_8_Insertion_Professionnelle", titre: "Mission 8 – Insertion professionnelle", critere: 7, ind: 30 },
-      { num: 9, folder: "14_MISSIONS_CFA/Mission_9_Mobilite_Erasmus", titre: "Mission 9 – Mobilité Erasmus+", critere: 3, ind: 10 },
-      { num: 10, folder: "14_MISSIONS_CFA/Mission_10_Mobilite_Nationale", titre: "Mission 10 – Mobilité nationale", critere: 3, ind: 10 },
-      { num: 11, folder: "14_MISSIONS_CFA/Mission_11_Aide_Recherche_Employeur", titre: "Mission 11 – Aide recherche employeur", critere: 3, ind: 10 },
-      { num: 12, folder: "14_MISSIONS_CFA/Mission_12_Accueil_Tout_Moment", titre: "Mission 12 – Accueil à tout moment", critere: 3, ind: 10 },
-      { num: 13, folder: "14_MISSIONS_CFA/Mission_13_Formation_Maitre_Apprentissage", titre: "Mission 13 – Formation du Maître d'Apprentissage", critere: 3, ind: 10 },
-      { num: 14, folder: "14_MISSIONS_CFA/Mission_14_Conseil_Perfectionnement", titre: "Mission 14 – Conseil de perfectionnement", critere: 3, ind: 10 },
+      { num: 1,  folder: "14_MISSIONS_CFA/Mission_1_Orientation_Handicap",               titre: "Mission 1 – Orientation & Handicap",                       critere: 3, ind: 10 },
+      { num: 2,  folder: "14_MISSIONS_CFA/Mission_2_Recherche_Employeur",                titre: "Mission 2 – Recherche d'un employeur",                     critere: 3, ind: 10 },
+      { num: 3,  folder: "14_MISSIONS_CFA/Mission_3_Coherence_CFA_Entreprise",           titre: "Mission 3 – Cohérence CFA / Entreprise",                   critere: 3, ind: 10 },
+      { num: 4,  folder: "14_MISSIONS_CFA/Mission_4_Droits_Devoirs_Sante_Securite",      titre: "Mission 4 – Droits, devoirs & santé-sécurité",             critere: 3, ind: 10 },
+      { num: 5,  folder: "14_MISSIONS_CFA/Mission_5_Rupture_Contrat",                    titre: "Mission 5 – Rupture de contrat (6 mois)",                  critere: 3, ind: 10 },
+      { num: 6,  folder: "14_MISSIONS_CFA/Mission_6_Accompagnement_Social_Materiel",     titre: "Mission 6 – Accompagnement social & matériel",             critere: 3, ind: 10 },
+      { num: 7,  folder: "14_MISSIONS_CFA/Mission_7_Mixite_Egalite_FH",                  titre: "Mission 7 – Mixité & Égalité F/H",                         critere: 3, ind: 10 },
+      { num: 8,  folder: "14_MISSIONS_CFA/Mission_8_Egalite_Pro_Mixite_Metiers",         titre: "Mission 8 – Égalité pro & mixité des métiers",             critere: 3, ind: 10 },
+      { num: 9,  folder: "14_MISSIONS_CFA/Mission_9_Diversite_Discriminations",          titre: "Mission 9 – Diversité & lutte contre les discriminations", critere: 3, ind: 10 },
+      { num: 10, folder: "14_MISSIONS_CFA/Mission_10_Mobilite_Nationale_Internationale", titre: "Mission 10 – Mobilité nationale & internationale",         critere: 3, ind: 10 },
+      { num: 11, folder: "14_MISSIONS_CFA/Mission_11_Formation_Distance",                titre: "Mission 11 – Suivi formation à distance",                  critere: 3, ind: 10 },
+      { num: 12, folder: "14_MISSIONS_CFA/Mission_12_Evaluation_Competences",            titre: "Mission 12 – Évaluation des compétences",                  critere: 3, ind: 10 },
+      { num: 13, folder: "14_MISSIONS_CFA/Mission_13_Accompagnement_Post_Formation",     titre: "Mission 13 – Accompagnement post-formation",               critere: 3, ind: 10 },
+      { num: 14, folder: "14_MISSIONS_CFA/Mission_14_Acces_Aides",                       titre: "Mission 14 – Accès aux aides des apprentis",               critere: 3, ind: 10 },
     ];
     MISSIONS_FOLDERS.forEach((m) => {
       stagiaires.forEach((s, si) => {
