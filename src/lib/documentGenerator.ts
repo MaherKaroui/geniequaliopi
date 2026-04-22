@@ -17,6 +17,7 @@ import { genPreuvesVeilleReglementaire } from "./veillePreuvesScreenshots";
 import { genDeroulePedagogique } from "./templatesAF";
 import { getRNCPByCode } from "./rncpData";
 import { generateExcelSuiviInscriptions, generateExcelSuiviParcoursBeneficiairesCFA, generateExcelSuiviPublicBeneficiaire, generateExcelSuiviPFMP, generateExcelOutilsSuiviAlternance, generateExcelTableauSuiviParcours } from "./xlsxGenerator";
+import { genVisuelMissionCFA } from "./visuelsMissionsCFA";
 import { getModuleSpecificConsigne, buildModuleSpecificResponse } from "./cfaExerciseContent";
 import { genProcedureAbandonReorientationCFA, genAccompagnementDistancielCFA, genEnquetePartenaireEmployeurCFA, genFicheRenseignementsCommanditaireCFA, genContratApprentissageModeEmploiCFA, genProcedureAccueilBeneficiairesCFA, genProcedureAdaptationPedagogiqueCFA, genProcedureGestionAnnulationsCFA, genProcedureRuptureContratApprentissageCFA, genLivretApprentissageCFA as genLivretApprentissageInd10, genLivretMaitreApprentissageCFA, genMesuresEngagementBeneficiairesCFA, genPreventionGestionAbandonsCFA, genGuideEntretienAbandonsCFA, genEviterSituationsEchecCFA, genProcedureAnnulationsAbandonsCFA, genFichierGestionAnnulationsCFA, genAccompagnementRechercheContratCFA, genListeAideSocialCFA, genCertificatRealisationCFA, genWebinaireFormationCompetencesCFA, genWebinaireNTCCFA, genDroitsDevoirsApprentiCFA, genReglesSSMilieuProCFA } from "./templatesCFA";
 import { genPlanActivitesCitoyennesCFA, genPlanMixiteEgaliteFHCFA, genSuiviInsertionProCFA, genConventionMobiliteErasmusCFA, genProcedureMobiliteErasmusCFA, genProcedureAideRechercheEmployeurCFA, genTableauSuiviCandidatsSansContratCFA, genAttestationFormationMaitreApprentissageCFA, genCoperationCFAEntrepriseCFA, genPlanDiversiteLutteDiscriminationsCFA, genPlanMobiliteNationaleCFA, genProcedureAccompagnementPostFormationCFA, genPlanMixiteMetiersCFA, genProcedureAccompagnementEducatifSocialCFA, genProcedureAccueilToutMomentCFA, genConseilPerfectionnementCFA, genQCMMissionCFA } from "./templatesCFA14Missions";
@@ -867,6 +868,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "exercices_opco": return genExercicesOPCO(o, f, stagiaires);
     case "decoupage_formation_cfa_excel": return genDecoupageFormationCFAExcel(o, f);
     case "suivi_inscriptions_excel": return generateExcelSuiviInscriptions(o, f, stagiaires);
+    case "visuel_mission_cfa": return genVisuelMissionCFA(o, params?.imageUrl || "", params?.missionTitre || "");
     case "book_qualiopi": {
       const allFormations = [f];
       const allStagiaires = mergeStagiaires(stagiaires);
