@@ -826,6 +826,11 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
       const missionNumero = typeof params?.missionNumero === "number" ? params.missionNumero : 1;
       return genMailMissionCFA(o, f, stagiaires, idx, missionNumero);
     }
+    case "mail_visite_entreprise_cfa": {
+      const idx = typeof params?.stagiaireIdx === "number" ? params.stagiaireIdx : 0;
+      const { genMailVisiteEntrepriseCFA } = require("@/lib/mailVisiteEntrepriseCFA");
+      return genMailVisiteEntrepriseCFA(o, f, stagiaires, idx);
+    }
     case "procedure_abandon_cfa": return genProcedureAbandon(o);
     case "procedure_absences_cfa": return genProcedureAbsences(o);
     case "emargement_cfa": return genEmargementCFA(o, f, stagiaires);
