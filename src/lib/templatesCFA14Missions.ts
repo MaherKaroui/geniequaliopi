@@ -874,7 +874,7 @@ export interface MissionQCM {
 export const MISSIONS_QCM: MissionQCM[] = [
   {
     numero: 1,
-    titre: "Mission 1 — Accompagnement des apprentis en situation de handicap",
+    titre: "Mission 1 — Orientation, réorientation et accompagnement des apprentis (y compris en situation de handicap)",
     questions: [
       { q: "Qui est le référent handicap dans un CFA ?", options: ["Un apprenti désigné", "Un professionnel chargé d'accompagner les apprentis en situation de handicap", "Le maître d'apprentissage", "L'employeur"], correctIndex: 1 },
       { q: "Quel organisme finance principalement les aménagements de poste ?", options: ["Pôle Emploi", "AGEFIPH / FIPHFP", "URSSAF", "DREETS"], correctIndex: 1 },
