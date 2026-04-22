@@ -127,6 +127,7 @@ export function normalizeLooseFileName(fileNameOrPath: string): string {
 
 export function getPreferredExtension(template: string, exportFormat: ExportFormat): string {
   if (template === "pdf_static") return ".pdf";
+  if (template === "outils_suivi_alternance_excel") return ".xlsx";
   if (EXCEL_TEMPLATES.has(template)) return ".xls";
   if (MAIL_DOCX_TEMPLATES.has(template)) return ".docx";
   return exportFormat === "pdf" ? ".pdf" : ".doc";
