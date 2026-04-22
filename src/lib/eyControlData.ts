@@ -201,6 +201,14 @@ export const EY_DOCUMENTS: EYDocumentItem[] = [
     category: "evaluation",
   },
   {
+    code: "34B",
+    label: "Grille d'acquisition des compétences",
+    description: "Grille d'acquisition des compétences du référentiel + QCM rempli par l'élève + analyse formateur (exemple type Genius Form / Academy)",
+    autoTemplates: ["ey_test_evaluation_fin"],
+    perStagiaire: true,
+    category: "evaluation",
+  },
+  {
     code: "35",
     label: "Évaluations blanches",
     description: "Exemples d'évaluations « à blanc » en vue du passage des certifications professionnelles/concours",
