@@ -86,7 +86,7 @@ export function genMailMissionCFA(
   const fromEmail = o.email || `contact@${(o.nom || "cfa").toLowerCase().replace(/[^a-z0-9]/g, "")}.fr`;
   const toEmail = s.email || `${(s.prenom || "").toLowerCase()}.${(s.nom || "").toLowerCase()}@email.fr`;
   const toName = `${s.prenom || ""} ${s.nom || ""}`.trim();
-  const civilite = s.civilite === "Madame" ? "Madame" : "Monsieur";
+  const civilite = s.civilite === "Mme" ? "Madame" : "Monsieur";
 
   const sujet = `[Semaine ${missionNumero}/14 — CFA] QCM Mission ${missionNumero} : ${mission.titre.replace(/^Mission \d+ — /, "")}`;
 
