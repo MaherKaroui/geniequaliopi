@@ -365,6 +365,18 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
       saveAs(blob, buildCatalogFileName(doc, undefined, ".xlsx"));
       return;
     }
+    if (doc.template === "suivi_public_beneficiaire_excel") {
+      const { generateSuiviPublicBeneficiaireXlsxBlob } = await import("@/lib/suiviPublicBeneficiaireXlsx");
+      const blob = generateSuiviPublicBeneficiaireXlsxBlob(mergedOrganisme, selectedFormation, allStagiaires);
+      saveAs(blob, buildCatalogFileName(doc, undefined, ".xlsx"));
+      return;
+    }
+    if (doc.template === "suivi_pfmp_excel") {
+      const { generateSuiviPFMPXlsxBlob } = await import("@/lib/suiviPFMPXlsx");
+      const blob = generateSuiviPFMPXlsxBlob(mergedOrganisme, selectedFormation, allStagiaires);
+      saveAs(blob, buildCatalogFileName(doc, undefined, ".xlsx"));
+      return;
+    }
 
     // Handle mail .docx templates (per-stagiaire)
     if (MAIL_TEMPLATE_FILES[doc.template] && typeof doc.params?.stagiaireIdx === "number") {
