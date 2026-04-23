@@ -1,12 +1,14 @@
 /**
- * BAHO - Modale temporaire pour générer le pack documentaire FORMAT SPHERE
+ * BAHO – Modale : pack global ZIP + aperçu RI individualisé par stagiaire (avec tampons)
  */
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Download, Loader2, Building2, Users, FileText } from "lucide-react";
-import { getBahoEntreprises, FORMAT_SPHERE_ORG } from "@/lib/baho/bahoData";
+import { Download, Loader2, Building2, Users, FileText, Eye, ChevronDown, ChevronRight, X } from "lucide-react";
+import { getBahoEntreprises, FORMAT_SPHERE_ORG, type BahoEntreprise, type BahoStagiaire } from "@/lib/baho/bahoData";
 import { buildBahoZip } from "@/lib/baho/bahoGenerator";
+import { getRIHTML } from "@/lib/baho/bahoStaticDocs";
+import { htmlToPdfBlob } from "@/lib/pdfExport";
 import { useBackgroundJobs } from "@/lib/backgroundJobs";
 import { toast } from "sonner";
 
@@ -15,11 +17,51 @@ interface BahoModalProps {
   onOpenChange: (open: boolean) => void;
 }
 
+interface PreviewState {
+  entreprise: BahoEntreprise;
+  stagiaire: BahoStagiaire | null; // null = RI entreprise sans stagiaire
+  pdfUrl: string;
+  loading: boolean;
+}
+
 export default function BahoModal({ open, onOpenChange }: BahoModalProps) {
   const [generating, setGenerating] = useState(false);
+  const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  const [preview, setPreview] = useState<PreviewState | null>(null);
   const { runJob } = useBackgroundJobs();
   const entreprises = getBahoEntreprises();
   const totalStagiaires = entreprises.reduce((acc, e) => acc + e.stagiaires.length, 0);
+
+  // Cleanup blob URL on unmount/preview change
+  useEffect(() => {
+    return () => {
+      if (preview?.pdfUrl) URL.revokeObjectURL(preview.pdfUrl);
+    };
+  }, [preview?.pdfUrl]);
+
+  const toggleExpand = (siret: string) => {
+    setExpanded((prev) => {
+      const next = new Set(prev);
+      if (next.has(siret)) next.delete(siret);
+      else next.add(siret);
+      return next;
+    });
+  };
+
+  const handlePreview = async (entreprise: BahoEntreprise, stagiaire: BahoStagiaire | null) => {
+    if (preview?.pdfUrl) URL.revokeObjectURL(preview.pdfUrl);
+    setPreview({ entreprise, stagiaire, pdfUrl: "", loading: true });
+    try {
+      const html = getRIHTML(entreprise, stagiaire ?? undefined);
+      const blob = await htmlToPdfBlob(html);
+      const url = URL.createObjectURL(blob);
+      setPreview({ entreprise, stagiaire, pdfUrl: url, loading: false });
+    } catch (err) {
+      console.error("Preview error:", err);
+      toast.error("Erreur lors de la génération de l'aperçu");
+      setPreview(null);
+    }
+  };
 
   const handleGenerate = async () => {
     setGenerating(true);
@@ -42,68 +84,109 @@ export default function BahoModal({ open, onOpenChange }: BahoModalProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-6xl max-h-[90vh] overflow-hidden flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Building2 className="w-5 h-5" /> Pack BAHO – FORMAT SPHERE
           </DialogTitle>
           <DialogDescription>
-            Génération automatique du dossier complet AFEST hôtellerie pour les {entreprises.length} hôtels.
+            Pack AFEST hôtellerie : {entreprises.length} hôtels, {totalStagiaires} stagiaires. Cliquez sur un stagiaire pour prévisualiser son RI individualisé (avec tampons hôtel + FORMAT SPHERE).
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 py-2">
-          <div className="grid grid-cols-3 gap-3 text-center">
-            <div className="p-3 bg-muted rounded-lg">
-              <div className="text-2xl font-bold text-primary">{entreprises.length}</div>
-              <div className="text-xs text-muted-foreground">Hôtels</div>
-            </div>
-            <div className="p-3 bg-muted rounded-lg">
-              <div className="text-2xl font-bold text-primary">{totalStagiaires}</div>
-              <div className="text-xs text-muted-foreground">Stagiaires</div>
-            </div>
-            <div className="p-3 bg-muted rounded-lg">
-              <div className="text-2xl font-bold text-primary">{entreprises.length * 5}</div>
-              <div className="text-xs text-muted-foreground">Documents</div>
-            </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 overflow-hidden">
+          {/* Liste hiérarchique */}
+          <div className="border rounded-lg overflow-y-auto p-2 text-sm">
+            {entreprises.map((e, i) => {
+              const isOpen = expanded.has(e.siret);
+              return (
+                <div key={e.siret} className="mb-1">
+                  <button
+                    onClick={() => toggleExpand(e.siret)}
+                    className="w-full flex items-center gap-2 px-2 py-2 rounded hover:bg-muted text-left"
+                  >
+                    {isOpen ? <ChevronDown className="w-4 h-4 shrink-0" /> : <ChevronRight className="w-4 h-4 shrink-0" />}
+                    <Building2 className="w-4 h-4 shrink-0 text-primary" />
+                    <span className="flex-1 truncate font-medium">{i + 1}. {e.nom}</span>
+                    <span className="text-xs text-muted-foreground flex items-center gap-1 shrink-0">
+                      <Users className="w-3 h-3" /> {e.stagiaires.length}
+                    </span>
+                  </button>
+                  {isOpen && (
+                    <div className="ml-6 border-l pl-2 mt-1 space-y-0.5">
+                      <button
+                        onClick={() => handlePreview(e, null)}
+                        className={`w-full flex items-center gap-2 px-2 py-1 rounded text-xs hover:bg-muted text-left ${
+                          preview?.entreprise.siret === e.siret && preview?.stagiaire === null ? "bg-primary/10 text-primary" : ""
+                        }`}
+                      >
+                        <FileText className="w-3 h-3" /> RI entreprise (sans stagiaire)
+                      </button>
+                      {e.stagiaires.map((s) => (
+                        <button
+                          key={s.codeStagiaire}
+                          onClick={() => handlePreview(e, s)}
+                          className={`w-full flex items-center gap-2 px-2 py-1 rounded text-xs hover:bg-muted text-left ${
+                            preview?.entreprise.siret === e.siret && preview?.stagiaire?.codeStagiaire === s.codeStagiaire
+                              ? "bg-primary/10 text-primary"
+                              : ""
+                          }`}
+                        >
+                          <Eye className="w-3 h-3 shrink-0" />
+                          <span className="truncate">{s.prenom} {s.nom}</span>
+                          <span className="text-muted-foreground shrink-0">#{s.codeStagiaire}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
 
-          <div className="text-sm space-y-2">
-            <p className="font-semibold flex items-center gap-1">
-              <FileText className="w-4 h-4" /> Documents générés par hôtel :
-            </p>
-            <ul className="list-disc pl-5 space-y-0.5 text-muted-foreground">
-              <li>Convention de formation (DOCX + PDF)</li>
-              <li>Devis (DOCX + PDF)</li>
-              <li>Facture (PDF)</li>
-              <li>Règlement intérieur (PDF)</li>
-              <li>Conditions Générales de Vente (PDF)</li>
-            </ul>
-          </div>
-
-          <div className="text-xs text-muted-foreground bg-muted/50 p-3 rounded-lg">
-            <strong>Émetteur :</strong> {FORMAT_SPHERE_ORG.nom} – SIRET {FORMAT_SPHERE_ORG.siret} – NDA {FORMAT_SPHERE_ORG.nda}
-          </div>
-
-          <div className="max-h-40 overflow-y-auto border rounded-lg p-2 text-xs">
-            {entreprises.map((e, i) => (
-              <div key={e.siret} className="flex items-center justify-between py-1 border-b last:border-0">
-                <span className="truncate">{i + 1}. {e.nom}</span>
-                <span className="text-muted-foreground flex items-center gap-1 shrink-0 ml-2">
-                  <Users className="w-3 h-3" /> {e.stagiaires.length}
-                </span>
+          {/* Aperçu PDF */}
+          <div className="border rounded-lg overflow-hidden flex flex-col bg-muted/30">
+            {preview ? (
+              <>
+                <div className="px-3 py-2 border-b bg-background flex items-center justify-between text-xs">
+                  <span className="truncate">
+                    <strong>{preview.entreprise.nom}</strong>
+                    {preview.stagiaire && ` – ${preview.stagiaire.prenom} ${preview.stagiaire.nom}`}
+                  </span>
+                  <button onClick={() => setPreview(null)} className="hover:text-destructive shrink-0 ml-2">
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+                {preview.loading ? (
+                  <div className="flex-1 flex items-center justify-center text-muted-foreground text-sm">
+                    <Loader2 className="w-4 h-4 animate-spin mr-2" /> Génération PDF…
+                  </div>
+                ) : (
+                  <iframe src={preview.pdfUrl} title="Aperçu RI" className="flex-1 w-full bg-white" />
+                )}
+              </>
+            ) : (
+              <div className="flex-1 flex items-center justify-center text-muted-foreground text-sm p-6 text-center">
+                <div>
+                  <Eye className="w-8 h-8 mx-auto mb-2 opacity-40" />
+                  Sélectionnez un stagiaire à gauche pour prévisualiser son Règlement Intérieur avec tampons.
+                </div>
               </div>
-            ))}
+            )}
           </div>
         </div>
 
-        <div className="flex justify-end gap-2">
+        <div className="text-xs text-muted-foreground bg-muted/50 p-2 rounded">
+          <strong>Émetteur :</strong> {FORMAT_SPHERE_ORG.nom} – SIRET {FORMAT_SPHERE_ORG.siret} – NDA {FORMAT_SPHERE_ORG.nda}
+        </div>
+
+        <div className="flex justify-end gap-2 pt-2 border-t">
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={generating}>
-            Annuler
+            Fermer
           </Button>
           <Button onClick={handleGenerate} disabled={generating} className="gap-2">
             {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
-            {generating ? "Lancement…" : "Générer le ZIP"}
+            {generating ? "Lancement…" : `Générer le ZIP complet (${entreprises.length * 5} docs)`}
           </Button>
         </div>
       </DialogContent>

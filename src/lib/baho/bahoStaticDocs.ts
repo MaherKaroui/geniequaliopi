@@ -1,7 +1,8 @@
 /**
  * BAHO - Static HTML docs (RI, CGV, Facture) — FORMAT SPHERE
  */
-import { FORMAT_SPHERE_ORG, type BahoEntreprise } from "./bahoData";
+import { FORMAT_SPHERE_ORG, type BahoEntreprise, type BahoStagiaire } from "./bahoData";
+import { getHotelStampSvg, getFormatSphereStampSvg, svgToDataUri } from "./bahoStamps";
 
 function formatDateLong(iso: string): string {
   if (!iso) return "";
@@ -49,13 +50,22 @@ function footer(): string {
   </div>`;
 }
 
-export function getRIHTML(e: BahoEntreprise): string {
+export function getRIHTML(e: BahoEntreprise, stagiaire?: BahoStagiaire): string {
+  const hotelStamp = svgToDataUri(getHotelStampSvg(e));
+  const fsStamp = svgToDataUri(getFormatSphereStampSvg());
+  const civilite = stagiaire ? `${stagiaire.prenom} ${stagiaire.nom}` : "";
+  const titreStagiaire = stagiaire
+    ? `<p><strong>Stagiaire :</strong> ${civilite}${stagiaire.emploi ? ` – ${stagiaire.emploi}` : ""}<br/>
+       <strong>Code stagiaire :</strong> ${stagiaire.codeStagiaire}</p>`
+    : "";
+
   return `<!DOCTYPE html><html><head><meta charset="utf-8"/>${BASE_CSS}</head><body>
   ${header()}
   <h1>Règlement intérieur</h1>
   <p><strong>Organisme de formation :</strong> ${FORMAT_SPHERE_ORG.nom}<br/>
-  <strong>Bénéficiaire :</strong> ${e.nom} – SIRET ${e.siret}<br/>
+  <strong>Bénéficiaire (entreprise) :</strong> ${e.nom} – SIRET ${e.siret}<br/>
   <strong>Date d'application :</strong> ${formatDateLong(e.dateConvention)}</p>
+  ${titreStagiaire}
 
   <h2>Article 1 – Objet et champ d'application</h2>
   <p>Le présent règlement intérieur est établi conformément aux articles L.6352-3 et L.6352-4 et R.6352-1 à R.6352-15 du Code du travail. Il s'applique à tous les stagiaires inscrits à une session dispensée par ${FORMAT_SPHERE_ORG.nom} et ce, pour toute la durée de la formation suivie.</p>
@@ -81,8 +91,27 @@ export function getRIHTML(e: BahoEntreprise): string {
   <h2>Article 8 – Publicité du règlement</h2>
   <p>Un exemplaire du présent règlement est remis à chaque stagiaire avant le début de la formation.</p>
 
-  <p style="margin-top:30px;">Fait à ${FORMAT_SPHERE_ORG.ville}, le ${formatDateLong(e.dateConvention)}<br/>
-  ${FORMAT_SPHERE_ORG.dirigeant} – Dirigeant ${FORMAT_SPHERE_ORG.nom}</p>
+  <p style="margin-top:30px;">Fait à ${FORMAT_SPHERE_ORG.ville}, le ${formatDateLong(e.dateConvention)}</p>
+
+  <table style="margin-top:20px; border:none;">
+    <tr style="border:none;">
+      <td style="border:none; width:50%; text-align:center; vertical-align:top;">
+        <strong>Pour l'organisme de formation</strong><br/>
+        ${FORMAT_SPHERE_ORG.dirigeant}<br/>
+        <em>${FORMAT_SPHERE_ORG.nom}</em><br/>
+        <img src="${fsStamp}" alt="Tampon FORMAT SPHERE" style="width:160px; height:160px; margin-top:10px;"/>
+      </td>
+      <td style="border:none; width:50%; text-align:center; vertical-align:top;">
+        <strong>Pour l'entreprise bénéficiaire</strong><br/>
+        ${e.dirigeant}<br/>
+        <em>${e.nom}</em><br/>
+        <img src="${hotelStamp}" alt="Tampon hôtel" style="width:160px; height:160px; margin-top:10px;"/>
+      </td>
+    </tr>
+  </table>
+
+  ${stagiaire ? `<p style="margin-top:20px;"><strong>Signature du stagiaire</strong> (${civilite}) :<br/>
+  <span style="display:inline-block; border-bottom:1px solid #888; width:300px; height:40px;"></span></p>` : ""}
 
   ${footer()}
   </body></html>`;
