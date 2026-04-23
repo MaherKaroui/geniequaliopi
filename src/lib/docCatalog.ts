@@ -673,7 +673,17 @@ export function buildFullCatalog(
       add(`cfa_c3i13_competences_${fi}`, `CT3 - IND 13 GRILLE COMPÉTENCES ALTERNANCE`, 3, 13, "competences_alternance", { fi });
       add(`cfa_c3i13_suivi_ent_${fi}`, `CT3 - IND 13 SUIVI EN ENTREPRISE`, 3, 13, "suivi_entreprise_cfa", { fi });
     });
-    add("cfa_c3i13_outils_suivi_excel", "CT3 - IND 13 OUTILS DE SUIVI ALTERNANCE (Excel)", 3, 13, "outils_suivi_alternance_excel");
+    // Un fichier Excel par stagiaire (apprenti)
+    stagiaires.forEach((s, si) => {
+      const nom = `${(s.nom || "").toUpperCase()} ${s.prenom || ""}`.trim() || `Apprenti ${si + 1}`;
+      add(
+        `cfa_c3i13_outils_suivi_excel_${si}`,
+        `CT3 - IND 13 OUTILS DE SUIVI ALTERNANCE (Excel) — ${nom}`,
+        3, 13,
+        "outils_suivi_alternance_excel",
+        { stagiaireIdx: si },
+      );
+    });
 
     // ===== IND 14 — ACCOMPAGNEMENT SOCIO-PROFESSIONNEL (CFA) =====
     formations.forEach((f, fi) => {

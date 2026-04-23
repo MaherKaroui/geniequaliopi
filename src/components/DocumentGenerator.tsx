@@ -352,8 +352,11 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
     // Handle real .xlsx (SheetJS) templates
     if (doc.template === "outils_suivi_alternance_excel") {
       const { generateOutilsSuiviAlternanceXlsxBlob } = await import("@/lib/outilsSuiviAlternanceXlsx");
-      const blob = generateOutilsSuiviAlternanceXlsxBlob(mergedOrganisme, selectedFormation, allStagiaires);
-      saveAs(blob, buildCatalogFileName(doc, undefined, ".xlsx"));
+      const idx = typeof doc.params?.stagiaireIdx === "number" ? doc.params.stagiaireIdx : -1;
+      const targetStagiaire = idx >= 0 ? allStagiaires[idx] : null;
+      const stagListe = targetStagiaire ? [targetStagiaire] : allStagiaires;
+      const blob = generateOutilsSuiviAlternanceXlsxBlob(mergedOrganisme, selectedFormation, stagListe);
+      saveAs(blob, buildCatalogFileName(doc, targetStagiaire ?? undefined, ".xlsx"));
       return;
     }
     if (doc.template === "suivi_parcours_beneficiaires_excel") {
