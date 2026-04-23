@@ -919,6 +919,9 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
           if (doc.template === "pdf_static" && getStaticFileUrl(doc)) {
             const resp = await fetch(getStaticFileUrl(doc)!);
             zip.file(`${stagFolder}/${buildCatalogFileName(doc, stagiaire)}`, await resp.blob());
+          } else if (NATIVE_XLSX_TEMPLATES.has(doc.template)) {
+            const blob = await generateNativeXlsxBlob(doc.template, mergedOrganisme, selectedFormation, allStagiaires, stagiaire);
+            if (blob) zip.file(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, ".xlsx")}`, blob);
           } else if (["indicateurs_performance", "tableau_suivi_parcours_excel", "plan_dev_competences_excel", "tableau_amelioration_continue_excel", "suivi_dysfonctionnements_excel", "relances_appreciations_excel", "vae_indicateurs_previsionnels"].includes(doc.template) || REAL_XLSX_TEMPLATES.has(doc.template)) {
             const excelContent = doc.template === "indicateurs_performance"
               ? generateExcelTableauBordPerformance(mergedOrganisme, selectedFormation, allStagiaires)
