@@ -166,6 +166,22 @@ const OrganismeForm = ({ data, onChange, hideFields = [] }: OrganismeFormProps) 
           <Label htmlFor="referentMobilite">Référent Mobilité (externalisé)</Label>
           <Input id="referentMobilite" value={data.referentMobilite} onChange={e => update('referentMobilite', e.target.value)} placeholder="Nom du référent mobilité (Mobi'Jeunes/Erasmus+)" />
         </div>
+        <div>
+          <Label htmlFor="referentDecrochage">Référent Décrochage / Lutte contre l'abandon (CFA)</Label>
+          <Input id="referentDecrochage" value={data.referentDecrochage || ""} onChange={e => update('referentDecrochage', e.target.value)} placeholder="Nom du référent décrochage" />
+        </div>
+        <div>
+          <Label htmlFor="coordinateurPedagogique">Coordinateur Pédagogique (CFA)</Label>
+          <Input id="coordinateurPedagogique" value={data.coordinateurPedagogique || ""} onChange={e => update('coordinateurPedagogique', e.target.value)} placeholder="Nom du coordinateur pédagogique" />
+        </div>
+        <div>
+          <Label htmlFor="conseillerFormation">Conseiller en Formation / Orientation</Label>
+          <Input id="conseillerFormation" value={data.conseillerFormation || ""} onChange={e => update('conseillerFormation', e.target.value)} placeholder="Nom du conseiller en formation" />
+        </div>
+        <div>
+          <Label htmlFor="referentNumerique">Référent Numérique / Distanciel</Label>
+          <Input id="referentNumerique" value={data.referentNumerique || ""} onChange={e => update('referentNumerique', e.target.value)} placeholder="Nom du référent numérique" />
+        </div>
         {!hidden('domainesFormation') && (
         <div className="md:col-span-2">
           <Label htmlFor="domainesFormation">Domaines de formation</Label>

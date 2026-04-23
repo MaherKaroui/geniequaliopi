@@ -45,6 +45,10 @@ export interface OrganismeInfo {
   poleAdministratif: string;
   relationEntreprises: string;
   referentMobilite: string;
+  referentDecrochage?: string;
+  coordinateurPedagogique?: string;
+  conseillerFormation?: string;
+  referentNumerique?: string;
   domainesFormation: string;
   typesActions: ('actions-formation' | 'bilans-competences' | 'vae' | 'apprentissage')[];
   certifications: string;
