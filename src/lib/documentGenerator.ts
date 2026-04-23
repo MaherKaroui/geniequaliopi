@@ -340,11 +340,11 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "rapport_amelioration": return genRapportAmelioration(o);
     // Type d'action spécifiques
     case "pv_conseil_perfectionnement": return genPVConseilPerfectionnement(o, f, stagiaires);
-    case "contrat_apprentissage": return genContratApprentissage(o, f, stagiaires);
+    case "contrat_apprentissage": return genContratApprentissage(o, f, stagiaires, typeof params?.stagiaireIdx === "number" ? params.stagiaireIdx : undefined);
     case "livret_apprentissage_cfa": return genLivretApprentissageCFA(o, f, stagiaires);
     case "fiche_maitre_apprentissage": return genFicheMaitreApprentissage(o, f);
-    case "suivi_entreprise_cfa": return genSuiviEntrepriseCFA(o, f, stagiaires);
-    case "competences_alternance": return genCompetencesAlternance(o, f, stagiaires);
+    case "suivi_entreprise_cfa": return genSuiviEntrepriseCFA(o, f, stagiaires, typeof params?.stagiaireIdx === "number" ? params.stagiaireIdx : undefined);
+    case "competences_alternance": return genCompetencesAlternance(o, f, stagiaires, typeof params?.stagiaireIdx === "number" ? params.stagiaireIdx : undefined);
     case "analyse_parcours_pro": return genAnalyseParcoursPro(o, f, stagiaires);
     case "plan_action_bilan": return genPlanActionBilan(o, f, stagiaires);
     case "synthese_bilan": return genSyntheseBilan(o, f, stagiaires);
