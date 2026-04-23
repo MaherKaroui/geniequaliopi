@@ -146,6 +146,78 @@ const YOUTUBE_COMMERCIAL: CourseData['youtubeVideos'] = [
   { title: "Réussir sa proposition commerciale", url: "https://www.youtube.com/watch?v=lBqFcFNO4bw", description: "Structurer une proposition commerciale convaincante : contexte, solution, avantages et prix." },
 ];
 
+const YOUTUBE_CIP: CourseData['youtubeVideos'] = [
+  { title: "Le métier de Conseiller en Insertion Professionnelle (CIP)", url: "https://www.youtube.com/watch?v=H6tYwT7p4Hk", description: "Présentation du métier de CIP : missions, posture, publics accompagnés et débouchés." },
+  { title: "Entretien d'accompagnement – Techniques d'écoute active", url: "https://www.youtube.com/watch?v=4VOubVB4CTU", description: "Maîtriser l'écoute active, la reformulation et le questionnement en entretien d'accompagnement." },
+  { title: "Construire un projet professionnel avec un bénéficiaire", url: "https://www.youtube.com/watch?v=pVnB6q4yOaM", description: "Méthodologie de construction d'un projet professionnel réaliste et adapté." },
+  { title: "Marché du travail et techniques de recherche d'emploi", url: "https://www.youtube.com/watch?v=2Z5n1tA8mEY", description: "Connaître le marché du travail, les outils et les canaux de recherche d'emploi efficaces." },
+  { title: "France Travail (Pôle emploi) – Outils et dispositifs", url: "https://www.youtube.com/watch?v=8oH6YXQs2eU", description: "Les principaux dispositifs et outils mobilisables par un CIP pour accompagner vers l'emploi." },
+];
+
+const YOUTUBE_RPMS: CourseData['youtubeVideos'] = [
+  { title: "Responsable de petite et moyenne structure (RPMS) – Présentation", url: "https://www.youtube.com/watch?v=2yE6bzj3hFw", description: "Découverte du titre RPMS : missions, blocs de compétences et secteurs d'activité." },
+  { title: "Pilotage d'une PME – Indicateurs et tableaux de bord", url: "https://www.youtube.com/watch?v=Y6YKb7BncwY", description: "Construire des tableaux de bord de pilotage : KPI commerciaux, financiers et RH." },
+  { title: "Management opérationnel d'équipe", url: "https://www.youtube.com/watch?v=TpPzFt-DTxg", description: "Animer, motiver et faire grandir une équipe au quotidien dans une petite structure." },
+  { title: "Gestion budgétaire et financière d'une PME", url: "https://www.youtube.com/watch?v=Tn-WjfoJfXU", description: "Comprendre le compte de résultat, le bilan, le budget prévisionnel et la trésorerie." },
+  { title: "Stratégie commerciale et développement d'activité", url: "https://www.youtube.com/watch?v=uQk8PaFQ5ZQ", description: "Définir et déployer une stratégie commerciale adaptée à une PME." },
+];
+
+const YOUTUBE_RESTAURATION: CourseData['youtubeVideos'] = [
+  { title: "HACCP – Les 7 principes en restauration", url: "https://www.youtube.com/watch?v=eEf5_T9Q4ZM", description: "Comprendre la méthode HACCP et les 7 principes appliqués en restauration commerciale." },
+  { title: "Hygiène alimentaire en cuisine professionnelle", url: "https://www.youtube.com/watch?v=DkaTrRlRrDk", description: "Bonnes pratiques d'hygiène en cuisine : marche en avant, températures, nettoyage et désinfection." },
+  { title: "Service en salle – Les techniques de base", url: "https://www.youtube.com/watch?v=xPm3YQwTIjQ", description: "Apprendre les bases du service en salle : accueil, prise de commande, port d'assiettes, débarrassage." },
+  { title: "Connaissance des produits et accords mets-vins", url: "https://www.youtube.com/watch?v=SQfkZQXnO8s", description: "Initiation aux accords mets et vins pour le personnel de salle." },
+  { title: "Gestion d'un établissement de restauration", url: "https://www.youtube.com/watch?v=8m1d8r37yjg", description: "Gestion d'un restaurant : ratios, food cost, planning, achats et relation fournisseurs." },
+];
+
+const YOUTUBE_INFOGRAPHISTE: CourseData['youtubeVideos'] = [
+  { title: "Adobe Photoshop – Tutoriel complet pour débutants", url: "https://www.youtube.com/watch?v=IyR_uYsRdPs", description: "Prise en main complète de Photoshop : interface, calques, sélections, retouches et effets." },
+  { title: "Adobe Illustrator – Apprendre les bases", url: "https://www.youtube.com/watch?v=Ib8UBwu3yGA", description: "Découverte d'Illustrator : outils vectoriels, formes, couleurs, typographie et création de logos." },
+  { title: "Adobe InDesign – Mise en page professionnelle", url: "https://www.youtube.com/watch?v=zP7Yt0Y7uww", description: "Maîtriser InDesign pour la mise en page de magazines, brochures et documents multipages." },
+  { title: "Les fondamentaux du design graphique", url: "https://www.youtube.com/watch?v=YqQx75OPRa0", description: "Théorie des couleurs, typographie, composition et hiérarchie visuelle." },
+  { title: "Créer une charte graphique complète", url: "https://www.youtube.com/watch?v=qQv7c9jdJU8", description: "Méthodologie pour construire une identité visuelle cohérente : logo, couleurs, typographies, déclinaisons." },
+];
+
+const YOUTUBE_SOCIO_ESTHETIQUE: CourseData['youtubeVideos'] = [
+  { title: "La socio-esthétique – Présentation du métier", url: "https://www.youtube.com/watch?v=ZTL2g7TmO2k", description: "Découverte du métier de socio-esthéticienne : publics fragilisés, missions et lieux d'exercice." },
+  { title: "Soins du visage adaptés aux peaux sensibles", url: "https://www.youtube.com/watch?v=TbL4OGhYVvE", description: "Protocole de soin du visage adapté aux peaux fragilisées (oncologie, gériatrie, handicap)." },
+  { title: "Massage relaxant des mains et des pieds", url: "https://www.youtube.com/watch?v=qAT3TgVyLbY", description: "Techniques douces de massage des extrémités pour un public en souffrance ou en perte d'autonomie." },
+  { title: "Posture professionnelle face à la souffrance", url: "https://www.youtube.com/watch?v=4VOubVB4CTU", description: "Communication, écoute et juste distance face à des publics fragilisés." },
+  { title: "Hygiène et précautions en milieu hospitalier", url: "https://www.youtube.com/watch?v=LPwbHvW22XA", description: "Règles d'hygiène et précautions standards à appliquer en milieu de soin." },
+];
+
+const YOUTUBE_MASSAGE_POSTPARTUM: CourseData['youtubeVideos'] = [
+  { title: "Massage post-natal – Techniques et bienfaits", url: "https://www.youtube.com/watch?v=qAT3TgVyLbY", description: "Présentation des techniques de massage adaptées à la jeune accouchée et de leurs bienfaits." },
+  { title: "Récupération du périnée après l'accouchement", url: "https://www.youtube.com/watch?v=0DulJJp7FIg", description: "Comprendre la récupération du périnée et accompagner la reprise d'activité." },
+  { title: "Drainage lymphatique manuel – Bases", url: "https://www.youtube.com/watch?v=-l1G8dYcaIM", description: "Techniques douces de drainage utiles dans l'accompagnement post-partum (jambes lourdes, œdèmes)." },
+  { title: "Diastase abdominale – Comprendre et accompagner", url: "https://www.youtube.com/watch?v=mXxhVVG6rI4", description: "Repérer la diastase post-partum et adapter ses techniques en toute sécurité." },
+  { title: "Yoga post-natal – Séance douce de récupération", url: "https://www.youtube.com/watch?v=qxn5J-O28gY", description: "Postures douces de récupération post-partum, complémentaires au massage." },
+];
+
+const YOUTUBE_ASSISTANT_DIRECTION: CourseData['youtubeVideos'] = [
+  { title: "Le métier d'assistant(e) de direction", url: "https://www.youtube.com/watch?v=V_bwp2mJTZI", description: "Missions, qualités requises et environnement de travail de l'assistant(e) de direction." },
+  { title: "Organiser et planifier l'agenda d'un dirigeant", url: "https://www.youtube.com/watch?v=Ae8x1lhGJ4U", description: "Méthodes d'organisation, gestion d'agenda partagé, priorisation et arbitrages." },
+  { title: "Rédaction professionnelle – Comptes rendus et notes", url: "https://www.youtube.com/watch?v=HBxCHonP6Ro", description: "Techniques de rédaction professionnelle : compte rendu de réunion, note de synthèse, courrier." },
+  { title: "Outlook et Teams – Outils collaboratifs essentiels", url: "https://www.youtube.com/watch?v=7Jn_t6A8q6w", description: "Maîtriser Outlook (mail, agenda) et Teams (réunions, canaux) pour assister une direction." },
+  { title: "Organiser un déplacement professionnel et un événement", url: "https://www.youtube.com/watch?v=KIgewAaWwek", description: "Planifier un déplacement (transport, hébergement, ordre de mission) et organiser un événement interne." },
+];
+
+const YOUTUBE_ECSR: CourseData['youtubeVideos'] = [
+  { title: "Devenir enseignant de la conduite (ECSR) – Le métier", url: "https://www.youtube.com/watch?v=q1m_z-Yq3Z4", description: "Présentation du métier d'enseignant de la conduite et de la sécurité routière (titre pro ECSR)." },
+  { title: "Pédagogie de la conduite – REMC", url: "https://www.youtube.com/watch?v=8W5B-0tbPYQ", description: "Le Référentiel pour l'Éducation à une Mobilité Citoyenne (REMC) : compétences et progression." },
+  { title: "Risques routiers et prévention", url: "https://www.youtube.com/watch?v=VrAyzh3lNi8", description: "Les principaux risques routiers et la pédagogie de prévention auprès des élèves." },
+  { title: "Réglementation du permis B et code de la route", url: "https://www.youtube.com/watch?v=Ae8x1lhGJ4U", description: "Mise à jour réglementaire : code de la route, examen pratique, évaluations." },
+  { title: "Animation de séances en salle et en voiture", url: "https://www.youtube.com/watch?v=TpPzFt-DTxg", description: "Techniques d'animation pédagogique en salle et en circulation, gestion des élèves." },
+];
+
+const YOUTUBE_BUREAUTIQUE: CourseData['youtubeVideos'] = [
+  { title: "Pack Office – Découverte de Word, Excel, PowerPoint", url: "https://www.youtube.com/watch?v=zbZ4GYt8i_0", description: "Tour d'horizon du Pack Office : usages, points communs et bonnes pratiques." },
+  { title: "MEGA TUTO : Les BASES de EXCEL – Formation complète", url: "https://www.youtube.com/watch?v=aZ-SY0ORaoA", description: "Toutes les bases d'Excel : interface, formules, mise en forme, graphiques." },
+  { title: "Formation Complète Word – Du Niveau Débutant à Avancé", url: "https://www.youtube.com/watch?v=uCTS_bqm9pk", description: "Maîtriser Word : mise en forme, styles, sommaire automatique, publipostage." },
+  { title: "PowerPoint – Créer une présentation professionnelle", url: "https://www.youtube.com/watch?v=KIgewAaWwek", description: "Créer une présentation PowerPoint professionnelle en quelques minutes." },
+  { title: "Outlook – Bien gérer ses mails et son agenda", url: "https://www.youtube.com/watch?v=7Jn_t6A8q6w", description: "Trier ses mails, organiser son agenda et collaborer efficacement avec Outlook." },
+];
+
 export function getYoutubeVideos(formationIntitule: string): CourseData['youtubeVideos'] {
   const t = formationIntitule.toLowerCase();
   if (t.includes('massage') || t.includes('prénatal') || t.includes('prenatal') || t.includes('relaxation') || t.includes('bien-être') || t.includes('postpartum') || t.includes('post-partum')) return YOUTUBE_MASSAGE;
