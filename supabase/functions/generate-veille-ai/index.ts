@@ -8,19 +8,19 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const buildSystemPrompt = (anneeN: number, anneeN1: number) => `Tu es expert Qualiopi spécialisé dans la veille réglementaire, métier et technologique pour la formation professionnelle française (CFA / Action de formation).
+const buildSystemPrompt = (anneeN: number, anneeN_1: number) => `Tu es expert Qualiopi spécialisé dans la veille réglementaire, métier et technologique pour la formation professionnelle française (CFA / Action de formation).
 
-Tu génères 3 tableaux de veille (réglementaire, métier, technologique) 100% COHÉRENTS avec le métier précis de la formation, pour un AUDIT DE SURVEILLANCE Qualiopi sur les années ${anneeN} et ${anneeN1}.
+Tu génères 3 tableaux de veille (réglementaire, métier, technologique) 100% COHÉRENTS avec le métier précis de la formation, pour un AUDIT DE SURVEILLANCE Qualiopi sur les années ${anneeN_1} et ${anneeN} (12 mois précédant la formation).
 
 RÈGLES STRICTES :
-- Chaque ligne contient : lien (URL réelle plausible), titre du texte/article, date (format "Mois AAAA" — UNIQUEMENT entre janvier ${anneeN} et décembre ${anneeN1}), commentaire (2-3 phrases concrètes – ANALYSE MÉTIER), exploitation Qualiopi (preuve + action concrète, ex: "sortir une version 2 du programme avec ajout d'un objectif IA dans le cycle de la vente").
+- Chaque ligne contient : lien (URL réelle plausible), titre du texte/article, date (format "Mois AAAA" — UNIQUEMENT entre janvier ${anneeN_1} et le mois précédant la formation en ${anneeN}), commentaire (2-3 phrases concrètes – ANALYSE MÉTIER), exploitation Qualiopi (preuve + action concrète, ex: "sortir une version 2 du programme avec ajout d'un objectif IA dans le cycle de la vente").
 - Veille RÉGLEMENTAIRE : 6 lignes — sources officielles obligatoires (Légifrance, Ministère du Travail, France Compétences, DGEFP, OPCO, codes métier). Inclure 1-2 textes Qualiopi V9 récents + textes spécifiques au métier (ex: NTC = code commerce/RGPD/IA Act, VTC = code transports, esthétique = code santé publique, conduite = code route).
-- Veille MÉTIER : 6 lignes DIVERSIFIÉES — DOIT obligatoirement mélanger : 1 forum / communauté professionnelle (ex: forum-vendeurs.fr, communauté LinkedIn), 1 événement / salon professionnel daté en ${anneeN} ou ${anneeN1} (ex: Salon Vendre, IA & Vente Summit), 1 article de presse spécialisée (Les Échos, LSA, Action Co, Chef d'Entreprise), 1 blog métier reconnu, 1 chaîne YouTube réelle/plausible du secteur, 1 ressource sur l'IA appliquée au métier (pour NTC : IA dans le cycle de la vente, prospection automatisée, ChatGPT pour commerciaux, Copilot ventes).
+- Veille MÉTIER : 6 lignes DIVERSIFIÉES — DOIT obligatoirement mélanger : 1 forum / communauté professionnelle (ex: forum-vendeurs.fr, communauté LinkedIn), 1 événement / salon professionnel daté en ${anneeN_1} ou ${anneeN} (ex: Salon Vendre, IA & Vente Summit), 1 article de presse spécialisée (Les Échos, LSA, Action Co, Chef d'Entreprise), 1 blog métier reconnu, 1 chaîne YouTube réelle/plausible du secteur, 1 ressource sur l'IA appliquée au métier (pour NTC : IA dans le cycle de la vente, prospection automatisée, ChatGPT pour commerciaux, Copilot ventes).
 - Veille TECHNOLOGIQUE : 6 lignes — outils, logiciels, plateformes, méthodologies récentes du métier. Inclure au moins 2 ressources vidéo YouTube réelles ou plausibles + 1 outil IA récent.
 - Toutes les URL doivent être en https:// et viser des sites réels du secteur.
-- Dates récentes UNIQUEMENT en ${anneeN} ou ${anneeN1} — JAMAIS d'année antérieure.
+- Dates UNIQUEMENT entre ${anneeN_1} et ${anneeN}, AVANT la date de début de formation — JAMAIS d'année postérieure ni antérieure à ${anneeN_1}.
 - Commentaires en FRANÇAIS professionnel, jamais génériques — toujours intituler "Analyse métier : ...".
-- Exploitation Qualiopi : toujours "Preuve : ... Action : ..." avec une action concrète et datée (ex: "Action : sortir version 2 du programme NTC en septembre ${anneeN1} avec objectif IA dans le cycle de la vente").
+- Exploitation Qualiopi : toujours "Preuve : ... Action : ..." avec une action concrète et datée (ex: "Action : sortir version 2 du programme NTC avant la session ${anneeN} avec objectif IA dans le cycle de la vente").
 - Réponds UNIQUEMENT via l'appel d'outil, jamais en texte libre.`;
 
 const veilleRowSchema = {
@@ -70,16 +70,16 @@ Deno.serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY non configurée");
 
-    // Année N = année de début de formation (ou année courante par défaut), N+1 = année suivante
+    // Année N = année de début de formation, N-1 = année précédente. La veille doit dater AVANT la formation.
     const refDate = dateDebut ? new Date(dateDebut) : (dateFin ? new Date(dateFin) : new Date());
     const anneeN = isNaN(refDate.getTime()) ? new Date().getFullYear() : refDate.getFullYear();
-    const anneeN1 = anneeN + 1;
-    const SYSTEM_PROMPT = buildSystemPrompt(anneeN, anneeN1);
+    const anneeN_1 = anneeN - 1;
+    const SYSTEM_PROMPT = buildSystemPrompt(anneeN, anneeN_1);
 
     const userPrompt = `Formation : « ${intitule} »
 ${codeRNCP ? `Certification : ${codeRNCP}\n` : ""}${objectifs ? `Objectifs : ${objectifs}\n` : ""}${publicVise ? `Public : ${publicVise}\n` : ""}${dateDebut ? `Période : du ${dateDebut} au ${dateFin || "(en cours)"}\n` : ""}${programme ? `Programme (extrait) : ${String(programme).slice(0, 1500)}\n` : ""}
-Contexte : audit de surveillance Qualiopi sur les années ${anneeN} et ${anneeN1}.
-Génère les 3 tableaux de veille (6 lignes chacun) parfaitement cohérents avec ce métier précis, avec dates UNIQUEMENT en ${anneeN} ou ${anneeN1}, en intégrant forums, événements/salons, articles de presse, blogs, chaînes YouTube et ressources IA appliquées au métier.`;
+Contexte : audit de surveillance Qualiopi. La veille doit couvrir les 12 mois précédant la formation (années ${anneeN_1} et ${anneeN}, dates AVANT le ${dateDebut || "début de session"}).
+Génère les 3 tableaux de veille (6 lignes chacun) parfaitement cohérents avec ce métier précis, avec dates UNIQUEMENT entre ${anneeN_1} et ${anneeN} (avant la formation), en intégrant forums, événements/salons, articles de presse, blogs, chaînes YouTube et ressources IA appliquées au métier.`;
 
     const aiResp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
