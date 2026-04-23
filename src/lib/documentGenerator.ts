@@ -1504,7 +1504,7 @@ function genEntretienPrealable(o: OrganismeInfo) {
   ] });
 }
 
-function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], realStagiairesCount: number = 1) {
+function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], realStagiairesCount: number = 1, isCFA: boolean = false) {
   const nbStagiaires = realStagiairesCount;
   // Parse programme into day blocks for the déroulé pédagogique table
   const programmeLines = f.programme.split("\n").filter(l => l.trim());
