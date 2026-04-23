@@ -220,21 +220,36 @@ const YOUTUBE_BUREAUTIQUE: CourseData['youtubeVideos'] = [
 
 export function getYoutubeVideos(formationIntitule: string): CourseData['youtubeVideos'] {
   const t = formationIntitule.toLowerCase();
-  if (t.includes('massage') || t.includes('prénatal') || t.includes('prenatal') || t.includes('relaxation') || t.includes('bien-être') || t.includes('postpartum') || t.includes('post-partum')) return YOUTUBE_MASSAGE;
+  // Massages spécifiques (avant générique)
+  if (t.includes('postpartum') || t.includes('post-partum') || t.includes('post partum') || t.includes('postnatal') || t.includes('post-natal') || t.includes('post natal')) return YOUTUBE_MASSAGE_POSTPARTUM;
+  if (t.includes('massage') || t.includes('prénatal') || t.includes('prenatal') || t.includes('relaxation') || t.includes('bien-être')) return YOUTUBE_MASSAGE;
+  // Bureautique unitaire
   if (t.includes('excel')) return YOUTUBE_EXCEL;
   if (t.includes('word')) return YOUTUBE_WORD;
   if (t.includes('powerpoint') || t.includes('ppt')) return YOUTUBE_POWERPOINT;
+  if (t.includes('bureautique') || t.includes('pack office') || t.includes('office 365') || t.includes('microsoft 365')) return YOUTUBE_BUREAUTIQUE;
+  // Langues
   if ((t.includes('anglais') || t.includes('english')) && (t.includes('a1') || t.includes('débutant'))) return YOUTUBE_ANGLAIS_A1;
   if (t.includes('vtest') || t.includes('v-test') || t.includes('rs6905')) return YOUTUBE_ANGLAIS;
-  if (t.includes('anglais') || t.includes('english')) return YOUTUBE_ANGLAIS;
-  if (t.includes('management') || t.includes('manager')) return YOUTUBE_MANAGEMENT;
-  if (t.includes('français') || t.includes('fle') || t.includes('médico-social') || t.includes('social')) return YOUTUBE_FLE;
+  if (t.includes('anglais') || t.includes('english') || t.includes('toeic')) return YOUTUBE_ANGLAIS;
+  if (t.includes('français') || t.includes('fle')) return YOUTUBE_FLE;
+  // Domaines spécifiques (avant management/commercial pour éviter conflits)
+  if (t.includes('socio') && t.includes('esthét')) return YOUTUBE_SOCIO_ESTHETIQUE;
+  if (t.includes('esthéti') || t.includes('cosmétique') || t.includes('beauté')) return YOUTUBE_ESTHETIQUE;
+  if (t.includes('infograph') || t.includes('photoshop') || t.includes('illustrator') || t.includes('indesign') || t.includes('design graphique') || t.includes('pao')) return YOUTUBE_INFOGRAPHISTE;
+  if (t.includes('restaurat') || t.includes('cuisine') || t.includes('serveur') || t.includes('serveuse') || t.includes('haccp')) return YOUTUBE_RESTAURATION;
+  if (t.includes('cip') || t.includes('conseiller en insertion') || t.includes('insertion professionnelle')) return YOUTUBE_CIP;
+  if (t.includes('rpms') || t.includes('responsable de petite') || t.includes('responsable petite et moyenne')) return YOUTUBE_RPMS;
+  if (t.includes('assistant de direction') || t.includes('assistante de direction') || t.includes('secrétaire de direction') || t.includes('office manager')) return YOUTUBE_ASSISTANT_DIRECTION;
+  if (t.includes('ecsr') || t.includes('enseignant de la conduite') || t.includes('moniteur auto-école') || t.includes('moniteur auto école')) return YOUTUBE_ECSR;
+  if (t.includes('vtc') || t.includes('voiture de transport avec chauffeur') || t.includes('rs5637') || t.includes('chauffeur vtc')) return YOUTUBE_VTC;
+  if (t.includes('secrétaire') || t.includes('médico-admin') || t.includes('médico admin')) return YOUTUBE_SECRETAIRE;
+  // Transverses
+  if (t.includes('management') || t.includes('manager') || t.includes('leadership')) return YOUTUBE_MANAGEMENT;
+  if (t.includes('médico-social') || t.includes('médico social')) return YOUTUBE_FLE;
   if (t.includes('intelligence artificielle') || t.includes('ia générative') || t.includes('contenus rédactionnels')) return YOUTUBE_IA;
   if (t.includes('webmarketing') || t.includes('marketing de contenus') || t.includes('réseaux sociaux') || t.includes('marketing digital')) return YOUTUBE_WEBMARKETING;
   if (t.includes('crm') || t.includes('automation') || t.includes('automatisation')) return YOUTUBE_CRM;
-  if (t.includes('esthéti') || t.includes('cosmétique') || t.includes('beauté')) return YOUTUBE_ESTHETIQUE;
-  if (t.includes('secrétaire') || t.includes('assistant') || t.includes('médico-admin')) return YOUTUBE_SECRETAIRE;
-  if (t.includes('vtc') || t.includes('voiture de transport avec chauffeur') || t.includes('rs5637') || t.includes('chauffeur vtc')) return YOUTUBE_VTC;
   if (t.includes('négociat') || t.includes('technico') || t.includes('ntc') || t.includes('commercial') || t.includes('vente')) return YOUTUBE_COMMERCIAL;
   return YOUTUBE_GENERIC;
 }
