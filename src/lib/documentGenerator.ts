@@ -10298,8 +10298,9 @@ function genTableauAmeliorationContinue(o: OrganismeInfo, f?: FormationInfo) {
 }
 
 function genTableauAmeliorationContinueExcel(o: OrganismeInfo, f: FormationInfo, formations: FormationInfo[], stagiaires: StagiaireInfo[]) {
-  // Use formation end date as base, then generate dates after it
-  const rawDate = f.dateFin || f.dateDebut || "";
+  // Use formation START date as base, then generate dates BEFORE it
+  // Improvements must be planned and closed BEFORE the training starts
+  const rawDate = f.dateDebut || f.dateFin || "";
   const parsedDate = rawDate ? new Date(rawDate + "T00:00:00") : null;
   const baseDate = parsedDate && !isNaN(parsedDate.getTime()) ? parsedDate : new Date();
   const year = baseDate.getFullYear();
@@ -10307,9 +10308,9 @@ function genTableauAmeliorationContinueExcel(o: OrganismeInfo, f: FormationInfo,
   // Helper to format date as DD/MM/YYYY
   const fmtDate = (d: Date) => `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
   
-  // Generate dates after the formation end date
+  // Generate dates BEFORE the formation start date (negative offsets)
   const addDays = (d: Date, n: number) => { const r = new Date(d); r.setDate(r.getDate() + n); return r; };
-  const dateOuverture = fmtDate(addDays(baseDate, 7)); // 1 week after formation
+  const dateOuverture = fmtDate(addDays(baseDate, -120)); // ~4 months before formation
   
   let xlsHtml = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
 <head><meta charset="UTF-8"><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>Amélioration Continue</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body>
