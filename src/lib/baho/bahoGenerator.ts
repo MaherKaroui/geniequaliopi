@@ -129,6 +129,23 @@ export async function buildBahoZip(reporter?: JobReporter, customFsStamp?: strin
     }
     step++; reporter?.setProgress(Math.round((step / totalSteps) * 100));
 
+    // 6. Feuilles d'émargement INDIVIDUELLES — une par stagiaire (priorité au stagiaire)
+    const emargFolder = folder.folder("Emargements")!;
+    for (let s = 0; s < e.stagiaires.length; s++) {
+      const stg = e.stagiaires[s];
+      try {
+        reporter?.setMessage(`${e.nom} – Émargement ${stg.prenom} ${stg.nom}…`);
+        const emargHtml = getEmargementHTML(e, stg, customFsStamp);
+        const emargPdf = await htmlToPdfBlob(emargHtml);
+        const stgName = safeName(`${stg.nom}_${stg.prenom}`);
+        emargFolder.file(`Emargement_${stgName}_${stg.codeStagiaire}.pdf`, emargPdf);
+      } catch (err) {
+        console.error("Emargement error:", err);
+        emargFolder.file(`ERREUR_Emargement_${safeName(stg.nom)}.txt`, `Erreur: ${(err as Error).message}`);
+      }
+      step++; reporter?.setProgress(Math.round((step / totalSteps) * 100));
+    }
+
     // Allow GC between entreprises
     if (i % 2 === 1) await new Promise((r) => setTimeout(r, 30));
   }
