@@ -7800,11 +7800,45 @@ function genDocumentsCertificateursCFA(o: OrganismeInfo, f: FormationInfo) {
   return buildDocument({ org: o, title: "DOCUMENTS CERTIFICATEURS – CFA", subtitle: f.intitule, sections });
 }
 
-/** Parse rythme alternance string to get CFA weeks and enterprise weeks per cycle */
+/** Parse rythme alternance string to get CFA weeks and enterprise weeks per cycle.
+ * Supports week-based ("1 sem CFA / 3 sem entreprise"), day-based same-week alternation
+ * ("2 jours CFA / 3 jours entreprise"), and "école"/"centre" wording.
+ */
 export function parseRythmeAlternance(rythme: string): { cfaWeeks: number; entrepriseWeeks: number } {
-  const match = rythme.match(/(\d+)\s*sem.*?\/\s*(\d+)\s*sem/i);
-  if (match) return { cfaWeeks: parseInt(match[1]), entrepriseWeeks: parseInt(match[2]) };
+  if (!rythme) return { cfaWeeks: 1, entrepriseWeeks: 3 };
+  const normalized = rythme.toLowerCase();
+  const weekMatch = normalized.match(/(\d+)\s*(?:semaines?|sem)\b[^\/]*\/\s*(\d+)\s*(?:semaines?|sem)\b/i);
+  if (weekMatch) return { cfaWeeks: Math.max(1, parseInt(weekMatch[1])), entrepriseWeeks: Math.max(0, parseInt(weekMatch[2])) };
+  const dayMatch = normalized.match(/(\d+)\s*jours?\b[^\/]*\/\s*(\d+)\s*jours?\b/i);
+  if (dayMatch) {
+    const cfaDays = parseInt(dayMatch[1]);
+    const entDays = parseInt(dayMatch[2]);
+    const total = cfaDays + entDays;
+    if (total > 0 && total <= 7) return { cfaWeeks: 1, entrepriseWeeks: 0 }; // mixed week
+    return { cfaWeeks: Math.max(1, Math.round(cfaDays / 5)), entrepriseWeeks: Math.max(0, Math.round(entDays / 5)) };
+  }
   return { cfaWeeks: 1, entrepriseWeeks: 3 };
+}
+
+/** True if rhythm is days-per-week alternation (CFA + entreprise within same calendar week). */
+export function isDayBasedRythme(rythme: string): boolean {
+  if (!rythme) return false;
+  const m = rythme.toLowerCase().match(/(\d+)\s*jours?\b[^\/]*\/\s*(\d+)\s*jours?\b/i);
+  if (!m) return false;
+  const t = parseInt(m[1]) + parseInt(m[2]);
+  return t > 0 && t <= 7;
+}
+
+/** CFA days per week (defaults to 5 for week-based rhythms). */
+export function getCFADaysPerWeek(rythme: string): number {
+  if (!rythme) return 5;
+  const m = rythme.toLowerCase().match(/(\d+)\s*jours?\b[^\/]*\/\s*(\d+)\s*jours?\b/i);
+  if (m) {
+    const c = parseInt(m[1]);
+    const e = parseInt(m[2]);
+    if (c + e > 0 && c + e <= 7) return c;
+  }
+  return 5;
 }
 
 /** Calculate the total number of CFA weeks for the formation */
@@ -10827,11 +10861,15 @@ function genTestCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: Sta
  * Returns array of { cfaWeekNum, weekStartDate } for each CFA week.
  */
 export function getCFAWeekDates(f: FormationInfo): { cfaWeekNum: number; weekStart: Date; weekEnd: Date }[] {
-  const { cfaWeeks: cfaPerCycle, entrepriseWeeks } = parseRythmeAlternance(f.rythmeAlternance || '1 semaine CFA / 3 semaines entreprise');
+  const rythmeStr = f.rythmeAlternance || '1 semaine CFA / 3 semaines entreprise';
+  const { cfaWeeks: cfaPerCycle, entrepriseWeeks } = parseRythmeAlternance(rythmeStr);
+  const dayBased = isDayBasedRythme(rythmeStr);
   const { totalHours } = parseDuree(f.duree);
   const effectiveTotal = totalHours > 0 ? totalHours : 420;
-  const totalCFAWeeks = Math.max(1, Math.ceil(effectiveTotal / 35));
-  const cycleLength = cfaPerCycle + entrepriseWeeks;
+  const cfaDaysPerWeek = getCFADaysPerWeek(rythmeStr);
+  const hoursPerCfaWeek = dayBased ? Math.max(7, cfaDaysPerWeek * 7) : 35;
+  const totalCFAWeeks = Math.max(1, Math.ceil(effectiveTotal / hoursPerCfaWeek));
+  const cycleLength = dayBased ? 1 : (cfaPerCycle + entrepriseWeeks);
 
   const rawStartDate = f.dateDebut ? new Date(f.dateDebut.split('/').reverse().join('-')) : new Date();
   if (isNaN(rawStartDate.getTime())) rawStartDate.setTime(Date.now());
@@ -10848,14 +10886,14 @@ export function getCFAWeekDates(f: FormationInfo): { cfaWeekNum: number; weekSta
 
   while (cfaWeekCount < totalCFAWeeks) {
     const posInCycle = calendarWeek % cycleLength;
-    const isCFA = posInCycle < cfaPerCycle;
+    const isCFA = dayBased ? true : posInCycle < cfaPerCycle;
 
     if (isCFA) {
       cfaWeekCount++;
       const weekStart = new Date(firstWeekStart);
       weekStart.setDate(firstWeekStart.getDate() + calendarWeek * 7);
       const weekEnd = new Date(weekStart);
-      weekEnd.setDate(weekEnd.getDate() + 4);
+      weekEnd.setDate(weekEnd.getDate() + (dayBased ? Math.max(0, cfaDaysPerWeek - 1) : 4));
       result.push({ cfaWeekNum: cfaWeekCount, weekStart, weekEnd });
     }
     calendarWeek++;
@@ -11661,11 +11699,14 @@ function genSupportCoursCFA(o: OrganismeInfo, f: FormationInfo) {
 function genCalendrierAnnuelCFA(o: OrganismeInfo, f: FormationInfo) {
   const rythme = f.rythmeAlternance || '1 semaine CFA / 3 semaines entreprise';
   const { cfaWeeks: cfaPerCycle, entrepriseWeeks } = parseRythmeAlternance(rythme);
+  const dayBased = isDayBasedRythme(rythme);
+  const cfaDaysPerWeek = getCFADaysPerWeek(rythme);
+  const hoursPerCfaWeek = dayBased ? cfaDaysPerWeek * 7 : 35;
   const { totalHours } = parseDuree(f.duree);
   const effectiveTotal = totalHours > 0 ? totalHours : 420;
-  const totalCFAWeeks = Math.max(1, Math.ceil(effectiveTotal / 35));
-  const cycleLength = cfaPerCycle + entrepriseWeeks;
-  const totalCycles = Math.ceil(totalCFAWeeks / cfaPerCycle);
+  const totalCFAWeeks = Math.max(1, Math.ceil(effectiveTotal / hoursPerCfaWeek));
+  const cycleLength = dayBased ? 1 : (cfaPerCycle + entrepriseWeeks);
+  const totalCycles = Math.ceil(totalCFAWeeks / Math.max(1, cfaPerCycle));
 
   const startDate = f.dateDebut ? new Date(f.dateDebut.split('/').reverse().join('-')) : new Date();
   if (isNaN(startDate.getTime())) startDate.setTime(Date.now());
@@ -11722,9 +11763,14 @@ function genCalendrierAnnuelCFA(o: OrganismeInfo, f: FormationInfo) {
       continue;
     }
 
-    const isCFAWeek = posInCycle < cfaPerCycle;
+    const isCFAWeek = dayBased ? true : posInCycle < cfaPerCycle;
     posInCycle++;
     if (posInCycle >= cycleLength) posInCycle = 0;
+
+    const cfaLabel = dayBased
+      ? `<strong>CFA + Entreprise</strong><br><small>${cfaDaysPerWeek}j CFA / ${Math.max(0, 5 - cfaDaysPerWeek)}j ent.</small>`
+      : `<strong>CFA</strong>`;
+    const hoursLabel = `${hoursPerCfaWeek}h`;
 
     if (isCFAWeek && moduleIdx < modules.length) {
       cfaWeekNum++;
@@ -11733,27 +11779,26 @@ function genCalendrierAnnuelCFA(o: OrganismeInfo, f: FormationInfo) {
         <td style="text-align:center">S${w + 1}</td>
         <td style="text-align:center">${fmtD(weekStart)} – ${fmtD(weekEnd)}</td>
         <td>${mois}</td>
-        <td style="background:#e8f0fe"><strong>CFA</strong></td>
+        <td style="background:#e8f0fe">${cfaLabel}</td>
         <td style="text-align:center">${cfaWeekNum}</td>
         <td>${mod.titre}</td>
-        <td style="text-align:center">35h</td>
+        <td style="text-align:center">${hoursLabel}</td>
       </tr>`;
-      remainingInModule -= 35;
+      remainingInModule -= hoursPerCfaWeek;
       if (remainingInModule <= 0) {
         moduleIdx++;
         remainingInModule = moduleIdx < modules.length ? modules[moduleIdx].volume : 0;
       }
     } else if (isCFAWeek && moduleIdx >= modules.length) {
-      // All modules done, remaining CFA weeks = revision/exams
       cfaWeekNum++;
       calendarRows += `<tr>
         <td style="text-align:center">S${w + 1}</td>
         <td style="text-align:center">${fmtD(weekStart)} – ${fmtD(weekEnd)}</td>
         <td>${mois}</td>
-        <td style="background:#e8f0fe"><strong>CFA</strong></td>
+        <td style="background:#e8f0fe">${cfaLabel}</td>
         <td style="text-align:center">${cfaWeekNum}</td>
         <td>Révisions / Examens blancs / Certification</td>
-        <td style="text-align:center">35h</td>
+        <td style="text-align:center">${hoursLabel}</td>
       </tr>`;
     } else {
       calendarRows += `<tr style="background:#f0f8f0">
@@ -11789,9 +11834,9 @@ function genCalendrierAnnuelCFA(o: OrganismeInfo, f: FormationInfo) {
     title: "CALENDRIER ANNUEL DE FORMATION – CFA",
     subtitle: f.intitule,
     sections: [
-      { heading: "Informations générales", content: `<p><strong>Formation :</strong> ${f.intitule}<br><strong>Rythme d'alternance :</strong> ${rythme}<br><strong>Durée totale en centre :</strong> ${effectiveTotal}h (${totalCFAWeeks} semaines CFA)<br><strong>Période :</strong> du ${fmtD(startDate)} au ${fmtD(endDate)} (52 semaines)<br><strong>Cycle :</strong> ${cfaPerCycle} sem. CFA + ${entrepriseWeeks} sem. entreprise = ${cycleLength} semaines</p>` },
+      { heading: "Informations générales", content: `<p><strong>Formation :</strong> ${f.intitule}<br><strong>Rythme d'alternance :</strong> ${rythme}<br><strong>Durée totale en centre :</strong> ${effectiveTotal}h (${totalCFAWeeks} ${dayBased ? 'semaines mixtes' : 'semaines CFA'})<br><strong>Période :</strong> du ${fmtD(startDate)} au ${fmtD(endDate)} (52 semaines)<br><strong>Cycle :</strong> ${dayBased ? `${cfaDaysPerWeek}j CFA + ${Math.max(0, 5 - cfaDaysPerWeek)}j entreprise par semaine (alternance journalière)` : `${cfaPerCycle} sem. CFA + ${entrepriseWeeks} sem. entreprise = ${cycleLength} semaines`}</p>` },
       { heading: "Calendrier détaillé – Année complète", content: tableHtml },
-      { heading: "Légende", content: `<p><span style="background:#e8f0fe;padding:2px 8px;border-radius:4px">CFA</span> = Semaine en centre &nbsp;&nbsp; <span style="background:#f0f8f0;padding:2px 8px;border-radius:4px">Entreprise</span> = Semaine en entreprise &nbsp;&nbsp; <span style="background:#fff3cd;padding:2px 8px;border-radius:4px">🏖 Congés</span> = Vacances</p><p><strong>Total semaines CFA :</strong> ${cfaWeekNum} &nbsp;|&nbsp; <strong>Heures en centre :</strong> ${cfaWeekNum * 35}h</p>`, variant: "green" },
+      { heading: "Légende", content: `<p><span style="background:#e8f0fe;padding:2px 8px;border-radius:4px">CFA</span> = ${dayBased ? `Semaine mixte (${cfaDaysPerWeek}j centre / ${Math.max(0, 5 - cfaDaysPerWeek)}j entreprise)` : 'Semaine en centre'} &nbsp;&nbsp; <span style="background:#f0f8f0;padding:2px 8px;border-radius:4px">Entreprise</span> = Semaine en entreprise &nbsp;&nbsp; <span style="background:#fff3cd;padding:2px 8px;border-radius:4px">🏖 Congés</span> = Vacances</p><p><strong>Total semaines CFA :</strong> ${cfaWeekNum} &nbsp;|&nbsp; <strong>Heures en centre :</strong> ${cfaWeekNum * hoursPerCfaWeek}h</p>`, variant: "green" },
     ],
   });
 }
