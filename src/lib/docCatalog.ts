@@ -536,11 +536,9 @@ export function buildFullCatalog(
     // Mission 9 — Diversité & lutte contre les discriminations
     add("cfa_mission9_plan_diversite", "CT3 - IND 10 📁 14 MISSIONS / Mission 9 – Plan diversité & lutte contre les discriminations", 3, 10, "plan_diversite_lutte_discriminations_cfa", { folder: "14_MISSIONS_CFA/Mission_9_Diversite_Discriminations" });
 
-    // Mission 10 — Mobilité nationale & internationale (Erasmus+)
-    add("cfa_mission10_convention_erasmus", "CT3 - IND 10 📁 14 MISSIONS / Mission 10 – Convention de mobilité internationale Erasmus+", 3, 10, "convention_mobilite_erasmus_cfa", { folder: "14_MISSIONS_CFA/Mission_10_Mobilite_Nationale_Internationale" });
-    add("cfa_mission10_procedure_erasmus", "CT3 - IND 10 📁 14 MISSIONS / Mission 10 – Procédure de mobilité internationale Erasmus+", 3, 10, "procedure_mobilite_erasmus_cfa", { folder: "14_MISSIONS_CFA/Mission_10_Mobilite_Nationale_Internationale" });
-    add("cfa_mission10_plan_mobilite_nationale", "CT3 - IND 10 📁 14 MISSIONS / Mission 10 – Plan de mobilité nationale des apprentis", 3, 10, "plan_mobilite_nationale_cfa", { folder: "14_MISSIONS_CFA/Mission_10_Mobilite_Nationale_Internationale" });
-    add("cfa_mission10_fiche_poste_referent_mobilite", "CT3 - IND 10 📁 14 MISSIONS / Mission 10 – Fiche de poste Référent Mobilité International", 3, 10, "pdf_static", { pdfUrl: "/pdfs/fiche_poste_referent_mobilite_international.docx", folder: "14_MISSIONS_CFA/Mission_10_Mobilite_Nationale_Internationale" });
+    // Mission 10 — Mobilité nationale des apprentis (sans Erasmus+)
+    add("cfa_mission10_plan_mobilite_nationale", "CT3 - IND 10 📁 14 MISSIONS / Mission 10 – Plan de mobilité nationale des apprentis", 3, 10, "plan_mobilite_nationale_cfa", { folder: "14_MISSIONS_CFA/Mission_10_Mobilite_Nationale" });
+    add("cfa_mission10_fiche_poste_referent_mobilite", "CT3 - IND 10 📁 14 MISSIONS / Mission 10 – Fiche de poste Référent Mobilité Nationale", 3, 10, "pdf_static", { pdfUrl: "/pdfs/fiche_poste_referent_mobilite_international.docx", folder: "14_MISSIONS_CFA/Mission_10_Mobilite_Nationale" });
 
     // Mission 11 — Suivi & accompagnement de la formation à distance
     add("cfa_mission11_suivi_distance", "CT3 - IND 10 📁 14 MISSIONS / Mission 11 – Procédure de suivi & accompagnement à distance", 3, 10, "procedure_accueil_tout_moment_cfa", { folder: "14_MISSIONS_CFA/Mission_11_Formation_Distance" });
