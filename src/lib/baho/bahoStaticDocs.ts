@@ -279,9 +279,8 @@ export function getConventionHTML(e: BahoEntreprise, customFsStamp?: string): st
   </ul>
 
   <p class="article-title">Article 4 – Tarif et financement</p>
-  <p><strong>Prix unitaire HT :</strong> ${prixUnit.toLocaleString("fr-FR")} € par stagiaire<br/>
-  <strong>Nombre de stagiaires :</strong> ${e.stagiaires.length}<br/>
-  <strong>Total HT :</strong> ${totalHt.toLocaleString("fr-FR")} €<br/>
+  <p><strong>Forfait par établissement HT :</strong> ${totalHt.toLocaleString("fr-FR")} €<br/>
+  <strong>Nombre de stagiaires couverts :</strong> ${e.stagiaires.length}<br/>
   TVA non applicable, art. 261-4-4° a du CGI<br/>
   <strong>Total TTC :</strong> ${totalHt.toLocaleString("fr-FR")} €</p>
 
