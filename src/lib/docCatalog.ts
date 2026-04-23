@@ -371,6 +371,7 @@ export function buildFullCatalog(
       add(`cfa_c2i4_dossier_candidature_${si}`, `CT2 - IND 4 DOSSIER DE CANDIDATURE – ${s.prenom} ${s.nom}`, 2, 4, "dossier_candidature_cfa", { stagiaireIdx: si });
     });
     add("cfa_c2i4_mail_type_candidat", "CT2 - IND 4 MAIL TYPES CANDIDAT (Renseignement, Dossier, Relance)", 2, 4, "mail_type_candidat_cfa");
+    add("cfa_c2i4_suivi_parcours_beneficiaires", "CT2 - IND 4 TABLEAU DE SUIVI DU PARCOURS DES BÉNÉFICIAIRES ET ADAPTATIONS (Excel)", 2, 4, "suivi_parcours_beneficiaires_excel");
 
     // IND 5 — Objectifs opérationnels et évaluables (CFA)
     stagiaires.forEach((s, si) => {
