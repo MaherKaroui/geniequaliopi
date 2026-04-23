@@ -1,10 +1,10 @@
 /**
  * BAHO – Modale : pack global ZIP + aperçu RI individualisé par stagiaire (avec tampons)
  */
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Download, Loader2, Building2, Users, FileText, Eye, ChevronDown, ChevronRight, X } from "lucide-react";
+import { Download, Loader2, Building2, Users, FileText, Eye, ChevronDown, ChevronRight, X, Upload, Stamp } from "lucide-react";
 import { getBahoEntreprises, FORMAT_SPHERE_ORG, type BahoEntreprise, type BahoStagiaire } from "@/lib/baho/bahoData";
 import { buildBahoZip } from "@/lib/baho/bahoGenerator";
 import { getRIHTML } from "@/lib/baho/bahoStaticDocs";
@@ -28,6 +28,8 @@ export default function BahoModal({ open, onOpenChange }: BahoModalProps) {
   const [generating, setGenerating] = useState(false);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [preview, setPreview] = useState<PreviewState | null>(null);
+  const [fsStamp, setFsStamp] = useState<string | null>(null); // data URI tampon FORMAT SPHERE custom
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { runJob } = useBackgroundJobs();
   const entreprises = getBahoEntreprises();
   const totalStagiaires = entreprises.reduce((acc, e) => acc + e.stagiaires.length, 0);
@@ -48,11 +50,26 @@ export default function BahoModal({ open, onOpenChange }: BahoModalProps) {
     });
   };
 
+  const handleStampUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      toast.error("Veuillez sélectionner une image (PNG, JPG, SVG).");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      setFsStamp(reader.result as string);
+      toast.success("Tampon FORMAT SPHERE chargé. Re-cliquez sur un stagiaire pour voir l'aperçu.");
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handlePreview = async (entreprise: BahoEntreprise, stagiaire: BahoStagiaire | null) => {
     if (preview?.pdfUrl) URL.revokeObjectURL(preview.pdfUrl);
     setPreview({ entreprise, stagiaire, pdfUrl: "", loading: true });
     try {
-      const html = getRIHTML(entreprise, stagiaire ?? undefined);
+      const html = getRIHTML(entreprise, stagiaire ?? undefined, fsStamp ?? undefined);
       const blob = await htmlToPdfBlob(html);
       const url = URL.createObjectURL(blob);
       setPreview({ entreprise, stagiaire, pdfUrl: url, loading: false });
@@ -70,7 +87,7 @@ export default function BahoModal({ open, onOpenChange }: BahoModalProps) {
         label: "Pack BAHO – FORMAT SPHERE",
         fileName: `BAHO_FORMAT_SPHERE_${new Date().toISOString().slice(0, 10)}.zip`,
         autoDownload: true,
-        run: async (reporter) => buildBahoZip(reporter),
+        run: async (reporter) => buildBahoZip(reporter, fsStamp ?? undefined),
       });
       toast.success("Génération lancée — voir la barre de progression en bas.");
       onOpenChange(false);
