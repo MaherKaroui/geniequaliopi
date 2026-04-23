@@ -174,7 +174,7 @@ export default function BahoModal({ open, onOpenChange }: BahoModalProps) {
                           preview?.entreprise.siret === e.siret && preview?.docKind === "devis" ? "bg-primary/10 text-primary" : ""
                         }`}
                       >
-                        <Receipt className="w-3 h-3 shrink-0" /> Devis
+                        <FileText className="w-3 h-3 shrink-0" /> Devis
                       </button>
                       <button
                         onClick={() => handlePreview(e, null, "cgv")}
