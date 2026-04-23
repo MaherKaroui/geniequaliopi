@@ -12146,18 +12146,61 @@ function genTempsConnexionOPCO(o: OrganismeInfo, f: FormationInfo, stagiaires: S
 }
 
 /**
- * Calendrier OPCO VIERGE : trame sans noms de stagiaires, prête à remplir.
- * Conserve la structure (rythme, sessions, jours école/entreprise) mais sans identités.
+ * Calendrier OPCO VIERGE : trame totalement vide — pas de dates, pas de noms.
+ * Conserve UNIQUEMENT la structure des colonnes et un nombre de lignes vides.
  */
-function genCalendrierFormationOPCOVierge(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
-  const html = genCalendrierFormationOPCO(o, f, stagiaires);
-  // Remplace les noms de stagiaires par "À compléter" dans les titres "Session X — Nom Prénom"
-  let cleaned = html
-    .replace(/(Session\s+\d+\s+—\s+)[^<]+(<\/h3>)/g, "$1À compléter$2")
-    .replace(/(Session\s+—\s+)[^<]+(<\/h3>)/g, "$1À compléter$2")
-    // Bandeau titre principal
-    .replace(/CALENDRIER DE FORMATION/g, "CALENDRIER DE FORMATION (TRAME VIERGE)");
-  return cleaned;
+function genCalendrierFormationOPCOVierge(o: OrganismeInfo, f: FormationInfo, _stagiaires: StagiaireInfo[]) {
+  const lieu = f.lieu?.trim() || o.adresse || "";
+  const isDistance = lieu.toLowerCase().includes("distance") || lieu.toLowerCase().includes("distanciel");
+  const horairesMatin = "09h00 – 12h30";
+  const horairesAprem = "13h30 – 17h00";
+
+  let extra = `<p><em>Trame vierge du calendrier de formation. À compléter manuellement avec les dates, jours et lieux de chaque journée. Une session par page.</em></p>`;
+  extra += `<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%;margin-bottom:18px">
+    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold;width:30%">Intitulé de la formation</td><td>&nbsp;</td></tr>
+    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Organisme</td><td>&nbsp;</td></tr>
+    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Modalité</td><td>${isDistance ? "Distanciel synchrone (classe virtuelle)" : "Présentiel"} — Apprentissage en alternance</td></tr>
+    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Lieu de déroulement</td><td>&nbsp;</td></tr>
+    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Rythme d'alternance</td><td>&nbsp;</td></tr>
+    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Horaires (jours école)</td><td>Matin : ${horairesMatin} &nbsp;|&nbsp; Après-midi : ${horairesAprem} (pause déjeuner 12h30 – 13h30) — 7 h/jour</td></tr>
+    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Formateur</td><td>&nbsp;</td></tr>
+    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Nombre de sessions</td><td>&nbsp;</td></tr>
+    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Nombre d'apprenants</td><td>&nbsp;</td></tr>
+  </table>`;
+
+  extra += `<h3 style="margin-top:18px;page-break-after:avoid">Session — À compléter</h3>`;
+  extra += `<p><strong>Période :</strong> du ____________ au ____________ &nbsp;|&nbsp; <strong>Rythme :</strong> ____________ &nbsp;|&nbsp; <strong>Jours école :</strong> ____</p>`;
+  extra += `<p style="margin:4px 0;font-size:0.9em;color:#1e3a7b"><strong>Date d'envoi du calendrier :</strong> ____________ <em>(7 jours ouvrés avant le démarrage — hors week-end et jours fériés)</em></p>`;
+  extra += `<table border="1" cellpadding="5" cellspacing="0" style="border-collapse:collapse;width:100%">
+    <thead><tr style="background:#1e3a7b;color:#fff">
+      <th style="width:6%">N°</th>
+      <th style="width:8%">Sem.</th>
+      <th style="width:12%">Type</th>
+      <th style="width:20%">Date</th>
+      <th style="width:12%">Jour</th>
+      <th style="width:14%">Horaires matin</th>
+      <th style="width:14%">Horaires après-midi</th>
+      <th>Lieu</th>
+    </tr></thead><tbody>`;
+  // 30 lignes vides pour permettre la saisie manuelle
+  for (let i = 0; i < 30; i++) {
+    extra += `<tr>
+      <td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>
+      <td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>
+    </tr>`;
+  }
+  extra += `</tbody></table>`;
+
+  extra += `<p style="margin-top:14px;font-size:0.9em"><em>Trame vierge — à compléter avec les dates exactes, le rythme d'alternance et le lieu de déroulement de la formation.</em></p>`;
+  extra += `<p style="margin-top:18px"><strong>Fait à</strong> ____________, <strong>le</strong> ____________</p>`;
+  extra += `<p><strong>____________________________</strong><br>____________________________</p>`;
+
+  return buildDocument({
+    org: o,
+    title: "CALENDRIER DE FORMATION (TRAME VIERGE)",
+    subtitle: f.intitule,
+    extraHtml: extra,
+  });
 }
 
 /**
