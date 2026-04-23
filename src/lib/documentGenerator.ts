@@ -11882,7 +11882,7 @@ function genCalendrierAnnuelCFA(o: OrganismeInfo, f: FormationInfo) {
       continue;
     }
 
-    const isCFAWeek = dayBased ? true : posInCycle < cfaPerCycle;
+    const isCFAWeek = (dayBased ? true : posInCycle < cfaPerCycle) && cfaWeekNum < totalCFAWeeks;
     posInCycle++;
     if (posInCycle >= cycleLength) posInCycle = 0;
 
