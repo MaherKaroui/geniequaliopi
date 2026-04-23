@@ -903,6 +903,8 @@ function genPresentation(o: OrganismeInfo) {
 }
 
 function genOrganigramme(o: OrganismeInfo) {
+  const relEnt = o.relationEntreprises?.trim() ? o.relationEntreprises : o.dirigeant;
+  const mob = o.referentMobilite?.trim() ? o.referentMobilite : "Prestataire externe – Mobi'Jeunes / Erasmus+ France";
   return buildDocument({ org: o, title: "ORGANIGRAMME DE L'ORGANISME", extraHtml: `
     <div style="text-align:center;margin:30px 0">
       <div style="background:#1e3a7b;color:white;padding:15px 30px;border-radius:8px;display:inline-block;margin-bottom:20px"><strong>Direction Générale</strong><br>${o.dirigeant}</div>
@@ -911,8 +913,11 @@ function genOrganigramme(o: OrganismeInfo) {
         <div style="background:#e8f0fe;padding:12px 20px;border-radius:8px;min-width:180px"><strong>Pôle Qualité</strong><br>${o.referentQualite}<br><em style="font-size:11px">Amélioration continue</em></div>
         <div style="background:#e8f0fe;padding:12px 20px;border-radius:8px;min-width:180px"><strong>Pôle Handicap</strong><br>${o.referentHandicap}<br><em style="font-size:11px">Accessibilité</em></div>
         <div style="background:#e8f0fe;padding:12px 20px;border-radius:8px;min-width:180px"><strong>Pôle Administratif</strong><br>${o.poleAdministratif}<br><em style="font-size:11px">Inscriptions, facturation</em></div>
+        <div style="background:#e8f0fe;padding:12px 20px;border-radius:8px;min-width:180px"><strong>Référent Relation Entreprises</strong><br>${relEnt}<br><em style="font-size:11px">Partenariats – Insertion</em></div>
+        <div style="background:#e8f0fe;padding:12px 20px;border-radius:8px;min-width:180px"><strong>Référent Mobilité nationale et internationale</strong><br>${mob}<br><em style="font-size:11px">Mission externalisée</em></div>
       </div>
-    </div>` });
+    </div>
+    <p style="text-align:center;font-size:11px;color:#666;margin-top:20px"><em>La fonction de Référent Mobilité nationale et internationale est externalisée auprès d'un prestataire spécialisé (Erasmus+ / Mobi'Jeunes).</em></p>` });
 }
 
 function genCharteQualite(o: OrganismeInfo) {
