@@ -356,6 +356,12 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
       saveAs(blob, buildCatalogFileName(doc, undefined, ".xlsx"));
       return;
     }
+    if (doc.template === "suivi_parcours_beneficiaires_excel") {
+      const { generateSuiviParcoursBeneficiairesXlsxBlob } = await import("@/lib/suiviParcoursBeneficiairesXlsx");
+      const blob = generateSuiviParcoursBeneficiairesXlsxBlob(mergedOrganisme, selectedFormation, allStagiaires);
+      saveAs(blob, buildCatalogFileName(doc, undefined, ".xlsx"));
+      return;
+    }
 
     // Handle mail .docx templates (per-stagiaire)
     if (MAIL_TEMPLATE_FILES[doc.template] && typeof doc.params?.stagiaireIdx === "number") {
