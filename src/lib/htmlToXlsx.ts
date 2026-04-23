@@ -111,6 +111,18 @@ export function htmlToXlsxBlob(html: string): Blob {
 
   sheets.forEach((spec, idx) => {
     const ws = XLSX.utils.table_to_sheet(spec.table, { raw: false });
+
+    // Nettoie les fusions qui dépassent le range réel des données
+    // (sinon Excel refuse d'ouvrir le fichier comme corrompu)
+    const ref = ws["!ref"];
+    if (ref && ws["!merges"]) {
+      const range = XLSX.utils.decode_range(ref);
+      ws["!merges"] = ws["!merges"].filter((m) =>
+        m.s.r >= range.s.r && m.e.r <= range.e.r &&
+        m.s.c >= range.s.c && m.e.c <= range.e.c
+      );
+    }
+
     applyAutoColumnWidths(ws);
 
     // Garantit un nom unique
