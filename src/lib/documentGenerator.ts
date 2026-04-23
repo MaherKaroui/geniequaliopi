@@ -11699,11 +11699,14 @@ function genSupportCoursCFA(o: OrganismeInfo, f: FormationInfo) {
 function genCalendrierAnnuelCFA(o: OrganismeInfo, f: FormationInfo) {
   const rythme = f.rythmeAlternance || '1 semaine CFA / 3 semaines entreprise';
   const { cfaWeeks: cfaPerCycle, entrepriseWeeks } = parseRythmeAlternance(rythme);
+  const dayBased = isDayBasedRythme(rythme);
+  const cfaDaysPerWeek = getCFADaysPerWeek(rythme);
+  const hoursPerCfaWeek = dayBased ? cfaDaysPerWeek * 7 : 35;
   const { totalHours } = parseDuree(f.duree);
   const effectiveTotal = totalHours > 0 ? totalHours : 420;
-  const totalCFAWeeks = Math.max(1, Math.ceil(effectiveTotal / 35));
-  const cycleLength = cfaPerCycle + entrepriseWeeks;
-  const totalCycles = Math.ceil(totalCFAWeeks / cfaPerCycle);
+  const totalCFAWeeks = Math.max(1, Math.ceil(effectiveTotal / hoursPerCfaWeek));
+  const cycleLength = dayBased ? 1 : (cfaPerCycle + entrepriseWeeks);
+  const totalCycles = Math.ceil(totalCFAWeeks / Math.max(1, cfaPerCycle));
 
   const startDate = f.dateDebut ? new Date(f.dateDebut.split('/').reverse().join('-')) : new Date();
   if (isNaN(startDate.getTime())) startDate.setTime(Date.now());
