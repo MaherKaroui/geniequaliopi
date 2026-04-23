@@ -536,8 +536,10 @@ export function buildFullCatalog(
     // Mission 9 — Diversité & lutte contre les discriminations
     add("cfa_mission9_plan_diversite", "CT3 - IND 10 📁 14 MISSIONS / Mission 9 – Plan diversité & lutte contre les discriminations", 3, 10, "plan_diversite_lutte_discriminations_cfa", { folder: "14_MISSIONS_CFA/Mission_9_Diversite_Discriminations" });
 
-    // Mission 10 — Mobilité nationale des apprentis (sans Erasmus+)
+    // Mission 10 — Mobilité nationale des apprentis (dispositif inter-CFA en France)
     add("cfa_mission10_plan_mobilite_nationale", "CT3 - IND 10 📁 14 MISSIONS / Mission 10 – Plan de mobilité nationale des apprentis", 3, 10, "plan_mobilite_nationale_cfa", { folder: "14_MISSIONS_CFA/Mission_10_Mobilite_Nationale" });
+    add("cfa_mission10_convention_inter_cfa", "CT3 - IND 10 📁 14 MISSIONS / Mission 10 – Convention de mise à disposition inter-CFA", 3, 10, "convention_mobilite_inter_cfa", { folder: "14_MISSIONS_CFA/Mission_10_Mobilite_Nationale" });
+    add("cfa_mission10_fiche_demande_mobilite", "CT3 - IND 10 📁 14 MISSIONS / Mission 10 – Fiche de demande de mobilité nationale (apprenti)", 3, 10, "fiche_demande_mobilite_nationale", { folder: "14_MISSIONS_CFA/Mission_10_Mobilite_Nationale" });
     add("cfa_mission10_fiche_poste_referent_mobilite", "CT3 - IND 10 📁 14 MISSIONS / Mission 10 – Fiche de poste Référent Mobilité Nationale", 3, 10, "pdf_static", { pdfUrl: "/pdfs/fiche_poste_referent_mobilite_international.docx", folder: "14_MISSIONS_CFA/Mission_10_Mobilite_Nationale" });
 
     // Mission 11 — Suivi & accompagnement de la formation à distance

@@ -820,6 +820,8 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "cooperation_cfa_entreprise_cfa": return genCoperationCFAEntrepriseCFA(o, f, stagiaires);
     case "plan_diversite_lutte_discriminations_cfa": return genPlanDiversiteLutteDiscriminationsCFA(o, f, stagiaires);
     case "plan_mobilite_nationale_cfa": return genPlanMobiliteNationaleCFA(o, f, stagiaires);
+    case "convention_mobilite_inter_cfa": return genConventionMobiliteInterCFA(o, f, stagiaires);
+    case "fiche_demande_mobilite_nationale": return genFicheDemandeMobiliteNationale(o, f, stagiaires);
     case "procedure_accompagnement_post_formation_cfa": return genProcedureAccompagnementPostFormationCFA(o);
     case "plan_mixite_metiers_cfa": return genPlanMixiteMetiersCFA(o, f, stagiaires);
     case "procedure_accompagnement_educatif_social_cfa": return genProcedureAccompagnementEducatifSocialCFA(o);
