@@ -900,7 +900,7 @@ export function generateExcelCalendrierOPCO(
     sheetHtml += tableRow(["Apprenants", apprenants]);
     sheetHtml += tableRow(["Période", `Du ${formatDate(grp.debut)} au ${formatDate(grp.fin)}`]);
     sheetHtml += tableRow(["Rythme", rythmeLabel]);
-    sheetHtml += tableRow(["Volume centre", `${volumeEcole} h sur ${nbEcoleDays} jour${nbEcoleDays > 1 ? "s" : ""} école (7 h/jour)`]);
+    // Volume centre retiré (demande utilisateur)
     sheetHtml += tableRow(["Lieu", lieu]);
     sheetHtml += tableRow(["Formateur", f.formateur || "—"]);
     sheetHtml += `<tr><td colspan="2" style="height:8px"></td></tr>`;
