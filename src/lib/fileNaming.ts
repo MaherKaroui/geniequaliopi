@@ -25,6 +25,7 @@ export const PER_STAGIAIRE_TEMPLATES = new Set([
   "reglement_interieur_cfa_v2",
   "contrat_formation_par_bloc",
   "dossier_inscription_cfa",
+  "outils_suivi_alternance_excel",
 ]);
 
 const EXCEL_TEMPLATES = new Set([
