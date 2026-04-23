@@ -664,7 +664,16 @@ export function buildFullCatalog(
     add("cfa_c3i12_fichier_gestion_annulations", "CT3 - IND 12 FICHIER GESTION DES ANNULATIONS", 3, 12, "fichier_gestion_annulations_cfa");
     add("cfa_c3i12_accompagnement_recherche_contrat", "CT3 - IND 12 ACCOMPAGNEMENT À LA RECHERCHE D'UN CONTRAT", 3, 12, "accompagnement_recherche_contrat_cfa");
     add("cfa_c3i12_liste_aide_social", "CT3 - IND 12 LISTE AIDE SOCIAL", 3, 12, "liste_aide_social_cfa");
-    add("cfa_c3i12_certificat_realisation", "CT3 - IND 12 CERTIFICAT DE RÉALISATION", 3, 12, "certificat_realisation_cfa");
+    // Un certificat individuel par stagiaire
+    stagiaires.forEach((s, si) => {
+      add(
+        `cfa_c3i12_certificat_realisation_${si}`,
+        `CT3 - IND 12 CERTIFICAT DE RÉALISATION – ${s.prenom} ${s.nom}`,
+        3, 12,
+        "certificat_realisation_cfa",
+        { stagiaireIdx: si },
+      );
+    });
     add("cfa_c3i12_suivi_public_excel", "CT3 - IND 12 SUIVI DU PUBLIC ET DU BÉNÉFICIAIRE (Excel)", 3, 12, "suivi_public_beneficiaire_excel");
     add("cfa_c3i12_suivi_pfmp_excel", "CT3 - IND 12 TABLEAU DE SUIVI PFMP (Excel)", 3, 12, "suivi_pfmp_excel");
 
