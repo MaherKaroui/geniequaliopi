@@ -25,6 +25,7 @@ const REAL_XLSX_TEMPLATES = new Set<string>([
   "suivi_chiffre_formation_excel",
   "tableau_suivi_parcours_beneficiaires_cfa_excel",
   "calendrier_annuel_cfa",
+  "tableau_suivi_parcours_excel",
 ]);
 import { downloadAsPdf, htmlToPdfBlob } from "@/lib/pdfExport";
 import { processDocxTemplate, processMailDocxTemplate, DOCX_TEMPLATE_FILES, MAIL_TEMPLATE_FILES } from "@/lib/docxTemplateExport";
