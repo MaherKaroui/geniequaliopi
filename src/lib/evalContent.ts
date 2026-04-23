@@ -1735,28 +1735,28 @@ QUESTIONS_OUVERTES["Restauration"] = {
 
 const DEFAULT_QUESTIONS_OUVERTES: QuestionsOuvertesFormation = {
   debut: [
-    { question: "Que savez-vous déjà sur le sujet de cette formation ?", reponseAttendue: "Le stagiaire exprime ses connaissances préalables sur le domaine de la formation." },
-    { question: "Quels outils ou logiciels avez-vous déjà utilisés dans ce domaine ?", reponseAttendue: "Liste des outils et logiciels que le stagiaire connaît ou a déjà pratiqués." },
-    { question: "Décrivez votre expérience professionnelle en lien avec cette formation.", reponseAttendue: "Description de l'expérience professionnelle passée en rapport avec le contenu de la formation." },
-    { question: "Quels sont vos objectifs principaux pour cette formation ?", reponseAttendue: "Objectifs personnels et professionnels clairement formulés." },
-    { question: "Avez-vous déjà suivi une formation similaire ? Si oui, laquelle ?", reponseAttendue: "Historique des formations antérieures dans le même domaine." },
-    { question: "Quel est votre niveau de connaissances actuel dans ce domaine ? (Débutant / Intermédiaire / Avancé)", reponseAttendue: "Auto-évaluation du niveau avec justification." },
-    { question: "Dans quel contexte professionnel souhaitez-vous appliquer les compétences acquises ?", reponseAttendue: "Description du contexte professionnel et des cas d'utilisation prévus." },
-    { question: "Quelles difficultés avez-vous déjà rencontrées dans ce domaine ?", reponseAttendue: "Identification des points de blocage et difficultés passées." },
-    { question: "Comment définiriez-vous les termes clés liés à cette formation ?", reponseAttendue: "Définitions des concepts fondamentaux du domaine de la formation." },
-    { question: "Qu'attendez-vous concrètement de cette formation ?", reponseAttendue: "Attentes claires et mesurables en termes de compétences à acquérir." },
+    { question: "Que connaissez-vous sur le sujet de la formation ?", reponseAttendue: "Le stagiaire dit ce qu'il sait déjà sur le domaine." },
+    { question: "Quels outils ou logiciels avez-vous déjà utilisés ?", reponseAttendue: "Liste des outils ou logiciels déjà pratiqués." },
+    { question: "Avez-vous déjà travaillé dans ce domaine ? Racontez.", reponseAttendue: "Description simple de l'expérience professionnelle en lien." },
+    { question: "Pourquoi suivez-vous cette formation ?", reponseAttendue: "Le stagiaire explique ses raisons et ses objectifs." },
+    { question: "Avez-vous déjà fait une formation sur le même sujet ?", reponseAttendue: "Oui ou non, et laquelle si oui." },
+    { question: "Comment évaluez-vous votre niveau ? (Débutant, Moyen, Avancé)", reponseAttendue: "Auto-évaluation simple du niveau, avec une explication courte." },
+    { question: "Où comptez-vous utiliser ce que vous allez apprendre ?", reponseAttendue: "Le stagiaire décrit le contexte d'utilisation prévu." },
+    { question: "Qu'est-ce qui vous semble difficile dans ce domaine ?", reponseAttendue: "Identification simple des points qui posent problème." },
+    { question: "Si vous deviez expliquer le sujet en quelques mots, que diriez-vous ?", reponseAttendue: "Définition courte et personnelle des notions clés." },
+    { question: "Qu'attendez-vous de cette formation ?", reponseAttendue: "Attentes claires : compétences à acquérir, résultats espérés." },
   ],
   fin: [
-    { question: "Quelles compétences clés avez-vous acquises durant cette formation ?", reponseAttendue: "Énumération des compétences principales développées au cours de la formation." },
-    { question: "Décrivez la méthode ou l'outil le plus utile que vous avez découvert.", reponseAttendue: "Description détaillée d'un outil ou méthode clé avec son utilité pratique." },
-    { question: "Comment allez-vous appliquer ces acquis dans votre activité professionnelle ?", reponseAttendue: "Plan d'action concret pour la mise en œuvre des compétences acquises." },
-    { question: "Quels sont les points que vous devez encore approfondir ?", reponseAttendue: "Identification honnête des lacunes restantes et plan d'amélioration." },
-    { question: "Résumez en quelques phrases les concepts essentiels de la formation.", reponseAttendue: "Synthèse structurée des principaux concepts abordés." },
-    { question: "Évaluez votre progression entre le début et la fin de cette formation.", reponseAttendue: "Auto-évaluation avec comparaison avant/après et éléments concrets de progression." },
-    { question: "Quel exercice ou mise en pratique vous a le plus aidé ? Pourquoi ?", reponseAttendue: "Identification de l'exercice le plus formateur avec explication de son apport." },
-    { question: "Recommanderiez-vous cette formation ? Justifiez.", reponseAttendue: "Recommandation argumentée avec points forts et éventuels axes d'amélioration." },
-    { question: "Quelles ressources complémentaires comptez-vous utiliser pour continuer à progresser ?", reponseAttendue: "Identification de ressources (livres, sites, formations, pratique) pour poursuivre l'apprentissage." },
-    { question: "Qu'avez-vous appris pendant cette formation ?", reponseAttendue: "Synthèse personnelle des apprentissages avec exemples concrets." },
+    { question: "Qu'avez-vous appris d'important pendant la formation ?", reponseAttendue: "Liste simple des compétences principales acquises." },
+    { question: "Quel outil ou méthode vous a paru le plus utile ?", reponseAttendue: "Description courte d'un outil ou d'une méthode et de son utilité." },
+    { question: "Comment allez-vous utiliser ces apprentissages dans votre travail ?", reponseAttendue: "Plan simple de mise en pratique au quotidien." },
+    { question: "Sur quoi voulez-vous encore vous améliorer ?", reponseAttendue: "Identification honnête des points à approfondir." },
+    { question: "Résumez en quelques phrases ce que vous retenez de la formation.", reponseAttendue: "Synthèse personnelle et claire des points essentiels." },
+    { question: "Pensez-vous avoir progressé ? Donnez un exemple.", reponseAttendue: "Comparaison simple avant/après avec un exemple concret." },
+    { question: "Quel exercice vous a le plus aidé ? Pourquoi ?", reponseAttendue: "Choix d'un exercice et explication courte de son utilité." },
+    { question: "Conseilleriez-vous cette formation à quelqu'un ? Pourquoi ?", reponseAttendue: "Recommandation simple avec une raison." },
+    { question: "Comment allez-vous continuer à progresser après la formation ?", reponseAttendue: "Idées de ressources ou d'actions pour continuer à apprendre." },
+    { question: "Qu'est-ce qui a changé pour vous grâce à cette formation ?", reponseAttendue: "Bilan personnel court avec un exemple concret." },
   ],
 };
 
@@ -1829,27 +1829,27 @@ function generateDynamicQuestions(
 
     if (type === "debut") {
       const qVariants = [
-        `Quelles sont vos connaissances actuelles concernant : ${topicShort} ?`,
-        `Avez-vous déjà été confronté à : ${topicShort} ? Décrivez votre expérience.`,
-        `Comment aborderiez-vous aujourd'hui : ${topicShort} ?`,
-        `Quels sont selon vous les points clés de : ${topicShort} ?`,
-        `Quelles difficultés anticipez-vous concernant : ${topicShort} ?`,
+        `Que connaissez-vous sur : ${topicShort} ?`,
+        `Avez-vous déjà fait : ${topicShort} ? Racontez en quelques mots.`,
+        `Comment feriez-vous aujourd'hui pour : ${topicShort} ?`,
+        `Selon vous, qu'est-ce qui est important dans : ${topicShort} ?`,
+        `Qu'est-ce qui vous semble difficile dans : ${topicShort} ?`,
       ];
       dynamicQs.push({
         question: qVariants[i % qVariants.length],
-        reponseAttendue: `Réponse attendue : description du niveau initial du stagiaire et identification des besoins concernant « ${topicShort} » dans le cadre de la formation « ${intitule} ».`,
+        reponseAttendue: `Réponse attendue : le stagiaire dit ce qu'il sait déjà sur « ${topicShort} » et ce qu'il a besoin d'apprendre dans la formation « ${intitule} ».`,
       });
     } else {
       const qVariants = [
-        `Expliquez avec vos propres mots ce que vous avez appris sur : ${topicShort}.`,
-        `Comment allez-vous appliquer en situation professionnelle : ${topicShort} ?`,
-        `Quels sont les points essentiels à retenir concernant : ${topicShort} ?`,
-        `Citez un exemple concret d'application de : ${topicShort}.`,
+        `Avec vos mots, expliquez ce que vous avez appris sur : ${topicShort}.`,
+        `Comment allez-vous utiliser au travail : ${topicShort} ?`,
+        `Que faut-il retenir d'important sur : ${topicShort} ?`,
+        `Donnez un exemple simple pour utiliser : ${topicShort}.`,
         `Quels outils ou méthodes utiliserez-vous pour : ${topicShort} ?`,
       ];
       dynamicQs.push({
         question: qVariants[i % qVariants.length],
-        reponseAttendue: `Réponse attendue : démonstration de la maîtrise acquise concernant « ${topicShort} » avec exemple concret d'application en situation professionnelle dans le cadre de « ${intitule} ».`,
+        reponseAttendue: `Réponse attendue : le stagiaire montre qu'il sait faire « ${topicShort} » et donne un exemple concret d'utilisation après la formation « ${intitule} ».`,
       });
     }
   }
