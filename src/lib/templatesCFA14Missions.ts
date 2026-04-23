@@ -1189,10 +1189,15 @@ export function genQCMMissionCFA(
       },
       {
         heading: "Signatures",
-        content: `<table style="width:100%;margin-top:20px;"><tr>
-          <td style="width:50%;padding:10px;border:1px solid #ccc;"><strong>Apprenti·e</strong><br>${stagiaire.prenom} ${stagiaire.nom}<br>Fait le ${formatDate(dateRef)}<br><br><br></td>
-          <td style="width:50%;padding:10px;border:1px solid #ccc;"><strong>Formateur·rice / Référent CFA</strong><br>${o.nom}<br>Fait le ${formatDate(dateRef)}<br><br><br></td>
-        </tr></table>`,
+        content: (() => {
+          const formateurNom = (stagiaire as any).formateurAssigne || (f as any).formateur || o.dirigeant || o.nom;
+          const sigApp = (stagiaire as any).signatureUrl ? `<img src="${(stagiaire as any).signatureUrl}" alt="signature" style="max-height:60px;margin-top:6px;">` : "";
+          const sigForm = (o as any).signatureUrl ? `<img src="${(o as any).signatureUrl}" alt="signature" style="max-height:60px;margin-top:6px;">` : "";
+          return `<table style="width:100%;margin-top:20px;border-collapse:collapse;"><tr>
+          <td style="width:50%;padding:12px;border:1px solid #ccc;vertical-align:top;"><strong>Apprenti·e</strong><br>${stagiaire.prenom} ${stagiaire.nom}<br>Fait le <strong>${formatDate(dateRef)}</strong>${sigApp}<br><br></td>
+          <td style="width:50%;padding:12px;border:1px solid #ccc;vertical-align:top;"><strong>Formateur·rice / Référent CFA</strong><br>${formateurNom}<br>Fait le <strong>${formatDate(dateRef)}</strong>${sigForm}<br><br></td>
+        </tr></table>`;
+        })(),
       },
     ],
   });
