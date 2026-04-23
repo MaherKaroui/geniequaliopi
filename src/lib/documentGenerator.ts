@@ -10909,7 +10909,7 @@ export function getCFAWeekDates(f: FormationInfo): { cfaWeekNum: number; weekSta
     totalCFAWeeks = Math.max(1, Math.ceil(effectiveTotal / hoursPerCfaWeek));
   }
 
-  const cycleLength = (dayBased || hourBased) ? 1 : (cfaPerCycle + entrepriseWeeks);
+  const cycleLength = dayBased ? 1 : (cfaPerCycle + entrepriseWeeks);
 
   const rawStartDate = f.dateDebut ? new Date(f.dateDebut.split('/').reverse().join('-')) : new Date();
   if (isNaN(rawStartDate.getTime())) rawStartDate.setTime(Date.now());
@@ -10926,7 +10926,7 @@ export function getCFAWeekDates(f: FormationInfo): { cfaWeekNum: number; weekSta
 
   while (cfaWeekCount < totalCFAWeeks) {
     const posInCycle = calendarWeek % Math.max(1, cycleLength);
-    const isCFA = (dayBased || hourBased) ? true : posInCycle < cfaPerCycle;
+    const isCFA = dayBased ? true : posInCycle < cfaPerCycle;
 
     if (isCFA) {
       cfaWeekCount++;
@@ -10938,7 +10938,7 @@ export function getCFAWeekDates(f: FormationInfo): { cfaWeekNum: number; weekSta
     }
     calendarWeek++;
     // Safety break to avoid infinite loops
-    if (calendarWeek > 200) break;
+    if (calendarWeek > 500) break;
   }
 
   return result;
