@@ -544,10 +544,6 @@ export function getDevisHTML(e: BahoEntreprise, numero: string, customFsStamp?: 
 
   ${stampsBlock(e, customFsStamp)}
 
-  <p style="margin-top:20px;"><strong>Bon pour accord</strong> (à retourner signé) :<br/>
-  Nom et qualité du signataire : <span style="display:inline-block; border-bottom:1px solid #888; width:300px;">&nbsp;</span><br/>
-  Date : <span style="display:inline-block; border-bottom:1px solid #888; width:120px;">&nbsp;</span> &nbsp; Signature et cachet :</p>
-
   ${footer()}
   </body></html>`;
 }
