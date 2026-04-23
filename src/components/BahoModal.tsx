@@ -4,10 +4,10 @@
 import { useState, useEffect, useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Download, Loader2, Building2, Users, FileText, Eye, ChevronDown, ChevronRight, X, Upload, Stamp } from "lucide-react";
+import { Download, Loader2, Building2, Users, FileText, Eye, ChevronDown, ChevronRight, X, Upload, Stamp, FileSignature, Receipt, ScrollText } from "lucide-react";
 import { getBahoEntreprises, FORMAT_SPHERE_ORG, type BahoEntreprise, type BahoStagiaire } from "@/lib/baho/bahoData";
 import { buildBahoZip } from "@/lib/baho/bahoGenerator";
-import { getRIHTML } from "@/lib/baho/bahoStaticDocs";
+import { getRIHTML, getConventionHTML, getCGVHTML, getFactureHTML } from "@/lib/baho/bahoStaticDocs";
 import { htmlToPdfBlob } from "@/lib/pdfExport";
 import { useBackgroundJobs } from "@/lib/backgroundJobs";
 import { toast } from "sonner";
@@ -17,9 +17,12 @@ interface BahoModalProps {
   onOpenChange: (open: boolean) => void;
 }
 
+type DocKind = "ri" | "convention" | "cgv" | "facture";
+
 interface PreviewState {
   entreprise: BahoEntreprise;
-  stagiaire: BahoStagiaire | null; // null = RI entreprise sans stagiaire
+  stagiaire: BahoStagiaire | null; // null = doc entreprise (sans stagiaire)
+  docKind: DocKind;
   pdfUrl: string;
   loading: boolean;
 }
