@@ -51,8 +51,6 @@ function footer(): string {
 }
 
 export function getRIHTML(e: BahoEntreprise, stagiaire?: BahoStagiaire, customFsStamp?: string): string {
-  const hotelStamp = svgToDataUri(getHotelStampSvg(e));
-  const fsStamp = customFsStamp || svgToDataUri(getFormatSphereStampSvg());
   const civilite = stagiaire ? `${stagiaire.prenom} ${stagiaire.nom}` : "";
   const titreStagiaire = stagiaire
     ? `<p><strong>Stagiaire :</strong> ${civilite}${stagiaire.emploi ? ` – ${stagiaire.emploi}` : ""}<br/>
