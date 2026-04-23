@@ -83,6 +83,9 @@ export default function BahoModal({ open, onOpenChange }: BahoModalProps) {
         case "facture":
           html = getFactureHTML(entreprise, `BAHO-${new Date().getFullYear()}-PREV`, fsStamp ?? undefined);
           break;
+        case "devis":
+          html = getDevisHTML(entreprise, `BAHO-${new Date().getFullYear()}-PREV`, fsStamp ?? undefined);
+          break;
         case "ri":
         default:
           html = getRIHTML(entreprise, stagiaire ?? undefined, fsStamp ?? undefined);
@@ -99,6 +102,7 @@ export default function BahoModal({ open, onOpenChange }: BahoModalProps) {
 
   const docLabels: Record<DocKind, string> = {
     convention: "Convention de formation",
+    devis: "Devis",
     cgv: "CGV",
     facture: "Facture",
     ri: "Règlement intérieur",
