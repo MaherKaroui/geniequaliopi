@@ -1129,8 +1129,19 @@ export function genQCMMissionCFA(
     });
   }
 
-  const terminee = isFormationTerminee(f, stagiaires);
-  const dateRef = terminee && f.dateFin ? f.dateFin : (f.dateDebut || new Date().toISOString().slice(0, 10));
+  // Date du QCM = vendredi de la semaine école N (rythme 1 sem école / 3 sem entreprise)
+  // Lundi semaine école N = lundi de dateDebut + (N-1)*28 jours ; QCM rendu vendredi (+4j)
+  function isoMondayOf(s: string): Date {
+    const d = new Date(s);
+    const day = (d.getDay() + 6) % 7;
+    d.setDate(d.getDate() - day);
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }
+  const startStr = f.dateDebut || new Date().toISOString().slice(0, 10);
+  const lundi = isoMondayOf(startStr);
+  lundi.setDate(lundi.getDate() + (missionNumero - 1) * 28 + 4); // vendredi semaine école N
+  const dateRef = lundi.toISOString().slice(0, 10);
   const answers = pickStudentAnswers(stagiaire, missionNumero, mission.questions);
   const score = answers.reduce((acc, a, i) => acc + (a === mission.questions[i].correctIndex ? 1 : 0), 0);
 
