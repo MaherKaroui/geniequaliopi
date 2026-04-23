@@ -390,8 +390,8 @@ export function getCGVHTML(e: BahoEntreprise, customFsStamp?: string): string {
 
 export function getFactureHTML(e: BahoEntreprise, numero: string, customFsStamp?: string): string {
   const nbStagiaires = e.stagiaires.length;
-  const prixUnitaire = 2000;
-  const total = nbStagiaires * prixUnitaire;
+  const total = 2000;
+  const prixUnitaire = total;
 
   return `<!DOCTYPE html><html><head><meta charset="utf-8"/>${BASE_CSS}</head><body>
   ${header()}
