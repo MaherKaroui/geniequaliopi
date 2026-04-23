@@ -305,39 +305,85 @@ export function getConventionHTML(e: BahoEntreprise, customFsStamp?: string): st
 }
 
 export function getCGVHTML(e: BahoEntreprise, customFsStamp?: string): string {
+  const dateCgv = subtractWorkingDays(e.dateDebut, 14);
+  const orgNom = FORMAT_SPHERE_ORG.nom;
+  const orgAdr = `${FORMAT_SPHERE_ORG.adresse}, ${FORMAT_SPHERE_ORG.codePostal} ${FORMAT_SPHERE_ORG.ville}`;
+  const orgMail = FORMAT_SPHERE_ORG.email;
+  const orgTel = FORMAT_SPHERE_ORG.telephone;
+  const orgSiret = FORMAT_SPHERE_ORG.siret;
+  const orgSiren = orgSiret.replace(/\s/g, "").slice(0, 9);
+
   return `<!DOCTYPE html><html><head><meta charset="utf-8"/>${BASE_CSS}</head><body>
   ${header()}
-  <h1>Conditions Générales de Vente</h1>
-  <p><strong>Prestataire :</strong> ${FORMAT_SPHERE_ORG.nom} – SIRET ${FORMAT_SPHERE_ORG.siret}<br/>
-  <strong>Client :</strong> ${e.nom} – SIRET ${e.siret}<br/>
-  <strong>Date :</strong> ${formatDateLong(e.dateConvention)}</p>
+  <h1>CONDITIONS GÉNÉRALES DE VENTES</h1>
+  <p style="text-align:center;"><strong>Effectué le :</strong> ${formatDateLong(dateCgv)}</p>
 
-  <h2>Article 1 – Objet</h2>
-  <p>Les présentes Conditions Générales de Vente (CGV) régissent les relations contractuelles entre ${FORMAT_SPHERE_ORG.nom}, organisme de formation, et toute personne physique ou morale (le « Client ») souhaitant bénéficier de prestations de formation professionnelle, notamment d'Actions de Formation En Situation de Travail (AFEST) en hôtellerie.</p>
+  <p>Les présentes conditions générales de vente régissent :</p>
+  <p>– D'une part, les ventes effectuées par <strong>${orgNom}</strong>, organisme de formation enregistré sous le numéro de SIRET ${orgSiret} / SIREN ${orgSiren}, et domicilié au ${orgAdr}.</p>
+  <p>Les coordonnées de <strong>${orgNom}</strong> sont les suivantes :<br/>
+  Mail : ${orgMail} – Tél : ${orgTel}</p>
+  <p>– Et d'autre part, l'achat effectué par toute personne physique ou morale, dénommée ci-après « le client » ou « l'acheteur ».</p>
 
-  <h2>Article 2 – Inscription et conditions d'accès</h2>
-  <p>L'inscription est validée par la signature d'une convention de formation professionnelle entre les parties. ${FORMAT_SPHERE_ORG.nom} se réserve le droit de refuser une inscription en cas d'incompatibilité avec les prérequis de la formation.</p>
+  <h2>ARTICLE 1 – OBJET</h2>
+  <p>Les présentes conditions de vente visent à définir les relations contractuelles entre ${orgNom} et l'acheteur ainsi que les conditions applicables à tout achat effectué auprès de l'organisme, que l'acheteur soit professionnel ou consommateur.</p>
+  <p>L'acquisition d'une prestation de formation implique une acceptation sans réserve par l'acheteur des présentes conditions de vente.</p>
+  <p>Ces conditions de vente prévaudront sur toutes autres conditions générales ou particulières non expressément agréées par ${orgNom}. Ce dernier se réserve le droit de pouvoir modifier ses conditions de vente à tout moment. Dans ce cas, les conditions applicables seront celles en vigueur à la date de la commande par l'acheteur.</p>
 
-  <h2>Article 3 – Tarifs et conditions de paiement</h2>
-  <p>Les prix sont indiqués en euros, exonérés de TVA selon l'article 261-4-4° a du CGI. Les factures sont payables à 30 jours date de facture, par virement bancaire. Tout retard de paiement entraînera l'application de pénalités au taux d'intérêt légal majoré, ainsi qu'une indemnité forfaitaire de recouvrement de 40 € (article L.441-10 du Code de commerce).</p>
+  <h2>ARTICLE 2 – CARACTÉRISTIQUES DES BIENS ET SERVICES PROPOSÉS</h2>
+  <p>Les produits et services offerts sont ceux qui figurent au sein du catalogue publié par ${orgNom}. Chaque produit est accompagné d'un descriptif établi par le centre de formation.</p>
 
-  <h2>Article 4 – Annulation et report</h2>
-  <p>Toute annulation par le Client doit être notifiée par écrit. En cas d'annulation moins de 14 jours avant le début de la formation, 50 % du montant total sera dû à titre de dédit. En cas d'absence totale du stagiaire, l'intégralité du coût pédagogique reste due.</p>
+  <h2>ARTICLE 3 – TARIFS</h2>
+  <p>Les prix figurant dans le catalogue sont indiqués en euros. ${orgNom} se réserve le droit de modifier ses prix à tout moment, étant toutefois entendu que le prix figurant au catalogue le jour de la commande sera le seul applicable à l'acheteur.</p>
+  <p>Les prix indiqués comprennent les frais de traitement de commandes. Toutes les commandes quelle que soit leur origine sont payables en euros.</p>
+  <p>Les prestations ne peuvent être réalisées que lors du paiement intégral du prix.</p>
 
-  <h2>Article 5 – Force majeure</h2>
-  <p>${FORMAT_SPHERE_ORG.nom} ne pourra être tenu responsable en cas de force majeure rendant impossible l'exécution de la prestation.</p>
+  <h2>ARTICLE 4 – COMMANDES</h2>
+  <p>Toute commande passée auprès de ${orgNom} suppose l'adhésion aux présentes Conditions Générales. Toute confirmation de commande entraîne acceptation et pleine adhésion aux présentes Conditions Générales, sans exception ni réserve.</p>
+  <p>L'acheteur, qui souhaite acheter une prestation, doit obligatoirement :</p>
+  <ul>
+    <li>Remplir la fiche d'identification sur laquelle il indiquera toutes les coordonnées demandées ;</li>
+    <li>Remplir le bon de commande en donnant toutes les références de la prestation choisie ;</li>
+    <li>Valider sa commande après l'avoir vérifiée ;</li>
+    <li>Effectuer le paiement dans les conditions prévues ;</li>
+    <li>Confirmer sa commande et son règlement.</li>
+  </ul>
+  <p>L'ensemble des données fournies et la confirmation enregistrée vaudront preuve de la transaction. La confirmation vaudra signature et acceptation des opérations effectuées.</p>
 
-  <h2>Article 6 – Propriété intellectuelle</h2>
-  <p>Les supports pédagogiques remis lors des formations sont la propriété exclusive de ${FORMAT_SPHERE_ORG.nom}. Toute reproduction ou diffusion sans autorisation écrite est interdite.</p>
+  <h2>ARTICLE 5 – PAIEMENT ET MODALITÉS DE PAIEMENT</h2>
+  <p>La validation d'une commande par l'acheteur implique le paiement du prix indiqué. Le règlement des achats peut s'effectuer par virement bancaire ou tout autre moyen sécurisé mis en place par ${orgNom}.</p>
 
-  <h2>Article 7 – Confidentialité et RGPD</h2>
-  <p>${FORMAT_SPHERE_ORG.nom} s'engage à respecter la confidentialité des informations communiquées par le Client. Les données personnelles sont traitées conformément au RGPD. Le Client dispose d'un droit d'accès, de rectification et de suppression.</p>
+  <h2>ARTICLE 6 – RÉTRACTATION</h2>
+  <p>Conformément aux dispositions de l'article L.121-21 du Code de la consommation, il est possible de bénéficier d'un délai de rétractation de 14 jours à compter de la signature, sans avoir à justifier de motifs ni à payer de pénalité.</p>
+  <p>Le délai légal de rétractation de 14 jours ne s'applique pas dès lors que la mise en œuvre du service a commencé.</p>
 
-  <h2>Article 8 – Litiges</h2>
-  <p>En cas de différend, les parties s'efforceront de trouver une solution amiable. À défaut, tout litige sera soumis aux tribunaux compétents du ressort du siège social de ${FORMAT_SPHERE_ORG.nom}.</p>
+  <h2>ARTICLE 7 – RÉSILIATION</h2>
+  <p>Le client peut mettre fin à son inscription à ${orgNom} à tout moment, sans frais et sans motif. Aucun remboursement ne pourra avoir lieu pour les prestations achetées et déjà débutées.</p>
 
-  <p style="margin-top:30px;">Fait à ${FORMAT_SPHERE_ORG.ville}, le ${formatDateLong(e.dateConvention)}<br/>
-  ${FORMAT_SPHERE_ORG.dirigeant} – Dirigeant</p>
+  <h2>ARTICLE 8 – LIVRAISONS</h2>
+  <p>Le client peut accéder à ses prestations selon les modalités définies dans la convention de formation. Si toutefois le client rencontre un problème, il peut contacter le service client à l'adresse suivante : ${orgMail}.</p>
+
+  <h2>ARTICLE 9 – RESPONSABILITÉ</h2>
+  <p>Le vendeur n'est tenu que par une obligation de moyens ; sa responsabilité ne pourra être engagée pour un dommage résultant de l'utilisation du réseau Internet tel que perte de données, intrusion, virus, piratage, rupture du service, ou autres problèmes involontaires.</p>
+
+  <h2>ARTICLE 10 – DONNÉES À CARACTÈRE PERSONNEL</h2>
+  <p>Conformément à la loi relative à l'informatique, aux fichiers et aux libertés du 6 janvier 1978 et au RGPD, les informations à caractère nominatif relatives aux acheteurs pourront faire l'objet d'un traitement automatisé.</p>
+  <p>Les clients peuvent s'opposer à la divulgation de leurs coordonnées en le signalant à ${orgNom}. De même, les utilisateurs disposent d'un droit d'accès et de rectification des données les concernant.</p>
+
+  <h2>ARTICLE 11 – ARCHIVAGE / PREUVE</h2>
+  <p>${orgNom} archive les bons de commandes et factures au sein d'un support fiable et durable, constituant une copie fidèle, conformément aux dispositions de l'article 1348 du Code civil.</p>
+  <p>Les registres informatisés de ${orgNom} seront considérés par toutes les parties comme preuve des communications, commandes, paiements et transactions intervenus entre les parties.</p>
+
+  <h2>ARTICLE 12 – PROPRIÉTÉ INTELLECTUELLE</h2>
+  <p>Tous les produits et services offerts par ${orgNom} sont destinés à un usage privé. Tous sont la propriété intellectuelle de ${orgNom}. Toute reproduction ou diffusion totale ou partielle des produits et services proposés à des tiers est interdite, sauf en cas d'autorisation préalable écrite.</p>
+  <p>Il est interdit de supprimer les mentions de copyrights, de marque ou de toute autre mention légale sur les contenus proposés par ${orgNom}.</p>
+
+  <h2>ARTICLE 13 – DROIT APPLICABLE EN CAS DE LITIGE</h2>
+  <p>La langue du présent contrat est la langue française. Les présentes conditions de vente sont soumises à la loi française. En cas de litige, les tribunaux français seront les seuls compétents.</p>
+
+  <p style="margin-top:30px;"><strong>Pour le bénéficiaire :</strong> ${e.nom}<br/>
+  Représenté par ${e.dirigeant}</p>
+
+  <p style="margin-top:10px;"><strong>Pour l'organisme :</strong> ${orgNom}</p>
 
   ${stampsBlock(e, customFsStamp)}
 
