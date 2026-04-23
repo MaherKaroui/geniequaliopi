@@ -10883,14 +10883,25 @@ function genTestCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: Sta
  */
 export function getCFAWeekDates(f: FormationInfo): { cfaWeekNum: number; weekStart: Date; weekEnd: Date }[] {
   const rythmeStr = f.rythmeAlternance || '1 semaine CFA / 3 semaines entreprise';
-  const { cfaWeeks: cfaPerCycle, entrepriseWeeks } = parseRythmeAlternance(rythmeStr);
+  const hourBased = isHourBasedRythme(rythmeStr);
   const dayBased = isDayBasedRythme(rythmeStr);
+  const { cfaWeeks: cfaPerCycle, entrepriseWeeks } = parseRythmeAlternance(rythmeStr);
   const { totalHours } = parseDuree(f.duree);
   const effectiveTotal = totalHours > 0 ? totalHours : 420;
   const cfaDaysPerWeek = getCFADaysPerWeek(rythmeStr);
   const hoursPerCfaWeek = dayBased ? Math.max(7, cfaDaysPerWeek * 7) : 35;
-  const totalCFAWeeks = Math.max(1, Math.ceil(effectiveTotal / hoursPerCfaWeek));
-  const cycleLength = dayBased ? 1 : (cfaPerCycle + entrepriseWeeks);
+
+  // For hour-based rhythms (e.g., "910h CFA / 280h entreprise"), use CFA hours from rhythm
+  let totalCFAWeeks: number;
+  if (hourBased) {
+    const hourMatch = rythmeStr.toLowerCase().match(/(\d+)\s*h\b/i);
+    const cfaHours = hourMatch ? parseInt(hourMatch[1]) : effectiveTotal;
+    totalCFAWeeks = Math.max(1, Math.ceil(cfaHours / 35));
+  } else {
+    totalCFAWeeks = Math.max(1, Math.ceil(effectiveTotal / hoursPerCfaWeek));
+  }
+
+  const cycleLength = (dayBased || hourBased) ? 1 : (cfaPerCycle + entrepriseWeeks);
 
   const rawStartDate = f.dateDebut ? new Date(f.dateDebut.split('/').reverse().join('-')) : new Date();
   if (isNaN(rawStartDate.getTime())) rawStartDate.setTime(Date.now());
@@ -10906,8 +10917,8 @@ export function getCFAWeekDates(f: FormationInfo): { cfaWeekNum: number; weekSta
   let calendarWeek = 0;
 
   while (cfaWeekCount < totalCFAWeeks) {
-    const posInCycle = calendarWeek % cycleLength;
-    const isCFA = dayBased ? true : posInCycle < cfaPerCycle;
+    const posInCycle = calendarWeek % Math.max(1, cycleLength);
+    const isCFA = (dayBased || hourBased) ? true : posInCycle < cfaPerCycle;
 
     if (isCFA) {
       cfaWeekCount++;
@@ -10918,6 +10929,8 @@ export function getCFAWeekDates(f: FormationInfo): { cfaWeekNum: number; weekSta
       result.push({ cfaWeekNum: cfaWeekCount, weekStart, weekEnd });
     }
     calendarWeek++;
+    // Safety break to avoid infinite loops
+    if (calendarWeek > 200) break;
   }
 
   return result;
