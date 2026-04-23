@@ -2826,7 +2826,7 @@ function genTestPositionnementTrame(o: OrganismeInfo, f: FormationInfo, type: "d
 }
 
 function genTestPositionnementIndividuel(o: OrganismeInfo, f: FormationInfo, s: StagiaireInfo, si: number, type: "debut" | "fin", stagiaires?: StagiaireInfo[]) {
-  const qo = getQuestionsOuvertes(f.intitule);
+  const qo = getQuestionsOuvertes(f.intitule, f.objectifs, f.programme);
   const questions = type === "debut" ? qo.debut : qo.fin;
   const label = type === "debut" ? "début" : "fin";
   const labelCap = type === "debut" ? "Début" : "Fin";
@@ -10929,7 +10929,7 @@ function genTestCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: Sta
     extra += `<p><strong>Score QCM :</strong> ${score.score} / ${score.total} (${Math.round(score.score / score.total * 100)}%)</p>`;
   }
 
-  const questionsOuvertes = getQuestionsOuvertes(f.intitule);
+  const questionsOuvertes = getQuestionsOuvertes(f.intitule, f.objectifs, f.programme);
   const openQs = isDebut ? questionsOuvertes.debut : questionsOuvertes.fin;
   const openAnswers = termine ? generateStagiaireOpenAnswers(openQs, si, isDebut, { nom: s.nom, prenom: s.prenom, entreprise: s.entreprise, poste: s.poste }) : [];
 
