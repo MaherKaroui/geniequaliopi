@@ -10861,7 +10861,9 @@ function genTestCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: Sta
  * Returns array of { cfaWeekNum, weekStartDate } for each CFA week.
  */
 export function getCFAWeekDates(f: FormationInfo): { cfaWeekNum: number; weekStart: Date; weekEnd: Date }[] {
-  const { cfaWeeks: cfaPerCycle, entrepriseWeeks } = parseRythmeAlternance(f.rythmeAlternance || '1 semaine CFA / 3 semaines entreprise');
+  const rythmeStr = f.rythmeAlternance || '1 semaine CFA / 3 semaines entreprise';
+  const { cfaWeeks: cfaPerCycle, entrepriseWeeks } = parseRythmeAlternance(rythmeStr);
+  const dayBased = isDayBasedRythme(rythmeStr);
   const { totalHours } = parseDuree(f.duree);
   const effectiveTotal = totalHours > 0 ? totalHours : 420;
   const totalCFAWeeks = Math.max(1, Math.ceil(effectiveTotal / 35));
