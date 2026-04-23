@@ -6,7 +6,7 @@
 import JSZip from "jszip";
 import { getBahoEntreprises, FORMAT_SPHERE_ORG, type BahoEntreprise } from "./bahoData";
 import { getRIHTML, getCGVHTML, getFactureHTML } from "./bahoStaticDocs";
-import { exportToPDF } from "@/lib/pdfExport";
+import { htmlToPdfBlob } from "@/lib/pdfExport";
 import { processDocxTemplate, type ConventionTemplateData, type DevisTemplateData } from "./bahoTemplate";
 import type { JobReporter } from "@/lib/backgroundJobs";
 
@@ -126,10 +126,8 @@ export async function buildBahoZip(reporter?: JobReporter): Promise<Blob> {
     try {
       reporter?.setMessage(`${e.nom} – Facture PDF…`);
       const factureHTML = getFactureHTML(e, devisNumero);
-      const facturePdf = await exportToPDF(factureHTML, "blob");
-      if (facturePdf instanceof Blob) {
-        folder.file(`Facture_${devisNumero}_${baseName}.pdf`, facturePdf);
-      }
+      const facturePdf = await htmlToPdfBlob(factureHTML);
+      folder.file(`Facture_${devisNumero}_${baseName}.pdf`, facturePdf);
     } catch (err) {
       console.error("Facture PDF error:", err);
       folder.file(`ERREUR_Facture.txt`, `Erreur: ${(err as Error).message}`);
@@ -140,10 +138,8 @@ export async function buildBahoZip(reporter?: JobReporter): Promise<Blob> {
     try {
       reporter?.setMessage(`${e.nom} – Règlement intérieur…`);
       const riHTML = getRIHTML(e);
-      const riPdf = await exportToPDF(riHTML, "blob");
-      if (riPdf instanceof Blob) {
-        folder.file(`Reglement_interieur_${baseName}.pdf`, riPdf);
-      }
+      const riPdf = await htmlToPdfBlob(riHTML);
+      folder.file(`Reglement_interieur_${baseName}.pdf`, riPdf);
     } catch (err) {
       console.error("RI error:", err);
       folder.file(`ERREUR_RI.txt`, `Erreur: ${(err as Error).message}`);
@@ -154,10 +150,8 @@ export async function buildBahoZip(reporter?: JobReporter): Promise<Blob> {
     try {
       reporter?.setMessage(`${e.nom} – CGV…`);
       const cgvHTML = getCGVHTML(e);
-      const cgvPdf = await exportToPDF(cgvHTML, "blob");
-      if (cgvPdf instanceof Blob) {
-        folder.file(`CGV_${baseName}.pdf`, cgvPdf);
-      }
+      const cgvPdf = await htmlToPdfBlob(cgvHTML);
+      folder.file(`CGV_${baseName}.pdf`, cgvPdf);
     } catch (err) {
       console.error("CGV error:", err);
       folder.file(`ERREUR_CGV.txt`, `Erreur: ${(err as Error).message}`);
