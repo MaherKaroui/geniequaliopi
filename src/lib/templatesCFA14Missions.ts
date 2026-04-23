@@ -1278,6 +1278,22 @@ export function genQCMMissionCFA(
     answers[qi] === q.correctIndex ? "<span style='color:#0a7d3a;font-weight:600;'>✔ Correct</span>" : "<span style='color:#c0392b;'>✘ Incorrect</span>",
   ]);
 
+  // Build the questions table separately so the PDF exporter can split it row-by-row
+  // (tables wrapped inside <div class="section"> are treated as a single block and overflow,
+  //  which causes the heading to land alone on a page and rows Q8-Q10 to be clipped).
+  const questionsTableHtml = `<h2>Questionnaire et corrigé</h2>${tableHTML(["Question", "Propositions (☒ = réponse de l'apprenti·e)", "Résultat"], rows)}`;
+
+  const resultatGlobalHtml = `<h2>Résultat global</h2><div class="section"><p style="font-size:1.05em;"><strong>Score : ${score} / ${mission.questions.length}</strong> — Note : <strong>${Math.round((score / mission.questions.length) * 20)}/20</strong></p>
+    <p>Appréciation : ${score >= 8 ? "Acquis — bonne maîtrise des notions de la mission." : score >= 6 ? "Partiellement acquis — quelques notions à revoir." : "À retravailler — un point pédagogique sera proposé."}</p></div>`;
+
+  const formateurNom = (stagiaire as any).formateurAssigne || (f as any).formateur || o.dirigeant || o.nom;
+  const sigApp = (stagiaire as any).signatureUrl ? `<img src="${(stagiaire as any).signatureUrl}" alt="signature" style="max-height:60px;margin-top:6px;">` : "";
+  const sigForm = (o as any).signatureUrl ? `<img src="${(o as any).signatureUrl}" alt="signature" style="max-height:60px;margin-top:6px;">` : "";
+  const signaturesHtml = `<h2>Signatures</h2><table style="width:100%;margin-top:20px;border-collapse:collapse;"><tr>
+    <td style="width:50%;padding:12px;border:1px solid #ccc;vertical-align:top;"><strong>Apprenti·e</strong><br>${stagiaire.prenom} ${stagiaire.nom}<br>Fait le <strong>${formatDate(dateRef)}</strong>${sigApp}<br><br></td>
+    <td style="width:50%;padding:12px;border:1px solid #ccc;vertical-align:top;"><strong>Formateur·rice / Référent CFA</strong><br>${formateurNom}<br>Fait le <strong>${formatDate(dateRef)}</strong>${sigForm}<br><br></td>
+  </tr></table>`;
+
   return buildDocument({
     title: `QCM — ${mission.titre}`,
     org: o,
@@ -1297,24 +1313,8 @@ export function genQCMMissionCFA(
         heading: "Consignes",
         content: `<p>Pour chaque question, cochez la <strong>seule</strong> bonne réponse. La case ☒ correspond à la réponse retenue par l'apprenti·e ; les bonnes réponses apparaissent en vert pour la correction.</p>`,
       },
-      {
-        heading: "Résultat global",
-        content: `<p style="font-size:1.05em;"><strong>Score : ${score} / ${mission.questions.length}</strong> — Note : <strong>${Math.round((score / mission.questions.length) * 20)}/20</strong></p>
-        <p>Appréciation : ${score >= 8 ? "Acquis — bonne maîtrise des notions de la mission." : score >= 6 ? "Partiellement acquis — quelques notions à revoir." : "À retravailler — un point pédagogique sera proposé."}</p>`,
-      },
-      {
-        heading: "Signatures",
-        content: (() => {
-          const formateurNom = (stagiaire as any).formateurAssigne || (f as any).formateur || o.dirigeant || o.nom;
-          const sigApp = (stagiaire as any).signatureUrl ? `<img src="${(stagiaire as any).signatureUrl}" alt="signature" style="max-height:60px;margin-top:6px;">` : "";
-          const sigForm = (o as any).signatureUrl ? `<img src="${(o as any).signatureUrl}" alt="signature" style="max-height:60px;margin-top:6px;">` : "";
-          return `<table style="width:100%;margin-top:20px;border-collapse:collapse;"><tr>
-          <td style="width:50%;padding:12px;border:1px solid #ccc;vertical-align:top;"><strong>Apprenti·e</strong><br>${stagiaire.prenom} ${stagiaire.nom}<br>Fait le <strong>${formatDate(dateRef)}</strong>${sigApp}<br><br></td>
-          <td style="width:50%;padding:12px;border:1px solid #ccc;vertical-align:top;"><strong>Formateur·rice / Référent CFA</strong><br>${formateurNom}<br>Fait le <strong>${formatDate(dateRef)}</strong>${sigForm}<br><br></td>
-        </tr></table>`;
-        })(),
-      },
     ],
+    extraHtml: questionsTableHtml + resultatGlobalHtml + signaturesHtml,
   });
 }
 
