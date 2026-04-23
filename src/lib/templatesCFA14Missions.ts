@@ -1187,3 +1187,70 @@ export function genQCMMissionCFA(
   });
 }
 
+// ============================================================================
+// CHAPEAU 14 MISSIONS — Procédure de communication & mise en œuvre
+// ============================================================================
+export function genProcedureCommunication14MissionsCFA(o: OrganismeInfo) {
+  const annee = new Date().getFullYear();
+  return buildDocument({
+    org: o,
+    title: "PROCÉDURE — COMMUNICATION ET MISE EN ŒUVRE DES 14 MISSIONS DU CFA",
+    sections: [
+      {
+        heading: "1. Objectif de la procédure",
+        content: `<p>Cette procédure définit les modalités de communication et de mise en œuvre des 14 missions du CFA <strong>${o.nom}</strong> auprès des apprentis, des entreprises d'accueil et des formateurs.</p><p>Elle vise à garantir :</p><ul><li>La compréhension des droits et obligations de chaque partie</li><li>L'accompagnement effectif des apprentis tout au long du parcours</li><li>La conformité réglementaire au regard de l'article L6231-2 du Code du travail</li></ul>`,
+      },
+      {
+        heading: "2. Organisation de la communication",
+        content: `<p>Une campagne annuelle de communication est mise en place sur l'année ${annee} et s'appuie sur trois canaux complémentaires :</p><ul><li>Newsletters thématiques</li><li>Webinaires animés par l'équipe pédagogique et le référent CFA</li><li>Exercices pratiques de mise en situation</li></ul>`,
+      },
+      {
+        heading: "3. Newsletters",
+        content: `<p>Chaque mission est communiquée via une newsletter dédiée, envoyée aux apprentis, aux entreprises d'accueil et aux formateurs.</p><ul><li><strong>1 mission = 1 newsletter</strong></li><li><strong>14 newsletters sur l'année</strong></li><li>Diffusion : 1 envoi toutes les 3 à 4 semaines</li></ul>`,
+      },
+      {
+        heading: "4. Contenu des newsletters",
+        content: `<p>Chaque newsletter présente, de façon claire et opérationnelle :</p><ul><li>Présentation de la mission</li><li>Explication concrète et exemples</li><li>Droits et devoirs des apprentis et des entreprises</li><li>Aides disponibles (financières, sociales, pédagogiques)</li><li>Contacts utiles (référent handicap, mobilité, recrutement, social)</li></ul>`,
+        variant: "green",
+      },
+      {
+        heading: "5. Missions abordées (Art. L6231-2)",
+        content: `<ol><li>Orientation et insertion professionnelle</li><li>Recherche d'entreprise et appui au recrutement</li><li>Suivi pédagogique CFA / entreprise</li><li>Santé et sécurité au travail</li><li>Maintien en formation 6 mois (rupture de contrat)</li><li>Aides sociales et matérielles</li><li>Égalité femmes-hommes</li><li>Égalité des chances</li><li>Lutte contre les discriminations</li><li>Mobilité nationale et internationale</li><li>Formation à distance</li><li>Évaluation des compétences</li><li>Réorientation</li><li>Accès aux aides spécifiques (handicap, logement, transport)</li></ol>`,
+      },
+      {
+        heading: "6. Webinaires",
+        content: `<ul><li>1 à 2 webinaires par mois</li><li>Programmation sur l'année complète</li><li>Présentation détaillée des missions</li><li>Échanges et questions / réponses avec les participants</li></ul>`,
+      },
+      {
+        heading: "7. Exercices pratiques",
+        content: `<p>Des cas pratiques sont proposés à l'issue de chaque mission afin de :</p><ul><li>Vérifier les acquis</li><li>Mettre les apprentis en situation</li><li>Évaluer la compréhension de la mission communiquée</li></ul>`,
+      },
+      {
+        heading: "8. Accompagnement des apprentis",
+        content: `<p>Le CFA <strong>${o.nom}</strong> mobilise un réseau d'aides concrètes :</p><ul><li>Aide à la recherche d'entreprise</li><li>Aides CAF</li><li>Aide au logement</li><li>Aide au transport</li><li>Épicerie solidaire</li><li>Orientation vers les Missions locales</li></ul>`,
+      },
+      {
+        heading: "9. Handicap",
+        content: `<ul><li>Référent handicap désigné : <strong>${(o as any).referentHandicap || o.poleAdministratif || o.dirigeant}</strong></li><li>Adaptation des parcours (rythme, supports, modalités d'évaluation)</li><li>Accompagnement personnalisé en lien avec l'AGEFIPH / Cap Emploi</li></ul>`,
+      },
+      {
+        heading: "10. Suivi",
+        content: `<ul><li>Suivi des newsletters envoyées et des taux d'ouverture</li><li>Participation aux webinaires</li><li>Résultats des exercices pratiques</li><li>Fiches de suivi individuelles des apprenants</li></ul>`,
+      },
+      {
+        heading: "11. Indicateurs",
+        content: `<ul><li>Taux de participation aux webinaires</li><li>Taux de lecture des newsletters</li><li>Taux de réussite aux exercices</li><li>Taux de satisfaction global</li></ul>`,
+      },
+      {
+        heading: "12. Amélioration continue",
+        content: `<p>Les actions sont analysées chaque trimestre par le Conseil de perfectionnement afin d'améliorer le dispositif (contenu, fréquence, supports, accessibilité).</p>`,
+        variant: "green",
+      },
+      {
+        heading: "13. Validation",
+        content: `<p><strong>Responsable :</strong> ${o.dirigeant} — Direction<br><strong>Date :</strong> ${formatDate(new Date().toISOString().slice(0, 10))}<br><strong>Version :</strong> V1</p>`,
+      },
+    ],
+  });
+}
+
