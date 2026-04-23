@@ -12,8 +12,8 @@ Pour les 3 documents OPCO Mobilités groupés par session (B9 Calendrier, C11 Te
 
 **Structure ZIP** (téléchargement individuel ET export global) :
 - 1 dossier par session (nommé `Session_X_{date_debut}_au_{date_fin}`).
-- À l'intérieur : **1 PDF PAR STAGIAIRE** (suffixé `Prenom_Nom`).
-- Pour B9 et C11 : ajout d'une trame vierge par session dans le même dossier.
+- À l'intérieur : **1 PDF PAR STAGIAIRE** (suffixé `Prenom_Nom`) — y compris pour C12 (exercices).
+- Pour B9 et C11 : ajout d'une trame vierge par session dans le même dossier (C12 n'a pas de trame vierge).
 - Pour B9 : Excel calendrier consolidé multi-onglets ajouté à la racine du ZIP (téléchargement individuel) ou du sous-dossier (export global).
 
 **Téléchargement individuel** (`handleDownloadSingle`) : ZIP avec arborescence ci-dessus.
