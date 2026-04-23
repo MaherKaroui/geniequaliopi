@@ -5,7 +5,7 @@
  */
 import JSZip from "jszip";
 import { getBahoEntreprises, FORMAT_SPHERE_ORG, type BahoEntreprise } from "./bahoData";
-import { getRIHTML, getCGVHTML, getFactureHTML, getConventionHTML } from "./bahoStaticDocs";
+import { getRIHTML, getCGVHTML, getFactureHTML, getConventionHTML, getDevisHTML } from "./bahoStaticDocs";
 import { htmlToPdfBlob } from "@/lib/pdfExport";
 import { processDocxTemplate, type ConventionTemplateData, type DevisTemplateData } from "./bahoTemplate";
 import type { JobReporter } from "@/lib/backgroundJobs";
