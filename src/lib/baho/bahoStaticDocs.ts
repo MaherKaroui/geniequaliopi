@@ -550,6 +550,112 @@ export function getDevisHTML(e: BahoEntreprise, numero: string, customFsStamp?: 
   </body></html>`;
 }
 
+/** Calcule les 3 jours consécutifs de formation à partir d'une date de début (saute weekends + fériés) */
+function getThreeWorkingDays(startIso: string): string[] {
+  if (!startIso) return ["", "", ""];
+  const d = new Date(startIso);
+  if (isNaN(d.getTime())) return ["", "", ""];
+  const out: string[] = [];
+  let holidays = getFrenchHolidays(d.getUTCFullYear());
+  let safety = 0;
+  while (out.length < 3 && safety < 30) {
+    const day = d.getUTCDay();
+    const iso10 = d.toISOString().slice(0, 10);
+    if (d.getUTCFullYear() !== Number(iso10.slice(0, 4))) {
+      holidays = getFrenchHolidays(d.getUTCFullYear());
+    }
+    if (day !== 0 && day !== 6 && !holidays.has(iso10)) {
+      out.push(iso10);
+    }
+    d.setUTCDate(d.getUTCDate() + 1);
+    safety++;
+  }
+  while (out.length < 3) out.push("");
+  return out;
+}
+
+/** Feuille d'émargement individuelle par stagiaire — 3 jours × 2 demi-journées */
+export function getEmargementHTML(
+  e: BahoEntreprise,
+  stagiaire: BahoStagiaire,
+  customFsStamp?: string,
+  overrideStart?: string,
+  overrideEnd?: string
+): string {
+  const startIso = overrideStart || e.dateDebut;
+  const days = getThreeWorkingDays(startIso);
+  const civilite = (() => {
+    const prenomsM = ["Taha", "Mathis", "Roland", "Mohamed", "Ahmed", "Karim", "Said", "Hassan", "Yann", "Pierre", "Jean", "Paul", "Marc", "Luc"];
+    const isM = prenomsM.some((p) => stagiaire.prenom?.toLowerCase().startsWith(p.toLowerCase()));
+    return isM ? "M." : "Mme";
+  })();
+  const fullName = `${civilite} ${stagiaire.nom.toUpperCase()} ${stagiaire.prenom}`;
+
+  const rows = days
+    .map((iso, idx) => {
+      const dateLabel = iso ? formatDateLong(iso) : `Jour ${idx + 1}`;
+      return `
+        <tr>
+          <td rowspan="2" style="text-align:center; font-weight:bold; background:#f6f8fc;">Jour ${idx + 1}<br/><span style="font-weight:normal; font-size:10pt;">${dateLabel}</span></td>
+          <td style="text-align:center;">Matin<br/><em>09h00 – 12h30</em></td>
+          <td style="height:42px;"></td>
+          <td style="height:42px;"></td>
+        </tr>
+        <tr>
+          <td style="text-align:center;">Après-midi<br/><em>14h00 – 17h30</em></td>
+          <td style="height:42px;"></td>
+          <td style="height:42px;"></td>
+        </tr>`;
+    })
+    .join("");
+
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"/>${BASE_CSS}
+  <style>
+    .emarg-info { margin-bottom: 12px; font-size: 11pt; }
+    .emarg-table th { background: #1a3a6e; color: #fff; text-align: center; }
+    .emarg-table td { vertical-align: middle; }
+  </style>
+  </head><body>
+  ${header()}
+  <h1>FEUILLE D'ÉMARGEMENT</h1>
+  <p style="text-align:center; font-style:italic; color:#555;">Action de formation en présentiel intra-entreprise – 21 heures sur 3 jours</p>
+
+  <div class="emarg-info">
+    <p><strong>Intitulé :</strong> Structuration des pratiques opérationnelles, amélioration de l'expérience client et sécurisation des points critiques d'exploitation en établissement hôtelier et de restauration<br/>
+    <strong>Organisme :</strong> ${FORMAT_SPHERE_ORG.nom} – SIRET ${FORMAT_SPHERE_ORG.siret} – NDA ${FORMAT_SPHERE_ORG.nda}<br/>
+    <strong>Bénéficiaire (entreprise) :</strong> ${e.nom} – SIRET ${e.siret}<br/>
+    <strong>Lieu de formation :</strong> ${e.adresse}<br/>
+    <strong>Formateur :</strong> Paolo FEOLA</p>
+
+    <p><strong>Stagiaire :</strong> ${fullName}${stagiaire.emploi ? ` – ${stagiaire.emploi}` : ""}<br/>
+    <strong>Code stagiaire :</strong> ${stagiaire.codeStagiaire}<br/>
+    <strong>Période individuelle :</strong> du ${formatDateLong(days[0] || startIso)} au ${formatDateLong(days[2] || overrideEnd || e.dateFin)}</p>
+  </div>
+
+  <table class="emarg-table">
+    <thead>
+      <tr>
+        <th style="width:20%;">Date</th>
+        <th style="width:20%;">Demi-journée</th>
+        <th style="width:30%;">Signature stagiaire</th>
+        <th style="width:30%;">Signature formateur</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${rows}
+    </tbody>
+  </table>
+
+  <p style="margin-top:20px; font-size:10pt;"><em>Le stagiaire et le formateur s'engagent à signer chaque demi-journée effectivement réalisée. Toute absence ou retard doit être justifié auprès de l'organisme de formation.</em></p>
+
+  <p style="margin-top:18px;"><strong>Fait à ${e.adresse.split(" ").slice(-1)[0] || FORMAT_SPHERE_ORG.ville}, le ${formatDateLong(days[0] || startIso)}</strong></p>
+
+  ${stampsBlock(e, customFsStamp)}
+
+  ${footer()}
+  </body></html>`;
+}
+
 /** Programme de formation officiel BAHO – Format Sphere */
 export function getProgrammeHTML(e: BahoEntreprise, customFsStamp?: string): string {
   const dateProg = subtractWorkingDays(e.dateDebut, 14);
