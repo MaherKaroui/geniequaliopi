@@ -7816,10 +7816,18 @@ export function parseRythmeAlternance(rythme: string): { cfaWeeks: number; entre
   if (hourMatch) {
     const cfaHours = parseInt(hourMatch[1]);
     const entHours = parseInt(hourMatch[2]);
-    // 35h per week in CFA, assume 35h/week in entreprise too for rhythm calculation
-    const cfaWeeks = Math.max(1, Math.ceil(cfaHours / 35));
-    const entWeeks = Math.max(0, Math.ceil(entHours / 35));
-    return { cfaWeeks, entrepriseWeeks: entWeeks };
+    // Reduce to a small alternance cycle (CFA weeks / entreprise weeks per cycle)
+    // Ratio CFA:Ent in weeks (35h/sem) → simplified to small integers (max 4)
+    const ratio = entHours > 0 ? cfaHours / entHours : 0;
+    let cfaW: number, entW: number;
+    if (ratio >= 3.5) { cfaW = 4; entW = 1; }
+    else if (ratio >= 2.5) { cfaW = 3; entW = 1; }
+    else if (ratio >= 1.5) { cfaW = 2; entW = 1; }
+    else if (ratio >= 0.85) { cfaW = 1; entW = 1; }
+    else if (ratio >= 0.4) { cfaW = 1; entW = 2; }
+    else if (ratio > 0) { cfaW = 1; entW = 3; }
+    else { cfaW = 1; entW = 0; }
+    return { cfaWeeks: cfaW, entrepriseWeeks: entW };
   }
 
   const weekMatch = normalized.match(/(\d+)\s*(?:semaines?|sem)\b[^\/]*\/\s*(\d+)\s*(?:semaines?|sem)\b/i);
