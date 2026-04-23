@@ -466,7 +466,7 @@ export function getFactureHTML(e: BahoEntreprise, numero: string, customFsStamp?
 
 export function getDevisHTML(e: BahoEntreprise, numero: string, customFsStamp?: string): string {
   const nbStagiaires = e.stagiaires.length;
-  const prixUnitaire = 1400;
+  const prixUnitaire = 2000;
   const total = nbStagiaires * prixUnitaire;
   const devisDate = (() => {
     if (!e.dateConvention) return "";
