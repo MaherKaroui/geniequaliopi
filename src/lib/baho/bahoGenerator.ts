@@ -134,12 +134,20 @@ export async function buildBahoZip(reporter?: JobReporter): Promise<Blob> {
     }
     step++; reporter?.setProgress(Math.round((step / totalSteps) * 100));
 
-    // 4. Règlement intérieur PDF
+    // 4. Règlement intérieur PDF — un par stagiaire (avec tampons hôtel + FORMAT SPHERE)
     try {
-      reporter?.setMessage(`${e.nom} – Règlement intérieur…`);
-      const riHTML = getRIHTML(e);
-      const riPdf = await htmlToPdfBlob(riHTML);
-      folder.file(`Reglement_interieur_${baseName}.pdf`, riPdf);
+      reporter?.setMessage(`${e.nom} – Règlements intérieurs (${e.stagiaires.length})…`);
+      const riFolder = folder.folder("Reglements_interieurs")!;
+      for (const s of e.stagiaires) {
+        const riHTML = getRIHTML(e, s);
+        const riPdf = await htmlToPdfBlob(riHTML);
+        const stgName = `${safeName(s.prenom)}_${safeName(s.nom)}_${s.codeStagiaire}`;
+        riFolder.file(`RI_${stgName}.pdf`, riPdf);
+      }
+      // Aussi un RI "entreprise" générique (sans stagiaire) pour archive
+      const riEntHTML = getRIHTML(e);
+      const riEntPdf = await htmlToPdfBlob(riEntHTML);
+      folder.file(`Reglement_interieur_${baseName}_entreprise.pdf`, riEntPdf);
     } catch (err) {
       console.error("RI error:", err);
       folder.file(`ERREUR_RI.txt`, `Erreur: ${(err as Error).message}`);
