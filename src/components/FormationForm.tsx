@@ -69,13 +69,14 @@ const FormationForm = ({ data, onChange, onImportStagiaires }: FormationFormProp
       onChange({ ...f });
       toast.success("✅ Formation générée — génération des QCM, exercices et veilles…", { id: t });
 
-      // Génère en parallèle : pack QCM/exercices ET pack veilles, tous cohérents avec la formation
+      // Génère en parallèle : pack QCM/exercices ET pack veilles, tous cohérents avec la formation.
+      // ⚠️ On NE supprime PAS les veilles existantes : si un pack veilles est déjà mis en cache
+      // (localStorage) pour cette formation, on le conserve tel quel.
       try {
         clearCachedPack(f);
-        clearCachedVeillePack(f);
         const [evalRes, veilleRes] = await Promise.allSettled([
           generateAIEvalPack(f, true),
-          generateAIVeillePack(f, true),
+          generateAIVeillePack(f, false), // false = réutilise le cache si présent
         ]);
         const evalOk = evalRes.status === "fulfilled";
         const veilleOk = veilleRes.status === "fulfilled";

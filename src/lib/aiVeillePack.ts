@@ -25,9 +25,23 @@ function cacheKey(f: FormationInfo): string {
   return CACHE_PREFIX + sig;
 }
 
+// Persistance : localStorage (survit à la fermeture d'onglet) avec fallback sessionStorage.
+function readRaw(key: string): string | null {
+  try {
+    const v = localStorage.getItem(key);
+    if (v) return v;
+  } catch { /* ignore */ }
+  try { return sessionStorage.getItem(key); } catch { return null; }
+}
+
+function writeRaw(key: string, value: string): void {
+  try { localStorage.setItem(key, value); return; } catch { /* quota: fallback */ }
+  try { sessionStorage.setItem(key, value); } catch { /* ignore */ }
+}
+
 export function getCachedVeillePack(f: FormationInfo): AIVeillePack | null {
   try {
-    const raw = sessionStorage.getItem(cacheKey(f));
+    const raw = readRaw(cacheKey(f));
     if (!raw) return null;
     return JSON.parse(raw) as AIVeillePack;
   } catch {
@@ -36,19 +50,12 @@ export function getCachedVeillePack(f: FormationInfo): AIVeillePack | null {
 }
 
 export function setCachedVeillePack(f: FormationInfo, pack: AIVeillePack): void {
-  try {
-    sessionStorage.setItem(cacheKey(f), JSON.stringify(pack));
-  } catch {
-    /* quota: ignore */
-  }
+  writeRaw(cacheKey(f), JSON.stringify(pack));
 }
 
 export function clearCachedVeillePack(f: FormationInfo): void {
-  try {
-    sessionStorage.removeItem(cacheKey(f));
-  } catch {
-    /* ignore */
-  }
+  try { localStorage.removeItem(cacheKey(f)); } catch { /* ignore */ }
+  try { sessionStorage.removeItem(cacheKey(f)); } catch { /* ignore */ }
 }
 
 export async function generateAIVeillePack(f: FormationInfo, force = false): Promise<AIVeillePack> {
