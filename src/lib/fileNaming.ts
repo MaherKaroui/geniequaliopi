@@ -140,6 +140,7 @@ export function getPreferredExtension(template: string, exportFormat: ExportForm
   if (template === "suivi_chiffre_formation_excel") return ".xlsx";
   if (template === "tableau_suivi_parcours_beneficiaires_cfa_excel") return ".xlsx";
   if (template === "calendrier_annuel_cfa") return ".xlsx";
+  if (template === "tableau_suivi_parcours_excel") return ".xlsx";
   if (EXCEL_TEMPLATES.has(template)) return ".xls";
   if (MAIL_DOCX_TEMPLATES.has(template)) return ".docx";
   return exportFormat === "pdf" ? ".pdf" : ".doc";
