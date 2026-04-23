@@ -683,6 +683,14 @@ export function buildFullCatalog(
     });
     add("cfa_c3i12_suivi_public_excel", "CT3 - IND 12 SUIVI DU PUBLIC ET DU BÉNÉFICIAIRE (Excel)", 3, 12, "suivi_public_beneficiaire_excel");
     add("cfa_c3i12_suivi_pfmp_excel", "CT3 - IND 12 TABLEAU DE SUIVI PFMP (Excel)", 3, 12, "suivi_pfmp_excel");
+    // Ressources PERFORMER SCHOOL (alignement ZIP de référence)
+    add("cfa_c3i12_cesdh", "CT3 - IND 12 📁 RESSOURCES – Convention européenne des droits de l'homme (CESDH)", 3, 12, "pdf_static", { pdfUrl: "/pdfs/cesdh.pdf" });
+    add("cfa_c3i12_guide_utilisateur_extranet", "CT3 - IND 12 📁 RESSOURCES – Guide utilisateur Extranet", 3, 12, "pdf_static", { pdfUrl: "/pdfs/guide_utilisateur_extranet.pdf" });
+    add("cfa_c3i12_precis_apprentissage", "CT3 - IND 12 📁 RESSOURCES – Précis de l'apprentissage", 3, 12, "pdf_static", { pdfUrl: "/pdfs/precis_apprentissage.pdf" });
+    add("cfa_c3i12_livret_accompagnez_alternants", "CT3 - IND 12 📁 RESSOURCES – Livret Accompagnez vos alternants", 3, 12, "pdf_static", { pdfUrl: "/pdfs/livret_accompagnez_alternants.pdf" });
+    add("cfa_c3i12_permis_b", "CT3 - IND 12 📁 RESSOURCES – Aide au permis B", 3, 12, "pdf_static", { pdfUrl: "/pdfs/permis_b.pdf" });
+    add("cfa_c3i12_procedure_rupture_reorientation_echecs", "CT3 - IND 12 📁 GESTION ABANDON – Procédure rupture, réorientation et échecs", 3, 12, "pdf_static", { pdfUrl: "/pdfs/procedure_rupture_reorientation_echecs.docx", folder: "Gestion_Abandon" });
+    add("cfa_c3i12_feuille_emargement_gestion_abandon", "CT3 - IND 12 📁 GESTION ABANDON – Feuille d'émargement (suivi abandon)", 3, 12, "pdf_static", { pdfUrl: "/pdfs/feuille_emargement_gestion_abandon.docx", folder: "Gestion_Abandon" });
 
     // ===== IND 12 — DOCUMENTS OFFICIELS MINISTÈRE (Évaluation) =====
     stagiaires.forEach((s, si) => {
