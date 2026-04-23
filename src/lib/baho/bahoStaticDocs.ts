@@ -117,7 +117,111 @@ export function getRIHTML(e: BahoEntreprise, stagiaire?: BahoStagiaire, customFs
   </body></html>`;
 }
 
-export function getCGVHTML(e: BahoEntreprise): string {
+/** Build a stamps signature block (FORMAT SPHERE + hotel) used in all PDFs */
+function stampsBlock(e: BahoEntreprise, customFsStamp?: string): string {
+  const hotelStamp = svgToDataUri(getHotelStampSvg(e));
+  const fsStamp = customFsStamp || svgToDataUri(getFormatSphereStampSvg());
+  return `
+  <table style="margin-top:25px; border:none; width:100%;">
+    <tr style="border:none;">
+      <td style="border:none; width:50%; text-align:center; vertical-align:top;">
+        <strong>Pour l'organisme de formation</strong><br/>
+        ${FORMAT_SPHERE_ORG.dirigeant}<br/>
+        <em>${FORMAT_SPHERE_ORG.nom}</em><br/>
+        <img src="${fsStamp}" alt="Tampon FORMAT SPHERE" style="width:150px; height:150px; margin-top:8px;"/>
+      </td>
+      <td style="border:none; width:50%; text-align:center; vertical-align:top;">
+        <strong>Pour l'entreprise bénéficiaire</strong><br/>
+        ${e.dirigeant}<br/>
+        <em>${e.nom}</em><br/>
+        <img src="${hotelStamp}" alt="Tampon hôtel" style="width:150px; height:150px; margin-top:8px;"/>
+      </td>
+    </tr>
+  </table>`;
+}
+
+/** Convention de formation per hotel — includes Article 3 - Participants (all stagiaires) + tampons */
+export function getConventionHTML(e: BahoEntreprise, customFsStamp?: string): string {
+  const civiliteForStg = (s: BahoStagiaire) => {
+    // Default to "Mme" unless prenom looks masculine — keep it simple, follow screenshot style
+    const prenomsM = ["Taha", "Mathis", "Roland", "Mohamed", "Ahmed", "Karim", "Said", "Hassan", "Yann", "Pierre", "Jean", "Paul", "Marc", "Luc"];
+    const isM = prenomsM.some((p) => s.prenom?.toLowerCase().startsWith(p.toLowerCase()));
+    return isM ? "M." : "Mme";
+  };
+
+  const participantsList = e.stagiaires
+    .map((s) => `<li><strong>${civiliteForStg(s)} ${s.nom.toUpperCase()} ${s.prenom}</strong>${s.emploi ? ` – ${s.emploi}` : ""}</li>`)
+    .join("");
+
+  const nbHeures = 14; // AFEST hôtellerie standard
+  const prixUnit = 1400;
+  const totalHt = e.stagiaires.length * prixUnit;
+
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"/>${BASE_CSS}
+  <style>
+    ul.participants { margin: 12px 0 12px 24px; padding: 0; list-style: disc; }
+    ul.participants li { margin: 8px 0; font-size: 11pt; }
+    .article-title { font-weight: bold; font-size: 14pt; margin-top: 18px; color: #1a3a6e; }
+  </style>
+  </head><body>
+  ${header()}
+  <h1>Convention de formation professionnelle</h1>
+  <p style="font-size:10pt; color:#555;">Articles L.6353-1 et L.6353-2 du Code du travail</p>
+
+  <p><strong>Entre les soussignés :</strong></p>
+  <p><strong>${FORMAT_SPHERE_ORG.nom}</strong>, organisme de formation<br/>
+  ${FORMAT_SPHERE_ORG.adresse}, ${FORMAT_SPHERE_ORG.codePostal} ${FORMAT_SPHERE_ORG.ville}<br/>
+  SIRET ${FORMAT_SPHERE_ORG.siret} – NDA ${FORMAT_SPHERE_ORG.nda}<br/>
+  Représenté par ${FORMAT_SPHERE_ORG.dirigeant}, dirigeant<br/>
+  Ci-après désigné « l'Organisme »</p>
+
+  <p><strong>Et</strong></p>
+  <p><strong>${e.nom}</strong><br/>
+  ${e.adresse}<br/>
+  SIRET ${e.siret}<br/>
+  Représenté par ${e.dirigeant}<br/>
+  Ci-après désigné « le Bénéficiaire »</p>
+
+  <p class="article-title">Article 1 – Objet</p>
+  <p>L'Organisme s'engage à organiser une Action de Formation En Situation de Travail (AFEST) intitulée :<br/>
+  « <strong>Hygiène, sécurité et qualité de service en hôtellerie</strong> »</p>
+
+  <p class="article-title">Article 2 – Modalités</p>
+  <p><strong>Dates :</strong> du ${formatDateLong(e.dateDebut)} au ${formatDateLong(e.dateFin)}<br/>
+  <strong>Durée :</strong> ${nbHeures} heures<br/>
+  <strong>Lieu :</strong> ${e.adresse}<br/>
+  <strong>Modalité :</strong> AFEST – Action de Formation En Situation de Travail</p>
+
+  <p class="article-title">Article 3 – Participants</p>
+  <ul class="participants">
+    ${participantsList}
+  </ul>
+
+  <p class="article-title">Article 4 – Tarif et financement</p>
+  <p><strong>Prix unitaire HT :</strong> ${prixUnit.toLocaleString("fr-FR")} € par stagiaire<br/>
+  <strong>Nombre de stagiaires :</strong> ${e.stagiaires.length}<br/>
+  <strong>Total HT :</strong> ${totalHt.toLocaleString("fr-FR")} €<br/>
+  TVA non applicable, art. 261-4-4° a du CGI<br/>
+  <strong>Total TTC :</strong> ${totalHt.toLocaleString("fr-FR")} €</p>
+
+  <p class="article-title">Article 5 – Modalités de règlement</p>
+  <p>Règlement à 30 jours date de facture, par virement bancaire à réception de la facture émise à l'issue de la formation.</p>
+
+  <p class="article-title">Article 6 – Dédit ou abandon</p>
+  <p>En cas d'annulation par le Bénéficiaire moins de 14 jours avant le début de la formation, 50 % du montant total sera dû à titre de dédit. En cas d'absence du stagiaire, l'intégralité du coût pédagogique reste due.</p>
+
+  <p class="article-title">Article 7 – Différends éventuels</p>
+  <p>Si une contestation ou un différend ne peuvent être réglés à l'amiable, le Tribunal compétent du ressort du siège social de l'Organisme sera seul compétent.</p>
+
+  <p style="margin-top:25px;">Fait à ${e.adresse.split(" ").slice(-1)[0] || FORMAT_SPHERE_ORG.ville}, en double exemplaire, le ${formatDateLong(e.dateConvention)}</p>
+
+  ${stampsBlock(e, customFsStamp)}
+
+  ${footer()}
+  </body></html>`;
+}
+
+export function getCGVHTML(e: BahoEntreprise, customFsStamp?: string): string {
   return `<!DOCTYPE html><html><head><meta charset="utf-8"/>${BASE_CSS}</head><body>
   ${header()}
   <h1>Conditions Générales de Vente</h1>
