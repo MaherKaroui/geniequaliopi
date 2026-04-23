@@ -3942,8 +3942,8 @@ function genCompetencesAlternance(o: OrganismeInfo, f: FormationInfo, stagiaires
   if (!s) {
     return buildDocument({ org: o, title: "GRILLE DE COMPÉTENCES ALTERNANCE", subtitle: f.intitule, sections: [{ heading: "Aucun apprenti", content: "<p>Aucun apprenti renseigné.</p>" }] });
   }
-  const dateDebut = getStagiaireDateDebut(s, f);
-  const dateFin = getStagiaireDateFin(s, f);
+  const dateDebut = new Date(getStagiaireDateDebut(s, f));
+  const dateFin = new Date(getStagiaireDateFin(s, f));
   const today = new Date();
   const progress = Math.min(1, Math.max(0, (today.getTime() - dateDebut.getTime()) / Math.max(1, dateFin.getTime() - dateDebut.getTime())));
   const niveau = (seuil: number) => progress >= seuil ? ["X", "Maîtrisé"] : progress >= seuil - 0.2 ? ["X", "Acquis"] : ["—", "En cours"];
@@ -3953,7 +3953,7 @@ function genCompetencesAlternance(o: OrganismeInfo, f: FormationInfo, stagiaires
     title: "GRILLE DE COMPÉTENCES ALTERNANCE",
     subtitle: `${s.prenom} ${s.nom} – ${f.intitule}`,
     sections: [
-      { heading: "Apprenti(e)", content: `<p><strong>Nom :</strong> ${s.prenom} ${s.nom}<br><strong>Entreprise :</strong> ${(s as any).entreprise || "________________________"}<br><strong>Période :</strong> du ${formatDate(dateDebut)} au ${formatDate(dateFin)}</p>` },
+      { heading: "Apprenti(e)", content: `<p><strong>Nom :</strong> ${s.prenom} ${s.nom}<br><strong>Entreprise :</strong> ${(s as any).entreprise || "________________________"}<br><strong>Période :</strong> du ${formatDate(dateDebut.toISOString())} au ${formatDate(dateFin.toISOString())}</p>` },
     ],
     table: {
       headers: ["Compétence", "CFA", "Entreprise", "Acquis", "Niveau"],
