@@ -5,7 +5,7 @@
  */
 import JSZip from "jszip";
 import { getBahoEntreprises, FORMAT_SPHERE_ORG, type BahoEntreprise } from "./bahoData";
-import { getRIHTML, getCGVHTML, getFactureHTML, getConventionHTML, getDevisHTML, getProgrammeHTML, getEmargementHTML } from "./bahoStaticDocs";
+import { getRIHTML, getCGVHTML, getFactureHTML, getConventionHTML, getDevisHTML, getProgrammeHTML } from "./bahoStaticDocs";
 import { htmlToPdfBlob } from "@/lib/pdfExport";
 import type { JobReporter } from "@/lib/backgroundJobs";
 
@@ -17,8 +17,7 @@ function safeName(s: string): string {
 export async function buildBahoZip(reporter?: JobReporter, customFsStamp?: string): Promise<Blob> {
   const zip = new JSZip();
   const entreprises = getBahoEntreprises();
-  const totalEmargements = entreprises.reduce((acc, e) => acc + e.stagiaires.length, 0);
-  const totalSteps = entreprises.length * 6 + totalEmargements; // 6 docs entreprise + 1 émargement par stagiaire
+  const totalSteps = entreprises.length * 6; // 6 docs par entreprise
   let step = 0;
 
   reporter?.setMessage(`Génération de ${entreprises.length} dossiers BAHO…`);
@@ -42,7 +41,6 @@ export async function buildBahoZip(reporter?: JobReporter, customFsStamp?: strin
     " - Facture (PDF tamponnée)",
     " - Règlement intérieur (PDF tamponné)",
     " - CGV (PDF tamponnée)",
-    " - Une feuille d'émargement INDIVIDUELLE par stagiaire (3 jours × 2 demi-journées)",
     "",
     "Liste :",
     ...entreprises.map((e, i) => ` ${i + 1}. ${e.nom} – ${e.siret} (${e.stagiaires.length} stagiaires)`),
@@ -81,7 +79,7 @@ export async function buildBahoZip(reporter?: JobReporter, customFsStamp?: strin
     }
     step++; reporter?.setProgress(Math.round((step / totalSteps) * 100));
 
-    // 2. Devis PDF tamponné
+    // 3. Devis PDF tamponné
     try {
       reporter?.setMessage(`${e.nom} – Devis PDF tamponné…`);
       const devisHtml = getDevisHTML(e, devisNumero, customFsStamp);
@@ -93,7 +91,7 @@ export async function buildBahoZip(reporter?: JobReporter, customFsStamp?: strin
     }
     step++; reporter?.setProgress(Math.round((step / totalSteps) * 100));
 
-    // 3. Facture PDF (tamponnée)
+    // 4. Facture PDF (tamponnée)
     try {
       reporter?.setMessage(`${e.nom} – Facture PDF…`);
       const factureHTML = getFactureHTML(e, devisNumero, customFsStamp);
@@ -105,7 +103,7 @@ export async function buildBahoZip(reporter?: JobReporter, customFsStamp?: strin
     }
     step++; reporter?.setProgress(Math.round((step / totalSteps) * 100));
 
-    // 4. Règlement intérieur PDF — un seul par hôtel (tamponné)
+    // 5. Règlement intérieur PDF — un seul par hôtel (tamponné)
     try {
       reporter?.setMessage(`${e.nom} – Règlement intérieur…`);
       const riHTML = getRIHTML(e, undefined, customFsStamp);
@@ -117,7 +115,7 @@ export async function buildBahoZip(reporter?: JobReporter, customFsStamp?: strin
     }
     step++; reporter?.setProgress(Math.round((step / totalSteps) * 100));
 
-    // 5. CGV PDF (tamponnée)
+    // 6. CGV PDF (tamponnée)
     try {
       reporter?.setMessage(`${e.nom} – CGV…`);
       const cgvHTML = getCGVHTML(e, customFsStamp);
@@ -128,23 +126,6 @@ export async function buildBahoZip(reporter?: JobReporter, customFsStamp?: strin
       folder.file(`ERREUR_CGV.txt`, `Erreur: ${(err as Error).message}`);
     }
     step++; reporter?.setProgress(Math.round((step / totalSteps) * 100));
-
-    // 6. Feuilles d'émargement INDIVIDUELLES — une par stagiaire (priorité au stagiaire)
-    const emargFolder = folder.folder("Emargements")!;
-    for (let s = 0; s < e.stagiaires.length; s++) {
-      const stg = e.stagiaires[s];
-      try {
-        reporter?.setMessage(`${e.nom} – Émargement ${stg.prenom} ${stg.nom}…`);
-        const emargHtml = getEmargementHTML(e, stg, customFsStamp);
-        const emargPdf = await htmlToPdfBlob(emargHtml);
-        const stgName = safeName(`${stg.nom}_${stg.prenom}`);
-        emargFolder.file(`Emargement_${stgName}_${stg.codeStagiaire}.pdf`, emargPdf);
-      } catch (err) {
-        console.error("Emargement error:", err);
-        emargFolder.file(`ERREUR_Emargement_${safeName(stg.nom)}.txt`, `Erreur: ${(err as Error).message}`);
-      }
-      step++; reporter?.setProgress(Math.round((step / totalSteps) * 100));
-    }
 
     // Allow GC between entreprises
     if (i % 2 === 1) await new Promise((r) => setTimeout(r, 30));
