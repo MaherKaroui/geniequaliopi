@@ -1,56 +1,16 @@
 /**
  * BAHO - Génération du ZIP global
  * Pour chaque entreprise (groupe par SIRET) : Convention, Devis, Facture, Règlement intérieur, CGV
- * Format : DOCX (templates remplis) + PDF
+ * Format : PDF tamponnés uniquement
  */
 import JSZip from "jszip";
 import { getBahoEntreprises, FORMAT_SPHERE_ORG, type BahoEntreprise } from "./bahoData";
 import { getRIHTML, getCGVHTML, getFactureHTML, getConventionHTML, getDevisHTML } from "./bahoStaticDocs";
 import { htmlToPdfBlob } from "@/lib/pdfExport";
-import { processDocxTemplate, type ConventionTemplateData, type DevisTemplateData } from "./bahoTemplate";
 import type { JobReporter } from "@/lib/backgroundJobs";
 
 function safeName(s: string): string {
   return s.replace(/[^\w\-]+/g, "_").replace(/_+/g, "_").replace(/^_|_$/g, "").slice(0, 80);
-}
-
-function formatDateLong(iso: string): string {
-  if (!iso) return "";
-  const d = new Date(iso);
-  if (isNaN(d.getTime())) return iso;
-  return d.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
-}
-
-function buildConventionData(e: BahoEntreprise): ConventionTemplateData {
-  return {
-    nom_entreprise: e.nom,
-    siretEntreprise: e.siret,
-    adresse_entreprise: e.adresse,
-    directriceEntreprise: e.dirigeant,
-    datedebut: formatDateLong(e.dateDebut),
-    datedefin: formatDateLong(e.dateFin),
-    dateConvention: formatDateLong(e.dateConvention),
-  };
-}
-
-function buildDevisData(e: BahoEntreprise, devisNumero: string): DevisTemplateData {
-  const stagiairesNames = e.stagiaires
-    .map((s) => `${s.nom} ${s.prenom}`)
-    .join(", ");
-  return {
-    numero: devisNumero,
-    nomEntreprise: e.nom,
-    adresseEntreprise: e.adresse,
-    siret: e.siret,
-    mailEntreprise: e.email,
-    date_debut: formatDateLong(e.dateDebut),
-    date_fin: formatDateLong(e.dateFin),
-    date_facture: formatDateLong(e.dateConvention),
-    nom: stagiairesNames,
-    prenom: "",
-    directeur: e.dirigeant,
-    adresse: e.adresse,
-  };
 }
 
 /** Build full BAHO ZIP and return as Blob */
