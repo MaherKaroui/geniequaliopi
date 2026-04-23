@@ -59,7 +59,7 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { intitule, objectifs, programme, publicVise, codeRNCP } = await req.json();
+    const { intitule, objectifs, programme, publicVise, codeRNCP, dateDebut, dateFin } = await req.json();
     if (!intitule) {
       return new Response(JSON.stringify({ error: "intitule requis" }), {
         status: 400,
@@ -70,9 +70,16 @@ Deno.serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY non configurée");
 
+    // Année N = année de début de formation (ou année courante par défaut), N+1 = année suivante
+    const refDate = dateDebut ? new Date(dateDebut) : (dateFin ? new Date(dateFin) : new Date());
+    const anneeN = isNaN(refDate.getTime()) ? new Date().getFullYear() : refDate.getFullYear();
+    const anneeN1 = anneeN + 1;
+    const SYSTEM_PROMPT = buildSystemPrompt(anneeN, anneeN1);
+
     const userPrompt = `Formation : « ${intitule} »
-${codeRNCP ? `Certification : ${codeRNCP}\n` : ""}${objectifs ? `Objectifs : ${objectifs}\n` : ""}${publicVise ? `Public : ${publicVise}\n` : ""}${programme ? `Programme (extrait) : ${String(programme).slice(0, 1500)}\n` : ""}
-Génère les 3 tableaux de veille (6 lignes chacun) parfaitement cohérents avec ce métier précis.`;
+${codeRNCP ? `Certification : ${codeRNCP}\n` : ""}${objectifs ? `Objectifs : ${objectifs}\n` : ""}${publicVise ? `Public : ${publicVise}\n` : ""}${dateDebut ? `Période : du ${dateDebut} au ${dateFin || "(en cours)"}\n` : ""}${programme ? `Programme (extrait) : ${String(programme).slice(0, 1500)}\n` : ""}
+Contexte : audit de surveillance Qualiopi sur les années ${anneeN} et ${anneeN1}.
+Génère les 3 tableaux de veille (6 lignes chacun) parfaitement cohérents avec ce métier précis, avec dates UNIQUEMENT en ${anneeN} ou ${anneeN1}, en intégrant forums, événements/salons, articles de presse, blogs, chaînes YouTube et ressources IA appliquées au métier.`;
 
     const aiResp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
