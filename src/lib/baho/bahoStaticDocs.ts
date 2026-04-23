@@ -105,8 +105,7 @@ function footer(): string {
   return `
   <div class="footer">
     <strong>${FORMAT_SPHERE_ORG.nom}</strong> – ${FORMAT_SPHERE_ORG.adresse}, ${FORMAT_SPHERE_ORG.codePostal} ${FORMAT_SPHERE_ORG.ville}<br/>
-    SIRET ${FORMAT_SPHERE_ORG.siret} – Déclaration d'activité enregistrée sous le n° ${FORMAT_SPHERE_ORG.nda} auprès du Préfet de région Île-de-France<br/>
-    Version 1.0 – ${formatDateLong(new Date().toISOString())}
+    SIRET ${FORMAT_SPHERE_ORG.siret} – Déclaration d'activité enregistrée sous le n° ${FORMAT_SPHERE_ORG.nda} auprès du Préfet de région Île-de-France
   </div>`;
 }
 
