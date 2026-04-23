@@ -15,6 +15,17 @@ import { toast } from "sonner";
 import DocStyleConfigPanel from "./DocStyleConfigPanel";
 import { downloadAsWord, htmlToWordBlob } from "@/lib/wordExport";
 import { generateExcelTableauBordPerformance, generateExcelTableauSuiviParcours, generateExcelIndicateursPrevisionnelsVAE, excelToBlob } from "@/lib/xlsxGenerator";
+import { htmlToXlsxBlob } from "@/lib/htmlToXlsx";
+
+// Templates qui doivent être téléchargés en VRAI fichier .xlsx (et non en .xls HTML déguisé)
+// La sortie HTML générée par leurs générateurs respectifs est convertie via SheetJS.
+const REAL_XLSX_TEMPLATES = new Set<string>([
+  "decoupage_formation_cfa_excel",
+  "matrice_competences_excel",
+  "suivi_chiffre_formation_excel",
+  "tableau_suivi_parcours_beneficiaires_cfa_excel",
+  "calendrier_annuel_cfa",
+]);
 import { downloadAsPdf, htmlToPdfBlob } from "@/lib/pdfExport";
 import { processDocxTemplate, processMailDocxTemplate, DOCX_TEMPLATE_FILES, MAIL_TEMPLATE_FILES } from "@/lib/docxTemplateExport";
 import { genCerfaApprentissagePdf } from "@/lib/cerfaApprentissage";
@@ -418,9 +429,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
       || doc.template === "relances_appreciations_excel"
       || doc.template === "indicateurs_performance"
       || doc.template === "vae_indicateurs_previsionnels"
-      || doc.template === "decoupage_formation_cfa_excel"
-      || doc.template === "matrice_competences_excel"
-      || doc.template === "suivi_chiffre_formation_excel"
+      || REAL_XLSX_TEMPLATES.has(doc.template)
     ) {
       let excelContent: string;
       if (doc.template === "tableau_suivi_parcours_excel") {
@@ -432,7 +441,11 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
       } else {
         excelContent = generateContent(doc);
       }
-      saveAs(excelToBlob(excelContent), buildCatalogFileName(doc, getDocStagiaire(doc), ".xls"));
+      if (REAL_XLSX_TEMPLATES.has(doc.template)) {
+        saveAs(htmlToXlsxBlob(excelContent), buildCatalogFileName(doc, getDocStagiaire(doc), ".xlsx"));
+      } else {
+        saveAs(excelToBlob(excelContent), buildCatalogFileName(doc, getDocStagiaire(doc), ".xls"));
+      }
       return;
     }
 
@@ -665,9 +678,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
             || doc.template === "suivi_dysfonctionnements_excel"
             || doc.template === "relances_appreciations_excel"
             || doc.template === "vae_indicateurs_previsionnels"
-            || doc.template === "decoupage_formation_cfa_excel"
-            || doc.template === "matrice_competences_excel"
-            || doc.template === "suivi_chiffre_formation_excel"
+            || REAL_XLSX_TEMPLATES.has(doc.template)
           ) {
             await safeRun(`${doc.nom} (${stagiaire.nom})`, async () => {
               const excelContent = doc.template === "indicateurs_performance"
@@ -677,7 +688,11 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
                   : doc.template === "vae_indicateurs_previsionnels"
                     ? generateExcelIndicateursPrevisionnelsVAE(mergedOrganisme, selectedFormation)
                     : generateContent(doc);
-              addFileToZip(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, ".xls")}`, excelToBlob(excelContent));
+              if (REAL_XLSX_TEMPLATES.has(doc.template)) {
+                addFileToZip(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, ".xlsx")}`, htmlToXlsxBlob(excelContent));
+              } else {
+                addFileToZip(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, ".xls")}`, excelToBlob(excelContent));
+              }
             });
           } else {
             await safeRun(`${doc.nom} (${stagiaire.nom})`, async () => {
@@ -747,9 +762,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
           || doc.template === "suivi_dysfonctionnements_excel"
           || doc.template === "relances_appreciations_excel"
           || doc.template === "vae_indicateurs_previsionnels"
-          || doc.template === "decoupage_formation_cfa_excel"
-      || doc.template === "matrice_competences_excel"
-      || doc.template === "suivi_chiffre_formation_excel"
+          || REAL_XLSX_TEMPLATES.has(doc.template)
         ) {
           await safeRun(doc.nom, async () => {
             const excelContent = doc.template === "indicateurs_performance"
@@ -759,7 +772,11 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
                 : doc.template === "vae_indicateurs_previsionnels"
                   ? generateExcelIndicateursPrevisionnelsVAE(mergedOrganisme, selectedFormation)
                   : generateContent(doc);
-            addFileToZip(`${basePath}/${buildCatalogFileName(doc, null, ".xls")}`, excelToBlob(excelContent));
+            if (REAL_XLSX_TEMPLATES.has(doc.template)) {
+              addFileToZip(`${basePath}/${buildCatalogFileName(doc, null, ".xlsx")}`, htmlToXlsxBlob(excelContent));
+            } else {
+              addFileToZip(`${basePath}/${buildCatalogFileName(doc, null, ".xls")}`, excelToBlob(excelContent));
+            }
           });
         } else {
           await safeRun(doc.nom, async () => {
@@ -849,7 +866,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
           if (doc.template === "pdf_static" && getStaticFileUrl(doc)) {
             const resp = await fetch(getStaticFileUrl(doc)!);
             zip.file(`${stagFolder}/${buildCatalogFileName(doc, stagiaire)}`, await resp.blob());
-          } else if (["indicateurs_performance", "tableau_suivi_parcours_excel", "plan_dev_competences_excel", "tableau_amelioration_continue_excel", "suivi_dysfonctionnements_excel", "relances_appreciations_excel", "vae_indicateurs_previsionnels"].includes(doc.template)) {
+          } else if (["indicateurs_performance", "tableau_suivi_parcours_excel", "plan_dev_competences_excel", "tableau_amelioration_continue_excel", "suivi_dysfonctionnements_excel", "relances_appreciations_excel", "vae_indicateurs_previsionnels"].includes(doc.template) || REAL_XLSX_TEMPLATES.has(doc.template)) {
             const excelContent = doc.template === "indicateurs_performance"
               ? generateExcelTableauBordPerformance(mergedOrganisme, selectedFormation, allStagiaires)
               : doc.template === "tableau_suivi_parcours_excel"
@@ -857,7 +874,11 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
                 : doc.template === "vae_indicateurs_previsionnels"
                   ? generateExcelIndicateursPrevisionnelsVAE(mergedOrganisme, selectedFormation)
                   : generateContent(doc);
-            zip.file(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, ".xls")}`, excelToBlob(excelContent));
+            if (REAL_XLSX_TEMPLATES.has(doc.template)) {
+              zip.file(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, ".xlsx")}`, htmlToXlsxBlob(excelContent));
+            } else {
+              zip.file(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, ".xls")}`, excelToBlob(excelContent));
+            }
           } else {
             const content = generateContent(doc);
             if (exportFormat === "pdf") {
@@ -976,7 +997,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
           if (doc.template === "pdf_static" && getStaticFileUrl(doc)) {
             const resp = await fetch(getStaticFileUrl(doc)!);
             zip.file(`${stagFolder}/${buildCatalogFileName(doc, stagiaire)}`, await resp.blob());
-          } else if (["indicateurs_performance", "tableau_suivi_parcours_excel", "plan_dev_competences_excel", "tableau_amelioration_continue_excel", "suivi_dysfonctionnements_excel", "relances_appreciations_excel", "vae_indicateurs_previsionnels", "decoupage_formation_cfa_excel", "matrice_competences_excel", "suivi_chiffre_formation_excel"].includes(doc.template)) {
+          } else if (["indicateurs_performance", "tableau_suivi_parcours_excel", "plan_dev_competences_excel", "tableau_amelioration_continue_excel", "suivi_dysfonctionnements_excel", "relances_appreciations_excel", "vae_indicateurs_previsionnels"].includes(doc.template) || REAL_XLSX_TEMPLATES.has(doc.template)) {
             const excelContent = doc.template === "indicateurs_performance"
               ? generateExcelTableauBordPerformance(mergedOrganisme, selectedFormation, allStagiaires)
               : doc.template === "tableau_suivi_parcours_excel"
@@ -984,7 +1005,11 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
                 : doc.template === "vae_indicateurs_previsionnels"
                   ? generateExcelIndicateursPrevisionnelsVAE(mergedOrganisme, selectedFormation)
                   : generateContent(doc);
-            zip.file(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, ".xls")}`, excelToBlob(excelContent));
+            if (REAL_XLSX_TEMPLATES.has(doc.template)) {
+              zip.file(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, ".xlsx")}`, htmlToXlsxBlob(excelContent));
+            } else {
+              zip.file(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, ".xls")}`, excelToBlob(excelContent));
+            }
           } else {
             const content = generateContent(doc);
             if (exportFormat === "pdf") {
@@ -1016,7 +1041,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
           const docxBlob = await processDocxTemplate(DOCX_TEMPLATE_FILES[doc.template], mergedOrganisme);
           zip.file(`${basePath}/${buildCatalogFileName(doc, null, ".docx")}`, docxBlob);
           await updateProgress();
-        } else if (["indicateurs_performance", "tableau_suivi_parcours_excel", "plan_dev_competences_excel", "tableau_amelioration_continue_excel", "suivi_dysfonctionnements_excel", "relances_appreciations_excel", "vae_indicateurs_previsionnels", "decoupage_formation_cfa_excel", "matrice_competences_excel", "suivi_chiffre_formation_excel"].includes(doc.template)) {
+        } else if (["indicateurs_performance", "tableau_suivi_parcours_excel", "plan_dev_competences_excel", "tableau_amelioration_continue_excel", "suivi_dysfonctionnements_excel", "relances_appreciations_excel", "vae_indicateurs_previsionnels"].includes(doc.template) || REAL_XLSX_TEMPLATES.has(doc.template)) {
           const excelContent = doc.template === "indicateurs_performance"
             ? generateExcelTableauBordPerformance(mergedOrganisme, selectedFormation, allStagiaires)
             : doc.template === "tableau_suivi_parcours_excel"
@@ -1024,7 +1049,11 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
               : doc.template === "vae_indicateurs_previsionnels"
                 ? generateExcelIndicateursPrevisionnelsVAE(mergedOrganisme, selectedFormation)
                 : generateContent(doc);
-          zip.file(`${basePath}/${buildCatalogFileName(doc, null, ".xls")}`, excelToBlob(excelContent));
+          if (REAL_XLSX_TEMPLATES.has(doc.template)) {
+            zip.file(`${basePath}/${buildCatalogFileName(doc, null, ".xlsx")}`, htmlToXlsxBlob(excelContent));
+          } else {
+            zip.file(`${basePath}/${buildCatalogFileName(doc, null, ".xls")}`, excelToBlob(excelContent));
+          }
           await updateProgress();
         } else {
           const content = generateContent(doc);
