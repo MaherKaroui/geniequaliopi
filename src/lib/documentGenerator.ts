@@ -10866,8 +10866,10 @@ export function getCFAWeekDates(f: FormationInfo): { cfaWeekNum: number; weekSta
   const dayBased = isDayBasedRythme(rythmeStr);
   const { totalHours } = parseDuree(f.duree);
   const effectiveTotal = totalHours > 0 ? totalHours : 420;
-  const totalCFAWeeks = Math.max(1, Math.ceil(effectiveTotal / 35));
-  const cycleLength = cfaPerCycle + entrepriseWeeks;
+  const cfaDaysPerWeek = getCFADaysPerWeek(rythmeStr);
+  const hoursPerCfaWeek = dayBased ? Math.max(7, cfaDaysPerWeek * 7) : 35;
+  const totalCFAWeeks = Math.max(1, Math.ceil(effectiveTotal / hoursPerCfaWeek));
+  const cycleLength = dayBased ? 1 : (cfaPerCycle + entrepriseWeeks);
 
   const rawStartDate = f.dateDebut ? new Date(f.dateDebut.split('/').reverse().join('-')) : new Date();
   if (isNaN(rawStartDate.getTime())) rawStartDate.setTime(Date.now());
@@ -10884,14 +10886,14 @@ export function getCFAWeekDates(f: FormationInfo): { cfaWeekNum: number; weekSta
 
   while (cfaWeekCount < totalCFAWeeks) {
     const posInCycle = calendarWeek % cycleLength;
-    const isCFA = posInCycle < cfaPerCycle;
+    const isCFA = dayBased ? true : posInCycle < cfaPerCycle;
 
     if (isCFA) {
       cfaWeekCount++;
       const weekStart = new Date(firstWeekStart);
       weekStart.setDate(firstWeekStart.getDate() + calendarWeek * 7);
       const weekEnd = new Date(weekStart);
-      weekEnd.setDate(weekEnd.getDate() + 4);
+      weekEnd.setDate(weekEnd.getDate() + (dayBased ? Math.max(0, cfaDaysPerWeek - 1) : 4));
       result.push({ cfaWeekNum: cfaWeekCount, weekStart, weekEnd });
     }
     calendarWeek++;
