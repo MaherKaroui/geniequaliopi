@@ -1,0 +1,199 @@
+/**
+ * BAHO - Données stagiaires/entreprises (FORMAT SPHERE / hôtellerie AFEST)
+ * Données issues du CSV BAHO_Stagiaire-Grid_view.csv
+ */
+
+export interface BahoStagiaire {
+  nom: string;
+  prenom: string;
+  adresse: string;
+  email: string;
+  telephone: string;
+  nir: string;
+  dateNaissance: string;
+  lieuNaissance: string;
+  emploi: string;
+  typeContrat: string;
+  codeStagiaire: string;
+}
+
+export interface BahoEntreprise {
+  nom: string;
+  adresse: string;
+  telephone: string;
+  email: string;
+  dirigeant: string;
+  siret: string;
+  dateDebut: string;     // ISO YYYY-MM-DD
+  dateFin: string;       // ISO YYYY-MM-DD
+  dateConvention: string; // ISO YYYY-MM-DD
+  stagiaires: BahoStagiaire[];
+}
+
+/** Convert "26/5/2026" → "2026-05-26" */
+function toIso(dStr: string): string {
+  if (!dStr) return "";
+  const trimmed = dStr.trim();
+  // Already ISO
+  if (/^\d{4}-\d{2}-\d{2}/.test(trimmed)) return trimmed.slice(0, 10);
+  const parts = trimmed.split("/");
+  if (parts.length !== 3) return "";
+  const [d, m, y] = parts;
+  return `${y.padStart(4, "20")}-${m.padStart(2, "0")}-${d.padStart(2, "0")}`;
+}
+
+// CSV parsé → groupé par SIRET
+const RAW: Array<Omit<BahoStagiaire, never> & {
+  entreprise: string;
+  adresseEntreprise: string;
+  telephoneEntreprise: string;
+  emailEntreprise: string;
+  dirigeant: string;
+  siret: string;
+  dateDebut: string;
+  dateFin: string;
+  dateConvention: string;
+}> = [
+  // SIRET 31667530500023 - HOTEL GRIL DE NIMES
+  { entreprise: "HOTEL GRIL DE NIMES", adresseEntreprise: "Chemin de la Carreirasse - RN 113 Route d'Arles - 30132 Caissargues", telephoneEntreprise: "04 66 84 27 05", emailEntreprise: "manager.nimes.caissargues@campanile.fr", dirigeant: "Isabelle CORLOBE", siret: "31667530500023", dateDebut: "26/5/2026", dateFin: "28/5/2026", dateConvention: "12/5/2026", nom: "ANDREU", prenom: "Taha", adresse: "2 BIS BOULEVARD TALABO 30000 NIMES", email: "", telephone: "", nir: "102091126216120", dateNaissance: "24/9/2002", lieuNaissance: "NARBONNE", emploi: "Réceptionniste", typeContrat: "CDI", codeStagiaire: "024" },
+  { entreprise: "HOTEL GRIL DE NIMES", adresseEntreprise: "Chemin de la Carreirasse - RN 113 Route d'Arles - 30132 Caissargues", telephoneEntreprise: "04 66 84 27 05", emailEntreprise: "manager.nimes.caissargues@campanile.fr", dirigeant: "Isabelle CORLOBE", siret: "31667530500023", dateDebut: "26/5/2026", dateFin: "28/5/2026", dateConvention: "12/5/2026", nom: "BARRAL", prenom: "Amelie", adresse: "31 BD GAMBETTA 30000 NIMES", email: "", telephone: "", nir: "299033018941041", dateNaissance: "28/3/1999", lieuNaissance: "NIMES", emploi: "Réceptionniste", typeContrat: "CDI", codeStagiaire: "005" },
+  { entreprise: "HOTEL GRIL DE NIMES", adresseEntreprise: "Chemin de la Carreirasse - RN 113 Route d'Arles - 30132 Caissargues", telephoneEntreprise: "04 66 84 27 05", emailEntreprise: "manager.nimes.caissargues@campanile.fr", dirigeant: "Isabelle CORLOBE", siret: "31667530500023", dateDebut: "26/5/2026", dateFin: "28/5/2026", dateConvention: "12/5/2026", nom: "EL HAMRI", prenom: "Hanane", adresse: "2 BIS BOULEVARD TALABOT 30000 NIMES", email: "", telephone: "", nir: "281039935022937", dateNaissance: "13/3/1981", lieuNaissance: "FES", emploi: "Aide hotelière P", typeContrat: "CDI", codeStagiaire: "007" },
+
+  // SIRET 32275016700015 - SNC GRIL MELUN DAMMARIE LES LYS
+  { entreprise: "SNC GRIL MELUN DAMMARIE LES LYS", adresseEntreprise: "346 Rue du Capitaine Bernard de Poret 77190 Dammarie-les-Lys", telephoneEntreprise: "01 64 37 51 51", emailEntreprise: "manager.melun.dammarieleslys@campanile.fr", dirigeant: "Franck RIS", siret: "32275016700015", dateDebut: "27/4/2026", dateFin: "29/4/2026", dateConvention: "13/4/2026", nom: "DEFONTAINE", prenom: "Francine", adresse: "40 Rue des Bouillants 77190 Dammarie-les-Lys", email: "", telephone: "", nir: "2 67 05 77 182 00913", dateNaissance: "12/5/1967", lieuNaissance: "LA FERTE GAUCHER", emploi: "Employé Exploit Polyvalent", typeContrat: "CDI", codeStagiaire: "001" },
+  { entreprise: "SNC GRIL MELUN DAMMARIE LES LYS", adresseEntreprise: "346 Rue du Capitaine Bernard de Poret 77190 Dammarie-les-Lys", telephoneEntreprise: "01 64 37 51 51", emailEntreprise: "manager.melun.dammarieleslys@campanile.fr", dirigeant: "Franck RIS", siret: "32275016700015", dateDebut: "27/4/2026", dateFin: "29/4/2026", dateConvention: "13/4/2026", nom: "GYALPO", prenom: "Youten", adresse: "APP B115 73 RUE FEDERICO GARCIA LORCA 77190 DAMMARIE LES LYS", email: "", telephone: "", nir: "286089921652309", dateNaissance: "7/8/1986", lieuNaissance: "CHINOIS", emploi: "Femme de chambre", typeContrat: "CDI", codeStagiaire: "058" },
+  { entreprise: "SNC GRIL MELUN DAMMARIE LES LYS", adresseEntreprise: "346 Rue du Capitaine Bernard de Poret 77190 Dammarie-les-Lys", telephoneEntreprise: "01 64 37 51 51", emailEntreprise: "manager.melun.dammarieleslys@campanile.fr", dirigeant: "Franck RIS", siret: "32275016700015", dateDebut: "27/4/2026", dateFin: "29/4/2026", dateConvention: "13/4/2026", nom: "LAROUI", prenom: "Doulia", adresse: "41 AV DE CORBEIL 77000 MELUN", email: "", telephone: "", nir: "289129935308933", dateNaissance: "22/12/1989", lieuNaissance: "ALGERIE", emploi: "Réceptionniste", typeContrat: "CDI", codeStagiaire: "033" },
+
+  // SIRET 32294104800017 - SNC STE HOTEL GRIL DE STRASBOURG
+  { entreprise: "SNC STE HOTEL GRIL DE STRASBOURG PARC DES TANNERIES", adresseEntreprise: "2 Rue de la faisanderie - BP 60017 - 67380 Lingolsheim", telephoneEntreprise: "03 88 78 10 10", emailEntreprise: "manager.mulhouse.morschwiller@campanile.fr", dirigeant: "Chaima GHERNOUTI", siret: "32294104800017", dateDebut: "1/6/2026", dateFin: "3/6/2026", dateConvention: "18/5/2026", nom: "AZRI AMARI", prenom: "Nora", adresse: "08 RUE DE DAHLENHEIM 67200 STRASBOURG", email: "", telephone: "", nir: "", dateNaissance: "2/9/1980", lieuNaissance: "ALGERIE", emploi: "Employé hébergement P", typeContrat: "", codeStagiaire: "006" },
+  { entreprise: "SNC STE HOTEL GRIL DE STRASBOURG PARC DES TANNERIES", adresseEntreprise: "2 Rue de la faisanderie - BP 60017 - 67380 Lingolsheim", telephoneEntreprise: "03 88 78 10 10", emailEntreprise: "manager.mulhouse.morschwiller@campanile.fr", dirigeant: "Chaima GHERNOUTI", siret: "32294104800017", dateDebut: "1/6/2026", dateFin: "3/6/2026", dateConvention: "18/5/2026", nom: "BOULAGROUH", prenom: "Halima", adresse: "3 RUE ERNEST RICKERT 67200 STRASBOURG", email: "", telephone: "0751167077", nir: "", dateNaissance: "25/12/1983", lieuNaissance: "MAROC", emploi: "Gouvernante", typeContrat: "", codeStagiaire: "048" },
+  { entreprise: "SNC STE HOTEL GRIL DE STRASBOURG PARC DES TANNERIES", adresseEntreprise: "2 Rue de la faisanderie - BP 60017 - 67380 Lingolsheim", telephoneEntreprise: "03 88 78 10 10", emailEntreprise: "manager.mulhouse.morschwiller@campanile.fr", dirigeant: "Chaima GHERNOUTI", siret: "32294104800017", dateDebut: "1/6/2026", dateFin: "3/6/2026", dateConvention: "18/5/2026", nom: "CHAOUI", prenom: "Saida", adresse: "10 RUE LAURENT HEYDT 67380 LINGOLSHEIM", email: "", telephone: "0682416399", nir: "", dateNaissance: "21/1/1977", lieuNaissance: "STRASBOURG", emploi: "Employé poly de restauration", typeContrat: "", codeStagiaire: "023" },
+
+  // SIRET 34075290600016 - SNC HOTEL GRIL DE MACON
+  { entreprise: "SNC HOTEL GRIL DE MACON", adresseEntreprise: "Les Bouchardes 130 Rue de la Bresse 71570 Chaintre", telephoneEntreprise: "03 85 23 98 88", emailEntreprise: "manager.macon.chaintre@campanile.fr", dirigeant: "Fabrice THOMAS", siret: "34075290600016", dateDebut: "18/5/2026", dateFin: "20/5/2026", dateConvention: "4/5/2026", nom: "BERAHNA", prenom: "Djamila", adresse: "LOTISSEMENT LE CLOS DES PERELLES 71680 CRECHES SUR SAONE", email: "", telephone: "0385346477", nir: "2750599352365 70", dateNaissance: "3/5/1975", lieuNaissance: "RABTA", emploi: "Employé hébergement P", typeContrat: "CDI", codeStagiaire: "049" },
+  { entreprise: "SNC HOTEL GRIL DE MACON", adresseEntreprise: "Les Bouchardes 130 Rue de la Bresse 71570 Chaintre", telephoneEntreprise: "03 85 23 98 88", emailEntreprise: "manager.macon.chaintre@campanile.fr", dirigeant: "Fabrice THOMAS", siret: "34075290600016", dateDebut: "18/5/2026", dateFin: "20/5/2026", dateConvention: "4/5/2026", nom: "BERISHA KRASCNICI", prenom: "Brendona", adresse: "395 ROUTE NATIONALE 6 71680 CRECHE SUR SAONE", email: "", telephone: "", nir: "295099915700826", dateNaissance: "3/9/1995", lieuNaissance: "GJAKOVE", emploi: "Aide hotelière P", typeContrat: "CDI", codeStagiaire: "051" },
+  { entreprise: "SNC HOTEL GRIL DE MACON", adresseEntreprise: "Les Bouchardes 130 Rue de la Bresse 71570 Chaintre", telephoneEntreprise: "03 85 23 98 88", emailEntreprise: "manager.macon.chaintre@campanile.fr", dirigeant: "Fabrice THOMAS", siret: "34075290600016", dateDebut: "18/5/2026", dateFin: "20/5/2026", dateConvention: "4/5/2026", nom: "BOST", prenom: "Mathis", adresse: "5 RUE PORTE DE MACON 71250 CLUNY", email: "", telephone: "", nir: "106016300302983", dateNaissance: "4/1/2006", lieuNaissance: "AMBERT", emploi: "Réceptionniste", typeContrat: "CDI", codeStagiaire: "063" },
+
+  // SIRET 34969788800015 - HOTEL GRIL SAINT GERMAIN LES CORBEIL
+  { entreprise: "HOTEL GRIL SAINT GERMAIN LES CORBEIL", adresseEntreprise: "Lieudit La Pointe Ringale 91250 Corbeil", telephoneEntreprise: "01 69 89 12 13", emailEntreprise: "manager.stgermainlescorbeil@campanile.fr", dirigeant: "Sonia TESTOURI", siret: "34969788800015", dateDebut: "4/6/2026", dateFin: "6/6/2026", dateConvention: "21/5/2026", nom: "BEN FATHALLAH", prenom: "Naouel", adresse: "4 PLACE LAVOISIER 91000 EVRY", email: "", telephone: "0626929826", nir: "285039935111918", dateNaissance: "29/3/1985", lieuNaissance: "MENZEL TEMIME", emploi: "Femme de chambre", typeContrat: "CDI", codeStagiaire: "038" },
+  { entreprise: "HOTEL GRIL SAINT GERMAIN LES CORBEIL", adresseEntreprise: "Lieudit La Pointe Ringale 91250 Corbeil", telephoneEntreprise: "01 69 89 12 13", emailEntreprise: "manager.stgermainlescorbeil@campanile.fr", dirigeant: "Sonia TESTOURI", siret: "34969788800015", dateDebut: "4/6/2026", dateFin: "6/6/2026", dateConvention: "21/5/2026", nom: "BEN ZAIED", prenom: "Souhaila", adresse: "2 Allée des Peupliers 91220 Bretigny sur Orge", email: "", telephone: "0782298895", nir: "281129935127211", dateNaissance: "15/12/1981", lieuNaissance: "ZARZIS", emploi: "Femme de chambre", typeContrat: "CDI", codeStagiaire: "042" },
+  { entreprise: "HOTEL GRIL SAINT GERMAIN LES CORBEIL", adresseEntreprise: "Lieudit La Pointe Ringale 91250 Corbeil", telephoneEntreprise: "01 69 89 12 13", emailEntreprise: "manager.stgermainlescorbeil@campanile.fr", dirigeant: "Sonia TESTOURI", siret: "34969788800015", dateDebut: "4/6/2026", dateFin: "6/6/2026", dateConvention: "21/5/2026", nom: "MOBIO", prenom: "Roland", adresse: "5 Rue Claude Debussy 91000 Evry", email: "Monsieurrolandmobio@gmail.com", telephone: "0749088314", nir: "190099932617036", dateNaissance: "17/9/1990", lieuNaissance: "SASSANDRA", emploi: "Réceptionniste", typeContrat: "CDI", codeStagiaire: "031" },
+
+  // SIRET 35028192900058 - SNC GESTION HOTELS MULHOUSE MORSCHWILLER
+  { entreprise: "SNC GESTION HOTELS MULHOUSE MORSCHWILLER", adresseEntreprise: "1 Rue de la Source 68790 Morschwiller-le-bas", telephoneEntreprise: "03 89 60 48 27", emailEntreprise: "manager.mulhouse.morschwiller@premiereclasse.fr", dirigeant: "Arwa CHEBBI", siret: "35028192900058", dateDebut: "1/6/2026", dateFin: "3/6/2026", dateConvention: "18/5/2026", nom: "DIALLO", prenom: "Maly", adresse: "5 RUE DE LA LOGE 68100 MULHOUSE", email: "", telephone: "", nir: "201099934120579", dateNaissance: "16/9/2001", lieuNaissance: "Sénégal", emploi: "Femme de chambre", typeContrat: "CDI", codeStagiaire: "041" },
+  { entreprise: "SNC GESTION HOTELS MULHOUSE MORSCHWILLER", adresseEntreprise: "1 Rue de la Source 68790 Morschwiller-le-bas", telephoneEntreprise: "03 89 60 48 27", emailEntreprise: "manager.mulhouse.morschwiller@premiereclasse.fr", dirigeant: "Arwa CHEBBI", siret: "35028192900058", dateDebut: "1/6/2026", dateFin: "3/6/2026", dateConvention: "18/5/2026", nom: "STELO", prenom: "Eva", adresse: "42 aL2E gLUCK 68200 MULHOUSE", email: "", telephone: "", nir: "296106822466209", dateNaissance: "18/10/1996", lieuNaissance: "MULHOUSE", emploi: "Employé polyvalent R", typeContrat: "CDI", codeStagiaire: "053" },
+  { entreprise: "SNC GESTION HOTELS MULHOUSE MORSCHWILLER", adresseEntreprise: "1 Rue de la Source 68790 Morschwiller-le-bas", telephoneEntreprise: "03 89 60 48 27", emailEntreprise: "manager.mulhouse.morschwiller@premiereclasse.fr", dirigeant: "Arwa CHEBBI", siret: "35028192900058", dateDebut: "1/6/2026", dateFin: "3/6/2026", dateConvention: "18/5/2026", nom: "THIAW", prenom: "Coumba", adresse: "7 Rue Zillisheim 68100 Mulhouse", email: "", telephone: "0751338610", nir: "292109934121687", dateNaissance: "15/10/1992", lieuNaissance: "Sénégal", emploi: "Réceptionniste", typeContrat: "CDI", codeStagiaire: "013" },
+
+  // SIRET 35283738900035 - GERESTEL AUXERRE NORD (Nadia)
+  { entreprise: "GERESTEL AUXERRE NORD", adresseEntreprise: "Rue d'Athènes 89470 Monéteau", telephoneEntreprise: "03 86 40 71 11", emailEntreprise: "manager.auxerre.moneteau@campanile.fr", dirigeant: "Nadia BAIDANE", siret: "35283738900035", dateDebut: "4/5/2026", dateFin: "6/5/2026", dateConvention: "20/4/2026", nom: "CHAIBI", prenom: "Hakima", adresse: "15 RUE DE SEIGNELAY 89470 MONETEAU", email: "", telephone: "", nir: "2770799350211 24", dateNaissance: "19/7/1977", lieuNaissance: "RABAT", emploi: "Maitre d'hotel", typeContrat: "CDI", codeStagiaire: "066" },
+  { entreprise: "GERESTEL AUXERRE NORD", adresseEntreprise: "Rue d'Athènes 89470 Monéteau", telephoneEntreprise: "03 86 40 71 11", emailEntreprise: "manager.auxerre.moneteau@campanile.fr", dirigeant: "Nadia BAIDANE", siret: "35283738900035", dateDebut: "4/5/2026", dateFin: "6/5/2026", dateConvention: "20/4/2026", nom: "HENRIET", prenom: "Karima", adresse: "25 RUE COTE RENARD Appartement D002 89470 MONETEAU", email: "", telephone: "", nir: "2780499350871 43", dateNaissance: "28/4/1978", lieuNaissance: "SIDI KACEM", emploi: "Employé poly de restauration", typeContrat: "CDI", codeStagiaire: "047" },
+  { entreprise: "GERESTEL AUXERRE NORD", adresseEntreprise: "Rue d'Athènes 89470 Monéteau", telephoneEntreprise: "03 86 40 71 11", emailEntreprise: "manager.auxerre.moneteau@campanile.fr", dirigeant: "Nadia BAIDANE", siret: "35283738900035", dateDebut: "4/5/2026", dateFin: "6/5/2026", dateConvention: "20/4/2026", nom: "LIEGEOIS", prenom: "Zoe", adresse: "72 RUE de SEIGNELAY 89470 MONETEAU", email: "zliegeois20@icloud.com", telephone: "0677349511", nir: "202018902436813", dateNaissance: "20/1/2002", lieuNaissance: "AUXERRE", emploi: "Serveur", typeContrat: "CDI", codeStagiaire: "052" },
+
+  // SIRET 35383738900043 - GERESTEL AUXERRE NORD (Alexandre - 2nd entité)
+  { entreprise: "GERESTEL AUXERRE NORD 43", adresseEntreprise: "Rue d'Athènes 89470 Monéteau", telephoneEntreprise: "04 76 35 60 00", emailEntreprise: "manager.grenoble.moirans@premiereclasse.fr", dirigeant: "Alexandre CESBRON", siret: "35383738900043", dateDebut: "4/5/2026", dateFin: "6/5/2026", dateConvention: "20/4/2026", nom: "PINTE", prenom: "Carlos", adresse: "4 RUE VERDEAU 89330 VILLEVALLIER", email: "", telephone: "", nir: "1680278172014 40", dateNaissance: "8/2/1968", lieuNaissance: "CONFLANS STE HONORINE", emploi: "Réceptionniste", typeContrat: "CDI", codeStagiaire: "034" },
+  { entreprise: "GERESTEL AUXERRE NORD 43", adresseEntreprise: "Rue d'Athènes 89470 Monéteau", telephoneEntreprise: "04 76 35 60 00", emailEntreprise: "manager.grenoble.moirans@premiereclasse.fr", dirigeant: "Alexandre CESBRON", siret: "35383738900043", dateDebut: "4/5/2026", dateFin: "6/5/2026", dateConvention: "20/4/2026", nom: "SALIBASHA", prenom: "Vjollca", adresse: "5 RUE JEAN MERMOZ 89470 MONETEAU", email: "", telephone: "", nir: "2900399125076 97", dateNaissance: "27/3/1990", lieuNaissance: "RREZE MALI", emploi: "Femme de chambre", typeContrat: "CDI", codeStagiaire: "020" },
+  { entreprise: "GERESTEL AUXERRE NORD 43", adresseEntreprise: "Rue d'Athènes 89470 Monéteau", telephoneEntreprise: "04 76 35 60 00", emailEntreprise: "manager.grenoble.moirans@premiereclasse.fr", dirigeant: "Alexandre CESBRON", siret: "35383738900043", dateDebut: "4/5/2026", dateFin: "6/5/2026", dateConvention: "20/4/2026", nom: "WALLACE", prenom: "Lucie", adresse: "41 AVENUE DE CHAMPLEROY 89000 AUXERRE", email: "LUCIEWALLACE89000@GMAIL.COM", telephone: "0615706618", nir: "296068902433381", dateNaissance: "20/6/1996", lieuNaissance: "AUXERRE", emploi: "RECEPTIONNISTE TOURNANT", typeContrat: "CDI", codeStagiaire: "032" },
+
+  // SIRET 38086196300037 - SNC HOTEL GRIL BUREAU DE MOIRANS
+  { entreprise: "SNC HOTEL GRIL BUREAU DE MOIRANS", adresseEntreprise: "187 Rue des Etangs 38430 Moirans", telephoneEntreprise: "04 76 35 60 00", emailEntreprise: "manager.grenoble.moirans@campanile.fr", dirigeant: "Alexandre CESBRON", siret: "38086196300037", dateDebut: "21/5/2026", dateFin: "23/5/2026", dateConvention: "7/5/2026", nom: "AKSOY", prenom: "Nurhayat", adresse: "105 AVENUE DU DOCTEUR VALOIS 38500 VOIRON", email: "nurhayat-irem@hotmail.fr", telephone: "0768321598", nir: "279049920837297", dateNaissance: "5/4/1979", lieuNaissance: "TURQUIE", emploi: "Employée d'hébergement chambre", typeContrat: "CDI", codeStagiaire: "059" },
+  { entreprise: "SNC HOTEL GRIL BUREAU DE MOIRANS", adresseEntreprise: "187 Rue des Etangs 38430 Moirans", telephoneEntreprise: "04 76 35 60 00", emailEntreprise: "manager.grenoble.moirans@campanile.fr", dirigeant: "Alexandre CESBRON", siret: "38086196300037", dateDebut: "21/5/2026", dateFin: "23/5/2026", dateConvention: "7/5/2026", nom: "ARANCIBIA", prenom: "Bozo Mauricio", adresse: "136 rue Barjon 38430 MOIRANS", email: "", telephone: "06 26 88 57 32", nir: "164109941703490", dateNaissance: "27/10/1964", lieuNaissance: "CHILI", emploi: "Aide hotelière P", typeContrat: "CDI", codeStagiaire: "056" },
+  { entreprise: "SNC HOTEL GRIL BUREAU DE MOIRANS", adresseEntreprise: "187 Rue des Etangs 38430 Moirans", telephoneEntreprise: "04 76 35 60 00", emailEntreprise: "manager.grenoble.moirans@campanile.fr", dirigeant: "Alexandre CESBRON", siret: "38086196300037", dateDebut: "21/5/2026", dateFin: "23/5/2026", dateConvention: "7/5/2026", nom: "ARAUJO", prenom: "Tatyana", adresse: "HLM LES JONQUILLES 67 RUE DES FLEURS 38430 MOIRANS", email: "", telephone: "", nir: "270109925800187", dateNaissance: "20/10/1970", lieuNaissance: "OUZBEKISTAN", emploi: "Femme de chambre", typeContrat: "CDI", codeStagiaire: "022" },
+
+  // SIRET 38232405100038 - SNC ECO LES DEUX HOTELS
+  { entreprise: "SNC ECO LES DEUX HOTELS", adresseEntreprise: "ZAC Le Mazaud 19100 Brive-la-Gaillarde", telephoneEntreprise: "05 55 88 02 67", emailEntreprise: "manager.brive@premiereclasse.fr", dirigeant: "Sylvie FERRERO-BERGER", siret: "38232405100038", dateDebut: "15/6/2026", dateFin: "17/6/2026", dateConvention: "1/6/2026", nom: "CHERKEZISHVILI", prenom: "Tea", adresse: "CCAS 22 RUE BERLIOZ 19100 BRIVE LA GAILLARDE", email: "teacherkezishbili91@gmail.com", telephone: "0780628708", nir: "811910000731391", dateNaissance: "4/5/1978", lieuNaissance: "TBILISI", emploi: "Femme de chambre", typeContrat: "CDI", codeStagiaire: "011" },
+  { entreprise: "SNC ECO LES DEUX HOTELS", adresseEntreprise: "ZAC Le Mazaud 19100 Brive-la-Gaillarde", telephoneEntreprise: "05 55 88 02 67", emailEntreprise: "manager.brive@premiereclasse.fr", dirigeant: "Sylvie FERRERO-BERGER", siret: "38232405100038", dateDebut: "15/6/2026", dateFin: "17/6/2026", dateConvention: "1/6/2026", nom: "HILAL HILALOU", prenom: "Samira", adresse: "9 allee bouygue 19100 brive la gaillarde", email: "samiramikir@gmail.com", telephone: "+33751147909", nir: "276099938029294", dateNaissance: "20/9/1976", lieuNaissance: "BZOU", emploi: "Femme de chambre", typeContrat: "CDI", codeStagiaire: "064" },
+  { entreprise: "SNC ECO LES DEUX HOTELS", adresseEntreprise: "ZAC Le Mazaud 19100 Brive-la-Gaillarde", telephoneEntreprise: "05 55 88 02 67", emailEntreprise: "manager.brive@premiereclasse.fr", dirigeant: "Sylvie FERRERO-BERGER", siret: "38232405100038", dateDebut: "15/6/2026", dateFin: "17/6/2026", dateConvention: "1/6/2026", nom: "LONCHAMBON", prenom: "Sylvie", adresse: "8 av. andre jalinat 19100 brive la gaillarde", email: "", telephone: "", nir: "273030701904430", dateNaissance: "14/3/1973", lieuNaissance: "AUBENAS", emploi: "Femme de chambre", typeContrat: "CDI", codeStagiaire: "010" },
+
+  // SIRET 39293902100029 - SARL VIRE INVEST HOTEL
+  { entreprise: "SARL VIRE INVEST HOTEL", adresseEntreprise: "Lieudit La Papillonnière 14500 Vire", telephoneEntreprise: "02 31 67 01 58", emailEntreprise: "manager.vire@campanile.fr", dirigeant: "Laurent GUILLOPE", siret: "39293902100029", dateDebut: "11/6/2026", dateFin: "13/6/2026", dateConvention: "28/5/2026", nom: "BOCQUET", prenom: "Anais", adresse: "LIEU DIT LES LANDES LARCHAMP 61800 TINCHEBRAY BOCAGE", email: "", telephone: "", nir: "286011411839324", dateNaissance: "30/1/1986", lieuNaissance: "CAEN", emploi: "Serveur", typeContrat: "CDI", codeStagiaire: "027" },
+  { entreprise: "SARL VIRE INVEST HOTEL", adresseEntreprise: "Lieudit La Papillonnière 14500 Vire", telephoneEntreprise: "02 31 67 01 58", emailEntreprise: "manager.vire@campanile.fr", dirigeant: "Laurent GUILLOPE", siret: "39293902100029", dateDebut: "11/6/2026", dateFin: "13/6/2026", dateConvention: "28/5/2026", nom: "CORDHOMME", prenom: "Christelle", adresse: "1 RUE DES JONC 14350 VALDALLIERE", email: "", telephone: "", nir: "275101402701334", dateNaissance: "7/10/1975", lieuNaissance: "AUNAY SUR ODON", emploi: "Cuisinier", typeContrat: "CDI", codeStagiaire: "009" },
+  { entreprise: "SARL VIRE INVEST HOTEL", adresseEntreprise: "Lieudit La Papillonnière 14500 Vire", telephoneEntreprise: "02 31 67 01 58", emailEntreprise: "manager.vire@campanile.fr", dirigeant: "Laurent GUILLOPE", siret: "39293902100029", dateDebut: "11/6/2026", dateFin: "13/6/2026", dateConvention: "28/5/2026", nom: "GOUAST", prenom: "Isabelle", adresse: "LA PAVERIE 14410 VALDALLIERE", email: "", telephone: "", nir: "267121476279929", dateNaissance: "27/12/1967", lieuNaissance: "VIRE", emploi: "Femme de chambre", typeContrat: "CDI", codeStagiaire: "025" },
+
+  // SIRET 41830255000011 - SNC ECO PAMIERS
+  { entreprise: "SNC ECO PAMIERS", adresseEntreprise: "Lieudit La Bouriette 09100 Pamiers", telephoneEntreprise: "05 61 68 95 18", emailEntreprise: "manager.pamiers@premiereclasse.fr", dirigeant: "Carole FRANCO", siret: "41830255000011", dateDebut: "15/6/2026", dateFin: "17/6/2026", dateConvention: "1/6/2026", nom: "BERGER", prenom: "Hedwige", adresse: "LE VILLAGE 09600 DUN", email: "", telephone: "06.82.97.38.07", nir: "271110916003753", dateNaissance: "23/11/1971", lieuNaissance: "LAVELANET", emploi: "Employé exploitation P", typeContrat: "CDI", codeStagiaire: "021" },
+  { entreprise: "SNC ECO PAMIERS", adresseEntreprise: "Lieudit La Bouriette 09100 Pamiers", telephoneEntreprise: "05 61 68 95 18", emailEntreprise: "manager.pamiers@premiereclasse.fr", dirigeant: "Carole FRANCO", siret: "41830255000011", dateDebut: "15/6/2026", dateFin: "17/6/2026", dateConvention: "1/6/2026", nom: "CARON", prenom: "Valerie", adresse: "9 BIS JEAN MOULIN 09100 SAINT JEAN DU FALGA", email: "", telephone: "06.85.80.50.48", nir: "274019303004413", dateNaissance: "31/1/1974", lieuNaissance: "DUGNY", emploi: "Femme de chambre", typeContrat: "CDI", codeStagiaire: "014" },
+  { entreprise: "SNC ECO PAMIERS", adresseEntreprise: "Lieudit La Bouriette 09100 Pamiers", telephoneEntreprise: "05 61 68 95 18", emailEntreprise: "manager.pamiers@premiereclasse.fr", dirigeant: "Carole FRANCO", siret: "41830255000011", dateDebut: "15/6/2026", dateFin: "17/6/2026", dateConvention: "1/6/2026", nom: "RECUERDA", prenom: "Maëva", adresse: "230 CHEMIN DES GRAOUES 31370 LABASTIDE CLERMONT", email: "", telephone: "", nir: "204100926406278", dateNaissance: "14/10/2004", lieuNaissance: "SAINT JEAN DE VERGES", emploi: "Femme de chambre", typeContrat: "CDI", codeStagiaire: "012" },
+
+  // SIRET 43872074000010 - SNC ECO CHATEAUROUX
+  { entreprise: "SNC ECO CHATEAUROUX", adresseEntreprise: "Avenue d'Occitanie 36250 Saint-Maur", telephoneEntreprise: "02 54 27 94 59", emailEntreprise: "manager.chateauroux@premiereclasse.fr", dirigeant: "Estelle RATOY", siret: "43872074000010", dateDebut: "11/5/2026", dateFin: "13/5/2026", dateConvention: "28/10/2026", nom: "CORBEAU", prenom: "Véronique", adresse: "44 RUE DES MARMOTTES 36000 CHATEAUROUX", email: "", telephone: "0668791815", nir: "263043722605405", dateNaissance: "5/4/1963", lieuNaissance: "SAINTE MAURE DE TOURRAINE", emploi: "Aide hotelière P", typeContrat: "CDI", codeStagiaire: "004" },
+  { entreprise: "SNC ECO CHATEAUROUX", adresseEntreprise: "Avenue d'Occitanie 36250 Saint-Maur", telephoneEntreprise: "02 54 27 94 59", emailEntreprise: "manager.chateauroux@premiereclasse.fr", dirigeant: "Estelle RATOY", siret: "43872074000010", dateDebut: "11/5/2026", dateFin: "13/5/2026", dateConvention: "28/10/2026", nom: "DESMARETZ", prenom: "Carole", adresse: "1 rue des Glycines 87200 CHAILLAC SUR VIENNE", email: "desmaretz.carole@orange.fr", telephone: "0608942844", nir: "272095905101967", dateNaissance: "10/9/1972", lieuNaissance: "LA BASSEE", emploi: "Employé exploitation P", typeContrat: "CDI", codeStagiaire: "017" },
+  { entreprise: "SNC ECO CHATEAUROUX", adresseEntreprise: "Avenue d'Occitanie 36250 Saint-Maur", telephoneEntreprise: "02 54 27 94 59", emailEntreprise: "manager.chateauroux@premiereclasse.fr", dirigeant: "Estelle RATOY", siret: "43872074000010", dateDebut: "11/5/2026", dateFin: "13/5/2026", dateConvention: "28/10/2026", nom: "HERTER", prenom: "Elsa Michelle", adresse: "42 BOULEVARD FRANCOIS MITTERAND APPT 7 36000 CHATEAUROUX", email: "elsaherter@gmail.com", telephone: "0780696072", nir: "203063604406316", dateNaissance: "4/6/2003", lieuNaissance: "CHATEAUROUX", emploi: "Aide hotelière P", typeContrat: "CDI", codeStagiaire: "039" },
+
+  // SIRET 52201422400029 - SH VILLEFRANCHE
+  { entreprise: "SH VILLEFRANCHE", adresseEntreprise: "163 Allée de Riottier Le Péage 69400 Limas", telephoneEntreprise: "06 20 05 65 38", emailEntreprise: "h2558-re@accor.com", dirigeant: "Sabah SAKER", siret: "52201422400029", dateDebut: "21/5/2026", dateFin: "23/5/2026", dateConvention: "7/5/2026", nom: "ATHMANI", prenom: "Leila", adresse: "2 ALLEE DU FOREST 69400 LIMAS", email: "", telephone: "", nir: "2811299353003 26", dateNaissance: "3/12/1981", lieuNaissance: "ANNABA", emploi: "Femme de chambre", typeContrat: "CDI", codeStagiaire: "037" },
+  { entreprise: "SH VILLEFRANCHE", adresseEntreprise: "163 Allée de Riottier Le Péage 69400 Limas", telephoneEntreprise: "06 20 05 65 38", emailEntreprise: "h2558-re@accor.com", dirigeant: "Sabah SAKER", siret: "52201422400029", dateDebut: "21/5/2026", dateFin: "23/5/2026", dateConvention: "7/5/2026", nom: "BERTHET", prenom: "Laura", adresse: "59 RUE DE LA SAONE 01600 ST BERNARD", email: "", telephone: "", nir: "2001169387084 02", dateNaissance: "30/11/2000", lieuNaissance: "LYON 7", emploi: "Réceptionnsite Polyvalent", typeContrat: "CDI", codeStagiaire: "002" },
+  { entreprise: "SH VILLEFRANCHE", adresseEntreprise: "163 Allée de Riottier Le Péage 69400 Limas", telephoneEntreprise: "06 20 05 65 38", emailEntreprise: "h2558-re@accor.com", dirigeant: "Sabah SAKER", siret: "52201422400029", dateDebut: "21/5/2026", dateFin: "23/5/2026", dateConvention: "7/5/2026", nom: "FEHIM", prenom: "Souad", adresse: "182 RUE AMPERE 69400 VILLEFRANCHE SUR SAONE", email: "", telephone: "", nir: "2830769092036 16", dateNaissance: "7/7/1983", lieuNaissance: "GLEIZE", emploi: "Réceptionniste", typeContrat: "CDI", codeStagiaire: "045" },
+
+  // SIRET 79902074800031 - PONTORGRA
+  { entreprise: "PONTORGRA", adresseEntreprise: "4 Rue Donnet Zedel 25300 Pontarlier", telephoneEntreprise: "03 81 46 66 66", emailEntreprise: "manager.pontarlier@campanile.fr", dirigeant: "Eda AK", siret: "79902074800031", dateDebut: "26/5/2026", dateFin: "28/5/2026", dateConvention: "12/5/2026", nom: "NICOLAS", prenom: "Renaud", adresse: "Campanile Pontarlier 4 rue Donnet Zedel 25300 pontarlier", email: "renaudn@gmail.com", telephone: "0658681972", nir: "179036005702052", dateNaissance: "2/3/1979", lieuNaissance: "BEAUVAIS", emploi: "Employé exploitation P", typeContrat: "CDI", codeStagiaire: "061" },
+  { entreprise: "PONTORGRA", adresseEntreprise: "4 Rue Donnet Zedel 25300 Pontarlier", telephoneEntreprise: "03 81 46 66 66", emailEntreprise: "manager.pontarlier@campanile.fr", dirigeant: "Eda AK", siret: "79902074800031", dateDebut: "26/5/2026", dateFin: "28/5/2026", dateConvention: "12/5/2026", nom: "TANRIVERDI", prenom: "Ayse", adresse: "11 RUE MASSENET 25300 PONTARLIER", email: "", telephone: "", nir: "288032546205360", dateNaissance: "15/3/1988", lieuNaissance: "PONTARLIER", emploi: "Employé hébergement P", typeContrat: "CDI", codeStagiaire: "028" },
+  { entreprise: "PONTORGRA", adresseEntreprise: "4 Rue Donnet Zedel 25300 Pontarlier", telephoneEntreprise: "03 81 46 66 66", emailEntreprise: "manager.pontarlier@campanile.fr", dirigeant: "Eda AK", siret: "79902074800031", dateDebut: "26/5/2026", dateFin: "28/5/2026", dateConvention: "12/5/2026", nom: "TROUTET", prenom: "Anais", adresse: "11 bis rue de Salins 25270 levier", email: "", telephone: "", nir: "2 91112505641228", dateNaissance: "10/11/1991", lieuNaissance: "BESANCON", emploi: "Aide hotelière P", typeContrat: "CDI", codeStagiaire: "036" },
+
+  // SIRET 79902092000028 - FOUPERVIC (Vichy/Bellerive)
+  { entreprise: "FOUPERVIC - Vichy Bellerive", adresseEntreprise: "74 Avenue de Vichy 03700 Bellerive-sur-Allier", telephoneEntreprise: "04 70 59 32 33", emailEntreprise: "manager.vichy.bellerive@campanile.fr", dirigeant: "Maryline MARKOWICZ", siret: "79902092000028", dateDebut: "18/5/2026", dateFin: "20/5/2026", dateConvention: "4/5/2026", nom: "ABRAHA ARAYA", prenom: "Merhawit", adresse: "12 RUE DU PARC DES BOURRINS 03200 VICHY", email: "aberhamerhawit614@gmail.com", telephone: "0620687839", nir: "290019931704658", dateNaissance: "1/1/1990", lieuNaissance: "DANOIRE GENET", emploi: "Employé polyvalent", typeContrat: "CDI", codeStagiaire: "046" },
+  { entreprise: "FOUPERVIC - Vichy Bellerive", adresseEntreprise: "74 Avenue de Vichy 03700 Bellerive-sur-Allier", telephoneEntreprise: "04 70 59 32 33", emailEntreprise: "manager.vichy.bellerive@campanile.fr", dirigeant: "Maryline MARKOWICZ", siret: "79902092000028", dateDebut: "18/5/2026", dateFin: "20/5/2026", dateConvention: "4/5/2026", nom: "BLONDEL", prenom: "Audrey", adresse: "RESIDENCE DU GOLF 8 RUE DU GOLF BAT A 03700 BELLERIVE SUR ALLIER", email: "eloime.ali@gmail.com", telephone: "06 62 28 81 66", nir: "296100331009245", dateNaissance: "13/10/1996", lieuNaissance: "VICHY", emploi: "Employé polyvalent", typeContrat: "CDI", codeStagiaire: "008" },
+  { entreprise: "FOUPERVIC - Vichy Bellerive", adresseEntreprise: "74 Avenue de Vichy 03700 Bellerive-sur-Allier", telephoneEntreprise: "04 70 59 32 33", emailEntreprise: "manager.vichy.bellerive@campanile.fr", dirigeant: "Maryline MARKOWICZ", siret: "79902092000028", dateDebut: "18/5/2026", dateFin: "20/5/2026", dateConvention: "4/5/2026", nom: "COQ", prenom: "Patricia", adresse: "O LA MOTTE 42620 SAINT PIERRE LAVAL", email: "pagriciacoq@gmail.com", telephone: "0686163872", nir: "281040331011876", dateNaissance: "28/4/1981", lieuNaissance: "VICHY", emploi: "Employé polyvalent", typeContrat: "CDI", codeStagiaire: "050" },
+
+  // SIRET 79902092000044 - FOUPERVIC (Fougères)
+  { entreprise: "FOUPERVIC - Fougères", adresseEntreprise: "28 Boulevard Michel Cointat 35300 Fougères", telephoneEntreprise: "02 99 94 54 00", emailEntreprise: "manager.fougeres@campanile.fr", dirigeant: "Julien LALONG", siret: "79902092000044", dateDebut: "8/6/2026", dateFin: "10/6/2026", dateConvention: "25/5/2026", nom: "AKILITOA", prenom: "Catherine", adresse: "3 ALLEE DES PRIMEVERES 35133 BEAUCE", email: "", telephone: "0780501247", nir: "273019881805937", dateNaissance: "2/1/1973", lieuNaissance: "NOUMEA", emploi: "Aide hotelière P", typeContrat: "CDI", codeStagiaire: "015" },
+  { entreprise: "FOUPERVIC - Fougères", adresseEntreprise: "28 Boulevard Michel Cointat 35300 Fougères", telephoneEntreprise: "02 99 94 54 00", emailEntreprise: "manager.fougeres@campanile.fr", dirigeant: "Julien LALONG", siret: "79902092000044", dateDebut: "8/6/2026", dateFin: "10/6/2026", dateConvention: "25/5/2026", nom: "DESHAIES", prenom: "Anita", adresse: "55 C, ANATOLE LE BRAZ 35300 FOUGERES", email: "", telephone: "0662817888", nir: "273123511509180", dateNaissance: "27/12/1973", lieuNaissance: "FOUGERES", emploi: "Employé hébergement P", typeContrat: "CDI", codeStagiaire: "044" },
+  { entreprise: "FOUPERVIC - Fougères", adresseEntreprise: "28 Boulevard Michel Cointat 35300 Fougères", telephoneEntreprise: "02 99 94 54 00", emailEntreprise: "manager.fougeres@campanile.fr", dirigeant: "Julien LALONG", siret: "79902092000044", dateDebut: "8/6/2026", dateFin: "10/6/2026", dateConvention: "25/5/2026", nom: "GRIEL ESTEVES", prenom: "Alicia", adresse: "13 ROUTE DE VITRE 53500 ERNEE", email: "", telephone: "", nir: "207110608838637", dateNaissance: "6/11/2007", lieuNaissance: "NICE", emploi: "Employé polyvalent R", typeContrat: "CDI", codeStagiaire: "065" },
+
+  // SIRET 79902094600023 - BOURAVAL (Sauvigny - Laura BASSLER 23)
+  { entreprise: "BOURAVAL - Sauvigny", adresseEntreprise: "Tuilerie de Cerce 89200 Sauvigny-le-bois", telephoneEntreprise: "03 86 34 50 00", emailEntreprise: "manager.avallon.sauvigny@premiereclasse.fr", dirigeant: "Laura BASSLER", siret: "79902094600023", dateDebut: "27/4/2026", dateFin: "29/4/2026", dateConvention: "13/4/2026", nom: "KOTYK", prenom: "Tetiana", adresse: "28 rue Fusains 89200 AVALLON", email: "", telephone: "", nir: "279049915517640", dateNaissance: "16/4/1979", lieuNaissance: "UKRAINE", emploi: "Femme de chambre", typeContrat: "CDI", codeStagiaire: "054" },
+  { entreprise: "BOURAVAL - Sauvigny", adresseEntreprise: "Tuilerie de Cerce 89200 Sauvigny-le-bois", telephoneEntreprise: "03 86 34 50 00", emailEntreprise: "manager.avallon.sauvigny@premiereclasse.fr", dirigeant: "Laura BASSLER", siret: "79902094600023", dateDebut: "27/4/2026", dateFin: "29/4/2026", dateConvention: "13/4/2026", nom: "KRIMA LANYARE", prenom: "Chaimae", adresse: "15 AVENUE DE LA REPUBLIQUE 89200 AVALLON", email: "", telephone: "", nir: "298109935066544", dateNaissance: "3/10/1998", lieuNaissance: "SAFI", emploi: "Femme de chambre", typeContrat: "CDI", codeStagiaire: "057" },
+  { entreprise: "BOURAVAL - Sauvigny", adresseEntreprise: "Tuilerie de Cerce 89200 Sauvigny-le-bois", telephoneEntreprise: "03 86 34 50 00", emailEntreprise: "manager.avallon.sauvigny@premiereclasse.fr", dirigeant: "Laura BASSLER", siret: "79902094600023", dateDebut: "27/4/2026", dateFin: "29/4/2026", dateConvention: "13/4/2026", nom: "PERREAU", prenom: "Patricia", adresse: "20. rue de l'hopital 89200 AVALLON", email: "", telephone: "", nir: "271122158401743", dateNaissance: "14/12/1971", lieuNaissance: "SAULIEU", emploi: "Employé hébergement P", typeContrat: "CDI", codeStagiaire: "060" },
+
+  // SIRET 79902094600056 - BOURAVAL (Avallon - 56)
+  { entreprise: "BOURAVAL - Avallon", adresseEntreprise: "Tuilerie de Cerce 89200 Sauvigny-le-bois", telephoneEntreprise: "03 86 34 50 00", emailEntreprise: "manager.avallon@campanile.fr", dirigeant: "Laura BASSLER", siret: "79902094600056", dateDebut: "11/5/2026", dateFin: "13/5/2026", dateConvention: "28/5/2026", nom: "BENCHENNI-OUARZAZI", prenom: "Samy", adresse: "4 RUE DES ACACIAS 89200 AVALLON", email: "sam.benchenni@outlook.com", telephone: "0637797917", nir: "194028920622056", dateNaissance: "26/2/1994", lieuNaissance: "JOINGY", emploi: "Employé polyvalent R", typeContrat: "CDI", codeStagiaire: "055" },
+  { entreprise: "BOURAVAL - Avallon", adresseEntreprise: "Tuilerie de Cerce 89200 Sauvigny-le-bois", telephoneEntreprise: "03 86 34 50 00", emailEntreprise: "manager.avallon@campanile.fr", dirigeant: "Laura BASSLER", siret: "79902094600056", dateDebut: "11/5/2026", dateFin: "13/5/2026", dateConvention: "28/5/2026", nom: "BRIZARD", prenom: "Felicie", adresse: "11RUE MARC HENARD 89630 ST LEGER VAUBAN", email: "", telephone: "", nir: "298018902522875", dateNaissance: "19/1/1998", lieuNaissance: "AVALLON", emploi: "Employé polyvalent R", typeContrat: "CDI", codeStagiaire: "019" },
+];
+
+/** Group by SIRET */
+export function getBahoEntreprises(): BahoEntreprise[] {
+  const map = new Map<string, BahoEntreprise>();
+  for (const r of RAW) {
+    const key = r.siret;
+    if (!map.has(key)) {
+      map.set(key, {
+        nom: r.entreprise,
+        adresse: r.adresseEntreprise,
+        telephone: r.telephoneEntreprise,
+        email: r.emailEntreprise,
+        dirigeant: r.dirigeant,
+        siret: r.siret,
+        dateDebut: toIso(r.dateDebut),
+        dateFin: toIso(r.dateFin),
+        dateConvention: toIso(r.dateConvention),
+        stagiaires: [],
+      });
+    }
+    map.get(key)!.stagiaires.push({
+      nom: r.nom,
+      prenom: r.prenom,
+      adresse: r.adresse,
+      email: r.email,
+      telephone: r.telephone,
+      nir: r.nir,
+      dateNaissance: toIso(r.dateNaissance),
+      lieuNaissance: r.lieuNaissance,
+      emploi: r.emploi,
+      typeContrat: r.typeContrat,
+      codeStagiaire: r.codeStagiaire,
+    });
+  }
+  return Array.from(map.values());
+}
+
+export const FORMAT_SPHERE_ORG = {
+  nom: "FORMAT SPHERE",
+  adresse: "23 Grande Rue de Villemeneux",
+  codePostal: "77170",
+  ville: "Brie-Comte-Robert",
+  siret: "940 558 448 00020",
+  nda: "11922874592",
+  email: "contact@formatsphere.fr",
+  telephone: "06 86 66 32 33",
+  dirigeant: "M. FEOLA Giuseppe",
+  siteWeb: "www.formatsphere.fr",
+};
