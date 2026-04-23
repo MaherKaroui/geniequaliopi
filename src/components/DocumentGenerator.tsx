@@ -15,6 +15,17 @@ import { toast } from "sonner";
 import DocStyleConfigPanel from "./DocStyleConfigPanel";
 import { downloadAsWord, htmlToWordBlob } from "@/lib/wordExport";
 import { generateExcelTableauBordPerformance, generateExcelTableauSuiviParcours, generateExcelIndicateursPrevisionnelsVAE, excelToBlob } from "@/lib/xlsxGenerator";
+import { htmlToXlsxBlob } from "@/lib/htmlToXlsx";
+
+// Templates qui doivent être téléchargés en VRAI fichier .xlsx (et non en .xls HTML déguisé)
+// La sortie HTML générée par leurs générateurs respectifs est convertie via SheetJS.
+const REAL_XLSX_TEMPLATES = new Set<string>([
+  "decoupage_formation_cfa_excel",
+  "matrice_competences_excel",
+  "suivi_chiffre_formation_excel",
+  "tableau_suivi_parcours_beneficiaires_cfa_excel",
+  "calendrier_annuel_cfa",
+]);
 import { downloadAsPdf, htmlToPdfBlob } from "@/lib/pdfExport";
 import { processDocxTemplate, processMailDocxTemplate, DOCX_TEMPLATE_FILES, MAIL_TEMPLATE_FILES } from "@/lib/docxTemplateExport";
 import { genCerfaApprentissagePdf } from "@/lib/cerfaApprentissage";
