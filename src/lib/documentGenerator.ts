@@ -2113,21 +2113,72 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
       <p><strong>Nombre de participants :</strong> ${nbStagiaires}</p>
     </div>
 
-    <h2>8. Modalités d'accès</h2>
+    ${(() => {
+      const rncp = f.codeRNCP ? getRNCPByCode(f.codeRNCP) : undefined;
+      if (!rncp) return "";
+      const voies = rncp.voiesAcces && rncp.voiesAcces.length > 0 ? rncp.voiesAcces : [];
+      const isRS = rncp.code?.toUpperCase().startsWith("RS");
+      const fcUrl = isRS
+        ? `https://www.francecompetences.fr/recherche/rs/${rncp.code.replace(/\D/g, "")}/#anchor4`
+        : `https://www.francecompetences.fr/recherche/rncp/${rncp.code.replace(/\D/g, "")}/#anchor4`;
+
+      // Normalise les voies d'accès officielles France Compétences
+      const norm = (s: string) => s.toLowerCase();
+      const has = (kw: string) => voies.some(v => norm(v).includes(kw));
+      const rows: { label: string; oui: boolean; jury: boolean }[] = [
+        { label: "Après un parcours de formation sous statut d'élève ou d'étudiant", oui: has("élève") || has("etudiant") || has("étudiant") || has("statut"), jury: false },
+        { label: "En contrat d'apprentissage", oui: has("apprentissage"), jury: true },
+        { label: "Après un parcours de formation continue", oui: has("formation continue") || has("continue"), jury: true },
+        { label: "En contrat de professionnalisation", oui: has("professionnalisation"), jury: true },
+        { label: "Par candidature individuelle", oui: has("candidature") || has("individuelle"), jury: false },
+        { label: "Par expérience (VAE)", oui: has("vae") || has("expérience") || has("experience"), jury: true },
+      ];
+
+      const compositionJury = `
+        <p style="margin:6px 0 4px 0">Les compétences des candidats (VAE ou issus de la formation) sont évaluées par un jury composé de deux professionnels habilités au vu :</p>
+        <ul style="margin-top:0">
+          <li>a) d'une mise en situation professionnelle ou d'une présentation d'un projet réalisé en amont de la session, éventuellement complétée par d'autres modalités d'évaluation : entretien technique, questionnaire professionnel, questionnement à partir de production(s) ;</li>
+          <li>b) d'un dossier faisant état des pratiques professionnelles du candidat ;</li>
+          <li>c) des résultats des évaluations passées en cours de formation pour les candidats issus d'un parcours de formation ;</li>
+          <li>d) d'un entretien final.</li>
+        </ul>
+      `;
+
+      const dateMod = rncp.dateEnregistrement || "—";
+
+      return `
+    <h2>8. Voies d'accès à la certification</h2>
     <div class="section">
-      ${(() => {
-        const rncp = f.codeRNCP ? getRNCPByCode(f.codeRNCP) : undefined;
-        const voies = rncp?.voiesAcces && rncp.voiesAcces.length > 0 ? rncp.voiesAcces : null;
-        const isRS = rncp?.code?.toUpperCase().startsWith("RS");
-        const fcUrl = rncp ? (isRS
-          ? `https://www.francecompetences.fr/recherche/rs/${rncp.code.replace(/\D/g, "")}/#anchor4`
-          : `https://www.francecompetences.fr/recherche/rncp/${rncp.code.replace(/\D/g, "")}/#anchor4`) : null;
-        return voies ? `
-          <p><strong>Voies d'accès à la certification :</strong></p>
-          <ul>${voies.map(v => `<li>${v}</li>`).join("")}</ul>
-          ${fcUrl ? `<p style="margin-bottom:10px"><em>Source officielle France Compétences : <a href="${fcUrl}" target="_blank">${fcUrl}</a></em></p>` : ""}
-        ` : "";
-      })()}
+      <p style="margin-bottom:8px">Conformément à la fiche officielle France Compétences <strong>${rncp.code}</strong> – ${rncp.intitule}, les voies d'accès à la certification sont les suivantes :</p>
+      <table style="width:100%;border-collapse:collapse">
+        <thead>
+          <tr>
+            <th style="width:38%">Voie d'accès à la certification</th>
+            <th style="width:8%">Oui</th>
+            <th style="width:8%">Non</th>
+            <th>Composition des jurys</th>
+            <th style="width:14%">Date de dernière modification</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.map(r => `
+            <tr>
+              <td><strong>${r.label}</strong></td>
+              <td style="text-align:center">${r.oui ? "X" : ""}</td>
+              <td style="text-align:center">${r.oui ? "" : "X"}</td>
+              <td>${r.oui && r.jury ? compositionJury : "—"}</td>
+              <td style="text-align:center">${dateMod}</td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
+      <p style="margin-top:10px"><em>Source officielle France Compétences : <a href="${fcUrl}" target="_blank">${fcUrl}</a></em></p>
+    </div>
+      `;
+    })()}
+
+    <h2>9. Modalités d'accès</h2>
+    <div class="section">
       <p><strong>Étapes d'inscription :</strong></p>
       <ol>
         <li>Préinscription ${o.siteWeb && o.siteWeb.trim() ? `via ${isFacebookPage(o.siteWeb) ? 'la page Facebook' : 'le site internet'} (${linkUrl(o.siteWeb)}), ` : ''}par téléphone ou par email auprès de ${o.nom}</li>
