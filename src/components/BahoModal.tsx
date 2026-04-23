@@ -68,19 +68,40 @@ export default function BahoModal({ open, onOpenChange }: BahoModalProps) {
     reader.readAsDataURL(file);
   };
 
-  const handlePreview = async (entreprise: BahoEntreprise, stagiaire: BahoStagiaire | null) => {
+  const handlePreview = async (entreprise: BahoEntreprise, stagiaire: BahoStagiaire | null, docKind: DocKind = "ri") => {
     if (preview?.pdfUrl) URL.revokeObjectURL(preview.pdfUrl);
-    setPreview({ entreprise, stagiaire, pdfUrl: "", loading: true });
+    setPreview({ entreprise, stagiaire, docKind, pdfUrl: "", loading: true });
     try {
-      const html = getRIHTML(entreprise, stagiaire ?? undefined, fsStamp ?? undefined);
+      let html = "";
+      switch (docKind) {
+        case "convention":
+          html = getConventionHTML(entreprise, fsStamp ?? undefined);
+          break;
+        case "cgv":
+          html = getCGVHTML(entreprise, fsStamp ?? undefined);
+          break;
+        case "facture":
+          html = getFactureHTML(entreprise, `BAHO-${new Date().getFullYear()}-PREV`, fsStamp ?? undefined);
+          break;
+        case "ri":
+        default:
+          html = getRIHTML(entreprise, stagiaire ?? undefined, fsStamp ?? undefined);
+      }
       const blob = await htmlToPdfBlob(html);
       const url = URL.createObjectURL(blob);
-      setPreview({ entreprise, stagiaire, pdfUrl: url, loading: false });
+      setPreview({ entreprise, stagiaire, docKind, pdfUrl: url, loading: false });
     } catch (err) {
       console.error("Preview error:", err);
       toast.error("Erreur lors de la génération de l'aperçu");
       setPreview(null);
     }
+  };
+
+  const docLabels: Record<DocKind, string> = {
+    convention: "Convention de formation",
+    cgv: "CGV",
+    facture: "Facture",
+    ri: "Règlement intérieur",
   };
 
   const handleGenerate = async () => {
