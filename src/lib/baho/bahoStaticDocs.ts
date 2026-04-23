@@ -1,7 +1,8 @@
 /**
  * BAHO - Static HTML docs (RI, CGV, Facture) — FORMAT SPHERE
  */
-import { FORMAT_SPHERE_ORG, type BahoEntreprise } from "./bahoData";
+import { FORMAT_SPHERE_ORG, type BahoEntreprise, type BahoStagiaire } from "./bahoData";
+import { getHotelStampSvg, getFormatSphereStampSvg, svgToDataUri } from "./bahoStamps";
 
 function formatDateLong(iso: string): string {
   if (!iso) return "";
