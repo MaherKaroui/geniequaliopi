@@ -76,8 +76,6 @@ export function genOrganigrammeCFA(o: OrganismeInfo) {
         <td style="width:33.33%"></td>
       </tr>
     </table>
-
-    <p style="text-align:center;font-size:11px;color:#666;margin-top:30px"><em>Les fonctions complémentaires (Référent décrochage, Coordinateur pédagogique, Référent numérique, Conseiller en formation) sont assurées en interne et peuvent être mutualisées selon la taille de l'organisme.</em></p>
   ` });
 }
 
