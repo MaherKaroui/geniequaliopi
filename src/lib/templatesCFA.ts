@@ -21,12 +21,13 @@ export function genOrganigrammeCFA(o: OrganismeInfo) {
   const qual = o.referentQualite || o.dirigeant;
   const admin = o.poleAdministratif || o.dirigeant;
   const handi = o.referentHandicap || o.dirigeant;
-  // Référent Mobilité : externalisé par défaut si non renseigné
   const mob = o.referentMobilite?.trim() ? o.referentMobilite : "Prestataire externe – Mobi'Jeunes / Erasmus+ France";
-  // Relation Entreprises
   const relEnt = o.relationEntreprises?.trim() ? o.relationEntreprises : o.dirigeant;
+  const decro = o.referentDecrochage?.trim() ? o.referentDecrochage : (o.responsablePedagogique || o.dirigeant);
+  const coord = o.coordinateurPedagogique?.trim() ? o.coordinateurPedagogique : (o.responsablePedagogique || o.dirigeant);
+  const conseil = o.conseillerFormation?.trim() ? o.conseillerFormation : (o.relationEntreprises || o.dirigeant);
+  const num = o.referentNumerique?.trim() ? o.referentNumerique : (o.responsablePedagogique || o.dirigeant);
 
-  // Boîte bleu clair (style ADEPROS) — titre bleu foncé en gras + nom + sous-titre italique
   const box = (titre: string, nom: string, soustitre?: string) => `
     <td style="width:33.33%;padding:10px;vertical-align:top;text-align:center;border:none">
       <div style="background:#e8f0fb;border-radius:14px;padding:18px 14px;min-height:110px;display:flex;flex-direction:column;justify-content:center;border:1px solid #d6e4f5">
@@ -37,7 +38,6 @@ export function genOrganigrammeCFA(o: OrganismeInfo) {
     </td>`;
 
   return buildDocument({ org: o, title: "ORGANIGRAMME DE L'ORGANISME", subtitle: o.nom, extraHtml: `
-    <!-- Direction Générale (encadré bleu foncé centré) -->
     <div style="text-align:center;margin:30px 0 35px 0">
       <div style="background:#1e3a7b;color:white;padding:16px 50px;border-radius:10px;display:inline-block;min-width:280px">
         <div style="font-size:15px;font-weight:bold">Direction Générale</div>
@@ -45,25 +45,39 @@ export function genOrganigrammeCFA(o: OrganismeInfo) {
       </div>
     </div>
 
-    <!-- Ligne 1 : 3 pôles principaux -->
     <table style="width:100%;border-collapse:separate;border-spacing:0;margin-bottom:6px">
       <tr>
-        ${box("Pôle Pédagogique", ped, "Formateurs")}
+        ${box("Pôle Pédagogique", ped, "Formateurs et programmes")}
+        ${box("Coordinateur Pédagogique", coord, "Suivi et planification")}
+        ${box("Référent Numérique", num, "Outils LMS / distanciel")}
+      </tr>
+    </table>
+
+    <table style="width:100%;border-collapse:separate;border-spacing:0;margin-bottom:6px">
+      <tr>
         ${box("Pôle Qualité", qual, "Amélioration continue")}
         ${box("Pôle Handicap", handi, "Accessibilité")}
+        ${box("Référent Décrochage", decro, "Lutte contre l'abandon")}
       </tr>
     </table>
 
-    <!-- Ligne 2 : 3 pôles complémentaires -->
+    <table style="width:100%;border-collapse:separate;border-spacing:0;margin-bottom:6px">
+      <tr>
+        ${box("Pôle Relation Entreprises", relEnt, "Partenariats – Insertion")}
+        ${box("Conseiller en Formation", conseil, "Orientation et inscription")}
+        ${box("Pôle Administratif", admin, "Inscriptions, facturation")}
+      </tr>
+    </table>
+
     <table style="width:100%;border-collapse:separate;border-spacing:0">
       <tr>
-        ${box("PÔLE RELATION ENTREPRISES", relEnt, "Partenariats – Insertion")}
-        ${box("Pôle Administratif", admin, "Inscriptions, facturation")}
+        <td style="width:33.33%"></td>
         ${box("Référent Mobilité<br>nationale et internationale", mob, "Mission externalisée")}
+        <td style="width:33.33%"></td>
       </tr>
     </table>
 
-    <p style="text-align:center;font-size:11px;color:#666;margin-top:30px"><em>La fonction de Référent Mobilité nationale et internationale est externalisée auprès d'un prestataire spécialisé (Erasmus+ / Mobi'Jeunes).</em></p>
+    <p style="text-align:center;font-size:11px;color:#666;margin-top:30px"><em>La fonction de Référent Mobilité nationale et internationale est externalisée auprès d'un prestataire spécialisé (Erasmus+ / Mobi'Jeunes). Les fonctions complémentaires (Référent décrochage, Coordinateur pédagogique, Référent numérique, Conseiller en formation) sont assurées en interne et peuvent être mutualisées selon la taille de l'organisme.</em></p>
   ` });
 }
 
