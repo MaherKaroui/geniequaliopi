@@ -81,7 +81,7 @@ function ensureRange(ws: XLSX.WorkSheet, lastRow: number, lastCol: number) {
 }
 
 function pickPriseEnCharge(s: StagiaireInfo): string {
-  const fin = (s.financement || "").toLowerCase();
+  const fin = ((s as any).financement || (s as any).typePrise || "OPCO").toString().toLowerCase();
   if (fin.includes("opco")) return "OPCO";
   if (fin.includes("cpf")) return "CPF";
   if (fin.includes("pôle") || fin.includes("pole") || fin.includes("france travail")) return "France Travail";
