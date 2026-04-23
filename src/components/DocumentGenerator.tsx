@@ -429,9 +429,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
       || doc.template === "relances_appreciations_excel"
       || doc.template === "indicateurs_performance"
       || doc.template === "vae_indicateurs_previsionnels"
-      || doc.template === "decoupage_formation_cfa_excel"
-      || doc.template === "matrice_competences_excel"
-      || doc.template === "suivi_chiffre_formation_excel"
+      || REAL_XLSX_TEMPLATES.has(doc.template)
     ) {
       let excelContent: string;
       if (doc.template === "tableau_suivi_parcours_excel") {
@@ -443,7 +441,11 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
       } else {
         excelContent = generateContent(doc);
       }
-      saveAs(excelToBlob(excelContent), buildCatalogFileName(doc, getDocStagiaire(doc), ".xls"));
+      if (REAL_XLSX_TEMPLATES.has(doc.template)) {
+        saveAs(htmlToXlsxBlob(excelContent), buildCatalogFileName(doc, getDocStagiaire(doc), ".xlsx"));
+      } else {
+        saveAs(excelToBlob(excelContent), buildCatalogFileName(doc, getDocStagiaire(doc), ".xls"));
+      }
       return;
     }
 
@@ -676,9 +678,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
             || doc.template === "suivi_dysfonctionnements_excel"
             || doc.template === "relances_appreciations_excel"
             || doc.template === "vae_indicateurs_previsionnels"
-            || doc.template === "decoupage_formation_cfa_excel"
-            || doc.template === "matrice_competences_excel"
-            || doc.template === "suivi_chiffre_formation_excel"
+            || REAL_XLSX_TEMPLATES.has(doc.template)
           ) {
             await safeRun(`${doc.nom} (${stagiaire.nom})`, async () => {
               const excelContent = doc.template === "indicateurs_performance"
@@ -688,7 +688,11 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
                   : doc.template === "vae_indicateurs_previsionnels"
                     ? generateExcelIndicateursPrevisionnelsVAE(mergedOrganisme, selectedFormation)
                     : generateContent(doc);
-              addFileToZip(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, ".xls")}`, excelToBlob(excelContent));
+              if (REAL_XLSX_TEMPLATES.has(doc.template)) {
+                addFileToZip(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, ".xlsx")}`, htmlToXlsxBlob(excelContent));
+              } else {
+                addFileToZip(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, ".xls")}`, excelToBlob(excelContent));
+              }
             });
           } else {
             await safeRun(`${doc.nom} (${stagiaire.nom})`, async () => {
@@ -758,9 +762,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
           || doc.template === "suivi_dysfonctionnements_excel"
           || doc.template === "relances_appreciations_excel"
           || doc.template === "vae_indicateurs_previsionnels"
-          || doc.template === "decoupage_formation_cfa_excel"
-      || doc.template === "matrice_competences_excel"
-      || doc.template === "suivi_chiffre_formation_excel"
+          || REAL_XLSX_TEMPLATES.has(doc.template)
         ) {
           await safeRun(doc.nom, async () => {
             const excelContent = doc.template === "indicateurs_performance"
@@ -770,7 +772,11 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
                 : doc.template === "vae_indicateurs_previsionnels"
                   ? generateExcelIndicateursPrevisionnelsVAE(mergedOrganisme, selectedFormation)
                   : generateContent(doc);
-            addFileToZip(`${basePath}/${buildCatalogFileName(doc, null, ".xls")}`, excelToBlob(excelContent));
+            if (REAL_XLSX_TEMPLATES.has(doc.template)) {
+              addFileToZip(`${basePath}/${buildCatalogFileName(doc, null, ".xlsx")}`, htmlToXlsxBlob(excelContent));
+            } else {
+              addFileToZip(`${basePath}/${buildCatalogFileName(doc, null, ".xls")}`, excelToBlob(excelContent));
+            }
           });
         } else {
           await safeRun(doc.nom, async () => {
