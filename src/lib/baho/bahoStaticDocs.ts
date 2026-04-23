@@ -236,8 +236,7 @@ export function getConventionHTML(e: BahoEntreprise, customFsStamp?: string): st
     .join("");
 
   const nbHeures = 14;
-  const prixUnit = 2000;
-  const totalHt = e.stagiaires.length * prixUnit;
+  const totalHt = 2000;
 
   return `<!DOCTYPE html><html><head><meta charset="utf-8"/>${BASE_CSS}
   <style>
@@ -280,9 +279,8 @@ export function getConventionHTML(e: BahoEntreprise, customFsStamp?: string): st
   </ul>
 
   <p class="article-title">Article 4 – Tarif et financement</p>
-  <p><strong>Prix unitaire HT :</strong> ${prixUnit.toLocaleString("fr-FR")} € par stagiaire<br/>
-  <strong>Nombre de stagiaires :</strong> ${e.stagiaires.length}<br/>
-  <strong>Total HT :</strong> ${totalHt.toLocaleString("fr-FR")} €<br/>
+  <p><strong>Forfait par établissement HT :</strong> ${totalHt.toLocaleString("fr-FR")} €<br/>
+  <strong>Nombre de stagiaires couverts :</strong> ${e.stagiaires.length}<br/>
   TVA non applicable, art. 261-4-4° a du CGI<br/>
   <strong>Total TTC :</strong> ${totalHt.toLocaleString("fr-FR")} €</p>
 
@@ -392,8 +390,8 @@ export function getCGVHTML(e: BahoEntreprise, customFsStamp?: string): string {
 
 export function getFactureHTML(e: BahoEntreprise, numero: string, customFsStamp?: string): string {
   const nbStagiaires = e.stagiaires.length;
-  const prixUnitaire = 2000;
-  const total = nbStagiaires * prixUnitaire;
+  const total = 2000;
+  const prixUnitaire = total;
 
   return `<!DOCTYPE html><html><head><meta charset="utf-8"/>${BASE_CSS}</head><body>
   ${header()}
@@ -425,26 +423,25 @@ export function getFactureHTML(e: BahoEntreprise, numero: string, customFsStamp?
   <h2>Détail de la prestation</h2>
   <table>
     <thead>
-      <tr><th>Désignation</th><th style="width:80px;">Quantité</th><th style="width:110px;">Prix unitaire HT</th><th style="width:110px;">Total HT</th></tr>
+      <tr><th>Désignation</th><th style="width:120px;">Forfait HT</th></tr>
     </thead>
     <tbody>
       <tr>
         <td>Action de Formation En Situation de Travail (AFEST) – Hôtellerie<br/>
+        <em>Forfait par établissement (${nbStagiaires} stagiaire${nbStagiaires > 1 ? "s" : ""} couvert${nbStagiaires > 1 ? "s" : ""})</em><br/>
         <em>Période : ${formatDateLong(e.dateDebut)} → ${formatDateLong(e.dateFin)}</em></td>
-        <td>${nbStagiaires}</td>
-        <td>${prixUnitaire.toLocaleString("fr-FR")} €</td>
         <td>${total.toLocaleString("fr-FR")} €</td>
       </tr>
       <tr class="total-row">
-        <td colspan="3" style="text-align:right;">Total HT</td>
+        <td style="text-align:right;">Total HT</td>
         <td>${total.toLocaleString("fr-FR")} €</td>
       </tr>
       <tr class="total-row">
-        <td colspan="3" style="text-align:right;">TVA (exonérée art. 261-4-4° a CGI)</td>
+        <td style="text-align:right;">TVA (exonérée art. 261-4-4° a CGI)</td>
         <td>0,00 €</td>
       </tr>
       <tr class="total-row">
-        <td colspan="3" style="text-align:right;">Total TTC</td>
+        <td style="text-align:right;">Total TTC</td>
         <td>${total.toLocaleString("fr-FR")} €</td>
       </tr>
     </tbody>
@@ -466,8 +463,7 @@ export function getFactureHTML(e: BahoEntreprise, numero: string, customFsStamp?
 
 export function getDevisHTML(e: BahoEntreprise, numero: string, customFsStamp?: string): string {
   const nbStagiaires = e.stagiaires.length;
-  const prixUnitaire = 2000;
-  const total = nbStagiaires * prixUnitaire;
+  const total = 2000;
   const devisDate = (() => {
     if (!e.dateConvention) return "";
     const d = new Date(e.dateConvention);
@@ -512,27 +508,26 @@ export function getDevisHTML(e: BahoEntreprise, numero: string, customFsStamp?: 
   <h2>Détail de la prestation</h2>
   <table>
     <thead>
-      <tr><th>Désignation</th><th style="width:80px;">Quantité</th><th style="width:110px;">Prix unitaire HT</th><th style="width:110px;">Total HT</th></tr>
+      <tr><th>Désignation</th><th style="width:120px;">Forfait HT</th></tr>
     </thead>
     <tbody>
       <tr>
         <td>Action de Formation En Situation de Travail (AFEST) – Hôtellerie<br/>
         <em>Hygiène, sécurité et qualité de service</em><br/>
+        <em>Forfait par établissement (${nbStagiaires} stagiaire${nbStagiaires > 1 ? "s" : ""} couvert${nbStagiaires > 1 ? "s" : ""})</em><br/>
         <em>Période : ${formatDateLong(e.dateDebut)} → ${formatDateLong(e.dateFin)}</em></td>
-        <td>${nbStagiaires}</td>
-        <td>${prixUnitaire.toLocaleString("fr-FR")} €</td>
         <td>${total.toLocaleString("fr-FR")} €</td>
       </tr>
       <tr class="total-row">
-        <td colspan="3" style="text-align:right;">Total HT</td>
+        <td style="text-align:right;">Total HT</td>
         <td>${total.toLocaleString("fr-FR")} €</td>
       </tr>
       <tr class="total-row">
-        <td colspan="3" style="text-align:right;">TVA (exonérée art. 261-4-4° a CGI)</td>
+        <td style="text-align:right;">TVA (exonérée art. 261-4-4° a CGI)</td>
         <td>0,00 €</td>
       </tr>
       <tr class="total-row">
-        <td colspan="3" style="text-align:right;">Total TTC</td>
+        <td style="text-align:right;">Total TTC</td>
         <td>${total.toLocaleString("fr-FR")} €</td>
       </tr>
     </tbody>
