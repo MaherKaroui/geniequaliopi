@@ -7800,11 +7800,45 @@ function genDocumentsCertificateursCFA(o: OrganismeInfo, f: FormationInfo) {
   return buildDocument({ org: o, title: "DOCUMENTS CERTIFICATEURS – CFA", subtitle: f.intitule, sections });
 }
 
-/** Parse rythme alternance string to get CFA weeks and enterprise weeks per cycle */
+/** Parse rythme alternance string to get CFA weeks and enterprise weeks per cycle.
+ * Supports week-based ("1 sem CFA / 3 sem entreprise"), day-based same-week alternation
+ * ("2 jours CFA / 3 jours entreprise"), and "école"/"centre" wording.
+ */
 export function parseRythmeAlternance(rythme: string): { cfaWeeks: number; entrepriseWeeks: number } {
-  const match = rythme.match(/(\d+)\s*sem.*?\/\s*(\d+)\s*sem/i);
-  if (match) return { cfaWeeks: parseInt(match[1]), entrepriseWeeks: parseInt(match[2]) };
+  if (!rythme) return { cfaWeeks: 1, entrepriseWeeks: 3 };
+  const normalized = rythme.toLowerCase();
+  const weekMatch = normalized.match(/(\d+)\s*(?:semaines?|sem)\b[^\/]*\/\s*(\d+)\s*(?:semaines?|sem)\b/i);
+  if (weekMatch) return { cfaWeeks: Math.max(1, parseInt(weekMatch[1])), entrepriseWeeks: Math.max(0, parseInt(weekMatch[2])) };
+  const dayMatch = normalized.match(/(\d+)\s*jours?\b[^\/]*\/\s*(\d+)\s*jours?\b/i);
+  if (dayMatch) {
+    const cfaDays = parseInt(dayMatch[1]);
+    const entDays = parseInt(dayMatch[2]);
+    const total = cfaDays + entDays;
+    if (total > 0 && total <= 7) return { cfaWeeks: 1, entrepriseWeeks: 0 }; // mixed week
+    return { cfaWeeks: Math.max(1, Math.round(cfaDays / 5)), entrepriseWeeks: Math.max(0, Math.round(entDays / 5)) };
+  }
   return { cfaWeeks: 1, entrepriseWeeks: 3 };
+}
+
+/** True if rhythm is days-per-week alternation (CFA + entreprise within same calendar week). */
+export function isDayBasedRythme(rythme: string): boolean {
+  if (!rythme) return false;
+  const m = rythme.toLowerCase().match(/(\d+)\s*jours?\b[^\/]*\/\s*(\d+)\s*jours?\b/i);
+  if (!m) return false;
+  const t = parseInt(m[1]) + parseInt(m[2]);
+  return t > 0 && t <= 7;
+}
+
+/** CFA days per week (defaults to 5 for week-based rhythms). */
+export function getCFADaysPerWeek(rythme: string): number {
+  if (!rythme) return 5;
+  const m = rythme.toLowerCase().match(/(\d+)\s*jours?\b[^\/]*\/\s*(\d+)\s*jours?\b/i);
+  if (m) {
+    const c = parseInt(m[1]);
+    const e = parseInt(m[2]);
+    if (c + e > 0 && c + e <= 7) return c;
+  }
+  return 5;
 }
 
 /** Calculate the total number of CFA weeks for the formation */
