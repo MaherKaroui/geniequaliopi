@@ -10304,10 +10304,18 @@ function genTableauAmeliorationContinueExcel(o: OrganismeInfo, f: FormationInfo,
   const parsedDate = rawDate ? new Date(rawDate + "T00:00:00") : null;
   const baseDate = parsedDate && !isNaN(parsedDate.getTime()) ? parsedDate : new Date();
   const year = baseDate.getFullYear();
-  
-  // Helper to format date as DD/MM/YYYY
-  const fmtDate = (d: Date) => `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
-  
+
+  // If formation is not finished, clamp all dates to TODAY (no future dates)
+  const termine = isFormationTerminee(f, stagiaires);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  // Helper to format date as DD/MM/YYYY (clamped to today if formation ongoing)
+  const fmtDate = (d: Date) => {
+    const clamped = !termine && d.getTime() > today.getTime() ? today : d;
+    return `${String(clamped.getDate()).padStart(2,'0')}/${String(clamped.getMonth()+1).padStart(2,'0')}/${clamped.getFullYear()}`;
+  };
+
   // Generate dates BEFORE the formation start date (negative offsets)
   const addDays = (d: Date, n: number) => { const r = new Date(d); r.setDate(r.getDate() + n); return r; };
   const dateOuverture = fmtDate(addDays(baseDate, -120)); // ~4 months before formation
