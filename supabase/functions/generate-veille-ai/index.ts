@@ -8,19 +8,19 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const SYSTEM_PROMPT = `Tu es expert Qualiopi spécialisé dans la veille réglementaire, métier et technologique pour la formation professionnelle française.
+const buildSystemPrompt = (anneeN: number, anneeN1: number) => `Tu es expert Qualiopi spécialisé dans la veille réglementaire, métier et technologique pour la formation professionnelle française (CFA / Action de formation).
 
-Tu génères 3 tableaux de veille (réglementaire, métier, technologique) 100% COHÉRENTS avec le métier précis de la formation.
+Tu génères 3 tableaux de veille (réglementaire, métier, technologique) 100% COHÉRENTS avec le métier précis de la formation, pour un AUDIT DE SURVEILLANCE Qualiopi sur les années ${anneeN} et ${anneeN1}.
 
 RÈGLES STRICTES :
-- Chaque ligne contient : lien (URL réelle plausible), titre du texte/article, date (format "Mois AAAA"), commentaire (2-3 phrases concrètes liées au métier), exploitation Qualiopi (preuve + action).
-- Veille RÉGLEMENTAIRE : 6 lignes — sources officielles obligatoires (Légifrance, Ministère du Travail, France Compétences, DGEFP, OPCO, codes métier). Inclure systématiquement 1-2 textes Qualiopi V9 récents + textes spécifiques au métier (ex: VTC = code transports, esthétique = code santé publique, IA = AI Act, conduite = code route).
-- Veille MÉTIER : 6 lignes — sources professionnelles du secteur (fédérations, syndicats, observatoires métiers, presse spécialisée, APEC, France Travail). 100% lié au métier de la formation.
-- Veille TECHNOLOGIQUE : 6 lignes — outils, logiciels, plateformes, méthodologies récentes du métier. Inclure 1 ressource vidéo YouTube réelle ou plausible.
+- Chaque ligne contient : lien (URL réelle plausible), titre du texte/article, date (format "Mois AAAA" — UNIQUEMENT entre janvier ${anneeN} et décembre ${anneeN1}), commentaire (2-3 phrases concrètes – ANALYSE MÉTIER), exploitation Qualiopi (preuve + action concrète, ex: "sortir une version 2 du programme avec ajout d'un objectif IA dans le cycle de la vente").
+- Veille RÉGLEMENTAIRE : 6 lignes — sources officielles obligatoires (Légifrance, Ministère du Travail, France Compétences, DGEFP, OPCO, codes métier). Inclure 1-2 textes Qualiopi V9 récents + textes spécifiques au métier (ex: NTC = code commerce/RGPD/IA Act, VTC = code transports, esthétique = code santé publique, conduite = code route).
+- Veille MÉTIER : 6 lignes DIVERSIFIÉES — DOIT obligatoirement mélanger : 1 forum / communauté professionnelle (ex: forum-vendeurs.fr, communauté LinkedIn), 1 événement / salon professionnel daté en ${anneeN} ou ${anneeN1} (ex: Salon Vendre, IA & Vente Summit), 1 article de presse spécialisée (Les Échos, LSA, Action Co, Chef d'Entreprise), 1 blog métier reconnu, 1 chaîne YouTube réelle/plausible du secteur, 1 ressource sur l'IA appliquée au métier (pour NTC : IA dans le cycle de la vente, prospection automatisée, ChatGPT pour commerciaux, Copilot ventes).
+- Veille TECHNOLOGIQUE : 6 lignes — outils, logiciels, plateformes, méthodologies récentes du métier. Inclure au moins 2 ressources vidéo YouTube réelles ou plausibles + 1 outil IA récent.
 - Toutes les URL doivent être en https:// et viser des sites réels du secteur.
-- Dates récentes : entre 12 mois et 1 mois avant la formation.
-- Commentaires en FRANÇAIS professionnel, jamais génériques.
-- Exploitation Qualiopi : toujours commencer par "Preuve :" puis "Action :".
+- Dates récentes UNIQUEMENT en ${anneeN} ou ${anneeN1} — JAMAIS d'année antérieure.
+- Commentaires en FRANÇAIS professionnel, jamais génériques — toujours intituler "Analyse métier : ...".
+- Exploitation Qualiopi : toujours "Preuve : ... Action : ..." avec une action concrète et datée (ex: "Action : sortir version 2 du programme NTC en septembre ${anneeN1} avec objectif IA dans le cycle de la vente").
 - Réponds UNIQUEMENT via l'appel d'outil, jamais en texte libre.`;
 
 const veilleRowSchema = {
@@ -59,7 +59,7 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { intitule, objectifs, programme, publicVise, codeRNCP } = await req.json();
+    const { intitule, objectifs, programme, publicVise, codeRNCP, dateDebut, dateFin } = await req.json();
     if (!intitule) {
       return new Response(JSON.stringify({ error: "intitule requis" }), {
         status: 400,
@@ -70,9 +70,16 @@ Deno.serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY non configurée");
 
+    // Année N = année de début de formation (ou année courante par défaut), N+1 = année suivante
+    const refDate = dateDebut ? new Date(dateDebut) : (dateFin ? new Date(dateFin) : new Date());
+    const anneeN = isNaN(refDate.getTime()) ? new Date().getFullYear() : refDate.getFullYear();
+    const anneeN1 = anneeN + 1;
+    const SYSTEM_PROMPT = buildSystemPrompt(anneeN, anneeN1);
+
     const userPrompt = `Formation : « ${intitule} »
-${codeRNCP ? `Certification : ${codeRNCP}\n` : ""}${objectifs ? `Objectifs : ${objectifs}\n` : ""}${publicVise ? `Public : ${publicVise}\n` : ""}${programme ? `Programme (extrait) : ${String(programme).slice(0, 1500)}\n` : ""}
-Génère les 3 tableaux de veille (6 lignes chacun) parfaitement cohérents avec ce métier précis.`;
+${codeRNCP ? `Certification : ${codeRNCP}\n` : ""}${objectifs ? `Objectifs : ${objectifs}\n` : ""}${publicVise ? `Public : ${publicVise}\n` : ""}${dateDebut ? `Période : du ${dateDebut} au ${dateFin || "(en cours)"}\n` : ""}${programme ? `Programme (extrait) : ${String(programme).slice(0, 1500)}\n` : ""}
+Contexte : audit de surveillance Qualiopi sur les années ${anneeN} et ${anneeN1}.
+Génère les 3 tableaux de veille (6 lignes chacun) parfaitement cohérents avec ce métier précis, avec dates UNIQUEMENT en ${anneeN} ou ${anneeN1}, en intégrant forums, événements/salons, articles de presse, blogs, chaînes YouTube et ressources IA appliquées au métier.`;
 
     const aiResp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
