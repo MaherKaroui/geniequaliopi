@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Download, Loader2, Building2, Users, FileText, Eye, ChevronDown, ChevronRight, X, Upload, Stamp, FileSignature, Receipt, ScrollText } from "lucide-react";
 import { getBahoEntreprises, FORMAT_SPHERE_ORG, type BahoEntreprise, type BahoStagiaire } from "@/lib/baho/bahoData";
 import { buildBahoZip } from "@/lib/baho/bahoGenerator";
-import { getRIHTML, getConventionHTML, getCGVHTML, getFactureHTML, getDevisHTML, getProgrammeHTML } from "@/lib/baho/bahoStaticDocs";
+import { getRIHTML, getConventionHTML, getCGVHTML, getFactureHTML, getDevisHTML, getProgrammeHTML, getEmargementHTML } from "@/lib/baho/bahoStaticDocs";
 import { htmlToPdfBlob } from "@/lib/pdfExport";
 import { useBackgroundJobs } from "@/lib/backgroundJobs";
 import { toast } from "sonner";
@@ -17,7 +17,7 @@ interface BahoModalProps {
   onOpenChange: (open: boolean) => void;
 }
 
-type DocKind = "ri" | "convention" | "cgv" | "facture" | "devis" | "programme";
+type DocKind = "ri" | "convention" | "cgv" | "facture" | "devis" | "programme" | "emargement";
 
 interface PreviewState {
   entreprise: BahoEntreprise;
@@ -86,6 +86,13 @@ export default function BahoModal({ open, onOpenChange }: BahoModalProps) {
         case "devis":
           html = getDevisHTML(entreprise, `BAHO-${new Date().getFullYear()}-PREV`, fsStamp ?? undefined);
           break;
+        case "programme":
+          html = getProgrammeHTML(entreprise, fsStamp ?? undefined);
+          break;
+        case "emargement":
+          if (!stagiaire) throw new Error("Stagiaire requis pour émargement");
+          html = getEmargementHTML(entreprise, stagiaire, fsStamp ?? undefined);
+          break;
         case "ri":
         default:
           html = getRIHTML(entreprise, stagiaire ?? undefined, fsStamp ?? undefined);
@@ -107,6 +114,7 @@ export default function BahoModal({ open, onOpenChange }: BahoModalProps) {
     cgv: "CGV",
     facture: "Facture",
     ri: "Règlement intérieur",
+    emargement: "Feuille d'émargement",
   };
 
   const handleGenerate = async () => {
@@ -136,7 +144,7 @@ export default function BahoModal({ open, onOpenChange }: BahoModalProps) {
             <Building2 className="w-5 h-5" /> Pack BAHO – FORMAT SPHERE
           </DialogTitle>
           <DialogDescription>
-            Pack AFEST hôtellerie : {entreprises.length} hôtels, {totalStagiaires} stagiaires. Convention par hôtel (avec liste de tous les participants), CGV, Facture, et 1 RI par stagiaire — tous tamponnés (hôtel + FORMAT SPHERE).
+            Pack AFEST hôtellerie : {entreprises.length} hôtels, {totalStagiaires} stagiaires. Programme, Convention, Devis, Facture, CGV, RI par hôtel + <strong>1 feuille d'émargement individuelle par stagiaire</strong> ({totalStagiaires} émargements au total) — tous tamponnés (hôtel + FORMAT SPHERE).
           </DialogDescription>
         </DialogHeader>
 
@@ -212,7 +220,7 @@ export default function BahoModal({ open, onOpenChange }: BahoModalProps) {
                       </button>
                       {e.stagiaires.map((s) => (
                         <button
-                          key={s.codeStagiaire}
+                          key={`ri-${s.codeStagiaire}`}
                           onClick={() => handlePreview(e, s, "ri")}
                           className={`w-full flex items-center gap-2 px-2 py-1 rounded text-xs hover:bg-muted text-left ${
                             preview?.entreprise.siret === e.siret && preview?.stagiaire?.codeStagiaire === s.codeStagiaire && preview?.docKind === "ri"
@@ -223,6 +231,21 @@ export default function BahoModal({ open, onOpenChange }: BahoModalProps) {
                           <Eye className="w-3 h-3 shrink-0" />
                           <span className="truncate">{s.prenom} {s.nom}</span>
                           <span className="text-muted-foreground shrink-0">#{s.codeStagiaire}</span>
+                        </button>
+                      ))}
+                      <div className="text-[10px] text-muted-foreground px-2 pt-1.5 pb-0.5 uppercase">Feuilles d'émargement (1 par stagiaire)</div>
+                      {e.stagiaires.map((s) => (
+                        <button
+                          key={`emarg-${s.codeStagiaire}`}
+                          onClick={() => handlePreview(e, s, "emargement")}
+                          className={`w-full flex items-center gap-2 px-2 py-1 rounded text-xs hover:bg-muted text-left ${
+                            preview?.entreprise.siret === e.siret && preview?.stagiaire?.codeStagiaire === s.codeStagiaire && preview?.docKind === "emargement"
+                              ? "bg-primary/10 text-primary"
+                              : ""
+                          }`}
+                        >
+                          <FileSignature className="w-3 h-3 shrink-0" />
+                          <span className="truncate">Émargement – {s.prenom} {s.nom}</span>
                         </button>
                       ))}
                     </div>
@@ -313,7 +336,7 @@ export default function BahoModal({ open, onOpenChange }: BahoModalProps) {
           </Button>
           <Button onClick={handleGenerate} disabled={generating} className="gap-2">
             {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
-            {generating ? "Lancement…" : `Générer le ZIP complet (${entreprises.length * 5} docs)`}
+            {generating ? "Lancement…" : `Générer le ZIP complet (${entreprises.length * 6 + totalStagiaires} docs)`}
           </Button>
         </div>
       </DialogContent>
