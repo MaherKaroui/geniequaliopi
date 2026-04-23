@@ -106,3 +106,4 @@ Unfinished training (latest end date not passed): final evaluations/tests must r
 - [logic/coherence-formation-besoins-evals](mem://logic/coherence-formation-besoins-evals) — Analyse besoins + questions ouvertes générées dynamiquement à partir des objectifs/programme réels
 - [logic/positionnement-fin-empty-if-not-finished](mem://logic/positionnement-fin-empty-if-not-finished) — Test de positionnement de fin (OPCO C6) en trame vierge tant que formation non terminée
 - [features/audit/cfa-visuels-14-missions](mem://features/audit/cfa-visuels-14-missions) — Affiches HD 14 missions dans CT3 IND 14, sous-dossier VISUELS_14_MISSIONS
+- [logic/veille-cache-persistence](mem://logic/veille-cache-persistence) — Pack veilles IA persisté en localStorage, jamais effacé sauf bouton "Régénérer"
