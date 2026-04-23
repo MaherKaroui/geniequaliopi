@@ -849,7 +849,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "fichier_gestion_annulations_cfa": return genFichierGestionAnnulationsCFA(o);
     case "accompagnement_recherche_contrat_cfa": return genAccompagnementRechercheContratCFA(o);
     case "liste_aide_social_cfa": return genListeAideSocialCFA(o);
-    case "certificat_realisation_cfa": return genCertificatRealisationCFA(o, f, stagiaires);
+    case "certificat_realisation_cfa": return genCertificatRealisationCFA(o, f, stagiaires, typeof params?.stagiaireIdx === "number" ? params.stagiaireIdx : undefined);
     case "suivi_public_beneficiaire_excel": return generateExcelSuiviPublicBeneficiaire(o, f, stagiaires);
     case "suivi_pfmp_excel": return generateExcelSuiviPFMP(o, f, stagiaires);
     // === IND 13 CFA Excel ===
