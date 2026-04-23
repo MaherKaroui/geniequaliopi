@@ -850,6 +850,11 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "procedure_abandon_cfa": return genProcedureAbandon(o);
     case "procedure_absences_cfa": return genProcedureAbsences(o);
     case "emargement_cfa": return genEmargementCFA(o, f, stagiaires);
+    case "emargement_cfa_stagiaire": {
+      const idx = typeof params?.stagiaireIdx === "number" ? params.stagiaireIdx : 0;
+      const s = stagiaires[idx];
+      return s ? genEmargementCFA(o, f, [s]) : genEmargementCFA(o, f, stagiaires);
+    }
     case "logs_connexion_cfa": return genRapportConnexion(o, f, stagiaires);
     // === IND 12 CFA templates ===
     case "mesures_engagement_beneficiaires_cfa": return genMesuresEngagementBeneficiairesCFA(o);
