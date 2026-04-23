@@ -721,6 +721,18 @@ export function getProgrammeHTML(e: BahoEntreprise, customFsStamp?: string): str
   <p>Accès après validation du besoin, signature de la convention et accord de prise en charge.<br/>
   <strong>Délai d'accès :</strong> 15 jours après validation administrative.</p>
 
+  <h2>Inscription CERES – Envoi des documents administratifs</h2>
+  <p>L'inscription est confirmée par l'envoi au client de l'ensemble des documents administratifs suivants :</p>
+  <ul>
+    <li>Contrat de formation professionnelle</li>
+    <li>Règlement intérieur</li>
+    <li>Convocation à la formation</li>
+    <li>Conditions Générales de Vente (CGV)</li>
+    <li>Programme de formation</li>
+    <li>ECF – Évaluation des Compétences en Fin de formation</li>
+    <li>Demande d'acompte et confirmation de l'inscription</li>
+  </ul>
+
   <h2>Moyens pédagogiques, techniques et encadrement</h2>
   <ul>
     <li>Supports pédagogiques structurés</li>
