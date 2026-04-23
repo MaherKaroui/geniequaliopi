@@ -10393,7 +10393,7 @@ function genTableauAmeliorationContinueExcel(o: OrganismeInfo, f: FormationInfo,
   }
 
   xlsHtml += `</table>
-<br/><p><strong>${o.nom}</strong> – Tableau d'amélioration continue – Post-formation ${f.intitule} – Année ${year}</p>
+<br/><p><strong>${o.nom}</strong> – Tableau d'amélioration continue – Préparation formation ${f.intitule} – Année ${year}</p>
 </body></html>`;
   return xlsHtml;
 }
