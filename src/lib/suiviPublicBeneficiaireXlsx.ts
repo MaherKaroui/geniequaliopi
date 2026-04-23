@@ -56,31 +56,51 @@ function buildSheet(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInf
   const merges: XLSX.Range[] = [];
   ws["!merges"] = merges;
 
-  // Titre
-  setCell(ws, "A1", `${(o.nom || "ORGANISME").toUpperCase()} – CAHIER DE CONTACT`, styleTitle());
-  merges.push({ s: { r: 0, c: 0 }, e: { r: 0, c: 6 } });
+  // Titre principal (gauche : organisme, droite : "Cahier de contact")
+  setCell(ws, "A1", (o.nom || "ORGANISME").toUpperCase(), styleTitle());
+  merges.push({ s: { r: 0, c: 0 }, e: { r: 0, c: 1 } });
+  setCell(ws, "C1", "Cahier de contact", styleTitle());
+  merges.push({ s: { r: 0, c: 2 }, e: { r: 0, c: 7 } });
 
+  // Sous-titre formation
   setCell(ws, "A2", `Suivi du public et du bénéficiaire — ${f.intitule || ""}`,
     { ...styleHeader(), font: { italic: true, sz: 10, color: { rgb: "1E3A7B" } } });
-  merges.push({ s: { r: 1, c: 0 }, e: { r: 1, c: 6 } });
+  merges.push({ s: { r: 1, c: 0 }, e: { r: 1, c: 7 } });
 
-  // En-têtes
-  const headers = ["Date", "Thème", "Raison sociale", "Identité", "Email", "Téléphone", "Résumé des échanges"];
-  headers.forEach((h, i) => setCell(ws, XLSX.utils.encode_cell({ r: 3, c: i }), h, styleHeader()));
+  // En-têtes sur 2 lignes (ligne 4 = groupes, ligne 5 = sous-en-têtes)
+  // A=Date, B=Thème, C..F=Contact (Date, Raison sociale, Identité, Email, Tel), G=Résumé
+  setCell(ws, "A4", "Date", styleHeader());
+  merges.push({ s: { r: 3, c: 0 }, e: { r: 4, c: 0 } });
+
+  setCell(ws, "B4", "Thème", styleHeader());
+  merges.push({ s: { r: 3, c: 1 }, e: { r: 4, c: 1 } });
+
+  setCell(ws, "C4", "Contact", styleHeader());
+  merges.push({ s: { r: 3, c: 2 }, e: { r: 3, c: 6 } });
+  // Sous-en-têtes du groupe Contact
+  ["Date", "Raison sociale", "Identité", "Email", "Tel"].forEach((h, i) => {
+    setCell(ws, XLSX.utils.encode_cell({ r: 4, c: 2 + i }), h, styleHeader());
+  });
+
+  setCell(ws, "H4", "Résumé des échanges", styleHeader());
+  merges.push({ s: { r: 3, c: 7 }, e: { r: 4, c: 7 } });
 
   // Lignes pré-remplies à partir des stagiaires
   const today = new Date();
-  let r = 4;
+  let r = 5;
   stagiaires.forEach((s, idx) => {
-    const d = new Date(today);
-    d.setDate(d.getDate() - (stagiaires.length - idx) * 3);
-    setCell(ws, XLSX.utils.encode_cell({ r, c: 0 }), frDate(d), styleCell());
+    const dTheme = new Date(today);
+    dTheme.setDate(dTheme.getDate() - (stagiaires.length - idx) * 5);
+    const dContact = new Date(dTheme);
+    dContact.setDate(dContact.getDate() + 2);
+    setCell(ws, XLSX.utils.encode_cell({ r, c: 0 }), frDate(dTheme), styleCell());
     setCell(ws, XLSX.utils.encode_cell({ r, c: 1 }), THEMES[idx % THEMES.length], styleCell());
-    setCell(ws, XLSX.utils.encode_cell({ r, c: 2 }), (s as any).entrepriseNom || (s as any).entreprise || "Particulier", styleCell());
-    setCell(ws, XLSX.utils.encode_cell({ r, c: 3 }), `${s.civilite || ""} ${s.nom || ""} ${s.prenom || ""}`.trim(), styleCell());
-    setCell(ws, XLSX.utils.encode_cell({ r, c: 4 }), s.email || "", styleCell());
-    setCell(ws, XLSX.utils.encode_cell({ r, c: 5 }), s.telephone || "", styleCell());
-    setCell(ws, XLSX.utils.encode_cell({ r, c: 6 }),
+    setCell(ws, XLSX.utils.encode_cell({ r, c: 2 }), frDate(dContact), styleCell());
+    setCell(ws, XLSX.utils.encode_cell({ r, c: 3 }), (s as any).entrepriseNom || (s as any).entreprise || "Particulier", styleCell());
+    setCell(ws, XLSX.utils.encode_cell({ r, c: 4 }), `${s.civilite || ""} ${s.nom || ""} ${s.prenom || ""}`.trim(), styleCell());
+    setCell(ws, XLSX.utils.encode_cell({ r, c: 5 }), s.email || "", styleCell());
+    setCell(ws, XLSX.utils.encode_cell({ r, c: 6 }), s.telephone || "", styleCell());
+    setCell(ws, XLSX.utils.encode_cell({ r, c: 7 }),
       `Échange concernant la formation ${f.intitule || ""}. Information transmise, candidature suivie.`,
       styleCell());
     r++;
@@ -88,18 +108,18 @@ function buildSheet(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInf
 
   // Lignes vierges supplémentaires
   for (let k = 0; k < 20; k++) {
-    for (let c = 0; c < 7; c++) {
+    for (let c = 0; c < 8; c++) {
       setCell(ws, XLSX.utils.encode_cell({ r, c }), "", styleCell());
     }
     r++;
   }
 
   ws["!cols"] = [
-    { wch: 12 }, { wch: 22 }, { wch: 24 }, { wch: 24 },
-    { wch: 28 }, { wch: 14 }, { wch: 50 },
+    { wch: 12 }, { wch: 22 }, { wch: 12 }, { wch: 24 },
+    { wch: 24 }, { wch: 28 }, { wch: 14 }, { wch: 50 },
   ];
-  ws["!rows"] = [{ hpt: 26 }, { hpt: 20 }, { hpt: 6 }, { hpt: 30 }];
-  ws["!ref"] = XLSX.utils.encode_range({ s: { r: 0, c: 0 }, e: { r: r - 1, c: 6 } });
+  ws["!rows"] = [{ hpt: 26 }, { hpt: 20 }, { hpt: 6 }, { hpt: 22 }, { hpt: 22 }];
+  ws["!ref"] = XLSX.utils.encode_range({ s: { r: 0, c: 0 }, e: { r: r - 1, c: 7 } });
   return ws;
 }
 
