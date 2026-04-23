@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Download, Loader2, Building2, Users, FileText, Eye, ChevronDown, ChevronRight, X, Upload, Stamp, FileSignature, Receipt, ScrollText } from "lucide-react";
 import { getBahoEntreprises, FORMAT_SPHERE_ORG, type BahoEntreprise, type BahoStagiaire } from "@/lib/baho/bahoData";
 import { buildBahoZip } from "@/lib/baho/bahoGenerator";
-import { getRIHTML, getConventionHTML, getCGVHTML, getFactureHTML, getDevisHTML } from "@/lib/baho/bahoStaticDocs";
+import { getRIHTML, getConventionHTML, getCGVHTML, getFactureHTML, getDevisHTML, getProgrammeHTML } from "@/lib/baho/bahoStaticDocs";
 import { htmlToPdfBlob } from "@/lib/pdfExport";
 import { useBackgroundJobs } from "@/lib/backgroundJobs";
 import { toast } from "sonner";
@@ -17,7 +17,7 @@ interface BahoModalProps {
   onOpenChange: (open: boolean) => void;
 }
 
-type DocKind = "ri" | "convention" | "cgv" | "facture" | "devis";
+type DocKind = "ri" | "convention" | "cgv" | "facture" | "devis" | "programme";
 
 interface PreviewState {
   entreprise: BahoEntreprise;
