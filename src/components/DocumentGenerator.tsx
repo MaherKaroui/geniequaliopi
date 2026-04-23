@@ -709,6 +709,24 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
             const docxBlob = await processDocxTemplate(DOCX_TEMPLATE_FILES[doc.template], mergedOrganisme);
             addFileToZip(`${basePath}/${buildCatalogFileName(doc, null, ".docx")}`, docxBlob);
           });
+        } else if (doc.template === "suivi_parcours_beneficiaires_excel") {
+          await safeRun(doc.nom, async () => {
+            const { generateSuiviParcoursBeneficiairesXlsxBlob } = await import("@/lib/suiviParcoursBeneficiairesXlsx");
+            const blob = generateSuiviParcoursBeneficiairesXlsxBlob(mergedOrganisme, selectedFormation, allStagiaires);
+            addFileToZip(`${basePath}/${buildCatalogFileName(doc, null, ".xlsx")}`, blob);
+          });
+        } else if (doc.template === "suivi_public_beneficiaire_excel") {
+          await safeRun(doc.nom, async () => {
+            const { generateSuiviPublicBeneficiaireXlsxBlob } = await import("@/lib/suiviPublicBeneficiaireXlsx");
+            const blob = generateSuiviPublicBeneficiaireXlsxBlob(mergedOrganisme, selectedFormation, allStagiaires);
+            addFileToZip(`${basePath}/${buildCatalogFileName(doc, null, ".xlsx")}`, blob);
+          });
+        } else if (doc.template === "suivi_pfmp_excel") {
+          await safeRun(doc.nom, async () => {
+            const { generateSuiviPFMPXlsxBlob } = await import("@/lib/suiviPFMPXlsx");
+            const blob = generateSuiviPFMPXlsxBlob(mergedOrganisme, selectedFormation, allStagiaires);
+            addFileToZip(`${basePath}/${buildCatalogFileName(doc, null, ".xlsx")}`, blob);
+          });
         } else if (
           doc.template === "indicateurs_performance"
           || doc.template === "tableau_suivi_parcours_excel"
