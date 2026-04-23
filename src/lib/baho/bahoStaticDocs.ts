@@ -93,22 +93,7 @@ export function getRIHTML(e: BahoEntreprise, stagiaire?: BahoStagiaire, customFs
 
   <p style="margin-top:30px;">Fait à ${FORMAT_SPHERE_ORG.ville}, le ${formatDateLong(e.dateConvention)}</p>
 
-  <table style="margin-top:20px; border:none;">
-    <tr style="border:none;">
-      <td style="border:none; width:50%; text-align:center; vertical-align:top;">
-        <strong>Pour l'organisme de formation</strong><br/>
-        ${FORMAT_SPHERE_ORG.dirigeant}<br/>
-        <em>${FORMAT_SPHERE_ORG.nom}</em><br/>
-        <img src="${fsStamp}" alt="Tampon FORMAT SPHERE" style="width:160px; height:160px; margin-top:10px;"/>
-      </td>
-      <td style="border:none; width:50%; text-align:center; vertical-align:top;">
-        <strong>Pour l'entreprise bénéficiaire</strong><br/>
-        ${e.dirigeant}<br/>
-        <em>${e.nom}</em><br/>
-        <img src="${hotelStamp}" alt="Tampon hôtel" style="width:160px; height:160px; margin-top:10px;"/>
-      </td>
-    </tr>
-  </table>
+  ${stampsBlock(e, customFsStamp)}
 
   ${stagiaire ? `<p style="margin-top:20px;"><strong>Signature du stagiaire</strong> (${civilite}) :<br/>
   <span style="display:inline-block; border-bottom:1px solid #888; width:300px; height:40px;"></span></p>` : ""}
