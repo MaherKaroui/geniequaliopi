@@ -63,6 +63,8 @@ export async function generateAIVeillePack(f: FormationInfo, force = false): Pro
       programme: f.programme,
       publicVise: f.publicVise,
       codeRNCP: f.codeRNCP,
+      dateDebut: f.dateDebut,
+      dateFin: f.dateFin,
     },
   });
   if (error) throw new Error(error.message || "Erreur appel IA veilles");
