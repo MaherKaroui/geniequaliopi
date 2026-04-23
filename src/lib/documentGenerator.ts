@@ -11865,7 +11865,6 @@ function genCalendrierFormationOPCO(o: OrganismeInfo, f: FormationInfo, stagiair
     const shift = computeWeekShift(g.debut);
     const ecoleDays = refDate ? allDays.filter((d) => isEcoleWeek(weekIndex(d, refDate), shift)) : [];
     const nbEcoleDays = ecoleDays.length;
-    const volumeEcole = nbEcoleDays * 7;
     const envoiISO = computeEnvoiDate(g.debut);
     if (envoiISO) envoiDatesISO.push(envoiISO);
     const envoiLabel = envoiISO ? formatDate(envoiISO) : "—";
@@ -11877,22 +11876,21 @@ function genCalendrierFormationOPCO(o: OrganismeInfo, f: FormationInfo, stagiair
       extra += `<div class="page-break-before" style="page-break-before:always;break-before:page;height:0px;overflow:hidden"></div>`;
     }
     extra += `<h3 style="margin-top:18px;page-break-after:avoid">${titreGroupe}</h3>`;
-    extra += `<p><strong>Période :</strong> du ${formatDate(g.debut)} au ${formatDate(g.fin)} &nbsp;|&nbsp; <strong>Rythme :</strong> ${rythmeLabel} &nbsp;|&nbsp; <strong>Volume centre :</strong> ${volumeEcole} h sur ${nbEcoleDays} jour${nbEcoleDays > 1 ? "s" : ""} école (7 h/jour)</p>`;
+    extra += `<p><strong>Période :</strong> du ${formatDate(g.debut)} au ${formatDate(g.fin)} &nbsp;|&nbsp; <strong>Rythme :</strong> ${rythmeLabel} &nbsp;|&nbsp; <strong>Jours école :</strong> ${nbEcoleDays}</p>`;
     extra += `<p style="margin:4px 0;font-size:0.9em;color:#1e3a7b"><strong>Date d'envoi du calendrier :</strong> ${envoiLabel} <em>(7 jours ouvrés avant le démarrage — hors week-end et jours fériés)</em></p>`;
     extra += `<table border="1" cellpadding="5" cellspacing="0" style="border-collapse:collapse;width:100%">
       <thead><tr style="background:#1e3a7b;color:#fff">
-        <th style="width:5%">N°</th>
-        <th style="width:7%">Sem.</th>
-        <th style="width:11%">Type</th>
-        <th style="width:17%">Date</th>
-        <th style="width:11%">Jour</th>
-        <th style="width:13%">Horaires matin</th>
-        <th style="width:13%">Horaires après-midi</th>
-        <th style="width:7%">Volume</th>
+        <th style="width:6%">N°</th>
+        <th style="width:8%">Sem.</th>
+        <th style="width:12%">Type</th>
+        <th style="width:20%">Date</th>
+        <th style="width:12%">Jour</th>
+        <th style="width:14%">Horaires matin</th>
+        <th style="width:14%">Horaires après-midi</th>
         <th>Lieu</th>
       </tr></thead><tbody>`;
     if (allDays.length === 0 || !refDate) {
-      extra += `<tr><td colspan="9" style="text-align:center;color:#888">Dates à renseigner dans la fiche stagiaire.</td></tr>`;
+      extra += `<tr><td colspan="8" style="text-align:center;color:#888">Dates à renseigner dans la fiche stagiaire.</td></tr>`;
     } else {
       let ecoleCounter = 0;
       let entrepriseCounter = 0;
@@ -11907,7 +11905,6 @@ function genCalendrierFormationOPCO(o: OrganismeInfo, f: FormationInfo, stagiair
           : `<span style="color:#9a6300;font-weight:bold">Entreprise</span>`;
         const matin = ecole ? horairesMatin : "—";
         const aprem = ecole ? horairesAprem : "—";
-        const vol = ecole ? "7 h" : "—";
         const lieuJour = ecole ? lieu : "Entreprise d'accueil";
         extra += `<tr style="background:${bg}">
           <td style="text-align:center">${numLabel}</td>
@@ -11917,7 +11914,6 @@ function genCalendrierFormationOPCO(o: OrganismeInfo, f: FormationInfo, stagiair
           <td style="text-transform:capitalize">${fmtJour(d)}</td>
           <td style="text-align:center">${matin}</td>
           <td style="text-align:center">${aprem}</td>
-          <td style="text-align:center">${vol}</td>
           <td>${lieuJour}</td>
         </tr>`;
       });
@@ -11926,8 +11922,8 @@ function genCalendrierFormationOPCO(o: OrganismeInfo, f: FormationInfo, stagiair
   }
 
   extra += `<p style="margin-top:14px;font-size:0.9em"><em>Ce calendrier est communiqué aux apprenants à l'inscription, à l'employeur et à l'OPCO financeur. Toute modification fait l'objet d'une convocation rectificative au moins 7 jours avant le démarrage. Le rythme d'alternance commence systématiquement par une semaine en centre de formation.</em></p>`;
-  // Date d'envoi globale = la plus précoce des dates d'envoi de session (premier départ - 7 j ouvrés)
-  const envoiGlobalISO = envoiDatesISO.sort()[0] || new Date().toISOString().slice(0, 10);
+  // "Fait à le" = date d'envoi (début de session - 7j ouvrés), priorité à la date la plus précoce
+  const envoiGlobalISO = envoiDatesISO.sort()[0] || subtractBusinessDays(new Date().toISOString().slice(0, 10), 7);
   extra += `<p style="margin-top:18px"><strong>Fait à</strong> ${o.ville || "—"}, <strong>le</strong> ${formatDate(envoiGlobalISO)}</p>`;
   extra += `<p><strong>${o.dirigeant || o.responsablePedagogique || "Le responsable pédagogique"}</strong><br>${o.nom}</p>`;
 
@@ -12150,18 +12146,61 @@ function genTempsConnexionOPCO(o: OrganismeInfo, f: FormationInfo, stagiaires: S
 }
 
 /**
- * Calendrier OPCO VIERGE : trame sans noms de stagiaires, prête à remplir.
- * Conserve la structure (rythme, sessions, jours école/entreprise) mais sans identités.
+ * Calendrier OPCO VIERGE : trame totalement vide — pas de dates, pas de noms.
+ * Conserve UNIQUEMENT la structure des colonnes et un nombre de lignes vides.
  */
-function genCalendrierFormationOPCOVierge(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
-  const html = genCalendrierFormationOPCO(o, f, stagiaires);
-  // Remplace les noms de stagiaires par "À compléter" dans les titres "Session X — Nom Prénom"
-  let cleaned = html
-    .replace(/(Session\s+\d+\s+—\s+)[^<]+(<\/h3>)/g, "$1À compléter$2")
-    .replace(/(Session\s+—\s+)[^<]+(<\/h3>)/g, "$1À compléter$2")
-    // Bandeau titre principal
-    .replace(/CALENDRIER DE FORMATION/g, "CALENDRIER DE FORMATION (TRAME VIERGE)");
-  return cleaned;
+function genCalendrierFormationOPCOVierge(o: OrganismeInfo, f: FormationInfo, _stagiaires: StagiaireInfo[]) {
+  const lieu = f.lieu?.trim() || o.adresse || "";
+  const isDistance = lieu.toLowerCase().includes("distance") || lieu.toLowerCase().includes("distanciel");
+  const horairesMatin = "09h00 – 12h30";
+  const horairesAprem = "13h30 – 17h00";
+
+  let extra = `<p><em>Trame vierge du calendrier de formation. À compléter manuellement avec les dates, jours et lieux de chaque journée. Une session par page.</em></p>`;
+  extra += `<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%;margin-bottom:18px">
+    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold;width:30%">Intitulé de la formation</td><td>&nbsp;</td></tr>
+    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Organisme</td><td>&nbsp;</td></tr>
+    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Modalité</td><td>${isDistance ? "Distanciel synchrone (classe virtuelle)" : "Présentiel"} — Apprentissage en alternance</td></tr>
+    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Lieu de déroulement</td><td>&nbsp;</td></tr>
+    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Rythme d'alternance</td><td>&nbsp;</td></tr>
+    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Horaires (jours école)</td><td>Matin : ${horairesMatin} &nbsp;|&nbsp; Après-midi : ${horairesAprem} (pause déjeuner 12h30 – 13h30) — 7 h/jour</td></tr>
+    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Formateur</td><td>&nbsp;</td></tr>
+    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Nombre de sessions</td><td>&nbsp;</td></tr>
+    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Nombre d'apprenants</td><td>&nbsp;</td></tr>
+  </table>`;
+
+  extra += `<h3 style="margin-top:18px;page-break-after:avoid">Session — À compléter</h3>`;
+  extra += `<p><strong>Période :</strong> du ____________ au ____________ &nbsp;|&nbsp; <strong>Rythme :</strong> ____________ &nbsp;|&nbsp; <strong>Jours école :</strong> ____</p>`;
+  extra += `<p style="margin:4px 0;font-size:0.9em;color:#1e3a7b"><strong>Date d'envoi du calendrier :</strong> ____________ <em>(7 jours ouvrés avant le démarrage — hors week-end et jours fériés)</em></p>`;
+  extra += `<table border="1" cellpadding="5" cellspacing="0" style="border-collapse:collapse;width:100%">
+    <thead><tr style="background:#1e3a7b;color:#fff">
+      <th style="width:6%">N°</th>
+      <th style="width:8%">Sem.</th>
+      <th style="width:12%">Type</th>
+      <th style="width:20%">Date</th>
+      <th style="width:12%">Jour</th>
+      <th style="width:14%">Horaires matin</th>
+      <th style="width:14%">Horaires après-midi</th>
+      <th>Lieu</th>
+    </tr></thead><tbody>`;
+  // 30 lignes vides pour permettre la saisie manuelle
+  for (let i = 0; i < 30; i++) {
+    extra += `<tr>
+      <td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>
+      <td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>
+    </tr>`;
+  }
+  extra += `</tbody></table>`;
+
+  extra += `<p style="margin-top:14px;font-size:0.9em"><em>Trame vierge — à compléter avec les dates exactes, le rythme d'alternance et le lieu de déroulement de la formation.</em></p>`;
+  extra += `<p style="margin-top:18px"><strong>Fait à</strong> ____________, <strong>le</strong> ____________</p>`;
+  extra += `<p><strong>____________________________</strong><br>____________________________</p>`;
+
+  return buildDocument({
+    org: o,
+    title: "CALENDRIER DE FORMATION (TRAME VIERGE)",
+    subtitle: f.intitule,
+    extraHtml: extra,
+  });
 }
 
 /**
@@ -12246,69 +12285,44 @@ function genTempsConnexionOPCOVierge(o: OrganismeInfo, f: FormationInfo, stagiai
 
   const plateforme = o.outilsUtilises || "Zoom / Teams";
 
-  let extra = `<p><em>Trame vierge du relevé des temps de connexion par session. Une session par page. Tableau prêt à compléter manuellement à partir des journaux LMS / classe virtuelle.</em></p>`;
+  let extra = `<p><em>Trame vierge du relevé des temps de connexion. À compléter manuellement avec les dates, noms et horaires relevés sur la plateforme LMS / classe virtuelle.</em></p>`;
   extra += `<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%;margin-bottom:18px">
-    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold;width:30%">Intitulé de la formation</td><td>${f.intitule}</td></tr>
-    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Organisme</td><td>${o.nom}${o.nda ? ` – NDA ${o.nda}` : ""}</td></tr>
+    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold;width:30%">Intitulé de la formation</td><td>&nbsp;</td></tr>
+    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Organisme</td><td>&nbsp;</td></tr>
     <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Plateforme</td><td>${plateforme}</td></tr>
-    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Rythme d'alternance</td><td>${rythmeLabel} — démarrage en semaine école</td></tr>
-    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Date d'édition</td><td>${formatDate(new Date().toISOString())}</td></tr>
-    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Nombre de sessions</td><td>${groupes.size}</td></tr>
+    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Rythme d'alternance</td><td>&nbsp;</td></tr>
+    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Date d'édition</td><td>&nbsp;</td></tr>
+    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Nombre de sessions</td><td>&nbsp;</td></tr>
   </table>`;
 
-  let groupIdx = 0;
-  for (const [, g] of groupes) {
-    groupIdx++;
-    const refDate = parseD(g.debut);
-    const shift = computeWeekShift(g.debut);
-    const allDays = buildAllWorkdays(g.debut, g.fin);
-    const ecoleDays = refDate ? allDays.filter((d) => isEcoleWeek(weekIndex(d, refDate), shift)) : [];
+  extra += `<h3 style="margin-top:18px;page-break-after:avoid">Session — À compléter</h3>`;
+  extra += `<p><strong>Période :</strong> du ____________ au ____________ &nbsp;|&nbsp; <strong>Jours école :</strong> ____ &nbsp;|&nbsp; <strong>Plateforme :</strong> ${plateforme}</p>`;
 
-    const titreGroupe = groupes.size > 1 ? `Session ${groupIdx} — À compléter` : `Session — À compléter`;
-    if (groupIdx > 1) {
-      extra += `<div class="page-break-before" style="page-break-before:always;break-before:page;height:0px;overflow:hidden"></div>`;
-    }
-    extra += `<h3 style="margin-top:18px;page-break-after:avoid">${titreGroupe}</h3>`;
-    extra += `<p><strong>Période :</strong> du ${formatDate(g.debut)} au ${formatDate(g.fin)} &nbsp;|&nbsp; <strong>Jours école :</strong> ${ecoleDays.length} &nbsp;|&nbsp; <strong>Plateforme :</strong> ${plateforme}</p>`;
-
-    extra += `<table border="1" cellpadding="5" cellspacing="0" style="border-collapse:collapse;width:100%;margin-bottom:14px">
-      <thead><tr style="background:#1e3a7b;color:#fff">
-        <th>Date</th>
-        <th>Jour</th>
-        <th>Nom apprenant</th>
-        <th>Adresse IP</th>
-        <th>Connexion matin</th>
-        <th>Déconnexion midi</th>
-        <th>Reconnexion</th>
-        <th>Déconnexion soir</th>
-        <th>Durée totale</th>
-        <th>Statut</th>
-      </tr></thead><tbody>`;
-
-    if (ecoleDays.length === 0) {
-      extra += `<tr><td colspan="10" style="text-align:center;color:#888">Aucun jour en centre de formation sur cette période.</td></tr>`;
-    } else {
-      ecoleDays.forEach((d) => {
-        extra += `<tr>
-          <td>${fmtDateLong(d)}</td>
-          <td style="text-transform:capitalize">${fmtJour(d)}</td>
-          <td>&nbsp;</td>
-          <td>&nbsp;</td>
-          <td>&nbsp;</td>
-          <td>&nbsp;</td>
-          <td>&nbsp;</td>
-          <td>&nbsp;</td>
-          <td>&nbsp;</td>
-          <td>&nbsp;</td>
-        </tr>`;
-      });
-    }
-    extra += `</tbody></table>`;
+  extra += `<table border="1" cellpadding="5" cellspacing="0" style="border-collapse:collapse;width:100%;margin-bottom:14px">
+    <thead><tr style="background:#1e3a7b;color:#fff">
+      <th>Date</th>
+      <th>Jour</th>
+      <th>Nom apprenant</th>
+      <th>Adresse IP</th>
+      <th>Connexion matin</th>
+      <th>Déconnexion midi</th>
+      <th>Reconnexion</th>
+      <th>Déconnexion soir</th>
+      <th>Durée totale</th>
+      <th>Statut</th>
+    </tr></thead><tbody>`;
+  // 25 lignes vides pour la saisie manuelle
+  for (let i = 0; i < 25; i++) {
+    extra += `<tr>
+      <td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>
+      <td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>
+    </tr>`;
   }
+  extra += `</tbody></table>`;
 
   extra += `<p style="margin-top:14px;font-size:0.9em"><em>Trame vierge — à compléter avec les temps de connexion réels relevés sur la plateforme LMS / classe virtuelle.</em></p>`;
-  extra += `<p style="margin-top:18px"><strong>Fait à</strong> ${o.ville || "—"}, <strong>le</strong> ${formatDate(new Date().toISOString())}</p>`;
-  extra += `<p><strong>${o.dirigeant || o.responsablePedagogique || "Le responsable pédagogique"}</strong><br>${o.nom}</p>`;
+  extra += `<p style="margin-top:18px"><strong>Fait à</strong> ____________, <strong>le</strong> ____________</p>`;
+  extra += `<p><strong>____________________________</strong><br>____________________________</p>`;
 
   return buildDocument({
     org: o,
@@ -12463,11 +12477,11 @@ function genExercicesOPCO(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
         ? baseExercices[exIdx % baseExercices.length]
         : { titre: `Exercice ${exIdx + 1}`, consigne: `Mise en pratique des compétences acquises durant la semaine ${exIdx + 1} en centre de formation.`, reponseAttendue: "" };
 
-      extra += `<div style="border:1px solid #ccc;padding:10px;margin-bottom:14px;page-break-inside:avoid">`;
-      extra += `<h4 style="margin:0 0 6px 0">Exercice ${exIdx + 1} — Semaine école ${exIdx + 1} — QCM /10</h4>`;
+      // Header bloc — sans wrapper div pour permettre la pagination row-by-row des tableaux QCM
+      extra += `<h4 style="margin:14px 0 4px 0;padding:6px 10px;background:#eef2fb;border-left:4px solid #1e3a7b;page-break-after:avoid">Exercice ${exIdx + 1} — Semaine école ${exIdx + 1} — QCM /10</h4>`;
       extra += `<p style="margin:2px 0;font-size:0.9em"><strong>Période semaine école :</strong> du ${fmtDateLong(firstDay)} au ${fmtDateLong(lastDay)} &nbsp;|&nbsp; <strong>Date de l'exercice :</strong> ${fmtDateLong(lastDay)}${isPast ? "" : ` <span style="color:#9a6300">(à venir)</span>`}</p>`;
       extra += `<p style="margin:6px 0 4px 0"><strong>Thème de la semaine :</strong> ${ex.titre}</p>`;
-      extra += `<p style="margin:4px 0;font-size:0.9em;color:#555"><em>${ex.consigne}</em></p>`;
+      extra += `<p style="margin:4px 0 8px 0;font-size:0.9em;color:#555"><em>${ex.consigne}</em></p>`;
 
       // Sélectionner 10 questions QCM cohérentes avec la formation (rotation déterministe dans le pool)
       const QCM_PER_EX = 10;
@@ -12480,7 +12494,6 @@ function genExercicesOPCO(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
       }
 
       if (isPast && selectedQuestions.length > 0) {
-        // Réponses RÉALISTES par stagiaire — chacun répond, score déterministe entre 7 et 10/10
         const observationsPool = [
           "QCM bien réussi. Les notions vues en séance sont acquises.",
           "Très bonne maîtrise des concepts. Quelques hésitations mineures.",
@@ -12493,7 +12506,6 @@ function genExercicesOPCO(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
         ];
         g.stagiaires.forEach((s, sIdx) => {
           const seedBase = ((s.nom?.charCodeAt(0) || 65) * 7 + (s.prenom?.charCodeAt(0) || 65) * 11 + exIdx * 13 + sIdx * 31);
-          // Score déterministe entre 7 et 10/10 (Qualiopi : résultats positifs)
           const note = 7 + (seedBase % 4);
           const nbErrors = 10 - note;
           const wrongIdxSet = new Set<number>();
@@ -12504,9 +12516,10 @@ function genExercicesOPCO(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
           const observation = observationsPool[(seedBase + exIdx) % observationsPool.length];
           const letters = ["a", "b", "c", "d", "e", "f"];
 
-          extra += `<div style="margin-top:10px;padding:8px;background:#f8f9fc;border-left:3px solid #1e3a7b">`;
-          extra += `<p style="margin:0 0 6px 0"><strong>Apprenant :</strong> ${s.prenom} ${s.nom}${s.entreprise ? ` — ${s.entreprise}` : ""} &nbsp;|&nbsp; <strong>Date :</strong> ${fmtDateLong(lastDay)}</p>`;
-          extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%;font-size:0.88em">
+          // En-tête apprenant en paragraphe (top-level, peut basculer de page indépendamment)
+          extra += `<p style="margin:10px 0 4px 0;padding:6px 8px;background:#f8f9fc;border-left:3px solid #1e3a7b;page-break-after:avoid"><strong>Apprenant :</strong> ${s.prenom} ${s.nom}${s.entreprise ? ` — ${s.entreprise}` : ""} &nbsp;|&nbsp; <strong>Date :</strong> ${fmtDateLong(lastDay)}</p>`;
+          // Tableau QCM en top-level → pagination row-by-row (thead répété)
+          extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%;font-size:0.88em;margin-bottom:6px">
             <thead><tr style="background:#1e3a7b;color:#fff">
               <th style="width:5%">N°</th>
               <th style="width:45%">Question</th>
@@ -12547,16 +12560,13 @@ function genExercicesOPCO(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
             </tr>`;
           });
           extra += `</tbody></table>`;
-          extra += `<p style="margin:6px 0 0 0"><strong>Score :</strong> <span style="color:#1e3a7b;font-weight:bold;font-size:1.1em">${note}/10</span> — ${appreciation} &nbsp;|&nbsp; <strong>Observation formateur :</strong> ${observation}</p>`;
-          extra += `</div>`;
+          extra += `<p style="margin:0 0 10px 0;padding:4px 8px;background:#f8f9fc"><strong>Score :</strong> <span style="color:#1e3a7b;font-weight:bold;font-size:1.1em">${note}/10</span> — ${appreciation} &nbsp;|&nbsp; <strong>Observation formateur :</strong> ${observation}</p>`;
         });
       } else if (!isPast && selectedQuestions.length > 0) {
-        // Trame vierge du QCM pour les semaines à venir — une trame par apprenant
         extra += `<p style="margin:6px 0;color:#888;font-style:italic">QCM à compléter par les apprenants à l'issue de la semaine école du ${fmtDateLong(lastDay)}.</p>`;
         g.stagiaires.forEach((s) => {
-          extra += `<div style="margin-top:10px;padding:8px;background:#fffaf0;border-left:3px solid #d4a017">`;
-          extra += `<p style="margin:0 0 6px 0"><strong>Apprenant :</strong> ${s.prenom} ${s.nom}${s.entreprise ? ` — ${s.entreprise}` : ""} &nbsp;|&nbsp; <strong>Date prévue :</strong> ${fmtDateLong(lastDay)}</p>`;
-          extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%;font-size:0.88em;margin-top:4px">
+          extra += `<p style="margin:10px 0 4px 0;padding:6px 8px;background:#fffaf0;border-left:3px solid #d4a017;page-break-after:avoid"><strong>Apprenant :</strong> ${s.prenom} ${s.nom}${s.entreprise ? ` — ${s.entreprise}` : ""} &nbsp;|&nbsp; <strong>Date prévue :</strong> ${fmtDateLong(lastDay)}</p>`;
+          extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%;font-size:0.88em;margin-bottom:6px">
             <thead><tr style="background:#fff8e8">
               <th style="width:5%">N°</th>
               <th style="width:55%">Question</th>
@@ -12573,13 +12583,11 @@ function genExercicesOPCO(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
             </tr>`;
           });
           extra += `</tbody></table>`;
-          extra += `<p style="margin:6px 0 0 0"><strong>Score :</strong> _____ /10 &nbsp;|&nbsp; <strong>Mention :</strong> _________________ &nbsp;|&nbsp; <strong>Observation formateur :</strong> _____________________________________________</p>`;
-          extra += `</div>`;
+          extra += `<p style="margin:0 0 10px 0;padding:4px 8px;background:#fffaf0"><strong>Score :</strong> _____ /10 &nbsp;|&nbsp; <strong>Mention :</strong> _________________ &nbsp;|&nbsp; <strong>Observation formateur :</strong> _____________________________________________</p>`;
         });
       } else if (isPast) {
         extra += `<p style="color:#888;font-style:italic">Aucune banque de QCM disponible pour cette formation. Exercice à formaliser manuellement par le formateur.</p>`;
       }
-      extra += `</div>`;
     });
   }
 
