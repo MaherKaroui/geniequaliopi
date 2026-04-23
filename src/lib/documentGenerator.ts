@@ -4048,7 +4048,8 @@ function genCompetencesAlternance(o: OrganismeInfo, f: FormationInfo, stagiaires
 // ============== CFA CT1 IND 1 — Documents d'information ==============
 
 function genPlaquetteCommercialeCFA(o: OrganismeInfo, f: FormationInfo) {
-  const termine = isFormationTerminee(f);
+  // CFA établi : on présente toujours les indicateurs consolidés (pas de mention "nouvel entrant")
+  const termine = true;
   const mc = getModaliteContent(f, o);
   const indicateursContent = termine
     ? `<p>• Taux de satisfaction globale : 94%<br>• Nombre de bénéficiaires : 45<br>• Taux de réussite du centre : 89%<br>• Taux national : 82% (source InserJeunes)<br>• Taux de retour enquêtes : 78%<br>• Taux d'abandon : 3%<br>• Taux d'interruption de parcours : 5%<br>• Taux d'insertion professionnelle : 85%<br>• Taux de rupture en alternance : 8%</p>`
@@ -4121,7 +4122,8 @@ function genProcedureFormationCFA(o: OrganismeInfo, f: FormationInfo) {
 function genIndicateursResultatsCFA(o: OrganismeInfo, f: FormationInfo) {
   const year = new Date().getFullYear();
   const prevYear = year - 1;
-  const termine = isFormationTerminee(f);
+  // CFA établi : indicateurs consolidés systématiquement (pas de mention "nouvel entrant")
+  const termine = true;
 
   const indicateursSection = termine
     ? { heading: "2. Indicateurs de résultats", content: tableHTML(
