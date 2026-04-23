@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Download, Loader2, Building2, Users, FileText, Eye, ChevronDown, ChevronRight, X, Upload, Stamp, FileSignature, Receipt, ScrollText } from "lucide-react";
 import { getBahoEntreprises, FORMAT_SPHERE_ORG, type BahoEntreprise, type BahoStagiaire } from "@/lib/baho/bahoData";
 import { buildBahoZip } from "@/lib/baho/bahoGenerator";
-import { getRIHTML, getConventionHTML, getCGVHTML, getFactureHTML } from "@/lib/baho/bahoStaticDocs";
+import { getRIHTML, getConventionHTML, getCGVHTML, getFactureHTML, getDevisHTML } from "@/lib/baho/bahoStaticDocs";
 import { htmlToPdfBlob } from "@/lib/pdfExport";
 import { useBackgroundJobs } from "@/lib/backgroundJobs";
 import { toast } from "sonner";
@@ -17,7 +17,7 @@ interface BahoModalProps {
   onOpenChange: (open: boolean) => void;
 }
 
-type DocKind = "ri" | "convention" | "cgv" | "facture";
+type DocKind = "ri" | "convention" | "cgv" | "facture" | "devis";
 
 interface PreviewState {
   entreprise: BahoEntreprise;
@@ -83,6 +83,9 @@ export default function BahoModal({ open, onOpenChange }: BahoModalProps) {
         case "facture":
           html = getFactureHTML(entreprise, `BAHO-${new Date().getFullYear()}-PREV`, fsStamp ?? undefined);
           break;
+        case "devis":
+          html = getDevisHTML(entreprise, `BAHO-${new Date().getFullYear()}-PREV`, fsStamp ?? undefined);
+          break;
         case "ri":
         default:
           html = getRIHTML(entreprise, stagiaire ?? undefined, fsStamp ?? undefined);
@@ -99,6 +102,7 @@ export default function BahoModal({ open, onOpenChange }: BahoModalProps) {
 
   const docLabels: Record<DocKind, string> = {
     convention: "Convention de formation",
+    devis: "Devis",
     cgv: "CGV",
     facture: "Facture",
     ri: "Règlement intérieur",
@@ -163,6 +167,14 @@ export default function BahoModal({ open, onOpenChange }: BahoModalProps) {
                         }`}
                       >
                         <FileSignature className="w-3 h-3 shrink-0" /> Convention (avec {e.stagiaires.length} participants)
+                      </button>
+                      <button
+                        onClick={() => handlePreview(e, null, "devis")}
+                        className={`w-full flex items-center gap-2 px-2 py-1 rounded text-xs hover:bg-muted text-left ${
+                          preview?.entreprise.siret === e.siret && preview?.docKind === "devis" ? "bg-primary/10 text-primary" : ""
+                        }`}
+                      >
+                        <FileText className="w-3 h-3 shrink-0" /> Devis
                       </button>
                       <button
                         onClick={() => handlePreview(e, null, "cgv")}

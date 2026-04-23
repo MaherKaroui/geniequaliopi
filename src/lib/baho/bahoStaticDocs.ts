@@ -318,3 +318,96 @@ export function getFactureHTML(e: BahoEntreprise, numero: string, customFsStamp?
   ${footer()}
   </body></html>`;
 }
+
+export function getDevisHTML(e: BahoEntreprise, numero: string, customFsStamp?: string): string {
+  const nbStagiaires = e.stagiaires.length;
+  const prixUnitaire = 1400;
+  const total = nbStagiaires * prixUnitaire;
+  const devisDate = (() => {
+    if (!e.dateConvention) return "";
+    const d = new Date(e.dateConvention);
+    d.setDate(d.getDate() - 7);
+    return d.toISOString().slice(0, 10);
+  })();
+  const validiteDate = (() => {
+    if (!devisDate) return "";
+    const d = new Date(devisDate);
+    d.setDate(d.getDate() + 30);
+    return d.toISOString().slice(0, 10);
+  })();
+
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"/>${BASE_CSS}</head><body>
+  ${header()}
+  <h1>Devis n° ${numero}</h1>
+
+  <table style="margin-bottom:20px;">
+    <tr>
+      <td style="width:50%;">
+        <strong>Émetteur :</strong><br/>
+        ${FORMAT_SPHERE_ORG.nom}<br/>
+        ${FORMAT_SPHERE_ORG.adresse}<br/>
+        ${FORMAT_SPHERE_ORG.codePostal} ${FORMAT_SPHERE_ORG.ville}<br/>
+        SIRET ${FORMAT_SPHERE_ORG.siret}<br/>
+        NDA ${FORMAT_SPHERE_ORG.nda}
+      </td>
+      <td style="width:50%;">
+        <strong>Client :</strong><br/>
+        ${e.nom}<br/>
+        ${e.adresse}<br/>
+        SIRET ${e.siret}<br/>
+        ${e.email}
+      </td>
+    </tr>
+  </table>
+
+  <p><strong>Date du devis :</strong> ${formatDateLong(devisDate)}<br/>
+  <strong>Validité :</strong> jusqu'au ${formatDateLong(validiteDate)}<br/>
+  <strong>Période de formation prévue :</strong> du ${formatDateLong(e.dateDebut)} au ${formatDateLong(e.dateFin)}</p>
+
+  <h2>Détail de la prestation</h2>
+  <table>
+    <thead>
+      <tr><th>Désignation</th><th style="width:80px;">Quantité</th><th style="width:110px;">Prix unitaire HT</th><th style="width:110px;">Total HT</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Action de Formation En Situation de Travail (AFEST) – Hôtellerie<br/>
+        <em>Hygiène, sécurité et qualité de service</em><br/>
+        <em>Période : ${formatDateLong(e.dateDebut)} → ${formatDateLong(e.dateFin)}</em></td>
+        <td>${nbStagiaires}</td>
+        <td>${prixUnitaire.toLocaleString("fr-FR")} €</td>
+        <td>${total.toLocaleString("fr-FR")} €</td>
+      </tr>
+      <tr class="total-row">
+        <td colspan="3" style="text-align:right;">Total HT</td>
+        <td>${total.toLocaleString("fr-FR")} €</td>
+      </tr>
+      <tr class="total-row">
+        <td colspan="3" style="text-align:right;">TVA (exonérée art. 261-4-4° a CGI)</td>
+        <td>0,00 €</td>
+      </tr>
+      <tr class="total-row">
+        <td colspan="3" style="text-align:right;">Total TTC</td>
+        <td>${total.toLocaleString("fr-FR")} €</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Conditions</h2>
+  <p>Devis valable 30 jours à compter de sa date d'émission.<br/>
+  Règlement à 30 jours par virement bancaire à réception de facture.<br/>
+  TVA non applicable, art. 261-4-4° a du CGI.<br/>
+  Bon pour accord vaut signature de la convention de formation professionnelle annexée.</p>
+
+  <p style="margin-top:30px;">Fait à ${FORMAT_SPHERE_ORG.ville}, le ${formatDateLong(devisDate)}<br/>
+  ${FORMAT_SPHERE_ORG.dirigeant}</p>
+
+  ${stampsBlock(e, customFsStamp)}
+
+  <p style="margin-top:20px;"><strong>Bon pour accord</strong> (à retourner signé) :<br/>
+  Nom et qualité du signataire : <span style="display:inline-block; border-bottom:1px solid #888; width:300px;">&nbsp;</span><br/>
+  Date : <span style="display:inline-block; border-bottom:1px solid #888; width:120px;">&nbsp;</span> &nbsp; Signature et cachet :</p>
+
+  ${footer()}
+  </body></html>`;
+}
