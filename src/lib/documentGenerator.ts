@@ -3903,14 +3903,16 @@ function genSuiviEntrepriseCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: S
   const dateDebut = formatDate(getStagiaireDateDebut(s, f));
   const dateFin = formatDate(getStagiaireDateFin(s, f));
   const today = new Date();
-  const totalMs = (getStagiaireDateFin(s, f).getTime() - getStagiaireDateDebut(s, f).getTime());
+  const dStart = new Date(getStagiaireDateDebut(s, f));
+  const dEnd = new Date(getStagiaireDateFin(s, f));
+  const totalMs = dEnd.getTime() - dStart.getTime();
   const visites = [
     { mois: "Mois 2", ratio: 2 / 12 },
     { mois: "Mois 5", ratio: 5 / 12 },
     { mois: "Mois 9", ratio: 9 / 12 },
     { mois: "Mois 11", ratio: 11 / 12 },
   ];
-  const startMs = getStagiaireDateDebut(s, f).getTime();
+  const startMs = dStart.getTime();
   const rows = visites.map((v, i) => {
     const d = new Date(startMs + totalMs * v.ratio);
     const realisee = d.getTime() <= today.getTime();
