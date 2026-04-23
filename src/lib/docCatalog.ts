@@ -511,6 +511,9 @@ export function buildFullCatalog(
     // ===== 14 MISSIONS OFFICIELLES DU CFA (Art. L.6231-2) =====
     // Numérotation alignée sur le texte officiel ; chaque mission = 1 sous-dossier.
 
+    // Chapeau — Procédure de communication & mise en œuvre des 14 missions
+    add("cfa_14missions_procedure_communication", "CT3 - IND 10 📁 14 MISSIONS / 00 – Procédure Communication & Mise en œuvre des 14 missions", 3, 10, "procedure_communication_14_missions_cfa", { folder: "14_MISSIONS_CFA" });
+
     // Mission 2 — Appui à la recherche d'un employeur
     add("cfa_mission2_procedure_aide_employeur", "CT3 - IND 10 📁 14 MISSIONS / Mission 2 – Procédure d'aide à la recherche d'employeur", 3, 10, "procedure_aide_recherche_employeur_cfa", { folder: "14_MISSIONS_CFA/Mission_2_Recherche_Employeur" });
     add("cfa_mission2_tableau_candidats_sans_contrat", "CT3 - IND 10 📁 14 MISSIONS / Mission 2 – Tableau de suivi des candidats sans contrat", 3, 10, "tableau_suivi_candidats_sans_contrat_cfa", { folder: "14_MISSIONS_CFA/Mission_2_Recherche_Employeur" });
