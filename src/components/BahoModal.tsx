@@ -175,6 +175,7 @@ export default function BahoModal({ open, onOpenChange }: BahoModalProps) {
                         }`}
                       >
                         <Receipt className="w-3 h-3 shrink-0" /> Devis
+                      </button>
                       <button
                         onClick={() => handlePreview(e, null, "cgv")}
                         className={`w-full flex items-center gap-2 px-2 py-1 rounded text-xs hover:bg-muted text-left ${
