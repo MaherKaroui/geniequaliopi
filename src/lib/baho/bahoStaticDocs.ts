@@ -120,7 +120,7 @@ export function getRIHTML(e: BahoEntreprise, stagiaire?: BahoStagiaire, customFs
   return `<!DOCTYPE html><html><head><meta charset="utf-8"/>${BASE_CSS}</head><body>
   ${header()}
   <h1>RÈGLEMENT INTÉRIEUR</h1>
-  <p style="text-align:center; font-style:italic; color:#555;">Action de Formation En Situation de Travail (AFEST) – Hôtellerie</p>
+  <p style="text-align:center; font-style:italic; color:#555;">Action de formation en présentiel intra-entreprise – Hôtellerie & Restauration</p>
 
   <p><strong>Organisme de formation :</strong> ${FORMAT_SPHERE_ORG.nom}<br/>
   <strong>Bénéficiaire (entreprise) :</strong> ${e.nom} – SIRET ${e.siret}<br/>
@@ -130,7 +130,7 @@ export function getRIHTML(e: BahoEntreprise, stagiaire?: BahoStagiaire, customFs
 
   <h2>Article 1 – Objet et champ d'application</h2>
   <p>Le présent règlement est établi conformément aux dispositions des articles L.6352-3 et L.6352-4 ainsi que R.6352-1 à R.6352-15 du Code du travail.</p>
-  <p>Il s'applique à l'ensemble des stagiaires inscrits à une formation dispensée en situation de travail (AFEST) au sein de l'établissement <strong>${e.nom}</strong> situé ${e.adresse}, pour toute la durée de ladite formation.</p>
+  <p>Il s'applique à l'ensemble des stagiaires inscrits à l'action de formation « <em>Structuration des pratiques opérationnelles, amélioration de l'expérience client et sécurisation des points critiques d'exploitation en établissement hôtelier et de restauration</em> » dispensée en présentiel au sein de l'établissement <strong>${e.nom}</strong> situé ${e.adresse}, pour toute la durée de ladite formation.</p>
   <p>Le centre de formation <strong>${FORMAT_SPHERE_ORG.nom}</strong>, domicilié au ${FORMAT_SPHERE_ORG.adresse}, ${FORMAT_SPHERE_ORG.codePostal} ${FORMAT_SPHERE_ORG.ville}, dispense ses formations en présentiel sur le site de l'entreprise bénéficiaire.</p>
   <p>Le présent règlement intérieur a pour objet de préciser les règles relatives à la discipline, à l'hygiène, à la sécurité, ainsi qu'aux droits et obligations des stagiaires, afin d'assurer le bon déroulement des formations.</p>
 
@@ -155,7 +155,7 @@ export function getRIHTML(e: BahoEntreprise, stagiaire?: BahoStagiaire, customFs
   <p>Aucune sanction ne peut être infligée sans que le stagiaire n'ait été informé des griefs retenus contre lui et mis en mesure de présenter ses observations.</p>
 
   <h2>Article 4 – Organisation de la formation</h2>
-  <p>Les formations sont dispensées en présentiel sur le site de l'entreprise (AFEST), selon un planning et des horaires communiqués préalablement au stagiaire par convocation ou par transmission du programme.</p>
+  <p>La formation est dispensée en présentiel intra-entreprise, sur 3 jours consécutifs (21 heures, 7h/jour, horaires 09h00–12h30 / 14h00–17h30), selon un planning et des horaires communiqués préalablement au stagiaire par convocation ou par transmission du programme.</p>
   <p>Le stagiaire s'engage à :</p>
   <ul>
     <li>Se présenter aux sessions aux horaires prévus ;</li>
@@ -235,7 +235,7 @@ export function getConventionHTML(e: BahoEntreprise, customFsStamp?: string): st
     .map((s) => `<li><strong>${civiliteForStg(s)} ${s.nom.toUpperCase()} ${s.prenom}</strong>${s.emploi ? ` – ${s.emploi}` : ""}</li>`)
     .join("");
 
-  const nbHeures = 14;
+  const nbHeures = 21;
   const totalHt = 2000;
 
   return `<!DOCTYPE html><html><head><meta charset="utf-8"/>${BASE_CSS}
@@ -264,14 +264,15 @@ export function getConventionHTML(e: BahoEntreprise, customFsStamp?: string): st
   Ci-après désigné « le Bénéficiaire »</p>
 
   <p class="article-title">Article 1 – Objet</p>
-  <p>L'Organisme s'engage à organiser une Action de Formation En Situation de Travail (AFEST) intitulée :<br/>
-  « <strong>Hygiène, sécurité et qualité de service en hôtellerie</strong> »</p>
+  <p>L'Organisme s'engage à organiser une action de formation intitulée :<br/>
+  « <strong>Structuration des pratiques opérationnelles, amélioration de l'expérience client et sécurisation des points critiques d'exploitation en établissement hôtelier et de restauration</strong> »</p>
 
   <p class="article-title">Article 2 – Modalités</p>
   <p><strong>Dates :</strong> du ${formatDateLong(e.dateDebut)} au ${formatDateLong(e.dateFin)}<br/>
-  <strong>Durée :</strong> ${nbHeures} heures<br/>
+  <strong>Durée :</strong> ${nbHeures} heures (3 jours consécutifs, 7h/jour)<br/>
+  <strong>Horaires :</strong> 09h00 – 12h30 / 14h00 – 17h30<br/>
   <strong>Lieu :</strong> ${e.adresse}<br/>
-  <strong>Modalité :</strong> AFEST – Action de Formation En Situation de Travail</p>
+  <strong>Modalité :</strong> Formation en présentiel intra-entreprise</p>
 
   <p class="article-title">Article 3 – Participants</p>
   <ul class="participants">
@@ -427,7 +428,8 @@ export function getFactureHTML(e: BahoEntreprise, numero: string, customFsStamp?
     </thead>
     <tbody>
       <tr>
-        <td>Action de Formation En Situation de Travail (AFEST) – Hôtellerie<br/>
+        <td>Structuration des pratiques opérationnelles et qualité de service en hôtellerie & restauration<br/>
+        <em>Formation en présentiel intra-entreprise – 21 heures sur 3 jours</em><br/>
         <em>Forfait par établissement (${nbStagiaires} stagiaire${nbStagiaires > 1 ? "s" : ""} couvert${nbStagiaires > 1 ? "s" : ""})</em><br/>
         <em>Période : ${formatDateLong(e.dateDebut)} → ${formatDateLong(e.dateFin)}</em></td>
         <td>${total.toLocaleString("fr-FR")} €</td>
@@ -512,8 +514,8 @@ export function getDevisHTML(e: BahoEntreprise, numero: string, customFsStamp?: 
     </thead>
     <tbody>
       <tr>
-        <td>Action de Formation En Situation de Travail (AFEST) – Hôtellerie<br/>
-        <em>Hygiène, sécurité et qualité de service</em><br/>
+        <td>Structuration des pratiques opérationnelles et qualité de service en hôtellerie & restauration<br/>
+        <em>Formation en présentiel intra-entreprise – 21 heures sur 3 jours</em><br/>
         <em>Forfait par établissement (${nbStagiaires} stagiaire${nbStagiaires > 1 ? "s" : ""} couvert${nbStagiaires > 1 ? "s" : ""})</em><br/>
         <em>Période : ${formatDateLong(e.dateDebut)} → ${formatDateLong(e.dateFin)}</em></td>
         <td>${total.toLocaleString("fr-FR")} €</td>
@@ -541,6 +543,189 @@ export function getDevisHTML(e: BahoEntreprise, numero: string, customFsStamp?: 
 
   <p style="margin-top:30px;">Fait à ${FORMAT_SPHERE_ORG.ville}, le ${formatDateLong(devisDate)}<br/>
   ${FORMAT_SPHERE_ORG.dirigeant}</p>
+
+  ${stampsBlock(e, customFsStamp)}
+
+  ${footer()}
+  </body></html>`;
+}
+
+/** Programme de formation officiel BAHO – Format Sphere */
+export function getProgrammeHTML(e: BahoEntreprise, customFsStamp?: string): string {
+  const dateProg = subtractWorkingDays(e.dateDebut, 14);
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"/>${BASE_CSS}
+  <style>
+    .day-block { margin-top: 16px; padding: 10px 14px; border-left: 4px solid #1a3a6e; background: #f6f8fc; }
+    .day-block h3 { color: #1a3a6e; margin: 0 0 6px 0; }
+    .demi { margin-top: 8px; }
+    .demi strong { color: #1a3a6e; }
+    ul { margin: 4px 0 8px 22px; }
+  </style>
+  </head><body>
+  ${header()}
+  <h1>PROGRAMME DE FORMATION</h1>
+
+  <h2>Intitulé de l'action de formation</h2>
+  <p><strong>Structuration des pratiques opérationnelles, amélioration de l'expérience client et sécurisation des points critiques d'exploitation en établissement hôtelier et de restauration</strong></p>
+
+  <p><strong>Bénéficiaire :</strong> ${e.nom} – SIRET ${e.siret}<br/>
+  <strong>Lieu :</strong> ${e.adresse}<br/>
+  <strong>Référent handicap :</strong> ${FORMAT_SPHERE_ORG.dirigeant}</p>
+
+  <h2>Contexte et finalité de l'action</h2>
+  <p>Cette action de formation vise à améliorer l'organisation du travail et la coordination des équipes au sein des établissements hôteliers et de restauration. Elle permet aux salariés de renforcer leurs pratiques professionnelles, de limiter les dysfonctionnements organisationnels, d'améliorer la qualité de service et de contribuer à la satisfaction et à la fidélisation de la clientèle.</p>
+  <p>L'action est mise en œuvre comme une action de formation en présentiel, centrée sur l'acquisition de compétences professionnelles transférables dans l'activité quotidienne.</p>
+
+  <h2>Objectif général</h2>
+  <p>Permettre aux participants de structurer leurs pratiques professionnelles, d'améliorer la coordination entre services et de sécuriser les situations ayant un impact sur l'expérience client et le bon fonctionnement de l'établissement.</p>
+
+  <h2>Objectifs pédagogiques</h2>
+  <p>À l'issue de la formation, les participants seront capables de :</p>
+  <ul>
+    <li>Identifier les rôles et interactions entre les services</li>
+    <li>Repérer les dysfonctionnements organisationnels</li>
+    <li>Appliquer des méthodes de travail structurées</li>
+    <li>Fiabiliser la transmission des informations</li>
+    <li>Adapter leur posture professionnelle aux situations sensibles</li>
+    <li>Appliquer une méthode de traitement des réclamations clients</li>
+    <li>Réagir de manière adaptée face aux incidents</li>
+  </ul>
+
+  <h2>Public visé</h2>
+  <p>Personnel intervenant dans le fonctionnement d'un établissement hôtelier et de restauration : réception, hébergement, restauration, personnel administratif, encadrement de proximité.</p>
+
+  <h2>Prérequis</h2>
+  <ul>
+    <li>Occuper un poste en lien avec l'activité de l'établissement</li>
+    <li>Comprendre des consignes simples en français</li>
+  </ul>
+
+  <h2>Durée, organisation et modalités</h2>
+  <ul>
+    <li><strong>Durée totale :</strong> 21 heures</li>
+    <li><strong>Organisation :</strong> 3 jours consécutifs</li>
+    <li><strong>Horaires :</strong> 09h00 – 12h30 / 14h00 – 17h30</li>
+    <li><strong>Durée quotidienne :</strong> 7 heures</li>
+    <li><strong>Effectif :</strong> ${e.stagiaires.length} participant${e.stagiaires.length > 1 ? "s" : ""}</li>
+    <li><strong>Modalité :</strong> formation en présentiel intra-entreprise</li>
+    <li><strong>Lieu :</strong> au sein de l'établissement (${e.adresse})</li>
+  </ul>
+
+  <h2>Modalités d'accès et délais d'accès</h2>
+  <p>Accès après validation du besoin, signature de la convention et accord de prise en charge.<br/>
+  <strong>Délai d'accès :</strong> 15 jours après validation administrative.</p>
+
+  <h2>Moyens pédagogiques, techniques et encadrement</h2>
+  <ul>
+    <li>Supports pédagogiques structurés</li>
+    <li>Études de cas issues du secteur hôtelier</li>
+    <li>Exercices pratiques</li>
+    <li>Mises en situation pédagogiques encadrées</li>
+    <li>Échanges de pratiques</li>
+  </ul>
+  <p><strong>Formateur :</strong> Paolo FEOLA – Formateur en organisation du travail et communication professionnelle</p>
+
+  <h2>Modalités de suivi, d'évaluation et de validation</h2>
+  <ul>
+    <li>Évaluation des connaissances en début de formation</li>
+    <li>Évaluation des acquis tout au long de la formation</li>
+    <li>Exercices pratiques</li>
+    <li>Évaluation finale basée sur une mise en situation pédagogique</li>
+    <li>Feuilles d'émargement par demi-journée</li>
+    <li>Attestation de fin de formation</li>
+  </ul>
+
+  <h2>Accessibilité</h2>
+  <p>Formation accessible aux personnes en situation de handicap sous réserve d'adaptation. Référent handicap : <strong>${FORMAT_SPHERE_ORG.dirigeant}</strong>.</p>
+
+  <h2>Tarifs et financement</h2>
+  <p><strong>Tarif :</strong> 2 000 € TTC<br/>
+  TVA non applicable – article 261-4-4° du CGI</p>
+
+  <h1 style="margin-top:30px;">CONTENU DÉTAILLÉ PAR JOURNÉE</h1>
+
+  <div class="day-block">
+    <h3>Jour 1 – Organisation et expérience client</h3>
+    <div class="demi">
+      <strong>Matin (09h00 – 12h30) — Objectifs : Comprendre l'organisation et ses impacts</strong>
+      <p><em>Contenu :</em></p>
+      <ul>
+        <li>Organisation des services et répartition des rôles</li>
+        <li>Identification des interactions entre services</li>
+        <li>Parcours client et points de contact</li>
+        <li>Identification des sources d'insatisfaction</li>
+      </ul>
+      <p><em>Méthodes :</em> apports structurés, études de cas, échanges dirigés.</p>
+    </div>
+    <div class="demi">
+      <strong>Après-midi (14h00 – 17h30) — Objectifs : Identifier les dysfonctionnements</strong>
+      <p><em>Contenu :</em></p>
+      <ul>
+        <li>Typologie des dysfonctionnements</li>
+        <li>Analyse des impacts sur la qualité de service</li>
+        <li>Transmission des informations entre services</li>
+      </ul>
+      <p><em>Méthodes :</em> études de cas, exercices pratiques, mise en application encadrée.</p>
+    </div>
+  </div>
+
+  <div class="day-block">
+    <h3>Jour 2 – Organisation du travail et méthodes</h3>
+    <div class="demi">
+      <strong>Matin (09h00 – 12h30) — Objectifs : Structurer le travail</strong>
+      <p><em>Contenu :</em></p>
+      <ul>
+        <li>Organisation des tâches</li>
+        <li>Priorisation des activités</li>
+        <li>Gestion du temps</li>
+      </ul>
+      <p><em>Méthodes :</em> apports, exercices pratiques.</p>
+    </div>
+    <div class="demi">
+      <strong>Après-midi (14h00 – 17h30) — Objectifs : Harmoniser les pratiques</strong>
+      <p><em>Contenu :</em></p>
+      <ul>
+        <li>Méthodes de travail communes</li>
+        <li>Standardisation des pratiques</li>
+        <li>Application sur cas concrets</li>
+      </ul>
+      <p><em>Méthodes :</em> travail en groupe, études de cas, exercices pratiques.</p>
+    </div>
+  </div>
+
+  <div class="day-block">
+    <h3>Jour 3 – Communication et gestion des situations</h3>
+    <div class="demi">
+      <strong>Matin (09h00 – 12h30) — Objectifs : Améliorer la communication</strong>
+      <p><em>Contenu :</em></p>
+      <ul>
+        <li>Transmission d'informations</li>
+        <li>Coordination entre services</li>
+        <li>Réduction des erreurs</li>
+      </ul>
+      <p><em>Méthodes :</em> exercices pratiques, études de cas.</p>
+    </div>
+    <div class="demi">
+      <strong>Après-midi (14h00 – 17h30) — Objectifs : Gérer les situations sensibles</strong>
+      <p><em>Contenu :</em></p>
+      <ul>
+        <li>Identification des situations d'insatisfaction</li>
+        <li>Méthode de traitement des réclamations clients (4 étapes)</li>
+        <li>Gestion des incidents</li>
+        <li>Posture professionnelle</li>
+      </ul>
+      <p><em>Méthodes :</em> exercices pratiques, mises en situation pédagogiques encadrées.</p>
+    </div>
+  </div>
+
+  <h2>Clôture de la formation</h2>
+  <ul>
+    <li>Synthèse des acquis</li>
+    <li>Évaluation finale</li>
+    <li>Identification des axes de progression</li>
+  </ul>
+
+  <p style="margin-top:25px;"><strong>Fait à ${FORMAT_SPHERE_ORG.ville}, le ${formatDateLong(dateProg)}</strong></p>
 
   ${stampsBlock(e, customFsStamp)}
 

@@ -5,7 +5,7 @@
  */
 import JSZip from "jszip";
 import { getBahoEntreprises, FORMAT_SPHERE_ORG, type BahoEntreprise } from "./bahoData";
-import { getRIHTML, getCGVHTML, getFactureHTML, getConventionHTML, getDevisHTML } from "./bahoStaticDocs";
+import { getRIHTML, getCGVHTML, getFactureHTML, getConventionHTML, getDevisHTML, getProgrammeHTML } from "./bahoStaticDocs";
 import { htmlToPdfBlob } from "@/lib/pdfExport";
 import type { JobReporter } from "@/lib/backgroundJobs";
 
@@ -17,7 +17,7 @@ function safeName(s: string): string {
 export async function buildBahoZip(reporter?: JobReporter, customFsStamp?: string): Promise<Blob> {
   const zip = new JSZip();
   const entreprises = getBahoEntreprises();
-  const totalSteps = entreprises.length * 5; // 5 documents par entreprise
+  const totalSteps = entreprises.length * 6; // 6 documents par entreprise
   let step = 0;
 
   reporter?.setMessage(`Génération de ${entreprises.length} dossiers BAHO…`);
@@ -35,6 +35,7 @@ export async function buildBahoZip(reporter?: JobReporter, customFsStamp?: strin
     `Nombre total de stagiaires : ${entreprises.reduce((acc, e) => acc + e.stagiaires.length, 0)}`,
     "",
     "Pour chaque entreprise (PDF uniquement) :",
+    " - Programme de formation (PDF tamponné)",
     " - Convention de formation (PDF tamponnée avec liste participants)",
     " - Devis (PDF tamponné)",
     " - Facture (PDF tamponnée)",
@@ -54,7 +55,19 @@ export async function buildBahoZip(reporter?: JobReporter, customFsStamp?: strin
     const baseName = `${safeName(e.nom)}_${e.siret}`;
     const devisNumero = `BAHO-${new Date().getFullYear()}-${String(invoiceCounter++).padStart(3, "0")}`;
 
-    // 1. Convention PDF tamponnée
+    // 1. Programme de formation PDF tamponné
+    try {
+      reporter?.setMessage(`${e.nom} – Programme de formation…`);
+      const progHtml = getProgrammeHTML(e, customFsStamp);
+      const progPdf = await htmlToPdfBlob(progHtml);
+      folder.file(`Programme_de_formation_${baseName}.pdf`, progPdf);
+    } catch (err) {
+      console.error("Programme error:", err);
+      folder.file(`ERREUR_Programme.txt`, `Erreur génération Programme: ${(err as Error).message}`);
+    }
+    step++; reporter?.setProgress(Math.round((step / totalSteps) * 100));
+
+    // 2. Convention PDF tamponnée
     try {
       reporter?.setMessage(`${e.nom} – Convention PDF tamponnée…`);
       const conventionHtml = getConventionHTML(e, customFsStamp);
