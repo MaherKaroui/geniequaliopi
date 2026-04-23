@@ -55,6 +55,47 @@ const yieldToBrowser = (delayMs = 0) =>
     });
   });
 
+// Templates générant directement un Blob .xlsx via SheetJS (sans passer par du HTML)
+// Doivent être traités avant la branche REAL_XLSX_TEMPLATES dans les ZIPs.
+const NATIVE_XLSX_TEMPLATES = new Set<string>([
+  "outils_suivi_alternance_excel",
+  "suivi_parcours_beneficiaires_excel",
+  "suivi_public_beneficiaire_excel",
+  "suivi_pfmp_excel",
+  "suivi_inscriptions_excel",
+]);
+
+async function generateNativeXlsxBlob(
+  template: string,
+  organisme: OrganismeInfo,
+  formation: FormationInfo,
+  stagiaires: StagiaireInfo[],
+  targetStagiaire?: StagiaireInfo | null,
+): Promise<Blob | null> {
+  if (template === "outils_suivi_alternance_excel") {
+    const { generateOutilsSuiviAlternanceXlsxBlob } = await import("@/lib/outilsSuiviAlternanceXlsx");
+    const list = targetStagiaire ? [targetStagiaire] : stagiaires;
+    return generateOutilsSuiviAlternanceXlsxBlob(organisme, formation, list);
+  }
+  if (template === "suivi_parcours_beneficiaires_excel") {
+    const { generateSuiviParcoursBeneficiairesXlsxBlob } = await import("@/lib/suiviParcoursBeneficiairesXlsx");
+    return generateSuiviParcoursBeneficiairesXlsxBlob(organisme, formation, stagiaires);
+  }
+  if (template === "suivi_public_beneficiaire_excel") {
+    const { generateSuiviPublicBeneficiaireXlsxBlob } = await import("@/lib/suiviPublicBeneficiaireXlsx");
+    return generateSuiviPublicBeneficiaireXlsxBlob(organisme, formation, stagiaires);
+  }
+  if (template === "suivi_pfmp_excel") {
+    const { generateSuiviPFMPXlsxBlob } = await import("@/lib/suiviPFMPXlsx");
+    return generateSuiviPFMPXlsxBlob(organisme, formation, stagiaires);
+  }
+  if (template === "suivi_inscriptions_excel") {
+    const { generateSuiviInscriptionsXlsxBlob } = await import("@/lib/suiviInscriptionsXlsx");
+    return generateSuiviInscriptionsXlsxBlob(organisme, formation, stagiaires);
+  }
+  return null;
+}
+
 /** Build preview title without duplicating stagiaire name already in doc.nom */
 function docTitle(docNom: string, s?: StagiaireInfo | null): string {
   if (!s) return docNom;
@@ -677,6 +718,11 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
               const fileBlob = await resp.blob();
               addFileToZip(`${stagFolder}/${buildCatalogFileName(doc, stagiaire)}`, fileBlob);
             });
+          } else if (NATIVE_XLSX_TEMPLATES.has(doc.template)) {
+            await safeRun(`${doc.nom} (${stagiaire.nom})`, async () => {
+              const blob = await generateNativeXlsxBlob(doc.template, mergedOrganisme, selectedFormation, allStagiaires, stagiaire);
+              if (blob) addFileToZip(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, ".xlsx")}`, blob);
+            });
           } else if (
             doc.template === "indicateurs_performance"
             || doc.template === "tableau_suivi_parcours_excel"
@@ -873,6 +919,9 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
           if (doc.template === "pdf_static" && getStaticFileUrl(doc)) {
             const resp = await fetch(getStaticFileUrl(doc)!);
             zip.file(`${stagFolder}/${buildCatalogFileName(doc, stagiaire)}`, await resp.blob());
+          } else if (NATIVE_XLSX_TEMPLATES.has(doc.template)) {
+            const blob = await generateNativeXlsxBlob(doc.template, mergedOrganisme, selectedFormation, allStagiaires, stagiaire);
+            if (blob) zip.file(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, ".xlsx")}`, blob);
           } else if (["indicateurs_performance", "tableau_suivi_parcours_excel", "plan_dev_competences_excel", "tableau_amelioration_continue_excel", "suivi_dysfonctionnements_excel", "relances_appreciations_excel", "vae_indicateurs_previsionnels"].includes(doc.template) || REAL_XLSX_TEMPLATES.has(doc.template)) {
             const excelContent = doc.template === "indicateurs_performance"
               ? generateExcelTableauBordPerformance(mergedOrganisme, selectedFormation, allStagiaires)
@@ -916,6 +965,10 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
         } else if (DOCX_TEMPLATE_FILES[doc.template]) {
           const docxBlob = await processDocxTemplate(DOCX_TEMPLATE_FILES[doc.template], mergedOrganisme);
           zip.file(`${basePath}/${buildCatalogFileName(doc, null, ".docx")}`, docxBlob);
+          await updateProgress();
+        } else if (NATIVE_XLSX_TEMPLATES.has(doc.template)) {
+          const blob = await generateNativeXlsxBlob(doc.template, mergedOrganisme, selectedFormation, allStagiaires);
+          if (blob) zip.file(`${basePath}/${buildCatalogFileName(doc, null, ".xlsx")}`, blob);
           await updateProgress();
         } else if (["indicateurs_performance", "tableau_suivi_parcours_excel", "plan_dev_competences_excel", "tableau_amelioration_continue_excel", "suivi_dysfonctionnements_excel", "relances_appreciations_excel", "vae_indicateurs_previsionnels"].includes(doc.template)) {
           const excelContent = doc.template === "indicateurs_performance"
@@ -1004,6 +1057,9 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
           if (doc.template === "pdf_static" && getStaticFileUrl(doc)) {
             const resp = await fetch(getStaticFileUrl(doc)!);
             zip.file(`${stagFolder}/${buildCatalogFileName(doc, stagiaire)}`, await resp.blob());
+          } else if (NATIVE_XLSX_TEMPLATES.has(doc.template)) {
+            const blob = await generateNativeXlsxBlob(doc.template, mergedOrganisme, selectedFormation, allStagiaires, stagiaire);
+            if (blob) zip.file(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, ".xlsx")}`, blob);
           } else if (["indicateurs_performance", "tableau_suivi_parcours_excel", "plan_dev_competences_excel", "tableau_amelioration_continue_excel", "suivi_dysfonctionnements_excel", "relances_appreciations_excel", "vae_indicateurs_previsionnels"].includes(doc.template) || REAL_XLSX_TEMPLATES.has(doc.template)) {
             const excelContent = doc.template === "indicateurs_performance"
               ? generateExcelTableauBordPerformance(mergedOrganisme, selectedFormation, allStagiaires)
@@ -1047,6 +1103,10 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
         } else if (DOCX_TEMPLATE_FILES[doc.template]) {
           const docxBlob = await processDocxTemplate(DOCX_TEMPLATE_FILES[doc.template], mergedOrganisme);
           zip.file(`${basePath}/${buildCatalogFileName(doc, null, ".docx")}`, docxBlob);
+          await updateProgress();
+        } else if (NATIVE_XLSX_TEMPLATES.has(doc.template)) {
+          const blob = await generateNativeXlsxBlob(doc.template, mergedOrganisme, selectedFormation, allStagiaires);
+          if (blob) zip.file(`${basePath}/${buildCatalogFileName(doc, null, ".xlsx")}`, blob);
           await updateProgress();
         } else if (["indicateurs_performance", "tableau_suivi_parcours_excel", "plan_dev_competences_excel", "tableau_amelioration_continue_excel", "suivi_dysfonctionnements_excel", "relances_appreciations_excel", "vae_indicateurs_previsionnels"].includes(doc.template) || REAL_XLSX_TEMPLATES.has(doc.template)) {
           const excelContent = doc.template === "indicateurs_performance"
