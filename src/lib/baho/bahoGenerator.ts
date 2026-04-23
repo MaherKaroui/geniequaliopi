@@ -122,6 +122,12 @@ export async function buildBahoZip(reporter?: JobReporter, customFsStamp?: strin
         buildDevisData(e, devisNumero) as unknown as Record<string, string>
       );
       folder.file(`Devis_${devisNumero}_${baseName}.docx`, devisBlob);
+
+      // Devis PDF tamponné
+      reporter?.setMessage(`${e.nom} – Devis PDF tamponné…`);
+      const devisHtml = getDevisHTML(e, devisNumero, customFsStamp);
+      const devisPdf = await htmlToPdfBlob(devisHtml);
+      folder.file(`Devis_${devisNumero}_${baseName}_TAMPONNE.pdf`, devisPdf);
     } catch (err) {
       console.error("Devis DOCX error:", err);
       folder.file(`ERREUR_Devis.txt`, `Erreur génération Devis DOCX: ${(err as Error).message}`);
