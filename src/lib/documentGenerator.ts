@@ -12285,69 +12285,44 @@ function genTempsConnexionOPCOVierge(o: OrganismeInfo, f: FormationInfo, stagiai
 
   const plateforme = o.outilsUtilises || "Zoom / Teams";
 
-  let extra = `<p><em>Trame vierge du relevé des temps de connexion par session. Une session par page. Tableau prêt à compléter manuellement à partir des journaux LMS / classe virtuelle.</em></p>`;
+  let extra = `<p><em>Trame vierge du relevé des temps de connexion. À compléter manuellement avec les dates, noms et horaires relevés sur la plateforme LMS / classe virtuelle.</em></p>`;
   extra += `<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%;margin-bottom:18px">
-    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold;width:30%">Intitulé de la formation</td><td>${f.intitule}</td></tr>
-    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Organisme</td><td>${o.nom}${o.nda ? ` – NDA ${o.nda}` : ""}</td></tr>
+    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold;width:30%">Intitulé de la formation</td><td>&nbsp;</td></tr>
+    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Organisme</td><td>&nbsp;</td></tr>
     <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Plateforme</td><td>${plateforme}</td></tr>
-    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Rythme d'alternance</td><td>${rythmeLabel} — démarrage en semaine école</td></tr>
-    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Date d'édition</td><td>${formatDate(new Date().toISOString())}</td></tr>
-    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Nombre de sessions</td><td>${groupes.size}</td></tr>
+    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Rythme d'alternance</td><td>&nbsp;</td></tr>
+    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Date d'édition</td><td>&nbsp;</td></tr>
+    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Nombre de sessions</td><td>&nbsp;</td></tr>
   </table>`;
 
-  let groupIdx = 0;
-  for (const [, g] of groupes) {
-    groupIdx++;
-    const refDate = parseD(g.debut);
-    const shift = computeWeekShift(g.debut);
-    const allDays = buildAllWorkdays(g.debut, g.fin);
-    const ecoleDays = refDate ? allDays.filter((d) => isEcoleWeek(weekIndex(d, refDate), shift)) : [];
+  extra += `<h3 style="margin-top:18px;page-break-after:avoid">Session — À compléter</h3>`;
+  extra += `<p><strong>Période :</strong> du ____________ au ____________ &nbsp;|&nbsp; <strong>Jours école :</strong> ____ &nbsp;|&nbsp; <strong>Plateforme :</strong> ${plateforme}</p>`;
 
-    const titreGroupe = groupes.size > 1 ? `Session ${groupIdx} — À compléter` : `Session — À compléter`;
-    if (groupIdx > 1) {
-      extra += `<div class="page-break-before" style="page-break-before:always;break-before:page;height:0px;overflow:hidden"></div>`;
-    }
-    extra += `<h3 style="margin-top:18px;page-break-after:avoid">${titreGroupe}</h3>`;
-    extra += `<p><strong>Période :</strong> du ${formatDate(g.debut)} au ${formatDate(g.fin)} &nbsp;|&nbsp; <strong>Jours école :</strong> ${ecoleDays.length} &nbsp;|&nbsp; <strong>Plateforme :</strong> ${plateforme}</p>`;
-
-    extra += `<table border="1" cellpadding="5" cellspacing="0" style="border-collapse:collapse;width:100%;margin-bottom:14px">
-      <thead><tr style="background:#1e3a7b;color:#fff">
-        <th>Date</th>
-        <th>Jour</th>
-        <th>Nom apprenant</th>
-        <th>Adresse IP</th>
-        <th>Connexion matin</th>
-        <th>Déconnexion midi</th>
-        <th>Reconnexion</th>
-        <th>Déconnexion soir</th>
-        <th>Durée totale</th>
-        <th>Statut</th>
-      </tr></thead><tbody>`;
-
-    if (ecoleDays.length === 0) {
-      extra += `<tr><td colspan="10" style="text-align:center;color:#888">Aucun jour en centre de formation sur cette période.</td></tr>`;
-    } else {
-      ecoleDays.forEach((d) => {
-        extra += `<tr>
-          <td>${fmtDateLong(d)}</td>
-          <td style="text-transform:capitalize">${fmtJour(d)}</td>
-          <td>&nbsp;</td>
-          <td>&nbsp;</td>
-          <td>&nbsp;</td>
-          <td>&nbsp;</td>
-          <td>&nbsp;</td>
-          <td>&nbsp;</td>
-          <td>&nbsp;</td>
-          <td>&nbsp;</td>
-        </tr>`;
-      });
-    }
-    extra += `</tbody></table>`;
+  extra += `<table border="1" cellpadding="5" cellspacing="0" style="border-collapse:collapse;width:100%;margin-bottom:14px">
+    <thead><tr style="background:#1e3a7b;color:#fff">
+      <th>Date</th>
+      <th>Jour</th>
+      <th>Nom apprenant</th>
+      <th>Adresse IP</th>
+      <th>Connexion matin</th>
+      <th>Déconnexion midi</th>
+      <th>Reconnexion</th>
+      <th>Déconnexion soir</th>
+      <th>Durée totale</th>
+      <th>Statut</th>
+    </tr></thead><tbody>`;
+  // 25 lignes vides pour la saisie manuelle
+  for (let i = 0; i < 25; i++) {
+    extra += `<tr>
+      <td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>
+      <td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>
+    </tr>`;
   }
+  extra += `</tbody></table>`;
 
   extra += `<p style="margin-top:14px;font-size:0.9em"><em>Trame vierge — à compléter avec les temps de connexion réels relevés sur la plateforme LMS / classe virtuelle.</em></p>`;
-  extra += `<p style="margin-top:18px"><strong>Fait à</strong> ${o.ville || "—"}, <strong>le</strong> ${formatDate(new Date().toISOString())}</p>`;
-  extra += `<p><strong>${o.dirigeant || o.responsablePedagogique || "Le responsable pédagogique"}</strong><br>${o.nom}</p>`;
+  extra += `<p style="margin-top:18px"><strong>Fait à</strong> ____________, <strong>le</strong> ____________</p>`;
+  extra += `<p><strong>____________________________</strong><br>____________________________</p>`;
 
   return buildDocument({
     org: o,
