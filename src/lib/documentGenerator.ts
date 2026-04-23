@@ -2115,6 +2115,19 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
 
     <h2>8. Modalités d'accès</h2>
     <div class="section">
+      ${(() => {
+        const rncp = f.codeRNCP ? getRNCPByCode(f.codeRNCP) : undefined;
+        const voies = rncp?.voiesAcces && rncp.voiesAcces.length > 0 ? rncp.voiesAcces : null;
+        const isRS = rncp?.code?.toUpperCase().startsWith("RS");
+        const fcUrl = rncp ? (isRS
+          ? `https://www.francecompetences.fr/recherche/rs/${rncp.code.replace(/\D/g, "")}/#anchor4`
+          : `https://www.francecompetences.fr/recherche/rncp/${rncp.code.replace(/\D/g, "")}/#anchor4`) : null;
+        return voies ? `
+          <p><strong>Voies d'accès à la certification :</strong></p>
+          <ul>${voies.map(v => `<li>${v}</li>`).join("")}</ul>
+          ${fcUrl ? `<p style="margin-bottom:10px"><em>Source officielle France Compétences : <a href="${fcUrl}" target="_blank">${fcUrl}</a></em></p>` : ""}
+        ` : "";
+      })()}
       <p><strong>Étapes d'inscription :</strong></p>
       <ol>
         <li>Préinscription ${o.siteWeb && o.siteWeb.trim() ? `via ${isFacebookPage(o.siteWeb) ? 'la page Facebook' : 'le site internet'} (${linkUrl(o.siteWeb)}), ` : ''}par téléphone ou par email auprès de ${o.nom}</li>
@@ -2127,8 +2140,10 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
             <li>Convocation à la formation</li>
             <li>Conditions Générales de Vente (CGV)</li>
             <li>Programme de formation</li>
+            <li>ECF – Évaluation des Compétences en Fin de formation</li>
           </ul>
         </li>
+        <li>Inscription CERES – Inscription officielle du candidat sur la plateforme CERES (gestion des sessions d'examen TP/RNCP) par le centre de formation</li>
         <li>Demande d'acompte et confirmation de l'inscription</li>
       </ol>
     </div>
