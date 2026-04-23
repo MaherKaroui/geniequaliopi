@@ -624,7 +624,7 @@ export function genConventionMobiliteInterCFA(o: OrganismeInfo, f: FormationInfo
       },
       {
         heading: "Article 1 — Parties à la convention",
-        content: `<p><strong>CFA d'origine :</strong> ${o.nom} — ${o.adresse || "[adresse]"} — SIRET ${o.siret || "[SIRET]"} — NDA ${o.nda || "[NDA]"}<br>Représenté par : ${o.dirigeant || "[Représentant légal]"}</p><p><strong>CFA d'accueil :</strong> [Dénomination du CFA d'accueil]<br>Adresse : [adresse]<br>SIRET : [SIRET] — NDA : [NDA]<br>Représenté par : [Nom du représentant légal]</p><p><strong>Employeur de l'apprenti :</strong> [Dénomination] — SIRET [SIRET]<br>Représenté par : [Nom et fonction]</p><p><strong>Apprenti concerné :</strong> ${s.civilite || ""} ${s.prenom} ${s.nom}<br>Né(e) le : ${s.dateNaissance || "[date]"}<br>Adresse : ${s.adresse || "[adresse]"}<br>Formation : ${f.nom} — ${f.duree || "[durée]"}</p>`,
+        content: `<p><strong>CFA d'origine :</strong> ${o.nom} — ${o.adresse || "[adresse]"} — SIRET ${o.siret || "[SIRET]"} — NDA ${o.nda || "[NDA]"}<br>Représenté par : ${o.dirigeant || "[Représentant légal]"}</p><p><strong>CFA d'accueil :</strong> [Dénomination du CFA d'accueil]<br>Adresse : [adresse]<br>SIRET : [SIRET] — NDA : [NDA]<br>Représenté par : [Nom du représentant légal]</p><p><strong>Employeur de l'apprenti :</strong> [Dénomination] — SIRET [SIRET]<br>Représenté par : [Nom et fonction]</p><p><strong>Apprenti concerné :</strong> ${s.civilite || ""} ${s.prenom} ${s.nom}<br>Né(e) le : ${s.dateNaissance || "[date]"}<br>Adresse : ${s.adresse || "[adresse]"}<br>Formation : ${f.intitule} — ${f.duree || "[durée]"}</p>`,
       },
       {
         heading: "Article 2 — Objet de la mise à disposition",
@@ -645,7 +645,7 @@ export function genConventionMobiliteInterCFA(o: OrganismeInfo, f: FormationInfo
       },
       {
         heading: "Article 4 — Contenu pédagogique et compétences visées",
-        content: `<p>La période de mobilité vise les compétences suivantes du référentiel <strong>${f.codeRNCP || "[code RNCP/RS]"} — ${f.nom}</strong> :</p><p>• Compétence 1 : ___________________________________<br>• Compétence 2 : ___________________________________<br>• Compétence 3 : ___________________________________</p><p>Modalités d'évaluation à l'issue : ☐ Attestation de réalisation  ☐ Évaluation formative transmise au CFA d'origine  ☐ Validation de bloc</p>`,
+        content: `<p>La période de mobilité vise les compétences suivantes du référentiel <strong>${f.codeRNCP || "[code RNCP/RS]"} — ${f.intitule}</strong> :</p><p>• Compétence 1 : ___________________________________<br>• Compétence 2 : ___________________________________<br>• Compétence 3 : ___________________________________</p><p>Modalités d'évaluation à l'issue : ☐ Attestation de réalisation  ☐ Évaluation formative transmise au CFA d'origine  ☐ Validation de bloc</p>`,
       },
       {
         heading: "Article 5 — Statut de l'apprenti pendant la mobilité",
@@ -688,7 +688,7 @@ export function genFicheDemandeMobiliteNationale(o: OrganismeInfo, f: FormationI
           [
             ["Civilité, Nom, Prénom", `${s.civilite || ""} ${s.nom} ${s.prenom}`],
             ["Date de naissance", s.dateNaissance || "[à compléter]"],
-            ["Formation suivie", `${f.nom} — ${f.codeRNCP || "[code]"}`],
+            ["Formation suivie", `${f.intitule} — ${f.codeRNCP || "[code]"}`],
             ["Année du cycle", "☐ 1ère année  ☐ 2ème année  ☐ 3ème année"],
             ["Employeur", "[Raison sociale + nom du Maître d'apprentissage]"],
             ["Référent au CFA d'origine", "[Nom du formateur référent]"],
