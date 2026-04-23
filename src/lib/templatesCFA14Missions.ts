@@ -1129,8 +1129,19 @@ export function genQCMMissionCFA(
     });
   }
 
-  const terminee = isFormationTerminee(f, stagiaires);
-  const dateRef = terminee && f.dateFin ? f.dateFin : (f.dateDebut || new Date().toISOString().slice(0, 10));
+  // Date du QCM = vendredi de la semaine école N (rythme 1 sem école / 3 sem entreprise)
+  // Lundi semaine école N = lundi de dateDebut + (N-1)*28 jours ; QCM rendu vendredi (+4j)
+  function isoMondayOf(s: string): Date {
+    const d = new Date(s);
+    const day = (d.getDay() + 6) % 7;
+    d.setDate(d.getDate() - day);
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }
+  const startStr = f.dateDebut || new Date().toISOString().slice(0, 10);
+  const lundi = isoMondayOf(startStr);
+  lundi.setDate(lundi.getDate() + (missionNumero - 1) * 28 + 4); // vendredi semaine école N
+  const dateRef = lundi.toISOString().slice(0, 10);
   const answers = pickStudentAnswers(stagiaire, missionNumero, mission.questions);
   const score = answers.reduce((acc, a, i) => acc + (a === mission.questions[i].correctIndex ? 1 : 0), 0);
 
@@ -1178,10 +1189,15 @@ export function genQCMMissionCFA(
       },
       {
         heading: "Signatures",
-        content: `<table style="width:100%;margin-top:20px;"><tr>
-          <td style="width:50%;padding:10px;border:1px solid #ccc;"><strong>Apprenti·e</strong><br>${stagiaire.prenom} ${stagiaire.nom}<br>Fait le ${formatDate(dateRef)}<br><br><br></td>
-          <td style="width:50%;padding:10px;border:1px solid #ccc;"><strong>Formateur·rice / Référent CFA</strong><br>${o.nom}<br>Fait le ${formatDate(dateRef)}<br><br><br></td>
-        </tr></table>`,
+        content: (() => {
+          const formateurNom = (stagiaire as any).formateurAssigne || (f as any).formateur || o.dirigeant || o.nom;
+          const sigApp = (stagiaire as any).signatureUrl ? `<img src="${(stagiaire as any).signatureUrl}" alt="signature" style="max-height:60px;margin-top:6px;">` : "";
+          const sigForm = (o as any).signatureUrl ? `<img src="${(o as any).signatureUrl}" alt="signature" style="max-height:60px;margin-top:6px;">` : "";
+          return `<table style="width:100%;margin-top:20px;border-collapse:collapse;"><tr>
+          <td style="width:50%;padding:12px;border:1px solid #ccc;vertical-align:top;"><strong>Apprenti·e</strong><br>${stagiaire.prenom} ${stagiaire.nom}<br>Fait le <strong>${formatDate(dateRef)}</strong>${sigApp}<br><br></td>
+          <td style="width:50%;padding:12px;border:1px solid #ccc;vertical-align:top;"><strong>Formateur·rice / Référent CFA</strong><br>${formateurNom}<br>Fait le <strong>${formatDate(dateRef)}</strong>${sigForm}<br><br></td>
+        </tr></table>`;
+        })(),
       },
     ],
   });
