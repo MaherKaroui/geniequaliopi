@@ -1244,8 +1244,15 @@ export function genListeAideSocialCFA(o: OrganismeInfo) {
   ` });
 }
 
-export function genCertificatRealisationCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
-  const stagList = stagiaires.length > 0 ? stagiaires.map(s => `${s.civilite} ${s.prenom} ${s.nom}`).join(', ') : '___________________';
+export function genCertificatRealisationCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], stagiaireIdx?: number) {
+  // Mode individuel si un stagiaireIdx est fourni : un certificat pour ce stagiaire uniquement
+  const target = typeof stagiaireIdx === "number" ? stagiaires[stagiaireIdx] : null;
+  const stagList = target
+    ? `${target.civilite || ""} ${target.prenom || ""} ${target.nom || ""}`.trim()
+    : (stagiaires.length > 0 ? stagiaires.map(s => `${s.civilite} ${s.prenom} ${s.nom}`).join(', ') : '___________________');
+  // Dates : individuelles si présentes, sinon dates formation
+  const dDeb = target?.dateDebutFormation || f.dateDebut;
+  const dFin = target?.dateFinFormation || f.dateFin;
   return buildDocument({ org: o, title: "CERTIFICAT DE RÉALISATION", extraHtml: `
     <p>Je soussigné <strong>${o.dirigeant}</strong>, représentant légal du dispensateur de l'action concourant au développement des compétences, de l'organisme de formation <strong>${o.nom}</strong></p>
     <p>atteste que :</p>
@@ -1258,10 +1265,10 @@ export function genCertificatRealisationCFA(o: OrganismeInfo, f: FormationInfo, 
       <li>☐ action de VAE</li>
       <li>☑ action de formation par apprentissage</li>
     </ul>
-    <p>Qui s'est déroulée du <strong>${formatDate(f.dateDebut)}</strong> au <strong>${formatDate(f.dateFin)}</strong> pour une durée de <strong>${f.duree}</strong></p>
+    <p>Qui s'est déroulée du <strong>${formatDate(dDeb)}</strong> au <strong>${formatDate(dFin)}</strong> pour une durée de <strong>${f.duree}</strong></p>
     <p style="margin-top:20px">Sans préjudice des délais imposés par les règles fiscales, comptables ou commerciales, je m'engage à conserver l'ensemble des pièces justificatives qui ont permis d'établir le présent certificat pendant une durée de 3 ans à compter de la fin de l'année du dernier paiement.</p>
     <p>En cas de cofinancement des fonds européens, la durée de conservation est étendue conformément aux obligations conventionnelles spécifiques.</p>
-    <p style="margin-top:30px">Fait à <strong>${o.ville}</strong>, le <strong>${formatDate(f.dateFin)}</strong></p>
+    <p style="margin-top:30px">Fait à <strong>${o.ville}</strong>, le <strong>${formatDate(dFin)}</strong></p>
     <p>Cachet et signature du responsable du dispensateur de formation</p>
     <p style="margin-top:40px"><strong>${o.dirigeant}</strong></p>
   ` }).replace("</head>", '<meta name="pdf-page-size" content="280x430"></head>');
