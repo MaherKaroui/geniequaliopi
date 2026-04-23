@@ -11865,7 +11865,6 @@ function genCalendrierFormationOPCO(o: OrganismeInfo, f: FormationInfo, stagiair
     const shift = computeWeekShift(g.debut);
     const ecoleDays = refDate ? allDays.filter((d) => isEcoleWeek(weekIndex(d, refDate), shift)) : [];
     const nbEcoleDays = ecoleDays.length;
-    const volumeEcole = nbEcoleDays * 7;
     const envoiISO = computeEnvoiDate(g.debut);
     if (envoiISO) envoiDatesISO.push(envoiISO);
     const envoiLabel = envoiISO ? formatDate(envoiISO) : "—";
@@ -11877,22 +11876,21 @@ function genCalendrierFormationOPCO(o: OrganismeInfo, f: FormationInfo, stagiair
       extra += `<div class="page-break-before" style="page-break-before:always;break-before:page;height:0px;overflow:hidden"></div>`;
     }
     extra += `<h3 style="margin-top:18px;page-break-after:avoid">${titreGroupe}</h3>`;
-    extra += `<p><strong>Période :</strong> du ${formatDate(g.debut)} au ${formatDate(g.fin)} &nbsp;|&nbsp; <strong>Rythme :</strong> ${rythmeLabel} &nbsp;|&nbsp; <strong>Volume centre :</strong> ${volumeEcole} h sur ${nbEcoleDays} jour${nbEcoleDays > 1 ? "s" : ""} école (7 h/jour)</p>`;
+    extra += `<p><strong>Période :</strong> du ${formatDate(g.debut)} au ${formatDate(g.fin)} &nbsp;|&nbsp; <strong>Rythme :</strong> ${rythmeLabel} &nbsp;|&nbsp; <strong>Jours école :</strong> ${nbEcoleDays}</p>`;
     extra += `<p style="margin:4px 0;font-size:0.9em;color:#1e3a7b"><strong>Date d'envoi du calendrier :</strong> ${envoiLabel} <em>(7 jours ouvrés avant le démarrage — hors week-end et jours fériés)</em></p>`;
     extra += `<table border="1" cellpadding="5" cellspacing="0" style="border-collapse:collapse;width:100%">
       <thead><tr style="background:#1e3a7b;color:#fff">
-        <th style="width:5%">N°</th>
-        <th style="width:7%">Sem.</th>
-        <th style="width:11%">Type</th>
-        <th style="width:17%">Date</th>
-        <th style="width:11%">Jour</th>
-        <th style="width:13%">Horaires matin</th>
-        <th style="width:13%">Horaires après-midi</th>
-        <th style="width:7%">Volume</th>
+        <th style="width:6%">N°</th>
+        <th style="width:8%">Sem.</th>
+        <th style="width:12%">Type</th>
+        <th style="width:20%">Date</th>
+        <th style="width:12%">Jour</th>
+        <th style="width:14%">Horaires matin</th>
+        <th style="width:14%">Horaires après-midi</th>
         <th>Lieu</th>
       </tr></thead><tbody>`;
     if (allDays.length === 0 || !refDate) {
-      extra += `<tr><td colspan="9" style="text-align:center;color:#888">Dates à renseigner dans la fiche stagiaire.</td></tr>`;
+      extra += `<tr><td colspan="8" style="text-align:center;color:#888">Dates à renseigner dans la fiche stagiaire.</td></tr>`;
     } else {
       let ecoleCounter = 0;
       let entrepriseCounter = 0;
@@ -11907,7 +11905,6 @@ function genCalendrierFormationOPCO(o: OrganismeInfo, f: FormationInfo, stagiair
           : `<span style="color:#9a6300;font-weight:bold">Entreprise</span>`;
         const matin = ecole ? horairesMatin : "—";
         const aprem = ecole ? horairesAprem : "—";
-        const vol = ecole ? "7 h" : "—";
         const lieuJour = ecole ? lieu : "Entreprise d'accueil";
         extra += `<tr style="background:${bg}">
           <td style="text-align:center">${numLabel}</td>
@@ -11917,7 +11914,6 @@ function genCalendrierFormationOPCO(o: OrganismeInfo, f: FormationInfo, stagiair
           <td style="text-transform:capitalize">${fmtJour(d)}</td>
           <td style="text-align:center">${matin}</td>
           <td style="text-align:center">${aprem}</td>
-          <td style="text-align:center">${vol}</td>
           <td>${lieuJour}</td>
         </tr>`;
       });
@@ -11926,8 +11922,8 @@ function genCalendrierFormationOPCO(o: OrganismeInfo, f: FormationInfo, stagiair
   }
 
   extra += `<p style="margin-top:14px;font-size:0.9em"><em>Ce calendrier est communiqué aux apprenants à l'inscription, à l'employeur et à l'OPCO financeur. Toute modification fait l'objet d'une convocation rectificative au moins 7 jours avant le démarrage. Le rythme d'alternance commence systématiquement par une semaine en centre de formation.</em></p>`;
-  // Date d'envoi globale = la plus précoce des dates d'envoi de session (premier départ - 7 j ouvrés)
-  const envoiGlobalISO = envoiDatesISO.sort()[0] || new Date().toISOString().slice(0, 10);
+  // "Fait à le" = date d'envoi (début de session - 7j ouvrés), priorité à la date la plus précoce
+  const envoiGlobalISO = envoiDatesISO.sort()[0] || subtractBusinessDays(new Date().toISOString().slice(0, 10), 7);
   extra += `<p style="margin-top:18px"><strong>Fait à</strong> ${o.ville || "—"}, <strong>le</strong> ${formatDate(envoiGlobalISO)}</p>`;
   extra += `<p><strong>${o.dirigeant || o.responsablePedagogique || "Le responsable pédagogique"}</strong><br>${o.nom}</p>`;
 
