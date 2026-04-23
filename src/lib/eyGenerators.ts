@@ -39,6 +39,12 @@ function isRestauration(f: FormationInfo): boolean {
   return t.includes("restaura") || t.includes("cuisi") || t.includes("pâtiss") || t.includes("boulang") || t.includes("haccp") || t.includes("hygiène alimentaire");
 }
 
+/** Détection domaine ECSR / enseignant de la conduite */
+function isECSR(f: FormationInfo): boolean {
+  const t = (f.intitule||"").toLowerCase() + " " + (f.codeRNCP||"").toLowerCase();
+  return t.includes("ecsr") || t.includes("enseignant de la conduite") || t.includes("sécurité routière") || t.includes("securite routiere") || t.includes("rncp35329") || t.includes("auto-école") || t.includes("auto ecole");
+}
+
 /** Détection domaine management / commerce */
 function isManagement(f: FormationInfo): boolean {
   const t = (f.intitule||"").toLowerCase();
@@ -1543,6 +1549,35 @@ function getDomainSpecificResources(f: FormationInfo): { quiz: RessourceQuiz[]; 
         { outil: isWebmkt ? "Plateformes Meta Ads / Google Ads" : isGraph ? "Bibliothèque de polices Adobe Fonts" : "Outils de prospection (LinkedIn Sales Navigator)", usage: "Travaux pratiques sur cas réels", acces: "Comptes d'entraînement" },
         { outil: isWebmkt ? "Canva Pro / Mailchimp" : isGraph ? "Bibliothèque d'images Adobe Stock" : "Salle équipée de bureaux et téléphones", usage: "Production de livrables professionnels", acces: "Accès individuel" },
         { outil: "Plateforme LMS Moodle", usage: "Quiz, supports, suivi, forums", acces: "Identifiant personnel" },
+      ],
+    };
+  }
+
+  // ECSR – Enseignant de la conduite et de la sécurité routière
+  if (isECSR(f)) {
+    return {
+      quiz: [
+        { titre: "QCM Code de la route et réglementation enseignement", type: "QCM", nb: 40, duree: "45 min", objectif: "Maîtriser le Code de la route, la réglementation des auto-écoles (R. 213) et le permis B" },
+        { titre: "QCM Pédagogie de la conduite et REMC", type: "QCM", nb: 25, duree: "35 min", objectif: "Connaître le Référentiel pour l'Éducation à une Mobilité Citoyenne (REMC) et la pédagogie active" },
+        { titre: "QCM Sécurité routière, accidentologie et risques", type: "QCM", nb: 20, duree: "30 min", objectif: "Identifier les facteurs d'accidents, populations à risque (jeunes, 2RM) et leviers de prévention" },
+        { titre: "Mise en situation – Leçon de conduite individuelle", type: "Mise en situation pédagogique", nb: 3, duree: "60 min", objectif: "Conduire une leçon (objectif, fiche de suivi, débriefing) selon le REMC" },
+        { titre: "Animation collective – Rendez-vous pédagogique post-permis / RV pédagogiques B", type: "Animation de groupe", nb: 2, duree: "90 min", objectif: "Animer une séance collective de sensibilisation à la sécurité routière" },
+        { titre: "Étude de cas – Élève en difficulté (stress, échec à l'examen)", type: "Étude de cas", nb: 2, duree: "45 min", objectif: "Adapter la pédagogie, gérer la motivation et préparer la représentation" },
+      ],
+      videos: [
+        { titre: "Le REMC expliqué – Référentiel pour l'Éducation à une Mobilité Citoyenne", source: "Sécurité routière / DSR", duree: "25 min", description: "Présentation officielle des 4 compétences du REMC et de la pédagogie associée" },
+        { titre: "L'examen pratique du permis B – Grille d'évaluation", source: "Sécurité routière", duree: "20 min", description: "Décryptage de la grille E (compétences évaluées par l'inspecteur)" },
+        { titre: "Conduite accompagnée (AAC) et conduite supervisée", source: "Sécurité routière", duree: "15 min", description: "Cadre réglementaire, rôle de l'enseignant et accompagnement des accompagnateurs" },
+        { titre: "Accidentologie des jeunes conducteurs", source: "ONISR – Observatoire National Interministériel de la Sécurité Routière", duree: "30 min", description: "Statistiques, comportements à risque et prévention" },
+        { titre: "Animer un rendez-vous pédagogique post-permis", source: "ANPER / DSR", duree: "20 min", description: "Méthodes d'animation collective et supports pour les jeunes conducteurs" },
+      ],
+      outils: [
+        { outil: "Véhicule école double commande équipé (catégorie B)", usage: "Leçons pratiques de conduite – mises en situation pédagogiques", acces: "Salle / parc véhicules de l'auto-école selon planning" },
+        { outil: "Fiches de suivi élève (fiche de progression REMC)", usage: "Traçabilité des compétences acquises et objectifs des leçons", acces: "Trame fournie + plateforme LMS" },
+        { outil: "Plateforme E-learning Code de la route (ENPC, Codes Rousseau, Prepacode)", usage: "Révisions du Code, tests blancs, suivi des résultats par élève", acces: "Identifiant individuel élève + tableau de bord enseignant" },
+        { outil: "Simulateur de conduite (poste fixe avec retour de force)", usage: "Apprentissage initial, gestion de situations à risque sans danger", acces: "Salle simulateur selon planning de l'auto-école" },
+        { outil: "Supports REMC officiels (DSR) + livret d'apprentissage", usage: "Référentiel des 4 compétences (manœuvres, circulation, partage, autonomie)", acces: "Téléchargement DSR + remise papier à chaque élève" },
+        { outil: "Ressources Sécurité routière, ONISR, attitudes-prevention.fr", usage: "Animation des rendez-vous pédagogiques, supports de sensibilisation", acces: "Sites institutionnels publics + bibliothèque interne" },
       ],
     };
   }
