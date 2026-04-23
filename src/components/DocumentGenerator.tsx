@@ -377,6 +377,12 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
       saveAs(blob, buildCatalogFileName(doc, undefined, ".xlsx"));
       return;
     }
+    if (doc.template === "suivi_inscriptions_excel") {
+      const { generateSuiviInscriptionsXlsxBlob } = await import("@/lib/suiviInscriptionsXlsx");
+      const blob = generateSuiviInscriptionsXlsxBlob(mergedOrganisme, selectedFormation, allStagiaires);
+      saveAs(blob, buildCatalogFileName(doc, undefined, ".xlsx"));
+      return;
+    }
 
     // Handle mail .docx templates (per-stagiaire)
     if (MAIL_TEMPLATE_FILES[doc.template] && typeof doc.params?.stagiaireIdx === "number") {
@@ -725,6 +731,12 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
           await safeRun(doc.nom, async () => {
             const { generateSuiviPFMPXlsxBlob } = await import("@/lib/suiviPFMPXlsx");
             const blob = generateSuiviPFMPXlsxBlob(mergedOrganisme, selectedFormation, allStagiaires);
+            addFileToZip(`${basePath}/${buildCatalogFileName(doc, null, ".xlsx")}`, blob);
+          });
+        } else if (doc.template === "suivi_inscriptions_excel") {
+          await safeRun(doc.nom, async () => {
+            const { generateSuiviInscriptionsXlsxBlob } = await import("@/lib/suiviInscriptionsXlsx");
+            const blob = generateSuiviInscriptionsXlsxBlob(mergedOrganisme, selectedFormation, allStagiaires);
             addFileToZip(`${basePath}/${buildCatalogFileName(doc, null, ".xlsx")}`, blob);
           });
         } else if (
