@@ -926,8 +926,7 @@ function genOrganigramme(o: OrganismeInfo) {
         <div style="background:#e8f0fe;padding:12px 20px;border-radius:8px;min-width:180px"><strong>Référent Relation Entreprises</strong><br>${relEnt}<br><em style="font-size:11px">Partenariats – Insertion</em></div>
         <div style="background:#e8f0fe;padding:12px 20px;border-radius:8px;min-width:180px"><strong>Référent Mobilité nationale et internationale</strong><br>${mob}<br><em style="font-size:11px">Mission externalisée</em></div>
       </div>
-    </div>
-    <p style="text-align:center;font-size:11px;color:#666;margin-top:20px"><em>Les fonctions complémentaires (Référent décrochage, Coordinateur pédagogique, Référent numérique, Conseiller en formation) sont assurées en interne et peuvent être mutualisées selon la taille de l'organisme.</em></p>` });
+    </div>` });
 }
 
 function genCharteQualite(o: OrganismeInfo) {
