@@ -2199,20 +2199,20 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
       </ol>
     </div>
 
-    <h2>9. Délais d'accès</h2>
+    <h2>10. Délais d'accès</h2>
     <div class="section">
       <p><strong>Délai d'accès :</strong> ${f.delaiAcces || "14 jours après validation de la préinscription et réception du dossier complet."}</p>
       <p><em>Ce délai peut être réduit en fonction des disponibilités et de l'urgence de la demande. Pour les personnes en situation de handicap, un délai supplémentaire peut être nécessaire pour la mise en place des aménagements.</em></p>
     </div>
 
-    <h2>10. Tarif</h2>
+    <h2>11. Tarif</h2>
     <div class="section">
       <p><strong>Tarif :</strong> ${displayTarif}</p>
       <p>TVA non applicable, article 261-4-4° du CGI.</p>
       <p><em>Possibilité de prise en charge par votre OPCO ou Pôle Emploi. Contactez-nous pour un devis personnalisé.</em></p>
     </div>
 
-    <h2>11. Méthodes pédagogiques et moyens pédagogiques</h2>
+    <h2>12. Méthodes pédagogiques et moyens pédagogiques</h2>
     <div class="section">
       <h3>Méthodes pédagogiques</h3>
       <ul>
@@ -2228,7 +2228,7 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
       ${moyensHtml}
     </div>
 
-    <h2>12. Modalités d'évaluation</h2>
+    <h2>13. Modalités d'évaluation</h2>
     <div class="section">
       <p><strong>Le dispositif d'évaluation comprend :</strong></p>
       ${evalHtml}
@@ -2237,7 +2237,7 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
 
     ${ntcBlocsHtml}
 
-    <h2>13. Accessibilité aux personnes en situation de handicap</h2>
+    <h2>14. Accessibilité aux personnes en situation de handicap</h2>
     <div class="section section-green">
       <p>La formation est accessible aux personnes à mobilité réduite (PMR) et aux personnes en situation de handicap (PSH).</p>
       <p>Des aménagements spécifiques peuvent être mis en place selon les besoins identifiés :</p>
@@ -2254,7 +2254,7 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
       <p>${o.telephone?.trim() ? `<strong>Téléphone :</strong> ${o.telephone}` : ""}</p>
     </div>
 
-    <h2>14. Indicateurs de performance – Année ${anneeFormation}</h2>
+    <h2>15. Indicateurs de performance – Année ${anneeFormation}</h2>
     <div class="section">
       ${isCFA ? `
       <table>
@@ -2293,7 +2293,7 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
       `}
     </div>
 
-    <h2>15. Déroulé pédagogique de la formation${!isBlocFormation ? ` (${heuresTotal})` : ""}</h2>
+    <h2>16. Déroulé pédagogique de la formation${!isBlocFormation ? ` (${heuresTotal})` : ""}</h2>
     <div class="section" style="padding:5px">
       <p style="margin-bottom:10px"><strong>Formation :</strong> ${f.intitule}<br>
       <strong>Durée :</strong> ${displayDuree}<br>
@@ -2302,7 +2302,7 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
     ${isBlocFormation ? blocDerouleHtml : derouleHtml}
 
     ${isCFA ? `
-    <h2>16. Préparation à la certification</h2>
+    <h2>17. Préparation à la certification</h2>
     <div class="section section-green">
       <p>Un dispositif d'entraînement intensif est mis en place tout au long de la formation pour garantir la réussite à l'examen :</p>
       <ul>
@@ -2314,7 +2314,7 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
       </ul>
     </div>
 
-    <h2>17. Débouchés professionnels</h2>
+    <h2>18. Débouchés professionnels</h2>
     <div class="section">
       ${(() => {
         const rncp = f.codeRNCP ? getRNCPByCode(f.codeRNCP) : undefined;
