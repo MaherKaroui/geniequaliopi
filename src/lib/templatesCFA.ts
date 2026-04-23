@@ -77,7 +77,7 @@ export function genOrganigrammeCFA(o: OrganismeInfo) {
       </tr>
     </table>
 
-    <p style="text-align:center;font-size:11px;color:#666;margin-top:30px"><em>La fonction de Référent Mobilité nationale et internationale est externalisée auprès d'un prestataire spécialisé (Erasmus+ / Mobi'Jeunes). Les fonctions complémentaires (Référent décrochage, Coordinateur pédagogique, Référent numérique, Conseiller en formation) sont assurées en interne et peuvent être mutualisées selon la taille de l'organisme.</em></p>
+    <p style="text-align:center;font-size:11px;color:#666;margin-top:30px"><em>Les fonctions complémentaires (Référent décrochage, Coordinateur pédagogique, Référent numérique, Conseiller en formation) sont assurées en interne et peuvent être mutualisées selon la taille de l'organisme.</em></p>
   ` });
 }
 
