@@ -134,6 +134,12 @@ export function getPreferredExtension(template: string, exportFormat: ExportForm
   if (template === "suivi_public_beneficiaire_excel") return ".xlsx";
   if (template === "suivi_pfmp_excel") return ".xlsx";
   if (template === "suivi_inscriptions_excel") return ".xlsx";
+  // Templates qui sont aussi téléchargés en vrai .xlsx via SheetJS
+  if (template === "decoupage_formation_cfa_excel") return ".xlsx";
+  if (template === "matrice_competences_excel") return ".xlsx";
+  if (template === "suivi_chiffre_formation_excel") return ".xlsx";
+  if (template === "tableau_suivi_parcours_beneficiaires_cfa_excel") return ".xlsx";
+  if (template === "calendrier_annuel_cfa") return ".xlsx";
   if (EXCEL_TEMPLATES.has(template)) return ".xls";
   if (MAIL_DOCX_TEMPLATES.has(template)) return ".docx";
   return exportFormat === "pdf" ? ".pdf" : ".doc";
