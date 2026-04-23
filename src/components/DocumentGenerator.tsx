@@ -718,6 +718,11 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
               const fileBlob = await resp.blob();
               addFileToZip(`${stagFolder}/${buildCatalogFileName(doc, stagiaire)}`, fileBlob);
             });
+          } else if (NATIVE_XLSX_TEMPLATES.has(doc.template)) {
+            await safeRun(`${doc.nom} (${stagiaire.nom})`, async () => {
+              const blob = await generateNativeXlsxBlob(doc.template, mergedOrganisme, selectedFormation, allStagiaires, stagiaire);
+              if (blob) addFileToZip(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, ".xlsx")}`, blob);
+            });
           } else if (
             doc.template === "indicateurs_performance"
             || doc.template === "tableau_suivi_parcours_excel"
