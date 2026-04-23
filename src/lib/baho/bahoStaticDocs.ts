@@ -225,8 +225,8 @@ function stampsBlock(e: BahoEntreprise, customFsStamp?: string): string {
 
 /** Convention de formation per hotel — includes Article 3 - Participants (all stagiaires) + tampons */
 export function getConventionHTML(e: BahoEntreprise, customFsStamp?: string): string {
+  const dateConv = subtractWorkingDays(e.dateDebut, 14);
   const civiliteForStg = (s: BahoStagiaire) => {
-    // Default to "Mme" unless prenom looks masculine — keep it simple, follow screenshot style
     const prenomsM = ["Taha", "Mathis", "Roland", "Mohamed", "Ahmed", "Karim", "Said", "Hassan", "Yann", "Pierre", "Jean", "Paul", "Marc", "Luc"];
     const isM = prenomsM.some((p) => s.prenom?.toLowerCase().startsWith(p.toLowerCase()));
     return isM ? "M." : "Mme";
@@ -236,7 +236,7 @@ export function getConventionHTML(e: BahoEntreprise, customFsStamp?: string): st
     .map((s) => `<li><strong>${civiliteForStg(s)} ${s.nom.toUpperCase()} ${s.prenom}</strong>${s.emploi ? ` – ${s.emploi}` : ""}</li>`)
     .join("");
 
-  const nbHeures = 14; // AFEST hôtellerie standard
+  const nbHeures = 14;
   const prixUnit = 1400;
   const totalHt = e.stagiaires.length * prixUnit;
 
