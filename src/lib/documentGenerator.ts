@@ -7022,7 +7022,7 @@ ${tableHTML(["Champ", "Réponse"], [
 ${s.signatureUrl ? `<p><img src="${s.signatureUrl}" alt="Signature" style="max-height:70px;"/></p>` : `<p><br/><br/></p>`}` },
 
     { heading: "10. Cadre réservé au CFA", content: `
-<p><strong>Dossier reçu le :</strong> ${recuLe}</p>
+<p><strong>Dossier reçu le :</strong> ${signeLe}</p>
 <p><strong>Dossier complet :</strong> <strong>Oui</strong></p>
 <p><strong>Avis du CFA :</strong> <strong>Favorable</strong></p>
 <p><strong>Observations du CFA :</strong> Candidature complète et conforme aux prérequis de la formation. Profil cohérent avec le métier visé. Admission validée sous réserve de signature du contrat d'apprentissage.</p>
