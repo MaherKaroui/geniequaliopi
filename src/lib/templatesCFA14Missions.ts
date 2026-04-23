@@ -606,8 +606,127 @@ export function genPlanMobiliteNationaleCFA(o: OrganismeInfo, f: FormationInfo, 
 }
 
 // ============================================================================
-// MISSION 13 (L6231-2) — Accompagnement des apprentis interrompus / sans diplôme
+// MISSION 10 — Convention de mise à disposition inter-CFA (mobilité nationale)
+// Cadre : Art. L6231-2 + Art. L6222-2 + Art. R6233-58 et suivants du Code du travail
+// Permet à un apprenti d'effectuer une période de formation dans un autre CFA français
 // ============================================================================
+export function genConventionMobiliteInterCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[] = []) {
+  const s = stagiaires[0] || ({ prenom: "[Prénom]", nom: "[Nom]", civilite: "M.", dateNaissance: "", adresse: "" } as StagiaireInfo);
+  const annee = f.dateDebut ? new Date(f.dateDebut).getFullYear() : new Date().getFullYear();
+
+  return buildDocument({
+    org: o,
+    title: `CONVENTION DE MISE À DISPOSITION D'UN APPRENTI ENTRE DEUX CFA — ANNÉE ${annee}`,
+    sections: [
+      {
+        heading: "Cadre juridique",
+        content: `<p>Convention établie en application des articles <strong>L6231-2, L6222-2 et R6233-58 et suivants</strong> du Code du travail, permettant à un apprenti de suivre une <strong>période de formation pratique ou théorique dans un autre CFA situé sur le territoire national</strong>, sans rupture de son contrat d'apprentissage initial.</p>`,
+      },
+      {
+        heading: "Article 1 — Parties à la convention",
+        content: `<p><strong>CFA d'origine :</strong> ${o.nom} — ${o.adresse || "[adresse]"} — SIRET ${o.siret || "[SIRET]"} — NDA ${o.nda || "[NDA]"}<br>Représenté par : ${o.dirigeant || "[Représentant légal]"}</p><p><strong>CFA d'accueil :</strong> [Dénomination du CFA d'accueil]<br>Adresse : [adresse]<br>SIRET : [SIRET] — NDA : [NDA]<br>Représenté par : [Nom du représentant légal]</p><p><strong>Employeur de l'apprenti :</strong> [Dénomination] — SIRET [SIRET]<br>Représenté par : [Nom et fonction]</p><p><strong>Apprenti concerné :</strong> ${s.civilite || ""} ${s.prenom} ${s.nom}<br>Né(e) le : ${s.dateNaissance || "[date]"}<br>Adresse : ${s.adresse || "[adresse]"}<br>Formation : ${f.intitule} — ${f.duree || "[durée]"}</p>`,
+      },
+      {
+        heading: "Article 2 — Objet de la mise à disposition",
+        content: `<p>La présente convention a pour objet d'organiser l'<strong>accueil temporaire</strong> de l'apprenti dans le CFA d'accueil afin qu'il y suive :</p><p>☐ Un module de formation théorique non dispensé au CFA d'origine<br>☐ Un plateau technique spécifique (équipement, machine, atelier)<br>☐ Une période de spécialisation ou d'approfondissement<br>☐ Autre : ____________________________</p>`,
+      },
+      {
+        heading: "Article 3 — Durée et calendrier",
+        content: tableHTML(
+          ["Élément", "Précision"],
+          [
+            ["Date de début de la mobilité", "[JJ/MM/AAAA]"],
+            ["Date de fin de la mobilité", "[JJ/MM/AAAA]"],
+            ["Durée totale", "[X] semaines / [Y] heures"],
+            ["Volume horaire hebdomadaire", "[Z] heures"],
+            ["Modalité", "☐ Présentiel  ☐ Distanciel  ☐ Mixte"],
+          ]
+        ),
+      },
+      {
+        heading: "Article 4 — Contenu pédagogique et compétences visées",
+        content: `<p>La période de mobilité vise les compétences suivantes du référentiel <strong>${f.codeRNCP || "[code RNCP/RS]"} — ${f.intitule}</strong> :</p><p>• Compétence 1 : ___________________________________<br>• Compétence 2 : ___________________________________<br>• Compétence 3 : ___________________________________</p><p>Modalités d'évaluation à l'issue : ☐ Attestation de réalisation  ☐ Évaluation formative transmise au CFA d'origine  ☐ Validation de bloc</p>`,
+      },
+      {
+        heading: "Article 5 — Statut de l'apprenti pendant la mobilité",
+        content: `<p>Pendant toute la durée de la mise à disposition :<br>• L'apprenti <strong>conserve son contrat d'apprentissage</strong> avec son employeur.<br>• Il <strong>reste rémunéré</strong> par son employeur dans les mêmes conditions.<br>• Le CFA d'accueil prend en charge l'<strong>encadrement pédagogique et la sécurité</strong> sur site.<br>• La <strong>couverture accident du travail</strong> reste assurée par l'employeur (Art. L6222-30).</p>`,
+      },
+      {
+        heading: "Article 6 — Modalités financières",
+        content: `<p>☐ Mise à disposition à <strong>titre gratuit</strong> (réciprocité entre CFA partenaires)<br>☐ Refacturation au CFA d'origine sur la base de [montant] € / heure stagiaire<br>☐ Prise en charge des frais de transport / hébergement par : ☐ Apprenti  ☐ Employeur  ☐ CFA d'origine  ☐ Aide régionale (Carte mobilité, ARA, etc.)</p>`,
+      },
+      {
+        heading: "Article 7 — Engagements du CFA d'accueil",
+        content: `<p>Le CFA d'accueil s'engage à :<br>• Désigner un <strong>référent pédagogique</strong> pour l'apprenti<br>• Garantir des <strong>conditions matérielles et de sécurité</strong> conformes<br>• Transmettre au CFA d'origine une <strong>attestation de présence</strong> hebdomadaire et un <strong>bilan pédagogique</strong> en fin de mobilité<br>• Signaler immédiatement toute absence ou difficulté</p>`,
+      },
+      {
+        heading: "Article 8 — Engagements du CFA d'origine",
+        content: `<p>Le CFA d'origine s'engage à :<br>• Préparer l'apprenti à la mobilité (objectifs, contenus, contacts)<br>• Assurer le <strong>suivi à distance</strong> pendant la période<br>• Intégrer les acquis dans le <strong>livret de suivi</strong> et la progression pédagogique<br>• Conserver la responsabilité administrative globale du parcours</p>`,
+      },
+      {
+        heading: "Article 9 — Signatures",
+        content: `<p>Fait en quatre exemplaires originaux, à _______________, le _____________</p><table style="width:100%;border-collapse:collapse;margin-top:16px;"><tr><td style="border:1px solid #ccc;padding:12px;width:25%;vertical-align:top;"><strong>CFA d'origine</strong><br>${o.nom}<br><br><br>Signature et cachet :</td><td style="border:1px solid #ccc;padding:12px;width:25%;vertical-align:top;"><strong>CFA d'accueil</strong><br>[Nom CFA]<br><br><br>Signature et cachet :</td><td style="border:1px solid #ccc;padding:12px;width:25%;vertical-align:top;"><strong>Employeur</strong><br>[Raison sociale]<br><br><br>Signature et cachet :</td><td style="border:1px solid #ccc;padding:12px;width:25%;vertical-align:top;"><strong>Apprenti</strong><br>${s.prenom} ${s.nom}<br>(ou représentant légal si mineur)<br><br>Signature :</td></tr></table>`,
+      },
+    ],
+  });
+}
+
+// ============================================================================
+// MISSION 10 — Fiche de demande de mobilité nationale (apprenti)
+// ============================================================================
+export function genFicheDemandeMobiliteNationale(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[] = []) {
+  const s = stagiaires[0] || ({ prenom: "[Prénom]", nom: "[Nom]", civilite: "M." } as StagiaireInfo);
+
+  return buildDocument({
+    org: o,
+    title: "FICHE DE DEMANDE DE MOBILITÉ NATIONALE — APPRENTI",
+    sections: [
+      {
+        heading: "Identification de l'apprenti",
+        content: tableHTML(
+          ["Champ", "Information"],
+          [
+            ["Civilité, Nom, Prénom", `${s.civilite || ""} ${s.nom} ${s.prenom}`],
+            ["Date de naissance", s.dateNaissance || "[à compléter]"],
+            ["Formation suivie", `${f.intitule} — ${f.codeRNCP || "[code]"}`],
+            ["Année du cycle", "☐ 1ère année  ☐ 2ème année  ☐ 3ème année"],
+            ["Employeur", "[Raison sociale + nom du Maître d'apprentissage]"],
+            ["Référent au CFA d'origine", "[Nom du formateur référent]"],
+          ]
+        ),
+      },
+      {
+        heading: "Projet de mobilité",
+        content: `<p><strong>CFA d'accueil souhaité :</strong> _______________________________ (ville : __________)<br><strong>Période demandée :</strong> du __________ au __________ (durée : ____ semaines)<br><strong>Type de mobilité :</strong> ☐ Module théorique spécifique  ☐ Plateau technique  ☐ Spécialisation  ☐ Autre</p><p><strong>Motivation et objectifs pédagogiques (à rédiger par l'apprenti) :</strong></p><p style="border:1px solid #ccc;min-height:100px;padding:8px;"></p>`,
+      },
+      {
+        heading: "Avis et accords requis",
+        content: tableHTML(
+          ["Partie prenante", "Avis", "Date", "Signature"],
+          [
+            ["Apprenti (ou représentant légal si mineur)", "☐ Demande", "", ""],
+            ["Maître d'apprentissage (entreprise)", "☐ Favorable  ☐ Défavorable", "", ""],
+            ["Employeur (signataire du contrat)", "☐ Accord  ☐ Refus", "", ""],
+            ["Référent pédagogique CFA d'origine", "☐ Favorable  ☐ Réserves", "", ""],
+            ["Direction du CFA d'origine", "☐ Validé  ☐ Refusé", "", ""],
+            ["CFA d'accueil (capacité confirmée)", "☐ OK  ☐ Liste d'attente", "", ""],
+          ]
+        ),
+      },
+      {
+        heading: "Aides mobilisables (à cocher)",
+        content: `<p>☐ <strong>Aide mobilité Région</strong> (transport / hébergement) — formulaire région<br>☐ <strong>Carte de réduction transport</strong> (Imagine R, OùRA!, Pass Pays de la Loire…)<br>☐ <strong>Aide au logement temporaire</strong> (FJT, CROUS hors étudiant, Action Logement Mobili-Jeune)<br>☐ <strong>Aide exceptionnelle CFA</strong> (fonds social interne)<br>☐ <strong>Aide employeur</strong> (prise en charge transport/repas)</p>`,
+      },
+      {
+        heading: "Décision finale",
+        content: `<p>☐ <strong>Demande acceptée</strong> — convention de mise à disposition à établir<br>☐ <strong>Demande différée</strong> — motif : ___________________________________<br>☐ <strong>Demande refusée</strong> — motif : ___________________________________</p><p>Date de décision : _____________  Signature direction CFA : _____________</p>`,
+        variant: "green",
+      },
+    ],
+  });
+}
+
+
 export function genProcedureAccompagnementPostFormationCFA(o: OrganismeInfo) {
   return buildDocument({
     org: o,
