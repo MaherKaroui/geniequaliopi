@@ -1444,35 +1444,102 @@ function genAnalyseBesoins(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
           + `• Examen blanc d'admission (épreuve pratique de conduite + entretien) avec correction individualisée`,
       };
     }
-    // Fallback: extract from objectives
-    const objItems = f.objectifs.split(/\n|[.;]/).map(l => l.trim().replace(/^[-•*]\s*/, '')).filter(l => l.length > 10);
-    const domainBesoins = objItems.length >= 5
-      ? objItems.slice(0, 10).map(obj => `Développer la capacité à ${obj.charAt(0).toLowerCase()}${obj.slice(1)}`)
-      : [
-        `Acquérir les compétences fondamentales en ${f.intitule}`,
-        `Maîtriser les techniques et outils spécifiques à ${f.intitule}`,
-        `Développer une pratique professionnelle dans le domaine de ${f.intitule}`,
+    // Fallback dynamique : génère des besoins, synthèse et adaptations basés
+    // sur les vraies données de la formation (objectifs + programme + intitulé).
+    const intitule = f.intitule || "la formation";
+    const cleanLine = (l: string) => l.trim()
+      .replace(/^[-•*◦▪►–—]\s*/, "")
+      .replace(/^\d+[\.\):]\s*/, "")
+      .replace(/^(Jour|Module|Bloc|Séquence|Chapitre)\s*\d+\s*[-:–]?\s*/i, "")
+      .replace(/^À l'issue.*capable de\s*:?\s*/i, "")
+      .replace(/^(Comprendre|Maîtriser|Acquérir|Développer|Apprendre|Savoir|Connaître|Identifier|Réaliser|Mettre en œuvre|Utiliser|Appliquer)\b/i, (m) => m)
+      .replace(/^le|^la|^les|^un|^une|^des/i, (m) => m.toLowerCase())
+      .trim();
+
+    const objItems = (f.objectifs || "")
+      .split(/\n|\.(?=\s)|;/)
+      .map(cleanLine)
+      .filter(l => l.length > 8 && l.length < 200);
+
+    const progItems = (f.programme || "")
+      .split(/\n/)
+      .map(cleanLine)
+      .filter(l => l.length > 8 && l.length < 200 && !/^\d{1,2}[h:]\d{2}/.test(l));
+
+    // Fusionne objectifs + programme, dédoublonne
+    const seen = new Set<string>();
+    const allTopics: string[] = [];
+    [...objItems, ...progItems].forEach(t => {
+      const key = t.toLowerCase().slice(0, 40);
+      if (!seen.has(key)) {
+        seen.add(key);
+        allTopics.push(t);
+      }
+    });
+
+    // Construit des besoins cohérents avec le contenu réel de la formation
+    const besoinPrefixes = [
+      "Maîtriser", "Acquérir les compétences nécessaires pour", "Développer la capacité à",
+      "Comprendre et appliquer", "Renforcer les connaissances en", "Savoir mettre en œuvre",
+      "Acquérir une pratique professionnelle de", "Approfondir", "Consolider",
+      "Être autonome sur",
+    ];
+
+    const formatBesoin = (topic: string, idx: number): string => {
+      const lower = topic.toLowerCase();
+      // Si le topic commence déjà par un verbe d'action, garde-le tel quel
+      if (/^(comprendre|maîtriser|acquérir|développer|apprendre|savoir|connaître|identifier|réaliser|mettre en œuvre|utiliser|appliquer|analyser|évaluer|gérer|organiser|concevoir|produire|communiquer)/i.test(topic)) {
+        return topic.charAt(0).toUpperCase() + topic.slice(1);
+      }
+      const prefix = besoinPrefixes[idx % besoinPrefixes.length];
+      // Évite la répétition "Maîtriser maîtriser"
+      const cleanTopic = lower.startsWith(prefix.toLowerCase().split(" ")[0]) ? topic.slice(prefix.split(" ")[0].length).trim() : topic;
+      return `${prefix} ${cleanTopic.charAt(0).toLowerCase()}${cleanTopic.slice(1)}`;
+    };
+
+    let domainBesoins: string[];
+    if (allTopics.length >= 5) {
+      domainBesoins = allTopics.slice(0, 10).map(formatBesoin);
+    } else {
+      // Si vraiment pas de contenu exploitable, complète avec besoins génériques sur l'intitulé
+      domainBesoins = [
+        ...allTopics.map(formatBesoin),
+        `Acquérir les compétences fondamentales en ${intitule}`,
+        `Maîtriser les techniques et outils spécifiques à ${intitule}`,
+        `Développer une pratique professionnelle dans le domaine de ${intitule}`,
         `Obtenir la certification ou validation visée par la formation`,
-        `Renforcer l'autonomie et la confiance dans la pratique de ${f.intitule}`,
+        `Renforcer l'autonomie et la confiance dans la pratique`,
         `Appliquer les connaissances acquises en situation professionnelle réelle`,
-        `Comprendre les enjeux et les évolutions du domaine de ${f.intitule}`,
-        `Développer un réseau professionnel dans le secteur`,
-        `Maîtriser les bonnes pratiques et les normes du domaine`,
+        `Comprendre les enjeux et les évolutions du domaine`,
+        `Maîtriser les bonnes pratiques et les normes du secteur`,
         `Consolider les acquis par la pratique et les mises en situation`,
-      ];
+        `Développer un réseau professionnel dans le secteur`,
+      ].slice(0, 10);
+    }
+
+    // Synthèse : utilise les premiers besoins réels avec proportions réalistes
+    const proportions = [0.85, 0.75, 0.65, 0.55, 0.45, 0.35];
+    const synthese = domainBesoins.slice(0, 5).map((b, i) => {
+      const nb = Math.max(1, Math.round(stagiaires.length * proportions[i]));
+      const besoinShort = b.length > 110 ? b.slice(0, 107) + "..." : b;
+      return `• ${nb} stagiaire${nb > 1 ? "s" : ""} expriment le besoin : ${besoinShort.toLowerCase()}`;
+    }).join("<br>");
+
+    // Adaptations cohérentes au contenu de la formation
+    const topicShort = allTopics.length > 0 ? allTopics[0].slice(0, 60) : intitule;
+    const adaptations = [
+      `Mises en situation professionnelles contextualisées au domaine de ${intitule}`,
+      `Exercices pratiques portant sur ${topicShort}${allTopics.length > 0 ? "..." : ""}`,
+      `Adaptation du rythme pédagogique selon le niveau initial de chaque stagiaire`,
+      `Supports pédagogiques (fiches techniques, cas concrets, vidéos) spécifiques à ${intitule}`,
+      `Évaluations formatives régulières pour ajuster le parcours individuel`,
+      `Accompagnement individualisé par le formateur référent et ressources complémentaires en ligne`,
+    ].join("<br>• ");
+
     return {
       besoins: domainBesoins,
-      synthese: `• ${Math.round(stagiaires.length * 0.8)} stagiaires souhaitent acquérir les compétences fondamentales en ${f.intitule}<br>`
-        + `• ${Math.round(stagiaires.length * 0.7)} stagiaires ont besoin de maîtriser les outils et techniques spécifiques<br>`
-        + `• ${Math.round(stagiaires.length * 0.5)} stagiaires visent la certification ou la validation des compétences<br>`
-        + `• ${Math.round(stagiaires.length * 0.4)} stagiaires recherchent un accompagnement personnalisé<br>`
-        + `• ${Math.round(stagiaires.length * 0.3)} stagiaires souhaitent un suivi post-formation`,
-      adaptations: `• Exercices pratiques adaptés au domaine de ${f.intitule}<br>`
-        + `• Mises en situation professionnelles contextualisées<br>`
-        + `• Supports pédagogiques spécifiques au secteur<br>`
-        + `• Adaptation du rythme selon le niveau de chaque stagiaire<br>`
-        + `• Ressources complémentaires en ligne pour approfondir<br>`
-        + `• Évaluations formatives régulières pour ajuster le parcours`,
+      synthese,
+      adaptations: "• " + adaptations,
     };
   }
 
@@ -2728,7 +2795,7 @@ function genEvalFinale(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiaire
 // ===== IND 8 — Tests de positionnement (questions ouvertes, format Drive) =====
 
 function genTestPositionnementTrame(o: OrganismeInfo, f: FormationInfo, type: "debut" | "fin") {
-  const qo = getQuestionsOuvertes(f.intitule);
+  const qo = getQuestionsOuvertes(f.intitule, f.objectifs, f.programme);
   const questions = type === "debut" ? qo.debut : qo.fin;
   const label = type === "debut" ? "début" : "fin";
   const labelCap = type === "debut" ? "Début" : "Fin";
@@ -2759,7 +2826,7 @@ function genTestPositionnementTrame(o: OrganismeInfo, f: FormationInfo, type: "d
 }
 
 function genTestPositionnementIndividuel(o: OrganismeInfo, f: FormationInfo, s: StagiaireInfo, si: number, type: "debut" | "fin", stagiaires?: StagiaireInfo[]) {
-  const qo = getQuestionsOuvertes(f.intitule);
+  const qo = getQuestionsOuvertes(f.intitule, f.objectifs, f.programme);
   const questions = type === "debut" ? qo.debut : qo.fin;
   const label = type === "debut" ? "début" : "fin";
   const labelCap = type === "debut" ? "Début" : "Fin";
@@ -10862,7 +10929,7 @@ function genTestCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: Sta
     extra += `<p><strong>Score QCM :</strong> ${score.score} / ${score.total} (${Math.round(score.score / score.total * 100)}%)</p>`;
   }
 
-  const questionsOuvertes = getQuestionsOuvertes(f.intitule);
+  const questionsOuvertes = getQuestionsOuvertes(f.intitule, f.objectifs, f.programme);
   const openQs = isDebut ? questionsOuvertes.debut : questionsOuvertes.fin;
   const openAnswers = termine ? generateStagiaireOpenAnswers(openQs, si, isDebut, { nom: s.nom, prenom: s.prenom, entreprise: s.entreprise, poste: s.poste }) : [];
 
