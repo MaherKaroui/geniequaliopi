@@ -433,15 +433,15 @@ export function getFactureHTML(e: BahoEntreprise, numero: string, customFsStamp?
         <td>${total.toLocaleString("fr-FR")} €</td>
       </tr>
       <tr class="total-row">
-        <td colspan="3" style="text-align:right;">Total HT</td>
+        <td style="text-align:right;">Total HT</td>
         <td>${total.toLocaleString("fr-FR")} €</td>
       </tr>
       <tr class="total-row">
-        <td colspan="3" style="text-align:right;">TVA (exonérée art. 261-4-4° a CGI)</td>
+        <td style="text-align:right;">TVA (exonérée art. 261-4-4° a CGI)</td>
         <td>0,00 €</td>
       </tr>
       <tr class="total-row">
-        <td colspan="3" style="text-align:right;">Total TTC</td>
+        <td style="text-align:right;">Total TTC</td>
         <td>${total.toLocaleString("fr-FR")} €</td>
       </tr>
     </tbody>
