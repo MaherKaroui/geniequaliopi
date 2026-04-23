@@ -54,7 +54,7 @@ function buildDevisData(e: BahoEntreprise, devisNumero: string): DevisTemplateDa
 }
 
 /** Build full BAHO ZIP and return as Blob */
-export async function buildBahoZip(reporter?: JobReporter): Promise<Blob> {
+export async function buildBahoZip(reporter?: JobReporter, customFsStamp?: string): Promise<Blob> {
   const zip = new JSZip();
   const entreprises = getBahoEntreprises();
   const totalSteps = entreprises.length * 5; // 5 documents par entreprise
@@ -139,13 +139,13 @@ export async function buildBahoZip(reporter?: JobReporter): Promise<Blob> {
       reporter?.setMessage(`${e.nom} – Règlements intérieurs (${e.stagiaires.length})…`);
       const riFolder = folder.folder("Reglements_interieurs")!;
       for (const s of e.stagiaires) {
-        const riHTML = getRIHTML(e, s);
+        const riHTML = getRIHTML(e, s, customFsStamp);
         const riPdf = await htmlToPdfBlob(riHTML);
         const stgName = `${safeName(s.prenom)}_${safeName(s.nom)}_${s.codeStagiaire}`;
         riFolder.file(`RI_${stgName}.pdf`, riPdf);
       }
       // Aussi un RI "entreprise" générique (sans stagiaire) pour archive
-      const riEntHTML = getRIHTML(e);
+      const riEntHTML = getRIHTML(e, undefined, customFsStamp);
       const riEntPdf = await htmlToPdfBlob(riEntHTML);
       folder.file(`Reglement_interieur_${baseName}_entreprise.pdf`, riEntPdf);
     } catch (err) {
