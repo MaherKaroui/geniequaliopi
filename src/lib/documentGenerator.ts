@@ -181,7 +181,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "questionnaire_positionnement": return genQuestionnairePositionnement(o, f, stagiaires);
     case "analyse_besoin": return genAnalyseBesoins(o, f, stagiaires);
     case "entretien_prealable": return genEntretienPrealable(o);
-    case "programme_formation": return genProgramme(o, f, stagiaires, realStagiairesCount);
+    case "programme_formation": return genProgramme(o, f, stagiaires, realStagiairesCount, params?.isCFA === true);
     case "objectifs_pedagogiques": return genObjectifs(o, f);
     case "plan_pedagogique": return genPlanPedagogique(o, f);
     case "adaptation_contenu": return genAdaptation(o, f);
