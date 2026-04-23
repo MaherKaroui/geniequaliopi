@@ -1829,27 +1829,27 @@ function generateDynamicQuestions(
 
     if (type === "debut") {
       const qVariants = [
-        `Quelles sont vos connaissances actuelles concernant : ${topicShort} ?`,
-        `Avez-vous déjà été confronté à : ${topicShort} ? Décrivez votre expérience.`,
-        `Comment aborderiez-vous aujourd'hui : ${topicShort} ?`,
-        `Quels sont selon vous les points clés de : ${topicShort} ?`,
-        `Quelles difficultés anticipez-vous concernant : ${topicShort} ?`,
+        `Que connaissez-vous sur : ${topicShort} ?`,
+        `Avez-vous déjà fait : ${topicShort} ? Racontez en quelques mots.`,
+        `Comment feriez-vous aujourd'hui pour : ${topicShort} ?`,
+        `Selon vous, qu'est-ce qui est important dans : ${topicShort} ?`,
+        `Qu'est-ce qui vous semble difficile dans : ${topicShort} ?`,
       ];
       dynamicQs.push({
         question: qVariants[i % qVariants.length],
-        reponseAttendue: `Réponse attendue : description du niveau initial du stagiaire et identification des besoins concernant « ${topicShort} » dans le cadre de la formation « ${intitule} ».`,
+        reponseAttendue: `Réponse attendue : le stagiaire dit ce qu'il sait déjà sur « ${topicShort} » et ce qu'il a besoin d'apprendre dans la formation « ${intitule} ».`,
       });
     } else {
       const qVariants = [
-        `Expliquez avec vos propres mots ce que vous avez appris sur : ${topicShort}.`,
-        `Comment allez-vous appliquer en situation professionnelle : ${topicShort} ?`,
-        `Quels sont les points essentiels à retenir concernant : ${topicShort} ?`,
-        `Citez un exemple concret d'application de : ${topicShort}.`,
+        `Avec vos mots, expliquez ce que vous avez appris sur : ${topicShort}.`,
+        `Comment allez-vous utiliser au travail : ${topicShort} ?`,
+        `Que faut-il retenir d'important sur : ${topicShort} ?`,
+        `Donnez un exemple simple pour utiliser : ${topicShort}.`,
         `Quels outils ou méthodes utiliserez-vous pour : ${topicShort} ?`,
       ];
       dynamicQs.push({
         question: qVariants[i % qVariants.length],
-        reponseAttendue: `Réponse attendue : démonstration de la maîtrise acquise concernant « ${topicShort} » avec exemple concret d'application en situation professionnelle dans le cadre de « ${intitule} ».`,
+        reponseAttendue: `Réponse attendue : le stagiaire montre qu'il sait faire « ${topicShort} » et donne un exemple concret d'utilisation après la formation « ${intitule} ».`,
       });
     }
   }
