@@ -718,17 +718,6 @@ export function getProgrammeHTML(e: BahoEntreprise, customFsStamp?: string): str
   </ul>
 
   <h2>Modalités d'accès et délais d'accès</h2>
-  <p><strong>Inscription CERES</strong><br/>
-  Envoi des documents administratifs :</p>
-  <ul>
-    <li>Contrat de formation professionnelle</li>
-    <li>Règlement intérieur</li>
-    <li>Convocation à la formation</li>
-    <li>Conditions Générales de Vente (CGV)</li>
-    <li>Programme de formation</li>
-    <li>ECF (Évaluation des Connaissances en début de Formation)</li>
-    <li>Demande d'acompte et confirmation de l'inscription</li>
-  </ul>
   <p>Accès après validation du besoin, signature de la convention et accord de prise en charge.<br/>
   <strong>Délai d'accès :</strong> 15 jours après validation administrative.</p>
 
