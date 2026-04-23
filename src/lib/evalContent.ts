@@ -1779,18 +1779,106 @@ function ensureMinimumQuestions(
   return merged;
 }
 
-export function getQuestionsOuvertes(formationIntitule: string): QuestionsOuvertesFormation {
+/**
+ * Génère 5 questions dynamiques (début/fin) à partir des objectifs et du programme
+ * réels de la formation. Utilisé en complément des questions fixes pour garantir
+ * la cohérence avec n'importe quelle formation.
+ */
+function generateDynamicQuestions(
+  formationIntitule: string,
+  objectifs?: string,
+  programme?: string,
+  type: "debut" | "fin" = "debut"
+): QuestionOuverte[] {
+  const intitule = formationIntitule || "cette formation";
+  const cleanLine = (l: string) => l.trim()
+    .replace(/^[-•*◦▪►–—]\s*/, "")
+    .replace(/^\d+[\.\):]\s*/, "")
+    .replace(/^(Jour|Module|Bloc|Séquence|Chapitre)\s*\d+\s*[-:–]?\s*/i, "")
+    .replace(/^À l'issue.*capable de\s*:?\s*/i, "")
+    .trim();
+
+  const objs = (objectifs || "")
+    .split(/\n|\.(?=\s)|;/)
+    .map(cleanLine)
+    .filter(l => l.length > 8 && l.length < 200);
+
+  const progs = (programme || "")
+    .split(/\n/)
+    .map(cleanLine)
+    .filter(l => l.length > 8 && l.length < 200 && !/^\d{1,2}[h:]\d{2}/.test(l));
+
+  const seen = new Set<string>();
+  const topics: string[] = [];
+  [...objs, ...progs].forEach(t => {
+    const key = t.toLowerCase().slice(0, 40);
+    if (!seen.has(key)) {
+      seen.add(key);
+      topics.push(t);
+    }
+  });
+
+  if (topics.length === 0) return [];
+
+  const dynamicQs: QuestionOuverte[] = [];
+  const maxQs = Math.min(5, topics.length);
+
+  for (let i = 0; i < maxQs; i++) {
+    const topic = topics[i];
+    const topicShort = topic.length > 80 ? topic.slice(0, 77) + "..." : topic;
+
+    if (type === "debut") {
+      const qVariants = [
+        `Quelles sont vos connaissances actuelles concernant : ${topicShort} ?`,
+        `Avez-vous déjà été confronté à : ${topicShort} ? Décrivez votre expérience.`,
+        `Comment aborderiez-vous aujourd'hui : ${topicShort} ?`,
+        `Quels sont selon vous les points clés de : ${topicShort} ?`,
+        `Quelles difficultés anticipez-vous concernant : ${topicShort} ?`,
+      ];
+      dynamicQs.push({
+        question: qVariants[i % qVariants.length],
+        reponseAttendue: `Réponse attendue : description du niveau initial du stagiaire et identification des besoins concernant « ${topicShort} » dans le cadre de la formation « ${intitule} ».`,
+      });
+    } else {
+      const qVariants = [
+        `Expliquez avec vos propres mots ce que vous avez appris sur : ${topicShort}.`,
+        `Comment allez-vous appliquer en situation professionnelle : ${topicShort} ?`,
+        `Quels sont les points essentiels à retenir concernant : ${topicShort} ?`,
+        `Citez un exemple concret d'application de : ${topicShort}.`,
+        `Quels outils ou méthodes utiliserez-vous pour : ${topicShort} ?`,
+      ];
+      dynamicQs.push({
+        question: qVariants[i % qVariants.length],
+        reponseAttendue: `Réponse attendue : démonstration de la maîtrise acquise concernant « ${topicShort} » avec exemple concret d'application en situation professionnelle dans le cadre de « ${intitule} ».`,
+      });
+    }
+  }
+
+  return dynamicQs;
+}
+
+export function getQuestionsOuvertes(
+  formationIntitule: string,
+  objectifs?: string,
+  programme?: string
+): QuestionsOuvertesFormation {
   const key = getContentKey(formationIntitule);
+  const hasSpecificContent = !!QUESTIONS_OUVERTES[key];
   const source = QUESTIONS_OUVERTES[key] || DEFAULT_QUESTIONS_OUVERTES;
   const wordFallback = key === "Initiation Word" ? QUESTIONS_OUVERTES["Bureautique"] : undefined;
 
+  // Si pas de contenu spécifique pour cette formation, génère des questions
+  // dynamiques cohérentes avec son intitulé/objectifs/programme.
+  const dynamicDebut = !hasSpecificContent ? generateDynamicQuestions(formationIntitule, objectifs, programme, "debut") : [];
+  const dynamicFin = !hasSpecificContent ? generateDynamicQuestions(formationIntitule, objectifs, programme, "fin") : [];
+
   return {
     debut: ensureMinimumQuestions(
-      source.debut,
+      [...dynamicDebut, ...source.debut],
       [...(wordFallback?.debut ?? []), ...DEFAULT_QUESTIONS_OUVERTES.debut]
     ),
     fin: ensureMinimumQuestions(
-      source.fin,
+      [...dynamicFin, ...source.fin],
       [...(wordFallback?.fin ?? []), ...DEFAULT_QUESTIONS_OUVERTES.fin]
     ),
   };
