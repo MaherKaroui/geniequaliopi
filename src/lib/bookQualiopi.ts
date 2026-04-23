@@ -207,44 +207,62 @@ tr:nth-child(even){background:#f8f9fa}
   </div>`;
   html += `<div class="page-break"></div>`;
 
-  // === CRITÈRES & INDICATEURS ===
+  // === CRITÈRES & INDICATEURS — une page dédiée par indicateur (32 pages) ===
   for (const critere of CRITERES_INFO) {
-    // Critère header page
+    // Page d'intro du critère
     html += `<div class="page">
       <div class="critere-header">
         <h2>CRITÈRE ${critere.numero}</h2>
         <p>${CRITERES_TITLES[critere.numero] || critere.titre}</p>
-      </div>`;
+      </div>
+      <div class="info-card" style="margin-top:20px">
+        <h3 style="color:#1e3a7b;margin-bottom:12px">Indicateurs de ce critère (${critere.indicateurs.length})</h3>
+        ${critere.indicateurs.map(ind => {
+          const ref = INDICATEURS_REFERENCE.find(r => r.numero === ind.numero);
+          return `<div class="sommaire-item">
+            <div class="sommaire-num">${ind.numero}</div>
+            <div class="sommaire-text"><strong>Indicateur ${ind.numero}</strong> — ${ref?.intitule || ind.titre}</div>
+          </div>`;
+        }).join("")}
+      </div>
+    </div><div class="page-break"></div>`;
 
+    // Une page dédiée par indicateur
     for (const ind of critere.indicateurs) {
       const ref = INDICATEURS_REFERENCE.find(r => r.numero === ind.numero);
       const indDocs = catalog.filter(d => d.indicateur === ind.numero);
 
-      html += `<div class="indicateur-block">
-        <div class="indicateur-num">
-          <span>INDICATEUR ${ind.numero}</span>
-          ${ref ? `<span class="badge">${ref.type === "commun" ? "COMMUN" : "SPÉCIFIQUE"}</span>` : ""}
-          ${ref ? `<span class="badge">${ref.applicableActions.join(" · ")}</span>` : ""}
+      html += `<div class="page">
+        <div class="critere-header" style="padding:16px 24px">
+          <h2 style="font-size:16px">CRITÈRE ${critere.numero} — INDICATEUR ${ind.numero}</h2>
+          <p>${CRITERES_TITLES[critere.numero] || critere.titre}</p>
         </div>
-        <div class="indicateur-content">
-          ${ref ? `<div class="indicateur-intitule">${ref.intitule}</div>` : ""}
-          ${ref ? `<div class="niveau-attendu"><strong>Niveau attendu :</strong> ${ref.niveauAttendu}</div>` : ""}
-          
-          <div class="preuves-list">
-            <h4>📁 Preuves et documents (${indDocs.length})</h4>
-            ${indDocs.map(d => `<div class="preuve-item"><span class="check">✅</span><span class="doc-name">${d.nom}</span></div>`).join("")}
+        <div class="indicateur-block" style="margin-top:20px">
+          <div class="indicateur-num">
+            <span>INDICATEUR ${ind.numero}</span>
+            ${ref ? `<span class="badge">${ref.type === "commun" ? "COMMUN" : "SPÉCIFIQUE"}</span>` : ""}
+            ${ref ? `<span class="badge">${ref.applicableActions.join(" · ")}</span>` : ""}
           </div>
-          
-          ${ref && ref.questionsPreuves.length > 0 ? `
-          <div class="info-card" style="margin-top:15px">
-            <h4 style="color:#1e3a7b;font-size:12px;margin-bottom:8px">Questions d'audit</h4>
-            ${ref.questionsPreuves.map(q => `<p style="font-size:11px;margin:4px 0">• ${q}</p>`).join("")}
-          </div>` : ""}
-        </div>
-      </div>`;
-    }
+          <div class="indicateur-content">
+            ${ref ? `<div class="indicateur-intitule">${ref.intitule}</div>` : `<div class="indicateur-intitule">${ind.titre}</div>`}
+            ${ref ? `<div class="niveau-attendu"><strong>Niveau attendu :</strong> ${ref.niveauAttendu}</div>` : ""}
 
-    html += `</div><div class="page-break"></div>`;
+            <div class="preuves-list">
+              <h4>📁 Preuves et documents (${indDocs.length})</h4>
+              ${indDocs.length > 0
+                ? indDocs.map(d => `<div class="preuve-item"><span class="check">✅</span><span class="doc-name">${d.nom}</span></div>`).join("")
+                : `<p style="font-size:12px;color:#666;font-style:italic;padding:8px 0">Aucun document généré pour cet indicateur.</p>`}
+            </div>
+
+            ${ref && ref.questionsPreuves.length > 0 ? `
+            <div class="info-card" style="margin-top:15px">
+              <h4 style="color:#1e3a7b;font-size:12px;margin-bottom:8px">Questions d'audit</h4>
+              ${ref.questionsPreuves.map(q => `<p style="font-size:11px;margin:4px 0">• ${q}</p>`).join("")}
+            </div>` : ""}
+          </div>
+        </div>
+      </div><div class="page-break"></div>`;
+    }
   }
 
   // === FOOTER ===
