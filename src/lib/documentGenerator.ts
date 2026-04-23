@@ -7802,11 +7802,26 @@ function genDocumentsCertificateursCFA(o: OrganismeInfo, f: FormationInfo) {
 
 /** Parse rythme alternance string to get CFA weeks and enterprise weeks per cycle.
  * Supports week-based ("1 sem CFA / 3 sem entreprise"), day-based same-week alternation
- * ("2 jours CFA / 3 jours entreprise"), and "école"/"centre" wording.
+ * ("2 jours CFA / 3 jours entreprise"), hour-based ("910h CFA / 280h entreprise"),
+ * and "école"/"centre" wording.
  */
 export function parseRythmeAlternance(rythme: string): { cfaWeeks: number; entrepriseWeeks: number } {
   if (!rythme) return { cfaWeeks: 1, entrepriseWeeks: 3 };
   const normalized = rythme.toLowerCase();
+
+  // Hour-based: "910h CFA / 280h entreprise"
+  const hourMatch = normalized.match(/(\d+)\s*h\b[^\/]*cfa[^\/]*\/\s*(\d+)\s*h\b[^\/]*entreprise/i)
+    || normalized.match(/(\d+)\s*h\b[^\/]*centre[^\/]*\/\s*(\d+)\s*h\b[^\/]*entreprise/i)
+    || normalized.match(/(\d+)\s*h\b[^\/]*école[^\/]*\/\s*(\d+)\s*h\b[^\/]*entreprise/i);
+  if (hourMatch) {
+    const cfaHours = parseInt(hourMatch[1]);
+    const entHours = parseInt(hourMatch[2]);
+    // 35h per week in CFA, assume 35h/week in entreprise too for rhythm calculation
+    const cfaWeeks = Math.max(1, Math.ceil(cfaHours / 35));
+    const entWeeks = Math.max(0, Math.ceil(entHours / 35));
+    return { cfaWeeks, entrepriseWeeks: entWeeks };
+  }
+
   const weekMatch = normalized.match(/(\d+)\s*(?:semaines?|sem)\b[^\/]*\/\s*(\d+)\s*(?:semaines?|sem)\b/i);
   if (weekMatch) return { cfaWeeks: Math.max(1, parseInt(weekMatch[1])), entrepriseWeeks: Math.max(0, parseInt(weekMatch[2])) };
   const dayMatch = normalized.match(/(\d+)\s*jours?\b[^\/]*\/\s*(\d+)\s*jours?\b/i);
@@ -7818,6 +7833,12 @@ export function parseRythmeAlternance(rythme: string): { cfaWeeks: number; entre
     return { cfaWeeks: Math.max(1, Math.round(cfaDays / 5)), entrepriseWeeks: Math.max(0, Math.round(entDays / 5)) };
   }
   return { cfaWeeks: 1, entrepriseWeeks: 3 };
+}
+
+/** True if rhythm is hour-based (e.g., "910h CFA / 280h entreprise"). */
+export function isHourBasedRythme(rythme: string): boolean {
+  if (!rythme) return false;
+  return /\d+\s*h\b/i.test(rythme.toLowerCase());
 }
 
 /** True if rhythm is days-per-week alternation (CFA + entreprise within same calendar week). */
