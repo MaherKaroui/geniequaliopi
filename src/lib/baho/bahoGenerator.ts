@@ -1,56 +1,16 @@
 /**
  * BAHO - Génération du ZIP global
  * Pour chaque entreprise (groupe par SIRET) : Convention, Devis, Facture, Règlement intérieur, CGV
- * Format : DOCX (templates remplis) + PDF
+ * Format : PDF tamponnés uniquement
  */
 import JSZip from "jszip";
 import { getBahoEntreprises, FORMAT_SPHERE_ORG, type BahoEntreprise } from "./bahoData";
 import { getRIHTML, getCGVHTML, getFactureHTML, getConventionHTML, getDevisHTML } from "./bahoStaticDocs";
 import { htmlToPdfBlob } from "@/lib/pdfExport";
-import { processDocxTemplate, type ConventionTemplateData, type DevisTemplateData } from "./bahoTemplate";
 import type { JobReporter } from "@/lib/backgroundJobs";
 
 function safeName(s: string): string {
   return s.replace(/[^\w\-]+/g, "_").replace(/_+/g, "_").replace(/^_|_$/g, "").slice(0, 80);
-}
-
-function formatDateLong(iso: string): string {
-  if (!iso) return "";
-  const d = new Date(iso);
-  if (isNaN(d.getTime())) return iso;
-  return d.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
-}
-
-function buildConventionData(e: BahoEntreprise): ConventionTemplateData {
-  return {
-    nom_entreprise: e.nom,
-    siretEntreprise: e.siret,
-    adresse_entreprise: e.adresse,
-    directriceEntreprise: e.dirigeant,
-    datedebut: formatDateLong(e.dateDebut),
-    datedefin: formatDateLong(e.dateFin),
-    dateConvention: formatDateLong(e.dateConvention),
-  };
-}
-
-function buildDevisData(e: BahoEntreprise, devisNumero: string): DevisTemplateData {
-  const stagiairesNames = e.stagiaires
-    .map((s) => `${s.nom} ${s.prenom}`)
-    .join(", ");
-  return {
-    numero: devisNumero,
-    nomEntreprise: e.nom,
-    adresseEntreprise: e.adresse,
-    siret: e.siret,
-    mailEntreprise: e.email,
-    date_debut: formatDateLong(e.dateDebut),
-    date_fin: formatDateLong(e.dateFin),
-    date_facture: formatDateLong(e.dateConvention),
-    nom: stagiairesNames,
-    prenom: "",
-    directeur: e.dirigeant,
-    adresse: e.adresse,
-  };
 }
 
 /** Build full BAHO ZIP and return as Blob */
@@ -74,11 +34,11 @@ export async function buildBahoZip(reporter?: JobReporter, customFsStamp?: strin
     `Nombre d'entreprises : ${entreprises.length}`,
     `Nombre total de stagiaires : ${entreprises.reduce((acc, e) => acc + e.stagiaires.length, 0)}`,
     "",
-    "Pour chaque entreprise :",
-    " - Convention de formation (DOCX template + PDF tamponnée avec liste participants)",
-    " - Devis (DOCX)",
+    "Pour chaque entreprise (PDF uniquement) :",
+    " - Convention de formation (PDF tamponnée avec liste participants)",
+    " - Devis (PDF tamponné)",
     " - Facture (PDF tamponnée)",
-    " - Règlements intérieurs : 1 PDF par stagiaire (tamponné)",
+    " - Règlement intérieur (PDF tamponné)",
     " - CGV (PDF tamponnée)",
     "",
     "Liste :",
@@ -94,43 +54,27 @@ export async function buildBahoZip(reporter?: JobReporter, customFsStamp?: strin
     const baseName = `${safeName(e.nom)}_${e.siret}`;
     const devisNumero = `BAHO-${new Date().getFullYear()}-${String(invoiceCounter++).padStart(3, "0")}`;
 
-    // 1. Convention DOCX (template) + PDF tamponné
+    // 1. Convention PDF tamponnée
     try {
-      reporter?.setMessage(`${e.nom} – Convention DOCX…`);
-      const conventionBlob = await processDocxTemplate(
-        "/templates/baho/convention_template.docx",
-        buildConventionData(e) as unknown as Record<string, string>
-      );
-      folder.file(`Convention_de_formation_${baseName}.docx`, conventionBlob);
-
-      // PDF version with all participants + tampons (RI, hôtel + FORMAT SPHERE)
       reporter?.setMessage(`${e.nom} – Convention PDF tamponnée…`);
       const conventionHtml = getConventionHTML(e, customFsStamp);
       const conventionPdf = await htmlToPdfBlob(conventionHtml);
-      folder.file(`Convention_de_formation_${baseName}_TAMPONNEE.pdf`, conventionPdf);
+      folder.file(`Convention_de_formation_${baseName}.pdf`, conventionPdf);
     } catch (err) {
       console.error("Convention error:", err);
       folder.file(`ERREUR_Convention.txt`, `Erreur génération Convention: ${(err as Error).message}`);
     }
     step++; reporter?.setProgress(Math.round((step / totalSteps) * 100));
 
-    // 2. Devis DOCX (template)
+    // 2. Devis PDF tamponné
     try {
-      reporter?.setMessage(`${e.nom} – Devis DOCX…`);
-      const devisBlob = await processDocxTemplate(
-        "/templates/baho/devis_template.docx",
-        buildDevisData(e, devisNumero) as unknown as Record<string, string>
-      );
-      folder.file(`Devis_${devisNumero}_${baseName}.docx`, devisBlob);
-
-      // Devis PDF tamponné
       reporter?.setMessage(`${e.nom} – Devis PDF tamponné…`);
       const devisHtml = getDevisHTML(e, devisNumero, customFsStamp);
       const devisPdf = await htmlToPdfBlob(devisHtml);
-      folder.file(`Devis_${devisNumero}_${baseName}_TAMPONNE.pdf`, devisPdf);
+      folder.file(`Devis_${devisNumero}_${baseName}.pdf`, devisPdf);
     } catch (err) {
-      console.error("Devis DOCX error:", err);
-      folder.file(`ERREUR_Devis.txt`, `Erreur génération Devis DOCX: ${(err as Error).message}`);
+      console.error("Devis error:", err);
+      folder.file(`ERREUR_Devis.txt`, `Erreur génération Devis: ${(err as Error).message}`);
     }
     step++; reporter?.setProgress(Math.round((step / totalSteps) * 100));
 
@@ -146,20 +90,12 @@ export async function buildBahoZip(reporter?: JobReporter, customFsStamp?: strin
     }
     step++; reporter?.setProgress(Math.round((step / totalSteps) * 100));
 
-    // 4. Règlement intérieur PDF — un par stagiaire (avec tampons hôtel + FORMAT SPHERE)
+    // 4. Règlement intérieur PDF — un seul par hôtel (tamponné)
     try {
-      reporter?.setMessage(`${e.nom} – Règlements intérieurs (${e.stagiaires.length})…`);
-      const riFolder = folder.folder("Reglements_interieurs")!;
-      for (const s of e.stagiaires) {
-        const riHTML = getRIHTML(e, s, customFsStamp);
-        const riPdf = await htmlToPdfBlob(riHTML);
-        const stgName = `${safeName(s.prenom)}_${safeName(s.nom)}_${s.codeStagiaire}`;
-        riFolder.file(`RI_${stgName}.pdf`, riPdf);
-      }
-      // Aussi un RI "entreprise" générique (sans stagiaire) pour archive
-      const riEntHTML = getRIHTML(e, undefined, customFsStamp);
-      const riEntPdf = await htmlToPdfBlob(riEntHTML);
-      folder.file(`Reglement_interieur_${baseName}_entreprise.pdf`, riEntPdf);
+      reporter?.setMessage(`${e.nom} – Règlement intérieur…`);
+      const riHTML = getRIHTML(e, undefined, customFsStamp);
+      const riPdf = await htmlToPdfBlob(riHTML);
+      folder.file(`Reglement_interieur_${baseName}.pdf`, riPdf);
     } catch (err) {
       console.error("RI error:", err);
       folder.file(`ERREUR_RI.txt`, `Erreur: ${(err as Error).message}`);

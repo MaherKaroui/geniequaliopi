@@ -105,8 +105,7 @@ function footer(): string {
   return `
   <div class="footer">
     <strong>${FORMAT_SPHERE_ORG.nom}</strong> – ${FORMAT_SPHERE_ORG.adresse}, ${FORMAT_SPHERE_ORG.codePostal} ${FORMAT_SPHERE_ORG.ville}<br/>
-    SIRET ${FORMAT_SPHERE_ORG.siret} – Déclaration d'activité enregistrée sous le n° ${FORMAT_SPHERE_ORG.nda} auprès du Préfet de région Île-de-France<br/>
-    Version 1.0 – ${formatDateLong(new Date().toISOString())}
+    SIRET ${FORMAT_SPHERE_ORG.siret} – Déclaration d'activité enregistrée sous le n° ${FORMAT_SPHERE_ORG.nda} auprès du Préfet de région Île-de-France
   </div>`;
 }
 
@@ -237,7 +236,7 @@ export function getConventionHTML(e: BahoEntreprise, customFsStamp?: string): st
     .join("");
 
   const nbHeures = 14;
-  const prixUnit = 1400;
+  const prixUnit = 2000;
   const totalHt = e.stagiaires.length * prixUnit;
 
   return `<!DOCTYPE html><html><head><meta charset="utf-8"/>${BASE_CSS}
@@ -393,7 +392,7 @@ export function getCGVHTML(e: BahoEntreprise, customFsStamp?: string): string {
 
 export function getFactureHTML(e: BahoEntreprise, numero: string, customFsStamp?: string): string {
   const nbStagiaires = e.stagiaires.length;
-  const prixUnitaire = 1400;
+  const prixUnitaire = 2000;
   const total = nbStagiaires * prixUnitaire;
 
   return `<!DOCTYPE html><html><head><meta charset="utf-8"/>${BASE_CSS}</head><body>
@@ -467,7 +466,7 @@ export function getFactureHTML(e: BahoEntreprise, numero: string, customFsStamp?
 
 export function getDevisHTML(e: BahoEntreprise, numero: string, customFsStamp?: string): string {
   const nbStagiaires = e.stagiaires.length;
-  const prixUnitaire = 1400;
+  const prixUnitaire = 2000;
   const total = nbStagiaires * prixUnitaire;
   const devisDate = (() => {
     if (!e.dateConvention) return "";
