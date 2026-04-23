@@ -2113,21 +2113,72 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
       <p><strong>Nombre de participants :</strong> ${nbStagiaires}</p>
     </div>
 
-    <h2>8. Modalités d'accès</h2>
+    ${(() => {
+      const rncp = f.codeRNCP ? getRNCPByCode(f.codeRNCP) : undefined;
+      if (!rncp) return "";
+      const voies = rncp.voiesAcces && rncp.voiesAcces.length > 0 ? rncp.voiesAcces : [];
+      const isRS = rncp.code?.toUpperCase().startsWith("RS");
+      const fcUrl = isRS
+        ? `https://www.francecompetences.fr/recherche/rs/${rncp.code.replace(/\D/g, "")}/#anchor4`
+        : `https://www.francecompetences.fr/recherche/rncp/${rncp.code.replace(/\D/g, "")}/#anchor4`;
+
+      // Normalise les voies d'accès officielles France Compétences
+      const norm = (s: string) => s.toLowerCase();
+      const has = (kw: string) => voies.some(v => norm(v).includes(kw));
+      const rows: { label: string; oui: boolean; jury: boolean }[] = [
+        { label: "Après un parcours de formation sous statut d'élève ou d'étudiant", oui: has("élève") || has("etudiant") || has("étudiant") || has("statut"), jury: false },
+        { label: "En contrat d'apprentissage", oui: has("apprentissage"), jury: true },
+        { label: "Après un parcours de formation continue", oui: has("formation continue") || has("continue"), jury: true },
+        { label: "En contrat de professionnalisation", oui: has("professionnalisation"), jury: true },
+        { label: "Par candidature individuelle", oui: has("candidature") || has("individuelle"), jury: false },
+        { label: "Par expérience (VAE)", oui: has("vae") || has("expérience") || has("experience"), jury: true },
+      ];
+
+      const compositionJury = `
+        <p style="margin:6px 0 4px 0">Les compétences des candidats (VAE ou issus de la formation) sont évaluées par un jury composé de deux professionnels habilités au vu :</p>
+        <ul style="margin-top:0">
+          <li>a) d'une mise en situation professionnelle ou d'une présentation d'un projet réalisé en amont de la session, éventuellement complétée par d'autres modalités d'évaluation : entretien technique, questionnaire professionnel, questionnement à partir de production(s) ;</li>
+          <li>b) d'un dossier faisant état des pratiques professionnelles du candidat ;</li>
+          <li>c) des résultats des évaluations passées en cours de formation pour les candidats issus d'un parcours de formation ;</li>
+          <li>d) d'un entretien final.</li>
+        </ul>
+      `;
+
+      const dateMod = rncp.dateEnregistrement || "—";
+
+      return `
+    <h2>8. Voies d'accès à la certification</h2>
     <div class="section">
-      ${(() => {
-        const rncp = f.codeRNCP ? getRNCPByCode(f.codeRNCP) : undefined;
-        const voies = rncp?.voiesAcces && rncp.voiesAcces.length > 0 ? rncp.voiesAcces : null;
-        const isRS = rncp?.code?.toUpperCase().startsWith("RS");
-        const fcUrl = rncp ? (isRS
-          ? `https://www.francecompetences.fr/recherche/rs/${rncp.code.replace(/\D/g, "")}/#anchor4`
-          : `https://www.francecompetences.fr/recherche/rncp/${rncp.code.replace(/\D/g, "")}/#anchor4`) : null;
-        return voies ? `
-          <p><strong>Voies d'accès à la certification :</strong></p>
-          <ul>${voies.map(v => `<li>${v}</li>`).join("")}</ul>
-          ${fcUrl ? `<p style="margin-bottom:10px"><em>Source officielle France Compétences : <a href="${fcUrl}" target="_blank">${fcUrl}</a></em></p>` : ""}
-        ` : "";
-      })()}
+      <p style="margin-bottom:8px">Conformément à la fiche officielle France Compétences <strong>${rncp.code}</strong> – ${rncp.intitule}, les voies d'accès à la certification sont les suivantes :</p>
+      <table style="width:100%;border-collapse:collapse">
+        <thead>
+          <tr>
+            <th style="width:38%">Voie d'accès à la certification</th>
+            <th style="width:8%">Oui</th>
+            <th style="width:8%">Non</th>
+            <th>Composition des jurys</th>
+            <th style="width:14%">Date de dernière modification</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.map(r => `
+            <tr>
+              <td><strong>${r.label}</strong></td>
+              <td style="text-align:center">${r.oui ? "X" : ""}</td>
+              <td style="text-align:center">${r.oui ? "" : "X"}</td>
+              <td>${r.oui && r.jury ? compositionJury : "—"}</td>
+              <td style="text-align:center">${dateMod}</td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
+      <p style="margin-top:10px"><em>Source officielle France Compétences : <a href="${fcUrl}" target="_blank">${fcUrl}</a></em></p>
+    </div>
+      `;
+    })()}
+
+    <h2>9. Modalités d'accès</h2>
+    <div class="section">
       <p><strong>Étapes d'inscription :</strong></p>
       <ol>
         <li>Préinscription ${o.siteWeb && o.siteWeb.trim() ? `via ${isFacebookPage(o.siteWeb) ? 'la page Facebook' : 'le site internet'} (${linkUrl(o.siteWeb)}), ` : ''}par téléphone ou par email auprès de ${o.nom}</li>
@@ -2148,20 +2199,20 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
       </ol>
     </div>
 
-    <h2>9. Délais d'accès</h2>
+    <h2>10. Délais d'accès</h2>
     <div class="section">
       <p><strong>Délai d'accès :</strong> ${f.delaiAcces || "14 jours après validation de la préinscription et réception du dossier complet."}</p>
       <p><em>Ce délai peut être réduit en fonction des disponibilités et de l'urgence de la demande. Pour les personnes en situation de handicap, un délai supplémentaire peut être nécessaire pour la mise en place des aménagements.</em></p>
     </div>
 
-    <h2>10. Tarif</h2>
+    <h2>11. Tarif</h2>
     <div class="section">
       <p><strong>Tarif :</strong> ${displayTarif}</p>
       <p>TVA non applicable, article 261-4-4° du CGI.</p>
       <p><em>Possibilité de prise en charge par votre OPCO ou Pôle Emploi. Contactez-nous pour un devis personnalisé.</em></p>
     </div>
 
-    <h2>11. Méthodes pédagogiques et moyens pédagogiques</h2>
+    <h2>12. Méthodes pédagogiques et moyens pédagogiques</h2>
     <div class="section">
       <h3>Méthodes pédagogiques</h3>
       <ul>
@@ -2177,7 +2228,7 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
       ${moyensHtml}
     </div>
 
-    <h2>12. Modalités d'évaluation</h2>
+    <h2>13. Modalités d'évaluation</h2>
     <div class="section">
       <p><strong>Le dispositif d'évaluation comprend :</strong></p>
       ${evalHtml}
@@ -2186,7 +2237,7 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
 
     ${ntcBlocsHtml}
 
-    <h2>13. Accessibilité aux personnes en situation de handicap</h2>
+    <h2>14. Accessibilité aux personnes en situation de handicap</h2>
     <div class="section section-green">
       <p>La formation est accessible aux personnes à mobilité réduite (PMR) et aux personnes en situation de handicap (PSH).</p>
       <p>Des aménagements spécifiques peuvent être mis en place selon les besoins identifiés :</p>
@@ -2203,7 +2254,7 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
       <p>${o.telephone?.trim() ? `<strong>Téléphone :</strong> ${o.telephone}` : ""}</p>
     </div>
 
-    <h2>14. Indicateurs de performance – Année ${anneeFormation}</h2>
+    <h2>15. Indicateurs de performance – Année ${anneeFormation}</h2>
     <div class="section">
       ${isCFA ? `
       <table>
@@ -2242,7 +2293,7 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
       `}
     </div>
 
-    <h2>15. Déroulé pédagogique de la formation${!isBlocFormation ? ` (${heuresTotal})` : ""}</h2>
+    <h2>16. Déroulé pédagogique de la formation${!isBlocFormation ? ` (${heuresTotal})` : ""}</h2>
     <div class="section" style="padding:5px">
       <p style="margin-bottom:10px"><strong>Formation :</strong> ${f.intitule}<br>
       <strong>Durée :</strong> ${displayDuree}<br>
@@ -2251,7 +2302,7 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
     ${isBlocFormation ? blocDerouleHtml : derouleHtml}
 
     ${isCFA ? `
-    <h2>16. Préparation à la certification</h2>
+    <h2>17. Préparation à la certification</h2>
     <div class="section section-green">
       <p>Un dispositif d'entraînement intensif est mis en place tout au long de la formation pour garantir la réussite à l'examen :</p>
       <ul>
@@ -2263,7 +2314,7 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
       </ul>
     </div>
 
-    <h2>17. Débouchés professionnels</h2>
+    <h2>18. Débouchés professionnels</h2>
     <div class="section">
       ${(() => {
         const rncp = f.codeRNCP ? getRNCPByCode(f.codeRNCP) : undefined;
