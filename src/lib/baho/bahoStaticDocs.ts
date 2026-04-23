@@ -11,6 +11,66 @@ function formatDateLong(iso: string): string {
   return d.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
 }
 
+/** Calcule les jours fériés français (métropole) pour une année donnée */
+function getFrenchHolidays(year: number): Set<string> {
+  const fixed = [
+    `${year}-01-01`, // Jour de l'an
+    `${year}-05-01`, // Fête du travail
+    `${year}-05-08`, // Victoire 1945
+    `${year}-07-14`, // Fête nationale
+    `${year}-08-15`, // Assomption
+    `${year}-11-01`, // Toussaint
+    `${year}-11-11`, // Armistice
+    `${year}-12-25`, // Noël
+  ];
+  // Calcul de Pâques (algorithme de Meeus/Jones/Butcher)
+  const a = year % 19;
+  const b = Math.floor(year / 100);
+  const c = year % 100;
+  const d = Math.floor(b / 4);
+  const e = b % 4;
+  const f = Math.floor((b + 8) / 25);
+  const g = Math.floor((b - f + 1) / 3);
+  const h = (19 * a + b - d - g + 15) % 30;
+  const i = Math.floor(c / 4);
+  const k = c % 4;
+  const l = (32 + 2 * e + 2 * i - h - k) % 7;
+  const m = Math.floor((a + 11 * h + 22 * l) / 451);
+  const month = Math.floor((h + l - 7 * m + 114) / 31);
+  const day = ((h + l - 7 * m + 114) % 31) + 1;
+  const easter = new Date(Date.UTC(year, month - 1, day));
+  const addDays = (base: Date, n: number) => {
+    const x = new Date(base);
+    x.setUTCDate(x.getUTCDate() + n);
+    return x.toISOString().slice(0, 10);
+  };
+  fixed.push(addDays(easter, 1));   // Lundi de Pâques
+  fixed.push(addDays(easter, 39));  // Ascension
+  fixed.push(addDays(easter, 50));  // Lundi de Pentecôte
+  return new Set(fixed);
+}
+
+/** Soustrait N jours ouvrés (hors weekends + jours fériés FR) à une date ISO */
+function subtractWorkingDays(iso: string, n: number): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return "";
+  let remaining = n;
+  let holidays = getFrenchHolidays(d.getUTCFullYear());
+  while (remaining > 0) {
+    d.setUTCDate(d.getUTCDate() - 1);
+    if (d.getUTCFullYear() !== [...holidays][0]?.slice(0, 4) as unknown as number) {
+      holidays = getFrenchHolidays(d.getUTCFullYear());
+    }
+    const day = d.getUTCDay();
+    const iso10 = d.toISOString().slice(0, 10);
+    if (day !== 0 && day !== 6 && !holidays.has(iso10)) {
+      remaining--;
+    }
+  }
+  return d.toISOString().slice(0, 10);
+}
+
 const BASE_CSS = `
 <style>
   body { font-family: 'Calibri', Arial, sans-serif; font-size: 11pt; color: #222; line-height: 1.5; padding: 30px; }
