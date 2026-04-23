@@ -648,7 +648,14 @@ export function buildFullCatalog(
     // ===== IND 12 — ENGAGEMENT DES BÉNÉFICIAIRES (CFA) =====
     add("cfa_procedure_abandon", "CT3 - IND 12 PROCÉDURE D'ABANDON CFA", 3, 12, "procedure_abandon_cfa");
     add("cfa_procedure_absences", "CT3 - IND 12 PROCÉDURE DES ABSENCES CFA", 3, 12, "procedure_absences_cfa");
-    add("cfa_logs_connexion", "CT3 - IND 12 LOGS DE CONNEXION CFA", 3, 12, "logs_connexion_cfa");
+    // Logs de connexion : uniquement si modalité distancielle / e-learning / FOAD / mixte
+    {
+      const moda = (formations[0]?.modalites || '').toLowerCase();
+      const isDistanciel = moda.includes('distanciel') || moda.includes('e-learning') || moda.includes('foad') || moda.includes('mixte');
+      if (isDistanciel) {
+        add("cfa_logs_connexion", "CT3 - IND 12 LOGS DE CONNEXION CFA", 3, 12, "logs_connexion_cfa");
+      }
+    }
     add("cfa_c3i12_mesures_engagement", "CT3 - IND 12 MESURES POUR FAVORISER L'ENGAGEMENT DES BÉNÉFICIAIRES", 3, 12, "mesures_engagement_beneficiaires_cfa");
     add("cfa_c3i12_prevention_abandons", "CT3 - IND 12 PRÉVENTION ET GESTION DES ABANDONS", 3, 12, "prevention_gestion_abandons_cfa");
     add("cfa_c3i12_guide_entretien_abandons", "CT3 - IND 12 GUIDE D'ENTRETIEN DES ABANDONS", 3, 12, "guide_entretien_abandons_cfa");
