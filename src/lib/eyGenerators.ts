@@ -1327,42 +1327,282 @@ function _buildCV(o: OrganismeInfo, fmt: FormateurInfo, role: string): string {
 }
 
 /* ═══ CODE 7 – Autres ressources pédagogiques (quiz, vidéos, simulateurs) ═══ */
+type RessourceQuiz = { titre: string; type: string; nb: number; duree: string; objectif: string };
+type RessourceVideo = { titre: string; source: string; duree: string; description: string };
+type RessourceOutil = { outil: string; usage: string; acces: string };
+
+function getDomainSpecificResources(f: FormationInfo): { quiz: RessourceQuiz[]; videos: RessourceVideo[]; outils: RessourceOutil[] } {
+  const t = ((f.intitule||"") + " " + (f.codeRNCP||"") + " " + (f.programme||"")).toLowerCase();
+  const titre = f.intitule || "Formation";
+
+  // Socio-esthétique
+  if (isSocioEsthetique(f)) {
+    return {
+      quiz: [
+        { titre: "QCM Diagnostic cutané – Peaux fragilisées", type: "QCM", nb: 20, duree: "30 min", objectif: "Vérifier les connaissances sur les pathologies cutanées (eczéma, psoriasis, effets secondaires des traitements oncologiques)" },
+        { titre: "QCM Protocoles de soins socio-esthétiques", type: "QCM", nb: 25, duree: "35 min", objectif: "Évaluer la maîtrise des protocoles adaptés aux publics vulnérables" },
+        { titre: "QCM Relation d'aide et posture professionnelle", type: "QCM", nb: 15, duree: "20 min", objectif: "Vérifier la compréhension de la posture d'écoute et du cadre éthique" },
+        { titre: "QCM Maquillage correcteur et conseil en image", type: "QCM", nb: 18, duree: "25 min", objectif: "Valider les techniques de camouflage des cicatrices, taches pigmentaires et rougeurs" },
+        { titre: "Cas pratique – Prise en charge globale", type: "Étude de cas", nb: 5, duree: "45 min", objectif: "Proposer un protocole de soins individualisé et justifier les choix" },
+      ],
+      videos: [
+        { titre: "Techniques de massage adaptées aux publics fragilisés", source: "YouTube / Interne", duree: "18 min", description: "Démonstration des gestes de massage de bien-être pour personnes âgées et patients en soins palliatifs" },
+        { titre: "Le maquillage correcteur en oncologie", source: "CEW France", duree: "25 min", description: "Tutoriel sur le camouflage des effets visibles des traitements (perte de sourcils, cernes, rougeurs)" },
+        { titre: "Diagnostic cutané : identifier les peaux fragilisées", source: "Interne / Captation", duree: "22 min", description: "Identification des pathologies cutanées rencontrées en socio-esthétique" },
+        { titre: "Posture professionnelle et relation d'aide", source: "YouTube", duree: "15 min", description: "Conférence sur l'écoute active, l'empathie et les limites du rôle" },
+      ],
+      outils: [
+        { outil: "Kit d'analyse de peau (loupe, fiches diagnostic)", usage: "Diagnostic cutané pratique", acces: "Mis à disposition en salle" },
+        { outil: "Bibliothèque CODES / Institut Curie", usage: "Documentation oncologie et accompagnement", acces: "Liens transmis sur la plateforme" },
+        { outil: "Plateforme LMS Moodle", usage: "Quiz, supports, suivi de progression", acces: "Identifiant individuel" },
+      ],
+    };
+  }
+
+  // Bureautique / Word / Excel / PowerPoint / TOSA
+  if (t.includes("word") || t.includes("excel") || t.includes("powerpoint") || t.includes("bureautique") || t.includes("tosa") || t.includes("icdl")) {
+    return {
+      quiz: [
+        { titre: "QCM Mise en forme et styles", type: "QCM", nb: 20, duree: "25 min", objectif: "Valider la maîtrise des styles, polices, paragraphes et thèmes" },
+        { titre: "QCM Tableaux, listes et tabulations", type: "QCM", nb: 18, duree: "20 min", objectif: "Vérifier la création et la mise en forme avancée de tableaux et listes" },
+        { titre: "QCM Publipostage et mise en page", type: "QCM", nb: 15, duree: "25 min", objectif: "Évaluer la maîtrise du publipostage, en-têtes, pieds de page et sections" },
+        { titre: "Examen blanc TOSA niveau opérationnel", type: "Examen blanc", nb: 35, duree: "60 min", objectif: "Simuler les conditions réelles de la certification TOSA" },
+        { titre: "Cas pratique – Création d'un rapport professionnel", type: "Étude de cas", nb: 1, duree: "90 min", objectif: "Produire un document complet (sommaire, styles, tableaux, publipostage)" },
+      ],
+      videos: [
+        { titre: "Tutoriel officiel Microsoft 365", source: "support.microsoft.com", duree: "Variable", description: "Bibliothèque de tutoriels vidéos officiels Microsoft pour Word, Excel, PowerPoint" },
+        { titre: "Maîtriser les styles et le sommaire automatique", source: "YouTube / Filiformation", duree: "18 min", description: "Démonstration pas à pas de la création d'un document structuré" },
+        { titre: "Le publipostage de A à Z", source: "YouTube", duree: "22 min", description: "Tutoriel complet du publipostage Word + Excel" },
+        { titre: "Raccourcis clavier indispensables", source: "Interne / Captation", duree: "12 min", description: "Les 30 raccourcis qui font gagner du temps en bureautique" },
+      ],
+      outils: [
+        { outil: "Microsoft 365 (Word, Excel, PowerPoint)", usage: "Logiciels de production étudiés en formation", acces: "Licence Microsoft 365 fournie pendant la formation" },
+        { outil: "Plateforme TOSA d'entraînement", usage: "Tests blancs et entraînement à la certification", acces: "Accès individuel via la plateforme LMS" },
+        { outil: "Modèles Word/Excel professionnels", usage: "Exemples de courriers, rapports, factures, devis", acces: "Téléchargeables sur la plateforme" },
+      ],
+    };
+  }
+
+  // IA / Intelligence artificielle / Copilot / ChatGPT
+  if (t.includes("intelligence artificielle") || t.includes("ia ") || t.includes("copilot") || t.includes("chatgpt") || t.includes("prompt")) {
+    return {
+      quiz: [
+        { titre: "QCM Fondamentaux de l'IA générative", type: "QCM", nb: 20, duree: "30 min", objectif: "Valider la compréhension des LLM, tokens, hallucinations, biais" },
+        { titre: "QCM Prompt engineering", type: "QCM", nb: 18, duree: "25 min", objectif: "Évaluer la maîtrise des techniques de prompt (zero-shot, few-shot, chain-of-thought)" },
+        { titre: "QCM RGPD et IA", type: "QCM", nb: 15, duree: "20 min", objectif: "Vérifier la connaissance des obligations légales (AI Act, RGPD, données personnelles)" },
+        { titre: "Cas pratique – Automatiser une tâche métier avec ChatGPT/Copilot", type: "Étude de cas", nb: 3, duree: "60 min", objectif: "Concevoir et tester un workflow IA appliqué à un besoin professionnel réel" },
+      ],
+      videos: [
+        { titre: "Comprendre les LLM en 20 minutes", source: "YouTube / Science4All", duree: "20 min", description: "Vulgarisation du fonctionnement des grands modèles de langage" },
+        { titre: "Prompt engineering : les 10 techniques essentielles", source: "OpenAI Academy", duree: "25 min", description: "Guide officiel des bonnes pratiques de prompting" },
+        { titre: "Microsoft Copilot dans Office 365", source: "Microsoft Learn", duree: "30 min", description: "Démonstration de Copilot dans Word, Excel, Outlook, Teams" },
+        { titre: "AI Act européen : ce qu'il faut savoir", source: "CNIL / YouTube", duree: "18 min", description: "Cadre réglementaire européen sur l'intelligence artificielle" },
+      ],
+      outils: [
+        { outil: "ChatGPT (OpenAI) – version Plus", usage: "Travaux pratiques de prompt engineering", acces: "Compte fourni pendant la formation" },
+        { outil: "Microsoft Copilot", usage: "Intégration IA dans la suite Office", acces: "Licence M365 Copilot fournie" },
+        { outil: "Plateforme Hugging Face", usage: "Découverte de modèles open source", acces: "Compte gratuit créé en formation" },
+        { outil: "Bibliothèque de prompts métier", usage: "Catalogue de prompts prêts à l'emploi", acces: "Téléchargeable sur la plateforme LMS" },
+      ],
+    };
+  }
+
+  // Anglais / FLE / langues
+  if (t.includes("anglais") || t.includes("english") || t.includes("toeic") || t.includes("bright") || t.includes("linguaskill") || t.includes("fle") || t.includes("français langue")) {
+    const lang = t.includes("fle") || t.includes("français langue") ? "français" : "anglais";
+    return {
+      quiz: [
+        { titre: `QCM Grammaire ${lang} – niveau A2/B1`, type: "QCM", nb: 30, duree: "30 min", objectif: "Évaluer la maîtrise des temps, structures et accords" },
+        { titre: `QCM Vocabulaire professionnel ${lang}`, type: "QCM", nb: 25, duree: "25 min", objectif: "Vérifier l'acquisition du lexique métier et de la communication d'entreprise" },
+        { titre: `Compréhension orale (audio + QCM)`, type: "Compréhension orale", nb: 20, duree: "30 min", objectif: "Tester la compréhension de dialogues professionnels et conversations courantes" },
+        { titre: `Test blanc ${t.includes("toeic") ? "TOEIC" : t.includes("bright") ? "Bright" : "de positionnement"}`, type: "Examen blanc", nb: 100, duree: "120 min", objectif: "Simuler les conditions réelles de la certification" },
+      ],
+      videos: [
+        { titre: `Cours vidéos BBC Learning ${lang}`, source: "BBC Learning English", duree: "Variable", description: "Bibliothèque de vidéos courtes par niveau (A1 à C1)" },
+        { titre: `Conversations professionnelles enregistrées`, source: "Interne / Captation", duree: "Variable", description: "Mises en situation : meeting, présentation, entretien téléphonique" },
+        { titre: `Prononciation : phonétique et accents`, source: "YouTube / Cambridge", duree: "20 min", description: "Maîtrise des sons spécifiques et de l'intonation" },
+      ],
+      outils: [
+        { outil: `Plateforme ${t.includes("toeic") ? "TOEIC Practice" : "GlobalExam"}`, usage: "Entraînement quotidien aux épreuves de certification", acces: "Compte individuel pendant la formation" },
+        { outil: "Application Duolingo / Memrise", usage: "Révision du vocabulaire en autonomie", acces: "Comptes gratuits recommandés" },
+        { outil: "Dictionnaires en ligne (WordReference, Linguee)", usage: "Traduction contextuelle et exemples", acces: "Liens transmis sur la plateforme" },
+        { outil: "Classes virtuelles Zoom", usage: "Sessions de conversation hebdomadaires", acces: "Lien envoyé 48h avant la session" },
+      ],
+    };
+  }
+
+  // Massage prénatal / postpartum / bien-être
+  if (t.includes("massage") || t.includes("prénatal") || t.includes("postpartum") || t.includes("bien-être")) {
+    return {
+      quiz: [
+        { titre: "QCM Anatomie et physiologie de la grossesse", type: "QCM", nb: 20, duree: "30 min", objectif: "Valider les connaissances anatomiques pour un massage adapté" },
+        { titre: "QCM Contre-indications et précautions", type: "QCM", nb: 18, duree: "25 min", objectif: "Identifier les contre-indications absolues et relatives au massage prénatal/postpartum" },
+        { titre: "QCM Protocoles de massage", type: "QCM", nb: 22, duree: "30 min", objectif: "Maîtriser les enchaînements, positions et pressions adaptés à chaque trimestre" },
+        { titre: "Cas pratique – Construction d'un protocole personnalisé", type: "Étude de cas", nb: 3, duree: "60 min", objectif: "Adapter le massage à une situation cliente concrète (lombalgie, œdèmes, anxiété)" },
+      ],
+      videos: [
+        { titre: "Démonstration complète massage prénatal", source: "Interne / Captation", duree: "45 min", description: "Protocole filmé de A à Z avec voix off explicative" },
+        { titre: "Positions sécuritaires par trimestre", source: "YouTube / formation pro", duree: "20 min", description: "Décubitus latéral, semi-assis, drainage : démonstrations" },
+        { titre: "Massage postpartum et rééquilibrage", source: "Interne", duree: "30 min", description: "Travail sur le diaphragme, le bassin et la sangle abdominale" },
+      ],
+      outils: [
+        { outil: "Tables de massage avec coussins de grossesse", usage: "Pratique en binôme", acces: "Mis à disposition en salle" },
+        { outil: "Huiles végétales bio (amande douce, jojoba, calendula)", usage: "Travaux pratiques", acces: "Fournis par l'organisme" },
+        { outil: "Fiches anatomiques plastifiées", usage: "Repérage des points d'attention", acces: "Distribuées en début de formation" },
+        { outil: "Bibliothèque numérique – ouvrages spécialisés", usage: "Documentation complémentaire", acces: "PDFs sur la plateforme LMS" },
+      ],
+    };
+  }
+
+  // CIP – Conseiller en insertion professionnelle
+  if (t.includes("cip") || t.includes("insertion professionnelle") || t.includes("rncp31114")) {
+    return {
+      quiz: [
+        { titre: "QCM Cadre réglementaire de l'insertion (Pôle Emploi, RSA, missions locales)", type: "QCM", nb: 25, duree: "30 min", objectif: "Maîtriser les dispositifs et les acteurs de l'insertion" },
+        { titre: "QCM Techniques d'entretien et posture du conseiller", type: "QCM", nb: 20, duree: "25 min", objectif: "Valider l'écoute active, la reformulation et le questionnement" },
+        { titre: "QCM Construction de parcours d'insertion", type: "QCM", nb: 18, duree: "25 min", objectif: "Évaluer les étapes du diagnostic à la construction du plan d'action" },
+        { titre: "Cas pratique – Accompagnement d'un bénéficiaire", type: "Étude de cas", nb: 3, duree: "90 min", objectif: "Construire un parcours d'insertion réaliste avec freins et leviers" },
+      ],
+      videos: [
+        { titre: "Présentation du Service Public de l'Emploi", source: "France Travail", duree: "20 min", description: "Cartographie des acteurs et des dispositifs" },
+        { titre: "Techniques d'entretien : l'écoute active", source: "YouTube / pédagogie", duree: "18 min", description: "Démonstration et analyse d'entretiens d'insertion" },
+        { titre: "Construire un projet professionnel réaliste", source: "Interne / Captation", duree: "30 min", description: "Méthodologie complète avec cas concrets" },
+      ],
+      outils: [
+        { outil: "Outil RIASEC / Inventaire d'intérêts", usage: "Diagnostic des appétences professionnelles", acces: "Plateforme dédiée" },
+        { outil: "Base ROME (Répertoire Opérationnel des Métiers)", usage: "Exploration des métiers et compétences", acces: "francetravail.fr (libre)" },
+        { outil: "Trame d'entretien d'accompagnement", usage: "Conduire les entretiens individuels", acces: "Modèle Word fourni" },
+        { outil: "Annuaire des partenaires (PE, ML, Cap Emploi)", usage: "Orientation et co-construction", acces: "PDF sur la plateforme" },
+      ],
+    };
+  }
+
+  // VTC / ECSR / conduite
+  if (t.includes("vtc") || t.includes("ecsr") || t.includes("conduite") || t.includes("transport de personnes") || t.includes("taxi")) {
+    return {
+      quiz: [
+        { titre: "QCM Code de la route et réglementation transport", type: "QCM", nb: 30, duree: "30 min", objectif: "Maîtriser le code et les obligations spécifiques VTC/Taxi" },
+        { titre: "QCM Sécurité routière et écoconduite", type: "QCM", nb: 20, duree: "25 min", objectif: "Évaluer les bonnes pratiques de conduite professionnelle" },
+        { titre: "QCM Relation client et gestion des conflits", type: "QCM", nb: 15, duree: "20 min", objectif: "Valider la posture professionnelle face à la clientèle" },
+        { titre: "Examen blanc VTC – épreuves théoriques", type: "Examen blanc", nb: 50, duree: "90 min", objectif: "Simuler l'examen national VTC" },
+      ],
+      videos: [
+        { titre: "Modules officiels Sécurité Routière", source: "securite-routiere.gouv.fr", duree: "Variable", description: "Vidéos pédagogiques officielles" },
+        { titre: "Tests psychotechniques – présentation", source: "YouTube / Auto-école", duree: "15 min", description: "Préparation aux tests psychotechniques obligatoires" },
+        { titre: "Gestion d'incidents et urgences à bord", source: "Interne / Captation", duree: "20 min", description: "Cas pratiques : malaise, agressivité, accident" },
+      ],
+      outils: [
+        { outil: "Plateforme d'entraînement Code de la route", usage: "Entraînement quotidien (>1000 questions)", acces: "Compte individuel pendant la formation" },
+        { outil: "Véhicule auto-école double commande", usage: "Conduite accompagnée", acces: "Sur planning individuel" },
+        { outil: "Tablette GPS + applications VTC (Uber, Bolt)", usage: "Familiarisation aux outils métier", acces: "Disponible en salle" },
+      ],
+    };
+  }
+
+  // CRM / Conseiller relation client
+  if (t.includes("crm") || t.includes("relation client") || t.includes("conseiller commercial") || t.includes("rs6107") || t.includes("centre d'appel")) {
+    return {
+      quiz: [
+        { titre: "QCM Techniques de vente et closing", type: "QCM", nb: 25, duree: "30 min", objectif: "Maîtriser les étapes de l'entretien de vente (CAP-SONCAS)" },
+        { titre: "QCM Gestion de la réclamation client", type: "QCM", nb: 18, duree: "25 min", objectif: "Évaluer la posture face aux clients mécontents" },
+        { titre: "QCM Outils CRM (Salesforce, HubSpot, Zoho)", type: "QCM", nb: 20, duree: "25 min", objectif: "Vérifier la maîtrise fonctionnelle des CRM du marché" },
+        { titre: "Cas pratique – Simulation appel entrant + sortant", type: "Mise en situation", nb: 4, duree: "60 min", objectif: "Conduire un entretien de vente complet enregistré et débriefé" },
+      ],
+      videos: [
+        { titre: "Méthodes CAP-SONCAS et SPIN Selling", source: "YouTube / Closer Evolution", duree: "25 min", description: "Démonstration des techniques de découverte client" },
+        { titre: "Tutoriels HubSpot Academy", source: "HubSpot Academy", duree: "Variable", description: "Parcours certifiant gratuit – CRM, marketing, vente" },
+        { titre: "Gestion d'un appel difficile", source: "Interne / Captation", duree: "15 min", description: "Cas filmés et débriefés" },
+      ],
+      outils: [
+        { outil: "HubSpot CRM (version gratuite)", usage: "Travaux pratiques – pipeline, contacts, deals", acces: "Compte individuel créé en formation" },
+        { outil: "Casques + softphone simulé", usage: "Entraînement aux appels téléphoniques", acces: "Postes équipés en salle" },
+        { outil: "Bibliothèque de scripts d'appels", usage: "Modèles d'argumentaires", acces: "PDF sur la plateforme LMS" },
+        { outil: "Enregistrements d'appels d'entraînement", usage: "Auto-évaluation et débriefing", acces: "Stockage sécurisé" },
+      ],
+    };
+  }
+
+  // NTC / Négociateur Technico-Commercial / Webmarketing / Infographiste
+  if (t.includes("ntc") || t.includes("technico-commercial") || t.includes("webmarketing") || t.includes("infographiste") || t.includes("graphiste") || t.includes("communication digitale")) {
+    const isWebmkt = t.includes("webmarketing") || t.includes("communication digitale");
+    const isGraph = t.includes("infographiste") || t.includes("graphiste");
+    return {
+      quiz: [
+        { titre: isWebmkt ? "QCM SEO, SEA et stratégies digitales" : isGraph ? "QCM Théorie des couleurs et typographie" : "QCM Techniques de prospection et négociation", type: "QCM", nb: 22, duree: "30 min", objectif: "Valider les fondamentaux du métier" },
+        { titre: isWebmkt ? "QCM Réseaux sociaux et community management" : isGraph ? "QCM Suite Adobe (Photoshop, Illustrator, InDesign)" : "QCM Études de marché et veille concurrentielle", type: "QCM", nb: 20, duree: "25 min", objectif: "Évaluer la maîtrise des outils et plateformes" },
+        { titre: isWebmkt ? "QCM Analytics et indicateurs de performance" : isGraph ? "QCM Charte graphique et identité visuelle" : "QCM Gestion de portefeuille clients", type: "QCM", nb: 18, duree: "25 min", objectif: "Vérifier l'analyse et la stratégie" },
+        { titre: "Cas pratique – Projet professionnel complet", type: "Étude de cas", nb: 1, duree: "180 min", objectif: "Produire un livrable conforme aux standards du métier" },
+      ],
+      videos: [
+        { titre: isWebmkt ? "Google Digital Garage – Marketing fondamental" : isGraph ? "Tutoriels Adobe Creative Cloud officiels" : "Techniques de négociation BtoB", source: isWebmkt ? "Google Skillshop" : isGraph ? "helpx.adobe.com" : "YouTube / formation pro", duree: "Variable", description: "Bibliothèque de tutoriels officiels" },
+        { titre: isWebmkt ? "SEMrush Academy – SEO avancé" : isGraph ? "Mise en page éditoriale (InDesign)" : "Construire un argumentaire technique", source: "YouTube / Interne", duree: "25 min", description: "Approfondissement technique" },
+        { titre: "Études de cas réelles", source: "Interne / Captation", duree: "30 min", description: "Analyses de campagnes / créations / négociations à succès" },
+      ],
+      outils: [
+        { outil: isWebmkt ? "Google Analytics + Search Console" : isGraph ? "Adobe Creative Cloud (Photoshop, Illustrator, InDesign)" : "CRM HubSpot / Pipedrive", usage: "Outils métier pratiqués en formation", acces: "Licences fournies pendant la formation" },
+        { outil: isWebmkt ? "Plateformes Meta Ads / Google Ads" : isGraph ? "Bibliothèque de polices Adobe Fonts" : "Outils de prospection (LinkedIn Sales Navigator)", usage: "Travaux pratiques sur cas réels", acces: "Comptes d'entraînement" },
+        { outil: isWebmkt ? "Canva Pro / Mailchimp" : isGraph ? "Bibliothèque d'images Adobe Stock" : "Salle équipée de bureaux et téléphones", usage: "Production de livrables professionnels", acces: "Accès individuel" },
+        { outil: "Plateforme LMS Moodle", usage: "Quiz, supports, suivi, forums", acces: "Identifiant personnel" },
+      ],
+    };
+  }
+
+  // Restauration / cuisine
+  if (isRestauration(f)) {
+    return {
+      quiz: [
+        { titre: "QCM HACCP et hygiène alimentaire", type: "QCM", nb: 25, duree: "30 min", objectif: "Valider la maîtrise des règles HACCP, traçabilité et chaîne du froid" },
+        { titre: "QCM Techniques culinaires de base", type: "QCM", nb: 20, duree: "25 min", objectif: "Vérifier les cuissons, découpes et préparations fondamentales" },
+        { titre: "QCM Allergènes et régimes spécifiques", type: "QCM", nb: 15, duree: "20 min", objectif: "Identifier les 14 allergènes obligatoires et adapter les recettes" },
+        { titre: "Cas pratique – Production d'un menu complet", type: "Mise en situation", nb: 1, duree: "240 min", objectif: "Réaliser un menu 3 services dans le respect HACCP" },
+      ],
+      videos: [
+        { titre: "Démonstrations gestes techniques (CAP/BTS Cuisine)", source: "YouTube / Chef Simon", duree: "Variable", description: "Bibliothèque de vidéos pédagogiques par technique" },
+        { titre: "Méthode HACCP en restauration", source: "Ministère de l'Agriculture", duree: "30 min", description: "Vidéo officielle de formation HACCP" },
+        { titre: "Allergènes : ce qu'il faut savoir", source: "DGCCRF", duree: "15 min", description: "Réglementation et bonnes pratiques" },
+      ],
+      outils: [
+        { outil: "Cuisine d'application équipée (pianos, fours, cellule de refroidissement)", usage: "Travaux pratiques quotidiens", acces: "Salle dédiée selon planning" },
+        { outil: "Thermomètres laser, balances de précision", usage: "Maîtrise des températures et grammages", acces: "Mis à disposition en cuisine" },
+        { outil: "Plan de maîtrise sanitaire (PMS) modèle", usage: "Construction du PMS de l'établissement", acces: "Trame Excel fournie" },
+        { outil: "Bibliothèque de fiches techniques recettes", usage: "Standardisation des productions", acces: "PDF sur la plateforme" },
+      ],
+    };
+  }
+
+  // Générique – Management / commerce / autres
+  return {
+    quiz: [
+      { titre: `QCM Module 1 – Fondamentaux ${titre}`, type: "QCM", nb: 20, duree: "30 min", objectif: "Vérifier l'acquisition des connaissances fondamentales du métier" },
+      { titre: `QCM Module 2 – Approfondissement`, type: "QCM", nb: 25, duree: "35 min", objectif: "Évaluer la maîtrise des compétences intermédiaires" },
+      { titre: `QCM Module 3 – Pratique avancée`, type: "QCM", nb: 20, duree: "30 min", objectif: "Valider les compétences opérationnelles avancées" },
+      { titre: `Cas pratique – Mise en situation professionnelle`, type: "Étude de cas", nb: 3, duree: "45 min", objectif: "Appliquer les connaissances en contexte professionnel réaliste" },
+      { titre: `Évaluation à blanc – Préparation certification`, type: "Examen blanc", nb: 30, duree: "60 min", objectif: "Simuler les conditions réelles de l'examen de certification" },
+    ],
+    videos: [
+      { titre: `Introduction à ${titre}`, source: "Interne / Captation", duree: "20 min", description: "Présentation du métier, des enjeux et du parcours de formation" },
+      { titre: "Méthodologie et bonnes pratiques", source: "YouTube", duree: "15 min", description: "Méthodes de travail efficaces pour réussir la certification" },
+      { titre: "Cas concrets en milieu professionnel", source: "Interne / Captation", duree: "25 min", description: "Vidéos de mise en situation en environnement professionnel réel" },
+    ],
+    outils: [
+      { outil: "Plateforme LMS Moodle", usage: "Hébergement des cours, quiz interactifs, suivi de progression", acces: "Accès individuel par identifiant" },
+      { outil: "Classes virtuelles (Zoom/Teams)", usage: "Sessions synchrones, partage d'écran, enregistrement", acces: "Lien envoyé 48h avant chaque session" },
+      { outil: "Forum de discussion", usage: "Échanges entre stagiaires et avec le formateur", acces: "Intégré à la plateforme LMS" },
+      { outil: "Bibliothèque de documents", usage: "Supports PDF, fiches techniques, référentiels", acces: "Téléchargement depuis la plateforme" },
+    ],
+  };
+}
+
 export function genRessourcesPedagogiques(o: OrganismeInfo, f: FormationInfo): string {
-  const socio = isSocioEsthetique(f);
   const titre = f.intitule || "Formation";
   const duree = parseDuree(f.duree || "52 heures");
-
-  const quizItems = socio ? [
-    { titre: "QCM Diagnostic cutané – Peaux fragilisées", type: "QCM", nb: 20, duree: "30 min", objectif: "Vérifier les connaissances sur les pathologies cutanées (eczéma, psoriasis, effets secondaires des traitements oncologiques)" },
-    { titre: "QCM Protocoles de soins socio-esthétiques", type: "QCM", nb: 25, duree: "35 min", objectif: "Évaluer la maîtrise des protocoles adaptés aux publics vulnérables (personnes âgées, patients en oncologie, personnes en réinsertion)" },
-    { titre: "QCM Relation d'aide et posture professionnelle", type: "QCM", nb: 15, duree: "20 min", objectif: "Vérifier la compréhension de la posture d'écoute, du cadre éthique et des limites de l'intervention" },
-    { titre: "QCM Maquillage correcteur et conseil en image", type: "QCM", nb: 18, duree: "25 min", objectif: "Valider les connaissances sur les techniques de camouflage des cicatrices, taches pigmentaires et rougeurs" },
-    { titre: "Cas pratique – Prise en charge globale", type: "Étude de cas", nb: 5, duree: "45 min", objectif: "Analyser une situation complexe, proposer un protocole de soins individualisé et justifier les choix" },
-  ] : [
-    { titre: `QCM Module 1 – Fondamentaux ${titre}`, type: "QCM", nb: 20, duree: "30 min", objectif: "Vérifier l'acquisition des connaissances fondamentales" },
-    { titre: `QCM Module 2 – Approfondissement`, type: "QCM", nb: 25, duree: "35 min", objectif: "Évaluer la maîtrise des compétences intermédiaires" },
-    { titre: `QCM Module 3 – Pratique avancée`, type: "QCM", nb: 20, duree: "30 min", objectif: "Valider les compétences opérationnelles avancées" },
-    { titre: `Cas pratique – Mise en situation professionnelle`, type: "Étude de cas", nb: 3, duree: "45 min", objectif: "Appliquer les connaissances en contexte professionnel réaliste" },
-    { titre: `Évaluation à blanc – Préparation certification`, type: "Examen blanc", nb: 30, duree: "60 min", objectif: "Simuler les conditions réelles de l'examen de certification" },
-  ];
-
-  const videoItems = socio ? [
-    { titre: "Techniques de massage adaptées aux publics fragilisés", source: "YouTube / Interne", duree: "18 min", description: "Démonstration des gestes de massage de bien-être adaptés pour les personnes âgées et les patients en soins palliatifs" },
-    { titre: "Le maquillage correcteur en oncologie", source: "YouTube / CEW France", duree: "25 min", description: "Tutoriel sur les techniques de camouflage des effets visibles des traitements (perte de sourcils, cernes, rougeurs)" },
-    { titre: "Diagnostic cutané : identifier les peaux fragilisées", source: "Interne / Captation", duree: "22 min", description: "Cours filmé sur l'identification des différentes pathologies cutanées rencontrées dans le domaine socio-esthétique" },
-    { titre: "Posture professionnelle et relation d'aide", source: "YouTube", duree: "15 min", description: "Conférence sur l'écoute active, l'empathie et les limites du rôle du socio-esthéticien" },
-    { titre: "Atelier collectif : animer un groupe de bien-être", source: "Interne / Captation", duree: "30 min", description: "Démonstration d'animation d'un atelier collectif en EHPAD : préparation, déroulement, évaluation" },
-  ] : [
-    { titre: `Introduction à ${titre}`, source: "YouTube / Interne", duree: "20 min", description: "Présentation du domaine, des enjeux et du déroulement de la formation" },
-    { titre: "Méthodologie et bonnes pratiques", source: "YouTube", duree: "15 min", description: "Les méthodes de travail efficaces pour réussir la certification" },
-    { titre: "Cas concrets en milieu professionnel", source: "Interne / Captation", duree: "25 min", description: "Vidéos de mise en situation en environnement professionnel réel" },
-  ];
+  const { quiz: quizItems, videos: videoItems, outils: outilsItems } = getDomainSpecificResources(f);
 
   let html = `<table style="width:100%;border-collapse:collapse;margin-top:16px;">
     <tr><th ${thStyle(pc())} colspan="5">INVENTAIRE DES RESSOURCES PÉDAGOGIQUES</th></tr>
     <tr style="background:#f5f7fa;"><th ${td}>Ressource</th><th ${td}>Type</th><th ${td}>Volume</th><th ${td}>Durée</th><th ${td}>Objectif pédagogique</th></tr>`;
   for (const q of quizItems) {
-    html += `<tr><td ${td}><strong>${q.titre}</strong></td><td ${td}>${q.type}</td><td ${td}>${q.nb} questions</td><td ${td}>${q.duree}</td><td ${td}>${q.objectif}</td></tr>`;
+    html += `<tr><td ${td}><strong>${q.titre}</strong></td><td ${td}>${q.type}</td><td ${td}>${q.nb} ${q.type.toLowerCase().includes("cas") || q.type.toLowerCase().includes("situation") ? "scénarios" : "questions"}</td><td ${td}>${q.duree}</td><td ${td}>${q.objectif}</td></tr>`;
   }
   html += `</table>`;
 
@@ -1376,12 +1616,11 @@ export function genRessourcesPedagogiques(o: OrganismeInfo, f: FormationInfo): s
 
   html += `<table style="width:100%;border-collapse:collapse;margin-top:24px;">
     <tr><th ${thStyle(pc())} colspan="3">OUTILS NUMÉRIQUES & PLATEFORMES</th></tr>
-    <tr style="background:#f5f7fa;"><th ${td}>Outil</th><th ${td}>Usage</th><th ${td}>Accès</th></tr>
-    <tr><td ${td}><strong>Plateforme LMS</strong></td><td ${td}>Hébergement des cours, quiz interactifs, suivi de progression</td><td ${td}>Accès individuel par identifiant/mot de passe</td></tr>
-    <tr><td ${td}><strong>Classes virtuelles (Zoom/Teams)</strong></td><td ${td}>Sessions synchrones, partage d'écran, enregistrement</td><td ${td}>Lien envoyé 48h avant chaque session</td></tr>
-    <tr><td ${td}><strong>Forum de discussion</strong></td><td ${td}>Échanges entre stagiaires, questions au formateur</td><td ${td}>Intégré à la plateforme LMS</td></tr>
-    <tr><td ${td}><strong>Bibliothèque de documents</strong></td><td ${td}>Supports PDF, fiches techniques, référentiels</td><td ${td}>Téléchargement depuis la plateforme</td></tr>
-  </table>`;
+    <tr style="background:#f5f7fa;"><th ${td}>Outil</th><th ${td}>Usage</th><th ${td}>Accès</th></tr>`;
+  for (const out of outilsItems) {
+    html += `<tr><td ${td}><strong>${out.outil}</strong></td><td ${td}>${out.usage}</td><td ${td}>${out.acces}</td></tr>`;
+  }
+  html += `</table>`;
 
   return buildDocument({ org: o, formation: f, title: "RESSOURCES PÉDAGOGIQUES COMPLÉMENTAIRES", sections: [
     { heading: "Objet", content: `<p>Ce document recense l'ensemble des ressources pédagogiques complémentaires mobilisées dans le cadre de la formation <strong>« ${titre} »</strong> (${f.duree || duree.totalHours + " heures"}).</p><p>Ces ressources viennent enrichir les supports de cours principaux et sont mises à disposition des stagiaires tout au long de leur parcours.</p>` },
