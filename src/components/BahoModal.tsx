@@ -169,6 +169,13 @@ export default function BahoModal({ open, onOpenChange }: BahoModalProps) {
                         <FileSignature className="w-3 h-3 shrink-0" /> Convention (avec {e.stagiaires.length} participants)
                       </button>
                       <button
+                        onClick={() => handlePreview(e, null, "devis")}
+                        className={`w-full flex items-center gap-2 px-2 py-1 rounded text-xs hover:bg-muted text-left ${
+                          preview?.entreprise.siret === e.siret && preview?.docKind === "devis" ? "bg-primary/10 text-primary" : ""
+                        }`}
+                      >
+                        <Receipt className="w-3 h-3 shrink-0" /> Devis
+                      <button
                         onClick={() => handlePreview(e, null, "cgv")}
                         className={`w-full flex items-center gap-2 px-2 py-1 rounded text-xs hover:bg-muted text-left ${
                           preview?.entreprise.siret === e.siret && preview?.docKind === "cgv" ? "bg-primary/10 text-primary" : ""
