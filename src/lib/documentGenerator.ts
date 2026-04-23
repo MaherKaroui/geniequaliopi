@@ -3395,12 +3395,7 @@ function genFicheSuiviTuteur(o: OrganismeInfo, f: FormationInfo, stagiaires: Sta
       headers: ["Date", "Activité réalisée", "Compétences travaillées", "Évaluation"],
       rows: [["Semaine 1", "Observation et découverte", "Compétences de base", "Satisfaisant"], ["Semaine 2", "Pratique guidée", "Compétences intermédiaires", "Bien"], ["Semaine 3", "Pratique autonome", "Compétences avancées", "Très bien"], ["Semaine 4", "Mise en situation réelle", "Compétences transversales", "Excellent"]]
     },
-    signatures: {
-      type: "2",
-      labels: ["Le Tuteur", `Le Stagiaire${stagiaireNom ? ` – ${stagiaireNom}` : ""}`],
-      names: [f.formateur, stagiaireNom],
-      stagiaireSignatureUrl: s?.signatureUrl,
-    },
+    extraHtml: `<div style="margin-top:30px"><p><strong>Le Tuteur :</strong> ${f.formateur}</p></div>`,
   });
 }
 
