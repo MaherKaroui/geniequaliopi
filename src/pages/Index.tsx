@@ -190,7 +190,7 @@ const Index = () => {
             <Button size="lg" variant="outline" className="px-8 py-6 text-base gap-2" onClick={() => navigate("/opco-mobilites")}>
               <Truck className="w-5 h-5" /> OPCO Mobilités
             </Button>
-            <Button size="lg" variant="outline" className="px-8 py-6 text-base gap-2 border-amber-500 text-amber-700 hover:bg-amber-50" onClick={() => setBahoOpen(true)}>
+            <Button size="lg" variant="outline" className="px-8 py-6 text-base gap-2 border-dashed" onClick={() => setBahoOpen(true)}>
               <Building2 className="w-5 h-5" /> BAHO (temporaire)
             </Button>
           </div>
