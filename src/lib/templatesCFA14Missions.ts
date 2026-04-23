@@ -1298,10 +1298,6 @@ export function genQCMMissionCFA(
         content: `<p>Pour chaque question, cochez la <strong>seule</strong> bonne réponse. La case ☒ correspond à la réponse retenue par l'apprenti·e ; les bonnes réponses apparaissent en vert pour la correction.</p>`,
       },
       {
-        heading: "Questionnaire et corrigé",
-        content: tableHTML(["Question", "Propositions (☒ = réponse de l'apprenti·e)", "Résultat"], rows),
-      },
-      {
         heading: "Résultat global",
         content: `<p style="font-size:1.05em;"><strong>Score : ${score} / ${mission.questions.length}</strong> — Note : <strong>${Math.round((score / mission.questions.length) * 20)}/20</strong></p>
         <p>Appréciation : ${score >= 8 ? "Acquis — bonne maîtrise des notions de la mission." : score >= 6 ? "Partiellement acquis — quelques notions à revoir." : "À retravailler — un point pédagogique sera proposé."}</p>`,
