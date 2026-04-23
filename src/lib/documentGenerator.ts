@@ -12463,11 +12463,11 @@ function genExercicesOPCO(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
         ? baseExercices[exIdx % baseExercices.length]
         : { titre: `Exercice ${exIdx + 1}`, consigne: `Mise en pratique des compétences acquises durant la semaine ${exIdx + 1} en centre de formation.`, reponseAttendue: "" };
 
-      extra += `<div style="border:1px solid #ccc;padding:10px;margin-bottom:14px;page-break-inside:avoid">`;
-      extra += `<h4 style="margin:0 0 6px 0">Exercice ${exIdx + 1} — Semaine école ${exIdx + 1} — QCM /10</h4>`;
+      // Header bloc — sans wrapper div pour permettre la pagination row-by-row des tableaux QCM
+      extra += `<h4 style="margin:14px 0 4px 0;padding:6px 10px;background:#eef2fb;border-left:4px solid #1e3a7b;page-break-after:avoid">Exercice ${exIdx + 1} — Semaine école ${exIdx + 1} — QCM /10</h4>`;
       extra += `<p style="margin:2px 0;font-size:0.9em"><strong>Période semaine école :</strong> du ${fmtDateLong(firstDay)} au ${fmtDateLong(lastDay)} &nbsp;|&nbsp; <strong>Date de l'exercice :</strong> ${fmtDateLong(lastDay)}${isPast ? "" : ` <span style="color:#9a6300">(à venir)</span>`}</p>`;
       extra += `<p style="margin:6px 0 4px 0"><strong>Thème de la semaine :</strong> ${ex.titre}</p>`;
-      extra += `<p style="margin:4px 0;font-size:0.9em;color:#555"><em>${ex.consigne}</em></p>`;
+      extra += `<p style="margin:4px 0 8px 0;font-size:0.9em;color:#555"><em>${ex.consigne}</em></p>`;
 
       // Sélectionner 10 questions QCM cohérentes avec la formation (rotation déterministe dans le pool)
       const QCM_PER_EX = 10;
@@ -12480,7 +12480,6 @@ function genExercicesOPCO(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
       }
 
       if (isPast && selectedQuestions.length > 0) {
-        // Réponses RÉALISTES par stagiaire — chacun répond, score déterministe entre 7 et 10/10
         const observationsPool = [
           "QCM bien réussi. Les notions vues en séance sont acquises.",
           "Très bonne maîtrise des concepts. Quelques hésitations mineures.",
@@ -12493,7 +12492,6 @@ function genExercicesOPCO(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
         ];
         g.stagiaires.forEach((s, sIdx) => {
           const seedBase = ((s.nom?.charCodeAt(0) || 65) * 7 + (s.prenom?.charCodeAt(0) || 65) * 11 + exIdx * 13 + sIdx * 31);
-          // Score déterministe entre 7 et 10/10 (Qualiopi : résultats positifs)
           const note = 7 + (seedBase % 4);
           const nbErrors = 10 - note;
           const wrongIdxSet = new Set<number>();
@@ -12504,9 +12502,10 @@ function genExercicesOPCO(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
           const observation = observationsPool[(seedBase + exIdx) % observationsPool.length];
           const letters = ["a", "b", "c", "d", "e", "f"];
 
-          extra += `<div style="margin-top:10px;padding:8px;background:#f8f9fc;border-left:3px solid #1e3a7b">`;
-          extra += `<p style="margin:0 0 6px 0"><strong>Apprenant :</strong> ${s.prenom} ${s.nom}${s.entreprise ? ` — ${s.entreprise}` : ""} &nbsp;|&nbsp; <strong>Date :</strong> ${fmtDateLong(lastDay)}</p>`;
-          extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%;font-size:0.88em">
+          // En-tête apprenant en paragraphe (top-level, peut basculer de page indépendamment)
+          extra += `<p style="margin:10px 0 4px 0;padding:6px 8px;background:#f8f9fc;border-left:3px solid #1e3a7b;page-break-after:avoid"><strong>Apprenant :</strong> ${s.prenom} ${s.nom}${s.entreprise ? ` — ${s.entreprise}` : ""} &nbsp;|&nbsp; <strong>Date :</strong> ${fmtDateLong(lastDay)}</p>`;
+          // Tableau QCM en top-level → pagination row-by-row (thead répété)
+          extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%;font-size:0.88em;margin-bottom:6px">
             <thead><tr style="background:#1e3a7b;color:#fff">
               <th style="width:5%">N°</th>
               <th style="width:45%">Question</th>
@@ -12547,16 +12546,13 @@ function genExercicesOPCO(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
             </tr>`;
           });
           extra += `</tbody></table>`;
-          extra += `<p style="margin:6px 0 0 0"><strong>Score :</strong> <span style="color:#1e3a7b;font-weight:bold;font-size:1.1em">${note}/10</span> — ${appreciation} &nbsp;|&nbsp; <strong>Observation formateur :</strong> ${observation}</p>`;
-          extra += `</div>`;
+          extra += `<p style="margin:0 0 10px 0;padding:4px 8px;background:#f8f9fc"><strong>Score :</strong> <span style="color:#1e3a7b;font-weight:bold;font-size:1.1em">${note}/10</span> — ${appreciation} &nbsp;|&nbsp; <strong>Observation formateur :</strong> ${observation}</p>`;
         });
       } else if (!isPast && selectedQuestions.length > 0) {
-        // Trame vierge du QCM pour les semaines à venir — une trame par apprenant
         extra += `<p style="margin:6px 0;color:#888;font-style:italic">QCM à compléter par les apprenants à l'issue de la semaine école du ${fmtDateLong(lastDay)}.</p>`;
         g.stagiaires.forEach((s) => {
-          extra += `<div style="margin-top:10px;padding:8px;background:#fffaf0;border-left:3px solid #d4a017">`;
-          extra += `<p style="margin:0 0 6px 0"><strong>Apprenant :</strong> ${s.prenom} ${s.nom}${s.entreprise ? ` — ${s.entreprise}` : ""} &nbsp;|&nbsp; <strong>Date prévue :</strong> ${fmtDateLong(lastDay)}</p>`;
-          extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%;font-size:0.88em;margin-top:4px">
+          extra += `<p style="margin:10px 0 4px 0;padding:6px 8px;background:#fffaf0;border-left:3px solid #d4a017;page-break-after:avoid"><strong>Apprenant :</strong> ${s.prenom} ${s.nom}${s.entreprise ? ` — ${s.entreprise}` : ""} &nbsp;|&nbsp; <strong>Date prévue :</strong> ${fmtDateLong(lastDay)}</p>`;
+          extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%;font-size:0.88em;margin-bottom:6px">
             <thead><tr style="background:#fff8e8">
               <th style="width:5%">N°</th>
               <th style="width:55%">Question</th>
@@ -12573,13 +12569,11 @@ function genExercicesOPCO(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
             </tr>`;
           });
           extra += `</tbody></table>`;
-          extra += `<p style="margin:6px 0 0 0"><strong>Score :</strong> _____ /10 &nbsp;|&nbsp; <strong>Mention :</strong> _________________ &nbsp;|&nbsp; <strong>Observation formateur :</strong> _____________________________________________</p>`;
-          extra += `</div>`;
+          extra += `<p style="margin:0 0 10px 0;padding:4px 8px;background:#fffaf0"><strong>Score :</strong> _____ /10 &nbsp;|&nbsp; <strong>Mention :</strong> _________________ &nbsp;|&nbsp; <strong>Observation formateur :</strong> _____________________________________________</p>`;
         });
       } else if (isPast) {
         extra += `<p style="color:#888;font-style:italic">Aucune banque de QCM disponible pour cette formation. Exercice à formaliser manuellement par le formateur.</p>`;
       }
-      extra += `</div>`;
     });
   }
 
