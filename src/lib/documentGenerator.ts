@@ -2796,6 +2796,11 @@ function genEvalFinale(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiaire
 
 function genTestPositionnementTrame(o: OrganismeInfo, f: FormationInfo, type: "debut" | "fin") {
   const qo = getQuestionsOuvertes(f.intitule, f.objectifs, f.programme);
+  const questions = type === "debut" ? qo.debut : qo.fin;
+  const label = type === "debut" ? "début" : "fin";
+  const labelCap = type === "debut" ? "Début" : "Fin";
+
+  let extra = `<h2>Test de positionnement en ${label} de formation – ${f.intitule}</h2>`;
   extra += `<p><strong>Nom du stagiaire :</strong> ...................................................</p>`;
   extra += `<p><strong>Date :</strong> ...................................................</p>`;
   extra += `<p><strong>Durée estimée :</strong> 20 minutes</p>`;
