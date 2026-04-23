@@ -111,7 +111,8 @@ function footer(): string {
 }
 
 export function getRIHTML(e: BahoEntreprise, stagiaire?: BahoStagiaire, customFsStamp?: string): string {
-  const civilite = stagiaire ? `${stagiaire.prenom} ${stagiaire.nom}` : "";
+  const civilite = stagiaire ? `${stagiaire.nom.toUpperCase()} ${stagiaire.prenom}` : "";
+  const dateRI = subtractWorkingDays(e.dateDebut, 14);
   const titreStagiaire = stagiaire
     ? `<p><strong>Stagiaire :</strong> ${civilite}${stagiaire.emploi ? ` – ${stagiaire.emploi}` : ""}<br/>
        <strong>Code stagiaire :</strong> ${stagiaire.codeStagiaire}</p>`
@@ -119,41 +120,80 @@ export function getRIHTML(e: BahoEntreprise, stagiaire?: BahoStagiaire, customFs
 
   return `<!DOCTYPE html><html><head><meta charset="utf-8"/>${BASE_CSS}</head><body>
   ${header()}
-  <h1>Règlement intérieur</h1>
+  <h1>RÈGLEMENT INTÉRIEUR</h1>
+  <p style="text-align:center; font-style:italic; color:#555;">Action de Formation En Situation de Travail (AFEST) – Hôtellerie</p>
+
   <p><strong>Organisme de formation :</strong> ${FORMAT_SPHERE_ORG.nom}<br/>
   <strong>Bénéficiaire (entreprise) :</strong> ${e.nom} – SIRET ${e.siret}<br/>
-  <strong>Date d'application :</strong> ${formatDateLong(e.dateConvention)}</p>
+  <strong>Lieu de formation :</strong> ${e.adresse}<br/>
+  <strong>Date d'application :</strong> ${formatDateLong(dateRI)}</p>
   ${titreStagiaire}
 
   <h2>Article 1 – Objet et champ d'application</h2>
-  <p>Le présent règlement intérieur est établi conformément aux articles L.6352-3 et L.6352-4 et R.6352-1 à R.6352-15 du Code du travail. Il s'applique à tous les stagiaires inscrits à une session dispensée par ${FORMAT_SPHERE_ORG.nom} et ce, pour toute la durée de la formation suivie.</p>
+  <p>Le présent règlement est établi conformément aux dispositions des articles L.6352-3 et L.6352-4 ainsi que R.6352-1 à R.6352-15 du Code du travail.</p>
+  <p>Il s'applique à l'ensemble des stagiaires inscrits à une formation dispensée en situation de travail (AFEST) au sein de l'établissement <strong>${e.nom}</strong> situé ${e.adresse}, pour toute la durée de ladite formation.</p>
+  <p>Le centre de formation <strong>${FORMAT_SPHERE_ORG.nom}</strong>, domicilié au ${FORMAT_SPHERE_ORG.adresse}, ${FORMAT_SPHERE_ORG.codePostal} ${FORMAT_SPHERE_ORG.ville}, dispense ses formations en présentiel sur le site de l'entreprise bénéficiaire.</p>
+  <p>Le présent règlement intérieur a pour objet de préciser les règles relatives à la discipline, à l'hygiène, à la sécurité, ainsi qu'aux droits et obligations des stagiaires, afin d'assurer le bon déroulement des formations.</p>
 
   <h2>Article 2 – Discipline générale</h2>
-  <p>Les stagiaires sont tenus de respecter les horaires de formation fixés par l'organisme. Toute absence ou retard doit être signalé au formateur référent. Il est interdit de fumer, de vapoter, de consommer de l'alcool ou des stupéfiants dans les locaux de formation.</p>
+  <p>Il est formellement interdit aux stagiaires, notamment :</p>
+  <ul>
+    <li>De se présenter aux sessions de formation en état d'ébriété ou sous l'emprise de substances illicites ;</li>
+    <li>De perturber le bon déroulement de la formation (comportement inapproprié, propos déplacés, interruptions répétées) ;</li>
+    <li>D'enregistrer, de filmer ou de diffuser tout ou partie des sessions de formation sans autorisation écrite préalable de l'organisme ;</li>
+    <li>De diffuser à des tiers les supports pédagogiques remis ou partagés durant la formation ;</li>
+    <li>D'utiliser les outils mis à disposition à des fins étrangères à la formation.</li>
+  </ul>
+  <p>Le stagiaire s'engage à adopter une attitude respectueuse à l'égard du formateur, des collègues et des autres participants, tant à l'oral qu'à l'écrit.</p>
 
-  <h2>Article 3 – Hygiène et sécurité</h2>
-  <p>Chaque stagiaire doit veiller à sa sécurité personnelle et à celle des autres en respectant les consignes générales et particulières de sécurité en vigueur sur les lieux de stage. Les consignes d'évacuation en cas d'incendie sont affichées dans les locaux.</p>
+  <h2>Article 3 – Sanctions disciplinaires</h2>
+  <p>Tout agissement considéré comme fautif par la direction de l'organisme de formation pourra, en fonction de sa nature et de sa gravité, faire l'objet de l'une des sanctions suivantes, par ordre croissant :</p>
+  <ul>
+    <li>Avertissement écrit ;</li>
+    <li>Blâme ;</li>
+    <li>Exclusion définitive de la formation.</li>
+  </ul>
+  <p>Aucune sanction ne peut être infligée sans que le stagiaire n'ait été informé des griefs retenus contre lui et mis en mesure de présenter ses observations.</p>
 
-  <h2>Article 4 – Tenue et comportement</h2>
-  <p>Les stagiaires sont invités à se présenter au lieu de formation en tenue décente et à avoir un comportement correct à l'égard de toute personne présente.</p>
+  <h2>Article 4 – Organisation de la formation</h2>
+  <p>Les formations sont dispensées en présentiel sur le site de l'entreprise (AFEST), selon un planning et des horaires communiqués préalablement au stagiaire par convocation ou par transmission du programme.</p>
+  <p>Le stagiaire s'engage à :</p>
+  <ul>
+    <li>Se présenter aux sessions aux horaires prévus ;</li>
+    <li>Émarger les feuilles de présence à chaque demi-journée ;</li>
+    <li>Informer l'organisme de formation et son responsable hiérarchique en cas de retard, d'absence ou de difficulté empêchant sa participation.</li>
+  </ul>
 
-  <h2>Article 5 – Sanctions disciplinaires</h2>
-  <p>Tout manquement du stagiaire à l'une des dispositions du présent règlement intérieur pourra faire l'objet d'une sanction. Les sanctions applicables sont, par ordre d'importance croissante : avertissement écrit, blâme, exclusion temporaire, exclusion définitive.</p>
+  <h2>Article 5 – Hygiène, sécurité et environnement de travail</h2>
+  <p>Chaque stagiaire est tenu de respecter les consignes générales et particulières d'hygiène et de sécurité en vigueur sur le lieu de formation, notamment celles propres à l'établissement hôtelier.</p>
+  <p>Il est interdit de participer à la formation dans des conditions susceptibles de nuire à la concentration ou à la sécurité (consommation d'alcool, de substances interdites, environnement inadapté).</p>
+  <p>Tout incident survenu durant une session de formation doit être signalé sans délai à l'organisme de formation et au responsable de l'établissement.</p>
 
-  <h2>Article 6 – Garanties disciplinaires</h2>
-  <p>Aucune sanction ne peut être infligée au stagiaire sans qu'il ait été informé au préalable des griefs retenus contre lui. Le stagiaire convoqué peut se faire assister par une personne de son choix.</p>
+  <h2>Article 6 – Tenue, comportement et assiduité</h2>
+  <p>Les stagiaires sont tenus d'adopter une tenue et un comportement corrects, compatibles avec un cadre professionnel hôtelier.</p>
+  <p>L'assiduité aux sessions est obligatoire. Toute absence ou retard doit être justifié auprès de ${FORMAT_SPHERE_ORG.nom} dans les meilleurs délais.</p>
+  <p>Le non-respect répété des horaires ou des obligations d'assiduité peut entraîner des sanctions disciplinaires.</p>
 
-  <h2>Article 7 – Représentation des stagiaires</h2>
-  <p>Pour les sessions d'une durée supérieure à 500 heures, il est procédé simultanément à l'élection d'un délégué titulaire et d'un délégué suppléant au scrutin uninominal à deux tours.</p>
+  <h2>Article 7 – Usage du matériel et des supports pédagogiques</h2>
+  <p>Les supports pédagogiques, documents et outils remis durant la formation sont strictement réservés à un usage personnel dans le cadre de la formation.</p>
+  <p>Il est interdit de modifier, copier, transmettre ou exploiter ces contenus sans l'autorisation écrite de l'organisme de formation.</p>
 
-  <h2>Article 8 – Publicité du règlement</h2>
-  <p>Un exemplaire du présent règlement est remis à chaque stagiaire avant le début de la formation.</p>
+  <h2>Article 8 – Enregistrements et captations</h2>
+  <p>Sauf autorisation expresse et écrite de ${FORMAT_SPHERE_ORG.nom}, il est strictement interdit d'enregistrer, de filmer ou de diffuser les sessions de formation, y compris les échanges entre participants.</p>
 
-  <p style="margin-top:30px;">Fait à ${FORMAT_SPHERE_ORG.ville}, le ${formatDateLong(e.dateConvention)}</p>
+  <h2>Article 9 – Propriété intellectuelle</h2>
+  <p>L'ensemble des supports pédagogiques remis ou accessibles durant la formation est protégé par le droit d'auteur. Ils ne peuvent être utilisés que pour un usage strictement personnel et ne peuvent faire l'objet d'aucune reproduction ou diffusion sans autorisation.</p>
+
+  <h2>Article 10 – Responsabilité</h2>
+  <p>L'organisme de formation ne saurait être tenu responsable des dommages, pertes ou vols de biens personnels du stagiaire survenus lors de la formation.</p>
+
+  <p style="margin-top:18px;">Un exemplaire du présent règlement intérieur est remis au stagiaire avant toute inscription définitive à la formation.</p>
+
+  <p style="margin-top:18px;"><strong>Fait le :</strong> ${formatDateLong(dateRI)}</p>
 
   ${stampsBlock(e, customFsStamp)}
 
-  ${stagiaire ? `<p style="margin-top:20px;"><strong>Signature du stagiaire</strong> (${civilite}) :<br/>
+  ${stagiaire ? `<p style="margin-top:20px;"><strong>Pour le bénéficiaire :</strong><br/>${civilite}<br/>
   <span style="display:inline-block; border-bottom:1px solid #888; width:300px; height:40px;"></span></p>` : ""}
 
   ${footer()}
