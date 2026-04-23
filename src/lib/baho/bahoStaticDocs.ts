@@ -120,7 +120,7 @@ export function getRIHTML(e: BahoEntreprise, stagiaire?: BahoStagiaire, customFs
   return `<!DOCTYPE html><html><head><meta charset="utf-8"/>${BASE_CSS}</head><body>
   ${header()}
   <h1>RÈGLEMENT INTÉRIEUR</h1>
-  <p style="text-align:center; font-style:italic; color:#555;">Action de Formation En Situation de Travail (AFEST) – Hôtellerie</p>
+  <p style="text-align:center; font-style:italic; color:#555;">Action de formation en présentiel intra-entreprise – Hôtellerie & Restauration</p>
 
   <p><strong>Organisme de formation :</strong> ${FORMAT_SPHERE_ORG.nom}<br/>
   <strong>Bénéficiaire (entreprise) :</strong> ${e.nom} – SIRET ${e.siret}<br/>
@@ -130,7 +130,7 @@ export function getRIHTML(e: BahoEntreprise, stagiaire?: BahoStagiaire, customFs
 
   <h2>Article 1 – Objet et champ d'application</h2>
   <p>Le présent règlement est établi conformément aux dispositions des articles L.6352-3 et L.6352-4 ainsi que R.6352-1 à R.6352-15 du Code du travail.</p>
-  <p>Il s'applique à l'ensemble des stagiaires inscrits à une formation dispensée en situation de travail (AFEST) au sein de l'établissement <strong>${e.nom}</strong> situé ${e.adresse}, pour toute la durée de ladite formation.</p>
+  <p>Il s'applique à l'ensemble des stagiaires inscrits à l'action de formation « <em>Structuration des pratiques opérationnelles, amélioration de l'expérience client et sécurisation des points critiques d'exploitation en établissement hôtelier et de restauration</em> » dispensée en présentiel au sein de l'établissement <strong>${e.nom}</strong> situé ${e.adresse}, pour toute la durée de ladite formation.</p>
   <p>Le centre de formation <strong>${FORMAT_SPHERE_ORG.nom}</strong>, domicilié au ${FORMAT_SPHERE_ORG.adresse}, ${FORMAT_SPHERE_ORG.codePostal} ${FORMAT_SPHERE_ORG.ville}, dispense ses formations en présentiel sur le site de l'entreprise bénéficiaire.</p>
   <p>Le présent règlement intérieur a pour objet de préciser les règles relatives à la discipline, à l'hygiène, à la sécurité, ainsi qu'aux droits et obligations des stagiaires, afin d'assurer le bon déroulement des formations.</p>
 
@@ -155,7 +155,7 @@ export function getRIHTML(e: BahoEntreprise, stagiaire?: BahoStagiaire, customFs
   <p>Aucune sanction ne peut être infligée sans que le stagiaire n'ait été informé des griefs retenus contre lui et mis en mesure de présenter ses observations.</p>
 
   <h2>Article 4 – Organisation de la formation</h2>
-  <p>Les formations sont dispensées en présentiel sur le site de l'entreprise (AFEST), selon un planning et des horaires communiqués préalablement au stagiaire par convocation ou par transmission du programme.</p>
+  <p>La formation est dispensée en présentiel intra-entreprise, sur 3 jours consécutifs (21 heures, 7h/jour, horaires 09h00–12h30 / 14h00–17h30), selon un planning et des horaires communiqués préalablement au stagiaire par convocation ou par transmission du programme.</p>
   <p>Le stagiaire s'engage à :</p>
   <ul>
     <li>Se présenter aux sessions aux horaires prévus ;</li>
@@ -235,7 +235,7 @@ export function getConventionHTML(e: BahoEntreprise, customFsStamp?: string): st
     .map((s) => `<li><strong>${civiliteForStg(s)} ${s.nom.toUpperCase()} ${s.prenom}</strong>${s.emploi ? ` – ${s.emploi}` : ""}</li>`)
     .join("");
 
-  const nbHeures = 14;
+  const nbHeures = 21;
   const totalHt = 2000;
 
   return `<!DOCTYPE html><html><head><meta charset="utf-8"/>${BASE_CSS}
@@ -264,14 +264,15 @@ export function getConventionHTML(e: BahoEntreprise, customFsStamp?: string): st
   Ci-après désigné « le Bénéficiaire »</p>
 
   <p class="article-title">Article 1 – Objet</p>
-  <p>L'Organisme s'engage à organiser une Action de Formation En Situation de Travail (AFEST) intitulée :<br/>
-  « <strong>Hygiène, sécurité et qualité de service en hôtellerie</strong> »</p>
+  <p>L'Organisme s'engage à organiser une action de formation intitulée :<br/>
+  « <strong>Structuration des pratiques opérationnelles, amélioration de l'expérience client et sécurisation des points critiques d'exploitation en établissement hôtelier et de restauration</strong> »</p>
 
   <p class="article-title">Article 2 – Modalités</p>
   <p><strong>Dates :</strong> du ${formatDateLong(e.dateDebut)} au ${formatDateLong(e.dateFin)}<br/>
-  <strong>Durée :</strong> ${nbHeures} heures<br/>
+  <strong>Durée :</strong> ${nbHeures} heures (3 jours consécutifs, 7h/jour)<br/>
+  <strong>Horaires :</strong> 09h00 – 12h30 / 14h00 – 17h30<br/>
   <strong>Lieu :</strong> ${e.adresse}<br/>
-  <strong>Modalité :</strong> AFEST – Action de Formation En Situation de Travail</p>
+  <strong>Modalité :</strong> Formation en présentiel intra-entreprise</p>
 
   <p class="article-title">Article 3 – Participants</p>
   <ul class="participants">
@@ -427,7 +428,8 @@ export function getFactureHTML(e: BahoEntreprise, numero: string, customFsStamp?
     </thead>
     <tbody>
       <tr>
-        <td>Action de Formation En Situation de Travail (AFEST) – Hôtellerie<br/>
+        <td>Structuration des pratiques opérationnelles et qualité de service en hôtellerie & restauration<br/>
+        <em>Formation en présentiel intra-entreprise – 21 heures sur 3 jours</em><br/>
         <em>Forfait par établissement (${nbStagiaires} stagiaire${nbStagiaires > 1 ? "s" : ""} couvert${nbStagiaires > 1 ? "s" : ""})</em><br/>
         <em>Période : ${formatDateLong(e.dateDebut)} → ${formatDateLong(e.dateFin)}</em></td>
         <td>${total.toLocaleString("fr-FR")} €</td>
@@ -512,8 +514,8 @@ export function getDevisHTML(e: BahoEntreprise, numero: string, customFsStamp?: 
     </thead>
     <tbody>
       <tr>
-        <td>Action de Formation En Situation de Travail (AFEST) – Hôtellerie<br/>
-        <em>Hygiène, sécurité et qualité de service</em><br/>
+        <td>Structuration des pratiques opérationnelles et qualité de service en hôtellerie & restauration<br/>
+        <em>Formation en présentiel intra-entreprise – 21 heures sur 3 jours</em><br/>
         <em>Forfait par établissement (${nbStagiaires} stagiaire${nbStagiaires > 1 ? "s" : ""} couvert${nbStagiaires > 1 ? "s" : ""})</em><br/>
         <em>Période : ${formatDateLong(e.dateDebut)} → ${formatDateLong(e.dateFin)}</em></td>
         <td>${total.toLocaleString("fr-FR")} €</td>
