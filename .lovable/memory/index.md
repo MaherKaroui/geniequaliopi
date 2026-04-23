@@ -102,4 +102,5 @@ Unfinished training (latest end date not passed): final evaluations/tests must r
 - [features/audit/opco-calendrier-alternance](mem://features/audit/opco-calendrier-alternance) — Calendrier OPCO B9 : rythme alternance, démarrage école, 7h/jour
 - [features/audit/opco-trames-vierges](mem://features/audit/opco-trames-vierges) — ZIP B9 et C11 : trame vierge ajoutée par session en plus du PDF rempli
 - [logic/bilan-froid-empty-if-not-finished](mem://logic/bilan-froid-empty-if-not-finished) — Bilan à froid (CODE 58bis / IND 30 / OPCO C10) vide tant que formation non terminée
+- [logic/positionnement-fin-empty-if-not-finished](mem://logic/positionnement-fin-empty-if-not-finished) — Test de positionnement de fin (OPCO C6) en trame vierge tant que formation non terminée
 - [features/audit/cfa-visuels-14-missions](mem://features/audit/cfa-visuels-14-missions) — Affiches HD 14 missions dans CT3 IND 14, sous-dossier VISUELS_14_MISSIONS
