@@ -26,6 +26,12 @@ const REAL_XLSX_TEMPLATES = new Set<string>([
   "tableau_suivi_parcours_beneficiaires_cfa_excel",
   "calendrier_annuel_cfa",
   "tableau_suivi_parcours_excel",
+  "plan_dev_competences_excel",
+  "tableau_amelioration_continue_excel",
+  "suivi_dysfonctionnements_excel",
+  "relances_appreciations_excel",
+  "indicateurs_performance",
+  "vae_indicateurs_previsionnels",
 ]);
 import { downloadAsPdf, htmlToPdfBlob } from "@/lib/pdfExport";
 import { processDocxTemplate, processMailDocxTemplate, DOCX_TEMPLATE_FILES, MAIL_TEMPLATE_FILES } from "@/lib/docxTemplateExport";
