@@ -340,11 +340,11 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "rapport_amelioration": return genRapportAmelioration(o);
     // Type d'action spécifiques
     case "pv_conseil_perfectionnement": return genPVConseilPerfectionnement(o, f, stagiaires);
-    case "contrat_apprentissage": return genContratApprentissage(o, f, stagiaires);
+    case "contrat_apprentissage": return genContratApprentissage(o, f, stagiaires, typeof params?.stagiaireIdx === "number" ? params.stagiaireIdx : undefined);
     case "livret_apprentissage_cfa": return genLivretApprentissageCFA(o, f, stagiaires);
     case "fiche_maitre_apprentissage": return genFicheMaitreApprentissage(o, f);
-    case "suivi_entreprise_cfa": return genSuiviEntrepriseCFA(o, f, stagiaires);
-    case "competences_alternance": return genCompetencesAlternance(o, f, stagiaires);
+    case "suivi_entreprise_cfa": return genSuiviEntrepriseCFA(o, f, stagiaires, typeof params?.stagiaireIdx === "number" ? params.stagiaireIdx : undefined);
+    case "competences_alternance": return genCompetencesAlternance(o, f, stagiaires, typeof params?.stagiaireIdx === "number" ? params.stagiaireIdx : undefined);
     case "analyse_parcours_pro": return genAnalyseParcoursPro(o, f, stagiaires);
     case "plan_action_bilan": return genPlanActionBilan(o, f, stagiaires);
     case "synthese_bilan": return genSyntheseBilan(o, f, stagiaires);
@@ -3810,11 +3810,14 @@ function genPVConseilPerfectionnement(o: OrganismeInfo, f: FormationInfo, stagia
   ], signatures: { type: "2", labels: ["Le Directeur du CFA", "Le Secrétaire de séance"], names: [o.dirigeant || o.nom, o.responsablePedagogique || ""] } });
 }
 
-function genContratApprentissage(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
-  const s = stagiaires[0] || { prenom: "Martin", nom: "Dupont", entreprise: "Tech Solutions SAS" };
-  return buildDocument({ org: o, title: "CONTRAT D'APPRENTISSAGE", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, sections: [
-    { heading: "Parties", content: `<p><strong>Employeur :</strong> ${s.entreprise}<br><strong>Apprenti(e) :</strong> ${s.prenom} ${s.nom}<br><strong>CFA :</strong> ${o.nom}<br><strong>Formation :</strong> ${f.intitule}</p>` },
-    { heading: "Durée du contrat", content: `<p>Sessions : Dates individuelles par stagiaire<br>Durée de la formation : À définir selon le groupe<br>Rythme d'alternance : 3 jours en entreprise / 2 jours en CFA</p>` },
+function genContratApprentissage(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si?: number) {
+  const idx = typeof si === "number" ? si : 0;
+  const s = stagiaires[idx] || stagiaires[0] || ({ prenom: "Martin", nom: "Dupont", entreprise: "Tech Solutions SAS" } as StagiaireInfo);
+  const dateDebut = formatDate(getStagiaireDateDebut(s as StagiaireInfo, f));
+  const dateFin = formatDate(getStagiaireDateFin(s as StagiaireInfo, f));
+  return buildDocument({ org: o, title: "CONTRAT D'APPRENTISSAGE", subtitle: `${s.prenom} ${s.nom} – ${f.intitule}`, formation: f, showFormationInfo: true, stagiaires: [s], sections: [
+    { heading: "Parties", content: `<p><strong>Employeur :</strong> ${(s as any).entreprise || "________________________"}<br><strong>Apprenti(e) :</strong> ${s.prenom} ${s.nom}<br><strong>CFA :</strong> ${o.nom}<br><strong>Formation :</strong> ${f.intitule}</p>` },
+    { heading: "Durée du contrat", content: `<p>Date de début : ${dateDebut}<br>Date de fin : ${dateFin}<br>Rythme d'alternance : 3 jours en entreprise / 2 jours en CFA</p>` },
     { heading: "Rémunération", content: "<p>Selon les dispositions légales et conventionnelles en vigueur, conformément à l'article D.6222-26 du Code du travail.</p>" },
     { heading: "Obligations", content: "<p><strong>L'employeur s'engage à :</strong><br>• Assurer la formation pratique de l'apprenti<br>• Désigner un maître d'apprentissage<br>• Permettre à l'apprenti de suivre la formation au CFA<br><br><strong>L'apprenti s'engage à :</strong><br>• Suivre assidûment la formation<br>• Respecter le règlement intérieur<br>• Participer aux évaluations</p>" },
   ], signatures: { type: "3", names: [s.prenom + " " + s.nom, f.formateur] } });
@@ -3891,24 +3894,79 @@ function genFicheMaitreApprentissage(o: OrganismeInfo, f: FormationInfo) {
   ], signatures: { type: "2", labels: ["Le Maître d'apprentissage", "Le Responsable RH"], names: [f.formateur, o.poleAdministratif] } });
 }
 
-function genSuiviEntrepriseCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
-  const rows = stagiaires.slice(0, 5).map((s, i) => [s.prenom + " " + s.nom, s.entreprise, i % 2 === 0 ? "Visite réalisée" : "Visite planifiée", `${7 + (i % 3)}/10`, i < 3 ? "✅ Satisfaisant" : "🔄 En progression"]);
-  return buildDocument({ org: o, title: "SUIVI EN ENTREPRISE", subtitle: f.intitule, table: {
-    headers: ["Apprenti", "Entreprise", "Visite", "Note tuteur", "Appréciation"], rows
-  } });
+function genSuiviEntrepriseCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si?: number) {
+  const idx = typeof si === "number" ? si : 0;
+  const s = stagiaires[idx] || stagiaires[0];
+  if (!s) {
+    return buildDocument({ org: o, title: "SUIVI EN ENTREPRISE", subtitle: f.intitule, sections: [{ heading: "Aucun apprenti", content: "<p>Aucun apprenti renseigné.</p>" }] });
+  }
+  const dateDebut = formatDate(getStagiaireDateDebut(s, f));
+  const dateFin = formatDate(getStagiaireDateFin(s, f));
+  const today = new Date();
+  const dStart = new Date(getStagiaireDateDebut(s, f));
+  const dEnd = new Date(getStagiaireDateFin(s, f));
+  const totalMs = dEnd.getTime() - dStart.getTime();
+  const visites = [
+    { mois: "Mois 2", ratio: 2 / 12 },
+    { mois: "Mois 5", ratio: 5 / 12 },
+    { mois: "Mois 9", ratio: 9 / 12 },
+    { mois: "Mois 11", ratio: 11 / 12 },
+  ];
+  const startMs = dStart.getTime();
+  const rows = visites.map((v, i) => {
+    const d = new Date(startMs + totalMs * v.ratio);
+    const realisee = d.getTime() <= today.getTime();
+    return [
+      v.mois,
+      realisee ? d.toLocaleDateString("fr-FR") : "À planifier",
+      realisee ? "Visite réalisée" : "Visite planifiée",
+      realisee ? `${7 + (i % 3)}/10` : "—",
+      realisee ? (i < 2 ? "Satisfaisant — bonne intégration" : "Satisfaisant — progression notable") : "À venir",
+    ];
+  });
+  return buildDocument({
+    org: o,
+    title: "SUIVI EN ENTREPRISE",
+    subtitle: `${s.prenom} ${s.nom} – ${f.intitule}`,
+    sections: [
+      { heading: "Apprenti(e)", content: `<p><strong>Nom :</strong> ${s.prenom} ${s.nom}<br><strong>Entreprise :</strong> ${(s as any).entreprise || "________________________"}<br><strong>Maître d'apprentissage :</strong> ${(s as any).maitreApprentissage || (s as any).responsableEntreprise || "________________________"}<br><strong>Tuteur CFA :</strong> ${o.responsablePedagogique || f.formateur}<br><strong>Période :</strong> du ${dateDebut} au ${dateFin}</p>` },
+    ],
+    table: { headers: ["Visite", "Date", "Statut", "Note tuteur", "Appréciation"], rows },
+    signatures: { type: "3", names: [s.prenom + " " + s.nom, (s as any).maitreApprentissage || (s as any).responsableEntreprise || ""] },
+  });
 }
 
-function genCompetencesAlternance(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
-  return buildDocument({ org: o, title: "GRILLE DE COMPÉTENCES ALTERNANCE", subtitle: f.intitule, table: {
-    headers: ["Compétence", "CFA", "Entreprise", "Acquis", "Niveau"],
-    rows: [
-      ["C1 – Fondamentaux métier", "Module 1", "Observation", "✅", "Maîtrisé"],
-      ["C2 – Techniques spécialisées", "Module 2", "Pratique guidée", "✅", "Acquis"],
-      ["C3 – Gestion de projet", "Module 3", "Projet tutoré", "🔄", "En cours"],
-      ["C4 – Communication professionnelle", "Transversal", "Réunions client", "✅", "Acquis"],
-      ["C5 – Autonomie", "Évaluation", "Mission autonome", "🔄", "En cours"],
-    ]
-  } });
+function genCompetencesAlternance(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si?: number) {
+  const idx = typeof si === "number" ? si : 0;
+  const s = stagiaires[idx] || stagiaires[0];
+  if (!s) {
+    return buildDocument({ org: o, title: "GRILLE DE COMPÉTENCES ALTERNANCE", subtitle: f.intitule, sections: [{ heading: "Aucun apprenti", content: "<p>Aucun apprenti renseigné.</p>" }] });
+  }
+  const dateDebut = new Date(getStagiaireDateDebut(s, f));
+  const dateFin = new Date(getStagiaireDateFin(s, f));
+  const today = new Date();
+  const progress = Math.min(1, Math.max(0, (today.getTime() - dateDebut.getTime()) / Math.max(1, dateFin.getTime() - dateDebut.getTime())));
+  const niveau = (seuil: number) => progress >= seuil ? ["X", "Maîtrisé"] : progress >= seuil - 0.2 ? ["X", "Acquis"] : ["—", "En cours"];
+  const c1 = niveau(0.3), c2 = niveau(0.5), c3 = niveau(0.7), c4 = niveau(0.5), c5 = niveau(0.85);
+  return buildDocument({
+    org: o,
+    title: "GRILLE DE COMPÉTENCES ALTERNANCE",
+    subtitle: `${s.prenom} ${s.nom} – ${f.intitule}`,
+    sections: [
+      { heading: "Apprenti(e)", content: `<p><strong>Nom :</strong> ${s.prenom} ${s.nom}<br><strong>Entreprise :</strong> ${(s as any).entreprise || "________________________"}<br><strong>Période :</strong> du ${formatDate(dateDebut.toISOString())} au ${formatDate(dateFin.toISOString())}</p>` },
+    ],
+    table: {
+      headers: ["Compétence", "CFA", "Entreprise", "Acquis", "Niveau"],
+      rows: [
+        ["C1 – Fondamentaux métier", "Module 1", "Observation", c1[0], c1[1]],
+        ["C2 – Techniques spécialisées", "Module 2", "Pratique guidée", c2[0], c2[1]],
+        ["C3 – Gestion de projet", "Module 3", "Projet tutoré", c3[0], c3[1]],
+        ["C4 – Communication professionnelle", "Transversal", "Réunions client", c4[0], c4[1]],
+        ["C5 – Autonomie", "Évaluation", "Mission autonome", c5[0], c5[1]],
+      ],
+    },
+    signatures: { type: "3", names: [s.prenom + " " + s.nom, f.formateur] },
+  });
 }
 
 // ============== CFA CT1 IND 1 — Documents d'information ==============
