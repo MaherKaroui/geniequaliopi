@@ -11763,9 +11763,14 @@ function genCalendrierAnnuelCFA(o: OrganismeInfo, f: FormationInfo) {
       continue;
     }
 
-    const isCFAWeek = posInCycle < cfaPerCycle;
+    const isCFAWeek = dayBased ? true : posInCycle < cfaPerCycle;
     posInCycle++;
     if (posInCycle >= cycleLength) posInCycle = 0;
+
+    const cfaLabel = dayBased
+      ? `<strong>CFA + Entreprise</strong><br><small>${cfaDaysPerWeek}j CFA / ${Math.max(0, 5 - cfaDaysPerWeek)}j ent.</small>`
+      : `<strong>CFA</strong>`;
+    const hoursLabel = `${hoursPerCfaWeek}h`;
 
     if (isCFAWeek && moduleIdx < modules.length) {
       cfaWeekNum++;
@@ -11774,27 +11779,26 @@ function genCalendrierAnnuelCFA(o: OrganismeInfo, f: FormationInfo) {
         <td style="text-align:center">S${w + 1}</td>
         <td style="text-align:center">${fmtD(weekStart)} – ${fmtD(weekEnd)}</td>
         <td>${mois}</td>
-        <td style="background:#e8f0fe"><strong>CFA</strong></td>
+        <td style="background:#e8f0fe">${cfaLabel}</td>
         <td style="text-align:center">${cfaWeekNum}</td>
         <td>${mod.titre}</td>
-        <td style="text-align:center">35h</td>
+        <td style="text-align:center">${hoursLabel}</td>
       </tr>`;
-      remainingInModule -= 35;
+      remainingInModule -= hoursPerCfaWeek;
       if (remainingInModule <= 0) {
         moduleIdx++;
         remainingInModule = moduleIdx < modules.length ? modules[moduleIdx].volume : 0;
       }
     } else if (isCFAWeek && moduleIdx >= modules.length) {
-      // All modules done, remaining CFA weeks = revision/exams
       cfaWeekNum++;
       calendarRows += `<tr>
         <td style="text-align:center">S${w + 1}</td>
         <td style="text-align:center">${fmtD(weekStart)} – ${fmtD(weekEnd)}</td>
         <td>${mois}</td>
-        <td style="background:#e8f0fe"><strong>CFA</strong></td>
+        <td style="background:#e8f0fe">${cfaLabel}</td>
         <td style="text-align:center">${cfaWeekNum}</td>
         <td>Révisions / Examens blancs / Certification</td>
-        <td style="text-align:center">35h</td>
+        <td style="text-align:center">${hoursLabel}</td>
       </tr>`;
     } else {
       calendarRows += `<tr style="background:#f0f8f0">
