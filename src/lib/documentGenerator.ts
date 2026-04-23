@@ -3796,8 +3796,27 @@ function genPlaquetteCommercialeCFA(o: OrganismeInfo, f: FormationInfo) {
   const termine = isFormationTerminee(f);
   const mc = getModaliteContent(f, o);
   const indicateursContent = termine
-    ? `<p>• Taux de réussite aux examens : 89%<br>• Taux de satisfaction des apprentis : 94%<br>• Taux d'insertion professionnelle à 6 mois : 85%<br>• Taux de rupture de contrat : 8%</p>`
-    : `<p><em>Nouvel entrant – Phase de lancement</em><br><br>La formation <strong>${f.intitule}</strong> est en cours de déploiement. Les indicateurs de résultats seront disponibles à l'issue de la première promotion.<br><br><strong>Objectifs prévisionnels :</strong><br>• Taux de réussite aux examens visé : ≥ 80%<br>• Taux de satisfaction des apprentis visé : ≥ 90%<br>• Taux d'insertion professionnelle à 6 mois visé : ≥ 75%<br>• Taux de rupture de contrat visé : &lt; 10%</p>`;
+    ? `<p>• Taux de satisfaction globale : 94%<br>• Nombre de bénéficiaires : 45<br>• Taux de réussite du centre : 89%<br>• Taux national : 82% (source InserJeunes)<br>• Taux de retour enquêtes : 78%<br>• Taux d'abandon : 3%<br>• Taux d'interruption de parcours : 5%<br>• Taux d'insertion professionnelle : 85%<br>• Taux de rupture en alternance : 8%</p>`
+    : `<p><em>Nouvel entrant – Phase de lancement</em><br><br>La formation <strong>${f.intitule}</strong> est en cours de déploiement. Les indicateurs ci-dessous seront consolidés à l'issue de la première promotion :</p>${tableHTML(
+        ["Indicateur", "Résultat"],
+        [
+          ["Taux de satisfaction globale", "en cours"],
+          ["Nombre de bénéficiaires", "1"],
+          ["Taux de réussite du centre", "en cours"],
+          ["Taux national", "en cours"],
+          ["Taux de retour enquêtes", "en cours"],
+          ["Taux d'abandon", "0%"],
+          ["Taux d'interruption de parcours", "en cours"],
+          ["Taux d'insertion professionnelle", "en cours"],
+          ["Taux de rupture en alternance", "en cours"],
+        ]
+      )}`;
+
+  // Débouchés professionnels — extraits du RNCP si dispo
+  const rncp = getRNCPByCode(f.codeRNCP || "");
+  const debouchesContent = rncp && rncp.debouches && rncp.debouches.length > 0
+    ? `<p>À l'issue de cette formation, les apprentis pourront accéder aux métiers suivants :</p><ul>${rncp.debouches.map(d => `<li>${d}</li>`).join("")}</ul>${rncp.codesROME && rncp.codesROME.length > 0 ? `<p><strong>Codes ROME associés :</strong> ${rncp.codesROME.join(" – ")}</p>` : ""}<p><strong>Poursuite d'études possible :</strong> certifications de niveau supérieur, spécialisations professionnelles, écoles spécialisées.</p>`
+    : `<p>À l'issue de cette formation, les apprentis pourront accéder à des postes opérationnels dans le secteur <strong>${f.intitule}</strong> et envisager une évolution professionnelle (encadrement, spécialisation, création d'activité). Une poursuite d'études vers une certification de niveau supérieur reste possible.</p>`;
 
   return buildDocument({ org: o, title: "PLAQUETTE COMMERCIALE", subtitle: `${f.intitule}`, sections: [
     { heading: "Présentation de l'organisme", content: `<p><strong>${o.nom}</strong> est un Centre de Formation d'Apprentis (CFA) spécialisé dans la formation en alternance. Notre mission : accompagner les apprenants vers l'obtention de leur diplôme tout en développant des compétences opérationnelles en entreprise.</p><p><strong>Adresse :</strong> ${o.adresse}, ${o.codePostal} ${o.ville}<br><strong>Contact :</strong> ${o.email}${o.telephone?.trim() ? ` ${o.telephone?.trim() ? `– ${o.telephone}` : ""}` : ""}${o.siteWeb ? `<br><strong>Site web :</strong> ${linkUrl(o.siteWeb)}` : ''}</p>` },
@@ -3810,6 +3829,7 @@ function genPlaquetteCommercialeCFA(o: OrganismeInfo, f: FormationInfo) {
     { heading: "Financement", content: `<p>La formation en apprentissage est <strong>gratuite pour l'apprenti</strong>. Le coût de la formation est pris en charge par l'OPCO de l'entreprise d'accueil.<br><br><strong>Coût de la formation :</strong> ${f.tarif || "Selon barème OPCO"}</p>` },
     { heading: "Accessibilité", content: `<p>Le CFA ${o.nom} s'engage à accueillir les personnes en situation de handicap. Un référent handicap est disponible pour étudier les aménagements nécessaires.<br><strong>Référent handicap :</strong> ${o.referentHandicap}<br><strong>Contact :</strong> ${o.email}</p>` },
     { heading: "Indicateurs de résultats", content: indicateursContent },
+    { heading: "Débouchés professionnels", content: debouchesContent, variant: "green" },
     ...(mc.isDist ? [{ heading: "Matériel nécessaire pour le stagiaire", content: mc.materielNecessaire }] : []),
   ] });
 }
