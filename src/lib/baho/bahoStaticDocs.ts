@@ -256,11 +256,13 @@ export function getCGVHTML(e: BahoEntreprise, customFsStamp?: string): string {
   <p style="margin-top:30px;">Fait à ${FORMAT_SPHERE_ORG.ville}, le ${formatDateLong(e.dateConvention)}<br/>
   ${FORMAT_SPHERE_ORG.dirigeant} – Dirigeant</p>
 
+  ${stampsBlock(e, customFsStamp)}
+
   ${footer()}
   </body></html>`;
 }
 
-export function getFactureHTML(e: BahoEntreprise, numero: string): string {
+export function getFactureHTML(e: BahoEntreprise, numero: string, customFsStamp?: string): string {
   const nbStagiaires = e.stagiaires.length;
   const prixUnitaire = 1400;
   const total = nbStagiaires * prixUnitaire;
@@ -327,6 +329,8 @@ export function getFactureHTML(e: BahoEntreprise, numero: string): string {
 
   <p style="margin-top:30px;">Fait à ${FORMAT_SPHERE_ORG.ville}, le ${formatDateLong(e.dateConvention)}<br/>
   ${FORMAT_SPHERE_ORG.dirigeant}</p>
+
+  ${stampsBlock(e, customFsStamp)}
 
   ${footer()}
   </body></html>`;
