@@ -588,9 +588,11 @@ export function buildFullCatalog(
     add("cfa_c1i1_livret_accueil", "CT1 - IND 1 LIVRET D'ACCUEIL CFA", 1, 1, "livret_accueil_cfa");
     add("cfa_procedure_psh", "Procédure PSH CFA", 6, 26, "procedure_psh_cfa");
     // ===== IND 11 — Évaluation de l'atteinte des objectifs (CFA) =====
-    // Émargement CFA — une feuille par semaine CFA avec dates réelles
+    // Émargement CFA — UNE FEUILLE PAR APPRENTI (chaque apprenti = 1 fichier dédié)
     formations.forEach((f, fi) => {
-      add(`cfa_c3i11_emargement_${fi}`, `CT3 - IND 11 FEUILLE D'ÉMARGEMENT CFA`, 3, 11, "emargement_cfa", { fi });
+      stagiaires.forEach((s, si) => {
+        add(`cfa_c3i11_emargement_${fi}_${si}`, `CT3 - IND 11 FEUILLE D'ÉMARGEMENT CFA – ${s.prenom} ${s.nom}`, 3, 11, "emargement_cfa_stagiaire", { fi, stagiaireIdx: si });
+      });
     });
     // Documents individuels per-stagiaire IND 11 CFA
     formations.forEach((f, fi) => {
