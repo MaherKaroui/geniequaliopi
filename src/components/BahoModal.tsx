@@ -193,8 +193,47 @@ export default function BahoModal({ open, onOpenChange }: BahoModalProps) {
           </div>
         </div>
 
-        <div className="text-xs text-muted-foreground bg-muted/50 p-2 rounded">
-          <strong>Émetteur :</strong> {FORMAT_SPHERE_ORG.nom} – SIRET {FORMAT_SPHERE_ORG.siret} – NDA {FORMAT_SPHERE_ORG.nda}
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 text-xs bg-muted/50 p-2 rounded">
+          <div className="flex-1">
+            <strong>Émetteur :</strong> {FORMAT_SPHERE_ORG.nom} – SIRET {FORMAT_SPHERE_ORG.siret} – NDA {FORMAT_SPHERE_ORG.nda}
+          </div>
+          <div className="flex items-center gap-2">
+            <Stamp className="w-4 h-4 text-primary shrink-0" />
+            <span className="text-muted-foreground">
+              Tampon FORMAT SPHERE :{" "}
+              <strong className={fsStamp ? "text-primary" : ""}>
+                {fsStamp ? "Personnalisé ✓" : "Auto-généré"}
+              </strong>
+            </span>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleStampUpload}
+            />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => fileInputRef.current?.click()}
+              className="h-7 gap-1"
+            >
+              <Upload className="w-3 h-3" /> {fsStamp ? "Changer" : "Importer"}
+            </Button>
+            {fsStamp && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setFsStamp(null);
+                  if (fileInputRef.current) fileInputRef.current.value = "";
+                }}
+                className="h-7 px-2"
+              >
+                <X className="w-3 h-3" />
+              </Button>
+            )}
+          </div>
         </div>
 
         <div className="flex justify-end gap-2 pt-2 border-t">
