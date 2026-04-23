@@ -10,7 +10,8 @@ import DocumentGenerator from "@/components/DocumentGenerator";
 import DossierHistory from "@/components/DossierHistory";
 
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, LogIn, LogOut, User, FileSpreadsheet, Upload, Loader2, ShieldCheck, FileCheck, UserCircle, Stamp, Truck } from "lucide-react";
+import { ChevronLeft, ChevronRight, LogIn, LogOut, User, FileSpreadsheet, Upload, Loader2, ShieldCheck, FileCheck, UserCircle, Stamp, Truck, Building2 } from "lucide-react";
+import BahoModal from "@/components/BahoModal";
 import { exportFormDataToExcel } from "@/lib/exportFormData";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -43,6 +44,7 @@ const Index = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const [airtableLoading, setAirtableLoading] = useState(false);
+  const [bahoOpen, setBahoOpen] = useState(false);
 
   const getAirtableErrorMessage = (payload: any) => {
     if (!payload) return "Erreur Airtable inconnue";
@@ -188,8 +190,12 @@ const Index = () => {
             <Button size="lg" variant="outline" className="px-8 py-6 text-base gap-2" onClick={() => navigate("/opco-mobilites")}>
               <Truck className="w-5 h-5" /> OPCO Mobilités
             </Button>
+            <Button size="lg" variant="outline" className="px-8 py-6 text-base gap-2 border-amber-500 text-amber-700 hover:bg-amber-50" onClick={() => setBahoOpen(true)}>
+              <Building2 className="w-5 h-5" /> BAHO (temporaire)
+            </Button>
           </div>
         </div>
+        <BahoModal open={bahoOpen} onOpenChange={setBahoOpen} />
       </div>
     );
   }
