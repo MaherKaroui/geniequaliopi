@@ -4,10 +4,10 @@
 import { useState, useEffect, useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Download, Loader2, Building2, Users, FileText, Eye, ChevronDown, ChevronRight, X, Upload, Stamp } from "lucide-react";
+import { Download, Loader2, Building2, Users, FileText, Eye, ChevronDown, ChevronRight, X, Upload, Stamp, FileSignature, Receipt, ScrollText } from "lucide-react";
 import { getBahoEntreprises, FORMAT_SPHERE_ORG, type BahoEntreprise, type BahoStagiaire } from "@/lib/baho/bahoData";
 import { buildBahoZip } from "@/lib/baho/bahoGenerator";
-import { getRIHTML } from "@/lib/baho/bahoStaticDocs";
+import { getRIHTML, getConventionHTML, getCGVHTML, getFactureHTML } from "@/lib/baho/bahoStaticDocs";
 import { htmlToPdfBlob } from "@/lib/pdfExport";
 import { useBackgroundJobs } from "@/lib/backgroundJobs";
 import { toast } from "sonner";
@@ -17,9 +17,12 @@ interface BahoModalProps {
   onOpenChange: (open: boolean) => void;
 }
 
+type DocKind = "ri" | "convention" | "cgv" | "facture";
+
 interface PreviewState {
   entreprise: BahoEntreprise;
-  stagiaire: BahoStagiaire | null; // null = RI entreprise sans stagiaire
+  stagiaire: BahoStagiaire | null; // null = doc entreprise (sans stagiaire)
+  docKind: DocKind;
   pdfUrl: string;
   loading: boolean;
 }
@@ -65,19 +68,40 @@ export default function BahoModal({ open, onOpenChange }: BahoModalProps) {
     reader.readAsDataURL(file);
   };
 
-  const handlePreview = async (entreprise: BahoEntreprise, stagiaire: BahoStagiaire | null) => {
+  const handlePreview = async (entreprise: BahoEntreprise, stagiaire: BahoStagiaire | null, docKind: DocKind = "ri") => {
     if (preview?.pdfUrl) URL.revokeObjectURL(preview.pdfUrl);
-    setPreview({ entreprise, stagiaire, pdfUrl: "", loading: true });
+    setPreview({ entreprise, stagiaire, docKind, pdfUrl: "", loading: true });
     try {
-      const html = getRIHTML(entreprise, stagiaire ?? undefined, fsStamp ?? undefined);
+      let html = "";
+      switch (docKind) {
+        case "convention":
+          html = getConventionHTML(entreprise, fsStamp ?? undefined);
+          break;
+        case "cgv":
+          html = getCGVHTML(entreprise, fsStamp ?? undefined);
+          break;
+        case "facture":
+          html = getFactureHTML(entreprise, `BAHO-${new Date().getFullYear()}-PREV`, fsStamp ?? undefined);
+          break;
+        case "ri":
+        default:
+          html = getRIHTML(entreprise, stagiaire ?? undefined, fsStamp ?? undefined);
+      }
       const blob = await htmlToPdfBlob(html);
       const url = URL.createObjectURL(blob);
-      setPreview({ entreprise, stagiaire, pdfUrl: url, loading: false });
+      setPreview({ entreprise, stagiaire, docKind, pdfUrl: url, loading: false });
     } catch (err) {
       console.error("Preview error:", err);
       toast.error("Erreur lors de la génération de l'aperçu");
       setPreview(null);
     }
+  };
+
+  const docLabels: Record<DocKind, string> = {
+    convention: "Convention de formation",
+    cgv: "CGV",
+    facture: "Facture",
+    ri: "Règlement intérieur",
   };
 
   const handleGenerate = async () => {
@@ -107,7 +131,7 @@ export default function BahoModal({ open, onOpenChange }: BahoModalProps) {
             <Building2 className="w-5 h-5" /> Pack BAHO – FORMAT SPHERE
           </DialogTitle>
           <DialogDescription>
-            Pack AFEST hôtellerie : {entreprises.length} hôtels, {totalStagiaires} stagiaires. Cliquez sur un stagiaire pour prévisualiser son RI individualisé (avec tampons hôtel + FORMAT SPHERE).
+            Pack AFEST hôtellerie : {entreprises.length} hôtels, {totalStagiaires} stagiaires. Convention par hôtel (avec liste de tous les participants), CGV, Facture, et 1 RI par stagiaire — tous tamponnés (hôtel + FORMAT SPHERE).
           </DialogDescription>
         </DialogHeader>
 
@@ -131,20 +155,46 @@ export default function BahoModal({ open, onOpenChange }: BahoModalProps) {
                   </button>
                   {isOpen && (
                     <div className="ml-6 border-l pl-2 mt-1 space-y-0.5">
+                      {/* Documents par hôtel */}
                       <button
-                        onClick={() => handlePreview(e, null)}
+                        onClick={() => handlePreview(e, null, "convention")}
                         className={`w-full flex items-center gap-2 px-2 py-1 rounded text-xs hover:bg-muted text-left ${
-                          preview?.entreprise.siret === e.siret && preview?.stagiaire === null ? "bg-primary/10 text-primary" : ""
+                          preview?.entreprise.siret === e.siret && preview?.docKind === "convention" ? "bg-primary/10 text-primary" : ""
                         }`}
                       >
-                        <FileText className="w-3 h-3" /> RI entreprise (sans stagiaire)
+                        <FileSignature className="w-3 h-3 shrink-0" /> Convention (avec {e.stagiaires.length} participants)
+                      </button>
+                      <button
+                        onClick={() => handlePreview(e, null, "cgv")}
+                        className={`w-full flex items-center gap-2 px-2 py-1 rounded text-xs hover:bg-muted text-left ${
+                          preview?.entreprise.siret === e.siret && preview?.docKind === "cgv" ? "bg-primary/10 text-primary" : ""
+                        }`}
+                      >
+                        <ScrollText className="w-3 h-3 shrink-0" /> CGV
+                      </button>
+                      <button
+                        onClick={() => handlePreview(e, null, "facture")}
+                        className={`w-full flex items-center gap-2 px-2 py-1 rounded text-xs hover:bg-muted text-left ${
+                          preview?.entreprise.siret === e.siret && preview?.docKind === "facture" ? "bg-primary/10 text-primary" : ""
+                        }`}
+                      >
+                        <Receipt className="w-3 h-3 shrink-0" /> Facture
+                      </button>
+                      <div className="text-[10px] text-muted-foreground px-2 pt-1.5 pb-0.5 uppercase">Règlements intérieurs</div>
+                      <button
+                        onClick={() => handlePreview(e, null, "ri")}
+                        className={`w-full flex items-center gap-2 px-2 py-1 rounded text-xs hover:bg-muted text-left ${
+                          preview?.entreprise.siret === e.siret && preview?.stagiaire === null && preview?.docKind === "ri" ? "bg-primary/10 text-primary" : ""
+                        }`}
+                      >
+                        <FileText className="w-3 h-3 shrink-0" /> RI entreprise (sans stagiaire)
                       </button>
                       {e.stagiaires.map((s) => (
                         <button
                           key={s.codeStagiaire}
-                          onClick={() => handlePreview(e, s)}
+                          onClick={() => handlePreview(e, s, "ri")}
                           className={`w-full flex items-center gap-2 px-2 py-1 rounded text-xs hover:bg-muted text-left ${
-                            preview?.entreprise.siret === e.siret && preview?.stagiaire?.codeStagiaire === s.codeStagiaire
+                            preview?.entreprise.siret === e.siret && preview?.stagiaire?.codeStagiaire === s.codeStagiaire && preview?.docKind === "ri"
                               ? "bg-primary/10 text-primary"
                               : ""
                           }`}
@@ -167,7 +217,7 @@ export default function BahoModal({ open, onOpenChange }: BahoModalProps) {
               <>
                 <div className="px-3 py-2 border-b bg-background flex items-center justify-between text-xs">
                   <span className="truncate">
-                    <strong>{preview.entreprise.nom}</strong>
+                    <strong>{docLabels[preview.docKind]}</strong> – {preview.entreprise.nom}
                     {preview.stagiaire && ` – ${preview.stagiaire.prenom} ${preview.stagiaire.nom}`}
                   </span>
                   <button onClick={() => setPreview(null)} className="hover:text-destructive shrink-0 ml-2">

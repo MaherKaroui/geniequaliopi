@@ -5,7 +5,7 @@
  */
 import JSZip from "jszip";
 import { getBahoEntreprises, FORMAT_SPHERE_ORG, type BahoEntreprise } from "./bahoData";
-import { getRIHTML, getCGVHTML, getFactureHTML } from "./bahoStaticDocs";
+import { getRIHTML, getCGVHTML, getFactureHTML, getConventionHTML } from "./bahoStaticDocs";
 import { htmlToPdfBlob } from "@/lib/pdfExport";
 import { processDocxTemplate, type ConventionTemplateData, type DevisTemplateData } from "./bahoTemplate";
 import type { JobReporter } from "@/lib/backgroundJobs";
@@ -75,11 +75,11 @@ export async function buildBahoZip(reporter?: JobReporter, customFsStamp?: strin
     `Nombre total de stagiaires : ${entreprises.reduce((acc, e) => acc + e.stagiaires.length, 0)}`,
     "",
     "Pour chaque entreprise :",
-    " - Convention de formation (DOCX + PDF)",
-    " - Devis (DOCX + PDF)",
-    " - Facture (PDF)",
-    " - Règlement intérieur (PDF)",
-    " - CGV (PDF)",
+    " - Convention de formation (DOCX template + PDF tamponnée avec liste participants)",
+    " - Devis (DOCX)",
+    " - Facture (PDF tamponnée)",
+    " - Règlements intérieurs : 1 PDF par stagiaire (tamponné)",
+    " - CGV (PDF tamponnée)",
     "",
     "Liste :",
     ...entreprises.map((e, i) => ` ${i + 1}. ${e.nom} – ${e.siret} (${e.stagiaires.length} stagiaires)`),
@@ -94,7 +94,7 @@ export async function buildBahoZip(reporter?: JobReporter, customFsStamp?: strin
     const baseName = `${safeName(e.nom)}_${e.siret}`;
     const devisNumero = `BAHO-${new Date().getFullYear()}-${String(invoiceCounter++).padStart(3, "0")}`;
 
-    // 1. Convention DOCX (template)
+    // 1. Convention DOCX (template) + PDF tamponné
     try {
       reporter?.setMessage(`${e.nom} – Convention DOCX…`);
       const conventionBlob = await processDocxTemplate(
@@ -102,9 +102,15 @@ export async function buildBahoZip(reporter?: JobReporter, customFsStamp?: strin
         buildConventionData(e) as unknown as Record<string, string>
       );
       folder.file(`Convention_de_formation_${baseName}.docx`, conventionBlob);
+
+      // PDF version with all participants + tampons (RI, hôtel + FORMAT SPHERE)
+      reporter?.setMessage(`${e.nom} – Convention PDF tamponnée…`);
+      const conventionHtml = getConventionHTML(e, customFsStamp);
+      const conventionPdf = await htmlToPdfBlob(conventionHtml);
+      folder.file(`Convention_de_formation_${baseName}_TAMPONNEE.pdf`, conventionPdf);
     } catch (err) {
-      console.error("Convention DOCX error:", err);
-      folder.file(`ERREUR_Convention.txt`, `Erreur génération Convention DOCX: ${(err as Error).message}`);
+      console.error("Convention error:", err);
+      folder.file(`ERREUR_Convention.txt`, `Erreur génération Convention: ${(err as Error).message}`);
     }
     step++; reporter?.setProgress(Math.round((step / totalSteps) * 100));
 
@@ -122,10 +128,10 @@ export async function buildBahoZip(reporter?: JobReporter, customFsStamp?: strin
     }
     step++; reporter?.setProgress(Math.round((step / totalSteps) * 100));
 
-    // 3. Facture PDF
+    // 3. Facture PDF (tamponnée)
     try {
       reporter?.setMessage(`${e.nom} – Facture PDF…`);
-      const factureHTML = getFactureHTML(e, devisNumero);
+      const factureHTML = getFactureHTML(e, devisNumero, customFsStamp);
       const facturePdf = await htmlToPdfBlob(factureHTML);
       folder.file(`Facture_${devisNumero}_${baseName}.pdf`, facturePdf);
     } catch (err) {
@@ -154,10 +160,10 @@ export async function buildBahoZip(reporter?: JobReporter, customFsStamp?: strin
     }
     step++; reporter?.setProgress(Math.round((step / totalSteps) * 100));
 
-    // 5. CGV PDF
+    // 5. CGV PDF (tamponnée)
     try {
       reporter?.setMessage(`${e.nom} – CGV…`);
-      const cgvHTML = getCGVHTML(e);
+      const cgvHTML = getCGVHTML(e, customFsStamp);
       const cgvPdf = await htmlToPdfBlob(cgvHTML);
       folder.file(`CGV_${baseName}.pdf`, cgvPdf);
     } catch (err) {
