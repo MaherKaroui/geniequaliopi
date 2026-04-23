@@ -501,10 +501,9 @@ export default function OPCOMobilites() {
         }
         if (isPerSession) {
           const zip = new JSZip();
-          // C12 : 1 PDF par session (l'exercice est partagé). Autres : 1 PDF par stagiaire + 1 trame vierge par session.
-          const isC12 = doc.code === "C12";
+          // B9, C11, C12 : 1 PDF par stagiaire + 1 trame vierge par session.
           const totalUnits = sessionsSnap.reduce(
-            (acc, g) => acc + (isC12 ? 1 : g.stagiaires.length + 1),
+            (acc, g) => acc + g.stagiaires.length + 1,
             0,
           ) || 1;
           let processedUnits = 0;
@@ -513,37 +512,26 @@ export default function OPCOMobilites() {
             const suffix = formatSessionSuffix(g, i);
             const folder = zip.folder(suffix)!;
 
-            if (isC12) {
-              reporter.setMessage(`${doc.code} — Session ${i + 1}/${sessionsSnap.length}`);
-              const blob = await generateAutoBlobForSession(doc, g.stagiaires);
+            for (const s of g.stagiaires) {
+              reporter.setMessage(`${doc.code} — Session ${i + 1}/${sessionsSnap.length} : ${s.prenom} ${s.nom}`);
+              const blob = await generateAutoBlobForSession(doc, [s]);
               if (blob) {
-                folder.file(buildOpcoFileName(ctxSnap, doc.label, "pdf", suffix), blob);
-              }
-              processedUnits++;
-              reporter.setProgress((processedUnits / totalUnits) * 90);
-              await new Promise((r) => setTimeout(r, 0));
-            } else {
-              for (const s of g.stagiaires) {
-                reporter.setMessage(`${doc.code} — Session ${i + 1}/${sessionsSnap.length} : ${s.prenom} ${s.nom}`);
-                const blob = await generateAutoBlobForSession(doc, [s]);
-                if (blob) {
-                  const stagSuffix = `${s.prenom || ""}_${s.nom || ""}`.trim() || "Stagiaire";
-                  folder.file(buildOpcoFileName(ctxSnap, doc.label, "pdf", stagSuffix), blob);
-                }
-                processedUnits++;
-                reporter.setProgress((processedUnits / totalUnits) * 90);
-                await new Promise((r) => setTimeout(r, 0));
-              }
-
-              reporter.setMessage(`${doc.code} — Trame vierge session ${i + 1}/${sessionsSnap.length}`);
-              const viergeBlob = await generateViergeBlobForSession(doc.code, g.stagiaires);
-              if (viergeBlob) {
-                folder.file(buildOpcoFileName(ctxSnap, `${doc.label} (Trame vierge)`, "pdf", suffix), viergeBlob);
+                const stagSuffix = `${s.prenom || ""}_${s.nom || ""}`.trim() || "Stagiaire";
+                folder.file(buildOpcoFileName(ctxSnap, doc.label, "pdf", stagSuffix), blob);
               }
               processedUnits++;
               reporter.setProgress((processedUnits / totalUnits) * 90);
               await new Promise((r) => setTimeout(r, 0));
             }
+
+            reporter.setMessage(`${doc.code} — Trame vierge session ${i + 1}/${sessionsSnap.length}`);
+            const viergeBlob = await generateViergeBlobForSession(doc.code, g.stagiaires);
+            if (viergeBlob) {
+              folder.file(buildOpcoFileName(ctxSnap, `${doc.label} (Trame vierge)`, "pdf", suffix), viergeBlob);
+            }
+            processedUnits++;
+            reporter.setProgress((processedUnits / totalUnits) * 90);
+            await new Promise((r) => setTimeout(r, 0));
           }
           if (doc.code === "B9") {
             reporter.setMessage("B9 — Calendrier Excel consolidé...");
