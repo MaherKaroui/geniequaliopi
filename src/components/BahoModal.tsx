@@ -101,6 +101,7 @@ export default function BahoModal({ open, onOpenChange }: BahoModalProps) {
   };
 
   const docLabels: Record<DocKind, string> = {
+    programme: "Programme de formation",
     convention: "Convention de formation",
     devis: "Devis",
     cgv: "CGV",
@@ -160,6 +161,14 @@ export default function BahoModal({ open, onOpenChange }: BahoModalProps) {
                   {isOpen && (
                     <div className="ml-6 border-l pl-2 mt-1 space-y-0.5">
                       {/* Documents par hôtel */}
+                      <button
+                        onClick={() => handlePreview(e, null, "programme")}
+                        className={`w-full flex items-center gap-2 px-2 py-1 rounded text-xs hover:bg-muted text-left ${
+                          preview?.entreprise.siret === e.siret && preview?.docKind === "programme" ? "bg-primary/10 text-primary" : ""
+                        }`}
+                      >
+                        <FileText className="w-3 h-3 shrink-0" /> Programme de formation
+                      </button>
                       <button
                         onClick={() => handlePreview(e, null, "convention")}
                         className={`w-full flex items-center gap-2 px-2 py-1 rounded text-xs hover:bg-muted text-left ${
