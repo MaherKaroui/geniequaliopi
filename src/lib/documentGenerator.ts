@@ -3814,8 +3814,8 @@ function genPlaquetteCommercialeCFA(o: OrganismeInfo, f: FormationInfo) {
 
   // Débouchés professionnels — extraits du RNCP si dispo
   const rncp = getRNCPByCode(f.codeRNCP || "");
-  const debouchesContent = rncp && rncp.debouches && rncp.debouches.length > 0
-    ? `<p>À l'issue de cette formation, les apprentis pourront accéder aux métiers suivants :</p><ul>${rncp.debouches.map(d => `<li>${d}</li>`).join("")}</ul>${rncp.codesROME && rncp.codesROME.length > 0 ? `<p><strong>Codes ROME associés :</strong> ${rncp.codesROME.join(" – ")}</p>` : ""}<p><strong>Poursuite d'études possible :</strong> certifications de niveau supérieur, spécialisations professionnelles, écoles spécialisées.</p>`
+  const debouchesContent = rncp && rncp.typesEmplois && rncp.typesEmplois.length > 0
+    ? `<p>À l'issue de cette formation, les apprentis pourront accéder aux métiers suivants :</p><ul>${rncp.typesEmplois.map(d => `<li>${d}</li>`).join("")}</ul>${rncp.codesROME && rncp.codesROME.length > 0 ? `<p><strong>Codes ROME associés :</strong> ${rncp.codesROME.join(" – ")}</p>` : ""}<p><strong>Poursuite d'études possible :</strong> certifications de niveau supérieur, spécialisations professionnelles, écoles spécialisées.</p>`
     : `<p>À l'issue de cette formation, les apprentis pourront accéder à des postes opérationnels dans le secteur <strong>${f.intitule}</strong> et envisager une évolution professionnelle (encadrement, spécialisation, création d'activité). Une poursuite d'études vers une certification de niveau supérieur reste possible.</p>`;
 
   return buildDocument({ org: o, title: "PLAQUETTE COMMERCIALE", subtitle: `${f.intitule}`, sections: [
