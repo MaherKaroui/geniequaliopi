@@ -141,6 +141,12 @@ export function getPreferredExtension(template: string, exportFormat: ExportForm
   if (template === "tableau_suivi_parcours_beneficiaires_cfa_excel") return ".xlsx";
   if (template === "calendrier_annuel_cfa") return ".xlsx";
   if (template === "tableau_suivi_parcours_excel") return ".xlsx";
+  if (template === "plan_dev_competences_excel") return ".xlsx";
+  if (template === "tableau_amelioration_continue_excel") return ".xlsx";
+  if (template === "suivi_dysfonctionnements_excel") return ".xlsx";
+  if (template === "relances_appreciations_excel") return ".xlsx";
+  if (template === "indicateurs_performance") return ".xlsx";
+  if (template === "vae_indicateurs_previsionnels") return ".xlsx";
   if (EXCEL_TEMPLATES.has(template)) return ".xls";
   if (MAIL_DOCX_TEMPLATES.has(template)) return ".docx";
   return exportFormat === "pdf" ? ".pdf" : ".doc";
