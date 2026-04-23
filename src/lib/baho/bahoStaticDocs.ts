@@ -296,7 +296,7 @@ export function getConventionHTML(e: BahoEntreprise, customFsStamp?: string): st
   <p class="article-title">Article 7 – Différends éventuels</p>
   <p>Si une contestation ou un différend ne peuvent être réglés à l'amiable, le Tribunal compétent du ressort du siège social de l'Organisme sera seul compétent.</p>
 
-  <p style="margin-top:25px;">Fait à ${e.adresse.split(" ").slice(-1)[0] || FORMAT_SPHERE_ORG.ville}, en double exemplaire, le ${formatDateLong(e.dateConvention)}</p>
+  <p style="margin-top:25px;">Fait à ${e.adresse.split(" ").slice(-1)[0] || FORMAT_SPHERE_ORG.ville}, en double exemplaire, le ${formatDateLong(dateConv)}</p>
 
   ${stampsBlock(e, customFsStamp)}
 
