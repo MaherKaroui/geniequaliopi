@@ -3894,24 +3894,77 @@ function genFicheMaitreApprentissage(o: OrganismeInfo, f: FormationInfo) {
   ], signatures: { type: "2", labels: ["Le Maître d'apprentissage", "Le Responsable RH"], names: [f.formateur, o.poleAdministratif] } });
 }
 
-function genSuiviEntrepriseCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
-  const rows = stagiaires.slice(0, 5).map((s, i) => [s.prenom + " " + s.nom, s.entreprise, i % 2 === 0 ? "Visite réalisée" : "Visite planifiée", `${7 + (i % 3)}/10`, i < 3 ? "✅ Satisfaisant" : "🔄 En progression"]);
-  return buildDocument({ org: o, title: "SUIVI EN ENTREPRISE", subtitle: f.intitule, table: {
-    headers: ["Apprenti", "Entreprise", "Visite", "Note tuteur", "Appréciation"], rows
-  } });
+function genSuiviEntrepriseCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si?: number) {
+  const idx = typeof si === "number" ? si : 0;
+  const s = stagiaires[idx] || stagiaires[0];
+  if (!s) {
+    return buildDocument({ org: o, title: "SUIVI EN ENTREPRISE", subtitle: f.intitule, sections: [{ heading: "Aucun apprenti", content: "<p>Aucun apprenti renseigné.</p>" }] });
+  }
+  const dateDebut = formatDate(getStagiaireDateDebut(s, f));
+  const dateFin = formatDate(getStagiaireDateFin(s, f));
+  const today = new Date();
+  const totalMs = (getStagiaireDateFin(s, f).getTime() - getStagiaireDateDebut(s, f).getTime());
+  const visites = [
+    { mois: "Mois 2", ratio: 2 / 12 },
+    { mois: "Mois 5", ratio: 5 / 12 },
+    { mois: "Mois 9", ratio: 9 / 12 },
+    { mois: "Mois 11", ratio: 11 / 12 },
+  ];
+  const startMs = getStagiaireDateDebut(s, f).getTime();
+  const rows = visites.map((v, i) => {
+    const d = new Date(startMs + totalMs * v.ratio);
+    const realisee = d.getTime() <= today.getTime();
+    return [
+      v.mois,
+      realisee ? d.toLocaleDateString("fr-FR") : "À planifier",
+      realisee ? "Visite réalisée" : "Visite planifiée",
+      realisee ? `${7 + (i % 3)}/10` : "—",
+      realisee ? (i < 2 ? "Satisfaisant — bonne intégration" : "Satisfaisant — progression notable") : "À venir",
+    ];
+  });
+  return buildDocument({
+    org: o,
+    title: "SUIVI EN ENTREPRISE",
+    subtitle: `${s.prenom} ${s.nom} – ${f.intitule}`,
+    sections: [
+      { heading: "Apprenti(e)", content: `<p><strong>Nom :</strong> ${s.prenom} ${s.nom}<br><strong>Entreprise :</strong> ${(s as any).entreprise || "________________________"}<br><strong>Maître d'apprentissage :</strong> ${(s as any).maitreApprentissage || (s as any).responsableEntreprise || "________________________"}<br><strong>Tuteur CFA :</strong> ${o.responsablePedagogique || f.formateur}<br><strong>Période :</strong> du ${dateDebut} au ${dateFin}</p>` },
+    ],
+    table: { headers: ["Visite", "Date", "Statut", "Note tuteur", "Appréciation"], rows },
+    signatures: { type: "3", names: [s.prenom + " " + s.nom, (s as any).maitreApprentissage || (s as any).responsableEntreprise || ""] },
+  });
 }
 
-function genCompetencesAlternance(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
-  return buildDocument({ org: o, title: "GRILLE DE COMPÉTENCES ALTERNANCE", subtitle: f.intitule, table: {
-    headers: ["Compétence", "CFA", "Entreprise", "Acquis", "Niveau"],
-    rows: [
-      ["C1 – Fondamentaux métier", "Module 1", "Observation", "✅", "Maîtrisé"],
-      ["C2 – Techniques spécialisées", "Module 2", "Pratique guidée", "✅", "Acquis"],
-      ["C3 – Gestion de projet", "Module 3", "Projet tutoré", "🔄", "En cours"],
-      ["C4 – Communication professionnelle", "Transversal", "Réunions client", "✅", "Acquis"],
-      ["C5 – Autonomie", "Évaluation", "Mission autonome", "🔄", "En cours"],
-    ]
-  } });
+function genCompetencesAlternance(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si?: number) {
+  const idx = typeof si === "number" ? si : 0;
+  const s = stagiaires[idx] || stagiaires[0];
+  if (!s) {
+    return buildDocument({ org: o, title: "GRILLE DE COMPÉTENCES ALTERNANCE", subtitle: f.intitule, sections: [{ heading: "Aucun apprenti", content: "<p>Aucun apprenti renseigné.</p>" }] });
+  }
+  const dateDebut = getStagiaireDateDebut(s, f);
+  const dateFin = getStagiaireDateFin(s, f);
+  const today = new Date();
+  const progress = Math.min(1, Math.max(0, (today.getTime() - dateDebut.getTime()) / Math.max(1, dateFin.getTime() - dateDebut.getTime())));
+  const niveau = (seuil: number) => progress >= seuil ? ["X", "Maîtrisé"] : progress >= seuil - 0.2 ? ["X", "Acquis"] : ["—", "En cours"];
+  const c1 = niveau(0.3), c2 = niveau(0.5), c3 = niveau(0.7), c4 = niveau(0.5), c5 = niveau(0.85);
+  return buildDocument({
+    org: o,
+    title: "GRILLE DE COMPÉTENCES ALTERNANCE",
+    subtitle: `${s.prenom} ${s.nom} – ${f.intitule}`,
+    sections: [
+      { heading: "Apprenti(e)", content: `<p><strong>Nom :</strong> ${s.prenom} ${s.nom}<br><strong>Entreprise :</strong> ${(s as any).entreprise || "________________________"}<br><strong>Période :</strong> du ${formatDate(dateDebut)} au ${formatDate(dateFin)}</p>` },
+    ],
+    table: {
+      headers: ["Compétence", "CFA", "Entreprise", "Acquis", "Niveau"],
+      rows: [
+        ["C1 – Fondamentaux métier", "Module 1", "Observation", c1[0], c1[1]],
+        ["C2 – Techniques spécialisées", "Module 2", "Pratique guidée", c2[0], c2[1]],
+        ["C3 – Gestion de projet", "Module 3", "Projet tutoré", c3[0], c3[1]],
+        ["C4 – Communication professionnelle", "Transversal", "Réunions client", c4[0], c4[1]],
+        ["C5 – Autonomie", "Évaluation", "Mission autonome", c5[0], c5[1]],
+      ],
+    },
+    signatures: { type: "3", names: [s.prenom + " " + s.nom, f.formateur] },
+  });
 }
 
 // ============== CFA CT1 IND 1 — Documents d'information ==============
