@@ -236,7 +236,7 @@ export function getConventionHTML(e: BahoEntreprise, customFsStamp?: string): st
     .join("");
 
   const nbHeures = 14;
-  const prixUnit = 1400;
+  const prixUnit = 2000;
   const totalHt = e.stagiaires.length * prixUnit;
 
   return `<!DOCTYPE html><html><head><meta charset="utf-8"/>${BASE_CSS}
