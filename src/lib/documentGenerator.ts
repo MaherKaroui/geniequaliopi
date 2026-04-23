@@ -11812,7 +11812,17 @@ function genCalendrierAnnuelCFA(o: OrganismeInfo, f: FormationInfo) {
   const cfaDaysPerWeek = getCFADaysPerWeek(rythme);
   const hoursPerCfaWeek = dayBased ? cfaDaysPerWeek * 7 : 35;
   const { totalHours } = parseDuree(f.duree);
-  const effectiveTotal = totalHours > 0 ? totalHours : 420;
+  // Si le rythme spécifie des heures CFA explicites (ex. "910h CFA / 280h entreprise"),
+  // on prend uniquement les heures CFA pour le calendrier (et non la durée totale qui inclurait l'entreprise).
+  const hourBasedRythme = isHourBasedRythme(rythme);
+  let effectiveTotal: number;
+  if (hourBasedRythme) {
+    const hMatch = rythme.toLowerCase().match(/(\d+)\s*h\b/i);
+    const cfaHoursFromRythme = hMatch ? parseInt(hMatch[1]) : 0;
+    effectiveTotal = cfaHoursFromRythme > 0 ? cfaHoursFromRythme : (totalHours > 0 ? totalHours : 420);
+  } else {
+    effectiveTotal = totalHours > 0 ? totalHours : 420;
+  }
   const totalCFAWeeks = Math.max(1, Math.ceil(effectiveTotal / hoursPerCfaWeek));
   const cycleLength = dayBased ? 1 : (cfaPerCycle + entrepriseWeeks);
   const totalCycles = Math.ceil(totalCFAWeeks / Math.max(1, cfaPerCycle));
