@@ -131,6 +131,8 @@ export function getPreferredExtension(template: string, exportFormat: ExportForm
   if (template === "pdf_static") return ".pdf";
   if (template === "outils_suivi_alternance_excel") return ".xlsx";
   if (template === "suivi_parcours_beneficiaires_excel") return ".xlsx";
+  if (template === "suivi_public_beneficiaire_excel") return ".xlsx";
+  if (template === "suivi_pfmp_excel") return ".xlsx";
   if (EXCEL_TEMPLATES.has(template)) return ".xls";
   if (MAIL_DOCX_TEMPLATES.has(template)) return ".docx";
   return exportFormat === "pdf" ? ".pdf" : ".doc";
