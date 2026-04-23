@@ -181,7 +181,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "questionnaire_positionnement": return genQuestionnairePositionnement(o, f, stagiaires);
     case "analyse_besoin": return genAnalyseBesoins(o, f, stagiaires);
     case "entretien_prealable": return genEntretienPrealable(o);
-    case "programme_formation": return genProgramme(o, f, stagiaires, realStagiairesCount);
+    case "programme_formation": return genProgramme(o, f, stagiaires, realStagiairesCount, params?.isCFA === true);
     case "objectifs_pedagogiques": return genObjectifs(o, f);
     case "plan_pedagogique": return genPlanPedagogique(o, f);
     case "adaptation_contenu": return genAdaptation(o, f);
@@ -1504,7 +1504,7 @@ function genEntretienPrealable(o: OrganismeInfo) {
   ] });
 }
 
-function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], realStagiairesCount: number = 1) {
+function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], realStagiairesCount: number = 1, isCFA: boolean = false) {
   const nbStagiaires = realStagiairesCount;
   // Parse programme into day blocks for the déroulé pédagogique table
   const programmeLines = f.programme.split("\n").filter(l => l.trim());
@@ -2104,7 +2104,21 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
 
     <h2>14. Indicateurs de performance – Année ${anneeFormation}</h2>
     <div class="section">
-      ${isFormationTerminee(f, stagiaires) ? `
+      ${isCFA ? `
+      <table>
+        <tr><th style="width:55%">Indicateur</th><th>Résultat</th></tr>
+        <tr><td>Taux de satisfaction globale</td><td><em>en cours</em></td></tr>
+        <tr><td>Nombre de bénéficiaires</td><td>${nbStagiaires}</td></tr>
+        <tr><td>Taux de réussite du centre</td><td><em>en cours</em></td></tr>
+        <tr><td>Taux national</td><td><em>en cours</em></td></tr>
+        <tr><td>Taux de retour enquêtes</td><td><em>en cours</em></td></tr>
+        <tr><td>Taux d'abandon</td><td>0</td></tr>
+        <tr><td>Taux d'interruption de parcours</td><td><em>en cours</em></td></tr>
+        <tr><td>Taux d'insertion professionnelle</td><td><em>en cours</em></td></tr>
+        <tr><td>Taux de rupture en alternance</td><td><em>en cours</em></td></tr>
+      </table>
+      <p style="margin-top:8px"><em>Indicateurs publiés annuellement (InserJeunes / France Compétences) sur ${o.siteWeb && o.siteWeb.trim() ? `${isFacebookPage(o.siteWeb) ? 'la page Facebook' : 'le site internet'} de ${o.nom}` : `demande auprès de ${o.nom}`}.</em></p>
+      ` : isFormationTerminee(f, stagiaires) ? `
       <table>
         <tr><th>Indicateur</th><th>Résultat</th></tr>
         <tr><td>Taux de satisfaction globale</td><td>100 / 100</td></tr>
@@ -2135,8 +2149,39 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
     </div>
     ${isBlocFormation ? blocDerouleHtml : derouleHtml}
 
+    ${isCFA ? `
+    <h2>16. Préparation à la certification</h2>
+    <div class="section section-green">
+      <p>Un dispositif d'entraînement intensif est mis en place tout au long de la formation pour garantir la réussite à l'examen :</p>
+      <ul>
+        <li><strong>Simulations d'épreuves</strong> – Mise en conditions réelles d'examen (mise en situation professionnelle)</li>
+        <li><strong>Entretien technique</strong> – Préparation à l'argumentation pédagogique et professionnelle</li>
+        <li><strong>Questionnaire professionnel</strong> – Entraînement aux QCM de connaissances</li>
+        <li><strong>Dossier Professionnel (DP)</strong> – Accompagnement à la rédaction, relecture et finalisation</li>
+        <li><strong>Inscription officielle</strong> – Gestion par le centre sur la plateforme CERES et envoi de la convocation</li>
+      </ul>
+    </div>
+
+    <h2>17. Débouchés professionnels</h2>
+    <div class="section">
+      ${(() => {
+        const rncp = f.codeRNCP ? getRNCPByCode(f.codeRNCP) : undefined;
+        const metiers = rncp?.typesEmplois && rncp.typesEmplois.length > 0
+          ? rncp.typesEmplois
+          : ["Métiers en lien direct avec la certification visée"];
+        const rome = rncp?.codesROME && rncp.codesROME.length > 0 ? rncp.codesROME : [];
+        return `
+          <p><strong>À l'issue de la formation, l'apprenti pourra exercer notamment les métiers suivants :</strong></p>
+          <ul>${metiers.map(m => `<li>${m}</li>`).join("")}</ul>
+          ${rome.length > 0 ? `<p style="margin-top:10px"><strong>Codes ROME associés :</strong> ${rome.join(", ")}</p>` : ""}
+          <p style="margin-top:10px"><strong>Poursuite d'études possible :</strong> certifications de niveau supérieur, spécialisations métier (CCS), formations complémentaires en lien avec le secteur.</p>
+        `;
+      })()}
+    </div>
+    ` : ""}
+
     <div class="section section-orange" style="margin-top:25px">
-      <p><strong>📋 Documents remis au stagiaire :</strong></p>
+      <p><strong>📋 Documents remis ${isCFA ? "à l'apprenti" : "au stagiaire"} :</strong></p>
       <ul>
         <li>Support de cours / fiches pratiques</li>
         <li>Attestation de fin de formation</li>
