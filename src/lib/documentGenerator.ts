@@ -13417,9 +13417,23 @@ function genAITestPositionnement(o: OrganismeInfo, f: FormationInfo, stagiaires:
   if (!pack) return aiPackPlaceholder(o, f, title, s);
 
   const qcm = mode === "debut" ? pack.qcmDebut : pack.qcmFin;
-  const answers = answersForQCM(qcm, si, s, mode);
+
+  // Si test de FIN et formation non terminée pour ce stagiaire → trame vierge
+  const stagFini = isStagiaireFormationTerminee(s, f);
+  const renderEmpty = mode === "fin" && !stagFini;
+
+  const answers = renderEmpty ? [] : answersForQCM(qcm, si, s, mode);
   let correct = 0;
   const rows = qcm.map((q, qi) => {
+    if (renderEmpty) {
+      return [
+        `Q${qi + 1}`,
+        q.question,
+        q.options.map((opt, oi) => `${String.fromCharCode(65 + oi)}) ${opt}`).join("<br>"),
+        "À compléter",
+        "—",
+      ];
+    }
     const chosen = answers[qi];
     const ok = chosen === q.correctIndex;
     if (ok) correct++;
@@ -13431,20 +13445,30 @@ function genAITestPositionnement(o: OrganismeInfo, f: FormationInfo, stagiaires:
       ok ? "Correct" : "Incorrect",
     ];
   });
-  const score = correct;
-  const pct = Math.round((score / qcm.length) * 100);
-  const niveau = mode === "debut"
-    ? (pct >= 70 ? "Bon niveau initial" : pct >= 40 ? "Niveau intermédiaire" : "Niveau débutant")
-    : (pct >= 80 ? "Objectifs atteints — Excellent" : pct >= 60 ? "Objectifs atteints" : "Objectifs partiellement atteints");
 
   let extra = `<h2>${title}</h2>`;
   extra += `<p><strong>Stagiaire :</strong> ${s.civilite ? s.civilite + " " : ""}${s.prenom} ${s.nom}<br>
     <strong>Formation :</strong> ${f.intitule}<br>
-    <strong>Date :</strong> ${formatDate(mode === "debut" ? getStagiaireDateDebut(s, f) : getStagiaireDateFin(s, f))}<br>
+    <strong>Date :</strong> ${renderEmpty ? "À compléter en fin de formation" : formatDate(mode === "debut" ? getStagiaireDateDebut(s, f) : getStagiaireDateFin(s, f))}<br>
     <strong>Nombre de questions :</strong> ${qcm.length} — <strong>Durée :</strong> 30 minutes — <strong>Barème :</strong> 1 pt / réponse</p>`;
-  extra += tableHTML(["N°", "Question", "Réponse du stagiaire", "Bonne réponse", "Résultat"], rows);
-  extra += `<div class="section section-green"><p><strong>Score : ${score}/${qcm.length} (${pct}%)</strong></p>
-    <p><strong>Appréciation :</strong> ${niveau}.</p></div>`;
+
+  if (renderEmpty) {
+    extra += `<div class="section" style="background:#fef3c7;border-left:3px solid #f59e0b;padding:10px;margin-bottom:15px">
+      <p><strong>Trame vierge</strong> — Le test de fin de formation sera complété par le stagiaire à l'issue de la session.</p>
+    </div>`;
+    extra += tableHTML(["N°", "Question", "Options proposées", "Réponse du stagiaire", "Résultat"], rows);
+    extra += `<div class="section"><p><strong>Score : ____ / ${qcm.length}  (____ %)</strong></p>
+      <p><strong>Appréciation :</strong> ____________________________________________________________</p></div>`;
+  } else {
+    const score = correct;
+    const pct = Math.round((score / qcm.length) * 100);
+    const niveau = mode === "debut"
+      ? (pct >= 70 ? "Bon niveau initial" : pct >= 40 ? "Niveau intermédiaire" : "Niveau débutant")
+      : (pct >= 80 ? "Objectifs atteints — Excellent" : pct >= 60 ? "Objectifs atteints" : "Objectifs partiellement atteints");
+    extra += tableHTML(["N°", "Question", "Réponse du stagiaire", "Bonne réponse", "Résultat"], rows);
+    extra += `<div class="section section-green"><p><strong>Score : ${score}/${qcm.length} (${pct}%)</strong></p>
+      <p><strong>Appréciation :</strong> ${niveau}.</p></div>`;
+  }
 
   return buildDocument({
     org: o, title, subtitle: f.intitule, formation: f, showFormationInfo: false, stagiaires: [s], extraHtml: extra,
