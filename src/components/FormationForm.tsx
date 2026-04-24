@@ -18,9 +18,10 @@ interface FormationFormProps {
   data: FormationInfo;
   onChange: (data: FormationInfo) => void;
   onImportStagiaires?: (stagiaires: StagiaireInfo[]) => void;
+  onApplyOrganisme?: (organisme: OrganismeInfo) => void;
 }
 
-const FormationForm = ({ data, onChange, onImportStagiaires }: FormationFormProps) => {
+const FormationForm = ({ data, onChange, onImportStagiaires, onApplyOrganisme }: FormationFormProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const formateurSigRef = useRef<HTMLInputElement>(null);
   const [importedSessions, setImportedSessions] = useState<EdofSession[]>([]);
