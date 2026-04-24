@@ -142,7 +142,7 @@ function ministereStyle(): string {
   return `<style>
     *{box-sizing:border-box;margin:0;padding:0}
     body{font-family:'Calibri','Arial',sans-serif;color:#000;font-size:11pt;line-height:1.4}
-    .page{max-width:780px;margin:0 auto;padding:30px 40px;background:#fff;position:relative;min-height:1100px}
+    .page{max-width:780px;margin:0 auto;padding:24px 40px 70px;background:#fff;position:relative}
     .page-break{page-break-after:always;break-after:page}
     .ministere-header{margin-bottom:20px}
     .ministere-header img.ministere-logo-img{display:block;max-height:110px;width:auto}
