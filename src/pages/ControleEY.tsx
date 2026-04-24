@@ -331,6 +331,7 @@ const ControleEY = () => {
                     data={formation}
                     onChange={handleFormChange}
                     onImportStagiaires={handleStagChange}
+                    onApplyOrganisme={handleOrgChange}
                   />
                 )}
                 {key === "stagiaires" && <StagiairesForm data={stagiaires} onChange={handleStagChange} />}
