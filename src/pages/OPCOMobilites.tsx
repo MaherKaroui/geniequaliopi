@@ -235,7 +235,7 @@ export default function OPCOMobilites() {
     if (doc.autoTemplates.length === 0) return null;
     for (const template of doc.autoTemplates) {
       try {
-        const params = stagiaireIdx !== undefined ? { stagiaireIdx, fi: 0, forceFilled: true } : { fi: 0, forceFilled: true };
+        const params = stagiaireIdx !== undefined ? { stagiaireIdx, fi: 0, forceFilled: true, isCFA: true } : { fi: 0, forceFilled: true, isCFA: true };
         const html = generateDocumentById(`opco_${doc.code}`, template, params, mergedOrganisme, formation, mergedStagiaires);
         if (html) return await htmlToPdfBlob(html);
       } catch (e) {
@@ -283,7 +283,7 @@ export default function OPCOMobilites() {
     for (const template of doc.autoTemplates) {
       try {
         // On passe UNIQUEMENT les stagiaires de cette session → le doc ne contiendra qu'1 session
-        const html = generateDocumentById(`opco_${doc.code}`, template, { fi: 0, forceFilled: true }, mergedOrganisme, formation, sessionStagiaires);
+        const html = generateDocumentById(`opco_${doc.code}`, template, { fi: 0, forceFilled: true, isCFA: true }, mergedOrganisme, formation, sessionStagiaires);
         if (html) return await htmlToPdfBlob(html);
       } catch (e) {
         console.warn(`Template ${template} failed for ${doc.code} (session):`, e);
@@ -301,7 +301,7 @@ export default function OPCOMobilites() {
       const html = generateDocumentById(
         "opco_C12",
         "exercices_opco_semaine",
-        { weekIdx, fi: 0, forceFilled: true },
+        { weekIdx, fi: 0, forceFilled: true, isCFA: true },
         mergedOrganisme,
         formation,
         [stagiaire],
@@ -328,7 +328,7 @@ export default function OPCOMobilites() {
       docCode === "C11" ? "temps_connexion_opco_vierge" : null;
     if (!template) return null;
     try {
-      const html = generateDocumentById(`opco_${docCode}_vierge`, template, { fi: 0, forceFilled: true }, mergedOrganisme, formation, sessionStagiaires);
+      const html = generateDocumentById(`opco_${docCode}_vierge`, template, { fi: 0, forceFilled: true, isCFA: true }, mergedOrganisme, formation, sessionStagiaires);
       if (html) return await htmlToPdfBlob(html);
     } catch (e) {
       console.warn(`Trame vierge ${template} failed for ${docCode}:`, e);
@@ -352,7 +352,7 @@ export default function OPCOMobilites() {
     const out: Array<{ template: string; blob: Blob }> = [];
     for (const template of doc.autoTemplates) {
       try {
-        const params = stagiaireIdx !== undefined ? { stagiaireIdx, fi: 0, forceFilled: true } : { fi: 0, forceFilled: true };
+        const params = stagiaireIdx !== undefined ? { stagiaireIdx, fi: 0, forceFilled: true, isCFA: true } : { fi: 0, forceFilled: true, isCFA: true };
         const html = generateDocumentById(`opco_${doc.code}`, template, params, mergedOrganisme, formation, mergedStagiaires);
         if (html) {
           const blob = await htmlToPdfBlob(html);
@@ -367,7 +367,7 @@ export default function OPCOMobilites() {
 
   // ─────────── Aperçu + Édition ───────────
   const renderPreviewForTemplate = (doc: OpcoDocumentItem, templateIdx: number): string | null => {
-    const params = doc.perStagiaire && mergedStagiaires.length > 0 ? { stagiaireIdx: 0, fi: 0, forceFilled: true } : { fi: 0, forceFilled: true };
+    const params = doc.perStagiaire && mergedStagiaires.length > 0 ? { stagiaireIdx: 0, fi: 0, forceFilled: true, isCFA: true } : { fi: 0, forceFilled: true, isCFA: true };
     // C6 : on respecte le template choisi par l'utilisateur
     if (doc.code === "C6") {
       const tpl = doc.autoTemplates[templateIdx] || doc.autoTemplates[0];
