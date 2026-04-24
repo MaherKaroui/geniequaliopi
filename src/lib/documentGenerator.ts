@@ -12989,18 +12989,22 @@ function genExercicesOPCO(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
       ? `Session ${groupIdx} — ${g.stagiaires.map(s => `${s.prenom} ${s.nom}`).join(", ")}`
       : `Session — ${g.stagiaires.map(s => `${s.prenom} ${s.nom}`).join(", ")}`;
 
-    if (groupIdx > 1) {
-      extra += `<div class="page-break-before" style="page-break-before:always;break-before:page;height:0px;overflow:hidden"></div>`;
+    if (!isSingleWeek) {
+      if (groupIdx > 1) {
+        extra += `<div class="page-break-before" style="page-break-before:always;break-before:page;height:0px;overflow:hidden"></div>`;
+      }
+      extra += `<h3 style="margin-top:18px;page-break-after:avoid">${titreGroupe}</h3>`;
+      extra += `<p><strong>Période :</strong> du ${formatDate(g.debut)} au ${formatDate(g.fin)} &nbsp;|&nbsp; <strong>Nombre de semaines école :</strong> ${ecoleWeeks.length} &nbsp;|&nbsp; <strong>Exercices à produire :</strong> ${ecoleWeeks.length}</p>`;
     }
-    extra += `<h3 style="margin-top:18px;page-break-after:avoid">${titreGroupe}</h3>`;
-    extra += `<p><strong>Période :</strong> du ${formatDate(g.debut)} au ${formatDate(g.fin)} &nbsp;|&nbsp; <strong>Nombre de semaines école :</strong> ${ecoleWeeks.length} &nbsp;|&nbsp; <strong>Exercices à produire :</strong> ${ecoleWeeks.length}</p>`;
 
     if (ecoleWeeks.length === 0) {
-      extra += `<p style="color:#888;font-style:italic">Aucune semaine école programmée sur cette session.</p>`;
+      if (!isSingleWeek) extra += `<p style="color:#888;font-style:italic">Aucune semaine école programmée sur cette session.</p>`;
       continue;
     }
 
     ecoleWeeks.forEach(([wIdx, days], exIdx) => {
+      // Mode single-week : ne garder que la semaine demandée
+      if (isSingleWeek && wIdx !== params!.weekIdx) return;
       const lastDay = days[days.length - 1];
       const firstDay = days[0];
       const isPast = lastDay <= today;
