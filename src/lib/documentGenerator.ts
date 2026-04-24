@@ -13132,7 +13132,27 @@ function genExercicesOPCO(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
   if (!isSingleWeek) {
     extra += `<p style="margin-top:14px;font-size:0.9em"><em>Chaque exercice porte sur les acquis de la semaine en centre de formation. Les exercices sont systématiquement corrigés par le formateur et restitués lors de la séance suivante. Les exercices futurs seront ajoutés au fur et à mesure du déroulement de la formation.</em></p>`;
   }
-  extra += `<p style="margin-top:18px"><strong>Fait à</strong> ${o.ville || "—"}, <strong>le</strong> ${formatDate(new Date().toISOString())}</p>`;
+  // Date de signature : en mode semaine unique → date de l'exercice (dernier jour école de la semaine).
+  // En mode global → date d'aujourd'hui.
+  let signatureDateStr = formatDate(new Date().toISOString());
+  if (isSingleWeek) {
+    const firstGroup = groupes.values().next().value as Sess | undefined;
+    if (firstGroup) {
+      const refDate = parseD(firstGroup.debut);
+      const shift = computeWeekShift(firstGroup.debut);
+      const allDays = buildAllWorkdays(firstGroup.debut, firstGroup.fin);
+      if (refDate) {
+        const daysInWeek = allDays.filter((d) => {
+          const wIdx = weekIndex(d, refDate);
+          return wIdx === params!.weekIdx && isEcoleWeek(wIdx, shift);
+        });
+        if (daysInWeek.length > 0) {
+          signatureDateStr = fmtDateLong(daysInWeek[daysInWeek.length - 1]);
+        }
+      }
+    }
+  }
+  extra += `<p style="margin-top:18px"><strong>Fait à</strong> ${o.ville || "—"}, <strong>le</strong> ${signatureDateStr}</p>`;
   extra += `<p><strong>${o.dirigeant || o.responsablePedagogique || "Le responsable pédagogique"}</strong><br>${o.nom}</p>`;
 
   const title = isSingleWeek
