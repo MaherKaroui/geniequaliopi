@@ -376,7 +376,7 @@ export default function BahoModal({ open, onOpenChange }: BahoModalProps) {
           </Button>
           <Button onClick={handleGenerate} disabled={generating} className="gap-2">
             {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
-            {generating ? "Lancement…" : `Générer le ZIP complet (${entreprises.length * 6 + totalStagiaires} docs)`}
+            {generating ? "Lancement…" : `Générer le ZIP complet (${entreprises.length * 6 + totalStagiaires * 3} docs)`}
           </Button>
         </div>
       </DialogContent>
