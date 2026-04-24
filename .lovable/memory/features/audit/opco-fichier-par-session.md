@@ -1,23 +1,30 @@
 ---
 name: OPCO un fichier par stagiaire dans dossier de session (B9, C11, C12)
-description: Téléchargement OPCO Mobilités - les documents B9 (calendrier), C11 (temps connexion) et C12 (exercices) génèrent 1 fichier PDF PAR STAGIAIRE dans un sous-dossier de session, regroupés par dates communes
+description: Téléchargement OPCO Mobilités - B9 (calendrier) et C11 (temps connexion) génèrent 1 PDF par stagiaire par session. C12 (exercices) génère 1 PDF PAR SEMAINE ÉCOLE PASSÉE PAR STAGIAIRE (séparés)
 type: feature
 ---
 Pour les 3 documents OPCO Mobilités groupés par session (B9 Calendrier, C11 Temps de connexion, C12 Exercices) :
 
 - **Constante** `PER_SESSION_DOCS = new Set(["B9", "C11", "C12"])` dans `src/pages/OPCOMobilites.tsx`.
-- **Helper** `groupStagiairesBySession()` regroupe les stagiaires par couple `(dateDebutFormation, dateFinFormation)` (priorité dates individuelles > dates globales formation).
-- **Helper** `generateAutoBlobForSession(doc, sessionStagiaires)` appelle `generateDocumentById` avec les stagiaires passés en paramètre.
-- **Helper** `formatSessionSuffix(g, idx)` produit le suffixe de dossier `Session_{idx+1}_{YYYY-MM-DD}_au_{YYYY-MM-DD}`.
+- **Helper** `groupStagiairesBySession()` regroupe les stagiaires par couple `(dateDebutFormation, dateFinFormation)`.
+- **Helper** `generateAutoBlobForSession(doc, sessionStagiaires)` pour B9 / C11.
+- **Helper** `generateC12WeekBlob(stagiaire, weekIdx)` pour C12 (1 PDF mono-semaine mono-stagiaire).
+- **Helper exporté** `getOpcoExerciceWeeks(f, sessionStagiaires)` (dans `src/lib/documentGenerator.ts`) renvoie les semaines école PASSÉES uniquement (`lastDay <= today`).
 
-**Structure ZIP** (téléchargement individuel ET export global) :
-- 1 dossier par session (nommé `Session_X_{date_debut}_au_{date_fin}`).
-- À l'intérieur : **1 PDF PAR STAGIAIRE** (suffixé `Prenom_Nom`) — y compris pour C12 (exercices).
-- Pour B9 et C11 : ajout d'une trame vierge par session dans le même dossier (C12 n'a pas de trame vierge).
-- Pour B9 : Excel calendrier consolidé multi-onglets ajouté à la racine du ZIP (téléchargement individuel) ou du sous-dossier (export global).
+**Structure ZIP B9 / C11** :
+- 1 dossier par session (`Session_X_{date_debut}_au_{date_fin}`).
+- À l'intérieur : 1 PDF par stagiaire + 1 trame vierge.
+- B9 : Excel calendrier consolidé multi-onglets ajouté à la racine du ZIP.
 
-**Téléchargement individuel** (`handleDownloadSingle`) : ZIP avec arborescence ci-dessus.
+**Structure ZIP C12 (NOUVEAU)** :
+- 1 dossier par session.
+- 1 sous-dossier par stagiaire (`Prenom_Nom`).
+- À l'intérieur : **1 PDF PAR SEMAINE ÉCOLE PASSÉE** nommé `Exercice_pratique_semaine_..._Semaine_NN_YYYY-MM-DD_Prenom_Nom_<date>.pdf`.
+- Les semaines futures sont **ignorées** (pas de PDF généré).
+- Pas de trame vierge pour C12.
 
-**Export ZIP global** (`handleExportFullZip`) : sous-dossier dédié `{folder}/{code}_{label}/` contenant l'arborescence par session.
+**Templates** :
+- `exercices_opco` (legacy, doc unique tout-en-un, conservé pour compatibilité).
+- `exercices_opco_semaine` (nouveau, accepte `params.weekIdx` pour rendre une seule semaine).
 
-**Fonctions sources inchangées** : `genCalendrierFormationOPCO`, `genTempsConnexionOPCO`, `genExercicesOPCO` dans `src/lib/documentGenerator.ts`.
+**Mode single-week dans `genExercicesOPCO`** : quand `params.weekIdx` est fourni, le doc omet l'intro/le tableau récapitulatif et le titre de session, et ne rend que le bloc QCM de la semaine demandée pour les stagiaires fournis (1 dans ce cas).

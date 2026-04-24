@@ -887,7 +887,8 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "calendrier_formation_opco_vierge": return genCalendrierFormationOPCOVierge(o, f, stagiaires);
     case "temps_connexion_opco": return genTempsConnexionOPCO(o, f, stagiaires);
     case "temps_connexion_opco_vierge": return genTempsConnexionOPCOVierge(o, f, stagiaires);
-    case "exercices_opco": return genExercicesOPCO(o, f, stagiaires);
+    case "exercices_opco": return genExercicesOPCO(o, f, stagiaires, params);
+    case "exercices_opco_semaine": return genExercicesOPCO(o, f, stagiaires, params);
     case "decoupage_formation_cfa_excel": return genDecoupageFormationCFAExcel(o, f);
     case "suivi_inscriptions_excel": return generateExcelSuiviInscriptions(o, f, stagiaires);
     case "visuel_mission_cfa": return genVisuelMissionCFA(o, params?.imageUrl || "", params?.missionTitre || "");
@@ -12775,7 +12776,97 @@ function genTempsConnexionOPCOVierge(o: OrganismeInfo, f: FormationInfo, stagiai
  * - Si la semaine école est future → exercice listé en "À venir" (vierge).
  * - Si formation pas encore terminée : seules les semaines passées sont remplies.
  */
-function genExercicesOPCO(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
+/**
+ * Calcule la liste des semaines école PASSÉES pour une session OPCO.
+ * Renvoie 1 entrée par semaine école avec premier/dernier jour école.
+ * Permet à OPCOMobilites.tsx de générer 1 PDF par semaine × stagiaire.
+ */
+export function getOpcoExerciceWeeks(
+  f: FormationInfo,
+  sessionStagiaires: StagiaireInfo[],
+): Array<{ weekIdx: number; firstDay: Date; lastDay: Date }> {
+  const parseRythme = (txt?: string): { ecole: number; entreprise: number } => {
+    if (!txt) return { ecole: 1, entreprise: 3 };
+    const m = txt.match(/(\d+)\s*sem[^0-9]*?(\d+)\s*sem/i);
+    if (m) return { ecole: Math.max(1, parseInt(m[1])), entreprise: Math.max(0, parseInt(m[2])) };
+    return { ecole: 1, entreprise: 3 };
+  };
+  const rythme = parseRythme(f.rythmeAlternance);
+  const cycleWeeks = rythme.ecole + rythme.entreprise;
+  const parseD = (s: string): Date | null => {
+    if (!s) return null;
+    const t = s.trim();
+    const fr = t.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if (fr) return new Date(parseInt(fr[3]), parseInt(fr[2]) - 1, parseInt(fr[1]));
+    const d = new Date(t);
+    return isNaN(d.getTime()) ? null : d;
+  };
+  const startOfWeek = (d: Date): Date => {
+    const r = new Date(d);
+    const dow = r.getDay();
+    const diff = dow === 0 ? -6 : 1 - dow;
+    r.setDate(r.getDate() + diff);
+    r.setHours(0, 0, 0, 0);
+    return r;
+  };
+  const weekIndex = (d: Date, ref: Date): number => {
+    const a = startOfWeek(d).getTime();
+    const b = startOfWeek(ref).getTime();
+    return Math.round((a - b) / (7 * 24 * 3600 * 1000));
+  };
+  const computeWeekShift = (startStr: string): number => {
+    const d = parseD(startStr);
+    if (!d) return 0;
+    const dow = d.getDay();
+    const remaining = dow === 0 ? 0 : Math.max(0, 6 - Math.max(dow, 1));
+    return remaining < 3 ? 1 : 0;
+  };
+  const isEcoleWeek = (wIdx: number, shift = 0): boolean => {
+    const adjusted = wIdx - shift;
+    if (adjusted < 0) return true;
+    const pos = ((adjusted % cycleWeeks) + cycleWeeks) % cycleWeeks;
+    return pos < rythme.ecole;
+  };
+
+  // PRIORITÉ aux dates individuelles : fallback sur la formation globale
+  const s0 = sessionStagiaires[0];
+  const debut = (s0?.dateDebutFormation || f.dateDebut || "");
+  const fin = (s0?.dateFinFormation || f.dateFin || "");
+  const refDate = parseD(debut);
+  const endDate = parseD(fin);
+  if (!refDate || !endDate) return [];
+
+  const today = new Date();
+  today.setHours(23, 59, 59, 999);
+
+  const shift = computeWeekShift(debut);
+  const cur = new Date(refDate);
+  const weekMap = new Map<number, Date[]>();
+  while (cur <= endDate) {
+    const dow = cur.getDay();
+    if (dow !== 0 && dow !== 6) {
+      const wIdx = weekIndex(cur, refDate);
+      if (isEcoleWeek(wIdx, shift)) {
+        if (!weekMap.has(wIdx)) weekMap.set(wIdx, []);
+        weekMap.get(wIdx)!.push(new Date(cur));
+      }
+    }
+    cur.setDate(cur.getDate() + 1);
+  }
+  const ordered = Array.from(weekMap.entries()).sort((a, b) => a[0] - b[0]);
+  const out: Array<{ weekIdx: number; firstDay: Date; lastDay: Date }> = [];
+  ordered.forEach(([wIdx, days]) => {
+    const firstDay = days[0];
+    const lastDay = days[days.length - 1];
+    // Ne renvoyer QUE les semaines passées (lastDay <= today)
+    if (lastDay <= today) {
+      out.push({ weekIdx: wIdx, firstDay, lastDay });
+    }
+  });
+  return out;
+}
+
+function genExercicesOPCO(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], params?: { weekIdx?: number }) {
   // Parse rythme alternance (défaut 1 sem école / 3 sem entreprise)
   const parseRythme = (txt?: string): { ecole: number; entreprise: number } => {
     if (!txt) return { ecole: 1, entreprise: 3 };
@@ -12860,15 +12951,21 @@ function genExercicesOPCO(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
     groupes.set("__default__", { debut: f.dateDebut, fin: f.dateFin, stagiaires: stagiaires.length ? stagiaires : [FALLBACK_STAGIAIRE] });
   }
 
-  let extra = `<p><em>Exercices pratiques de fin de semaine pour le suivi pédagogique en alternance. Un exercice par semaine en centre de formation, daté du dernier jour école de la semaine concernée. Une session par page. Les semaines à venir sont listées et seront complétées au fur et à mesure du déroulement de la formation.</em></p>`;
-  extra += `<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%;margin-bottom:18px">
-    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold;width:30%">Intitulé de la formation</td><td>${f.intitule}</td></tr>
-    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Organisme</td><td>${o.nom}${o.nda ? ` – NDA ${o.nda}` : ""}</td></tr>
-    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Rythme d'alternance</td><td>${rythmeLabel}</td></tr>
-    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Cadence des exercices</td><td>1 exercice par semaine en centre de formation, daté du dernier jour école de la semaine</td></tr>
-    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Date d'extraction</td><td>${formatDate(new Date().toISOString())}</td></tr>
-    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Nombre de sessions</td><td>${groupes.size}</td></tr>
-  </table>`;
+  const isSingleWeek = typeof params?.weekIdx === "number";
+
+  let extra = isSingleWeek
+    ? ""
+    : `<p><em>Exercices pratiques de fin de semaine pour le suivi pédagogique en alternance. Un exercice par semaine en centre de formation, daté du dernier jour école de la semaine concernée. Une session par page. Les semaines à venir sont listées et seront complétées au fur et à mesure du déroulement de la formation.</em></p>`;
+  if (!isSingleWeek) {
+    extra += `<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%;margin-bottom:18px">
+      <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold;width:30%">Intitulé de la formation</td><td>${f.intitule}</td></tr>
+      <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Organisme</td><td>${o.nom}${o.nda ? ` – NDA ${o.nda}` : ""}</td></tr>
+      <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Rythme d'alternance</td><td>${rythmeLabel}</td></tr>
+      <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Cadence des exercices</td><td>1 exercice par semaine en centre de formation, daté du dernier jour école de la semaine</td></tr>
+      <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Date d'extraction</td><td>${formatDate(new Date().toISOString())}</td></tr>
+      <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Nombre de sessions</td><td>${groupes.size}</td></tr>
+    </table>`;
+  }
 
   let groupIdx = 0;
   for (const [, g] of groupes) {
@@ -12893,18 +12990,22 @@ function genExercicesOPCO(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
       ? `Session ${groupIdx} — ${g.stagiaires.map(s => `${s.prenom} ${s.nom}`).join(", ")}`
       : `Session — ${g.stagiaires.map(s => `${s.prenom} ${s.nom}`).join(", ")}`;
 
-    if (groupIdx > 1) {
-      extra += `<div class="page-break-before" style="page-break-before:always;break-before:page;height:0px;overflow:hidden"></div>`;
+    if (!isSingleWeek) {
+      if (groupIdx > 1) {
+        extra += `<div class="page-break-before" style="page-break-before:always;break-before:page;height:0px;overflow:hidden"></div>`;
+      }
+      extra += `<h3 style="margin-top:18px;page-break-after:avoid">${titreGroupe}</h3>`;
+      extra += `<p><strong>Période :</strong> du ${formatDate(g.debut)} au ${formatDate(g.fin)} &nbsp;|&nbsp; <strong>Nombre de semaines école :</strong> ${ecoleWeeks.length} &nbsp;|&nbsp; <strong>Exercices à produire :</strong> ${ecoleWeeks.length}</p>`;
     }
-    extra += `<h3 style="margin-top:18px;page-break-after:avoid">${titreGroupe}</h3>`;
-    extra += `<p><strong>Période :</strong> du ${formatDate(g.debut)} au ${formatDate(g.fin)} &nbsp;|&nbsp; <strong>Nombre de semaines école :</strong> ${ecoleWeeks.length} &nbsp;|&nbsp; <strong>Exercices à produire :</strong> ${ecoleWeeks.length}</p>`;
 
     if (ecoleWeeks.length === 0) {
-      extra += `<p style="color:#888;font-style:italic">Aucune semaine école programmée sur cette session.</p>`;
+      if (!isSingleWeek) extra += `<p style="color:#888;font-style:italic">Aucune semaine école programmée sur cette session.</p>`;
       continue;
     }
 
     ecoleWeeks.forEach(([wIdx, days], exIdx) => {
+      // Mode single-week : ne garder que la semaine demandée
+      if (isSingleWeek && wIdx !== params!.weekIdx) return;
       const lastDay = days[days.length - 1];
       const firstDay = days[0];
       const isPast = lastDay <= today;
@@ -13027,13 +13128,19 @@ function genExercicesOPCO(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
     });
   }
 
-  extra += `<p style="margin-top:14px;font-size:0.9em"><em>Chaque exercice porte sur les acquis de la semaine en centre de formation. Les exercices sont systématiquement corrigés par le formateur et restitués lors de la séance suivante. Les exercices futurs seront ajoutés au fur et à mesure du déroulement de la formation.</em></p>`;
+  if (!isSingleWeek) {
+    extra += `<p style="margin-top:14px;font-size:0.9em"><em>Chaque exercice porte sur les acquis de la semaine en centre de formation. Les exercices sont systématiquement corrigés par le formateur et restitués lors de la séance suivante. Les exercices futurs seront ajoutés au fur et à mesure du déroulement de la formation.</em></p>`;
+  }
   extra += `<p style="margin-top:18px"><strong>Fait à</strong> ${o.ville || "—"}, <strong>le</strong> ${formatDate(new Date().toISOString())}</p>`;
   extra += `<p><strong>${o.dirigeant || o.responsablePedagogique || "Le responsable pédagogique"}</strong><br>${o.nom}</p>`;
 
+  const title = isSingleWeek
+    ? `EXERCICE PRATIQUE — SEMAINE ÉCOLE`
+    : "EXERCICES PRATIQUES PAR SEMAINE — SUIVI ALTERNANCE";
+
   return buildDocument({
     org: o,
-    title: "EXERCICES PRATIQUES PAR SEMAINE — SUIVI ALTERNANCE",
+    title,
     subtitle: f.intitule,
     extraHtml: extra,
   });
