@@ -46,7 +46,6 @@ export async function buildBahoZip(reporter?: JobReporter, customFsStamp?: strin
     "",
     "Pour chaque stagiaire (PDF tamponné) :",
     " - Convocation individuelle",
-    " - Feuille d'émargement individuelle",
     " - Certificat de réalisation individuel",
     "",
     "Liste :",
