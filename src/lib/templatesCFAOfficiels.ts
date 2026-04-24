@@ -813,7 +813,7 @@ export function genECFOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
   // ===== Page Signatures finale =====
   html += `<div class="page">
     <h2 class="section-title">Observations générales</h2>
-    <div class="obs-box" style="min-height:80px">${termine ? "Le parcours de formation a été mené à son terme. Le/la candidat(e) peut être présenté(e) à la session d'examen du titre professionnel." : "&nbsp;"}</div>
+    <div class="obs-box" style="min-height:80px">${termine ? `Le parcours de formation menant au titre professionnel « ${intituleTitre} » a été mené à son terme dans le respect du référentiel et des modalités pédagogiques prévues. Le/la candidat(e) ${s.prenom} ${(s.nom || "").toUpperCase()} a démontré sa capacité à mobiliser les compétences attendues sur l'ensemble des activités-types. Il/elle peut être présenté(e) à la session d'examen du titre professionnel.` : "&nbsp;"}</div>
 
     <h3 class="subsection" style="margin-top:20px">Formateur(s) / Évaluateur(s)</h3>
     <table class="eval-table">
