@@ -91,6 +91,11 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
   const previewIframeRef = useRef<HTMLIFrameElement>(null);
   const orgName = organisme.nom || "Organisme";
   const safeName = useMemo(() => orgName.replace(/[^a-zA-Z0-9_-]/g, "_"), [orgName]);
+  // Organisme enrichi avec la signature EY (utilisée pour DP/ECF/PV comme signature du dirigeant/représentant)
+  const organismeWithSignature = useMemo<OrganismeInfo>(() => {
+    if (!signature) return organisme;
+    return { ...organisme, signatureUrl: organisme.signatureUrl || signature };
+  }, [organisme, signature]);
   const mergedStagiaires = useMemo(
     () => mergeStagiaires(stagiaires).filter((stagiaire): stagiaire is StagiaireInfo => Boolean(stagiaire)),
     [stagiaires]
