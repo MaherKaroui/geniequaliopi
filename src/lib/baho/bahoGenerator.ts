@@ -17,7 +17,9 @@ function safeName(s: string): string {
 export async function buildBahoZip(reporter?: JobReporter, customFsStamp?: string): Promise<Blob> {
   const zip = new JSZip();
   const entreprises = getBahoEntreprises();
-  const totalSteps = entreprises.length * 6; // 6 docs par entreprise
+  const totalStagiaires = entreprises.reduce((acc, e) => acc + e.stagiaires.length, 0);
+  // 6 docs par entreprise + 3 docs par stagiaire (convocation, émargement, certificat)
+  const totalSteps = entreprises.length * 6 + totalStagiaires * 3;
   let step = 0;
 
   reporter?.setMessage(`Génération de ${entreprises.length} dossiers BAHO…`);
@@ -32,15 +34,20 @@ export async function buildBahoZip(reporter?: JobReporter, customFsStamp?: strin
     `NDA : ${FORMAT_SPHERE_ORG.nda}`,
     "",
     `Nombre d'entreprises : ${entreprises.length}`,
-    `Nombre total de stagiaires : ${entreprises.reduce((acc, e) => acc + e.stagiaires.length, 0)}`,
+    `Nombre total de stagiaires : ${totalStagiaires}`,
     "",
     "Pour chaque entreprise (PDF uniquement) :",
     " - Programme de formation (PDF tamponné)",
     " - Convention de formation (PDF tamponnée avec liste participants)",
     " - Devis (PDF tamponné)",
-    " - Facture (PDF tamponnée)",
+    " - Facture (PDF tamponnée avec liste participants + modalité présentiel)",
     " - Règlement intérieur (PDF tamponné)",
     " - CGV (PDF tamponnée)",
+    "",
+    "Pour chaque stagiaire (PDF tamponné) :",
+    " - Convocation individuelle",
+    " - Feuille d'émargement individuelle",
+    " - Certificat de réalisation individuel",
     "",
     "Liste :",
     ...entreprises.map((e, i) => ` ${i + 1}. ${e.nom} – ${e.siret} (${e.stagiaires.length} stagiaires)`),
