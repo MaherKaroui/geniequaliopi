@@ -14,19 +14,21 @@ import { saveAs } from "file-saver";
 import {
   Home, Truck, ChevronDown, ChevronRight, Upload, CheckCircle2, Circle,
   XCircle, Download, FileText, Loader2, FolderArchive, Eye, Pencil, Save,
-  LogIn, LogOut, FolderOpen, Trash2, Plus,
+  LogIn, LogOut, FolderOpen, Trash2, Plus, Palette,
 } from "lucide-react";
 import OrganismeForm from "@/components/OrganismeForm";
 import FormationForm from "@/components/FormationForm";
 import StagiairesForm from "@/components/StagiairesForm";
+import DocStyleConfigPanel from "@/components/DocStyleConfigPanel";
 import {
   OPCO_DOCUMENTS, OPCO_CATEGORIES, type OpcoCategory,
   type OpcoDocumentItem, type OpcoDocState, type OpcoDocStatus,
 } from "@/lib/opcoMobilitesCatalog";
 import { buildOpcoFileName, buildOpcoZipFolder, buildOpcoRootName, type OpcoNamingContext } from "@/lib/opcoNaming";
-import type { OrganismeInfo, FormationInfo, StagiaireInfo, CritereData } from "@/types/qualiopi";
-import { CRITERES } from "@/types/qualiopi";
+import type { OrganismeInfo, FormationInfo, StagiaireInfo, CritereData, DocStyleConfig } from "@/types/qualiopi";
+import { CRITERES, DEFAULT_DOC_STYLE } from "@/types/qualiopi";
 import { generateDocumentById, getOpcoExerciceWeeks } from "@/lib/documentGenerator";
+import { setDocStyle as applyDocStyle } from "@/lib/docBuilder";
 import { generateAIEvalPack, getCachedPack, clearCachedPack } from "@/lib/aiEvalPack";
 import { Sparkles } from "lucide-react";
 import { generateExcelCalendrierOPCO, excelToBlob } from "@/lib/xlsxGenerator";
