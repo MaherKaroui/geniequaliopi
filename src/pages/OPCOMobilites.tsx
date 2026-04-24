@@ -292,6 +292,32 @@ export default function OPCOMobilites() {
     return null;
   };
 
+  /** C12 : génère 1 PDF pour UNE semaine école ET UN stagiaire donnés. */
+  const generateC12WeekBlob = async (
+    stagiaire: StagiaireInfo,
+    weekIdx: number,
+  ): Promise<Blob | null> => {
+    try {
+      const html = generateDocumentById(
+        "opco_C12",
+        "exercices_opco_semaine",
+        { weekIdx, fi: 0, forceFilled: true },
+        mergedOrganisme,
+        formation,
+        [stagiaire],
+      );
+      if (html) return await htmlToPdfBlob(html);
+    } catch (e) {
+      console.warn(`C12 semaine ${weekIdx} failed for ${stagiaire.prenom} ${stagiaire.nom}:`, e);
+    }
+    return null;
+  };
+
+  /** Format date pour suffixe fichier : YYYY-MM-DD */
+  const fmtDateForFile = (d: Date): string => {
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  };
+
   /** Génère la trame VIERGE pour B9 (calendrier) ou C11 (temps de connexion). Retourne null si non applicable. */
   const generateViergeBlobForSession = async (
     docCode: string,
