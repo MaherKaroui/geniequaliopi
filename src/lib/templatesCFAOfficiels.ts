@@ -447,7 +447,7 @@ export function genDPOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: St
 
   // ===== PAGE 1 - Couverture =====
   const nomUsage = (s.nom || "").toUpperCase();
-  html += `<div class="page">
+  html += `<div class="page" style="page-break-before:always;break-before:page">
     <div style="text-align:center;font-size:10pt;margin-bottom:8px">
       <p style="font-style:italic;color:#555">Liberté • Égalité • Fraternité</p>
       <p style="font-weight:bold;letter-spacing:1px">RÉPUBLIQUE FRANÇAISE</p>
@@ -468,7 +468,7 @@ export function genDPOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: St
   </div>`;
 
   // ===== PAGE 2 - Présentation =====
-  html += `<div class="page">
+  html += `<div class="page" style="page-break-before:always;break-before:page">
     <h2 class="section-title">DOSSIER PROFESSIONNEL (DP)</h2>
     <h3 class="subsection">Présentation du dossier</h3>
     <p class="justify">Le dossier professionnel (DP) constitue un élément du système de validation du titre professionnel. <strong>Ce titre est délivré par le Ministère chargé de l'emploi.</strong></p>
@@ -503,7 +503,7 @@ export function genDPOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: St
       <div class="sommaire-exemple"><span>▶ Exemple n° 2</span><span>p. ${firstPage + 1}</span></div>`;
   }).join("");
   const pageAfterExemples = pageExemple + activites.length * 2;
-  html += `<div class="page">
+  html += `<div class="page" style="page-break-before:always;break-before:page">
     <h2 class="section-title">DOSSIER PROFESSIONNEL (DP)</h2>
     <h3 class="subsection" style="text-align:center;font-size:14pt">Sommaire</h3>
     <h4 style="margin-top:20px;text-align:center;font-style:italic">Exemples de pratique professionnelle</h4>
@@ -516,7 +516,7 @@ export function genDPOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: St
   </div>`;
 
   // ===== PAGE 4 - Séparateur Exemples =====
-  html += `<div class="page" style="display:flex;align-items:center;justify-content:center;flex-direction:column">
+  html += `<div class="page" style="page-break-before:always;break-before:page;display:flex;align-items:center;justify-content:center;flex-direction:column">
     <h2 class="section-title" style="text-align:center;width:100%">DOSSIER PROFESSIONNEL (DP)</h2>
     <h1 style="font-size:22pt;text-align:center;margin:120px 0 80px;letter-spacing:2px;color:#0055A4">EXEMPLES DE PRATIQUE PROFESSIONNELLE</h1>
     ${footerDPOfficiel("4")}
@@ -528,7 +528,7 @@ export function genDPOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: St
     const aiExemple = aiPack?.exemples?.[ai] || null;
     [1, 2].forEach((exNum) => {
       const ex = buildDPExemple(f, s, act, ai, exNum, aiExemple);
-      html += `<div class="page">
+      html += `<div class="page" style="page-break-before:always;break-before:page">
         <h2 class="section-title">DOSSIER PROFESSIONNEL (DP)</h2>
         <div class="activite-type">Activité-type ${ai + 1} · ${act.titre.toUpperCase()}</div>
         <p class="exemple-titre">Exemple n°${exNum} ▶ ${ex.intitule}</p>
@@ -564,7 +564,7 @@ export function genDPOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: St
   });
 
   // ===== PAGE - Titres, diplômes, CQP, attestations (facultatif) =====
-  html += `<div class="page">
+  html += `<div class="page" style="page-break-before:always;break-before:page">
     <h2 class="section-title">DOSSIER PROFESSIONNEL (DP)</h2>
     <h3 class="subsection">Titres, diplômes, CQP, attestations de formation <em style="font-weight:normal">(facultatif)</em></h3>
     <table class="annex-table">
@@ -576,7 +576,7 @@ export function genDPOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: St
   pageNum++;
 
   // ===== PAGE Déclaration sur l'honneur =====
-  html += `<div class="page">
+  html += `<div class="page" style="page-break-before:always;break-before:page">
     <h2 class="section-title">DOSSIER PROFESSIONNEL (DP)</h2>
     <h3 class="subsection">Déclaration sur l'honneur</h3>
     <p class="declaration">Je soussigné(e) <strong>${(s.prenom || "").toUpperCase()} ${(s.nom || "").toUpperCase()}</strong>,</p>
@@ -594,7 +594,7 @@ export function genDPOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: St
   pageNum++;
 
   // ===== PAGE Documents illustrant la pratique professionnelle (facultatif) =====
-  html += `<div class="page">
+  html += `<div class="page" style="page-break-before:always;break-before:page">
     <h2 class="section-title">DOSSIER PROFESSIONNEL (DP)</h2>
     <h3 class="subsection">Documents illustrant la pratique professionnelle <em style="font-weight:normal">(facultatif)</em></h3>
     <table class="annex-table">
@@ -606,7 +606,7 @@ export function genDPOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: St
   pageNum++;
 
   // ===== PAGE Annexes =====
-  html += `<div class="page">
+  html += `<div class="page" style="page-break-before:always;break-before:page">
     <h2 class="section-title">DOSSIER PROFESSIONNEL (DP)</h2>
     <h3 class="subsection">ANNEXES</h3>
     <p style="font-style:italic;color:#666">(Si le RC le prévoit)</p>
@@ -656,7 +656,7 @@ export function genECFOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
   let html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">${ministereStyle()}</head><body>`;
 
   // ===== PAGE 1 - Couverture =====
-  html += `<div class="page">
+  html += `<div class="page" style="page-break-before:always;break-before:page">
     <div style="text-align:center;font-size:10pt;margin-bottom:8px">
       <p style="font-style:italic;color:#555">Liberté • Égalité • Fraternité</p>
       <p style="font-weight:bold;letter-spacing:1px">RÉPUBLIQUE FRANÇAISE</p>
@@ -691,7 +691,7 @@ export function genECFOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
   </div>`;
 
   // ===== PAGE 2 - Présentation =====
-  html += `<div class="page">
+  html += `<div class="page" style="page-break-before:always;break-before:page">
     <h2 class="section-title">Présentation du dossier</h2>
     <p class="justify">Les évaluations passées en cours de formation décrites dans les fiches qui suivent ont été mises en œuvre en référence aux critères issus des référentiels du titre professionnel, pour les sessions d'examen « Titre », « CCP » et « CCS » telles que prévues par l'arrêté du 22 décembre 2015 relatif aux conditions de délivrance du titre professionnel du ministère chargé de l'emploi.</p>
     <p class="justify" style="margin-top:12px">Le <em>Guide de mise en œuvre</em> des Évaluations passées en cours de formation est à télécharger sur le site du ministère de l'emploi : <strong>http://travail-emploi.gouv.fr/</strong> (rubrique <em>Documents techniques</em>). Il comporte un mode d'emploi du présent Livret d'évaluations passées en cours de formation.</p>
@@ -702,7 +702,7 @@ export function genECFOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
   let pageNum = 3;
   activites.forEach((act, ai) => {
     // ---- Fiche de résultats ----
-    html += `<div class="page">
+    html += `<div class="page" style="page-break-before:always;break-before:page">
       <h2 class="section-title">Fiche de résultats des évaluations</h2>
       <div class="activite-type">Activité-type ${ai + 1} · ${act.titre}</div>
       <h3 class="subsection">Compétences :</h3>
@@ -740,7 +740,7 @@ export function genECFOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
     pageNum++;
 
     // ---- Page Compétences à réévaluer ----
-    html += `<div class="page">
+    html += `<div class="page" style="page-break-before:always;break-before:page">
       <h2 class="section-title">Fiche de résultats des évaluations (suite)</h2>
       <div class="activite-type">Activité-type ${ai + 1} · ${act.titre}</div>
       <p class="justify" style="margin-top:10px">Si le candidat n'a pas satisfait aux critères issus des référentiels, notez ci-dessous les points d'attention et précisions éventuelles.</p>
@@ -766,7 +766,7 @@ export function genECFOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
       "Questionnement à partir de productions professionnelles",
       "Mise en situation professionnelle reconstituée complémentaire",
     ];
-    html += `<div class="page">
+    html += `<div class="page" style="page-break-before:always;break-before:page">
       <h2 class="section-title">Évaluations complémentaires <em style="font-weight:normal;font-size:10pt">(si nécessaire)</em></h2>
       <div class="activite-type">Activité-type ${ai + 1} · ${act.titre}</div>
       <p class="justify" style="margin-top:8px;font-style:italic;color:#555">${termine ? `Les évaluations initiales ayant permis de valider l'ensemble des compétences de l'activité-type, aucune évaluation complémentaire n'a été nécessaire pour ${s.prenom} ${(s.nom || "").toUpperCase()}.` : "Les évaluations complémentaires sont à renseigner uniquement si des compétences restent à valider à l'issue des évaluations initiales."}</p>
@@ -798,7 +798,7 @@ export function genECFOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
   });
 
   // ===== Page Synthèse =====
-  html += `<div class="page">
+  html += `<div class="page" style="page-break-before:always;break-before:page">
     <h2 class="section-title" style="text-align:center">SYNTHÈSE DES RÉSULTATS OBTENUS PAR LE CANDIDAT À L'ISSUE DU PARCOURS DE FORMATION</h2>
     <table class="eval-table" style="margin-top:14px">
       <tr><th style="width:40%">Intitulé de l'activité-type</th><th>Compétences professionnelles</th><th style="width:18%">Maîtrisée</th></tr>
@@ -818,7 +818,7 @@ export function genECFOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
   pageNum++;
 
   // ===== Page Signatures finale =====
-  html += `<div class="page">
+  html += `<div class="page" style="page-break-before:always;break-before:page">
     <h2 class="section-title">Observations générales</h2>
     <div class="obs-box" style="min-height:80px">${termine ? `Le parcours de formation menant au titre professionnel « ${intituleTitre} » a été mené à son terme dans le respect du référentiel et des modalités pédagogiques prévues. Le/la candidat(e) ${s.prenom} ${(s.nom || "").toUpperCase()} a démontré sa capacité à mobiliser les compétences attendues sur l'ensemble des activités-types. Il/elle peut être présenté(e) à la session d'examen du titre professionnel.` : "&nbsp;"}</div>
 
@@ -935,7 +935,7 @@ export function genPVSessionGlobal(o: OrganismeInfo, f: FormationInfo, stagiaire
   </style></head><body>`;
 
   // Page unique principale
-  html += `<div class="page page-pv">
+  html += `<div class="page page-pv" style="page-break-before:always;break-before:page">
     ${ministereHeader("PROCÈS-VERBAL GÉNÉRAL RELATIF À UNE SESSION D'EXAMEN<br>POUR L'OBTENTION DU TITRE PROFESSIONNEL")}
     <p style="text-align:center;font-style:italic;color:#555;margin-bottom:4px;font-size:9pt">Session n° ${sessionNum}</p>
     <p style="text-align:center;font-weight:bold;font-size:10pt;margin-bottom:10px">${codeTitre} — ${intituleTitre}</p>
