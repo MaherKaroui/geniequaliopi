@@ -887,7 +887,8 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "calendrier_formation_opco_vierge": return genCalendrierFormationOPCOVierge(o, f, stagiaires);
     case "temps_connexion_opco": return genTempsConnexionOPCO(o, f, stagiaires);
     case "temps_connexion_opco_vierge": return genTempsConnexionOPCOVierge(o, f, stagiaires);
-    case "exercices_opco": return genExercicesOPCO(o, f, stagiaires);
+    case "exercices_opco": return genExercicesOPCO(o, f, stagiaires, params);
+    case "exercices_opco_semaine": return genExercicesOPCO(o, f, stagiaires, params);
     case "decoupage_formation_cfa_excel": return genDecoupageFormationCFAExcel(o, f);
     case "suivi_inscriptions_excel": return generateExcelSuiviInscriptions(o, f, stagiaires);
     case "visuel_mission_cfa": return genVisuelMissionCFA(o, params?.imageUrl || "", params?.missionTitre || "");
