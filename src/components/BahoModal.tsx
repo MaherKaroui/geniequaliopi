@@ -17,7 +17,7 @@ interface BahoModalProps {
   onOpenChange: (open: boolean) => void;
 }
 
-type DocKind = "ri" | "convention" | "cgv" | "facture" | "devis" | "programme" | "emargement" | "convocation" | "certificat";
+type DocKind = "ri" | "convention" | "cgv" | "facture" | "devis" | "programme" | "convocation" | "certificat";
 
 interface PreviewState {
   entreprise: BahoEntreprise;
