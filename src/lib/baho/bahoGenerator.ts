@@ -133,7 +133,7 @@ export async function buildBahoZip(reporter?: JobReporter, customFsStamp?: strin
     }
     step++; reporter?.setProgress(Math.round((step / totalSteps) * 100));
 
-    // 7. Documents individuels par stagiaire : Convocation + Émargement + Certificat de réalisation
+    // 7. Documents individuels par stagiaire : Convocation + Certificat de réalisation
     const stagiairesFolder = folder.folder("Stagiaires")!;
     for (let si = 0; si < e.stagiaires.length; si++) {
       const s = e.stagiaires[si];
@@ -152,19 +152,7 @@ export async function buildBahoZip(reporter?: JobReporter, customFsStamp?: strin
       }
       step++; reporter?.setProgress(Math.round((step / totalSteps) * 100));
 
-      // 7b. Feuille d'émargement individuelle
-      try {
-        reporter?.setMessage(`${e.nom} – Émargement ${s.prenom} ${s.nom}…`);
-        const emargHtml = getEmargementHTML(e, s, customFsStamp);
-        const emargPdf = await htmlToPdfBlob(emargHtml);
-        stagFolder.file(`Emargement_${stagNameSafe}_${s.codeStagiaire}.pdf`, emargPdf);
-      } catch (err) {
-        console.error("Emargement error:", err);
-        stagFolder.file(`ERREUR_Emargement.txt`, `Erreur: ${(err as Error).message}`);
-      }
-      step++; reporter?.setProgress(Math.round((step / totalSteps) * 100));
-
-      // 7c. Certificat de réalisation
+      // 7b. Certificat de réalisation
       try {
         reporter?.setMessage(`${e.nom} – Certificat ${s.prenom} ${s.nom}…`);
         const certifHtml = getCertificatRealisationHTML(e, s, customFsStamp);
