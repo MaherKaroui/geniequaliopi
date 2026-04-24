@@ -254,6 +254,29 @@ const SCENARIOS_PAR_DOMAINE: Record<string, { intitules: string[]; entreprises: 
     entreprises: ["DIGITAL FACTORY", "WEB AGENCY PRO", "CODE & CO", "TECH STARTUP", "INNOV NUMÉRIQUE"],
     secteur: "Développement",
   },
+  transport: {
+    intitules: [
+      "Organisation d'un plan de transport régulier Île-de-France ↔ Hauts-de-France pour un chargeur industriel",
+      "Tarification et formalisation d'une proposition d'affrètement complet 24T sur l'axe Paris-Lyon-Marseille",
+      "Mise en place d'un plan de tournées de messagerie sur la zone Grand Paris avec optimisation TMS",
+      "Traitement d'un litige transport (avarie marchandise) sous Convention CMR avec expertise contradictoire",
+      "Reconstitution des indicateurs de performance exploitation (OTIF, taux de retour à vide, PRK) et plan d'actions correctives",
+      "Sélection et contractualisation d'un panel de sous-traitants conformément au contrat-type sous-traitance transport",
+      "Pilotage d'une équipe de 8 conducteurs PL/SPL dans le respect du règlement (CE) 561/2006 et de l'AETR",
+      "Gestion d'un aléa exploitation : panne véhicule sur tournée régulière et réorganisation en temps réel",
+    ],
+    entreprises: [
+      "TRANSPORTS GEODIS",
+      "DACHSER FRANCE",
+      "STEF TRANSPORT",
+      "GROUPE CHARLES ANDRÉ (GCA)",
+      "TRANSPORTS JACKY PERRENOT",
+      "DELANCHY TRANSPORTS",
+      "XPO LOGISTICS",
+      "HEPPNER TRANSPORTS",
+    ],
+    secteur: "Exploitation Transport Routier de Marchandises",
+  },
   default: {
     intitules: [
       "Mise en œuvre d'une procédure interne d'amélioration des processus",
@@ -269,6 +292,8 @@ const SCENARIOS_PAR_DOMAINE: Record<string, { intitules: string[]; entreprises: 
 
 function detectDomaine(f: FormationInfo): keyof typeof SCENARIOS_PAR_DOMAINE {
   const t = `${f.intitule} ${f.codeRNCP}`.toLowerCase();
+  // Transport routier de marchandises (GOTRM, exploitant, affréteur) — AVANT "conduite" car contient "routier"
+  if (/gotrm|gestionnaire.*transport|transport.*routier.*marchandises|exploitant.*transport|affr[ée]teur|rncp40990|tp-?01329/i.test(t)) return "transport";
   if (/n[ée]goci|commercial|vente|technico/i.test(t)) return "commercial";
   if (/conduite|ecsr|enseignant.*conduite|s[ée]curit[ée] routi/i.test(t)) return "conduite";
   if (/responsable|petite.*moyenne|management|dirigeant|rpms|assistant.*direction/i.test(t)) return "management";
@@ -291,18 +316,30 @@ function genererExemplePratique(
   const competence = pick(activite.competences, seed + 13);
   const competence2 = pick(activite.competences, seed + 17);
 
-  const tache = `Dans le cadre de mes fonctions au sein de ${entreprise}, j'ai été chargé(e) de mener à bien l'opération suivante : « ${intitule} ». Cette mission s'inscrivait pleinement dans l'activité « ${activite.titre.toLowerCase()} » et visait à ${competence.toLowerCase()}. J'ai d'abord procédé à une analyse complète du contexte initial pour identifier les besoins, les contraintes et les opportunités. J'ai ensuite défini un plan d'action structuré, validé en interne avec ma hiérarchie, puis mis en œuvre les différentes étapes en assurant le suivi et le pilotage continu de l'activité. Cette démarche m'a permis de mobiliser pleinement mes compétences professionnelles et d'apporter une réponse opérationnelle conforme aux attendus. Les résultats obtenus ont été présentés lors d'une revue de fin de mission, validant l'atteinte des objectifs fixés.`;
+  const tache = dom === "transport"
+    ? `Dans le cadre de mes fonctions d'exploitant transport au sein de ${entreprise}, j'ai été chargé(e) de l'opération suivante : « ${intitule} ». Cette mission s'inscrit dans l'activité-type « ${activite.titre.toLowerCase()} » et m'a conduit(e) à ${competence.toLowerCase()}. J'ai d'abord analysé le cahier des charges client (volumes, délais, contraintes ADR/ATP, incoterms), puis vérifié la faisabilité technique et réglementaire (Code des transports, R(CE) 561/2006, AETR, contrat-type général). J'ai ensuite calculé le prix de revient kilométrique (PRK) à partir des indices CNR, formalisé la proposition commerciale, affecté les moyens (tracteurs, semi-remorques, conducteurs disponibles selon coupures et repos hebdomadaires) et planifié l'opération dans notre TMS. Pendant l'exécution, j'ai assuré le suivi temps réel via géolocalisation, traité les aléas (panne, retard chargement, refus livraison) et tenu informé le donneur d'ordres. À la clôture, j'ai contrôlé les CMR, levé les réserves éventuelles, validé la facturation et alimenté les indicateurs OTIF et marge brute remontés à la direction d'exploitation.`
+    : `Dans le cadre de mes fonctions au sein de ${entreprise}, j'ai été chargé(e) de mener à bien l'opération suivante : « ${intitule} ». Cette mission s'inscrivait pleinement dans l'activité « ${activite.titre.toLowerCase()} » et visait à ${competence.toLowerCase()}. J'ai d'abord procédé à une analyse complète du contexte initial pour identifier les besoins, les contraintes et les opportunités. J'ai ensuite défini un plan d'action structuré, validé en interne avec ma hiérarchie, puis mis en œuvre les différentes étapes en assurant le suivi et le pilotage continu de l'activité. Cette démarche m'a permis de mobiliser pleinement mes compétences professionnelles et d'apporter une réponse opérationnelle conforme aux attendus. Les résultats obtenus ont été présentés lors d'une revue de fin de mission, validant l'atteinte des objectifs fixés.`;
 
-  const moyens = `Pour mener à bien cette mission, j'ai utilisé les outils et ressources suivants : suite bureautique (Word, Excel, PowerPoint), outils internes de gestion et de reporting, plateforme collaborative pour le partage documentaire, fiches de procédures internes, supports de communication adaptés, ainsi que les ressources documentaires de référence du métier. J'ai également mobilisé les compétences acquises en formation, notamment celles relatives à « ${competence2.toLowerCase()} », pour structurer ma démarche et garantir la qualité du livrable final.`;
+  const moyens = dom === "transport"
+    ? `Moyens humains et matériels mobilisés : équipe d'exploitation (2 à 3 exploitants + 1 affréteur), 8 conducteurs PL/SPL en propre et un panel de 12 sous-traitants référencés (licence communautaire, attestation de capacité, RC pro à jour). Moyens techniques : TMS exploitation (Akanea / Trans-iX), bourses de fret B2P, Teleroute et Wtransnet pour le complément d'affrètement, géolocalisation embarquée (Shippeo), chronotachygraphes numériques pour le contrôle des temps de conduite, suite bureautique Word® / Excel® pour les états de tournée, indices CNR pour l'indexation gazole, contrat-type général transport et contrat-type sous-traitance (décret du 26/12/2017). J'ai mobilisé les compétences acquises en formation, en particulier « ${competence2.toLowerCase()} », pour sécuriser juridiquement et économiquement l'opération.`
+    : `Pour mener à bien cette mission, j'ai utilisé les outils et ressources suivants : suite bureautique (Word, Excel, PowerPoint), outils internes de gestion et de reporting, plateforme collaborative pour le partage documentaire, fiches de procédures internes, supports de communication adaptés, ainsi que les ressources documentaires de référence du métier. J'ai également mobilisé les compétences acquises en formation, notamment celles relatives à « ${competence2.toLowerCase()} », pour structurer ma démarche et garantir la qualité du livrable final.`;
 
   const seedColl = hashStr(`${s.prenom}-coll-${exempleIdx}`);
-  const collColl = [
-    "ma responsable hiérarchique, qui a validé chaque étape clé",
-    "mes collègues du service, en particulier le pôle qualité et le pôle administratif",
-    "le service support et la direction, pour la validation finale des livrables",
-    "l'équipe projet pluridisciplinaire mobilisée sur ce dossier",
-    "mon tuteur pédagogique et mon maître d'apprentissage",
-  ];
+  const collColl = dom === "transport"
+    ? [
+        "le responsable d'exploitation, qui a validé le plan de transport et arbitré les priorités",
+        "l'équipe d'affrètement (2 affréteurs) pour la sélection et le suivi des sous-traitants",
+        "le service SAV / litiges pour le traitement des réserves CMR et les indemnisations",
+        "le service commercial pour la remontée client et la fidélisation du donneur d'ordres",
+        "le service comptabilité-facturation pour la clôture financière du dossier",
+      ]
+    : [
+        "ma responsable hiérarchique, qui a validé chaque étape clé",
+        "mes collègues du service, en particulier le pôle qualité et le pôle administratif",
+        "le service support et la direction, pour la validation finale des livrables",
+        "l'équipe projet pluridisciplinaire mobilisée sur ce dossier",
+        "mon tuteur pédagogique et mon maître d'apprentissage",
+      ];
   const collegues = `J'ai travaillé en collaboration avec ${pick(collColl, seedColl)}. Cette collaboration transversale a été essentielle pour garantir la cohérence de l'action menée et l'adhésion de l'ensemble des parties prenantes.`;
 
   const periode = (() => {
