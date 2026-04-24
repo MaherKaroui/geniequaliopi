@@ -65,7 +65,7 @@ export function genFactureOPCO(o: OrganismeInfo, f: FormationInfo, stagiaires: S
   const dateFacture = formatDate(dateFactureISO);
 
   // Infos stagiaire (pavé gauche)
-  const stagAdresse = [s.adresse, [s.codePostal, s.ville].filter(Boolean).join(" ")].filter(Boolean).join(", ") || "________________________________";
+  const stagAdresse = ((s as any).adresse ? `${(s as any).adresse}${(s as any).codePostal || (s as any).ville ? `, ${[(s as any).codePostal, (s as any).ville].filter(Boolean).join(" ")}` : ""}` : "________________________________");
   const stagEmail = s.email || "________________________________";
   const stagTel = (s.telephone || "").trim();
 
