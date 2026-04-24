@@ -465,7 +465,7 @@ export function genDPOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: St
     <p class="dp-modalite-line"><span class="check-box"></span> Validation des Acquis de l'Expérience (VAE)</p>
     <p class="dp-modalite-line"><span class="check-box ck"></span> Parcours de formation</p>
     ${footerDPOfficiel("1")}
-  </div><div class="page-break"></div>`;
+  </div>`;
 
   // ===== PAGE 2 - Présentation =====
   html += `<div class="page">
@@ -492,7 +492,7 @@ export function genDPOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: St
     </ul>
     <p style="font-style:italic;margin-top:10px">Pour compléter ce dossier, le candidat dispose d'un site web en accès libre : <strong>http://travail-emploi.gouv.fr/titres-professionnels</strong></p>
     ${footerDPOfficiel("2")}
-  </div><div class="page-break"></div>`;
+  </div>`;
 
   // ===== PAGE 3 - Sommaire =====
   let pageExemple = 5; // après couverture(1), présentation(2), sommaire(3), séparateur Exemples(4)
@@ -513,14 +513,14 @@ export function genDPOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: St
     <div class="sommaire-other"><span>Documents illustrant la pratique professionnelle <em style="font-weight:normal">(facultatif)</em></span><span>p. ${pageAfterExemples + 2}</span></div>
     <div class="sommaire-other"><span>Annexes <em style="font-weight:normal">(Si le RC le prévoit)</em></span><span>p. ${pageAfterExemples + 3}</span></div>
     ${footerDPOfficiel("3")}
-  </div><div class="page-break"></div>`;
+  </div>`;
 
   // ===== PAGE 4 - Séparateur Exemples =====
   html += `<div class="page" style="display:flex;align-items:center;justify-content:center;flex-direction:column">
     <h2 class="section-title" style="text-align:center;width:100%">DOSSIER PROFESSIONNEL (DP)</h2>
     <h1 style="font-size:22pt;text-align:center;margin:120px 0 80px;letter-spacing:2px;color:#0055A4">EXEMPLES DE PRATIQUE PROFESSIONNELLE</h1>
     ${footerDPOfficiel("4")}
-  </div><div class="page-break"></div>`;
+  </div>`;
 
   // ===== PAGES Activités-types & Exemples =====
   let pageNum = 5;
@@ -558,7 +558,7 @@ export function genDPOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: St
           <div class="a">Cette mission s'inscrit dans la continuité de mon parcours professionnel et illustre ma capacité à mobiliser les compétences attendues par le référentiel.</div>
         </div>
         ${footerDPOfficiel(String(pageNum))}
-      </div><div class="page-break"></div>`;
+      </div>`;
       pageNum++;
     });
   });
@@ -572,7 +572,7 @@ export function genDPOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: St
       ${Array.from({ length: 9 }).map(() => `<tr><td class="empty"></td><td class="empty"></td><td class="empty"></td></tr>`).join("")}
     </table>
     ${footerDPOfficiel(String(pageNum))}
-  </div><div class="page-break"></div>`;
+  </div>`;
   pageNum++;
 
   // ===== PAGE Déclaration sur l'honneur =====
@@ -590,7 +590,7 @@ export function genDPOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: St
       ${s.signatureUrl ? `<img src="${s.signatureUrl}" alt="Signature candidat" style="max-height:70px;max-width:200px;object-fit:contain" />` : ""}
     </div>
     ${footerDPOfficiel(String(pageNum))}
-  </div><div class="page-break"></div>`;
+  </div>`;
   pageNum++;
 
   // ===== PAGE Documents illustrant la pratique professionnelle (facultatif) =====
@@ -602,7 +602,7 @@ export function genDPOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: St
       ${Array.from({ length: 10 }).map(() => `<tr><td class="empty"></td></tr>`).join("")}
     </table>
     ${footerDPOfficiel(String(pageNum))}
-  </div><div class="page-break"></div>`;
+  </div>`;
   pageNum++;
 
   // ===== PAGE Annexes =====
@@ -688,7 +688,7 @@ export function genECFOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
       <tr><th>Date de naissance</th><td>${getStagDateNaissance(s)}</td></tr>
     </table>
     ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, pageStr(1), dateMaj)}
-  </div><div class="page-break"></div>`;
+  </div>`;
 
   // ===== PAGE 2 - Présentation =====
   html += `<div class="page">
@@ -696,7 +696,7 @@ export function genECFOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
     <p class="justify">Les évaluations passées en cours de formation décrites dans les fiches qui suivent ont été mises en œuvre en référence aux critères issus des référentiels du titre professionnel, pour les sessions d'examen « Titre », « CCP » et « CCS » telles que prévues par l'arrêté du 22 décembre 2015 relatif aux conditions de délivrance du titre professionnel du ministère chargé de l'emploi.</p>
     <p class="justify" style="margin-top:12px">Le <em>Guide de mise en œuvre</em> des Évaluations passées en cours de formation est à télécharger sur le site du ministère de l'emploi : <strong>http://travail-emploi.gouv.fr/</strong> (rubrique <em>Documents techniques</em>). Il comporte un mode d'emploi du présent Livret d'évaluations passées en cours de formation.</p>
     ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, pageStr(2), dateMaj)}
-  </div><div class="page-break"></div>`;
+  </div>`;
 
   // ===== Pages par activité-type =====
   let pageNum = 3;
@@ -736,7 +736,7 @@ export function genECFOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
       <p class="check-line"><span class="check-box${termine ? " ck" : ""}"></span>Avoir satisfait aux critères issus des référentiels du titre professionnel attendus pour la réalisation de cette activité-type.</p>
       <p class="check-line"><span class="check-box"></span>Ne pas avoir satisfait aux critères issus des référentiels du titre professionnel.</p>
       ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, pageStr(pageNum), dateMaj)}
-    </div><div class="page-break"></div>`;
+    </div>`;
     pageNum++;
 
     // ---- Page Compétences à réévaluer ----
@@ -757,7 +757,7 @@ export function genECFOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
       <h3 class="subsection">Observations du formateur évaluateur</h3>
       <div class="obs-box" style="min-height:80px">${termine ? `Le/la candidat(e) a fait preuve d'une bonne maîtrise des compétences attendues sur l'activité-type « ${act.titre} ». Les productions présentées lors des mises en situation professionnelle sont de qualité et témoignent d'une réelle compréhension des enjeux du métier. L'implication et la progression observées tout au long du parcours confirment l'aptitude à exercer l'activité en autonomie. Aucune réévaluation n'est nécessaire.` : "&nbsp;"}</div>
       ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, pageStr(pageNum), dateMaj)}
-    </div><div class="page-break"></div>`;
+    </div>`;
     pageNum++;
 
     // ---- Page Évaluations complémentaires ----
@@ -793,7 +793,7 @@ export function genECFOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
         </tr>
       </table>
       ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, pageStr(pageNum), dateMaj)}
-    </div><div class="page-break"></div>`;
+    </div>`;
     pageNum++;
   });
 
@@ -814,7 +814,7 @@ export function genECFOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
     <h3 class="subsection">Observations</h3>
     <div class="obs-box">${termine ? `Le/la candidat(e) ${s.prenom} ${(s.nom || "").toUpperCase()} a satisfait à l'ensemble des évaluations prévues au référentiel du titre professionnel « ${intituleTitre} ». Les acquis pédagogiques et professionnels sont conformes aux attendus sur les ${activites.length} activité(s)-type du référentiel. Le parcours a été mené avec assiduité (présence 100%) et les productions rendues témoignent d'une réelle appropriation des compétences. Le/la candidat(e) est prêt(e) à se présenter à la session d'examen du titre professionnel.` : "&nbsp;"}</div>
     ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, pageStr(pageNum), dateMaj)}
-  </div><div class="page-break"></div>`;
+  </div>`;
   pageNum++;
 
   // ===== Page Signatures finale =====
