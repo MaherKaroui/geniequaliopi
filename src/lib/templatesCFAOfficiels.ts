@@ -737,18 +737,18 @@ export function genECFOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
       <h2 class="section-title">Fiche de résultats des évaluations (suite)</h2>
       <div class="activite-type">Activité-type ${ai + 1} · ${act.titre}</div>
       <p class="justify" style="margin-top:10px">Si le candidat n'a pas satisfait aux critères issus des référentiels, notez ci-dessous les points d'attention et précisions éventuelles.</p>
-      <div class="obs-box" style="min-height:110px">${termine ? "Sans objet — l'ensemble des critères du référentiel est satisfait." : "&nbsp;"}</div>
+      <div class="obs-box" style="min-height:90px">${termine ? `À l'issue des évaluations initiales conduites entre le ${dateDebut} et le ${dateEval}, le/la candidat(e) ${s.prenom} ${(s.nom || "").toUpperCase()} a démontré une maîtrise satisfaisante de l'ensemble des compétences du référentiel pour cette activité-type. Aucune réévaluation n'est nécessaire.` : "&nbsp;"}</div>
       <h3 class="subsection">Compétences à réévaluer :</h3>
-      <p style="font-style:italic;color:#555">(Voir évaluations complémentaires ci-après.)</p>
+      <p style="font-style:italic;color:#555">${termine ? "Aucune — l'ensemble des compétences de l'activité-type est validé." : "(Voir évaluations complémentaires ci-après.)"}</p>
       <table class="eval-table" style="margin-top:10px">
         <tr><th style="width:70%">Compétence à réévaluer</th><th>N° compétence</th></tr>
         ${act.competences.map((_, i) => `<tr>
-          <td style="height:28px"></td>
+          <td style="height:28px;${termine ? "font-style:italic;color:#666" : ""}">${termine ? "Sans objet — compétence acquise" : ""}</td>
           <td style="text-align:center">${i + 1}</td>
         </tr>`).join("")}
       </table>
       <h3 class="subsection">Observations du formateur évaluateur</h3>
-      <div class="obs-box" style="min-height:80px">${termine ? "Le/la candidat(e) a fait preuve d'une bonne maîtrise des compétences attendues sur cette activité-type. Les productions présentées sont de qualité et témoignent d'une réelle compréhension des enjeux professionnels. Aucune réévaluation n'est nécessaire." : "&nbsp;"}</div>
+      <div class="obs-box" style="min-height:80px">${termine ? `Le/la candidat(e) a fait preuve d'une bonne maîtrise des compétences attendues sur l'activité-type « ${act.titre} ». Les productions présentées lors des mises en situation professionnelle sont de qualité et témoignent d'une réelle compréhension des enjeux du métier. L'implication et la progression observées tout au long du parcours confirment l'aptitude à exercer l'activité en autonomie. Aucune réévaluation n'est nécessaire.` : "&nbsp;"}</div>
       ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, pageStr(pageNum), dateMaj)}
     </div><div class="page-break"></div>`;
     pageNum++;
