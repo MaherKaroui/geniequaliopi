@@ -49,9 +49,9 @@ export function genFacture(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
 }
 
 /**
- * Facture OPCO — un fichier par apprenti, montant fixe 500,00 € TTC.
- * Utilisé dans le contrôle OPCO Mobilités (C13) comme justificatif de facturation
- * réglée par l'OPCO au titre de la prise en charge de la formation.
+ * Facture OPCO Mobilités — un fichier par apprenti.
+ * Frais de 1er équipement (tenue de travail, EPI, outillage de base) : 500,00 € exonéré de TVA.
+ * Reproduit fidèlement le modèle officiel OPCO Mobilités (C13).
  */
 export function genFactureOPCO(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], stagiaireIdx?: number) {
   const idx = typeof stagiaireIdx === "number" ? stagiaireIdx : 0;
@@ -59,37 +59,113 @@ export function genFactureOPCO(o: OrganismeInfo, f: FormationInfo, stagiaires: S
   if (!s) return "";
   const today = new Date();
   const year = today.getFullYear();
-  const factNum = `OPCO-${year}-${String(idx + 1).padStart(3, "0")}`;
+  const factNum = `${year}-${String(idx + 1).padStart(3, "0")}`;
   const dateDebutISO = getStagiaireDateDebut(s, f) || f.dateDebut || "";
   const dateFactureISO = dateDebutISO ? subtractBusinessDays(dateDebutISO, 3) : today.toISOString().slice(0, 10);
   const dateFacture = formatDate(dateFactureISO);
 
+  // Infos stagiaire (pavé gauche)
+  const stagAdresse = [s.adresse, [s.codePostal, s.ville].filter(Boolean).join(" ")].filter(Boolean).join(", ") || "________________________________";
+  const stagEmail = s.email || "________________________________";
+  const stagTel = (s.telephone || "").trim();
+
+  // En-tête organisme (pavé gauche) — on utilise les données dynamiques de l'organisme
+  const orgAdresse = [o.adresse, [o.codePostal, o.ville].filter(Boolean).join(" ")].filter(Boolean).join(", ");
+  const orgHeaderHtml = `
+    <table style="width:100%;border:none;margin-bottom:20px">
+      <tr style="border:none">
+        <td style="border:none;vertical-align:top;width:55%">
+          ${o.logoUrl ? `<img src="${o.logoUrl}" alt="Logo" style="max-height:70px;margin-bottom:8px"><br>` : ""}
+          <strong style="font-size:14px">${o.nom}</strong><br>
+          ${orgAdresse}<br>
+          SIRET : ${o.siret || "—"}<br>
+          ${o.siret ? `SIREN : ${o.siret.replace(/\s/g, "").slice(0, 9)}<br>` : ""}
+          ${o.nda ? `NDA : ${o.nda}<br>` : ""}
+          ${o.email || ""}<br>
+          ${o.dirigeant ? `${o.dirigeant}` : ""}
+        </td>
+        <td style="border:none;vertical-align:top;text-align:right;width:45%">
+          <div style="font-size:22px;font-weight:bold;letter-spacing:1px">FACTURE</div>
+          <div style="font-size:14px;margin-top:4px"><strong>N° ${factNum}</strong></div>
+          <div style="font-size:12px;margin-top:8px">Date : ${dateFacture}</div>
+        </td>
+      </tr>
+    </table>`;
+
+  // Bloc Stagiaire / Facturé à (OPCO Mobilités fixe)
+  const partiesHtml = `
+    <table style="width:100%;border:none;margin-bottom:16px">
+      <tr style="border:none">
+        <td style="border:1px solid #333;padding:10px;vertical-align:top;width:50%">
+          <strong>Stagiaire :</strong><br><br>
+          <strong>${s.prenom} ${s.nom}</strong><br>
+          Adresse : ${stagAdresse}<br>
+          Mail : ${stagEmail}${stagTel ? `<br>Téléphone : ${stagTel}` : ""}
+        </td>
+        <td style="border:1px solid #333;padding:10px;vertical-align:top;width:50%">
+          <strong>Facturé à :</strong><br><br>
+          <strong>OPCO Mobilités</strong><br>
+          65 Quai Georges Gorse<br>
+          92100 Boulogne-Billancourt<br>
+          SIRET : 851 240 499 00679
+        </td>
+      </tr>
+    </table>
+    <p style="margin:12px 0"><strong>Objet :</strong> Frais de 1<sup>er</sup> équipement – Apprenti(e) en contrat d'apprentissage</p>`;
+
+  // Tableau désignation (format modèle)
+  const designationTable = `
+    <table style="width:100%;border-collapse:collapse;margin-top:6px">
+      <thead>
+        <tr style="background:#f0f0f0">
+          <th style="border:1px solid #333;padding:8px;text-align:left">Désignation</th>
+          <th style="border:1px solid #333;padding:8px;text-align:center;width:60px">Qté</th>
+          <th style="border:1px solid #333;padding:8px;text-align:right;width:120px">Prix unitaire HT</th>
+          <th style="border:1px solid #333;padding:8px;text-align:center;width:80px">TVA</th>
+          <th style="border:1px solid #333;padding:8px;text-align:right;width:110px">Montant HT</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="border:1px solid #333;padding:8px">Frais de 1<sup>er</sup> équipement (tenue de travail, EPI, outillage de base)</td>
+          <td style="border:1px solid #333;padding:8px;text-align:center">1</td>
+          <td style="border:1px solid #333;padding:8px;text-align:right">500,00 €</td>
+          <td style="border:1px solid #333;padding:8px;text-align:center">Exonéré *</td>
+          <td style="border:1px solid #333;padding:8px;text-align:right">500,00 €</td>
+        </tr>
+      </tbody>
+    </table>
+    <table style="width:100%;border:none;margin-top:10px">
+      <tr style="border:none"><td style="border:none;text-align:right;padding:4px"><strong>Total HT :</strong></td><td style="border:none;text-align:right;width:110px;padding:4px">500,00 €</td></tr>
+      <tr style="border:none"><td style="border:none;text-align:right;padding:4px">TVA (0% – exonéré) :</td><td style="border:none;text-align:right;padding:4px">0,00 €</td></tr>
+      <tr style="border:none"><td style="border:none;text-align:right;padding:6px;font-size:14px"><strong>TOTAL TTC :</strong></td><td style="border:none;text-align:right;padding:6px;font-size:14px"><strong>500,00 €</strong></td></tr>
+    </table>
+    <p style="font-size:10px;font-style:italic;margin-top:10px;color:#555">* Exonération de TVA applicable aux organismes de formation professionnelle continue en vertu de l'article 261-4-4° du Code Général des Impôts (CGI).</p>`;
+
+  // Modalités de règlement
+  const modalitesHtml = `
+    <h3 style="margin-top:24px;margin-bottom:8px">Modalités de règlement</h3>
+    <table style="width:100%;border:none">
+      <tr style="border:none"><td style="border:none;padding:4px;width:35%"><strong>Mode de paiement :</strong></td><td style="border:none;padding:4px">Virement bancaire par l'OPCO</td></tr>
+      <tr style="border:none"><td style="border:none;padding:4px"><strong>À l'ordre de :</strong></td><td style="border:none;padding:4px">${o.nom}</td></tr>
+      <tr style="border:none"><td style="border:none;padding:4px"><strong>Délai de paiement :</strong></td><td style="border:none;padding:4px">30 jours à réception de la facture</td></tr>
+      ${o.email ? `<tr style="border:none"><td style="border:none;padding:4px"><strong>Email :</strong></td><td style="border:none;padding:4px">${o.email}</td></tr>` : ""}
+    </table>`;
+
+  // Cachet et signature
+  const signHtml = `
+    <div style="margin-top:40px;text-align:right">
+      <p style="margin:0"><strong>Cachet et Signature</strong><br>
+      <em>${o.nom}</em><br>
+      ${o.dirigeant || ""}</p>
+      ${o.TamponUrl ? `<img src="${o.TamponUrl}" alt="Tampon" style="max-height:130px;margin-top:8px">` : o.signatureUrl ? `<img src="${o.signatureUrl}" alt="Signature" style="max-height:80px;margin-top:8px">` : ""}
+    </div>`;
+
   return buildDocument({
     org: o,
-    title: "FACTURE DE FORMATION",
-    subtitle: `N° ${factNum}`,
-    formation: f,
-    showFormationInfo: true,
-    stagiaires: [s],
-    sections: [
-      {
-        heading: "Prestation réalisée",
-        content: `<p><strong>Formation :</strong> ${f.intitule}<br><strong>Durée :</strong> ${f.duree}<br><strong>Modalité :</strong> ${f.modalites}<br><strong>Lieu :</strong> ${f.lieu}<br><strong>Période :</strong> du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}<br><strong>Date de la facture :</strong> ${dateFacture}</p>`,
-      },
-    ],
-    table: {
-      headers: ["Désignation", "Quantité", "Prix unitaire", "Total"],
-      rows: [
-        [`Prise en charge – ${f.intitule} (${s.prenom} ${s.nom})`, "1", "500,00 €", "500,00 €"],
-        ["<strong>Total HT</strong>", "", "", "<strong>500,00 €</strong>"],
-        ["TVA (non applicable, art. 261-4-4° du CGI)", "", "", "0,00 €"],
-        ["<strong>Total TTC</strong>", "", "", "<strong>500,00 €</strong>"],
-        ["<strong>Net à payer</strong>", "", "", "<strong>500,00 €</strong>"],
-      ],
-    },
-    extraHtml: `<h2>Modalités de règlement</h2>
-      <div class="section"><p><strong>Montant total :</strong> 500,00 € TTC<br><strong>Échéance :</strong> 30 jours à réception de facture<br><strong>Mode de règlement :</strong> Virement bancaire<br><strong>Pénalités de retard :</strong> 3 fois le taux d'intérêt légal + indemnité forfaitaire de 40 € pour frais de recouvrement (art. L.441-10 du Code de commerce).</p></div>
-      <div class="section" style="margin-top:30px"><p><strong>Pour l'organisme</strong><br>Nom : ${o.dirigeant || o.nom}<br>Date : ${dateFacture}<br>Signature :${o.signatureUrl ? `<br><img src="${o.signatureUrl}" alt="Signature" style="max-height:60px;margin-top:4px">` : ""}</p></div>`,
+    title: "",
+    showFormationInfo: false,
+    extraHtml: orgHeaderHtml + partiesHtml + designationTable + modalitesHtml + signHtml,
   });
 }
 
