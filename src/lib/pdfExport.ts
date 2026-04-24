@@ -332,6 +332,32 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
         current = createPage(host, footerHtml, footerHeightPx, PAGE_W_PX, PAGE_H_PX);
         pages.push(current.page);
         current.content.appendChild(clone);
+      } else {
+        // "Keep with next": if this node is a heading (h1..h4) and the next renderable
+        // node does NOT fit on the current page, move the heading along with it to
+        // the next page so the heading isn't left orphaned at the bottom.
+        const isHeading =
+          node instanceof HTMLElement && /^H[1-4]$/.test(node.tagName);
+        if (isHeading && hasMoreNodes) {
+          const nextNode = nodes[index + 1];
+          // Skip pure page-break markers (they don't have visual content)
+          const nextBehavior = getPageBreakBehavior(nextNode);
+          if (!nextBehavior.markerOnly && !nextBehavior.before) {
+            const nextClone = nextNode.cloneNode(true);
+            current.content.appendChild(nextClone);
+            if (current.content.scrollHeight > current.content.clientHeight + 1) {
+              // Next node doesn't fit -> move heading + next node to a new page
+              current.content.removeChild(nextClone);
+              current.content.removeChild(clone);
+              current = createPage(host, footerHtml, footerHeightPx, PAGE_W_PX, PAGE_H_PX);
+              pages.push(current.page);
+              current.content.appendChild(clone);
+            } else {
+              // Fits — remove the probe; the next iteration will re-add it normally
+              current.content.removeChild(nextClone);
+            }
+          }
+        }
       }
 
       if (pageBreak.after && hasMoreNodes) {
