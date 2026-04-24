@@ -52,6 +52,47 @@ export const STAGIAIRES_BAC_PRO_LOGISTIQUE: StagiaireInfo[] = [
   { civilite: "Mme", nom: "LAUNAY", prenom: "Juliette", email: "juju9lau@gmail.com", telephone: "07 23 89 24 10", entreprise: "TROPIDO", poste: "", dateNaissance: "2000-12-28", adresse: "1 RUE D'ORMESSON", codePostal: "93800", commune: "EPINAY-SUR-SEINE", dateDebutFormation: "2025-09-01", dateFinFormation: "2026-05-15" },
 ];
 
+// ═══════════════════════════════════════════════════════════════════════════
+// HEXAGONE FORMATION – Organisme + 10 stagiaires TP GOTRM (issus des factures)
+// ═══════════════════════════════════════════════════════════════════════════
+export const HEXAGONE_FORMATION_ORG: OrganismeInfo = {
+  nom: "HEXAGONE FORMATION",
+  siret: "931 115 521 00011",
+  adresse: "32 RUE DE PARIS",
+  codePostal: "92100",
+  ville: "BOULOGNE-BILLANCOURT",
+  telephone: "06 79 93 25 62",
+  email: "hexagone.formation@outlook.fr",
+  siteWeb: "",
+  nda: "",
+  dirigeant: "Benhamida Wahid",
+  responsablePedagogique: "Mesbah Morad",
+  referentHandicap: "Benhamida Wahid",
+  referentQualite: "Mesbah Morad",
+  poleAdministratif: "Benhamida Wahid",
+  relationEntreprises: "",
+  referentMobilite: "",
+  domainesFormation: "Transport routier de marchandises – Préparation au TP-01329 Gestionnaire des Opérations de Transport Routier de Marchandises",
+  typesActions: ["actions-formation"],
+  certifications: "TP-01329 (RNCP40990)",
+  outilsUtilises: "Word, Excel, plateformes pédagogiques transport, simulateurs TMS",
+  version: "1",
+  dateMaj: "2025-01-06",
+};
+
+export const STAGIAIRES_HEXAGONE_GOTRM: StagiaireInfo[] = [
+  { civilite: "M.", nom: "DEBOUBA", prenom: "Mongi", email: "mongi.debouba@gmail.com", telephone: "06 82 65 25 82", entreprise: "", poste: "", dateNaissance: "", adresse: "4 allée des Framboisiers", codePostal: "91160", commune: "LA VILLE DU BOIS", dateDebutFormation: "2025-01-13", dateFinFormation: "2025-01-17", tarifFormation: "1500" },
+  { civilite: "M.", nom: "DABOUBA", prenom: "Khaled", email: "daboubakhaled@hotmail.com", telephone: "06 68 63 70 05", entreprise: "", poste: "", dateNaissance: "", adresse: "45 RUE LUCIEN SAMPAIX", codePostal: "92320", commune: "CHATILLON", dateDebutFormation: "2025-04-07", dateFinFormation: "2025-04-11", tarifFormation: "1500" },
+  { civilite: "M.", nom: "RIAHI", prenom: "Ismahel", email: "ismahelr@gmail.com", telephone: "06 66 18 82 42", entreprise: "", poste: "", dateNaissance: "", adresse: "132 Boulevard Stalingrad", codePostal: "94200", commune: "IVRY-SUR-SEINE", dateDebutFormation: "2025-01-13", dateFinFormation: "2025-01-17", tarifFormation: "1500" },
+  { civilite: "M.", nom: "TOUABET", prenom: "Samir", email: "tsb94@hotmail.fr", telephone: "06 67 47 60 60", entreprise: "", poste: "", dateNaissance: "", adresse: "L'insurrection Parisienne", codePostal: "94600", commune: "CHOISY-LE-ROI", dateDebutFormation: "2025-01-13", dateFinFormation: "2025-01-17", tarifFormation: "1500" },
+  { civilite: "M.", nom: "BENMALEK", prenom: "El Houceine", email: "benmalek13500@gmail.com", telephone: "07 58 67 52 45", entreprise: "", poste: "", dateNaissance: "", adresse: "27 RUE PIERRE LOTI CHEZ MME ZIACH", codePostal: "95110", commune: "SANNOIS", dateDebutFormation: "2025-08-18", dateFinFormation: "2025-08-22", tarifFormation: "1500" },
+  { civilite: "M.", nom: "GARY", prenom: "Yakouba", email: "gary-ykb@outlook.fr", telephone: "07 87 46 98 99", entreprise: "", poste: "", dateNaissance: "", adresse: "135 impasse du Lac, Station Plagne Centre", codePostal: "73210", commune: "MACOT-LA-PLAGNE", dateDebutFormation: "2025-03-10", dateFinFormation: "2025-03-14", tarifFormation: "1500" },
+  { civilite: "M.", nom: "OGBI", prenom: "Merwane", email: "contact.psm91@gmail.com", telephone: "07 67 07 22 36", entreprise: "", poste: "", dateNaissance: "", adresse: "4 rue Jacob", codePostal: "91670", commune: "ANGERVILLE", dateDebutFormation: "2025-03-13", dateFinFormation: "2025-03-17", tarifFormation: "1500" },
+  { civilite: "M.", nom: "DANURE", prenom: "Kirthichandra", email: "Danuke8@gmail.com", telephone: "06 76 22 46 07", entreprise: "", poste: "", dateNaissance: "", adresse: "18 domaine de la butte à la reine", codePostal: "91120", commune: "PALAISEAU", dateDebutFormation: "2025-03-10", dateFinFormation: "2025-03-14", tarifFormation: "1500" },
+  { civilite: "M.", nom: "MHADJOU", prenom: "Ahmed", email: "geantgrand603@gmail.com", telephone: "07 53 33 85 49", entreprise: "", poste: "", dateNaissance: "", adresse: "48 AVENUE ALEXIS VARAGNE", codePostal: "95400", commune: "VILLIERS-LE-BEL", dateDebutFormation: "2025-09-22", dateFinFormation: "2025-09-26", tarifFormation: "1500" },
+  { civilite: "M.", nom: "DIAGOURAGA", prenom: "Moussa", email: "moussadiagouragara93belr@gmail.com", telephone: "06 19 63 90 79", entreprise: "", poste: "", dateNaissance: "", adresse: "06 RUE ROSA PARKS", codePostal: "93100", commune: "MONTREUIL", dateDebutFormation: "2025-09-21", dateFinFormation: "2025-09-25", tarifFormation: "1500" },
+];
+
 export interface FormateurInfo {
   nom: string;
   prenom: string;
@@ -650,6 +691,26 @@ export const SAMPLE_FORMATIONS: FormationInfo[] = [
     nombreParticipants: "12",
     formateur: "Jean-Pierre Blanc",
     rythmeAlternance: "2 jours en CFA (lundi-mardi) / 3 jours en entreprise (mercredi-jeudi-vendredi)",
+    codeRNCP: "RNCP40990",
+  },
+  {
+    intitule: "HEXAGONE FORMATION – TP GOTRM (Session intensive 5 jours)",
+    objectifs: "Préparer la session d'examen du Titre Professionnel TP-01329 « Gestionnaire des Opérations de Transport Routier de Marchandises » (RNCP40990, niveau 5, arrêté du 03/06/2025 publié au JO du 14/06/2025). Session intensive de 5 jours destinée aux candidats déjà professionnels du transport souhaitant valider le titre par capitalisation des 3 CCP ou par session globale. À l'issue, le candidat sera prêt à présenter : (1) la mise en situation professionnelle (10h en deux parties indépendantes sur deux jours, dossier sous Word® et Excel®), (2) l'entretien technique (1h00), (3) le questionnement à partir de productions (30 min, document de 8 à 12 pages), (4) l'entretien final (30 min). Le titre procure par équivalence l'attestation de capacité professionnelle en transport routier de marchandises (>3,5 t) et de commissionnaire de transport.",
+    prerequis: "Justifier d'une expérience professionnelle dans le transport routier de marchandises ou la logistique (minimum 1 an souhaité). Maîtrise du français écrit et oral. Maîtrise des outils bureautiques (Word, Excel, navigation web). Aisance avec les chiffres (PRK, marges, indices CNR). Permis B souhaité. Avoir rédigé en amont (ou s'engager à finaliser pendant la session) le document support du Questionnement à partir de productions (8 à 12 pages, 10 000 à 17 000 caractères).",
+    duree: "35 heures sur 5 jours consécutifs (lundi au vendredi, 7h/jour)",
+    modalites: "presentiel",
+    tarif: "1 500 € HT par stagiaire (TVA 0 % – exonération article 261-4-4° du CGI)",
+    programme: "JOUR 1 (lundi, 7h) – CCP1 partie 1 : Étude de faisabilité et tarification\n• Code des transports, ADR, ATP, Convention CMR/TIR\n• Calcul du prix de revient kilométrique (PRK), grilles tarifaires, indices CNR\n• Formalisation de la proposition technique sous Word®/Excel® (étude de cas)\n\nJOUR 2 (mardi, 7h) – CCP1 partie 2 : Affectation, affrètement, planification, encadrement conducteurs\n• Choix des moyens humains et matériels, contrôle administratif des sous-traitants (licence, capacité, RC)\n• Bourses de fret (B2P, Teleroute, Wtransnet), TMS pédagogique (Akanea, Trans-iX)\n• Règlement (CE) 561/2006, AETR, accord 35h transport, lecture chronotachygraphes numériques\n• Mise en situation : encadrement d'équipe, plans de marche, gestion des infractions\n\nJOUR 3 (mercredi, 7h) – CCP2 : Trafics réguliers et sous-traitance\n• Contrat-type sous-traitance transport (décret du 26/12/2017), clauses tarifaires et indexation gazole\n• Supervision traction / groupage / dégroupage / camionnage – hubs et plateformes messagerie\n• Optimisation tournées (PTV, OptimoRoute), géolocalisation, suivi temps réel\n• Service après-vente : litiges (avaries, manquants, retards), réserves CMR, indemnisations\n\nJOUR 4 (jeudi, 7h) – CCP3 : Optimisation des moyens et pilotage\n• Animation et supervision de l'exploitation, conduite de réunion, briefings/débriefings\n• Tableau de bord exploitation : km/litre, taux de remplissage, taux de retour à vide, productivité conducteur, marge brute par client\n• Reporting direction, plans d'actions correctives, démarche d'amélioration continue (PDCA, 5 pourquoi)\n• Préparation de l'entretien final sur la culture professionnelle du métier\n\nJOUR 5 (vendredi, 7h) – Examen blanc complet et finalisation\n• Mise en situation professionnelle blanche (matin) sur poste informatique avec dossier technique sous Word® et Excel®\n• Entretien technique blanc (après-midi) avec 20 min de préparation\n• Questionnement à partir de productions blanc (30 min) sur le document rédigé en amont par le candidat\n• Entretien final blanc (30 min) – débriefing collectif et plan de révision personnalisé jusqu'à la session officielle",
+    methodesEvaluation: "Évaluations formatives quotidiennes : QCM réglementaire (RSE, AETR, Code des transports, ADR), études de cas tarifaires sur Excel®, mises en situation sur TMS pédagogique, jeux de rôle SAV/litiges, analyse critique des productions du candidat. Évaluation sommative blanche le jour 5 reproduisant fidèlement la session du titre (mise en situation 10h compressées sur la journée + entretiens). Grille d'acquisition des compétences par CCP. Bilan à chaud le dernier jour, bilan à froid à 3 mois.",
+    moyensPedagogiques: "Salle de formation équipée de PC individuels avec Word®, Excel®, accès Internet et accès aux textes Legifrance. Logiciel TMS pédagogique (type Akanea Transport ou équivalent), simulateur de bourse de fret. Plateforme LMS de révision (modules e-learning RSE, AETR, Code des transports, QCM auto-corrigés disponibles 6 mois). Documentation à jour : Code des transports, contrats-types DGITM, Convention CMR, IRU, conventions collectives transport routier (3085). Annales des sessions du titre. Vidéoprojecteur, paperboard, classeur stagiaire avec exercices et corrigés. Accompagnement individualisé par un formateur référent du domaine transport.",
+    publicVise: "Conducteurs routiers évoluant vers l'exploitation, agents administratifs du transport souhaitant accéder à un poste d'exploitation, exploitants déjà en poste souhaitant valider leur titre par capitalisation des 3 CCP, candidats VAE justifiant d'au moins 1 an d'expérience en service exploitation transport.",
+    delaiAcces: "14 jours après signature de la convention de formation et règlement de la facture (1 500 € HT par virement bancaire).",
+    dateDebut: "2025-01-13",
+    dateFin: "2025-09-26",
+    lieu: "HEXAGONE FORMATION – 32 RUE DE PARIS, 92100 BOULOGNE-BILLANCOURT",
+    nombreParticipants: "10",
+    formateur: "Mesbah Morad",
+    rythmeAlternance: "Sessions hebdomadaires en présentiel (lundi au vendredi, 7h/jour)",
     codeRNCP: "RNCP40990",
   },
   {
