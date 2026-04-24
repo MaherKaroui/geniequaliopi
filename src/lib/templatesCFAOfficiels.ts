@@ -254,6 +254,29 @@ const SCENARIOS_PAR_DOMAINE: Record<string, { intitules: string[]; entreprises: 
     entreprises: ["DIGITAL FACTORY", "WEB AGENCY PRO", "CODE & CO", "TECH STARTUP", "INNOV NUMÉRIQUE"],
     secteur: "Développement",
   },
+  transport: {
+    intitules: [
+      "Organisation d'un plan de transport régulier Île-de-France ↔ Hauts-de-France pour un chargeur industriel",
+      "Tarification et formalisation d'une proposition d'affrètement complet 24T sur l'axe Paris-Lyon-Marseille",
+      "Mise en place d'un plan de tournées de messagerie sur la zone Grand Paris avec optimisation TMS",
+      "Traitement d'un litige transport (avarie marchandise) sous Convention CMR avec expertise contradictoire",
+      "Reconstitution des indicateurs de performance exploitation (OTIF, taux de retour à vide, PRK) et plan d'actions correctives",
+      "Sélection et contractualisation d'un panel de sous-traitants conformément au contrat-type sous-traitance transport",
+      "Pilotage d'une équipe de 8 conducteurs PL/SPL dans le respect du règlement (CE) 561/2006 et de l'AETR",
+      "Gestion d'un aléa exploitation : panne véhicule sur tournée régulière et réorganisation en temps réel",
+    ],
+    entreprises: [
+      "TRANSPORTS GEODIS",
+      "DACHSER FRANCE",
+      "STEF TRANSPORT",
+      "GROUPE CHARLES ANDRÉ (GCA)",
+      "TRANSPORTS JACKY PERRENOT",
+      "DELANCHY TRANSPORTS",
+      "XPO LOGISTICS",
+      "HEPPNER TRANSPORTS",
+    ],
+    secteur: "Exploitation Transport Routier de Marchandises",
+  },
   default: {
     intitules: [
       "Mise en œuvre d'une procédure interne d'amélioration des processus",
