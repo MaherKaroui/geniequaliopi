@@ -387,7 +387,7 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
     setIsEditing(false);
     try {
       const template = eyDoc.autoTemplates[0];
-      const o = mergeOrganisme(organisme);
+      const o = mergeOrganisme(organismeWithSignature);
       const s = exportStagiaires;
       const params = eyDoc.perStagiaire && s.length > 0 ? { stagiaireIdx: 0, fi: 0 } : { fi: 0 };
       const html = generateDocumentById(`ey_${eyDoc.code}`, template, params, o, formation, s);
