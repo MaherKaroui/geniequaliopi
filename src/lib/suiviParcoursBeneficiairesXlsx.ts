@@ -310,8 +310,9 @@ export function generateSuiviParcoursBeneficiairesXlsxBlob(
 ): Blob {
   const wb = XLSX.utils.book_new();
 
-  // Onglet principal pour la formation courante
-  const sheetName = `Formation ${(f.intitule || "1").slice(0, 25)}`.replace(/[\\/?*\[\]:]/g, " ");
+  // Onglet principal pour la formation courante (max 31 chars, caractères interdits filtrés)
+  const rawName = `Formation ${(f.intitule || "1")}`.replace(/[\\/?*\[\]:]/g, " ").trim();
+  const sheetName = (rawName.length > 31 ? rawName.slice(0, 31) : rawName) || "Formation";
   XLSX.utils.book_append_sheet(wb, buildSheet(o, f, stagiaires), sheetName);
 
   // Onglet vierge supplémentaire prêt à l'emploi
