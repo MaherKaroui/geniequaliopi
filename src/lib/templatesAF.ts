@@ -158,7 +158,7 @@ export function genFactureOPCO(o: OrganismeInfo, f: FormationInfo, stagiaires: S
       <p style="margin:0"><strong>Cachet et Signature</strong><br>
       <em>${o.nom}</em><br>
       ${o.dirigeant || ""}</p>
-      ${o.TamponUrl ? `<img src="${o.TamponUrl}" alt="Tampon" style="max-height:130px;margin-top:8px">` : o.signatureUrl ? `<img src="${o.signatureUrl}" alt="Signature" style="max-height:80px;margin-top:8px">` : ""}
+      ${o.tamponUrl ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:130px;margin-top:8px">` : o.signatureUrl ? `<img src="${o.signatureUrl}" alt="Signature" style="max-height:80px;margin-top:8px">` : ""}
     </div>`;
 
   return buildDocument({
