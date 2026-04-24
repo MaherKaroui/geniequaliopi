@@ -66,7 +66,7 @@ export function genFactureOPCO(o: OrganismeInfo, f: FormationInfo, stagiaires: S
 
   return buildDocument({
     org: o,
-    title: "FACTURE DE FORMATION – PRISE EN CHARGE OPCO",
+    title: "FACTURE DE FORMATION",
     subtitle: `N° ${factNum}`,
     formation: f,
     showFormationInfo: true,
