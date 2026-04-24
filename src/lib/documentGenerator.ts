@@ -12775,7 +12775,97 @@ function genTempsConnexionOPCOVierge(o: OrganismeInfo, f: FormationInfo, stagiai
  * - Si la semaine école est future → exercice listé en "À venir" (vierge).
  * - Si formation pas encore terminée : seules les semaines passées sont remplies.
  */
-function genExercicesOPCO(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
+/**
+ * Calcule la liste des semaines école PASSÉES pour une session OPCO.
+ * Renvoie 1 entrée par semaine école avec premier/dernier jour école.
+ * Permet à OPCOMobilites.tsx de générer 1 PDF par semaine × stagiaire.
+ */
+export function getOpcoExerciceWeeks(
+  f: FormationInfo,
+  sessionStagiaires: StagiaireInfo[],
+): Array<{ weekIdx: number; firstDay: Date; lastDay: Date }> {
+  const parseRythme = (txt?: string): { ecole: number; entreprise: number } => {
+    if (!txt) return { ecole: 1, entreprise: 3 };
+    const m = txt.match(/(\d+)\s*sem[^0-9]*?(\d+)\s*sem/i);
+    if (m) return { ecole: Math.max(1, parseInt(m[1])), entreprise: Math.max(0, parseInt(m[2])) };
+    return { ecole: 1, entreprise: 3 };
+  };
+  const rythme = parseRythme(f.rythmeAlternance);
+  const cycleWeeks = rythme.ecole + rythme.entreprise;
+  const parseD = (s: string): Date | null => {
+    if (!s) return null;
+    const t = s.trim();
+    const fr = t.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if (fr) return new Date(parseInt(fr[3]), parseInt(fr[2]) - 1, parseInt(fr[1]));
+    const d = new Date(t);
+    return isNaN(d.getTime()) ? null : d;
+  };
+  const startOfWeek = (d: Date): Date => {
+    const r = new Date(d);
+    const dow = r.getDay();
+    const diff = dow === 0 ? -6 : 1 - dow;
+    r.setDate(r.getDate() + diff);
+    r.setHours(0, 0, 0, 0);
+    return r;
+  };
+  const weekIndex = (d: Date, ref: Date): number => {
+    const a = startOfWeek(d).getTime();
+    const b = startOfWeek(ref).getTime();
+    return Math.round((a - b) / (7 * 24 * 3600 * 1000));
+  };
+  const computeWeekShift = (startStr: string): number => {
+    const d = parseD(startStr);
+    if (!d) return 0;
+    const dow = d.getDay();
+    const remaining = dow === 0 ? 0 : Math.max(0, 6 - Math.max(dow, 1));
+    return remaining < 3 ? 1 : 0;
+  };
+  const isEcoleWeek = (wIdx: number, shift = 0): boolean => {
+    const adjusted = wIdx - shift;
+    if (adjusted < 0) return true;
+    const pos = ((adjusted % cycleWeeks) + cycleWeeks) % cycleWeeks;
+    return pos < rythme.ecole;
+  };
+
+  // PRIORITÉ aux dates individuelles : fallback sur la formation globale
+  const s0 = sessionStagiaires[0];
+  const debut = (s0?.dateDebutFormation || f.dateDebut || "");
+  const fin = (s0?.dateFinFormation || f.dateFin || "");
+  const refDate = parseD(debut);
+  const endDate = parseD(fin);
+  if (!refDate || !endDate) return [];
+
+  const today = new Date();
+  today.setHours(23, 59, 59, 999);
+
+  const shift = computeWeekShift(debut);
+  const cur = new Date(refDate);
+  const weekMap = new Map<number, Date[]>();
+  while (cur <= endDate) {
+    const dow = cur.getDay();
+    if (dow !== 0 && dow !== 6) {
+      const wIdx = weekIndex(cur, refDate);
+      if (isEcoleWeek(wIdx, shift)) {
+        if (!weekMap.has(wIdx)) weekMap.set(wIdx, []);
+        weekMap.get(wIdx)!.push(new Date(cur));
+      }
+    }
+    cur.setDate(cur.getDate() + 1);
+  }
+  const ordered = Array.from(weekMap.entries()).sort((a, b) => a[0] - b[0]);
+  const out: Array<{ weekIdx: number; firstDay: Date; lastDay: Date }> = [];
+  ordered.forEach(([wIdx, days]) => {
+    const firstDay = days[0];
+    const lastDay = days[days.length - 1];
+    // Ne renvoyer QUE les semaines passées (lastDay <= today)
+    if (lastDay <= today) {
+      out.push({ weekIdx: wIdx, firstDay, lastDay });
+    }
+  });
+  return out;
+}
+
+function genExercicesOPCO(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], params?: { weekIdx?: number }) {
   // Parse rythme alternance (défaut 1 sem école / 3 sem entreprise)
   const parseRythme = (txt?: string): { ecole: number; entreprise: number } => {
     if (!txt) return { ecole: 1, entreprise: 3 };
