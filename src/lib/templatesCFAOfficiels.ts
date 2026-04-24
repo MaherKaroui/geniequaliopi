@@ -603,7 +603,7 @@ export function genDPOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: St
     <h2 class="section-title">DOSSIER PROFESSIONNEL (DP)</h2>
     <h3 class="subsection">ANNEXES</h3>
     <p style="font-style:italic;color:#666">(Si le RC le prévoit)</p>
-    <div style="margin-top:30px;min-height:700px;border:1px dashed #bbb;background:#fafafa"></div>
+    <div style="margin-top:20px;height:620px;border:1px dashed #bbb;background:#fafafa"></div>
     ${footerDPOfficiel(String(pageNum))}
   </div>`;
 
