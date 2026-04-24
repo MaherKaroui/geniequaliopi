@@ -966,6 +966,18 @@ export default function OPCOMobilites() {
             <StagiairesForm data={stagiaires} onChange={setStagiaires} />
           </Card>
 
+          <Card className="p-6 space-y-4">
+            <div className="flex items-center gap-2">
+              <Palette className="w-5 h-5 text-primary" />
+              <h2 className="text-xl font-semibold">Design des documents</h2>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Choisissez le thème visuel appliqué à l'ensemble des documents OPCO générés
+              (polices, couleurs, en-têtes, styles de titres et de tableaux).
+            </p>
+            <DocStyleConfigPanel style={docStyle} onChange={handleStyleChange} />
+          </Card>
+
           <div className="flex justify-end gap-2">
             <Button onClick={() => { if (validateSetup()) setStep("documents"); }} size="lg" className="gap-2">
               Accéder à la checklist OPCO <ChevronRight className="w-4 h-4" />
