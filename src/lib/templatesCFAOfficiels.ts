@@ -142,8 +142,11 @@ function ministereStyle(): string {
   return `<style>
     *{box-sizing:border-box;margin:0;padding:0}
     body{font-family:'Calibri','Arial',sans-serif;color:#000;font-size:11pt;line-height:1.4}
-    .page{max-width:780px;margin:0 auto;padding:24px 40px 70px;background:#fff;position:relative}
-    .page-break{page-break-after:always;break-after:page}
+    /* .page = logical section only. The PDF engine handles the A4 sizing.
+       No max-width / no padding / no absolute footer so we don't overflow
+       the engine content area and trigger blank pages. */
+    .page{background:#fff;padding:10px 18px 18px;margin:0}
+    .page + .page{page-break-before:always;break-before:page}
     .ministere-header{margin-bottom:20px}
     .ministere-header img.ministere-logo-img{display:block;max-height:110px;width:auto}
     h1.dp-title{text-align:center;font-size:18pt;font-weight:bold;margin:30px 0 20px;letter-spacing:1px;color:#0055A4}
@@ -162,7 +165,9 @@ function ministereStyle(): string {
     .check-line{margin:8px 0;font-size:10pt}
     .check-box{display:inline-block;width:14px;height:14px;border:1.5px solid #000;text-align:center;line-height:11px;vertical-align:middle;margin-right:6px;font-weight:bold}
     .check-box.ck::before{content:"X";font-size:11pt}
-    .footer-table{position:absolute;bottom:30px;left:40px;right:40px;width:auto}
+    /* Footer is no longer absolutely positioned — it sits inline at the end
+       of each .page block so it cannot overflow the PDF page area. */
+    .footer-table{margin-top:24px;width:100%}
     .footer-table table{width:100%;border-collapse:collapse;font-size:8pt}
     .footer-table th,.footer-table td{border:1px solid #999;padding:3px 5px;text-align:center}
     .footer-table th{background:#F0F0F0}
@@ -177,6 +182,8 @@ function ministereStyle(): string {
     .competence-list{margin:8px 0 12px 22px;font-size:10pt}
     .competence-list li{margin:3px 0}
     .resultat-final{padding:12px;border:2px solid #0055A4;background:#E8EEF7;text-align:center;font-weight:bold;margin:14px 0;font-size:11pt}
+    /* Neutralise stray break markers that used to create blank pages. */
+    .page-break{display:none}
   </style>`;
 }
 
