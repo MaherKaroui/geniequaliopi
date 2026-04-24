@@ -331,6 +331,16 @@ export const OPCO_DOCUMENTS: OpcoDocumentItem[] = [
     perStagiaire: false,
     category: "service_apprenant",
   },
+  {
+    code: "C13",
+    label: "Facture OPCO",
+    longLabel: "Facture OPCO – Prise en charge (500 € par apprenti)",
+    description: "Facture adressée à OPCO Mobilités au titre de la prise en charge de la formation : 500,00 € TTC par apprenti. Un fichier par apprenti, daté 3 jours ouvrés avant le démarrage individuel.",
+    autoTemplates: ["facture_opco"],
+    perStagiaire: true,
+    category: "service_apprenant",
+    forAllApprentis: true,
+  },
 ];
 
 export type OpcoDocStatus = "pending" | "auto" | "uploaded" | "not_applicable";
