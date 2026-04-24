@@ -1011,6 +1011,92 @@ export const RNCP_FICHES: RNCPFiche[] = [
     voiesAcces: ["Après un parcours de formation continue auprès d'un organisme habilité par la CMA France", "Inscription libre à l'examen via le site de la CMA"],
     dureeIndicative: "140h (épreuves communes + spécifiques + pratique)",
   },
+  {
+    code: "RNCP40990",
+    intitule: "TP - Gestionnaire des opérations de transport routier de marchandises",
+    niveau: "Niveau 5 (Bac+2)",
+    certificateur: "MINISTÈRE DU TRAVAIL, DE LA SANTÉ, DES SOLIDARITÉS ET DES FAMILLES",
+    dateEnregistrement: "14/06/2025",
+    dateEcheance: "24/08/2030",
+    codeNSF: "311n – Études et projets d'organisation de transit de biens ou de personnes",
+    formacodes: "31827 / 31856 / 31822 / 31895 / 31839 – Transport routier de marchandises, exploitation, affrètement",
+    resume: "Le Gestionnaire des opérations de transport routier de marchandises (GOTRM, sigle TP-01329, millésime 03, arrêté du 03/06/2025 publié au JO du 14/06/2025) conçoit, organise, met en œuvre et pilote les prestations de transport routier de marchandises jusqu'à la clôture des dossiers. Il pilote les trafics réguliers sous contrat de sous-traitance et optimise l'ensemble des moyens humains, matériels et financiers liés à l'activité de transport. Le titre procure par équivalence l'attestation de capacité professionnelle en transport routier de marchandises (>3,5 t) et de commissionnaire de transport.",
+    activitesVisees: "Étudier la faisabilité des demandes de transport (y compris affrétées), tarifer et formaliser les propositions techniques. Affecter, affréter et planifier les moyens. Encadrer une équipe de conducteurs dans le respect de la réglementation sociale (RSE 561/2006, AETR, temps de conduite/repos). Coordonner l'exécution, renseigner les tableaux de suivi qualité-rentabilité. Négocier et contractualiser les opérations sous-traitées. Superviser traction, groupage, dégroupage, camionnage. Assurer le SAV (litiges, avaries, manquants). Animer et superviser le personnel exploitation. Reconstituer les indicateurs de performance et préconiser des mesures correctives.",
+    blocsCompetences: [
+      {
+        titre: "CCP1 – Concevoir, organiser, mettre en œuvre et piloter des prestations de transport routier de marchandises jusqu'à la clôture des dossiers",
+        competences: [
+          "Étudier la faisabilité des demandes de transport, y compris affrétées, les tarifer et transmettre par écrit une proposition technique détaillée au donneur d'ordres",
+          "Affecter, affréter et planifier les moyens adaptés à la réalisation des opérations de transport routier de marchandises",
+          "Encadrer au quotidien une équipe de conducteurs dans le respect des réglementations en vigueur",
+          "Coordonner l'exécution de chaque opération de transport, renseigner les tableaux de suivi et contrôler le respect des objectifs qualité et de rentabilité fixés par l'entreprise",
+        ],
+        matieres: [
+          { competence: "Étude de faisabilité et tarification", contenu: "Cahier des charges client, contraintes réglementaires (Code des transports, ADR, ATP, conventions internationales CMR/TIR), méthodes de calcul de prix de revient kilométrique (PRK), grilles tarifaires, indices CNR, formalisation de la proposition commerciale conforme au code des transports", volume: "60h" },
+          { competence: "Affectation, affrètement et planification", contenu: "Choix des moyens humains et matériels, sélection et contrôle administratif des sous-traitants (licence, attestation de capacité, assurance RC), bourses de fret (B2P, Teleroute, Wtransnet), TMS (Akanea, Shippeo, Trans-iX), planning d'exploitation, prise en compte des situations de handicap", volume: "70h" },
+          { competence: "Encadrement d'équipe de conducteurs", contenu: "Réglementation sociale européenne (R(CE) 561/2006), AETR, accord 35h transport, lecture des chronotachygraphes numériques, plans de marche, déclaration des infractions, communication managériale, gestion des conflits", volume: "60h" },
+          { competence: "Coordination et clôture des dossiers", contenu: "Suivi temps réel des opérations, gestion des aléas (panne, accident, marchandises non prêtes, refus livraison), réserves CMR, indicateurs qualité (taux de service, OTIF), indicateurs de rentabilité, alertes hiérarchie", volume: "50h" },
+        ],
+        modalitesEval: "Mise en situation professionnelle (1ère partie – 5h00) : dossier technique sous Word® + Excel® sur poste informatique, sans annotation jury. Entretien technique (1h00, dont 20 min de préparation hors décompte). Questionnement à partir de production(s) (30 min) basé sur un document de 8 à 12 pages (10 000 à 17 000 caractères) rédigé en amont par le candidat à partir d'une période en entreprise de 280h minimum, décrivant une opération de rechargement, un aléa et une situation de litige.",
+      },
+      {
+        titre: "CCP2 – Piloter les trafics réguliers sous contrat de sous-traitance",
+        competences: [
+          "Négocier et contractualiser les opérations de transport régulièrement sous-traitées",
+          "Superviser les opérations de traction, groupage, dégroupage ou camionnage",
+          "Assurer le service après-vente des opérations de livraisons et de retours de marchandises",
+        ],
+        matieres: [
+          { competence: "Négociation et contractualisation sous-traitance", contenu: "Contrat-type sous-traitance transport (décret du 26/12/2017), clauses tarifaires et indexation gazole, négociation B2B, due diligence, plan de transport régulier, KPI contractuels", volume: "55h" },
+          { competence: "Supervision traction / groupage / dégroupage / camionnage", contenu: "Organisation des hubs et plateformes de messagerie, optimisation des tournées (logiciels de tournée type ORTEC, PTV, OptimoRoute), suivi temps réel (géolocalisation), gestion des écarts plan/réel", volume: "55h" },
+          { competence: "Service après-vente transport", contenu: "Traitement des litiges (avaries, manquants, retards), procédures de réclamation, expertise contradictoire, indemnisations (Convention CMR, contrat-type général), satisfaction client, fidélisation B2B", volume: "40h" },
+        ],
+        modalitesEval: "Mise en situation professionnelle (2ème partie – 5h00) sur poste informatique. Entretien technique (1h00) portant notamment sur le SAV et la qualité de service.",
+      },
+      {
+        titre: "CCP3 – Optimiser l'ensemble des moyens liés à l'activité de transport",
+        competences: [
+          "Animer et superviser l'activité du personnel du service exploitation",
+          "Reconstituer les indicateurs de performance de l'activité globale et, si besoin, préconiser des mesures correctives",
+        ],
+        matieres: [
+          { competence: "Animation et supervision de l'exploitation", contenu: "Management d'équipe exploitation, conduite de réunion, briefings/débriefings, plan de formation interne, entretiens professionnels, prévention des RPS dans le secteur transport", volume: "45h" },
+          { competence: "Indicateurs de performance et mesures correctives", contenu: "Tableau de bord exploitation (km/litre, taux de remplissage, taux de retour à vide, productivité conducteur, marge brute par client), reporting direction, plans d'actions correctives, démarche d'amélioration continue (PDCA, 5 pourquoi)", volume: "50h" },
+        ],
+        modalitesEval: "Mise en situation professionnelle (intégrée à la 2ème partie). Entretien technique. Entretien final (30 min) avec le jury sur la culture professionnelle, le rôle et la fonction de gestionnaire des opérations de transport.",
+      },
+    ],
+    secteursActivite: "Entreprises de transport public routier de marchandises et commissionnaires de transport. Entreprises industrielles et commerciales avec activité de transport intégré. Logistique. Messagerie, lot, vrac, température dirigée, TMD (transport de matières dangereuses).",
+    typesEmplois: [
+      "Exploitant en transport routier de marchandises",
+      "Technicien d'exploitation en transport routier de marchandises",
+      "Agent / Assistant d'exploitation en transport routier de marchandises",
+      "Affréteur transport routier / Affréteur transport international",
+      "Chef de service affrètement",
+      "Technicien de planning – Dispatcheur / Répartiteur",
+      "Responsable camionnage / Chef de service camionnage",
+      "Responsable d'exploitation messagerie",
+      "Chef d'agence transport routier de marchandises",
+      "Chef de trafic messagerie / Responsable d'agence messagerie",
+      "Responsable opérationnel / d'exploitation en transport routier de marchandises",
+      "Gestionnaire de transport routier de marchandises",
+      "Employé / Responsable du Service Après-Vente (SAV) transport",
+      "Employé du service litiges",
+    ],
+    codesROME: [
+      "N1207 – Chef / Cheffe de groupe affrètement",
+      "N4203 – Agent d'intervention technique d'exploitation des transports routiers de marchandises",
+      "N4201 – Responsable d'agence transport routier de marchandises",
+      "N1201 – Affréteur / Affréteuse",
+    ],
+    voiesAcces: [
+      "Parcours continu de formation (avec période en entreprise obligatoire de 280h minimum)",
+      "Contrat d'apprentissage ou de professionnalisation",
+      "Validation des Acquis de l'Expérience (VAE)",
+      "Capitalisation des 3 CCP",
+    ],
+    dureeIndicative: "Session du titre : 12h00 (Mise en situation 10h en 2 jours + Entretien technique 1h + Questionnement 30 min + Entretien final 30 min). Parcours de formation : environ 485h en centre + 280h minimum en entreprise.",
+  },
 ];
 
 export function getRNCPByCode(code: string): RNCPFiche | undefined {
