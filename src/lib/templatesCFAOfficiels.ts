@@ -400,39 +400,64 @@ function buildDPExemple(
   return genererExemplePratique(f, s, activite, ai * 10 + exNum);
 }
 
+/**
+ * Footer officiel du DP (Version du 01/06/2016).
+ * Le PDF ministériel n'utilise pas le tableau tabulaire mais une ligne discrète.
+ */
+function footerDPOfficiel(pageLabel: string): string {
+  return `<div class="footer-dp">
+    <span>▶ DOSSIER PROFESSIONNEL — Version du 01/06/2016</span>
+    <span>Page ${pageLabel}</span>
+  </div>`;
+}
+
 export function genDPOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], stagiaireIdx: number = 0): string {
   const s = stagiaires[stagiaireIdx];
   if (!s) return "<p>Stagiaire introuvable</p>";
 
-  const codeTitre = getCodeTitre(f);
-  const mil = getMillesime(f);
-  const dateJo = getDateJO(f);
   const dateMaj = getDateMajOrg(o);
-  const sigle = "DP";
-  const typeDoc = "Dossier professionnel";
   const activites = getActivitesTypes(f);
   const intituleTitre = f.intitule || "Titre professionnel";
-  const aiPack = getCachedDPPack(f, s); // null si pas préchargé
-  const termineDP = isStagiaireFormationTerminee(s, f);
+  const aiPack = getCachedDPPack(f, s);
 
-  let html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">${ministereStyle()}</head><body>`;
+  // Style spécifique DP (footer simple + check-box carré vide)
+  const dpExtraStyle = `<style>
+    .footer-dp{position:absolute;bottom:24px;left:40px;right:40px;display:flex;justify-content:space-between;font-size:9pt;color:#555;border-top:1px solid #ddd;padding-top:6px}
+    .dp-cover-field{display:flex;align-items:baseline;gap:10px;margin:14px 0;border-bottom:1px solid #000;padding-bottom:4px}
+    .dp-cover-field .lbl{min-width:200px;font-weight:bold}
+    .dp-cover-field .val{flex:1;min-height:22px;color:#333}
+    .dp-modalite-line{margin:10px 0;font-size:11pt}
+    .sommaire-activite{font-weight:bold;margin-top:14px;background:#E8EEF7;padding:6px 10px;border-left:3px solid #0055A4}
+    .sommaire-exemple{margin:3px 0 3px 20px;display:flex;justify-content:space-between;border-bottom:1px dotted #999;padding:2px 0}
+    .sommaire-other{margin-top:16px;display:flex;justify-content:space-between;border-bottom:1px dotted #999;padding:4px 0;font-weight:bold}
+    .annex-table{width:100%;border-collapse:collapse;margin:10px 0;font-size:10pt}
+    .annex-table th,.annex-table td{border:1px solid #000;padding:8px;vertical-align:top}
+    .annex-table th{background:#E8EEF7;font-weight:bold;text-align:left}
+    .annex-table td.empty{height:26px}
+  </style>`;
+
+  let html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">${ministereStyle()}${dpExtraStyle}</head><body>`;
 
   // ===== PAGE 1 - Couverture =====
+  const nomUsage = (s.nom || "").toUpperCase();
   html += `<div class="page">
+    <div style="text-align:center;font-size:10pt;margin-bottom:8px">
+      <p style="font-style:italic;color:#555">Liberté • Égalité • Fraternité</p>
+      <p style="font-weight:bold;letter-spacing:1px">RÉPUBLIQUE FRANÇAISE</p>
+    </div>
     ${ministereHeader("DOSSIER PROFESSIONNEL (DP)", "MINISTÈRE CHARGÉ DE L'EMPLOI")}
-    <div class="info-block" style="margin-top:30px">
-      <p><strong>Nom de naissance ▶</strong> ${s.nom?.toUpperCase() || ""}</p>
-      <p><strong>Nom d'usage ▶</strong> ${s.nom?.toUpperCase() || ""}</p>
-      <p><strong>Prénom ▶</strong> ${s.prenom || ""}</p>
-      <p><strong>Date de naissance ▶</strong> ${getStagDateNaissance(s)}</p>
-      <p><strong>Adresse ▶</strong><br>${getStagAdresse(s)}</p>
+    <div style="margin-top:40px">
+      <div class="dp-cover-field"><span class="lbl">Nom de naissance ▶</span><span class="val">${nomUsage}</span></div>
+      <div class="dp-cover-field"><span class="lbl">Nom d'usage ▶</span><span class="val">${nomUsage}</span></div>
+      <div class="dp-cover-field"><span class="lbl">Prénom ▶</span><span class="val">${s.prenom || ""}</span></div>
+      <div class="dp-cover-field"><span class="lbl">Adresse ▶</span><span class="val">${getStagAdresse(s).replace(/<br>/g, " – ")}</span></div>
     </div>
     <h2 class="section-title" style="margin-top:30px">Titre professionnel visé</h2>
     <p style="font-size:13pt;font-weight:bold;margin:8px 0">${intituleTitre}</p>
     <h3 class="subsection">MODALITÉ D'ACCÈS :</h3>
-    <p class="check-line"><span class="check-box ck"></span>Parcours de formation</p>
-    <p class="check-line"><span class="check-box"></span>Validation des Acquis de l'Expérience (VAE)</p>
-    ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, "1", dateMaj)}
+    <p class="dp-modalite-line"><span class="check-box"></span> Validation des Acquis de l'Expérience (VAE)</p>
+    <p class="dp-modalite-line"><span class="check-box ck"></span> Parcours de formation</p>
+    ${footerDPOfficiel("1")}
   </div><div class="page-break"></div>`;
 
   // ===== PAGE 2 - Présentation =====
@@ -443,25 +468,55 @@ export function genDPOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: St
     <p class="justify">Le DP appartient au candidat. Il le conserve, l'actualise durant son parcours et le présente <strong>obligatoirement à chaque session d'examen</strong>.</p>
     <p class="justify">Pour rédiger le DP, le candidat peut être aidé par un formateur ou par un accompagnateur VAE. Il est consulté par le jury au moment de la session d'examen.</p>
     <h3 class="subsection">Pour prendre sa décision, le jury dispose :</h3>
-    <ul class="dp-list">
+    <ol class="dp-list" style="list-style:decimal;margin-left:24px">
       <li>des résultats de la mise en situation professionnelle complétés, éventuellement, du questionnaire professionnel ou de l'entretien professionnel ou de l'entretien technique ou du questionnement à partir de productions ;</li>
       <li>du Dossier Professionnel (DP) dans lequel le candidat a consigné les preuves de sa pratique professionnelle ;</li>
       <li>des résultats des évaluations passées en cours de formation lorsque le candidat évalué est issu d'un parcours de formation ;</li>
       <li>de l'entretien final (dans le cadre de la session titre).</li>
-    </ul>
+    </ol>
     <p style="font-style:italic;font-size:9pt;margin-top:10px">[Arrêté du 22 décembre 2015, relatif aux conditions de délivrance des titres professionnels du ministère chargé de l'Emploi]</p>
     <h3 class="subsection">Ce dossier comporte :</h3>
     <ul class="dp-list">
       <li>pour chaque activité-type du titre visé, un à trois exemples de pratique professionnelle ;</li>
+      <li>un tableau à renseigner si le candidat souhaite porter à la connaissance du jury la détention d'un titre, d'un diplôme, d'un certificat de qualification professionnelle (CQP) ou des attestations de formation ;</li>
       <li>une déclaration sur l'honneur à compléter et à signer ;</li>
-      <li>des documents illustrant la pratique professionnelle du candidat (facultatif) ;</li>
+      <li>des documents illustrant la pratique professionnelle du candidat <em>(facultatif)</em> ;</li>
       <li>des annexes, si nécessaire.</li>
     </ul>
-    ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, "2", dateMaj)}
+    <p style="font-style:italic;margin-top:10px">Pour compléter ce dossier, le candidat dispose d'un site web en accès libre : <strong>http://travail-emploi.gouv.fr/titres-professionnels</strong></p>
+    ${footerDPOfficiel("2")}
+  </div><div class="page-break"></div>`;
+
+  // ===== PAGE 3 - Sommaire =====
+  let pageExemple = 5; // après couverture(1), présentation(2), sommaire(3), séparateur Exemples(4)
+  const sommaireRows = activites.map((act, ai) => {
+    const firstPage = pageExemple + ai * 2;
+    return `<div class="sommaire-activite">Intitulé de l'activité-type n° ${ai + 1} : ${act.titre}<span style="float:right">p. ${firstPage}</span></div>
+      <div class="sommaire-exemple"><span>▶ Exemple n° 1</span><span>p. ${firstPage}</span></div>
+      <div class="sommaire-exemple"><span>▶ Exemple n° 2</span><span>p. ${firstPage + 1}</span></div>`;
+  }).join("");
+  const pageAfterExemples = pageExemple + activites.length * 2;
+  html += `<div class="page">
+    <h2 class="section-title">DOSSIER PROFESSIONNEL (DP)</h2>
+    <h3 class="subsection" style="text-align:center;font-size:14pt">Sommaire</h3>
+    <h4 style="margin-top:20px;text-align:center;font-style:italic">Exemples de pratique professionnelle</h4>
+    ${sommaireRows}
+    <div class="sommaire-other"><span>Titres, diplômes, CQP, attestations de formation <em style="font-weight:normal">(facultatif)</em></span><span>p. ${pageAfterExemples}</span></div>
+    <div class="sommaire-other"><span>Déclaration sur l'honneur</span><span>p. ${pageAfterExemples + 1}</span></div>
+    <div class="sommaire-other"><span>Documents illustrant la pratique professionnelle <em style="font-weight:normal">(facultatif)</em></span><span>p. ${pageAfterExemples + 2}</span></div>
+    <div class="sommaire-other"><span>Annexes <em style="font-weight:normal">(Si le RC le prévoit)</em></span><span>p. ${pageAfterExemples + 3}</span></div>
+    ${footerDPOfficiel("3")}
+  </div><div class="page-break"></div>`;
+
+  // ===== PAGE 4 - Séparateur Exemples =====
+  html += `<div class="page" style="display:flex;align-items:center;justify-content:center;flex-direction:column;min-height:1000px">
+    <h2 class="section-title" style="text-align:center;width:100%">DOSSIER PROFESSIONNEL (DP)</h2>
+    <h1 style="font-size:22pt;text-align:center;margin-top:80px;letter-spacing:2px;color:#0055A4">EXEMPLES DE PRATIQUE PROFESSIONNELLE</h1>
+    ${footerDPOfficiel("4")}
   </div><div class="page-break"></div>`;
 
   // ===== PAGES Activités-types & Exemples =====
-  let pageNum = 3;
+  let pageNum = 5;
   activites.forEach((act, ai) => {
     const aiExemple = aiPack?.exemples?.[ai] || null;
     [1, 2].forEach((exNum) => {
@@ -495,29 +550,61 @@ export function genDPOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: St
           <div class="q">5. Informations complémentaires <em>(facultatif)</em></div>
           <div class="a">Cette mission s'inscrit dans la continuité de mon parcours professionnel et illustre ma capacité à mobiliser les compétences attendues par le référentiel.</div>
         </div>
-        ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, String(pageNum), dateMaj)}
+        ${footerDPOfficiel(String(pageNum))}
       </div><div class="page-break"></div>`;
       pageNum++;
     });
   });
+
+  // ===== PAGE - Titres, diplômes, CQP, attestations (facultatif) =====
+  html += `<div class="page">
+    <h2 class="section-title">DOSSIER PROFESSIONNEL (DP)</h2>
+    <h3 class="subsection">Titres, diplômes, CQP, attestations de formation <em style="font-weight:normal">(facultatif)</em></h3>
+    <table class="annex-table">
+      <tr><th style="width:45%">Intitulé</th><th style="width:35%">Autorité ou organisme</th><th style="width:20%">Date</th></tr>
+      ${Array.from({ length: 9 }).map(() => `<tr><td class="empty"></td><td class="empty"></td><td class="empty"></td></tr>`).join("")}
+    </table>
+    ${footerDPOfficiel(String(pageNum))}
+  </div><div class="page-break"></div>`;
+  pageNum++;
 
   // ===== PAGE Déclaration sur l'honneur =====
   html += `<div class="page">
     <h2 class="section-title">DOSSIER PROFESSIONNEL (DP)</h2>
     <h3 class="subsection">Déclaration sur l'honneur</h3>
     <p class="declaration">Je soussigné(e) <strong>${(s.prenom || "").toUpperCase()} ${(s.nom || "").toUpperCase()}</strong>,</p>
-    <p class="declaration">Déclare sur l'honneur que les informations consignées dans le présent Dossier Professionnel sont exactes et que les exemples de pratique professionnelle relatés correspondent à des situations vécues dans le cadre de mon activité professionnelle ou de mon parcours de formation.</p>
-    <p class="declaration">Je certifie l'authenticité des documents joints en annexe et m'engage à pouvoir en justifier l'origine si demande en est faite.</p>
-    <p class="declaration">Pour faire valoir ce que de droit.</p>
-    <div style="margin-top:40px;display:flex;justify-content:space-between;font-size:10pt">
-      <div><strong>Fait à :</strong> ${o.ville || "Paris"}</div>
-      <div><strong>Le :</strong> ${dateMaj}</div>
+    <p class="declaration">déclare sur l'honneur que les renseignements fournis dans ce dossier sont exacts et que je suis l'auteur(e) des réalisations jointes.</p>
+    <div style="margin-top:30px;font-size:11pt">
+      <p><strong>Fait à</strong> ${o.ville || "Paris"} <strong>le</strong> ${dateMaj}</p>
     </div>
-    <div style="margin-top:30px"><strong>Signature du candidat :</strong></div>
+    <p class="declaration" style="margin-top:20px;font-style:italic">Pour faire valoir ce que de droit.</p>
+    <div style="margin-top:30px"><strong>Signature :</strong></div>
     <div style="height:80px;border:1px dashed #999;margin-top:10px;display:flex;align-items:center;justify-content:center;background:#fff">
       ${s.signatureUrl ? `<img src="${s.signatureUrl}" alt="Signature candidat" style="max-height:70px;max-width:200px;object-fit:contain" />` : ""}
     </div>
-    ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, String(pageNum), dateMaj)}
+    ${footerDPOfficiel(String(pageNum))}
+  </div><div class="page-break"></div>`;
+  pageNum++;
+
+  // ===== PAGE Documents illustrant la pratique professionnelle (facultatif) =====
+  html += `<div class="page">
+    <h2 class="section-title">DOSSIER PROFESSIONNEL (DP)</h2>
+    <h3 class="subsection">Documents illustrant la pratique professionnelle <em style="font-weight:normal">(facultatif)</em></h3>
+    <table class="annex-table">
+      <tr><th>Intitulé</th></tr>
+      ${Array.from({ length: 10 }).map(() => `<tr><td class="empty"></td></tr>`).join("")}
+    </table>
+    ${footerDPOfficiel(String(pageNum))}
+  </div><div class="page-break"></div>`;
+  pageNum++;
+
+  // ===== PAGE Annexes =====
+  html += `<div class="page">
+    <h2 class="section-title">DOSSIER PROFESSIONNEL (DP)</h2>
+    <h3 class="subsection">ANNEXES</h3>
+    <p style="font-style:italic;color:#666">(Si le RC le prévoit)</p>
+    <div style="margin-top:30px;min-height:700px;border:1px dashed #bbb;background:#fafafa"></div>
+    ${footerDPOfficiel(String(pageNum))}
   </div>`;
 
   html += `</body></html>`;
