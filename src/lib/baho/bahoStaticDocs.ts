@@ -570,28 +570,35 @@ export function getCertificatRealisationHTML(e: BahoEntreprise, stagiaire: BahoS
 
   return `<!DOCTYPE html><html><head><meta charset="utf-8"/>${BASE_CSS}
   <style>
-    .certif-box { border: 2px solid #1a3a6e; padding: 24px 28px; margin: 20px 0; background: #fafcff; }
-    .certif-name { font-size: 16pt; font-weight: bold; color: #1a3a6e; text-align: center; margin: 10px 0; }
-    .certif-intitule { font-style: italic; text-align: center; color: #333; margin: 8px 0 16px 0; }
+    body { padding: 20px 30px !important; font-size: 10.5pt !important; line-height: 1.35 !important; }
+    h1 { margin: 8px 0 4px 0 !important; }
+    .certif-box { border: 1.5px solid #1a3a6e; padding: 10px 16px; margin: 10px 0; background: #fafcff; }
+    .certif-box p { margin: 4px 0; }
+    .certif-name { font-size: 13pt; font-weight: bold; color: #1a3a6e; text-align: center; margin: 6px 0 2px 0; }
+    .certif-intitule { font-style: italic; text-align: center; color: #333; margin: 4px 0 8px 0; font-size: 10pt; }
+    .certif-box table { margin: 6px 0 !important; }
+    .certif-box table th, .certif-box table td { padding: 3px 6px !important; font-size: 9.5pt !important; }
+    .stamps-tight { margin-top: 12px !important; }
+    .stamps-tight img { width: 120px !important; height: 120px !important; margin-top: 4px !important; }
   </style>
   </head><body>
   ${header()}
   <h1 style="text-align:center;">CERTIFICAT DE RÉALISATION</h1>
-  <p style="text-align:center; font-size:10pt; color:#555;">Article L.6353-1 du Code du travail – Décret n° 2019-1143 du 7 novembre 2019</p>
+  <p style="text-align:center; font-size:9pt; color:#555; margin:2px 0 6px 0;">Article L.6353-1 du Code du travail – Décret n° 2019-1143 du 7 novembre 2019</p>
 
   <div class="certif-box">
     <p>Je soussigné, <strong>${FORMAT_SPHERE_ORG.dirigeant}</strong>, représentant légal de l'organisme de formation <strong>${FORMAT_SPHERE_ORG.nom}</strong> (SIRET ${FORMAT_SPHERE_ORG.siret} – NDA ${FORMAT_SPHERE_ORG.nda}), certifie que :</p>
 
     <p class="certif-name">${fullName}</p>
-    ${neLe || lieuNaiss ? `<p style="text-align:center;">${neLe ? `né(e) le ${neLe}` : ""}${neLe && lieuNaiss ? " à " : ""}${lieuNaiss}</p>` : ""}
-    <p style="text-align:center;">salarié(e) de l'entreprise <strong>${e.nom}</strong> (SIRET ${e.siret})</p>
+    ${neLe || lieuNaiss ? `<p style="text-align:center; margin:2px 0;">${neLe ? `né(e) le ${neLe}` : ""}${neLe && lieuNaiss ? " à " : ""}${lieuNaiss}</p>` : ""}
+    <p style="text-align:center; margin:2px 0;">salarié(e) de l'entreprise <strong>${e.nom}</strong> (SIRET ${e.siret})</p>
 
-    <p>a suivi l'action de formation intitulée :</p>
+    <p style="margin-top:8px;">a suivi l'action de formation intitulée :</p>
     <p class="certif-intitule">« Structuration des pratiques opérationnelles, amélioration de l'expérience client et sécurisation des points critiques d'exploitation en établissement hôtelier et de restauration »</p>
 
-    <table style="margin:14px 0;">
+    <table>
       <tbody>
-        <tr><th style="width:40%;">Nature de l'action</th><td>Action de formation (art. L.6313-1, 1° du Code du travail)</td></tr>
+        <tr><th style="width:38%;">Nature de l'action</th><td>Action de formation (art. L.6313-1, 1° du Code du travail)</td></tr>
         <tr><th>Modalité de réalisation</th><td><strong>Formation en présentiel intra-entreprise</strong></td></tr>
         <tr><th>Lieu de réalisation</th><td>${e.nom} – ${e.adresse}</td></tr>
         <tr><th>Dates de réalisation</th><td>Du ${formatDateLong(e.dateDebut)} au ${formatDateLong(e.dateFin)}</td></tr>
@@ -603,12 +610,29 @@ export function getCertificatRealisationHTML(e: BahoEntreprise, stagiaire: BahoS
       </tbody>
     </table>
 
-    <p>Le présent certificat est délivré pour servir et valoir ce que de droit, conformément aux dispositions réglementaires en vigueur.</p>
+    <p style="margin-top:6px;">Le présent certificat est délivré pour servir et valoir ce que de droit, conformément aux dispositions réglementaires en vigueur.</p>
   </div>
 
-  <p style="margin-top:18px;">Fait à ${FORMAT_SPHERE_ORG.ville}, le ${formatDateLong(e.dateFin)}</p>
+  <p style="margin:8px 0;">Fait à ${FORMAT_SPHERE_ORG.ville}, le ${formatDateLong(e.dateFin)}</p>
 
-  ${stampsBlock(e, customFsStamp)}
+  <div class="stamps-tight">
+    <table style="border:none; width:100%;">
+      <tr style="border:none;">
+        <td style="border:none; width:50%; text-align:center; vertical-align:top;">
+          <strong>Pour l'organisme de formation</strong><br/>
+          ${FORMAT_SPHERE_ORG.dirigeant}<br/>
+          <em>${FORMAT_SPHERE_ORG.nom}</em><br/>
+          <img src="${customFsStamp || svgToDataUri(getFormatSphereStampSvg())}" alt="Tampon FORMAT SPHERE"/>
+        </td>
+        <td style="border:none; width:50%; text-align:center; vertical-align:top;">
+          <strong>Pour l'entreprise bénéficiaire</strong><br/>
+          ${e.dirigeant}<br/>
+          <em>${e.nom}</em><br/>
+          <img src="${svgToDataUri(getHotelStampSvg(e))}" alt="Tampon hôtel"/>
+        </td>
+      </tr>
+    </table>
+  </div>
 
   ${footer()}
   </body></html>`;
