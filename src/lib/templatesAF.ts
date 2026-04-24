@@ -63,9 +63,6 @@ export function genFactureOPCO(o: OrganismeInfo, f: FormationInfo, stagiaires: S
   const dateDebutISO = getStagiaireDateDebut(s, f) || f.dateDebut || "";
   const dateFactureISO = dateDebutISO ? subtractBusinessDays(dateDebutISO, 3) : today.toISOString().slice(0, 10);
   const dateFacture = formatDate(dateFactureISO);
-  const entreprise = (s.entreprise || "").trim();
-  const opcoLabel = "OPCO Mobilités";
-  const adresseOpco = "80 rue de Reuilly, CS 92401, 75724 Paris Cedex 12";
 
   return buildDocument({
     org: o,
@@ -75,10 +72,6 @@ export function genFactureOPCO(o: OrganismeInfo, f: FormationInfo, stagiaires: S
     showFormationInfo: true,
     stagiaires: [s],
     sections: [
-      {
-        heading: "Facturé à",
-        content: `<p><strong>${opcoLabel}</strong><br>${adresseOpco}<br><strong>Référence dossier :</strong> ${factNum}<br><strong>Apprenti(e) concerné(e) :</strong> ${s.prenom} ${s.nom}${entreprise ? `<br><strong>Employeur :</strong> ${entreprise}` : ""}</p>`,
-      },
       {
         heading: "Prestation réalisée",
         content: `<p><strong>Formation :</strong> ${f.intitule}<br><strong>Durée :</strong> ${f.duree}<br><strong>Modalité :</strong> ${f.modalites}<br><strong>Lieu :</strong> ${f.lieu}<br><strong>Période :</strong> du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}<br><strong>Date de la facture :</strong> ${dateFacture}</p>`,
@@ -94,16 +87,9 @@ export function genFactureOPCO(o: OrganismeInfo, f: FormationInfo, stagiaires: S
         ["<strong>Net à payer</strong>", "", "", "<strong>500,00 €</strong>"],
       ],
     },
-    extraHtml: `<div class="section section-green"><p><strong>TVA non applicable, art. 261-4-4° du CGI.</strong><br>Facture adressée à ${opcoLabel} au titre de la prise en charge de la formation de l'apprenti(e) ${s.prenom} ${s.nom}.</p></div>
-      <h2>Modalités de règlement</h2>
-      <div class="section"><p><strong>Montant total :</strong> 500,00 € TTC<br><strong>Échéance :</strong> 30 jours à réception de facture<br><strong>Mode de règlement :</strong> Virement bancaire<br><strong>Pénalités de retard :</strong> 3 fois le taux d'intérêt légal + indemnité forfaitaire de 40 € pour frais de recouvrement (art. L.441-10 du Code de commerce).</p></div>`,
-    signatures: {
-      type: "2",
-      labels: ["Pour l'organisme", "Pour l'OPCO"],
-      names: [o.dirigeant || o.nom, opcoLabel],
-      noOrgSignature: false,
-      dates: [dateFacture, dateFacture],
-    },
+    extraHtml: `<h2>Modalités de règlement</h2>
+      <div class="section"><p><strong>Montant total :</strong> 500,00 € TTC<br><strong>Échéance :</strong> 30 jours à réception de facture<br><strong>Mode de règlement :</strong> Virement bancaire<br><strong>Pénalités de retard :</strong> 3 fois le taux d'intérêt légal + indemnité forfaitaire de 40 € pour frais de recouvrement (art. L.441-10 du Code de commerce).</p></div>
+      <div class="section" style="margin-top:30px"><p><strong>Pour l'organisme</strong><br>Nom : ${o.dirigeant || o.nom}<br>Date : ${dateFacture}<br>Signature :${o.signatureUrl ? `<br><img src="${o.signatureUrl}" alt="Signature" style="max-height:60px;margin-top:4px">` : ""}</p></div>`,
   });
 }
 
