@@ -805,7 +805,7 @@ export function genECFOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
       </tr>`).join("")}
     </table>
     <h3 class="subsection">Observations</h3>
-    <div class="obs-box">${termine ? "Le candidat a satisfait à l'ensemble des évaluations prévues au référentiel du titre professionnel. Les acquis pédagogiques et professionnels sont conformes aux attendus." : "&nbsp;"}</div>
+    <div class="obs-box">${termine ? `Le/la candidat(e) ${s.prenom} ${(s.nom || "").toUpperCase()} a satisfait à l'ensemble des évaluations prévues au référentiel du titre professionnel « ${intituleTitre} ». Les acquis pédagogiques et professionnels sont conformes aux attendus sur les ${activites.length} activité(s)-type du référentiel. Le parcours a été mené avec assiduité (présence 100%) et les productions rendues témoignent d'une réelle appropriation des compétences. Le/la candidat(e) est prêt(e) à se présenter à la session d'examen du titre professionnel.` : "&nbsp;"}</div>
     ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, pageStr(pageNum), dateMaj)}
   </div><div class="page-break"></div>`;
   pageNum++;
