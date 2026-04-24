@@ -48,6 +48,65 @@ export function genFacture(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
   });
 }
 
+/**
+ * Facture OPCO — un fichier par apprenti, montant fixe 500,00 € TTC.
+ * Utilisé dans le contrôle OPCO Mobilités (C13) comme justificatif de facturation
+ * réglée par l'OPCO au titre de la prise en charge de la formation.
+ */
+export function genFactureOPCO(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], stagiaireIdx?: number) {
+  const idx = typeof stagiaireIdx === "number" ? stagiaireIdx : 0;
+  const s = stagiaires[idx] || stagiaires[0];
+  if (!s) return "";
+  const today = new Date();
+  const year = today.getFullYear();
+  const factNum = `OPCO-${year}-${String(idx + 1).padStart(3, "0")}`;
+  const dateDebutISO = getStagiaireDateDebut(s, f) || f.dateDebut || "";
+  const dateFactureISO = dateDebutISO ? subtractBusinessDays(dateDebutISO, 3) : today.toISOString().slice(0, 10);
+  const dateFacture = formatDate(dateFactureISO);
+  const entreprise = (s.entreprise || "").trim();
+  const opcoLabel = "OPCO Mobilités";
+  const adresseOpco = "80 rue de Reuilly, CS 92401, 75724 Paris Cedex 12";
+
+  return buildDocument({
+    org: o,
+    title: "FACTURE DE FORMATION – PRISE EN CHARGE OPCO",
+    subtitle: `N° ${factNum}`,
+    formation: f,
+    showFormationInfo: true,
+    stagiaires: [s],
+    sections: [
+      {
+        heading: "Facturé à",
+        content: `<p><strong>${opcoLabel}</strong><br>${adresseOpco}<br><strong>Référence dossier :</strong> ${factNum}<br><strong>Apprenti(e) concerné(e) :</strong> ${s.prenom} ${s.nom}${entreprise ? `<br><strong>Employeur :</strong> ${entreprise}` : ""}</p>`,
+      },
+      {
+        heading: "Prestation réalisée",
+        content: `<p><strong>Formation :</strong> ${f.intitule}<br><strong>Durée :</strong> ${f.duree}<br><strong>Modalité :</strong> ${f.modalites}<br><strong>Lieu :</strong> ${f.lieu}<br><strong>Période :</strong> du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}<br><strong>Date de la facture :</strong> ${dateFacture}</p>`,
+      },
+    ],
+    table: {
+      headers: ["Désignation", "Quantité", "Prix unitaire", "Total"],
+      rows: [
+        [`Prise en charge – ${f.intitule} (${s.prenom} ${s.nom})`, "1", "500,00 €", "500,00 €"],
+        ["<strong>Total HT</strong>", "", "", "<strong>500,00 €</strong>"],
+        ["TVA (non applicable, art. 261-4-4° du CGI)", "", "", "0,00 €"],
+        ["<strong>Total TTC</strong>", "", "", "<strong>500,00 €</strong>"],
+        ["<strong>Net à payer</strong>", "", "", "<strong>500,00 €</strong>"],
+      ],
+    },
+    extraHtml: `<div class="section section-green"><p><strong>TVA non applicable, art. 261-4-4° du CGI.</strong><br>Facture adressée à ${opcoLabel} au titre de la prise en charge de la formation de l'apprenti(e) ${s.prenom} ${s.nom}.</p></div>
+      <h2>Modalités de règlement</h2>
+      <div class="section"><p><strong>Montant total :</strong> 500,00 € TTC<br><strong>Échéance :</strong> 30 jours à réception de facture<br><strong>Mode de règlement :</strong> Virement bancaire<br><strong>Pénalités de retard :</strong> 3 fois le taux d'intérêt légal + indemnité forfaitaire de 40 € pour frais de recouvrement (art. L.441-10 du Code de commerce).</p></div>`,
+    signatures: {
+      type: "2",
+      labels: ["Pour l'organisme", "Pour l'OPCO"],
+      names: [o.dirigeant || o.nom, opcoLabel],
+      noOrgSignature: false,
+      dates: [dateFacture, dateFacture],
+    },
+  });
+}
+
 export function genContratFormationParticulier(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const s = stagiaires[0] || { prenom: "___", nom: "___", email: "", telephone: "" };
   const prereq = (f.prerequis || "").trim() || "Avoir au minimum 18 ans. Aucune qualification spécifique n'est requise pour suivre cette formation.";
