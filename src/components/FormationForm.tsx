@@ -127,6 +127,16 @@ const FormationForm = ({ data, onChange, onImportStagiaires, onApplyOrganisme }:
         onImportStagiaires([...STAGIAIRES_BAC_PRO_LOGISTIQUE]);
         toast.success(`9 stagiaires Bac Pro Logistique importés automatiquement`);
       }
+      // Auto-import organisme + stagiaires for HEXAGONE FORMATION GOTRM
+      if (selected.intitule.toUpperCase().includes("HEXAGONE")) {
+        if (onApplyOrganisme) {
+          onApplyOrganisme({ ...HEXAGONE_FORMATION_ORG });
+        }
+        if (onImportStagiaires) {
+          onImportStagiaires([...STAGIAIRES_HEXAGONE_GOTRM]);
+        }
+        toast.success(`Organisme HEXAGONE FORMATION + 10 stagiaires GOTRM importés`);
+      }
     }
   };
 
