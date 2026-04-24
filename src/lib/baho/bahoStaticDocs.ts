@@ -392,7 +392,24 @@ export function getCGVHTML(e: BahoEntreprise, customFsStamp?: string): string {
 export function getFactureHTML(e: BahoEntreprise, numero: string, customFsStamp?: string): string {
   const nbStagiaires = e.stagiaires.length;
   const total = 2000;
-  const prixUnitaire = total;
+
+  const civiliteForStg = (s: BahoStagiaire) => {
+    const prenomsM = ["Taha", "Mathis", "Roland", "Mohamed", "Ahmed", "Karim", "Said", "Hassan", "Yann", "Pierre", "Jean", "Paul", "Marc", "Luc"];
+    const isM = prenomsM.some((p) => s.prenom?.toLowerCase().startsWith(p.toLowerCase()));
+    return isM ? "M." : "Mme";
+  };
+
+  const participantsRows = e.stagiaires
+    .map(
+      (s, idx) => `
+    <tr>
+      <td style="text-align:center; width:40px;">${idx + 1}</td>
+      <td>${civiliteForStg(s)} ${s.nom.toUpperCase()} ${s.prenom}</td>
+      <td>${s.emploi || "—"}</td>
+      <td style="text-align:center;">${s.codeStagiaire}</td>
+    </tr>`
+    )
+    .join("");
 
   return `<!DOCTYPE html><html><head><meta charset="utf-8"/>${BASE_CSS}</head><body>
   ${header()}
@@ -419,7 +436,8 @@ export function getFactureHTML(e: BahoEntreprise, numero: string, customFsStamp?
   </table>
 
   <p><strong>Date de facture :</strong> ${formatDateLong(e.dateConvention)}<br/>
-  <strong>Période de formation :</strong> du ${formatDateLong(e.dateDebut)} au ${formatDateLong(e.dateFin)}</p>
+  <strong>Période de formation :</strong> du ${formatDateLong(e.dateDebut)} au ${formatDateLong(e.dateFin)}<br/>
+  <strong>Modalité :</strong> Formation en <strong>présentiel</strong> intra-entreprise</p>
 
   <h2>Détail de la prestation</h2>
   <table>
@@ -429,7 +447,7 @@ export function getFactureHTML(e: BahoEntreprise, numero: string, customFsStamp?
     <tbody>
       <tr>
         <td>Structuration des pratiques opérationnelles et qualité de service en hôtellerie & restauration<br/>
-        <em>Formation en présentiel intra-entreprise – 21 heures sur 3 jours</em><br/>
+        <em>Formation en <strong>présentiel</strong> intra-entreprise – 21 heures sur 3 jours</em><br/>
         <em>Forfait par établissement (${nbStagiaires} stagiaire${nbStagiaires > 1 ? "s" : ""} couvert${nbStagiaires > 1 ? "s" : ""})</em><br/>
         <em>Période : ${formatDateLong(e.dateDebut)} → ${formatDateLong(e.dateFin)}</em></td>
         <td>${total.toLocaleString("fr-FR")} €</td>
@@ -449,6 +467,21 @@ export function getFactureHTML(e: BahoEntreprise, numero: string, customFsStamp?
     </tbody>
   </table>
 
+  <h2>Participants couverts par la présente facture</h2>
+  <table>
+    <thead>
+      <tr>
+        <th style="width:40px; text-align:center;">N°</th>
+        <th>Nom et prénom</th>
+        <th>Fonction</th>
+        <th style="width:140px; text-align:center;">Code stagiaire</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${participantsRows}
+    </tbody>
+  </table>
+
   <h2>Conditions de paiement</h2>
   <p>Règlement à 30 jours par virement bancaire.<br/>
   TVA non applicable, art. 261-4-4° a du CGI.<br/>
@@ -456,6 +489,124 @@ export function getFactureHTML(e: BahoEntreprise, numero: string, customFsStamp?
 
   <p style="margin-top:30px;">Fait à ${FORMAT_SPHERE_ORG.ville}, le ${formatDateLong(e.dateConvention)}<br/>
   ${FORMAT_SPHERE_ORG.dirigeant}</p>
+
+  ${stampsBlock(e, customFsStamp)}
+
+  ${footer()}
+  </body></html>`;
+}
+
+/** Convocation individuelle par stagiaire — datée 14 jours ouvrés avant le début */
+export function getConvocationHTML(e: BahoEntreprise, stagiaire: BahoStagiaire, customFsStamp?: string): string {
+  const dateConvoc = subtractWorkingDays(e.dateDebut, 14);
+  const civilite = (() => {
+    const prenomsM = ["Taha", "Mathis", "Roland", "Mohamed", "Ahmed", "Karim", "Said", "Hassan", "Yann", "Pierre", "Jean", "Paul", "Marc", "Luc"];
+    const isM = prenomsM.some((p) => stagiaire.prenom?.toLowerCase().startsWith(p.toLowerCase()));
+    return isM ? "M." : "Mme";
+  })();
+  const fullName = `${civilite} ${stagiaire.nom.toUpperCase()} ${stagiaire.prenom}`;
+  const politesse = civilite === "M." ? "Monsieur" : "Madame";
+
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"/>${BASE_CSS}</head><body>
+  ${header()}
+  <h1>CONVOCATION À LA FORMATION</h1>
+  <p style="text-align:right; font-size:10pt; color:#555;">${FORMAT_SPHERE_ORG.ville}, le ${formatDateLong(dateConvoc)}</p>
+
+  <p><strong>Destinataire :</strong><br/>
+  ${fullName}${stagiaire.emploi ? ` – ${stagiaire.emploi}` : ""}<br/>
+  ${stagiaire.adresse}</p>
+
+  <p><strong>Objet :</strong> Convocation à l'action de formation « Structuration des pratiques opérationnelles et qualité de service en hôtellerie & restauration »</p>
+
+  <p>${politesse},</p>
+
+  <p>Nous avons le plaisir de vous convoquer à l'action de formation organisée par <strong>${FORMAT_SPHERE_ORG.nom}</strong> au sein de l'établissement <strong>${e.nom}</strong>, dans les conditions suivantes :</p>
+
+  <table style="margin:14px 0;">
+    <tbody>
+      <tr><th style="width:35%;">Intitulé de la formation</th><td>Structuration des pratiques opérationnelles, amélioration de l'expérience client et sécurisation des points critiques d'exploitation en établissement hôtelier et de restauration</td></tr>
+      <tr><th>Modalité</th><td><strong>Formation en présentiel intra-entreprise</strong></td></tr>
+      <tr><th>Lieu de formation</th><td>${e.nom} – ${e.adresse}</td></tr>
+      <tr><th>Dates</th><td>Du ${formatDateLong(e.dateDebut)} au ${formatDateLong(e.dateFin)} (3 jours consécutifs)</td></tr>
+      <tr><th>Horaires</th><td>09h00 – 12h30 / 14h00 – 17h30 (pause déjeuner de 12h30 à 14h00)</td></tr>
+      <tr><th>Durée totale</th><td>21 heures</td></tr>
+      <tr><th>Formateur</th><td>Paolo FEOLA</td></tr>
+      <tr><th>Code stagiaire</th><td>${stagiaire.codeStagiaire}</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Documents et consignes</h2>
+  <ul>
+    <li>Merci de vous présenter <strong>10 minutes avant le début</strong> de la première demi-journée.</li>
+    <li>Une feuille d'émargement devra être signée à chaque demi-journée.</li>
+    <li>Le règlement intérieur et le programme de la formation vous ont été transmis préalablement.</li>
+    <li>Tenue de travail correcte et adaptée à l'environnement hôtelier exigée.</li>
+    <li>En cas d'empêchement, merci d'informer sans délai l'organisme de formation et votre responsable hiérarchique.</li>
+  </ul>
+
+  <h2>Accessibilité – Référent handicap</h2>
+  <p>Si vous avez besoin d'un aménagement particulier (situation de handicap, besoin spécifique), vous pouvez contacter notre référent handicap : <strong>${FORMAT_SPHERE_ORG.dirigeant}</strong> – ${FORMAT_SPHERE_ORG.email} – ${FORMAT_SPHERE_ORG.telephone}.</p>
+
+  <p>Nous vous remercions de votre participation et restons à votre disposition pour toute question relative à l'organisation de cette action de formation.</p>
+
+  <p style="margin-top:18px;">Veuillez agréer, ${politesse}, l'expression de nos salutations distinguées.</p>
+
+  ${stampsBlock(e, customFsStamp)}
+
+  ${footer()}
+  </body></html>`;
+}
+
+/** Certificat de réalisation individuel par stagiaire — daté du dernier jour de formation */
+export function getCertificatRealisationHTML(e: BahoEntreprise, stagiaire: BahoStagiaire, customFsStamp?: string): string {
+  const civilite = (() => {
+    const prenomsM = ["Taha", "Mathis", "Roland", "Mohamed", "Ahmed", "Karim", "Said", "Hassan", "Yann", "Pierre", "Jean", "Paul", "Marc", "Luc"];
+    const isM = prenomsM.some((p) => stagiaire.prenom?.toLowerCase().startsWith(p.toLowerCase()));
+    return isM ? "M." : "Mme";
+  })();
+  const fullName = `${civilite} ${stagiaire.nom.toUpperCase()} ${stagiaire.prenom}`;
+  const neLe = stagiaire.dateNaissance ? formatDateLong(stagiaire.dateNaissance) : "";
+  const lieuNaiss = stagiaire.lieuNaissance || "";
+
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"/>${BASE_CSS}
+  <style>
+    .certif-box { border: 2px solid #1a3a6e; padding: 24px 28px; margin: 20px 0; background: #fafcff; }
+    .certif-name { font-size: 16pt; font-weight: bold; color: #1a3a6e; text-align: center; margin: 10px 0; }
+    .certif-intitule { font-style: italic; text-align: center; color: #333; margin: 8px 0 16px 0; }
+  </style>
+  </head><body>
+  ${header()}
+  <h1 style="text-align:center;">CERTIFICAT DE RÉALISATION</h1>
+  <p style="text-align:center; font-size:10pt; color:#555;">Article L.6353-1 du Code du travail – Décret n° 2019-1143 du 7 novembre 2019</p>
+
+  <div class="certif-box">
+    <p>Je soussigné, <strong>${FORMAT_SPHERE_ORG.dirigeant}</strong>, représentant légal de l'organisme de formation <strong>${FORMAT_SPHERE_ORG.nom}</strong> (SIRET ${FORMAT_SPHERE_ORG.siret} – NDA ${FORMAT_SPHERE_ORG.nda}), certifie que :</p>
+
+    <p class="certif-name">${fullName}</p>
+    ${neLe || lieuNaiss ? `<p style="text-align:center;">${neLe ? `né(e) le ${neLe}` : ""}${neLe && lieuNaiss ? " à " : ""}${lieuNaiss}</p>` : ""}
+    <p style="text-align:center;">salarié(e) de l'entreprise <strong>${e.nom}</strong> (SIRET ${e.siret})</p>
+
+    <p>a suivi l'action de formation intitulée :</p>
+    <p class="certif-intitule">« Structuration des pratiques opérationnelles, amélioration de l'expérience client et sécurisation des points critiques d'exploitation en établissement hôtelier et de restauration »</p>
+
+    <table style="margin:14px 0;">
+      <tbody>
+        <tr><th style="width:40%;">Nature de l'action</th><td>Action de formation (art. L.6313-1, 1° du Code du travail)</td></tr>
+        <tr><th>Modalité de réalisation</th><td><strong>Formation en présentiel intra-entreprise</strong></td></tr>
+        <tr><th>Lieu de réalisation</th><td>${e.nom} – ${e.adresse}</td></tr>
+        <tr><th>Dates de réalisation</th><td>Du ${formatDateLong(e.dateDebut)} au ${formatDateLong(e.dateFin)}</td></tr>
+        <tr><th>Durée totale réalisée</th><td>21 heures (3 jours consécutifs, 7h/jour)</td></tr>
+        <tr><th>Assiduité</th><td>Présence intégrale constatée par émargement</td></tr>
+        <tr><th>Objectifs atteints</th><td>Oui — évaluation des acquis validée par le formateur</td></tr>
+        <tr><th>Formateur</th><td>Paolo FEOLA</td></tr>
+        <tr><th>Code stagiaire</th><td>${stagiaire.codeStagiaire}</td></tr>
+      </tbody>
+    </table>
+
+    <p>Le présent certificat est délivré pour servir et valoir ce que de droit, conformément aux dispositions réglementaires en vigueur.</p>
+  </div>
+
+  <p style="margin-top:18px;">Fait à ${FORMAT_SPHERE_ORG.ville}, le ${formatDateLong(e.dateFin)}</p>
 
   ${stampsBlock(e, customFsStamp)}
 
