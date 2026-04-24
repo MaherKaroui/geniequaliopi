@@ -170,7 +170,7 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
     const currentStagiaire = sourceStagiaires[stagiaireIdx];
     if (!currentStagiaire) return null;
     try {
-      const o = mergeOrganisme(organisme);
+      const o = mergeOrganisme(organismeWithSignature);
       const params = { stagiaireIdx, fi: 0 };
       const html = generateDocumentById(`ey_${eyDoc.code}`, template, params, o, formation, sourceStagiaires);
       if (!html) return null;
