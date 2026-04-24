@@ -118,7 +118,6 @@ export default function BahoModal({ open, onOpenChange }: BahoModalProps) {
     cgv: "CGV",
     facture: "Facture",
     ri: "Règlement intérieur",
-    emargement: "Feuille d'émargement",
     convocation: "Convocation",
     certificat: "Certificat de réalisation",
   };
