@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { FormationInfo, StagiaireInfo } from "@/types/qualiopi";
+import { FormationInfo, StagiaireInfo, OrganismeInfo } from "@/types/qualiopi";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
