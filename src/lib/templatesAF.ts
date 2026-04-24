@@ -69,17 +69,8 @@ export function genFactureOPCO(o: OrganismeInfo, f: FormationInfo, stagiaires: S
   const stagEmail = s.email || "________________________________";
   const stagTel = (s.telephone || "").trim();
 
-  // En-tête : uniquement le bloc FACTURE N° + date (sans coordonnées organisme)
-  const orgHeaderHtml = `
-    <table style="width:100%;border:none;margin-bottom:20px">
-      <tr style="border:none">
-        <td style="border:none;vertical-align:top;text-align:right">
-          <div style="font-size:22px;font-weight:bold;letter-spacing:1px">FACTURE</div>
-          <div style="font-size:14px;margin-top:4px"><strong>N° ${factNum}</strong></div>
-          <div style="font-size:12px;margin-top:8px">Date : ${dateFacture}</div>
-        </td>
-      </tr>
-    </table>`;
+  // En-tête vide (logo/nom/FACTURE N° supprimés à la demande)
+  const orgHeaderHtml = ``;
 
   // Bloc Stagiaire / Facturé à (OPCO Mobilités fixe)
   const partiesHtml = `
