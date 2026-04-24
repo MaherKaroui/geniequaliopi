@@ -26,7 +26,7 @@ import {
 import { buildOpcoFileName, buildOpcoZipFolder, buildOpcoRootName, type OpcoNamingContext } from "@/lib/opcoNaming";
 import type { OrganismeInfo, FormationInfo, StagiaireInfo, CritereData } from "@/types/qualiopi";
 import { CRITERES } from "@/types/qualiopi";
-import { generateDocumentById } from "@/lib/documentGenerator";
+import { generateDocumentById, getOpcoExerciceWeeks } from "@/lib/documentGenerator";
 import { generateAIEvalPack, getCachedPack, clearCachedPack } from "@/lib/aiEvalPack";
 import { Sparkles } from "lucide-react";
 import { generateExcelCalendrierOPCO, excelToBlob } from "@/lib/xlsxGenerator";
