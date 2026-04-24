@@ -2940,18 +2940,23 @@ function genTestPositionnementIndividuel(o: OrganismeInfo, f: FormationInfo, s: 
   const totalScore = answers.reduce((sum, a) => sum + a.score, 0);
   const dateTest = isDebut ? formatDate(getStagiaireDateDebut(s, f)) : formatDate(getStagiaireDateFin(s, f));
 
+  const dateDebutSession = formatDate(getStagiaireDateDebut(s, f));
+  const dateFinSession = formatDate(getStagiaireDateFin(s, f));
+
   let extra = `<h2>Test de positionnement en ${label} de formation – ${f.intitule}</h2>`;
+  extra += `<p><strong>Session :</strong> du ${dateDebutSession} au ${dateFinSession}</p>`;
   extra += `<p><strong>Nom du stagiaire :</strong> ${s.prenom} ${s.nom}</p>`;
-  extra += `<p><strong>Date :</strong> ${dateTest}</p>`;
+  extra += `<p><strong>Date du test :</strong> ${dateTest}</p>`;
   extra += `<p><strong>Durée estimée :</strong> 20 minutes</p>`;
   extra += `<p><strong>Note :</strong> ${totalScore} /10</p>`;
 
   extra += `<h3>Questions</h3>`;
   questions.forEach((q, qi) => {
     const ans = answers[qi];
+    const appreciation = generateQuestionAppreciation(ans.score, qi, si, isDebut, s);
     extra += `<p><strong>${qi + 1}.</strong> ${q.question}</p>`;
     extra += `<p>${ans.reponse}</p>`;
-    extra += `<p><em>${ans.feedback} – ${ans.score} / 1</em></p>`;
+    extra += `<p><em><strong>Appréciation du formateur :</strong> ${ans.feedback} (${ans.score} / 1). ${appreciation}</em></p>`;
     if (qi < questions.length - 1) extra += `<br>`;
   });
 
@@ -2963,6 +2968,57 @@ function genTestPositionnementIndividuel(o: OrganismeInfo, f: FormationInfo, s: 
   extra += `<p>${comment}</p>`;
 
   return buildDocument({ org: o, title: `TEST DE POSITIONNEMENT ${labelCap.toUpperCase()} DE FORMATION`, subtitle: `${s.prenom} ${s.nom} – ${f.intitule}`, formation: f, showFormationInfo: false, extraHtml: extra });
+}
+
+function generateQuestionAppreciation(score: number, qi: number, si: number, isDebut: boolean, s: StagiaireInfo): string {
+  const prenom = s.prenom || "Le/la stagiaire";
+  if (isDebut) {
+    if (score === 1) {
+      const pool = [
+        `${prenom} démontre une connaissance solide de cette notion, avec une formulation claire et des éléments pertinents.`,
+        `Les prérequis sont manifestement acquis sur ce point : la réponse est précise et correctement argumentée.`,
+        `Très bonne maîtrise préalable du sujet. ${prenom} pourra servir de ressource au sein du groupe sur cette thématique.`,
+        `Réponse structurée et pertinente. Les bases sont bien ancrées, la formation permettra un approfondissement.`,
+        `${prenom} mobilise un vocabulaire adapté et des notions justes. Aucune remédiation nécessaire sur ce point.`,
+      ];
+      return pool[(qi + si) % pool.length];
+    }
+    if (score === 0.5) {
+      const pool = [
+        `${prenom} possède une intuition correcte mais la réponse reste partielle. Un approfondissement sera nécessaire durant la formation.`,
+        `Les grandes lignes sont identifiées, mais des éléments clés manquent. Ce point sera retravaillé en priorité.`,
+        `Réponse fragmentaire révélant des bases instables. Des exercices ciblés seront proposés pour consolider cette notion.`,
+        `${prenom} connaît une partie du sujet mais confond certains aspects. Une clarification sera apportée en début de module.`,
+        `Compréhension en cours d'acquisition. Le formateur proposera des illustrations concrètes pour solidifier cet acquis.`,
+      ];
+      return pool[(qi + si) % pool.length];
+    }
+    const pool = [
+      `${prenom} ne maîtrise pas encore cette notion. Elle fera l'objet d'un apport théorique complet en ouverture de formation.`,
+      `Point non acquis : un travail de fond sera nécessaire. Des supports pédagogiques adaptés seront mis à disposition.`,
+      `Réponse hors sujet traduisant une découverte du domaine. ${prenom} bénéficiera d'un accompagnement renforcé sur ce thème.`,
+      `Lacune identifiée. Le formateur intégrera des rappels et exercices progressifs pour permettre l'acquisition de cette compétence.`,
+      `Notion totalement nouvelle pour ${prenom}. Un temps d'initiation spécifique sera prévu dans le déroulé pédagogique.`,
+    ];
+    return pool[(qi + si) % pool.length];
+  }
+  // fin de formation
+  if (score === 1) {
+    const pool = [
+      `Objectif pédagogique pleinement atteint. ${prenom} a parfaitement intégré cette compétence.`,
+      `Réponse maîtrisée et directement transférable en situation professionnelle.`,
+      `Excellente assimilation : les apports de la formation sont visibles et opérationnels.`,
+    ];
+    return pool[(qi + si) % pool.length];
+  }
+  if (score === 0.5) {
+    const pool = [
+      `Acquis en cours de consolidation. La pratique régulière permettra d'ancrer durablement cette compétence.`,
+      `Progression réelle mais à confirmer par la mise en application.`,
+    ];
+    return pool[(qi + si) % pool.length];
+  }
+  return `Compétence à retravailler. Un accompagnement post-formation est recommandé sur ce point spécifique.`;
 }
 
 function generateFormateurComment(s: StagiaireInfo, f: FormationInfo, totalScore: number, isDebut: boolean, si: number): string {
