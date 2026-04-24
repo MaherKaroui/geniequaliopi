@@ -61,7 +61,7 @@ export function genFactureOPCO(o: OrganismeInfo, f: FormationInfo, stagiaires: S
   const year = today.getFullYear();
   const factNum = `${year}-${String(idx + 1).padStart(3, "0")}`;
   const dateDebutISO = getStagiaireDateDebut(s, f) || f.dateDebut || "";
-  const dateFactureISO = dateDebutISO ? subtractBusinessDays(dateDebutISO, 3) : today.toISOString().slice(0, 10);
+  const dateFactureISO = dateDebutISO ? subtractBusinessDays(dateDebutISO, 14) : today.toISOString().slice(0, 10);
   const dateFacture = formatDate(dateFactureISO);
 
   // Infos stagiaire (pavé gauche)
