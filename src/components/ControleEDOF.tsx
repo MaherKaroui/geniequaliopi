@@ -183,7 +183,7 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
       console.error(`Error generating ${eyDoc.code} for stagiaire ${stagiaireIdx}:`, e);
       return null;
     }
-  }, [organisme, formation, exportStagiaires, safeName]);
+  }, [organisme, organismeWithSignature, formation, exportStagiaires, safeName]);
 
   const generateAutoDoc = useCallback(async (
     eyDoc: EYDocumentItem,
