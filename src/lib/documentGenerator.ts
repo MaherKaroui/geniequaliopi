@@ -14034,9 +14034,12 @@ function genAITestPositionnement(o: OrganismeInfo, f: FormationInfo, stagiaires:
       <p><strong>Appréciation :</strong> ${niveau}.</p></div>`;
   }
 
+  const sigDate = mode === "debut"
+    ? formatDate(getStagiaireDateDebut(s, f))
+    : (renderEmpty ? "" : formatDate(getStagiaireDateFin(s, f)));
   return buildDocument({
     org: o, title, subtitle: f.intitule, formation: f, showFormationInfo: false, stagiaires: [s], extraHtml: extra,
-    signatures: { type: "2", labels: ["Le Stagiaire", "Le Formateur"], names: [`${s.prenom} ${s.nom}`, f.formateur] },
+    signatures: { type: "2", labels: ["Le Stagiaire", "Le Formateur"], names: [`${s.prenom} ${s.nom}`, f.formateur], dates: sigDate ? [sigDate, sigDate] : undefined },
   });
 }
 
