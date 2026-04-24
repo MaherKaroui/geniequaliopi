@@ -109,6 +109,18 @@ export default function OPCOMobilites() {
     return m;
   });
 
+  // Document style (visual theme engine)
+  const [docStyle, setDocStyleState] = useState<DocStyleConfig>(() => {
+    try { const s = sessionStorage.getItem("opco_style"); return s ? JSON.parse(s) : DEFAULT_DOC_STYLE; }
+    catch { return DEFAULT_DOC_STYLE; }
+  });
+  const handleStyleChange = useCallback((style: DocStyleConfig) => {
+    setDocStyleState(style);
+    sessionStorage.setItem("opco_style", JSON.stringify(style));
+  }, []);
+  // Apply theme globally before any generation
+  useEffect(() => { applyDocStyle(docStyle); }, [docStyle]);
+
   const [expandedCats, setExpandedCats] = useState<Set<OpcoCategory>>(
     new Set(Object.keys(OPCO_CATEGORIES) as OpcoCategory[])
   );
