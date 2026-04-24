@@ -14,19 +14,21 @@ import { saveAs } from "file-saver";
 import {
   Home, Truck, ChevronDown, ChevronRight, Upload, CheckCircle2, Circle,
   XCircle, Download, FileText, Loader2, FolderArchive, Eye, Pencil, Save,
-  LogIn, LogOut, FolderOpen, Trash2, Plus,
+  LogIn, LogOut, FolderOpen, Trash2, Plus, Palette,
 } from "lucide-react";
 import OrganismeForm from "@/components/OrganismeForm";
 import FormationForm from "@/components/FormationForm";
 import StagiairesForm from "@/components/StagiairesForm";
+import DocStyleConfigPanel from "@/components/DocStyleConfigPanel";
 import {
   OPCO_DOCUMENTS, OPCO_CATEGORIES, type OpcoCategory,
   type OpcoDocumentItem, type OpcoDocState, type OpcoDocStatus,
 } from "@/lib/opcoMobilitesCatalog";
 import { buildOpcoFileName, buildOpcoZipFolder, buildOpcoRootName, type OpcoNamingContext } from "@/lib/opcoNaming";
-import type { OrganismeInfo, FormationInfo, StagiaireInfo, CritereData } from "@/types/qualiopi";
-import { CRITERES } from "@/types/qualiopi";
+import type { OrganismeInfo, FormationInfo, StagiaireInfo, CritereData, DocStyleConfig } from "@/types/qualiopi";
+import { CRITERES, DEFAULT_DOC_STYLE } from "@/types/qualiopi";
 import { generateDocumentById, getOpcoExerciceWeeks } from "@/lib/documentGenerator";
+import { setDocStyle as applyDocStyle } from "@/lib/docBuilder";
 import { generateAIEvalPack, getCachedPack, clearCachedPack } from "@/lib/aiEvalPack";
 import { Sparkles } from "lucide-react";
 import { generateExcelCalendrierOPCO, excelToBlob } from "@/lib/xlsxGenerator";
@@ -106,6 +108,18 @@ export default function OPCOMobilites() {
     });
     return m;
   });
+
+  // Document style (visual theme engine)
+  const [docStyle, setDocStyleState] = useState<DocStyleConfig>(() => {
+    try { const s = sessionStorage.getItem("opco_style"); return s ? JSON.parse(s) : DEFAULT_DOC_STYLE; }
+    catch { return DEFAULT_DOC_STYLE; }
+  });
+  const handleStyleChange = useCallback((style: DocStyleConfig) => {
+    setDocStyleState(style);
+    sessionStorage.setItem("opco_style", JSON.stringify(style));
+  }, []);
+  // Apply theme globally before any generation
+  useEffect(() => { applyDocStyle(docStyle); }, [docStyle]);
 
   const [expandedCats, setExpandedCats] = useState<Set<OpcoCategory>>(
     new Set(Object.keys(OPCO_CATEGORIES) as OpcoCategory[])
@@ -950,6 +964,18 @@ export default function OPCOMobilites() {
           </Card>
           <Card className="p-6">
             <StagiairesForm data={stagiaires} onChange={setStagiaires} />
+          </Card>
+
+          <Card className="p-6 space-y-4">
+            <div className="flex items-center gap-2">
+              <Palette className="w-5 h-5 text-primary" />
+              <h2 className="text-xl font-semibold">Design des documents</h2>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Choisissez le thème visuel appliqué à l'ensemble des documents OPCO générés
+              (polices, couleurs, en-têtes, styles de titres et de tableaux).
+            </p>
+            <DocStyleConfigPanel style={docStyle} onChange={handleStyleChange} />
           </Card>
 
           <div className="flex justify-end gap-2">
