@@ -142,7 +142,7 @@ function ministereStyle(): string {
   return `<style>
     *{box-sizing:border-box;margin:0;padding:0}
     body{font-family:'Calibri','Arial',sans-serif;color:#000;font-size:11pt;line-height:1.4}
-    .page{max-width:780px;margin:0 auto;padding:30px 40px;background:#fff;position:relative;min-height:1100px}
+    .page{max-width:780px;margin:0 auto;padding:24px 40px 70px;background:#fff;position:relative}
     .page-break{page-break-after:always;break-after:page}
     .ministere-header{margin-bottom:20px}
     .ministere-header img.ministere-logo-img{display:block;max-height:110px;width:auto}
@@ -509,9 +509,9 @@ export function genDPOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: St
   </div><div class="page-break"></div>`;
 
   // ===== PAGE 4 - Séparateur Exemples =====
-  html += `<div class="page" style="display:flex;align-items:center;justify-content:center;flex-direction:column;min-height:1000px">
+  html += `<div class="page" style="display:flex;align-items:center;justify-content:center;flex-direction:column">
     <h2 class="section-title" style="text-align:center;width:100%">DOSSIER PROFESSIONNEL (DP)</h2>
-    <h1 style="font-size:22pt;text-align:center;margin-top:80px;letter-spacing:2px;color:#0055A4">EXEMPLES DE PRATIQUE PROFESSIONNELLE</h1>
+    <h1 style="font-size:22pt;text-align:center;margin:120px 0 80px;letter-spacing:2px;color:#0055A4">EXEMPLES DE PRATIQUE PROFESSIONNELLE</h1>
     ${footerDPOfficiel("4")}
   </div><div class="page-break"></div>`;
 
@@ -603,7 +603,7 @@ export function genDPOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: St
     <h2 class="section-title">DOSSIER PROFESSIONNEL (DP)</h2>
     <h3 class="subsection">ANNEXES</h3>
     <p style="font-style:italic;color:#666">(Si le RC le prévoit)</p>
-    <div style="margin-top:30px;min-height:700px;border:1px dashed #bbb;background:#fafafa"></div>
+    <div style="margin-top:20px;height:620px;border:1px dashed #bbb;background:#fafafa"></div>
     ${footerDPOfficiel(String(pageNum))}
   </div>`;
 
@@ -737,30 +737,36 @@ export function genECFOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
       <h2 class="section-title">Fiche de résultats des évaluations (suite)</h2>
       <div class="activite-type">Activité-type ${ai + 1} · ${act.titre}</div>
       <p class="justify" style="margin-top:10px">Si le candidat n'a pas satisfait aux critères issus des référentiels, notez ci-dessous les points d'attention et précisions éventuelles.</p>
-      <div class="obs-box" style="min-height:110px">${termine ? "Sans objet — l'ensemble des critères du référentiel est satisfait." : "&nbsp;"}</div>
+      <div class="obs-box" style="min-height:90px">${termine ? `À l'issue des évaluations initiales conduites entre le ${dateDebut} et le ${dateEval}, le/la candidat(e) ${s.prenom} ${(s.nom || "").toUpperCase()} a démontré une maîtrise satisfaisante de l'ensemble des compétences du référentiel pour cette activité-type. Aucune réévaluation n'est nécessaire.` : "&nbsp;"}</div>
       <h3 class="subsection">Compétences à réévaluer :</h3>
-      <p style="font-style:italic;color:#555">(Voir évaluations complémentaires ci-après.)</p>
+      <p style="font-style:italic;color:#555">${termine ? "Aucune — l'ensemble des compétences de l'activité-type est validé." : "(Voir évaluations complémentaires ci-après.)"}</p>
       <table class="eval-table" style="margin-top:10px">
         <tr><th style="width:70%">Compétence à réévaluer</th><th>N° compétence</th></tr>
         ${act.competences.map((_, i) => `<tr>
-          <td style="height:28px"></td>
+          <td style="height:28px;${termine ? "font-style:italic;color:#666" : ""}">${termine ? "Sans objet — compétence acquise" : ""}</td>
           <td style="text-align:center">${i + 1}</td>
         </tr>`).join("")}
       </table>
       <h3 class="subsection">Observations du formateur évaluateur</h3>
-      <div class="obs-box" style="min-height:80px">${termine ? "Le/la candidat(e) a fait preuve d'une bonne maîtrise des compétences attendues sur cette activité-type. Les productions présentées sont de qualité et témoignent d'une réelle compréhension des enjeux professionnels. Aucune réévaluation n'est nécessaire." : "&nbsp;"}</div>
+      <div class="obs-box" style="min-height:80px">${termine ? `Le/la candidat(e) a fait preuve d'une bonne maîtrise des compétences attendues sur l'activité-type « ${act.titre} ». Les productions présentées lors des mises en situation professionnelle sont de qualité et témoignent d'une réelle compréhension des enjeux du métier. L'implication et la progression observées tout au long du parcours confirment l'aptitude à exercer l'activité en autonomie. Aucune réévaluation n'est nécessaire.` : "&nbsp;"}</div>
       ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, pageStr(pageNum), dateMaj)}
     </div><div class="page-break"></div>`;
     pageNum++;
 
     // ---- Page Évaluations complémentaires ----
+    const complLabels = [
+      "Entretien technique complémentaire",
+      "Questionnement à partir de productions professionnelles",
+      "Mise en situation professionnelle reconstituée complémentaire",
+    ];
     html += `<div class="page">
       <h2 class="section-title">Évaluations complémentaires <em style="font-weight:normal;font-size:10pt">(si nécessaire)</em></h2>
       <div class="activite-type">Activité-type ${ai + 1} · ${act.titre}</div>
+      <p class="justify" style="margin-top:8px;font-style:italic;color:#555">${termine ? `Les évaluations initiales ayant permis de valider l'ensemble des compétences de l'activité-type, aucune évaluation complémentaire n'a été nécessaire pour ${s.prenom} ${(s.nom || "").toUpperCase()}.` : "Les évaluations complémentaires sont à renseigner uniquement si des compétences restent à valider à l'issue des évaluations initiales."}</p>
       <table class="eval-table" style="margin-top:10px">
         <tr><th>Description des évaluations mises en œuvre</th><th>Dates</th><th>Compétences évaluées (cochez)</th></tr>
-        ${[1, 2, 3].map((n) => `<tr>
-          <td><strong>${n}.</strong> <em style="color:#777">${termine ? "Sans objet" : "—"}</em></td>
+        ${complLabels.map((lbl, n) => `<tr>
+          <td><strong>${n + 1}.</strong> ${termine ? `<em style="color:#666">Sans objet — ${lbl.toLowerCase()} non mobilisé(e) (activité-type validée)</em>` : lbl}</td>
           <td>${termine ? "—" : ""}</td>
           <td>${act.competences.map((_, i) => `${i + 1} <span class="check-box"></span>`).join(" &nbsp; ")}</td>
         </tr>`).join("")}
@@ -799,7 +805,7 @@ export function genECFOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
       </tr>`).join("")}
     </table>
     <h3 class="subsection">Observations</h3>
-    <div class="obs-box">${termine ? "Le candidat a satisfait à l'ensemble des évaluations prévues au référentiel du titre professionnel. Les acquis pédagogiques et professionnels sont conformes aux attendus." : "&nbsp;"}</div>
+    <div class="obs-box">${termine ? `Le/la candidat(e) ${s.prenom} ${(s.nom || "").toUpperCase()} a satisfait à l'ensemble des évaluations prévues au référentiel du titre professionnel « ${intituleTitre} ». Les acquis pédagogiques et professionnels sont conformes aux attendus sur les ${activites.length} activité(s)-type du référentiel. Le parcours a été mené avec assiduité (présence 100%) et les productions rendues témoignent d'une réelle appropriation des compétences. Le/la candidat(e) est prêt(e) à se présenter à la session d'examen du titre professionnel.` : "&nbsp;"}</div>
     ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, pageStr(pageNum), dateMaj)}
   </div><div class="page-break"></div>`;
   pageNum++;
@@ -807,7 +813,7 @@ export function genECFOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
   // ===== Page Signatures finale =====
   html += `<div class="page">
     <h2 class="section-title">Observations générales</h2>
-    <div class="obs-box" style="min-height:80px">${termine ? "Le parcours de formation a été mené à son terme. Le/la candidat(e) peut être présenté(e) à la session d'examen du titre professionnel." : "&nbsp;"}</div>
+    <div class="obs-box" style="min-height:80px">${termine ? `Le parcours de formation menant au titre professionnel « ${intituleTitre} » a été mené à son terme dans le respect du référentiel et des modalités pédagogiques prévues. Le/la candidat(e) ${s.prenom} ${(s.nom || "").toUpperCase()} a démontré sa capacité à mobiliser les compétences attendues sur l'ensemble des activités-types. Il/elle peut être présenté(e) à la session d'examen du titre professionnel.` : "&nbsp;"}</div>
 
     <h3 class="subsection" style="margin-top:20px">Formateur(s) / Évaluateur(s)</h3>
     <table class="eval-table">
