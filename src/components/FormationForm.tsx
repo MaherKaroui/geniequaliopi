@@ -7,7 +7,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Upload, Sparkles, Loader2, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SAMPLE_FORMATIONS, STAGIAIRES_BAC_PRO_LOGISTIQUE, STAGIAIRES_HEXAGONE_GOTRM, HEXAGONE_FORMATION_ORG } from "@/lib/sampleData";
-import { OrganismeInfo } from "@/types/qualiopi";
 import { parseEdofXlsx, EdofSession } from "@/lib/edofParser";
 import { RNCP_FICHES } from "@/lib/rncpData";
 import { supabase } from "@/integrations/supabase/client";
