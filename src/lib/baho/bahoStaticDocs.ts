@@ -627,17 +627,11 @@ export function getCertificatRealisationHTML(e: BahoEntreprise, stagiaire: BahoS
   <div class="stamps-tight">
     <table style="border:none; width:100%;">
       <tr style="border:none;">
-        <td style="border:none; width:50%; text-align:center; vertical-align:top;">
+        <td style="border:none; width:100%; text-align:center; vertical-align:top;">
           <strong>Pour l'organisme de formation</strong><br/>
           ${FORMAT_SPHERE_ORG.dirigeant}<br/>
           <em>${FORMAT_SPHERE_ORG.nom}</em><br/>
           <img src="${customFsStamp || svgToDataUri(getFormatSphereStampSvg())}" alt="Tampon FORMAT SPHERE"/>
-        </td>
-        <td style="border:none; width:50%; text-align:center; vertical-align:top;">
-          <strong>Pour l'entreprise bénéficiaire</strong><br/>
-          ${e.dirigeant}<br/>
-          <em>${e.nom}</em><br/>
-          <img src="${svgToDataUri(getHotelStampSvg(e))}" alt="Tampon hôtel"/>
         </td>
       </tr>
     </table>
