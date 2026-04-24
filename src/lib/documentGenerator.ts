@@ -2124,7 +2124,24 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
 
     ${(() => {
       const rncp = f.codeRNCP ? getRNCPByCode(f.codeRNCP) : undefined;
-      if (!rncp) return "";
+      if (!rncp) {
+        // Fallback sans RNCP : voies d'accès génériques
+        return `
+    <h2>8. Voies d'accès à la formation</h2>
+    <div class="section">
+      <p>La présente formation est accessible par les voies suivantes :</p>
+      <ul>
+        <li>Contrat d'apprentissage (pour les publics 16-29 ans, ou sans limite d'âge pour les travailleurs handicapés et certains projets)</li>
+        <li>Contrat de professionnalisation</li>
+        <li>Plan de développement des compétences de l'entreprise</li>
+        <li>Compte Personnel de Formation (CPF)</li>
+        <li>Reconversion ou Promotion par Alternance (Pro-A)</li>
+        <li>Financement Pôle emploi / France Travail (AIF, POEI, AFPR)</li>
+        <li>Financement individuel (à la charge du bénéficiaire)</li>
+      </ul>
+    </div>
+        `;
+      }
       const voies = rncp.voiesAcces && rncp.voiesAcces.length > 0 ? rncp.voiesAcces : [];
       const isRS = rncp.code?.toUpperCase().startsWith("RS");
       const fcUrl = isRS
@@ -2135,12 +2152,12 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
       const norm = (s: string) => s.toLowerCase();
       const has = (kw: string) => voies.some(v => norm(v).includes(kw));
       const rows: { label: string; oui: boolean; jury: boolean }[] = [
-        { label: "Après un parcours de formation sous statut d'élève ou d'étudiant", oui: has("élève") || has("etudiant") || has("étudiant") || has("statut"), jury: false },
+        { label: "Après un parcours de formation sous statut d'élève ou d'étudiant", oui: has("élève") || has("etudiant") || has("étudiant") || has("statut") || has("scolaire") || has("lycée") || has("initiale"), jury: false },
         { label: "En contrat d'apprentissage", oui: has("apprentissage"), jury: true },
-        { label: "Après un parcours de formation continue", oui: has("formation continue") || has("continue"), jury: true },
+        { label: "Après un parcours de formation continue", oui: has("formation continue") || has("continue") || has("distance") || has("cpf"), jury: true },
         { label: "En contrat de professionnalisation", oui: has("professionnalisation"), jury: true },
-        { label: "Par candidature individuelle", oui: has("candidature") || has("individuelle"), jury: false },
-        { label: "Par expérience (VAE)", oui: has("vae") || has("expérience") || has("experience"), jury: true },
+        { label: "Par candidature individuelle", oui: has("candidature") || has("individuelle") || has("libre") || has("ponctuelle") || has("3 année") || has("trois année"), jury: false },
+        { label: "Par expérience (VAE)", oui: has("vae") || has("expérience") || has("experience") || has("acquis"), jury: true },
       ];
 
       const compositionJury = `
