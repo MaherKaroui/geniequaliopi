@@ -2135,12 +2135,12 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
       const norm = (s: string) => s.toLowerCase();
       const has = (kw: string) => voies.some(v => norm(v).includes(kw));
       const rows: { label: string; oui: boolean; jury: boolean }[] = [
-        { label: "Après un parcours de formation sous statut d'élève ou d'étudiant", oui: has("élève") || has("etudiant") || has("étudiant") || has("statut"), jury: false },
+        { label: "Après un parcours de formation sous statut d'élève ou d'étudiant", oui: has("élève") || has("etudiant") || has("étudiant") || has("statut") || has("scolaire") || has("lycée") || has("initiale"), jury: false },
         { label: "En contrat d'apprentissage", oui: has("apprentissage"), jury: true },
-        { label: "Après un parcours de formation continue", oui: has("formation continue") || has("continue"), jury: true },
+        { label: "Après un parcours de formation continue", oui: has("formation continue") || has("continue") || has("distance") || has("cpf"), jury: true },
         { label: "En contrat de professionnalisation", oui: has("professionnalisation"), jury: true },
-        { label: "Par candidature individuelle", oui: has("candidature") || has("individuelle"), jury: false },
-        { label: "Par expérience (VAE)", oui: has("vae") || has("expérience") || has("experience"), jury: true },
+        { label: "Par candidature individuelle", oui: has("candidature") || has("individuelle") || has("libre") || has("ponctuelle") || has("3 année") || has("trois année"), jury: false },
+        { label: "Par expérience (VAE)", oui: has("vae") || has("expérience") || has("experience") || has("acquis"), jury: true },
       ];
 
       const compositionJury = `
