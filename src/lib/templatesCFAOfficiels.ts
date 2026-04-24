@@ -292,6 +292,8 @@ const SCENARIOS_PAR_DOMAINE: Record<string, { intitules: string[]; entreprises: 
 
 function detectDomaine(f: FormationInfo): keyof typeof SCENARIOS_PAR_DOMAINE {
   const t = `${f.intitule} ${f.codeRNCP}`.toLowerCase();
+  // Transport routier de marchandises (GOTRM, exploitant, affréteur) — AVANT "conduite" car contient "routier"
+  if (/gotrm|gestionnaire.*transport|transport.*routier.*marchandises|exploitant.*transport|affr[ée]teur|rncp40990|tp-?01329/i.test(t)) return "transport";
   if (/n[ée]goci|commercial|vente|technico/i.test(t)) return "commercial";
   if (/conduite|ecsr|enseignant.*conduite|s[ée]curit[ée] routi/i.test(t)) return "conduite";
   if (/responsable|petite.*moyenne|management|dirigeant|rpms|assistant.*direction/i.test(t)) return "management";
