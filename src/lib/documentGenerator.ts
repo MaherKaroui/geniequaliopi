@@ -14,7 +14,7 @@ import { genPlanDevPreuvesInscription } from "./planDevPreuvesInscription";
 import { genVeilleReglementaireV2, genVeilleMetierV2, genVeilleTechnologiqueV2, genVeilleHandicap, genListePartenairesV2, genContratSousTraitanceV2, genCharteQualiteFormateurExterne } from "./templatesCritere6";
 import { genNewsletterScreenshots, genScreenshotFranceCompetences, genScreenshotDRIEETS, genScreenshotCentreInfoo, genScreenshotMicrosoft, genScreenshotOpenAI, genScreenshotAgefiph, genCertificatCoursera } from "./newsletterScreenshots";
 import { genPreuvesVeilleReglementaire } from "./veillePreuvesScreenshots";
-import { genDeroulePedagogique } from "./templatesAF";
+import { genDeroulePedagogique, genFactureOPCO } from "./templatesAF";
 import { getRNCPByCode } from "./rncpData";
 import { generateExcelSuiviInscriptions, generateExcelSuiviParcoursBeneficiairesCFA, generateExcelSuiviPublicBeneficiaire, generateExcelSuiviPFMP, generateExcelOutilsSuiviAlternance, generateExcelTableauSuiviParcours } from "./xlsxGenerator";
 import { genVisuelMissionCFA } from "./visuelsMissionsCFA";
@@ -889,6 +889,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "temps_connexion_opco_vierge": return genTempsConnexionOPCOVierge(o, f, stagiaires);
     case "exercices_opco": return genExercicesOPCO(o, f, stagiaires, params);
     case "exercices_opco_semaine": return genExercicesOPCO(o, f, stagiaires, params);
+    case "facture_opco": return genFactureOPCO(o, f, stagiaires, typeof params?.stagiaireIdx === "number" ? params.stagiaireIdx : undefined);
     case "decoupage_formation_cfa_excel": return genDecoupageFormationCFAExcel(o, f);
     case "suivi_inscriptions_excel": return generateExcelSuiviInscriptions(o, f, stagiaires);
     case "visuel_mission_cfa": return genVisuelMissionCFA(o, params?.imageUrl || "", params?.missionTitre || "");
