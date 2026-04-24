@@ -754,13 +754,19 @@ export function genECFOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
     pageNum++;
 
     // ---- Page Évaluations complémentaires ----
+    const complLabels = [
+      "Entretien technique complémentaire",
+      "Questionnement à partir de productions professionnelles",
+      "Mise en situation professionnelle reconstituée complémentaire",
+    ];
     html += `<div class="page">
       <h2 class="section-title">Évaluations complémentaires <em style="font-weight:normal;font-size:10pt">(si nécessaire)</em></h2>
       <div class="activite-type">Activité-type ${ai + 1} · ${act.titre}</div>
+      <p class="justify" style="margin-top:8px;font-style:italic;color:#555">${termine ? `Les évaluations initiales ayant permis de valider l'ensemble des compétences de l'activité-type, aucune évaluation complémentaire n'a été nécessaire pour ${s.prenom} ${(s.nom || "").toUpperCase()}.` : "Les évaluations complémentaires sont à renseigner uniquement si des compétences restent à valider à l'issue des évaluations initiales."}</p>
       <table class="eval-table" style="margin-top:10px">
         <tr><th>Description des évaluations mises en œuvre</th><th>Dates</th><th>Compétences évaluées (cochez)</th></tr>
-        ${[1, 2, 3].map((n) => `<tr>
-          <td><strong>${n}.</strong> <em style="color:#777">${termine ? "Sans objet" : "—"}</em></td>
+        ${complLabels.map((lbl, n) => `<tr>
+          <td><strong>${n + 1}.</strong> ${termine ? `<em style="color:#666">Sans objet — ${lbl.toLowerCase()} non mobilisé(e) (activité-type validée)</em>` : lbl}</td>
           <td>${termine ? "—" : ""}</td>
           <td>${act.competences.map((_, i) => `${i + 1} <span class="check-box"></span>`).join(" &nbsp; ")}</td>
         </tr>`).join("")}
