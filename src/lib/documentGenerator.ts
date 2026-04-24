@@ -13127,13 +13127,19 @@ function genExercicesOPCO(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
     });
   }
 
-  extra += `<p style="margin-top:14px;font-size:0.9em"><em>Chaque exercice porte sur les acquis de la semaine en centre de formation. Les exercices sont systématiquement corrigés par le formateur et restitués lors de la séance suivante. Les exercices futurs seront ajoutés au fur et à mesure du déroulement de la formation.</em></p>`;
+  if (!isSingleWeek) {
+    extra += `<p style="margin-top:14px;font-size:0.9em"><em>Chaque exercice porte sur les acquis de la semaine en centre de formation. Les exercices sont systématiquement corrigés par le formateur et restitués lors de la séance suivante. Les exercices futurs seront ajoutés au fur et à mesure du déroulement de la formation.</em></p>`;
+  }
   extra += `<p style="margin-top:18px"><strong>Fait à</strong> ${o.ville || "—"}, <strong>le</strong> ${formatDate(new Date().toISOString())}</p>`;
   extra += `<p><strong>${o.dirigeant || o.responsablePedagogique || "Le responsable pédagogique"}</strong><br>${o.nom}</p>`;
 
+  const title = isSingleWeek
+    ? `EXERCICE PRATIQUE — SEMAINE ÉCOLE`
+    : "EXERCICES PRATIQUES PAR SEMAINE — SUIVI ALTERNANCE";
+
   return buildDocument({
     org: o,
-    title: "EXERCICES PRATIQUES PAR SEMAINE — SUIVI ALTERNANCE",
+    title,
     subtitle: f.intitule,
     extraHtml: extra,
   });
