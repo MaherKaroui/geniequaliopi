@@ -538,16 +538,42 @@ export default function OPCOMobilites() {
             const suffix = formatSessionSuffix(g, i);
             const folder = zip.folder(suffix)!;
 
-            for (const s of g.stagiaires) {
-              reporter.setMessage(`${doc.code} — Session ${i + 1}/${sessionsSnap.length} : ${s.prenom} ${s.nom}`);
-              const blob = await generateAutoBlobForSession(doc, [s]);
-              if (blob) {
+            // C12 : 1 PDF par semaine école PASSÉE × stagiaire (au lieu d'un seul PDF tout-en-un)
+            if (doc.code === "C12") {
+              const weeks = getOpcoExerciceWeeks(formSnap, g.stagiaires);
+              for (const s of g.stagiaires) {
                 const stagSuffix = `${s.prenom || ""}_${s.nom || ""}`.trim() || "Stagiaire";
-                folder.file(buildOpcoFileName(ctxSnap, doc.label, "pdf", stagSuffix), blob);
+                const stagFolder = folder.folder(stagSuffix)!;
+                for (let wi = 0; wi < weeks.length; wi++) {
+                  const w = weeks[wi];
+                  reporter.setMessage(
+                    `C12 — Session ${i + 1}/${sessionsSnap.length} — ${s.prenom} ${s.nom} — Semaine ${wi + 1}/${weeks.length}`,
+                  );
+                  const blob = await generateC12WeekBlob(s, w.weekIdx);
+                  if (blob) {
+                    const wkSuffix = `Semaine_${String(wi + 1).padStart(2, "0")}_${fmtDateForFile(w.lastDay)}_${stagSuffix}`;
+                    stagFolder.file(
+                      buildOpcoFileName(ctxSnap, "Exercice_pratique_semaine", "pdf", wkSuffix),
+                      blob,
+                    );
+                  }
+                  await new Promise((r) => setTimeout(r, 0));
+                }
+                processedUnits++;
+                reporter.setProgress((processedUnits / totalUnits) * 90);
               }
-              processedUnits++;
-              reporter.setProgress((processedUnits / totalUnits) * 90);
-              await new Promise((r) => setTimeout(r, 0));
+            } else {
+              for (const s of g.stagiaires) {
+                reporter.setMessage(`${doc.code} — Session ${i + 1}/${sessionsSnap.length} : ${s.prenom} ${s.nom}`);
+                const blob = await generateAutoBlobForSession(doc, [s]);
+                if (blob) {
+                  const stagSuffix = `${s.prenom || ""}_${s.nom || ""}`.trim() || "Stagiaire";
+                  folder.file(buildOpcoFileName(ctxSnap, doc.label, "pdf", stagSuffix), blob);
+                }
+                processedUnits++;
+                reporter.setProgress((processedUnits / totalUnits) * 90);
+                await new Promise((r) => setTimeout(r, 0));
+              }
             }
 
             reporter.setMessage(`${doc.code} — Trame vierge session ${i + 1}/${sessionsSnap.length}`);
