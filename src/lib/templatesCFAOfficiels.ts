@@ -623,7 +623,7 @@ export function genECFOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
   const mil = getMillesime(f);
   const dateJo = getDateJO(f);
   const dateMaj = getDateMajOrg(o);
-  const sigle = "ECF";
+  const sigle = "EPR"; // Sigle officiel du Livret ECF selon trame ministérielle
   const typeDoc = "Livret d'évaluations passées en cours de formation";
   const activites = getActivitesTypes(f);
   const intituleTitre = f.intitule || "Titre professionnel";
@@ -639,20 +639,32 @@ export function genECFOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
   const formateur1 = formateurPrincipal;
   const responsable = o.dirigeant || o.responsablePedagogique || "OUACHEK Hakim";
   const dateEval = termine ? (fmtDateFR(getDateFin(f, s)) || todayCompact()) : "";
+  const dateDebut = termine ? (fmtDateFR(getDateDebut(f, s)) || "") : "";
+
+  // Chaque activité = 3 pages (Fiche résultats + Réévaluation + Évaluations complémentaires)
+  // Total = 2 (couverture+présentation) + 3*N + 2 (synthèse + signatures) = 3N + 4
+  const totalPages = activites.length * 3 + 4;
+  const pageStr = (n: number) => `${n}/${totalPages}`;
 
   let html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">${ministereStyle()}</head><body>`;
 
   // ===== PAGE 1 - Couverture =====
   html += `<div class="page">
+    <div style="text-align:center;font-size:10pt;margin-bottom:8px">
+      <p style="font-style:italic;color:#555">Liberté • Égalité • Fraternité</p>
+      <p style="font-weight:bold;letter-spacing:1px">RÉPUBLIQUE FRANÇAISE</p>
+      <p style="margin-top:8px;font-size:9pt">MINISTÈRE CHARGÉ DE L'EMPLOI</p>
+    </div>
     ${ministereHeader("LIVRET D'ÉVALUATIONS PASSÉES EN COURS DE FORMATION")}
     <div style="text-align:center;margin:20px 0">
       <p style="font-weight:bold;font-size:13pt">Titre professionnel</p>
       <p style="font-size:14pt;font-weight:bold;color:#0055A4;margin:10px 0">${intituleTitre}</p>
       <p style="font-size:11pt">${niveau}</p>
     </div>
-    <div style="margin:30px 0;font-size:10pt;text-align:center">
-      <p>Code : <strong>${codeTitre}</strong></p>
-      <p>Date JO : ${dateJo}</p>
+    <div style="margin:20px 0;font-size:10pt;text-align:center">
+      <p>Arrêté du : <strong>${dateJo}</strong></p>
+      <p>J.O. du : <strong>${dateJo}</strong></p>
+      <p>Code titre : <strong>${codeTitre}</strong> — Millésime : <strong>${mil}</strong></p>
     </div>
     <table class="candidate-table">
       <tr><th>Organisme de formation</th><td>${o.nom || ""}</td></tr>
@@ -668,22 +680,21 @@ export function genECFOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
       <tr><th>Prénom</th><td>${s.prenom || ""}</td></tr>
       <tr><th>Date de naissance</th><td>${getStagDateNaissance(s)}</td></tr>
     </table>
-    ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, "1", dateMaj)}
+    ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, pageStr(1), dateMaj)}
   </div><div class="page-break"></div>`;
 
   // ===== PAGE 2 - Présentation =====
   html += `<div class="page">
     <h2 class="section-title">Présentation du dossier</h2>
     <p class="justify">Les évaluations passées en cours de formation décrites dans les fiches qui suivent ont été mises en œuvre en référence aux critères issus des référentiels du titre professionnel, pour les sessions d'examen « Titre », « CCP » et « CCS » telles que prévues par l'arrêté du 22 décembre 2015 relatif aux conditions de délivrance du titre professionnel du ministère chargé de l'emploi.</p>
-    <p class="justify" style="margin-top:12px">Le <em>Guide de mise en œuvre</em> des Évaluations passées en cours de formation est à télécharger sur le site du ministère de l'emploi : http://travail-emploi.gouv.fr/ (rubrique <em>Documents techniques</em>). Il comporte un mode d'emploi du présent Livret d'évaluations passées en cours de formation.</p>
-    ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, "2", dateMaj)}
+    <p class="justify" style="margin-top:12px">Le <em>Guide de mise en œuvre</em> des Évaluations passées en cours de formation est à télécharger sur le site du ministère de l'emploi : <strong>http://travail-emploi.gouv.fr/</strong> (rubrique <em>Documents techniques</em>). Il comporte un mode d'emploi du présent Livret d'évaluations passées en cours de formation.</p>
+    ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, pageStr(2), dateMaj)}
   </div><div class="page-break"></div>`;
 
-  // ===== Pages Fiches de résultats =====
+  // ===== Pages par activité-type =====
   let pageNum = 3;
   activites.forEach((act, ai) => {
-    // Fiche de résultats
-    const evalSeed = hashStr(`${s.nom}-${ai}`);
+    // ---- Fiche de résultats ----
     html += `<div class="page">
       <h2 class="section-title">Fiche de résultats des évaluations</h2>
       <div class="activite-type">Activité-type ${ai + 1} · ${act.titre}</div>
@@ -692,35 +703,71 @@ export function genECFOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
         ${act.competences.map(c => `<li>${c}</li>`).join("")}
       </ol>
       <table class="eval-table">
-        <tr><th>Description des évaluations mises en œuvre</th><th>Dates</th><th>Compétences évaluées</th></tr>
+        <tr><th>Description des évaluations mises en œuvre</th><th>Dates</th><th>Compétences évaluées (cochez)</th></tr>
         <tr>
           <td><strong>1.</strong> Évaluation formative en situation professionnelle reconstituée — étude de cas écrite</td>
-          <td>${termine ? fmtDateFR(getDateDebut(f, s)) : ""}</td>
-          <td>${act.competences.map((_, i) => `${i + 1} <span class="check-box${termine ? " ck" : ""}"></span>`).join(" ")}</td>
+          <td>${dateDebut}</td>
+          <td>${act.competences.map((_, i) => `${i + 1} <span class="check-box${termine ? " ck" : ""}"></span>`).join(" &nbsp; ")}</td>
         </tr>
         <tr>
           <td><strong>2.</strong> Mise en situation professionnelle reconstituée — oral devant jury de formation</td>
-          <td>${termine ? fmtDateFR(getDateDebut(f, s)) : ""}</td>
-          <td>${act.competences.map((_, i) => `${i + 1} <span class="check-box${termine ? " ck" : ""}"></span>`).join(" ")}</td>
+          <td>${dateDebut}</td>
+          <td>${act.competences.map((_, i) => `${i + 1} <span class="check-box${termine ? " ck" : ""}"></span>`).join(" &nbsp; ")}</td>
         </tr>
         <tr>
           <td><strong>3.</strong> Évaluation pratique en entreprise — observation sur poste de travail</td>
-          <td>${termine ? fmtDateFR(getDateFin(f, s)) : ""}</td>
-          <td>${act.competences.map((_, i) => `${i + 1} <span class="check-box${termine ? " ck" : ""}"></span>`).join(" ")}</td>
+          <td>${dateEval}</td>
+          <td>${act.competences.map((_, i) => `${i + 1} <span class="check-box${termine ? " ck" : ""}"></span>`).join(" &nbsp; ")}</td>
         </tr>
         <tr>
           <td><strong>4.</strong> Questionnement à partir de productions professionnelles</td>
           <td>${dateEval}</td>
-          <td>${act.competences.map((_, i) => `${i + 1} <span class="check-box${termine ? " ck" : ""}"></span>`).join(" ")}</td>
+          <td>${act.competences.map((_, i) => `${i + 1} <span class="check-box${termine ? " ck" : ""}"></span>`).join(" &nbsp; ")}</td>
         </tr>
       </table>
       <p style="margin-top:14px;font-weight:bold">Lors de l'évaluation ou des évaluations passée(s) en cours de formation, le/la candidat(e) est considéré(e) :</p>
       <p class="check-line"><span class="check-box${termine ? " ck" : ""}"></span>Avoir satisfait aux critères issus des référentiels du titre professionnel attendus pour la réalisation de cette activité-type.</p>
       <p class="check-line"><span class="check-box"></span>Ne pas avoir satisfait aux critères issus des référentiels du titre professionnel.</p>
+      ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, pageStr(pageNum), dateMaj)}
+    </div><div class="page-break"></div>`;
+    pageNum++;
 
-      <h3 class="subsection">Observations</h3>
-      <div class="obs-box">Le/la candidat(e) a fait preuve d'une bonne maîtrise des compétences attendues sur cette activité-type. Les productions présentées sont de qualité et témoignent d'une réelle compréhension des enjeux professionnels.</div>
+    // ---- Page Compétences à réévaluer ----
+    html += `<div class="page">
+      <h2 class="section-title">Fiche de résultats des évaluations (suite)</h2>
+      <div class="activite-type">Activité-type ${ai + 1} · ${act.titre}</div>
+      <p class="justify" style="margin-top:10px">Si le candidat n'a pas satisfait aux critères issus des référentiels, notez ci-dessous les points d'attention et précisions éventuelles.</p>
+      <div class="obs-box" style="min-height:110px">${termine ? "Sans objet — l'ensemble des critères du référentiel est satisfait." : "&nbsp;"}</div>
+      <h3 class="subsection">Compétences à réévaluer :</h3>
+      <p style="font-style:italic;color:#555">(Voir évaluations complémentaires ci-après.)</p>
+      <table class="eval-table" style="margin-top:10px">
+        <tr><th style="width:70%">Compétence à réévaluer</th><th>N° compétence</th></tr>
+        ${act.competences.map((_, i) => `<tr>
+          <td style="height:28px"></td>
+          <td style="text-align:center">${i + 1}</td>
+        </tr>`).join("")}
+      </table>
+      <h3 class="subsection">Observations du formateur évaluateur</h3>
+      <div class="obs-box" style="min-height:80px">${termine ? "Le/la candidat(e) a fait preuve d'une bonne maîtrise des compétences attendues sur cette activité-type. Les productions présentées sont de qualité et témoignent d'une réelle compréhension des enjeux professionnels. Aucune réévaluation n'est nécessaire." : "&nbsp;"}</div>
+      ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, pageStr(pageNum), dateMaj)}
+    </div><div class="page-break"></div>`;
+    pageNum++;
 
+    // ---- Page Évaluations complémentaires ----
+    html += `<div class="page">
+      <h2 class="section-title">Évaluations complémentaires <em style="font-weight:normal;font-size:10pt">(si nécessaire)</em></h2>
+      <div class="activite-type">Activité-type ${ai + 1} · ${act.titre}</div>
+      <table class="eval-table" style="margin-top:10px">
+        <tr><th>Description des évaluations mises en œuvre</th><th>Dates</th><th>Compétences évaluées (cochez)</th></tr>
+        ${[1, 2, 3].map((n) => `<tr>
+          <td><strong>${n}.</strong> <em style="color:#777">${termine ? "Sans objet" : "—"}</em></td>
+          <td>${termine ? "—" : ""}</td>
+          <td>${act.competences.map((_, i) => `${i + 1} <span class="check-box"></span>`).join(" &nbsp; ")}</td>
+        </tr>`).join("")}
+      </table>
+      <p style="margin-top:14px;font-weight:bold">À l'issue des évaluations complémentaires, le/la candidat(e) est considéré(e) :</p>
+      <p class="check-line"><span class="check-box${termine ? " ck" : ""}"></span>Avoir satisfait aux critères issus des référentiels du titre professionnel.</p>
+      <p class="check-line"><span class="check-box"></span>Ne pas avoir satisfait aux critères issus des référentiels du titre professionnel.</p>
       <h3 class="subsection">Formateur évaluateur</h3>
       <table class="eval-table">
         <tr><th>Nom</th><th>Date</th><th>Visa</th></tr>
@@ -732,7 +779,7 @@ export function genECFOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
           </td>
         </tr>
       </table>
-      ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, `${pageNum}/${activites.length + 4}`, dateMaj)}
+      ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, pageStr(pageNum), dateMaj)}
     </div><div class="page-break"></div>`;
     pageNum++;
   });
@@ -740,20 +787,31 @@ export function genECFOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
   // ===== Page Synthèse =====
   html += `<div class="page">
     <h2 class="section-title" style="text-align:center">SYNTHÈSE DES RÉSULTATS OBTENUS PAR LE CANDIDAT À L'ISSUE DU PARCOURS DE FORMATION</h2>
-    <table class="eval-table">
-      <tr><th style="width:50%">Intitulé de l'activité-type</th><th>Activité maîtrisée</th></tr>
+    <table class="eval-table" style="margin-top:14px">
+      <tr><th style="width:40%">Intitulé de l'activité-type</th><th>Compétences professionnelles</th><th style="width:18%">Maîtrisée</th></tr>
       ${activites.map((act, ai) => `<tr>
-        <td><strong>${act.titre}</strong></td>
-        <td>L'activité ${ai + 1} est maîtrisée : <span class="check-box${termine ? " ck" : ""}"></span> OUI &nbsp;&nbsp; <span class="check-box"></span> NON</td>
+        <td><strong>Activité-type ${ai + 1}</strong><br>${act.titre}</td>
+        <td><ol style="margin:0 0 0 18px;padding:0">${act.competences.map(c => `<li>${c}</li>`).join("")}</ol></td>
+        <td style="text-align:center;vertical-align:middle">
+          <span class="check-box${termine ? " ck" : ""}"></span> OUI<br>
+          <span class="check-box"></span> NON
+        </td>
       </tr>`).join("")}
     </table>
-
     <h3 class="subsection">Observations</h3>
     <div class="obs-box">${termine ? "Le candidat a satisfait à l'ensemble des évaluations prévues au référentiel du titre professionnel. Les acquis pédagogiques et professionnels sont conformes aux attendus." : "&nbsp;"}</div>
+    ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, pageStr(pageNum), dateMaj)}
+  </div><div class="page-break"></div>`;
+  pageNum++;
 
-    <h3 class="subsection">Formateur évaluateur</h3>
+  // ===== Page Signatures finale =====
+  html += `<div class="page">
+    <h2 class="section-title">Observations générales</h2>
+    <div class="obs-box" style="min-height:80px">${termine ? "Le parcours de formation a été mené à son terme. Le/la candidat(e) peut être présenté(e) à la session d'examen du titre professionnel." : "&nbsp;"}</div>
+
+    <h3 class="subsection" style="margin-top:20px">Formateur(s) / Évaluateur(s)</h3>
     <table class="eval-table">
-      <tr><th>Nom</th><th>Date</th><th>Visa</th></tr>
+      <tr><th style="width:40%">Nom</th><th style="width:30%">Date</th><th>Visa</th></tr>
       <tr>
         <td>${formateur1}</td>
         <td>${dateEval}</td>
@@ -765,7 +823,7 @@ export function genECFOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
 
     <h3 class="subsection">Représentant de l'organisme de formation</h3>
     <table class="eval-table">
-      <tr><th>Nom</th><th>Date</th><th>Visa</th></tr>
+      <tr><th style="width:40%">Nom</th><th style="width:30%">Date</th><th>Visa</th></tr>
       <tr>
         <td>${responsable}</td>
         <td>${dateEval}</td>
@@ -783,7 +841,7 @@ export function genECFOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
     <div style="height:70px;border:1px dashed #999;margin-top:8px;display:flex;align-items:center;justify-content:center;background:#fff">
       ${termine && s.signatureUrl ? `<img src="${s.signatureUrl}" alt="Signature candidat" style="max-height:60px;max-width:200px;object-fit:contain" />` : ""}
     </div>
-    ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, `${pageNum}/${activites.length + 4}`, dateMaj)}
+    ${footerOfficiel(sigle, typeDoc, codeTitre, mil, dateJo, pageStr(pageNum), dateMaj)}
   </div>`;
 
   html += `</body></html>`;
