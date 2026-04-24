@@ -670,13 +670,35 @@ export default function OPCOMobilites() {
                 const suffix = formatSessionSuffix(g, i);
                 const sessionFolder = `${subFolder}/${suffix}`;
 
-                for (const s of g.stagiaires) {
-                  const blob = await generateAutoBlobForSession(doc, [s]);
-                  if (blob) {
+                if (doc.code === "C12") {
+                  const weeks = getOpcoExerciceWeeks(formSnap, g.stagiaires);
+                  for (const s of g.stagiaires) {
                     const stagSuffix = `${s.prenom || ""}_${s.nom || ""}`.trim() || "Stagiaire";
-                    zip.file(`${sessionFolder}/${buildOpcoFileName(ctxSnap, doc.label, "pdf", stagSuffix)}`, blob);
+                    for (let wi = 0; wi < weeks.length; wi++) {
+                      const w = weeks[wi];
+                      reporter.setMessage(
+                        `C12 — ${suffix} — ${s.prenom} ${s.nom} — Semaine ${wi + 1}/${weeks.length}`,
+                      );
+                      const blob = await generateC12WeekBlob(s, w.weekIdx);
+                      if (blob) {
+                        const wkSuffix = `Semaine_${String(wi + 1).padStart(2, "0")}_${fmtDateForFile(w.lastDay)}_${stagSuffix}`;
+                        zip.file(
+                          `${sessionFolder}/${stagSuffix}/${buildOpcoFileName(ctxSnap, "Exercice_pratique_semaine", "pdf", wkSuffix)}`,
+                          blob,
+                        );
+                      }
+                      await new Promise((r) => setTimeout(r, 0));
+                    }
                   }
-                  await new Promise((r) => setTimeout(r, 30));
+                } else {
+                  for (const s of g.stagiaires) {
+                    const blob = await generateAutoBlobForSession(doc, [s]);
+                    if (blob) {
+                      const stagSuffix = `${s.prenom || ""}_${s.nom || ""}`.trim() || "Stagiaire";
+                      zip.file(`${sessionFolder}/${buildOpcoFileName(ctxSnap, doc.label, "pdf", stagSuffix)}`, blob);
+                    }
+                    await new Promise((r) => setTimeout(r, 30));
+                  }
                 }
 
                 const viergeBlob = await generateViergeBlobForSession(doc.code, g.stagiaires);
