@@ -5,7 +5,7 @@
  */
 import JSZip from "jszip";
 import { getBahoEntreprises, FORMAT_SPHERE_ORG, type BahoEntreprise } from "./bahoData";
-import { getRIHTML, getCGVHTML, getFactureHTML, getConventionHTML, getDevisHTML, getProgrammeHTML } from "./bahoStaticDocs";
+import { getRIHTML, getCGVHTML, getFactureHTML, getConventionHTML, getDevisHTML, getProgrammeHTML, getEmargementHTML, getConvocationHTML, getCertificatRealisationHTML } from "./bahoStaticDocs";
 import { htmlToPdfBlob } from "@/lib/pdfExport";
 import type { JobReporter } from "@/lib/backgroundJobs";
 
@@ -17,7 +17,9 @@ function safeName(s: string): string {
 export async function buildBahoZip(reporter?: JobReporter, customFsStamp?: string): Promise<Blob> {
   const zip = new JSZip();
   const entreprises = getBahoEntreprises();
-  const totalSteps = entreprises.length * 6; // 6 docs par entreprise
+  const totalStagiaires = entreprises.reduce((acc, e) => acc + e.stagiaires.length, 0);
+  // 6 docs par entreprise + 3 docs par stagiaire (convocation, émargement, certificat)
+  const totalSteps = entreprises.length * 6 + totalStagiaires * 3;
   let step = 0;
 
   reporter?.setMessage(`Génération de ${entreprises.length} dossiers BAHO…`);
@@ -32,15 +34,20 @@ export async function buildBahoZip(reporter?: JobReporter, customFsStamp?: strin
     `NDA : ${FORMAT_SPHERE_ORG.nda}`,
     "",
     `Nombre d'entreprises : ${entreprises.length}`,
-    `Nombre total de stagiaires : ${entreprises.reduce((acc, e) => acc + e.stagiaires.length, 0)}`,
+    `Nombre total de stagiaires : ${totalStagiaires}`,
     "",
     "Pour chaque entreprise (PDF uniquement) :",
     " - Programme de formation (PDF tamponné)",
     " - Convention de formation (PDF tamponnée avec liste participants)",
     " - Devis (PDF tamponné)",
-    " - Facture (PDF tamponnée)",
+    " - Facture (PDF tamponnée avec liste participants + modalité présentiel)",
     " - Règlement intérieur (PDF tamponné)",
     " - CGV (PDF tamponnée)",
+    "",
+    "Pour chaque stagiaire (PDF tamponné) :",
+    " - Convocation individuelle",
+    " - Feuille d'émargement individuelle",
+    " - Certificat de réalisation individuel",
     "",
     "Liste :",
     ...entreprises.map((e, i) => ` ${i + 1}. ${e.nom} – ${e.siret} (${e.stagiaires.length} stagiaires)`),
@@ -126,6 +133,53 @@ export async function buildBahoZip(reporter?: JobReporter, customFsStamp?: strin
       folder.file(`ERREUR_CGV.txt`, `Erreur: ${(err as Error).message}`);
     }
     step++; reporter?.setProgress(Math.round((step / totalSteps) * 100));
+
+    // 7. Documents individuels par stagiaire : Convocation + Émargement + Certificat de réalisation
+    const stagiairesFolder = folder.folder("Stagiaires")!;
+    for (let si = 0; si < e.stagiaires.length; si++) {
+      const s = e.stagiaires[si];
+      const stagNameSafe = safeName(`${s.nom}_${s.prenom}`);
+      const stagFolder = stagiairesFolder.folder(`${String(si + 1).padStart(2, "0")}_${stagNameSafe}_${s.codeStagiaire}`)!;
+
+      // 7a. Convocation
+      try {
+        reporter?.setMessage(`${e.nom} – Convocation ${s.prenom} ${s.nom}…`);
+        const convocHtml = getConvocationHTML(e, s, customFsStamp);
+        const convocPdf = await htmlToPdfBlob(convocHtml);
+        stagFolder.file(`Convocation_${stagNameSafe}_${s.codeStagiaire}.pdf`, convocPdf);
+      } catch (err) {
+        console.error("Convocation error:", err);
+        stagFolder.file(`ERREUR_Convocation.txt`, `Erreur: ${(err as Error).message}`);
+      }
+      step++; reporter?.setProgress(Math.round((step / totalSteps) * 100));
+
+      // 7b. Feuille d'émargement individuelle
+      try {
+        reporter?.setMessage(`${e.nom} – Émargement ${s.prenom} ${s.nom}…`);
+        const emargHtml = getEmargementHTML(e, s, customFsStamp);
+        const emargPdf = await htmlToPdfBlob(emargHtml);
+        stagFolder.file(`Emargement_${stagNameSafe}_${s.codeStagiaire}.pdf`, emargPdf);
+      } catch (err) {
+        console.error("Emargement error:", err);
+        stagFolder.file(`ERREUR_Emargement.txt`, `Erreur: ${(err as Error).message}`);
+      }
+      step++; reporter?.setProgress(Math.round((step / totalSteps) * 100));
+
+      // 7c. Certificat de réalisation
+      try {
+        reporter?.setMessage(`${e.nom} – Certificat ${s.prenom} ${s.nom}…`);
+        const certifHtml = getCertificatRealisationHTML(e, s, customFsStamp);
+        const certifPdf = await htmlToPdfBlob(certifHtml);
+        stagFolder.file(`Certificat_de_realisation_${stagNameSafe}_${s.codeStagiaire}.pdf`, certifPdf);
+      } catch (err) {
+        console.error("Certificat error:", err);
+        stagFolder.file(`ERREUR_Certificat.txt`, `Erreur: ${(err as Error).message}`);
+      }
+      step++; reporter?.setProgress(Math.round((step / totalSteps) * 100));
+
+      // GC pause every 3 stagiaires
+      if (si % 3 === 2) await new Promise((r) => setTimeout(r, 30));
+    }
 
     // Allow GC between entreprises
     if (i % 2 === 1) await new Promise((r) => setTimeout(r, 30));

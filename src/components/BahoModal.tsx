@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Download, Loader2, Building2, Users, FileText, Eye, ChevronDown, ChevronRight, X, Upload, Stamp, FileSignature, Receipt, ScrollText } from "lucide-react";
 import { getBahoEntreprises, FORMAT_SPHERE_ORG, type BahoEntreprise, type BahoStagiaire } from "@/lib/baho/bahoData";
 import { buildBahoZip } from "@/lib/baho/bahoGenerator";
-import { getRIHTML, getConventionHTML, getCGVHTML, getFactureHTML, getDevisHTML, getProgrammeHTML, getEmargementHTML } from "@/lib/baho/bahoStaticDocs";
+import { getRIHTML, getConventionHTML, getCGVHTML, getFactureHTML, getDevisHTML, getProgrammeHTML, getEmargementHTML, getConvocationHTML, getCertificatRealisationHTML } from "@/lib/baho/bahoStaticDocs";
 import { htmlToPdfBlob } from "@/lib/pdfExport";
 import { useBackgroundJobs } from "@/lib/backgroundJobs";
 import { toast } from "sonner";
@@ -17,7 +17,7 @@ interface BahoModalProps {
   onOpenChange: (open: boolean) => void;
 }
 
-type DocKind = "ri" | "convention" | "cgv" | "facture" | "devis" | "programme" | "emargement";
+type DocKind = "ri" | "convention" | "cgv" | "facture" | "devis" | "programme" | "emargement" | "convocation" | "certificat";
 
 interface PreviewState {
   entreprise: BahoEntreprise;
@@ -93,6 +93,14 @@ export default function BahoModal({ open, onOpenChange }: BahoModalProps) {
           if (!stagiaire) throw new Error("Stagiaire requis pour émargement");
           html = getEmargementHTML(entreprise, stagiaire, fsStamp ?? undefined);
           break;
+        case "convocation":
+          if (!stagiaire) throw new Error("Stagiaire requis pour convocation");
+          html = getConvocationHTML(entreprise, stagiaire, fsStamp ?? undefined);
+          break;
+        case "certificat":
+          if (!stagiaire) throw new Error("Stagiaire requis pour certificat");
+          html = getCertificatRealisationHTML(entreprise, stagiaire, fsStamp ?? undefined);
+          break;
         case "ri":
         default:
           html = getRIHTML(entreprise, stagiaire ?? undefined, fsStamp ?? undefined);
@@ -115,6 +123,8 @@ export default function BahoModal({ open, onOpenChange }: BahoModalProps) {
     facture: "Facture",
     ri: "Règlement intérieur",
     emargement: "Feuille d'émargement",
+    convocation: "Convocation",
+    certificat: "Certificat de réalisation",
   };
 
   const handleGenerate = async () => {
@@ -144,7 +154,7 @@ export default function BahoModal({ open, onOpenChange }: BahoModalProps) {
             <Building2 className="w-5 h-5" /> Pack BAHO – FORMAT SPHERE
           </DialogTitle>
           <DialogDescription>
-            Pack AFEST hôtellerie : {entreprises.length} hôtels, {totalStagiaires} stagiaires. Programme, Convention, Devis, Facture, CGV, RI par hôtel + <strong>1 feuille d'émargement individuelle par stagiaire</strong> ({totalStagiaires} émargements au total) — tous tamponnés (hôtel + FORMAT SPHERE).
+            Pack AFEST hôtellerie : {entreprises.length} hôtels, {totalStagiaires} stagiaires. Programme, Convention, Devis, Facture (avec liste participants + présentiel), CGV, RI par hôtel + <strong>Convocation, Émargement et Certificat de réalisation par stagiaire</strong> ({totalStagiaires * 3} docs individuels) — tous tamponnés (hôtel + FORMAT SPHERE).
           </DialogDescription>
         </DialogHeader>
 
@@ -248,6 +258,36 @@ export default function BahoModal({ open, onOpenChange }: BahoModalProps) {
                           <span className="truncate">Émargement – {s.prenom} {s.nom}</span>
                         </button>
                       ))}
+                      <div className="text-[10px] text-muted-foreground px-2 pt-1.5 pb-0.5 uppercase">Convocations (1 par stagiaire)</div>
+                      {e.stagiaires.map((s) => (
+                        <button
+                          key={`convoc-${s.codeStagiaire}`}
+                          onClick={() => handlePreview(e, s, "convocation")}
+                          className={`w-full flex items-center gap-2 px-2 py-1 rounded text-xs hover:bg-muted text-left ${
+                            preview?.entreprise.siret === e.siret && preview?.stagiaire?.codeStagiaire === s.codeStagiaire && preview?.docKind === "convocation"
+                              ? "bg-primary/10 text-primary"
+                              : ""
+                          }`}
+                        >
+                          <FileText className="w-3 h-3 shrink-0" />
+                          <span className="truncate">Convocation – {s.prenom} {s.nom}</span>
+                        </button>
+                      ))}
+                      <div className="text-[10px] text-muted-foreground px-2 pt-1.5 pb-0.5 uppercase">Certificats de réalisation (1 par stagiaire)</div>
+                      {e.stagiaires.map((s) => (
+                        <button
+                          key={`certif-${s.codeStagiaire}`}
+                          onClick={() => handlePreview(e, s, "certificat")}
+                          className={`w-full flex items-center gap-2 px-2 py-1 rounded text-xs hover:bg-muted text-left ${
+                            preview?.entreprise.siret === e.siret && preview?.stagiaire?.codeStagiaire === s.codeStagiaire && preview?.docKind === "certificat"
+                              ? "bg-primary/10 text-primary"
+                              : ""
+                          }`}
+                        >
+                          <ScrollText className="w-3 h-3 shrink-0" />
+                          <span className="truncate">Certificat – {s.prenom} {s.nom}</span>
+                        </button>
+                      ))}
                     </div>
                   )}
                 </div>
@@ -336,7 +376,7 @@ export default function BahoModal({ open, onOpenChange }: BahoModalProps) {
           </Button>
           <Button onClick={handleGenerate} disabled={generating} className="gap-2">
             {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
-            {generating ? "Lancement…" : `Générer le ZIP complet (${entreprises.length * 6 + totalStagiaires} docs)`}
+            {generating ? "Lancement…" : `Générer le ZIP complet (${entreprises.length * 6 + totalStagiaires * 3} docs)`}
           </Button>
         </div>
       </DialogContent>
