@@ -134,6 +134,53 @@ export async function buildBahoZip(reporter?: JobReporter, customFsStamp?: strin
     }
     step++; reporter?.setProgress(Math.round((step / totalSteps) * 100));
 
+    // 7. Documents individuels par stagiaire : Convocation + Émargement + Certificat de réalisation
+    const stagiairesFolder = folder.folder("Stagiaires")!;
+    for (let si = 0; si < e.stagiaires.length; si++) {
+      const s = e.stagiaires[si];
+      const stagNameSafe = safeName(`${s.nom}_${s.prenom}`);
+      const stagFolder = stagiairesFolder.folder(`${String(si + 1).padStart(2, "0")}_${stagNameSafe}_${s.codeStagiaire}`)!;
+
+      // 7a. Convocation
+      try {
+        reporter?.setMessage(`${e.nom} – Convocation ${s.prenom} ${s.nom}…`);
+        const convocHtml = getConvocationHTML(e, s, customFsStamp);
+        const convocPdf = await htmlToPdfBlob(convocHtml);
+        stagFolder.file(`Convocation_${stagNameSafe}_${s.codeStagiaire}.pdf`, convocPdf);
+      } catch (err) {
+        console.error("Convocation error:", err);
+        stagFolder.file(`ERREUR_Convocation.txt`, `Erreur: ${(err as Error).message}`);
+      }
+      step++; reporter?.setProgress(Math.round((step / totalSteps) * 100));
+
+      // 7b. Feuille d'émargement individuelle
+      try {
+        reporter?.setMessage(`${e.nom} – Émargement ${s.prenom} ${s.nom}…`);
+        const emargHtml = getEmargementHTML(e, s, customFsStamp);
+        const emargPdf = await htmlToPdfBlob(emargHtml);
+        stagFolder.file(`Emargement_${stagNameSafe}_${s.codeStagiaire}.pdf`, emargPdf);
+      } catch (err) {
+        console.error("Emargement error:", err);
+        stagFolder.file(`ERREUR_Emargement.txt`, `Erreur: ${(err as Error).message}`);
+      }
+      step++; reporter?.setProgress(Math.round((step / totalSteps) * 100));
+
+      // 7c. Certificat de réalisation
+      try {
+        reporter?.setMessage(`${e.nom} – Certificat ${s.prenom} ${s.nom}…`);
+        const certifHtml = getCertificatRealisationHTML(e, s, customFsStamp);
+        const certifPdf = await htmlToPdfBlob(certifHtml);
+        stagFolder.file(`Certificat_de_realisation_${stagNameSafe}_${s.codeStagiaire}.pdf`, certifPdf);
+      } catch (err) {
+        console.error("Certificat error:", err);
+        stagFolder.file(`ERREUR_Certificat.txt`, `Erreur: ${(err as Error).message}`);
+      }
+      step++; reporter?.setProgress(Math.round((step / totalSteps) * 100));
+
+      // GC pause every 3 stagiaires
+      if (si % 3 === 2) await new Promise((r) => setTimeout(r, 30));
+    }
+
     // Allow GC between entreprises
     if (i % 2 === 1) await new Promise((r) => setTimeout(r, 30));
   }
