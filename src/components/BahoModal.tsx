@@ -89,10 +89,6 @@ export default function BahoModal({ open, onOpenChange }: BahoModalProps) {
         case "programme":
           html = getProgrammeHTML(entreprise, fsStamp ?? undefined);
           break;
-        case "emargement":
-          if (!stagiaire) throw new Error("Stagiaire requis pour émargement");
-          html = getEmargementHTML(entreprise, stagiaire, fsStamp ?? undefined);
-          break;
         case "convocation":
           if (!stagiaire) throw new Error("Stagiaire requis pour convocation");
           html = getConvocationHTML(entreprise, stagiaire, fsStamp ?? undefined);
