@@ -93,6 +93,14 @@ export default function BahoModal({ open, onOpenChange }: BahoModalProps) {
           if (!stagiaire) throw new Error("Stagiaire requis pour émargement");
           html = getEmargementHTML(entreprise, stagiaire, fsStamp ?? undefined);
           break;
+        case "convocation":
+          if (!stagiaire) throw new Error("Stagiaire requis pour convocation");
+          html = getConvocationHTML(entreprise, stagiaire, fsStamp ?? undefined);
+          break;
+        case "certificat":
+          if (!stagiaire) throw new Error("Stagiaire requis pour certificat");
+          html = getCertificatRealisationHTML(entreprise, stagiaire, fsStamp ?? undefined);
+          break;
         case "ri":
         default:
           html = getRIHTML(entreprise, stagiaire ?? undefined, fsStamp ?? undefined);
@@ -115,6 +123,8 @@ export default function BahoModal({ open, onOpenChange }: BahoModalProps) {
     facture: "Facture",
     ri: "Règlement intérieur",
     emargement: "Feuille d'émargement",
+    convocation: "Convocation",
+    certificat: "Certificat de réalisation",
   };
 
   const handleGenerate = async () => {
