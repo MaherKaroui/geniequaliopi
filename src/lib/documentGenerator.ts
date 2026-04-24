@@ -2085,7 +2085,10 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
             <tr><th>Code(s) NSF</th><td>${rncp.codeNSF}</td></tr>
             <tr><th>Formacode(s)</th><td>${rncp.formacodes}</td></tr>
             <tr><th>Lien France Compétences</th><td><a href="${fcUrl}" target="_blank">${fcUrl}</a></td></tr>
-          </table>`;
+          </table>
+          ${rncp.resume ? `<p style="margin-top:12px"><strong>Résumé de la certification :</strong><br>${rncp.resume}</p>` : ""}
+          ${rncp.activitesVisees ? `<p style="margin-top:8px"><strong>Activités visées :</strong><br>${rncp.activitesVisees}</p>` : ""}
+          `;
       })()}
     </div>
 
@@ -2201,6 +2204,48 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
       <p style="margin-top:10px"><em>Source officielle France Compétences : <a href="${fcUrl}" target="_blank">${fcUrl}</a></em></p>
     </div>
       `;
+    })()}
+
+    ${(() => {
+      const rncp = f.codeRNCP ? getRNCPByCode(f.codeRNCP) : undefined;
+      if (!rncp) return "";
+      const blocsHtml = rncp.blocsCompetences && rncp.blocsCompetences.length > 0
+        ? `<table style="width:100%;margin-top:8px">
+            <thead>
+              <tr>
+                <th style="width:35%">Bloc de compétences</th>
+                <th>Compétences associées</th>
+                <th style="width:25%">Modalités d'évaluation</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rncp.blocsCompetences.map(b => `
+                <tr>
+                  <td><strong>${b.titre}</strong></td>
+                  <td><ul style="margin:0;padding-left:18px">${(b.competences || []).map(c => `<li>${c}</li>`).join("")}</ul></td>
+                  <td>${b.modalitesEval || "Mise en situation professionnelle, étude de cas, questionnement oral"}</td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>`
+        : "";
+      const emploisHtml = rncp.typesEmplois && rncp.typesEmplois.length > 0
+        ? `<ul>${rncp.typesEmplois.map(e => `<li>${e}</li>`).join("")}</ul>`
+        : "";
+      const romeHtml = rncp.codesROME && rncp.codesROME.length > 0
+        ? `<p><strong>Code(s) ROME :</strong> ${rncp.codesROME.join(", ")}</p>`
+        : "";
+      return `
+    <h2>8 bis. Certification visée – Détail officiel</h2>
+    <div class="section section-green">
+      ${rncp.secteursActivite ? `<p><strong>Secteurs d'activité :</strong><br>${rncp.secteursActivite}</p>` : ""}
+      ${emploisHtml ? `<p><strong>Types d'emplois accessibles :</strong></p>${emploisHtml}` : ""}
+      ${romeHtml}
+      ${rncp.dureeIndicative ? `<p><strong>Durée indicative du parcours :</strong> ${rncp.dureeIndicative}</p>` : ""}
+      ${blocsHtml ? `<p style="margin-top:10px"><strong>Blocs de compétences et modalités d'évaluation :</strong></p>${blocsHtml}` : ""}
+      <p style="margin-top:10px"><em>Informations extraites de la fiche officielle France Compétences ${rncp.code}.</em></p>
+    </div>
+    `;
     })()}
 
     <h2>9. Modalités d'accès</h2>
