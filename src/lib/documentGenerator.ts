@@ -2940,18 +2940,23 @@ function genTestPositionnementIndividuel(o: OrganismeInfo, f: FormationInfo, s: 
   const totalScore = answers.reduce((sum, a) => sum + a.score, 0);
   const dateTest = isDebut ? formatDate(getStagiaireDateDebut(s, f)) : formatDate(getStagiaireDateFin(s, f));
 
+  const dateDebutSession = formatDate(getStagiaireDateDebut(s, f));
+  const dateFinSession = formatDate(getStagiaireDateFin(s, f));
+
   let extra = `<h2>Test de positionnement en ${label} de formation – ${f.intitule}</h2>`;
+  extra += `<p><strong>Session :</strong> du ${dateDebutSession} au ${dateFinSession}</p>`;
   extra += `<p><strong>Nom du stagiaire :</strong> ${s.prenom} ${s.nom}</p>`;
-  extra += `<p><strong>Date :</strong> ${dateTest}</p>`;
+  extra += `<p><strong>Date du test :</strong> ${dateTest}</p>`;
   extra += `<p><strong>Durée estimée :</strong> 20 minutes</p>`;
   extra += `<p><strong>Note :</strong> ${totalScore} /10</p>`;
 
   extra += `<h3>Questions</h3>`;
   questions.forEach((q, qi) => {
     const ans = answers[qi];
+    const appreciation = generateQuestionAppreciation(ans.score, qi, si, isDebut, s);
     extra += `<p><strong>${qi + 1}.</strong> ${q.question}</p>`;
     extra += `<p>${ans.reponse}</p>`;
-    extra += `<p><em>${ans.feedback} – ${ans.score} / 1</em></p>`;
+    extra += `<p><em><strong>Appréciation du formateur :</strong> ${ans.feedback} (${ans.score} / 1). ${appreciation}</em></p>`;
     if (qi < questions.length - 1) extra += `<br>`;
   });
 
