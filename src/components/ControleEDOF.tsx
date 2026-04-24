@@ -402,7 +402,7 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
     } finally {
       setPreviewLoading(false);
     }
-  }, [organisme, formation, exportStagiaires]);
+  }, [organisme, organismeWithSignature, formation, exportStagiaires]);
 
   // Toggle edit mode — sync content from iframe when entering/exiting
   const toggleEditMode = useCallback(() => {
