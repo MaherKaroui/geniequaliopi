@@ -258,6 +258,36 @@ export default function BahoModal({ open, onOpenChange }: BahoModalProps) {
                           <span className="truncate">Émargement – {s.prenom} {s.nom}</span>
                         </button>
                       ))}
+                      <div className="text-[10px] text-muted-foreground px-2 pt-1.5 pb-0.5 uppercase">Convocations (1 par stagiaire)</div>
+                      {e.stagiaires.map((s) => (
+                        <button
+                          key={`convoc-${s.codeStagiaire}`}
+                          onClick={() => handlePreview(e, s, "convocation")}
+                          className={`w-full flex items-center gap-2 px-2 py-1 rounded text-xs hover:bg-muted text-left ${
+                            preview?.entreprise.siret === e.siret && preview?.stagiaire?.codeStagiaire === s.codeStagiaire && preview?.docKind === "convocation"
+                              ? "bg-primary/10 text-primary"
+                              : ""
+                          }`}
+                        >
+                          <FileText className="w-3 h-3 shrink-0" />
+                          <span className="truncate">Convocation – {s.prenom} {s.nom}</span>
+                        </button>
+                      ))}
+                      <div className="text-[10px] text-muted-foreground px-2 pt-1.5 pb-0.5 uppercase">Certificats de réalisation (1 par stagiaire)</div>
+                      {e.stagiaires.map((s) => (
+                        <button
+                          key={`certif-${s.codeStagiaire}`}
+                          onClick={() => handlePreview(e, s, "certificat")}
+                          className={`w-full flex items-center gap-2 px-2 py-1 rounded text-xs hover:bg-muted text-left ${
+                            preview?.entreprise.siret === e.siret && preview?.stagiaire?.codeStagiaire === s.codeStagiaire && preview?.docKind === "certificat"
+                              ? "bg-primary/10 text-primary"
+                              : ""
+                          }`}
+                        >
+                          <ScrollText className="w-3 h-3 shrink-0" />
+                          <span className="truncate">Certificat – {s.prenom} {s.nom}</span>
+                        </button>
+                      ))}
                     </div>
                   )}
                 </div>
