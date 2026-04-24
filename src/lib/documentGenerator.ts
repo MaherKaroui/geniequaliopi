@@ -12950,15 +12950,21 @@ function genExercicesOPCO(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
     groupes.set("__default__", { debut: f.dateDebut, fin: f.dateFin, stagiaires: stagiaires.length ? stagiaires : [FALLBACK_STAGIAIRE] });
   }
 
-  let extra = `<p><em>Exercices pratiques de fin de semaine pour le suivi pédagogique en alternance. Un exercice par semaine en centre de formation, daté du dernier jour école de la semaine concernée. Une session par page. Les semaines à venir sont listées et seront complétées au fur et à mesure du déroulement de la formation.</em></p>`;
-  extra += `<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%;margin-bottom:18px">
-    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold;width:30%">Intitulé de la formation</td><td>${f.intitule}</td></tr>
-    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Organisme</td><td>${o.nom}${o.nda ? ` – NDA ${o.nda}` : ""}</td></tr>
-    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Rythme d'alternance</td><td>${rythmeLabel}</td></tr>
-    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Cadence des exercices</td><td>1 exercice par semaine en centre de formation, daté du dernier jour école de la semaine</td></tr>
-    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Date d'extraction</td><td>${formatDate(new Date().toISOString())}</td></tr>
-    <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Nombre de sessions</td><td>${groupes.size}</td></tr>
-  </table>`;
+  const isSingleWeek = typeof params?.weekIdx === "number";
+
+  let extra = isSingleWeek
+    ? ""
+    : `<p><em>Exercices pratiques de fin de semaine pour le suivi pédagogique en alternance. Un exercice par semaine en centre de formation, daté du dernier jour école de la semaine concernée. Une session par page. Les semaines à venir sont listées et seront complétées au fur et à mesure du déroulement de la formation.</em></p>`;
+  if (!isSingleWeek) {
+    extra += `<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%;margin-bottom:18px">
+      <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold;width:30%">Intitulé de la formation</td><td>${f.intitule}</td></tr>
+      <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Organisme</td><td>${o.nom}${o.nda ? ` – NDA ${o.nda}` : ""}</td></tr>
+      <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Rythme d'alternance</td><td>${rythmeLabel}</td></tr>
+      <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Cadence des exercices</td><td>1 exercice par semaine en centre de formation, daté du dernier jour école de la semaine</td></tr>
+      <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Date d'extraction</td><td>${formatDate(new Date().toISOString())}</td></tr>
+      <tr><td style="background:#1e3a7b;color:#fff;font-weight:bold">Nombre de sessions</td><td>${groupes.size}</td></tr>
+    </table>`;
+  }
 
   let groupIdx = 0;
   for (const [, g] of groupes) {
