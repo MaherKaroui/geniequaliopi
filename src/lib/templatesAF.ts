@@ -63,9 +63,6 @@ export function genFactureOPCO(o: OrganismeInfo, f: FormationInfo, stagiaires: S
   const dateDebutISO = getStagiaireDateDebut(s, f) || f.dateDebut || "";
   const dateFactureISO = dateDebutISO ? subtractBusinessDays(dateDebutISO, 3) : today.toISOString().slice(0, 10);
   const dateFacture = formatDate(dateFactureISO);
-  const entreprise = (s.entreprise || "").trim();
-  const opcoLabel = "OPCO Mobilités";
-  const adresseOpco = "80 rue de Reuilly, CS 92401, 75724 Paris Cedex 12";
 
   return buildDocument({
     org: o,
