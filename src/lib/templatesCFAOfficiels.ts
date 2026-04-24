@@ -509,9 +509,9 @@ export function genDPOfficiel(o: OrganismeInfo, f: FormationInfo, stagiaires: St
   </div><div class="page-break"></div>`;
 
   // ===== PAGE 4 - Séparateur Exemples =====
-  html += `<div class="page" style="display:flex;align-items:center;justify-content:center;flex-direction:column;min-height:1000px">
+  html += `<div class="page" style="display:flex;align-items:center;justify-content:center;flex-direction:column">
     <h2 class="section-title" style="text-align:center;width:100%">DOSSIER PROFESSIONNEL (DP)</h2>
-    <h1 style="font-size:22pt;text-align:center;margin-top:80px;letter-spacing:2px;color:#0055A4">EXEMPLES DE PRATIQUE PROFESSIONNELLE</h1>
+    <h1 style="font-size:22pt;text-align:center;margin:120px 0 80px;letter-spacing:2px;color:#0055A4">EXEMPLES DE PRATIQUE PROFESSIONNELLE</h1>
     ${footerDPOfficiel("4")}
   </div><div class="page-break"></div>`;
 
