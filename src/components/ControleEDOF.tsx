@@ -91,6 +91,11 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
   const previewIframeRef = useRef<HTMLIFrameElement>(null);
   const orgName = organisme.nom || "Organisme";
   const safeName = useMemo(() => orgName.replace(/[^a-zA-Z0-9_-]/g, "_"), [orgName]);
+  // Organisme enrichi avec la signature EY (utilisée pour DP/ECF/PV comme signature du dirigeant/représentant)
+  const organismeWithSignature = useMemo<OrganismeInfo>(() => {
+    if (!signature) return organisme;
+    return { ...organisme, signatureUrl: organisme.signatureUrl || signature };
+  }, [organisme, signature]);
   const mergedStagiaires = useMemo(
     () => mergeStagiaires(stagiaires).filter((stagiaire): stagiaire is StagiaireInfo => Boolean(stagiaire)),
     [stagiaires]
@@ -165,7 +170,7 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
     const currentStagiaire = sourceStagiaires[stagiaireIdx];
     if (!currentStagiaire) return null;
     try {
-      const o = mergeOrganisme(organisme);
+      const o = mergeOrganisme(organismeWithSignature);
       const params = { stagiaireIdx, fi: 0 };
       const html = generateDocumentById(`ey_${eyDoc.code}`, template, params, o, formation, sourceStagiaires);
       if (!html) return null;
@@ -178,7 +183,7 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
       console.error(`Error generating ${eyDoc.code} for stagiaire ${stagiaireIdx}:`, e);
       return null;
     }
-  }, [organisme, formation, exportStagiaires, safeName]);
+  }, [organisme, organismeWithSignature, formation, exportStagiaires, safeName]);
 
   const generateAutoDoc = useCallback(async (
     eyDoc: EYDocumentItem,
@@ -188,7 +193,7 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
     const template = eyDoc.autoTemplates[0];
     const sourceStagiaires = options?.sourceStagiaires ?? exportStagiaires;
     try {
-      const o = mergeOrganisme(organisme);
+      const o = mergeOrganisme(organismeWithSignature);
       const params = eyDoc.perStagiaire && sourceStagiaires.length > 0 ? { stagiaireIdx: 0, fi: 0 } : { fi: 0 };
       const html = generateDocumentById(`ey_${eyDoc.code}`, template, params, o, formation, sourceStagiaires);
       if (!html) return null;
@@ -198,7 +203,7 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
       console.error(`Error generating ${eyDoc.code}:`, e);
       return null;
     }
-  }, [organisme, formation, exportStagiaires, safeName]);
+  }, [organisme, organismeWithSignature, formation, exportStagiaires, safeName]);
 
   const appendAutoDocToZip = useCallback(async (
     zip: JSZip,
@@ -382,7 +387,7 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
     setIsEditing(false);
     try {
       const template = eyDoc.autoTemplates[0];
-      const o = mergeOrganisme(organisme);
+      const o = mergeOrganisme(organismeWithSignature);
       const s = exportStagiaires;
       const params = eyDoc.perStagiaire && s.length > 0 ? { stagiaireIdx: 0, fi: 0 } : { fi: 0 };
       const html = generateDocumentById(`ey_${eyDoc.code}`, template, params, o, formation, s);
@@ -397,7 +402,7 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
     } finally {
       setPreviewLoading(false);
     }
-  }, [organisme, formation, exportStagiaires]);
+  }, [organisme, organismeWithSignature, formation, exportStagiaires]);
 
   // Toggle edit mode — sync content from iframe when entering/exiting
   const toggleEditMode = useCallback(() => {
