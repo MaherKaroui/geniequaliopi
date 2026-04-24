@@ -69,22 +69,11 @@ export function genFactureOPCO(o: OrganismeInfo, f: FormationInfo, stagiaires: S
   const stagEmail = s.email || "________________________________";
   const stagTel = (s.telephone || "").trim();
 
-  // En-tête organisme (pavé gauche) — on utilise les données dynamiques de l'organisme
-  const orgAdresse = [o.adresse, [o.codePostal, o.ville].filter(Boolean).join(" ")].filter(Boolean).join(", ");
+  // En-tête : uniquement le bloc FACTURE N° + date (sans coordonnées organisme)
   const orgHeaderHtml = `
     <table style="width:100%;border:none;margin-bottom:20px">
       <tr style="border:none">
-        <td style="border:none;vertical-align:top;width:55%">
-          ${o.logoUrl ? `<img src="${o.logoUrl}" alt="Logo" style="max-height:70px;margin-bottom:8px"><br>` : ""}
-          <strong style="font-size:14px">${o.nom}</strong><br>
-          ${orgAdresse}<br>
-          SIRET : ${o.siret || "—"}<br>
-          ${o.siret ? `SIREN : ${o.siret.replace(/\s/g, "").slice(0, 9)}<br>` : ""}
-          ${o.nda ? `NDA : ${o.nda}<br>` : ""}
-          ${o.email || ""}<br>
-          ${o.dirigeant ? `${o.dirigeant}` : ""}
-        </td>
-        <td style="border:none;vertical-align:top;text-align:right;width:45%">
+        <td style="border:none;vertical-align:top;text-align:right">
           <div style="font-size:22px;font-weight:bold;letter-spacing:1px">FACTURE</div>
           <div style="font-size:14px;margin-top:4px"><strong>N° ${factNum}</strong></div>
           <div style="font-size:12px;margin-top:8px">Date : ${dateFacture}</div>
