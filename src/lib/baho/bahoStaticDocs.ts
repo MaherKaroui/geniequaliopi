@@ -551,7 +551,16 @@ export function getConvocationHTML(e: BahoEntreprise, stagiaire: BahoStagiaire, 
 
   <p style="margin-top:18px;">Veuillez agréer, ${politesse}, l'expression de nos salutations distinguées.</p>
 
-  ${stampsBlock(e, customFsStamp)}
+  <table style="margin-top:25px; border:none; width:100%;">
+    <tr style="border:none;">
+      <td style="border:none; width:100%; text-align:center; vertical-align:top;">
+        <strong>Pour l'organisme de formation</strong><br/>
+        ${FORMAT_SPHERE_ORG.dirigeant}<br/>
+        <em>${FORMAT_SPHERE_ORG.nom}</em><br/>
+        <img src="${customFsStamp || svgToDataUri(getFormatSphereStampSvg())}" alt="Tampon FORMAT SPHERE" style="width:150px; height:150px; margin-top:8px;"/>
+      </td>
+    </tr>
+  </table>
 
   ${footer()}
   </body></html>`;
