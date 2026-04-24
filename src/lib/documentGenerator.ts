@@ -14047,12 +14047,14 @@ function genAITestPositionnement(o: OrganismeInfo, f: FormationInfo, stagiaires:
 
   const answers = renderEmpty ? [] : answersForQCM(qcm, si, s, mode);
   let correct = 0;
+  const isDebut = mode === "debut";
   const rows = qcm.map((q, qi) => {
+    const optionsCell = q.options.map((opt, oi) => `${String.fromCharCode(65 + oi)}) ${opt}`).join("<br>");
     if (renderEmpty) {
       return [
         `Q${qi + 1}`,
         q.question,
-        q.options.map((opt, oi) => `${String.fromCharCode(65 + oi)}) ${opt}`).join("<br>"),
+        optionsCell,
         "À compléter",
         "—",
       ];
@@ -14060,6 +14062,16 @@ function genAITestPositionnement(o: OrganismeInfo, f: FormationInfo, stagiaires:
     const chosen = answers[qi];
     const ok = chosen === q.correctIndex;
     if (ok) correct++;
+    if (isDebut) {
+      return [
+        `Q${qi + 1}`,
+        q.question,
+        optionsCell,
+        `${String.fromCharCode(65 + chosen)}) ${q.options[chosen]}`,
+        `${String.fromCharCode(65 + q.correctIndex)}) ${q.options[q.correctIndex]}`,
+        ok ? "Correct" : "Incorrect",
+      ];
+    }
     return [
       `Q${qi + 1}`,
       q.question,
@@ -14069,9 +14081,13 @@ function genAITestPositionnement(o: OrganismeInfo, f: FormationInfo, stagiaires:
     ];
   });
 
+  const dateDebutSession = formatDate(getStagiaireDateDebut(s, f));
+  const dateFinSession = formatDate(getStagiaireDateFin(s, f));
+
   let extra = `<h2>${title}</h2>`;
   extra += `<p><strong>Stagiaire :</strong> ${s.civilite ? s.civilite + " " : ""}${s.prenom} ${s.nom}<br>
     <strong>Formation :</strong> ${f.intitule}<br>
+    <strong>Session :</strong> du ${dateDebutSession} au ${dateFinSession}<br>
     <strong>Date :</strong> ${renderEmpty ? "À compléter en fin de formation" : formatDate(mode === "debut" ? getStagiaireDateDebut(s, f) : getStagiaireDateFin(s, f))}<br>
     <strong>Nombre de questions :</strong> ${qcm.length} — <strong>Durée :</strong> 30 minutes — <strong>Barème :</strong> 1 pt / réponse</p>`;
 
@@ -14085,12 +14101,44 @@ function genAITestPositionnement(o: OrganismeInfo, f: FormationInfo, stagiaires:
   } else {
     const score = correct;
     const pct = Math.round((score / qcm.length) * 100);
-    const niveau = mode === "debut"
+    const fullName = `${s.civilite ? s.civilite + " " : ""}${s.prenom} ${s.nom}`;
+    const prenom = s.prenom;
+
+    // Appréciation enrichie pour le test de DÉBUT
+    const enrichedDebutAppreciation = (): string => {
+      const parts: string[] = [];
+      if (pct >= 80) {
+        parts.push(`${fullName} obtient un score de ${score}/${qcm.length} (${pct}%), traduisant une <strong>excellente maîtrise initiale</strong> des prérequis liés à la formation « ${f.intitule} ».`);
+        parts.push(`Les fondamentaux sont solidement acquis : ${prenom} identifie correctement les notions clés et mobilise un vocabulaire professionnel précis dès le démarrage du parcours.`);
+        parts.push(`<strong>Recommandation pédagogique :</strong> orienter la progression vers les contenus de niveau avancé, approfondir les mises en situation complexes et valoriser l'autonomie sur les exercices pratiques.`);
+      } else if (pct >= 60) {
+        parts.push(`${fullName} obtient un score de ${score}/${qcm.length} (${pct}%), traduisant un <strong>bon niveau initial</strong> sur les fondamentaux de la formation « ${f.intitule} ».`);
+        parts.push(`La majorité des notions de base sont maîtrisées. Quelques points techniques nécessitent un approfondissement, notamment sur les aspects méthodologiques et les procédures spécifiques au métier.`);
+        parts.push(`<strong>Recommandation pédagogique :</strong> prévoir des rappels ciblés en début de parcours et renforcer les exercices d'application sur les notions partiellement acquises.`);
+      } else if (pct >= 40) {
+        parts.push(`${fullName} obtient un score de ${score}/${qcm.length} (${pct}%), traduisant un <strong>niveau intermédiaire</strong> à l'entrée en formation « ${f.intitule} ».`);
+        parts.push(`Des bases existent mais restent fragiles. Plusieurs notions fondamentales doivent être consolidées avant d'aborder les contenus avancés. ${prenom} montre néanmoins une bonne réceptivité et une motivation à progresser.`);
+        parts.push(`<strong>Recommandation pédagogique :</strong> mettre en place un <em>accompagnement renforcé</em> sur les modules 1 et 2, avec apports théoriques complémentaires et exercices de remédiation avant chaque évaluation intermédiaire.`);
+      } else {
+        parts.push(`${fullName} obtient un score de ${score}/${qcm.length} (${pct}%), traduisant un <strong>niveau débutant</strong> à l'entrée en formation « ${f.intitule} ».`);
+        parts.push(`Les prérequis ne sont pas encore acquis. Un <em>apport théorique complet</em> sera nécessaire sur l'ensemble des blocs de compétences afin de sécuriser les apprentissages à venir.`);
+        parts.push(`<strong>Recommandation pédagogique :</strong> individualiser le parcours avec un accompagnement pédagogique renforcé, multiplier les mises en pratique guidées et planifier un point d'étape à mi-parcours pour ajuster la progression.`);
+      }
+      return parts.map(p => `<p style="margin:6px 0">${p}</p>`).join("");
+    };
+
+    const niveau = isDebut
       ? (pct >= 70 ? "Bon niveau initial" : pct >= 40 ? "Niveau intermédiaire" : "Niveau débutant")
       : (pct >= 80 ? "Objectifs atteints — Excellent" : pct >= 60 ? "Objectifs atteints" : "Objectifs partiellement atteints");
-    extra += tableHTML(["N°", "Question", "Réponse du stagiaire", "Bonne réponse", "Résultat"], rows);
-    extra += `<div class="section section-green"><p><strong>Score : ${score}/${qcm.length} (${pct}%)</strong></p>
-      <p><strong>Appréciation :</strong> ${niveau}.</p></div>`;
+
+    if (isDebut) {
+      extra += tableHTML(["N°", "Question", "Options proposées", "Réponse du stagiaire", "Bonne réponse", "Résultat"], rows);
+    } else {
+      extra += tableHTML(["N°", "Question", "Réponse du stagiaire", "Bonne réponse", "Résultat"], rows);
+    }
+    extra += `<div class="section section-green"><p><strong>Score : ${score}/${qcm.length} (${pct}%)</strong> — <strong>Niveau :</strong> ${niveau}</p>
+      <p><strong>Appréciation du formateur :</strong></p>
+      ${isDebut ? enrichedDebutAppreciation() : `<p>${niveau}.</p>`}</div>`;
   }
 
   const sigDate = mode === "debut"
