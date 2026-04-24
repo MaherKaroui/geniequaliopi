@@ -154,7 +154,7 @@ export default function BahoModal({ open, onOpenChange }: BahoModalProps) {
             <Building2 className="w-5 h-5" /> Pack BAHO – FORMAT SPHERE
           </DialogTitle>
           <DialogDescription>
-            Pack AFEST hôtellerie : {entreprises.length} hôtels, {totalStagiaires} stagiaires. Programme, Convention, Devis, Facture, CGV, RI par hôtel + <strong>1 feuille d'émargement individuelle par stagiaire</strong> ({totalStagiaires} émargements au total) — tous tamponnés (hôtel + FORMAT SPHERE).
+            Pack AFEST hôtellerie : {entreprises.length} hôtels, {totalStagiaires} stagiaires. Programme, Convention, Devis, Facture (avec liste participants + présentiel), CGV, RI par hôtel + <strong>Convocation, Émargement et Certificat de réalisation par stagiaire</strong> ({totalStagiaires * 3} docs individuels) — tous tamponnés (hôtel + FORMAT SPHERE).
           </DialogDescription>
         </DialogHeader>
 
