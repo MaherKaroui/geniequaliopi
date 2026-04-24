@@ -2085,7 +2085,10 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
             <tr><th>Code(s) NSF</th><td>${rncp.codeNSF}</td></tr>
             <tr><th>Formacode(s)</th><td>${rncp.formacodes}</td></tr>
             <tr><th>Lien France Compétences</th><td><a href="${fcUrl}" target="_blank">${fcUrl}</a></td></tr>
-          </table>`;
+          </table>
+          ${rncp.resume ? `<p style="margin-top:12px"><strong>Résumé de la certification :</strong><br>${rncp.resume}</p>` : ""}
+          ${rncp.activitesVisees ? `<p style="margin-top:8px"><strong>Activités visées :</strong><br>${rncp.activitesVisees}</p>` : ""}
+          `;
       })()}
     </div>
 
