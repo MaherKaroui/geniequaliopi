@@ -9,6 +9,7 @@ import { generateFakeStagiairesIDF } from "@/lib/fakeStagiaireIDF";
 import { REGIONS, RegionKey } from "@/lib/fakeStagiaireRegions";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { extractConvocationFromDocx, convocationToStagiaire } from "@/lib/convocationExtractor";
 
 const FORMATEURS_PREDIFINIS = [
   "AHMED EL HILALI",
@@ -37,11 +38,13 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
   const sigRespRefs = useRef<Record<number, HTMLInputElement | null>>({});
   const sigFormateurRefs = useRef<Record<number, HTMLInputElement | null>>({});
   const cerfaInputRef = useRef<HTMLInputElement | null>(null);
+  const convocInputRef = useRef<HTMLInputElement | null>(null);
   // Track which signature pad is open: "sig-0", "resp-1", "formateur-2", etc.
   const [drawingPad, setDrawingPad] = useState<string | null>(null);
   const [fakeCount, setFakeCount] = useState<number>(5);
   const [fakeRegion, setFakeRegion] = useState<RegionKey | "all">("ile-de-france");
   const [importingCerfa, setImportingCerfa] = useState(false);
+  const [importingConvoc, setImportingConvoc] = useState(false);
   const addStagiaire = () => onChange([...data, { ...emptyStagiaire }]);
   const generateFakes = (replace: boolean) => {
     const n = Math.max(1, Math.min(100, Math.floor(fakeCount) || 1));
@@ -123,6 +126,37 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
     }
   };
 
+  const handleConvocImport = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    setImportingConvoc(true);
+    const newStagiaires: StagiaireInfo[] = [];
+    let successCount = 0;
+    let errorCount = 0;
+
+    try {
+      for (const file of Array.from(files)) {
+        try {
+          const extracted = await extractConvocationFromDocx(file);
+          if (!extracted.nom && !extracted.prenom) {
+            errorCount++;
+            continue;
+          }
+          newStagiaires.push(convocationToStagiaire(extracted, { ...emptyStagiaire }));
+          successCount++;
+        } catch (e) {
+          console.error("Erreur fichier Convocation:", e);
+          errorCount++;
+        }
+      }
+      if (newStagiaires.length > 0) onChange([...data, ...newStagiaires]);
+      if (successCount > 0) toast.success(`${successCount} convocation(s) importée(s)`);
+      if (errorCount > 0) toast.error(`${errorCount} fichier(s) illisible(s)`);
+    } finally {
+      setImportingConvoc(false);
+      if (convocInputRef.current) convocInputRef.current.value = "";
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-6">
@@ -176,6 +210,24 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
           >
             {importingCerfa ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileUp className="w-4 h-4" />}
             {importingCerfa ? "Extraction..." : "Importer CERFA"}
+          </Button>
+          <input
+            ref={convocInputRef}
+            type="file"
+            accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            multiple
+            className="hidden"
+            onChange={(e) => handleConvocImport(e.target.files)}
+          />
+          <Button
+            onClick={() => convocInputRef.current?.click()}
+            size="sm"
+            variant="outline"
+            disabled={importingConvoc}
+            className="gap-1 h-9"
+          >
+            {importingConvoc ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileUp className="w-4 h-4" />}
+            {importingConvoc ? "Extraction..." : "Importer Convocation"}
           </Button>
           <Button onClick={addStagiaire} size="sm" className="h-9">
             + Ajouter
