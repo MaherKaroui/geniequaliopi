@@ -211,6 +211,24 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
             {importingCerfa ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileUp className="w-4 h-4" />}
             {importingCerfa ? "Extraction..." : "Importer CERFA"}
           </Button>
+          <input
+            ref={convocInputRef}
+            type="file"
+            accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            multiple
+            className="hidden"
+            onChange={(e) => handleConvocImport(e.target.files)}
+          />
+          <Button
+            onClick={() => convocInputRef.current?.click()}
+            size="sm"
+            variant="outline"
+            disabled={importingConvoc}
+            className="gap-1 h-9"
+          >
+            {importingConvoc ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileUp className="w-4 h-4" />}
+            {importingConvoc ? "Extraction..." : "Importer Convocation"}
+          </Button>
           <Button onClick={addStagiaire} size="sm" className="h-9">
             + Ajouter
           </Button>
