@@ -56,7 +56,7 @@ export const parseConvocationText = (raw: string): ConvocationExtraction => {
     const civMatch = fullName.match(/^(M\.|Mme|Madame|Monsieur|Mlle)\s+/i);
     if (civMatch) {
       const c = civMatch[1].toLowerCase();
-      result.civilite = c.startsWith("m") && (c === "mme" || c === "madame") ? "Madame" : "Monsieur";
+      result.civilite = (c === "mme" || c === "madame" || c === "mlle") ? "Mme" : "M.";
       fullName = fullName.replace(civMatch[0], "").trim();
     }
 
