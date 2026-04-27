@@ -10,6 +10,12 @@ import { REGIONS, RegionKey } from "@/lib/fakeStagiaireRegions";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { extractConvocationFromDocx, convocationToStagiaire } from "@/lib/convocationExtractor";
+import {
+  extractStagiaireFromFile,
+  extractionToStagiaire,
+  mergeExtractions,
+  type StagiaireExtraction,
+} from "@/lib/stagiaireFileExtractor";
 
 const FORMATEURS_PREDIFINIS = [
   "AHMED EL HILALI",
