@@ -112,7 +112,10 @@ const readAnyFile = async (file: File): Promise<string> => {
 /* ---------------- Extraction des champs ---------------- */
 
 export const parseStagiaireFromText = (raw: string): StagiaireExtraction => {
-  const text = raw.replace(/\u00A0/g, " ").replace(/\s+\n/g, "\n");
+  const text = raw
+    .replace(/\u00A0/g, " ")
+    .replace(/[\u2019\u2018\u02BC`]/g, "'")
+    .replace(/\s+\n/g, "\n");
   const result: StagiaireExtraction = {};
 
   /* --- Civilité + Nom + Prénom --- */
