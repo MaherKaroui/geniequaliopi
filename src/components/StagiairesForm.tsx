@@ -126,6 +126,37 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
     }
   };
 
+  const handleConvocImport = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    setImportingConvoc(true);
+    const newStagiaires: StagiaireInfo[] = [];
+    let successCount = 0;
+    let errorCount = 0;
+
+    try {
+      for (const file of Array.from(files)) {
+        try {
+          const extracted = await extractConvocationFromDocx(file);
+          if (!extracted.nom && !extracted.prenom) {
+            errorCount++;
+            continue;
+          }
+          newStagiaires.push(convocationToStagiaire(extracted, { ...emptyStagiaire }));
+          successCount++;
+        } catch (e) {
+          console.error("Erreur fichier Convocation:", e);
+          errorCount++;
+        }
+      }
+      if (newStagiaires.length > 0) onChange([...data, ...newStagiaires]);
+      if (successCount > 0) toast.success(`${successCount} convocation(s) importée(s)`);
+      if (errorCount > 0) toast.error(`${errorCount} fichier(s) illisible(s)`);
+    } finally {
+      setImportingConvoc(false);
+      if (convocInputRef.current) convocInputRef.current.value = "";
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-6">
