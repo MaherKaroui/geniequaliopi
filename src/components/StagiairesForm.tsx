@@ -135,28 +135,56 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
   const handleConvocImport = async (files: FileList | null) => {
     if (!files || files.length === 0) return;
     setImportingConvoc(true);
-    const newStagiaires: StagiaireInfo[] = [];
     let successCount = 0;
     let errorCount = 0;
 
     try {
+      // 1) Extraire chaque fichier
+      const perFile: { file: File; ex: StagiaireExtraction }[] = [];
       for (const file of Array.from(files)) {
         try {
-          const extracted = await extractConvocationFromDocx(file);
-          if (!extracted.nom && !extracted.prenom) {
-            errorCount++;
-            continue;
-          }
-          newStagiaires.push(convocationToStagiaire(extracted, { ...emptyStagiaire }));
-          successCount++;
+          const ex = await extractStagiaireFromFile(file);
+          perFile.push({ file, ex });
         } catch (e) {
-          console.error("Erreur fichier Convocation:", e);
+          console.error("Erreur lecture fichier:", file.name, e);
           errorCount++;
         }
       }
+
+      // 2) Regrouper par stagiaire (clé = nom + prénom normalisés)
+      const groups = new Map<string, StagiaireExtraction[]>();
+      const orphelins: StagiaireExtraction[] = [];
+      perFile.forEach(({ ex }) => {
+        const key = `${(ex.nom || "").toUpperCase()}|${(ex.prenom || "").toUpperCase()}`.trim();
+        if (key === "|" || (!ex.nom && !ex.prenom)) {
+          orphelins.push(ex);
+          return;
+        }
+        const arr = groups.get(key) ?? [];
+        arr.push(ex);
+        groups.set(key, arr);
+      });
+
+      // 3) Fusionner et créer les stagiaires
+      const newStagiaires: StagiaireInfo[] = [];
+      groups.forEach((arr) => {
+        const merged = mergeExtractions(arr);
+        if (merged.nom || merged.prenom) {
+          newStagiaires.push(extractionToStagiaire(merged, { ...emptyStagiaire }));
+          successCount++;
+        } else {
+          errorCount++;
+        }
+      });
+
       if (newStagiaires.length > 0) onChange([...data, ...newStagiaires]);
-      if (successCount > 0) toast.success(`${successCount} convocation(s) importée(s)`);
-      if (errorCount > 0) toast.error(`${errorCount} fichier(s) illisible(s)`);
+      if (orphelins.length > 0) {
+        toast.warning(`${orphelins.length} fichier(s) sans identité détectée — ignoré(s)`);
+      }
+      if (successCount > 0)
+        toast.success(`${successCount} stagiaire(s) importé(s) depuis ${perFile.length} fichier(s)`);
+      if (errorCount > 0 && successCount === 0)
+        toast.error(`${errorCount} fichier(s) illisible(s)`);
     } finally {
       setImportingConvoc(false);
       if (convocInputRef.current) convocInputRef.current.value = "";
