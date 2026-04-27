@@ -10,6 +10,12 @@ import { REGIONS, RegionKey } from "@/lib/fakeStagiaireRegions";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { extractConvocationFromDocx, convocationToStagiaire } from "@/lib/convocationExtractor";
+import {
+  extractStagiaireFromFile,
+  extractionToStagiaire,
+  mergeExtractions,
+  type StagiaireExtraction,
+} from "@/lib/stagiaireFileExtractor";
 
 const FORMATEURS_PREDIFINIS = [
   "AHMED EL HILALI",
@@ -129,28 +135,56 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
   const handleConvocImport = async (files: FileList | null) => {
     if (!files || files.length === 0) return;
     setImportingConvoc(true);
-    const newStagiaires: StagiaireInfo[] = [];
     let successCount = 0;
     let errorCount = 0;
 
     try {
+      // 1) Extraire chaque fichier
+      const perFile: { file: File; ex: StagiaireExtraction }[] = [];
       for (const file of Array.from(files)) {
         try {
-          const extracted = await extractConvocationFromDocx(file);
-          if (!extracted.nom && !extracted.prenom) {
-            errorCount++;
-            continue;
-          }
-          newStagiaires.push(convocationToStagiaire(extracted, { ...emptyStagiaire }));
-          successCount++;
+          const ex = await extractStagiaireFromFile(file);
+          perFile.push({ file, ex });
         } catch (e) {
-          console.error("Erreur fichier Convocation:", e);
+          console.error("Erreur lecture fichier:", file.name, e);
           errorCount++;
         }
       }
+
+      // 2) Regrouper par stagiaire (clé = nom + prénom normalisés)
+      const groups = new Map<string, StagiaireExtraction[]>();
+      const orphelins: StagiaireExtraction[] = [];
+      perFile.forEach(({ ex }) => {
+        const key = `${(ex.nom || "").toUpperCase()}|${(ex.prenom || "").toUpperCase()}`.trim();
+        if (key === "|" || (!ex.nom && !ex.prenom)) {
+          orphelins.push(ex);
+          return;
+        }
+        const arr = groups.get(key) ?? [];
+        arr.push(ex);
+        groups.set(key, arr);
+      });
+
+      // 3) Fusionner et créer les stagiaires
+      const newStagiaires: StagiaireInfo[] = [];
+      groups.forEach((arr) => {
+        const merged = mergeExtractions(arr);
+        if (merged.nom || merged.prenom) {
+          newStagiaires.push(extractionToStagiaire(merged, { ...emptyStagiaire }));
+          successCount++;
+        } else {
+          errorCount++;
+        }
+      });
+
       if (newStagiaires.length > 0) onChange([...data, ...newStagiaires]);
-      if (successCount > 0) toast.success(`${successCount} convocation(s) importée(s)`);
-      if (errorCount > 0) toast.error(`${errorCount} fichier(s) illisible(s)`);
+      if (orphelins.length > 0) {
+        toast.warning(`${orphelins.length} fichier(s) sans identité détectée — ignoré(s)`);
+      }
+      if (successCount > 0)
+        toast.success(`${successCount} stagiaire(s) importé(s) depuis ${perFile.length} fichier(s)`);
+      if (errorCount > 0 && successCount === 0)
+        toast.error(`${errorCount} fichier(s) illisible(s)`);
     } finally {
       setImportingConvoc(false);
       if (convocInputRef.current) convocInputRef.current.value = "";
@@ -214,7 +248,7 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
           <input
             ref={convocInputRef}
             type="file"
-            accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            accept=".docx,.pdf,.xlsx,.xls,.csv,.txt,.html,.htm,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             multiple
             className="hidden"
             onChange={(e) => handleConvocImport(e.target.files)}
@@ -225,9 +259,10 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
             variant="outline"
             disabled={importingConvoc}
             className="gap-1 h-9"
+            title="Importer n'importe quel fichier contenant des infos stagiaire (convocation, contrat, devis, attestation, CERFA, Excel…)"
           >
             {importingConvoc ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileUp className="w-4 h-4" />}
-            {importingConvoc ? "Extraction..." : "Importer Convocation"}
+            {importingConvoc ? "Extraction..." : "Importer fichiers stagiaire"}
           </Button>
           <Button onClick={addStagiaire} size="sm" className="h-9">
             + Ajouter
