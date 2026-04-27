@@ -248,7 +248,7 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
           <input
             ref={convocInputRef}
             type="file"
-            accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            accept=".docx,.pdf,.xlsx,.xls,.csv,.txt,.html,.htm,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             multiple
             className="hidden"
             onChange={(e) => handleConvocImport(e.target.files)}
@@ -259,9 +259,10 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
             variant="outline"
             disabled={importingConvoc}
             className="gap-1 h-9"
+            title="Importer n'importe quel fichier contenant des infos stagiaire (convocation, contrat, devis, attestation, CERFA, Excel…)"
           >
             {importingConvoc ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileUp className="w-4 h-4" />}
-            {importingConvoc ? "Extraction..." : "Importer Convocation"}
+            {importingConvoc ? "Extraction..." : "Importer fichiers stagiaire"}
           </Button>
           <Button onClick={addStagiaire} size="sm" className="h-9">
             + Ajouter
