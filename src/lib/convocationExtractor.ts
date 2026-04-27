@@ -7,7 +7,7 @@ import { StagiaireInfo } from "@/types/qualiopi";
  * adresse formation (lieu), email, téléphone éventuels.
  */
 export interface ConvocationExtraction {
-  civilite?: string;
+  civilite?: "M." | "Mme";
   nom?: string;
   prenom?: string;
   email?: string;
