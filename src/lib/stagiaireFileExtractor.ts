@@ -117,8 +117,10 @@ export const parseStagiaireFromText = (raw: string): StagiaireExtraction => {
 
   /* --- Civilité + Nom + Prénom --- */
   // Patterns tentés successivement
+  // Apostrophes typographiques acceptées : ' (U+0027), ’ (U+2019), ‘ (U+2018), ʼ (U+02BC), ` (U+0060)
+  const APO = "['\u2019\u2018\u02BC`]";
   const namePatterns: RegExp[] = [
-    /[ÀA]\s*l['']\s*attention\s*de\s*:?\s*([^\n\r,;]+)/i,
+    new RegExp(`[ÀA]\\s*l${APO}?\\s*attention\\s*(?:de|du|des)?\\s*:?\\s*([^\\n\\r,;]+)`, "i"),
     /(?:Nom\s+et\s+pr[ée]nom|Pr[ée]nom\s+et\s+nom|Stagiaire|B[ée]n[ée]ficiaire|Apprenant|Apprenti|Candidat|Participant|Salari[ée])\s*:\s*([^\n\r,;]+)/i,
     /Je\s+soussign[ée]\(?e?\)?\s*,?\s*((?:M\.|Mme|Madame|Monsieur|Mlle)?\s*[A-ZÉÈÀÂÔÛ][^\n\r,;]+)/,
   ];
