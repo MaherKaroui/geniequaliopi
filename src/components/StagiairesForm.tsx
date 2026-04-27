@@ -38,11 +38,13 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
   const sigRespRefs = useRef<Record<number, HTMLInputElement | null>>({});
   const sigFormateurRefs = useRef<Record<number, HTMLInputElement | null>>({});
   const cerfaInputRef = useRef<HTMLInputElement | null>(null);
+  const convocInputRef = useRef<HTMLInputElement | null>(null);
   // Track which signature pad is open: "sig-0", "resp-1", "formateur-2", etc.
   const [drawingPad, setDrawingPad] = useState<string | null>(null);
   const [fakeCount, setFakeCount] = useState<number>(5);
   const [fakeRegion, setFakeRegion] = useState<RegionKey | "all">("ile-de-france");
   const [importingCerfa, setImportingCerfa] = useState(false);
+  const [importingConvoc, setImportingConvoc] = useState(false);
   const addStagiaire = () => onChange([...data, { ...emptyStagiaire }]);
   const generateFakes = (replace: boolean) => {
     const n = Math.max(1, Math.min(100, Math.floor(fakeCount) || 1));
