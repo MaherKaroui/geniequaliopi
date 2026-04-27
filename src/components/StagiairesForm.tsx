@@ -9,6 +9,7 @@ import { generateFakeStagiairesIDF } from "@/lib/fakeStagiaireIDF";
 import { REGIONS, RegionKey } from "@/lib/fakeStagiaireRegions";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { extractConvocationFromDocx, convocationToStagiaire } from "@/lib/convocationExtractor";
 
 const FORMATEURS_PREDIFINIS = [
   "AHMED EL HILALI",
