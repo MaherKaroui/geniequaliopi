@@ -935,9 +935,9 @@ function genOrganigramme(o: OrganismeInfo) {
   const refPeda = o.responsablePedagogique?.trim() || dir;
   const refAdmin = o.poleAdministratif?.trim() || dir;
   const refHandi = o.referentHandicap?.trim() || dir;
+  const refQualite = o.referentQualite?.trim() || dir;
   // Formateur principal : on prend celui de la formation si fourni, sinon le dirigeant
   const formateur = (o as any).formateurPrincipal?.trim?.() || dir;
-  const showFormateur = formateur && formateur !== dir;
 
   const box = (titre: string, nom: string) => `
     <div style="background:#e8f0fe;padding:14px 18px;border-radius:8px;min-width:170px;text-align:center;border:1px solid #c7d7f5">
@@ -948,9 +948,10 @@ function genOrganigramme(o: OrganismeInfo) {
   const boxes = [
     box("Référent Pédagogique", refPeda),
     box("Référent Administratif", refAdmin),
+    box("Référent Qualité", refQualite),
     box("Référent Handicap", refHandi),
+    box("Formateur", formateur),
   ];
-  if (showFormateur) boxes.push(box("Formateur", formateur));
 
   return buildDocument({ org: o, title: `ORGANIGRAMME ${(o.nom || "").toUpperCase()}`, extraHtml: `
     <div style="text-align:center;margin:30px 0">
