@@ -159,7 +159,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
   switch (template) {
     case "fiche_identite": return genFicheIdentite(o);
     case "presentation_organisme": return genPresentation(o);
-    case "organigramme": return genOrganigramme(o);
+    case "organigramme": return genOrganigramme(o, f);
     case "charte_qualite": return genCharteQualite(o);
     case "politique_qualite": return genPolitiqueQualite(o);
     case "cgv": return genCGV_V2(o, f, stagiaires);
@@ -930,14 +930,14 @@ function genPresentation(o: OrganismeInfo) {
   ]});
 }
 
-function genOrganigramme(o: OrganismeInfo) {
+function genOrganigramme(o: OrganismeInfo, f?: FormationInfo) {
   const dir = o.dirigeant || "—";
   const refPeda = o.responsablePedagogique?.trim() || dir;
   const refAdmin = o.poleAdministratif?.trim() || dir;
   const refHandi = o.referentHandicap?.trim() || dir;
   const refQualite = o.referentQualite?.trim() || dir;
   // Formateur principal : on prend celui de la formation si fourni, sinon le dirigeant
-  const formateur = (o as any).formateurPrincipal?.trim?.() || dir;
+  const formateur = f?.formateur?.trim() || dir;
 
   const box = (titre: string, nom: string) => `
     <div style="background:#e8f0fe;padding:14px 18px;border-radius:8px;min-width:170px;text-align:center;border:1px solid #c7d7f5">
