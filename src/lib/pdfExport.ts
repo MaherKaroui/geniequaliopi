@@ -352,7 +352,7 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
         if (current.content.scrollHeight > current.content.clientHeight + 1 && clone instanceof HTMLElement) {
           current.content.removeChild(clone);
           const wrapperTag = clone.tagName === "BODY" ? "DIV" : clone.tagName;
-          const splitWrapper = document.createElement(wrapperTag);
+          let splitWrapper = document.createElement(wrapperTag);
           for (const attr of Array.from(clone.attributes)) {
             splitWrapper.setAttribute(attr.name, attr.value);
           }
@@ -372,6 +372,7 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
               }
               nextWrapper.style.cssText = clone.style.cssText;
               current.content.appendChild(nextWrapper);
+              splitWrapper = nextWrapper;
               nextWrapper.appendChild(childClone);
             }
           }
