@@ -955,12 +955,7 @@ export function genExercicesStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
   // --- SCORE & APPRÉCIATION FORMATEUR (1 QCM par fichier) ---
   const exMoyenne = totalMax > 0 ? Math.round(totalNote / totalMax * 10 * 10) / 10 : 0;
   const moyenneFinale = exMoyenne; // Single QCM = single score
-  extra += `<h3>SCORE FINAL DU QCM</h3>`;
-  extra += tableHTML(["Élément", "Résultat"], [
-    ["Total points obtenus", `${totalNote} / ${totalMax}`],
-    ["Note sur 10", `${moyenneFinale}/10`],
-    ["Décision", moyenneFinale >= 7 ? "✅ VALIDÉ – QCM acquis" : "⚠️ À consolider"],
-  ]);
+  // Bloc "SCORE FINAL DU QCM" supprimé : le tableau "Résultat de ce QCM" rendu dans la boucle suffit.
 
   // Global appreciation (single-QCM oriented)
   const avgPct = moyenneFinale * 10;
