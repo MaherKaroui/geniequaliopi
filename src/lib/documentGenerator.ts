@@ -31,6 +31,46 @@ import { genDPOfficiel, genECFOfficiel, genPVSessionGlobal, preloadDPAIPack } fr
 import { getCachedPack, answersForQCM, studentAnswerFromCorrection, noteForOpenQuestion, type AIEvalPack } from "./aiEvalPack";
 
 const FALLBACK_STAGIAIRE: StagiaireInfo = { prenom: "Martin", nom: "Dupont", civilite: "" as "M." | "Mme" | "", email: "", telephone: "", entreprise: "", poste: "", dateNaissance: "" };
+
+/**
+ * Détecte si la formation est un cursus ECSR (cours du soir + samedi).
+ * Horaires : Lundi–Vendredi 18h00–22h00 (4h) | Samedi 09h00–12h30 + 13h30–17h30 (7h30).
+ */
+export function isECSRFormation(f: FormationInfo): boolean {
+  const t = (f.intitule || "").toLowerCase();
+  return t.includes("ecsr")
+    || t.includes("enseignant de la conduite")
+    || t.includes("sécurité routière")
+    || t.includes("securite routiere")
+    || t.includes("moniteur auto-école")
+    || t.includes("moniteur auto-ecole");
+}
+
+/** Retourne la chaîne d'horaires d'affichage selon la formation et le jour de semaine (0=dim, 6=sam). */
+export function getHorairesLabel(f: FormationInfo, dow?: number): string {
+  if (isECSRFormation(f)) {
+    if (dow === 6) return "09h00 – 12h30 / 13h30 – 17h30";
+    return "18h00 – 22h00 (cours du soir)";
+  }
+  return "09h00 – 12h30 / 13h30 – 17h00";
+}
+
+/** Renvoie les blocs d'émargement d'une journée pour la formation. */
+export function getEmargementBlocs(f: FormationInfo, dow?: number): { label: string; horaire: string }[] {
+  if (isECSRFormation(f)) {
+    if (dow === 6) {
+      return [
+        { label: "Matin", horaire: "09h00 – 12h30" },
+        { label: "Après-midi", horaire: "13h30 – 17h30" },
+      ];
+    }
+    return [{ label: "Soirée", horaire: "18h00 – 22h00" }];
+  }
+  return [
+    { label: "Matin", horaire: "09h00 – 12h30" },
+    { label: "Après-midi", horaire: "13h30 – 17h00" },
+  ];
+}
 export function getFullCatalog(org: OrganismeInfo, userFormation: FormationInfo, userStagiaires: StagiaireInfo[]): DocEntry[] {
   // Use only the single selected formation (merged with sample defaults if needed)
   const selectedFormation = userFormation.intitule
