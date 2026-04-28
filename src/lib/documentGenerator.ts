@@ -9002,7 +9002,79 @@ function generateEvalBesoinsAnswers(s: StagiaireInfo, f: FormationInfo, o: Organ
     };
   }
 
-  // === DIPLÔMES (10+ options par type) ===
+  // === Early return : ECSR (Enseignant de la conduite et de la sécurité routière) ===
+  if (isECSR) {
+    const ecsrDiplomes = [
+      "Baccalauréat général + BAFA + Permis B (8 ans)",
+      "BEPECASER (ancien diplôme d'enseignant de la conduite)",
+      "Baccalauréat professionnel Commerce + Permis B (10 ans)",
+      "Licence STAPS + Permis B (6 ans) + expérience d'animation",
+      "BTS Management Commercial Opérationnel + Permis B",
+      "CAP Petite Enfance + Permis B (12 ans) – reconversion vers l'enseignement",
+      "Brevet des collèges + Permis B (15 ans) + expérience tutorat AAC",
+      "Baccalauréat ES + Permis B (5 ans) + Brevet de moniteur fédéral",
+      "Titre professionnel Conseiller en insertion professionnelle + Permis B",
+      "Baccalauréat technologique STMG + Permis B (7 ans)",
+    ];
+    const ecsrAttentes = [
+      `Permettre à mon salarié d'obtenir le titre professionnel ECSR afin de l'intégrer durablement comme enseignant de la conduite dans notre auto-école et renforcer notre équipe pédagogique.`,
+      `Disposer d'un enseignant supplémentaire qualifié et autorisé par la préfecture pour répondre à la forte demande de leçons de conduite et réduire nos délais d'attente.`,
+      `Former un collaborateur capable d'animer aussi bien les séances individuelles de conduite que les séances collectives de Code et de sensibilisation à la sécurité routière en entreprise.`,
+      `Renforcer la qualité pédagogique de notre établissement en formant un enseignant maîtrisant le REMC, les outils numériques et les nouvelles méthodes d'évaluation continue.`,
+      `Préparer la relève de notre équipe : un de nos enseignants part à la retraite dans 18 mois, nous formons son remplaçant pour assurer la continuité de service.`,
+    ];
+    const ecsrMissions = [
+      `Animer des leçons individuelles de conduite (B/B96) sur véhicule à double commande, suivre les apprenants via le livret d'apprentissage et préparer aux examens ETG et pratique.`,
+      `Assurer les séances collectives de Code de la route en salle, animer les séances de rendez-vous pédagogiques de l'AAC (1er et 2ème rendez-vous) et accompagner les accompagnateurs.`,
+      `Conduire des actions de sensibilisation au risque routier en entreprise (PRP routier), animer des stages de récupération de points et des journées sécurité routière en collège/lycée.`,
+      `Évaluer les candidats à l'inscription, construire les plans de formation individualisés, renseigner le livret d'apprentissage et présenter les apprenants aux examens.`,
+      `Réaliser des séances sur simulateur de conduite, accompagner les publics fragiles (post-permis, conducteurs seniors, personnes en situation de handicap) et assurer le suivi pédagogique.`,
+    ];
+    const ecsrContribution = [
+      `Cette formation nous permet de pérenniser notre équipe pédagogique et de répondre à la croissance de l'activité (+15% d'inscriptions sur les 12 derniers mois).`,
+      `Former un nouvel enseignant en interne sécurise notre capacité de production de leçons et améliore notre taux de réussite à l'examen, indicateur clé pour notre référencement sur la plateforme du permis.`,
+      `Notre auto-école développe une offre B2B (sensibilisation entreprises, flottes professionnelles) : disposer d'un enseignant CCP2 nous ouvre ce marché en complément de l'activité B2C classique.`,
+      `Cette formation s'inscrit dans notre politique RH : favoriser la promotion interne d'un secrétaire pédagogique vers le métier d'enseignant de la conduite via le titre professionnel.`,
+      `Renforcer notre conformité Qualiopi et notre attractivité : un enseignant supplémentaire diplômé ECSR consolide notre dossier qualité et nos engagements de service.`,
+    ];
+    const ecsrObjectif = [
+      `Obtenir le Titre Professionnel ECSR (niveau 5) afin d'exercer comme enseignant de la conduite et de la sécurité routière en auto-école et obtenir l'autorisation d'enseigner délivrée par la préfecture.`,
+      `Valider les 2 CCP du titre (CCP1 – Former à la conduite VL / CCP2 – Sensibiliser à la sécurité routière) pour exercer pleinement le métier d'enseignant de la conduite.`,
+      `Me reconvertir professionnellement vers le métier d'enseignant de la conduite, secteur en tension qui recrute, et obtenir un emploi stable en auto-école dans les 3 mois suivant la certification.`,
+      `Devenir enseignant de la conduite indépendant, m'associer à une auto-école en portage ou créer ma propre structure (auto-école associative ou label CER/ECF) à moyen terme.`,
+      `Compléter mon expérience d'accompagnateur AAC par une qualification professionnelle reconnue pour exercer légalement comme enseignant de la conduite et animer des actions de sensibilisation.`,
+    ];
+    const ecsrProjetPro = [
+      `Cette formation me permettra d'obtenir le titre professionnel ECSR de niveau 5 et l'autorisation d'enseigner délivrée par le préfet, conditions indispensables pour exercer le métier en auto-école.`,
+      `La maîtrise du REMC, des techniques d'animation pédagogique et des outils d'évaluation me donnera la posture et les compétences attendues par les employeurs du secteur.`,
+      `Au-delà de la simple conduite, cette formation m'apportera les compétences en pédagogie, accidentologie, neurosciences de l'apprentissage et gestion des publics qui font la différence sur le marché du recrutement.`,
+      `Le CCP2 (sensibilisation) m'ouvrira en plus le marché des actions de prévention routière en entreprise et en milieu scolaire, qui se développe fortement avec le Plan PRP routier.`,
+      `Cette certification est la voie obligatoire pour exercer légalement le métier : sans titre ECSR + autorisation préfectorale, impossible de donner des leçons de conduite contre rémunération.`,
+    ];
+    const ecsrHandicap = [
+      "Non, je ne suis pas en situation de handicap. Mon permis B est valide sans restriction et ma visite médicale auprès d'un médecin agréé préfecture est à jour, condition indispensable pour exercer.",
+      "Non, aucune situation de handicap déclarée. Mon aptitude à la conduite professionnelle a été récemment confirmée par un médecin agréé.",
+      "Non. Je suis apte à la conduite et à l'animation pédagogique en salle comme en véhicule, sans aménagement particulier.",
+      "Non, pas de handicap. Aucune restriction sur le permis B et bonne acuité visuelle (verres correcteurs portés en permanence).",
+      "Non, je ne déclare aucun handicap. La visite médicale obligatoire pour la profession est valide.",
+    ];
+    return {
+      civilite,
+      raisonSociale: hasEntreprise ? s.entreprise : "/",
+      attentes: hasEntreprise ? ecsrAttentes[h(4) % ecsrAttentes.length] : "/",
+      missions: hasEntreprise ? ecsrMissions[h(5) % ecsrMissions.length] : "/",
+      contribution: hasEntreprise ? ecsrContribution[h(6) % ecsrContribution.length] : "/",
+      diplome: ecsrDiplomes[h(2) % ecsrDiplomes.length],
+      objectif: ecsrObjectif[h(7) % ecsrObjectif.length],
+      budget: hasEntreprise
+        ? "Formation prise en charge par l'OPCO Mobilités au titre du plan de développement des compétences de l'entreprise."
+        : "Financement personnel via le CPF (Compte Personnel de Formation) – environ 4 500 € TTC, complété si besoin par un abondement France Travail dans le cadre d'un projet de reconversion professionnelle (PTP / AIF).",
+      projetPro: ecsrProjetPro[h(8) % ecsrProjetPro.length],
+      handicap: ecsrHandicap[h(9) % ecsrHandicap.length],
+    };
+  }
+
+
   let diplomes: string[];
   if (isFLE) {
     diplomes = [
