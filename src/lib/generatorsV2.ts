@@ -717,14 +717,15 @@ export function genExercicesStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
     jourLabel = '';
   }
 
-  // Date du QCM : 1 QCM tous les 2 jours de formation (jour 2, 4, 6, … N)
-  // Si plus de QCM que de jours/2, on retombe sur le dernier jour
+  // Date du QCM : 1 QCM par jour de formation (jour 1, 2, 3, … N).
+  // Garantie : la date du QCM ne dépasse JAMAIS la date de fin de formation.
   let exerciseDate: string;
   if (exerciceIdx !== undefined) {
     const days = getFormationDays(f);
     const nbJours = days.length;
-    const jourCible = Math.min((exerciceIdx + 1) * 2, nbJours);
-    exerciseDate = days.length > 0 && jourCible > 0 ? days[jourCible - 1] : formatDate(getStagiaireDateFin(s, f));
+    // 1 QCM par jour ; si plus de QCM que de jours, on plafonne au dernier jour (= date de fin)
+    const jourCible = nbJours > 0 ? Math.min(exerciceIdx + 1, nbJours) : 0;
+    exerciseDate = nbJours > 0 && jourCible > 0 ? days[jourCible - 1] : formatDate(getStagiaireDateFin(s, f));
   } else {
     exerciseDate = formatDate(getStagiaireDateFin(s, f));
   }
