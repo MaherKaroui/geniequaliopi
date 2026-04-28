@@ -1037,7 +1037,7 @@ export function genExamenFinalStagiaire(o: OrganismeInfo, f: FormationInfo, stag
   for (let exIdx = 0; exIdx < nbQcm; exIdx++) {
     const sub = genExercicesStagiaire(o, f, stagiaires, stagiaireIdx, exIdx);
     // Extrait le contenu entre les balises body si présent, sinon utilise tel quel
-    let html = sub.html || (sub as any).content || '';
+    let html = typeof sub === 'string' ? sub : ((sub as any)?.html || (sub as any)?.content || '');
     // Heuristique : retire les wrappers d'en-tête/pied pour ne garder que le bloc QCM
     // On cherche le <h2>QCM ...</h2> et tout ce qui suit jusqu'à la fin du contenu utile
     const h2Match = html.match(/<h2>QCM[\s\S]*/i);
