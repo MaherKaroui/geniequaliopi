@@ -80,9 +80,9 @@ export function genMailBilanFroid3Mois(
     { nom: `BILAN A FROID - ${(s.nom || "").toUpperCase()}`, taille: "188 Ko", color: "#107C41" },
   ];
   const pjHtml = pj.map(p => `
-      <div style="display:inline-block;vertical-align:top;border:1px solid #e1dfdd;border-radius:4px;padding:8px 28px 8px 38px;margin:0 8px 8px 0;background:#faf9f8;min-width:170px;position:relative;font-size:12px;">
-        <div style="position:absolute;left:8px;top:8px;width:22px;height:22px;background:${p.color};color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;border-radius:2px;">W</div>
-        <div style="color:#201f1e;font-weight:600;line-height:1.3;max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(p.nom)}</div>
+      <div style="display:inline-block;vertical-align:top;border:1px solid #e1dfdd;border-radius:4px;padding:8px 14px 8px 40px;margin:0 8px 8px 0;background:#faf9f8;position:relative;font-size:12px;max-width:100%;">
+        <div style="position:absolute;left:8px;top:8px;width:24px;height:24px;background:${p.color};color:#fff;font-size:11px;font-weight:700;text-align:center;line-height:24px;border-radius:2px;">W</div>
+        <div style="color:#201f1e;font-weight:600;line-height:1.3;white-space:nowrap;">${escapeHtml(p.nom)}.docx</div>
         <div style="color:#605e5c;font-size:11px;margin-top:2px;">${escapeHtml(p.taille)}</div>
       </div>`).join("");
 
