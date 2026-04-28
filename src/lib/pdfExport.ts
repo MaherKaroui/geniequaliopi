@@ -199,6 +199,13 @@ function getRenderableNodes(source: HTMLDivElement): ChildNode[] {
   });
 }
 
+function getRenderableChildNodes(source: HTMLElement): ChildNode[] {
+  return Array.from(source.childNodes).filter((node) => {
+    if (node.nodeType === Node.TEXT_NODE) return Boolean(node.textContent?.trim());
+    return true;
+  });
+}
+
 function pageHasRenderableContent(page: HTMLDivElement): boolean {
   const content = page.querySelector(".pdf-root");
   if (!content) return false;
@@ -342,6 +349,34 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
           pages.push(current.page);
         }
         current.content.appendChild(clone);
+        if (current.content.scrollHeight > current.content.clientHeight + 1 && clone instanceof HTMLElement) {
+          current.content.removeChild(clone);
+          const wrapperTag = clone.tagName === "BODY" ? "DIV" : clone.tagName;
+          let splitWrapper = document.createElement(wrapperTag);
+          for (const attr of Array.from(clone.attributes)) {
+            splitWrapper.setAttribute(attr.name, attr.value);
+          }
+          splitWrapper.style.cssText = clone.style.cssText;
+          current.content.appendChild(splitWrapper);
+
+          for (const child of getRenderableChildNodes(clone)) {
+            const childClone = child.cloneNode(true);
+            splitWrapper.appendChild(childClone);
+            if (current.content.scrollHeight > current.content.clientHeight + 1) {
+              splitWrapper.removeChild(childClone);
+              current = createPage(host, footerHtml, footerHeightPx, PAGE_W_PX, PAGE_H_PX);
+              pages.push(current.page);
+              const nextWrapper = document.createElement(wrapperTag);
+              for (const attr of Array.from(clone.attributes)) {
+                nextWrapper.setAttribute(attr.name, attr.value);
+              }
+              nextWrapper.style.cssText = clone.style.cssText;
+              current.content.appendChild(nextWrapper);
+              splitWrapper = nextWrapper;
+              nextWrapper.appendChild(childClone);
+            }
+          }
+        }
       } else {
         // "Keep with next": if this node is a heading (h1..h4) and the next renderable
         // node does NOT fit on the current page, move the heading along with it to
