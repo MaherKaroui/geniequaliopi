@@ -943,8 +943,8 @@ export function getModaliteContent(f: FormationInfo, o: OrganismeInfo) {
     : `${f.lieu || o.adresse || '___'}, ${o.codePostal || '___'} ${o.ville || '___'}`;
 
   const horaires = dist
-    ? "Accès à la plateforme 24h/24 – Accompagnement synchrone : 09h00 – 17h00"
-    : "09h00 – 12h30 / 13h30 – 17h00";
+    ? "Accès à la plateforme 24h/24 – Accompagnement synchrone : Lun-Ven 18h00 – 22h00 (cours du soir) / Samedi 09h00 – 12h30 et 13h30 – 17h30"
+    : "Lundi au vendredi 18h00 – 22h00 (cours du soir) / Samedi 09h00 – 12h30 et 13h30 – 17h30";
 
   const moyensPedagogiques = dist
     ? `<p>• Plateforme e-learning (supports de cours, vidéos, exercices interactifs)<br>• Classes virtuelles avec le formateur<br>• Messagerie et forum de discussion<br>• Ressources pédagogiques numériques accessibles 24h/24<br>• Ordinateur personnel et connexion internet requis</p>`

@@ -52,30 +52,22 @@ export function isECSRFormation(f: FormationInfo): boolean {
 }
 
 
-/** Retourne la chaîne d'horaires d'affichage selon la formation et le jour de semaine (0=dim, 6=sam). */
-export function getHorairesLabel(f: FormationInfo, dow?: number): string {
-  if (isECSRFormation(f)) {
-    if (dow === 6) return "09h00 – 12h30 / 13h30 – 17h30";
-    return "18h00 – 22h00 (cours du soir)";
-  }
-  return "09h00 – 12h30 / 13h30 – 17h00";
+/** Retourne la chaîne d'horaires d'affichage selon le jour de semaine (0=dim, 6=sam).
+ * Règle globale : cours du soir Lun-Ven 18h00–22h00, samedi 09h00–12h30 / 13h30–17h30. */
+export function getHorairesLabel(_f: FormationInfo, dow?: number): string {
+  if (dow === 6) return "09h00 – 12h30 / 13h30 – 17h30";
+  return "18h00 – 22h00 (cours du soir)";
 }
 
 /** Renvoie les blocs d'émargement d'une journée pour la formation. */
-export function getEmargementBlocs(f: FormationInfo, dow?: number): { label: string; horaire: string }[] {
-  if (isECSRFormation(f)) {
-    if (dow === 6) {
-      return [
-        { label: "Matin", horaire: "09h00 – 12h30" },
-        { label: "Après-midi", horaire: "13h30 – 17h30" },
-      ];
-    }
-    return [{ label: "Soirée", horaire: "18h00 – 22h00" }];
+export function getEmargementBlocs(_f: FormationInfo, dow?: number): { label: string; horaire: string }[] {
+  if (dow === 6) {
+    return [
+      { label: "Matin", horaire: "09h00 – 12h30" },
+      { label: "Après-midi", horaire: "13h30 – 17h30" },
+    ];
   }
-  return [
-    { label: "Matin", horaire: "09h00 – 12h30" },
-    { label: "Après-midi", horaire: "13h30 – 17h00" },
-  ];
+  return [{ label: "Soirée", horaire: "18h00 – 22h00" }];
 }
 export function getFullCatalog(org: OrganismeInfo, userFormation: FormationInfo, userStagiaires: StagiaireInfo[]): DocEntry[] {
   // Use only the single selected formation (merged with sample defaults if needed)
