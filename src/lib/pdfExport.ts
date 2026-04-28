@@ -417,7 +417,7 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
           const nextNode = nodes[index + 1];
           // Skip pure page-break markers (they don't have visual content)
           const nextBehavior = getPageBreakBehavior(nextNode);
-          if (!nextBehavior.markerOnly && !nextBehavior.before) {
+          if (!nextBehavior.markerOnly && !nextBehavior.before && nodeFitsOnFreshPage(host, nextNode, footerHtml, footerHeightPx, PAGE_W_PX, PAGE_H_PX)) {
             const nextClone = nextNode.cloneNode(true);
             current.content.appendChild(nextClone);
             if (current.content.scrollHeight > current.content.clientHeight + 1) {
@@ -442,7 +442,7 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
     }
 
     // Drop accidental blank pages caused by oversized sections/page-break markers.
-    const renderPages = pages.filter(pageHasRenderableContent);
+    const renderPages = pages.filter((page, index) => pageHasRenderableContent(page) && !(index > 0 && pageOnlyHasOrphanHeading(page)));
     if (renderPages.length === 0) {
       renderPages.push(createPage(host, footerHtml, footerHeightPx, PAGE_W_PX, PAGE_H_PX).page);
     }
