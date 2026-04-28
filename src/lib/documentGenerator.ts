@@ -2258,7 +2258,28 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
 
     <h2>9. Modalités d'accès</h2>
     <div class="section">
-      <p><strong>Étapes d'inscription :</strong></p>
+      ${(() => {
+        const tProg = (f.intitule || "").toLowerCase();
+        const isVTCProg = tProg.includes("vtc") || tProg.includes("conducteur") || tProg.includes("transport de personnes") || tProg.includes("t3p") || tProg.includes("chauffeur");
+        if (isVTCProg) {
+          return `<p><strong>Étapes d'inscription :</strong></p>
+      <ol>
+        <li>Préinscription ${o.siteWeb && o.siteWeb.trim() ? `via ${isFacebookPage(o.siteWeb) ? 'la page Facebook' : 'le site internet'} (${linkUrl(o.siteWeb)}), ` : ''}par téléphone ou par email auprès de ${o.nom}</li>
+        <li>Analyse de la demande et validation de l'adéquation formation / projet professionnel</li>
+        <li>Entretien de positionnement (si nécessaire) pour adapter le parcours</li>
+        <li>Rendez-vous au centre de formation pour confirmation des objectifs de formation</li>
+        <li>Envoi des documents administratifs :
+          <ul>
+            <li>Contrat de formation professionnelle</li>
+            <li>Règlement intérieur</li>
+            <li>Convocation à la formation</li>
+            <li>Conditions Générales de Vente (CGV)</li>
+            <li>Programme de formation</li>
+          </ul>
+        </li>
+      </ol>`;
+        }
+        return `<p><strong>Étapes d'inscription :</strong></p>
       <ol>
         <li>Préinscription ${o.siteWeb && o.siteWeb.trim() ? `via ${isFacebookPage(o.siteWeb) ? 'la page Facebook' : 'le site internet'} (${linkUrl(o.siteWeb)}), ` : ''}par téléphone ou par email auprès de ${o.nom}</li>
         <li>Analyse de la demande et validation de l'adéquation formation / projet professionnel</li>
@@ -2275,7 +2296,8 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
         </li>
         <li>Inscription CERES – Inscription officielle du candidat sur la plateforme CERES (gestion des sessions d'examen TP/RNCP) par le centre de formation</li>
         <li>Demande d'acompte et confirmation de l'inscription</li>
-      </ol>
+      </ol>`;
+      })()}
     </div>
 
     <h2>10. Délais d'accès</h2>
