@@ -2448,7 +2448,28 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
         `;
       })()}
     </div>
-    ` : ""}
+    ` : (() => {
+      // Pour les AF avec une certification RS (Répertoire Spécifique),
+      // on ajoute également une section Débouchés professionnels.
+      const rncp = f.codeRNCP ? getRNCPByCode(f.codeRNCP) : undefined;
+      const isRS = rncp?.code?.toUpperCase().startsWith("RS");
+      if (!isRS) return "";
+      const metiers = rncp?.typesEmplois && rncp.typesEmplois.length > 0
+        ? rncp.typesEmplois
+        : ["Métiers en lien direct avec la certification visée"];
+      const rome = rncp?.codesROME && rncp.codesROME.length > 0 ? rncp.codesROME : [];
+      return `
+    <h2>17. Débouchés professionnels</h2>
+    <div class="section section-green">
+      <p><strong>À l'issue de la formation, le stagiaire pourra exercer ou évoluer vers les métiers suivants :</strong></p>
+      <ul>${metiers.map(m => `<li>${m}</li>`).join("")}</ul>
+      ${rome.length > 0 ? `<p style="margin-top:10px"><strong>Codes ROME associés :</strong> ${rome.join(", ")}</p>` : ""}
+      ${rncp?.secteursActivite ? `<p style="margin-top:10px"><strong>Secteurs d'activité :</strong> ${rncp.secteursActivite}</p>` : ""}
+      <p style="margin-top:10px"><strong>Poursuite de parcours :</strong> certifications complémentaires, spécialisations métier, blocs de compétences associés ou montée en niveau dans le même secteur.</p>
+      <p style="margin-top:8px"><em>Informations issues de la fiche officielle France Compétences ${rncp?.code}.</em></p>
+    </div>
+      `;
+    })()}
 
     <div class="section section-orange" style="margin-top:25px">
       <p><strong>📋 Documents remis ${isCFA ? "à l'apprenti" : "au stagiaire"} :</strong></p>
