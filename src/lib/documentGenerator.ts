@@ -52,30 +52,22 @@ export function isECSRFormation(f: FormationInfo): boolean {
 }
 
 
-/** Retourne la chaîne d'horaires d'affichage selon la formation et le jour de semaine (0=dim, 6=sam). */
-export function getHorairesLabel(f: FormationInfo, dow?: number): string {
-  if (isECSRFormation(f)) {
-    if (dow === 6) return "09h00 – 12h30 / 13h30 – 17h30";
-    return "18h00 – 22h00 (cours du soir)";
-  }
-  return "09h00 – 12h30 / 13h30 – 17h00";
+/** Retourne la chaîne d'horaires d'affichage selon le jour de semaine (0=dim, 6=sam).
+ * Règle globale : cours du soir Lun-Ven 18h00–22h00, samedi 09h00–12h30 / 13h30–17h30. */
+export function getHorairesLabel(_f: FormationInfo, dow?: number): string {
+  if (dow === 6) return "09h00 – 12h30 / 13h30 – 17h30";
+  return "18h00 – 22h00 (cours du soir)";
 }
 
 /** Renvoie les blocs d'émargement d'une journée pour la formation. */
-export function getEmargementBlocs(f: FormationInfo, dow?: number): { label: string; horaire: string }[] {
-  if (isECSRFormation(f)) {
-    if (dow === 6) {
-      return [
-        { label: "Matin", horaire: "09h00 – 12h30" },
-        { label: "Après-midi", horaire: "13h30 – 17h30" },
-      ];
-    }
-    return [{ label: "Soirée", horaire: "18h00 – 22h00" }];
+export function getEmargementBlocs(_f: FormationInfo, dow?: number): { label: string; horaire: string }[] {
+  if (dow === 6) {
+    return [
+      { label: "Matin", horaire: "09h00 – 12h30" },
+      { label: "Après-midi", horaire: "13h30 – 17h30" },
+    ];
   }
-  return [
-    { label: "Matin", horaire: "09h00 – 12h30" },
-    { label: "Après-midi", horaire: "13h30 – 17h00" },
-  ];
+  return [{ label: "Soirée", horaire: "18h00 – 22h00" }];
 }
 export function getFullCatalog(org: OrganismeInfo, userFormation: FormationInfo, userStagiaires: StagiaireInfo[]): DocEntry[] {
   // Use only the single selected formation (merged with sample defaults if needed)
@@ -1750,12 +1742,11 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
       const isLastDay = d === nbJours - 1;
       const rows: string[][] = [];
 
-      if (ecsrFormation) {
-        // Alterne soirée semaine (4h) et samedi journée (7h30) — démarre en semaine
-        const isSamedi = d % 6 === 5; // 1 samedi tous les 6 jours environ
+      // Toutes les formations : cours du soir Lun-Ven (4h) + samedi journée (7h30)
+      {
+        const isSamedi = d % 6 === 5;
         const dayTitle = `Séance ${d + 1} – ${isFirstDay ? "Découverte et fondamentaux" : isLastDay ? "Approfondissement et évaluation finale" : "Pratique et progression"} ${isSamedi ? "(samedi – 7h30)" : "(soirée – 4h)"}`;
         if (isSamedi) {
-          // Samedi 9h-12h30 / 13h30-17h30
           if (isFirstDay) {
             rows.push(["09h00 – 09h30", "Accueil, présentation de la formation et tour de table"]);
             rows.push(["09h30 – 10h45", dayTopics[0] ? `${dayTopics[0]} et test de positionnement début` : `Introduction à ${formationName} et test de positionnement début`]);
@@ -1776,7 +1767,6 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
             rows.push(["16h45 – 17h30", `Synthèse de la séance et préparation de la suivante`]);
           }
         } else {
-          // Soirée semaine 18h-22h (4h)
           if (isFirstDay) {
             rows.push(["18h00 – 18h15", "Accueil et présentation de la formation"]);
             rows.push(["18h15 – 19h45", dayTopics[0] ? `${dayTopics[0]} et test de positionnement début` : `Introduction à ${formationName} et test de positionnement`]);
@@ -1795,34 +1785,6 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
         dayBlocks.push({ title: dayTitle, rows });
         continue;
       }
-
-      const dayTitle = `Jour ${d + 1} – ${isFirstDay ? "Découverte et fondamentaux" : isLastDay ? "Approfondissement et évaluation finale" : `Jour ${d + 1} – Pratique et progression`} (7 heures)`;
-
-      // Morning
-      if (isFirstDay) {
-        rows.push(["09h00 – 09h30", "Accueil, présentation de la formation, des objectifs et tour de table"]);
-        rows.push(["09h30 – 10h30", dayTopics[0] ? `${dayTopics[0]} et test de positionnement début` : `Introduction à ${formationName} et test de positionnement début`]);
-      } else {
-        rows.push(["09h00 – 09h30", "Accueil, rappel des acquis de la veille et objectifs du jour"]);
-        rows.push(["09h30 – 10h30", dayTopics[0] || fillers[d % fillers.length]]);
-      }
-      rows.push(["10h30 – 11h00", "Pause"]);
-      rows.push(["11h00 – 12h30", dayTopics[1] || (dayTopics[0] ? `Approfondissement : ${dayTopics[0]}` : fillers[(d + 1) % fillers.length])]);
-
-      // Afternoon
-      rows.push(["12h30 – 13h30", "Pause déjeuner"]);
-      rows.push(["13h30 – 15h00", dayTopics[2] || fillers[(d + 2) % fillers.length]]);
-      rows.push(["15h00 – 15h15", "Pause"]);
-
-      if (isLastDay) {
-        rows.push(["15h15 – 16h30", "Test de positionnement fin de formation et évaluation finale"]);
-        rows.push(["16h30 – 17h00", "Grille d'acquisition des compétences, bilan de formation et remise des attestations"]);
-      } else {
-        rows.push(["15h15 – 16h30", dayTopics[3] || fillers[(d + 3) % fillers.length]]);
-        rows.push(["16h30 – 17h00", `Synthèse de la journée, questions-réponses et préparation du jour ${d + 2}`]);
-      }
-
-      dayBlocks.push({ title: dayTitle, rows });
     }
   }
 
@@ -2239,7 +2201,7 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
     <div class="section">
       <p><strong>Durée totale :</strong> ${displayDuree}${!isBlocFormation ? ` (${nbJours} jour${nbJours > 1 ? "s" : ""})` : ""}</p>
       ${hasIndiv ? sessionsHtml : ""}
-      <p><strong>Horaires :</strong> ${isECSRFormation(f) ? "Lundi au vendredi : 18h00 – 22h00 (cours du soir) &nbsp;|&nbsp; Samedi : 09h00 – 12h30 / 13h30 – 17h30" : "09h00 – 12h30 / 13h30 – 17h00"}</p>
+      <p><strong>Horaires :</strong> Lundi au vendredi : 18h00 – 22h00 (cours du soir) &nbsp;|&nbsp; Samedi : 09h00 – 12h30 / 13h30 – 17h30</p>
       <p><strong>Modalité :</strong> ${modaliteLabel}</p>
       <p><strong>Lieu de formation :</strong> ${f.lieu || `${o.adresse}, ${o.codePostal} ${o.ville}`}</p>
       <p><strong>Nombre de participants :</strong> ${nbStagiaires}</p>
@@ -2756,7 +2718,7 @@ function genLivretAccueil(o: OrganismeInfo, f: FormationInfo) {
   return buildDocument({ org: o, title: "LIVRET D'ACCUEIL", subtitle: f.intitule, sections: [
     { heading: "Bienvenue !", content: `<p>Nous sommes heureux de vous accueillir pour la formation « ${f.intitule} ». Ce livret contient les informations essentielles.</p>` },
     { heading: "Vos contacts", content: `<p><strong>Direction :</strong> ${o.dirigeant}<br><strong>Pédagogie :</strong> ${o.responsablePedagogique}<br><strong>Handicap :</strong> ${o.referentHandicap}<br><strong>Qualité :</strong> ${o.referentQualite}<br>${o.telephone?.trim() ? `<strong>Tél :</strong> ${o.telephone}<br>` : ""}<strong>Email :</strong> ${o.email}</p>` },
-    { heading: "Votre formation", content: `<p><strong>Durée :</strong> À définir selon le groupe<br><strong>Lieu :</strong> ${f.lieu}<br><strong>Formateur :</strong> ${f.formateur}<br><strong>Horaires :</strong> ${isECSRFormation(f) ? "Lun-Ven 18h00-22h00 / Samedi 09h00-12h30 et 13h30-17h30" : "9h00-12h30 / 13h30-17h00"}</p>` },
+    { heading: "Votre formation", content: `<p><strong>Durée :</strong> À définir selon le groupe<br><strong>Lieu :</strong> ${f.lieu}<br><strong>Formateur :</strong> ${f.formateur}<br><strong>Horaires :</strong> Lun-Ven 18h00-22h00 / Samedi 09h00-12h30 et 13h30-17h30</p>` },
     { heading: "Informations pratiques", content: "<p>• Merci de vous munir de cette convocation<br>• En cas d'absence, prévenir" + (o.telephone?.trim() ? ` au ${o.telephone}` : "") + "<br>• Le règlement intérieur vous sera remis le premier jour</p>" },
   ] });
 }
@@ -2808,7 +2770,7 @@ function genEmargementJour(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
   const ecsr = isECSRFormation(f);
   // Heuristique : alterner samedi tous les 6 jours (cohérent avec déroulé pédagogique ECSR)
   const isSamedi = ecsr && jour % 6 === 5;
-  const blocs = ecsr ? (isSamedi ? [{ label: 'Matin', horaire: '09h00 – 12h30' }, { label: 'Après-midi', horaire: '13h30 – 17h30' }] : [{ label: 'Soirée', horaire: '18h00 – 22h00' }]) : [{ label: 'Matin', horaire: '09h00 – 12h30' }, { label: 'Après-midi', horaire: '13h30 – 17h00' }];
+  const blocs = isSamedi ? [{ label: 'Matin', horaire: '09h00 – 12h30' }, { label: 'Après-midi', horaire: '13h30 – 17h30' }] : [{ label: 'Soirée', horaire: '18h00 – 22h00' }];
   const sigHeaders = blocs.map(b => `Signature ${b.label} (${b.horaire})`);
   const rows = stagiaires.slice(0, 10).map(s => {
     const sig = `Signé ${s.prenom[0]}.${s.nom}`;
@@ -3713,7 +3675,7 @@ function genConditionsAccueil(o: OrganismeInfo, f: FormationInfo) {
   return buildDocument({ org: o, title: "FICHE CONDITIONS D'ACCUEIL", subtitle: f.intitule, formation: f, showFormationInfo: true, sections: [
     { heading: "Locaux", content: `<p>Adresse : ${f.lieu}<br>Accès : Métro, bus, parking<br>Accessibilité PMR : ✅ Oui<br>Wifi : ✅ Disponible</p>` },
     { heading: "Équipements", content: `<p>${f.moyensPedagogiques}</p>` },
-    { heading: "Horaires", content: isECSRFormation(f) ? "<p><strong>Cours du soir (lundi au vendredi) :</strong> 18h00 – 22h00 (4 h)<br><strong>Samedi :</strong> 09h00 – 12h30 et 13h30 – 17h30 (7 h 30)<br>Pause déjeuner du samedi : 12h30 – 13h30</p>" : "<p>Matin : 9h00 – 12h30<br>Après-midi : 13h30 – 17h00<br>Pause déjeuner : 12h30 – 13h30</p>" },
+    { heading: "Horaires", content: "<p><strong>Cours du soir (lundi au vendredi) :</strong> 18h00 – 22h00 (4 h)<br><strong>Samedi :</strong> 09h00 – 12h30 et 13h30 – 17h30 (7 h 30)<br>Pause déjeuner du samedi : 12h30 – 13h30</p>" },
   ] });
 }
 
