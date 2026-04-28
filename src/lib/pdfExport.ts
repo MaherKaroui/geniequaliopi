@@ -213,6 +213,36 @@ function pageHasRenderableContent(page: HTMLDivElement): boolean {
   return Boolean(content.querySelector("img, svg, canvas, table, input, textarea"));
 }
 
+function isSubstantiveElement(el: Element): boolean {
+  if (el.textContent?.trim()) return true;
+  return Boolean(el.querySelector("img, svg, canvas, table, input, textarea"));
+}
+
+function contentOnlyHasHeadings(content: Element): boolean {
+  const children = Array.from(content.children).filter(isSubstantiveElement);
+  return children.length > 0 && children.every((el) => /^H[1-4]$/.test(el.tagName));
+}
+
+function pageOnlyHasOrphanHeading(page: HTMLDivElement): boolean {
+  const content = page.querySelector(".pdf-root");
+  return !!content && contentOnlyHasHeadings(content);
+}
+
+function nodeFitsOnFreshPage(
+  host: HTMLDivElement,
+  node: Node,
+  footerHtml: string,
+  footerHeightPx: number,
+  pageWPx: number,
+  pageHPx: number
+): boolean {
+  const probe = createPage(host, footerHtml, footerHeightPx, pageWPx, pageHPx);
+  probe.content.appendChild(node.cloneNode(true));
+  const fits = probe.content.scrollHeight <= probe.content.clientHeight + 1;
+  host.removeChild(probe.page);
+  return fits;
+}
+
 export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptions = {}): Promise<Blob> {
   const {
     scale = 2,
@@ -387,7 +417,7 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
           const nextNode = nodes[index + 1];
           // Skip pure page-break markers (they don't have visual content)
           const nextBehavior = getPageBreakBehavior(nextNode);
-          if (!nextBehavior.markerOnly && !nextBehavior.before) {
+          if (!nextBehavior.markerOnly && !nextBehavior.before && nodeFitsOnFreshPage(host, nextNode, footerHtml, footerHeightPx, PAGE_W_PX, PAGE_H_PX)) {
             const nextClone = nextNode.cloneNode(true);
             current.content.appendChild(nextClone);
             if (current.content.scrollHeight > current.content.clientHeight + 1) {
@@ -412,7 +442,7 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
     }
 
     // Drop accidental blank pages caused by oversized sections/page-break markers.
-    const renderPages = pages.filter(pageHasRenderableContent);
+    const renderPages = pages.filter((page, index) => pageHasRenderableContent(page) && !(index > 0 && pageOnlyHasOrphanHeading(page)));
     if (renderPages.length === 0) {
       renderPages.push(createPage(host, footerHtml, footerHeightPx, PAGE_W_PX, PAGE_H_PX).page);
     }

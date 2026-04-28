@@ -1684,6 +1684,16 @@ export function genContratSousTraitanceV2(o: OrganismeInfo, f: FormationInfo, st
   const stagList = stagiaires.map(s => `${s.prenom} ${s.nom}${s.poste ? ' – ' + s.poste : ''}`).join(', ') || "___";
   const dateMaj = (o as any).dateMaj ? new Date((o as any).dateMaj).toLocaleDateString("fr-FR") : new Date().toLocaleDateString("fr-FR");
   const formateurNom = f.formateur || "";
+  const firstSession = stagiaires[0];
+  const formationTitle = f.intitule || "Formation professionnelle continue";
+  const formationType = (f as any).typeFormation || formationTitle;
+  const formationDuration = (firstSession as any)?.duree || f.duree || "À définir selon le groupe";
+  const formationDates = firstSession?.dateDebutFormation && firstSession?.dateFinFormation
+    ? `Du ${formatDate(firstSession.dateDebutFormation)} au ${formatDate(firstSession.dateFinFormation)}`
+    : f.dateDebut && f.dateFin
+      ? `Du ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)}`
+      : "Sessions : Dates individuelles par stagiaire";
+  const formationHours = (firstSession as any)?.horaires || (f as any).horaires || "De 9h00 à 12h30 et de 13h30 à 17h00";
   // Find the matching stagiaire for this formateur to get their specific signature
   const matchingStagiaire = stagiaires.find(s => s.formateur === formateurNom);
   const fmtSigUrl = matchingStagiaire?.formateurSignatureUrl || f.formateurSignatureUrl;
@@ -1768,14 +1778,14 @@ export function genContratSousTraitanceV2(o: OrganismeInfo, f: FormationInfo, st
     { heading: "ARTICLE 2 – DESCRIPTION DE LA FORMATION", content: `
       <table>
         <tr><th style="width:40%">Élément</th><th>Détail</th></tr>
-        <tr><td><strong>Intitulé de la formation</strong></td><td>${f.intitule}</td></tr>
-        <tr><td><strong>Type de formation</strong></td><td>${f.intitule || "Formation professionnelle continue"}</td></tr>
+        <tr><td><strong>Intitulé de la formation</strong></td><td>${formationTitle}</td></tr>
+        <tr><td><strong>Type de formation</strong></td><td>${formationType}</td></tr>
         <tr><td><strong>Public visé</strong></td><td>${f.publicVise || "Adultes"}</td></tr>
-        <tr><td><strong>Durée totale</strong></td><td>${f.duree || "À définir selon le groupe"}</td></tr>
-        <tr><td><strong>Dates prévisionnelles</strong></td><td>${f.dateDebut && f.dateFin ? `Du ${new Date(f.dateDebut).toLocaleDateString("fr-FR")} au ${new Date(f.dateFin).toLocaleDateString("fr-FR")}` : "Sessions : Dates individuelles par stagiaire"}</td></tr>
+        <tr><td><strong>Durée totale</strong></td><td>${formationDuration}</td></tr>
+        <tr><td><strong>Dates prévisionnelles</strong></td><td>${formationDates}</td></tr>
         <tr><td><strong>Modalités</strong></td><td>${f.modalites || "Présentiel et/ou distanciel (à adapter selon les besoins)"}</td></tr>
         <tr><td><strong>Lieu de formation</strong></td><td>${f.lieu || `${o.adresse}, ${o.codePostal} ${o.ville}`}</td></tr>
-        <tr><td><strong>Horaires</strong></td><td>${(f as any).horaires || "De 9h00 à 12h30 et de 13h30 à 17h00 (susceptibles d'être adaptés selon les contraintes pédagogiques)"}</td></tr>
+        <tr><td><strong>Horaires</strong></td><td>${formationHours}</td></tr>
       </table>
       <p style="margin-top:10px"><strong>Modules de formation :</strong></p>
       <ul>
