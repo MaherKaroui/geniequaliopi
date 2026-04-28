@@ -2441,6 +2441,36 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
       <p style="margin-top:10px"><em>Une attestation de fin de formation et un certificat de réalisation seront remis à chaque stagiaire ayant suivi l'intégralité de la formation.</em></p>
     </div>
 
+    ${(() => {
+      const tProg = (f.intitule || "").toLowerCase();
+      const isVTCProg = tProg.includes("vtc") || tProg.includes("conducteur") || tProg.includes("transport de personnes") || tProg.includes("t3p") || tProg.includes("chauffeur");
+      if (!isVTCProg) return "";
+      return `
+    <h2>13 bis. Modalités d'examen – Certification RS5637</h2>
+    <div class="section section-green">
+      <p>Les modalités d'évaluation de la certification <strong>RS5637</strong> reposent sur la réussite à un <strong>examen obligatoire organisé par les Chambres de Métiers et de l'Artisanat (CMA)</strong>, composé de deux phases complémentaires : une épreuve théorique d'admissibilité et une épreuve pratique d'admission.</p>
+      <p><strong>1. Épreuve théorique d'admissibilité</strong></p>
+      <p>Elle se déroule sous forme d'exercices écrits comprenant des <strong>questionnaires à choix multiples (QCM)</strong> et des <strong>questions à réponses courtes (QRC)</strong>, permettant d'évaluer les connaissances du candidat en :</p>
+      <ul>
+        <li>Réglementation du transport public particulier de personnes (T3P)</li>
+        <li>Gestion d'entreprise (statuts juridiques, fiscalité, comptabilité)</li>
+        <li>Sécurité routière</li>
+        <li>Langue française et langue anglaise (niveau A2)</li>
+        <li>Développement commercial et relation client</li>
+      </ul>
+      <p><strong>2. Épreuve pratique d'admission</strong></p>
+      <p>Elle consiste en une <strong>mise en situation professionnelle réelle de transport de personnes</strong>, incluant :</p>
+      <ul>
+        <li>Une phase de conduite en circulation (évaluation de la sécurité de conduite, du respect du code de la route et du confort passager)</li>
+        <li>Une simulation de prise en charge client (accueil, qualité de service, relation client, gestion d'incident)</li>
+      </ul>
+      <p>La validation de la certification est conditionnée par la <strong>réussite aux deux épreuves</strong>, conformément au référentiel fixé par <strong>l'arrêté du 6 avril 2017</strong>.</p>
+      <p style="margin-top:10px"><strong>Tarif de l'examen :</strong> 241 € (à régler directement auprès de la Chambre de Métiers et de l'Artisanat, non inclus dans le tarif de la formation).</p>
+      <p><strong>Organisateur :</strong> Chambres de Métiers et de l'Artisanat (CMA)</p>
+      <p><strong>Plus d'informations :</strong> <a href="https://www.artisanat.fr/nous-connaitre/vous-accompagner/examens-taxi-vtc-vmdtr" style="color:hsl(220,60%,50%)">https://www.artisanat.fr/nous-connaitre/vous-accompagner/examens-taxi-vtc-vmdtr</a></p>
+    </div>`;
+    })()}
+
     ${ntcBlocsHtml}
 
     <h2>14. Accessibilité aux personnes en situation de handicap</h2>
