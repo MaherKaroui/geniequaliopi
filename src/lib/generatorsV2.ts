@@ -762,7 +762,7 @@ export function genExercicesStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
   let totalMax = 0;
   const notesRecap: { titre: string; note: number; max: number }[] = [];
 
-  // Build a truly unique profile per stagiaire for realistic note distribution
+  // Profils — le 'style' contient des marqueurs (e)/ve//se résolus selon la civilité du stagiaire
   const profiles: Array<{ baseNote: number; strengths: string; weakness: string; style: string; strengthsEN: string; weaknessEN: string; styleEN: string }> = [
     { baseNote: 4.5, strengths: "méthodologie et rigueur", weakness: "gestion du temps", style: "méthodique et structuré(e)", strengthsEN: "methodology and rigour", weaknessEN: "time management", styleEN: "methodical and well-structured" },
     { baseNote: 5, strengths: "créativité et autonomie", weakness: "aucune difficulté majeure", style: "autonome et proactif/ve", strengthsEN: "creativity and independence", weaknessEN: "no major difficulty", styleEN: "independent and proactive" },
@@ -775,7 +775,32 @@ export function genExercicesStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
     { baseNote: 5, strengths: "compréhension rapide", weakness: "aucune difficulté majeure", style: "rapide et intuitif/ve", strengthsEN: "quick understanding", weaknessEN: "no major difficulty", styleEN: "quick and intuitive" },
     { baseNote: 4, strengths: "curiosité et questionnement", weakness: "quelques imprécisions mineures", style: "curieux/se et engagé(e)", strengthsEN: "curiosity and questioning", weaknessEN: "minor inaccuracies", styleEN: "curious and engaged" },
   ];
-  const profile = profiles[stagiaireIdx % profiles.length];
+  const rawProfile = profiles[stagiaireIdx % profiles.length];
+
+  // Genre déduit auto depuis s.civilite (fallback : terminaison du prénom)
+  const isFem = (() => {
+    if (s.civilite === "Mme") return true;
+    if (s.civilite === "M.") return false;
+    const p = (s.prenom || "").trim().toLowerCase();
+    return p.endsWith("a") || p.endsWith("e");
+  })();
+
+  // Résout les marqueurs (e) /ve /se → forme correcte selon le genre
+  const adaptGender = (txt: string): string => {
+    if (isFem) {
+      return txt
+        .replace(/\(e\)/g, "e")              // structuré(e) → structurée
+        .replace(/\/ve\b/g, "ve")             // proactif/ve → proactive ; intuitif/ve → intuitive ; attentif/ve → attentive
+        .replace(/\/se\b/g, "se");            // sérieux/se → sérieuse ; rigoureux/se → rigoureuse
+    }
+    // Masculin : suppression simple des marqueurs
+    return txt
+      .replace(/\(e\)/g, "")                  // structuré(e) → structuré
+      .replace(/\/ve\b/g, "")                 // proactif/ve → proactif
+      .replace(/\/se\b/g, "");                // sérieux/se → sérieux ; rigoureux/se → rigoureux
+  };
+
+  const profile = { ...rawProfile, style: adaptGender(rawProfile.style) };
 
   // ====== QCM PARSER : détecte le format "1) … A) … B) … C) … D) …" ======
   const parseQCM = (consigne: string, reponseAttendue: string): { questions: { num: number; enonce: string; options: string[] }[]; correct: string[] } | null => {
