@@ -2471,6 +2471,11 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
         <li>Une simulation de prise en charge client (accueil, qualité de service, relation client, gestion d'incident)</li>
       </ul>
       <p>La validation de la certification est conditionnée par la <strong>réussite aux deux épreuves</strong>, conformément au référentiel fixé par <strong>l'arrêté du 6 avril 2017</strong>.</p>
+      <p style="margin-top:10px"><strong>Durée totale de l'examen :</strong></p>
+      <ul>
+        <li><strong>Épreuve théorique :</strong> 3h50</li>
+        <li><strong>Épreuve pratique :</strong> environ 25 minutes</li>
+      </ul>
       <p style="margin-top:10px"><strong>Tarif de l'examen :</strong> 241 € (à régler directement auprès de la Chambre de Métiers et de l'Artisanat, non inclus dans le tarif de la formation).</p>
       <p><strong>Organisateur :</strong> Chambres de Métiers et de l'Artisanat (CMA)</p>
       <p><strong>Plus d'informations :</strong> <a href="https://www.artisanat.fr/nous-connaitre/vous-accompagner/examens-taxi-vtc-vmdtr" style="color:hsl(220,60%,50%)">https://www.artisanat.fr/nous-connaitre/vous-accompagner/examens-taxi-vtc-vmdtr</a></p>
