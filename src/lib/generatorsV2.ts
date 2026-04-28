@@ -3,10 +3,13 @@ import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { buildDocument, tableHTML, formatDate, subtractBusinessDays, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif, getStagiaireDuree, isFormationTerminee } from "./docBuilder";
 import { EVAL_SCORES, getFormationDays, CONNECTION_TIMES_6H, CONNECTION_TIMES_7H, parseDuree } from "./sampleData";
 
-function getHoraireFin(f: FormationInfo): string {
-  const { hoursPerDay } = parseDuree(f.duree);
-  return hoursPerDay <= 6 ? "16h00" : "17h00";
+function getHoraireFin(_f: FormationInfo): string {
+  // Conservé pour compatibilité — non utilisé dans l'affichage des horaires (cours du soir)
+  return "22h00";
 }
+
+const HORAIRES_TEXTE = "Lundi au vendredi : 18h00 – 22h00 (cours du soir) | Samedi : 09h00 – 12h30 et 13h30 – 17h30";
+const HORAIRES_LIGNE = "Lun-Ven 18h00–22h00 / Samedi 09h00–12h30 et 13h30–17h30";
 import { getEvalContent, generateStagiaireAnswers, computeQCMScore, getQuestionsOuvertes, generateStagiaireOpenAnswers } from "./evalContent";
 import { getRNCPByCode } from "./rncpData";
 
