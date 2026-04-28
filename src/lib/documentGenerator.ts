@@ -2468,6 +2468,8 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
       <p style="margin-top:10px"><strong>Tarif de l'examen :</strong> 241 € (à régler directement auprès de la Chambre de Métiers et de l'Artisanat, non inclus dans le tarif de la formation).</p>
       <p><strong>Organisateur :</strong> Chambres de Métiers et de l'Artisanat (CMA)</p>
       <p><strong>Plus d'informations :</strong> <a href="https://www.artisanat.fr/nous-connaitre/vous-accompagner/examens-taxi-vtc-vmdtr" style="color:hsl(220,60%,50%)">https://www.artisanat.fr/nous-connaitre/vous-accompagner/examens-taxi-vtc-vmdtr</a></p>
+      <p><strong>Création de compte et inscription à l'examen :</strong> <a href="https://www.exament3p.fr/inscription?code=VTC" style="color:hsl(220,60%,50%)">https://www.exament3p.fr/inscription?code=VTC</a></p>
+      <p><em>Le candidat doit créer son compte personnel sur la plateforme officielle EXAMEN T3P, puis s'inscrire à une session d'examen VTC. Le centre de formation accompagne le stagiaire dans cette démarche en amont du passage des épreuves.</em></p>
     </div>`;
     })()}
 
