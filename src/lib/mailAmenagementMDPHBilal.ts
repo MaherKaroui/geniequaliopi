@@ -51,13 +51,17 @@ export function genMailAmenagementMDPHBilal(
 
   // Pièce jointe pour le mail du stagiaire
   const pjHtml = `
-    <div style="display:inline-flex;align-items:center;border:1px solid #e1dfdd;border-radius:4px;background:#faf9f8;padding:8px 14px;margin:6px 0 14px;">
-      <div style="width:28px;height:28px;background:#d13438;color:#fff;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;margin-right:10px;">PDF</div>
-      <div style="font-size:13px;color:#201f1e;">
-        <div style="font-weight:600;">Certificat médical MDPH - Bilal NOUIRA.pdf</div>
-        <div style="color:#605e5c;font-size:11px;">142 Ko</div>
-      </div>
-    </div>
+    <table style="border-collapse:collapse;border:1px solid #e1dfdd;background:#faf9f8;margin:8px 0 14px;">
+      <tr>
+        <td style="padding:8px 10px 8px 12px;vertical-align:middle;">
+          <div style="width:28px;height:28px;background:#d13438;color:#fff;border-radius:2px;text-align:center;line-height:28px;font-size:10px;font-weight:700;">PDF</div>
+        </td>
+        <td style="padding:8px 14px 8px 4px;vertical-align:middle;font-size:12.5px;color:#201f1e;">
+          <div style="font-weight:600;">Certificat médical MDPH - Bilal NOUIRA.pdf</div>
+          <div style="color:#605e5c;font-size:11px;">142 Ko</div>
+        </td>
+      </tr>
+    </table>
   `;
 
   const renderMail = (opts: {
@@ -69,37 +73,39 @@ export function genMailAmenagementMDPHBilal(
     dateHeader: string;
     body: string;
   }) => `
-<div style="max-width:900px;margin:0 auto 28px;background:#ffffff;border:1px solid #edebe9;page-break-inside:avoid;">
-  <div style="background:#ffffff;border-bottom:1px solid #edebe9;padding:8px 16px;font-size:13px;color:#323130;display:flex;align-items:center;gap:18px;flex-wrap:wrap;">
-    <span style="color:#a4262c;">↩ Répondre à tous</span>
-    <span>✉ Lu / non lu</span>
-    <span style="color:#a4262c;">⚑ Marquer / démarquer</span>
-    <span>⊞</span>
-    <span>👥 Découvrez des groupes</span>
-    <span style="color:#a19f9d;">↶ Annuler</span>
-    <span style="margin-left:auto;">⋯</span>
+<div style="width:100%;max-width:760px;margin:0 auto 18px;background:#ffffff;border:1px solid #edebe9;page-break-inside:avoid;break-inside:avoid;">
+  <div style="background:#ffffff;border-bottom:1px solid #edebe9;padding:6px 14px;font-size:12px;color:#605e5c;">
+    <span style="color:#a4262c;margin-right:14px;">↩ Répondre à tous</span>
+    <span style="margin-right:14px;">✉ Lu / non lu</span>
+    <span style="color:#a4262c;margin-right:14px;">⚑ Marquer</span>
+    <span style="float:right;">⋯</span>
+    <div style="clear:both;"></div>
   </div>
 
-  <div style="padding:18px 24px;border-bottom:1px solid #edebe9;font-size:18px;font-weight:600;color:#201f1e;">
+  <div style="padding:14px 20px 10px;border-bottom:1px solid #edebe9;font-size:17px;font-weight:600;color:#201f1e;">
     ${escapeHtml(opts.sujet)}
   </div>
 
-  <div style="padding:14px 24px;display:flex;align-items:flex-start;gap:14px;border-bottom:1px solid #edebe9;">
-    <div style="width:40px;height:40px;border-radius:50%;background:${opts.fromColor};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:14px;flex-shrink:0;">
-      ${escapeHtml(opts.fromInitials)}
-    </div>
-    <div style="flex:1;font-size:13px;line-height:1.5;">
-      <div style="font-weight:600;color:#201f1e;">${escapeHtml(opts.fromName)}</div>
-      <div style="color:#605e5c;">À : ${escapeHtml(opts.toEmail)}</div>
-    </div>
-    <div style="font-size:12px;color:#605e5c;white-space:nowrap;">${escapeHtml(opts.dateHeader)}</div>
-  </div>
+  <table style="width:100%;border-collapse:collapse;border-bottom:1px solid #edebe9;">
+    <tr>
+      <td style="width:54px;padding:12px 0 12px 20px;vertical-align:top;">
+        <div style="width:38px;height:38px;border-radius:50%;background:${opts.fromColor};color:#fff;text-align:center;line-height:38px;font-weight:600;font-size:13px;">${escapeHtml(opts.fromInitials)}</div>
+      </td>
+      <td style="padding:12px 12px 12px 10px;vertical-align:top;font-size:13px;line-height:1.5;">
+        <div style="font-weight:600;color:#201f1e;">${escapeHtml(opts.fromName)}</div>
+        <div style="color:#605e5c;">À : ${escapeHtml(opts.toEmail)}</div>
+      </td>
+      <td style="padding:12px 20px 12px 0;vertical-align:top;text-align:right;font-size:12px;color:#605e5c;white-space:nowrap;">
+        ${escapeHtml(opts.dateHeader)}
+      </td>
+    </tr>
+  </table>
 
-  <div style="padding:18px 24px 24px;font-size:14px;line-height:1.7;color:#201f1e;">
+  <div style="padding:16px 20px 20px;font-size:13.5px;line-height:1.65;color:#201f1e;">
     ${opts.body}
-    <div style="margin-top:26px;">
-      <span style="display:inline-block;border:1px solid #d1d1d1;border-radius:2px;padding:6px 16px;margin-right:8px;font-size:13px;color:#a4262c;">↩ Répondre</span>
-      <span style="display:inline-block;border:1px solid #d1d1d1;border-radius:2px;padding:6px 16px;font-size:13px;color:#0078d4;">→ Transférer</span>
+    <div style="margin-top:18px;">
+      <span style="display:inline-block;border:1px solid #d1d1d1;border-radius:2px;padding:5px 14px;margin-right:6px;font-size:12px;color:#a4262c;">↩ Répondre</span>
+      <span style="display:inline-block;border:1px solid #d1d1d1;border-radius:2px;padding:5px 14px;font-size:12px;color:#0078d4;">→ Transférer</span>
     </div>
   </div>
 </div>`;
@@ -147,7 +153,7 @@ export function genMailAmenagementMDPHBilal(
 
   return `<!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8"><title>${escapeHtml(sujet1)}</title></head>
-<body style="margin:0;padding:24px;background:#faf9f8;font-family:'Segoe UI','Segoe UI Web',Arial,sans-serif;color:#201f1e;">
+<body style="margin:0;padding:16px;background:#faf9f8;font-family:'Segoe UI','Segoe UI Web',Arial,sans-serif;color:#201f1e;">
 ${mail1}
 ${mail2}
 </body></html>`;
