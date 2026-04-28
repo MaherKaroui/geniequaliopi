@@ -199,6 +199,13 @@ function getRenderableNodes(source: HTMLDivElement): ChildNode[] {
   });
 }
 
+function pageHasRenderableContent(page: HTMLDivElement): boolean {
+  const content = page.querySelector(".pdf-root");
+  if (!content) return false;
+  if (content.textContent?.trim()) return true;
+  return Boolean(content.querySelector("img, svg, canvas, table, input, textarea"));
+}
+
 export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptions = {}): Promise<Blob> {
   const {
     scale = 2,
@@ -324,13 +331,16 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
       }
 
       const clone = node.cloneNode(true);
+      const hadContentBeforeClone = current.content.childNodes.length > 0;
       current.content.appendChild(clone);
 
       // If current block overflows, move the whole block to next page
       if (current.content.scrollHeight > current.content.clientHeight + 1) {
         current.content.removeChild(clone);
-        current = createPage(host, footerHtml, footerHeightPx, PAGE_W_PX, PAGE_H_PX);
-        pages.push(current.page);
+        if (hadContentBeforeClone) {
+          current = createPage(host, footerHtml, footerHeightPx, PAGE_W_PX, PAGE_H_PX);
+          pages.push(current.page);
+        }
         current.content.appendChild(clone);
       } else {
         // "Keep with next": if this node is a heading (h1..h4) and the next renderable
@@ -366,23 +376,24 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
       }
     }
 
-    // Keep a single empty page if nothing was added
-    if (pages.length === 0) {
-      pages.push(createPage(host, footerHtml, footerHeightPx, PAGE_W_PX, PAGE_H_PX).page);
+    // Drop accidental blank pages caused by oversized sections/page-break markers.
+    const renderPages = pages.filter(pageHasRenderableContent);
+    if (renderPages.length === 0) {
+      renderPages.push(createPage(host, footerHtml, footerHeightPx, PAGE_W_PX, PAGE_H_PX).page);
     }
 
     const orientation = PAGE_W_MM > PAGE_H_MM ? "landscape" : "portrait";
     const pdf = new jsPDF({ unit: "mm", format: [PAGE_W_MM, PAGE_H_MM], orientation });
     const pxToMm = PAGE_W_MM / PAGE_W_PX;
 
-    for (let i = 0; i < pages.length; i++) {
+    for (let i = 0; i < renderPages.length; i++) {
       if (pageYieldMs > 0) {
         await yieldToBrowser(pageYieldMs);
       }
 
       if (i > 0) pdf.addPage();
 
-      const canvas = await html2canvas(pages[i], {
+      const canvas = await html2canvas(renderPages[i], {
         scale,
         useCORS: true,
         logging: false,
@@ -397,8 +408,8 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
       pdf.addImage(imgData, "JPEG", 0, 0, PAGE_W_MM, PAGE_H_MM);
 
       // Add clickable link annotations over the rasterized image
-      const anchors = pages[i].querySelectorAll("a[href]");
-      const pageRect = pages[i].getBoundingClientRect();
+      const anchors = renderPages[i].querySelectorAll("a[href]");
+      const pageRect = renderPages[i].getBoundingClientRect();
       anchors.forEach((anchor) => {
         const href = anchor.getAttribute("href");
         if (!href || !href.startsWith("http")) return;
@@ -421,8 +432,8 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
       canvas.height = 0;
 
       // Remove rendered page from DOM immediately to free memory
-      if (pages[i].parentNode) {
-        pages[i].parentNode.removeChild(pages[i]);
+      if (renderPages[i].parentNode) {
+        renderPages[i].parentNode.removeChild(renderPages[i]);
       }
     }
 
