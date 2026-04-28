@@ -254,6 +254,10 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
       const exIdx = params?.exerciceIdx ?? undefined;
       return genExercicesStagiaire(o, f, stagiaires, si, exIdx);
     }
+    case "examen_final_stagiaire": {
+      const si = params?.stagiaireIdx ?? 0;
+      return genExamenFinalStagiaire(o, f, stagiaires, si);
+    }
     case "grille_acquisition_stagiaire": {
       const si = params?.stagiaireIdx ?? 0;
       return genGrilleAcquisitionStagiaire(o, f, stagiaires, si);
