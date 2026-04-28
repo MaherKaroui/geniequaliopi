@@ -2,6 +2,7 @@ import { DocEntry, FormationInfo } from "@/types/qualiopi";
 import { StagiaireInfo } from "@/types/qualiopi";
 import { FormateurInfo, getFormationDays, parseDuree } from "./sampleData";
 import { getRNCPByCode } from "./rncpData";
+import { getEvalContent } from "./evalContent";
 
 export type ActionType = 'actions-formation' | 'bilans-competences' | 'vae' | 'apprentissage';
 
@@ -159,23 +160,33 @@ export function buildFullCatalog(
         add(`af_c3i11_test_debut_${fi}_${si}`, `CT3 - IND 11 TEST DÉBUT DE FORMATION – ${s.prenom} ${s.nom}`, 3, 11, "test_positionnement_debut_stagiaire", { fi, stagiaireIdx: si });
         add(`af_c3i11_test_fin_${fi}_${si}`, `CT3 - IND 11 TEST FIN DE FORMATION – ${s.prenom} ${s.nom}`, 3, 11, "test_positionnement_fin_stagiaire", { fi, stagiaireIdx: si });
 
-        if (hasBlocs) {
-          // Un fichier exercice par bloc de compétences
-          rncp!.blocsCompetences.forEach((bloc, blocIdx) => {
-            const blocLabel = bloc.titre.length > 50 ? bloc.titre.substring(0, 50) + '…' : bloc.titre;
-            add(`af_c3i11_exercices_${fi}_${si}_ex${blocIdx}`, `CT3 - IND 11 EXERCICES PRATIQUES (${blocLabel}) – ${s.prenom} ${s.nom}`, 3, 11, "exercices_stagiaire", { fi, stagiaireIdx: si, exerciceIdx: blocIdx });
-          });
+        // 1 fichier = 1 QCM. On utilise le nombre de QCM réels définis dans evalContent
+        // (10 pour VTC), avec un repli sur les blocs RNCP ou les jours pour les autres formations.
+        const evalData = getEvalContent(f.intitule);
+        const nbQcmContent = evalData?.exercices?.length || 0;
+        let nbQcm: number;
+        if (nbQcmContent > 0) {
+          nbQcm = nbQcmContent;
+        } else if (hasBlocs) {
+          nbQcm = rncp!.blocsCompetences.length;
         } else {
-          // Fallback: un fichier exercice par tranche de 2 jours
-          const nbExercices = Math.max(1, Math.ceil(nbJours / 2));
-          for (let exIdx = 0; exIdx < nbExercices; exIdx++) {
-            const jourDebut = exIdx * 2 + 1;
-            const jourFin = Math.min(exIdx * 2 + 2, nbJours);
-            // Skip single-day duplicates like "Jour 11-11"
-            if (jourDebut === jourFin && exIdx > 0) continue;
-            const label = nbExercices > 1 ? ` (Jour ${jourDebut}-${jourFin})` : '';
-            add(`af_c3i11_exercices_${fi}_${si}_ex${exIdx}`, `CT3 - IND 11 EXERCICES PRATIQUES${label} – ${s.prenom} ${s.nom}`, 3, 11, "exercices_stagiaire", { fi, stagiaireIdx: si, exerciceIdx: exIdx });
-          }
+          nbQcm = Math.max(1, Math.ceil(nbJours / 2));
+        }
+        for (let exIdx = 0; exIdx < nbQcm; exIdx++) {
+          const exTitle = evalData?.exercices?.[exIdx]?.titre;
+          const labelBase = exTitle
+            ? exTitle.replace(/^QCM\s*\d+\s*[—\-:]\s*/i, "").substring(0, 60)
+            : (hasBlocs && rncp!.blocsCompetences[exIdx]?.titre)
+              ? rncp!.blocsCompetences[exIdx].titre.substring(0, 50)
+              : `Partie ${exIdx + 1}`;
+          add(
+            `af_c3i11_exercices_${fi}_${si}_ex${exIdx}`,
+            `CT3 - IND 11 QCM ${exIdx + 1} - ${labelBase} – ${s.prenom} ${s.nom}`,
+            3,
+            11,
+            "exercices_stagiaire",
+            { fi, stagiaireIdx: si, exerciceIdx: exIdx }
+          );
         }
 
         add(`af_c3i11_grille_acquisition_${fi}_${si}`, `CT3 - IND 11 GRILLE D'ACQUISITION – ${s.prenom} ${s.nom}`, 3, 11, "grille_acquisition_stagiaire", { fi, stagiaireIdx: si });

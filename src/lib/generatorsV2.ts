@@ -664,7 +664,7 @@ export function genExercicesStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
   const hasBlocs = rncp && rncp.blocsCompetences && rncp.blocsCompetences.length > 0;
 
   let nbBlocks: number;
-  let EXERCICES_PER_BLOCK = 2;
+  let EXERCICES_PER_BLOCK = 1;
   let blocLabels: string[] = [];
 
   if (hasBlocs) {
@@ -748,11 +748,12 @@ export function genExercicesStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
     return lower.includes('anglais') || lower.includes('english') || lower.includes('toeic');
   })();
 
+  // QCM title (1 QCM per file, 10 sub-questions inside)
+  const qcmTitleLabel = selectedExercices[0]?.titre || `QCM`;
   let extra = `
-    <h2>ÉVALUATION FINALE – EXERCICES & JEUX${jourLabel} – FORMATION ${f.intitule.toUpperCase()}</h2>
+    <h2>QCM – ${qcmTitleLabel.toUpperCase()} – FORMATION ${f.intitule.toUpperCase()}</h2>
     <p><strong>Nom et prénom :</strong> ${s.prenom} ${s.nom}</p>
     <p><strong>Date :</strong> ${exerciseDate}</p>
-    <h3>PARTIE 1 – EXERCICES PRATIQUES</h3>
   `;
 
   const hash = (s.nom + s.prenom).split("").reduce((a: number, c: string) => a + c.charCodeAt(0), 0);
@@ -865,123 +866,50 @@ export function genExercicesStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
 
   });
 
-  // --- PARTIE 2 : JEUX PÉDAGOGIQUES ---
-  extra += `<div class="page-break"></div>`;
-  extra += `<h3>PARTIE 2 – JEUX PÉDAGOGIQUES</h3>`;
-
-  // Jeu 1 : Quiz Rapidité
-  const quizSeed = ((hash * 11 + stagiaireIdx * 7) & 0x7FFFFFFF) % 4;
-  const quizScore = 7 + ((stagiaireIdx * 3 + 5) % 4);
-  const quizBonus = stagiaireIdx % 3 === 0 ? 2 : 0;
-  const quizTotal = Math.min(12, quizScore + quizBonus);
-  extra += `<h4>Jeu 1 : Quiz Rapidité – Questions Flash</h4>`;
-  extra += `<div class="section"><p><strong>Règle du jeu :</strong> Le formateur pose 10 questions rapides sur les notions clés de la formation. Chaque participant dispose de 15 secondes pour répondre. 1 point par bonne réponse. Bonus de 2 points pour la réponse la plus rapide.</p></div>`;
-  extra += tableHTML(["Critère", "Résultat"], [
-    ["Score quiz (sur 10)", `${quizScore}/10`],
-    ["Bonus rapidité", quizBonus > 0 ? "+2 points" : "0"],
-    ["Total", `${quizTotal}/12`],
-    ["Résultat", quizTotal >= 9 ? "🏆 Excellent" : "✅ Validé"],
+  // --- SCORE & APPRÉCIATION FORMATEUR (1 QCM par fichier) ---
+  const exMoyenne = totalMax > 0 ? Math.round(totalNote / totalMax * 10 * 10) / 10 : 0;
+  const moyenneFinale = exMoyenne; // Single QCM = single score
+  extra += `<h3>SCORE FINAL DU QCM</h3>`;
+  extra += tableHTML(["Élément", "Résultat"], [
+    ["Total points obtenus", `${totalNote} / ${totalMax}`],
+    ["Note sur 10", `${moyenneFinale}/10`],
+    ["Décision", moyenneFinale >= 7 ? "✅ VALIDÉ – QCM acquis" : "⚠️ À consolider"],
   ]);
-  const quizComments = [
-    `${s.prenom} a fait preuve d'une réactivité exemplaire et a su mobiliser rapidement ses connaissances. Les réponses sont précises et témoignent d'une excellente mémorisation des notions clés.`,
-    `Très bonne performance de ${s.prenom} au quiz. La rapidité de réponse démontre une assimilation solide des concepts abordés en formation. Participation dynamique et enthousiaste.`,
-    `${s.prenom} a participé activement au quiz avec enthousiasme. Les bonnes réponses montrent une compréhension claire des fondamentaux. Quelques hésitations sur les questions avancées mais le résultat global est très satisfaisant.`,
-    `Participation active et résultats positifs pour ${s.prenom}. Le quiz confirme une bonne maîtrise des connaissances de base et une capacité à raisonner rapidement sous contrainte de temps.`,
-  ];
-  extra += `<p><em>Commentaire : ${quizComments[quizSeed]}</em></p>`;
 
-  // Jeu 2 : Jeu de Rôle / Mise en situation
-  extra += `<h4>Jeu 2 : Mise en Situation – Jeu de Rôle</h4>`;
-  const isSolo = stagiaires.length <= 1;
-  extra += `<div class="section"><p><strong>Règle du jeu :</strong> ${isSolo
-    ? `Le stagiaire doit résoudre un cas pratique en 20 minutes en mobilisant les compétences acquises. Le formateur évalue la pertinence, la créativité et la qualité de l'argumentation.`
-    : `En binôme, résoudre un cas pratique en 20 minutes en mobilisant les compétences acquises. Le formateur évalue la collaboration, la pertinence et la créativité.`
-  }</p></div>`;
-  const collab = 3 + ((stagiaireIdx * 2 + 1) % 3);
-  const pertin = 3 + ((stagiaireIdx * 3 + 2) % 3);
-  const creat = 3 + ((stagiaireIdx + 4) % 3);
-  const roleTotal = collab + pertin + creat;
-  extra += isSolo
-    ? tableHTML(["Critère", "Note"], [
-        ["Pertinence des réponses", `${pertin}/5`],
-        ["Créativité", `${creat}/5`],
-        ["Qualité de l'argumentation", `${collab}/5`],
-        ["Total", `${roleTotal}/15`],
-      ])
-    : tableHTML(["Critère", "Note"], [
-        ["Collaboration", `${collab}/5`],
-        ["Pertinence des réponses", `${pertin}/5`],
-        ["Créativité", `${creat}/5`],
-        ["Total", `${roleTotal}/15`],
-      ]);
-  const roleSeed = ((hash * 13 + stagiaireIdx * 11) & 0x7FFFFFFF) % 4;
-  const roleComments = isSolo ? [
-    `${s.prenom} a fait preuve d'une excellente capacité d'analyse et de synthèse durant la mise en situation. Les solutions proposées sont pertinentes et directement applicables en situation professionnelle chez ${s.entreprise || 'son entreprise'}.`,
-    `Très bonne prestation de ${s.prenom}. Les solutions avancées sont créatives et bien argumentées. ${s.prenom} a su structurer sa réflexion de manière méthodique et proposer des pistes concrètes.`,
-    `${s.prenom} a su mobiliser efficacement les acquis de la formation dans cette mise en situation. L'exercice a révélé des compétences transversales solides : communication, analyse et prise de décision.`,
-    `Participation active et pertinente de ${s.prenom}. Bonne gestion du temps imparti et capacité à hiérarchiser les priorités dans la résolution du cas pratique. Le livrable produit est de qualité.`,
-  ] : [
-    `${s.prenom} a montré un excellent esprit d'équipe et une capacité de synthèse remarquable durant le jeu de rôle. Les solutions proposées sont pertinentes et directement applicables en situation professionnelle chez ${s.entreprise || 'son entreprise'}.`,
-    `Très bonne participation de ${s.prenom}. Les solutions avancées sont créatives et bien argumentées. ${s.prenom} a su écouter son binôme tout en apportant des idées constructives. Le travail collaboratif est fluide et efficace.`,
-    `${s.prenom} a su mobiliser efficacement les acquis de la formation dans ce jeu de rôle. La mise en situation a révélé des compétences transversales solides : communication, analyse et prise de décision. Excellent travail d'équipe.`,
-    `Participation active et pertinente de ${s.prenom}. Bonne gestion du temps imparti et capacité à hiérarchiser les priorités dans la résolution du cas pratique. Le binôme a produit un livrable de qualité.`,
-  ];
-  extra += `<p><em>Commentaire : ${roleComments[roleSeed]}</em></p>`;
-
-  // --- BILAN GLOBAL ---
-  extra += `<div class="page-break"></div>`;
-  extra += `<h3>BILAN GLOBAL DE L'ÉVALUATION FINALE</h3>`;
-  const exMoyenne = Math.round(totalNote / totalMax * 10 * 10) / 10;
-  const quizSur10 = Math.round(quizTotal / 12 * 10 * 10) / 10;
-  const roleSur10 = Math.round(roleTotal / 15 * 10 * 10) / 10;
-  const moyenneFinale = Math.round((exMoyenne + quizSur10 + roleSur10) / 3 * 10) / 10;
-
-  extra += tableHTML(["Épreuve", "Note /10"], [
-    ["Exercices pratiques", `${exMoyenne}/10`],
-    ["Quiz Rapidité", `${quizSur10}/10`],
-    ["Jeu de Rôle", `${roleSur10}/10`],
-    ["MOYENNE FINALE", `${moyenneFinale}/10`],
-  ]);
-  extra += `<p><strong>Décision : ${moyenneFinale >= 7 ? '✅ VALIDÉ – Compétences acquises' : '⚠️ À consolider – Plan de progression recommandé'}</strong></p>`;
-
-  // Recap table for exercises
-  extra += `<h4>Détail des notes – Exercices pratiques</h4>`;
-  const recapRows = notesRecap.map(n => [n.titre, `${n.note} / ${n.max}`]);
-  extra += tableHTML(["Exercice", "Note"], recapRows);
-
-  // Global appreciation
+  // Global appreciation (single-QCM oriented)
   const avgPct = moyenneFinale * 10;
   const appSeed = ((hash * 29 + stagiaireIdx * 19) & 0x7FFFFFFF) % 5;
 
   const appreciationsFR = [
     [ // excellent (>=80%)
-      `${s.prenom} ${s.nom} a fait preuve d'une excellente maîtrise des compétences pratiques tout au long de la formation « ${f.intitule} ». Son profil ${profile.style} lui permet d'aborder les exercices avec assurance et efficacité. Les jeux pédagogiques ont révélé un dynamisme et une réactivité au-dessus de la moyenne. Les travaux rendus sont systématiquement de qualité professionnelle. ${s.prenom} est un(e) élément moteur du groupe. ${profile.strengths} est un atout majeur pour son poste de ${s.poste} chez ${s.entreprise}. Avis très favorable.`,
-      `Les résultats de ${s.prenom} ${s.nom} sont remarquables sur l'ensemble de l'évaluation finale : exercices, quiz et jeu de rôle. ${s.prenom} a su combiner ${profile.strengths} avec une capacité réelle de transfert en contexte professionnel. La progression est significative. Le travail fourni est exemplaire. Évaluation globale : Excellent.`,
-      `${s.prenom} ${s.nom} a brillamment réussi l'évaluation finale. Chaque épreuve démontre une compréhension approfondie et une autonomie remarquable. En tant que ${s.poste}, ${s.prenom} saura exploiter immédiatement ces acquis chez ${s.entreprise}. Félicitations.`,
-      `Excellent parcours pour ${s.prenom} ${s.nom}. L'engagement est constant, les résultats dépassent les objectifs tant sur les exercices que sur les jeux pédagogiques. ${s.prenom} est opérationnel(le) et autonome sur l'ensemble des compétences évaluées. Validation complète.`,
-      `${s.prenom} ${s.nom} termine cette évaluation avec un bilan élogieux. La constance dans l'excellence et la maturité professionnelle sont remarquables. Compétences pleinement acquises et validées.`,
+      `${s.prenom} ${s.nom} a brillamment réussi ce QCM. Les réponses témoignent d'une maîtrise solide des notions abordées dans la formation « ${f.intitule} ». ${profile.strengths} est un atout évident. Compétence pleinement acquise.`,
+      `Excellent résultat pour ${s.prenom} ${s.nom} sur ce QCM. La précision des réponses démontre une compréhension approfondie du sujet. Profil ${profile.style}. Validation sans réserve.`,
+      `${s.prenom} ${s.nom} a obtenu un score remarquable. Le QCM met en évidence une appropriation rigoureuse des connaissances. Félicitations.`,
+      `Très bonne performance de ${s.prenom} ${s.nom} sur ce QCM. ${profile.strengths} se confirme. Compétence validée avec distinction.`,
+      `${s.prenom} ${s.nom} démontre une excellente maîtrise des notions évaluées. QCM réussi avec un haut niveau de précision.`,
     ],
     [ // bon (60-80%)
-      `${s.prenom} ${s.nom} a suivi cette évaluation avec sérieux. Les exercices et les jeux sont globalement bien réussis, avec un profil ${profile.style}. Les compétences principales sont acquises, même si ${profile.weakness} mérite attention. Bilan positif.`,
-      `Bonne performance d'ensemble pour ${s.prenom} ${s.nom}. La formation a permis de développer des compétences solides. ${profile.strengths} est un point fort. Le quiz et le jeu de rôle confirment une bonne dynamique d'apprentissage. Encouragements.`,
-      `${s.prenom} ${s.nom} a atteint la majorité des objectifs. Le quiz et le jeu de rôle montrent une bonne capacité d'adaptation. Appréciation : Bien.`,
-      `Le bilan de ${s.prenom} ${s.nom} est positif. Les exercices et les jeux montrent une compréhension solide des fondamentaux. Quelques ajustements sur ${profile.weakness} permettront d'atteindre l'excellence.`,
-      `${s.prenom} ${s.nom} clôture cette évaluation avec un bilan encourageant. Les jeux pédagogiques ont révélé de bonnes compétences transversales. Appréciation globale : Bien.`,
+      `${s.prenom} ${s.nom} a obtenu un score satisfaisant sur ce QCM. Les notions principales sont acquises ; ${profile.weakness} reste un point à consolider. Bilan positif.`,
+      `Bonne performance de ${s.prenom} ${s.nom}. Les fondamentaux sont compris. Quelques erreurs ponctuelles à reprendre. ${profile.strengths} est un point fort.`,
+      `${s.prenom} ${s.nom} valide ce QCM avec un niveau correct. La majorité des questions sont traitées avec justesse. Encouragements.`,
+      `Le QCM est validé par ${s.prenom} ${s.nom}. Quelques points de vigilance sur ${profile.weakness} à retravailler en autonomie.`,
+      `${s.prenom} ${s.nom} clôture ce QCM avec un score encourageant. Compétence en bonne voie d'acquisition.`,
     ],
     [ // moyen (<60%)
-      `${s.prenom} ${s.nom} a participé activement malgré des résultats en-deçà des objectifs. ${profile.strengths} montre du potentiel. Plan de remédiation établi.`,
-      `Le parcours de ${s.prenom} ${s.nom} appelle un accompagnement complémentaire. Les jeux pédagogiques montrent de bonnes dispositions mais les exercices pratiques révèlent des lacunes sur ${profile.weakness}.`,
-      `${s.prenom} ${s.nom} a fourni des efforts mais les résultats restent fragiles. Dispositif de soutien mis en place.`,
-      `Le bilan de ${s.prenom} ${s.nom} est mitigé. Les jeux pédagogiques sont encourageants mais les exercices nécessitent un renforcement. Ressources de remédiation transmises.`,
-      `${s.prenom} ${s.nom} termine l'évaluation avec des acquis partiels. Plan d'action adapté mis en place. Accompagnement renforcé activé.`,
+      `${s.prenom} ${s.nom} a participé activement à ce QCM mais le score reste à consolider. Plan de remédiation prévu sur ${profile.weakness}.`,
+      `Le résultat de ${s.prenom} ${s.nom} appelle un accompagnement complémentaire. Reprise des notions clés programmée.`,
+      `${s.prenom} ${s.nom} a fourni des efforts mais les acquis sont partiels. Dispositif de soutien mis en place.`,
+      `Le QCM révèle des lacunes sur ${profile.weakness} pour ${s.prenom} ${s.nom}. Ressources de remédiation transmises.`,
+      `${s.prenom} ${s.nom} termine ce QCM avec des acquis partiels. Accompagnement renforcé activé.`,
     ],
   ];
 
   const appIdx = avgPct >= 80 ? 0 : avgPct >= 60 ? 1 : 2;
   extra += `<h3>Appréciation globale du formateur : ${f.formateur}, ${formatDate(getStagiaireDateFin(s, f))}</h3>`;
   extra += `<p>${appreciationsFR[appIdx][appSeed]}</p>`;
+  extra += `<p><strong>Score final attribué : ${moyenneFinale}/10 — ${totalNote}/${totalMax} points</strong></p>`;
 
-  return buildDocument({ org: o, title: `ÉVALUATION FINALE – EXERCICES & JEUX${jourLabel} – RÉSULTATS`, subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, extraHtml: extra });
+  return buildDocument({ org: o, title: `QCM – ${qcmTitleLabel.toUpperCase()} – RÉSULTATS`, subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, extraHtml: extra });
   // NO signatures
 }
 
