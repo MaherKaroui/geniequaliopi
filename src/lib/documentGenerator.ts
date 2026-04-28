@@ -8133,7 +8133,7 @@ function genEnqueteSatisfactionFormateur(o: OrganismeInfo, f: FormationInfo, sta
       return [crit, score === 1 ? "X" : "", score === 2 ? "X" : "", score === 3 ? "X" : "", score === 4 ? "X" : ""];
     });
     let html = `<div class="section" style="page-break-after:always">`;
-    html += `<h2>Enquête n°${i + 1} – ${formateurNom}</h2>`;
+    html += `<h2>Enquête n°${globalIdx + 1} – ${formateurNom}</h2>`;
     html += `<p><strong>Date :</strong> ${formatDate(f.dateFin)}<br>`;
     html += `<strong>Nom du formateur :</strong> ${formateurNom}<br>`;
     if (traineeName) html += `<strong>Stagiaire concerné :</strong> ${traineeName}<br>`;
