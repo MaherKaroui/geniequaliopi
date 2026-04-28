@@ -130,7 +130,12 @@ export function genMailDeroulementExamenVTC(
       <div><strong>241 €</strong> à régler <strong>directement auprès de la Chambre de Métiers et de l'Artisanat</strong> (non inclus dans le tarif de la formation).</div>
     </div>
 
-    <h3 style="margin:18px 0 8px;font-size:15px;color:#0078d4;">📋 Inscription à l'examen</h3>
+  </div>
+</div>
+
+<div style="max-width:900px;margin:0 auto;background:#ffffff;border:1px solid #edebe9;page-break-before:always;break-before:page;">
+  <div style="padding:18px 24px 24px;font-size:14px;line-height:1.7;color:#201f1e;">
+    <h3 style="margin:0 0 8px;font-size:15px;color:#0078d4;">📋 Inscription à l'examen</h3>
     <p style="margin:0 0 10px;"><strong>Organisateur :</strong> Chambres de Métiers et de l'Artisanat (CMA)</p>
     <p style="margin:0 0 10px;">
       <strong>Plus d'informations :</strong><br>
