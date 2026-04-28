@@ -382,6 +382,7 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
         current.content.appendChild(clone);
         if (current.content.scrollHeight > current.content.clientHeight + 1 && clone instanceof HTMLElement) {
           current.content.removeChild(clone);
+          let oversizedTableStarted = false;
           const wrapperTag = clone.tagName === "BODY" ? "DIV" : clone.tagName;
           let splitWrapper = document.createElement(wrapperTag);
           for (const attr of Array.from(clone.attributes)) {
@@ -391,6 +392,34 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
           current.content.appendChild(splitWrapper);
 
           for (const child of getRenderableChildNodes(clone)) {
+            if (child instanceof HTMLElement && child.tagName === "TABLE") {
+              if (splitWrapper.childNodes.length === 0 && current.content.childNodes.length > 0) current.content.removeChild(splitWrapper);
+              let currentTable = cloneTableShell(child);
+              if (current.content.scrollHeight + child.offsetHeight > current.content.clientHeight + 1 && !oversizedTableStarted) {
+                current = createPage(host, footerHtml, footerHeightPx, PAGE_W_PX, PAGE_H_PX);
+                pages.push(current.page);
+              }
+              current.content.appendChild(currentTable);
+              for (const row of getTableBodyRows(child)) {
+                const tbody = currentTable.querySelector("tbody") || currentTable;
+                const rowClone = row.cloneNode(true) as HTMLElement;
+                tbody.appendChild(rowClone);
+                if (current.content.scrollHeight > current.content.clientHeight + 1) {
+                  tbody.removeChild(rowClone);
+                  current = createPage(host, footerHtml, footerHeightPx, PAGE_W_PX, PAGE_H_PX);
+                  pages.push(current.page);
+                  currentTable = cloneTableShell(child);
+                  current.content.appendChild(currentTable);
+                  (currentTable.querySelector("tbody") || currentTable).appendChild(rowClone);
+                }
+              }
+              oversizedTableStarted = true;
+              splitWrapper = document.createElement(wrapperTag);
+              for (const attr of Array.from(clone.attributes)) splitWrapper.setAttribute(attr.name, attr.value);
+              splitWrapper.style.cssText = clone.style.cssText;
+              current.content.appendChild(splitWrapper);
+              continue;
+            }
             const childClone = child.cloneNode(true);
             splitWrapper.appendChild(childClone);
             if (current.content.scrollHeight > current.content.clientHeight + 1) {
