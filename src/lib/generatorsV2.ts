@@ -688,7 +688,84 @@ export function genExercicesStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
   const totalExNeeded = nbBlocks * EXERCICES_PER_BLOCK;
 
   const exercices = [...allExercices];
-  for (let i = allExercices.length; i < totalExNeeded; i++) {
+
+  // ====== VTC : ajout de 2 QCM en anglais (épreuve théorique RS5637 – partie langue étrangère) ======
+  // Insérés EN PREMIER dans la liste pour qu'ils prennent les premiers slots du fill et ne soient pas tronqués.
+  if (_isVTC) {
+    exercices.push({
+      titre: "QCM English – Welcoming and assisting passengers (RS5637)",
+      consigne: `Answer the following multiple-choice questions in English. Only one answer is correct per question.
+
+1) A passenger asks: "How long will it take to reach the airport?". The most appropriate answer is:
+A) "I don't know, sorry."
+B) "It should take approximately 35 minutes depending on traffic, sir/madam."
+C) "Maybe one hour."
+D) "Wait and see."
+
+2) When greeting a client at pick-up, the most professional sentence is:
+A) "Hi, get in."
+B) "Good morning, my name is [...], I will be your driver today. May I help you with your luggage?"
+C) "Hello, where do you go?"
+D) "Hey, ready?"
+
+3) The client asks: "Could you please turn down the air conditioning?". You should:
+A) Ignore the request.
+B) Reply "Of course, right away." and adjust it.
+C) Say "It is not possible."
+D) Open the windows instead without asking.
+
+4) Which sentence is the most appropriate to confirm the destination?
+A) "Where to?"
+B) "May I confirm that we are heading to [destination], sir/madam?"
+C) "You said somewhere, right?"
+D) "Tell me again."
+
+5) A client says: "I am in a hurry, I have a flight at 6 p.m.". The best answer is:
+A) "Don't worry, I will choose the fastest route while respecting safety and traffic rules."
+B) "I will drive as fast as possible."
+C) "Not my problem."
+D) "We will see."`,
+      reponseAttendue: `Réponses correctes : 1-B, 2-B, 3-B, 4-B, 5-A. The professional VTC driver must use polite, clear and reassuring English with passengers (greetings, confirmation of destination, response to comfort requests, time estimates) while always prioritising safety and customer service quality (réf. arrêté du 6 avril 2017 – RS5637).`,
+    });
+    exercices.push({
+      titre: "QCM English – Safety, regulation and customer service (RS5637)",
+      consigne: `Answer the following multiple-choice questions in English. Only one answer is correct per question.
+
+1) The VTC professional card in France is valid for:
+A) 1 year
+B) 3 years
+C) 5 years
+D) 10 years
+
+2) The applicable VAT rate on VTC rides in metropolitan France is:
+A) 5.5%
+B) 10%
+C) 20%
+D) 0%
+
+3) A written quote (devis) is mandatory for any ride above:
+A) 50 euros
+B) 100 euros
+C) 200 euros
+D) 500 euros
+
+4) A passenger forgets a personal item in your vehicle. You must:
+A) Keep it for yourself.
+B) Throw it away.
+C) Contact the platform / client and return the lost item as soon as possible, keeping a written record.
+D) Wait one month before doing anything.
+
+5) During the ride, a passenger feels unwell. The correct reaction is:
+A) Continue driving and ignore.
+B) Safely pull over, check the passenger, call emergency services (15 / 112) if needed, and inform the platform.
+C) Drop the passenger on the side of the road.
+D) Drive faster to finish the ride.`,
+      reponseAttendue: `Réponses correctes : 1-C, 2-B, 3-B, 4-C, 5-B. Le candidat doit maîtriser en anglais les notions clés de réglementation VTC (durée carte pro 5 ans, TVA 10 %, devis obligatoire au-delà de 100 €), les obligations en cas d'objet trouvé et la conduite à tenir en cas d'urgence à bord (PSC1, appel 15/112), conformément au référentiel RS5637.`,
+    });
+  }
+
+  // Fill the remaining slots with generic case studies if needed
+  for (let i = exercices.length; i < totalExNeeded; i++) {
     const blockIdx = Math.floor(i / EXERCICES_PER_BLOCK);
     if (hasBlocs) {
       const blocTitre = blocLabels[blockIdx] || `Bloc ${blockIdx + 1}`;
