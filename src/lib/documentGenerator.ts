@@ -1742,12 +1742,11 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
       const isLastDay = d === nbJours - 1;
       const rows: string[][] = [];
 
-      if (ecsrFormation) {
-        // Alterne soirée semaine (4h) et samedi journée (7h30) — démarre en semaine
-        const isSamedi = d % 6 === 5; // 1 samedi tous les 6 jours environ
+      // Toutes les formations : cours du soir Lun-Ven (4h) + samedi journée (7h30)
+      {
+        const isSamedi = d % 6 === 5;
         const dayTitle = `Séance ${d + 1} – ${isFirstDay ? "Découverte et fondamentaux" : isLastDay ? "Approfondissement et évaluation finale" : "Pratique et progression"} ${isSamedi ? "(samedi – 7h30)" : "(soirée – 4h)"}`;
         if (isSamedi) {
-          // Samedi 9h-12h30 / 13h30-17h30
           if (isFirstDay) {
             rows.push(["09h00 – 09h30", "Accueil, présentation de la formation et tour de table"]);
             rows.push(["09h30 – 10h45", dayTopics[0] ? `${dayTopics[0]} et test de positionnement début` : `Introduction à ${formationName} et test de positionnement début`]);
@@ -1768,7 +1767,6 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
             rows.push(["16h45 – 17h30", `Synthèse de la séance et préparation de la suivante`]);
           }
         } else {
-          // Soirée semaine 18h-22h (4h)
           if (isFirstDay) {
             rows.push(["18h00 – 18h15", "Accueil et présentation de la formation"]);
             rows.push(["18h15 – 19h45", dayTopics[0] ? `${dayTopics[0]} et test de positionnement début` : `Introduction à ${formationName} et test de positionnement`]);
@@ -1787,34 +1785,6 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
         dayBlocks.push({ title: dayTitle, rows });
         continue;
       }
-
-      const dayTitle = `Jour ${d + 1} – ${isFirstDay ? "Découverte et fondamentaux" : isLastDay ? "Approfondissement et évaluation finale" : `Jour ${d + 1} – Pratique et progression`} (7 heures)`;
-
-      // Morning
-      if (isFirstDay) {
-        rows.push(["09h00 – 09h30", "Accueil, présentation de la formation, des objectifs et tour de table"]);
-        rows.push(["09h30 – 10h30", dayTopics[0] ? `${dayTopics[0]} et test de positionnement début` : `Introduction à ${formationName} et test de positionnement début`]);
-      } else {
-        rows.push(["09h00 – 09h30", "Accueil, rappel des acquis de la veille et objectifs du jour"]);
-        rows.push(["09h30 – 10h30", dayTopics[0] || fillers[d % fillers.length]]);
-      }
-      rows.push(["10h30 – 11h00", "Pause"]);
-      rows.push(["11h00 – 12h30", dayTopics[1] || (dayTopics[0] ? `Approfondissement : ${dayTopics[0]}` : fillers[(d + 1) % fillers.length])]);
-
-      // Afternoon
-      rows.push(["12h30 – 13h30", "Pause déjeuner"]);
-      rows.push(["13h30 – 15h00", dayTopics[2] || fillers[(d + 2) % fillers.length]]);
-      rows.push(["15h00 – 15h15", "Pause"]);
-
-      if (isLastDay) {
-        rows.push(["15h15 – 16h30", "Test de positionnement fin de formation et évaluation finale"]);
-        rows.push(["16h30 – 17h00", "Grille d'acquisition des compétences, bilan de formation et remise des attestations"]);
-      } else {
-        rows.push(["15h15 – 16h30", dayTopics[3] || fillers[(d + 3) % fillers.length]]);
-        rows.push(["16h30 – 17h00", `Synthèse de la journée, questions-réponses et préparation du jour ${d + 2}`]);
-      }
-
-      dayBlocks.push({ title: dayTitle, rows });
     }
   }
 
