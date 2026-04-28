@@ -8927,7 +8927,8 @@ function generateEvalBesoinsAnswers(s: StagiaireInfo, f: FormationInfo, o: Organ
   const isEsthetique = t.includes("esthétique") || t.includes("cosmétique");
   const isInfo = t.includes("informatique") || t.includes("systèmes") || t.includes("réseaux");
   const isBureautique = t.includes("bureautique") || t.includes("pack office");
-  const isVTC = t.includes("vtc") || t.includes("conducteur") || t.includes("transport de personnes") || t.includes("t3p") || t.includes("chauffeur");
+  const isECSR = t.includes("ecsr") || t.includes("enseignant de la conduite") || t.includes("sécurité routière") || t.includes("securite routiere") || t.includes("moniteur auto-école") || t.includes("moniteur auto-ecole");
+  const isVTC = !isECSR && (t.includes("vtc") || t.includes("conducteur") || t.includes("transport de personnes") || t.includes("t3p") || t.includes("chauffeur"));
 
   // === Early return : VTC (cohérent avec le métier de conducteur VTC) ===
   if (isVTC) {
