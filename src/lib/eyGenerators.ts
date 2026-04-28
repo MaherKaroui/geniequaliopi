@@ -948,11 +948,23 @@ export function genBilanFroidStagiaire(o: OrganismeInfo, f: FormationInfo, stagi
     ], signatures: { type: "2", labels: ["Date et signature du stagiaire", "Visa de l'organisme"], names: ["", ""] }});
   }
 
-  /* Réponses garanties ≥ 90% Très satisfait : sur 8 questions, au plus 0 à « Moyennement » → 100% Très satisfait
-     Pour conserver une variabilité réaliste, 1 stagiaire sur 4 a 1 question en « Moyennement » (7/8 = 87.5% — arrondi 90%) */
-  const seed = si * 7 + 3;
-  const moyennePos = (seed % 4 === 0) ? (seed % 8) : -1;
-  const reponsesNiveaux = Array.from({ length: 8 }, (_, i) => i === moyennePos ? 3 : 4);
+  /* Réponses variées par stagiaire, garanties ≥ 90% « Très satisfait » (niveau 4)
+     Sur 8 questions : 7 ou 8 « Très satisfait », au plus 1 « Moyennement satisfait » (niveau 3)
+     → 87.5% à 100% selon stagiaire, en moyenne ≥ 90% */
+  const seed = si * 13 + 5;
+  // Profils variés : pas de Moyennement (4 cas/8), 1 Moyennement à différentes positions
+  const profils = [
+    [-1],           // si=0 : 100% TS
+    [2],            // si=1 : 1 Moyennement sur Q3
+    [-1],           // si=2 : 100% TS
+    [5],            // si=3 : 1 Moyennement sur Q6
+    [-1],           // si=4 : 100% TS
+    [4],            // si=5 : 1 Moyennement sur Q5
+    [1],            // si=6 : 1 Moyennement sur Q2
+    [-1],           // si=7 : 100% TS
+  ];
+  const profil = profils[si % profils.length];
+  const reponsesNiveaux = Array.from({ length: 8 }, (_, i) => profil.includes(i) ? 3 : 4);
 
   let qRows = questions.map((q, i) => {
     const rep = reponsesNiveaux[i];
