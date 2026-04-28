@@ -243,6 +243,25 @@ function nodeFitsOnFreshPage(
   return fits;
 }
 
+function cloneTableShell(original: HTMLElement): HTMLTableElement {
+  const tbl = document.createElement("table");
+  for (const attr of Array.from(original.attributes)) {
+    tbl.setAttribute(attr.name, attr.value);
+  }
+  tbl.style.cssText = original.style.cssText;
+  const thead = original.querySelector("thead");
+  if (thead) tbl.appendChild(thead.cloneNode(true) as HTMLElement);
+  const tbody = document.createElement("tbody");
+  tbl.appendChild(tbody);
+  return tbl;
+}
+
+function getTableBodyRows(table: HTMLElement): HTMLTableRowElement[] {
+  return Array.from(table.querySelectorAll("tbody tr, tr")).filter(
+    (tr) => !tr.closest("thead")
+  ) as HTMLTableRowElement[];
+}
+
 export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptions = {}): Promise<Blob> {
   const {
     scale = 2,
