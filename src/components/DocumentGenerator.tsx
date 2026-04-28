@@ -282,6 +282,29 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
     // Clean up previous blob URL
     if (previewBlobUrl) { URL.revokeObjectURL(previewBlobUrl); setPreviewBlobUrl(null); }
 
+    // Reset/start loading state with a 30s timeout fallback
+    setPreviewError(null);
+    setPreviewLoading(true);
+    setPreviewTitle(doc.nom);
+    if (previewTimeoutRef.current) clearTimeout(previewTimeoutRef.current);
+    previewTimeoutRef.current = setTimeout(() => {
+      setPreviewLoading(false);
+      setPreviewError("La génération de l'aperçu prend trop de temps. Réessayez ou choisissez un autre document.");
+    }, 30000);
+
+    try {
+      await handlePreviewInner(doc);
+    } catch (e) {
+      console.error("Preview error", e);
+      setPreviewError(e instanceof Error ? e.message : "Erreur lors de la génération de l'aperçu.");
+    } finally {
+      if (previewTimeoutRef.current) { clearTimeout(previewTimeoutRef.current); previewTimeoutRef.current = null; }
+      setPreviewLoading(false);
+    }
+  };
+
+  const handlePreviewInner = async (doc: DocEntry) => {
+
     // CERFA Apprentissage rempli → PDF dans iframe
     if (doc.template === "cerfa_apprentissage" && typeof doc.params?.stagiaireIdx === "number") {
       const s = allStagiaires[doc.params.stagiaireIdx];
