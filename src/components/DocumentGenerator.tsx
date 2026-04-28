@@ -210,7 +210,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
    * le document est placé dans CT{c}_IND_{i}/{folder}/ pour regrouper les missions.
    */
   const getDocBasePath = useCallback((doc: DocEntry): string => {
-    const HTML_MAIL_TEMPLATES = ["mail_mission_cfa", "mail_visite_entreprise_cfa", "mail_envoi_evaluation_prealable", "mail_retour_documents_completes", "mail_rdv_evaluation_besoins", "mail_bilan_froid_3mois", "mail_deroulement_examen_vtc"];
+    const HTML_MAIL_TEMPLATES = ["mail_mission_cfa", "mail_visite_entreprise_cfa", "mail_envoi_evaluation_prealable", "mail_retour_documents_completes", "mail_rdv_evaluation_besoins", "mail_bilan_froid_3mois", "mail_deroulement_examen_vtc", "mail_invitation_formateur_externe"];
     const isHtmlMail = doc.critere === 0 && HTML_MAIL_TEMPLATES.includes(doc.template);
     const isMail = doc.critere === 0 && (!!MAIL_TEMPLATE_FILES[doc.template] || isHtmlMail);
     const isSiteWeb = doc.id.startsWith("cfa_siteweb_");
@@ -1462,7 +1462,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
 
       {/* === MAIL SECTION (outside critères) === */}
       {(() => {
-        const isHtmlMailTpl = (t: string) => ["mail_mission_cfa", "mail_visite_entreprise_cfa", "mail_envoi_evaluation_prealable", "mail_retour_documents_completes", "mail_rdv_evaluation_besoins", "mail_bilan_froid_3mois", "mail_deroulement_examen_vtc"].includes(t);
+        const isHtmlMailTpl = (t: string) => ["mail_mission_cfa", "mail_visite_entreprise_cfa", "mail_envoi_evaluation_prealable", "mail_retour_documents_completes", "mail_rdv_evaluation_besoins", "mail_bilan_froid_3mois", "mail_deroulement_examen_vtc", "mail_invitation_formateur_externe"].includes(t);
         const mailDocs = catalog.filter((doc) => doc.critere === 0 && (MAIL_TEMPLATE_FILES[doc.template] || isHtmlMailTpl(doc.template)));
         if (mailDocs.length === 0) return null;
         const isMailExpanded = expandedCriteres.has(99);
