@@ -2233,7 +2233,7 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
     <div class="section">
       <p><strong>Durée totale :</strong> ${displayDuree}${!isBlocFormation ? ` (${nbJours} jour${nbJours > 1 ? "s" : ""})` : ""}</p>
       ${hasIndiv ? sessionsHtml : ""}
-      <p><strong>Horaires :</strong> 09h00 – 12h30 / 13h30 – 17h00</p>
+      <p><strong>Horaires :</strong> ${isECSRFormation(f) ? "Lundi au vendredi : 18h00 – 22h00 (cours du soir) &nbsp;|&nbsp; Samedi : 09h00 – 12h30 / 13h30 – 17h30" : "09h00 – 12h30 / 13h30 – 17h00"}</p>
       <p><strong>Modalité :</strong> ${modaliteLabel}</p>
       <p><strong>Lieu de formation :</strong> ${f.lieu || `${o.adresse}, ${o.codePostal} ${o.ville}`}</p>
       <p><strong>Nombre de participants :</strong> ${nbStagiaires}</p>
@@ -2713,7 +2713,7 @@ function genLivretAccueil(o: OrganismeInfo, f: FormationInfo) {
   return buildDocument({ org: o, title: "LIVRET D'ACCUEIL", subtitle: f.intitule, sections: [
     { heading: "Bienvenue !", content: `<p>Nous sommes heureux de vous accueillir pour la formation « ${f.intitule} ». Ce livret contient les informations essentielles.</p>` },
     { heading: "Vos contacts", content: `<p><strong>Direction :</strong> ${o.dirigeant}<br><strong>Pédagogie :</strong> ${o.responsablePedagogique}<br><strong>Handicap :</strong> ${o.referentHandicap}<br><strong>Qualité :</strong> ${o.referentQualite}<br>${o.telephone?.trim() ? `<strong>Tél :</strong> ${o.telephone}<br>` : ""}<strong>Email :</strong> ${o.email}</p>` },
-    { heading: "Votre formation", content: `<p><strong>Durée :</strong> À définir selon le groupe<br><strong>Lieu :</strong> ${f.lieu}<br><strong>Formateur :</strong> ${f.formateur}<br><strong>Horaires :</strong> 9h00-12h30 / 13h30-17h00</p>` },
+    { heading: "Votre formation", content: `<p><strong>Durée :</strong> À définir selon le groupe<br><strong>Lieu :</strong> ${f.lieu}<br><strong>Formateur :</strong> ${f.formateur}<br><strong>Horaires :</strong> ${isECSRFormation(f) ? "Lun-Ven 18h00-22h00 / Samedi 09h00-12h30 et 13h30-17h30" : "9h00-12h30 / 13h30-17h00"}</p>` },
     { heading: "Informations pratiques", content: "<p>• Merci de vous munir de cette convocation<br>• En cas d'absence, prévenir" + (o.telephone?.trim() ? ` au ${o.telephone}` : "") + "<br>• Le règlement intérieur vous sera remis le premier jour</p>" },
   ] });
 }
@@ -3654,7 +3654,7 @@ function genConditionsAccueil(o: OrganismeInfo, f: FormationInfo) {
   return buildDocument({ org: o, title: "FICHE CONDITIONS D'ACCUEIL", subtitle: f.intitule, formation: f, showFormationInfo: true, sections: [
     { heading: "Locaux", content: `<p>Adresse : ${f.lieu}<br>Accès : Métro, bus, parking<br>Accessibilité PMR : ✅ Oui<br>Wifi : ✅ Disponible</p>` },
     { heading: "Équipements", content: `<p>${f.moyensPedagogiques}</p>` },
-    { heading: "Horaires", content: "<p>Matin : 9h00 – 12h30<br>Après-midi : 13h30 – 17h00<br>Pause déjeuner : 12h30 – 13h30</p>" },
+    { heading: "Horaires", content: isECSRFormation(f) ? "<p><strong>Cours du soir (lundi au vendredi) :</strong> 18h00 – 22h00 (4 h)<br><strong>Samedi :</strong> 09h00 – 12h30 et 13h30 – 17h30 (7 h 30)<br>Pause déjeuner du samedi : 12h30 – 13h30</p>" : "<p>Matin : 9h00 – 12h30<br>Après-midi : 13h30 – 17h00<br>Pause déjeuner : 12h30 – 13h30</p>" },
   ] });
 }
 
