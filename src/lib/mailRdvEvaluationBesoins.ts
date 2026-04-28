@@ -48,7 +48,8 @@ export function genMailRdvEvaluationBesoins(
   const debut = parseDateSafe(debutStr) || new Date();
 
   // RDV évaluation : 14 jours ouvrés avant le début
-  const rdv = subtractBusinessDays(debut, 14);
+  const rdvStr = subtractBusinessDays(debutStr, 14);
+  const rdv = parseDateSafe(rdvStr) || new Date(debut);
   rdv.setHours(14, 0, 0, 0);
 
   // Envoi du mail : 7 jours avant le RDV
