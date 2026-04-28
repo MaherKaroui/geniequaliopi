@@ -666,7 +666,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
       const fForEntretien = params?.formateurNom ? { ...f, formateur: params.formateurNom } : f;
       return genFicheEntretienAnnuelFormateur(o, fForEntretien, fmtForEntretien, stagiaires);
     }
-    case "enquete_satisfaction_formateur": return genEnqueteSatisfactionFormateur(o, f, stagiaires);
+    case "enquete_satisfaction_formateur": return genEnqueteSatisfactionFormateur(o, f, stagiaires, params?.stagiaireIdx);
     // === Nouveaux templates CFA ===
     case "attestation_inscription_cfa": return genAttestationInscriptionCFAV2(o, f, stagiaires, params?.stagiaireIdx ?? 0);
     case "fiche_renseignement_cfa": return genFicheRenseignementCFA(o, f, stagiaires, params?.stagiaireIdx ?? 0);
@@ -8091,8 +8091,10 @@ function genFicheEntretienAnnuelFormateur(o: OrganismeInfo, f: FormationInfo, fm
   });
 }
 
-function genEnqueteSatisfactionFormateur(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
-  const list = (stagiaires && stagiaires.length > 0) ? stagiaires : [{ nom: "", prenom: "", formateur: f.formateur } as StagiaireInfo];
+function genEnqueteSatisfactionFormateur(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], stagiaireIdx?: number) {
+  const baseList = (stagiaires && stagiaires.length > 0) ? stagiaires : [{ nom: "", prenom: "", formateur: f.formateur } as StagiaireInfo];
+  const list = (typeof stagiaireIdx === "number" && baseList[stagiaireIdx]) ? [baseList[stagiaireIdx]] : baseList;
+  const idxOffset = (typeof stagiaireIdx === "number") ? stagiaireIdx : 0;
   // Réponses réalistes (majorité "Très satisfait", quelques "Satisfait")
   const patterns = [
     [4,4,4,3,4,4,3,4],
@@ -8121,16 +8123,17 @@ function genEnqueteSatisfactionFormateur(o: OrganismeInfo, f: FormationInfo, sta
   ];
 
   const blocks = list.map((s, i) => {
+    const globalIdx = idxOffset + i;
     const formateurNom = (s.formateur && s.formateur.trim()) || f.formateur || "[Formateur non renseigné]";
     const traineeName = `${s.prenom || ""} ${s.nom || ""}`.trim();
-    const p = patterns[i % patterns.length];
-    const c = commentaires[i % commentaires.length];
+    const p = patterns[globalIdx % patterns.length];
+    const c = commentaires[globalIdx % commentaires.length];
     const rows = criteres.map((crit, idx) => {
       const score = p[idx];
       return [crit, score === 1 ? "X" : "", score === 2 ? "X" : "", score === 3 ? "X" : "", score === 4 ? "X" : ""];
     });
     let html = `<div class="section" style="page-break-after:always">`;
-    html += `<h2>Enquête n°${i + 1} – ${formateurNom}</h2>`;
+    html += `<h2>Enquête n°${globalIdx + 1} – ${formateurNom}</h2>`;
     html += `<p><strong>Date :</strong> ${formatDate(f.dateFin)}<br>`;
     html += `<strong>Nom du formateur :</strong> ${formateurNom}<br>`;
     if (traineeName) html += `<strong>Stagiaire concerné :</strong> ${traineeName}<br>`;

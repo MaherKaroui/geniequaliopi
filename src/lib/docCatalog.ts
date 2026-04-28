@@ -323,7 +323,10 @@ export function buildFullCatalog(
     // ===== CRITÈRE 7 — AMÉLIORATION CONTINUE =====
 
     // IND 30 — Appréciations et amélioration continue
-    add("af_c7i30_eval_formateur", "CT7 - IND 30 ÉVALUATION FORMATEUR", 7, 30, "enquete_satisfaction_formateur");
+    // Évaluation formateur — un fichier par stagiaire
+    stagiaires.forEach((s, si) => {
+      add(`af_c7i30_eval_formateur_${si}`, `CT7 - IND 30 ÉVALUATION FORMATEUR – ${s.prenom} ${s.nom}`, 7, 30, "enquete_satisfaction_formateur", { stagiaireIdx: si });
+    });
     // Bilan à chaud — un fichier par stagiaire
     stagiaires.forEach((s, si) => {
       add(`af_c7i30_bilan_chaud_${si}`, `CT7 - IND 30 BILAN À CHAUD – ${s.prenom} ${s.nom}`, 7, 30, "bilan_chaud_stagiaire", { stagiaireIdx: si });
@@ -998,7 +1001,10 @@ export function buildFullCatalog(
     // ===== CRITÈRE 7 — AMÉLIORATION CONTINUE (CFA) =====
 
     // IND 30 — Appréciations et amélioration continue
-    add("cfa_c7i30_eval_formateur", "CT7 - IND 30 ÉVALUATION FORMATEUR", 7, 30, "enquete_satisfaction_formateur");
+    // Évaluation formateur — un fichier par stagiaire
+    stagiaires.forEach((s, si) => {
+      add(`cfa_c7i30_eval_formateur_${si}`, `CT7 - IND 30 ÉVALUATION FORMATEUR – ${s.prenom} ${s.nom}`, 7, 30, "enquete_satisfaction_formateur", { stagiaireIdx: si });
+    });
     stagiaires.forEach((s, si) => {
       add(`cfa_c7i30_bilan_chaud_${si}`, `CT7 - IND 30 BILAN À CHAUD – ${s.prenom} ${s.nom}`, 7, 30, "bilan_chaud_stagiaire", { stagiaireIdx: si });
     });
