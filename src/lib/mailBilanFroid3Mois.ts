@@ -134,11 +134,11 @@ export function genMailBilanFroid3Mois(
       Dans le cadre de notre démarche qualité <strong>Qualiopi</strong> et de l'amélioration continue de nos prestations, nous souhaiterions recueillir votre retour à froid sur :
     </p>
 
-    <ul style="margin:0 0 14px;padding-left:22px;">
-      <li>L'<strong>impact réel</strong> de la formation sur votre activité professionnelle ;</li>
-      <li>L'utilité concrète des <strong>compétences acquises</strong> ;</li>
-      <li>Votre <strong>insertion ou évolution professionnelle</strong> depuis la fin du parcours ;</li>
-      <li>Vos <strong>suggestions d'amélioration</strong> pour les prochaines promotions.</li>
+    <ul style="margin:0 0 14px;padding-left:22px;list-style-type:disc;list-style-position:outside;">
+      <li style="display:list-item;list-style-type:disc;margin-bottom:4px;">L'<strong>impact réel</strong> de la formation sur votre activité professionnelle ;</li>
+      <li style="display:list-item;list-style-type:disc;margin-bottom:4px;">L'utilité concrète des <strong>compétences acquises</strong> ;</li>
+      <li style="display:list-item;list-style-type:disc;margin-bottom:4px;">Votre <strong>insertion ou évolution professionnelle</strong> depuis la fin du parcours ;</li>
+      <li style="display:list-item;list-style-type:disc;margin-bottom:4px;">Vos <strong>suggestions d'amélioration</strong> pour les prochaines promotions.</li>
     </ul>
 
     <p style="margin:0 0 14px;">
