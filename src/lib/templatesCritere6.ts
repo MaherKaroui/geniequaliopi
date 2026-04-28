@@ -1687,7 +1687,7 @@ export function genContratSousTraitanceV2(o: OrganismeInfo, f: FormationInfo, st
   const firstSession = stagiaires[0];
   const formationTitle = f.intitule || "Formation professionnelle continue";
   const formationType = (f as any).typeFormation || formationTitle;
-  const formationDuration = firstSession?.duree || f.duree || "À définir selon le groupe";
+  const formationDuration = (firstSession as any)?.duree || f.duree || "À définir selon le groupe";
   const formationDates = firstSession?.dateDebutFormation && firstSession?.dateFinFormation
     ? `Du ${formatDate(firstSession.dateDebutFormation)} au ${formatDate(firstSession.dateFinFormation)}`
     : f.dateDebut && f.dateFin
