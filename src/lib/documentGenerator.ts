@@ -562,6 +562,10 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
       const si = params?.stagiaireIdx ?? 0;
       return genTrameEvalBesoinsEntreprise(o, f, stagiaires, si);
     }
+    case "trame_eval_besoins_combine": {
+      const si = params?.stagiaireIdx ?? 0;
+      return genTrameEvalBesoinsCombine(o, f, stagiaires, si);
+    }
     case "deroule_pedagogique_detaille": return genDeroulePedagogiqueDetaille(o, f);
     case "contrat_formation_pro": return genContratFormationPro_V2(o, f, stagiaires);
     case "procedure_accueil_stagiaires": return genProcedureAccueil_V2(o);
