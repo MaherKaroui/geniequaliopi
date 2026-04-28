@@ -1293,6 +1293,7 @@ export function buildFullCatalog(
       add(`mail_deroulement_examen_${si}`, `MAIL - DÉROULEMENT EXAMEN VTC (RS5637) – ${s.prenom} ${s.nom}`, 0, 0, "mail_deroulement_examen_vtc", { stagiaireIdx: si });
       add(`mail_fin_formation_${si}`, `MAIL - BILAN À CHAUD – ${s.prenom} ${s.nom}`, 0, 0, "mail_fin_formation", { stagiaireIdx: si });
       add(`mail_bilan_froid_${si}`, `MAIL - BILAN À FROID (3 mois après) – ${s.prenom} ${s.nom}`, 0, 0, "mail_bilan_froid_3mois", { stagiaireIdx: si });
+      add(`mail_invitation_formateur_externe_${si}`, `MAIL - INVITATION FORMATEUR EXTERNE (Nabih Ouardani) – Session ${s.prenom} ${s.nom}`, 0, 0, "mail_invitation_formateur_externe", { stagiaireIdx: si });
     });
   }
 
