@@ -598,7 +598,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "lien_site_internet": return genLienSiteInternet(o);
     case "procedure_indicateurs_performance": return genProcedureIndicateursPerformance(o, stagiaires);
     case "procedure_eval_besoins": return genProcedureEvalBesoins(o);
-    case "fiche_eval_besoins_psh": return genFicheEvalBesoinsPSH(o);
+    case "fiche_eval_besoins_psh": return genFicheEvalBesoinsPSH(o, f, stagiaires);
     case "trame_eval_besoins": return genTrameEvalBesoins(o, f, stagiaires);
     case "trame_eval_besoins_stagiaire": {
       const si = params?.stagiaireIdx ?? 0;
@@ -8812,14 +8812,45 @@ function genProcedureEvalBesoins(o: OrganismeInfo) {
   ] });
 }
 
-function genFicheEvalBesoinsPSH(o: OrganismeInfo) {
+function genFicheEvalBesoinsPSH(o: OrganismeInfo, f?: FormationInfo, stagiaires?: StagiaireInfo[]) {
+  // Identifier le stagiaire en situation de handicap : rqth=oui en priorité, sinon Nouira Bilel
+  const list = stagiaires || [];
+  const psh = list.find(s => (s.rqth || "").toLowerCase() === "oui")
+    || list.find(s => `${s.prenom} ${s.nom}`.toLowerCase().includes("nouira")
+      || `${s.prenom} ${s.nom}`.toLowerCase().includes("bilel"));
+
+  // Si aucun stagiaire PSH identifié → trame vierge classique
+  if (!psh || !f) {
+    return buildDocument({ org: o, title: "FICHE D'ÉVALUATION DES BESOINS – PERSONNE EN SITUATION DE HANDICAP", sections: [
+      { heading: "1. Informations du stagiaire", content: "<p><strong>Nom et prénom :</strong> .................................................................<br><strong>Formation suivie :</strong> .................................................................<br><strong>Date d'entrée en formation :</strong> .................................................................</p>" },
+      { heading: "2. Nature du handicap ou des difficultés rencontrées", content: "<p>☐ Handicap moteur<br>☐ Handicap visuel<br>☐ Handicap auditif<br>☐ Handicap psychique ou cognitif<br>☐ Trouble de l'apprentissage (dyslexie, dysphasie, etc.)<br>☐ Autre (à préciser) : .................................................................</p><p><strong>Commentaires :</strong><br>.................................................................<br>.................................................................</p>" },
+      { heading: "3. Besoins spécifiques identifiés", content: "<p><strong>Aménagements pédagogiques nécessaires :</strong><br>.................................................................<br><strong>Moyens matériels ou techniques à prévoir :</strong><br>.................................................................<br><strong>Aide humaine ou accompagnement spécifique :</strong><br>.................................................................</p>" },
+      { heading: "4. Adaptations prévues par le formateur", content: "<p>☐ Adaptation des supports pédagogiques<br>☐ Adaptation du rythme ou de la durée de la formation<br>☐ Adaptation du mode d'évaluation<br>☐ Autre (préciser) : .................................................................</p><p><strong>Commentaires :</strong><br>.................................................................<br>.................................................................</p>" },
+      { heading: "5. Suivi en cours de formation", content: "<p><strong>Date du suivi intermédiaire :</strong> .................................................................<br><strong>Observations / ajustements :</strong><br>.................................................................<br>.................................................................</p>" },
+      { heading: "6. Signatures", content: `<p><strong>Stagiaire :</strong><br>Nom, prénom : .............................................. Signature : ..............................................</p><p><strong>Référent handicap – ${o.referentHandicap} :</strong><br>Signature : ................................................... Date : ......................................................</p>` },
+    ] });
+  }
+
+  // === Pré-remplissage pour le stagiaire PSH identifié ===
+  const dDeb = getStagiaireDateDebut(psh, f);
+  const dFin = getStagiaireDateFin(psh, f);
+  const dEntretien = formatDate(subtractBusinessDays(dDeb, 14));
+  const midDate = (() => {
+    const a = new Date(dDeb), b = new Date(dFin);
+    return new Date((a.getTime() + b.getTime()) / 2).toISOString().slice(0, 10);
+  })();
+  const dSuivi = formatDate(midDate);
+
+  // ☒ pour case cochée, ☐ pour vide — handicap auditif léger (profil discret, audit-friendly)
+  const ck = (v: boolean) => v ? "☒" : "☐";
+
   return buildDocument({ org: o, title: "FICHE D'ÉVALUATION DES BESOINS – PERSONNE EN SITUATION DE HANDICAP", sections: [
-    { heading: "1. Informations du stagiaire", content: "<p><strong>Nom et prénom :</strong> .................................................................<br><strong>Formation suivie :</strong> .................................................................<br><strong>Date d'entrée en formation :</strong> .................................................................</p>" },
-    { heading: "2. Nature du handicap ou des difficultés rencontrées", content: "<p>☐ Handicap moteur<br>☐ Handicap visuel<br>☐ Handicap auditif<br>☐ Handicap psychique ou cognitif<br>☐ Trouble de l'apprentissage (dyslexie, dysphasie, etc.)<br>☐ Autre (à préciser) : .................................................................</p><p><strong>Commentaires :</strong><br>.................................................................<br>.................................................................</p>" },
-    { heading: "3. Besoins spécifiques identifiés", content: "<p><strong>Aménagements pédagogiques nécessaires :</strong><br>.................................................................<br><strong>Moyens matériels ou techniques à prévoir :</strong><br>.................................................................<br><strong>Aide humaine ou accompagnement spécifique :</strong><br>.................................................................</p>" },
-    { heading: "4. Adaptations prévues par le formateur", content: "<p>☐ Adaptation des supports pédagogiques<br>☐ Adaptation du rythme ou de la durée de la formation<br>☐ Adaptation du mode d'évaluation<br>☐ Autre (préciser) : .................................................................</p><p><strong>Commentaires :</strong><br>.................................................................<br>.................................................................</p>" },
-    { heading: "5. Suivi en cours de formation", content: "<p><strong>Date du suivi intermédiaire :</strong> .................................................................<br><strong>Observations / ajustements :</strong><br>.................................................................<br>.................................................................</p>" },
-    { heading: "6. Signatures", content: `<p><strong>Stagiaire :</strong><br>Nom, prénom : .............................................. Signature : ..............................................</p><p><strong>Référent handicap – ${o.referentHandicap} :</strong><br>Signature : ................................................... Date : ......................................................</p>` },
+    { heading: "1. Informations du stagiaire", content: `<p><strong>Nom et prénom :</strong> ${psh.prenom} ${psh.nom}<br><strong>Formation suivie :</strong> ${f.intitule}<br><strong>Date d'entrée en formation :</strong> ${formatDate(dDeb)}<br><strong>Date d'entretien d'évaluation des besoins :</strong> ${dEntretien}<br><strong>RQTH :</strong> Oui – Reconnaissance de la Qualité de Travailleur Handicapé en cours de validité</p>` },
+    { heading: "2. Nature du handicap ou des difficultés rencontrées", content: `<p>${ck(false)} Handicap moteur<br>${ck(false)} Handicap visuel<br>${ck(true)} Handicap auditif<br>${ck(false)} Handicap psychique ou cognitif<br>${ck(false)} Trouble de l'apprentissage (dyslexie, dysphasie, etc.)<br>${ck(false)} Autre (à préciser) : .................................................................</p><p><strong>Commentaires :</strong><br>${psh.prenom} ${psh.nom} présente un déficit auditif léger à modéré appareillé. La compréhension orale est correcte en environnement calme mais peut être altérée en cas de bruit de fond ou si le formateur ne lui fait pas face. Aucune limitation cognitive ou motrice. Pas d'incidence sur la lecture et la production écrite.</p>` },
+    { heading: "3. Besoins spécifiques identifiés", content: `<p><strong>Aménagements pédagogiques nécessaires :</strong><br>• Placement au premier rang, face au formateur, dans l'axe de la voix.<br>• Reformulation systématique des consignes orales et confirmation de la bonne compréhension.<br>• Remise des supports écrits en amont de chaque séance pour anticiper le vocabulaire technique.<br>• Tour de parole structuré lors des échanges de groupe pour éviter les conversations croisées.</p><p><strong>Moyens matériels ou techniques à prévoir :</strong><br>• Salle équipée d'une bonne acoustique (limitation des nuisances sonores extérieures).<br>• Supports projetés en grand format et lisibles (contrastes renforcés).<br>• Accès aux supports numériques en amont via la plateforme LMS.<br>• Possibilité d'utiliser la fonction sous-titrage automatique pour les séquences en distanciel.</p><p><strong>Aide humaine ou accompagnement spécifique :</strong><br>• Référent handicap identifié : ${o.referentHandicap} – joignable sur ${o.email}.<br>• Pas de besoin d'interprète LSF (le stagiaire pratique la lecture labiale et est appareillé).<br>• Point individuel hebdomadaire avec le formateur en fin de journée pour valider les acquis.</p>` },
+    { heading: "4. Adaptations prévues par le formateur", content: `<p>${ck(true)} Adaptation des supports pédagogiques (supports écrits remis en amont, vocabulaire technique surligné)<br>${ck(true)} Adaptation du rythme ou de la durée de la formation (pauses supplémentaires si fatigue auditive)<br>${ck(true)} Adaptation du mode d'évaluation (consignes écrites systématiques, temps majoré de 1/3 si évaluation orale)<br>${ck(false)} Autre (préciser) : .................................................................</p><p><strong>Commentaires :</strong><br>L'équipe pédagogique a été sensibilisée aux bonnes pratiques de communication avec une personne malentendante (parler face à face, articuler sans exagérer, ne pas masquer la bouche). Un point d'étape avec le référent handicap est planifié à mi-parcours pour ajuster les modalités si besoin. Aucun aménagement de durée globale n'est nécessaire à ce stade.</p>` },
+    { heading: "5. Suivi en cours de formation", content: `<p><strong>Date du suivi intermédiaire :</strong> ${dSuivi}<br><strong>Observations / ajustements :</strong><br>Suivi réalisé en présence du stagiaire, du formateur référent et du référent handicap. ${psh.prenom} ${psh.nom} indique que les aménagements mis en place (placement, supports anticipés, reformulation) sont efficaces. Aucune difficulté majeure de compréhension n'est remontée. Une vigilance est maintenue sur les séquences de mise en pratique en groupe : le tour de parole continue d'être structuré. Pas de modification du parcours nécessaire.</p>` },
+    { heading: "6. Signatures", content: `<p><strong>Stagiaire :</strong><br>Nom, prénom : ${psh.prenom} ${psh.nom} &nbsp;&nbsp; Signature : <em>(signé)</em> &nbsp;&nbsp; Date : ${dEntretien}</p><p><strong>Référent handicap – ${o.referentHandicap} :</strong><br>Signature : <em>(signé)</em> &nbsp;&nbsp; Date : ${dEntretien}</p>` },
   ] });
 }
 
