@@ -717,27 +717,14 @@ export function genExercicesStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
     jourLabel = '';
   }
 
-  // Calculate exercise date: spread across formation days by bloc
+  // Date du QCM : 1 QCM tous les 2 jours de formation (jour 2, 4, 6, … N)
+  // Si plus de QCM que de jours/2, on retombe sur le dernier jour
   let exerciseDate: string;
-  if (hasBlocs && exerciceIdx !== undefined) {
+  if (exerciceIdx !== undefined) {
     const days = getFormationDays(f);
     const nbJours = days.length;
-    // Distribute days proportionally across blocs: each bloc ends at its proportional last day
-    const totalBlocVolumes = rncp!.blocsCompetences.map(b =>
-      b.matieres.reduce((sum, m) => sum + (parseInt(m.volume) || 0), 0)
-    );
-    const totalH = totalBlocVolumes.reduce((a, b) => a + b, 0) || nbJours;
-    let cumDays = 0;
-    for (let bi = 0; bi <= exerciceIdx; bi++) {
-      cumDays += Math.round((totalBlocVolumes[bi] / totalH) * nbJours);
-    }
-    cumDays = Math.min(cumDays, nbJours);
-    exerciseDate = days.length >= cumDays && cumDays > 0 ? days[cumDays - 1] : formatDate(getStagiaireDateFin(s, f));
-  } else if (!hasBlocs && exerciceIdx !== undefined) {
-    const days = getFormationDays(f);
-    const nbJours = days.length;
-    const jourFin = Math.min(exerciceIdx * 2 + 2, nbJours);
-    exerciseDate = days.length >= jourFin ? days[jourFin - 1] : formatDate(getStagiaireDateFin(s, f));
+    const jourCible = Math.min((exerciceIdx + 1) * 2, nbJours);
+    exerciseDate = days.length > 0 && jourCible > 0 ? days[jourCible - 1] : formatDate(getStagiaireDateFin(s, f));
   } else {
     exerciseDate = formatDate(getStagiaireDateFin(s, f));
   }
