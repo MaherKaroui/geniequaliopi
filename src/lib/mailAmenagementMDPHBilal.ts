@@ -51,13 +51,17 @@ export function genMailAmenagementMDPHBilal(
 
   // Pièce jointe pour le mail du stagiaire
   const pjHtml = `
-    <div style="display:inline-flex;align-items:center;border:1px solid #e1dfdd;border-radius:4px;background:#faf9f8;padding:8px 14px;margin:6px 0 14px;">
-      <div style="width:28px;height:28px;background:#d13438;color:#fff;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;margin-right:10px;">PDF</div>
-      <div style="font-size:13px;color:#201f1e;">
-        <div style="font-weight:600;">Certificat médical MDPH - Bilal NOUIRA.pdf</div>
-        <div style="color:#605e5c;font-size:11px;">142 Ko</div>
-      </div>
-    </div>
+    <table style="border-collapse:collapse;border:1px solid #e1dfdd;background:#faf9f8;margin:8px 0 14px;">
+      <tr>
+        <td style="padding:8px 10px 8px 12px;vertical-align:middle;">
+          <div style="width:28px;height:28px;background:#d13438;color:#fff;border-radius:2px;text-align:center;line-height:28px;font-size:10px;font-weight:700;">PDF</div>
+        </td>
+        <td style="padding:8px 14px 8px 4px;vertical-align:middle;font-size:12.5px;color:#201f1e;">
+          <div style="font-weight:600;">Certificat médical MDPH - Bilal NOUIRA.pdf</div>
+          <div style="color:#605e5c;font-size:11px;">142 Ko</div>
+        </td>
+      </tr>
+    </table>
   `;
 
   const renderMail = (opts: {
