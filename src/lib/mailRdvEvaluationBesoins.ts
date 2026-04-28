@@ -112,9 +112,7 @@ export function genMailRdvEvaluationBesoins(
 
     <ul style="margin:0 0 14px;padding-left:22px;">
       <li>Un <strong>entretien individuel d'évaluation des besoins</strong> ;</li>
-      <li>Un <strong>test de positionnement</strong> permettant d'évaluer votre niveau de départ ;</li>
-      <li>Un <strong>test de culture générale</strong> ;</li>
-      <li>La présentation détaillée du <strong>programme de formation</strong> et des modalités pédagogiques.</li>
+      <li>Un <strong>test de positionnement</strong> permettant d'évaluer votre niveau de départ.</li>
     </ul>
 
     <div style="border:1px solid #c7e0f4;background:#eff6fc;border-radius:4px;padding:12px 16px;margin:0 0 16px;">
