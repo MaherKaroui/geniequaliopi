@@ -153,7 +153,7 @@ export function genMailAmenagementMDPHBilal(
 
   return `<!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8"><title>${escapeHtml(sujet1)}</title></head>
-<body style="margin:0;padding:24px;background:#faf9f8;font-family:'Segoe UI','Segoe UI Web',Arial,sans-serif;color:#201f1e;">
+<body style="margin:0;padding:16px;background:#faf9f8;font-family:'Segoe UI','Segoe UI Web',Arial,sans-serif;color:#201f1e;">
 ${mail1}
 ${mail2}
 </body></html>`;
