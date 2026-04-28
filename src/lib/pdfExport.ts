@@ -243,6 +243,25 @@ function nodeFitsOnFreshPage(
   return fits;
 }
 
+function cloneTableShell(original: HTMLElement): HTMLTableElement {
+  const tbl = document.createElement("table");
+  for (const attr of Array.from(original.attributes)) {
+    tbl.setAttribute(attr.name, attr.value);
+  }
+  tbl.style.cssText = original.style.cssText;
+  const thead = original.querySelector("thead");
+  if (thead) tbl.appendChild(thead.cloneNode(true) as HTMLElement);
+  const tbody = document.createElement("tbody");
+  tbl.appendChild(tbody);
+  return tbl;
+}
+
+function getTableBodyRows(table: HTMLElement): HTMLTableRowElement[] {
+  return Array.from(table.querySelectorAll("tbody tr, tr")).filter(
+    (tr) => !tr.closest("thead")
+  ) as HTMLTableRowElement[];
+}
+
 export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptions = {}): Promise<Blob> {
   const {
     scale = 2,
@@ -321,26 +340,8 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
 
       // Special handling for tables: split row by row, repeat thead
       if (node instanceof HTMLElement && node.tagName === "TABLE") {
-        const thead = node.querySelector("thead");
-        const rows = Array.from(node.querySelectorAll("tbody tr, tr")).filter(
-          (tr) => !tr.closest("thead")
-        );
-
-        // Helper to create a new table shell with thead clone
-        const createTableShell = (): HTMLTableElement => {
-          const tbl = document.createElement("table");
-          // Copy attributes & styles from original table
-          for (const attr of Array.from(node.attributes)) {
-            tbl.setAttribute(attr.name, attr.value);
-          }
-          tbl.style.cssText = node.style.cssText;
-          if (thead) tbl.appendChild(thead.cloneNode(true) as HTMLElement);
-          const tbody = document.createElement("tbody");
-          tbl.appendChild(tbody);
-          return tbl;
-        };
-
-        let currentTable = createTableShell();
+        const rows = getTableBodyRows(node);
+        let currentTable = cloneTableShell(node);
         current.content.appendChild(currentTable);
 
         for (const row of rows) {
@@ -354,7 +355,7 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
             // Start new page with a fresh table (with thead)
             current = createPage(host, footerHtml, footerHeightPx, PAGE_W_PX, PAGE_H_PX);
             pages.push(current.page);
-            currentTable = createTableShell();
+            currentTable = cloneTableShell(node);
             current.content.appendChild(currentTable);
             const newTbody = currentTable.querySelector("tbody") || currentTable;
             newTbody.appendChild(rowClone);
@@ -381,6 +382,7 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
         current.content.appendChild(clone);
         if (current.content.scrollHeight > current.content.clientHeight + 1 && clone instanceof HTMLElement) {
           current.content.removeChild(clone);
+          let oversizedTableStarted = false;
           const wrapperTag = clone.tagName === "BODY" ? "DIV" : clone.tagName;
           let splitWrapper = document.createElement(wrapperTag);
           for (const attr of Array.from(clone.attributes)) {
@@ -390,6 +392,34 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
           current.content.appendChild(splitWrapper);
 
           for (const child of getRenderableChildNodes(clone)) {
+            if (child instanceof HTMLElement && child.tagName === "TABLE") {
+              if (splitWrapper.childNodes.length === 0 && current.content.childNodes.length > 0) current.content.removeChild(splitWrapper);
+              let currentTable = cloneTableShell(child);
+              if (current.content.scrollHeight + child.offsetHeight > current.content.clientHeight + 1 && !oversizedTableStarted) {
+                current = createPage(host, footerHtml, footerHeightPx, PAGE_W_PX, PAGE_H_PX);
+                pages.push(current.page);
+              }
+              current.content.appendChild(currentTable);
+              for (const row of getTableBodyRows(child)) {
+                const tbody = currentTable.querySelector("tbody") || currentTable;
+                const rowClone = row.cloneNode(true) as HTMLElement;
+                tbody.appendChild(rowClone);
+                if (current.content.scrollHeight > current.content.clientHeight + 1) {
+                  tbody.removeChild(rowClone);
+                  current = createPage(host, footerHtml, footerHeightPx, PAGE_W_PX, PAGE_H_PX);
+                  pages.push(current.page);
+                  currentTable = cloneTableShell(child);
+                  current.content.appendChild(currentTable);
+                  (currentTable.querySelector("tbody") || currentTable).appendChild(rowClone);
+                }
+              }
+              oversizedTableStarted = true;
+              splitWrapper = document.createElement(wrapperTag);
+              for (const attr of Array.from(clone.attributes)) splitWrapper.setAttribute(attr.name, attr.value);
+              splitWrapper.style.cssText = clone.style.cssText;
+              current.content.appendChild(splitWrapper);
+              continue;
+            }
             const childClone = child.cloneNode(true);
             splitWrapper.appendChild(childClone);
             if (current.content.scrollHeight > current.content.clientHeight + 1) {
