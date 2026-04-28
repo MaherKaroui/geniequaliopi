@@ -173,7 +173,7 @@ export function genConvocation_V2(o: OrganismeInfo, f: FormationInfo, stagiaires
       <p>Nous avons le plaisir de vous confirmer votre inscription à la formation suivante :</p>
       <h3>Intitulé de la formation</h3><p>${f.intitule}</p>
       <h3>Dates de la formation</h3><p>Du : ${formatDate(getStagiaireDateDebut(s, f))}<br>Au : ${formatDate(getStagiaireDateFin(s, f))}</p>
-      <h3>Horaires</h3><p>De : 09h00<br>À : ${getHoraireFin(f)}</p>
+      <h3>Horaires</h3><p>${HORAIRES_TEXTE}</p>
       <h3>Durée totale</h3><p>${getStagiaireDuree(s, f)}</p>
       <h3>Modalité</h3><p>Formation ${modaliteTexte(f)}</p>
       ${isPresentiel(f) ? `<h3>Lieu de formation</h3><p>${f.lieu}</p>` : `<h3>Accès à la plateforme</h3><p>Les identifiants de connexion vous seront transmis par email avant le début de la formation.</p>`}
@@ -219,7 +219,7 @@ export function genContratFormationPro_V2(o: OrganismeInfo, f: FormationInfo, st
       <p>À l'issue de la formation, le stagiaire sera capable de :</p>
       <p>${f.objectifs.split('\n').map(o => `• ${o}`).join('<br>')}</p>
       <h3>Article 3 – Organisation de la formation</h3>
-      <p><strong>Durée totale :</strong> ${getStagiaireDuree(s, f)}<br><strong>Dates :</strong> du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}<br><strong>Horaires :</strong> de 09h00 à ${getHoraireFin(f)}<br><strong>Modalité :</strong> Formation ${modaliteTexte(f)}${isPresentiel(f) ? `<br><strong>Lieu :</strong> ${f.lieu}` : ''}</p>
+      <p><strong>Durée totale :</strong> ${getStagiaireDuree(s, f)}<br><strong>Dates :</strong> du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}<br><strong>Horaires :</strong> ${HORAIRES_LIGNE}<br><strong>Modalité :</strong> Formation ${modaliteTexte(f)}${isPresentiel(f) ? `<br><strong>Lieu :</strong> ${f.lieu}` : ''}</p>
       <h3>Article 4 – Prérequis</h3>
       <p>${f.prerequis || 'Aucun prérequis spécifique'}</p>
       <h3>Article 5 – Moyens pédagogiques et techniques</h3>
@@ -277,7 +277,7 @@ export function genConvocationStagiaire(o: OrganismeInfo, f: FormationInfo, stag
     <p>Nous avons le plaisir de vous confirmer votre inscription à la formation suivante :</p>
     <h3>Intitulé de la formation</h3><p>${f.intitule}</p>
     <h3>Dates de la formation</h3><p>Du : ${formatDate(getStagiaireDateDebut(s, f))}<br>Au : ${formatDate(getStagiaireDateFin(s, f))}</p>
-    <h3>Horaires</h3><p>De : 09h00<br>À : ${getHoraireFin(f)}</p>
+    <h3>Horaires</h3><p>${HORAIRES_TEXTE}</p>
     <h3>Durée totale</h3><p>${getStagiaireDuree(s, f)}</p>
     <h3>Modalité</h3><p>Formation ${modaliteTexte(f)}</p>
     ${isPresentiel(f) ? `<h3>Lieu de formation</h3><p>${f.lieu}</p>` : `<h3>Accès à la plateforme</h3><p>Les identifiants de connexion vous seront transmis par email avant le début de la formation.</p>`}
@@ -320,7 +320,7 @@ export function genContratFormationProStagiaire(o: OrganismeInfo, f: FormationIn
     <p>À l'issue de la formation, le stagiaire sera capable de :</p>
     <p>${f.objectifs.split('\n').map(o => `• ${o}`).join('<br>')}</p>
     <h3>Article 3 – Organisation de la formation</h3>
-    <p><strong>Durée totale :</strong> ${getStagiaireDuree(s, f)}<br><strong>Dates :</strong> du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}<br><strong>Horaires :</strong> de 09h00 à ${getHoraireFin(f)}<br><strong>Modalité :</strong> Formation ${modaliteTexte(f)}${isPresentiel(f) ? `<br><strong>Lieu :</strong> ${f.lieu}` : ''}</p>
+    <p><strong>Durée totale :</strong> ${getStagiaireDuree(s, f)}<br><strong>Dates :</strong> du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}<br><strong>Horaires :</strong> ${HORAIRES_LIGNE}<br><strong>Modalité :</strong> Formation ${modaliteTexte(f)}${isPresentiel(f) ? `<br><strong>Lieu :</strong> ${f.lieu}` : ''}</p>
     <h3>Article 4 – Prérequis</h3>
     <p>${f.prerequis || 'Aucun prérequis spécifique'}</p>
     <h3>Article 5 – Moyens pédagogiques et techniques</h3>
@@ -394,7 +394,7 @@ export function genConventionFormationTripartite(o: OrganismeInfo, f: FormationI
     <p>À l'issue de la formation, le/la stagiaire sera capable de :</p>
     <p>${f.objectifs.split('\n').map(obj => '• ' + obj).join('<br>')}</p>
     <h3>Article 3 – Organisation de la formation</h3>
-    <p><strong>Durée totale :</strong> ${getStagiaireDuree(s, f)}<br><strong>Dates :</strong> du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}<br><strong>Horaires :</strong> de 09h00 à ${getHoraireFin(f)}<br><strong>Modalité :</strong> Formation ${modaliteTexte(f)}${isPresentiel(f) ? '<br><strong>Lieu :</strong> ' + f.lieu : ''}</p>
+    <p><strong>Durée totale :</strong> ${getStagiaireDuree(s, f)}<br><strong>Dates :</strong> du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}<br><strong>Horaires :</strong> ${HORAIRES_LIGNE}<br><strong>Modalité :</strong> Formation ${modaliteTexte(f)}${isPresentiel(f) ? '<br><strong>Lieu :</strong> ' + f.lieu : ''}</p>
     <h3>Article 4 – Programme</h3>
     <p>Le programme détaillé est annexé à la présente convention.</p>
     <p><strong>Prérequis :</strong> ${f.prerequis || 'Aucun prérequis spécifique'}</p>
