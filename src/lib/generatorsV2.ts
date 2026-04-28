@@ -664,7 +664,7 @@ export function genExercicesStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
   const hasBlocs = rncp && rncp.blocsCompetences && rncp.blocsCompetences.length > 0;
 
   let nbBlocks: number;
-  let EXERCICES_PER_BLOCK = 2;
+  let EXERCICES_PER_BLOCK = 1;
   let blocLabels: string[] = [];
 
   if (hasBlocs) {
