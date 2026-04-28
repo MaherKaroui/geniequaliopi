@@ -8710,6 +8710,90 @@ function genTrameEvalBesoinsEntreprise(o: OrganismeInfo, f: FormationInfo, stagi
 ` });
 }
 
+function genTrameEvalBesoinsCombine(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
+  const s = stagiaires[si] || stagiaires[0];
+  const answers = generateEvalBesoinsAnswers(s, f, o, si);
+  const hasEntreprise = !!(s.entreprise && s.entreprise.trim() && s.entreprise.trim().toLowerCase() !== "entreprise");
+  const tuteurNom = (s as any).tuteur?.trim() || "Tuteur entreprise";
+  const dateAnalyse = formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f), 20));
+
+  const civiliteBlock = `<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse;width:100%">
+<tr><td style="background:#f8f9fa">
+<strong>Civilité :</strong> ${answers.civilite}<br>
+<strong>Nom :</strong> ${s.nom}<br>
+<strong>Prénom :</strong> ${s.prenom}<br>
+${s.telephone?.trim() ? `<strong>Téléphone :</strong> ${s.telephone}<br>` : ""}
+<strong>Mail :</strong> ${s.email || "___"}<br>
+<strong>Date :</strong> du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}<br>
+<strong>Formation souhaitée :</strong> ${f.intitule}
+</td></tr></table>`;
+
+  const apprenantPart = `
+<h2 style="margin-top:24px;color:#1e3a7b;border-bottom:2px solid #1e3a7b;padding-bottom:6px">PARTIE APPRENANT</h2>
+<p style="margin-top:8px;font-style:italic;color:#555">Trame d'évaluation des besoins – Partie Apprenant (parcours, expérience, projet, financement, accessibilité).</p>
+
+<h3 style="margin-top:16px;color:#1e3a7b">EXPÉRIENCE ET SCOLAIRE :</h3>
+
+<p><strong>1. Quel est le dernier diplôme ou titre que vous avez obtenu ?</strong></p>
+<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${answers.diplome}</td></tr></table>
+
+<p><strong>2. Quel objectif professionnel ou personnel souhaitez-vous atteindre grâce à cette formation ?</strong></p>
+<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${answers.objectif}</td></tr></table>
+
+<p><strong>3. Quel budget avez-vous prévu pour cette formation et bénéficiez-vous d'un dispositif de financement (CPF, OPCO, Pôle emploi, financement personnel) ?</strong></p>
+<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${answers.budget}</td></tr></table>
+
+<p><strong>4. En quoi pensez-vous que cette formation contribuera à la réalisation de votre projet professionnel ou personnel ?</strong></p>
+<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${answers.projetPro}</td></tr></table>
+
+<p><strong>5. Êtes-vous en situation de handicap ?</strong></p>
+<p><em>Si oui, avez-vous besoin d'adaptations spécifiques (pédagogiques, techniques, matérielles) pour suivre la formation ?</em></p>
+<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${answers.handicap}</td></tr></table>
+
+<p style="margin-top:16px"><strong>Signature du bénéficiaire :</strong> ${s.prenom} ${s.nom}</p>`;
+
+  const entreprisePart = `
+<div style="page-break-before:always"></div>
+<h2 style="margin-top:24px;color:#1e3a7b;border-bottom:2px solid #1e3a7b;padding-bottom:6px">PARTIE ENTREPRISE</h2>
+<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse;width:100%;margin-top:8px">
+<tr><td style="background:#f8f9fa">
+<strong>Apprenant(e) concerné(e) :</strong> ${answers.civilite} ${s.prenom} ${s.nom}<br>
+<strong>Formation :</strong> ${f.intitule}<br>
+<strong>Période :</strong> du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}<br>
+<strong>Entreprise :</strong> ${hasEntreprise ? s.entreprise : "À compléter"}<br>
+<strong>Tuteur / Maître d'apprentissage :</strong> ${tuteurNom}
+</td></tr></table>
+
+<p style="margin-top:14px;font-style:italic;color:#555">Trame d'évaluation des besoins – Partie Entreprise (à compléter par l'employeur ou le tuteur).</p>
+
+<p><strong>1. Raison sociale de l'entreprise ou nom commercial</strong></p>
+<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${answers.raisonSociale}</td></tr></table>
+
+<p><strong>2. Quelles sont vos attentes et objectifs pour vous-même et/ou votre salarié(e) dans le cadre de cette formation ?</strong></p>
+<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${answers.attentes}</td></tr></table>
+
+<p><strong>3. Quelles sont les missions actuelles ou à venir confiées au salarié(e) en lien avec la formation ?</strong></p>
+<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${answers.missions}</td></tr></table>
+
+<p><strong>4. En quoi cette formation contribue-t-elle au développement ou aux objectifs stratégiques de votre entreprise ?</strong></p>
+<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${answers.contribution}</td></tr></table>
+
+<p style="margin-top:16px"><strong>Signature du tuteur / représentant entreprise :</strong> ${tuteurNom}</p>`;
+
+  const footer = `
+<p style="margin-top:24px"><strong>Analyse du référent pédagogique :</strong> ${o.responsablePedagogique}</p>
+<p><strong>Date d'analyse :</strong> ${dateAnalyse}</p>
+<p>FAIT À ${o.ville.toUpperCase()}</p>
+<p>LE : ${dateAnalyse}</p>`;
+
+  return buildDocument({
+    org: o,
+    title: `Évaluation des besoins – ${s.prenom} ${s.nom}`,
+    extraHtml: civiliteBlock + apprenantPart + entreprisePart + footer,
+  });
+}
+
+
 
 export function getEvalBesoinsFinancement(s: StagiaireInfo, f: FormationInfo, o: OrganismeInfo, idx: number): string {
   return generateEvalBesoinsAnswers(s, f, o, idx).budget;
