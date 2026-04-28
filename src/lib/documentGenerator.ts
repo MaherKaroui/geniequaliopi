@@ -9173,13 +9173,20 @@ function generateEvalBesoinsAnswers(s: StagiaireInfo, f: FormationInfo, o: Organ
       `Cette formation est la première étape concrète de ma reconversion : carte VTC obtenue → immatriculation EVTC → équipement véhicule → mise en ligne sur Uber et Bolt → premières courses.`,
       `Au-delà de la carte, l'apprentissage des bonnes pratiques (conduite premium, gestion plateformes, optimisation fiscale) me permettra de durer dans le métier et de générer un revenu pérenne.`,
     ];
-    const vtcHandicap = [
-      "Non, je ne suis pas en situation de handicap. J'ai un permis B valide sans restriction médicale, indispensable pour exercer comme conducteur VTC.",
-      "Non, aucune situation de handicap. Ma visite médicale auprès d'un médecin agréé préfecture est à jour, condition obligatoire pour la carte VTC.",
-      "Non. Je suis en bonne santé et apte à la conduite professionnelle de longue durée (vérifié par mon médecin agréé).",
-      "Non, pas de handicap déclaré. Mon aptitude médicale à la conduite professionnelle a été récemment confirmée.",
-      "Non. Aucune restriction sur mon permis B et aucune contre-indication médicale à la conduite professionnelle.",
-    ];
+    const vtcHandicap = isStagiairePSH(s)
+      ? [
+          "Oui, je suis en situation de handicap (RQTH). Mon permis B reste valide et compatible avec la conduite professionnelle VTC. Je sollicite toutefois des aménagements pédagogiques : supports écrits agrandis, pauses régulières lors des sessions théoriques et accompagnement renforcé du référent handicap pour adapter le rythme aux modules les plus denses (réglementation T3P, gestion).",
+          "Oui, je suis reconnu(e) travailleur handicapé (RQTH). Mon aptitude médicale à la conduite professionnelle a été confirmée par le médecin agréé préfecture. J'ai besoin d'aménagements : temps majoré sur les évaluations écrites, supports adaptés et entretien préalable avec le référent handicap pour préparer au mieux l'examen théorique VTC.",
+          "Oui, situation de handicap reconnue (RQTH). Le permis B a été délivré sans restriction médicale incompatible avec l'activité VTC. Je sollicite des adaptations : aménagement des plages horaires en journée, supports pédagogiques accessibles et orientation vers les partenaires spécialisés (Agefiph, Cap Emploi) pour le financement du véhicule professionnel.",
+          "Oui, je dispose d'une RQTH. Mon aptitude à la conduite professionnelle est confirmée. Je demande des aménagements : sessions en journée plutôt que cours du soir, pauses fréquentes, et accompagnement individualisé par le référent handicap pour la préparation aux épreuves T3P et VTC.",
+        ]
+      : [
+          "Non, je ne suis pas en situation de handicap. J'ai un permis B valide sans restriction médicale, indispensable pour exercer comme conducteur VTC.",
+          "Non, aucune situation de handicap. Ma visite médicale auprès d'un médecin agréé préfecture est à jour, condition obligatoire pour la carte VTC.",
+          "Non. Je suis en bonne santé et apte à la conduite professionnelle de longue durée (vérifié par mon médecin agréé).",
+          "Non, pas de handicap déclaré. Mon aptitude médicale à la conduite professionnelle a été récemment confirmée.",
+          "Non. Aucune restriction sur mon permis B et aucune contre-indication médicale à la conduite professionnelle.",
+        ];
     return {
       civilite,
       raisonSociale: hasEntreprise ? s.entreprise : "/",
