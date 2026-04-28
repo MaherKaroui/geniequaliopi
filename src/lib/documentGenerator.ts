@@ -8856,7 +8856,7 @@ function genFicheEvalBesoinsPSH(o: OrganismeInfo, f?: FormationInfo, stagiaires?
     ],
     signatures: {
       type: "2",
-      labels: ["Le Stagiaire", `Le Référent handicap – ${o.referentHandicap}`],
+      labels: ["Le Stagiaire", `Le Dirigeant / Référent handicap – ${o.referentHandicap}`],
       names: [`${psh.prenom} ${psh.nom}`, o.referentHandicap],
       stagiaireSignatureUrl: psh.signatureUrl,
       dates: [dEntretien, dEntretien],
