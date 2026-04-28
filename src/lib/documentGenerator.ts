@@ -666,7 +666,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
       const fForEntretien = params?.formateurNom ? { ...f, formateur: params.formateurNom } : f;
       return genFicheEntretienAnnuelFormateur(o, fForEntretien, fmtForEntretien, stagiaires);
     }
-    case "enquete_satisfaction_formateur": return genEnqueteSatisfactionFormateur(o, f);
+    case "enquete_satisfaction_formateur": return genEnqueteSatisfactionFormateur(o, f, stagiaires);
     // === Nouveaux templates CFA ===
     case "attestation_inscription_cfa": return genAttestationInscriptionCFAV2(o, f, stagiaires, params?.stagiaireIdx ?? 0);
     case "fiche_renseignement_cfa": return genFicheRenseignementCFA(o, f, stagiaires, params?.stagiaireIdx ?? 0);
