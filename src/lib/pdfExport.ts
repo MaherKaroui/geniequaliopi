@@ -340,26 +340,8 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
 
       // Special handling for tables: split row by row, repeat thead
       if (node instanceof HTMLElement && node.tagName === "TABLE") {
-        const thead = node.querySelector("thead");
-        const rows = Array.from(node.querySelectorAll("tbody tr, tr")).filter(
-          (tr) => !tr.closest("thead")
-        );
-
-        // Helper to create a new table shell with thead clone
-        const createTableShell = (): HTMLTableElement => {
-          const tbl = document.createElement("table");
-          // Copy attributes & styles from original table
-          for (const attr of Array.from(node.attributes)) {
-            tbl.setAttribute(attr.name, attr.value);
-          }
-          tbl.style.cssText = node.style.cssText;
-          if (thead) tbl.appendChild(thead.cloneNode(true) as HTMLElement);
-          const tbody = document.createElement("tbody");
-          tbl.appendChild(tbody);
-          return tbl;
-        };
-
-        let currentTable = createTableShell();
+        const rows = getTableBodyRows(node);
+        let currentTable = cloneTableShell(node);
         current.content.appendChild(currentTable);
 
         for (const row of rows) {
@@ -373,7 +355,7 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
             // Start new page with a fresh table (with thead)
             current = createPage(host, footerHtml, footerHeightPx, PAGE_W_PX, PAGE_H_PX);
             pages.push(current.page);
-            currentTable = createTableShell();
+            currentTable = cloneTableShell(node);
             current.content.appendChild(currentTable);
             const newTbody = currentTable.querySelector("tbody") || currentTable;
             newTbody.appendChild(rowClone);
