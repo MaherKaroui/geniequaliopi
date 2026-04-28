@@ -931,18 +931,35 @@ function genPresentation(o: OrganismeInfo) {
 }
 
 function genOrganigramme(o: OrganismeInfo) {
-  const relEnt = o.relationEntreprises?.trim() ? o.relationEntreprises : o.dirigeant;
-  const mob = o.referentMobilite?.trim() ? o.referentMobilite : "Prestataire externe – Mobi'Jeunes / Erasmus+ France";
-  return buildDocument({ org: o, title: "ORGANIGRAMME DE L'ORGANISME", extraHtml: `
+  const dir = o.dirigeant || "—";
+  const refPeda = o.responsablePedagogique?.trim() || dir;
+  const refAdmin = o.poleAdministratif?.trim() || dir;
+  const refHandi = o.referentHandicap?.trim() || dir;
+  // Formateur principal : on prend celui de la formation si fourni, sinon le dirigeant
+  const formateur = (o as any).formateurPrincipal?.trim?.() || dir;
+  const showFormateur = formateur && formateur !== dir;
+
+  const box = (titre: string, nom: string) => `
+    <div style="background:#e8f0fe;padding:14px 18px;border-radius:8px;min-width:170px;text-align:center;border:1px solid #c7d7f5">
+      <strong style="color:#1e3a7b;display:block;margin-bottom:6px">${titre}</strong>
+      <span style="font-size:13px">${nom}</span>
+    </div>`;
+
+  const boxes = [
+    box("Référent Pédagogique", refPeda),
+    box("Référent Administratif", refAdmin),
+    box("Référent Handicap", refHandi),
+  ];
+  if (showFormateur) boxes.push(box("Formateur", formateur));
+
+  return buildDocument({ org: o, title: `ORGANIGRAMME ${(o.nom || "").toUpperCase()}`, extraHtml: `
     <div style="text-align:center;margin:30px 0">
-      <div style="background:#1e3a7b;color:white;padding:15px 30px;border-radius:8px;display:inline-block;margin-bottom:20px"><strong>Direction Générale</strong><br>${o.dirigeant}</div>
-      <div style="display:flex;justify-content:center;gap:20px;flex-wrap:wrap;margin-top:20px">
-        <div style="background:#e8f0fe;padding:12px 20px;border-radius:8px;min-width:180px"><strong>Pôle Pédagogique</strong><br>${o.responsablePedagogique}<br><em style="font-size:11px">Formateurs</em></div>
-        <div style="background:#e8f0fe;padding:12px 20px;border-radius:8px;min-width:180px"><strong>Pôle Qualité</strong><br>${o.referentQualite}<br><em style="font-size:11px">Amélioration continue</em></div>
-        <div style="background:#e8f0fe;padding:12px 20px;border-radius:8px;min-width:180px"><strong>Pôle Handicap</strong><br>${o.referentHandicap}<br><em style="font-size:11px">Accessibilité</em></div>
-        <div style="background:#e8f0fe;padding:12px 20px;border-radius:8px;min-width:180px"><strong>Pôle Administratif</strong><br>${o.poleAdministratif}<br><em style="font-size:11px">Inscriptions, facturation</em></div>
-        <div style="background:#e8f0fe;padding:12px 20px;border-radius:8px;min-width:180px"><strong>Référent Relation Entreprises</strong><br>${relEnt}<br><em style="font-size:11px">Partenariats – Insertion</em></div>
-        <div style="background:#e8f0fe;padding:12px 20px;border-radius:8px;min-width:180px"><strong>Référent Mobilité nationale et internationale</strong><br>${mob}<br><em style="font-size:11px">Mission externalisée</em></div>
+      <div style="background:#1e3a7b;color:white;padding:16px 36px;border-radius:8px;display:inline-block;margin-bottom:30px">
+        <strong style="display:block;font-size:14px;margin-bottom:4px">Président</strong>
+        <span style="font-size:15px">${dir}</span>
+      </div>
+      <div style="display:flex;justify-content:center;gap:18px;flex-wrap:wrap;margin-top:20px">
+        ${boxes.join("")}
       </div>
     </div>` });
 }
