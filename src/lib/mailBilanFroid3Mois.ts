@@ -80,9 +80,9 @@ export function genMailBilanFroid3Mois(
     { nom: `BILAN A FROID - ${(s.nom || "").toUpperCase()}`, taille: "188 Ko", color: "#107C41" },
   ];
   const pjHtml = pj.map(p => `
-      <div style="display:inline-block;vertical-align:top;border:1px solid #e1dfdd;border-radius:4px;padding:8px 28px 8px 38px;margin:0 8px 8px 0;background:#faf9f8;min-width:170px;position:relative;font-size:12px;">
-        <div style="position:absolute;left:8px;top:8px;width:22px;height:22px;background:${p.color};color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;border-radius:2px;">W</div>
-        <div style="color:#201f1e;font-weight:600;line-height:1.3;max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(p.nom)}</div>
+      <div style="display:inline-block;vertical-align:top;border:1px solid #e1dfdd;border-radius:4px;padding:8px 14px 8px 40px;margin:0 8px 8px 0;background:#faf9f8;position:relative;font-size:12px;max-width:100%;">
+        <div style="position:absolute;left:8px;top:8px;width:24px;height:24px;background:${p.color};color:#fff;font-size:11px;font-weight:700;text-align:center;line-height:24px;border-radius:2px;">W</div>
+        <div style="color:#201f1e;font-weight:600;line-height:1.3;white-space:nowrap;">${escapeHtml(p.nom)}.docx</div>
         <div style="color:#605e5c;font-size:11px;margin-top:2px;">${escapeHtml(p.taille)}</div>
       </div>`).join("");
 
@@ -134,11 +134,11 @@ export function genMailBilanFroid3Mois(
       Dans le cadre de notre démarche qualité <strong>Qualiopi</strong> et de l'amélioration continue de nos prestations, nous souhaiterions recueillir votre retour à froid sur :
     </p>
 
-    <ul style="margin:0 0 14px;padding-left:22px;">
-      <li>L'<strong>impact réel</strong> de la formation sur votre activité professionnelle ;</li>
-      <li>L'utilité concrète des <strong>compétences acquises</strong> ;</li>
-      <li>Votre <strong>insertion ou évolution professionnelle</strong> depuis la fin du parcours ;</li>
-      <li>Vos <strong>suggestions d'amélioration</strong> pour les prochaines promotions.</li>
+    <ul style="margin:0 0 14px;padding-left:22px;list-style-type:disc;list-style-position:outside;">
+      <li style="display:list-item;list-style-type:disc;margin-bottom:4px;">L'<strong>impact réel</strong> de la formation sur votre activité professionnelle ;</li>
+      <li style="display:list-item;list-style-type:disc;margin-bottom:4px;">L'utilité concrète des <strong>compétences acquises</strong> ;</li>
+      <li style="display:list-item;list-style-type:disc;margin-bottom:4px;">Votre <strong>insertion ou évolution professionnelle</strong> depuis la fin du parcours ;</li>
+      <li style="display:list-item;list-style-type:disc;margin-bottom:4px;">Vos <strong>suggestions d'amélioration</strong> pour les prochaines promotions.</li>
     </ul>
 
     <p style="margin:0 0 14px;">
