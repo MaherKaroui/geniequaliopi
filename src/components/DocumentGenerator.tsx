@@ -1631,12 +1631,12 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
         );
       })()}
 
-      {(previewContent || previewBlobUrl) && (
+      {(previewContent || previewBlobUrl || previewLoading || previewError) && (
         <div className="mt-6">
           <div className="flex items-center justify-between mb-3 gap-2 flex-wrap">
-            <h3 className="text-lg font-bold truncate flex-1">{previewTitle}</h3>
+            <h3 className="text-lg font-bold truncate flex-1">{previewTitle || "Aperçu"}</h3>
             <div className="flex gap-2 shrink-0">
-              {!previewBlobUrl && (
+              {!previewBlobUrl && !previewLoading && !previewError && previewContent && (
                 <Button
                   variant={editing ? "default" : "outline"}
                   size="sm"
@@ -1645,7 +1645,11 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
                   {editing ? "Enregistrer" : "Modifier"}
                 </Button>
               )}
-              <Button variant="ghost" size="sm" onClick={() => { setPreviewContent(null); setPreviewBlobUrl(null); setEditing(false); }}>
+              <Button variant="ghost" size="sm" onClick={() => {
+                if (previewTimeoutRef.current) { clearTimeout(previewTimeoutRef.current); previewTimeoutRef.current = null; }
+                setPreviewContent(null); setPreviewBlobUrl(null); setEditing(false);
+                setPreviewLoading(false); setPreviewError(null);
+              }}>
                 <X className="w-4 h-4 mr-1" /> Fermer
               </Button>
             </div>
@@ -1655,14 +1659,32 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
               Mode édition activé : cliquez directement dans le document pour le modifier. Les changements seront sauvegardés.
             </div>
           )}
-          <div className="bg-card border rounded-xl shadow-elevated overflow-hidden">
-            {previewBlobUrl ? (
+          <div className="bg-card border rounded-xl shadow-elevated overflow-hidden relative">
+            {previewLoading && (
+              <div className="flex flex-col items-center justify-center h-[600px] gap-3 bg-muted/30">
+                <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                <p className="text-sm text-muted-foreground">Génération de l'aperçu en cours…</p>
+                <p className="text-xs text-muted-foreground">Cela peut prendre quelques secondes pour les gros documents.</p>
+              </div>
+            )}
+            {!previewLoading && previewError && (
+              <div className="flex flex-col items-center justify-center h-[400px] gap-3 bg-destructive/5 px-6 text-center">
+                <div className="w-12 h-12 rounded-full bg-destructive/10 flex items-center justify-center">
+                  <X className="w-6 h-6 text-destructive" />
+                </div>
+                <p className="text-sm font-semibold text-destructive">Aperçu indisponible</p>
+                <p className="text-xs text-muted-foreground max-w-md">{previewError}</p>
+                <Button variant="outline" size="sm" onClick={() => setPreviewError(null)}>Fermer le message</Button>
+              </div>
+            )}
+            {!previewLoading && !previewError && previewBlobUrl && (
               <iframe
                 src={previewBlobUrl}
                 className="w-full h-[700px] border-0"
                 title="Aperçu PDF"
               />
-            ) : (
+            )}
+            {!previewLoading && !previewError && !previewBlobUrl && previewContent && (
               <iframe
                 ref={iframeRef}
                 srcDoc={previewContent!}
