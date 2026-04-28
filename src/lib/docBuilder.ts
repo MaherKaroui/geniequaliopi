@@ -581,12 +581,17 @@ function resolveSignature(label: string, nom: string, urls: SignatureUrls): stri
       ? sigImg(urls.responsableEntrepriseSignatureUrl, "Signature responsable entreprise")
       : `<p style="font-style:italic;color:#999;margin-top:15px">${nom ? `Signé par ${nom}` : ""}</p>`;
   }
+  // Dirigeant / Directeur (priority over "référent" so a combined label
+  // like "Dirigeant / Référent handicap" still gets the dirigeant signature + tampon)
+  if (/dirigeant|directeur/i.test(l)) {
+    return tamponImg(urls.tamponUrl) + sigImg(urls.dirigeantSignatureUrl, "Signature dirigeant");
+  }
   // Resp. Pédagogique / Référent qualité / Référent handicap → no auto signature (different people)
   if (/pédagogique|qualité|handicap|référent/i.test(l)) {
     return `<p style="font-style:italic;color:#999;margin-top:15px">${nom ? `Signé par ${nom}` : ""}</p>`;
   }
-  // Dirigeant / Responsable (of org) / Directeur → tampon only
-  if (/dirigeant|responsable|directeur/i.test(l)) {
+  // Responsable (of org) → tampon only
+  if (/responsable/i.test(l)) {
     return tamponImg(urls.tamponUrl);
   }
   // Client / Bon pour accord → stagiaire signature
