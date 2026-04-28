@@ -213,6 +213,36 @@ function pageHasRenderableContent(page: HTMLDivElement): boolean {
   return Boolean(content.querySelector("img, svg, canvas, table, input, textarea"));
 }
 
+function isSubstantiveElement(el: Element): boolean {
+  if (el.textContent?.trim()) return true;
+  return Boolean(el.querySelector("img, svg, canvas, table, input, textarea"));
+}
+
+function contentOnlyHasHeadings(content: Element): boolean {
+  const children = Array.from(content.children).filter(isSubstantiveElement);
+  return children.length > 0 && children.every((el) => /^H[1-4]$/.test(el.tagName));
+}
+
+function pageOnlyHasOrphanHeading(page: HTMLDivElement): boolean {
+  const content = page.querySelector(".pdf-root");
+  return !!content && contentOnlyHasHeadings(content);
+}
+
+function nodeFitsOnFreshPage(
+  host: HTMLDivElement,
+  node: Node,
+  footerHtml: string,
+  footerHeightPx: number,
+  pageWPx: number,
+  pageHPx: number
+): boolean {
+  const probe = createPage(host, footerHtml, footerHeightPx, pageWPx, pageHPx);
+  probe.content.appendChild(node.cloneNode(true));
+  const fits = probe.content.scrollHeight <= probe.content.clientHeight + 1;
+  host.removeChild(probe.page);
+  return fits;
+}
+
 export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptions = {}): Promise<Blob> {
   const {
     scale = 2,
