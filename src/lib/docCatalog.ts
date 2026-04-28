@@ -189,6 +189,18 @@ export function buildFullCatalog(
           );
         }
 
+        // EXAMEN FINAL — regroupe tous les QCM en un seul document, daté de la fin de formation
+        if (nbQcmContent > 0) {
+          add(
+            `af_c3i11_examen_final_${fi}_${si}`,
+            `CT3 - IND 11 EXAMEN FINAL – ${s.prenom} ${s.nom}`,
+            3,
+            11,
+            "examen_final_stagiaire",
+            { fi, stagiaireIdx: si }
+          );
+        }
+
         add(`af_c3i11_grille_acquisition_${fi}_${si}`, `CT3 - IND 11 GRILLE D'ACQUISITION – ${s.prenom} ${s.nom}`, 3, 11, "grille_acquisition_stagiaire", { fi, stagiaireIdx: si });
         add(`af_c3i11_attestation_${fi}_${si}`, `CT3 - IND 11 ATTESTATION DE RÉUSSITE – ${s.prenom} ${s.nom}`, 3, 11, "attestation_reussite_stagiaire", { fi, stagiaireIdx: si });
       });

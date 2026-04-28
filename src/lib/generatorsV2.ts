@@ -1006,6 +1006,82 @@ export function genExercicesStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
   // NO signatures
 }
 
+// ====== EXAMEN FINAL — regroupe tous les QCM en un seul document, daté de la fin de formation ======
+export function genExamenFinalStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], stagiaireIdx: number) {
+  const s = stagiaires[stagiaireIdx] || stagiaires[0];
+  const evalData = getEvalContent(f.intitule);
+  const nbQcm = evalData?.exercices?.length || 0;
+  const dateFin = formatDate(getStagiaireDateFin(s, f));
+
+  if (nbQcm === 0) {
+    return buildDocument({
+      org: o, title: `EXAMEN FINAL – ${f.intitule.toUpperCase()}`,
+      subtitle: `${s.prenom} ${s.nom} – ${dateFin}`,
+      extraHtml: `<p><em>Aucun QCM disponible pour cette formation.</em></p>`,
+    });
+  }
+
+  let extra = `
+    <h2>EXAMEN FINAL – FORMATION ${f.intitule.toUpperCase()}</h2>
+    <p><strong>Nom et prénom :</strong> ${s.prenom} ${s.nom}</p>
+    <p><strong>Formateur :</strong> ${f.formateur}</p>
+    <p><strong>Date de l'examen :</strong> ${dateFin}</p>
+    <p><strong>Composition :</strong> ${nbQcm} QCM regroupant l'ensemble des compétences évaluées durant la formation.</p>
+    <hr/>
+  `;
+
+  // On délègue à genExercicesStagiaire pour chaque QCM, puis on extrait le HTML interne
+  let totalScoreObtenu = 0;
+  let totalScoreMax = 0;
+
+  for (let exIdx = 0; exIdx < nbQcm; exIdx++) {
+    const sub = genExercicesStagiaire(o, f, stagiaires, stagiaireIdx, exIdx);
+    // Extrait le contenu entre les balises body si présent, sinon utilise tel quel
+    let html = typeof sub === 'string' ? sub : ((sub as any)?.html || (sub as any)?.content || '');
+    // Heuristique : retire les wrappers d'en-tête/pied pour ne garder que le bloc QCM
+    // On cherche le <h2>QCM ...</h2> et tout ce qui suit jusqu'à la fin du contenu utile
+    const h2Match = html.match(/<h2>QCM[\s\S]*/i);
+    if (h2Match) html = h2Match[0];
+    // Coupe au footer s'il y en a un
+    html = html.replace(/<footer[\s\S]*$/i, '').replace(/<\/body>[\s\S]*$/i, '');
+
+    extra += `<div style="page-break-before: always;">`;
+    extra += `<h2>━━━ Partie ${exIdx + 1} / ${nbQcm} ━━━</h2>`;
+    extra += html;
+    extra += `</div>`;
+
+    // Comptabilise le score si on peut le retrouver dans le HTML
+    const scoreMatch = html.match(/Score obtenu[^<]*<\/td>\s*<td[^>]*>(\d+)\s*\/\s*(\d+)/i);
+    if (scoreMatch) {
+      totalScoreObtenu += parseInt(scoreMatch[1]);
+      totalScoreMax += parseInt(scoreMatch[2]);
+    }
+  }
+
+  // Synthèse finale
+  if (totalScoreMax > 0) {
+    const noteSur20 = Math.round((totalScoreObtenu / totalScoreMax) * 20);
+    extra += `<div style="page-break-before: always;">`;
+    extra += `<h2>SYNTHÈSE GÉNÉRALE DE L'EXAMEN FINAL</h2>`;
+    extra += tableHTML(["Élément", "Résultat"], [
+      ["Nombre de QCM", `${nbQcm}`],
+      ["Score total obtenu", `${totalScoreObtenu} / ${totalScoreMax}`],
+      ["Note finale ramenée sur 20", `${noteSur20} / 20`],
+      ["Décision", noteSur20 >= 10 ? "✅ EXAMEN VALIDÉ" : "⚠️ EXAMEN À REPRÉSENTER"],
+    ]);
+    extra += `<p style="margin-top:24px;"><strong>Fait à ${o.adresse?.split(',').pop()?.trim() || 'Paris'}, le ${dateFin}</strong></p>`;
+    extra += `<p><strong>Signature du formateur : ${f.formateur}</strong></p>`;
+    extra += `</div>`;
+  }
+
+  return buildDocument({
+    org: o,
+    title: `EXAMEN FINAL – ${f.intitule.toUpperCase()}`,
+    subtitle: `${s.prenom} ${s.nom} – ${dateFin}`,
+    extraHtml: extra,
+  });
+}
+
 export function genGrilleAcquisitionStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], stagiaireIdx: number) {
   const s = stagiaires[stagiaireIdx] || stagiaires[0];
   const evalData = getEvalContent(f.intitule);
