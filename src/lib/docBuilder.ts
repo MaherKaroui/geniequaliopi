@@ -632,11 +632,16 @@ export function signatureBlock2(label1: string, nom1: string, label2: string, no
   const sig1Html = resolveSignature(label1, nom1, urls);
   const sig2Html = resolveSignature(label2, nom2, urls);
   const fallbackDate = new Date().toLocaleDateString("fr-FR");
+  // If dates is explicitly provided with empty strings, omit the Date line
+  const hideDate1 = dates !== undefined && (dates[0] === "" || dates[0] === null);
+  const hideDate2 = dates !== undefined && (dates[1] === "" || dates[1] === null);
   const date1 = dates?.[0] || fallbackDate;
   const date2 = dates?.[1] || date1;
+  const dateLine1 = hideDate1 ? "" : `<p>Date : ${date1}</p>`;
+  const dateLine2 = hideDate2 ? "" : `<p>Date : ${date2}</p>`;
   return `<div class="signature-block-2">
-    <div class="sig-box"><p class="sig-label">${label1}</p><p>Nom : ${nom1}</p><p>Date : ${date1}</p><p style="margin-top:20px">Signature :</p>${sig1Html}</div>
-    <div class="sig-box"><p class="sig-label">${label2}</p><p>Nom : ${nom2}</p><p>Date : ${date2}</p><p style="margin-top:20px">Signature :</p>${sig2Html}</div>
+    <div class="sig-box"><p class="sig-label">${label1}</p><p>Nom : ${nom1}</p>${dateLine1}<p style="margin-top:20px">Signature :</p>${sig1Html}</div>
+    <div class="sig-box"><p class="sig-label">${label2}</p><p>Nom : ${nom2}</p>${dateLine2}<p style="margin-top:20px">Signature :</p>${sig2Html}</div>
   </div>`;
 }
 

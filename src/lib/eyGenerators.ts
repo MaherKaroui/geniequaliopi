@@ -967,7 +967,7 @@ export function genBilanFroidStagiaire(o: OrganismeInfo, f: FormationInfo, stagi
     "Excellente formation, le formateur était très pédagogue et à l'écoute de nos besoins individuels.",
   ];
 
-  return buildDocument({ org: o, formation: f, title: "Questionnaire de Satisfaction du bénéficiaire – À froid", subtitle: `${s.prenom} ${(s.nom||"").toUpperCase()}`, sections: [
+  return buildDocument({ org: o, formation: f, stagiaires: [s], title: "Questionnaire de Satisfaction du bénéficiaire – À froid", subtitle: `${s.prenom} ${(s.nom||"").toUpperCase()}`, sections: [
     { heading: "Référence de l'action", content: `<p style="font-size:0.85em;color:#666;margin-bottom:12px;">Cette enquête est administrée entre 3 et 6 mois après la formation. En cas de non-retour, l'enquête est renvoyée dans un délai d'une semaine. Si pas de réponse, l'enquête est administrée par téléphone.</p>
       <table style="width:100%;border-collapse:collapse;">
         <tr><td ${tdb} style="width:35%;">Intitulé de la formation</td><td ${td}>${titre}</td></tr>
@@ -979,7 +979,7 @@ export function genBilanFroidStagiaire(o: OrganismeInfo, f: FormationInfo, stagi
         <th ${td}>Question</th><th ${td} style="width:12%;">Pas du tout satisfait</th><th ${td} style="width:12%;">Peu satisfait</th><th ${td} style="width:12%;">Moyennement satisfait</th><th ${td} style="width:12%;">Très satisfait</th>
       </tr></thead><tbody>${qRows}</tbody></table>` },
     { heading: "Commentaires, pistes d'amélioration", content: `<p style="padding:12px;background:#f9f9f9;border-left:3px solid ${pc()};margin:8px 0;"><em>${commentaires[si % commentaires.length]}</em></p>` },
-  ], signatures: { type: "2", labels: ["Date et signature du stagiaire", "Visa de l'organisme"], names: [`${s.prenom} ${s.nom}`, o.nom||""] }});
+  ], signatures: { type: "2", labels: ["Date et signature du stagiaire", "Visa de l'organisme"], names: [`${s.prenom} ${s.nom}`, o.nom||""], dates: ["", ""] }});
 }
 
 /* ═══ CODE 59 – Informations certifications (taux, blocs, passerelles) ═══ */
