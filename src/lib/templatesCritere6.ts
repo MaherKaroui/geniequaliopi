@@ -1769,13 +1769,13 @@ export function genContratSousTraitanceV2(o: OrganismeInfo, f: FormationInfo, st
       <table>
         <tr><th style="width:40%">Élément</th><th>Détail</th></tr>
         <tr><td><strong>Intitulé de la formation</strong></td><td>${f.intitule}</td></tr>
-        <tr><td><strong>Type de formation</strong></td><td>Formation en Langue Française – Français Langue Étrangère (FLE)</td></tr>
-        <tr><td><strong>Public visé</strong></td><td>Adultes</td></tr>
-        <tr><td><strong>Durée totale</strong></td><td>À définir selon le groupe</td></tr>
-        <tr><td><strong>Dates prévisionnelles</strong></td><td>Sessions : Dates individuelles par stagiaire</td></tr>
+        <tr><td><strong>Type de formation</strong></td><td>${f.intitule || "Formation professionnelle continue"}</td></tr>
+        <tr><td><strong>Public visé</strong></td><td>${f.publicVise || "Adultes"}</td></tr>
+        <tr><td><strong>Durée totale</strong></td><td>${f.duree || "À définir selon le groupe"}</td></tr>
+        <tr><td><strong>Dates prévisionnelles</strong></td><td>${f.dateDebut && f.dateFin ? `Du ${new Date(f.dateDebut).toLocaleDateString("fr-FR")} au ${new Date(f.dateFin).toLocaleDateString("fr-FR")}` : "Sessions : Dates individuelles par stagiaire"}</td></tr>
         <tr><td><strong>Modalités</strong></td><td>${f.modalites || "Présentiel et/ou distanciel (à adapter selon les besoins)"}</td></tr>
         <tr><td><strong>Lieu de formation</strong></td><td>${f.lieu || `${o.adresse}, ${o.codePostal} ${o.ville}`}</td></tr>
-        <tr><td><strong>Horaires</strong></td><td>De 9h00 à 12h30 et de 13h30 à 17h00</td></tr>
+        <tr><td><strong>Horaires</strong></td><td>${(f as any).horaires || "De 9h00 à 12h30 et de 13h30 à 17h00 (susceptibles d'être adaptés selon les contraintes pédagogiques)"}</td></tr>
       </table>
       <p style="margin-top:10px"><strong>Modules de formation :</strong></p>
       <ul>
