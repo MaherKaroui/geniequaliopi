@@ -967,16 +967,8 @@ export function genBilanFroidStagiaire(o: OrganismeInfo, f: FormationInfo, stagi
     "Excellente formation, le formateur était très pédagogue et à l'écoute de nos besoins individuels.",
   ];
 
-  // Date du bilan à froid : ~4 mois après la fin de formation (entre 3 et 6 mois)
-  let dateBilanFroid = "";
-  if (fin) {
-    const finDate = new Date(fin);
-    if (!isNaN(finDate.getTime())) {
-      const offsetMonths = 3 + ((si % 4)); // 3, 4, 5 ou 6 mois selon stagiaire
-      finDate.setMonth(finDate.getMonth() + offsetMonths);
-      dateBilanFroid = fmtDate(finDate.toISOString().slice(0, 10));
-    }
-  }
+  // Bilan à froid : pas de date exacte, mention "3 à 6 mois après la fin de formation"
+  const mentionDelai = "3 à 6 mois après la fin de formation";
 
   return buildDocument({ org: o, formation: f, stagiaires: [s], title: "Questionnaire de Satisfaction du bénéficiaire – À froid", subtitle: `${s.prenom} ${(s.nom||"").toUpperCase()}`, sections: [
     { heading: "Référence de l'action", content: `<p style="font-size:0.85em;color:#666;margin-bottom:12px;">Cette enquête est administrée entre 3 et 6 mois après la formation. En cas de non-retour, l'enquête est renvoyée dans un délai d'une semaine. Si pas de réponse, l'enquête est administrée par téléphone.</p>
@@ -984,14 +976,14 @@ export function genBilanFroidStagiaire(o: OrganismeInfo, f: FormationInfo, stagi
         <tr><td ${tdb} style="width:35%;">Intitulé de la formation</td><td ${td}>${titre}</td></tr>
         <tr><td ${tdb}>Dates de formation</td><td ${td}>${deb ? fmtDate(deb) : "—"} au ${fin ? fmtDate(fin) : "—"}</td></tr>
         <tr><td ${tdb}>Nom/prénom du participant</td><td ${td}>${(s.nom||"").toUpperCase()} ${s.prenom||""}</td></tr>
-        ${dateBilanFroid ? `<tr><td ${tdb}>Date du bilan à froid</td><td ${td}>${dateBilanFroid}</td></tr>` : ""}
+        <tr><td ${tdb}>Période d'administration</td><td ${td}>${mentionDelai}</td></tr>
       </table>` },
     { heading: "Évaluation", content: `<p>Merci d'indiquer votre niveau de satisfaction en cochant la case correspondante avec un X</p>
       <table style="width:100%;border-collapse:collapse;font-size:0.88em;"><thead><tr style="background:${pc()};color:#fff;">
         <th ${td}>Question</th><th ${td} style="width:12%;">Pas du tout satisfait</th><th ${td} style="width:12%;">Peu satisfait</th><th ${td} style="width:12%;">Moyennement satisfait</th><th ${td} style="width:12%;">Très satisfait</th>
       </tr></thead><tbody>${qRows}</tbody></table>` },
     { heading: "Commentaires, pistes d'amélioration", content: `<p style="padding:12px;background:#f9f9f9;border-left:3px solid ${pc()};margin:8px 0;"><em>${commentaires[si % commentaires.length]}</em></p>` },
-  ], signatures: { type: "2", labels: ["Date et signature du stagiaire", "Visa de l'organisme"], names: [`${s.prenom} ${s.nom}`, o.nom||""], dates: [dateBilanFroid, dateBilanFroid], stagiaireSignatureUrl: s.signatureUrl }});
+  ], signatures: { type: "2", labels: ["Date et signature du stagiaire", "Visa de l'organisme"], names: [`${s.prenom} ${s.nom}`, o.nom||""], dates: [mentionDelai, mentionDelai], stagiaireSignatureUrl: s.signatureUrl }});
 }
 
 /* ═══ CODE 59 – Informations certifications (taux, blocs, passerelles) ═══ */
