@@ -8875,6 +8875,10 @@ ${s.telephone?.trim() ? `<strong>Téléphone :</strong> ${s.telephone}` : ""}<br
 <p><em>Si oui, avez-vous besoin d'adaptations spécifiques (pédagogiques, techniques, matérielles) pour suivre la formation ?</em></p>
 <table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${answers.handicap}</td></tr></table>
 
+<p><strong>6. Quelles sont vos disponibilités et avez-vous une demande d'aménagement horaire ?</strong></p>
+<p><em>Précisez les créneaux qui vous conviennent (journée, cours du soir, samedi…) et toute contrainte particulière.</em></p>
+<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${getDisponibilitesAnswer(s)}</td></tr></table>
+
 <p style="margin-top:20px"><strong>Analyse du référent pédagogique :</strong> ${o.responsablePedagogique}</p>
 <p><strong>Date d'analyse :</strong> ${formatDate(subtractBusinessDays(f.dateDebut, 20))}</p>
 <p>FAIT À ${o.ville.toUpperCase()}</p>
@@ -8917,6 +8921,10 @@ ${s.telephone?.trim() ? `<strong>Téléphone :</strong> ${s.telephone}` : ""}<br
 <p><strong>5. Êtes-vous en situation de handicap ?</strong></p>
 <p><em>Si oui, avez-vous besoin d'adaptations spécifiques (pédagogiques, techniques, matérielles) pour suivre la formation ?</em></p>
 <table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${answers.handicap}</td></tr></table>
+
+<p><strong>6. Quelles sont vos disponibilités et avez-vous une demande d'aménagement horaire ?</strong></p>
+<p><em>Précisez les créneaux qui vous conviennent (journée, cours du soir, samedi…) et toute contrainte particulière.</em></p>
+<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${getDisponibilitesAnswer(s)}</td></tr></table>
 
 <p style="margin-top:20px"><strong>Signature du bénéficiaire :</strong> ${s.prenom} ${s.nom}</p>
 <p style="margin-top:20px"><strong>Analyse du référent pédagogique :</strong> ${o.responsablePedagogique}</p>
@@ -9007,6 +9015,10 @@ ${s.telephone?.trim() ? `<strong>Téléphone :</strong> ${s.telephone}<br>` : ""
 <p><em>Si oui, avez-vous besoin d'adaptations spécifiques (pédagogiques, techniques, matérielles) pour suivre la formation ?</em></p>
 <table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${answers.handicap}</td></tr></table>
 
+<p><strong>6. Quelles sont vos disponibilités et avez-vous une demande d'aménagement horaire ?</strong></p>
+<p><em>Précisez les créneaux qui vous conviennent (journée, cours du soir, samedi…) et toute contrainte particulière.</em></p>
+<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${getDisponibilitesAnswer(s)}</td></tr></table>
+
 <p style="margin-top:16px"><strong>Signature du bénéficiaire :</strong> ${s.prenom} ${s.nom}</p>`;
 
   const entreprisePart = `
@@ -9051,6 +9063,21 @@ ${s.telephone?.trim() ? `<strong>Téléphone :</strong> ${s.telephone}<br>` : ""
 }
 
 
+
+/** Détecte si le stagiaire est en situation de handicap (Nouira Bilel ou RQTH=oui). */
+function isStagiairePSH(s: StagiaireInfo | undefined | null): boolean {
+  if (!s) return false;
+  if (((s as any).rqth || "").toLowerCase() === "oui") return true;
+  return `${s.prenom || ""} ${s.nom || ""}`.toLowerCase().includes("nouira");
+}
+
+/** Réponse "disponibilités / aménagement horaire" : cours du soir par défaut, journée pour PSH. */
+function getDisponibilitesAnswer(s: StagiaireInfo): string {
+  if (isStagiairePSH(s)) {
+    return `Je suis disponible en journée, du lundi au vendredi sur les créneaux <strong>09h00 – 12h30</strong> et <strong>13h30 – 17h00</strong>. Je sollicite un aménagement horaire en journée au titre de ma situation de handicap, afin de bénéficier de meilleures conditions d'apprentissage et d'éviter la fatigue liée aux cours du soir.`;
+  }
+  return `En raison de mon activité professionnelle en journée, je sollicite un suivi de la formation en <strong>cours du soir</strong>, du lundi au vendredi de <strong>18h00 à 22h00</strong>, complété par des sessions le <strong>samedi de 09h00 à 12h30 et de 13h30 à 17h30</strong>. Ce rythme me permet de concilier ma vie professionnelle et mon parcours de formation sans perte de revenus.`;
+}
 
 export function getEvalBesoinsFinancement(s: StagiaireInfo, f: FormationInfo, o: OrganismeInfo, idx: number): string {
   return generateEvalBesoinsAnswers(s, f, o, idx).budget;
