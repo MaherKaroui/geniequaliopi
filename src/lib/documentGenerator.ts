@@ -8918,6 +8918,10 @@ ${s.telephone?.trim() ? `<strong>Téléphone :</strong> ${s.telephone}` : ""}<br
 <p><em>Si oui, avez-vous besoin d'adaptations spécifiques (pédagogiques, techniques, matérielles) pour suivre la formation ?</em></p>
 <table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${answers.handicap}</td></tr></table>
 
+<p><strong>6. Quelles sont vos disponibilités et avez-vous une demande d'aménagement horaire ?</strong></p>
+<p><em>Précisez les créneaux qui vous conviennent (journée, cours du soir, samedi…) et toute contrainte particulière.</em></p>
+<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${getDisponibilitesAnswer(s)}</td></tr></table>
+
 <p style="margin-top:20px"><strong>Signature du bénéficiaire :</strong> ${s.prenom} ${s.nom}</p>
 <p style="margin-top:20px"><strong>Analyse du référent pédagogique :</strong> ${o.responsablePedagogique}</p>
 <p><strong>Date d'analyse :</strong> ${formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f), 20))}</p>
