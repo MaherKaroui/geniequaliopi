@@ -676,6 +676,15 @@ export function genExercicesStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
     nbBlocks = Math.max(1, Math.ceil(nbJours / 2));
   }
 
+  // VTC : on ajoutera 2 QCM anglais supplémentaires (épreuve langue étrangère RS5637)
+  const _tIntitVTC = (f.intitule || "").toLowerCase();
+  const _isVTC = _tIntitVTC.includes("vtc") || _tIntitVTC.includes("conducteur") ||
+    _tIntitVTC.includes("transport de personnes") || _tIntitVTC.includes("t3p") || _tIntitVTC.includes("chauffeur");
+  if (_isVTC) {
+    nbBlocks += 2;
+    blocLabels = [...blocLabels, "QCM English – Welcoming passengers", "QCM English – Safety & regulation"];
+  }
+
   const totalExNeeded = nbBlocks * EXERCICES_PER_BLOCK;
 
   const exercices = [...allExercices];
