@@ -1300,6 +1300,8 @@ export function buildFullCatalog(
       const s0 = stagiaires[0];
       add(`mail_questions_vtc_${0}`, `MAIL - QUESTIONS FORMATION VTC (Échange ${s0.prenom} ${s0.nom} ↔ Nabih)`, 0, 0, "mail_questions_formation_vtc", { stagiaireIdx: 0 });
     }
+    // Mail conversation Bilal Nouira ↔ Start Formation (demande aménagement MDPH)
+    add(`mail_amenagement_mdph_bilal`, `MAIL - DEMANDE AMÉNAGEMENT MDPH (Échange Bilal Nouira ↔ Start Formation)`, 0, 0, "mail_amenagement_mdph_bilal");
   }
 
   // ===== MAIL — Envois hebdomadaires QCM 14 missions (CFA uniquement) =====
