@@ -30,6 +30,7 @@ import { genMailBilanFroid3Mois } from "./mailBilanFroid3Mois";
 import { genMailDeroulementExamenVTC } from "./mailDeroulementExamenVTC";
 import { genMailInvitationFormateurExterne } from "./mailInvitationFormateurExterne";
 import { genMailQuestionsFormationVTC } from "./mailQuestionsFormationVTC";
+import { genMailAmenagementMDPHBilal } from "./mailAmenagementMDPHBilal";
 import { getYearFromDateCandidates } from "./eyExport";
 import { genProgrammeBDC as genProgrammeBDC_imported, genEvaluationBesoins as genEvaluationBesoins_imported, genDocumentSynthese as genDocumentSynthese_imported, genDerouleModalitesBDC as genDerouleModalitesBDC_imported, genEnqueteMetierBDC as genEnqueteMetierBDC_imported, genCGVBilanCompetences as genCGVBilanCompetences_imported, genContratBilanCompetences as genContratBilanCompetences_imported, genConventionBilanCompetences as genConventionBilanCompetences_imported, genFormulaireAttentesBDC as genFormulaireAttentesBDC_imported, genConvocationBDC as genConvocationBDC_imported, genSynopsisBDC as genSynopsisBDC_imported, genGrilleSuiviBDC as genGrilleSuiviBDC_imported, genSuiviPostBilanBDC as genSuiviPostBilanBDC_imported, genProcedureAdaptationBDC as genProcedureAdaptationBDC_imported, genExplorationMetierBDC as genExplorationMetierBDC_imported, genFichePosteConsultantBDC as genFichePosteConsultantBDC_imported, genCompteRenduFinBDC as genCompteRenduFinBDC_imported, genFicheIntervenantExterneBDC as genFicheIntervenantExterneBDC_imported, genSatisfactionChaudBDC as genSatisfactionChaudBDC_imported, genFormulaireReclamationBDC as genFormulaireReclamationBDC_imported, genGestionReclamationsBDC as genGestionReclamationsBDC_imported, genActionsCorrectivesBDC as genActionsCorrectivesBDC_imported, genBilanAbandonsRupturesBDC as genBilanAbandonsRupturesBDC_imported, genBilanMensuelBDC as genBilanMensuelBDC_imported, genQuestionnaireEnqueteMetiersBDC as genQuestionnaireEnqueteMetiersBDC_imported, genGuideProtocolesBDC as genGuideProtocolesBDC_imported, genTableauBasesBDC as genTableauBasesBDC_imported, genFicheVeilleBDC as genFicheVeilleBDC_imported, genContratSousTraitanceBDC as genContratSousTraitanceBDC_imported } from "./templatesBDC";
 import { genDPOfficiel, genECFOfficiel, genPVSessionGlobal, preloadDPAIPack } from "./templatesCFAOfficiels";
@@ -919,6 +920,9 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "mail_questions_formation_vtc": {
       const idx = typeof params?.stagiaireIdx === "number" ? params.stagiaireIdx : 0;
       return genMailQuestionsFormationVTC(o, f, stagiaires, idx);
+    }
+    case "mail_amenagement_mdph_bilal": {
+      return genMailAmenagementMDPHBilal(o, f, stagiaires);
     }
     case "procedure_abandon_cfa": return genProcedureAbandon(o);
     case "procedure_absences_cfa": return genProcedureAbsences(o);
