@@ -33,7 +33,7 @@ import { getCachedPack, answersForQCM, studentAnswerFromCorrection, noteForOpenQ
 const FALLBACK_STAGIAIRE: StagiaireInfo = { prenom: "Martin", nom: "Dupont", civilite: "" as "M." | "Mme" | "", email: "", telephone: "", entreprise: "", poste: "", dateNaissance: "" };
 
 /**
- * Détecte si la formation est un cursus ECSR (cours du soir + samedi).
+ * Détecte si la formation est un cursus en cours du soir + samedi (ECSR ou VTC).
  * Horaires : Lundi–Vendredi 18h00–22h00 (4h) | Samedi 09h00–12h30 + 13h30–17h30 (7h30).
  */
 export function isECSRFormation(f: FormationInfo): boolean {
@@ -43,8 +43,14 @@ export function isECSRFormation(f: FormationInfo): boolean {
     || t.includes("sécurité routière")
     || t.includes("securite routiere")
     || t.includes("moniteur auto-école")
-    || t.includes("moniteur auto-ecole");
+    || t.includes("moniteur auto-ecole")
+    || t.includes("vtc")
+    || t.includes("conducteur")
+    || t.includes("transport de personnes")
+    || t.includes("t3p")
+    || t.includes("chauffeur");
 }
+
 
 /** Retourne la chaîne d'horaires d'affichage selon la formation et le jour de semaine (0=dim, 6=sam). */
 export function getHorairesLabel(f: FormationInfo, dow?: number): string {
