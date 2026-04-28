@@ -171,7 +171,7 @@ const Index = () => {
               </div>
             ))}
           </div>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 justify-center">
             <Button size="lg" className="bg-gradient-hero border-0 text-primary-foreground px-8 py-6 text-base shadow-elevated" onClick={() => updateStarted(true)}>
               Commencer <ChevronRight className="w-5 h-5 ml-2" />
             </Button>
