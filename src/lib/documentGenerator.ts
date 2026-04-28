@@ -916,6 +916,10 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
       const idx = typeof params?.stagiaireIdx === "number" ? params.stagiaireIdx : 0;
       return genMailInvitationFormateurExterne(o, f, stagiaires, idx);
     }
+    case "mail_questions_formation_vtc": {
+      const idx = typeof params?.stagiaireIdx === "number" ? params.stagiaireIdx : 0;
+      return genMailQuestionsFormationVTC(o, f, stagiaires, idx);
+    }
     case "procedure_abandon_cfa": return genProcedureAbandon(o);
     case "procedure_absences_cfa": return genProcedureAbsences(o);
     case "emargement_cfa": return genEmargementCFA(o, f, stagiaires);

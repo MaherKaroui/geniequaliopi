@@ -1295,6 +1295,14 @@ export function buildFullCatalog(
       add(`mail_bilan_froid_${si}`, `MAIL - BILAN À FROID (3 mois après) – ${s.prenom} ${s.nom}`, 0, 0, "mail_bilan_froid_3mois", { stagiaireIdx: si });
       add(`mail_invitation_formateur_externe_${si}`, `MAIL - INVITATION FORMATEUR EXTERNE (Nabih Ouardani) – Session ${s.prenom} ${s.nom}`, 0, 0, "mail_invitation_formateur_externe", { stagiaireIdx: si });
     });
+    // Mail conversation élève ↔ formateur Nabih (1 seul stagiaire)
+    if (stagiaires[0]) {
+      const s0 = stagiaires[0];
+      add(`mail_questions_vtc_${0}`, `MAIL - QUESTIONS FORMATION VTC (Échange ${s0.prenom} ${s0.nom} ↔ Nabih)`, 0, 0, "mail_questions_formation_vtc", { stagiaireIdx: 0 });
+    }
+    // Placeholder to keep brace balance (closed below)
+    [].forEach(() => {
+    });
   }
 
   // ===== MAIL — Envois hebdomadaires QCM 14 missions (CFA uniquement) =====
