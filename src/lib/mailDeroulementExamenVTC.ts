@@ -98,21 +98,21 @@ export function genMailDeroulementExamenVTC(
     <p style="margin:0 0 10px;">
       Elle se déroule sous forme d'exercices écrits comprenant des <strong>questionnaires à choix multiples (QCM)</strong> et des <strong>questions à réponses courtes (QRC)</strong>, permettant d'évaluer vos connaissances en :
     </p>
-    <ul style="margin:0 0 14px;padding-left:22px;">
-      <li>Réglementation du transport public particulier de personnes (T3P) ;</li>
-      <li>Gestion d'entreprise (statuts juridiques, fiscalité, comptabilité) ;</li>
-      <li>Sécurité routière ;</li>
-      <li>Langue française et langue anglaise (niveau A2) ;</li>
-      <li>Développement commercial et relation client.</li>
+    <ul style="margin:0 0 14px;padding-left:22px;list-style-type:disc;list-style-position:outside;">
+      <li style="display:list-item;list-style-type:disc;margin-bottom:4px;">Réglementation du transport public particulier de personnes (T3P) ;</li>
+      <li style="display:list-item;list-style-type:disc;margin-bottom:4px;">Gestion d'entreprise (statuts juridiques, fiscalité, comptabilité) ;</li>
+      <li style="display:list-item;list-style-type:disc;margin-bottom:4px;">Sécurité routière ;</li>
+      <li style="display:list-item;list-style-type:disc;margin-bottom:4px;">Langue française et langue anglaise (niveau A2) ;</li>
+      <li style="display:list-item;list-style-type:disc;margin-bottom:4px;">Développement commercial et relation client.</li>
     </ul>
 
     <h3 style="margin:18px 0 8px;font-size:15px;color:#0078d4;">2. Épreuve pratique d'admission</h3>
     <p style="margin:0 0 10px;">
       Elle consiste en une <strong>mise en situation professionnelle réelle</strong> de transport de personnes, incluant :
     </p>
-    <ul style="margin:0 0 14px;padding-left:22px;">
-      <li>Une <strong>phase de conduite en circulation</strong> : évaluation de la sécurité de conduite, du respect du code de la route et du confort passager ;</li>
-      <li>Une <strong>simulation de prise en charge client</strong> : accueil, qualité de service, relation client, gestion d'incident.</li>
+    <ul style="margin:0 0 14px;padding-left:22px;list-style-type:disc;list-style-position:outside;">
+      <li style="display:list-item;list-style-type:disc;margin-bottom:4px;">Une <strong>phase de conduite en circulation</strong> : évaluation de la sécurité de conduite, du respect du code de la route et du confort passager ;</li>
+      <li style="display:list-item;list-style-type:disc;margin-bottom:4px;">Une <strong>simulation de prise en charge client</strong> : accueil, qualité de service, relation client, gestion d'incident.</li>
     </ul>
 
     <p style="margin:0 0 14px;">
