@@ -748,11 +748,12 @@ export function genExercicesStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
     return lower.includes('anglais') || lower.includes('english') || lower.includes('toeic');
   })();
 
+  // QCM title (1 QCM per file, 10 sub-questions inside)
+  const qcmTitleLabel = selectedExercices[0]?.titre || `QCM`;
   let extra = `
-    <h2>ÉVALUATION FINALE – EXERCICES & JEUX${jourLabel} – FORMATION ${f.intitule.toUpperCase()}</h2>
+    <h2>QCM – ${qcmTitleLabel.toUpperCase()} – FORMATION ${f.intitule.toUpperCase()}</h2>
     <p><strong>Nom et prénom :</strong> ${s.prenom} ${s.nom}</p>
     <p><strong>Date :</strong> ${exerciseDate}</p>
-    <h3>PARTIE 1 – EXERCICES PRATIQUES</h3>
   `;
 
   const hash = (s.nom + s.prenom).split("").reduce((a: number, c: string) => a + c.charCodeAt(0), 0);
