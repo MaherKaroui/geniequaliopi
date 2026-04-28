@@ -2784,8 +2784,9 @@ function genEmargementStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: 
   const s = stagiaires[stagiaireIdx] || fallbackStagiaire;
   const dateDebut = s.dateDebutFormation || f.dateDebut || "";
   const dateFin = s.dateFinFormation || f.dateFin || "";
-  let days: string[] = [];
-  const includeSat = formationIncludesSaturday(f);
+  let days: { label: string; dow: number }[] = [];
+  const ecsr = isECSRFormation(f);
+  const includeSat = ecsr || formationIncludesSaturday(f);
   if (dateDebut && dateFin) {
     const start = parseDateSafe(dateDebut);
     const end = parseDateSafe(dateFin);
@@ -2794,13 +2795,16 @@ function genEmargementStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: 
       while (current <= end) {
         const dow = current.getDay();
         if (dow !== 0 && (includeSat || dow !== 6)) {
-          days.push(current.toLocaleDateString("fr-FR", { weekday: "long", year: "numeric", month: "long", day: "numeric" }));
+          days.push({
+            label: current.toLocaleDateString("fr-FR", { weekday: "long", year: "numeric", month: "long", day: "numeric" }),
+            dow,
+          });
         }
         current.setDate(current.getDate() + 1);
       }
     }
   }
-  if (days.length === 0) days = getFormationDays(f);
+  if (days.length === 0) days = getFormationDays(f).map(d => ({ label: d, dow: 1 }));
   const mixte = isMixte(f);
   const stagName = `${s.civilite ? s.civilite + " " : ""}${s.prenom} ${(s.nom || "").toUpperCase()}`.trim();
   const stagiaireInitiale = s.prenom?.trim().charAt(0) || "S";
@@ -2812,19 +2816,23 @@ function genEmargementStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: 
   let extra = `<p><strong>Stagiaire :</strong> ${stagName}</p>`;
   extra += `<p><strong>Session :</strong> Du ${formatDate(dateDebut)} au ${formatDate(dateFin)}</p>`;
   extra += `<p><strong>Formateur :</strong> ${f.formateur}</p>`;
+  if (ecsr) extra += `<p><strong>Horaires :</strong> Lundi au vendredi 18h00 – 22h00 (cours du soir) / Samedi 09h00 – 12h30 et 13h30 – 17h30</p>`;
   if (mixte) extra += `<p><strong>Modalité :</strong> Mixte (alternance Présentiel / Distanciel)</p>`;
   days.forEach((day, di) => {
     if (di > 0 && di % 5 === 0) extra += '<div class="page-break"></div>';
-    const isPast = isFrLongDayPast(day);
+    const isPast = isFrLongDayPast(day.label);
     const modalite = getDayModalite(f, di);
     const modaliteLabel = mixte ? ` <span style="color:#1e3a7b;font-weight:600">(${modalite === 'P' ? 'Présentiel' : 'Distanciel'})</span>` : '';
     const sigStag = isPast ? stagSigHtml : blankSigHtml;
     const sigForm = isPast ? formateurSigHtml : blankSigHtml;
     const stagDisplay = isPast ? stagName : '';
     const formDisplay = isPast ? f.formateur : '';
+    const blocs = getEmargementBlocs(f, day.dow);
     let tableRows = '';
-    tableRows += `<tr style="background:#fff;border-bottom:1px solid #ddd"><td>${day}${modaliteLabel}</td><td>Matin</td><td style="padding:10px 6px">${stagDisplay}${sigStag}</td><td style="padding:10px 6px">${formDisplay}${sigForm}</td></tr>`;
-    tableRows += `<tr style="background:#fff;border-bottom:1px solid #ccc"><td></td><td>Après-midi</td><td style="padding:10px 6px">${stagDisplay}${sigStag}</td><td style="padding:10px 6px">${formDisplay}${sigForm}</td></tr>`;
+    blocs.forEach((b, bi) => {
+      const dateCell = bi === 0 ? `${day.label}${modaliteLabel}` : '';
+      tableRows += `<tr style="background:#fff;border-bottom:1px solid ${bi === blocs.length - 1 ? '#ccc' : '#ddd'}"><td>${dateCell}</td><td>${b.label}<br><small>${b.horaire}</small></td><td style="padding:10px 6px">${stagDisplay}${sigStag}</td><td style="padding:10px 6px">${formDisplay}${sigForm}</td></tr>`;
+    });
     extra += `<table><tr><th>Date</th><th>Horaires</th><th>Signature du Stagiaire</th><th>Signature du Formateur</th></tr>${tableRows}</table>`;
   });
   return buildDocument({ org: o, title: "FEUILLE D'ÉMARGEMENT", subtitle: `${f.intitule} – ${stagName}`, extraHtml: extra });
