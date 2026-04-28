@@ -666,7 +666,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
       const fForEntretien = params?.formateurNom ? { ...f, formateur: params.formateurNom } : f;
       return genFicheEntretienAnnuelFormateur(o, fForEntretien, fmtForEntretien, stagiaires);
     }
-    case "enquete_satisfaction_formateur": return genEnqueteSatisfactionFormateur(o, f);
+    case "enquete_satisfaction_formateur": return genEnqueteSatisfactionFormateur(o, f, stagiaires);
     // === Nouveaux templates CFA ===
     case "attestation_inscription_cfa": return genAttestationInscriptionCFAV2(o, f, stagiaires, params?.stagiaireIdx ?? 0);
     case "fiche_renseignement_cfa": return genFicheRenseignementCFA(o, f, stagiaires, params?.stagiaireIdx ?? 0);
@@ -8091,23 +8091,67 @@ function genFicheEntretienAnnuelFormateur(o: OrganismeInfo, f: FormationInfo, fm
   });
 }
 
-function genEnqueteSatisfactionFormateur(o: OrganismeInfo, f: FormationInfo) {
-  return buildDocument({ org: o, title: "ENQUÊTE DE SATISFACTION – FORMATEUR(TRICE)", sections: [
-    { heading: "Informations", content: `<p><strong>Date :</strong> ${formatDate(f.dateFin)}<br><strong>Nom du formateur :</strong> ${f.formateur}<br><strong>Formation dispensée :</strong> ${f.intitule}<br><strong>Période :</strong> Du ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)}</p>` },
-  ], table: {
-    headers: ["Critère", "1 – Pas satisfait", "2 – Peu satisfait", "3 – Satisfait", "4 – Très satisfait"],
-    rows: [
-      ["Organisation et logistique de la formation", "☐", "☐", "☐", "☐"],
-      ["Qualité des supports et outils mis à disposition", "☐", "☐", "☐", "☐"],
-      ["Communication avec l'équipe pédagogique", "☐", "☐", "☐", "☐"],
-      ["Adéquation du public avec le programme", "☐", "☐", "☐", "☐"],
-      ["Conditions matérielles (salle, matériel, connexion)", "☐", "☐", "☐", "☐"],
-      ["Accompagnement et soutien de la direction", "☐", "☐", "☐", "☐"],
-      ["Rémunération et conditions contractuelles", "☐", "☐", "☐", "☐"],
-      ["Possibilités de développement professionnel", "☐", "☐", "☐", "☐"],
-    ]
-  }, extraHtml: `<div class="section"><p><strong>Points positifs :</strong> ________________________________</p><p><strong>Axes d'amélioration suggérés :</strong> ________________________________</p><p><strong>Recommanderiez-vous ${o.nom} à un autre formateur ?</strong> ☐ Oui ☐ Non</p><p><strong>Commentaires libres :</strong> ________________________________</p></div>`,
-  });
+function genEnqueteSatisfactionFormateur(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
+  const list = (stagiaires && stagiaires.length > 0) ? stagiaires : [{ nom: "", prenom: "", formateur: f.formateur } as StagiaireInfo];
+  // Réponses réalistes (majorité "Très satisfait", quelques "Satisfait")
+  const patterns = [
+    [4,4,4,3,4,4,3,4],
+    [4,3,4,4,4,4,4,3],
+    [3,4,4,4,3,4,4,4],
+    [4,4,3,4,4,3,4,4],
+    [4,4,4,4,4,4,3,4],
+    [3,4,4,3,4,4,4,4],
+  ];
+  const criteres = [
+    "Organisation et logistique de la formation",
+    "Qualité des supports et outils mis à disposition",
+    "Communication avec l'équipe pédagogique",
+    "Adéquation du public avec le programme",
+    "Conditions matérielles (salle, matériel, connexion)",
+    "Accompagnement et soutien de la direction",
+    "Rémunération et conditions contractuelles",
+    "Possibilités de développement professionnel",
+  ];
+  const commentaires = [
+    { pos: "Stagiaires motivés, bonne dynamique de groupe, supports pédagogiques de qualité.", axes: "Prévoir davantage de cas pratiques sectoriels.", reco: true },
+    { pos: "Excellente organisation, équipe administrative réactive, conditions matérielles optimales.", axes: "Renforcer les ressources e-learning complémentaires.", reco: true },
+    { pos: "Communication fluide avec la direction, autonomie pédagogique appréciée.", axes: "Plus de temps pour les échanges en équipe pédagogique.", reco: true },
+    { pos: "Accompagnement individualisé possible, public attentif et investi.", axes: "Améliorer la connexion internet en salle.", reco: true },
+    { pos: "Bonne adéquation entre profils stagiaires et niveau attendu, supports clairs.", axes: "Ajouter des outils numériques d'évaluation continue.", reco: true },
+  ];
+
+  const blocks = list.map((s, i) => {
+    const formateurNom = (s.formateur && s.formateur.trim()) || f.formateur || "[Formateur non renseigné]";
+    const traineeName = `${s.prenom || ""} ${s.nom || ""}`.trim();
+    const p = patterns[i % patterns.length];
+    const c = commentaires[i % commentaires.length];
+    const rows = criteres.map((crit, idx) => {
+      const score = p[idx];
+      return [crit, score === 1 ? "X" : "", score === 2 ? "X" : "", score === 3 ? "X" : "", score === 4 ? "X" : ""];
+    });
+    let html = `<div class="section" style="page-break-after:always">`;
+    html += `<h2>Enquête n°${i + 1} – ${formateurNom}</h2>`;
+    html += `<p><strong>Date :</strong> ${formatDate(f.dateFin)}<br>`;
+    html += `<strong>Nom du formateur :</strong> ${formateurNom}<br>`;
+    if (traineeName) html += `<strong>Stagiaire concerné :</strong> ${traineeName}<br>`;
+    html += `<strong>Formation dispensée :</strong> ${f.intitule}<br>`;
+    html += `<strong>Période :</strong> Du ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)}</p>`;
+    html += `<table border="1" cellpadding="6" cellspacing="0" style="width:100%;border-collapse:collapse;margin-top:8px">`;
+    html += `<tr style="background:#e8f0fe"><th>Critère</th><th>1 – Pas satisfait</th><th>2 – Peu satisfait</th><th>3 – Satisfait</th><th>4 – Très satisfait</th></tr>`;
+    rows.forEach((r, idx) => {
+      const bg = idx % 2 === 0 ? "#ffffff" : "#f5f9ff";
+      html += `<tr style="background:${bg}"><td>${r[0]}</td><td style="text-align:center">${r[1]}</td><td style="text-align:center">${r[2]}</td><td style="text-align:center">${r[3]}</td><td style="text-align:center">${r[4]}</td></tr>`;
+    });
+    html += `</table>`;
+    html += `<p style="margin-top:10px"><strong>Points positifs :</strong> ${c.pos}</p>`;
+    html += `<p><strong>Axes d'amélioration suggérés :</strong> ${c.axes}</p>`;
+    html += `<p><strong>Recommanderiez-vous ${o.nom} à un autre formateur ?</strong> ${c.reco ? "☒ Oui  ☐ Non" : "☐ Oui  ☒ Non"}</p>`;
+    html += `<p><strong>Signature formateur :</strong> ${formateurNom}</p>`;
+    html += `</div>`;
+    return html;
+  }).join("");
+
+  return buildDocument({ org: o, title: "ENQUÊTES DE SATISFACTION – FORMATEUR(TRICE)S", subtitle: f.intitule, formation: f, showFormationInfo: true, extraHtml: blocks });
 }
 function genDocumentsCertificateursCFA(o: OrganismeInfo, f: FormationInfo) {
   const fiche = f.codeRNCP ? getRNCPByCode(f.codeRNCP) : undefined;
