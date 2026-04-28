@@ -44,10 +44,9 @@ export function buildFullCatalog(
     // IND 4 — Analyse du besoin du bénéficiaire
     add("af_c2i4_procedure_eval_besoins", "CT2 - IND 4 PROCÉDURE D'ÉVALUATION DES BESOINS DES STAGIAIRES", 2, 4, "procedure_eval_besoins");
     add("af_c2i4_fiche_eval_psh", "CT2 - IND 4 FICHE D'ÉVALUATION DES BESOINS – PERSONNE EN SITUATION DE HANDICAP", 2, 4, "fiche_eval_besoins_psh");
-    // Trame évaluation des besoins — un fichier par stagiaire
+    // Trame évaluation des besoins — un fichier par stagiaire (apprenant + entreprise regroupés)
     stagiaires.forEach((s, si) => {
-      add(`af_c2i4_trame_eval_besoins_apprenant_${si}`, `CT2 - IND 4 TRAME ÉVALUATION DES BESOINS – APPRENANT – ${s.prenom} ${s.nom}`, 2, 4, "trame_eval_besoins_stagiaire", { stagiaireIdx: si });
-      add(`af_c2i4_trame_eval_besoins_entreprise_${si}`, `CT2 - IND 4 TRAME ÉVALUATION DES BESOINS – ENTREPRISE – ${s.prenom} ${s.nom}`, 2, 4, "trame_eval_besoins_entreprise", { stagiaireIdx: si });
+      add(`af_c2i4_trame_eval_besoins_${si}`, `CT2 - IND 4 TRAME ÉVALUATION DES BESOINS – ${s.prenom} ${s.nom}`, 2, 4, "trame_eval_besoins_combine", { stagiaireIdx: si });
     });
 
     // IND 5 — Objectifs opérationnels et évaluables
@@ -122,7 +121,7 @@ export function buildFullCatalog(
     add("af_c3i10_procedure_adaptation", "CT3 - IND 10 PROCÉDURE D'ADAPTATION PÉDAGOGIQUE", 3, 10, "procedure_adaptation");
     // Évaluation des besoins — un fichier par stagiaire
     stagiaires.forEach((s, si) => {
-      add(`af_c3i10_eval_besoins_${si}`, `CT3 - IND 10 ÉVALUATION DES BESOINS – ${s.prenom} ${s.nom}`, 3, 10, "trame_eval_besoins_stagiaire", { stagiaireIdx: si });
+      add(`af_c3i10_eval_besoins_${si}`, `CT3 - IND 10 ÉVALUATION DES BESOINS – ${s.prenom} ${s.nom}`, 3, 10, "trame_eval_besoins_combine", { stagiaireIdx: si });
     });
     formations.forEach((f, fi) => {
       add(`af_c3i10_deroule_pedagogique_${fi}`, `CT3 - IND 10 DÉROULÉ PÉDAGOGIQUE DÉTAILLÉ`, 3, 10, "deroule_pedagogique_detaille", { fi });
