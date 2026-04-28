@@ -199,6 +199,13 @@ function getRenderableNodes(source: HTMLDivElement): ChildNode[] {
   });
 }
 
+function getRenderableChildNodes(source: HTMLElement): ChildNode[] {
+  return Array.from(source.childNodes).filter((node) => {
+    if (node.nodeType === Node.TEXT_NODE) return Boolean(node.textContent?.trim());
+    return true;
+  });
+}
+
 function pageHasRenderableContent(page: HTMLDivElement): boolean {
   const content = page.querySelector(".pdf-root");
   if (!content) return false;
