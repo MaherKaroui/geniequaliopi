@@ -8123,10 +8123,11 @@ function genEnqueteSatisfactionFormateur(o: OrganismeInfo, f: FormationInfo, sta
   ];
 
   const blocks = list.map((s, i) => {
+    const globalIdx = idxOffset + i;
     const formateurNom = (s.formateur && s.formateur.trim()) || f.formateur || "[Formateur non renseigné]";
     const traineeName = `${s.prenom || ""} ${s.nom || ""}`.trim();
-    const p = patterns[i % patterns.length];
-    const c = commentaires[i % commentaires.length];
+    const p = patterns[globalIdx % patterns.length];
+    const c = commentaires[globalIdx % commentaires.length];
     const rows = criteres.map((crit, idx) => {
       const score = p[idx];
       return [crit, score === 1 ? "X" : "", score === 2 ? "X" : "", score === 3 ? "X" : "", score === 4 ? "X" : ""];
