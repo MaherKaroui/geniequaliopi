@@ -777,9 +777,95 @@ export function genExercicesStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
   ];
   const profile = profiles[stagiaireIdx % profiles.length];
 
+  // ====== QCM PARSER : détecte le format "1) … A) … B) … C) … D) …" ======
+  const parseQCM = (consigne: string, reponseAttendue: string): { questions: { num: number; enonce: string; options: string[] }[]; correct: string[] } | null => {
+    // Détection : la consigne contient "1)" et "A)" sur plusieurs lignes
+    if (!/\b1\)/.test(consigne) || !/\bA\)/.test(consigne)) return null;
+    const blocks = consigne.split(/\n\s*\n/).map(b => b.trim()).filter(b => /^\d+\)/.test(b));
+    if (blocks.length < 3) return null;
+    const questions = blocks.map(b => {
+      const numMatch = b.match(/^(\d+)\)\s*([\s\S]*)/);
+      if (!numMatch) return null;
+      const num = parseInt(numMatch[1]);
+      const rest = numMatch[2];
+      // Split options : on cherche A) ... B) ... C) ... D)
+      const optMatches = [...rest.matchAll(/([A-D])\)\s*([^\n]*?)(?=\s{2,}[A-D]\)|$)/g)];
+      if (optMatches.length < 2) return null;
+      // L'énoncé est tout ce qui précède la première option
+      const firstOptIdx = rest.search(/[A-D]\)/);
+      const enonce = rest.slice(0, firstOptIdx).trim().replace(/[:：]\s*$/, '').trim();
+      const options = optMatches.map(m => m[2].trim());
+      return { num, enonce, options };
+    }).filter(Boolean) as { num: number; enonce: string; options: string[] }[];
+    if (questions.length < 3) return null;
+    // Parse "1-B  2-C  3-C ..."
+    const correctMap: Record<number, string> = {};
+    [...reponseAttendue.matchAll(/(\d+)\s*[-–]\s*([A-D])/g)].forEach(m => {
+      correctMap[parseInt(m[1])] = m[2];
+    });
+    const correct = questions.map(q => correctMap[q.num] || 'A');
+    return { questions, correct };
+  };
+
   selectedExercices.forEach((ex, localIdx) => {
     const ei = blockStart + localIdx;
     const exSeed = ((hash * 13 + ei * 37 + stagiaireIdx * 29) & 0x7FFFFFFF) % 100;
+
+    // ====== TENTATIVE DE RENDU EN VRAI QCM ======
+    const qcm = parseQCM(ex.consigne, ex.reponseAttendue);
+    if (qcm) {
+      // Génère les réponses du stagiaire avec un score réaliste (7-10/10)
+      const targetScore = 7 + (exSeed % 4); // 7,8,9,10 sur 10
+      const wrongIdx = new Set<number>();
+      // Choisit (10 - targetScore) questions à rater de manière déterministe
+      const nbWrong = qcm.questions.length - targetScore;
+      for (let k = 0; k < nbWrong; k++) {
+        wrongIdx.add(((exSeed * 7 + k * 13 + stagiaireIdx * 11) % qcm.questions.length));
+      }
+      let scoreObtenu = 0;
+      let qcmHTML = '';
+      qcm.questions.forEach((q, qi) => {
+        const correctLetter = qcm.correct[qi];
+        const isWrong = wrongIdx.has(qi);
+        const letters = ['A', 'B', 'C', 'D'];
+        const otherLetters = letters.filter(l => l !== correctLetter);
+        const studentAnswer = isWrong ? otherLetters[(exSeed + qi) % otherLetters.length] : correctLetter;
+        const note = isWrong ? 0 : 1;
+        scoreObtenu += note;
+
+        qcmHTML += `<div style="margin: 14px 0; page-break-inside: avoid;">`;
+        qcmHTML += `<p><strong>Question ${q.num}</strong><br/>${q.enonce}</p>`;
+        qcmHTML += `<p style="margin-left: 16px; line-height: 1.8;">`;
+        q.options.forEach((opt, oi) => {
+          qcmHTML += `${letters[oi]}. ${opt}<br/>`;
+        });
+        qcmHTML += `</p>`;
+        qcmHTML += `<p><strong>Réponse du stagiaire :</strong> <span style="background:#fff59d;padding:2px 8px;font-weight:bold;">${studentAnswer}</span></p>`;
+        qcmHTML += `<p><strong>Bonne réponse :</strong> ${correctLetter}</p>`;
+        qcmHTML += `<p><strong>Note :</strong> <span style="background:#fff59d;padding:2px 8px;font-weight:bold;">${note}</span> / 1</p>`;
+        qcmHTML += `</div>`;
+      });
+
+      // Note globale ramenée sur 5 (cohérence avec totalMax existant)
+      const noteRound = Math.round((scoreObtenu / qcm.questions.length) * 5 * 2) / 2;
+      totalNote += noteRound;
+      totalMax += noteMax;
+      notesRecap.push({ titre: ex.titre, note: noteRound, max: noteMax });
+
+      if (localIdx > 0) extra += `<br/>`;
+      extra += `<h3>${ex.titre}</h3>`;
+      extra += `<p><strong>Consigne :</strong> Cochez la bonne réponse pour chacune des ${qcm.questions.length} questions.</p>`;
+      extra += qcmHTML;
+      extra += `<h4>Résultat de ce QCM</h4>`;
+      extra += tableHTML(["Élément", "Résultat"], [
+        ["Score obtenu", `${scoreObtenu} / ${qcm.questions.length}`],
+        ["Note ramenée sur 20", `${Math.round((scoreObtenu / qcm.questions.length) * 20)} / 20`],
+        ["Décision", scoreObtenu >= 6 ? "✅ ACQUIS" : "⚠️ À consolider"],
+      ]);
+      return; // Skip the standard exercice rendering
+    }
+
+    // ====== RENDU EXERCICE STANDARD (non-QCM) ======
     let noteBase = profile.baseNote;
     const variation = ((exSeed % 10) - 3) / 10;
     const rawNote = noteBase + variation;
