@@ -2762,11 +2762,19 @@ function genEmargementJour(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
   const mixte = isMixte(f);
   const modalite = getDayModalite(f, jour);
   const modaliteLabel = modalite === 'P' ? 'Présentiel' : 'Distanciel';
-  const rows = stagiaires.slice(0, 10).map(s => [s.nom, s.prenom, s.entreprise, `Signé ${s.prenom[0]}.${s.nom}`, `Signé ${s.prenom[0]}.${s.nom}`]);
-  if (rows.length < 5) { for (let i = rows.length; i < 5; i++) rows.push(["", "", "", "", ""]); }
+  const ecsr = isECSRFormation(f);
+  // Heuristique : alterner samedi tous les 6 jours (cohérent avec déroulé pédagogique ECSR)
+  const isSamedi = ecsr && jour % 6 === 5;
+  const blocs = ecsr ? (isSamedi ? [{ label: 'Matin', horaire: '09h00 – 12h30' }, { label: 'Après-midi', horaire: '13h30 – 17h30' }] : [{ label: 'Soirée', horaire: '18h00 – 22h00' }]) : [{ label: 'Matin', horaire: '09h00 – 12h30' }, { label: 'Après-midi', horaire: '13h30 – 17h00' }];
+  const sigHeaders = blocs.map(b => `Signature ${b.label} (${b.horaire})`);
+  const rows = stagiaires.slice(0, 10).map(s => {
+    const sig = `Signé ${s.prenom[0]}.${s.nom}`;
+    return [s.nom, s.prenom, s.entreprise, ...blocs.map(() => sig)];
+  });
+  if (rows.length < 5) { for (let i = rows.length; i < 5; i++) rows.push(["", "", "", ...blocs.map(() => "")]); }
   const subtitle = mixte ? `${f.intitule} – ${jourLabel} (${modaliteLabel})` : `${f.intitule} – ${jourLabel}`;
   return buildDocument({ org: o, title: "FEUILLE D'ÉMARGEMENT", subtitle, formation: f, showFormationInfo: true, stagiaires, table: {
-    headers: ["Nom", "Prénom", "Entreprise", "Signature Matin", "Signature Après-midi"], rows
+    headers: ["Nom", "Prénom", "Entreprise", ...sigHeaders], rows
   }, signatures: { type: "2", labels: ["Le Formateur", "Le Responsable"], names: [f.formateur, o.dirigeant] } });
 }
 
