@@ -2,6 +2,7 @@ import { DocEntry, FormationInfo } from "@/types/qualiopi";
 import { StagiaireInfo } from "@/types/qualiopi";
 import { FormateurInfo, getFormationDays, parseDuree } from "./sampleData";
 import { getRNCPByCode } from "./rncpData";
+import { getEvalContent } from "./evalContent";
 
 export type ActionType = 'actions-formation' | 'bilans-competences' | 'vae' | 'apprentissage';
 
