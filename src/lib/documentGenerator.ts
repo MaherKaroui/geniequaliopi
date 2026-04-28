@@ -159,7 +159,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
   switch (template) {
     case "fiche_identite": return genFicheIdentite(o);
     case "presentation_organisme": return genPresentation(o);
-    case "organigramme": return genOrganigramme(o, f);
+    case "organigramme": return genOrganigramme(o, selectedFormation);
     case "charte_qualite": return genCharteQualite(o);
     case "politique_qualite": return genPolitiqueQualite(o);
     case "cgv": return genCGV_V2(o, f, stagiaires);
