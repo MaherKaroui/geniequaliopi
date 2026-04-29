@@ -14005,10 +14005,10 @@ function genFicheSuiviActivitesEmployeur(o: OrganismeInfo, f: FormationInfo, sta
           <div>${s.responsableEntreprise || "—"}${s.entreprise ? `<br><span style="font-size:0.9em;color:#555">${s.entreprise}</span>` : ""}</div>
           ${sigMaitre}
         </td>
-        <td style="width:33%;border:1px solid #ccc;padding:10px">
+        <td style="width:33%;border:1px solid #ccc;padding:10px;text-align:center">
           <div style="font-weight:bold;color:#1e3a7b;margin-bottom:6px">Le référent pédagogique</div>
-          <div>${referentNom}<br><span style="font-size:0.9em;color:#555">${o.nom || ""}</span></div>
-          <div>${sigReferent}${tampon}</div>
+          <div>${o.nom || ""}</div>
+          <div style="margin-top:6px">${tampon || `<span style="font-style:italic;color:#888">Tampon de l'organisme</span>`}</div>
         </td>
       </tr>
     </table>
