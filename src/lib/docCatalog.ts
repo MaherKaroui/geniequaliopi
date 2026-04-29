@@ -1029,8 +1029,25 @@ export function buildFullCatalog(
     stagiaires.forEach((s, si) => {
       add(`cfa_c7i30_eval_formateur_${si}`, `CT7 - IND 30 ÉVALUATION FORMATEUR – ${s.prenom} ${s.nom}`, 7, 30, "enquete_satisfaction_formateur", { stagiaireIdx: si });
     });
-    // Auto-évaluation formateur — un seul fichier par session
-    add("cfa_c7i30_autoevaluation_formateur", `CT7 - IND 30 AUTO-ÉVALUATION FORMATEUR`, 7, 30, "autoevaluation_formateur", { formateurIdx: 0 });
+    // Auto-évaluation formateur — un fichier par session (groupé par dates)
+    {
+      const f0 = formations[0];
+      const sessionsMap = new Map<string, { debut: string; fin: string }>();
+      stagiaires.forEach(s => {
+        const debut = s.dateDebutFormation || f0?.dateDebut || "";
+        const fin = s.dateFinFormation || f0?.dateFin || "";
+        const key = `${debut}|${fin}`;
+        if (!sessionsMap.has(key)) sessionsMap.set(key, { debut, fin });
+      });
+      if (sessionsMap.size === 0) {
+        sessionsMap.set("default", { debut: f0?.dateDebut || "", fin: f0?.dateFin || "" });
+      }
+      const fmtShort = (d: string) => d ? d.split("-").reverse().join("/") : "";
+      Array.from(sessionsMap.values()).forEach((sess, idx) => {
+        const label = sess.debut && sess.fin ? `Session ${fmtShort(sess.debut)} – ${fmtShort(sess.fin)}` : `Session ${idx + 1}`;
+        add(`cfa_c7i30_autoevaluation_formateur_s${idx}`, `CT7 - IND 30 AUTO-ÉVALUATION FORMATEUR – ${label}`, 7, 30, "autoevaluation_formateur", { sessionDebut: sess.debut, sessionFin: sess.fin });
+      });
+    }
     stagiaires.forEach((s, si) => {
       add(`cfa_c7i30_bilan_chaud_${si}`, `CT7 - IND 30 BILAN À CHAUD – ${s.prenom} ${s.nom}`, 7, 30, "bilan_chaud_stagiaire", { stagiaireIdx: si });
     });
