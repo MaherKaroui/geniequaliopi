@@ -25,6 +25,7 @@ import { genMailMissionCFA } from "./mailsMissionsCFA";
 import { genMailVisiteEntrepriseCFA } from "./mailVisiteEntrepriseCFA";
 import { genMailEnvoiEvaluationPrealable } from "./mailEnvoiEvaluationPrealable";
 import { genMailRetourDocumentsCompletes } from "./mailRetourDocumentsCompletes";
+import { genMailEnvoiContratConvocationRI } from "./mailEnvoiContratConvocationRI";
 import { genMailRdvEvaluationBesoins } from "./mailRdvEvaluationBesoins";
 import { genMailBilanFroid3Mois } from "./mailBilanFroid3Mois";
 import { genMailDeroulementExamenVTC } from "./mailDeroulementExamenVTC";
@@ -900,6 +901,10 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "mail_retour_documents_completes": {
       const idx = typeof params?.stagiaireIdx === "number" ? params.stagiaireIdx : 0;
       return genMailRetourDocumentsCompletes(o, f, stagiaires, idx);
+    }
+    case "mail_envoi_contrat_convocation_ri": {
+      const idx = typeof params?.stagiaireIdx === "number" ? params.stagiaireIdx : 0;
+      return genMailEnvoiContratConvocationRI(o, f, stagiaires, idx);
     }
     case "mail_rdv_evaluation_besoins": {
       const idx = typeof params?.stagiaireIdx === "number" ? params.stagiaireIdx : 0;
