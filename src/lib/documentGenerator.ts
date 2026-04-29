@@ -630,16 +630,23 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "autoevaluation_formateur": {
       let formateurName = params?.formateurNom || f.formateur || fmt.prenom + " " + fmt.nom;
       let stagiaireForDoc: StagiaireInfo[] = stagiaires;
-      let stagiaireNom: string | undefined = undefined;
-      if (typeof params?.stagiaireIdx === "number" && stagiaires[params.stagiaireIdx]) {
+      let sessionDates: { debut?: string; fin?: string } | undefined = undefined;
+      if (params?.sessionDebut || params?.sessionFin) {
+        sessionDates = { debut: params.sessionDebut, fin: params.sessionFin };
+        // Filter trainees in this session for signature lookup
+        stagiaireForDoc = stagiaires.filter(s =>
+          (s.dateDebutFormation || f.dateDebut) === (params.sessionDebut || f.dateDebut) &&
+          (s.dateFinFormation || f.dateFin) === (params.sessionFin || f.dateFin)
+        );
+        if (stagiaireForDoc.length === 0) stagiaireForDoc = stagiaires;
+      } else if (typeof params?.stagiaireIdx === "number" && stagiaires[params.stagiaireIdx]) {
         const s = stagiaires[params.stagiaireIdx];
         if (s.formateur && s.formateur.trim()) formateurName = s.formateur;
         stagiaireForDoc = [s];
-        stagiaireNom = `${s.prenom || ""} ${s.nom || ""}`.trim();
       }
       const parts = formateurName.trim().split(/\s+/);
       const autoFmt: FormateurInfo = { ...fmt, prenom: parts.slice(0, -1).join(" ") || parts[0], nom: parts[parts.length - 1] || "" };
-      return genAutoEvaluationFormateurV2(o, f, autoFmt, stagiaireForDoc, stagiaireNom);
+      return genAutoEvaluationFormateurV2(o, f, autoFmt, stagiaireForDoc, sessionDates);
     }
     case "liste_partenaires": return genListePartenairesV2(o);
     case "mandat_qualiopi": return genMandatQualiopi(o);
