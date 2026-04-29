@@ -1030,7 +1030,25 @@ export function buildFullCatalog(
     add("cfa_c6i27_charte_qualite_formateur", "CT6 - IND 27 CHARTE QUALITÉ FORMATEUR EXTERNE", 6, 27, "charte_qualite_formateur_externe");
     add("cfa_c6i27_mandat_qualiopi", "CT6 - IND 27 MANDAT DE PRÉSENTATION ET DE GESTION QUALIOPI", 6, 27, "mandat_qualiopi");
     add("cfa_c6i27_pdf_guide_qualiopi", "CT6 - IND 27 V9 GUIDE DE LECTURE QUALIOPI", 6, 27, "pdf_static", { pdfFile: "v9_guide_lecture_qualiopi.pdf" });
-    add("cfa_c6i27_checklist_formateur", "CT6 - IND 27 CHECKLIST FORMATEUR", 6, 27, "checklist_formateur");
+    // Checklist formateur — un fichier par session (groupé par dates)
+    {
+      const f0 = formations[0];
+      const sessionsMapCkC = new Map<string, { debut: string; fin: string }>();
+      stagiaires.forEach(s => {
+        const debut = s.dateDebutFormation || f0?.dateDebut || "";
+        const fin = s.dateFinFormation || f0?.dateFin || "";
+        const key = `${debut}|${fin}`;
+        if (!sessionsMapCkC.has(key)) sessionsMapCkC.set(key, { debut, fin });
+      });
+      if (sessionsMapCkC.size === 0) {
+        sessionsMapCkC.set("default", { debut: f0?.dateDebut || "", fin: f0?.dateFin || "" });
+      }
+      const fmtShortCkC = (d: string) => d ? d.split("-").reverse().join("/") : "";
+      Array.from(sessionsMapCkC.values()).forEach((sess, idx) => {
+        const label = sess.debut && sess.fin ? `Session ${fmtShortCkC(sess.debut)} – ${fmtShortCkC(sess.fin)}` : `Session ${idx + 1}`;
+        add(`cfa_c6i27_checklist_formateur_s${idx}`, `CT6 - IND 27 CHECKLIST FORMATEUR – ${label}`, 6, 27, "checklist_formateur", { sessionDebut: sess.debut, sessionFin: sess.fin });
+      });
+    }
 
     // IND 28 — Mobilisation des acteurs économiques et sociaux
     add("cfa_c6i28_orientation_pour_tous", "CT6 - IND 28 📁 ORIENTATION POUR TOUS", 6, 28, "pdf_static", { pdfUrl: "/pdfs/citoyennete/orientation_pour_tous.png" });
