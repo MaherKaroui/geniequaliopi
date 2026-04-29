@@ -1289,6 +1289,7 @@ export function buildFullCatalog(
       add(`mail_inscription_${si}`, `MAIL - CONFIRMATION INSCRIPTION – ${s.prenom} ${s.nom}`, 0, 0, "mail_inscription", { stagiaireIdx: si });
       add(`mail_rdv_eval_${si}`, `MAIL - 1er RENDEZ-VOUS (Évaluation des besoins + Test positionnement) – ${s.prenom} ${s.nom}`, 0, 0, "mail_rdv_evaluation_besoins", { stagiaireIdx: si });
       add(`mail_convocation_${si}`, `MAIL - CONVOCATION – ${s.prenom} ${s.nom}`, 0, 0, "mail_convocation", { stagiaireIdx: si });
+      add(`mail_envoi_contrat_convocation_ri_${si}`, `MAIL - ENVOI CONTRAT + CONVOCATION + RÈGLEMENT INTÉRIEUR – ${s.prenom} ${s.nom}`, 0, 0, "mail_envoi_contrat_convocation_ri", { stagiaireIdx: si });
       add(`mail_envoie_sc_${si}`, `MAIL - ENVOI SC ET RESSOURCES – ${s.prenom} ${s.nom}`, 0, 0, "mail_envoie_sc_ressources", { stagiaireIdx: si });
       add(`mail_deroulement_examen_${si}`, `MAIL - DÉROULEMENT EXAMEN VTC (RS5637) – ${s.prenom} ${s.nom}`, 0, 0, "mail_deroulement_examen_vtc", { stagiaireIdx: si });
       add(`mail_fin_formation_${si}`, `MAIL - BILAN À CHAUD – ${s.prenom} ${s.nom}`, 0, 0, "mail_fin_formation", { stagiaireIdx: si });
