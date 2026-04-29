@@ -13833,8 +13833,10 @@ function genFicheSuiviActivitesEmployeur(o: OrganismeInfo, f: FormationInfo, sta
   const dFin = parseD(dateFinStr);
   const today = new Date(); today.setHours(0, 0, 0, 0);
 
-  // Période suivie : du début à min(today, dateFin)
-  const dEnd = dFin && dFin < today ? dFin : (dFin || today);
+  // Période suivie : du début à AUJOURD'HUI (jamais au-delà — formation en cours = pas d'activités futures)
+  const dEnd = dDeb && dFin
+    ? (dFin < today ? dFin : (dDeb > today ? dDeb : today))
+    : (dFin || today);
   const periodeDebut = dDeb ? fmtLong(dDeb) : (dateDebutStr || "—");
   const periodeFin = dEnd ? fmtLong(dEnd) : (dateFinStr || "—");
 
@@ -13900,10 +13902,12 @@ function genFicheSuiviActivitesEmployeur(o: OrganismeInfo, f: FormationInfo, sta
   const fmtPeriode = (p: { from: Date; to: Date }) => `Du ${fmtLong(p.from)} au ${fmtLong(p.to)}`;
 
   const rowsHtml = periodes
+    .filter((p) => p.from <= today) // n'afficher que les périodes déjà commencées
     .map((p, i) => {
       const a = activitesGeneriques[i];
+      const pTo = p.to > today ? today : p.to; // borner la fin à aujourd'hui
       return `<tr>
-        <td style="vertical-align:top">${fmtPeriode(p)}</td>
+        <td style="vertical-align:top">${fmtPeriode({ from: p.from, to: pTo })}</td>
         <td style="vertical-align:top">${a.activite}</td>
         <td style="vertical-align:top">${a.objectif}</td>
         <td style="vertical-align:top">${a.competences}</td>
@@ -14001,10 +14005,10 @@ function genFicheSuiviActivitesEmployeur(o: OrganismeInfo, f: FormationInfo, sta
           <div>${s.responsableEntreprise || "—"}${s.entreprise ? `<br><span style="font-size:0.9em;color:#555">${s.entreprise}</span>` : ""}</div>
           ${sigMaitre}
         </td>
-        <td style="width:33%;border:1px solid #ccc;padding:10px">
+        <td style="width:33%;border:1px solid #ccc;padding:10px;text-align:center">
           <div style="font-weight:bold;color:#1e3a7b;margin-bottom:6px">Le référent pédagogique</div>
-          <div>${referentNom}<br><span style="font-size:0.9em;color:#555">${o.nom || ""}</span></div>
-          <div>${sigReferent}${tampon}</div>
+          <div>${o.nom || ""}</div>
+          <div style="margin-top:6px">${tampon || `<span style="font-style:italic;color:#888">Tampon de l'organisme</span>`}</div>
         </td>
       </tr>
     </table>
