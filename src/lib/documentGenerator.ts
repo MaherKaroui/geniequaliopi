@@ -13902,10 +13902,12 @@ function genFicheSuiviActivitesEmployeur(o: OrganismeInfo, f: FormationInfo, sta
   const fmtPeriode = (p: { from: Date; to: Date }) => `Du ${fmtLong(p.from)} au ${fmtLong(p.to)}`;
 
   const rowsHtml = periodes
+    .filter((p) => p.from <= today) // n'afficher que les périodes déjà commencées
     .map((p, i) => {
       const a = activitesGeneriques[i];
+      const pTo = p.to > today ? today : p.to; // borner la fin à aujourd'hui
       return `<tr>
-        <td style="vertical-align:top">${fmtPeriode(p)}</td>
+        <td style="vertical-align:top">${fmtPeriode({ from: p.from, to: pTo })}</td>
         <td style="vertical-align:top">${a.activite}</td>
         <td style="vertical-align:top">${a.objectif}</td>
         <td style="vertical-align:top">${a.competences}</td>
