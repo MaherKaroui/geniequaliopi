@@ -1953,6 +1953,7 @@ export function genChecklistFormateur(o: OrganismeInfo, f: FormationInfo, sessio
   const sessDebut = sessionDates?.debut || f.dateDebut;
   const sessFin = sessionDates?.fin || f.dateFin;
   const dateDoc = sessDebut ? formatDate(sessDebut) : new Date().toLocaleDateString("fr-FR");
+  const dateSig = sessFin ? formatDate(sessFin) : dateDoc;
   const formateurNom = f.formateur || "—";
   const tamponHtml = o.tamponUrl ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />` : "";
   const fmtSigUrl = (f as any).formateurSignatureUrl;
