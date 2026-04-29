@@ -88,10 +88,10 @@ export function genMailEnvoiContratConvocationRI(
   const pjHtml = pj
     .map(
       (p) => `
-      <div style="display:inline-block;vertical-align:top;border:1px solid #e1dfdd;border-radius:4px;padding:8px 28px 8px 38px;margin:0 8px 8px 0;background:#faf9f8;min-width:200px;position:relative;font-size:12px;">
-        <div style="position:absolute;left:8px;top:8px;width:22px;height:22px;background:${p.color};color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;border-radius:2px;">P</div>
-        <div style="color:#201f1e;font-weight:600;line-height:1.3;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(p.nom)}</div>
-        <div style="color:#605e5c;font-size:11px;margin-top:2px;">${escapeHtml(p.taille)}</div>
+      <div style="display:inline-block;vertical-align:top;border:1px solid #e1dfdd;border-radius:4px;padding:10px 14px 10px 44px;margin:0 8px 8px 0;background:#faf9f8;width:300px;position:relative;font-size:12px;box-sizing:border-box;">
+        <div style="position:absolute;left:10px;top:12px;width:24px;height:24px;background:${p.color};color:#fff;font-size:10px;font-weight:700;text-align:center;line-height:24px;border-radius:2px;">P</div>
+        <div style="color:#201f1e;font-weight:600;line-height:1.35;word-break:break-word;white-space:normal;">${escapeHtml(p.nom)}</div>
+        <div style="color:#605e5c;font-size:11px;margin-top:3px;">${escapeHtml(p.taille)}</div>
       </div>`
     )
     .join("");
