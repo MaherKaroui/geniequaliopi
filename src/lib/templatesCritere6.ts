@@ -2088,7 +2088,7 @@ export function genChecklistFormateur(o: OrganismeInfo, f: FormationInfo, sessio
         <div class="sig-box">
           <p class="sig-label">Le Responsable Pédagogique</p>
           <p>Nom : ${o.responsablePedagogique || o.dirigeant}</p>
-          <p>Date : ${dateDoc}</p>
+          <p>Date : ${dateSig}</p>
           <p style="margin-top:20px">Cachet :</p>
           ${tamponHtml}
         </div>
