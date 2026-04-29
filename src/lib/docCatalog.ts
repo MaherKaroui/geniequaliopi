@@ -324,6 +324,7 @@ export function buildFullCatalog(
     add("af_c6i27_charte_qualite_formateur", "CT6 - IND 27 CHARTE QUALITÉ FORMATEUR EXTERNE", 6, 27, "charte_qualite_formateur_externe");
     add("af_c6i27_mandat_qualiopi", "CT6 - IND 27 MANDAT DE PRÉSENTATION ET DE GESTION QUALIOPI", 6, 27, "mandat_qualiopi");
     add("af_c6i27_pdf_guide_qualiopi", "CT6 - IND 27 V9 GUIDE DE LECTURE QUALIOPI", 6, 27, "pdf_static", { pdfFile: "v9_guide_lecture_qualiopi.pdf" });
+    add("af_c6i27_checklist_formateur", "CT6 - IND 27 CHECKLIST FORMATEUR", 6, 27, "checklist_formateur");
 
     // ===== CRITÈRE 7 — AMÉLIORATION CONTINUE =====
 
