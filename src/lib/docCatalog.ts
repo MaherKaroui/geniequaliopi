@@ -334,15 +334,16 @@ export function buildFullCatalog(
     });
     // Auto-évaluation formateur — un fichier par session (groupé par dates)
     {
+      const f0 = formations[0];
       const sessionsMap = new Map<string, { debut: string; fin: string }>();
       stagiaires.forEach(s => {
-        const debut = s.dateDebutFormation || formation.dateDebut || "";
-        const fin = s.dateFinFormation || formation.dateFin || "";
+        const debut = s.dateDebutFormation || f0?.dateDebut || "";
+        const fin = s.dateFinFormation || f0?.dateFin || "";
         const key = `${debut}|${fin}`;
         if (!sessionsMap.has(key)) sessionsMap.set(key, { debut, fin });
       });
       if (sessionsMap.size === 0) {
-        sessionsMap.set("default", { debut: formation.dateDebut || "", fin: formation.dateFin || "" });
+        sessionsMap.set("default", { debut: f0?.dateDebut || "", fin: f0?.dateFin || "" });
       }
       const fmtShort = (d: string) => d ? d.split("-").reverse().join("/") : "";
       Array.from(sessionsMap.values()).forEach((sess, idx) => {
