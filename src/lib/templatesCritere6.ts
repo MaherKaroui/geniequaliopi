@@ -2035,7 +2035,7 @@ export function genChecklistFormateur(o: OrganismeInfo, f: FormationInfo, sessio
           ${sec.items.map((item, i) => `
             <tr style="background:${i % 2 === 0 ? "#f0f6ff" : "#ffffff"}">
               <td style="padding:6px;border:1px solid #cbd5e1">${item}</td>
-              <td style="padding:6px;border:1px solid #cbd5e1;text-align:center;font-weight:bold;color:#16a34a">☒</td>
+              <td style="padding:6px;border:1px solid #cbd5e1;text-align:center;font-weight:bold;color:#16a34a">X</td>
               <td style="padding:6px;border:1px solid #cbd5e1;text-align:center">☐</td>
               <td style="padding:6px;border:1px solid #cbd5e1;text-align:center">☐</td>
               <td style="padding:6px;border:1px solid #cbd5e1">RAS</td>
