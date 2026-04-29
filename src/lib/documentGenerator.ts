@@ -25,6 +25,7 @@ import { genMailMissionCFA } from "./mailsMissionsCFA";
 import { genMailVisiteEntrepriseCFA } from "./mailVisiteEntrepriseCFA";
 import { genMailEnvoiEvaluationPrealable } from "./mailEnvoiEvaluationPrealable";
 import { genMailRetourDocumentsCompletes } from "./mailRetourDocumentsCompletes";
+import { genMailEnvoiContratConvocationRI } from "./mailEnvoiContratConvocationRI";
 import { genMailRdvEvaluationBesoins } from "./mailRdvEvaluationBesoins";
 import { genMailBilanFroid3Mois } from "./mailBilanFroid3Mois";
 import { genMailDeroulementExamenVTC } from "./mailDeroulementExamenVTC";
