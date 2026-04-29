@@ -13833,8 +13833,10 @@ function genFicheSuiviActivitesEmployeur(o: OrganismeInfo, f: FormationInfo, sta
   const dFin = parseD(dateFinStr);
   const today = new Date(); today.setHours(0, 0, 0, 0);
 
-  // Période suivie : du début à min(today, dateFin)
-  const dEnd = dFin && dFin < today ? dFin : (dFin || today);
+  // Période suivie : du début à AUJOURD'HUI (jamais au-delà — formation en cours = pas d'activités futures)
+  const dEnd = dDeb && dFin
+    ? (dFin < today ? dFin : (dDeb > today ? dDeb : today))
+    : (dFin || today);
   const periodeDebut = dDeb ? fmtLong(dDeb) : (dateDebutStr || "—");
   const periodeFin = dEnd ? fmtLong(dEnd) : (dateFinStr || "—");
 
