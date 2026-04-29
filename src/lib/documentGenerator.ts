@@ -8174,7 +8174,70 @@ function genFicheEntretienAnnuelFormateur(o: OrganismeInfo, f: FormationInfo, fm
         `
       },
       {
-        heading: "IV – OBJECTIFS PRIORITAIRES DE LA PÉRIODE À VENIR",
+        heading: "IV – ÉVALUATION DES COMPÉTENCES PROFESSIONNELLES",
+        content: (() => {
+          const intitule = (f.intitule || "").toLowerCase();
+          const isVTC = /vtc|transport.*personnes|t3p/i.test(intitule);
+          let competences: string[] = [];
+          if (isVTC) {
+            competences = [
+              "Maîtriser la réglementation T3P et les spécificités VTC",
+              "Connaître les conditions d'obtention et de renouvellement de la carte professionnelle",
+              "Vérifier la conformité du véhicule et de sa signalétique",
+              "Choisir un statut juridique et fiscal adapté à son activité",
+              "Calculer un prix de revient et fixer des tarifs rentables",
+              "Émettre une facture conforme et gérer l'encaissement",
+              "Appliquer le Code de la route en conduite professionnelle",
+              "Adopter une conduite souple, sécurisée et économique",
+              "Gérer une situation d'urgence ou d'accident (méthode PAS)",
+              "Communiquer en anglais niveau A2 avec une clientèle internationale",
+              "Préparer un parcours et utiliser efficacement le GPS",
+              "Offrir un service commercial de qualité (accueil, prise de congé)",
+              "Distinguer maraude légale et illégale (taxi vs VTC)",
+              "Comprendre les enjeux des plateformes et préserver son indépendance",
+            ];
+          } else {
+            const fiche = f.codeRNCP ? getRNCPByCode(f.codeRNCP) : undefined;
+            if (fiche?.blocsCompetences?.length) {
+              fiche.blocsCompetences.forEach(b => b.competences.slice(0, 4).forEach(c => competences.push(c)));
+            }
+            if (competences.length === 0) {
+              competences = [
+                `Maîtriser les fondamentaux théoriques de la formation « ${f.intitule} »`,
+                "Mettre en œuvre les méthodes et techniques professionnelles enseignées",
+                "Appliquer la réglementation et les normes propres au secteur",
+                "Adopter une posture professionnelle adaptée au métier visé",
+                "Communiquer efficacement avec les clients, collègues et partenaires",
+                "Gérer son activité dans le respect des consignes de sécurité",
+                "Utiliser les outils numériques et logiciels métier",
+                "Analyser une situation professionnelle et proposer des solutions",
+                "Travailler en autonomie et rendre compte de son activité",
+                "Évaluer la qualité de son travail et s'inscrire dans une démarche d'amélioration continue",
+              ];
+            }
+          }
+          const rows = competences.map((c, i) => {
+            const bg = i % 2 === 0 ? "#ffffff" : "#f5f9ff";
+            return `<tr style="background:${bg}"><td style="border:1px solid #ccc;padding:6px">${c}</td><td style="border:1px solid #ccc;padding:6px;text-align:center"><strong>X</strong></td><td style="border:1px solid #ccc;padding:6px;text-align:center"></td><td style="border:1px solid #ccc;padding:6px;text-align:center"></td></tr>`;
+          }).join("");
+          return `
+            <p><em>Évaluation des compétences professionnelles transmises par le formateur dans le cadre de la formation « ${f.intitule} ».</em></p>
+            <table style="width:100%;border-collapse:collapse;margin:12px 0">
+              <thead>
+                <tr style="background:var(--primary-color,#1e3a7b);color:white">
+                  <th style="border:1px solid #ccc;padding:8px;text-align:left;width:55%">COMPÉTENCES PROFESSIONNELLES</th>
+                  <th style="border:1px solid #ccc;padding:8px;text-align:center;width:15%">ACQUIS</th>
+                  <th style="border:1px solid #ccc;padding:8px;text-align:center;width:15%">NON ACQUIS</th>
+                  <th style="border:1px solid #ccc;padding:8px;text-align:center;width:15%">EN COURS D'ACQUISITION</th>
+                </tr>
+              </thead>
+              <tbody>${rows}</tbody>
+            </table>
+          `;
+        })()
+      },
+      {
+        heading: "V – OBJECTIFS PRIORITAIRES DE LA PÉRIODE À VENIR",
         content: `
           <ul>
             <li>Intégrer davantage les outils numériques et l'intelligence artificielle dans les séquences pédagogiques</li>
