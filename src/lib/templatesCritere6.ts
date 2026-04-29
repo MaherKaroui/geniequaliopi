@@ -2081,7 +2081,7 @@ export function genChecklistFormateur(o: OrganismeInfo, f: FormationInfo, sessio
         <div class="sig-box">
           <p class="sig-label">Le Formateur</p>
           <p>Nom : ${formateurNom}</p>
-          <p>Date : ${dateDoc}</p>
+          <p>Date : ${dateSig}</p>
           <p style="margin-top:20px">Signature :</p>
           ${fmtSigUrl ? `<img src="${fmtSigUrl}" alt="Signature formateur" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : ""}
         </div>
