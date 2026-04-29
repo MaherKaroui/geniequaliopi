@@ -2049,13 +2049,13 @@ export function genChecklistFormateur(o: OrganismeInfo, f: FormationInfo, sessio
   return buildDocument({
     org: o,
     title: "Checklist Formateur — Contrôle qualité de la prestation",
-    subtitle: `${formateurNom} — ${f.intitule || ""}`,
+    subtitle: sessionLabel ? `${formateurNom} — ${f.intitule || ""} — ${sessionLabel}` : `${formateurNom} — ${f.intitule || ""}`,
     sections: [
       { heading: "Identification", content: `
         <p>
           <strong>Formateur :</strong> ${formateurNom}<br>
           <strong>Formation :</strong> ${f.intitule || "—"}<br>
-          <strong>Période :</strong> du ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)}<br>
+          <strong>Période :</strong> du ${formatDate(sessDebut)} au ${formatDate(sessFin)}<br>
           <strong>Modalité :</strong> ${f.modalites || "Présentiel"}<br>
           <strong>Date de la checklist :</strong> ${dateDoc}
         </p>
