@@ -8271,7 +8271,7 @@ function genFicheEntretienAnnuelFormateur(o: OrganismeInfo, f: FormationInfo, fm
         `
       },
       {
-        heading: "VI – AUTRES COMMENTAIRES DU FORMATEUR",
+        heading: "VII – AUTRES COMMENTAIRES DU FORMATEUR",
         content: `
           <p><strong>Relation et attentes vis-à-vis de la structure :</strong></p>
           <p>La collaboration avec ${o.nom} est très satisfaisante. Le cadre de travail est propice à un enseignement de qualité. J'apprécie la réactivité de la direction et l'accompagnement dans la démarche qualité Qualiopi.</p>
