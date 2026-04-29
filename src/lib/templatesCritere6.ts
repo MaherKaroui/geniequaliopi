@@ -2053,7 +2053,7 @@ export function genChecklistFormateur(o: OrganismeInfo, f: FormationInfo) {
           <strong>Formateur :</strong> ${formateurNom}<br>
           <strong>Formation :</strong> ${f.intitule || "—"}<br>
           <strong>Période :</strong> du ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)}<br>
-          <strong>Modalité :</strong> ${f.modalite || "Présentiel"}<br>
+          <strong>Modalité :</strong> ${f.modalites || "Présentiel"}<br>
           <strong>Date de la checklist :</strong> ${dateDoc}
         </p>
         <p style="font-style:italic;color:#475569;font-size:12px">
