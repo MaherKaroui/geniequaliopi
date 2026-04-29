@@ -9088,8 +9088,7 @@ ${s.telephone?.trim() ? `<strong>Téléphone :</strong> ${s.telephone}<br>` : ""
 <p style="margin:4px 0">Je soussigné(e) <strong>${o.responsablePedagogique}</strong>, référent pédagogique, atteste avoir vérifié et validé que <strong>${s.prenom} ${s.nom}</strong> remplit les prérequis suivants pour suivre la formation :</p>
 <p style="margin:6px 0 4px 24px">☒ Titulaire du <strong>permis B</strong> en cours de validité</p>
 <p style="margin:4px 0 4px 24px">☒ Sait <strong>parler, lire et écrire le français</strong> (niveau suffisant pour suivre la formation)</p>
-<p style="margin:10px 0 0 0"><strong>Signature du dirigeant :</strong> ${o.dirigeant}</p>
-${o.signatureUrl ? `<img src="${o.signatureUrl}" alt="Signature dirigeant" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : ""}
+<p style="margin:10px 0 0 0"><strong>Signature et tampon du dirigeant :</strong> ${o.dirigeant}</p>
 ${o.tamponUrl ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />` : ""}
 <p style="margin:8px 0 0 0"><strong>Date :</strong> ${dateAnalyse}</p>
 </td></tr></table>
