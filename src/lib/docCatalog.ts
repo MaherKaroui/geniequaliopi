@@ -205,7 +205,11 @@ export function buildFullCatalog(
       });
     });
 
-    // IND 12 — (vide pour AF)
+    // IND 12 — Gestion d'abandon (AF)
+    add("af_c3i12_procedure_abandon", "CT3 - IND 12 PROCÉDURE DE GESTION D'ABANDON", 3, 12, "procedure_abandon");
+    add("af_c3i12_prevention_gestion_abandons", "CT3 - IND 12 PRÉVENTION ET GESTION DES ABANDONS", 3, 12, "prevention_gestion_abandons_cfa");
+    add("af_c3i12_guide_entretien_abandons", "CT3 - IND 12 GUIDE D'ENTRETIEN DES ABANDONS", 3, 12, "guide_entretien_abandons_cfa");
+    add("af_c3i12_mesures_engagement", "CT3 - IND 12 MESURES POUR FAVORISER L'ENGAGEMENT DES BÉNÉFICIAIRES", 3, 12, "mesures_engagement_beneficiaires_cfa");
 
     // IND 16 — Présentation des bénéficiaires à la certification (si formation avec code RS/RNCP)
     formations.forEach((f, fi) => {
