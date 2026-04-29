@@ -1949,11 +1949,14 @@ export function genContratSousTraitanceV2(o: OrganismeInfo, f: FormationInfo, st
   })() });
 }
 
-export function genChecklistFormateur(o: OrganismeInfo, f: FormationInfo) {
-  const dateDoc = f.dateDebut ? formatDate(f.dateDebut) : new Date().toLocaleDateString("fr-FR");
+export function genChecklistFormateur(o: OrganismeInfo, f: FormationInfo, sessionDates?: { debut?: string; fin?: string }) {
+  const sessDebut = sessionDates?.debut || f.dateDebut;
+  const sessFin = sessionDates?.fin || f.dateFin;
+  const dateDoc = sessDebut ? formatDate(sessDebut) : new Date().toLocaleDateString("fr-FR");
   const formateurNom = f.formateur || "—";
   const tamponHtml = o.tamponUrl ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />` : "";
   const fmtSigUrl = (f as any).formateurSignatureUrl;
+  const sessionLabel = sessDebut && sessFin ? `Session du ${formatDate(sessDebut)} au ${formatDate(sessFin)}` : "";
 
   const sections: { titre: string; items: string[] }[] = [
     { titre: "1. Préparation pédagogique", items: [
