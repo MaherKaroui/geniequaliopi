@@ -1953,6 +1953,7 @@ export function genChecklistFormateur(o: OrganismeInfo, f: FormationInfo, sessio
   const sessDebut = sessionDates?.debut || f.dateDebut;
   const sessFin = sessionDates?.fin || f.dateFin;
   const dateDoc = sessDebut ? formatDate(sessDebut) : new Date().toLocaleDateString("fr-FR");
+  const dateSig = sessFin ? formatDate(sessFin) : dateDoc;
   const formateurNom = f.formateur || "—";
   const tamponHtml = o.tamponUrl ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />` : "";
   const fmtSigUrl = (f as any).formateurSignatureUrl;
@@ -2035,7 +2036,7 @@ export function genChecklistFormateur(o: OrganismeInfo, f: FormationInfo, sessio
           ${sec.items.map((item, i) => `
             <tr style="background:${i % 2 === 0 ? "#f0f6ff" : "#ffffff"}">
               <td style="padding:6px;border:1px solid #cbd5e1">${item}</td>
-              <td style="padding:6px;border:1px solid #cbd5e1;text-align:center;font-weight:bold;color:#16a34a">☒</td>
+              <td style="padding:6px;border:1px solid #cbd5e1;text-align:center;font-weight:bold;color:#16a34a">X</td>
               <td style="padding:6px;border:1px solid #cbd5e1;text-align:center">☐</td>
               <td style="padding:6px;border:1px solid #cbd5e1;text-align:center">☐</td>
               <td style="padding:6px;border:1px solid #cbd5e1">RAS</td>
@@ -2080,14 +2081,14 @@ export function genChecklistFormateur(o: OrganismeInfo, f: FormationInfo, sessio
         <div class="sig-box">
           <p class="sig-label">Le Formateur</p>
           <p>Nom : ${formateurNom}</p>
-          <p>Date : ${dateDoc}</p>
+          <p>Date : ${dateSig}</p>
           <p style="margin-top:20px">Signature :</p>
           ${fmtSigUrl ? `<img src="${fmtSigUrl}" alt="Signature formateur" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : ""}
         </div>
         <div class="sig-box">
           <p class="sig-label">Le Responsable Pédagogique</p>
           <p>Nom : ${o.responsablePedagogique || o.dirigeant}</p>
-          <p>Date : ${dateDoc}</p>
+          <p>Date : ${dateSig}</p>
           <p style="margin-top:20px">Cachet :</p>
           ${tamponHtml}
         </div>
