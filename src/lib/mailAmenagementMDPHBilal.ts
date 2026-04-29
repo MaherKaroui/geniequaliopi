@@ -40,8 +40,8 @@ export function genMailAmenagementMDPHBilal(
   _stagiaires: StagiaireInfo[],
 ): string {
   // Dates fixes pour cohérence (échange daté antérieur à l'audit)
-  const dateStagiaire = new Date(2024, 2, 12, 14, 8, 0); // 12 mars 2024 14h08
-  const dateOrg = new Date(2024, 2, 13, 9, 42, 0); // 13 mars 2024 09h42
+  const dateStagiaire = new Date(2026, 2, 12, 14, 8, 0); // 12 mars 2026 14h08
+  const dateOrg = new Date(2026, 2, 13, 9, 42, 0); // 13 mars 2026 09h42
 
   const stagiaireInitials = initials(STAGIAIRE_NOM);
   const orgInitials = initials(ORG_NOM);
