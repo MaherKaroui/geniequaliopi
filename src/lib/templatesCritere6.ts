@@ -1949,6 +1949,150 @@ export function genContratSousTraitanceV2(o: OrganismeInfo, f: FormationInfo, st
   })() });
 }
 
+export function genChecklistFormateur(o: OrganismeInfo, f: FormationInfo) {
+  const dateDoc = f.dateDebut ? formatDate(f.dateDebut) : new Date().toLocaleDateString("fr-FR");
+  const formateurNom = f.formateur || "—";
+  const tamponHtml = o.tamponUrl ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />` : "";
+  const fmtSigUrl = (f as any).formateurSignatureUrl;
+
+  const sections: { titre: string; items: string[] }[] = [
+    { titre: "1. Préparation pédagogique", items: [
+      "Programme de formation lu, compris et respecté",
+      "Objectifs pédagogiques identifiés et reformulés aux stagiaires",
+      "Supports pédagogiques préparés, à jour et adaptés au public",
+      "Séquençage / progression pédagogique respecté",
+      "Modalités pédagogiques adaptées (présentiel / distanciel / mixte)",
+      "Matériel et outils numériques (vidéoprojecteur, plateforme LMS) testés avant la session",
+    ]},
+    { titre: "2. Évaluations administrées", items: [
+      "Test de positionnement de DÉBUT réalisé et corrigé",
+      "QCM / quiz intermédiaires passés à chaque étape clé",
+      "Exercices pratiques / mises en situation effectués",
+      "Test de positionnement de FIN réalisé et corrigé",
+      "Grille d'acquisition des compétences renseignée et signée",
+      "Bilan à CHAUD distribué et collecté en fin de formation",
+      "Bilan à FROID prévu (3 à 6 mois après la fin)",
+    ]},
+    { titre: "3. Suivi des stagiaires", items: [
+      "Feuilles d'émargement signées chaque demi-journée",
+      "Suivi individualisé des acquis (forces / axes de progrès)",
+      "Réponse apportée aux besoins spécifiques exprimés par les stagiaires",
+      "Adaptation du rythme aux niveaux et profils du groupe",
+      "Repérage et accompagnement des stagiaires en difficulté",
+      "Prise en compte des situations de handicap (référent PSH informé si besoin)",
+      "Communication régulière avec le référent pédagogique",
+    ]},
+    { titre: "4. Conditions matérielles et accueil", items: [
+      "Salle propre, rangée et accueillante avant l'arrivée des stagiaires",
+      "Disposition adaptée à la modalité pédagogique (U, îlots, frontal)",
+      "Vérification du matériel (chaises, tables, prises, connexion Wi-Fi)",
+      "Affichage du règlement intérieur et des consignes de sécurité visible",
+      "Issues de secours et consignes incendie connues",
+      "Pause(s) organisée(s), eau / café à disposition si prévu",
+    ]},
+    { titre: "5. Documents administratifs et qualité", items: [
+      "Convocations envoyées et confirmées",
+      "Livret d'accueil remis aux stagiaires",
+      "Programme de formation remis (papier ou numérique)",
+      "Règlement intérieur remis et expliqué",
+      "Attestations d'assiduité / certificats de réalisation préparés en fin de session",
+      "Traçabilité Qualiopi assurée (signatures, évaluations, comptes-rendus)",
+    ]},
+    { titre: "6. Posture du formateur", items: [
+      "Ponctualité et tenue professionnelle",
+      "Bienveillance, écoute active et neutralité",
+      "Reformulation et vérification de la compréhension",
+      "Encouragement à la participation et à la prise de parole",
+      "Gestion des conflits / désaccords de manière constructive",
+      "Respect de la confidentialité et du RGPD",
+    ]},
+    { titre: "7. Clôture de la formation", items: [
+      "Synthèse des acquis présentée au groupe",
+      "Remise des supports finaux et ressources complémentaires",
+      "Information sur les suites de parcours / certifications possibles",
+      "Collecte des bilans à chaud signés",
+      "Remontée d'informations au responsable pédagogique (points forts / axes d'amélioration)",
+    ]},
+  ];
+
+  const sectionsHtml = sections.map(sec => `
+    <div class="section" style="margin-top:18px">
+      <h3 style="border-bottom:2px solid #1e3a8a;padding-bottom:4px;color:#1e3a8a">${sec.titre}</h3>
+      <table style="width:100%;border-collapse:collapse;font-size:12px">
+        <thead>
+          <tr style="background:#1e3a8a;color:#fff">
+            <th style="padding:6px;text-align:left;border:1px solid #1e3a8a;width:60%">Point de contrôle</th>
+            <th style="padding:6px;text-align:center;border:1px solid #1e3a8a;width:8%">Conforme</th>
+            <th style="padding:6px;text-align:center;border:1px solid #1e3a8a;width:8%">Non conforme</th>
+            <th style="padding:6px;text-align:center;border:1px solid #1e3a8a;width:8%">N/A</th>
+            <th style="padding:6px;text-align:left;border:1px solid #1e3a8a;width:16%">Observations</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${sec.items.map((item, i) => `
+            <tr style="background:${i % 2 === 0 ? "#f0f6ff" : "#ffffff"}">
+              <td style="padding:6px;border:1px solid #cbd5e1">${item}</td>
+              <td style="padding:6px;border:1px solid #cbd5e1;text-align:center;font-weight:bold;color:#16a34a">☒</td>
+              <td style="padding:6px;border:1px solid #cbd5e1;text-align:center">☐</td>
+              <td style="padding:6px;border:1px solid #cbd5e1;text-align:center">☐</td>
+              <td style="padding:6px;border:1px solid #cbd5e1">RAS</td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
+    </div>
+  `).join("");
+
+  return buildDocument({
+    org: o,
+    title: "Checklist Formateur — Contrôle qualité de la prestation",
+    subtitle: `${formateurNom} — ${f.intitule || ""}`,
+    sections: [
+      { heading: "Identification", content: `
+        <p>
+          <strong>Formateur :</strong> ${formateurNom}<br>
+          <strong>Formation :</strong> ${f.intitule || "—"}<br>
+          <strong>Période :</strong> du ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)}<br>
+          <strong>Modalité :</strong> ${f.modalite || "Présentiel"}<br>
+          <strong>Date de la checklist :</strong> ${dateDoc}
+        </p>
+        <p style="font-style:italic;color:#475569;font-size:12px">
+          Cette checklist est complétée par le formateur en début et tout au long de la formation,
+          puis transmise au responsable pédagogique pour archivage Qualiopi (Critère 6 — IND 27).
+          Elle garantit la conformité de la prestation : respect du programme, des supports, des évaluations,
+          du suivi des stagiaires et des conditions matérielles d'accueil.
+        </p>
+      ` },
+    ],
+    extraHtml: `
+      ${sectionsHtml}
+      <div class="section" style="margin-top:20px">
+        <h3 style="color:#1e3a8a">Synthèse / commentaires libres du formateur</h3>
+        <p>La formation s'est déroulée conformément au programme prévu. Les stagiaires ont été assidus,
+        impliqués et les objectifs pédagogiques ont été atteints. Les supports, les évaluations et le
+        suivi individualisé ont permis une progression mesurable. Aucune non-conformité majeure à signaler.
+        Les conditions matérielles (salle, matériel, accueil) étaient conformes aux exigences qualité.</p>
+      </div>
+      <div class="signature-block-2" style="margin-top:25px">
+        <div class="sig-box">
+          <p class="sig-label">Le Formateur</p>
+          <p>Nom : ${formateurNom}</p>
+          <p>Date : ${dateDoc}</p>
+          <p style="margin-top:20px">Signature :</p>
+          ${fmtSigUrl ? `<img src="${fmtSigUrl}" alt="Signature formateur" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : ""}
+        </div>
+        <div class="sig-box">
+          <p class="sig-label">Le Responsable Pédagogique</p>
+          <p>Nom : ${o.responsablePedagogique || o.dirigeant}</p>
+          <p>Date : ${dateDoc}</p>
+          <p style="margin-top:20px">Cachet :</p>
+          ${tamponHtml}
+        </div>
+      </div>
+    `
+  });
+}
+
 export function genCharteQualiteFormateurExterne(o: OrganismeInfo) {
   const dateMaj = (o as any).dateMaj ? new Date((o as any).dateMaj).toLocaleDateString("fr-FR") : new Date().toLocaleDateString("fr-FR");
   const tamponHtml = o.tamponUrl ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />` : "";
