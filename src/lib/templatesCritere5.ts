@@ -102,15 +102,19 @@ function genFichePosteResponsablePedagogique(o: OrganismeInfo) {
 
 // ===== IND 21 — AUTO-ÉVALUATION FORMATEUR =====
 
-export function genAutoEvaluationFormateurV2(o: OrganismeInfo, f: FormationInfo, fmt: FormateurInfo, stagiaires: StagiaireInfo[] = [], stagiaireNom?: string) {
+export function genAutoEvaluationFormateurV2(o: OrganismeInfo, f: FormationInfo, fmt: FormateurInfo, stagiaires: StagiaireInfo[] = [], sessionDates?: { debut?: string; fin?: string }) {
   const formateurNom = `${fmt.prenom} ${fmt.nom}`.trim();
   // Find matching stagiaire for this formateur to get their specific signature
   const matchingStagiaire = stagiaires.find(s => s.formateur === formateurNom || s.formateur === f.formateur);
   const fmtSigUrl = matchingStagiaire?.formateurSignatureUrl || f.formateurSignatureUrl;
-  const subtitle = stagiaireNom ? `${formateurNom} – Stagiaire : ${stagiaireNom}` : formateurNom;
-  const stagiaireLine = stagiaireNom ? `<br><strong>Stagiaire concerné :</strong> ${stagiaireNom}` : "";
+  const sessionLabel = sessionDates && (sessionDates.debut || sessionDates.fin)
+    ? `Session du ${formatDate(sessionDates.debut || "")} au ${formatDate(sessionDates.fin || "")}`
+    : "";
+  const subtitle = sessionLabel ? `${formateurNom} – ${sessionLabel}` : formateurNom;
+  const sessionLine = sessionLabel ? `<br><strong>Session :</strong> du ${formatDate(sessionDates!.debut || "")} au ${formatDate(sessionDates!.fin || "")}` : "";
+  const dateSig = sessionDates?.fin || f.dateFin;
   return buildDocument({ org: o, title: "Auto-évaluation du formateur", subtitle, sections: [
-    { heading: "Informations", content: `<p><strong>Nom :</strong> ${formateurNom}<br><strong>Date :</strong> ${formatDate(f.dateFin)}<br><strong>Formation concernée :</strong> ${f.intitule}${stagiaireLine}</p>` },
+    { heading: "Informations", content: `<p><strong>Nom :</strong> ${formateurNom}<br><strong>Date :</strong> ${formatDate(dateSig)}<br><strong>Formation concernée :</strong> ${f.intitule}${sessionLine}</p>` },
   ], table: {
     headers: ["Critères", "Évaluation (1 à 5)", "Commentaires / Remarques"],
     rows: [
