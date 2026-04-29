@@ -13858,7 +13858,9 @@ function genFicheSuiviActivitesEmployeur(o: OrganismeInfo, f: FormationInfo, sta
       { from: p3Start, to: end },
     ];
   };
-  const periodes = splitPeriods(dDeb, dEnd);
+  // Découpe la période début → AUJOURD'HUI (jamais au-delà), pour ne montrer que ce qui est réellement passé
+  const splitEnd = dDeb && dDeb > today ? dDeb : (dFin && dFin < today ? dFin : today);
+  const periodes = splitPeriods(dDeb, splitEnd);
 
   // Contenus pédagogiques calés sur la formation (générique mais cohérent)
   const intituleLow = (f.intitule || "").toLowerCase();
