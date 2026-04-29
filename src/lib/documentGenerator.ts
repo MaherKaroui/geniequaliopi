@@ -714,7 +714,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
       return genContratSousTraitanceV2(o, fForST, stagiaires);
     }
     case "charte_qualite_formateur_externe": return genCharteQualiteFormateurExterne(o);
-    case "checklist_formateur": return genChecklistFormateur(o, f);
+    case "checklist_formateur": return genChecklistFormateur(o, f, { debut: params?.sessionDebut, fin: params?.sessionFin });
     case "plan_dev_competences_excel": return genPlanDevCompetencesExcel(o, f, formateurs, stagiaires);
     case "plan_dev_preuves_inscription": return genPlanDevPreuvesInscription(o, f, formateurs);
     case "grille_entretien_annuel": return genGrilleEntretienAnnuel(o, fmt);
