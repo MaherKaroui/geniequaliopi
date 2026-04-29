@@ -341,6 +341,16 @@ export const OPCO_DOCUMENTS: OpcoDocumentItem[] = [
     category: "service_apprenant",
     forAllApprentis: true,
   },
+  {
+    code: "C14",
+    label: "Fiche Suivi Activites Employeur",
+    longLabel: "Fiche de suivi des activités réalisées par l'apprenti chez l'employeur",
+    description: "Fiche de suivi en entreprise (activités, objectifs, compétences, niveau d'autonomie, observations du maître d'apprentissage, points forts, axes de progrès). Un fichier par apprenti, automatiquement personnalisé, signé par l'apprenti, le maître d'apprentissage et le référent pédagogique.",
+    autoTemplates: ["fiche_suivi_activites_employeur_opco"],
+    perStagiaire: true,
+    category: "service_apprenant",
+    forAllApprentis: true,
+  },
 ];
 
 export type OpcoDocStatus = "pending" | "auto" | "uploaded" | "not_applicable";
