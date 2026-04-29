@@ -970,6 +970,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "exercices_opco": return genExercicesOPCO(o, f, stagiaires, params);
     case "exercices_opco_semaine": return genExercicesOPCO(o, f, stagiaires, params);
     case "facture_opco": return genFactureOPCO(o, f, stagiaires, typeof params?.stagiaireIdx === "number" ? params.stagiaireIdx : undefined);
+    case "fiche_suivi_activites_employeur_opco": return genFicheSuiviActivitesEmployeur(o, f, stagiaires, typeof params?.stagiaireIdx === "number" ? params.stagiaireIdx : 0);
     case "decoupage_formation_cfa_excel": return genDecoupageFormationCFAExcel(o, f);
     case "suivi_inscriptions_excel": return generateExcelSuiviInscriptions(o, f, stagiaires);
     case "visuel_mission_cfa": return genVisuelMissionCFA(o, params?.imageUrl || "", params?.missionTitre || "");
