@@ -215,13 +215,143 @@ export function genGrilleAnalyseNiveauInitial(o: OrganismeInfo, f: FormationInfo
 export function genDeroulePedagogique(o: OrganismeInfo, f: FormationInfo) {
   const t = (f.intitule || "").toLowerCase();
   const isMassage = t.includes("massage") && (t.includes("prénatal") || t.includes("prenatal") || t.includes("relaxation"));
+  const isVTC = t.includes("vtc") || t.includes("t3p") || t.includes("transport de personnes") || t.includes("chauffeur");
 
   if (isMassage) {
     return genDerouleMassagePrenatal(o, f);
   }
 
+  if (isVTC) {
+    return genDerouleVTC(o, f);
+  }
+
   // ── Generic déroulé logic ──
   return genDeroulePedagogiqueGeneric(o, f);
+}
+
+function genDerouleVTC(o: OrganismeInfo, f: FormationInfo) {
+  const headers = ["Séquence", "Durée", "Type", "Objectif pédagogique", "Contenus abordés", "Méthodes & activités", "Outils / supports", "Évaluation"];
+
+  // 14h théorique + 105h pratique = 119h
+  const theorique: string[][] = [
+    ["Réglementation T3P et carte professionnelle VTC", "3h00", "Théorique",
+      "Maîtriser le cadre juridique de la profession VTC",
+      "Code des transports (L.3120-1 et suivants), distinction Taxi/VTC/VMDTR, carte professionnelle (conditions d'obtention, validité 5 ans), inscription au registre VTC, obligations du véhicule (4-9 places, 4,50m, 84kW, < 6 ans), macaron, signalétique",
+      "Exposé interactif + étude de textes réglementaires", "Code des transports, fiches synthèse, vidéoprojecteur",
+      "QCM réglementation"],
+    ["Sécurité routière et conduite professionnelle", "3h00", "Théorique",
+      "Acquérir les fondamentaux de la sécurité routière appliqués au transport de personnes",
+      "Code de la route appliqué au VTC, distances de sécurité, gestion de la fatigue, vitesse adaptée, conduite défensive, écoconduite, prise en compte des passagers (PMR, enfants, personnes âgées), PSC1",
+      "Exposé + études de cas d'accidents", "Supports vidéo INRS, fiches sécurité",
+      "QCM sécurité routière"],
+    ["Gestion d'entreprise et statuts juridiques", "3h00", "Théorique",
+      "Maîtriser les notions juridiques, fiscales et comptables de l'activité VTC",
+      "Choix du statut (micro, EI, EURL, SASU), TVA 10%, calcul du prix de revient kilométrique, charges sociales (URSSAF, SSI), comptabilité, facturation, plateformes (commissions Uber/Bolt/Heetch)",
+      "Exposé + cas pratiques de gestion", "Fiches statuts, simulateurs URSSAF, modèles de factures",
+      "QCM gestion + exercice de calcul"],
+    ["Anglais professionnel VTC", "2h00", "Théorique",
+      "Acquérir le vocabulaire anglais nécessaire à la prise en charge d'une clientèle internationale",
+      "Salutations, confirmation de destination, vocabulaire du paiement et de l'itinéraire, gestion des bagages, demandes de confort (climatisation, musique), situations d'urgence, réponses aux objets trouvés",
+      "Mises en situation orales + jeux de rôle", "Fiches vocabulaire, dialogues audio, supports RS5637",
+      "QCM anglais (épreuve langue étrangère)"],
+    ["Développement commercial et qualité de service", "3h00", "Théorique",
+      "Développer une posture commerciale et une qualité de service exemplaire",
+      "Accueil du client, présentation, tenue vestimentaire, propreté du véhicule, gestion des litiges et réclamations, fidélisation, e-réputation (notes Uber/Bolt), confidentialité (RGPD), service client premium",
+      "Exposé + jeux de rôle + analyse d'avis clients", "Charte qualité, scripts d'accueil, retours d'expérience",
+      "Évaluation orale + grille d'observation"],
+  ];
+
+  const pratique: string[][] = [
+    ["Prise en main du véhicule et vérifications de sécurité", "7h00", "Pratique",
+      "Maîtriser le poste de conduite et les contrôles avant prise de service",
+      "Réglages (siège, rétroviseurs, volant), vérifications (pneus, freins, niveaux, éclairage), check-list quotidienne, propreté intérieure/extérieure, équipements obligatoires (gilet, triangle, éthylotest, extincteur)",
+      "Démonstration + pratique sur véhicule pédagogique", "Véhicule VTC, check-lists, EPI",
+      "Observation continue par le formateur"],
+    ["Conduite en ville et en zone urbaine dense", "14h00", "Pratique",
+      "Conduire en sécurité dans un environnement urbain complexe avec passagers",
+      "Conduite en agglomération (Paris/banlieue), gestion des ronds-points, voies de bus, zones piétonnes, livraisons, double-files, anticipation des piétons, deux-roues, prise et dépose en double-file",
+      "Conduite accompagnée + débriefing après chaque session", "Véhicule VTC, GPS, caméra de débriefing",
+      "Grille d'observation conduite urbaine"],
+    ["Conduite sur autoroute et voies rapides", "10h00", "Pratique",
+      "Maîtriser la conduite sur axes rapides avec passagers",
+      "Insertion sur autoroute, dépassements, distances de sécurité à 110/130 km/h, gestion de la fatigue sur longs trajets, péages, aires de service, conduite par météo dégradée (pluie, brouillard)",
+      "Conduite accompagnée longs trajets", "Véhicule VTC, GPS, fiches météo",
+      "Grille d'observation autoroute"],
+    ["Conduite de nuit et en conditions dégradées", "8h00", "Pratique",
+      "Adapter sa conduite à la nuit, à la pluie et au brouillard",
+      "Réglage des feux, anticipation visuelle réduite, vigilance accrue, gestion de l'éblouissement, conduite sous la pluie (aquaplaning), brouillard (vitesse, feux), neige/verglas (notions)",
+      "Conduite de nuit accompagnée", "Véhicule VTC, équipements visibilité",
+      "Observation conduite nocturne"],
+    ["Écoconduite et conduite souple avec passagers", "10h00", "Pratique",
+      "Adopter une conduite souple, économique et confortable pour les passagers",
+      "Anticipation, freinage progressif, accélérations douces, choix du rapport (boîte auto/manu), réduction de la consommation, confort des passagers (pas de à-coups, virages doux), maintien d'une vitesse stable",
+      "Conduite accompagnée + analyse de la consommation", "Véhicule VTC, ordinateur de bord",
+      "Mesure consommation + grille confort passager"],
+    ["Utilisation des outils numériques et applications VTC", "8h00", "Pratique",
+      "Maîtriser les applications professionnelles (Uber, Bolt, Heetch, GPS)",
+      "Création et paramétrage de comptes chauffeur, acceptation/refus de courses, gestion des notes, navigation GPS (Waze, Google Maps, plans Uber), optimisation des trajets, gestion de la batterie/recharge",
+      "Manipulation guidée + mises en situation", "Smartphone, applications VTC, supports vidéo",
+      "Exercice pratique de prise de course"],
+    ["Itinéraires et géographie locale (Paris/IDF)", "10h00", "Pratique",
+      "Connaître les principaux pôles, gares, aéroports et axes d'Île-de-France",
+      "Aéroports (CDG, Orly, Beauvais, Le Bourget), gares parisiennes (Nord, Lyon, Saint-Lazare, Montparnasse), centres d'affaires (La Défense, Paris 8e), hôtels prestige, lieux touristiques, contournements (A86, périphérique, A104)",
+      "Cartographie + parcours pratiques d'itinéraires", "Cartes IGN, GPS, fiches itinéraires",
+      "Test pratique d'itinéraire"],
+    ["Accueil client et prise en charge passagers", "8h00", "Pratique",
+      "Maîtriser l'accueil, la prise en charge et le service à bord",
+      "Présentation au client, vérification d'identité (réservation), aide aux bagages, ouverture/fermeture des portières, proposition d'eau/journal/chargeur, ambiance sonore, climatisation, conversation discrète, fin de course (paiement, reçu, salutation)",
+      "Jeux de rôle + mises en situation réelles avec passagers fictifs", "Véhicule VTC, scripts d'accueil",
+      "Grille d'évaluation accueil client"],
+    ["Manœuvres avancées et stationnement", "8h00", "Pratique",
+      "Maîtriser les manœuvres délicates en environnement contraint",
+      "Créneau, bataille, épi, stationnement à l'aéroport (zones de prise en charge), demi-tour en espace réduit, marche arrière en pente, parkings souterrains (gabarit, hauteur), zones de dépose minute",
+      "Pratique sur aire d'évolution + situations réelles", "Véhicule VTC, plots, aires d'entraînement",
+      "Évaluation pratique des manœuvres"],
+    ["Gestion de situations d'urgence et premiers secours", "6h00", "Pratique",
+      "Réagir efficacement face à une urgence à bord ou sur la route",
+      "Malaise passager (PSC1 : PLS, alerte 15/112), accident (sécuriser, alerter, secourir), incendie véhicule (extincteur), comportement agressif (désamorcer, alerter), perte d'objet (procédure), panne mécanique (sécurisation)",
+      "Mises en situation + ateliers PSC1", "Mannequin PSC1, extincteur, fiches procédures",
+      "Évaluation pratique PSC1"],
+    ["Course complète en conditions réelles (épreuve blanche)", "10h00", "Pratique",
+      "Réaliser une course complète conforme aux exigences professionnelles",
+      "Réception de la course sur application, navigation jusqu'au client, accueil, vérification destination, conduite adaptée, dépose, clôture de course, demande d'évaluation. Évaluation par le formateur sur l'ensemble du process",
+      "Mises en situation grandeur nature avec passagers évaluateurs", "Véhicule VTC, applications, grille d'évaluation",
+      "Grille d'évaluation course complète"],
+    ["Examen blanc pratique – épreuve conduite", "6h00", "Pratique",
+      "Se préparer aux conditions réelles de l'épreuve pratique CMA",
+      "Reproduction des conditions d'examen : 30 minutes de conduite urbaine + extra-urbaine, manœuvre, accueil client, débriefing complet selon la grille officielle CMA. Identification des points à améliorer",
+      "Examen blanc en conditions réelles + débriefing individuel", "Véhicule VTC, grille officielle CMA",
+      "Évaluation finale selon grille CMA"],
+  ];
+
+  const sumH = (rows: string[][]) => rows.reduce((acc, r) => {
+    const m = r[1].match(/(\d+)h(\d{0,2})/);
+    if (!m) return acc;
+    return acc + parseInt(m[1]) + (m[2] ? parseInt(m[2]) / 60 : 0);
+  }, 0);
+
+  const totalTheorique = sumH(theorique);
+  const totalPratique = sumH(pratique);
+
+  const buildTable = (rows: string[][]) => {
+    let html = `<table><thead><tr>${headers.map(h => `<th>${h}</th>`).join("")}</tr></thead><tbody>`;
+    for (const row of rows) {
+      html += `<tr>${row.map(c => `<td>${c}</td>`).join("")}</tr>`;
+    }
+    html += `</tbody></table>`;
+    return html;
+  };
+
+  let content = `<p><strong>Volume horaire total :</strong> 119 heures (${totalTheorique}h théoriques + ${totalPratique}h pratiques)</p>`;
+  content += `<h3>PARTIE THÉORIQUE – ${totalTheorique}h</h3>`;
+  content += buildTable(theorique);
+  content += `<div class="page-break"></div>`;
+  content += `<h3>PARTIE PRATIQUE – ${totalPratique}h</h3>`;
+  content += buildTable(pratique);
+
+  return buildDocument({ org: o, title: "DÉROULÉ PÉDAGOGIQUE DÉTAILLÉ", subtitle: f.intitule, formation: f, showFormationInfo: true, sections: [
+    { heading: "", content },
+  ] });
 }
 
 function genDerouleMassagePrenatal(o: OrganismeInfo, f: FormationInfo) {
