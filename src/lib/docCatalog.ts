@@ -332,10 +332,8 @@ export function buildFullCatalog(
     stagiaires.forEach((s, si) => {
       add(`af_c7i30_eval_formateur_${si}`, `CT7 - IND 30 ÉVALUATION FORMATEUR – ${s.prenom} ${s.nom}`, 7, 30, "enquete_satisfaction_formateur", { stagiaireIdx: si });
     });
-    // Auto-évaluation formateur — un fichier par stagiaire
-    stagiaires.forEach((s, si) => {
-      add(`af_c7i30_autoevaluation_formateur_${si}`, `CT7 - IND 30 AUTO-ÉVALUATION FORMATEUR – ${s.prenom} ${s.nom}`, 7, 30, "autoevaluation_formateur", { stagiaireIdx: si });
-    });
+    // Auto-évaluation formateur — un seul fichier par session
+    add("af_c7i30_autoevaluation_formateur", `CT7 - IND 30 AUTO-ÉVALUATION FORMATEUR`, 7, 30, "autoevaluation_formateur", { formateurIdx: 0 });
     // Bilan à chaud — un fichier par stagiaire
     stagiaires.forEach((s, si) => {
       add(`af_c7i30_bilan_chaud_${si}`, `CT7 - IND 30 BILAN À CHAUD – ${s.prenom} ${s.nom}`, 7, 30, "bilan_chaud_stagiaire", { stagiaireIdx: si });
@@ -1014,10 +1012,8 @@ export function buildFullCatalog(
     stagiaires.forEach((s, si) => {
       add(`cfa_c7i30_eval_formateur_${si}`, `CT7 - IND 30 ÉVALUATION FORMATEUR – ${s.prenom} ${s.nom}`, 7, 30, "enquete_satisfaction_formateur", { stagiaireIdx: si });
     });
-    // Auto-évaluation formateur — un fichier par stagiaire
-    stagiaires.forEach((s, si) => {
-      add(`cfa_c7i30_autoevaluation_formateur_${si}`, `CT7 - IND 30 AUTO-ÉVALUATION FORMATEUR – ${s.prenom} ${s.nom}`, 7, 30, "autoevaluation_formateur", { stagiaireIdx: si });
-    });
+    // Auto-évaluation formateur — un seul fichier par session
+    add("cfa_c7i30_autoevaluation_formateur", `CT7 - IND 30 AUTO-ÉVALUATION FORMATEUR`, 7, 30, "autoevaluation_formateur", { formateurIdx: 0 });
     stagiaires.forEach((s, si) => {
       add(`cfa_c7i30_bilan_chaud_${si}`, `CT7 - IND 30 BILAN À CHAUD – ${s.prenom} ${s.nom}`, 7, 30, "bilan_chaud_stagiaire", { stagiaireIdx: si });
     });
