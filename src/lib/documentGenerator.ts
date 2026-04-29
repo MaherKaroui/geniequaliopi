@@ -628,11 +628,17 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "facture_make": return genFactureMake(o);
     case "facture_genspark": return genFactureGenspark(o);
     case "autoevaluation_formateur": {
-      // Use formateurNom from params if provided (per-session formateur), else from formation
-      const formateurName = params?.formateurNom || f.formateur || fmt.prenom + " " + fmt.nom;
+      // Use stagiaire-specific formateur if stagiaireIdx provided, then params, else formation
+      let formateurName = params?.formateurNom || f.formateur || fmt.prenom + " " + fmt.nom;
+      let stagiaireForDoc: StagiaireInfo[] = stagiaires;
+      if (typeof params?.stagiaireIdx === "number" && stagiaires[params.stagiaireIdx]) {
+        const s = stagiaires[params.stagiaireIdx];
+        if (s.formateur && s.formateur.trim()) formateurName = s.formateur;
+        stagiaireForDoc = [s];
+      }
       const parts = formateurName.trim().split(/\s+/);
       const autoFmt: FormateurInfo = { ...fmt, prenom: parts.slice(0, -1).join(" ") || parts[0], nom: parts[parts.length - 1] || "" };
-      return genAutoEvaluationFormateurV2(o, f, autoFmt, stagiaires);
+      return genAutoEvaluationFormateurV2(o, f, autoFmt, stagiaireForDoc);
     }
     case "liste_partenaires": return genListePartenairesV2(o);
     case "mandat_qualiopi": return genMandatQualiopi(o);
