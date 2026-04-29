@@ -102,15 +102,19 @@ function genFichePosteResponsablePedagogique(o: OrganismeInfo) {
 
 // ===== IND 21 — AUTO-ÉVALUATION FORMATEUR =====
 
-export function genAutoEvaluationFormateurV2(o: OrganismeInfo, f: FormationInfo, fmt: FormateurInfo, stagiaires: StagiaireInfo[] = [], stagiaireNom?: string) {
+export function genAutoEvaluationFormateurV2(o: OrganismeInfo, f: FormationInfo, fmt: FormateurInfo, stagiaires: StagiaireInfo[] = [], sessionDates?: { debut?: string; fin?: string }) {
   const formateurNom = `${fmt.prenom} ${fmt.nom}`.trim();
   // Find matching stagiaire for this formateur to get their specific signature
   const matchingStagiaire = stagiaires.find(s => s.formateur === formateurNom || s.formateur === f.formateur);
   const fmtSigUrl = matchingStagiaire?.formateurSignatureUrl || f.formateurSignatureUrl;
-  const subtitle = stagiaireNom ? `${formateurNom} – Stagiaire : ${stagiaireNom}` : formateurNom;
-  const stagiaireLine = stagiaireNom ? `<br><strong>Stagiaire concerné :</strong> ${stagiaireNom}` : "";
+  const sessionLabel = sessionDates && (sessionDates.debut || sessionDates.fin)
+    ? `Session du ${formatDate(sessionDates.debut || "")} au ${formatDate(sessionDates.fin || "")}`
+    : "";
+  const subtitle = sessionLabel ? `${formateurNom} – ${sessionLabel}` : formateurNom;
+  const sessionLine = sessionLabel ? `<br><strong>Session :</strong> du ${formatDate(sessionDates!.debut || "")} au ${formatDate(sessionDates!.fin || "")}` : "";
+  const dateSig = sessionDates?.fin || f.dateFin;
   return buildDocument({ org: o, title: "Auto-évaluation du formateur", subtitle, sections: [
-    { heading: "Informations", content: `<p><strong>Nom :</strong> ${formateurNom}<br><strong>Date :</strong> ${formatDate(f.dateFin)}<br><strong>Formation concernée :</strong> ${f.intitule}${stagiaireLine}</p>` },
+    { heading: "Informations", content: `<p><strong>Nom :</strong> ${formateurNom}<br><strong>Date :</strong> ${formatDate(dateSig)}<br><strong>Formation concernée :</strong> ${f.intitule}${sessionLine}</p>` },
   ], table: {
     headers: ["Critères", "Évaluation (1 à 5)", "Commentaires / Remarques"],
     rows: [
@@ -134,8 +138,8 @@ export function genAutoEvaluationFormateurV2(o: OrganismeInfo, f: FormationInfo,
     <p>Renforcer encore la pratique sur des cas professionnels concrets.</p></div>
     <p><strong>Organisme de formation :</strong> ${o.nom}</p>
     <div class="signature-block-2">
-      <div class="sig-box"><p class="sig-label">Signature du formateur</p><p>Nom : ${formateurNom}</p><p>Date : ${formatDate(f.dateFin)}</p><p style="margin-top:20px">Signature :</p>${fmtSigUrl ? `<img src="${fmtSigUrl}" alt="Signature formateur" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : ""}</div>
-      <div class="sig-box"><p class="sig-label">Le Responsable Pédagogique</p><p>Nom : ${o.responsablePedagogique}</p><p>Date : ${formatDate(f.dateFin)}</p><p style="margin-top:20px">Cachet :</p>${o.tamponUrl ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />` : ""}</div>
+      <div class="sig-box"><p class="sig-label">Signature du formateur</p><p>Nom : ${formateurNom}</p><p>Date : ${formatDate(dateSig)}</p><p style="margin-top:20px">Signature :</p>${fmtSigUrl ? `<img src="${fmtSigUrl}" alt="Signature formateur" style="max-height:50px;max-width:120px;object-fit:contain;margin-top:5px" />` : ""}</div>
+      <div class="sig-box"><p class="sig-label">Le Responsable Pédagogique</p><p>Nom : ${o.responsablePedagogique}</p><p>Date : ${formatDate(dateSig)}</p><p style="margin-top:20px">Cachet :</p>${o.tamponUrl ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />` : ""}</div>
     </div>
   ` });
 }
