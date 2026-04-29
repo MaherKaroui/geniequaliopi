@@ -902,6 +902,10 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
       const idx = typeof params?.stagiaireIdx === "number" ? params.stagiaireIdx : 0;
       return genMailRetourDocumentsCompletes(o, f, stagiaires, idx);
     }
+    case "mail_envoi_contrat_convocation_ri": {
+      const idx = typeof params?.stagiaireIdx === "number" ? params.stagiaireIdx : 0;
+      return genMailEnvoiContratConvocationRI(o, f, stagiaires, idx);
+    }
     case "mail_rdv_evaluation_besoins": {
       const idx = typeof params?.stagiaireIdx === "number" ? params.stagiaireIdx : 0;
       return genMailRdvEvaluationBesoins(o, f, stagiaires, idx);
