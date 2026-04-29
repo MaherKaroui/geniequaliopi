@@ -9081,7 +9081,18 @@ ${s.telephone?.trim() ? `<strong>Téléphone :</strong> ${s.telephone}<br>` : ""
   const footer = `
 <p style="margin-top:24px"><strong>Analyse du référent pédagogique :</strong> ${o.responsablePedagogique}</p>
 <p><strong>Date d'analyse :</strong> ${dateAnalyse}</p>
-<p>FAIT À ${o.ville.toUpperCase()}</p>
+
+<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse;width:100%;margin-top:16px;background:#f8f9fa">
+<tr><td>
+<p style="margin:0 0 8px 0"><strong>Validation des prérequis par le référent pédagogique :</strong></p>
+<p style="margin:4px 0">Je soussigné(e) <strong>${o.responsablePedagogique}</strong>, référent pédagogique, atteste avoir vérifié et validé que <strong>${s.prenom} ${s.nom}</strong> remplit les prérequis suivants pour suivre la formation :</p>
+<p style="margin:6px 0 4px 24px">☒ Titulaire du <strong>permis B</strong> en cours de validité</p>
+<p style="margin:4px 0 4px 24px">☒ Sait <strong>parler, lire et écrire le français</strong> (niveau suffisant pour suivre la formation)</p>
+<p style="margin:10px 0 0 0"><strong>Signature du référent pédagogique :</strong> ${o.responsablePedagogique}</p>
+<p style="margin:4px 0 0 0"><strong>Date :</strong> ${dateAnalyse}</p>
+</td></tr></table>
+
+<p style="margin-top:16px">FAIT À ${o.ville.toUpperCase()}</p>
 <p>LE : ${dateAnalyse}</p>`;
 
   return buildDocument({
