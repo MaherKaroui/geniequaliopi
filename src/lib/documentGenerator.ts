@@ -970,6 +970,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "exercices_opco": return genExercicesOPCO(o, f, stagiaires, params);
     case "exercices_opco_semaine": return genExercicesOPCO(o, f, stagiaires, params);
     case "facture_opco": return genFactureOPCO(o, f, stagiaires, typeof params?.stagiaireIdx === "number" ? params.stagiaireIdx : undefined);
+    case "fiche_suivi_activites_employeur_opco": return genFicheSuiviActivitesEmployeur(o, f, stagiaires, typeof params?.stagiaireIdx === "number" ? params.stagiaireIdx : 0);
     case "decoupage_formation_cfa_excel": return genDecoupageFormationCFAExcel(o, f);
     case "suivi_inscriptions_excel": return generateExcelSuiviInscriptions(o, f, stagiaires);
     case "visuel_mission_cfa": return genVisuelMissionCFA(o, params?.imageUrl || "", params?.missionTitre || "");
@@ -13805,6 +13806,215 @@ function genExercicesOPCO(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
     subtitle: f.intitule,
     extraHtml: extra,
   });
+}
+
+function genFicheSuiviActivitesEmployeur(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number = 0): string {
+  // Fiche de suivi des activités réalisées par l'apprenti chez l'employeur — OPCO Mobilités
+  // SANS EN-TÊTE organisme (uniquement infos textuelles), 1 fichier par apprenti, signatures auto.
+  const s = stagiaires[si] || stagiaires[0];
+  if (!s) return htmlWrap(`<h1>Aucun apprenti</h1>`);
+
+  const parseD = (str?: string): Date | null => {
+    if (!str) return null;
+    const t = str.trim();
+    const fr = t.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if (fr) return new Date(parseInt(fr[3]), parseInt(fr[2]) - 1, parseInt(fr[1]));
+    const d = new Date(t);
+    return isNaN(d.getTime()) ? null : d;
+  };
+  const fmtLong = (d: Date) => {
+    const mois = ["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
+    return `${d.getDate()} ${mois[d.getMonth()]} ${d.getFullYear()}`;
+  };
+
+  const dateDebutStr = s.dateDebutFormation || f.dateDebut || "";
+  const dateFinStr = s.dateFinFormation || f.dateFin || "";
+  const dDeb = parseD(dateDebutStr);
+  const dFin = parseD(dateFinStr);
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+
+  // Période suivie : du début à min(today, dateFin)
+  const dEnd = dFin && dFin < today ? dFin : (dFin || today);
+  const periodeDebut = dDeb ? fmtLong(dDeb) : (dateDebutStr || "—");
+  const periodeFin = dEnd ? fmtLong(dEnd) : (dateFinStr || "—");
+
+  // Découpe la période en 3 sous-périodes pour le tableau d'activités
+  const splitPeriods = (start: Date | null, end: Date | null): { from: Date; to: Date }[] => {
+    if (!start || !end || end < start) {
+      const fallback = today;
+      return [{ from: fallback, to: fallback }, { from: fallback, to: fallback }, { from: fallback, to: fallback }];
+    }
+    const totalMs = end.getTime() - start.getTime();
+    const stepMs = Math.max(86400000, Math.floor(totalMs / 3));
+    const p1End = new Date(start.getTime() + stepMs);
+    const p2Start = new Date(p1End.getTime() + 86400000);
+    const p2End = new Date(p2Start.getTime() + stepMs);
+    const p3Start = new Date(p2End.getTime() + 86400000);
+    return [
+      { from: start, to: p1End },
+      { from: p2Start, to: p2End },
+      { from: p3Start, to: end },
+    ];
+  };
+  const periodes = splitPeriods(dDeb, dEnd);
+
+  // Contenus pédagogiques calés sur la formation (générique mais cohérent)
+  const intituleLow = (f.intitule || "").toLowerCase();
+  type Activity = { activite: string; objectif: string; competences: string; autonomie: string; observation: string };
+  const activitesGeneriques: Activity[] = [
+    {
+      activite: `Découverte du poste, du fonctionnement de l'entreprise et des outils utilisés en lien avec la formation « ${f.intitule} ».`,
+      objectif: "Prendre ses repères dans l'environnement professionnel et identifier les missions confiées.",
+      competences: "Adaptation au poste, communication interne, respect des consignes et des règles d'hygiène/sécurité.",
+      autonomie: "Accompagné(e)",
+      observation: "Apprenti(e) impliqué(e), curieux(se), pose des questions pertinentes au maître d'apprentissage.",
+    },
+    {
+      activite: "Réalisation de tâches opérationnelles encadrées : participation aux missions courantes du service, application des procédures internes.",
+      objectif: "Mettre en pratique les compétences acquises en centre de formation et gagner en efficacité.",
+      competences: "Mise en œuvre des techniques métier, organisation, gestion du temps, qualité de la production.",
+      autonomie: "Autonomie partielle",
+      observation: "Bonne progression observée, capacité à reproduire les gestes professionnels après démonstration.",
+    },
+    {
+      activite: "Prise en charge progressive de missions plus complètes, avec restitution au maître d'apprentissage et points de suivi réguliers.",
+      objectif: "Consolider l'autonomie et la prise d'initiative dans le respect du cadre fixé.",
+      competences: "Autonomie, prise d'initiative, esprit d'analyse, communication professionnelle.",
+      autonomie: "Autonome",
+      observation: "Apprenti(e) fiable, sait alerter en cas de difficulté, intègre les retours formulés.",
+    },
+  ];
+
+  // Adaptation légère selon domaine
+  if (/transport|logistique|conducteur|cariste|exploitation/.test(intituleLow)) {
+    activitesGeneriques[1].activite = "Participation aux opérations d'exploitation : préparation des tournées, gestion des documents de transport, suivi des flux.";
+    activitesGeneriques[2].activite = "Suivi de dossiers transport/logistique, relation client/conducteurs, contrôle qualité des opérations.";
+  } else if (/commerc|vente|relation client/.test(intituleLow)) {
+    activitesGeneriques[1].activite = "Accueil clients, présentation de l'offre, prise en charge de demandes simples sous supervision.";
+    activitesGeneriques[2].activite = "Gestion d'un portefeuille de prospects, suivi commercial, contribution aux objectifs de l'équipe.";
+  } else if (/gestion|comptab|administr|assistant/.test(intituleLow)) {
+    activitesGeneriques[1].activite = "Traitement de dossiers administratifs : saisie, classement, suivi des échéances et des dossiers en cours.";
+    activitesGeneriques[2].activite = "Pilotage autonome de dossiers, production de tableaux de bord, contribution aux reportings du service.";
+  }
+
+  const fmtPeriode = (p: { from: Date; to: Date }) => `Du ${fmtLong(p.from)} au ${fmtLong(p.to)}`;
+
+  const rowsHtml = periodes
+    .map((p, i) => {
+      const a = activitesGeneriques[i];
+      return `<tr>
+        <td style="vertical-align:top">${fmtPeriode(p)}</td>
+        <td style="vertical-align:top">${a.activite}</td>
+        <td style="vertical-align:top">${a.objectif}</td>
+        <td style="vertical-align:top">${a.competences}</td>
+        <td style="vertical-align:top;text-align:center">${a.autonomie}</td>
+        <td style="vertical-align:top">${a.observation}</td>
+      </tr>`;
+    })
+    .join("");
+
+  const resumeActivites = activitesGeneriques.map((a) => a.activite.replace(/\.$/, "")).join(" ; ") + ".";
+  const competencesDeveloppees = "respect des procédures, qualité d'exécution, autonomie, communication professionnelle, capacité à rendre compte au maître d'apprentissage";
+  const niveauAutonomieGlobal = "progression d'un niveau accompagné vers une autonomie partielle puis complète sur les missions confiées";
+  const pointsForts = "Sérieux et ponctualité ; bonne intégration à l'équipe ; capacité à mettre en application les apports du centre de formation ; qualité d'écoute et de restitution.";
+  const axesAmelioration = "Poursuivre la prise d'initiative sur des dossiers plus complexes ; développer l'anticipation et la priorisation des tâches ; renforcer le suivi écrit des actions menées.";
+  const avisMaitre = `${s.responsableEntreprise || "Le maître d'apprentissage"} confirme la progression de ${s.prenom} ${s.nom} sur la période et la cohérence des activités réalisées avec le référentiel de la formation préparée. L'apprenti(e) est pleinement intégré(e) à l'équipe et tient les engagements pris.`;
+
+  const dateSignature = fmtLong(today);
+  const ville = o.ville || "—";
+
+  // Signatures images (apprenti / maître d'apprentissage / référent pédagogique organisme)
+  const sigImg = (url?: string, alt = "Signature") =>
+    url
+      ? `<img src="${url}" alt="${alt}" style="max-height:55px;max-width:140px;object-fit:contain;margin-top:6px" />`
+      : `<span style="font-style:italic;color:#888">Signé électroniquement</span>`;
+
+  const sigApprenti = sigImg(s.signatureUrl, "Signature apprenti");
+  const sigMaitre = sigImg(s.signatureResponsableUrl, "Signature maître d'apprentissage");
+  const sigReferent = sigImg(o.signatureUrl, "Signature référent pédagogique");
+  const tampon = o.tamponUrl
+    ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:80px;max-width:140px;object-fit:contain;margin-left:12px;vertical-align:middle" />`
+    : "";
+
+  const referentNom = o.responsablePedagogique || o.dirigeant || "Le référent pédagogique";
+
+  // Construction HTML — SANS en-tête organisme (pas d'orgHeader / pas de h1 logo)
+  const body = `
+    <h1 style="margin:0 0 14px 0;font-size:1.35em;text-align:center">FICHE DE SUIVI DES ACTIVITÉS RÉALISÉES PAR L'APPRENTI CHEZ L'EMPLOYEUR</h1>
+
+    <table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%;margin-bottom:16px;font-size:0.95em">
+      <tr><td style="background:#f0f4fa;font-weight:bold;width:32%">Organisme de formation</td><td>${o.nom || "—"}${o.nda ? ` — NDA ${o.nda}` : ""}</td></tr>
+      <tr><td style="background:#f0f4fa;font-weight:bold">Entreprise d'accueil</td><td>${s.entreprise || "—"}</td></tr>
+      <tr><td style="background:#f0f4fa;font-weight:bold">Apprenti(e)</td><td>${s.civilite ? s.civilite + " " : ""}${s.prenom} ${s.nom}</td></tr>
+      <tr><td style="background:#f0f4fa;font-weight:bold">Formation préparée</td><td>${f.intitule || "—"}</td></tr>
+      <tr><td style="background:#f0f4fa;font-weight:bold">Période concernée</td><td>Du ${periodeDebut} au ${periodeFin}</td></tr>
+      <tr><td style="background:#f0f4fa;font-weight:bold">Maître d'apprentissage</td><td>${s.responsableEntreprise || "—"}</td></tr>
+      <tr><td style="background:#f0f4fa;font-weight:bold">Poste occupé</td><td>${s.poste || "—"}</td></tr>
+    </table>
+
+    <h2 style="font-size:1.05em;color:#1e3a7b;margin-top:18px">1. Objectif du suivi</h2>
+    <p>Ce document permet d'identifier les activités réalisées par l'apprenti(e) au sein de l'entreprise d'accueil, de vérifier leur cohérence avec les objectifs de la formation et d'assurer le suivi de la progression professionnelle de l'apprenti(e).</p>
+
+    <h2 style="font-size:1.05em;color:#1e3a7b;margin-top:18px">2. Activités réalisées chez l'employeur</h2>
+    <table border="1" cellpadding="5" cellspacing="0" style="border-collapse:collapse;width:100%;font-size:0.85em">
+      <thead>
+        <tr style="background:#1e3a7b;color:#fff">
+          <th style="width:14%">Date / période</th>
+          <th style="width:22%">Activité réalisée</th>
+          <th style="width:18%">Objectif professionnel</th>
+          <th style="width:18%">Compétences mobilisées</th>
+          <th style="width:10%">Niveau d'autonomie</th>
+          <th style="width:18%">Observation du maître d'apprentissage</th>
+        </tr>
+      </thead>
+      <tbody>${rowsHtml}</tbody>
+    </table>
+
+    <h2 style="font-size:1.05em;color:#1e3a7b;margin-top:18px">3. Progression constatée</h2>
+    <p>Au cours de la période suivie, l'apprenti(e) a réalisé les activités suivantes : ${resumeActivites}</p>
+    <p>Ces activités lui ont permis de développer progressivement ses compétences professionnelles, notamment en matière de ${competencesDeveloppees}.</p>
+    <p>Le niveau d'autonomie observé est le suivant : ${niveauAutonomieGlobal}.</p>
+
+    <h2 style="font-size:1.05em;color:#1e3a7b;margin-top:18px">4. Points forts observés</h2>
+    <p>${pointsForts}</p>
+
+    <h2 style="font-size:1.05em;color:#1e3a7b;margin-top:18px">5. Axes d'amélioration</h2>
+    <p>${axesAmelioration}</p>
+
+    <h2 style="font-size:1.05em;color:#1e3a7b;margin-top:18px">6. Avis du maître d'apprentissage</h2>
+    <p>${avisMaitre}</p>
+
+    <h2 style="font-size:1.05em;color:#1e3a7b;margin-top:18px">7. Conclusion du suivi</h2>
+    <p>Les activités réalisées par l'apprenti(e) chez l'employeur sont cohérentes avec le parcours de formation préparé. Elles permettent une mise en application progressive des compétences attendues et contribuent à la professionnalisation de l'apprenti(e).</p>
+
+    <p style="margin-top:22px"><strong>Fait à</strong> ${ville}, <strong>le</strong> ${dateSignature}</p>
+
+    <table cellpadding="8" cellspacing="0" style="width:100%;margin-top:16px;border-collapse:collapse">
+      <tr style="vertical-align:top">
+        <td style="width:33%;border:1px solid #ccc;padding:10px">
+          <div style="font-weight:bold;color:#1e3a7b;margin-bottom:6px">L'apprenti(e)</div>
+          <div>${s.prenom} ${s.nom}</div>
+          ${sigApprenti}
+        </td>
+        <td style="width:34%;border:1px solid #ccc;padding:10px">
+          <div style="font-weight:bold;color:#1e3a7b;margin-bottom:6px">Le maître d'apprentissage</div>
+          <div>${s.responsableEntreprise || "—"}${s.entreprise ? `<br><span style="font-size:0.9em;color:#555">${s.entreprise}</span>` : ""}</div>
+          ${sigMaitre}
+        </td>
+        <td style="width:33%;border:1px solid #ccc;padding:10px">
+          <div style="font-weight:bold;color:#1e3a7b;margin-bottom:6px">Le référent pédagogique</div>
+          <div>${referentNom}<br><span style="font-size:0.9em;color:#555">${o.nom || ""}</span></div>
+          <div>${sigReferent}${tampon}</div>
+        </td>
+      </tr>
+    </table>
+
+    ${footer(o)}
+  `;
+
+  let result = htmlWrap(body);
+  result = applyGender(result, s);
+  return result;
 }
 
 function genDecoupageFormationCFAExcel(o: OrganismeInfo, f: FormationInfo) {
