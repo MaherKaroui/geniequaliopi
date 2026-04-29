@@ -262,6 +262,7 @@ export function buildFullCatalog(
     }
     add("af_c5i21_fiche_poste_ref_admin", "CT5 - IND 21 FICHE DE POSTE – RÉFÉRENT ADMINISTRATIF", 5, 21, "fiche_poste_formateur", { role: "referent_administratif" });
     add("af_c5i21_fiche_poste_ref_handicap", "CT5 - IND 21 FICHE DE POSTE – RÉFÉRENT HANDICAP", 5, 21, "fiche_poste_formateur", { role: "referent_handicap" });
+    add("af_c5i21_fiche_poste_ref_qualite_externe", "CT5 - IND 21 FICHE DE POSTE – RÉFÉRENT QUALITÉ EXTERNE (Nadine DENDANI)", 5, 21, "fiche_poste_formateur", { role: "referent_qualite_externe" });
     // Une seule auto-évaluation pour le formateur de la formation
     add("af_c5i21_autoevaluation_0", `CT5 - IND 21 AUTO-ÉVALUATION FORMATEUR`, 5, 21, "autoevaluation_formateur", { formateurIdx: 0 });
     add("af_c5i21_processus_recrutement", "CT5 - IND 21 DESCRIPTION DU PROCESSUS DE RECRUTEMENT", 5, 21, "procedure_recrutement_formateur");
