@@ -8249,7 +8249,7 @@ function genFicheEntretienAnnuelFormateur(o: OrganismeInfo, f: FormationInfo, fm
         `
       },
       {
-        heading: "V – BESOINS POUR SATISFAIRE CES OBJECTIFS",
+        heading: "VI – BESOINS POUR SATISFAIRE CES OBJECTIFS",
         content: `
           <p><strong>1) FORMATION</strong></p>
           <ul>
