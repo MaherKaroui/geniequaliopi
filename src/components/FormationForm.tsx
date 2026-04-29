@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Upload, Sparkles, Loader2, RefreshCw } from "lucide-react";
+import { Upload, Sparkles, Loader2, RefreshCw, FileDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SAMPLE_FORMATIONS, STAGIAIRES_BAC_PRO_LOGISTIQUE, STAGIAIRES_HEXAGONE_GOTRM, HEXAGONE_FORMATION_ORG } from "@/lib/sampleData";
 import { parseEdofXlsx, EdofSession } from "@/lib/edofParser";
@@ -264,6 +264,79 @@ const FormationForm = ({ data, onChange, onImportStagiaires, onApplyOrganisme }:
         </Button>
       </div>
 
+      {/* Téléchargement du référentiel */}
+      <div className="p-4 bg-primary/5 border-2 border-primary/30 rounded-xl flex items-center justify-between gap-3">
+        <div className="flex-1">
+          <Label className="font-semibold">Référentiel de la formation</Label>
+          <p className="text-xs text-muted-foreground">
+            Télécharge un fichier HTML du référentiel pour « {data.intitule || "votre formation"} ».
+          </p>
+        </div>
+        <Button
+          type="button"
+          variant="default"
+          onClick={() => {
+            const titre = data.intitule || "Formation";
+            const html = `<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Référentiel - ${titre}</title>
+<style>
+  body { font-family: Arial, sans-serif; max-width: 900px; margin: 40px auto; padding: 20px; color: #1a1a1a; }
+  h1 { color: #1e40af; border-bottom: 3px solid #1e40af; padding-bottom: 10px; }
+  h2 { color: #1e3a8a; margin-top: 30px; }
+  table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+  th, td { border: 1px solid #cbd5e1; padding: 8px 12px; text-align: left; vertical-align: top; }
+  th { background: #1e40af; color: white; }
+  tr:nth-child(even) { background: #f1f5f9; }
+  .meta { background: #eff6ff; padding: 15px; border-radius: 8px; margin: 20px 0; }
+</style>
+</head>
+<body>
+  <h1>Référentiel de formation</h1>
+  <h2>${titre}</h2>
+
+  <div class="meta">
+    <p><strong>Durée :</strong> ${data.duree || "—"}</p>
+    <p><strong>Modalités :</strong> ${data.modalites || "—"}</p>
+    <p><strong>Public visé :</strong> ${data.publicVise || "—"}</p>
+    <p><strong>Prérequis :</strong> ${data.prerequis || "—"}</p>
+    <p><strong>Tarif :</strong> ${data.tarif || "—"}</p>
+  </div>
+
+  <h2>Objectifs pédagogiques</h2>
+  <p>${(data.objectifs || "—").replace(/\n/g, "<br>")}</p>
+
+  <h2>Programme</h2>
+  <p>${(data.programme || "—").replace(/\n/g, "<br>")}</p>
+
+  <h2>Méthodes d'évaluation</h2>
+  <p>${(data.methodesEvaluation || "—").replace(/\n/g, "<br>")}</p>
+
+  <h2>Moyens pédagogiques</h2>
+  <p>${(data.moyensPedagogiques || "—").replace(/\n/g, "<br>")}</p>
+
+  <h2>Délai d'accès</h2>
+  <p>${data.delaiAcces || "—"}</p>
+</body>
+</html>`;
+            const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `Referentiel - ${titre}.html`;
+            a.click();
+            URL.revokeObjectURL(url);
+            toast.success("Référentiel téléchargé");
+          }}
+          disabled={!data.intitule}
+          className="gap-2 shrink-0"
+        >
+          <FileDown className="w-4 h-4" />
+          Télécharger référentiel
+        </Button>
+      </div>
       {/* EDOF Import */}
       <div className="p-4 bg-accent/30 border-2 border-accent rounded-xl">
         <div className="flex items-center justify-between">
