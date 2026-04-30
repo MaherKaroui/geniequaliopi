@@ -9065,6 +9065,25 @@ function genTrameEvalBesoinsEntreprise(o: OrganismeInfo, f: FormationInfo, stagi
 ` });
 }
 
+/**
+ * Parse les prérequis de la formation en items individuels pour la validation
+ * dans la trame d'évaluation des besoins (IND 4).
+ * Découpe sur retours ligne, puces, points-virgules et points.
+ * Si aucun prérequis n'est défini, renvoie une mention par défaut.
+ */
+function parsePrerequisItems(prerequis: string | undefined): string[] {
+  const raw = (prerequis || "").trim();
+  if (!raw || /^aucun/i.test(raw)) {
+    return ["Aucun prérequis spécifique requis pour suivre cette formation"];
+  }
+  // Split sur \n, • - * –, ; ou . suivi d'espace/fin
+  const parts = raw
+    .split(/\n+|[•\-\*–]\s+|;\s*|\.\s+(?=[A-ZÀ-Ý])/)
+    .map(p => p.replace(/^[\s•\-\*–·]+/, "").replace(/\.$/, "").trim())
+    .filter(p => p.length > 2);
+  return parts.length > 0 ? parts : [raw];
+}
+
 function genTrameEvalBesoinsCombine(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = stagiaires[si] || stagiaires[0];
   const answers = generateEvalBesoinsAnswers(s, f, o, si);
