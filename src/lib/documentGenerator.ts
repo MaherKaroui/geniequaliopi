@@ -40,8 +40,8 @@ import { getCachedPack, answersForQCM, studentAnswerFromCorrection, noteForOpenQ
 const FALLBACK_STAGIAIRE: StagiaireInfo = { prenom: "Martin", nom: "Dupont", civilite: "" as "M." | "Mme" | "", email: "", telephone: "", entreprise: "", poste: "", dateNaissance: "" };
 
 /**
- * Détecte si la formation est un cursus en cours du soir + samedi (ECSR ou VTC).
- * Horaires : Lundi–Vendredi 18h00–22h00 (4h) | Samedi 09h00–12h30 + 13h30–17h30 (7h30).
+ * Détecte si la formation est un cursus ECSR ou VTC (conduite, T3P, transport de personnes).
+ * Horaires standard : journée 09h00–12h30 / 13h30–17h00 (7 h/jour) du lundi au samedi.
  */
 export function isECSRFormation(f: FormationInfo): boolean {
   const t = (f.intitule || "").toLowerCase();
@@ -60,21 +60,17 @@ export function isECSRFormation(f: FormationInfo): boolean {
 
 
 /** Retourne la chaîne d'horaires d'affichage selon le jour de semaine (0=dim, 6=sam).
- * Règle globale : cours du soir Lun-Ven 18h00–22h00, samedi 09h00–12h30 / 13h30–17h30. */
-export function getHorairesLabel(_f: FormationInfo, dow?: number): string {
-  if (dow === 6) return "09h00 – 12h30 / 13h30 – 17h30";
-  return "18h00 – 22h00 (cours du soir)";
+ * Règle globale : journée 09h00–12h30 / 13h30–17h00 (7 h/jour) du lundi au samedi. */
+export function getHorairesLabel(_f: FormationInfo, _dow?: number): string {
+  return "09h00 – 12h30 / 13h30 – 17h00";
 }
 
 /** Renvoie les blocs d'émargement d'une journée pour la formation. */
-export function getEmargementBlocs(_f: FormationInfo, dow?: number): { label: string; horaire: string }[] {
-  if (dow === 6) {
-    return [
-      { label: "Matin", horaire: "09h00 – 12h30" },
-      { label: "Après-midi", horaire: "13h30 – 17h30" },
-    ];
-  }
-  return [{ label: "Soirée", horaire: "18h00 – 22h00" }];
+export function getEmargementBlocs(_f: FormationInfo, _dow?: number): { label: string; horaire: string }[] {
+  return [
+    { label: "Matin", horaire: "09h00 – 12h30" },
+    { label: "Après-midi", horaire: "13h30 – 17h00" },
+  ];
 }
 export function getFullCatalog(org: OrganismeInfo, userFormation: FormationInfo, userStagiaires: StagiaireInfo[]): DocEntry[] {
   // Use only the single selected formation (merged with sample defaults if needed)
@@ -1792,45 +1788,27 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
       const isLastDay = d === nbJours - 1;
       const rows: string[][] = [];
 
-      // Toutes les formations : cours du soir Lun-Ven (4h) + samedi journée (7h30)
+      // Toutes les formations : journée 09h00–12h30 / 13h30–17h00 (7 h/jour)
       {
-        const isSamedi = d % 6 === 5;
-        const dayTitle = `Séance ${d + 1} – ${isFirstDay ? "Découverte et fondamentaux" : isLastDay ? "Approfondissement et évaluation finale" : "Pratique et progression"} ${isSamedi ? "(samedi – 7h30)" : "(soirée – 4h)"}`;
-        if (isSamedi) {
-          if (isFirstDay) {
-            rows.push(["09h00 – 09h30", "Accueil, présentation de la formation et tour de table"]);
-            rows.push(["09h30 – 10h45", dayTopics[0] ? `${dayTopics[0]} et test de positionnement début` : `Introduction à ${formationName} et test de positionnement début`]);
-          } else {
-            rows.push(["09h00 – 09h30", "Accueil, rappel des acquis et objectifs du jour"]);
-            rows.push(["09h30 – 10h45", dayTopics[0] || fillers[d % fillers.length]]);
-          }
-          rows.push(["10h45 – 11h00", "Pause"]);
-          rows.push(["11h00 – 12h30", dayTopics[1] || fillers[(d + 1) % fillers.length]]);
-          rows.push(["12h30 – 13h30", "Pause déjeuner"]);
-          rows.push(["13h30 – 15h00", dayTopics[2] || fillers[(d + 2) % fillers.length]]);
-          rows.push(["15h00 – 15h15", "Pause"]);
-          if (isLastDay) {
-            rows.push(["15h15 – 16h45", "Test de positionnement fin et évaluation finale"]);
-            rows.push(["16h45 – 17h30", "Grille d'acquisition des compétences, bilan et remise des attestations"]);
-          } else {
-            rows.push(["15h15 – 16h45", dayTopics[3] || fillers[(d + 3) % fillers.length]]);
-            rows.push(["16h45 – 17h30", `Synthèse de la séance et préparation de la suivante`]);
-          }
+        const dayTitle = `Séance ${d + 1} – ${isFirstDay ? "Découverte et fondamentaux" : isLastDay ? "Approfondissement et évaluation finale" : "Pratique et progression"} (journée – 7 h)`;
+        if (isFirstDay) {
+          rows.push(["09h00 – 09h30", "Accueil, présentation de la formation et tour de table"]);
+          rows.push(["09h30 – 10h45", dayTopics[0] ? `${dayTopics[0]} et test de positionnement début` : `Introduction à ${formationName} et test de positionnement début`]);
         } else {
-          if (isFirstDay) {
-            rows.push(["18h00 – 18h15", "Accueil et présentation de la formation"]);
-            rows.push(["18h15 – 19h45", dayTopics[0] ? `${dayTopics[0]} et test de positionnement début` : `Introduction à ${formationName} et test de positionnement`]);
-          } else {
-            rows.push(["18h00 – 18h15", "Accueil et rappel des acquis"]);
-            rows.push(["18h15 – 19h45", dayTopics[0] || fillers[d % fillers.length]]);
-          }
-          rows.push(["19h45 – 20h00", "Pause"]);
-          rows.push(["20h00 – 21h30", dayTopics[1] || fillers[(d + 1) % fillers.length]]);
-          if (isLastDay) {
-            rows.push(["21h30 – 22h00", "Test de positionnement fin de formation et bilan"]);
-          } else {
-            rows.push(["21h30 – 22h00", `Synthèse de la séance et travail à préparer pour la suivante`]);
-          }
+          rows.push(["09h00 – 09h30", "Accueil, rappel des acquis et objectifs du jour"]);
+          rows.push(["09h30 – 10h45", dayTopics[0] || fillers[d % fillers.length]]);
+        }
+        rows.push(["10h45 – 11h00", "Pause"]);
+        rows.push(["11h00 – 12h30", dayTopics[1] || fillers[(d + 1) % fillers.length]]);
+        rows.push(["12h30 – 13h30", "Pause déjeuner"]);
+        rows.push(["13h30 – 15h00", dayTopics[2] || fillers[(d + 2) % fillers.length]]);
+        rows.push(["15h00 – 15h15", "Pause"]);
+        if (isLastDay) {
+          rows.push(["15h15 – 16h15", "Test de positionnement fin et évaluation finale"]);
+          rows.push(["16h15 – 17h00", "Grille d'acquisition des compétences, bilan et remise des attestations"]);
+        } else {
+          rows.push(["15h15 – 16h15", dayTopics[3] || fillers[(d + 3) % fillers.length]]);
+          rows.push(["16h15 – 17h00", `Synthèse de la séance et préparation de la suivante`]);
         }
         dayBlocks.push({ title: dayTitle, rows });
         continue;
@@ -2251,7 +2229,7 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
     <div class="section">
       <p><strong>Durée totale :</strong> ${displayDuree}${!isBlocFormation ? ` (${nbJours} jour${nbJours > 1 ? "s" : ""})` : ""}</p>
       ${hasIndiv ? sessionsHtml : ""}
-      <p><strong>Horaires :</strong> Lundi au vendredi : 18h00 – 22h00 (cours du soir) &nbsp;|&nbsp; Samedi : 09h00 – 12h30 / 13h30 – 17h30</p>
+      <p><strong>Horaires :</strong> Du lundi au samedi : 09h00 – 12h30 et 13h30 – 17h00 (7 h/jour)</p>
       <p><strong>Modalité :</strong> ${modaliteLabel}</p>
       <p><strong>Lieu de formation :</strong> ${f.lieu || `${o.adresse}, ${o.codePostal} ${o.ville}`}</p>
       <p><strong>Nombre de participants :</strong> ${nbStagiaires}</p>
@@ -2768,7 +2746,7 @@ function genLivretAccueil(o: OrganismeInfo, f: FormationInfo) {
   return buildDocument({ org: o, title: "LIVRET D'ACCUEIL", subtitle: f.intitule, sections: [
     { heading: "Bienvenue !", content: `<p>Nous sommes heureux de vous accueillir pour la formation « ${f.intitule} ». Ce livret contient les informations essentielles.</p>` },
     { heading: "Vos contacts", content: `<p><strong>Direction :</strong> ${o.dirigeant}<br><strong>Pédagogie :</strong> ${o.responsablePedagogique}<br><strong>Handicap :</strong> ${o.referentHandicap}<br><strong>Qualité :</strong> ${o.referentQualite}<br>${o.telephone?.trim() ? `<strong>Tél :</strong> ${o.telephone}<br>` : ""}<strong>Email :</strong> ${o.email}</p>` },
-    { heading: "Votre formation", content: `<p><strong>Durée :</strong> À définir selon le groupe<br><strong>Lieu :</strong> ${f.lieu}<br><strong>Formateur :</strong> ${f.formateur}<br><strong>Horaires :</strong> Lun-Ven 18h00-22h00 / Samedi 09h00-12h30 et 13h30-17h30</p>` },
+    { heading: "Votre formation", content: `<p><strong>Durée :</strong> À définir selon le groupe<br><strong>Lieu :</strong> ${f.lieu}<br><strong>Formateur :</strong> ${f.formateur}<br><strong>Horaires :</strong> Lun-Sam 09h00-12h30 / 13h30-17h00 (7 h/jour)</p>` },
     { heading: "Informations pratiques", content: "<p>• Merci de vous munir de cette convocation<br>• En cas d'absence, prévenir" + (o.telephone?.trim() ? ` au ${o.telephone}` : "") + "<br>• Le règlement intérieur vous sera remis le premier jour</p>" },
   ] });
 }
@@ -2818,9 +2796,8 @@ function genEmargementJour(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
   const modalite = getDayModalite(f, jour);
   const modaliteLabel = modalite === 'P' ? 'Présentiel' : 'Distanciel';
   const ecsr = isECSRFormation(f);
-  // Heuristique : alterner samedi tous les 6 jours (cohérent avec déroulé pédagogique ECSR)
-  const isSamedi = ecsr && jour % 6 === 5;
-  const blocs = isSamedi ? [{ label: 'Matin', horaire: '09h00 – 12h30' }, { label: 'Après-midi', horaire: '13h30 – 17h30' }] : [{ label: 'Soirée', horaire: '18h00 – 22h00' }];
+  // Horaires journée standard : matin + après-midi (7 h/jour)
+  const blocs = [{ label: 'Matin', horaire: '09h00 – 12h30' }, { label: 'Après-midi', horaire: '13h30 – 17h00' }];
   const sigHeaders = blocs.map(b => `Signature ${b.label} (${b.horaire})`);
   const rows = stagiaires.slice(0, 10).map(s => {
     const sig = `Signé ${s.prenom[0]}.${s.nom}`;
@@ -2879,7 +2856,7 @@ function genEmargementStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: 
   let extra = `<p><strong>Stagiaire :</strong> ${stagName}</p>`;
   extra += `<p><strong>Session :</strong> Du ${formatDate(dateDebut)} au ${formatDate(dateFin)}</p>`;
   extra += `<p><strong>Formateur :</strong> ${f.formateur}</p>`;
-  if (ecsr) extra += `<p><strong>Horaires :</strong> Lundi au vendredi 18h00 – 22h00 (cours du soir) / Samedi 09h00 – 12h30 et 13h30 – 17h30</p>`;
+  extra += `<p><strong>Horaires :</strong> Du lundi au samedi : 09h00 – 12h30 et 13h30 – 17h00 (7 h/jour)</p>`;
   if (mixte) extra += `<p><strong>Modalité :</strong> Mixte (alternance Présentiel / Distanciel)</p>`;
   days.forEach((day, di) => {
     if (di > 0 && di % 5 === 0) extra += '<div class="page-break"></div>';
@@ -3725,7 +3702,7 @@ function genConditionsAccueil(o: OrganismeInfo, f: FormationInfo) {
   return buildDocument({ org: o, title: "FICHE CONDITIONS D'ACCUEIL", subtitle: f.intitule, formation: f, showFormationInfo: true, sections: [
     { heading: "Locaux", content: `<p>Adresse : ${f.lieu}<br>Accès : Métro, bus, parking<br>Accessibilité PMR : ✅ Oui<br>Wifi : ✅ Disponible</p>` },
     { heading: "Équipements", content: `<p>${f.moyensPedagogiques}</p>` },
-    { heading: "Horaires", content: "<p><strong>Cours du soir (lundi au vendredi) :</strong> 18h00 – 22h00 (4 h)<br><strong>Samedi :</strong> 09h00 – 12h30 et 13h30 – 17h30 (7 h 30)<br>Pause déjeuner du samedi : 12h30 – 13h30</p>" },
+    { heading: "Horaires", content: "<p><strong>Du lundi au samedi :</strong> 09h00 – 12h30 et 13h30 – 17h00 (7 h/jour)<br>Pause déjeuner : 12h30 – 13h30</p>" },
   ] });
 }
 
@@ -9196,13 +9173,13 @@ function isStagiairePSH(s: StagiaireInfo | undefined | null): boolean {
   return `${s.prenom || ""} ${s.nom || ""}`.toLowerCase().includes("nouira");
 }
 
-/** Réponse "disponibilités / aménagement horaire" : cours du soir par défaut, journée pour PSH. */
+/** Réponse "disponibilités / aménagement horaire" : journée standard 09h-17h. */
 function getDisponibilitesAnswer(s: StagiaireInfo): string {
   const baseHash = ((s.nom || "") + (s.prenom || "")).split("").reduce((a, c) => a + c.charCodeAt(0), 0);
 
   if (isStagiairePSH(s)) {
     const variantesPSH = [
-      `Compte tenu de ma situation de handicap (RQTH), je sollicite un aménagement horaire en journée. Je suis disponible du lundi au vendredi de <strong>09h00 à 12h30</strong> et de <strong>13h30 à 17h00</strong>, créneaux qui me permettent de suivre la formation dans des conditions adaptées à mon état de santé et d'éviter la fatigue liée aux cours du soir.`,
+      `Compte tenu de ma situation de handicap (RQTH), je sollicite un aménagement horaire en journée. Je suis disponible du lundi au vendredi de <strong>09h00 à 12h30</strong> et de <strong>13h30 à 17h00</strong>, créneaux qui me permettent de suivre la formation dans des conditions adaptées à mon état de santé.`,
       `Je sollicite un aménagement horaire spécifique au titre de ma RQTH : disponibilité en journée du lundi au vendredi, sur les plages <strong>09h00 – 12h30</strong> et <strong>13h30 – 17h00</strong>. Cet aménagement est nécessaire pour préserver mon énergie et garantir une assimilation optimale des contenus pédagogiques.`,
       `En raison de ma situation de handicap, je demande à suivre la formation en journée, du lundi au vendredi, de <strong>09h00 à 12h30</strong> puis de <strong>13h30 à 17h00</strong>. Ce rythme diurne est indispensable pour me permettre de concilier mes contraintes médicales avec un parcours de formation soutenu.`,
       `Mon état de santé (RQTH) nécessite un aménagement horaire en journée. Je serai disponible du lundi au vendredi sur les créneaux <strong>09h00 – 12h30</strong> et <strong>13h30 – 17h00</strong>, ce qui me permettra de bénéficier d'une concentration optimale et d'un suivi pédagogique adapté à mes besoins.`,
@@ -9210,15 +9187,15 @@ function getDisponibilitesAnswer(s: StagiaireInfo): string {
     return variantesPSH[baseHash % variantesPSH.length];
   }
 
-  const variantesSoir = [
-    `En raison de mon activité professionnelle en journée, je sollicite un suivi de la formation en <strong>cours du soir</strong>, du lundi au vendredi de <strong>18h00 à 22h00</strong>, complété par des sessions le <strong>samedi de 09h00 à 12h30 et de 13h30 à 17h30</strong>. Ce rythme me permet de concilier ma vie professionnelle et mon parcours de formation sans perte de revenus.`,
-    `Étant en activité professionnelle à temps plein, je demande à suivre la formation en <strong>cours du soir</strong> (<strong>18h00 – 22h00</strong> du lundi au vendredi) ainsi que le <strong>samedi (09h00 – 12h30 et 13h30 – 17h30)</strong>. Ce format est le seul compatible avec mes obligations professionnelles et me permet de me former sans interrompre mon activité.`,
-    `Mes disponibilités sont limitées à la fin de journée et au week-end. Je sollicite donc un parcours en <strong>cours du soir du lundi au vendredi (18h00 – 22h00)</strong> ainsi que le <strong>samedi de 09h00 à 12h30 et de 13h30 à 17h30</strong>, format adapté à ma situation de salarié(e) en activité.`,
-    `Pour ne pas pénaliser mon emploi actuel, je souhaite suivre la formation sur le créneau <strong>cours du soir : 18h00 – 22h00 du lundi au vendredi</strong>, complété par le <strong>samedi (matin 09h00 – 12h30 et après-midi 13h30 – 17h30)</strong>. Ce planning concilie engagement professionnel et montée en compétences.`,
-    `Je travaille en journée et ne suis disponible qu'à partir de 18h00. Je demande donc un suivi en <strong>cours du soir (18h00 – 22h00, du lundi au vendredi)</strong> et le <strong>samedi (09h00 – 12h30 / 13h30 – 17h30)</strong>. Ce rythme me permettra de maintenir mes revenus tout en me formant sérieusement.`,
-    `Compte tenu de mes obligations professionnelles en semaine, je sollicite un aménagement en <strong>cours du soir du lundi au vendredi (18h00 – 22h00)</strong> et des journées complètes le <strong>samedi (09h00 – 12h30 et 13h30 – 17h30)</strong>. Ce rythme garantit ma présence assidue sans nuire à mon activité.`,
+  const variantesJour = [
+    `Je suis disponible en journée pour suivre la formation, du lundi au samedi sur les créneaux <strong>09h00 – 12h30</strong> et <strong>13h30 – 17h00</strong> (7 h/jour). Ce rythme me permet une assimilation optimale des contenus et une présence assidue sur l'ensemble du parcours.`,
+    `Mes disponibilités me permettent de suivre la formation en journée, du lundi au samedi, sur les plages <strong>09h00 – 12h30</strong> et <strong>13h30 – 17h00</strong>. Ce format de 7 h/jour garantit une bonne dynamique d'apprentissage et un suivi régulier.`,
+    `Je sollicite un suivi en journée, du lundi au samedi, sur les créneaux <strong>09h00 – 12h30</strong> et <strong>13h30 – 17h00</strong> (7 h/jour). Ce rythme est compatible avec mon projet professionnel et favorise une montée en compétences progressive.`,
+    `Je suis pleinement disponible en journée du lundi au samedi pour suivre la formation sur les plages <strong>09h00 – 12h30</strong> et <strong>13h30 – 17h00</strong>. Ce format de 7 h/jour me convient parfaitement pour mener à bien mon parcours.`,
+    `Mes obligations actuelles me permettent un suivi en journée. Je serai présent(e) du lundi au samedi de <strong>09h00 à 12h30</strong> et de <strong>13h30 à 17h00</strong> (7 h/jour), ce qui assure une régularité indispensable à la réussite de la formation.`,
+    `Je m'engage à suivre la formation en journée, du lundi au samedi, sur les créneaux <strong>09h00 – 12h30</strong> et <strong>13h30 – 17h00</strong> (7 h/jour). Ce rythme me garantit une présence assidue et une concentration optimale tout au long du parcours.`,
   ];
-  return variantesSoir[baseHash % variantesSoir.length];
+  return variantesJour[baseHash % variantesJour.length];
 }
 
 export function getEvalBesoinsFinancement(s: StagiaireInfo, f: FormationInfo, o: OrganismeInfo, idx: number): string {
