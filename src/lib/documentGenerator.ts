@@ -9065,6 +9065,25 @@ function genTrameEvalBesoinsEntreprise(o: OrganismeInfo, f: FormationInfo, stagi
 ` });
 }
 
+/**
+ * Parse les prérequis de la formation en items individuels pour la validation
+ * dans la trame d'évaluation des besoins (IND 4).
+ * Découpe sur retours ligne, puces, points-virgules et points.
+ * Si aucun prérequis n'est défini, renvoie une mention par défaut.
+ */
+function parsePrerequisItems(prerequis: string | undefined): string[] {
+  const raw = (prerequis || "").trim();
+  if (!raw || /^aucun/i.test(raw)) {
+    return ["Aucun prérequis spécifique requis pour suivre cette formation"];
+  }
+  // Split sur \n, • - * –, ; ou . suivi d'espace/fin
+  const parts = raw
+    .split(/\n+|[•\-\*–]\s+|;\s*|\.\s+(?=[A-ZÀ-Ý])/)
+    .map(p => p.replace(/^[\s•\-\*–·]+/, "").replace(/\.$/, "").trim())
+    .filter(p => p.length > 2);
+  return parts.length > 0 ? parts : [raw];
+}
+
 function genTrameEvalBesoinsCombine(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = stagiaires[si] || stagiaires[0];
   const answers = generateEvalBesoinsAnswers(s, f, o, si);
@@ -9147,8 +9166,7 @@ ${s.telephone?.trim() ? `<strong>Téléphone :</strong> ${s.telephone}<br>` : ""
 <tr><td>
 <p style="margin:0 0 8px 0"><strong>Validation des prérequis par le référent pédagogique :</strong></p>
 <p style="margin:4px 0">Je soussigné(e) <strong>${o.responsablePedagogique}</strong>, référent pédagogique, atteste avoir vérifié et validé que <strong>${s.prenom} ${s.nom}</strong> remplit les prérequis suivants pour suivre la formation :</p>
-<p style="margin:6px 0 4px 24px">☒ Titulaire du <strong>permis B</strong> en cours de validité</p>
-<p style="margin:4px 0 4px 24px">☒ Sait <strong>parler, lire et écrire le français</strong> (niveau suffisant pour suivre la formation)</p>
+${parsePrerequisItems(f.prerequis).map(item => `<p style="margin:4px 0 4px 24px">☒ ${item}</p>`).join("\n")}
 <p style="margin:10px 0 0 0"><strong>Signature et tampon du dirigeant :</strong> ${o.dirigeant}</p>
 ${o.tamponUrl ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px;opacity:0.85" />` : ""}
 <p style="margin:8px 0 0 0"><strong>Date :</strong> ${dateAnalyse}</p>
