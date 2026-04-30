@@ -9173,13 +9173,13 @@ function isStagiairePSH(s: StagiaireInfo | undefined | null): boolean {
   return `${s.prenom || ""} ${s.nom || ""}`.toLowerCase().includes("nouira");
 }
 
-/** Réponse "disponibilités / aménagement horaire" : cours du soir par défaut, journée pour PSH. */
+/** Réponse "disponibilités / aménagement horaire" : journée standard 09h-17h. */
 function getDisponibilitesAnswer(s: StagiaireInfo): string {
   const baseHash = ((s.nom || "") + (s.prenom || "")).split("").reduce((a, c) => a + c.charCodeAt(0), 0);
 
   if (isStagiairePSH(s)) {
     const variantesPSH = [
-      `Compte tenu de ma situation de handicap (RQTH), je sollicite un aménagement horaire en journée. Je suis disponible du lundi au vendredi de <strong>09h00 à 12h30</strong> et de <strong>13h30 à 17h00</strong>, créneaux qui me permettent de suivre la formation dans des conditions adaptées à mon état de santé et d'éviter la fatigue liée aux cours du soir.`,
+      `Compte tenu de ma situation de handicap (RQTH), je sollicite un aménagement horaire en journée. Je suis disponible du lundi au vendredi de <strong>09h00 à 12h30</strong> et de <strong>13h30 à 17h00</strong>, créneaux qui me permettent de suivre la formation dans des conditions adaptées à mon état de santé.`,
       `Je sollicite un aménagement horaire spécifique au titre de ma RQTH : disponibilité en journée du lundi au vendredi, sur les plages <strong>09h00 – 12h30</strong> et <strong>13h30 – 17h00</strong>. Cet aménagement est nécessaire pour préserver mon énergie et garantir une assimilation optimale des contenus pédagogiques.`,
       `En raison de ma situation de handicap, je demande à suivre la formation en journée, du lundi au vendredi, de <strong>09h00 à 12h30</strong> puis de <strong>13h30 à 17h00</strong>. Ce rythme diurne est indispensable pour me permettre de concilier mes contraintes médicales avec un parcours de formation soutenu.`,
       `Mon état de santé (RQTH) nécessite un aménagement horaire en journée. Je serai disponible du lundi au vendredi sur les créneaux <strong>09h00 – 12h30</strong> et <strong>13h30 – 17h00</strong>, ce qui me permettra de bénéficier d'une concentration optimale et d'un suivi pédagogique adapté à mes besoins.`,
@@ -9187,15 +9187,15 @@ function getDisponibilitesAnswer(s: StagiaireInfo): string {
     return variantesPSH[baseHash % variantesPSH.length];
   }
 
-  const variantesSoir = [
-    `En raison de mon activité professionnelle en journée, je sollicite un suivi de la formation en <strong>cours du soir</strong>, du lundi au vendredi de <strong>18h00 à 22h00</strong>, complété par des sessions le <strong>samedi de 09h00 à 12h30 et de 13h30 à 17h30</strong>. Ce rythme me permet de concilier ma vie professionnelle et mon parcours de formation sans perte de revenus.`,
-    `Étant en activité professionnelle à temps plein, je demande à suivre la formation en <strong>cours du soir</strong> (<strong>18h00 – 22h00</strong> du lundi au vendredi) ainsi que le <strong>samedi (09h00 – 12h30 et 13h30 – 17h30)</strong>. Ce format est le seul compatible avec mes obligations professionnelles et me permet de me former sans interrompre mon activité.`,
-    `Mes disponibilités sont limitées à la fin de journée et au week-end. Je sollicite donc un parcours en <strong>cours du soir du lundi au vendredi (18h00 – 22h00)</strong> ainsi que le <strong>samedi de 09h00 à 12h30 et de 13h30 à 17h30</strong>, format adapté à ma situation de salarié(e) en activité.`,
-    `Pour ne pas pénaliser mon emploi actuel, je souhaite suivre la formation sur le créneau <strong>cours du soir : 18h00 – 22h00 du lundi au vendredi</strong>, complété par le <strong>samedi (matin 09h00 – 12h30 et après-midi 13h30 – 17h30)</strong>. Ce planning concilie engagement professionnel et montée en compétences.`,
-    `Je travaille en journée et ne suis disponible qu'à partir de 18h00. Je demande donc un suivi en <strong>cours du soir (18h00 – 22h00, du lundi au vendredi)</strong> et le <strong>samedi (09h00 – 12h30 / 13h30 – 17h30)</strong>. Ce rythme me permettra de maintenir mes revenus tout en me formant sérieusement.`,
-    `Compte tenu de mes obligations professionnelles en semaine, je sollicite un aménagement en <strong>cours du soir du lundi au vendredi (18h00 – 22h00)</strong> et des journées complètes le <strong>samedi (09h00 – 12h30 et 13h30 – 17h30)</strong>. Ce rythme garantit ma présence assidue sans nuire à mon activité.`,
+  const variantesJour = [
+    `Je suis disponible en journée pour suivre la formation, du lundi au samedi sur les créneaux <strong>09h00 – 12h30</strong> et <strong>13h30 – 17h00</strong> (7 h/jour). Ce rythme me permet une assimilation optimale des contenus et une présence assidue sur l'ensemble du parcours.`,
+    `Mes disponibilités me permettent de suivre la formation en journée, du lundi au samedi, sur les plages <strong>09h00 – 12h30</strong> et <strong>13h30 – 17h00</strong>. Ce format de 7 h/jour garantit une bonne dynamique d'apprentissage et un suivi régulier.`,
+    `Je sollicite un suivi en journée, du lundi au samedi, sur les créneaux <strong>09h00 – 12h30</strong> et <strong>13h30 – 17h00</strong> (7 h/jour). Ce rythme est compatible avec mon projet professionnel et favorise une montée en compétences progressive.`,
+    `Je suis pleinement disponible en journée du lundi au samedi pour suivre la formation sur les plages <strong>09h00 – 12h30</strong> et <strong>13h30 – 17h00</strong>. Ce format de 7 h/jour me convient parfaitement pour mener à bien mon parcours.`,
+    `Mes obligations actuelles me permettent un suivi en journée. Je serai présent(e) du lundi au samedi de <strong>09h00 à 12h30</strong> et de <strong>13h30 à 17h00</strong> (7 h/jour), ce qui assure une régularité indispensable à la réussite de la formation.`,
+    `Je m'engage à suivre la formation en journée, du lundi au samedi, sur les créneaux <strong>09h00 – 12h30</strong> et <strong>13h30 – 17h00</strong> (7 h/jour). Ce rythme me garantit une présence assidue et une concentration optimale tout au long du parcours.`,
   ];
-  return variantesSoir[baseHash % variantesSoir.length];
+  return variantesJour[baseHash % variantesJour.length];
 }
 
 export function getEvalBesoinsFinancement(s: StagiaireInfo, f: FormationInfo, o: OrganismeInfo, idx: number): string {
