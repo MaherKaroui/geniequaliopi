@@ -40,8 +40,8 @@ import { getCachedPack, answersForQCM, studentAnswerFromCorrection, noteForOpenQ
 const FALLBACK_STAGIAIRE: StagiaireInfo = { prenom: "Martin", nom: "Dupont", civilite: "" as "M." | "Mme" | "", email: "", telephone: "", entreprise: "", poste: "", dateNaissance: "" };
 
 /**
- * Détecte si la formation est un cursus en cours du soir + samedi (ECSR ou VTC).
- * Horaires : Lundi–Vendredi 18h00–22h00 (4h) | Samedi 09h00–12h30 + 13h30–17h30 (7h30).
+ * Détecte si la formation est un cursus ECSR ou VTC (conduite, T3P, transport de personnes).
+ * Horaires standard : journée 09h00–12h30 / 13h30–17h00 (7 h/jour) du lundi au samedi.
  */
 export function isECSRFormation(f: FormationInfo): boolean {
   const t = (f.intitule || "").toLowerCase();
