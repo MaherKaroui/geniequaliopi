@@ -4,12 +4,12 @@ import { buildDocument, tableHTML, formatDate, subtractBusinessDays, getStagiair
 import { EVAL_SCORES, getFormationDays, CONNECTION_TIMES_6H, CONNECTION_TIMES_7H, parseDuree } from "./sampleData";
 
 function getHoraireFin(_f: FormationInfo): string {
-  // Conservé pour compatibilité — non utilisé dans l'affichage des horaires (cours du soir)
-  return "22h00";
+  // Conservé pour compatibilité — horaires journée standard
+  return "17h00";
 }
 
-const HORAIRES_TEXTE = "Lundi au vendredi : 18h00 – 22h00 (cours du soir) | Samedi : 09h00 – 12h30 et 13h30 – 17h30";
-const HORAIRES_LIGNE = "Lun-Ven 18h00–22h00 / Samedi 09h00–12h30 et 13h30–17h30";
+const HORAIRES_TEXTE = "Du lundi au samedi : 09h00 – 12h30 et 13h30 – 17h00 (7 h/jour)";
+const HORAIRES_LIGNE = "Lun-Sam 09h00–12h30 / 13h30–17h00 (7 h/jour)";
 const HORAIRES_TEXTE_PSH = "Du lundi au vendredi : 09h00 – 12h30 et 13h30 – 17h00 (aménagement personne en situation de handicap)";
 const HORAIRES_LIGNE_PSH = "Lun-Ven 09h00–12h30 / 13h30–17h00 (aménagement PSH)";
 
