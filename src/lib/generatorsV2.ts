@@ -8,8 +8,8 @@ function getHoraireFin(_f: FormationInfo): string {
   return "17h00";
 }
 
-const HORAIRES_TEXTE = "Du lundi au samedi : 09h00 – 12h30 et 13h30 – 17h00 (7 h/jour)";
-const HORAIRES_LIGNE = "Lun-Sam 09h00–12h30 / 13h30–17h00 (7 h/jour)";
+const HORAIRES_TEXTE = "Du lundi au vendredi : 09h00 – 12h30 et 13h30 – 17h00 (7 h/jour)";
+const HORAIRES_LIGNE = "Lun-Ven 09h00–12h30 / 13h30–17h00 (7 h/jour)";
 const HORAIRES_TEXTE_PSH = "Du lundi au vendredi : 09h00 – 12h30 et 13h30 – 17h00 (aménagement personne en situation de handicap)";
 const HORAIRES_LIGNE_PSH = "Lun-Ven 09h00–12h30 / 13h30–17h00 (aménagement PSH)";
 

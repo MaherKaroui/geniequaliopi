@@ -41,7 +41,7 @@ const FALLBACK_STAGIAIRE: StagiaireInfo = { prenom: "Martin", nom: "Dupont", civ
 
 /**
  * Détecte si la formation est un cursus ECSR ou VTC (conduite, T3P, transport de personnes).
- * Horaires standard : journée 09h00–12h30 / 13h30–17h00 (7 h/jour) du lundi au samedi.
+ * Horaires standard : journée 09h00–12h30 / 13h30–17h00 (7 h/jour) du lundi au vendredi.
  */
 export function isECSRFormation(f: FormationInfo): boolean {
   const t = (f.intitule || "").toLowerCase();
@@ -60,7 +60,7 @@ export function isECSRFormation(f: FormationInfo): boolean {
 
 
 /** Retourne la chaîne d'horaires d'affichage selon le jour de semaine (0=dim, 6=sam).
- * Règle globale : journée 09h00–12h30 / 13h30–17h00 (7 h/jour) du lundi au samedi. */
+ * Règle globale : journée 09h00–12h30 / 13h30–17h00 (7 h/jour) du lundi au vendredi. */
 export function getHorairesLabel(_f: FormationInfo, _dow?: number): string {
   return "09h00 – 12h30 / 13h30 – 17h00";
 }
@@ -2229,7 +2229,7 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
     <div class="section">
       <p><strong>Durée totale :</strong> ${displayDuree}${!isBlocFormation ? ` (${nbJours} jour${nbJours > 1 ? "s" : ""})` : ""}</p>
       ${hasIndiv ? sessionsHtml : ""}
-      <p><strong>Horaires :</strong> Du lundi au samedi : 09h00 – 12h30 et 13h30 – 17h00 (7 h/jour)</p>
+      <p><strong>Horaires :</strong> Du lundi au vendredi : 09h00 – 12h30 et 13h30 – 17h00 (7 h/jour)</p>
       <p><strong>Modalité :</strong> ${modaliteLabel}</p>
       <p><strong>Lieu de formation :</strong> ${f.lieu || `${o.adresse}, ${o.codePostal} ${o.ville}`}</p>
       <p><strong>Nombre de participants :</strong> ${nbStagiaires}</p>
@@ -2746,7 +2746,7 @@ function genLivretAccueil(o: OrganismeInfo, f: FormationInfo) {
   return buildDocument({ org: o, title: "LIVRET D'ACCUEIL", subtitle: f.intitule, sections: [
     { heading: "Bienvenue !", content: `<p>Nous sommes heureux de vous accueillir pour la formation « ${f.intitule} ». Ce livret contient les informations essentielles.</p>` },
     { heading: "Vos contacts", content: `<p><strong>Direction :</strong> ${o.dirigeant}<br><strong>Pédagogie :</strong> ${o.responsablePedagogique}<br><strong>Handicap :</strong> ${o.referentHandicap}<br><strong>Qualité :</strong> ${o.referentQualite}<br>${o.telephone?.trim() ? `<strong>Tél :</strong> ${o.telephone}<br>` : ""}<strong>Email :</strong> ${o.email}</p>` },
-    { heading: "Votre formation", content: `<p><strong>Durée :</strong> À définir selon le groupe<br><strong>Lieu :</strong> ${f.lieu}<br><strong>Formateur :</strong> ${f.formateur}<br><strong>Horaires :</strong> Lun-Sam 09h00-12h30 / 13h30-17h00 (7 h/jour)</p>` },
+    { heading: "Votre formation", content: `<p><strong>Durée :</strong> À définir selon le groupe<br><strong>Lieu :</strong> ${f.lieu}<br><strong>Formateur :</strong> ${f.formateur}<br><strong>Horaires :</strong> Lun-Ven 09h00-12h30 / 13h30-17h00 (7 h/jour)</p>` },
     { heading: "Informations pratiques", content: "<p>• Merci de vous munir de cette convocation<br>• En cas d'absence, prévenir" + (o.telephone?.trim() ? ` au ${o.telephone}` : "") + "<br>• Le règlement intérieur vous sera remis le premier jour</p>" },
   ] });
 }
@@ -2856,7 +2856,7 @@ function genEmargementStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: 
   let extra = `<p><strong>Stagiaire :</strong> ${stagName}</p>`;
   extra += `<p><strong>Session :</strong> Du ${formatDate(dateDebut)} au ${formatDate(dateFin)}</p>`;
   extra += `<p><strong>Formateur :</strong> ${f.formateur}</p>`;
-  extra += `<p><strong>Horaires :</strong> Du lundi au samedi : 09h00 – 12h30 et 13h30 – 17h00 (7 h/jour)</p>`;
+  extra += `<p><strong>Horaires :</strong> Du lundi au vendredi : 09h00 – 12h30 et 13h30 – 17h00 (7 h/jour)</p>`;
   if (mixte) extra += `<p><strong>Modalité :</strong> Mixte (alternance Présentiel / Distanciel)</p>`;
   days.forEach((day, di) => {
     if (di > 0 && di % 5 === 0) extra += '<div class="page-break"></div>';
@@ -3702,7 +3702,7 @@ function genConditionsAccueil(o: OrganismeInfo, f: FormationInfo) {
   return buildDocument({ org: o, title: "FICHE CONDITIONS D'ACCUEIL", subtitle: f.intitule, formation: f, showFormationInfo: true, sections: [
     { heading: "Locaux", content: `<p>Adresse : ${f.lieu}<br>Accès : Métro, bus, parking<br>Accessibilité PMR : ✅ Oui<br>Wifi : ✅ Disponible</p>` },
     { heading: "Équipements", content: `<p>${f.moyensPedagogiques}</p>` },
-    { heading: "Horaires", content: "<p><strong>Du lundi au samedi :</strong> 09h00 – 12h30 et 13h30 – 17h00 (7 h/jour)<br>Pause déjeuner : 12h30 – 13h30</p>" },
+    { heading: "Horaires", content: "<p><strong>Du lundi au vendredi :</strong> 09h00 – 12h30 et 13h30 – 17h00 (7 h/jour)<br>Pause déjeuner : 12h30 – 13h30</p>" },
   ] });
 }
 
@@ -9206,12 +9206,12 @@ function getDisponibilitesAnswer(s: StagiaireInfo): string {
   }
 
   const variantesJour = [
-    `Je suis disponible en journée pour suivre la formation, du lundi au samedi sur les créneaux <strong>09h00 – 12h30</strong> et <strong>13h30 – 17h00</strong> (7 h/jour). Ce rythme me permet une assimilation optimale des contenus et une présence assidue sur l'ensemble du parcours.`,
-    `Mes disponibilités me permettent de suivre la formation en journée, du lundi au samedi, sur les plages <strong>09h00 – 12h30</strong> et <strong>13h30 – 17h00</strong>. Ce format de 7 h/jour garantit une bonne dynamique d'apprentissage et un suivi régulier.`,
-    `Je sollicite un suivi en journée, du lundi au samedi, sur les créneaux <strong>09h00 – 12h30</strong> et <strong>13h30 – 17h00</strong> (7 h/jour). Ce rythme est compatible avec mon projet professionnel et favorise une montée en compétences progressive.`,
-    `Je suis pleinement disponible en journée du lundi au samedi pour suivre la formation sur les plages <strong>09h00 – 12h30</strong> et <strong>13h30 – 17h00</strong>. Ce format de 7 h/jour me convient parfaitement pour mener à bien mon parcours.`,
-    `Mes obligations actuelles me permettent un suivi en journée. Je serai présent(e) du lundi au samedi de <strong>09h00 à 12h30</strong> et de <strong>13h30 à 17h00</strong> (7 h/jour), ce qui assure une régularité indispensable à la réussite de la formation.`,
-    `Je m'engage à suivre la formation en journée, du lundi au samedi, sur les créneaux <strong>09h00 – 12h30</strong> et <strong>13h30 – 17h00</strong> (7 h/jour). Ce rythme me garantit une présence assidue et une concentration optimale tout au long du parcours.`,
+    `Je suis disponible en journée pour suivre la formation, du lundi au vendredi sur les créneaux <strong>09h00 – 12h30</strong> et <strong>13h30 – 17h00</strong> (7 h/jour). Ce rythme me permet une assimilation optimale des contenus et une présence assidue sur l'ensemble du parcours.`,
+    `Mes disponibilités me permettent de suivre la formation en journée, du lundi au vendredi, sur les plages <strong>09h00 – 12h30</strong> et <strong>13h30 – 17h00</strong>. Ce format de 7 h/jour garantit une bonne dynamique d'apprentissage et un suivi régulier.`,
+    `Je sollicite un suivi en journée, du lundi au vendredi, sur les créneaux <strong>09h00 – 12h30</strong> et <strong>13h30 – 17h00</strong> (7 h/jour). Ce rythme est compatible avec mon projet professionnel et favorise une montée en compétences progressive.`,
+    `Je suis pleinement disponible en journée du lundi au vendredi pour suivre la formation sur les plages <strong>09h00 – 12h30</strong> et <strong>13h30 – 17h00</strong>. Ce format de 7 h/jour me convient parfaitement pour mener à bien mon parcours.`,
+    `Mes obligations actuelles me permettent un suivi en journée. Je serai présent(e) du lundi au vendredi de <strong>09h00 à 12h30</strong> et de <strong>13h30 à 17h00</strong> (7 h/jour), ce qui assure une régularité indispensable à la réussite de la formation.`,
+    `Je m'engage à suivre la formation en journée, du lundi au vendredi, sur les créneaux <strong>09h00 – 12h30</strong> et <strong>13h30 – 17h00</strong> (7 h/jour). Ce rythme me garantit une présence assidue et une concentration optimale tout au long du parcours.`,
   ];
   return variantesJour[baseHash % variantesJour.length];
 }
