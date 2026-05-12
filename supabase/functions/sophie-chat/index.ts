@@ -38,10 +38,21 @@ Deno.serve(async (req) => {
       ? { role: "system", content: `Contexte actuel du dossier (JSON):\n${JSON.stringify(context).slice(0, 6000)}` }
       : null;
 
+    // Drop leading assistant messages — gateway requires first message after system to be user
+    const cleanMessages = Array.isArray(messages) ? messages.filter((m: any) => m && typeof m.content === "string" && m.content.trim().length > 0) : [];
+    const firstUserIdx = cleanMessages.findIndex((m: any) => m.role === "user");
+    const trimmed = firstUserIdx >= 0 ? cleanMessages.slice(firstUserIdx) : [];
+
+    if (!trimmed.length) {
+      return new Response(JSON.stringify({ error: "Aucun message utilisateur." }), {
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const allMessages = [
       { role: "system", content: SYSTEM_PROMPT },
       ...(contextMessage ? [contextMessage] : []),
-      ...messages,
+      ...trimmed,
     ];
 
     const upstream = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
