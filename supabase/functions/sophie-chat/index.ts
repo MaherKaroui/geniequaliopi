@@ -28,7 +28,7 @@ Deno.serve(async (req) => {
   try {
     const { messages, context } = await req.json();
     const apiKey = Deno.env.get("LOVABLE_API_KEY");
-    console.log("[sophie-chat] apiKey present?", !!apiKey, "len=", apiKey?.length);
+    
     if (!apiKey) {
       return new Response(JSON.stringify({ error: "LOVABLE_API_KEY missing" }), {
         status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
