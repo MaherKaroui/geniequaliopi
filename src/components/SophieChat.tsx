@@ -46,12 +46,70 @@ const SophieChat = () => {
     } catch { return null; }
   };
 
+  const FIELD_LABELS: Record<string, string> = {
+    nom: "Nom", prenom: "Prénom", civilite: "Civilité", email: "Email",
+    telephone: "Téléphone", dateNaissance: "Date de naissance", lieuNaissance: "Lieu de naissance",
+    adresse: "Adresse", dateDebut: "Date de début", dateFin: "Date de fin",
+    formation: "Formation", duree: "Durée", modalites: "Modalités",
+    organisme: "Organisme", siret: "SIRET", nda: "NDA", dirigeant: "Dirigeant",
+    rqth: "RQTH", nir: "NIR",
+  };
+
+  const resolveField = (field: string, s: any, org: any, form: any): string => {
+    if (["organisme", "siret", "nda", "dirigeant"].includes(field)) {
+      return field === "organisme" ? (org?.nom || "") : (org?.[field] || "");
+    }
+    if (["formation", "duree", "modalites"].includes(field)) {
+      return field === "formation" ? (form?.intitule || "") : (form?.[field] || "");
+    }
+    if (field === "dateDebut") return s?.dateDebut || form?.dateDebut || "";
+    if (field === "dateFin") return s?.dateFin || form?.dateFin || "";
+    return s?.[field] ?? "";
+  };
+
+  const handleQuickDoc = async (j: any) => {
+    const { downloadAsPdf } = await import("@/lib/pdfExport");
+    const org = JSON.parse(sessionStorage.getItem("qualiopi_org") || "{}");
+    const form = JSON.parse(sessionStorage.getItem("qualiopi_form") || "{}");
+    const stag = JSON.parse(sessionStorage.getItem("qualiopi_stag") || "[]");
+    const fields: string[] = Array.isArray(j.fields) ? j.fields : [];
+    if (!fields.length) { toast.error("Sophie : aucun champ détecté"); return; }
+    let targets: any[] = Array.isArray(stag) ? stag : [];
+    if (j.target && j.target !== "all" && targets.length) {
+      const t = String(j.target).toLowerCase();
+      const f = targets.filter((s: any) => `${s?.prenom || ""} ${s?.nom || ""}`.toLowerCase().includes(t));
+      if (f.length) targets = f;
+    }
+    if (!targets.length) targets = [{}];
+    const today = new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
+    const title = j.title || "Document généré par Sophie";
+    const headers = fields.map(f => `<th style="background:#1e3a7b;color:#fff;padding:8px;border:1px solid #1e3a7b;font-size:12px;text-align:left">${FIELD_LABELS[f] || f}</th>`).join("");
+    const rows = targets.map((s: any, i: number) => {
+      const cells = fields.map(f => `<td style="padding:8px;border:1px solid #ccc;font-size:12px">${resolveField(f, s, org, form) || "—"}</td>`).join("");
+      return `<tr style="background:${i % 2 ? "#f0f5ff" : "#fff"}">${cells}</tr>`;
+    }).join("");
+    const html = `
+      <div style="font-family:Arial,sans-serif;padding:20px">
+        <h1 style="color:#1e3a7b;text-align:center;font-size:20px;margin-bottom:6px">${title}</h1>
+        <p style="text-align:center;color:#666;font-size:11px;margin-bottom:20px">${org?.nom || ""} — Édité le ${today}</p>
+        <table style="width:100%;border-collapse:collapse"><thead><tr>${headers}</tr></thead><tbody>${rows}</tbody></table>
+        <p style="margin-top:30px;font-size:10px;color:#888;text-align:center">Document généré automatiquement par Sophie • ${org?.nom || ""} ${org?.siret ? "• SIRET " + org.siret : ""} ${org?.nda ? "• NDA " + org.nda : ""}</p>
+      </div>`;
+    const filename = `${title.replace(/[^\w\s-]/g, "").replace(/\s+/g, "_")}.pdf`;
+    try {
+      await downloadAsPdf(html, filename);
+      toast.success(`✅ ${j.note || "Fichier téléchargé"}`);
+    } catch (e: any) {
+      toast.error("Export PDF : " + (e?.message || "erreur"));
+    }
+  };
+
   const handleAction = (raw: string) => {
-    // Try to parse a generator action JSON
-    const match = raw.match(/\{[^{}]*"action"\s*:\s*"generate"[^{}]*\}/);
+    const match = raw.match(/\{[\s\S]*?"action"\s*:\s*"(generate|quick_doc)"[\s\S]*?\}/);
     if (!match) return false;
     try {
       const j = JSON.parse(match[0]);
+      if (j.action === "quick_doc") { handleQuickDoc(j); return true; }
       toast.success(`📋 ${j.note || "Document demandé"}`, {
         description: `Type: ${j.docType} • Cible: ${j.target}. Va à l'étape "Dossier" pour générer.`,
         duration: 6000,
