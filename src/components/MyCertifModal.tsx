@@ -44,10 +44,30 @@ interface Preview {
 export default function MyCertifModal({ open, onOpenChange }: { open: boolean; onOpenChange: (v: boolean) => void }) {
   const [generating, setGenerating] = useState(false);
   const [preview, setPreview] = useState<Preview | null>(null);
+  const [signature, setSignature] = useState<string | null>(() => typeof localStorage !== "undefined" ? localStorage.getItem("mycertif_signature_presidente") : null);
   const { runJob } = useBackgroundJobs();
   const sessions = Array.from(new Set(STAGIAIRES.map(s => s.sessionDate)));
 
   useEffect(() => () => { if (preview?.pdfUrl) URL.revokeObjectURL(preview.pdfUrl); }, [preview?.pdfUrl]);
+
+  const handleSignatureUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = reader.result as string;
+      localStorage.setItem("mycertif_signature_presidente", dataUrl);
+      setSignature(dataUrl);
+      toast.success("Signature enregistrée");
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const clearSignature = () => {
+    localStorage.removeItem("mycertif_signature_presidente");
+    setSignature(null);
+    toast.success("Signature supprimée");
+  };
 
   const showPreview = async (docKind: DocKind, stagiaire: CertifStagiaire | null, sessionDate?: string) => {
     if (preview?.pdfUrl) URL.revokeObjectURL(preview.pdfUrl);
