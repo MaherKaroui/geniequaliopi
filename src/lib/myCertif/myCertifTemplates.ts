@@ -1,7 +1,7 @@
 /**
  * MyCertif – HTML templates for the 5 documents per stagiaire
  */
-import { ORG_FORMATION, ORG_CERTIFICATEUR, CERTIFICATION, JURY, COMPETENCES, QUESTIONNAIRE, FOOTER_ACADEMY, FOOTER_ESCALE, type CertifStagiaire } from "./myCertifData";
+import { ORG_FORMATION, ORG_CERTIFICATEUR, CERTIFICATION, JURY, COMPETENCES, QUESTIONNAIRE, QUESTIONNAIRE_VARIANTES, STAGIAIRES, FOOTER_ACADEMY, FOOTER_ESCALE, type CertifStagiaire } from "./myCertifData";
 
 const baseStyle = `
   <style>
