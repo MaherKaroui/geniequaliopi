@@ -6,25 +6,38 @@ import { ORG_FORMATION, ORG_CERTIFICATEUR, CERTIFICATION, JURY, COMPETENCES, QUE
 const baseStyle = `
   <style>
     @page { size: A4; margin: 18mm; }
-    body { font-family: 'Calibri', Arial, sans-serif; color: #222; font-size: 11pt; line-height: 1.45; margin: 0; }
-    h1 { color: #1a1a1a; font-size: 18pt; text-align: center; margin: 0 0 8px; letter-spacing: 0.5px; }
-    h2 { color: #1a1a1a; font-size: 13pt; margin: 14px 0 6px; }
+    body { font-family: 'Calibri', Arial, sans-serif; color: #222; font-size: 11pt; line-height: 1.5; margin: 0; }
+    h1 { color: #1a1a1a; font-size: 17pt; text-align: left; margin: 18px 0 14px; font-weight: bold; }
+    h2 { color: #1a1a1a; font-size: 12pt; margin: 14px 0 6px; font-weight: bold; }
     table { width: 100%; border-collapse: collapse; margin: 8px 0; }
-    th { background: #e6007e; color: white; padding: 6px 8px; font-size: 10pt; text-align: left; border: 1px solid #c00067; }
-    td { padding: 6px 8px; border: 1px solid #ccc; font-size: 10pt; vertical-align: top; }
-    .header-org { font-size: 10pt; color: #555; line-height: 1.4; margin-bottom: 6px; }
-    .stamp-img { max-width: 130px; opacity: 0.92; }
-    .label { color: #666; font-weight: 600; }
-    .checkbox { font-family: monospace; font-size: 11pt; }
+    th { background: #f3f3f3; color: #1a1a1a; padding: 7px 9px; font-size: 10pt; text-align: left; border: 1px solid #bbb; font-weight: bold; }
+    td { padding: 7px 9px; border: 1px solid #bbb; font-size: 10.5pt; vertical-align: top; }
+    .pf-header-block { border-bottom: 2px solid #d4af37; padding-bottom: 10px; margin-bottom: 18px; display:flex; justify-content:space-between; align-items:flex-start; }
+    .pf-header-block .org { font-size: 10pt; line-height: 1.5; }
+    .pf-header-block .org .name { font-weight: bold; font-size: 12pt; color: #1a1a1a; }
+    .pf-header-block img { max-width: 110px; max-height: 90px; }
+    .pf-footer-block { margin-top: 30px; padding-top: 8px; border-top: 1px solid #bbb; text-align: center; font-size: 9pt; color: #555; line-height: 1.5; }
+    .pf-footer-block strong { color: #1a1a1a; }
+    .label { color: #444; font-weight: 600; }
   </style>
 `;
 
 const headerAcademy = () => `
-  <div class="header-org">
-    <strong>${ORG_FORMATION.nom}</strong><br>
-    ${ORG_FORMATION.adresse}, ${ORG_FORMATION.codePostal} ${ORG_FORMATION.ville}<br>
-    SIRET : ${ORG_FORMATION.siret} – Numéro de déclaration d'activité : ${ORG_FORMATION.nda}<br>
-    Présidente : ${ORG_FORMATION.presidente}
+  <div class="pf-header-block">
+    <div class="org">
+      <div class="name">${ORG_FORMATION.nom}</div>
+      ${ORG_FORMATION.adresse}, ${ORG_FORMATION.codePostal} ${ORG_FORMATION.ville}<br>
+      SIRET : ${ORG_FORMATION.siret} – Numéro de déclaration d'activité : ${ORG_FORMATION.nda}<br>
+      Président : ${ORG_FORMATION.presidente}
+    </div>
+    <img src="/mycertif/proforma_logo.jpg" alt="Pro Forma">
+  </div>
+`;
+
+const footerProForma = () => `
+  <div class="pf-footer-block">
+    <strong>${ORG_FORMATION.nom}</strong> – ${ORG_FORMATION.adresse}, ${ORG_FORMATION.codePostal} ${ORG_FORMATION.ville}<br>
+    SIRET ${ORG_FORMATION.siret} – Numéro de déclaration d'activité : ${ORG_FORMATION.nda} – Président : ${ORG_FORMATION.presidente}
   </div>
 `;
 
@@ -126,7 +139,7 @@ export function getEmargementJuryHTML(sessionDate: string): string {
       </tbody>
     </table>
 
-    ${FOOTER_ACADEMY}
+    ${footerProForma()}
   </body></html>`;
 }
 
@@ -135,7 +148,7 @@ export function getEmargementJuryHTML(sessionDate: string): string {
 // ======================================================================
 export function getGrilleEvaluationHTML(s: CertifStagiaire): string {
   const competencesRows = COMPETENCES.map((c) => `
-    <tr><td colspan="3" style="background:#fef0f8;padding:10px;font-weight:bold;border-top:2px solid #e6007e">
+    <tr><td colspan="3" style="background:#f8f4e8;padding:10px;font-weight:bold;border-top:2px solid #d4af37">
       ${c.titre}<div style="font-weight:normal;font-size:9pt;color:#555;margin-top:4px;font-style:italic">${c.description}</div>
     </td></tr>
     ${c.criteres.map(cr => `
@@ -198,7 +211,7 @@ export function getGrilleEvaluationHTML(s: CertifStagiaire): string {
       </div>
     </div>
 
-    ${FOOTER_ESCALE}
+    ${footerProForma()}
   </body></html>`;
 }
 
@@ -238,7 +251,7 @@ export function getAttestationHonneurHTML(s: CertifStagiaire): string {
       <div style="font-family: 'Brush Script MT', cursive; font-size: 22pt; color:#1a3a7b; margin-top:6px">${s.prenom} ${s.nom}</div>
     </div>
 
-    ${FOOTER_ACADEMY}
+    ${footerProForma()}
   </body></html>`;
 }
 
@@ -253,7 +266,7 @@ export function getQuestionnaireHTML(s: CertifStagiaire): string {
     return `
     <div style="margin-bottom:14px;page-break-inside:avoid">
       <p style="font-weight:bold;font-size:10.5pt;margin:0 0 4px">${i + 1}. ${q.question}</p>
-      <div style="border:1px solid #ddd;border-left:3px solid #e6007e;padding:6px 10px;font-size:10pt;background:#fdfaff;line-height:1.5">${reponse}</div>
+      <div style="border:1px solid #ddd;border-left:3px solid #d4af37;padding:6px 10px;font-size:10pt;background:#fcfaf3;line-height:1.5">${reponse}</div>
     </div>`;
   }).join("");
 
@@ -264,10 +277,10 @@ export function getQuestionnaireHTML(s: CertifStagiaire): string {
 
     <table style="margin:12px 0">
       <tbody>
-        <tr><td style="width:30%;background:#fef0f8"><strong>Candidat(e)</strong></td><td>${s.prenom} ${s.nom}</td></tr>
-        <tr><td style="background:#fef0f8"><strong>Date de naissance</strong></td><td>${s.dateNaissance}</td></tr>
-        <tr><td style="background:#fef0f8"><strong>Date de session</strong></td><td>${s.sessionDate}</td></tr>
-        <tr><td style="background:#fef0f8"><strong>Membre du jury</strong></td><td>${s.membreJury || JURY[0].prenom + " " + JURY[0].nom}</td></tr>
+        <tr><td style="width:30%;background:#f8f4e8"><strong>Candidat(e)</strong></td><td>${s.prenom} ${s.nom}</td></tr>
+        <tr><td style="background:#f8f4e8"><strong>Date de naissance</strong></td><td>${s.dateNaissance}</td></tr>
+        <tr><td style="background:#f8f4e8"><strong>Date de session</strong></td><td>${s.sessionDate}</td></tr>
+        <tr><td style="background:#f8f4e8"><strong>Membre du jury</strong></td><td>${s.membreJury || JURY[0].prenom + " " + JURY[0].nom}</td></tr>
       </tbody>
     </table>
 
@@ -285,6 +298,6 @@ export function getQuestionnaireHTML(s: CertifStagiaire): string {
       </div>
     </div>
 
-    ${FOOTER_ACADEMY}
+    ${footerProForma()}
   </body></html>`;
 }
