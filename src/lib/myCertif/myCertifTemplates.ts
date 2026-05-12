@@ -29,60 +29,70 @@ const headerAcademy = () => `
 `;
 
 // ======================================================================
-// 1. ATTESTATION DE DÉLIVRANCE — recreated from scratch (decorative cert)
+// 1. ATTESTATION DE DÉLIVRANCE — modèle Pro Forma
 // ======================================================================
 export function getAttestationDelivranceHTML(s: CertifStagiaire): string {
   return `<!doctype html><html><head><meta charset="utf-8">${baseStyle}<style>
-    @page { size: A4 portrait; margin: 0; }
-    body { background: linear-gradient(135deg, #fff 0%, #fdf4f9 100%); padding: 40px 50px; min-height: 100vh; box-sizing: border-box; }
-    .cert { border: 6px double #d4af37; padding: 30px; min-height: 700px; position: relative; background: white; }
-    .cert::before, .cert::after { content: ""; position: absolute; width: 60px; height: 60px; border: 3px solid #d4af37; }
-    .cert::before { top: 12px; left: 12px; border-right: none; border-bottom: none; }
-    .cert::after { bottom: 12px; right: 12px; border-left: none; border-top: none; }
-    .brand { text-align: center; font-family: 'Brush Script MT', cursive; font-size: 28pt; color: #1a1a1a; margin-bottom: 18px; }
-    .title { text-align: center; font-size: 22pt; font-weight: bold; letter-spacing: 1px; color: #1a1a1a; margin: 18px 0 6px; }
-    .subtitle { text-align: center; font-size: 14pt; color: #555; margin-bottom: 30px; font-style: italic; }
-    .attribuee { text-align: center; font-size: 12pt; color: #444; margin: 20px 0 10px; }
-    .wreath { text-align: center; margin: 20px 0; position: relative; padding: 30px 60px; }
-    .wreath::before { content: "🌿"; position: absolute; left: 30px; top: 50%; transform: translateY(-50%) scale(2.5) rotate(-25deg); opacity: 0.5; }
-    .wreath::after { content: "🌿"; position: absolute; right: 30px; top: 50%; transform: translateY(-50%) scale(2.5) rotate(25deg) scaleX(-1); opacity: 0.5; }
-    .name { font-size: 26pt; font-weight: bold; color: #1a1a1a; letter-spacing: 2px; }
-    .legal { text-align: center; font-size: 10pt; color: #555; margin: 22px 30px; line-height: 1.6; }
-    .footer-row { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 38px; padding: 0 10px; }
-    .sig-block { font-size: 10pt; }
-    .sig-line { border-top: 1px solid #888; width: 200px; margin-top: 30px; padding-top: 4px; }
-    .stamp { width: 110px; opacity: 0.9; }
-    .bottom-brand { text-align: center; font-size: 8pt; color: #888; margin-top: 25px; padding-top: 10px; border-top: 1px solid #eee; }
+    @page { size: A4 portrait; margin: 18mm; }
+    body { font-family: 'Calibri', Arial, sans-serif; color: #222; padding: 0; }
+    .pf-header { display:flex; justify-content:space-between; align-items:flex-start; border-bottom: 2px solid #d4af37; padding-bottom: 10px; margin-bottom: 20px; }
+    .pf-org { font-size: 10pt; line-height: 1.5; }
+    .pf-org .name { font-weight: bold; font-size: 12pt; color: #1a1a1a; }
+    .pf-logo { max-width: 130px; max-height: 110px; }
+    .pf-title { text-align:center; font-size: 17pt; font-weight: bold; text-decoration: underline; margin: 30px 0 8px; letter-spacing: 0.5px; }
+    .pf-subtitle { text-align:center; font-size: 14pt; font-weight: bold; text-decoration: underline; margin-bottom: 30px; text-transform: uppercase; }
+    .pf-attribuee { font-size: 12pt; margin: 20px 0 8px; }
+    .pf-name { text-align:center; font-size: 22pt; font-weight: bold; color: #1a1a1a; margin: 18px 0 30px; letter-spacing: 1px; }
+    .pf-legal { font-size: 11pt; line-height: 1.6; margin: 18px 0; text-align: justify; }
+    .pf-faits { margin-top: 30px; font-size: 11pt; }
+    .pf-faits p { margin: 4px 0; }
+    .pf-sig-block { margin-top: 28px; }
+    .pf-sig-img { max-height: 110px; margin-top: 8px; }
+    .pf-footer { position: fixed; bottom: 12mm; left: 18mm; right: 18mm; text-align: center; font-size: 8.5pt; color: #555; border-top: 1px solid #ccc; padding-top: 6px; line-height: 1.45; }
+    .pf-footer strong { color:#1a1a1a; }
   </style></head><body>
-    <div class="cert">
-      <div class="brand">Academy by Djika</div>
-      <div class="title">ATTESTATION DE DÉLIVRANCE DE CERTIFICATION</div>
-      <div class="subtitle">${CERTIFICATION.intitule.toUpperCase()}</div>
-
-      <div class="attribuee">Cette certification est attribuée à :</div>
-      <div class="wreath"><span class="name">${s.prenom.toUpperCase()} ${s.nom.toUpperCase()}</span></div>
-
-      <div class="legal">
-        Certification <strong>${CERTIFICATION.code}</strong> enregistrée au Répertoire Spécifique des Certifications et Habilitations,
-        par décision du Directeur Général de France Compétences en date du <strong>${CERTIFICATION.decisionDate}</strong>
-        (Code NSF ${CERTIFICATION.codeNSF}).<br><br>
-        Formation suivie <strong>du ${s.dateDebut} au ${s.dateFin}</strong> auprès de ${ORG_FORMATION.nom}.<br>
-        Délivrée sur décision du jury de certification.
+    <div class="pf-header">
+      <div class="pf-org">
+        <div class="name">${ORG_FORMATION.nom}</div>
+        ${ORG_FORMATION.adresse}, ${ORG_FORMATION.codePostal} ${ORG_FORMATION.ville}<br>
+        <strong>Siret</strong> : ${ORG_FORMATION.siret} &nbsp; <strong>Siren</strong> : ${(ORG_FORMATION as any).siren || ORG_FORMATION.siret.slice(0,9)}<br>
+        Mail : ${ORG_FORMATION.email}<br>
+        Président : <strong>${ORG_FORMATION.presidente}</strong>
       </div>
+      <img src="/mycertif/proforma_logo.jpg" class="pf-logo" alt="Pro Forma">
+    </div>
 
-      <div class="footer-row">
-        <div class="sig-block">
-          <div><strong>Fait à :</strong> ${ORG_FORMATION.ville}</div>
-          <div><strong>Le :</strong> ${s.sessionDate}</div>
-          <div style="margin-top:18px"><strong>Signature de la Présidente :</strong> ${ORG_FORMATION.presidente}</div>
-          ${(() => { const sig = typeof localStorage !== 'undefined' ? localStorage.getItem('mycertif_signature_presidente') : null; return sig ? `<img src="${sig}" style="max-height:70px;margin-top:4px" alt="Signature">` : `<div style="font-family: 'Brush Script MT', cursive; font-size: 22pt; color:#1a3a7b; margin-top:4px">NGHA Lydia</div>`; })()}
-        </div>
-        <div class="sig-block" style="text-align:center">
-          <img src="/mycertif/tampon_academy.jpg" class="stamp" alt="Tampon Academy">
-        </div>
-      </div>
+    <div class="pf-title">ATTESTATION DE DÉLIVRANCE DE CERTIFICATION</div>
+    <div class="pf-subtitle">${CERTIFICATION.intitule}</div>
 
-      <div class="bottom-brand">${ORG_FORMATION.nom} — RCS ${ORG_FORMATION.rcs} — ${ORG_FORMATION.adresse}, ${ORG_FORMATION.codePostal} ${ORG_FORMATION.ville}</div>
+    <p class="pf-attribuee">Cette certification est attribuée à :</p>
+    <div class="pf-name">${s.prenom.toUpperCase()} ${s.nom.toUpperCase()}</div>
+
+    <p class="pf-legal">
+      Certification <strong>${CERTIFICATION.code}</strong> enregistrée au Répertoire Spécifique des Certifications et Habilitations,
+      par décision du Directeur Général de France Compétences en date du <strong>${CERTIFICATION.decisionDate}</strong>
+      (Code NSF ${CERTIFICATION.codeNSF}).
+    </p>
+    <p class="pf-legal">
+      Formation suivie <strong>du ${s.dateDebut} au ${s.dateFin}</strong> auprès de ${ORG_FORMATION.nom}.<br>
+      Délivrée sur décision du jury de certification.
+    </p>
+
+    <div class="pf-faits">
+      <p><strong>Fait à :</strong> ${ORG_FORMATION.ville}</p>
+      <p><strong>Le :</strong> ${s.sessionDate}</p>
+    </div>
+
+    <div class="pf-sig-block">
+      <p><strong>Signature du Président :</strong></p>
+      ${(() => { const sig = typeof localStorage !== 'undefined' ? localStorage.getItem('mycertif_signature_presidente') : null; return sig ? `<img src="${sig}" class="pf-sig-img" alt="Signature">` : `<img src="/mycertif/proforma_signature.jpg" class="pf-sig-img" alt="Signature Pro Forma">`; })()}
+    </div>
+
+    <div class="pf-footer">
+      <strong>${ORG_FORMATION.nom}</strong><br>
+      ${ORG_FORMATION.adresse}, ${ORG_FORMATION.codePostal} ${ORG_FORMATION.ville}<br>
+      Siret : ${ORG_FORMATION.siret} &nbsp; Siren : ${(ORG_FORMATION as any).siren || ORG_FORMATION.siret.slice(0,9)}<br>
+      NDA : ${ORG_FORMATION.nda} — Cet enregistrement ne vaut pas agrément de l'État. — Document mis à jour le V1 ${s.sessionDate}
     </div>
   </body></html>`;
 }
