@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, LogIn, LogOut, User, FileSpreadsheet, Upload, Loader2, ShieldCheck, FileCheck, UserCircle, Stamp, Truck, Building2, Palette } from "lucide-react";
 import BahoModal from "@/components/BahoModal";
 import BrandingAutoModal from "@/components/BrandingAutoModal";
+import MyCertifModal from "@/components/MyCertifModal";
 import { exportFormDataToExcel } from "@/lib/exportFormData";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -47,6 +48,7 @@ const Index = () => {
   const [airtableLoading, setAirtableLoading] = useState(false);
   const [bahoOpen, setBahoOpen] = useState(false);
   const [brandingOpen, setBrandingOpen] = useState(false);
+  const [myCertifOpen, setMyCertifOpen] = useState(false);
 
   const getAirtableErrorMessage = (payload: any) => {
     if (!payload) return "Erreur Airtable inconnue";
@@ -230,6 +232,9 @@ const Index = () => {
             <Button variant="outline" size="sm" onClick={() => setBrandingOpen(true)} className="gap-1 border-purple-300 text-purple-700 hover:bg-purple-50">
               <Palette className="w-4 h-4" /> Branding
             </Button>
+            <Button variant="outline" size="sm" onClick={() => setMyCertifOpen(true)} className="gap-1 border-pink-300 text-pink-700 hover:bg-pink-50">
+              🎓 MyCertif
+            </Button>
             <Button variant="outline" size="sm" onClick={() => navigate("/musee")} className="gap-1 border-amber-300 text-amber-700 hover:bg-amber-50">
               🏛️ Musée 3D
             </Button>
@@ -273,6 +278,7 @@ const Index = () => {
         </div>
       </main>
       <BrandingAutoModal open={brandingOpen} onOpenChange={setBrandingOpen} organisme={organisme} />
+      <MyCertifModal open={myCertifOpen} onOpenChange={setMyCertifOpen} />
     </div>
   );
 };
