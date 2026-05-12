@@ -11,6 +11,7 @@ import GenerateurCV from "./pages/GenerateurCV";
 import GenerateurTampon from "./pages/GenerateurTampon";
 import OPCOMobilites from "./pages/OPCOMobilites";
 import NotFound from "./pages/NotFound";
+import SophieChat from "./components/SophieChat";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +32,7 @@ const App = () => (
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
+        <SophieChat />
         </BackgroundJobsProvider>
       </BrowserRouter>
     </TooltipProvider>
