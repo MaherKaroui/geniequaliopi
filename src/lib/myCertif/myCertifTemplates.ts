@@ -129,8 +129,8 @@ export function getEmargementJuryHTML(sessionDate: string): string {
             <td>${j.prenom}</td>
             <td>${j.fonction}</td>
             <td style="text-align:center;color:#666;font-style:italic">
-              ${i === JURY.length - 1
-                ? `<img src="/mycertif/proforma_signature.jpg" style="max-height:60px" alt="Tampon Pro Forma">`
+              ${j.prenom === "Lydia" && j.nom.includes("NGHA")
+                ? `<img src="/mycertif/tampon_academy.jpg" style="max-height:60px" alt="Tampon Academy by Djika">`
                 : `<span style="font-family: 'Brush Script MT', cursive; font-size: 16pt; color:#1a3a7b">${j.prenom.charAt(0)}. ${j.nom.split(' ')[0].toLowerCase()}</span>`
               }
             </td>
