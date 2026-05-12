@@ -49,9 +49,9 @@ Deno.serve(async (req) => {
       });
     }
 
+    const sysContent = SYSTEM_PROMPT + (context ? `\n\nContexte actuel du dossier (JSON):\n${JSON.stringify(context).slice(0, 6000)}` : "");
     const allMessages = [
-      { role: "system", content: SYSTEM_PROMPT },
-      ...(contextMessage ? [contextMessage] : []),
+      { role: "system", content: sysContent },
       ...trimmed,
     ];
 
