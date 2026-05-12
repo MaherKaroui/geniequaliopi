@@ -55,7 +55,6 @@ Deno.serve(async (req) => {
     const body = JSON.stringify({
       model: "google/gemini-2.5-flash",
       messages: [{ role: "user", content: "hi" }],
-      stream: true,
     });
     console.log("[sophie-chat] body=", body);
     const upstream = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
