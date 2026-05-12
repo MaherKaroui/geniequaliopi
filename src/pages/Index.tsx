@@ -233,6 +233,9 @@ const Index = () => {
             <Button variant="outline" size="sm" onClick={() => navigate("/musee")} className="gap-1 border-amber-300 text-amber-700 hover:bg-amber-50">
               🏛️ Musée 3D
             </Button>
+            <Button variant="outline" size="sm" onClick={() => navigate("/audit-live")} className="gap-1 border-emerald-300 text-emerald-700 hover:bg-emerald-50">
+              <ShieldCheck className="w-4 h-4" /> Audit live
+            </Button>
             <Button variant="ghost" size="sm" onClick={() => updateStarted(false)}>Accueil</Button>
           </div>
         </div>
