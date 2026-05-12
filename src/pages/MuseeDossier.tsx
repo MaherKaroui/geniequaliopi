@@ -162,6 +162,131 @@ function CritereLabel({ num, titre, color, position, rotationY }: { num: number;
   );
 }
 
+// Particules dorées flottantes (poussière de musée)
+function GoldenDust({ count = 250 }: { count?: number }) {
+  const ref = useRef<THREE.Points>(null);
+  const positions = useMemo(() => {
+    const arr = new Float32Array(count * 3);
+    for (let i = 0; i < count; i++) {
+      const r = 2 + Math.random() * 10;
+      const a = Math.random() * Math.PI * 2;
+      arr[i * 3] = Math.sin(a) * r;
+      arr[i * 3 + 1] = Math.random() * 5.5 + 0.2;
+      arr[i * 3 + 2] = Math.cos(a) * r;
+    }
+    return arr;
+  }, [count]);
+  useFrame((s) => {
+    if (!ref.current) return;
+    const arr = (ref.current.geometry.attributes.position as THREE.BufferAttribute).array as Float32Array;
+    for (let i = 0; i < count; i++) {
+      arr[i * 3 + 1] += 0.003 + Math.sin(s.clock.elapsedTime + i) * 0.001;
+      if (arr[i * 3 + 1] > 5.8) arr[i * 3 + 1] = 0.2;
+    }
+    (ref.current.geometry.attributes.position as THREE.BufferAttribute).needsUpdate = true;
+    ref.current.rotation.y = s.clock.elapsedTime * 0.02;
+  });
+  return (
+    <points ref={ref}>
+      <bufferGeometry>
+        <bufferAttribute attach="attributes-position" count={count} array={positions} itemSize={3} args={[positions, 3]} />
+      </bufferGeometry>
+      <pointsMaterial color="#ffd87a" size={0.04} transparent opacity={0.7} sizeAttenuation depthWrite={false} />
+    </points>
+  );
+}
+
+// Colonne de marbre décorative
+function MarbleColumn({ position }: { position: [number, number, number] }) {
+  return (
+    <group position={position}>
+      <mesh position={[0, 0.1, 0]}>
+        <boxGeometry args={[0.9, 0.2, 0.9]} />
+        <meshStandardMaterial color="#d8cdb5" roughness={0.4} />
+      </mesh>
+      <mesh position={[0, 3, 0]}>
+        <cylinderGeometry args={[0.3, 0.35, 5.6, 24]} />
+        <meshStandardMaterial color="#e8dec5" roughness={0.5} metalness={0.1} />
+      </mesh>
+      <mesh position={[0, 5.95, 0]}>
+        <boxGeometry args={[0.85, 0.3, 0.85]} />
+        <meshStandardMaterial color="#d8cdb5" roughness={0.4} />
+      </mesh>
+    </group>
+  );
+}
+
+// Trophée Qualiopi rotatif central (remplace le torusKnot statique)
+function CentralTrophy() {
+  const ref = useRef<THREE.Group>(null);
+  useFrame((s) => {
+    if (ref.current) {
+      ref.current.rotation.y = s.clock.elapsedTime * 0.3;
+      ref.current.position.y = 0.9 + Math.sin(s.clock.elapsedTime) * 0.08;
+    }
+  });
+  return (
+    <group ref={ref}>
+      <mesh>
+        <torusKnotGeometry args={[0.4, 0.13, 120, 20]} />
+        <meshStandardMaterial color="#ffcc55" metalness={0.95} roughness={0.1} emissive="#553200" emissiveIntensity={0.4} />
+      </mesh>
+      <pointLight intensity={1.2} color="#ffd070" distance={5} />
+    </group>
+  );
+}
+
+// Banc de musée
+function Bench({ position, rotationY }: { position: [number, number, number]; rotationY: number }) {
+  return (
+    <group position={position} rotation={[0, rotationY, 0]}>
+      <mesh position={[0, 0.4, 0]}>
+        <boxGeometry args={[2, 0.12, 0.5]} />
+        <meshStandardMaterial color="#5b3a22" roughness={0.6} />
+      </mesh>
+      {[-0.85, 0.85].map((x, i) => (
+        <mesh key={i} position={[x, 0.2, 0]}>
+          <boxGeometry args={[0.12, 0.4, 0.45]} />
+          <meshStandardMaterial color="#3a2515" roughness={0.7} />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+// Hologramme de Sophie l'auditrice (guide)
+function SophieHologram() {
+  const ref = useRef<THREE.Group>(null);
+  useFrame((s) => {
+    if (ref.current) {
+      ref.current.rotation.y = s.clock.elapsedTime * 0.5;
+      const m = ref.current.children[0] as THREE.Mesh;
+      if (m && (m.material as THREE.MeshStandardMaterial).opacity !== undefined) {
+        (m.material as THREE.MeshStandardMaterial).opacity = 0.55 + Math.sin(s.clock.elapsedTime * 2) * 0.15;
+      }
+    }
+  });
+  return (
+    <group ref={ref} position={[3.5, 0, 0]}>
+      <mesh position={[0, 1.2, 0]}>
+        <capsuleGeometry args={[0.35, 1.1, 8, 16]} />
+        <meshStandardMaterial color="#7ad7ff" transparent opacity={0.6} emissive="#3a9fd6" emissiveIntensity={1.2} />
+      </mesh>
+      <mesh position={[0, 2.15, 0]}>
+        <sphereGeometry args={[0.28, 16, 16]} />
+        <meshStandardMaterial color="#7ad7ff" transparent opacity={0.7} emissive="#3a9fd6" emissiveIntensity={1.2} />
+      </mesh>
+      <mesh position={[0, 0.05, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[0.4, 0.55, 32]} />
+        <meshStandardMaterial color="#3a9fd6" emissive="#3a9fd6" emissiveIntensity={1.5} side={THREE.DoubleSide} />
+      </mesh>
+      <Text position={[0, 2.8, 0]} fontSize={0.18} color="#bce9ff" anchorX="center" outlineWidth={0.01} outlineColor="#0a3a5a">
+        Sophie · Guide auditrice
+      </Text>
+    </group>
+  );
+}
+
 function Gallery({ onSelect }: { onSelect: (f: FrameData) => void }) {
   const marble = useMemo(() => makeMarbleTexture(), []);
 
@@ -231,20 +356,40 @@ function Gallery({ onSelect }: { onSelect: (f: FrameData) => void }) {
         <pointLight intensity={2} color="#ffe0a0" distance={20} />
       </group>
 
-      {/* Statue centrale = badge Qualiopi */}
+      {/* Statue centrale = badge Qualiopi avec trophée animé */}
       <group position={[0, 0.5, 0]}>
         <mesh>
           <cylinderGeometry args={[0.6, 0.8, 1, 16]} />
           <meshStandardMaterial color="#3a2a1a" roughness={0.6} />
         </mesh>
-        <mesh position={[0, 0.9, 0]}>
-          <torusKnotGeometry args={[0.4, 0.13, 80, 16]} />
-          <meshStandardMaterial color="#c9a961" metalness={0.95} roughness={0.15} />
-        </mesh>
+        <CentralTrophy />
         <Text position={[0, -0.7, 0.85]} fontSize={0.18} color="#c9a961" anchorX="center">
           QUALIOPI
         </Text>
       </group>
+
+      {/* Hologramme guide Sophie */}
+      <SophieHologram />
+
+      {/* Poussière dorée flottante */}
+      <GoldenDust />
+
+      {/* Bancs de musée disposés autour */}
+      {[0, Math.PI / 2, Math.PI, -Math.PI / 2].map((a, i) => (
+        <Bench key={i} position={[Math.sin(a) * 4, 0, Math.cos(a) * 4]} rotationY={a + Math.PI} />
+      ))}
+
+      {/* Colonnes de marbre entre chaque critère */}
+      {CRITERES_INFO.map((_, ci) => {
+        const acc = CRITERES_INFO.slice(0, ci).reduce((s, c) => s + c.indicateurs.length, 0);
+        const angle = (acc - 0.5) * totalAngleStep;
+        return (
+          <MarbleColumn
+            key={`col-${ci}`}
+            position={[Math.sin(angle) * (RADIUS - 0.15), 0, Math.cos(angle) * (RADIUS - 0.15)]}
+          />
+        );
+      })}
 
       {/* Cadres */}
       {frames.map((f, i) => (
