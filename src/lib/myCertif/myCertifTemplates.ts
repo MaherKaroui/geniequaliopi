@@ -139,7 +139,7 @@ export function getEmargementJuryHTML(sessionDate: string): string {
       </tbody>
     </table>
 
-    ${FOOTER_ACADEMY}
+    ${footerProForma()}
   </body></html>`;
 }
 
@@ -148,7 +148,7 @@ export function getEmargementJuryHTML(sessionDate: string): string {
 // ======================================================================
 export function getGrilleEvaluationHTML(s: CertifStagiaire): string {
   const competencesRows = COMPETENCES.map((c) => `
-    <tr><td colspan="3" style="background:#fef0f8;padding:10px;font-weight:bold;border-top:2px solid #e6007e">
+    <tr><td colspan="3" style="background:#f8f4e8;padding:10px;font-weight:bold;border-top:2px solid #d4af37">
       ${c.titre}<div style="font-weight:normal;font-size:9pt;color:#555;margin-top:4px;font-style:italic">${c.description}</div>
     </td></tr>
     ${c.criteres.map(cr => `
@@ -211,7 +211,7 @@ export function getGrilleEvaluationHTML(s: CertifStagiaire): string {
       </div>
     </div>
 
-    ${FOOTER_ESCALE}
+    ${footerProForma()}
   </body></html>`;
 }
 
@@ -251,7 +251,7 @@ export function getAttestationHonneurHTML(s: CertifStagiaire): string {
       <div style="font-family: 'Brush Script MT', cursive; font-size: 22pt; color:#1a3a7b; margin-top:6px">${s.prenom} ${s.nom}</div>
     </div>
 
-    ${FOOTER_ACADEMY}
+    ${footerProForma()}
   </body></html>`;
 }
 
@@ -266,7 +266,7 @@ export function getQuestionnaireHTML(s: CertifStagiaire): string {
     return `
     <div style="margin-bottom:14px;page-break-inside:avoid">
       <p style="font-weight:bold;font-size:10.5pt;margin:0 0 4px">${i + 1}. ${q.question}</p>
-      <div style="border:1px solid #ddd;border-left:3px solid #e6007e;padding:6px 10px;font-size:10pt;background:#fdfaff;line-height:1.5">${reponse}</div>
+      <div style="border:1px solid #ddd;border-left:3px solid #d4af37;padding:6px 10px;font-size:10pt;background:#fcfaf3;line-height:1.5">${reponse}</div>
     </div>`;
   }).join("");
 
@@ -277,10 +277,10 @@ export function getQuestionnaireHTML(s: CertifStagiaire): string {
 
     <table style="margin:12px 0">
       <tbody>
-        <tr><td style="width:30%;background:#fef0f8"><strong>Candidat(e)</strong></td><td>${s.prenom} ${s.nom}</td></tr>
-        <tr><td style="background:#fef0f8"><strong>Date de naissance</strong></td><td>${s.dateNaissance}</td></tr>
-        <tr><td style="background:#fef0f8"><strong>Date de session</strong></td><td>${s.sessionDate}</td></tr>
-        <tr><td style="background:#fef0f8"><strong>Membre du jury</strong></td><td>${s.membreJury || JURY[0].prenom + " " + JURY[0].nom}</td></tr>
+        <tr><td style="width:30%;background:#f8f4e8"><strong>Candidat(e)</strong></td><td>${s.prenom} ${s.nom}</td></tr>
+        <tr><td style="background:#f8f4e8"><strong>Date de naissance</strong></td><td>${s.dateNaissance}</td></tr>
+        <tr><td style="background:#f8f4e8"><strong>Date de session</strong></td><td>${s.sessionDate}</td></tr>
+        <tr><td style="background:#f8f4e8"><strong>Membre du jury</strong></td><td>${s.membreJury || JURY[0].prenom + " " + JURY[0].nom}</td></tr>
       </tbody>
     </table>
 
@@ -298,6 +298,6 @@ export function getQuestionnaireHTML(s: CertifStagiaire): string {
       </div>
     </div>
 
-    ${FOOTER_ACADEMY}
+    ${footerProForma()}
   </body></html>`;
 }
