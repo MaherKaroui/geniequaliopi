@@ -50,12 +50,21 @@ export interface CertifStagiaire {
 export const STAGIAIRES: CertifStagiaire[] = [
   { nom: "HOUCHAT", prenom: "Linda", dateNaissance: "24/10/1989", adresse: "12 rue des Lilas", ville: "Saint-Denis", sessionDate: "03/04/2026", membreJury: "TAMBA Cindy" },
   { nom: "BENALI", prenom: "Sarah", dateNaissance: "15/06/1992", adresse: "8 avenue Jean Jaurès", ville: "Aubervilliers", sessionDate: "03/04/2026", membreJury: "TAMBA Cindy" },
-  { nom: "DIALLO", prenom: "Aïcha", dateNaissance: "07/02/1995", adresse: "23 rue Voltaire", ville: "Saint-Ouen", sessionDate: "10/04/2026", membreJury: "LUBANZADIO BAZU Noémie" },
+  { nom: "DIALLO", prenom: "Aïcha", dateNaissance: "07/02/1995", adresse: "23 rue Voltaire", ville: "Saint-Ouen", sessionDate: "03/04/2026", membreJury: "LUBANZADIO BAZU Noémie" },
   { nom: "MARTIN", prenom: "Sophie", dateNaissance: "30/11/1988", adresse: "5 boulevard de la Villette", ville: "Paris 19e", sessionDate: "10/04/2026", membreJury: "LUBANZADIO BAZU Noémie" },
-  { nom: "ROBERT", prenom: "Émilie", dateNaissance: "12/09/1991", adresse: "17 rue de Belleville", ville: "Paris 20e", sessionDate: "17/04/2026", membreJury: "TAMBA Cindy" },
-  { nom: "NGUYEN", prenom: "Linh", dateNaissance: "22/03/1994", adresse: "44 rue Stalingrad", ville: "Pantin", sessionDate: "17/04/2026", membreJury: "TAMBA Cindy" },
-  { nom: "PEREIRA", prenom: "Manuela", dateNaissance: "05/07/1990", adresse: "9 rue de la Convention", ville: "Bobigny", sessionDate: "24/04/2026", membreJury: "LUBANZADIO BAZU Noémie" },
-  { nom: "CISSE", prenom: "Fatou", dateNaissance: "18/12/1993", adresse: "31 rue de la République", ville: "Saint-Denis", sessionDate: "24/04/2026", membreJury: "LUBANZADIO BAZU Noémie" },
+  { nom: "ROBERT", prenom: "Émilie", dateNaissance: "12/09/1991", adresse: "17 rue de Belleville", ville: "Paris 20e", sessionDate: "10/04/2026", membreJury: "TAMBA Cindy" },
+  { nom: "NGUYEN", prenom: "Linh", dateNaissance: "22/03/1994", adresse: "44 rue Stalingrad", ville: "Pantin", sessionDate: "10/04/2026", membreJury: "TAMBA Cindy" },
+  { nom: "PEREIRA", prenom: "Manuela", dateNaissance: "05/07/1990", adresse: "9 rue de la Convention", ville: "Bobigny", sessionDate: "17/04/2026", membreJury: "LUBANZADIO BAZU Noémie" },
+  { nom: "CISSE", prenom: "Fatou", dateNaissance: "18/12/1993", adresse: "31 rue de la République", ville: "Saint-Denis", sessionDate: "17/04/2026", membreJury: "LUBANZADIO BAZU Noémie" },
+  { nom: "TRAORE", prenom: "Mariam", dateNaissance: "09/05/1996", adresse: "14 rue du Landy", ville: "Aubervilliers", sessionDate: "17/04/2026", membreJury: "TAMBA Cindy" },
+  { nom: "DA SILVA", prenom: "Inès", dateNaissance: "21/01/1992", adresse: "6 rue de Paris", ville: "Saint-Denis", sessionDate: "24/04/2026", membreJury: "TAMBA Cindy" },
+  { nom: "KONE", prenom: "Awa", dateNaissance: "14/08/1990", adresse: "27 avenue de la Marne", ville: "Pantin", sessionDate: "24/04/2026", membreJury: "LUBANZADIO BAZU Noémie" },
+  { nom: "LOPES", prenom: "Carla", dateNaissance: "03/04/1993", adresse: "11 rue Jules Guesde", ville: "Saint-Ouen", sessionDate: "24/04/2026", membreJury: "LUBANZADIO BAZU Noémie" },
+  { nom: "AMARA", prenom: "Yasmine", dateNaissance: "28/10/1994", adresse: "19 boulevard Anatole France", ville: "Saint-Denis", sessionDate: "01/05/2026", membreJury: "TAMBA Cindy" },
+  { nom: "BOUKHARI", prenom: "Nora", dateNaissance: "16/02/1991", adresse: "33 rue du Pré Saint-Gervais", ville: "Pantin", sessionDate: "01/05/2026", membreJury: "TAMBA Cindy" },
+  { nom: "SYLLA", prenom: "Aminata", dateNaissance: "02/12/1995", adresse: "7 rue Émile Zola", ville: "Bobigny", sessionDate: "01/05/2026", membreJury: "LUBANZADIO BAZU Noémie" },
+  { nom: "FERREIRA", prenom: "Joana", dateNaissance: "19/06/1989", adresse: "21 rue Henri Barbusse", ville: "Saint-Denis", sessionDate: "08/05/2026", membreJury: "LUBANZADIO BAZU Noémie" },
+  { nom: "EL AMRANI", prenom: "Salma", dateNaissance: "11/03/1992", adresse: "4 rue Carnot", ville: "Aubervilliers", sessionDate: "08/05/2026", membreJury: "TAMBA Cindy" },
 ];
 
 // Grille d'évaluation : 10 compétences avec critères (extrait fidèle du référentiel RS 7302)
