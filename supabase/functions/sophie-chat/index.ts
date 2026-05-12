@@ -60,7 +60,7 @@ Deno.serve(async (req) => {
       messages: allMessages,
       stream: true,
     });
-    console.log("[sophie-chat] sending body, len=", body.length, "msgs=", allMessages.length);
+    console.log("[sophie-chat] body=", body);
     const upstream = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
