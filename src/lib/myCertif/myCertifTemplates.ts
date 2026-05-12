@@ -6,25 +6,38 @@ import { ORG_FORMATION, ORG_CERTIFICATEUR, CERTIFICATION, JURY, COMPETENCES, QUE
 const baseStyle = `
   <style>
     @page { size: A4; margin: 18mm; }
-    body { font-family: 'Calibri', Arial, sans-serif; color: #222; font-size: 11pt; line-height: 1.45; margin: 0; }
-    h1 { color: #1a1a1a; font-size: 18pt; text-align: center; margin: 0 0 8px; letter-spacing: 0.5px; }
-    h2 { color: #1a1a1a; font-size: 13pt; margin: 14px 0 6px; }
+    body { font-family: 'Calibri', Arial, sans-serif; color: #222; font-size: 11pt; line-height: 1.5; margin: 0; }
+    h1 { color: #1a1a1a; font-size: 17pt; text-align: left; margin: 18px 0 14px; font-weight: bold; }
+    h2 { color: #1a1a1a; font-size: 12pt; margin: 14px 0 6px; font-weight: bold; }
     table { width: 100%; border-collapse: collapse; margin: 8px 0; }
-    th { background: #e6007e; color: white; padding: 6px 8px; font-size: 10pt; text-align: left; border: 1px solid #c00067; }
-    td { padding: 6px 8px; border: 1px solid #ccc; font-size: 10pt; vertical-align: top; }
-    .header-org { font-size: 10pt; color: #555; line-height: 1.4; margin-bottom: 6px; }
-    .stamp-img { max-width: 130px; opacity: 0.92; }
-    .label { color: #666; font-weight: 600; }
-    .checkbox { font-family: monospace; font-size: 11pt; }
+    th { background: #f3f3f3; color: #1a1a1a; padding: 7px 9px; font-size: 10pt; text-align: left; border: 1px solid #bbb; font-weight: bold; }
+    td { padding: 7px 9px; border: 1px solid #bbb; font-size: 10.5pt; vertical-align: top; }
+    .pf-header-block { border-bottom: 2px solid #d4af37; padding-bottom: 10px; margin-bottom: 18px; display:flex; justify-content:space-between; align-items:flex-start; }
+    .pf-header-block .org { font-size: 10pt; line-height: 1.5; }
+    .pf-header-block .org .name { font-weight: bold; font-size: 12pt; color: #1a1a1a; }
+    .pf-header-block img { max-width: 110px; max-height: 90px; }
+    .pf-footer-block { margin-top: 30px; padding-top: 8px; border-top: 1px solid #bbb; text-align: center; font-size: 9pt; color: #555; line-height: 1.5; }
+    .pf-footer-block strong { color: #1a1a1a; }
+    .label { color: #444; font-weight: 600; }
   </style>
 `;
 
 const headerAcademy = () => `
-  <div class="header-org">
-    <strong>${ORG_FORMATION.nom}</strong><br>
-    ${ORG_FORMATION.adresse}, ${ORG_FORMATION.codePostal} ${ORG_FORMATION.ville}<br>
-    SIRET : ${ORG_FORMATION.siret} – Numéro de déclaration d'activité : ${ORG_FORMATION.nda}<br>
-    Présidente : ${ORG_FORMATION.presidente}
+  <div class="pf-header-block">
+    <div class="org">
+      <div class="name">${ORG_FORMATION.nom}</div>
+      ${ORG_FORMATION.adresse}, ${ORG_FORMATION.codePostal} ${ORG_FORMATION.ville}<br>
+      SIRET : ${ORG_FORMATION.siret} – Numéro de déclaration d'activité : ${ORG_FORMATION.nda}<br>
+      Président : ${ORG_FORMATION.presidente}
+    </div>
+    <img src="/mycertif/proforma_logo.jpg" alt="Pro Forma">
+  </div>
+`;
+
+const footerProForma = () => `
+  <div class="pf-footer-block">
+    <strong>${ORG_FORMATION.nom}</strong> – ${ORG_FORMATION.adresse}, ${ORG_FORMATION.codePostal} ${ORG_FORMATION.ville}<br>
+    SIRET ${ORG_FORMATION.siret} – Numéro de déclaration d'activité : ${ORG_FORMATION.nda} – Président : ${ORG_FORMATION.presidente}
   </div>
 `;
 
