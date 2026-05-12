@@ -10,8 +10,9 @@ import DocumentGenerator from "@/components/DocumentGenerator";
 import DossierHistory from "@/components/DossierHistory";
 
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, LogIn, LogOut, User, FileSpreadsheet, Upload, Loader2, ShieldCheck, FileCheck, UserCircle, Stamp, Truck, Building2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, LogIn, LogOut, User, FileSpreadsheet, Upload, Loader2, ShieldCheck, FileCheck, UserCircle, Stamp, Truck, Building2, Palette } from "lucide-react";
 import BahoModal from "@/components/BahoModal";
+import BrandingAutoModal from "@/components/BrandingAutoModal";
 import { exportFormDataToExcel } from "@/lib/exportFormData";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -45,6 +46,7 @@ const Index = () => {
   const navigate = useNavigate();
   const [airtableLoading, setAirtableLoading] = useState(false);
   const [bahoOpen, setBahoOpen] = useState(false);
+  const [brandingOpen, setBrandingOpen] = useState(false);
 
   const getAirtableErrorMessage = (payload: any) => {
     if (!payload) return "Erreur Airtable inconnue";
@@ -225,6 +227,9 @@ const Index = () => {
               {airtableLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
               {airtableLoading ? 'Envoi...' : 'Airtable'}
             </Button>
+            <Button variant="outline" size="sm" onClick={() => setBrandingOpen(true)} className="gap-1 border-purple-300 text-purple-700 hover:bg-purple-50">
+              <Palette className="w-4 h-4" /> Branding
+            </Button>
             <Button variant="ghost" size="sm" onClick={() => updateStarted(false)}>Accueil</Button>
           </div>
         </div>
@@ -261,6 +266,7 @@ const Index = () => {
           </Button>
         </div>
       </main>
+      <BrandingAutoModal open={brandingOpen} onOpenChange={setBrandingOpen} organisme={organisme} />
     </div>
   );
 };
