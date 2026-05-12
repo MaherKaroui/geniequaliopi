@@ -54,7 +54,7 @@ Deno.serve(async (req) => {
     ];
 
     const body = JSON.stringify({
-      model: "google/gemini-2.5-flash",
+      model: "google/gemini-3-flash-preview",
       messages: [{ role: "user", content: "hi" }],
     });
     console.log("[sophie-chat] body=", body);
