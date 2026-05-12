@@ -10,6 +10,7 @@ import DemandeNDA from "./pages/DemandeNDA";
 import GenerateurCV from "./pages/GenerateurCV";
 import GenerateurTampon from "./pages/GenerateurTampon";
 import OPCOMobilites from "./pages/OPCOMobilites";
+import MuseeDossier from "./pages/MuseeDossier";
 import NotFound from "./pages/NotFound";
 import SophieChat from "./components/SophieChat";
 
