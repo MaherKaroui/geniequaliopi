@@ -28,15 +28,13 @@ Deno.serve(async (req) => {
   try {
     const { messages, context } = await req.json();
     const apiKey = Deno.env.get("LOVABLE_API_KEY");
+    console.log("[sophie-chat] apiKey present?", !!apiKey, "len=", apiKey?.length);
     if (!apiKey) {
       return new Response(JSON.stringify({ error: "LOVABLE_API_KEY missing" }), {
         status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const contextMessage = context
-      ? { role: "system", content: `Contexte actuel du dossier (JSON):\n${JSON.stringify(context).slice(0, 6000)}` }
-      : null;
 
     // Drop leading assistant messages — gateway requires first message after system to be user
     const cleanMessages = Array.isArray(messages) ? messages.filter((m: any) => m && typeof m.content === "string" && m.content.trim().length > 0) : [];
@@ -49,24 +47,32 @@ Deno.serve(async (req) => {
       });
     }
 
+    const sysContent = SYSTEM_PROMPT + (context ? `\n\nContexte actuel du dossier (JSON):\n${JSON.stringify(context).slice(0, 6000)}` : "");
     const allMessages = [
-      { role: "system", content: SYSTEM_PROMPT },
-      ...(contextMessage ? [contextMessage] : []),
+      { role: "system", content: sysContent },
       ...trimmed,
     ];
 
+    const body = JSON.stringify({
+      model: "google/gemini-3-flash-preview",
+      messages: [{ role: "user", content: "hi" }],
+    });
+    console.log("[sophie-chat] body=", body);
     const upstream = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${apiKey}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: allMessages,
-        stream: true,
-      }),
+      body,
     });
+    if (!upstream.ok) {
+      const errTxt = await upstream.text();
+      console.log("[sophie-chat] upstream error", upstream.status, errTxt);
+      return new Response(JSON.stringify({ error: errTxt, status: upstream.status }), {
+        status: upstream.status, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     if (upstream.status === 429) {
       return new Response(JSON.stringify({ error: "Trop de requêtes, réessaie dans quelques secondes." }), {
