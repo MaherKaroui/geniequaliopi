@@ -74,7 +74,7 @@ export function getAttestationDelivranceHTML(s: CertifStagiaire): string {
           <div><strong>Fait à :</strong> ${ORG_FORMATION.ville}</div>
           <div><strong>Le :</strong> ${s.sessionDate}</div>
           <div style="margin-top:18px"><strong>Signature de la Présidente :</strong> ${ORG_FORMATION.presidente}</div>
-          <div style="font-family: 'Brush Script MT', cursive; font-size: 22pt; color:#1a3a7b; margin-top:4px">NGHA Lydia</div>
+          ${(() => { const sig = typeof localStorage !== 'undefined' ? localStorage.getItem('mycertif_signature_presidente') : null; return sig ? `<img src="${sig}" style="max-height:70px;margin-top:4px" alt="Signature">` : `<div style="font-family: 'Brush Script MT', cursive; font-size: 22pt; color:#1a3a7b; margin-top:4px">NGHA Lydia</div>`; })()}
         </div>
         <div class="sig-block" style="text-align:center">
           <img src="/mycertif/tampon_academy.jpg" class="stamp" alt="Tampon Academy">

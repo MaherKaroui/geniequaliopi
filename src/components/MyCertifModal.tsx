@@ -44,10 +44,30 @@ interface Preview {
 export default function MyCertifModal({ open, onOpenChange }: { open: boolean; onOpenChange: (v: boolean) => void }) {
   const [generating, setGenerating] = useState(false);
   const [preview, setPreview] = useState<Preview | null>(null);
+  const [signature, setSignature] = useState<string | null>(() => typeof localStorage !== "undefined" ? localStorage.getItem("mycertif_signature_presidente") : null);
   const { runJob } = useBackgroundJobs();
   const sessions = Array.from(new Set(STAGIAIRES.map(s => s.sessionDate)));
 
   useEffect(() => () => { if (preview?.pdfUrl) URL.revokeObjectURL(preview.pdfUrl); }, [preview?.pdfUrl]);
+
+  const handleSignatureUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = reader.result as string;
+      localStorage.setItem("mycertif_signature_presidente", dataUrl);
+      setSignature(dataUrl);
+      toast.success("Signature enregistrée");
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const clearSignature = () => {
+    localStorage.removeItem("mycertif_signature_presidente");
+    setSignature(null);
+    toast.success("Signature supprimée");
+  };
 
   const showPreview = async (docKind: DocKind, stagiaire: CertifStagiaire | null, sessionDate?: string) => {
     if (preview?.pdfUrl) URL.revokeObjectURL(preview.pdfUrl);
@@ -150,8 +170,22 @@ export default function MyCertifModal({ open, onOpenChange }: { open: boolean; o
           </div>
         </div>
 
-        <div className="text-xs bg-muted/50 p-2 rounded">
-          <strong>Émetteur :</strong> {ORG_FORMATION.nom} – SIRET {ORG_FORMATION.siret} – NDA {ORG_FORMATION.nda}
+        <div className="text-xs bg-muted/50 p-2 rounded flex items-center justify-between gap-3 flex-wrap">
+          <span><strong>Émetteur :</strong> {ORG_FORMATION.nom} – SIRET {ORG_FORMATION.siret} – NDA {ORG_FORMATION.nda}</span>
+          <div className="flex items-center gap-2">
+            <span className="text-muted-foreground">Signature Présidente :</span>
+            {signature ? (
+              <>
+                <img src={signature} alt="sig" className="h-8 bg-white border rounded px-1" />
+                <button onClick={clearSignature} className="text-destructive hover:underline text-[11px]">Retirer</button>
+              </>
+            ) : (
+              <label className="cursor-pointer text-primary hover:underline text-[11px]">
+                Importer (PNG)
+                <input type="file" accept="image/*" className="hidden" onChange={handleSignatureUpload} />
+              </label>
+            )}
+          </div>
         </div>
 
         <div className="flex justify-end gap-2 pt-2 border-t">
