@@ -34,9 +34,6 @@ Deno.serve(async (req) => {
       });
     }
 
-    const contextMessage = context
-      ? { role: "system", content: `Contexte actuel du dossier (JSON):\n${JSON.stringify(context).slice(0, 6000)}` }
-      : null;
 
     // Drop leading assistant messages — gateway requires first message after system to be user
     const cleanMessages = Array.isArray(messages) ? messages.filter((m: any) => m && typeof m.content === "string" && m.content.trim().length > 0) : [];
