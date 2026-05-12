@@ -66,6 +66,7 @@ export function getAttestationDelivranceHTML(s: CertifStagiaire): string {
         Certification <strong>${CERTIFICATION.code}</strong> enregistrée au Répertoire Spécifique des Certifications et Habilitations,
         par décision du Directeur Général de France Compétences en date du <strong>${CERTIFICATION.decisionDate}</strong>
         (Code NSF ${CERTIFICATION.codeNSF}).<br><br>
+        Formation suivie <strong>du ${s.dateDebut} au ${s.dateFin}</strong> auprès de ${ORG_FORMATION.nom}.<br>
         Délivrée sur décision du jury de certification.
       </div>
 
