@@ -4,16 +4,17 @@
  */
 
 export const ORG_FORMATION = {
-  nom: "ACADEMY BY DJIKA",
-  adresse: "40 quai de la Marine",
-  codePostal: "93450",
-  ville: "L'Île-Saint-Denis",
-  siret: "90123845100016",
-  nda: "11930895593",
-  presidente: "NGHA Lydia",
-  email: "academy@bydjika.com",
-  tel: "07.83.08.09.56",
-  rcs: "901 238 451",
+  nom: "Pro Forma",
+  adresse: "6 B Rue du Bas Village",
+  codePostal: "35510",
+  ville: "Cesson-Sévigné",
+  siret: "90038394400015",
+  siren: "900383944",
+  nda: "53351103735",
+  presidente: "Ben Abdelhadi Soufiane",
+  email: "proforma.contact@yahoo.com",
+  tel: "",
+  rcs: "900 383 944",
 };
 
 export const ORG_CERTIFICATEUR = {
