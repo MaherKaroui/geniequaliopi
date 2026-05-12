@@ -278,6 +278,7 @@ const Index = () => {
         </div>
       </main>
       <BrandingAutoModal open={brandingOpen} onOpenChange={setBrandingOpen} organisme={organisme} />
+      <MyCertifModal open={myCertifOpen} onOpenChange={setMyCertifOpen} />
     </div>
   );
 };
