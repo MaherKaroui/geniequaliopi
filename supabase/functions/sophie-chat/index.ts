@@ -55,18 +55,27 @@ Deno.serve(async (req) => {
       ...trimmed,
     ];
 
+    const body = JSON.stringify({
+      model: "google/gemini-2.5-flash",
+      messages: allMessages,
+      stream: true,
+    });
+    console.log("[sophie-chat] sending body, len=", body.length, "msgs=", allMessages.length);
     const upstream = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${apiKey}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
-        messages: allMessages,
-        stream: true,
-      }),
+      body,
     });
+    if (!upstream.ok) {
+      const errTxt = await upstream.text();
+      console.log("[sophie-chat] upstream error", upstream.status, errTxt);
+      return new Response(JSON.stringify({ error: errTxt, status: upstream.status }), {
+        status: upstream.status, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     if (upstream.status === 429) {
       return new Response(JSON.stringify({ error: "Trop de requêtes, réessaie dans quelques secondes." }), {
