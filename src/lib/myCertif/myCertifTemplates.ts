@@ -73,7 +73,8 @@ export function getAttestationDelivranceHTML(s: CertifStagiaire): string {
         <div class="sig-block">
           <div><strong>Fait à :</strong> ${ORG_FORMATION.ville}</div>
           <div><strong>Le :</strong> ${s.sessionDate}</div>
-          <div class="sig-line">Signature de la Présidente : ${ORG_FORMATION.presidente}</div>
+          <div style="margin-top:18px"><strong>Signature de la Présidente :</strong> ${ORG_FORMATION.presidente}</div>
+          <div style="font-family: 'Brush Script MT', cursive; font-size: 22pt; color:#1a3a7b; margin-top:4px">NGHA Lydia</div>
         </div>
         <div class="sig-block" style="text-align:center">
           <img src="/mycertif/tampon_academy.jpg" class="stamp" alt="Tampon Academy">
