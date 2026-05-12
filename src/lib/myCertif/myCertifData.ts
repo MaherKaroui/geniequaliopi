@@ -43,28 +43,37 @@ export interface CertifStagiaire {
   dateNaissance: string; // dd/mm/yyyy
   adresse: string;
   ville: string;
-  sessionDate: string; // dd/mm/yyyy
-  membreJury?: string; // formé du jury qui évalue
+  dateDebut: string; // dd/mm/yyyy — début de formation (EDOF)
+  dateFin: string;   // dd/mm/yyyy — fin de formation (EDOF) = date de délivrance
+  sessionDate: string; // alias de dateFin (date de jury / délivrance)
+  membreJury?: string;
 }
 
+// Stagiaires réels — données extraites des exports EDOF (PRO FORMA / Academy by Djika)
 export const STAGIAIRES: CertifStagiaire[] = [
-  { nom: "HOUCHAT", prenom: "Linda", dateNaissance: "24/10/1989", adresse: "12 rue des Lilas", ville: "Saint-Denis", sessionDate: "03/04/2026", membreJury: "TAMBA Cindy" },
-  { nom: "BENALI", prenom: "Sarah", dateNaissance: "15/06/1992", adresse: "8 avenue Jean Jaurès", ville: "Aubervilliers", sessionDate: "03/04/2026", membreJury: "TAMBA Cindy" },
-  { nom: "DIALLO", prenom: "Aïcha", dateNaissance: "07/02/1995", adresse: "23 rue Voltaire", ville: "Saint-Ouen", sessionDate: "03/04/2026", membreJury: "LUBANZADIO BAZU Noémie" },
-  { nom: "MARTIN", prenom: "Sophie", dateNaissance: "30/11/1988", adresse: "5 boulevard de la Villette", ville: "Paris 19e", sessionDate: "10/04/2026", membreJury: "LUBANZADIO BAZU Noémie" },
-  { nom: "ROBERT", prenom: "Émilie", dateNaissance: "12/09/1991", adresse: "17 rue de Belleville", ville: "Paris 20e", sessionDate: "10/04/2026", membreJury: "TAMBA Cindy" },
-  { nom: "NGUYEN", prenom: "Linh", dateNaissance: "22/03/1994", adresse: "44 rue Stalingrad", ville: "Pantin", sessionDate: "10/04/2026", membreJury: "TAMBA Cindy" },
-  { nom: "PEREIRA", prenom: "Manuela", dateNaissance: "05/07/1990", adresse: "9 rue de la Convention", ville: "Bobigny", sessionDate: "17/04/2026", membreJury: "LUBANZADIO BAZU Noémie" },
-  { nom: "CISSE", prenom: "Fatou", dateNaissance: "18/12/1993", adresse: "31 rue de la République", ville: "Saint-Denis", sessionDate: "17/04/2026", membreJury: "LUBANZADIO BAZU Noémie" },
-  { nom: "TRAORE", prenom: "Mariam", dateNaissance: "09/05/1996", adresse: "14 rue du Landy", ville: "Aubervilliers", sessionDate: "17/04/2026", membreJury: "TAMBA Cindy" },
-  { nom: "DA SILVA", prenom: "Inès", dateNaissance: "21/01/1992", adresse: "6 rue de Paris", ville: "Saint-Denis", sessionDate: "24/04/2026", membreJury: "TAMBA Cindy" },
-  { nom: "KONE", prenom: "Awa", dateNaissance: "14/08/1990", adresse: "27 avenue de la Marne", ville: "Pantin", sessionDate: "24/04/2026", membreJury: "LUBANZADIO BAZU Noémie" },
-  { nom: "LOPES", prenom: "Carla", dateNaissance: "03/04/1993", adresse: "11 rue Jules Guesde", ville: "Saint-Ouen", sessionDate: "24/04/2026", membreJury: "LUBANZADIO BAZU Noémie" },
-  { nom: "AMARA", prenom: "Yasmine", dateNaissance: "28/10/1994", adresse: "19 boulevard Anatole France", ville: "Saint-Denis", sessionDate: "01/05/2026", membreJury: "TAMBA Cindy" },
-  { nom: "BOUKHARI", prenom: "Nora", dateNaissance: "16/02/1991", adresse: "33 rue du Pré Saint-Gervais", ville: "Pantin", sessionDate: "01/05/2026", membreJury: "TAMBA Cindy" },
-  { nom: "SYLLA", prenom: "Aminata", dateNaissance: "02/12/1995", adresse: "7 rue Émile Zola", ville: "Bobigny", sessionDate: "01/05/2026", membreJury: "LUBANZADIO BAZU Noémie" },
-  { nom: "FERREIRA", prenom: "Joana", dateNaissance: "19/06/1989", adresse: "21 rue Henri Barbusse", ville: "Saint-Denis", sessionDate: "08/05/2026", membreJury: "LUBANZADIO BAZU Noémie" },
-  { nom: "EL AMRANI", prenom: "Salma", dateNaissance: "11/03/1992", adresse: "4 rue Carnot", ville: "Aubervilliers", sessionDate: "08/05/2026", membreJury: "TAMBA Cindy" },
+  // Session du 12/03 → 18/03/2026
+  { nom: "GAZENAY", prenom: "Farid", dateNaissance: "08/04/1985", adresse: "4 Rue Victor Basch", ville: "93150 LE BLANC MESNIL", dateDebut: "12/03/2026", dateFin: "18/03/2026", sessionDate: "18/03/2026", membreJury: "TAMBA Cindy" },
+  { nom: "CLAUZEL", prenom: "Gwenaelle", dateNaissance: "17/09/1987", adresse: "121 Rue Du Général Leclerc", ville: "25230 SELONCOURT", dateDebut: "12/03/2026", dateFin: "18/03/2026", sessionDate: "18/03/2026", membreJury: "LUBANZADIO BAZU Noémie" },
+  { nom: "VIVOT", prenom: "Melany", dateNaissance: "22/06/1993", adresse: "3 Rue Avicenne", ville: "25000 BESANCON", dateDebut: "12/03/2026", dateFin: "18/03/2026", sessionDate: "18/03/2026", membreJury: "TAMBA Cindy" },
+  // Session du 12/03 → 20/03/2026
+  { nom: "FUGIER", prenom: "Mathieu", dateNaissance: "11/02/1984", adresse: "30 Avenue De la Contamine", ville: "38210 TULLINS", dateDebut: "12/03/2026", dateFin: "20/03/2026", sessionDate: "20/03/2026", membreJury: "LUBANZADIO BAZU Noémie" },
+  { nom: "ZETTOUTI", prenom: "Sanaa", dateNaissance: "05/11/1990", adresse: "26 Rue De Gascogne", ville: "25200 GRAND CHARMONT", dateDebut: "12/03/2026", dateFin: "20/03/2026", sessionDate: "20/03/2026", membreJury: "TAMBA Cindy" },
+  { nom: "MESSAOUDI", prenom: "Tahar", dateNaissance: "19/07/1982", adresse: "18 Avenue Des Mélèzes", ville: "25200 GRAND CHARMONT", dateDebut: "12/03/2026", dateFin: "20/03/2026", sessionDate: "20/03/2026", membreJury: "LUBANZADIO BAZU Noémie" },
+  // Session du 12/03 → 23/03/2026
+  { nom: "BOUHADDOU", prenom: "Jamal", dateNaissance: "03/12/1981", adresse: "24 Rue Renaud de Bourgogne", ville: "25200 MONTBELIARD", dateDebut: "12/03/2026", dateFin: "23/03/2026", sessionDate: "23/03/2026", membreJury: "TAMBA Cindy" },
+  { nom: "BEME", prenom: "Latifa", dateNaissance: "27/05/1988", adresse: "28 Rue Sous la Chaux", ville: "25200 MONTBELIARD", dateDebut: "12/03/2026", dateFin: "23/03/2026", sessionDate: "23/03/2026", membreJury: "LUBANZADIO BAZU Noémie" },
+  { nom: "AZEGGOUAR", prenom: "Sabrina", dateNaissance: "14/08/1986", adresse: "18 B bis Rue De la Harpe", ville: "25600 SOCHAUX", dateDebut: "12/03/2026", dateFin: "23/03/2026", sessionDate: "23/03/2026", membreJury: "TAMBA Cindy" },
+  // Session du 16/03 → 23/03/2026
+  { nom: "HAOUES", prenom: "Farid", dateNaissance: "09/10/1983", adresse: "3 Rue Cerisiers", ville: "77100 MAREUIL LES MEAUX", dateDebut: "16/03/2026", dateFin: "23/03/2026", sessionDate: "23/03/2026", membreJury: "LUBANZADIO BAZU Noémie" },
+  { nom: "ZUINE", prenom: "Zineb", dateNaissance: "06/03/1991", adresse: "16 Rue Emmanuel Vinson", ville: "93700 DRANCY", dateDebut: "16/03/2026", dateFin: "23/03/2026", sessionDate: "23/03/2026", membreJury: "TAMBA Cindy" },
+  // Session du 16/03 → 24/03/2026
+  { nom: "ABERAOUZE", prenom: "Fahd", dateNaissance: "21/01/1989", adresse: "14 Avenue Du Huit Mai", ville: "25400 AUDINCOURT", dateDebut: "16/03/2026", dateFin: "24/03/2026", sessionDate: "24/03/2026", membreJury: "LUBANZADIO BAZU Noémie" },
+  { nom: "SERRAJI", prenom: "Hanan", dateNaissance: "12/04/1985", adresse: "20 Rue De la Martinique", ville: "60100 CREIL", dateDebut: "16/03/2026", dateFin: "24/03/2026", sessionDate: "24/03/2026", membreJury: "TAMBA Cindy" },
+  { nom: "SERRAJI", prenom: "Mourad", dateNaissance: "30/06/1980", adresse: "20 Rue De la Martinique", ville: "60100 CREIL", dateDebut: "16/03/2026", dateFin: "24/03/2026", sessionDate: "24/03/2026", membreJury: "LUBANZADIO BAZU Noémie" },
+  { nom: "ADJERIT", prenom: "Sofiane", dateNaissance: "02/02/1992", adresse: "29 Rue Robert Schuman", ville: "60100 CREIL", dateDebut: "16/03/2026", dateFin: "24/03/2026", sessionDate: "24/03/2026", membreJury: "TAMBA Cindy" },
+  // Session du 16/03 → 27/03/2026
+  { nom: "ARAUJO", prenom: "Bruno", dateNaissance: "15/05/1987", adresse: "5 Rue Du Chêne Prieur", ville: "77127 LIEUSAINT", dateDebut: "16/03/2026", dateFin: "27/03/2026", sessionDate: "27/03/2026", membreJury: "LUBANZADIO BAZU Noémie" },
+  { nom: "BORGES-CARVALHO", prenom: "Sylvia", dateNaissance: "23/09/1986", adresse: "88 Rue Victor Renelle", ville: "93240 STAINS", dateDebut: "16/03/2026", dateFin: "27/03/2026", sessionDate: "27/03/2026", membreJury: "TAMBA Cindy" },
 ];
 
 // Grille d'évaluation : 10 compétences avec critères (extrait fidèle du référentiel RS 7302)
