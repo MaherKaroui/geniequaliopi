@@ -11,6 +11,7 @@ import GenerateurCV from "./pages/GenerateurCV";
 import GenerateurTampon from "./pages/GenerateurTampon";
 import OPCOMobilites from "./pages/OPCOMobilites";
 import MuseeDossier from "./pages/MuseeDossier";
+import QualiopiCheck from "./pages/QualiopiCheck";
 import NotFound from "./pages/NotFound";
 import SophieChat from "./components/SophieChat";
 
@@ -31,6 +32,7 @@ const App = () => (
           <Route path="/generateur-tampon" element={<GenerateurTampon />} />
           <Route path="/opco-mobilites" element={<OPCOMobilites />} />
           <Route path="/musee" element={<MuseeDossier />} />
+          <Route path="/audit-live" element={<QualiopiCheck />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
