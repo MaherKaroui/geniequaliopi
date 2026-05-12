@@ -117,7 +117,7 @@ export function getEmargementJuryHTML(sessionDate: string): string {
             <td>${j.fonction}</td>
             <td style="text-align:center;color:#666;font-style:italic">
               ${i === JURY.length - 1
-                ? `<img src="/mycertif/tampon_academy.jpg" style="max-height:60px" alt="Tampon">`
+                ? `<img src="/mycertif/proforma_signature.jpg" style="max-height:60px" alt="Tampon Pro Forma">`
                 : `<span style="font-family: 'Brush Script MT', cursive; font-size: 16pt; color:#1a3a7b">${j.prenom.charAt(0)}. ${j.nom.split(' ')[0].toLowerCase()}</span>`
               }
             </td>
@@ -194,7 +194,7 @@ export function getGrilleEvaluationHTML(s: CertifStagiaire): string {
       <div style="flex:1;text-align:right">
         <p style="font-size:10pt"><strong>Session du :</strong> ${s.sessionDate}</p>
         <p style="font-size:10pt;color:#666">Tampon :</p>
-        <img src="/mycertif/tampon_academy.jpg" style="max-height:80px" alt="Tampon">
+        <img src="/mycertif/proforma_signature.jpg" style="max-height:80px" alt="Tampon Pro Forma">
       </div>
     </div>
 
@@ -281,7 +281,7 @@ export function getQuestionnaireHTML(s: CertifStagiaire): string {
       </div>
       <div style="flex:1;text-align:right">
         <p style="font-size:10pt"><strong>Tampon :</strong></p>
-        <img src="/mycertif/tampon_academy.jpg" style="max-height:80px" alt="Tampon">
+        <img src="/mycertif/proforma_signature.jpg" style="max-height:80px" alt="Tampon Pro Forma">
       </div>
     </div>
 
