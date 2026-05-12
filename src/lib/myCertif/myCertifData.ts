@@ -35,7 +35,7 @@ export const CERTIFICATION = {
 export const JURY = [
   { nom: "TAMBA", prenom: "Cindy", fonction: "Présidente du jury" },
   { nom: "LUBANZADIO BAZU", prenom: "Noémie", fonction: "Membre du jury" },
-  { nom: "BEN ABDELHADI", prenom: "Soufiane", fonction: "Représentant organisme" },
+  { nom: "NGHA", prenom: "Lydia", fonction: "Représentante organisme" },
 ];
 
 export interface CertifStagiaire {
