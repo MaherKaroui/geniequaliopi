@@ -356,20 +356,40 @@ function Gallery({ onSelect }: { onSelect: (f: FrameData) => void }) {
         <pointLight intensity={2} color="#ffe0a0" distance={20} />
       </group>
 
-      {/* Statue centrale = badge Qualiopi */}
+      {/* Statue centrale = badge Qualiopi avec trophée animé */}
       <group position={[0, 0.5, 0]}>
         <mesh>
           <cylinderGeometry args={[0.6, 0.8, 1, 16]} />
           <meshStandardMaterial color="#3a2a1a" roughness={0.6} />
         </mesh>
-        <mesh position={[0, 0.9, 0]}>
-          <torusKnotGeometry args={[0.4, 0.13, 80, 16]} />
-          <meshStandardMaterial color="#c9a961" metalness={0.95} roughness={0.15} />
-        </mesh>
+        <CentralTrophy />
         <Text position={[0, -0.7, 0.85]} fontSize={0.18} color="#c9a961" anchorX="center">
           QUALIOPI
         </Text>
       </group>
+
+      {/* Hologramme guide Sophie */}
+      <SophieHologram />
+
+      {/* Poussière dorée flottante */}
+      <GoldenDust />
+
+      {/* Bancs de musée disposés autour */}
+      {[0, Math.PI / 2, Math.PI, -Math.PI / 2].map((a, i) => (
+        <Bench key={i} position={[Math.sin(a) * 4, 0, Math.cos(a) * 4]} rotationY={a + Math.PI} />
+      ))}
+
+      {/* Colonnes de marbre entre chaque critère */}
+      {CRITERES_INFO.map((_, ci) => {
+        const acc = CRITERES_INFO.slice(0, ci).reduce((s, c) => s + c.indicateurs.length, 0);
+        const angle = (acc - 0.5) * totalAngleStep;
+        return (
+          <MarbleColumn
+            key={`col-${ci}`}
+            position={[Math.sin(angle) * (RADIUS - 0.15), 0, Math.cos(angle) * (RADIUS - 0.15)]}
+          />
+        );
+      })}
 
       {/* Cadres */}
       {frames.map((f, i) => (
