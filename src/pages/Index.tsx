@@ -230,6 +230,9 @@ const Index = () => {
             <Button variant="outline" size="sm" onClick={() => setBrandingOpen(true)} className="gap-1 border-purple-300 text-purple-700 hover:bg-purple-50">
               <Palette className="w-4 h-4" /> Branding
             </Button>
+            <Button variant="outline" size="sm" onClick={() => navigate("/musee")} className="gap-1 border-amber-300 text-amber-700 hover:bg-amber-50">
+              🏛️ Musée 3D
+            </Button>
             <Button variant="ghost" size="sm" onClick={() => updateStarted(false)}>Accueil</Button>
           </div>
         </div>
