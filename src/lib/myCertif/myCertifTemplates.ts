@@ -1,7 +1,7 @@
 /**
  * MyCertif – HTML templates for the 5 documents per stagiaire
  */
-import { ORG_FORMATION, ORG_CERTIFICATEUR, CERTIFICATION, JURY, COMPETENCES, QUESTIONNAIRE, FOOTER_ACADEMY, FOOTER_ESCALE, type CertifStagiaire } from "./myCertifData";
+import { ORG_FORMATION, ORG_CERTIFICATEUR, CERTIFICATION, JURY, COMPETENCES, QUESTIONNAIRE, QUESTIONNAIRE_VARIANTES, STAGIAIRES, FOOTER_ACADEMY, FOOTER_ESCALE, type CertifStagiaire } from "./myCertifData";
 
 const baseStyle = `
   <style>
@@ -234,12 +234,16 @@ export function getAttestationHonneurHTML(s: CertifStagiaire): string {
 // 5. QUESTIONNAIRE PROTHÉSISTE ONGULAIRE (rempli)
 // ======================================================================
 export function getQuestionnaireHTML(s: CertifStagiaire): string {
-  const questionsHtml = QUESTIONNAIRE.map((q, i) => `
+  const idx = Math.max(0, STAGIAIRES.findIndex(x => x.nom === s.nom && x.prenom === s.prenom));
+  const questionsHtml = QUESTIONNAIRE.map((q, i) => {
+    const variantes = QUESTIONNAIRE_VARIANTES[i];
+    const reponse = variantes ? variantes[(idx + i) % variantes.length] : q.reponse;
+    return `
     <div style="margin-bottom:14px;page-break-inside:avoid">
       <p style="font-weight:bold;font-size:10.5pt;margin:0 0 4px">${i + 1}. ${q.question}</p>
-      <div style="border:1px solid #ddd;border-left:3px solid #e6007e;padding:6px 10px;font-size:10pt;background:#fdfaff;line-height:1.5">${q.reponse}</div>
-    </div>
-  `).join("");
+      <div style="border:1px solid #ddd;border-left:3px solid #e6007e;padding:6px 10px;font-size:10pt;background:#fdfaff;line-height:1.5">${reponse}</div>
+    </div>`;
+  }).join("");
 
   return `<!doctype html><html><head><meta charset="utf-8">${baseStyle}</head><body>
     ${headerAcademy()}

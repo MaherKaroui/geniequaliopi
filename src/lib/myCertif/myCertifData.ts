@@ -183,6 +183,137 @@ export const COMPETENCES: Competence[] = [
 ];
 
 // Questionnaire RS 7302 — questions + réponses types (audit-ready)
+// Variantes de réponse par question (3 formulations différentes par question)
+// Choisies selon (stagiaireIdx + questionIdx) % 3 pour varier d'une candidate à l'autre.
+export const QUESTIONNAIRE_VARIANTES: string[][] = [
+  // Q1 - Nouvelle cliente
+  [
+    "Ses habitudes (fréquence, type de produit utilisé), ses attentes (forme, longueur, déco), l'état de ses ongles, ses allergies éventuelles et son métier (impact sur la résistance attendue).",
+    "Je commence par lui demander si elle a déjà eu des poses, quelle technique elle préfère (gel, acrygel, capsules), si elle a des allergies ou problèmes de santé, et son rythme de vie pour adapter la longueur.",
+    "Je lui pose des questions sur son historique de poses, ses goûts (formes/couleurs), d'éventuelles contre-indications médicales (grossesse, allergies HEMA), et son budget pour orienter le choix de la prestation.",
+  ],
+  // Q2 - Tache verdâtre / greenie
+  [
+    "C'est une bactérie pseudomonas (greenie). Je dépose entièrement le gel, je désinfecte l'ongle, je ne repose pas immédiatement et j'oriente la cliente vers un dermatologue.",
+    "Il s'agit du « greenie », infection bactérienne due à de l'humidité piégée. Je retire toute la pose, je désinfecte à l'alcool, je laisse l'ongle respirer et je recommande une consultation médicale avant toute nouvelle pose.",
+    "C'est une mycobactérie (pseudomonas aeruginosa). Dépose complète obligatoire, désinfection minutieuse, pas de repose tant que la tache n'a pas disparu, et orientation vers un médecin si elle persiste.",
+  ],
+  // Q3 - French capsules
+  [
+    "Après la construction et la mise en forme du gel, avant le gel de finition. La french se réalise sur la couche de construction limée et matifiée.",
+    "Une fois la capsule posée, l'architecture réalisée et la forme limée, je matifie puis j'applique la french avant le top coat de finition.",
+    "Sur la couche de construction limée et matifiée, juste avant le gel de finition, pour que le sourire soit protégé sous le top coat.",
+  ],
+  // Q4 - Construction sur ongles naturels
+  [
+    "Après la préparation de l'ongle (cuticules, matification, dépoussiérage), l'application du Primer/Nail Prep, et le gel de base catalysé.",
+    "Une fois le primer appliqué et le gel de base catalysé sous lampe, je pose le gel de construction pour sculpter l'architecture.",
+    "Après préparation complète : repousse cuticules, matification, dégraissage au cleaner, primer, puis base catalysée — la construction vient ensuite.",
+  ],
+  // Q5 - Compétences prothésiste
+  [
+    "Maîtrise des techniques de pose (gel, acrygel, capsules), connaissance de l'anatomie de l'ongle et des pathologies, sens du conseil, rigueur d'hygiène, créativité et gestion de la relation client.",
+    "Techniques de pose et de remplissage, connaissance des produits et des pathologies unguéales, hygiène irréprochable, écoute, créativité (nail-art) et gestion d'une activité indépendante.",
+    "Compétences techniques (architecture, formes, nail-art), théoriques (anatomie, hygiène, pathologies), commerciales (accueil, conseil, fidélisation) et entrepreneuriales (gestion, communication).",
+  ],
+  // Q6 - Refuser cliente
+  [
+    "Toute cliente présentant une mycose, une infection bactérienne (greenie), un psoriasis sévère, des ongles décollés (onycholyse), ou enceinte si solvants forts utilisés sans ventilation. Orienter vers un médecin.",
+    "Cliente avec pathologie unguéale active (mycose, panaris, paronychie), allergie déclarée aux composants, ou plaie ouverte. Refus poli et orientation vers un dermatologue.",
+    "Mycose, greenie, psoriasis sur les mains, onycholyse, allergie HEMA connue, ou femme enceinte au premier trimestre si extraction puissante prévue : refuser et orienter vers un professionnel de santé.",
+  ],
+  // Q7 - Lunule
+  [
+    "La lunule. C'est la partie visible de la matrice de l'ongle.",
+    "Cette demi-lune blanche s'appelle la lunule, c'est la partie superficielle de la matrice.",
+    "C'est la lunule, zone visible de la matrice qui produit la kératine de l'ongle.",
+  ],
+  // Q8 - Sous les cuticules
+  [
+    "L'éponychium (peau vivante qui protège la matrice) et la matrice elle-même qui produit la kératine.",
+    "On trouve l'éponychium et la matrice, qui est la zone de fabrication de l'ongle.",
+    "La matrice (zone germinative) protégée par l'éponychium ; il ne faut jamais l'endommager au risque de marquer définitivement l'ongle.",
+  ],
+  // Q9 - Plaque
+  [
+    "C'est la partie dure et visible de l'ongle composée de kératine. On l'appelle aussi 'tablette unguéale' ou 'corps de l'ongle'.",
+    "La plaque, ou tablette unguéale, est la partie kératinisée visible de l'ongle.",
+    "Composée de kératine, c'est la tablette unguéale (corpus unguis) — la surface dure sur laquelle on travaille.",
+  ],
+  // Q10 - Préparation ongles naturels
+  [
+    "Repousser les cuticules, limer le bord libre, matifier la plaque avec un buffer, dépoussiérer à la brosse, dégraisser au Cleaner.",
+    "Cuticules repoussées au repousse-cuticule, bord libre limé à la forme voulue, matification douce de la plaque, dépoussiérage et nettoyage au cleaner.",
+    "Étapes : repousse des cuticules, mise en forme du bord libre, matification de la plaque, dépoussiérage soigneux, dégraissage au cleaner avant primer.",
+  ],
+  // Q11 - Délai remplissage
+  [
+    "En moyenne toutes les 3 à 4 semaines selon la pousse de l'ongle.",
+    "Toutes les 3 semaines pour une pose qui reste impeccable, jusqu'à 4 semaines maximum.",
+    "Entre 3 et 4 semaines selon la rapidité de pousse de la cliente et la sollicitation des mains.",
+  ],
+  // Q12 - Onycholyse
+  [
+    "Il s'agit d'une onycholyse (décollement de l'ongle). Je ne pose pas sur cette zone, je désinfecte et je conseille une consultation chez un dermatologue.",
+    "C'est un début d'onycholyse. Pas de pose sur la zone décollée, désinfection, et orientation vers un dermatologue pour identifier la cause (choc, mycose, médicament).",
+    "Onycholyse : décollement de la tablette unguéale du lit. Je n'applique aucun produit dessus, je désinfecte, et j'oriente la cliente vers un médecin.",
+  ],
+  // Q13 - Ongles colorés
+  [
+    "C'est probablement une coloration due à un vernis foncé porté longtemps sans base. Réaliser un soin éclaircissant et toujours appliquer une base avant un vernis pigmenté.",
+    "Tâche due à des pigments de vernis foncés sans base protectrice. Soin éclaircissant doux, et systématiquement une base avant tout vernis pigmenté.",
+    "Coloration des pigments dans la kératine. Je propose un soin blanchissant et je rappelle qu'une base coat est indispensable avant un vernis foncé.",
+  ],
+  // Q14 - Cuticules rouges
+  [
+    "Probablement une paronychie (inflammation/infection de la cuticule). Ne pas réaliser la prestation, désinfecter, orienter vers un médecin.",
+    "Une paronychie (panaris), inflammation des replis. Refus de la prestation, désinfection, et orientation médicale.",
+    "Inflammation infectieuse type paronychie. Je ne touche pas, je désinfecte la zone et j'envoie la cliente consulter rapidement.",
+  ],
+  // Q15 - Après gel construction
+  [
+    "Catalyser sous lampe LED/UV (60 secondes minimum), puis limer la forme, matifier, dépoussiérer et passer au gel de finition.",
+    "Catalysation sous lampe, puis sculpture/limage de la forme, matification, dépoussiérage et application du top coat.",
+    "Polymérisation sous LED, limage de l'architecture, matification douce, dépoussiérage à la brosse puis gel de finition catalysé.",
+  ],
+  // Q16 - Doigts fins
+  [
+    "Une forme amande, ovale ou stiletto qui allonge visuellement le doigt et féminise la main.",
+    "Forme amande ou ovale pour féminiser et allonger le doigt sans le déséquilibrer.",
+    "Privilégier l'amande ou l'ovale. La forme carrée alourdirait visuellement la main.",
+  ],
+  // Q17 - Hygiène et sécurité
+  [
+    "Désinfection systématique du poste, stérilisation des outils, port des EPI (masque FFP2, gants), aspiration des poussières, ventilation, gestion des déchets, formation continue.",
+    "Poste désinfecté entre chaque cliente, outils stérilisés (autoclave/ultrasons), EPI obligatoires, aspiration et ventilation, traçabilité des déchets, veille réglementaire.",
+    "Hygiène stricte : désinfection, stérilisation, EPI (masque FFP2, gants nitrile, lunettes), aspiration des poussières, ventilation, gestion des DASRI et formation régulière.",
+  ],
+  // Q18 - Choix produits
+  [
+    "Marques professionnelles aux normes CE/NF, composition surveillée (sans HEMA si possible, sans Toluène), respect des fiches techniques, privilégier les produits hypoallergéniques.",
+    "Toujours du matériel pro normé CE, fiches de données de sécurité disponibles, sans HEMA ni MMA, et adaptés à la sensibilité des clientes.",
+    "Marques reconnues, composition saine (HEMA-free de préférence), MMA proscrit, respect des MAJ produits et formation aux gammes choisies.",
+  ],
+  // Q19 - Protéger soi/clientes
+  [
+    "Pour soi : masque FFP2, lunettes, gants nitrile, aspiration. Pour la cliente : désinfection des mains, lunettes lors du meulage, vérification des allergies, fiche diagnostique signée.",
+    "EPI complets côté pro (masque, lunettes, gants), désinfection des mains et fiche client signée côté cliente, ventilation et aspiration côté poste.",
+    "Côté praticienne : FFP2, gants, lunettes. Côté cliente : mains désinfectées, lunettes pendant le ponçage, fiche allergies remplie. Côté local : ventilation et aspirateur de poussières.",
+  ],
+  // Q20 - Mycose
+  [
+    "Ongle jauni, épaissi, cassant, parfois décollé. Refuser la pose, conseiller une consultation médicale, traitement antifongique, attendre la guérison complète.",
+    "Aspect jaunâtre, épaississement, friabilité. Pas de pose, orientation dermatologue, antifongique prescrit, retour seulement après guérison totale.",
+    "Couleur jaune/blanche, ongle qui s'effrite ou se décolle. Refus catégorique, orientation médicale et reprise de pose uniquement sur ongle sain.",
+  ],
+  // Q21 - Conseils post-traitement
+  [
+    "Hydrater quotidiennement les cuticules à l'huile, porter des gants pour les tâches ménagères, ne pas utiliser les ongles comme outils, remplissage toutes les 3-4 semaines, ne jamais arracher la pose.",
+    "Huile à cuticules tous les soirs, gants pour le ménage et la vaisselle, pas d'outil avec les ongles, remplissage régulier, jamais d'arrachage qui abîmerait la matrice.",
+    "Hydratation quotidienne, port de gants pour les produits agressifs, respect du planning de remplissage (3-4 semaines), aucune dépose sauvage, et venir en cabine si décollement.",
+  ],
+];
+
 export const QUESTIONNAIRE: { question: string; reponse: string }[] = [
   { question: "Quelles questions dois-je poser à une nouvelle cliente ?", reponse: "Ses habitudes (fréquence des poses, type de gel utilisé), ses attentes (forme, longueur, couleur, déco), l'état de ses ongles, ses éventuelles allergies ou contre-indications, son métier (impact sur la résistance attendue)." },
   { question: "Lors d'un remplissage, je m'aperçois qu'une tache verdâtre est sous le gel, que dois-je faire ?", reponse: "Il s'agit d'une bactérie pseudomonas (greenie). Je dois déposer entièrement le gel, désinfecter l'ongle, ne pas reposer immédiatement et orienter la cliente vers un médecin/dermatologue avant toute nouvelle pose." },
