@@ -5,13 +5,13 @@ import { ORG_FORMATION, ORG_CERTIFICATEUR, CERTIFICATION, JURY, COMPETENCES, QUE
 
 const baseStyle = `
   <style>
-    @page { size: A4; margin: 18mm; }
-    body { font-family: 'Calibri', Arial, sans-serif; color: #222; font-size: 11pt; line-height: 1.5; margin: 0; }
-    h1 { color: #1a1a1a; font-size: 17pt; text-align: left; margin: 18px 0 14px; font-weight: bold; }
-    h2 { color: #1a1a1a; font-size: 12pt; margin: 14px 0 6px; font-weight: bold; }
-    table { width: 100%; border-collapse: collapse; margin: 8px 0; }
-    th { background: #f3f3f3; color: #1a1a1a; padding: 7px 9px; font-size: 10pt; text-align: left; border: 1px solid #bbb; font-weight: bold; }
-    td { padding: 7px 9px; border: 1px solid #bbb; font-size: 10.5pt; vertical-align: top; }
+    @page { size: A4; margin: 14mm 16mm; }
+    body { font-family: 'Calibri', Arial, sans-serif; color: #222; font-size: 10.5pt; line-height: 1.45; margin: 0; }
+    h1 { color: #1a1a1a; font-size: 16pt; text-align: left; margin: 10px 0 10px; font-weight: bold; }
+    h2 { color: #1a1a1a; font-size: 11.5pt; margin: 10px 0 5px; font-weight: bold; }
+    table { width: 100%; border-collapse: collapse; margin: 6px 0; }
+    th { background: #eef2f7; color: #1a1a1a; padding: 6px 8px; font-size: 9.5pt; text-align: left; border: 1px solid #bbb; font-weight: bold; }
+    td { padding: 5px 8px; border: 1px solid #bbb; font-size: 10pt; vertical-align: top; }
     .pf-header-block { border-bottom: 2px solid #d4af37; padding-bottom: 10px; margin-bottom: 18px; display:flex; justify-content:space-between; align-items:flex-start; }
     .pf-header-block .org { font-size: 10pt; line-height: 1.5; }
     .pf-header-block .org .name { font-weight: bold; font-size: 12pt; color: #1a1a1a; }
@@ -147,21 +147,32 @@ export function getEmargementJuryHTML(sessionDate: string): string {
 // 3. GRILLE D'ÉVALUATION — 11 pages (Escale Beauty)
 // ======================================================================
 export function getGrilleEvaluationHTML(s: CertifStagiaire): string {
-  const competencesRows = COMPETENCES.map((c) => `
-    <tr><td colspan="3" style="background:#f8f4e8;padding:10px;font-weight:bold;border-top:2px solid #d4af37">
-      ${c.titre}<div style="font-weight:normal;font-size:9pt;color:#555;margin-top:4px;font-style:italic">${c.description}</div>
-    </td></tr>
-    ${c.criteres.map(cr => `
-      <tr>
-        <td style="width:55%;padding-left:18px">${cr.texte}</td>
-        <td style="width:25%;text-align:center;font-size:10pt">
-          ${cr.acquis ? '<span style="color:#0a8a3a;font-weight:bold">☒ Acquis</span>' : '☐ Acquis'}
-        </td>
-        <td style="width:20%;text-align:center;font-size:10pt;color:#999">
-          ${!cr.acquis ? '<span style="font-weight:bold">☒ Non acquis</span>' : '☐ Non acquis'}
-        </td>
-      </tr>
-    `).join("")}
+  // Each competence rendered as its OWN small table so it stays together (page-break-inside:avoid)
+  const competenceBlocks = COMPETENCES.map((c) => `
+    <table style="margin:0 0 6px 0;page-break-inside:avoid">
+      <colgroup><col style="width:58%"><col style="width:21%"><col style="width:21%"></colgroup>
+      <thead>
+        <tr>
+          <th colspan="3" style="background:#eef2f7;border-top:2px solid #1a3a7b;padding:6px 8px;font-size:10pt">
+            ${c.titre}
+            <div style="font-weight:normal;font-size:8.5pt;color:#555;margin-top:2px;font-style:italic">${c.description}</div>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        ${c.criteres.map(cr => `
+          <tr>
+            <td style="padding-left:14px">${cr.texte}</td>
+            <td style="text-align:center;font-size:9.5pt">
+              ${cr.acquis ? '<span style="color:#0a8a3a;font-weight:bold">☒ Acquis</span>' : '☐ Acquis'}
+            </td>
+            <td style="text-align:center;font-size:9.5pt;color:#999">
+              ${!cr.acquis ? '<span style="font-weight:bold">☒ Non acquis</span>' : '☐ Non acquis'}
+            </td>
+          </tr>
+        `).join("")}
+      </tbody>
+    </table>
   `).join("");
 
   const synthese = COMPETENCES.map(c =>
@@ -169,14 +180,14 @@ export function getGrilleEvaluationHTML(s: CertifStagiaire): string {
   ).join("");
 
   return `<!doctype html><html><head><meta charset="utf-8">${baseStyle}</head><body>
-    <div style="text-align:center;font-size:9pt;color:#888;margin-bottom:8px">ANNEXE 3 : GRILLE D'ÉVALUATION</div>
-    <h1>GRILLE D'ÉVALUATION</h1>
-    <p style="font-size:10pt">L'évaluation se déroule de la manière suivante. Chaque compétence est évaluée par deux modalités :</p>
-    <p style="font-size:10pt;font-style:italic;margin:4px 0"><strong>M1</strong> – Mise en situation sur un modèle vivant (de l'accueil à la prestation) : 70% de la note globale.</p>
-    <p style="font-size:10pt;font-style:italic;margin:4px 0"><strong>M2</strong> – Questionnaire « Techniques de prothésie ongulaire » : 30% de la note globale.</p>
-    <p style="font-size:10pt"><strong>Pour chaque critère il faudra 70% d'indicateurs réussis pour déclarer une compétence acquise.</strong></p>
+    <div style="text-align:center;font-size:8.5pt;color:#888;margin-bottom:4px">ANNEXE 3 : GRILLE D'ÉVALUATION</div>
+    <h1 style="text-align:center;margin:4px 0 10px">GRILLE D'ÉVALUATION</h1>
+    <p style="font-size:9.5pt;margin:2px 0">L'évaluation se déroule de la manière suivante. Chaque compétence est évaluée par deux modalités :</p>
+    <p style="font-size:9.5pt;font-style:italic;margin:2px 0"><strong>M1</strong> – Mise en situation sur un modèle vivant (de l'accueil à la prestation) : 70% de la note globale.</p>
+    <p style="font-size:9.5pt;font-style:italic;margin:2px 0"><strong>M2</strong> – Questionnaire « Techniques de prothésie ongulaire » : 30% de la note globale.</p>
+    <p style="font-size:9.5pt;margin:4px 0"><strong>Pour chaque critère il faudra 70% d'indicateurs réussis pour déclarer une compétence acquise.</strong></p>
 
-    <table style="margin-top:14px">
+    <table style="margin-top:8px;page-break-inside:avoid">
       <thead><tr><th>CANDIDAT</th><th>MEMBRE DU JURY</th><th>SESSION</th></tr></thead>
       <tbody><tr>
         <td>Nom : ${s.nom}<br>Prénom : ${s.prenom}<br>Date de naissance : ${s.dateNaissance}</td>
@@ -185,30 +196,31 @@ export function getGrilleEvaluationHTML(s: CertifStagiaire): string {
       </tr></tbody>
     </table>
 
-    <h2 style="margin-top:18px">« ${CERTIFICATION.intitule.toUpperCase()} »</h2>
-    <table>
-      <thead><tr><th style="width:55%">CRITÈRES</th><th style="width:25%">ACQUIS</th><th style="width:20%">NON ACQUIS</th></tr></thead>
-      <tbody>${competencesRows}</tbody>
-    </table>
+    <h2 style="margin-top:14px">« ${CERTIFICATION.intitule.toUpperCase()} »</h2>
+    ${competenceBlocks}
 
-    <h2 style="margin-top:22px;page-break-before:always">Synthèse des compétences</h2>
-    <table>
+    <h2 style="margin-top:16px;page-break-inside:avoid">Synthèse des compétences</h2>
+    <table style="page-break-inside:avoid">
       <thead><tr><th>Compétence</th><th style="width:25%">Acquise</th><th style="width:25%">Non acquise</th></tr></thead>
       <tbody>${synthese}</tbody>
     </table>
 
-    <p style="margin-top:30px;font-size:10pt"><strong>Décision du jury :</strong> Compétences acquises — certification délivrée.</p>
-    <div style="display:flex;gap:30px;margin-top:30px">
-      <div style="flex:1">
-        <p style="font-size:10pt"><strong>Membre du jury :</strong> ${s.membreJury || JURY[0].prenom + " " + JURY[0].nom}</p>
-        <p style="font-size:10pt;color:#666">Signature :</p>
-        <div style="font-family: 'Brush Script MT', cursive; font-size: 18pt; color:#1a3a7b">${(s.membreJury || JURY[0].nom).split(' ')[0]}</div>
-      </div>
-      <div style="flex:1;text-align:right">
-        <p style="font-size:10pt"><strong>Session du :</strong> ${s.sessionDate}</p>
-        <p style="font-size:10pt;color:#666">Tampon :</p>
-        <img src="/mycertif/proforma_signature.jpg" style="max-height:80px" alt="Tampon Pro Forma">
-      </div>
+    <div style="page-break-inside:avoid;margin-top:14px">
+      <p style="font-size:10pt;margin:6px 0"><strong>Décision du jury :</strong> Compétences acquises — certification délivrée.</p>
+      <table style="border:none">
+        <tr>
+          <td style="border:none;width:50%;vertical-align:top">
+            <p style="font-size:10pt;margin:2px 0"><strong>Membre du jury :</strong> ${s.membreJury || JURY[0].prenom + " " + JURY[0].nom}</p>
+            <p style="font-size:9.5pt;color:#666;margin:2px 0">Signature :</p>
+            <div style="font-family: 'Brush Script MT', cursive; font-size: 18pt; color:#1a3a7b">${(s.membreJury || JURY[0].nom).split(' ')[0]}</div>
+          </td>
+          <td style="border:none;width:50%;vertical-align:top;text-align:right">
+            <p style="font-size:10pt;margin:2px 0"><strong>Session du :</strong> ${s.sessionDate}</p>
+            <p style="font-size:9.5pt;color:#666;margin:2px 0">Tampon :</p>
+            <img src="/mycertif/proforma_signature.jpg" style="max-height:80px" alt="Tampon Pro Forma">
+          </td>
+        </tr>
+      </table>
     </div>
 
     ${footerProForma()}
@@ -264,38 +276,42 @@ export function getQuestionnaireHTML(s: CertifStagiaire): string {
     const variantes = QUESTIONNAIRE_VARIANTES[i];
     const reponse = variantes ? variantes[(idx + i) % variantes.length] : q.reponse;
     return `
-    <div style="margin-bottom:14px;page-break-inside:avoid">
-      <p style="font-weight:bold;font-size:10.5pt;margin:0 0 4px">${i + 1}. ${q.question}</p>
-      <div style="border:1px solid #ddd;border-left:3px solid #d4af37;padding:6px 10px;font-size:10pt;background:#fcfaf3;line-height:1.5">${reponse}</div>
+    <div style="margin-bottom:8px;page-break-inside:avoid">
+      <p style="font-weight:bold;font-size:10pt;margin:0 0 3px;color:#1a1a1a">${i + 1}. ${q.question}</p>
+      <div style="border:1px solid #d8dde6;border-left:3px solid #1a3a7b;padding:5px 9px;font-size:9.5pt;background:#fafbfd;line-height:1.4">${reponse}</div>
     </div>`;
   }).join("");
 
   return `<!doctype html><html><head><meta charset="utf-8">${baseStyle}</head><body>
     ${headerAcademy()}
-    <h1 style="margin-top:20px">QUESTIONNAIRE — FORMATION PROTHÉSISTE ONGULAIRE</h1>
-    <p style="text-align:center;font-size:10pt;color:#555">${CERTIFICATION.code} — Modalité M2 (30% de la note globale)</p>
+    <h1 style="text-align:center;margin:8px 0 4px">QUESTIONNAIRE — FORMATION PROTHÉSISTE ONGULAIRE</h1>
+    <p style="text-align:center;font-size:9.5pt;color:#555;margin:0 0 8px">${CERTIFICATION.code} — Modalité M2 (30% de la note globale)</p>
 
-    <table style="margin:12px 0">
+    <table style="margin:6px 0 10px;page-break-inside:avoid">
       <tbody>
-        <tr><td style="width:30%;background:#f8f4e8"><strong>Candidat(e)</strong></td><td>${s.prenom} ${s.nom}</td></tr>
-        <tr><td style="background:#f8f4e8"><strong>Date de naissance</strong></td><td>${s.dateNaissance}</td></tr>
-        <tr><td style="background:#f8f4e8"><strong>Date de session</strong></td><td>${s.sessionDate}</td></tr>
-        <tr><td style="background:#f8f4e8"><strong>Membre du jury</strong></td><td>${s.membreJury || JURY[0].prenom + " " + JURY[0].nom}</td></tr>
+        <tr><td style="width:30%;background:#eef2f7"><strong>Candidat(e)</strong></td><td>${s.prenom} ${s.nom}</td>
+            <td style="width:25%;background:#eef2f7"><strong>Date de session</strong></td><td>${s.sessionDate}</td></tr>
+        <tr><td style="background:#eef2f7"><strong>Date de naissance</strong></td><td>${s.dateNaissance}</td>
+            <td style="background:#eef2f7"><strong>Membre du jury</strong></td><td>${s.membreJury || JURY[0].prenom + " " + JURY[0].nom}</td></tr>
       </tbody>
     </table>
 
-    <div style="margin-top:18px">${questionsHtml}</div>
+    <div>${questionsHtml}</div>
 
-    <p style="margin-top:20px;font-size:10pt"><strong>Évaluation du jury :</strong> Réponses satisfaisantes — connaissances acquises (≥ 70%).</p>
-    <div style="margin-top:18px;display:flex;gap:30px">
-      <div style="flex:1">
-        <p style="font-size:10pt"><strong>Signature du candidat :</strong></p>
-        <div style="font-family: 'Brush Script MT', cursive; font-size: 18pt; color:#1a3a7b">${s.prenom} ${s.nom}</div>
-      </div>
-      <div style="flex:1;text-align:right">
-        <p style="font-size:10pt"><strong>Tampon :</strong></p>
-        <img src="/mycertif/proforma_signature.jpg" style="max-height:80px" alt="Tampon Pro Forma">
-      </div>
+    <div style="page-break-inside:avoid;margin-top:10px">
+      <p style="font-size:9.5pt;margin:4px 0"><strong>Évaluation du jury :</strong> Réponses satisfaisantes — connaissances acquises (≥ 70%).</p>
+      <table style="border:none">
+        <tr>
+          <td style="border:none;width:50%;vertical-align:top">
+            <p style="font-size:10pt;margin:2px 0"><strong>Signature du candidat :</strong></p>
+            <div style="font-family: 'Brush Script MT', cursive; font-size: 18pt; color:#1a3a7b">${s.prenom} ${s.nom}</div>
+          </td>
+          <td style="border:none;width:50%;vertical-align:top;text-align:right">
+            <p style="font-size:10pt;margin:2px 0"><strong>Tampon :</strong></p>
+            <img src="/mycertif/proforma_signature.jpg" style="max-height:80px" alt="Tampon Pro Forma">
+          </td>
+        </tr>
+      </table>
     </div>
 
     ${footerProForma()}
