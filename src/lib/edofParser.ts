@@ -166,7 +166,7 @@ export function parseEdofXlsx(data: ArrayBuffer): EdofSession[] {
     };
 
     const stagiaires: StagiaireInfo[] = group.rows.map(row => {
-      const montant = getCol(row, "MONTANT_FORMATION", "MONTANT FORMATION", "MONTANT", "Tarif", "Prix", "COUT", "Coût");
+      const montant = getCol(row, "MONTANT_FORMATION", "MONTANT FORMATION", "MONTANT", "Montant (€)", "Montant", "Tarif", "Prix", "COUT", "Coût");
       const tarifStr = montant ? `${parseFloat(String(montant)).toLocaleString("fr-FR")} € HT` : "";
       const rawCivilite = String(getCol(row, "CIVILITE", "Civilité", "Civilite") || "");
       let civilite: "" | "M." | "Mme" = "";
@@ -176,27 +176,27 @@ export function parseEdofXlsx(data: ArrayBuffer): EdofSession[] {
         civilite,
         nom: String(getCol(row, "NOM", "Nom") || "").toUpperCase(),
         prenom: String(getCol(row, "PRENOM", "Prénom", "Prenom") || "").charAt(0).toUpperCase() + String(getCol(row, "PRENOM", "Prénom", "Prenom") || "").slice(1).toLowerCase(),
-        email: String(getCol(row, "COURRIEL", "EMAIL", "Mail", "E-mail", "Courriel") || "").replace(/\\/g, ""),
-        telephone: formatPhone(getCol(row, "NUMERO_TELEPHONE_PORTABLE", "NUMERO TELEPHONE PORTABLE", "TELEPHONE", "Téléphone", "Tel", "Tél") || getCol(row, "NUMERO_TELEPHONE_FIXE", "NUMERO TELEPHONE FIXE")),
+        email: String(getCol(row, "COURRIEL", "EMAIL", "Email", "Mail", "E-mail", "Courriel") || "").replace(/\\/g, ""),
+        telephone: formatPhone(getCol(row, "NUMERO_TELEPHONE_PORTABLE", "NUMERO TELEPHONE PORTABLE", "TELEPHONE", "Téléphone", "Telephone", "Tel", "Tél") || getCol(row, "NUMERO_TELEPHONE_FIXE", "NUMERO TELEPHONE FIXE")),
         entreprise: String(getCol(row, "ENTREPRISE", "Entreprise", "SOCIETE", "Société") || ""),
         responsableEntreprise: "",
         signatureResponsableUrl: "",
         poste: String(getCol(row, "POSTE", "Poste", "FONCTION", "Fonction") || ""),
-        dateNaissance: parseEdofDate(getCol(row, "DATE_DE_NAISSANCE", "DATE DE NAISSANCE", "DATE_NAISSANCE", "Date naissance")),
-        dateDebutFormation: parseEdofDate(getCol(row, "DATE_DEBUT_SESSION", "DATE DEBUT SESSION", "DATE_DEBUT", "DATE DEBUT", "Début", "Date début")),
-        dateFinFormation: parseEdofDate(getCol(row, "DATE_FIN_SESSION", "DATE FIN SESSION", "DATE_FIN", "DATE FIN", "Fin", "Date fin")),
+        dateNaissance: parseEdofDate(getCol(row, "DATE_DE_NAISSANCE", "DATE DE NAISSANCE", "DATE_NAISSANCE", "Date naissance", "Date de naissance")),
+        dateDebutFormation: parseEdofDate(getCol(row, "DATE_DEBUT_SESSION", "DATE DEBUT SESSION", "DATE_DEBUT", "DATE DEBUT", "Début session", "Debut session", "Début", "Date début")),
+        dateFinFormation: parseEdofDate(getCol(row, "DATE_FIN_SESSION", "DATE FIN SESSION", "DATE_FIN", "DATE FIN", "Fin session", "Fin", "Date fin")),
         tarifFormation: tarifStr,
         signatureUrl: "",
-        adresse: String(getCol(row, "ADRESSE_POSTALE", "ADRESSE POSTALE", "Adresse") || ""),
-        codePostal: String(getCol(row, "ADRESSE_CODE_POSTAL", "ADRESSE CODE POSTAL", "Code postal adresse") || ""),
-        commune: String(getCol(row, "ADRESSE_VILLE", "ADRESSE VILLE", "Ville adresse") || ""),
+        adresse: String(getCol(row, "ADRESSE_POSTALE", "ADRESSE POSTALE", "Adresse", "ADRESSE") || ""),
+        codePostal: String(getCol(row, "ADRESSE_CODE_POSTAL", "ADRESSE CODE POSTAL", "Code postal adresse", "Code postal", "CP") || ""),
+        commune: String(getCol(row, "ADRESSE_VILLE", "ADRESSE VILLE", "Ville adresse", "Ville", "VILLE") || ""),
         nationalite: String(getCol(row, "PAYS_LIEU_DE_NAISSANCE", "PAYS LIEU DE NAISSANCE", "Nationalité") || ""),
         nir: "",
         departementNaissance: String(getCol(row, "DEPARTEMENT_LIEU_DE_NAISSANCE", "DEPARTEMENT LIEU DE NAISSANCE", "Département naissance") || ""),
         communeNaissance: String(getCol(row, "VILLE_LIEU_DE_NAISSANCE", "VILLE LIEU DE NAISSANCE", "Commune naissance") || ""),
         diplome: "",
         rqth: "",
-        numeroAction: String(getCol(row, "NUMERO_ACTION", "NUMERO ACTION", "NUMERO_ ACTION", "N° ACTION", "NUM_ACTION", "Numéro action") || ""),
+        numeroAction: String(getCol(row, "NUMERO_ACTION", "NUMERO ACTION", "NUMERO_ ACTION", "N° ACTION", "N° Action", "NUM_ACTION", "Numéro action") || ""),
       };
     });
 
