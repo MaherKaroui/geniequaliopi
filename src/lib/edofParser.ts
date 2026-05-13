@@ -130,20 +130,20 @@ export function parseEdofXlsx(data: ArrayBuffer): EdofSession[] {
     );
 
     // Find earliest start and latest end dates
-    const allStarts = group.rows.map(r => parseEdofDate(getCol(r, "DATE_DEBUT_SESSION", "DATE DEBUT SESSION", "DATE_DEBUT", "DATE DEBUT", "Début", "Date début"))).filter(Boolean).sort();
-    const allEnds = group.rows.map(r => parseEdofDate(getCol(r, "DATE_FIN_SESSION", "DATE FIN SESSION", "DATE_FIN", "DATE FIN", "Fin", "Date fin"))).filter(Boolean).sort();
+    const allStarts = group.rows.map(r => parseEdofDate(getCol(r, "DATE_DEBUT_SESSION", "DATE DEBUT SESSION", "DATE_DEBUT", "DATE DEBUT", "Début session", "Debut session", "Début", "Date début"))).filter(Boolean).sort();
+    const allEnds = group.rows.map(r => parseEdofDate(getCol(r, "DATE_FIN_SESSION", "DATE FIN SESSION", "DATE_FIN", "DATE FIN", "Fin session", "Fin", "Date fin"))).filter(Boolean).sort();
     const earliestStart = allStarts[0] || "";
     const latestEnd = allEnds[allEnds.length - 1] || "";
 
     // Collect unique locations
     const locations = [...new Set(group.rows.map(r => {
       const ville = getCol(r, "LIEU_FORMATION_VILLE", "LIEU FORMATION VILLE", "VILLE", "Ville");
-      const cp = getCol(r, "LIEU_FORMATION_CODE_POSTAL", "LIEU FORMATION CODE POSTAL", "CODE_POSTAL", "Code postal");
+      const cp = getCol(r, "LIEU_FORMATION_CODE_POSTAL", "LIEU FORMATION CODE POSTAL", "CODE_POSTAL", "Code postal", "CP");
       return ville ? `${cp} ${ville}`.trim() : "";
     }).filter(Boolean))];
 
     // Average tarif
-    const tarifs = group.rows.map(r => parseFloat(String(getCol(r, "MONTANT_FORMATION", "MONTANT FORMATION", "MONTANT", "Tarif", "Prix") || "0"))).filter(t => t > 0);
+    const tarifs = group.rows.map(r => parseFloat(String(getCol(r, "MONTANT_FORMATION", "MONTANT FORMATION", "MONTANT", "Montant (€)", "Montant", "Tarif", "Prix") || "0"))).filter(t => t > 0);
     const avgTarif = tarifs.length > 0 ? Math.round(tarifs.reduce((a, b) => a + b, 0) / tarifs.length) : 0;
 
     const formation: FormationInfo = {
