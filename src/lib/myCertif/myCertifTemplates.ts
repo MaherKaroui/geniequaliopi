@@ -5,8 +5,11 @@ import { ORG_FORMATION, ORG_CERTIFICATEUR, CERTIFICATION, JURY, COMPETENCES, QUE
 
 const baseStyle = `
   <style>
-    @page { size: A4; margin: 14mm 16mm; }
-    body { font-family: 'Calibri', Arial, sans-serif; color: #222; font-size: 10.5pt; line-height: 1.45; margin: 0; }
+    @page { size: A4; margin: 0; }
+    body { font-family: 'Calibri', Arial, sans-serif; color: #222; font-size: 10.5pt; line-height: 1.45; margin: 0; background:#fff; }
+    .mycertif-page { box-sizing: border-box; width: 100%; padding: 14mm 18mm 22mm; }
+    .pdf-root > h1, .pdf-root > h2, .pdf-root > p, .pdf-root > table, .pdf-root > div:not(.footer):not(.mycertif-page):not(.pf-cert-page),
+    .mycertif-page > h1, .mycertif-page > h2, .mycertif-page > p, .mycertif-page > table, .mycertif-page > div:not(.footer) { max-width: 174mm; margin-left: auto; margin-right: auto; }
     h1 { color: #1a1a1a; font-size: 16pt; text-align: left; margin: 10px 0 10px; font-weight: bold; }
     h2 { color: #1a1a1a; font-size: 11.5pt; margin: 10px 0 5px; font-weight: bold; }
     table { width: 100%; border-collapse: collapse; margin: 6px 0; }
@@ -16,7 +19,7 @@ const baseStyle = `
     .pf-header-block .org { font-size: 10pt; line-height: 1.5; }
     .pf-header-block .org .name { font-weight: bold; font-size: 12pt; color: #1a1a1a; }
     .pf-header-block img { max-width: 110px; max-height: 90px; }
-    .pf-footer-block { margin-top: 30px; padding-top: 8px; border-top: 1px solid #bbb; text-align: center; font-size: 9pt; color: #555; line-height: 1.5; }
+    .pf-footer-block { margin: 0 18mm; padding-top: 7px; border-top: 1px solid #bbb; text-align: center; font-size: 8.5pt; color: #555; line-height: 1.35; }
     .pf-footer-block strong { color: #1a1a1a; }
     .label { color: #444; font-weight: 600; }
   </style>
@@ -35,7 +38,7 @@ const headerAcademy = () => `
 `;
 
 const footerProForma = () => `
-  <div class="pf-footer-block">
+  <div class="pf-footer-block footer">
     <strong>${ORG_FORMATION.nom}</strong> – ${ORG_FORMATION.adresse}, ${ORG_FORMATION.codePostal} ${ORG_FORMATION.ville}<br>
     SIRET ${ORG_FORMATION.siret} – Numéro de déclaration d'activité : ${ORG_FORMATION.nda} – Président : ${ORG_FORMATION.presidente}
   </div>
@@ -46,8 +49,9 @@ const footerProForma = () => `
 // ======================================================================
 export function getAttestationDelivranceHTML(s: CertifStagiaire): string {
   return `<!doctype html><html><head><meta charset="utf-8">${baseStyle}<style>
-    @page { size: A4 portrait; margin: 18mm; }
+    @page { size: A4 portrait; margin: 0; }
     body { font-family: 'Calibri', Arial, sans-serif; color: #222; padding: 0; }
+    .pf-cert-page { box-sizing:border-box; width:100%; padding:18mm 20mm 34mm; }
     .pf-header { display:flex; justify-content:space-between; align-items:flex-start; border-bottom: 2px solid #d4af37; padding-bottom: 10px; margin-bottom: 20px; }
     .pf-org { font-size: 10pt; line-height: 1.5; }
     .pf-org .name { font-weight: bold; font-size: 12pt; color: #1a1a1a; }
@@ -61,9 +65,10 @@ export function getAttestationDelivranceHTML(s: CertifStagiaire): string {
     .pf-faits p { margin: 4px 0; }
     .pf-sig-block { margin-top: 28px; }
     .pf-sig-img { max-height: 110px; margin-top: 8px; }
-    .pf-footer { position: fixed; bottom: 12mm; left: 18mm; right: 18mm; text-align: center; font-size: 8.5pt; color: #555; border-top: 1px solid #ccc; padding-top: 6px; line-height: 1.45; }
+    .pf-footer { margin:0 20mm; text-align: center; font-size: 8.5pt; color: #555; border-top: 1px solid #ccc; padding-top: 6px; line-height: 1.45; }
     .pf-footer strong { color:#1a1a1a; }
   </style></head><body>
+    <div class="pf-cert-page">
     <div class="pf-header">
       <div class="pf-org">
         <div class="name">${ORG_FORMATION.nom}</div>
@@ -100,8 +105,9 @@ export function getAttestationDelivranceHTML(s: CertifStagiaire): string {
       <p><strong>Signature du Président :</strong></p>
       ${(() => { const sig = typeof localStorage !== 'undefined' ? localStorage.getItem('mycertif_signature_presidente') : null; return sig ? `<img src="${sig}" class="pf-sig-img" alt="Signature">` : `<img src="/mycertif/proforma_signature.jpg" class="pf-sig-img" alt="Signature Pro Forma">`; })()}
     </div>
+    </div>
 
-    <div class="pf-footer">
+    <div class="pf-footer footer">
       <strong>${ORG_FORMATION.nom}</strong><br>
       ${ORG_FORMATION.adresse}, ${ORG_FORMATION.codePostal} ${ORG_FORMATION.ville}<br>
       Siret : ${ORG_FORMATION.siret} &nbsp; Siren : ${(ORG_FORMATION as any).siren || ORG_FORMATION.siret.slice(0,9)}<br>
@@ -115,6 +121,7 @@ export function getAttestationDelivranceHTML(s: CertifStagiaire): string {
 // ======================================================================
 export function getEmargementJuryHTML(sessionDate: string): string {
   return `<!doctype html><html><head><meta charset="utf-8">${baseStyle}</head><body>
+    <div class="mycertif-page">
     ${headerAcademy()}
     <h1 style="margin-top:24px">Feuille d'émargement des membres présents</h1>
     <p style="text-align:center"><strong>DATE :</strong> ${sessionDate}</p>
@@ -138,6 +145,7 @@ export function getEmargementJuryHTML(sessionDate: string): string {
         `).join("")}
       </tbody>
     </table>
+    </div>
 
     ${footerProForma()}
   </body></html>`;
@@ -149,7 +157,7 @@ export function getEmargementJuryHTML(sessionDate: string): string {
 export function getGrilleEvaluationHTML(s: CertifStagiaire): string {
   // Each competence rendered as its OWN small table so it stays together (page-break-inside:avoid)
   const competenceBlocks = COMPETENCES.map((c) => `
-    <table style="margin:0 0 6px 0;page-break-inside:avoid">
+    <table class="grille-table" style="margin:0 0 6px 0;page-break-inside:avoid">
       <colgroup><col style="width:58%"><col style="width:21%"><col style="width:21%"></colgroup>
       <thead>
         <tr>
@@ -179,15 +187,22 @@ export function getGrilleEvaluationHTML(s: CertifStagiaire): string {
     `<tr><td>Compétence ${c.num}</td><td style="text-align:center"><strong style="color:#0a8a3a">☒ Acquise</strong></td><td style="text-align:center;color:#999">☐ Non acquise</td></tr>`
   ).join("");
 
-  return `<!doctype html><html><head><meta charset="utf-8">${baseStyle}</head><body>
+  return `<!doctype html><html><head><meta charset="utf-8">${baseStyle}<style>
+    .grille-page { padding-left: 17mm; padding-right: 17mm; }
+    .grille-intro { max-width: 172mm; margin: 0 auto 8px; }
+    .grille-table { max-width: 172mm; margin-left:auto !important; margin-right:auto !important; }
+  </style></head><body>
+    <div class="mycertif-page grille-page">
     <div style="text-align:center;font-size:8.5pt;color:#888;margin-bottom:4px">ANNEXE 3 : GRILLE D'ÉVALUATION</div>
     <h1 style="text-align:center;margin:4px 0 10px">GRILLE D'ÉVALUATION</h1>
-    <p style="font-size:9.5pt;margin:2px 0">L'évaluation se déroule de la manière suivante. Chaque compétence est évaluée par deux modalités :</p>
-    <p style="font-size:9.5pt;font-style:italic;margin:2px 0"><strong>M1</strong> – Mise en situation sur un modèle vivant (de l'accueil à la prestation) : 70% de la note globale.</p>
-    <p style="font-size:9.5pt;font-style:italic;margin:2px 0"><strong>M2</strong> – Questionnaire « Techniques de prothésie ongulaire » : 30% de la note globale.</p>
-    <p style="font-size:9.5pt;margin:4px 0"><strong>Pour chaque critère il faudra 70% d'indicateurs réussis pour déclarer une compétence acquise.</strong></p>
+    <div class="grille-intro">
+      <p style="font-size:9.5pt;margin:2px 0">L'évaluation se déroule de la manière suivante. Chaque compétence est évaluée par deux modalités :</p>
+      <p style="font-size:9.5pt;font-style:italic;margin:2px 0"><strong>M1</strong> – Mise en situation sur un modèle vivant (de l'accueil à la prestation) : 70% de la note globale.</p>
+      <p style="font-size:9.5pt;font-style:italic;margin:2px 0"><strong>M2</strong> – Questionnaire « Techniques de prothésie ongulaire » : 30% de la note globale.</p>
+      <p style="font-size:9.5pt;margin:4px 0"><strong>Pour chaque critère il faudra 70% d'indicateurs réussis pour déclarer une compétence acquise.</strong></p>
+    </div>
 
-    <table style="margin-top:8px;page-break-inside:avoid">
+    <table class="grille-table" style="margin-top:8px;page-break-inside:avoid">
       <thead><tr><th>CANDIDAT</th><th>MEMBRE DU JURY</th><th>SESSION</th></tr></thead>
       <tbody><tr>
         <td>Nom : ${s.nom}<br>Prénom : ${s.prenom}<br>Date de naissance : ${s.dateNaissance}</td>
@@ -200,7 +215,7 @@ export function getGrilleEvaluationHTML(s: CertifStagiaire): string {
     ${competenceBlocks}
 
     <h2 style="margin-top:16px;page-break-inside:avoid">Synthèse des compétences</h2>
-    <table style="page-break-inside:avoid">
+    <table class="grille-table" style="page-break-inside:avoid">
       <thead><tr><th>Compétence</th><th style="width:25%">Acquise</th><th style="width:25%">Non acquise</th></tr></thead>
       <tbody>${synthese}</tbody>
     </table>
@@ -222,6 +237,7 @@ export function getGrilleEvaluationHTML(s: CertifStagiaire): string {
         </tr>
       </table>
     </div>
+    </div>
 
     ${footerProForma()}
   </body></html>`;
@@ -232,6 +248,7 @@ export function getGrilleEvaluationHTML(s: CertifStagiaire): string {
 // ======================================================================
 export function getAttestationHonneurHTML(s: CertifStagiaire): string {
   return `<!doctype html><html><head><meta charset="utf-8">${baseStyle}</head><body>
+    <div class="mycertif-page">
     ${headerAcademy()}
     <h1 style="margin-top:30px">ATTESTATION SUR L'HONNEUR</h1>
 
@@ -262,6 +279,7 @@ export function getAttestationHonneurHTML(s: CertifStagiaire): string {
       <div style="margin-top:8px;font-size:10pt;font-style:italic">Lu et approuvé, bon pour attestation sur l'honneur</div>
       <div style="font-family: 'Brush Script MT', cursive; font-size: 22pt; color:#1a3a7b; margin-top:6px">${s.prenom} ${s.nom}</div>
     </div>
+    </div>
 
     ${footerProForma()}
   </body></html>`;
@@ -282,7 +300,10 @@ export function getQuestionnaireHTML(s: CertifStagiaire): string {
     </div>`;
   }).join("");
 
-  return `<!doctype html><html><head><meta charset="utf-8">${baseStyle}</head><body>
+  return `<!doctype html><html><head><meta charset="utf-8">${baseStyle}<style>
+    .questionnaire-page { padding-left: 17mm; padding-right: 17mm; }
+  </style></head><body>
+    <div class="mycertif-page questionnaire-page">
     ${headerAcademy()}
     <h1 style="text-align:center;margin:8px 0 4px">QUESTIONNAIRE — FORMATION PROTHÉSISTE ONGULAIRE</h1>
     <p style="text-align:center;font-size:9.5pt;color:#555;margin:0 0 8px">${CERTIFICATION.code} — Modalité M2 (30% de la note globale)</p>
@@ -296,7 +317,7 @@ export function getQuestionnaireHTML(s: CertifStagiaire): string {
       </tbody>
     </table>
 
-    <div>${questionsHtml}</div>
+    ${questionsHtml}
 
     <div style="page-break-inside:avoid;margin-top:10px">
       <p style="font-size:9.5pt;margin:4px 0"><strong>Évaluation du jury :</strong> Réponses satisfaisantes — connaissances acquises (≥ 70%).</p>
@@ -312,6 +333,7 @@ export function getQuestionnaireHTML(s: CertifStagiaire): string {
           </td>
         </tr>
       </table>
+    </div>
     </div>
 
     ${footerProForma()}
