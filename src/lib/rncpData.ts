@@ -1495,6 +1495,81 @@ export const RNCP_FICHES: RNCPFiche[] = [
     ],
     dureeIndicative: "Parcours indicatif 385h en centre + période d'application en entreprise (PAE) de 4 à 8 semaines selon le profil. Examen final TP : 4h30 (mise en situation professionnelle + entretien technique avec le jury, sur la base d'un dossier professionnel).",
   },
+  {
+    code: "RNCP38575",
+    intitule: "TP - Responsable de petite ou moyenne structure (RPMS)",
+    niveau: "Niveau 5 (Bac+2)",
+    certificateur: "MINISTÈRE DU TRAVAIL DU PLEIN EMPLOI ET DE L'INSERTION",
+    dateEnregistrement: "02/07/2025",
+    dateEcheance: "02/07/2030",
+    codeNSF: "310p-a – Spécialités plurivalentes des échanges et de la gestion (Management)",
+    formacodes: "32135 – Conduite projet / 32062 – Encadrement management / 32663 – Gestion PME PMI",
+    resume: "Le responsable de petite ou moyenne structure (RPMS) dirige et gère une entreprise, un établissement ou une association de moins de 50 salariés dans ses dimensions stratégique, humaine, commerciale, productive, financière, administrative et sociétale. Il traduit les orientations stratégiques en objectifs opérationnels, anime une équipe, met en œuvre l'objet social de la structure et rend compte de son activité à la gouvernance.",
+    activitesVisees: "Le RPMS développe une vision systémique de sa structure dans son environnement, l'inscrit dans son territoire, manage et anime une équipe. Il adapte l'offre à la demande, organise et développe la diffusion de cette offre, organise la production. Il analyse le bilan et le compte de résultat de la structure, rédige et présente le rapport d'activité (incluant données financières, RSE, QVCT, parité, handicap, transition écologique).",
+    blocsCompetences: [
+      {
+        titre: "Bloc 1 – Diriger une structure avec une équipe",
+        competences: [
+          "CP1 – Développer une vision systémique de la structure dans son environnement",
+          "CP2 – Inscrire la structure dans son territoire",
+          "CP3 – Manager et animer une équipe",
+        ],
+        matieres: [
+          { competence: "CP1 – Vision systémique de la structure", contenu: "Diagnostic interne/externe (PESTEL, SWOT, 5 forces de Porter, chaîne de valeur), veille stratégique (outils Feedly, Google Alerts, observatoires sectoriels), approche systémique, identification des acteurs clés, définition d'un plan d'action stratégique, environnement fiscal et social, RSE, risques civils et pénaux du dirigeant, sécurité numérique", volume: "60h" },
+          { competence: "CP2 – Inscription dans le territoire", contenu: "Définition d'un territoire, acteurs institutionnels et consulaires (CCI, CMA, Région, communauté de communes), réseaux professionnels (clubs d'entreprises, French Tech, BPI), partenariats et conventionnement, communication sur Internet et réseaux sociaux (LinkedIn, Facebook Pro, Instagram, site vitrine, SEO local Google Business), événementiel territorial", volume: "50h" },
+          { competence: "CP3 – Manager et animer une équipe", contenu: "Organisation du travail, recrutement (fiche de poste, sourcing, entretien structuré, DPAE, intégration / onboarding), styles de management (Hersey & Blanchard), motivation (Maslow, Herzberg, McClelland), entretiens (annuel, professionnel, recadrage), conduite de réunions, gestion des conflits (DESC, médiation), GEPP, droit du travail (CDI/CDD, durée du travail, congés, CSE, DUERP), QVCT, non-discrimination, handicap (RQTH, AGEFIPH)", volume: "120h" },
+        ],
+        modalitesEval: "Mise en situation professionnelle écrite (étude de cas) + entretien technique sur la base du Dossier Professionnel (DP). Durée 02h30 par bloc.",
+      },
+      {
+        titre: "Bloc 2 – Mettre en œuvre l'objet social de la structure",
+        competences: [
+          "CP4 – Adapter l'offre de la structure à la demande",
+          "CP5 – Organiser et développer la diffusion de l'offre",
+          "CP6 – Organiser la production",
+        ],
+        matieres: [
+          { competence: "CP4 – Adapter l'offre à la demande", contenu: "Étude de marché (qualitative/quantitative), segmentation/ciblage/positionnement (STP), persona, parcours client, analyse des besoins (Kano), mix-marketing 4P/7P, fixation des prix (cost+, valeur perçue, marché), cycle de vie produit, innovation, écoconception, accessibilité de l'offre", volume: "70h" },
+          { competence: "CP5 – Diffusion de l'offre", contenu: "Plan d'actions commerciales (PAC), prospection multicanale (phoning, social selling, emailing RGPD), CRM (Axonaut, HubSpot, Sellsy), entonnoir de conversion, négociation commerciale, contractualisation (CGV, devis, bon de commande), fidélisation (NPS, CSAT, programme fidélité), gestion des réclamations (méthode CRAC), e-commerce, marketplaces", volume: "80h" },
+          { competence: "CP6 – Organiser la production", contenu: "Planification (PERT, GANTT, Kanban), gestion des stocks (Wilson, ABC, juste-à-temps), approvisionnement et appel d'offres (achats responsables), qualité (PDCA, Ishikawa, 5 pourquoi, ISO 9001), Lean / 5S, indicateurs de production (TRS, taux de service, taux de rebut), sécurité (DUERP, EPI), environnement (ISO 14001, économie circulaire, bilan carbone simplifié), digitalisation (ERP, GPAO)", volume: "90h" },
+        ],
+        modalitesEval: "Mise en situation professionnelle (élaboration d'un plan d'actions commerciales et d'un planning de production) + entretien technique sur la base du DP. Durée 02h30.",
+      },
+      {
+        titre: "Bloc 3 – Établir et présenter un rapport d'activité de la structure",
+        competences: [
+          "CP7 – Analyser le bilan de la structure",
+          "CP8 – Analyser le compte de résultat de la structure",
+          "CP9 – Rédiger le rapport d'activité de la structure",
+        ],
+        matieres: [
+          { competence: "CP7 – Analyse du bilan", contenu: "Présentation du bilan comptable (PCG), bilan fonctionnel (emplois/ressources), Fonds de Roulement (FR), Besoin en Fonds de Roulement (BFR), trésorerie nette, BFR normatif, ratios de structure (autonomie financière, indépendance, liquidité), situation nette, financement court / moyen / long terme, cessation de paiement et procédures collectives (sauvegarde, redressement, liquidation), tribunal de commerce", volume: "60h" },
+          { competence: "CP8 – Analyse du compte de résultat", contenu: "Structure du compte de résultat, Soldes Intermédiaires de Gestion (marge commerciale, valeur ajoutée, EBE, résultat d'exploitation, résultat courant, résultat net), Capacité d'Autofinancement (CAF), comptabilité analytique (coûts complets, coûts partiels, méthode ABC), seuil de rentabilité et point mort, charges fixes/variables, M/CV, retraitements (crédit-bail, intérim), techniques budgétaires et prévisionnelles, demande de subvention (BPI, Région, Europe)", volume: "60h" },
+          { competence: "CP9 – Rapport d'activité", contenu: "Collecte et structuration des données financières et extra-financières, RSE et critères ESG, Déclaration de Performance Extra-Financière (DPEF), CSRD, indicateurs de durabilité, QVCT, parité H/F, index égalité professionnelle, handicap (DOETH), bilan carbone, tableau de bord équilibré (Balanced Scorecard), data-visualisation (Power BI, Looker Studio), rédaction professionnelle, présentation orale à la gouvernance / AG", volume: "55h" },
+        ],
+        modalitesEval: "Mise en situation professionnelle écrite (analyse de documents comptables + rédaction d'une synthèse de rapport d'activité) + entretien technique sur la base du DP. Durée 03h00.",
+      },
+    ],
+    secteursActivite: "Tous secteurs : industrie, artisanat, commerce, services, BTP, économie sociale et solidaire (associations, mutuelles, coopératives), secteur public et parapublic. PME, ETI, établissements de moins de 50 salariés, agences, centres de profit, sites, unités opérationnelles.",
+    typesEmplois: [
+      "Manageur / chef / responsable / directeur adjoint / directeur",
+      "Délégué / délégué général",
+      "Responsable de proximité / d'agence / d'unité / de centre de profit",
+      "Responsable de site / de centre / d'établissement / d'entreprise",
+      "Directeur d'association / délégué général d'association",
+      "Adjoint de direction de PME-PMI",
+    ],
+    codesROME: ["M1302"],
+    voiesAcces: [
+      "Après un parcours de formation continue (GRETA, AFPA, organismes privés)",
+      "En contrat d'apprentissage (CFA habilité)",
+      "Après un parcours de formation hors temps de travail",
+      "En contrat de professionnalisation",
+      "Par candidature individuelle (épreuve ponctuelle)",
+      "Par expérience (VAE)",
+    ],
+    dureeIndicative: "Parcours indicatif 645h en centre de formation + période d'application en entreprise (PAE) de 8 à 12 semaines (280 à 420h). Examen final TP : 8h00 (3 mises en situation professionnelles + entretien technique avec le jury, sur la base d'un dossier professionnel comportant un rapport d'activité réel).",
+  },
 ];
 
 export function getRNCPByCode(code: string): RNCPFiche | undefined {
