@@ -185,15 +185,22 @@ export function getGrilleEvaluationHTML(s: CertifStagiaire): string {
     `<tr><td>Compétence ${c.num}</td><td style="text-align:center"><strong style="color:#0a8a3a">☒ Acquise</strong></td><td style="text-align:center;color:#999">☐ Non acquise</td></tr>`
   ).join("");
 
-  return `<!doctype html><html><head><meta charset="utf-8">${baseStyle}</head><body>
+  return `<!doctype html><html><head><meta charset="utf-8">${baseStyle}<style>
+    .grille-page { padding-left: 17mm; padding-right: 17mm; }
+    .grille-intro { max-width: 172mm; margin: 0 auto 8px; }
+    .grille-table { max-width: 172mm; margin-left:auto !important; margin-right:auto !important; }
+  </style></head><body>
+    <div class="mycertif-page grille-page">
     <div style="text-align:center;font-size:8.5pt;color:#888;margin-bottom:4px">ANNEXE 3 : GRILLE D'ÉVALUATION</div>
     <h1 style="text-align:center;margin:4px 0 10px">GRILLE D'ÉVALUATION</h1>
-    <p style="font-size:9.5pt;margin:2px 0">L'évaluation se déroule de la manière suivante. Chaque compétence est évaluée par deux modalités :</p>
-    <p style="font-size:9.5pt;font-style:italic;margin:2px 0"><strong>M1</strong> – Mise en situation sur un modèle vivant (de l'accueil à la prestation) : 70% de la note globale.</p>
-    <p style="font-size:9.5pt;font-style:italic;margin:2px 0"><strong>M2</strong> – Questionnaire « Techniques de prothésie ongulaire » : 30% de la note globale.</p>
-    <p style="font-size:9.5pt;margin:4px 0"><strong>Pour chaque critère il faudra 70% d'indicateurs réussis pour déclarer une compétence acquise.</strong></p>
+    <div class="grille-intro">
+      <p style="font-size:9.5pt;margin:2px 0">L'évaluation se déroule de la manière suivante. Chaque compétence est évaluée par deux modalités :</p>
+      <p style="font-size:9.5pt;font-style:italic;margin:2px 0"><strong>M1</strong> – Mise en situation sur un modèle vivant (de l'accueil à la prestation) : 70% de la note globale.</p>
+      <p style="font-size:9.5pt;font-style:italic;margin:2px 0"><strong>M2</strong> – Questionnaire « Techniques de prothésie ongulaire » : 30% de la note globale.</p>
+      <p style="font-size:9.5pt;margin:4px 0"><strong>Pour chaque critère il faudra 70% d'indicateurs réussis pour déclarer une compétence acquise.</strong></p>
+    </div>
 
-    <table style="margin-top:8px;page-break-inside:avoid">
+    <table class="grille-table" style="margin-top:8px;page-break-inside:avoid">
       <thead><tr><th>CANDIDAT</th><th>MEMBRE DU JURY</th><th>SESSION</th></tr></thead>
       <tbody><tr>
         <td>Nom : ${s.nom}<br>Prénom : ${s.prenom}<br>Date de naissance : ${s.dateNaissance}</td>
@@ -206,7 +213,7 @@ export function getGrilleEvaluationHTML(s: CertifStagiaire): string {
     ${competenceBlocks}
 
     <h2 style="margin-top:16px;page-break-inside:avoid">Synthèse des compétences</h2>
-    <table style="page-break-inside:avoid">
+    <table class="grille-table" style="page-break-inside:avoid">
       <thead><tr><th>Compétence</th><th style="width:25%">Acquise</th><th style="width:25%">Non acquise</th></tr></thead>
       <tbody>${synthese}</tbody>
     </table>
@@ -227,6 +234,7 @@ export function getGrilleEvaluationHTML(s: CertifStagiaire): string {
           </td>
         </tr>
       </table>
+    </div>
     </div>
 
     ${footerProForma()}
