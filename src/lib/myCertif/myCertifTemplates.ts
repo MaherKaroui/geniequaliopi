@@ -8,7 +8,7 @@ const baseStyle = `
     @page { size: A4; margin: 0; }
     body { font-family: 'Calibri', Arial, sans-serif; color: #222; font-size: 10.5pt; line-height: 1.45; margin: 0; background:#fff; }
     .mycertif-page { box-sizing: border-box; width: 100%; padding: 14mm 18mm 22mm; }
-    .pdf-root > h1, .pdf-root > h2, .pdf-root > p, .pdf-root > table, .pdf-root > div:not(.footer),
+    .pdf-root > h1, .pdf-root > h2, .pdf-root > p, .pdf-root > table, .pdf-root > div:not(.footer):not(.mycertif-page):not(.pf-cert-page),
     .mycertif-page > h1, .mycertif-page > h2, .mycertif-page > p, .mycertif-page > table, .mycertif-page > div:not(.footer) { max-width: 174mm; margin-left: auto; margin-right: auto; }
     h1 { color: #1a1a1a; font-size: 16pt; text-align: left; margin: 10px 0 10px; font-weight: bold; }
     h2 { color: #1a1a1a; font-size: 11.5pt; margin: 10px 0 5px; font-weight: bold; }
