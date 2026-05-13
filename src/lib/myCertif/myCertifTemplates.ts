@@ -47,8 +47,9 @@ const footerProForma = () => `
 // ======================================================================
 export function getAttestationDelivranceHTML(s: CertifStagiaire): string {
   return `<!doctype html><html><head><meta charset="utf-8">${baseStyle}<style>
-    @page { size: A4 portrait; margin: 18mm; }
+    @page { size: A4 portrait; margin: 0; }
     body { font-family: 'Calibri', Arial, sans-serif; color: #222; padding: 0; }
+    .pf-cert-page { box-sizing:border-box; width:100%; padding:18mm 20mm 34mm; }
     .pf-header { display:flex; justify-content:space-between; align-items:flex-start; border-bottom: 2px solid #d4af37; padding-bottom: 10px; margin-bottom: 20px; }
     .pf-org { font-size: 10pt; line-height: 1.5; }
     .pf-org .name { font-weight: bold; font-size: 12pt; color: #1a1a1a; }
@@ -62,9 +63,10 @@ export function getAttestationDelivranceHTML(s: CertifStagiaire): string {
     .pf-faits p { margin: 4px 0; }
     .pf-sig-block { margin-top: 28px; }
     .pf-sig-img { max-height: 110px; margin-top: 8px; }
-    .pf-footer { position: fixed; bottom: 12mm; left: 18mm; right: 18mm; text-align: center; font-size: 8.5pt; color: #555; border-top: 1px solid #ccc; padding-top: 6px; line-height: 1.45; }
+    .pf-footer { margin:0 20mm; text-align: center; font-size: 8.5pt; color: #555; border-top: 1px solid #ccc; padding-top: 6px; line-height: 1.45; }
     .pf-footer strong { color:#1a1a1a; }
   </style></head><body>
+    <div class="pf-cert-page">
     <div class="pf-header">
       <div class="pf-org">
         <div class="name">${ORG_FORMATION.nom}</div>
@@ -101,8 +103,9 @@ export function getAttestationDelivranceHTML(s: CertifStagiaire): string {
       <p><strong>Signature du Président :</strong></p>
       ${(() => { const sig = typeof localStorage !== 'undefined' ? localStorage.getItem('mycertif_signature_presidente') : null; return sig ? `<img src="${sig}" class="pf-sig-img" alt="Signature">` : `<img src="/mycertif/proforma_signature.jpg" class="pf-sig-img" alt="Signature Pro Forma">`; })()}
     </div>
+    </div>
 
-    <div class="pf-footer">
+    <div class="pf-footer footer">
       <strong>${ORG_FORMATION.nom}</strong><br>
       ${ORG_FORMATION.adresse}, ${ORG_FORMATION.codePostal} ${ORG_FORMATION.ville}<br>
       Siret : ${ORG_FORMATION.siret} &nbsp; Siren : ${(ORG_FORMATION as any).siren || ORG_FORMATION.siret.slice(0,9)}<br>
@@ -116,6 +119,7 @@ export function getAttestationDelivranceHTML(s: CertifStagiaire): string {
 // ======================================================================
 export function getEmargementJuryHTML(sessionDate: string): string {
   return `<!doctype html><html><head><meta charset="utf-8">${baseStyle}</head><body>
+    <div class="mycertif-page">
     ${headerAcademy()}
     <h1 style="margin-top:24px">Feuille d'émargement des membres présents</h1>
     <p style="text-align:center"><strong>DATE :</strong> ${sessionDate}</p>
@@ -139,6 +143,7 @@ export function getEmargementJuryHTML(sessionDate: string): string {
         `).join("")}
       </tbody>
     </table>
+    </div>
 
     ${footerProForma()}
   </body></html>`;
