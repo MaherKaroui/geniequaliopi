@@ -5,8 +5,9 @@ import { ORG_FORMATION, ORG_CERTIFICATEUR, CERTIFICATION, JURY, COMPETENCES, QUE
 
 const baseStyle = `
   <style>
-    @page { size: A4; margin: 14mm 16mm; }
-    body { font-family: 'Calibri', Arial, sans-serif; color: #222; font-size: 10.5pt; line-height: 1.45; margin: 0; }
+    @page { size: A4; margin: 0; }
+    body { font-family: 'Calibri', Arial, sans-serif; color: #222; font-size: 10.5pt; line-height: 1.45; margin: 0; background:#fff; }
+    .mycertif-page { box-sizing: border-box; width: 100%; padding: 14mm 18mm 22mm; }
     h1 { color: #1a1a1a; font-size: 16pt; text-align: left; margin: 10px 0 10px; font-weight: bold; }
     h2 { color: #1a1a1a; font-size: 11.5pt; margin: 10px 0 5px; font-weight: bold; }
     table { width: 100%; border-collapse: collapse; margin: 6px 0; }
@@ -16,7 +17,7 @@ const baseStyle = `
     .pf-header-block .org { font-size: 10pt; line-height: 1.5; }
     .pf-header-block .org .name { font-weight: bold; font-size: 12pt; color: #1a1a1a; }
     .pf-header-block img { max-width: 110px; max-height: 90px; }
-    .pf-footer-block { margin-top: 30px; padding-top: 8px; border-top: 1px solid #bbb; text-align: center; font-size: 9pt; color: #555; line-height: 1.5; }
+    .pf-footer-block { margin: 0 18mm; padding-top: 7px; border-top: 1px solid #bbb; text-align: center; font-size: 8.5pt; color: #555; line-height: 1.35; }
     .pf-footer-block strong { color: #1a1a1a; }
     .label { color: #444; font-weight: 600; }
   </style>
@@ -35,7 +36,7 @@ const headerAcademy = () => `
 `;
 
 const footerProForma = () => `
-  <div class="pf-footer-block">
+  <div class="pf-footer-block footer">
     <strong>${ORG_FORMATION.nom}</strong> – ${ORG_FORMATION.adresse}, ${ORG_FORMATION.codePostal} ${ORG_FORMATION.ville}<br>
     SIRET ${ORG_FORMATION.siret} – Numéro de déclaration d'activité : ${ORG_FORMATION.nda} – Président : ${ORG_FORMATION.presidente}
   </div>
