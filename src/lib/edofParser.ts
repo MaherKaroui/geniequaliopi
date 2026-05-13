@@ -112,7 +112,7 @@ export function parseEdofXlsx(data: ArrayBuffer): EdofSession[] {
   const groups = new Map<string, { rows: Record<string, any>[] }>();
 
   for (const row of rows) {
-    const title = getCol(row, "INTITULE_FORMATION", "INTITULE FORMATION", "INTITULE_CERTIF/THEM", "INTITULE CERTIF/THEM", "INTITULE", "Formation");
+    const title = getCol(row, "INTITULE_FORMATION", "INTITULE FORMATION", "Intitulé Formation", "Intitule Formation", "INTITULE_CERTIF/THEM", "INTITULE CERTIF/THEM", "INTITULE", "Formation");
     if (!title) continue;
     if (!groups.has(title)) {
       groups.set(title, { rows: [] });
