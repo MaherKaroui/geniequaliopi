@@ -1410,6 +1410,91 @@ export const RNCP_FICHES: RNCPFiche[] = [
     ],
     dureeIndicative: "Bac Pro en 3 ans (seconde, première, terminale) : environ 1850h en centre de formation + 22 semaines de PFMP (770h) en milieu professionnel. En apprentissage : alternance sur 2 ou 3 ans (rythme type 1 semaine CFA / 2 ou 3 semaines entreprise), environ 675h/an en CFA.",
   },
+  {
+    code: "RNCP38663",
+    intitule: "TP - Employé polyvalent en restauration",
+    niveau: "Niveau 3 (CAP/BEP)",
+    certificateur: "MINISTÈRE DU TRAVAIL DU PLEIN EMPLOI ET DE L'INSERTION",
+    dateEnregistrement: "27/03/2025",
+    dateEcheance: "27/03/2030",
+    codeNSF: "334t – Réception, hébergement, service de restauration, accompagnement",
+    formacodes: "42753 – Restauration / 42716 – Production cuisine / 42735 – Service salle restauration",
+    resume: "Par sa maîtrise de la technique culinaire et sa posture de service, l'employé polyvalent en restauration contribue à la satisfaction de la clientèle et à la réputation de l'établissement. Il réalise des productions culinaires simples (entrées, plats chauds, snacking, desserts), les dresse avec goût, accueille et sert les clients, encaisse les prestations et assure la plonge ainsi que le nettoyage des locaux et des matériels.",
+    activitesVisees: "L'employé polyvalent en restauration met en place et réalise des entrées, des desserts, des plats chauds et des produits snacking selon les fiches techniques. Il accueille, conseille et sert la clientèle (y compris en situation de handicap), encaisse les prestations. Il conduit le poste laverie vaisselle, réalise la plonge batterie et effectue le nettoyage des locaux et des matériels dans le respect du PMS, des bonnes pratiques d'hygiène (HACCP), de la lutte anti-gaspillage (loi Egalim, loi climat et résilience) et des règles de sécurité au travail.",
+    blocsCompetences: [
+      {
+        titre: "Préparer et dresser des entrées et des desserts",
+        competences: [
+          "Réaliser la mise en place des entrées et des desserts",
+          "Assembler et dresser les entrées et les desserts",
+        ],
+        matieres: [
+          { competence: "Mise en place des entrées et des desserts", contenu: "Lecture de fiches techniques, déconditionnement, épluchage/lavage/désinfection des végétaux, taillage, portionnage (fromages, charcuteries, poissons, viandes, préparations végétales), réalisation de pâtes, sauces et appareils de base, cuissons, traçabilité, PMS/HACCP, EPI", volume: "70h" },
+          { competence: "Assemblage et dressage des entrées et desserts", contenu: "Respect des fiches techniques, assaisonnement, dégustation/rectification, dressage esthétique, contenants adaptés, mise en attente, lutte anti-gaspillage, tri des déchets", volume: "35h" },
+        ],
+        modalitesEval: "Mise en situation professionnelle (préparation et dressage d'entrées et desserts) + entretien technique. Durée totale CCP1 : 02h40min.",
+      },
+      {
+        titre: "Préparer et dresser des plats chauds et des produits snacking",
+        competences: [
+          "Réaliser la mise en place des plats chauds et des produits snacking",
+          "Assembler et dresser les plats chauds et les produits snacking",
+        ],
+        matieres: [
+          { competence: "Mise en place des plats chauds et snacking", contenu: "Prétraitement, taillage, marinades, panures, cuissons (griller, snacker, sauter, rôtir, pocher, frire, vapeur), remise en température des PCEA, contrôle températures à cœur (≥ +63°C), thermomètre sonde, liaisons chaude/froide/directe", volume: "84h" },
+          { competence: "Assemblage et dressage plats chauds / snacking", contenu: "Cuissons minute, montage des sandwichs/burgers/wraps/pizzas, dressage à l'assiette ou en contenant snacking, envoi au passe, vocabulaire professionnel", volume: "42h" },
+        ],
+        modalitesEval: "Mise en situation professionnelle (préparation, cuissons et dressage de plats chauds et de produits snacking) + entretien technique. Durée totale CCP2 : 02h20min.",
+      },
+      {
+        titre: "Accueillir, conseiller et servir la clientèle",
+        competences: [
+          "Réaliser la mise en place des espaces de distribution et de restauration",
+          "Accueillir et conseiller la clientèle",
+          "Servir la clientèle et encaisser les prestations",
+        ],
+        matieres: [
+          { competence: "Mise en place espaces distribution / restauration", contenu: "Approvisionnement vitrines et postes de vente, dressage des tables, alimentation des consoles, marchandisage, affichages obligatoires (origine produits, allergènes, prix), contrôle des températures vitrines/bains-marie", volume: "35h" },
+          { competence: "Accueil et conseil clientèle", contenu: "Posture de service, accueil des clients (y compris en situation de handicap), commercialisation de l'offre, conseil sur composition/origine, ventes additionnelles, prise de commande sur outils digitaux (bornes, caisses, click & collect)", volume: "35h" },
+          { competence: "Service et encaissement", contenu: "Service à l'assiette / au plat / self / vente à emporter, gestion de la caisse (NF525), moyens de paiement (espèces, CB, titres-restaurant), édition de la facture, gestion des réclamations", volume: "28h" },
+        ],
+        modalitesEval: "Mise en situation professionnelle (mise en place, accueil, conseil, service, encaissement) + entretien technique. Durée totale CCP3 : 01h20min.",
+      },
+      {
+        titre: "Réaliser la plonge et le nettoyage des locaux et des matériels",
+        competences: [
+          "Assurer la conduite du poste laverie vaisselle",
+          "Réaliser la plonge batterie",
+          "Effectuer le nettoyage des locaux et des matériels",
+        ],
+        matieres: [
+          { competence: "Conduite poste laverie vaisselle", contenu: "Mise en marche machine, dérochage des plateaux, tri des déchets, classement et chargement des paniers, pré-rinçage, contrôle qualité sortie machine, rangement protégé des contaminations", volume: "21h" },
+          { competence: "Plonge batterie", contenu: "Pré-débarrassage, lavage manuel, rinçage et séchage de la batterie de cuisine, contrôle propreté, rangement, économies d'eau et d'énergie", volume: "14h" },
+          { competence: "Nettoyage locaux et matériels", contenu: "Plan de nettoyage et désinfection (PND), méthode TACT (Température/Action mécanique/Concentration/Temps), produits lessiviels (FDS), sécurité chimique, traçabilité du nettoyage, marche en avant", volume: "21h" },
+        ],
+        modalitesEval: "Mise en situation professionnelle (conduite laverie + plonge batterie + nettoyage) + entretien technique. Durée totale CCP4 : 00h50min.",
+      },
+    ],
+    secteursActivite: "Restauration commerciale (traditionnelle, brasserie, bistrot, à thème, cafétéria, restauration rapide), circuits alternatifs (boulangerie, point chaud), restauration collective (travail, enseignement, hospitalier, médico-social), catering aérien et ferroviaire.",
+    typesEmplois: [
+      "Employé polyvalent de restauration / employé polyvalent de restaurant",
+      "Agent de restauration",
+      "Employé de restauration collective / employé de cantine",
+      "Employé de cafétéria / employé de snack-bar",
+      "Équipier polyvalent de restauration rapide / agent de restauration rapide",
+      "Préparateur-vendeur en point chaud",
+    ],
+    codesROME: ["G1603"],
+    voiesAcces: [
+      "Après un parcours de formation continue",
+      "En contrat d'apprentissage",
+      "Après un parcours de formation hors temps de travail",
+      "En contrat de professionnalisation",
+      "Par candidature individuelle (épreuve ponctuelle)",
+      "Par expérience (VAE)",
+    ],
+    dureeIndicative: "Parcours indicatif 385h en centre + période d'application en entreprise (PAE) de 4 à 8 semaines selon le profil. Examen final TP : 4h30 (mise en situation professionnelle + entretien technique avec le jury, sur la base d'un dossier professionnel).",
+  },
 ];
 
 export function getRNCPByCode(code: string): RNCPFiche | undefined {
