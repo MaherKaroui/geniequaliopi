@@ -155,7 +155,7 @@ export function getEmargementJuryHTML(sessionDate: string): string {
 export function getGrilleEvaluationHTML(s: CertifStagiaire): string {
   // Each competence rendered as its OWN small table so it stays together (page-break-inside:avoid)
   const competenceBlocks = COMPETENCES.map((c) => `
-    <table style="margin:0 0 6px 0;page-break-inside:avoid">
+    <table class="grille-table" style="margin:0 0 6px 0;page-break-inside:avoid">
       <colgroup><col style="width:58%"><col style="width:21%"><col style="width:21%"></colgroup>
       <thead>
         <tr>
@@ -246,6 +246,7 @@ export function getGrilleEvaluationHTML(s: CertifStagiaire): string {
 // ======================================================================
 export function getAttestationHonneurHTML(s: CertifStagiaire): string {
   return `<!doctype html><html><head><meta charset="utf-8">${baseStyle}</head><body>
+    <div class="mycertif-page">
     ${headerAcademy()}
     <h1 style="margin-top:30px">ATTESTATION SUR L'HONNEUR</h1>
 
@@ -276,6 +277,7 @@ export function getAttestationHonneurHTML(s: CertifStagiaire): string {
       <div style="margin-top:8px;font-size:10pt;font-style:italic">Lu et approuvé, bon pour attestation sur l'honneur</div>
       <div style="font-family: 'Brush Script MT', cursive; font-size: 22pt; color:#1a3a7b; margin-top:6px">${s.prenom} ${s.nom}</div>
     </div>
+    </div>
 
     ${footerProForma()}
   </body></html>`;
@@ -296,7 +298,12 @@ export function getQuestionnaireHTML(s: CertifStagiaire): string {
     </div>`;
   }).join("");
 
-  return `<!doctype html><html><head><meta charset="utf-8">${baseStyle}</head><body>
+  return `<!doctype html><html><head><meta charset="utf-8">${baseStyle}<style>
+    .questionnaire-page { padding-left: 17mm; padding-right: 17mm; }
+    .questionnaire-inner { max-width: 172mm; margin: 0 auto; }
+  </style></head><body>
+    <div class="mycertif-page questionnaire-page">
+    <div class="questionnaire-inner">
     ${headerAcademy()}
     <h1 style="text-align:center;margin:8px 0 4px">QUESTIONNAIRE — FORMATION PROTHÉSISTE ONGULAIRE</h1>
     <p style="text-align:center;font-size:9.5pt;color:#555;margin:0 0 8px">${CERTIFICATION.code} — Modalité M2 (30% de la note globale)</p>
@@ -326,6 +333,8 @@ export function getQuestionnaireHTML(s: CertifStagiaire): string {
           </td>
         </tr>
       </table>
+    </div>
+    </div>
     </div>
 
     ${footerProForma()}
