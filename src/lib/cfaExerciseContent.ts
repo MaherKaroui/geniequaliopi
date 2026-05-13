@@ -44,6 +44,37 @@ export function getModuleSpecificConsigne(matiereTitle: string, matiereContenu: 
   }
   // ===== Fin EPR =====
 
+  // ===== RPMS (RNCP38575) - Responsable de petite ou moyenne structure (REAC v08, 02/07/2025) =====
+  if (mt.includes('vision systémique') || (mt.includes('diagnostic') && mt.includes('environnement')) || ((mt.includes('pestel') || mt.includes('swot')) && !mt.includes('produit'))) {
+    return `Mise en situation (CP1 — TP-RPMS) : Vous prenez la direction d'une PME industrielle (38 salariés, CA 6,2 M€).\n\n1. Analyse PESTEL contextualisée (2 facteurs par dimension).\n2. Matrice SWOT (5 items par case).\n3. 5 forces de Porter appliquées au secteur.\n4. Dispositif de veille stratégique (5 sources, 2 outils, fréquence, pilote).\n5. 3 acteurs clés du territoire à rencontrer.\n6. Note de synthèse 2 pages avec 4 recommandations stratégiques argumentées.`;
+  }
+  if (mt.includes('territoire') || (mt.includes('visibilité') && (mt.includes('local') || mt.includes('numérique')))) {
+    return `Mise en situation (CP2 — TP-RPMS) : PME 32 salariés récemment implantée en Occitanie.\n\n1. Cartographie acteurs institutionnels (préfecture, DREETS, Région, EPCI, CCI, CMA).\n2. Plan visibilité numérique 6 mois : Google Business Profile, SEO local (10 mots-clés), LinkedIn, annuaires.\n3. 8 actions de présence physique sur 12 mois.\n4. 3 partenariats stratégiques avec bénéfices.\n5. Budget 18 000 € HT + 5 KPIs mensuels.`;
+  }
+  if (((mt.includes('manager') || mt.includes('animer')) && mt.includes('équipe')) || mt.includes('recrutement') || mt.includes('gepp') || mt.includes('gpec')) {
+    return `Mise en situation (CP3 — TP-RPMS) : Agence 24 collaborateurs, recrutement chef de projet senior + restructuration animation (turnover 28%).\n\n1. Fiche de poste complète.\n2. Plan de sourcing multicanal avec budget.\n3. Grille d'entretien structurée méthode STAR (8 questions).\n4. Onboarding 90 jours (J1, S1, M1, M3).\n5. Ishikawa 5M des causes du turnover.\n6. Plan managérial 6 mois (rituels, entretiens, baromètre QVCT).\n7. Planning entretiens professionnels (sanction CPF 3 000 €).`;
+  }
+  if ((mt.includes('offre') && (mt.includes('adapter') || mt.includes('demande'))) || mt.includes('segmentation') || mt.includes('mix marketing') || (mt.includes('positionnement') && !mt.includes('géopositionnement'))) {
+    return `Mise en situation (CP4 — TP-RPMS) : PME cosmétique bio (28 sal., CA 1,8 M€).\n\n1. Étude de marché (sources, méthode quanti+quali).\n2. Segmentation 3 segments (socio-démo, psycho, comportemental).\n3. 2 personas détaillés.\n4. Ciblage prioritaire (matrice attractivité × accessibilité).\n5. Formule de positionnement.\n6. Mix-marketing 7P (3 actions/P).\n7. Estimation potentiel CA additionnel à 12 mois.`;
+  }
+  if ((mt.includes('diffusion') && mt.includes('offre')) || mt.includes("plan d'actions commerciales") || mt.includes('crm') || mt.includes('prospection multicanale') || mt.includes('fidélisation')) {
+    return `Mise en situation (CP5 — TP-RPMS) : Agence comm B2B (14 sal., CA 1,1 M€). Objectif N+1 : 1,4 M€.\n\n1. 4 objectifs SMART.\n2. PAC 12 mois (cibles, actions, moyens, calendrier, KPIs).\n3. Multicanal : phoning BEBEDC, emailing RGPD, social selling LinkedIn.\n4. Choix CRM (Axonaut/Sellsy/HubSpot Free) avec budget.\n5. Entonnoir conversion B2B avec taux cibles.\n6. Plan fidélisation (NPS, CSAT, programme).\n7. Tableau de bord commercial (10 KPIs).`;
+  }
+  if (mt.includes('organiser la production') || mt.includes('gestion des stocks') || mt.includes('lean') || mt.includes('5s') || mt.includes('iso 9001')) {
+    return `Mise en situation (CP6 — TP-RPMS) : PME industrielle (45 sal., CA 8,5 M€) — rebut 4,8%, TRS 62%, ruptures stock A.\n\n1. VSM simplifié.\n2. Calcul TRS (Disponibilité × Performance × Qualité).\n3. Chantier 5S 8 semaines.\n4. Méthode ABC + Wilson pour stocks de sécurité.\n5. Ishikawa 5M + 5 Pourquoi sur le rebut.\n6. Plan PDCA 6 mois (5 actions chiffrées en €).\n7. Évaluation ISO 9001 (coût, durée, ROI).`;
+  }
+  if (mt.includes('analyser le bilan') || mt.includes('bilan fonctionnel') || mt.includes('fonds de roulement') || mt.includes('bfr')) {
+    return `Mise en situation (CP7 — TP-RPMS) : Bilan PME BTP (50 sal., CA 7,8 M€).\n\nBilan N (k€) : Immo brut 2 100 / Amort. 850 / Stocks 480 / Créances TTC 1 920 / Dispo 65 / CP 1 280 / Dettes LT 720 / Dettes fourn. TTC 980 / Dettes fisc/soc 310 / CBC 425.\n\n1. Bilan fonctionnel.\n2. FR, BFR, TN — commentaire équilibre.\n3. Ratios : autonomie, indépendance, capacité endettement (CAF=240), délai clients (CA TTC=9 360), délai fourn. (achats TTC=4 200).\n4. Comparaison normes BTP.\n5. 3 faiblesses majeures.\n6. 5 préconisations chiffrées.\n7. Risque cessation de paiement à 6 mois.`;
+  }
+  if (mt.includes('compte de résultat') || mt.includes('soldes intermédiaires') || mt.includes(' sig') || mt.includes('seuil de rentabilité') || mt.includes('point mort')) {
+    return `Mise en situation (CP8 — TP-RPMS) : Compte de résultat PME services (CA 2,4 M€, 22 sal.).\n\nN (k€) : CA 2 400 / Achats 720 / Var. stocks -30 / Autres charges externes 380 / Impôts/taxes 60 / Personnel 980 / Dot. amort. 95 / Charges fin. 32 / Produits fin. 4 / Résultat except. +12 / IS 28%.\n\n1. 7 SIG.\n2. CAF par les 2 méthodes.\n3. Ratios : taux VA, taux marge EBE, partage VA, marge nette.\n4. Décomposition CF/CV → MCV, taux MCV, seuil de rentabilité.\n5. Point mort en jours.\n6. Écarts N/N-1 (CA N-1=2 200, EBE N-1=285).\n7. 4 préconisations argumentées.`;
+  }
+  if (mt.includes("rapport d'activité") || (mt.includes('rédiger') && mt.includes('rapport')) || mt.includes('dpef') || mt.includes('csrd') || mt.includes('extra-financier')) {
+    return `Mise en situation (CP9 — TP-RPMS) : SAS 42 sal. (CA 6,9 M€), AG actionnaires dans 5 semaines.\n\n1. Sommaire 7 chapitres.\n2. Mot du dirigeant (1 page).\n3. Tableau N/N-1/N-2 avec 8 KPIs + 3 data-viz.\n4. Volet RSE :\n   - Environnement : bilan carbone ADEME (Scope 1/2/3), énergies, déchets\n   - Social : Index Égalité Pro (5 indicateurs/100 pts), DOETH 6%, QVCT, TF/TG\n   - Sociétal : ancrage territorial, achats ISO 20400\n5. Perspectives N+1 (3 axes chiffrés).\n6. Slides AG (12, règle 6×6, 25 min) + 5 questions préparées.\n7. Conformité seuils DPEF/CSRD.`;
+  }
+  // ===== Fin RPMS =====
+
+
 
   if (mt.includes('veille commerciale') || (mt.includes('veille') && !mt.includes('information'))) {
     const consignes = [

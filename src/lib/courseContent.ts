@@ -381,7 +381,7 @@ export function getCourseChapters(formationIntitule: string): CourseChapter[] {
   if (t.includes('ecsr') || t.includes('enseignant de la conduite') || t.includes('sécurité routière')) return getECSRChapters();
   if (t.includes('vtest') || t.includes('v-test') || t.includes('rs6905')) return getVTestChapters();
   if (t.includes('conseiller en insertion') || t.includes('insertion professionnelle') || t.includes('cip') || t.includes('rncp37274')) return getCIPChapters();
-  if (t.includes('responsable de petite') || t.includes('rpms') || t.includes('petite et moyenne structure')) return getRPMSChapters();
+  if (t.includes('responsable de petite') || t.includes('rpms') || t.includes('petite et moyenne structure') || t.includes('petite ou moyenne structure') || t.includes('rncp38575')) return getRPMSChapters();
   if (t.includes('assistant') && t.includes('direction')) return getAssistantDirectionChapters();
   if (t.includes('infographiste') || t.includes('infographie')) return getInfographisteChapters();
   if (t.includes('restauration') || t.includes('employé polyvalent en restauration') || t.includes('rncp38663') || t.includes('epr')) return getRestaurationChapters();
