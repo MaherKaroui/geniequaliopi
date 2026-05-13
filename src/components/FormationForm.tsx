@@ -337,12 +337,12 @@ const FormationForm = ({ data, onChange, onImportStagiaires, onApplyOrganisme }:
           Télécharger référentiel
         </Button>
       </div>
-      {/* EDOF Import */}
+      {/* EDOF / CPF Import */}
       <div className="p-4 bg-accent/30 border-2 border-accent rounded-xl">
         <div className="flex items-center justify-between">
           <div>
-            <Label className="font-semibold text-primary">Importer un fichier EDOF</Label>
-            <p className="text-xs text-muted-foreground">Import automatique des stagiaires, dates, tarifs depuis votre export EDOF (.xlsx)</p>
+            <Label className="font-semibold text-primary">Importer un fichier EDOF ou CPF</Label>
+            <p className="text-xs text-muted-foreground">Import automatique des stagiaires, dates, tarifs depuis votre export EDOF ou CPF (Bilan de compétences, .xlsx)</p>
           </div>
           <div>
             <input
