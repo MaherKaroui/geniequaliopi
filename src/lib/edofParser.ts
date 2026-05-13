@@ -112,7 +112,7 @@ export function parseEdofXlsx(data: ArrayBuffer): EdofSession[] {
   const groups = new Map<string, { rows: Record<string, any>[] }>();
 
   for (const row of rows) {
-    const title = getCol(row, "INTITULE_FORMATION", "INTITULE FORMATION", "INTITULE_CERTIF/THEM", "INTITULE CERTIF/THEM", "INTITULE", "Formation");
+    const title = getCol(row, "INTITULE_FORMATION", "INTITULE FORMATION", "Intitulé Formation", "Intitule Formation", "INTITULE_CERTIF/THEM", "INTITULE CERTIF/THEM", "INTITULE", "Formation");
     if (!title) continue;
     if (!groups.has(title)) {
       groups.set(title, { rows: [] });
@@ -130,20 +130,20 @@ export function parseEdofXlsx(data: ArrayBuffer): EdofSession[] {
     );
 
     // Find earliest start and latest end dates
-    const allStarts = group.rows.map(r => parseEdofDate(getCol(r, "DATE_DEBUT_SESSION", "DATE DEBUT SESSION", "DATE_DEBUT", "DATE DEBUT", "Début", "Date début"))).filter(Boolean).sort();
-    const allEnds = group.rows.map(r => parseEdofDate(getCol(r, "DATE_FIN_SESSION", "DATE FIN SESSION", "DATE_FIN", "DATE FIN", "Fin", "Date fin"))).filter(Boolean).sort();
+    const allStarts = group.rows.map(r => parseEdofDate(getCol(r, "DATE_DEBUT_SESSION", "DATE DEBUT SESSION", "DATE_DEBUT", "DATE DEBUT", "Début session", "Debut session", "Début", "Date début"))).filter(Boolean).sort();
+    const allEnds = group.rows.map(r => parseEdofDate(getCol(r, "DATE_FIN_SESSION", "DATE FIN SESSION", "DATE_FIN", "DATE FIN", "Fin session", "Fin", "Date fin"))).filter(Boolean).sort();
     const earliestStart = allStarts[0] || "";
     const latestEnd = allEnds[allEnds.length - 1] || "";
 
     // Collect unique locations
     const locations = [...new Set(group.rows.map(r => {
       const ville = getCol(r, "LIEU_FORMATION_VILLE", "LIEU FORMATION VILLE", "VILLE", "Ville");
-      const cp = getCol(r, "LIEU_FORMATION_CODE_POSTAL", "LIEU FORMATION CODE POSTAL", "CODE_POSTAL", "Code postal");
+      const cp = getCol(r, "LIEU_FORMATION_CODE_POSTAL", "LIEU FORMATION CODE POSTAL", "CODE_POSTAL", "Code postal", "CP");
       return ville ? `${cp} ${ville}`.trim() : "";
     }).filter(Boolean))];
 
     // Average tarif
-    const tarifs = group.rows.map(r => parseFloat(String(getCol(r, "MONTANT_FORMATION", "MONTANT FORMATION", "MONTANT", "Tarif", "Prix") || "0"))).filter(t => t > 0);
+    const tarifs = group.rows.map(r => parseFloat(String(getCol(r, "MONTANT_FORMATION", "MONTANT FORMATION", "MONTANT", "Montant (€)", "Montant", "Tarif", "Prix") || "0"))).filter(t => t > 0);
     const avgTarif = tarifs.length > 0 ? Math.round(tarifs.reduce((a, b) => a + b, 0) / tarifs.length) : 0;
 
     const formation: FormationInfo = {
@@ -166,7 +166,7 @@ export function parseEdofXlsx(data: ArrayBuffer): EdofSession[] {
     };
 
     const stagiaires: StagiaireInfo[] = group.rows.map(row => {
-      const montant = getCol(row, "MONTANT_FORMATION", "MONTANT FORMATION", "MONTANT", "Tarif", "Prix", "COUT", "Coût");
+      const montant = getCol(row, "MONTANT_FORMATION", "MONTANT FORMATION", "MONTANT", "Montant (€)", "Montant", "Tarif", "Prix", "COUT", "Coût");
       const tarifStr = montant ? `${parseFloat(String(montant)).toLocaleString("fr-FR")} € HT` : "";
       const rawCivilite = String(getCol(row, "CIVILITE", "Civilité", "Civilite") || "");
       let civilite: "" | "M." | "Mme" = "";
@@ -176,27 +176,27 @@ export function parseEdofXlsx(data: ArrayBuffer): EdofSession[] {
         civilite,
         nom: String(getCol(row, "NOM", "Nom") || "").toUpperCase(),
         prenom: String(getCol(row, "PRENOM", "Prénom", "Prenom") || "").charAt(0).toUpperCase() + String(getCol(row, "PRENOM", "Prénom", "Prenom") || "").slice(1).toLowerCase(),
-        email: String(getCol(row, "COURRIEL", "EMAIL", "Mail", "E-mail", "Courriel") || "").replace(/\\/g, ""),
-        telephone: formatPhone(getCol(row, "NUMERO_TELEPHONE_PORTABLE", "NUMERO TELEPHONE PORTABLE", "TELEPHONE", "Téléphone", "Tel", "Tél") || getCol(row, "NUMERO_TELEPHONE_FIXE", "NUMERO TELEPHONE FIXE")),
+        email: String(getCol(row, "COURRIEL", "EMAIL", "Email", "Mail", "E-mail", "Courriel") || "").replace(/\\/g, ""),
+        telephone: formatPhone(getCol(row, "NUMERO_TELEPHONE_PORTABLE", "NUMERO TELEPHONE PORTABLE", "TELEPHONE", "Téléphone", "Telephone", "Tel", "Tél") || getCol(row, "NUMERO_TELEPHONE_FIXE", "NUMERO TELEPHONE FIXE")),
         entreprise: String(getCol(row, "ENTREPRISE", "Entreprise", "SOCIETE", "Société") || ""),
         responsableEntreprise: "",
         signatureResponsableUrl: "",
         poste: String(getCol(row, "POSTE", "Poste", "FONCTION", "Fonction") || ""),
-        dateNaissance: parseEdofDate(getCol(row, "DATE_DE_NAISSANCE", "DATE DE NAISSANCE", "DATE_NAISSANCE", "Date naissance")),
-        dateDebutFormation: parseEdofDate(getCol(row, "DATE_DEBUT_SESSION", "DATE DEBUT SESSION", "DATE_DEBUT", "DATE DEBUT", "Début", "Date début")),
-        dateFinFormation: parseEdofDate(getCol(row, "DATE_FIN_SESSION", "DATE FIN SESSION", "DATE_FIN", "DATE FIN", "Fin", "Date fin")),
+        dateNaissance: parseEdofDate(getCol(row, "DATE_DE_NAISSANCE", "DATE DE NAISSANCE", "DATE_NAISSANCE", "Date naissance", "Date de naissance")),
+        dateDebutFormation: parseEdofDate(getCol(row, "DATE_DEBUT_SESSION", "DATE DEBUT SESSION", "DATE_DEBUT", "DATE DEBUT", "Début session", "Debut session", "Début", "Date début")),
+        dateFinFormation: parseEdofDate(getCol(row, "DATE_FIN_SESSION", "DATE FIN SESSION", "DATE_FIN", "DATE FIN", "Fin session", "Fin", "Date fin")),
         tarifFormation: tarifStr,
         signatureUrl: "",
-        adresse: String(getCol(row, "ADRESSE_POSTALE", "ADRESSE POSTALE", "Adresse") || ""),
-        codePostal: String(getCol(row, "ADRESSE_CODE_POSTAL", "ADRESSE CODE POSTAL", "Code postal adresse") || ""),
-        commune: String(getCol(row, "ADRESSE_VILLE", "ADRESSE VILLE", "Ville adresse") || ""),
+        adresse: String(getCol(row, "ADRESSE_POSTALE", "ADRESSE POSTALE", "Adresse", "ADRESSE") || ""),
+        codePostal: String(getCol(row, "ADRESSE_CODE_POSTAL", "ADRESSE CODE POSTAL", "Code postal adresse", "Code postal", "CP") || ""),
+        commune: String(getCol(row, "ADRESSE_VILLE", "ADRESSE VILLE", "Ville adresse", "Ville", "VILLE") || ""),
         nationalite: String(getCol(row, "PAYS_LIEU_DE_NAISSANCE", "PAYS LIEU DE NAISSANCE", "Nationalité") || ""),
         nir: "",
         departementNaissance: String(getCol(row, "DEPARTEMENT_LIEU_DE_NAISSANCE", "DEPARTEMENT LIEU DE NAISSANCE", "Département naissance") || ""),
         communeNaissance: String(getCol(row, "VILLE_LIEU_DE_NAISSANCE", "VILLE LIEU DE NAISSANCE", "Commune naissance") || ""),
         diplome: "",
         rqth: "",
-        numeroAction: String(getCol(row, "NUMERO_ACTION", "NUMERO ACTION", "NUMERO_ ACTION", "N° ACTION", "NUM_ACTION", "Numéro action") || ""),
+        numeroAction: String(getCol(row, "NUMERO_ACTION", "NUMERO ACTION", "NUMERO_ ACTION", "N° ACTION", "N° Action", "NUM_ACTION", "Numéro action") || ""),
       };
     });
 
