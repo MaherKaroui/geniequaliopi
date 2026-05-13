@@ -384,7 +384,7 @@ export function getCourseChapters(formationIntitule: string): CourseChapter[] {
   if (t.includes('responsable de petite') || t.includes('rpms') || t.includes('petite et moyenne structure')) return getRPMSChapters();
   if (t.includes('assistant') && t.includes('direction')) return getAssistantDirectionChapters();
   if (t.includes('infographiste') || t.includes('infographie')) return getInfographisteChapters();
-  if (t.includes('restauration') || t.includes('employé polyvalent en restauration')) return getRestaurationChapters();
+  if (t.includes('restauration') || t.includes('employé polyvalent en restauration') || t.includes('rncp38663') || t.includes('epr')) return getRestaurationChapters();
   if (t.includes('excel')) return getExcelChapters();
   if (t.includes('word')) return getWordChapters();
   if ((t.includes('anglais') || t.includes('english')) && (t.includes('a1') || t.includes('débutant') || t.includes('niveau a1'))) return getAnglaisA1Chapters();
