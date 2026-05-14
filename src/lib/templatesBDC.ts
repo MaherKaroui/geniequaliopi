@@ -455,51 +455,145 @@ export function genExplorationMetierBDC(o: OrganismeInfo, f: FormationInfo, stag
 
 // ===== CR4 - IND 19 : Guide des protocoles métier =====
 export function genGuideProtocolesBDC(o: OrganismeInfo, f: FormationInfo) {
-  const domain = f.intitule || "Esthétique";
-  const style = getDocStyle();
+  const profile = getBdcDomainProfile(f);
+  const key = (f.intitule || "").toLowerCase();
   const imgStyle = `width:100%;max-height:220px;object-fit:cover;border-radius:8px;margin:10px 0;`;
-  return buildDocument({ org: o, title: `GUIDE DES PROTOCOLES – ${domain.toUpperCase()}`, subtitle: `Ressource pédagogique – Bilan de compétences`, sections: [
-    { heading: "Introduction", content: `<p>Ce guide recense les protocoles essentiels du domaine de <strong>${domain}</strong>. Il constitue une ressource pédagogique mise à disposition du bénéficiaire dans le cadre de son bilan de compétences, pour l'aider à identifier, consolider et valoriser ses compétences techniques.</p>` },
-    { heading: "PROTOCOLE 1 – Soin du visage classique", content: `<img src="https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=800&q=80" alt="Soin du visage" style="${imgStyle}"/><p><strong>Objectif :</strong> Nettoyer, purifier et hydrater la peau du visage.<br><br><strong>Matériel nécessaire :</strong><br>• Lait démaquillant ou eau micellaire<br>• Lotion tonique<br>• Gommage doux (grains fins)<br>• Vapeur d'ozone ou serviette chaude<br>• Masque adapté au type de peau<br>• Crème hydratante de finition<br>• Cotons, compresses, spatule<br><br><strong>Déroulé :</strong><br>1. <strong>Démaquillage</strong> (5 min) – Appliquer le lait démaquillant en mouvements circulaires, rincer à la lotion tonique.<br>2. <strong>Analyse de peau</strong> (3 min) – Observer sous lampe loupe : type de peau, imperfections, zones de sécheresse.<br>3. <strong>Gommage</strong> (5 min) – Appliquer le gommage en évitant le contour des yeux, masser doucement.<br>4. <strong>Vapozone / Serviette chaude</strong> (8 min) – Ouvrir les pores pour faciliter l'extraction.<br>5. <strong>Extraction</strong> (10 min) – Retirer les comédons avec précaution à l'aide de cotons.<br>6. <strong>Masque</strong> (15 min) – Appliquer le masque adapté, laisser poser.<br>7. <strong>Hydratation finale</strong> (5 min) – Crème hydratante + protection solaire si nécessaire.</p>`, variant: "green" },
-    { heading: "PROTOCOLE 2 – Épilation à la cire", content: `<img src="https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=800&q=80" alt="Épilation professionnelle" style="${imgStyle}"/><p><strong>Objectif :</strong> Retirer les poils de manière durable et hygiénique.<br><br><strong>Matériel nécessaire :</strong><br>• Cire tiède ou chaude (pot ou cartouche)<br>• Chauffe-cire<br>• Bandes non-tissées (si cire tiède)<br>• Huile post-épilation<br>• Talc, spatules, gants<br><br><strong>Déroulé :</strong><br>1. <strong>Préparation</strong> (3 min) – Désinfecter la zone, appliquer du talc pour absorber l'humidité.<br>2. <strong>Test de température</strong> – Vérifier sur le poignet avant application.<br>3. <strong>Application</strong> – Dans le sens de la pousse du poil, couche fine et régulière.<br>4. <strong>Retrait</strong> – D'un geste sec, dans le sens inverse de la pousse.<br>5. <strong>Finition</strong> – Appliquer l'huile post-épilation pour apaiser et retirer les résidus.</p><p><strong>Précautions :</strong><br>• Vérifier les contre-indications (varices, traitements médicamenteux, coups de soleil)<br>• Respecter les règles d'hygiène strictes (spatule à usage unique)</p>` },
-    { heading: "PROTOCOLE 3 – Manucure complète", content: `<img src="https://images.unsplash.com/photo-1604654894610-df63bc536371?w=800&q=80" alt="Manucure professionnelle" style="${imgStyle}"/><p><strong>Objectif :</strong> Embellir les mains et les ongles, traiter les cuticules.<br><br><strong>Matériel nécessaire :</strong><br>• Dissolvant, cotons<br>• Lime à ongles (grain 180/240)<br>• Bâtonnet de buis ou repousse-cuticules<br>• Bol d'eau tiède + savon doux<br>• Coupe-ongles, pince à envies<br>• Base coat, vernis, top coat<br>• Crème hydratante mains<br><br><strong>Déroulé :</strong><br>1. <strong>Retrait du vernis</strong> (3 min)<br>2. <strong>Limage</strong> (5 min) – Forme choisie par la cliente (ronde, carrée, amande)<br>3. <strong>Trempage</strong> (5 min) – Ramollir les cuticules dans l'eau tiède.<br>4. <strong>Soin des cuticules</strong> (5 min) – Repousser et retirer les envies.<br>5. <strong>Massage des mains</strong> (5 min) – Crème hydratante.<br>6. <strong>Pose du vernis</strong> (10 min) – Base, 2 couches de couleur, top coat.</p>` },
-    { heading: "PROTOCOLE 4 – Maquillage jour / naturel", content: `<img src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=800&q=80" alt="Maquillage professionnel" style="${imgStyle}"/><p><strong>Objectif :</strong> Sublimer le visage de manière naturelle pour un rendu quotidien.<br><br><strong>Déroulé :</strong><br>1. <strong>Préparation</strong> – Hydrater la peau, appliquer un primer si nécessaire.<br>2. <strong>Teint</strong> – Fond de teint adapté à la carnation, estomper au pinceau ou à l'éponge. Correcteur sous les yeux si nécessaire.<br>3. <strong>Poudre</strong> – Fixer légèrement avec une poudre libre translucide.<br>4. <strong>Sourcils</strong> – Structurer avec un crayon ou gel teinté.<br>5. <strong>Yeux</strong> – Ombre à paupières neutre, trait de crayon discret, mascara.<br>6. <strong>Blush</strong> – Touche de couleur sur les pommettes.<br>7. <strong>Lèvres</strong> – Baume teinté ou rouge à lèvres nude.</p>` },
-    { heading: "PROTOCOLE 5 – Soin des pieds / Beauté des pieds", content: `<img src="https://images.unsplash.com/photo-1519415510236-718bdfcd89c8?w=800&q=80" alt="Soin des pieds" style="${imgStyle}"/><p><strong>Objectif :</strong> Traiter les callosités, embellir les ongles des pieds.<br><br><strong>Déroulé :</strong><br>1. <strong>Bain de pieds</strong> (10 min) – Eau tiède + sel ou huile essentielle.<br>2. <strong>Gommage</strong> (5 min) – Gommage mécanique sur les callosités.<br>3. <strong>Râpe / Pierre ponce</strong> (5 min) – Éliminer les peaux mortes sur les talons.<br>4. <strong>Soin des ongles</strong> (10 min) – Coupe, limage, cuticules.<br>5. <strong>Masque hydratant</strong> (10 min) – Envelopper les pieds dans une serviette chaude.<br>6. <strong>Massage + Vernis</strong> (10 min) – Hydratation et pose de vernis.</p>` },
-    { heading: "Références et normes", content: `<p>• Code de la santé publique – Normes d'hygiène en esthétique<br>• Référentiel CAP Esthétique Cosmétique Parfumerie<br>• Fiche ROME D1208 – Soins esthétiques et corporels<br>• Guide INRS – Prévention des risques en institut de beauté</p>` },
-  ] });
+  const isMeca = /mecan|véhic|vehic|automob/i.test(key);
+  const isNTC = /negoc|technico|commerc/i.test(key);
+
+  let sections: { heading: string; content: string; variant?: "green" }[] = [];
+  let refs = "";
+
+  if (isMeca) {
+    sections = [
+      { heading: "Introduction", content: `<p>Ce guide recense les protocoles essentiels du métier de <strong>${profile.metier}</strong> exercé dans ${profile.secteur}. Il est remis au bénéficiaire comme ressource d'appui pendant la phase d'investigation pour identifier ses compétences techniques transférables.</p>` },
+      { heading: "PROTOCOLE 1 – Accueil client et ordre de réparation (OR)", content: `<img src="https://images.unsplash.com/photo-1632823471565-1ecdf5158051?w=800&q=80" alt="Accueil client en garage automobile" style="${imgStyle}"/><p><strong>Objectif :</strong> Réceptionner le véhicule, formaliser la demande client et sécuriser l'intervention.<br><br><strong>Matériel nécessaire :</strong><br>• Logiciel DMS (GIMS, Sage Garage, iCar)<br>• Fiche OR papier ou tablette<br>• Housse de protection siège, volant, levier de vitesses<br>• Carte d'identification véhicule (carte grise)<br><br><strong>Déroulé :</strong><br>1. <strong>Accueil et écoute</strong> (5 min) – Reformuler la panne décrite par le client.<br>2. <strong>Tour de véhicule</strong> (5 min) – Relever chocs, rayures, kilométrage, niveau carburant.<br>3. <strong>Saisie OR</strong> (10 min) – Immatriculation, VIN, motorisation, opérations demandées.<br>4. <strong>Devis prévisionnel</strong> – Forfait main-d'œuvre + pièces.<br>5. <strong>Validation client</strong> – Signature OR et accord sur délai/montant.</p>`, variant: "green" },
+      { heading: "PROTOCOLE 2 – Vidange moteur et remplacement filtres", content: `<img src="https://images.unsplash.com/photo-1635260615739-bf3c7c4e0c7d?w=800&q=80" alt="Vidange moteur automobile" style="${imgStyle}"/><p><strong>Matériel :</strong> Pont élévateur, bac de récupération, clé à filtre, clé dynamométrique, huile préconisée constructeur (5W30, 0W20…), joint de bouchon de vidange neuf, filtre à huile neuf.<br><br><strong>Déroulé :</strong><br>1. Mettre le véhicule sur pont, moteur tiède.<br>2. Dévisser le bouchon de vidange, laisser s'écouler 10 min.<br>3. Remplacer le joint, resserrer au couple constructeur.<br>4. Démonter et remplacer le filtre à huile (graisser le joint neuf).<br>5. Remplir d'huile à la jauge maxi, contrôler étanchéité après démarrage.<br>6. Réinitialiser l'indicateur d'entretien sur le tableau de bord.<br>7. Tracer l'intervention sur le carnet et l'OR.</p>` },
+      { heading: "PROTOCOLE 3 – Remplacement plaquettes et disques de frein", content: `<img src="https://images.unsplash.com/photo-1487754180451-c456f719a1fc?w=800&q=80" alt="Système de freinage automobile" style="${imgStyle}"/><p><strong>Matériel :</strong> Cric, chandelles, clé dynamométrique, repousse-piston, nettoyant frein, graisse cuivre, plaquettes et disques neufs.<br><br><strong>Déroulé :</strong><br>1. Lever le véhicule, déposer la roue.<br>2. Démonter l'étrier, repousser le piston (attention au liquide DOT4).<br>3. Déposer plaquettes et disque, nettoyer le moyeu.<br>4. Monter disque neuf + plaquettes neuves (graisse cuivre sur les chants uniquement).<br>5. Resserrer au couple, reposer la roue.<br>6. Pomper la pédale jusqu'à dureté retrouvée.<br>7. Essai routier de freinage et rodage 200 km doux.</p>` },
+      { heading: "PROTOCOLE 4 – Diagnostic électronique OBD-II", content: `<img src="https://images.unsplash.com/photo-1632823469850-1b7b1e8b7c6b?w=800&q=80" alt="Valise diagnostic OBD" style="${imgStyle}"/><p><strong>Matériel :</strong> Valise diagnostic multimarque (Bosch KTS, Delphi, Launch X431), multimètre, oscilloscope.<br><br><strong>Déroulé :</strong><br>1. Connecter la valise sur la prise OBD-II (sous le volant).<br>2. Lire les codes défaut sur chaque calculateur (moteur, ABS, ESP, airbag).<br>3. Interpréter les codes (DTC) avec la documentation technique constructeur.<br>4. Effectuer les mesures de paramètres en temps réel (sondes, capteurs).<br>5. Localiser la panne (élément, faisceau, calculateur).<br>6. Effacer les défauts après réparation et valider l'absence de retour.</p>` },
+      { heading: "PROTOCOLE 5 – Intervention sur véhicule hybride / électrique (consignation)", content: `<img src="https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=800&q=80" alt="Maintenance véhicule électrique" style="${imgStyle}"/><p><strong>Habilitation requise :</strong> B1L / B2L / BCL selon la norme NF C 18-550.<br><br><strong>Déroulé :</strong><br>1. EPI : gants isolants 1000 V, écran facial, tapis isolant.<br>2. Couper le contact, retirer la clé, attendre la temporisation constructeur (5 à 10 min).<br>3. Déposer le shut-off plug (sectionneur de service haute tension).<br>4. Vérifier l'absence de tension (VAT) sur les bornes batterie HT.<br>5. Poser la pancarte de consignation et la condamnation.<br>6. Réaliser l'intervention.<br>7. Déconsigner dans l'ordre inverse, contrôler les défauts au démarrage.</p>` },
+    ];
+    refs = `<p>• Référentiel CAP Maintenance des véhicules option A – RNCP36796<br>• Norme NF C 18-550 – Opérations sur véhicules à motorisation thermique, hybride et électrique<br>• Convention Collective Services de l'Automobile (IDCC 1090)<br>• Fiche ROME I1604 – Mécanique automobile<br>• Documentation INRS / ANFA – Sécurité atelier après-vente</p>`;
+  } else if (isNTC) {
+    sections = [
+      { heading: "Introduction", content: `<p>Ce guide recense les protocoles commerciaux clés du métier de <strong>${profile.metier}</strong> dans ${profile.secteur}. Il sert de ressource d'appui en phase d'investigation pour formaliser les compétences déjà mises en œuvre par le bénéficiaire.</p>` },
+      { heading: "PROTOCOLE 1 – Plan de prospection multicanale", content: `<img src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&q=80" alt="Prospection commerciale BtoB" style="${imgStyle}"/><p><strong>Objectif :</strong> Construire un pipeline de prospects qualifiés sur 4 semaines.<br><br><strong>Outils :</strong> CRM (HubSpot, Salesforce, Pipedrive), LinkedIn Sales Navigator, fichiers ICP (Ideal Customer Profile), séquences e-mail (Lemlist, Waalaxy).<br><br><strong>Déroulé :</strong><br>1. <strong>Définition de l'ICP</strong> – Secteur, taille, CA, décideur cible.<br>2. <strong>Constitution du fichier</strong> (200 comptes) – Sales Nav + bases sectorielles.<br>3. <strong>Plan de touches multicanal</strong> – J1 connexion LinkedIn, J3 e-mail personnalisé, J6 appel, J10 e-mail de relance, J15 message LinkedIn de relance.<br>4. <strong>Suivi CRM quotidien</strong> – Statut prospect, prochaine action.<br>5. <strong>Indicateurs hebdo</strong> – Taux de réponse, taux de RDV, coût par lead.</p>`, variant: "green" },
+      { heading: "PROTOCOLE 2 – Découverte client (méthode SPIN / SONCAS)", content: `<img src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=800&q=80" alt="Rendez-vous commercial BtoB" style="${imgStyle}"/><p><strong>Déroulé d'un rendez-vous découverte (45 min) :</strong><br>1. <strong>Brise-glace + cadrage</strong> (3 min) – Méthode CROC.<br>2. <strong>Questions de Situation</strong> – Comment fonctionnent-ils aujourd'hui ?<br>3. <strong>Questions de Problème</strong> – Quelles difficultés rencontrent-ils ?<br>4. <strong>Questions d'Implication</strong> – Quelles conséquences sur leur activité ?<br>5. <strong>Questions de Need-payoff</strong> – Quelle valeur attendue d'une solution ?<br>6. <strong>Identification du profil SONCAS</strong> – Sécurité, Orgueil, Nouveauté, Confort, Argent, Sympathie.<br>7. <strong>Synthèse + prochaine étape</strong> – Engagement sur la suite (démo, devis, RDV décideur).</p>` },
+      { heading: "PROTOCOLE 3 – Construction d'une proposition commerciale technico-commerciale", content: `<img src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=800&q=80" alt="Proposition commerciale" style="${imgStyle}"/><p><strong>Structure standard :</strong><br>1. Page de garde personnalisée (logo client, nom de l'interlocuteur, date).<br>2. Reformulation du besoin et des enjeux exprimés en découverte.<br>3. Solution technique proposée (caractéristiques, schémas, options).<br>4. Bénéfices client chiffrés (ROI, gain de temps, économies).<br>5. Méthodologie de mise en œuvre (planning, jalons, équipe).<br>6. Tarification – Détail prix unitaires, remises, conditions de paiement, validité de l'offre.<br>7. Références clients similaires.<br>8. CGV et bon pour accord.</p>` },
+      { heading: "PROTOCOLE 4 – Négociation et traitement des objections", content: `<img src="https://images.unsplash.com/photo-1521791136064-7986c2920216?w=800&q=80" alt="Négociation commerciale" style="${imgStyle}"/><p><strong>Méthode CRAC pour traiter une objection :</strong><br>• <strong>C</strong>reuser – « Qu'entendez-vous par … ? »<br>• <strong>R</strong>eformuler – « Si je comprends bien … »<br>• <strong>A</strong>rgumenter – Bénéfice concret + preuve.<br>• <strong>C</strong>ontrôler – « Cela répond-il à votre attente ? »<br><br><strong>Levier de négociation :</strong> ne jamais lâcher de remise sans contrepartie (volume, délai de paiement, durée d'engagement, témoignage).</p>` },
+      { heading: "PROTOCOLE 5 – Suivi CRM et fidélisation portefeuille", content: `<img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80" alt="Tableau de bord CRM" style="${imgStyle}"/><p><strong>Rituels hebdomadaires :</strong><br>• Mise à jour systématique du pipeline (date de closing, montant, probabilité).<br>• Relance des opportunités sans activité depuis 7 jours.<br>• Reporting hebdo manager (CA prévisionnel, taux de transformation).<br><br><strong>Plan de fidélisation client :</strong><br>1. Bilan trimestriel client (QBR).<br>2. Identification d'opportunités de cross-selling et up-selling.<br>3. Mesure du NPS (Net Promoter Score) post-livraison.<br>4. Programme parrainage / témoignage client.</p>` },
+    ];
+    refs = `<p>• Référentiel Titre Professionnel Négociateur Technico-Commercial – RNCP39063 (niveau 5)<br>• Fiche ROME D1402 – Relation commerciale grands comptes et entreprises<br>• Code de la consommation – CGV BtoB / délais de paiement (loi LME)<br>• RGPD – Prospection commerciale et consentement (CNIL)<br>• Référentiel APEC – Métiers commerciaux BtoB</p>`;
+  } else {
+    // Default: Esthétique
+    sections = [
+      { heading: "Introduction", content: `<p>Ce guide recense les protocoles essentiels du métier de <strong>${profile.metier}</strong> dans ${profile.secteur}. Il est remis au bénéficiaire comme ressource d'appui pendant la phase d'investigation du bilan.</p>` },
+      { heading: "PROTOCOLE 1 – Soin du visage classique", content: `<img src="https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=800&q=80" alt="Soin du visage" style="${imgStyle}"/><p><strong>Objectif :</strong> Nettoyer, purifier et hydrater la peau du visage.<br><br><strong>Matériel :</strong> Lait démaquillant, lotion tonique, gommage, vapozone, masque adapté, crème hydratante, cotons, spatule.<br><br><strong>Déroulé :</strong><br>1. Démaquillage (5 min).<br>2. Analyse de peau sous lampe loupe (3 min).<br>3. Gommage doux (5 min).<br>4. Vapozone pour ouvrir les pores (8 min).<br>5. Extraction des comédons (10 min).<br>6. Masque adapté (15 min).<br>7. Hydratation finale + protection solaire (5 min).</p>`, variant: "green" },
+      { heading: "PROTOCOLE 2 – Épilation à la cire", content: `<img src="https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=800&q=80" alt="Épilation professionnelle" style="${imgStyle}"/><p><strong>Matériel :</strong> Cire tiède ou chaude, chauffe-cire, bandes non-tissées, huile post-épilation, talc, spatules, gants.<br><br><strong>Déroulé :</strong><br>1. Désinfecter la zone, appliquer du talc.<br>2. Tester la température de la cire au poignet.<br>3. Appliquer dans le sens du poil, couche fine.<br>4. Retirer d'un geste sec dans le sens inverse.<br>5. Appliquer l'huile post-épilation.<br><br><strong>Précautions :</strong> contre-indications (varices, médicaments, coups de soleil), spatules à usage unique.</p>` },
+      { heading: "PROTOCOLE 3 – Manucure complète", content: `<img src="https://images.unsplash.com/photo-1604654894610-df63bc536371?w=800&q=80" alt="Manucure professionnelle" style="${imgStyle}"/><p><strong>Déroulé :</strong><br>1. Retrait du vernis (3 min).<br>2. Limage forme cliente (5 min).<br>3. Trempage des mains (5 min).<br>4. Soin des cuticules au bâtonnet (5 min).<br>5. Massage hydratant des mains (5 min).<br>6. Pose vernis : base, 2 couches, top coat (10 min).</p>` },
+      { heading: "PROTOCOLE 4 – Maquillage jour / naturel", content: `<img src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=800&q=80" alt="Maquillage professionnel" style="${imgStyle}"/><p><strong>Déroulé :</strong> hydratation + primer, fond de teint estompé, correcteur, poudre libre, sourcils structurés, ombre neutre + mascara, blush léger, baume teinté.</p>` },
+      { heading: "PROTOCOLE 5 – Beauté des pieds", content: `<img src="https://images.unsplash.com/photo-1519415510236-718bdfcd89c8?w=800&q=80" alt="Soin des pieds" style="${imgStyle}"/><p><strong>Déroulé :</strong> bain de pieds (10 min), gommage callosités (5 min), pierre ponce sur talons (5 min), soin des ongles (10 min), masque hydratant (10 min), massage + vernis (10 min).</p>` },
+    ];
+    refs = `<p>• Code de la santé publique – Normes d'hygiène en esthétique<br>• Référentiel CAP Esthétique Cosmétique Parfumerie – RNCP31041<br>• Fiche ROME D1208 – Soins esthétiques et corporels<br>• Guide INRS – Prévention des risques en institut de beauté</p>`;
+  }
+
+  sections.push({ heading: "Références et normes", content: refs });
+
+  return buildDocument({ org: o, title: `GUIDE DES PROTOCOLES – ${profile.label.toUpperCase()}`, subtitle: `Ressource pédagogique – Bilan de compétences`, sections });
 }
 
 // ===== CR4 - IND 19 : Tableau des bases métier =====
 export function genTableauBasesBDC(o: OrganismeInfo, f: FormationInfo) {
-  const domain = f.intitule || "Esthétique";
-  return buildDocument({ org: o, title: `TABLEAU DES BASES – ${domain.toUpperCase()}`, subtitle: `Référentiel technique – Bilan de compétences`, sections: [
-    { heading: "Introduction", content: `<p>Ce tableau récapitulatif présente les bases techniques essentielles du domaine de <strong>${domain}</strong>. Il est remis au bénéficiaire en tant que ressource d'appui lors de la phase d'investigation du bilan de compétences.</p>` },
-  ], table: { headers: ["Catégorie", "Technique / Produit", "Ingrédients / Composants clés", "Dosage / Application", "Précautions"], rows: [
-    ["SOINS VISAGE", "Démaquillage", "Lait démaquillant, eau micellaire", "Appliquer au coton, mouvements circulaires", "Éviter le contour des yeux avec produits agressifs"],
-    ["", "Gommage mécanique", "Grains de jojoba, poudre de noyau", "1 noisette, masser 3-5 min", "Peau sensible : grains fins uniquement"],
-    ["", "Gommage enzymatique", "Enzymes de papaye / ananas", "Poser 10 min sans frotter", "Contre-indiqué sur peau lésée"],
-    ["", "Masque purifiant", "Argile verte, kaolin", "Couche épaisse, poser 15 min", "Ne pas laisser sécher complètement"],
-    ["", "Masque hydratant", "Acide hyaluronique, aloe vera", "Couche fine, poser 15-20 min", "Adapter au type de peau"],
-    ["", "Modelage facial", "Huile d'amande douce, jojoba", "Pressions douces, 15 min", "Attention zones fragiles"],
-    ["ÉPILATION", "Cire tiède", "Résine, colophane, huile", "Chauffer 40-45°C, bandes", "Test température obligatoire"],
-    ["", "Cire chaude", "Cire d'abeille, résine", "Chauffer 55-60°C, sans bande", "Contre-indiqué : varices, irritations"],
-    ["", "Cire orientale", "Sucre, citron, eau", "Tiède, à la main ou spatule", "Naturelle, hypoallergénique"],
-    ["", "Post-épilation", "Huile végétale, bisabolol", "Appliquer en massage doux", "Pas d'exposition solaire 24h"],
-    ["MAQUILLAGE", "Base / Primer", "Silicone, acide hyaluronique", "Noisette, estomper au doigt", "Laisser sécher avant fond de teint"],
-    ["", "Fond de teint", "Pigments, émollients", "Adapter à la carnation", "Choisir texture selon type de peau"],
-    ["", "Poudre libre", "Talc, silice, amidon", "Pinceau large, tapotements", "Éviter excès sur peaux sèches"],
-    ["", "Contouring", "Poudre bronzante, highlighter", "Creux des joues, arête du nez", "Estomper impérativement"],
-    ["MANUCURE", "Limage", "Lime 180/240 grains", "Un seul sens, forme choisie", "Ne pas limer en va-et-vient"],
-    ["", "Soin cuticules", "Huile de ricin, bâtonnet buis", "Repousser après trempage", "Ne jamais couper les cuticules"],
-    ["", "Base coat", "Résine, nitrocellulose", "1 couche fine et uniforme", "Protège l'ongle de la coloration"],
-    ["", "Vernis semi-permanent", "Gel UV, photoinitiateurs", "2 couches, catalyser 60s UV", "Dépose à l'acétone, ne pas arracher"],
-    ["SOINS CORPS", "Gommage corporel", "Sel marin, sucre, huile coco", "Mouvements circulaires, rincer", "Éviter sur peau irritée"],
-    ["", "Enveloppement", "Algues, argile, boue thermale", "Couvrir 20-30 min, film alimentaire", "Vérifier allergies"],
-    ["", "Massage relaxant", "Huile d'argan, lavande", "Pressions moyennes, 30-45 min", "Contre-indications médicales"],
-    ["HYGIÈNE / SÉCURITÉ", "Stérilisation outils", "Autoclave, UV", "Après chaque client", "Norme NF EN ISO 15883"],
-    ["", "Désinfection surfaces", "Bactéricide virucide", "Spray + essuyage", "Porter des gants"],
-    ["", "Lavage des mains", "Savon antiseptique, SHA", "30 sec min, entre chaque soin", "Obligatoire avant/après tout soin"],
-  ] } });
+  const profile = getBdcDomainProfile(f);
+  const key = (f.intitule || "").toLowerCase();
+  const isMeca = /mecan|véhic|vehic|automob/i.test(key);
+  const isNTC = /negoc|technico|commerc/i.test(key);
+
+  let headers: string[] = [];
+  let rows: string[][] = [];
+
+  if (isMeca) {
+    headers = ["Catégorie", "Opération / Système", "Outils / Pièces clés", "Procédure / Couples", "Précautions sécurité"];
+    rows = [
+      ["ENTRETIEN PÉRIODIQUE", "Vidange moteur", "Clé à filtre, bac récupération, huile constructeur 5W30/0W20", "Bouchon : 25-30 N·m, joint neuf systématique", "Huile chaude – risque brûlure"],
+      ["", "Filtre à air / habitacle", "Tournevis, filtre OEM ou équivalent", "Sens de montage flèche flux d'air", "Vérifier joints d'étanchéité"],
+      ["", "Filtre à carburant diesel", "Clés plates, joints neufs", "Amorçage circuit obligatoire", "Risque incendie – ventiler"],
+      ["", "Bougies d'allumage", "Clé à bougie, clé dynamo", "Couple : 25 N·m, écartement constructeur", "Moteur froid uniquement"],
+      ["FREINAGE", "Plaquettes avant/arrière", "Repousse-piston, clé dynamo, graisse cuivre", "Vis étrier : 28-35 N·m", "Liquide DOT4 : pomper la pédale après remontage"],
+      ["", "Disques de frein", "Tournevis Torx, nettoyant frein", "Voile maxi 0,05 mm, épaisseur mini gravée", "Rodage 200 km doux après changement"],
+      ["", "Liquide de frein DOT4", "Purgeur, bocal, tuyau transparent", "Purger les 4 roues, ordre constructeur", "Liquide corrosif – protection peinture"],
+      ["DISTRIBUTION", "Courroie de distribution", "Outils calage constructeur, clé dynamo", "Tension contrôlée, repères PMH", "Erreur de calage = casse moteur"],
+      ["", "Chaîne de distribution", "Tendeur OEM, joints neufs", "Contrôle élongation, bruits anormaux", "Intervention complexe – atelier équipé"],
+      ["PNEUMATIQUES", "Montage / équilibrage", "Démonte-pneu, équilibreuse", "Pression à froid (étiquette portière)", "Sens de rotation respecté"],
+      ["", "Géométrie 3D", "Banc géométrie laser/caméras", "Carrossage, parallélisme, chasse constructeur", "Ressorts en bon état préalable"],
+      ["ÉLECTRIQUE BT", "Batterie 12V", "Pince ampèremétrique, multimètre", "Tension repos > 12,5 V, démarrage > 9,5 V", "Reprogrammation après débranchement"],
+      ["", "Alternateur / démarreur", "Multimètre, pince ampèremétrique", "Charge : 13,8 à 14,4 V à 2000 tr/min", "Attention courts-circuits"],
+      ["DIAGNOSTIC", "Lecture codes OBD-II", "Valise Bosch KTS / Launch X431", "Connecteur sous volant, contact +", "Effacer après réparation uniquement"],
+      ["", "Mesures capteurs", "Multimètre, oscilloscope", "Comparer aux valeurs RTA constructeur", "Risque court-circuit calculateur"],
+      ["VE / HYBRIDE (HT)", "Consignation HT", "Sectionneur, VAT, EPI 1000 V", "Temporisation 5-10 min, VAT obligatoire", "Habilitation B1L/B2L/BCL exigée"],
+      ["", "Batterie lithium-ion", "Outils isolés, gants 1000 V", "Ne jamais ouvrir un module HT", "Risque arc électrique mortel"],
+      ["CLIMATISATION", "Recharge R134a / R1234yf", "Station de recharge agréée", "Tirage au vide 30 min, charge au poids", "Habilitation fluides frigorigènes Cat. V"],
+      ["HYGIÈNE / SÉCURITÉ", "EPI atelier", "Gants nitrile, lunettes, chaussures S3", "Port obligatoire toute intervention", "Code du travail – EPI à jour"],
+      ["", "Levage véhicule", "Pont 2 ou 4 colonnes, chandelles", "Points de levage constructeur uniquement", "Vérification annuelle obligatoire"],
+    ];
+  } else if (isNTC) {
+    headers = ["Étape commerciale", "Outil / Méthode", "Données clés", "Indicateurs", "Points de vigilance"];
+    rows = [
+      ["PROSPECTION", "Définition ICP", "Secteur, taille, CA, décideur, géographie", "Nombre de comptes ciblés", "Affiner après chaque campagne"],
+      ["", "LinkedIn Sales Navigator", "Filtres avancés, alertes, lead lists", "Taux d'acceptation > 30 %", "Personnaliser chaque invitation"],
+      ["", "E-mailing personnalisé (Lemlist, Waalaxy)", "Objet < 50 caractères, AIDA, signature pro", "Taux d'ouverture > 35 %, réponse > 8 %", "Respect RGPD / opt-out clair"],
+      ["", "Cold call (téléphone)", "Méthode CROC : Contact, Raison, Objectif, Conclusion", "Taux RDV / appels décrochés > 15 %", "Ne jamais lire un script mot à mot"],
+      ["DÉCOUVERTE", "Méthode SPIN", "Situation, Problème, Implication, Need-payoff", "Durée RDV 30-45 min", "80 % d'écoute, 20 % de parole"],
+      ["", "Méthode SONCAS", "Sécurité, Orgueil, Nouveauté, Confort, Argent, Sympathie", "Profil détecté en 10 min", "Adapter l'argumentaire au profil"],
+      ["", "Compte rendu CRM", "Besoins, contexte, BANT, prochaine étape", "100 % des RDV CR sous 24 h", "Sans CR : pas de suivi possible"],
+      ["PROPOSITION", "Argumentaire CAP", "Caractéristique → Avantage → Preuve", "1 CAP par bénéfice client", "Toujours chiffrer le ROI"],
+      ["", "Devis / proposition commerciale", "Reformulation besoin, solution, planning, prix, CGV", "Délai d'envoi < 48 h", "Validité de l'offre limitée (15-30 j)"],
+      ["", "Calcul de marge", "PV = PA / (1 - taux marge)", "Marge brute > 25 % minimum", "Ne pas brader sans contrepartie"],
+      ["NÉGOCIATION", "Méthode CRAC objections", "Creuser, Reformuler, Argumenter, Contrôler", "100 % des objections traitées", "Ne jamais couper la parole"],
+      ["", "Échiquier des concessions", "Lister les contreparties possibles à l'avance", "Ratio concession/contrepartie 1:1", "Préparer 3 niveaux de remise"],
+      ["", "Closing", "Alternative, accord partiel, urgence", "Taux de transformation > 25 %", "Toujours demander la commande"],
+      ["CONTRACTUALISATION", "Bon de commande / contrat", "CGV, ADV, modalités de paiement", "Signature dans les 7 j", "Vérifier RIB et conditions"],
+      ["", "Délais de paiement (LME)", "30 j fin de mois max BtoB", "DSO < 45 j", "Pénalités de retard légales"],
+      ["FIDÉLISATION", "QBR (Quarterly Business Review)", "Bilan trimestriel client + plan d'action", "1 QBR / trimestre / compte clé", "Préparer slides + données chiffrées"],
+      ["", "NPS (Net Promoter Score)", "« Recommanderiez-vous… ? » 0-10", "NPS > 50 = excellent", "Relancer les détracteurs"],
+      ["", "Cross-sell / Up-sell", "Identifier nouveaux besoins / montée en gamme", "+ 15 % CA portefeuille / an", "Ne pas saturer le client"],
+      ["PILOTAGE", "Tableau de bord CRM", "Pipeline, prévisionnel, taux closing, vélocité", "Mise à jour quotidienne", "Données fausses = prévisions fausses"],
+      ["RGPD", "Consentement prospect", "Base légale (intérêt légitime BtoB)", "Registre des traitements à jour", "Droit d'opposition à respecter"],
+    ];
+  } else {
+    // Default: Esthétique (existing data)
+    headers = ["Catégorie", "Technique / Produit", "Ingrédients / Composants clés", "Dosage / Application", "Précautions"];
+    rows = [
+      ["SOINS VISAGE", "Démaquillage", "Lait démaquillant, eau micellaire", "Appliquer au coton, mouvements circulaires", "Éviter le contour des yeux avec produits agressifs"],
+      ["", "Gommage mécanique", "Grains de jojoba, poudre de noyau", "1 noisette, masser 3-5 min", "Peau sensible : grains fins uniquement"],
+      ["", "Gommage enzymatique", "Enzymes de papaye / ananas", "Poser 10 min sans frotter", "Contre-indiqué sur peau lésée"],
+      ["", "Masque purifiant", "Argile verte, kaolin", "Couche épaisse, poser 15 min", "Ne pas laisser sécher complètement"],
+      ["", "Masque hydratant", "Acide hyaluronique, aloe vera", "Couche fine, poser 15-20 min", "Adapter au type de peau"],
+      ["", "Modelage facial", "Huile d'amande douce, jojoba", "Pressions douces, 15 min", "Attention zones fragiles"],
+      ["ÉPILATION", "Cire tiède", "Résine, colophane, huile", "Chauffer 40-45°C, bandes", "Test température obligatoire"],
+      ["", "Cire chaude", "Cire d'abeille, résine", "Chauffer 55-60°C, sans bande", "Contre-indiqué : varices, irritations"],
+      ["", "Cire orientale", "Sucre, citron, eau", "Tiède, à la main ou spatule", "Naturelle, hypoallergénique"],
+      ["", "Post-épilation", "Huile végétale, bisabolol", "Appliquer en massage doux", "Pas d'exposition solaire 24h"],
+      ["MAQUILLAGE", "Base / Primer", "Silicone, acide hyaluronique", "Noisette, estomper au doigt", "Laisser sécher avant fond de teint"],
+      ["", "Fond de teint", "Pigments, émollients", "Adapter à la carnation", "Choisir texture selon type de peau"],
+      ["", "Poudre libre", "Talc, silice, amidon", "Pinceau large, tapotements", "Éviter excès sur peaux sèches"],
+      ["", "Contouring", "Poudre bronzante, highlighter", "Creux des joues, arête du nez", "Estomper impérativement"],
+      ["MANUCURE", "Limage", "Lime 180/240 grains", "Un seul sens, forme choisie", "Ne pas limer en va-et-vient"],
+      ["", "Soin cuticules", "Huile de ricin, bâtonnet buis", "Repousser après trempage", "Ne jamais couper les cuticules"],
+      ["", "Base coat", "Résine, nitrocellulose", "1 couche fine et uniforme", "Protège l'ongle de la coloration"],
+      ["", "Vernis semi-permanent", "Gel UV, photoinitiateurs", "2 couches, catalyser 60s UV", "Dépose à l'acétone, ne pas arracher"],
+      ["SOINS CORPS", "Gommage corporel", "Sel marin, sucre, huile coco", "Mouvements circulaires, rincer", "Éviter sur peau irritée"],
+      ["", "Enveloppement", "Algues, argile, boue thermale", "Couvrir 20-30 min, film alimentaire", "Vérifier allergies"],
+      ["", "Massage relaxant", "Huile d'argan, lavande", "Pressions moyennes, 30-45 min", "Contre-indications médicales"],
+      ["HYGIÈNE / SÉCURITÉ", "Stérilisation outils", "Autoclave, UV", "Après chaque client", "Norme NF EN ISO 15883"],
+      ["", "Désinfection surfaces", "Bactéricide virucide", "Spray + essuyage", "Porter des gants"],
+      ["", "Lavage des mains", "Savon antiseptique, SHA", "30 sec min, entre chaque soin", "Obligatoire avant/après tout soin"],
+    ];
+  }
+
+  return buildDocument({ org: o, title: `TABLEAU DES BASES – ${profile.label.toUpperCase()}`, subtitle: `Référentiel technique – Bilan de compétences`, sections: [
+    { heading: "Introduction", content: `<p>Ce tableau récapitulatif présente les bases techniques essentielles du métier de <strong>${profile.metier}</strong> dans ${profile.secteur}. Il est remis au bénéficiaire en tant que ressource d'appui lors de la phase d'investigation du bilan de compétences.</p>` },
+  ], table: { headers, rows } });
 }
 
 // ===== CR5 - IND 21 : Fiche de poste consultant bilan =====
