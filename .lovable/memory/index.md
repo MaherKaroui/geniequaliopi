@@ -85,6 +85,7 @@ Unfinished training (latest end date not passed): final evaluations/tests must r
 - [logic/cfa-domain-coherence-logic](mem://logic/cfa-domain-coherence-logic) — Partial filling for ongoing sessions based on current date
 - [features/document-templates/bdc-monitoring](mem://features/document-templates/bdc-monitoring) — BDC IND 23/24/25 consolidated Fiche de Veille
 - [features/document-templates/bdc-action-type](mem://features/document-templates/bdc-action-type) — BDC terminology (bénéficiaire) and removed signatures
+- [features/document-templates/bdc-personalization](mem://features/document-templates/bdc-personalization) — BDC proofs personalized per beneficiary and coherent with CAP esthétique, CAP mécanique, NTC
 - [logic/completion-status-logic](mem://logic/completion-status-logic) — isFormationTerminee based on latest end date
 - [features/audit/ey-control-bac-pro](mem://features/audit/ey-control-bac-pro) — Bac Pro 22 docs for 9 trainees with high scores
 - [features/document-templates/vae-pack](mem://features/document-templates/vae-pack) — VAE Livret 2, Séquençage, and role signatures

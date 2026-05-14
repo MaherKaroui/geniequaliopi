@@ -39,6 +39,142 @@ function phasesDates(f: FormationInfo) {
   return { p1: { start: fmt(d0), end: fmt(p1End) }, p2: { start: fmt(p2Start), end: fmt(p2End) }, p3: { start: fmt(p3Start), end: fmt(dEnd) } };
 }
 
+type BdcDomainProfile = {
+  label: string;
+  metier: string;
+  secteur: string;
+  missions: string[];
+  techniques: string[];
+  transversales: string[];
+  contraintes: string[];
+  formations: string[];
+  opportunites: string[];
+  axes: string[];
+  veilleReglementaire: { intitule: string; source: string; lien: string; date: string; exploitation: string };
+  veilleMetier: { intitule: string; source: string; lien: string; date: string; exploitation: string };
+  veilleTechnologique: { intitule: string; source: string; lien: string; date: string; exploitation: string };
+};
+
+function normalizeBdc(value: string): string {
+  return (value || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
+
+function listHtml(items: string[]): string {
+  return `<p>${items.map((item) => `• ${item}`).join("<br>")}</p>`;
+}
+
+function deterministicIndex(s: StagiaireInfo | undefined, si: number, length: number, offset = 0): number {
+  if (length <= 0) return 0;
+  const raw = `${s?.prenom || ""}${s?.nom || ""}${s?.email || ""}${si}`;
+  const sum = raw.split("").reduce((acc, char, idx) => acc + char.charCodeAt(0) * (idx + 3), 0);
+  return Math.abs(sum + si * 37 + offset * 53) % length;
+}
+
+function pickForBeneficiaire(s: StagiaireInfo | undefined, si: number, items: string[], offset = 0): string {
+  return items[deterministicIndex(s, si, items.length, offset)] || items[0] || "";
+}
+
+function getBdcDomainProfile(f: FormationInfo): BdcDomainProfile {
+  const key = normalizeBdc(f.intitule || "");
+  if (key.includes("esthetique") || key.includes("cosmetique") || key.includes("parfumerie")) {
+    return {
+      label: "CAP Esthétique Cosmétique Parfumerie",
+      metier: "esthéticien(ne)-cosméticien(ne)",
+      secteur: "instituts de beauté, parfumeries, spas et espaces bien-être",
+      missions: ["accueillir et conseiller la clientèle", "réaliser des soins visage et corps", "effectuer les épilations, manucures et maquillages", "vendre des produits cosmétiques et parfums", "appliquer les règles strictes d'hygiène et de sécurité"],
+      techniques: ["diagnostic de peau et protocole de soin visage", "épilation à la cire et soins post-épilation", "maquillage jour/soir et conseil image", "manucure, beauté des pieds et pose de vernis", "vente-conseil en cosmétique et parfumerie"],
+      transversales: ["écoute client et reformulation du besoin", "sens esthétique et précision du geste", "hygiène professionnelle irréprochable", "gestion du planning de rendez-vous", "posture commerciale en cabine et en boutique"],
+      contraintes: ["station debout prolongée et gestes répétitifs", "travail possible le samedi et en horaires élargis", "respect rigoureux des protocoles d'hygiène", "contact clientèle permanent", "nécessité de suivre les tendances beauté"],
+      formations: ["CAP Esthétique Cosmétique Parfumerie", "CQP spa praticien ou maquillage conseil", "formation hygiène/salubrité selon prestations", "perfectionnement vente-conseil en parfumerie"],
+      opportunites: ["emploi en institut de beauté", "poste de conseillère en parfumerie", "spécialisation soins visage/corps", "création d'une activité indépendante à domicile ou en cabine", "évolution vers responsable d'institut"],
+      axes: ["renforcer la précision des protocoles de soin", "gagner en aisance dans la vente conseil", "sécuriser les règles d'hygiène en cabine", "structurer un projet d'installation indépendante"],
+      veilleReglementaire: { intitule: "Actualisation des obligations d'hygiène pour les prestations esthétiques", source: "Légifrance – Code de la santé publique et règles d'hygiène applicables", lien: "https://www.legifrance.gouv.fr", date: "Décembre 2024", exploitation: "Point intégré aux entretiens sur les conditions réelles d'exercice en institut : hygiène du matériel, traçabilité des produits, contre-indications et information client. Les bénéficiaires orientés vers l'indépendance reçoivent une vigilance spécifique sur les obligations sanitaires." },
+      veilleMetier: { intitule: "Évolution des métiers beauté : soins naturels, expérience client et vente omnicanale", source: "CIDJ – Fiche métier esthéticienne-cosméticienne", lien: "https://www.cidj.com", date: "Janvier 2025", exploitation: "Utilisé pendant l'enquête métier pour comparer les environnements institut, parfumerie et activité indépendante. Les plans d'action intègrent les compétences de conseil, fidélisation client et visibilité digitale." },
+      veilleTechnologique: { intitule: "Nouveaux équipements de soin visage, diagnostic peau et outils de réservation", source: "Esthétique Pro – veille équipements et gestion d'institut", lien: "https://www.esthetique-pro.fr", date: "Février 2025", exploitation: "Présenté en phase d'investigation pour identifier les investissements utiles, les limites réglementaires et les compétences numériques nécessaires à la gestion d'une clientèle." },
+    };
+  }
+  if (key.includes("mecanique") || key.includes("vehicule") || key.includes("automobile")) {
+    return {
+      label: "CAP Maintenance des véhicules / Mécanique automobile",
+      metier: "mécanicien(ne) de maintenance automobile",
+      secteur: "garages, concessions, centres auto et ateliers de maintenance véhicules",
+      missions: ["réaliser un diagnostic de premier niveau", "effectuer l'entretien courant d'un véhicule", "remplacer les pièces d'usure et contrôler les organes de sécurité", "utiliser les outils de diagnostic électronique", "expliquer les interventions au client ou au réceptionnaire"],
+      techniques: ["lecture d'un ordre de réparation et diagnostic simple", "vidange, freinage, pneumatiques et trains roulants", "contrôle moteur, batterie et circuits électriques", "utilisation d'une valise de diagnostic", "respect des procédures sécurité atelier"],
+      transversales: ["rigueur dans le contrôle qualité", "méthode et sens de l'observation", "respect des consignes de sécurité", "communication avec l'équipe atelier", "gestion du temps sur intervention"],
+      contraintes: ["postures physiques et manutention", "respect strict des règles sécurité atelier", "évolution rapide des motorisations hybrides/électriques", "travail sous délais en atelier", "besoin de précision dans la traçabilité des interventions"],
+      formations: ["CAP Maintenance des véhicules option voitures particulières", "habilitation électrique véhicules hybrides/électriques", "formation diagnostic électronique", "stage constructeur ou centre auto sur nouveaux équipements"],
+      opportunites: ["emploi en garage indépendant", "poste en centre auto ou concession", "spécialisation diagnostic électronique", "évolution vers réceptionnaire atelier", "création d'un atelier mobile ou service entretien"],
+      axes: ["consolider le diagnostic électrique de base", "renforcer la méthodologie de recherche de panne", "sécuriser les gestes atelier et EPI", "développer la relation client autour du devis"],
+      veilleReglementaire: { intitule: "Sécurité atelier et interventions sur véhicules électriques/hybrides", source: "INRS – Prévention des risques en réparation automobile", lien: "https://www.inrs.fr", date: "Novembre 2024", exploitation: "Exploitée pour rappeler les exigences de sécurité, EPI, consignation et limites d'intervention. Les bénéficiaires visant l'atelier sont orientés vers les habilitations nécessaires." },
+      veilleMetier: { intitule: "Mutation du métier de mécanicien automobile avec l'électrification du parc", source: "France Travail – Fiche métier maintenance automobile", lien: "https://www.francetravail.fr", date: "Janvier 2025", exploitation: "Support d'analyse des débouchés en garage, concession et centre auto. Le plan d'action valorise la maintenance courante et prévoit une montée en compétence diagnostic électronique." },
+      veilleTechnologique: { intitule: "Diagnostic électronique, ADAS et outils connectés en atelier", source: "Auto Infos – innovations après-vente automobile", lien: "https://www.autoinfos.fr", date: "Mars 2025", exploitation: "Intégré aux enquêtes métier pour montrer l'importance des valises diagnostic, calibrage ADAS et documentation technique numérique dans l'employabilité." },
+    };
+  }
+  if (key.includes("negociateur") || key.includes("technico") || key.includes("commercial")) {
+    return {
+      label: "Négociateur Technico-Commercial",
+      metier: "négociateur(trice) technico-commercial(e)",
+      secteur: "vente BtoB, prospection commerciale, solutions techniques et relation client",
+      missions: ["prospecter un portefeuille clients", "analyser un besoin technique et commercial", "construire une proposition argumentée", "négocier les conditions de vente", "suivre la relation client et le reporting CRM"],
+      techniques: ["qualification des prospects et découverte besoin", "argumentaire SONCAS/CAP et traitement objections", "chiffrage d'une offre et marge commerciale", "négociation et closing", "utilisation CRM, pipeline et relances"],
+      transversales: ["aisance orale et écoute active", "organisation de la prospection", "résilience face au refus", "analyse des besoins client", "suivi administratif et reporting"],
+      contraintes: ["objectifs chiffrés et pression commerciale", "déplacements possibles", "nécessité d'une relance régulière", "maîtrise des caractéristiques techniques de l'offre", "forte exigence de traçabilité dans le CRM"],
+      formations: ["Titre professionnel Négociateur Technico-Commercial", "formation prospection et techniques de vente", "perfectionnement CRM et social selling", "formation négociation BtoB"],
+      opportunites: ["poste de commercial terrain ou sédentaire", "business developer BtoB", "chargé d'affaires junior", "évolution vers responsable commercial", "création d'une activité d'agent commercial"],
+      axes: ["structurer la prospection hebdomadaire", "renforcer le traitement des objections", "améliorer la découverte des besoins techniques", "professionnaliser le suivi CRM et les relances"],
+      veilleReglementaire: { intitule: "Encadrement de la prospection commerciale, RGPD et consentement", source: "CNIL – Prospection commerciale et données personnelles", lien: "https://www.cnil.fr", date: "Octobre 2024", exploitation: "Utilisé pour sécuriser les pratiques de prospection, qualification des fichiers et conservation des données. Les bénéficiaires intègrent une étape RGPD dans leur plan d'action commercial." },
+      veilleMetier: { intitule: "Évolution des métiers commerciaux BtoB : hybride, CRM et social selling", source: "APEC – Tendances métiers commerciaux", lien: "https://www.apec.fr", date: "Janvier 2025", exploitation: "Mobilisé pendant l'enquête métier pour distinguer vente terrain, sédentaire et business development. Les plans d'action ciblent les compétences CRM, prospection et négociation." },
+      veilleTechnologique: { intitule: "CRM, automatisation des relances et IA d'aide à la vente", source: "HubSpot France – tendances CRM et sales enablement", lien: "https://www.hubspot.fr", date: "Février 2025", exploitation: "Exploité pour montrer l'impact des outils CRM, séquences e-mail et tableaux de bord sur la performance commerciale et l'organisation personnelle." },
+    };
+  }
+  return {
+    label: f.intitule || "Bilan de compétences",
+    metier: `professionnel(le) du domaine ${f.intitule || "visé"}`,
+    secteur: f.intitule || "secteur professionnel visé",
+    missions: ["analyser les activités clés du métier visé", "identifier les compétences transférables", "vérifier les conditions réelles d'exercice", "rencontrer ou interroger un professionnel", "formaliser un plan d'action réaliste"],
+    techniques: ["analyse du parcours et portefeuille de compétences", "enquête métier et recherche documentaire", "identification des écarts de compétences", "construction d'un projet réaliste", "formalisation du plan d'action"],
+    transversales: ["communication professionnelle", "organisation", "adaptabilité", "autonomie", "capacité d'analyse"],
+    contraintes: ["contraintes de rythme et disponibilité", "besoin de sécuriser le financement", "validation progressive du projet", "mise à jour des compétences", "nécessité de confronter le projet au terrain"],
+    formations: ["formation certifiante adaptée au projet", "stage d'immersion ou PMSMP", "modules courts de remise à niveau", "accompagnement à la recherche d'emploi ou création d'activité"],
+    opportunites: ["reconversion sécurisée", "mobilité interne ou externe", "formation qualifiante", "création d'activité", "spécialisation progressive"],
+    axes: ["clarifier le projet professionnel", "renforcer les compétences transférables", "confronter le projet au marché", "organiser les étapes de transition"],
+    veilleReglementaire: { intitule: "Évolutions des dispositifs de reconversion et financement", source: "Ministère du Travail – formation professionnelle", lien: "https://travail-emploi.gouv.fr", date: "Janvier 2025", exploitation: "Exploitée pour sécuriser les choix de financement, CPF, transition professionnelle et accompagnement post-bilan." },
+    veilleMetier: { intitule: `Tendances emploi et compétences dans le secteur ${f.intitule || "visé"}`, source: "France Travail – fiches métiers et marché du travail", lien: "https://www.francetravail.fr", date: "Février 2025", exploitation: "Utilisée pour vérifier les débouchés, compétences attendues et conditions d'accès au métier visé." },
+    veilleTechnologique: { intitule: "Outils numériques de recherche métier, CV et suivi du plan d'action", source: "France Compétences – ressources orientation et compétences", lien: "https://www.francecompetences.fr", date: "Mars 2025", exploitation: "Présentée pour structurer les recherches, suivre les candidatures et documenter les compétences à développer." },
+  };
+}
+
+function bdcPersonalisation(f: FormationInfo, s: StagiaireInfo | undefined, si: number) {
+  const profile = getBdcDomainProfile(f);
+  const objectif = pickForBeneficiaire(s, si, [
+    `valider une reconversion vers le métier de ${profile.metier}`,
+    `sécuriser une évolution professionnelle dans ${profile.secteur}`,
+    `confirmer la faisabilité d'un projet dans ${profile.secteur}`,
+    `construire un plan d'action avant d'intégrer une formation ou un poste en lien avec ${profile.label}`,
+  ], 1);
+  return {
+    profile,
+    objectif,
+    technique: pickForBeneficiaire(s, si, profile.techniques, 2),
+    techniqueSecondaire: pickForBeneficiaire(s, si, profile.techniques, 3),
+    transversal: pickForBeneficiaire(s, si, profile.transversales, 4),
+    axe: pickForBeneficiaire(s, si, profile.axes, 5),
+    contrainte: pickForBeneficiaire(s, si, profile.contraintes, 6),
+    opportunite: pickForBeneficiaire(s, si, profile.opportunites, 7),
+    formation: pickForBeneficiaire(s, si, profile.formations, 8),
+    financement: pickForBeneficiaire(s, si, ["CPF", "Projet de transition professionnelle", "autofinancement sécurisé", "France Travail / CPF", "plan de développement des compétences"], 9),
+    rythme: pickForBeneficiaire(s, si, ["séances en journée avec travail personnel entre deux rendez-vous", "rythme hebdomadaire compatible avec les obligations personnelles", "accompagnement mixte avec recherches guidées entre les séances", "créneaux réguliers pour maintenir la dynamique du projet"], 10),
+    pointFort: pickForBeneficiaire(s, si, ["capacité d'analyse", "motivation constante", "sens de l'organisation", "aisance relationnelle", "rigueur dans les recherches"], 11),
+    vigilance: pickForBeneficiaire(s, si, ["formaliser les étapes du projet", "confronter le projet à des professionnels", "chiffrer le financement et le calendrier", "renforcer la confiance en situation d'entretien", "prioriser les actions à court terme"], 12),
+    commentaireSatisfaction: pickForBeneficiaire(s, si, [
+      `Les échanges m'ont aidé(e) à clarifier mon projet vers ${profile.metier} et à identifier les étapes concrètes.`,
+      `L'enquête métier et le plan d'action m'ont permis de mieux comprendre les exigences de ${profile.secteur}.`,
+      `Les outils utilisés ont mis en évidence mes compétences transférables et les points à renforcer.`,
+      `L'accompagnement m'a donné une vision réaliste des débouchés et des formations possibles.`,
+    ], 13),
+  };
+}
+
 // ===== CR1 - IND 1 : Programme du bilan =====
 export function genProgrammeBDC(o: OrganismeInfo, f: FormationInfo) {
   const ph = phasesDates(f);
@@ -62,15 +198,16 @@ export function genEvaluationBesoins(o: OrganismeInfo, f: FormationInfo, stagiai
   const s = stagiaires[si] || stagiaires[0];
   const ref = s?.dateDebutFormation || f.dateDebut || "";
   const dt = ref ? formatDate(subtractBusinessDays(ref, 20)) : new Date().toLocaleDateString("fr-FR");
-  return buildDocument({ org: o, title: "ÉVALUATION DES BESOINS", subtitle: `Bilan de compétences – ${f.intitule}`, stagiaires: [s], sections: [
-    { heading: "Identification", content: `<p><strong>Date :</strong> ${dt}<br><strong>Nom :</strong> ${s.nom}<br><strong>Prénom :</strong> ${s.prenom}<br><strong>E-mail :</strong> ${s.email || "—"}<br><strong>Formation souhaitée :</strong> Bilan de compétences – ${f.intitule}</p>` },
-    { heading: "1) Éléments à prendre en considération (handicap, problème de santé, besoin particulier)", content: "<p>Aucun besoin particulier signalé.</p>" },
-    { heading: "2) Nos adaptations possibles", content: "<p>• Handicap / Maladie : adaptation des rythmes et contenus<br>• Contenus : outils et méthodes adaptés<br>• Accompagnement : durée, emploi du temps, rythme personnalisé</p>" },
-    { heading: "3) Quel est votre objectif professionnel à travers ce bilan ?", content: `<p>Faire le point sur mon parcours en ${f.intitule} afin d'envisager une évolution professionnelle. Identifier mes atouts, axes d'amélioration et opportunités d'évolution.</p>`, variant: "green" },
-    { heading: "4) Domaines spécifiques à approfondir ?", content: `<p>• Renforcement des compétences techniques en ${f.intitule}<br>• Développement de compétences transversales : communication, gestion du stress, leadership</p>` },
-    { heading: "5) Format préféré ?", content: `<p>${f.modalites || "Présentiel"}</p>` },
-    { heading: "6) Préférences horaires ?", content: "<p>En journée</p>" },
-    { heading: "7) Moyens de financement envisagés ?", content: "<p>CPF / Autofinancement</p>" },
+  const p = bdcPersonalisation(f, s, si);
+  return buildDocument({ org: o, title: "ÉVALUATION DES BESOINS", subtitle: `Bilan de compétences – ${p.profile.label}`, stagiaires: [s], sections: [
+    { heading: "Identification", content: `<p><strong>Date :</strong> ${dt}<br><strong>Nom :</strong> ${s.nom}<br><strong>Prénom :</strong> ${s.prenom}<br><strong>E-mail :</strong> ${s.email || "—"}<br><strong>Formation souhaitée :</strong> Bilan de compétences – ${p.profile.label}</p>` },
+    { heading: "1) Éléments à prendre en considération (handicap, problème de santé, besoin particulier)", content: `<p>Aucun aménagement médical déclaré lors du pré-entretien. Point de vigilance personnel identifié : <strong>${p.contrainte}</strong>. L'accompagnement prévoit un rythme compatible avec cette contrainte.</p>` },
+    { heading: "2) Nos adaptations possibles", content: `<p>• Entretiens individualisés centrés sur le projet ${p.profile.metier}<br>• Supports métier ciblés : fiches ROME, référentiels CAP/titre, offres d'emploi et enquêtes terrain<br>• Exercices adaptés : analyse d'expérience, portefeuille de compétences, plan d'action ${p.profile.secteur}<br>• Ajustement du rythme : ${p.rythme}</p>` },
+    { heading: "3) Quel est votre objectif professionnel à travers ce bilan ?", content: `<p>Je souhaite ${p.objectif}. Mon besoin principal est de vérifier l'adéquation entre mon parcours, mes contraintes et les réalités du secteur : <strong>${p.profile.secteur}</strong>.</p>`, variant: "green" },
+    { heading: "4) Domaines spécifiques à approfondir ?", content: `<p>• Compétence technique prioritaire : <strong>${p.technique}</strong><br>• Compétence complémentaire : <strong>${p.techniqueSecondaire}</strong><br>• Compétence transversale à valoriser : <strong>${p.transversal}</strong><br>• Axe de progression personnel : <strong>${p.axe}</strong></p>` },
+    { heading: "5) Format préféré ?", content: `<p>${f.modalites || "Présentiel"} – avec recherches guidées entre les séances et restitution individuelle.</p>` },
+    { heading: "6) Préférences horaires ?", content: `<p>${p.rythme}.</p>` },
+    { heading: "7) Moyens de financement envisagés ?", content: `<p>${p.financement}. Le financement sera sécurisé dans le plan d'action final avec les démarches et échéances correspondantes.</p>` },
   ], signatures: { type: "2", labels: [`${g(s, "Le Consultant", "La Consultante")}`, `${g(s, "Le Bénéficiaire", "La Bénéficiaire")}`], names: [consultantName(o), beneficiaireLabel(s)], dates: [dt, dt] } });
 }
 
@@ -109,15 +246,17 @@ export function genDerouleModalitesBDC(o: OrganismeInfo, f: FormationInfo) {
 // ===== CR2 - IND 6 : Questionnaire enquête métier =====
 export function genEnqueteMetierBDC(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = stagiaires[si] || stagiaires[0];
-  return buildDocument({ org: o, title: "BILAN DE COMPÉTENCES – ENQUÊTE MÉTIER", subtitle: `Domaine exploré : ${f.intitule}`, stagiaires: [s], sections: [
+  const p = bdcPersonalisation(f, s, si);
+  return buildDocument({ org: o, title: "BILAN DE COMPÉTENCES – ENQUÊTE MÉTIER", subtitle: `Domaine exploré : ${p.profile.label}`, stagiaires: [s], sections: [
     { heading: "1. Identification du bénéficiaire", content: `<p><strong>Nom :</strong> ${s.nom}<br><strong>Prénom :</strong> ${s.prenom}<br><strong>Date de naissance :</strong> ${s.dateNaissance ? formatDate(s.dateNaissance) : "—"}<br><strong>E-mail :</strong> ${s.email || "—"}${s.telephone?.trim() ? `<br><strong>Téléphone :</strong> ${s.telephone}` : ""}</p>` },
-    { heading: "2. Cadre du bilan", content: `<p><strong>Consultant(e) :</strong> ${consultantName(o)}<br><strong>Organisme :</strong> ${o.nom}<br><strong>Domaine exploré :</strong> ${f.intitule}<br><strong>Date de l'entretien :</strong> ${startDate(s, f)}</p>` },
-    { heading: "3. Objectifs de l'enquête métier", content: `<p>• Comprendre les missions et responsabilités principales du métier visé dans le domaine de ${f.intitule}.<br>• Identifier les compétences techniques et transversales indispensables.<br>• Évaluer la cohérence entre le projet professionnel du bénéficiaire et les exigences du secteur.<br>• Mettre en lumière les contraintes, conditions de travail et opportunités d'évolution.<br>• Valider la motivation et définir les pistes de formation nécessaires.</p>`, variant: "green" },
-    { heading: "4. Présentation du métier", content: `<p>Le métier dans le domaine de ${f.intitule} implique :<br>• Maîtrise des techniques spécifiques au secteur<br>• Application des normes et réglementations en vigueur<br>• Gestion de la relation client/usager<br>• Veille sectorielle et formation continue</p>` },
-    { heading: "5. Compétences requises", content: "<p><strong>Techniques professionnelles :</strong><br>• Maîtrise des techniques de base et avancées du secteur<br>• Utilisation des outils et équipements spécifiques<br>• Connaissance des normes réglementaires<br><br><strong>Compétences transversales :</strong><br>• Organisation et gestion du temps<br>• Communication et travail en équipe<br>• Adaptabilité et résolution de problèmes</p>" },
-    { heading: "6. Formations recommandées", content: `<p>• Certifications et diplômes du secteur de ${f.intitule}<br>• Stages de perfectionnement<br>• Formation continue et mise à jour des compétences</p>` },
-    { heading: "7. Perspectives d'emploi", content: `<p>• Secteur dynamique avec des opportunités variées<br>• Évolutions possibles : spécialisation, management, création d'entreprise<br>• Cohérence avec le projet du bénéficiaire validée</p>` },
-    { heading: "8. Conclusion", content: `<p>Le métier est en cohérence avec le projet de reconversion ou d'évolution exprimé par ${g(s, "le", "la")} bénéficiaire. Les compétences identifiées et les formations recommandées sont documentées dans le plan d'action.</p>` },
+    { heading: "2. Cadre du bilan", content: `<p><strong>Consultant(e) :</strong> ${consultantName(o)}<br><strong>Organisme :</strong> ${o.nom}<br><strong>Métier exploré :</strong> ${p.profile.metier}<br><strong>Domaine :</strong> ${p.profile.secteur}<br><strong>Date de l'entretien :</strong> ${startDate(s, f)}</p>` },
+    { heading: "3. Objectifs de l'enquête métier", content: `<p>• Vérifier la cohérence du projet de ${beneficiaireLabel(s)} : <strong>${p.objectif}</strong>.<br>• Comprendre les missions, contraintes et débouchés du métier de <strong>${p.profile.metier}</strong>.<br>• Identifier les compétences déjà transférables et les écarts à combler.<br>• Repérer les formations ou immersions nécessaires pour sécuriser le parcours.</p>`, variant: "green" },
+    { heading: "4. Présentation du métier", content: `<p>Le métier de <strong>${p.profile.metier}</strong> s'exerce principalement dans ${p.profile.secteur}. Les missions observées sont :</p>${listHtml(p.profile.missions)}` },
+    { heading: "5. Compétences requises", content: `<p><strong>Techniques professionnelles :</strong></p>${listHtml(p.profile.techniques)}<p><strong>Compétences transversales :</strong></p>${listHtml(p.profile.transversales)}<p><strong>Point ciblé pour ${beneficiaireLabel(s)} :</strong> ${p.technique} et ${p.transversal}.</p>` },
+    { heading: "6. Contraintes et points de vigilance", content: `${listHtml(p.profile.contraintes)}<p><strong>Vigilance personnelle retenue :</strong> ${p.contrainte}. Une action dédiée sera prévue dans le plan d'action.</p>` },
+    { heading: "7. Formations recommandées", content: `${listHtml(p.profile.formations)}<p><strong>Priorité proposée :</strong> ${p.formation}.</p>` },
+    { heading: "8. Perspectives d'emploi", content: `${listHtml(p.profile.opportunites)}<p><strong>Piste prioritaire pour ${beneficiaireLabel(s)} :</strong> ${p.opportunite}.</p>` },
+    { heading: "9. Conclusion", content: `<p>L'enquête métier confirme que le projet est cohérent avec les motivations exprimées par ${g(s, "le", "la")} bénéficiaire, sous réserve de travailler l'axe suivant : <strong>${p.axe}</strong>. Les résultats alimentent le document de synthèse et le plan d'action final.</p>` },
   ], signatures: { type: "2", labels: [`${g(s, "Le Consultant", "La Consultante")}`, `${g(s, "Le Bénéficiaire", "La Bénéficiaire")}`], names: [consultantName(o), beneficiaireLabel(s)], dates: [sigDateBDC(s, f), sigDateBDC(s, f)] } });
 }
 
@@ -219,25 +358,26 @@ export function genGrilleSuiviBDC(o: OrganismeInfo, f: FormationInfo, stagiaires
   const d0 = new Date(s.dateDebutFormation || f.dateDebut || Date.now());
   const dEnd = new Date(s.dateFinFormation || f.dateFin || Date.now());
   const total = dEnd.getTime() - d0.getTime();
+  const p = bdcPersonalisation(f, s, si);
   const rows: string[][] = [];
   const steps = [
-    { pct: 0, label: "Accueil et présentation du bilan", action: "Présentation du déroulé, objectifs et attentes", obs: "Bénéficiaire motivé(e), objectifs définis" },
-    { pct: 0.05, label: "Entretien individuel", action: "Recueil du parcours professionnel et personnel", obs: "Parcours riche, expériences diversifiées" },
-    { pct: 0.1, label: "Analyse des compétences techniques", action: "Évaluation des savoir-faire", obs: "Compétences solides identifiées" },
-    { pct: 0.2, label: "Tests pratiques", action: "Exercices techniques et mises en situation", obs: "Bon niveau, axes de perfectionnement identifiés" },
-    { pct: 0.35, label: "Analyse des compétences transversales", action: "Évaluation soft skills", obs: "Communication et gestion du temps à renforcer" },
-    { pct: 0.5, label: "Enquête métier", action: "Recueil des attentes métiers et opportunités", obs: "Informations précieuses collectées" },
-    { pct: 0.65, label: "Étude du marché", action: "Analyse des opportunités professionnelles", obs: "Plusieurs pistes envisagées" },
-    { pct: 0.75, label: "Synthèse des résultats", action: "Bilan des compétences et points d'amélioration", obs: "Projet professionnel confirmé" },
-    { pct: 0.85, label: "Élaboration du plan d'action", action: "Recommandations et formations complémentaires", obs: "Plan d'action formalisé" },
-    { pct: 1.0, label: "Entretien de restitution", action: "Présentation finale et validation du bilan", obs: "Bénéficiaire satisfait(e) et engagé(e)" },
+    { pct: 0, label: "Accueil et cadrage", action: `Clarification de l'objectif : ${p.objectif}`, obs: `Motivation observée ; vigilance initiale sur ${p.contrainte}` },
+    { pct: 0.08, label: "Analyse du parcours", action: `Repérage des expériences transférables vers ${p.profile.metier}`, obs: `Point fort repéré : ${p.pointFort}` },
+    { pct: 0.16, label: "Cartographie des compétences", action: `Évaluation ciblée : ${p.technique}`, obs: `Compétence exploitable, à consolider par ${p.formation}` },
+    { pct: 0.28, label: "Compétences transversales", action: `Travail sur ${p.transversal} et situations professionnelles vécues`, obs: `Axe de progression : ${p.axe}` },
+    { pct: 0.42, label: "Enquête métier", action: `Recherche sur ${p.profile.secteur} et comparaison des postes visés`, obs: `Piste prioritaire retenue : ${p.opportunite}` },
+    { pct: 0.56, label: "Confrontation au marché", action: `Analyse d'offres, prérequis et contraintes : ${p.contrainte}`, obs: `Projet réaliste sous réserve de planifier les étapes de montée en compétences` },
+    { pct: 0.70, label: "Scénarios de parcours", action: `Choix entre formation, immersion ou candidature dans ${p.profile.secteur}`, obs: `Scénario privilégié : ${p.formation}` },
+    { pct: 0.82, label: "Plan d'action", action: `Construction du calendrier : financement ${p.financement}, contacts, échéances`, obs: `Plan personnalisé formalisé avec priorités à 30/90 jours` },
+    { pct: 0.92, label: "Préparation restitution", action: `Synthèse des preuves, compétences et points de vigilance`, obs: `Document de synthèse préparé autour de ${p.techniqueSecondaire}` },
+    { pct: 1.0, label: "Entretien de restitution", action: `Validation finale du projet ${p.profile.metier} et des prochaines démarches`, obs: `${g(s, "Bénéficiaire engagé", "Bénéficiaire engagée")} ; suivi à 6 mois programmé` },
   ];
   for (const step of steps) {
     const d = new Date(d0.getTime() + total * step.pct);
     rows.push([d.toLocaleDateString("fr-FR"), step.label, step.action, step.obs]);
   }
   return buildDocument({ org: o, title: "GRILLE DE SUIVI DU BILAN DE COMPÉTENCES", stagiaires: [s], sections: [
-    { heading: "Informations", content: `<p><strong>Bénéficiaire :</strong> ${beneficiaireLabel(s)}<br><strong>Domaine :</strong> ${f.intitule}<br><strong>Organisme :</strong> ${o.nom}<br><strong>Période :</strong> ${startDate(s, f)} – ${endDate(s, f)}</p>` },
+    { heading: "Informations", content: `<p><strong>Bénéficiaire :</strong> ${beneficiaireLabel(s)}<br><strong>Domaine :</strong> ${p.profile.label}<br><strong>Organisme :</strong> ${o.nom}<br><strong>Période :</strong> ${startDate(s, f)} – ${endDate(s, f)}</p>` },
   ], table: { headers: ["Date", "Étapes du bilan", "Actions réalisées", "Observations"], rows } });
 }
 
@@ -373,12 +513,13 @@ export function genFichePosteConsultantBDC(o: OrganismeInfo) {
 // ===== CR5 - IND 21 : Compte rendu de fin de bilan =====
 export function genCompteRenduFinBDC(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = stagiaires[si] || stagiaires[0];
+  const p = bdcPersonalisation(f, s, si);
   return buildDocument({ org: o, title: "COMPTE RENDU DE FIN DE BILAN DE COMPÉTENCES", stagiaires: [s], sections: [
-    { heading: "Informations", content: `<p><strong>Organisme :</strong> ${o.nom}<br><strong>Consultant(e) :</strong> ${consultantName(o)}<br><strong>Bénéficiaire :</strong> ${beneficiaireLabel(s)}<br>${s.dateNaissance ? `<strong>Date de naissance :</strong> ${formatDate(s.dateNaissance)}<br>` : ""}<strong>Dates du bilan :</strong> du ${startDate(s, f)} au ${endDate(s, f)}<br><strong>Domaine :</strong> ${f.intitule}</p>` },
-    { heading: "1. Introduction", content: `<p>${beneficiaireLabel(s)} a intégré le dispositif de bilan de compétences avec l'objectif de faire le point sur son parcours professionnel et de valider son projet dans le domaine de ${f.intitule}. Dès le premier entretien, ${g(s, "il", "elle")} a exprimé une forte motivation et une volonté claire de s'investir dans une carrière en lien avec ses valeurs et ses compétences.</p>` },
-    { heading: "2. Déroulement du bilan", content: `<p>Le bilan s'est déroulé sur la période prévue, dans le respect des trois phases :<br><br><strong>Phase préliminaire :</strong><br>• Définition des objectifs<br>• Analyse des attentes et clarification du contexte<br>• Validation de la pertinence de la démarche<br><br><strong>Phase d'investigation :</strong><br>• Exploration du parcours et identification des compétences<br>• Tests de personnalité et d'aptitudes<br>• Enquête métier avec un professionnel du secteur<br><br><strong>Phase de conclusion :</strong><br>• Validation du projet professionnel<br>• Élaboration d'un plan d'action détaillé<br>• Remise du document de synthèse</p>`, variant: "green" },
-    { heading: "3. Appréciation du consultant", content: `<p>Tout au long du parcours, ${beneficiaireLabel(s)} a fait preuve d'un excellent engagement. ${g(s, "Il", "Elle")} a abordé chaque exercice avec sérieux, curiosité et sens critique. Son sens de l'analyse, sa rigueur et sa capacité à se remettre en question ont été particulièrement appréciés.<br><br>${beneficiaireLabel(s)} a su mettre en évidence de nombreuses compétences transférables :<br>• Sens de l'organisation<br>• Créativité et adaptabilité<br>• Rigueur et méthode<br>• Esprit d'équipe et sens du service</p>` },
-    { heading: "4. Conclusion", content: `<p>Le bilan de compétences s'est déroulé dans de bonnes conditions. ${g(s, "Le", "La")} bénéficiaire repart avec un projet professionnel validé et un plan d'action concret. Un entretien de suivi est prévu dans les 6 mois suivant la fin du bilan.</p>` },
+    { heading: "Informations", content: `<p><strong>Organisme :</strong> ${o.nom}<br><strong>Consultant(e) :</strong> ${consultantName(o)}<br><strong>Bénéficiaire :</strong> ${beneficiaireLabel(s)}<br>${s.dateNaissance ? `<strong>Date de naissance :</strong> ${formatDate(s.dateNaissance)}<br>` : ""}<strong>Dates du bilan :</strong> du ${startDate(s, f)} au ${endDate(s, f)}<br><strong>Domaine :</strong> ${p.profile.label}</p>` },
+    { heading: "1. Introduction", content: `<p>${beneficiaireLabel(s)} a intégré le dispositif de bilan de compétences pour ${p.objectif}. Dès le premier entretien, ${g(s, "il", "elle")} a exprimé le besoin de confronter son projet aux réalités de ${p.profile.secteur}, notamment sur le point suivant : <strong>${p.contrainte}</strong>.</p>` },
+    { heading: "2. Déroulement du bilan", content: `<p>Le bilan s'est déroulé sur la période prévue, dans le respect des trois phases :<br><br><strong>Phase préliminaire :</strong><br>• clarification de la demande et validation du projet ${p.profile.metier}<br>• identification du point fort initial : ${p.pointFort}<br>• cadrage du rythme : ${p.rythme}<br><br><strong>Phase d'investigation :</strong><br>• analyse du parcours et des compétences transférables<br>• travail ciblé sur ${p.technique} et ${p.transversal}<br>• enquête métier dans ${p.profile.secteur}<br>• comparaison des formations et débouchés : ${p.formation}<br><br><strong>Phase de conclusion :</strong><br>• validation de la piste ${p.opportunite}<br>• formalisation des étapes de financement : ${p.financement}<br>• remise du document de synthèse confidentiel</p>`, variant: "green" },
+    { heading: "3. Appréciation du consultant", content: `<p>Tout au long du parcours, ${beneficiaireLabel(s)} a montré ${p.pointFort} et une implication régulière. Les travaux réalisés ont confirmé des ressources transférables vers le métier de <strong>${p.profile.metier}</strong>.<br><br><strong>Compétences mises en évidence :</strong><br>• ${p.technique}<br>• ${p.techniqueSecondaire}<br>• ${p.transversal}<br><br><strong>Axe à poursuivre :</strong> ${p.axe}. Cet axe est intégré dans le plan d'action final avec des actions concrètes à court terme.</p>` },
+    { heading: "4. Conclusion", content: `<p>Le bilan s'est déroulé dans de bonnes conditions. ${g(s, "Le", "La")} bénéficiaire repart avec un projet professionnel individualisé : <strong>${p.opportunite}</strong>. Les prochaines étapes portent sur ${p.formation}, la sécurisation du financement (${p.financement}) et la mise en relation avec des professionnels du secteur. Un entretien de suivi est prévu dans les 6 mois suivant la fin du bilan.</p>` },
   ], signatures: { type: "2", labels: [`${g(s, "Le Consultant", "La Consultante")}`, `${g(s, "Le Bénéficiaire", "La Bénéficiaire")}`], names: [consultantName(o), beneficiaireLabel(s)], dates: [endDate(s, f), endDate(s, f)] } });
 }
 
@@ -397,32 +538,31 @@ export function genFicheIntervenantExterneBDC(o: OrganismeInfo, f: FormationInfo
 export function genSatisfactionChaudBDC(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = stagiaires[si] || stagiaires[0];
   const dtFin = endDate(s, f);
-  // Bonnes réponses réalistes : majorité "Très satisfait(e)" avec quelques "Satisfait(e)"
-  const satisfactionTable = (title: string, questions: string[]) => {
+  const p = bdcPersonalisation(f, s, si);
+  const satisfactionTable = (title: string, questions: string[], offset = 0) => {
     const headers = ["Questions", "Très satisfait(e)", "Satisfait(e)", "Moyennement", "Pas satisfait(e)"];
     const patterns = [
-      ["X", "", "", ""],
-      ["X", "", "", ""],
-      ["", "X", "", ""],
-      ["X", "", "", ""],
+      [["X", "", "", ""], ["", "X", "", ""], ["X", "", "", ""], ["X", "", "", ""]],
+      [["", "X", "", ""], ["X", "", "", ""], ["X", "", "", ""], ["", "X", "", ""]],
+      [["X", "", "", ""], ["X", "", "", ""], ["", "X", "", ""], ["", "X", "", ""]],
     ];
-    const rows = questions.map((q, i) => [q, ...patterns[i % patterns.length]]);
+    const selected = patterns[deterministicIndex(s, si, patterns.length, offset)];
+    const rows = questions.map((q, i) => [q, ...selected[i % selected.length]]);
     return `<h2>${title}</h2>${tableHTML(headers, rows)}`;
   };
-  const body = orgHeader(o);
   let content = `<h1>QUESTIONNAIRE DE SATISFACTION À CHAUD – BILAN DE COMPÉTENCES</h1>`;
-  content += `<p><strong>Bénéficiaire :</strong> ${beneficiaireLabel(s)}<br><strong>Date du bilan :</strong> du ${startDate(s, f)} au ${endDate(s, f)}<br><strong>Consultant(e) :</strong> ${consultantName(o)}<br><strong>Organisme :</strong> ${o.nom}</p>`;
+  content += `<p><strong>Bénéficiaire :</strong> ${beneficiaireLabel(s)}<br><strong>Domaine :</strong> ${p.profile.label}<br><strong>Date du bilan :</strong> du ${startDate(s, f)} au ${endDate(s, f)}<br><strong>Consultant(e) :</strong> ${consultantName(o)}<br><strong>Organisme :</strong> ${o.nom}</p>`;
   content += `<p>Merci de répondre aux questions suivantes en cochant la case correspondant à votre ressenti.</p>`;
   content += satisfactionTable("1. Déroulement du bilan", [
-    "L'accueil de l'organisme", "La disponibilité du/de la consultant(e)", "Le respect du calendrier établi", "Le cadre et l'organisation générale"
-  ]);
+    "L'accueil de l'organisme", `La disponibilité du/de la consultant(e) sur mon projet ${p.profile.metier}`, "Le respect du calendrier établi", "Le cadre et l'organisation générale"
+  ], 1);
   content += satisfactionTable("2. Contenu du bilan", [
-    "Les outils utilisés (tests, entretiens, enquêtes)", "La clarté des informations reçues", "L'adaptation de l'accompagnement à vos besoins", "L'aide à la définition de votre projet professionnel"
-  ]);
+    `Les outils utilisés pour analyser ${p.technique}`, "La clarté des informations reçues", `L'adaptation de l'accompagnement à mon besoin : ${p.axe}`, `L'aide à la définition de mon projet professionnel vers ${p.opportunite}`
+  ], 2);
   content += satisfactionTable("3. Résultats et utilité", [
-    "La pertinence du document de synthèse", "La clarté du plan d'action", "L'utilité du bilan pour votre avenir professionnel", "Votre satisfaction globale"
-  ]);
-  content += `<h2>4. Commentaires</h2><p>Ce qui vous a le plus apporté : L'accompagnement personnalisé et la clarté du plan d'action.<br><br>Suggestions d'amélioration : RAS – très satisfait(e) de la prestation.<br><br>Recommanderiez-vous ce bilan ? ☒ Oui ☐ Non</p>`;
+    "La pertinence du document de synthèse", `La clarté du plan d'action et du financement ${p.financement}`, `L'utilité du bilan pour évoluer dans ${p.profile.secteur}`, "Votre satisfaction globale"
+  ], 3);
+  content += `<h2>4. Commentaires</h2><p>Ce qui vous a le plus apporté : ${p.commentaireSatisfaction}<br><br>Suggestion d'amélioration : disposer d'un exemple supplémentaire d'offre ou de parcours dans ${p.profile.secteur}.<br><br>Recommanderiez-vous ce bilan ? ☒ Oui ☐ Non</p>`;
   
   return buildDocument({ org: o, title: "QUESTIONNAIRE DE SATISFACTION À CHAUD – BILAN DE COMPÉTENCES", stagiaires: [s], extraHtml: content.replace(/<h1>.*?<\/h1>/, ""), sections: [
     { heading: "", content: `<p><strong>Bénéficiaire :</strong> ${beneficiaireLabel(s)}<br><strong>Date du bilan :</strong> du ${startDate(s, f)} au ${endDate(s, f)}<br><strong>Consultant(e) :</strong> ${consultantName(o)}</p>` },
@@ -526,7 +666,7 @@ export function genBilanMensuelBDC(o: OrganismeInfo, f: FormationInfo, stagiaire
 
 // ===== CT6 - IND 23/24/25 : Fiche de veille combinée =====
 export function genFicheVeilleBDC(o: OrganismeInfo, f: FormationInfo) {
-  const domain = f.intitule || "Esthétique";
+  const profile = getBdcDomainProfile(f);
   const tableStyle = `style="width:100%;border-collapse:collapse;margin-bottom:10px"`;
   const cellStyle = `style="border:1px solid #999;padding:8px;vertical-align:top"`;
   const headerCell = `style="border:1px solid #999;padding:8px;background:#f0f0f0;font-weight:bold;width:160px;vertical-align:top"`;
@@ -535,39 +675,31 @@ export function genFicheVeilleBDC(o: OrganismeInfo, f: FormationInfo) {
     return `<tr><td ${headerCell}>${label}</td><td ${cellStyle}>${value}</td></tr>`;
   }
 
+  function renderVeille(v: BdcDomainProfile["veilleReglementaire"], dateLabel: string) {
+    return `<table ${tableStyle}>
+${veillTable("Intitulé", `<strong>${v.intitule}</strong>`)}
+${veillTable("Source", v.source)}
+${veillTable("Lien", `<a href="${v.lien}">${v.lien.replace("https://", "")}</a>`)}
+${veillTable(dateLabel, v.date)}
+${veillTable("Exploitation", v.exploitation)}
+</table>`;
+  }
+
   return buildDocument({
     org: o,
-    title: `FICHE DE VEILLE – ${domain.toUpperCase()}`,
+    title: `FICHE DE VEILLE – ${profile.label.toUpperCase()}`,
     sections: [
       {
         heading: "1. Veille Réglementaire",
-        content: `<table ${tableStyle}>
-${veillTable("Intitulé", `<strong>Mise à jour des normes d'hygiène et sécurité – Instituts de beauté et soins esthétiques</strong>`)}
-${veillTable("Source", "Arrêté du 12 décembre 2024 relatif aux règles d'hygiène et de salubrité applicables aux établissements pratiquant des soins esthétiques")}
-${veillTable("Lien", '<a href="https://www.legifrance.gouv.fr">www.legifrance.gouv.fr</a>')}
-${veillTable("Date de publication", "12/12/2024")}
-${veillTable("Exploitation", "Intégré dans les échanges avec les bénéficiaires sur les obligations sanitaires en institut. Mentionné dans la fiche métier. Orientations vers les formations hygiène et salubrité recommandées. Mise à jour des protocoles d'hygiène pour les soins du visage et du corps.")}
-</table>`,
+        content: renderVeille(profile.veilleReglementaire, "Date de publication"),
       },
       {
         heading: "2. Veille Métiers",
-        content: `<table ${tableStyle}>
-${veillTable("Intitulé", `<strong>Évolution des métiers de l'esthétique et de la cosmétique en 2025</strong>`)}
-${veillTable("Source", "CIDJ – Fiche métier Esthéticien(ne)-Cosméticien(ne)")}
-${veillTable("Lien", '<a href="https://www.cidj.com">www.cidj.com</a>')}
-${veillTable("Date de mise à jour", "Janvier 2025")}
-${veillTable("Exploitation", "Présentation des nouvelles tendances métiers en phase d'exploration : soins bio et naturels, dermopigmentation, extension de cils, montée de la vente en ligne de cosmétiques, importance de l'image de marque (Instagram, TikTok). Permet une personnalisation du plan d'action pour les bénéficiaires souhaitant se reconvertir dans le secteur esthétique.")}
-</table>`,
+        content: renderVeille(profile.veilleMetier, "Date de mise à jour"),
       },
       {
         heading: "3. Veille Technologique",
-        content: `<table ${tableStyle}>
-${veillTable("Intitulé", `<strong>Nouveaux équipements et innovations en esthétique</strong>`)}
-${veillTable("Source", "Revue <em>Esthétique Pro</em> – n°42")}
-${veillTable("Lien", '<a href="https://www.esthetique-pro.fr">www.esthetique-pro.fr</a>')}
-${veillTable("Date de publication", "06/02/2025")}
-${veillTable("Exploitation", "Sensibilisation à l'évolution technologique des outils professionnels : appareils de photorajeunissement LED, machines à microdermabrasion, appareils d'électrostimulation faciale, imprimante 3D pour ongles. Présenté lors des échanges individuels pour les porteurs de projet de création d'institut ou reconversion dans le secteur beauté et bien-être.")}
-</table>`,
+        content: renderVeille(profile.veilleTechnologique, "Date de publication"),
       },
     ],
   });
@@ -579,6 +711,7 @@ export function genContratSousTraitanceBDC(o: OrganismeInfo, f: FormationInfo) {
   const dateContrat = formatDate(majDate);
   const oneYearLater = (() => { const d = new Date(majDate); d.setFullYear(d.getFullYear() + 1); return d.toISOString().slice(0, 10); })();
   const dateFinContrat = formatDate(oneYearLater);
+  const cachetUrl = (o as OrganismeInfo & { cachet?: string }).cachet || o.tamponUrl;
 
   return buildDocument({
     org: o,
@@ -667,7 +800,7 @@ En <strong>deux exemplaires originaux</strong>.</p>
   </div>
   <div style="width:45%;text-align:center">
     <p><strong>Pour ${o.nom}</strong><br>${o.dirigeant || "Le/la dirigeant(e)"}<br><em>(Lu et approuvé)</em></p>
-    ${(o as any).cachet ? `<img src="${(o as any).cachet}" alt="Tampon" style="max-width:200px;margin:10px auto" />` : (o.tamponUrl ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-width:200px;margin:10px auto" />` : '<p style="margin-top:40px">Tampon :</p>')}
+    ${cachetUrl ? `<img src="${cachetUrl}" alt="Tampon" style="max-width:200px;margin:10px auto" />` : '<p style="margin-top:40px">Tampon :</p>'}
   </div>
 </div>`,
       },
