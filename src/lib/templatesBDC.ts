@@ -711,6 +711,7 @@ export function genContratSousTraitanceBDC(o: OrganismeInfo, f: FormationInfo) {
   const dateContrat = formatDate(majDate);
   const oneYearLater = (() => { const d = new Date(majDate); d.setFullYear(d.getFullYear() + 1); return d.toISOString().slice(0, 10); })();
   const dateFinContrat = formatDate(oneYearLater);
+  const cachetUrl = (o as OrganismeInfo & { cachet?: string }).cachet || o.tamponUrl;
 
   return buildDocument({
     org: o,
@@ -799,7 +800,7 @@ En <strong>deux exemplaires originaux</strong>.</p>
   </div>
   <div style="width:45%;text-align:center">
     <p><strong>Pour ${o.nom}</strong><br>${o.dirigeant || "Le/la dirigeant(e)"}<br><em>(Lu et approuvé)</em></p>
-    ${(o as any).cachet ? `<img src="${(o as any).cachet}" alt="Tampon" style="max-width:200px;margin:10px auto" />` : (o.tamponUrl ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-width:200px;margin:10px auto" />` : '<p style="margin-top:40px">Tampon :</p>')}
+    ${cachetUrl ? `<img src="${cachetUrl}" alt="Tampon" style="max-width:200px;margin:10px auto" />` : '<p style="margin-top:40px">Tampon :</p>'}
   </div>
 </div>`,
       },
