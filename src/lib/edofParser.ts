@@ -106,13 +106,32 @@ function getCol(row: Record<string, any>, ...keys: string[]): any {
 export function parseEdofXlsx(data: ArrayBuffer): EdofSession[] {
   const workbook = XLSX.read(data, { type: "array" });
   const sheet = workbook.Sheets[workbook.SheetNames[0]];
-  const rows = XLSX.utils.sheet_to_json<Record<string, any>>(sheet, { defval: "" });
+
+  // Lecture en mode tableau pour pouvoir détecter une ligne d'en-tête qui n'est pas la première
+  // (certains exports CPF/EDOF ajoutent une ligne de titre comme "Étudiants ACTION FORMATION (CPF203)")
+  const matrix: any[][] = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
+  let headerIdx = 0;
+  for (let i = 0; i < Math.min(matrix.length, 10); i++) {
+    const row = matrix[i].map((c) => String(c).toUpperCase().trim());
+    if (row.includes("NOM") && row.includes("PRENOM")) {
+      headerIdx = i;
+      break;
+    }
+  }
+  const headers = matrix[headerIdx].map((h) => String(h).trim());
+  const rows: Record<string, any>[] = matrix.slice(headerIdx + 1)
+    .filter((r) => r.some((c) => c !== "" && c != null))
+    .map((r) => {
+      const obj: Record<string, any> = {};
+      headers.forEach((h, i) => { if (h) obj[h] = r[i] ?? ""; });
+      return obj;
+    });
 
   // Group by formation title
   const groups = new Map<string, { rows: Record<string, any>[] }>();
 
   for (const row of rows) {
-    const title = getCol(row, "INTITULE_FORMATION", "INTITULE FORMATION", "Intitulé Formation", "Intitule Formation", "INTITULE_CERTIF/THEM", "INTITULE CERTIF/THEM", "INTITULE", "Formation");
+    const title = getCol(row, "FORMATION", "INTITULE_FORMATION", "INTITULE FORMATION", "Intitulé Formation", "Intitule Formation", "INTITULE_CERTIF/THEM", "INTITULE CERTIF/THEM", "INTITULE");
     if (!title) continue;
     if (!groups.has(title)) {
       groups.set(title, { rows: [] });
