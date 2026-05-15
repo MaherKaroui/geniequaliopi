@@ -902,10 +902,15 @@ export default function OPCOMobilites() {
                 <Input id="dname" value={dossierName} onChange={(e) => setDossierName(e.target.value)}
                   placeholder="ex : OPCO Mob - 2026 - SELECT FORMATION" />
               </div>
-              <Button onClick={handleSaveDossier} disabled={savingDossier} className="gap-2">
+              <Button onClick={() => handleSaveDossier(currentDossierId ? "update" : "save")} disabled={savingDossier} className="gap-2">
                 {savingDossier ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                 {currentDossierId ? "Mettre à jour" : "Sauvegarder"}
               </Button>
+              {currentDossierId && (
+                <Button variant="secondary" onClick={() => handleSaveDossier("saveAsNew")} disabled={savingDossier} className="gap-2">
+                  <Save className="w-4 h-4" /> Enregistrer comme nouveau
+                </Button>
+              )}
               <Button variant="outline" onClick={handleNewDossier} className="gap-2">
                 <Plus className="w-4 h-4" /> Nouveau
               </Button>
