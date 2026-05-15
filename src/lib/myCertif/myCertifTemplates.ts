@@ -305,7 +305,8 @@ export function getAttestationHonneurHTML(s: CertifStagiaire): string {
       <p><span class="label">Le :</span> ${s.sessionDate}</p>
       <p style="margin-top:14px;font-style:italic;font-size:10pt">Signature précédée de la mention « Lu et approuvé, bon pour attestation sur l'honneur »</p>
       <div style="margin-top:8px;font-size:10pt;font-style:italic">Lu et approuvé, bon pour attestation sur l'honneur</div>
-      <div style="font-family: 'Brush Script MT', cursive; font-size: 22pt; color:#1a3a7b; margin-top:6px">${s.prenom} ${s.nom}</div>
+      <img src="/mycertif/signatures/${s.prenom}_${s.nom}.png" style="max-height:80px;max-width:200px;margin-top:6px" alt="Signature ${s.prenom} ${s.nom}" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+      <div style="display:none;font-family: 'Brush Script MT', cursive; font-size: 22pt; color:#1a3a7b; margin-top:6px">${s.prenom} ${s.nom}</div>
     </div>
     </div>
 
