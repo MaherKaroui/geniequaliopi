@@ -429,6 +429,8 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "bdc_procedure_handicap": return genProcedureHandicapBDC_imported(o);
     case "bdc_engagement_confidentialite": { const si = params?.stagiaireIdx ?? 0; return genEngagementConfidentialiteBDC_imported(o, f, stagiaires, si); }
     case "bdc_trame_suivi_6mois": { const si = params?.stagiaireIdx ?? 0; return genTrameSuivi6MoisBDC_imported(o, f, stagiaires, si); }
+    case "bdc_cv_beneficiaire": { const si = params?.stagiaireIdx ?? 0; return genCVBeneficiaireBDC_imported(o, f, stagiaires, si); }
+    case "bdc_test_personnalite": { const si = params?.stagiaireIdx ?? 0; return genTestPersonnaliteBDC_imported(o, f, stagiaires, si); }
     case "livret_recevabilite_vae": return genLivretRecevabilite(o, f, stagiaires);
     case "dossier_validation_vae": return genDossierValidation(o, f, stagiaires);
     case "accompagnement_vae": return genAccompagnementVAE(o, f, stagiaires);
