@@ -1145,6 +1145,8 @@ export function buildFullCatalog(
     // CT1 - IND 1 : Programme
     add("bdc_c1i1_programme", "CT1 - IND 1 Programme du bilan de compétences", 1, 1, "bdc_programme");
     add("bdc_c1i1_catalogue", "CT1 - IND 1 Fiche commerciale publique (Qualiopi V9)", 1, 1, "bdc_catalogue_commercial");
+    add("bdc_c1i1_parcours", "CT1 - IND 1 Parcours bilan de compétences (process écrit)", 1, 1, "bdc_parcours");
+    add("bdc_c2i6_support_cours", "CT2 - IND 6 Support de cours – Bilan de compétences", 2, 6, "bdc_support_cours");
     // CT1 - IND 2 : Indicateurs (Excel existant)
     add("bdc_c1i2_indicateurs", "CT1 - IND 2 Indicateurs de performance (Excel)", 1, 2, "indicateurs_performance");
     // Registre bénéficiaires (suivi parcours)
