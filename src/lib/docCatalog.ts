@@ -1211,6 +1211,8 @@ export function buildFullCatalog(
     add("bdc_c5i21_fiche_poste", "CT5 - IND 21 Fiche de poste consultant bilan", 5, 21, "bdc_fiche_poste_consultant");
     stagiaires.forEach((s, si) => {
       add(`bdc_c5i21_compte_rendu_${si}`, `CT5 - IND 21 Compte rendu de fin de bilan – ${s.prenom} ${s.nom}`, 5, 21, "bdc_compte_rendu_fin", { stagiaireIdx: si });
+      add(`bdc_c5i21_cv_${si}`, `CT5 - IND 21 CV du bénéficiaire – ${s.prenom} ${s.nom}`, 5, 21, "bdc_cv_beneficiaire", { stagiaireIdx: si });
+      add(`bdc_c2i5_test_personnalite_${si}`, `CT2 - IND 5 Test de personnalité – ${s.prenom} ${s.nom}`, 2, 5, "bdc_test_personnalite", { stagiaireIdx: si });
     });
     add("bdc_c5i21_fiche_intervenant", "CT5 - IND 21 Fiche intervenant externe", 5, 21, "bdc_fiche_intervenant");
 
