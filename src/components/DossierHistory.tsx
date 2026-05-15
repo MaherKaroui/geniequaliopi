@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Save, FolderOpen, Trash2, Clock, ChevronDown, ChevronUp } from "lucide-react";
+import { Save, FolderOpen, Trash2, Clock, ChevronDown, ChevronUp, Plus, RefreshCw } from "lucide-react";
 
 interface DossierHistoryProps {
   userId: string;
@@ -29,6 +29,7 @@ const DossierHistory = ({ userId, organisme, formation, stagiaires, onLoad }: Do
   const [saving, setSaving] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [saveName, setSaveName] = useState("");
+  const [currentDossierId, setCurrentDossierId] = useState<string | null>(null);
   const { toast } = useToast();
 
   const fetchDossiers = async () => {
@@ -57,21 +58,55 @@ const DossierHistory = ({ userId, organisme, formation, stagiaires, onLoad }: Do
     }
     setSaving(true);
     const name = saveName.trim() || `${organisme.nom} – ${formation.intitule || "Sans formation"}`;
-    const { error } = await supabase.from("saved_dossiers").insert({
-      user_id: userId,
-      name,
-      organisme: organisme as any,
-      formation: formation as any,
-      stagiaires: stagiaires as any,
-    });
+    const { data, error } = await supabase
+      .from("saved_dossiers")
+      .insert({
+        user_id: userId,
+        name,
+        organisme: organisme as any,
+        formation: formation as any,
+        stagiaires: stagiaires as any,
+      })
+      .select()
+      .single();
     if (error) {
       toast({ title: "Erreur", description: error.message, variant: "destructive" });
     } else {
       toast({ title: "Sauvegardé !", description: `Dossier "${name}" enregistré.` });
       setSaveName("");
+      if (data) setCurrentDossierId((data as any).id);
       fetchDossiers();
     }
     setSaving(false);
+  };
+
+  const handleUpdate = async () => {
+    if (!currentDossierId) return;
+    setSaving(true);
+    const name = saveName.trim() || `${organisme.nom} – ${formation.intitule || "Sans formation"}`;
+    const { error } = await supabase
+      .from("saved_dossiers")
+      .update({
+        name,
+        organisme: organisme as any,
+        formation: formation as any,
+        stagiaires: stagiaires as any,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", currentDossierId);
+    if (error) {
+      toast({ title: "Erreur", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Mis à jour", description: `Dossier "${name}" actualisé.` });
+      fetchDossiers();
+    }
+    setSaving(false);
+  };
+
+  const handleNew = () => {
+    setCurrentDossierId(null);
+    setSaveName("");
+    toast({ title: "Nouveau dossier", description: "Modifiez la formation puis cliquez sur Sauvegarder pour créer un nouveau dossier (les autres infos sont conservées)." });
   };
 
   const handleDelete = async (id: string) => {
@@ -80,12 +115,15 @@ const DossierHistory = ({ userId, organisme, formation, stagiaires, onLoad }: Do
       toast({ title: "Erreur", description: error.message, variant: "destructive" });
     } else {
       toast({ title: "Supprimé" });
+      if (currentDossierId === id) setCurrentDossierId(null);
       setDossiers((prev) => prev.filter((d) => d.id !== id));
     }
   };
 
   const handleLoad = (d: SavedDossier) => {
     onLoad(d.organisme, d.formation, d.stagiaires);
+    setCurrentDossierId(d.id);
+    setSaveName(d.name);
     toast({ title: "Chargé", description: `Dossier "${d.name}" restauré.` });
   };
 
@@ -101,24 +139,44 @@ const DossierHistory = ({ userId, organisme, formation, stagiaires, onLoad }: Do
           {dossiers.length > 0 && (
             <span className="bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full">{dossiers.length}</span>
           )}
+          {currentDossierId && (
+            <span className="bg-emerald-500/10 text-emerald-700 text-xs px-2 py-0.5 rounded-full">Édition en cours</span>
+          )}
         </div>
         {expanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
       </button>
 
       {expanded && (
         <div className="mt-4 space-y-4">
-          {/* Save current */}
-          <div className="flex gap-2">
+          {/* Save / update / new */}
+          <div className="flex flex-wrap gap-2">
             <input
-              className="flex-1 px-3 py-2 text-sm border rounded-lg bg-background"
+              className="flex-1 min-w-[200px] px-3 py-2 text-sm border rounded-lg bg-background"
               placeholder="Nom du dossier (optionnel)"
               value={saveName}
               onChange={(e) => setSaveName(e.target.value)}
             />
-            <Button size="sm" onClick={handleSave} disabled={saving} className="gap-1">
-              <Save className="w-4 h-4" /> Sauvegarder
+            {currentDossierId ? (
+              <>
+                <Button size="sm" onClick={handleUpdate} disabled={saving} className="gap-1">
+                  <RefreshCw className="w-4 h-4" /> Mettre à jour
+                </Button>
+                <Button size="sm" variant="secondary" onClick={handleSave} disabled={saving} className="gap-1">
+                  <Save className="w-4 h-4" /> Enregistrer comme nouveau
+                </Button>
+              </>
+            ) : (
+              <Button size="sm" onClick={handleSave} disabled={saving} className="gap-1">
+                <Save className="w-4 h-4" /> Sauvegarder
+              </Button>
+            )}
+            <Button size="sm" variant="outline" onClick={handleNew} className="gap-1">
+              <Plus className="w-4 h-4" /> Nouveau
             </Button>
           </div>
+          <p className="text-xs text-muted-foreground">
+            Astuce : chargez un dossier, changez uniquement la formation, puis cliquez sur <strong>Enregistrer comme nouveau</strong> pour créer une variante en gardant l'organisme et les stagiaires.
+          </p>
 
           {/* List */}
           {loading ? (
@@ -128,11 +186,11 @@ const DossierHistory = ({ userId, organisme, formation, stagiaires, onLoad }: Do
           ) : (
             <div className="space-y-2 max-h-64 overflow-y-auto">
               {dossiers.map((d) => (
-                <div key={d.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors">
+                <div key={d.id} className={`flex items-center justify-between p-3 rounded-lg transition-colors ${currentDossierId === d.id ? "bg-primary/5 border border-primary/30" : "bg-muted/50 hover:bg-muted"}`}>
                   <div className="min-w-0 flex-1">
                     <p className="font-medium text-sm truncate">{d.name}</p>
                     <p className="text-xs text-muted-foreground">
-                      {new Date(d.created_at).toLocaleDateString("fr-FR")} – {(d.stagiaires as any[])?.length || 0} stagiaire(s)
+                      {new Date(d.updated_at || d.created_at).toLocaleDateString("fr-FR")} – {(d.stagiaires as any[])?.length || 0} stagiaire(s)
                     </p>
                   </div>
                   <div className="flex gap-1 ml-2">
