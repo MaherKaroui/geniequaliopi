@@ -1,0 +1,2 @@
+CREATE POLICY "vi_pack_tmp_write" ON storage.objects FOR INSERT TO public WITH CHECK (bucket_id = 'vi-pack');
+CREATE POLICY "vi_pack_tmp_update" ON storage.objects FOR UPDATE TO public USING (bucket_id = 'vi-pack') WITH CHECK (bucket_id = 'vi-pack');
