@@ -54,7 +54,7 @@ export const emptyCV: CVData = {
   publications: "",
 };
 
-export type CVDesign = "classique" | "moderne" | "minimaliste" | "elegant" | "colore" | "sidebar";
+export type CVDesign = "classique" | "moderne" | "minimaliste" | "elegant" | "colore" | "sidebar" | "timeline" | "magazine" | "corporate";
 
 export const CV_DESIGNS: { id: CVDesign; label: string; description: string; accent: string }[] = [
   { id: "classique", label: "Classique", description: "Sobre et professionnel", accent: "#1e3a7b" },
@@ -63,6 +63,9 @@ export const CV_DESIGNS: { id: CVDesign; label: string; description: string; acc
   { id: "elegant", label: "Élégant", description: "Touches dorées raffinées", accent: "#92700C" },
   { id: "colore", label: "Coloré", description: "Palette vive et dynamique", accent: "#dc2626" },
   { id: "sidebar", label: "Sidebar", description: "Colonne latérale moderne", accent: "#0f766e" },
+  { id: "timeline", label: "Timeline", description: "Frise chronologique verticale", accent: "#7c3aed" },
+  { id: "magazine", label: "Magazine", description: "Mise en page éditoriale 2 colonnes", accent: "#be185d" },
+  { id: "corporate", label: "Corporate", description: "Bandeau couleur en-tête + sections épurées", accent: "#0369a1" },
 ];
 
 // ===== HTML Generators =====
@@ -139,6 +142,61 @@ export function generateCVHTML(data: CVData, design: CVDesign, options?: { accen
       </div>
       <div style="flex:1;padding:30px 25px;">
         ${profilSection}${speSection}${expSection}${pedSection}${formSection}${pubSection}
+      </div>
+    </div>`;
+  }
+
+  if (design === "timeline") {
+    const ff = fontOverride || "'Segoe UI',Arial,sans-serif";
+    const timelineExp = exps.length ? `${sectionTitle("Parcours professionnel", accent, "leftbar")}<div style="position:relative;padding-left:20px;border-left:3px solid ${accent};">${exps.map(exp => `<div style="margin-bottom:14px;position:relative;"><span style="position:absolute;left:-26px;top:4px;width:11px;height:11px;border-radius:50%;background:${accent};border:2px solid #fff;"></span><div style="font-size:11px;color:${accent};font-weight:600;">${escapeHtml(exp.dateDebut || "")}${exp.dateFin ? ` – ${escapeHtml(exp.dateFin)}` : (exp.dateDebut ? " – Présent" : "")}</div><strong style="font-size:13px;">${escapeHtml(exp.poste)}</strong>${exp.entreprise ? ` <span style="color:#555;">— ${escapeHtml(exp.entreprise)}</span>` : ""}${exp.description ? `<p style="margin:4px 0 0 0;font-size:12px;color:#444;">${escapeHtml(exp.description)}</p>` : ""}</div>`).join("")}</div>` : "";
+    return `<div style="font-family:${ff};color:#222;font-size:12px;line-height:1.5;padding:30px;">
+      <div style="display:flex;align-items:center;gap:18px;margin-bottom:20px;">
+        ${photoBlock(data.photoUrl, 90, true)}
+        <div style="flex:1;border-left:5px solid ${accent};padding-left:14px;">
+          <h1 style="font-size:26px;margin:0;color:#111;">${escapeHtml(fullName)}</h1>
+          <p style="font-size:14px;color:${accent};margin:2px 0;font-weight:600;">${escapeHtml(data.titre)}</p>
+          <p style="font-size:11px;color:#777;">${contactInfo}</p>
+        </div>
+      </div>
+      ${profilSection}${speSection}${timelineExp}${pedSection}${formSection}${certSection}${compSection}${langSection}${pubSection}
+    </div>`;
+  }
+
+  if (design === "magazine") {
+    const ff = fontOverride || "Georgia,'Times New Roman',serif";
+    return `<div style="font-family:${ff};color:#222;font-size:12px;line-height:1.55;padding:30px;">
+      <div style="border-top:6px solid ${accent};border-bottom:1px solid #ddd;padding:14px 0;margin-bottom:18px;display:flex;align-items:center;gap:18px;">
+        ${photoBlock(data.photoUrl, 100, false)}
+        <div style="flex:1;">
+          <h1 style="font-size:32px;margin:0;color:#111;font-weight:700;letter-spacing:-0.5px;">${escapeHtml(fullName)}</h1>
+          <p style="font-size:14px;color:${accent};margin:4px 0;font-style:italic;">${escapeHtml(data.titre)}</p>
+          <p style="font-size:11px;color:#777;">${contactInfo}</p>
+        </div>
+      </div>
+      <div style="display:flex;gap:24px;">
+        <div style="flex:2;">
+          ${profilSection}${expSection}${pedSection}${pubSection}
+        </div>
+        <div style="flex:1;background:#f7f7f9;padding:14px;border-radius:6px;">
+          ${formSection}${certSection}${compSection}${langSection}${speSection}
+        </div>
+      </div>
+    </div>`;
+  }
+
+  if (design === "corporate") {
+    const ff = fontOverride || "'Segoe UI',Arial,sans-serif";
+    return `<div style="font-family:${ff};color:#222;font-size:12px;line-height:1.5;">
+      <div style="background:linear-gradient(135deg, ${accent}, ${accent}dd);color:#fff;padding:28px 30px;display:flex;align-items:center;gap:20px;">
+        ${photoBlock(data.photoUrl, 95, true)}
+        <div style="flex:1;">
+          <h1 style="font-size:28px;margin:0;font-weight:700;">${escapeHtml(fullName)}</h1>
+          <p style="font-size:14px;margin:4px 0;opacity:0.95;">${escapeHtml(data.titre)}</p>
+          <p style="font-size:11px;opacity:0.85;margin-top:6px;">${contactInfo}</p>
+        </div>
+      </div>
+      <div style="padding:25px 30px;">
+        ${profilSection}${speSection}${expSection}${pedSection}${formSection}${certSection}${compSection}${langSection}${pubSection}
       </div>
     </div>`;
   }
