@@ -246,18 +246,24 @@ export function getGrilleEvaluationHTML(s: CertifStagiaire): string {
       <p style="font-size:10pt;margin:6px 0"><strong>Décision du jury :</strong> Compétences acquises — certification délivrée.</p>
       <table style="border:none">
         <tr>
-          <td style="border:none;width:50%;vertical-align:top">
-            <p style="font-size:10pt;margin:2px 0"><strong>Membre du jury :</strong> ${s.membreJury || JURY[0].prenom + " " + JURY[0].nom}</p>
-            <p style="font-size:9.5pt;color:#666;margin:2px 0">Signature :</p>
-            <div style="height:60px"></div>
+          <td style="border:none;width:33%;vertical-align:top">
+            <p style="font-size:10pt;margin:2px 0"><strong>Signature du candidat :</strong></p>
+            <p style="font-size:9pt;color:#666;margin:2px 0">${s.prenom} ${s.nom}</p>
+            <img src="/mycertif/signatures/${s.prenom}_${s.nom}.png" style="max-height:75px;max-width:180px" alt="Signature ${s.prenom} ${s.nom}" onerror="this.style.display='none'">
           </td>
-          <td style="border:none;width:50%;vertical-align:top;text-align:right">
-            <p style="font-size:10pt;margin:2px 0"><strong>Session du :</strong> ${s.sessionDate}</p>
-            <p style="font-size:9.5pt;color:#666;margin:2px 0">Tampon :</p>
-            <div style="height:80px"></div>
+          <td style="border:none;width:33%;vertical-align:top">
+            <p style="font-size:10pt;margin:2px 0"><strong>Membre du jury :</strong></p>
+            <p style="font-size:9pt;color:#666;margin:2px 0">${s.membreJury || JURY[0].prenom + " " + JURY[0].nom}</p>
+            <div style="font-family: 'Brush Script MT', cursive; font-size: 18pt; color:#1a3a7b;margin-top:8px">${(s.membreJury || JURY[0].prenom + " " + JURY[0].nom).split(" ").map(w => w[0]).join(".")}.</div>
+          </td>
+          <td style="border:none;width:34%;vertical-align:top;text-align:right">
+            <p style="font-size:10pt;margin:2px 0"><strong>Tampon Pro Forma :</strong></p>
+            <p style="font-size:9pt;color:#666;margin:2px 0">Session du ${s.sessionDate}</p>
+            <img src="/mycertif/proforma_signature.jpg" style="max-height:90px" alt="Tampon Pro Forma">
           </td>
         </tr>
       </table>
+    </div>
     </div>
     </div>
 
