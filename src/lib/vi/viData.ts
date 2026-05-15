@@ -204,7 +204,7 @@ function hashStr(s: string): number {
   for (let i = 0; i < s.length; i++) h = (h * 33) ^ s.charCodeAt(i);
   return h >>> 0;
 }
-function pick<T>(arr: T[], seed: number): T { return arr[seed % arr.length]; }
+function pick<T>(arr: T[], seed: number): T { return arr[Math.abs(seed | 0) % arr.length]; }
 
 const VILLES_IDF: Array<{ cp: string; ville: string }> = [
   { cp: "94270", ville: "Le Kremlin-Bicêtre" },
