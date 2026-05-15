@@ -225,10 +225,9 @@ export function getGrilleEvaluationHTML(s: CertifStagiaire): string {
     </div>
 
     <table class="grille-table" style="margin-top:8px;page-break-inside:avoid">
-      <thead><tr><th>CANDIDAT</th><th>MEMBRE DU JURY</th><th>SESSION</th></tr></thead>
+      <thead><tr><th style="width:60%">CANDIDAT</th><th style="width:40%">SESSION</th></tr></thead>
       <tbody><tr>
         <td>Nom : ${s.nom}<br>Prénom : ${s.prenom}<br>Date de naissance : ${s.dateNaissance}</td>
-        <td>${s.membreJury || JURY[0].prenom + " " + JURY[0].nom}<br>Titre : Technique de prothésie ongulaire</td>
         <td>Date : ${s.sessionDate}</td>
       </tr></tbody>
     </table>
