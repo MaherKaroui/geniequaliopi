@@ -6,6 +6,7 @@
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { buildDocument, formatDate, subtractBusinessDays, tableHTML, section, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif, getStagiaireDuree, g, getDocStyle, footer, orgHeader, htmlWrap, applyGender } from "./docBuilder";
 import { FormateurInfo, parseDuree } from "./sampleData";
+import { generateCVHTML, CV_DESIGNS, type CVData, type CVDesign } from "./cvGenerator";
 
 // ---------- helpers ----------
 function consultantName(o: OrganismeInfo): string {
