@@ -103,7 +103,8 @@ export function getAttestationDelivranceHTML(s: CertifStagiaire): string {
 
     <div class="pf-sig-block">
       <p><strong>Signature du Président :</strong></p>
-      ${(() => { const sig = typeof localStorage !== 'undefined' ? localStorage.getItem('mycertif_signature_presidente') : null; return sig ? `<img src="${sig}" class="pf-sig-img" alt="Signature">` : `<img src="/mycertif/proforma_signature.jpg" class="pf-sig-img" alt="Signature Pro Forma">`; })()}
+      ${(() => { const sig = typeof localStorage !== 'undefined' ? localStorage.getItem('mycertif_signature_presidente') : null; return sig ? `<img src="${sig}" class="pf-sig-img" alt="Signature">` : `<img src="/mycertif/president_signature.png" class="pf-sig-img" alt="Signature Président">`; })()}
+      <img src="/mycertif/proforma_signature.jpg" class="pf-sig-img" style="margin-left:24px" alt="Tampon Pro Forma">
     </div>
     </div>
 
@@ -245,18 +246,24 @@ export function getGrilleEvaluationHTML(s: CertifStagiaire): string {
       <p style="font-size:10pt;margin:6px 0"><strong>Décision du jury :</strong> Compétences acquises — certification délivrée.</p>
       <table style="border:none">
         <tr>
-          <td style="border:none;width:50%;vertical-align:top">
-            <p style="font-size:10pt;margin:2px 0"><strong>Membre du jury :</strong> ${s.membreJury || JURY[0].prenom + " " + JURY[0].nom}</p>
-            <p style="font-size:9.5pt;color:#666;margin:2px 0">Signature :</p>
-            <div style="height:60px"></div>
+          <td style="border:none;width:33%;vertical-align:top">
+            <p style="font-size:10pt;margin:2px 0"><strong>Signature du candidat :</strong></p>
+            <p style="font-size:9pt;color:#666;margin:2px 0">${s.prenom} ${s.nom}</p>
+            <img src="/mycertif/signatures/${s.prenom}_${s.nom}.png" style="max-height:75px;max-width:180px" alt="Signature ${s.prenom} ${s.nom}" onerror="this.style.display='none'">
           </td>
-          <td style="border:none;width:50%;vertical-align:top;text-align:right">
-            <p style="font-size:10pt;margin:2px 0"><strong>Session du :</strong> ${s.sessionDate}</p>
-            <p style="font-size:9.5pt;color:#666;margin:2px 0">Tampon :</p>
-            <div style="height:80px"></div>
+          <td style="border:none;width:33%;vertical-align:top">
+            <p style="font-size:10pt;margin:2px 0"><strong>Membre du jury :</strong></p>
+            <p style="font-size:9pt;color:#666;margin:2px 0">${s.membreJury || JURY[0].prenom + " " + JURY[0].nom}</p>
+            <div style="font-family: 'Brush Script MT', cursive; font-size: 18pt; color:#1a3a7b;margin-top:8px">${(s.membreJury || JURY[0].prenom + " " + JURY[0].nom).split(" ").map(w => w[0]).join(".")}.</div>
+          </td>
+          <td style="border:none;width:34%;vertical-align:top;text-align:right">
+            <p style="font-size:10pt;margin:2px 0"><strong>Tampon Pro Forma :</strong></p>
+            <p style="font-size:9pt;color:#666;margin:2px 0">Session du ${s.sessionDate}</p>
+            <img src="/mycertif/proforma_signature.jpg" style="max-height:90px" alt="Tampon Pro Forma">
           </td>
         </tr>
       </table>
+    </div>
     </div>
     </div>
 
@@ -298,7 +305,8 @@ export function getAttestationHonneurHTML(s: CertifStagiaire): string {
       <p><span class="label">Le :</span> ${s.sessionDate}</p>
       <p style="margin-top:14px;font-style:italic;font-size:10pt">Signature précédée de la mention « Lu et approuvé, bon pour attestation sur l'honneur »</p>
       <div style="margin-top:8px;font-size:10pt;font-style:italic">Lu et approuvé, bon pour attestation sur l'honneur</div>
-      <div style="font-family: 'Brush Script MT', cursive; font-size: 22pt; color:#1a3a7b; margin-top:6px">${s.prenom} ${s.nom}</div>
+      <img src="/mycertif/signatures/${s.prenom}_${s.nom}.png" style="max-height:80px;max-width:200px;margin-top:6px" alt="Signature ${s.prenom} ${s.nom}" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+      <div style="display:none;font-family: 'Brush Script MT', cursive; font-size: 22pt; color:#1a3a7b; margin-top:6px">${s.prenom} ${s.nom}</div>
     </div>
     </div>
 
@@ -346,7 +354,8 @@ export function getQuestionnaireHTML(s: CertifStagiaire): string {
         <tr>
           <td style="border:none;width:50%;vertical-align:top">
             <p style="font-size:10pt;margin:2px 0"><strong>Signature du candidat :</strong></p>
-            <div style="height:60px"></div>
+            <p style="font-size:9pt;color:#666;margin:2px 0">${s.prenom} ${s.nom}</p>
+            <img src="/mycertif/signatures/${s.prenom}_${s.nom}.png" style="max-height:70px;max-width:180px" alt="Signature ${s.prenom} ${s.nom}" onerror="this.style.display='none'">
           </td>
           <td style="border:none;width:50%;vertical-align:top;text-align:right">
             <p style="font-size:10pt;margin:2px 0"><strong>Tampon :</strong></p>
