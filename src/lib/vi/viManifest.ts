@@ -9,8 +9,8 @@ export const VI_APPRENTIS: ViApprenti[] = [
       {
         "kind": "apprentissage",
         "label": "Livret d'apprentissage",
-        "filename": "Livret_Apprentissage_Adama_BAKAYOKO.pdf",
-        "url": "https://uwjxorvytlqqxszylxre.supabase.co/storage/v1/object/public/vi-pack/files/Adama_Bakayoko/PDF/Livret_Apprentissage_Adama_BAKAYOKO.pdf"
+        "filename": "Livret_Apprentissage_Adama_BAKAYOKO_corrige.pdf",
+        "url": "https://uwjxorvytlqqxszylxre.supabase.co/storage/v1/object/public/vi-pack/files/Livret_Apprentissage_Adama_BAKAYOKO_corrige.pdf"
       },
       {
         "kind": "maitre",
@@ -39,8 +39,8 @@ export const VI_APPRENTIS: ViApprenti[] = [
       {
         "kind": "apprentissage",
         "label": "Livret d'apprentissage",
-        "filename": "Livret_Apprentissage_Aminata_DIALLO.pdf",
-        "url": "https://uwjxorvytlqqxszylxre.supabase.co/storage/v1/object/public/vi-pack/files/Aminata_Diallo/PDF/Livret_Apprentissage_Aminata_DIALLO.pdf"
+        "filename": "Livret_Apprentissage_Aminata_DIALLO_corrige.pdf",
+        "url": "https://uwjxorvytlqqxszylxre.supabase.co/storage/v1/object/public/vi-pack/files/Livret_Apprentissage_Aminata_DIALLO_corrige.pdf"
       },
       {
         "kind": "maitre",
@@ -69,8 +69,8 @@ export const VI_APPRENTIS: ViApprenti[] = [
       {
         "kind": "apprentissage",
         "label": "Livret d'apprentissage",
-        "filename": "Livret_Apprentissage_Diakha_FOFANA.pdf",
-        "url": "https://uwjxorvytlqqxszylxre.supabase.co/storage/v1/object/public/vi-pack/files/Diakha_Fofana/PDF/Livret_Apprentissage_Diakha_FOFANA.pdf"
+        "filename": "Livret_Apprentissage_Diakha_FOFANA_corrige.pdf",
+        "url": "https://uwjxorvytlqqxszylxre.supabase.co/storage/v1/object/public/vi-pack/files/Livret_Apprentissage_Diakha_FOFANA_corrige.pdf"
       },
       {
         "kind": "maitre",
@@ -99,8 +99,8 @@ export const VI_APPRENTIS: ViApprenti[] = [
       {
         "kind": "apprentissage",
         "label": "Livret d'apprentissage",
-        "filename": "Livret_Apprentissage_Diye_BA.pdf",
-        "url": "https://uwjxorvytlqqxszylxre.supabase.co/storage/v1/object/public/vi-pack/files/Diye_Ba/PDF/Livret_Apprentissage_Diye_BA.pdf"
+        "filename": "Livret_Apprentissage_Diye_BA_corrige.pdf",
+        "url": "https://uwjxorvytlqqxszylxre.supabase.co/storage/v1/object/public/vi-pack/files/Livret_Apprentissage_Diye_BA_corrige.pdf"
       },
       {
         "kind": "maitre",
@@ -129,8 +129,8 @@ export const VI_APPRENTIS: ViApprenti[] = [
       {
         "kind": "apprentissage",
         "label": "Livret d'apprentissage",
-        "filename": "Livret_Apprentissage_Donovan_DELION.pdf",
-        "url": "https://uwjxorvytlqqxszylxre.supabase.co/storage/v1/object/public/vi-pack/files/Donovan_Delion/PDF/Livret_Apprentissage_Donovan_DELION.pdf"
+        "filename": "Livret_Apprentissage_Donovan_DELION_corrige.pdf",
+        "url": "https://uwjxorvytlqqxszylxre.supabase.co/storage/v1/object/public/vi-pack/files/Livret_Apprentissage_Donovan_DELION_corrige.pdf"
       },
       {
         "kind": "maitre",
@@ -159,8 +159,8 @@ export const VI_APPRENTIS: ViApprenti[] = [
       {
         "kind": "apprentissage",
         "label": "Livret d'apprentissage",
-        "filename": "Livret_Apprentissage_Elhadj_AYMEN.pdf",
-        "url": "https://uwjxorvytlqqxszylxre.supabase.co/storage/v1/object/public/vi-pack/files/Elhadj_Aymen/PDF/Livret_Apprentissage_Elhadj_AYMEN.pdf"
+        "filename": "Livret_Apprentissage_Elhadj_AYMEN_corrige.pdf",
+        "url": "https://uwjxorvytlqqxszylxre.supabase.co/storage/v1/object/public/vi-pack/files/Livret_Apprentissage_Elhadj_AYMEN_corrige.pdf"
       },
       {
         "kind": "maitre",
@@ -189,8 +189,8 @@ export const VI_APPRENTIS: ViApprenti[] = [
       {
         "kind": "apprentissage",
         "label": "Livret d'apprentissage",
-        "filename": "Livret_Apprentissage_Housna_GALIFANI.pdf",
-        "url": "https://uwjxorvytlqqxszylxre.supabase.co/storage/v1/object/public/vi-pack/files/Housna_Galifani/PDF/Livret_Apprentissage_Housna_GALIFANI.pdf"
+        "filename": "Livret_Apprentissage_Housna_GALIFANI_corrige.pdf",
+        "url": "https://uwjxorvytlqqxszylxre.supabase.co/storage/v1/object/public/vi-pack/files/Livret_Apprentissage_Housna_GALIFANI_corrige.pdf"
       },
       {
         "kind": "maitre",
@@ -219,8 +219,8 @@ export const VI_APPRENTIS: ViApprenti[] = [
       {
         "kind": "apprentissage",
         "label": "Livret d'apprentissage",
-        "filename": "Livret_Apprentissage_Zohaire-Khalil_ZEGRIR.pdf",
-        "url": "https://uwjxorvytlqqxszylxre.supabase.co/storage/v1/object/public/vi-pack/files/Khalil_Zegrir_Zohaire/PDF/Livret_Apprentissage_Zohaire-Khalil_ZEGRIR.pdf"
+        "filename": "Livret_Apprentissage_Zohaire-Khalil_ZEGRIR_corrige.pdf",
+        "url": "https://uwjxorvytlqqxszylxre.supabase.co/storage/v1/object/public/vi-pack/files/Livret_Apprentissage_Zohaire-Khalil_ZEGRIR_corrige.pdf"
       },
       {
         "kind": "maitre",
@@ -249,8 +249,8 @@ export const VI_APPRENTIS: ViApprenti[] = [
       {
         "kind": "apprentissage",
         "label": "Livret d'apprentissage",
-        "filename": "Livret_Apprentissage_Lassana_FOFANA.pdf",
-        "url": "https://uwjxorvytlqqxszylxre.supabase.co/storage/v1/object/public/vi-pack/files/Lassana_Fofana/PDF/Livret_Apprentissage_Lassana_FOFANA.pdf"
+        "filename": "Livret_Apprentissage_Lassana_FOFANA_corrige.pdf",
+        "url": "https://uwjxorvytlqqxszylxre.supabase.co/storage/v1/object/public/vi-pack/files/Livret_Apprentissage_Lassana_FOFANA_corrige.pdf"
       },
       {
         "kind": "maitre",
@@ -279,8 +279,8 @@ export const VI_APPRENTIS: ViApprenti[] = [
       {
         "kind": "apprentissage",
         "label": "Livret d'apprentissage",
-        "filename": "Livret_Apprentissage_Laurie_JEAN-JOSEPH.pdf",
-        "url": "https://uwjxorvytlqqxszylxre.supabase.co/storage/v1/object/public/vi-pack/files/Laurie_Jean_Joseph/PDF/Livret_Apprentissage_Laurie_JEAN-JOSEPH.pdf"
+        "filename": "Livret_Apprentissage_Laurie_JEAN-JOSEPH_corrige.pdf",
+        "url": "https://uwjxorvytlqqxszylxre.supabase.co/storage/v1/object/public/vi-pack/files/Livret_Apprentissage_Laurie_JEAN-JOSEPH_corrige.pdf"
       },
       {
         "kind": "maitre",
@@ -309,8 +309,8 @@ export const VI_APPRENTIS: ViApprenti[] = [
       {
         "kind": "apprentissage",
         "label": "Livret d'apprentissage",
-        "filename": "Livret_Apprentissage_Leni_GRENET.pdf",
-        "url": "https://uwjxorvytlqqxszylxre.supabase.co/storage/v1/object/public/vi-pack/files/Leni_Grenet/PDF/Livret_Apprentissage_Leni_GRENET.pdf"
+        "filename": "Livret_Apprentissage_Leni_GRENET_corrige.pdf",
+        "url": "https://uwjxorvytlqqxszylxre.supabase.co/storage/v1/object/public/vi-pack/files/Livret_Apprentissage_Leni_GRENET_corrige.pdf"
       },
       {
         "kind": "maitre",
@@ -339,8 +339,8 @@ export const VI_APPRENTIS: ViApprenti[] = [
       {
         "kind": "apprentissage",
         "label": "Livret d'apprentissage",
-        "filename": "Livret_Apprentissage_Lotfi_MATHOU.pdf",
-        "url": "https://uwjxorvytlqqxszylxre.supabase.co/storage/v1/object/public/vi-pack/files/Lotfi_Mathou/PDF/Livret_Apprentissage_Lotfi_MATHOU.pdf"
+        "filename": "Livret_Apprentissage_Lotfi_MATHOU_corrige.pdf",
+        "url": "https://uwjxorvytlqqxszylxre.supabase.co/storage/v1/object/public/vi-pack/files/Livret_Apprentissage_Lotfi_MATHOU_corrige.pdf"
       },
       {
         "kind": "maitre",
@@ -369,8 +369,8 @@ export const VI_APPRENTIS: ViApprenti[] = [
       {
         "kind": "apprentissage",
         "label": "Livret d'apprentissage",
-        "filename": "Livret_Apprentissage_Mamuna_KHANAM-MOHAMMAD.pdf",
-        "url": "https://uwjxorvytlqqxszylxre.supabase.co/storage/v1/object/public/vi-pack/files/Mamuna_Khanam_Mohammad/PDF/Livret_Apprentissage_Mamuna_KHANAM-MOHAMMAD.pdf"
+        "filename": "Livret_Apprentissage_Mamuna_KHANAM-MOHAMMAD_corrige.pdf",
+        "url": "https://uwjxorvytlqqxszylxre.supabase.co/storage/v1/object/public/vi-pack/files/Livret_Apprentissage_Mamuna_KHANAM-MOHAMMAD_corrige.pdf"
       },
       {
         "kind": "maitre",
@@ -399,8 +399,8 @@ export const VI_APPRENTIS: ViApprenti[] = [
       {
         "kind": "apprentissage",
         "label": "Livret d'apprentissage",
-        "filename": "Livret_Apprentissage_Marion_LAURI.pdf",
-        "url": "https://uwjxorvytlqqxszylxre.supabase.co/storage/v1/object/public/vi-pack/files/Marion_Lauri/PDF/Livret_Apprentissage_Marion_LAURI.pdf"
+        "filename": "Livret_Apprentissage_Marion_LAURI_corrige.pdf",
+        "url": "https://uwjxorvytlqqxszylxre.supabase.co/storage/v1/object/public/vi-pack/files/Livret_Apprentissage_Marion_LAURI_corrige.pdf"
       },
       {
         "kind": "maitre",
@@ -429,8 +429,8 @@ export const VI_APPRENTIS: ViApprenti[] = [
       {
         "kind": "apprentissage",
         "label": "Livret d'apprentissage",
-        "filename": "Livret_Apprentissage_Naheed_AKHTAR-MOHAMMAD.pdf",
-        "url": "https://uwjxorvytlqqxszylxre.supabase.co/storage/v1/object/public/vi-pack/files/Naheed_Akhtar_Mohammad/PDF/Livret_Apprentissage_Naheed_AKHTAR-MOHAMMAD.pdf"
+        "filename": "Livret_Apprentissage_Naheed_AKHTAR-MOHAMMAD_corrige.pdf",
+        "url": "https://uwjxorvytlqqxszylxre.supabase.co/storage/v1/object/public/vi-pack/files/Livret_Apprentissage_Naheed_AKHTAR-MOHAMMAD_corrige.pdf"
       },
       {
         "kind": "maitre",
@@ -459,8 +459,8 @@ export const VI_APPRENTIS: ViApprenti[] = [
       {
         "kind": "apprentissage",
         "label": "Livret d'apprentissage",
-        "filename": "Livret_Apprentissage_Nicolas_SCHOUPPE.pdf",
-        "url": "https://uwjxorvytlqqxszylxre.supabase.co/storage/v1/object/public/vi-pack/files/Nicolas_Schouppe/PDF/Livret_Apprentissage_Nicolas_SCHOUPPE.pdf"
+        "filename": "Livret_Apprentissage_Nicolas_SCHOUPPE_corrige.pdf",
+        "url": "https://uwjxorvytlqqxszylxre.supabase.co/storage/v1/object/public/vi-pack/files/Livret_Apprentissage_Nicolas_SCHOUPPE_corrige.pdf"
       },
       {
         "kind": "maitre",
@@ -489,8 +489,8 @@ export const VI_APPRENTIS: ViApprenti[] = [
       {
         "kind": "apprentissage",
         "label": "Livret d'apprentissage",
-        "filename": "Livret_Apprentissage_Rayane_BONDROIT.pdf",
-        "url": "https://uwjxorvytlqqxszylxre.supabase.co/storage/v1/object/public/vi-pack/files/Rayane_Bondroit/PDF/Livret_Apprentissage_Rayane_BONDROIT.pdf"
+        "filename": "Livret_Apprentissage_Rayane_BONDROIT_corrige.pdf",
+        "url": "https://uwjxorvytlqqxszylxre.supabase.co/storage/v1/object/public/vi-pack/files/Livret_Apprentissage_Rayane_BONDROIT_corrige.pdf"
       },
       {
         "kind": "maitre",
@@ -519,8 +519,8 @@ export const VI_APPRENTIS: ViApprenti[] = [
       {
         "kind": "apprentissage",
         "label": "Livret d'apprentissage",
-        "filename": "Livret_Apprentissage_Saliou_CISSE-SALL.pdf",
-        "url": "https://uwjxorvytlqqxszylxre.supabase.co/storage/v1/object/public/vi-pack/files/Saliou_Cisse_Sall/PDF/Livret_Apprentissage_Saliou_CISSE-SALL.pdf"
+        "filename": "Livret_Apprentissage_Saliou_CISSE-SALL_corrige.pdf",
+        "url": "https://uwjxorvytlqqxszylxre.supabase.co/storage/v1/object/public/vi-pack/files/Livret_Apprentissage_Saliou_CISSE-SALL_corrige.pdf"
       },
       {
         "kind": "maitre",
@@ -549,8 +549,8 @@ export const VI_APPRENTIS: ViApprenti[] = [
       {
         "kind": "apprentissage",
         "label": "Livret d'apprentissage",
-        "filename": "Livret_Apprentissage_Sandeep_KUMAR.pdf",
-        "url": "https://uwjxorvytlqqxszylxre.supabase.co/storage/v1/object/public/vi-pack/files/Sandeep_Kumar/PDF/Livret_Apprentissage_Sandeep_KUMAR.pdf"
+        "filename": "Livret_Apprentissage_Sandeep_KUMAR_corrige.pdf",
+        "url": "https://uwjxorvytlqqxszylxre.supabase.co/storage/v1/object/public/vi-pack/files/Livret_Apprentissage_Sandeep_KUMAR_corrige.pdf"
       },
       {
         "kind": "maitre",
@@ -579,8 +579,8 @@ export const VI_APPRENTIS: ViApprenti[] = [
       {
         "kind": "apprentissage",
         "label": "Livret d'apprentissage",
-        "filename": "Livret_Apprentissage_Shaimaa_SAIDI.pdf",
-        "url": "https://uwjxorvytlqqxszylxre.supabase.co/storage/v1/object/public/vi-pack/files/Shaimaa_Saidi/PDF/Livret_Apprentissage_Shaimaa_SAIDI.pdf"
+        "filename": "Livret_Apprentissage_Shaimaa_SAIDI_corrige.pdf",
+        "url": "https://uwjxorvytlqqxszylxre.supabase.co/storage/v1/object/public/vi-pack/files/Livret_Apprentissage_Shaimaa_SAIDI_corrige.pdf"
       },
       {
         "kind": "maitre",
@@ -609,8 +609,8 @@ export const VI_APPRENTIS: ViApprenti[] = [
       {
         "kind": "apprentissage",
         "label": "Livret d'apprentissage",
-        "filename": "Livret_Apprentissage_Tacko_SOUMARE.pdf",
-        "url": "https://uwjxorvytlqqxszylxre.supabase.co/storage/v1/object/public/vi-pack/files/Tacko_Soumare/PDF/Livret_Apprentissage_Tacko_SOUMARE.pdf"
+        "filename": "Livret_Apprentissage_Tacko_SOUMARE_corrige.pdf",
+        "url": "https://uwjxorvytlqqxszylxre.supabase.co/storage/v1/object/public/vi-pack/files/Livret_Apprentissage_Tacko_SOUMARE_corrige.pdf"
       },
       {
         "kind": "maitre",
@@ -639,8 +639,8 @@ export const VI_APPRENTIS: ViApprenti[] = [
       {
         "kind": "apprentissage",
         "label": "Livret d'apprentissage",
-        "filename": "Livret_Apprentissage_Valentin_CUTITARU.pdf",
-        "url": "https://uwjxorvytlqqxszylxre.supabase.co/storage/v1/object/public/vi-pack/files/Valentin_Cutitaru/PDF/Livret_Apprentissage_Valentin_CUTITARU.pdf"
+        "filename": "Livret_Apprentissage_Valentin_CUTITARU_corrige.pdf",
+        "url": "https://uwjxorvytlqqxszylxre.supabase.co/storage/v1/object/public/vi-pack/files/Livret_Apprentissage_Valentin_CUTITARU_corrige.pdf"
       },
       {
         "kind": "maitre",
@@ -669,8 +669,8 @@ export const VI_APPRENTIS: ViApprenti[] = [
       {
         "kind": "apprentissage",
         "label": "Livret d'apprentissage",
-        "filename": "Livret_Apprentissage_Zouheyr_GOURINE.pdf",
-        "url": "https://uwjxorvytlqqxszylxre.supabase.co/storage/v1/object/public/vi-pack/files/Zouheyr_Gourine/PDF/Livret_Apprentissage_Zouheyr_GOURINE.pdf"
+        "filename": "Livret_Apprentissage_Zouheyr_GOURINE_corrige.pdf",
+        "url": "https://uwjxorvytlqqxszylxre.supabase.co/storage/v1/object/public/vi-pack/files/Livret_Apprentissage_Zouheyr_GOURINE_corrige.pdf"
       },
       {
         "kind": "maitre",
