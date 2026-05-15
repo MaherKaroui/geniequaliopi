@@ -186,7 +186,7 @@ export function generateCVHTML(data: CVData, design: CVDesign, options?: { accen
     </div>`;
   }
 
-  const fontFamily = design === "elegant" ? "Georgia,'Times New Roman',serif" : "'Segoe UI',Arial,sans-serif";
+  const fontFamily = fontOverride || (design === "elegant" ? "Georgia,'Times New Roman',serif" : "'Segoe UI',Arial,sans-serif");
   const baseStyle = `font-family:${fontFamily};color:#222;font-size:12px;line-height:1.5;`;
 
   // Return header + each section as separate top-level divs for proper PDF pagination
