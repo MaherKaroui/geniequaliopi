@@ -1125,39 +1125,78 @@ export function genCVBeneficiaireBDC(o: OrganismeInfo, f: FormationInfo, stagiai
     photoUrl: "",
     profil: pickForBeneficiaire(s, si, profilTexts, 42),
     specialites: profile.techniques.slice(0, 3).join(" • "),
-    experiences: [
-      {
-        poste,
-        entreprise: entreprise || `Secteur ${profile.secteur}`,
-        dateDebut: `${yearMid}`,
-        dateFin: `${yearNow}`,
-        description: pickForBeneficiaire(s, si, expDescriptions, 43),
-      },
-      {
-        poste: perso.profile.metier,
-        entreprise: pickForBeneficiaire(s, si, [
-          `Entreprise locale – ${ville}`,
-          `PME du secteur ${profile.secteur}`,
-          `Établissement à ${ville}`,
-          `Société de services – ${ville}`,
-        ], 44),
-        dateDebut: `${yearStart}`,
-        dateFin: `${yearMid}`,
-        description: pickForBeneficiaire(s, si, [
-          "Polyvalence sur les missions confiées et adaptation rapide à de nouveaux environnements de travail.",
-          "Participation à l'organisation quotidienne et au respect des procédures internes.",
-          "Contribution à la satisfaction client et au bon déroulement de l'activité.",
-          "Soutien à l'équipe sur les pics d'activité et reporting régulier au responsable.",
-        ], 45),
-      },
-      {
-        poste: pickForBeneficiaire(s, si, ["Premier poste / stage", "Emploi saisonnier", "Mission d'intérim", "Apprentissage"], 46),
-        entreprise: ville,
-        dateDebut: `${yearEarly}`,
-        dateFin: `${yearStart}`,
-        description: "Découverte du monde professionnel, intégration à une équipe et acquisition des fondamentaux du métier.",
-      },
-    ],
+    experiences: (() => {
+      // Nombre d'expériences variable : 2, 3, 4 ou 5 selon le bénéficiaire
+      const nbExp = 2 + deterministicIndex(s, si, 4, 91);
+      const villes = [ville, "Paris", "Lyon", "Marseille", "Toulouse", "Nantes", "Bordeaux", "Lille"];
+      const v2 = pickForBeneficiaire(s, si, villes, 92);
+      const v3 = pickForBeneficiaire(s, si, villes, 93);
+      const all = [
+        // Exp 1 - Poste actuel/récent
+        {
+          poste,
+          entreprise: entreprise || `Secteur ${profile.secteur} – ${ville}`,
+          dateDebut: `${yearMid}`,
+          dateFin: `${yearNow}`,
+          description: pickForBeneficiaire(s, si, expDescriptions, 43),
+        },
+        // Exp 2 - Précédente
+        {
+          poste: perso.profile.metier,
+          entreprise: pickForBeneficiaire(s, si, [
+            `Entreprise locale – ${ville}`, `PME du secteur ${profile.secteur}`,
+            `Établissement à ${ville}`, `Société de services – ${v2}`,
+            `Cabinet ${profile.secteur} – ${v2}`,
+          ], 44),
+          dateDebut: `${yearStart}`,
+          dateFin: `${yearMid}`,
+          description: pickForBeneficiaire(s, si, [
+            "Polyvalence sur les missions confiées et adaptation rapide à de nouveaux environnements de travail.",
+            "Participation à l'organisation quotidienne et au respect des procédures internes.",
+            "Contribution à la satisfaction client et au bon déroulement de l'activité.",
+            "Soutien à l'équipe sur les pics d'activité et reporting régulier au responsable.",
+            "Encadrement ponctuel de stagiaires et formation des nouveaux entrants sur les procédures.",
+          ], 45),
+        },
+        // Exp 3 - Premier poste
+        {
+          poste: pickForBeneficiaire(s, si, ["Premier poste / stage", "Emploi saisonnier", "Mission d'intérim", "Apprentissage", "Contrat aidé"], 46),
+          entreprise: pickForBeneficiaire(s, si, [`Établissement local – ${ville}`, `TPE – ${v3}`, `Association locale`, `Commerce de proximité – ${ville}`], 94),
+          dateDebut: `${yearEarly}`,
+          dateFin: `${yearStart}`,
+          description: pickForBeneficiaire(s, si, [
+            "Découverte du monde professionnel, intégration à une équipe et acquisition des fondamentaux du métier.",
+            "Apprentissage des bases du métier, observation des process et premières prises de responsabilité.",
+            "Mission de remplacement : adaptation rapide, autonomie et fiabilité dans l'exécution des tâches.",
+          ], 95),
+        },
+        // Exp 4 - Mission complémentaire (optionnelle)
+        {
+          poste: pickForBeneficiaire(s, si, ["Mission ponctuelle", "Vacation", "Bénévolat associatif", "Activité indépendante", "Service civique"], 96),
+          entreprise: pickForBeneficiaire(s, si, [`Association ${ville}`, `Indépendant – ${ville}`, `Collectif local`, `Structure d'insertion – ${v2}`], 97),
+          dateDebut: `${yearEarly - 1}`,
+          dateFin: `${yearEarly}`,
+          description: pickForBeneficiaire(s, si, [
+            "Engagement dans une démarche solidaire et développement de compétences transversales (organisation, communication, gestion de projet).",
+            "Accompagnement de publics variés et travail en équipe pluridisciplinaire.",
+            "Participation à l'animation d'événements et à la coordination logistique.",
+          ], 98),
+        },
+        // Exp 5 - Formation/job étudiant (optionnelle)
+        {
+          poste: pickForBeneficiaire(s, si, ["Job étudiant", "Stage de découverte", "Aide familial(e)", "Petits boulots", "Service à la personne"], 99),
+          entreprise: pickForBeneficiaire(s, si, [`Restauration – ${ville}`, `Grande distribution – ${ville}`, `Particulier employeur`, `Commerce indépendant – ${v3}`], 100),
+          dateDebut: `${yearEarly - 3}`,
+          dateFin: `${yearEarly - 1}`,
+          description: pickForBeneficiaire(s, si, [
+            "Première expérience du monde du travail : ponctualité, sens du service, gestion du stress.",
+            "Contact client direct, encaissement, mise en rayon et entretien de l'espace de travail.",
+            "Accompagnement de personnes au quotidien, sens de l'écoute et de la bienveillance.",
+          ], 101),
+        },
+      ];
+      return all.slice(0, nbExp);
+    })(),
     formations: [
       ...(s.diplome ? [{ diplome: s.diplome, etablissement: pickForBeneficiaire(s, si, ["Lycée professionnel", "Centre de formation", "CFA régional", "Établissement public"], 47), annee: `${yearStart - 1}` }] : []),
       { diplome: pickForBeneficiaire(s, si, profile.formations, 48), etablissement: "Formation continue", annee: `${yearMid}` },
