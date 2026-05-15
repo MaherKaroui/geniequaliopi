@@ -780,7 +780,7 @@ export default function OPCOMobilites() {
     return obj;
   };
 
-  const handleSaveDossier = async () => {
+  const handleSaveDossier = async (mode: "save" | "update" | "saveAsNew" = "save") => {
     if (!user) { toast.error("Connectez-vous pour sauvegarder"); navigate("/auth"); return; }
     if (!organisme.nom?.trim()) { toast.error("Nom de l'organisme requis"); return; }
     setSavingDossier(true);
@@ -795,15 +795,16 @@ export default function OPCOMobilites() {
       doc_states: serializeDocStates() as any,
     };
     let res;
-    if (currentDossierId) {
+    if (mode === "update" && currentDossierId) {
       res = await supabase.from("saved_opco_dossiers").update(payload).eq("id", currentDossierId).select().single();
     } else {
+      // save or saveAsNew → toujours insert
       res = await supabase.from("saved_opco_dossiers").insert(payload).select().single();
     }
     setSavingDossier(false);
     if (res.error) { toast.error(`Erreur : ${res.error.message}`); return; }
     setCurrentDossierId((res.data as any).id);
-    toast.success(currentDossierId ? "Dossier mis à jour" : "Dossier sauvegardé");
+    toast.success(mode === "update" ? "Dossier mis à jour" : mode === "saveAsNew" ? "Nouveau dossier créé" : "Dossier sauvegardé");
     loadSavedList();
   };
 
