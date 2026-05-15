@@ -606,14 +606,16 @@ export function genTableauBasesBDC(o: OrganismeInfo, f: FormationInfo, stagiaire
     ];
   }
 
-  return buildDocument({ org: o, title: `TABLEAU DES BASES – ${profile.label.toUpperCase()}`, subtitle: `Référentiel technique – Bilan de compétences`, sections: [
+  return buildDocument({ org: o, title: `TABLEAU DES BASES – ${profile.label.toUpperCase()}`, subtitle: `Référentiel technique – Bilan de compétences`, stagiaires: stagiaires?.[si] ? [stagiaires[si]] : undefined, sections: [
+    ...bdcBeneficiarySections(f, stagiaires, si),
     { heading: "Introduction", content: `<p>Ce tableau récapitulatif présente les bases techniques essentielles du métier de <strong>${profile.metier}</strong> dans ${profile.secteur}. Il est remis au bénéficiaire en tant que ressource d'appui lors de la phase d'investigation du bilan de compétences.</p>` },
   ], table: { headers, rows } });
 }
 
 // ===== CR5 - IND 21 : Fiche de poste consultant bilan =====
-export function genFichePosteConsultantBDC(o: OrganismeInfo) {
-  return buildDocument({ org: o, title: "FICHE DE POSTE – CONSULTANT(E) BILAN DE COMPÉTENCES", sections: [
+export function genFichePosteConsultantBDC(o: OrganismeInfo, f?: FormationInfo, stagiaires?: StagiaireInfo[], si = 0) {
+  return buildDocument({ org: o, title: "FICHE DE POSTE – CONSULTANT(E) BILAN DE COMPÉTENCES", stagiaires: stagiaires?.[si] ? [stagiaires[si]] : undefined, sections: [
+    ...(f ? bdcBeneficiarySections(f, stagiaires, si) : []),
     { heading: "Intitulé du poste", content: `<p>Consultant(e) en bilan de compétences<br><strong>Organisme :</strong> ${o.nom}<br><strong>Rattachement :</strong> Direction pédagogique</p>` },
     { heading: "Missions principales", content: "<p>• Conduire des bilans de compétences conformément aux articles L6313-1 à L6313-12 du Code du travail<br>• Accompagner les bénéficiaires dans les trois phases du bilan (préliminaire, investigation, conclusion)<br>• Rédiger les documents de synthèse confidentiels<br>• Assurer le suivi à 6 mois<br>• Réaliser les enquêtes métier et les recherches sectorielles<br>• Garantir la confidentialité des données</p>" },
     { heading: "Compétences requises", content: "<p>• Maîtrise des techniques d'entretien et d'écoute active<br>• Connaissance approfondie du marché de l'emploi et des dispositifs de formation<br>• Capacité d'analyse et de synthèse<br>• Maîtrise des outils d'évaluation (tests, grilles de compétences)<br>• Connaissance du cadre réglementaire (Qualiopi, RGPD)</p>", variant: "green" },
