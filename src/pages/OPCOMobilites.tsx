@@ -1000,9 +1000,9 @@ export default function OPCOMobilites() {
             {refDossier && <Badge variant="outline" className="ml-2">Réf. {refDossier}</Badge>}
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={handleSaveDossier} disabled={savingDossier} className="gap-1">
+            <Button variant="outline" size="sm" onClick={() => handleSaveDossier(currentDossierId ? "update" : "save")} disabled={savingDossier} className="gap-1">
               {savingDossier ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-              Sauvegarder
+              {currentDossierId ? "Mettre à jour" : "Sauvegarder"}
             </Button>
             <Button variant="outline" size="sm" onClick={() => setStep("setup")}>
               Modifier les infos
