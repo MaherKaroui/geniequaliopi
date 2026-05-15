@@ -1025,8 +1025,25 @@ export function genCVBeneficiaireBDC(o: OrganismeInfo, f: FormationInfo, stagiai
   const poste = s.poste || perso.profile.metier;
   const adresseLine = [s.adresse, [s.codePostal, s.commune].filter(Boolean).join(" ")].filter(Boolean).join(", ");
 
-  // Pick a deterministic CV design per beneficiary so each one looks unique
+  // Pick a deterministic CV design + accent + font per beneficiary so each one looks visually distinct
   const design: CVDesign = CV_DESIGNS[deterministicIndex(s, si, CV_DESIGNS.length, 41)].id;
+  const accentPalette = [
+    "#1e3a7b", "#2563eb", "#0f766e", "#92700C", "#dc2626", "#7c3aed",
+    "#0891b2", "#be185d", "#15803d", "#b45309", "#475569", "#9333ea",
+    "#c2410c", "#0369a1", "#4d7c0f", "#a21caf",
+  ];
+  const fontPalette = [
+    "'Segoe UI',Arial,sans-serif",
+    "Georgia,'Times New Roman',serif",
+    "'Helvetica Neue',Helvetica,Arial,sans-serif",
+    "'Trebuchet MS',sans-serif",
+    "'Verdana',Geneva,sans-serif",
+    "'Calibri','Segoe UI',sans-serif",
+    "'Garamond','Times New Roman',serif",
+    "'Tahoma',Geneva,sans-serif",
+  ];
+  const accent = accentPalette[deterministicIndex(s, si, accentPalette.length, 81)];
+  const fontFamily = fontPalette[deterministicIndex(s, si, fontPalette.length, 82)];
 
   const profilTexts = [
     `${perso.profile.metier} avec ${yearNow - yearStart} ans d'expérience dans le secteur ${profile.secteur}. ${perso.objectif.charAt(0).toUpperCase() + perso.objectif.slice(1)}.`,
