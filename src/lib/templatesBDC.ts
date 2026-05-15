@@ -4,7 +4,7 @@
  *               phases d'accompagnement (pas modules de cours)
  */
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
-import { buildDocument, formatDate, subtractBusinessDays, tableHTML, section, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif, getStagiaireDuree, g, getDocStyle, footer, orgHeader, htmlWrap, applyGender } from "./docBuilder";
+import { buildDocument, formatDate, subtractBusinessDays, tableHTML, section, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif, getStagiaireDuree, g, getDocStyle, footer, orgHeader, htmlWrap, applyGender, isStagiaireFormationTerminee } from "./docBuilder";
 import { FormateurInfo, parseDuree } from "./sampleData";
 import { generateCVHTML, CV_DESIGNS, type CVData, type CVDesign } from "./cvGenerator";
 
@@ -432,8 +432,37 @@ export function genQuestionnaireEnqueteMetiersBDC(o: OrganismeInfo, f: Formation
 // ===== CR3 - IND 11 : Questionnaire suivi post-bilan =====
 export function genSuiviPostBilanBDC(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = stagiaires[si] || stagiaires[0];
+  const termine = isStagiaireFormationTerminee(s, f);
+  const p = bdcPersonalisation(f, s, si);
+  // Si formation terminée → pré-remplir avec données réalistes pour audit
+  if (termine) {
+    const dtFin = endDate(s, f);
+    // Date du questionnaire : ~6 mois après fin de bilan
+    const dFin = new Date(s.dateFinFormation || f.dateFin);
+    dFin.setMonth(dFin.getMonth() + 6);
+    const dtQuestionnaire = formatDate(dFin.toISOString().split("T")[0]);
+    // Variantes déterministes
+    const planAction = ["☒ Oui, intégralement", "☒ Oui, partiellement", "☒ Oui, intégralement"][deterministicIndex(s, si, 3, 51)];
+    const projetEvol = ["☒ Je poursuis le même projet", "☒ Je poursuis le même projet", "☒ J'ai modifié mon projet"][deterministicIndex(s, si, 3, 52)];
+    const formationCompl = ["☒ Oui", "☐ Oui", "☒ Oui"][deterministicIndex(s, si, 3, 53)];
+    const formLib = formationCompl.includes("☒") ? p.formation : "—";
+    const situations = ["☒ En poste (nouvel employeur)", "☒ En formation", "☒ Création d'entreprise", "☒ En poste (même employeur)"];
+    const situation = situations[deterministicIndex(s, si, situations.length, 54)];
+    const utilites = ["☒ Très utile", "☒ Très utile", "☒ Assez utile"];
+    const utilite = utilites[deterministicIndex(s, si, utilites.length, 55)];
+    return buildDocument({ org: o, title: "QUESTIONNAIRE DE SUIVI POST BILAN DE COMPÉTENCES", subtitle: "Bilan à 6 mois après la fin du bilan", stagiaires: [s], sections: [
+      { heading: "Identification", content: `<p><strong>Bénéficiaire :</strong> ${beneficiaireLabel(s)}<br><strong>Consultant(e) :</strong> ${consultantName(o)}<br><strong>Date du bilan :</strong> du ${startDate(s, f)} au ${dtFin}<br><strong>Date du questionnaire :</strong> ${dtQuestionnaire}</p>` },
+      { heading: "1. Avez-vous mis en œuvre votre plan d'action ?", content: `<p>${planAction.includes("intégralement") ? planAction : "☐ Oui, intégralement"}<br>${planAction.includes("partiellement") ? planAction : "☐ Oui, partiellement"}<br>☐ Non, pas encore<br>Précisions : ${p.opportunite} – démarches engagées (${p.formation}).</p>` },
+      { heading: "2. Votre projet professionnel a-t-il évolué ?", content: `<p>${projetEvol.includes("même") ? projetEvol : "☐ Je poursuis le même projet"}<br>${projetEvol.includes("modifié") ? projetEvol : "☐ J'ai modifié mon projet"}<br>☐ J'ai abandonné mon projet<br>Précisions : confirmation de la piste ${p.opportunite} dans ${p.profile.secteur}.</p>` },
+      { heading: "3. Avez-vous suivi une formation complémentaire ?", content: `<p>${formationCompl} – Laquelle : ${formLib}<br>${formationCompl.includes("☒") ? "☐ Non" : "☒ Non"}</p>`, variant: "green" },
+      { heading: "4. Votre situation professionnelle actuelle", content: `<p>${situation}<br>Précisions : insertion en cours dans ${p.profile.secteur}.</p>` },
+      { heading: "5. Le bilan vous a-t-il aidé dans vos démarches ?", content: `<p>${utilite}</p>` },
+      { heading: "6. Commentaires libres", content: `<p>${p.commentaireSatisfaction}</p>` },
+    ], signatures: { type: "2", labels: [`${g(s, "Le Consultant", "La Consultante")}`, `${g(s, "Le Bénéficiaire", "La Bénéficiaire")}`], names: [consultantName(o), beneficiaireLabel(s)], dates: [dtQuestionnaire, dtQuestionnaire] } });
+  }
+  // Sinon : trame vierge (formation non terminée)
   return buildDocument({ org: o, title: "QUESTIONNAIRE DE SUIVI POST BILAN DE COMPÉTENCES", subtitle: "À remplir 6 mois après la fin du bilan", stagiaires: [s], sections: [
-    { heading: "Identification", content: `<p><strong>Bénéficiaire :</strong> <br><strong>Consultant(e) :</strong> <br><strong>Date du bilan :</strong> du ____/____/________ au ____/____/________<br><strong>Date du questionnaire :</strong> ____/____/________</p>` },
+    { heading: "Identification", content: `<p><strong>Bénéficiaire :</strong> ${beneficiaireLabel(s)}<br><strong>Consultant(e) :</strong> ${consultantName(o)}<br><strong>Date du bilan :</strong> du ${startDate(s, f)} au ${endDate(s, f)}<br><strong>Date du questionnaire :</strong> ____/____/________</p>` },
     { heading: "1. Avez-vous mis en œuvre votre plan d'action ?", content: "<p>☐ Oui, intégralement<br>☐ Oui, partiellement<br>☐ Non, pas encore<br>Précisions : _______________________________</p>" },
     { heading: "2. Votre projet professionnel a-t-il évolué ?", content: "<p>☐ Je poursuis le même projet<br>☐ J'ai modifié mon projet<br>☐ J'ai abandonné mon projet<br>Précisions : _______________________________</p>" },
     { heading: "3. Avez-vous suivi une formation complémentaire ?", content: "<p>☐ Oui – Laquelle : _______________________________<br>☐ Non</p>" },
@@ -639,10 +668,31 @@ export function genCompteRenduFinBDC(o: OrganismeInfo, f: FormationInfo, stagiai
 
 // ===== CR5 - IND 21 : Fiche intervenant externe =====
 export function genFicheIntervenantExterneBDC(o: OrganismeInfo, f: FormationInfo, stagiaires?: StagiaireInfo[], si = 0) {
+  const s = stagiaires?.[si];
+  const p = bdcPersonalisation(f, s, si);
+  // Pool d'intervenants externes réalistes par secteur
+  const intervenantsBySector: Record<string, Array<{nom: string; prenom: string; entreprise: string; siret: string; fonction: string; email: string; tel: string}>> = {
+    esthetique: [
+      { nom: "MARTINEZ", prenom: "Sophie", entreprise: "Institut Belle Époque", siret: "82345678900015", fonction: "Esthéticienne diplômée – Gérante", email: "s.martinez@institut-belle-epoque.fr", tel: "06 12 34 56 78" },
+      { nom: "DUBOIS", prenom: "Camille", entreprise: "Spa Harmonie & Co", siret: "79456123400022", fonction: "Praticienne spa & soins corps", email: "c.dubois@spa-harmonie.fr", tel: "06 45 78 12 33" },
+    ],
+    automobile: [
+      { nom: "LEROY", prenom: "Thomas", entreprise: "Garage LEROY Auto", siret: "81234567800019", fonction: "Mécanicien automobile – Chef d'atelier", email: "contact@leroy-auto.fr", tel: "06 78 23 45 67" },
+      { nom: "BERNARD", prenom: "Julien", entreprise: "AD Expert Mécanique", siret: "80987654300017", fonction: "Technicien diagnostic automobile", email: "j.bernard@ad-expert.fr", tel: "06 23 89 56 14" },
+    ],
+    commerce: [
+      { nom: "ROUSSEAU", prenom: "Marc", entreprise: "Cabinet Habitat Conseil", siret: "82456789100023", fonction: "Négociateur immobilier senior", email: "m.rousseau@habitat-conseil.fr", tel: "06 14 56 78 92" },
+      { nom: "GIRAUD", prenom: "Sandrine", entreprise: "Performance B2B", siret: "81765432100018", fonction: "Technico-commerciale terrain", email: "s.giraud@performance-b2b.fr", tel: "06 89 23 45 17" },
+    ],
+  };
+  const sectorKey = /esth/i.test(p.profile.label) ? "esthetique" : /m[ée]canique|automobile|v[ée]hicule/i.test(p.profile.label) ? "automobile" : "commerce";
+  const pool = intervenantsBySector[sectorKey];
+  const idx = deterministicIndex(s, si, pool.length, 7);
+  const it = pool[idx];
   return buildDocument({ org: o, title: "FICHE INTERVENANT EXTERNE", subtitle: `Bilan de compétences – ${f.intitule}`, stagiaires: stagiaires?.[si] ? [stagiaires[si]] : undefined, sections: [
     ...bdcBeneficiarySections(f, stagiaires, si),
     { heading: "Organisme de formation", content: `<p><strong>${o.nom}</strong><br>Adresse : ${o.adresse}<br>SIRET : ${o.siret || "—"}<br>Consultant(e) : ${consultantName(o)}<br>Contact : ${o.email || "—"}${o.telephone?.trim() ? ` – ${o.telephone}` : ""}<br>Formation concernée : Bilan de compétences – ${f.intitule}<br>Dates : du ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)}</p>` },
-    { heading: "Identité de l'intervenant externe", content: "<p>• <strong>Nom :</strong> (à compléter)<br>• <strong>Prénom :</strong> (à compléter)<br>• <strong>Entreprise / Structure :</strong> (à compléter)<br>• <strong>SIRET :</strong> (à compléter)<br>• <strong>Fonction :</strong> Professionnel du secteur / Formateur spécialisé<br>• <strong>E-mail :</strong> (à compléter)<br>• <strong>Téléphone :</strong> (à compléter)</p>" },
+    { heading: "Identité de l'intervenant externe", content: `<p>• <strong>Nom :</strong> ${it.nom}<br>• <strong>Prénom :</strong> ${it.prenom}<br>• <strong>Entreprise / Structure :</strong> ${it.entreprise}<br>• <strong>SIRET :</strong> ${it.siret}<br>• <strong>Fonction :</strong> ${it.fonction}<br>• <strong>E-mail :</strong> ${it.email}<br>• <strong>Téléphone :</strong> ${it.tel}</p>` },
     { heading: "Compétences et qualifications", content: `<p>• <strong>Diplôme :</strong> Qualification dans le domaine de ${f.intitule}<br>• <strong>Expérience :</strong> Minimum 1 an dans le secteur<br>• <strong>Expérience en transmission :</strong> Ateliers, formation professionnelle ou encadrement</p>`, variant: "green" },
     { heading: "Rôle dans le bilan", content: "<p>• Intervention lors de la <strong>phase d'investigation</strong> du bilan<br>• Présentation du métier : conditions, débouchés, réalités terrain<br>• Partage d'expérience et retour constructif<br>• Participation à la validation du projet du bénéficiaire</p>" },
     { heading: "Modalités d'intervention", content: "<p>• <strong>Type :</strong> Présentiel / Visio<br>• <strong>Durée estimée :</strong> 2 à 4 heures<br>• <strong>Supports fournis :</strong> Témoignage oral, fiche métier, démonstration éventuelle</p>" },
