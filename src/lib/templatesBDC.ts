@@ -4,7 +4,7 @@
  *               phases d'accompagnement (pas modules de cours)
  */
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
-import { buildDocument, formatDate, subtractBusinessDays, tableHTML, section, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif, getStagiaireDuree, g, getDocStyle, footer, orgHeader, htmlWrap, applyGender } from "./docBuilder";
+import { buildDocument, formatDate, subtractBusinessDays, tableHTML, section, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif, getStagiaireDuree, g, getDocStyle, footer, orgHeader, htmlWrap, applyGender, isStagiaireFormationTerminee } from "./docBuilder";
 import { FormateurInfo, parseDuree } from "./sampleData";
 import { generateCVHTML, CV_DESIGNS, type CVData, type CVDesign } from "./cvGenerator";
 
