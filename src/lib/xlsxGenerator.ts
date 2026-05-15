@@ -988,3 +988,46 @@ export function generateExcelCalendrierOPCO(
 export function excelToBlob(htmlContent: string): Blob {
   return new Blob(["\ufeff", htmlContent], { type: "application/vnd.ms-excel" });
 }
+
+// ===== BDC : Registre des bénéficiaires =====
+export function generateExcelRegistreBeneficiairesBDC(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]): string {
+  let html = tableRow([
+    "N°", "Nom", "Prénom", "Sexe", "Date entrée", "Date sortie",
+    "Financement", "Phase préliminaire", "Phase investigation", "Phase conclusion",
+    "Document de synthèse remis", "Plan d'action remis", "Confidentialité signée",
+    "Référent handicap mobilisé", "Satisfaction à chaud /10",
+    "Entretien suivi 6 mois (date prévue)", "Suivi 6 mois réalisé", "Devenir / impact",
+    "Observations"
+  ], true);
+  stagiaires.slice(0, 30).forEach((s, i) => {
+    const sc = EVAL_SCORES[i] || [8, 9, 8, 9, 8];
+    const avg = Math.round(sc.reduce((a, b) => a + b, 0) / sc.length * 10) / 10;
+    const sexe = s.prenom?.endsWith('a') || s.prenom?.endsWith('e') ? 'F' : 'H';
+    const fin = s?.dateFinFormation || f.dateFin || "";
+    let dt6m = "";
+    if (fin) { const d = new Date(fin); if (!isNaN(d.getTime())) { d.setMonth(d.getMonth() + 6); dt6m = formatDate(d.toISOString().split("T")[0]); } }
+    const termine = isFormationTerminee(f, stagiaires);
+    html += tableRow([
+      String(i + 1),
+      (s.nom || "").toUpperCase(),
+      (s.prenom || "").toUpperCase(),
+      sexe,
+      formatDate(s?.dateDebutFormation || f.dateDebut || ""),
+      formatDate(fin),
+      "CPF",
+      "Validée",
+      termine ? "Validée" : "En cours",
+      termine ? "Validée" : "À venir",
+      termine ? "Oui" : "À venir",
+      termine ? "Oui" : "À venir",
+      "Oui",
+      "Non (sans objet)",
+      termine ? `${avg}/10` : "—",
+      dt6m,
+      termine ? "À planifier" : "—",
+      termine ? "Plan d'action en cours" : "—",
+      ""
+    ]);
+  });
+  return excelWrap(`REGISTRE DES BÉNÉFICIAIRES – BILAN DE COMPÉTENCES – ${o.nom || ""}`, [{ name: "Registre BDC", html }]);
+}
