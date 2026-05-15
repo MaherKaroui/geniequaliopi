@@ -1190,6 +1190,7 @@ export function buildFullCatalog(
     stagiaires.forEach((s, si) => {
       add(`bdc_c3i11_grille_suivi_${si}`, `CT3 - IND 11 Grille de suivi – ${s.prenom} ${s.nom}`, 3, 11, "bdc_grille_suivi", { stagiaireIdx: si });
       add(`bdc_c3i11_suivi_post_${si}`, `CT3 - IND 11 Questionnaire suivi post-bilan – ${s.prenom} ${s.nom}`, 3, 11, "bdc_suivi_post_bilan", { stagiaireIdx: si });
+      add(`bdc_c3i11_trame_6mois_${si}`, `CT3 - IND 11 Trame entretien de suivi à 6 mois – ${s.prenom} ${s.nom}`, 3, 11, "bdc_trame_suivi_6mois", { stagiaireIdx: si });
     });
 
     // CT3 - IND 12 : Déroulé et modalités + Procédure d'adaptation
