@@ -154,9 +154,28 @@ export function getEmargementJuryHTML(sessionDate: string): string {
 // ======================================================================
 // 3. GRILLE D'ÉVALUATION — 11 pages (Escale Beauty)
 // ======================================================================
+// Seeded PRNG for per-trainee deterministic variation
+function seededRand(seed: string) {
+  let h = 2166136261 >>> 0;
+  for (let i = 0; i < seed.length; i++) { h ^= seed.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return () => {
+    h = Math.imul(h ^ (h >>> 15), 2246822507);
+    h = Math.imul(h ^ (h >>> 13), 3266489909);
+    h ^= h >>> 16;
+    return (h >>> 0) / 4294967296;
+  };
+}
+
 export function getGrilleEvaluationHTML(s: CertifStagiaire): string {
-  // Each competence rendered as its OWN small table so it stays together (page-break-inside:avoid)
-  const competenceBlocks = COMPETENCES.map((c) => `
+  // Per-trainee variation: ~88% acquired criteria. Compétence acquise si ≥70% critères acquis.
+  const rand = seededRand(`${s.nom}|${s.prenom}|${s.dateNaissance}`);
+  const perCompetence = COMPETENCES.map((c) => {
+    const criteres = c.criteres.map((cr) => ({ ...cr, acquis: rand() < 0.88 }));
+    const ratio = criteres.filter((x) => x.acquis).length / criteres.length;
+    return { c, criteres, competenceAcquise: ratio >= 0.7 };
+  });
+
+  const competenceBlocks = perCompetence.map(({ c, criteres }) => `
     <table class="grille-table" style="margin:0 0 6px 0;page-break-inside:avoid">
       <colgroup><col style="width:58%"><col style="width:21%"><col style="width:21%"></colgroup>
       <thead>
@@ -168,14 +187,14 @@ export function getGrilleEvaluationHTML(s: CertifStagiaire): string {
         </tr>
       </thead>
       <tbody>
-        ${c.criteres.map(cr => `
+        ${criteres.map(cr => `
           <tr>
             <td style="padding-left:14px">${cr.texte}</td>
             <td style="text-align:center;font-size:9.5pt">
               ${cr.acquis ? '<span style="color:#0a8a3a;font-weight:bold">☒ Acquis</span>' : '☐ Acquis'}
             </td>
             <td style="text-align:center;font-size:9.5pt;color:#999">
-              ${!cr.acquis ? '<span style="font-weight:bold">☒ Non acquis</span>' : '☐ Non acquis'}
+              ${!cr.acquis ? '<span style="font-weight:bold;color:#b00020">☒ Non acquis</span>' : '☐ Non acquis'}
             </td>
           </tr>
         `).join("")}
@@ -183,8 +202,10 @@ export function getGrilleEvaluationHTML(s: CertifStagiaire): string {
     </table>
   `).join("");
 
-  const synthese = COMPETENCES.map(c =>
-    `<tr><td>Compétence ${c.num}</td><td style="text-align:center"><strong style="color:#0a8a3a">☒ Acquise</strong></td><td style="text-align:center;color:#999">☐ Non acquise</td></tr>`
+  const synthese = perCompetence.map(({ c, competenceAcquise }) =>
+    `<tr><td>Compétence ${c.num}</td>` +
+    `<td style="text-align:center">${competenceAcquise ? '<strong style="color:#0a8a3a">☒ Acquise</strong>' : '<span style="color:#999">☐ Acquise</span>'}</td>` +
+    `<td style="text-align:center">${!competenceAcquise ? '<strong style="color:#b00020">☒ Non acquise</strong>' : '<span style="color:#999">☐ Non acquise</span>'}</td></tr>`
   ).join("");
 
   return `<!doctype html><html><head><meta charset="utf-8">${baseStyle}<style>
