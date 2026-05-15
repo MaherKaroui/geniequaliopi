@@ -1144,8 +1144,11 @@ export function buildFullCatalog(
   if (isBDC) {
     // CT1 - IND 1 : Programme
     add("bdc_c1i1_programme", "CT1 - IND 1 Programme du bilan de compétences", 1, 1, "bdc_programme");
+    add("bdc_c1i1_catalogue", "CT1 - IND 1 Fiche commerciale publique (Qualiopi V9)", 1, 1, "bdc_catalogue_commercial");
     // CT1 - IND 2 : Indicateurs (Excel existant)
     add("bdc_c1i2_indicateurs", "CT1 - IND 2 Indicateurs de performance (Excel)", 1, 2, "indicateurs_performance");
+    // Registre bénéficiaires (suivi parcours)
+    add("bdc_c1i2_registre_beneficiaires", "CT1 - IND 2 Registre des bénéficiaires (Excel)", 1, 2, "tableau_suivi_parcours_excel");
 
     // CT2 - IND 4 : Évaluation des besoins (per bénéficiaire)
     stagiaires.forEach((s, si) => {
