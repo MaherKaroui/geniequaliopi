@@ -154,9 +154,28 @@ export function getEmargementJuryHTML(sessionDate: string): string {
 // ======================================================================
 // 3. GRILLE D'ÉVALUATION — 11 pages (Escale Beauty)
 // ======================================================================
+// Seeded PRNG for per-trainee deterministic variation
+function seededRand(seed: string) {
+  let h = 2166136261 >>> 0;
+  for (let i = 0; i < seed.length; i++) { h ^= seed.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return () => {
+    h = Math.imul(h ^ (h >>> 15), 2246822507);
+    h = Math.imul(h ^ (h >>> 13), 3266489909);
+    h ^= h >>> 16;
+    return (h >>> 0) / 4294967296;
+  };
+}
+
 export function getGrilleEvaluationHTML(s: CertifStagiaire): string {
-  // Each competence rendered as its OWN small table so it stays together (page-break-inside:avoid)
-  const competenceBlocks = COMPETENCES.map((c) => `
+  // Per-trainee variation: ~88% acquired criteria. Compétence acquise si ≥70% critères acquis.
+  const rand = seededRand(`${s.nom}|${s.prenom}|${s.dateNaissance}`);
+  const perCompetence = COMPETENCES.map((c) => {
+    const criteres = c.criteres.map((cr) => ({ ...cr, acquis: rand() < 0.88 }));
+    const ratio = criteres.filter((x) => x.acquis).length / criteres.length;
+    return { c, criteres, competenceAcquise: ratio >= 0.7 };
+  });
+
+  const competenceBlocks = perCompetence.map(({ c, criteres }) => `
     <table class="grille-table" style="margin:0 0 6px 0;page-break-inside:avoid">
       <colgroup><col style="width:58%"><col style="width:21%"><col style="width:21%"></colgroup>
       <thead>
