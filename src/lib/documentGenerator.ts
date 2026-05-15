@@ -421,18 +421,18 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "bdc_fiche_intervenant": { const si = params?.stagiaireIdx ?? 0; return genFicheIntervenantExterneBDC_imported(o, f, stagiaires, si); }
     case "bdc_satisfaction_chaud": { const si = params?.stagiaireIdx ?? 0; return genSatisfactionChaudBDC_imported(o, f, stagiaires, si); }
     case "bdc_formulaire_reclamation": { const si = params?.stagiaireIdx ?? 0; return genFormulaireReclamationBDC_imported(o, f, stagiaires, si); }
-    case "bdc_gestion_reclamations": return genGestionReclamationsBDC_imported(o);
-    case "bdc_actions_correctives": return genActionsCorrectivesBDC_imported(o);
-    case "bdc_fiche_veille": return genFicheVeilleBDC_imported(o, f);
-    case "bdc_contrat_sous_traitance": return genContratSousTraitanceBDC_imported(o, f);
-    case "bdc_catalogue_commercial": return genCatalogueCommercialBDC_imported(o, f);
-    case "bdc_procedure_handicap": return genProcedureHandicapBDC_imported(o);
+    case "bdc_gestion_reclamations": { const si = params?.stagiaireIdx ?? 0; return genGestionReclamationsBDC_imported(o, f, stagiaires, si); }
+    case "bdc_actions_correctives": { const si = params?.stagiaireIdx ?? 0; return genActionsCorrectivesBDC_imported(o, f, stagiaires, si); }
+    case "bdc_fiche_veille": { const si = params?.stagiaireIdx ?? 0; return genFicheVeilleBDC_imported(o, f, stagiaires, si); }
+    case "bdc_contrat_sous_traitance": { const si = params?.stagiaireIdx ?? 0; return genContratSousTraitanceBDC_imported(o, f, stagiaires, si); }
+    case "bdc_catalogue_commercial": { const si = params?.stagiaireIdx ?? 0; return genCatalogueCommercialBDC_imported(o, f, stagiaires, si); }
+    case "bdc_procedure_handicap": { const si = params?.stagiaireIdx ?? 0; return genProcedureHandicapBDC_imported(o, f, stagiaires, si); }
     case "bdc_engagement_confidentialite": { const si = params?.stagiaireIdx ?? 0; return genEngagementConfidentialiteBDC_imported(o, f, stagiaires, si); }
     case "bdc_trame_suivi_6mois": { const si = params?.stagiaireIdx ?? 0; return genTrameSuivi6MoisBDC_imported(o, f, stagiaires, si); }
     case "bdc_cv_beneficiaire": { const si = params?.stagiaireIdx ?? 0; return genCVBeneficiaireBDC_imported(o, f, stagiaires, si); }
     case "bdc_test_personnalite": { const si = params?.stagiaireIdx ?? 0; return genTestPersonnaliteBDC_imported(o, f, stagiaires, si); }
-    case "bdc_parcours": return genParcoursBDC_imported(o, f);
-    case "bdc_support_cours": return genSupportCoursBDC_imported(o, f);
+    case "bdc_parcours": { const si = params?.stagiaireIdx ?? 0; return genParcoursBDC_imported(o, f, stagiaires, si); }
+    case "bdc_support_cours": { const si = params?.stagiaireIdx ?? 0; return genSupportCoursBDC_imported(o, f, stagiaires, si); }
     case "livret_recevabilite_vae": return genLivretRecevabilite(o, f, stagiaires);
     case "dossier_validation_vae": return genDossierValidation(o, f, stagiaires);
     case "accompagnement_vae": return genAccompagnementVAE(o, f, stagiaires);
