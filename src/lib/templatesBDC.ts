@@ -444,8 +444,9 @@ export function genSuiviPostBilanBDC(o: OrganismeInfo, f: FormationInfo, stagiai
 }
 
 // ===== CR3 - IND 12 : Procédure d'adaptation =====
-export function genProcedureAdaptationBDC(o: OrganismeInfo) {
-  return buildDocument({ org: o, title: "PROCÉDURE D'ADAPTATION DE L'ACCOMPAGNEMENT POUR LES BÉNÉFICIAIRES", sections: [
+export function genProcedureAdaptationBDC(o: OrganismeInfo, f?: FormationInfo, stagiaires?: StagiaireInfo[], si = 0) {
+  return buildDocument({ org: o, title: "PROCÉDURE D'ADAPTATION DE L'ACCOMPAGNEMENT POUR LES BÉNÉFICIAIRES", stagiaires: stagiaires?.[si] ? [stagiaires[si]] : undefined, sections: [
+    ...(f ? bdcBeneficiarySections(f, stagiaires, si) : []),
     { heading: "1. Objectif", content: "<p>L'objectif de cette procédure est d'assurer que chaque bénéficiaire d'un bilan de compétences bénéficie d'un accompagnement adapté à ses besoins spécifiques, ses compétences, son rythme et ses contraintes.</p>" },
     { heading: "2. Identification des besoins spécifiques", content: "<p><strong>2.1. Pré-entretien ou questionnaire d'accueil :</strong><br>• Identifier les objectifs professionnels et personnels<br>• Recueillir les informations relatives au parcours<br>• Détecter les besoins spécifiques : handicap, contraintes personnelles, préférences d'apprentissage<br><br><strong>2.2. Documents complémentaires :</strong><br>• Recueil d'attestations médicales si nécessaire (avec consentement)</p>" },
     { heading: "3. Analyse et diagnostic", content: "<p>• Identifier les écarts entre compétences actuelles et objectifs visés<br>• Détecter les obstacles potentiels<br>• Prioriser les adaptations : contenus, rythme, modalités d'évaluation, accompagnement spécifique</p>", variant: "green" },
@@ -468,7 +469,7 @@ export function genExplorationMetierBDC(o: OrganismeInfo, f: FormationInfo, stag
 }
 
 // ===== CR4 - IND 19 : Guide des protocoles métier =====
-export function genGuideProtocolesBDC(o: OrganismeInfo, f: FormationInfo) {
+export function genGuideProtocolesBDC(o: OrganismeInfo, f: FormationInfo, stagiaires?: StagiaireInfo[], si = 0) {
   const profile = getBdcDomainProfile(f);
   const key = (f.intitule || "").toLowerCase();
   const imgStyle = `width:100%;max-height:220px;object-fit:cover;border-radius:8px;margin:10px 0;`;
@@ -513,11 +514,11 @@ export function genGuideProtocolesBDC(o: OrganismeInfo, f: FormationInfo) {
 
   sections.push({ heading: "Références et normes", content: refs });
 
-  return buildDocument({ org: o, title: `GUIDE DES PROTOCOLES – ${profile.label.toUpperCase()}`, subtitle: `Ressource pédagogique – Bilan de compétences`, sections });
+  return buildDocument({ org: o, title: `GUIDE DES PROTOCOLES – ${profile.label.toUpperCase()}`, subtitle: `Ressource pédagogique – Bilan de compétences`, stagiaires: stagiaires?.[si] ? [stagiaires[si]] : undefined, sections: [...bdcBeneficiarySections(f, stagiaires, si), ...sections] });
 }
 
 // ===== CR4 - IND 19 : Tableau des bases métier =====
-export function genTableauBasesBDC(o: OrganismeInfo, f: FormationInfo) {
+export function genTableauBasesBDC(o: OrganismeInfo, f: FormationInfo, stagiaires?: StagiaireInfo[], si = 0) {
   const profile = getBdcDomainProfile(f);
   const key = (f.intitule || "").toLowerCase();
   const isMeca = /mecan|véhic|vehic|automob/i.test(key);
