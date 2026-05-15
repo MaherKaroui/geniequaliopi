@@ -696,8 +696,9 @@ export function genFormulaireReclamationBDC(o: OrganismeInfo, f?: FormationInfo,
 }
 
 // ===== CR7 - IND 31 : Gestion des réclamations BDC =====
-export function genGestionReclamationsBDC(o: OrganismeInfo) {
-  return buildDocument({ org: o, title: "GESTION DES RÉCLAMATIONS ET DES DYSFONCTIONNEMENTS", sections: [
+export function genGestionReclamationsBDC(o: OrganismeInfo, f?: FormationInfo, stagiaires?: StagiaireInfo[], si = 0) {
+  return buildDocument({ org: o, title: "GESTION DES RÉCLAMATIONS ET DES DYSFONCTIONNEMENTS", stagiaires: stagiaires?.[si] ? [stagiaires[si]] : undefined, sections: [
+    ...(f ? bdcBeneficiarySections(f, stagiaires, si) : []),
     { heading: "1. Objet", content: "<p>Cette procédure décrit les modalités de traitement des réclamations et dysfonctionnements signalés par les bénéficiaires de bilans de compétences.</p>" },
     { heading: "2. Recueil des réclamations", content: "<p>Les réclamations peuvent être transmises par :<br>• Formulaire de dépôt de réclamation (papier ou numérique)<br>• Courrier électronique<br>• Appel téléphonique (consigné par écrit)</p>" },
     { heading: "3. Traitement", content: "<p>• Accusé de réception sous 48h<br>• Analyse de la réclamation par le responsable qualité<br>• Enquête interne si nécessaire<br>• Réponse apportée sous 15 jours ouvrés<br>• Actions correctives mises en place</p>", variant: "green" },
@@ -706,13 +707,13 @@ export function genGestionReclamationsBDC(o: OrganismeInfo) {
 }
 
 // ===== CR7 - IND 32 : Tableau actions correctives =====
-export function genActionsCorrectivesBDC(o: OrganismeInfo) {
+export function genActionsCorrectivesBDC(o: OrganismeInfo, f?: FormationInfo, stagiaires?: StagiaireInfo[], si = 0) {
   const rows = [
     ["Retard de restitution synthèse", "10/01/2025", "Réorganisation planning", "Consultant", "Terminé", "30/01/2025"],
     ["Demande d'adaptation horaires", "15/01/2025", "Flexibilité des créneaux", "Direction", "En cours", "—"],
     ["Difficulté d'accès distanciel", "20/01/2025", "Vérification outil visio", "IT", "Terminé", "25/01/2025"],
   ];
-  return buildDocument({ org: o, title: "TABLEAU ACTIONS CORRECTIVES – TRAITEMENT DES RÉCLAMATIONS", table: { headers: ["Réclamation", "Date", "Action corrective", "Responsable", "Statut", "Date clôture"], rows } });
+  return buildDocument({ org: o, title: "TABLEAU ACTIONS CORRECTIVES – TRAITEMENT DES RÉCLAMATIONS", stagiaires: stagiaires?.[si] ? [stagiaires[si]] : undefined, sections: f ? bdcBeneficiarySections(f, stagiaires, si) : [], table: { headers: ["Réclamation", "Date", "Action corrective", "Responsable", "Statut", "Date clôture"], rows } });
 }
 
 // ===== CT2 - IND 4 : Bilan mensuel des abandons / ruptures =====
