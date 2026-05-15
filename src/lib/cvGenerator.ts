@@ -96,9 +96,10 @@ function expBlock(exp: CVExperience) {
   return `<div style="margin-bottom:10px;"><strong>${escapeHtml(exp.poste)}</strong>${exp.entreprise ? ` — ${escapeHtml(exp.entreprise)}` : ""}${exp.dateDebut ? `<br><span style="color:#666;font-size:11px;">${exp.dateDebut}${exp.dateFin ? ` – ${exp.dateFin}` : " – Présent"}</span>` : ""}${exp.description ? `<p style="margin:4px 0 0 0;font-size:12px;color:#444;">${escapeHtml(exp.description)}</p>` : ""}</div>`;
 }
 
-export function generateCVHTML(data: CVData, design: CVDesign): string {
+export function generateCVHTML(data: CVData, design: CVDesign, options?: { accent?: string; fontFamily?: string }): string {
   const d = CV_DESIGNS.find(dd => dd.id === design)!;
-  const accent = d.accent;
+  const accent = options?.accent || d.accent;
+  const fontOverride = options?.fontFamily;
   const fullName = `${data.prenom} ${data.nom}`.trim() || "Votre Nom";
 
   const contactInfo = [data.email, data.telephone, data.adresse].filter(Boolean).join(" • ");
