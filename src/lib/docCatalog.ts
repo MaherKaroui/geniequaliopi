@@ -1219,6 +1219,7 @@ export function buildFullCatalog(
 
     // CT6 - IND 26 : Handicap + Partenaires (existants)
     add("bdc_c6i26_veille_handicap", "CT6 - IND 26 Veille handicap", 6, 26, "veille_handicap");
+    add("bdc_c6i26_procedure_handicap", "CT6 - IND 26 Procédure d'accueil handicap (Qualiopi V9)", 6, 26, "bdc_procedure_handicap");
     add("bdc_c6i26_liste_partenaires", "CT6 - IND 26 Liste des partenaires locaux", 6, 26, "liste_partenaires");
 
     // CT6 - IND 27 : Sous-traitance
