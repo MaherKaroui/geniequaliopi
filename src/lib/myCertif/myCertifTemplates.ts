@@ -103,7 +103,8 @@ export function getAttestationDelivranceHTML(s: CertifStagiaire): string {
 
     <div class="pf-sig-block">
       <p><strong>Signature du Président :</strong></p>
-      ${(() => { const sig = typeof localStorage !== 'undefined' ? localStorage.getItem('mycertif_signature_presidente') : null; return sig ? `<img src="${sig}" class="pf-sig-img" alt="Signature">` : `<img src="/mycertif/proforma_signature.jpg" class="pf-sig-img" alt="Signature Pro Forma">`; })()}
+      ${(() => { const sig = typeof localStorage !== 'undefined' ? localStorage.getItem('mycertif_signature_presidente') : null; return sig ? `<img src="${sig}" class="pf-sig-img" alt="Signature">` : `<img src="/mycertif/president_signature.png" class="pf-sig-img" alt="Signature Président">`; })()}
+      <img src="/mycertif/proforma_signature.jpg" class="pf-sig-img" style="margin-left:24px" alt="Tampon Pro Forma">
     </div>
     </div>
 
