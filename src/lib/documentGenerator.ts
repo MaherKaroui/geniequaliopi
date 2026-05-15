@@ -412,15 +412,15 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "bdc_grille_suivi": { const si = params?.stagiaireIdx ?? 0; return genGrilleSuiviBDC_imported(o, f, stagiaires, si); }
     case "bdc_questionnaire_enquete_metiers": { const si = params?.stagiaireIdx ?? 0; return genQuestionnaireEnqueteMetiersBDC_imported(o, f, stagiaires, si); }
     case "bdc_suivi_post_bilan": { const si = params?.stagiaireIdx ?? 0; return genSuiviPostBilanBDC_imported(o, f, stagiaires, si); }
-    case "bdc_procedure_adaptation": return genProcedureAdaptationBDC_imported(o);
+    case "bdc_procedure_adaptation": { const si = params?.stagiaireIdx ?? 0; return genProcedureAdaptationBDC_imported(o, f, stagiaires, si); }
     case "bdc_exploration_metier": { const si = params?.stagiaireIdx ?? 0; return genExplorationMetierBDC_imported(o, f, stagiaires, si); }
-    case "bdc_guide_protocoles": return genGuideProtocolesBDC_imported(o, f);
-    case "bdc_tableau_bases": return genTableauBasesBDC_imported(o, f);
-    case "bdc_fiche_poste_consultant": return genFichePosteConsultantBDC_imported(o);
+    case "bdc_guide_protocoles": { const si = params?.stagiaireIdx ?? 0; return genGuideProtocolesBDC_imported(o, f, stagiaires, si); }
+    case "bdc_tableau_bases": { const si = params?.stagiaireIdx ?? 0; return genTableauBasesBDC_imported(o, f, stagiaires, si); }
+    case "bdc_fiche_poste_consultant": { const si = params?.stagiaireIdx ?? 0; return genFichePosteConsultantBDC_imported(o, f, stagiaires, si); }
     case "bdc_compte_rendu_fin": { const si = params?.stagiaireIdx ?? 0; return genCompteRenduFinBDC_imported(o, f, stagiaires, si); }
-    case "bdc_fiche_intervenant": return genFicheIntervenantExterneBDC_imported(o, f);
+    case "bdc_fiche_intervenant": { const si = params?.stagiaireIdx ?? 0; return genFicheIntervenantExterneBDC_imported(o, f, stagiaires, si); }
     case "bdc_satisfaction_chaud": { const si = params?.stagiaireIdx ?? 0; return genSatisfactionChaudBDC_imported(o, f, stagiaires, si); }
-    case "bdc_formulaire_reclamation": return genFormulaireReclamationBDC_imported(o);
+    case "bdc_formulaire_reclamation": { const si = params?.stagiaireIdx ?? 0; return genFormulaireReclamationBDC_imported(o, f, stagiaires, si); }
     case "bdc_gestion_reclamations": return genGestionReclamationsBDC_imported(o);
     case "bdc_actions_correctives": return genActionsCorrectivesBDC_imported(o);
     case "bdc_fiche_veille": return genFicheVeilleBDC_imported(o, f);
