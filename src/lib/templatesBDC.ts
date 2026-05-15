@@ -432,8 +432,37 @@ export function genQuestionnaireEnqueteMetiersBDC(o: OrganismeInfo, f: Formation
 // ===== CR3 - IND 11 : Questionnaire suivi post-bilan =====
 export function genSuiviPostBilanBDC(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = stagiaires[si] || stagiaires[0];
+  const termine = isStagiaireFormationTerminee(s, f);
+  const p = bdcPersonalisation(f, s, si);
+  // Si formation terminée → pré-remplir avec données réalistes pour audit
+  if (termine) {
+    const dtFin = endDate(s, f);
+    // Date du questionnaire : ~6 mois après fin de bilan
+    const dFin = new Date(s.dateFinFormation || f.dateFin);
+    dFin.setMonth(dFin.getMonth() + 6);
+    const dtQuestionnaire = formatDate(dFin.toISOString().split("T")[0]);
+    // Variantes déterministes
+    const planAction = ["☒ Oui, intégralement", "☒ Oui, partiellement", "☒ Oui, intégralement"][deterministicIndex(s, si, 3, 51)];
+    const projetEvol = ["☒ Je poursuis le même projet", "☒ Je poursuis le même projet", "☒ J'ai modifié mon projet"][deterministicIndex(s, si, 3, 52)];
+    const formationCompl = ["☒ Oui", "☐ Oui", "☒ Oui"][deterministicIndex(s, si, 3, 53)];
+    const formLib = formationCompl.includes("☒") ? p.formation : "—";
+    const situations = ["☒ En poste (nouvel employeur)", "☒ En formation", "☒ Création d'entreprise", "☒ En poste (même employeur)"];
+    const situation = situations[deterministicIndex(s, si, situations.length, 54)];
+    const utilites = ["☒ Très utile", "☒ Très utile", "☒ Assez utile"];
+    const utilite = utilites[deterministicIndex(s, si, utilites.length, 55)];
+    return buildDocument({ org: o, title: "QUESTIONNAIRE DE SUIVI POST BILAN DE COMPÉTENCES", subtitle: "Bilan à 6 mois après la fin du bilan", stagiaires: [s], sections: [
+      { heading: "Identification", content: `<p><strong>Bénéficiaire :</strong> ${beneficiaireLabel(s)}<br><strong>Consultant(e) :</strong> ${consultantName(o)}<br><strong>Date du bilan :</strong> du ${startDate(s, f)} au ${dtFin}<br><strong>Date du questionnaire :</strong> ${dtQuestionnaire}</p>` },
+      { heading: "1. Avez-vous mis en œuvre votre plan d'action ?", content: `<p>${planAction.includes("intégralement") ? planAction : "☐ Oui, intégralement"}<br>${planAction.includes("partiellement") ? planAction : "☐ Oui, partiellement"}<br>☐ Non, pas encore<br>Précisions : ${p.opportunite} – démarches engagées (${p.formation}).</p>` },
+      { heading: "2. Votre projet professionnel a-t-il évolué ?", content: `<p>${projetEvol.includes("même") ? projetEvol : "☐ Je poursuis le même projet"}<br>${projetEvol.includes("modifié") ? projetEvol : "☐ J'ai modifié mon projet"}<br>☐ J'ai abandonné mon projet<br>Précisions : confirmation de la piste ${p.opportunite} dans ${p.profile.secteur}.</p>` },
+      { heading: "3. Avez-vous suivi une formation complémentaire ?", content: `<p>${formationCompl} – Laquelle : ${formLib}<br>${formationCompl.includes("☒") ? "☐ Non" : "☒ Non"}</p>`, variant: "green" },
+      { heading: "4. Votre situation professionnelle actuelle", content: `<p>${situation}<br>Précisions : insertion en cours dans ${p.profile.secteur}.</p>` },
+      { heading: "5. Le bilan vous a-t-il aidé dans vos démarches ?", content: `<p>${utilite}</p>` },
+      { heading: "6. Commentaires libres", content: `<p>${p.commentaireSatisfaction}</p>` },
+    ], signatures: { type: "2", labels: [`${g(s, "Le Consultant", "La Consultante")}`, `${g(s, "Le Bénéficiaire", "La Bénéficiaire")}`], names: [consultantName(o), beneficiaireLabel(s)], dates: [dtQuestionnaire, dtQuestionnaire] } });
+  }
+  // Sinon : trame vierge (formation non terminée)
   return buildDocument({ org: o, title: "QUESTIONNAIRE DE SUIVI POST BILAN DE COMPÉTENCES", subtitle: "À remplir 6 mois après la fin du bilan", stagiaires: [s], sections: [
-    { heading: "Identification", content: `<p><strong>Bénéficiaire :</strong> <br><strong>Consultant(e) :</strong> <br><strong>Date du bilan :</strong> du ____/____/________ au ____/____/________<br><strong>Date du questionnaire :</strong> ____/____/________</p>` },
+    { heading: "Identification", content: `<p><strong>Bénéficiaire :</strong> ${beneficiaireLabel(s)}<br><strong>Consultant(e) :</strong> ${consultantName(o)}<br><strong>Date du bilan :</strong> du ${startDate(s, f)} au ${endDate(s, f)}<br><strong>Date du questionnaire :</strong> ____/____/________</p>` },
     { heading: "1. Avez-vous mis en œuvre votre plan d'action ?", content: "<p>☐ Oui, intégralement<br>☐ Oui, partiellement<br>☐ Non, pas encore<br>Précisions : _______________________________</p>" },
     { heading: "2. Votre projet professionnel a-t-il évolué ?", content: "<p>☐ Je poursuis le même projet<br>☐ J'ai modifié mon projet<br>☐ J'ai abandonné mon projet<br>Précisions : _______________________________</p>" },
     { heading: "3. Avez-vous suivi une formation complémentaire ?", content: "<p>☐ Oui – Laquelle : _______________________________<br>☐ Non</p>" },
