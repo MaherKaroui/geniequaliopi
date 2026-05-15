@@ -639,10 +639,31 @@ export function genCompteRenduFinBDC(o: OrganismeInfo, f: FormationInfo, stagiai
 
 // ===== CR5 - IND 21 : Fiche intervenant externe =====
 export function genFicheIntervenantExterneBDC(o: OrganismeInfo, f: FormationInfo, stagiaires?: StagiaireInfo[], si = 0) {
+  const s = stagiaires?.[si];
+  const p = bdcPersonalisation(f, s, si);
+  // Pool d'intervenants externes réalistes par secteur
+  const intervenantsBySector: Record<string, Array<{nom: string; prenom: string; entreprise: string; siret: string; fonction: string; email: string; tel: string}>> = {
+    esthetique: [
+      { nom: "MARTINEZ", prenom: "Sophie", entreprise: "Institut Belle Époque", siret: "82345678900015", fonction: "Esthéticienne diplômée – Gérante", email: "s.martinez@institut-belle-epoque.fr", tel: "06 12 34 56 78" },
+      { nom: "DUBOIS", prenom: "Camille", entreprise: "Spa Harmonie & Co", siret: "79456123400022", fonction: "Praticienne spa & soins corps", email: "c.dubois@spa-harmonie.fr", tel: "06 45 78 12 33" },
+    ],
+    automobile: [
+      { nom: "LEROY", prenom: "Thomas", entreprise: "Garage LEROY Auto", siret: "81234567800019", fonction: "Mécanicien automobile – Chef d'atelier", email: "contact@leroy-auto.fr", tel: "06 78 23 45 67" },
+      { nom: "BERNARD", prenom: "Julien", entreprise: "AD Expert Mécanique", siret: "80987654300017", fonction: "Technicien diagnostic automobile", email: "j.bernard@ad-expert.fr", tel: "06 23 89 56 14" },
+    ],
+    commerce: [
+      { nom: "ROUSSEAU", prenom: "Marc", entreprise: "Cabinet Habitat Conseil", siret: "82456789100023", fonction: "Négociateur immobilier senior", email: "m.rousseau@habitat-conseil.fr", tel: "06 14 56 78 92" },
+      { nom: "GIRAUD", prenom: "Sandrine", entreprise: "Performance B2B", siret: "81765432100018", fonction: "Technico-commerciale terrain", email: "s.giraud@performance-b2b.fr", tel: "06 89 23 45 17" },
+    ],
+  };
+  const sectorKey = /esth/i.test(p.profile.label) ? "esthetique" : /m[ée]canique|automobile|v[ée]hicule/i.test(p.profile.label) ? "automobile" : "commerce";
+  const pool = intervenantsBySector[sectorKey];
+  const idx = deterministicIndex(s, si, pool.length, 7);
+  const it = pool[idx];
   return buildDocument({ org: o, title: "FICHE INTERVENANT EXTERNE", subtitle: `Bilan de compétences – ${f.intitule}`, stagiaires: stagiaires?.[si] ? [stagiaires[si]] : undefined, sections: [
     ...bdcBeneficiarySections(f, stagiaires, si),
     { heading: "Organisme de formation", content: `<p><strong>${o.nom}</strong><br>Adresse : ${o.adresse}<br>SIRET : ${o.siret || "—"}<br>Consultant(e) : ${consultantName(o)}<br>Contact : ${o.email || "—"}${o.telephone?.trim() ? ` – ${o.telephone}` : ""}<br>Formation concernée : Bilan de compétences – ${f.intitule}<br>Dates : du ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)}</p>` },
-    { heading: "Identité de l'intervenant externe", content: "<p>• <strong>Nom :</strong> (à compléter)<br>• <strong>Prénom :</strong> (à compléter)<br>• <strong>Entreprise / Structure :</strong> (à compléter)<br>• <strong>SIRET :</strong> (à compléter)<br>• <strong>Fonction :</strong> Professionnel du secteur / Formateur spécialisé<br>• <strong>E-mail :</strong> (à compléter)<br>• <strong>Téléphone :</strong> (à compléter)</p>" },
+    { heading: "Identité de l'intervenant externe", content: `<p>• <strong>Nom :</strong> ${it.nom}<br>• <strong>Prénom :</strong> ${it.prenom}<br>• <strong>Entreprise / Structure :</strong> ${it.entreprise}<br>• <strong>SIRET :</strong> ${it.siret}<br>• <strong>Fonction :</strong> ${it.fonction}<br>• <strong>E-mail :</strong> ${it.email}<br>• <strong>Téléphone :</strong> ${it.tel}</p>` },
     { heading: "Compétences et qualifications", content: `<p>• <strong>Diplôme :</strong> Qualification dans le domaine de ${f.intitule}<br>• <strong>Expérience :</strong> Minimum 1 an dans le secteur<br>• <strong>Expérience en transmission :</strong> Ateliers, formation professionnelle ou encadrement</p>`, variant: "green" },
     { heading: "Rôle dans le bilan", content: "<p>• Intervention lors de la <strong>phase d'investigation</strong> du bilan<br>• Présentation du métier : conditions, débouchés, réalités terrain<br>• Partage d'expérience et retour constructif<br>• Participation à la validation du projet du bénéficiaire</p>" },
     { heading: "Modalités d'intervention", content: "<p>• <strong>Type :</strong> Présentiel / Visio<br>• <strong>Durée estimée :</strong> 2 à 4 heures<br>• <strong>Supports fournis :</strong> Témoignage oral, fiche métier, démonstration éventuelle</p>" },
