@@ -255,10 +255,11 @@ export function genDocumentSynthese(o: OrganismeInfo, f: FormationInfo, stagiair
 }
 
 // ===== CR2 - IND 6 : Déroulé et modalités =====
-export function genDerouleModalitesBDC(o: OrganismeInfo, f: FormationInfo) {
+export function genDerouleModalitesBDC(o: OrganismeInfo, f: FormationInfo, stagiaires?: StagiaireInfo[], si = 0) {
   const ph = phasesDates(f);
   const { totalHours } = parseDuree(f.duree || "24h");
-  return buildDocument({ org: o, title: `DÉROULÉ ET MODALITÉS DU BILAN DE COMPÉTENCES`, subtitle: `Domaine : ${f.intitule}`, sections: [
+  return buildDocument({ org: o, title: `DÉROULÉ ET MODALITÉS DU BILAN DE COMPÉTENCES`, subtitle: `Domaine : ${f.intitule}`, stagiaires: stagiaires?.[si] ? [stagiaires[si]] : undefined, sections: [
+    ...bdcBeneficiarySections(f, stagiaires, si),
     { heading: "Objectif du bilan", content: `<p>Le bilan de compétences vise à accompagner un(e) professionnel(le) souhaitant :<br>• faire un point global sur son parcours professionnel,<br>• identifier ses forces et ses axes d'amélioration,<br>• valider un projet d'évolution (spécialisation, reconversion, entrepreneuriat…),<br>• ou confirmer ses motivations à créer ou reprendre une activité dans le secteur de ${f.intitule}.</p>` },
     { heading: "1. Phase préliminaire (2 à 3 heures)", content: "<p>• Recueil de la demande spécifique<br>• Présentation du déroulement du bilan<br>• Définition des objectifs personnalisés<br>• Planification des séances</p>" },
     { heading: "2. Phase d'investigation (15 à 17 heures)", content: `<p>Cette phase approfondit les compétences acquises dans le domaine de ${f.intitule} et explore les pistes de valorisation et d'évolution :<br>• Analyse du parcours professionnel et des réalisations concrètes<br>• Identification des compétences clés (techniques, organisationnelles, relationnelles)<br>• Évaluation des motivations et du projet de vie<br>• Enquêtes métier<br>• Analyse des possibilités : retour en formation, VAE, création d'entreprise, mobilité</p>`, variant: "green" },
@@ -411,33 +412,20 @@ export function genGrilleSuiviBDC(o: OrganismeInfo, f: FormationInfo, stagiaires
 }
 
 // ===== CR3 - IND 11 : Questionnaire enquête métiers (vide) =====
-export function genQuestionnaireEnqueteMetiersBDC(o: OrganismeInfo, f: FormationInfo) {
-  return buildDocument({ org: o, title: "QUESTIONNAIRE ENQUÊTE MÉTIERS", subtitle: `Bilan de compétences – ${f.intitule}`, sections: [
-    { heading: "CIBLER LES ACTIVITÉS", content: "" },
-    { heading: "Pouvez-vous me décrire votre métier ?", content: "<p>_______________________________________________</p>" },
-    { heading: "Au quotidien quelles sont vos activités ?", content: "<p>_______________________________________________</p>" },
-    { heading: "Quels types d'outils ou machines utilisez-vous ?", content: "<p>_______________________________________________</p>" },
-    { heading: "Utilisez-vous des matières premières ? Lesquelles ?", content: "<p>_______________________________________________</p>" },
-    { heading: "Quelle est la part d'initiative dans votre métier ?", content: "<p>_______________________________________________</p>" },
-    { heading: "Conditions de travail", content: "" },
-    { heading: "Où travaillez-vous ?", content: "<p>_______________________________________________</p>" },
-    { heading: "Travaillez-vous en intérieur ou extérieur ?", content: "<p>_______________________________________________</p>" },
-    { heading: "Êtes-vous sédentaire ou travaillez-vous sur des sites différents ?", content: "<p>_______________________________________________</p>" },
-    { heading: "Travaillez-vous en équipe ou seul ?", content: "<p>_______________________________________________</p>" },
-    { heading: "Avez-vous un supérieur hiérarchique ? Où se trouve-t-il ? Comment intervient-il ?", content: "<p>_______________________________________________</p>" },
-    { heading: "Quels sont vos horaires. Sont-ils réguliers ?", content: "<p>_______________________________________________</p>" },
-    { heading: "Qualités", content: "" },
-    { heading: "Les principales qualités demandées dans cette profession sont :", content: "<p>_______________________________________________</p>" },
-    { heading: "Celui qui choisit cette profession doit montrer de l'intérêt pour :", content: "<p>_______________________________________________</p>" },
-    { heading: "Existe-t-il des exigences physiques particulières ? Si oui, lesquelles ?", content: "<p>_______________________________________________</p>" },
-    { heading: "Débouchés", content: "" },
-    { heading: "Est-il facile de trouver un emploi dans votre branche ? Pourquoi ?", content: "<p>_______________________________________________</p>" },
-    { heading: "Carrière", content: "" },
-    { heading: "Quel est votre salaire ?", content: "<p>_______________________________________________</p>" },
-    { heading: "Quelles sont vos perspectives de promotion ?", content: "<p>_______________________________________________</p>" },
-    { heading: "Formation", content: "" },
-    { heading: "Quels sont les diplômes qui préparent à ce métier ?", content: "<p>_______________________________________________</p>" },
-    { heading: "Quels sont les avantages, les inconvénients de votre métier ?", content: "<p>_______________________________________________</p>" },
+export function genQuestionnaireEnqueteMetiersBDC(o: OrganismeInfo, f: FormationInfo, stagiaires?: StagiaireInfo[], si = 0) {
+  const s = stagiaires?.[si] || stagiaires?.[0];
+  const p = bdcPersonalisation(f, s, si);
+  return buildDocument({ org: o, title: "QUESTIONNAIRE ENQUÊTE MÉTIERS", subtitle: `Bilan de compétences – ${s ? beneficiaireLabel(s) : f.intitule}`, stagiaires: s ? [s] : undefined, sections: [
+    ...bdcBeneficiarySections(f, stagiaires, si),
+    { heading: "Cibler les activités", content: `<p><strong>Métier interrogé :</strong> ${p.profile.metier}<br><strong>Secteur :</strong> ${p.profile.secteur}<br><strong>Objectif de l'enquête :</strong> vérifier ${p.objectif}.</p>` },
+    { heading: "Pouvez-vous me décrire votre métier ?", content: `<p>Le métier de ${p.profile.metier} consiste principalement à ${p.profile.missions.slice(0, 3).join(", ")}. Les activités demandent une bonne connaissance du terrain et une capacité d'adaptation aux situations rencontrées.</p>` },
+    { heading: "Au quotidien quelles sont vos activités ?", content: listHtml(p.profile.missions) },
+    { heading: "Quels types d'outils ou machines utilisez-vous ?", content: listHtml(p.profile.techniques) },
+    { heading: "Conditions de travail", content: `<p>Les principales contraintes observées sont :</p>${listHtml(p.profile.contraintes)}<p><strong>Point à vérifier pour ${s ? beneficiaireLabel(s) : "le bénéficiaire"} :</strong> ${p.contrainte}.</p>` },
+    { heading: "Qualités", content: `<p>Les qualités attendues sont :</p>${listHtml(p.profile.transversales)}<p><strong>Atout personnel à valoriser :</strong> ${p.pointFort}. <strong>Axe à renforcer :</strong> ${p.axe}.</p>` },
+    { heading: "Débouchés", content: `${listHtml(p.profile.opportunites)}<p><strong>Piste privilégiée :</strong> ${p.opportunite}.</p>` },
+    { heading: "Formation", content: `${listHtml(p.profile.formations)}<p><strong>Formation prioritaire identifiée :</strong> ${p.formation}.</p>` },
+    { heading: "Synthèse de l'enquête", content: `<p>L'enquête confirme la cohérence du projet sous réserve de travailler : <strong>${p.vigilance}</strong>. Les informations recueillies seront intégrées au document de synthèse et au plan d'action final.</p>`, variant: "green" },
   ] });
 }
 
