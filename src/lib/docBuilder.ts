@@ -813,6 +813,25 @@ export function applyGender(html: string, s: { civilite?: string } | undefined |
     [/spécialisé\(e\)/gi, "spécialisé", "spécialisée"],
     [/pertinent\(e\)/gi, "pertinent", "pertinente"],
     [/indépendant\(e\)/gi, "indépendant", "indépendante"],
+    // Métiers genrés
+    [/négociateur\(trice\)/gi, "négociateur", "négociatrice"],
+    [/commercial\(e\)/gi, "commercial", "commerciale"],
+    [/technico-commercial\(e\)/gi, "technico-commercial", "technico-commerciale"],
+    [/mécanicien\(ne\)/gi, "mécanicien", "mécanicienne"],
+    [/technicien\(ne\)/gi, "technicien", "technicienne"],
+    [/professionnel\(le\)/gi, "professionnel", "professionnelle"],
+    [/vendeur\(se\)/gi, "vendeur", "vendeuse"],
+    [/vendeur\(euse\)/gi, "vendeur", "vendeuse"],
+    [/ouvrier\(ère\)/gi, "ouvrier", "ouvrière"],
+    [/agent\(e\)/gi, "agent", "agente"],
+    [/assistant\(e\)/gi, "assistant", "assistante"],
+    [/conseiller\(ère\)/gi, "conseiller", "conseillère"],
+    [/chargé\(e\) d'affaires/gi, "chargé d'affaires", "chargée d'affaires"],
+    [/animateur\(trice\)/gi, "animateur", "animatrice"],
+    [/acheteur\(se\)/gi, "acheteur", "acheteuse"],
+    [/responsable\(e\)/gi, "responsable", "responsable"],
+    [/un\(e\)/gi, "un", "une"],
+    [/d'un\(e\)/gi, "d'un", "d'une"],
   ];
   // Generic catch-all for any remaining (e) on past participles: word ending in é(e), i(e), u(e)
   let result = html;
