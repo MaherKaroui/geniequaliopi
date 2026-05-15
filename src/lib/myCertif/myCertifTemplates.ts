@@ -354,7 +354,8 @@ export function getQuestionnaireHTML(s: CertifStagiaire): string {
         <tr>
           <td style="border:none;width:50%;vertical-align:top">
             <p style="font-size:10pt;margin:2px 0"><strong>Signature du candidat :</strong></p>
-            <div style="height:60px"></div>
+            <p style="font-size:9pt;color:#666;margin:2px 0">${s.prenom} ${s.nom}</p>
+            <img src="/mycertif/signatures/${s.prenom}_${s.nom}.png" style="max-height:70px;max-width:180px" alt="Signature ${s.prenom} ${s.nom}" onerror="this.style.display='none'">
           </td>
           <td style="border:none;width:50%;vertical-align:top;text-align:right">
             <p style="font-size:10pt;margin:2px 0"><strong>Tampon :</strong></p>
