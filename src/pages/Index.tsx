@@ -10,8 +10,9 @@ import DocumentGenerator from "@/components/DocumentGenerator";
 import DossierHistory from "@/components/DossierHistory";
 
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, LogIn, LogOut, User, FileSpreadsheet, Upload, Loader2, ShieldCheck, FileCheck, UserCircle, Stamp, Truck, Building2, Palette } from "lucide-react";
+import { ChevronLeft, ChevronRight, LogIn, LogOut, User, FileSpreadsheet, Upload, Loader2, ShieldCheck, FileCheck, UserCircle, Stamp, Truck, Building2, Palette, GraduationCap } from "lucide-react";
 import BahoModal from "@/components/BahoModal";
+import ViModal from "@/components/ViModal";
 import BrandingAutoModal from "@/components/BrandingAutoModal";
 import MyCertifModal from "@/components/MyCertifModal";
 import { exportFormDataToExcel } from "@/lib/exportFormData";
@@ -47,6 +48,7 @@ const Index = () => {
   const navigate = useNavigate();
   const [airtableLoading, setAirtableLoading] = useState(false);
   const [bahoOpen, setBahoOpen] = useState(false);
+  const [viOpen, setViOpen] = useState(false);
   const [brandingOpen, setBrandingOpen] = useState(false);
   const [myCertifOpen, setMyCertifOpen] = useState(false);
 
@@ -197,9 +199,13 @@ const Index = () => {
             <Button size="lg" variant="outline" className="px-8 py-6 text-base gap-2 border-dashed" onClick={() => setBahoOpen(true)}>
               <Building2 className="w-5 h-5" /> BAHO (temporaire)
             </Button>
+            <Button size="lg" variant="outline" className="px-8 py-6 text-base gap-2 border-dashed border-blue-400 text-blue-700 hover:bg-blue-50" onClick={() => setViOpen(true)}>
+              <GraduationCap className="w-5 h-5" /> VI – Visionnaire Institute (temporaire)
+            </Button>
           </div>
         </div>
         <BahoModal open={bahoOpen} onOpenChange={setBahoOpen} />
+        <ViModal open={viOpen} onOpenChange={setViOpen} />
       </div>
     );
   }
