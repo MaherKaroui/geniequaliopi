@@ -1128,10 +1128,7 @@ export function genCVBeneficiaireBDC(o: OrganismeInfo, f: FormationInfo, stagiai
     publications: "",
   };
 
-  const cvHtml = generateCVHTML(data, design, { accent, fontFamily });
-  // Append a discreet Qualiopi footer block (separate top-level div for paginator)
-  const footerNote = `<div style="font-family:'Segoe UI',Arial,sans-serif;font-size:10px;color:#666;padding:10px 30px;border-top:1px solid #ddd;margin-top:10px;">CV établi dans le cadre du bilan de compétences réalisé par <strong>${o.nom}</strong>${o.siret ? ` – SIRET ${o.siret}` : ""}${o.nda ? ` – NDA ${o.nda}` : ""}. Document confidentiel, propriété du bénéficiaire (art. R.6313-7 du Code du travail).</div>`;
-  return cvHtml + footerNote;
+  return generateCVHTML(data, design, { accent, fontFamily });
 }
 
 // ===== CR – Test de personnalité (typologie MBTI E/I, S/N, T/F, J/P) =====
