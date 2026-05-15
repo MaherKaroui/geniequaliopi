@@ -187,14 +187,14 @@ export function getGrilleEvaluationHTML(s: CertifStagiaire): string {
         </tr>
       </thead>
       <tbody>
-        ${c.criteres.map(cr => `
+        ${criteres.map(cr => `
           <tr>
             <td style="padding-left:14px">${cr.texte}</td>
             <td style="text-align:center;font-size:9.5pt">
               ${cr.acquis ? '<span style="color:#0a8a3a;font-weight:bold">☒ Acquis</span>' : '☐ Acquis'}
             </td>
             <td style="text-align:center;font-size:9.5pt;color:#999">
-              ${!cr.acquis ? '<span style="font-weight:bold">☒ Non acquis</span>' : '☐ Non acquis'}
+              ${!cr.acquis ? '<span style="font-weight:bold;color:#b00020">☒ Non acquis</span>' : '☐ Non acquis'}
             </td>
           </tr>
         `).join("")}
@@ -202,8 +202,10 @@ export function getGrilleEvaluationHTML(s: CertifStagiaire): string {
     </table>
   `).join("");
 
-  const synthese = COMPETENCES.map(c =>
-    `<tr><td>Compétence ${c.num}</td><td style="text-align:center"><strong style="color:#0a8a3a">☒ Acquise</strong></td><td style="text-align:center;color:#999">☐ Non acquise</td></tr>`
+  const synthese = perCompetence.map(({ c, competenceAcquise }) =>
+    `<tr><td>Compétence ${c.num}</td>` +
+    `<td style="text-align:center">${competenceAcquise ? '<strong style="color:#0a8a3a">☒ Acquise</strong>' : '<span style="color:#999">☐ Acquise</span>'}</td>` +
+    `<td style="text-align:center">${!competenceAcquise ? '<strong style="color:#b00020">☒ Non acquise</strong>' : '<span style="color:#999">☐ Non acquise</span>'}</td></tr>`
   ).join("");
 
   return `<!doctype html><html><head><meta charset="utf-8">${baseStyle}<style>
