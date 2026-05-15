@@ -178,9 +178,9 @@ function bdcPersonalisation(f: FormationInfo, s: StagiaireInfo | undefined, si: 
 // ===== CR1 - IND 1 : Programme du bilan =====
 export function genProgrammeBDC(o: OrganismeInfo, f: FormationInfo) {
   const ph = phasesDates(f);
-  const totalHours = 28;
-  const hPrelim = 4;
-  const hInvest = 18;
+  const totalHours = 24;
+  const hPrelim = 3;
+  const hInvest = 15;
   const hConcl = totalHours - hPrelim - hInvest; // 6h
   const profile = getBdcDomainProfile(f);
   const li = (arr: string[]) => arr.map(x => `• ${x}`).join("<br>");
