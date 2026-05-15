@@ -1144,8 +1144,11 @@ export function buildFullCatalog(
   if (isBDC) {
     // CT1 - IND 1 : Programme
     add("bdc_c1i1_programme", "CT1 - IND 1 Programme du bilan de compétences", 1, 1, "bdc_programme");
+    add("bdc_c1i1_catalogue", "CT1 - IND 1 Fiche commerciale publique (Qualiopi V9)", 1, 1, "bdc_catalogue_commercial");
     // CT1 - IND 2 : Indicateurs (Excel existant)
     add("bdc_c1i2_indicateurs", "CT1 - IND 2 Indicateurs de performance (Excel)", 1, 2, "indicateurs_performance");
+    // Registre bénéficiaires (suivi parcours)
+    add("bdc_c1i2_registre_beneficiaires", "CT1 - IND 2 Registre des bénéficiaires (Excel)", 1, 2, "tableau_suivi_parcours_excel");
 
     // CT2 - IND 4 : Évaluation des besoins (per bénéficiaire)
     stagiaires.forEach((s, si) => {
@@ -1154,9 +1157,10 @@ export function buildFullCatalog(
     add("bdc_c2i4_bilan_abandons", "CT2 - IND 4 Bilan mensuel des abandons / ruptures", 2, 4, "bdc_bilan_abandons_ruptures");
     add("bdc_c2i4_bilan_mensuel", "CT2 - IND 4 Bilan mensuel", 2, 4, "bdc_bilan_mensuel");
 
-    // CT2 - IND 5 : Document de synthèse (per bénéficiaire) - PIÈCE CENTRALE
+    // CT2 - IND 5 : Document de synthèse (per bénéficiaire) - PIÈCE CENTRALE + engagement confidentialité
     stagiaires.forEach((s, si) => {
       add(`bdc_c2i5_synthese_${si}`, `CT2 - IND 5 Document de synthèse – ${s.prenom} ${s.nom}`, 2, 5, "bdc_document_synthese", { stagiaireIdx: si });
+      add(`bdc_c2i5_engagement_confid_${si}`, `CT2 - IND 5 Engagement de confidentialité signé – ${s.prenom} ${s.nom}`, 2, 5, "bdc_engagement_confidentialite", { stagiaireIdx: si });
     });
 
     // CT2 - IND 6 : Déroulé et modalités + Enquête métier
@@ -1186,6 +1190,7 @@ export function buildFullCatalog(
     stagiaires.forEach((s, si) => {
       add(`bdc_c3i11_grille_suivi_${si}`, `CT3 - IND 11 Grille de suivi – ${s.prenom} ${s.nom}`, 3, 11, "bdc_grille_suivi", { stagiaireIdx: si });
       add(`bdc_c3i11_suivi_post_${si}`, `CT3 - IND 11 Questionnaire suivi post-bilan – ${s.prenom} ${s.nom}`, 3, 11, "bdc_suivi_post_bilan", { stagiaireIdx: si });
+      add(`bdc_c3i11_trame_6mois_${si}`, `CT3 - IND 11 Trame entretien de suivi à 6 mois – ${s.prenom} ${s.nom}`, 3, 11, "bdc_trame_suivi_6mois", { stagiaireIdx: si });
     });
 
     // CT3 - IND 12 : Déroulé et modalités + Procédure d'adaptation
@@ -1214,6 +1219,7 @@ export function buildFullCatalog(
 
     // CT6 - IND 26 : Handicap + Partenaires (existants)
     add("bdc_c6i26_veille_handicap", "CT6 - IND 26 Veille handicap", 6, 26, "veille_handicap");
+    add("bdc_c6i26_procedure_handicap", "CT6 - IND 26 Procédure d'accueil handicap (Qualiopi V9)", 6, 26, "bdc_procedure_handicap");
     add("bdc_c6i26_liste_partenaires", "CT6 - IND 26 Liste des partenaires locaux", 6, 26, "liste_partenaires");
 
     // CT6 - IND 27 : Sous-traitance
