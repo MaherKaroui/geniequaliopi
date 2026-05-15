@@ -931,12 +931,13 @@ En <strong>deux exemplaires originaux</strong>.</p>
 }
 
 // ===== CR1 - IND 1 : Catalogue / fiche commerciale publique =====
-export function genCatalogueCommercialBDC(o: OrganismeInfo, f: FormationInfo) {
+export function genCatalogueCommercialBDC(o: OrganismeInfo, f: FormationInfo, stagiaires?: StagiaireInfo[], si = 0) {
   const profile = getBdcDomainProfile(f);
   const refHandicap = (o as any).referentHandicap || consultantName(o);
   const tel = o.telephone ? ` – ${o.telephone}` : "";
   const dateMaj = new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
-  return buildDocument({ org: o, title: "FICHE COMMERCIALE – BILAN DE COMPÉTENCES", subtitle: `Domaine : ${profile.label} • Mise à jour : ${dateMaj}`, sections: [
+  return buildDocument({ org: o, title: "FICHE COMMERCIALE – BILAN DE COMPÉTENCES", subtitle: `Domaine : ${profile.label} • Mise à jour : ${dateMaj}`, stagiaires: stagiaires?.[si] ? [stagiaires[si]] : undefined, sections: [
+    ...bdcBeneficiarySections(f, stagiaires, si),
     { heading: "Objectifs", content: `<p>Faire le point sur les compétences, aptitudes et motivations du bénéficiaire, vérifier la faisabilité d'un projet professionnel ciblé sur le métier de <strong>${profile.metier}</strong> dans le secteur ${profile.secteur}, et bâtir un plan d'action concret (formation, mobilité, création d'activité).</p>` },
     { heading: "Public visé", content: "<p>Salariés du privé (CDI/CDD), demandeurs d'emploi inscrits à France Travail, travailleurs indépendants, intérimaires, agents publics. Sans condition de diplôme.</p>" },
     { heading: "Prérequis", content: "<p>Aucun prérequis de diplôme ou d'expérience. Maîtrise orale du français pour les entretiens et la rédaction de la synthèse. Démarche personnelle et volontaire.</p>" },
@@ -954,11 +955,12 @@ export function genCatalogueCommercialBDC(o: OrganismeInfo, f: FormationInfo) {
 }
 
 // ===== CR3 - IND 26 : Procédure handicap dédiée BDC =====
-export function genProcedureHandicapBDC(o: OrganismeInfo) {
+export function genProcedureHandicapBDC(o: OrganismeInfo, f?: FormationInfo, stagiaires?: StagiaireInfo[], si = 0) {
   const refHandicap = (o as any).referentHandicap || consultantName(o);
   const tel = o.telephone ? ` – ${o.telephone}` : "";
   const dateMaj = new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
-  return buildDocument({ org: o, title: "PROCÉDURE D'ACCUEIL DES PERSONNES EN SITUATION DE HANDICAP", subtitle: `Bilan de compétences • Version en vigueur au ${dateMaj}`, sections: [
+  return buildDocument({ org: o, title: "PROCÉDURE D'ACCUEIL DES PERSONNES EN SITUATION DE HANDICAP", subtitle: `Bilan de compétences • Version en vigueur au ${dateMaj}`, stagiaires: stagiaires?.[si] ? [stagiaires[si]] : undefined, sections: [
+    ...(f ? bdcBeneficiarySections(f, stagiaires, si) : []),
     { heading: "1. Engagement de l'organisme", content: `<p>${o.nom || "L'organisme"} s'engage à garantir l'égalité d'accès au bilan de compétences pour toute personne en situation de handicap (loi du 11 février 2005, art. L5211-1 et R6316-1 CT). Aucun bénéficiaire ne peut être écarté en raison de son handicap.</p>` },
     { heading: "2. Référent handicap", content: `<p><strong>Identité :</strong> ${refHandicap}<br><strong>Coordonnées :</strong>${tel}${o.email ? ` – ${o.email}` : ""}<br><strong>Missions :</strong> point d'entrée unique du bénéficiaire, analyse du besoin d'adaptation, mobilisation des partenaires (Agefiph, Cap Emploi, MDPH), suivi de la mise en œuvre, évaluation à l'issue du bilan.</p>` },
     { heading: "3. Détection du besoin", content: "<p>Dès l'entretien préalable :<br>• question ouverte sur l'existence d'une RQTH ou d'un besoin d'aménagement<br>• proposition systématique d'un échange confidentiel avec le référent handicap<br>• recueil – avec accord écrit – des préconisations médicales utiles<br>• jamais d'obligation de déclarer son handicap</p>" },
