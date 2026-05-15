@@ -1191,10 +1191,65 @@ export function genTestPersonnaliteBDC(o: OrganismeInfo, f: FormationInfo, stagi
       ] },
   ];
 
-  const sections = blocks.map(b => ({
-    heading: b.title,
-    content: tableHTML([b.left, b.right], b.rows.map(r => [`☐ ${r[0]}`, `☐ ${r[1]}`])) + `<p style="margin-top:8px;"><strong>Score :</strong> ${b.score}</p>`,
-  }));
+  // Préférences dominantes par bénéficiaire (déterministe)
+  const letters = ["E","I","S","N","T","F","J","P"];
+  const dominants: ("L"|"R")[] = [];
+  const scores: [number, number][] = [];
+  const sections = blocks.map((b, bi) => {
+    // Choix de la dominante : ratio entre 6/10 et 9/10 pour la lettre dominante
+    const dominantSide: "L" | "R" = deterministicIndex(s, si, 2, 130 + bi * 7) === 0 ? "L" : "R";
+    const dominantScore = 6 + deterministicIndex(s, si, 4, 140 + bi * 11); // 6..9
+    const otherScore = 10 - dominantScore;
+    dominants.push(dominantSide);
+    scores.push(dominantSide === "L" ? [dominantScore, otherScore] : [otherScore, dominantScore]);
+
+    // Cocher dominantScore lignes du côté dominant, otherScore lignes côté opposé
+    const total = b.rows.length; // 10
+    // Sélection déterministe des lignes cochées côté dominant
+    const dominantRows = new Set<number>();
+    let seed = (si + 1) * 31 + bi * 17;
+    while (dominantRows.size < dominantScore) {
+      seed = (seed * 1103515245 + 12345) & 0x7fffffff;
+      dominantRows.add(seed % total);
+    }
+    const renderedRows: [string, string][] = b.rows.map((r, ri) => {
+      const dominantHere = dominantRows.has(ri);
+      const leftChecked = (dominantSide === "L" && dominantHere) || (dominantSide === "R" && !dominantHere);
+      return [
+        `${leftChecked ? "☒" : "☐"} ${r[0]}`,
+        `${leftChecked ? "☐" : "☒"} ${r[1]}`,
+      ];
+    });
+    const [lScore, rScore] = dominantSide === "L" ? [dominantScore, otherScore] : [otherScore, dominantScore];
+    const scoreLabel = `${b.left.split(" ")[0]} : ${lScore} / 10  •  ${b.right.split(" ")[0]} : ${rScore} / 10`;
+    return {
+      heading: b.title,
+      content: tableHTML([b.left, b.right], renderedRows) + `<p style="margin-top:8px;"><strong>Score :</strong> ${scoreLabel}  →  Préférence dominante : <strong>${dominantSide === "L" ? b.left.split(" ")[0] : b.right.split(" ")[0]}</strong></p>`,
+    };
+  });
+
+  // Type MBTI complet
+  const mbti = blocks.map((b, i) => (dominants[i] === "L" ? b.left.split(" ")[0] : b.right.split(" ")[0])).join("");
+  const mbtiDescriptions: Record<string, string> = {
+    ISTJ: "Logisticien : organisé, méthodique, fiable. Profil adapté aux fonctions structurées et opérationnelles.",
+    ISFJ: "Défenseur : loyal, attentionné, soucieux du bien-être collectif. Bon relationnel et sens du service.",
+    INFJ: "Avocat : intuitif, déterminé, porté par des convictions fortes. Apprécie les projets porteurs de sens.",
+    INTJ: "Architecte : stratège, indépendant, orienté résultats. À l'aise dans la conception et la planification.",
+    ISTP: "Virtuose : pragmatique, observateur, habile dans la résolution concrète de problèmes.",
+    ISFP: "Aventurier : sensible, flexible, créatif. Aime travailler dans un cadre humain et bienveillant.",
+    INFP: "Médiateur : idéaliste, empathique, créatif. Recherche un alignement entre valeurs et activité professionnelle.",
+    INTP: "Logicien : analytique, curieux, aime explorer les concepts et résoudre des problèmes complexes.",
+    ESTP: "Entrepreneur : dynamique, réactif, à l'aise dans l'action et la négociation directe.",
+    ESFP: "Animateur : sociable, énergique, à l'écoute. Excellent dans les fonctions de contact et d'animation.",
+    ENFP: "Inspirateur : enthousiaste, créatif, communicatif. Aime initier des projets et fédérer.",
+    ENTP: "Innovateur : agile, persuasif, aime débattre et explorer de nouvelles idées.",
+    ESTJ: "Directeur : organisé, décidé, naturellement à l'aise dans le pilotage et la coordination d'équipe.",
+    ESFJ: "Consul : attentif aux autres, organisé, fiable. Bon profil pour les métiers d'accompagnement.",
+    ENFJ: "Protagoniste : leader naturel, empathique, fédérateur. Aime accompagner la progression des autres.",
+    ENTJ: "Commandant : déterminé, stratégique, orienté objectifs. À l'aise dans le management et la décision.",
+  };
+  const mbtiDesc = mbtiDescriptions[mbti] || "Profil équilibré, capable de s'adapter à différents contextes professionnels.";
+  const pistes = `Le profil <strong>${mbti}</strong> ouvre des pistes cohérentes avec le projet exploré (${(f.intitule || "formation").trim()}). À approfondir lors de la phase de conclusion : confirmation des environnements professionnels favorables, repérage des leviers de motivation et points de vigilance.`;
 
   return buildDocument({
     org: o,
@@ -1204,7 +1259,7 @@ export function genTestPersonnaliteBDC(o: OrganismeInfo, f: FormationInfo, stagi
     sections: [
       { heading: "Consignes", content: `<p>Pour chacune des 4 dimensions, cochez la phrase qui vous correspond le mieux dans chaque ligne. Comptabilisez ensuite vos réponses pour obtenir vos préférences dominantes (E/I, S/N, T/F, J/P).</p><p><em>Outil de positionnement utilisé en phase d'investigation – à exploiter en entretien avec ${consultantName(o)}.</em></p>`, variant: "green" },
       ...sections,
-      { heading: "Quel profil êtes-vous ?", content: `<p>Reportez ici les 4 lettres dominantes : <strong>____  ____  ____  ____</strong></p><p>Type MBTI obtenu : ___________________________</p><p>Synthèse / pistes d'exploration retenues avec le consultant :<br>______________________________________________________________<br>______________________________________________________________</p>` },
+      { heading: "Quel profil êtes-vous ?", content: `<p>Lettres dominantes : <strong>${mbti.split("").join("  ")}</strong></p><p><strong>Type MBTI obtenu :</strong> ${mbti} – ${mbtiDesc}</p><p><strong>Synthèse / pistes d'exploration retenues avec le consultant :</strong><br>${pistes}</p>`, variant: "green" },
     ],
     signatures: { type: "2", labels: [`${g(s, "Le Bénéficiaire", "La Bénéficiaire")}`, `${g(s, "Le Consultant", "La Consultante")}`], names: [beneficiaireLabel(s), consultantName(o)], dates: [dt, dt] },
   });
