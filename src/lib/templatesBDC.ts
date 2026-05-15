@@ -176,8 +176,19 @@ function bdcPersonalisation(f: FormationInfo, s: StagiaireInfo | undefined, si: 
   };
 }
 
+function bdcBeneficiarySections(f: FormationInfo, stagiaires?: StagiaireInfo[], si = 0) {
+  const s = stagiaires?.[si] || stagiaires?.[0];
+  if (!s) return [];
+  const p = bdcPersonalisation(f, s, si);
+  return [{
+    heading: "Bénéficiaire concerné",
+    content: `<p><strong>Nom :</strong> ${s.nom || ""}<br><strong>Prénom :</strong> ${s.prenom || ""}${s.email ? `<br><strong>E-mail :</strong> ${s.email}` : ""}${s.telephone?.trim() ? `<br><strong>Téléphone :</strong> ${s.telephone}` : ""}<br><strong>Période du bilan :</strong> du ${startDate(s, f)} au ${endDate(s, f)}<br><strong>Objectif individualisé :</strong> ${p.objectif}<br><strong>Axe de travail prioritaire :</strong> ${p.axe}</p>`,
+    variant: "green" as const,
+  }];
+}
+
 // ===== CR1 - IND 1 : Programme du bilan =====
-export function genProgrammeBDC(o: OrganismeInfo, f: FormationInfo) {
+export function genProgrammeBDC(o: OrganismeInfo, f: FormationInfo, stagiaires?: StagiaireInfo[], si = 0) {
   const ph = phasesDates(f);
   const totalHours = 24;
   const hPrelim = 3;
@@ -187,7 +198,8 @@ export function genProgrammeBDC(o: OrganismeInfo, f: FormationInfo) {
   const li = (arr: string[]) => arr.map(x => `• ${x}`).join("<br>");
   const refHandicap = (o as any).referentHandicap || consultantName(o);
   const tel = o.telephone ? ` – ${o.telephone}` : "";
-  return buildDocument({ org: o, title: "PROGRAMME DE BILAN DE COMPÉTENCES", subtitle: `Domaine : ${profile.label}`, sections: [
+  return buildDocument({ org: o, title: "PROGRAMME DE BILAN DE COMPÉTENCES", subtitle: `Domaine : ${profile.label}`, stagiaires: stagiaires?.[si] ? [stagiaires[si]] : undefined, sections: [
+    ...bdcBeneficiarySections(f, stagiaires, si),
     { heading: "Objectifs du bilan de compétences", content: `<p>• Analyser les compétences, aptitudes et motivations du bénéficiaire en lien avec le métier de <strong>${profile.metier}</strong> exercé dans le secteur ${profile.secteur}.<br>• Vérifier la faisabilité d'un projet professionnel ciblé sur ce métier (insertion, évolution ou création d'activité).<br>• Identifier les compétences transférables et les écarts à combler par rapport aux exigences du métier.<br>• Élaborer un plan d'action personnalisé : formation, certification, immersion, recherche d'emploi ou installation indépendante.</p>` },
     { heading: "Public visé", content: `<p>• Salariés du secteur privé (CDI, CDD) souhaitant évoluer ou se reconvertir vers le métier de ${profile.metier}.<br>• Demandeurs d'emploi inscrits à France Travail en réflexion sur un projet dans le secteur ${profile.secteur}.<br>• Travailleurs indépendants, intérimaires ou agents publics.<br>• Toute personne en démarche de mobilité professionnelle, sans condition de diplôme.</p>` },
     { heading: "Prérequis", content: `<p>• Aucun diplôme ni expérience préalable exigés dans le domaine.<br>• Maîtrise orale du français souhaitée pour les entretiens et la rédaction de la synthèse.<br>• Démarche personnelle et volontaire de questionnement ou de reconversion vers le métier de ${profile.metier}.</p>` },
