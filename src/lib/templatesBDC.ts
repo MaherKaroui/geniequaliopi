@@ -996,3 +996,163 @@ export function genTrameSuivi6MoisBDC(o: OrganismeInfo, f: FormationInfo, stagia
     { heading: "7. Préconisations du consultant", content: "<p>Synthèse de l'échange, ressources orientées, prochaine étape conseillée, éventuelle prolongation d'accompagnement.</p>" },
   ], signatures: { type: "2", labels: [`${g(s, "Le Consultant", "La Consultante")}`, `${g(s, "Le Bénéficiaire", "La Bénéficiaire")}`], names: [consultantName(o), beneficiaireLabel(s)], dates: [dt6m, dt6m] } });
 }
+
+// ===== CR – CV du bénéficiaire (annexé au dossier de bilan) =====
+export function genCVBeneficiaireBDC(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
+  const s = stagiaires[si] || stagiaires[0];
+  const profile = getBdcDomainProfile(f);
+  const perso = bdcPersonalisation(f, s, si);
+  const fullName = `${(s.prenom || "").toUpperCase()} ${(s.nom || "").toUpperCase()}`.trim() || "BÉNÉFICIAIRE";
+  const civ = s.civilite || "";
+  const email = s.email || "";
+  const tel = s.telephone || "";
+  const adresseLines = [s.adresse, [s.codePostal, s.commune].filter(Boolean).join(" ")].filter(Boolean).join("<br>");
+  const poste = s.poste || perso.profile.metier;
+  const yearNow = new Date().getFullYear();
+  const yearMid = yearNow - deterministicIndex(s, si, 4, 21) - 2;
+  const yearStart = yearMid - deterministicIndex(s, si, 5, 22) - 2;
+  const ville = s.commune || (o.adresse || "").split(",").slice(-1)[0]?.trim() || "France";
+  const entreprise = s.entreprise && s.entreprise.toLowerCase() !== "demandeur d'emploi" ? s.entreprise : "";
+  const expSecondaire = pickForBeneficiaire(s, si, [
+    "Polyvalence sur les missions confiées et adaptation rapide à de nouveaux environnements de travail.",
+    "Participation à l'organisation quotidienne et au respect des procédures internes.",
+    "Contribution à la satisfaction client et au bon déroulement de l'activité.",
+    "Soutien à l'équipe sur les pics d'activité et reporting régulier au responsable.",
+  ], 23);
+  const formationLine = pickForBeneficiaire(s, si, profile.formations, 24);
+
+  return buildDocument({
+    org: o,
+    title: "CURRICULUM VITAE",
+    subtitle: `${fullName} – ${profile.metier}`,
+    stagiaires: [s],
+    sections: [
+      {
+        heading: "État civil",
+        content: `<p><strong>${civ ? civ + " " : ""}${fullName}</strong><br>` +
+          (s.dateNaissance ? `Né(e) le ${formatDate(s.dateNaissance)}${s.communeNaissance ? ` à ${s.communeNaissance}` : ""}<br>` : "") +
+          (adresseLines ? `${adresseLines}<br>` : "") +
+          (tel ? `Téléphone : ${tel}<br>` : "") +
+          (email ? `Email : ${email}<br>` : "") +
+          (s.nationalite ? `Nationalité : ${s.nationalite}` : "") +
+          `</p>`,
+      },
+      {
+        heading: "Projet professionnel",
+        content: `<p>${perso.objectif.charAt(0).toUpperCase() + perso.objectif.slice(1)}. Je souhaite mettre à profit mon parcours et mes compétences au service du métier de <strong>${profile.metier}</strong> dans le secteur ${profile.secteur}.</p>`,
+        variant: "green",
+      },
+      {
+        heading: "Expérience professionnelle",
+        content: `<p><strong>${poste}</strong>${entreprise ? ` – ${entreprise}` : ""}<br><em>${yearMid} – ${yearNow}${entreprise ? "" : " (parcours en activité)"}</em><br>` +
+          profile.missions.slice(0, 4).map(m => `• ${m.charAt(0).toUpperCase() + m.slice(1)}`).join("<br>") +
+          `</p>` +
+          `<p><strong>${perso.profile.metier} (poste précédent)</strong> – ${ville}<br><em>${yearStart} – ${yearMid}</em><br>${expSecondaire}</p>`,
+      },
+      {
+        heading: "Formation",
+        content: `<p>` +
+          (s.diplome ? `<strong>${s.diplome}</strong><br>` : "") +
+          `Formation continue : <strong>${formationLine}</strong><br>` +
+          `Bilan de compétences en cours – ${o.nom}, ${formatDate(f.dateDebut)} – ${formatDate(f.dateFin)}` +
+          `</p>`,
+      },
+      {
+        heading: "Compétences techniques",
+        content: listHtml(profile.techniques),
+      },
+      {
+        heading: "Compétences transversales",
+        content: listHtml(profile.transversales),
+        variant: "green",
+      },
+      {
+        heading: "Centres d'intérêt",
+        content: `<p>${pickForBeneficiaire(s, si, ["Lecture, marche, voyages", "Sport, cuisine, bénévolat associatif", "Photographie, randonnée, activités familiales", "Musique, jardinage, engagement local"], 25)}</p>`,
+      },
+      {
+        heading: "Note",
+        content: `<p style="font-size:11px;color:#555;">CV établi dans le cadre du bilan de compétences réalisé par <strong>${o.nom}</strong>. Document de travail confidentiel, propriété du bénéficiaire (art. R6313-7 du Code du travail).</p>`,
+      },
+    ],
+  });
+}
+
+// ===== CR – Test de personnalité (typologie MBTI E/I, S/N, T/F, J/P) =====
+export function genTestPersonnaliteBDC(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
+  const s = stagiaires[si] || stagiaires[0];
+  const dt = formatDate(s.dateDebutFormation || f.dateDebut || new Date().toISOString().split("T")[0]);
+
+  const blocks: { title: string; left: string; right: string; rows: [string, string][]; score: string }[] = [
+    { title: "1. Êtes-vous plutôt « E » (Extraverti) ou plutôt « I » (Introverti) ?", left: "E – Extraverti(e)", right: "I – Introverti(e)", score: "E : ___ / 10  •  I : ___ / 10",
+      rows: [
+        ["Vous êtes dynamique", "Vous êtes calme"],
+        ["Vous aimez parler", "Vous aimez écouter"],
+        ["Vous pensez à voix haute", "Vous réfléchissez posément"],
+        ["Vous agissez puis pensez", "Vous pensez puis agissez"],
+        ["Vous n'aimez pas être seul(e)", "Vous vous sentez bien quand vous êtes seul(e)"],
+        ["Vous aimez établir de nouveaux contacts", "Vous aimez approfondir vos contacts"],
+        ["Vous préférez parler plutôt qu'écrire", "Vous êtes considéré(e) comme plutôt secret(ète) et réservé(e)"],
+        ["Vous pouvez facilement être distrait(e)", "Vous possédez une bonne capacité de concentration"],
+        ["Vous préférez faire plusieurs choses à la fois", "Vous préférez faire une chose à la fois"],
+        ["Vous avez parfois un discours changeant", "Vous êtes indépendant(e)"],
+      ] },
+    { title: "2. Êtes-vous plutôt « S » (Sensation) ou plutôt « N » (iNtuition) ?", left: "S – Sensation", right: "N – Intuition", score: "S : ___ / 10  •  N : ___ / 10",
+      rows: [
+        ["Vous aimez les choses utiles", "Vous aimez les choses différemment"],
+        ["Vous vivez dans l'instant présent", "Vous pensez aux implications futures"],
+        ["Vous faites confiance à l'expérience", "Vous suivez votre instinct"],
+        ["Vous aimez approfondir vos compétences", "Vous aimez apprendre de nouvelles compétences"],
+        ["Vous restez fidèle aux méthodes éprouvées", "Vous n'aimez pas la routine"],
+        ["Vous préférez les instructions étape par étape", "Vous cherchez à comprendre globalement"],
+        ["Vous êtes pratique", "Vous êtes théorique"],
+        ["Vous aimez ce qui est concret, réel, observable", "Vous êtes attiré(e) par les idées originales"],
+        ["Vous êtes réaliste : vous voyez ce qui existe", "Vous êtes imaginatif(ve) : vous voyez les possibilités"],
+        ["Vous préférez les faits aux concepts", "Vous préférez les concepts aux faits"],
+      ] },
+    { title: "3. Êtes-vous plutôt « T » (Pensée) ou plutôt « F » (Sentiment) ?", left: "T – Pensée (Thinking)", right: "F – Sentiment (Feeling)", score: "T : ___ / 10  •  F : ___ / 10",
+      rows: [
+        ["Vous vous efforcez d'être objectif(ve) dans vos décisions", "Vous fondez vos décisions sur vos valeurs et sentiments"],
+        ["Vous apparaissez calme et réservé(e)", "Vous êtes sociable et amical(e)"],
+        ["Vous avez un sens aigu de la justice", "Vous avez tendance à la clémence"],
+        ["Vous vous impliquez peu, vous prenez de la distance", "Vous prenez les choses à cœur"],
+        ["Vous évitez la discussion et le conflit", "Vous recherchez la conciliation"],
+        ["Vous êtes franc(he) et direct(e)", "Vous êtes diplomate et faites preuve de tact"],
+        ["Vous êtes motivé(e) par vos projets", "Vous êtes motivé(e) par l'estime des autres"],
+        ["Vous aimez vous placer en observateur(trice)", "Vous êtes sensible (facilement blessé(e))"],
+        ["Vous êtes sensible à la logique", "Vous faites confiance à vos impressions"],
+        ["Vous décidez avec la tête", "Vous décidez avec le cœur"],
+      ] },
+    { title: "4. Êtes-vous plutôt « J » (Jugement) ou plutôt « P » (Perception) ?", left: "J – Jugement", right: "P – Perception", score: "J : ___ / 10  •  P : ___ / 10",
+      rows: [
+        ["Vous aimez organiser et planifier", "Vous aimez vivre de façon flexible"],
+        ["Vous êtes sérieux(se) et conventionnel(le)", "Vous êtes ludique et non-conventionnel(le)"],
+        ["Vous suivez votre calendrier et êtes ponctuel(le)", "Vous tenez peu compte des heures et délais"],
+        ["Vous aimez terminer vos projets", "Vous aimez démarrer des projets"],
+        ["Vous travaillez d'abord, vous vous amusez ensuite", "Vous vous amusez d'abord, travaillez ensuite"],
+        ["Vous n'aimez pas le stress de dernière minute", "Vous rechignez à vous engager"],
+        ["Vous ne discutez pas les règles", "Vous discutez les règles"],
+        ["Vous cherchez à maîtriser", "Vous cherchez à comprendre"],
+        ["Vous êtes à l'aise dans des structures bien définies", "Vous aimez conserver votre liberté d'action"],
+        ["Vous n'aimez pas le provisoire, l'incertain", "Vous restez ouvert(e) aux expériences et à l'adaptation"],
+      ] },
+  ];
+
+  const sections = blocks.map(b => ({
+    heading: b.title,
+    content: tableHTML([b.left, b.right], b.rows.map(r => [`☐ ${r[0]}`, `☐ ${r[1]}`])) + `<p style="margin-top:8px;"><strong>Score :</strong> ${b.score}</p>`,
+  }));
+
+  return buildDocument({
+    org: o,
+    title: "TEST DE PERSONNALITÉ – TYPOLOGIE",
+    subtitle: `Bilan de compétences – ${beneficiaireLabel(s)} • Date : ${dt}`,
+    stagiaires: [s],
+    sections: [
+      { heading: "Consignes", content: `<p>Pour chacune des 4 dimensions, cochez la phrase qui vous correspond le mieux dans chaque ligne. Comptabilisez ensuite vos réponses pour obtenir vos préférences dominantes (E/I, S/N, T/F, J/P).</p><p><em>Outil de positionnement utilisé en phase d'investigation – à exploiter en entretien avec ${consultantName(o)}.</em></p>`, variant: "green" },
+      ...sections,
+      { heading: "Quel profil êtes-vous ?", content: `<p>Reportez ici les 4 lettres dominantes : <strong>____  ____  ____  ____</strong></p><p>Type MBTI obtenu : ___________________________</p><p>Synthèse / pistes d'exploration retenues avec le consultant :<br>______________________________________________________________<br>______________________________________________________________</p>` },
+    ],
+    signatures: { type: "2", labels: [`${g(s, "Le Bénéficiaire", "La Bénéficiaire")}`, `${g(s, "Le Consultant", "La Consultante")}`], names: [beneficiaireLabel(s), consultantName(o)], dates: [dt, dt] },
+  });
+}
