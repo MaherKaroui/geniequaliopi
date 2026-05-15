@@ -27,6 +27,15 @@ export const PER_STAGIAIRE_TEMPLATES = new Set([
   "dossier_inscription_cfa",
   "outils_suivi_alternance_excel",
   "certificat_realisation_cfa",
+  "bdc_programme", "bdc_catalogue_commercial", "bdc_parcours", "bdc_support_cours",
+  "bdc_eval_besoins", "bdc_document_synthese", "bdc_engagement_confidentialite", "bdc_test_personnalite",
+  "bdc_deroule_modalites", "bdc_enquete_metier", "bdc_cgv", "bdc_contrat", "bdc_convention",
+  "bdc_formulaire_attentes", "bdc_convocation", "bdc_synopsis", "bdc_questionnaire_enquete_metiers",
+  "bdc_grille_suivi", "bdc_suivi_post_bilan", "bdc_trame_suivi_6mois", "bdc_procedure_adaptation",
+  "bdc_exploration_metier", "bdc_guide_protocoles", "bdc_tableau_bases", "bdc_fiche_poste_consultant",
+  "bdc_compte_rendu_fin", "bdc_cv_beneficiaire", "bdc_fiche_intervenant", "bdc_fiche_veille",
+  "bdc_procedure_handicap", "bdc_contrat_sous_traitance", "bdc_satisfaction_chaud",
+  "bdc_formulaire_reclamation", "bdc_gestion_reclamations", "bdc_actions_correctives",
 ]);
 
 const EXCEL_TEMPLATES = new Set([
