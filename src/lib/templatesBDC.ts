@@ -1197,7 +1197,7 @@ export function genTestPersonnaliteBDC(o: OrganismeInfo, f: FormationInfo, stagi
 }
 
 // ===== CR – Parcours Bilan de Compétences (process écrit, 29 étapes) =====
-export function genParcoursBDC(o: OrganismeInfo, f: FormationInfo) {
+export function genParcoursBDC(o: OrganismeInfo, f: FormationInfo, stagiaires?: StagiaireInfo[], si = 0) {
   const referent = o.referentHandicap || o.responsablePedagogique || o.dirigeant || "Le référent pédagogique";
   const rows: [string, string][] = [
     ["1 – C", "Recherche d'information : CPF, site internet, bouche à oreille, prospection. Programme téléchargeable via le site, ainsi que la plaquette."],
@@ -1234,7 +1234,9 @@ export function genParcoursBDC(o: OrganismeInfo, f: FormationInfo) {
     org: o,
     title: "PARCOURS BILAN DE COMPÉTENCES",
     subtitle: `Processus écrit – C : client / OF : ${o.nom}`,
+    stagiaires: stagiaires?.[si] ? [stagiaires[si]] : undefined,
     sections: [
+      ...bdcBeneficiarySections(f, stagiaires, si),
       { heading: "Référents", content: `<p><strong>Référent pédagogique, administratif, handicap et service médiation/réclamation :</strong> ${referent}<br><strong>Email :</strong> ${o.email || "—"}<br><strong>Téléphone :</strong> ${o.telephone || "—"}</p>` },
       { heading: "Documents à fournir / processus écrit", content: tableHTML(["Étape", "Action"], rows) },
       { heading: "Mails types associés", content: "<p><strong>Mail 1</strong> : confirmation entretien préliminaire — <strong>Mail 2</strong> : envoi programme/plaquette/prérequis — <strong>Mail 3.1</strong> : validation prérequis et convention — <strong>Mail 3.2</strong> : refus motivé — <strong>Mail 4</strong> : confirmation inscription CPF — <strong>Mail 5</strong> : synthèse mi-parcours — <strong>Mail 6</strong> : remise des livrables de fin de bilan — <strong>Mail 7</strong> : compte rendu suivi 1 mois — <strong>Mail 8</strong> : RDV de suivi à 6 mois — <strong>Mail 9</strong> : questionnaire satisfaction à 6 mois.</p>", variant: "green" },
@@ -1243,7 +1245,7 @@ export function genParcoursBDC(o: OrganismeInfo, f: FormationInfo) {
 }
 
 // ===== CR – Support de cours Bilan de Compétences =====
-export function genSupportCoursBDC(o: OrganismeInfo, f: FormationInfo) {
+export function genSupportCoursBDC(o: OrganismeInfo, f: FormationInfo, stagiaires?: StagiaireInfo[], si = 0) {
   const profile = getBdcDomainProfile(f);
   const phasesRows: string[][] = [
     ["1. Phase préliminaire", "Confirmer l'engagement dans la démarche ; définir et analyser les besoins et attentes ; informer des conditions de déroulement ; élaborer un programme de travail et un calendrier adapté.", "Entretien individuel"],
@@ -1255,7 +1257,9 @@ export function genSupportCoursBDC(o: OrganismeInfo, f: FormationInfo) {
     org: o,
     title: "SUPPORT DE COURS – BILAN DE COMPÉTENCES",
     subtitle: `Domaine : ${profile.label} • Version 1`,
+    stagiaires: stagiaires?.[si] ? [stagiaires[si]] : undefined,
     sections: [
+      ...bdcBeneficiarySections(f, stagiaires, si),
       { heading: "Sommaire", content: "<p>1. Objectifs<br>2. Programme<br>3. Finalités du bilan de compétences et engagements<br>4. Cœur de métier<br>5. Approche du bilan de compétences<br>6. Phases du bilan de compétences<br>7. Méthodologie<br>8. Éthique<br>9. Valeur ajoutée<br>10. Démarche qualité</p>" },
       { heading: "1. Objectifs", content: `<p><strong>Phase 1 – Entretien préliminaire :</strong> confirmer l'engagement, définir et analyser les besoins, informer des conditions, élaborer un programme et un calendrier adaptés.</p><p><strong>Phase 2 – Investigation :</strong><br>• Module 1 : analyser la dynamique du parcours<br>• Module 2 : valoriser les réalisations et le CV<br>• Module 3 : diagnostiquer motivations, besoins et valeurs<br>• Module 4 : déterminer points forts et axes de développement<br>• Module 5 : positionnement sur l'inventaire d'intérêts professionnels<br>• Module 6 : élaborer des voies d'orientation<br>• Module 7 : valider la cohérence du projet</p><p><strong>Phase 3 – Conclusion (Module 8) :</strong> confirmer le projet professionnel et/ou de formation, récapituler les résultats détaillés, co-rédiger la synthèse, recenser les facteurs favorables/défavorables, planifier la mise en œuvre.</p>`, variant: "green" },
       { heading: "2. Programme", content: tableHTML(["Phase", "Thèmes traités", "Pédagogie"], phasesRows) },
