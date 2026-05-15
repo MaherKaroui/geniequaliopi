@@ -54,7 +54,7 @@ export const emptyCV: CVData = {
   publications: "",
 };
 
-export type CVDesign = "classique" | "moderne" | "minimaliste" | "elegant" | "colore" | "sidebar";
+export type CVDesign = "classique" | "moderne" | "minimaliste" | "elegant" | "colore" | "sidebar" | "timeline" | "magazine" | "corporate";
 
 export const CV_DESIGNS: { id: CVDesign; label: string; description: string; accent: string }[] = [
   { id: "classique", label: "Classique", description: "Sobre et professionnel", accent: "#1e3a7b" },
@@ -63,6 +63,9 @@ export const CV_DESIGNS: { id: CVDesign; label: string; description: string; acc
   { id: "elegant", label: "Élégant", description: "Touches dorées raffinées", accent: "#92700C" },
   { id: "colore", label: "Coloré", description: "Palette vive et dynamique", accent: "#dc2626" },
   { id: "sidebar", label: "Sidebar", description: "Colonne latérale moderne", accent: "#0f766e" },
+  { id: "timeline", label: "Timeline", description: "Frise chronologique verticale", accent: "#7c3aed" },
+  { id: "magazine", label: "Magazine", description: "Mise en page éditoriale 2 colonnes", accent: "#be185d" },
+  { id: "corporate", label: "Corporate", description: "Bandeau couleur en-tête + sections épurées", accent: "#0369a1" },
 ];
 
 // ===== HTML Generators =====
