@@ -1143,10 +1143,12 @@ export function buildFullCatalog(
   // ===== Bilan de compétences =====
   if (isBDC) {
     // CT1 - IND 1 : Programme
-    add("bdc_c1i1_programme", "CT1 - IND 1 Programme du bilan de compétences", 1, 1, "bdc_programme");
-    add("bdc_c1i1_catalogue", "CT1 - IND 1 Fiche commerciale publique (Qualiopi V9)", 1, 1, "bdc_catalogue_commercial");
-    add("bdc_c1i1_parcours", "CT1 - IND 1 Parcours bilan de compétences (process écrit)", 1, 1, "bdc_parcours");
-    add("bdc_c2i6_support_cours", "CT2 - IND 6 Support de cours – Bilan de compétences", 2, 6, "bdc_support_cours");
+    stagiaires.forEach((s, si) => {
+      add(`bdc_c1i1_programme_${si}`, `CT1 - IND 1 Programme du bilan de compétences – ${s.prenom} ${s.nom}`, 1, 1, "bdc_programme", { stagiaireIdx: si });
+      add(`bdc_c1i1_catalogue_${si}`, `CT1 - IND 1 Fiche commerciale publique (Qualiopi V9) – ${s.prenom} ${s.nom}`, 1, 1, "bdc_catalogue_commercial", { stagiaireIdx: si });
+      add(`bdc_c1i1_parcours_${si}`, `CT1 - IND 1 Parcours bilan de compétences (process écrit) – ${s.prenom} ${s.nom}`, 1, 1, "bdc_parcours", { stagiaireIdx: si });
+      add(`bdc_c2i6_support_cours_${si}`, `CT2 - IND 6 Support de cours – Bilan de compétences – ${s.prenom} ${s.nom}`, 2, 6, "bdc_support_cours", { stagiaireIdx: si });
+    });
     // CT1 - IND 2 : Indicateurs (Excel existant)
     add("bdc_c1i2_indicateurs", "CT1 - IND 2 Indicateurs de performance (Excel)", 1, 2, "indicateurs_performance");
     // Registre bénéficiaires (suivi parcours)
@@ -1166,8 +1168,8 @@ export function buildFullCatalog(
     });
 
     // CT2 - IND 6 : Déroulé et modalités + Enquête métier
-    add("bdc_c2i6_deroule", "CT2 - IND 6 Déroulé et modalités du bilan de compétences", 2, 6, "bdc_deroule_modalites");
     stagiaires.forEach((s, si) => {
+      add(`bdc_c2i6_deroule_${si}`, `CT2 - IND 6 Déroulé et modalités du bilan de compétences – ${s.prenom} ${s.nom}`, 2, 6, "bdc_deroule_modalites", { stagiaireIdx: si });
       add(`bdc_c2i6_enquete_metier_${si}`, `CT2 - IND 6 Enquête métier – ${s.prenom} ${s.nom}`, 2, 6, "bdc_enquete_metier", { stagiaireIdx: si });
     });
 
@@ -1188,8 +1190,8 @@ export function buildFullCatalog(
     });
 
     // CT3 - IND 11 : Grille de suivi + Enquête métiers + Suivi post-bilan
-    add(`bdc_c3i11_questionnaire_enquete_metiers`, `CT3 - IND 11 Questionnaire enquête métiers`, 3, 11, "bdc_questionnaire_enquete_metiers");
     stagiaires.forEach((s, si) => {
+      add(`bdc_c3i11_questionnaire_enquete_metiers_${si}`, `CT3 - IND 11 Questionnaire enquête métiers – ${s.prenom} ${s.nom}`, 3, 11, "bdc_questionnaire_enquete_metiers", { stagiaireIdx: si });
       add(`bdc_c3i11_grille_suivi_${si}`, `CT3 - IND 11 Grille de suivi – ${s.prenom} ${s.nom}`, 3, 11, "bdc_grille_suivi", { stagiaireIdx: si });
       add(`bdc_c3i11_suivi_post_${si}`, `CT3 - IND 11 Questionnaire suivi post-bilan – ${s.prenom} ${s.nom}`, 3, 11, "bdc_suivi_post_bilan", { stagiaireIdx: si });
       add(`bdc_c3i11_trame_6mois_${si}`, `CT3 - IND 11 Trame entretien de suivi à 6 mois – ${s.prenom} ${s.nom}`, 3, 11, "bdc_trame_suivi_6mois", { stagiaireIdx: si });
