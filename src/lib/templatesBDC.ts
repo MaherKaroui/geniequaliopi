@@ -917,3 +917,82 @@ En <strong>deux exemplaires originaux</strong>.</p>
     ],
   });
 }
+
+// ===== CR1 - IND 1 : Catalogue / fiche commerciale publique =====
+export function genCatalogueCommercialBDC(o: OrganismeInfo, f: FormationInfo) {
+  const profile = getBdcDomainProfile(f);
+  const refHandicap = (o as any).referentHandicap || consultantName(o);
+  const tel = o.telephone ? ` – ${o.telephone}` : "";
+  const dateMaj = new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
+  return buildDocument({ org: o, title: "FICHE COMMERCIALE – BILAN DE COMPÉTENCES", subtitle: `Domaine : ${profile.label} • Mise à jour : ${dateMaj}`, sections: [
+    { heading: "Objectifs", content: `<p>Faire le point sur les compétences, aptitudes et motivations du bénéficiaire, vérifier la faisabilité d'un projet professionnel ciblé sur le métier de <strong>${profile.metier}</strong> dans le secteur ${profile.secteur}, et bâtir un plan d'action concret (formation, mobilité, création d'activité).</p>` },
+    { heading: "Public visé", content: "<p>Salariés du privé (CDI/CDD), demandeurs d'emploi inscrits à France Travail, travailleurs indépendants, intérimaires, agents publics. Sans condition de diplôme.</p>" },
+    { heading: "Prérequis", content: "<p>Aucun prérequis de diplôme ou d'expérience. Maîtrise orale du français pour les entretiens et la rédaction de la synthèse. Démarche personnelle et volontaire.</p>" },
+    { heading: "Durée", content: "<p><strong>24 heures</strong> d'accompagnement individuel maximum (art. R6313-4 à R6313-8 CT), réparties sur 8 à 10 séances individuelles, sur 8 à 12 semaines.</p>" },
+    { heading: "Tarif", content: "<p><strong>1 800 € net de TVA</strong> (organisme exonéré – art. 261-4-4° a CGI).</p>" },
+    { heading: "Modalités", content: `<p>Présentiel et/ou distanciel synchrone (visioconférence). Entretiens individuels, tests psychométriques (RIASEC, Sosie/Performanse), enquête métier, travail intersession guidé.</p>` },
+    { heading: "Délais d'accès", content: "<p>• 11 jours ouvrés minimum après acceptation du devis (CPF)<br>• 15 jours pour un financement employeur ou Transitions Pro<br>• Démarrage sous 2 à 4 semaines selon disponibilités</p>" },
+    { heading: "Méthodes mobilisées", content: "<p>Entretiens individuels avec un consultant qualifié, tests psychométriques validés, enquête métier auprès de professionnels du secteur, exploration documentaire (ROME, référentiels), travail intersession guidé, restitution personnalisée.</p>" },
+    { heading: "Modalités d'évaluation", content: "<p>Évaluation continue à chaque séance, questionnaire de satisfaction à chaud en fin de bilan, entretien de suivi à 6 mois (art. R6313-8 CT), questionnaire d'évaluation à froid pour mesurer l'impact.</p>" },
+    { heading: "Document de synthèse", content: "<p>Remise en main propre au bénéficiaire (papier + numérique) lors du dernier entretien. Document propriété exclusive du bénéficiaire (art. R6313-7 CT), non communiquable à un tiers sans son accord écrit.</p>" },
+    { heading: "Accessibilité aux personnes en situation de handicap", content: `<p>Locaux et modalités accessibles. Référent handicap mobilisable dès l'entretien préalable pour étudier les adaptations nécessaires (rythme, supports, lieu, distanciel, partenariats Agefiph / Cap Emploi).<br><strong>Référent handicap :</strong> ${refHandicap}${tel}${o.email ? ` – ${o.email}` : ""}.</p>` },
+    { heading: "Financements possibles", content: "<p>CPF (Mon Compte Formation), Transitions Pro (PTP), plan de développement des compétences employeur, France Travail (AIF), financement personnel.</p>" },
+    { heading: "Contact et inscription", content: `<p>${o.nom || ""}${o.adresse ? ` – ${o.adresse}` : ""}${o.telephone ? `<br>Téléphone : ${o.telephone}` : ""}${o.email ? `<br>E-mail : ${o.email}` : ""}${o.siteWeb ? `<br>Site : ${o.siteWeb}` : ""}</p>` },
+  ] });
+}
+
+// ===== CR3 - IND 26 : Procédure handicap dédiée BDC =====
+export function genProcedureHandicapBDC(o: OrganismeInfo) {
+  const refHandicap = (o as any).referentHandicap || consultantName(o);
+  const tel = o.telephone ? ` – ${o.telephone}` : "";
+  const dateMaj = new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
+  return buildDocument({ org: o, title: "PROCÉDURE D'ACCUEIL DES PERSONNES EN SITUATION DE HANDICAP", subtitle: `Bilan de compétences • Version en vigueur au ${dateMaj}`, sections: [
+    { heading: "1. Engagement de l'organisme", content: `<p>${o.nom || "L'organisme"} s'engage à garantir l'égalité d'accès au bilan de compétences pour toute personne en situation de handicap (loi du 11 février 2005, art. L5211-1 et R6316-1 CT). Aucun bénéficiaire ne peut être écarté en raison de son handicap.</p>` },
+    { heading: "2. Référent handicap", content: `<p><strong>Identité :</strong> ${refHandicap}<br><strong>Coordonnées :</strong>${tel}${o.email ? ` – ${o.email}` : ""}<br><strong>Missions :</strong> point d'entrée unique du bénéficiaire, analyse du besoin d'adaptation, mobilisation des partenaires (Agefiph, Cap Emploi, MDPH), suivi de la mise en œuvre, évaluation à l'issue du bilan.</p>` },
+    { heading: "3. Détection du besoin", content: "<p>Dès l'entretien préalable :<br>• question ouverte sur l'existence d'une RQTH ou d'un besoin d'aménagement<br>• proposition systématique d'un échange confidentiel avec le référent handicap<br>• recueil – avec accord écrit – des préconisations médicales utiles<br>• jamais d'obligation de déclarer son handicap</p>" },
+    { heading: "4. Analyse et plan d'adaptation", content: "<p>Le référent handicap formalise un <strong>plan d'adaptation individuel</strong> précisant :<br>• les adaptations matérielles (locaux PMR, supports en gros caractères, supports audio, logiciels d'accessibilité)<br>• les adaptations pédagogiques (rythme allongé, pauses, distanciel, durée des séances réduite)<br>• les adaptations organisationnelles (horaires, accompagnement par un tiers)<br>• les partenaires mobilisés (Agefiph, Cap Emploi, SAMETH, médecin du travail)</p>", variant: "green" },
+    { heading: "5. Mise en œuvre", content: "<p>• Information du consultant en charge du bilan (dans le respect du secret)<br>• Validation conjointe avec le bénéficiaire des adaptations retenues<br>• Démarrage du bilan dans les conditions adaptées<br>• Point d'étape à mi-parcours pour ajuster le dispositif</p>" },
+    { heading: "6. Partenaires mobilisables", content: "<p>• <strong>Agefiph</strong> – aides techniques et humaines : agefiph.fr<br>• <strong>Cap Emploi</strong> – accompagnement vers l'emploi<br>• <strong>MDPH</strong> – reconnaissance RQTH, PCH, AAH<br>• <strong>SAMETH</strong> – maintien dans l'emploi<br>• <strong>Médecin du travail</strong> – préconisations professionnelles</p>" },
+    { heading: "7. Confidentialité", content: "<p>Toutes les informations relatives à la situation de handicap sont strictement confidentielles. Elles ne sont partagées qu'avec accord écrit du bénéficiaire et uniquement dans la mesure nécessaire à l'adaptation du bilan.</p>" },
+    { heading: "8. Suivi et amélioration continue", content: "<p>• Bilan d'adaptation en fin de bilan<br>• Question dédiée dans le questionnaire de satisfaction<br>• Revue annuelle de la procédure<br>• Mise à jour de la veille handicap (CR6 IND 26)</p>" },
+  ] });
+}
+
+// ===== CR2 - IND 5 : Engagement de confidentialité signé =====
+export function genEngagementConfidentialiteBDC(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
+  const s = stagiaires[si] || stagiaires[0];
+  const dt = sigDateBDC(s, f);
+  return buildDocument({ org: o, title: "ENGAGEMENT RÉCIPROQUE DE CONFIDENTIALITÉ", subtitle: "Bilan de compétences", stagiaires: [s], sections: [
+    { heading: "Entre", content: `<p><strong>L'organisme prestataire :</strong> ${o.nom}, SIRET ${o.siret || "—"}, représenté par ${consultantName(o)}, agissant en qualité de consultant(e) bilan,<br><br><strong>ET</strong><br><br><strong>${g(s, "Le bénéficiaire", "La bénéficiaire")} :</strong> ${beneficiaireLabel(s)}.</p>` },
+    { heading: "Cadre légal", content: "<p>Le présent engagement est conclu en application des articles <strong>L6313-10 à L6313-12</strong> et <strong>R6313-4 à R6313-8</strong> du Code du travail, qui imposent au prestataire et à ses intervenants une obligation de confidentialité absolue sur les informations recueillies à l'occasion du bilan.</p>" },
+    { heading: "Article 1 – Engagement du consultant et de l'organisme", content: "<p>Le consultant et l'organisme s'engagent à :<br>• ne divulguer à aucun tiers le contenu des entretiens, des tests, du document de synthèse et de toute pièce du dossier<br>• respecter le secret professionnel sur l'existence même de la prestation<br>• ne transmettre aucune information à l'employeur, au financeur ou à un tiers sans <strong>accord écrit préalable du bénéficiaire</strong><br>• détruire, à l'issue du bilan, tous les documents établis pour sa réalisation, sauf le document de synthèse et la convention qui ne sont conservés qu'avec accord écrit du bénéficiaire (1 an max)</p>", variant: "green" },
+    { heading: "Article 2 – Engagement du bénéficiaire", content: "<p>Le bénéficiaire reconnaît :<br>• avoir été informé que les résultats détaillés et le document de synthèse sont sa <strong>propriété exclusive</strong> (art. R6313-7 CT)<br>• disposer librement du document de synthèse et pouvoir refuser à tout moment sa transmission à un tiers<br>• avoir reçu une information claire sur les objectifs, la méthodologie et les modalités du bilan</p>" },
+    { heading: "Article 3 – Sécurisation des données", content: "<p>Les données personnelles collectées font l'objet d'un traitement conforme au RGPD : finalité limitée à la réalisation du bilan, accès restreint au consultant désigné, durée de conservation limitée, droit d'accès et de rectification ouvert au bénéficiaire à tout moment.</p>" },
+    { heading: "Article 4 – Sanctions", content: "<p>Tout manquement à la présente obligation expose son auteur aux sanctions prévues par l'article 226-13 du Code pénal (un an d'emprisonnement et 15 000 € d'amende) et engage la responsabilité civile de l'organisme.</p>" },
+  ], signatures: { type: "2", labels: [`${g(s, "Le Consultant", "La Consultante")}`, `${g(s, "Le Bénéficiaire", "La Bénéficiaire")}`], names: [consultantName(o), beneficiaireLabel(s)], dates: [dt, dt] } });
+}
+
+// ===== CR3 - IND 11 : Trame entretien de suivi à 6 mois =====
+export function genTrameSuivi6MoisBDC(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
+  const s = stagiaires[si] || stagiaires[0];
+  const finRef = s?.dateFinFormation || f.dateFin || "";
+  let dt6m = new Date().toLocaleDateString("fr-FR");
+  if (finRef) {
+    const d = new Date(finRef);
+    if (!isNaN(d.getTime())) {
+      d.setMonth(d.getMonth() + 6);
+      dt6m = formatDate(d.toISOString().split("T")[0]);
+    }
+  }
+  const profile = getBdcDomainProfile(f);
+  return buildDocument({ org: o, title: "ENTRETIEN DE SUIVI À 6 MOIS", subtitle: `Bilan de compétences – ${beneficiaireLabel(s)} • Domaine : ${profile.label}`, stagiaires: [s], sections: [
+    { heading: "Cadre", content: `<p>Conformément à l'article <strong>R6313-8</strong> du Code du travail, un entretien de suivi est proposé au bénéficiaire dans les 6 mois suivant la fin du bilan pour mesurer la mise en œuvre du plan d'action et apporter un éventuel appui.</p><p><strong>Date de fin du bilan :</strong> ${endDate(s, f)}<br><strong>Date prévue de l'entretien :</strong> ${dt6m}<br><strong>Modalité :</strong> téléphone / visioconférence / présentiel<br><strong>Consultant(e) :</strong> ${consultantName(o)}</p>` },
+    { heading: "1. Situation actuelle du bénéficiaire", content: "<p>• Situation professionnelle : (en poste / en formation / en recherche / en création d'activité)<br>• Évolution depuis la fin du bilan :<br>• Changements personnels significatifs :</p>" },
+    { heading: "2. Mise en œuvre du plan d'action", content: "<p><strong>Étapes prévues dans le plan :</strong><br>• Étape 1 : ☐ Réalisée  ☐ En cours  ☐ Reportée  ☐ Abandonnée — Commentaire :<br>• Étape 2 : ☐ Réalisée  ☐ En cours  ☐ Reportée  ☐ Abandonnée — Commentaire :<br>• Étape 3 : ☐ Réalisée  ☐ En cours  ☐ Reportée  ☐ Abandonnée — Commentaire :</p>", variant: "green" },
+    { heading: "3. Démarches engagées", content: `<p>• Inscription en formation : ☐ Oui  ☐ Non — Précisez :<br>• Démarche de validation (VAE, certification) : ☐ Oui  ☐ Non — Précisez :<br>• Recherche d'emploi (CV, lettres, entretiens) : ☐ Oui  ☐ Non — Précisez :<br>• Démarche de création d'activité : ☐ Oui  ☐ Non — Précisez :<br>• Mobilisation du réseau professionnel (${profile.secteur}) : ☐ Oui  ☐ Non</p>` },
+    { heading: "4. Atteinte du projet professionnel", content: `<p>Projet retenu en fin de bilan : <strong>${profile.metier}</strong><br>• Projet maintenu ? ☐ Oui  ☐ Réorienté  ☐ Abandonné — Pourquoi :<br>• Niveau d'avancement (de 1 à 10) : ___ / 10<br>• Premiers résultats concrets observés :</p>` },
+    { heading: "5. Difficultés rencontrées et besoins d'appui", content: "<p>• Difficultés principales (financières, organisationnelles, motivation, santé) :<br>• Besoin d'un appui complémentaire ? ☐ Oui  ☐ Non — Lequel :<br>• Orientation vers un partenaire (France Travail, Cap Emploi, OPCO, Mission Locale, BGE) : ☐ Oui  ☐ Non</p>" },
+    { heading: "6. Satisfaction à froid", content: "<p>• Le bilan a-t-il été utile dans votre parcours ? ☐ Très utile  ☐ Utile  ☐ Peu utile  ☐ Pas utile<br>• Recommanderiez-vous le bilan à un proche ? ☐ Oui  ☐ Non — Pourquoi :<br>• Suggestions d'amélioration :</p>" },
+    { heading: "7. Préconisations du consultant", content: "<p>Synthèse de l'échange, ressources orientées, prochaine étape conseillée, éventuelle prolongation d'accompagnement.</p>" },
+  ], signatures: { type: "2", labels: [`${g(s, "Le Consultant", "La Consultante")}`, `${g(s, "Le Bénéficiaire", "La Bénéficiaire")}`], names: [consultantName(o), beneficiaireLabel(s)], dates: [dt6m, dt6m] } });
+}
