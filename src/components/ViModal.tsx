@@ -126,7 +126,7 @@ export default function ViModal({ open, onOpenChange }: Props) {
             </a>
           </Button>
           <Button onClick={handleDownloadPack} className="gap-2">
-            <Download className="w-4 h-4" /> Télécharger le pack complet (~156 Mo)
+            <Download className="w-4 h-4" /> Télécharger le pack PDF (~100 Mo)
           </Button>
         </div>
       </DialogContent>
