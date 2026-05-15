@@ -123,7 +123,7 @@ export function generateCVHTML(data: CVData, design: CVDesign, options?: { accen
   const pubSection = data.publications ? `${sectionTitle("Publications", accent, secStyle)}<p style="font-size:12px;color:#333;white-space:pre-wrap;">${escapeHtml(data.publications)}</p>` : "";
 
   if (design === "sidebar") {
-    return `<div style="font-family:'Segoe UI',Arial,sans-serif;max-width:800px;margin:0 auto;display:flex;min-height:1100px;">
+    return `<div style="font-family:${fontOverride || "'Segoe UI',Arial,sans-serif"};max-width:800px;margin:0 auto;display:flex;min-height:1100px;">
       <div style="width:260px;background:${accent};color:#fff;padding:30px 20px;">
         <div style="text-align:center;margin-bottom:20px;">${photoBlock(data.photoUrl, 120, true)}</div>
         <h1 style="font-size:20px;margin:0 0 4px 0;text-align:center;">${escapeHtml(fullName)}</h1>
