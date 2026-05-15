@@ -1143,10 +1143,12 @@ export function buildFullCatalog(
   // ===== Bilan de compétences =====
   if (isBDC) {
     // CT1 - IND 1 : Programme
-    add("bdc_c1i1_programme", "CT1 - IND 1 Programme du bilan de compétences", 1, 1, "bdc_programme");
-    add("bdc_c1i1_catalogue", "CT1 - IND 1 Fiche commerciale publique (Qualiopi V9)", 1, 1, "bdc_catalogue_commercial");
-    add("bdc_c1i1_parcours", "CT1 - IND 1 Parcours bilan de compétences (process écrit)", 1, 1, "bdc_parcours");
-    add("bdc_c2i6_support_cours", "CT2 - IND 6 Support de cours – Bilan de compétences", 2, 6, "bdc_support_cours");
+    stagiaires.forEach((s, si) => {
+      add(`bdc_c1i1_programme_${si}`, `CT1 - IND 1 Programme du bilan de compétences – ${s.prenom} ${s.nom}`, 1, 1, "bdc_programme", { stagiaireIdx: si });
+      add(`bdc_c1i1_catalogue_${si}`, `CT1 - IND 1 Fiche commerciale publique (Qualiopi V9) – ${s.prenom} ${s.nom}`, 1, 1, "bdc_catalogue_commercial", { stagiaireIdx: si });
+      add(`bdc_c1i1_parcours_${si}`, `CT1 - IND 1 Parcours bilan de compétences (process écrit) – ${s.prenom} ${s.nom}`, 1, 1, "bdc_parcours", { stagiaireIdx: si });
+      add(`bdc_c2i6_support_cours_${si}`, `CT2 - IND 6 Support de cours – Bilan de compétences – ${s.prenom} ${s.nom}`, 2, 6, "bdc_support_cours", { stagiaireIdx: si });
+    });
     // CT1 - IND 2 : Indicateurs (Excel existant)
     add("bdc_c1i2_indicateurs", "CT1 - IND 2 Indicateurs de performance (Excel)", 1, 2, "indicateurs_performance");
     // Registre bénéficiaires (suivi parcours)
@@ -1166,8 +1168,8 @@ export function buildFullCatalog(
     });
 
     // CT2 - IND 6 : Déroulé et modalités + Enquête métier
-    add("bdc_c2i6_deroule", "CT2 - IND 6 Déroulé et modalités du bilan de compétences", 2, 6, "bdc_deroule_modalites");
     stagiaires.forEach((s, si) => {
+      add(`bdc_c2i6_deroule_${si}`, `CT2 - IND 6 Déroulé et modalités du bilan de compétences – ${s.prenom} ${s.nom}`, 2, 6, "bdc_deroule_modalites", { stagiaireIdx: si });
       add(`bdc_c2i6_enquete_metier_${si}`, `CT2 - IND 6 Enquête métier – ${s.prenom} ${s.nom}`, 2, 6, "bdc_enquete_metier", { stagiaireIdx: si });
     });
 
@@ -1188,16 +1190,18 @@ export function buildFullCatalog(
     });
 
     // CT3 - IND 11 : Grille de suivi + Enquête métiers + Suivi post-bilan
-    add(`bdc_c3i11_questionnaire_enquete_metiers`, `CT3 - IND 11 Questionnaire enquête métiers`, 3, 11, "bdc_questionnaire_enquete_metiers");
     stagiaires.forEach((s, si) => {
+      add(`bdc_c3i11_questionnaire_enquete_metiers_${si}`, `CT3 - IND 11 Questionnaire enquête métiers – ${s.prenom} ${s.nom}`, 3, 11, "bdc_questionnaire_enquete_metiers", { stagiaireIdx: si });
       add(`bdc_c3i11_grille_suivi_${si}`, `CT3 - IND 11 Grille de suivi – ${s.prenom} ${s.nom}`, 3, 11, "bdc_grille_suivi", { stagiaireIdx: si });
       add(`bdc_c3i11_suivi_post_${si}`, `CT3 - IND 11 Questionnaire suivi post-bilan – ${s.prenom} ${s.nom}`, 3, 11, "bdc_suivi_post_bilan", { stagiaireIdx: si });
       add(`bdc_c3i11_trame_6mois_${si}`, `CT3 - IND 11 Trame entretien de suivi à 6 mois – ${s.prenom} ${s.nom}`, 3, 11, "bdc_trame_suivi_6mois", { stagiaireIdx: si });
     });
 
     // CT3 - IND 12 : Déroulé et modalités + Procédure d'adaptation
-    add("bdc_c3i12_deroule_modalites", "CT3 - IND 12 Déroulé et modalités du bilan", 3, 12, "bdc_deroule_modalites");
-    add("bdc_c3i12_procedure_adaptation", "CT3 - IND 12 Procédure d'adaptation de l'accompagnement", 3, 12, "bdc_procedure_adaptation");
+    stagiaires.forEach((s, si) => {
+      add(`bdc_c3i12_deroule_modalites_${si}`, `CT3 - IND 12 Déroulé et modalités du bilan – ${s.prenom} ${s.nom}`, 3, 12, "bdc_deroule_modalites", { stagiaireIdx: si });
+      add(`bdc_c3i12_procedure_adaptation_${si}`, `CT3 - IND 12 Procédure d'adaptation de l'accompagnement – ${s.prenom} ${s.nom}`, 3, 12, "bdc_procedure_adaptation", { stagiaireIdx: si });
+    });
 
     // CT4 - IND 18 : Organigramme (existant)
     add("bdc_c4i18_organigramme", "CT4 - IND 18 Organigramme", 4, 18, "organigramme");
@@ -1206,28 +1210,38 @@ export function buildFullCatalog(
     stagiaires.forEach((s, si) => {
       add(`bdc_c4i19_exploration_metier_${si}`, `CT4 - IND 19 Exploration métier – ${s.prenom} ${s.nom}`, 4, 19, "bdc_exploration_metier", { stagiaireIdx: si });
     });
-    add(`bdc_c4i19_guide_protocoles`, `CT4 - IND 19 Guide des protocoles métier`, 4, 19, "bdc_guide_protocoles");
-    add(`bdc_c4i19_tableau_bases`, `CT4 - IND 19 Tableau des bases métier`, 4, 19, "bdc_tableau_bases");
+    stagiaires.forEach((s, si) => {
+      add(`bdc_c4i19_guide_protocoles_${si}`, `CT4 - IND 19 Guide des protocoles métier – ${s.prenom} ${s.nom}`, 4, 19, "bdc_guide_protocoles", { stagiaireIdx: si });
+      add(`bdc_c4i19_tableau_bases_${si}`, `CT4 - IND 19 Tableau des bases métier – ${s.prenom} ${s.nom}`, 4, 19, "bdc_tableau_bases", { stagiaireIdx: si });
+    });
 
     // CT5 - IND 21 : Fiche de poste consultant + Compte rendu fin + Fiche intervenant
-    add("bdc_c5i21_fiche_poste", "CT5 - IND 21 Fiche de poste consultant bilan", 5, 21, "bdc_fiche_poste_consultant");
     stagiaires.forEach((s, si) => {
+      add(`bdc_c5i21_fiche_poste_${si}`, `CT5 - IND 21 Fiche de poste consultant bilan – ${s.prenom} ${s.nom}`, 5, 21, "bdc_fiche_poste_consultant", { stagiaireIdx: si });
       add(`bdc_c5i21_compte_rendu_${si}`, `CT5 - IND 21 Compte rendu de fin de bilan – ${s.prenom} ${s.nom}`, 5, 21, "bdc_compte_rendu_fin", { stagiaireIdx: si });
       add(`bdc_c5i21_cv_${si}`, `CT5 - IND 21 CV du bénéficiaire – ${s.prenom} ${s.nom}`, 5, 21, "bdc_cv_beneficiaire", { stagiaireIdx: si });
       add(`bdc_c2i5_test_personnalite_${si}`, `CT2 - IND 5 Test de personnalité – ${s.prenom} ${s.nom}`, 2, 5, "bdc_test_personnalite", { stagiaireIdx: si });
     });
-    add("bdc_c5i21_fiche_intervenant", "CT5 - IND 21 Fiche intervenant externe", 5, 21, "bdc_fiche_intervenant");
+    stagiaires.forEach((s, si) => {
+      add(`bdc_c5i21_fiche_intervenant_${si}`, `CT5 - IND 21 Fiche intervenant externe – ${s.prenom} ${s.nom}`, 5, 21, "bdc_fiche_intervenant", { stagiaireIdx: si });
+    });
 
     // CT6 - IND 23/24/25 : Fiche de veille combinée
-    add("bdc_c6_fiche_veille", "CT6 - IND 23/24/25 Fiche de veille", 6, 23, "bdc_fiche_veille");
+    stagiaires.forEach((s, si) => {
+      add(`bdc_c6_fiche_veille_${si}`, `CT6 - IND 23/24/25 Fiche de veille – ${s.prenom} ${s.nom}`, 6, 23, "bdc_fiche_veille", { stagiaireIdx: si });
+    });
 
     // CT6 - IND 26 : Handicap + Partenaires (existants)
     add("bdc_c6i26_veille_handicap", "CT6 - IND 26 Veille handicap", 6, 26, "veille_handicap");
-    add("bdc_c6i26_procedure_handicap", "CT6 - IND 26 Procédure d'accueil handicap (Qualiopi V9)", 6, 26, "bdc_procedure_handicap");
+    stagiaires.forEach((s, si) => {
+      add(`bdc_c6i26_procedure_handicap_${si}`, `CT6 - IND 26 Procédure d'accueil handicap (Qualiopi V9) – ${s.prenom} ${s.nom}`, 6, 26, "bdc_procedure_handicap", { stagiaireIdx: si });
+    });
     add("bdc_c6i26_liste_partenaires", "CT6 - IND 26 Liste des partenaires locaux", 6, 26, "liste_partenaires");
 
     // CT6 - IND 27 : Sous-traitance
-    add("bdc_c6i27_contrat_sous_traitance", "CT6 - IND 27 Contrat de sous-traitance", 6, 27, "bdc_contrat_sous_traitance");
+    stagiaires.forEach((s, si) => {
+      add(`bdc_c6i27_contrat_sous_traitance_${si}`, `CT6 - IND 27 Contrat de sous-traitance – ${s.prenom} ${s.nom}`, 6, 27, "bdc_contrat_sous_traitance", { stagiaireIdx: si });
+    });
 
     // CT7 - IND 30 : Satisfaction à chaud (per bénéficiaire) + Relances Excel
     stagiaires.forEach((s, si) => {
@@ -1236,12 +1250,16 @@ export function buildFullCatalog(
     add("bdc_c7i30_relances_excel", "CT7 - IND 30 Tableau de relance des appréciations (Excel)", 7, 30, "relances_appreciations_excel");
 
     // CT7 - IND 31 : Réclamations
-    add("bdc_c7i31_formulaire_reclamation", "CT7 - IND 31 Formulaire de dépôt de réclamation", 7, 31, "bdc_formulaire_reclamation");
-    add("bdc_c7i31_gestion_reclamations", "CT7 - IND 31 Gestion des réclamations et dysfonctionnements", 7, 31, "bdc_gestion_reclamations");
+    stagiaires.forEach((s, si) => {
+      add(`bdc_c7i31_formulaire_reclamation_${si}`, `CT7 - IND 31 Formulaire de dépôt de réclamation – ${s.prenom} ${s.nom}`, 7, 31, "bdc_formulaire_reclamation", { stagiaireIdx: si });
+      add(`bdc_c7i31_gestion_reclamations_${si}`, `CT7 - IND 31 Gestion des réclamations et dysfonctionnements – ${s.prenom} ${s.nom}`, 7, 31, "bdc_gestion_reclamations", { stagiaireIdx: si });
+    });
     add("bdc_c7i31_suivi_dysfonctionnements", "CT7 - IND 31 Suivi de dysfonctionnements (Excel)", 7, 31, "suivi_dysfonctionnements_excel");
 
     // CT7 - IND 32 : Amélioration continue
-    add("bdc_c7i32_actions_correctives", "CT7 - IND 32 Tableau actions correctives", 7, 32, "bdc_actions_correctives");
+    stagiaires.forEach((s, si) => {
+      add(`bdc_c7i32_actions_correctives_${si}`, `CT7 - IND 32 Tableau actions correctives – ${s.prenom} ${s.nom}`, 7, 32, "bdc_actions_correctives", { stagiaireIdx: si });
+    });
     add("bdc_c7i32_amelioration_excel", "CT7 - IND 32 Tableau d'amélioration continue (Excel)", 7, 32, "tableau_amelioration_continue_excel");
   }
 

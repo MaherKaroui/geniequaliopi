@@ -176,8 +176,19 @@ function bdcPersonalisation(f: FormationInfo, s: StagiaireInfo | undefined, si: 
   };
 }
 
+function bdcBeneficiarySections(f: FormationInfo, stagiaires?: StagiaireInfo[], si = 0) {
+  const s = stagiaires?.[si] || stagiaires?.[0];
+  if (!s) return [];
+  const p = bdcPersonalisation(f, s, si);
+  return [{
+    heading: "Bénéficiaire concerné",
+    content: `<p><strong>Nom :</strong> ${s.nom || ""}<br><strong>Prénom :</strong> ${s.prenom || ""}${s.email ? `<br><strong>E-mail :</strong> ${s.email}` : ""}${s.telephone?.trim() ? `<br><strong>Téléphone :</strong> ${s.telephone}` : ""}<br><strong>Période du bilan :</strong> du ${startDate(s, f)} au ${endDate(s, f)}<br><strong>Objectif individualisé :</strong> ${p.objectif}<br><strong>Axe de travail prioritaire :</strong> ${p.axe}</p>`,
+    variant: "green" as const,
+  }];
+}
+
 // ===== CR1 - IND 1 : Programme du bilan =====
-export function genProgrammeBDC(o: OrganismeInfo, f: FormationInfo) {
+export function genProgrammeBDC(o: OrganismeInfo, f: FormationInfo, stagiaires?: StagiaireInfo[], si = 0) {
   const ph = phasesDates(f);
   const totalHours = 24;
   const hPrelim = 3;
@@ -187,7 +198,8 @@ export function genProgrammeBDC(o: OrganismeInfo, f: FormationInfo) {
   const li = (arr: string[]) => arr.map(x => `• ${x}`).join("<br>");
   const refHandicap = (o as any).referentHandicap || consultantName(o);
   const tel = o.telephone ? ` – ${o.telephone}` : "";
-  return buildDocument({ org: o, title: "PROGRAMME DE BILAN DE COMPÉTENCES", subtitle: `Domaine : ${profile.label}`, sections: [
+  return buildDocument({ org: o, title: "PROGRAMME DE BILAN DE COMPÉTENCES", subtitle: `Domaine : ${profile.label}`, stagiaires: stagiaires?.[si] ? [stagiaires[si]] : undefined, sections: [
+    ...bdcBeneficiarySections(f, stagiaires, si),
     { heading: "Objectifs du bilan de compétences", content: `<p>• Analyser les compétences, aptitudes et motivations du bénéficiaire en lien avec le métier de <strong>${profile.metier}</strong> exercé dans le secteur ${profile.secteur}.<br>• Vérifier la faisabilité d'un projet professionnel ciblé sur ce métier (insertion, évolution ou création d'activité).<br>• Identifier les compétences transférables et les écarts à combler par rapport aux exigences du métier.<br>• Élaborer un plan d'action personnalisé : formation, certification, immersion, recherche d'emploi ou installation indépendante.</p>` },
     { heading: "Public visé", content: `<p>• Salariés du secteur privé (CDI, CDD) souhaitant évoluer ou se reconvertir vers le métier de ${profile.metier}.<br>• Demandeurs d'emploi inscrits à France Travail en réflexion sur un projet dans le secteur ${profile.secteur}.<br>• Travailleurs indépendants, intérimaires ou agents publics.<br>• Toute personne en démarche de mobilité professionnelle, sans condition de diplôme.</p>` },
     { heading: "Prérequis", content: `<p>• Aucun diplôme ni expérience préalable exigés dans le domaine.<br>• Maîtrise orale du français souhaitée pour les entretiens et la rédaction de la synthèse.<br>• Démarche personnelle et volontaire de questionnement ou de reconversion vers le métier de ${profile.metier}.</p>` },
@@ -243,10 +255,11 @@ export function genDocumentSynthese(o: OrganismeInfo, f: FormationInfo, stagiair
 }
 
 // ===== CR2 - IND 6 : Déroulé et modalités =====
-export function genDerouleModalitesBDC(o: OrganismeInfo, f: FormationInfo) {
+export function genDerouleModalitesBDC(o: OrganismeInfo, f: FormationInfo, stagiaires?: StagiaireInfo[], si = 0) {
   const ph = phasesDates(f);
   const { totalHours } = parseDuree(f.duree || "24h");
-  return buildDocument({ org: o, title: `DÉROULÉ ET MODALITÉS DU BILAN DE COMPÉTENCES`, subtitle: `Domaine : ${f.intitule}`, sections: [
+  return buildDocument({ org: o, title: `DÉROULÉ ET MODALITÉS DU BILAN DE COMPÉTENCES`, subtitle: `Domaine : ${f.intitule}`, stagiaires: stagiaires?.[si] ? [stagiaires[si]] : undefined, sections: [
+    ...bdcBeneficiarySections(f, stagiaires, si),
     { heading: "Objectif du bilan", content: `<p>Le bilan de compétences vise à accompagner un(e) professionnel(le) souhaitant :<br>• faire un point global sur son parcours professionnel,<br>• identifier ses forces et ses axes d'amélioration,<br>• valider un projet d'évolution (spécialisation, reconversion, entrepreneuriat…),<br>• ou confirmer ses motivations à créer ou reprendre une activité dans le secteur de ${f.intitule}.</p>` },
     { heading: "1. Phase préliminaire (2 à 3 heures)", content: "<p>• Recueil de la demande spécifique<br>• Présentation du déroulement du bilan<br>• Définition des objectifs personnalisés<br>• Planification des séances</p>" },
     { heading: "2. Phase d'investigation (15 à 17 heures)", content: `<p>Cette phase approfondit les compétences acquises dans le domaine de ${f.intitule} et explore les pistes de valorisation et d'évolution :<br>• Analyse du parcours professionnel et des réalisations concrètes<br>• Identification des compétences clés (techniques, organisationnelles, relationnelles)<br>• Évaluation des motivations et du projet de vie<br>• Enquêtes métier<br>• Analyse des possibilités : retour en formation, VAE, création d'entreprise, mobilité</p>`, variant: "green" },
@@ -399,33 +412,20 @@ export function genGrilleSuiviBDC(o: OrganismeInfo, f: FormationInfo, stagiaires
 }
 
 // ===== CR3 - IND 11 : Questionnaire enquête métiers (vide) =====
-export function genQuestionnaireEnqueteMetiersBDC(o: OrganismeInfo, f: FormationInfo) {
-  return buildDocument({ org: o, title: "QUESTIONNAIRE ENQUÊTE MÉTIERS", subtitle: `Bilan de compétences – ${f.intitule}`, sections: [
-    { heading: "CIBLER LES ACTIVITÉS", content: "" },
-    { heading: "Pouvez-vous me décrire votre métier ?", content: "<p>_______________________________________________</p>" },
-    { heading: "Au quotidien quelles sont vos activités ?", content: "<p>_______________________________________________</p>" },
-    { heading: "Quels types d'outils ou machines utilisez-vous ?", content: "<p>_______________________________________________</p>" },
-    { heading: "Utilisez-vous des matières premières ? Lesquelles ?", content: "<p>_______________________________________________</p>" },
-    { heading: "Quelle est la part d'initiative dans votre métier ?", content: "<p>_______________________________________________</p>" },
-    { heading: "Conditions de travail", content: "" },
-    { heading: "Où travaillez-vous ?", content: "<p>_______________________________________________</p>" },
-    { heading: "Travaillez-vous en intérieur ou extérieur ?", content: "<p>_______________________________________________</p>" },
-    { heading: "Êtes-vous sédentaire ou travaillez-vous sur des sites différents ?", content: "<p>_______________________________________________</p>" },
-    { heading: "Travaillez-vous en équipe ou seul ?", content: "<p>_______________________________________________</p>" },
-    { heading: "Avez-vous un supérieur hiérarchique ? Où se trouve-t-il ? Comment intervient-il ?", content: "<p>_______________________________________________</p>" },
-    { heading: "Quels sont vos horaires. Sont-ils réguliers ?", content: "<p>_______________________________________________</p>" },
-    { heading: "Qualités", content: "" },
-    { heading: "Les principales qualités demandées dans cette profession sont :", content: "<p>_______________________________________________</p>" },
-    { heading: "Celui qui choisit cette profession doit montrer de l'intérêt pour :", content: "<p>_______________________________________________</p>" },
-    { heading: "Existe-t-il des exigences physiques particulières ? Si oui, lesquelles ?", content: "<p>_______________________________________________</p>" },
-    { heading: "Débouchés", content: "" },
-    { heading: "Est-il facile de trouver un emploi dans votre branche ? Pourquoi ?", content: "<p>_______________________________________________</p>" },
-    { heading: "Carrière", content: "" },
-    { heading: "Quel est votre salaire ?", content: "<p>_______________________________________________</p>" },
-    { heading: "Quelles sont vos perspectives de promotion ?", content: "<p>_______________________________________________</p>" },
-    { heading: "Formation", content: "" },
-    { heading: "Quels sont les diplômes qui préparent à ce métier ?", content: "<p>_______________________________________________</p>" },
-    { heading: "Quels sont les avantages, les inconvénients de votre métier ?", content: "<p>_______________________________________________</p>" },
+export function genQuestionnaireEnqueteMetiersBDC(o: OrganismeInfo, f: FormationInfo, stagiaires?: StagiaireInfo[], si = 0) {
+  const s = stagiaires?.[si] || stagiaires?.[0];
+  const p = bdcPersonalisation(f, s, si);
+  return buildDocument({ org: o, title: "QUESTIONNAIRE ENQUÊTE MÉTIERS", subtitle: `Bilan de compétences – ${s ? beneficiaireLabel(s) : f.intitule}`, stagiaires: s ? [s] : undefined, sections: [
+    ...bdcBeneficiarySections(f, stagiaires, si),
+    { heading: "Cibler les activités", content: `<p><strong>Métier interrogé :</strong> ${p.profile.metier}<br><strong>Secteur :</strong> ${p.profile.secteur}<br><strong>Objectif de l'enquête :</strong> vérifier ${p.objectif}.</p>` },
+    { heading: "Pouvez-vous me décrire votre métier ?", content: `<p>Le métier de ${p.profile.metier} consiste principalement à ${p.profile.missions.slice(0, 3).join(", ")}. Les activités demandent une bonne connaissance du terrain et une capacité d'adaptation aux situations rencontrées.</p>` },
+    { heading: "Au quotidien quelles sont vos activités ?", content: listHtml(p.profile.missions) },
+    { heading: "Quels types d'outils ou machines utilisez-vous ?", content: listHtml(p.profile.techniques) },
+    { heading: "Conditions de travail", content: `<p>Les principales contraintes observées sont :</p>${listHtml(p.profile.contraintes)}<p><strong>Point à vérifier pour ${s ? beneficiaireLabel(s) : "le bénéficiaire"} :</strong> ${p.contrainte}.</p>` },
+    { heading: "Qualités", content: `<p>Les qualités attendues sont :</p>${listHtml(p.profile.transversales)}<p><strong>Atout personnel à valoriser :</strong> ${p.pointFort}. <strong>Axe à renforcer :</strong> ${p.axe}.</p>` },
+    { heading: "Débouchés", content: `${listHtml(p.profile.opportunites)}<p><strong>Piste privilégiée :</strong> ${p.opportunite}.</p>` },
+    { heading: "Formation", content: `${listHtml(p.profile.formations)}<p><strong>Formation prioritaire identifiée :</strong> ${p.formation}.</p>` },
+    { heading: "Synthèse de l'enquête", content: `<p>L'enquête confirme la cohérence du projet sous réserve de travailler : <strong>${p.vigilance}</strong>. Les informations recueillies seront intégrées au document de synthèse et au plan d'action final.</p>`, variant: "green" },
   ] });
 }
 
@@ -444,8 +444,9 @@ export function genSuiviPostBilanBDC(o: OrganismeInfo, f: FormationInfo, stagiai
 }
 
 // ===== CR3 - IND 12 : Procédure d'adaptation =====
-export function genProcedureAdaptationBDC(o: OrganismeInfo) {
-  return buildDocument({ org: o, title: "PROCÉDURE D'ADAPTATION DE L'ACCOMPAGNEMENT POUR LES BÉNÉFICIAIRES", sections: [
+export function genProcedureAdaptationBDC(o: OrganismeInfo, f?: FormationInfo, stagiaires?: StagiaireInfo[], si = 0) {
+  return buildDocument({ org: o, title: "PROCÉDURE D'ADAPTATION DE L'ACCOMPAGNEMENT POUR LES BÉNÉFICIAIRES", stagiaires: stagiaires?.[si] ? [stagiaires[si]] : undefined, sections: [
+    ...(f ? bdcBeneficiarySections(f, stagiaires, si) : []),
     { heading: "1. Objectif", content: "<p>L'objectif de cette procédure est d'assurer que chaque bénéficiaire d'un bilan de compétences bénéficie d'un accompagnement adapté à ses besoins spécifiques, ses compétences, son rythme et ses contraintes.</p>" },
     { heading: "2. Identification des besoins spécifiques", content: "<p><strong>2.1. Pré-entretien ou questionnaire d'accueil :</strong><br>• Identifier les objectifs professionnels et personnels<br>• Recueillir les informations relatives au parcours<br>• Détecter les besoins spécifiques : handicap, contraintes personnelles, préférences d'apprentissage<br><br><strong>2.2. Documents complémentaires :</strong><br>• Recueil d'attestations médicales si nécessaire (avec consentement)</p>" },
     { heading: "3. Analyse et diagnostic", content: "<p>• Identifier les écarts entre compétences actuelles et objectifs visés<br>• Détecter les obstacles potentiels<br>• Prioriser les adaptations : contenus, rythme, modalités d'évaluation, accompagnement spécifique</p>", variant: "green" },
@@ -468,7 +469,7 @@ export function genExplorationMetierBDC(o: OrganismeInfo, f: FormationInfo, stag
 }
 
 // ===== CR4 - IND 19 : Guide des protocoles métier =====
-export function genGuideProtocolesBDC(o: OrganismeInfo, f: FormationInfo) {
+export function genGuideProtocolesBDC(o: OrganismeInfo, f: FormationInfo, stagiaires?: StagiaireInfo[], si = 0) {
   const profile = getBdcDomainProfile(f);
   const key = (f.intitule || "").toLowerCase();
   const imgStyle = `width:100%;max-height:220px;object-fit:cover;border-radius:8px;margin:10px 0;`;
@@ -513,11 +514,11 @@ export function genGuideProtocolesBDC(o: OrganismeInfo, f: FormationInfo) {
 
   sections.push({ heading: "Références et normes", content: refs });
 
-  return buildDocument({ org: o, title: `GUIDE DES PROTOCOLES – ${profile.label.toUpperCase()}`, subtitle: `Ressource pédagogique – Bilan de compétences`, sections });
+  return buildDocument({ org: o, title: `GUIDE DES PROTOCOLES – ${profile.label.toUpperCase()}`, subtitle: `Ressource pédagogique – Bilan de compétences`, stagiaires: stagiaires?.[si] ? [stagiaires[si]] : undefined, sections: [...bdcBeneficiarySections(f, stagiaires, si), ...sections] });
 }
 
 // ===== CR4 - IND 19 : Tableau des bases métier =====
-export function genTableauBasesBDC(o: OrganismeInfo, f: FormationInfo) {
+export function genTableauBasesBDC(o: OrganismeInfo, f: FormationInfo, stagiaires?: StagiaireInfo[], si = 0) {
   const profile = getBdcDomainProfile(f);
   const key = (f.intitule || "").toLowerCase();
   const isMeca = /mecan|véhic|vehic|automob/i.test(key);
@@ -605,14 +606,16 @@ export function genTableauBasesBDC(o: OrganismeInfo, f: FormationInfo) {
     ];
   }
 
-  return buildDocument({ org: o, title: `TABLEAU DES BASES – ${profile.label.toUpperCase()}`, subtitle: `Référentiel technique – Bilan de compétences`, sections: [
+  return buildDocument({ org: o, title: `TABLEAU DES BASES – ${profile.label.toUpperCase()}`, subtitle: `Référentiel technique – Bilan de compétences`, stagiaires: stagiaires?.[si] ? [stagiaires[si]] : undefined, sections: [
+    ...bdcBeneficiarySections(f, stagiaires, si),
     { heading: "Introduction", content: `<p>Ce tableau récapitulatif présente les bases techniques essentielles du métier de <strong>${profile.metier}</strong> dans ${profile.secteur}. Il est remis au bénéficiaire en tant que ressource d'appui lors de la phase d'investigation du bilan de compétences.</p>` },
   ], table: { headers, rows } });
 }
 
 // ===== CR5 - IND 21 : Fiche de poste consultant bilan =====
-export function genFichePosteConsultantBDC(o: OrganismeInfo) {
-  return buildDocument({ org: o, title: "FICHE DE POSTE – CONSULTANT(E) BILAN DE COMPÉTENCES", sections: [
+export function genFichePosteConsultantBDC(o: OrganismeInfo, f?: FormationInfo, stagiaires?: StagiaireInfo[], si = 0) {
+  return buildDocument({ org: o, title: "FICHE DE POSTE – CONSULTANT(E) BILAN DE COMPÉTENCES", stagiaires: stagiaires?.[si] ? [stagiaires[si]] : undefined, sections: [
+    ...(f ? bdcBeneficiarySections(f, stagiaires, si) : []),
     { heading: "Intitulé du poste", content: `<p>Consultant(e) en bilan de compétences<br><strong>Organisme :</strong> ${o.nom}<br><strong>Rattachement :</strong> Direction pédagogique</p>` },
     { heading: "Missions principales", content: "<p>• Conduire des bilans de compétences conformément aux articles L6313-1 à L6313-12 du Code du travail<br>• Accompagner les bénéficiaires dans les trois phases du bilan (préliminaire, investigation, conclusion)<br>• Rédiger les documents de synthèse confidentiels<br>• Assurer le suivi à 6 mois<br>• Réaliser les enquêtes métier et les recherches sectorielles<br>• Garantir la confidentialité des données</p>" },
     { heading: "Compétences requises", content: "<p>• Maîtrise des techniques d'entretien et d'écoute active<br>• Connaissance approfondie du marché de l'emploi et des dispositifs de formation<br>• Capacité d'analyse et de synthèse<br>• Maîtrise des outils d'évaluation (tests, grilles de compétences)<br>• Connaissance du cadre réglementaire (Qualiopi, RGPD)</p>", variant: "green" },
@@ -635,8 +638,9 @@ export function genCompteRenduFinBDC(o: OrganismeInfo, f: FormationInfo, stagiai
 }
 
 // ===== CR5 - IND 21 : Fiche intervenant externe =====
-export function genFicheIntervenantExterneBDC(o: OrganismeInfo, f: FormationInfo) {
-  return buildDocument({ org: o, title: "FICHE INTERVENANT EXTERNE", subtitle: `Bilan de compétences – ${f.intitule}`, sections: [
+export function genFicheIntervenantExterneBDC(o: OrganismeInfo, f: FormationInfo, stagiaires?: StagiaireInfo[], si = 0) {
+  return buildDocument({ org: o, title: "FICHE INTERVENANT EXTERNE", subtitle: `Bilan de compétences – ${f.intitule}`, stagiaires: stagiaires?.[si] ? [stagiaires[si]] : undefined, sections: [
+    ...bdcBeneficiarySections(f, stagiaires, si),
     { heading: "Organisme de formation", content: `<p><strong>${o.nom}</strong><br>Adresse : ${o.adresse}<br>SIRET : ${o.siret || "—"}<br>Consultant(e) : ${consultantName(o)}<br>Contact : ${o.email || "—"}${o.telephone?.trim() ? ` – ${o.telephone}` : ""}<br>Formation concernée : Bilan de compétences – ${f.intitule}<br>Dates : du ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)}</p>` },
     { heading: "Identité de l'intervenant externe", content: "<p>• <strong>Nom :</strong> (à compléter)<br>• <strong>Prénom :</strong> (à compléter)<br>• <strong>Entreprise / Structure :</strong> (à compléter)<br>• <strong>SIRET :</strong> (à compléter)<br>• <strong>Fonction :</strong> Professionnel du secteur / Formateur spécialisé<br>• <strong>E-mail :</strong> (à compléter)<br>• <strong>Téléphone :</strong> (à compléter)</p>" },
     { heading: "Compétences et qualifications", content: `<p>• <strong>Diplôme :</strong> Qualification dans le domaine de ${f.intitule}<br>• <strong>Expérience :</strong> Minimum 1 an dans le secteur<br>• <strong>Expérience en transmission :</strong> Ateliers, formation professionnelle ou encadrement</p>`, variant: "green" },
@@ -681,17 +685,20 @@ export function genSatisfactionChaudBDC(o: OrganismeInfo, f: FormationInfo, stag
 }
 
 // ===== CR7 - IND 31 : Formulaire de réclamation BDC =====
-export function genFormulaireReclamationBDC(o: OrganismeInfo) {
-  return buildDocument({ org: o, title: "FORMULAIRE DE DÉPÔT DE RÉCLAMATION", sections: [
-    { heading: "Identification", content: "<p>Nom : ___________________________<br>Prénom : ___________________________<br>Date de naissance : ___________________________<br>Adresse : ___________________________<br>Téléphone : ___________________________<br>Mail : ___________________________<br>Date du bilan : ___________________________<br>Intitulé du bilan : ___________________________</p>" },
+export function genFormulaireReclamationBDC(o: OrganismeInfo, f?: FormationInfo, stagiaires?: StagiaireInfo[], si = 0) {
+  const s = stagiaires?.[si] || stagiaires?.[0];
+  return buildDocument({ org: o, title: "FORMULAIRE DE DÉPÔT DE RÉCLAMATION", stagiaires: s ? [s] : undefined, sections: [
+    ...(f ? bdcBeneficiarySections(f, stagiaires, si) : []),
+    { heading: "Identification", content: `<p>Nom : ${s?.nom || "___________________________"}<br>Prénom : ${s?.prenom || "___________________________"}<br>Date de naissance : ${s?.dateNaissance ? formatDate(s.dateNaissance) : "___________________________"}<br>Adresse : ${s?.adresse || "___________________________"}<br>${s?.telephone?.trim() ? `Téléphone : ${s.telephone}<br>` : ""}Mail : ${s?.email || "___________________________"}<br>Date du bilan : ${f ? `du ${startDate(s, f)} au ${endDate(s, f)}` : "___________________________"}<br>Intitulé du bilan : ${f ? `Bilan de compétences – ${f.intitule}` : "___________________________"}</p>` },
     { heading: "Description de la réclamation", content: "<p>Veuillez détailler de manière la plus précise possible votre réclamation :<br>___________________________<br>___________________________<br>___________________________<br>___________________________</p>" },
     { heading: "Autorisation", content: `<p>J'autorise le centre ${o.nom} à conserver ce formulaire pour améliorer la qualité des prestations et à reprendre contact avec moi :<br><br>☐ Oui &nbsp;&nbsp;&nbsp;&nbsp; ☐ Non</p>` },
   ] });
 }
 
 // ===== CR7 - IND 31 : Gestion des réclamations BDC =====
-export function genGestionReclamationsBDC(o: OrganismeInfo) {
-  return buildDocument({ org: o, title: "GESTION DES RÉCLAMATIONS ET DES DYSFONCTIONNEMENTS", sections: [
+export function genGestionReclamationsBDC(o: OrganismeInfo, f?: FormationInfo, stagiaires?: StagiaireInfo[], si = 0) {
+  return buildDocument({ org: o, title: "GESTION DES RÉCLAMATIONS ET DES DYSFONCTIONNEMENTS", stagiaires: stagiaires?.[si] ? [stagiaires[si]] : undefined, sections: [
+    ...(f ? bdcBeneficiarySections(f, stagiaires, si) : []),
     { heading: "1. Objet", content: "<p>Cette procédure décrit les modalités de traitement des réclamations et dysfonctionnements signalés par les bénéficiaires de bilans de compétences.</p>" },
     { heading: "2. Recueil des réclamations", content: "<p>Les réclamations peuvent être transmises par :<br>• Formulaire de dépôt de réclamation (papier ou numérique)<br>• Courrier électronique<br>• Appel téléphonique (consigné par écrit)</p>" },
     { heading: "3. Traitement", content: "<p>• Accusé de réception sous 48h<br>• Analyse de la réclamation par le responsable qualité<br>• Enquête interne si nécessaire<br>• Réponse apportée sous 15 jours ouvrés<br>• Actions correctives mises en place</p>", variant: "green" },
@@ -700,13 +707,13 @@ export function genGestionReclamationsBDC(o: OrganismeInfo) {
 }
 
 // ===== CR7 - IND 32 : Tableau actions correctives =====
-export function genActionsCorrectivesBDC(o: OrganismeInfo) {
+export function genActionsCorrectivesBDC(o: OrganismeInfo, f?: FormationInfo, stagiaires?: StagiaireInfo[], si = 0) {
   const rows = [
     ["Retard de restitution synthèse", "10/01/2025", "Réorganisation planning", "Consultant", "Terminé", "30/01/2025"],
     ["Demande d'adaptation horaires", "15/01/2025", "Flexibilité des créneaux", "Direction", "En cours", "—"],
     ["Difficulté d'accès distanciel", "20/01/2025", "Vérification outil visio", "IT", "Terminé", "25/01/2025"],
   ];
-  return buildDocument({ org: o, title: "TABLEAU ACTIONS CORRECTIVES – TRAITEMENT DES RÉCLAMATIONS", table: { headers: ["Réclamation", "Date", "Action corrective", "Responsable", "Statut", "Date clôture"], rows } });
+  return buildDocument({ org: o, title: "TABLEAU ACTIONS CORRECTIVES – TRAITEMENT DES RÉCLAMATIONS", stagiaires: stagiaires?.[si] ? [stagiaires[si]] : undefined, sections: f ? bdcBeneficiarySections(f, stagiaires, si) : [], table: { headers: ["Réclamation", "Date", "Action corrective", "Responsable", "Statut", "Date clôture"], rows } });
 }
 
 // ===== CT2 - IND 4 : Bilan mensuel des abandons / ruptures =====
@@ -776,7 +783,7 @@ export function genBilanMensuelBDC(o: OrganismeInfo, f: FormationInfo, stagiaire
 }
 
 // ===== CT6 - IND 23/24/25 : Fiche de veille combinée =====
-export function genFicheVeilleBDC(o: OrganismeInfo, f: FormationInfo) {
+export function genFicheVeilleBDC(o: OrganismeInfo, f: FormationInfo, stagiaires?: StagiaireInfo[], si = 0) {
   const profile = getBdcDomainProfile(f);
   const tableStyle = `style="width:100%;border-collapse:collapse;margin-bottom:10px"`;
   const cellStyle = `style="border:1px solid #999;padding:8px;vertical-align:top"`;
@@ -799,7 +806,9 @@ ${veillTable("Exploitation", v.exploitation)}
   return buildDocument({
     org: o,
     title: `FICHE DE VEILLE – ${profile.label.toUpperCase()}`,
+    stagiaires: stagiaires?.[si] ? [stagiaires[si]] : undefined,
     sections: [
+      ...bdcBeneficiarySections(f, stagiaires, si),
       {
         heading: "1. Veille Réglementaire",
         content: renderVeille(profile.veilleReglementaire, "Date de publication"),
@@ -817,7 +826,7 @@ ${veillTable("Exploitation", v.exploitation)}
 }
 
 // ===== CT6 - IND 27 : Contrat de sous-traitance BDC (style IZIBUSINESS) =====
-export function genContratSousTraitanceBDC(o: OrganismeInfo, f: FormationInfo) {
+export function genContratSousTraitanceBDC(o: OrganismeInfo, f: FormationInfo, stagiaires?: StagiaireInfo[], si = 0) {
   const majDate = o.dateMaj || new Date().toISOString().slice(0, 10);
   const dateContrat = formatDate(majDate);
   const oneYearLater = (() => { const d = new Date(majDate); d.setFullYear(d.getFullYear() + 1); return d.toISOString().slice(0, 10); })();
@@ -827,7 +836,9 @@ export function genContratSousTraitanceBDC(o: OrganismeInfo, f: FormationInfo) {
   return buildDocument({
     org: o,
     title: "CONTRAT DE SOUS-TRAITANCE",
+    stagiaires: stagiaires?.[si] ? [stagiaires[si]] : undefined,
     sections: [
+      ...bdcBeneficiarySections(f, stagiaires, si),
       {
         heading: "",
         content: `<p>Entre les soussignés :</p>
@@ -920,12 +931,13 @@ En <strong>deux exemplaires originaux</strong>.</p>
 }
 
 // ===== CR1 - IND 1 : Catalogue / fiche commerciale publique =====
-export function genCatalogueCommercialBDC(o: OrganismeInfo, f: FormationInfo) {
+export function genCatalogueCommercialBDC(o: OrganismeInfo, f: FormationInfo, stagiaires?: StagiaireInfo[], si = 0) {
   const profile = getBdcDomainProfile(f);
   const refHandicap = (o as any).referentHandicap || consultantName(o);
   const tel = o.telephone ? ` – ${o.telephone}` : "";
   const dateMaj = new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
-  return buildDocument({ org: o, title: "FICHE COMMERCIALE – BILAN DE COMPÉTENCES", subtitle: `Domaine : ${profile.label} • Mise à jour : ${dateMaj}`, sections: [
+  return buildDocument({ org: o, title: "FICHE COMMERCIALE – BILAN DE COMPÉTENCES", subtitle: `Domaine : ${profile.label} • Mise à jour : ${dateMaj}`, stagiaires: stagiaires?.[si] ? [stagiaires[si]] : undefined, sections: [
+    ...bdcBeneficiarySections(f, stagiaires, si),
     { heading: "Objectifs", content: `<p>Faire le point sur les compétences, aptitudes et motivations du bénéficiaire, vérifier la faisabilité d'un projet professionnel ciblé sur le métier de <strong>${profile.metier}</strong> dans le secteur ${profile.secteur}, et bâtir un plan d'action concret (formation, mobilité, création d'activité).</p>` },
     { heading: "Public visé", content: "<p>Salariés du privé (CDI/CDD), demandeurs d'emploi inscrits à France Travail, travailleurs indépendants, intérimaires, agents publics. Sans condition de diplôme.</p>" },
     { heading: "Prérequis", content: "<p>Aucun prérequis de diplôme ou d'expérience. Maîtrise orale du français pour les entretiens et la rédaction de la synthèse. Démarche personnelle et volontaire.</p>" },
@@ -943,11 +955,12 @@ export function genCatalogueCommercialBDC(o: OrganismeInfo, f: FormationInfo) {
 }
 
 // ===== CR3 - IND 26 : Procédure handicap dédiée BDC =====
-export function genProcedureHandicapBDC(o: OrganismeInfo) {
+export function genProcedureHandicapBDC(o: OrganismeInfo, f?: FormationInfo, stagiaires?: StagiaireInfo[], si = 0) {
   const refHandicap = (o as any).referentHandicap || consultantName(o);
   const tel = o.telephone ? ` – ${o.telephone}` : "";
   const dateMaj = new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
-  return buildDocument({ org: o, title: "PROCÉDURE D'ACCUEIL DES PERSONNES EN SITUATION DE HANDICAP", subtitle: `Bilan de compétences • Version en vigueur au ${dateMaj}`, sections: [
+  return buildDocument({ org: o, title: "PROCÉDURE D'ACCUEIL DES PERSONNES EN SITUATION DE HANDICAP", subtitle: `Bilan de compétences • Version en vigueur au ${dateMaj}`, stagiaires: stagiaires?.[si] ? [stagiaires[si]] : undefined, sections: [
+    ...(f ? bdcBeneficiarySections(f, stagiaires, si) : []),
     { heading: "1. Engagement de l'organisme", content: `<p>${o.nom || "L'organisme"} s'engage à garantir l'égalité d'accès au bilan de compétences pour toute personne en situation de handicap (loi du 11 février 2005, art. L5211-1 et R6316-1 CT). Aucun bénéficiaire ne peut être écarté en raison de son handicap.</p>` },
     { heading: "2. Référent handicap", content: `<p><strong>Identité :</strong> ${refHandicap}<br><strong>Coordonnées :</strong>${tel}${o.email ? ` – ${o.email}` : ""}<br><strong>Missions :</strong> point d'entrée unique du bénéficiaire, analyse du besoin d'adaptation, mobilisation des partenaires (Agefiph, Cap Emploi, MDPH), suivi de la mise en œuvre, évaluation à l'issue du bilan.</p>` },
     { heading: "3. Détection du besoin", content: "<p>Dès l'entretien préalable :<br>• question ouverte sur l'existence d'une RQTH ou d'un besoin d'aménagement<br>• proposition systématique d'un échange confidentiel avec le référent handicap<br>• recueil – avec accord écrit – des préconisations médicales utiles<br>• jamais d'obligation de déclarer son handicap</p>" },
@@ -1184,7 +1197,7 @@ export function genTestPersonnaliteBDC(o: OrganismeInfo, f: FormationInfo, stagi
 }
 
 // ===== CR – Parcours Bilan de Compétences (process écrit, 29 étapes) =====
-export function genParcoursBDC(o: OrganismeInfo, f: FormationInfo) {
+export function genParcoursBDC(o: OrganismeInfo, f: FormationInfo, stagiaires?: StagiaireInfo[], si = 0) {
   const referent = o.referentHandicap || o.responsablePedagogique || o.dirigeant || "Le référent pédagogique";
   const rows: [string, string][] = [
     ["1 – C", "Recherche d'information : CPF, site internet, bouche à oreille, prospection. Programme téléchargeable via le site, ainsi que la plaquette."],
@@ -1221,7 +1234,9 @@ export function genParcoursBDC(o: OrganismeInfo, f: FormationInfo) {
     org: o,
     title: "PARCOURS BILAN DE COMPÉTENCES",
     subtitle: `Processus écrit – C : client / OF : ${o.nom}`,
+    stagiaires: stagiaires?.[si] ? [stagiaires[si]] : undefined,
     sections: [
+      ...bdcBeneficiarySections(f, stagiaires, si),
       { heading: "Référents", content: `<p><strong>Référent pédagogique, administratif, handicap et service médiation/réclamation :</strong> ${referent}<br><strong>Email :</strong> ${o.email || "—"}<br><strong>Téléphone :</strong> ${o.telephone || "—"}</p>` },
       { heading: "Documents à fournir / processus écrit", content: tableHTML(["Étape", "Action"], rows) },
       { heading: "Mails types associés", content: "<p><strong>Mail 1</strong> : confirmation entretien préliminaire — <strong>Mail 2</strong> : envoi programme/plaquette/prérequis — <strong>Mail 3.1</strong> : validation prérequis et convention — <strong>Mail 3.2</strong> : refus motivé — <strong>Mail 4</strong> : confirmation inscription CPF — <strong>Mail 5</strong> : synthèse mi-parcours — <strong>Mail 6</strong> : remise des livrables de fin de bilan — <strong>Mail 7</strong> : compte rendu suivi 1 mois — <strong>Mail 8</strong> : RDV de suivi à 6 mois — <strong>Mail 9</strong> : questionnaire satisfaction à 6 mois.</p>", variant: "green" },
@@ -1230,7 +1245,7 @@ export function genParcoursBDC(o: OrganismeInfo, f: FormationInfo) {
 }
 
 // ===== CR – Support de cours Bilan de Compétences =====
-export function genSupportCoursBDC(o: OrganismeInfo, f: FormationInfo) {
+export function genSupportCoursBDC(o: OrganismeInfo, f: FormationInfo, stagiaires?: StagiaireInfo[], si = 0) {
   const profile = getBdcDomainProfile(f);
   const phasesRows: string[][] = [
     ["1. Phase préliminaire", "Confirmer l'engagement dans la démarche ; définir et analyser les besoins et attentes ; informer des conditions de déroulement ; élaborer un programme de travail et un calendrier adapté.", "Entretien individuel"],
@@ -1242,7 +1257,9 @@ export function genSupportCoursBDC(o: OrganismeInfo, f: FormationInfo) {
     org: o,
     title: "SUPPORT DE COURS – BILAN DE COMPÉTENCES",
     subtitle: `Domaine : ${profile.label} • Version 1`,
+    stagiaires: stagiaires?.[si] ? [stagiaires[si]] : undefined,
     sections: [
+      ...bdcBeneficiarySections(f, stagiaires, si),
       { heading: "Sommaire", content: "<p>1. Objectifs<br>2. Programme<br>3. Finalités du bilan de compétences et engagements<br>4. Cœur de métier<br>5. Approche du bilan de compétences<br>6. Phases du bilan de compétences<br>7. Méthodologie<br>8. Éthique<br>9. Valeur ajoutée<br>10. Démarche qualité</p>" },
       { heading: "1. Objectifs", content: `<p><strong>Phase 1 – Entretien préliminaire :</strong> confirmer l'engagement, définir et analyser les besoins, informer des conditions, élaborer un programme et un calendrier adaptés.</p><p><strong>Phase 2 – Investigation :</strong><br>• Module 1 : analyser la dynamique du parcours<br>• Module 2 : valoriser les réalisations et le CV<br>• Module 3 : diagnostiquer motivations, besoins et valeurs<br>• Module 4 : déterminer points forts et axes de développement<br>• Module 5 : positionnement sur l'inventaire d'intérêts professionnels<br>• Module 6 : élaborer des voies d'orientation<br>• Module 7 : valider la cohérence du projet</p><p><strong>Phase 3 – Conclusion (Module 8) :</strong> confirmer le projet professionnel et/ou de formation, récapituler les résultats détaillés, co-rédiger la synthèse, recenser les facteurs favorables/défavorables, planifier la mise en œuvre.</p>`, variant: "green" },
       { heading: "2. Programme", content: tableHTML(["Phase", "Thèmes traités", "Pédagogie"], phasesRows) },

@@ -396,12 +396,12 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "plan_action_bilan": return genPlanActionBilan(o, f, stagiaires);
     case "synthese_bilan": return genSyntheseBilan(o, f, stagiaires);
     // ===== Bilan de compétences =====
-    case "bdc_programme": return genProgrammeBDC_imported(o, f);
+    case "bdc_programme": { const si = params?.stagiaireIdx ?? 0; return genProgrammeBDC_imported(o, f, stagiaires, si); }
     case "bdc_eval_besoins": { const si = params?.stagiaireIdx ?? 0; return genEvaluationBesoins_imported(o, f, stagiaires, si); }
     case "bdc_bilan_abandons_ruptures": return genBilanAbandonsRupturesBDC_imported(o, f, stagiaires);
     case "bdc_bilan_mensuel": return genBilanMensuelBDC_imported(o, f, stagiaires);
     case "bdc_document_synthese": { const si = params?.stagiaireIdx ?? 0; return genDocumentSynthese_imported(o, f, stagiaires, si); }
-    case "bdc_deroule_modalites": return genDerouleModalitesBDC_imported(o, f);
+    case "bdc_deroule_modalites": { const si = params?.stagiaireIdx ?? 0; return genDerouleModalitesBDC_imported(o, f, stagiaires, si); }
     case "bdc_enquete_metier": { const si = params?.stagiaireIdx ?? 0; return genEnqueteMetierBDC_imported(o, f, stagiaires, si); }
     case "bdc_cgv": { const si = params?.stagiaireIdx ?? 0; return genCGVBilanCompetences_imported(o, f, stagiaires, si); }
     case "bdc_contrat": { const si = params?.stagiaireIdx ?? 0; return genContratBilanCompetences_imported(o, f, stagiaires, si); }
@@ -410,29 +410,29 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "bdc_convocation": { const si = params?.stagiaireIdx ?? 0; return genConvocationBDC_imported(o, f, stagiaires, si); }
     case "bdc_synopsis": { const si = params?.stagiaireIdx ?? 0; return genSynopsisBDC_imported(o, f, stagiaires, si); }
     case "bdc_grille_suivi": { const si = params?.stagiaireIdx ?? 0; return genGrilleSuiviBDC_imported(o, f, stagiaires, si); }
-    case "bdc_questionnaire_enquete_metiers": return genQuestionnaireEnqueteMetiersBDC_imported(o, f);
+    case "bdc_questionnaire_enquete_metiers": { const si = params?.stagiaireIdx ?? 0; return genQuestionnaireEnqueteMetiersBDC_imported(o, f, stagiaires, si); }
     case "bdc_suivi_post_bilan": { const si = params?.stagiaireIdx ?? 0; return genSuiviPostBilanBDC_imported(o, f, stagiaires, si); }
-    case "bdc_procedure_adaptation": return genProcedureAdaptationBDC_imported(o);
+    case "bdc_procedure_adaptation": { const si = params?.stagiaireIdx ?? 0; return genProcedureAdaptationBDC_imported(o, f, stagiaires, si); }
     case "bdc_exploration_metier": { const si = params?.stagiaireIdx ?? 0; return genExplorationMetierBDC_imported(o, f, stagiaires, si); }
-    case "bdc_guide_protocoles": return genGuideProtocolesBDC_imported(o, f);
-    case "bdc_tableau_bases": return genTableauBasesBDC_imported(o, f);
-    case "bdc_fiche_poste_consultant": return genFichePosteConsultantBDC_imported(o);
+    case "bdc_guide_protocoles": { const si = params?.stagiaireIdx ?? 0; return genGuideProtocolesBDC_imported(o, f, stagiaires, si); }
+    case "bdc_tableau_bases": { const si = params?.stagiaireIdx ?? 0; return genTableauBasesBDC_imported(o, f, stagiaires, si); }
+    case "bdc_fiche_poste_consultant": { const si = params?.stagiaireIdx ?? 0; return genFichePosteConsultantBDC_imported(o, f, stagiaires, si); }
     case "bdc_compte_rendu_fin": { const si = params?.stagiaireIdx ?? 0; return genCompteRenduFinBDC_imported(o, f, stagiaires, si); }
-    case "bdc_fiche_intervenant": return genFicheIntervenantExterneBDC_imported(o, f);
+    case "bdc_fiche_intervenant": { const si = params?.stagiaireIdx ?? 0; return genFicheIntervenantExterneBDC_imported(o, f, stagiaires, si); }
     case "bdc_satisfaction_chaud": { const si = params?.stagiaireIdx ?? 0; return genSatisfactionChaudBDC_imported(o, f, stagiaires, si); }
-    case "bdc_formulaire_reclamation": return genFormulaireReclamationBDC_imported(o);
-    case "bdc_gestion_reclamations": return genGestionReclamationsBDC_imported(o);
-    case "bdc_actions_correctives": return genActionsCorrectivesBDC_imported(o);
-    case "bdc_fiche_veille": return genFicheVeilleBDC_imported(o, f);
-    case "bdc_contrat_sous_traitance": return genContratSousTraitanceBDC_imported(o, f);
-    case "bdc_catalogue_commercial": return genCatalogueCommercialBDC_imported(o, f);
-    case "bdc_procedure_handicap": return genProcedureHandicapBDC_imported(o);
+    case "bdc_formulaire_reclamation": { const si = params?.stagiaireIdx ?? 0; return genFormulaireReclamationBDC_imported(o, f, stagiaires, si); }
+    case "bdc_gestion_reclamations": { const si = params?.stagiaireIdx ?? 0; return genGestionReclamationsBDC_imported(o, f, stagiaires, si); }
+    case "bdc_actions_correctives": { const si = params?.stagiaireIdx ?? 0; return genActionsCorrectivesBDC_imported(o, f, stagiaires, si); }
+    case "bdc_fiche_veille": { const si = params?.stagiaireIdx ?? 0; return genFicheVeilleBDC_imported(o, f, stagiaires, si); }
+    case "bdc_contrat_sous_traitance": { const si = params?.stagiaireIdx ?? 0; return genContratSousTraitanceBDC_imported(o, f, stagiaires, si); }
+    case "bdc_catalogue_commercial": { const si = params?.stagiaireIdx ?? 0; return genCatalogueCommercialBDC_imported(o, f, stagiaires, si); }
+    case "bdc_procedure_handicap": { const si = params?.stagiaireIdx ?? 0; return genProcedureHandicapBDC_imported(o, f, stagiaires, si); }
     case "bdc_engagement_confidentialite": { const si = params?.stagiaireIdx ?? 0; return genEngagementConfidentialiteBDC_imported(o, f, stagiaires, si); }
     case "bdc_trame_suivi_6mois": { const si = params?.stagiaireIdx ?? 0; return genTrameSuivi6MoisBDC_imported(o, f, stagiaires, si); }
     case "bdc_cv_beneficiaire": { const si = params?.stagiaireIdx ?? 0; return genCVBeneficiaireBDC_imported(o, f, stagiaires, si); }
     case "bdc_test_personnalite": { const si = params?.stagiaireIdx ?? 0; return genTestPersonnaliteBDC_imported(o, f, stagiaires, si); }
-    case "bdc_parcours": return genParcoursBDC_imported(o, f);
-    case "bdc_support_cours": return genSupportCoursBDC_imported(o, f);
+    case "bdc_parcours": { const si = params?.stagiaireIdx ?? 0; return genParcoursBDC_imported(o, f, stagiaires, si); }
+    case "bdc_support_cours": { const si = params?.stagiaireIdx ?? 0; return genSupportCoursBDC_imported(o, f, stagiaires, si); }
     case "livret_recevabilite_vae": return genLivretRecevabilite(o, f, stagiaires);
     case "dossier_validation_vae": return genDossierValidation(o, f, stagiaires);
     case "accompagnement_vae": return genAccompagnementVAE(o, f, stagiaires);
