@@ -26,7 +26,7 @@ export default function ViModal({ open, onOpenChange }: Props) {
     a.href = PACK_URL;
     a.download = `VI_Pack_${new Date().toISOString().slice(0, 10)}.zip`;
     document.body.appendChild(a); a.click(); a.remove();
-    toast.success("Téléchargement du pack lancé (≈156 Mo)");
+    toast.success("Téléchargement du pack PDF lancé (≈100 Mo)");
   };
 
   const downloadOne = (doc: ViDoc) => {
