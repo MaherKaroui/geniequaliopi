@@ -638,8 +638,9 @@ export function genCompteRenduFinBDC(o: OrganismeInfo, f: FormationInfo, stagiai
 }
 
 // ===== CR5 - IND 21 : Fiche intervenant externe =====
-export function genFicheIntervenantExterneBDC(o: OrganismeInfo, f: FormationInfo) {
-  return buildDocument({ org: o, title: "FICHE INTERVENANT EXTERNE", subtitle: `Bilan de compétences – ${f.intitule}`, sections: [
+export function genFicheIntervenantExterneBDC(o: OrganismeInfo, f: FormationInfo, stagiaires?: StagiaireInfo[], si = 0) {
+  return buildDocument({ org: o, title: "FICHE INTERVENANT EXTERNE", subtitle: `Bilan de compétences – ${f.intitule}`, stagiaires: stagiaires?.[si] ? [stagiaires[si]] : undefined, sections: [
+    ...bdcBeneficiarySections(f, stagiaires, si),
     { heading: "Organisme de formation", content: `<p><strong>${o.nom}</strong><br>Adresse : ${o.adresse}<br>SIRET : ${o.siret || "—"}<br>Consultant(e) : ${consultantName(o)}<br>Contact : ${o.email || "—"}${o.telephone?.trim() ? ` – ${o.telephone}` : ""}<br>Formation concernée : Bilan de compétences – ${f.intitule}<br>Dates : du ${formatDate(f.dateDebut)} au ${formatDate(f.dateFin)}</p>` },
     { heading: "Identité de l'intervenant externe", content: "<p>• <strong>Nom :</strong> (à compléter)<br>• <strong>Prénom :</strong> (à compléter)<br>• <strong>Entreprise / Structure :</strong> (à compléter)<br>• <strong>SIRET :</strong> (à compléter)<br>• <strong>Fonction :</strong> Professionnel du secteur / Formateur spécialisé<br>• <strong>E-mail :</strong> (à compléter)<br>• <strong>Téléphone :</strong> (à compléter)</p>" },
     { heading: "Compétences et qualifications", content: `<p>• <strong>Diplôme :</strong> Qualification dans le domaine de ${f.intitule}<br>• <strong>Expérience :</strong> Minimum 1 an dans le secteur<br>• <strong>Expérience en transmission :</strong> Ateliers, formation professionnelle ou encadrement</p>`, variant: "green" },
@@ -684,9 +685,11 @@ export function genSatisfactionChaudBDC(o: OrganismeInfo, f: FormationInfo, stag
 }
 
 // ===== CR7 - IND 31 : Formulaire de réclamation BDC =====
-export function genFormulaireReclamationBDC(o: OrganismeInfo) {
-  return buildDocument({ org: o, title: "FORMULAIRE DE DÉPÔT DE RÉCLAMATION", sections: [
-    { heading: "Identification", content: "<p>Nom : ___________________________<br>Prénom : ___________________________<br>Date de naissance : ___________________________<br>Adresse : ___________________________<br>Téléphone : ___________________________<br>Mail : ___________________________<br>Date du bilan : ___________________________<br>Intitulé du bilan : ___________________________</p>" },
+export function genFormulaireReclamationBDC(o: OrganismeInfo, f?: FormationInfo, stagiaires?: StagiaireInfo[], si = 0) {
+  const s = stagiaires?.[si] || stagiaires?.[0];
+  return buildDocument({ org: o, title: "FORMULAIRE DE DÉPÔT DE RÉCLAMATION", stagiaires: s ? [s] : undefined, sections: [
+    ...(f ? bdcBeneficiarySections(f, stagiaires, si) : []),
+    { heading: "Identification", content: `<p>Nom : ${s?.nom || "___________________________"}<br>Prénom : ${s?.prenom || "___________________________"}<br>Date de naissance : ${s?.dateNaissance ? formatDate(s.dateNaissance) : "___________________________"}<br>Adresse : ${s?.adresse || "___________________________"}<br>${s?.telephone?.trim() ? `Téléphone : ${s.telephone}<br>` : ""}Mail : ${s?.email || "___________________________"}<br>Date du bilan : ${f ? `du ${startDate(s, f)} au ${endDate(s, f)}` : "___________________________"}<br>Intitulé du bilan : ${f ? `Bilan de compétences – ${f.intitule}` : "___________________________"}</p>` },
     { heading: "Description de la réclamation", content: "<p>Veuillez détailler de manière la plus précise possible votre réclamation :<br>___________________________<br>___________________________<br>___________________________<br>___________________________</p>" },
     { heading: "Autorisation", content: `<p>J'autorise le centre ${o.nom} à conserver ce formulaire pour améliorer la qualité des prestations et à reprendre contact avec moi :<br><br>☐ Oui &nbsp;&nbsp;&nbsp;&nbsp; ☐ Non</p>` },
   ] });
