@@ -96,9 +96,10 @@ function expBlock(exp: CVExperience) {
   return `<div style="margin-bottom:10px;"><strong>${escapeHtml(exp.poste)}</strong>${exp.entreprise ? ` — ${escapeHtml(exp.entreprise)}` : ""}${exp.dateDebut ? `<br><span style="color:#666;font-size:11px;">${exp.dateDebut}${exp.dateFin ? ` – ${exp.dateFin}` : " – Présent"}</span>` : ""}${exp.description ? `<p style="margin:4px 0 0 0;font-size:12px;color:#444;">${escapeHtml(exp.description)}</p>` : ""}</div>`;
 }
 
-export function generateCVHTML(data: CVData, design: CVDesign): string {
+export function generateCVHTML(data: CVData, design: CVDesign, options?: { accent?: string; fontFamily?: string }): string {
   const d = CV_DESIGNS.find(dd => dd.id === design)!;
-  const accent = d.accent;
+  const accent = options?.accent || d.accent;
+  const fontOverride = options?.fontFamily;
   const fullName = `${data.prenom} ${data.nom}`.trim() || "Votre Nom";
 
   const contactInfo = [data.email, data.telephone, data.adresse].filter(Boolean).join(" • ");
@@ -122,7 +123,7 @@ export function generateCVHTML(data: CVData, design: CVDesign): string {
   const pubSection = data.publications ? `${sectionTitle("Publications", accent, secStyle)}<p style="font-size:12px;color:#333;white-space:pre-wrap;">${escapeHtml(data.publications)}</p>` : "";
 
   if (design === "sidebar") {
-    return `<div style="font-family:'Segoe UI',Arial,sans-serif;max-width:800px;margin:0 auto;display:flex;min-height:1100px;">
+    return `<div style="font-family:${fontOverride || "'Segoe UI',Arial,sans-serif"};max-width:800px;margin:0 auto;display:flex;min-height:1100px;">
       <div style="width:260px;background:${accent};color:#fff;padding:30px 20px;">
         <div style="text-align:center;margin-bottom:20px;">${photoBlock(data.photoUrl, 120, true)}</div>
         <h1 style="font-size:20px;margin:0 0 4px 0;text-align:center;">${escapeHtml(fullName)}</h1>
@@ -185,7 +186,7 @@ export function generateCVHTML(data: CVData, design: CVDesign): string {
     </div>`;
   }
 
-  const fontFamily = design === "elegant" ? "Georgia,'Times New Roman',serif" : "'Segoe UI',Arial,sans-serif";
+  const fontFamily = fontOverride || (design === "elegant" ? "Georgia,'Times New Roman',serif" : "'Segoe UI',Arial,sans-serif");
   const baseStyle = `font-family:${fontFamily};color:#222;font-size:12px;line-height:1.5;`;
 
   // Return header + each section as separate top-level divs for proper PDF pagination
