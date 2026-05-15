@@ -248,12 +248,12 @@ export function getGrilleEvaluationHTML(s: CertifStagiaire): string {
           <td style="border:none;width:50%;vertical-align:top">
             <p style="font-size:10pt;margin:2px 0"><strong>Membre du jury :</strong> ${s.membreJury || JURY[0].prenom + " " + JURY[0].nom}</p>
             <p style="font-size:9.5pt;color:#666;margin:2px 0">Signature :</p>
-            <div style="font-family: 'Brush Script MT', cursive; font-size: 18pt; color:#1a3a7b">${(s.membreJury || JURY[0].nom).split(' ')[0]}</div>
+            <div style="height:60px"></div>
           </td>
           <td style="border:none;width:50%;vertical-align:top;text-align:right">
             <p style="font-size:10pt;margin:2px 0"><strong>Session du :</strong> ${s.sessionDate}</p>
             <p style="font-size:9.5pt;color:#666;margin:2px 0">Tampon :</p>
-            <img src="/mycertif/proforma_signature.jpg" style="max-height:80px" alt="Tampon Pro Forma">
+            <div style="height:80px"></div>
           </td>
         </tr>
       </table>
