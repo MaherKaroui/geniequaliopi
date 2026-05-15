@@ -178,12 +178,10 @@ function bdcPersonalisation(f: FormationInfo, s: StagiaireInfo | undefined, si: 
 // ===== CR1 - IND 1 : Programme du bilan =====
 export function genProgrammeBDC(o: OrganismeInfo, f: FormationInfo) {
   const ph = phasesDates(f);
-  // Bilan de compétences : 24h maximum réglementaires (art. R6313-4 à R6313-8 CT)
-  const parsed = parseDuree(f.duree || "24h").totalHours;
-  const totalHours = Math.min(parsed || 24, 24);
-  const hPrelim = 3;
-  const hInvest = 15;
-  const hConcl = totalHours - hPrelim - hInvest; // 6h si 24h
+  const totalHours = 28;
+  const hPrelim = 4;
+  const hInvest = 18;
+  const hConcl = totalHours - hPrelim - hInvest; // 6h
   const profile = getBdcDomainProfile(f);
   const li = (arr: string[]) => arr.map(x => `• ${x}`).join("<br>");
   const refHandicap = (o as any).referentHandicap || consultantName(o);
