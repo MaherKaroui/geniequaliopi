@@ -1,0 +1,1 @@
+insert into storage.buckets (id, name, public) values ('vi-pack', 'vi-pack', true) on conflict (id) do update set public = true;
