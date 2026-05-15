@@ -1156,3 +1156,78 @@ export function genTestPersonnaliteBDC(o: OrganismeInfo, f: FormationInfo, stagi
     signatures: { type: "2", labels: [`${g(s, "Le Bénéficiaire", "La Bénéficiaire")}`, `${g(s, "Le Consultant", "La Consultante")}`], names: [beneficiaireLabel(s), consultantName(o)], dates: [dt, dt] },
   });
 }
+
+// ===== CR – Parcours Bilan de Compétences (process écrit, 29 étapes) =====
+export function genParcoursBDC(o: OrganismeInfo, f: FormationInfo) {
+  const referent = o.referentHandicap || o.responsablePedagogique || o.dirigeant || "Le référent pédagogique";
+  const rows: [string, string][] = [
+    ["1 – C", "Recherche d'information : CPF, site internet, bouche à oreille, prospection. Programme téléchargeable via le site, ainsi que la plaquette."],
+    ["2 – C", "Demande de contact ou de renseignements via le CPF, le site internet ou par mail."],
+    ["3 – OF", "Proposer un entretien préliminaire et confirmer par <strong>mail 1</strong> le RDV."],
+    ["4 – OF", "À la fin de l'entretien préliminaire, envoyer par <strong>mail 2</strong> le programme, la plaquette et le questionnaire des prérequis."],
+    ["5 – C", "Compléter le questionnaire des prérequis."],
+    ["6 – OF", "Validation des prérequis et envoi de la convention de collaboration et du règlement intérieur — <strong>mail 3.1</strong> processus de validation des inscriptions. Si refus : <strong>mail 3.2</strong>."],
+    ["7 – C", "Inscription via le CPF."],
+    ["8 – OF", "Valider le dossier client sur le CPF et envoyer un mail de confirmation — <strong>mail 4</strong>."],
+    ["9 – C", "Compléter la convention et la renvoyer signée par mail à l'OF."],
+    ["10 – C", "Valider le financement via le CPF."],
+    ["11 – OF", "Envoyer pour le premier entretien par mail : convocation, planning prévisionnel, livret d'accueil + attestation, engagement client, workbook, process visio."],
+    ["12 – C", "1<sup>er</sup> RDV : travail sur le workbook."],
+    ["13 – OF", "Lors du 1<sup>er</sup> RDV : remplir le dossier client et l'objectif individualisé, faire signer la feuille d'émargement."],
+    ["14 – C", "2<sup>e</sup> RDV : travail sur le workbook et réalisation des tests."],
+    ["15 – OF", "Feuille d'émargement à faire signer + remise d'exercices si besoin."],
+    ["16 – C", "3<sup>e</sup> RDV : travail sur le workbook."],
+    ["17 – OF", "Feuille d'émargement à faire signer + remise d'exercices si besoin."],
+    ["18 – C", "4<sup>e</sup> RDV : travail sur le workbook et/ou les exercices."],
+    ["19 – OF", "Construire la <strong>synthèse de mi-parcours</strong> et faire signer la feuille d'émargement — <strong>mail 5</strong>."],
+    ["20 – C", "5<sup>e</sup> RDV : travail sur le workbook."],
+    ["21 – OF", "Feuille d'émargement à faire signer + remise d'exercices si besoin."],
+    ["22 – C", "6<sup>e</sup> RDV : travail sur le workbook + exercices et synthèse."],
+    ["23 – OF", "Feuille d'émargement à faire signer + remise d'exercices si besoin."],
+    ["24 – C", "7<sup>e</sup> et dernier RDV : travail sur le workbook + exercices et synthèse."],
+    ["25 – OF", "Remise — <strong>mail 6</strong> : feuille d'émargement, dossier client, synthèse + attestation, objectif individualisé, questionnaire à chaud."],
+    ["26 – OF", "Appel pour le suivi à 1 mois et envoi par <strong>mail 7</strong> du compte rendu de l'appel."],
+    ["27 – OF", "RDV à 6 mois — <strong>mail 8</strong> avec envoi du questionnaire à 6 mois."],
+    ["28 – C", "Confirmer le RDV de suivi à 6 mois par mail."],
+    ["29 – OF", "Envoyer le questionnaire de satisfaction à 6 mois — <strong>mail 9</strong> (en l'absence d'obtention d'un RDV à 6 mois)."],
+  ];
+  return buildDocument({
+    org: o,
+    title: "PARCOURS BILAN DE COMPÉTENCES",
+    subtitle: `Processus écrit – C : client / OF : ${o.nom}`,
+    sections: [
+      { heading: "Référents", content: `<p><strong>Référent pédagogique, administratif, handicap et service médiation/réclamation :</strong> ${referent}<br><strong>Email :</strong> ${o.email || "—"}<br><strong>Téléphone :</strong> ${o.telephone || "—"}</p>` },
+      { heading: "Documents à fournir / processus écrit", content: tableHTML(["Étape", "Action"], rows) },
+      { heading: "Mails types associés", content: "<p><strong>Mail 1</strong> : confirmation entretien préliminaire — <strong>Mail 2</strong> : envoi programme/plaquette/prérequis — <strong>Mail 3.1</strong> : validation prérequis et convention — <strong>Mail 3.2</strong> : refus motivé — <strong>Mail 4</strong> : confirmation inscription CPF — <strong>Mail 5</strong> : synthèse mi-parcours — <strong>Mail 6</strong> : remise des livrables de fin de bilan — <strong>Mail 7</strong> : compte rendu suivi 1 mois — <strong>Mail 8</strong> : RDV de suivi à 6 mois — <strong>Mail 9</strong> : questionnaire satisfaction à 6 mois.</p>", variant: "green" },
+    ],
+  });
+}
+
+// ===== CR – Support de cours Bilan de Compétences =====
+export function genSupportCoursBDC(o: OrganismeInfo, f: FormationInfo) {
+  const profile = getBdcDomainProfile(f);
+  const phasesRows: string[][] = [
+    ["1. Phase préliminaire", "Confirmer l'engagement dans la démarche ; définir et analyser les besoins et attentes ; informer des conditions de déroulement ; élaborer un programme de travail et un calendrier adapté.", "Entretien individuel"],
+    ["2. Phase d'investigation", "Analyser la dynamique du parcours ; valoriser les réalisations et le CV ; diagnostiquer motivations, besoins et valeurs ; déterminer points forts et axes de développement ; positionnement sur l'inventaire d'intérêts professionnels ; élaborer des voies d'orientation ; valider la cohérence du projet.", "Entretien individuel, recherches, mise en situation, tests, enquête métier"],
+    ["3. Phase de conclusion", "Récapituler les résultats détaillés ; co-rédiger la synthèse et vérifier l'appropriation par le bénéficiaire ; recenser les facteurs favorables et défavorables ; prévoir les principales étapes de mise en œuvre du projet.", "Entretien individuel, travail de rédaction"],
+    ["Évaluation", "Évaluation de la satisfaction, évaluation à chaud, suivi à froid à 6 mois.", "Questionnaires"],
+  ];
+  return buildDocument({
+    org: o,
+    title: "SUPPORT DE COURS – BILAN DE COMPÉTENCES",
+    subtitle: `Domaine : ${profile.label} • Version 1`,
+    sections: [
+      { heading: "Sommaire", content: "<p>1. Objectifs<br>2. Programme<br>3. Finalités du bilan de compétences et engagements<br>4. Cœur de métier<br>5. Approche du bilan de compétences<br>6. Phases du bilan de compétences<br>7. Méthodologie<br>8. Éthique<br>9. Valeur ajoutée<br>10. Démarche qualité</p>" },
+      { heading: "1. Objectifs", content: `<p><strong>Phase 1 – Entretien préliminaire :</strong> confirmer l'engagement, définir et analyser les besoins, informer des conditions, élaborer un programme et un calendrier adaptés.</p><p><strong>Phase 2 – Investigation :</strong><br>• Module 1 : analyser la dynamique du parcours<br>• Module 2 : valoriser les réalisations et le CV<br>• Module 3 : diagnostiquer motivations, besoins et valeurs<br>• Module 4 : déterminer points forts et axes de développement<br>• Module 5 : positionnement sur l'inventaire d'intérêts professionnels<br>• Module 6 : élaborer des voies d'orientation<br>• Module 7 : valider la cohérence du projet</p><p><strong>Phase 3 – Conclusion (Module 8) :</strong> confirmer le projet professionnel et/ou de formation, récapituler les résultats détaillés, co-rédiger la synthèse, recenser les facteurs favorables/défavorables, planifier la mise en œuvre.</p>`, variant: "green" },
+      { heading: "2. Programme", content: tableHTML(["Phase", "Thèmes traités", "Pédagogie"], phasesRows) },
+      { heading: "3. Finalités et engagements", content: "<p>Le bilan de compétences nécessite une démarche active du bénéficiaire. Il vise à :<br>• identifier les compétences au regard des fonctions exercées<br>• repérer intérêts, motivations, traits de personnalité, atouts et axes de développement<br>• traduire ces éléments en projet professionnel<br>• valider un projet de repositionnement et son plan d'action (mobilité, formation, développement dans la fonction).</p><p>Nos engagements :<br>• respecter le protocole légal (Loi n° 91-1405 du 31 décembre 1991, Décret n° 92-1075 du 2 octobre 1992 ; articles L6313-10 à L6313-12 et R6313-4 à R6313-8 du Code du travail)<br>• adapter l'approche en fonction du bénéficiaire et du besoin défini lors de l'entretien d'accueil<br>• favoriser le travail de réflexion et d'appropriation du bénéficiaire.</p>" },
+      { heading: "4. Notre cœur de métier", content: `<p>${o.nom} accompagne les transitions professionnelles dans le secteur ${profile.secteur}. Domaines : conseil RH, gestion des compétences, accompagnement individuel et collectif, ingénierie de formation, conduite du changement.</p>` },
+      { heading: "5. Notre approche", content: "<p>Le bilan est une démarche <strong>volontaire, individuelle et confidentielle</strong>. L'accompagnement s'inscrit dans une relation bipartite ou tripartite avec engagements réciproques :<br>• <strong>Vous</strong> : démarche active pour vous réapproprier votre identité professionnelle et identifier des projets d'avenir.<br>• <strong>Nous</strong> : vous aider à élaborer un projet réaliste en tenant compte de votre globalité de vie, de votre contexte et de la réalité du marché.<br>• <strong>Votre entreprise</strong> (le cas échéant) : finance la démarche et peut, à votre demande ou avec votre accord, bénéficier d'entretiens tripartites de démarrage et de présentation des projets.</p><p>Méthodologie fondée sur l'alternance de travail individuel et de temps d'accompagnement : écoute active, mise en processus de la réflexion, outils et méthodes adaptés.</p>" },
+      { heading: "6. Phases détaillées", content: "<p><strong>0 / Phase d'accueil :</strong> point sur les besoins, attentes et contexte ; information sur le déroulement et le cadre légal ; confirmation de l'engagement réciproque.</p><p><strong>1 / Phase préparatoire :</strong> analyse de l'histoire professionnelle, repérage des points clés, mise en lumière du fil conducteur, identification des compétences acquises et transférables, analyse des facteurs de réussite et freins, prise en compte des aspirations et contraintes, élaboration des premières hypothèses d'évolution.</p><p><strong>2 / Phase d'investigation :</strong> identification des comportements professionnels dominants, mesure des écarts de perception, inventaire de personnalité, exploration des valeurs, aspirations et facteurs de motivation, confrontation aux exigences du marché.</p><p><strong>3 / Phase de conclusion :</strong> validation du projet, plan d'action, document de synthèse remis au seul bénéficiaire.</p>", variant: "green" },
+      { heading: "7. Méthodologie", content: "<p>Entretiens individuels en face-à-face espacés sur 8 à 16 semaines : remise d'un support méthodologique, séances de travail, passation de questionnaires de personnalité et tests métiers, travail personnel entre les séances, recherches documentaires, démarches terrain, rédaction de la synthèse.</p>" },
+      { heading: "8. Notre éthique", content: "<p>Nos consultants sont des professionnels confirmés mettant régulièrement à jour leurs méthodes, outils et connaissance de l'environnement économique. Nous travaillons dans le respect de la personne et nous engageons à ne pas divulguer à des tiers les informations recueillies au cours du bilan. Le bénéficiaire est le seul destinataire du document de synthèse, qui ne peut être communiqué à un tiers sans son accord écrit.</p>" },
+      { heading: "9. Notre valeur ajoutée", content: "<p>• Professionnalisme et complémentarité des intervenants (RH, ingénierie de formation, évaluation, orientation, coaching).<br>• Outils éprouvés et fiables, régulièrement mis à jour.<br>• Personnalisation de la relation, neutralité d'analyse, prise en compte des réalités de l'entreprise et du marché.<br>• Confidentialité absolue des informations recueillies.</p>" },
+      { heading: "10. Notre démarche qualité", content: `<p>Mesure systématique de la satisfaction (questionnaire à chaud + à 6 mois). Remontée des insatisfactions ou suggestions par mail (${o.email || "—"}) ou téléphone (${o.telephone || "—"}). Mise en œuvre d'actions correctives consignées dans le tableau d'amélioration continue (Critère 7).</p>` },
+    ],
+  });
+}
