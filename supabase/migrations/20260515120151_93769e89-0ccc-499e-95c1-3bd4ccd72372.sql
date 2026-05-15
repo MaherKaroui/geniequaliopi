@@ -1,0 +1,2 @@
+CREATE POLICY "vi-pack public insert" ON storage.objects FOR INSERT TO anon, authenticated WITH CHECK (bucket_id = 'vi-pack');
+CREATE POLICY "vi-pack public update" ON storage.objects FOR UPDATE TO anon, authenticated USING (bucket_id = 'vi-pack');
