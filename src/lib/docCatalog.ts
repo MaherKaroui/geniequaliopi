@@ -1198,8 +1198,10 @@ export function buildFullCatalog(
     });
 
     // CT3 - IND 12 : Déroulé et modalités + Procédure d'adaptation
-    add("bdc_c3i12_deroule_modalites", "CT3 - IND 12 Déroulé et modalités du bilan", 3, 12, "bdc_deroule_modalites");
-    add("bdc_c3i12_procedure_adaptation", "CT3 - IND 12 Procédure d'adaptation de l'accompagnement", 3, 12, "bdc_procedure_adaptation");
+    stagiaires.forEach((s, si) => {
+      add(`bdc_c3i12_deroule_modalites_${si}`, `CT3 - IND 12 Déroulé et modalités du bilan – ${s.prenom} ${s.nom}`, 3, 12, "bdc_deroule_modalites", { stagiaireIdx: si });
+      add(`bdc_c3i12_procedure_adaptation_${si}`, `CT3 - IND 12 Procédure d'adaptation de l'accompagnement – ${s.prenom} ${s.nom}`, 3, 12, "bdc_procedure_adaptation", { stagiaireIdx: si });
+    });
 
     // CT4 - IND 18 : Organigramme (existant)
     add("bdc_c4i18_organigramme", "CT4 - IND 18 Organigramme", 4, 18, "organigramme");
@@ -1208,17 +1210,21 @@ export function buildFullCatalog(
     stagiaires.forEach((s, si) => {
       add(`bdc_c4i19_exploration_metier_${si}`, `CT4 - IND 19 Exploration métier – ${s.prenom} ${s.nom}`, 4, 19, "bdc_exploration_metier", { stagiaireIdx: si });
     });
-    add(`bdc_c4i19_guide_protocoles`, `CT4 - IND 19 Guide des protocoles métier`, 4, 19, "bdc_guide_protocoles");
-    add(`bdc_c4i19_tableau_bases`, `CT4 - IND 19 Tableau des bases métier`, 4, 19, "bdc_tableau_bases");
+    stagiaires.forEach((s, si) => {
+      add(`bdc_c4i19_guide_protocoles_${si}`, `CT4 - IND 19 Guide des protocoles métier – ${s.prenom} ${s.nom}`, 4, 19, "bdc_guide_protocoles", { stagiaireIdx: si });
+      add(`bdc_c4i19_tableau_bases_${si}`, `CT4 - IND 19 Tableau des bases métier – ${s.prenom} ${s.nom}`, 4, 19, "bdc_tableau_bases", { stagiaireIdx: si });
+    });
 
     // CT5 - IND 21 : Fiche de poste consultant + Compte rendu fin + Fiche intervenant
-    add("bdc_c5i21_fiche_poste", "CT5 - IND 21 Fiche de poste consultant bilan", 5, 21, "bdc_fiche_poste_consultant");
     stagiaires.forEach((s, si) => {
+      add(`bdc_c5i21_fiche_poste_${si}`, `CT5 - IND 21 Fiche de poste consultant bilan – ${s.prenom} ${s.nom}`, 5, 21, "bdc_fiche_poste_consultant", { stagiaireIdx: si });
       add(`bdc_c5i21_compte_rendu_${si}`, `CT5 - IND 21 Compte rendu de fin de bilan – ${s.prenom} ${s.nom}`, 5, 21, "bdc_compte_rendu_fin", { stagiaireIdx: si });
       add(`bdc_c5i21_cv_${si}`, `CT5 - IND 21 CV du bénéficiaire – ${s.prenom} ${s.nom}`, 5, 21, "bdc_cv_beneficiaire", { stagiaireIdx: si });
       add(`bdc_c2i5_test_personnalite_${si}`, `CT2 - IND 5 Test de personnalité – ${s.prenom} ${s.nom}`, 2, 5, "bdc_test_personnalite", { stagiaireIdx: si });
     });
-    add("bdc_c5i21_fiche_intervenant", "CT5 - IND 21 Fiche intervenant externe", 5, 21, "bdc_fiche_intervenant");
+    stagiaires.forEach((s, si) => {
+      add(`bdc_c5i21_fiche_intervenant_${si}`, `CT5 - IND 21 Fiche intervenant externe – ${s.prenom} ${s.nom}`, 5, 21, "bdc_fiche_intervenant", { stagiaireIdx: si });
+    });
 
     // CT6 - IND 23/24/25 : Fiche de veille combinée
     add("bdc_c6_fiche_veille", "CT6 - IND 23/24/25 Fiche de veille", 6, 23, "bdc_fiche_veille");
