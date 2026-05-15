@@ -10,7 +10,7 @@ import { toast } from "sonner";
 
 interface Props { open: boolean; onOpenChange: (o: boolean) => void; }
 
-const PACK_URL = "https://uwjxorvytlqqxszylxre.supabase.co/storage/v1/object/public/vi-pack/vi-output.zip";
+const PACK_URL = "https://uwjxorvytlqqxszylxre.supabase.co/storage/v1/object/public/vi-pack/vi-pdfs-only.zip";
 
 export default function ViModal({ open, onOpenChange }: Props) {
   const [selectedSlug, setSelectedSlug] = useState<string>(VI_APPRENTIS[0]?.slug ?? "");
@@ -26,7 +26,7 @@ export default function ViModal({ open, onOpenChange }: Props) {
     a.href = PACK_URL;
     a.download = `VI_Pack_${new Date().toISOString().slice(0, 10)}.zip`;
     document.body.appendChild(a); a.click(); a.remove();
-    toast.success("Téléchargement du pack lancé (≈156 Mo)");
+    toast.success("Téléchargement du pack PDF lancé (≈100 Mo)");
   };
 
   const downloadOne = (doc: ViDoc) => {
@@ -126,7 +126,7 @@ export default function ViModal({ open, onOpenChange }: Props) {
             </a>
           </Button>
           <Button onClick={handleDownloadPack} className="gap-2">
-            <Download className="w-4 h-4" /> Télécharger le pack complet (~156 Mo)
+            <Download className="w-4 h-4" /> Télécharger le pack PDF (~100 Mo)
           </Button>
         </div>
       </DialogContent>
