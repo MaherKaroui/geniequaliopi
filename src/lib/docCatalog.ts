@@ -1157,9 +1157,10 @@ export function buildFullCatalog(
     add("bdc_c2i4_bilan_abandons", "CT2 - IND 4 Bilan mensuel des abandons / ruptures", 2, 4, "bdc_bilan_abandons_ruptures");
     add("bdc_c2i4_bilan_mensuel", "CT2 - IND 4 Bilan mensuel", 2, 4, "bdc_bilan_mensuel");
 
-    // CT2 - IND 5 : Document de synthèse (per bénéficiaire) - PIÈCE CENTRALE
+    // CT2 - IND 5 : Document de synthèse (per bénéficiaire) - PIÈCE CENTRALE + engagement confidentialité
     stagiaires.forEach((s, si) => {
       add(`bdc_c2i5_synthese_${si}`, `CT2 - IND 5 Document de synthèse – ${s.prenom} ${s.nom}`, 2, 5, "bdc_document_synthese", { stagiaireIdx: si });
+      add(`bdc_c2i5_engagement_confid_${si}`, `CT2 - IND 5 Engagement de confidentialité signé – ${s.prenom} ${s.nom}`, 2, 5, "bdc_engagement_confidentialite", { stagiaireIdx: si });
     });
 
     // CT2 - IND 6 : Déroulé et modalités + Enquête métier
