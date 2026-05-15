@@ -782,7 +782,7 @@ export function genBilanMensuelBDC(o: OrganismeInfo, f: FormationInfo, stagiaire
 }
 
 // ===== CT6 - IND 23/24/25 : Fiche de veille combinée =====
-export function genFicheVeilleBDC(o: OrganismeInfo, f: FormationInfo) {
+export function genFicheVeilleBDC(o: OrganismeInfo, f: FormationInfo, stagiaires?: StagiaireInfo[], si = 0) {
   const profile = getBdcDomainProfile(f);
   const tableStyle = `style="width:100%;border-collapse:collapse;margin-bottom:10px"`;
   const cellStyle = `style="border:1px solid #999;padding:8px;vertical-align:top"`;
@@ -805,7 +805,9 @@ ${veillTable("Exploitation", v.exploitation)}
   return buildDocument({
     org: o,
     title: `FICHE DE VEILLE – ${profile.label.toUpperCase()}`,
+    stagiaires: stagiaires?.[si] ? [stagiaires[si]] : undefined,
     sections: [
+      ...bdcBeneficiarySections(f, stagiaires, si),
       {
         heading: "1. Veille Réglementaire",
         content: renderVeille(profile.veilleReglementaire, "Date de publication"),
@@ -823,7 +825,7 @@ ${veillTable("Exploitation", v.exploitation)}
 }
 
 // ===== CT6 - IND 27 : Contrat de sous-traitance BDC (style IZIBUSINESS) =====
-export function genContratSousTraitanceBDC(o: OrganismeInfo, f: FormationInfo) {
+export function genContratSousTraitanceBDC(o: OrganismeInfo, f: FormationInfo, stagiaires?: StagiaireInfo[], si = 0) {
   const majDate = o.dateMaj || new Date().toISOString().slice(0, 10);
   const dateContrat = formatDate(majDate);
   const oneYearLater = (() => { const d = new Date(majDate); d.setFullYear(d.getFullYear() + 1); return d.toISOString().slice(0, 10); })();
@@ -833,7 +835,9 @@ export function genContratSousTraitanceBDC(o: OrganismeInfo, f: FormationInfo) {
   return buildDocument({
     org: o,
     title: "CONTRAT DE SOUS-TRAITANCE",
+    stagiaires: stagiaires?.[si] ? [stagiaires[si]] : undefined,
     sections: [
+      ...bdcBeneficiarySections(f, stagiaires, si),
       {
         heading: "",
         content: `<p>Entre les soussignés :</p>
