@@ -1227,15 +1227,21 @@ export function buildFullCatalog(
     });
 
     // CT6 - IND 23/24/25 : Fiche de veille combinée
-    add("bdc_c6_fiche_veille", "CT6 - IND 23/24/25 Fiche de veille", 6, 23, "bdc_fiche_veille");
+    stagiaires.forEach((s, si) => {
+      add(`bdc_c6_fiche_veille_${si}`, `CT6 - IND 23/24/25 Fiche de veille – ${s.prenom} ${s.nom}`, 6, 23, "bdc_fiche_veille", { stagiaireIdx: si });
+    });
 
     // CT6 - IND 26 : Handicap + Partenaires (existants)
     add("bdc_c6i26_veille_handicap", "CT6 - IND 26 Veille handicap", 6, 26, "veille_handicap");
-    add("bdc_c6i26_procedure_handicap", "CT6 - IND 26 Procédure d'accueil handicap (Qualiopi V9)", 6, 26, "bdc_procedure_handicap");
+    stagiaires.forEach((s, si) => {
+      add(`bdc_c6i26_procedure_handicap_${si}`, `CT6 - IND 26 Procédure d'accueil handicap (Qualiopi V9) – ${s.prenom} ${s.nom}`, 6, 26, "bdc_procedure_handicap", { stagiaireIdx: si });
+    });
     add("bdc_c6i26_liste_partenaires", "CT6 - IND 26 Liste des partenaires locaux", 6, 26, "liste_partenaires");
 
     // CT6 - IND 27 : Sous-traitance
-    add("bdc_c6i27_contrat_sous_traitance", "CT6 - IND 27 Contrat de sous-traitance", 6, 27, "bdc_contrat_sous_traitance");
+    stagiaires.forEach((s, si) => {
+      add(`bdc_c6i27_contrat_sous_traitance_${si}`, `CT6 - IND 27 Contrat de sous-traitance – ${s.prenom} ${s.nom}`, 6, 27, "bdc_contrat_sous_traitance", { stagiaireIdx: si });
+    });
 
     // CT7 - IND 30 : Satisfaction à chaud (per bénéficiaire) + Relances Excel
     stagiaires.forEach((s, si) => {
@@ -1244,12 +1250,16 @@ export function buildFullCatalog(
     add("bdc_c7i30_relances_excel", "CT7 - IND 30 Tableau de relance des appréciations (Excel)", 7, 30, "relances_appreciations_excel");
 
     // CT7 - IND 31 : Réclamations
-    add("bdc_c7i31_formulaire_reclamation", "CT7 - IND 31 Formulaire de dépôt de réclamation", 7, 31, "bdc_formulaire_reclamation");
-    add("bdc_c7i31_gestion_reclamations", "CT7 - IND 31 Gestion des réclamations et dysfonctionnements", 7, 31, "bdc_gestion_reclamations");
+    stagiaires.forEach((s, si) => {
+      add(`bdc_c7i31_formulaire_reclamation_${si}`, `CT7 - IND 31 Formulaire de dépôt de réclamation – ${s.prenom} ${s.nom}`, 7, 31, "bdc_formulaire_reclamation", { stagiaireIdx: si });
+      add(`bdc_c7i31_gestion_reclamations_${si}`, `CT7 - IND 31 Gestion des réclamations et dysfonctionnements – ${s.prenom} ${s.nom}`, 7, 31, "bdc_gestion_reclamations", { stagiaireIdx: si });
+    });
     add("bdc_c7i31_suivi_dysfonctionnements", "CT7 - IND 31 Suivi de dysfonctionnements (Excel)", 7, 31, "suivi_dysfonctionnements_excel");
 
     // CT7 - IND 32 : Amélioration continue
-    add("bdc_c7i32_actions_correctives", "CT7 - IND 32 Tableau actions correctives", 7, 32, "bdc_actions_correctives");
+    stagiaires.forEach((s, si) => {
+      add(`bdc_c7i32_actions_correctives_${si}`, `CT7 - IND 32 Tableau actions correctives – ${s.prenom} ${s.nom}`, 7, 32, "bdc_actions_correctives", { stagiaireIdx: si });
+    });
     add("bdc_c7i32_amelioration_excel", "CT7 - IND 32 Tableau d'amélioration continue (Excel)", 7, 32, "tableau_amelioration_continue_excel");
   }
 
