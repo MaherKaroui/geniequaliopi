@@ -1003,80 +1003,105 @@ export function genCVBeneficiaireBDC(o: OrganismeInfo, f: FormationInfo, stagiai
   const s = stagiaires[si] || stagiaires[0];
   const profile = getBdcDomainProfile(f);
   const perso = bdcPersonalisation(f, s, si);
-  const fullName = `${(s.prenom || "").toUpperCase()} ${(s.nom || "").toUpperCase()}`.trim() || "BÉNÉFICIAIRE";
-  const civ = s.civilite || "";
-  const email = s.email || "";
-  const tel = s.telephone || "";
-  const adresseLines = [s.adresse, [s.codePostal, s.commune].filter(Boolean).join(" ")].filter(Boolean).join("<br>");
-  const poste = s.poste || perso.profile.metier;
   const yearNow = new Date().getFullYear();
   const yearMid = yearNow - deterministicIndex(s, si, 4, 21) - 2;
   const yearStart = yearMid - deterministicIndex(s, si, 5, 22) - 2;
+  const yearEarly = yearStart - deterministicIndex(s, si, 4, 31) - 2;
   const ville = s.commune || (o.adresse || "").split(",").slice(-1)[0]?.trim() || "France";
   const entreprise = s.entreprise && s.entreprise.toLowerCase() !== "demandeur d'emploi" ? s.entreprise : "";
-  const expSecondaire = pickForBeneficiaire(s, si, [
-    "Polyvalence sur les missions confiées et adaptation rapide à de nouveaux environnements de travail.",
-    "Participation à l'organisation quotidienne et au respect des procédures internes.",
-    "Contribution à la satisfaction client et au bon déroulement de l'activité.",
-    "Soutien à l'équipe sur les pics d'activité et reporting régulier au responsable.",
-  ], 23);
-  const formationLine = pickForBeneficiaire(s, si, profile.formations, 24);
+  const poste = s.poste || perso.profile.metier;
+  const adresseLine = [s.adresse, [s.codePostal, s.commune].filter(Boolean).join(" ")].filter(Boolean).join(", ");
 
-  return buildDocument({
-    org: o,
-    title: "CURRICULUM VITAE",
-    subtitle: `${fullName} – ${profile.metier}`,
-    stagiaires: [s],
-    sections: [
+  // Pick a deterministic CV design per beneficiary so each one looks unique
+  const design: CVDesign = CV_DESIGNS[deterministicIndex(s, si, CV_DESIGNS.length, 41)].id;
+
+  const profilTexts = [
+    `${perso.profile.metier} avec ${yearNow - yearStart} ans d'expérience dans le secteur ${profile.secteur}. ${perso.objectif.charAt(0).toUpperCase() + perso.objectif.slice(1)}.`,
+    `Professionnel(le) engagé(e) dans le secteur ${profile.secteur}, je souhaite donner un nouvel élan à mon parcours. ${perso.objectif.charAt(0).toUpperCase() + perso.objectif.slice(1)}.`,
+    `Fort(e) d'un parcours dans ${profile.secteur}, je m'investis aujourd'hui dans une démarche de bilan de compétences pour clarifier mon projet : ${perso.objectif}.`,
+    `Acteur/actrice de mon évolution professionnelle, je m'appuie sur mon expérience de ${perso.profile.metier} pour construire un projet cohérent : ${perso.objectif}.`,
+  ];
+  const interets = [
+    "Lecture, marche, voyages",
+    "Sport, cuisine, bénévolat associatif",
+    "Photographie, randonnée, activités familiales",
+    "Musique, jardinage, engagement local",
+    "Cinéma, course à pied, cuisine du monde",
+  ];
+
+  const expDescriptions = [
+    profile.missions.slice(0, 3).map(m => m.charAt(0).toUpperCase() + m.slice(1)).join(". ") + ".",
+    profile.missions.slice(1, 4).map(m => m.charAt(0).toUpperCase() + m.slice(1)).join(". ") + ".",
+    `Polyvalence sur ${pickForBeneficiaire(s, si, profile.missions, 51)}, ${pickForBeneficiaire(s, si, profile.missions, 52)} et ${pickForBeneficiaire(s, si, profile.missions, 53)}.`,
+  ];
+
+  const data: CVData = {
+    prenom: s.prenom || "",
+    nom: s.nom || "",
+    titre: poste,
+    email: s.email || "",
+    telephone: s.telephone || "",
+    adresse: adresseLine,
+    photoUrl: "",
+    profil: pickForBeneficiaire(s, si, profilTexts, 42),
+    specialites: profile.techniques.slice(0, 3).join(" • "),
+    experiences: [
       {
-        heading: "État civil",
-        content: `<p><strong>${civ ? civ + " " : ""}${fullName}</strong><br>` +
-          (s.dateNaissance ? `Né(e) le ${formatDate(s.dateNaissance)}${s.communeNaissance ? ` à ${s.communeNaissance}` : ""}<br>` : "") +
-          (adresseLines ? `${adresseLines}<br>` : "") +
-          (tel ? `Téléphone : ${tel}<br>` : "") +
-          (email ? `Email : ${email}<br>` : "") +
-          (s.nationalite ? `Nationalité : ${s.nationalite}` : "") +
-          `</p>`,
+        poste,
+        entreprise: entreprise || `Secteur ${profile.secteur}`,
+        dateDebut: `${yearMid}`,
+        dateFin: `${yearNow}`,
+        description: pickForBeneficiaire(s, si, expDescriptions, 43),
       },
       {
-        heading: "Projet professionnel",
-        content: `<p>${perso.objectif.charAt(0).toUpperCase() + perso.objectif.slice(1)}. Je souhaite mettre à profit mon parcours et mes compétences au service du métier de <strong>${profile.metier}</strong> dans le secteur ${profile.secteur}.</p>`,
-        variant: "green",
+        poste: perso.profile.metier,
+        entreprise: pickForBeneficiaire(s, si, [
+          `Entreprise locale – ${ville}`,
+          `PME du secteur ${profile.secteur}`,
+          `Établissement à ${ville}`,
+          `Société de services – ${ville}`,
+        ], 44),
+        dateDebut: `${yearStart}`,
+        dateFin: `${yearMid}`,
+        description: pickForBeneficiaire(s, si, [
+          "Polyvalence sur les missions confiées et adaptation rapide à de nouveaux environnements de travail.",
+          "Participation à l'organisation quotidienne et au respect des procédures internes.",
+          "Contribution à la satisfaction client et au bon déroulement de l'activité.",
+          "Soutien à l'équipe sur les pics d'activité et reporting régulier au responsable.",
+        ], 45),
       },
       {
-        heading: "Expérience professionnelle",
-        content: `<p><strong>${poste}</strong>${entreprise ? ` – ${entreprise}` : ""}<br><em>${yearMid} – ${yearNow}${entreprise ? "" : " (parcours en activité)"}</em><br>` +
-          profile.missions.slice(0, 4).map(m => `• ${m.charAt(0).toUpperCase() + m.slice(1)}`).join("<br>") +
-          `</p>` +
-          `<p><strong>${perso.profile.metier} (poste précédent)</strong> – ${ville}<br><em>${yearStart} – ${yearMid}</em><br>${expSecondaire}</p>`,
-      },
-      {
-        heading: "Formation",
-        content: `<p>` +
-          (s.diplome ? `<strong>${s.diplome}</strong><br>` : "") +
-          `Formation continue : <strong>${formationLine}</strong><br>` +
-          `Bilan de compétences en cours – ${o.nom}, ${formatDate(f.dateDebut)} – ${formatDate(f.dateFin)}` +
-          `</p>`,
-      },
-      {
-        heading: "Compétences techniques",
-        content: listHtml(profile.techniques),
-      },
-      {
-        heading: "Compétences transversales",
-        content: listHtml(profile.transversales),
-        variant: "green",
-      },
-      {
-        heading: "Centres d'intérêt",
-        content: `<p>${pickForBeneficiaire(s, si, ["Lecture, marche, voyages", "Sport, cuisine, bénévolat associatif", "Photographie, randonnée, activités familiales", "Musique, jardinage, engagement local"], 25)}</p>`,
-      },
-      {
-        heading: "Note",
-        content: `<p style="font-size:11px;color:#555;">CV établi dans le cadre du bilan de compétences réalisé par <strong>${o.nom}</strong>. Document de travail confidentiel, propriété du bénéficiaire (art. R6313-7 du Code du travail).</p>`,
+        poste: pickForBeneficiaire(s, si, ["Premier poste / stage", "Emploi saisonnier", "Mission d'intérim", "Apprentissage"], 46),
+        entreprise: ville,
+        dateDebut: `${yearEarly}`,
+        dateFin: `${yearStart}`,
+        description: "Découverte du monde professionnel, intégration à une équipe et acquisition des fondamentaux du métier.",
       },
     ],
-  });
+    formations: [
+      ...(s.diplome ? [{ diplome: s.diplome, etablissement: pickForBeneficiaire(s, si, ["Lycée professionnel", "Centre de formation", "CFA régional", "Établissement public"], 47), annee: `${yearStart - 1}` }] : []),
+      { diplome: pickForBeneficiaire(s, si, profile.formations, 48), etablissement: "Formation continue", annee: `${yearMid}` },
+      { diplome: `Bilan de compétences – ${o.nom}`, etablissement: o.nom, annee: `${yearNow}` },
+    ],
+    competences: profile.techniques.slice(0, 6).map((t, idx) => ({
+      nom: t.charAt(0).toUpperCase() + t.slice(1),
+      niveau: 3 + ((deterministicIndex(s, si, 3, 50 + idx)) % 3), // 3, 4 or 5
+    })),
+    langues: [
+      { langue: "Français", niveau: "Langue maternelle" },
+      ...(deterministicIndex(s, si, 2, 60) === 0 ? [{ langue: "Anglais", niveau: pickForBeneficiaire(s, si, ["Notions (A2)", "Intermédiaire (B1)", "Courant (B2)"], 61) }] : []),
+    ],
+    certifications: [
+      ...(deterministicIndex(s, si, 2, 70) === 0 ? [{ nom: pickForBeneficiaire(s, si, ["SST – Sauveteur Secouriste du Travail", "Habilitation électrique BS/BE", "Permis B", "PIX – Compétences numériques"], 71), annee: `${yearMid}` }] : []),
+    ],
+    experiencePedagogique: "",
+    publications: "",
+  };
+
+  const cvHtml = generateCVHTML(data, design);
+  // Append a discreet Qualiopi footer block (separate top-level div for paginator)
+  const footerNote = `<div style="font-family:'Segoe UI',Arial,sans-serif;font-size:10px;color:#666;padding:10px 30px;border-top:1px solid #ddd;margin-top:10px;">CV établi dans le cadre du bilan de compétences réalisé par <strong>${o.nom}</strong> – ${o.siret ? `SIRET ${o.siret} – ` : ""}NDA ${o.numeroDeclaration || ""}. Document confidentiel, propriété du bénéficiaire (art. R.6313-7 du Code du travail).</div>`;
+  return cvHtml + footerNote;
 }
 
 // ===== CR – Test de personnalité (typologie MBTI E/I, S/N, T/F, J/P) =====
