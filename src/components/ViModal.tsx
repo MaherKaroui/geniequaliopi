@@ -10,7 +10,7 @@ import { toast } from "sonner";
 
 interface Props { open: boolean; onOpenChange: (o: boolean) => void; }
 
-const PACK_URL = "https://uwjxorvytlqqxszylxre.supabase.co/storage/v1/object/public/vi-pack/vi-output.zip";
+const PACK_URL = "https://uwjxorvytlqqxszylxre.supabase.co/storage/v1/object/public/vi-pack/vi-pdfs-only.zip";
 
 export default function ViModal({ open, onOpenChange }: Props) {
   const [selectedSlug, setSelectedSlug] = useState<string>(VI_APPRENTIS[0]?.slug ?? "");
