@@ -247,6 +247,12 @@ function ThemeMiniPreview({ theme, primary, secondary, bodyFont, headFont }: { t
     nature: { background: `${primary}15`, borderLeft: `3px solid ${primary}`, padding: "3px 8px", color: primary, fontFamily: headFont, fontWeight: 700, fontSize: 11, borderRadius: "0 4px 4px 0" },
     academique: { borderBottom: `3px double ${primary}`, paddingBottom: 3, color: primary, fontFamily: headFont, fontWeight: 600, fontSize: 11 },
     corporate: { background: primary, color: "white", padding: "5px 8px", borderRadius: 4, boxShadow: `0 1px 4px ${primary}50`, fontFamily: headFont, fontWeight: 700, fontSize: 11 },
+    editorial: { color: primary, fontFamily: headFont, fontWeight: 700, fontStyle: "italic", fontSize: 13, borderBottom: `0.5px solid ${primary}`, paddingBottom: 3, letterSpacing: -0.3 },
+    neobrutaliste: { background: primary, color: "#fff", padding: "4px 8px", border: "2px solid #000", boxShadow: "3px 3px 0 #000", fontFamily: headFont, fontWeight: 800, fontSize: 11, textTransform: "uppercase" as const },
+    futuriste: { background: `linear-gradient(90deg,${primary},${secondary})`, color: "#fff", padding: "4px 8px", fontFamily: headFont, fontWeight: 700, fontSize: 11, letterSpacing: 1, textTransform: "uppercase" as const, clipPath: "polygon(0 0,100% 0,98% 100%,2% 100%)" },
+    luxe: { color: primary, fontFamily: headFont, fontWeight: 400, fontSize: 13, borderTop: `1px solid ${secondary}`, borderBottom: `1px solid ${secondary}`, padding: "3px 0", textAlign: "center" as const, letterSpacing: 2, textTransform: "uppercase" as const },
+    scandinave: { background: `${primary}18`, color: primary, padding: "4px 10px", borderRadius: 20, fontFamily: headFont, fontWeight: 600, fontSize: 11 },
+    artdeco: { color: secondary, fontFamily: headFont, fontWeight: 700, fontSize: 12, textAlign: "center" as const, borderTop: `3px double ${secondary}`, borderBottom: `3px double ${secondary}`, padding: "3px 0", letterSpacing: 3, textTransform: "uppercase" as const },
   };
 
   const thStyles: Record<DocTheme, React.CSSProperties> = {
