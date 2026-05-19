@@ -3036,14 +3036,32 @@ function buildRealisticConnectionDay(
   };
 }
 
+function parseFrLongDate(dayStr: string): Date | null {
+  try {
+    const months: Record<string, number> = { "janvier":0,"février":1,"fevrier":1,"mars":2,"avril":3,"mai":4,"juin":5,"juillet":6,"août":7,"aout":7,"septembre":8,"octobre":9,"novembre":10,"décembre":11,"decembre":11 };
+    const m = dayStr.toLowerCase().match(/(\d{1,2})\s+([a-zéèêûôîçà]+)\s+(\d{4})/);
+    if (!m) return null;
+    const mo = months[m[2]]; if (mo === undefined) return null;
+    return new Date(parseInt(m[3]), mo, parseInt(m[1]), 12, 0, 0, 0);
+  } catch { return null; }
+}
+
 function genTempsConnexionReel(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], stagiaireIdx?: number) {
   const mixte = isMixte(f);
   const { hoursPerDay } = parseDuree(f.duree);
   const hpd = hoursPerDay > 0 && hoursPerDay <= 12 ? hoursPerDay : 7;
+  const isCFA = !!(f.rythmeAlternance && f.rythmeAlternance.trim().length > 0);
+  const cfaWeeks = isCFA ? getCFAWeekDates(f) : [];
+  const isInCFAWeek = (d: Date): boolean => {
+    if (!isCFA) return true;
+    return cfaWeeks.some(w => d >= w.weekStart && d <= w.weekEnd);
+  };
 
   let extra = '';
   extra += `<p style="margin:6px 0 12px;font-size:11px;color:#555;"><strong>Modalité :</strong> Formation à distance — traçabilité automatique des connexions LMS.<br><strong>Volume cible / jour :</strong> ${hpd}h (les durées réelles peuvent varier de ±10 min).</p>`;
   if (mixte) extra += `<p><em>Modalité mixte : seuls les jours réalisés en distanciel apparaissent dans le relevé ci-dessous.</em></p>`;
+  if (isCFA) extra += `<p><em>Rythme d'alternance : ${f.rythmeAlternance}. Seules les semaines en CFA apparaissent dans le relevé (les semaines en entreprise ne génèrent pas de connexion LMS).</em></p>`;
+
 
   const targetList = typeof stagiaireIdx === 'number' && stagiaires[stagiaireIdx]
     ? [stagiaires[stagiaireIdx]]
