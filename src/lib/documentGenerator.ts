@@ -1034,28 +1034,31 @@ function genOrganigramme(o: OrganismeInfo, f?: FormationInfo) {
   const formateur = f?.formateur?.trim() || dir;
 
   const box = (titre: string, nom: string) => `
-    <div style="background:#e8f0fe;padding:14px 18px;border-radius:8px;min-width:170px;text-align:center;border:1px solid #c7d7f5">
-      <strong style="color:#1e3a7b;display:block;margin-bottom:6px">${titre}</strong>
-      <span style="font-size:13px">${nom}</span>
-    </div>`;
-
-  const boxes = [
-    box("Référent Pédagogique", refPeda),
-    box("Référent Administratif", refAdmin),
-    box("Référent Qualité", refQualite),
-    box("Référent Handicap", refHandi),
-    box("Formateur", formateur),
-  ];
+    <td style="padding:10px;vertical-align:top">
+      <div style="background:#eef3fc;padding:16px 18px;border-radius:10px;text-align:center;border:1px solid #c7d7f5;min-height:70px">
+        <div style="color:#1e3a7b;font-weight:700;font-size:13px;margin-bottom:6px">${titre}</div>
+        <div style="font-size:13px;color:#1a1a1a">${nom}</div>
+      </div>
+    </td>`;
 
   return buildDocument({ org: o, title: `ORGANIGRAMME ${(o.nom || "").toUpperCase()}`, extraHtml: `
-    <div style="text-align:center;margin:30px 0">
-      <div style="background:#1e3a7b;color:#ffffff;padding:18px 40px;border-radius:8px;display:inline-block;margin-bottom:30px;min-width:240px">
+    <div style="margin:30px 0;text-align:center">
+      <div style="background:#1e3a7b;color:#ffffff;padding:18px 50px;border-radius:10px;display:inline-block;margin-bottom:28px;min-width:280px">
         <div style="color:#ffffff;font-weight:700;font-size:14px;margin-bottom:6px;letter-spacing:0.5px;text-transform:uppercase">Direction Générale</div>
         <div style="color:#ffffff;font-size:15px">${dir}</div>
       </div>
-      <div style="display:flex;justify-content:center;gap:18px;flex-wrap:wrap;margin-top:20px">
-        ${boxes.join("")}
-      </div>
+      <table style="margin:0 auto;border-collapse:separate;border-spacing:0">
+        <tr>
+          ${box("Référent Pédagogique", refPeda)}
+          ${box("Référent Administratif", refAdmin)}
+          ${box("Référent Qualité", refQualite)}
+        </tr>
+        <tr>
+          <td style="padding:10px"></td>
+          ${box("Référent Handicap", refHandi)}
+          ${box("Formateur", formateur)}
+        </tr>
+      </table>
     </div>` });
 }
 
