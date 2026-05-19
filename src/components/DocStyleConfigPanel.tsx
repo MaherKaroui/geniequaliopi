@@ -63,6 +63,36 @@ const THEME_PRESETS: ThemePreset[] = [
     description: "En-têtes avec ombre, tableaux encadrés, look entreprise premium",
     defaults: { primaryColor: "#1a237e", secondaryColor: "#00695c", fontFamily: "'Inter', sans-serif", headingFont: "'Inter', sans-serif" }
   },
+  {
+    id: "editorial", name: "Éditorial Magazine",
+    description: "Style presse haut de gamme, serif majestueuse, filets fins, capitales espacées",
+    defaults: { primaryColor: "#1a1a1a", secondaryColor: "#b8860b", fontFamily: "'Source Serif 4', serif", headingFont: "'Playfair Display', serif", fontSize: 13 }
+  },
+  {
+    id: "neobrutaliste", name: "Néo-Brutaliste",
+    description: "Aplats vifs, bordures noires épaisses, ombres dures décalées, look pop choc",
+    defaults: { primaryColor: "#ff3366", secondaryColor: "#facc15", fontFamily: "'Space Grotesk', sans-serif", headingFont: "'Space Grotesk', sans-serif" }
+  },
+  {
+    id: "futuriste", name: "Futuriste / Cyber",
+    description: "Lignes néon, gradients tech, tableaux sombres, typographie monospace d'accent",
+    defaults: { primaryColor: "#0ea5e9", secondaryColor: "#a855f7", fontFamily: "'Sora', sans-serif", headingFont: "'Space Grotesk', sans-serif" }
+  },
+  {
+    id: "luxe", name: "Luxe Noir & Or",
+    description: "Fond crème, accents dorés, sérif raffinée, esprit boutique-hôtel",
+    defaults: { primaryColor: "#1a1a1a", secondaryColor: "#c9a14a", fontFamily: "'Cormorant Garamond', serif", headingFont: "'DM Serif Display', serif", fontSize: 14 }
+  },
+  {
+    id: "scandinave", name: "Scandinave / Doux",
+    description: "Pastels poudrés, beaucoup d'air, formes très arrondies, ambiance feutrée",
+    defaults: { primaryColor: "#5b8a8a", secondaryColor: "#d4a574", fontFamily: "'Manrope', sans-serif", headingFont: "'Fraunces', serif" }
+  },
+  {
+    id: "artdeco", name: "Art Déco",
+    description: "Géométrie dorée, doubles filets, symétrie, années 1920 chic",
+    defaults: { primaryColor: "#0b1d2a", secondaryColor: "#c9a14a", fontFamily: "'Cormorant Garamond', serif", headingFont: "'DM Serif Display', serif" }
+  },
 ];
 
 const FONT_CATEGORIES = [
