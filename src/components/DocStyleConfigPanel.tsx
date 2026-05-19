@@ -278,6 +278,11 @@ function ThemeMiniPreview({ theme, primary, secondary, bodyFont, headFont }: { t
     luxe: { color: primary, fontFamily: headFont, fontWeight: 400, fontSize: 13, borderTop: `1px solid ${secondary}`, borderBottom: `1px solid ${secondary}`, padding: "3px 0", textAlign: "center" as const, letterSpacing: 2, textTransform: "uppercase" as const },
     scandinave: { background: `${primary}18`, color: primary, padding: "4px 10px", borderRadius: 20, fontFamily: headFont, fontWeight: 600, fontSize: 11 },
     artdeco: { color: secondary, fontFamily: headFont, fontWeight: 700, fontSize: 12, textAlign: "center" as const, borderTop: `3px double ${secondary}`, borderBottom: `3px double ${secondary}`, padding: "3px 0", letterSpacing: 3, textTransform: "uppercase" as const },
+    consulting: { background: primary, color: "#fff", padding: "5px 10px", fontFamily: headFont, fontWeight: 700, fontSize: 11, borderLeft: `4px solid ${secondary}` },
+    notarial: { color: primary, fontFamily: headFont, fontWeight: 700, fontSize: 12, fontStyle: "italic" as const, borderBottom: `2px solid ${primary}`, paddingBottom: 3, textAlign: "center" as const },
+    techstartup: { background: `linear-gradient(135deg,${primary},${secondary})`, color: "#fff", padding: "5px 12px", borderRadius: 10, fontFamily: headFont, fontWeight: 700, fontSize: 11 },
+    botanique: { color: primary, fontFamily: headFont, fontWeight: 600, fontSize: 12, fontStyle: "italic" as const, borderBottom: `1px solid ${secondary}80`, paddingBottom: 3 },
+    suisse: { color: "#111", fontFamily: headFont, fontWeight: 800, fontSize: 14, letterSpacing: -0.5, borderLeft: `4px solid ${secondary}`, paddingLeft: 6 },
   };
 
   const thStyles: Record<DocTheme, React.CSSProperties> = {
