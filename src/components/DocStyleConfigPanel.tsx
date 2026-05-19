@@ -281,6 +281,12 @@ function ThemeMiniPreview({ theme, primary, secondary, bodyFont, headFont }: { t
     nature: { background: `linear-gradient(to right,${primary}08,${secondary}05)`, borderLeft: `3px solid ${secondary}`, borderRadius: 4, padding: "3px 6px", ...common, fontFamily: bodyFont },
     academique: { border: `0.5px solid ${primary}25`, borderLeft: `3px solid ${primary}`, padding: "3px 6px", ...common, fontFamily: bodyFont },
     corporate: { background: "#f4f7fb", borderLeft: `3px solid ${secondary}`, borderRadius: 4, padding: "3px 6px", boxShadow: "0 0.5px 2px rgba(0,0,0,0.04)", ...common, fontFamily: bodyFont },
+    editorial: { borderTop: `0.5px solid ${primary}`, borderBottom: `0.5px solid ${primary}`, padding: "5px 6px", ...common, fontFamily: bodyFont, color: "#222", fontStyle: "italic" as const },
+    neobrutaliste: { background: "#fff", border: "2px solid #000", boxShadow: "3px 3px 0 #000", padding: "3px 6px", ...common, fontFamily: bodyFont, color: "#000", fontWeight: 600 },
+    futuriste: { background: "linear-gradient(135deg,#0f172a,#1e293b)", borderLeft: `2px solid ${secondary}`, borderRadius: 3, padding: "4px 6px", ...common, fontFamily: bodyFont, color: "#e2e8f0" },
+    luxe: { background: "#faf6ee", borderLeft: `2px solid ${secondary}`, padding: "4px 8px", ...common, fontFamily: bodyFont, color: primary, fontStyle: "italic" as const },
+    scandinave: { background: `${primary}10`, padding: "5px 10px", ...common, fontFamily: bodyFont, color: primary, borderRadius: 12 },
+    artdeco: { background: "#fbf7ee", border: `1px solid ${secondary}80`, padding: "4px 8px", ...common, fontFamily: bodyFont, color: primary },
   };
 
   return (
