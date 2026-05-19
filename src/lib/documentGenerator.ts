@@ -387,6 +387,8 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "rapport_amelioration": return genRapportAmelioration(o);
     // Type d'action spécifiques
     case "pv_conseil_perfectionnement": return genPVConseilPerfectionnement(o, f, stagiaires);
+    case "convocation_conseil_perfectionnement": return genConvocationConseilPerfectionnement(o, f, stagiaires);
+    case "fiche_referent_mobilite_cfa": return genFicheReferentMobiliteCFA(o, f);
     case "contrat_apprentissage": return genContratApprentissage(o, f, stagiaires, typeof params?.stagiaireIdx === "number" ? params.stagiaireIdx : undefined);
     case "livret_apprentissage_cfa": return genLivretApprentissageCFA(o, f, stagiaires);
     case "fiche_maitre_apprentissage": return genFicheMaitreApprentissage(o, f);
