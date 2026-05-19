@@ -4472,9 +4472,10 @@ function genIndicateursResultatsCFA(o: OrganismeInfo, f: FormationInfo, stagiair
   const annee = parsedDate && !isNaN(parsedDate.getTime()) ? parsedDate.getFullYear() : new Date().getFullYear();
   const anneeSuiv = annee + 1;
 
+  const termineRes = isFormationTerminee(f, validStagiaires);
   const indicateursSection = { heading: "2. Indicateurs de résultats", content: tableHTML(
     ["Indicateur", `Résultat ${annee}`, `Objectif ${anneeSuiv}`, "Commentaire"],
-    [
+    termineRes ? [
       ["Taux de réussite à la certification", "100%", "100%", `${nbStagiaires} ${nbStagiaires > 1 ? "apprentis certifiés" : "apprenti certifié"} sur ${nbStagiaires}`],
       ["Taux de satisfaction global des apprentis", "100%", "≥ 95%", "Enquête de fin de formation – note moyenne 10/10"],
       ["Taux d'insertion professionnelle à 6 mois", "85%", "88%", "Suivi post-formation à 6 mois"],
@@ -4484,6 +4485,16 @@ function genIndicateursResultatsCFA(o: OrganismeInfo, f: FormationInfo, stagiair
       ["Taux de présence moyen", "100%", "100%", "Suivi assiduité – émargements complets"],
       ["Taux de retour enquêtes", "100%", "≥ 90%", "Tous les apprentis ont répondu"],
       ["Taux d'abandon", "0%", "< 3%", "Aucun abandon constaté"],
+    ] : [
+      ["Taux de réussite à la certification", "En cours", "100%", "Disponible à l'issue des examens"],
+      ["Taux de satisfaction global des apprentis", "En cours", "≥ 95%", "Enquête de fin de formation à administrer"],
+      ["Taux d'insertion professionnelle à 6 mois", "En cours", "88%", "Mesuré 6 mois après la sortie de formation"],
+      ["Taux de rupture de contrat d'apprentissage", "0% (à date)", "< 5%", "Aucune rupture à ce jour"],
+      ["Taux de poursuite d'études", "En cours", "35%", "Mesuré post-diplôme"],
+      ["Nombre d'apprentis inscrits", String(nbStagiaires), String(nbStagiaires + 1), `Promotion ${annee} en cours`],
+      ["Taux de présence moyen", "En cours", "100%", "Suivi assiduité en cours – émargements en cours de remplissage"],
+      ["Taux de retour enquêtes", "En cours", "≥ 90%", "Enquête à administrer en fin de formation"],
+      ["Taux d'abandon", "0% (à date)", "< 3%", "Aucun abandon constaté à ce jour"],
     ]
   ) };
 
