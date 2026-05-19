@@ -1058,9 +1058,14 @@ function genOrganigramme(o: OrganismeInfo, f?: FormationInfo) {
           ${box("Référent Qualité", refQualite)}
         </tr>
         <tr>
-          <td style="padding:10px"></td>
           ${box("Référent Handicap", refHandi)}
           ${box("Formateur", formateur)}
+          ${box("Relation Entreprise", refPeda)}
+        </tr>
+        <tr>
+          <td style="padding:10px"></td>
+          ${box("Référent Mobilité Nationale et Internationale", refPeda)}
+          <td style="padding:10px"></td>
         </tr>
       </table>
     </div>` });
