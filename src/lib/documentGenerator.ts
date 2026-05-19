@@ -3076,6 +3076,10 @@ function genTempsConnexionReel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
     let totalMinutes = 0;
     days.forEach((day, di) => {
       if (mixte && getDayModalite(f, di) === 'P') return;
+      if (isCFA) {
+        const dt = parseFrLongDate(day);
+        if (!dt || !isInCFAWeek(dt)) return;
+      }
       if (renderedDays > 0 && renderedDays % 5 === 0) extra += '<div class="page-break"></div>';
       extra += `<h4>📅 ${day}</h4>`;
 
