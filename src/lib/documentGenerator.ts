@@ -1047,9 +1047,9 @@ function genOrganigramme(o: OrganismeInfo, f?: FormationInfo) {
 
   return buildDocument({ org: o, title: `ORGANIGRAMME ${(o.nom || "").toUpperCase()}`, extraHtml: `
     <div style="text-align:center;margin:30px 0">
-      <div style="background:#1e3a7b;color:white;padding:16px 36px;border-radius:8px;display:inline-block;margin-bottom:30px">
-        <strong style="display:block;font-size:14px;margin-bottom:4px">Président</strong>
-        <span style="font-size:15px">${dir}</span>
+      <div style="background:#1e3a7b;color:#ffffff;padding:18px 40px;border-radius:8px;display:inline-block;margin-bottom:30px;min-width:240px">
+        <div style="color:#ffffff;font-weight:700;font-size:14px;margin-bottom:6px;letter-spacing:0.5px;text-transform:uppercase">Direction Générale</div>
+        <div style="color:#ffffff;font-size:15px">${dir}</div>
       </div>
       <div style="display:flex;justify-content:center;gap:18px;flex-wrap:wrap;margin-top:20px">
         ${boxes.join("")}
