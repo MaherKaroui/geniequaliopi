@@ -3036,7 +3036,7 @@ function buildRealisticConnectionDay(
   };
 }
 
-function genTempsConnexionReel(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
+function genTempsConnexionReel(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], stagiaireIdx?: number) {
   const mixte = isMixte(f);
   const { hoursPerDay } = parseDuree(f.duree);
   const hpd = hoursPerDay > 0 && hoursPerDay <= 12 ? hoursPerDay : 7;
@@ -3045,7 +3045,10 @@ function genTempsConnexionReel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
   extra += `<p style="margin:6px 0 12px;font-size:11px;color:#555;"><strong>Modalité :</strong> Formation à distance — traçabilité automatique des connexions LMS.<br><strong>Volume cible / jour :</strong> ${hpd}h (les durées réelles peuvent varier de ±10 min).</p>`;
   if (mixte) extra += `<p><em>Modalité mixte : seuls les jours réalisés en distanciel apparaissent dans le relevé ci-dessous.</em></p>`;
 
-  stagiaires.slice(0, 10).forEach((s, si) => {
+  const targetList = typeof stagiaireIdx === 'number' && stagiaires[stagiaireIdx]
+    ? [stagiaires[stagiaireIdx]]
+    : stagiaires.slice(0, 10);
+  targetList.forEach((s, si) => {
     const days = getStagiaireDays(s, f);
     if (si > 0) extra += '<div class="page-break"></div>';
     extra += `<h3>📋 ${s.prenom} ${s.nom}</h3>`;
