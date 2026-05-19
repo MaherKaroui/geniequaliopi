@@ -63,6 +63,36 @@ const THEME_PRESETS: ThemePreset[] = [
     description: "En-têtes avec ombre, tableaux encadrés, look entreprise premium",
     defaults: { primaryColor: "#1a237e", secondaryColor: "#00695c", fontFamily: "'Inter', sans-serif", headingFont: "'Inter', sans-serif" }
   },
+  {
+    id: "editorial", name: "Éditorial Magazine",
+    description: "Style presse haut de gamme, serif majestueuse, filets fins, capitales espacées",
+    defaults: { primaryColor: "#1a1a1a", secondaryColor: "#b8860b", fontFamily: "'Source Serif 4', serif", headingFont: "'Playfair Display', serif", fontSize: 13 }
+  },
+  {
+    id: "neobrutaliste", name: "Néo-Brutaliste",
+    description: "Aplats vifs, bordures noires épaisses, ombres dures décalées, look pop choc",
+    defaults: { primaryColor: "#ff3366", secondaryColor: "#facc15", fontFamily: "'Space Grotesk', sans-serif", headingFont: "'Space Grotesk', sans-serif" }
+  },
+  {
+    id: "futuriste", name: "Futuriste / Cyber",
+    description: "Lignes néon, gradients tech, tableaux sombres, typographie monospace d'accent",
+    defaults: { primaryColor: "#0ea5e9", secondaryColor: "#a855f7", fontFamily: "'Sora', sans-serif", headingFont: "'Space Grotesk', sans-serif" }
+  },
+  {
+    id: "luxe", name: "Luxe Noir & Or",
+    description: "Fond crème, accents dorés, sérif raffinée, esprit boutique-hôtel",
+    defaults: { primaryColor: "#1a1a1a", secondaryColor: "#c9a14a", fontFamily: "'Cormorant Garamond', serif", headingFont: "'DM Serif Display', serif", fontSize: 14 }
+  },
+  {
+    id: "scandinave", name: "Scandinave / Doux",
+    description: "Pastels poudrés, beaucoup d'air, formes très arrondies, ambiance feutrée",
+    defaults: { primaryColor: "#5b8a8a", secondaryColor: "#d4a574", fontFamily: "'Manrope', sans-serif", headingFont: "'Fraunces', serif" }
+  },
+  {
+    id: "artdeco", name: "Art Déco",
+    description: "Géométrie dorée, doubles filets, symétrie, années 1920 chic",
+    defaults: { primaryColor: "#0b1d2a", secondaryColor: "#c9a14a", fontFamily: "'Cormorant Garamond', serif", headingFont: "'DM Serif Display', serif" }
+  },
 ];
 
 const FONT_CATEGORIES = [
@@ -217,6 +247,12 @@ function ThemeMiniPreview({ theme, primary, secondary, bodyFont, headFont }: { t
     nature: { background: `${primary}15`, borderLeft: `3px solid ${primary}`, padding: "3px 8px", color: primary, fontFamily: headFont, fontWeight: 700, fontSize: 11, borderRadius: "0 4px 4px 0" },
     academique: { borderBottom: `3px double ${primary}`, paddingBottom: 3, color: primary, fontFamily: headFont, fontWeight: 600, fontSize: 11 },
     corporate: { background: primary, color: "white", padding: "5px 8px", borderRadius: 4, boxShadow: `0 1px 4px ${primary}50`, fontFamily: headFont, fontWeight: 700, fontSize: 11 },
+    editorial: { color: primary, fontFamily: headFont, fontWeight: 700, fontStyle: "italic", fontSize: 13, borderBottom: `0.5px solid ${primary}`, paddingBottom: 3, letterSpacing: -0.3 },
+    neobrutaliste: { background: primary, color: "#fff", padding: "4px 8px", border: "2px solid #000", boxShadow: "3px 3px 0 #000", fontFamily: headFont, fontWeight: 800, fontSize: 11, textTransform: "uppercase" as const },
+    futuriste: { background: `linear-gradient(90deg,${primary},${secondary})`, color: "#fff", padding: "4px 8px", fontFamily: headFont, fontWeight: 700, fontSize: 11, letterSpacing: 1, textTransform: "uppercase" as const, clipPath: "polygon(0 0,100% 0,98% 100%,2% 100%)" },
+    luxe: { color: primary, fontFamily: headFont, fontWeight: 400, fontSize: 13, borderTop: `1px solid ${secondary}`, borderBottom: `1px solid ${secondary}`, padding: "3px 0", textAlign: "center" as const, letterSpacing: 2, textTransform: "uppercase" as const },
+    scandinave: { background: `${primary}18`, color: primary, padding: "4px 10px", borderRadius: 20, fontFamily: headFont, fontWeight: 600, fontSize: 11 },
+    artdeco: { color: secondary, fontFamily: headFont, fontWeight: 700, fontSize: 12, textAlign: "center" as const, borderTop: `3px double ${secondary}`, borderBottom: `3px double ${secondary}`, padding: "3px 0", letterSpacing: 3, textTransform: "uppercase" as const },
   };
 
   const thStyles: Record<DocTheme, React.CSSProperties> = {
@@ -228,6 +264,12 @@ function ThemeMiniPreview({ theme, primary, secondary, bodyFont, headFont }: { t
     nature: { background: `${primary}18`, color: primary, padding: "2px 4px", fontSize: 7, borderBottom: `1px solid ${primary}30` },
     academique: { background: `${primary}10`, color: primary, padding: "2px 4px", fontSize: 7, borderBottom: `1.5px solid ${primary}`, borderRight: `0.5px solid ${primary}20` },
     corporate: { background: primary, color: "white", padding: "3px 4px", fontSize: 7 },
+    editorial: { background: "none", color: primary, padding: "2px 4px", fontSize: 7, borderBottom: `1.5px solid ${primary}`, fontWeight: 700, textTransform: "uppercase" as const, letterSpacing: 1 },
+    neobrutaliste: { background: secondary, color: "#000", padding: "3px 4px", fontSize: 7, border: "1.5px solid #000", fontWeight: 800 },
+    futuriste: { background: `${primary}30`, color: primary, padding: "2px 4px", fontSize: 7, borderBottom: `1px solid ${primary}`, textTransform: "uppercase" as const, letterSpacing: 0.5 },
+    luxe: { background: "none", color: primary, padding: "3px 4px", fontSize: 7, borderBottom: `0.5px solid ${secondary}`, fontStyle: "italic" as const, fontWeight: 600 },
+    scandinave: { background: `${primary}10`, color: primary, padding: "3px 6px", fontSize: 7, borderRadius: 6 },
+    artdeco: { background: primary, color: secondary, padding: "3px 4px", fontSize: 7, borderTop: `1px solid ${secondary}`, borderBottom: `1px solid ${secondary}`, textTransform: "uppercase" as const, letterSpacing: 0.5 },
   };
 
   const sectionStyles: Record<DocTheme, React.CSSProperties> = {
@@ -239,6 +281,12 @@ function ThemeMiniPreview({ theme, primary, secondary, bodyFont, headFont }: { t
     nature: { background: `linear-gradient(to right,${primary}08,${secondary}05)`, borderLeft: `3px solid ${secondary}`, borderRadius: 4, padding: "3px 6px", ...common, fontFamily: bodyFont },
     academique: { border: `0.5px solid ${primary}25`, borderLeft: `3px solid ${primary}`, padding: "3px 6px", ...common, fontFamily: bodyFont },
     corporate: { background: "#f4f7fb", borderLeft: `3px solid ${secondary}`, borderRadius: 4, padding: "3px 6px", boxShadow: "0 0.5px 2px rgba(0,0,0,0.04)", ...common, fontFamily: bodyFont },
+    editorial: { borderTop: `0.5px solid ${primary}`, borderBottom: `0.5px solid ${primary}`, padding: "5px 6px", ...common, fontFamily: bodyFont, color: "#222", fontStyle: "italic" as const },
+    neobrutaliste: { background: "#fff", border: "2px solid #000", boxShadow: "3px 3px 0 #000", padding: "3px 6px", ...common, fontFamily: bodyFont, color: "#000", fontWeight: 600 },
+    futuriste: { background: "linear-gradient(135deg,#0f172a,#1e293b)", borderLeft: `2px solid ${secondary}`, borderRadius: 3, padding: "4px 6px", ...common, fontFamily: bodyFont, color: "#e2e8f0" },
+    luxe: { background: "#faf6ee", borderLeft: `2px solid ${secondary}`, padding: "4px 8px", ...common, fontFamily: bodyFont, color: primary, fontStyle: "italic" as const },
+    scandinave: { background: `${primary}10`, padding: "5px 10px", ...common, fontFamily: bodyFont, color: primary, borderRadius: 12 },
+    artdeco: { background: "#fbf7ee", border: `1px solid ${secondary}80`, padding: "4px 8px", ...common, fontFamily: bodyFont, color: primary },
   };
 
   return (
