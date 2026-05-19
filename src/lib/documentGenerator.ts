@@ -2981,26 +2981,84 @@ function genTempsConnexion(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
   } });
 }
 
+/**
+ * Génère un relevé de connexion réaliste pour 1 journée distancielle :
+ * - durée totale = hoursPerDay (issue de la formation) ± 5 min
+ * - matin ≈ 3h30 (±10 min), pause déjeuner ≈ 1h (±10 min), après-midi = reste
+ * - secondes mises à 0, minutes variables, IP cohérente avec la box du stagiaire
+ */
+function buildRealisticConnectionDay(
+  seedBase: number,
+  hoursPerDay: number,
+): {
+  ip: string;
+  connMatin: string; deconnMidi: string;
+  connApMidi: string; deconnSoir: string;
+  dureeMatinMin: number; dureeApMidiMin: number; dureeTotalMin: number;
+} {
+  const seed = ((seedBase % 997) + 997) % 997;
+  const pad = (n: number) => String(n).padStart(2, "0");
+  // Total cible en minutes, légère variation ±5 min
+  const targetTotal = Math.round(hoursPerDay * 60) + ((seed % 11) - 5);
+  // Matin : 3h30 ± 10 min ; capé par le total
+  const morningTarget = Math.min(targetTotal - 60, 210 + ((seed * 7) % 21) - 10);
+  const afternoonTarget = Math.max(60, targetTotal - morningTarget);
+
+  // Connexion matin entre 08h45 et 09h10
+  const hConn = 8;
+  const mConn = 45 + ((seed * 3) % 25);
+  const startMatin = hConn * 60 + mConn;
+  const endMatin = startMatin + morningTarget;
+  // Pause déjeuner 50–75 min
+  const pause = 50 + ((seed * 5) % 26);
+  const startApMidi = endMatin + pause;
+  const endApMidi = startApMidi + afternoonTarget;
+
+  const toHHMM = (totalMin: number) => `${pad(Math.floor(totalMin / 60))}h${pad(totalMin % 60)}`;
+
+  // IP type box française (Orange/Free/SFR) — cohérente par stagiaire
+  const ipOctet3 = 1 + (seed % 254);
+  const ipOctet4 = 1 + ((seed * 13) % 254);
+  const operatorBase = seed % 3 === 0 ? `90.${24 + (seed % 40)}` // Orange
+    : seed % 3 === 1 ? `82.${64 + (seed % 60)}`                  // Free
+    : `78.${128 + (seed % 60)}`;                                 // SFR
+  const ip = `${operatorBase}.${ipOctet3}.${ipOctet4}`;
+
+  return {
+    ip,
+    connMatin: toHHMM(startMatin),
+    deconnMidi: toHHMM(endMatin),
+    connApMidi: toHHMM(startApMidi),
+    deconnSoir: toHHMM(endApMidi),
+    dureeMatinMin: morningTarget,
+    dureeApMidiMin: afternoonTarget,
+    dureeTotalMin: morningTarget + afternoonTarget,
+  };
+}
+
 function genTempsConnexionReel(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const mixte = isMixte(f);
+  const { hoursPerDay } = parseDuree(f.duree);
+  const hpd = hoursPerDay > 0 && hoursPerDay <= 12 ? hoursPerDay : 7;
+
   let extra = '';
+  extra += `<p style="margin:6px 0 12px;font-size:11px;color:#555;"><strong>Modalité :</strong> Formation à distance — traçabilité automatique des connexions LMS.<br><strong>Volume cible / jour :</strong> ${hpd}h (les durées réelles peuvent varier de ±10 min).</p>`;
   if (mixte) extra += `<p><em>Modalité mixte : seuls les jours réalisés en distanciel apparaissent dans le relevé ci-dessous.</em></p>`;
 
   stagiaires.slice(0, 10).forEach((s, si) => {
     const days = getStagiaireDays(s, f);
     if (si > 0) extra += '<div class="page-break"></div>';
     extra += `<h3>📋 ${s.prenom} ${s.nom}</h3>`;
-    extra += `<p><strong>Période :</strong> ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}<br><strong>Plateforme :</strong> ${o.outilsUtilises || 'Zoom / Teams'}</p>`;
+    extra += `<p><strong>Période :</strong> ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}<br><strong>Plateforme :</strong> ${o.outilsUtilises || 'Zoom / Teams / LMS Moodle'}</p>`;
 
     let renderedDays = 0;
     let totalMinutes = 0;
     days.forEach((day, di) => {
-      // Skip présentiel days in mixte mode
       if (mixte && getDayModalite(f, di) === 'P') return;
       if (renderedDays > 0 && renderedDays % 5 === 0) extra += '<div class="page-break"></div>';
       extra += `<h4>📅 ${day}</h4>`;
 
-      // Future day → blank row
+      // Jour futur → ligne vide
       if (!isFrLongDayPast(day)) {
         extra += tableHTML(
           ["Adresse IP", "Connexion matin", "Déconnexion midi", "Reconnexion", "Déconnexion soir", "Durée totale", "Statut"],
@@ -3010,34 +3068,15 @@ function genTempsConnexionReel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
         return;
       }
 
-      const seed = (s.nom.charCodeAt(0) * 7 + di * 13 + si * 3) % 256;
-      const ip = `${80 + (seed % 120)}.${(seed * 3 + si * 17) % 256}.${(seed * 7 + di * 31) % 256}.${(seed * 11 + si * 23 + di * 5) % 256}`;
-      const hConnexion = 8 + (seed % 2);
-      const mConnexion = (seed * 3) % 30;
-      const hDeconnexion = 12 + (seed % 2);
-      const mDeconnexion = (seed * 5) % 30;
-      const hReconnexion = 13 + (seed % 2);
-      const mReconnexion = (seed * 7) % 20;
-      const hFinale = 16 + (seed % 2);
-      const mFinale = 30 + (seed * 2) % 30;
-      const dureeMatin = (hDeconnexion - hConnexion) * 60 + mDeconnexion - mConnexion;
-      const dureeApresMidi = (hFinale - hReconnexion) * 60 + mFinale - mReconnexion;
-      const dureeTotal = dureeMatin + dureeApresMidi;
-      totalMinutes += dureeTotal;
-      const hTotal = Math.floor(dureeTotal / 60);
-      const mTotal = dureeTotal % 60;
+      const seedBase = s.nom.charCodeAt(0) * 7 + (s.prenom?.charCodeAt(0) || 65) * 3 + di * 13 + si * 5;
+      const d = buildRealisticConnectionDay(seedBase, hpd);
+      totalMinutes += d.dureeTotalMin;
+      const hTotal = Math.floor(d.dureeTotalMin / 60);
+      const mTotal = d.dureeTotalMin % 60;
 
       extra += tableHTML(
         ["Adresse IP", "Connexion matin", "Déconnexion midi", "Reconnexion", "Déconnexion soir", "Durée totale", "Statut"],
-        [[
-          ip,
-          `${String(hConnexion).padStart(2, '0')}h${String(mConnexion).padStart(2, '0')}`,
-          `${String(hDeconnexion).padStart(2, '0')}h${String(mDeconnexion).padStart(2, '0')}`,
-          `${String(hReconnexion).padStart(2, '0')}h${String(mReconnexion).padStart(2, '0')}`,
-          `${String(hFinale).padStart(2, '0')}h${String(mFinale).padStart(2, '0')}`,
-          `${hTotal}h${String(mTotal).padStart(2, '0')}min`,
-          '✅ Connecté'
-        ]]
+        [[d.ip, d.connMatin, d.deconnMidi, d.connApMidi, d.deconnSoir, `${hTotal}h${String(mTotal).padStart(2, '0')}min`, '✅ Connecté']]
       );
       renderedDays++;
     });
@@ -3051,7 +3090,7 @@ function genTempsConnexionReel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
     const hT = Math.floor(totalMinutes / 60);
     const mT = totalMinutes % 60;
     const stagDuree = getStagiaireDuree(s, f);
-    const dureeFormationH = parseInt(stagDuree) || days.length * 7;
+    const dureeFormationH = parseInt(stagDuree) || days.length * hpd;
     const taux = dureeFormationH > 0 ? Math.min(100, Math.round((totalMinutes / (dureeFormationH * 60)) * 100)) : 0;
     const termine = isStagiaireFormationTerminee(s, f);
     const tauxLabel = termine ? `${taux}%` : `${taux}% (en cours)`;
