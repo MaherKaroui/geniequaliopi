@@ -4329,7 +4329,7 @@ function genConvocationConseilPerfectionnement(o: OrganismeInfo, f: FormationInf
     </ol>` },
     { heading: "Participants attendus", content: `<ul><li>Direction de ${o.nom}</li><li>Référents (Handicap, Mobilité, Qualité, Pédagogique)</li><li>Formateurs</li><li>Représentants des entreprises partenaires</li><li>Apprenants représentants</li></ul>` },
     { heading: "Confirmation de présence", content: `<p>Merci de confirmer votre présence avant le ${dateLimite || "[date limite]"} en contactant <strong>${o.email || ""}</strong>${o.telephone ? ` ou au <strong>${o.telephone}</strong>` : ""}.</p>` },
-  ], signatures: { type: "2", labels: ["La Direction", "Le Référent Qualité"], names: [o.dirigeant || o.nom, o.referentQualite || ""] } });
+  ] });
 }
 
 function genFicheReferentMobiliteCFA(o: OrganismeInfo, f: FormationInfo) {
@@ -4339,7 +4339,7 @@ function genFicheReferentMobiliteCFA(o: OrganismeInfo, f: FormationInfo) {
     { heading: "Les actions du Référent Mobilité", content: `<p><strong>Il favorise :</strong></p><ul><li>L'accueil des candidats (en amont et durant le cursus)</li><li>La sécurisation du parcours de formation des apprentis en mobilité (y compris pour les examens)</li><li>Leur orientation</li><li>Leur insertion professionnelle</li><li>Et leur accompagnement sur leur lieu d'emploi (en lien avec leur maître d'apprentissage et l'équipe tutorale)</li></ul><p>Il <strong>écoute et dialogue avec les apprentis et stagiaires</strong> afin de les aider à préciser, mettre en œuvre et sécuriser leur projet de formation en vue de leur poursuite de parcours.</p>` },
     { heading: "Coordination et accompagnement", content: `<p>Il écoute et dialogue avec l'environnement des personnes dans le cadre de la mobilité nationale et internationale afin de le sensibiliser et de l'amener à contribuer activement au projet de formation et d'insertion professionnelle. L'environnement est défini par : les formateurs, les éducateurs, le maître d'apprentissage, les administrations, les OPCO, etc.</p><p>Il repère les incidences propres à chaque situation de mobilité nationale et internationale en lien avec l'équipe pluriprofessionnelle. Pour cela, il coordonne l'identification, la mise en œuvre collective et le suivi de solutions d'adaptation, de compensation, d'amélioration des conditions de formation et des solutions de sécurité.</p>` },
     { heading: "Joindre le Référent Mobilité", content: `<p>Le référent mobilité est joignable par email : <strong>${o.email || ""}</strong>${o.telephone ? ` ou par téléphone au <strong>${o.telephone}</strong>` : ""}.</p>` },
-  ], signatures: { type: "2", labels: ["La Direction", "Le Référent Qualité"], names: [o.dirigeant || o.nom, o.referentQualite || ""] } });
+  ] });
 }
 
 function genContratApprentissage(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si?: number) {
