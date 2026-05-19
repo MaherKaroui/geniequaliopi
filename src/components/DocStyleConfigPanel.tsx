@@ -264,6 +264,12 @@ function ThemeMiniPreview({ theme, primary, secondary, bodyFont, headFont }: { t
     nature: { background: `${primary}18`, color: primary, padding: "2px 4px", fontSize: 7, borderBottom: `1px solid ${primary}30` },
     academique: { background: `${primary}10`, color: primary, padding: "2px 4px", fontSize: 7, borderBottom: `1.5px solid ${primary}`, borderRight: `0.5px solid ${primary}20` },
     corporate: { background: primary, color: "white", padding: "3px 4px", fontSize: 7 },
+    editorial: { background: "none", color: primary, padding: "2px 4px", fontSize: 7, borderBottom: `1.5px solid ${primary}`, fontWeight: 700, textTransform: "uppercase" as const, letterSpacing: 1 },
+    neobrutaliste: { background: secondary, color: "#000", padding: "3px 4px", fontSize: 7, border: "1.5px solid #000", fontWeight: 800 },
+    futuriste: { background: `${primary}30`, color: primary, padding: "2px 4px", fontSize: 7, borderBottom: `1px solid ${primary}`, textTransform: "uppercase" as const, letterSpacing: 0.5 },
+    luxe: { background: "none", color: primary, padding: "3px 4px", fontSize: 7, borderBottom: `0.5px solid ${secondary}`, fontStyle: "italic" as const, fontWeight: 600 },
+    scandinave: { background: `${primary}10`, color: primary, padding: "3px 6px", fontSize: 7, borderRadius: 6 },
+    artdeco: { background: primary, color: secondary, padding: "3px 4px", fontSize: 7, borderTop: `1px solid ${secondary}`, borderBottom: `1px solid ${secondary}`, textTransform: "uppercase" as const, letterSpacing: 0.5 },
   };
 
   const sectionStyles: Record<DocTheme, React.CSSProperties> = {
