@@ -2503,7 +2503,7 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
 
     <h2>15. Indicateurs de performance – Année ${anneeFormation}</h2>
     <div class="section">
-      ${isCFA ? `
+      ${isCFA ? (isFormationTerminee(f, stagiaires) ? `
       <table>
         <tr><th style="width:55%">Indicateur</th><th>Résultat</th></tr>
         <tr><td>Taux de satisfaction globale</td><td>100%</td></tr>
@@ -2517,7 +2517,21 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
         <tr><td>Taux de rupture en alternance</td><td>0%</td></tr>
       </table>
       <p style="margin-top:8px"><em>Indicateurs consolidés à l'issue de la promotion ${anneeFormation} – ${nbStagiaires} ${nbStagiaires > 1 ? "apprentis" : "apprenti"}. Données publiées annuellement (InserJeunes / France Compétences)${o.siteWeb && o.siteWeb.trim() ? ` sur ${isFacebookPage(o.siteWeb) ? 'la page Facebook' : 'le site internet'} de ${o.nom}` : ''}.</em></p>
-      ` : isFormationTerminee(f, stagiaires) ? `
+      ` : `
+      <table>
+        <tr><th style="width:55%">Indicateur</th><th>Statut</th></tr>
+        <tr><td>Taux de satisfaction globale</td><td><em>En cours – disponible à l'issue de la promotion</em></td></tr>
+        <tr><td>Nombre d'apprentis inscrits</td><td>${nbStagiaires}</td></tr>
+        <tr><td>Taux de réussite à la certification</td><td><em>En cours – disponible à l'issue des examens</em></td></tr>
+        <tr><td>Taux national</td><td>82%</td></tr>
+        <tr><td>Taux de retour enquêtes</td><td><em>En cours – enquête de fin de formation</em></td></tr>
+        <tr><td>Taux d'abandon</td><td>0% (à date)</td></tr>
+        <tr><td>Taux d'interruption de parcours</td><td>0% (à date)</td></tr>
+        <tr><td>Taux d'insertion professionnelle à 6 mois</td><td><em>En cours – mesuré à 6 mois après la sortie</em></td></tr>
+        <tr><td>Taux de rupture en alternance</td><td>0% (à date)</td></tr>
+      </table>
+      <p style="margin-top:8px"><em>Promotion ${anneeFormation} en cours – les indicateurs définitifs seront publiés à l'issue de la session${o.siteWeb && o.siteWeb.trim() ? ` sur ${isFacebookPage(o.siteWeb) ? 'la page Facebook' : 'le site internet'} de ${o.nom}` : ''}.</em></p>
+      `) : isFormationTerminee(f, stagiaires) ? `
       <table>
         <tr><th>Indicateur</th><th>Résultat</th></tr>
         <tr><td>Taux de satisfaction globale</td><td>100 / 100</td></tr>
@@ -4393,7 +4407,10 @@ function genPlaquetteCommercialeCFA(o: OrganismeInfo, f: FormationInfo, stagiair
   const parsedDate = firstDate ? new Date(firstDate + "T00:00:00") : null;
   const annee = parsedDate && !isNaN(parsedDate.getTime()) ? parsedDate.getFullYear() : new Date().getFullYear();
 
-  const indicateursContent = `<p>• Taux de satisfaction globale : 100% (${nbStagiaires} ${nbStagiaires > 1 ? "apprentis" : "apprenti"} – année ${annee})<br>• Nombre d'apprentis formés : ${nbStagiaires}<br>• Taux de réussite à la certification : 100%<br>• Taux national : 82% (source InserJeunes)<br>• Taux de retour enquêtes : 100%<br>• Taux d'abandon : 0%<br>• Taux d'interruption de parcours : 0%<br>• Taux d'insertion professionnelle à 6 mois : 85%<br>• Taux de rupture en alternance : 0%</p>`;
+  const termineCFA = isFormationTerminee(f, validStagiaires);
+  const indicateursContent = termineCFA
+    ? `<p>• Taux de satisfaction globale : 100% (${nbStagiaires} ${nbStagiaires > 1 ? "apprentis" : "apprenti"} – année ${annee})<br>• Nombre d'apprentis formés : ${nbStagiaires}<br>• Taux de réussite à la certification : 100%<br>• Taux national : 82% (source InserJeunes)<br>• Taux de retour enquêtes : 100%<br>• Taux d'abandon : 0%<br>• Taux d'interruption de parcours : 0%<br>• Taux d'insertion professionnelle à 6 mois : 85%<br>• Taux de rupture en alternance : 0%</p>`
+    : `<p><em>Promotion ${annee} en cours – les indicateurs définitifs seront publiés à l'issue de la formation.</em><br>• Nombre d'apprentis inscrits : ${nbStagiaires}<br>• Taux national : 82% (source InserJeunes)<br>• Taux de satisfaction globale : <em>en cours</em><br>• Taux de réussite à la certification : <em>en cours</em><br>• Taux d'abandon : 0% (à date)<br>• Taux d'interruption de parcours : 0% (à date)<br>• Taux de rupture en alternance : 0% (à date)<br>• Taux d'insertion professionnelle à 6 mois : <em>mesuré 6 mois après la sortie</em></p>`;
 
   // Débouchés professionnels — extraits du RNCP si dispo
   const rncp = getRNCPByCode(f.codeRNCP || "");
@@ -4455,9 +4472,10 @@ function genIndicateursResultatsCFA(o: OrganismeInfo, f: FormationInfo, stagiair
   const annee = parsedDate && !isNaN(parsedDate.getTime()) ? parsedDate.getFullYear() : new Date().getFullYear();
   const anneeSuiv = annee + 1;
 
+  const termineRes = isFormationTerminee(f, validStagiaires);
   const indicateursSection = { heading: "2. Indicateurs de résultats", content: tableHTML(
     ["Indicateur", `Résultat ${annee}`, `Objectif ${anneeSuiv}`, "Commentaire"],
-    [
+    termineRes ? [
       ["Taux de réussite à la certification", "100%", "100%", `${nbStagiaires} ${nbStagiaires > 1 ? "apprentis certifiés" : "apprenti certifié"} sur ${nbStagiaires}`],
       ["Taux de satisfaction global des apprentis", "100%", "≥ 95%", "Enquête de fin de formation – note moyenne 10/10"],
       ["Taux d'insertion professionnelle à 6 mois", "85%", "88%", "Suivi post-formation à 6 mois"],
@@ -4467,6 +4485,16 @@ function genIndicateursResultatsCFA(o: OrganismeInfo, f: FormationInfo, stagiair
       ["Taux de présence moyen", "100%", "100%", "Suivi assiduité – émargements complets"],
       ["Taux de retour enquêtes", "100%", "≥ 90%", "Tous les apprentis ont répondu"],
       ["Taux d'abandon", "0%", "< 3%", "Aucun abandon constaté"],
+    ] : [
+      ["Taux de réussite à la certification", "En cours", "100%", "Disponible à l'issue des examens"],
+      ["Taux de satisfaction global des apprentis", "En cours", "≥ 95%", "Enquête de fin de formation à administrer"],
+      ["Taux d'insertion professionnelle à 6 mois", "En cours", "88%", "Mesuré 6 mois après la sortie de formation"],
+      ["Taux de rupture de contrat d'apprentissage", "0% (à date)", "< 5%", "Aucune rupture à ce jour"],
+      ["Taux de poursuite d'études", "En cours", "35%", "Mesuré post-diplôme"],
+      ["Nombre d'apprentis inscrits", String(nbStagiaires), String(nbStagiaires + 1), `Promotion ${annee} en cours`],
+      ["Taux de présence moyen", "En cours", "100%", "Suivi assiduité en cours – émargements en cours de remplissage"],
+      ["Taux de retour enquêtes", "En cours", "≥ 90%", "Enquête à administrer en fin de formation"],
+      ["Taux d'abandon", "0% (à date)", "< 3%", "Aucun abandon constaté à ce jour"],
     ]
   ) };
 

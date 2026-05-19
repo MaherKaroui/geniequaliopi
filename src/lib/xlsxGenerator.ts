@@ -259,10 +259,13 @@ export function generateExcelTableauBordPerformance(o: OrganismeInfo, f: Formati
     countPerMonth[moisF] = nbStagiaires;
   }
 
-  // ═══ Variante CFA — Tableau synthétique 9 indicateurs (formation terminée, valeurs consolidées) ═══
+  const termine = isFormationTerminee(f, stagiaires);
+  const enCours = "En cours – formation non terminée";
+
+  // ═══ Variante CFA — Tableau synthétique 9 indicateurs ═══
   if (isCFA) {
     let cfaHtml = `<tr><th>Indicateur</th><th>Résultat ${annee}</th><th>Commentaire</th></tr>`;
-    const rows: Array<[string, string, string]> = [
+    const rows: Array<[string, string, string]> = termine ? [
       ["Taux de satisfaction globale", "100%", `Enquête de fin de formation – ${nbStagiaires} ${labelBeneficiaire}${nbStagiaires > 1 ? "s" : ""} – note moyenne 10/10.`],
       [`Nombre de ${labelBeneficiaires}`, String(nbStagiaires), `${nbStagiaires} ${labelBeneficiaire}${nbStagiaires > 1 ? "s" : ""} formé${nbStagiaires > 1 ? "s" : ""} sur la formation ${f.intitule || ""}.`],
       ["Taux de réussite à la certification", "100%", `${nbStagiaires}/${nbStagiaires} ${labelBeneficiaire}${nbStagiaires > 1 ? "s certifiés" : " certifié"}.`],
@@ -272,6 +275,16 @@ export function generateExcelTableauBordPerformance(o: OrganismeInfo, f: Formati
       ["Taux d'interruption de parcours", "0%", "Aucune interruption sur la promotion."],
       ["Taux d'insertion professionnelle", "85%", "Enquête à 6 mois après la sortie de formation (référentiel InserJeunes)."],
       ["Taux de rupture en alternance", "0%", "Aucune rupture sur la promotion – objectif < 10%."],
+    ] : [
+      ["Taux de satisfaction globale", enCours, "Enquête à administrer en fin de formation."],
+      [`Nombre de ${labelBeneficiaires} inscrits`, String(nbStagiaires), `Promotion ${annee} en cours sur la formation ${f.intitule || ""}.`],
+      ["Taux de réussite à la certification", enCours, "Disponible à l'issue des examens / soutenances."],
+      ["Taux national", "82%", "Donnée publiée par France Compétences (InserJeunes) – mise à jour annuelle."],
+      ["Taux de retour enquêtes", enCours, "Enquête de satisfaction à administrer en fin de formation."],
+      ["Taux d'abandon", "0% (à date)", "Aucun abandon constaté à ce jour – suivi pédagogique en cours."],
+      ["Taux d'interruption de parcours", "0% (à date)", "Aucune interruption à ce jour."],
+      ["Taux d'insertion professionnelle", enCours, "Mesuré à 6 mois après la sortie de formation."],
+      ["Taux de rupture en alternance", "0% (à date)", "Aucune rupture à ce jour – objectif < 10%."],
     ];
     rows.forEach(([ind, res, com]) => {
       cfaHtml += `<tr><td>${ind}</td><td>${res}</td><td>${com}</td></tr>`;
@@ -284,13 +297,24 @@ export function generateExcelTableauBordPerformance(o: OrganismeInfo, f: Formati
   mois.forEach(m => { html += `<th>${m}-${String(annee).slice(2)}</th>`; });
   html += `<th>Commentaires / analyse</th></tr>`;
 
+  // Cell value: terminated months show value, future/ongoing months show "En cours"
+  const monthIsPast = (mIdx: number): boolean => {
+    // Consider a month "past" if formation is fully terminated OR globally terminated
+    if (termine) return countPerMonth[mIdx] > 0;
+    return false;
+  };
+  const satCell = (mIdx: number) => countPerMonth[mIdx] > 0 ? (monthIsPast(mIdx) ? "100%" : "En cours") : "";
+  const reuCell = (mIdx: number) => countPerMonth[mIdx] > 0 ? (monthIsPast(mIdx) ? "100%" : "En cours") : "";
+
   // Taux de satisfaction row
   const satisfactionN1 = isVAE ? "N/A – Nouvel entrant" : "";
   html += `<tr><td rowspan="3">${f.intitule || o.nom}</td><td>Taux de satisfaction appréciation des bénéficiaires</td><td>${satisfactionN1}</td>`;
-  mois.forEach((_, i) => { html += `<td>${countPerMonth[i] > 0 ? "100%" : ""}</td>`; });
+  mois.forEach((_, i) => { html += `<td>${satCell(i)}</td>`; });
   html += `<td>${isVAE 
     ? `${o.nom} est nouvel entrant sur l'activité VAE. ${nbStagiaires} ${nbStagiaires > 1 ? labelBeneficiaires : labelBeneficiaire} accompagné${nbStagiaires > 1 ? "s" : ""} pour l'année ${annee}. Les indicateurs seront renseignés au fur et à mesure de l'activité et diffusés dès qu'ils seront significatifs.`
-    : `${f.intitule || o.nom} a reçu ${nbStagiaires} ${nbStagiaires > 1 ? labelBeneficiaires : labelBeneficiaire} pour l'année ${annee}. Nous avons été noté 10/10 sur le taux de satisfaction pour l'année ${annee} au critère 7.30. Nous communiquerons cet élément de diffusion sur notre programme de formation${o.siteWeb && o.siteWeb.trim() ? ` et sur ${isFacebookPage(o.siteWeb) ? 'notre page Facebook' : 'notre site internet'} (${o.siteWeb})` : ''}.`}</td></tr>`;
+    : (termine
+        ? `${f.intitule || o.nom} a reçu ${nbStagiaires} ${nbStagiaires > 1 ? labelBeneficiaires : labelBeneficiaire} pour l'année ${annee}. Nous avons été noté 10/10 sur le taux de satisfaction pour l'année ${annee} au critère 7.30. Nous communiquerons cet élément de diffusion sur notre programme de formation${o.siteWeb && o.siteWeb.trim() ? ` et sur ${isFacebookPage(o.siteWeb) ? 'notre page Facebook' : 'notre site internet'} (${o.siteWeb})` : ''}.`
+        : `Formation en cours – ${nbStagiaires} ${nbStagiaires > 1 ? labelBeneficiaires : labelBeneficiaire} inscrit${nbStagiaires > 1 ? "s" : ""}. Les indicateurs définitifs seront consolidés à l'issue de la session et publiés${o.siteWeb && o.siteWeb.trim() ? ` sur ${isFacebookPage(o.siteWeb) ? 'notre page Facebook' : 'notre site internet'} (${o.siteWeb})` : ''}.`)}</td></tr>`;
 
   // Nombre de bénéficiaires row
   html += `<tr><td>Nombre de ${labelBeneficiaires}</td><td>${isVAE ? "0 – Nouvel entrant" : "0"}</td>`;
@@ -300,7 +324,7 @@ export function generateExcelTableauBordPerformance(o: OrganismeInfo, f: Formati
   // Taux de réussite row (VAE specific: certification obtenue)
   const labelReussite = isVAE ? "Taux de validation (certification obtenue)" : "Taux de réussite";
   html += `<tr><td>${labelReussite}</td><td>${isVAE ? "0 – Nouvel entrant" : "0"}</td>`;
-  mois.forEach((_, i) => { html += `<td>${countPerMonth[i] > 0 ? "100%" : ""}</td>`; });
+  mois.forEach((_, i) => { html += `<td>${reuCell(i)}</td>`; });
   html += `<td>${isVAE ? `Nouvel entrant – aucun historique en ${anneeN1}. ${nbStagiaires} ${labelBeneficiaire}${nbStagiaires > 1 ? "s" : ""} en cours de validation pour ${annee}. Objectif prévisionnel : taux de validation totale ≥ 70%.` : ""}</td></tr>`;
 
   return excelWrap(`TABLEAU DE BORD INDICATEURS DE PERFORMANCE – ${annee}`, [{ name: "Tableau de bord", html }]);

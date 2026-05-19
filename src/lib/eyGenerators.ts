@@ -893,17 +893,25 @@ export function genIndicateursPerformanceEY(o: OrganismeInfo, f: FormationInfo, 
     const deb = s.dateDebutFormation || f.dateDebut || "";
     const fin = s.dateFinFormation || f.dateFin || "";
     const moisIdx = deb ? new Date(deb).getMonth() : i % 12;
+    const termS = isStagiaireFormationTerminee(s, f);
     const sat = 90 + ((i * 7 + 3) % 11); // 90-100
-    return `<tr><td ${td}>${moisNoms[moisIdx] || "—"}</td><td ${td}>${(s.nom||"").toUpperCase()}</td><td ${td}>${s.prenom||""}</td><td ${td}>${deb ? fmtDate(deb) : "—"} – ${fin ? fmtDate(fin) : "—"}</td><td ${td}>${sat} %</td><td ${td}>100 %</td></tr>`;
+    const satCell = termS ? `${sat} %` : `<em style="color:#92400e;">En cours</em>`;
+    const reuCell = termS ? `100 %` : `<em style="color:#92400e;">En cours</em>`;
+    return `<tr><td ${td}>${moisNoms[moisIdx] || "—"}</td><td ${td}>${(s.nom||"").toUpperCase()}</td><td ${td}>${s.prenom||""}</td><td ${td}>${deb ? fmtDate(deb) : "—"} – ${fin ? fmtDate(fin) : "—"}</td><td ${td}>${satCell}</td><td ${td}>${reuCell}</td></tr>`;
   }).join("");
 
+  const anyTermine = stagiaires.some(s => isStagiaireFormationTerminee(s, f));
+  const allTermine = stagiaires.length > 0 && stagiaires.every(s => isStagiaireFormationTerminee(s, f));
+  const cellOrEnCours = (val: string) => allTermine ? val : `<em style="color:#92400e;">Formation en cours</em>`;
+
   return buildDocument({ org: o, formation: f, title: `TABLEAU DE SUIVI ${yr}`, sections: [
+    ...(!allTermine ? [{ heading: "Statut", content: `<p style="padding:10px;background:#fff8e1;border-left:4px solid #f59e0b;color:#92400e;"><strong>⏳ Formation en cours</strong> — les taux de réussite, satisfaction et abandon seront consolidés à la fin de la session${anyTermine ? " (certains stagiaires sont terminés, d'autres en cours)" : ""}.</p>` }] : []),
     { heading: "Suivi des stagiaires", content: `<table style="width:100%;border-collapse:collapse;font-size:0.9em;"><thead><tr style="background:${pc()};color:#fff;"><th ${td}>Mois</th><th ${td}>Nom</th><th ${td}>Prénom</th><th ${td}>Session</th><th ${td}>Taux de satisfaction</th><th ${td}>Taux de réussite</th></tr></thead><tbody>${suiviRows}</tbody></table>` },
     { heading: "Synthèse", content: `<table style="width:100%;border-collapse:collapse;">
-      <tr><td ${tdb} style="width:50%;">Nombre total de stagiaires formés (${yr})</td><td ${td}>${n}</td></tr>
-      <tr><td ${tdb}>Taux de réussite global</td><td ${td} style="color:${pc()};font-weight:700;">100 %</td></tr>
-      <tr><td ${tdb}>Taux de satisfaction moyen</td><td ${td}>95 %</td></tr>
-      <tr><td ${tdb}>Taux d'abandon</td><td ${td}>0 %</td></tr>
+      <tr><td ${tdb} style="width:50%;">Nombre total de stagiaires ${allTermine ? "formés" : "inscrits"} (${yr})</td><td ${td}>${n}</td></tr>
+      <tr><td ${tdb}>Taux de réussite global</td><td ${td} style="${allTermine ? `color:${pc()};font-weight:700;` : ""}">${cellOrEnCours("100 %")}</td></tr>
+      <tr><td ${tdb}>Taux de satisfaction moyen</td><td ${td}>${cellOrEnCours("95 %")}</td></tr>
+      <tr><td ${tdb}>Taux d'abandon</td><td ${td}>${cellOrEnCours("0 %")}</td></tr>
     </table>` },
   ]});
 }
