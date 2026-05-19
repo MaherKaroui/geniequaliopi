@@ -8462,6 +8462,8 @@ function genEnqueteSatisfactionFormateur(o: OrganismeInfo, f: FormationInfo, sta
     { pos: "Bonne adéquation entre profils stagiaires et niveau attendu, supports clairs.", axes: "Ajouter des outils numériques d'évaluation continue.", reco: true },
   ];
 
+  const terminee = isFormationTerminee(f, stagiaires);
+
   const blocks = list.map((s, i) => {
     const globalIdx = idxOffset + i;
     const formateurNom = (s.formateur && s.formateur.trim()) || f.formateur || "[Formateur non renseigné]";
@@ -8469,12 +8471,13 @@ function genEnqueteSatisfactionFormateur(o: OrganismeInfo, f: FormationInfo, sta
     const p = patterns[globalIdx % patterns.length];
     const c = commentaires[globalIdx % commentaires.length];
     const rows = criteres.map((crit, idx) => {
+      if (!terminee) return [crit, "", "", "", ""];
       const score = p[idx];
       return [crit, score === 1 ? "X" : "", score === 2 ? "X" : "", score === 3 ? "X" : "", score === 4 ? "X" : ""];
     });
     let html = `<div class="section" style="page-break-after:always">`;
     html += `<h2>Enquête n°${globalIdx + 1} – ${formateurNom}</h2>`;
-    html += `<p><strong>Date :</strong> ${formatDate(f.dateFin)}<br>`;
+    html += `<p><strong>Date :</strong> ${terminee ? formatDate(f.dateFin) : ""}<br>`;
     html += `<strong>Nom du formateur :</strong> ${formateurNom}<br>`;
     if (traineeName) html += `<strong>Stagiaire concerné :</strong> ${traineeName}<br>`;
     html += `<strong>Formation dispensée :</strong> ${f.intitule}<br>`;
@@ -8486,10 +8489,10 @@ function genEnqueteSatisfactionFormateur(o: OrganismeInfo, f: FormationInfo, sta
       html += `<tr style="background:${bg}"><td>${r[0]}</td><td style="text-align:center">${r[1]}</td><td style="text-align:center">${r[2]}</td><td style="text-align:center">${r[3]}</td><td style="text-align:center">${r[4]}</td></tr>`;
     });
     html += `</table>`;
-    html += `<p style="margin-top:10px"><strong>Points positifs :</strong> ${c.pos}</p>`;
-    html += `<p><strong>Axes d'amélioration suggérés :</strong> ${c.axes}</p>`;
-    html += `<p><strong>Recommanderiez-vous ${o.nom} à un autre formateur ?</strong> ${c.reco ? "☒ Oui  ☐ Non" : "☐ Oui  ☒ Non"}</p>`;
-    html += `<p><strong>Signature formateur :</strong> ${formateurNom}</p>`;
+    html += `<p style="margin-top:10px"><strong>Points positifs :</strong> ${terminee ? c.pos : ""}</p>`;
+    html += `<p><strong>Axes d'amélioration suggérés :</strong> ${terminee ? c.axes : ""}</p>`;
+    html += `<p><strong>Recommanderiez-vous ${o.nom} à un autre formateur ?</strong> ${terminee ? (c.reco ? "☒ Oui  ☐ Non" : "☐ Oui  ☒ Non") : "☐ Oui  ☐ Non"}</p>`;
+    html += `<p><strong>Signature formateur :</strong> ${terminee ? formateurNom : ""}</p>`;
     html += `</div>`;
     return html;
   }).join("");
