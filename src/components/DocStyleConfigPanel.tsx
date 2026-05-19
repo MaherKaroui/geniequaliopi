@@ -322,6 +322,11 @@ function ThemeMiniPreview({ theme, primary, secondary, bodyFont, headFont }: { t
     luxe: { background: "#faf6ee", borderLeft: `2px solid ${secondary}`, padding: "4px 8px", ...common, fontFamily: bodyFont, color: primary, fontStyle: "italic" as const },
     scandinave: { background: `${primary}10`, padding: "5px 10px", ...common, fontFamily: bodyFont, color: primary, borderRadius: 12 },
     artdeco: { background: "#fbf7ee", border: `1px solid ${secondary}80`, padding: "4px 8px", ...common, fontFamily: bodyFont, color: primary },
+    consulting: { background: "#f4f6f9", borderLeft: `4px solid ${secondary}`, padding: "4px 8px", ...common, fontFamily: bodyFont, color: primary, fontWeight: 500 },
+    notarial: { background: "#fbf8f3", border: `0.5px solid ${primary}40`, padding: "4px 8px", ...common, fontFamily: bodyFont, color: primary, fontStyle: "italic" as const },
+    techstartup: { background: `linear-gradient(135deg,${primary}10,${secondary}10)`, border: `1px solid ${primary}20`, borderRadius: 10, padding: "4px 8px", ...common, fontFamily: bodyFont, color: primary },
+    botanique: { background: "#f7f3ea", borderLeft: `3px solid ${primary}`, padding: "4px 8px", ...common, fontFamily: bodyFont, color: primary, fontStyle: "italic" as const },
+    suisse: { background: "#fff", borderLeft: `4px solid ${secondary}`, padding: "4px 8px", ...common, fontFamily: bodyFont, color: "#111", fontWeight: 500 },
   };
 
   return (
