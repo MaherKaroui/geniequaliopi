@@ -300,6 +300,11 @@ function ThemeMiniPreview({ theme, primary, secondary, bodyFont, headFont }: { t
     luxe: { background: "none", color: primary, padding: "3px 4px", fontSize: 7, borderBottom: `0.5px solid ${secondary}`, fontStyle: "italic" as const, fontWeight: 600 },
     scandinave: { background: `${primary}10`, color: primary, padding: "3px 6px", fontSize: 7, borderRadius: 6 },
     artdeco: { background: primary, color: secondary, padding: "3px 4px", fontSize: 7, borderTop: `1px solid ${secondary}`, borderBottom: `1px solid ${secondary}`, textTransform: "uppercase" as const, letterSpacing: 0.5 },
+    consulting: { background: primary, color: "#fff", padding: "3px 5px", fontSize: 7, fontWeight: 700, textTransform: "uppercase" as const, letterSpacing: 0.5 },
+    notarial: { background: `${primary}10`, color: primary, padding: "3px 5px", fontSize: 7, borderBottom: `1.5px solid ${primary}`, fontStyle: "italic" as const, fontWeight: 700 },
+    techstartup: { background: `${primary}12`, color: primary, padding: "3px 5px", fontSize: 7, fontWeight: 700, borderRadius: 4 },
+    botanique: { background: `${primary}15`, color: primary, padding: "3px 5px", fontSize: 7, fontWeight: 600, borderBottom: `1px solid ${primary}40` },
+    suisse: { background: "#111", color: "#fff", padding: "3px 5px", fontSize: 7, fontWeight: 700, textTransform: "uppercase" as const },
   };
 
   const sectionStyles: Record<DocTheme, React.CSSProperties> = {
