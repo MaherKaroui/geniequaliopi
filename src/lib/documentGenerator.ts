@@ -1043,10 +1043,14 @@ function genOrganigramme(o: OrganismeInfo, f?: FormationInfo) {
 
   return buildDocument({ org: o, title: `ORGANIGRAMME ${(o.nom || "").toUpperCase()}`, extraHtml: `
     <div style="margin:30px 0;text-align:center">
-      <div style="background:#eef3fc;padding:18px 50px;border-radius:10px;display:inline-block;margin-bottom:28px;min-width:300px;border:1px solid #c7d7f5;-webkit-print-color-adjust:exact;print-color-adjust:exact">
-        <div style="color:#1e3a7b;font-weight:700;font-size:14px;margin-bottom:6px;letter-spacing:0.5px;text-transform:uppercase;font-family:Arial,sans-serif">DIRECTION GÉNÉRALE</div>
-        <div style="color:#1a1a1a;font-size:13px;font-family:Arial,sans-serif">${dir}</div>
-      </div>
+      <table style="margin:0 auto 28px auto;border-collapse:separate;border-spacing:0;width:360px">
+        <tr>
+          <td style="background:#eef3fc;border:1px solid #c7d7f5;border-radius:10px;padding:18px 22px;text-align:center;-webkit-print-color-adjust:exact;print-color-adjust:exact">
+            <div style="display:block;color:#111111 !important;font-weight:800;font-size:16px;line-height:1.25;margin:0 0 8px 0;text-transform:uppercase;font-family:Arial,sans-serif">DIRECTION GÉNÉRALE</div>
+            <div style="display:block;color:#111111 !important;font-weight:600;font-size:14px;line-height:1.25;margin:0;font-family:Arial,sans-serif">${dir}</div>
+          </td>
+        </tr>
+      </table>
       <table style="margin:0 auto;border-collapse:separate;border-spacing:0">
         <tr>
           ${box("Référent Pédagogique", refPeda)}
