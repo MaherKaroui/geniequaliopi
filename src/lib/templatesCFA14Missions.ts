@@ -1261,37 +1261,53 @@ export function genQCMMissionCFA(
   const lundi = isoMondayOf(startStr);
   lundi.setDate(lundi.getDate() + (missionNumero - 1) * 28 + 4); // vendredi semaine école N
   const dateRef = lundi.toISOString().slice(0, 10);
-  const answers = pickStudentAnswers(stagiaire, missionNumero, mission.questions);
-  const score = answers.reduce((acc, a, i) => acc + (a === mission.questions[i].correctIndex ? 1 : 0), 0);
+
+  // Si la date du QCM n'est pas encore passée (formation pas encore arrivée à cette
+  // semaine d'école), on laisse la copie vierge : pas de réponse cochée, pas de score,
+  // pas de signature. Conforme à la règle « formation non terminée → pas de QCM rempli ».
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const qcmDate = new Date(dateRef);
+  const isFuture = qcmDate.getTime() > today.getTime();
+
+  const answers = isFuture
+    ? mission.questions.map(() => -1)
+    : pickStudentAnswers(stagiaire, missionNumero, mission.questions);
+  const score = isFuture
+    ? 0
+    : answers.reduce((acc, a, i) => acc + (a === mission.questions[i].correctIndex ? 1 : 0), 0);
 
   const rows = mission.questions.map((q, qi) => [
     `<strong>Q${qi + 1}.</strong> ${q.q}`,
     q.options
       .map((opt, oi) => {
-        const isCorrect = oi === q.correctIndex;
-        const isPicked = oi === answers[qi];
+        const isPicked = !isFuture && oi === answers[qi];
         const mark = isPicked ? "☒" : "☐";
+        // En mode vierge (avenir) : pas de surlignage de la bonne réponse
+        const isCorrect = !isFuture && oi === q.correctIndex;
         const style = isCorrect ? "color:#0a7d3a;font-weight:600;" : isPicked && !isCorrect ? "color:#c0392b;" : "";
         return `<div style="${style}">${mark} ${String.fromCharCode(65 + oi)}. ${opt}</div>`;
       })
       .join(""),
-    answers[qi] === q.correctIndex ? "<span style='color:#0a7d3a;font-weight:600;'>✔ Correct</span>" : "<span style='color:#c0392b;'>✘ Incorrect</span>",
+    isFuture
+      ? "<span style='color:#777;'>— À compléter —</span>"
+      : (answers[qi] === q.correctIndex ? "<span style='color:#0a7d3a;font-weight:600;'>✔ Correct</span>" : "<span style='color:#c0392b;'>✘ Incorrect</span>"),
   ]);
 
-  // Build the questions table separately so the PDF exporter can split it row-by-row
-  // (tables wrapped inside <div class="section"> are treated as a single block and overflow,
-  //  which causes the heading to land alone on a page and rows Q8-Q10 to be clipped).
-  const questionsTableHtml = `<h2>Questionnaire et corrigé</h2>${tableHTML(["Question", "Propositions (☒ = réponse de l'apprenti·e)", "Résultat"], rows)}`;
+  const questionsTableHtml = `<h2>Questionnaire${isFuture ? "" : " et corrigé"}</h2>${tableHTML(["Question", `Propositions ${isFuture ? "(☐ à cocher par l'apprenti·e le jour du QCM)" : "(☒ = réponse de l'apprenti·e)"}`, "Résultat"], rows)}`;
 
-  const resultatGlobalHtml = `<h2>Résultat global</h2><div class="section"><p style="font-size:1.05em;"><strong>Score : ${score} / ${mission.questions.length}</strong> — Note : <strong>${Math.round((score / mission.questions.length) * 20)}/20</strong></p>
-    <p>Appréciation : ${score >= 8 ? "Acquis — bonne maîtrise des notions de la mission." : score >= 6 ? "Partiellement acquis — quelques notions à revoir." : "À retravailler — un point pédagogique sera proposé."}</p></div>`;
+  const resultatGlobalHtml = isFuture
+    ? `<h2>Résultat global</h2><div class="section"><p style="font-size:1.05em;color:#777;"><strong>QCM à passer le ${formatDate(dateRef)}</strong> — non encore réalisé à ce jour.</p>
+        <p>Score et appréciation seront renseignés à l'issue de la session.</p></div>`
+    : `<h2>Résultat global</h2><div class="section"><p style="font-size:1.05em;"><strong>Score : ${score} / ${mission.questions.length}</strong> — Note : <strong>${Math.round((score / mission.questions.length) * 20)}/20</strong></p>
+        <p>Appréciation : ${score >= 8 ? "Acquis — bonne maîtrise des notions de la mission." : score >= 6 ? "Partiellement acquis — quelques notions à revoir." : "À retravailler — un point pédagogique sera proposé."}</p></div>`;
 
   const formateurNom = (stagiaire as any).formateurAssigne || (f as any).formateur || o.dirigeant || o.nom;
-  const sigApp = (stagiaire as any).signatureUrl ? `<img src="${(stagiaire as any).signatureUrl}" alt="signature" style="max-height:60px;margin-top:6px;">` : "";
-  const sigForm = (o as any).signatureUrl ? `<img src="${(o as any).signatureUrl}" alt="signature" style="max-height:60px;margin-top:6px;">` : "";
+  const sigApp = !isFuture && (stagiaire as any).signatureUrl ? `<img src="${(stagiaire as any).signatureUrl}" alt="signature" style="max-height:60px;margin-top:6px;">` : "";
+  const sigForm = !isFuture && (o as any).signatureUrl ? `<img src="${(o as any).signatureUrl}" alt="signature" style="max-height:60px;margin-top:6px;">` : "";
+  const dateCell = isFuture ? "Fait le ……………" : `Fait le <strong>${formatDate(dateRef)}</strong>`;
   const signaturesHtml = `<h2>Signatures</h2><table style="width:100%;margin-top:20px;border-collapse:collapse;"><tr>
-    <td style="width:50%;padding:12px;border:1px solid #ccc;vertical-align:top;"><strong>Apprenti·e</strong><br>${stagiaire.prenom} ${stagiaire.nom}<br>Fait le <strong>${formatDate(dateRef)}</strong>${sigApp}<br><br></td>
-    <td style="width:50%;padding:12px;border:1px solid #ccc;vertical-align:top;"><strong>Formateur·rice / Référent CFA</strong><br>${formateurNom}<br>Fait le <strong>${formatDate(dateRef)}</strong>${sigForm}<br><br></td>
+    <td style="width:50%;padding:12px;border:1px solid #ccc;vertical-align:top;"><strong>Apprenti·e</strong><br>${stagiaire.prenom} ${stagiaire.nom}<br>${dateCell}${sigApp}<br><br></td>
+    <td style="width:50%;padding:12px;border:1px solid #ccc;vertical-align:top;"><strong>Formateur·rice / Référent CFA</strong><br>${formateurNom}<br>${dateCell}${sigForm}<br><br></td>
   </tr></table>`;
 
   return buildDocument({
@@ -1304,14 +1320,17 @@ export function genQCMMissionCFA(
           <tr><td style="padding:4px 8px;"><strong>Apprenti·e</strong></td><td>${stagiaire.prenom} ${stagiaire.nom}</td></tr>
           <tr><td style="padding:4px 8px;"><strong>Formation</strong></td><td>${f.intitule || ""}</td></tr>
           <tr><td style="padding:4px 8px;"><strong>Mission évaluée</strong></td><td>${mission.titre}</td></tr>
-          <tr><td style="padding:4px 8px;"><strong>Date</strong></td><td>${formatDate(dateRef)}</td></tr>
+          <tr><td style="padding:4px 8px;"><strong>Date${isFuture ? " prévue" : ""}</strong></td><td>${formatDate(dateRef)}${isFuture ? " <em>(à venir)</em>" : ""}</td></tr>
           <tr><td style="padding:4px 8px;"><strong>Durée</strong></td><td>20 minutes</td></tr>
           <tr><td style="padding:4px 8px;"><strong>Modalité</strong></td><td>QCM individuel — 1 réponse correcte par question</td></tr>
+          <tr><td style="padding:4px 8px;"><strong>Statut</strong></td><td>${isFuture ? "⏳ <strong>À compléter</strong> — QCM non encore passé" : "✔ Réalisé"}</td></tr>
         </table>`,
       },
       {
         heading: "Consignes",
-        content: `<p>Pour chaque question, cochez la <strong>seule</strong> bonne réponse. La case ☒ correspond à la réponse retenue par l'apprenti·e ; les bonnes réponses apparaissent en vert pour la correction.</p>`,
+        content: isFuture
+          ? `<p>Pour chaque question, l'apprenti·e devra cocher la <strong>seule</strong> bonne réponse à l'aide de la case ☐. Le formateur procédera ensuite à la correction.</p>`
+          : `<p>Pour chaque question, cochez la <strong>seule</strong> bonne réponse. La case ☒ correspond à la réponse retenue par l'apprenti·e ; les bonnes réponses apparaissent en vert pour la correction.</p>`,
       },
     ],
     extraHtml: questionsTableHtml + resultatGlobalHtml + signaturesHtml,
