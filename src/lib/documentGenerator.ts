@@ -263,7 +263,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     }
     case "rapport_connexion": return genRapportConnexion(o, f, stagiaires);
     case "temps_connexion": return genTempsConnexion(o, f, stagiaires);
-    case "temps_connexion_reel": return genTempsConnexionReel(o, f, stagiaires);
+    case "temps_connexion_reel": return genTempsConnexionReel(o, f, stagiaires, params?.stagiaireIdx);
     case "tableau_presence": return genTableauPresence(o, f, stagiaires);
     case "eval_positionnement_remplie": return genEvalPositionnement(o, f, stagiaires);
     case "eval_intermediaire_remplie": return genEvalIntermediaire(o, f, stagiaires);
