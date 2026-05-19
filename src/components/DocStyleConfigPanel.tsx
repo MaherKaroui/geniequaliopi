@@ -93,6 +93,31 @@ const THEME_PRESETS: ThemePreset[] = [
     description: "Géométrie dorée, doubles filets, symétrie, années 1920 chic",
     defaults: { primaryColor: "#0b1d2a", secondaryColor: "#c9a14a", fontFamily: "'Cormorant Garamond', serif", headingFont: "'DM Serif Display', serif" }
   },
+  {
+    id: "consulting", name: "Consulting (McKinsey)",
+    description: "Bandeau bleu nuit, KPI mis en avant, tableaux denses, look cabinet de conseil",
+    defaults: { primaryColor: "#051c2c", secondaryColor: "#00a3e0", fontFamily: "'Inter', sans-serif", headingFont: "'Inter', sans-serif", fontSize: 12 }
+  },
+  {
+    id: "notarial", name: "Notarial / Officiel",
+    description: "Filigrane bordeaux, sérif classique, numérotation, esprit étude notariale",
+    defaults: { primaryColor: "#5e1a1a", secondaryColor: "#8b6f3a", fontFamily: "'EB Garamond', serif", headingFont: "'EB Garamond', serif", fontSize: 14 }
+  },
+  {
+    id: "techstartup", name: "Tech Startup",
+    description: "Dégradés indigo/cyan, cartes arrondies, tags pilule, look SaaS moderne",
+    defaults: { primaryColor: "#4f46e5", secondaryColor: "#06b6d4", fontFamily: "'Inter', sans-serif", headingFont: "'Plus Jakarta Sans', sans-serif" }
+  },
+  {
+    id: "botanique", name: "Botanique Premium",
+    description: "Vert forêt profond sur crème, sérif douce, filigranes feuilles, raffiné nature",
+    defaults: { primaryColor: "#2c4a2a", secondaryColor: "#a87c4f", fontFamily: "'Lora', serif", headingFont: "'Fraunces', serif" }
+  },
+  {
+    id: "suisse", name: "Suisse / Helvetica",
+    description: "Grille stricte, rouge pur, sans-serif géométrique, design Swiss style",
+    defaults: { primaryColor: "#1a1a1a", secondaryColor: "#e30613", fontFamily: "'Inter', sans-serif", headingFont: "'Inter', sans-serif" }
+  },
 ];
 
 const FONT_CATEGORIES = [
@@ -253,6 +278,11 @@ function ThemeMiniPreview({ theme, primary, secondary, bodyFont, headFont }: { t
     luxe: { color: primary, fontFamily: headFont, fontWeight: 400, fontSize: 13, borderTop: `1px solid ${secondary}`, borderBottom: `1px solid ${secondary}`, padding: "3px 0", textAlign: "center" as const, letterSpacing: 2, textTransform: "uppercase" as const },
     scandinave: { background: `${primary}18`, color: primary, padding: "4px 10px", borderRadius: 20, fontFamily: headFont, fontWeight: 600, fontSize: 11 },
     artdeco: { color: secondary, fontFamily: headFont, fontWeight: 700, fontSize: 12, textAlign: "center" as const, borderTop: `3px double ${secondary}`, borderBottom: `3px double ${secondary}`, padding: "3px 0", letterSpacing: 3, textTransform: "uppercase" as const },
+    consulting: { background: primary, color: "#fff", padding: "5px 10px", fontFamily: headFont, fontWeight: 700, fontSize: 11, borderLeft: `4px solid ${secondary}` },
+    notarial: { color: primary, fontFamily: headFont, fontWeight: 700, fontSize: 12, fontStyle: "italic" as const, borderBottom: `2px solid ${primary}`, paddingBottom: 3, textAlign: "center" as const },
+    techstartup: { background: `linear-gradient(135deg,${primary},${secondary})`, color: "#fff", padding: "5px 12px", borderRadius: 10, fontFamily: headFont, fontWeight: 700, fontSize: 11 },
+    botanique: { color: primary, fontFamily: headFont, fontWeight: 600, fontSize: 12, fontStyle: "italic" as const, borderBottom: `1px solid ${secondary}80`, paddingBottom: 3 },
+    suisse: { color: "#111", fontFamily: headFont, fontWeight: 800, fontSize: 14, letterSpacing: -0.5, borderLeft: `4px solid ${secondary}`, paddingLeft: 6 },
   };
 
   const thStyles: Record<DocTheme, React.CSSProperties> = {
@@ -270,6 +300,11 @@ function ThemeMiniPreview({ theme, primary, secondary, bodyFont, headFont }: { t
     luxe: { background: "none", color: primary, padding: "3px 4px", fontSize: 7, borderBottom: `0.5px solid ${secondary}`, fontStyle: "italic" as const, fontWeight: 600 },
     scandinave: { background: `${primary}10`, color: primary, padding: "3px 6px", fontSize: 7, borderRadius: 6 },
     artdeco: { background: primary, color: secondary, padding: "3px 4px", fontSize: 7, borderTop: `1px solid ${secondary}`, borderBottom: `1px solid ${secondary}`, textTransform: "uppercase" as const, letterSpacing: 0.5 },
+    consulting: { background: primary, color: "#fff", padding: "3px 5px", fontSize: 7, fontWeight: 700, textTransform: "uppercase" as const, letterSpacing: 0.5 },
+    notarial: { background: `${primary}10`, color: primary, padding: "3px 5px", fontSize: 7, borderBottom: `1.5px solid ${primary}`, fontStyle: "italic" as const, fontWeight: 700 },
+    techstartup: { background: `${primary}12`, color: primary, padding: "3px 5px", fontSize: 7, fontWeight: 700, borderRadius: 4 },
+    botanique: { background: `${primary}15`, color: primary, padding: "3px 5px", fontSize: 7, fontWeight: 600, borderBottom: `1px solid ${primary}40` },
+    suisse: { background: "#111", color: "#fff", padding: "3px 5px", fontSize: 7, fontWeight: 700, textTransform: "uppercase" as const },
   };
 
   const sectionStyles: Record<DocTheme, React.CSSProperties> = {
@@ -287,6 +322,11 @@ function ThemeMiniPreview({ theme, primary, secondary, bodyFont, headFont }: { t
     luxe: { background: "#faf6ee", borderLeft: `2px solid ${secondary}`, padding: "4px 8px", ...common, fontFamily: bodyFont, color: primary, fontStyle: "italic" as const },
     scandinave: { background: `${primary}10`, padding: "5px 10px", ...common, fontFamily: bodyFont, color: primary, borderRadius: 12 },
     artdeco: { background: "#fbf7ee", border: `1px solid ${secondary}80`, padding: "4px 8px", ...common, fontFamily: bodyFont, color: primary },
+    consulting: { background: "#f4f6f9", borderLeft: `4px solid ${secondary}`, padding: "4px 8px", ...common, fontFamily: bodyFont, color: primary, fontWeight: 500 },
+    notarial: { background: "#fbf8f3", border: `0.5px solid ${primary}40`, padding: "4px 8px", ...common, fontFamily: bodyFont, color: primary, fontStyle: "italic" as const },
+    techstartup: { background: `linear-gradient(135deg,${primary}10,${secondary}10)`, border: `1px solid ${primary}20`, borderRadius: 10, padding: "4px 8px", ...common, fontFamily: bodyFont, color: primary },
+    botanique: { background: "#f7f3ea", borderLeft: `3px solid ${primary}`, padding: "4px 8px", ...common, fontFamily: bodyFont, color: primary, fontStyle: "italic" as const },
+    suisse: { background: "#fff", borderLeft: `4px solid ${secondary}`, padding: "4px 8px", ...common, fontFamily: bodyFont, color: "#111", fontWeight: 500 },
   };
 
   return (
