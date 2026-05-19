@@ -1043,11 +1043,23 @@ function genOrganigramme(o: OrganismeInfo, f?: FormationInfo) {
 
   return buildDocument({ org: o, title: `ORGANIGRAMME ${(o.nom || "").toUpperCase()}`, extraHtml: `
     <div style="margin:30px 0;text-align:center">
-      <div style="background:#1e3a7b;color:#ffffff;padding:18px 50px;border-radius:10px;display:inline-block;margin-bottom:28px;min-width:280px">
-        <div style="color:#ffffff;font-weight:700;font-size:14px;margin-bottom:6px;letter-spacing:0.5px;text-transform:uppercase">Direction Générale</div>
-        <div style="color:#ffffff;font-size:15px">${dir}</div>
+      <div style="background:#1e3a7b !important;padding:20px 50px;border-radius:10px;display:inline-block;margin-bottom:28px;min-width:300px;border:2px solid #1e3a7b;-webkit-print-color-adjust:exact;print-color-adjust:exact">
+        <div style="color:#ffffff !important;font-weight:800;font-size:15px;margin-bottom:8px;letter-spacing:1px;text-transform:uppercase;font-family:Arial,sans-serif">DIRECTION GÉNÉRALE</div>
+        <div style="color:#ffffff !important;font-size:16px;font-weight:600;font-family:Arial,sans-serif">${dir}</div>
       </div>
       <table style="margin:0 auto;border-collapse:separate;border-spacing:0">
+        <tr>
+          ${box("Référent Pédagogique", refPeda)}
+          ${box("Référent Administratif", refAdmin)}
+          ${box("Référent Qualité", refQualite)}
+        </tr>
+        <tr>
+          <td style="padding:10px"></td>
+          ${box("Référent Handicap", refHandi)}
+          ${box("Formateur", formateur)}
+        </tr>
+      </table>
+    </div>` });
         <tr>
           ${box("Référent Pédagogique", refPeda)}
           ${box("Référent Administratif", refAdmin)}
