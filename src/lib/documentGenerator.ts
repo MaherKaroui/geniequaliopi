@@ -2503,7 +2503,7 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
 
     <h2>15. Indicateurs de performance – Année ${anneeFormation}</h2>
     <div class="section">
-      ${isCFA ? `
+      ${isCFA ? (isFormationTerminee(f, stagiaires) ? `
       <table>
         <tr><th style="width:55%">Indicateur</th><th>Résultat</th></tr>
         <tr><td>Taux de satisfaction globale</td><td>100%</td></tr>
@@ -2517,7 +2517,21 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
         <tr><td>Taux de rupture en alternance</td><td>0%</td></tr>
       </table>
       <p style="margin-top:8px"><em>Indicateurs consolidés à l'issue de la promotion ${anneeFormation} – ${nbStagiaires} ${nbStagiaires > 1 ? "apprentis" : "apprenti"}. Données publiées annuellement (InserJeunes / France Compétences)${o.siteWeb && o.siteWeb.trim() ? ` sur ${isFacebookPage(o.siteWeb) ? 'la page Facebook' : 'le site internet'} de ${o.nom}` : ''}.</em></p>
-      ` : isFormationTerminee(f, stagiaires) ? `
+      ` : `
+      <table>
+        <tr><th style="width:55%">Indicateur</th><th>Statut</th></tr>
+        <tr><td>Taux de satisfaction globale</td><td><em>En cours – disponible à l'issue de la promotion</em></td></tr>
+        <tr><td>Nombre d'apprentis inscrits</td><td>${nbStagiaires}</td></tr>
+        <tr><td>Taux de réussite à la certification</td><td><em>En cours – disponible à l'issue des examens</em></td></tr>
+        <tr><td>Taux national</td><td>82%</td></tr>
+        <tr><td>Taux de retour enquêtes</td><td><em>En cours – enquête de fin de formation</em></td></tr>
+        <tr><td>Taux d'abandon</td><td>0% (à date)</td></tr>
+        <tr><td>Taux d'interruption de parcours</td><td>0% (à date)</td></tr>
+        <tr><td>Taux d'insertion professionnelle à 6 mois</td><td><em>En cours – mesuré à 6 mois après la sortie</em></td></tr>
+        <tr><td>Taux de rupture en alternance</td><td>0% (à date)</td></tr>
+      </table>
+      <p style="margin-top:8px"><em>Promotion ${anneeFormation} en cours – les indicateurs définitifs seront publiés à l'issue de la session${o.siteWeb && o.siteWeb.trim() ? ` sur ${isFacebookPage(o.siteWeb) ? 'la page Facebook' : 'le site internet'} de ${o.nom}` : ''}.</em></p>
+      `) : isFormationTerminee(f, stagiaires) ? `
       <table>
         <tr><th>Indicateur</th><th>Résultat</th></tr>
         <tr><td>Taux de satisfaction globale</td><td>100 / 100</td></tr>
