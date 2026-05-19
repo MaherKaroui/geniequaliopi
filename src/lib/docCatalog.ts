@@ -132,7 +132,8 @@ export function buildFullCatalog(
     formations.forEach((f, fi) => {
       const moda = (f.modalites || '').toLowerCase();
       const distanciel = moda.includes('distanciel') || moda.includes('e-learning') || moda.includes('foad');
-      const presentiel = !distanciel || moda.includes('mixte');
+      const mixte = moda.includes('mixte');
+      const presentiel = !distanciel || mixte;
       // Check if stagiaires have individual dates
       const hasIndivDates = stagiaires.some(s => s.dateDebutFormation || s.dateFinFormation);
       if (presentiel) {
@@ -145,8 +146,15 @@ export function buildFullCatalog(
           add(`af_c3i11_emargement_${fi}`, `CT3 - IND 11 FEUILLE D'ÉMARGEMENT`, 3, 11, "emargement_jour", { fi });
         }
       }
-      if (distanciel || moda.includes('mixte')) {
-        add(`af_c3i11_temps_connexion_${fi}`, `CT3 - IND 11 TEMPS DE CONNEXION RÉEL`, 3, 11, "temps_connexion_reel", { fi });
+      if (distanciel || mixte) {
+        if (hasIndivDates) {
+          // Distanciel : remplace la feuille d'émargement par un relevé de temps de connexion par stagiaire
+          stagiaires.forEach((s, si) => {
+            add(`af_c3i11_temps_connexion_${fi}_${si}`, `CT3 - IND 11 TEMPS DE CONNEXION RÉEL – ${s.prenom} ${s.nom}`, 3, 11, "temps_connexion_reel", { fi, stagiaireIdx: si });
+          });
+        } else {
+          add(`af_c3i11_temps_connexion_${fi}`, `CT3 - IND 11 TEMPS DE CONNEXION RÉEL`, 3, 11, "temps_connexion_reel", { fi });
+        }
       }
     });
     // Documents individuels per-stagiaire IND 11
