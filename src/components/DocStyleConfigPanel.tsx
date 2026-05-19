@@ -93,6 +93,31 @@ const THEME_PRESETS: ThemePreset[] = [
     description: "Géométrie dorée, doubles filets, symétrie, années 1920 chic",
     defaults: { primaryColor: "#0b1d2a", secondaryColor: "#c9a14a", fontFamily: "'Cormorant Garamond', serif", headingFont: "'DM Serif Display', serif" }
   },
+  {
+    id: "consulting", name: "Consulting (McKinsey)",
+    description: "Bandeau bleu nuit, KPI mis en avant, tableaux denses, look cabinet de conseil",
+    defaults: { primaryColor: "#051c2c", secondaryColor: "#00a3e0", fontFamily: "'Inter', sans-serif", headingFont: "'Inter', sans-serif", fontSize: 12 }
+  },
+  {
+    id: "notarial", name: "Notarial / Officiel",
+    description: "Filigrane bordeaux, sérif classique, numérotation, esprit étude notariale",
+    defaults: { primaryColor: "#5e1a1a", secondaryColor: "#8b6f3a", fontFamily: "'EB Garamond', serif", headingFont: "'EB Garamond', serif", fontSize: 14 }
+  },
+  {
+    id: "techstartup", name: "Tech Startup",
+    description: "Dégradés indigo/cyan, cartes arrondies, tags pilule, look SaaS moderne",
+    defaults: { primaryColor: "#4f46e5", secondaryColor: "#06b6d4", fontFamily: "'Inter', sans-serif", headingFont: "'Plus Jakarta Sans', sans-serif" }
+  },
+  {
+    id: "botanique", name: "Botanique Premium",
+    description: "Vert forêt profond sur crème, sérif douce, filigranes feuilles, raffiné nature",
+    defaults: { primaryColor: "#2c4a2a", secondaryColor: "#a87c4f", fontFamily: "'Lora', serif", headingFont: "'Fraunces', serif" }
+  },
+  {
+    id: "suisse", name: "Suisse / Helvetica",
+    description: "Grille stricte, rouge pur, sans-serif géométrique, design Swiss style",
+    defaults: { primaryColor: "#1a1a1a", secondaryColor: "#e30613", fontFamily: "'Inter', sans-serif", headingFont: "'Inter', sans-serif" }
+  },
 ];
 
 const FONT_CATEGORIES = [
