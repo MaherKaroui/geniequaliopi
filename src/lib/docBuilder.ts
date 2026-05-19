@@ -745,6 +745,13 @@ function tamponImg(url: string | undefined): string {
 
 function resolveSignature(label: string, nom: string, urls: SignatureUrls): string {
   const l = label.toLowerCase();
+  // Specific CFA Conseil de Perfectionnement overrides
+  if (l.includes('directeur du cfa')) {
+    return tamponImg(urls.tamponUrl);
+  }
+  if (l.includes('secrétaire de séance')) {
+    return sigImg(urls.dirigeantSignatureUrl, "Signature dirigeant");
+  }
   // Organisme / Cachet → tampon only
   if ((/organisme|cachet/i.test(l) && !/responsable/i.test(l)) || l === 'cachet') {
     return tamponImg(urls.tamponUrl);
