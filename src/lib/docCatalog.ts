@@ -666,10 +666,20 @@ export function buildFullCatalog(
     add("cfa_c1i1_livret_accueil", "CT1 - IND 1 LIVRET D'ACCUEIL CFA", 1, 1, "livret_accueil_cfa");
     add("cfa_procedure_psh", "Procédure PSH CFA", 6, 26, "procedure_psh_cfa");
     // ===== IND 11 — Évaluation de l'atteinte des objectifs (CFA) =====
-    // Émargement CFA — UNE FEUILLE PAR APPRENTI (chaque apprenti = 1 fichier dédié)
+    // Émargement CFA / Temps de connexion selon modalité — UNE FEUILLE PAR APPRENTI
     formations.forEach((f, fi) => {
+      const moda = (f.modalites || '').toLowerCase();
+      const distanciel = moda.includes('distanciel') || moda.includes('e-learning') || moda.includes('foad');
+      const mixte = moda.includes('mixte');
       stagiaires.forEach((s, si) => {
-        add(`cfa_c3i11_emargement_${fi}_${si}`, `CT3 - IND 11 FEUILLE D'ÉMARGEMENT CFA – ${s.prenom} ${s.nom}`, 3, 11, "emargement_cfa_stagiaire", { fi, stagiaireIdx: si });
+        if (distanciel && !mixte) {
+          add(`cfa_c3i11_temps_connexion_${fi}_${si}`, `CT3 - IND 11 TEMPS DE CONNEXION RÉEL CFA – ${s.prenom} ${s.nom}`, 3, 11, "temps_connexion_reel", { fi, stagiaireIdx: si });
+        } else {
+          add(`cfa_c3i11_emargement_${fi}_${si}`, `CT3 - IND 11 FEUILLE D'ÉMARGEMENT CFA – ${s.prenom} ${s.nom}`, 3, 11, "emargement_cfa_stagiaire", { fi, stagiaireIdx: si });
+          if (mixte) {
+            add(`cfa_c3i11_temps_connexion_${fi}_${si}`, `CT3 - IND 11 TEMPS DE CONNEXION RÉEL CFA – ${s.prenom} ${s.nom}`, 3, 11, "temps_connexion_reel", { fi, stagiaireIdx: si });
+          }
+        }
       });
     });
     // Documents individuels per-stagiaire IND 11 CFA
