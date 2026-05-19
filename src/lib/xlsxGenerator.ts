@@ -1010,7 +1010,17 @@ export function generateExcelCalendrierOPCO(
 
 // Helper to generate Excel blob
 export function excelToBlob(htmlContent: string): Blob {
-  return new Blob(["\ufeff", htmlContent], { type: "application/vnd.ms-excel" });
+  // Convert the HTML-based workbook into a real .xlsx file so that files
+  // saved with a .xlsx extension open correctly in Excel/LibreOffice.
+  // Fallback to the legacy HTML (.xls) blob if conversion fails for any reason.
+  try {
+    // Dynamic require to avoid a circular import at module init time.
+    const { htmlToXlsxBlob } = require("./htmlToXlsx") as typeof import("./htmlToXlsx");
+    return htmlToXlsxBlob(htmlContent);
+  } catch (e) {
+    console.warn("[excelToBlob] fallback to HTML .xls blob:", e);
+    return new Blob(["\ufeff", htmlContent], { type: "application/vnd.ms-excel" });
+  }
 }
 
 // ===== BDC : Registre des bénéficiaires =====
