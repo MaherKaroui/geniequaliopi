@@ -4301,6 +4301,45 @@ function genPVConseilPerfectionnement(o: OrganismeInfo, f: FormationInfo, stagia
   ], signatures: { type: "2", labels: ["Le Directeur du CFA", "Le Secrétaire de séance"], names: [o.dirigeant || o.nom, o.responsablePedagogique || ""] } });
 }
 
+function genConvocationConseilPerfectionnement(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
+  const now = new Date();
+  const dateReunion = f.dateDebut ? (() => {
+    const d = new Date(f.dateDebut);
+    d.setMonth(d.getMonth() + 3);
+    return formatDate(d.toISOString().slice(0, 10));
+  })() : formatDate(new Date(now.getFullYear(), 9, 13).toISOString().slice(0, 10));
+  const dateLimite = f.dateDebut ? (() => {
+    const d = new Date(f.dateDebut);
+    d.setMonth(d.getMonth() + 2);
+    d.setDate(d.getDate() + 15);
+    return formatDate(d.toISOString().slice(0, 10));
+  })() : "";
+  const lieu = `${o.adresse || ""}${o.codePostal ? `, ${o.codePostal}` : ""}${o.ville ? ` ${o.ville}` : ""}`.trim() || o.nom;
+
+  return buildDocument({ org: o, title: "CONVOCATION AU CONSEIL DE PERFECTIONNEMENT", subtitle: o.nom, sections: [
+    { heading: "Informations sur la réunion", content: `<p><strong>Date de la réunion :</strong> ${dateReunion}<br><strong>Lieu :</strong> ${lieu}<br><strong>Mode de réunion :</strong> Présentiel / Distanciel (selon disponibilités des participants)</p>` },
+    { heading: "Ordre du jour", content: `<ol>
+      <li><strong>Introduction et objectifs de la réunion</strong><ul><li>Rappel du rôle du Conseil de Perfectionnement</li><li>Validation de l'ordre du jour</li></ul></li>
+      <li><strong>Analyse des actions menées depuis la dernière réunion</strong><ul><li>Points positifs et axes d'amélioration</li><li>Bilan des formations et satisfaction des parties prenantes</li></ul></li>
+      <li><strong>Mise à jour des référents et leurs missions</strong><ul>${o.referentHandicap ? `<li>${o.referentHandicap} — Référent handicap et pédagogique</li>` : `<li>Référent handicap et pédagogique</li>`}${o.referentQualite ? `<li>${o.referentQualite} — Référent(e) qualité</li>` : `<li>Référent(e) qualité</li>`}<li>Référent mobilité nationale et internationale</li></ul></li>
+      <li><strong>Plan d'action pour l'année à venir</strong><ul><li>Amélioration de l'accessibilité des formations</li><li>Développement des programmes de mobilité</li><li>Mise en conformité avec les normes Qualiopi</li></ul></li>
+      <li><strong>Divers et questions ouvertes</strong></li>
+    </ol>` },
+    { heading: "Participants attendus", content: `<ul><li>Direction de ${o.nom}</li><li>Référents (Handicap, Mobilité, Qualité, Pédagogique)</li><li>Formateurs</li><li>Représentants des entreprises partenaires</li><li>Apprenants représentants</li></ul>` },
+    { heading: "Confirmation de présence", content: `<p>Merci de confirmer votre présence avant le ${dateLimite || "[date limite]"} en contactant <strong>${o.email || ""}</strong>${o.telephone ? ` ou au <strong>${o.telephone}</strong>` : ""}.</p>` },
+  ], signatures: { type: "1", labels: ["La Direction"], names: [o.dirigeant || o.nom] } });
+}
+
+function genFicheReferentMobiliteCFA(o: OrganismeInfo, f: FormationInfo) {
+  return buildDocument({ org: o, title: "RÉFÉRENT MOBILITÉ NATIONALE ET INTERNATIONALE", subtitle: o.nom, sections: [
+    { heading: "Contact", content: `<p><strong>Mail :</strong> ${o.email || ""}${o.telephone ? `<br><strong>Téléphone :</strong> ${o.telephone}` : ""}</p>` },
+    { heading: "Rôle du Référent Mobilité", content: `<p>Le <strong>référent mobilité nationale et internationale</strong> à ${o.nom} est l'interlocuteur privilégié des apprentis et des stagiaires en situation de mobilité nationale et internationale qui souhaitent poursuivre tout ou partie de leur formation dans une région différente ou à l'étranger. Il apporte aux apprentis et aux stagiaires concernés des réponses personnalisées, adaptées à leurs besoins et à leur situation.</p><p>Il <strong>coordonne également les acteurs de l'accompagnement de l'apprenti</strong> dans son parcours de formation et vers l'emploi.</p><p>Le référent mobilité est missionné pour <strong>intervenir auprès des différents acteurs du parcours de formation de l'apprenti ou du stagiaire</strong>. Ainsi, il travaille aussi bien auprès de l'apprenti et de sa famille, qu'auprès de l'équipe pédagogique et administrative. Enfin, il peut intervenir auprès de son employeur, maître d'apprentissage ou tuteur en entreprise.</p>` },
+    { heading: "Les actions du Référent Mobilité", content: `<p><strong>Il favorise :</strong></p><ul><li>L'accueil des candidats (en amont et durant le cursus)</li><li>La sécurisation du parcours de formation des apprentis en mobilité (y compris pour les examens)</li><li>Leur orientation</li><li>Leur insertion professionnelle</li><li>Et leur accompagnement sur leur lieu d'emploi (en lien avec leur maître d'apprentissage et l'équipe tutorale)</li></ul><p>Il <strong>écoute et dialogue avec les apprentis et stagiaires</strong> afin de les aider à préciser, mettre en œuvre et sécuriser leur projet de formation en vue de leur poursuite de parcours.</p>` },
+    { heading: "Coordination et accompagnement", content: `<p>Il écoute et dialogue avec l'environnement des personnes dans le cadre de la mobilité nationale et internationale afin de le sensibiliser et de l'amener à contribuer activement au projet de formation et d'insertion professionnelle. L'environnement est défini par : les formateurs, les éducateurs, le maître d'apprentissage, les administrations, les OPCO, etc.</p><p>Il repère les incidences propres à chaque situation de mobilité nationale et internationale en lien avec l'équipe pluriprofessionnelle. Pour cela, il coordonne l'identification, la mise en œuvre collective et le suivi de solutions d'adaptation, de compensation, d'amélioration des conditions de formation et des solutions de sécurité.</p>` },
+    { heading: "Joindre le Référent Mobilité", content: `<p>Le référent mobilité est joignable par email : <strong>${o.email || ""}</strong>${o.telephone ? ` ou par téléphone au <strong>${o.telephone}</strong>` : ""}.</p>` },
+  ], signatures: { type: "1", labels: ["La Direction"], names: [o.dirigeant || o.nom] } });
+}
+
 function genContratApprentissage(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si?: number) {
   const idx = typeof si === "number" ? si : 0;
   const s = stagiaires[idx] || stagiaires[0] || ({ prenom: "Martin", nom: "Dupont", entreprise: "Tech Solutions SAS" } as StagiaireInfo);
