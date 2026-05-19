@@ -1251,37 +1251,59 @@ export function genGrilleAcquisitionStagiaire(o: OrganismeInfo, f: FormationInfo
 export function genAttestationReussiteStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], stagiaireIdx: number) {
   const s = stagiaires[stagiaireIdx] || stagiaires[0];
   const termine = isFormationTerminee(f);
-  if (!termine) {
-    return buildDocument({ org: o, title: "ATTESTATION DE RÉUSSITE", subtitle: `${s.prenom} ${s.nom} – ${f.intitule}`, stagiaires: [s],
-      extraHtml: `<div class="section section-green"><p><em>La formation est en cours. L'attestation de réussite sera délivrée à l'issue de la formation.</em></p></div>` });
-  }
-  const stagDuree = getStagiaireDuree(s, f);
-  const dureeHeures = parseInt(stagDuree) || (getFormationDays(f).length * 7);
-  const tauxRealisation = 100; // Default to 100%
+  const fiche = f.codeRNCP ? getRNCPByCode(f.codeRNCP) : undefined;
+  const ccps: { titre: string }[] = fiche?.blocsCompetences?.length
+    ? fiche.blocsCompetences.map(b => ({ titre: b.titre }))
+    : [];
+  const titrePro = fiche?.intitule || f.intitule;
 
-  let extra = `
-    <div style="text-align:center;padding:30px">
-      <h2 style="color:${getDocStyleColor()}">ATTESTATION DE RÉUSSITE</h2>
-      <p style="margin-top:20px">${o.nom} atteste que :</p>
-      <p><strong>Nom et prénom :</strong> ${s.prenom} ${s.nom}</p>
-      ${s.email ? `<p><strong>Email :</strong> ${s.email}</p>` : ''}
-      <p style="margin-top:15px">a réussi avec succès la formation suivante :</p>
-      <p style="font-size:16px;font-weight:700">${f.intitule}</p>
-      <p><strong>Durée de la formation :</strong> ${stagDuree} de formation ${modaliteTexte(f)}</p>
-      <p><strong>Date de début :</strong> ${formatDate(getStagiaireDateDebut(s, f))}</p>
-      <p><strong>Date de fin :</strong> ${formatDate(getStagiaireDateFin(s, f))}</p>
-      <p style="margin-top:15px">Cette formation a été dispensée conformément aux normes de qualité et aux exigences pédagogiques de ${o.nom}. L'apprenant(e) a démontré un haut niveau d'engagement, de compétence et de participation active tout au long du programme.</p>
-      <h3>Assiduité du stagiaire</h3>
-      <p>Durée effective suivie par le/la stagiaire : ${dureeHeures} heures, soit un taux de réalisation de ${tauxRealisation.toFixed(2)} %.</p>
-      <p style="margin-top:20px"><strong>Fait à ${o.ville}, le :</strong> ${formatDate(getStagiaireDateFin(s, f))}</p>
-      <p style="margin-top:15px"><strong>Pour ${o.nom}</strong></p>
-      <p>${o.dirigeant}<br>Dirigeant – Formateur</p>
-      ${dirigeantSig(o)}
+  const dateDebut = getStagiaireDateDebut(s, f);
+  const dateFin = getStagiaireDateFin(s, f);
+  const sessionTxt = (dateDebut && dateFin) ? `Du ${formatDate(dateDebut)} au ${formatDate(dateFin)}` : "";
+  const lieuTxt = isPresentiel(f) && f.lieu ? f.lieu : (isDistanciel(f) ? "Distanciel (visioconférence)" : (f.lieu || ""));
+
+  const civ = s.civilite || "";
+  const adrLine1 = s.adresse || "";
+  const adrLine2 = [s.codePostal, s.commune || ""].filter(Boolean).join(" ");
+
+  // Si formation non terminée → résultats vides (cases d'évaluation à remplir)
+  const resultLine = (label: string) => termine
+    ? `<p style="margin:6px 0 14px">⇒ ${label} : <strong>Admis(e)</strong></p>`
+    : `<p style="margin:6px 0 14px">⇒ ${label} :</p><p style="margin:0 0 14px;color:#888;font-style:italic">(Admis(e) – Admis(e) partiellement – Échec)</p>`;
+
+  const ccpsHtml = ccps.length
+    ? ccps.map(c => resultLine(`Certificat de compétences professionnelles « <strong>${c.titre}</strong> »`)).join("")
+    : `<p style="margin:6px 0 14px">⇒ Évaluation des acquis de la formation : ${termine ? "<strong>Admis(e)</strong>" : `<span style="color:#888;font-style:italic">(Admis(e) – Admis(e) partiellement – Échec)</span>`}</p>`;
+
+  const titreLine = ccps.length
+    ? `<p style="margin-top:18px"><strong>Délivrance du Titre Professionnel ${titrePro.toUpperCase()}</strong> : ${termine ? "<strong>Admis(e)</strong>" : `<span style="color:#888;font-style:italic">(Admis(e) – Admis(e) partiellement)</span>`}</p>`
+    : "";
+
+  const dateFait = termine && dateFin ? formatDate(dateFin) : "";
+
+  const extra = `
+    <div style="text-align:center;margin:20px 0 30px">
+      <h2 style="color:${getDocStyleColor()};letter-spacing:1px">ATTESTATION DE RÉUSSITE</h2>
     </div>
+    <p>Délivrée par <strong>${o.nom}</strong>,</p>
+    <p style="margin-top:14px">À ${civ ? `<strong>${civ}</strong> ` : ""}<strong>${s.prenom} ${s.nom}</strong>${adrLine1 ? `<br>${adrLine1}` : ""}${adrLine2 ? `<br>${adrLine2}` : ""}</p>
+    <p style="margin-top:18px"><strong>Intitulé de la formation :</strong> ${ccps.length ? `Titre professionnel <strong>${titrePro.toUpperCase()}</strong>` : f.intitule}</p>
+    ${lieuTxt ? `<p><strong>Lieu de formation :</strong> ${lieuTxt}</p>` : ""}
+    ${sessionTxt ? `<p><strong>Date de la session :</strong> ${sessionTxt}</p>` : ""}
+    <p style="margin-top:18px"><strong>Évaluation des acquis de la formation :</strong></p>
+    ${ccpsHtml}
+    ${titreLine}
+    <p style="margin-top:24px;font-style:italic">Cette attestation peut vous permettre de renseigner votre passeport orientation-formation (art. L.6315-2 du Code du travail).</p>
+
+    <div class="page-break"></div>
+
+    <p style="margin-top:30px"><strong>Fait à ${o.ville}, le ${dateFait || "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"}</strong></p>
+    <p style="margin-top:30px"><strong>Signature et cachet du centre de formation ${o.nom}</strong></p>
+    <p style="margin-top:6px">Service pédagogique</p>
+    ${dirigeantSig(o)}
   `;
 
   return buildDocument({ org: o, title: "ATTESTATION DE RÉUSSITE", subtitle: `${s.prenom} ${s.nom} – ${f.intitule}`, stagiaires: [s], extraHtml: extra });
-  // Signature: organisme only (with tampon) - included inline
 }
 
 // Helper to get doc style primary color
