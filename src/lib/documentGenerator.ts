@@ -4407,7 +4407,10 @@ function genPlaquetteCommercialeCFA(o: OrganismeInfo, f: FormationInfo, stagiair
   const parsedDate = firstDate ? new Date(firstDate + "T00:00:00") : null;
   const annee = parsedDate && !isNaN(parsedDate.getTime()) ? parsedDate.getFullYear() : new Date().getFullYear();
 
-  const indicateursContent = `<p>• Taux de satisfaction globale : 100% (${nbStagiaires} ${nbStagiaires > 1 ? "apprentis" : "apprenti"} – année ${annee})<br>• Nombre d'apprentis formés : ${nbStagiaires}<br>• Taux de réussite à la certification : 100%<br>• Taux national : 82% (source InserJeunes)<br>• Taux de retour enquêtes : 100%<br>• Taux d'abandon : 0%<br>• Taux d'interruption de parcours : 0%<br>• Taux d'insertion professionnelle à 6 mois : 85%<br>• Taux de rupture en alternance : 0%</p>`;
+  const termineCFA = isFormationTerminee(f, validStagiaires);
+  const indicateursContent = termineCFA
+    ? `<p>• Taux de satisfaction globale : 100% (${nbStagiaires} ${nbStagiaires > 1 ? "apprentis" : "apprenti"} – année ${annee})<br>• Nombre d'apprentis formés : ${nbStagiaires}<br>• Taux de réussite à la certification : 100%<br>• Taux national : 82% (source InserJeunes)<br>• Taux de retour enquêtes : 100%<br>• Taux d'abandon : 0%<br>• Taux d'interruption de parcours : 0%<br>• Taux d'insertion professionnelle à 6 mois : 85%<br>• Taux de rupture en alternance : 0%</p>`
+    : `<p><em>Promotion ${annee} en cours – les indicateurs définitifs seront publiés à l'issue de la formation.</em><br>• Nombre d'apprentis inscrits : ${nbStagiaires}<br>• Taux national : 82% (source InserJeunes)<br>• Taux de satisfaction globale : <em>en cours</em><br>• Taux de réussite à la certification : <em>en cours</em><br>• Taux d'abandon : 0% (à date)<br>• Taux d'interruption de parcours : 0% (à date)<br>• Taux de rupture en alternance : 0% (à date)<br>• Taux d'insertion professionnelle à 6 mois : <em>mesuré 6 mois après la sortie</em></p>`;
 
   // Débouchés professionnels — extraits du RNCP si dispo
   const rncp = getRNCPByCode(f.codeRNCP || "");
