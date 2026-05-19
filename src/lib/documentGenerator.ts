@@ -1060,18 +1060,6 @@ function genOrganigramme(o: OrganismeInfo, f?: FormationInfo) {
         </tr>
       </table>
     </div>` });
-        <tr>
-          ${box("Référent Pédagogique", refPeda)}
-          ${box("Référent Administratif", refAdmin)}
-          ${box("Référent Qualité", refQualite)}
-        </tr>
-        <tr>
-          <td style="padding:10px"></td>
-          ${box("Référent Handicap", refHandi)}
-          ${box("Formateur", formateur)}
-        </tr>
-      </table>
-    </div>` });
 }
 
 function genCharteQualite(o: OrganismeInfo) {
