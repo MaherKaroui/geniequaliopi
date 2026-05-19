@@ -994,7 +994,9 @@ export function buildFullCatalog(
     add("cfa_c4i19_ressources_pedagogiques", "CT4 - IND 19 RESSOURCES PÉDAGOGIQUES", 4, 19, "ressources_pedagogiques");
 
     // IND 20 — Conseil de perfectionnement
+    add("cfa_c4i20_convocation_conseil_perfectionnement", "CT4 - IND 20 CONVOCATION AU CONSEIL DE PERFECTIONNEMENT", 4, 20, "convocation_conseil_perfectionnement");
     add("cfa_c4i20_pv_conseil_perfectionnement", "CT4 - IND 20 PROCÈS-VERBAL – CONSEIL DE PERFECTIONNEMENT", 4, 20, "pv_conseil_perfectionnement");
+    add("cfa_c4i20_fiche_referent_mobilite", "CT4 - IND 20 FICHE RÉFÉRENT MOBILITÉ NATIONALE ET INTERNATIONALE", 4, 20, "fiche_referent_mobilite_cfa");
 
     // ===== CRITÈRE 5 — QUALIFICATION DU PERSONNEL (CFA) =====
 
