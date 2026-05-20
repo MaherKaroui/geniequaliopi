@@ -209,6 +209,15 @@ export const OPCO_DOCUMENTS: OpcoDocumentItem[] = [
     perStagiaire: false,
     category: "pedagogique",
   },
+  {
+    code: "B10",
+    label: "Evaluation Besoins",
+    longLabel: "Évaluation des besoins des apprenants",
+    description: "Analyse des besoins des apprenants automatiquement personnalisée selon la formation (intitulé, objectifs, programme) et les réponses des stagiaires : besoins exprimés, synthèse quantitative, adaptations pédagogiques mises en œuvre.",
+    autoTemplates: ["analyse_besoin"],
+    perStagiaire: false,
+    category: "pedagogique",
+  },
 
   // ════════════════════════════════════════════════
   // C. CONTRÔLE DU SERVICE RENDU AUX APPRENANTS
