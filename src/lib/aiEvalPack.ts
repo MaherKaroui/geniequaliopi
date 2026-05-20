@@ -110,16 +110,35 @@ function stagSeed(s: StagiaireInfo, si: number, offset = 0): number {
 
 /**
  * For each QCM question, return the index chosen by stagiaire si.
- * Strategy : ~80–90% correct (debut), ~90–95% correct (fin).
- * Variation is deterministic per stagiaire.
+ * Strategy : score garanti > 7/10 (8 ou 9 correctes) pour le début,
+ * et ≥ 9/10 pour la fin. Variation déterministe par stagiaire.
  */
 export function answersForQCM(qcm: AIQCMQuestion[], si: number, s: StagiaireInfo, mode: "debut" | "fin"): number[] {
-  const correctRate = mode === "fin" ? 0.92 : 0.78;
+  const n = qcm.length;
+  // Nombre de réponses fausses ciblé (déterministe par stagiaire)
+  const seedBase = stagSeed(s, si, mode === "fin" ? 999 : 0);
+  let wrongCount: number;
+  if (mode === "fin") {
+    // 0 ou 1 faux (score ≥ 9/10)
+    wrongCount = seedBase % 2;
+  } else {
+    // 1 ou 2 faux → score 8 ou 9 / 10 (> 7)
+    wrongCount = 1 + (seedBase % 2);
+  }
+  wrongCount = Math.min(wrongCount, Math.max(0, n - 8));
+
+  // Choisir les indices de questions fausses de manière déterministe
+  const wrongSet = new Set<number>();
+  let k = 0;
+  while (wrongSet.size < wrongCount && k < n * 4) {
+    const idx = stagSeed(s, si, (mode === "fin" ? 5000 : 2000) + k * 11) % n;
+    wrongSet.add(idx);
+    k++;
+  }
+
   return qcm.map((q, qi) => {
+    if (!wrongSet.has(qi)) return q.correctIndex;
     const seed = stagSeed(s, si, qi * 7 + (mode === "fin" ? 1000 : 0));
-    const rand = ((seed * 9301 + 49297) % 233280) / 233280;
-    if (rand < correctRate) return q.correctIndex;
-    // wrong: choose another option deterministically
     const wrongOptions = [0, 1, 2, 3].filter((i) => i !== q.correctIndex);
     return wrongOptions[seed % wrongOptions.length];
   });
