@@ -113,7 +113,7 @@ function stagSeed(s: StagiaireInfo, si: number, offset = 0): number {
  * Strategy : score garanti > 7/10 (8 ou 9 correctes) pour le début,
  * et ≥ 9/10 pour la fin. Variation déterministe par stagiaire.
  */
-export function answersForQCM(qcm: AIQCMQuestion[], si: number, s: StagiaireInfo, mode: "debut" | "fin"): number[] {
+export function answersForQCM(qcm: AIQCMQuestion[], si: number, s: StagiaireInfo, mode: "debut" | "fin", isOpco: boolean = false): number[] {
   const n = qcm.length;
   // Nombre de réponses fausses ciblé (déterministe par stagiaire)
   const seedBase = stagSeed(s, si, mode === "fin" ? 999 : 0);
@@ -121,11 +121,14 @@ export function answersForQCM(qcm: AIQCMQuestion[], si: number, s: StagiaireInfo
   if (mode === "fin") {
     // 0 ou 1 faux (score ≥ 9/10)
     wrongCount = seedBase % 2;
+  } else if (isOpco) {
+    // OPCO début : score < 7/10 → 4 à 6 fausses (note 4, 5 ou 6 sur 10)
+    wrongCount = 4 + (seedBase % 3);
   } else {
     // 1 ou 2 faux → score 8 ou 9 / 10 (> 7)
     wrongCount = 1 + (seedBase % 2);
   }
-  wrongCount = Math.min(wrongCount, Math.max(0, n - 8));
+  wrongCount = Math.min(wrongCount, n);
 
   // Choisir les indices de questions fausses de manière déterministe
   const wrongSet = new Set<number>();
