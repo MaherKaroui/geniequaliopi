@@ -212,11 +212,12 @@ export const OPCO_DOCUMENTS: OpcoDocumentItem[] = [
   {
     code: "B10",
     label: "Evaluation Besoins",
-    longLabel: "Évaluation des besoins des apprenants",
-    description: "Analyse des besoins des apprenants automatiquement personnalisée selon la formation (intitulé, objectifs, programme) et les réponses des stagiaires : besoins exprimés, synthèse quantitative, adaptations pédagogiques mises en œuvre.",
-    autoTemplates: ["analyse_besoin"],
-    perStagiaire: false,
+    longLabel: "Évaluation des besoins (par apprenant)",
+    description: "Trame d'évaluation des besoins identique à celle utilisée en Action de Formation (apprenant + entreprise regroupés). Un fichier par apprenant, automatiquement personnalisé selon la formation et les réponses du stagiaire.",
+    autoTemplates: ["trame_eval_besoins_combine"],
+    perStagiaire: true,
     category: "pedagogique",
+    forAllApprentis: true,
   },
 
   // ════════════════════════════════════════════════
