@@ -9148,7 +9148,7 @@ ${s.telephone?.trim() ? `<strong>Téléphone :</strong> ${s.telephone}` : ""}<br
 <strong>Formation souhaitée :</strong> ${f.intitule}
 </td></tr></table>`;
 
-  return buildDocument({ org: o, title: `Évaluation des besoins – Apprenant – ${s.prenom} ${s.nom}`, extraHtml: civiliteBlock + `
+  return buildDocument({ org: o, title: "Évaluation des besoins – Apprenant", extraHtml: civiliteBlock + `
 <p style="margin-top:14px;font-style:italic;color:#555">Trame d'évaluation des besoins – <strong>Partie Apprenant</strong> (parcours, expérience, projet, financement, accessibilité).</p>
 
 <h3 style="margin-top:20px;color:#1e3a7b">PARTIE EXPÉRIENCE ET SCOLAIRE :</h3>
