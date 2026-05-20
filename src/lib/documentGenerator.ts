@@ -10081,18 +10081,86 @@ function generateEvalBesoinsAnswers(s: StagiaireInfo, f: FormationInfo, o: Organ
     "Non, pas de handicap. Je n'ai aucune contrainte particulière pour suivre cette formation.",
   ];
 
+  // === FALLBACK COHÉRENT FORMATION : extraction des topics réels ===
+  // Pour les formations sans domaine reconnu, on remplace les réponses génériques
+  // par des phrases référençant les vrais objectifs et le programme de la formation.
+  const isKnownDomain = isFLE || isMassage || isIA || isExcel || isAnglais || isManagement
+    || isDigital || isEsthetique || isInfo || isBureautique;
+
+  let finalAttentes = hasEntreprise ? attentesOptions[h(4) % attentesOptions.length] : "/";
+  let finalMissions = hasEntreprise ? missionsEntreprise[h(5) % missionsEntreprise.length] : "/";
+  let finalContribution = hasEntreprise ? contributionEntreprise[h(6) % contributionEntreprise.length] : "/";
+  let finalObjectif = objectifOptions[h(7) % objectifOptions.length];
+  let finalProjetPro = projetProOptions[h(8) % projetProOptions.length];
+
+  if (!isKnownDomain) {
+    const topics = extractFormationTopics(f);
+    if (topics.length > 0) {
+      const t1 = topics[h(20) % topics.length];
+      const t2 = topics[(h(21) + 1) % topics.length];
+      const t3 = topics[(h(22) + 2) % topics.length];
+      const t4 = topics[(h(23) + 3) % topics.length];
+
+      finalObjectif = `Dans le cadre de la formation « ${formation} », mon objectif principal est de ${lc(t1)}. Je souhaite également ${lc(t2)} et ${lc(t3)} afin d'être pleinement opérationnel(le) à l'issue du parcours et de mettre ces compétences en pratique dans mes missions de ${s.poste || "professionnel(le)"}.`;
+
+      finalProjetPro = `Cette formation s'inscrit directement dans mon projet professionnel : je vais pouvoir ${lc(t1)} et ${lc(t2)}, deux compétences clés pour mon poste${s.entreprise ? ` au sein de ${s.entreprise}` : ""}. À l'issue de la formation, je serai en mesure de ${lc(t3)} et de prendre en charge des missions à plus forte valeur ajoutée en lien avec ${formation}.`;
+
+      if (hasEntreprise) {
+        finalAttentes = `Nous attendons de cette formation que ${s.prenom} soit capable de ${lc(t1)} et de ${lc(t2)} dans le cadre de ses fonctions de ${s.poste} chez ${s.entreprise}. La maîtrise de « ${formation} » est devenue indispensable pour notre activité et permettra à ${s.prenom} de monter en autonomie sur ces sujets.`;
+        finalMissions = `Au sein de ${s.entreprise}, ${s.prenom} occupe le poste de ${s.poste} et intervient régulièrement sur des sujets liés à ${formation}. Ses missions le/la conduisent notamment à ${lc(t1)}, ${lc(t2)} et ${lc(t3)} — autant d'activités directement couvertes par les objectifs de la formation.`;
+        finalContribution = `La formation « ${formation} » contribuera concrètement à notre activité : ${s.prenom} pourra ${lc(t1)} en autonomie et ${lc(t4 || t2)}, ce qui sécurisera la qualité de nos livrables et réduira notre dépendance à des prestataires externes sur ces sujets.`;
+      }
+    }
+  }
+
   return {
     civilite,
     raisonSociale: hasEntreprise ? s.entreprise : "/",
-    attentes: hasEntreprise ? attentesOptions[h(4) % attentesOptions.length] : "/",
-    missions: hasEntreprise ? missionsEntreprise[h(5) % missionsEntreprise.length] : "/",
-    contribution: hasEntreprise ? contributionEntreprise[h(6) % contributionEntreprise.length] : "/",
+    attentes: finalAttentes,
+    missions: finalMissions,
+    contribution: finalContribution,
     diplome,
-    objectif: objectifOptions[h(7) % objectifOptions.length],
+    objectif: finalObjectif,
     budget,
-    projetPro: projetProOptions[h(8) % projetProOptions.length],
+    projetPro: finalProjetPro,
     handicap: handicapResponses[h(9) % handicapResponses.length],
   };
+}
+
+/** Minuscule la première lettre d'une phrase. */
+function lc(s: string): string {
+  if (!s) return "";
+  return s.charAt(0).toLowerCase() + s.slice(1);
+}
+
+/** Extrait des "topics" (verbes d'action / compétences) cohérents avec la formation,
+ *  à partir des objectifs et du programme. Retourne 6-12 phrases nettoyées. */
+function extractFormationTopics(f: FormationInfo): string[] {
+  const sources: string[] = [];
+  if (f.objectifs) sources.push(...f.objectifs.split(/\n|\.|;/));
+  if (f.programme) sources.push(...f.programme.split(/\n/));
+
+  const cleaned: string[] = [];
+  const seen = new Set<string>();
+  for (const raw of sources) {
+    let line = (raw || "")
+      .replace(/^\s*[-•·▪◦*]\s*/, "")
+      .replace(/^\s*\d+[\.\)°]\s*/, "")
+      .replace(/^\s*(jour|j|module|chapitre|partie|séance|seance)\s*\d+\s*[:\-–]?\s*/i, "")
+      .replace(/^\s*(à l['']issue|a l['']issue)[^,:]*[,:]\s*/i, "")
+      .replace(/^\s*(être capable de|etre capable de|savoir|comprendre|connaître|connaitre|maîtriser|maitriser|apprendre à|apprendre a)\s+/i, "")
+      .trim();
+
+    if (!line || line.length < 12 || line.length > 180) continue;
+    const key = line.toLowerCase().slice(0, 50);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    // Retire ponctuation finale parasite
+    line = line.replace(/[\.;,:]+$/, "").trim();
+    cleaned.push(line);
+    if (cleaned.length >= 12) break;
+  }
+  return cleaned;
 }
 
 function genDeroulePedagogiqueDetaille(o: OrganismeInfo, f: FormationInfo) {
