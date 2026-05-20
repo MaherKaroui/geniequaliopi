@@ -83,7 +83,17 @@ const GenerateurCV = () => {
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
-      setCv(prev => ({ ...prev, ...data, photoUrl: prev.photoUrl }));
+      setCv(prev => ({
+        ...emptyCV,
+        ...prev,
+        ...data,
+        experiences: Array.isArray(data?.experiences) && data.experiences.length ? data.experiences : prev.experiences,
+        formations: Array.isArray(data?.formations) && data.formations.length ? data.formations : prev.formations,
+        competences: Array.isArray(data?.competences) && data.competences.length ? data.competences : prev.competences,
+        langues: Array.isArray(data?.langues) && data.langues.length ? data.langues : prev.langues,
+        certifications: Array.isArray(data?.certifications) && data.certifications.length ? data.certifications : prev.certifications,
+        photoUrl: prev.photoUrl,
+      }));
       toast.success("CV généré par IA ! Vous pouvez ajuster les détails.");
     } catch (e: any) {
       console.error(e);
