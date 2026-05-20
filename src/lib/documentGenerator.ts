@@ -15167,7 +15167,7 @@ function aiPackPlaceholder(o: OrganismeInfo, f: FormationInfo, title: string, s?
   });
 }
 
-function genAITestPositionnement(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number, mode: "debut" | "fin"): string {
+function genAITestPositionnement(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number, mode: "debut" | "fin", isOpco: boolean = false): string {
   const pack: AIEvalPack | null = getCachedPack(f);
   const s = stagiaires[si] || stagiaires[0];
   const title = mode === "debut" ? "TEST DE POSITIONNEMENT — DÉBUT DE FORMATION" : "TEST DE POSITIONNEMENT — FIN DE FORMATION";
@@ -15179,7 +15179,7 @@ function genAITestPositionnement(o: OrganismeInfo, f: FormationInfo, stagiaires:
   const stagFini = isStagiaireFormationTerminee(s, f);
   const renderEmpty = mode === "fin" && !stagFini;
 
-  const answers = renderEmpty ? [] : answersForQCM(qcm, si, s, mode);
+  const answers = renderEmpty ? [] : answersForQCM(qcm, si, s, mode, isOpco);
   let correct = 0;
   const isDebut = mode === "debut";
   const rows = qcm.map((q, qi) => {
