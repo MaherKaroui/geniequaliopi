@@ -69,8 +69,9 @@ export const CV_DESIGNS: { id: CVDesign; label: string; description: string; acc
 ];
 
 // ===== HTML Generators =====
-function escapeHtml(s: string) {
-  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+function escapeHtml(s: any) {
+  if (s === null || s === undefined) return "";
+  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
 function skillBar(level: number, accent: string, style: "bar" | "dots" | "line" = "bar") {
@@ -106,11 +107,11 @@ export function generateCVHTML(data: CVData, design: CVDesign, options?: { accen
   const fullName = `${data.prenom} ${data.nom}`.trim() || "Votre Nom";
 
   const contactInfo = [data.email, data.telephone, data.adresse].filter(Boolean).join(" • ");
-  const exps = data.experiences.filter(e => e.poste || e.entreprise);
-  const forms = data.formations.filter(f => f.diplome || f.etablissement);
-  const comps = data.competences.filter(c => c.nom);
-  const langs = data.langues.filter(l => l.langue);
-  const certs = data.certifications.filter(c => c.nom);
+  const exps = (data.experiences || []).filter(e => e && (e.poste || e.entreprise));
+  const forms = (data.formations || []).filter(f => f && (f.diplome || f.etablissement));
+  const comps = (data.competences || []).filter(c => c && c.nom);
+  const langs = (data.langues || []).filter(l => l && l.langue);
+  const certs = (data.certifications || []).filter(c => c && c.nom);
 
   const sStyle = (s: "underline" | "filled" | "plain" | "leftbar") => s;
   const secStyle = design === "moderne" ? sStyle("leftbar") : design === "colore" ? sStyle("filled") : design === "minimaliste" ? sStyle("plain") : sStyle("underline");
