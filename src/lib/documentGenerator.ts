@@ -10102,7 +10102,12 @@ function generateEvalBesoinsAnswers(s: StagiaireInfo, f: FormationInfo, o: Organ
       const t1 = topics[h(20) % topics.length];
       const t2 = topics[(h(21) + 1) % topics.length];
 
-      finalObjectif = `Mon objectif est de monter en compétences sur « ${formationLabel} » et d'être pleinement opérationnel(le) à l'issue du parcours. Cela me permettra de mieux assurer mes missions de ${s.poste || "professionnel(le)"} au quotidien.`;
+      const isF = s.civilite === "Mme";
+      const operationnel = isF ? "opérationnelle" : "opérationnel";
+      const professionnel = isF ? "professionnelle" : "professionnel";
+      const posteLabel = s.poste || professionnel;
+
+      finalObjectif = `Mon objectif est de monter en compétences sur « ${formationLabel} » et d'être pleinement ${operationnel} à l'issue du parcours. Cela me permettra de mieux assurer mes missions de ${posteLabel} au quotidien.`;
 
       finalProjetPro = `Cette formation s'inscrit directement dans mon projet professionnel${s.entreprise ? ` au sein de ${s.entreprise}` : ""}. Elle me permettra de gagner en autonomie sur « ${formationLabel} » et de prendre en charge des missions à plus forte valeur ajoutée.`;
 
@@ -10112,9 +10117,13 @@ function generateEvalBesoinsAnswers(s: StagiaireInfo, f: FormationInfo, o: Organ
         finalContribution = `La formation contribuera directement à notre activité : ${s.prenom} pourra appliquer concrètement les compétences acquises en « ${formationLabel} ». Cela sécurisera la qualité de nos livrables et renforcera notre équipe sur ce périmètre.`;
       }
     } else {
+      const isF = s.civilite === "Mme";
+      const operationnel = isF ? "opérationnelle" : "opérationnel";
+      const professionnel = isF ? "professionnelle" : "professionnel";
+      const posteLabel = s.poste || professionnel;
       // Pas assez de topics exploitables : phrases simples sans détails programme
-      finalObjectif = `Mon objectif est de me former à « ${formationLabel} » et de maîtriser les compétences visées. Je souhaite être pleinement opérationnel(le) à l'issue du parcours.`;
-      finalProjetPro = `Cette formation s'inscrit dans mon projet professionnel${s.entreprise ? ` au sein de ${s.entreprise}` : ""}. Elle me permettra d'évoluer dans mes missions de ${s.poste || "professionnel(le)"}.`;
+      finalObjectif = `Mon objectif est de me former à « ${formationLabel} » et de maîtriser les compétences visées. Je souhaite être pleinement ${operationnel} à l'issue du parcours.`;
+      finalProjetPro = `Cette formation s'inscrit dans mon projet professionnel${s.entreprise ? ` au sein de ${s.entreprise}` : ""}. Elle me permettra d'évoluer dans mes missions de ${posteLabel}.`;
     }
   }
 
