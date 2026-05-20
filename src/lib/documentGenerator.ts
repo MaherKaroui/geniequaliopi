@@ -10093,23 +10093,28 @@ function generateEvalBesoinsAnswers(s: StagiaireInfo, f: FormationInfo, o: Organ
   let finalObjectif = objectifOptions[h(7) % objectifOptions.length];
   let finalProjetPro = projetProOptions[h(8) % projetProOptions.length];
 
+  // Nettoie l'intitulé : retire les codes (RNCP12345), (RS1234), durées (35h), etc.
+  const formationLabel = cleanFormationLabel(formation);
+
   if (!isKnownDomain) {
     const topics = extractFormationTopics(f);
-    if (topics.length > 0) {
+    if (topics.length >= 2) {
       const t1 = topics[h(20) % topics.length];
       const t2 = topics[(h(21) + 1) % topics.length];
-      const t3 = topics[(h(22) + 2) % topics.length];
-      const t4 = topics[(h(23) + 3) % topics.length];
 
-      finalObjectif = `Dans le cadre de la formation « ${formation} », mon objectif principal est de ${lc(t1)}. Je souhaite également ${lc(t2)} et ${lc(t3)} afin d'être pleinement opérationnel(le) à l'issue du parcours et de mettre ces compétences en pratique dans mes missions de ${s.poste || "professionnel(le)"}.`;
+      finalObjectif = `Mon objectif est de monter en compétences sur « ${formationLabel} » et d'être pleinement opérationnel(le) à l'issue du parcours. Cela me permettra de mieux assurer mes missions de ${s.poste || "professionnel(le)"} au quotidien.`;
 
-      finalProjetPro = `Cette formation s'inscrit directement dans mon projet professionnel : je vais pouvoir ${lc(t1)} et ${lc(t2)}, deux compétences clés pour mon poste${s.entreprise ? ` au sein de ${s.entreprise}` : ""}. À l'issue de la formation, je serai en mesure de ${lc(t3)} et de prendre en charge des missions à plus forte valeur ajoutée en lien avec ${formation}.`;
+      finalProjetPro = `Cette formation s'inscrit directement dans mon projet professionnel${s.entreprise ? ` au sein de ${s.entreprise}` : ""}. Elle me permettra de gagner en autonomie sur « ${formationLabel} » et de prendre en charge des missions à plus forte valeur ajoutée.`;
 
       if (hasEntreprise) {
-        finalAttentes = `Nous attendons de cette formation que ${s.prenom} soit capable de ${lc(t1)} et de ${lc(t2)} dans le cadre de ses fonctions de ${s.poste} chez ${s.entreprise}. La maîtrise de « ${formation} » est devenue indispensable pour notre activité et permettra à ${s.prenom} de monter en autonomie sur ces sujets.`;
-        finalMissions = `Au sein de ${s.entreprise}, ${s.prenom} occupe le poste de ${s.poste} et intervient régulièrement sur des sujets liés à ${formation}. Ses missions le/la conduisent notamment à ${lc(t1)}, ${lc(t2)} et ${lc(t3)} — autant d'activités directement couvertes par les objectifs de la formation.`;
-        finalContribution = `La formation « ${formation} » contribuera concrètement à notre activité : ${s.prenom} pourra ${lc(t1)} en autonomie et ${lc(t4 || t2)}, ce qui sécurisera la qualité de nos livrables et réduira notre dépendance à des prestataires externes sur ces sujets.`;
+        finalAttentes = `Nous attendons de cette formation que ${s.prenom} maîtrise les compétences couvertes par « ${formationLabel} ». Cela lui permettra de gagner en autonomie dans ses fonctions de ${s.poste} chez ${s.entreprise}.`;
+        finalMissions = `Au sein de ${s.entreprise}, ${s.prenom} occupe le poste de ${s.poste} et intervient sur des sujets liés à « ${formationLabel} ». La formation lui apportera les compétences nécessaires pour mener ces missions en autonomie.`;
+        finalContribution = `La formation contribuera directement à notre activité : ${s.prenom} pourra appliquer concrètement les compétences acquises en « ${formationLabel} ». Cela sécurisera la qualité de nos livrables et renforcera notre équipe sur ce périmètre.`;
       }
+    } else {
+      // Pas assez de topics exploitables : phrases simples sans détails programme
+      finalObjectif = `Mon objectif est de me former à « ${formationLabel} » et de maîtriser les compétences visées. Je souhaite être pleinement opérationnel(le) à l'issue du parcours.`;
+      finalProjetPro = `Cette formation s'inscrit dans mon projet professionnel${s.entreprise ? ` au sein de ${s.entreprise}` : ""}. Elle me permettra d'évoluer dans mes missions de ${s.poste || "professionnel(le)"}.`;
     }
   }
 
@@ -10133,8 +10138,17 @@ function lc(s: string): string {
   return s.charAt(0).toLowerCase() + s.slice(1);
 }
 
-/** Extrait des "topics" (verbes d'action / compétences) cohérents avec la formation,
- *  à partir des objectifs et du programme. Retourne 6-12 phrases nettoyées. */
+/** Nettoie l'intitulé d'une formation : retire codes RNCP/RS et durées entre parenthèses. */
+function cleanFormationLabel(label: string): string {
+  return (label || "")
+    .replace(/\s*\(\s*(RNCP|RS)\s*\d+\s*\)/gi, "")
+    .replace(/\s*\(\s*\d+\s*(h|heures|semaines|mois|jours)\b[^)]*\)/gi, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/** Extrait des "topics" (compétences) cohérents avec la formation,
+ *  à partir des objectifs et du programme. Retourne des libellés courts et propres. */
 function extractFormationTopics(f: FormationInfo): string[] {
   const sources: string[] = [];
   if (f.objectifs) sources.push(...f.objectifs.split(/\n|\.|;/));
@@ -10146,16 +10160,33 @@ function extractFormationTopics(f: FormationInfo): string[] {
     let line = (raw || "")
       .replace(/^\s*[-•·▪◦*]\s*/, "")
       .replace(/^\s*\d+[\.\)°]\s*/, "")
-      .replace(/^\s*(jour|j|module|chapitre|partie|séance|seance)\s*\d+\s*[:\-–]?\s*/i, "")
+      .replace(/^\s*(jour|j|module|chapitre|partie|séance|seance|bloc|stage|période|periode|semaine|unité|unite)\s*\d*\s*[:\-–]?\s*/i, "")
       .replace(/^\s*(à l['']issue|a l['']issue)[^,:]*[,:]\s*/i, "")
       .replace(/^\s*(être capable de|etre capable de|savoir|comprendre|connaître|connaitre|maîtriser|maitriser|apprendre à|apprendre a)\s+/i, "")
       .trim();
 
-    if (!line || line.length < 12 || line.length > 180) continue;
+    // Si format "Titre – sous-titre" ou "Titre : détail", garder la partie la plus parlante
+    if (/[–\-:]/.test(line)) {
+      const parts = line.split(/\s*[–\-:]\s*/).map(p => p.trim()).filter(Boolean);
+      // Préfère un segment qui ressemble à une compétence (sans "h" / "semaines" / chiffres seuls)
+      const best = parts.find(p => !/\b\d+\s*(h|heures|semaines|mois|jours)\b/i.test(p) && p.length >= 10) || parts[parts.length - 1];
+      if (best) line = best;
+    }
+
+    // Retire les segments de durée résiduels
+    line = line
+      .replace(/\(\s*\d+\s*(h|heures|semaines|mois|jours)\b[^)]*\)/gi, "")
+      .replace(/\b\d+\s*(h|heures|semaines|mois|jours)\b/gi, "")
+      .replace(/\s+/g, " ")
+      .trim();
+
+    // Rejette si encore trop "section programme" (commence par mot-clé structurel résiduel, ou trop court/long)
+    if (!line || line.length < 12 || line.length > 140) continue;
+    if (/^(stage|observation|intégration|integration|missions confiées|missions confiees)$/i.test(line)) continue;
+
     const key = line.toLowerCase().slice(0, 50);
     if (seen.has(key)) continue;
     seen.add(key);
-    // Retire ponctuation finale parasite
     line = line.replace(/[\.;,:]+$/, "").trim();
     cleaned.push(line);
     if (cleaned.length >= 12) break;
