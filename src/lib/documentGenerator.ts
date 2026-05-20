@@ -270,7 +270,8 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "eval_finale_remplie": return genEvalFinale(o, f, stagiaires);
     case "ai_test_positionnement_debut": {
       const si = params?.stagiaireIdx ?? 0;
-      return genAITestPositionnement(o, f, stagiaires, si, "debut");
+      const isOpco = (docId || "").startsWith("opco_");
+      return genAITestPositionnement(o, f, stagiaires, si, "debut", isOpco);
     }
     case "ai_test_positionnement_fin": {
       const si = params?.stagiaireIdx ?? 0;
