@@ -9381,7 +9381,10 @@ function generateEvalBesoinsAnswers(s: StagiaireInfo, f: FormationInfo, o: Organ
   const formation = f.intitule || "la formation";
   const t = formation.toLowerCase();
   const baseHash = (s.nom + s.prenom).split("").reduce((a, c) => a + c.charCodeAt(0), 0);
-  const h = (offset: number) => (baseHash * 31 + idx * 17 + offset) & 0x7FFFFFFF;
+  // idx * 1000003 (prime) garantit que `h(offset) % N` est unique pour chaque idx (jusqu'à N=10).
+  // baseHash * 2520 (= PPCM(1..10)) ne change PAS le résultat modulo N≤10 : le nom n'influence pas la sélection,
+  // ce qui assure que deux stagiaires consécutifs reçoivent TOUJOURS des réponses différentes.
+  const h = (offset: number) => idx * 1000003 + offset * 31 + baseHash * 2520;
   
   const hasEntreprise = !!(s.entreprise && s.entreprise.trim() && s.entreprise.trim().toLowerCase() !== "entreprise");
   
