@@ -9197,7 +9197,7 @@ function genTrameEvalBesoinsEntreprise(o: OrganismeInfo, f: FormationInfo, stagi
 <strong>Tuteur / Maître d'apprentissage :</strong> ${tuteurNom}
 </td></tr></table>`;
 
-  return buildDocument({ org: o, title: `Évaluation des besoins – Entreprise – ${s.prenom} ${s.nom}`, extraHtml: headerBlock + `
+  return buildDocument({ org: o, title: "Évaluation des besoins – Entreprise", extraHtml: headerBlock + `
 <p style="margin-top:14px;font-style:italic;color:#555">Trame d'évaluation des besoins – <strong>Partie Entreprise</strong> (à compléter par l'employeur ou le tuteur).</p>
 
 <h3 style="margin-top:20px;color:#1e3a7b">Partie Entreprise :</h3>
@@ -9334,7 +9334,7 @@ ${o.tamponUrl ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;m
 
   return buildDocument({
     org: o,
-    title: `Évaluation des besoins – ${s.prenom} ${s.nom}`,
+    title: "Évaluation des besoins",
     extraHtml: civiliteBlock + apprenantPart + entreprisePart + footer,
   });
 }
