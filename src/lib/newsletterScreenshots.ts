@@ -288,7 +288,7 @@ function certificateDateLong(f: FormationInfo): string {
   const d = new Date(base);
   d.setMonth(d.getMonth() - 2);
   const months = ["JANUARY","FEBRUARY","MARCH","APRIL","MAY","JUNE","JULY","AUGUST","SEPTEMBER","OCTOBER","NOVEMBER","DECEMBER"];
-  return `${months[d.getMonth()]} ${d.getDate() < 10 ? "0" : ""}${d.getDate()}, ${d.getFullYear()}`;
+  return `${months[d.getMonth()]} ${d.getDate() < 10 ? "0" : ""}${d.getDate()}, 2025`;
 }
 
 export function courseCertificateHtml(o: OrganismeInfo, f: FormationInfo): string {
