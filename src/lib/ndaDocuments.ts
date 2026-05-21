@@ -1,0 +1,313 @@
+/**
+ * Documents NDA — design sobre et homogène avec Contrat / Règlement.
+ * Génère : Programme, Devis, Feuille d'émargement, Liste des formateurs.
+ * Toutes les données sont déduites automatiquement de l'organisme,
+ * de la formation et des stagiaires saisis.
+ */
+import type { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
+import type { CVData } from "@/lib/cvGenerator";
+import { CSS, footerHtml, escapeHtml, v, fmtDateLong, adresseComplete, parseHeures, parseMontant, DOTS } from "@/lib/ndaContratReglement";
+
+function wrap(body: string): string {
+  return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">${CSS}</head><body><div class="doc">${body}</div></body></html>`;
+}
+
+function today(): string {
+  return fmtDateLong(new Date().toISOString().slice(0, 10));
+}
+
+/* =========================================================================
+ * PROGRAMME DE FORMATION
+ * ========================================================================= */
+export function genProgrammeNDA(o: OrganismeInfo, f: FormationInfo, _s: StagiaireInfo[]): string {
+  const dureeH = parseHeures(f.duree);
+  const body = `
+<h1>Programme de formation</h1>
+<h2>${escapeHtml(f.intitule || "")}</h2>
+<div class="meta">${escapeHtml(o.nom || "")} — ${today()}</div>
+
+<h3>Intitulé de la formation</h3>
+<p>${v(f.intitule)}</p>
+
+<h3>Public visé</h3>
+<p>${v(f.publicVise)}</p>
+
+<h3>Prérequis</h3>
+<p>${v(f.prerequis)}</p>
+
+<h3>Objectifs pédagogiques</h3>
+<p>${v(f.objectifs)}</p>
+
+<h3>Contenu du programme</h3>
+<p>${(f.programme || DOTS).split(/\r?\n/).map(escapeHtml).join("<br>")}</p>
+
+<h3>Durée et organisation</h3>
+<ul>
+  <li><strong>Durée :</strong> ${dureeH} heures</li>
+  <li><strong>Dates :</strong> du ${fmtDateLong(f.dateDebut)} au ${fmtDateLong(f.dateFin)}</li>
+  <li><strong>Lieu :</strong> ${v(f.lieu)}</li>
+  <li><strong>Modalités :</strong> ${v(f.modalites)}</li>
+  <li><strong>Effectif :</strong> ${v(f.nombreParticipants)}</li>
+  <li><strong>Délai d'accès :</strong> ${v(f.delaiAcces)}</li>
+</ul>
+
+<h3>Moyens pédagogiques et techniques</h3>
+<p>${v(f.moyensPedagogiques)}</p>
+
+<h3>Modalités d'évaluation</h3>
+<p>${v(f.methodesEvaluation)}</p>
+
+<h3>Formateur(s)</h3>
+<p>${v(f.formateur)}</p>
+
+<h3>Tarif</h3>
+<p>${v(f.tarif)}</p>
+
+<h3>Accessibilité aux personnes en situation de handicap</h3>
+<p>Notre organisme étudie au cas par cas toute situation de handicap afin d'envisager une intégration adaptée à la formation. Référent handicap : ${v(o.referentHandicap)}.</p>
+
+${footerHtml(o)}`;
+  return wrap(body);
+}
+
+/* =========================================================================
+ * DEVIS
+ * ========================================================================= */
+export function genDevisNDA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]): string {
+  const numDevis = `DV-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 9000) + 1000)}`;
+  const prixUnit = parseMontant(f.tarif);
+  const list = stagiaires.length ? stagiaires : [{ prenom: "", nom: "", entreprise: "" } as StagiaireInfo];
+
+  const rows = list.map((s) => {
+    const nom = `${s.prenom || ""} ${s.nom || ""}`.trim() || DOTS;
+    const p = parseMontant(s.tarifFormation) ?? prixUnit;
+    const prixStr = p !== null ? p.toFixed(2).replace(".", ",") + " €" : DOTS;
+    return `<tr><td>${escapeHtml(nom)}</td><td>${v(f.intitule)}</td><td>${parseHeures(f.duree)} h</td><td style="text-align:right;">${prixStr}</td></tr>`;
+  }).join("");
+
+  const totalHT = list.reduce((acc, s) => {
+    const p = parseMontant(s.tarifFormation) ?? prixUnit ?? 0;
+    return acc + p;
+  }, 0);
+  const totalStr = totalHT.toFixed(2).replace(".", ",") + " €";
+
+  const body = `
+<h1>Devis</h1>
+<h2>N° ${numDevis} — ${today()}</h2>
+
+<h3>Émetteur</h3>
+<p><strong>${escapeHtml(o.nom || "")}</strong><br>
+${escapeHtml(adresseComplete(o.adresse, o.codePostal, o.ville))}<br>
+${o.siret ? "SIRET : " + escapeHtml(o.siret) + "<br>" : ""}
+${o.email ? "Email : " + escapeHtml(o.email) : ""}</p>
+
+<h3>Destinataire</h3>
+<p>${escapeHtml(list[0]?.entreprise || `${list[0]?.prenom || ""} ${list[0]?.nom || ""}`.trim() || DOTS)}</p>
+
+<h3>Détail de la prestation</h3>
+<table>
+  <thead><tr><th>Stagiaire</th><th>Formation</th><th>Durée</th><th style="text-align:right;">Montant HT</th></tr></thead>
+  <tbody>${rows}</tbody>
+  <tfoot><tr><td colspan="3" style="text-align:right;font-weight:700;">Total HT</td><td style="text-align:right;font-weight:700;">${totalStr}</td></tr>
+  <tr><td colspan="3" style="text-align:right;">TVA</td><td style="text-align:right;">Exonérée (art. 261-4-4° du CGI)</td></tr>
+  <tr><td colspan="3" style="text-align:right;font-weight:700;">Total net à payer</td><td style="text-align:right;font-weight:700;">${totalStr}</td></tr></tfoot>
+</table>
+
+<h3>Conditions</h3>
+<p>Validité du devis : 30 jours. Règlement à 30 jours à réception de facture. Devis à retourner daté et signé avec la mention « Bon pour accord ».</p>
+
+<div class="signatures">
+  <div class="box">
+    <div class="title">Pour l'organisme de formation</div>
+    ${v(o.dirigeant)}<br><em>${v(o.nom)}</em>
+    ${o.tamponUrl ? `<img src="${o.tamponUrl}" class="sig-img" alt="Tampon" />` : ""}
+  </div>
+  <div class="box">
+    <div class="title">Pour le client (Bon pour accord)</div>
+    <div class="mention">Date et signature</div>
+  </div>
+</div>
+
+${footerHtml(o)}`;
+  return wrap(body);
+}
+
+/* =========================================================================
+ * FEUILLE D'ÉMARGEMENT (multi-jours, sans weekends ni jours fériés)
+ * ========================================================================= */
+function enumerateBusinessDays(startIso?: string, endIso?: string): string[] {
+  if (!startIso || !endIso) return [];
+  const start = new Date(startIso);
+  const end = new Date(endIso);
+  if (isNaN(start.getTime()) || isNaN(end.getTime()) || start > end) return [];
+  const out: string[] = [];
+  const cur = new Date(start);
+  while (cur <= end) {
+    const dow = cur.getDay();
+    if (dow !== 0 && dow !== 6) out.push(cur.toISOString().slice(0, 10));
+    cur.setDate(cur.getDate() + 1);
+    if (out.length > 60) break; // garde-fou
+  }
+  return out;
+}
+
+export function genEmargementNDA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]): string {
+  const list = stagiaires.length ? stagiaires : [{ prenom: "", nom: "" } as StagiaireInfo];
+  const jours = enumerateBusinessDays(f.dateDebut, f.dateFin);
+  const joursAffiches = jours.length > 0 ? jours : [f.dateDebut || ""];
+
+  const pages = joursAffiches.map((iso, idx) => {
+    const rows = list.map((s) => {
+      const nom = `${s.prenom || ""} ${s.nom || ""}`.trim() || DOTS;
+      const sig = s.signatureUrl
+        ? `<img src="${s.signatureUrl}" style="max-height:50px;max-width:140px;" />`
+        : "";
+      return `<tr>
+        <td>${escapeHtml(nom)}</td>
+        <td style="height:60px;">${sig}</td>
+        <td style="height:60px;">${sig}</td>
+      </tr>`;
+    }).join("");
+
+    const formateurSig = f.formateurSignatureUrl
+      ? `<img src="${f.formateurSignatureUrl}" class="sig-img" alt="Signature formateur" />`
+      : "";
+
+    return `${idx > 0 ? '<div class="page-break"></div>' : ''}
+<h1>Feuille d'émargement</h1>
+<h2>${escapeHtml(f.intitule || "")}</h2>
+<div class="meta">Journée du ${fmtDateLong(iso)} — ${v(f.lieu)}</div>
+
+<table>
+  <thead>
+    <tr>
+      <th rowspan="2" style="width:38%;">Nom et prénom du stagiaire</th>
+      <th colspan="2" style="text-align:center;">Signatures</th>
+    </tr>
+    <tr>
+      <th style="text-align:center;">Matin</th>
+      <th style="text-align:center;">Après-midi</th>
+    </tr>
+  </thead>
+  <tbody>${rows}</tbody>
+</table>
+
+<div class="signatures">
+  <div class="box">
+    <div class="title">Formateur</div>
+    ${v(f.formateur)}
+    ${formateurSig}
+  </div>
+  <div class="box">
+    <div class="title">Pour l'organisme de formation</div>
+    ${v(o.dirigeant)}<br><em>${v(o.nom)}</em>
+    ${o.tamponUrl ? `<img src="${o.tamponUrl}" class="sig-img" alt="Tampon" />` : ""}
+  </div>
+</div>
+
+${footerHtml(o)}`;
+  }).join("\n");
+
+  return wrap(pages);
+}
+
+/* =========================================================================
+ * LISTE DES FORMATEURS (template officiel DRIEETS / DREETS)
+ * ========================================================================= */
+export function genListeFormateursNDA(o: OrganismeInfo, cv: CVData | null, _stagiaires: StagiaireInfo[] = []): string {
+  const adresseOrg = adresseComplete(o.adresse, o.codePostal, o.ville);
+
+  // 1) Intervenant principal (depuis CV) : ligne du tableau 1
+  const nomCV = cv ? `${cv.prenom || ""} ${cv.nom || ""}`.trim() : "";
+  const exps = cv?.experiences?.filter(e => e.poste || e.entreprise) || [];
+  const forms = cv?.formations?.filter(f => f.diplome || f.etablissement) || [];
+  const certs = cv?.certifications?.filter(c => c.nom) || [];
+
+  const qualitesParts: string[] = [];
+  if (forms.length) qualitesParts.push(forms.map(f => `${f.diplome || ""}${f.etablissement ? " — " + f.etablissement : ""}${f.annee ? " (" + f.annee + ")" : ""}`).join(" ; "));
+  if (certs.length) qualitesParts.push("Certifications : " + certs.map(c => c.nom + (c.annee ? ` (${c.annee})` : "")).join(", "));
+  if (exps.length) qualitesParts.push("Expérience : " + exps.map(e => `${e.poste || ""}${e.entreprise ? " (" + e.entreprise + ")" : ""}`).join(" ; "));
+  const qualites = qualitesParts.join(" — ") || DOTS;
+
+  const row1 = nomCV ? `<tr>
+    <td>${escapeHtml(nomCV)}</td>
+    <td>${DOTS}</td>
+    <td>Formateur occasionnel</td>
+    <td>${escapeHtml(qualites)}</td>
+  </tr>` : `<tr><td>${DOTS}</td><td>${DOTS}</td><td>${DOTS}</td><td>${DOTS}</td></tr>`;
+
+  // 3) Dirigeant (travailleur indépendant)
+  const dirigQualites = nomCV && (cv?.profil || qualitesParts.length)
+    ? escapeHtml(cv?.profil || qualites)
+    : DOTS;
+
+  const body = `
+<h1>Liste des formateurs</h1>
+<h2>Intervenant dans l'organisme de formation à la date de la déclaration d'activité</h2>
+
+<p><strong>Dénomination et adresse de l'organisme de formation :</strong><br>
+${escapeHtml(o.nom || "")} — ${escapeHtml(adresseOrg)}</p>
+
+<h3>1. Votre organisme emploie</h3>
+<p>– des <strong>formateurs salariés</strong> (sous CDI ou CDD, formateur occasionnel),<br>
+– ou, pour les associations, fait appel à des <strong>bénévoles</strong>,<br>
+– ou, pour les sociétés, fait appel à des <strong>associés</strong>.</p>
+<table>
+  <thead>
+    <tr>
+      <th>Nom et prénom de l'intervenant</th>
+      <th>Date d'embauche</th>
+      <th>Statut (CDI, CDD, occasionnel, bénévole, associé)</th>
+      <th>Titres, diplômes, qualités, expérience</th>
+    </tr>
+  </thead>
+  <tbody>${row1}</tbody>
+</table>
+<p style="font-size:9pt;font-style:italic;">Au-delà de 5 intervenants, joindre une liste complémentaire avec présentation identique.</p>
+
+<h3>2. Votre organisme fait appel à des sous-traitants</h3>
+<p>(via un contrat de sous-traitance ou de prestation de service). Vos sous-traitants doivent être déclarés auprès des organismes de recouvrement (URSSAF…) et disposer d'un numéro de déclaration d'activité.</p>
+<table>
+  <thead>
+    <tr>
+      <th>Nom et prénom de l'intervenant</th>
+      <th>Nom de l'organisme et adresse</th>
+      <th>Numéro de déclaration d'activité</th>
+      <th>Titres, diplômes, qualités, expérience</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>${DOTS}</td><td>${DOTS}</td><td>${DOTS}</td><td>${DOTS}</td></tr>
+  </tbody>
+</table>
+<p style="font-size:9pt;font-style:italic;">Au-delà de 5 intervenants, joindre une liste complémentaire avec présentation identique.</p>
+
+<h3>3. Votre activité est exercée en tant que travailleur indépendant ou dirigeant</h3>
+<table>
+  <thead>
+    <tr><th>Titres, diplômes, qualités, expérience</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>${dirigQualites}</td></tr>
+  </tbody>
+</table>
+
+<p style="margin-top:24px;">Fait à <strong>${v(o.ville)}</strong>, le <strong>${today()}</strong>.</p>
+
+<div class="signatures">
+  <div class="box">
+    <div class="title">Cachet de l'organisme</div>
+    ${o.tamponUrl ? `<img src="${o.tamponUrl}" class="sig-img" alt="Tampon organisme" />` : ""}
+  </div>
+  <div class="box">
+    <div class="title">Nom et qualité du signataire</div>
+    Nom : <strong>${v(o.dirigeant)}</strong><br>
+    Qualité : Dirigeant
+    <div class="mention">Signature :</div>
+  </div>
+</div>
+
+${footerHtml(o)}`;
+
+  return wrap(body);
+}
