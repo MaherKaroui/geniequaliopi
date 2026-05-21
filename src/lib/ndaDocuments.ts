@@ -142,7 +142,7 @@ ${objectifsHtml}
 <p><strong>Référent handicap :</strong> ${v(o.referentHandicap || o.dirigeant)}${o.email ? `<br><strong>Email :</strong> ${escapeHtml(o.email)}` : ""}</p>
 
 <h3>15. Indicateurs de performance – Année ${annee}</h3>
-<table>
+<table class="nda-text-table">
   <thead><tr><th>Indicateur</th><th>Statut</th></tr></thead>
   <tbody>
     <tr><td>Taux de satisfaction globale</td><td><em>En cours – disponible à l'issue de la formation</em></td></tr>
@@ -366,7 +366,7 @@ ${escapeHtml(o.nom || "")} — ${escapeHtml(adresseOrg)}</p>
 <p>– des <strong>formateurs salariés</strong> (sous CDI ou CDD, formateur occasionnel),<br>
 – ou, pour les associations, fait appel à des <strong>bénévoles</strong>,<br>
 – ou, pour les sociétés, fait appel à des <strong>associés</strong>.</p>
-<table>
+<table class="nda-text-table">
   <thead>
     <tr>
       <th>Nom et prénom de l'intervenant</th>
@@ -381,7 +381,7 @@ ${escapeHtml(o.nom || "")} — ${escapeHtml(adresseOrg)}</p>
 
 <h3>2. Votre organisme fait appel à des sous-traitants</h3>
 <p>(via un contrat de sous-traitance ou de prestation de service). Vos sous-traitants doivent être déclarés auprès des organismes de recouvrement (URSSAF…) et disposer d'un numéro de déclaration d'activité.</p>
-<table>
+<table class="nda-text-table">
   <thead>
     <tr>
       <th>Nom et prénom de l'intervenant</th>
