@@ -325,14 +325,54 @@ const DemandeNDA = () => {
     else { toast.success("Dossier supprimé"); fetchDossiers(); }
   };
 
+  const getDocHTML = (docId: string): string | null => {
+    if (editedDocs[docId]) return editedDocs[docId];
+    return generateDocumentHTML(docId, organisme, formation, stagiaires, cvData, cvDesign, uploadedCV);
+  };
+
   const handlePreview = (docId: string) => {
-    const html = generateDocumentHTML(docId, organisme, formation, stagiaires, cvData, cvDesign, uploadedCV);
+    const html = getDocHTML(docId);
     if (!html) {
       toast.error(docId === "logo" ? "Veuillez d'abord importer un logo" : "Veuillez remplir le CV du formateur ou en uploader un");
       return;
     }
     setPreviewDoc(docId);
     setPreviewHTML(html);
+    setEditing(false);
+  };
+
+  const handleEdit = (docId: string) => {
+    const html = getDocHTML(docId);
+    if (!html) {
+      toast.error("Document non disponible.");
+      return;
+    }
+    setPreviewDoc(docId);
+    setPreviewHTML(html);
+    setEditing(true);
+  };
+
+  const handleSaveEdit = () => {
+    if (!previewDoc) return;
+    const doc = previewIframeRef.current?.contentDocument;
+    if (!doc) { toast.error("Impossible de récupérer le contenu."); return; }
+    const html = "<!DOCTYPE html><html>" + doc.documentElement.innerHTML + "</html>";
+    setEditedDocs(prev => ({ ...prev, [previewDoc]: html }));
+    setPreviewHTML(html);
+    setEditing(false);
+    toast.success("Modifications enregistrées");
+  };
+
+  const handleResetEdit = (docId: string) => {
+    setEditedDocs(prev => {
+      const next = { ...prev };
+      delete next[docId];
+      return next;
+    });
+    const html = generateDocumentHTML(docId, organisme, formation, stagiaires, cvData, cvDesign, uploadedCV);
+    if (html) setPreviewHTML(html);
+    setEditing(false);
+    toast.success("Document réinitialisé");
   };
 
   const handleDownload = async (docId: string) => {
