@@ -224,10 +224,22 @@ ${footerHtml(o)}`;
 /* =========================================================================
  * DOCUMENT 2 : RÈGLEMENT INTÉRIEUR
  * ========================================================================= */
-export function genReglementNDA(o: OrganismeInfo, _f?: FormationInfo, _s?: StagiaireInfo[]): string {
-  const today = new Date();
-  const dateStr = today.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
+export function genReglementNDA(o: OrganismeInfo, f?: FormationInfo, s?: StagiaireInfo[]): string {
+  // Date d'établissement = date de début de formation − 14 jours ouvrés
+  // (exclut weekends + jours fériés). À défaut, date du jour.
+  const refStart = f?.dateDebut || "";
+  const dateIso = refStart ? subtractBusinessDays(refStart, 14) : new Date().toISOString().slice(0, 10);
+  const dateStr = fmtDateLong(dateIso);
   const ville = v(o.ville);
+
+  const firstStag = s && s[0];
+  const nomStagiaire = firstStag ? `${firstStag.prenom || ""} ${firstStag.nom || ""}`.trim() : "";
+  const sigStagiaire = firstStag?.signatureUrl
+    ? `<img src="${firstStag.signatureUrl}" class="sig-img" alt="Signature stagiaire" />` : "";
+  const sigOrg = o.signatureUrl
+    ? `<img src="${o.signatureUrl}" class="sig-img" alt="Signature organisme" />` : "";
+  const tamponOrg = o.tamponUrl
+    ? `<img src="${o.tamponUrl}" class="sig-img" alt="Tampon organisme" />` : "";
 
   const body = `
 <h1>Règlement intérieur</h1>
@@ -274,12 +286,25 @@ export function genReglementNDA(o: OrganismeInfo, _f?: FormationInfo, _s?: Stagi
 <h3>Article 7</h3>
 <p>Un exemplaire du présent règlement est tenu à la disposition de chaque stagiaire (avant toute inscription définitive) ou lui est remis dans le cadre d'un contrat de formation professionnelle.</p>
 
+<p style="margin-top:18px;">Fait à <strong>${ville}</strong>, le <strong>${dateStr}</strong>.</p>
+
 <div class="signatures">
-  <div class="box"><strong>Pour l'organisme de formation</strong><br>${v(o.dirigeant)}<br><em>${v(o.nom)}</em><br>Fait à ${ville}, le ${dateStr}</div>
-  <div class="box"><strong>Le stagiaire</strong><br><em>(signature précédée de la mention « Lu et approuvé »)</em></div>
+  <div class="box">
+    <div class="title">Pour l'organisme de formation</div>
+    ${v(o.dirigeant)}<br><em>${v(o.nom)}</em>
+    ${sigOrg}
+    ${tamponOrg}
+  </div>
+  <div class="box">
+    <div class="title">Le stagiaire</div>
+    ${nomStagiaire || DOTS}
+    ${sigStagiaire}
+    <div class="mention">(signature précédée de la mention « Lu et approuvé »)</div>
+  </div>
 </div>
 
 ${footerHtml(o)}`;
 
-  return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">${CSS}</head><body>${body}</body></html>`;
+  return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">${CSS}</head><body><div class="doc">${body}</div></body></html>`;
 }
+
