@@ -93,9 +93,13 @@ export function genContratNDA(
   f: FormationInfo,
   stagiaires: StagiaireInfo[]
 ): string {
-  const today = new Date().toISOString().slice(0, 10);
-  const dateSignature = fmtDateLong(today);
+  // Date de signature = date de début de formation − 14 jours ouvrés
+  // (le calcul exclut weekends + jours fériés français).
+  const refStart = f.dateDebut || "";
+  const signatureIso = refStart ? subtractBusinessDays(refStart, 14) : new Date().toISOString().slice(0, 10);
+  const dateSignature = fmtDateLong(signatureIso);
   const lieuSignature = v(o.ville);
+
 
   // Génère un contrat par stagiaire (séparés par saut de page).
   const list: StagiaireInfo[] = (stagiaires && stagiaires.length > 0) ? stagiaires : [{
