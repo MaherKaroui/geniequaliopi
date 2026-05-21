@@ -30,32 +30,25 @@ Deno.serve(async (req) => {
     const siren = sirenMatch[1].slice(0, 9);
     console.log('Looking up SIREN:', siren);
 
-    // Use suggestions.pappers.fr (public, no API key needed)
-    const suggestUrl = `https://suggestions.pappers.fr/v2?q=${siren}&cibles=nom_entreprise,siren,siret`;
-    const suggestResp = await fetch(suggestUrl, {
-      headers: {
-        'Accept': 'application/json',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Origin': 'https://www.pappers.fr',
-        'Referer': 'https://www.pappers.fr/',
-      },
+    // Use the official French government API (recherche-entreprises) — free, no key
+    const apiUrl = `https://recherche-entreprises.api.gouv.fr/search?q=${siren}&page=1&per_page=1`;
+    const resp = await fetch(apiUrl, {
+      headers: { 'Accept': 'application/json', 'User-Agent': 'Mozilla/5.0' },
     });
 
-    if (!suggestResp.ok) {
-      const errBody = await suggestResp.text();
-      console.error('Suggestions API error:', suggestResp.status, errBody);
+    if (!resp.ok) {
+      const errBody = await resp.text();
+      console.error('API error:', resp.status, errBody);
       return new Response(
-        JSON.stringify({ success: false, error: `Erreur API: ${suggestResp.status}` }),
+        JSON.stringify({ success: false, error: `Erreur API: ${resp.status}` }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    const suggestData = await suggestResp.json();
-    console.log('Suggestions response:', JSON.stringify(suggestData).slice(0, 1000));
+    const apiData = await resp.json();
+    console.log('API response:', JSON.stringify(apiData).slice(0, 1000));
 
-    // Find matching company
-    const results = suggestData?.resultats_siren || suggestData?.resultats_nom_entreprise || suggestData || [];
-    const company = Array.isArray(results) ? results[0] : results;
+    const company = apiData?.results?.[0];
 
     if (!company) {
       return new Response(
@@ -64,18 +57,23 @@ Deno.serve(async (req) => {
       );
     }
 
+    const siege = company.siege || {};
+    const adresse = siege.adresse
+      || [siege.numero_voie, siege.type_voie, siege.libelle_voie].filter(Boolean).join(' ').trim();
+
     const result = {
-      nom: company.nom_complet || company.denomination || company.nom_entreprise || '',
-      siret: company.siege?.siret || company.siret || '',
+      nom: company.nom_complet || company.nom_raison_sociale || '',
+      siret: siege.siret || '',
       siren: company.siren || siren,
-      adresse: company.siege?.adresse_ligne_1 || company.siege?.adresse || '',
-      codePostal: company.siege?.code_postal || '',
-      ville: company.siege?.ville || company.siege?.libelle_commune || '',
+      adresse,
+      codePostal: siege.code_postal || '',
+      ville: siege.libelle_commune || siege.commune || '',
       dirigeant: extractDirigeant(company),
-      domainesFormation: company.libelle_activite_principale || company.siege?.libelle_activite_principale || '',
+      domainesFormation: company.activite_principale || siege.activite_principale || '',
       nda: '',
       siteWeb: '',
     };
+
 
     console.log('Parsed:', JSON.stringify(result));
 
@@ -93,10 +91,12 @@ Deno.serve(async (req) => {
 });
 
 function extractDirigeant(data: any): string {
-  const reps = data.representants || data.dirigeants || [];
+  const reps = data.dirigeants || data.representants || [];
   if (reps.length > 0) {
     const r = reps[0];
-    return `${r.prenom || ''} ${r.nom || ''}`.trim();
+    const prenom = r.prenoms || r.prenom || '';
+    const nom = r.nom || r.nom_complet || '';
+    return `${prenom} ${nom}`.trim();
   }
-  return data.dirigeant || '';
+  return '';
 }
