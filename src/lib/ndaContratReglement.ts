@@ -73,16 +73,20 @@ const CSS = `
   .signatures .box .title { font-weight: 700; margin-bottom: 8px; }
   .signatures .box .mention { font-style: italic; color: #111; font-size: 10pt; margin-top: 8px; }
   .signatures .box .sig-img { display: block; max-height: 95px; max-width: 220px; margin: 10px 0 4px 0; }
-  .footer { margin-top: 26px; padding-top: 5px; font-size: 9pt; color: #333; text-align: left; }
+  .footer { margin-top: 26px; padding-top: 8px; border-top: 1px solid #ddd; font-size: 9pt; color: #333; text-align: center; line-height: 1.5; }
+  .footer strong { display: block; font-size: 10pt; color: #111; margin-bottom: 2px; }
   .page-break { page-break-before: always; }
 </style>
 `;
 
 
 function footerHtml(o: OrganismeInfo): string {
-  const parts = [o.nom, o.siret ? `SIRET ${o.siret}` : "", o.nda ? `Déclaration d'activité n° ${o.nda}` : ""]
-    .filter(Boolean).join(" — ");
-  return `<div class="footer"><strong>${escapeHtml(o.nom || "")}</strong>${parts.replace(o.nom || "", "") ? " — " + escapeHtml(parts.replace((o.nom || "") + " — ", "")) : ""}</div>`;
+  // Pied de page centré : nom en gras sur une ligne, SIRET / NDA sur la suivante
+  const infos = [
+    o.siret ? `SIRET ${escapeHtml(o.siret)}` : "",
+    o.nda ? `Déclaration d'activité n° ${escapeHtml(o.nda)}` : "",
+  ].filter(Boolean).join(" — ");
+  return `<div class="footer"><strong>${escapeHtml(o.nom || "")}</strong>${infos}</div>`;
 }
 
 /* =========================================================================
