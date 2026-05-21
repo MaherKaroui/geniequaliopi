@@ -236,10 +236,24 @@ export function genListeFormateursNDA(o: OrganismeInfo, cv: CVData | null, _stag
     <td>${escapeHtml(qualites)}</td>
   </tr>` : `<tr><td>${DOTS}</td><td>${DOTS}</td><td>${DOTS}</td><td>${DOTS}</td></tr>`;
 
-  // 3) Dirigeant (travailleur indépendant)
-  const dirigQualites = nomCV && (cv?.profil || qualitesParts.length)
-    ? escapeHtml(cv?.profil || qualites)
-    : DOTS;
+  // 3) Dirigeant (travailleur indépendant) — détail expériences/formations/certifications du CV
+  const dirigParts: string[] = [];
+  if (cv?.profil) dirigParts.push(`<strong>Profil :</strong> ${escapeHtml(cv.profil)}`);
+  if (forms.length) dirigParts.push(`<strong>Diplômes :</strong><br>` + forms.map(f =>
+    `• ${escapeHtml(f.diplome || "")}${f.etablissement ? " — " + escapeHtml(f.etablissement) : ""}${f.annee ? " (" + escapeHtml(f.annee) + ")" : ""}`
+  ).join("<br>"));
+  if (certs.length) dirigParts.push(`<strong>Certifications :</strong><br>` + certs.map(c =>
+    `• ${escapeHtml(c.nom)}${c.annee ? " (" + escapeHtml(c.annee) + ")" : ""}`
+  ).join("<br>"));
+  if (exps.length) dirigParts.push(`<strong>Expériences professionnelles :</strong><br>` + exps.map(e =>
+    `• <strong>${escapeHtml(e.poste || "")}</strong>${e.entreprise ? " — " + escapeHtml(e.entreprise) : ""}${(e.dateDebut || e.dateFin) ? ` (${escapeHtml(e.dateDebut || "")}${e.dateFin ? " – " + escapeHtml(e.dateFin) : ""})` : ""}${e.description ? `<br><span style="font-size:10pt;color:#333;">${escapeHtml(e.description)}</span>` : ""}`
+  ).join("<br>"));
+  if (cv?.experiencePedagogique) dirigParts.push(`<strong>Expérience pédagogique :</strong><br>${escapeHtml(cv.experiencePedagogique)}`);
+  if (cv?.competences?.length) {
+    const comps = cv.competences.filter(c => c.nom);
+    if (comps.length) dirigParts.push(`<strong>Compétences :</strong> ` + comps.map(c => escapeHtml(c.nom)).join(", "));
+  }
+  const dirigQualites = dirigParts.length ? dirigParts.join("<br><br>") : DOTS;
 
   const body = `
 <h1>Liste des formateurs</h1>
