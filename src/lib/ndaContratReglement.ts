@@ -59,8 +59,8 @@ const CSS = `
   @page { size: A4; margin: 18mm 17mm 18mm 17mm; }
   html, body { margin: 0; padding: 0; }
   body { font-family: Calibri, Arial, sans-serif; font-size: 11pt; color: #111; line-height: 1.35; background: #fff; }
-  .doc { width: min(100%, 1120px); margin: 0 auto; padding: 28px 40px; box-sizing: border-box; }
-  @media screen and (max-width: 768px) { .doc { width: 100%; padding: 18px; } }
+  .doc { width: min(100%, 1120px); margin: 0 auto; padding: 40px 110px; box-sizing: border-box; }
+  @media screen and (max-width: 768px) { .doc { width: 100%; padding: 24px 22px; } }
   h1 { font-size: 15pt; text-align: center; text-transform: uppercase; margin: 14px 0 4px 0; font-weight: 700; }
   h2 { font-size: 11pt; text-align: center; font-weight: 400; font-style: italic; margin: 0 0 18px 0; color: #111; }
   h3 { font-size: 11pt; margin: 15px 0 6px 0; color: #111; font-weight: 700; }
