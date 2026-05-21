@@ -318,6 +318,7 @@ ${escapeHtml(o.nom || "")} — ${escapeHtml(adresseOrg)}</p>
     Nom : <strong>${v(o.dirigeant)}</strong><br>
     Qualité : Dirigeant
     <div class="mention">Signature :</div>
+    ${o.signatureUrl ? `<img src="${o.signatureUrl}" class="sig-img" alt="Signature dirigeant" />` : ""}
   </div>
 </div>
 
