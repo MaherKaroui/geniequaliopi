@@ -385,7 +385,7 @@ const DemandeNDA = () => {
       toast.success("CV téléchargé !");
       return;
     }
-    const html = generateDocumentHTML(docId, organisme, formation, stagiaires, cvData, cvDesign, uploadedCV);
+    const html = getDocHTML(docId);
     if (!html) { toast.error("Document non disponible."); return; }
     if (docId === "logo" && organisme.logoUrl) {
       const a = document.createElement("a");
