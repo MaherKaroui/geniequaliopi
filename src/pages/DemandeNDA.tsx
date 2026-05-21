@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChevronLeft, ChevronRight, Download, FileText, Loader2, CheckCircle2, Save, FolderOpen, Trash2, Clock, Upload, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Download, FileText, Loader2, CheckCircle2, Save, FolderOpen, Trash2, Clock, Upload, X, Pencil, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 import { OrganismeInfo, FormationInfo, StagiaireInfo, CritereData, CRITERES } from "@/types/qualiopi";
 import OrganismeForm from "@/components/OrganismeForm";
@@ -250,6 +250,9 @@ const DemandeNDA = () => {
   const [extractingCV, setExtractingCV] = useState(false);
   const [previewDoc, setPreviewDoc] = useState<string | null>(null);
   const [previewHTML, setPreviewHTML] = useState("");
+  const [editing, setEditing] = useState(false);
+  const [editedDocs, setEditedDocs] = useState<Record<string, string>>({});
+  const previewIframeRef = useRef<HTMLIFrameElement | null>(null);
   const [generating, setGenerating] = useState(false);
   const [exportFormat, setExportFormat] = useState<"pdf" | "doc">("pdf");
   const [docStyle, setDocStyleState] = useState<DocStyleConfig>({ ...DEFAULT_DOC_STYLE });
@@ -322,14 +325,54 @@ const DemandeNDA = () => {
     else { toast.success("Dossier supprimé"); fetchDossiers(); }
   };
 
+  const getDocHTML = (docId: string): string | null => {
+    if (editedDocs[docId]) return editedDocs[docId];
+    return generateDocumentHTML(docId, organisme, formation, stagiaires, cvData, cvDesign, uploadedCV);
+  };
+
   const handlePreview = (docId: string) => {
-    const html = generateDocumentHTML(docId, organisme, formation, stagiaires, cvData, cvDesign, uploadedCV);
+    const html = getDocHTML(docId);
     if (!html) {
       toast.error(docId === "logo" ? "Veuillez d'abord importer un logo" : "Veuillez remplir le CV du formateur ou en uploader un");
       return;
     }
     setPreviewDoc(docId);
     setPreviewHTML(html);
+    setEditing(false);
+  };
+
+  const handleEdit = (docId: string) => {
+    const html = getDocHTML(docId);
+    if (!html) {
+      toast.error("Document non disponible.");
+      return;
+    }
+    setPreviewDoc(docId);
+    setPreviewHTML(html);
+    setEditing(true);
+  };
+
+  const handleSaveEdit = () => {
+    if (!previewDoc) return;
+    const doc = previewIframeRef.current?.contentDocument;
+    if (!doc) { toast.error("Impossible de récupérer le contenu."); return; }
+    const html = "<!DOCTYPE html><html>" + doc.documentElement.innerHTML + "</html>";
+    setEditedDocs(prev => ({ ...prev, [previewDoc]: html }));
+    setPreviewHTML(html);
+    setEditing(false);
+    toast.success("Modifications enregistrées");
+  };
+
+  const handleResetEdit = (docId: string) => {
+    setEditedDocs(prev => {
+      const next = { ...prev };
+      delete next[docId];
+      return next;
+    });
+    const html = generateDocumentHTML(docId, organisme, formation, stagiaires, cvData, cvDesign, uploadedCV);
+    if (html) setPreviewHTML(html);
+    setEditing(false);
+    toast.success("Document réinitialisé");
   };
 
   const handleDownload = async (docId: string) => {
@@ -342,7 +385,7 @@ const DemandeNDA = () => {
       toast.success("CV téléchargé !");
       return;
     }
-    const html = generateDocumentHTML(docId, organisme, formation, stagiaires, cvData, cvDesign, uploadedCV);
+    const html = getDocHTML(docId);
     if (!html) { toast.error("Document non disponible."); return; }
     if (docId === "logo" && organisme.logoUrl) {
       const a = document.createElement("a");
@@ -393,7 +436,7 @@ const DemandeNDA = () => {
           } catch { /* skip */ }
           continue;
         }
-        const html = generateDocumentHTML(doc.id, organisme, formation, stagiaires, cvData, cvDesign, uploadedCV);
+        const html = getDocHTML(doc.id);
         if (html) {
           const wrappedHtml = html;
           if (exportFormat === "pdf") {
@@ -633,10 +676,18 @@ const DemandeNDA = () => {
                           </div>
                           {ready && <CheckCircle2 className="w-4 h-4 text-emerald-500" />}
                         </div>
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 flex-wrap">
                           <Button variant="outline" size="sm" onClick={() => handlePreview(doc.id)} className="gap-1">
                             <FileText className="w-3.5 h-3.5" /> Aperçu
                           </Button>
+                          <Button variant="outline" size="sm" onClick={() => handleEdit(doc.id)} className="gap-1">
+                            <Pencil className="w-3.5 h-3.5" /> Modifier
+                          </Button>
+                          {editedDocs[doc.id] && (
+                            <Button variant="outline" size="sm" onClick={() => handleResetEdit(doc.id)} className="gap-1" title="Réinitialiser le document">
+                              <RotateCcw className="w-3.5 h-3.5" />
+                            </Button>
+                          )}
                           <Button variant="outline" size="sm" onClick={() => handleDownload(doc.id)} className="gap-1">
                             <Download className="w-3.5 h-3.5" /> {exportFormat.toUpperCase()}
                           </Button>
@@ -650,15 +701,44 @@ const DemandeNDA = () => {
               {previewDoc && (
                 <Card>
                   <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-lg">Aperçu : {NDA_DOCUMENTS.find(d => d.id === previewDoc)?.label}</CardTitle>
-                      <Button variant="ghost" size="sm" onClick={() => setPreviewDoc(null)}>Fermer</Button>
+                    <div className="flex items-center justify-between flex-wrap gap-2">
+                      <CardTitle className="text-lg">
+                        {editing ? "Modification" : "Aperçu"} : {NDA_DOCUMENTS.find(d => d.id === previewDoc)?.label}
+                        {editedDocs[previewDoc] && !editing && <span className="ml-2 text-xs text-emerald-600">(modifié)</span>}
+                      </CardTitle>
+                      <div className="flex gap-2">
+                        {editing ? (
+                          <>
+                            <Button variant="default" size="sm" onClick={handleSaveEdit} className="gap-1">
+                              <Save className="w-3.5 h-3.5" /> Enregistrer
+                            </Button>
+                            <Button variant="ghost" size="sm" onClick={() => { setEditing(false); const html = getDocHTML(previewDoc); if (html) setPreviewHTML(html); }}>Annuler</Button>
+                          </>
+                        ) : (
+                          <Button variant="outline" size="sm" onClick={() => setEditing(true)} className="gap-1">
+                            <Pencil className="w-3.5 h-3.5" /> Modifier
+                          </Button>
+                        )}
+                        <Button variant="ghost" size="sm" onClick={() => { setPreviewDoc(null); setEditing(false); }}>Fermer</Button>
+                      </div>
                     </div>
+                    {editing && (
+                      <p className="text-xs text-muted-foreground mt-2">Cliquez dans le document pour modifier le texte directement, puis cliquez sur « Enregistrer ».</p>
+                    )}
                   </CardHeader>
                   <CardContent>
                     <div className="border rounded-lg overflow-hidden bg-white" style={{ maxHeight: "600px", overflowY: "auto" }}>
                       <iframe
-                        srcDoc={`<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{margin:0;padding:0;}</style></head><body>${previewHTML}</body></html>`}
+                        ref={previewIframeRef}
+                        key={`${previewDoc}-${editing ? "edit" : "view"}-${editedDocs[previewDoc] ? "m" : "o"}`}
+                        srcDoc={`<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{margin:0;padding:0;} ${editing ? "body{outline:2px dashed hsl(var(--primary));outline-offset:-2px;} [contenteditable]:focus{outline:2px solid hsl(var(--primary));}" : ""}</style></head><body>${previewHTML}</body></html>`}
+                        onLoad={(e) => {
+                          if (!editing) return;
+                          const doc = (e.target as HTMLIFrameElement).contentDocument;
+                          if (doc) {
+                            try { doc.designMode = "on"; } catch { /* noop */ }
+                          }
+                        }}
                         style={{ width: "100%", minHeight: "500px", border: "none" }}
                         title="Aperçu document"
                       />
