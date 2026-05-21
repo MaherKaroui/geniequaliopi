@@ -53,27 +53,27 @@ function adresseComplete(adresse?: string, cp?: string, ville?: string): string 
   return out || DOTS;
 }
 
-/** Style commun aux deux documents (sobre, A4 en impression, pleine largeur à l'écran) */
+/** Style commun aux deux documents : rendu Word/NDA proche des exemples fournis. */
 const CSS = `
 <style>
-  @page { size: A4; margin: 18mm 18mm 22mm 18mm; }
+  @page { size: A4; margin: 18mm 17mm 18mm 17mm; }
   html, body { margin: 0; padding: 0; }
-  body { font-family: 'Times New Roman', Georgia, serif; font-size: 11.5pt; color: #111; line-height: 1.6; background: #fff; }
-  .doc { max-width: 900px; margin: 0 auto; padding: 24px 32px; box-sizing: border-box; }
-  @media screen and (max-width: 768px) { .doc { padding: 16px; } }
-  h1 { font-size: 18pt; text-align: center; text-transform: uppercase; letter-spacing: 1px; margin: 0 0 4px 0; }
-  h2 { font-size: 11pt; text-align: center; font-weight: normal; font-style: italic; margin: 0 0 18px 0; color: #444; }
-  h3 { font-size: 12.5pt; margin: 16px 0 6px 0; color: #1a1a1a; }
-  p { margin: 6px 0; text-align: justify; }
-  ul { margin: 4px 0 8px 22px; padding: 0; }
-  li { margin: 2px 0; }
-  .meta { text-align: center; font-size: 10.5pt; color: #555; margin-bottom: 18px; }
-  .signatures { margin-top: 32px; display: flex; gap: 32px; justify-content: space-between; flex-wrap: wrap; }
-  .signatures .box { flex: 1 1 280px; border: 1px solid #999; border-radius: 6px; padding: 12px 14px; font-size: 10.5pt; min-height: 160px; background: #fafafa; }
-  .signatures .box .title { font-weight: bold; margin-bottom: 4px; }
-  .signatures .box .mention { font-style: italic; color: #666; font-size: 9.5pt; margin-top: 6px; }
-  .signatures .box .sig-img { display: block; max-height: 90px; max-width: 100%; margin: 8px 0 4px 0; }
-  .footer { margin-top: 28px; padding-top: 6px; border-top: 1px solid #ccc; font-size: 9pt; color: #777; text-align: center; }
+  body { font-family: Calibri, Arial, sans-serif; font-size: 11pt; color: #111; line-height: 1.35; background: #fff; }
+  .doc { width: min(100%, 1120px); margin: 0 auto; padding: 28px 40px; box-sizing: border-box; }
+  @media screen and (max-width: 768px) { .doc { width: 100%; padding: 18px; } }
+  h1 { font-size: 15pt; text-align: center; text-transform: uppercase; margin: 14px 0 4px 0; font-weight: 700; }
+  h2 { font-size: 11pt; text-align: center; font-weight: 400; font-style: italic; margin: 0 0 18px 0; color: #111; }
+  h3 { font-size: 11pt; margin: 15px 0 6px 0; color: #111; font-weight: 700; }
+  p { margin: 7px 0; text-align: justify; }
+  ul { margin: 5px 0 9px 28px; padding: 0; }
+  li { margin: 4px 0; padding-left: 2px; }
+  .meta { text-align: center; font-size: 11pt; color: #111; margin-bottom: 18px; }
+  .signatures { margin-top: 34px; display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: start; }
+  .signatures .box { font-size: 11pt; min-height: 145px; }
+  .signatures .box .title { font-weight: 700; margin-bottom: 8px; }
+  .signatures .box .mention { font-style: italic; color: #111; font-size: 10pt; margin-top: 8px; }
+  .signatures .box .sig-img { display: block; max-height: 95px; max-width: 220px; margin: 10px 0 4px 0; }
+  .footer { margin-top: 26px; padding-top: 5px; font-size: 9pt; color: #333; text-align: left; }
   .page-break { page-break-before: always; }
 </style>
 `;
@@ -148,7 +148,7 @@ export function genContratNDA(
 <div class="meta">Fait à ${lieuSignature}, le ${dateSignIndiv}</div>
 
 <p><strong>Entre les soussignés :</strong></p>
-<p>1) <strong>${v(o.nom)}</strong>, dont le siège est situé ${adresseOrg}, représenté par <strong>${v(o.dirigeant)}</strong>, enregistré sous le numéro de déclaration d'activité <strong>${v(o.nda)}</strong> auprès de la DRIEETS, ci-après désigné « l'organisme de formation ».</p>
+<p>1) <strong>${v(o.nom)}</strong>, dont le siège est situé ${adresseOrg}, représenté par <strong>${v(o.dirigeant)}</strong>, ci-après désigné « l'organisme de formation ».</p>
 <p>2) <strong>${nomStagiaire || DOTS}</strong>, demeurant ${adresseStagiaire}, ci-après désigné « le stagiaire ».</p>
 <p>Il est conclu le présent contrat de formation professionnelle en application des articles L.6353-3 à L.6353-7 du Code du travail.</p>
 
