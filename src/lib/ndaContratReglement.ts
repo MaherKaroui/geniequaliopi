@@ -89,10 +89,12 @@ export function genContratNDA(
   const lieuSignature = v(o.ville);
 
   // Génère un contrat par stagiaire (séparés par saut de page).
-  const list = (stagiaires && stagiaires.length > 0) ? stagiaires : [{
-    nom: "", prenom: "", email: "", telephone: "",
-    adresse: "", codePostal: "", ville: "",
-  } as StagiaireInfo];
+  const list: StagiaireInfo[] = (stagiaires && stagiaires.length > 0) ? stagiaires : [{
+    civilite: "", nom: "", prenom: "", email: "", telephone: "",
+    entreprise: "", poste: "", dateNaissance: "",
+    adresse: "", codePostal: "", commune: "",
+  }];
+
 
   const prixNum = parseMontant(f.tarif);
   const prixHT = prixNum !== null ? prixNum.toFixed(2).replace(".", ",") : DOTS;
