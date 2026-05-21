@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChevronLeft, ChevronRight, Download, FileText, Loader2, CheckCircle2, Save, FolderOpen, Trash2, Clock, Upload, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Download, FileText, Loader2, CheckCircle2, Save, FolderOpen, Trash2, Clock, Upload, X, Pencil, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 import { OrganismeInfo, FormationInfo, StagiaireInfo, CritereData, CRITERES } from "@/types/qualiopi";
 import OrganismeForm from "@/components/OrganismeForm";
