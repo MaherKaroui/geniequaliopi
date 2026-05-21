@@ -226,10 +226,6 @@ ${o.email ? "Email : " + escapeHtml(o.email) : ""}</p>
     ${v(o.dirigeant)}<br><em>${v(o.nom)}</em>
     ${o.tamponUrl ? `<img src="${o.tamponUrl}" class="sig-img" alt="Tampon" />` : ""}
   </div>
-  <div class="box">
-    <div class="title">Pour le client (Bon pour accord)</div>
-    <div class="mention">Date et signature</div>
-  </div>
 </div>
 
 ${footerHtml(o)}`;
