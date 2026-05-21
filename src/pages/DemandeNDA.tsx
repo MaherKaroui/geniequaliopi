@@ -15,6 +15,8 @@ import { genContratFormationParticulier, genDevis, genFacture } from "@/lib/temp
 import { courseCertificateHtml } from "@/lib/newsletterScreenshots";
 import { isFormationTerminee, setDocStyle } from "@/lib/docBuilder";
 import { genReglement_V2, genEmargementJour_V2 } from "@/lib/generatorsV2";
+import { genContratNDA, genReglementNDA } from "@/lib/ndaContratReglement";
+
 import { generateDocumentById } from "@/lib/documentGenerator";
 import { htmlToPdfBlob } from "@/lib/pdfExport";
 import { CVData, CVDesign, emptyCV, generateCVHTML } from "@/lib/cvGenerator";
