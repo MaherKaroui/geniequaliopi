@@ -177,7 +177,15 @@ ${footerHtml(o)}`;
  * DEVIS
  * ========================================================================= */
 export function genDevisNDA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]): string {
-  const numDevis = `DV-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 9000) + 1000)}`;
+  // Si la formation est terminée (date de fin passée), le document devient une FACTURE
+  const fin = f.dateFin ? new Date(f.dateFin) : null;
+  const today0 = new Date(); today0.setHours(0, 0, 0, 0);
+  const isFacture = !!(fin && !isNaN(fin.getTime()) && fin.getTime() < today0.getTime());
+
+  const prefix = isFacture ? "FA" : "DV";
+  const numDoc = `${prefix}-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 9000) + 1000)}`;
+  const titre = isFacture ? "Facture" : "Devis";
+
   const prixUnit = parseMontant(f.tarif);
   const list = stagiaires.length ? stagiaires : [{ prenom: "", nom: "", entreprise: "" } as StagiaireInfo];
 
@@ -194,9 +202,19 @@ export function genDevisNDA(o: OrganismeInfo, f: FormationInfo, stagiaires: Stag
   }, 0);
   const totalStr = totalHT.toFixed(2).replace(".", ",") + " €";
 
+  const periodeFormation = (f.dateDebut || f.dateFin)
+    ? `<p><strong>Période de formation :</strong> du ${fmtDateLong(f.dateDebut)} au ${fmtDateLong(f.dateFin)}</p>`
+    : "";
+
+  const conditions = isFacture
+    ? `<h3>Conditions de règlement</h3>
+<p>Facture émise à l'issue de la formation. Règlement à 30 jours à réception, par virement bancaire. TVA non applicable, article 261-4-4° du CGI.</p>`
+    : `<h3>Conditions</h3>
+<p>Validité du devis : 30 jours. Règlement à 30 jours à réception de facture.</p>`;
+
   const body = `
-<h1>Devis</h1>
-<h2>N° ${numDevis} — ${today()}</h2>
+<h1>${titre}</h1>
+<h2>N° ${numDoc} — ${today()}</h2>
 
 <h3>Émetteur</h3>
 <p><strong>${escapeHtml(o.nom || "")}</strong><br>
@@ -207,6 +225,8 @@ ${o.email ? "Email : " + escapeHtml(o.email) : ""}</p>
 <h3>Destinataire</h3>
 <p>${escapeHtml(list[0]?.entreprise || `${list[0]?.prenom || ""} ${list[0]?.nom || ""}`.trim() || DOTS)}</p>
 
+${periodeFormation}
+
 <h3>Détail de la prestation</h3>
 <table>
   <thead><tr><th>Stagiaire</th><th>Formation</th><th>Durée</th><th style="text-align:right;">Montant HT</th></tr></thead>
@@ -216,8 +236,7 @@ ${o.email ? "Email : " + escapeHtml(o.email) : ""}</p>
   <tr><td colspan="3" style="text-align:right;font-weight:700;">Total net à payer</td><td style="text-align:right;font-weight:700;">${totalStr}</td></tr></tfoot>
 </table>
 
-<h3>Conditions</h3>
-<p>Validité du devis : 30 jours. Règlement à 30 jours à réception de facture. Devis à retourner daté et signé avec la mention « Bon pour accord ».</p>
+${conditions}
 
 <div class="signatures">
   <div class="box">
