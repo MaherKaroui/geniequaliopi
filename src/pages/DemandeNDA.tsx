@@ -436,7 +436,7 @@ const DemandeNDA = () => {
           } catch { /* skip */ }
           continue;
         }
-        const html = generateDocumentHTML(doc.id, organisme, formation, stagiaires, cvData, cvDesign, uploadedCV);
+        const html = getDocHTML(doc.id);
         if (html) {
           const wrappedHtml = html;
           if (exportFormat === "pdf") {
