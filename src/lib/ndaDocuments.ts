@@ -278,7 +278,7 @@ export function genEmargementNDA(o: OrganismeInfo, f: FormationInfo, stagiaires:
 <h2>${escapeHtml(f.intitule || "")}</h2>
 <div class="meta">Journée du ${fmtDateLong(iso)} — ${v(f.lieu)}</div>
 
-<table class="nda-text-table">
+<table>
   <thead>
     <tr>
       <th rowspan="2" style="width:38%;">Nom et prénom du stagiaire</th>
