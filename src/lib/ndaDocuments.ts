@@ -232,7 +232,7 @@ export function genListeFormateursNDA(o: OrganismeInfo, cv: CVData | null, _stag
   const row1 = nomCV ? `<tr>
     <td>${escapeHtml(nomCV)}</td>
     <td>${DOTS}</td>
-    <td>Formateur occasionnel</td>
+    <td>Dirigeant et formateur</td>
     <td>${escapeHtml(qualites)}</td>
   </tr>` : `<tr><td>${DOTS}</td><td>${DOTS}</td><td>${DOTS}</td><td>${DOTS}</td></tr>`;
 
