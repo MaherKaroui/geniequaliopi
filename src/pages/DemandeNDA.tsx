@@ -15,6 +15,8 @@ import { genContratFormationParticulier, genDevis, genFacture } from "@/lib/temp
 import { courseCertificateHtml } from "@/lib/newsletterScreenshots";
 import { isFormationTerminee, setDocStyle } from "@/lib/docBuilder";
 import { genReglement_V2, genEmargementJour_V2 } from "@/lib/generatorsV2";
+import { genContratNDA, genReglementNDA } from "@/lib/ndaContratReglement";
+
 import { generateDocumentById } from "@/lib/documentGenerator";
 import { htmlToPdfBlob } from "@/lib/pdfExport";
 import { CVData, CVDesign, emptyCV, generateCVHTML } from "@/lib/cvGenerator";
@@ -172,11 +174,12 @@ function generateDocumentHTML(docId: string, o: OrganismeInfo, f: FormationInfo,
 
   switch (docId) {
     case "contrat":
-      return genContratFormationParticulier(cleanOrganisme, f, s);
+      return genContratNDA(cleanOrganisme, f, s);
     case "programme":
       return generateProgrammeNDA(cleanOrganisme, f, s);
     case "reglement":
-      return genReglement_V2(cleanOrganisme, f, s);
+      return genReglementNDA(cleanOrganisme, f, s);
+
     case "devis_facture":
       return isFormationTerminee(f, s) ? genFacture(cleanOrganisme, f, s) : genDevis(cleanOrganisme, f, s);
     case "logo":
