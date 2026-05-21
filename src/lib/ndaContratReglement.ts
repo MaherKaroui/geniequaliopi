@@ -61,6 +61,7 @@ export const CSS = `
   body { font-family: Calibri, Arial, sans-serif; font-size: 11pt; color: #111; line-height: 1.35; background: #fff; }
   .doc { width: min(100%, 1120px); margin: 0 auto; padding: 40px 110px; box-sizing: border-box; }
   @media screen and (max-width: 768px) { .doc { width: 100%; padding: 24px 22px; } }
+  @media print { .doc { width: 100%; max-width: none; padding: 0; } }
   h1 { font-size: 15pt; text-align: center; text-transform: uppercase; margin: 14px 0 4px 0; font-weight: 700; }
   h2 { font-size: 11pt; text-align: center; font-weight: 400; font-style: italic; margin: 0 0 18px 0; color: #111; }
   h3 { font-size: 11pt; margin: 15px 0 6px 0; color: #111; font-weight: 700; }
@@ -68,8 +69,8 @@ export const CSS = `
   ul { margin: 5px 0 9px 28px; padding: 0; }
   li { margin: 4px 0; padding-left: 2px; }
   .meta { text-align: center; font-size: 11pt; color: #111; margin-bottom: 18px; }
-  table { border-collapse: collapse; width: 100%; margin: 10px 0; font-size: 10.5pt; }
-  th, td { border: 1px solid #444; padding: 6px 8px; vertical-align: top; text-align: left; }
+  table { border-collapse: collapse; width: 100%; max-width: 100%; margin: 10px 0; font-size: 10.5pt; table-layout: fixed; word-wrap: break-word; }
+  th, td { border: 1px solid #444; padding: 6px 8px; vertical-align: top; text-align: left; word-wrap: break-word; overflow-wrap: break-word; }
   th { background: #f0f0f0; font-weight: 700; }
   .signatures { margin-top: 34px; display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: start; }
   .signatures .box { font-size: 11pt; min-height: 145px; }
