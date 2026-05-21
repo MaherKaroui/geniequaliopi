@@ -53,8 +53,8 @@ function adresseComplete(adresse?: string, cp?: string, ville?: string): string 
   return out || DOTS;
 }
 
-/** Style commun aux deux documents : rendu Word/NDA proche des exemples fournis. */
-const CSS = `
+/** Style commun à TOUS les documents NDA : design sobre type Word. */
+export const CSS = `
 <style>
   @page { size: A4; margin: 18mm 17mm 18mm 17mm; }
   html, body { margin: 0; padding: 0; }
@@ -68,6 +68,9 @@ const CSS = `
   ul { margin: 5px 0 9px 28px; padding: 0; }
   li { margin: 4px 0; padding-left: 2px; }
   .meta { text-align: center; font-size: 11pt; color: #111; margin-bottom: 18px; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; font-size: 10.5pt; }
+  th, td { border: 1px solid #444; padding: 6px 8px; vertical-align: top; text-align: left; }
+  th { background: #f0f0f0; font-weight: 700; }
   .signatures { margin-top: 34px; display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: start; }
   .signatures .box { font-size: 11pt; min-height: 145px; }
   .signatures .box .title { font-weight: 700; margin-bottom: 8px; }
@@ -80,14 +83,15 @@ const CSS = `
 `;
 
 
-function footerHtml(o: OrganismeInfo): string {
-  // Pied de page centré : nom en gras sur une ligne, SIRET / NDA sur la suivante
+export function footerHtml(o: OrganismeInfo): string {
   const infos = [
     o.siret ? `SIRET ${escapeHtml(o.siret)}` : "",
     o.nda ? `Déclaration d'activité n° ${escapeHtml(o.nda)}` : "",
   ].filter(Boolean).join(" — ");
   return `<div class="footer"><strong>${escapeHtml(o.nom || "")}</strong>${infos}</div>`;
 }
+
+export { escapeHtml, v, fmtDateLong, adresseComplete, parseHeures, parseMontant, DOTS };
 
 /* =========================================================================
  * DOCUMENT 1 : CONTRAT DE FORMATION PROFESSIONNELLE
