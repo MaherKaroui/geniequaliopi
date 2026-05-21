@@ -16,6 +16,7 @@ import { courseCertificateHtml } from "@/lib/newsletterScreenshots";
 import { isFormationTerminee, setDocStyle } from "@/lib/docBuilder";
 import { genReglement_V2, genEmargementJour_V2 } from "@/lib/generatorsV2";
 import { genContratNDA, genReglementNDA } from "@/lib/ndaContratReglement";
+import { genProgrammeNDA, genDevisNDA, genEmargementNDA, genListeFormateursNDA } from "@/lib/ndaDocuments";
 
 import { generateDocumentById } from "@/lib/documentGenerator";
 import { htmlToPdfBlob } from "@/lib/pdfExport";
