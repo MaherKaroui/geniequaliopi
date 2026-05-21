@@ -112,7 +112,7 @@ export function genContratNDA(
 
   const blocks = list.map((s, idx) => {
     const nomStagiaire = `${s.prenom || ""} ${s.nom || ""}`.trim();
-    const adresseStagiaire = adresseComplete(s.adresse, s.codePostal, s.ville);
+    const adresseStagiaire = adresseComplete(s.adresse, s.codePostal, s.commune);
     const pageBreak = idx > 0 ? `<div class="page-break"></div>` : "";
 
     return `${pageBreak}
