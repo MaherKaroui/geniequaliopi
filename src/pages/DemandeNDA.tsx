@@ -207,7 +207,7 @@ function generateDocumentHTML(docId: string, o: OrganismeInfo, f: FormationInfo,
       return genListeFormateursNDA(cleanOrganisme, hasCV ? cvData : null, s);
     }
     case "emargement":
-      return genEmargementNDA(cleanOrganisme, f, s);
+      return genEmargementJour_V2(cleanOrganisme, f, s, 0, "");
     case "certificat_coursera": {
       // Format A4 paysage 297x210mm (~1123x794px @96dpi).
       // Certificat source: 1100x850px (ratio 1.294). Scale ≈ 0.847 → 932x720 final.
