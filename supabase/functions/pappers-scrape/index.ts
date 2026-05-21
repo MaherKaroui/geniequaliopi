@@ -91,10 +91,12 @@ Deno.serve(async (req) => {
 });
 
 function extractDirigeant(data: any): string {
-  const reps = data.representants || data.dirigeants || [];
+  const reps = data.dirigeants || data.representants || [];
   if (reps.length > 0) {
     const r = reps[0];
-    return `${r.prenom || ''} ${r.nom || ''}`.trim();
+    const prenom = r.prenoms || r.prenom || '';
+    const nom = r.nom || r.nom_complet || '';
+    return `${prenom} ${nom}`.trim();
   }
-  return data.dirigeant || '';
+  return '';
 }
