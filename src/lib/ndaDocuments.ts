@@ -397,7 +397,7 @@ ${escapeHtml(o.nom || "")} — ${escapeHtml(adresseOrg)}</p>
 <p style="font-size:9pt;font-style:italic;">Au-delà de 5 intervenants, joindre une liste complémentaire avec présentation identique.</p>
 
 <h3>3. Votre activité est exercée en tant que travailleur indépendant ou dirigeant</h3>
-<table>
+<table class="nda-text-table">
   <thead>
     <tr><th>Titres, diplômes, qualités, expérience</th></tr>
   </thead>
