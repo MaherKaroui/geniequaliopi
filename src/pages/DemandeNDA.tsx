@@ -250,6 +250,9 @@ const DemandeNDA = () => {
   const [extractingCV, setExtractingCV] = useState(false);
   const [previewDoc, setPreviewDoc] = useState<string | null>(null);
   const [previewHTML, setPreviewHTML] = useState("");
+  const [editing, setEditing] = useState(false);
+  const [editedDocs, setEditedDocs] = useState<Record<string, string>>({});
+  const previewIframeRef = useRef<HTMLIFrameElement | null>(null);
   const [generating, setGenerating] = useState(false);
   const [exportFormat, setExportFormat] = useState<"pdf" | "doc">("pdf");
   const [docStyle, setDocStyleState] = useState<DocStyleConfig>({ ...DEFAULT_DOC_STYLE });
