@@ -9,6 +9,8 @@
  * Les champs vides apparaissent en pointillés "..........".
  */
 import type { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
+import { subtractBusinessDays } from "@/lib/docBuilder";
+
 
 const DOTS = "..........";
 
@@ -51,24 +53,31 @@ function adresseComplete(adresse?: string, cp?: string, ville?: string): string 
   return out || DOTS;
 }
 
-/** Style commun aux deux documents (sobre, A4, police lisible) */
+/** Style commun aux deux documents (sobre, A4 en impression, pleine largeur à l'écran) */
 const CSS = `
 <style>
   @page { size: A4; margin: 18mm 18mm 22mm 18mm; }
-  body { font-family: 'Times New Roman', Georgia, serif; font-size: 11.5pt; color: #111; line-height: 1.55; }
-  h1 { font-size: 16pt; text-align: center; text-transform: uppercase; letter-spacing: 1px; margin: 0 0 4px 0; }
+  html, body { margin: 0; padding: 0; }
+  body { font-family: 'Times New Roman', Georgia, serif; font-size: 11.5pt; color: #111; line-height: 1.6; background: #fff; }
+  .doc { max-width: 900px; margin: 0 auto; padding: 24px 32px; box-sizing: border-box; }
+  @media screen and (max-width: 768px) { .doc { padding: 16px; } }
+  h1 { font-size: 18pt; text-align: center; text-transform: uppercase; letter-spacing: 1px; margin: 0 0 4px 0; }
   h2 { font-size: 11pt; text-align: center; font-weight: normal; font-style: italic; margin: 0 0 18px 0; color: #444; }
-  h3 { font-size: 12pt; margin: 14px 0 6px 0; color: #1a1a1a; }
+  h3 { font-size: 12.5pt; margin: 16px 0 6px 0; color: #1a1a1a; }
   p { margin: 6px 0; text-align: justify; }
   ul { margin: 4px 0 8px 22px; padding: 0; }
   li { margin: 2px 0; }
-  .meta { text-align: center; font-size: 10pt; color: #555; margin-bottom: 18px; }
-  .signatures { margin-top: 28px; display: flex; gap: 40px; justify-content: space-between; }
-  .signatures .box { flex: 1; border-top: 1px solid #999; padding-top: 6px; font-size: 10.5pt; min-height: 70px; }
-  .footer { margin-top: 24px; padding-top: 6px; border-top: 1px solid #ccc; font-size: 9pt; color: #777; text-align: center; }
+  .meta { text-align: center; font-size: 10.5pt; color: #555; margin-bottom: 18px; }
+  .signatures { margin-top: 32px; display: flex; gap: 32px; justify-content: space-between; flex-wrap: wrap; }
+  .signatures .box { flex: 1 1 280px; border: 1px solid #999; border-radius: 6px; padding: 12px 14px; font-size: 10.5pt; min-height: 160px; background: #fafafa; }
+  .signatures .box .title { font-weight: bold; margin-bottom: 4px; }
+  .signatures .box .mention { font-style: italic; color: #666; font-size: 9.5pt; margin-top: 6px; }
+  .signatures .box .sig-img { display: block; max-height: 90px; max-width: 100%; margin: 8px 0 4px 0; }
+  .footer { margin-top: 28px; padding-top: 6px; border-top: 1px solid #ccc; font-size: 9pt; color: #777; text-align: center; }
   .page-break { page-break-before: always; }
 </style>
 `;
+
 
 function footerHtml(o: OrganismeInfo): string {
   const parts = [o.nom, o.siret ? `SIRET ${o.siret}` : "", o.nda ? `Déclaration d'activité n° ${o.nda}` : ""]
@@ -84,9 +93,13 @@ export function genContratNDA(
   f: FormationInfo,
   stagiaires: StagiaireInfo[]
 ): string {
-  const today = new Date().toISOString().slice(0, 10);
-  const dateSignature = fmtDateLong(today);
+  // Date de signature = date de début de formation − 14 jours ouvrés
+  // (le calcul exclut weekends + jours fériés français).
+  const refStart = f.dateDebut || "";
+  const signatureIso = refStart ? subtractBusinessDays(refStart, 14) : new Date().toISOString().slice(0, 10);
+  const dateSignature = fmtDateLong(signatureIso);
   const lieuSignature = v(o.ville);
+
 
   // Génère un contrat par stagiaire (séparés par saut de page).
   const list: StagiaireInfo[] = (stagiaires && stagiaires.length > 0) ? stagiaires : [{
@@ -115,10 +128,27 @@ export function genContratNDA(
     const adresseStagiaire = adresseComplete(s.adresse, s.codePostal, s.commune);
     const pageBreak = idx > 0 ? `<div class="page-break"></div>` : "";
 
+    // Date individuelle si renseignée, sinon date globale (toujours -14 jours ouvrés)
+    const indivStart = s.dateDebutFormation || f.dateDebut || "";
+    const indivSignIso = indivStart ? subtractBusinessDays(indivStart, 14) : signatureIso;
+    const dateSignIndiv = fmtDateLong(indivSignIso);
+
+    // Signature stagiaire (image uploadée ou tracée)
+    const sigStagiaire = s.signatureUrl
+      ? `<img src="${s.signatureUrl}" class="sig-img" alt="Signature stagiaire" />`
+      : "";
+    // Signature/tampon organisme
+    const sigOrg = o.signatureUrl
+      ? `<img src="${o.signatureUrl}" class="sig-img" alt="Signature organisme" />`
+      : "";
+    const tamponOrg = o.tamponUrl
+      ? `<img src="${o.tamponUrl}" class="sig-img" alt="Tampon organisme" />`
+      : "";
+
     return `${pageBreak}
 <h1>Contrat de formation professionnelle</h1>
 <h2>(Articles L.6353-3 et suivants du Code du travail)</h2>
-<div class="meta">Fait à ${lieuSignature}, le ${dateSignature}</div>
+<div class="meta">Fait à ${lieuSignature}, le ${dateSignIndiv}</div>
 
 <p><strong>Entre les soussignés :</strong></p>
 <p>1) <strong>${v(o.nom)}</strong>, dont le siège est situé ${adresseOrg}, représenté par <strong>${v(o.dirigeant)}</strong>, enregistré sous le numéro de déclaration d'activité <strong>${v(o.nda)}</strong> auprès de la DRIEETS, ci-après désigné « l'organisme de formation ».</p>
@@ -150,7 +180,7 @@ export function genContratNDA(
 </ul>
 
 <h3>Article 5 — Nature de la sanction</h3>
-<p>La formation donne lieu à la délivrance ${sanction === "une attestation de fin de formation" ? "d'" + sanction : "d'" + sanction} précisant les objectifs, la nature, la durée de l'action et les résultats de l'évaluation des acquis.</p>
+<p>La formation donne lieu à la délivrance d'${sanction} précisant les objectifs, la nature, la durée de l'action et les résultats de l'évaluation des acquis.</p>
 
 <h3>Article 6 — Délai de rétractation</h3>
 <p>À compter de la date de signature du présent contrat, le stagiaire dispose d'un délai de <strong>${delaiRetractation} jours</strong> pour se rétracter. Il en informe l'organisme de formation par lettre recommandée avec accusé de réception. Dans ce cas, aucune somme ne peut être exigée du stagiaire.</p>
@@ -167,26 +197,49 @@ export function genContratNDA(
 <h3>Article 9 — Cas de différend</h3>
 <p>Si une contestation ou un différend ne peuvent être réglés à l'amiable, le tribunal de <strong>${tribunal}</strong> sera seul compétent pour se prononcer.</p>
 
-<p style="margin-top:18px;">Fait en double exemplaire, à <strong>${lieuSignature}</strong>, le <strong>${dateSignature}</strong>.</p>
+<p style="margin-top:18px;">Fait en double exemplaire, à <strong>${lieuSignature}</strong>, le <strong>${dateSignIndiv}</strong>.</p>
 
 <div class="signatures">
-  <div class="box"><strong>Pour le stagiaire</strong><br>${nomStagiaire || DOTS}<br><em>(signature précédée de la mention « Lu et approuvé »)</em></div>
-  <div class="box"><strong>Pour l'organisme de formation</strong><br>${v(o.dirigeant)}<br><em>${v(o.nom)}</em></div>
+  <div class="box">
+    <div class="title">Pour le stagiaire</div>
+    ${nomStagiaire || DOTS}
+    ${sigStagiaire}
+    <div class="mention">(signature précédée de la mention « Lu et approuvé »)</div>
+  </div>
+  <div class="box">
+    <div class="title">Pour l'organisme de formation</div>
+    ${v(o.dirigeant)}<br><em>${v(o.nom)}</em>
+    ${sigOrg}
+    ${tamponOrg}
+  </div>
 </div>
 
 ${footerHtml(o)}`;
   }).join("\n");
 
-  return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">${CSS}</head><body>${blocks}</body></html>`;
+  return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">${CSS}</head><body><div class="doc">${blocks}</div></body></html>`;
 }
+
 
 /* =========================================================================
  * DOCUMENT 2 : RÈGLEMENT INTÉRIEUR
  * ========================================================================= */
-export function genReglementNDA(o: OrganismeInfo, _f?: FormationInfo, _s?: StagiaireInfo[]): string {
-  const today = new Date();
-  const dateStr = today.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
+export function genReglementNDA(o: OrganismeInfo, f?: FormationInfo, s?: StagiaireInfo[]): string {
+  // Date d'établissement = date de début de formation − 14 jours ouvrés
+  // (exclut weekends + jours fériés). À défaut, date du jour.
+  const refStart = f?.dateDebut || "";
+  const dateIso = refStart ? subtractBusinessDays(refStart, 14) : new Date().toISOString().slice(0, 10);
+  const dateStr = fmtDateLong(dateIso);
   const ville = v(o.ville);
+
+  const firstStag = s && s[0];
+  const nomStagiaire = firstStag ? `${firstStag.prenom || ""} ${firstStag.nom || ""}`.trim() : "";
+  const sigStagiaire = firstStag?.signatureUrl
+    ? `<img src="${firstStag.signatureUrl}" class="sig-img" alt="Signature stagiaire" />` : "";
+  const sigOrg = o.signatureUrl
+    ? `<img src="${o.signatureUrl}" class="sig-img" alt="Signature organisme" />` : "";
+  const tamponOrg = o.tamponUrl
+    ? `<img src="${o.tamponUrl}" class="sig-img" alt="Tampon organisme" />` : "";
 
   const body = `
 <h1>Règlement intérieur</h1>
@@ -233,12 +286,25 @@ export function genReglementNDA(o: OrganismeInfo, _f?: FormationInfo, _s?: Stagi
 <h3>Article 7</h3>
 <p>Un exemplaire du présent règlement est tenu à la disposition de chaque stagiaire (avant toute inscription définitive) ou lui est remis dans le cadre d'un contrat de formation professionnelle.</p>
 
+<p style="margin-top:18px;">Fait à <strong>${ville}</strong>, le <strong>${dateStr}</strong>.</p>
+
 <div class="signatures">
-  <div class="box"><strong>Pour l'organisme de formation</strong><br>${v(o.dirigeant)}<br><em>${v(o.nom)}</em><br>Fait à ${ville}, le ${dateStr}</div>
-  <div class="box"><strong>Le stagiaire</strong><br><em>(signature précédée de la mention « Lu et approuvé »)</em></div>
+  <div class="box">
+    <div class="title">Pour l'organisme de formation</div>
+    ${v(o.dirigeant)}<br><em>${v(o.nom)}</em>
+    ${sigOrg}
+    ${tamponOrg}
+  </div>
+  <div class="box">
+    <div class="title">Le stagiaire</div>
+    ${nomStagiaire || DOTS}
+    ${sigStagiaire}
+    <div class="mention">(signature précédée de la mention « Lu et approuvé »)</div>
+  </div>
 </div>
 
 ${footerHtml(o)}`;
 
-  return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">${CSS}</head><body>${body}</body></html>`;
+  return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">${CSS}</head><body><div class="doc">${body}</div></body></html>`;
 }
+
