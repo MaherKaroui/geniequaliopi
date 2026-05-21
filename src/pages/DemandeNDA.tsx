@@ -16,6 +16,7 @@ import { courseCertificateHtml } from "@/lib/newsletterScreenshots";
 import { isFormationTerminee, setDocStyle } from "@/lib/docBuilder";
 import { genReglement_V2, genEmargementJour_V2 } from "@/lib/generatorsV2";
 import { genContratNDA, genReglementNDA } from "@/lib/ndaContratReglement";
+import { genProgrammeNDA, genDevisNDA, genEmargementNDA, genListeFormateursNDA } from "@/lib/ndaDocuments";
 
 import { generateDocumentById } from "@/lib/documentGenerator";
 import { htmlToPdfBlob } from "@/lib/pdfExport";
@@ -176,12 +177,12 @@ function generateDocumentHTML(docId: string, o: OrganismeInfo, f: FormationInfo,
     case "contrat":
       return genContratNDA(cleanOrganisme, f, s);
     case "programme":
-      return generateProgrammeNDA(cleanOrganisme, f, s);
+      return genProgrammeNDA(cleanOrganisme, f, s);
     case "reglement":
       return genReglementNDA(cleanOrganisme, f, s);
 
     case "devis_facture":
-      return isFormationTerminee(f, s) ? genFacture(cleanOrganisme, f, s) : genDevis(cleanOrganisme, f, s);
+      return genDevisNDA(cleanOrganisme, f, s);
     case "logo":
       if (cleanOrganisme.logoUrl) return `<div style="text-align:center;padding:60px;"><img src="${cleanOrganisme.logoUrl}" style="max-width:400px;" /><p style="margin-top:20px;color:#666;">Logo de l'organisme</p></div>`;
       return null;
@@ -201,25 +202,12 @@ function generateDocumentHTML(docId: string, o: OrganismeInfo, f: FormationInfo,
       return null;
     }
     case "liste_formateurs": {
+      // Toujours générer : auto-rempli à partir de l'organisme + CV (si saisi)
       const hasCV = cvData.prenom || cvData.nom || cvData.experiences.some(e => e.poste);
-      // If a CV file has been uploaded but no generated CV data, build a minimal CVData
-      // from organisme info so the list document can still be produced.
-      if (!hasCV && uploadedCV) {
-        const dirig = (cleanOrganisme.dirigeant || "").trim();
-        const [prenom, ...rest] = dirig.split(/\s+/);
-        const fallbackCV: CVData = {
-          ...cvData,
-          prenom: prenom || "Formateur",
-          nom: rest.join(" ") || cleanOrganisme.nom || "",
-          profil: cvData.profil || `Voir CV joint (${uploadedCV.name})`,
-        };
-        return generateListeFormateursHTML(cleanOrganisme, fallbackCV, s);
-      }
-      if (!hasCV) return null;
-      return generateListeFormateursHTML(cleanOrganisme, cvData, s);
+      return genListeFormateursNDA(cleanOrganisme, hasCV ? cvData : null, s);
     }
     case "emargement":
-      return genEmargementJour_V2(cleanOrganisme, f, s, 0, "");
+      return genEmargementNDA(cleanOrganisme, f, s);
     case "certificat_coursera": {
       // Format A4 paysage 297x210mm (~1123x794px @96dpi).
       // Certificat source: 1100x850px (ratio 1.294). Scale ≈ 0.847 → 932x720 final.
