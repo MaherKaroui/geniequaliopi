@@ -128,10 +128,27 @@ export function genContratNDA(
     const adresseStagiaire = adresseComplete(s.adresse, s.codePostal, s.commune);
     const pageBreak = idx > 0 ? `<div class="page-break"></div>` : "";
 
+    // Date individuelle si renseignée, sinon date globale (toujours -14 jours ouvrés)
+    const indivStart = s.dateDebutFormation || f.dateDebut || "";
+    const indivSignIso = indivStart ? subtractBusinessDays(indivStart, 14) : signatureIso;
+    const dateSignIndiv = fmtDateLong(indivSignIso);
+
+    // Signature stagiaire (image uploadée ou tracée)
+    const sigStagiaire = s.signatureUrl
+      ? `<img src="${s.signatureUrl}" class="sig-img" alt="Signature stagiaire" />`
+      : "";
+    // Signature/tampon organisme
+    const sigOrg = o.signatureUrl
+      ? `<img src="${o.signatureUrl}" class="sig-img" alt="Signature organisme" />`
+      : "";
+    const tamponOrg = o.tamponUrl
+      ? `<img src="${o.tamponUrl}" class="sig-img" alt="Tampon organisme" />`
+      : "";
+
     return `${pageBreak}
 <h1>Contrat de formation professionnelle</h1>
 <h2>(Articles L.6353-3 et suivants du Code du travail)</h2>
-<div class="meta">Fait à ${lieuSignature}, le ${dateSignature}</div>
+<div class="meta">Fait à ${lieuSignature}, le ${dateSignIndiv}</div>
 
 <p><strong>Entre les soussignés :</strong></p>
 <p>1) <strong>${v(o.nom)}</strong>, dont le siège est situé ${adresseOrg}, représenté par <strong>${v(o.dirigeant)}</strong>, enregistré sous le numéro de déclaration d'activité <strong>${v(o.nda)}</strong> auprès de la DRIEETS, ci-après désigné « l'organisme de formation ».</p>
@@ -163,7 +180,7 @@ export function genContratNDA(
 </ul>
 
 <h3>Article 5 — Nature de la sanction</h3>
-<p>La formation donne lieu à la délivrance ${sanction === "une attestation de fin de formation" ? "d'" + sanction : "d'" + sanction} précisant les objectifs, la nature, la durée de l'action et les résultats de l'évaluation des acquis.</p>
+<p>La formation donne lieu à la délivrance d'${sanction} précisant les objectifs, la nature, la durée de l'action et les résultats de l'évaluation des acquis.</p>
 
 <h3>Article 6 — Délai de rétractation</h3>
 <p>À compter de la date de signature du présent contrat, le stagiaire dispose d'un délai de <strong>${delaiRetractation} jours</strong> pour se rétracter. Il en informe l'organisme de formation par lettre recommandée avec accusé de réception. Dans ce cas, aucune somme ne peut être exigée du stagiaire.</p>
@@ -180,18 +197,29 @@ export function genContratNDA(
 <h3>Article 9 — Cas de différend</h3>
 <p>Si une contestation ou un différend ne peuvent être réglés à l'amiable, le tribunal de <strong>${tribunal}</strong> sera seul compétent pour se prononcer.</p>
 
-<p style="margin-top:18px;">Fait en double exemplaire, à <strong>${lieuSignature}</strong>, le <strong>${dateSignature}</strong>.</p>
+<p style="margin-top:18px;">Fait en double exemplaire, à <strong>${lieuSignature}</strong>, le <strong>${dateSignIndiv}</strong>.</p>
 
 <div class="signatures">
-  <div class="box"><strong>Pour le stagiaire</strong><br>${nomStagiaire || DOTS}<br><em>(signature précédée de la mention « Lu et approuvé »)</em></div>
-  <div class="box"><strong>Pour l'organisme de formation</strong><br>${v(o.dirigeant)}<br><em>${v(o.nom)}</em></div>
+  <div class="box">
+    <div class="title">Pour le stagiaire</div>
+    ${nomStagiaire || DOTS}
+    ${sigStagiaire}
+    <div class="mention">(signature précédée de la mention « Lu et approuvé »)</div>
+  </div>
+  <div class="box">
+    <div class="title">Pour l'organisme de formation</div>
+    ${v(o.dirigeant)}<br><em>${v(o.nom)}</em>
+    ${sigOrg}
+    ${tamponOrg}
+  </div>
 </div>
 
 ${footerHtml(o)}`;
   }).join("\n");
 
-  return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">${CSS}</head><body>${blocks}</body></html>`;
+  return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">${CSS}</head><body><div class="doc">${blocks}</div></body></html>`;
 }
+
 
 /* =========================================================================
  * DOCUMENT 2 : RÈGLEMENT INTÉRIEUR
