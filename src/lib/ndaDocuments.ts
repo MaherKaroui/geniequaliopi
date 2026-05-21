@@ -19,52 +19,156 @@ function today(): string {
 /* =========================================================================
  * PROGRAMME DE FORMATION
  * ========================================================================= */
-export function genProgrammeNDA(o: OrganismeInfo, f: FormationInfo, _s: StagiaireInfo[]): string {
+export function genProgrammeNDA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]): string {
   const dureeH = parseHeures(f.duree);
-  const body = `
-<h1>Programme de formation</h1>
-<h2>${escapeHtml(f.intitule || "")}</h2>
-<div class="meta">${escapeHtml(o.nom || "")} — ${today()}</div>
+  const adresseOrg = adresseComplete(o.adresse, o.codePostal, o.ville);
+  const nbStagiaires = stagiaires?.length || parseInt(f.nombreParticipants || "1", 10) || 1;
+  const annee = new Date().getFullYear();
 
-<h3>Intitulé de la formation</h3>
+  const objectifsList = (f.objectifs || "").split(/\r?\n|;|•/).map(s => s.trim()).filter(Boolean);
+  const objectifsHtml = objectifsList.length
+    ? `<ul>${objectifsList.map(o => `<li>${escapeHtml(o)}</li>`).join("")}</ul>`
+    : `<p>${v(f.objectifs)}</p>`;
+
+  const programmeHtml = (f.programme || DOTS).split(/\r?\n/).map(escapeHtml).join("<br>");
+
+  const body = `
+<h1>${escapeHtml(o.nom || "")}</h1>
+<h2>Organisme de formation – SIRET : ${escapeHtml(o.siret || "")}</h2>
+<div class="meta"><strong>${escapeHtml(f.intitule || "")}</strong></div>
+
+<h1 style="margin-top:18px;">Programme de formation</h1>
+
+<h3>1. Organisme de formation</h3>
+<p><strong>Nom :</strong> ${escapeHtml(o.nom || "")}<br>
+<strong>Adresse :</strong> ${escapeHtml(adresseOrg)}<br>
+<strong>SIRET :</strong> ${v(o.siret)}<br>
+${o.email ? `<strong>Email :</strong> ${escapeHtml(o.email)}<br>` : ""}
+<strong>Dirigeant – Formateur – Référent pédagogique – Référent handicap :</strong> ${v(o.dirigeant)}</p>
+
+<h3>2. Intitulé de la formation</h3>
 <p>${v(f.intitule)}</p>
 
-<h3>Public visé</h3>
-<p>${v(f.publicVise)}</p>
-
-<h3>Prérequis</h3>
+<h3>3. Prérequis</h3>
 <p>${v(f.prerequis)}</p>
 
-<h3>Objectifs pédagogiques</h3>
-<p>${v(f.objectifs)}</p>
+<h3>4. Objectifs pédagogiques</h3>
+<p>À l'issue de la formation, le stagiaire sera capable de :</p>
+${objectifsHtml}
 
-<h3>Contenu du programme</h3>
-<p>${(f.programme || DOTS).split(/\r?\n/).map(escapeHtml).join("<br>")}</p>
+<h3>5. Compétences développées</h3>
+<p>À l'issue de cette formation, les compétences suivantes seront acquises et mobilisables en situation professionnelle :</p>
+${objectifsHtml}
 
-<h3>Durée et organisation</h3>
+<h3>6. Public visé</h3>
+<p>${v(f.publicVise)}</p>
+
+<h3>7. Durée et lieu de formation</h3>
 <ul>
-  <li><strong>Durée :</strong> ${dureeH} heures</li>
+  <li><strong>Durée totale :</strong> ${dureeH} heures</li>
   <li><strong>Dates :</strong> du ${fmtDateLong(f.dateDebut)} au ${fmtDateLong(f.dateFin)}</li>
-  <li><strong>Lieu :</strong> ${v(f.lieu)}</li>
-  <li><strong>Modalités :</strong> ${v(f.modalites)}</li>
-  <li><strong>Effectif :</strong> ${v(f.nombreParticipants)}</li>
-  <li><strong>Délai d'accès :</strong> ${v(f.delaiAcces)}</li>
+  <li><strong>Horaires :</strong> Du lundi au vendredi : 09h00 – 12h30 et 13h30 – 17h00 (7 h/jour)</li>
+  <li><strong>Modalité :</strong> ${v(f.modalites)}</li>
+  <li><strong>Lieu de formation :</strong> ${v(f.lieu)}</li>
+  <li><strong>Nombre de participants :</strong> ${nbStagiaires}</li>
 </ul>
 
-<h3>Moyens pédagogiques et techniques</h3>
+<h3>8. Voies d'accès à la formation</h3>
+<p>La présente formation est accessible par les voies suivantes :</p>
+<ul>
+  <li>Contrat d'apprentissage (pour les publics 16-29 ans, ou sans limite d'âge pour les travailleurs handicapés et certains projets)</li>
+  <li>Contrat de professionnalisation</li>
+  <li>Plan de développement des compétences de l'entreprise</li>
+  <li>Compte Personnel de Formation (CPF)</li>
+  <li>Reconversion ou Promotion par Alternance (Pro-A)</li>
+  <li>Financement Pôle emploi / France Travail (AIF, POEI, AFPR)</li>
+  <li>Financement individuel (à la charge du bénéficiaire)</li>
+</ul>
+
+<h3>9. Modalités d'accès</h3>
+<p>Étapes d'inscription :</p>
+<ul>
+  <li>Préinscription par téléphone ou par email auprès de ${escapeHtml(o.nom || "")}</li>
+  <li>Rendez-vous au centre de formation pour confirmation des objectifs de formation</li>
+  <li>Réalisation de l'évaluation des besoins et du test de positionnement</li>
+  <li>Envoi des documents administratifs : contrat de formation professionnelle, règlement intérieur, convocation à la formation, Conditions Générales de Vente (CGV), programme de formation</li>
+</ul>
+
+<h3>10. Délais d'accès</h3>
+<p><strong>Délai d'accès :</strong> ${v(f.delaiAcces) !== DOTS ? v(f.delaiAcces) : "14 jours"} après validation de la préinscription et réception du dossier complet.</p>
+<p>Ce délai peut être réduit en fonction des disponibilités et de l'urgence de la demande. Pour les personnes en situation de handicap, un délai supplémentaire peut être nécessaire pour la mise en place des aménagements.</p>
+
+<h3>11. Tarif</h3>
+<p><strong>Tarif :</strong> ${v(f.tarif)}</p>
+<p>TVA non applicable, article 261-4-4° du CGI.</p>
+<p>Possibilité de prise en charge par votre OPCO ou Pôle Emploi. Contactez-nous pour un devis personnalisé.</p>
+
+<h3>12. Méthodes pédagogiques et moyens pédagogiques</h3>
+<p><strong>Méthodes pédagogiques :</strong></p>
+<ul>
+  <li>Apports théoriques progressifs et structurés</li>
+  <li>Démonstrations en direct par le formateur</li>
+  <li>Exercices pratiques guidés puis en autonomie</li>
+  <li>Mises en situation professionnelle</li>
+  <li>Études de cas concrets tirés du terrain</li>
+  <li>Accompagnement individualisé et différencié</li>
+  <li>Échanges, questions-réponses et retours d'expérience</li>
+</ul>
+<p><strong>Moyens pédagogiques et outils mobilisés :</strong></p>
 <p>${v(f.moyensPedagogiques)}</p>
 
-<h3>Modalités d'évaluation</h3>
+<h3>13. Modalités d'évaluation</h3>
+<p>Le dispositif d'évaluation comprend :</p>
+<ul>
+  <li>Test de positionnement en début et fin de formation</li>
+  <li>Cas pratiques et mises en situation professionnelle</li>
+  <li>Évaluation finale</li>
+  <li>Grille d'acquisition des compétences</li>
+</ul>
 <p>${v(f.methodesEvaluation)}</p>
+<p>Une attestation de fin de formation et un certificat de réalisation seront remis à chaque stagiaire ayant suivi l'intégralité de la formation.</p>
 
-<h3>Formateur(s)</h3>
-<p>${v(f.formateur)}</p>
+<h3>14. Accessibilité aux personnes en situation de handicap</h3>
+<p>La formation est accessible aux personnes à mobilité réduite (PMR) et aux personnes en situation de handicap (PSH).</p>
+<p>Des aménagements spécifiques peuvent être mis en place selon les besoins identifiés :</p>
+<ul>
+  <li>Adaptation des supports pédagogiques (police agrandie, contrastes renforcés)</li>
+  <li>Aménagement des horaires et des pauses</li>
+  <li>Temps supplémentaire pour les évaluations</li>
+  <li>Salle accessible PMR</li>
+  <li>Accompagnement individualisé renforcé</li>
+</ul>
+<p>Merci de contacter le référent handicap en amont de la formation.</p>
+<p><strong>Référent handicap :</strong> ${v(o.referentHandicap || o.dirigeant)}${o.email ? `<br><strong>Email :</strong> ${escapeHtml(o.email)}` : ""}</p>
 
-<h3>Tarif</h3>
-<p>${v(f.tarif)}</p>
+<h3>15. Indicateurs de performance – Année ${annee}</h3>
+<table>
+  <thead><tr><th>Indicateur</th><th>Statut</th></tr></thead>
+  <tbody>
+    <tr><td>Taux de satisfaction globale</td><td><em>En cours – disponible à l'issue de la formation</em></td></tr>
+    <tr><td>Taux de réussite aux évaluations</td><td><em>En cours – disponible à l'issue de la formation</em></td></tr>
+    <tr><td>Nombre de stagiaires inscrits</td><td>${nbStagiaires}</td></tr>
+    <tr><td>Taux d'abandon</td><td><em>En cours – disponible à l'issue de la formation</em></td></tr>
+    <tr><td>Taux de recommandation</td><td><em>En cours – disponible à l'issue de la formation</em></td></tr>
+  </tbody>
+</table>
+<p><em>Formation en cours : les indicateurs définitifs seront publiés à l'issue de la session.</em></p>
 
-<h3>Accessibilité aux personnes en situation de handicap</h3>
-<p>Notre organisme étudie au cas par cas toute situation de handicap afin d'envisager une intégration adaptée à la formation. Référent handicap : ${v(o.referentHandicap)}.</p>
+<h3>16. Déroulé pédagogique de la formation (${dureeH} heures)</h3>
+<p><strong>Formation :</strong> ${v(f.intitule)}<br>
+<strong>Durée :</strong> ${dureeH} heures<br>
+<strong>Formateur :</strong> ${v(f.formateur)}</p>
+<p>${programmeHtml}</p>
+
+<h3>Documents remis au stagiaire</h3>
+<ul>
+  <li>Support de cours / fiches pratiques</li>
+  <li>Attestation de fin de formation</li>
+  <li>Certificat de réalisation</li>
+  <li>Grille d'acquisition des compétences</li>
+  <li>Résultats des évaluations (test de positionnement début/fin)</li>
+  <li>Liens vidéos complémentaires</li>
+</ul>
 
 ${footerHtml(o)}`;
   return wrap(body);
