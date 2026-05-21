@@ -53,24 +53,31 @@ function adresseComplete(adresse?: string, cp?: string, ville?: string): string 
   return out || DOTS;
 }
 
-/** Style commun aux deux documents (sobre, A4, police lisible) */
+/** Style commun aux deux documents (sobre, A4 en impression, pleine largeur à l'écran) */
 const CSS = `
 <style>
   @page { size: A4; margin: 18mm 18mm 22mm 18mm; }
-  body { font-family: 'Times New Roman', Georgia, serif; font-size: 11.5pt; color: #111; line-height: 1.55; }
-  h1 { font-size: 16pt; text-align: center; text-transform: uppercase; letter-spacing: 1px; margin: 0 0 4px 0; }
+  html, body { margin: 0; padding: 0; }
+  body { font-family: 'Times New Roman', Georgia, serif; font-size: 11.5pt; color: #111; line-height: 1.6; background: #fff; }
+  .doc { max-width: 900px; margin: 0 auto; padding: 24px 32px; box-sizing: border-box; }
+  @media screen and (max-width: 768px) { .doc { padding: 16px; } }
+  h1 { font-size: 18pt; text-align: center; text-transform: uppercase; letter-spacing: 1px; margin: 0 0 4px 0; }
   h2 { font-size: 11pt; text-align: center; font-weight: normal; font-style: italic; margin: 0 0 18px 0; color: #444; }
-  h3 { font-size: 12pt; margin: 14px 0 6px 0; color: #1a1a1a; }
+  h3 { font-size: 12.5pt; margin: 16px 0 6px 0; color: #1a1a1a; }
   p { margin: 6px 0; text-align: justify; }
   ul { margin: 4px 0 8px 22px; padding: 0; }
   li { margin: 2px 0; }
-  .meta { text-align: center; font-size: 10pt; color: #555; margin-bottom: 18px; }
-  .signatures { margin-top: 28px; display: flex; gap: 40px; justify-content: space-between; }
-  .signatures .box { flex: 1; border-top: 1px solid #999; padding-top: 6px; font-size: 10.5pt; min-height: 70px; }
-  .footer { margin-top: 24px; padding-top: 6px; border-top: 1px solid #ccc; font-size: 9pt; color: #777; text-align: center; }
+  .meta { text-align: center; font-size: 10.5pt; color: #555; margin-bottom: 18px; }
+  .signatures { margin-top: 32px; display: flex; gap: 32px; justify-content: space-between; flex-wrap: wrap; }
+  .signatures .box { flex: 1 1 280px; border: 1px solid #999; border-radius: 6px; padding: 12px 14px; font-size: 10.5pt; min-height: 160px; background: #fafafa; }
+  .signatures .box .title { font-weight: bold; margin-bottom: 4px; }
+  .signatures .box .mention { font-style: italic; color: #666; font-size: 9.5pt; margin-top: 6px; }
+  .signatures .box .sig-img { display: block; max-height: 90px; max-width: 100%; margin: 8px 0 4px 0; }
+  .footer { margin-top: 28px; padding-top: 6px; border-top: 1px solid #ccc; font-size: 9pt; color: #777; text-align: center; }
   .page-break { page-break-before: always; }
 </style>
 `;
+
 
 function footerHtml(o: OrganismeInfo): string {
   const parts = [o.nom, o.siret ? `SIRET ${o.siret}` : "", o.nda ? `Déclaration d'activité n° ${o.nda}` : ""]
