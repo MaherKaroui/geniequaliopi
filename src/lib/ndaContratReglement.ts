@@ -70,6 +70,8 @@ export const CSS = `
   li { margin: 4px 0; padding-left: 2px; }
   .meta { text-align: center; font-size: 11pt; color: #111; margin-bottom: 18px; }
   table { border-collapse: collapse; width: 100%; max-width: 100%; margin: 10px 0; font-size: 10.5pt; table-layout: fixed; word-wrap: break-word; }
+  .pdf-root > table.nda-text-table { width: calc(100% - 220px); max-width: calc(100% - 220px); margin-left: 110px; margin-right: 110px; }
+  @media screen and (max-width: 768px) { .pdf-root > table.nda-text-table { width: calc(100% - 44px); max-width: calc(100% - 44px); margin-left: 22px; margin-right: 22px; } }
   th, td { border: 1px solid #444; padding: 6px 8px; vertical-align: top; text-align: left; word-wrap: break-word; overflow-wrap: break-word; }
   th { background: #f0f0f0; font-weight: 700; }
   .signatures { margin-top: 34px; display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: start; }
