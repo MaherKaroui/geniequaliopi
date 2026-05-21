@@ -137,10 +137,7 @@ export function genContratNDA(
     const sigStagiaire = s.signatureUrl
       ? `<img src="${s.signatureUrl}" class="sig-img" alt="Signature stagiaire" />`
       : "";
-    // Signature/tampon organisme
-    const sigOrg = o.signatureUrl
-      ? `<img src="${o.signatureUrl}" class="sig-img" alt="Signature organisme" />`
-      : "";
+    // Tampon organisme uniquement (pas de signature)
     const tamponOrg = o.tamponUrl
       ? `<img src="${o.tamponUrl}" class="sig-img" alt="Tampon organisme" />`
       : "";
@@ -209,7 +206,6 @@ export function genContratNDA(
   <div class="box">
     <div class="title">Pour l'organisme de formation</div>
     ${v(o.dirigeant)}<br><em>${v(o.nom)}</em>
-    ${sigOrg}
     ${tamponOrg}
   </div>
 </div>
@@ -236,8 +232,7 @@ export function genReglementNDA(o: OrganismeInfo, f?: FormationInfo, s?: Stagiai
   const nomStagiaire = firstStag ? `${firstStag.prenom || ""} ${firstStag.nom || ""}`.trim() : "";
   const sigStagiaire = firstStag?.signatureUrl
     ? `<img src="${firstStag.signatureUrl}" class="sig-img" alt="Signature stagiaire" />` : "";
-  const sigOrg = o.signatureUrl
-    ? `<img src="${o.signatureUrl}" class="sig-img" alt="Signature organisme" />` : "";
+  // Tampon organisme uniquement (pas de signature)
   const tamponOrg = o.tamponUrl
     ? `<img src="${o.tamponUrl}" class="sig-img" alt="Tampon organisme" />` : "";
 
@@ -292,7 +287,6 @@ export function genReglementNDA(o: OrganismeInfo, f?: FormationInfo, s?: Stagiai
   <div class="box">
     <div class="title">Pour l'organisme de formation</div>
     ${v(o.dirigeant)}<br><em>${v(o.nom)}</em>
-    ${sigOrg}
     ${tamponOrg}
   </div>
   <div class="box">
