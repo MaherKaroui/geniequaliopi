@@ -57,7 +57,7 @@ export const STAGIAIRES: CertifStagiaire[] = [
   { nom: "CLAUZEL", prenom: "Gwenaelle", dateNaissance: "17/09/1987", adresse: "121 Rue Du Général Leclerc", ville: "25230 SELONCOURT", dateDebut: "12/03/2026", dateFin: "18/03/2026", sessionDate: "18/03/2026", membreJury: "LUBANZADIO BAZU Noémie" },
   { nom: "VIVOT", prenom: "Melany", dateNaissance: "22/06/1993", adresse: "3 Rue Avicenne", ville: "25000 BESANCON", dateDebut: "12/03/2026", dateFin: "18/03/2026", sessionDate: "18/03/2026", membreJury: "TAMBA Cindy" },
   // Session du 12/03 → 20/03/2026
-  { nom: "FUGIER", prenom: "Mathieu", dateNaissance: "11/02/1984", adresse: "30 Avenue De la Contamine", ville: "38210 TULLINS", dateDebut: "12/03/2026", dateFin: "20/03/2026", sessionDate: "20/03/2026", membreJury: "LUBANZADIO BAZU Noémie" },
+  { nom: "FUGIER", prenom: "Mathieu", dateNaissance: "11/07/1985", adresse: "30 Avenue De la Contamine", ville: "38210 TULLINS", dateDebut: "12/03/2026", dateFin: "20/03/2026", sessionDate: "20/03/2026", membreJury: "LUBANZADIO BAZU Noémie" },
   { nom: "ZETTOUTI", prenom: "Sanaa", dateNaissance: "05/11/1990", adresse: "26 Rue De Gascogne", ville: "25200 GRAND CHARMONT", dateDebut: "12/03/2026", dateFin: "20/03/2026", sessionDate: "20/03/2026", membreJury: "TAMBA Cindy" },
   { nom: "MESSAOUDI", prenom: "Tahar", dateNaissance: "19/07/1982", adresse: "18 Avenue Des Mélèzes", ville: "25200 GRAND CHARMONT", dateDebut: "12/03/2026", dateFin: "20/03/2026", sessionDate: "20/03/2026", membreJury: "LUBANZADIO BAZU Noémie" },
   // Session du 12/03 → 23/03/2026
@@ -74,7 +74,7 @@ export const STAGIAIRES: CertifStagiaire[] = [
   { nom: "ADJERIT", prenom: "Sofiane", dateNaissance: "02/02/1992", adresse: "29 Rue Robert Schuman", ville: "60100 CREIL", dateDebut: "16/03/2026", dateFin: "24/03/2026", sessionDate: "24/03/2026", membreJury: "TAMBA Cindy" },
   // Session du 16/03 → 27/03/2026
   { nom: "ARAUJO", prenom: "Bruno", dateNaissance: "15/05/1987", adresse: "5 Rue Du Chêne Prieur", ville: "77127 LIEUSAINT", dateDebut: "16/03/2026", dateFin: "27/03/2026", sessionDate: "27/03/2026", membreJury: "LUBANZADIO BAZU Noémie" },
-  { nom: "BORGES-CARVALHO", prenom: "Sylvia", dateNaissance: "23/09/1986", adresse: "88 Rue Victor Renelle", ville: "93240 STAINS", dateDebut: "16/03/2026", dateFin: "27/03/2026", sessionDate: "27/03/2026", membreJury: "TAMBA Cindy" },
+  { nom: "BORGES-CARVALHO", prenom: "Sylvia", dateNaissance: "02/01/1988", adresse: "88 Rue Victor Renelle", ville: "93240 STAINS", dateDebut: "16/03/2026", dateFin: "27/03/2026", sessionDate: "27/03/2026", membreJury: "TAMBA Cindy" },
 ];
 
 // Grille d'évaluation : 10 compétences avec critères (extrait fidèle du référentiel RS 7302)
