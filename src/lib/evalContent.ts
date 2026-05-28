@@ -1,4 +1,6 @@
 // Formation-specific QCM questions, exercises, and evaluation content
+import { getCachedContentPack } from "./aiContentPack";
+
 
 export interface QCMQuestion {
   question: string;
