@@ -393,6 +393,7 @@ import { getEsthetiqueChapters } from "./courseContentEsthetique";
 
 import { getNTCChapters } from "./courseContentNTC";
 import { getGPMEChapters } from "./courseContentGPME";
+import { getCachedContentPack, pickImagesForQuery } from "./aiContentPack";
 export { getWordChapters, getAnglaisChapters, getAnglaisA1Chapters, getManagementChapters, getGenericChapters, getFLEChapters, getIAChapters, getWebmarketingChapters, getCRMChapters, getMassagePrenatalChapters, getMassagePostpartumChapters, getECSRChapters, getVTestChapters, getCIPChapters, getRPMSChapters, getAssistantDirectionChapters, getInfographisteChapters, getRestaurationChapters, getSocioEsthetiqueChapters, getVTCChapters, getEsthetiqueChapters, getNTCChapters, getGPMEChapters };
 
 // Override AI : si un AIContentPack est en cache pour cette formation, on utilise
