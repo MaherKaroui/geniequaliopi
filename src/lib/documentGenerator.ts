@@ -1696,7 +1696,16 @@ function genAnalyseBesoins(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
     };
   }
 
-  const domain = getDomainBesoins();
+  let domain = getDomainBesoins();
+  // Override AI : si un AIContentPack est en cache, on utilise les besoins/synthèse/adaptations IA
+  const aiContent = getCachedContentPack(f);
+  if (aiContent?.besoins) {
+    domain = {
+      besoins: aiContent.besoins.besoinsList?.length ? aiContent.besoins.besoinsList : domain.besoins,
+      synthese: aiContent.besoins.syntheseHtml || domain.synthese,
+      adaptations: aiContent.besoins.adaptationsHtml || domain.adaptations,
+    };
+  }
 
   // Tableau récapitulatif des stagiaires avec leurs dates individuelles
   let tableStag = "";
