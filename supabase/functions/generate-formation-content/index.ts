@@ -171,10 +171,10 @@ PRÉREQUIS : ${prerequis || "(à déduire)"}
 NOMBRE DE STAGIAIRES : ${nbStagiaires}
 
 Tu dois OBLIGATOIREMENT produire :
-1. besoins (réponses d'évaluation des besoins : 10-12 besoins individuels + synthèse + adaptations)
-2. chapters : **6 à 8 chapitres**, **4 à 6 sections par chapitre**, **300-500 mots de HTML dense par section** (cible : 30+ pages au total)
-3. exercises : **8 à 12 exercices** progressifs avec **corrigés détaillés** (réponse attendue + critères d'évaluation)
-4. ressources : supports, outils, 5+ vidéos YouTube (URLs de recherche), sites/livres réels du domaine
+1. besoins (10 besoins individuels + synthèse + adaptations)
+2. chapters : **5 chapitres**, **3 sections par chapitre**, **200-300 mots de HTML par section**
+3. exercises : **6 exercices** progressifs avec **corrigés détaillés**
+4. ressources : supports, outils, 5 vidéos YouTube (URLs de recherche), sites/livres réels du domaine
 
 Tout doit être 100% cohérent avec le métier "${intitule}".`;
 
