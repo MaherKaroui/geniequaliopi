@@ -32,6 +32,43 @@ const FormationForm = ({ data, onChange, onImportStagiaires, onApplyOrganisme }:
   const [aiModel, setAiModel] = useState<string>("google/gemini-2.5-flash");
   const [aiLoading, setAiLoading] = useState(false);
   const [veilleLoading, setVeilleLoading] = useState(false);
+  const [contentLoading, setContentLoading] = useState(false);
+
+  const handleRegenerateAllContent = async () => {
+    if (!data.intitule || data.intitule.trim().length < 3) {
+      toast.error("Renseignez d'abord l'intitulé de la formation");
+      return;
+    }
+    setContentLoading(true);
+    const t = toast.loading("Génération IA : support de cours +30p, exercices, corrigés, évaluation des besoins, ressources…");
+    try {
+      clearCachedPack(data);
+      clearCachedContentPack(data);
+      clearCachedVeillePack(data);
+      const [evalRes, contentRes, veilleRes] = await Promise.allSettled([
+        generateAIEvalPack(data, true),
+        generateAIContentPack(data, { force: true }),
+        generateAIVeillePack(data, true),
+      ]);
+      const failures: string[] = [];
+      if (evalRes.status !== "fulfilled") failures.push("QCM/exercices");
+      if (contentRes.status !== "fulfilled") failures.push("support de cours");
+      if (veilleRes.status !== "fulfilled") failures.push("veilles");
+      if (failures.length === 0) {
+        toast.success("✅ Tout généré : évaluation besoins, support de cours, exercices+corrigés, QCM, veilles, ressources pédagogiques", { id: t });
+      } else {
+        toast.warning(`Génération partielle. Échec : ${failures.join(" + ")}`, { id: t });
+        if (evalRes.status === "rejected") console.error("Eval pack:", evalRes.reason);
+        if (contentRes.status === "rejected") console.error("Content pack:", contentRes.reason);
+        if (veilleRes.status === "rejected") console.error("Veille pack:", veilleRes.reason);
+      }
+    } catch (err: any) {
+      console.error("Regenerate all content error:", err);
+      toast.error(err?.message || "Échec de la génération", { id: t });
+    } finally {
+      setContentLoading(false);
+    }
+  };
 
   const handleRegenerateVeilles = async () => {
     if (!data.intitule || data.intitule.trim().length < 3) {
