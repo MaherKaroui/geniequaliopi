@@ -197,7 +197,13 @@ Deno.serve(async (req) => {
     const body = await req.json();
     const nom = String(body?.nom || "").trim();
     const codeRNCP = String(body?.codeRNCP || "").trim();
-    const model = String(body?.model || "google/gemini-2.5-flash").trim();
+    const ALLOWED_MODELS = new Set([
+      "google/gemini-2.5-flash",
+      "google/gemini-2.5-flash-lite",
+      "google/gemini-2.5-pro",
+    ]);
+    const requestedModel = String(body?.model || "google/gemini-2.5-flash").trim();
+    const model = ALLOWED_MODELS.has(requestedModel) ? requestedModel : "google/gemini-2.5-flash";
 
     if (!nom || nom.length < 3) {
       return new Response(
