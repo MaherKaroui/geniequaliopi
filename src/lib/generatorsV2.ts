@@ -1325,7 +1325,10 @@ export function genExercicesPratiques_V2(o: OrganismeInfo, f: FormationInfo, sta
       extraHtml: `<div class="section section-green"><p><em>La formation est en cours. Les résultats des exercices et jeux pédagogiques seront disponibles à l'issue de la formation.</em></p></div>` });
   }
   const evalData = getEvalContent(f.intitule);
-  const exercices = evalData.exercices;
+  const aiPackEP = getCachedContentPack(f);
+  const exercices = aiPackEP?.exercises?.length
+    ? aiPackEP.exercises.map(e => ({ titre: e.titre, consigne: e.consigne, reponseAttendue: e.reponseAttendue }))
+    : evalData.exercices;
   let extra = `<h2>ÉVALUATION FINALE – EXERCICES & JEUX</h2>`;
   extra += `<p><strong>Formation :</strong> ${f.intitule}<br><strong>Formateur :</strong> ${f.formateur}<br><strong>Date :</strong> ${formatDate(f.dateFin)}<br><strong>Nombre d'épreuves :</strong> ${exercices.length + 2} (${exercices.length} exercices + 2 jeux pédagogiques)</p>`;
 
