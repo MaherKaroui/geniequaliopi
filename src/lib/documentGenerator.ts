@@ -7849,19 +7849,36 @@ ${tableHTML(["", ""], [
     { heading: "GRILLE D'ACQUISITION DES COMPÉTENCES", content: `<p>La grille ci-dessous permet de suivre la progression de l'apprenti(e) de manière homogène tout au long du parcours.</p>
 ${tableHTML(["Bloc de compétences", "Compétence évaluée", "Non acquis", "En cours d'acquisition", "Acquis"], grilleRows)}
 <p><strong>Niveaux d'évaluation :</strong></p><ul><li><strong>Non acquis :</strong> la compétence n'est pas maîtrisée</li><li><strong>En cours d'acquisition :</strong> la compétence est partiellement maîtrisée</li><li><strong>Acquis :</strong> la compétence est maîtrisée de manière autonome</li></ul>
-<p><strong>Appréciation globale du formateur / maître d'apprentissage :</strong></p><p>.......................................................................................................................</p>` },
+<p><strong>Appréciation globale du formateur / maître d'apprentissage :</strong></p><p>${appreciationGlobale}</p>` },
 
     // SUIVI PÉDAGOGIQUE
     { heading: "SUIVI PÉDAGOGIQUE CONTINU", content: `<p>Le suivi pédagogique est assuré tout au long du parcours de formation afin de garantir la progression régulière de l'apprenti(e).</p><p>Ce suivi repose sur des échanges réguliers entre l'apprenti(e), le formateur référent et le maître d'apprentissage.</p>` },
 
     // VISITES EN ENTREPRISE
-    { heading: "VISITES EN ENTREPRISE ET BILANS", content: `<p>Le CFA organise deux visites par an en entreprise. Ces visites constituent des temps formalisés essentiels.</p>
+    { heading: "VISITES EN ENTREPRISE ET BILANS", content: `<p>Le CFA organise deux visites par an en entreprise. Ces visites constituent des temps formalisés essentiels et donnent lieu à un compte rendu écrit, co-signé par l'apprenti(e), le maître d'apprentissage et le référent pédagogique du CFA.</p>
 ${tableHTML(["", ""], [
   ["Nom du CFA", o.nom],
   ["Nom et prénom de l'apprenti(e)", `${s.prenom} ${s.nom}`],
-  ["Entreprise d'accueil", s.entreprise || '___'],
-  ["Type de visite", "1ère visite annuelle ou 2e visite annuelle"],
-])}<p>Chaque visite donne lieu à un compte rendu écrit et formalisé.</p>` },
+  ["Entreprise d'accueil", entrepriseNom],
+  ["Maître d'apprentissage", maitreNom],
+])}
+<h4>1ʳᵉ visite en entreprise — ${visite1Date}</h4>
+${tableHTML(["", ""], [
+  ["Date de la visite", visite1Date],
+  ["Type de visite", "1ʳᵉ visite annuelle"],
+  ["Personnes présentes", `${s.prenom} ${s.nom} (apprenti·e), ${maitreNom} (maître d'apprentissage), ${o.responsablePedagogique || o.dirigeant || 'Référent CFA'} (CFA ${o.nom})`],
+])}
+<p><strong>Commentaire du maître d'apprentissage :</strong></p>
+<p>${commentaireV1}</p>
+
+<h4>2ᵉ visite en entreprise — ${visite2Date}</h4>
+${tableHTML(["", ""], [
+  ["Date de la visite", visite2Date],
+  ["Type de visite", "2ᵉ visite annuelle"],
+  ["Personnes présentes", `${s.prenom} ${s.nom} (apprenti·e), ${maitreNom} (maître d'apprentissage), ${o.responsablePedagogique || o.dirigeant || 'Référent CFA'} (CFA ${o.nom})`],
+])}
+<p><strong>Commentaire du maître d'apprentissage :</strong></p>
+<p>${commentaireV2}</p>` },
 
     // ACCOMPAGNEMENT SOCIAL
     { heading: "ACCOMPAGNEMENT SOCIAL ET PRÉVENTION DES RUPTURES", content: `<p>Le CFA <strong>${o.nom}</strong> met en œuvre un accompagnement social structuré et individualisé afin de sécuriser le parcours de l'apprenti(e) et prévenir les ruptures de contrat.</p><p>La prévention des ruptures constitue une priorité. Elle s'appuie sur le dialogue, la médiation et la mobilisation de solutions adaptées.</p>` },
