@@ -36,7 +36,7 @@ import { getYearFromDateCandidates } from "./eyExport";
 import { genProgrammeBDC as genProgrammeBDC_imported, genEvaluationBesoins as genEvaluationBesoins_imported, genDocumentSynthese as genDocumentSynthese_imported, genDerouleModalitesBDC as genDerouleModalitesBDC_imported, genEnqueteMetierBDC as genEnqueteMetierBDC_imported, genCGVBilanCompetences as genCGVBilanCompetences_imported, genContratBilanCompetences as genContratBilanCompetences_imported, genConventionBilanCompetences as genConventionBilanCompetences_imported, genFormulaireAttentesBDC as genFormulaireAttentesBDC_imported, genConvocationBDC as genConvocationBDC_imported, genSynopsisBDC as genSynopsisBDC_imported, genGrilleSuiviBDC as genGrilleSuiviBDC_imported, genSuiviPostBilanBDC as genSuiviPostBilanBDC_imported, genProcedureAdaptationBDC as genProcedureAdaptationBDC_imported, genExplorationMetierBDC as genExplorationMetierBDC_imported, genFichePosteConsultantBDC as genFichePosteConsultantBDC_imported, genCompteRenduFinBDC as genCompteRenduFinBDC_imported, genFicheIntervenantExterneBDC as genFicheIntervenantExterneBDC_imported, genSatisfactionChaudBDC as genSatisfactionChaudBDC_imported, genFormulaireReclamationBDC as genFormulaireReclamationBDC_imported, genGestionReclamationsBDC as genGestionReclamationsBDC_imported, genActionsCorrectivesBDC as genActionsCorrectivesBDC_imported, genBilanAbandonsRupturesBDC as genBilanAbandonsRupturesBDC_imported, genBilanMensuelBDC as genBilanMensuelBDC_imported, genQuestionnaireEnqueteMetiersBDC as genQuestionnaireEnqueteMetiersBDC_imported, genGuideProtocolesBDC as genGuideProtocolesBDC_imported, genTableauBasesBDC as genTableauBasesBDC_imported, genFicheVeilleBDC as genFicheVeilleBDC_imported, genContratSousTraitanceBDC as genContratSousTraitanceBDC_imported, genCatalogueCommercialBDC as genCatalogueCommercialBDC_imported, genProcedureHandicapBDC as genProcedureHandicapBDC_imported, genEngagementConfidentialiteBDC as genEngagementConfidentialiteBDC_imported, genTrameSuivi6MoisBDC as genTrameSuivi6MoisBDC_imported, genCVBeneficiaireBDC as genCVBeneficiaireBDC_imported, genTestPersonnaliteBDC as genTestPersonnaliteBDC_imported, genParcoursBDC as genParcoursBDC_imported, genSupportCoursBDC as genSupportCoursBDC_imported } from "./templatesBDC";
 import { genDPOfficiel, genECFOfficiel, genPVSessionGlobal, preloadDPAIPack } from "./templatesCFAOfficiels";
 import { getCachedPack, answersForQCM, studentAnswerFromCorrection, noteForOpenQuestion, type AIEvalPack } from "./aiEvalPack";
-import { getCachedContentPack } from "./aiContentPack";
+import { getCachedContentPack, pickImagesForQuery } from "./aiContentPack";
 
 const FALLBACK_STAGIAIRE: StagiaireInfo = { prenom: "Martin", nom: "Dupont", civilite: "" as "M." | "Mme" | "", email: "", telephone: "", entreprise: "", poste: "", dateNaissance: "" };
 
@@ -10887,10 +10887,20 @@ function pickSupportTheme(seed: string) {
 
 function genSupportCoursRef(o: OrganismeInfo, f: FormationInfo) {
   const theme = pickSupportTheme(`${f.intitule}|${f.codeRNCP || ''}|${o.nom}`);
-  const chapters = getCourseChapters(f.intitule);
-  
+  // Override AI : si un pack IA est en cache, on utilise ses chapitres riches + images
+  const aiPack = getCachedContentPack(f);
+  const chapters = (aiPack?.chapters?.length
+    ? aiPack.chapters.map(c => ({
+        title: c.title,
+        description: c.description,
+        imageQuery: c.imageQuery,
+        sections: c.sections.map(s => ({ title: s.title, content: s.contentHtml })),
+      }))
+    : getCourseChapters(f.intitule).map(c => ({ ...c, imageQuery: f.intitule } as any))
+  );
+
   let chaptersHtml = '';
-  chapters.forEach((ch, ci) => {
+  chapters.forEach((ch: any, ci: number) => {
     // Chapter title page
     chaptersHtml += `<div class="page-break"></div>`;
     chaptersHtml += `<div style="background:linear-gradient(135deg,${theme.primary},${theme.dark});color:white;padding:40px;border-radius:12px;margin-bottom:30px">`;
@@ -10898,8 +10908,17 @@ function genSupportCoursRef(o: OrganismeInfo, f: FormationInfo) {
     chaptersHtml += `<h3 style="color:white;font-size:20px;margin-top:10px">${ch.title}</h3>`;
     chaptersHtml += `<p style="color:rgba(255,255,255,0.85);margin-top:10px">${ch.description}</p>`;
     chaptersHtml += `</div>`;
-    
-    ch.sections.forEach((sec, si) => {
+
+    // Image contextuelle pour le chapitre (IA pack)
+    if (aiPack?.chapters?.length) {
+      const imgs = pickImagesForQuery(ch.imageQuery || ch.title || '', f.intitule);
+      const img = imgs[ci % imgs.length];
+      if (img) {
+        chaptersHtml += `<div style="text-align:center;margin:0 0 20px"><img src="${img}" alt="${ch.title}" style="max-width:100%;max-height:320px;border-radius:8px;object-fit:cover" /></div>`;
+      }
+    }
+
+    ch.sections.forEach((sec: any, si: number) => {
       if (si > 0 && si % 2 === 0) chaptersHtml += `<div class="page-break"></div>`;
       chaptersHtml += `<div style="margin-bottom:25px">`;
       chaptersHtml += `<h3 style="color:${theme.primary};font-size:16px;border-bottom:2px solid ${theme.primary};padding-bottom:5px;margin-bottom:12px">Section ${ci + 1}.${si + 1} — ${sec.title}</h3>`;
@@ -10907,6 +10926,7 @@ function genSupportCoursRef(o: OrganismeInfo, f: FormationInfo) {
       chaptersHtml += `</div>`;
     });
   });
+
 
   // Table des matières
   let tocHtml = `<div style="margin-bottom:30px"><h2 style="text-align:center;color:${theme.primary}">SOMMAIRE</h2>`;
