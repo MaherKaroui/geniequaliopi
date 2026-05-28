@@ -23,6 +23,7 @@ function horairesTexteFor(s?: StagiaireInfo) { return isPSHStagiaire(s) ? HORAIR
 function horairesLigneFor(s?: StagiaireInfo) { return isPSHStagiaire(s) ? HORAIRES_LIGNE_PSH : HORAIRES_LIGNE; }
 import { getEvalContent, generateStagiaireAnswers, computeQCMScore, getQuestionsOuvertes, generateStagiaireOpenAnswers } from "./evalContent";
 import { getRNCPByCode } from "./rncpData";
+import { getCachedContentPack } from "./aiContentPack";
 
 // ========== HELPERS ==========
 
