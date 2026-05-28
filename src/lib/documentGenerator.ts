@@ -10952,8 +10952,12 @@ function genSupportCoursRef(o: OrganismeInfo, f: FormationInfo) {
 }
 
 function genRessourcesPedagogiques(o: OrganismeInfo, f: FormationInfo) {
-  const videos = getYoutubeVideos(f.intitule);
-  
+  // Override AI : si un AIContentPack est en cache pour cette formation, on utilise
+  // les ressources pédagogiques générées par l'IA forte (modèle pro).
+  const aiContent = getCachedContentPack(f);
+  const aiRes = aiContent?.ressources;
+  const videos = aiRes?.videos?.length ? aiRes.videos : getYoutubeVideos(f.intitule);
+
   let videosHtml = '';
   videos.forEach((v, i) => {
     videosHtml += `<div style="margin-bottom:15px;padding:12px;border:1px solid #e0e0e0;border-radius:8px;background:#fafafa">
@@ -10962,6 +10966,20 @@ function genRessourcesPedagogiques(o: OrganismeInfo, f: FormationInfo) {
       <p><a href="${v.url}" style="color:hsl(220,60%,50%);text-decoration:underline">${v.url}</a></p>
     </div>`;
   });
+
+  // Si l'IA a généré supports/outils/ressources, on les utilise directement.
+  if (aiRes?.supportsHtml || aiRes?.outilsHtml || aiRes?.ressourcesComplHtml) {
+    return buildDocument({
+      org: o, title: "RESSOURCES PÉDAGOGIQUES", subtitle: f.intitule, formation: f, showFormationInfo: true,
+      sections: [
+        { heading: "Supports de formation", content: aiRes.supportsHtml || "" },
+        { heading: "Outils numériques et matériels", content: aiRes.outilsHtml || "", variant: "blue" },
+        { heading: "Ressources vidéo complémentaires", content: videosHtml, variant: "green" },
+        { heading: "Ressources complémentaires", content: aiRes.ressourcesComplHtml || "" },
+        { heading: "Modalités d'accès aux ressources", content: `<p>L'ensemble des ressources est mis à disposition des stagiaires via la plateforme pédagogique de l'organisme et lors des séances en présentiel. Un accès individuel et sécurisé est fourni à chaque participant pour la durée de la formation.</p>`, variant: "blue" },
+      ],
+    });
+  }
 
   // Domain-specific supports and resources
   const lower = f.intitule.toLowerCase();
