@@ -1,6 +1,101 @@
 import { CourseChapter } from "./courseContent";
 
+// Banque d'images Unsplash contextuelles par mot-clé
+const IMG_BANK: Record<string, string[]> = {
+  default: [
+    "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=900&q=80",
+    "https://images.unsplash.com/photo-1552664730-d307ca884978?w=900&q=80",
+    "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=900&q=80",
+    "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=900&q=80",
+    "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=900&q=80",
+  ],
+  bureautique: [
+    "https://images.unsplash.com/photo-1518770660439-4636190af475?w=900&q=80",
+    "https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=900&q=80",
+    "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=900&q=80",
+  ],
+  commerce: [
+    "https://images.unsplash.com/photo-1556740738-b6a63e27c4df?w=900&q=80",
+    "https://images.unsplash.com/photo-1556761175-b413da4baf72?w=900&q=80",
+    "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=900&q=80",
+  ],
+  sante: [
+    "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=900&q=80",
+    "https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=900&q=80",
+    "https://images.unsplash.com/photo-1559757175-5700dde675bc?w=900&q=80",
+  ],
+  beaute: [
+    "https://images.unsplash.com/photo-1560750588-73207b1ef5b8?w=900&q=80",
+    "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=900&q=80",
+    "https://images.unsplash.com/photo-1522335789203-aaaa66c1a09b?w=900&q=80",
+  ],
+  conduite: [
+    "https://images.unsplash.com/photo-1485291571150-772bcfc10da5?w=900&q=80",
+    "https://images.unsplash.com/photo-1502877338535-766e1452684a?w=900&q=80",
+    "https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=900&q=80",
+  ],
+  cuisine: [
+    "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=900&q=80",
+    "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=900&q=80",
+    "https://images.unsplash.com/photo-1466637574441-749b8f19452f?w=900&q=80",
+  ],
+  langue: [
+    "https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=900&q=80",
+    "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=900&q=80",
+    "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=900&q=80",
+  ],
+  marketing: [
+    "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=900&q=80",
+    "https://images.unsplash.com/photo-1432888622747-4eb9a8efeb07?w=900&q=80",
+    "https://images.unsplash.com/photo-1533750349088-cd871a92f312?w=900&q=80",
+  ],
+  ia: [
+    "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=900&q=80",
+    "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=900&q=80",
+    "https://images.unsplash.com/photo-1535378917042-10a22c95931a?w=900&q=80",
+  ],
+  batiment: [
+    "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=900&q=80",
+    "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=900&q=80",
+    "https://images.unsplash.com/photo-1581094271901-8022df4466f9?w=900&q=80",
+  ],
+  social: [
+    "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=900&q=80",
+    "https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=900&q=80",
+    "https://images.unsplash.com/photo-1591084728795-1149f32d9866?w=900&q=80",
+  ],
+  management: [
+    "https://images.unsplash.com/photo-1556761175-4b46a572b786?w=900&q=80",
+    "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=900&q=80",
+    "https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=900&q=80",
+  ],
+};
+
+function pickImages(intitule: string): string[] {
+  const t = (intitule || "").toLowerCase();
+  if (/excel|word|bureautique|powerpoint|office|outlook/.test(t)) return IMG_BANK.bureautique;
+  if (/commerc|vente|vendeur|technico|négoc|ntc|client/.test(t)) return IMG_BANK.commerce;
+  if (/massage|aide-soign|infirm|sant|médic|petite enfance|auxiliaire/.test(t)) return IMG_BANK.sante;
+  if (/esthét|esthet|cosmétique|maquillage|coiffure|spa|onglerie/.test(t)) return IMG_BANK.beaute;
+  if (/vtc|conduite|chauffeur|ecsr|sécurité routière|transport/.test(t)) return IMG_BANK.conduite;
+  if (/cuisine|restauration|pâtiss|boulang|cap epc|cap cuisine/.test(t)) return IMG_BANK.cuisine;
+  if (/anglais|english|fle|français|toeic|vtest|espagnol|langue/.test(t)) return IMG_BANK.langue;
+  if (/marketing|webmarketing|digital|réseaux sociaux|seo|community/.test(t)) return IMG_BANK.marketing;
+  if (/ia|intelligence artificielle|chatgpt|prompt|générative/.test(t)) return IMG_BANK.ia;
+  if (/bâtiment|batiment|maçon|électric|plomb|peintre|menuis|btp/.test(t)) return IMG_BANK.batiment;
+  if (/social|cip|insertion|médico-social|éducateur|moniteur/.test(t)) return IMG_BANK.social;
+  if (/management|manager|rh|gpme|leadership|direction|encadrement/.test(t)) return IMG_BANK.management;
+  return IMG_BANK.default;
+}
+
+function imgFig(src: string, alt: string): string {
+  return `<figure style="margin:14px 0;text-align:center"><img src="${src}" alt="${alt}" loading="lazy" style="max-width:100%;height:auto;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,0.12)" /><figcaption style="font-size:12px;color:#666;margin-top:6px;font-style:italic">${alt}</figcaption></figure>`;
+}
+
 export function getGenericChapters(formationIntitule: string): CourseChapter[] {
+  const imgs = pickImages(formationIntitule);
+  const chapterImage = (idx: number, alt: string) =>
+    imgFig(imgs[idx % imgs.length], alt);
   return [
     {
       title: `Introduction à ${formationIntitule}`,
