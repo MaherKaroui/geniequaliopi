@@ -36,6 +36,7 @@ import { getYearFromDateCandidates } from "./eyExport";
 import { genProgrammeBDC as genProgrammeBDC_imported, genEvaluationBesoins as genEvaluationBesoins_imported, genDocumentSynthese as genDocumentSynthese_imported, genDerouleModalitesBDC as genDerouleModalitesBDC_imported, genEnqueteMetierBDC as genEnqueteMetierBDC_imported, genCGVBilanCompetences as genCGVBilanCompetences_imported, genContratBilanCompetences as genContratBilanCompetences_imported, genConventionBilanCompetences as genConventionBilanCompetences_imported, genFormulaireAttentesBDC as genFormulaireAttentesBDC_imported, genConvocationBDC as genConvocationBDC_imported, genSynopsisBDC as genSynopsisBDC_imported, genGrilleSuiviBDC as genGrilleSuiviBDC_imported, genSuiviPostBilanBDC as genSuiviPostBilanBDC_imported, genProcedureAdaptationBDC as genProcedureAdaptationBDC_imported, genExplorationMetierBDC as genExplorationMetierBDC_imported, genFichePosteConsultantBDC as genFichePosteConsultantBDC_imported, genCompteRenduFinBDC as genCompteRenduFinBDC_imported, genFicheIntervenantExterneBDC as genFicheIntervenantExterneBDC_imported, genSatisfactionChaudBDC as genSatisfactionChaudBDC_imported, genFormulaireReclamationBDC as genFormulaireReclamationBDC_imported, genGestionReclamationsBDC as genGestionReclamationsBDC_imported, genActionsCorrectivesBDC as genActionsCorrectivesBDC_imported, genBilanAbandonsRupturesBDC as genBilanAbandonsRupturesBDC_imported, genBilanMensuelBDC as genBilanMensuelBDC_imported, genQuestionnaireEnqueteMetiersBDC as genQuestionnaireEnqueteMetiersBDC_imported, genGuideProtocolesBDC as genGuideProtocolesBDC_imported, genTableauBasesBDC as genTableauBasesBDC_imported, genFicheVeilleBDC as genFicheVeilleBDC_imported, genContratSousTraitanceBDC as genContratSousTraitanceBDC_imported, genCatalogueCommercialBDC as genCatalogueCommercialBDC_imported, genProcedureHandicapBDC as genProcedureHandicapBDC_imported, genEngagementConfidentialiteBDC as genEngagementConfidentialiteBDC_imported, genTrameSuivi6MoisBDC as genTrameSuivi6MoisBDC_imported, genCVBeneficiaireBDC as genCVBeneficiaireBDC_imported, genTestPersonnaliteBDC as genTestPersonnaliteBDC_imported, genParcoursBDC as genParcoursBDC_imported, genSupportCoursBDC as genSupportCoursBDC_imported } from "./templatesBDC";
 import { genDPOfficiel, genECFOfficiel, genPVSessionGlobal, preloadDPAIPack } from "./templatesCFAOfficiels";
 import { getCachedPack, answersForQCM, studentAnswerFromCorrection, noteForOpenQuestion, type AIEvalPack } from "./aiEvalPack";
+import { getCachedContentPack } from "./aiContentPack";
 
 const FALLBACK_STAGIAIRE: StagiaireInfo = { prenom: "Martin", nom: "Dupont", civilite: "" as "M." | "Mme" | "", email: "", telephone: "", entreprise: "", poste: "", dateNaissance: "" };
 
@@ -1695,7 +1696,16 @@ function genAnalyseBesoins(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
     };
   }
 
-  const domain = getDomainBesoins();
+  let domain = getDomainBesoins();
+  // Override AI : si un AIContentPack est en cache, on utilise les besoins/synthèse/adaptations IA
+  const aiContent = getCachedContentPack(f);
+  if (aiContent?.besoins) {
+    domain = {
+      besoins: aiContent.besoins.besoinsList?.length ? aiContent.besoins.besoinsList : domain.besoins,
+      synthese: aiContent.besoins.syntheseHtml || domain.synthese,
+      adaptations: aiContent.besoins.adaptationsHtml || domain.adaptations,
+    };
+  }
 
   // Tableau récapitulatif des stagiaires avec leurs dates individuelles
   let tableStag = "";
@@ -10942,8 +10952,12 @@ function genSupportCoursRef(o: OrganismeInfo, f: FormationInfo) {
 }
 
 function genRessourcesPedagogiques(o: OrganismeInfo, f: FormationInfo) {
-  const videos = getYoutubeVideos(f.intitule);
-  
+  // Override AI : si un AIContentPack est en cache pour cette formation, on utilise
+  // les ressources pédagogiques générées par l'IA forte (modèle pro).
+  const aiContent = getCachedContentPack(f);
+  const aiRes = aiContent?.ressources;
+  const videos = aiRes?.videos?.length ? aiRes.videos : getYoutubeVideos(f.intitule);
+
   let videosHtml = '';
   videos.forEach((v, i) => {
     videosHtml += `<div style="margin-bottom:15px;padding:12px;border:1px solid #e0e0e0;border-radius:8px;background:#fafafa">
@@ -10952,6 +10966,20 @@ function genRessourcesPedagogiques(o: OrganismeInfo, f: FormationInfo) {
       <p><a href="${v.url}" style="color:hsl(220,60%,50%);text-decoration:underline">${v.url}</a></p>
     </div>`;
   });
+
+  // Si l'IA a généré supports/outils/ressources, on les utilise directement.
+  if (aiRes?.supportsHtml || aiRes?.outilsHtml || aiRes?.ressourcesComplHtml) {
+    return buildDocument({
+      org: o, title: "RESSOURCES PÉDAGOGIQUES", subtitle: f.intitule, formation: f, showFormationInfo: true,
+      sections: [
+        { heading: "Supports de formation", content: aiRes.supportsHtml || "" },
+        { heading: "Outils numériques et matériels", content: aiRes.outilsHtml || "", variant: "orange" },
+        { heading: "Ressources vidéo complémentaires", content: videosHtml, variant: "green" },
+        { heading: "Ressources complémentaires", content: aiRes.ressourcesComplHtml || "" },
+        { heading: "Modalités d'accès aux ressources", content: `<p>L'ensemble des ressources est mis à disposition des stagiaires via la plateforme pédagogique de l'organisme et lors des séances en présentiel. Un accès individuel et sécurisé est fourni à chaque participant pour la durée de la formation.</p>`, variant: "orange" },
+      ],
+    });
+  }
 
   // Domain-specific supports and resources
   const lower = f.intitule.toLowerCase();

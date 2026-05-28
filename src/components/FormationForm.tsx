@@ -13,6 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { generateAIEvalPack, clearCachedPack } from "@/lib/aiEvalPack";
 import { generateAIVeillePack, clearCachedVeillePack } from "@/lib/aiVeillePack";
+import { generateAIContentPack, clearCachedContentPack } from "@/lib/aiContentPack";
 
 interface FormationFormProps {
   data: FormationInfo;
@@ -75,24 +76,29 @@ const FormationForm = ({ data, onChange, onImportStagiaires, onApplyOrganisme }:
       // (localStorage) pour cette formation, on le conserve tel quel.
       try {
         clearCachedPack(f);
-        const [evalRes, veilleRes] = await Promise.allSettled([
+        clearCachedContentPack(f);
+        const [evalRes, veilleRes, contentRes] = await Promise.allSettled([
           generateAIEvalPack(f, true),
           generateAIVeillePack(f, false), // false = réutilise le cache si présent
+          generateAIContentPack(f, { force: true }),
         ]);
         const evalOk = evalRes.status === "fulfilled";
         const veilleOk = veilleRes.status === "fulfilled";
-        if (evalOk && veilleOk) {
-          toast.success("✅ QCM, exercices, évaluation finale et veilles (réglementaire/métier/techno) générés", { id: t });
+        const contentOk = contentRes.status === "fulfilled";
+        if (evalOk && veilleOk && contentOk) {
+          toast.success("✅ QCM, exercices, évaluation finale, veilles, support de cours (30+ p.), ressources pédagogiques générés", { id: t });
         } else {
           const failures: string[] = [];
           if (!evalOk) failures.push("QCM/exercices");
           if (!veilleOk) failures.push("veilles");
+          if (!contentOk) failures.push("contenu pédagogique");
           toast.warning(
             `Formation OK. Échec partiel : ${failures.join(" + ")}. Réessayez via l'étape 5.`,
             { id: t },
           );
           if (!evalOk) console.error("Eval pack error:", (evalRes as PromiseRejectedResult).reason);
           if (!veilleOk) console.error("Veille pack error:", (veilleRes as PromiseRejectedResult).reason);
+          if (!contentOk) console.error("Content pack error:", (contentRes as PromiseRejectedResult).reason);
         }
       } catch (extraErr: any) {
         console.error("Extra IA generation error:", extraErr);
