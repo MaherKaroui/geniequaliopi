@@ -10973,10 +10973,10 @@ function genRessourcesPedagogiques(o: OrganismeInfo, f: FormationInfo) {
       org: o, title: "RESSOURCES PÉDAGOGIQUES", subtitle: f.intitule, formation: f, showFormationInfo: true,
       sections: [
         { heading: "Supports de formation", content: aiRes.supportsHtml || "" },
-        { heading: "Outils numériques et matériels", content: aiRes.outilsHtml || "", variant: "blue" },
+        { heading: "Outils numériques et matériels", content: aiRes.outilsHtml || "", variant: "orange" },
         { heading: "Ressources vidéo complémentaires", content: videosHtml, variant: "green" },
         { heading: "Ressources complémentaires", content: aiRes.ressourcesComplHtml || "" },
-        { heading: "Modalités d'accès aux ressources", content: `<p>L'ensemble des ressources est mis à disposition des stagiaires via la plateforme pédagogique de l'organisme et lors des séances en présentiel. Un accès individuel et sécurisé est fourni à chaque participant pour la durée de la formation.</p>`, variant: "blue" },
+        { heading: "Modalités d'accès aux ressources", content: `<p>L'ensemble des ressources est mis à disposition des stagiaires via la plateforme pédagogique de l'organisme et lors des séances en présentiel. Un accès individuel et sécurisé est fourni à chaque participant pour la durée de la formation.</p>`, variant: "orange" },
       ],
     });
   }
