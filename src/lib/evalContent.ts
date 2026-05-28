@@ -1988,8 +1988,6 @@ export function getQuestionsOuvertes(
   let aiDebut: QuestionOuverte[] = [];
   let aiFin: QuestionOuverte[] = [];
   try {
-    // Import dynamique pour éviter cycle de dépendances
-    const { getCachedContentPack } = require("./aiContentPack");
     const pack = getCachedContentPack({ intitule: formationIntitule } as any);
     if (pack?.exercises?.length) {
       const exs = pack.exercises.slice(0, 10);
