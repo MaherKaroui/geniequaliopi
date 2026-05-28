@@ -13,6 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { generateAIEvalPack, clearCachedPack } from "@/lib/aiEvalPack";
 import { generateAIVeillePack, clearCachedVeillePack } from "@/lib/aiVeillePack";
+import { generateAIContentPack, clearCachedContentPack } from "@/lib/aiContentPack";
 
 interface FormationFormProps {
   data: FormationInfo;
