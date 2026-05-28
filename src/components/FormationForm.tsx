@@ -32,6 +32,43 @@ const FormationForm = ({ data, onChange, onImportStagiaires, onApplyOrganisme }:
   const [aiModel, setAiModel] = useState<string>("google/gemini-2.5-flash");
   const [aiLoading, setAiLoading] = useState(false);
   const [veilleLoading, setVeilleLoading] = useState(false);
+  const [contentLoading, setContentLoading] = useState(false);
+
+  const handleRegenerateAllContent = async () => {
+    if (!data.intitule || data.intitule.trim().length < 3) {
+      toast.error("Renseignez d'abord l'intitulé de la formation");
+      return;
+    }
+    setContentLoading(true);
+    const t = toast.loading("Génération IA : support de cours +30p, exercices, corrigés, évaluation des besoins, ressources…");
+    try {
+      clearCachedPack(data);
+      clearCachedContentPack(data);
+      clearCachedVeillePack(data);
+      const [evalRes, contentRes, veilleRes] = await Promise.allSettled([
+        generateAIEvalPack(data, true),
+        generateAIContentPack(data, { force: true }),
+        generateAIVeillePack(data, true),
+      ]);
+      const failures: string[] = [];
+      if (evalRes.status !== "fulfilled") failures.push("QCM/exercices");
+      if (contentRes.status !== "fulfilled") failures.push("support de cours");
+      if (veilleRes.status !== "fulfilled") failures.push("veilles");
+      if (failures.length === 0) {
+        toast.success("✅ Tout généré : évaluation besoins, support de cours, exercices+corrigés, QCM, veilles, ressources pédagogiques", { id: t });
+      } else {
+        toast.warning(`Génération partielle. Échec : ${failures.join(" + ")}`, { id: t });
+        if (evalRes.status === "rejected") console.error("Eval pack:", evalRes.reason);
+        if (contentRes.status === "rejected") console.error("Content pack:", contentRes.reason);
+        if (veilleRes.status === "rejected") console.error("Veille pack:", veilleRes.reason);
+      }
+    } catch (err: any) {
+      console.error("Regenerate all content error:", err);
+      toast.error(err?.message || "Échec de la génération", { id: t });
+    } finally {
+      setContentLoading(false);
+    }
+  };
 
   const handleRegenerateVeilles = async () => {
     if (!data.intitule || data.intitule.trim().length < 3) {
@@ -269,6 +306,28 @@ const FormationForm = ({ data, onChange, onImportStagiaires, onApplyOrganisme }:
           {veilleLoading ? "Génération…" : "Régénérer les veilles"}
         </Button>
       </div>
+
+      {/* Régénération complète du contenu pédagogique IA */}
+      <div className="p-4 bg-gradient-to-br from-accent/20 to-primary/10 border-2 border-primary/30 rounded-xl flex items-center justify-between gap-3">
+        <div className="flex-1">
+          <Label className="font-semibold text-primary">Contenu pédagogique IA (tout-en-un)</Label>
+          <p className="text-xs text-muted-foreground">
+            Régénère en 1 clic pour « {data.intitule || "votre formation"} » : réponses évaluation des besoins, test de positionnement (début/fin), exercices + corrigés, QCM, support de cours +30 pages avec photos, ressources pédagogiques (vidéos YouTube, livres, sites).
+          </p>
+        </div>
+        <Button
+          type="button"
+          variant="default"
+          onClick={handleRegenerateAllContent}
+          disabled={contentLoading || !data.intitule}
+          className="gap-2 shrink-0"
+          size="lg"
+        >
+          {contentLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+          {contentLoading ? "Génération…" : "Tout générer (cours + exos + besoins)"}
+        </Button>
+      </div>
+
 
       {/* Téléchargement du référentiel */}
       <div className="p-4 bg-primary/5 border-2 border-primary/30 rounded-xl flex items-center justify-between gap-3">
