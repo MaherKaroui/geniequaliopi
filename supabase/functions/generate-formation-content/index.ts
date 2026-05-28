@@ -35,8 +35,8 @@ const SYSTEM_PROMPT = `Tu es un ingénieur pédagogique français expert en conf
 RÈGLES STRICTES :
 - Tout le contenu est dense, concret, opérationnel, et **toujours cohérent avec le métier de la formation**.
 - Le HTML est propre, sans <style> inline lourd : utilise <p>, <ul><li>, <strong>, <em>, <h4>, <table>, <br>. Pas de <script>. Pas de <html>/<body>.
-- Les CHAPITRES sont 6 minimum, chacun avec 4 à 6 sections, chaque section avec un contenu HTML de **300 à 500 mots minimum** (équivalent ≥ 1 page A4 imprimée). Total visé : **30+ pages**.
-- Les EXERCICES sont 8 minimum, progressifs (du simple au complexe), avec **corrigés détaillés** (réponse attendue + explication + critères d'évaluation).
+- Les CHAPITRES sont 5, chacun avec 3 sections, chaque section avec un contenu HTML de **200 à 300 mots** (concis mais dense).
+- Les EXERCICES sont 6, progressifs (du simple au complexe), avec **corrigés détaillés** (réponse attendue + critères d'évaluation).
 - Les RÉPONSES D'ÉVALUATION DES BESOINS sont synthétisées sous forme de bullet HTML cohérents avec le métier et les profils types.
 - Les RESSOURCES PÉDAGOGIQUES citent des **sites officiels, livres, normes, plateformes RÉELLES** du domaine (pas de liens inventés).
 - Les VIDÉOS YouTube sont 5 URLs de **recherche YouTube** (format https://www.youtube.com/results?search_query=...) ciblées sur le métier.
