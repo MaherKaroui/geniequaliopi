@@ -181,7 +181,7 @@ Deno.serve(async (req) => {
     }
 
     // Modèle fort par défaut : gemini-2.5-pro
-    const model = String(body?.model || "google/gemini-2.5-pro").trim();
+    const model = String(body?.model || "google/gemini-2.5-flash").trim();
 
     const userPrompt = `Génère le PACK CONTENU PÉDAGOGIQUE COMPLET pour la formation suivante :
 
