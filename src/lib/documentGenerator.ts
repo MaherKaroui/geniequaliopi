@@ -7742,22 +7742,50 @@ function genLivreApprentissageCFA(o: OrganismeInfo, f: FormationInfo, stagiaires
   const s = stagiaires[si] || stagiaires[0] || { prenom: '___', nom: '___', entreprise: '___' } as StagiaireInfo;
   const rncp = getRNCPByCode(f.codeRNCP || '');
   const titreFormation = f.intitule || 'Formation en alternance';
-  const dateDebut = formatDate(getStagiaireDateDebut(s, f));
-  const dateFin = formatDate(getStagiaireDateFin(s, f));
-  const dateSignature = f.dateDebut ? formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f) || f.dateDebut, 14)) : formatDate(new Date().toISOString().slice(0, 10));
+  const dDebut = getStagiaireDateDebut(s, f);
+  const dFin = getStagiaireDateFin(s, f);
+  const dateDebut = formatDate(dDebut);
+  const dateFin = formatDate(dFin);
+  const dateSignature = f.dateDebut ? formatDate(subtractBusinessDays(dDebut || f.dateDebut, 14)) : formatDate(new Date().toISOString().slice(0, 10));
   const sigApprentie = s.signatureUrl ? `<img src="${s.signatureUrl}" style="max-height:60px" />` : '&#160;';
   const tamponCFA = o.tamponUrl ? `<img src="${o.tamponUrl}" style="max-height:80px" />` : '&#160;';
+  const termine = isStagiaireFormationTerminee(s, f);
 
   const blocsHtml = rncp ? rncp.blocsCompetences.map((b, i) =>
     `<p><strong>Bloc ${i + 1} (CCP${i + 1}) :</strong> ${b.titre}</p><ul>${b.competences.map(c => `<li>${c}</li>`).join('')}</ul>`
   ).join('') : '<p>Voir programme détaillé de la formation.</p>';
 
+  const acquisMark = termine ? 'X' : '';
   const grilleRows = rncp ? rncp.blocsCompetences.map((b, i) =>
-    [`<strong>CCP${i + 1} – ${b.titre}</strong>`, `Compétences du bloc ${i + 1} issues du référentiel ${f.codeRNCP || 'RNCP'}`, '', '', '']
+    [`<strong>CCP${i + 1} – ${b.titre}</strong>`, `Compétences du bloc ${i + 1} issues du référentiel ${f.codeRNCP || 'RNCP'}`, '', '', acquisMark]
   ) : [
-    ["CCP1", "Compétences du bloc 1", "", "", ""],
-    ["CCP2", "Compétences du bloc 2", "", "", ""],
+    ["CCP1", "Compétences du bloc 1", "", "", acquisMark],
+    ["CCP2", "Compétences du bloc 2", "", "", acquisMark],
   ];
+
+  const appreciationGlobale = termine
+    ? `<strong>${s.prenom} ${s.nom}</strong> a démontré une implication exemplaire tout au long du parcours d'apprentissage. L'ensemble des blocs de compétences du référentiel <strong>${f.codeRNCP || titreFormation}</strong> est <strong>acquis</strong>. L'apprenti(e) fait preuve d'autonomie, de rigueur professionnelle et d'une excellente capacité d'adaptation en entreprise. Le maître d'apprentissage et l'équipe pédagogique du CFA saluent une progression constante, une attitude professionnelle irréprochable et une parfaite maîtrise des gestes métiers attendus. Avis très favorable à la validation du titre.`
+    : `.......................................................................................................................`;
+
+  // VISITES — 2 dates espacées d'au moins 5 mois (sur la base des dates individuelles du stagiaire)
+  const maitreNom = s.responsableEntreprise || (s as any).tuteur || 'le maître d\'apprentissage';
+  const entrepriseNom = s.entreprise || '___';
+  let visite1Date = '___', visite2Date = '___';
+  if (dDebut && dFin) {
+    const d1 = new Date(dDebut);
+    const d2 = new Date(dFin);
+    const totalMs = d2.getTime() - d1.getTime();
+    const minGapMs = 5 * 30 * 24 * 3600 * 1000; // 5 mois
+    let v1 = new Date(d1.getTime() + Math.max(totalMs * 0.20, 30 * 24 * 3600 * 1000));
+    let v2 = new Date(d1.getTime() + Math.max(totalMs * 0.75, v1.getTime() - d1.getTime() + minGapMs));
+    if (v2.getTime() - v1.getTime() < minGapMs) v2 = new Date(v1.getTime() + minGapMs);
+    if (v2.getTime() > d2.getTime()) v2 = new Date(d2.getTime());
+    if (v2.getTime() - v1.getTime() < minGapMs) v1 = new Date(v2.getTime() - minGapMs);
+    visite1Date = formatDate(v1.toISOString().slice(0, 10));
+    visite2Date = formatDate(v2.toISOString().slice(0, 10));
+  }
+  const commentaireV1 = `Première visite très satisfaisante. <strong>${s.prenom} ${s.nom}</strong> s'est parfaitement intégré(e) à l'équipe de ${entrepriseNom}. L'apprenti(e) montre une réelle motivation, applique avec sérieux les consignes données et progresse rapidement sur les fondamentaux du métier en lien avec la formation « ${titreFormation} ». Ponctualité, présentation et savoir-être professionnels exemplaires. Aucune difficulté particulière relevée. Maître d'apprentissage : ${maitreNom}.`;
+  const commentaireV2 = `Seconde visite tout aussi positive. <strong>${s.prenom} ${s.nom}</strong> a confirmé sa montée en compétences sur l'ensemble des activités confiées en entreprise. L'apprenti(e) gagne en autonomie, prend des initiatives pertinentes et maîtrise désormais les gestes techniques attendus par le référentiel ${f.codeRNCP || titreFormation}. Le maître d'apprentissage ${maitreNom} se déclare très satisfait du parcours réalisé et émet un avis favorable à la poursuite et à la validation du titre. Très bonne articulation entre les apports du CFA et les missions en entreprise.`;
 
   const programmeLines = (f.programme || "").split(/[\n;]/).filter(Boolean).map(l => l.trim()).filter(Boolean);
 
@@ -7821,19 +7849,36 @@ ${tableHTML(["", ""], [
     { heading: "GRILLE D'ACQUISITION DES COMPÉTENCES", content: `<p>La grille ci-dessous permet de suivre la progression de l'apprenti(e) de manière homogène tout au long du parcours.</p>
 ${tableHTML(["Bloc de compétences", "Compétence évaluée", "Non acquis", "En cours d'acquisition", "Acquis"], grilleRows)}
 <p><strong>Niveaux d'évaluation :</strong></p><ul><li><strong>Non acquis :</strong> la compétence n'est pas maîtrisée</li><li><strong>En cours d'acquisition :</strong> la compétence est partiellement maîtrisée</li><li><strong>Acquis :</strong> la compétence est maîtrisée de manière autonome</li></ul>
-<p><strong>Appréciation globale du formateur / maître d'apprentissage :</strong></p><p>.......................................................................................................................</p>` },
+<p><strong>Appréciation globale du formateur / maître d'apprentissage :</strong></p><p>${appreciationGlobale}</p>` },
 
     // SUIVI PÉDAGOGIQUE
     { heading: "SUIVI PÉDAGOGIQUE CONTINU", content: `<p>Le suivi pédagogique est assuré tout au long du parcours de formation afin de garantir la progression régulière de l'apprenti(e).</p><p>Ce suivi repose sur des échanges réguliers entre l'apprenti(e), le formateur référent et le maître d'apprentissage.</p>` },
 
     // VISITES EN ENTREPRISE
-    { heading: "VISITES EN ENTREPRISE ET BILANS", content: `<p>Le CFA organise deux visites par an en entreprise. Ces visites constituent des temps formalisés essentiels.</p>
+    { heading: "VISITES EN ENTREPRISE ET BILANS", content: `<p>Le CFA organise deux visites par an en entreprise. Ces visites constituent des temps formalisés essentiels et donnent lieu à un compte rendu écrit, co-signé par l'apprenti(e), le maître d'apprentissage et le référent pédagogique du CFA.</p>
 ${tableHTML(["", ""], [
   ["Nom du CFA", o.nom],
   ["Nom et prénom de l'apprenti(e)", `${s.prenom} ${s.nom}`],
-  ["Entreprise d'accueil", s.entreprise || '___'],
-  ["Type de visite", "1ère visite annuelle ou 2e visite annuelle"],
-])}<p>Chaque visite donne lieu à un compte rendu écrit et formalisé.</p>` },
+  ["Entreprise d'accueil", entrepriseNom],
+  ["Maître d'apprentissage", maitreNom],
+])}
+<h4>1ʳᵉ visite en entreprise — ${visite1Date}</h4>
+${tableHTML(["", ""], [
+  ["Date de la visite", visite1Date],
+  ["Type de visite", "1ʳᵉ visite annuelle"],
+  ["Personnes présentes", `${s.prenom} ${s.nom} (apprenti·e), ${maitreNom} (maître d'apprentissage), ${o.responsablePedagogique || o.dirigeant || 'Référent CFA'} (CFA ${o.nom})`],
+])}
+<p><strong>Commentaire du maître d'apprentissage :</strong></p>
+<p>${commentaireV1}</p>
+
+<h4>2ᵉ visite en entreprise — ${visite2Date}</h4>
+${tableHTML(["", ""], [
+  ["Date de la visite", visite2Date],
+  ["Type de visite", "2ᵉ visite annuelle"],
+  ["Personnes présentes", `${s.prenom} ${s.nom} (apprenti·e), ${maitreNom} (maître d'apprentissage), ${o.responsablePedagogique || o.dirigeant || 'Référent CFA'} (CFA ${o.nom})`],
+])}
+<p><strong>Commentaire du maître d'apprentissage :</strong></p>
+<p>${commentaireV2}</p>` },
 
     // ACCOMPAGNEMENT SOCIAL
     { heading: "ACCOMPAGNEMENT SOCIAL ET PRÉVENTION DES RUPTURES", content: `<p>Le CFA <strong>${o.nom}</strong> met en œuvre un accompagnement social structuré et individualisé afin de sécuriser le parcours de l'apprenti(e) et prévenir les ruptures de contrat.</p><p>La prévention des ruptures constitue une priorité. Elle s'appuie sur le dialogue, la médiation et la mobilisation de solutions adaptées.</p>` },
