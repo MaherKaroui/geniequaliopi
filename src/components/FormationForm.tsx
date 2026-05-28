@@ -307,6 +307,28 @@ const FormationForm = ({ data, onChange, onImportStagiaires, onApplyOrganisme }:
         </Button>
       </div>
 
+      {/* Régénération complète du contenu pédagogique IA */}
+      <div className="p-4 bg-gradient-to-br from-accent/20 to-primary/10 border-2 border-primary/30 rounded-xl flex items-center justify-between gap-3">
+        <div className="flex-1">
+          <Label className="font-semibold text-primary">Contenu pédagogique IA (tout-en-un)</Label>
+          <p className="text-xs text-muted-foreground">
+            Régénère en 1 clic pour « {data.intitule || "votre formation"} » : réponses évaluation des besoins, test de positionnement (début/fin), exercices + corrigés, QCM, support de cours +30 pages avec photos, ressources pédagogiques (vidéos YouTube, livres, sites).
+          </p>
+        </div>
+        <Button
+          type="button"
+          variant="default"
+          onClick={handleRegenerateAllContent}
+          disabled={contentLoading || !data.intitule}
+          className="gap-2 shrink-0"
+          size="lg"
+        >
+          {contentLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+          {contentLoading ? "Génération…" : "Tout générer (cours + exos + besoins)"}
+        </Button>
+      </div>
+
+
       {/* Téléchargement du référentiel */}
       <div className="p-4 bg-primary/5 border-2 border-primary/30 rounded-xl flex items-center justify-between gap-3">
         <div className="flex-1">
