@@ -1,0 +1,272 @@
+// Edge function : Génération IA d'un PACK CONTENU pédagogique complet via Lovable AI (modèle fort)
+// - Réponses d'évaluation des besoins (synthèse + adaptations + besoins individuels)
+// - Support de cours détaillé (6 chapitres x 4-6 sections = 30+ pages)
+// - Exercices avec corrigés
+// - Ressources pédagogiques (supports, outils, vidéos, sites)
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
+
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+
+async function requireAuth(req: Request): Promise<Response | null> {
+  const authHeader = req.headers.get("Authorization");
+  if (!authHeader?.startsWith("Bearer ")) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+  const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_ANON_KEY")!);
+  const { data, error } = await supabase.auth.getUser(authHeader.replace("Bearer ", ""));
+  if (error || !data?.user) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+  return null;
+}
+
+const SYSTEM_PROMPT = `Tu es un ingénieur pédagogique français expert en conformité Qualiopi (référentiel national qualité v9). Tu rédiges des contenus de formation COMPLETS, RÉALISTES, AUDIT-READY, en français professionnel impeccable, parfaitement cohérents avec l'intitulé, les objectifs et le programme fournis.
+
+RÈGLES STRICTES :
+- Tout le contenu est dense, concret, opérationnel, et **toujours cohérent avec le métier de la formation**.
+- Le HTML est propre, sans <style> inline lourd : utilise <p>, <ul><li>, <strong>, <em>, <h4>, <table>, <br>. Pas de <script>. Pas de <html>/<body>.
+- Les CHAPITRES sont 6 minimum, chacun avec 4 à 6 sections, chaque section avec un contenu HTML de **300 à 500 mots minimum** (équivalent ≥ 1 page A4 imprimée). Total visé : **30+ pages**.
+- Les EXERCICES sont 8 minimum, progressifs (du simple au complexe), avec **corrigés détaillés** (réponse attendue + explication + critères d'évaluation).
+- Les RÉPONSES D'ÉVALUATION DES BESOINS sont synthétisées sous forme de bullet HTML cohérents avec le métier et les profils types.
+- Les RESSOURCES PÉDAGOGIQUES citent des **sites officiels, livres, normes, plateformes RÉELLES** du domaine (pas de liens inventés).
+- Les VIDÉOS YouTube sont 5 URLs de **recherche YouTube** (format https://www.youtube.com/results?search_query=...) ciblées sur le métier.
+- Les imageQuery sont 2-4 mots-clés en anglais simple pour Unsplash (ex: "office team meeting", "esthetician at work", "vtc driver car").
+
+Tu utilises OBLIGATOIREMENT l'outil generate_content pour structurer ta réponse.`;
+
+const CONTENT_TOOL = {
+  type: "function",
+  function: {
+    name: "generate_content",
+    description: "Génère un pack pédagogique complet pour une formation Qualiopi.",
+    parameters: {
+      type: "object",
+      properties: {
+        besoins: {
+          type: "object",
+          properties: {
+            besoinsList: {
+              type: "array",
+              minItems: 10,
+              maxItems: 12,
+              items: { type: "string" },
+              description: "10-12 besoins individuels typiques (1 phrase chacun)",
+            },
+            syntheseHtml: {
+              type: "string",
+              description: "Synthèse HTML des besoins (5-7 bullets <br>) cohérente avec le métier",
+            },
+            adaptationsHtml: {
+              type: "string",
+              description: "Adaptations pédagogiques mises en place (5-7 bullets <br>)",
+            },
+          },
+          required: ["besoinsList", "syntheseHtml", "adaptationsHtml"],
+          additionalProperties: false,
+        },
+        chapters: {
+          type: "array",
+          minItems: 6,
+          maxItems: 8,
+          items: {
+            type: "object",
+            properties: {
+              title: { type: "string" },
+              description: { type: "string" },
+              imageQuery: { type: "string", description: "Mots-clés Unsplash en anglais simple" },
+              sections: {
+                type: "array",
+                minItems: 4,
+                maxItems: 6,
+                items: {
+                  type: "object",
+                  properties: {
+                    title: { type: "string" },
+                    contentHtml: {
+                      type: "string",
+                      description: "Contenu HTML dense : 300-500 mots, avec <p>, <ul>, <strong>",
+                    },
+                  },
+                  required: ["title", "contentHtml"],
+                  additionalProperties: false,
+                },
+              },
+            },
+            required: ["title", "description", "imageQuery", "sections"],
+            additionalProperties: false,
+          },
+        },
+        exercises: {
+          type: "array",
+          minItems: 8,
+          maxItems: 12,
+          items: {
+            type: "object",
+            properties: {
+              titre: { type: "string" },
+              consigne: { type: "string", description: "Énoncé détaillé (3-6 phrases)" },
+              reponseAttendue: { type: "string", description: "Corrigé détaillé avec explication et critères" },
+              points: { type: "number" },
+            },
+            required: ["titre", "consigne", "reponseAttendue", "points"],
+            additionalProperties: false,
+          },
+        },
+        ressources: {
+          type: "object",
+          properties: {
+            supportsHtml: { type: "string", description: "<p>...</p> liste des supports de cours" },
+            outilsHtml: { type: "string", description: "<p>...</p> liste des outils numériques et matériels" },
+            ressourcesComplHtml: { type: "string", description: "<p>...</p> sites officiels, livres, normes réels" },
+            videos: {
+              type: "array",
+              minItems: 5,
+              maxItems: 6,
+              items: {
+                type: "object",
+                properties: {
+                  title: { type: "string" },
+                  description: { type: "string" },
+                  url: { type: "string", description: "https://www.youtube.com/results?search_query=..." },
+                },
+                required: ["title", "description", "url"],
+                additionalProperties: false,
+              },
+            },
+          },
+          required: ["supportsHtml", "outilsHtml", "ressourcesComplHtml", "videos"],
+          additionalProperties: false,
+        },
+      },
+      required: ["besoins", "chapters", "exercises", "ressources"],
+      additionalProperties: false,
+    },
+  },
+};
+
+Deno.serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
+  }
+  const authErr = await requireAuth(req);
+  if (authErr) return authErr;
+
+  try {
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY non configurée");
+
+    const body = await req.json();
+    const intitule = String(body?.intitule || "").trim();
+    const objectifs = String(body?.objectifs || "").trim();
+    const programme = String(body?.programme || "").trim();
+    const publicVise = String(body?.publicVise || "").trim();
+    const prerequis = String(body?.prerequis || "").trim();
+    const nbStagiaires = Number(body?.nbStagiaires || 1);
+
+    if (!intitule || intitule.length < 3) {
+      return new Response(JSON.stringify({ error: "intitule requis" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Modèle fort par défaut : gemini-2.5-pro
+    const model = String(body?.model || "google/gemini-2.5-pro").trim();
+
+    const userPrompt = `Génère le PACK CONTENU PÉDAGOGIQUE COMPLET pour la formation suivante :
+
+INTITULÉ : ${intitule}
+OBJECTIFS : ${objectifs || "(à déduire de l'intitulé)"}
+PROGRAMME : ${programme || "(à déduire de l'intitulé)"}
+PUBLIC VISÉ : ${publicVise || "(à déduire)"}
+PRÉREQUIS : ${prerequis || "(à déduire)"}
+NOMBRE DE STAGIAIRES : ${nbStagiaires}
+
+Tu dois OBLIGATOIREMENT produire :
+1. besoins (réponses d'évaluation des besoins : 10-12 besoins individuels + synthèse + adaptations)
+2. chapters : **6 à 8 chapitres**, **4 à 6 sections par chapitre**, **300-500 mots de HTML dense par section** (cible : 30+ pages au total)
+3. exercises : **8 à 12 exercices** progressifs avec **corrigés détaillés** (réponse attendue + critères d'évaluation)
+4. ressources : supports, outils, 5+ vidéos YouTube (URLs de recherche), sites/livres réels du domaine
+
+Tout doit être 100% cohérent avec le métier "${intitule}".`;
+
+    const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model,
+        messages: [
+          { role: "system", content: SYSTEM_PROMPT },
+          { role: "user", content: userPrompt },
+        ],
+        tools: [CONTENT_TOOL],
+        tool_choice: { type: "function", function: { name: "generate_content" } },
+      }),
+    });
+
+    if (!aiResponse.ok) {
+      if (aiResponse.status === 429) {
+        return new Response(JSON.stringify({ error: "Limite de requêtes IA atteinte." }), {
+          status: 429,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      if (aiResponse.status === 402) {
+        return new Response(JSON.stringify({ error: "Crédits IA épuisés." }), {
+          status: 402,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const errText = await aiResponse.text();
+      console.error("AI gateway error:", aiResponse.status, errText);
+      return new Response(JSON.stringify({ error: "Erreur du service IA" }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const data = await aiResponse.json();
+    const toolCall = data?.choices?.[0]?.message?.tool_calls?.[0];
+    if (!toolCall?.function?.arguments) {
+      console.error("Réponse IA invalide:", JSON.stringify(data));
+      return new Response(JSON.stringify({ error: "L'IA n'a pas retourné de structure valide." }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    let pack;
+    try {
+      pack = JSON.parse(toolCall.function.arguments);
+    } catch (e) {
+      console.error("JSON parse error:", e);
+      return new Response(JSON.stringify({ error: "Réponse IA mal formée" }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    return new Response(JSON.stringify({ pack }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  } catch (e) {
+    console.error("generate-formation-content error:", e);
+    return new Response(
+      JSON.stringify({ error: e instanceof Error ? e.message : "Erreur inconnue" }),
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    );
+  }
+});
