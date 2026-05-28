@@ -3892,6 +3892,53 @@ function genFicheSuiviTuteur(o: OrganismeInfo, f: FormationInfo, stagiaires: Sta
   const s = stagiaires[0];
   const stagiaireNom = s ? `${s.prenom || ""} ${s.nom || ""}`.trim() : "";
   const subtitle = stagiaireNom ? `${f.intitule} – ${stagiaireNom}` : f.intitule;
+  const termine = s ? isStagiaireFormationTerminee(s, f) : isFormationTerminee(f);
+  const dDebut = s ? getStagiaireDateDebut(s, f) : f.dateDebut;
+  const dFin = s ? getStagiaireDateFin(s, f) : f.dateFin;
+  const tuteurNom = (s as any)?.responsableEntreprise || (s as any)?.tuteur || "Maître d'apprentissage";
+  const entreprise = s?.entreprise || "l'entreprise d'accueil";
+  const rncp = getRNCPByCode(f.codeRNCP || "");
+  const blocs = rncp?.blocsCompetences || [];
+
+  // 6 entretiens de suivi répartis sur la durée du contrat
+  let rows: string[][];
+  if (termine && dDebut && dFin) {
+    const d1 = new Date(dDebut).getTime();
+    const d2 = new Date(dFin).getTime();
+    const span = d2 - d1;
+    const points = [0.08, 0.22, 0.40, 0.58, 0.78, 0.95];
+    const activites = [
+      { act: "Accueil, intégration dans l'équipe, présentation des outils, postes et procédures de l'entreprise", comp: blocs[0]?.titre || "Compétences socles & savoir-être professionnel", eval: "Très bien" },
+      { act: "Observation guidée et participation aux missions courantes sous supervision du maître d'apprentissage", comp: blocs[0]?.titre || "Compétences techniques fondamentales", eval: "Très bien" },
+      { act: "Prise en charge progressive de missions opérationnelles en autonomie partielle, premiers livrables validés", comp: blocs[1]?.titre || blocs[0]?.titre || "Mise en pratique professionnelle", eval: "Bien" },
+      { act: "Conduite de missions complètes en autonomie, restitution orale au maître d'apprentissage, lien avec les apports du CFA", comp: blocs[2]?.titre || blocs[1]?.titre || "Autonomie & qualité de production", eval: "Très bien" },
+      { act: "Pilotage d'un dossier transverse de bout en bout, prise d'initiatives, contribution aux projets de l'équipe", comp: blocs[3]?.titre || blocs[2]?.titre || blocs[0]?.titre || "Compétences transversales & posture pro", eval: "Excellent" },
+      { act: "Bilan de fin de contrat, préparation des épreuves de certification, présentation du dossier professionnel", comp: "Validation de l'ensemble des blocs du référentiel " + (f.codeRNCP || "RNCP"), eval: "Excellent" },
+    ];
+    rows = points.map((p, i) => {
+      const d = new Date(d1 + span * p);
+      return [formatDate(d.toISOString().slice(0, 10)), activites[i].act, activites[i].comp, activites[i].eval];
+    });
+  } else {
+    rows = [
+      ["Semaine 1", "Observation et découverte", "Compétences de base", ""],
+      ["Semaine 2", "Pratique guidée", "Compétences intermédiaires", ""],
+      ["Semaine 3", "Pratique autonome", "Compétences avancées", ""],
+      ["Semaine 4", "Mise en situation réelle", "Compétences transversales", ""],
+    ];
+  }
+
+  const obsTuteur = termine
+    ? `<p><strong>${stagiaireNom || "L'apprenti(e)"}</strong> a effectué l'intégralité de son parcours en alternance chez <strong>${entreprise}</strong> avec un sérieux et une implication remarquables. Présence, ponctualité et savoir-être professionnels exemplaires tout au long du contrat. L'apprenti(e) a progressé de manière constante : observation, prise en main, puis pleine autonomie sur les missions confiées en lien avec la formation « ${f.intitule} ». Les compétences attendues par le référentiel ${f.codeRNCP || ""} sont aujourd'hui <strong>maîtrisées</strong>. Très bonne articulation entre les apports théoriques du CFA et la pratique en entreprise. J'émets un <strong>avis très favorable</strong> à la validation du titre et à la poursuite professionnelle de l'apprenti(e).</p>`
+    : `<p>L'apprenti(e) fait preuve de motivation et d'assiduité. Les compétences se développent de manière satisfaisante.</p>`;
+
+  const synthese = termine
+    ? `<p><strong>Synthèse globale :</strong> Parcours mené à terme dans d'excellentes conditions. Tous les objectifs pédagogiques et professionnels fixés en début de contrat sont atteints. L'ensemble des blocs de compétences est <strong>acquis</strong>.</p><p><strong>Points forts :</strong> autonomie, rigueur, esprit d'équipe, capacité d'adaptation, qualité des productions.</p><p><strong>Axes de poursuite :</strong> consolidation de l'expertise métier en situation professionnelle.</p>`
+    : "";
+
+  const dateBilan = termine && dFin ? formatDate(dFin) : "";
+  const extraHtml = `${synthese}<div style="margin-top:30px"><p><strong>Le Tuteur / Maître d'apprentissage :</strong> ${tuteurNom}${dateBilan ? `<br><strong>Date du bilan final :</strong> ${dateBilan}` : ""}</p></div>`;
+
   return buildDocument({
     org: o,
     title: "FICHE DE SUIVI TUTEUR",
@@ -3899,14 +3946,23 @@ function genFicheSuiviTuteur(o: OrganismeInfo, f: FormationInfo, stagiaires: Sta
     formation: f,
     showFormationInfo: true,
     stagiaires: s ? [s] : undefined,
-    sections: stagiaireNom
-      ? [{ heading: "Identité de l'apprenti suivi", content: `<p><strong>Nom et prénom :</strong> ${stagiaireNom}${s?.entreprise ? `<br><strong>Entreprise d'accueil :</strong> ${s.entreprise}` : ""}${s?.email ? `<br><strong>Email :</strong> ${s.email}` : ""}</p>` }]
-      : undefined,
+    sections: [
+      ...(stagiaireNom ? [{ heading: "Identité de l'apprenti suivi", content: `<p><strong>Nom et prénom :</strong> ${stagiaireNom}${s?.entreprise ? `<br><strong>Entreprise d'accueil :</strong> ${s.entreprise}` : ""}${tuteurNom ? `<br><strong>Maître d'apprentissage :</strong> ${tuteurNom}` : ""}${s?.email ? `<br><strong>Email :</strong> ${s.email}` : ""}</p>` }] : []),
+      { heading: "Observations du tuteur", content: obsTuteur },
+    ],
     table: {
       headers: ["Date", "Activité réalisée", "Compétences travaillées", "Évaluation"],
-      rows: [["Semaine 1", "Observation et découverte", "Compétences de base", "Satisfaisant"], ["Semaine 2", "Pratique guidée", "Compétences intermédiaires", "Bien"], ["Semaine 3", "Pratique autonome", "Compétences avancées", "Très bien"], ["Semaine 4", "Mise en situation réelle", "Compétences transversales", "Excellent"]]
+      rows,
     },
-    extraHtml: `<div style="margin-top:30px"><p><strong>Le Tuteur :</strong> ${f.formateur}</p></div>`,
+    extraHtml,
+    signatures: termine ? {
+      type: "2",
+      labels: ["Le Tuteur / Maître d'apprentissage", `L'Apprenti(e)${stagiaireNom ? ` – ${stagiaireNom}` : ""}`],
+      names: [tuteurNom, stagiaireNom],
+      stagiaireSignatureUrl: s?.signatureUrl,
+      dates: [dateBilan, dateBilan],
+      noOrgSignature: true,
+    } : undefined,
   });
 }
 
