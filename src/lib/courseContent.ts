@@ -395,7 +395,37 @@ import { getNTCChapters } from "./courseContentNTC";
 import { getGPMEChapters } from "./courseContentGPME";
 export { getWordChapters, getAnglaisChapters, getAnglaisA1Chapters, getManagementChapters, getGenericChapters, getFLEChapters, getIAChapters, getWebmarketingChapters, getCRMChapters, getMassagePrenatalChapters, getMassagePostpartumChapters, getECSRChapters, getVTestChapters, getCIPChapters, getRPMSChapters, getAssistantDirectionChapters, getInfographisteChapters, getRestaurationChapters, getSocioEsthetiqueChapters, getVTCChapters, getEsthetiqueChapters, getNTCChapters, getGPMEChapters };
 
+// Override AI : si un AIContentPack est en cache pour cette formation, on utilise
+// les chapitres générés par l'IA forte (gemini-2.5-pro) en injectant des photos
+// contextuelles Unsplash au début de chaque chapitre.
+function tryAIChapters(formationIntitule: string): CourseChapter[] | null {
+  try {
+    // import dynamique pour éviter cycle
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const mod = require("./aiContentPack") as typeof import("./aiContentPack");
+    const pack = mod.getCachedContentPack({ intitule: formationIntitule } as any);
+    if (!pack?.chapters?.length) return null;
+    return pack.chapters.map((ch, idx) => {
+      const imgs = mod.pickImagesForQuery(ch.imageQuery || "", formationIntitule);
+      const heroImg = imgs[idx % imgs.length];
+      const figure = `<figure style="margin:14px 0;text-align:center"><img src="${heroImg}" alt="${ch.title.replace(/"/g, "&quot;")}" loading="lazy" style="max-width:100%;height:auto;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,0.12)" /><figcaption style="font-size:12px;color:#666;margin-top:6px;font-style:italic">${ch.title}</figcaption></figure>`;
+      return {
+        title: ch.title,
+        description: ch.description,
+        sections: ch.sections.map((s, si) => ({
+          title: s.title,
+          content: (si === 0 ? figure : "") + s.contentHtml,
+        })),
+      };
+    });
+  } catch {
+    return null;
+  }
+}
+
 export function getCourseChapters(formationIntitule: string): CourseChapter[] {
+  const ai = tryAIChapters(formationIntitule);
+  if (ai) return ai;
   const t = formationIntitule.toLowerCase();
   if (t.includes('gestion de la pme') || t.includes('gestion pme') || t.includes('bts gpme') || t.includes(' gpme') || t.startsWith('gpme') || t.includes('rncp38363')) return getGPMEChapters();
   if (t.includes('socio-esthéti') || t.includes('socio esthéti') || t.includes('rs5992') || t.includes('soins socio')) return getSocioEsthetiqueChapters();
