@@ -99,7 +99,7 @@ export async function generateAIContentPack(
       publicVise: f.publicVise,
       prerequis: f.prerequis,
       nbStagiaires: opts.nbStagiaires ?? 1,
-      model: "google/gemini-2.5-pro",
+      model: "google/gemini-2.5-flash",
     },
   });
   if (error) throw new Error(error.message || "Erreur appel IA contenu");
