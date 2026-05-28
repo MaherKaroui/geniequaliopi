@@ -7768,7 +7768,7 @@ function genLivreApprentissageCFA(o: OrganismeInfo, f: FormationInfo, stagiaires
     : `.......................................................................................................................`;
 
   // VISITES — 2 dates espacées d'au moins 5 mois (sur la base des dates individuelles du stagiaire)
-  const maitreNom = s.responsableEntreprise || s.tuteur || 'le maître d\'apprentissage';
+  const maitreNom = s.responsableEntreprise || (s as any).tuteur || 'le maître d\'apprentissage';
   const entrepriseNom = s.entreprise || '___';
   let visite1Date = '___', visite2Date = '___';
   if (dDebut && dFin) {
