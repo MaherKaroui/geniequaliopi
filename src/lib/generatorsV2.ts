@@ -704,7 +704,9 @@ export function genExercicesStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
       extraHtml: `<p><strong>Nom et prénom :</strong> ${s.prenom} ${s.nom}</p><div class="section section-green"><p><em>La formation est en cours. Les exercices seront complétés et évalués à l'issue de la formation.</em></p></div>` });
   }
   const evalData = getEvalContent(f.intitule);
-  const allExercices = evalData.exercices;
+  // Override AI : si un AIContentPack est en cache, on utilise ses exercices riches en priorité
+  const aiPack = getCachedContentPack(f);
+  const allExercices = (aiPack?.exercises?.length ? aiPack.exercises.map(e => ({ titre: e.titre, consigne: e.consigne, reponseAttendue: e.reponseAttendue })) : evalData.exercices);
   const sc = EVAL_SCORES[stagiaireIdx] || [7, 8, 7, 8, 7];
 
   // Check if formation has competency blocs
