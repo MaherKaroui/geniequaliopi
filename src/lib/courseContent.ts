@@ -218,6 +218,25 @@ const YOUTUBE_BUREAUTIQUE: CourseData['youtubeVideos'] = [
   { title: "Outlook – Bien gérer ses mails et son agenda", url: "https://www.youtube.com/watch?v=7Jn_t6A8q6w", description: "Trier ses mails, organiser son agenda et collaborer efficacement avec Outlook." },
 ];
 
+/** Génère des vidéos YouTube dynamiques (recherches ciblées) à partir de l'intitulé. */
+function getDynamicYoutubeVideos(formationIntitule: string): CourseData['youtubeVideos'] {
+  const raw = (formationIntitule || "Formation professionnelle").trim();
+  // Nettoie : retire codes RNCP/RS, parenthèses
+  const clean = raw
+    .replace(/\((?:rncp|rs)[^)]*\)/gi, "")
+    .replace(/\b(?:rncp|rs)\s*\d+\b/gi, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  const enc = (q: string) => `https://www.youtube.com/results?search_query=${encodeURIComponent(q)}`;
+  return [
+    { title: `Formation complète : ${clean}`, url: enc(`formation complète ${clean}`), description: `Recherche YouTube : tutoriels et formations complètes sur ${clean}.` },
+    { title: `${clean} – Tutoriel pour débutants`, url: enc(`${clean} tutoriel débutant français`), description: `Recherche YouTube : vidéos d'introduction adaptées aux débutants en ${clean}.` },
+    { title: `${clean} – Techniques et bonnes pratiques`, url: enc(`${clean} techniques bonnes pratiques`), description: `Recherche YouTube : techniques professionnelles et bonnes pratiques liées à ${clean}.` },
+    { title: `${clean} – Cas pratiques et mises en situation`, url: enc(`${clean} cas pratique exemple`), description: `Recherche YouTube : études de cas et exemples concrets dans le domaine ${clean}.` },
+    { title: `${clean} – Préparation examen / certification`, url: enc(`${clean} examen préparation certification`), description: `Recherche YouTube : ressources de préparation à l'évaluation finale ou à la certification ${clean}.` },
+  ];
+}
+
 export function getYoutubeVideos(formationIntitule: string): CourseData['youtubeVideos'] {
   const t = formationIntitule.toLowerCase();
   // Massages spécifiques (avant générique)
@@ -251,7 +270,8 @@ export function getYoutubeVideos(formationIntitule: string): CourseData['youtube
   if (t.includes('webmarketing') || t.includes('marketing de contenus') || t.includes('réseaux sociaux') || t.includes('marketing digital')) return YOUTUBE_WEBMARKETING;
   if (t.includes('crm') || t.includes('automation') || t.includes('automatisation')) return YOUTUBE_CRM;
   if (t.includes('négociat') || t.includes('technico') || t.includes('ntc') || t.includes('commercial') || t.includes('vente')) return YOUTUBE_COMMERCIAL;
-  return YOUTUBE_GENERIC;
+  // Fallback : recherches YouTube ciblées sur l'intitulé exact (au lieu de vidéos génériques sans rapport)
+  return getDynamicYoutubeVideos(formationIntitule);
 }
 
 // ========== COURSE CHAPTER CONTENT ==========
