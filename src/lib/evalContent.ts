@@ -1981,13 +1981,34 @@ export function getQuestionsOuvertes(
   const dynamicDebut = !hasSpecificContent ? generateDynamicQuestions(formationIntitule, objectifs, programme, "debut") : [];
   const dynamicFin = !hasSpecificContent ? generateDynamicQuestions(formationIntitule, objectifs, programme, "fin") : [];
 
+  // Override AI : si un pack IA est en cache, on dérive des questions de positionnement
+  // à partir des exercices riches (titre + corrigé) pour garantir cohérence avec la formation.
+  let aiDebut: QuestionOuverte[] = [];
+  let aiFin: QuestionOuverte[] = [];
+  try {
+    // Import dynamique pour éviter cycle de dépendances
+    const { getCachedContentPack } = require("./aiContentPack");
+    const pack = getCachedContentPack({ intitule: formationIntitule } as any);
+    if (pack?.exercises?.length) {
+      const exs = pack.exercises.slice(0, 10);
+      aiDebut = exs.map((e: any) => ({
+        question: `Avant la formation, que savez-vous sur : ${e.titre} ?`,
+        reponseAttendue: e.reponseAttendue,
+      }));
+      aiFin = exs.map((e: any) => ({
+        question: `À l'issue de la formation, expliquez ce que vous maîtrisez sur : ${e.titre}.`,
+        reponseAttendue: e.reponseAttendue,
+      }));
+    }
+  } catch { /* ignore */ }
+
   return {
     debut: ensureMinimumQuestions(
-      [...dynamicDebut, ...source.debut],
+      [...aiDebut, ...dynamicDebut, ...source.debut],
       [...(wordFallback?.debut ?? []), ...DEFAULT_QUESTIONS_OUVERTES.debut]
     ),
     fin: ensureMinimumQuestions(
-      [...dynamicFin, ...source.fin],
+      [...aiFin, ...dynamicFin, ...source.fin],
       [...(wordFallback?.fin ?? []), ...DEFAULT_QUESTIONS_OUVERTES.fin]
     ),
   };
