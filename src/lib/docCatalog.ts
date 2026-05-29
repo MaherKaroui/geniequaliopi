@@ -1484,5 +1484,15 @@ export function buildFullCatalog(
     });
   }
 
-  return d;
+  // On ne conserve que les mails dont un template DOCX existe réellement.
+  // Cela évite l'apparition d'un dossier "Critere_0" dans les ZIP et garde l'UI
+  // cohérente avec la section MAILS (docx uniquement).
+  const MAIL_DOCX_TEMPLATES = new Set<string>([
+    "mail_pre_inscription",
+    "mail_inscription",
+    "mail_convocation",
+    "mail_envoie_sc_ressources",
+    "mail_fin_formation",
+  ]);
+  return d.filter((doc) => doc.critere !== 0 || MAIL_DOCX_TEMPLATES.has(doc.template));
 }
