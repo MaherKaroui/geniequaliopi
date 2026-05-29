@@ -2134,12 +2134,6 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
         <li>Accessible par capitalisation des CCP ou suite à un parcours de formation, conformément à l'arrêté du 22 décembre 2015 modifié relatif aux conditions de délivrance du titre professionnel du ministère chargé de l'emploi.</li>
       </ul>
 
-      <h3>Taux de réussite</h3>
-      <table>
-        <tr><th>Indicateur</th><th>Valeur</th></tr>
-        <tr><td>Taux de réussite national (France Compétences – RNCP 39063)</td><td>48 % (moyenne constatée sur les résultats publiés)</td></tr>
-        <tr><td>Taux du centre ${o.nom}</td><td>3 stagiaires formés – 1 présenté – 1 reçu → <strong>100 % de réussite parmi les présentés</strong></td></tr>
-      </table>
     </div>
 
     <h2>Débouchés professionnels (extraits du RNCP 39063)</h2>
