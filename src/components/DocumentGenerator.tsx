@@ -1461,8 +1461,8 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
 
       {/* === MAIL SECTION (outside critères) === */}
       {(() => {
-        const isHtmlMailTpl = (t: string) => ["mail_mission_cfa", "mail_visite_entreprise_cfa", "mail_envoi_evaluation_prealable", "mail_retour_documents_completes", "mail_rdv_evaluation_besoins", "mail_bilan_froid_3mois", "mail_deroulement_examen_vtc", "mail_invitation_formateur_externe", "mail_questions_formation_vtc", "mail_amenagement_mdph_bilal", "mail_envoi_contrat_convocation_ri"].includes(t);
-        const mailDocs = catalog.filter((doc) => doc.critere === 0 && (MAIL_TEMPLATE_FILES[doc.template] || isHtmlMailTpl(doc.template)));
+        const isHtmlMailTpl = (_t: string) => false;
+        const mailDocs = catalog.filter((doc) => doc.critere === 0 && !!MAIL_TEMPLATE_FILES[doc.template]);
         if (mailDocs.length === 0) return null;
         const isMailExpanded = expandedCriteres.has(99);
         const mailGenerated = mailDocs.filter((doc) => generated.has(doc.id)).length;
