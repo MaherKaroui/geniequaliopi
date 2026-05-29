@@ -1034,6 +1034,7 @@ function genOrganigramme(o: OrganismeInfo, f?: FormationInfo) {
   const refQualite = o.referentQualite?.trim() || dir;
   // Formateur principal : on prend celui de la formation si fourni, sinon le dirigeant
   const formateur = f?.formateur?.trim() || dir;
+  const isCFA = Array.isArray(o.typesActions) && (o.typesActions.includes('apprentissage') || o.typesActions.includes('vae'));
 
   const box = (titre: string, nom: string) => `
     <td style="padding:10px;vertical-align:top">
