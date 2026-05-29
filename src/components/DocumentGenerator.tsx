@@ -210,9 +210,8 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
    * le document est placé dans CT{c}_IND_{i}/{folder}/ pour regrouper les missions.
    */
   const getDocBasePath = useCallback((doc: DocEntry): string => {
-    const HTML_MAIL_TEMPLATES = ["mail_mission_cfa", "mail_visite_entreprise_cfa", "mail_envoi_evaluation_prealable", "mail_retour_documents_completes", "mail_rdv_evaluation_besoins", "mail_bilan_froid_3mois", "mail_deroulement_examen_vtc", "mail_invitation_formateur_externe", "mail_questions_formation_vtc", "mail_amenagement_mdph_bilal", "mail_envoi_contrat_convocation_ri"];
-    const isHtmlMail = doc.critere === 0 && HTML_MAIL_TEMPLATES.includes(doc.template);
-    const isMail = doc.critere === 0 && (!!MAIL_TEMPLATE_FILES[doc.template] || isHtmlMail);
+    // Seuls les mails DOCX (templates .docx) sont conservés dans le dossier MAILS.
+    const isMail = doc.critere === 0 && !!MAIL_TEMPLATE_FILES[doc.template];
     const isSiteWeb = doc.id.startsWith("cfa_siteweb_");
     const root = isSiteWeb ? "Documents site web" : (isMail ? "MAILS" : shortCriterePath(doc.critere, doc.indicateur));
     const subFolder = typeof doc.params?.folder === "string" ? doc.params.folder : null;
