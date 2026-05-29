@@ -1062,13 +1062,13 @@ function genOrganigramme(o: OrganismeInfo, f?: FormationInfo) {
         <tr>
           ${box("Référent Handicap", refHandi)}
           ${box("Formateur", formateur)}
-          ${box("Relation Entreprise", refPeda)}
+          ${isCFA ? box("Relation Entreprise", refPeda) : `<td style="padding:10px"></td>`}
         </tr>
-        <tr>
+        ${isCFA ? `<tr>
           <td style="padding:10px"></td>
           ${box("Référent Mobilité Nationale et Internationale", refPeda)}
           <td style="padding:10px"></td>
-        </tr>
+        </tr>` : ``}
       </table>
     </div>` });
 }
