@@ -250,7 +250,7 @@ export function genContratNDA(
 ${footerHtml(o)}`;
   }).join("\n");
 
-  return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">${CSS}</head><body><div class="doc">${blocks}</div></body></html>`;
+  return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">${buildCSS()}</head><body><div class="doc">${blocks}</div></body></html>`;
 }
 
 
@@ -336,6 +336,6 @@ export function genReglementNDA(o: OrganismeInfo, f?: FormationInfo, s?: Stagiai
 
 ${footerHtml(o)}`;
 
-  return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">${CSS}</head><body><div class="doc">${body}</div></body></html>`;
+  return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">${buildCSS()}</head><body><div class="doc">${body}</div></body></html>`;
 }
 

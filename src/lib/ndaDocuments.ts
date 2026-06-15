@@ -9,7 +9,7 @@ import type { CVData } from "@/lib/cvGenerator";
 import { CSS, footerHtml, escapeHtml, v, fmtDateLong, adresseComplete, parseHeures, parseMontant, DOTS } from "@/lib/ndaContratReglement";
 
 function wrap(body: string): string {
-  return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">${CSS}</head><body><div class="doc">${body}</div></body></html>`;
+  return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">${buildCSS()}</head><body><div class="doc">${body}</div></body></html>`;
 }
 
 function today(): string {
