@@ -53,37 +53,63 @@ function adresseComplete(adresse?: string, cp?: string, ville?: string): string 
   return out || DOTS;
 }
 
-/** Style commun à TOUS les documents NDA : design sobre type Word. */
-export const CSS = `
+/** Style commun à TOUS les documents NDA — applique la personnalisation choisie sur la plateforme. */
+export function buildCSS(): string {
+  const s = getDocStyle();
+  const primary = s.primaryColor || "#1e3a7b";
+  const secondary = s.secondaryColor || "#2d8659";
+  const bodyFont = s.fontFamily || "Calibri, Arial, sans-serif";
+  const headingFont = s.headingFont || bodyFont;
+  const fsBody = (s.fontSize || 11);
+  // Construit une teinte claire de la couleur primaire pour les lignes alternées
+  const lightPrimary = hexToRgba(primary, 0.08);
+  return `
 <style>
   @page { size: A4; margin: 18mm 17mm 18mm 17mm; }
   html, body { margin: 0; padding: 0; }
-  body { font-family: Calibri, Arial, sans-serif; font-size: 11pt; color: #111; line-height: 1.35; background: #fff; }
+  body { font-family: ${bodyFont}; font-size: ${fsBody}pt; color: #111; line-height: 1.4; background: #fff; }
   .doc { width: min(100%, 1120px); margin: 0 auto; padding: 40px 110px; box-sizing: border-box; }
   @media screen and (max-width: 768px) { .doc { width: 100%; padding: 24px 22px; } }
   @media print { .doc { width: 100%; max-width: none; padding: 0; } }
-  h1 { font-size: 15pt; text-align: center; text-transform: uppercase; margin: 14px 0 4px 0; font-weight: 700; }
-  h2 { font-size: 11pt; text-align: center; font-weight: 400; font-style: italic; margin: 0 0 18px 0; color: #111; }
-  h3 { font-size: 11pt; margin: 15px 0 6px 0; color: #111; font-weight: 700; }
+  h1 { font-family: ${headingFont}; font-size: ${fsBody + 4}pt; text-align: center; text-transform: uppercase; margin: 14px 0 6px 0; font-weight: 700; color: ${primary}; letter-spacing: 0.5px; border-bottom: 2px solid ${primary}; padding-bottom: 8px; }
+  h2 { font-family: ${headingFont}; font-size: ${fsBody}pt; text-align: center; font-weight: 400; font-style: italic; margin: 0 0 18px 0; color: ${secondary}; }
+  h3 { font-family: ${headingFont}; font-size: ${fsBody}pt; margin: 16px 0 6px 0; color: ${primary}; font-weight: 700; }
   p { margin: 7px 0; text-align: justify; }
   ul { margin: 5px 0 9px 28px; padding: 0; }
   li { margin: 4px 0; padding-left: 2px; }
-  .meta { text-align: center; font-size: 11pt; color: #111; margin-bottom: 18px; }
-  table { border-collapse: collapse; width: 100%; max-width: 100%; margin: 10px 0; font-size: 10.5pt; table-layout: fixed; word-wrap: break-word; }
+  strong { color: #111; }
+  .meta { text-align: center; font-size: ${fsBody}pt; color: ${secondary}; margin-bottom: 18px; font-style: italic; }
+  table { border-collapse: collapse; width: 100%; max-width: 100%; margin: 10px 0; font-size: ${fsBody - 0.5}pt; table-layout: fixed; word-wrap: break-word; }
   .pdf-root > table.nda-text-table { width: calc(100% - 220px); max-width: calc(100% - 220px); margin-left: 110px; margin-right: 110px; }
   @media screen and (max-width: 768px) { .pdf-root > table.nda-text-table { width: calc(100% - 44px); max-width: calc(100% - 44px); margin-left: 22px; margin-right: 22px; } }
-  th, td { border: 1px solid #444; padding: 6px 8px; vertical-align: top; text-align: left; word-wrap: break-word; overflow-wrap: break-word; }
-  th { background: #f0f0f0; font-weight: 700; }
+  th, td { border: 1px solid ${primary}; padding: 7px 9px; vertical-align: top; text-align: left; word-wrap: break-word; overflow-wrap: break-word; }
+  th { background: ${primary}; color: #fff; font-weight: 700; font-family: ${headingFont}; }
+  tr:nth-child(even) td { background: ${lightPrimary}; }
+  tr:nth-child(odd) td { background: #fff; }
   .signatures { margin-top: 34px; display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: start; }
-  .signatures .box { font-size: 11pt; min-height: 145px; }
-  .signatures .box .title { font-weight: 700; margin-bottom: 8px; }
-  .signatures .box .mention { font-style: italic; color: #111; font-size: 10pt; margin-top: 8px; }
+  .signatures .box { font-size: ${fsBody}pt; min-height: 145px; padding: 12px; border-top: 2px solid ${primary}; }
+  .signatures .box .title { font-family: ${headingFont}; font-weight: 700; margin-bottom: 8px; color: ${primary}; text-transform: uppercase; font-size: ${fsBody - 0.5}pt; letter-spacing: 0.5px; }
+  .signatures .box .mention { font-style: italic; color: #555; font-size: ${fsBody - 1}pt; margin-top: 8px; }
   .signatures .box .sig-img { display: block; max-height: 95px; max-width: 220px; margin: 10px 0 4px 0; }
-  .footer { margin-top: 26px; padding-top: 8px; border-top: 1px solid #ddd; font-size: 9pt; color: #333; text-align: center; line-height: 1.5; }
-  .footer strong { display: block; font-size: 10pt; color: #111; margin-bottom: 2px; }
+  .footer { margin-top: 26px; padding-top: 8px; border-top: 2px solid ${primary}; font-size: ${fsBody - 2}pt; color: #333; text-align: center; line-height: 1.5; }
+  .footer strong { display: block; font-family: ${headingFont}; font-size: ${fsBody - 1}pt; color: ${primary}; margin-bottom: 2px; }
   .page-break { page-break-before: always; }
 </style>
 `;
+}
+
+/** Convertit #RRGGBB en rgba(r,g,b,a) */
+function hexToRgba(hex: string, alpha: number): string {
+  const h = hex.replace("#", "");
+  const full = h.length === 3 ? h.split("").map(c => c + c).join("") : h;
+  const r = parseInt(full.slice(0, 2), 16) || 0;
+  const g = parseInt(full.slice(2, 4), 16) || 0;
+  const b = parseInt(full.slice(4, 6), 16) || 0;
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
+/** @deprecated — utilise buildCSS() pour profiter du thème en cours */
+export const CSS = "";
 
 
 export function footerHtml(o: OrganismeInfo): string {
