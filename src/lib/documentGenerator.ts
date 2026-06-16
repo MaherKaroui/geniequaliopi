@@ -2809,6 +2809,25 @@ function genConvention(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiaire
 }
 
 /** Check if a French long-format day string ("lundi 4 novembre 2024") is in the past (<=today) */
+/** Optional override stored in sessionStorage to simulate "today" for connection/attendance reports.
+ *  Set sessionStorage key 'connexion_as_of' to an ISO date (YYYY-MM-DD) to cap "past" days at that date. */
+function getAsOfDate(): Date {
+  try {
+    const iso = typeof window !== 'undefined' ? window.sessionStorage?.getItem('connexion_as_of') : null;
+    if (iso) {
+      const m = iso.match(/^(\d{4})-(\d{2})-(\d{2})/);
+      if (m) {
+        const d = new Date(parseInt(m[1]), parseInt(m[2]) - 1, parseInt(m[3]));
+        d.setHours(23, 59, 59, 999);
+        return d;
+      }
+    }
+  } catch {}
+  const today = new Date();
+  today.setHours(23, 59, 59, 999);
+  return today;
+}
+
 function isFrLongDayPast(dayStr: string): boolean {
   try {
     const months: Record<string, number> = { "janvier":0,"février":1,"fevrier":1,"mars":2,"avril":3,"mai":4,"juin":5,"juillet":6,"août":7,"aout":7,"septembre":8,"octobre":9,"novembre":10,"décembre":11,"decembre":11 };
@@ -2819,9 +2838,7 @@ function isFrLongDayPast(dayStr: string): boolean {
     const year = parseInt(m[3]);
     if (month === undefined) return false;
     const d = new Date(year, month, day);
-    const today = new Date();
-    today.setHours(23, 59, 59, 999);
-    return d <= today;
+    return d <= getAsOfDate();
   } catch { return false; }
 }
 
