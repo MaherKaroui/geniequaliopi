@@ -12190,6 +12190,10 @@ function genTestCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: Sta
   const titre = isDebut ? "TEST DE POSITIONNEMENT DÉBUT DE FORMATION" : "TEST DE POSITIONNEMENT FIN DE FORMATION";
   const dateTest = isDebut ? formatDate(f.dateDebut) : formatDate(f.dateFin);
 
+  // Le test de début est TOUJOURS rempli (preuve d'évaluation initiale).
+  // Le test de fin reste vide si la formation n'est pas terminée.
+  const rempli = isDebut ? true : termine;
+
   let extra = `<h2>${titre}</h2>
     <p><strong>Formation :</strong> ${f.intitule}</p>
     <p><strong>Apprenti(e) :</strong> ${s.prenom} ${s.nom}</p>
@@ -12200,14 +12204,36 @@ function genTestCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: Sta
   }
 
   const questions = evalData.qcmPositionnement;
-  const answers = termine ? generateStagiaireAnswers(questions, si) : [];
-  const score = termine ? computeQCMScore(questions, answers) : null;
+
+  // Pour le test de début, on cible une note de 8/20 (≈ 40 % de bonnes réponses).
+  let answers: number[] = [];
+  if (rempli) {
+    if (isDebut) {
+      // Cible : 40 % de bonnes réponses (déterministe par stagiaire)
+      const targetCorrect = Math.max(1, Math.round(questions.length * 0.4));
+      const seedBase = (s.prenom + s.nom + si).split('').reduce((a, c) => (a * 31 + c.charCodeAt(0)) | 0, 0);
+      const correctSet = new Set<number>();
+      let k = 0;
+      while (correctSet.size < targetCorrect && k < questions.length * 4) {
+        correctSet.add(Math.abs(seedBase + k * 17) % questions.length);
+        k++;
+      }
+      answers = questions.map((q, qi) => {
+        if (correctSet.has(qi)) return q.correctIndex;
+        const wrong = q.options.map((_, i) => i).filter(i => i !== q.correctIndex);
+        return wrong[Math.abs(seedBase + qi * 11) % wrong.length];
+      });
+    } else {
+      answers = generateStagiaireAnswers(questions, si);
+    }
+  }
+  const score = rempli ? computeQCMScore(questions, answers) : null;
 
   extra += `<h3>Partie 1 — QCM (${questions.length} questions)</h3>`;
   questions.forEach((q, qi) => {
     extra += `<p><strong>${qi + 1}. ${q.question}</strong></p><ul>`;
     q.options.forEach((opt, oi) => {
-      if (termine) {
+      if (rempli) {
         const checked = answers[qi] === oi;
         const isCorrect = oi === q.correctIndex;
         const mark = checked ? (isCorrect ? ' [CORRECT]' : ' [INCORRECT]') : '';
@@ -12219,27 +12245,39 @@ function genTestCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: Sta
     extra += `</ul>`;
   });
 
-  if (termine && score) {
+  if (rempli && score) {
     extra += `<p><strong>Score QCM :</strong> ${score.score} / ${score.total} (${Math.round(score.score / score.total * 100)}%)</p>`;
   }
 
   const questionsOuvertes = getQuestionsOuvertes(f.intitule, f.objectifs, f.programme);
   const openQs = isDebut ? questionsOuvertes.debut : questionsOuvertes.fin;
-  const openAnswers = termine ? generateStagiaireOpenAnswers(openQs, si, isDebut, { nom: s.nom, prenom: s.prenom, entreprise: s.entreprise, poste: s.poste }) : [];
+  const openAnswers = rempli ? generateStagiaireOpenAnswers(openQs, si, isDebut, { nom: s.nom, prenom: s.prenom, entreprise: s.entreprise, poste: s.poste }) : [];
 
   extra += `<h3>Partie 2 — Questions ouvertes</h3>`;
   openQs.forEach((q, qi) => {
     extra += `<p><strong>${qi + 1}. ${q.question}</strong></p>`;
-    if (termine && openAnswers[qi]) {
+    if (rempli && openAnswers[qi]) {
       extra += `<p style="border:1px solid #ccc;padding:8px;background:#f9f9f9">${openAnswers[qi].reponse}</p>`;
     } else {
       extra += `<div style="border:1px solid #ccc;min-height:60px;padding:8px">&#160;</div>`;
     }
   });
 
-  if (termine) {
-    const appreciation = isDebut ? "Niveau initial évalué" : "Progression constatée en fin de formation";
-    extra += `<h3>Appréciation globale</h3><p>${appreciation} — Score QCM : ${score ? Math.round(score.score / score.total * 100) : 0}%</p>`;
+  if (rempli) {
+    if (isDebut) {
+      // Note ramenée sur 20
+      const note20 = score ? Math.round((score.score / score.total) * 20) : 8;
+      extra += `<h3>Note globale</h3>
+        <p><strong>Note : ${note20} / 20</strong> — Niveau initial : prérequis partiellement acquis, accompagnement renforcé à prévoir.</p>
+        <h3>Commentaire du formateur</h3>
+        <p style="border:1px solid #ccc;padding:10px;background:#f9f9f9">
+          ${s.prenom} démontre une motivation réelle mais les connaissances de base restent fragiles : les notions techniques clés du référentiel ne sont pas encore maîtrisées.<br/>
+          Un plan d'accompagnement personnalisé sera mis en place dès la première semaine CFA afin de consolider les fondamentaux et sécuriser la progression vers les blocs de compétences.
+        </p>`;
+    } else {
+      const note20 = score ? Math.round((score.score / score.total) * 20) : 0;
+      extra += `<h3>Appréciation globale</h3><p>Progression constatée en fin de formation — Note : ${note20} / 20 (${score ? Math.round(score.score / score.total * 100) : 0}%)</p>`;
+    }
   }
 
   return buildDocument({ org: o, title: titre, subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra });
