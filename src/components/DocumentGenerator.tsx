@@ -1329,6 +1329,10 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
         </span>
       </div>
 
+      <SignatairesConnexionForm />
+
+
+
 
       <div className="p-3 bg-primary/5 rounded-xl border border-primary/20 flex items-center gap-3 flex-wrap">
         <span className="text-sm font-semibold text-primary">Stagiaire sélectionné :</span>
