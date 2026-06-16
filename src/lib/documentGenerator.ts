@@ -3136,9 +3136,13 @@ function genTempsConnexionReel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
       const hTotal = Math.floor(d.dureeTotalMin / 60);
       const mTotal = d.dureeTotalMin % 60;
 
+      const sigHtml = s.signatureUrl
+        ? `<br><img src="${s.signatureUrl}" alt="Sig" style="max-height:28px;max-width:80px;object-fit:contain;margin-top:2px" />`
+        : `<br><span style="font-style:italic;color:#666;font-size:9px">Signé ${(s.prenom||'').charAt(0)}.${s.nom||''}</span>`;
+
       extra += tableHTML(
         ["Adresse IP", "Connexion matin", "Déconnexion midi", "Reconnexion", "Déconnexion soir", "Durée totale", "Statut"],
-        [[d.ip, d.connMatin, d.deconnMidi, d.connApMidi, d.deconnSoir, `${hTotal}h${String(mTotal).padStart(2, '0')}min`, '✅ Connecté']]
+        [[d.ip, `${d.connMatin}${sigHtml}`, `${d.deconnMidi}${sigHtml}`, `${d.connApMidi}${sigHtml}`, `${d.deconnSoir}${sigHtml}`, `${hTotal}h${String(mTotal).padStart(2, '0')}min`, '✅ Connecté']]
       );
       renderedDays++;
     });
