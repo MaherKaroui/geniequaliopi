@@ -1246,7 +1246,7 @@ export function genGrilleAcquisitionStagiaire(o: OrganismeInfo, f: FormationInfo
     <p>*ACQUIS (EXCELLENT) : 8/10 - 10/10</p>
   </div>`;
 
-  return buildDocument({ org: o, title: "GRILLE D'ACQUISITION DES COMPÉTENCES", subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, extraHtml: extra });
+  return buildDocument({ org: o, title: "GRILLE D'ACQUISITION DES COMPÉTENCES", subtitle: f.intitule, extraHtml: extra });
   // NO signatures
 }
 
