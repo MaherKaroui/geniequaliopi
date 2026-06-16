@@ -1305,7 +1305,7 @@ export function genAttestationReussiteStagiaire(o: OrganismeInfo, f: FormationIn
     ${dirigeantSig(o)}
   `;
 
-  return buildDocument({ org: o, title: "ATTESTATION DE RÉUSSITE", subtitle: `${s.prenom} ${s.nom} – ${f.intitule}`, stagiaires: [s], extraHtml: extra });
+  return buildDocument({ org: o, title: "ATTESTATION DE RÉUSSITE", subtitle: f.intitule, stagiaires: [s], extraHtml: extra });
 }
 
 // Helper to get doc style primary color
