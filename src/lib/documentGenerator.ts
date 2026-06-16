@@ -12269,7 +12269,7 @@ function genTestCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: Sta
       // Note ramenée sur 20
       const note20 = score ? Math.round((score.score / score.total) * 20) : 8;
       extra += `<h3>Note globale</h3>
-        <p><strong>Note : ${note20} / 20</strong> — Niveau initial : prérequis partiellement acquis, accompagnement renforcé à prévoir.</p>
+        <p><strong style="color:#c0212d">Note : ${note20} / 20</strong> — Niveau initial : prérequis partiellement acquis, accompagnement renforcé à prévoir.</p>
         <h3>Commentaire du formateur</h3>
         <p style="border:1px solid #ccc;padding:10px;background:#f9f9f9">
           ${s.prenom} démontre une motivation réelle mais les connaissances de base restent fragiles : les notions techniques clés du référentiel ne sont pas encore maîtrisées.<br/>
