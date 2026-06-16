@@ -13,6 +13,7 @@ import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import { toast } from "sonner";
 import DocStyleConfigPanel from "./DocStyleConfigPanel";
+import SignatairesConnexionForm from "./SignatairesConnexionForm";
 import { downloadAsWord, htmlToWordBlob } from "@/lib/wordExport";
 import { generateExcelTableauBordPerformance, generateExcelTableauSuiviParcours, generateExcelIndicateursPrevisionnelsVAE, excelToBlob } from "@/lib/xlsxGenerator";
 import { htmlToXlsxBlob } from "@/lib/htmlToXlsx";
@@ -1328,6 +1329,10 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
           Remplit les jours ≤ cette date (par défaut = aujourd'hui). Utile pour simuler une formation en cours.
         </span>
       </div>
+
+      <SignatairesConnexionForm />
+
+
 
 
       <div className="p-3 bg-primary/5 rounded-xl border border-primary/20 flex items-center gap-3 flex-wrap">
