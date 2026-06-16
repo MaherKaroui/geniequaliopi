@@ -12803,7 +12803,7 @@ function genExamenBlancCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiair
     extra += `<p><strong>Note :</strong> _____ / 20</p>`;
   }
 
-  return buildDocument({ org: o, title: "EXAMEN BLANC", subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra });
+  return buildDocument({ org: o, title: "EXAMEN BLANC", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra });
 }
 
 function genGrilleAcquisitionCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
