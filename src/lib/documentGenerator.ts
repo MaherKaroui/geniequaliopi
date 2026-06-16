@@ -12709,7 +12709,6 @@ function genExamenBlancCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiair
   const dureeExamen = Math.max(2, Math.round(totalHours * 0.05));
 
   let extra = `<h2>EXAMEN BLANC – ${f.intitule.toUpperCase()}</h2>
-    <p><strong>Apprenti(e) :</strong> ${s.prenom} ${s.nom}</p>
     <p><strong>Date :</strong> ${termine ? formatDate(f.dateFin) : '___/___/______'}</p>
     <p><strong>Durée de l'épreuve :</strong> ${dureeExamen} heures</p>`;
 
@@ -12804,7 +12803,7 @@ function genExamenBlancCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiair
     extra += `<p><strong>Note :</strong> _____ / 20</p>`;
   }
 
-  return buildDocument({ org: o, title: "EXAMEN BLANC", subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra });
+  return buildDocument({ org: o, title: "EXAMEN BLANC", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra });
 }
 
 function genGrilleAcquisitionCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
@@ -12815,7 +12814,6 @@ function genGrilleAcquisitionCFAStagiaire(o: OrganismeInfo, f: FormationInfo, st
   const s = stagiaires[si] || stagiaires[0];
   const rncp = getRNCPByCode(f.codeRNCP || '');
   let extra = `<h2>GRILLE D'ACQUISITION DES COMPÉTENCES</h2>
-    <p><strong>Apprenti(e) :</strong> ${s.prenom} ${s.nom}</p>
     <p><strong>Formation :</strong> ${f.intitule}</p>
     <p><strong>Date :</strong> ___/___/______</p>`;
 
@@ -12841,7 +12839,7 @@ function genGrilleAcquisitionCFAStagiaire(o: OrganismeInfo, f: FormationInfo, st
   extra += `</table>`;
   extra += `<p><strong>Appréciation globale :</strong></p><div style="border:1px solid #ccc;min-height:60px;padding:8px">&#160;</div>`;
 
-  return buildDocument({ org: o, title: "GRILLE D'ACQUISITION DES COMPÉTENCES", subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra });
+  return buildDocument({ org: o, title: "GRILLE D'ACQUISITION DES COMPÉTENCES", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra });
 }
 
 function genAttestationReussiteCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
@@ -12851,9 +12849,7 @@ function genAttestationReussiteCFAStagiaire(o: OrganismeInfo, f: FormationInfo, 
   }
   const s = stagiaires[si] || stagiaires[0];
   let extra = `<h2>ATTESTATION DE RÉUSSITE</h2>
-    <p>Je soussigné(e), ${o.dirigeant || '____________________'}, en qualité de responsable pédagogique de l'organisme de formation <strong>${o.nom}</strong>, certifie que :</p>
-    <p><strong>Nom :</strong> ${s.nom}<br><strong>Prénom :</strong> ${s.prenom}</p>
-    <p>a suivi la formation <strong>« ${f.intitule} »</strong> du __________ au __________.</p>
+    <p>Je soussigné(e), ${o.dirigeant || '____________________'}, en qualité de responsable pédagogique de l'organisme de formation <strong>${o.nom}</strong>, certifie que l'apprenti(e) a suivi la formation <strong>« ${f.intitule} »</strong> du __________ au __________.</p>
     <p><strong>Résultats obtenus :</strong></p>
     <ul>
       <li>Test de positionnement début : _____ %</li>
@@ -12864,7 +12860,7 @@ function genAttestationReussiteCFAStagiaire(o: OrganismeInfo, f: FormationInfo, 
     <p><strong>Avis :</strong> &#9744; FAVORABLE &#9744; RÉSERVÉ</p>
     <p>Fait à ${o.ville || '__________'}, le ___/___/______</p>`;
 
-  return buildDocument({ org: o, title: "ATTESTATION DE RÉUSSITE", subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra });
+  return buildDocument({ org: o, title: "ATTESTATION DE RÉUSSITE", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra });
 }
 
 function genBilanFinFormationFormateur(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], formateurNomParam?: string) {

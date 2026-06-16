@@ -1228,7 +1228,6 @@ export function genGrilleAcquisitionStagiaire(o: OrganismeInfo, f: FormationInfo
   let extra = `
     <h3>GRILLE DE SUIVI DU NIVEAU D'ACQUISITION DES COMPÉTENCES PROFESSIONNELLES</h3>
     <p><strong>DATE :</strong> ${formatDate(getStagiaireDateDebut(s, f))} – ${formatDate(getStagiaireDateFin(s, f))}</p>
-    <p><strong>NOM / PRÉNOM :</strong> ${s.prenom} ${s.nom}</p>
     <p><strong>FORMATION :</strong> ${f.intitule}</p>
   `;
 
@@ -1247,7 +1246,7 @@ export function genGrilleAcquisitionStagiaire(o: OrganismeInfo, f: FormationInfo
     <p>*ACQUIS (EXCELLENT) : 8/10 - 10/10</p>
   </div>`;
 
-  return buildDocument({ org: o, title: "GRILLE D'ACQUISITION DES COMPÉTENCES", subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, extraHtml: extra });
+  return buildDocument({ org: o, title: "GRILLE D'ACQUISITION DES COMPÉTENCES", subtitle: f.intitule, extraHtml: extra });
   // NO signatures
 }
 
@@ -1289,7 +1288,7 @@ export function genAttestationReussiteStagiaire(o: OrganismeInfo, f: FormationIn
       <h2 style="color:${getDocStyleColor()};letter-spacing:1px">ATTESTATION DE RÉUSSITE</h2>
     </div>
     <p>Délivrée par <strong>${o.nom}</strong>,</p>
-    <p style="margin-top:14px">À ${civ ? `<strong>${civ}</strong> ` : ""}<strong>${s.prenom} ${s.nom}</strong>${adrLine1 ? `<br>${adrLine1}` : ""}${adrLine2 ? `<br>${adrLine2}` : ""}</p>
+    <p style="margin-top:14px">À l'apprenant(e)${adrLine1 ? `<br>${adrLine1}` : ""}${adrLine2 ? `<br>${adrLine2}` : ""}</p>
     <p style="margin-top:18px"><strong>Intitulé de la formation :</strong> ${ccps.length ? `Titre professionnel <strong>${titrePro.toUpperCase()}</strong>` : f.intitule}</p>
     ${lieuTxt ? `<p><strong>Lieu de formation :</strong> ${lieuTxt}</p>` : ""}
     ${sessionTxt ? `<p><strong>Date de la session :</strong> ${sessionTxt}</p>` : ""}
@@ -1306,7 +1305,7 @@ export function genAttestationReussiteStagiaire(o: OrganismeInfo, f: FormationIn
     ${dirigeantSig(o)}
   `;
 
-  return buildDocument({ org: o, title: "ATTESTATION DE RÉUSSITE", subtitle: `${s.prenom} ${s.nom} – ${f.intitule}`, stagiaires: [s], extraHtml: extra });
+  return buildDocument({ org: o, title: "ATTESTATION DE RÉUSSITE", subtitle: f.intitule, stagiaires: [s], extraHtml: extra });
 }
 
 // Helper to get doc style primary color
