@@ -12236,8 +12236,9 @@ function genTestCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: Sta
       if (rempli) {
         const checked = answers[qi] === oi;
         const isCorrect = oi === q.correctIndex;
-        const mark = checked ? (isCorrect ? ' [CORRECT]' : ' [INCORRECT]') : '';
-        extra += `<li>${checked ? '<strong>' : ''}${String.fromCharCode(65 + oi)}) ${opt}${mark}${checked ? '</strong>' : ''}</li>`;
+        const mark = checked ? (isCorrect ? ' [CORRECT]' : ' <span style="color:#c0212d;font-weight:bold">[INCORRECT]</span>') : '';
+        const liStyle = checked && !isCorrect ? ' style="color:#c0212d"' : '';
+        extra += `<li${liStyle}>${checked ? '<strong>' : ''}${String.fromCharCode(65 + oi)}) ${opt}${mark}${checked ? '</strong>' : ''}</li>`;
       } else {
         extra += `<li>${String.fromCharCode(65 + oi)}) ${opt} &#9744;</li>`;
       }
@@ -12268,7 +12269,7 @@ function genTestCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: Sta
       // Note ramenée sur 20
       const note20 = score ? Math.round((score.score / score.total) * 20) : 8;
       extra += `<h3>Note globale</h3>
-        <p><strong>Note : ${note20} / 20</strong> — Niveau initial : prérequis partiellement acquis, accompagnement renforcé à prévoir.</p>
+        <p><strong style="color:#c0212d">Note : ${note20} / 20</strong> — Niveau initial : prérequis partiellement acquis, accompagnement renforcé à prévoir.</p>
         <h3>Commentaire du formateur</h3>
         <p style="border:1px solid #ccc;padding:10px;background:#f9f9f9">
           ${s.prenom} démontre une motivation réelle mais les connaissances de base restent fragiles : les notions techniques clés du référentiel ne sont pas encore maîtrisées.<br/>
