@@ -1311,6 +1311,25 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
         </span>
       </div>
 
+      <div className="p-3 bg-blue-50 dark:bg-blue-950/30 rounded-xl border border-blue-200 dark:border-blue-900 flex items-center gap-3 flex-wrap">
+        <span className="text-sm font-semibold text-blue-800 dark:text-blue-200">Date d'arrêté (temps de connexion / émargement) :</span>
+        <input
+          type="date"
+          defaultValue={typeof window !== 'undefined' ? (window.sessionStorage.getItem('connexion_as_of') || '') : ''}
+          onChange={(e) => {
+            const v = e.target.value;
+            if (v) window.sessionStorage.setItem('connexion_as_of', v);
+            else window.sessionStorage.removeItem('connexion_as_of');
+            toast.success(v ? `Documents arrêtés au ${v}` : "Date d'arrêté réinitialisée (= aujourd'hui)");
+          }}
+          className="px-3 py-1.5 rounded-lg text-sm border border-blue-300 bg-white dark:bg-background"
+        />
+        <span className="text-xs text-muted-foreground">
+          Remplit les jours ≤ cette date (par défaut = aujourd'hui). Utile pour simuler une formation en cours.
+        </span>
+      </div>
+
+
       <div className="p-3 bg-primary/5 rounded-xl border border-primary/20 flex items-center gap-3 flex-wrap">
         <span className="text-sm font-semibold text-primary">Stagiaire sélectionné :</span>
         <Select value={selectedStagiaire === -1 ? "all" : String(selectedStagiaire)} onValueChange={handleStagiaireChange}>
