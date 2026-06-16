@@ -12709,6 +12709,7 @@ function genExamenBlancCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiair
   const dureeExamen = Math.max(2, Math.round(totalHours * 0.05));
 
   let extra = `<h2>EXAMEN BLANC – ${f.intitule.toUpperCase()}</h2>
+    <p><strong>L'apprenti(e) :</strong> ............................................................</p>
     <p><strong>Date :</strong> ${termine ? formatDate(f.dateFin) : '___/___/______'}</p>
     <p><strong>Durée de l'épreuve :</strong> ${dureeExamen} heures</p>`;
 
@@ -12814,6 +12815,7 @@ function genGrilleAcquisitionCFAStagiaire(o: OrganismeInfo, f: FormationInfo, st
   const s = stagiaires[si] || stagiaires[0];
   const rncp = getRNCPByCode(f.codeRNCP || '');
   let extra = `<h2>GRILLE D'ACQUISITION DES COMPÉTENCES</h2>
+    <p><strong>L'apprenti(e) :</strong> ............................................................</p>
     <p><strong>Formation :</strong> ${f.intitule}</p>
     <p><strong>Date :</strong> ___/___/______</p>`;
 
@@ -12849,7 +12851,8 @@ function genAttestationReussiteCFAStagiaire(o: OrganismeInfo, f: FormationInfo, 
   }
   const s = stagiaires[si] || stagiaires[0];
   let extra = `<h2>ATTESTATION DE RÉUSSITE</h2>
-    <p>Je soussigné(e), ${o.dirigeant || '____________________'}, en qualité de responsable pédagogique de l'organisme de formation <strong>${o.nom}</strong>, certifie que l'apprenti(e) a suivi la formation <strong>« ${f.intitule} »</strong> du __________ au __________.</p>
+    <p><strong>L'apprenti(e) :</strong> ............................................................</p>
+    <p>Je soussigné(e), ${o.dirigeant || '____________________'}, en qualité de responsable pédagogique de l'organisme de formation <strong>${o.nom}</strong>, certifie que l'apprenti(e) susnommé(e) a suivi la formation <strong>« ${f.intitule} »</strong> du __________ au __________.</p>
     <p><strong>Résultats obtenus :</strong></p>
     <ul>
       <li>Test de positionnement début : _____ %</li>
