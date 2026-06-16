@@ -990,12 +990,12 @@ export function genBilanFroidStagiaire(o: OrganismeInfo, f: FormationInfo, stagi
   // Bilan à froid : pas de date exacte, mention "3 à 6 mois après la fin de formation"
   const mentionDelai = "3 à 6 mois après la fin de formation";
 
-  return buildDocument({ org: o, formation: f, stagiaires: [s], title: "Questionnaire de Satisfaction du bénéficiaire – À froid", subtitle: `${s.prenom} ${(s.nom||"").toUpperCase()}`, sections: [
+  return buildDocument({ org: o, formation: f, stagiaires: [s], title: "Questionnaire de Satisfaction du bénéficiaire – À froid", sections: [
     { heading: "Référence de l'action", content: `<p style="font-size:0.85em;color:#666;margin-bottom:12px;">Cette enquête est administrée entre 3 et 6 mois après la formation. En cas de non-retour, l'enquête est renvoyée dans un délai d'une semaine. Si pas de réponse, l'enquête est administrée par téléphone.</p>
       <table style="width:100%;border-collapse:collapse;">
         <tr><td ${tdb} style="width:35%;">Intitulé de la formation</td><td ${td}>${titre}</td></tr>
         <tr><td ${tdb}>Dates de formation</td><td ${td}>${deb ? fmtDate(deb) : "—"} au ${fin ? fmtDate(fin) : "—"}</td></tr>
-        <tr><td ${tdb}>Nom/prénom du participant</td><td ${td}>${(s.nom||"").toUpperCase()} ${s.prenom||""}</td></tr>
+        <tr><td ${tdb}>L'apprenti(e) :</td><td ${td}>............................................................</td></tr>
         <tr><td ${tdb}>Période d'administration</td><td ${td}>${mentionDelai}</td></tr>
       </table>` },
     { heading: "Évaluation", content: `<p>Merci d'indiquer votre niveau de satisfaction en cochant la case correspondante avec un X</p>
