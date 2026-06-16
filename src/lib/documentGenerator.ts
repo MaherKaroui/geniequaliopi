@@ -12815,6 +12815,7 @@ function genGrilleAcquisitionCFAStagiaire(o: OrganismeInfo, f: FormationInfo, st
   const s = stagiaires[si] || stagiaires[0];
   const rncp = getRNCPByCode(f.codeRNCP || '');
   let extra = `<h2>GRILLE D'ACQUISITION DES COMPÉTENCES</h2>
+    <p><strong>L'apprenti(e) :</strong> ............................................................</p>
     <p><strong>Formation :</strong> ${f.intitule}</p>
     <p><strong>Date :</strong> ___/___/______</p>`;
 
