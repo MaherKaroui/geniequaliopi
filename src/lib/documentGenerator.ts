@@ -12236,8 +12236,9 @@ function genTestCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: Sta
       if (rempli) {
         const checked = answers[qi] === oi;
         const isCorrect = oi === q.correctIndex;
-        const mark = checked ? (isCorrect ? ' [CORRECT]' : ' [INCORRECT]') : '';
-        extra += `<li>${checked ? '<strong>' : ''}${String.fromCharCode(65 + oi)}) ${opt}${mark}${checked ? '</strong>' : ''}</li>`;
+        const mark = checked ? (isCorrect ? ' [CORRECT]' : ' <span style="color:#c0212d;font-weight:bold">[INCORRECT]</span>') : '';
+        const liStyle = checked && !isCorrect ? ' style="color:#c0212d"' : '';
+        extra += `<li${liStyle}>${checked ? '<strong>' : ''}${String.fromCharCode(65 + oi)}) ${opt}${mark}${checked ? '</strong>' : ''}</li>`;
       } else {
         extra += `<li>${String.fromCharCode(65 + oi)}) ${opt} &#9744;</li>`;
       }
