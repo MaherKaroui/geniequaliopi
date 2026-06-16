@@ -3169,7 +3169,7 @@ function genTempsConnexionReel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
       );
       renderedDays++;
     });
-    });
+
 
     if (renderedDays === 0) {
       extra += `<p style="color:#888;font-style:italic">Aucun jour distanciel réalisé à ce jour.</p>`;
