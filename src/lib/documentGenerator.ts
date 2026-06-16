@@ -12097,7 +12097,7 @@ function genBilanChaudStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: 
   }
   extra += `<p><strong>Date du bilan :</strong> ${formatDate(dateFin)} (dernier jour de formation)</p>`;
   extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%">
-    <tr><td><strong>Nom/prénom du participant :</strong></td><td>${s.prenom} ${s.nom}</td></tr>
+    <tr><td><strong>L'apprenti(e) :</strong></td><td>............................................................</td></tr>
     <tr><td><strong>Entreprise :</strong></td><td>${s.entreprise || "—"}</td></tr>
     <tr><td><strong>Formation :</strong></td><td>${f.intitule}</td></tr>
     <tr><td><strong>Formateur :</strong></td><td>${f.formateur}</td></tr>
@@ -12132,7 +12132,7 @@ function genBilanChaudStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: 
     extra += `<p><strong>Commentaire :</strong> _______________________________________________</p>`;
   }
 
-  return buildDocument({ org: o, title: "BILAN À CHAUD", subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, stagiaires: [s], sections: [
+  return buildDocument({ org: o, title: "BILAN À CHAUD", subtitle: f.intitule, stagiaires: [s], sections: [
     { heading: "Informations", content: `<p><strong>Organisme :</strong> ${o.nom}<br><strong>Formation :</strong> ${f.intitule}<br><strong>Durée :</strong> ${dureeH} heures</p>` },
   ], extraHtml: extra });
 }
