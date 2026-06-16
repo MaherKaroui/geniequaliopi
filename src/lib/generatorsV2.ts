@@ -1288,7 +1288,7 @@ export function genAttestationReussiteStagiaire(o: OrganismeInfo, f: FormationIn
       <h2 style="color:${getDocStyleColor()};letter-spacing:1px">ATTESTATION DE RÉUSSITE</h2>
     </div>
     <p>Délivrée par <strong>${o.nom}</strong>,</p>
-    <p style="margin-top:14px">À ${civ ? `<strong>${civ}</strong> ` : ""}<strong>${s.prenom} ${s.nom}</strong>${adrLine1 ? `<br>${adrLine1}` : ""}${adrLine2 ? `<br>${adrLine2}` : ""}</p>
+    <p style="margin-top:14px">À l'apprenant(e)${adrLine1 ? `<br>${adrLine1}` : ""}${adrLine2 ? `<br>${adrLine2}` : ""}</p>
     <p style="margin-top:18px"><strong>Intitulé de la formation :</strong> ${ccps.length ? `Titre professionnel <strong>${titrePro.toUpperCase()}</strong>` : f.intitule}</p>
     ${lieuTxt ? `<p><strong>Lieu de formation :</strong> ${lieuTxt}</p>` : ""}
     ${sessionTxt ? `<p><strong>Date de la session :</strong> ${sessionTxt}</p>` : ""}
