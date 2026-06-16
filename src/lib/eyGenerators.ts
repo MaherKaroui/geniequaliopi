@@ -940,12 +940,12 @@ export function genBilanFroidStagiaire(o: OrganismeInfo, f: FormationInfo, stagi
   if (!termine) {
     const qRowsVides = questions.map(q => `<tr><td ${td}>${q}</td><td ${td} style="text-align:center;width:12%;"></td><td ${td} style="text-align:center;width:12%;"></td><td ${td} style="text-align:center;width:12%;"></td><td ${td} style="text-align:center;width:12%;"></td></tr>`).join("");
 
-    return buildDocument({ org: o, formation: f, title: "Questionnaire de Satisfaction du bénéficiaire – À froid", subtitle: `${s.prenom} ${(s.nom||"").toUpperCase()}`, sections: [
+    return buildDocument({ org: o, formation: f, title: "Questionnaire de Satisfaction du bénéficiaire – À froid", sections: [
       { heading: "Référence de l'action", content: `<p style="font-size:0.85em;color:#666;margin-bottom:12px;">Cette enquête est administrée entre 3 et 6 mois après la formation. En cas de non-retour, l'enquête est renvoyée dans un délai d'une semaine. Si pas de réponse, l'enquête est administrée par téléphone.</p>
         <table style="width:100%;border-collapse:collapse;">
           <tr><td ${tdb} style="width:35%;">Intitulé de la formation</td><td ${td}>${titre}</td></tr>
           <tr><td ${tdb}>Dates de formation</td><td ${td}>${deb ? fmtDate(deb) : "—"} au ${fin ? fmtDate(fin) : "—"}</td></tr>
-          <tr><td ${tdb}>Nom/prénom du participant</td><td ${td}>${(s.nom||"").toUpperCase()} ${s.prenom||""}</td></tr>
+          <tr><td ${tdb}>L'apprenti(e) :</td><td ${td}>............................................................</td></tr>
           <tr><td ${tdb} style="background:#fff8e1;">Statut</td><td ${td} style="background:#fff8e1;color:#92400e;font-weight:600;">⏳ Formation en cours — bilan à froid à administrer 3 à 6 mois après la fin (${fin ? fmtDate(fin) : "—"})</td></tr>
         </table>` },
       { heading: "Évaluation", content: `<p style="color:#666;font-style:italic;">À compléter par le bénéficiaire entre 3 et 6 mois après la fin de la formation.</p>
