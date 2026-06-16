@@ -12706,7 +12706,7 @@ function genExamenBlancCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiair
   const rncp = getRNCPByCode(f.codeRNCP || '');
   const evalData = getEvalContent(f.intitule);
   const { totalHours } = parseDuree(f.duree);
-  const dureeExamen = Math.max(2, Math.round(totalHours * 0.05));
+  const dureeExamen = 2;
 
   let extra = `<h2>EXAMEN BLANC – ${f.intitule.toUpperCase()}</h2>
     <p><strong>L'apprenti(e) :</strong> ............................................................</p>
