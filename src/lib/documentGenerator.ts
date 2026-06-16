@@ -12849,9 +12849,7 @@ function genAttestationReussiteCFAStagiaire(o: OrganismeInfo, f: FormationInfo, 
   }
   const s = stagiaires[si] || stagiaires[0];
   let extra = `<h2>ATTESTATION DE RÉUSSITE</h2>
-    <p>Je soussigné(e), ${o.dirigeant || '____________________'}, en qualité de responsable pédagogique de l'organisme de formation <strong>${o.nom}</strong>, certifie que :</p>
-    <p><strong>Nom :</strong> ${s.nom}<br><strong>Prénom :</strong> ${s.prenom}</p>
-    <p>a suivi la formation <strong>« ${f.intitule} »</strong> du __________ au __________.</p>
+    <p>Je soussigné(e), ${o.dirigeant || '____________________'}, en qualité de responsable pédagogique de l'organisme de formation <strong>${o.nom}</strong>, certifie que l'apprenti(e) a suivi la formation <strong>« ${f.intitule} »</strong> du __________ au __________.</p>
     <p><strong>Résultats obtenus :</strong></p>
     <ul>
       <li>Test de positionnement début : _____ %</li>
@@ -12862,7 +12860,7 @@ function genAttestationReussiteCFAStagiaire(o: OrganismeInfo, f: FormationInfo, 
     <p><strong>Avis :</strong> &#9744; FAVORABLE &#9744; RÉSERVÉ</p>
     <p>Fait à ${o.ville || '__________'}, le ___/___/______</p>`;
 
-  return buildDocument({ org: o, title: "ATTESTATION DE RÉUSSITE", subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra });
+  return buildDocument({ org: o, title: "ATTESTATION DE RÉUSSITE", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra });
 }
 
 function genBilanFinFormationFormateur(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], formateurNomParam?: string) {
