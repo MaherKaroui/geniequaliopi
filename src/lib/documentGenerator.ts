@@ -914,6 +914,11 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
       const missionNumero = typeof params?.missionNumero === "number" ? params.missionNumero : 1;
       return genMailMissionCFA(o, f, stagiaires, idx, missionNumero);
     }
+    case "mail_diffusion_mission_cfa": {
+      const idx = typeof params?.stagiaireIdx === "number" ? params.stagiaireIdx : 0;
+      const missionNumero = typeof params?.missionNumero === "number" ? params.missionNumero : 1;
+      return genMailDiffusionMissionCFA(o, f, stagiaires, idx, missionNumero);
+    }
     case "mail_visite_entreprise_cfa": {
       const idx = typeof params?.stagiaireIdx === "number" ? params.stagiaireIdx : 0;
       return genMailVisiteEntrepriseCFA(o, f, stagiaires, idx);
