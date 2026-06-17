@@ -66,14 +66,14 @@ function renderPieceJointe(missionNumero: number, missionTitre: string): string 
   const cleanTitre = missionTitre.replace(/[^a-zA-Z0-9]+/g, "_").substring(0, 40);
   const fileName = `Affiche_A3_Mission_${String(missionNumero).padStart(2, "0")}_${cleanTitre}.pdf`;
   return `
-    <div style="margin:18px 0 8px;font-size:13px;color:#5f6368;">1 pièce jointe</div>
-    <table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:separate;border-spacing:0;border:1px solid #dadce0;border-radius:8px;background:#fff;width:320px;max-width:100%;page-break-inside:avoid;break-inside:avoid;">
+    <div style="margin:20px 0 8px;font-size:13px;color:#5f6368;">1 pièce jointe</div>
+    <table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:separate;border-spacing:0;border:1px solid #dadce0;border-radius:4px;background:#fff;width:260px;max-width:100%;page-break-inside:avoid;break-inside:avoid;">
       <tr>
-        <td style="width:46px;padding:10px 0 10px 14px;vertical-align:middle;">
-          <div style="width:32px;height:40px;background:#d93025;color:#fff;font-size:10px;font-weight:700;text-align:center;line-height:40px;border-radius:3px;">PDF</div>
+        <td style="width:46px;padding:10px 0 10px 12px;vertical-align:middle;">
+          <div style="width:30px;height:36px;background:#d93025;color:#fff;font-size:9px;font-weight:700;text-align:center;line-height:36px;border-radius:2px;">PDF</div>
         </td>
-        <td style="padding:10px 14px 10px 8px;vertical-align:middle;font-size:13px;line-height:1.3;">
-          <div style="color:#202124;font-weight:500;word-break:break-word;">${escapeHtml(fileName)}</div>
+        <td style="padding:8px 12px 8px 8px;vertical-align:middle;font-size:12px;line-height:1.3;">
+          <div style="color:#202124;word-break:break-word;">${escapeHtml(fileName)}</div>
           <div style="color:#5f6368;font-size:11px;margin-top:2px;">PDF · ~220 Ko</div>
         </td>
       </tr>
@@ -96,90 +96,82 @@ export function genMailDiffusionMissionCFA(
   const dEnvoi = dateMailDiffusionMission(f, missionNumero);
   const dDiffusion = dateDiffusionMission(f, missionNumero);
   const finSemaine = addDays(dDiffusion, 4);
-  const dateLong = fmtLong(dEnvoi);
+
+  const dateCourt = dEnvoi.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
   const heure = fmtTime(dEnvoi);
 
   const fromName = o.nom || "Centre de Formation";
   const fromEmail = o.email || `contact@${(o.nom || "cfa").toLowerCase().replace(/[^a-z0-9]/g, "")}.fr`;
   const toEmail = s.email || `${(s.prenom || "").toLowerCase()}.${(s.nom || "").toLowerCase()}@email.fr`;
-  const toName = `${s.prenom || ""} ${s.nom || ""}`.trim();
   const civilite = s.civilite === "Mme" ? "Madame" : "Monsieur";
 
-  const sujet = `[Diffusion CFA — J-1] Demain ${fmtShort(dDiffusion)} : lancement Mission ${missionNumero} – ${mission.titre}`;
+  const sujet = `Diffusion Mission ${missionNumero} – ${mission.titre}`;
   const pjHtml = renderPieceJointe(missionNumero, mission.titre);
 
+  const threadId = `r${(missionNumero * 8284624083642395367).toString().slice(0, 19)}`;
+  const msgId = `r${(missionNumero * 712068502500123).toString().slice(0, 15)}`;
+  const gmailLink = `https://mail.google.com/mail/u/0/?ik=fe5f9da148&amp;view=pt&amp;search=all&amp;permthid=thread-a:${threadId}&amp;simpl=msg-a:${msgId}…`;
+
   return `<!DOCTYPE html>
-<html lang="fr"><head><meta charset="utf-8"><title>${escapeHtml(sujet)}</title><style>body{margin:0;padding:0;background:#ffffff}.mail-shell{width:760px;max-width:760px;margin:0 auto;background:#ffffff;border:1px solid #dadce0;border-radius:6px;overflow:hidden;font-family:'Google Sans','Segoe UI',Roboto,Arial,sans-serif;color:#202124;box-sizing:border-box}.mail-body{padding:22px 24px 24px;font-size:14px;line-height:1.62;color:#202124}.mail-meta{font-size:13px;line-height:1.45;color:#5f6368}.keep{page-break-inside:avoid;break-inside:avoid}@media print{.mail-shell{width:100%;max-width:100%;border-radius:0}.mail-body{padding:20px 24px}}</style></head>
+<html lang="fr"><head><meta charset="utf-8"><title>${escapeHtml(sujet)}</title>
+<style>
+  body{margin:0;padding:0;background:#ffffff;font-family:Arial,'Helvetica Neue',Helvetica,sans-serif;color:#000;}
+  .mail-shell{width:760px;max-width:760px;margin:0 auto;background:#ffffff;padding:24px 28px 32px;box-sizing:border-box;font-size:13px;line-height:1.5;}
+  .gmail-top{font-size:11px;color:#5f6368;margin-bottom:18px;}
+  .gmail-top .m{color:#d93025;font-weight:700;}
+  .subject{font-size:16px;font-weight:400;color:#000;margin:0 0 18px;}
+  .from-row{width:100%;border-collapse:collapse;margin-bottom:14px;}
+  .from-row td{vertical-align:top;font-size:12px;}
+  .from-row .from{color:#000;}
+  .from-row .date{text-align:right;color:#000;white-space:nowrap;}
+  .to-row{font-size:12px;color:#000;margin-bottom:18px;}
+  .body p{margin:0 0 12px;font-size:13px;line-height:1.55;}
+  .footer-link{font-size:10px;color:#5f6368;margin-top:28px;word-break:break-all;}
+  .page-num{font-size:10px;color:#5f6368;text-align:right;margin-top:4px;}
+  .pj-section{margin-top:24px;border-top:1px solid #e0e0e0;padding-top:14px;}
+  .keep{page-break-inside:avoid;break-inside:avoid;}
+  @media print{.mail-shell{width:100%;max-width:100%;padding:16px 20px;}}
+</style></head>
 <body>
 <div class="mail-shell">
 
-  <div style="background:#f1f3f4;padding:10px 16px;border-bottom:1px solid #dadce0;font-size:13px;color:#5f6368;">
-    <span style="color:#d93025;font-weight:700;">M</span> Gmail &nbsp;·&nbsp; Boîte de réception
-  </div>
+  <div class="gmail-top"><span class="m">M</span> Gmail - ${escapeHtml(sujet)}</div>
 
-  <div class="keep" style="padding:18px 24px 8px;border-bottom:1px solid #f1f3f4;">
-    <div style="font-size:20px;font-weight:500;color:#202124;line-height:1.3;">${escapeHtml(sujet)}</div>
-    <div style="margin-top:6px;display:inline-block;background:#e8f0fe;color:#1967d2;font-size:11px;font-weight:600;padding:2px 8px;border-radius:10px;">Boîte de réception</div>
-  </div>
+  <div class="subject">${escapeHtml(sujet)}</div>
 
-  <table role="presentation" cellspacing="0" cellpadding="0" class="keep" style="width:100%;border-collapse:collapse;border-bottom:1px solid #f1f3f4;">
+  <table class="from-row" role="presentation" cellspacing="0" cellpadding="0">
     <tr>
-      <td style="width:56px;padding:14px 0 14px 24px;vertical-align:top;">
-        <div style="width:40px;height:40px;border-radius:50%;background:#1a73e8;color:#fff;text-align:center;line-height:40px;font-weight:700;font-size:16px;">${escapeHtml((o.nom || "C")[0].toUpperCase())}</div>
-      </td>
-      <td class="mail-meta" style="padding:14px 24px 14px 8px;vertical-align:top;">
-        <div><strong style="color:#202124;">${escapeHtml(fromName)}</strong> <span style="color:#5f6368;">&lt;${escapeHtml(fromEmail)}&gt;</span></div>
-        <div style="color:#5f6368;">À : <strong style="color:#202124;">${escapeHtml(toName)}</strong> &lt;${escapeHtml(toEmail)}&gt;</div>
-        <div style="color:#5f6368;">${escapeHtml(dateLong)} à ${escapeHtml(heure)}</div>
-      </td>
+      <td class="from"><strong>${escapeHtml(fromName)}</strong> &lt;${escapeHtml(fromEmail)}&gt;</td>
+      <td class="date">${escapeHtml(dateCourt)} à ${escapeHtml(heure)}</td>
     </tr>
   </table>
+  <div class="to-row">À : ${escapeHtml(toEmail)}</div>
 
-  <div class="mail-body">
-    <p style="margin:0 0 14px;">Bonjour ${escapeHtml(civilite)} <strong>${escapeHtml(s.nom || "")}</strong>,</p>
+  <div class="body keep">
+    <p>Bonjour ${escapeHtml(civilite)} <strong>${escapeHtml(s.nom || "")}</strong>,</p>
 
-    <p style="margin:0 0 14px;">
-      Petit message d'information à la veille du lancement de la <strong>semaine école n°${missionNumero}/14</strong>
-      de votre formation <strong>${escapeHtml(f.intitule || "")}</strong>.
-    </p>
+    <p>Je vous informe que le CFA <strong>${escapeHtml(o.nom || "")}</strong> lancera dès demain, ${escapeHtml(fmtLong(dDiffusion))}, la diffusion officielle de la <strong>Mission ${missionNumero} – ${escapeHtml(mission.titre)}</strong>, dans le cadre des 14 missions du CFA (article L.6231-2 du Code du Travail).</p>
 
-    <p style="margin:0 0 14px;">
-      <strong>Dès demain ${escapeHtml(fmtLong(dDiffusion))}</strong>, le CFA <strong>${escapeHtml(o.nom || "")}</strong>
-      lance la diffusion officielle de la <strong>Mission ${missionNumero} – ${escapeHtml(mission.titre)}</strong>,
-      dans le cadre des 14 missions du CFA (article <strong>L.6231-2 du Code du Travail</strong>).
-    </p>
+    <p>Cette diffusion s'inscrit dans la <strong>semaine école n°${missionNumero}/14</strong> de votre formation <strong>${escapeHtml(f.intitule || "")}</strong> et se tiendra du ${escapeHtml(fmtShort(dDiffusion))} au ${escapeHtml(fmtShort(finSemaine))}.</p>
 
-    <div style="margin:14px 0;padding:12px 14px;background:#f1f3f4;border-left:3px solid #1a73e8;border-radius:4px;font-size:13px;line-height:1.6;">
-      <strong>Semaine de diffusion :</strong> du ${escapeHtml(fmtShort(dDiffusion))} au ${escapeHtml(fmtShort(finSemaine))}<br>
-      <strong>Supports diffusés :</strong> ${escapeHtml(mission.supports)}<br>
-      <strong>Canaux :</strong> affichage en salle commune + ENT / LMS + mail apprenti<br>
-      <strong>Horaires école :</strong> 09h00 – 12h30 / 13h30 – 17h00 (7h / jour)
-    </div>
+    <p>Les supports diffusés seront : ${escapeHtml(mission.supports)}. Ils seront mis à disposition par affichage en salle commune, dépôt sur l'ENT / LMS et envoi par mail. Vous trouverez ci-joint le visuel A3 qui sera affiché dès demain matin dans le centre.</p>
 
-    <p style="margin:14px 0;">
-      Vous trouverez en pièce jointe le <strong>visuel A3</strong> qui sera affiché dès demain matin dans la salle
-      commune du centre. Merci d'en prendre connaissance avant votre arrivée.
-    </p>
+    <p>Je reste à votre disposition pour toute question ou besoin d'accompagnement complémentaire.</p>
 
-    ${pjHtml}
+    <p>Cordialement,</p>
 
-    <p style="margin:20px 0 14px;">
-      Le QCM de la mission vous sera transmis séparément en début de semaine. En cas de question
-      ou de difficulté, n'hésitez pas à me répondre directement à ce mail.
-    </p>
-
-    <p style="margin:18px 0 4px;">Bonne préparation et à demain,</p>
-    <p style="margin:0 0 14px;"><strong>${escapeHtml(o.dirigeant || o.nom || "L'équipe pédagogique")}</strong><br>
-      <span style="color:#5f6368;font-size:13px;">${escapeHtml(o.nom || "")}</span></p>
-
-    <hr style="border:none;border-top:1px solid #e8eaed;margin:20px 0;">
-    <div style="font-size:11px;color:#5f6368;line-height:1.5;">
-      ${escapeHtml(o.nom || "")} — ${escapeHtml(o.adresse || "")} ${escapeHtml(o.codePostal || "")} ${escapeHtml(o.ville || "")}<br>
-      ${o.telephone ? `Tél : ${escapeHtml(o.telephone)} — ` : ""}${escapeHtml(o.email || "")}<br>
-      SIRET : ${escapeHtml(o.siret || "")} — N° NDA : ${escapeHtml(o.nda || "")}<br>
-      Mail automatique d'annonce de diffusion généré le ${escapeHtml(dateLong)}.
-    </div>
+    <p><strong>${escapeHtml(o.dirigeant || o.nom || "L'équipe pédagogique")}</strong><br>
+    ${escapeHtml(o.nom || "")}<br>
+    ${escapeHtml(o.email || "")}${o.telephone ? `<br>${escapeHtml(o.telephone)}` : ""}</p>
   </div>
+
+  <div class="footer-link">${gmailLink}</div>
+  <div class="page-num">1/1</div>
+
+  <div class="pj-section keep">
+    ${pjHtml}
+  </div>
+
 </div>
 </body></html>`;
 }
