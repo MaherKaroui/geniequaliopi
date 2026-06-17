@@ -7877,6 +7877,8 @@ function genLivreApprentissageCFA(o: OrganismeInfo, f: FormationInfo, stagiaires
   const maitreNom = s.responsableEntreprise || (s as any).tuteur || 'le maître d\'apprentissage';
   const entrepriseNom = s.entreprise || '___';
   let visite1Date = '___', visite2Date = '___';
+  let v1Past = false, v2Past = false;
+  const todayRef = new Date();
   if (dDebut && dFin) {
     const d1 = new Date(dDebut);
     const d2 = new Date(dFin);
@@ -7889,9 +7891,16 @@ function genLivreApprentissageCFA(o: OrganismeInfo, f: FormationInfo, stagiaires
     if (v2.getTime() - v1.getTime() < minGapMs) v1 = new Date(v2.getTime() - minGapMs);
     visite1Date = formatDate(v1.toISOString().slice(0, 10));
     visite2Date = formatDate(v2.toISOString().slice(0, 10));
+    v1Past = v1.getTime() <= todayRef.getTime();
+    v2Past = v2.getTime() <= todayRef.getTime();
   }
-  const commentaireV1 = `Première visite très satisfaisante. <strong>${s.prenom} ${s.nom}</strong> s'est parfaitement intégré(e) à l'équipe de ${entrepriseNom}. L'apprenti(e) montre une réelle motivation, applique avec sérieux les consignes données et progresse rapidement sur les fondamentaux du métier en lien avec la formation « ${titreFormation} ». Ponctualité, présentation et savoir-être professionnels exemplaires. Aucune difficulté particulière relevée. Maître d'apprentissage : ${maitreNom}.`;
-  const commentaireV2 = `Seconde visite tout aussi positive. <strong>${s.prenom} ${s.nom}</strong> a confirmé sa montée en compétences sur l'ensemble des activités confiées en entreprise. L'apprenti(e) gagne en autonomie, prend des initiatives pertinentes et maîtrise désormais les gestes techniques attendus par le référentiel ${f.codeRNCP || titreFormation}. Le maître d'apprentissage ${maitreNom} se déclare très satisfait du parcours réalisé et émet un avis favorable à la poursuite et à la validation du titre. Très bonne articulation entre les apports du CFA et les missions en entreprise.`;
+  const blankLines = `.......................................................................................................................<br>.......................................................................................................................<br>.......................................................................................................................`;
+  const commentaireV1 = v1Past
+    ? `Première visite très satisfaisante. <strong>${s.prenom} ${s.nom}</strong> s'est parfaitement intégré(e) à l'équipe de ${entrepriseNom}. L'apprenti(e) montre une réelle motivation, applique avec sérieux les consignes données et progresse rapidement sur les fondamentaux du métier en lien avec la formation « ${titreFormation} ». Ponctualité, présentation et savoir-être professionnels exemplaires. Aucune difficulté particulière relevée. Maître d'apprentissage : ${maitreNom}.`
+    : blankLines;
+  const commentaireV2 = v2Past
+    ? `Seconde visite tout aussi positive. <strong>${s.prenom} ${s.nom}</strong> a confirmé sa montée en compétences sur l'ensemble des activités confiées en entreprise. L'apprenti(e) gagne en autonomie, prend des initiatives pertinentes et maîtrise désormais les gestes techniques attendus par le référentiel ${f.codeRNCP || titreFormation}. Le maître d'apprentissage ${maitreNom} se déclare très satisfait du parcours réalisé et émet un avis favorable à la poursuite et à la validation du titre. Très bonne articulation entre les apports du CFA et les missions en entreprise.`
+    : blankLines;
 
   const programmeLines = (f.programme || "").split(/[\n;]/).filter(Boolean).map(l => l.trim()).filter(Boolean);
 
