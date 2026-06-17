@@ -384,6 +384,12 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
           current.content.removeChild(clone);
           let oversizedTableStarted = false;
           const wrapperTag = clone.tagName === "BODY" ? "DIV" : clone.tagName;
+          const makeShell = (sourceEl: HTMLElement) => {
+            const shell = document.createElement(sourceEl.tagName === "BODY" ? "DIV" : sourceEl.tagName);
+            for (const attr of Array.from(sourceEl.attributes)) shell.setAttribute(attr.name, attr.value);
+            shell.style.cssText = sourceEl.style.cssText;
+            return shell;
+          };
           let splitWrapper = document.createElement(wrapperTag);
           for (const attr of Array.from(clone.attributes)) {
             splitWrapper.setAttribute(attr.name, attr.value);
@@ -424,6 +430,25 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
             splitWrapper.appendChild(childClone);
             if (current.content.scrollHeight > current.content.clientHeight + 1) {
               splitWrapper.removeChild(childClone);
+              if (child instanceof HTMLElement && getRenderableChildNodes(child).length > 0 && !nodeFitsOnFreshPage(host, child, footerHtml, footerHeightPx, PAGE_W_PX, PAGE_H_PX)) {
+                let nestedWrapper = makeShell(child);
+                splitWrapper.appendChild(nestedWrapper);
+                for (const grandChild of getRenderableChildNodes(child)) {
+                  const grandClone = grandChild.cloneNode(true);
+                  nestedWrapper.appendChild(grandClone);
+                  if (current.content.scrollHeight > current.content.clientHeight + 1) {
+                    nestedWrapper.removeChild(grandClone);
+                    current = createPage(host, footerHtml, footerHeightPx, PAGE_W_PX, PAGE_H_PX);
+                    pages.push(current.page);
+                    splitWrapper = makeShell(clone);
+                    current.content.appendChild(splitWrapper);
+                    nestedWrapper = makeShell(child);
+                    splitWrapper.appendChild(nestedWrapper);
+                    nestedWrapper.appendChild(grandClone);
+                  }
+                }
+                continue;
+              }
               current = createPage(host, footerHtml, footerHeightPx, PAGE_W_PX, PAGE_H_PX);
               pages.push(current.page);
               const nextWrapper = document.createElement(wrapperTag);
