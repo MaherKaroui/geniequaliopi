@@ -3,6 +3,7 @@ import { StagiaireInfo } from "@/types/qualiopi";
 import { FormateurInfo, getFormationDays, parseDuree } from "./sampleData";
 import { getRNCPByCode } from "./rncpData";
 import { getEvalContent } from "./evalContent";
+import { dateDiffusionMission } from "./mailsDiffusionMissionsCFA";
 
 export type ActionType = 'actions-formation' | 'bilans-competences' | 'vae' | 'apprentissage';
 
