@@ -196,12 +196,7 @@ const Index = () => {
             <Button size="lg" variant="outline" className="px-8 py-6 text-base gap-2" onClick={() => navigate("/opco-mobilites")}>
               <Truck className="w-5 h-5" /> OPCO Mobilités
             </Button>
-            <Button size="lg" variant="outline" className="px-8 py-6 text-base gap-2 border-dashed" onClick={() => setBahoOpen(true)}>
-              <Building2 className="w-5 h-5" /> BAHO (temporaire)
-            </Button>
-            <Button size="lg" variant="outline" className="px-8 py-6 text-base gap-2 border-dashed border-blue-400 text-blue-700 hover:bg-blue-50" onClick={() => setViOpen(true)}>
-              <GraduationCap className="w-5 h-5" /> VI – Visionnaire Institute (temporaire)
-            </Button>
+            {/* Archivés : BAHO, VI – Visionnaire Institute */}
           </div>
         </div>
         <BahoModal open={bahoOpen} onOpenChange={setBahoOpen} />
@@ -238,9 +233,7 @@ const Index = () => {
             <Button variant="outline" size="sm" onClick={() => setBrandingOpen(true)} className="gap-1 border-purple-300 text-purple-700 hover:bg-purple-50">
               <Palette className="w-4 h-4" /> Branding
             </Button>
-            <Button variant="outline" size="sm" onClick={() => setMyCertifOpen(true)} className="gap-1 border-pink-300 text-pink-700 hover:bg-pink-50">
-              🎓 MyCertif
-            </Button>
+            {/* Archivé : MyCertif */}
             <Button variant="outline" size="sm" onClick={() => navigate("/musee")} className="gap-1 border-amber-300 text-amber-700 hover:bg-amber-50">
               🏛️ Musée 3D
             </Button>
