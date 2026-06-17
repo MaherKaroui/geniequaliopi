@@ -1404,3 +1404,98 @@ export function genProcedureCommunication14MissionsCFA(o: OrganismeInfo) {
   });
 }
 
+
+// ============================================================================
+// PLANNING DE DIFFUSION DES 14 MISSIONS CFA
+// 1 mission diffusée par semaine école — cohérent avec les mails QCM hebdo
+// ============================================================================
+const MISSIONS_PLANNING: { num: number; titre: string; thematique: string; supports: string; canal: string }[] = [
+  { num: 1,  titre: "Orientation, réorientation & Handicap",                thematique: "Accueil, projet pro, RQTH, référent handicap",       supports: "Affiche A3 Mission 1 + Livret référent handicap + QCM",                  canal: "Salle commune + ENT + Mail apprenti" },
+  { num: 2,  titre: "Aide à la recherche d'un employeur",                   thematique: "CV, lettre, simulations d'entretien, suivi candidats", supports: "Affiche A3 Mission 2 + Procédure aide recherche + QCM",                   canal: "Atelier CV + ENT + Mail apprenti" },
+  { num: 3,  titre: "Cohérence CFA / Entreprise",                           thematique: "Maître d'apprentissage, visites, livret",            supports: "Affiche A3 Mission 3 + Procédure coopération + QCM",                       canal: "Réunion MA + ENT + Mail apprenti" },
+  { num: 4,  titre: "Droits, devoirs & Santé-Sécurité au travail",          thematique: "Code du travail, prévention, RPS",                   supports: "Affiche A3 Mission 4 + Note d'information SST + QCM",                      canal: "Affichage atelier + ENT + Mail apprenti" },
+  { num: 5,  titre: "Rupture de contrat",                                   thematique: "Procédure de rupture, maintien 6 mois en formation", supports: "Affiche A3 Mission 5 + Procédure maintien 6 mois + QCM",                   canal: "Entretien individuel + ENT + Mail apprenti" },
+  { num: 6,  titre: "Accompagnement social & matériel",                     thematique: "Aides régionales, transport, santé psy, logement",   supports: "Affiche A3 Mission 6 + Cartes aides (ARA, Imagine R, Santé Psy) + QCM",    canal: "Référent social + ENT + Mail apprenti" },
+  { num: 7,  titre: "Mixité Femmes – Hommes",                               thematique: "Plan mixité, lutte contre stéréotypes",              supports: "Affiche A3 Mission 7 + Plan d'actions mixité F/H + QCM",                  canal: "Salle commune + ENT + Mail apprenti" },
+  { num: 8,  titre: "Égalité professionnelle & mixité des métiers",         thematique: "Mixité dans les métiers préparés, témoignages",      supports: "Affiche A3 Mission 8 + Plan mixité des métiers + QCM",                    canal: "Forum métiers + ENT + Mail apprenti" },
+  { num: 9,  titre: "Diversité & lutte contre les discriminations",         thematique: "Charte diversité, cellule d'écoute",                 supports: "Affiche A3 Mission 9 + Plan diversité + QCM",                              canal: "Affichage + ENT + Mail apprenti" },
+  { num: 10, titre: "Mobilité nationale & internationale",                  thematique: "Erasmus+, mobilité inter-CFA",                       supports: "Affiche A3 Mission 10 + Convention inter-CFA + Fiche demande + QCM",       canal: "Réunion d'information + ENT + Mail apprenti" },
+  { num: 11, titre: "Suivi de la formation à distance",                     thematique: "LMS, connexion, accompagnement pédagogique distant", supports: "Affiche A3 Mission 11 + Procédure suivi distance + QCM",                  canal: "Mail + LMS + ENT" },
+  { num: 12, titre: "Évaluation des compétences acquises",                  thematique: "Modalités d'évaluation, livret, jurys",              supports: "Affiche A3 Mission 12 + Attestation formation MA + QCM",                  canal: "Réunion pédagogique + ENT + Mail apprenti" },
+  { num: 13, titre: "Accompagnement post-formation",                        thematique: "Insertion, suivi à 6 mois, réseau alumni",           supports: "Affiche A3 Mission 13 + Procédure accompagnement post-formation + QCM",   canal: "Mail + ENT + Entretien individuel" },
+  { num: 14, titre: "Accès aux aides des apprentis",                        thematique: "Aide permis B, aide 1er équipement, mobili-jeunes", supports: "Affiche A3 Mission 14 + Procédure accès aux aides + QCM",                  canal: "Référent social + ENT + Mail apprenti" },
+];
+
+function fmtLongFRPlanning(d: Date): string {
+  return d.toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" });
+}
+
+export function genPlanningDiffusion14MissionsCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[] = []) {
+  const dateDebut = f.dateDebut ? new Date(f.dateDebut) : new Date();
+  const lundi0 = new Date(dateDebut);
+  const day = (lundi0.getDay() + 6) % 7;
+  lundi0.setDate(lundi0.getDate() - day);
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const terminee = isFormationTerminee(f, stagiaires);
+  const cycleJours = 28; // 1 sem école / 3 sem entreprise
+
+  const rows = MISSIONS_PLANNING.map((m) => {
+    const debutSem = new Date(lundi0);
+    debutSem.setDate(debutSem.getDate() + (m.num - 1) * cycleJours);
+    const finSem = new Date(debutSem);
+    finSem.setDate(finSem.getDate() + 4);
+    const isPast = debutSem.getTime() <= today.getTime();
+    const statut = terminee || isPast
+      ? `<span style="color:#15803d;font-weight:600;">✓ Diffusé</span>`
+      : `<span style="color:#1d4ed8;font-weight:600;">◷ Programmé</span>`;
+    return [
+      `S${String(m.num).padStart(2, "0")}`,
+      `Du ${fmtLongFRPlanning(debutSem)}<br>au ${fmtLongFRPlanning(finSem)}`,
+      `<strong>Mission ${m.num}</strong><br>${m.titre}`,
+      m.thematique,
+      m.supports,
+      m.canal,
+      "Référent CFA / Équipe pédagogique",
+      statut,
+    ];
+  });
+
+  const intro = `
+    <p>Le présent planning formalise la <strong>diffusion hebdomadaire des 14 missions du CFA</strong> (Art. <strong>L.6231-2 du Code du Travail</strong>) auprès des apprentis, des maîtres d'apprentissage et de l'équipe pédagogique de <strong>${o.nom}</strong>.</p>
+    <p>Chaque mission est diffusée durant une <strong>semaine école dédiée</strong>, selon le rythme d'alternance de la formation <strong>${f.intitule || ""}</strong>. La diffusion s'appuie sur trois canaux complémentaires : <em>affichage physique</em> (visuels A3 en salle commune et en atelier), <em>environnement numérique de travail</em> (ENT / LMS) et <em>communication directe</em> (mail hebdomadaire + QCM de la semaine).</p>
+  `;
+
+  const suivi = `
+    <p>Le suivi de diffusion est tracé via :</p>
+    <ul>
+      <li>les <strong>mails hebdomadaires</strong> d'envoi du QCM mission (1 mail = 1 mission, archivés dans la section MAIL du dossier Qualiopi) ;</li>
+      <li>les <strong>QCM mission</strong> retournés par les apprentis (10 questions, durée ≈ 15 min) ;</li>
+      <li>les <strong>visuels A3</strong> affichés en présentiel et photographiés pour preuves (dossier <em>VISUELS_14_MISSIONS</em>) ;</li>
+      <li>les <strong>fiches de présence</strong> aux temps d'information collectifs (forum métiers, réunions MA, atelier CV…).</li>
+    </ul>
+    <p>Un bilan annuel de la diffusion est présenté lors du <strong>Conseil de Perfectionnement</strong> (Mission 14 — Art. R.6233-1).</p>
+  `;
+
+  return buildDocument({
+    org: o,
+    title: "PLANNING DE DIFFUSION DES 14 MISSIONS DU CFA",
+    subtitle: `Formation : ${f.intitule || ""} — Rythme : 1 mission diffusée par semaine école`,
+    sections: [
+      { heading: "Cadre réglementaire et objectifs", content: intro },
+      {
+        heading: "Calendrier de diffusion des 14 missions",
+        content: tableHTML(
+          ["Semaine", "Période de diffusion", "Mission", "Thématique", "Supports diffusés", "Canal", "Responsable", "Statut"],
+          rows
+        ),
+      },
+      { heading: "Modalités de suivi et preuves", content: suivi, variant: "green" },
+      {
+        heading: "Validation",
+        content: `<p><strong>Responsable :</strong> ${o.dirigeant || "Direction"} — Direction<br><strong>Établissement :</strong> ${o.nom} — SIRET ${o.siret || ""} — NDA ${o.nda || ""}<br><strong>Date d'édition :</strong> ${formatDate(new Date().toISOString().slice(0, 10))}<br><strong>Version :</strong> V1</p>`,
+      },
+    ],
+  });
+}

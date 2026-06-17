@@ -821,6 +821,13 @@ export function buildFullCatalog(
       }
     });
 
+    // ===== IND 14 — PLANNING DE DIFFUSION DES 14 MISSIONS CFA =====
+    add(
+      "cfa_c3i14_planning_diffusion_14_missions",
+      "CT3 - IND 14 📅 PLANNING DE DIFFUSION DES 14 MISSIONS CFA",
+      3, 14, "planning_diffusion_14_missions_cfa",
+    );
+
     // ===== IND 14 — VISUELS / AFFICHES DES 14 MISSIONS DU CFA =====
     // Affiches modernes avec illustration + nom d'organisme dynamique
     const visuels14 = [
