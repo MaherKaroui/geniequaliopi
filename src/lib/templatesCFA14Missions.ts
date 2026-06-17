@@ -1494,7 +1494,7 @@ export function genPlanningDiffusion14MissionsCFA(o: OrganismeInfo, f: Formation
       { heading: "Modalités de suivi et preuves", content: suivi, variant: "green" },
       {
         heading: "Validation",
-        content: `<p><strong>Responsable :</strong> ${o.dirigeant || "Direction"} — Direction<br><strong>Établissement :</strong> ${o.nom} — SIRET ${o.siret || ""} — NDA ${o.nda || ""}<br><strong>Date d'édition :</strong> ${formatDate(new Date().toISOString().slice(0, 10))}<br><strong>Version :</strong> V1</p>`,
+        content: `<p><strong>Responsable :</strong> ${o.dirigeant || "Direction"} — Direction<br><strong>Établissement :</strong> ${o.nom} — SIRET ${o.siret || ""} — NDA ${o.nda || ""}<br><strong>Version :</strong> V1</p>`,
       },
     ],
   });
