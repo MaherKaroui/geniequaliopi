@@ -67,15 +67,17 @@ function renderPieceJointe(missionNumero: number, missionTitre: string): string 
   const fileName = `Affiche_A3_Mission_${String(missionNumero).padStart(2, "0")}_${cleanTitre}.pdf`;
   return `
     <div style="margin:18px 0 8px;font-size:13px;color:#5f6368;">1 pièce jointe</div>
-    <div style="display:inline-block;border:1px solid #dadce0;border-radius:8px;padding:10px 14px;background:#fff;min-width:260px;">
-      <div style="display:flex;align-items:center;gap:10px;">
-        <div style="width:32px;height:40px;background:#d93025;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;border-radius:3px;flex-shrink:0;">PDF</div>
-        <div style="font-size:13px;line-height:1.3;">
-          <div style="color:#202124;font-weight:500;">${escapeHtml(fileName)}</div>
+    <table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:separate;border-spacing:0;border:1px solid #dadce0;border-radius:8px;background:#fff;width:320px;max-width:100%;page-break-inside:avoid;break-inside:avoid;">
+      <tr>
+        <td style="width:46px;padding:10px 0 10px 14px;vertical-align:middle;">
+          <div style="width:32px;height:40px;background:#d93025;color:#fff;font-size:10px;font-weight:700;text-align:center;line-height:40px;border-radius:3px;">PDF</div>
+        </td>
+        <td style="padding:10px 14px 10px 8px;vertical-align:middle;font-size:13px;line-height:1.3;">
+          <div style="color:#202124;font-weight:500;word-break:break-word;">${escapeHtml(fileName)}</div>
           <div style="color:#5f6368;font-size:11px;margin-top:2px;">PDF · ~220 Ko</div>
-        </div>
-      </div>
-    </div>
+        </td>
+      </tr>
+    </table>
   `;
 }
 
@@ -107,31 +109,33 @@ export function genMailDiffusionMissionCFA(
   const pjHtml = renderPieceJointe(missionNumero, mission.titre);
 
   return `<!DOCTYPE html>
-<html lang="fr"><head><meta charset="utf-8"><title>${escapeHtml(sujet)}</title></head>
-<body style="margin:0;padding:24px;background:#f6f8fa;font-family:'Google Sans','Segoe UI',Roboto,Arial,sans-serif;color:#202124;">
-<div style="max-width:780px;margin:0 auto;background:#ffffff;border:1px solid #dadce0;border-radius:8px;overflow:hidden;">
+<html lang="fr"><head><meta charset="utf-8"><title>${escapeHtml(sujet)}</title><style>body{margin:0;padding:0;background:#ffffff}.mail-shell{width:760px;max-width:760px;margin:0 auto;background:#ffffff;border:1px solid #dadce0;border-radius:6px;overflow:hidden;font-family:'Google Sans','Segoe UI',Roboto,Arial,sans-serif;color:#202124;box-sizing:border-box}.mail-body{padding:22px 24px 24px;font-size:14px;line-height:1.62;color:#202124}.mail-meta{font-size:13px;line-height:1.45;color:#5f6368}.keep{page-break-inside:avoid;break-inside:avoid}@media print{.mail-shell{width:100%;max-width:100%;border-radius:0}.mail-body{padding:20px 24px}}</style></head>
+<body>
+<div class="mail-shell">
 
   <div style="background:#f1f3f4;padding:10px 16px;border-bottom:1px solid #dadce0;font-size:13px;color:#5f6368;">
     <span style="color:#d93025;font-weight:700;">M</span> Gmail &nbsp;·&nbsp; Boîte de réception
   </div>
 
-  <div style="padding:18px 24px 8px;border-bottom:1px solid #f1f3f4;">
+  <div class="keep" style="padding:18px 24px 8px;border-bottom:1px solid #f1f3f4;">
     <div style="font-size:20px;font-weight:500;color:#202124;line-height:1.3;">${escapeHtml(sujet)}</div>
     <div style="margin-top:6px;display:inline-block;background:#e8f0fe;color:#1967d2;font-size:11px;font-weight:600;padding:2px 8px;border-radius:10px;">Boîte de réception</div>
   </div>
 
-  <div style="padding:14px 24px;display:flex;align-items:flex-start;gap:12px;border-bottom:1px solid #f1f3f4;">
-    <div style="width:40px;height:40px;border-radius:50%;background:#1a73e8;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;flex-shrink:0;">
-      ${escapeHtml((o.nom || "C")[0].toUpperCase())}
-    </div>
-    <div style="flex:1;font-size:13px;line-height:1.5;">
-      <div><strong style="color:#202124;">${escapeHtml(fromName)}</strong> <span style="color:#5f6368;">&lt;${escapeHtml(fromEmail)}&gt;</span></div>
-      <div style="color:#5f6368;">À : <strong style="color:#202124;">${escapeHtml(toName)}</strong> &lt;${escapeHtml(toEmail)}&gt;</div>
-      <div style="color:#5f6368;">${escapeHtml(dateLong)} à ${escapeHtml(heure)}</div>
-    </div>
-  </div>
+  <table role="presentation" cellspacing="0" cellpadding="0" class="keep" style="width:100%;border-collapse:collapse;border-bottom:1px solid #f1f3f4;">
+    <tr>
+      <td style="width:56px;padding:14px 0 14px 24px;vertical-align:top;">
+        <div style="width:40px;height:40px;border-radius:50%;background:#1a73e8;color:#fff;text-align:center;line-height:40px;font-weight:700;font-size:16px;">${escapeHtml((o.nom || "C")[0].toUpperCase())}</div>
+      </td>
+      <td class="mail-meta" style="padding:14px 24px 14px 8px;vertical-align:top;">
+        <div><strong style="color:#202124;">${escapeHtml(fromName)}</strong> <span style="color:#5f6368;">&lt;${escapeHtml(fromEmail)}&gt;</span></div>
+        <div style="color:#5f6368;">À : <strong style="color:#202124;">${escapeHtml(toName)}</strong> &lt;${escapeHtml(toEmail)}&gt;</div>
+        <div style="color:#5f6368;">${escapeHtml(dateLong)} à ${escapeHtml(heure)}</div>
+      </td>
+    </tr>
+  </table>
 
-  <div style="padding:24px;font-size:14px;line-height:1.65;color:#202124;">
+  <div class="mail-body">
     <p style="margin:0 0 14px;">Bonjour ${escapeHtml(civilite)} <strong>${escapeHtml(s.nom || "")}</strong>,</p>
 
     <p style="margin:0 0 14px;">
