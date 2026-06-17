@@ -997,6 +997,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "decoupage_formation_cfa_excel": return genDecoupageFormationCFAExcel(o, f);
     case "suivi_inscriptions_excel": return generateExcelSuiviInscriptions(o, f, stagiaires);
     case "visuel_mission_cfa": return genVisuelMissionCFA(o, params?.imageUrl || "", params?.missionTitre || "");
+    case "planning_diffusion_14_missions_cfa": return genPlanningDiffusion14MissionsCFA(o, f, stagiaires);
     case "book_qualiopi": {
       const allFormations = [f];
       const allStagiaires = mergeStagiaires(stagiaires);
