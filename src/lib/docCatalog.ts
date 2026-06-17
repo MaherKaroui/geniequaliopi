@@ -1524,6 +1524,8 @@ export function buildFullCatalog(
     "mail_convocation",
     "mail_envoie_sc_ressources",
     "mail_fin_formation",
+    "mail_mission_cfa",
+    "mail_diffusion_mission_cfa",
   ]);
   return d.filter((doc) => doc.critere !== 0 || MAIL_DOCX_TEMPLATES.has(doc.template));
 }
