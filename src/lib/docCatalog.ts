@@ -1506,9 +1506,9 @@ export function buildFullCatalog(
     });
   }
 
-  // On ne conserve que les mails dont un template DOCX existe réellement.
+  // On ne conserve que les mails réellement générables.
   // Cela évite l'apparition d'un dossier "Critere_0" dans les ZIP et garde l'UI
-  // cohérente avec la section MAILS (docx uniquement).
+  // cohérente avec la section MAILS.
   const MAIL_DOCX_TEMPLATES = new Set<string>([
     "mail_pre_inscription",
     "mail_inscription",
