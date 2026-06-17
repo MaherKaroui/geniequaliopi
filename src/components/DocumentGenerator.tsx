@@ -66,6 +66,13 @@ const NATIVE_XLSX_TEMPLATES = new Set<string>([
   "suivi_inscriptions_excel",
 ]);
 
+const HTML_MAIL_TEMPLATES = new Set<string>([
+  "mail_mission_cfa",
+  "mail_diffusion_mission_cfa",
+]);
+
+const isHtmlMailTemplate = (template: string) => HTML_MAIL_TEMPLATES.has(template);
+
 async function generateNativeXlsxBlob(
   template: string,
   organisme: OrganismeInfo,
@@ -211,8 +218,8 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
    * le document est placé dans CT{c}_IND_{i}/{folder}/ pour regrouper les missions.
    */
   const getDocBasePath = useCallback((doc: DocEntry): string => {
-    // Seuls les mails DOCX (templates .docx) sont conservés dans le dossier MAILS.
-    const isMail = doc.critere === 0 && !!MAIL_TEMPLATE_FILES[doc.template];
+    // Tous les mails (DOCX ou générés en HTML) sont conservés dans le dossier MAILS.
+    const isMail = doc.critere === 0 && (!!MAIL_TEMPLATE_FILES[doc.template] || isHtmlMailTemplate(doc.template));
     const isSiteWeb = doc.id.startsWith("cfa_siteweb_");
     const root = isSiteWeb ? "Documents site web" : (isMail ? "MAILS" : shortCriterePath(doc.critere, doc.indicateur));
     const subFolder = typeof doc.params?.folder === "string" ? doc.params.folder : null;
@@ -1485,8 +1492,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
 
       {/* === MAIL SECTION (outside critères) === */}
       {(() => {
-        const isHtmlMailTpl = (_t: string) => false;
-        const mailDocs = catalog.filter((doc) => doc.critere === 0 && !!MAIL_TEMPLATE_FILES[doc.template]);
+        const mailDocs = catalog.filter((doc) => doc.critere === 0 && (!!MAIL_TEMPLATE_FILES[doc.template] || isHtmlMailTemplate(doc.template)));
         if (mailDocs.length === 0) return null;
         const isMailExpanded = expandedCriteres.has(99);
         const mailGenerated = mailDocs.filter((doc) => generated.has(doc.id)).length;
@@ -1521,7 +1527,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
                           const blob = await processMailDocxTemplate(MAIL_TEMPLATE_FILES[doc.template], mergedOrganisme, selectedFormation, s);
                           zip.file(buildCatalogFileName(doc, s, ".docx"), blob);
                         }
-                      } else if (isHtmlMailTpl(doc.template) && typeof doc.params?.stagiaireIdx === "number") {
+                      } else if (isHtmlMailTemplate(doc.template) && typeof doc.params?.stagiaireIdx === "number") {
                         const s = allStagiaires[doc.params.stagiaireIdx];
                         if (s) {
                           const html = generateContent(doc, doc.params.stagiaireIdx);
