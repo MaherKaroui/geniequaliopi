@@ -80,32 +80,34 @@ export function genMailVisiteEntrepriseCFA(
   const sujet = `Visite de suivi en entreprise — ${apprentiNom} (apprenti·e ${escapeHtml(f.intitule || "")})`;
 
   return `<!DOCTYPE html>
-<html lang="fr"><head><meta charset="utf-8"><title>${escapeHtml(sujet)}</title></head>
-<body style="margin:0;padding:24px;background:#f6f8fa;font-family:'Google Sans','Segoe UI',Roboto,Arial,sans-serif;color:#202124;">
-<div style="max-width:780px;margin:0 auto;background:#ffffff;border:1px solid #dadce0;border-radius:8px;overflow:hidden;">
+<html lang="fr"><head><meta charset="utf-8"><title>${escapeHtml(sujet)}</title><style>body{margin:0;padding:0;background:#ffffff}.mail-shell{width:760px;max-width:760px;margin:0 auto;background:#ffffff;border:1px solid #dadce0;border-radius:6px;overflow:hidden;font-family:'Google Sans','Segoe UI',Roboto,Arial,sans-serif;color:#202124;box-sizing:border-box}.mail-body{padding:22px 24px 24px;font-size:14px;line-height:1.62;color:#202124}.mail-meta{font-size:13px;line-height:1.45;color:#5f6368}.keep{page-break-inside:avoid;break-inside:avoid}@media print{.mail-shell{width:100%;max-width:100%;border-radius:0}.mail-body{padding:20px 24px}}</style></head>
+<body>
+<div class="mail-shell">
 
   <div style="background:#f1f3f4;padding:10px 16px;border-bottom:1px solid #dadce0;font-size:13px;color:#5f6368;">
     <span style="color:#d93025;font-weight:700;">M</span> Gmail &nbsp;·&nbsp; Messages envoyés
   </div>
 
-  <div style="padding:18px 24px 8px;border-bottom:1px solid #f1f3f4;">
+  <div class="keep" style="padding:18px 24px 8px;border-bottom:1px solid #f1f3f4;">
     <div style="font-size:20px;font-weight:500;color:#202124;line-height:1.3;">${escapeHtml(sujet)}</div>
     <div style="margin-top:6px;display:inline-block;background:#fef7e0;color:#b06000;font-size:11px;font-weight:600;padding:2px 8px;border-radius:10px;">Suivi alternance</div>
   </div>
 
-  <div style="padding:14px 24px;display:flex;align-items:flex-start;gap:12px;border-bottom:1px solid #f1f3f4;">
-    <div style="width:40px;height:40px;border-radius:50%;background:#1a73e8;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;flex-shrink:0;">
-      ${escapeHtml((o.nom || "C")[0].toUpperCase())}
-    </div>
-    <div style="flex:1;font-size:13px;line-height:1.5;">
-      <div><strong style="color:#202124;">${escapeHtml(fromName)}</strong> <span style="color:#5f6368;">&lt;${escapeHtml(fromEmail)}&gt;</span></div>
-      <div style="color:#5f6368;">À : <strong style="color:#202124;">${escapeHtml(responsable)}</strong> &lt;${escapeHtml(toEmail)}&gt;</div>
-      ${s.email ? `<div style="color:#5f6368;">Cc : <strong style="color:#202124;">${escapeHtml(apprentiNom)}</strong> &lt;${escapeHtml(s.email)}&gt;</div>` : ""}
-      <div style="color:#5f6368;">${escapeHtml(dateLong)} à ${escapeHtml(heure)}</div>
-    </div>
-  </div>
+  <table role="presentation" cellspacing="0" cellpadding="0" class="keep" style="width:100%;border-collapse:collapse;border-bottom:1px solid #f1f3f4;">
+    <tr>
+      <td style="width:56px;padding:14px 0 14px 24px;vertical-align:top;">
+        <div style="width:40px;height:40px;border-radius:50%;background:#1a73e8;color:#fff;text-align:center;line-height:40px;font-weight:700;font-size:16px;">${escapeHtml((o.nom || "C")[0].toUpperCase())}</div>
+      </td>
+      <td class="mail-meta" style="padding:14px 24px 14px 8px;vertical-align:top;">
+        <div><strong style="color:#202124;">${escapeHtml(fromName)}</strong> <span style="color:#5f6368;">&lt;${escapeHtml(fromEmail)}&gt;</span></div>
+        <div style="color:#5f6368;">À : <strong style="color:#202124;">${escapeHtml(responsable)}</strong> &lt;${escapeHtml(toEmail)}&gt;</div>
+        ${s.email ? `<div style="color:#5f6368;">Cc : <strong style="color:#202124;">${escapeHtml(apprentiNom)}</strong> &lt;${escapeHtml(s.email)}&gt;</div>` : ""}
+        <div style="color:#5f6368;">${escapeHtml(dateLong)} à ${escapeHtml(heure)}</div>
+      </td>
+    </tr>
+  </table>
 
-  <div style="padding:24px;font-size:14px;line-height:1.65;color:#202124;">
+  <div class="mail-body">
     <p style="margin:0 0 14px;">${escapeHtml(civiliteResp)},</p>
 
     <p style="margin:0 0 14px;">
