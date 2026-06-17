@@ -22,6 +22,7 @@ import { getModuleSpecificConsigne, buildModuleSpecificResponse } from "./cfaExe
 import { genProcedureAbandonReorientationCFA, genAccompagnementDistancielCFA, genEnquetePartenaireEmployeurCFA, genFicheRenseignementsCommanditaireCFA, genContratApprentissageModeEmploiCFA, genProcedureAccueilBeneficiairesCFA, genProcedureAdaptationPedagogiqueCFA, genProcedureGestionAnnulationsCFA, genProcedureRuptureContratApprentissageCFA, genLivretApprentissageCFA as genLivretApprentissageInd10, genLivretMaitreApprentissageCFA, genMesuresEngagementBeneficiairesCFA, genPreventionGestionAbandonsCFA, genGuideEntretienAbandonsCFA, genEviterSituationsEchecCFA, genProcedureAnnulationsAbandonsCFA, genFichierGestionAnnulationsCFA, genAccompagnementRechercheContratCFA, genListeAideSocialCFA, genCertificatRealisationCFA, genWebinaireFormationCompetencesCFA, genWebinaireNTCCFA, genDroitsDevoirsApprentiCFA, genReglesSSMilieuProCFA } from "./templatesCFA";
 import { genPlanActivitesCitoyennesCFA, genPlanMixiteEgaliteFHCFA, genSuiviInsertionProCFA, genConventionMobiliteErasmusCFA, genProcedureMobiliteErasmusCFA, genProcedureAideRechercheEmployeurCFA, genTableauSuiviCandidatsSansContratCFA, genAttestationFormationMaitreApprentissageCFA, genCoperationCFAEntrepriseCFA, genPlanDiversiteLutteDiscriminationsCFA, genPlanMobiliteNationaleCFA, genConventionMobiliteInterCFA, genFicheDemandeMobiliteNationale, genProcedureAccompagnementPostFormationCFA, genPlanMixiteMetiersCFA, genProcedureAccompagnementEducatifSocialCFA, genProcedureAccueilToutMomentCFA, genConseilPerfectionnementCFA, genQCMMissionCFA, genProcedureCommunication14MissionsCFA, genPlanningDiffusion14MissionsCFA } from "./templatesCFA14Missions";
 import { genMailMissionCFA } from "./mailsMissionsCFA";
+import { genMailDiffusionMissionCFA, dateDiffusionMission } from "./mailsDiffusionMissionsCFA";
 import { genMailVisiteEntrepriseCFA } from "./mailVisiteEntrepriseCFA";
 import { genMailEnvoiEvaluationPrealable } from "./mailEnvoiEvaluationPrealable";
 import { genMailRetourDocumentsCompletes } from "./mailRetourDocumentsCompletes";
@@ -912,6 +913,11 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
       const idx = typeof params?.stagiaireIdx === "number" ? params.stagiaireIdx : 0;
       const missionNumero = typeof params?.missionNumero === "number" ? params.missionNumero : 1;
       return genMailMissionCFA(o, f, stagiaires, idx, missionNumero);
+    }
+    case "mail_diffusion_mission_cfa": {
+      const idx = typeof params?.stagiaireIdx === "number" ? params.stagiaireIdx : 0;
+      const missionNumero = typeof params?.missionNumero === "number" ? params.missionNumero : 1;
+      return genMailDiffusionMissionCFA(o, f, stagiaires, idx, missionNumero);
     }
     case "mail_visite_entreprise_cfa": {
       const idx = typeof params?.stagiaireIdx === "number" ? params.stagiaireIdx : 0;

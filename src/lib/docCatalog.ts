@@ -3,6 +3,7 @@ import { StagiaireInfo } from "@/types/qualiopi";
 import { FormateurInfo, getFormationDays, parseDuree } from "./sampleData";
 import { getRNCPByCode } from "./rncpData";
 import { getEvalContent } from "./evalContent";
+import { dateDiffusionMission } from "./mailsDiffusionMissionsCFA";
 
 export type ActionType = 'actions-formation' | 'bilans-competences' | 'vae' | 'apprentissage';
 
@@ -1489,6 +1490,29 @@ export function buildFullCatalog(
         );
       });
     });
+
+    // ===== MAIL — Annonces de DIFFUSION des 14 missions (J-1) =====
+    // Uniquement pour les missions DÉJÀ diffusées (date de diffusion <= aujourd'hui).
+    const fDiff = formations[0];
+    if (fDiff?.dateDebut) {
+      const todayDiff = new Date();
+      todayDiff.setHours(0, 0, 0, 0);
+      stagiaires.forEach((s, si) => {
+        MISSIONS_TITRES.forEach((m) => {
+          const dDiffusion = dateDiffusionMission(fDiff, m.num);
+          if (dDiffusion.getTime() <= todayDiff.getTime()) {
+            add(
+              `mail_diffusion_mission${m.num}_${si}`,
+              `MAIL - 📢 Annonce diffusion J-1 – Mission ${m.num} ${m.titre} – ${s.prenom} ${s.nom}`,
+              0,
+              0,
+              "mail_diffusion_mission_cfa",
+              { stagiaireIdx: si, missionNumero: m.num },
+            );
+          }
+        });
+      });
+    }
   }
 
   // On ne conserve que les mails dont un template DOCX existe réellement.
