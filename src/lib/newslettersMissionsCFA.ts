@@ -344,21 +344,22 @@ export function genNewsletterMissionCFA(
   .content {
     margin-top: 3mm;
     display: grid; grid-template-columns: 86mm 1fr; gap: 5mm;
-    flex: 1; min-height: 0;
+    flex: 1; min-height: 0; align-items: start;
   }
-  .puces { width: 100%; border-collapse: collapse; }
+  .puces { width: 100%; border-collapse: collapse; height: auto; }
   .puces tr { vertical-align: top; }
-  .puces td { padding: 1.05mm 0; }
+  .puces td { padding: 1.6mm 0; }
   .puces .ico { width: 10mm; padding-right: 2mm; vertical-align: top; }
   .puces .ico svg { width: 7mm; height: 7mm; display: block; }
   .puce-label {
     font-family: 'Helvetica Neue', Arial, sans-serif;
-    font-weight: 700; font-size: 9pt; color: #1a1a1a; line-height: 1.2;
+    font-weight: 700; font-size: 9.5pt; color: #1a1a1a; line-height: 1.2;
   }
   .puce-desc {
     font-family: 'Helvetica Neue', Arial, sans-serif;
-    font-size: 7.8pt; color: #3a3a3a; margin-top: 0.3mm; line-height: 1.22;
+    font-size: 8.2pt; color: #3a3a3a; margin-top: 0.4mm; line-height: 1.28;
   }
+
   .paragraphe {
     font-family: Georgia, 'Times New Roman', serif;
     font-size: 10pt; line-height: 1.38; color: #1a1a1a; text-align: justify;
