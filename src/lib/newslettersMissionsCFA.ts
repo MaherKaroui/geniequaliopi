@@ -297,7 +297,7 @@ export function genNewsletterMissionCFA(
   .frame {
     height: 100%;
     border: 1px solid #d8d8d2;
-    padding: 8mm 10mm 7mm;
+    padding: 7mm 9mm 6mm;
     position: relative;
     background: #fbfbf7;
     display: flex; flex-direction: column;
@@ -309,7 +309,7 @@ export function genNewsletterMissionCFA(
   .frame::before { top: -3.5mm; left: -3.5mm; border-right: none; border-bottom: none; }
   .frame::after  { bottom: -3.5mm; right: -3.5mm; border-left: none; border-top: none; }
 
-  .header { display: flex; align-items: center; gap: 5mm; margin-bottom: 2mm; flex-shrink: 0; }
+  .header { display: flex; align-items: center; gap: 5mm; margin-bottom: 1.5mm; flex-shrink: 0; }
   .logo-circle {
     width: 14mm; height: 14mm; border-radius: 50%;
     border: 1.2px solid #1a2540;
@@ -320,7 +320,7 @@ export function genNewsletterMissionCFA(
   .org-block { flex: 1; }
   .org-name {
     font-family: Georgia, 'Times New Roman', serif;
-    font-size: 22pt; font-weight: 400; letter-spacing: 2px; color: #1a2540;
+    font-size: 20pt; font-weight: 400; letter-spacing: 2px; color: #1a2540;
     line-height: 1; text-transform: uppercase;
   }
   .nl-tag {
@@ -331,24 +331,24 @@ export function genNewsletterMissionCFA(
 
   .title {
     font-family: 'Helvetica Neue', Arial, sans-serif;
-    font-weight: 800; font-size: 15pt; line-height: 1.2;
-    color: #1a2540; margin: 3mm 0; flex-shrink: 0;
+    font-weight: 800; font-size: 14pt; line-height: 1.18;
+    color: #1a2540; margin: 2.5mm 0; flex-shrink: 0;
   }
 
   .hero {
-    width: 100%; height: 68mm; object-fit: cover;
+    width: 100%; height: 63mm; object-fit: cover;
     display: block; border: 1px solid #e0e0d8;
     background: #eeeee8; flex-shrink: 0;
   }
 
   .content {
-    margin-top: 4mm;
-    display: grid; grid-template-columns: 88mm 1fr; gap: 6mm;
+    margin-top: 3mm;
+    display: grid; grid-template-columns: 86mm 1fr; gap: 5mm;
     flex: 1; min-height: 0;
   }
   .puces { width: 100%; border-collapse: collapse; }
   .puces tr { vertical-align: top; }
-  .puces td { padding: 1.3mm 0; }
+  .puces td { padding: 1.05mm 0; }
   .puces .ico { width: 10mm; padding-right: 2mm; vertical-align: top; }
   .puces .ico svg { width: 7mm; height: 7mm; display: block; }
   .puce-label {
@@ -357,25 +357,13 @@ export function genNewsletterMissionCFA(
   }
   .puce-desc {
     font-family: 'Helvetica Neue', Arial, sans-serif;
-    font-size: 8pt; color: #3a3a3a; margin-top: 0.4mm; line-height: 1.3;
+    font-size: 7.8pt; color: #3a3a3a; margin-top: 0.3mm; line-height: 1.22;
   }
   .paragraphe {
     font-family: Georgia, 'Times New Roman', serif;
-    font-size: 10.5pt; line-height: 1.45; color: #1a1a1a; text-align: justify;
+    font-size: 10pt; line-height: 1.38; color: #1a1a1a; text-align: justify;
   }
   .paragraphe strong { color: #1a2540; }
-
-  .footer {
-    margin-top: 4mm; padding-top: 3mm;
-    border-top: 1px dashed #b0b0a8;
-    text-align: center;
-    font-family: 'Helvetica Neue', Arial, sans-serif;
-    font-size: 9pt; color: #1a1a1a;
-    flex-shrink: 0;
-  }
-  .footer .web { font-weight: 700; }
-  .footer .contact { margin-top: 1mm; font-weight: 600; }
-  .footer .contact b { font-weight: 800; }
 </style></head>
 <body>
 <div class="sheet">
@@ -399,10 +387,6 @@ export function genNewsletterMissionCFA(
       </div>
     </div>
 
-    <div class="footer">
-      <div>Découvrez notre engagement sur <span class="web">${escHtml(siteWeb)}</span></div>
-      <div class="contact"><b>Contact :</b> ${escHtml(ref.fonction)}, ${escHtml(ref.nom)} – <b>${escHtml(ref.tel)}</b></div>
-    </div>
   </div>
 </div>
 </body></html>`;
