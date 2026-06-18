@@ -283,99 +283,98 @@ export function genNewsletterMissionCFA(
   @page { size: A4 portrait; margin: 0; }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body {
-    width: 210mm; min-height: 297mm; background: #fafaf7;
+    width: 210mm; height: 297mm; background: #fafaf7;
     font-family: Georgia, 'Times New Roman', serif;
     color: #1a1a1a;
     -webkit-print-color-adjust: exact; print-color-adjust: exact;
   }
   .sheet {
-    width: 210mm; min-height: 297mm;
-    padding: 14mm 14mm 12mm;
+    width: 210mm; height: 297mm;
+    padding: 10mm;
     background: #fafaf7;
-    position: relative;
+    overflow: hidden;
   }
-  /* Cadre style "épreuve d'imprimerie" */
   .frame {
+    height: 100%;
     border: 1px solid #d8d8d2;
-    padding: 12mm 12mm 10mm;
+    padding: 8mm 10mm 7mm;
     position: relative;
     background: #fbfbf7;
+    display: flex; flex-direction: column;
   }
   .frame::before, .frame::after {
-    content: ""; position: absolute; width: 8mm; height: 8mm;
+    content: ""; position: absolute; width: 7mm; height: 7mm;
     border: 1px solid #b0b0a8;
   }
-  .frame::before { top: -4mm; left: -4mm; border-right: none; border-bottom: none; }
-  .frame::after  { bottom: -4mm; right: -4mm; border-left: none; border-top: none; }
+  .frame::before { top: -3.5mm; left: -3.5mm; border-right: none; border-bottom: none; }
+  .frame::after  { bottom: -3.5mm; right: -3.5mm; border-left: none; border-top: none; }
 
-  /* Header */
-  .header { display: flex; align-items: center; gap: 6mm; margin-bottom: 4mm; }
+  .header { display: flex; align-items: center; gap: 5mm; margin-bottom: 2mm; flex-shrink: 0; }
   .logo-circle {
-    width: 18mm; height: 18mm; border-radius: 50%;
-    border: 1.5px solid #1a2540;
+    width: 14mm; height: 14mm; border-radius: 50%;
+    border: 1.2px solid #1a2540;
     display: flex; align-items: center; justify-content: center;
-    font-family: Georgia, serif; font-weight: 700; font-size: 11pt; color: #1a2540;
+    font-family: Georgia, serif; font-weight: 700; font-size: 10pt; color: #1a2540;
     letter-spacing: 0.5px; flex-shrink: 0;
   }
   .org-block { flex: 1; }
   .org-name {
     font-family: Georgia, 'Times New Roman', serif;
-    font-size: 26pt; font-weight: 400; letter-spacing: 2px; color: #1a2540;
+    font-size: 22pt; font-weight: 400; letter-spacing: 2px; color: #1a2540;
     line-height: 1; text-transform: uppercase;
   }
   .nl-tag {
     font-family: 'Helvetica Neue', Arial, sans-serif;
-    font-size: 11pt; letter-spacing: 2px; color: #4a4a4a;
-    margin-top: 2mm;
+    font-size: 9.5pt; letter-spacing: 2px; color: #4a4a4a;
+    margin-top: 1.5mm;
   }
 
-  /* Title */
   .title {
     font-family: 'Helvetica Neue', Arial, sans-serif;
-    font-weight: 800; font-size: 19pt; line-height: 1.2;
-    color: #1a2540; margin: 5mm 0 6mm;
+    font-weight: 800; font-size: 15pt; line-height: 1.2;
+    color: #1a2540; margin: 3mm 0; flex-shrink: 0;
   }
 
-  /* Image */
   .hero {
-    width: 100%; height: 95mm; object-fit: cover;
+    width: 100%; height: 68mm; object-fit: cover;
     display: block; border: 1px solid #e0e0d8;
-    background: #eeeee8;
+    background: #eeeee8; flex-shrink: 0;
   }
 
-  /* Content grid */
-  .content { margin-top: 6mm; display: grid; grid-template-columns: 95mm 1fr; gap: 8mm; }
+  .content {
+    margin-top: 4mm;
+    display: grid; grid-template-columns: 88mm 1fr; gap: 6mm;
+    flex: 1; min-height: 0;
+  }
   .puces { width: 100%; border-collapse: collapse; }
   .puces tr { vertical-align: top; }
-  .puces td { padding: 2.5mm 0; }
-  .puces .ico {
-    width: 12mm; padding-right: 2mm; vertical-align: top;
-  }
-  .puces .ico svg { width: 8mm; height: 8mm; display: block; }
+  .puces td { padding: 1.3mm 0; }
+  .puces .ico { width: 10mm; padding-right: 2mm; vertical-align: top; }
+  .puces .ico svg { width: 7mm; height: 7mm; display: block; }
   .puce-label {
     font-family: 'Helvetica Neue', Arial, sans-serif;
-    font-weight: 700; font-size: 10pt; color: #1a1a1a; line-height: 1.25;
+    font-weight: 700; font-size: 9pt; color: #1a1a1a; line-height: 1.2;
   }
   .puce-desc {
     font-family: 'Helvetica Neue', Arial, sans-serif;
-    font-size: 9pt; color: #3a3a3a; margin-top: 0.6mm; line-height: 1.35;
+    font-size: 8pt; color: #3a3a3a; margin-top: 0.4mm; line-height: 1.3;
   }
   .paragraphe {
     font-family: Georgia, 'Times New Roman', serif;
-    font-size: 11.5pt; line-height: 1.55; color: #1a1a1a; text-align: justify;
+    font-size: 10.5pt; line-height: 1.45; color: #1a1a1a; text-align: justify;
   }
   .paragraphe strong { color: #1a2540; }
 
-  /* Footer */
   .footer {
-    margin-top: 8mm; padding-top: 5mm;
+    margin-top: 4mm; padding-top: 3mm;
     border-top: 1px dashed #b0b0a8;
     text-align: center;
     font-family: 'Helvetica Neue', Arial, sans-serif;
-    font-size: 10pt; color: #1a1a1a;
+    font-size: 9pt; color: #1a1a1a;
+    flex-shrink: 0;
   }
   .footer .web { font-weight: 700; }
-  .footer .contact { margin-top: 1.5mm; font-weight: 600; }
+  .footer .contact { margin-top: 1mm; font-weight: 600; }
   .footer .contact b { font-weight: 800; }
 </style></head>
 <body>
