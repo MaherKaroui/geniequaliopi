@@ -859,6 +859,32 @@ export function buildFullCatalog(
       );
     });
 
+    // ===== IND 10 — NEWSLETTERS DES 14 MISSIONS CFA (1 par mission, rangée dans le dossier de chaque mission) =====
+    const newsletters14 = [
+      { num: 1,  folder: "14_MISSIONS_CFA/Mission_1_Orientation_Handicap" },
+      { num: 2,  folder: "14_MISSIONS_CFA/Mission_2_Recherche_Employeur" },
+      { num: 3,  folder: "14_MISSIONS_CFA/Mission_3_Coherence_CFA_Entreprise" },
+      { num: 4,  folder: "14_MISSIONS_CFA/Mission_4_Droits_Devoirs_Sante_Securite" },
+      { num: 5,  folder: "14_MISSIONS_CFA/Mission_5_Rupture_Contrat" },
+      { num: 6,  folder: "14_MISSIONS_CFA/Mission_6_Accompagnement_Social_Materiel" },
+      { num: 7,  folder: "14_MISSIONS_CFA/Mission_7_Mixite_Egalite_FH" },
+      { num: 8,  folder: "14_MISSIONS_CFA/Mission_8_Egalite_Pro_Mixite_Metiers" },
+      { num: 9,  folder: "14_MISSIONS_CFA/Mission_9_Diversite_Discriminations" },
+      { num: 10, folder: "14_MISSIONS_CFA/Mission_10_Mobilite_Nationale" },
+      { num: 11, folder: "14_MISSIONS_CFA/Mission_11_Formation_Distance" },
+      { num: 12, folder: "14_MISSIONS_CFA/Mission_12_Evaluation_Competences" },
+      { num: 13, folder: "14_MISSIONS_CFA/Mission_13_Accompagnement_Post_Formation" },
+      { num: 14, folder: "14_MISSIONS_CFA/Mission_14_Acces_Aides" },
+    ];
+    newsletters14.forEach((n) => {
+      add(
+        `cfa_c3i10_newsletter_mission_${n.num}`,
+        `CT3 - IND 10 📁 14 MISSIONS / Mission ${n.num} – 📰 Newsletter N°${n.num}`,
+        3, 10, "newsletter_mission_cfa",
+        { missionNum: n.num, folder: n.folder },
+      );
+    });
+
     // ===== IND 14 — DOSSIER PERMIS B =====
     add("cfa_c3i14_permisb_aide_financement", "CT3 - IND 14 📁 PERMIS B – Aide au Financement Permis B", 3, 14, "pdf_static", { pdfUrl: "/pdfs/aide_financement_permis_b.pdf" });
     add("cfa_c3i14_permisb_bordereau_transmission", "CT3 - IND 14 📁 PERMIS B – Bordereau de Transmission", 3, 14, "pdf_static", { pdfUrl: "/pdfs/bordereau_transmission_permis_b.pdf" });
