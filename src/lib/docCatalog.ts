@@ -880,11 +880,6 @@ export function buildFullCatalog(
       );
     });
 
-    // ===== IND 14 — DOSSIER PERMIS B =====
-    add("cfa_c3i14_permisb_aide_financement", "CT3 - IND 14 📁 PERMIS B – Aide au Financement Permis B", 3, 14, "pdf_static", { pdfUrl: "/pdfs/aide_financement_permis_b.pdf" });
-    add("cfa_c3i14_permisb_bordereau_transmission", "CT3 - IND 14 📁 PERMIS B – Bordereau de Transmission", 3, 14, "pdf_static", { pdfUrl: "/pdfs/bordereau_transmission_permis_b.pdf" });
-    add("cfa_c3i14_permisb_formulaire_aide", "CT3 - IND 14 📁 PERMIS B – Formulaire Aide au Financement", 3, 14, "pdf_static", { pdfUrl: "/pdfs/formulaire_aide_financement_permis_b.pdf" });
-    add("cfa_c3i14_permisb_permis", "CT3 - IND 14 📁 PERMIS B – Permis B", 3, 14, "pdf_static", { pdfUrl: "/pdfs/permis_b.pdf" });
     add("cfa_c3i14_notice_aide_financiere_idf", "CT3 - IND 14 📁 NOTICE – Aide Financière Apprenti Île-de-France", 3, 14, "pdf_static", { pdfUrl: "/pdfs/notice_aide_financiere_apprenti_idf.pdf" });
 
     // ===== IND 14 — DOSSIER CITOYENNETÉ (Vie Publique) =====
