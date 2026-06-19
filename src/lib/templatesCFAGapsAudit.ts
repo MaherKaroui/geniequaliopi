@@ -119,39 +119,40 @@ export function genProcedureRespectCertificateurCFA(o: OrganismeInfo, f: Formati
 // IND 14 — Pages site : aides, ateliers CV & entretien
 // ============================================================================
 export function genPagesSiteAidesAteliersCFA(o: OrganismeInfo, f: FormationInfo) {
-  const site = o.siteWeb?.trim() || "[adresse du site web]";
-  const base = site.replace(/\/+$/, "");
-  const lien = (path: string) => `${base}${path}`;
   const aides = [
-    { titre: "Aides financières pour les apprentis", url: lien("/aides/aides-financieres"), desc: "Aide au permis de conduire (500€), aide au premier équipement, aide à la mobilité, aide au logement (Mobili-Jeune), prime d'activité." },
-    { titre: "Aides à la mobilité internationale", url: lien("/aides/mobilite-internationale"), desc: "Erasmus+ apprentissage, bourses régionales, accompagnement à la mobilité européenne pour les apprentis." },
-    { titre: "Aides au logement", url: lien("/aides/logement"), desc: "Mobili-Jeune (jusqu'à 100€/mois), APL, résidences jeunes travailleurs, garantie Visale." },
-    { titre: "Aides spécifiques handicap (Agefiph)", url: lien("/aides/handicap"), desc: "Aides à l'aménagement du poste, prime à l'apprentissage majorée, accompagnement par le référent handicap." },
-    { titre: "Aide au transport", url: lien("/aides/transport"), desc: "Prise en charge de l'abonnement transport en commun (50%) par l'employeur, aides régionales transport." },
+    { titre: "Guide officiel des aides aux alternants 2026", url: "https://labonnealternance.apprentissage.beta.gouv.fr/guide-alternant/les-aides-financieres-et-materielles", desc: "Portail officiel République Française regroupant l'ensemble des aides : logement, transport, restauration, équipement, mobilité internationale." },
+    { titre: "Aide MOBILI-JEUNE® – Action Logement", url: "https://mobilijeune.actionlogement.fr/", desc: "Aide au logement pour les alternants de moins de 30 ans : prise en charge d'une partie du loyer (jusqu'à 100 €/mois) pendant la durée du contrat." },
+    { titre: "Dispositifs logement alternants – Action Logement", url: "https://www.actionlogement.fr/salarie/alternant", desc: "Ensemble des dispositifs logement pour alternants : Mobili-Jeune, garantie Visale, avance Loca-Pass, aide à la mobilité." },
+    { titre: "Aide Mobili-Jeune – Service Public", url: "https://www.service-public.gouv.fr/particuliers/vosdroits/F33173", desc: "Fiche officielle Service-Public : conditions d'attribution, montant, démarches pour obtenir l'aide Mobili-Jeune." },
+    { titre: "Aides Agefiph (apprentis en situation de handicap)", url: "https://www.agefiph.fr/aides-financieres", desc: "Aides financières Agefiph pour les apprentis en situation de handicap : aménagement du poste, compensation, accompagnement RQTH." },
+    { titre: "Aide à l'apprentissage RQTH – Agefiph", url: "https://www.agefiph.fr/aides-financieres/aide-lembauche-en-contrat-dapprentissage-dune-personne-en-situation-de-handicap", desc: "Aide pouvant aller jusqu'à 3 000 € pour l'embauche en contrat d'apprentissage d'une personne en situation de handicap." },
+    { titre: "Mobilité européenne et internationale des alternants – Ministère du Travail", url: "https://travail-emploi.gouv.fr/la-mobilite-europeenne-et-internationale-des-alternants", desc: "Dispositif de mobilité Erasmus+ pour les apprentis : conditions, durée, financement, démarches auprès du CFA." },
+    { titre: "Mobilité des alternants Erasmus+ – Agence Erasmus+ France", url: "https://agence.erasmusplus.fr/priorites-et-thematiques/la-mobilite-des-alternants-avec-erasmus/", desc: "Agence officielle Erasmus+ France : informations pratiques, bourses, accompagnement pour partir en mobilité européenne pendant l'apprentissage." },
   ];
   const ateliers = [
-    { titre: "Atelier Rédaction de CV", url: lien("/ateliers/cv"), desc: "Méthodologie de rédaction, structuration, valorisation de l'expérience apprentissage, exemples de CV par secteur, relecture personnalisée." },
-    { titre: "Atelier Lettre de motivation", url: lien("/ateliers/lettre-motivation"), desc: "Construction d'une lettre percutante, adaptation au poste, conseils de mise en forme, exemples commentés." },
-    { titre: "Atelier Préparation à l'entretien d'embauche", url: lien("/ateliers/entretien-embauche"), desc: "Simulation d'entretien, questions fréquentes, posture, gestion du stress, négociation salariale, suivi post-entretien." },
-    { titre: "Atelier Recherche d'entreprise d'accueil", url: lien("/ateliers/recherche-entreprise"), desc: "Identification des entreprises cibles, prospection téléphonique et email, suivi des candidatures, relances." },
-    { titre: "Atelier LinkedIn & e-réputation", url: lien("/ateliers/linkedin"), desc: "Création et optimisation du profil LinkedIn, développement du réseau professionnel, gestion de l'identité numérique." },
-    { titre: "Atelier Projet professionnel", url: lien("/ateliers/projet-pro"), desc: "Bilan de compétences, identification des métiers cibles, construction du parcours post-apprentissage." },
+    { titre: "Ateliers « Préparer sa candidature » – France Travail", url: "https://www.francetravail.fr/candidat/les-ateliers-francetravail/ateliers-sur-les-techniques-de-r.html", desc: "Ateliers officiels France Travail (auto-inscription) : faire le point sur ses compétences, créer un CV clair et percutant, structurer sa candidature." },
+    { titre: "Préparer votre candidature – France Travail", url: "https://www.francetravail.fr/candidat/vos-recherches/preparer-votre-candidature.html", desc: "Conseils pratiques pour la rédaction du CV, de la lettre de motivation et la préparation de l'entretien d'embauche (avec vidéos et fiches méthode)." },
+    { titre: "Votre recherche d'emploi – France Travail", url: "https://www.francetravail.fr/candidat/votre-recherche-demploi.html", desc: "Espace dédié à la recherche d'emploi : profil de compétences, CV en ligne, services pour organiser sa recherche et retenir l'attention des recruteurs." },
+    { titre: "1 jeune 1 solution – Recherche d'entreprise et accompagnement", url: "https://www.1jeune1solution.gouv.fr/", desc: "Plateforme gouvernementale pour les jeunes : offres en alternance, aides, accompagnement à l'insertion, ressources CV/entretien." },
+    { titre: "La Bonne Alternance – Recherche d'entreprise", url: "https://labonnealternance.apprentissage.beta.gouv.fr/", desc: "Service officiel République Française pour identifier les entreprises qui recrutent en alternance et candidater directement." },
+    { titre: "CIDJ – Conseils CV, lettre, entretien", url: "https://www.cidj.com/", desc: "Centre d'Information et de Documentation Jeunesse : fiches pratiques CV, lettre de motivation, simulation d'entretien, orientation." },
   ];
-  const rowsAides = aides.map(a => [a.titre, `<a href="${a.url}">${a.url}</a>`, a.desc]);
-  const rowsAteliers = ateliers.map(a => [a.titre, `<a href="${a.url}">${a.url}</a>`, a.desc]);
+  const rowsAides = aides.map(a => [a.titre, `<a href="${a.url}" target="_blank" rel="noopener">${a.url}</a>`, a.desc]);
+  const rowsAteliers = ateliers.map(a => [a.titre, `<a href="${a.url}" target="_blank" rel="noopener">${a.url}</a>`, a.desc]);
   return buildDocument({
     org: o,
-    title: "PAGES SITE — AIDES, ATELIERS CV & ENTRETIEN",
-    subtitle: "Ressources mises à disposition des apprentis sur le site du CFA",
+    title: "PAGES & RESSOURCES EN LIGNE — AIDES, ATELIERS CV & ENTRETIEN",
+    subtitle: "Liens utiles communiqués aux apprentis du CFA",
     sections: [
-      { heading: "Objet", content: `<p>Le CFA <strong>${o.nom}</strong> met à disposition de ses apprentis un ensemble de ressources en ligne accessibles depuis son site internet (<a href="${site}">${site}</a>). Ces ressources visent à faciliter l'accès aux aides existantes et à accompagner les apprentis dans leurs démarches d'insertion professionnelle (rédaction de CV, préparation aux entretiens, recherche d'entreprise).</p>` },
-      { heading: "Pages dédiées aux aides", content: tableHTML(["Page", "Lien", "Contenu"], rowsAides) },
-      { heading: "Pages ateliers CV & entretien", content: tableHTML(["Atelier", "Lien", "Contenu"], rowsAteliers) },
-      { heading: "Accès et accompagnement", content: `<p>L'accès à ces pages est libre et gratuit pour tous les apprentis inscrits au CFA. Un accompagnement individuel peut être sollicité auprès de <strong>${o.responsablePedagogique || "la coordination pédagogique"}</strong> ou du <strong>référent handicap (${o.referentHandicap || "—"})</strong> pour les apprentis en situation de handicap.</p><p>Les ateliers en présentiel ou en distanciel sont planifiés tout au long de l'année et communiqués via la newsletter et l'espace apprenant.</p>` },
-      { heading: "Mise à jour", content: `<p>Les pages et liens sont mis à jour par le ${o.referentQualite || o.responsablePedagogique || "référent qualité"} dans le cadre de la veille socio-professionnelle. Toute évolution des aides (montants, conditions, dispositifs nouveaux) est intégrée dans un délai maximal de 30 jours.</p>` },
+      { heading: "Objet", content: `<p>Le CFA <strong>${o.nom}</strong> communique à ses apprentis un ensemble de liens vers les sites institutionnels et officiels permettant d'accéder aux aides existantes (logement, mobilité, handicap, mobilité internationale) et aux ressources d'accompagnement à l'insertion professionnelle (CV, lettre de motivation, préparation à l'entretien d'embauche, recherche d'entreprise).</p><p>Ces liens sont diffusés via le livret d'accueil, l'espace apprenant et lors des entretiens individuels de suivi.</p>` },
+      { heading: "Aides financières et sociales — sites officiels", content: tableHTML(["Ressource", "Lien officiel", "Contenu"], rowsAides) },
+      { heading: "Ateliers CV, lettre & entretien d'embauche — sites officiels", content: tableHTML(["Ressource", "Lien officiel", "Contenu"], rowsAteliers) },
+      { heading: "Accompagnement par le CFA", content: `<p>Un accompagnement individuel à la mobilisation de ces ressources peut être sollicité auprès de <strong>${o.responsablePedagogique || "la coordination pédagogique"}</strong>. Pour les apprentis en situation de handicap, le référent handicap <strong>${o.referentHandicap || "—"}</strong> oriente vers les dispositifs Agefiph adaptés.</p>` },
+      { heading: "Veille et mise à jour", content: `<p>Les liens et dispositifs sont vérifiés et mis à jour par le ${o.referentQualite || o.responsablePedagogique || "référent qualité"} dans le cadre de la veille socio-professionnelle. Toute évolution réglementaire (suppression, création, évolution des montants) est intégrée dans un délai maximal de 30 jours.</p>` },
     ],
   });
 }
+
 
 
 // ============================================================================
