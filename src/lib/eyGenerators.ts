@@ -953,7 +953,7 @@ export function genBilanFroidStagiaire(o: OrganismeInfo, f: FormationInfo, stagi
           <th ${td}>Question</th><th ${td} style="width:12%;">Pas du tout satisfait</th><th ${td} style="width:12%;">Peu satisfait</th><th ${td} style="width:12%;">Moyennement satisfait</th><th ${td} style="width:12%;">Très satisfait</th>
         </tr></thead><tbody>${qRowsVides}</tbody></table>` },
       { heading: "Commentaires, pistes d'amélioration", content: `<div style="padding:24px;background:#f9f9f9;border-left:3px solid ${pc()};margin:8px 0;min-height:80px;color:#999;font-style:italic;">— en attente du retour bénéficiaire —</div>` },
-    ], signatures: { type: "2", labels: ["Date et signature du stagiaire", "Visa de l'organisme"], names: ["", ""] }});
+    ]});
   }
 
   /* Réponses variées par stagiaire, garanties ≥ 90% « Très satisfait » (niveau 4)
@@ -1003,7 +1003,7 @@ export function genBilanFroidStagiaire(o: OrganismeInfo, f: FormationInfo, stagi
         <th ${td}>Question</th><th ${td} style="width:12%;">Pas du tout satisfait</th><th ${td} style="width:12%;">Peu satisfait</th><th ${td} style="width:12%;">Moyennement satisfait</th><th ${td} style="width:12%;">Très satisfait</th>
       </tr></thead><tbody>${qRows}</tbody></table>` },
     { heading: "Commentaires, pistes d'amélioration", content: `<p style="padding:12px;background:#f9f9f9;border-left:3px solid ${pc()};margin:8px 0;"><em>${commentaires[si % commentaires.length]}</em></p>` },
-  ], signatures: { type: "2", labels: ["Date et signature du stagiaire", "Visa de l'organisme"], names: [`${s.prenom} ${s.nom}`, o.nom||""], dates: [mentionDelai, mentionDelai], stagiaireSignatureUrl: s.signatureUrl }});
+  ]});
 }
 
 /* ═══ CODE 59 – Informations certifications (taux, blocs, passerelles) ═══ */
