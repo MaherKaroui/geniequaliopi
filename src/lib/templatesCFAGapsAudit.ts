@@ -115,6 +115,44 @@ export function genProcedureRespectCertificateurCFA(o: OrganismeInfo, f: Formati
 }
 
 
+// ============================================================================
+// IND 14 — Pages site : aides, ateliers CV & entretien
+// ============================================================================
+export function genPagesSiteAidesAteliersCFA(o: OrganismeInfo, f: FormationInfo) {
+  const site = o.siteWeb?.trim() || "[adresse du site web]";
+  const base = site.replace(/\/+$/, "");
+  const lien = (path: string) => `${base}${path}`;
+  const aides = [
+    { titre: "Aides financières pour les apprentis", url: lien("/aides/aides-financieres"), desc: "Aide au permis de conduire (500€), aide au premier équipement, aide à la mobilité, aide au logement (Mobili-Jeune), prime d'activité." },
+    { titre: "Aides à la mobilité internationale", url: lien("/aides/mobilite-internationale"), desc: "Erasmus+ apprentissage, bourses régionales, accompagnement à la mobilité européenne pour les apprentis." },
+    { titre: "Aides au logement", url: lien("/aides/logement"), desc: "Mobili-Jeune (jusqu'à 100€/mois), APL, résidences jeunes travailleurs, garantie Visale." },
+    { titre: "Aides spécifiques handicap (Agefiph)", url: lien("/aides/handicap"), desc: "Aides à l'aménagement du poste, prime à l'apprentissage majorée, accompagnement par le référent handicap." },
+    { titre: "Aide au transport", url: lien("/aides/transport"), desc: "Prise en charge de l'abonnement transport en commun (50%) par l'employeur, aides régionales transport." },
+  ];
+  const ateliers = [
+    { titre: "Atelier Rédaction de CV", url: lien("/ateliers/cv"), desc: "Méthodologie de rédaction, structuration, valorisation de l'expérience apprentissage, exemples de CV par secteur, relecture personnalisée." },
+    { titre: "Atelier Lettre de motivation", url: lien("/ateliers/lettre-motivation"), desc: "Construction d'une lettre percutante, adaptation au poste, conseils de mise en forme, exemples commentés." },
+    { titre: "Atelier Préparation à l'entretien d'embauche", url: lien("/ateliers/entretien-embauche"), desc: "Simulation d'entretien, questions fréquentes, posture, gestion du stress, négociation salariale, suivi post-entretien." },
+    { titre: "Atelier Recherche d'entreprise d'accueil", url: lien("/ateliers/recherche-entreprise"), desc: "Identification des entreprises cibles, prospection téléphonique et email, suivi des candidatures, relances." },
+    { titre: "Atelier LinkedIn & e-réputation", url: lien("/ateliers/linkedin"), desc: "Création et optimisation du profil LinkedIn, développement du réseau professionnel, gestion de l'identité numérique." },
+    { titre: "Atelier Projet professionnel", url: lien("/ateliers/projet-pro"), desc: "Bilan de compétences, identification des métiers cibles, construction du parcours post-apprentissage." },
+  ];
+  const rowsAides = aides.map(a => [a.titre, `<a href="${a.url}">${a.url}</a>`, a.desc]);
+  const rowsAteliers = ateliers.map(a => [a.titre, `<a href="${a.url}">${a.url}</a>`, a.desc]);
+  return buildDocument({
+    org: o,
+    title: "PAGES SITE — AIDES, ATELIERS CV & ENTRETIEN",
+    subtitle: "Ressources mises à disposition des apprentis sur le site du CFA",
+    sections: [
+      { heading: "Objet", content: `<p>Le CFA <strong>${o.nom}</strong> met à disposition de ses apprentis un ensemble de ressources en ligne accessibles depuis son site internet (<a href="${site}">${site}</a>). Ces ressources visent à faciliter l'accès aux aides existantes et à accompagner les apprentis dans leurs démarches d'insertion professionnelle (rédaction de CV, préparation aux entretiens, recherche d'entreprise).</p>` },
+      { heading: "Pages dédiées aux aides", content: tableHTML(["Page", "Lien", "Contenu"], rowsAides) },
+      { heading: "Pages ateliers CV & entretien", content: tableHTML(["Atelier", "Lien", "Contenu"], rowsAteliers) },
+      { heading: "Accès et accompagnement", content: `<p>L'accès à ces pages est libre et gratuit pour tous les apprentis inscrits au CFA. Un accompagnement individuel peut être sollicité auprès de <strong>${o.responsablePedagogique || "la coordination pédagogique"}</strong> ou du <strong>référent handicap (${o.referentHandicap || "—"})</strong> pour les apprentis en situation de handicap.</p><p>Les ateliers en présentiel ou en distanciel sont planifiés tout au long de l'année et communiqués via la newsletter et l'espace apprenant.</p>` },
+      { heading: "Mise à jour", content: `<p>Les pages et liens sont mis à jour par le ${o.referentQualite || o.responsablePedagogique || "référent qualité"} dans le cadre de la veille socio-professionnelle. Toute évolution des aides (montants, conditions, dispositifs nouveaux) est intégrée dans un délai maximal de 30 jours.</p>` },
+    ],
+  });
+}
+
 
 // ============================================================================
 // IND 16 — PV de session générique
