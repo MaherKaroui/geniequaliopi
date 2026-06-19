@@ -381,10 +381,9 @@ export function genAnnuairePartenairesHandicapCFA(o: OrganismeInfo) {
     org: o,
     title: `ANNUAIRE DES PARTENAIRES HANDICAP — APPRENTISSAGE`,
     sections: [
-      { heading: "Objet (Indicateur 26)", content: `<p>Annuaire mobilisé par le référent handicap du CFA <strong>${o.nom}</strong> (${o.referentHandicap}) pour l'accueil et l'accompagnement des apprentis PSH. Daté du ${todayLong()}.</p>` },
+      { heading: "Objet (Indicateur 26)", content: `<p>Annuaire mobilisé par le référent handicap du CFA <strong>${o.nom}</strong> (${o.referentHandicap}) pour l'accueil et l'accompagnement des apprentis PSH.</p>` },
     ],
     table: { headers: ["Partenaire", "Mission", "Contact", "Site"], rows },
-    signatures: { type: "2", labels: ["Référent handicap", "Direction"], names: [o.referentHandicap, o.dirigeant], dates: [todayLong(), todayLong()] },
   });
 }
 
