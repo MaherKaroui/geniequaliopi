@@ -921,6 +921,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "site_web_14_missions_cfa": return genSiteWeb14MissionsCFA(o);
     case "site_web_atelier_cv_cfa": return genSiteWebAtelierCVCFA(o);
     case "site_web_atelier_entretien_cfa": return genSiteWebAtelierEntretienCFA(o);
+    case "livret_referent_handicap_cfa": return genLivretReferentHandicapCFA(o);
     case "tableau_suivi_candidats_sans_contrat_cfa": return genTableauSuiviCandidatsSansContratCFA(o, f, stagiaires);
     case "attestation_formation_maitre_apprentissage_cfa": return genAttestationFormationMaitreApprentissageCFA(o, f, stagiaires);
     case "cooperation_cfa_entreprise_cfa": return genCoperationCFAEntrepriseCFA(o, f, stagiaires);
