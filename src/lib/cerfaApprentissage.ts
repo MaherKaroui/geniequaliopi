@@ -377,6 +377,8 @@ export async function genCerfaApprentissagePdf(
     if (sigRespImg) drawFitted(page2, sigRespImg, 30, 110, 150, 55);
     // Signature apprenti (centre, sous "Signature de l'apprenti(e)")
     if (sigStagImg) drawFitted(page2, sigStagImg, 220, 110, 150, 55);
+    // Signature représentant légal (droite) = signature du responsable d'entreprise
+    if (sigRespImg) drawFitted(page2, sigRespImg, 410, 110, 150, 55);
     // Tampon organisme dans la zone "Visa du CFA (cachet et signature du directeur)" (colonne gauche FORMATION)
     if (tamponImg) drawFitted(page2, tamponImg, 30, 290, 130, 90);
   }
