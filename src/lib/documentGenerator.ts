@@ -4492,7 +4492,7 @@ function genPVConseilPerfectionnement(o: OrganismeInfo, f: FormationInfo, stagia
   const now = new Date();
   const dateReunion = f.dateDebut ? (() => {
     const d = new Date(f.dateDebut);
-    d.setMonth(d.getMonth() + 3);
+    d.setMonth(d.getMonth() + 5);
     return formatDate(d.toISOString().slice(0, 10));
   })() : formatDate(new Date(now.getFullYear(), 9, 13).toISOString().slice(0, 10));
 
@@ -4508,12 +4508,12 @@ function genConvocationConseilPerfectionnement(o: OrganismeInfo, f: FormationInf
   const now = new Date();
   const dateReunion = f.dateDebut ? (() => {
     const d = new Date(f.dateDebut);
-    d.setMonth(d.getMonth() + 3);
+    d.setMonth(d.getMonth() + 5);
     return formatDate(d.toISOString().slice(0, 10));
   })() : formatDate(new Date(now.getFullYear(), 9, 13).toISOString().slice(0, 10));
   const dateLimite = f.dateDebut ? (() => {
     const d = new Date(f.dateDebut);
-    d.setMonth(d.getMonth() + 2);
+    d.setMonth(d.getMonth() + 4);
     d.setDate(d.getDate() + 15);
     return formatDate(d.toISOString().slice(0, 10));
   })() : "";
