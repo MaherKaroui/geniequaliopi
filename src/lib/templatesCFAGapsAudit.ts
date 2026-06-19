@@ -250,12 +250,30 @@ export function genCRReunionPedagogiqueCFA(o: OrganismeInfo, f: FormationInfo, s
 // ============================================================================
 // IND 19 — Guide d'assistance FOAD
 // ============================================================================
-export function genGuideAssistanceFOADCFA(o: OrganismeInfo) {
+export function genGuideAssistanceFOADCFA(o: OrganismeInfo, f?: FormationInfo) {
+  // Date de signature = 1 jour avant le début de la formation (jour ouvré)
+  let signatureDate = todayLong();
+  if (f?.dateDebut) {
+    const parts = f.dateDebut.includes('/') ? f.dateDebut.split('/') : f.dateDebut.split('-');
+    let d: Date | null = null;
+    if (parts.length === 3) {
+      d = f.dateDebut.includes('/')
+        ? new Date(+parts[2], +parts[1] - 1, +parts[0])
+        : new Date(+parts[0], +parts[1] - 1, +parts[2]);
+    }
+    if (d && !isNaN(d.getTime())) {
+      d.setDate(d.getDate() - 1);
+      // si week-end, reculer au vendredi
+      if (d.getDay() === 0) d.setDate(d.getDate() - 2);
+      else if (d.getDay() === 6) d.setDate(d.getDate() - 1);
+      signatureDate = d.toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" });
+    }
+  }
   return buildDocument({
     org: o,
     title: `GUIDE D'ASSISTANCE TECHNIQUE ET PÉDAGOGIQUE FOAD`,
     sections: [
-      { heading: "Cadre réglementaire", content: `<p>Conformément à l'article D.6313-3-1 du Code du travail, le CFA <strong>${o.nom}</strong> garantit aux apprenants en formation à distance une assistance technique et pédagogique appropriée.</p><p><em>Document daté du ${todayLong()}.</em></p>` },
+      { heading: "Cadre réglementaire", content: `<p>Conformément à l'article D.6313-3-1 du Code du travail, le CFA <strong>${o.nom}</strong> garantit aux apprenants en formation à distance une assistance technique et pédagogique appropriée.</p><p><em>Document daté du ${signatureDate}.</em></p>` },
       { heading: "Outils de classe virtuelle utilisés", content: `<p>La formation à distance est entièrement assurée via des outils de visioconférence :</p><p>• <strong>Zoom</strong> (plateforme principale) — version Education, hébergement UE, conforme RGPD<br>• <strong>Google Meet</strong> (plateforme de secours) — via le compte Google Workspace de l'organisme</p><p>Le lien de connexion (Zoom ou Google Meet), le code d'accès et le mot de passe sont transmis par email à chaque apprenant <strong>au plus tard 48h avant chaque session</strong>, avec un rappel automatique J-1.</p>` },
       { heading: "Procédure de connexion", content: `<p><strong>Zoom :</strong></p><p>1. Cliquer sur le lien reçu par email (format : https://zoom.us/j/XXXXXXXXXX)<br>2. Saisir le code d'accès si demandé<br>3. Autoriser micro et caméra<br>4. Renseigner Prénom NOM dans le champ "Nom"</p><p><strong>Google Meet :</strong></p><p>1. Cliquer sur le lien reçu par email (format : https://meet.google.com/xxx-xxxx-xxx)<br>2. Se connecter avec son compte Google (ou en invité)<br>3. Autoriser micro et caméra<br>4. Renseigner Prénom NOM</p><p>Des tutoriels vidéo Zoom et Google Meet sont envoyés à chaque apprenant <strong>avant le démarrage de la formation</strong>.</p>` },
       { heading: "Prérequis techniques apprenant", content: `<p>• Ordinateur (PC ou Mac), tablette ou smartphone récent<br>• <strong>Webcam et micro fonctionnels</strong> (casque audio recommandé)<br>• Connexion internet stable : minimum <strong>5 Mbps en réception, 2 Mbps en émission</strong><br>• Navigateur à jour : Chrome, Firefox, Edge ou Safari<br>• Application Zoom installée (gratuite) ou navigateur compatible Google Meet</p>` },
@@ -269,14 +287,14 @@ export function genGuideAssistanceFOADCFA(o: OrganismeInfo) {
             <td style="width:50%;vertical-align:top;padding:10px;border:1px solid #ddd">
               <p style="margin:0 0 6px 0"><strong>Responsable pédagogique</strong></p>
               <p style="margin:0">Nom : ${o.responsablePedagogique}</p>
-              <p style="margin:0">Date : ${todayLong()}</p>
+              <p style="margin:0">Date : ${signatureDate}</p>
               <p style="margin:8px 0 0 0">Signature :</p>
               ${o.signatureUrl ? `<img src="${o.signatureUrl}" alt="Signature" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px" />` : ""}
             </td>
             <td style="width:50%;vertical-align:top;padding:10px;border:1px solid #ddd">
               <p style="margin:0 0 6px 0"><strong>Le Dirigeant</strong></p>
               <p style="margin:0">Nom : ${o.dirigeant}</p>
-              <p style="margin:0">Date : ${todayLong()}</p>
+              <p style="margin:0">Date : ${signatureDate}</p>
               <p style="margin:8px 0 0 0">Cachet :</p>
               ${o.tamponUrl ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:80px;max-width:160px;object-fit:contain;margin-top:5px;opacity:0.9" />` : ""}
             </td>
