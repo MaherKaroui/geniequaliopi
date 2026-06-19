@@ -1503,17 +1503,12 @@ export function genPlanningDiffusion14MissionsCFA(o: OrganismeInfo, f: Formation
 
 // ============================================================================
 // SITE WEB — Page « Les 14 missions du CFA »
-// Reproduction d'une page web institutionnelle, dynamique selon l'organisme.
+// Version simple basée sur buildDocument : nom de l'organisme automatique
+// et pagination correcte à l'export PDF.
 // Texte officiel : Art. L.6231-2 du Code du travail (source DREETS Normandie).
 // ============================================================================
 export function genSiteWeb14MissionsCFA(o: OrganismeInfo) {
   const nom = o.nom || "Centre de Formation d'Apprentis";
-  const siteWeb = (o.siteWeb || `www.${nom.toLowerCase().replace(/[^a-z0-9]/g, "")}.fr`).replace(/^https?:\/\//, "");
-  const email = o.email || "";
-  const tel = o.telephone || "";
-  const adresse = `${o.adresse || ""} ${o.codePostal || ""} ${o.ville || ""}`.trim();
-  const annee = new Date().getFullYear();
-
   const missions: { n: number; titre: string; texte: string }[] = [
     { n: 1,  titre: "Orientation et accompagnement (y compris handicap)",
       texte: `Accompagner les personnes, <strong>y compris celles en situation de handicap</strong>, souhaitant s'orienter ou se réorienter par la voie de l'apprentissage, en développant leurs connaissances et leurs compétences et en facilitant leur intégration en emploi, en cohérence avec leur projet professionnel. Pour les personnes en situation de handicap, le CFA appuie la recherche d'un employeur et facilite leur intégration, en désignant un <strong>référent handicap</strong>.` },
@@ -1545,91 +1540,28 @@ export function genSiteWeb14MissionsCFA(o: OrganismeInfo) {
       texte: `Accompagner les apprentis dans leurs <strong>démarches pour accéder aux aides</strong> auxquelles ils peuvent prétendre au regard de la législation et de la réglementation en vigueur (logement <em>Mobili-Jeune</em>, <em>Visale</em>, <em>Loca-Pass</em>, restauration, mobilité, fonds social, premier équipement, prime d'activité). <em>L'aide au permis B est supprimée — Loi de finances 2026.</em>` },
   ];
 
-  const cards = missions.map(m => `
-    <div class="mission-card">
-      <div class="mission-num">Mission ${m.n.toString().padStart(2, "0")}</div>
-      <h3 class="mission-titre">${m.titre}</h3>
-      <p class="mission-texte">${m.texte}</p>
-    </div>`).join("");
+  const sections = missions.map(m => ({
+    heading: `Mission ${m.n.toString().padStart(2, "0")} — ${m.titre}`,
+    content: `<p>${m.texte}</p>`,
+  }));
 
-  const safeNom = nom.replace(/&/g, "&amp;");
+  sections.unshift({
+    heading: "Présentation",
+    content: `<p>Le centre de formation d'apprentis <strong>${nom}</strong> s'engage à accomplir l'ensemble des <strong>14 missions</strong> prévues par l'<strong>article L.6231-2 du Code du travail</strong>, au service de la réussite et de l'insertion professionnelle de ses apprentis.</p>`,
+  });
 
-  return `<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="utf-8">
-<title>${safeNom} — Les 14 missions du CFA</title>
-<style>
-  @page { size: A4; margin: 14mm; }
-  * { box-sizing: border-box; }
-  body { margin:0; padding:0; background:#f7fafc; font-family:'Helvetica Neue', Arial, sans-serif; color:#1a202c; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
-  .site-wrap { background:#ffffff; }
-  .navbar { background:#0f3a6b; color:#fff; padding:14px 28px; display:flex; align-items:center; justify-content:space-between; border-bottom:4px solid #f59e0b; }
-  .brand { font-weight:800; font-size:18pt; letter-spacing:0.5pt; }
-  .nav-links { font-size:10pt; opacity:0.9; }
-  .nav-links span { margin-left:18px; }
-  .hero { background: linear-gradient(135deg,#0f3a6b 0%, #1d4ed8 100%); color:#fff; padding:42px 32px 36px; }
-  .hero .breadcrumb { font-size:9.5pt; opacity:0.85; margin-bottom:8px; }
-  .hero h1 { margin:0 0 8px; font-size:26pt; font-weight:800; line-height:1.15; }
-  .hero p.lead { margin:0; font-size:11.5pt; opacity:0.95; max-width:720px; line-height:1.5; }
-  .container { padding:28px 32px; }
-  .intro { background:#eff6ff; border-left:4px solid #1d4ed8; padding:14px 18px; border-radius:4px; font-size:10.5pt; line-height:1.55; margin-bottom:24px; }
-  .intro strong { color:#0f3a6b; }
-  .missions-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
-  .mission-card { border:1px solid #e2e8f0; border-radius:6px; padding:14px 16px; background:#ffffff; page-break-inside:avoid; break-inside:avoid; }
-  .mission-num { display:inline-block; background:#f59e0b; color:#fff; font-weight:700; font-size:9pt; padding:2px 9px; border-radius:10px; letter-spacing:0.5pt; margin-bottom:8px; }
-  .mission-titre { margin:0 0 6px; font-size:11pt; font-weight:700; color:#0f3a6b; line-height:1.25; }
-  .mission-texte { margin:0; font-size:9.5pt; line-height:1.5; color:#2d3748; text-align:justify; }
-  .source-box { margin-top:22px; background:#f1f5f9; border:1px solid #cbd5e1; border-radius:6px; padding:12px 16px; font-size:9pt; line-height:1.5; color:#475569; }
-  .source-box strong { color:#0f3a6b; }
-  .footer { background:#0f3a6b; color:#cbd5e1; padding:18px 32px; font-size:8.5pt; line-height:1.55; margin-top:24px; }
-  .footer .f-brand { color:#fff; font-weight:700; font-size:10pt; margin-bottom:4px; }
-  .footer a { color:#93c5fd; text-decoration:none; }
-</style>
-</head>
-<body>
-<div class="site-wrap">
+  sections.push({
+    heading: "Référence officielle",
+    content: `<p><strong>Article L.6231-2 du Code du travail.</strong><br>Source : DREETS Normandie — « Missions et obligations des CFA » (Service Régional de Contrôle de la Formation Professionnelle).<br>Lien : <a href="https://normandie.dreets.gouv.fr/sites/normandie.dreets.gouv.fr/IMG/pdf/missions_et_obligations_des_cfa.pdf">normandie.dreets.gouv.fr — missions_et_obligations_des_cfa.pdf</a></p>`,
+  });
 
-  <div class="navbar">
-    <div class="brand">${safeNom}</div>
-    <div class="nav-links"><span>Accueil</span><span>Formations</span><span>Le CFA</span><span>Contact</span></div>
-  </div>
-
-  <div class="hero">
-    <div class="breadcrumb">Accueil &nbsp;›&nbsp; Le CFA &nbsp;›&nbsp; Les 14 missions</div>
-    <h1>Les 14 missions du CFA</h1>
-    <p class="lead">Le centre de formation d'apprentis <strong>${safeNom}</strong> s'engage à accomplir l'ensemble des 14 missions prévues par l'<strong>article L.6231-2 du Code du travail</strong>, au service de la réussite et de l'insertion professionnelle de ses apprentis.</p>
-  </div>
-
-  <div class="container">
-
-    <div class="intro">
-      Conformément à la réglementation en vigueur, ${safeNom} met en œuvre les <strong>14 missions officielles du CFA</strong> définies par l'article <strong>L.6231-2 du Code du travail</strong>. Vous trouverez ci-dessous la liste complète de ces missions, telles que prévues par la loi, et les engagements pris par notre centre pour les réaliser au quotidien (année ${annee}).
-    </div>
-
-    <div class="missions-grid">
-      ${cards}
-    </div>
-
-    <div class="source-box">
-      <strong>Référence officielle :</strong> Article L.6231-2 du Code du travail.<br>
-      Source : DREETS Normandie — « Missions et obligations des CFA » (Service Régional de Contrôle de la Formation Professionnelle).<br>
-      Lien : <a href="https://normandie.dreets.gouv.fr/sites/normandie.dreets.gouv.fr/IMG/pdf/missions_et_obligations_des_cfa.pdf">normandie.dreets.gouv.fr — missions_et_obligations_des_cfa.pdf</a>
-    </div>
-
-  </div>
-
-  <div class="footer">
-    <div class="f-brand">${safeNom}</div>
-    ${adresse ? `${adresse}<br>` : ""}
-    ${tel ? `Tél. ${tel} &nbsp;·&nbsp; ` : ""}${email ? `${email} &nbsp;·&nbsp; ` : ""}${siteWeb}<br>
-    SIRET ${o.siret || ""} &nbsp;·&nbsp; N° NDA ${o.nda || ""} &nbsp;·&nbsp; © ${annee} ${safeNom} — Tous droits réservés.
-  </div>
-
-</div>
-</body>
-</html>`;
+  return buildDocument({
+    org: o,
+    title: "LES 14 MISSIONS DU CFA",
+    sections,
+  });
 }
+
 
 
 // ============================================================================
