@@ -2538,7 +2538,13 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
         <tr><td>Taux de satisfaction globale</td><td>100%</td></tr>
         <tr><td>Nombre d'apprentis formés</td><td>${nbStagiaires}</td></tr>
         <tr><td>Taux de réussite à la certification</td><td>100%</td></tr>
+        ${isNTCProg ? `
+        <tr><td>Taux national d'insertion professionnelle à 6 mois <em>(source InserJeunes)</em></td><td>50%</td></tr>
+        <tr><td>Taux national de poursuite d'études <em>(source InserJeunes)</em></td><td>33%</td></tr>
+        <tr><td>Taux national de rupture des contrats d'apprentissage <em>(source InserJeunes)</em></td><td>44%</td></tr>
+        ` : `
         <tr><td>Taux national</td><td>82%</td></tr>
+        `}
         <tr><td>Taux de retour enquêtes</td><td>100%</td></tr>
         <tr><td>Taux d'abandon</td><td>0%</td></tr>
         <tr><td>Taux d'interruption de parcours</td><td>0%</td></tr>
@@ -2546,13 +2552,20 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
         <tr><td>Taux de rupture en alternance</td><td>0%</td></tr>
       </table>
       <p style="margin-top:8px"><em>Indicateurs consolidés à l'issue de la promotion ${anneeFormation} – ${nbStagiaires} ${nbStagiaires > 1 ? "apprentis" : "apprenti"}. Données publiées annuellement (InserJeunes / France Compétences)${o.siteWeb && o.siteWeb.trim() ? ` sur ${isFacebookPage(o.siteWeb) ? 'la page Facebook' : 'le site internet'} de ${o.nom}` : ''}.</em></p>
+      ${isNTCProg ? `<p style="margin-top:6px;font-size:11px"><strong>Source officielle (preuve) :</strong> <a href="https://www.inserjeunes.education.gouv.fr/diffusion/formation?formation=AUTRE_5$31203$TH5-T" target="_blank" style="color:hsl(220,60%,50%)">InserJeunes – TH5 T Négociateur Technico-Commercial (apprentissage)</a> – Ministère de l'Éducation nationale / France Compétences.</p>` : ''}
       ` : `
       <table>
         <tr><th style="width:55%">Indicateur</th><th>Statut</th></tr>
         <tr><td>Taux de satisfaction globale</td><td><em>En cours – disponible à l'issue de la promotion</em></td></tr>
         <tr><td>Nombre d'apprentis inscrits</td><td>${nbStagiaires}</td></tr>
         <tr><td>Taux de réussite à la certification</td><td><em>En cours – disponible à l'issue des examens</em></td></tr>
+        ${isNTCProg ? `
+        <tr><td>Taux national d'insertion professionnelle à 6 mois <em>(source InserJeunes)</em></td><td>50%</td></tr>
+        <tr><td>Taux national de poursuite d'études <em>(source InserJeunes)</em></td><td>33%</td></tr>
+        <tr><td>Taux national de rupture des contrats d'apprentissage <em>(source InserJeunes)</em></td><td>44%</td></tr>
+        ` : `
         <tr><td>Taux national</td><td>82%</td></tr>
+        `}
         <tr><td>Taux de retour enquêtes</td><td><em>En cours – enquête de fin de formation</em></td></tr>
         <tr><td>Taux d'abandon</td><td>0% (à date)</td></tr>
         <tr><td>Taux d'interruption de parcours</td><td>0% (à date)</td></tr>
@@ -2560,6 +2573,7 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
         <tr><td>Taux de rupture en alternance</td><td>0% (à date)</td></tr>
       </table>
       <p style="margin-top:8px"><em>Promotion ${anneeFormation} en cours – les indicateurs définitifs seront publiés à l'issue de la session${o.siteWeb && o.siteWeb.trim() ? ` sur ${isFacebookPage(o.siteWeb) ? 'la page Facebook' : 'le site internet'} de ${o.nom}` : ''}.</em></p>
+      ${isNTCProg ? `<p style="margin-top:6px;font-size:11px"><strong>Source officielle (preuve) :</strong> <a href="https://www.inserjeunes.education.gouv.fr/diffusion/formation?formation=AUTRE_5$31203$TH5-T" target="_blank" style="color:hsl(220,60%,50%)">InserJeunes – TH5 T Négociateur Technico-Commercial (apprentissage)</a> – Ministère de l'Éducation nationale / France Compétences.</p>` : ''}
       `) : isFormationTerminee(f, stagiaires) ? `
       <table>
         <tr><th>Indicateur</th><th>Résultat</th></tr>
