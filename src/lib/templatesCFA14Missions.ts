@@ -1499,3 +1499,134 @@ export function genPlanningDiffusion14MissionsCFA(o: OrganismeInfo, f: Formation
     ],
   });
 }
+
+
+// ============================================================================
+// SITE WEB — Page « Les 14 missions du CFA »
+// Reproduction d'une page web institutionnelle, dynamique selon l'organisme.
+// Texte officiel : Art. L.6231-2 du Code du travail (source DREETS Normandie).
+// ============================================================================
+export function genSiteWeb14MissionsCFA(o: OrganismeInfo) {
+  const nom = o.nom || "Centre de Formation d'Apprentis";
+  const siteWeb = (o.siteWeb || `www.${nom.toLowerCase().replace(/[^a-z0-9]/g, "")}.fr`).replace(/^https?:\/\//, "");
+  const email = o.email || "";
+  const tel = o.telephone || "";
+  const adresse = `${o.adresse || ""} ${o.codePostal || ""} ${o.ville || ""}`.trim();
+  const annee = new Date().getFullYear();
+
+  const missions: { n: number; titre: string; texte: string }[] = [
+    { n: 1,  titre: "Orientation et accompagnement (y compris handicap)",
+      texte: `Accompagner les personnes, <strong>y compris celles en situation de handicap</strong>, souhaitant s'orienter ou se réorienter par la voie de l'apprentissage, en développant leurs connaissances et leurs compétences et en facilitant leur intégration en emploi, en cohérence avec leur projet professionnel. Pour les personnes en situation de handicap, le CFA appuie la recherche d'un employeur et facilite leur intégration, en désignant un <strong>référent handicap</strong>.` },
+    { n: 2,  titre: "Aide à la recherche d'un employeur",
+      texte: `Appuyer et accompagner les postulants à l'apprentissage dans leur <strong>recherche d'un employeur</strong>.` },
+    { n: 3,  titre: "Cohérence formation CFA / entreprise",
+      texte: `Assurer la <strong>cohérence entre la formation dispensée au CFA et celle dispensée en entreprise</strong>, en particulier en organisant la coopération entre les formateurs et les maîtres d'apprentissage.` },
+    { n: 4,  titre: "Information droits, devoirs, santé et sécurité au travail",
+      texte: `Informer, dès le début de leur formation, les apprentis de leurs <strong>droits et devoirs</strong> en tant qu'apprentis et en tant que salariés, ainsi que des règles applicables en matière de <strong>santé et de sécurité en milieu professionnel</strong>.` },
+    { n: 5,  titre: "Maintien en formation 6 mois en cas de rupture",
+      texte: `Permettre aux apprentis en rupture de contrat <strong>la poursuite de leur formation pendant six mois</strong> tout en les accompagnant dans la recherche d'un nouvel employeur, en lien avec le service public de l'emploi (art. L.6342-1 et L.6341-1).` },
+    { n: 6,  titre: "Accompagnement social et matériel",
+      texte: `Apporter, en lien avec le service public de l'emploi (notamment les <strong>missions locales</strong>), un accompagnement aux apprentis pour <strong>prévenir ou résoudre les difficultés d'ordre social et matériel</strong> susceptibles de mettre en péril le déroulement du contrat d'apprentissage.` },
+    { n: 7,  titre: "Mixité et égalité Femmes – Hommes",
+      texte: `Favoriser la <strong>mixité</strong> au sein du CFA en sensibilisant formateurs, maîtres d'apprentissage et apprentis à <strong>l'égalité entre les femmes et les hommes</strong> ainsi qu'à la <strong>prévention du harcèlement sexuel</strong> au travail, et participer à la lutte contre la répartition sexuée des métiers.` },
+    { n: 8,  titre: "Mixité des métiers et égalité professionnelle",
+      texte: `Encourager la <strong>mixité des métiers</strong> et l'<strong>égalité professionnelle</strong> entre les femmes et les hommes en organisant des actions d'information à destination des apprentis.` },
+    { n: 9,  titre: "Diversité et lutte contre les discriminations",
+      texte: `Favoriser, au-delà de l'égalité F/H, la <strong>diversité</strong> au sein du CFA en sensibilisant formateurs, maîtres d'apprentissage et apprentis à l'<strong>égalité des chances</strong> et à la <strong>lutte contre toutes formes de discriminations</strong>.` },
+    { n: 10, titre: "Mobilité nationale et internationale",
+      texte: `Encourager la <strong>mobilité nationale et internationale</strong> des apprentis en nommant un personnel dédié (référent mobilité) mobilisant, au niveau national, les ressources locales et, au niveau international, les <strong>programmes de l'Union européenne</strong> (Erasmus+).` },
+    { n: 11, titre: "Suivi et accompagnement de la formation à distance",
+      texte: `Assurer le <strong>suivi et l'accompagnement des apprentis</strong> lorsque la formation est dispensée en tout ou partie <strong>à distance</strong> (art. L.6211-2, 2°).` },
+    { n: 12, titre: "Évaluation des compétences acquises",
+      texte: `Évaluer les <strong>compétences acquises</strong> par les apprentis, y compris sous la forme d'un <strong>contrôle continu</strong>, dans le respect des règles définies par chaque organisme certificateur.` },
+    { n: 13, titre: "Accompagnement vers la poursuite de formation",
+      texte: `Accompagner les apprentis ayant <strong>interrompu leur formation</strong> ou n'ayant pas, à l'issue de leur formation, <strong>obtenu de diplôme ou de titre à finalité professionnelle</strong>, vers les personnes et organismes susceptibles de les accompagner dans la définition d'un <strong>projet de poursuite de formation</strong>.` },
+    { n: 14, titre: "Accès aux aides des apprentis",
+      texte: `Accompagner les apprentis dans leurs <strong>démarches pour accéder aux aides</strong> auxquelles ils peuvent prétendre au regard de la législation et de la réglementation en vigueur (logement <em>Mobili-Jeune</em>, <em>Visale</em>, <em>Loca-Pass</em>, restauration, mobilité, fonds social, premier équipement, prime d'activité). <em>L'aide au permis B est supprimée — Loi de finances 2026.</em>` },
+  ];
+
+  const cards = missions.map(m => `
+    <div class="mission-card">
+      <div class="mission-num">Mission ${m.n.toString().padStart(2, "0")}</div>
+      <h3 class="mission-titre">${m.titre}</h3>
+      <p class="mission-texte">${m.texte}</p>
+    </div>`).join("");
+
+  const safeNom = nom.replace(/&/g, "&amp;");
+
+  return `<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>${safeNom} — Les 14 missions du CFA</title>
+<style>
+  @page { size: A4; margin: 14mm; }
+  * { box-sizing: border-box; }
+  body { margin:0; padding:0; background:#f7fafc; font-family:'Helvetica Neue', Arial, sans-serif; color:#1a202c; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .site-wrap { background:#ffffff; }
+  .navbar { background:#0f3a6b; color:#fff; padding:14px 28px; display:flex; align-items:center; justify-content:space-between; border-bottom:4px solid #f59e0b; }
+  .brand { font-weight:800; font-size:18pt; letter-spacing:0.5pt; }
+  .nav-links { font-size:10pt; opacity:0.9; }
+  .nav-links span { margin-left:18px; }
+  .hero { background: linear-gradient(135deg,#0f3a6b 0%, #1d4ed8 100%); color:#fff; padding:42px 32px 36px; }
+  .hero .breadcrumb { font-size:9.5pt; opacity:0.85; margin-bottom:8px; }
+  .hero h1 { margin:0 0 8px; font-size:26pt; font-weight:800; line-height:1.15; }
+  .hero p.lead { margin:0; font-size:11.5pt; opacity:0.95; max-width:720px; line-height:1.5; }
+  .container { padding:28px 32px; }
+  .intro { background:#eff6ff; border-left:4px solid #1d4ed8; padding:14px 18px; border-radius:4px; font-size:10.5pt; line-height:1.55; margin-bottom:24px; }
+  .intro strong { color:#0f3a6b; }
+  .missions-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .mission-card { border:1px solid #e2e8f0; border-radius:6px; padding:14px 16px; background:#ffffff; page-break-inside:avoid; break-inside:avoid; }
+  .mission-num { display:inline-block; background:#f59e0b; color:#fff; font-weight:700; font-size:9pt; padding:2px 9px; border-radius:10px; letter-spacing:0.5pt; margin-bottom:8px; }
+  .mission-titre { margin:0 0 6px; font-size:11pt; font-weight:700; color:#0f3a6b; line-height:1.25; }
+  .mission-texte { margin:0; font-size:9.5pt; line-height:1.5; color:#2d3748; text-align:justify; }
+  .source-box { margin-top:22px; background:#f1f5f9; border:1px solid #cbd5e1; border-radius:6px; padding:12px 16px; font-size:9pt; line-height:1.5; color:#475569; }
+  .source-box strong { color:#0f3a6b; }
+  .footer { background:#0f3a6b; color:#cbd5e1; padding:18px 32px; font-size:8.5pt; line-height:1.55; margin-top:24px; }
+  .footer .f-brand { color:#fff; font-weight:700; font-size:10pt; margin-bottom:4px; }
+  .footer a { color:#93c5fd; text-decoration:none; }
+</style>
+</head>
+<body>
+<div class="site-wrap">
+
+  <div class="navbar">
+    <div class="brand">${safeNom}</div>
+    <div class="nav-links"><span>Accueil</span><span>Formations</span><span>Le CFA</span><span>Contact</span></div>
+  </div>
+
+  <div class="hero">
+    <div class="breadcrumb">Accueil &nbsp;›&nbsp; Le CFA &nbsp;›&nbsp; Les 14 missions</div>
+    <h1>Les 14 missions du CFA</h1>
+    <p class="lead">Le centre de formation d'apprentis <strong>${safeNom}</strong> s'engage à accomplir l'ensemble des 14 missions prévues par l'<strong>article L.6231-2 du Code du travail</strong>, au service de la réussite et de l'insertion professionnelle de ses apprentis.</p>
+  </div>
+
+  <div class="container">
+
+    <div class="intro">
+      Conformément à la réglementation en vigueur, ${safeNom} met en œuvre les <strong>14 missions officielles du CFA</strong> définies par l'article <strong>L.6231-2 du Code du travail</strong>. Vous trouverez ci-dessous la liste complète de ces missions, telles que prévues par la loi, et les engagements pris par notre centre pour les réaliser au quotidien (année ${annee}).
+    </div>
+
+    <div class="missions-grid">
+      ${cards}
+    </div>
+
+    <div class="source-box">
+      <strong>Référence officielle :</strong> Article L.6231-2 du Code du travail.<br>
+      Source : DREETS Normandie — « Missions et obligations des CFA » (Service Régional de Contrôle de la Formation Professionnelle).<br>
+      Lien : <a href="https://normandie.dreets.gouv.fr/sites/normandie.dreets.gouv.fr/IMG/pdf/missions_et_obligations_des_cfa.pdf">normandie.dreets.gouv.fr — missions_et_obligations_des_cfa.pdf</a>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    <div class="f-brand">${safeNom}</div>
+    ${adresse ? `${adresse}<br>` : ""}
+    ${tel ? `Tél. ${tel} &nbsp;·&nbsp; ` : ""}${email ? `${email} &nbsp;·&nbsp; ` : ""}${siteWeb}<br>
+    SIRET ${o.siret || ""} &nbsp;·&nbsp; N° NDA ${o.nda || ""} &nbsp;·&nbsp; © ${annee} ${safeNom} — Tous droits réservés.
+  </div>
+
+</div>
+</body>
+</html>`;
+}

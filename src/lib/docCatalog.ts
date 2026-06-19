@@ -1240,7 +1240,7 @@ export function buildFullCatalog(
     add("cfa_siteweb_reglement_interieur", "📁 SITE WEB – Règlement intérieur", 3, 9, "reglement_interieur_cfa_v2", { genericStagiaire: true, stagiaireIdx: 0 });
     add("cfa_siteweb_annexes_reglement", "📁 SITE WEB – Annexes du règlement intérieur", 3, 9, "pdf_static", { pdfUrl: "/pdfs/site_web/annexes_reglement_interieur.pdf" });
     add("cfa_siteweb_droits_devoirs", "📁 SITE WEB – Droits et devoirs de l'apprenti", 3, 9, "droits_devoirs_apprenti_cfa", { genericStagiaire: true });
-    add("cfa_siteweb_14_missions", "📁 SITE WEB – Les 14 missions du CFA", 3, 10, "pdf_static", { pdfUrl: "/pdfs/site_web/14_missions_cfa.pdf" });
+    add("cfa_siteweb_14_missions", "📁 SITE WEB – Les 14 missions du CFA", 3, 10, "site_web_14_missions_cfa");
     add("cfa_siteweb_livret_accueil", "📁 SITE WEB – Livret d'accueil de l'apprenti", 3, 9, "livret_accueil_cfa_v2", { genericStagiaire: true, stagiaireIdx: 0 });
     add("cfa_siteweb_livret_apprentissage", "📁 SITE WEB – Livret d'apprentissage", 2, 5, "livret_apprentissage_cfa_v2", { genericStagiaire: true, stagiaireIdx: 0 });
     add("cfa_siteweb_aide_permis", "📁 SITE WEB – L'aide au permis B", 3, 14, "pdf_static", { pdfUrl: "/pdfs/aide_financement_permis_b.pdf" });
