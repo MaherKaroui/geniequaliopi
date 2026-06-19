@@ -638,7 +638,7 @@ export function buildFullCatalog(
 
     // Mission 13 — Accompagnement post-formation (interruption / non-diplômés)
     add("cfa_mission13_accompagnement_post_formation", "CT3 - IND 10 📁 14 MISSIONS / Mission 13 – Procédure d'accompagnement post-formation", 3, 10, "procedure_accompagnement_post_formation_cfa", { folder: "14_MISSIONS_CFA/Mission_13_Accompagnement_Post_Formation" });
-    add("cfa_mission13_suivi_insertion", "CT7 - IND 30 📁 14 MISSIONS / Mission 13 – Suivi insertion / poursuite parcours à 6 mois", 7, 30, "suivi_insertion_pro_cfa", { folder: "14_MISSIONS_CFA/Mission_13_Accompagnement_Post_Formation" });
+    
 
     // Mission 14 — Accès aux aides des apprentis
     add("cfa_mission14_acces_aides", "CT3 - IND 10 📁 14 MISSIONS / Mission 14 – Procédure d'accompagnement à l'accès aux aides", 3, 10, "procedure_accompagnement_educatif_social_cfa", { folder: "14_MISSIONS_CFA/Mission_14_Acces_Aides" });
