@@ -342,7 +342,7 @@ export function buildFullCatalog(
 
     // IND 27 — Sous-traitance et partenariats
     add("af_c6i27_partenaires", "CT6 - IND 27 LES PARTENAIRES", 6, 27, "liste_partenaires");
-    add("af_c6i27_contrat_sous_traitance", "CT6 - IND 27 CONTRAT DE SOUS-TRAITANCE DE FORMATEUR", 6, 27, "contrat_sous_traitance_v2");
+    if (hasExternalFormateur) add("af_c6i27_contrat_sous_traitance", "CT6 - IND 27 CONTRAT DE SOUS-TRAITANCE DE FORMATEUR", 6, 27, "contrat_sous_traitance_v2");
     add("af_c6i27_charte_qualite_formateur", "CT6 - IND 27 CHARTE QUALITÉ FORMATEUR EXTERNE", 6, 27, "charte_qualite_formateur_externe");
     add("af_c6i27_mandat_qualiopi", "CT6 - IND 27 MANDAT DE PRÉSENTATION ET DE GESTION QUALIOPI", 6, 27, "mandat_qualiopi");
     add("af_c6i27_pdf_guide_qualiopi", "CT6 - IND 27 V9 GUIDE DE LECTURE QUALIOPI", 6, 27, "pdf_static", { pdfFile: "v9_guide_lecture_qualiopi.pdf" });
@@ -362,7 +362,7 @@ export function buildFullCatalog(
       const fmtShortCk = (d: string) => d ? d.split("-").reverse().join("/") : "";
       Array.from(sessionsMapCk.values()).forEach((sess, idx) => {
         const label = sess.debut && sess.fin ? `Session ${fmtShortCk(sess.debut)} – ${fmtShortCk(sess.fin)}` : `Session ${idx + 1}`;
-        add(`af_c6i27_checklist_formateur_s${idx}`, `CT6 - IND 27 CHECKLIST FORMATEUR – ${label}`, 6, 27, "checklist_formateur", { sessionDebut: sess.debut, sessionFin: sess.fin });
+        if (hasExternalFormateur) add(`af_c6i27_checklist_formateur_s${idx}`, `CT6 - IND 27 CHECKLIST FORMATEUR – ${label}`, 6, 27, "checklist_formateur", { sessionDebut: sess.debut, sessionFin: sess.fin });
       });
     }
 
@@ -1081,7 +1081,7 @@ export function buildFullCatalog(
 
     // IND 27 — Sous-traitance et partenariats
     add("cfa_c6i27_partenaires", "CT6 - IND 27 LES PARTENAIRES", 6, 27, "liste_partenaires");
-    add("cfa_c6i27_contrat_sous_traitance", "CT6 - IND 27 CONTRAT DE SOUS-TRAITANCE DE FORMATEUR", 6, 27, "contrat_sous_traitance_v2");
+    if (hasExternalFormateur) add("cfa_c6i27_contrat_sous_traitance", "CT6 - IND 27 CONTRAT DE SOUS-TRAITANCE DE FORMATEUR", 6, 27, "contrat_sous_traitance_v2");
     add("cfa_c6i27_charte_qualite_formateur", "CT6 - IND 27 CHARTE QUALITÉ FORMATEUR EXTERNE", 6, 27, "charte_qualite_formateur_externe");
     add("cfa_c6i27_mandat_qualiopi", "CT6 - IND 27 MANDAT DE PRÉSENTATION ET DE GESTION QUALIOPI", 6, 27, "mandat_qualiopi");
     add("cfa_c6i27_pdf_guide_qualiopi", "CT6 - IND 27 V9 GUIDE DE LECTURE QUALIOPI", 6, 27, "pdf_static", { pdfFile: "v9_guide_lecture_qualiopi.pdf" });
@@ -1101,7 +1101,7 @@ export function buildFullCatalog(
       const fmtShortCkC = (d: string) => d ? d.split("-").reverse().join("/") : "";
       Array.from(sessionsMapCkC.values()).forEach((sess, idx) => {
         const label = sess.debut && sess.fin ? `Session ${fmtShortCkC(sess.debut)} – ${fmtShortCkC(sess.fin)}` : `Session ${idx + 1}`;
-        add(`cfa_c6i27_checklist_formateur_s${idx}`, `CT6 - IND 27 CHECKLIST FORMATEUR – ${label}`, 6, 27, "checklist_formateur", { sessionDebut: sess.debut, sessionFin: sess.fin });
+        if (hasExternalFormateur) add(`cfa_c6i27_checklist_formateur_s${idx}`, `CT6 - IND 27 CHECKLIST FORMATEUR – ${label}`, 6, 27, "checklist_formateur", { sessionDebut: sess.debut, sessionFin: sess.fin });
       });
     }
 
@@ -1200,7 +1200,7 @@ export function buildFullCatalog(
     add("cfa_c4i20_lettre_mission_handicap", "CT4 - IND 20 LETTRE DE MISSION RÉFÉRENT HANDICAP", 4, 20, "lettre_mission_referent_handicap_cfa");
     // IND 21 — Grilles recrutement + évaluation (retirées)
     // IND 22 — Entretien professionnel annuel
-    add("cfa_c5i22_entretien_pro_annuel", "CT5 - IND 22 ENTRETIEN PROFESSIONNEL ANNUEL INTERVENANT", 5, 22, "entretien_professionnel_annuel_cfa");
+    if (hasExternalFormateur) add("cfa_c5i22_entretien_pro_annuel", "CT5 - IND 22 ENTRETIEN PROFESSIONNEL ANNUEL INTERVENANT", 5, 22, "entretien_professionnel_annuel_cfa");
     // IND 26 — Annuaire partenaires handicap
     add("cfa_c6i26_annuaire_handicap", "CT6 - IND 26 ANNUAIRE PARTENAIRES HANDICAP APPRENTISSAGE", 6, 26, "annuaire_partenaires_handicap_cfa");
     // IND 29 — Questionnaires entreprise/MA + financeur
