@@ -621,6 +621,5 @@ export function genPlanInsertionReductionRupturesCFA(o: OrganismeInfo, f: Format
       },
       { heading: "Indicateurs de pilotage", content: `<p>• Taux de rupture des contrats d'apprentissage<br>• Taux d'insertion à 6 mois<br>• Taux de poursuite d'études<br>• Taux d'obtention de la certification</p><p>Ces indicateurs seront publiés annuellement et croisés avec les données InserJeunes.</p>` },
     ],
-    signatures: { type: "2", labels: ["Référent qualité", "Direction"], names: [o.referentQualite, o.dirigeant], dates: [todayLong(), todayLong()] },
   });
 }
