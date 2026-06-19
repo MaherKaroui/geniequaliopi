@@ -495,8 +495,6 @@ export function buildFullCatalog(
     // Indicateur 16 - Présentation certification
     formations.forEach((f, fi) => {
       stagiaires.forEach((s, si) => {
-        add(`cfa_c3i16_livret_${fi}_${si}`, `Livret d'apprentissage – ${s.prenom} ${s.nom}`, 3, 16, "livre_apprentissage_cfa", { fi, stagiaireIdx: si });
-        add(`cfa_c3i16_suivi_tuteur_${fi}_${si}`, `Fiche suivi tuteur – ${s.prenom} ${s.nom}`, 3, 16, "fiche_suivi_tuteur", { fi, stagiaireIdx: si });
         if (f.codeRNCP) {
           add(`cfa_c3i16_attestation_reussite_${fi}_${si}`, `CT3 - IND 16 ATTESTATION DE RÉUSSITE – ${s.prenom} ${s.nom}`, 3, 16, "attestation_reussite_stagiaire", { fi, stagiaireIdx: si });
         }
