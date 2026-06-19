@@ -387,9 +387,11 @@ export function buildFullCatalog(
         sessionsMap.set("default", { debut: f0?.dateDebut || "", fin: f0?.dateFin || "" });
       }
       const fmtShort = (d: string) => d ? d.split("-").reverse().join("/") : "";
+      const _now = new Date();
       Array.from(sessionsMap.values()).forEach((sess, idx) => {
         const label = sess.debut && sess.fin ? `Session ${fmtShort(sess.debut)} – ${fmtShort(sess.fin)}` : `Session ${idx + 1}`;
-        add(`af_c7i30_autoevaluation_formateur_s${idx}`, `CT7 - IND 30 AUTO-ÉVALUATION FORMATEUR – ${label}`, 7, 30, "autoevaluation_formateur", { sessionDebut: sess.debut, sessionFin: sess.fin });
+        const finPassee = sess.fin ? new Date(sess.fin) < _now : false;
+        if (finPassee) add(`af_c7i30_autoevaluation_formateur_s${idx}`, `CT7 - IND 30 AUTO-ÉVALUATION FORMATEUR – ${label}`, 7, 30, "autoevaluation_formateur", { sessionDebut: sess.debut, sessionFin: sess.fin });
       });
     }
     // Bilan à chaud — un fichier par stagiaire
@@ -1136,9 +1138,11 @@ export function buildFullCatalog(
         sessionsMap.set("default", { debut: f0?.dateDebut || "", fin: f0?.dateFin || "" });
       }
       const fmtShort = (d: string) => d ? d.split("-").reverse().join("/") : "";
+      const _nowC = new Date();
       Array.from(sessionsMap.values()).forEach((sess, idx) => {
         const label = sess.debut && sess.fin ? `Session ${fmtShort(sess.debut)} – ${fmtShort(sess.fin)}` : `Session ${idx + 1}`;
-        add(`cfa_c7i30_autoevaluation_formateur_s${idx}`, `CT7 - IND 30 AUTO-ÉVALUATION FORMATEUR – ${label}`, 7, 30, "autoevaluation_formateur", { sessionDebut: sess.debut, sessionFin: sess.fin });
+        const finPassee = sess.fin ? new Date(sess.fin) < _nowC : false;
+        if (finPassee) add(`cfa_c7i30_autoevaluation_formateur_s${idx}`, `CT7 - IND 30 AUTO-ÉVALUATION FORMATEUR – ${label}`, 7, 30, "autoevaluation_formateur", { sessionDebut: sess.debut, sessionFin: sess.fin });
       });
     }
     stagiaires.forEach((s, si) => {
