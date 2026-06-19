@@ -90,12 +90,22 @@ function splitDate(iso: string | undefined): [string, string, string] {
   return [m[3], m[2], m[1]];
 }
 
-/** Découpe une adresse "12 RUE DES LILAS" en numéro / voie */
+/** Découpe une adresse "12 RUE DES LILAS" en numéro / voie (gère "7-15", "12bis") */
 function splitAdresse(adresse: string | undefined): { numero: string; voie: string } {
   if (!adresse) return { numero: "", voie: "" };
-  const m = adresse.trim().match(/^(\d+\s*(?:bis|ter)?)\s+(.+)$/i);
-  if (m) return { numero: m[1].trim(), voie: m[2].trim() };
-  return { numero: "", voie: adresse.trim() };
+  // On retire d'abord un éventuel ", 93290 VILLE" en fin de chaîne (CP+ville parasites)
+  const cleaned = adresse.trim().replace(/[,;]\s*\d{5}\b.*$/, "").trim();
+  const m = cleaned.match(/^(\d+(?:\s*[-/]\s*\d+)?\s*(?:bis|ter|quater)?)\s+(.+)$/i);
+  if (m) return { numero: m[1].replace(/\s+/g, ""), voie: m[2].trim() };
+  return { numero: "", voie: cleaned };
+}
+
+/** Extrait CP + Ville depuis une adresse complète "76 AVENUE X, 93290 TREMBLAY" */
+function splitCpVille(adresse: string | undefined): { cp: string; ville: string } {
+  if (!adresse) return { cp: "", ville: "" };
+  const m = adresse.match(/(\d{5})\s+([A-ZÀ-ÿ' -]+)\s*$/i);
+  if (m) return { cp: m[1], ville: m[2].trim() };
+  return { cp: "", ville: "" };
 }
 
 /** Setter sécurisé : ignore les champs absents */
