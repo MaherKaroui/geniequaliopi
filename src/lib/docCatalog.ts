@@ -413,7 +413,7 @@ export function buildFullCatalog(
     });
     add("af_c7i30_appreciations_entreprises", "CT7 - IND 30 QUESTIONNAIRE DE SATISFACTION CLIENT COMMANDITAIRE", 7, 30, "appreciations_entreprises");
     add("af_c7i30_appreciations_financeurs", "CT7 - IND 30 ENQUÊTE SATISFACTION FINANCEUR", 7, 30, "appreciations_financeurs");
-    add("af_c7i30_relances_appreciations_excel", "CT7 - IND 30 TABLEAU DE RELANCES DES APPRÉCIATIONS", 7, 30, "relances_appreciations_excel");
+    
 
     // IND 31 — Réclamations et dysfonctionnements
     add("af_c7i31_formulaire_reclamation", "CT7 - IND 31 FORMULAIRE DE DÉPÔT DE RÉCLAMATION", 7, 31, "formulaire_reclamation");
@@ -1158,7 +1158,7 @@ export function buildFullCatalog(
     });
     add("cfa_c7i30_appreciations_entreprises", "CT7 - IND 30 QUESTIONNAIRE DE SATISFACTION CLIENT COMMANDITAIRE", 7, 30, "appreciations_entreprises");
     add("cfa_c7i30_appreciations_financeurs", "CT7 - IND 30 ENQUÊTE SATISFACTION FINANCEUR", 7, 30, "appreciations_financeurs");
-    add("cfa_c7i30_relances_appreciations_excel", "CT7 - IND 30 TABLEAU DE RELANCES DES APPRÉCIATIONS", 7, 30, "relances_appreciations_excel");
+    
 
     // ===== IND 30 — DOCUMENTS OFFICIELS MINISTÈRE (Certification) =====
     stagiaires.forEach((s, si) => {
@@ -1209,7 +1209,7 @@ export function buildFullCatalog(
     });
     add("cfa_c7i29_satisfaction_financeur", "CT7 - IND 29 QUESTIONNAIRE SATISFACTION FINANCEUR (OPCO)", 7, 29, "questionnaire_satisfaction_financeur_cfa");
     // IND 30 — Tableau de relances
-    add("cfa_c7i30_tableau_relances", "CT7 - IND 30 TABLEAU DE RELANCES DES APPRÉCIATIONS", 7, 30, "tableau_relances_appreciations_cfa");
+    
     // IND 32 — Plan d'action insertion / réduction ruptures
     add("cfa_c7i32_plan_insertion_ruptures", "CT7 - IND 32 PLAN D'ACTION INSERTION & RÉDUCTION DES RUPTURES", 7, 32, "plan_insertion_reduction_ruptures_cfa");
 
