@@ -7970,7 +7970,7 @@ ${mc.isDist ? `<h4>Comportement en classe virtuelle</h4><p>Les apprenants adopte
   ],
     ...((s.nom || s.prenom)
       ? { signatures: { type: "2" as const, labels: ["Le Directeur du CFA", "L'Apprenti(e) (lu et approuvé)"], names: [o.dirigeant || '___', `${s.prenom} ${s.nom}`], noOrgSignature: true, stagiaireSignatureUrl: s.signatureUrl, dates: [dateSignature, dateSignature] } }
-      : { extraHtml: `<div style="margin-top:40px;text-align:center;width:50%"><p><strong>Le Directeur du CFA</strong></p><p>${o.dirigeant || '___'}</p><p>Date : ${dateSignature}</p><div style="min-height:80px"></div></div>` })
+      : { extraHtml: `<div style="margin-top:40px;text-align:center;width:50%"><p><strong>Le Directeur du CFA</strong></p><p>${o.dirigeant || '___'}</p><p>Date : ${dateSignature}</p><div style="min-height:80px;position:relative">${/dreamers/i.test(o.nom || "") && o.tamponUrl ? `<img src="${o.tamponUrl}" style="max-height:90px" />` : ""}</div></div>` })
   });
 }
 
