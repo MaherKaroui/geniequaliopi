@@ -1186,10 +1186,6 @@ export function buildFullCatalog(
     stagiaires.forEach((s, si) => {
       add(`cfa_c3i13_grille_competences_${si}`, `CT3 - IND 13 GRILLE DE COMPÉTENCES ALTERNANCE – ${s.prenom} ${s.nom}`, 3, 13, "grille_competences_alternance_cfa", { stagiaireIdx: si });
     });
-    // IND 15 — Attestation de remise livret SST
-    stagiaires.forEach((s, si) => {
-      add(`cfa_c3i15_attestation_sst_${si}`, `CT3 - IND 15 ATTESTATION DE REMISE DU LIVRET SST – ${s.prenom} ${s.nom}`, 3, 15, "attestation_remise_livret_sst_cfa", { stagiaireIdx: si });
-    });
     // IND 16 — Procédure de respect des exigences du certificateur
     add("cfa_c3i16_procedure_respect_certificateur", "CT3 - IND 16 PROCÉDURE DE RESPECT DES EXIGENCES DU CERTIFICATEUR", 3, 16, "procedure_respect_certificateur_cfa");
     // IND 17 — Inventaire des moyens
