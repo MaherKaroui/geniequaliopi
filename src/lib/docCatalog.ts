@@ -1212,8 +1212,6 @@ export function buildFullCatalog(
     add("cfa_c5i21_grille_evaluation_pedago", "CT5 - IND 21 GRILLE D'ÉVALUATION PÉDAGOGIQUE FORMATEUR", 5, 21, "grille_evaluation_pedagogique_cfa");
     // IND 22 — Entretien professionnel annuel
     add("cfa_c5i22_entretien_pro_annuel", "CT5 - IND 22 ENTRETIEN PROFESSIONNEL ANNUEL INTERVENANT", 5, 22, "entretien_professionnel_annuel_cfa");
-    // IND 23/24/25 — Fiche de veille consolidée
-    add("cfa_c6i23_veille_consolidee", "CT6 - IND 23-24-25 FICHE DE VEILLE CONSOLIDÉE CFA", 6, 23, "fiche_veille_consolidee_cfa");
     // IND 26 — Annuaire partenaires handicap
     add("cfa_c6i26_annuaire_handicap", "CT6 - IND 26 ANNUAIRE PARTENAIRES HANDICAP APPRENTISSAGE", 6, 26, "annuaire_partenaires_handicap_cfa");
     // IND 29 — Questionnaires entreprise/MA + financeur
