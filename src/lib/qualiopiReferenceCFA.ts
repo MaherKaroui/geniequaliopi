@@ -99,7 +99,7 @@ export const INDICATEURS_CFA: IndicateurCFA[] = [
   { numero: 14, critere: 3, titre: "[Spécifique] Accompagnement socio-professionnel, éducatif et citoyen",
     nouvelEntrant: true, ponderable: false,
     niveauAttendu: "Démontrer que l'accompagnement socio-professionnel, éducatif et relatif à la citoyenneté est formalisé et mis en œuvre via des projets spécifiques (mission des CFA, art. L.6231-2). Nouvel entrant : formalisé ; mise en œuvre à la surveillance. NC MAJEURE.",
-    ceQuIlFautDire: "Nous déployons un accompagnement éducatif et citoyen : webinaires, ressources citoyenneté, planning de diffusion des 14 missions, aides au logement (Mobili-Jeune, Visale, Loca-Pass), mobilité, fonds social, prime d'activité et aides régionales (l'aide au permis B a été supprimée par la loi de finances 2026).",
+    ceQuIlFautDire: "Nous déployons un accompagnement éducatif et citoyen : webinaires, ressources citoyenneté, planning de diffusion des 14 missions, aides au logement (Mobili-Jeune, Visale, Loca-Pass), mobilité, fonds social, prime d'activité et aides régionales.",
     preuves: ["Planning de diffusion des 14 missions CFA", "Ressources citoyenneté", "Webinaires formation", "Notices aides", "QCM 14 missions rempli par l'apprenti"] },
   { numero: 15, critere: 3, titre: "[Spécifique] Information droits/devoirs et santé-sécurité",
     nouvelEntrant: false, ponderable: false,

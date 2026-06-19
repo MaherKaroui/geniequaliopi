@@ -584,7 +584,7 @@ export function genPlanMobiliteNationaleCFA(o: OrganismeInfo, f: FormationInfo, 
           ? tableHTML(
               ["Apprenti", "Type d'aide demandée", "Statut dossier", "Date suivi"],
               stagiaires.slice(0, 5).map((s, i) => {
-                const aides = ["Aide Mobili-Jeune", "Aide permis B 500 €", "Carte Imagine R", "Aide régionale ARA", "Aide Mobili-Jeune"];
+                const aides = ["Aide Mobili-Jeune", "Carte Imagine R", "Aide régionale ARA", "Aide Mobili-Jeune", "Aide Mobili-Jeune"];
                 const statuts = terminee
                   ? ["Accordée", "Accordée", "Accordée", "En instruction", "Accordée"]
                   : ["En instruction", "Dossier déposé", "À déposer", "À déposer", "Accordée"];
@@ -844,7 +844,7 @@ export function genProcedureAccompagnementEducatifSocialCFA(o: OrganismeInfo) {
           [
             ["Logement", "Action Logement / CROUS / Mobili-Jeune", "Aide jusqu'à 100 €/mois (- 30 ans)"],
             ["Restauration", "Carte étudiante des métiers", "Tarifs réduits restauration"],
-            ["Mobilité", "Région / Aide permis B (500 €)", "Aide au permis pour apprentis - 30 ans"],
+            ["Mobilité", "Région / Aide régionale mobilité", "Aide à la mobilité pour apprentis - 30 ans"],
             ["Santé", "CPAM / PASS Santé Jeunes", "Couverture santé + accès aux soins"],
             ["Précarité financière", "FSL / Mission Locale / CCAS", "Aides d'urgence ponctuelles"],
             ["Handicap", "AGEFIPH / Référent handicap CFA", "Aménagements, aides techniques"],
@@ -1203,8 +1203,6 @@ export const MISSIONS_QCM: MissionQCM[] = [
     titre: "Mission 14 — Accompagnement des apprentis dans l'accès aux aides auxquelles ils peuvent prétendre",
     questions: [
       { q: "La mission 14 impose au CFA de :", options: ["Verser les aides", "Accompagner les apprentis dans leurs démarches d'accès aux aides légales et réglementaires", "Refuser les aides", "Sanctionner"], correctIndex: 1 },
-      { q: "L'aide forfaitaire de 500 € pour le permis B est destinée :", options: ["Aux seuls majeurs sans condition", "Aux apprentis majeurs préparant le permis B", "Aux retraités", "Aux cadres"], correctIndex: 1 },
-      { q: "Cette aide permis B est versée par :", options: ["Le CFA via l'ASP", "L'employeur", "L'URSSAF", "Le tribunal"], correctIndex: 0 },
       { q: "L'aide Mobili-Jeune est versée par :", options: ["Action Logement", "L'État seul", "L'URSSAF", "Le CFA"], correctIndex: 0 },
       { q: "L'APL (Aide Personnalisée au Logement) est gérée par :", options: ["La CAF", "L'employeur", "Le CFA", "L'OPCO"], correctIndex: 0 },
       { q: "L'aide au premier équipement professionnel est financée par :", options: ["La Région ou l'OPCO selon les cas", "L'apprenti seul", "L'URSSAF", "Personne"], correctIndex: 0 },

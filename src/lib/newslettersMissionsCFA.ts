@@ -225,7 +225,7 @@ const MISSIONS: Record<number, Omit<MissionNL, "imageUrl" | "referent">> = {
       { label: "Aides santé & psy", desc: "Mutuelle, complémentaire, dispositif Santé Psy Étudiant.", icon: ICONS.heart },
       { label: "Aides régionales spécifiques", desc: "Équipement, prime IDF, aides France Travail, AAH/RQTH selon situation.", icon: ICONS.euro },
     ],
-    paragraphe: "accompagne chaque apprenti dans l'accès aux droits et aux aides : logement (Mobili-Jeune, Visale, Loca-Pass, APL), mobilité, restauration, santé, fonds social CFA, prime d'activité et aides régionales. Un référent dédié facilite les démarches administratives pour lever les obstacles sociaux et matériels. Note : l'aide au permis B (500 €) a été supprimée par l'article 202 de la loi de finances 2026.",
+    paragraphe: "accompagne chaque apprenti dans l'accès aux droits et aux aides : logement (Mobili-Jeune, Visale, Loca-Pass, APL), mobilité, restauration, santé, fonds social CFA, prime d'activité et aides régionales. Un référent dédié facilite les démarches administratives pour lever les obstacles sociaux et matériels.",
   },
 };
 
