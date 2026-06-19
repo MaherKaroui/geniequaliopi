@@ -7967,7 +7967,11 @@ ${mc.isDist ? `<h4>Comportement en classe virtuelle</h4><p>Les apprenants adopte
 
     { heading: "Article 8 : Représentation des apprenants", content: `<h4>Délégué de classe</h4><p>Pour les formations de plus de 400 heures :</p><ul><li>Tous les apprenants sont électeurs et éligibles</li><li>Élection d'un délégué titulaire et d'un suppléant au scrutin uninominal à deux tours</li><li>Le scrutin a lieu dans les deux mois suivant le début de la formation</li><li>Les délégués représentent les apprenants dans tous les conseils de classe</li><li>Ils font toute suggestion pour améliorer les conditions de formation</li></ul>
 <h4>Conseil de Perfectionnement</h4><p>Le Conseil de Perfectionnement se réunit au moins une fois par an. Il est composé de représentants parmi les apprenants, le personnel administratif et l'équipe pédagogique. Il est présidé par le Directeur. Chaque réunion fait l'objet d'un procès-verbal.</p>` },
-  ], signatures: { type: "2", labels: ["Le Directeur du CFA", "L'Apprenti(e) (lu et approuvé)"], names: [o.dirigeant || '___', `${s.prenom} ${s.nom}`], noOrgSignature: true, stagiaireSignatureUrl: s.signatureUrl, dates: [dateSignature, dateSignature] } });
+  ],
+    ...((s.nom || s.prenom)
+      ? { signatures: { type: "2" as const, labels: ["Le Directeur du CFA", "L'Apprenti(e) (lu et approuvé)"], names: [o.dirigeant || '___', `${s.prenom} ${s.nom}`], noOrgSignature: true, stagiaireSignatureUrl: s.signatureUrl, dates: [dateSignature, dateSignature] } }
+      : { extraHtml: `<div style="margin-top:40px;text-align:center;width:50%"><p><strong>Le Directeur du CFA</strong></p><p>${o.dirigeant || '___'}</p><p>Date : ${dateSignature}</p><div style="min-height:80px"></div></div>` })
+  });
 }
 
 // ============== CFA IND 9 — LIVRE D'APPRENTISSAGE (complet, par stagiaire) ==============
@@ -8212,7 +8216,7 @@ function genCGVCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo
     { heading: "Article 13 – Litiges", content: `<p>Tout différend relatif à l'exécution de la présente convention qui ne pourrait être réglé à l'amiable sera porté devant les juridictions compétentes du ressort du siège social de l'organisme de formation.</p>` },
   ], extraHtml: `<div style="display:flex;justify-content:space-between;margin-top:40px">
 <div style="text-align:center;width:45%"><p><strong>${o.nom}</strong></p><p>${o.dirigeant || '___'}, Dirigeant</p><div style="min-height:80px;border:1px solid #ccc;padding:10px">${tamponCFA}</div></div>
-<div style="text-align:center;width:45%"><p><strong>Le Stagiaire</strong></p><p>${s.prenom} ${s.nom}</p><p><em>Signature précédée de la mention « Lu et approuvé »</em></p><div style="min-height:80px;border:1px solid #ccc;padding:10px">${sigApprentie}</div></div>
+${(s.nom || s.prenom) ? `<div style="text-align:center;width:45%"><p><strong>Le Stagiaire</strong></p><p>${s.prenom} ${s.nom}</p><p><em>Signature précédée de la mention « Lu et approuvé »</em></p><div style="min-height:80px;border:1px solid #ccc;padding:10px">${sigApprentie}</div></div>` : ''}
 </div>
 <p style="text-align:center;margin-top:10px"><strong>Fait à</strong> ${o.ville || 'Paris'}, <strong>le</strong> ${dateSignature}</p>` });
 }
