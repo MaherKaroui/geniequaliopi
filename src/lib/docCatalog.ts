@@ -974,7 +974,7 @@ export function buildFullCatalog(
     // ===== IND 15 — DROITS ET DEVOIRS DE L'APPRENTI (CFA) =====
     formations.forEach((f, fi) => {
       add(`cfa_c3i15_conditions_${fi}`, `CT3 - IND 15 FICHE CONDITIONS ACCUEIL`, 3, 15, "conditions_accueil", { fi });
-      add(`cfa_c3i15_charte_${fi}`, `CT3 - IND 15 CHARTE ACCUEIL`, 3, 15, "charte_accueil", { fi });
+      
     });
     add("cfa_c3i15_droits_devoirs_apprenti", "CT3 - IND 15 DROITS ET DEVOIRS DE L'APPRENTI", 3, 15, "droits_devoirs_apprenti_cfa");
     add("cfa_c3i15_regles_sante_securite", "CT3 - IND 15 RÈGLES SANTÉ ET SÉCURITÉ EN MILIEU PROFESSIONNEL", 3, 15, "regles_sante_securite_cfa");
