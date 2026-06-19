@@ -1180,10 +1180,7 @@ export function buildFullCatalog(
     // ===========================================================
     // ===== GAPS AUDIT QUALIOPI CFA (Dreamers Team / V9) =======
     // ===========================================================
-    // IND 13 — Grille de compétences alternance nominative
-    stagiaires.forEach((s, si) => {
-      add(`cfa_c3i13_grille_competences_${si}`, `CT3 - IND 13 GRILLE DE COMPÉTENCES ALTERNANCE – ${s.prenom} ${s.nom}`, 3, 13, "grille_competences_alternance_cfa", { stagiaireIdx: si });
-    });
+    // IND 13 — Grille de compétences alternance nominative (retirée)
     // IND 16 — Procédure de respect des exigences du certificateur
     add("cfa_c3i16_procedure_respect_certificateur", "CT3 - IND 16 PROCÉDURE DE RESPECT DES EXIGENCES DU CERTIFICATEUR", 3, 16, "procedure_respect_certificateur_cfa");
     // IND 16 — DP & ECF officiels par stagiaire
