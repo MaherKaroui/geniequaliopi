@@ -559,7 +559,6 @@ export function genPlanMobiliteNationaleCFA(o: OrganismeInfo, f: FormationInfo, 
           ["Dispositif", "Public", "Aide / Outil", "Partenaire"],
           [
             ["Aide Mobili-Jeune (Action Logement)", "Apprentis < 30 ans", "Jusqu'à 100 €/mois pendant 1 an", "Action Logement"],
-            ["Aide Mobili-Jeune (Action Logement)", "Apprentis < 30 ans", "Jusqu'à 100 €/mois pendant 1 an", "Action Logement"],
             ["Carte Imagine R / Pass Navigo solidarité", "Apprentis Île-de-France", "Tarif réduit transports", "Île-de-France Mobilités"],
             ["Aide régionale à la mobilité (ARA)", "Apprentis selon Région", "Variable (ex. 200–600 €)", "Conseils régionaux"],
             ["Plateforme « 1jeune1solution » — Mobilité", "Tous apprentis", "Information + simulateur", "État"],
