@@ -152,20 +152,23 @@ export async function genCerfaApprentissagePdf(
   const ent = clean(s.entreprise);
   const siretEnt = clean(s.siretEntreprise);
   const adrEnt = splitAdresse(s.adresseEntreprise);
+  const cpvEnt = splitCpVille(s.adresseEntreprise);
+  const telEnt = clean(s.telephone); // fallback
+  const courrielEnt = clean(s.email); // fallback
 
   setText(form, "Zone de texte 8", ent); // Nom/dénomination employeur
   setText(form, "Zone de texte 8_2", siretEnt); // N° SIRET
-  setText(form, "Zone de texte 8_3", ""); // Type employeur
+  setText(form, "Zone de texte 8_3", "SARL/Entreprise privée"); // Type employeur
   setText(form, "Zone de texte 8_14", adrEnt.numero); // N° adresse
   setText(form, "Zone de texte 8_13", adrEnt.voie); // Voie
   setText(form, "Zone de texte 8_4", ""); // Employeur spécifique
   setText(form, "Zone de texte 8_8", ""); // Complément
   setText(form, "Zone de texte 8_7", ""); // Code APE
-  setText(form, "Zone de texte 8_9", ""); // Code postal entreprise
-  setText(form, "Zone de texte 8_10", ""); // Commune entreprise
+  setText(form, "Zone de texte 8_9", cpvEnt.cp); // Code postal entreprise
+  setText(form, "Zone de texte 8_10", cpvEnt.ville); // Commune entreprise
   setText(form, "Zone de texte 8_5", ""); // Effectif total
-  setText(form, "Zone de texte 8_11", ""); // Téléphone entreprise
-  setText(form, "Zone de texte 8_12", ""); // Courriel entreprise
+  setText(form, "Zone de texte 8_11", telEnt); // Téléphone entreprise (fallback)
+  setText(form, "Zone de texte 8_12", courrielEnt); // Courriel entreprise (fallback)
   setText(form, "Zone de texte 8_6", ""); // Code IDCC
 
   // ---------- PAGE 1 — APPRENTI ----------
