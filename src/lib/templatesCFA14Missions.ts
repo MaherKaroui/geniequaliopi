@@ -1550,10 +1550,8 @@ export function genSiteWeb14MissionsCFA(o: OrganismeInfo) {
     content: `<p>Le centre de formation d'apprentis <strong>${nom}</strong> s'engage à accomplir l'ensemble des <strong>14 missions</strong> prévues par l'<strong>article L.6231-2 du Code du travail</strong>, au service de la réussite et de l'insertion professionnelle de ses apprentis.</p>`,
   });
 
-  sections.push({
-    heading: "Référence officielle",
-    content: `<p><strong>Article L.6231-2 du Code du travail.</strong><br>Source : DREETS Normandie — « Missions et obligations des CFA » (Service Régional de Contrôle de la Formation Professionnelle).<br>Lien : <a href="https://normandie.dreets.gouv.fr/sites/normandie.dreets.gouv.fr/IMG/pdf/missions_et_obligations_des_cfa.pdf">normandie.dreets.gouv.fr — missions_et_obligations_des_cfa.pdf</a></p>`,
-  });
+
+
 
   return buildDocument({
     org: o,
