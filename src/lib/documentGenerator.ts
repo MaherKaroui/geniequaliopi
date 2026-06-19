@@ -3903,12 +3903,42 @@ function genQuestionnaireInsertion(o: OrganismeInfo, f: FormationInfo) {
 }
 
 function genConditionsAccueil(o: OrganismeInfo, f: FormationInfo) {
+  const modal = `${f.modalites || ""} ${f.modalitesPedagogiques || ""}`.toLowerCase();
+  const isDistanciel = /distanc|e-learning|elearning|foad|visio|à distance|a distance/.test(modal) && !/présent|presentiel/.test(modal);
+  const isMixte = /mixte|hybride|blended/.test(modal) || (/distanc|visio|foad/.test(modal) && /présent|presentiel/.test(modal));
+
+  if (isDistanciel) {
+    return buildDocument({ org: o, title: "FICHE CONDITIONS D'ACCUEIL — FORMATION À DISTANCE", subtitle: f.intitule, formation: f, showFormationInfo: true, sections: [
+      { heading: "Modalité de la formation", content: `<p>La formation <strong>« ${f.intitule} »</strong> se déroule intégralement <strong>à distance</strong> (FOAD / classe virtuelle synchrone et activités asynchrones). Aucun déplacement en centre n'est requis.</p>` },
+      { heading: "Plateformes de visioconférence", content: `<p>Les sessions synchrones sont animées via les outils suivants :</p><p>• <strong>Zoom</strong> (plateforme principale) — version Education, hébergement UE, conforme RGPD<br>• <strong>Google Meet</strong> (plateforme de secours) — accessible via le compte Google Workspace de l'organisme<br>Le lien de connexion (Zoom ou Google Meet) ainsi que le mot de passe sont transmis par email à chaque apprenant <strong>au plus tard 48h avant chaque session</strong>, accompagnés d'un rappel J-1.</p>` },
+      { heading: "Plateforme pédagogique (LMS)", content: `<p>Les ressources, exercices et évaluations sont accessibles 7j/7 et 24h/24 sur la plateforme LMS de l'organisme${o.siteWeb && o.siteWeb.trim() ? ` (<a href="https://moodle.${o.siteWeb.replace(/^https?:\/\//, '').replace(/^www\./, '')}">https://moodle.${o.siteWeb.replace(/^https?:\/\//, '').replace(/^www\./, '')}</a>)` : ""}. Identifiants personnels envoyés par email avant le démarrage de la formation.</p>` },
+      { heading: "Prérequis techniques apprenant", content: `<p>• Ordinateur (PC ou Mac) avec webcam et micro fonctionnels<br>• Connexion internet stable : <strong>minimum 5 Mbps</strong> en réception, 2 Mbps en émission<br>• Navigateur à jour : Chrome, Firefox, Edge ou Safari<br>• Casque audio recommandé pour le confort des échanges<br>• Application Zoom installée (gratuite) ou navigateur compatible Google Meet</p>` },
+      { heading: "Horaires des classes virtuelles", content: "<p><strong>Du lundi au vendredi :</strong> 09h00 – 12h30 et 13h30 – 17h00 (7 h/jour)<br>Pause déjeuner : 12h30 – 13h30<br>Pauses pédagogiques toutes les 90 minutes (recommandation FOAD)</p>" },
+      { heading: "Accessibilité PSH à distance", content: `<p>• Sous-titrage automatique disponible sur Zoom et Google Meet (à la demande)<br>• Supports pédagogiques accessibles (PDF balisés, contrastes adaptés)<br>• Aménagements spécifiques sur demande auprès du référent handicap : <strong>${o.referentHandicap || "—"}</strong>${o.email ? ` — ${o.email}` : ""}</p>` },
+      { heading: "Assistance technique", content: `<p>Une assistance technique est assurée pendant toute la durée de la formation :</p><p>• Hotline email : <strong>${o.email}</strong>${o.telephone?.trim() ? `<br>• Téléphone : <strong>${o.telephone}</strong>` : ""}<br>• Délai de réponse : sous 4 heures ouvrées<br>• Tutoriels de connexion Zoom / Google Meet envoyés avant le démarrage</p>` },
+      { heading: "Équipements et moyens pédagogiques", content: `<p>${f.moyensPedagogiques || "Supports numériques, classes virtuelles, ressources LMS, quiz interactifs, partages d'écran et travaux en sous-groupes (breakout rooms)."}</p>` },
+    ] });
+  }
+
+  if (isMixte) {
+    return buildDocument({ org: o, title: "FICHE CONDITIONS D'ACCUEIL — FORMATION MIXTE (PRÉSENTIEL + DISTANCIEL)", subtitle: f.intitule, formation: f, showFormationInfo: true, sections: [
+      { heading: "Modalité de la formation", content: `<p>La formation <strong>« ${f.intitule} »</strong> se déroule en <strong>modalité mixte</strong> : alternance de sessions en présentiel au centre et de classes virtuelles à distance.</p>` },
+      { heading: "Locaux (sessions en présentiel)", content: `<p>Adresse : ${f.lieu}<br>Accès : Métro, bus, parking<br>Accessibilité PMR : ✅ Oui<br>Wifi : ✅ Disponible</p>` },
+      { heading: "Plateformes de visioconférence (sessions à distance)", content: `<p>Les classes virtuelles sont animées via :</p><p>• <strong>Zoom</strong> (plateforme principale)<br>• <strong>Google Meet</strong> (plateforme de secours)<br>Lien de connexion transmis par email 48h avant chaque session, rappel J-1.</p>` },
+      { heading: "Prérequis techniques (sessions à distance)", content: "<p>• Ordinateur avec webcam et micro<br>• Connexion internet stable (≥ 5 Mbps)<br>• Navigateur à jour, casque audio recommandé</p>" },
+      { heading: "Équipements", content: `<p>${f.moyensPedagogiques}</p>` },
+      { heading: "Horaires", content: "<p><strong>Du lundi au vendredi :</strong> 09h00 – 12h30 et 13h30 – 17h00 (7 h/jour)<br>Pause déjeuner : 12h30 – 13h30</p>" },
+      { heading: "Assistance technique", content: `<p>Hotline : <strong>${o.email}</strong>${o.telephone?.trim() ? ` — ${o.telephone}` : ""} — réponse sous 4h ouvrées</p>` },
+    ] });
+  }
+
   return buildDocument({ org: o, title: "FICHE CONDITIONS D'ACCUEIL", subtitle: f.intitule, formation: f, showFormationInfo: true, sections: [
     { heading: "Locaux", content: `<p>Adresse : ${f.lieu}<br>Accès : Métro, bus, parking<br>Accessibilité PMR : ✅ Oui<br>Wifi : ✅ Disponible</p>` },
     { heading: "Équipements", content: `<p>${f.moyensPedagogiques}</p>` },
     { heading: "Horaires", content: "<p><strong>Du lundi au vendredi :</strong> 09h00 – 12h30 et 13h30 – 17h00 (7 h/jour)<br>Pause déjeuner : 12h30 – 13h30</p>" },
   ] });
 }
+
 
 function genCharteAccueil(o: OrganismeInfo, f: FormationInfo) {
   return buildDocument({ org: o, title: "CHARTE D'ACCUEIL", subtitle: f.intitule, sections: [
