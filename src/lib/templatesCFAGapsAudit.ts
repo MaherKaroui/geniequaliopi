@@ -90,21 +90,31 @@ export function genAttestationLivretSSTCFA(o: OrganismeInfo, f: FormationInfo, s
 }
 
 // ============================================================================
-// IND 16 — Convention/habilitation certificateur (générique)
+// IND 16 — Procédure de respect des exigences du certificateur
 // ============================================================================
-export function genConventionCertificateurCFA(o: OrganismeInfo, f: FormationInfo) {
+export function genProcedureRespectCertificateurCFA(o: OrganismeInfo, f: FormationInfo) {
+  const titre = f.intitule || "[Intitulé de la formation]";
+  const rncp = f.codeRNCP ? ` (code RNCP ${f.codeRNCP})` : "";
   return buildDocument({
     org: o,
-    title: `CONVENTION D'HABILITATION CERTIFICATEUR — ${f.intitule || ""}`,
+    title: "PROCÉDURE DE RESPECT DES EXIGENCES DU CERTIFICATEUR",
+    subtitle: titre,
     sections: [
-      { heading: "Parties", content: `<p><strong>Le certificateur :</strong> [Nom du certificateur officiel — à compléter selon RNCP/RS]<br><strong>L'organisme habilité :</strong> ${o.nom} — SIRET ${o.siret} — NDA ${o.nda}</p>` },
-      { heading: "Objet", content: `<p>La présente convention autorise ${o.nom} à présenter des candidats à la certification <strong>${f.intitule || "[Titre RNCP]"}</strong>${f.codeRNCP ? ` (code RNCP ${f.codeRNCP})` : ""} dans le respect du référentiel d'évaluation et du règlement d'examen du certificateur.</p>` },
-      { heading: "Engagements de l'organisme habilité", content: `<p>• Respecter le référentiel d'activités, de compétences et d'évaluation<br>• Appliquer le règlement d'examen<br>• Mettre en œuvre les aménagements PSH<br>• Transmettre les PV de session dans les délais<br>• Garantir la confidentialité des sujets et grilles</p>` },
-      { heading: "Durée & dépôt", content: `<p>Convention applicable à compter du ${todayLong()} pour la durée d'enregistrement du titre au RNCP/RS. Convention déposée et opposable à l'auditeur Qualiopi.</p>` },
+      { heading: "1. Objet", content: `<p>La présente procédure décrit les modalités mises en œuvre par ${o.nom} pour garantir le strict respect des exigences du certificateur dans le cadre de la préparation au titre <strong>${titre}</strong>${rncp}. Elle s'applique à l'ensemble des intervenants pédagogiques et administratifs du CFA.</p>` },
+      { heading: "2. Référentiels applicables", content: `<p>Le CFA applique en intégralité :</p><p>• Le <strong>référentiel d'activités</strong> du titre<br>• Le <strong>référentiel de compétences</strong> (blocs de compétences enregistrés au RNCP)<br>• Le <strong>référentiel d'évaluation</strong> et le règlement d'examen du certificateur<br>• Les <strong>modalités d'accès</strong> (prérequis, voies d'accès, équivalences)<br>• La <strong>durée minimale</strong> de formation imposée par le certificateur</p>` },
+      { heading: "3. Contenus obligatoires", content: `<p>Le programme pédagogique reprend l'intégralité des compétences et savoirs associés du référentiel. Chaque bloc de compétences fait l'objet d'un séquençage détaillé, d'objectifs pédagogiques alignés sur le référentiel et de modalités d'évaluation conformes au règlement d'examen. Aucun contenu obligatoire ne peut être retiré ou allégé.</p>` },
+      { heading: "4. Durée de formation", content: `<p>La durée totale de la formation respecte la durée minimale fixée par le certificateur, incluant les heures en centre de formation et les heures en entreprise. Toute adaptation (positionnement, allègement, dispense) fait l'objet d'une décision motivée et tracée dans le dossier de l'apprenant.</p>` },
+      { heading: "5. Modalités d'évaluation", content: `<p>Les évaluations sont conçues et organisées conformément au règlement d'examen :</p><p>• <strong>Évaluations en cours de formation (ECF)</strong> : grilles d'évaluation du certificateur utilisées sans modification<br>• <strong>Mises en situation professionnelle</strong> : conditions, durées et critères imposés par le référentiel<br>• <strong>Dossier professionnel (DP)</strong> : trame officielle du certificateur remise et expliquée aux apprenants<br>• <strong>Entretien avec le jury</strong> : durée et déroulé conformes au règlement d'examen</p>` },
+      { heading: "6. Composition et habilitation du jury", content: `<p>Le jury de certification est composé conformément aux exigences du certificateur :</p><p>• Au moins un membre professionnel du secteur en exercice<br>• Membres habilités par le certificateur lorsque requis<br>• Indépendance et impartialité garanties (aucun membre n'a participé directement à la formation des candidats évalués)<br>• Présidence assurée selon les règles du certificateur</p>` },
+      { heading: "7. Confidentialité et sécurité des épreuves", content: `<p>Les sujets, grilles d'évaluation et corrigés sont conservés sous accès restreint. Seuls les formateurs habilités et le jury y ont accès. Les supports d'évaluation ne sont diffusés qu'au moment de la passation.</p>` },
+      { heading: "8. Traçabilité et transmission", content: `<p>Chaque session donne lieu à :</p><p>• Un <strong>procès-verbal de session</strong> signé par le jury<br>• Les <strong>livrets d'évaluation</strong> individuels par bloc de compétences<br>• La <strong>transmission des résultats</strong> au certificateur dans les délais imposés<br>• L'<strong>archivage</strong> des pièces pendant la durée requise par le certificateur</p>` },
+      { heading: "9. Veille et mise à jour", content: `<p>${o.referentQualite || o.responsablePedagogique || "Le référent qualité"} assure une veille permanente sur les évolutions du référentiel (mises à jour France Compétences, notes du certificateur, évolutions réglementaires). Toute évolution est intégrée au programme dans un délai maximal de 3 mois et communiquée à l'équipe pédagogique.</p>` },
+      { heading: "10. Contrôle et amélioration", content: `<p>Le respect de cette procédure fait l'objet d'un contrôle annuel par la direction pédagogique. Les écarts éventuels donnent lieu à des actions correctives tracées dans le plan d'amélioration continue.</p>` },
     ],
-    signatures: { type: "2", labels: ["Pour le certificateur", "Pour l'organisme habilité"], names: ["[Représentant certificateur]", o.dirigeant], dates: [todayLong(), todayLong()] },
   });
 }
+
+
 
 // ============================================================================
 // IND 16 — PV de session générique
