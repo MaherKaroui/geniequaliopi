@@ -85,7 +85,7 @@ export function genLivretAccueilApprenti(o: OrganismeInfo, f: FormationInfo) {
     { heading: "Vos contacts", content: `<p><strong>Direction :</strong> ${o.dirigeant}<br><strong>Coord. pédagogique :</strong> ${o.responsablePedagogique}<br><strong>Référent handicap :</strong> ${o.referentHandicap}<br><strong>Référent qualité :</strong> ${o.referentQualite}<br>${o.telephone?.trim() ? `<strong>Tél :</strong> ${o.telephone} | ` : ""}<strong>Email :</strong> ${o.email}</p>` },
     { heading: "Votre alternance", content: `<p><strong>Rythme :</strong> ${f.rythmeAlternance?.trim() || "Selon calendrier d'alternance remis à l'inscription"}<br><strong>Durée :</strong> À définir selon le groupe<br><strong>Lieu CFA :</strong> ${f.lieu}<br><strong>Horaires :</strong> 8h30-12h30 / 13h30-16h30</p>` },
     { heading: "Vos droits et devoirs", content: "<p>• Suivre avec assiduité la formation au CFA et en entreprise<br>• Respecter le règlement intérieur<br>• Tenir à jour votre carnet de liaison<br>• Prévenir en cas d'absence (CFA ET entreprise)<br>• Participer aux évaluations et examens</p>" },
-    { heading: "Aides et accompagnement", content: "<p>• Aide au permis de conduire<br>• Aide au premier équipement<br>• Aide à la mobilité<br>• Accompagnement social (logement, santé)<br>• Soutien scolaire individualisé</p>", variant: "green" },
+    { heading: "Aides et accompagnement", content: "<p>• Aide au premier équipement<br>• Aide à la mobilité<br>• Accompagnement social (logement, santé)<br>• Soutien scolaire individualisé</p>", variant: "green" },
   ] });
 }
 
