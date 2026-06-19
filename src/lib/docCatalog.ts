@@ -568,11 +568,6 @@ export function buildFullCatalog(
     add("cfa_c3i10_aff_harcelement_sur_site", "CT3 - IND 10 📁 AFFICHAGE – Affiche Non au Harcèlement", 3, 10, "pdf_static", { pdfUrl: "/pdfs/harcelement_sur_site.jpg" });
     add("cfa_c3i10_aff_charte_laicite", "CT3 - IND 10 📁 AFFICHAGE – Charte de la Laïcité", 3, 10, "pdf_static", { pdfUrl: "/pdfs/charte_laicite.pdf" });
     add("cfa_c3i10_aff_contacts_ressources_handicap", "CT3 - IND 10 📁 AFFICHAGE – Contacts Ressources Handicap Formation", 3, 10, "pdf_static", { pdfUrl: "/pdfs/contacts_ressources_handicap.pdf" });
-    // --- IND 10 — Dossier Aide au financement Permis B ---
-    add("cfa_c3i10_permisb_bordereau_transmission", "CT3 - IND 10 📁 PERMIS B – Bordereau de Transmission", 3, 10, "pdf_static", { pdfUrl: "/pdfs/bordereau_transmission_permis_b.pdf" });
-    add("cfa_c3i10_permisb_formulaire_aide", "CT3 - IND 10 📁 PERMIS B – Formulaire Aide au Financement", 3, 10, "pdf_static", { pdfUrl: "/pdfs/formulaire_aide_financement_permis_b.pdf" });
-    add("cfa_c3i10_permisb_permis", "CT3 - IND 10 📁 PERMIS B – Permis B", 3, 10, "pdf_static", { pdfUrl: "/pdfs/permis_b.pdf" });
-    add("cfa_c3i10_permisb_aide_financement", "CT3 - IND 10 📁 PERMIS B – Aide au Financement Permis B", 3, 10, "pdf_static", { pdfUrl: "/pdfs/aide_financement_permis_b.pdf" });
     // --- IND 10 — Mission 5 : maintien en formation 6 mois (rupture de contrat) ---
     add("cfa_c3i10_mission5_rupture_contrat", "CT3 - IND 10 📁 14 MISSIONS / Mission 5 – Maintien en formation 6 mois (rupture de contrat)", 3, 10, "procedure_rupture_contrat_apprentissage_cfa", { folder: "14_MISSIONS_CFA/Mission_5_Rupture_Contrat" });
     add("cfa_c3i10_mission5_cas_rupture_pdf", "CT3 - IND 10 📁 14 MISSIONS / Mission 5 – Les cas de rupture du contrat d'apprentissage (PDF)", 3, 10, "pdf_static", { pdfUrl: "/pdfs/procedure_rupture_contrat_apprentissage.docx", folder: "14_MISSIONS_CFA/Mission_5_Rupture_Contrat" });
@@ -780,7 +775,7 @@ export function buildFullCatalog(
     add("cfa_c3i12_guide_utilisateur_extranet", "CT3 - IND 12 📁 RESSOURCES – Guide utilisateur Extranet", 3, 12, "pdf_static", { pdfUrl: "/pdfs/guide_utilisateur_extranet.pdf" });
     add("cfa_c3i12_precis_apprentissage", "CT3 - IND 12 📁 RESSOURCES – Précis de l'apprentissage", 3, 12, "pdf_static", { pdfUrl: "/pdfs/precis_apprentissage.pdf" });
     add("cfa_c3i12_livret_accompagnez_alternants", "CT3 - IND 12 📁 RESSOURCES – Livret Accompagnez vos alternants", 3, 12, "pdf_static", { pdfUrl: "/pdfs/livret_accompagnez_alternants.pdf" });
-    add("cfa_c3i12_permis_b", "CT3 - IND 12 📁 RESSOURCES – Aide au permis B", 3, 12, "pdf_static", { pdfUrl: "/pdfs/permis_b.pdf" });
+    
     add("cfa_c3i12_procedure_rupture_reorientation_echecs", "CT3 - IND 12 📁 GESTION ABANDON – Procédure rupture, réorientation et échecs", 3, 12, "pdf_static", { pdfUrl: "/pdfs/procedure_rupture_reorientation_echecs.docx", folder: "Gestion_Abandon" });
     add("cfa_c3i12_feuille_emargement_gestion_abandon", "CT3 - IND 12 📁 GESTION ABANDON – Feuille d'émargement (suivi abandon)", 3, 12, "pdf_static", { pdfUrl: "/pdfs/feuille_emargement_gestion_abandon.docx", folder: "Gestion_Abandon" });
 
@@ -885,11 +880,6 @@ export function buildFullCatalog(
       );
     });
 
-    // ===== IND 14 — DOSSIER PERMIS B =====
-    add("cfa_c3i14_permisb_aide_financement", "CT3 - IND 14 📁 PERMIS B – Aide au Financement Permis B", 3, 14, "pdf_static", { pdfUrl: "/pdfs/aide_financement_permis_b.pdf" });
-    add("cfa_c3i14_permisb_bordereau_transmission", "CT3 - IND 14 📁 PERMIS B – Bordereau de Transmission", 3, 14, "pdf_static", { pdfUrl: "/pdfs/bordereau_transmission_permis_b.pdf" });
-    add("cfa_c3i14_permisb_formulaire_aide", "CT3 - IND 14 📁 PERMIS B – Formulaire Aide au Financement", 3, 14, "pdf_static", { pdfUrl: "/pdfs/formulaire_aide_financement_permis_b.pdf" });
-    add("cfa_c3i14_permisb_permis", "CT3 - IND 14 📁 PERMIS B – Permis B", 3, 14, "pdf_static", { pdfUrl: "/pdfs/permis_b.pdf" });
     add("cfa_c3i14_notice_aide_financiere_idf", "CT3 - IND 14 📁 NOTICE – Aide Financière Apprenti Île-de-France", 3, 14, "pdf_static", { pdfUrl: "/pdfs/notice_aide_financiere_apprenti_idf.pdf" });
 
     // ===== IND 14 — DOSSIER CITOYENNETÉ (Vie Publique) =====
@@ -1238,7 +1228,7 @@ export function buildFullCatalog(
     add("cfa_siteweb_14_missions", "📁 SITE WEB – Les 14 missions du CFA", 3, 10, "site_web_14_missions_cfa");
     add("cfa_siteweb_livret_accueil", "📁 SITE WEB – Livret d'accueil de l'apprenti", 3, 9, "livret_accueil_cfa_v2", { genericStagiaire: true, stagiaireIdx: 0 });
     add("cfa_siteweb_livret_apprentissage", "📁 SITE WEB – Livret d'apprentissage", 2, 5, "livret_apprentissage_cfa_v2", { genericStagiaire: true, stagiaireIdx: 0 });
-    add("cfa_siteweb_aide_permis", "📁 SITE WEB – L'aide au permis B", 3, 14, "pdf_static", { pdfUrl: "/pdfs/aide_financement_permis_b.pdf" });
+    
     add("cfa_siteweb_aides_sociales", "📁 SITE WEB – Aides sociales (ARA, équipement, santé psy, Imagine R)", 3, 14, "pdf_static", { pdfUrl: "/pdfs/site_web/aides_sociales.pdf" });
     add("cfa_siteweb_atelier_entretien", "📁 SITE WEB – Atelier préparation entretien", 3, 14, "site_web_atelier_entretien_cfa");
     add("cfa_siteweb_atelier_cv", "📁 SITE WEB – Atelier CV", 3, 14, "site_web_atelier_cv_cfa");
