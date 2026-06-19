@@ -582,7 +582,7 @@ export function buildFullCatalog(
     });
     add("cfa_c3i10_livret_maitre_apprentissage", "CT3 - IND 10 📁 LIVRETS – Livret du Maître d'Apprentissage", 3, 10, "livret_maitre_apprentissage_cfa");
     // --- IND 10 — Mission 1 : Orientation & Handicap ---
-    add("cfa_c3i10_handicap_livret_referent", "CT3 - IND 10 📁 14 MISSIONS / Mission 1 – Livret Référent Handicap (orientation/réorientation)", 3, 10, "pdf_static", { pdfUrl: "/pdfs/livret_referent_handicap.docx", folder: "14_MISSIONS_CFA/Mission_1_Orientation_Handicap" });
+    add("cfa_c3i10_handicap_livret_referent", "CT3 - IND 10 📁 14 MISSIONS / Mission 1 – Livret Référent Handicap (orientation/réorientation)", 3, 10, "livret_referent_handicap_cfa", { folder: "14_MISSIONS_CFA/Mission_1_Orientation_Handicap" });
     add("cfa_c3i10_handicap_eval_besoins_agefiph", "CT3 - IND 10 📁 14 MISSIONS / Mission 1 – Évaluation Besoins Apprenants AGEFIPH (Excel)", 3, 10, "pdf_static", { pdfUrl: "/pdfs/evaluation_besoins_handicap_agefiph.xlsx", folder: "14_MISSIONS_CFA/Mission_1_Orientation_Handicap" });
     add("cfa_c3i10_handicap_types_moyens", "CT3 - IND 10 📁 14 MISSIONS / Mission 1 – Types de Handicap, Moyens et Partenaires (Excel)", 3, 10, "pdf_static", { pdfUrl: "/pdfs/handicap_types_moyens_partenaires.xlsx", folder: "14_MISSIONS_CFA/Mission_1_Orientation_Handicap" });
 
