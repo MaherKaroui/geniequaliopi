@@ -216,13 +216,16 @@ const MISSIONS: Record<number, Omit<MissionNL, "imageUrl" | "referent">> = {
     titre: "Accompagner les apprentis dans l'accès aux droits et aux aides spécifiques",
     accent: "#6D28D9",
     puces: [
-      { label: "Permis B aide au financement", desc: "Accompagnement aux dossiers d'aide.", icon: ICONS.card },
-      { label: "Aide au logement & restauration", desc: "Information et orientation CROUS / Action Logement.", icon: ICONS.hand },
-      { label: "Aide à la mobilité", desc: "Carte Imagine R, aide transport, mobilité Erasmus+.", icon: ICONS.plane },
+      { label: "Mobili-Jeune (Action Logement)", desc: "Jusqu'à 100 €/mois sur le loyer, sous conditions.", icon: ICONS.hand },
+      { label: "Garantie Visale + Avance Loca-Pass", desc: "Caution locative gratuite + avance du dépôt de garantie.", icon: ICONS.hand },
+      { label: "Aide au logement & restauration", desc: "Information et orientation CROUS / Action Logement / APL CAF.", icon: ICONS.hand },
+      { label: "Aide à la mobilité", desc: "Carte Imagine R, aide transport régionale, mobilité Erasmus+.", icon: ICONS.plane },
+      { label: "Carte d'étudiant des métiers + Prime d'activité (CAF)", desc: "Réductions loisirs/transports/commerces + complément de revenus selon ressources.", icon: ICONS.card },
+      { label: "Fonds social du CFA + Aide premier équipement", desc: "Aide ponctuelle situations financières difficiles + matériel, outils, tenue professionnelle.", icon: ICONS.euro },
       { label: "Aides santé & psy", desc: "Mutuelle, complémentaire, dispositif Santé Psy Étudiant.", icon: ICONS.heart },
-      { label: "Aides régionales spécifiques", desc: "Équipement, prime IDF, aides France Travail.", icon: ICONS.euro },
+      { label: "Aides régionales spécifiques", desc: "Équipement, prime IDF, aides France Travail, AAH/RQTH selon situation.", icon: ICONS.euro },
     ],
-    paragraphe: "accompagne chaque apprenti dans l'accès aux droits et aux aides : permis B, logement, mobilité, santé, équipement, aides régionales. Un référent dédié facilite les démarches administratives pour lever les obstacles sociaux et matériels.",
+    paragraphe: "accompagne chaque apprenti dans l'accès aux droits et aux aides : logement (Mobili-Jeune, Visale, Loca-Pass, APL), mobilité, restauration, santé, fonds social CFA, prime d'activité et aides régionales. Un référent dédié facilite les démarches administratives pour lever les obstacles sociaux et matériels. Note : l'aide au permis B (500 €) a été supprimée par l'article 202 de la loi de finances 2026.",
   },
 };
 

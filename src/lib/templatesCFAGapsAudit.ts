@@ -58,7 +58,7 @@ export function genQCM14MissionsCFA(o: OrganismeInfo, f: FormationInfo, stagiair
       { heading: "Questions",
         content:
           Q("Qui peut m'aider à trouver un employeur ?", "Le référent recrutement du CFA", "Le médecin du travail", "Aucun, c'est à moi seul", 0) +
-          Q("Quelle aide existe pour le permis B ?", "Aucune", "Une aide forfaitaire de 500 €", "Le permis n'est pas concerné", 1) +
+          Q("Quelle aide existe pour aider à payer le loyer ?", "Aucune", "Mobili-Jeune (Action Logement) — jusqu'à 100 €/mois", "Uniquement les APL", 1) +
           Q("Qui est mon référent handicap ?", `Le référent handicap désigné : ${o.referentHandicap || "[à compléter]"}`, "Le directeur du CFA seulement", "Aucun référent n'existe", 0) +
           Q("Que faire en cas de rupture de contrat ?", "Je quitte la formation", "Je suis accompagné(e) 6 mois maximum pour retrouver un employeur", "Je rembourse les frais", 1) +
           Q("Le CFA propose-t-il une mobilité Erasmus+ ?", "Non", "Oui, sur demande au référent mobilité", "Seulement aux salariés", 1) +
