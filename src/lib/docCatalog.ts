@@ -1245,8 +1245,8 @@ export function buildFullCatalog(
     add("cfa_siteweb_livret_apprentissage", "📁 SITE WEB – Livret d'apprentissage", 2, 5, "livret_apprentissage_cfa_v2", { genericStagiaire: true, stagiaireIdx: 0 });
     add("cfa_siteweb_aide_permis", "📁 SITE WEB – L'aide au permis B", 3, 14, "pdf_static", { pdfUrl: "/pdfs/aide_financement_permis_b.pdf" });
     add("cfa_siteweb_aides_sociales", "📁 SITE WEB – Aides sociales (ARA, équipement, santé psy, Imagine R)", 3, 14, "pdf_static", { pdfUrl: "/pdfs/site_web/aides_sociales.pdf" });
-    add("cfa_siteweb_atelier_entretien", "📁 SITE WEB – Atelier préparation entretien", 3, 14, "pdf_static", { pdfUrl: "/pdfs/site_web/atelier_entretien.pdf" });
-    add("cfa_siteweb_atelier_cv", "📁 SITE WEB – Atelier CV", 3, 14, "pdf_static", { pdfUrl: "/pdfs/site_web/atelier_cv.pdf" });
+    add("cfa_siteweb_atelier_entretien", "📁 SITE WEB – Atelier préparation entretien", 3, 14, "site_web_atelier_entretien_cfa");
+    add("cfa_siteweb_atelier_cv", "📁 SITE WEB – Atelier CV", 3, 14, "site_web_atelier_cv_cfa");
   }
 
   // ===== Bilan de compétences =====
