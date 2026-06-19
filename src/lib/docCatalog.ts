@@ -1175,7 +1175,7 @@ export function buildFullCatalog(
       add(`cfa_c3i15_attestation_sst_${si}`, `CT3 - IND 15 ATTESTATION DE REMISE DU LIVRET SST – ${s.prenom} ${s.nom}`, 3, 15, "attestation_remise_livret_sst_cfa", { stagiaireIdx: si });
     });
     // IND 16 — Convention certificateur + PV de session
-    add("cfa_c3i16_convention_certificateur", "CT3 - IND 16 CONVENTION D'HABILITATION CERTIFICATEUR", 3, 16, "convention_certificateur_cfa");
+    
     add("cfa_c3i16_pv_session_generique", "CT3 - IND 16 PV DE SESSION GÉNÉRIQUE", 3, 16, "pv_session_generique_cfa");
     // IND 17 — Inventaire des moyens
     add("cfa_c4i17_inventaire_moyens", "CT4 - IND 17 INVENTAIRE DES MOYENS PÉDAGOGIQUES ET TECHNIQUES", 4, 17, "inventaire_moyens_cfa");
