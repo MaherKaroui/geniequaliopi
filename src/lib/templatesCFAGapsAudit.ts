@@ -33,7 +33,7 @@ export function genGrilleCompetencesAlternanceCFA(o: OrganismeInfo, f: Formation
       { heading: "Modalités de coordination", content: `<p>• Visite en entreprise : 2 par an minimum<br>• Entretien tripartite : à chaque fin de période en entreprise<br>• Outil de suivi : livret d'apprentissage + tableau Excel partagé</p>` },
     ],
     table: { headers: ["Bloc / Compétence", "Modalité", "Validé", "Évalué par"], rows },
-    signatures: { type: "3", names: [`${s.prenom} ${s.nom}`, s.responsableEntreprise || "Maître d'apprentissage", f.formateur || "Formateur référent"], labels: ["Apprenti", "Maître d'apprentissage", "Formateur CFA"], dates: [todayLong(), todayLong(), todayLong()] },
+    
     stagiaires: [s],
   });
 }
