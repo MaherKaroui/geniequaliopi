@@ -359,23 +359,23 @@ export async function genCerfaApprentissagePdf(
 
   pdf.getForm().updateFieldAppearances();
 
-  // ---------- SIGNATURES & TAMPON (page 2, sous "Fait à") ----------
-  // Coords bottom-up. "Fait à" label = y≈234. Signatures juste en-dessous : y≈170-220.
-  // 3 colonnes : Employeur (~x=20-180), Apprenti (~x=200-360), Représentant légal (~x=380-560)
+  // ---------- SIGNATURES & TAMPON (page 2) ----------
+  // Coords bottom-up. Labels "Signature de l'employeur / apprenti / représentant légal" ≈ y=175.
+  // Champ "Fait à" 8_90 ≈ y=197. → On dessine les signatures SOUS les labels, entre y=110 et y=160.
+  // Tampon CFA : zone "Visa du CFA" colonne gauche, sous l'adresse CFA (entre y=270 et y=395).
   const page2 = pdf.getPages()[1];
   if (page2) {
     const [tamponImg, sigStagImg, sigRespImg] = await Promise.all([
       embedImage(pdf, o.tamponUrl),
       embedImage(pdf, s.signatureUrl),
-      embedImage(pdf, s.signatureResponsableUrl),
+      embedImage(pdf, s.signatureResponsableUrl || o.signatureUrl),
     ]);
-    // Signature employeur (gauche, sous "Signature de l'employeur")
-    if (sigRespImg) drawFitted(page2, sigRespImg, 25, 175, 130, 50);
+    // Signature employeur (gauche, sous "Signature de l'employeur") — fallback signature dirigeant CFA si manquante
+    if (sigRespImg) drawFitted(page2, sigRespImg, 30, 110, 150, 55);
     // Signature apprenti (centre, sous "Signature de l'apprenti(e)")
-    if (sigStagImg) drawFitted(page2, sigStagImg, 215, 175, 130, 50);
-    // Tampon organisme : à droite ("Visa du CFA cachet et signature du directeur") — zone y≈300-400 à gauche
-    // Ou superposé à la signature employeur. On le met dans la zone Visa CFA (gauche, sous "Visa du CFA")
-    if (tamponImg) drawFitted(page2, tamponImg, 30, 350, 110, 70);
+    if (sigStagImg) drawFitted(page2, sigStagImg, 220, 110, 150, 55);
+    // Tampon organisme dans la zone "Visa du CFA (cachet et signature du directeur)" (colonne gauche FORMATION)
+    if (tamponImg) drawFitted(page2, tamponImg, 30, 290, 130, 90);
   }
 
   const out = await pdf.save();
