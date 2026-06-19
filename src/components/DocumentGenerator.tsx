@@ -1421,6 +1421,31 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
         </div>
       </div>
 
+      {isCFAOrg && (
+        <div className="p-4 bg-gradient-to-r from-orange-500/10 to-amber-500/10 rounded-xl border-2 border-orange-400/40 flex items-center justify-between">
+          <div>
+            <h3 className="font-bold text-orange-700 flex items-center gap-2">
+              <span className="text-xs font-bold bg-orange-500 text-white px-2 py-0.5 rounded">CFA</span>
+              PRÉPA AUDIT QUALIOPI CFA
+            </h3>
+            <p className="text-xs text-muted-foreground mt-1">
+              Pack spécial CFA (audit initial nouvel entrant) : 32 indicateurs V9 avec niveau attendu, script "ce qu'il faut dire", preuves et vigilance. Format Dreamers Team.
+            </p>
+          </div>
+          <div className="flex gap-2 flex-wrap">
+            <Button variant="outline" size="sm" onClick={handleDownloadGuideAuditCFA}>
+              Guide audit (Quoi dire)
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleDownloadFeuilleRouteCFA}>
+              Feuille de route CFA (Excel)
+            </Button>
+            <Button size="sm" onClick={handleDownloadBookCFA} className="bg-orange-600 text-white border-0 hover:bg-orange-700">
+              Book Qualiopi CFA
+            </Button>
+          </div>
+        </div>
+      )}
+
       <div className="p-3 bg-secondary rounded-xl flex items-center gap-3">
         <div className="flex-1">
           <div className="flex justify-between text-sm">
