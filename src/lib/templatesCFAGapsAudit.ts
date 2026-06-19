@@ -264,7 +264,7 @@ export function genGuideAssistanceFOADCFA(o: OrganismeInfo) {
       { heading: "Modalités d'accompagnement et traçabilité", content: `<p>• Information sur l'accès aux activités (planning des sessions, ressources, modalités d'évaluation) communiquée par email avant le démarrage<br>• Accompagnement à l'appropriation de l'environnement de visioconférence (tutoriels + session de prise en main)<br>• <strong>Traçabilité de la présence</strong> : extraction automatique des logs de connexion Zoom et Google Meet (horodatage entrée/sortie, durée de présence par participant)<br>• Points d'étape pédagogiques formalisés (compte-rendu et liste de présence)</p>` },
       { heading: "Référent FOAD", content: `<p><strong>${o.responsablePedagogique}</strong> — Responsable pédagogique<br>Email : ${o.email}</p>` },
     ],
-    signatures: { type: "2", labels: ["Responsable pédagogique", "Direction"], names: [o.responsablePedagogique, o.dirigeant], dates: [todayLong(), todayLong()] },
+    signatures: { type: "2", labels: ["Responsable pédagogique", "Le Dirigeant"], names: [o.responsablePedagogique, o.dirigeant], dates: [todayLong(), todayLong()] },
   });
 }
 
