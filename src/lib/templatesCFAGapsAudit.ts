@@ -118,6 +118,173 @@ export function genProcedureRespectCertificateurCFA(o: OrganismeInfo, f: Formati
 // ============================================================================
 // IND 14 — Pages site : aides, ateliers CV & entretien
 // ============================================================================
+type RegionAides = {
+  region: string;
+  aides: { titre: string; url: string; desc: string }[];
+};
+
+// Mapping département (2 premiers chiffres du CP) → région + aides régionales officielles
+function getRegionAidesByCodePostal(codePostal?: string): RegionAides | null {
+  if (!codePostal) return null;
+  const dep = codePostal.trim().slice(0, 2);
+  // DOM-TOM (3 chiffres)
+  const dep3 = codePostal.trim().slice(0, 3);
+
+  const map: Record<string, RegionAides> = {
+    // ÎLE-DE-FRANCE
+    IDF: {
+      region: "Île-de-France",
+      aides: [
+        { titre: "Aides aux apprentis – Région Île-de-France", url: "https://www.iledefrance.fr/aides-et-appels-a-projets/aides-aux-apprentis", desc: "Carte Imagine R, aide à l'équipement professionnel, aide à l'hébergement pour apprentis franciliens." },
+        { titre: "Imagine R – Île-de-France Mobilités", url: "https://www.iledefrance-mobilites.fr/titres-et-tarifs/detail/imagine-r-scolaire", desc: "Forfait transport annuel à tarif réduit pour les apprentis franciliens de moins de 26 ans." },
+      ],
+    },
+    // AUVERGNE-RHÔNE-ALPES
+    ARA: {
+      region: "Auvergne-Rhône-Alpes",
+      aides: [
+        { titre: "Aides aux apprentis – Région Auvergne-Rhône-Alpes", url: "https://www.auvergnerhonealpes.fr/aide/65/297-pass-region-apprentis-formation-jeunes.htm", desc: "Pass'Région Apprentis : aide forfaitaire de 30 €, livres, manuels, équipement et activités culturelles/sportives." },
+      ],
+    },
+    // HAUTS-DE-FRANCE
+    HDF: {
+      region: "Hauts-de-France",
+      aides: [
+        { titre: "Aides aux apprentis – Région Hauts-de-France", url: "https://guide-aides.hautsdefrance.fr/aap/index_alpha.php?ind=apprentissage", desc: "Génération + Hauts-de-France, aide à l'équipement, aide à la mobilité internationale des apprentis." },
+      ],
+    },
+    // GRAND EST
+    GE: {
+      region: "Grand Est",
+      aides: [
+        { titre: "Aides aux apprentis – Région Grand Est", url: "https://www.grandest.fr/vos-aides-regionales/?cat=apprentissage", desc: "Aide au transport, à l'hébergement, à la restauration et à l'équipement professionnel pour apprentis." },
+      ],
+    },
+    // NOUVELLE-AQUITAINE
+    NA: {
+      region: "Nouvelle-Aquitaine",
+      aides: [
+        { titre: "Aides aux apprentis – Région Nouvelle-Aquitaine", url: "https://les-aides.nouvelle-aquitaine.fr/jeunesse-et-citoyennete/apprentissage", desc: "Aide au premier équipement professionnel, aide au transport, hébergement et restauration." },
+      ],
+    },
+    // OCCITANIE
+    OCC: {
+      region: "Occitanie",
+      aides: [
+        { titre: "Aides aux apprentis – Région Occitanie", url: "https://www.laregion.fr/-Apprentissage-", desc: "Carte Jeune Région, aide au transport, hébergement, restauration et équipement professionnel des apprentis." },
+      ],
+    },
+    // PROVENCE-ALPES-CÔTE D'AZUR
+    PACA: {
+      region: "Provence-Alpes-Côte d'Azur",
+      aides: [
+        { titre: "Aides aux apprentis – Région Sud (PACA)", url: "https://www.maregionsud.fr/aides-et-appels-a-projets/detail/e-pass-jeunes", desc: "e-PASS jeunes 80 €, aide au transport (PassZou!), hébergement et restauration des apprentis." },
+      ],
+    },
+    // PAYS DE LA LOIRE
+    PDL: {
+      region: "Pays de la Loire",
+      aides: [
+        { titre: "Aides aux apprentis – Région Pays de la Loire", url: "https://www.paysdelaloire.fr/les-aides/pack-apprentissage-pour-les-apprentis", desc: "Pack Apprentissage : transport, hébergement, restauration et équipement professionnel." },
+      ],
+    },
+    // BRETAGNE
+    BRE: {
+      region: "Bretagne",
+      aides: [
+        { titre: "Aides aux apprentis – Région Bretagne", url: "https://www.bretagne.bzh/aides/fiches/aide-individuelle-apprentis/", desc: "Aide individuelle aux apprentis bretons : transport, hébergement, restauration." },
+      ],
+    },
+    // NORMANDIE
+    NOR: {
+      region: "Normandie",
+      aides: [
+        { titre: "Aides aux apprentis – Région Normandie", url: "https://aides.normandie.fr/atouts-normandie", desc: "Atouts Normandie : aide aux loisirs sportifs, culturels, équipement et permis B pour les apprentis." },
+      ],
+    },
+    // BOURGOGNE-FRANCHE-COMTÉ
+    BFC: {
+      region: "Bourgogne-Franche-Comté",
+      aides: [
+        { titre: "Aides aux apprentis – Région Bourgogne-Franche-Comté", url: "https://www.bourgognefranchecomte.fr/aides-aux-apprentis", desc: "Carte Avantages Jeunes, aide au transport, hébergement, restauration et premier équipement." },
+      ],
+    },
+    // CENTRE-VAL DE LOIRE
+    CVL: {
+      region: "Centre-Val de Loire",
+      aides: [
+        { titre: "Aides aux apprentis – Région Centre-Val de Loire", url: "https://www.centre-valdeloire.fr/les-aides/aides-aux-apprentis", desc: "YEP'S, aide au transport, à l'hébergement et à la restauration pour les apprentis du Centre-Val de Loire." },
+      ],
+    },
+    // CORSE
+    COR: {
+      region: "Corse",
+      aides: [
+        { titre: "Aides aux apprentis – Collectivité de Corse", url: "https://www.isula.corsica/Apprentissage_a36.html", desc: "Aides à la mobilité, à l'hébergement, à la restauration et à l'équipement pour les apprentis corses." },
+      ],
+    },
+    // DOM
+    GUA: {
+      region: "Guadeloupe",
+      aides: [{ titre: "Aides aux apprentis – Région Guadeloupe", url: "https://www.regionguadeloupe.fr/", desc: "Aides régionales à l'apprentissage : transport, hébergement, équipement." }],
+    },
+    MAR: {
+      region: "Martinique",
+      aides: [{ titre: "Aides aux apprentis – CTM Martinique", url: "https://www.collectivitedemartinique.mq/", desc: "Aides de la Collectivité Territoriale de Martinique aux apprentis." }],
+    },
+    GUY: {
+      region: "Guyane",
+      aides: [{ titre: "Aides aux apprentis – CTG Guyane", url: "https://www.ctguyane.fr/", desc: "Aides de la Collectivité Territoriale de Guyane aux apprentis." }],
+    },
+    REU: {
+      region: "La Réunion",
+      aides: [{ titre: "Aides aux apprentis – Région Réunion", url: "https://regionreunion.com/aides-services/apprentissage", desc: "Aides régionales à l'apprentissage à La Réunion : transport, équipement, mobilité." }],
+    },
+    MAY: {
+      region: "Mayotte",
+      aides: [{ titre: "Aides aux apprentis – Département de Mayotte", url: "https://www.cg976.fr/", desc: "Dispositifs d'aide à l'apprentissage à Mayotte." }],
+    },
+  };
+
+  // Mapping département → clé région
+  const depToRegion: Record<string, string> = {
+    // Île-de-France : 75, 77, 78, 91, 92, 93, 94, 95
+    "75": "IDF", "77": "IDF", "78": "IDF", "91": "IDF", "92": "IDF", "93": "IDF", "94": "IDF", "95": "IDF",
+    // Auvergne-Rhône-Alpes : 01, 03, 07, 15, 26, 38, 42, 43, 63, 69, 73, 74
+    "01": "ARA", "03": "ARA", "07": "ARA", "15": "ARA", "26": "ARA", "38": "ARA", "42": "ARA", "43": "ARA", "63": "ARA", "69": "ARA", "73": "ARA", "74": "ARA",
+    // Hauts-de-France : 02, 59, 60, 62, 80
+    "02": "HDF", "59": "HDF", "60": "HDF", "62": "HDF", "80": "HDF",
+    // Grand Est : 08, 10, 51, 52, 54, 55, 57, 67, 68, 88
+    "08": "GE", "10": "GE", "51": "GE", "52": "GE", "54": "GE", "55": "GE", "57": "GE", "67": "GE", "68": "GE", "88": "GE",
+    // Nouvelle-Aquitaine : 16, 17, 19, 23, 24, 33, 40, 47, 64, 79, 86, 87
+    "16": "NA", "17": "NA", "19": "NA", "23": "NA", "24": "NA", "33": "NA", "40": "NA", "47": "NA", "64": "NA", "79": "NA", "86": "NA", "87": "NA",
+    // Occitanie : 09, 11, 12, 30, 31, 32, 34, 46, 48, 65, 66, 81, 82
+    "09": "OCC", "11": "OCC", "12": "OCC", "30": "OCC", "31": "OCC", "32": "OCC", "34": "OCC", "46": "OCC", "48": "OCC", "65": "OCC", "66": "OCC", "81": "OCC", "82": "OCC",
+    // PACA : 04, 05, 06, 13, 83, 84
+    "04": "PACA", "05": "PACA", "06": "PACA", "13": "PACA", "83": "PACA", "84": "PACA",
+    // Pays de la Loire : 44, 49, 53, 72, 85
+    "44": "PDL", "49": "PDL", "53": "PDL", "72": "PDL", "85": "PDL",
+    // Bretagne : 22, 29, 35, 56
+    "22": "BRE", "29": "BRE", "35": "BRE", "56": "BRE",
+    // Normandie : 14, 27, 50, 61, 76
+    "14": "NOR", "27": "NOR", "50": "NOR", "61": "NOR", "76": "NOR",
+    // Bourgogne-Franche-Comté : 21, 25, 39, 58, 70, 71, 89, 90
+    "21": "BFC", "25": "BFC", "39": "BFC", "58": "BFC", "70": "BFC", "71": "BFC", "89": "BFC", "90": "BFC",
+    // Centre-Val de Loire : 18, 28, 36, 37, 41, 45
+    "18": "CVL", "28": "CVL", "36": "CVL", "37": "CVL", "41": "CVL", "45": "CVL",
+    // Corse : 2A, 2B (codes postaux 20)
+    "20": "COR", "2A": "COR", "2B": "COR",
+  };
+
+  // DOM (3 premiers chiffres)
+  const dep3ToRegion: Record<string, string> = {
+    "971": "GUA", "972": "MAR", "973": "GUY", "974": "REU", "976": "MAY",
+  };
+
+  const key = dep3ToRegion[dep3] || depToRegion[dep];
+  return key ? map[key] : null;
+}
+
 export function genPagesSiteAidesAteliersCFA(o: OrganismeInfo, f: FormationInfo) {
   const aides = [
     { titre: "Guide officiel des aides aux alternants 2026", url: "https://labonnealternance.apprentissage.beta.gouv.fr/guide-alternant/les-aides-financieres-et-materielles", desc: "Portail officiel République Française regroupant l'ensemble des aides : logement, transport, restauration, équipement, mobilité internationale." },
@@ -129,6 +296,11 @@ export function genPagesSiteAidesAteliersCFA(o: OrganismeInfo, f: FormationInfo)
     { titre: "Mobilité européenne et internationale des alternants – Ministère du Travail", url: "https://travail-emploi.gouv.fr/la-mobilite-europeenne-et-internationale-des-alternants", desc: "Dispositif de mobilité Erasmus+ pour les apprentis : conditions, durée, financement, démarches auprès du CFA." },
     { titre: "Mobilité des alternants Erasmus+ – Agence Erasmus+ France", url: "https://agence.erasmusplus.fr/priorites-et-thematiques/la-mobilite-des-alternants-avec-erasmus/", desc: "Agence officielle Erasmus+ France : informations pratiques, bourses, accompagnement pour partir en mobilité européenne pendant l'apprentissage." },
   ];
+
+  // Aides régionales automatisées selon le code postal de l'organisme
+  const regionAides = getRegionAidesByCodePostal(o.codePostal);
+  const aidesRegionales = regionAides?.aides || [];
+
   const ateliers = [
     { titre: "Ateliers « Préparer sa candidature » – France Travail", url: "https://www.francetravail.fr/candidat/les-ateliers-francetravail/ateliers-sur-les-techniques-de-r.html", desc: "Ateliers officiels France Travail (auto-inscription) : faire le point sur ses compétences, créer un CV clair et percutant, structurer sa candidature." },
     { titre: "Préparer votre candidature – France Travail", url: "https://www.francetravail.fr/candidat/vos-recherches/preparer-votre-candidature.html", desc: "Conseils pratiques pour la rédaction du CV, de la lettre de motivation et la préparation de l'entretien d'embauche (avec vidéos et fiches méthode)." },
@@ -138,14 +310,24 @@ export function genPagesSiteAidesAteliersCFA(o: OrganismeInfo, f: FormationInfo)
     { titre: "CIDJ – Conseils CV, lettre, entretien", url: "https://www.cidj.com/", desc: "Centre d'Information et de Documentation Jeunesse : fiches pratiques CV, lettre de motivation, simulation d'entretien, orientation." },
   ];
   const rowsAides = aides.map(a => [a.titre, `<a href="${a.url}" target="_blank" rel="noopener">${a.url}</a>`, a.desc]);
+  const rowsAidesRegionales = aidesRegionales.map(a => [a.titre, `<a href="${a.url}" target="_blank" rel="noopener">${a.url}</a>`, a.desc]);
   const rowsAteliers = ateliers.map(a => [a.titre, `<a href="${a.url}" target="_blank" rel="noopener">${a.url}</a>`, a.desc]);
+
+  const sectionAidesRegionales = regionAides
+    ? [{
+        heading: `Aides régionales spécifiques — ${regionAides.region} (CP ${o.codePostal})`,
+        content: `<p>Aides du Conseil régional <strong>${regionAides.region}</strong> identifiées automatiquement à partir du code postal du CFA (<strong>${o.codePostal}</strong>).</p>${tableHTML(["Ressource", "Lien officiel", "Contenu"], rowsAidesRegionales)}`,
+      }]
+    : [];
+
   return buildDocument({
     org: o,
     title: "PAGES & RESSOURCES EN LIGNE — AIDES, ATELIERS CV & ENTRETIEN",
-    subtitle: "Liens utiles communiqués aux apprentis du CFA",
+    subtitle: regionAides ? `Liens utiles communiqués aux apprentis — Région ${regionAides.region}` : "Liens utiles communiqués aux apprentis du CFA",
     sections: [
-      { heading: "Objet", content: `<p>Le CFA <strong>${o.nom}</strong> communique à ses apprentis un ensemble de liens vers les sites institutionnels et officiels permettant d'accéder aux aides existantes (logement, mobilité, handicap, mobilité internationale) et aux ressources d'accompagnement à l'insertion professionnelle (CV, lettre de motivation, préparation à l'entretien d'embauche, recherche d'entreprise).</p><p>Ces liens sont diffusés via le livret d'accueil, l'espace apprenant et lors des entretiens individuels de suivi.</p>` },
-      { heading: "Aides financières et sociales — sites officiels", content: tableHTML(["Ressource", "Lien officiel", "Contenu"], rowsAides) },
+      { heading: "Objet", content: `<p>Le CFA <strong>${o.nom}</strong> communique à ses apprentis un ensemble de liens vers les sites institutionnels et officiels permettant d'accéder aux aides existantes (nationales et régionales : logement, mobilité, handicap, mobilité internationale) et aux ressources d'accompagnement à l'insertion professionnelle (CV, lettre de motivation, préparation à l'entretien d'embauche, recherche d'entreprise).</p><p>Ces liens sont diffusés via le livret d'accueil, l'espace apprenant et lors des entretiens individuels de suivi. <strong>Les aides régionales affichées ci-dessous sont automatiquement adaptées au code postal du CFA${o.codePostal ? ` (${o.codePostal})` : ""}.</strong></p>` },
+      { heading: "Aides financières et sociales nationales — sites officiels", content: tableHTML(["Ressource", "Lien officiel", "Contenu"], rowsAides) },
+      ...sectionAidesRegionales,
       { heading: "Ateliers CV, lettre & entretien d'embauche — sites officiels", content: tableHTML(["Ressource", "Lien officiel", "Contenu"], rowsAteliers) },
       { heading: "Accompagnement par le CFA", content: `<p>Un accompagnement individuel à la mobilisation de ces ressources peut être sollicité auprès de <strong>${o.responsablePedagogique || "la coordination pédagogique"}</strong>. Pour les apprentis en situation de handicap, le référent handicap <strong>${o.referentHandicap || "—"}</strong> oriente vers les dispositifs Agefiph adaptés.</p>` },
       { heading: "Veille et mise à jour", content: `<p>Les liens et dispositifs sont vérifiés et mis à jour par le ${o.referentQualite || o.responsablePedagogique || "référent qualité"} dans le cadre de la veille socio-professionnelle. Toute évolution réglementaire (suppression, création, évolution des montants) est intégrée dans un délai maximal de 30 jours.</p>` },
