@@ -4,7 +4,7 @@
 // (croisées avec les documents générés par l'application), et les vigilances éventuelles.
 
 import { OrganismeInfo, FormationInfo, StagiaireInfo, DocEntry } from "@/types/qualiopi";
-import { INDICATEURS_CFA, CRITERES_CFA, getPonderationLabel } from "./qualiopiReferenceCFA";
+import { INDICATEURS_CFA, CRITERES_CFA } from "./qualiopiReferenceCFA";
 
 export function generateBookQualiopiCFA(
   org: OrganismeInfo,
