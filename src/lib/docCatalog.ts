@@ -1180,6 +1180,56 @@ export function buildFullCatalog(
     add("cfa_c7i32_procedure_amelioration", "CT7 - IND 32 PROCÉDURE AMÉLIORATION CONTINUE", 7, 32, "procedure_amelioration_continue");
 
     // ===========================================================
+    // ===== GAPS AUDIT QUALIOPI CFA (Dreamers Team / V9) =======
+    // ===========================================================
+    // IND 13 — Grille de compétences alternance nominative
+    stagiaires.forEach((s, si) => {
+      add(`cfa_c3i13_grille_competences_${si}`, `CT3 - IND 13 GRILLE DE COMPÉTENCES ALTERNANCE – ${s.prenom} ${s.nom}`, 3, 13, "grille_competences_alternance_cfa", { stagiaireIdx: si });
+    });
+    // IND 14 — QCM 14 missions nominatif
+    stagiaires.forEach((s, si) => {
+      add(`cfa_c3i14_qcm_14_missions_${si}`, `CT3 - IND 14 QCM 14 MISSIONS – ${s.prenom} ${s.nom}`, 3, 14, "qcm_14_missions_cfa", { stagiaireIdx: si });
+    });
+    // IND 15 — Attestation de remise livret SST
+    stagiaires.forEach((s, si) => {
+      add(`cfa_c3i15_attestation_sst_${si}`, `CT3 - IND 15 ATTESTATION DE REMISE DU LIVRET SST – ${s.prenom} ${s.nom}`, 3, 15, "attestation_remise_livret_sst_cfa", { stagiaireIdx: si });
+    });
+    // IND 16 — Convention certificateur + PV de session
+    add("cfa_c3i16_convention_certificateur", "CT3 - IND 16 CONVENTION D'HABILITATION CERTIFICATEUR", 3, 16, "convention_certificateur_cfa");
+    add("cfa_c3i16_pv_session_generique", "CT3 - IND 16 PV DE SESSION GÉNÉRIQUE", 3, 16, "pv_session_generique_cfa");
+    // IND 17 — Inventaire des moyens
+    add("cfa_c4i17_inventaire_moyens", "CT4 - IND 17 INVENTAIRE DES MOYENS PÉDAGOGIQUES ET TECHNIQUES", 4, 17, "inventaire_moyens_cfa");
+    // IND 18 — Fiches de poste + CR réunion
+    add("cfa_c4i18_fiches_poste", "CT4 - IND 18 FICHES DE POSTE ÉQUIPE CFA", 4, 18, "fiches_poste_cfa");
+    add("cfa_c4i18_cr_reunion_pedagogique", "CT4 - IND 18 COMPTE-RENDU DE RÉUNION PÉDAGOGIQUE", 4, 18, "cr_reunion_pedagogique_cfa");
+    // IND 19 — Guide assistance FOAD
+    add("cfa_c4i19_guide_assistance_foad", "CT4 - IND 19 GUIDE D'ASSISTANCE TECHNIQUE ET PÉDAGOGIQUE FOAD", 4, 19, "guide_assistance_foad_cfa");
+    // IND 20 — Lettres de mission
+    add("cfa_c4i20_lettre_mission_mobilite", "CT4 - IND 20 LETTRE DE MISSION RÉFÉRENT MOBILITÉ", 4, 20, "lettre_mission_referent_mobilite_cfa");
+    add("cfa_c4i20_lettre_mission_handicap", "CT4 - IND 20 LETTRE DE MISSION RÉFÉRENT HANDICAP", 4, 20, "lettre_mission_referent_handicap_cfa");
+    // IND 21 — Grilles recrutement + évaluation
+    add("cfa_c5i21_grille_recrutement", "CT5 - IND 21 GRILLE DE RECRUTEMENT FORMATEUR", 5, 21, "grille_recrutement_formateur_cfa");
+    add("cfa_c5i21_grille_evaluation_pedago", "CT5 - IND 21 GRILLE D'ÉVALUATION PÉDAGOGIQUE FORMATEUR", 5, 21, "grille_evaluation_pedagogique_cfa");
+    // IND 22 — Entretien professionnel annuel
+    add("cfa_c5i22_entretien_pro_annuel", "CT5 - IND 22 ENTRETIEN PROFESSIONNEL ANNUEL INTERVENANT", 5, 22, "entretien_professionnel_annuel_cfa");
+    // IND 23/24/25 — Fiche de veille consolidée
+    add("cfa_c6i23_veille_consolidee", "CT6 - IND 23-24-25 FICHE DE VEILLE CONSOLIDÉE CFA", 6, 23, "fiche_veille_consolidee_cfa");
+    // IND 26 — Annuaire partenaires handicap
+    add("cfa_c6i26_annuaire_handicap", "CT6 - IND 26 ANNUAIRE PARTENAIRES HANDICAP APPRENTISSAGE", 6, 26, "annuaire_partenaires_handicap_cfa");
+    // IND 28 — Annuaire entreprises + CR coconstruction branche
+    add("cfa_c6i28_annuaire_entreprises", "CT6 - IND 28 ANNUAIRE DES ENTREPRISES PARTENAIRES", 6, 28, "annuaire_entreprises_partenaires_cfa");
+    add("cfa_c6i28_cr_coconstruction_branche", "CT6 - IND 28 CR COCONSTRUCTION AVEC BRANCHE PRO", 6, 28, "cr_coconstruction_branche_cfa");
+    // IND 29 — Questionnaires entreprise/MA + financeur
+    stagiaires.forEach((s, si) => {
+      add(`cfa_c7i29_satisfaction_entreprise_${si}`, `CT7 - IND 29 QUESTIONNAIRE SATISFACTION ENTREPRISE / MA – ${s.prenom} ${s.nom}`, 7, 29, "questionnaire_satisfaction_entreprise_cfa", { stagiaireIdx: si });
+    });
+    add("cfa_c7i29_satisfaction_financeur", "CT7 - IND 29 QUESTIONNAIRE SATISFACTION FINANCEUR (OPCO)", 7, 29, "questionnaire_satisfaction_financeur_cfa");
+    // IND 30 — Tableau de relances
+    add("cfa_c7i30_tableau_relances", "CT7 - IND 30 TABLEAU DE RELANCES DES APPRÉCIATIONS", 7, 30, "tableau_relances_appreciations_cfa");
+    // IND 32 — Plan d'action insertion / réduction ruptures
+    add("cfa_c7i32_plan_insertion_ruptures", "CT7 - IND 32 PLAN D'ACTION INSERTION & RÉDUCTION DES RUPTURES", 7, 32, "plan_insertion_reduction_ruptures_cfa");
+
+    // ===========================================================
     // ===== 📁 SITE WEB — Documents publics (sans stagiaire) =====
     // ===========================================================
     // Versions vierges signées/tamponnées, prêtes à être publiées sur le site internet du CFA.
