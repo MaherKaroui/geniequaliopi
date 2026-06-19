@@ -243,7 +243,6 @@ export function genCRReunionPedagogiqueCFA(o: OrganismeInfo, f: FormationInfo, s
       { heading: "Décisions & actions", content: `<p>• Maintien du planning prévisionnel.<br>• Renforcement du suivi tuteur pour les apprentis identifiés en alerte.<br>• Programmation d'un examen blanc à mi-parcours.<br>• Mise à jour du livret d'apprentissage à l'issue de la session.</p>` },
       { heading: "Prochaine réunion", content: `<p>Réunion mensuelle — date à fixer.</p>` },
     ],
-    signatures: { type: "2", labels: ["Animateur", "Direction"], names: [o.responsablePedagogique, o.dirigeant], dates: [date, date] },
   });
 }
 
