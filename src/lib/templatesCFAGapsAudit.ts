@@ -232,13 +232,12 @@ export function genFichesPosteCFA(o: OrganismeInfo) {
 // IND 18 — CR réunion pédagogique CFA
 // ============================================================================
 export function genCRReunionPedagogiqueCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
-  const date = todayLong();
   const nbApprentis = stagiaires.length;
   return buildDocument({
     org: o,
     title: `COMPTE-RENDU DE RÉUNION PÉDAGOGIQUE`,
     sections: [
-      { heading: "Identification", content: `<p><strong>Date :</strong> ${date}<br><strong>Lieu :</strong> Locaux CFA — ${o.ville || ""}<br><strong>Animateur :</strong> ${o.responsablePedagogique}<br><strong>Participants :</strong> ${o.dirigeant}, ${o.responsablePedagogique}, ${o.referentQualite}, ${f.formateur || "Formateur référent"}</p>` },
+      { heading: "Identification", content: `<p><strong>Lieu :</strong> Locaux CFA — ${o.ville || ""}<br><strong>Animateur :</strong> ${o.responsablePedagogique}<br><strong>Participants :</strong> ${o.dirigeant}, ${o.responsablePedagogique}, ${o.referentQualite}, ${f.formateur || "Formateur référent"}</p>` },
       { heading: "Ordre du jour", content: `<p>1. Suivi de la promotion ${f.intitule || ""} (${nbApprentis} apprenti${nbApprentis > 1 ? "s" : ""})<br>2. Retours des visites en entreprise<br>3. Évaluations intermédiaires<br>4. Préparation des examens<br>5. Questions diverses</p>` },
       { heading: "Décisions & actions", content: `<p>• Maintien du planning prévisionnel.<br>• Renforcement du suivi tuteur pour les apprentis identifiés en alerte.<br>• Programmation d'un examen blanc à mi-parcours.<br>• Mise à jour du livret d'apprentissage à l'issue de la session.</p>` },
       { heading: "Prochaine réunion", content: `<p>Réunion mensuelle — date à fixer.</p>` },
