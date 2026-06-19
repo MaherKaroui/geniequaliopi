@@ -102,6 +102,7 @@ Unfinished training (latest end date not passed): final evaluations/tests must r
 - [logic/emargement-connexion-mixte](mem://logic/emargement-connexion-mixte) — Émargement/connexion : mixte alterné jour par jour, jours futurs en blanc
 - [features/audit/opco-calendrier-alternance](mem://features/audit/opco-calendrier-alternance) — Calendrier OPCO B9 : rythme alternance, démarrage école, 7h/jour
 - [features/audit/opco-trames-vierges](mem://features/audit/opco-trames-vierges) — ZIP B9 et C11 : trame vierge ajoutée par session en plus du PDF rempli
+- [features/audit/cfa-prepa-audit-dreamers](mem://features/audit/cfa-prepa-audit-dreamers) — Pack CFA (Book + Feuille de route + Guide audit + 18 docs gaps) format Dreamers Team V9 nouvel entrant
 - [logic/horaires-cours-du-soir](mem://logic/horaires-cours-du-soir) — Cours du soir 18h-22h + samedi 9h-17h30 (PSH/Nouira : 9h-17h). OPCO/CFA gardent rythme journée.
 - [logic/rythme-alternance-parser](mem://logic/rythme-alternance-parser) — Parser rythme alternance : 3 formats (semaines, jours, heures ex 910h/280h)
 - [logic/bilan-froid-empty-if-not-finished](mem://logic/bilan-froid-empty-if-not-finished) — Bilan à froid (CODE 58bis / IND 30 / OPCO C10) vide tant que formation non terminée
