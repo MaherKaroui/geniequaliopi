@@ -596,7 +596,7 @@ export function genPlanInsertionReductionRupturesCFA(o: OrganismeInfo, f: Format
     org: o,
     title: `PLAN D'ACTION — INSERTION & RÉDUCTION DES RUPTURES`,
     sections: [
-      { heading: "Objet (Indicateur 32 — spécifique CFA)", content: `<p>Plan d'amélioration continue formalisé du CFA <strong>${o.nom}</strong> sur deux leviers prioritaires : amélioration de l'insertion professionnelle et réduction des ruptures de contrat. Daté du ${todayLong()}. Nouvel entrant : les résultats seront mesurés à la première surveillance.</p>` },
+      { heading: "Objet (Indicateur 32 — spécifique CFA)", content: `<p>Plan d'amélioration continue formalisé du CFA <strong>${o.nom}</strong> sur deux leviers prioritaires : amélioration de l'insertion professionnelle et réduction des ruptures de contrat. Nouvel entrant : les résultats seront mesurés à la première surveillance.</p>` },
       { heading: "Axe 1 — Prévention des ruptures",
         content: tableHTML(
           ["Action", "Indicateur", "Cible", "Pilote", "Échéance"],
