@@ -4,6 +4,9 @@ import { OrganismeInfo, FormationInfo, StagiaireInfo, CritereData, CRITERES_INFO
 import { getFullCatalog, generateDocumentById } from "@/lib/documentGenerator";
 import { generateBookQualiopi } from "@/lib/bookQualiopi";
 import { generateFeuilleRouteQualiopi } from "@/lib/feuilleRouteQualiopi";
+import { generateBookQualiopiCFA } from "@/lib/bookQualiopiCFA";
+import { generateFeuilleRouteQualiopiCFA } from "@/lib/feuilleRouteQualiopiCFA";
+import { generateGuideAuditCFA } from "@/lib/guideAuditCFA";
 import { setDocStyle } from "@/lib/docBuilder";
 import { SAMPLE_FORMATIONS, mergeStagiaires, mergeOrganisme } from "@/lib/sampleData";
 import { Button } from "@/components/ui/button";
@@ -664,6 +667,29 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
       console.error(e);
       toast.error("Erreur lors de la génération de la feuille de route");
     }
+  };
+
+  const isCFAOrg = (mergedOrganisme.typesActions || []).includes("apprentissage");
+
+  const handleDownloadBookCFA = async () => {
+    const content = generateBookQualiopiCFA(mergedOrganisme, [selectedFormation], allStagiaires, catalog);
+    await downloadFile(content, buildGenericFileName("BOOK_QUALIOPI_CFA", mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, ".doc"));
+  };
+
+  const handleDownloadFeuilleRouteCFA = () => {
+    try {
+      const blob = generateFeuilleRouteQualiopiCFA(mergedOrganisme, catalog);
+      saveAs(blob, buildGenericFileName("FEUILLE_ROUTE_QUALIOPI_CFA", mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, ".xlsx"));
+      toast.success("Feuille de route Qualiopi CFA téléchargée");
+    } catch (e) {
+      console.error(e);
+      toast.error("Erreur lors de la génération de la feuille de route CFA");
+    }
+  };
+
+  const handleDownloadGuideAuditCFA = async () => {
+    const content = generateGuideAuditCFA(mergedOrganisme, [selectedFormation], catalog);
+    await downloadFile(content, buildGenericFileName("GUIDE_AUDIT_CFA_QUOI_DIRE", mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, ".doc"));
   };
 
   const handleDownloadAll = () => {
