@@ -3,6 +3,7 @@ import mammoth from "mammoth";
 import { OrganismeInfo, FormationInfo, StagiaireInfo, CritereData, CRITERES_INFO, DocEntry, DocStyleConfig, DEFAULT_DOC_STYLE } from "@/types/qualiopi";
 import { getFullCatalog, generateDocumentById } from "@/lib/documentGenerator";
 import { generateBookQualiopi } from "@/lib/bookQualiopi";
+import { generateFeuilleRouteQualiopi } from "@/lib/feuilleRouteQualiopi";
 import { setDocStyle } from "@/lib/docBuilder";
 import { SAMPLE_FORMATIONS, mergeStagiaires, mergeOrganisme } from "@/lib/sampleData";
 import { Button } from "@/components/ui/button";
@@ -652,6 +653,17 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
   const handleDownloadBook = async () => {
     const content = generateBookQualiopi(mergedOrganisme, [selectedFormation], allStagiaires, catalog);
     await downloadFile(content, buildGenericFileName("BOOK_QUALIOPI_COMPLET", mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, ".doc"));
+  };
+
+  const handleDownloadFeuilleRoute = () => {
+    try {
+      const blob = generateFeuilleRouteQualiopi(mergedOrganisme, catalog);
+      saveAs(blob, buildGenericFileName("FEUILLE_ROUTE_QUALIOPI", mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, ".xlsx"));
+      toast.success("Feuille de route Qualiopi téléchargée");
+    } catch (e) {
+      console.error(e);
+      toast.error("Erreur lors de la génération de la feuille de route");
+    }
   };
 
   const handleDownloadAll = () => {
@@ -1373,6 +1385,9 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
         <div className="flex gap-2">
           <Button variant="outline" size="sm" onClick={handlePreviewBook}>
             Aperçu
+          </Button>
+          <Button variant="outline" size="sm" onClick={handleDownloadFeuilleRoute}>
+            Feuille de route (Excel)
           </Button>
           <Button size="sm" onClick={handleDownloadBook} className="bg-gradient-hero text-primary-foreground border-0">
             Télécharger
