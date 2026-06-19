@@ -4616,28 +4616,39 @@ function genSuiviEntrepriseCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: S
     { mois: "Mois 11", ratio: 11 / 12 },
   ];
   const startMs = dStart.getTime();
+  let firstVisitDate = "";
   const rows = visites.map((v, i) => {
     const d = new Date(startMs + totalMs * v.ratio);
     const realisee = d.getTime() <= today.getTime();
+    const dStr = d.toLocaleDateString("fr-FR");
+    if (realisee && !firstVisitDate) firstVisitDate = dStr;
     return [
       v.mois,
-      realisee ? d.toLocaleDateString("fr-FR") : "À planifier",
+      realisee ? dStr : "À planifier",
       realisee ? "Visite réalisée" : "Visite planifiée",
       realisee ? `${7 + (i % 3)}/10` : "—",
       realisee ? (i < 2 ? "Satisfaisant — bonne intégration" : "Satisfaisant — progression notable") : "À venir",
     ];
   });
+  const maitreApp = (s as any).maitreApprentissage || (s as any).responsableEntreprise || "________________________";
+  const formateurCFA = f.formateur || o.responsablePedagogique || "";
   return buildDocument({
     org: o,
     title: "SUIVI EN ENTREPRISE",
     subtitle: `${s.prenom} ${s.nom} – ${f.intitule}`,
     sections: [
-      { heading: "Apprenti(e)", content: `<p><strong>Nom :</strong> ${s.prenom} ${s.nom}<br><strong>Entreprise :</strong> ${(s as any).entreprise || "________________________"}<br><strong>Maître d'apprentissage :</strong> ${(s as any).maitreApprentissage || (s as any).responsableEntreprise || "________________________"}<br><strong>Tuteur CFA :</strong> ${o.responsablePedagogique || f.formateur}<br><strong>Période :</strong> du ${dateDebut} au ${dateFin}</p>` },
+      { heading: "Apprenti(e)", content: `<p><strong>Nom :</strong> ${s.prenom} ${s.nom}<br><strong>Entreprise :</strong> ${(s as any).entreprise || "________________________"}<br><strong>Maître d'apprentissage :</strong> ${maitreApp}<br><strong>Formateur CFA :</strong> ${formateurCFA}<br><strong>Période :</strong> du ${dateDebut} au ${dateFin}</p>` },
     ],
     table: { headers: ["Visite", "Date", "Statut", "Note tuteur", "Appréciation"], rows },
-    signatures: { type: "3", names: [s.prenom + " " + s.nom, (s as any).maitreApprentissage || (s as any).responsableEntreprise || ""] },
+    signatures: firstVisitDate ? {
+      type: "3",
+      labels: ["L'apprenti(e)", "Le Maître d'apprentissage", "Le Formateur CFA"],
+      names: [`${s.prenom} ${s.nom}`, maitreApp, formateurCFA],
+      dates: [firstVisitDate, firstVisitDate, firstVisitDate],
+    } : undefined,
   });
 }
+
 
 function genCompetencesAlternance(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si?: number) {
   const idx = typeof si === "number" ? si : 0;
