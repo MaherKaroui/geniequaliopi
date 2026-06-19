@@ -1191,7 +1191,7 @@ export function buildFullCatalog(
     // IND 17 — Inventaire des moyens
     
     // IND 18 — Fiches de poste + CR réunion
-    add("cfa_c4i18_fiches_poste", "CT4 - IND 18 FICHES DE POSTE ÉQUIPE CFA", 4, 18, "fiches_poste_cfa");
+    
     add("cfa_c4i18_cr_reunion_pedagogique", "CT4 - IND 18 COMPTE-RENDU DE RÉUNION PÉDAGOGIQUE", 4, 18, "cr_reunion_pedagogique_cfa");
     // IND 19 — Guide assistance FOAD
     add("cfa_c4i19_guide_assistance_foad", "CT4 - IND 19 GUIDE D'ASSISTANCE TECHNIQUE ET PÉDAGOGIQUE FOAD", 4, 19, "guide_assistance_foad_cfa");
