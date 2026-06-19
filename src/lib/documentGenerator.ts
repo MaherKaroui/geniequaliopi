@@ -4520,7 +4520,7 @@ function genContratApprentissage(o: OrganismeInfo, f: FormationInfo, stagiaires:
   const dateFin = formatDate(getStagiaireDateFin(s as StagiaireInfo, f));
   return buildDocument({ org: o, title: "CONTRAT D'APPRENTISSAGE", subtitle: `${s.prenom} ${s.nom} – ${f.intitule}`, formation: f, showFormationInfo: true, stagiaires: [s], sections: [
     { heading: "Parties", content: `<p><strong>Employeur :</strong> ${(s as any).entreprise || "________________________"}<br><strong>Apprenti(e) :</strong> ${s.prenom} ${s.nom}<br><strong>CFA :</strong> ${o.nom}<br><strong>Formation :</strong> ${f.intitule}</p>` },
-    { heading: "Durée du contrat", content: `<p>Date de début : ${dateDebut}<br>Date de fin : ${dateFin}<br>Rythme d'alternance : 3 jours en entreprise / 2 jours en CFA</p>` },
+    { heading: "Durée du contrat", content: `<p>Date de début : ${dateDebut}<br>Date de fin : ${dateFin}<br>Rythme d'alternance : ${f.rythmeAlternance?.trim() || "Selon calendrier d'alternance défini en début de formation"}</p>` },
     { heading: "Rémunération", content: "<p>Selon les dispositions légales et conventionnelles en vigueur, conformément à l'article D.6222-26 du Code du travail.</p>" },
     { heading: "Obligations", content: "<p><strong>L'employeur s'engage à :</strong><br>• Assurer la formation pratique de l'apprenti<br>• Désigner un maître d'apprentissage<br>• Permettre à l'apprenti de suivre la formation au CFA<br><br><strong>L'apprenti s'engage à :</strong><br>• Suivre assidûment la formation<br>• Respecter le règlement intérieur<br>• Participer aux évaluations</p>" },
   ], signatures: { type: "3", names: [s.prenom + " " + s.nom, f.formateur] } });
