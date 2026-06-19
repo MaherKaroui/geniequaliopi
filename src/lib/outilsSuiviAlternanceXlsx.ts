@@ -298,8 +298,13 @@ export function generateOutilsSuiviAlternanceXlsxBlob(
   const totalMs = dFin.getTime() - dDebut.getTime();
 
   const dateEssai = new Date(dDebut.getTime() + 45 * 86400000);
-  const dateB1 = new Date(dDebut.getTime() + totalMs * (1 / 3));
-  const dateB2 = new Date(dDebut.getTime() + totalMs * (2 / 3));
+  // Aligné sur LIVRE D'APPRENTISSAGE (IND 9) : visite 1 à 20% min +30j, visite 2 à 75% min +5 mois après v1
+  const minGapMs = 5 * 30 * 24 * 3600 * 1000;
+  const v1Ms = dDebut.getTime() + Math.max(totalMs * 0.20, 30 * 86400000);
+  const v2MsRaw = dDebut.getTime() + Math.max(totalMs * 0.75, (v1Ms - dDebut.getTime()) + minGapMs);
+  const v2Ms = Math.max(v2MsRaw, v1Ms + minGapMs);
+  const dateB1 = new Date(v1Ms);
+  const dateB2 = new Date(v2Ms);
   const dateB3 = new Date(dDebut.getTime() + totalMs * (4 / 5));
   const dateBF = dFin;
   const isPast = (d: Date) => d.getTime() < now.getTime();
