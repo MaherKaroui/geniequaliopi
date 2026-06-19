@@ -347,7 +347,10 @@ export async function genCerfaApprentissagePdf(
   setText(form, "Zone de texte 21_47", dfM);
   setText(form, "Zone de texte 21_48", dfA);
   setText(form, "Zone de texte 8_58", String(tarif.y1));
-  setText(form, "Zone de texte 8_59", "SMIC");
+  // Montant brut mensuel = % du SMIC (SMIC brut mensuel 2024 = 1801,80 €)
+  const SMIC_BRUT_MENSUEL = 1801.80;
+  const montantTarif = Math.round((SMIC_BRUT_MENSUEL * tarif.y1) / 100 * 100) / 100;
+  setText(form, "Zone de texte 8_59", montantTarif.toFixed(2).replace(".", ",") + " €");
 
   // ---------- CADRE RÉSERVÉ ORGANISME (bas page 2) ----------
   // Seules les zones "Nom" (8_91) et "N° SIRET organisme" (8_92) sont à remplir.
