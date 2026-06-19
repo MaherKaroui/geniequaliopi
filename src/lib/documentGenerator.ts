@@ -9670,6 +9670,16 @@ export function getEvalBesoinsFinancement(s: StagiaireInfo, f: FormationInfo, o:
 }
 
 function generateEvalBesoinsAnswers(s: StagiaireInfo, f: FormationInfo, o: OrganismeInfo, idx: number) {
+  const result = _generateEvalBesoinsAnswersImpl(s, f, o, idx);
+  const isDreamers = /dreamers/i.test(o.nom || "");
+  const isFatima = /fatima/i.test(s.prenom || "") && /oliveira/i.test(s.nom || "");
+  if (isDreamers && isFatima) {
+    result.budget = "Formation financée via le CPF (Compte Personnel de Formation) mobilisé par la bénéficiaire.";
+  }
+  return result;
+}
+
+function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: OrganismeInfo, idx: number) {
   const formation = f.intitule || "la formation";
   const t = formation.toLowerCase();
   const baseHash = (s.nom + s.prenom).split("").reduce((a, c) => a + c.charCodeAt(0), 0);
