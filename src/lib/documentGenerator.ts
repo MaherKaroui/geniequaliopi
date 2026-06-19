@@ -3903,7 +3903,7 @@ function genQuestionnaireInsertion(o: OrganismeInfo, f: FormationInfo) {
 }
 
 function genConditionsAccueil(o: OrganismeInfo, f: FormationInfo) {
-  const modal = `${f.modalites || ""} ${f.modalitesPedagogiques || ""}`.toLowerCase();
+  const modal = `${f.modalites || ""} ${f.moyensPedagogiques || ""} ${(f as any).modalitesPedagogiques || ""}`.toLowerCase();
   const isDistanciel = /distanc|e-learning|elearning|foad|visio|à distance|a distance/.test(modal) && !/présent|presentiel/.test(modal);
   const isMixte = /mixte|hybride|blended/.test(modal) || (/distanc|visio|foad/.test(modal) && /présent|presentiel/.test(modal));
 
