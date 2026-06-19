@@ -1216,9 +1216,6 @@ export function buildFullCatalog(
     add("cfa_c6i23_veille_consolidee", "CT6 - IND 23-24-25 FICHE DE VEILLE CONSOLIDÉE CFA", 6, 23, "fiche_veille_consolidee_cfa");
     // IND 26 — Annuaire partenaires handicap
     add("cfa_c6i26_annuaire_handicap", "CT6 - IND 26 ANNUAIRE PARTENAIRES HANDICAP APPRENTISSAGE", 6, 26, "annuaire_partenaires_handicap_cfa");
-    // IND 28 — Annuaire entreprises + CR coconstruction branche
-    add("cfa_c6i28_annuaire_entreprises", "CT6 - IND 28 ANNUAIRE DES ENTREPRISES PARTENAIRES", 6, 28, "annuaire_entreprises_partenaires_cfa");
-    add("cfa_c6i28_cr_coconstruction_branche", "CT6 - IND 28 CR COCONSTRUCTION AVEC BRANCHE PRO", 6, 28, "cr_coconstruction_branche_cfa");
     // IND 29 — Questionnaires entreprise/MA + financeur
     stagiaires.forEach((s, si) => {
       add(`cfa_c7i29_satisfaction_entreprise_${si}`, `CT7 - IND 29 QUESTIONNAIRE SATISFACTION ENTREPRISE / MA – ${s.prenom} ${s.nom}`, 7, 29, "questionnaire_satisfaction_entreprise_cfa", { stagiaireIdx: si });
