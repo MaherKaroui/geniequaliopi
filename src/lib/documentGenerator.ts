@@ -7662,8 +7662,8 @@ function genDossierCandidatureCFA(o: OrganismeInfo, f: FormationInfo, stagiaires
     ? `${new Date(dDeb).getFullYear()} / ${new Date(dFin).getFullYear()}`
     : "—";
 
-  // Rythme alternance (déduit des modalités CFA standard)
-  const rythme = "1 semaine en école / 3 semaines en entreprise";
+  // Rythme alternance (issu du formulaire formation)
+  const rythme = f.rythmeAlternance?.trim() || "1 semaine en école / 3 semaines en entreprise";
 
   // Disponibilité = date de début de formation
   const dispo = dDeb ? formatDate(dDeb) : "—";
