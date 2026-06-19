@@ -655,6 +655,17 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
     await downloadFile(content, buildGenericFileName("BOOK_QUALIOPI_COMPLET", mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, ".doc"));
   };
 
+  const handleDownloadFeuilleRoute = () => {
+    try {
+      const blob = generateFeuilleRouteQualiopi(mergedOrganisme, catalog);
+      saveAs(blob, buildGenericFileName("FEUILLE_ROUTE_QUALIOPI", mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, ".xlsx"));
+      toast.success("Feuille de route Qualiopi téléchargée");
+    } catch (e) {
+      console.error(e);
+      toast.error("Erreur lors de la génération de la feuille de route");
+    }
+  };
+
   const handleDownloadAll = () => {
     runJob({
       label: "Dossier Qualiopi complet (ZIP)",
