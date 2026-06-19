@@ -1187,9 +1187,7 @@ export function buildFullCatalog(
     // IND 20 — Lettres de mission
     add("cfa_c4i20_lettre_mission_mobilite", "CT4 - IND 20 LETTRE DE MISSION RÉFÉRENT MOBILITÉ", 4, 20, "lettre_mission_referent_mobilite_cfa");
     add("cfa_c4i20_lettre_mission_handicap", "CT4 - IND 20 LETTRE DE MISSION RÉFÉRENT HANDICAP", 4, 20, "lettre_mission_referent_handicap_cfa");
-    // IND 21 — Grilles recrutement + évaluation
-    add("cfa_c5i21_grille_recrutement", "CT5 - IND 21 GRILLE DE RECRUTEMENT FORMATEUR", 5, 21, "grille_recrutement_formateur_cfa");
-    add("cfa_c5i21_grille_evaluation_pedago", "CT5 - IND 21 GRILLE D'ÉVALUATION PÉDAGOGIQUE FORMATEUR", 5, 21, "grille_evaluation_pedagogique_cfa");
+    // IND 21 — Grilles recrutement + évaluation (retirées)
     // IND 22 — Entretien professionnel annuel
     add("cfa_c5i22_entretien_pro_annuel", "CT5 - IND 22 ENTRETIEN PROFESSIONNEL ANNUEL INTERVENANT", 5, 22, "entretien_professionnel_annuel_cfa");
     // IND 26 — Annuaire partenaires handicap
