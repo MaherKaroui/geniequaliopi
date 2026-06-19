@@ -854,7 +854,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "inventaire_moyens_cfa": return genInventaireMoyensCFA(o, f);
     case "fiches_poste_cfa": return genFichesPosteCFA(o);
     case "cr_reunion_pedagogique_cfa": return genCRReunionPedagogiqueCFA(o, f, stagiaires);
-    case "guide_assistance_foad_cfa": return genGuideAssistanceFOADCFA(o);
+    case "guide_assistance_foad_cfa": return genGuideAssistanceFOADCFA(o, f);
     case "lettre_mission_referent_mobilite_cfa": return genLettreMissionReferentMobiliteCFA(o);
     case "lettre_mission_referent_handicap_cfa": return genLettreMissionReferentHandicapCFA(o);
     case "grille_recrutement_formateur_cfa": return genGrilleRecrutementFormateurCFA(o);
