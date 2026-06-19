@@ -1630,3 +1630,159 @@ export function genSiteWeb14MissionsCFA(o: OrganismeInfo) {
 </body>
 </html>`;
 }
+
+
+// ============================================================================
+// SITE WEB — Page « Atelier CV »
+// ============================================================================
+function siteWebShell(o: OrganismeInfo, pageTitre: string, breadcrumb: string, heroLead: string, bodyHtml: string): string {
+  const nom = (o.nom || "Centre de Formation d'Apprentis");
+  const safeNom = nom.replace(/&/g, "&amp;");
+  const siteWeb = (o.siteWeb || `www.${nom.toLowerCase().replace(/[^a-z0-9]/g, "")}.fr`).replace(/^https?:\/\//, "");
+  const email = o.email || "";
+  const tel = o.telephone || "";
+  const adresse = `${o.adresse || ""} ${o.codePostal || ""} ${o.ville || ""}`.trim();
+  const annee = new Date().getFullYear();
+  return `<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><title>${safeNom} — ${pageTitre}</title>
+<style>
+  @page { size: A4; margin: 14mm; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:#f7fafc; font-family:'Helvetica Neue', Arial, sans-serif; color:#1a202c; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .site-wrap { background:#ffffff; }
+  .navbar { background:#0f3a6b; color:#fff; padding:14px 28px; display:flex; justify-content:space-between; align-items:center; border-bottom:4px solid #f59e0b; }
+  .brand { font-weight:800; font-size:18pt; letter-spacing:0.5pt; }
+  .nav-links { font-size:10pt; opacity:0.9; }
+  .nav-links span { margin-left:18px; }
+  .hero { background: linear-gradient(135deg,#0f3a6b 0%, #1d4ed8 100%); color:#fff; padding:42px 32px 36px; }
+  .hero .breadcrumb { font-size:9.5pt; opacity:0.85; margin-bottom:8px; }
+  .hero h1 { margin:0 0 8px; font-size:26pt; font-weight:800; line-height:1.15; }
+  .hero p.lead { margin:0; font-size:11.5pt; opacity:0.95; max-width:720px; line-height:1.5; }
+  .container { padding:28px 32px; font-size:10.5pt; line-height:1.6; color:#2d3748; }
+  .container h2 { color:#0f3a6b; font-size:14pt; margin:22px 0 10px; border-left:4px solid #f59e0b; padding-left:10px; }
+  .container h3 { color:#1d4ed8; font-size:11.5pt; margin:14px 0 6px; }
+  .container ul, .container ol { margin:6px 0 10px 22px; padding:0; }
+  .container li { margin-bottom:4px; }
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .card { border:1px solid #e2e8f0; border-radius:6px; padding:14px 16px; background:#fff; page-break-inside:avoid; break-inside:avoid; }
+  .card h3 { margin-top:0; }
+  .badge { display:inline-block; background:#f59e0b; color:#fff; font-weight:700; font-size:9pt; padding:2px 9px; border-radius:10px; letter-spacing:0.5pt; margin-bottom:8px; }
+  .cta { background:#eff6ff; border-left:4px solid #1d4ed8; padding:14px 18px; border-radius:4px; margin:18px 0; }
+  .footer { background:#0f3a6b; color:#cbd5e1; padding:18px 32px; font-size:8.5pt; line-height:1.55; }
+  .footer .f-brand { color:#fff; font-weight:700; font-size:10pt; margin-bottom:4px; }
+</style></head><body><div class="site-wrap">
+  <div class="navbar"><div class="brand">${safeNom}</div><div class="nav-links"><span>Accueil</span><span>Formations</span><span>Le CFA</span><span>Contact</span></div></div>
+  <div class="hero"><div class="breadcrumb">${breadcrumb}</div><h1>${pageTitre}</h1><p class="lead">${heroLead}</p></div>
+  <div class="container">${bodyHtml}</div>
+  <div class="footer"><div class="f-brand">${safeNom}</div>
+    ${adresse ? `${adresse}<br>` : ""}
+    ${tel ? `Tél. ${tel} &nbsp;·&nbsp; ` : ""}${email ? `${email} &nbsp;·&nbsp; ` : ""}${siteWeb}<br>
+    SIRET ${o.siret || ""} &nbsp;·&nbsp; N° NDA ${o.nda || ""} &nbsp;·&nbsp; © ${annee} ${safeNom} — Tous droits réservés.
+  </div>
+</div></body></html>`;
+}
+
+export function genSiteWebAtelierCVCFA(o: OrganismeInfo) {
+  const nom = (o.nom || "notre CFA").replace(/&/g, "&amp;");
+  const body = `
+    <div class="cta"><strong>Pourquoi cet atelier ?</strong> Un bon CV est votre première porte d'entrée vers l'entreprise. ${nom} vous accompagne pour construire un CV percutant, adapté à votre projet d'apprentissage et aux attentes des recruteurs.</div>
+
+    <h2>Objectifs de l'atelier</h2>
+    <ul>
+      <li>Identifier vos compétences, expériences et qualités à valoriser</li>
+      <li>Structurer un CV clair, lisible et professionnel (1 page)</li>
+      <li>Adapter votre CV à chaque offre / chaque secteur d'activité</li>
+      <li>Éviter les erreurs classiques (fautes, photo inadaptée, surcharge)</li>
+      <li>Repartir avec un CV finalisé, prêt à être diffusé</li>
+    </ul>
+
+    <h2>Programme — 3 heures</h2>
+    <div class="grid2">
+      <div class="card"><span class="badge">Séquence 1</span><h3>Mes atouts (45 min)</h3><p>Bilan personnel : parcours, compétences, savoir-être, centres d'intérêt — ce que je veux mettre en avant.</p></div>
+      <div class="card"><span class="badge">Séquence 2</span><h3>Structurer le CV (45 min)</h3><p>État civil, accroche, expériences, formation, compétences, langues, hobbies — ordre et hiérarchie de l'information.</p></div>
+      <div class="card"><span class="badge">Séquence 3</span><h3>Mise en page (45 min)</h3><p>Modèles modernes, choix des couleurs, typographie, photo, export PDF — outils gratuits (Canva, Word, LinkedIn).</p></div>
+      <div class="card"><span class="badge">Séquence 4</span><h3>Relecture & feedback (45 min)</h3><p>Relecture croisée entre apprenants, retour individuel du formateur, plan d'envoi (mail de candidature, plateformes).</p></div>
+    </div>
+
+    <h2>Les 10 règles d'or du CV</h2>
+    <ol>
+      <li>Une seule page, aérée et lisible</li>
+      <li>Une accroche claire en haut (« Apprenti(e) en … recherche entreprise »)</li>
+      <li>Coordonnées professionnelles (email sérieux, téléphone joignable)</li>
+      <li>Photo sobre et professionnelle (facultative)</li>
+      <li>Expériences classées de la plus récente à la plus ancienne</li>
+      <li>Verbes d'action + résultats concrets (chiffres, livrables)</li>
+      <li>Mots-clés du métier visé / de l'offre</li>
+      <li>Aucune faute d'orthographe (faire relire)</li>
+      <li>Format PDF nommé : <em>CV_Nom_Prenom.pdf</em></li>
+      <li>Mise à jour à chaque nouvelle expérience</li>
+    </ol>
+
+    <h2>Pour qui ?</h2>
+    <p>Tous les apprentis et candidats à l'apprentissage de ${nom}, quel que soit le niveau ou la filière.</p>
+
+    <h2>Modalités pratiques</h2>
+    <ul>
+      <li><strong>Durée :</strong> 3 heures</li>
+      <li><strong>Format :</strong> en présentiel au CFA ou en visio</li>
+      <li><strong>Tarif :</strong> gratuit pour les apprentis et candidats inscrits</li>
+      <li><strong>Inscription :</strong> auprès du référent recrutement de ${nom}</li>
+    </ul>
+
+    <div class="cta"><strong>Inscription :</strong> contactez ${nom} pour réserver votre place au prochain atelier CV.</div>
+  `;
+  return siteWebShell(o, "Atelier CV", "Accueil &nbsp;›&nbsp; Le CFA &nbsp;›&nbsp; Ateliers &nbsp;›&nbsp; CV",
+    `${nom} propose un atelier dédié à la <strong>rédaction de votre CV</strong>, pour mettre toutes les chances de votre côté dans votre recherche d'entreprise d'apprentissage.`, body);
+}
+
+export function genSiteWebAtelierEntretienCFA(o: OrganismeInfo) {
+  const nom = (o.nom || "notre CFA").replace(/&/g, "&amp;");
+  const body = `
+    <div class="cta"><strong>Pourquoi cet atelier ?</strong> L'entretien de recrutement est l'étape décisive de votre recherche d'apprentissage. ${nom} vous prépare à vous présenter, argumenter et convaincre votre futur employeur.</div>
+
+    <h2>Objectifs de l'atelier</h2>
+    <ul>
+      <li>Préparer un pitch personnel clair (présentation 1 à 2 minutes)</li>
+      <li>Anticiper les questions classiques et les questions pièges</li>
+      <li>Travailler la posture, la voix et le langage non verbal</li>
+      <li>Gérer le stress et les silences</li>
+      <li>Conclure l'entretien et faire un suivi (mail de remerciement)</li>
+    </ul>
+
+    <h2>Programme — 3 heures</h2>
+    <div class="grid2">
+      <div class="card"><span class="badge">Séquence 1</span><h3>Se présenter (45 min)</h3><p>Construire son pitch : qui je suis, mon parcours, mon projet, pourquoi cette entreprise — règle des 3 P (Présentation / Parcours / Projet).</p></div>
+      <div class="card"><span class="badge">Séquence 2</span><h3>Questions types (45 min)</h3><p>Travail sur les 20 questions les plus posées : motivation, qualités/défauts, prétentions, disponibilité, projet à 3 ans.</p></div>
+      <div class="card"><span class="badge">Séquence 3</span><h3>Simulations (45 min)</h3><p>Mises en situation filmées : jeu de rôle recruteur / candidat, débriefing collectif et axes d'amélioration personnalisés.</p></div>
+      <div class="card"><span class="badge">Séquence 4</span><h3>Posture & suivi (45 min)</h3><p>Langage non verbal, tenue vestimentaire, gestion du stress, conclusion d'entretien et mail de remerciement.</p></div>
+    </div>
+
+    <h2>Les 10 réflexes gagnants</h2>
+    <ol>
+      <li>Se renseigner sur l'entreprise (site web, actu, produits, valeurs)</li>
+      <li>Préparer son pitch et l'avoir répété à voix haute</li>
+      <li>Arriver 10 minutes en avance</li>
+      <li>Tenue soignée et adaptée au secteur</li>
+      <li>Téléphone éteint, regard franc, poignée de main ferme</li>
+      <li>Sourire et écouter avant de répondre</li>
+      <li>Donner des exemples concrets (situations vécues, résultats)</li>
+      <li>Préparer 2 ou 3 questions à poser au recruteur</li>
+      <li>Remercier en fin d'entretien et demander les prochaines étapes</li>
+      <li>Envoyer un mail de remerciement dans les 24 h</li>
+    </ol>
+
+    <h2>Pour qui ?</h2>
+    <p>Tous les apprentis et candidats à l'apprentissage de ${nom}, en recherche active d'entreprise.</p>
+
+    <h2>Modalités pratiques</h2>
+    <ul>
+      <li><strong>Durée :</strong> 3 heures (simulations filmées)</li>
+      <li><strong>Format :</strong> en présentiel au CFA, groupes de 6 à 10 personnes</li>
+      <li><strong>Tarif :</strong> gratuit pour les apprentis et candidats inscrits</li>
+      <li><strong>Inscription :</strong> auprès du référent recrutement de ${nom}</li>
+    </ul>
+
+    <div class="cta"><strong>Inscription :</strong> contactez ${nom} pour réserver votre place au prochain atelier de préparation à l'entretien.</div>
+  `;
+  return siteWebShell(o, "Atelier préparation entretien", "Accueil &nbsp;›&nbsp; Le CFA &nbsp;›&nbsp; Ateliers &nbsp;›&nbsp; Entretien",
+    `${nom} vous prépare à réussir vos <strong>entretiens de recrutement</strong> avec un atelier pratique : pitch, simulations filmées et débriefing personnalisé.`, body);
+}
