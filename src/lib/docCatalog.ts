@@ -785,8 +785,6 @@ export function buildFullCatalog(
     // Un fichier par stagiaire pour chaque type de document
     stagiaires.forEach((s, si) => {
       const nom = `${(s.nom || "").toUpperCase()} ${s.prenom || ""}`.trim() || `Apprenti ${si + 1}`;
-      add(`cfa_c3i13_contrat_${si}`, `CT3 - IND 13 CONTRAT D'APPRENTISSAGE — ${nom}`, 3, 13, "contrat_apprentissage", { stagiaireIdx: si });
-      add(`cfa_c3i13_competences_${si}`, `CT3 - IND 13 GRILLE COMPÉTENCES ALTERNANCE — ${nom}`, 3, 13, "competences_alternance", { stagiaireIdx: si });
       add(`cfa_c3i13_suivi_ent_${si}`, `CT3 - IND 13 SUIVI EN ENTREPRISE — ${nom}`, 3, 13, "suivi_entreprise_cfa", { stagiaireIdx: si });
       add(
         `cfa_c3i13_outils_suivi_excel_${si}`,
