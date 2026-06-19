@@ -4743,40 +4743,56 @@ function genIndicateursResultatsCFA(o: OrganismeInfo, f: FormationInfo, stagiair
   const annee = parsedDate && !isNaN(parsedDate.getTime()) ? parsedDate.getFullYear() : new Date().getFullYear();
   const anneeSuiv = annee + 1;
 
+  // Détection NTC pour injecter les taux nationaux InserJeunes (TH5 T)
+  const lowerF = (f.intitule || "").toLowerCase();
+  const isNTC = lowerF.includes("négociateur") || lowerF.includes("technico-commercial") || lowerF.includes("technico commercial") || (f.codeRNCP || "").toUpperCase().includes("39063");
+
   const termineRes = isFormationTerminee(f, validStagiaires);
+  const baseRows: string[][] = termineRes ? [
+    ["Taux de réussite à la certification", "100%", "100%", `${nbStagiaires} ${nbStagiaires > 1 ? "apprentis certifiés" : "apprenti certifié"} sur ${nbStagiaires}`],
+    ["Taux de satisfaction global des apprentis", "100%", "≥ 95%", "Enquête de fin de formation – note moyenne 10/10"],
+    ["Taux d'insertion professionnelle à 6 mois", "85%", "88%", "Suivi post-formation à 6 mois"],
+    ["Taux de rupture de contrat d'apprentissage", "0%", "< 5%", "Aucune rupture sur la promotion"],
+    ["Taux de poursuite d'études", "32%", "35%", "Orientation post-diplôme"],
+    ["Nombre d'apprentis formés", String(nbStagiaires), String(nbStagiaires + 1), `Effectif réel de la promotion ${annee}`],
+    ["Taux de présence moyen", "100%", "100%", "Suivi assiduité – émargements complets"],
+    ["Taux de retour enquêtes", "100%", "≥ 90%", "Tous les apprentis ont répondu"],
+    ["Taux d'abandon", "0%", "< 3%", "Aucun abandon constaté"],
+  ] : [
+    ["Taux de réussite à la certification", "En cours", "100%", "Disponible à l'issue des examens"],
+    ["Taux de satisfaction global des apprentis", "En cours", "≥ 95%", "Enquête de fin de formation à administrer"],
+    ["Taux d'insertion professionnelle à 6 mois", "En cours", "88%", "Mesuré 6 mois après la sortie de formation"],
+    ["Taux de rupture de contrat d'apprentissage", "0% (à date)", "< 5%", "Aucune rupture à ce jour"],
+    ["Taux de poursuite d'études", "En cours", "35%", "Mesuré post-diplôme"],
+    ["Nombre d'apprentis inscrits", String(nbStagiaires), String(nbStagiaires + 1), `Promotion ${annee} en cours`],
+    ["Taux de présence moyen", "En cours", "100%", "Suivi assiduité en cours – émargements en cours de remplissage"],
+    ["Taux de retour enquêtes", "En cours", "≥ 90%", "Enquête à administrer en fin de formation"],
+    ["Taux d'abandon", "0% (à date)", "< 3%", "Aucun abandon constaté à ce jour"],
+  ];
+
+  const nationalRows: string[][] = isNTC ? [
+    ["Taux national d'insertion professionnelle à 6 mois (InserJeunes)", "50%", "—", "Donnée nationale Ministère de l'Éducation nationale / France Compétences (TH5 T)"],
+    ["Taux national de poursuite d'études (InserJeunes)", "33%", "—", "Donnée nationale Ministère de l'Éducation nationale / France Compétences (TH5 T)"],
+    ["Taux national de rupture des contrats d'apprentissage (InserJeunes)", "44%", "—", "Donnée nationale Ministère de l'Éducation nationale / France Compétences (TH5 T)"],
+  ] : [];
+
   const indicateursSection = { heading: "2. Indicateurs de résultats", content: tableHTML(
     ["Indicateur", `Résultat ${annee}`, `Objectif ${anneeSuiv}`, "Commentaire"],
-    termineRes ? [
-      ["Taux de réussite à la certification", "100%", "100%", `${nbStagiaires} ${nbStagiaires > 1 ? "apprentis certifiés" : "apprenti certifié"} sur ${nbStagiaires}`],
-      ["Taux de satisfaction global des apprentis", "100%", "≥ 95%", "Enquête de fin de formation – note moyenne 10/10"],
-      ["Taux d'insertion professionnelle à 6 mois", "85%", "88%", "Suivi post-formation à 6 mois"],
-      ["Taux de rupture de contrat d'apprentissage", "0%", "< 5%", "Aucune rupture sur la promotion"],
-      ["Taux de poursuite d'études", "32%", "35%", "Orientation post-diplôme"],
-      ["Nombre d'apprentis formés", String(nbStagiaires), String(nbStagiaires + 1), `Effectif réel de la promotion ${annee}`],
-      ["Taux de présence moyen", "100%", "100%", "Suivi assiduité – émargements complets"],
-      ["Taux de retour enquêtes", "100%", "≥ 90%", "Tous les apprentis ont répondu"],
-      ["Taux d'abandon", "0%", "< 3%", "Aucun abandon constaté"],
-    ] : [
-      ["Taux de réussite à la certification", "En cours", "100%", "Disponible à l'issue des examens"],
-      ["Taux de satisfaction global des apprentis", "En cours", "≥ 95%", "Enquête de fin de formation à administrer"],
-      ["Taux d'insertion professionnelle à 6 mois", "En cours", "88%", "Mesuré 6 mois après la sortie de formation"],
-      ["Taux de rupture de contrat d'apprentissage", "0% (à date)", "< 5%", "Aucune rupture à ce jour"],
-      ["Taux de poursuite d'études", "En cours", "35%", "Mesuré post-diplôme"],
-      ["Nombre d'apprentis inscrits", String(nbStagiaires), String(nbStagiaires + 1), `Promotion ${annee} en cours`],
-      ["Taux de présence moyen", "En cours", "100%", "Suivi assiduité en cours – émargements en cours de remplissage"],
-      ["Taux de retour enquêtes", "En cours", "≥ 90%", "Enquête à administrer en fin de formation"],
-      ["Taux d'abandon", "0% (à date)", "< 3%", "Aucun abandon constaté à ce jour"],
-    ]
+    [...baseRows, ...nationalRows]
   ) };
+
+  const sourceSection = isNTC ? { heading: "6. Source officielle (preuve)", content: `<p><strong>Données nationales InserJeunes</strong> – Titre Professionnel Négociateur Technico-Commercial (TH5 T, code 31203) – voie apprentissage :<br><a href="https://www.inserjeunes.education.gouv.fr/diffusion/formation?formation=AUTRE_5$31203$TH5-T" target="_blank" style="color:hsl(220,60%,50%)">https://www.inserjeunes.education.gouv.fr/diffusion/formation?formation=AUTRE_5$31203$TH5-T</a></p><p><em>Source : Ministère de l'Éducation nationale, de l'Enseignement supérieur et de la Recherche – France Compétences. Données publiées annuellement sur le portail InserJeunes.</em></p>` } : null;
 
   return buildDocument({ org: o, title: "INDICATEURS DE RÉSULTATS CFA", subtitle: `${f.intitule} – Année ${annee}`, sections: [
     { heading: "1. Objet", content: `<p>Ce document présente les indicateurs de résultats du CFA <strong>${o.nom}</strong> pour la formation <strong>${f.intitule}</strong>, conformément aux exigences du Référentiel National Qualité (indicateur 2). Effectif de la promotion : <strong>${nbStagiaires} ${nbStagiaires > 1 ? "apprentis" : "apprenti"}</strong>.</p>` },
     indicateursSection,
-    { heading: "3. Méthodologie de collecte", content: `<p>Les données sont collectées via :<br>• <strong>Enquêtes de satisfaction</strong> : questionnaires envoyés aux apprentis à la fin de chaque session<br>• <strong>Suivi de l'insertion</strong> : enquête à 3 mois et 6 mois après la fin de la formation<br>• <strong>Données administratives</strong> : résultats aux examens, émargements, absences<br>• <strong>Suivi des ruptures</strong> : registre des ruptures de contrat avec motifs</p>` },
+    { heading: "3. Méthodologie de collecte", content: `<p>Les données sont collectées via :<br>• <strong>Enquêtes de satisfaction</strong> : questionnaires envoyés aux apprentis à la fin de chaque session<br>• <strong>Suivi de l'insertion</strong> : enquête à 3 mois et 6 mois après la fin de la formation<br>• <strong>Données administratives</strong> : résultats aux examens, émargements, absences<br>• <strong>Suivi des ruptures</strong> : registre des ruptures de contrat avec motifs${isNTC ? "<br>• <strong>Comparaison nationale</strong> : taux nationaux publiés par InserJeunes (Ministère de l'Éducation nationale / France Compétences)" : ""}</p>` },
     { heading: "4. Actions d'amélioration engagées", content: `<p>• Renforcement de l'accompagnement individuel pour réduire les ruptures<br>• Mise en place d'examens blancs supplémentaires pour améliorer le taux de réussite<br>• Développement du réseau d'entreprises partenaires pour favoriser l'insertion<br>• Amélioration de la plateforme pédagogique en ligne</p>`, variant: "green" },
     { heading: "5. Diffusion des résultats", content: `<p>Ces indicateurs sont diffusés sur :<br>${o.siteWeb ? `• ${isFacebookPage(o.siteWeb) ? 'La page Facebook' : 'Le site internet'} du CFA : <strong>${linkUrl(o.siteWeb)}</strong><br>` : ''}• Les supports de communication (plaquettes, fiches formation)<br>• Les documents contractuels remis aux entreprises et aux apprentis</p>` },
+    ...(sourceSection ? [sourceSection] : []),
   ] });
 }
+
 
 function genTitreRNCPCFA(o: OrganismeInfo, f: FormationInfo) {
   const rncp = getRNCPByCode(f.codeRNCP || "");
