@@ -1189,7 +1189,7 @@ export function buildFullCatalog(
     // IND 16 — Procédure de respect des exigences du certificateur
     add("cfa_c3i16_procedure_respect_certificateur", "CT3 - IND 16 PROCÉDURE DE RESPECT DES EXIGENCES DU CERTIFICATEUR", 3, 16, "procedure_respect_certificateur_cfa");
     // IND 17 — Inventaire des moyens
-    add("cfa_c4i17_inventaire_moyens", "CT4 - IND 17 INVENTAIRE DES MOYENS PÉDAGOGIQUES ET TECHNIQUES", 4, 17, "inventaire_moyens_cfa");
+    
     // IND 18 — Fiches de poste + CR réunion
     add("cfa_c4i18_fiches_poste", "CT4 - IND 18 FICHES DE POSTE ÉQUIPE CFA", 4, 18, "fiches_poste_cfa");
     add("cfa_c4i18_cr_reunion_pedagogique", "CT4 - IND 18 COMPTE-RENDU DE RÉUNION PÉDAGOGIQUE", 4, 18, "cr_reunion_pedagogique_cfa");
