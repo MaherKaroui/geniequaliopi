@@ -4490,11 +4490,13 @@ function genRapportAmelioration(o: OrganismeInfo) {
 
 function genPVConseilPerfectionnement(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const now = new Date();
-  const dateReunion = f.dateDebut ? (() => {
+  const isDreamers = /dreamers/i.test(o.nom || "");
+  const dateReunion = isDreamers ? formatDate("2026-07-01") : (f.dateDebut ? (() => {
     const d = new Date(f.dateDebut);
     d.setMonth(d.getMonth() + 5);
     return formatDate(d.toISOString().slice(0, 10));
-  })() : formatDate(new Date(now.getFullYear(), 9, 13).toISOString().slice(0, 10));
+  })() : formatDate(new Date(now.getFullYear(), 9, 13).toISOString().slice(0, 10)));
+
 
   return buildDocument({ org: o, title: "PROCÈS-VERBAL – CONSEIL DE PERFECTIONNEMENT", subtitle: o.nom, sections: [
     { heading: "1. Objet", content: `<p>Le présent document constate la <strong>programmation du Conseil de Perfectionnement</strong> du CFA ${o.nom}, fixé au <strong>${dateReunion}</strong>.</p>` },
@@ -4506,17 +4508,19 @@ function genPVConseilPerfectionnement(o: OrganismeInfo, f: FormationInfo, stagia
 
 function genConvocationConseilPerfectionnement(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const now = new Date();
-  const dateReunion = f.dateDebut ? (() => {
+  const isDreamers = /dreamers/i.test(o.nom || "");
+  const dateReunion = isDreamers ? formatDate("2026-07-01") : (f.dateDebut ? (() => {
     const d = new Date(f.dateDebut);
     d.setMonth(d.getMonth() + 5);
     return formatDate(d.toISOString().slice(0, 10));
-  })() : formatDate(new Date(now.getFullYear(), 9, 13).toISOString().slice(0, 10));
-  const dateLimite = f.dateDebut ? (() => {
+  })() : formatDate(new Date(now.getFullYear(), 9, 13).toISOString().slice(0, 10)));
+  const dateLimite = isDreamers ? formatDate("2026-06-15") : (f.dateDebut ? (() => {
     const d = new Date(f.dateDebut);
     d.setMonth(d.getMonth() + 4);
     d.setDate(d.getDate() + 15);
     return formatDate(d.toISOString().slice(0, 10));
-  })() : "";
+  })() : "");
+
   const lieu = `${o.adresse || ""}${o.codePostal ? `, ${o.codePostal}` : ""}${o.ville ? ` ${o.ville}` : ""}`.trim() || o.nom;
 
   return buildDocument({ org: o, title: "CONVOCATION AU CONSEIL DE PERFECTIONNEMENT", subtitle: o.nom, sections: [
