@@ -1386,6 +1386,9 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
           <Button variant="outline" size="sm" onClick={handlePreviewBook}>
             Aperçu
           </Button>
+          <Button variant="outline" size="sm" onClick={handleDownloadFeuilleRoute}>
+            Feuille de route (Excel)
+          </Button>
           <Button size="sm" onClick={handleDownloadBook} className="bg-gradient-hero text-primary-foreground border-0">
             Télécharger
           </Button>
