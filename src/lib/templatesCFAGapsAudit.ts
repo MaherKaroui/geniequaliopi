@@ -263,8 +263,27 @@ export function genGuideAssistanceFOADCFA(o: OrganismeInfo) {
       { heading: "Assistance pédagogique", content: `<p>• Tuteur référent identifié dès l'inscription<br>• Classes virtuelles synchrones animées par le formateur<br>• Travaux en sous-groupes via les "breakout rooms" (Zoom) ou salles de réunion (Google Meet)<br>• Partage d'écran, tableau blanc collaboratif, chat intégré<br>• Rendez-vous individualisés à la demande (en visio Zoom ou Google Meet)<br>• Échanges par email entre les sessions</p>` },
       { heading: "Modalités d'accompagnement et traçabilité", content: `<p>• Information sur l'accès aux activités (planning des sessions, ressources, modalités d'évaluation) communiquée par email avant le démarrage<br>• Accompagnement à l'appropriation de l'environnement de visioconférence (tutoriels + session de prise en main)<br>• <strong>Traçabilité de la présence</strong> : extraction automatique des logs de connexion Zoom et Google Meet (horodatage entrée/sortie, durée de présence par participant)<br>• Points d'étape pédagogiques formalisés (compte-rendu et liste de présence)</p>` },
       { heading: "Référent FOAD", content: `<p><strong>${o.responsablePedagogique}</strong> — Responsable pédagogique<br>Email : ${o.email}</p>` },
+      { heading: "", content: `
+        <table style="width:100%;border-collapse:collapse;margin-top:30px">
+          <tr>
+            <td style="width:50%;vertical-align:top;padding:10px;border:1px solid #ddd">
+              <p style="margin:0 0 6px 0"><strong>Responsable pédagogique</strong></p>
+              <p style="margin:0">Nom : ${o.responsablePedagogique}</p>
+              <p style="margin:0">Date : ${todayLong()}</p>
+              <p style="margin:8px 0 0 0">Signature :</p>
+              ${o.signatureUrl ? `<img src="${o.signatureUrl}" alt="Signature" style="max-height:60px;max-width:140px;object-fit:contain;margin-top:5px" />` : ""}
+            </td>
+            <td style="width:50%;vertical-align:top;padding:10px;border:1px solid #ddd">
+              <p style="margin:0 0 6px 0"><strong>Le Dirigeant</strong></p>
+              <p style="margin:0">Nom : ${o.dirigeant}</p>
+              <p style="margin:0">Date : ${todayLong()}</p>
+              <p style="margin:8px 0 0 0">Cachet :</p>
+              ${o.tamponUrl ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:80px;max-width:160px;object-fit:contain;margin-top:5px;opacity:0.9" />` : ""}
+            </td>
+          </tr>
+        </table>
+      ` },
     ],
-    signatures: { type: "2", labels: ["Responsable pédagogique", "Le Dirigeant"], names: [o.responsablePedagogique, o.dirigeant], dates: [todayLong(), todayLong()] },
   });
 }
 
