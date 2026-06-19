@@ -10,7 +10,8 @@ export function buildFullCatalog(
   formations: FormationInfo[],
   stagiaires: StagiaireInfo[],
   formateurs: FormateurInfo[],
-  typesActions?: ActionType[]
+  typesActions?: ActionType[],
+  dirigeantNom?: string
 ): DocEntry[] {
   const d: DocEntry[] = [];
   const add = (id: string, nom: string, c: number, i: number, template: string, params?: Record<string, any>) =>
@@ -20,6 +21,16 @@ export function buildFullCatalog(
   const isCFA = typesActions?.includes('apprentissage');
   const isBDC = typesActions?.includes('bilans-competences');
   const isVAE = typesActions?.includes('vae');
+
+  // Détecte si au moins un formateur (assigné aux stagiaires ou à la formation) est différent du dirigeant.
+  const normalizeName = (s: string) => (s || "").trim().toLowerCase().replace(/\s+/g, " ");
+  const dirigeantKey = normalizeName(dirigeantNom || "");
+  const formateurNames = new Set<string>();
+  stagiaires.forEach(s => { if (s.formateur) formateurNames.add(normalizeName(s.formateur)); });
+  formations.forEach(f => { if (f.formateur) formateurNames.add(normalizeName(f.formateur)); });
+  formateurNames.delete("");
+  const hasExternalFormateur = Array.from(formateurNames).some(n => n !== dirigeantKey);
+
 
   // =============================================
   // ===== AF — ACTION DE FORMATION (SELECT FORMATION) =====
