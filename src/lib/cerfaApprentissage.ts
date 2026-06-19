@@ -90,12 +90,22 @@ function splitDate(iso: string | undefined): [string, string, string] {
   return [m[3], m[2], m[1]];
 }
 
-/** Découpe une adresse "12 RUE DES LILAS" en numéro / voie */
+/** Découpe une adresse "12 RUE DES LILAS" en numéro / voie (gère "7-15", "12bis") */
 function splitAdresse(adresse: string | undefined): { numero: string; voie: string } {
   if (!adresse) return { numero: "", voie: "" };
-  const m = adresse.trim().match(/^(\d+\s*(?:bis|ter)?)\s+(.+)$/i);
-  if (m) return { numero: m[1].trim(), voie: m[2].trim() };
-  return { numero: "", voie: adresse.trim() };
+  // On retire d'abord un éventuel ", 93290 VILLE" en fin de chaîne (CP+ville parasites)
+  const cleaned = adresse.trim().replace(/[,;]\s*\d{5}\b.*$/, "").trim();
+  const m = cleaned.match(/^(\d+(?:\s*[-/]\s*\d+)?\s*(?:bis|ter|quater)?)\s+(.+)$/i);
+  if (m) return { numero: m[1].replace(/\s+/g, ""), voie: m[2].trim() };
+  return { numero: "", voie: cleaned };
+}
+
+/** Extrait CP + Ville depuis une adresse complète "76 AVENUE X, 93290 TREMBLAY" */
+function splitCpVille(adresse: string | undefined): { cp: string; ville: string } {
+  if (!adresse) return { cp: "", ville: "" };
+  const m = adresse.match(/(\d{5})\s+([A-ZÀ-ÿ' -]+)\s*$/i);
+  if (m) return { cp: m[1], ville: m[2].trim() };
+  return { cp: "", ville: "" };
 }
 
 /** Setter sécurisé : ignore les champs absents */
@@ -142,20 +152,23 @@ export async function genCerfaApprentissagePdf(
   const ent = clean(s.entreprise);
   const siretEnt = clean(s.siretEntreprise);
   const adrEnt = splitAdresse(s.adresseEntreprise);
+  const cpvEnt = splitCpVille(s.adresseEntreprise);
+  const telEnt = clean(s.telephone); // fallback
+  const courrielEnt = clean(s.email); // fallback
 
   setText(form, "Zone de texte 8", ent); // Nom/dénomination employeur
   setText(form, "Zone de texte 8_2", siretEnt); // N° SIRET
-  setText(form, "Zone de texte 8_3", ""); // Type employeur
+  setText(form, "Zone de texte 8_3", "SARL/Entreprise privée"); // Type employeur
   setText(form, "Zone de texte 8_14", adrEnt.numero); // N° adresse
   setText(form, "Zone de texte 8_13", adrEnt.voie); // Voie
   setText(form, "Zone de texte 8_4", ""); // Employeur spécifique
   setText(form, "Zone de texte 8_8", ""); // Complément
   setText(form, "Zone de texte 8_7", ""); // Code APE
-  setText(form, "Zone de texte 8_9", ""); // Code postal entreprise
-  setText(form, "Zone de texte 8_10", ""); // Commune entreprise
+  setText(form, "Zone de texte 8_9", cpvEnt.cp); // Code postal entreprise
+  setText(form, "Zone de texte 8_10", cpvEnt.ville); // Commune entreprise
   setText(form, "Zone de texte 8_5", ""); // Effectif total
-  setText(form, "Zone de texte 8_11", ""); // Téléphone entreprise
-  setText(form, "Zone de texte 8_12", ""); // Courriel entreprise
+  setText(form, "Zone de texte 8_11", telEnt); // Téléphone entreprise (fallback)
+  setText(form, "Zone de texte 8_12", courrielEnt); // Courriel entreprise (fallback)
   setText(form, "Zone de texte 8_6", ""); // Code IDCC
 
   // ---------- PAGE 1 — APPRENTI ----------
@@ -318,8 +331,10 @@ export async function genCerfaApprentissagePdf(
   // Attestation pièces justificatives
   setCheck(form, "Case #C3#A0 cocher 8", true);
 
-  // Fait à
-  setText(form, "Zone de texte 8_55", clean(o.ville));
+  // Numéro contrat précédent (vide pour un nouveau contrat type 11)
+  setText(form, "Zone de texte 8_55", "");
+  // Fait à (champ correct = 8_90)
+  setText(form, "Zone de texte 8_90", clean(o.ville));
 
   // ---------- RÉMUNÉRATION (1ère année — selon âge apprenti à date début contrat) ----------
   const age = ageAt(s.dateNaissance, dateDebut) ?? 20;
@@ -344,23 +359,23 @@ export async function genCerfaApprentissagePdf(
 
   pdf.getForm().updateFieldAppearances();
 
-  // ---------- SIGNATURES & TAMPON (page 2, sous "Fait à") ----------
-  // Coords bottom-up. "Fait à" label = y≈234. Signatures juste en-dessous : y≈170-220.
-  // 3 colonnes : Employeur (~x=20-180), Apprenti (~x=200-360), Représentant légal (~x=380-560)
+  // ---------- SIGNATURES & TAMPON (page 2) ----------
+  // Coords bottom-up. Labels "Signature de l'employeur / apprenti / représentant légal" ≈ y=175.
+  // Champ "Fait à" 8_90 ≈ y=197. → On dessine les signatures SOUS les labels, entre y=110 et y=160.
+  // Tampon CFA : zone "Visa du CFA" colonne gauche, sous l'adresse CFA (entre y=270 et y=395).
   const page2 = pdf.getPages()[1];
   if (page2) {
     const [tamponImg, sigStagImg, sigRespImg] = await Promise.all([
       embedImage(pdf, o.tamponUrl),
       embedImage(pdf, s.signatureUrl),
-      embedImage(pdf, s.signatureResponsableUrl),
+      embedImage(pdf, s.signatureResponsableUrl || o.signatureUrl),
     ]);
-    // Signature employeur (gauche, sous "Signature de l'employeur")
-    if (sigRespImg) drawFitted(page2, sigRespImg, 25, 175, 130, 50);
+    // Signature employeur (gauche, sous "Signature de l'employeur") — fallback signature dirigeant CFA si manquante
+    if (sigRespImg) drawFitted(page2, sigRespImg, 30, 110, 150, 55);
     // Signature apprenti (centre, sous "Signature de l'apprenti(e)")
-    if (sigStagImg) drawFitted(page2, sigStagImg, 215, 175, 130, 50);
-    // Tampon organisme : à droite ("Visa du CFA cachet et signature du directeur") — zone y≈300-400 à gauche
-    // Ou superposé à la signature employeur. On le met dans la zone Visa CFA (gauche, sous "Visa du CFA")
-    if (tamponImg) drawFitted(page2, tamponImg, 30, 350, 110, 70);
+    if (sigStagImg) drawFitted(page2, sigStagImg, 220, 110, 150, 55);
+    // Tampon organisme dans la zone "Visa du CFA (cachet et signature du directeur)" (colonne gauche FORMATION)
+    if (tamponImg) drawFitted(page2, tamponImg, 30, 290, 130, 90);
   }
 
   const out = await pdf.save();
