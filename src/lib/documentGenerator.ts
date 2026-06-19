@@ -8212,7 +8212,7 @@ function genCGVCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo
     { heading: "Article 13 – Litiges", content: `<p>Tout différend relatif à l'exécution de la présente convention qui ne pourrait être réglé à l'amiable sera porté devant les juridictions compétentes du ressort du siège social de l'organisme de formation.</p>` },
   ], extraHtml: `<div style="display:flex;justify-content:space-between;margin-top:40px">
 <div style="text-align:center;width:45%"><p><strong>${o.nom}</strong></p><p>${o.dirigeant || '___'}, Dirigeant</p><div style="min-height:80px;border:1px solid #ccc;padding:10px">${tamponCFA}</div></div>
-<div style="text-align:center;width:45%"><p><strong>Le Stagiaire</strong></p><p>${s.prenom} ${s.nom}</p><p><em>Signature précédée de la mention « Lu et approuvé »</em></p><div style="min-height:80px;border:1px solid #ccc;padding:10px">${sigApprentie}</div></div>
+${(s.nom || s.prenom) ? `<div style="text-align:center;width:45%"><p><strong>Le Stagiaire</strong></p><p>${s.prenom} ${s.nom}</p><p><em>Signature précédée de la mention « Lu et approuvé »</em></p><div style="min-height:80px;border:1px solid #ccc;padding:10px">${sigApprentie}</div></div>` : ''}
 </div>
 <p style="text-align:center;margin-top:10px"><strong>Fait à</strong> ${o.ville || 'Paris'}, <strong>le</strong> ${dateSignature}</p>` });
 }
