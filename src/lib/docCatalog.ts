@@ -875,6 +875,7 @@ export function buildFullCatalog(
     });
 
     add("cfa_c3i14_notice_aide_financiere_idf", "CT3 - IND 14 📁 NOTICE – Aide Financière Apprenti Île-de-France", 3, 14, "pdf_static", { pdfUrl: "/pdfs/notice_aide_financiere_apprenti_idf.pdf" });
+    add("cfa_c3i14_pages_site_aides_ateliers", "CT3 - IND 14 PAGES SITE – AIDES, ATELIERS CV & ENTRETIEN", 3, 14, "pages_site_aides_ateliers_cfa");
 
     // ===== IND 14 — DOSSIER CITOYENNETÉ (Vie Publique) =====
     add("cfa_c3i14_cit_chaque_citoyen_a_t_il_droit_au_respect_d", "CT3 - IND 14 📁 CITOYENNETÉ – Droits & Libertés – Chaque citoyen a t il droit au respect de sa vie privée", 3, 14, "pdf_static", { folder: "CITOYENNETE", pdfUrl: "/pdfs/citoyennete/chaque_citoyen_a_t_il_droit_au_respect_de_sa_vie_privee.pdf" });
