@@ -331,8 +331,10 @@ export async function genCerfaApprentissagePdf(
   // Attestation pièces justificatives
   setCheck(form, "Case #C3#A0 cocher 8", true);
 
-  // Fait à
-  setText(form, "Zone de texte 8_55", clean(o.ville));
+  // Numéro contrat précédent (vide pour un nouveau contrat type 11)
+  setText(form, "Zone de texte 8_55", "");
+  // Fait à (champ correct = 8_90)
+  setText(form, "Zone de texte 8_90", clean(o.ville));
 
   // ---------- RÉMUNÉRATION (1ère année — selon âge apprenti à date début contrat) ----------
   const age = ageAt(s.dateNaissance, dateDebut) ?? 20;
