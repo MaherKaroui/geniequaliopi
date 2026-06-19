@@ -4639,16 +4639,21 @@ function genSuiviEntrepriseCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: S
   const dStart = new Date(getStagiaireDateDebut(s, f));
   const dEnd = new Date(getStagiaireDateFin(s, f));
   const totalMs = dEnd.getTime() - dStart.getTime();
+  // 1ère visite alignée sur celle du LIVRE D'APPRENTISSAGE (20% du parcours, min +30 jours)
+  const minGapMs = 5 * 30 * 24 * 3600 * 1000; // 5 mois
+  const v1Ms = dStart.getTime() + Math.max(totalMs * 0.20, 30 * 24 * 3600 * 1000);
+  const v2MsRaw = dStart.getTime() + Math.max(totalMs * 0.75, v1Ms - dStart.getTime() + minGapMs);
+  const v2Ms = Math.max(v2MsRaw, v1Ms + minGapMs);
+  // 4 visites : v1 (livre), intermédiaire, v2 (livre), bilan final
   const visites = [
-    { mois: "Mois 2", ratio: 2 / 12 },
-    { mois: "Mois 5", ratio: 5 / 12 },
-    { mois: "Mois 9", ratio: 9 / 12 },
-    { mois: "Mois 11", ratio: 11 / 12 },
+    { mois: "1ʳᵉ visite",   ms: v1Ms },
+    { mois: "Visite intermédiaire", ms: v1Ms + (v2Ms - v1Ms) * 0.4 },
+    { mois: "2ᵉ visite",    ms: v2Ms },
+    { mois: "Bilan final",  ms: dStart.getTime() + totalMs * 0.95 },
   ];
-  const startMs = dStart.getTime();
   let firstVisitDate = "";
   const rows = visites.map((v, i) => {
-    const d = new Date(startMs + totalMs * v.ratio);
+    const d = new Date(v.ms);
     const realisee = d.getTime() <= today.getTime();
     const dStr = d.toLocaleDateString("fr-FR");
     if (realisee && !firstVisitDate) firstVisitDate = dStr;
