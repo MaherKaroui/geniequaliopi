@@ -1639,3 +1639,104 @@ export function genSiteWebAtelierEntretienCFA(o: OrganismeInfo) {
   });
 }
 
+// ============================================================================
+// MISSION 1 — Livret d'accueil des apprenants en situation de handicap
+// (orientation / réorientation) — sans signatures ni dates
+// ============================================================================
+export function genLivretReferentHandicapCFA(o: OrganismeInfo) {
+  const nom = o.nom || "notre CFA";
+  return buildDocument({
+    org: o,
+    title: "LIVRET D'ACCUEIL DES APPRENANTS EN SITUATION DE HANDICAP",
+    sections: [
+      {
+        heading: "Introduction",
+        content: `<p>Le CFA <strong>${nom}</strong> s'inscrit dans une politique d'égalité des chances afin de permettre à tous les apprenants d'accéder à ses formations et de développer leur potentiel. Tous les apprenants en situation de handicap sont accompagnés tout au long de leur formation.</p>
+<p>Le CFA <strong>${nom}</strong> s'engage ainsi, pour tout étudiant présentant une situation de handicap à :</p>
+<ul>
+  <li>Prendre en compte ses besoins ;</li>
+  <li>Étudier des aménagements spécifiques pour son accompagnement tout au long de sa formation ;</li>
+  <li>Faire le lien entre les différents services de l'école ;</li>
+  <li>L'accompagner dans ses démarches.</li>
+</ul>
+<p>Le CFA <strong>${nom}</strong> se donne pour mission de déployer les moyens humains, matériels et techniques dont il dispose pour favoriser l'accueil, l'accompagnement et l'insertion professionnelle des apprenants en situation de handicap. Toutefois, la réussite de l'apprenant reste de sa responsabilité.</p>
+<p>Vous retrouverez dans ce livret les informations essentielles sur l'accessibilité de nos formations, le dispositif d'accompagnement déployé pour les apprenants en situation de handicap, ainsi que les aménagements mis en place.</p>`,
+      },
+      {
+        heading: "1. Qu'est-ce que le handicap ?",
+        content: `<p>Est considéré comme un handicap :</p>
+<ul>
+  <li>Toute limitation d'activité ou restriction de participation à la vie en société subie dans son environnement par une personne en raison d'une altération substantielle, durable ou définitive d'une ou plusieurs fonctions physiques, sensorielles, mentales, cognitives ou psychiques, d'un polyhandicap ou d'un trouble de santé invalidant ;</li>
+  <li>L'incapacité d'une personne à vivre et à agir dans son environnement en raison de déficiences physiques, mentales ou sensorielles, se traduisant par des difficultés de déplacement, d'expression ou de compréhension.</li>
+</ul>
+<p>Afin de bénéficier du dispositif d'accompagnement et des aménagements spécifiques, l'apprenant est invité à se munir d'un document officiel attestant de sa situation de handicap, ou à engager les démarches nécessaires à sa reconnaissance.</p>
+<p><strong>Reconnaissances officielles :</strong></p>
+<ul>
+  <li><strong>RQTH</strong> (MDPH) — Reconnaissance de la Qualité de Travailleur Handicapé : ouvre droit à des aides spécifiques et à un tiers temps.</li>
+  <li><strong>PPS</strong> (MDPH) — Projet Personnalisé de Scolarisation : aménagements spécifiques de la scolarité.</li>
+  <li><strong>AAH</strong> (CDAPH) — Allocation aux Adultes Handicapés : aide financière minimum de ressources.</li>
+  <li><strong>AEEH</strong> (CDAPH) — Allocation d'Éducation de l'Enfant Handicapé (&lt; 20 ans).</li>
+  <li><strong>ALD</strong> (Sécurité sociale, attestation AMELI) — Affection de Longue Durée (maladies chroniques).</li>
+</ul>`,
+      },
+      {
+        heading: "2. Qui m'accompagne ?",
+        content: `<p>L'apprenant dispose au sein du CFA <strong>${nom}</strong> d'un <strong>Référent Handicap${o.referentHandicap ? ` : ${o.referentHandicap}` : ""}</strong>, placé sous la responsabilité de la Direction.</p>
+<p>Sa mission est de veiller à la prise en compte de l'accueil des apprenants en situation de handicap par l'ensemble des acteurs de l'établissement : équipe administrative, équipe pédagogique, accompagnateurs. Il veille à un accompagnement équitable.</p>
+<p>Il est l'interlocuteur privilégié de l'apprenant, de sa famille et des équipes pédagogiques pour la prise en compte de la situation de handicap à l'école et en entreprise.</p>`,
+      },
+      {
+        heading: "3. Comment se déroule ma formation ?",
+        content: `<p><strong>Un accompagnement en 3 étapes.</strong></p>
+<p><strong>• Quand parler de mon handicap ?</strong><br>
+À tout instant, dès la candidature. Il suffit de l'indiquer dans l'espace prévu sur le dossier de candidature ou d'inscription. Le Responsable des admissions en informe le Référent handicap. L'apprenant peut également écrire directement au Référent handicap par mail.</p>
+<p><strong>• Mise en place des aménagements</strong><br>
+Lors de l'entretien avec le Référent handicap, les aménagements nécessaires sont déterminés conjointement, en fonction de la situation. L'attestation de reconnaissance du handicap sera demandée pour formaliser ces aménagements.</p>
+<p><strong>• Suivi de la formation</strong><br>
+Tout au long de la formation, le Référent handicap reste à l'écoute, en lien avec la direction et les intervenants. Il peut, sur demande, orienter l'apprenant vers d'autres structures d'accompagnement partenaires. Le Référent handicap s'engage à respecter la confidentialité des échanges et ne transmet aucune information sans l'accord de l'apprenant.</p>`,
+      },
+      {
+        heading: "4. Les outils mis à ma disposition",
+        content: `<p>Un espace numérique dédié est mis à disposition de chaque apprenant inscrit au CFA <strong>${nom}</strong>, accessible depuis un ordinateur, une tablette ou un smartphone avec connexion internet. Il centralise :</p>
+<ul>
+  <li>Une boîte mail</li>
+  <li>Tous les documents annuels</li>
+  <li>Le planning des cours</li>
+  <li>Les supports de cours</li>
+  <li>Les relevés de notes</li>
+  <li>Les actualités de l'école</li>
+</ul>`,
+      },
+      {
+        heading: "5. Apprentissage et handicap",
+        content: `<p>Pour tout apprenant en situation de handicap inscrit en apprentissage, le CFA <strong>${nom}</strong> met en place un accompagnement spécifique tout au long de la formation :</p>
+<ul>
+  <li><strong>Information</strong> sur les métiers, formations proposées, offres de contrats et préparation à l'apprentissage ;</li>
+  <li><strong>Échanges avec l'employeur</strong> et les partenaires impliqués tout au long du parcours ;</li>
+  <li><strong>Parcours de formation adapté et contractualisé</strong> en fonction de la situation individuelle ;</li>
+  <li><strong>Suivi du parcours et ajustements</strong> en fonction de l'évolution des besoins, en concertation avec l'employeur et les partenaires ;</li>
+  <li><strong>Information sur la suite du parcours</strong> : France Travail, Cap emploi, Missions Locales, réseau formation, techniques de recherche d'emploi ;</li>
+  <li><strong>Bilan de fin de formation</strong> (aménagements mis en place, pistes envisagées) communiqué avant la sortie du CFA.</li>
+</ul>`,
+      },
+      {
+        heading: "6. Partenariats",
+        content: `<p>Le CFA <strong>${nom}</strong> met en place des partenariats afin d'accompagner l'apprenant en situation de handicap dans sa démarche de recherche d'alternance et d'insertion professionnelle : <strong>AGEFIPH, Cap emploi, MDPH, Mission Locale, Resp'Handicap, RHF</strong> et missions handicap des OPCO.</p>`,
+      },
+      {
+        heading: "7. Contacts utiles",
+        content: `<ul>
+  <li><strong>Référent Handicap :</strong> ${o.referentHandicap || "—"}</li>
+  <li><strong>Direction pédagogique :</strong> ${o.dirigeant || "—"}</li>
+  <li><strong>Email :</strong> ${o.email || "—"}</li>
+  ${o.telephone ? `<li><strong>Téléphone :</strong> ${o.telephone}</li>` : ""}
+  ${o.adresse ? `<li><strong>Adresse :</strong> ${o.adresse}</li>` : ""}
+  ${o.siteWeb ? `<li><strong>Site web :</strong> ${o.siteWeb}</li>` : ""}
+</ul>`,
+        variant: "green",
+      },
+    ],
+  });
+}
+
+
