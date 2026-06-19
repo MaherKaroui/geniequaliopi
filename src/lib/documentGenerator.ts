@@ -4632,6 +4632,19 @@ function genSuiviEntrepriseCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: S
   });
   const maitreApp = (s as any).maitreApprentissage || (s as any).responsableEntreprise || "________________________";
   const formateurCFA = f.formateur || o.responsablePedagogique || "";
+  const sigStag = (s as any).signatureUrl as string | undefined;
+  const sigMaitre = (s as any).signatureResponsableUrl as string | undefined;
+  const sigFormateur = (f as any).formateurSignatureUrl as string | undefined;
+  const imgTag = (url?: string, nom?: string) =>
+    url
+      ? `<img src="${url}" alt="signature" style="max-height:60px;max-width:180px;display:block;margin-top:4px"/>`
+      : (nom ? `<p style="font-family:'Brush Script MT',cursive;font-size:18px;color:#1a3a8c;margin:4px 0 0">Signé par ${nom}</p>` : "");
+  const sigBlock = firstVisitDate ? `
+    <div class="signature-block" style="display:flex;gap:16px;margin-top:24px">
+      <div class="sig-box" style="flex:1;border:1px solid #ccc;padding:10px"><p class="sig-label" style="font-weight:bold">L'apprenti(e)</p><p>Nom : ${s.prenom} ${s.nom}</p><p>Date : ${firstVisitDate}</p><p style="margin-top:12px">Signature :</p>${imgTag(sigStag, `${s.prenom} ${s.nom}`)}</div>
+      <div class="sig-box" style="flex:1;border:1px solid #ccc;padding:10px"><p class="sig-label" style="font-weight:bold">Le Maître d'apprentissage</p><p>Nom : ${maitreApp}</p><p>Date : ${firstVisitDate}</p><p style="margin-top:12px">Signature :</p>${imgTag(sigMaitre, maitreApp)}</div>
+      <div class="sig-box" style="flex:1;border:1px solid #ccc;padding:10px"><p class="sig-label" style="font-weight:bold">Le Formateur CFA</p><p>Nom : ${formateurCFA}</p><p>Date : ${firstVisitDate}</p><p style="margin-top:12px">Signature :</p>${imgTag(sigFormateur, formateurCFA)}</div>
+    </div>` : "";
   return buildDocument({
     org: o,
     title: "SUIVI EN ENTREPRISE",
@@ -4640,14 +4653,10 @@ function genSuiviEntrepriseCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: S
       { heading: "Apprenti(e)", content: `<p><strong>Nom :</strong> ${s.prenom} ${s.nom}<br><strong>Entreprise :</strong> ${(s as any).entreprise || "________________________"}<br><strong>Maître d'apprentissage :</strong> ${maitreApp}<br><strong>Formateur CFA :</strong> ${formateurCFA}<br><strong>Période :</strong> du ${dateDebut} au ${dateFin}</p>` },
     ],
     table: { headers: ["Visite", "Date", "Statut", "Note tuteur", "Appréciation"], rows },
-    signatures: firstVisitDate ? {
-      type: "3",
-      labels: ["L'apprenti(e)", "Le Maître d'apprentissage", "Le Formateur CFA"],
-      names: [`${s.prenom} ${s.nom}`, maitreApp, formateurCFA],
-      dates: [firstVisitDate, firstVisitDate, firstVisitDate],
-    } : undefined,
+    extraHtml: sigBlock,
   });
 }
+
 
 
 function genCompetencesAlternance(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si?: number) {
