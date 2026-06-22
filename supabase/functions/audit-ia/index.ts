@@ -141,7 +141,7 @@ Deno.serve(async (req) => {
           { role: "user", content: userMsg },
         ],
         response_format: { type: "json_object" },
-        max_tokens: 8000,
+        max_tokens: isCfa ? 14000 : 8000,
       }),
     });
 
