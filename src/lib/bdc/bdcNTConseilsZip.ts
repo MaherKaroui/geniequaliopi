@@ -485,8 +485,12 @@ function preprocessGridTables(md: string): string {
     let headerRowIdx = -1;
     for (const bl of block) {
       if (isBorder(bl)) {
-        if (/=/.test(bl)) headerRowIdx = rows.length - 1;
-        if (curHas) { rows.push(cur.map(cleanCell)); cur = new Array(nCols).fill(""); curHas = false; }
+        if (curHas) {
+          rows.push(cur.map(cleanCell));
+          if (/=/.test(bl)) headerRowIdx = rows.length - 1;
+          cur = new Array(nCols).fill("");
+          curHas = false;
+        }
         continue;
       }
       if (!/^\|/.test(bl)) {
