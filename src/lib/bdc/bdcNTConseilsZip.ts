@@ -424,11 +424,13 @@ function mdToHtml(md: string, title: string, org: OrganismeInfo, stagiaire: Stag
     orgHeader(org, title) +
     beneficiaireLine +
     `<div class="bdc-doc-body">${body}</div>` +
-    `<style>.bdc-doc-body table{border-collapse:collapse;width:100%;margin:8px 0;font-size:11px}` +
+    `<style>.bdc-doc-body{font-size:11pt}` +
+    `.bdc-doc-body table{border-collapse:collapse;width:100%;margin:10px 0;font-size:10.5pt}` +
     `.bdc-doc-body table td,.bdc-doc-body table th{border:1px solid #bbb;padding:6px;vertical-align:top}` +
-    `.bdc-doc-body h1{font-size:18pt;color:#0b2545;margin-top:0}` +
-    `.bdc-doc-body h2{font-size:14pt;color:#0b2545;margin-top:18px}` +
-    `.bdc-doc-body h3{font-size:12pt;color:#1d4ed8;margin-top:14px}` +
+    `.bdc-doc-body h2{font-size:14pt;color:#0b2545;margin:16px 0 8px;page-break-before:avoid;border-bottom:1px solid #0b254540;padding-bottom:4px}` +
+    `.bdc-doc-body h3{font-size:12pt;color:#1d4ed8;margin:14px 0 6px;page-break-before:avoid}` +
+    `.bdc-doc-body h4{font-size:11pt;color:#334155;margin:12px 0 4px;page-break-before:avoid}` +
+    `.bdc-doc-body p{margin:6px 0;line-height:1.55}` +
     `.bdc-doc-body strong{color:#0b2545}` +
     `.bdc-doc-body ul,.bdc-doc-body ol{margin:6px 0 8px 22px}</style>`;
   return htmlWrap(content);
