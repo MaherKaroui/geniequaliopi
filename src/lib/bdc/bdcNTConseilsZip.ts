@@ -276,6 +276,15 @@ function applySubstitutions(src: string, org: OrganismeInfo, s: StagiaireInfo | 
     return /jour|mois|semaine/i.test(d) ? d : `un délai de ${d}`;
   })());
 
+  // Placeholders Informations périphériques (IND 9) — alimentés depuis le formulaire organisme
+  const orgTelLine = orgTel ? `\n- Téléphone : ${orgTel}` : "";
+  txt = txt
+    .replace(/\{ORG_ADRESSE_COMPLETE\}/g, orgAdresse || "[Adresse de l'organisme]")
+    .replace(/\{VILLE_ORG\}/g, villeOrg)
+    .replace(/\{ORG_EMAIL\}/g, orgEmail)
+    .replace(/\{ORG_TEL_LINE\}/g, orgTelLine);
+
+
   // Bloc d'informations bénéficiaire (utilisé dans la Convention de prestation)
   if (s) {
     const civ = s.civilite === "Mme" ? "Mme" : (s.civilite === "M." ? "M." : "");
