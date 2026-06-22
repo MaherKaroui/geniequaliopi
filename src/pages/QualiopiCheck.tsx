@@ -562,19 +562,13 @@ const QualiopiCheck = () => {
                             <Button
                               size="sm"
                               variant={decision === "fix" ? "default" : "outline"}
+                              disabled={fixingIdx === idx}
                               className={decision === "fix" ? "bg-green-600 hover:bg-green-700 h-7 text-xs" : "h-7 text-xs"}
-                              onClick={() => {
-                                setDecisions(d => ({ ...d, [idx]: "fix" }));
-                                const r = routeFor(f.zone);
-                                if (r) {
-                                  toast.success("Marqué à corriger — ouverture du formulaire concerné");
-                                  setTimeout(() => navigate(r), 600);
-                                } else {
-                                  toast.success("Marqué à corriger");
-                                }
-                              }}
+                              onClick={() => applyFix(idx, f)}
                             >
-                              <CheckCircle2 className="w-3 h-3 mr-1" /> Corriger
+                              {fixingIdx === idx
+                                ? <><Loader2 className="w-3 h-3 mr-1 animate-spin" /> Correction IA…</>
+                                : <><CheckCircle2 className="w-3 h-3 mr-1" /> Corriger avec IA</>}
                             </Button>
                             <Button
                               size="sm"
