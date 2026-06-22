@@ -437,11 +437,128 @@ ${attentes}
 `;
 }
 
+const FICHE_PEDA_KEY = "Indicateur 10/Indicateur 10 - Fiche p\u00e9dagogique";
+
+function buildFichePedagogiqueMd(
+  s: StagiaireInfo,
+  org: OrganismeInfo,
+  dates: DatesCtx,
+  formation?: FormationInfo,
+): string {
+  const nom = `${s.prenom || ""} ${s.nom || ""}`.trim() || "Bénéficiaire";
+  const orgNom = org.nom || "[Organisme]";
+  const lieu = [org.adresse, org.codePostal, org.ville].filter(Boolean).join(" ") || "[Adresse]";
+  const consultant = ((org as any).responsablePedagogique || org.dirigeant || "[Consultant]").toString();
+  const debut = parseDateFR(s.dateDebutFormation) || parseDateFR(formation?.dateDebut) || new Date();
+  const fin = parseDateFR(s.dateFinFormation) || parseDateFR(formation?.dateFin) || debut;
+  const dureeStr = (formation?.duree || "").trim();
+  const dureeTotale = (() => {
+    const m = dureeStr.match(/(\d+)/);
+    return m ? parseInt(m[1], 10) : 24;
+  })();
+
+  const sessions = [
+    { titre: "Phase préliminaire — Accueil et cadrage",
+      objectifs: ["ACCUEILLIR", "ANALYSER LA DEMANDE", "CONTRACTUALISER"],
+      programme: [
+        "Présentation du cadre déontologique et des modalités du bilan.",
+        "Recueil et analyse de la demande, attentes et contexte.",
+        "Formalisation du document de contractualisation et planning.",
+      ] },
+    { titre: "Phase d'investigation — Parcours et compétences",
+      objectifs: ["ANALYSER", "IDENTIFIER", "VALORISER"],
+      programme: [
+        "Analyse du parcours professionnel passé.",
+        "Identification des compétences techniques et comportementales.",
+        "Exploration des réalisations et des succès professionnels.",
+      ] },
+    { titre: "Phase d'investigation — Intérêts, valeurs, personnalité",
+      objectifs: ["EXPLORER", "DIAGNOSTIQUER", "PRIORISER"],
+      programme: [
+        "Passation et restitution des tests d'intérêts et de personnalité.",
+        "Clarification des valeurs professionnelles et freins éventuels.",
+        "Hiérarchisation des motivations et critères de choix.",
+      ] },
+    { titre: "Phase d'investigation — Pistes professionnelles",
+      objectifs: ["DEVELOPPER", "CONFRONTER", "VALIDER"],
+      programme: [
+        "Émergence et formalisation de 2 à 3 pistes professionnelles.",
+        "Recherche documentaire métiers, formations et marché de l'emploi.",
+        "Préparation des enquêtes terrain auprès de professionnels.",
+      ] },
+    { titre: "Phase d'investigation — Enquêtes métiers",
+      objectifs: ["ENQUÊTER", "ANALYSER", "AJUSTER"],
+      programme: [
+        "Débriefing des enquêtes métiers réalisées entre les séances.",
+        "Confrontation des hypothèses aux réalités du terrain.",
+        "Ajustement du projet professionnel principal et alternatif.",
+      ] },
+    { titre: "Phase de conclusion — Plan d'action",
+      objectifs: ["STRUCTURER", "PLANIFIER", "SÉCURISER"],
+      programme: [
+        "Élaboration du plan d'action chiffré et calendaire.",
+        "Identification des dispositifs de financement (CPF, autres).",
+        "Préparation des étapes clés sur 6 / 12 / 18 mois.",
+      ] },
+    { titre: "Phase de conclusion — Synthèse et suivi",
+      objectifs: ["SYNTHÉTISER", "RESTITUER", "SUIVI"],
+      programme: [
+        "Rédaction conjointe du document de synthèse du bilan.",
+        "Restitution finale et remise officielle de la synthèse.",
+        "Programmation de l'entretien de suivi à 6 mois.",
+      ] },
+  ];
+
+  const span = fin.getTime() - debut.getTime();
+  const sessionDates = sessions.map((_, idx) =>
+    sessions.length === 1 ? debut : new Date(debut.getTime() + (span * idx) / (sessions.length - 1))
+  );
+  const dureeSeance = Math.max(2, Math.round(dureeTotale / sessions.length));
+
+  const blocks = sessions.map((sess, idx) => {
+    const dateStr = fmtShortDate(sessionDates[idx]);
+    const num = idx + 1;
+    const objLine = sess.objectifs.map(o => `• ${o}`).join(" — ");
+    const prog = sess.programme.map(p => `- ${p}`).join("\n");
+    return `**SÉANCE ${num} — ${sess.titre}**
+
+| **Date :** ${dateStr} | **Objectifs de la séance :** ${objLine} |
+|---|---|
+| **Lieu :** ${lieu} | **Numéro de séance :** ${num} |
+| **Nom du consultant :** ${consultant} | **Durée de la séance :** ${dureeSeance} heures |
+
+**Programme de la séance :**
+
+${prog}
+
+**Remarques et observations :**
+
+| **Retard ou absence :** |
+|---|
+|   |
+`;
+  }).join("\n\n");
+
+  return `**[${orgNom}]{.underline}**
+
+**FICHE PÉDAGOGIQUE**
+
+Bénéficiaire : **${nom}**
+
+Prestation : Bilan de compétences — du ${dates.dateDebut} au ${dates.dateFin}
+
+Durée totale : ${dureeTotale} heures réparties sur ${sessions.length} séances
+
+${blocks}
+`;
+}
+
 /** Retourne un markdown personnalisé pour les clés qui le supportent, sinon null. */
-function getPersonalizedRaw(key: string, s: StagiaireInfo | null, org: OrganismeInfo, dates: DatesCtx): string | null {
+function getPersonalizedRaw(key: string, s: StagiaireInfo | null, org: OrganismeInfo, dates: DatesCtx, formation?: FormationInfo): string | null {
   if (!s) return null;
   if (key === OUTIL_PREPA_KEY) return buildOutilPreparatoireMd(s, org, dates);
   if (key === TEST_POSITIONNEMENT_KEY) return buildTestPositionnementMd(s, org, dates);
+  if (key === FICHE_PEDA_KEY) return buildFichePedagogiqueMd(s, org, dates, formation);
   return null;
 }
 
@@ -742,7 +859,7 @@ export function renderBdcNTDocHtml(
     return htmlWrap(orgHeader(org, title) + `<p style="color:#b91c1c">Document BDC introuvable (clé : ${key}).</p>` + docFooter(org));
   }
   const dates = computeDates(stagiaire || undefined, org, formation);
-  const personalized = getPersonalizedRaw(key, stagiaire, org, dates);
+  const personalized = getPersonalizedRaw(key, stagiaire, org, dates, formation);
   const effectiveRaw = personalized ?? raw;
   let md = applySubstitutions(effectiveRaw, org, stagiaire, dates, formation);
 
@@ -864,7 +981,7 @@ export async function buildBDCNTConseilsZip(
           blob = r!.blob; ext = r!.extension;
         } else {
           const dts = computeDates(s, org, formation);
-          const personalized = getPersonalizedRaw(key, s, org, dts);
+          const personalized = getPersonalizedRaw(key, s, org, dts, formation);
           blob = await genDocx(personalized ?? raw, `${baseName} – ${s.prenom} ${s.nom}`, s);
         }
         const path = critereFolder
