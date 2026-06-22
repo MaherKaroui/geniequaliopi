@@ -730,6 +730,12 @@ function mdToHtmlBody(md: string): string {
       if (new RegExp(`</${rawHtmlTag}>\\s*$`, "i").test(trimmed)) rawHtmlTag = null;
       continue;
     }
+    // Ligne <img> autonome : passe sans échappement
+    if (/^<img\s[^>]*\/?>\s*$/i.test(trimmed)) {
+      flushParagraph(); closeLists(); closeTable();
+      out.push(line);
+      continue;
+    }
     const rawStart = trimmed.match(/^<(table|div|section|article)[\s>]/i);
     if (rawStart) {
       flushParagraph(); closeLists(); closeTable();
@@ -738,6 +744,7 @@ function mdToHtmlBody(md: string): string {
       if (!new RegExp(`</${tag}>\\s*$`, "i").test(trimmed)) rawHtmlTag = tag;
       continue;
     }
+
     if (!trimmed) {
       // Une ligne vide ne ferme PAS une liste si la prochaine ligne non vide est encore un item
       // (sinon chaque item recommence à "1.")
