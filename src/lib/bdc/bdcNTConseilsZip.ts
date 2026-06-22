@@ -496,18 +496,27 @@ function preprocessGridTables(md: string): string {
       for (let k = 0; k < nCols; k++) {
         const a = cols[k] + 1, b = Math.min(cols[k + 1], bl.length);
         const slice = bl.slice(a, b).replace(/\s+$/, "").replace(/^\s+/, "");
-        if (slice) { cur[k] = cur[k] ? cur[k] + " " + slice : slice; curHas = true; }
+        if (slice) {
+          cur[k] = cur[k] ? cur[k] + (cur[k].endsWith("§§BR§§") ? "" : " ") + slice : slice;
+          curHas = true;
+        } else if (cur[k]) {
+          cur[k] = cur[k] + "§§BR§§";
+        }
       }
     }
     if (curHas) rows.push(cur.map(cleanCell));
 
     if (rows.length > 0) {
-      const headerIdx = headerRowIdx >= 0 ? headerRowIdx : 0;
       const join = (cells: string[]) => "| " + cells.map(c => (c.replace(/ +/g, " ") || " ")).join(" | ") + " |";
       out.push("");
-      out.push(join(rows[headerIdx]));
-      out.push("|" + rows[headerIdx].map(() => "---").join("|") + "|");
-      for (let r = 0; r < rows.length; r++) { if (r === headerIdx) continue; out.push(join(rows[r])); }
+      if (headerRowIdx >= 0) {
+        out.push(join(rows[headerRowIdx]));
+        out.push("|" + rows[headerRowIdx].map(() => "---").join("|") + "|");
+        for (let r = 0; r < rows.length; r++) { if (r === headerRowIdx) continue; out.push(join(rows[r])); }
+      } else {
+        out.push("§§NOHEADER_TABLE§§");
+        for (const row of rows) out.push(join(row));
+      }
       out.push("");
     }
     i = j;
