@@ -430,7 +430,8 @@ function mdToHtmlBody(md: string): string {
     .replace(/(?<!\*)\*([^*\n]+)\*(?!\*)/g, "<em>$1</em>")
     .replace(/\[([^\]]+)\]\{\.underline\}/g, "<u>$1</u>")
     .replace(/\\\\/g, "<br>")
-    .replace(/\\$/gm, "<br>");
+    .replace(/\\$/gm, "<br>")
+    .replace(/§§BR§§/g, "<br>");
 
   // Strip leading blank lines AND a leading H1: the org header already prints the title,
   // so a body-level <h1> duplicates it AND triggers a page break in the DOCX renderer
