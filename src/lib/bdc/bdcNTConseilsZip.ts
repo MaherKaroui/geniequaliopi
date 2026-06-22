@@ -467,7 +467,7 @@ function buildFichePedagogiqueMd(
   const dureeStr = (formation?.duree || "").trim();
   const dureeTotale = (() => {
     const m = dureeStr.match(/(\d+)/);
-    return m ? parseInt(m[1], 10) : 24;
+    return m ? parseInt(m[1], 10) : 18;
   })();
 
   const sessions = [
@@ -498,13 +498,6 @@ function buildFichePedagogiqueMd(
         "Émergence et formalisation de 2 à 3 pistes professionnelles.",
         "Recherche documentaire métiers, formations et marché de l'emploi.",
         "Préparation des enquêtes terrain auprès de professionnels.",
-      ] },
-    { titre: "Phase d'investigation — Enquêtes métiers",
-      objectifs: ["ENQUÊTER", "ANALYSER", "AJUSTER"],
-      programme: [
-        "Débriefing des enquêtes métiers réalisées entre les séances.",
-        "Confrontation des hypothèses aux réalités du terrain.",
-        "Ajustement du projet professionnel principal et alternatif.",
       ] },
     { titre: "Phase de conclusion — Plan d'action",
       objectifs: ["STRUCTURER", "PLANIFIER", "SÉCURISER"],
