@@ -51,6 +51,10 @@ const EXCEL_TEMPLATES = new Set([
   "matrice_competences_excel",
   "suivi_chiffre_formation_excel",
   "suivi_inscriptions_excel",
+  "bdc_nt_calendrier_annuel",
+  "bdc_nt_suivi_adaptation",
+  "bdc_nt_contacts_handicap",
+  "bdc_nt_tableau_dysfonctionnements",
 ]);
 
 export const MAIL_DOCX_TEMPLATES = new Set([

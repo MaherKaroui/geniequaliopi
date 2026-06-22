@@ -1267,8 +1267,14 @@ export function buildFullCatalog(
         );
       }
     });
-    // Assets statiques (xlsx / pdf téléchargés tels quels)
+    // Trames Excel dynamiques (générées comme les autres docs xlsx, prévisualisables et téléchargeables en .xlsx)
+    add("bdc_nt_calendrier_annuel", "CT1 - IND 1 Calendrier annuel (Excel)", 1, 1, "bdc_nt_calendrier_annuel");
+    add("bdc_nt_suivi_adaptation", "CT3 - IND 10 Suivi de l'adaptation à l'accompagnement (Excel)", 3, 10, "bdc_nt_suivi_adaptation");
+    add("bdc_nt_contacts_handicap", "CT6 - IND 26 Contacts & suivi handicap (Excel)", 6, 26, "bdc_nt_contacts_handicap");
+    add("bdc_nt_tableau_dysfonctionnements", "CT7 - IND 31 Tableau d'analyse des appréciations & réclamations (Excel)", 7, 31, "bdc_nt_tableau_dysfonctionnements");
+    // Ressources statiques restantes (PDF non générables dynamiquement)
     BDC_NT_STATIC_ASSETS.forEach((a, idx) => {
+      if (!/\.pdf$/i.test(a.src)) return;
       const fileName = a.zipPath.split("/").pop() || a.zipPath;
       const folder = a.zipPath.includes("/") ? a.zipPath.split("/")[0] : "";
       const ind = folder ? indicateurFromKey(folder) : 1;
@@ -1281,6 +1287,7 @@ export function buildFullCatalog(
       );
     });
   }
+
 
 
   // ===== VAE — VALIDATION DES ACQUIS DE L'EXPÉRIENCE =====
