@@ -104,6 +104,36 @@ export function genPlanActivitesCitoyennesCFA(o: OrganismeInfo, f: FormationInfo
 export function genPlanMixiteEgaliteFHCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[] = []) {
   const annee = f.dateDebut ? new Date(f.dateDebut).getFullYear() : new Date().getFullYear();
   const terminee = isFormationTerminee(f, stagiaires);
+  const today = new Date();
+
+  // Dates calculées automatiquement sur la fenêtre [dateDebut, dateFin]
+  const MOIS_FR = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
+  const d1 = f.dateDebut ? new Date(f.dateDebut) : null;
+  const d2 = f.dateFin ? new Date(f.dateFin) : null;
+  const totalMs = d1 && d2 ? d2.getTime() - d1.getTime() : 0;
+  const at = (ratio: number): Date | null => {
+    if (!d1 || !d2 || totalMs <= 0) return null;
+    const r = Math.max(0, Math.min(1, ratio));
+    return new Date(d1.getTime() + totalMs * r);
+  };
+  const periode = (d: Date | null, fallback: string) => d ? `${MOIS_FR[d.getMonth()]} ${d.getFullYear()}` : fallback;
+  const statut = (d: Date | null) => {
+    if (terminee) return "Réalisée";
+    if (!d) return "Programmée";
+    if (d.getTime() < today.getTime() - 7 * 24 * 3600 * 1000) return "Réalisée";
+    if (Math.abs(d.getTime() - today.getTime()) <= 30 * 24 * 3600 * 1000) return "En cours";
+    return "Programmée";
+  };
+  const cell = (ratio: number, fallback: string) => {
+    const d = at(ratio);
+    return { p: periode(d, fallback), s: statut(d) };
+  };
+
+  // Répartition des actions datées sur le parcours : signalement (5%), stéréotypes (25%), bilan final (90%)
+  const signalement = cell(0.05, `Septembre ${annee}`);
+  const stereotypes = cell(0.25, `Novembre ${annee}`);
+  const bilan = cell(0.90, `Juin ${annee + 1}`);
+
   return buildDocument({
     org: o,
     title: `PLAN D'ACTIONS — MIXITÉ ET ÉGALITÉ FEMMES / HOMMES — ${annee}`,
@@ -127,14 +157,14 @@ export function genPlanMixiteEgaliteFHCFA(o: OrganismeInfo, f: FormationInfo, st
       },
       {
         heading: "Actions programmées",
-        content: tableHTML(
+        content: `<p><em>Échéances calculées automatiquement sur la base du calendrier de la formation (${f.dateDebut ? formatDate(f.dateDebut) : "—"} → ${f.dateFin ? formatDate(f.dateFin) : "—"}).</em></p>` + tableHTML(
           ["Action", "Échéance", "Pilote", "Statut"],
           [
             ["Diffusion de la Charte Égalité F/H à l'inscription", "Permanent", "Pôle administratif", "Réalisée"],
-            ["Module « Stéréotypes de genre dans le métier »", `Novembre ${annee}`, "Référent égalité", terminee ? "Réalisée" : "Programmée"],
+            ["Procédure de signalement des comportements sexistes", signalement.p, "Direction", terminee ? "Réalisée — communiquée à 100 %" : signalement.s],
+            ["Module « Stéréotypes de genre dans le métier »", stereotypes.p, "Référent égalité", terminee ? "Réalisée" : stereotypes.s],
             ["Affichage permanent (numéro 3919, dispositifs d'aide)", "Permanent", "Référent égalité", "Réalisée — contrôlé trimestriellement"],
-            ["Procédure de signalement des comportements sexistes", `Septembre ${annee}`, "Direction", "Réalisée — communiquée à 100 %"],
-            ["Bilan annuel chiffré présenté au Conseil de Perfectionnement", `Juin ${annee + 1}`, "Direction", terminee ? "Réalisée — PV diffusé" : "À réaliser en fin de cycle"],
+            ["Bilan annuel chiffré présenté au Conseil de Perfectionnement", bilan.p, "Direction", terminee ? "Réalisée — PV diffusé" : bilan.s],
           ]
         ),
       },
