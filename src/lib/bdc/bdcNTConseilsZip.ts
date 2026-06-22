@@ -123,6 +123,12 @@ function applySubstitutions(src: string, org: OrganismeInfo, s: StagiaireInfo | 
   // Nettoie d'éventuels doubles espaces laissés par le retrait de "ANTTOISSE"
   txt = txt.replace(/[ \t]{2,}/g, " ");
 
+  // Tampon de l'organisme sous "Président" (contrat Droit à l'image)
+  if (org.tamponUrl) {
+    const tamponImg = `\n\n<img src="${org.tamponUrl}" alt="Tampon ${orgNom}" style="max-height:110px;max-width:200px;display:block;margin:8px 0;" />`;
+    txt = txt.replace(/(^|\n)Président\s*$/m, `$1Président${tamponImg}`);
+  }
+
   if (s) {
     const nomComplet = `${s.prenom} ${s.nom}`.trim();
     const civPrefix = s.civilite === "Mme" ? "Mme" : "M.";
