@@ -383,7 +383,10 @@ export function renderBdcNTDocHtml(
     return htmlWrap(orgHeader(org, title) + `<p style="color:#b91c1c">Document BDC introuvable (clé : ${key}).</p>` + docFooter(org));
   }
   const dates = computeDates(stagiaire || undefined, org);
-  let md = applySubstitutions(raw, org, stagiaire, dates);
+  const personalized = getPersonalizedRaw(key, stagiaire, org, dates);
+  const effectiveRaw = personalized ?? raw;
+  let md = applySubstitutions(effectiveRaw, org, stagiaire, dates);
+
   if (!dates.bilanTermine && /Certificat de réalisation|Compte rendu de fin/i.test(title)) {
     md = md.replace(/\n[^|\n]{200,}\n/g, "\n[À compléter à la fin du bilan]\n");
   }
