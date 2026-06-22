@@ -1029,6 +1029,8 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     }
     case "procedure_abandon_cfa": return genProcedureAbandon(o);
     case "procedure_absences_cfa": return genProcedureAbsences(o);
+    case "procedure_rupture_reorientation_echecs_cfa": return genProcedureRuptureReorientationEchecs(o);
+    case "feuille_emargement_gestion_abandon_cfa": return genFeuilleEmargementGestionAbandon(o, f, stagiaires);
     case "emargement_cfa": return genEmargementCFA(o, f, stagiaires);
     case "emargement_cfa_stagiaire": {
       const idx = typeof params?.stagiaireIdx === "number" ? params.stagiaireIdx : 0;
@@ -7271,6 +7273,66 @@ function genProcedureAbandon(o: OrganismeInfo) {
     { heading: "Suivi post-abandon", content: "<p>• Contact à 1 mois pour proposer un accompagnement<br>• Proposition de reprise si possible<br>• Analyse des causes pour prévention</p>" },
     { heading: "Indicateurs", content: "<p>• Taux d'abandon par formation<br>• Causes principales identifiées<br>• Taux de reprise après abandon<br>• Actions préventives mises en œuvre</p>", variant: "green" },
   ] });
+}
+
+function genProcedureRuptureReorientationEchecs(o: OrganismeInfo) {
+  return buildDocument({ org: o, title: "PROCÉDURE – ACCOMPAGNEMENT ET RÉORIENTATION DES APPRENTIS", sections: [
+    { heading: "1. Objectif de la procédure", content: `<p>La présente procédure a pour objectif de définir les modalités d'accompagnement, de suivi et de réorientation des apprentis de ${o.nom} en situation de rupture de contrat, d'échec à l'examen ou de changement de projet professionnel.</p><p>Elle vise à garantir :</p><p>• La continuité du parcours de formation<br>• L'accompagnement individualisé<br>• L'insertion ou la réorientation professionnelle</p>` },
+    { heading: "2. Champ d'application", content: "<p>Cette procédure s'applique à l'ensemble des apprentis du CFA, notamment :</p><p>• Apprentis sans entreprise<br>• Apprentis ayant rompu leur contrat<br>• Apprentis en échec à la certification<br>• Apprentis souhaitant se réorienter</p>" },
+    { heading: "3. Références réglementaires", content: "<p>• Code du travail<br>• Référentiel National Qualité – Indicateur 12<br>• Obligation d'accompagnement des apprentis en rupture</p>" },
+    { heading: "4. Acteurs concernés", content: `<p>• Référent pédagogique : ${o.responsablePedagogique}<br>• Référent administratif<br>• Référent handicap : ${o.referentHandicap || o.responsablePedagogique}<br>• Direction du CFA : ${o.dirigeant}<br>• Partenaires emploi (France Travail)</p>` },
+    { heading: "5.1 Identification de la situation", content: "<p>• Rupture du contrat d'apprentissage<br>• Absence d'entreprise<br>• Échec à la certification<br>• Demande de réorientation</p><p>Un entretien individuel est organisé systématiquement.</p>" },
+    { heading: "5.2 Maintien en formation (6 mois maximum)", content: "<p>Le CFA maintient l'apprenti en formation pendant une durée maximale de 6 mois afin de lui permettre de retrouver une entreprise.</p><p>Pendant cette période :</p><p>• Accès aux cours maintenu<br>• Suivi pédagogique individualisé<br>• Mise à disposition de ressources pédagogiques</p>" },
+    { heading: "5.3 Accompagnement à la recherche d'entreprise", content: "<p>• Ateliers CV et lettre de motivation<br>• Préparation aux entretiens<br>• Coaching individuel<br>• Mise en relation avec les entreprises<br>• Diffusion d'offres d'alternance</p><p>Un suivi régulier est organisé.</p>" },
+    { heading: "5.4 Inscription France Travail", content: "<p>• Accompagnement à l'inscription<br>• Création du profil candidat<br>• Aide à la recherche d'emploi</p>" },
+    { heading: "5.5 Information sur les aides", content: "<p>• Aides France Travail<br>• Aides CAF<br>• Aides locales</p>" },
+    { heading: "5.6 Réorientation professionnelle", content: "<p>• Entretien de positionnement<br>• Analyse du projet professionnel<br>• Proposition de nouvelles filières<br>• Orientation vers d'autres formations ou écoles</p>" },
+    { heading: "5.7 Suivi et traçabilité", content: "<p>• Fiche de suivi apprenant<br>• Compte rendu d'entretien<br>• Historique des actions<br>• Suivi des démarches</p>" },
+    { heading: "6. Indicateurs de suivi", content: "<p>• Taux de retour en entreprise<br>• Taux de réorientation<br>• Taux d'abandon<br>• Satisfaction des apprenants</p>", variant: "green" },
+    { heading: "7. Amélioration continue", content: "<p>Les résultats sont analysés afin d'améliorer les dispositifs d'accompagnement et de renforcer les actions.</p>" },
+    { heading: "8. Validation", content: `<p><strong>Responsable :</strong> ${o.dirigeant} – Direction du CFA<br><strong>Date :</strong> ${new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}<br><strong>Version :</strong> V1</p>` },
+  ] });
+}
+
+function genFeuilleEmargementGestionAbandon(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
+  const fmt = (d: Date) => d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  const start = f.dateDebut ? new Date(f.dateDebut) : new Date();
+  const end = f.dateFin ? new Date(f.dateFin) : new Date();
+  const today = new Date(); today.setHours(23,59,59,999);
+  // 6 entretiens mensuels de suivi abandon
+  const sessions: { date: Date; objet: string }[] = [];
+  const months = Math.min(6, Math.max(1, Math.round((end.getTime()-start.getTime())/(1000*60*60*24*30))));
+  for (let i = 0; i < months; i++) {
+    const d = new Date(start);
+    d.setMonth(d.getMonth() + i);
+    sessions.push({ date: d, objet: i === 0 ? "Entretien initial – identification de la situation" : `Entretien de suivi mensuel n°${i+1}` });
+  }
+
+  let extra = `<p><strong>Objet :</strong> Suivi des entretiens d'accompagnement dans le cadre de la procédure de gestion d'abandon / rupture / réorientation.</p>`;
+  extra += `<p><strong>Formation :</strong> ${f.intitule}<br><strong>Période de suivi :</strong> du ${fmt(start)} au ${fmt(end)}<br><strong>Référent pédagogique :</strong> ${o.responsablePedagogique}</p>`;
+
+  sessions.forEach((s, idx) => {
+    if (idx > 0) extra += '<div style="height:14px"></div>';
+    const past = s.date <= today;
+    extra += `<h3>Entretien du ${fmt(s.date)}</h3>`;
+    extra += `<p><strong>Objet :</strong> ${s.objet}</p>`;
+    let rows = '';
+    rows += `<tr><th>Prénom et Nom</th><th>Rôle</th><th>Signature</th></tr>`;
+    const refSig = o.signatureUrl ? `<img src="${o.signatureUrl}" alt="sig" style="max-height:38px;max-width:100px;object-fit:contain" />` : (past ? `<span style="font-style:italic;color:#666">Signé ${o.responsablePedagogique}</span>` : `<span style="color:#bbb;font-style:italic">— en attente —</span>`);
+    rows += `<tr style="background:#eaf2fb"><td>${o.responsablePedagogique}</td><td>Référent pédagogique</td><td>${past ? refSig : '<span style="color:#bbb;font-style:italic">— en attente —</span>'}</td></tr>`;
+    stagiaires.slice(0, 12).forEach((st, i) => {
+      const name = `${st.prenom} ${st.nom.toUpperCase()}`;
+      const sig = st.signatureUrl
+        ? `<img src="${st.signatureUrl}" alt="sig" style="max-height:38px;max-width:100px;object-fit:contain" />`
+        : `<span style="font-style:italic;color:#666">Signé ${st.prenom[0]}.${st.nom}</span>`;
+      const cell = past ? sig : '<span style="color:#bbb;font-style:italic">— en attente —</span>';
+      const bg = i % 2 === 0 ? '#ffffff' : '#f5f9ff';
+      rows += `<tr style="background:${bg}"><td>${name}</td><td>Apprenti(e)</td><td style="padding:10px 6px">${cell}</td></tr>`;
+    });
+    extra += `<table>${rows}</table>`;
+  });
+
+  return buildDocument({ org: o, title: "FEUILLE D'ÉMARGEMENT – SUIVI ABANDON / RÉORIENTATION", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra });
 }
 
 function genProcedureAbsences(o: OrganismeInfo) {
