@@ -998,6 +998,11 @@ export async function buildBDCNTConseilsZip(
     if (!dates.bilanTermine && /Certificat de réalisation|Compte rendu de fin/i.test(title)) {
       md = md.replace(/\n[^|\n]{200,}\n/g, "\n[À compléter à la fin du bilan]\n");
     }
+    if (/Certificat de réalisation/i.test(title) && org.tamponUrl) {
+      const tampon = `\n\n<img src="${org.tamponUrl}" alt="Tampon ${org.nom || ""}" style="max-height:120px;max-width:220px;display:block;margin:8px 0;object-fit:contain;" />\n`;
+      md = md.replace(/(^|\n)\s*Signature\s*$/m, `$1Signature${tampon}`);
+      if (!/<img[^>]+Tampon/i.test(md)) md += tampon;
+    }
 
     const html = mdToHtml(md, title, org, s).replace("</body>", buildFooter(org, dates) + "</body>");
     return await htmlToWordBlob(html);
