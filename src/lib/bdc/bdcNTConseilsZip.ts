@@ -358,7 +358,17 @@ function mdToHtmlBody(md: string): string {
     .replace(/\\\\/g, "<br>")
     .replace(/\\$/gm, "<br>");
 
-  const lines = md.split(/\r?\n/);
+  // Strip leading blank lines AND a leading H1: the org header already prints the title,
+  // so a body-level <h1> duplicates it AND triggers a page break in the DOCX renderer
+  // (leaving page 1 visually empty).
+  const allLines = md.split(/\r?\n/);
+  let start = 0;
+  while (start < allLines.length && !allLines[start].trim()) start++;
+  if (start < allLines.length && /^#\s+/.test(allLines[start].trim())) {
+    start++;
+    while (start < allLines.length && !allLines[start].trim()) start++;
+  }
+  const lines = allLines.slice(start);
   const out: string[] = [];
   let inUl = false, inOl = false, inTable = false;
   const closeLists = () => { if (inUl){out.push("</ul>");inUl=false;} if(inOl){out.push("</ol>");inOl=false;} };
@@ -369,7 +379,13 @@ function mdToHtmlBody(md: string): string {
     const trimmed = line.trim();
     if (!trimmed) { closeLists(); closeTable(); out.push(""); continue; }
     let m = trimmed.match(/^(#{1,6})\s+(.*)$/);
-    if (m) { closeLists(); closeTable(); const lvl = m[1].length; out.push(`<h${lvl}>${inline(m[2])}</h${lvl}>`); continue; }
+    if (m) {
+      closeLists(); closeTable();
+      // Demote one level: #/##/### → h2/h3/h4 to avoid duplicate h1 + page-break-before
+      const lvl = Math.min(6, m[1].length + 1);
+      out.push(`<h${lvl}>${inline(m[2])}</h${lvl}>`);
+      continue;
+    }
     if (/^[-*+]\s+/.test(trimmed)) {
       closeTable();
       if (!inUl) { closeLists(); out.push("<ul>"); inUl = true; }
