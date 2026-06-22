@@ -358,7 +358,17 @@ function mdToHtmlBody(md: string): string {
     .replace(/\\\\/g, "<br>")
     .replace(/\\$/gm, "<br>");
 
-  const lines = md.split(/\r?\n/);
+  // Strip leading blank lines AND a leading H1: the org header already prints the title,
+  // so a body-level <h1> duplicates it AND triggers a page break in the DOCX renderer
+  // (leaving page 1 visually empty).
+  const allLines = md.split(/\r?\n/);
+  let start = 0;
+  while (start < allLines.length && !allLines[start].trim()) start++;
+  if (start < allLines.length && /^#\s+/.test(allLines[start].trim())) {
+    start++;
+    while (start < allLines.length && !allLines[start].trim()) start++;
+  }
+  const lines = allLines.slice(start);
   const out: string[] = [];
   let inUl = false, inOl = false, inTable = false;
   const closeLists = () => { if (inUl){out.push("</ul>");inUl=false;} if(inOl){out.push("</ol>");inOl=false;} };
@@ -369,7 +379,13 @@ function mdToHtmlBody(md: string): string {
     const trimmed = line.trim();
     if (!trimmed) { closeLists(); closeTable(); out.push(""); continue; }
     let m = trimmed.match(/^(#{1,6})\s+(.*)$/);
-    if (m) { closeLists(); closeTable(); const lvl = m[1].length; out.push(`<h${lvl}>${inline(m[2])}</h${lvl}>`); continue; }
+    if (m) {
+      closeLists(); closeTable();
+      // Demote one level: #/##/### → h2/h3/h4 to avoid duplicate h1 + page-break-before
+      const lvl = Math.min(6, m[1].length + 1);
+      out.push(`<h${lvl}>${inline(m[2])}</h${lvl}>`);
+      continue;
+    }
     if (/^[-*+]\s+/.test(trimmed)) {
       closeTable();
       if (!inUl) { closeLists(); out.push("<ul>"); inUl = true; }
@@ -408,11 +424,13 @@ function mdToHtml(md: string, title: string, org: OrganismeInfo, stagiaire: Stag
     orgHeader(org, title) +
     beneficiaireLine +
     `<div class="bdc-doc-body">${body}</div>` +
-    `<style>.bdc-doc-body table{border-collapse:collapse;width:100%;margin:8px 0;font-size:11px}` +
+    `<style>.bdc-doc-body{font-size:11pt}` +
+    `.bdc-doc-body table{border-collapse:collapse;width:100%;margin:10px 0;font-size:10.5pt}` +
     `.bdc-doc-body table td,.bdc-doc-body table th{border:1px solid #bbb;padding:6px;vertical-align:top}` +
-    `.bdc-doc-body h1{font-size:18pt;color:#0b2545;margin-top:0}` +
-    `.bdc-doc-body h2{font-size:14pt;color:#0b2545;margin-top:18px}` +
-    `.bdc-doc-body h3{font-size:12pt;color:#1d4ed8;margin-top:14px}` +
+    `.bdc-doc-body h2{font-size:14pt;color:#0b2545;margin:16px 0 8px;page-break-before:avoid;border-bottom:1px solid #0b254540;padding-bottom:4px}` +
+    `.bdc-doc-body h3{font-size:12pt;color:#1d4ed8;margin:14px 0 6px;page-break-before:avoid}` +
+    `.bdc-doc-body h4{font-size:11pt;color:#334155;margin:12px 0 4px;page-break-before:avoid}` +
+    `.bdc-doc-body p{margin:6px 0;line-height:1.55}` +
     `.bdc-doc-body strong{color:#0b2545}` +
     `.bdc-doc-body ul,.bdc-doc-body ol{margin:6px 0 8px 22px}</style>`;
   return htmlWrap(content);
@@ -494,7 +512,7 @@ export function renderBdcNTDocHtml(
     orgHeader(org, title) +
     beneficiaireLine +
     `<div class="bdc-doc-body">${body}</div>` +
-    `<style>.bdc-doc-body table{border-collapse:collapse;width:100%;margin:8px 0;font-size:11px}.bdc-doc-body table td,.bdc-doc-body table th{border:1px solid #bbb;padding:6px;vertical-align:top}.bdc-doc-body h2{margin-top:18px}.bdc-doc-body h3{margin-top:14px}.bdc-doc-body ul,.bdc-doc-body ol{margin:6px 0 8px 22px}</style>` +
+    `<style>.bdc-doc-body{font-size:11pt}.bdc-doc-body table{border-collapse:collapse;width:100%;margin:10px 0;font-size:10.5pt}.bdc-doc-body table td,.bdc-doc-body table th{border:1px solid #bbb;padding:6px;vertical-align:top}.bdc-doc-body h2{font-size:14pt;color:#0b2545;margin:16px 0 8px;page-break-before:avoid;border-bottom:1px solid #0b254540;padding-bottom:4px}.bdc-doc-body h3{font-size:12pt;color:#1d4ed8;margin:14px 0 6px;page-break-before:avoid}.bdc-doc-body h4{font-size:11pt;color:#334155;margin:12px 0 4px;page-break-before:avoid}.bdc-doc-body p{margin:6px 0;line-height:1.55}.bdc-doc-body strong{color:#0b2545}.bdc-doc-body ul,.bdc-doc-body ol{margin:6px 0 8px 22px}</style>` +
     docFooter(org)
   );
 }
