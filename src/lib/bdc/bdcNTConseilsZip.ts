@@ -534,13 +534,24 @@ function mdToHtmlBody(md: string): string {
   // Convertit les tableaux grid pandoc (+---+---+) en tableaux pipe
   md = preprocessGridTables(md);
   const esc = (s: string) => s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-  const inline = (s: string) => esc(s)
-    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
-    .replace(/(?<!\*)\*([^*\n]+)\*(?!\*)/g, "<em>$1</em>")
-    .replace(/\[([^\]]+)\]\{\.underline\}/g, "<u>$1</u>")
-    .replace(/\\\\/g, "<br>")
-    .replace(/\\$/gm, "<br>")
-    .replace(/§§BR§§/g, "<br>");
+  const inline = (s: string) => {
+    // Extraire les images markdown ![alt](url) AVANT l'échappement HTML
+    const imgs: string[] = [];
+    s = s.replace(/!\[([^\]]*)\]\(([^)\s]+)(?:\s+"[^"]*")?\)(?:\{[^}]*\})?/g, (_, alt, url) => {
+      const idx = imgs.length;
+      imgs.push(`<img src="${url}" alt="${alt.replace(/"/g,'&quot;')}" style="max-width:140px;max-height:70px;display:block;margin:4px auto;object-fit:contain;" />`);
+      return `§§IMG${idx}§§`;
+    });
+    let out = esc(s)
+      .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+      .replace(/(?<!\*)\*([^*\n]+)\*(?!\*)/g, "<em>$1</em>")
+      .replace(/\[([^\]]+)\]\{\.underline\}/g, "<u>$1</u>")
+      .replace(/\\\\/g, "<br>")
+      .replace(/\\$/gm, "<br>")
+      .replace(/§§BR§§/g, "<br>");
+    out = out.replace(/§§IMG(\d+)§§/g, (_, i) => imgs[Number(i)] || "");
+    return out;
+  };
 
   // Strip leading blank lines AND a leading H1: the org header already prints the title,
   // so a body-level <h1> duplicates it AND triggers a page break in the DOCX renderer
