@@ -55,10 +55,16 @@ interface DatesCtx {
   bilanTermine: boolean;
 }
 
-function computeDates(s?: StagiaireInfo, org?: OrganismeInfo): DatesCtx {
+function computeDates(s?: StagiaireInfo, org?: OrganismeInfo, formation?: FormationInfo): DatesCtx {
   const today = new Date();
-  const debut = parseDateFR(s?.dateDebutFormation) || parseDateFR(org?.dateMaj) || today;
-  const fin = parseDateFR(s?.dateFinFormation) || debut;
+  // Priorité : dates du stagiaire > dates de la formation > dateMaj de l'organisme
+  const debut = parseDateFR(s?.dateDebutFormation)
+    || parseDateFR(formation?.dateDebut)
+    || parseDateFR(org?.dateMaj)
+    || today;
+  const fin = parseDateFR(s?.dateFinFormation)
+    || parseDateFR(formation?.dateFin)
+    || debut;
   const conv = minusBusinessDays(debut, 14);
   const mi = new Date((debut.getTime() + fin.getTime()) / 2);
   const bilanTermine = fin.getTime() <= today.getTime();
