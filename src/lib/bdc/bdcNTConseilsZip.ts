@@ -209,6 +209,46 @@ function fileTitle(key: string): string {
   return name;
 }
 
+/** Mappe un numéro d'indicateur Qualiopi vers son critère. */
+function critereForIndicateur(ind: number): number {
+  if (ind <= 3) return 1;
+  if (ind <= 8) return 2;
+  if (ind <= 16) return 3;
+  if (ind <= 20) return 4;
+  if (ind <= 22) return 5;
+  if (ind <= 29) return 6;
+  return 7;
+}
+
+/**
+ * Convertit un dossier source (ex: "Indicateur 10", "Indicateur 23 & 24 & 25")
+ * en chemin "Critere_X/Indicateur_Y" pour le ZIP final.
+ */
+function mapFolderToCriterePath(folder: string): string {
+  if (!folder) return "";
+  const m = folder.match(/Indicateur\s*(\d+)/i);
+  if (!m) return folder;
+  const ind = parseInt(m[1], 10);
+  const crit = critereForIndicateur(ind);
+  return `Critere_${crit}/Indicateur_${ind}`;
+}
+
+/** Convertit un zipPath source en chemin avec critère. */
+function mapAssetPathToCriterePath(zipPath: string): string {
+  if (zipPath.includes("/")) {
+    const idx = zipPath.indexOf("/");
+    const folder = zipPath.slice(0, idx);
+    const rest = zipPath.slice(idx + 1);
+    return `${mapFolderToCriterePath(folder)}/${rest}`;
+  }
+  const m = zipPath.match(/^Indicateur\s*(\d+)/i);
+  if (m) {
+    const ind = parseInt(m[1], 10);
+    return `${mapFolderToCriterePath(`Indicateur ${ind}`)}/${zipPath}`;
+  }
+  return zipPath;
+}
+
 export async function buildBDCNTConseilsZip(
   org: OrganismeInfo,
   formation: FormationInfo,
