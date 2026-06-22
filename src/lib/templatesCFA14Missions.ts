@@ -443,6 +443,24 @@ export function genAttestationFormationMaitreApprentissageCFA(o: OrganismeInfo, 
   const dateJ4 = formatDate(addBusinessDays(baseDate, 3));
   const dateJ5 = formatDate(addBusinessDays(baseDate, 4));
 
+  // Modalité dynamique calée sur le formulaire de formation (Présentiel / Distanciel / Mixte / E-learning…)
+  const modRaw = (f.modalites || "").toLowerCase();
+  const isMixte = /mixte|hybride|blended/.test(modRaw);
+  const isDistanciel = /distanciel|distance|e-?learning|en ligne|fad|foad/.test(modRaw) && !isMixte;
+  const isPresentiel = /pr[eé]sentiel/.test(modRaw) && !isMixte;
+  const modaliteDefaut = isMixte
+    ? "Mixte (présentiel + distanciel)"
+    : isDistanciel
+    ? "Distanciel"
+    : isPresentiel
+    ? "Présentiel"
+    : (f.modalites && f.modalites.trim()) || "Présentiel";
+  // Pour le mixte : on alterne présentiel / distanciel sur les modules
+  const modMod = (i: number) => {
+    if (isMixte) return i % 2 === 0 ? "Présentiel" : "Distanciel";
+    return modaliteDefaut;
+  };
+
   return buildDocument({
     org: o,
     title: terminee
@@ -451,7 +469,7 @@ export function genAttestationFormationMaitreApprentissageCFA(o: OrganismeInfo, 
     sections: [
       {
         heading: "Cadre (Mission 13 — Art. L6231-2 et R6223-24 du Code du Travail)",
-        content: `<p>Le CFA <strong>${o.nom}</strong> propose et atteste de la formation des maîtres d'apprentissage à la fonction tutorale, conformément à la 13ᵉ mission des CFA.</p>${terminee ? "" : `<p><em>Document <strong>provisoire</strong> — formation du maître d'apprentissage en cours. L'attestation définitive sera délivrée à l'issue des 21 heures.</em></p>`}`,
+        content: `<p>Le CFA <strong>${o.nom}</strong> propose et atteste de la formation des maîtres d'apprentissage à la fonction tutorale, conformément à la 13ᵉ mission des CFA.</p><p><em>Modalité retenue : <strong>${modaliteDefaut}</strong> (alignée sur les modalités de la formation « ${f.intitule} »).</em></p>${terminee ? "" : `<p><em>Document <strong>provisoire</strong> — formation du maître d'apprentissage en cours. L'attestation définitive sera délivrée à l'issue des 21 heures.</em></p>`}`,
       },
       {
         heading: "Identité du Maître d'Apprentissage formé",
@@ -462,11 +480,11 @@ export function genAttestationFormationMaitreApprentissageCFA(o: OrganismeInfo, 
         content: tableHTML(
           ["Module", "Durée", "Date", "Modalité", "Statut"],
           [
-            ["Cadre légal de l'apprentissage et rôle du MA", "3 h 30", dateJ1, "Présentiel", terminee ? "Validé" : "Réalisé"],
-            ["Pédagogie de l'alternance et transmission des savoir-faire", "7 h 00", dateJ2, "Présentiel", terminee ? "Validé" : "Réalisé"],
-            ["Évaluation des compétences et utilisation du livret apprentissage", "3 h 30", dateJ3, "Présentiel", terminee ? "Validé" : "En cours"],
-            ["Communication, posture et gestion des conflits", "3 h 30", dateJ4, "Présentiel", terminee ? "Validé" : "À venir"],
-            ["Articulation CFA / Entreprise / Apprenti", "3 h 30", dateJ5, "Distanciel", terminee ? "Validé" : "À venir"],
+            ["Cadre légal de l'apprentissage et rôle du MA", "3 h 30", dateJ1, modMod(0), terminee ? "Validé" : "Réalisé"],
+            ["Pédagogie de l'alternance et transmission des savoir-faire", "7 h 00", dateJ2, modMod(1), terminee ? "Validé" : "Réalisé"],
+            ["Évaluation des compétences et utilisation du livret apprentissage", "3 h 30", dateJ3, modMod(2), terminee ? "Validé" : "En cours"],
+            ["Communication, posture et gestion des conflits", "3 h 30", dateJ4, modMod(3), terminee ? "Validé" : "À venir"],
+            ["Articulation CFA / Entreprise / Apprenti", "3 h 30", dateJ5, modMod(4), terminee ? "Validé" : "À venir"],
           ]
         ),
       },
