@@ -1,0 +1,308 @@
+/**
+ * Générateur du dossier BDC complet — trame "NT Conseils"
+ * Produit un ZIP fidèle à la structure du dossier source : 14 indicateurs,
+ * documents collectifs + documents personnalisés par bénéficiaire.
+ *
+ * Personnalisation :
+ *   - Substitutions org/bénéficiaire/dates intelligentes (jamais "today")
+ *   - DOCX via htmlToWordBlob (markdown → HTML → DOCX)
+ *   - Assets statiques (xlsx, pdf) téléchargés depuis /pdfs/bdc_nt/
+ */
+import JSZip from "jszip";
+import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
+import { htmlToWordBlob } from "@/lib/wordExport";
+import { BDC_NT_SOURCE, BDC_NT_PER_BENEFICIAIRE, BDC_NT_STATIC_ASSETS } from "./bdcNTSource";
+import type { JobReporter } from "@/lib/backgroundJobs";
+
+const MOIS_FR = ["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
+
+function fmtLongDate(d: Date): string {
+  return `${d.getDate()} ${MOIS_FR[d.getMonth()]} ${d.getFullYear()}`;
+}
+function fmtShortDate(d: Date): string {
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()}`;
+}
+function parseDateFR(s?: string): Date | null {
+  if (!s) return null;
+  // accept "YYYY-MM-DD" or "DD/MM/YYYY"
+  const iso = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (iso) return new Date(+iso[1], +iso[2]-1, +iso[3]);
+  const fr = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
+  if (fr) return new Date(+fr[3], +fr[2]-1, +fr[1]);
+  const t = Date.parse(s);
+  return isNaN(t) ? null : new Date(t);
+}
+function minusBusinessDays(d: Date, n: number): Date {
+  const r = new Date(d);
+  let i = 0;
+  while (i < n) {
+    r.setDate(r.getDate() - 1);
+    const wd = r.getDay();
+    if (wd !== 0 && wd !== 6) i++;
+  }
+  return r;
+}
+
+interface DatesCtx {
+  dateConvention: string;    // J-14 ouvrés avant début
+  dateDebut: string;
+  dateFin: string;
+  dateMiParcours: string;
+  dateCertificat: string;
+  dateVersion: string;
+  bilanTermine: boolean;
+}
+
+function computeDates(s?: StagiaireInfo, org?: OrganismeInfo): DatesCtx {
+  const today = new Date();
+  const debut = parseDateFR(s?.dateDebutFormation) || parseDateFR(org?.dateMaj) || today;
+  const fin = parseDateFR(s?.dateFinFormation) || debut;
+  const conv = minusBusinessDays(debut, 14);
+  const mi = new Date((debut.getTime() + fin.getTime()) / 2);
+  const bilanTermine = fin.getTime() <= today.getTime();
+  const versionD = parseDateFR(org?.dateMaj) || new Date(debut.getFullYear(), 0, 1);
+  return {
+    dateConvention: fmtLongDate(conv),
+    dateDebut: fmtLongDate(debut),
+    dateFin: fmtLongDate(fin),
+    dateMiParcours: fmtLongDate(mi),
+    dateCertificat: bilanTermine ? fmtLongDate(fin) : "",
+    dateVersion: fmtLongDate(versionD),
+    bilanTermine,
+  };
+}
+
+/** Substitutions globales : remplace tous les marqueurs NT Conseils par les données organisme/bénéficiaire. */
+function applySubstitutions(src: string, org: OrganismeInfo, s: StagiaireInfo | null, dates: DatesCtx): string {
+  let txt = src;
+  const orgNom = org.nom || "[Organisme]";
+  const orgAdresse = [org.adresse, org.codePostal, org.ville].filter(Boolean).join(" ");
+  const orgEmail = org.email || "contact@organisme.fr";
+  const orgTel = org.telephone || "";
+  const orgSiret = org.siret || "[SIRET]";
+  const orgNda = org.nda || "[NDA en cours d'attribution]";
+  const dirigeant = org.dirigeant || "Le Responsable";
+
+  const map: [RegExp, string][] = [
+    [/NT\s*CONSEILS/gi, orgNom],
+    [/5\s*rue\s*Pleyel\s*93200\s*Saint-Denis/gi, orgAdresse || "[Adresse]"],
+    [/5\s*rue\s*Pleyel,?\s*93200/gi, [org.adresse, org.codePostal].filter(Boolean).join(" ") || "[Adresse]"],
+    [/Saint-Denis/g, org.ville || "[Ville]"],
+    [/902\s*274\s*448\s*000\s*31/g, orgSiret],
+    [/902\s*274\s*448/g, orgSiret.replace(/\s/g,"").slice(0,9) || orgSiret],
+    [/contact\.ntconseil@gmail\.com/gi, orgEmail],
+    [/Marc\.z103@gmail\.com/gi, orgEmail],
+    [/Préfet\s+de\s+la\s+région\s+ILE-DE-FRANCE/gi, `Préfet de la région ${org.ville || "[Région]"}`],
+    [/Préfet\s+de\s+la\s+région\s+XXX/gi, `Préfet de la région ${org.ville || "[Région]"}`],
+    [/SIRET\s*XXX/gi, `SIRET ${orgSiret}`],
+    [/Fait\s+à\s+Saint-Denis\s+le\s+\d{2}\/\d{2}\/\d{4}/gi, `Fait à ${org.ville || "[Ville]"} le ${dates.dateConvention}`],
+    [/01\/01\/2026/g, fmtShortDate(parseDateFR(dates.dateVersion) || new Date())],
+  ];
+  for (const [re, val] of map) txt = txt.replace(re, val);
+
+  if (s) {
+    const nomComplet = `${s.prenom} ${s.nom}`.trim();
+    txt = txt.replace(/ABDOULHALIK/g, (s.nom || "").toUpperCase() || "[NOM]");
+    txt = txt.replace(/\bNom\s*:\s*\n/g, `Nom : ${s.nom || ""}\n`);
+    txt = txt.replace(/\bPrénom\s*:\s*\n/g, `Prénom : ${s.prenom || ""}\n`);
+    txt = txt.replace(/\bbénéficiaire\s*:\s*\n/gi, `bénéficiaire : ${nomComplet}\n`);
+    // entête mail destinataire
+    txt = txt.replace(/Bonjour\s*Monsieur,?/g, `Bonjour ${s.civilite === "Mme" ? "Madame" : "Monsieur"},`);
+  }
+
+  // dates dynamiques
+  txt = txt.replace(/\{DATE_CONVENTION\}/g, dates.dateConvention);
+  txt = txt.replace(/\{DATE_DEBUT\}/g, dates.dateDebut);
+  txt = txt.replace(/\{DATE_FIN\}/g, dates.dateFin);
+
+  return txt;
+}
+
+/** Markdown (pandoc-style) → HTML compact (titres, listes, gras, tableaux) */
+function mdToHtml(md: string, title: string): string {
+  const esc = (s: string) => s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  const inline = (s: string) => esc(s)
+    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+    .replace(/(?<!\*)\*([^*\n]+)\*(?!\*)/g, "<em>$1</em>")
+    .replace(/\[([^\]]+)\]\{\.underline\}/g, "<u>$1</u>")
+    .replace(/\\\\/g, "<br>")
+    .replace(/\\$/gm, "<br>");
+
+  const lines = md.split(/\r?\n/);
+  const out: string[] = [];
+  let inUl = false, inOl = false, inTable = false;
+  const closeLists = () => { if (inUl){out.push("</ul>");inUl=false;} if(inOl){out.push("</ol>");inOl=false;} };
+  const closeTable = () => { if (inTable){out.push("</table>");inTable=false;} };
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const trimmed = line.trim();
+    if (!trimmed) { closeLists(); closeTable(); out.push(""); continue; }
+    // Headings
+    let m = trimmed.match(/^(#{1,6})\s+(.*)$/);
+    if (m) { closeLists(); closeTable(); const lvl = m[1].length; out.push(`<h${lvl}>${inline(m[2])}</h${lvl}>`); continue; }
+    // Bullet
+    if (/^[-*+]\s+/.test(trimmed)) {
+      closeTable();
+      if (!inUl) { closeLists(); out.push("<ul>"); inUl = true; }
+      out.push(`<li>${inline(trimmed.replace(/^[-*+]\s+/,""))}</li>`);
+      continue;
+    }
+    // Numbered
+    if (/^\d+\.\s+/.test(trimmed)) {
+      closeTable();
+      if (!inOl) { closeLists(); out.push("<ol>"); inOl = true; }
+      out.push(`<li>${inline(trimmed.replace(/^\d+\.\s+/,""))}</li>`);
+      continue;
+    }
+    // Pandoc grid/pipe table row
+    if (/^\|.*\|$/.test(trimmed)) {
+      closeLists();
+      if (!inTable) { out.push('<table border="1" cellspacing="0" cellpadding="6" style="border-collapse:collapse;width:100%;border:1px solid #999;font-size:12px">'); inTable = true; }
+      const cells = trimmed.slice(1, -1).split("|").map(c => c.trim());
+      if (cells.every(c => /^-+$/.test(c) || c === "")) continue; // separator
+      out.push("<tr>" + cells.map(c => `<td style="border:1px solid #bbb;padding:6px;vertical-align:top">${inline(c)}</td>`).join("") + "</tr>");
+      continue;
+    }
+    if (/^[+\-=]{3,}/.test(trimmed)) { closeTable(); continue; }
+    closeLists(); closeTable();
+    out.push(`<p>${inline(trimmed)}</p>`);
+  }
+  closeLists(); closeTable();
+
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${esc(title)}</title>
+<style>
+body{font-family:Calibri,Arial,sans-serif;font-size:11pt;color:#1a1a2e;line-height:1.45}
+h1{font-size:18pt;color:#0b2545;border-bottom:2px solid #1d4ed8;padding-bottom:6px;margin-top:0}
+h2{font-size:14pt;color:#0b2545;margin-top:18px}
+h3{font-size:12pt;color:#1d4ed8;margin-top:14px}
+table{border-collapse:collapse;margin:8px 0;width:100%}
+td,th{border:1px solid #999;padding:6px;vertical-align:top;font-size:10pt}
+strong{color:#0b2545}
+ul,ol{margin:6px 0 8px 22px}
+.footer{margin-top:30px;border-top:1px solid #ccc;padding-top:8px;font-size:9pt;color:#475569;text-align:center}
+</style></head><body>
+<h1>${esc(title)}</h1>
+${out.join("\n")}
+</body></html>`;
+}
+
+function buildFooter(org: OrganismeInfo, dates: DatesCtx): string {
+  const parts = [
+    `<strong>${org.nom || ""}</strong>`,
+    org.siret ? `SIRET ${org.siret}` : "",
+    org.nda ? `NDA ${org.nda}` : "",
+    org.version ? `Version ${org.version}` : "",
+    `Édition du ${dates.dateVersion}`,
+  ].filter(Boolean);
+  return `<div class="footer">${parts.join(" · ")}</div>`;
+}
+
+function slugBen(s: StagiaireInfo): string {
+  return `${s.prenom}_${s.nom}`.normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^\w\-]+/g,"_").replace(/_+/g,"_").slice(0, 60);
+}
+
+/** Génère un titre de fichier propre depuis la clé source */
+function fileTitle(key: string): string {
+  const name = key.split("/").pop() || key;
+  return name;
+}
+
+export async function buildBDCNTConseilsZip(
+  org: OrganismeInfo,
+  formation: FormationInfo,
+  beneficiaires: StagiaireInfo[],
+  reporter?: JobReporter,
+): Promise<Blob> {
+  const zip = new JSZip();
+  const keys = Object.keys(BDC_NT_SOURCE).sort();
+  const benList = beneficiaires.length > 0 ? beneficiaires : [{
+    civilite: "M.", nom: "BENEFICIAIRE", prenom: "Modèle", email: "", telephone: "",
+    entreprise: "", poste: "", dateNaissance: "",
+  } as StagiaireInfo];
+
+  // README global
+  const totalDocs = keys.length + BDC_NT_STATIC_ASSETS.length;
+  const readme = [
+    "DOSSIER BILAN DE COMPÉTENCES — TRAME NT CONSEILS",
+    "================================================",
+    "",
+    `Organisme : ${org.nom}`,
+    `SIRET : ${org.siret}    NDA : ${org.nda}`,
+    `Bénéficiaires : ${benList.length}`,
+    "",
+    "Structure :",
+    "  - Documents collectifs à la racine de chaque dossier Indicateur",
+    "  - Documents nominatifs dans le sous-dossier de chaque bénéficiaire",
+    "",
+    `Total documents : ${totalDocs} par bénéficiaire pour les nominatifs.`,
+  ].join("\n");
+  zip.file("LISEZMOI.txt", readme);
+
+  let step = 0;
+  const totalSteps = keys.length + keys.filter(k => BDC_NT_PER_BENEFICIAIRE.has(k)).length * (benList.length - 1) + BDC_NT_STATIC_ASSETS.length;
+  const advance = (msg: string) => {
+    step++;
+    reporter?.setProgress(Math.min(99, (step / Math.max(1, totalSteps)) * 100));
+    reporter?.setMessage(msg);
+  };
+
+  // Helper : génère un DOCX depuis markdown + substitutions
+  const genDocx = async (rawMd: string, title: string, s: StagiaireInfo | null): Promise<Blob> => {
+    const dates = computeDates(s || undefined, org);
+    let md = applySubstitutions(rawMd, org, s, dates);
+
+    // Bilan en cours : on neutralise les évaluations finales
+    if (!dates.bilanTermine && /Certificat de réalisation|Compte rendu de fin/i.test(title)) {
+      md = md.replace(/\n[^|\n]{200,}\n/g, "\n[À compléter à la fin du bilan]\n");
+    }
+
+    const html = mdToHtml(md, title).replace("</body>", buildFooter(org, dates) + "</body>");
+    return await htmlToWordBlob(html);
+  };
+
+  for (const key of keys) {
+    const folder = key.includes("/") ? key.split("/")[0] : "";
+    const baseName = fileTitle(key);
+    const isPerBen = BDC_NT_PER_BENEFICIAIRE.has(key);
+    const raw = BDC_NT_SOURCE[key];
+
+    if (isPerBen) {
+      for (const s of benList) {
+        advance(`${baseName} — ${s.prenom} ${s.nom}`);
+        const blob = await genDocx(raw, `${baseName} – ${s.prenom} ${s.nom}`, s);
+        const benFolder = `Bénéficiaire - ${s.prenom} ${s.nom}`;
+        const path = folder
+          ? `${benFolder}/${folder}/${baseName}.docx`
+          : `${benFolder}/${baseName}.docx`;
+        zip.file(path, blob);
+      }
+    } else {
+      advance(baseName);
+      const blob = await genDocx(raw, baseName, null);
+      const path = folder ? `${folder}/${baseName}.docx` : `${baseName}.docx`;
+      zip.file(path, blob);
+    }
+  }
+
+  // Static assets
+  for (const a of BDC_NT_STATIC_ASSETS) {
+    advance(a.zipPath.split("/").pop() || a.zipPath);
+    try {
+      const res = await fetch(a.src);
+      if (res.ok) {
+        const buf = await res.arrayBuffer();
+        zip.file(a.zipPath, buf);
+      }
+    } catch (e) {
+      console.warn("[BDC NT] asset failed", a.src, e);
+    }
+  }
+
+  reporter?.setProgress(99);
+  reporter?.setMessage("Compression du ZIP…");
+  const blob = await zip.generateAsync({ type: "blob", compression: "DEFLATE", compressionOptions: { level: 6 } });
+  reporter?.setProgress(100);
+  return blob;
+}

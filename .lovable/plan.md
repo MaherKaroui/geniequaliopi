@@ -1,41 +1,55 @@
+# Refonte BDC Qualiopi — trame NT Conseils
+
 ## Objectif
+Remplacer intégralement le module Bilan de Compétences actuel par la structure exacte du dossier `AUDIT NT CONSEILS` que vous avez envoyé : 54 documents répartis sur 14 indicateurs, générés automatiquement, personnalisés par bénéficiaire, et datés intelligemment (jamais la date d'aujourd'hui — toujours calculés à partir des dates réelles du bilan).
 
-Mettre à jour les aides apprenti CFA conformément au document officiel 2026 :
-- Supprimer toute référence à l'**aide au permis B (500€)** — supprimée par l'article 202 de la loi de finances 2026.
-- Ajouter les 4 aides manquantes confirmées par l'utilisateur.
+## Périmètre — 54 documents par dossier
 
-## Fichiers à modifier
+| Indicateur | Documents |
+|---|---|
+| **1** Information du public | Process général, Présentation BDC, Présentation BDC v2, Cadre légal, Calendrier annuel (xlsx) |
+| **2** Indicateurs résultats | Indicateurs de résultats |
+| **4** Analyse du besoin | Process analyse, Mail type handicap |
+| **5** Objectifs | Outil préparatoire |
+| **8** Positionnement | Test positionnement, Mail test positionnement |
+| **9** Conditions déroulement | CGV, Règlement intérieur, Engagements déontologiques, Droit à l'image, Informations périphériques (présentiel), Certificat de réalisation, Mail début prestation, Mail envoi convention, Mail envoi certificat |
+| **10** Adaptation | Convention prestation, Fiche pédagogique, Entretien intermédiaire, Adaptation accompagnement, Suivi adaptation (docx + xlsx) |
+| **12** Engagement / abandons | Process abandons, Guide entretien abandons |
+| **18** Coordination | Organigramme, Annuaire contacts |
+| **21** Compétences intervenants | Process recrutement, Entretien recrutement, Entretien annuel x2, Fiches de poste (comptable x2, resp. administratif x2, commercial, communication, veille) |
+| **23/24/25** Veilles | Process veilles (consolidé) |
+| **26** Handicap | Process formations handicap x2, Partenaires nationaux, Contacts AGEFIPH (pdf statique), Contacts & suivi handicap (xlsx) |
+| **27** Sous-traitance | Process sous-traitance, Contrat sous-traitance, Charte formateurs, Quiz Qualiopi |
+| **30** Satisfaction | Process satisfaction, Questionnaire interne, entreprise, financeur |
+| **31** Dysfonctionnements | Tableau dysfonctionnements (xlsx) |
 
-### 1. `src/lib/newslettersMissionsCFA.ts` (Mission 14 — Affiche A3 & paragraphe)
-Remplacer la puce « Permis B aide au financement » par les nouvelles aides et mettre à jour le paragraphe :
+## Logique d'automatisation
 
-Nouvelles puces Mission 14 :
-- **Mobili-Jeune (Action Logement)** — jusqu'à 100 €/mois sur le loyer, sous conditions.
-- **Garantie Visale + Avance Loca-Pass** — caution locative gratuite + avance du dépôt de garantie.
-- **Aide au logement & restauration** — CROUS / Action Logement (conservée).
-- **Aide à la mobilité** — Carte Imagine R, aide transport, Erasmus+ (conservée).
-- **Carte d'étudiant des métiers + Prime d'activité (CAF)** — réductions + complément de revenus.
-- **Fonds social du CFA + Aide premier équipement** — situations financières difficiles, matériel/tenue.
-- **Aides santé & psy** — Mutuelle, Santé Psy Étudiant (conservée).
-- **Aides régionales spécifiques** — équipement, prime IDF, France Travail (conservée).
+- **Personnalisation par bénéficiaire** : chaque doc nominatif (positionnement, convention, fiche pédagogique, entretien intermédiaire, certificat, satisfaction…) est généré pour chaque bénéficiaire du formulaire, en respectant la mémoire `bdc-personalization` (réponses variées par projet : CAP esthétique / CAP mécanique / NTC / autre).
+- **Vocabulaire BDC** systématiquement : bénéficiaire, consultant, bilan (jamais stagiaire / formateur / formation).
+- **Datage intelligent** (jamais `new Date()` brut) :
+  - Convention, CGV, RI, engagements, droit image → **J-14 jours ouvrés** avant `dateDebutBilan` du bénéficiaire.
+  - Test positionnement, mail début → `dateDebutBilan`.
+  - Entretien intermédiaire → **mi-parcours** entre dateDebut et dateFin.
+  - Certificat réalisation, satisfaction à chaud, fiche pédagogique finale → `dateFinBilan`.
+  - Si `dateFinBilan` est **future** (bilan en cours) → certificat, satisfaction, fiche pédagogique finale = trames vides.
+  - Process / organigramme / fiches de poste / veilles / annuaire / partenaires handicap / tableaux → datés à la **version organisme** (`org.dateMaj` ou 1er janvier de l'année du bilan).
+- **Téléphone vide** → omis (mémoire existante).
 
-Paragraphe Mission 14 reformulé sans permis B, mentionnant logement (Mobili-Jeune, Visale, Loca-Pass), mobilité, fonds social, prime d'activité, et aides régionales. Ajout d'une note : « L'aide au permis B (500€) a été supprimée par la loi de finances 2026. »
+## Implémentation technique
 
-### 2. `src/lib/qualiopiReferenceCFA.ts` (IND 14 — script audit)
-Ligne 102 : retirer « permis B » du « ceQuIlFautDire » et le remplacer par « aides logement (Mobili-Jeune, Visale, Loca-Pass), mobilité, fonds social, aides régionales ».
+1. **Nouveau fichier** `src/lib/bdc/bdcNTConseils.ts` : générateur principal, fonction `generateBDCNTConseilsZip(org, formation, beneficiaires)` qui retourne un Blob ZIP avec l'arborescence exacte (`Indicateur N/...`).
+2. **Templates** dans `src/lib/bdc/templates/` : un fichier par document (54 fichiers compacts, fonctions `(org, beneficiaire, dates) => htmlString`). Conversion HTML → DOCX via `html-to-docx` (déjà utilisé dans le projet) et XLSX via `xlsxGenerator` + `htmlToXlsx`.
+3. **Branchement UI** : dans `DocumentGenerator.tsx`, quand le type d'action = "Bilan de compétences", le bouton "Télécharger tout" appelle `generateBDCNTConseilsZip` au lieu du pipeline générique. Suppression du catalogue BDC actuel (anciens documents BDC retirés de `getCatalog` / `getCatalogCFA` quand action = BDC).
+4. **Fichiers supprimés** : `src/lib/templatesAF.ts` entrées BDC obsolètes, anciens mappings BDC dans `documentGenerator.ts` (uniquement les blocs BDC, le reste — CFA, AF, VAE, OPCO — reste intact).
+5. **Nomenclature ZIP** : `BDC_{NomOrganisme}_{NomBeneficiaire}.zip` par bénéficiaire OU un seul ZIP global `BDC_{Organisme}_{Date}.zip` contenant tous les bénéficiaires dans des sous-dossiers — à confirmer ci-dessous.
 
-### 3. `src/lib/templatesCFAGapsAudit.ts` (QCM 14 missions)
-Ligne 61 : remplacer la question QCM sur l'aide permis B (500€) par une question sur **Mobili-Jeune** (« Quelle aide existe pour aider à payer le loyer ? » → Mobili-Jeune jusqu'à 100€/mois).
+## Question avant de lancer
 
-### 4. `src/lib/feuilleRouteQualiopi.ts` (Feuille de route — ligne IND 15)
-Ligne 41 : remplacer « permis, mobilité, hébergement, restauration, équipement » par « logement (Mobili-Jeune, Visale, Loca-Pass), mobilité, restauration, fonds social, premier équipement, prime d'activité ».
+Avant de coder ces 54 templates, j'ai besoin de confirmer **un** point :
 
-## Fichiers **non touchés** (sciemment)
+**Structure du ZIP final** : voulez-vous
+- (A) **un seul ZIP** par organisme avec tous les bénéficiaires regroupés (les docs individuels dans des sous-dossiers `Bénéficiaire - Prénom NOM/Indicateur N/...`, les docs collectifs à la racine sous `Indicateur N/...`) — **identique à la structure NT Conseils que vous avez envoyée**, ou
+- (B) **un ZIP par bénéficiaire**, chacun avec sa propre arborescence complète des 14 indicateurs ?
 
-- `src/lib/courseContent.ts`, `courseContentECSR.ts`, `courseContentCIP.ts` : références au « permis B » dans les **contenus pédagogiques** des formations ECSR (moniteur auto-école) et CIP (freins périphériques) — ce n'est pas une aide apprenti, c'est un sujet de cours métier.
-- `src/lib/mailRdvEvaluationBesoins.ts` : demande au stagiaire d'apporter son permis B comme **pièce d'identité** lors d'un RDV — rien à voir avec l'aide financière.
-
-## Sources
-
-- Document officiel utilisateur `aides-apprenti-cfa-2026.docx` (loi de finances 2026, article 202).
-- Portail de l'alternance / Service-Public / Action Logement / CAF / Centre Inffo.
+Le dossier que vous m'avez envoyé est mono-bénéficiaire (structure A appliquée à 1 personne). Je pars sur **(A)** par défaut si vous validez le plan tel quel — dites-moi si vous préférez (B).

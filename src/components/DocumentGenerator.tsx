@@ -21,6 +21,7 @@ import SignatairesConnexionForm from "./SignatairesConnexionForm";
 import { downloadAsWord, htmlToWordBlob } from "@/lib/wordExport";
 import { generateExcelTableauBordPerformance, generateExcelTableauSuiviParcours, generateExcelIndicateursPrevisionnelsVAE, excelToBlob } from "@/lib/xlsxGenerator";
 import { htmlToXlsxBlob } from "@/lib/htmlToXlsx";
+import { buildBDCNTConseilsZip } from "@/lib/bdc/bdcNTConseilsZip";
 
 // Templates qui doivent être téléchargés en VRAI fichier .xlsx (et non en .xls HTML déguisé)
 // La sortie HTML générée par leurs générateurs respectifs est convertie via SheetJS.
@@ -692,7 +693,21 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
     await downloadFile(content, buildGenericFileName("GUIDE_AUDIT_CFA_QUOI_DIRE", mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, ".doc"));
   };
 
+  const isBDCOrg = (mergedOrganisme.typesActions || []).includes("bilans-competences");
+
   const handleDownloadAll = () => {
+    // BDC : on génère exclusivement le dossier "NT Conseils" (51 docs + 5 trames Excel/PDF)
+    if (isBDCOrg) {
+      runJob({
+        label: "Dossier Bilan de compétences (NT Conseils)",
+        fileName: buildGenericFileName("BDC_DOSSIER_COMPLET", mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, ".zip"),
+        autoDownload: true,
+        run: async (reporter) => {
+          return await buildBDCNTConseilsZip(mergedOrganisme, selectedFormation, allStagiaires, reporter);
+        },
+      });
+      return;
+    }
     runJob({
       label: "Dossier Qualiopi complet (ZIP)",
       fileName: buildGenericFileName("DOSSIER_QUALIOPI_COMPLET", mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, ".zip"),
