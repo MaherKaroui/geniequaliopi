@@ -857,7 +857,10 @@ Le paiement sera dû à réception de la facture.
 peuvent être réglés à l'amiable, le tribunal de NANTERRE sera seul
 compétent pour régler le litige.
 
-Fait à SAINT-DENIS, le 01/01/2026 en double exemplaires 
+Fait à {VILLE_ORG}, le {DATE_CONVENTION} en double exemplaires.
+
+{SIGNATURES_ORG_STAGIAIRE}
+
 `,
   "Indicateur 10/Indicateur 10 - Entretien interm\u00e9diaire b\u00e9n\u00e9ficiaire": `**NT CONSEILS**
 
