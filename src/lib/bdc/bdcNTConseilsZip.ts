@@ -664,8 +664,8 @@ function mdToHtmlBody(md: string): string {
   md = md.replace(/\\'/g, "'").replace(/\\"/g, '"');
   // Convertit les antislashs pandoc parasites (issus des template literals) en sauts de ligne / suppression
   md = md
-    .replace(/\\(?=\*)/g, "<br>")              // \ juste avant **gras** => saut de ligne
-    .replace(/\\$/gm, "<br>")                  // \ en fin de ligne => saut de ligne
+    .replace(/\\(?=\*)/g, "")                  // \ juste avant **gras** => supprimé
+    .replace(/\\$/gm, "")                      // \ en fin de ligne => supprimé
     .replace(/\\([\-_'"<>\[\]\(\)])/g, "$1");  // \ devant ponctuation => simple caractère
   // Convertit les tableaux grid pandoc (+---+---+) en tableaux pipe
   md = preprocessGridTables(md);
@@ -683,9 +683,9 @@ function mdToHtmlBody(md: string): string {
       .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
       .replace(/(?<!\*)\*([^*\n]+)\*(?!\*)/g, "<em>$1</em>")
       .replace(/\[([^\]]+)\]\{\.underline\}/g, "<u>$1</u>")
-      .replace(/\\\\/g, "<br>")
-      .replace(/\\$/gm, "<br>")
-      .replace(/§§BR§§/g, "<br>");
+      .replace(/\\\\/g, " ")
+      .replace(/\\$/gm, "")
+      .replace(/§§BR§§/g, " ");
     out = out.replace(/§§IMG(\d+)§§/g, (_, i) => imgs[Number(i)] || "");
     return out;
   };
