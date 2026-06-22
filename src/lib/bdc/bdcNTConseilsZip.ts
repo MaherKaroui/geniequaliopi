@@ -36,19 +36,49 @@ function parseDateFR(s?: string): Date | null {
   const t = Date.parse(s);
   return isNaN(t) ? null : new Date(t);
 }
-function minusBusinessDays(d: Date, n: number): Date {
+function getFrenchHolidaysFR(year: number): Set<string> {
+  const h = new Set<string>();
+  const pad = (n: number) => String(n).padStart(2, "0");
+  const add = (m: number, d: number) => h.add(`${year}-${pad(m)}-${pad(d)}`);
+  add(1, 1); add(5, 1); add(5, 8); add(7, 14); add(8, 15);
+  add(11, 1); add(11, 11); add(12, 25); add(12, 26);
+  // Pâques (Butcher)
+  const a = year % 19, b = Math.floor(year / 100), c = year % 100;
+  const d2 = Math.floor(b / 4), e = b % 4, f = Math.floor((b + 8) / 25);
+  const g = Math.floor((b - f + 1) / 3), hh = (19 * a + b - d2 - g + 15) % 30;
+  const i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - hh - k) % 7;
+  const mm = Math.floor((a + 11 * hh + 22 * l) / 451);
+  const month = Math.floor((hh + l - 7 * mm + 114) / 31);
+  const day = ((hh + l - 7 * mm + 114) % 31) + 1;
+  const easter = new Date(year, month - 1, day);
+  const addD = (off: number) => {
+    const x = new Date(easter); x.setDate(x.getDate() + off);
+    h.add(`${x.getFullYear()}-${pad(x.getMonth()+1)}-${pad(x.getDate())}`);
+  };
+  addD(1);  // Lundi de Pâques
+  addD(39); // Ascension
+  addD(50); // Lundi de Pentecôte
+  return h;
+}
+function minusBusinessDays(d: Date, n: number, skipHolidays = false): Date {
   const r = new Date(d);
+  const pad = (x: number) => String(x).padStart(2, "0");
+  let holidays = skipHolidays
+    ? new Set([...getFrenchHolidaysFR(r.getFullYear()), ...getFrenchHolidaysFR(r.getFullYear() - 1)])
+    : new Set<string>();
   let i = 0;
   while (i < n) {
     r.setDate(r.getDate() - 1);
     const wd = r.getDay();
-    if (wd !== 0 && wd !== 6) i++;
+    const iso = `${r.getFullYear()}-${pad(r.getMonth()+1)}-${pad(r.getDate())}`;
+    if (wd !== 0 && wd !== 6 && !holidays.has(iso)) i++;
   }
   return r;
 }
 
 interface DatesCtx {
   dateConvention: string;    // J-14 ouvrés avant début
+  dateOutilPrep: string;     // J-20 ouvrés (weekends + jours fériés) avant début
   dateDebut: string;
   dateFin: string;
   dateMiParcours: string;
@@ -68,11 +98,13 @@ function computeDates(s?: StagiaireInfo, org?: OrganismeInfo, formation?: Format
     || parseDateFR(formation?.dateFin)
     || debut;
   const conv = minusBusinessDays(debut, 14);
+  const outilPrep = minusBusinessDays(debut, 20, true);
   const mi = new Date((debut.getTime() + fin.getTime()) / 2);
   const bilanTermine = fin.getTime() <= today.getTime();
   const versionD = parseDateFR(org?.dateMaj) || new Date(debut.getFullYear(), 0, 1);
   return {
     dateConvention: fmtLongDate(conv),
+    dateOutilPrep: fmtLongDate(outilPrep),
     dateDebut: fmtLongDate(debut),
     dateFin: fmtLongDate(fin),
     dateMiParcours: fmtLongDate(mi),
@@ -459,7 +491,7 @@ function buildOutilPreparatoireMd(
 
   return `**OUTIL PRÉPARATOIRE BÉNÉFICIAIRE**
 
-**Date de l'entretien :** ${dates.dateConvention}
+**Date de l'entretien :** ${dates.dateOutilPrep}
 
 **Bénéficiaire : ${civ} ${nom}**
 
