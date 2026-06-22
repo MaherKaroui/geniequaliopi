@@ -478,7 +478,12 @@ function mdToHtmlBody(md: string): string {
       if (!inTable) { out.push('<table class="bdc-table">'); inTable = true; }
       const cells = trimmed.slice(1, -1).split("|").map(c => c.trim());
       if (cells.every(c => /^-+$/.test(c) || c === "")) continue;
-      out.push("<tr>" + cells.map(c => `<td>${inline(c)}</td>`).join("") + "</tr>");
+      // Première ligne de tableau = en-tête (th), suivantes = td
+      const isHeader = !out.some(s => s.startsWith("<tr") && out.lastIndexOf("<table") > out.lastIndexOf("</table>") ? false : false) === false
+        ? !/<tr>/.test(out.slice(out.lastIndexOf('<table class="bdc-table">')).join(""))
+        : false;
+      const tag = isHeader ? "th" : "td";
+      out.push("<tr>" + cells.map(c => `<${tag}>${inline(c)}</${tag}>`).join("") + "</tr>");
       continue;
     }
     if (/^[+\-=]{3,}/.test(trimmed)) { closeTable(); continue; }
