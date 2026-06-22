@@ -82,7 +82,7 @@ function computeDates(s?: StagiaireInfo, org?: OrganismeInfo, formation?: Format
 }
 
 /** Substitutions globales : remplace tous les marqueurs NT Conseils par les données organisme/bénéficiaire. */
-function applySubstitutions(src: string, org: OrganismeInfo, s: StagiaireInfo | null, dates: DatesCtx): string {
+function applySubstitutions(src: string, org: OrganismeInfo, s: StagiaireInfo | null, dates: DatesCtx, formation?: FormationInfo): string {
   let txt = src;
   const orgNom = org.nom || "[Organisme]";
   const orgAdresse = [org.adresse, org.codePostal, org.ville].filter(Boolean).join(" ");
@@ -122,11 +122,46 @@ function applySubstitutions(src: string, org: OrganismeInfo, s: StagiaireInfo | 
 
   if (s) {
     const nomComplet = `${s.prenom} ${s.nom}`.trim();
+    const civPrefix = s.civilite === "Mme" ? "Mme" : "M.";
+    const civLong = s.civilite === "Mme" ? "Madame" : "Monsieur";
+    const stagiaireEmail = s.email || "";
     txt = txt.replace(/\bNom\s*:\s*\n/g, `Nom : ${s.nom || ""}\n`);
     txt = txt.replace(/\bPrénom\s*:\s*\n/g, `Prénom : ${s.prenom || ""}\n`);
     txt = txt.replace(/\bbénéficiaire\s*:\s*\n/gi, `bénéficiaire : ${nomComplet}\n`);
     // entête mail destinataire
-    txt = txt.replace(/Bonjour\s*Monsieur,?/g, `Bonjour ${s.civilite === "Mme" ? "Madame" : "Monsieur"},`);
+    txt = txt.replace(/Bonjour\s*Monsieur,?/g, `Bonjour ${civLong},`);
+
+    // --- Automatisation du bénéficiaire (remplace ZOCLY Marc partout) ---
+    if (nomComplet) {
+      txt = txt.replace(/M\.\s*ZOCLY\s+Marc/g, `${civPrefix} ${nomComplet}`);
+      txt = txt.replace(/ZOCLY\s+Marc/g, nomComplet);
+      txt = txt.replace(/\bZOCLY\b/g, s.nom || "");
+      // "Marc" isolé en début de ligne (après retrait de "ZOCLY")
+      txt = txt.replace(/(^|\n)Marc\b/g, `$1${s.prenom || ""}`);
+    }
+    // Email du bénéficiaire
+    if (stagiaireEmail) {
+      txt = txt.replace(/Marc\.z103@gmail\.com/gi, stagiaireEmail);
+    }
+  }
+
+  // --- Automatisation des dates de prestation (formats courts hardcodés DD/MM/YYYY) ---
+  const debutD = parseDateFR(s?.dateDebutFormation) || parseDateFR(formation?.dateDebut);
+  const finD = parseDateFR(s?.dateFinFormation) || parseDateFR(formation?.dateFin);
+  if (debutD) {
+    txt = txt.replace(/19\/02\/2024/g, fmtShortDate(debutD));
+  }
+  if (finD) {
+    const short = fmtShortDate(finD);
+    txt = txt.replace(/22\/02\/2024/g, short);
+    txt = txt.replace(/22\/04\/2024/g, short);
+  }
+  // Durée de la prestation (24 heures par défaut dans la trame NT Conseils)
+  const duree = (formation?.duree || "").trim();
+  if (duree) {
+    const dureeNorm = /heure/i.test(duree) ? duree : `${duree} heures`;
+    txt = txt.replace(/24\s*heures\s*\/\s*2\s*heures\s*par\s*semaine/gi, dureeNorm);
+    txt = txt.replace(/(?<!\d)24\s*heures/gi, dureeNorm);
   }
 
   // dates dynamiques
@@ -601,7 +636,7 @@ export function renderBdcNTDocHtml(
   const dates = computeDates(stagiaire || undefined, org, formation);
   const personalized = getPersonalizedRaw(key, stagiaire, org, dates);
   const effectiveRaw = personalized ?? raw;
-  let md = applySubstitutions(effectiveRaw, org, stagiaire, dates);
+  let md = applySubstitutions(effectiveRaw, org, stagiaire, dates, formation);
 
   if (!dates.bilanTermine && /Certificat de réalisation|Compte rendu de fin/i.test(title)) {
     md = md.replace(/\n[^|\n]{200,}\n/g, "\n[À compléter à la fin du bilan]\n");
@@ -691,7 +726,7 @@ export async function buildBDCNTConseilsZip(
   // Helper : génère un DOCX depuis markdown + substitutions
   const genDocx = async (rawMd: string, title: string, s: StagiaireInfo | null): Promise<Blob> => {
     const dates = computeDates(s || undefined, org, formation);
-    let md = applySubstitutions(rawMd, org, s, dates);
+    let md = applySubstitutions(rawMd, org, s, dates, formation);
 
     // Bilan en cours : on neutralise les évaluations finales
     if (!dates.bilanTermine && /Certificat de réalisation|Compte rendu de fin/i.test(title)) {
