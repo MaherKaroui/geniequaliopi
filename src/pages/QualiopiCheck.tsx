@@ -291,7 +291,8 @@ const QualiopiCheck = () => {
       if ((data as any)?.error) throw new Error((data as any).error);
       if (!(data as any)?.findings) throw new Error("Réponse IA invalide");
       setAiAudit(data as AiAudit);
-      toast.success(`Audit IA terminé — ${(data as AiAudit).findings.length} points relevés`);
+      setDecisions({});
+      toast.success(`Audit IA terminé — ${(data as AiAudit).findings.length} points relevés. Décide pour chacun : Corriger ou Ignorer.`);
     } catch (e: any) {
       toast.error(e.message || "Erreur audit IA");
     } finally {
