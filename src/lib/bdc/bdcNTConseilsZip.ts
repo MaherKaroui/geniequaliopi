@@ -639,7 +639,7 @@ ${besoin}
 Question 6 : Qu'attendez-vous spécifiquement de ce bilan de compétences ?
 
 ${attentes}
-`;
+`, s.civilite);
 }
 
 const FICHE_PEDA_KEY = "Indicateur 10/Indicateur 10 - Fiche p\u00e9dagogique";
