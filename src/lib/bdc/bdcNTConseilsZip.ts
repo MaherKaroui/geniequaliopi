@@ -606,7 +606,7 @@ function buildFicheAnalyseBesoinMd(
   const contraintesH = pick(["En dehors des heures de bureau", "Le mercredi et le samedi matin", "Soirs après 18h"], seed, 6);
   const contraintesG = pick(["Aucune contrainte particulière", `Déplacements limités à ${org.ville || "la région"}`, "Privilégier le distanciel"], seed, 7);
   const contraintesP = pick(["Aucune contrainte particulière", "Organisation familiale à anticiper", "Charge professionnelle élevée"], seed, 8);
-  const modaliteRetenue = (formation?.modalite || "Présentiel").toLowerCase();
+  const modaliteRetenue = (formation?.modalites || "Présentiel").toLowerCase();
   const isPres = /pr.sentiel/.test(modaliteRetenue) && !/distan/.test(modaliteRetenue);
   const isDist = /distan/.test(modaliteRetenue) && !/pr.sent/.test(modaliteRetenue);
   const isMix = /mixte|hybride/.test(modaliteRetenue) || (!isPres && !isDist);
@@ -791,7 +791,7 @@ function buildFichePrealableMd(
     "Aucune contrainte particulière",
   ], seed, 8);
 
-  const modaliteRetenue = (formation?.modalite || "Présentiel").toLowerCase();
+  const modaliteRetenue = (formation?.modalites || "Présentiel").toLowerCase();
   const isPres = /pr.sentiel/.test(modaliteRetenue) && !/distan/.test(modaliteRetenue);
   const isDist = /distan/.test(modaliteRetenue) && !/pr.sent/.test(modaliteRetenue);
   const isMix = /mixte|hybride/.test(modaliteRetenue) || (!isPres && !isDist);
