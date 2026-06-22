@@ -605,7 +605,7 @@ export async function buildBDCNTConseilsZip(
 
   // Helper : génère un DOCX depuis markdown + substitutions
   const genDocx = async (rawMd: string, title: string, s: StagiaireInfo | null): Promise<Blob> => {
-    const dates = computeDates(s || undefined, org);
+    const dates = computeDates(s || undefined, org, formation);
     let md = applySubstitutions(rawMd, org, s, dates);
 
     // Bilan en cours : on neutralise les évaluations finales
