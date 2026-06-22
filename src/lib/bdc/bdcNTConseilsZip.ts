@@ -499,7 +499,7 @@ function preprocessGridTables(md: string): string {
       }
       for (let k = 0; k < nCols; k++) {
         const a = cols[k] + 1, b = Math.min(cols[k + 1], bl.length);
-        const slice = bl.slice(a, b).replace(/\s+$/, "").replace(/^\s+/, "");
+        const slice = bl.slice(a, b).replace(/^\s*\|\s*/, "").replace(/\s*\|\s*$/, "").trim();
         if (slice) {
           cur[k] = cur[k] ? cur[k] + (cur[k].endsWith("§§BR§§") ? "" : " ") + slice : slice;
           curHas = true;
