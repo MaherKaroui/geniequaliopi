@@ -390,26 +390,29 @@ function preprocessGridTables(md: string): string {
       } else break;
     }
 
-    // Parse les cellules accumulées entre bordures
+    // Parse les cellules accumulées entre bordures (préserve les sauts de ligne via §§BR§§)
     const rows: string[][] = [];
     let cur: string[] = new Array(cols.length - 1).fill("");
     let curHas = false;
     for (const bl of block) {
       if (isBorder(bl)) {
-        if (curHas) { rows.push(cur.map(s => s.replace(/\s+/g, " ").trim())); cur = new Array(cols.length - 1).fill(""); curHas = false; }
+        if (curHas) { rows.push(cur.map(s => s.replace(/§§BR§§\s*$/,"").replace(/^\s*§§BR§§/,"").trim())); cur = new Array(cols.length - 1).fill(""); curHas = false; }
         continue;
       }
       if (!/^\|/.test(bl)) continue;
       for (let k = 0; k < cols.length - 1; k++) {
         const slice = bl.slice(cols[k] + 1, cols[k + 1]).trim();
         if (slice) { cur[k] = cur[k] ? cur[k] + " " + slice : slice; curHas = true; }
+        else if (cur[k]) { cur[k] = cur[k] + "§§BR§§"; }
       }
     }
 
     if (rows.length > 0) {
-      out.push("| " + rows[0].join(" | ") + " |");
+      // Marqueur §§BR§§ pour préserver les retours à la ligne dans les cellules
+      const join = (cells: string[]) => "| " + cells.map(c => c.replace(/ +/g, " ")).join(" | ") + " |";
+      out.push(join(rows[0]));
       out.push("|" + rows[0].map(() => "---").join("|") + "|");
-      for (let r = 1; r < rows.length; r++) out.push("| " + rows[r].join(" | ") + " |");
+      for (let r = 1; r < rows.length; r++) out.push(join(rows[r]));
     }
     i = j;
   }
@@ -427,7 +430,8 @@ function mdToHtmlBody(md: string): string {
     .replace(/(?<!\*)\*([^*\n]+)\*(?!\*)/g, "<em>$1</em>")
     .replace(/\[([^\]]+)\]\{\.underline\}/g, "<u>$1</u>")
     .replace(/\\\\/g, "<br>")
-    .replace(/\\$/gm, "<br>");
+    .replace(/\\$/gm, "<br>")
+    .replace(/§§BR§§/g, "<br>");
 
   // Strip leading blank lines AND a leading H1: the org header already prints the title,
   // so a body-level <h1> duplicates it AND triggers a page break in the DOCX renderer
@@ -441,9 +445,9 @@ function mdToHtmlBody(md: string): string {
   }
   const lines = allLines.slice(start);
   const out: string[] = [];
-  let inUl = false, inOl = false, inTable = false;
+  let inUl = false, inOl = false, inTable = false, tableRowIdx = 0;
   const closeLists = () => { if (inUl){out.push("</ul>");inUl=false;} if(inOl){out.push("</ol>");inOl=false;} };
-  const closeTable = () => { if (inTable){out.push("</table>");inTable=false;} };
+  const closeTable = () => { if (inTable){out.push("</table>");inTable=false;tableRowIdx=0;} };
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
@@ -471,10 +475,12 @@ function mdToHtmlBody(md: string): string {
     }
     if (/^\|.*\|$/.test(trimmed)) {
       closeLists();
-      if (!inTable) { out.push('<table class="bdc-table">'); inTable = true; }
+      if (!inTable) { out.push('<table class="bdc-table">'); inTable = true; tableRowIdx = 0; }
       const cells = trimmed.slice(1, -1).split("|").map(c => c.trim());
       if (cells.every(c => /^-+$/.test(c) || c === "")) continue;
-      out.push("<tr>" + cells.map(c => `<td>${inline(c)}</td>`).join("") + "</tr>");
+      const tag = tableRowIdx === 0 ? "th" : "td";
+      out.push("<tr>" + cells.map(c => `<${tag}>${inline(c)}</${tag}>`).join("") + "</tr>");
+      tableRowIdx++;
       continue;
     }
     if (/^[+\-=]{3,}/.test(trimmed)) { closeTable(); continue; }
@@ -497,7 +503,7 @@ function mdToHtml(md: string, title: string, org: OrganismeInfo, stagiaire: Stag
     `<div class="bdc-doc-body">${body}</div>` +
     `<style>.bdc-doc-body{font-size:11pt}` +
     `.bdc-doc-body table{border-collapse:collapse;width:100%;margin:10px 0;font-size:10.5pt}` +
-    `.bdc-doc-body table td,.bdc-doc-body table th{border:1px solid #bbb;padding:6px;vertical-align:top}` +
+    `.bdc-doc-body table td,.bdc-doc-body table th{border:1px solid #94a3b8;padding:6px 8px;vertical-align:top;text-align:left}.bdc-doc-body table th{background:#cfe2f3;color:#0b2545;font-weight:bold}` +
     `.bdc-doc-body h2{font-size:14pt;color:#0b2545;margin:16px 0 8px;page-break-before:avoid;border-bottom:1px solid #0b254540;padding-bottom:4px}` +
     `.bdc-doc-body h3{font-size:12pt;color:#1d4ed8;margin:14px 0 6px;page-break-before:avoid}` +
     `.bdc-doc-body h4{font-size:11pt;color:#334155;margin:12px 0 4px;page-break-before:avoid}` +
@@ -584,7 +590,7 @@ export function renderBdcNTDocHtml(
     orgHeader(org, title) +
     beneficiaireLine +
     `<div class="bdc-doc-body">${body}</div>` +
-    `<style>.bdc-doc-body{font-size:11pt}.bdc-doc-body table{border-collapse:collapse;width:100%;margin:10px 0;font-size:10.5pt}.bdc-doc-body table td,.bdc-doc-body table th{border:1px solid #bbb;padding:6px;vertical-align:top}.bdc-doc-body h2{font-size:14pt;color:#0b2545;margin:16px 0 8px;page-break-before:avoid;border-bottom:1px solid #0b254540;padding-bottom:4px}.bdc-doc-body h3{font-size:12pt;color:#1d4ed8;margin:14px 0 6px;page-break-before:avoid}.bdc-doc-body h4{font-size:11pt;color:#334155;margin:12px 0 4px;page-break-before:avoid}.bdc-doc-body p{margin:4px 0;line-height:1.35;text-align:justify}.bdc-doc-body strong{color:#0b2545}.bdc-doc-body ul,.bdc-doc-body ol{margin:6px 0 8px 22px}</style>` +
+    `<style>.bdc-doc-body{font-size:11pt}.bdc-doc-body table{border-collapse:collapse;width:100%;margin:10px 0;font-size:10.5pt}.bdc-doc-body table td,.bdc-doc-body table th{border:1px solid #94a3b8;padding:6px 8px;vertical-align:top;text-align:left}.bdc-doc-body table th{background:#cfe2f3;color:#0b2545;font-weight:bold}.bdc-doc-body h2{font-size:14pt;color:#0b2545;margin:16px 0 8px;page-break-before:avoid;border-bottom:1px solid #0b254540;padding-bottom:4px}.bdc-doc-body h3{font-size:12pt;color:#1d4ed8;margin:14px 0 6px;page-break-before:avoid}.bdc-doc-body h4{font-size:11pt;color:#334155;margin:12px 0 4px;page-break-before:avoid}.bdc-doc-body p{margin:4px 0;line-height:1.35;text-align:justify}.bdc-doc-body strong{color:#0b2545}.bdc-doc-body ul,.bdc-doc-body ol{margin:6px 0 8px 22px}</style>` +
     docFooter(org)
   );
 }
