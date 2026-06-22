@@ -457,6 +457,18 @@ const QualiopiCheck = () => {
                 </div>
 
                 <div className="space-y-2">
+                  {(() => {
+                    const total = aiAudit.findings.length;
+                    const decided = Object.keys(decisions).length;
+                    const fixed = Object.values(decisions).filter(v => v === "fix").length;
+                    const ignored = Object.values(decisions).filter(v => v === "ignore").length;
+                    return (
+                      <div className="flex items-center justify-between text-xs bg-muted/40 rounded p-2 mb-2">
+                        <span className="font-medium">Décisions : {decided}/{total}</span>
+                        <span className="text-muted-foreground">✅ {fixed} à corriger · ✗ {ignored} ignorés · ⏳ {total - decided} en attente</span>
+                      </div>
+                    );
+                  })()}
                   {aiAudit.findings
                     .slice()
                     .sort((a, b) => {
@@ -464,8 +476,11 @@ const QualiopiCheck = () => {
                       return ord[a.severity] - ord[b.severity];
                     })
                     .map((f, idx) => {
+                      const decision = decisions[idx];
                       const color =
-                        f.severity === "critical" ? "border-l-destructive bg-destructive/5"
+                        decision === "ignore" ? "border-l-muted bg-muted/30 opacity-60"
+                        : decision === "fix" ? "border-l-green-500 bg-green-50"
+                        : f.severity === "critical" ? "border-l-destructive bg-destructive/5"
                         : f.severity === "major" ? "border-l-orange-500 bg-orange-50"
                         : f.severity === "minor" ? "border-l-amber-400 bg-amber-50"
                         : "border-l-blue-400 bg-blue-50";
@@ -475,6 +490,13 @@ const QualiopiCheck = () => {
                         incorrect: "❌ Incorrect",
                         amelioration: "💡 Amélioration",
                       }[f.categorie] || f.categorie;
+                      const routeFor = (zone: string) => {
+                        const z = (zone || "").toLowerCase();
+                        if (z.includes("organisme") || z.includes("siret") || z.includes("nda")) return "/organisme";
+                        if (z.includes("stagiaire") || z.includes("apprenti") || z.includes("bénéficiaire")) return "/stagiaires";
+                        if (z.includes("formation") || z.includes("programme") || z.includes("session")) return "/formation";
+                        return null;
+                      };
                       return (
                         <div key={idx} className={`border-l-4 rounded p-3 ${color}`}>
                           <div className="flex items-center gap-2 flex-wrap mb-1">
@@ -482,10 +504,53 @@ const QualiopiCheck = () => {
                             <span className="text-xs font-semibold">{catLabel}</span>
                             {f.critere > 0 && <Badge variant="secondary" className="text-[10px]">C{f.critere}{f.indicateur > 0 ? ` · IND ${f.indicateur}` : ""}</Badge>}
                             <span className="text-xs text-muted-foreground">{f.zone}</span>
+                            {decision === "fix" && <Badge className="bg-green-600 hover:bg-green-600 text-[10px] ml-auto">✅ À corriger</Badge>}
+                            {decision === "ignore" && <Badge variant="outline" className="text-[10px] ml-auto">✗ Ignoré</Badge>}
                           </div>
                           <p className="text-sm font-medium">{f.constat}</p>
                           {f.impact && <p className="text-xs text-muted-foreground mt-1"><strong>Impact :</strong> {f.impact}</p>}
                           {f.action && <p className="text-xs text-primary mt-1">→ <strong>Action :</strong> {f.action}</p>}
+                          <div className="flex items-center gap-2 mt-2 pt-2 border-t border-current/10">
+                            <span className="text-xs font-semibold text-muted-foreground mr-1">Ta décision :</span>
+                            <Button
+                              size="sm"
+                              variant={decision === "fix" ? "default" : "outline"}
+                              className={decision === "fix" ? "bg-green-600 hover:bg-green-700 h-7 text-xs" : "h-7 text-xs"}
+                              onClick={() => {
+                                setDecisions(d => ({ ...d, [idx]: "fix" }));
+                                const r = routeFor(f.zone);
+                                if (r) {
+                                  toast.success("Marqué à corriger — ouverture du formulaire concerné");
+                                  setTimeout(() => navigate(r), 600);
+                                } else {
+                                  toast.success("Marqué à corriger");
+                                }
+                              }}
+                            >
+                              <CheckCircle2 className="w-3 h-3 mr-1" /> Corriger
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant={decision === "ignore" ? "secondary" : "ghost"}
+                              className="h-7 text-xs"
+                              onClick={() => {
+                                setDecisions(d => ({ ...d, [idx]: "ignore" }));
+                                toast("Point ignoré");
+                              }}
+                            >
+                              <XCircle className="w-3 h-3 mr-1" /> Ignorer
+                            </Button>
+                            {decision && (
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="h-7 text-xs text-muted-foreground"
+                                onClick={() => setDecisions(d => { const n = { ...d }; delete n[idx]; return n; })}
+                              >
+                                Réinitialiser
+                              </Button>
+                            )}
+                          </div>
                         </div>
                       );
                     })}
