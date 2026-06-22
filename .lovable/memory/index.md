@@ -110,3 +110,4 @@ Unfinished training (latest end date not passed): final evaluations/tests must r
 - [logic/positionnement-fin-empty-if-not-finished](mem://logic/positionnement-fin-empty-if-not-finished) — Test de positionnement de fin (OPCO C6) en trame vierge tant que formation non terminée
 - [features/audit/cfa-visuels-14-missions](mem://features/audit/cfa-visuels-14-missions) — Affiches HD 14 missions dans CT3 IND 14, sous-dossier VISUELS_14_MISSIONS
 - [logic/veille-cache-persistence](mem://logic/veille-cache-persistence) — Pack veilles IA persisté en localStorage, jamais effacé sauf bouton "Régénérer"
+- [features/bdc-nt-conseils](mem://features/bdc-nt-conseils) — BDC trame NT Conseils : 51 docs + 5 trames, ZIP unique, ancien catalogue BDC supprimé
