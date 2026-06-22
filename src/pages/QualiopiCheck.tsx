@@ -256,6 +256,40 @@ const QualiopiCheck = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tick]);
 
+  // Auto-detect default audit type from org.typesActions
+  useEffect(() => {
+    const t = (org?.typesActions || []) as string[];
+    if (t.includes("vae")) setAuditType("VAE");
+    else if (t.includes("bilans-competences")) setAuditType("BC");
+    else if (t.includes("apprentissage")) setAuditType("CFA");
+    else setAuditType("AF");
+  }, [org?.typesActions]);
+
+  const runAiAudit = async () => {
+    setAiLoading(true);
+    setAiAudit(null);
+    try {
+      const formations = form?.intitule ? [form] : [];
+      let documents: { nom: string; critere: number; indicateur: number }[] = [];
+      try {
+        const cat = buildFullCatalog(formations as any, (stag || []) as any, [], (org?.typesActions || []) as any, org?.dirigeant);
+        documents = cat.map(d => ({ nom: d.nom, critere: d.critere, indicateur: d.indicateur }));
+      } catch {}
+      const { data, error } = await supabase.functions.invoke("audit-ia", {
+        body: { type: auditType, organisme: org, formation: form, stagiaires: stag, documents },
+      });
+      if (error) throw error;
+      if ((data as any)?.error) throw new Error((data as any).error);
+      if (!(data as any)?.findings) throw new Error("Réponse IA invalide");
+      setAiAudit(data as AiAudit);
+      toast.success(`Audit IA terminé — ${(data as AiAudit).findings.length} points relevés`);
+    } catch (e: any) {
+      toast.error(e.message || "Erreur audit IA");
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
   const errCount = incos.filter(i => i.severity === "error").length;
   const warnCount = incos.filter(i => i.severity === "warning").length;
 
