@@ -270,9 +270,17 @@ const QualiopiCheck = () => {
     setAiAudit(null);
     try {
       const formations = form?.intitule ? [form] : [];
+      // Map the audit type → typesActions so the catalog contains the right docs
+      const typeMap: Record<AuditType, string[]> = {
+        AF: ["actions-formation"],
+        BC: ["bilans-competences"],
+        VAE: ["vae"],
+        CFA: ["apprentissage"],
+      };
+      const typesForCatalog = typeMap[auditType];
       let documents: { nom: string; critere: number; indicateur: number }[] = [];
       try {
-        const cat = buildFullCatalog(formations as any, (stag || []) as any, [], (org?.typesActions || []) as any, org?.dirigeant);
+        const cat = buildFullCatalog(formations as any, (stag || []) as any, [], typesForCatalog as any, org?.dirigeant);
         documents = cat.map(d => ({ nom: d.nom, critere: d.critere, indicateur: d.indicateur }));
       } catch {}
       const { data, error } = await supabase.functions.invoke("audit-ia", {
