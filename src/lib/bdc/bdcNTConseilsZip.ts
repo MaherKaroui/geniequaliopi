@@ -365,9 +365,62 @@ function getPersonalizedRaw(key: string, s: StagiaireInfo | null, org: Organisme
 
 
 /** Markdown (pandoc-style) → fragment HTML (corps uniquement) */
+function preprocessGridTables(md: string): string {
+  const lines = md.split(/\r?\n/);
+  const out: string[] = [];
+  const isBorder = (s: string) => /^\+[-=+]+\+\s*$/.test(s);
+  let i = 0;
+  while (i < lines.length) {
+    if (!isBorder(lines[i])) { out.push(lines[i]); i++; continue; }
+    // Détecte la position des colonnes via les '+'
+    const cols: number[] = [];
+    for (let p = 0; p < lines[i].length; p++) if (lines[i][p] === "+") cols.push(p);
+    if (cols.length < 2) { out.push(lines[i]); i++; continue; }
+
+    // Collecte le bloc jusqu'à la dernière ligne de bordure consécutive
+    const block: string[] = [lines[i]];
+    let j = i + 1;
+    while (j < lines.length) {
+      const ln = lines[j];
+      if (isBorder(ln) || /^\|/.test(ln) || ln.trim() === "") {
+        block.push(ln);
+        j++;
+        // arrêt si bordure suivie d'une ligne non-tableau
+        if (isBorder(ln) && (j >= lines.length || (!/^\|/.test(lines[j]) && !isBorder(lines[j])))) break;
+      } else break;
+    }
+
+    // Parse les cellules accumulées entre bordures
+    const rows: string[][] = [];
+    let cur: string[] = new Array(cols.length - 1).fill("");
+    let curHas = false;
+    for (const bl of block) {
+      if (isBorder(bl)) {
+        if (curHas) { rows.push(cur.map(s => s.replace(/\s+/g, " ").trim())); cur = new Array(cols.length - 1).fill(""); curHas = false; }
+        continue;
+      }
+      if (!/^\|/.test(bl)) continue;
+      for (let k = 0; k < cols.length - 1; k++) {
+        const slice = bl.slice(cols[k] + 1, cols[k + 1]).trim();
+        if (slice) { cur[k] = cur[k] ? cur[k] + " " + slice : slice; curHas = true; }
+      }
+    }
+
+    if (rows.length > 0) {
+      out.push("| " + rows[0].join(" | ") + " |");
+      out.push("|" + rows[0].map(() => "---").join("|") + "|");
+      for (let r = 1; r < rows.length; r++) out.push("| " + rows[r].join(" | ") + " |");
+    }
+    i = j;
+  }
+  return out.join("\n");
+}
+
 function mdToHtmlBody(md: string): string {
   // Nettoie les artefacts d'échappement (ex: \' → ', \" → ")
   md = md.replace(/\\'/g, "'").replace(/\\"/g, '"');
+  // Convertit les tableaux grid pandoc (+---+---+) en tableaux pipe
+  md = preprocessGridTables(md);
   const esc = (s: string) => s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
   const inline = (s: string) => esc(s)
     .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
