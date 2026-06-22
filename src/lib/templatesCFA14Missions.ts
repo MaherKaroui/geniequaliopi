@@ -583,6 +583,37 @@ export function genCoperationCFAEntrepriseCFA(o: OrganismeInfo, f: FormationInfo
 export function genPlanDiversiteLutteDiscriminationsCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[] = []) {
   const terminee = isFormationTerminee(f, stagiaires);
   const annee = f.dateDebut ? new Date(f.dateDebut).getFullYear() : new Date().getFullYear();
+  const today = new Date();
+
+  // Dates calculées automatiquement sur la fenêtre [dateDebut, dateFin]
+  const MOIS_FR = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
+  const d1 = f.dateDebut ? new Date(f.dateDebut) : null;
+  const d2 = f.dateFin ? new Date(f.dateFin) : null;
+  const totalMs = d1 && d2 ? d2.getTime() - d1.getTime() : 0;
+  const at = (ratio: number): Date | null => {
+    if (!d1 || !d2 || totalMs <= 0) return null;
+    const r = Math.max(0, Math.min(1, ratio));
+    return new Date(d1.getTime() + totalMs * r);
+  };
+  const periode = (d: Date | null, fallback: string) => d ? `${MOIS_FR[d.getMonth()]} ${d.getFullYear()}` : fallback;
+  const statut = (d: Date | null) => {
+    if (terminee) return "Réalisée";
+    if (!d) return "Programmée";
+    if (d.getTime() < today.getTime() - 7 * 24 * 3600 * 1000) return "Réalisée";
+    if (Math.abs(d.getTime() - today.getTime()) <= 30 * 24 * 3600 * 1000) return "En cours";
+    return "Programmée";
+  };
+  const cell = (ratio: number, fallback: string) => {
+    const d = at(ratio);
+    return { p: periode(d, fallback), s: statut(d) };
+  };
+
+  // Répartition des actions sur le parcours
+  const moduleDisc = cell(0.15, `Décembre ${annee}`);
+  const sensibMA   = cell(0.40, `Mars ${annee + 1}`);
+  const audit      = cell(0.75, `Juin ${annee + 1}`);
+  const bilan      = cell(0.90, `Juin ${annee + 1}`);
+
   return buildDocument({
     org: o,
     title: `PLAN D'ACTIONS — DIVERSITÉ & LUTTE CONTRE LES DISCRIMINATIONS — ${annee}`,
@@ -597,26 +628,26 @@ export function genPlanDiversiteLutteDiscriminationsCFA(o: OrganismeInfo, f: For
       },
       {
         heading: "Actions programmées",
-        content: tableHTML(
+        content: `<p><em>Échéances calculées automatiquement sur la base du calendrier de la formation (${f.dateDebut ? formatDate(f.dateDebut) : "—"} → ${f.dateFin ? formatDate(f.dateFin) : "—"}).</em></p>` + tableHTML(
           ["Action", "Échéance", "Pilote", "Statut"],
           [
             ["Affichage Charte Diversité + n° 3928", "Permanent", "Référent diversité", "Réalisée"],
-            ["Module « Lutte contre les discriminations » (4h)", `Décembre ${annee}`, "Formateur transversal", terminee ? "Réalisée" : "Programmée"],
-            ["Sensibilisation des MA (webinaire annuel)", `Mars ${annee + 1}`, "Direction CFA", terminee ? "Réalisée" : "Programmée"],
-            ["Audit annuel des pratiques de recrutement", `Juin ${annee + 1}`, "Direction + RH", terminee ? "Réalisée" : "À réaliser"],
-            ["Bilan annuel diversité présenté au Conseil de Perfectionnement", `Juin ${annee + 1}`, "Direction", terminee ? "Réalisée — PV diffusé" : "À venir"],
+            ["Module « Lutte contre les discriminations » (4h)", moduleDisc.p, "Formateur transversal", terminee ? "Réalisée" : moduleDisc.s],
+            ["Sensibilisation des MA (webinaire annuel)", sensibMA.p, "Direction CFA", terminee ? "Réalisée" : sensibMA.s],
+            ["Audit annuel des pratiques de recrutement", audit.p, "Direction + RH", terminee ? "Réalisée" : audit.s],
+            ["Bilan annuel diversité présenté au Conseil de Perfectionnement", bilan.p, "Direction", terminee ? "Réalisée — PV diffusé" : bilan.s],
           ]
         ),
       },
       {
         heading: "Indicateurs de suivi",
         content: tableHTML(
-          ["Indicateur", "Année N-1", `Cible ${annee}`, terminee ? `Réalisé ${annee}` : "Suivi"],
+          ["Indicateur", `Cible ${annee}`, terminee ? `Réalisé ${annee}` : "Suivi"],
           [
-            ["Taux d'apprentis issus QPV / ZRR", "12 %", "≥ 15 %", terminee ? "16 %" : "En cours"],
-            ["Taux d'apprentis en situation de handicap", "4 %", "≥ 6 %", terminee ? "6 %" : "En cours"],
-            ["Réclamations pour discrimination", "0", "0", "0"],
-            ["Heures de sensibilisation diversité par apprenti", "2 h", "4 h", terminee ? "4 h" : "En cours"],
+            ["Taux d'apprentis issus QPV / ZRR", "≥ 15 %", terminee ? "16 %" : "En cours"],
+            ["Taux d'apprentis en situation de handicap", "≥ 6 %", terminee ? "6 %" : "En cours"],
+            ["Réclamations pour discrimination", "0", "0"],
+            ["Heures de sensibilisation diversité par apprenti", "4 h", terminee ? "4 h" : "En cours"],
           ]
         ),
       },
