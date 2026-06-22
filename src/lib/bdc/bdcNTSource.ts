@@ -936,53 +936,53 @@ Prestation : Bilan de compétences
 |          |                        |                |           |
 |          |                        |                |           |
 `,
-  "Indicateur 12/Indicateur 12 - Guide d_entretien des abandons": `**GUIDE D'ENTRETIEN\\
-DES ABANDONS**
+  "Indicateur 12/Indicateur 12 - Guide d_entretien des abandons": `**GUIDE D'ENTRETIEN DES ABANDONS**
 
-Nom du bénéficiaire **: ZOCLY Marc**
+Nom du bénéficiaire : **ZOCLY Marc**
 
-Date de l'entretien : 19/02/2024
+Date de l'entretien : 19/02/2024
 
-Prestation : Bilan de compétences
+Prestation : Bilan de compétences
 
-  -----------------------------------------------------------------------
-  Pourquoi souhaitez-vous abandonner le bilan de compétences ?
-  -----------------------------------------------------------------------
-  Quels sont les points qui vous ont contraint à prendre cette décision ?
+| **Pourquoi souhaitez-vous abandonner le bilan de compétences ?** |
+|---|
+|   |
+|   |
+|   |
+|   |
+|   |
 
-  -----------------------------------------------------------------------
+| **Quels sont les points qui vous ont contraint à prendre cette décision ?** |
+|---|
+|   |
+|   |
+|   |
+|   |
+|   |
 `,
   "Indicateur 12/Indicateur 12 - Process Abandons": `**PROCESS ABANDONS**
 
-Je mets en place les actions décrites pour favoriser l'engagement des
-bénéficiaires et éviter les situations d'échec
+Je mets en place les actions décrites pour favoriser l'engagement des bénéficiaires et éviter les situations d'échec.
 
-« Favoriser l'engagement des bénéficiaires »
+« Favoriser l'engagement des bénéficiaires » — « Éviter les situations d'échec »
 
-« Éviter les situations d'échec »
+↓
 
-Si malgré toutes ces mesures, l'un de mes bénéficiaires souhaite
-abandonner la prestation, j'essaye d'en connaître la raison à travers un
-entretien physique ou téléphonique
+Si malgré toutes ces mesures, l'un de mes bénéficiaires souhaite abandonner la prestation, j'essaye d'en connaître la raison à travers un entretien physique ou téléphonique.
 
-« Guide d'entretien des abandons »
+« Guide d'entretien des abandons »
 
-A une fréquence pertinente, j'analyse les causes des abandons ou des
-dysfonctionnements pour apporter des améliorations (si nécessaire) pour
-éviter que cela ne se reproduise
+↙ ↘
 
-« Tableau d'amélioration continue »
+| **Même en mettant en place des adaptations et des aménagements, le bénéficiaire ne souhaite plus continuer la prestation.** J'en assure donc le suivi. | **En mettant en place des adaptations et des aménagements, le bénéficiaire souhaite continuer la prestation.** J'en assure le suivi. |
+|---|---|
+| « Tableau des dysfonctionnements — onglet Abandons » | « Tableau des dysfonctionnements — onglet Dysfonctionnements » |
 
-Même en mettant en place des adaptations et des aménagements, **le
-bénéficiaire ne souhaite plus continuer la prestation.** J'en assure
-donc le suivi.
+↘ ↙
 
-« Tableau des dysfonctionnements -- onglet Abandons »
+A une fréquence pertinente, j'analyse les causes des abandons ou des dysfonctionnements pour apporter des améliorations (si nécessaire) pour éviter que cela ne se reproduise.
 
-En mettant en place des adaptations et des aménagements, **le
-bénéficiaire souhaite continuer la prestation.** J'en assure le suivi.
-
-« Tableau des dysfonctionnements -- onglet Dysfonctionnements »
+« Tableau d'amélioration continue »
 `,
   "Indicateur 18/Indicateur 18 - Annuaire des contacts": `**ANNUAIRE DES CONTACTS**
 
