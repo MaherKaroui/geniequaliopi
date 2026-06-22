@@ -21,6 +21,7 @@ import SignatairesConnexionForm from "./SignatairesConnexionForm";
 import { downloadAsWord, htmlToWordBlob } from "@/lib/wordExport";
 import { generateExcelTableauBordPerformance, generateExcelTableauSuiviParcours, generateExcelIndicateursPrevisionnelsVAE, excelToBlob } from "@/lib/xlsxGenerator";
 import { htmlToXlsxBlob } from "@/lib/htmlToXlsx";
+import { buildBDCNTConseilsZip } from "@/lib/bdc/bdcNTConseilsZip";
 
 // Templates qui doivent être téléchargés en VRAI fichier .xlsx (et non en .xls HTML déguisé)
 // La sortie HTML générée par leurs générateurs respectifs est convertie via SheetJS.
