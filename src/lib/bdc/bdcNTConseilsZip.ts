@@ -695,14 +695,111 @@ ${blocks}
 `;
 }
 
+const ENTRETIEN_INTER_KEY = "Indicateur 10/Indicateur 10 - Entretien interm\u00e9diaire b\u00e9n\u00e9ficiaire";
+
+function buildEntretienIntermediaireMd(
+  s: StagiaireInfo,
+  org: OrganismeInfo,
+  dates: DatesCtx,
+  formation?: FormationInfo,
+): string {
+  const orgNom = org.nom || "[Organisme]";
+  const civ = s.civilite === "Mme" ? "Mme" : "M.";
+  const nomComplet = `${s.prenom || ""} ${s.nom || ""}`.trim() || "Bénéficiaire";
+  const email = s.email || "";
+  const debut = parseDateFR(s.dateDebutFormation) || parseDateFR(formation?.dateDebut) || new Date();
+  const fin = parseDateFR(s.dateFinFormation) || parseDateFR(formation?.dateFin) || debut;
+  const milieu = new Date((debut.getTime() + fin.getTime()) / 2);
+  const consultant = ((org as any).responsablePedagogique || org.dirigeant || "le consultant").toString();
+
+  const profile = formation ? getBdcDomainProfile(formation) : null;
+  const metier = profile?.metier || "le métier visé";
+  const seed = hashStr(`enti|${s.prenom}|${s.nom}|${s.email}`);
+  const pickP = (arr: string[], off: number) => arr.length ? arr[(seed + off) % arr.length] : "";
+  const technique = profile ? pickP(profile.techniques, 0) : "";
+  const transv = profile ? pickP(profile.transversales, 1) : "";
+
+  const attentesArr = [
+    `Oui, la prestation répond pleinement à mes attentes. Les premières séances m'ont permis de clarifier mon parcours et de commencer à structurer mon projet${profile ? ` autour de ${metier}` : ""}. Je me sens accompagné(e) à mon rythme, dans un cadre rassurant et professionnel.`,
+    `Globalement oui. La méthodologie est claire et les outils proposés (tests, exercices, fiches métier) sont concrets. Je découvre des aspects de moi-même que je ne soupçonnais pas et cela alimente ma réflexion${profile ? ` sur l'orientation vers ${metier}` : ""}.`,
+    `Oui, j'apprécie la qualité de l'écoute et la rigueur de l'accompagnement. Les échanges sont riches et je commence à voir plus clair sur les options qui s'offrent à moi${profile ? `, notamment dans ${profile.secteur}` : ""}.`,
+  ];
+
+  const apprecPlusArr = [
+    `La qualité de l'écoute, la bienveillance et la disponibilité du consultant. J'apprécie également les supports de travail entre les séances, qui m'aident à avancer concrètement${profile && technique ? ` (notamment l'approche autour de ${technique})` : ""}.`,
+    `La structure claire des séances et les outils d'auto-évaluation. J'aime aussi le fait de pouvoir prendre du recul sur mes compétences${profile && transv ? ` (en particulier ${transv})` : ""} et de les confronter à la réalité du marché.`,
+    `Les enquêtes métier et la possibilité d'aller à la rencontre de professionnels${profile ? ` du secteur ${profile.secteur}` : ""}. Cela me permet de valider concrètement mes pistes et d'ajuster mon projet.`,
+  ];
+
+  const apprecMoinsArr = [
+    `Le travail personnel entre les séances demande de la rigueur et du temps, ce qui est parfois difficile à articuler avec mes obligations. Mais c'est nécessaire pour avancer.`,
+    `Certains tests sont denses et nécessitent de la concentration. J'aurais aimé un peu plus de temps de restitution sur les résultats, mais le consultant reste disponible pour y revenir.`,
+    `Rien de particulier à signaler. Le rythme et le contenu me conviennent. J'aimerais simplement, dans la suite, approfondir davantage les démarches concrètes (formation, financement).`,
+  ];
+
+  const commArr = [
+    `Oui, ${consultant} communique de façon très claire, structurée et dynamique. Les consignes sont explicites et les échanges fluides.`,
+    `Oui, la communication est professionnelle et adaptée à mon profil. Je me sens en confiance pour poser mes questions, même celles qui me semblent naïves.`,
+    `Tout à fait. Les explications sont précises, les reformulations utiles et le ton toujours respectueux. Le rythme des séances est bien calibré.`,
+  ];
+
+  const remarquesArr = [
+    `Pas de remarque particulière à ce stade. Je souhaite poursuivre dans le même esprit et approfondir la phase d'investigation${profile ? ` autour du métier de ${metier}` : ""}.`,
+    `Je suis satisfait(e) de l'accompagnement. J'aimerais, dans les prochaines séances, travailler plus en profondeur sur le plan d'action et les pistes de financement (CPF, autres dispositifs).`,
+    `Merci pour la qualité de l'accompagnement. Je n'ai pas de point d'amélioration à formuler pour l'instant et je me projette positivement dans la suite du bilan.`,
+  ];
+
+  const attentes = pick(attentesArr, seed, 0);
+  const apprecPlus = pick(apprecPlusArr, seed, 1);
+  const apprecMoins = pick(apprecMoinsArr, seed, 2);
+  const comm = pick(commArr, seed, 3);
+  const remarques = pick(remarquesArr, seed, 4);
+
+  return `**${orgNom}**
+
+**ENTRETIEN INTERMÉDIAIRE\\
+BÉNÉFICIAIRE**
+
+**Date de l'entretien :** ${fmtShortDate(milieu)}
+
+**Bénéficiaire :** ${civ} ${nomComplet}${email ? `\n\n**Contact :** ${email}` : ""}
+
+**Date de début de prestation :** ${fmtShortDate(debut)}
+
+**Date de fin de prestation :** ${fmtShortDate(fin)}
+
+**La prestation correspond-elle à vos attentes ?**
+
+${attentes}
+
+**Quels éléments appréciez-vous le plus ?**
+
+${apprecPlus}
+
+**Quels éléments appréciez-vous le moins ?**
+
+${apprecMoins}
+
+**Le consultant communique-t-il d'une façon claire et dynamique ?**
+
+${comm}
+
+**Avez-vous des remarques à nous formuler ?**
+
+${remarques}
+`;
+}
+
 /** Retourne un markdown personnalisé pour les clés qui le supportent, sinon null. */
 function getPersonalizedRaw(key: string, s: StagiaireInfo | null, org: OrganismeInfo, dates: DatesCtx, formation?: FormationInfo): string | null {
   if (!s) return null;
   if (key === OUTIL_PREPA_KEY) return buildOutilPreparatoireMd(s, org, dates);
   if (key === TEST_POSITIONNEMENT_KEY) return buildTestPositionnementMd(s, org, dates, formation);
   if (key === FICHE_PEDA_KEY) return buildFichePedagogiqueMd(s, org, dates, formation);
+  if (key === ENTRETIEN_INTER_KEY) return buildEntretienIntermediaireMd(s, org, dates, formation);
   return null;
 }
+
 
 
 
