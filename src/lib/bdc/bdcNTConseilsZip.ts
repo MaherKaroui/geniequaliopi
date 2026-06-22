@@ -407,9 +407,11 @@ function preprocessGridTables(md: string): string {
     }
 
     if (rows.length > 0) {
-      out.push("| " + rows[0].join(" | ") + " |");
+      // Marqueur §§BR§§ pour préserver les retours à la ligne dans les cellules
+      const join = (cells: string[]) => "| " + cells.map(c => c.replace(/ +/g, " ")).join(" | ") + " |";
+      out.push(join(rows[0]));
       out.push("|" + rows[0].map(() => "---").join("|") + "|");
-      for (let r = 1; r < rows.length; r++) out.push("| " + rows[r].join(" | ") + " |");
+      for (let r = 1; r < rows.length; r++) out.push(join(rows[r]));
     }
     i = j;
   }
