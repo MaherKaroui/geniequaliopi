@@ -938,7 +938,7 @@ Prestation : Bilan de compétences
 `,
   "Indicateur 12/Indicateur 12 - Guide d_entretien des abandons": `**GUIDE D'ENTRETIEN DES ABANDONS**
 
-Nom du bénéficiaire : **ZOCLY Marc**
+
 
 Date de l'entretien : 19/02/2024
 
