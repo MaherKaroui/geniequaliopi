@@ -232,6 +232,7 @@ const QualiopiCheck = () => {
   const [auditType, setAuditType] = useState<AuditType>("AF");
   const [aiLoading, setAiLoading] = useState(false);
   const [aiAudit, setAiAudit] = useState<AiAudit | null>(null);
+  const [decisions, setDecisions] = useState<Record<number, "fix" | "ignore">>({});
 
   // Live refresh: re-read sessionStorage on focus
   useEffect(() => {
