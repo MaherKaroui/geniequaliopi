@@ -440,6 +440,43 @@ export function genAttestationFormationMaitreApprentissageCFA(o: OrganismeInfo, 
 export function genCoperationCFAEntrepriseCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[] = []) {
   const terminee = isFormationTerminee(f, stagiaires);
   const annee = f.dateDebut ? new Date(f.dateDebut).getFullYear() : new Date().getFullYear();
+
+  // Calcul intelligent des dates calé sur le LIVRE D'APPRENTISSAGE (CT3 - IND 9)
+  // - Réunion de rentrée : date de début de formation
+  // - 1ère visite : début + 20% du parcours (min +30 jours)
+  // - Bilan tripartite mi-parcours : mi-parcours (50%)
+  // - 2ème visite : début + 75% du parcours (≥ 5 mois après la 1ère)
+  // - Conseil de Perfectionnement + bilan final : date de fin de formation
+  const MOIS_FR = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
+  const periodeLabel = (d: Date) => `${MOIS_FR[d.getMonth()]} ${d.getFullYear()}`;
+  const today = new Date();
+
+  let rentree: Date | null = null, v1: Date | null = null, miParcours: Date | null = null, v2: Date | null = null, bilanFinal: Date | null = null;
+  if (f.dateDebut && f.dateFin) {
+    const d1 = new Date(f.dateDebut);
+    const d2 = new Date(f.dateFin);
+    const totalMs = d2.getTime() - d1.getTime();
+    const minGapMs = 5 * 30 * 24 * 3600 * 1000;
+    rentree = d1;
+    v1 = new Date(d1.getTime() + Math.max(totalMs * 0.20, 30 * 24 * 3600 * 1000));
+    miParcours = new Date(d1.getTime() + totalMs * 0.50);
+    v2 = new Date(d1.getTime() + Math.max(totalMs * 0.75, v1.getTime() - d1.getTime() + minGapMs));
+    if (v2.getTime() > d2.getTime()) v2 = new Date(d2.getTime());
+    bilanFinal = d2;
+  }
+  const statut = (d: Date | null, label: string) => {
+    if (!d) return label;
+    if (terminee) return "Réalisée";
+    if (d.getTime() < today.getTime() - 7 * 24 * 3600 * 1000) return "Réalisée";
+    if (Math.abs(d.getTime() - today.getTime()) <= 30 * 24 * 3600 * 1000) return "En cours";
+    return "Programmée";
+  };
+  const row = (d: Date | null, fallback: string, evt: string) => [
+    d ? periodeLabel(d) : fallback,
+    evt,
+    statut(d, "Programmée"),
+  ];
+
   return buildDocument({
     org: o,
     title: "PROCÉDURE DE COOPÉRATION CFA / ENTREPRISE — FORMATEURS & MAÎTRES D'APPRENTISSAGE",
@@ -463,14 +500,14 @@ export function genCoperationCFAEntrepriseCFA(o: OrganismeInfo, f: FormationInfo
       },
       {
         heading: "Planification annuelle des temps de coopération",
-        content: tableHTML(
+        content: `<p><em>Dates générées automatiquement à partir du calendrier de la formation (synchronisées avec le LIVRE D'APPRENTISSAGE — CT3 IND 9).</em></p>` + tableHTML(
           ["Période", "Temps de coopération", "Statut"],
           [
-            [`Septembre ${annee}`, "Réunion de rentrée MA + Formateurs", terminee ? "Réalisée" : "Réalisée"],
-            [`Novembre ${annee}`, "1ère visite en entreprise", terminee ? "Réalisée" : "En cours"],
-            [`Janvier ${annee + 1}`, "Bilan tripartite mi-parcours", terminee ? "Réalisée" : "Programmée"],
-            [`Avril ${annee + 1}`, "2ème visite en entreprise", terminee ? "Réalisée" : "Programmée"],
-            [`Juin ${annee + 1}`, "Conseil de Perfectionnement + bilan final", terminee ? "Réalisée" : "Programmée"],
+            row(rentree, `Septembre ${annee}`, "Réunion de rentrée MA + Formateurs"),
+            row(v1, `Novembre ${annee}`, "1ère visite en entreprise"),
+            row(miParcours, `Janvier ${annee + 1}`, "Bilan tripartite mi-parcours"),
+            row(v2, `Avril ${annee + 1}`, "2ème visite en entreprise"),
+            row(bilanFinal, `Juin ${annee + 1}`, "Conseil de Perfectionnement + bilan final"),
           ]
         ),
       },
