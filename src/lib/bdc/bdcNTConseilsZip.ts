@@ -120,8 +120,8 @@ function applySubstitutions(src: string, org: OrganismeInfo, s: StagiaireInfo | 
   return txt;
 }
 
-/** Markdown (pandoc-style) → HTML compact (titres, listes, gras, tableaux) */
-function mdToHtml(md: string, title: string): string {
+/** Markdown (pandoc-style) → fragment HTML (corps uniquement) */
+function mdToHtmlBody(md: string): string {
   const esc = (s: string) => s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
   const inline = (s: string) => esc(s)
     .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
@@ -140,30 +140,26 @@ function mdToHtml(md: string, title: string): string {
     const line = lines[i];
     const trimmed = line.trim();
     if (!trimmed) { closeLists(); closeTable(); out.push(""); continue; }
-    // Headings
     let m = trimmed.match(/^(#{1,6})\s+(.*)$/);
     if (m) { closeLists(); closeTable(); const lvl = m[1].length; out.push(`<h${lvl}>${inline(m[2])}</h${lvl}>`); continue; }
-    // Bullet
     if (/^[-*+]\s+/.test(trimmed)) {
       closeTable();
       if (!inUl) { closeLists(); out.push("<ul>"); inUl = true; }
       out.push(`<li>${inline(trimmed.replace(/^[-*+]\s+/,""))}</li>`);
       continue;
     }
-    // Numbered
     if (/^\d+\.\s+/.test(trimmed)) {
       closeTable();
       if (!inOl) { closeLists(); out.push("<ol>"); inOl = true; }
       out.push(`<li>${inline(trimmed.replace(/^\d+\.\s+/,""))}</li>`);
       continue;
     }
-    // Pandoc grid/pipe table row
     if (/^\|.*\|$/.test(trimmed)) {
       closeLists();
-      if (!inTable) { out.push('<table border="1" cellspacing="0" cellpadding="6" style="border-collapse:collapse;width:100%;border:1px solid #999;font-size:12px">'); inTable = true; }
+      if (!inTable) { out.push('<table class="bdc-table">'); inTable = true; }
       const cells = trimmed.slice(1, -1).split("|").map(c => c.trim());
-      if (cells.every(c => /^-+$/.test(c) || c === "")) continue; // separator
-      out.push("<tr>" + cells.map(c => `<td style="border:1px solid #bbb;padding:6px;vertical-align:top">${inline(c)}</td>`).join("") + "</tr>");
+      if (cells.every(c => /^-+$/.test(c) || c === "")) continue;
+      out.push("<tr>" + cells.map(c => `<td>${inline(c)}</td>`).join("") + "</tr>");
       continue;
     }
     if (/^[+\-=]{3,}/.test(trimmed)) { closeTable(); continue; }
@@ -171,23 +167,31 @@ function mdToHtml(md: string, title: string): string {
     out.push(`<p>${inline(trimmed)}</p>`);
   }
   closeLists(); closeTable();
+  return out.join("\n");
+}
 
+/** Markdown → HTML complet autonome (utilisé pour l'export ZIP DOCX). */
+function mdToHtml(md: string, title: string): string {
+  const esc = (s: string) => s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  const body = mdToHtmlBody(md);
   return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${esc(title)}</title>
 <style>
 body{font-family:Calibri,Arial,sans-serif;font-size:11pt;color:#1a1a2e;line-height:1.45}
 h1{font-size:18pt;color:#0b2545;border-bottom:2px solid #1d4ed8;padding-bottom:6px;margin-top:0}
 h2{font-size:14pt;color:#0b2545;margin-top:18px}
 h3{font-size:12pt;color:#1d4ed8;margin-top:14px}
-table{border-collapse:collapse;margin:8px 0;width:100%}
-td,th{border:1px solid #999;padding:6px;vertical-align:top;font-size:10pt}
+.bdc-table{border-collapse:collapse;margin:8px 0;width:100%;border:1px solid #999;font-size:10pt}
+.bdc-table td,.bdc-table th{border:1px solid #bbb;padding:6px;vertical-align:top}
 strong{color:#0b2545}
 ul,ol{margin:6px 0 8px 22px}
 .footer{margin-top:30px;border-top:1px solid #ccc;padding-top:8px;font-size:9pt;color:#475569;text-align:center}
 </style></head><body>
 <h1>${esc(title)}</h1>
-${out.join("\n")}
+${body}
 </body></html>`;
 }
+
+
 
 function buildFooter(org: OrganismeInfo, dates: DatesCtx): string {
   const parts = [
