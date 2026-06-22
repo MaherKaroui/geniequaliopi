@@ -467,7 +467,7 @@ function buildFichePedagogiqueMd(
   const dureeStr = (formation?.duree || "").trim();
   const dureeTotale = (() => {
     const m = dureeStr.match(/(\d+)/);
-    return m ? parseInt(m[1], 10) : 24;
+    return m ? parseInt(m[1], 10) : 18;
   })();
 
   const sessions = [
