@@ -11,6 +11,7 @@
 import JSZip from "jszip";
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { htmlToWordBlob } from "@/lib/wordExport";
+import { htmlWrap, orgHeader, footer as docFooter } from "@/lib/docBuilder";
 import { BDC_NT_SOURCE, BDC_NT_PER_BENEFICIAIRE, BDC_NT_STATIC_ASSETS } from "./bdcNTSource";
 import type { JobReporter } from "@/lib/backgroundJobs";
 
