@@ -212,6 +212,22 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
       const s = (template === "bdc_nt_doc_per_ben" && typeof si === "number") ? stagiaires[si] || null : null;
       return renderBdcNTDocHtml(sourceKey, o, s);
     }
+    case "bdc_nt_calendrier_annuel": {
+      const { generateBdcNTCalendrierAnnuel } = require("@/lib/bdc/bdcNTXlsx");
+      return generateBdcNTCalendrierAnnuel(o);
+    }
+    case "bdc_nt_suivi_adaptation": {
+      const { generateBdcNTSuiviAdaptation } = require("@/lib/bdc/bdcNTXlsx");
+      return generateBdcNTSuiviAdaptation(o, f, stagiaires);
+    }
+    case "bdc_nt_contacts_handicap": {
+      const { generateBdcNTContactsHandicap } = require("@/lib/bdc/bdcNTXlsx");
+      return generateBdcNTContactsHandicap(o);
+    }
+    case "bdc_nt_tableau_dysfonctionnements": {
+      const { generateBdcNTTableauDysfonctionnements } = require("@/lib/bdc/bdcNTXlsx");
+      return generateBdcNTTableauDysfonctionnements(o);
+    }
     case "bdc_nt_asset": {
       const name = params?.assetName || "ressource";
       const src = params?.assetSrc || "";
