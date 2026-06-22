@@ -691,12 +691,8 @@ expérimenté auprès des organismes de formation.
 
 **QUELQUES CHIFFRES :**
 
-+------------------------------------+---------------------------------+
-| **1**                              | Taux de satisfaction            |
-|                                    | bénéficiaires :                 |
-| Bénéficiaire                       |                                 |
-|                                    | **100 %**                       |
-+====================================+=================================+
+| **1**§§BR§§Bénéficiaire | Taux de satisfaction bénéficiaires :§§BR§§**100 %** |
+|---|---|
 `,
   "Indicateur 10/Indicateur 10 - Adaptation de l_accompagnement": `**NT CONSEILS**
 
