@@ -551,14 +551,14 @@ function mdToHtmlBody(md: string): string {
   const lines = allLines.slice(start);
   const out: string[] = [];
   const paragraphBuffer: string[] = [];
-  let inUl = false, inOl = false, inTable = false, tableRowIdx = 0;
+  let inUl = false, inOl = false, inTable = false, tableRowIdx = 0, tableHasHeader = true;
   const flushParagraph = () => {
     if (paragraphBuffer.length === 0) return;
     out.push(`<p>${inline(paragraphBuffer.join(" ").replace(/\s+/g, " ").trim())}</p>`);
     paragraphBuffer.length = 0;
   };
   const closeLists = () => { if (inUl){out.push("</ul>");inUl=false;} if(inOl){out.push("</ol>");inOl=false;} };
-  const closeTable = () => { if (inTable){out.push("</table>");inTable=false;tableRowIdx=0;} };
+  const closeTable = () => { if (inTable){out.push("</table>");inTable=false;tableRowIdx=0;tableHasHeader=true;} };
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
@@ -574,6 +574,13 @@ function mdToHtmlBody(md: string): string {
       if (!nextIsListItem) closeLists();
       closeTable();
       out.push("");
+      continue;
+    }
+    if (trimmed === "§§NOHEADER_TABLE§§") {
+      flushParagraph();
+      closeLists();
+      closeTable();
+      tableHasHeader = false;
       continue;
     }
     let m = trimmed.match(/^(#{1,6})\s+(.*)$/);
@@ -607,7 +614,7 @@ function mdToHtmlBody(md: string): string {
       const inner = trimmed.replace(/\s+$/, "").slice(1, -1);
       const cells = inner.split(/(?<!\\)\|/).map(c => c.replace(/\\\|/g, "|").trim());
       if (cells.every(c => /^:?-+:?$/.test(c) || c === "")) continue;
-      const tag = tableRowIdx === 0 ? "th" : "td";
+      const tag = tableHasHeader && tableRowIdx === 0 ? "th" : "td";
       out.push("<tr>" + cells.map(c => `<${tag}>${inline(c)}</${tag}>`).join("") + "</tr>");
       tableRowIdx++;
       continue;
