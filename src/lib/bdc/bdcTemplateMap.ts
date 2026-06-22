@@ -134,10 +134,6 @@ export const BDC_TEMPLATES: Record<string, BdcTemplateMapping> = {
     templateUrl: "/templates/bdc/ind1/presentation_bilan.docx",
     type: "docx",
   },
-  "Indicateur 1/Indicateur 1 - Pr\u00e9sentation du bilan de comp\u00e9tences (2)": {
-    templateUrl: "/templates/bdc/ind1/presentation_bilan_2.docx",
-    type: "docx",
-  },
   "Indicateur 1/Indicateur 1 - Cadre l\u00e9gal et r\u00e9glementaire": {
     templateUrl: "/templates/bdc/ind1/cadre_legal.docx",
     type: "docx",
