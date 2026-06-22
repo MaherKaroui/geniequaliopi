@@ -440,6 +440,18 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
       return;
     }
 
+    // BDC NT Conseils — ressources statiques (Excel/PDF officielles)
+    if (doc.template === "bdc_nt_asset" && doc.params?.assetSrc) {
+      const src = doc.params.assetSrc as string;
+      const name = (doc.params.assetName as string) || src.split("/").pop() || "ressource";
+      const resp = await fetch(src);
+      const blob = await resp.blob();
+      const ext = "." + (name.split(".").pop() || "bin");
+      saveAs(blob, buildCatalogFileName(doc, undefined, ext));
+      return;
+    }
+
+
     // Handle .docx template files (factures IND 17)
     if (DOCX_TEMPLATE_FILES[doc.template]) {
       const blob = await processDocxTemplate(DOCX_TEMPLATE_FILES[doc.template], mergedOrganisme);
