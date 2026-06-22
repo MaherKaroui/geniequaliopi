@@ -242,12 +242,109 @@ function buildOutilPreparatoireMd(
 `;
 }
 
+const TEST_POSITIONNEMENT_KEY = "Indicateur 8/Indicateur 8 - Test de positionnement";
+
+function buildTestPositionnementMd(
+  s: StagiaireInfo,
+  org: OrganismeInfo,
+  _dates: DatesCtx,
+): string {
+  const nom = `${s.prenom || ""} ${s.nom || ""}`.trim() || "Bénéficiaire";
+  const poste = (s.poste || "").trim();
+  const entreprise = (s.entreprise || "").trim();
+  const seed = hashStr(`pos|${s.prenom}|${s.nom}|${s.email}`);
+  const orgNom = org.nom || "NT CONSEILS";
+
+  const domaines = [
+    poste || "mon métier actuel",
+    entreprise ? `mon expérience chez ${entreprise}` : "mon parcours professionnel",
+  ];
+
+  const motivationsArr = [
+    `Faire le point sur mes compétences acquises ${poste ? `dans le poste de ${poste}` : "au fil de mon parcours"} et identifier des pistes d'évolution réalistes. Je souhaite construire un projet aligné avec mes valeurs et mes contraintes personnelles.`,
+    `Sortir d'une routine professionnelle qui ne me correspond plus et explorer de nouvelles voies. Le bilan est pour moi un temps structuré pour prendre du recul et décider de la suite.`,
+    `Sécuriser une reconversion que j'envisage depuis plusieurs mois${entreprise ? `, en parallèle de mon poste chez ${entreprise}` : ""}. J'attends du bilan des outils concrets et un regard extérieur professionnel.`,
+    `Confirmer une intuition de changement de métier et la confronter à la réalité du marché. Je veux éviter de me lancer sans avoir validé mes hypothèses.`,
+  ];
+
+  const parcoursArr = [
+    `J'ai exercé ${poste ? `comme ${poste}` : "plusieurs fonctions"} pendant environ ${5 + (seed % 8)} ans${entreprise ? `, principalement au sein de ${entreprise}` : ""}. J'ai développé des compétences en organisation, en relation client et en gestion de priorités.`,
+    `Mon parcours est mixte : une première partie technique${poste ? ` autour du métier de ${poste}` : ""}, puis une évolution progressive vers des missions à plus forte dimension relationnelle et d'encadrement d'équipe.`,
+    `Après des études supérieures, j'ai occupé ${2 + (seed % 4)} postes successifs${entreprise ? `, dont le dernier chez ${entreprise}` : ""}. Chaque expérience m'a permis de monter en autonomie et de confronter mes choix initiaux à la réalité du terrain.`,
+  ];
+
+  const pointsFortsArr = [
+    `Capacité d'adaptation, sens de l'organisation et écoute active. Mes collègues soulignent souvent ma fiabilité et ma rigueur dans le suivi des dossiers.`,
+    `Autonomie, esprit d'analyse et persévérance face aux situations complexes. Je sais prendre du recul avant d'agir et je m'appuie sur des faits.`,
+    `Sens du collectif, pédagogie et capacité à fédérer autour d'un objectif commun. J'aime transmettre et accompagner la montée en compétences des autres.`,
+    `Curiosité, capacité à apprendre vite et à m'approprier de nouveaux outils numériques. Je suis à l'aise avec le changement quand il est expliqué.`,
+  ];
+
+  const objectifsArr = [
+    `À court terme : poser un diagnostic clair sur mes compétences et mes motivations. À moyen terme : identifier 2 ou 3 pistes professionnelles crédibles. À long terme : engager une transition (formation, mobilité interne ou changement d'employeur) dans les 12 à 18 mois.`,
+    `À court terme : structurer mon projet et lever mes doutes. À moyen terme : suivre la formation identifiée comme nécessaire. À long terme : exercer un métier qui ait du sens et m'assure un équilibre vie pro / vie perso satisfaisant.`,
+    `À court terme : sécuriser mon poste actuel tout en explorant des alternatives. À moyen terme : tester une nouvelle voie via une mission, un stage ou une mobilité. À long terme : me stabiliser dans un projet professionnel à 5 ans.`,
+  ];
+
+  const besoinBilanArr = [
+    `Je suis arrivé(e) à un palier dans mon poste actuel et je manque de visibilité sur la suite. Le bilan doit m'aider à clarifier ce qui est possible et à hiérarchiser mes options.`,
+    `Je traverse une période de questionnement et j'ai besoin d'un cadre méthodique, accompagné par un professionnel neutre, pour avancer sans m'éparpiller.`,
+    `Mon environnement de travail évolue fortement (organisation, outils, missions) et je veux m'assurer que mon projet reste cohérent avec ces changements et avec mes aspirations.`,
+  ];
+
+  const attentesArr = [
+    `Un accompagnement à la fois bienveillant et exigeant, des tests fiables, et la production d'une synthèse écrite que je pourrai réutiliser pour mes démarches (entretiens, dossiers de formation, CPF).`,
+    `Des outils concrets pour mieux me connaître (intérêts, valeurs, personnalité), une exploration du marché du travail réaliste, et un plan d'action chiffré et calendaire.`,
+    `Un travail de fond sur mes compétences transférables, une validation de mon projet par des enquêtes métier, et la sécurisation du financement (CPF, autres dispositifs).`,
+  ];
+
+  const motivation = pick(motivationsArr, seed, 0);
+  const parcours = pick(parcoursArr, seed, 1);
+  const pointsForts = pick(pointsFortsArr, seed, 2);
+  const objectifs = pick(objectifsArr, seed, 3);
+  const besoin = pick(besoinBilanArr, seed, 4);
+  const attentes = pick(attentesArr, seed, 5);
+
+  return `**[${orgNom}]{.underline}**
+
+**TEST DE POSITIONNEMENT**
+
+**Bénéficiaire : ${nom}**${poste ? `\n\n**Poste actuel : ${poste}**` : ""}${entreprise ? `\n\n**Entreprise : ${entreprise}**` : ""}
+
+Question 1 : Quelles sont vos principales motivations pour entreprendre un bilan de compétences ?
+
+${motivation}
+
+Question 2 : Pouvez-vous décrire brièvement votre parcours professionnel jusqu'à présent ?
+
+${parcours}
+
+Question 3 : Quels sont selon vous vos points forts sur le plan professionnel ?
+
+${pointsForts}
+
+Question 4 : Quels sont vos objectifs professionnels à court, moyen et long terme ?
+
+${objectifs}
+
+Question 5 : Pourquoi pensez-vous avoir besoin d'un bilan de compétences à ce stade de votre carrière ?
+
+${besoin}
+
+Question 6 : Qu'attendez-vous spécifiquement de ce bilan de compétences ?
+
+${attentes}
+`;
+}
+
 /** Retourne un markdown personnalisé pour les clés qui le supportent, sinon null. */
 function getPersonalizedRaw(key: string, s: StagiaireInfo | null, org: OrganismeInfo, dates: DatesCtx): string | null {
   if (!s) return null;
   if (key === OUTIL_PREPA_KEY) return buildOutilPreparatoireMd(s, org, dates);
+  if (key === TEST_POSITIONNEMENT_KEY) return buildTestPositionnementMd(s, org, dates);
   return null;
 }
+
 
 
 
