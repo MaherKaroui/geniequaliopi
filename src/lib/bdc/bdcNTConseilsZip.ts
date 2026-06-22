@@ -712,9 +712,22 @@ function mdToHtmlBody(md: string): string {
   const closeLists = () => { if (inUl){out.push("</ul>");inUl=false;} if(inOl){out.push("</ol>");inOl=false;} };
   const closeTable = () => { if (inTable){out.push("</table>");inTable=false;tableRowIdx=0;tableHasHeader=true;} };
 
+  let inRawHtml = false;
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
     const trimmed = line.trim();
+    // Bloc HTML brut (ex: tableau signatures) : passe sans échappement markdown
+    if (inRawHtml) {
+      out.push(line);
+      if (/<\/(table|div|section|article)>\s*$/i.test(trimmed)) inRawHtml = false;
+      continue;
+    }
+    if (/^<(table|div|section|article)[\s>]/i.test(trimmed)) {
+      flushParagraph(); closeLists(); closeTable();
+      out.push(line);
+      if (!new RegExp(`</(table|div|section|article)>\\s*$`, "i").test(trimmed)) inRawHtml = true;
+      continue;
+    }
     if (!trimmed) {
       // Une ligne vide ne ferme PAS une liste si la prochaine ligne non vide est encore un item
       // (sinon chaque item recommence à "1.")
