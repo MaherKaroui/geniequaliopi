@@ -690,7 +690,7 @@ ${blocks}
 function getPersonalizedRaw(key: string, s: StagiaireInfo | null, org: OrganismeInfo, dates: DatesCtx, formation?: FormationInfo): string | null {
   if (!s) return null;
   if (key === OUTIL_PREPA_KEY) return buildOutilPreparatoireMd(s, org, dates);
-  if (key === TEST_POSITIONNEMENT_KEY) return buildTestPositionnementMd(s, org, dates);
+  if (key === TEST_POSITIONNEMENT_KEY) return buildTestPositionnementMd(s, org, dates, formation);
   if (key === FICHE_PEDA_KEY) return buildFichePedagogiqueMd(s, org, dates, formation);
   return null;
 }
