@@ -610,7 +610,7 @@ function buildTestPositionnementMd(
   const besoin = pick(besoinBilanArr, seed, 4);
   const attentes = pick(attentesArr, seed, 5);
 
-  return `**[${orgNom}]{.underline}**
+  return accordCivilite(`**[${orgNom}]{.underline}**
 
 **TEST DE POSITIONNEMENT**
 
