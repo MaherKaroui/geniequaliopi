@@ -36,6 +36,7 @@ export const PER_STAGIAIRE_TEMPLATES = new Set([
   "bdc_compte_rendu_fin", "bdc_cv_beneficiaire", "bdc_fiche_intervenant", "bdc_fiche_veille",
   "bdc_procedure_handicap", "bdc_contrat_sous_traitance", "bdc_satisfaction_chaud",
   "bdc_formulaire_reclamation", "bdc_gestion_reclamations", "bdc_actions_correctives",
+  "bdc_nt_doc_per_ben",
 ]);
 
 const EXCEL_TEMPLATES = new Set([
