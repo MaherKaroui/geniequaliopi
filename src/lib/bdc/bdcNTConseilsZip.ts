@@ -843,7 +843,7 @@ ${comm}
 **Avez-vous des remarques à nous formuler ?**
 
 ${remarques}
-`;
+`, s.civilite);
 }
 
 // ===== Questionnaires de satisfaction (IND 30) =====
