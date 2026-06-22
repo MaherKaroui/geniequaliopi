@@ -340,6 +340,22 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
 
       // Special handling for tables: split row by row, repeat thead
       if (node instanceof HTMLElement && node.tagName === "TABLE") {
+        if (current.content.childNodes.length > 0 && nodeFitsOnFreshPage(host, node, footerHtml, footerHeightPx, PAGE_W_PX, PAGE_H_PX)) {
+          const wholeTable = node.cloneNode(true);
+          current.content.appendChild(wholeTable);
+          if (current.content.scrollHeight > current.content.clientHeight + 1) {
+            current.content.removeChild(wholeTable);
+            current = createPage(host, footerHtml, footerHeightPx, PAGE_W_PX, PAGE_H_PX);
+            pages.push(current.page);
+            current.content.appendChild(wholeTable);
+          }
+          if (pageBreak.after && hasMoreNodes) {
+            current = createPage(host, footerHtml, footerHeightPx, PAGE_W_PX, PAGE_H_PX);
+            pages.push(current.page);
+          }
+          continue;
+        }
+
         const rows = getTableBodyRows(node);
         let currentTable = cloneTableShell(node);
         current.content.appendChild(currentTable);
