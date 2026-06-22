@@ -204,8 +204,7 @@ function applySubstitutions(src: string, org: OrganismeInfo, s: StagiaireInfo | 
     <tr>
       <td style="border:1px solid #cbd5e1;padding:14px;vertical-align:top;height:140px;">
         <div style="font-size:12px;color:#475569;margin-bottom:6px;">Tampon et signature</div>
-        ${tampon}
-        ${signOrg}
+        ${tampon || signOrg}
         <div style="font-size:12px;color:#1e293b;margin-top:6px;">${org.dirigeant || ""}</div>
       </td>
       <td style="border:1px solid #cbd5e1;padding:14px;vertical-align:top;height:140px;">
