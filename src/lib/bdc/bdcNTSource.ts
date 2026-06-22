@@ -2118,6 +2118,8 @@ Merci d'accepter de participer à la démarche et de consacrer quelques minutes 
 |---|
 | §§BR§§§§BR§§§§BR§§ |
 `,
+  "Indicateur 4/Indicateur 4 - Fiche d'analyse de besoin": `**FICHE D'ANALYSE DU BESOIN** — Bilan de compétences (générée automatiquement par bénéficiaire).`,
+  "Indicateur 4/Indicateur 4 - Fiche préalable au bilan de compétences": `**FICHE PRÉALABLE AU BILAN DE COMPÉTENCES** (générée automatiquement par bénéficiaire).`,
   "Indicateur 4/Indicateur 4 - Mail type handicap": `**MAIL TYPE\\
 HANDICAP**
 
