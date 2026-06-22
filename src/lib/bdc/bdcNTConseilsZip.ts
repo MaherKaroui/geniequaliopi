@@ -199,6 +199,82 @@ function applySubstitutions(src: string, org: OrganismeInfo, s: StagiaireInfo | 
     if (!d) return "24 heures";
     return /heure/i.test(d) ? d : `${d} heures`;
   })());
+
+  // ----- Placeholders IND 1 (Présentation du bilan) automatisés depuis la formation -----
+  const toBullets = (raw: string, fallback: string[]): string => {
+    const text = (raw || "").trim();
+    if (!text) return fallback.map((l) => `- ${l}`).join("\n\n");
+    // Découpage : retours à la ligne, puces existantes, ou phrases séparées par ; ou .
+    const parts = text
+      .split(/\r?\n|(?:^|\s)[•\-\*]\s+|(?<=[\.;])\s+(?=[A-ZÀ-Ý])/g)
+      .map((p) => p.replace(/^[\s\-•\*]+/, "").trim())
+      .filter((p) => p.length > 3);
+    const uniq: string[] = [];
+    for (const p of parts) {
+      const norm = p.replace(/[\s\.;,]+$/, "");
+      if (norm && !uniq.includes(norm)) uniq.push(norm);
+    }
+    const items = uniq.length ? uniq : [text];
+    return items.map((l) => `- ${l}`).join("\n\n");
+  };
+  txt = txt.replace(/\{BDC_INTITULE\}/g, formation?.intitule || "Bilan de compétences");
+  txt = txt.replace(/\{BDC_PUBLIC\}/g, toBullets(formation?.publicVise || "", [
+    "Tout salarié en poste",
+    "Chef d'entreprise et cadre",
+    "Demandeur d'emploi",
+    "Personne en fin de contrat ou en transition professionnelle",
+    "Jeune actif",
+  ]));
+  txt = txt.replace(/\{BDC_PREREQUIS\}/g, toBullets(formation?.prerequis || "", [
+    "Être engagé dans une démarche de réflexion professionnelle",
+    "Disposer d'un moyen de communication (téléphone ou e-mail)",
+    "Pour les séquences à distance : disposer d'un ordinateur et d'une connexion internet",
+  ]));
+  txt = txt.replace(/\{BDC_OBJECTIFS\}/g, (() => {
+    const o = (formation?.objectifs || "").trim();
+    if (!o) {
+      return [
+        "Permettre au bénéficiaire :",
+        "",
+        "- D'analyser son parcours professionnel et personnel",
+        "",
+        "- D'identifier ses compétences transférables et ses motivations",
+        "",
+        "- De construire un projet professionnel réaliste et un plan d'action",
+      ].join("\n");
+    }
+    return "Permettre au bénéficiaire :\n\n" + toBullets(o, []);
+  })());
+  txt = txt.replace(/\{BDC_DUREE_HORAIRES\}/g, (() => {
+    const d = (formation?.duree || "").trim();
+    const dureeTxt = d ? (/heure/i.test(d) ? d : `${d} heures`) : "18 heures sur 2 à 5 mois";
+    return [
+      "Un premier entretien préalable à l'inscription (1h) gratuit et sans engagement est prévu afin de vérifier que le bilan de compétences répondra aux attentes du bénéficiaire. Une fois l'inscription finalisée, la prestation est de " + dureeTxt + " répartie de la façon suivante :",
+      "",
+      "- 12h d'entretien individuel (6 rdv de 2 heures ou fréquence personnalisée) réparties sur 3 mois maximum",
+      "",
+      "- 6h de travail personnel guidé, de recherche et d'enquête terrain",
+      "",
+      "- Le suivi à 6 mois est inclus dans la prestation mais n'est pas comptabilisé dans les heures d'accompagnement",
+    ].join("\n");
+  })());
+  txt = txt.replace(/\{BDC_LIEU\}/g, (() => {
+    const lieu = (formation?.lieu || "").trim();
+    if (lieu) return `- ${lieu}`;
+    const adr = orgAdresse || orgNom;
+    return `- En présentiel dans les locaux de ${orgNom}${adr ? ` (${adr})` : ""}, à distance par visioconférence ou en format mixte (présentiel/distanciel) selon les besoins du bénéficiaire`;
+  })());
+  txt = txt.replace(/\{BDC_TARIF\}/g, (() => {
+    const t = (formation?.tarif || "").trim();
+    if (!t) return "- Tarif communiqué sur devis personnalisé";
+    return `- ${t}`;
+  })());
+  txt = txt.replace(/\{BDC_DELAI_ACCES\}/g, (() => {
+    const d = (formation?.delaiAcces || "").trim();
+    if (!d) return "un temps minimum d'un mois";
+    return /jour|mois|semaine/i.test(d) ? d : `un délai de ${d}`;
+  })());
+
   // Bloc d'informations bénéficiaire (utilisé dans la Convention de prestation)
   if (s) {
     const civ = s.civilite === "Mme" ? "Mme" : (s.civilite === "M." ? "M." : "");
