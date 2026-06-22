@@ -327,6 +327,9 @@ const QualiopiCheck = () => {
               <p className="text-xs text-muted-foreground mt-2">{warnCount} alerte(s) • {incos.length - errCount - warnCount} info(s)</p>
             </div>
             <div className="flex flex-col gap-2">
+              <Button variant={tab === "ai" ? "default" : "outline"} onClick={() => setTab("ai")} className="justify-start">
+                <Sparkles className="w-4 h-4 mr-2" /> Audit IA (réel)
+              </Button>
               <Button variant={tab === "checklist" ? "default" : "outline"} onClick={() => setTab("checklist")} className="justify-start">
                 <ShieldCheck className="w-4 h-4 mr-2" /> Checklist 32 indicateurs
               </Button>
