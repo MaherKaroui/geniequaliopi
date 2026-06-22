@@ -590,12 +590,14 @@ function mdToHtmlBody(md: string): string {
       out.push(`<li>${inline(trimmed.replace(/^\d+\.\s+/,""))}</li>`);
       continue;
     }
-    if (/^\|.*\|$/.test(trimmed)) {
+    if (/^\|.*\|\s*$/.test(trimmed)) {
       flushParagraph();
       closeLists();
       if (!inTable) { out.push('<table class="bdc-table">'); inTable = true; tableRowIdx = 0; }
-      const cells = trimmed.slice(1, -1).split("|").map(c => c.trim());
-      if (cells.every(c => /^-+$/.test(c) || c === "")) continue;
+      // Split sur '|' non-échappés, puis dé-échappe les '\|'
+      const inner = trimmed.replace(/\s+$/, "").slice(1, -1);
+      const cells = inner.split(/(?<!\\)\|/).map(c => c.replace(/\\\|/g, "|").trim());
+      if (cells.every(c => /^:?-+:?$/.test(c) || c === "")) continue;
       const tag = tableRowIdx === 0 ? "th" : "td";
       out.push("<tr>" + cells.map(c => `<${tag}>${inline(c)}</${tag}>`).join("") + "</tr>");
       tableRowIdx++;
