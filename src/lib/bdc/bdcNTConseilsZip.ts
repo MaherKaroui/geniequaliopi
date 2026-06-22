@@ -90,6 +90,7 @@ function applySubstitutions(src: string, org: OrganismeInfo, s: StagiaireInfo | 
   const orgSiret = org.siret || "[SIRET]";
   const orgNda = org.nda || "[NDA en cours d'attribution]";
   const dirigeant = org.dirigeant || "Le Responsable";
+  const dirigeantUpper = dirigeant.toUpperCase();
 
   const map: [RegExp, string][] = [
     [/NT\s*CONSEILS/gi, orgNom],
@@ -105,12 +106,21 @@ function applySubstitutions(src: string, org: OrganismeInfo, s: StagiaireInfo | 
     [/SIRET\s*XXX/gi, `SIRET ${orgSiret}`],
     [/Fait\s+à\s+Saint-Denis\s+le\s+\d{2}\/\d{2}\/\d{4}/gi, `Fait à ${org.ville || "[Ville]"} le ${dates.dateConvention}`],
     [/01\/01\/2026/g, fmtShortDate(parseDateFR(dates.dateVersion) || new Date())],
+    // Dirigeant : remplace toutes les occurrences du nom NT Conseils par le dirigeant de l'organisme
+    [/ABDOULHALIK\s+ANTTOISSE/gi, dirigeantUpper],
+    [/ABDULHALIK\s+ANTTOISSE/gi, dirigeantUpper],
+    [/Abdoulhalik\s+Anttoisse/g, dirigeant],
+    [/Abdulhalik\s+Anttoisse/g, dirigeant],
+    [/\bABDOULHALIK\b/g, dirigeantUpper],
+    [/\bABDULHALIK\b/g, dirigeantUpper],
+    [/\bANTTOISSE\b/g, ""],
   ];
   for (const [re, val] of map) txt = txt.replace(re, val);
+  // Nettoie d'éventuels doubles espaces laissés par le retrait de "ANTTOISSE"
+  txt = txt.replace(/[ \t]{2,}/g, " ");
 
   if (s) {
     const nomComplet = `${s.prenom} ${s.nom}`.trim();
-    txt = txt.replace(/ABDOULHALIK/g, (s.nom || "").toUpperCase() || "[NOM]");
     txt = txt.replace(/\bNom\s*:\s*\n/g, `Nom : ${s.nom || ""}\n`);
     txt = txt.replace(/\bPrénom\s*:\s*\n/g, `Prénom : ${s.prenom || ""}\n`);
     txt = txt.replace(/\bbénéficiaire\s*:\s*\n/gi, `bénéficiaire : ${nomComplet}\n`);
