@@ -786,8 +786,8 @@ export function buildFullCatalog(
     add("cfa_c3i12_precis_apprentissage", "CT3 - IND 12 📁 RESSOURCES – Précis de l'apprentissage", 3, 12, "pdf_static", { pdfUrl: "/pdfs/precis_apprentissage.pdf" });
     add("cfa_c3i12_livret_accompagnez_alternants", "CT3 - IND 12 📁 RESSOURCES – Livret Accompagnez vos alternants", 3, 12, "pdf_static", { pdfUrl: "/pdfs/livret_accompagnez_alternants.pdf" });
     
-    add("cfa_c3i12_procedure_rupture_reorientation_echecs", "CT3 - IND 12 📁 GESTION ABANDON – Procédure rupture, réorientation et échecs", 3, 12, "pdf_static", { pdfUrl: "/pdfs/procedure_rupture_reorientation_echecs.docx", folder: "Gestion_Abandon" });
-    add("cfa_c3i12_feuille_emargement_gestion_abandon", "CT3 - IND 12 📁 GESTION ABANDON – Feuille d'émargement (suivi abandon)", 3, 12, "pdf_static", { pdfUrl: "/pdfs/feuille_emargement_gestion_abandon.docx", folder: "Gestion_Abandon" });
+    add("cfa_c3i12_procedure_rupture_reorientation_echecs", "CT3 - IND 12 📁 GESTION ABANDON – Procédure rupture, réorientation et échecs", 3, 12, "procedure_rupture_reorientation_echecs_cfa", { folder: "Gestion_Abandon" });
+    add("cfa_c3i12_feuille_emargement_gestion_abandon", "CT3 - IND 12 📁 GESTION ABANDON – Feuille d'émargement (suivi abandon)", 3, 12, "feuille_emargement_gestion_abandon_cfa", { folder: "Gestion_Abandon" });
 
     // ===== IND 12 — DOCUMENTS OFFICIELS MINISTÈRE (Évaluation) =====
     stagiaires.forEach((s, si) => {

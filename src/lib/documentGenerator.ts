@@ -1029,6 +1029,8 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     }
     case "procedure_abandon_cfa": return genProcedureAbandon(o);
     case "procedure_absences_cfa": return genProcedureAbsences(o);
+    case "procedure_rupture_reorientation_echecs_cfa": return genProcedureRuptureReorientationEchecs(o);
+    case "feuille_emargement_gestion_abandon_cfa": return genFeuilleEmargementGestionAbandon(o, f, stagiaires);
     case "emargement_cfa": return genEmargementCFA(o, f, stagiaires);
     case "emargement_cfa_stagiaire": {
       const idx = typeof params?.stagiaireIdx === "number" ? params.stagiaireIdx : 0;
