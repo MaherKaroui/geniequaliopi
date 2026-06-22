@@ -3433,6 +3433,10 @@ défaut la partie la plus diligente saisira le tribunal compétent.
 
 Pour toute information, question ou réclamation, le client peut
 s'adresser à **NT CONSEILS.**
+
+Fait à {VILLE_ORG}, le {DATE_REGLEMENT}.
+
+{SIGNATURES_ORG_STAGIAIRE}
 `,
   "Indicateur 9/Indicateur 9 - Certificat de r\u00e9alisation": `Je soussigné **ABDOULHALIK ANTTOISSE**, représentant légal du
 dispensateur de l'action bilan de compétences :
