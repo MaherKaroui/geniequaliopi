@@ -414,6 +414,15 @@ function hashStr(s: string): number {
 function pick<T>(arr: T[], seed: number, off = 0): T {
   return arr[(seed + off) % arr.length];
 }
+/** Adapte les accords "(e)" au genre du bénéficiaire selon sa civilité. */
+function accordCivilite(text: string, civilite?: string): string {
+  const fem = civilite === "Mme" || civilite === "Madame";
+  return text
+    .replace(/\(e\)/g, fem ? "e" : "")
+    .replace(/\(rice\)/g, fem ? "rice" : "eur")
+    .replace(/\(euse\)/g, fem ? "euse" : "eur")
+    .replace(/\(ne\)/g, fem ? "ne" : "");
+}
 
 function buildOutilPreparatoireMd(
   s: StagiaireInfo,
