@@ -499,13 +499,6 @@ function buildFichePedagogiqueMd(
         "Recherche documentaire métiers, formations et marché de l'emploi.",
         "Préparation des enquêtes terrain auprès de professionnels.",
       ] },
-    { titre: "Phase d'investigation — Enquêtes métiers",
-      objectifs: ["ENQUÊTER", "ANALYSER", "AJUSTER"],
-      programme: [
-        "Débriefing des enquêtes métiers réalisées entre les séances.",
-        "Confrontation des hypothèses aux réalités du terrain.",
-        "Ajustement du projet professionnel principal et alternatif.",
-      ] },
     { titre: "Phase de conclusion — Plan d'action",
       objectifs: ["STRUCTURER", "PLANIFIER", "SÉCURISER"],
       programme: [
