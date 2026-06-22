@@ -1062,581 +1062,344 @@ fiabilité et la précision des données recueillies.
 `,
   "Indicateur 21/Indicateur 21 - Entretien annuel": `**ENTRETIEN ANNUEL**
 
-Date de l'entretien :
+**Date de l'entretien :** _____________________
 
-Nom :
+**Nom :** _____________________
 
-Poste occupé :
+**Poste occupé :** _____________________
 
-Depuis le :
+**Depuis le :** _____________________
 
-Entretien réalisé par :
+**Entretien réalisé par :** _____________________
 
 **MA MISSION**
 
-Depuis votre dernier entretien, vos missions ont-elles évolué ?
+Depuis votre dernier entretien, vos missions ont-elles évolué ? **Oui / Non**
 
-Oui / Non
+| **Si oui, quelles sont les missions que vous réalisez au quotidien ?** |
+|---|
+|   |
+|   |
+|   |
 
-Si oui, quelles sont les missions que vous réalisez au quotidien ?
+| **Avez-vous eu depuis votre dernier entretien des missions ponctuelles ?** (ex : participation à des projets différents de vos missions habituelles) |
+|---|
+|   |
+|   |
+|   |
 
-  -----------------------------------------------------------------------
-
-  -----------------------------------------------------------------------
-
-Avez-vous eu depuis votre dernier entretien des missions ponctuelles ?
-(ex : participation à des projets différents de vos missions
-habituelles)
-
-  -----------------------------------------------------------------------
-
-  -----------------------------------------------------------------------
-
-Avez-vous des commentaires à apporter concernant vos missions et vos
-activités actuelles ?
-
-  -----------------------------------------------------------------------
-
-  -----------------------------------------------------------------------
-
-**\\**
+| **Avez-vous des commentaires à apporter concernant vos missions et vos activités actuelles ?** |
+|---|
+|   |
+|   |
+|   |
 
 **MES POINTS FORTS**
 
-Quelle activité, quel projet pouvez-vous mettre en avant depuis le
-dernier entretien pour lesquels vous avez ressenti une réelle
-satisfaction ?
-
-  -----------------------------------------------------------------------
-
-  -----------------------------------------------------------------------
-
-Avez-vous participé à des projets qui ont permis de démontrer des points
-forts ? En quoi avez-vous pu vous révéler dans cette mission ?
-
-  -----------------------------------------------------------------------
-
-  -----------------------------------------------------------------------
-
-**LES DIFFICULTÉS RENCONTRÉES**
-
-Y'a-t-il des activités du quotidien pour lesquelles vous vous sentez en
-difficulté ?
-
-  -----------------------------------------------------------------------
-
-  -----------------------------------------------------------------------
-
-Quelle difficulté vous a le plus marqué depuis votre dernier entretien ?
-
-  -----------------------------------------------------------------------
-
-  -----------------------------------------------------------------------
-
-**\\**
+| **Quelle activité, quel projet pouvez-vous mettre en avant depuis le dernier entretien pour lesquels vous avez ressenti une réelle satisfaction ?** |
+|---|
+|   |
+|   |
+|   |
 
 **MES COMPÉTENCES**
 
-  --------------------------------------------------------------------------
-  **Savoir**                   **Note**   **Commentaires**
-  ---------------------------- ---------- ----------------------------------
-  Connaissance du secteur de              
-  la formation                            
+| **Savoir** | **Note** | **Commentaires** |
+|---|---|---|
+| Connaissance du secteur de la formation |   |   |
+| Connaissance des techniques pédagogiques |   |   |
+| Connaissance sur le secteur d'intervention |   |   |
 
-  Connaissance des techniques             
-  pédagogiques                            
+*Notation : 1 = débutant — 2 = confirmé — 3 = expert*
 
-  Connaissance sur le secteur             
-  d'intervention                          
-  --------------------------------------------------------------------------
+| **Savoir-faire** | **Note** | **Commentaires** |
+|---|---|---|
+| Sait transmettre ses connaissances |   |   |
+| Sait écouter et communiquer |   |   |
+| Sait transmettre sa motivation |   |   |
 
-[Notation :]{.underline}
+*Notation : 1 = 1er apprentissage — 2 = maitrise à l'aide de ressources documentaires — 3 = autonomie complète — 4 = capacité à transmettre son savoir*
 
-1= débutant
+| **Savoir-être** | **Note** | **Commentaires** |
+|---|---|---|
+| Est pédagogue |   |   |
+| Est à l'écoute |   |   |
+| Est enthousiaste et positif |   |   |
 
-2= confirmé
-
-3= expert
-
-  --------------------------------------------------------------------------
-  **Savoir-faire**             **Note**   **Commentaires**
-  ---------------------------- ---------- ----------------------------------
-  Sait transmettre ses                    
-  connaissances                           
-
-  Sait écouter et communiquer             
-
-  Sait transmettre sa                     
-  motivation                              
-  --------------------------------------------------------------------------
-
-Notation :
-
-1= 1^er^ apprentissage
-
-2= maitrise à l'aide de ressources documentaires
-
-3= autonomie complète
-
-4= capacité à transmettre son savoir
-
-  --------------------------------------------------------------------------
-  **Savoir-être**              **Note**   **Commentaires**
-  ---------------------------- ---------- ----------------------------------
-  Est pédagogue                           
-
-  Est à l'écoute                          
-
-  Est enthousiaste et positif             
-  --------------------------------------------------------------------------
-
-[Notation :]{.underline}\\
-1= non reconnu comme savoir-être
-
-2= identifié comme valeur
-
-3= valeur primordiale
+*Notation : 1 = non reconnu comme savoir-être — 2 = identifié comme valeur — 3 = valeur primordiale*
 
 **MES OBJECTIFS**
 
-  -----------------------------------------------------------------------
-  **Objectif 1 :**
-  -----------------------------------------------------------------------
-  **Objectif 2 :**
+| **Objectif 1 :** |
+|---|
+|   |
 
-  **Objectif 3 :**
-  -----------------------------------------------------------------------
+| **Objectif 2 :** |
+|---|
+|   |
+
+| **Objectif 3 :** |
+|---|
+|   |
 
 **CONCLUSION**
 
-Avez-vous un commentaire à apporter concernant votre entretien ?
-
-  -----------------------------------------------------------------------
-
-  -----------------------------------------------------------------------
+| **Avez-vous un commentaire à apporter concernant votre entretien ?** |
+|---|
+|   |
+|   |
+|   |
 `,
   "Indicateur 21/Indicateur 21 - Entretien de recrutement": `**ENTRETIEN DE RECRUTEMENT**
 
-Nom et prénom du candidat :
+**Nom et prénom du candidat :** _____________________
 
-Date de l'entretien :
+**Date de l'entretien :** _____________________
 
-Pour le poste de :
+**Pour le poste de :** _____________________
 
 **PRÉSENTATION ET PARCOURS**
 
-**Parlez-moi de vous**
-
-  -----------------------------------------------------------------------
-
-  -----------------------------------------------------------------------
-
-**Pouvez-vous me parler de votre cursus / vos formations ?**
-
-  -----------------------------------------------------------------------
-
-  -----------------------------------------------------------------------
-
-**Quel est le dernier poste que vous avez occupé ?**
-
-  -----------------------------------------------------------------------
-
-  -----------------------------------------------------------------------
-
-**À quoi ressemblait une semaine type dans ce poste ?**
-
-  -----------------------------------------------------------------------
-
-  -----------------------------------------------------------------------
-
-**Pouvez-vous me dire pourquoi vous avez quitté ce poste ?**
-
-  -----------------------------------------------------------------------
-
-  -----------------------------------------------------------------------
-
-**\\**
+| **Parlez-moi de vous** |
+|---|
+|   |
+|   |
+|   |
+|   |
 
 **MOTIVATIONS**
 
-**Pourquoi avez-vous postulé pour ce poste ? Qu'en attendez-vous ?**
-
-  -----------------------------------------------------------------------
-
-  -----------------------------------------------------------------------
-
-**Que savez-vous de nous ? (Organisme, bilans de compétences...)**
-
-  -----------------------------------------------------------------------
-
-  -----------------------------------------------------------------------
-
-**Qu'est-ce qui vous anime au travail ?**
-
-  -----------------------------------------------------------------------
-
-  -----------------------------------------------------------------------
-
-**Quelle serait votre semaine idéale ?**
-
-  -----------------------------------------------------------------------
-
-  -----------------------------------------------------------------------
-
-**\\**
+| **Pourquoi avez-vous postulé pour ce poste ? Qu'en attendez-vous ?** |
+|---|
+|   |
+|   |
+|   |
+|   |
 
 **COMPÉTENCES**
 
-**Quelles compétences pourriez-vous apporter pour ce poste ?**
-
-  -----------------------------------------------------------------------
-
-  -----------------------------------------------------------------------
-
-**Compétences recherchées Fait illustrant**
-
-  ------------------------- ------- -------------------------------------
-                                    
-
-                                    
-  ------------------------- ------- -------------------------------------
-
-**Savoir-être (comportement professionnel)**
-
-+-----------------------------------------------------------------------+
-| - *Avez-vous déjà travaillé en équipe ? Si oui, pouvez-vous me parler |
-|   de cette expérience ?*                                              |
-|                                                                       |
-| - *Imaginez, un collaborateur vous fait une remarque sur votre rendu, |
-|   comment réagissez-vous ?*                                           |
-|                                                                       |
-| - *Direz-vous que vous êtes plus efficace en début ou en fin de       |
-|   journée ?*                                                          |
-|                                                                       |
-| - *Avez-vous déjà pris en charge des projets ? Comment cela s\\'est    |
-|   passé ?*                                                            |
-|                                                                       |
-| - *Racontez-moi un échec/difficulté que vous avez rencontré au        |
-|   travail. Comment l'avez-vous abordé ?*                              |
-|                                                                       |
-| - *Que disent vos collègues de vous ?*                                |
-|                                                                       |
-| - *Savez-vous travailler sous la pression ?*                          |
-+=======================================================================+
-
-**\\**
+| **Quelles compétences pourriez-vous apporter pour ce poste ?** |
+|---|
+|   |
+|   |
+|   |
+|   |
 
 **ADÉQUATION ET DISPONIBILITÉ**
 
-**Mobilité géographique :** Oui / Non
+**Mobilité géographique :** Oui / Non
 
-**Favorable au travail à distance :** Oui / Non
+**Favorable au travail à distance :** Oui / Non
 
-**Dates de disponibilité :**
+**Dates de disponibilité :** _____________________
 
-**Prétentions salariales :**
+**Prétentions salariales :** _____________________
 
-**Êtes-vous engagé dans un autre processus de recrutement ?**
+**Êtes-vous engagé dans un autre processus de recrutement ?** _____________________
 
 **SYNTHÈSE**
 
-**Avez-vous des questions ?**
+| **Avez-vous des questions ?** |
+|---|
+|   |
+|   |
+|   |
 
-  -----------------------------------------------------------------------
+| **Premières impressions suite à l'entretien** |
+|---|
+|   |
+|   |
+|   |
 
-  -----------------------------------------------------------------------
+**Le candidat est-il en adéquation avec le poste ?** Oui / Non
 
-**Contrôle de référence : quel employeur pouvons-nous contacter ?**
+**Le candidat est-il en adéquation avec l'entreprise ?** Oui / Non
 
-  -----------------------------------------------------------------------
+| **Explications qui justifient ces réponses** |
+|---|
+|   |
+|   |
+|   |
 
-  -----------------------------------------------------------------------
+| **Impressions à valider lors d'éventuels prochains entretiens** |
+|---|
+|   |
+|   |
+|   |
 
-**\\**
-
-**Premières impressions suite à l'entretien**
-
-  -----------------------------------------------------------------------
-
-  -----------------------------------------------------------------------
-
-**Le candidat est-il en adéquation avec le poste ?** Oui / Non
-
-**Le candidat est-il en adéquation avec l'entreprise ?** Oui / Non
-
-**Explications qui justifient ces réponses**
-
-  -----------------------------------------------------------------------
-
-  -----------------------------------------------------------------------
-
-**Impressions à valider lors d'éventuels prochains entretiens**
-
-  -----------------------------------------------------------------------
-
-  -----------------------------------------------------------------------
-
-**Commentaires divers**
-
-  -----------------------------------------------------------------------
-
-  -----------------------------------------------------------------------
+| **Commentaires divers** |
+|---|
+|   |
+|   |
+|   |
 `,
-  "Indicateur 21/Indicateur 21 - Fiche de poste comptable": `**FICHE DE POSTE\\
-COMPTABLE**
+  "Indicateur 21/Indicateur 21 - Fiche de poste comptable": `**FICHE DE POSTE — COMPTABLE**
 
-**\\**
+**ACTIVITÉ PRINCIPALE**
 
-**ACTIVITE PRINCIPALE**
-
-Rigoureux, le comptable veille aux dépenses quotidiennes de l'organisme
-de formation, ses recettes et aux coûts des investissements nécessaires.
-En maîtrisant la « comptabilité analytique » le comptable étudie les
-coûts de revient ou le chiffre d'affaires par produit. Le comptable est
-également celui qui synthétise les données chiffrées de l'entreprise et
-en réfère aux dirigeants.
+Rigoureux, le comptable veille aux dépenses quotidiennes de l'organisme de formation, ses recettes et aux coûts des investissements nécessaires. En maîtrisant la « comptabilité analytique » le comptable étudie les coûts de revient ou le chiffre d'affaires par produit. Le comptable est également celui qui synthétise les données chiffrées de l'entreprise et en réfère aux dirigeants.
 
 **MISSIONS PRINCIPALES**
 
 - Consigner et rassembler les données commerciales et financières
-
 - Faire des balances de comptes, comptes de résultat et autres bilans
-
 - Vérifier l'exactitude des écritures comptables
-
 - Rendre compte des chiffres auprès des responsables de la structure
 
-**QUALITES REQUISES**
+**QUALITÉS REQUISES**
 
 - Organiser et prioriser son travail en fonction des enjeux
-
 - Savoir respecter les délais, être rigoureux et précis
-
 - Savoir s'intégrer dans une chaine de décisions comptables
-
 - Adapter ses explications aux divers interlocuteurs
 
-**COMPETENCES REQUISES**
+**COMPÉTENCES REQUISES**
 
-- Maitrise des techniques et des règles de la comptabilité publique et
-  générale
-
+- Maitrise des techniques et des règles de la comptabilité publique et générale
 - Maitrise de la gestion financière
-
 - Maitrise du régime de la TVA
-
 - Maitrise des règles de conservation des pièces comptables
-
 - Maitrise des grands principes des charges sociales
 `,
-  "Indicateur 21/Indicateur 21 - Fiche de poste responsable administratif": `**FICHE DE POSTE\\
-RESPONSABLE ADMINISTRATIF**
+  "Indicateur 21/Indicateur 21 - Fiche de poste responsable administratif": `**FICHE DE POSTE — RESPONSABLE ADMINISTRATIF**
 
-**ACTIVITE PRINCIPALE**
+**ACTIVITÉ PRINCIPALE**
 
-Le responsable administratif est un acteur central de l\\'entreprise qui
-facilite les tâches quotidiennes et assure la liaison entre les
-différents services. Il exerce au plus près de la direction, en toute
-confiance et transparence.
+Le responsable administratif est un acteur central de l'entreprise qui facilite les tâches quotidiennes et assure la liaison entre les différents services. Il exerce au plus près de la direction, en toute confiance et transparence.
 
-Selon sa formation initiale, le responsable administratif peut également
-revêtir un rôle financier : élaboration et suivi des budgets,
-répartition des financements entre les services, rédaction d\\'études
-prévisionnelles\\...
+Selon sa formation initiale, le responsable administratif peut également revêtir un rôle financier : élaboration et suivi des budgets, répartition des financements entre les services, rédaction d'études prévisionnelles…
 
 **MISSIONS PRINCIPALES**
 
-- Encadrer et coordonner le travail des différentes équipes du service
-  administratif
-
+- Encadrer et coordonner le travail des différentes équipes du service administratif
 - Assurer la liaison entre la direction et les équipes opérationnelles
-
 - Rédiger des plans stratégiques et des rapports de suivi
-
 - Proposer de nouvelles méthodes et nouveaux outils de gestion
-
 - Préparer les réunions et en rédiger le compte-rendu
 
-**QUALITES REQUISES**
+**QUALITÉS REQUISES**
 
 - Être discret (sens du secret professionnel)
-
 - Être fiable et organisé
-
 - Savoir se montrer adaptable et réactif
-
 - Résistance à la pression
 
-**COMPETENCES REQUISES**
+**COMPÉTENCES REQUISES**
 
 - Gestion administrative
-
-- Techniques de prise de notes, expression écrite et orthographe
-  irréprochables
-
+- Techniques de prise de notes, expression écrite et orthographe irréprochables
 - Maitrise des outils bureautiques et collaboratifs
 `,
-  "Indicateur 21/Indicateur 21 - Fiche de poste responsable commercial": `**FICHE DE POSTE\\
-RESPONSABLE COMMERCIAL**
+  "Indicateur 21/Indicateur 21 - Fiche de poste responsable commercial": `**FICHE DE POSTE — RESPONSABLE COMMERCIAL**
 
-**ACTIVITE PRINCIPALE**
+**ACTIVITÉ PRINCIPALE**
 
-Le responsable commercial propose à la direction diverses stratégies de
-façon à développer les prestations vendues par l'organisme de formation
-et ainsi augmenter son chiffre d'affaires. Pour ce faire, il met en
-place diverses actions : fixer le nombre de ventes, établir une
-politique de fidélisation des apprenants, être présent sur les salons ou
-dans les villes situées à proximité de la société lors d'événements
-locaux\\...
+Le responsable commercial propose à la direction diverses stratégies de façon à développer les prestations vendues par l'organisme de formation et ainsi augmenter son chiffre d'affaires. Pour ce faire, il met en place diverses actions : fixer le nombre de ventes, établir une politique de fidélisation des apprenants, être présent sur les salons ou dans les villes situées à proximité de la société lors d'événements locaux…
 
-Le responsable commercial anime et coordonne également une équipe de
-collaborateurs, analyse et évalue les résultats obtenus.
+Le responsable commercial anime et coordonne également une équipe de collaborateurs, analyse et évalue les résultats obtenus.
 
 **MISSIONS PRINCIPALES**
 
 - Établir une stratégie commerciale
-
 - Prospecter de nouveaux clients
-
 - Fidéliser la clientèle
-
 - Manager et animer une équipe
 
-**QUALITES REQUISES**
+**QUALITÉS REQUISES**
 
 - Excellente connaissance du secteur de la formation professionnelle
-
 - Être fiable et organisé
-
 - Avoir un esprit critique
-
 - Savoir motiver ses collaborateurs
 
-**COMPETENCES REQUISES**
+**COMPÉTENCES REQUISES**
 
 - Compétences commerciales et de négociation
-
-- Techniques de prise de notes, expression écrite et orthographe
-  irréprochables
-
+- Techniques de prise de notes, expression écrite et orthographe irréprochables
 - Maitrise des outils bureautiques et collaboratifs
 `,
-  "Indicateur 21/Indicateur 21 - Fiche de poste responsable communication": `**FICHE DE POSTE\\
-RESPONSABLE COMMUNICATION**
+  "Indicateur 21/Indicateur 21 - Fiche de poste responsable communication": `**FICHE DE POSTE — RESPONSABLE COMMUNICATION**
 
-**ACTIVITE PRINCIPALE**
+**ACTIVITÉ PRINCIPALE**
 
-Le responsable communication gère les communications de l'organisme de
-formation aussi bien en interne qu'en externe. Il est chargé de
-valoriser l'image de la structure. Il lui revient de déterminer les
-modes de communication à privilégier, les valeurs à promouvoir ou encore
-les partenaires à associer en gérant un ou plusieurs supports
-d'information.
+Le responsable communication gère les communications de l'organisme de formation aussi bien en interne qu'en externe. Il est chargé de valoriser l'image de la structure. Il lui revient de déterminer les modes de communication à privilégier, les valeurs à promouvoir ou encore les partenaires à associer en gérant un ou plusieurs supports d'information.
 
-Le responsable communication joue un rôle clé au sein de l'organisme de
-formation : celui de diffuser l'image de marque et de coordonner les
-actions de communication. Il constitue un lien entre la direction, les
-intervenants et les apprenants/partenaires.
+Le responsable communication joue un rôle clé au sein de l'organisme de formation : celui de diffuser l'image de marque et de coordonner les actions de communication. Il constitue un lien entre la direction, les intervenants et les apprenants/partenaires.
 
 **MISSIONS PRINCIPALES**
 
-- Assurer les différentes formes de communication dans l'organisme de
-  formation
-
+- Assurer les différentes formes de communication dans l'organisme de formation
 - Concevoir les actions marketing pour la promotion de la structure
-
-- Définir les campagnes de communication, notamment sur les réseaux
-  sociaux
-
+- Définir les campagnes de communication, notamment sur les réseaux sociaux
 - Garantir la cohérence du message véhiculé
 
-**QUALITES REQUISES**
+**QUALITÉS REQUISES**
 
 - Excellente connaissance du secteur de la formation professionnelle
-
 - Qualité d'écoute, d'aisance relationnelle et d'ouverture d'esprit
-
 - Avoir du charisme et le contact facile
-
 - Être rigoureux et avoir le sens de l'organisation
 
-**COMPETENCES REQUISES**
+**COMPÉTENCES REQUISES**
 
 - Savoir gérer un budget et des ressources
-
 - Maitriser les logiciels de PAO ainsi que les outils de communication
-
 - Capacité de management
 `,
-  "Indicateur 21/Indicateur 21 - Fiche de poste responsable veille": `**FICHE DE POSTE\\
-RESPONSABLE VEILLE**
+  "Indicateur 21/Indicateur 21 - Fiche de poste responsable veille": `**FICHE DE POSTE — RESPONSABLE VEILLE**
 
-**ACTIVITE PRINCIPALE**
+**ACTIVITÉ PRINCIPALE**
 
-Le chargé de veille documentaire a pour mission de concevoir, de mettre
-en place et d\\'assurer l\\'évolution de tous les outils de veille
-concurrentielle, juridique ou technologique\\...
+Le chargé de veille documentaire a pour mission de concevoir, de mettre en place et d'assurer l'évolution de tous les outils de veille concurrentielle, juridique ou technologique…
 
-Son rôle est de détecter et d\\'anticiper les changements pouvant
-survenir dans un environnement technique en constante évolution, et
-susceptibles d\\'affecter l\\'activité de l\\'entreprise. De même, le
-chargé de veille documentaire doit signaler les opportunités pouvant se
-présenter, tout en prévenant des risques éventuels.
+Son rôle est de détecter et d'anticiper les changements pouvant survenir dans un environnement technique en constante évolution, et susceptibles d'affecter l'activité de l'entreprise. De même, le chargé de veille documentaire doit signaler les opportunités pouvant se présenter, tout en prévenant des risques éventuels.
 
 **MISSIONS PRINCIPALES**
 
 - Organiser la veille de l'organisme de formation
-
-- Réaliser la veille sur les thématiques légale et réglementaire, métier
-  et pédagogique et technologique
-
+- Réaliser la veille sur les thématiques légale et réglementaire, métier et pédagogique et technologique
 - Anticiper les changements à venir dans la formation professionnelle
+- Rendre compte de cette veille à tous les intervenants internes de la structure
 
-- Rendre compte de cette veille à tous les intervenants internes de la
-  structure
-
-**QUALITES REQUISES**
+**QUALITÉS REQUISES**
 
 - Être rigoureux et précis
-
 - Excellente capacité d'analyse et de communication écrite
-
 - Adapter ses explications aux divers interlocuteurs
 
-**COMPETENCES REQUISES**
+**COMPÉTENCES REQUISES**
 
 - Maitrise du monde de la formation professionnelle
-
 - Excellente capacité de classement et d'archivage
-
 - Maitrise des outils informatiques
 `,
   "Indicateur 21/Indicateur 21 - Process Recrutement": `**PROCESS RECRUTEMENT**
 
-J'intègre mon nouveau salarié dans l'entreprise. Je lui remets un livret
-d'accueil (s'il existe) et je le présente aux autres collaborateurs
+Je définis et anticipe les besoins humains pour les prochains mois.
 
-Une fois la sélection du candidat faite, je m'assure du respect des
-nombreuses déclarations à faire (DPAE, inscription au registre du
-personnel, DSN, contrat de travail...)
+« Projet pluriannuel » — « Fiches de poste »
 
-Je sélectionne différents candidats et je fais passer des entretiens
-d'embauche afin de m'assurer des motivations du candidat et de ses
-compétences
+↓
 
-J'analyse les candidatures que j'ai reçues en les rapprochant des
-qualités et compétences recherchées dans la fiche de poste
+Je rédige et diffuse mon offre sur les différents sites que j'ai préalablement identifiés.
 
-Je rédige et diffuse mon offre sur les différents sites que j'ai
-préalablement identifiés
+↓
 
-Je définie et anticipe les besoins humains pour
+J'analyse les candidatures que j'ai reçues en les rapprochant des qualités et compétences recherchées dans la fiche de poste.
 
-les X prochains mois
+↓
 
-« Projet 2024- 2026 »
+Je sélectionne différents candidats et je fais passer des entretiens d'embauche afin de m'assurer des motivations du candidat et de ses compétences.
 
-« Fiches de poste »
+« Entretien de recrutement »
+
+↓
+
+Une fois la sélection du candidat faite, je m'assure du respect des nombreuses déclarations à faire (DPAE, inscription au registre du personnel, DSN, contrat de travail…).
+
+↓
+
+J'intègre mon nouveau salarié dans l'entreprise. Je lui remets un livret d'accueil (s'il existe) et je le présente aux autres collaborateurs.
 `,
   "Indicateur 23 & 24 & 25 - Process Veilles": `**PROCESS VEILLES**
 
