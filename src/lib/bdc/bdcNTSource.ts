@@ -5,7 +5,8 @@ export const BDC_NT_PER_BENEFICIAIRE = new Set<string>([
   "Indicateur 10/Indicateur 10 - Fiche p\u00e9dagogique",
   "Indicateur 10/Indicateur 10 - Suivi de l_adaptation \u00e0 l_accompagnement",
   "Indicateur 30/Indicateur 30 - Questionnaire satisfaction interne",
-  
+  "Indicateur 30/Indicateur 30 - Questionnaire satisfaction entreprise",
+  "Indicateur 30/Indicateur 30 - Questionnaire satisfaction financeur",
   "Indicateur 5/Indicateur 5 - Outil pr\u00e9paratoire",
   "Indicateur 8/Indicateur 8 - Mail test de positionnement",
   "Indicateur 8/Indicateur 8 - Test de positionnement",
