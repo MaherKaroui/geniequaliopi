@@ -76,16 +76,19 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ error: "LOVABLE_API_KEY missing" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
+    const docList = Array.isArray(documents) ? documents : [];
+    const docNames = Array.from(new Set(docList.map((d: any) => (typeof d === "string" ? d : d?.nom)).filter(Boolean))).slice(0, 150);
+
     const ctx = {
       typeAction: type || "AF",
       organisme: organisme || {},
       formation: formation || {},
       stagiaires: Array.isArray(stagiaires) ? stagiaires : [],
       nbStagiaires: Array.isArray(stagiaires) ? stagiaires.length : 0,
-      documentsGeneres: Array.isArray(documents) ? documents.slice(0, 200) : [],
+      documentsGeneres: docNames,
     };
 
-    const userMsg = `Audit du dossier suivant (type ${ctx.typeAction}) :\n\n${JSON.stringify(ctx, null, 2).slice(0, 14000)}\n\nFais l'audit complet maintenant.`;
+    const userMsg = `Audit du dossier suivant (type ${ctx.typeAction}) :\n\n${JSON.stringify(ctx, null, 2).slice(0, 18000)}\n\nFais l'audit complet maintenant. Limite-toi à 15 findings maximum (les plus importants).`;
 
     const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -100,6 +103,7 @@ Deno.serve(async (req) => {
           { role: "user", content: userMsg },
         ],
         response_format: { type: "json_object" },
+        max_tokens: 8000,
       }),
     });
 
