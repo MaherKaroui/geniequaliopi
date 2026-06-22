@@ -666,13 +666,46 @@ export function genPlanDiversiteLutteDiscriminationsCFA(o: OrganismeInfo, f: For
 export function genPlanMobiliteNationaleCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[] = []) {
   const terminee = isFormationTerminee(f, stagiaires);
   const annee = f.dateDebut ? new Date(f.dateDebut).getFullYear() : new Date().getFullYear();
+  const today = new Date();
+
+  // Dates calculées automatiquement à l'intérieur de la fenêtre [dateDebut, dateFin]
+  const MOIS_FR = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
+  const d1 = f.dateDebut ? new Date(f.dateDebut) : null;
+  const d2 = f.dateFin ? new Date(f.dateFin) : null;
+  const totalMs = d1 && d2 ? d2.getTime() - d1.getTime() : 0;
+  const at = (ratio: number): Date | null => {
+    if (!d1 || !d2 || totalMs <= 0) return null;
+    const r = Math.max(0, Math.min(1, ratio));
+    return new Date(d1.getTime() + totalMs * r);
+  };
+  const periode = (d: Date | null, fallback: string) => d ? `${MOIS_FR[d.getMonth()]} ${d.getFullYear()}` : fallback;
+  const statut = (d: Date | null) => {
+    if (terminee) return "Réalisée";
+    if (!d) return "Programmée";
+    if (d.getTime() < today.getTime() - 7 * 24 * 3600 * 1000) return "Réalisée";
+    if (Math.abs(d.getTime() - today.getTime()) <= 30 * 24 * 3600 * 1000) return "En cours";
+    return "Programmée";
+  };
+  const cell = (ratio: number, fallback: string) => {
+    const d = at(ratio);
+    return { p: periode(d, fallback), s: statut(d) };
+  };
+
+  // Actions programmées — réparties sur le parcours
+  const a1 = cell(0.05, `Septembre ${annee}`);   // Diffusion guide rentrée
+  const a2 = cell(0.25, `Novembre ${annee}`);   // Atelier collectif
+  const a4 = cell(0.90, `Juin ${annee + 1}`);   // Bilan annuel
+
+  // Ratios pour dates de suivi individuel (5%, 30%, 55%, 75%, 95%)
+  const suiviRatios = [0.05, 0.30, 0.55, 0.75, 0.95];
+
   return buildDocument({
     org: o,
     title: `PLAN DE MOBILITÉ NATIONALE DES APPRENTIS — ${annee}`,
     sections: [
       {
         heading: "Cadre (Mission 10 — Art. L6231-2)",
-        content: `<p>Le CFA <strong>${o.nom}</strong> encourage la mobilité nationale et internationale des apprentis. Le présent plan détaille les actions de mobilité <strong>nationale</strong> (la mobilité internationale Erasmus+ fait l'objet d'une procédure dédiée).</p>${terminee ? "" : `<p><em>Plan <strong>en cours d'exécution</strong> — mobilités à venir signalées « Programmée ».</em></p>`}`,
+        content: `<p>Le CFA <strong>${o.nom}</strong> encourage la mobilité nationale et internationale des apprentis. Le présent plan détaille les actions de mobilité <strong>nationale</strong> (la mobilité internationale Erasmus+ fait l'objet d'une procédure dédiée).</p>${terminee ? "" : `<p><em>Plan <strong>en cours d'exécution</strong> — mobilités à venir signalées « Programmée ».</em></p>`}<p><em>Dates calculées automatiquement sur la base du calendrier de la formation (${f.dateDebut ? formatDate(f.dateDebut) : "—"} → ${f.dateFin ? formatDate(f.dateFin) : "—"}).</em></p>`,
       },
       {
         heading: "Référent mobilité",
@@ -696,10 +729,10 @@ export function genPlanMobiliteNationaleCFA(o: OrganismeInfo, f: FormationInfo, 
         content: tableHTML(
           ["Action", "Échéance", "Statut"],
           [
-            [`Diffusion du Guide Mobilité Apprentis à la rentrée`, `Septembre ${annee}`, "Réalisée"],
-            [`Atelier collectif « Aides à la mobilité »`, `Novembre ${annee}`, terminee ? "Réalisée" : "Programmée"],
+            [`Diffusion du Guide Mobilité Apprentis à la rentrée`, a1.p, a1.s],
+            [`Atelier collectif « Aides à la mobilité »`, a2.p, a2.s],
             [`Permanences individuelles avec le Référent mobilité`, "Mensuelles", terminee ? "Réalisées" : "En cours"],
-            [`Bilan annuel mobilité (national + Erasmus+)`, `Juin ${annee + 1}`, terminee ? "Réalisé" : "À venir"],
+            [`Bilan annuel mobilité (national + Erasmus+)`, a4.p, a4.s],
           ]
         ),
       },
@@ -713,7 +746,10 @@ export function genPlanMobiliteNationaleCFA(o: OrganismeInfo, f: FormationInfo, 
                 const statuts = terminee
                   ? ["Accordée", "Accordée", "Accordée", "En instruction", "Accordée"]
                   : ["En instruction", "Dossier déposé", "À déposer", "À déposer", "Accordée"];
-                return [`${s.prenom} ${s.nom}`, aides[i % aides.length], statuts[i % statuts.length], formatDate(o.dateMaj || new Date().toISOString().slice(0, 10))];
+                const ratio = suiviRatios[i % suiviRatios.length];
+                const dSuivi = at(ratio);
+                const dateSuiviStr = dSuivi ? formatDate(dSuivi.toISOString().slice(0, 10)) : formatDate(o.dateMaj || new Date().toISOString().slice(0, 10));
+                return [`${s.prenom} ${s.nom}`, aides[i % aides.length], statuts[i % statuts.length], dateSuiviStr];
               })
             )
           : `<p><em>Aucun apprenti renseigné — tableau à compléter au fil des demandes.</em></p>`,
