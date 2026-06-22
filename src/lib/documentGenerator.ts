@@ -210,7 +210,6 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
       const sourceKey = params?.sourceKey as string;
       const si = params?.stagiaireIdx;
       const s = (template === "bdc_nt_doc_per_ben" && typeof si === "number") ? stagiaires[si] || null : null;
-      const { renderBdcNTDocHtml } = require("@/lib/bdc/bdcNTConseilsZip");
       return renderBdcNTDocHtml(sourceKey, o, s);
     }
     case "bdc_nt_asset": {
