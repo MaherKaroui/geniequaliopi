@@ -120,6 +120,137 @@ function applySubstitutions(src: string, org: OrganismeInfo, s: StagiaireInfo | 
   return txt;
 }
 
+/* ============================================================== */
+/* Outil préparatoire — personnalisé par bénéficiaire             */
+/* ============================================================== */
+const OUTIL_PREPA_KEY = "Indicateur 5/Indicateur 5 - Outil pr\u00e9paratoire";
+
+function hashStr(s: string): number {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0;
+  return Math.abs(h);
+}
+function pick<T>(arr: T[], seed: number, off = 0): T {
+  return arr[(seed + off) % arr.length];
+}
+
+function buildOutilPreparatoireMd(
+  s: StagiaireInfo,
+  org: OrganismeInfo,
+  dates: DatesCtx,
+): string {
+  const nom = `${s.prenom || ""} ${s.nom || ""}`.trim() || "Bénéficiaire";
+  const email = s.email || "";
+  const tel = s.telephone || "";
+  const poste = (s.poste || "").trim();
+  const entreprise = (s.entreprise || "").trim();
+  const handicap = (s as any).rqth === true || (s as any).rqth === "Oui" ? "Oui" : "Non";
+  const civ = s.civilite === "Mme" ? "Madame" : "Monsieur";
+  const seed = hashStr(`${s.prenom}|${s.nom}|${s.email}`);
+
+  const motivations = [
+    `Faire le point sur mon parcours${poste ? ` de ${poste}` : ""} et clarifier mes axes d'évolution`,
+    `Préparer une reconversion professionnelle réfléchie après plusieurs années${entreprise ? ` chez ${entreprise}` : " d'expérience"}`,
+    `Valider un projet professionnel cohérent avec mes valeurs et mes compétences`,
+    `Identifier les formations utiles pour sécuriser mon avenir professionnel`,
+    `Reprendre confiance et structurer une démarche de mobilité interne ou externe`,
+  ];
+  const objectifs = [
+    `Identifier mes compétences clés et mes atouts pour construire un projet réaliste`,
+    `Définir un projet professionnel principal et un projet alternatif crédibles`,
+    `Élaborer un plan d'action concret avec étapes, ressources et calendrier`,
+    `Confronter mes hypothèses au marché du travail via des enquêtes métier`,
+    `Mettre en cohérence mes aspirations, mes compétences et les opportunités du marché`,
+  ];
+  const rythmes = [
+    "24 heures réparties en séances de 2 heures hebdomadaires, sur 12 semaines",
+    "24 heures avec 3 séances de 2h par mois, étalées sur 4 mois",
+    "24 heures dont 20h en entretien individuel et 4h de travail personnel encadré",
+    "24 heures en mixte : 16h en présentiel et 8h en distanciel synchrone",
+  ];
+  const modalites = [
+    "Entretiens individuels, tests psychotechniques, travaux intersession personnalisés",
+    "Alternance d'entretiens, d'auto-diagnostic en ligne et de mises en situation",
+    "Supports numériques, questionnaires d'intérêts, grilles d'analyse de compétences",
+    "Entretiens d'exploration, tests de personnalité et restitution argumentée",
+  ];
+  const environnements = [
+    "Bureau dédié, calme et confidentiel, accès Wi-Fi sécurisé, matériel mis à disposition",
+    "Salle d'entretien individuelle équipée, environnement neutre garantissant la confidentialité",
+    "Locaux accessibles PMR, espace d'accueil dédié et créneaux flexibles (soir / samedi possibles)",
+  ];
+  const equipes = [
+    `Consultante référente : ${org.responsablePedagogique || org.dirigeant || "Le consultant désigné"} ; supervision qualité : ${org.referentQualite || org.dirigeant || "Le référent qualité"}`,
+    `Un consultant unique tout au long du bilan, appuyé par le référent handicap (${org.referentHandicap || "à désigner"}) si besoin`,
+    `Binôme consultant principal / consultant ressource, coordination assurée par ${org.dirigeant || "la direction"}`,
+  ];
+  const remarques = [
+    poste ? `Souhaite explorer des passerelles depuis le poste de ${poste}.` : "Souhaite explorer plusieurs pistes sans a priori.",
+    entreprise ? `Démarche initiée à titre personnel, hors de l'employeur actuel (${entreprise}).` : "Démarche personnelle et confidentielle.",
+    `Disponibilités à privilégier : ${pick(["fin de journée", "matinée", "mercredi après-midi", "samedi matin"], seed, 3)}.`,
+  ];
+  const adminNotes = [
+    "Dossier complet, financement CPF mobilisable.",
+    "Pièces administratives reçues, RIB et attestation CPF en cours.",
+    "Convention à émettre après validation du devis par le bénéficiaire.",
+  ];
+
+  const motivation = pick(motivations, seed, 0);
+  const objectif = pick(objectifs, seed, 1);
+  const rythme = pick(rythmes, seed, 2);
+  const modalite = pick(modalites, seed, 3);
+  const env = pick(environnements, seed, 4);
+  const equipe = pick(equipes, seed, 5);
+  const remarque = pick(remarques, seed, 6);
+  const admin = pick(adminNotes, seed, 7);
+
+  const initiative = (s as any).financement && /entreprise|employeur|opco/i.test(String((s as any).financement)) ? "Non — à l'initiative de l'employeur" : "Oui";
+  const contacts = [email, tel].filter(Boolean).join(" · ") || "[Contacts à compléter]";
+  const carac = poste ? `Poste actuel : ${poste}${entreprise ? ` — ${entreprise}` : ""}` : "Situation professionnelle à préciser en entretien";
+
+  return `**OUTIL PRÉPARATOIRE BÉNÉFICIAIRE**
+
+**Date de l'entretien :** ${dates.dateConvention}
+
+**Bénéficiaire : ${civ} ${nom}**
+
+**Contacts : ${contacts}**
+
+**Dates du bilan de compétences souhaitées : du ${dates.dateDebut} au ${dates.dateFin}**
+
+1)  **Bénéficiaire**
+
+| **Caractéristiques et spécificités :** |
+| ${carac} |
+| **Situation de handicap ?** ${handicap}${handicap === "Oui" ? " — voir process handicap" : ""} |
+
+2)  **Désirs / souhaits :**
+
+| **Bilan de compétences à l'initiative du bénéficiaire ?** ${initiative} |
+| **Motivations :** ${motivation} |
+| **Objectifs du bilan de compétences :** ${objectif} |
+| **Remarques autres :** ${remarque} |
+
+3)  **Hypothèses :**
+
+| **Rythmes et temps de prestation :** ${rythme} |
+| **Modalités pédagogiques, contenus, supports et outils :** ${modalite} |
+| **Environnement de la prestation :** ${env} |
+| **Structuration de l'équipe pédagogique :** ${equipe} |
+
+| **Cadre réservé au service administratif :** ${admin} |
+`;
+}
+
+/** Retourne un markdown personnalisé pour les clés qui le supportent, sinon null. */
+function getPersonalizedRaw(key: string, s: StagiaireInfo | null, org: OrganismeInfo, dates: DatesCtx): string | null {
+  if (!s) return null;
+  if (key === OUTIL_PREPA_KEY) return buildOutilPreparatoireMd(s, org, dates);
+  return null;
+}
+
+
+
 /** Markdown (pandoc-style) → fragment HTML (corps uniquement) */
 function mdToHtmlBody(md: string): string {
   const esc = (s: string) => s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
