@@ -636,7 +636,7 @@ export function renderBdcNTDocHtml(
   const dates = computeDates(stagiaire || undefined, org, formation);
   const personalized = getPersonalizedRaw(key, stagiaire, org, dates);
   const effectiveRaw = personalized ?? raw;
-  let md = applySubstitutions(effectiveRaw, org, stagiaire, dates);
+  let md = applySubstitutions(effectiveRaw, org, stagiaire, dates, formation);
 
   if (!dates.bilanTermine && /Certificat de réalisation|Compte rendu de fin/i.test(title)) {
     md = md.replace(/\n[^|\n]{200,}\n/g, "\n[À compléter à la fin du bilan]\n");
@@ -726,7 +726,7 @@ export async function buildBDCNTConseilsZip(
   // Helper : génère un DOCX depuis markdown + substitutions
   const genDocx = async (rawMd: string, title: string, s: StagiaireInfo | null): Promise<Blob> => {
     const dates = computeDates(s || undefined, org, formation);
-    let md = applySubstitutions(rawMd, org, s, dates);
+    let md = applySubstitutions(rawMd, org, s, dates, formation);
 
     // Bilan en cours : on neutralise les évaluations finales
     if (!dates.bilanTermine && /Certificat de réalisation|Compte rendu de fin/i.test(title)) {
