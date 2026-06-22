@@ -194,13 +194,10 @@ function applySubstitutions(src: string, org: OrganismeInfo, s: StagiaireInfo | 
     .replace(/\{ORG_TEL\}/g, orgTel || "")
     .replace(/\{ORG_MAIL\}/g, orgEmail);
 
-  // Bloc signatures Qualiopi sobre : tampon/signature organisme à gauche,
-  // signature bénéficiaire à droite. Les deux images sont affichées si présentes.
+  // Bloc signatures Qualiopi sobre : tampon organisme du formulaire à gauche,
+  // signature bénéficiaire du formulaire stagiaire à droite.
   const tampon = org.tamponUrl
     ? `<img src="${org.tamponUrl}" alt="Tampon ${orgNom}" style="max-height:78px;max-width:150px;display:block;margin:2px 0 6px;object-fit:contain;" />`
-    : "";
-  const signOrg = org.signatureUrl
-    ? `<img src="${org.signatureUrl}" alt="Signature ${dirigeant}" style="max-height:58px;max-width:170px;display:block;margin:2px 0 6px;object-fit:contain;" />`
     : "";
   const signSta = s?.signatureUrl
     ? `<img src="${s.signatureUrl}" alt="Signature bénéficiaire" style="max-height:58px;max-width:170px;display:block;margin:2px 0 6px;object-fit:contain;" />`
@@ -217,8 +214,8 @@ function applySubstitutions(src: string, org: OrganismeInfo, s: StagiaireInfo | 
   <tbody>
     <tr>
       <td style="border:1px solid #94a3b8;padding:12px;vertical-align:top;height:118px;">
-        <div style="font-size:11px;color:#475569;margin-bottom:6px;">Tampon et signature</div>
-        ${tampon}${signOrg}
+        <div style="font-size:11px;color:#475569;margin-bottom:6px;">Tampon de l'organisme</div>
+        ${tampon}
         <div style="font-size:11px;color:#1e293b;margin-top:4px;font-weight:600;">${dirigeant}</div>
         <div style="font-size:10.5px;color:#475569;">${org.nom || ""}</div>
       </td>
