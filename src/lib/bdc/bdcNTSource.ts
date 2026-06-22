@@ -3433,6 +3433,10 @@ défaut la partie la plus diligente saisira le tribunal compétent.
 
 Pour toute information, question ou réclamation, le client peut
 s'adresser à **NT CONSEILS.**
+
+Fait à {VILLE_ORG}, le {DATE_REGLEMENT}.
+
+{SIGNATURES_ORG_STAGIAIRE}
 `,
   "Indicateur 9/Indicateur 9 - Certificat de r\u00e9alisation": `Je soussigné **ABDOULHALIK ANTTOISSE**, représentant légal du
 dispensateur de l'action bilan de compétences :
@@ -4063,12 +4067,9 @@ ainsi qu\\'il suit :
 
 **Entrée en application**
 
-Le présent règlement intérieur entre en application à compter du
-01/01/2026.
+Le présent règlement intérieur entre en application à compter du {DATE_REGLEMENT}.
 
-Copie remise à l'apprenant le
-
-Nom, prénom et signature de l'apprenant
+{SIGNATURES_ORG_STAGIAIRE}
 `,
 };
 

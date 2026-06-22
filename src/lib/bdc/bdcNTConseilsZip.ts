@@ -168,6 +168,46 @@ function applySubstitutions(src: string, org: OrganismeInfo, s: StagiaireInfo | 
   txt = txt.replace(/\{DATE_CONVENTION\}/g, dates.dateConvention);
   txt = txt.replace(/\{DATE_DEBUT\}/g, dates.dateDebut);
   txt = txt.replace(/\{DATE_FIN\}/g, dates.dateFin);
+  // Date de mise en application RI / CGV : toujours J-14 ouvrés avant début de formation
+  txt = txt.replace(/\{DATE_REGLEMENT\}/g, dates.dateConvention);
+  txt = txt.replace(/\{VILLE_ORG\}/g, org.ville || "[Ville]");
+
+  // Bloc signatures : tampon + signature organisme | signature apprenant
+  const tampon = org.tamponUrl
+    ? `<img src="${org.tamponUrl}" alt="Tampon" style="max-height:90px;max-width:170px;display:block;margin:4px 0;" />`
+    : "";
+  const signOrg = org.signatureUrl
+    ? `<img src="${org.signatureUrl}" alt="Signature" style="max-height:70px;max-width:200px;display:block;margin:4px 0;" />`
+    : "";
+  const signSta = s?.signatureUrl
+    ? `<img src="${s.signatureUrl}" alt="Signature apprenant" style="max-height:70px;max-width:200px;display:block;margin:4px 0;" />`
+    : "";
+  const nomStagiaire = s ? `${s.prenom || ""} ${s.nom || ""}`.trim() : "";
+  const signaturesHtml = `
+<table style="width:100%;border-collapse:collapse;margin-top:24px;border:1px solid #cbd5e1;">
+  <thead>
+    <tr style="background:#eef2f7;">
+      <th style="border:1px solid #cbd5e1;padding:10px;text-align:left;width:50%;">Pour l'organisme — ${org.nom || ""}</th>
+      <th style="border:1px solid #cbd5e1;padding:10px;text-align:left;width:50%;">Pour l'apprenant — ${nomStagiaire}</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="border:1px solid #cbd5e1;padding:14px;vertical-align:top;height:140px;">
+        <div style="font-size:12px;color:#475569;margin-bottom:6px;">Tampon et signature</div>
+        ${tampon}
+        ${signOrg}
+        <div style="font-size:12px;color:#1e293b;margin-top:6px;">${org.dirigeant || ""}</div>
+      </td>
+      <td style="border:1px solid #cbd5e1;padding:14px;vertical-align:top;height:140px;">
+        <div style="font-size:12px;color:#475569;margin-bottom:6px;">Signature</div>
+        ${signSta}
+        <div style="font-size:12px;color:#1e293b;margin-top:6px;">${nomStagiaire}</div>
+      </td>
+    </tr>
+  </tbody>
+</table>`;
+  txt = txt.replace(/\{SIGNATURES_ORG_STAGIAIRE\}/g, signaturesHtml);
 
   return txt;
 }
