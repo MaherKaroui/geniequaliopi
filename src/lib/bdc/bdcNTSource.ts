@@ -3306,12 +3306,27 @@ Mail : **contact.ntconseil@gmail.com**
 `,
   "Indicateur 4/Indicateur 4 - Process Analyse du besoin": `**PROCESS ANALYSE DU BESOIN**
 
-Si la demande provient d'une personne en situation de handicap, alors
-j'étudie sa situation pour lui proposer des éventuels aménagements ou
-des adaptations
+_NT CONSEILS ET VOUS À VOTRE ÉCOUTE POUR UN AVENIR MEILLEUR_
+
+**① Lorsque je reçois une demande de prestation, j'analyse le besoin du bénéficiaire**
+
+→ « Outil préparatoire »
+
+⬇
+
+**② Si la demande provient d'une personne en situation de handicap, alors j'étudie sa situation pour lui proposer des éventuels aménagements ou des adaptations**
 
 (voir process handicap)
+
+⬇
+
+**③ Je confirme les besoins du bénéficiaire à travers un entretien téléphonique ou physique**
+
+⬇
+
+**④ Je décide si j'accepte ou non de dispenser cette prestation. Dans le cas d'une réponse négative, j'en explique les raisons au bénéficiaire**
 `,
+
   "Indicateur 5/Indicateur 5 - Outil pr\u00e9paratoire": `**OUTIL PRÉPARATOIRE BÉNÉFICIAIRE**
 
 **Date de l'entretien :** 16­/02/2024
