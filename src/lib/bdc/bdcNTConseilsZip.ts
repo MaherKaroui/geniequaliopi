@@ -183,7 +183,7 @@ function applySubstitutions(src: string, org: OrganismeInfo, s: StagiaireInfo | 
     ? `<img src="${org.signatureUrl}" alt="Signature" style="max-height:70px;max-width:200px;display:block;margin:4px 0;" />`
     : "";
   const signSta = s?.signatureUrl
-    ? `<img src="${s.signatureUrl}" alt="Signature apprenant" style="max-height:70px;max-width:200px;display:block;margin:4px 0;" />`
+    ? `<img src="${s.signatureUrl}" alt="Signature bénéficiaire" style="max-height:70px;max-width:200px;display:block;margin:4px 0;" />`
     : "";
   const nomStagiaire = s ? `${s.prenom || ""} ${s.nom || ""}`.trim() : "";
   const signaturesHtml = `
