@@ -1024,69 +1024,69 @@ fiabilité et la précision des données recueillies.
 `,
   "Indicateur 21/Indicateur 21 - Entretien annuel": `**ENTRETIEN ANNUEL**
 
-**Date de l'entretien :** _____________________
+**Date de l\'entretien :** {ENTRETIEN_DATE}
 
-**Nom :** _____________________
+**Nom :** {ORG_DIRIGEANT}
 
-**Poste occupé :** _____________________
+**Poste occupé :** Consultant(e) — Bilan de compétences / Formateur(rice) référent(e)
 
-**Depuis le :** _____________________
+**Depuis le :** Janvier 2023
 
-**Entretien réalisé par :** _____________________
+**Entretien réalisé par :** Direction — {ORG_NOM}
 
 **MA MISSION**
 
-Depuis votre dernier entretien, vos missions ont-elles évolué ? **Oui / Non**
+Depuis votre dernier entretien, vos missions ont-elles évolué ? **Oui**
 
 | **Si oui, quelles sont les missions que vous réalisez au quotidien ?** |
 |---|
-|   |
-|   |
-|   |
+| Accueil et analyse de la demande des bénéficiaires, conduite des entretiens (phases préliminaire, d\'investigation et de conclusion), passation et restitution des tests, enquêtes métier {BDC_SECTEUR_TXT}, rédaction des documents de synthèse, suivi à 6 mois. |
+| Animation des séances en présentiel et en visioconférence, mise à jour des supports pédagogiques, veille réglementaire et veille métier sur les domaines accompagnés. |
+| Gestion administrative des dossiers (conventions, CGV, certificats de réalisation), suivi des indicateurs de satisfaction et de réussite des bénéficiaires. |
 
 | **Avez-vous eu depuis votre dernier entretien des missions ponctuelles ?** (ex : participation à des projets différents de vos missions habituelles) |
 |---|
-|   |
-|   |
-|   |
+| Refonte du process Qualiopi suite à l\'audit de surveillance, mise à jour des fiches de poste et du livret d\'accueil. |
+| Participation à un groupe de travail interne sur l\'amélioration des outils d\'évaluation et la digitalisation des supports. |
+| Représentation de l\'organisme sur 2 salons professionnels (présentation de l\'offre BDC). |
 
 | **Avez-vous des commentaires à apporter concernant vos missions et vos activités actuelles ?** |
 |---|
-|   |
-|   |
-|   |
+| Charge de travail soutenue mais cohérente avec mon engagement et mes appétences. La diversité des profils accompagnés (dont {BDC_METIER}) rend le métier passionnant. |
+| Bonne articulation entre face à face pédagogique, suivi administratif et démarche qualité. |
+| Souhait d\'approfondir certaines spécialisations sectorielles dans l\'année à venir. |
 
 **MES POINTS FORTS**
 
 | **Quelle activité, quel projet pouvez-vous mettre en avant depuis le dernier entretien pour lesquels vous avez ressenti une réelle satisfaction ?** |
 |---|
-|   |
-|   |
-|   |
+| Accompagnement de plusieurs bénéficiaires jusqu\'à la concrétisation effective de leur projet (entrée en formation, mobilité interne, création d\'activité). |
+| Mise en place d\'un kit de supports actualisés (fiches métier, grille de suivi, livret de restitution) directement réutilisable par toute l\'équipe pédagogique. |
+| Bons retours de satisfaction des bénéficiaires (notes moyennes ≥ 8/10) et taux de complétion du bilan élevé. |
 
 **MES COMPÉTENCES**
 
 | **Savoir** | **Note** | **Commentaires** |
 |---|---|---|
-| Connaissance du secteur de la formation |   |   |
-| Connaissance des techniques pédagogiques |   |   |
-| Connaissance sur le secteur d'intervention |   |   |
+| Connaissance du secteur de la formation | 3 | Maîtrise du cadre Qualiopi, des dispositifs de financement (CPF, autres) et de la réglementation BDC. |
+| Connaissance des techniques pédagogiques | 3 | Approches individualisées, posture d\'écoute active, outils d\'investigation variés. |
+| Connaissance sur le secteur d\'intervention | 3 | Veille active {BDC_SECTEUR_TXT} et autres secteurs accompagnés. |
 
 *Notation : 1 = débutant — 2 = confirmé — 3 = expert*
 
 | **Savoir-faire** | **Note** | **Commentaires** |
 |---|---|---|
-| Sait transmettre ses connaissances |   |   |
-| Sait écouter et communiquer |   |   |
-| Sait transmettre sa motivation |   |   |
+| Sait transmettre ses connaissances | 4 | Pédagogie adaptée à chaque profil, supports clairs et progressifs. |
+| Sait écouter et communiquer | 4 | Écoute active, reformulation, posture bienveillante mais structurante. |
+| Sait transmettre sa motivation | 3 | Capacité à remobiliser les bénéficiaires dans les moments de doute. |
 
-*Notation : 1 = 1er apprentissage — 2 = maitrise à l'aide de ressources documentaires — 3 = autonomie complète — 4 = capacité à transmettre son savoir*
+*Notation : 1 = 1er apprentissage — 2 = maitrise à l\'aide de ressources documentaires — 3 = autonomie complète — 4 = capacité à transmettre son savoir*
 
 | **Savoir-être** | **Note** | **Commentaires** |
 |---|---|---|
-| Est pédagogue |   |   |
-| Est à l'écoute |   |   |
-| Est enthousiaste et positif |   |   |
+| Est pédagogue | 3 | Pédagogie naturelle, posture rassurante. |
+| Est à l\'écoute | 3 | Disponibilité et qualité d\'écoute reconnues par les bénéficiaires. |
+| Est enthousiaste et positif | 3 | Énergie communicative, soutien constant des bénéficiaires. |
 
 *Notation : 1 = non reconnu comme savoir-être — 2 = identifié comme valeur — 3 = valeur primordiale*
 
@@ -1094,106 +1094,106 @@ Depuis votre dernier entretien, vos missions ont-elles évolué ? **Oui / Non**
 
 | **Objectif 1 :** |
 |---|
-|   |
+| Maintenir un taux de satisfaction bénéficiaires ≥ 90 % et un taux de complétion du bilan ≥ 95 % sur l\'année à venir. |
 
 | **Objectif 2 :** |
 |---|
-|   |
+| Approfondir la veille métier sur {BDC_SECTEUR_TXT} et 2 secteurs porteurs supplémentaires (production de fiches sectorielles actualisées). |
 
 | **Objectif 3 :** |
 |---|
-|   |
+| Participer activement à la démarche d\'amélioration continue et à la préparation de l\'audit de surveillance Qualiopi. |
 
 **CONCLUSION**
 
 | **Avez-vous un commentaire à apporter concernant votre entretien ?** |
 |---|
-|   |
-|   |
-|   |
+| Entretien constructif, échanges clairs sur les missions, les axes de progrès et les objectifs partagés. |
+| Bonne adéquation entre les missions confiées et mes appétences professionnelles. |
+| Je remercie la direction pour l\'écoute et la qualité du cadre de travail. |
 `,
   "Indicateur 21/Indicateur 21 - Entretien de recrutement": `**ENTRETIEN DE RECRUTEMENT**
 
-**Nom et prénom du candidat :** _____________________
+**Nom et prénom du candidat :** Marion LAURENT
 
-**Date de l'entretien :** _____________________
+**Date de l\'entretien :** {ENTRETIEN_DATE}
 
-**Pour le poste de :** _____________________
+**Pour le poste de :** Consultant(e) en bilan de compétences
 
 **PRÉSENTATION ET PARCOURS**
 
 | **Parlez-moi de vous** |
 |---|
-|   |
-|   |
-|   |
-|   |
+| Je suis titulaire d\'un Master 2 en Psychologie du travail et formée à l\'accompagnement du changement professionnel. |
+| J\'ai exercé pendant 6 ans en cabinet conseil RH (accompagnement individuel, bilans de compétences, outplacement) auprès d\'un public diversifié (salariés, demandeurs d\'emploi, indépendants). |
+| J\'ai également animé des ateliers collectifs autour de la reconversion et de la construction de projet professionnel{BDC_SECTEUR_TXT_PHRASE}. |
+| Je souhaite aujourd\'hui rejoindre une structure à taille humaine, engagée sur la qualité (Qualiopi) et le suivi personnalisé. |
 
 **MOTIVATIONS**
 
-| **Pourquoi avez-vous postulé pour ce poste ? Qu'en attendez-vous ?** |
+| **Pourquoi avez-vous postulé pour ce poste ? Qu\'en attendez-vous ?** |
 |---|
-|   |
-|   |
-|   |
-|   |
+| Votre approche du bilan de compétences (cadre méthodique, qualité des supports, suivi à 6 mois) correspond pleinement à ma façon de travailler. |
+| Je souhaite m\'investir dans un projet pédagogique cohérent et exigeant, avec des bénéficiaires accompagnés sur la durée. |
+| J\'attends de ce poste une stabilité, une autonomie dans la conduite des bilans et la possibilité de contribuer à l\'amélioration continue de l\'offre. |
 
 **COMPÉTENCES**
 
 | **Quelles compétences pourriez-vous apporter pour ce poste ?** |
 |---|
-|   |
-|   |
-|   |
-|   |
+| Maîtrise des outils d\'investigation (tests d\'intérêts, de personnalité, de valeurs) et des méthodes d\'analyse de parcours. |
+| Solide connaissance des dispositifs de financement (CPF, autres) et du cadre réglementaire du bilan de compétences. |
+| Compétences pédagogiques en présentiel et à distance (visioconférence, outils numériques). |
+| Capacité à conduire des enquêtes métier{BDC_SECTEUR_TXT_PHRASE2}. |
+| Rigueur administrative (conventions, attestations, certificats) et appétence pour la démarche qualité. |
 
 **ADÉQUATION ET DISPONIBILITÉ**
 
-**Mobilité géographique :** Oui / Non
+**Mobilité géographique :** Oui
 
-**Favorable au travail à distance :** Oui / Non
+**Favorable au travail à distance :** Oui (mixte présentiel/distanciel)
 
-**Dates de disponibilité :** _____________________
+**Dates de disponibilité :** Sous 1 mois (préavis en cours)
 
-**Prétentions salariales :** _____________________
+**Prétentions salariales :** 38 — 42 K€ bruts annuels, négociables selon le package global
 
-**Êtes-vous engagé dans un autre processus de recrutement ?** _____________________
+**Êtes-vous engagé dans un autre processus de recrutement ?** Oui, un second entretien est prévu dans un autre cabinet, mais votre poste est mon premier choix.
 
 **SYNTHÈSE**
 
 | **Avez-vous des questions ?** |
 |---|
-|   |
-|   |
-|   |
+| Quelle est la composition actuelle de l\'équipe pédagogique et comment se répartit la charge de bilans ? |
+| Quels sont les outils utilisés pour la digitalisation des supports et le suivi des bénéficiaires ? |
+| Quelle est la trajectoire de l\'organisme à 2 ou 3 ans (volumes, nouvelles certifications, public visé) ? |
 
-| **Premières impressions suite à l'entretien** |
+| **Premières impressions suite à l\'entretien** |
 |---|
-|   |
-|   |
-|   |
+| Candidate posée, structurée et clairement professionnelle. Discours cohérent et factuel sur son parcours et ses motivations. |
+| Bonne compréhension du cadre Qualiopi et du métier de consultant BDC. |
+| Posture chaleureuse et bienveillante, en adéquation avec notre culture interne. |
 
-**Le candidat est-il en adéquation avec le poste ?** Oui / Non
+**Le candidat est-il en adéquation avec le poste ?** Oui
 
-**Le candidat est-il en adéquation avec l'entreprise ?** Oui / Non
+**Le candidat est-il en adéquation avec l\'entreprise ?** Oui
 
 | **Explications qui justifient ces réponses** |
 |---|
-|   |
-|   |
-|   |
+| Profil expérimenté avec une réelle pratique du bilan de compétences et une bonne maîtrise des outils. |
+| Valeurs partagées : qualité de l\'accompagnement, écoute, rigueur, amélioration continue. |
+| Disponibilité compatible avec nos besoins et prétentions cohérentes avec la grille interne. |
 
-| **Impressions à valider lors d'éventuels prochains entretiens** |
+| **Impressions à valider lors d\'éventuels prochains entretiens** |
 |---|
-|   |
-|   |
-|   |
+| Mise en situation : conduite d\'un entretien de phase préliminaire avec un bénéficiaire fictif. |
+| Vérification de la capacité à structurer un livret de synthèse à partir d\'éléments fournis. |
+| Échange avec l\'équipe pédagogique pour valider la posture en équipe. |
 
 | **Commentaires divers** |
 |---|
-|   |
-|   |
-|   |
+| Références professionnelles à contacter (avec accord de la candidate). |
+| Confirmer la date de prise de poste après le second entretien. |
+| Prévoir un parcours d\'intégration de 2 semaines (accompagnement sur les outils internes et la démarche Qualiopi). |
 `,
   "Indicateur 21/Indicateur 21 - Fiche de poste comptable": `**FICHE DE POSTE — COMPTABLE**
 
