@@ -209,6 +209,46 @@ function fileTitle(key: string): string {
   return name;
 }
 
+/** Mappe un numéro d'indicateur Qualiopi vers son critère. */
+function critereForIndicateur(ind: number): number {
+  if (ind <= 3) return 1;
+  if (ind <= 8) return 2;
+  if (ind <= 16) return 3;
+  if (ind <= 20) return 4;
+  if (ind <= 22) return 5;
+  if (ind <= 29) return 6;
+  return 7;
+}
+
+/**
+ * Convertit un dossier source (ex: "Indicateur 10", "Indicateur 23 & 24 & 25")
+ * en chemin "Critere_X/Indicateur_Y" pour le ZIP final.
+ */
+function mapFolderToCriterePath(folder: string): string {
+  if (!folder) return "";
+  const m = folder.match(/Indicateur\s*(\d+)/i);
+  if (!m) return folder;
+  const ind = parseInt(m[1], 10);
+  const crit = critereForIndicateur(ind);
+  return `Critere_${crit}/Indicateur_${ind}`;
+}
+
+/** Convertit un zipPath source en chemin avec critère. */
+function mapAssetPathToCriterePath(zipPath: string): string {
+  if (zipPath.includes("/")) {
+    const idx = zipPath.indexOf("/");
+    const folder = zipPath.slice(0, idx);
+    const rest = zipPath.slice(idx + 1);
+    return `${mapFolderToCriterePath(folder)}/${rest}`;
+  }
+  const m = zipPath.match(/^Indicateur\s*(\d+)/i);
+  if (m) {
+    const ind = parseInt(m[1], 10);
+    return `${mapFolderToCriterePath(`Indicateur ${ind}`)}/${zipPath}`;
+  }
+  return zipPath;
+}
+
 export async function buildBDCNTConseilsZip(
   org: OrganismeInfo,
   formation: FormationInfo,
@@ -264,6 +304,7 @@ export async function buildBDCNTConseilsZip(
 
   for (const key of keys) {
     const folder = key.includes("/") ? key.split("/")[0] : "";
+    const critereFolder = mapFolderToCriterePath(folder);
     const baseName = fileTitle(key);
     const isPerBen = BDC_NT_PER_BENEFICIAIRE.has(key);
     const raw = BDC_NT_SOURCE[key];
@@ -273,15 +314,15 @@ export async function buildBDCNTConseilsZip(
         advance(`${baseName} — ${s.prenom} ${s.nom}`);
         const blob = await genDocx(raw, `${baseName} – ${s.prenom} ${s.nom}`, s);
         const benFolder = `Bénéficiaire - ${s.prenom} ${s.nom}`;
-        const path = folder
-          ? `${benFolder}/${folder}/${baseName}.docx`
+        const path = critereFolder
+          ? `${benFolder}/${critereFolder}/${baseName}.docx`
           : `${benFolder}/${baseName}.docx`;
         zip.file(path, blob);
       }
     } else {
       advance(baseName);
       const blob = await genDocx(raw, baseName, null);
-      const path = folder ? `${folder}/${baseName}.docx` : `${baseName}.docx`;
+      const path = critereFolder ? `${critereFolder}/${baseName}.docx` : `${baseName}.docx`;
       zip.file(path, blob);
     }
   }
@@ -293,7 +334,7 @@ export async function buildBDCNTConseilsZip(
       const res = await fetch(a.src);
       if (res.ok) {
         const buf = await res.arrayBuffer();
-        zip.file(a.zipPath, buf);
+        zip.file(mapAssetPathToCriterePath(a.zipPath), buf);
       }
     } catch (e) {
       console.warn("[BDC NT] asset failed", a.src, e);
