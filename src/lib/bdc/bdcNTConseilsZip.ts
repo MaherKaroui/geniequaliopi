@@ -1434,6 +1434,8 @@ function getPersonalizedRaw(key: string, s: StagiaireInfo | null, org: Organisme
   if (key === SAT_ENTREPRISE_KEY) return buildSatisfactionEntrepriseMd(s, org, dates, formation);
   if (key === SAT_FINANCEUR_KEY) return buildSatisfactionFinanceurMd(s, org, dates, formation);
   if (key === SAT_INTERNE_KEY) return buildSatisfactionInterneMd(s, org, dates, formation);
+  if (key === FICHE_ANALYSE_BESOIN_KEY) return buildFicheAnalyseBesoinMd(s, org, dates, formation);
+  if (key === FICHE_PREALABLE_KEY) return buildFichePrealableMd(s, org, dates, formation);
   return null;
 }
 
