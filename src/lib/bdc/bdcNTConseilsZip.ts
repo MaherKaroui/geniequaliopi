@@ -189,6 +189,33 @@ function applySubstitutions(src: string, org: OrganismeInfo, s: StagiaireInfo | 
   // Date de mise en application RI / CGV : toujours J-14 ouvrés avant début de formation
   txt = txt.replace(/\{DATE_REGLEMENT\}/g, dates.dateConvention);
   txt = txt.replace(/\{VILLE_ORG\}/g, org.ville || "[Ville]");
+  txt = txt.replace(/\{ORG_SIRET\}/g, orgSiret);
+  txt = txt.replace(/\{ORG_NDA\}/g, orgNda);
+  txt = txt.replace(/\{ORG_NOM\}/g, orgNom);
+  txt = txt.replace(/\{DIRIGEANT_ORG\}/g, dirigeantUpper);
+  txt = txt.replace(/\{LIEU_FORMATION\}/g, (formation?.lieu || orgAdresse || "[Lieu de formation]"));
+  txt = txt.replace(/\{DUREE_FORMATION\}/g, (() => {
+    const d = (formation?.duree || "").trim();
+    if (!d) return "24 heures";
+    return /heure/i.test(d) ? d : `${d} heures`;
+  })());
+  // Bloc d'informations bénéficiaire (utilisé dans la Convention de prestation)
+  if (s) {
+    const civ = s.civilite === "Mme" ? "Mme" : (s.civilite === "M." ? "M." : "");
+    const nomComplet = `${s.prenom || ""} ${s.nom || ""}`.trim();
+    const civNomBenef = [civ, nomComplet].filter(Boolean).join(" ");
+    txt = txt.replace(/\{CIV_NOM_BENEF\}/g, civNomBenef || "[Bénéficiaire]");
+    const adresseBenef = [s.adresse, [s.codePostal, s.commune].filter(Boolean).join(" ")]
+      .filter(Boolean).join(", ");
+    const lignes: string[] = [];
+    if (adresseBenef) lignes.push(`Adresse : ${adresseBenef}`);
+    if (s.email) lignes.push(`Email : ${s.email}`);
+    if (s.telephone) lignes.push(`Téléphone : ${s.telephone}`);
+    txt = txt.replace(/\{BENEF_INFOS_BLOC\}/g, lignes.join("\\\n"));
+  } else {
+    txt = txt.replace(/\{CIV_NOM_BENEF\}/g, "[Bénéficiaire]");
+    txt = txt.replace(/\{BENEF_INFOS_BLOC\}/g, "");
+  }
 
   // Placeholders Annuaire / Organigramme (IND 18)
   const respForm = (org.dirigeant || "[Responsable]").toString();
