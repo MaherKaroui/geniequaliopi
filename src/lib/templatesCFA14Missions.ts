@@ -887,6 +887,109 @@ export function genFicheDemandeMobiliteNationale(o: OrganismeInfo, f: FormationI
 }
 
 
+// ============================================================================
+// MISSION 10 — Fiche de poste « Référent Mobilité Nationale »
+// Auto-générée à partir des informations de l'organisme et de la formation.
+// ============================================================================
+export function genFichePosteReferentMobiliteNationale(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[] = []) {
+  const refNom = (o as any).referentMobilite || o.responsablePedagogique || o.dirigeant || "[À désigner]";
+  const annee = f.dateDebut ? new Date(f.dateDebut).getFullYear() : new Date().getFullYear();
+  const dateDispo = f.dateDebut ? formatDate(f.dateDebut) : `1ᵉʳ septembre ${annee}`;
+  const domaines = (o as any).domainesFormation || f.intitule || "[domaines de formation du CFA]";
+  const tel = o.telephone ? o.telephone : "—";
+  const adresse = o.adresse || "[Adresse du CFA]";
+
+  return buildDocument({
+    org: o,
+    title: "FICHE DE POSTE — RÉFÉRENT MOBILITÉ NATIONALE & INTERNATIONALE",
+    sections: [
+      {
+        heading: "Cadre du poste",
+        content: `<p>Conformément à la <strong>Mission 10 (Art. L6231-2 du Code du Travail)</strong>, le CFA <strong>${o.nom}</strong> désigne un <strong>Référent Mobilité Nationale et Internationale</strong>, interlocuteur privilégié des apprentis souhaitant effectuer tout ou partie de leur formation dans une autre région française ou à l'étranger (Erasmus+).</p><p><em>Fiche de poste générée automatiquement à partir des informations de l'organisme (${o.nom} — SIRET ${o.siret} — NDA ${o.nda}).</em></p>`,
+      },
+      {
+        heading: "Identification du poste",
+        content: tableHTML(
+          ["Rubrique", "Information"],
+          [
+            ["Intitulé du poste", "Référent Mobilité Nationale et Internationale du CFA"],
+            ["Fiche métier", "Référent mobilité — Accompagnement des parcours de mobilité des apprentis"],
+            ["Numéro de poste", "Mission 10 — L6231-2"],
+            ["Type de contrat", "CDI / CDD / Détachement interne"],
+            ["Quotité", "Temps plein ou temps partiel selon effectif d'apprentis"],
+            ["Poste à pourvoir à compter du", dateDispo],
+          ]
+        ),
+      },
+      {
+        heading: "Localisation",
+        content: `<p><strong>${o.nom}</strong><br><strong>Adresse :</strong> ${adresse}</p>`,
+      },
+      {
+        heading: "Description de la structure",
+        content: `<p>${o.nom} est un Centre de Formation d'Apprentis (CFA) intervenant dans les domaines suivants : <strong>${domaines}</strong>. L'établissement accompagne ses apprentis tout au long de leur parcours et déploie les 14 missions définies par l'article L6231-2 du Code du Travail, dont la mobilité nationale et internationale.</p><p>Dans une logique d'ouverture et d'enrichissement des parcours, ${o.nom} encourage activement la mobilité de ses apprentis : mobilité inter-CFA en France (plateaux techniques, modules de spécialisation) et mobilité Erasmus+ à l'étranger.</p>`,
+      },
+      {
+        heading: "Nature du poste",
+        content: tableHTML(
+          ["Rubrique", "Détail"],
+          [
+            ["Intitulé", "Référent Mobilité Nationale et Internationale"],
+            ["Contexte hiérarchique", `Sous l'autorité de ${o.dirigeant || "la Direction"}, en lien avec ${o.responsablePedagogique || "le Responsable Pédagogique"}`],
+            ["Encadrement", "Non"],
+            ["Rattachement administratif", o.nom],
+          ]
+        ),
+      },
+      {
+        heading: "Missions principales",
+        content: `<p>Dans le cadre du projet d'établissement et de la certification Qualiopi de <strong>${o.nom}</strong>, le Référent Mobilité assure les missions suivantes :</p><p>• <strong>Accompagnement individuel</strong> des apprentis dans la définition et la mise en œuvre de leur projet de mobilité (nationale ou Erasmus+).<br>• <strong>Vérification</strong> des documents administratifs et contractuels liés aux bourses de mobilité (Erasmus+, aides régionales, ARA, Mobili-Jeune…).<br>• <strong>Saisie et suivi</strong> sur les bases de données institutionnelles (Mobility Tool+, Beneficiary Module, plateformes régionales).<br>• <strong>Relance, classement et archivage</strong> des dossiers de mobilité dans l'espace partagé du CFA.<br>• <strong>Organisation des réunions</strong> du réseau Référents Mobilité, suivi et comptes-rendus.<br>• <strong>Animation</strong> du réseau de CFA partenaires (France) et d'établissements d'accueil (Europe).<br>• <strong>Suivi des projets individuels</strong> de mobilité (préparation, départ, suivi à distance, retour, Europass Mobilité).<br>• <strong>Écoute et dialogue</strong> avec les apprenants pour préciser, mettre en œuvre et sécuriser leur projet de mobilité.<br>• <strong>Participation</strong> au groupe de travail interne qualité dans une démarche d'amélioration continue de la mobilité.<br>• <strong>Représentation</strong> de ${o.nom} lors d'événements liés à la mobilité européenne et nationale.</p>`,
+      },
+      {
+        heading: "Spécificités du poste / contraintes",
+        content: `<p>• <strong>Haut niveau de responsabilité</strong> : pilotage et coordination des programmes de mobilité nationale et internationale, gestion simultanée de plusieurs dossiers dans des délais contraints.<br>• <strong>Environnement exigeant</strong> : capacité à gérer les urgences (annulations, problèmes administratifs, situations d'apprentis à l'étranger) et à proposer des solutions rapides.<br>• <strong>Heures de travail</strong> : amplitude variable en période de campagne Erasmus+ et de départs ; déplacements ponctuels (réunions réseau, événements partenaires).<br>• <strong>Confidentialité</strong> : traitement de données personnelles, financières et médicales des apprentis (RGPD).</p>`,
+      },
+      {
+        heading: "Profil souhaité",
+        content: tableHTML(
+          ["Qualités requises", "Connaissances professionnelles", "Savoir-faire opérationnel / comportemental"],
+          [
+            [
+              "• Sens de l'organisation, rigueur et attention aux détails<br>• Maîtrise de Microsoft Pack Office<br>• Ouverture d'esprit et intérêt pour l'international<br>• Aisance relationnelle et bonne communication<br>• Capacité à travailler en équipe à distance et en présentiel<br>• Anglais (niveau B2 minimum souhaité)",
+              "<strong>N°1 :</strong> Connaissance de l'environnement institutionnel de l'apprentissage et de la mobilité (Erasmus+, France Compétences, OPCO, Régions).<br><br><strong>N°2 :</strong> Connaissance générale des dispositifs institutionnels, financiers et budgétaires en matière de coopération nationale et internationale.<br><br><strong>N°3 :</strong> Connaissance des techniques de gestion administrative et financière des bourses et conventions de mobilité.",
+              "• Planification de ses tâches et travail en réseau<br>• Proposer des veilles informationnelles<br>• Maîtrise des outils dédiés (Pack Office, Mobility Tool+, ENT du CFA)<br>• Capacité à gérer les urgences<br>• Sens de l'organisation et du discernement<br>• Capacité à prendre des initiatives<br>• Sens de l'écoute et de la communication",
+            ],
+          ]
+        ),
+      },
+      {
+        heading: "Formation et/ou expérience professionnelle souhaitée(s)",
+        content: `<p>• Parcours de professionnalisation des référents mobilité (réseau Erasmus+ France, Agence Erasmus+ Éducation/Formation).<br>• <strong>Bac+3 à Bac+5</strong> en Ressources Humaines, Sciences de l'Éducation, Relations Internationales, Gestion de projet ou équivalent.<br>• Expérience souhaitée en CFA, organisme de formation ou structure d'accompagnement de la mobilité (1 à 3 ans).<br>• Connaissance du programme <strong>Erasmus+ 2021-2027</strong> appréciée.<br>• Offres de formation gratuites disponibles via les opérateurs de compétences et les agences nationales.</p>`,
+      },
+      {
+        heading: "Contact",
+        content: tableHTML(
+          ["Nom du référent", "Téléphone", "Email"],
+          [[refNom, tel, o.email || "—"]]
+        ),
+      },
+      {
+        heading: "Adresse",
+        content: `<p><strong>${adresse}</strong></p><p><strong>Poste à pourvoir à compter du :</strong> ${dateDispo}</p>`,
+      },
+      {
+        heading: "Validation",
+        content: `<p>Fiche de poste validée par <strong>${o.dirigeant || "la Direction"}</strong> — ${o.nom}<br>Date : ${formatDate(new Date().toISOString())}</p>`,
+        variant: "green",
+      },
+    ],
+  });
+}
+
+
+
+
+
 export function genProcedureAccompagnementPostFormationCFA(o: OrganismeInfo) {
   return buildDocument({
     org: o,
