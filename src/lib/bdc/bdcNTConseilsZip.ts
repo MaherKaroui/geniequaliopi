@@ -191,7 +191,7 @@ function applySubstitutions(src: string, org: OrganismeInfo, s: StagiaireInfo | 
   <thead>
     <tr style="background:#eef2f7;">
       <th style="border:1px solid #cbd5e1;padding:10px;text-align:left;width:50%;">Pour l'organisme — ${org.nom || ""}</th>
-      <th style="border:1px solid #cbd5e1;padding:10px;text-align:left;width:50%;">Pour l'apprenant — ${nomStagiaire}</th>
+      <th style="border:1px solid #cbd5e1;padding:10px;text-align:left;width:50%;">Pour le bénéficiaire — ${nomStagiaire}</th>
     </tr>
   </thead>
   <tbody>
