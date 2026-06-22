@@ -112,7 +112,7 @@ function applySubstitutions(src: string, org: OrganismeInfo, s: StagiaireInfo | 
     [/SIRET\s*XXX/gi, `SIRET ${orgSiret}`],
     [/Fait\s+à\s+Saint[-\s]?\s*Denis\s+le\s+\d{2}\/\d{2}\/\d{4}/gi, `Fait à ${villeOrg} le ${dates.dateConvention}`],
     [/Fait\s+à\s+Saint[-\s]?\s*Denis/gi, `Fait à ${villeOrg}`],
-    [/01\/01\/2026/g, fmtShortDate(parseDateFR(dates.dateVersion) || new Date())],
+    [/01\/01\/2026/g, fmtShortDate(minusBusinessDays(parseDateFR(s?.dateDebutFormation) || parseDateFR(formation?.dateDebut) || new Date(), 14))],
     // Dirigeant : remplace toutes les occurrences du nom NT Conseils par le dirigeant de l'organisme
     [/ABDOULHALIK\s+ANTTOISSE/gi, dirigeantUpper],
     [/ABDULHALIK\s+ANTTOISSE/gi, dirigeantUpper],
@@ -128,9 +128,14 @@ function applySubstitutions(src: string, org: OrganismeInfo, s: StagiaireInfo | 
 
   // Tampon de l'organisme sous "Président" (contrat Droit à l'image)
   if (org.tamponUrl) {
-    const tamponImg = `\n\n<img src="${org.tamponUrl}" alt="Tampon ${orgNom}" style="max-height:110px;max-width:200px;display:block;margin:8px 0;" />`;
-    txt = txt.replace(/(^|\n)Président\s*$/m, `$1Président${tamponImg}`);
+    const tamponImg = `<img src="${org.tamponUrl}" alt="Tampon ${orgNom}" style="max-height:120px;max-width:220px;display:block;margin:6px 0;object-fit:contain;" />`;
+    // Insère le tampon juste après une ligne "Président" (avec ou sans espaces/ponctuation)
+    if (/(^|\n)\s*Président\s*\.?\s*$/m.test(txt)) {
+      txt = txt.replace(/((^|\n)\s*Président\s*\.?\s*)$/m, `$1\n\n${tamponImg}\n`);
+    }
   }
+
+
 
 
   if (s) {
