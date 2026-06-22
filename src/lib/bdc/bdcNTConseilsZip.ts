@@ -398,25 +398,24 @@ function mdToHtmlBody(md: string): string {
   return out.join("\n");
 }
 
-/** Markdown → HTML complet autonome (utilisé pour l'export ZIP DOCX). */
-function mdToHtml(md: string, title: string): string {
-  const esc = (s: string) => s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+/** Markdown → HTML complet autonome — utilise la charte commune Qualiopi (orgHeader + footer). */
+function mdToHtml(md: string, title: string, org: OrganismeInfo, stagiaire: StagiaireInfo | null): string {
   const body = mdToHtmlBody(md);
-  return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${esc(title)}</title>
-<style>
-body{font-family:Calibri,Arial,sans-serif;font-size:11pt;color:#1a1a2e;line-height:1.45}
-h1{font-size:18pt;color:#0b2545;border-bottom:2px solid #1d4ed8;padding-bottom:6px;margin-top:0}
-h2{font-size:14pt;color:#0b2545;margin-top:18px}
-h3{font-size:12pt;color:#1d4ed8;margin-top:14px}
-.bdc-table{border-collapse:collapse;margin:8px 0;width:100%;border:1px solid #999;font-size:10pt}
-.bdc-table td,.bdc-table th{border:1px solid #bbb;padding:6px;vertical-align:top}
-strong{color:#0b2545}
-ul,ol{margin:6px 0 8px 22px}
-.footer{margin-top:30px;border-top:1px solid #ccc;padding-top:8px;font-size:9pt;color:#475569;text-align:center}
-</style></head><body>
-<h1>${esc(title)}</h1>
-${body}
-</body></html>`;
+  const beneficiaireLine = stagiaire
+    ? `<div style="margin:6px 0 18px;color:#475569;font-size:12px">Bénéficiaire : <strong>${stagiaire.prenom} ${stagiaire.nom}</strong></div>`
+    : "";
+  const content =
+    orgHeader(org, title) +
+    beneficiaireLine +
+    `<div class="bdc-doc-body">${body}</div>` +
+    `<style>.bdc-doc-body table{border-collapse:collapse;width:100%;margin:8px 0;font-size:11px}` +
+    `.bdc-doc-body table td,.bdc-doc-body table th{border:1px solid #bbb;padding:6px;vertical-align:top}` +
+    `.bdc-doc-body h1{font-size:18pt;color:#0b2545;margin-top:0}` +
+    `.bdc-doc-body h2{font-size:14pt;color:#0b2545;margin-top:18px}` +
+    `.bdc-doc-body h3{font-size:12pt;color:#1d4ed8;margin-top:14px}` +
+    `.bdc-doc-body strong{color:#0b2545}` +
+    `.bdc-doc-body ul,.bdc-doc-body ol{margin:6px 0 8px 22px}</style>`;
+  return htmlWrap(content);
 }
 
 
