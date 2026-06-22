@@ -485,7 +485,7 @@ function buildTestPositionnementMd(
   const profile = formation ? getBdcDomainProfile(formation) : null;
   const metier = profile?.metier || "le métier visé";
   const secteur = profile?.secteur || "le secteur visé";
-  const missions = profile?.missions || [];
+  void (profile?.missions || []);
   const techniques = profile?.techniques || [];
   const transversales = profile?.transversales || [];
   const formationsProf = profile?.formations || [];
