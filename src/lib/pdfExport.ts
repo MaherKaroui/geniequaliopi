@@ -418,6 +418,21 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
 
           for (const child of getRenderableChildNodes(clone)) {
             if (child instanceof HTMLElement && child.tagName === "TABLE") {
+              if (nodeFitsOnFreshPage(host, child, footerHtml, footerHeightPx, PAGE_W_PX, PAGE_H_PX)) {
+                const wholeTable = child.cloneNode(true);
+                splitWrapper.appendChild(wholeTable);
+                if (current.content.scrollHeight > current.content.clientHeight + 1) {
+                  splitWrapper.removeChild(wholeTable);
+                  current = createPage(host, footerHtml, footerHeightPx, PAGE_W_PX, PAGE_H_PX);
+                  pages.push(current.page);
+                  splitWrapper = makeShell(clone);
+                  current.content.appendChild(splitWrapper);
+                  splitWrapper.appendChild(wholeTable);
+                }
+                oversizedTableStarted = true;
+                continue;
+              }
+
               if (splitWrapper.childNodes.length === 0 && current.content.childNodes.length > 0) current.content.removeChild(splitWrapper);
               let currentTable = cloneTableShell(child);
               if (current.content.scrollHeight + child.offsetHeight > current.content.clientHeight + 1 && !oversizedTableStarted) {
