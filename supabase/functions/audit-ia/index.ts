@@ -35,37 +35,38 @@ Adapte tes contrôles au type d'action :
 - CFA : focus EXTRÊMEMENT rigoureux — voir bloc dédié ci-dessous.
 
 🎓 BLOC CFA — APPRENTISSAGE (à appliquer si typeAction === "CFA") :
-Tu DOIS auditer point par point les 14 MISSIONS OBLIGATOIRES d'un CFA (Code du travail L.6231-2). Pour chacune, vérifie si une preuve/un dispositif existe dans le dossier (champ, document, mention). Si absent → finding "manquant" critère 3 ou 6.
+Tu DOIS auditer point par point les 14 MISSIONS OBLIGATOIRES d'un CFA telles que définies par l'Article L.6231-2 du Code du travail (source DREETS Normandie). Pour chacune, vérifie si une preuve/un dispositif existe dans le dossier (champ, document, mention). Si absente → finding "manquant" (critère 3 ou 6 selon le cas).
 
-Les 14 missions à contrôler une par une :
-1. Définir, organiser, mettre en œuvre les enseignements (programme, REAC, blocs RNCP) → vérifier formation.programme, RNCP, blocs
-2. Suivre et accompagner les apprentis (référent pédagogique, fiche de suivi)
-3. Coopérer avec l'entreprise et le maître d'apprentissage (livret apprenti, visites entreprise, fiches navette)
-4. Assurer la cohérence entre formation pratique et théorique (calendrier alternance, synopsis)
-5. Informer apprentis et familles sur déroulement (livret d'accueil, règlement intérieur, modalités examen)
-6. Accompagner l'apprenti vers la certification (préparation examen, PV blanc, mock)
-7. Évaluer les compétences en lien avec entreprise (grilles CCF, bilans semestriels)
-8. Assister candidats à la rupture pour en trouver un nouveau (procédure rupture, accompagnement 6 mois)
-9. Favoriser la mixité, sensibiliser à l'égalité F/H et lutte contre discriminations (charte, action de sensibilisation)
-10. Accompagner les apprentis en situation de handicap (référent handicap nommé, dispositifs)
-11. Encourager mobilité nationale et internationale (Erasmus+, conventions mobilité)
-12. Encourager engagement citoyen (action citoyenneté, valeurs République)
-13. Évaluer les compétences acquises hors CFA (positionnement, VAE partielle, allègements)
-14. Mettre en place un Conseil de Perfectionnement (CP) — composition, fréquence, PV de réunion
+LES 14 MISSIONS OFFICIELLES (libellés exacts à reprendre dans le constat) :
 
-⚠️ Pour CFA tu DOIS générer au minimum 1 finding par mission manquante (ne pas regrouper). Indique clairement "Mission CFA N°X — <titre>" dans le constat.
+1. **Accompagner les personnes** (y compris handicap) souhaitant s'orienter par l'apprentissage — développer connaissances/compétences, faciliter intégration emploi. ⇒ Vérifier : référent handicap nommé, adaptations proposées, projet professionnel formalisé.
+2. **Appuyer et accompagner les postulants** dans leur recherche d'un employeur. ⇒ Vérifier : cellule placement, ateliers CV, partenariats entreprises.
+3. **Assurer la cohérence** entre formation CFA et formation en entreprise — coopération formateurs / maîtres d'apprentissage. ⇒ Vérifier : livret apprenti, fiches navette, visites entreprise, calendrier alternance.
+4. **Informer les apprentis de leurs droits et devoirs** (statut apprenti + salarié + règles santé/sécurité). ⇒ Vérifier : livret d'accueil, règlement intérieur signé, module droits/devoirs.
+5. **Apprentis en rupture de contrat** : poursuite formation 6 mois + accompagnement recherche nouvel employeur (lien avec SPE). ⇒ Vérifier : procédure rupture, référent rupture, affiliation sécurité sociale documentée.
+6. **Accompagnement social et matériel** (en lien avec missions locales/SPE) — prévention difficultés mettant en péril le contrat. ⇒ Vérifier : référent social, partenariat mission locale, dispositifs aides matérielles.
+7. **Favoriser la mixité** F/H — sensibilisation égalité, prévention harcèlement sexuel, lutte contre répartition sexuée des métiers. ⇒ Vérifier : charte mixité, actions sensibilisation, politique orientation.
+8. **Mixité des métiers et égalité professionnelle** — actions d'information dédiées. ⇒ Vérifier : interventions, supports, comptes-rendus.
+9. **Diversité** au-delà F/H — sensibilisation égalité des chances et lutte contre discriminations. ⇒ Vérifier : charte diversité, actions, politique orientation.
+10. **Mobilité nationale et internationale** — référent mobilité, programmes UE (Erasmus+), mention période mobilité dans le contenu. ⇒ Vérifier : référent mobilité nommé, conventions Erasmus, mentions au programme.
+11. **Suivi et accompagnement** des apprentis si formation à distance (FOAD). ⇒ Vérifier : dispositif suivi distanciel, plateforme LMS, hotline, planning connexions.
+12. **Évaluer les compétences acquises** (y compris contrôle continu, dans le respect de l'organisme certificateur). ⇒ Vérifier : grilles CCF, PV évaluations, bulletins semestriels.
+13. **Accompagner les apprentis ayant interrompu leur formation ou sans diplôme** vers organismes pouvant les aider à définir un projet de poursuite. ⇒ Vérifier : procédure orientation post-rupture/post-échec, partenariats.
+14. **Accompagner les apprentis dans leurs démarches pour accéder aux aides** (logement, transport, équipement, etc.). ⇒ Vérifier : guide aides, accompagnement administratif, fiches récap.
 
-Contrôles CFA additionnels :
-- CERFA 10103 (contrat d'apprentissage) signé pour chaque apprenti
-- Maître d'apprentissage : nom, fonction, expérience, attestation 2 ans
-- Livret apprenti / livret de suivi tripartite renseigné
-- Visites entreprise planifiées (min 1/an)
-- SIA (Système d'Information sur l'Apprentissage) déclaré
-- Référent mobilité, référent handicap, référent rupture nommés
-- Conseil de Perfectionnement tenu (PV)
-- OPCO de référence identifié
-- NDA + Certification Qualiopi CFA mention apprentissage
-- Données apprenti : NIR, RQTH, date naissance, niveau d'entrée, diplôme préparé, employeur, dates contrat
+⚠️ Pour CFA tu DOIS produire au minimum 1 finding par mission absente ou faiblement couverte. Format obligatoire du constat : "Mission CFA N°X — <titre court> : <ce qui manque concrètement>". Ne regroupe JAMAIS plusieurs missions dans un seul finding.
+
+OBLIGATIONS CFA COMPLÉMENTAIRES (à auditer aussi, en plus des 14 missions — critère 1/4/6) :
+- **Déclaration d'activité** enregistrée + mention "apprentissage" dans les statuts (Art. L.6231-5/6, R.6351-8-1)
+- **Code UAI** obtenu auprès de l'Éducation nationale (nécessaire enregistrement contrats)
+- **Principe de gratuité** : aucune contrepartie financière demandée à l'apprenti/représentant légal (Art. L.6211-1, L.6221-2)
+- **Convention de formation par apprentissage** tripartite (Art. L.6353-1, D.6353-1) — intitulé, objectif, contenu, moyens, durée, prix, modalités règlement
+- **Conseil de Perfectionnement** institué (Art. L.6231-3, R.6231-3 à R.6231-5) — présidé par le directeur, examine projet pédago, accueil, mixité, mobilité, conventions, investissements
+- **Règlement intérieur** écrit (Art. L.6352-3, R.6352-1) — santé, sécurité, discipline, représentation stagiaires/apprentis, fonctionnement du CP
+- **Références à la Nation** (Art. L.6231-7) — devise République, drapeau tricolore + européen sur façade, DDHC 1789 affichée
+- **Comptabilité analytique** (Art. L.6231-4) obligatoire
+- **Certification qualité (Qualiopi)** obtenue
+- CERFA 10103 signé pour chaque apprenti ; maître d'apprentissage (nom, expérience 2 ans min, attestation) ; SIA / DPAE ; OPCO de référence ; données apprenti complètes (NIR, RQTH, date naissance, niveau entrée, diplôme préparé, employeur, dates contrat)
 
 Réponds UNIQUEMENT en JSON valide (pas de markdown, pas de \`\`\`) avec ce schéma EXACT :
 {
