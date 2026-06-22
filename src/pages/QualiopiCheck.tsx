@@ -4,9 +4,31 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { ArrowLeft, AlertTriangle, CheckCircle2, XCircle, RefreshCw, ShieldCheck, Search } from "lucide-react";
+import { ArrowLeft, AlertTriangle, CheckCircle2, XCircle, RefreshCw, ShieldCheck, Search, Sparkles, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { buildFullCatalog } from "@/lib/docCatalog";
 
 type Severity = "error" | "warning" | "info";
+type AuditType = "AF" | "BC" | "VAE" | "CFA";
+type AiSeverity = "critical" | "major" | "minor" | "info";
+
+interface AiFinding {
+  severity: AiSeverity;
+  categorie: "manquant" | "incoherence" | "incorrect" | "amelioration";
+  critere: number;
+  indicateur: number;
+  zone: string;
+  constat: string;
+  impact: string;
+  action: string;
+}
+
+interface AiAudit {
+  scoreGlobal: number;
+  synthese: string;
+  findings: AiFinding[];
+}
 
 interface CheckRow {
   critere: number;
