@@ -485,8 +485,12 @@ function preprocessGridTables(md: string): string {
     let headerRowIdx = -1;
     for (const bl of block) {
       if (isBorder(bl)) {
-        if (/=/.test(bl)) headerRowIdx = rows.length - 1;
-        if (curHas) { rows.push(cur.map(cleanCell)); cur = new Array(nCols).fill(""); curHas = false; }
+        if (curHas) {
+          rows.push(cur.map(cleanCell));
+          if (/=/.test(bl)) headerRowIdx = rows.length - 1;
+          cur = new Array(nCols).fill("");
+          curHas = false;
+        }
         continue;
       }
       if (!/^\|/.test(bl)) {
@@ -495,19 +499,28 @@ function preprocessGridTables(md: string): string {
       }
       for (let k = 0; k < nCols; k++) {
         const a = cols[k] + 1, b = Math.min(cols[k + 1], bl.length);
-        const slice = bl.slice(a, b).replace(/\s+$/, "").replace(/^\s+/, "");
-        if (slice) { cur[k] = cur[k] ? cur[k] + " " + slice : slice; curHas = true; }
+        const slice = bl.slice(a, b).replace(/^\s*\|\s*/, "").replace(/\s*\|\s*$/, "").trim();
+        if (slice) {
+          cur[k] = cur[k] ? cur[k] + (cur[k].endsWith("§§BR§§") ? "" : " ") + slice : slice;
+          curHas = true;
+        } else if (cur[k]) {
+          cur[k] = cur[k] + "§§BR§§";
+        }
       }
     }
     if (curHas) rows.push(cur.map(cleanCell));
 
     if (rows.length > 0) {
-      const headerIdx = headerRowIdx >= 0 ? headerRowIdx : 0;
       const join = (cells: string[]) => "| " + cells.map(c => (c.replace(/ +/g, " ") || " ")).join(" | ") + " |";
       out.push("");
-      out.push(join(rows[headerIdx]));
-      out.push("|" + rows[headerIdx].map(() => "---").join("|") + "|");
-      for (let r = 0; r < rows.length; r++) { if (r === headerIdx) continue; out.push(join(rows[r])); }
+      if (headerRowIdx >= 0) {
+        out.push(join(rows[headerRowIdx]));
+        out.push("|" + rows[headerRowIdx].map(() => "---").join("|") + "|");
+        for (let r = 0; r < rows.length; r++) { if (r === headerRowIdx) continue; out.push(join(rows[r])); }
+      } else {
+        out.push("§§NOHEADER_TABLE§§");
+        for (const row of rows) out.push(join(row));
+      }
       out.push("");
     }
     i = j;
@@ -542,14 +555,14 @@ function mdToHtmlBody(md: string): string {
   const lines = allLines.slice(start);
   const out: string[] = [];
   const paragraphBuffer: string[] = [];
-  let inUl = false, inOl = false, inTable = false, tableRowIdx = 0;
+  let inUl = false, inOl = false, inTable = false, tableRowIdx = 0, tableHasHeader = true;
   const flushParagraph = () => {
     if (paragraphBuffer.length === 0) return;
     out.push(`<p>${inline(paragraphBuffer.join(" ").replace(/\s+/g, " ").trim())}</p>`);
     paragraphBuffer.length = 0;
   };
   const closeLists = () => { if (inUl){out.push("</ul>");inUl=false;} if(inOl){out.push("</ol>");inOl=false;} };
-  const closeTable = () => { if (inTable){out.push("</table>");inTable=false;tableRowIdx=0;} };
+  const closeTable = () => { if (inTable){out.push("</table>");inTable=false;tableRowIdx=0;tableHasHeader=true;} };
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
@@ -565,6 +578,13 @@ function mdToHtmlBody(md: string): string {
       if (!nextIsListItem) closeLists();
       closeTable();
       out.push("");
+      continue;
+    }
+    if (trimmed === "§§NOHEADER_TABLE§§") {
+      flushParagraph();
+      closeLists();
+      closeTable();
+      tableHasHeader = false;
       continue;
     }
     let m = trimmed.match(/^(#{1,6})\s+(.*)$/);
@@ -598,7 +618,7 @@ function mdToHtmlBody(md: string): string {
       const inner = trimmed.replace(/\s+$/, "").slice(1, -1);
       const cells = inner.split(/(?<!\\)\|/).map(c => c.replace(/\\\|/g, "|").trim());
       if (cells.every(c => /^:?-+:?$/.test(c) || c === "")) continue;
-      const tag = tableRowIdx === 0 ? "th" : "td";
+      const tag = tableHasHeader && tableRowIdx === 0 ? "th" : "td";
       out.push("<tr>" + cells.map(c => `<${tag}>${inline(c)}</${tag}>`).join("") + "</tr>");
       tableRowIdx++;
       continue;
