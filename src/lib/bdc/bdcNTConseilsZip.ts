@@ -506,13 +506,14 @@ export function renderBdcNTDocHtml(
   key: string,
   org: OrganismeInfo,
   stagiaire: StagiaireInfo | null,
+  formation?: FormationInfo,
 ): string {
   const raw = BDC_NT_SOURCE[key];
   const title = bdcDocTitle(key);
   if (!raw) {
     return htmlWrap(orgHeader(org, title) + `<p style="color:#b91c1c">Document BDC introuvable (clé : ${key}).</p>` + docFooter(org));
   }
-  const dates = computeDates(stagiaire || undefined, org);
+  const dates = computeDates(stagiaire || undefined, org, formation);
   const personalized = getPersonalizedRaw(key, stagiaire, org, dates);
   const effectiveRaw = personalized ?? raw;
   let md = applySubstitutions(effectiveRaw, org, stagiaire, dates);
