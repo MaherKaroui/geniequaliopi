@@ -78,6 +78,7 @@ function minusBusinessDays(d: Date, n: number, skipHolidays = false): Date {
 
 interface DatesCtx {
   dateConvention: string;    // J-14 ouvrés avant début
+  dateOutilPrep: string;     // J-20 ouvrés (weekends + jours fériés) avant début
   dateDebut: string;
   dateFin: string;
   dateMiParcours: string;
@@ -97,11 +98,13 @@ function computeDates(s?: StagiaireInfo, org?: OrganismeInfo, formation?: Format
     || parseDateFR(formation?.dateFin)
     || debut;
   const conv = minusBusinessDays(debut, 14);
+  const outilPrep = minusBusinessDays(debut, 20, true);
   const mi = new Date((debut.getTime() + fin.getTime()) / 2);
   const bilanTermine = fin.getTime() <= today.getTime();
   const versionD = parseDateFR(org?.dateMaj) || new Date(debut.getFullYear(), 0, 1);
   return {
     dateConvention: fmtLongDate(conv),
+    dateOutilPrep: fmtLongDate(outilPrep),
     dateDebut: fmtLongDate(debut),
     dateFin: fmtLongDate(fin),
     dateMiParcours: fmtLongDate(mi),
