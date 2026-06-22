@@ -334,8 +334,9 @@ portable (Droit individuel à la formation). Enfin, il est également
 possible de mobiliser son Compte personnel de formation (CPF) pour
 réaliser un bilan de compétences.
 `,
-  "Indicateur 1/Indicateur 1 - Pr\u00e9sentation du bilan de comp\u00e9tences": `**Bilan de compétences NT Conseils\\
-V1 -- 01/01/2026**
+  "Indicateur 1/Indicateur 1 - Pr\u00e9sentation du bilan de comp\u00e9tences": `**Bilan de compétences NT Conseils**
+
+
 
 **PUBLIC CONCERNE :**
 
