@@ -948,6 +948,106 @@ export function genProcedureRuptureContratApprentissageCFA(o: OrganismeInfo) {
   ] });
 }
 
+// ========== IND 10 — Mission 5 : LES CAS DE RUPTURE (version détaillée fidèle au document de référence) ==========
+
+export function genCasRuptureContratApprentissageCFA(o: OrganismeInfo) {
+  return buildDocument({ org: o, title: "LES CAS DE RUPTURE DU CONTRAT D'APPRENTISSAGE", sections: [
+    { heading: "Préambule", content: `<p>Le contrat d'apprentissage est un contrat de travail conclu entre un employeur et un apprenti dans le cadre d'une formation initiale. Il permet à l'apprenti d'acquérir des compétences professionnelles sanctionnées par un diplôme d'État ou un titre reconnu au Répertoire National des Certifications Professionnelles (<strong>RNCP</strong>).</p>
+<p>Le déroulement de la formation en contrat d'apprentissage repose sur l'alternance : une formation théorique dans un organisme de formation et une mise en pratique au sein d'une entreprise.</p>
+<p>En principe, le contrat d'apprentissage prend fin à son terme, mais comme tout contrat de travail, il peut aussi être rompu à d'autres moments. La rupture peut être à l'initiative de <strong>l'employeur</strong>, du <strong>salarié</strong> ou de <strong>l'administration</strong>.</p>` },
+
+    { heading: "1. Dans quels cas peut-on rompre un contrat d'apprentissage ?", content: `<p>Durant la <strong>période probatoire des 45 premiers jours</strong> de formation pratique (consécutifs ou non), l'employeur ou l'apprenti peuvent rompre le contrat sans motif et sans préavis.</p>
+<p>Pour le calcul de cette période d'essai, ne sont comptabilisées que les périodes en entreprise — les semaines en CFA sont exclues.</p>
+<p>La rupture pendant la période d'essai ne donne lieu à aucune indemnité. Elle doit être notifiée par écrit au Directeur du CFA en charge de la formation et à l'organisme d'enregistrement, puis transmise à la délégation locale de la <strong>DREETS</strong> (ex-DIRECCTE).</p>
+<p><strong>Au-delà de la période probatoire</strong>, la rupture anticipée ne peut être effectuée que dans certains cas : <em>commun accord</em> entre les parties ou <em>décision unilatérale</em> de l'une d'elles, selon des procédures bien définies. L'apprenti peut également demander une rupture anticipée lors de l'<strong>obtention de son diplôme</strong>.</p>` },
+
+    { heading: "2. Rupture à l'initiative de l'employeur", content: `<p>Durant la période probatoire, aucune indemnité n'est due au salarié, sauf stipulation contraire (art. <strong>L. 6222-21</strong> du Code du travail).</p>
+<p>L'employeur peut résilier le contrat en cas de <em>faute grave de l'apprenti</em> (refus d'exécuter les consignes, embauche par un autre employeur à l'issue d'un arrêt maladie…) ou d'<em>inaptitude à exercer le métier</em>.</p>
+<p>L'inaptitude est validée à la suite d'un examen par un médecin (<em>inaptitude médicale</em>) ou par un centre d'information et d'orientation (<em>inaptitude professionnelle</em>), sur ordonnance du juge ou à la demande de l'employeur, de l'apprenti, de son représentant légal ou du directeur du CFA.</p>
+<p>Passé la période probatoire de 45 jours, la rupture est conclue :</p>
+<ul>
+<li><strong>Par accord</strong> entre l'employeur et l'apprenti, constaté par écrit et notifié au directeur du CFA, au responsable d'établissement, à la Chambre Consulaire ayant enregistré le contrat et à la DDT (Direction Départementale du Travail).</li>
+<li><strong>Par résiliation judiciaire</strong> à la suite d'une faute grave ou de l'inaptitude de l'apprenti. Cette résiliation est prononcée par le Conseil de prud'hommes que l'employeur est obligatoirement tenu de saisir. Pendant l'instance, l'apprenti est frappé d'une mise à pied conservatoire ; il peut bénéficier de son salaire s'il est prouvé qu'il n'est pas à l'origine de la rupture.</li>
+</ul>
+<p>En cas de <strong>non saisine</strong> du Conseil de prud'hommes, l'employeur est tenu de :</p>
+<ul>
+<li>Payer les salaires dûs jusqu'au terme (ou jusqu'au jour de la résiliation judiciaire).</li>
+<li>Verser des dommages et intérêts à l'apprenti — montant au moins égal au salaire qu'il aurait perçu jusqu'au terme du contrat.</li>
+</ul>` },
+
+    { heading: "2 bis. Changements des conditions de rupture à partir de 2019", content: `<p>La loi « <strong>Pour la liberté de choisir son avenir professionnel</strong> » a assoupli les conditions de rupture pour les contrats conclus à compter du <strong>1ᵉʳ janvier 2019</strong>.</p>
+<p>L'employeur n'est plus tenu de solliciter le Conseil des prud'hommes pour licencier un apprenti, s'il respecte la procédure de licenciement pour motif personnel ou disciplinaire prévue en cas de faute grave, inaptitude ou force majeure.</p>
+<p>L'<strong>exclusion définitive</strong> d'un apprenti du CFA constitue désormais une cause réelle et sérieuse de licenciement pour motif personnel.</p>` },
+
+    { heading: "3. La rupture du contrat à l'initiative du salarié", content: `<p>La loi « <strong>Avenir professionnel</strong> » ouvre droit à la démission pour l'apprenti, pour les contrats conclus à partir du <strong>1ᵉʳ janvier 2019</strong>, dans les conditions définies par le décret n° <strong>2018-1231</strong> du 24 décembre 2018.</p>
+<p>Pour faire valoir son droit à la démission, l'apprenti doit, sauf exception, saisir le <em>médiateur de l'apprentissage</em> désigné par les chambres consulaires dont il dépend, puis informer son employeur dans les <strong>5 jours suivants</strong> par lettre recommandée avec accusé de réception (ou tout moyen conférant date certaine).</p>
+<p>La rupture intervient ensuite dans un délai d'<strong>au moins 7 jours</strong> à compter de la notification.</p>` },
+
+    { heading: "3 bis. Conditions de rupture pour les contrats conclus avant le 01 janvier 2019", content: `<p>L'apprenti peut rompre le contrat en déposant sa démission uniquement pendant la période probatoire, ou suite à une faute de l'employeur à l'issue de celle-ci.</p>
+<p>Passé ce délai, le contrat peut être résilié :</p>
+<ul>
+<li><strong>Par accord commun</strong> entre l'employeur et l'apprenti (mêmes formalités que pour l'initiative de l'employeur).</li>
+<li><strong>Suite à l'obtention du diplôme ou du titre préparé</strong> — l'apprenti dispose d'un préavis de 1 mois pour informer l'employeur par écrit.</li>
+</ul>
+<p>Les autres cas de démission ne sont pas acceptés. Si l'employeur les acte tout de même, cela ouvre droit à indemnités au profit de l'apprenti. L'employeur peut alors demander la résiliation judiciaire du contrat.</p>` },
+
+    { heading: "3 ter. Rupture pour faute de l'employeur", content: `<p>En cas de faute ou de manquements répétés de l'employeur, l'apprenti peut demander la résiliation auprès du Conseil de prud'hommes. La résiliation peut être prononcée notamment dans les cas suivants :</p>
+<ul>
+<li><strong>Non règlement des sommes dues</strong> (Cass. Soc. n°92-42.427 du 06/12/1995).</li>
+<li><strong>Insalubrité des conditions d'hébergement</strong> de l'apprenti (CA Douai, 30 nov. 2000).</li>
+<li><strong>Violences</strong> à l'égard de l'apprenti (Cass. Soc. n°88-40.597 du 05/02/1992).</li>
+<li><strong>Manquements répétés</strong> aux dispositions règlementaires sur la durée du travail, l'interdiction du travail les jours fériés et le dimanche pour les salariés de moins de 18 ans (CA Versailles, 05 nov. 1999).</li>
+<li><strong>Suppression de l'hébergement</strong> dont bénéficiait l'apprenti (Cass. Soc. n°98-42.385).</li>
+</ul>
+<p>L'apprenti reste tenu d'exécuter son contrat jusqu'à ce que la décision du juge soit prononcée.</p>` },
+
+    { heading: "3 quater. Rupture anticipée après obtention du diplôme", content: `<p>L'<strong>article L115-2</strong> du Code du travail prévoit qu'un apprenti peut demander la rupture anticipée du contrat d'apprentissage en cas d'obtention du diplôme ou titre visé par la formation suivie.</p>
+<p>L'apprenti doit notifier sa décision à l'employeur par <strong>lettre recommandée A/R au minimum 1 mois avant</strong> la date souhaitée de rupture (décret n° <strong>2020-372 du 30 mars 2020</strong>, alinéa 8). Cette lettre précise la date d'effet et le motif. L'apprenti informe également son organisme de formation et la chambre consulaire concernée.</p>` },
+
+    { heading: "4. La rupture du contrat à l'initiative de l'administration", content: `<p>L'administration peut suspendre ou rompre le contrat d'apprentissage lorsque l'employeur manque à ses obligations ou que l'apprenti est mis en danger :</p>
+<ul>
+<li><em>Manquements de l'employeur</em> (dépassement des horaires, violation de l'obligation de formation, sans mise en danger) : le préfet peut interdire l'engagement d'apprentis et exiger la rupture des contrats en cours. L'employeur verse alors à l'apprenti les sommes qu'il aurait perçues jusqu'au terme.</li>
+<li><em>Changement d'employeur</em> : le contrat est automatiquement transmis au nouvel employeur, qui doit effectuer une déclaration pour accomplir la formation.</li>
+<li><em>Risques majeurs d'atteinte à la santé ou à l'intégrité physique et morale</em> : sévices physiques ou moraux (insultes, humiliations, harcèlement), exposition à des substances dangereuses sans protections, conduite de machines dangereuses, installations non conformes, infractions graves aux règlementations sur la durée du travail ou le travail de nuit. Le contrat peut être suspendu en urgence en vue d'une rupture.</li>
+</ul>` },
+
+    { heading: "4 bis. Procédures de l'administration pour rompre un contrat d'apprentissage", content: `<p>L'<strong>Inspection du travail</strong> effectue une enquête. Le directeur départemental du travail dispose de <strong>15 jours</strong> pour statuer sur la rupture ou la poursuite du contrat. Durant ce délai, l'apprenti continue à percevoir sa rémunération.</p>
+<p>Si la reprise du contrat n'est pas autorisée :</p>
+<ul>
+<li>Le contrat est rompu et l'employeur verse à l'apprenti les sommes qu'il aurait perçues jusqu'au terme. Le directeur départemental peut interdire temporairement le recrutement de nouveaux apprentis ou de jeunes en insertion professionnelle.</li>
+<li>L'apprenti peut demander la réparation du préjudice subi.</li>
+<li>Le titre de <strong>Maître d'apprentissage confirmé</strong> est retiré d'office si l'employeur en est le titulaire.</li>
+</ul>` },
+
+    { heading: "5. Conséquences de la rupture du contrat", content: `<p>En échange de son engagement de formation, l'employeur perçoit normalement des aides financières versées par l'État ou la Région.</p>
+<p>Si le contrat est rompu et que l'employeur a été reconnu en tort, ou si la rupture est prononcée par l'administration, il est alors tenu de reverser :</p>
+<ul>
+<li>L'<strong>indemnité forfaitaire</strong> reçue de la Région.</li>
+<li>Les <strong>exonérations de charges sociales</strong> et le <strong>crédit d'impôt</strong> dont il a bénéficié de la part de l'État.</li>
+</ul>
+<p>Par ailleurs, la loi « <strong>Avenir professionnel</strong> » prévoit, pour les contrats signés à partir du <strong>1ᵉʳ janvier 2019</strong>, que le CFA est désormais tenu de permettre à l'apprenti de continuer à suivre sa formation théorique pendant <strong>6 mois</strong> dans tous les cas de rupture à l'initiative de l'employeur, et doit contribuer à lui en trouver un nouveau (cf. <strong>Mission 5</strong> du CFA).</p>` },
+
+    { heading: "6. Engagement de l'organisme — Mission 5 du CFA", content: `<p><strong>${o.nom || "Le CFA"}</strong>, conformément à l'article <strong>L.6231-2</strong> du Code du travail et à la <strong>Mission 5</strong> des CFA, s'engage à :</p>
+<ul>
+<li><strong>Maintenir l'apprenti en formation pendant 6 mois maximum</strong> après la rupture, sans surcoût pour l'apprenti.</li>
+<li>L'<strong>accompagner activement</strong> dans la recherche d'un nouvel employeur (réunions individuelles, mise en relation avec le réseau partenaire, ateliers CV et entretien).</li>
+<li><strong>Notifier la rupture</strong> sous 30 jours à l'OPCO, à la DREETS et au financeur public, conformément aux obligations Qualiopi (IND 9 &amp; 10).</li>
+<li>Tracer la procédure dans le <strong>« Tableau de suivi des ruptures »</strong> et le <strong>« Plan de maintien en formation »</strong> archivés au dossier de l'apprenti.</li>
+</ul>
+<p>Référent à contacter en cas de rupture : <strong>${o.responsablePedagogique || "Référent pédagogique du CFA"}</strong>${o.email ? " — " + o.email : ""}${o.telephone ? " — " + o.telephone : ""}.</p>` },
+
+    { heading: "Textes de référence", content: `<ul>
+<li>Code du travail : articles <strong>L.6222-18</strong>, <strong>L.6222-21</strong>, <strong>L.6231-2</strong>, <strong>L.115-2</strong>.</li>
+<li>Loi n° <strong>2018-771</strong> du 5 septembre 2018 « Pour la liberté de choisir son avenir professionnel ».</li>
+<li>Décret n° <strong>2018-1231</strong> du 24 décembre 2018 (démission de l'apprenti).</li>
+<li>Décret n° <strong>2020-372</strong> du 30 mars 2020 (rupture après obtention du diplôme).</li>
+<li>Référentiel National Qualité <strong>Qualiopi V9</strong>, indicateurs <strong>9, 10 et 23</strong>.</li>
+</ul>` },
+  ] });
+}
+
+
+
 // ========== IND 10 — LIVRET D'APPRENTISSAGE ET MAÎTRE D'APPRENTISSAGE ==========
 
 export function genLivretApprentissageCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {

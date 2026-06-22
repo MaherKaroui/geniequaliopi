@@ -581,7 +581,7 @@ export function buildFullCatalog(
     add("cfa_c3i10_aff_contacts_ressources_handicap", "CT3 - IND 10 📁 AFFICHAGE – Contacts Ressources Handicap Formation", 3, 10, "pdf_static", { pdfUrl: "/pdfs/contacts_ressources_handicap.pdf" });
     // --- IND 10 — Mission 5 : maintien en formation 6 mois (rupture de contrat) ---
     add("cfa_c3i10_mission5_rupture_contrat", "CT3 - IND 10 📁 14 MISSIONS / Mission 5 – Maintien en formation 6 mois (rupture de contrat)", 3, 10, "procedure_rupture_contrat_apprentissage_cfa", { folder: "14_MISSIONS_CFA/Mission_5_Rupture_Contrat" });
-    add("cfa_c3i10_mission5_cas_rupture_pdf", "CT3 - IND 10 📁 14 MISSIONS / Mission 5 – Les cas de rupture du contrat d'apprentissage (PDF)", 3, 10, "pdf_static", { pdfUrl: "/pdfs/procedure_rupture_contrat_apprentissage.docx", folder: "14_MISSIONS_CFA/Mission_5_Rupture_Contrat" });
+    add("cfa_c3i10_mission5_cas_rupture_pdf", "CT3 - IND 10 📁 14 MISSIONS / Mission 5 – Les cas de rupture du contrat d'apprentissage (PDF)", 3, 10, "cas_rupture_contrat_apprentissage_cfa", { folder: "14_MISSIONS_CFA/Mission_5_Rupture_Contrat" });
     // --- IND 10 — Mission 6 : aides sociales et matérielles aux apprentis ---
     add("cfa_c3i10_mission6_aide_ara", "CT3 - IND 10 📁 14 MISSIONS / Mission 6 – Aide Régionale à l'Apprentissage (ARA)", 3, 10, "pdf_static", { pdfUrl: "/pdfs/aide_ara.png", folder: "14_MISSIONS_CFA/Mission_6_Accompagnement_Social_Materiel" });
     add("cfa_c3i10_mission6_aide_equipement", "CT3 - IND 10 📁 14 MISSIONS / Mission 6 – Aide Régionale Équipement Individuel", 3, 10, "pdf_static", { pdfUrl: "/pdfs/aide_regionale_equipement.png", folder: "14_MISSIONS_CFA/Mission_6_Accompagnement_Social_Materiel" });
