@@ -496,13 +496,16 @@ export async function buildBDCNTConseilsZip(
     if (isPerBen) {
       for (const s of benList) {
         advance(`${baseName} — ${s.prenom} ${s.nom}`);
-        const blob = await genDocx(raw, `${baseName} – ${s.prenom} ${s.nom}`, s);
+        const dts = computeDates(s, org);
+        const personalized = getPersonalizedRaw(key, s, org, dts);
+        const blob = await genDocx(personalized ?? raw, `${baseName} – ${s.prenom} ${s.nom}`, s);
         const benFolder = `Bénéficiaire - ${s.prenom} ${s.nom}`;
         const path = critereFolder
           ? `${benFolder}/${critereFolder}/${baseName}.docx`
           : `${benFolder}/${baseName}.docx`;
         zip.file(path, blob);
       }
+
     } else {
       advance(baseName);
       const blob = await genDocx(raw, baseName, null);
