@@ -194,36 +194,38 @@ function applySubstitutions(src: string, org: OrganismeInfo, s: StagiaireInfo | 
     .replace(/\{ORG_TEL\}/g, orgTel || "")
     .replace(/\{ORG_MAIL\}/g, orgEmail);
 
-  // Bloc signatures : tampon + signature organisme | signature apprenant
+  // Bloc signatures Qualiopi sobre : tampon/signature organisme à gauche,
+  // signature bénéficiaire à droite. Les deux images sont affichées si présentes.
   const tampon = org.tamponUrl
-    ? `<img src="${org.tamponUrl}" alt="Tampon" style="max-height:90px;max-width:170px;display:block;margin:4px 0;" />`
+    ? `<img src="${org.tamponUrl}" alt="Tampon ${orgNom}" style="max-height:78px;max-width:150px;display:block;margin:2px 0 6px;object-fit:contain;" />`
     : "";
   const signOrg = org.signatureUrl
-    ? `<img src="${org.signatureUrl}" alt="Signature" style="max-height:70px;max-width:200px;display:block;margin:4px 0;" />`
+    ? `<img src="${org.signatureUrl}" alt="Signature ${dirigeant}" style="max-height:58px;max-width:170px;display:block;margin:2px 0 6px;object-fit:contain;" />`
     : "";
   const signSta = s?.signatureUrl
-    ? `<img src="${s.signatureUrl}" alt="Signature bénéficiaire" style="max-height:70px;max-width:200px;display:block;margin:4px 0;" />`
+    ? `<img src="${s.signatureUrl}" alt="Signature bénéficiaire" style="max-height:58px;max-width:170px;display:block;margin:2px 0 6px;object-fit:contain;" />`
     : "";
   const nomStagiaire = s ? `${s.prenom || ""} ${s.nom || ""}`.trim() : "";
   const signaturesHtml = `
-<table style="width:100%;border-collapse:collapse;margin-top:24px;border:1px solid #cbd5e1;">
+<table class="bdc-signatures" style="width:100%;border-collapse:collapse;margin-top:22px;border:1px solid #94a3b8;page-break-inside:avoid;break-inside:avoid;">
   <thead>
-    <tr style="background:#eef2f7;">
-      <th style="border:1px solid #cbd5e1;padding:10px;text-align:left;width:50%;">Pour l'organisme — ${org.nom || ""}</th>
-      <th style="border:1px solid #cbd5e1;padding:10px;text-align:left;width:50%;">Pour le bénéficiaire — ${nomStagiaire}</th>
+    <tr style="background:#cfe2f3;">
+      <th style="border:1px solid #94a3b8;padding:8px;text-align:center;width:50%;">Organisme de formation</th>
+      <th style="border:1px solid #94a3b8;padding:8px;text-align:center;width:50%;">Bénéficiaire</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td style="border:1px solid #cbd5e1;padding:14px;vertical-align:top;height:140px;">
-        <div style="font-size:12px;color:#475569;margin-bottom:6px;">Tampon et signature</div>
-        ${tampon || signOrg}
-        <div style="font-size:12px;color:#1e293b;margin-top:6px;">${org.dirigeant || ""}</div>
+      <td style="border:1px solid #94a3b8;padding:12px;vertical-align:top;height:118px;">
+        <div style="font-size:11px;color:#475569;margin-bottom:6px;">Tampon et signature</div>
+        ${tampon}${signOrg}
+        <div style="font-size:11px;color:#1e293b;margin-top:4px;font-weight:600;">${dirigeant}</div>
+        <div style="font-size:10.5px;color:#475569;">${org.nom || ""}</div>
       </td>
-      <td style="border:1px solid #cbd5e1;padding:14px;vertical-align:top;height:140px;">
-        <div style="font-size:12px;color:#475569;margin-bottom:6px;">Signature</div>
+      <td style="border:1px solid #94a3b8;padding:12px;vertical-align:top;height:118px;">
+        <div style="font-size:11px;color:#475569;margin-bottom:6px;">Signature du bénéficiaire</div>
         ${signSta}
-        <div style="font-size:12px;color:#1e293b;margin-top:6px;">${nomStagiaire}</div>
+        <div style="font-size:11px;color:#1e293b;margin-top:4px;font-weight:600;">${nomStagiaire}</div>
       </td>
     </tr>
   </tbody>

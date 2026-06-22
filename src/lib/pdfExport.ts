@@ -340,6 +340,22 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
 
       // Special handling for tables: split row by row, repeat thead
       if (node instanceof HTMLElement && node.tagName === "TABLE") {
+        if (current.content.childNodes.length > 0 && nodeFitsOnFreshPage(host, node, footerHtml, footerHeightPx, PAGE_W_PX, PAGE_H_PX)) {
+          const wholeTable = node.cloneNode(true);
+          current.content.appendChild(wholeTable);
+          if (current.content.scrollHeight > current.content.clientHeight + 1) {
+            current.content.removeChild(wholeTable);
+            current = createPage(host, footerHtml, footerHeightPx, PAGE_W_PX, PAGE_H_PX);
+            pages.push(current.page);
+            current.content.appendChild(wholeTable);
+          }
+          if (pageBreak.after && hasMoreNodes) {
+            current = createPage(host, footerHtml, footerHeightPx, PAGE_W_PX, PAGE_H_PX);
+            pages.push(current.page);
+          }
+          continue;
+        }
+
         const rows = getTableBodyRows(node);
         let currentTable = cloneTableShell(node);
         current.content.appendChild(currentTable);
@@ -372,10 +388,13 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
       const hadContentBeforeClone = current.content.childNodes.length > 0;
       current.content.appendChild(clone);
 
-      // If current block overflows, move the whole block to next page
+      // If current block overflows, move normal blocks to next page.
+      // Oversized containers (ex: full document body) must be split immediately,
+      // otherwise page 1 keeps only the header and the real content starts page 2.
       if (current.content.scrollHeight > current.content.clientHeight + 1) {
         current.content.removeChild(clone);
-        if (hadContentBeforeClone) {
+        const cloneIsOversized = clone instanceof HTMLElement && !nodeFitsOnFreshPage(host, clone, footerHtml, footerHeightPx, PAGE_W_PX, PAGE_H_PX);
+        if (hadContentBeforeClone && !cloneIsOversized) {
           current = createPage(host, footerHtml, footerHeightPx, PAGE_W_PX, PAGE_H_PX);
           pages.push(current.page);
         }
@@ -399,6 +418,21 @@ export async function htmlToPdfBlob(htmlContent: string, options: PdfExportOptio
 
           for (const child of getRenderableChildNodes(clone)) {
             if (child instanceof HTMLElement && child.tagName === "TABLE") {
+              if (nodeFitsOnFreshPage(host, child, footerHtml, footerHeightPx, PAGE_W_PX, PAGE_H_PX)) {
+                const wholeTable = child.cloneNode(true);
+                splitWrapper.appendChild(wholeTable);
+                if (current.content.scrollHeight > current.content.clientHeight + 1) {
+                  splitWrapper.removeChild(wholeTable);
+                  current = createPage(host, footerHtml, footerHeightPx, PAGE_W_PX, PAGE_H_PX);
+                  pages.push(current.page);
+                  splitWrapper = makeShell(clone);
+                  current.content.appendChild(splitWrapper);
+                  splitWrapper.appendChild(wholeTable);
+                }
+                oversizedTableStarted = true;
+                continue;
+              }
+
               if (splitWrapper.childNodes.length === 0 && current.content.childNodes.length > 0) current.content.removeChild(splitWrapper);
               let currentTable = cloneTableShell(child);
               if (current.content.scrollHeight + child.offsetHeight > current.content.clientHeight + 1 && !oversizedTableStarted) {
