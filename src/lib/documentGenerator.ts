@@ -1,4 +1,6 @@
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
+import { renderBdcNTDocHtml } from "@/lib/bdc/bdcNTConseilsZip";
+
 import { genContratBacPro, genConvocationBacPro, genConvocationExamenBacPro, genTestPositionnementBacPro, genGrilleAcquisitionBacPro, genSatisfactionBacPro, genBilanFormationBacPro, genEval01, genEval02, genEval03, genEval04, genEval05, genEval06, genEval07, genEval08, genEval09, genEval10, genEval11, genEval12, genEval13, genEval14, genEval15, genRapportConnexionBacPro } from "./bacProGenerators";
 import { genObjectifsMethodesSequence, genDossierStagiaire, genDescriptifMoyensMateriels, genCahierMaintenance, genCVFormateur as genCVFormateurEY, genFichierFormateursStatut, genBilanIntermediaire, genTauxReussiteEY, genGrilleTarifaire, genFactureHorsMCF, genDevisEY, genCommunicationReport, genPreuveCreationSession, genPlaquettePresentation, genPlanningIntervenants, genPlanningSessionsEY, genCVResponsablePedagogique, genActionsEngagement, genActionsPassageExamen, genAccompagnementFOAD, genInventaireMateriels, genContratsProprieteSupports, genAttestationDiplomesFormateurs, genCertificatQualiopiModele, genAutorisationsCertificateur, genAgrementsMinisteriels, genIndicateursPerformanceEY, genInfosCertifications, genPreuveReprogrammation, genProcessusAnalyseDemandes, genRessourcesPedagogiques as genRessourcesPedagogiquesEY, genBailLocaux, genBilanPedagogiqueFinancier, genQuestionnaireSatisfactionEY, genAdaptationsHandicapEY, genOutilsSuiviProgressionEY, genTestEvaluationFinEY, genEvaluationBlancheEY, genFacturesEquipementsEY, genEquipementsPedagogiquesEY, genFormationContinueFormateurs, genBilanFroidStagiaire, genMethodesAnimationEY, genListeSupportsDocumentsEY, genAdaptationsPSHAcademy, genProcessusQualiteSousTraitantsEY, genCompteRenduPositionnementEY, genEvaluationDesBesoinsEY, genGrilleAcquisitionCompetencesEY, genEvaluationBlancheAcademyEY, genTauxReussiteAcademyEY } from "./eyGenerators";
 import { buildDocument, htmlWrap, orgHeader, formationInfoBlock, formationInfoBlockStagiaire, tableHTML, signatureBlock3, signatureBlock2, footer, section, formatDate, infoGrid, getDocStyle, subtractBusinessDays, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif, getStagiaireDuree, applyGender, g, getDisplayDuree, linkUrl, optSiteWeb, isFormationTerminee, isStagiaireFormationTerminee, getModaliteContent, hasDistanciel, hasPresentiel, isMixte, isFacebookPage, getSiteWebLabel, buildEcheancierPaiement } from "./docBuilder";
@@ -203,12 +205,31 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
   }
 
   switch (template) {
+    case "bdc_nt_doc":
+    case "bdc_nt_doc_per_ben": {
+      const sourceKey = params?.sourceKey as string;
+      const si = params?.stagiaireIdx;
+      const s = (template === "bdc_nt_doc_per_ben" && typeof si === "number") ? stagiaires[si] || null : null;
+      return renderBdcNTDocHtml(sourceKey, o, s);
+    }
+    case "bdc_nt_asset": {
+      const name = params?.assetName || "ressource";
+      const src = params?.assetSrc || "";
+      return `<!DOCTYPE html><html><head><meta charset="utf-8"></head><body style="font-family:Arial;padding:40px;color:#0b2545">
+<h1>Ressource statique BDC</h1>
+<p><strong>${name}</strong></p>
+<p>Fichier source (Excel / PDF) à télécharger directement :</p>
+<p><a href="${src}" target="_blank" rel="noopener">${src}</a></p>
+<p style="color:#64748b;font-size:11pt">Ces ressources sont fournies telles quelles (trames officielles) et ne sont pas générées dynamiquement.</p>
+</body></html>`;
+    }
     case "bdc_nt_dossier_complet":
       return `<!DOCTYPE html><html><head><meta charset="utf-8"></head><body style="font-family:Arial;padding:40px;color:#0b2545">
 <h1>Dossier Bilan de compétences — trame NT Conseils</h1>
 <p>Ce document représente le <strong>dossier complet</strong> (51 documents + 5 trames Excel/PDF).</p>
 <p>Pour le télécharger, cliquez sur le bouton <strong>« Télécharger le dossier complet »</strong> en haut de la page.<br>Le ZIP sera généré avec la structure officielle (14 indicateurs, documents personnalisés par bénéficiaire).</p>
 </body></html>`;
+
     case "fiche_identite": return genFicheIdentite(o);
     case "presentation_organisme": return genPresentation(o);
     case "organigramme": return genOrganigramme(o, selectedFormation);

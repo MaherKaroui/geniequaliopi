@@ -3,6 +3,9 @@ import { StagiaireInfo } from "@/types/qualiopi";
 import { FormateurInfo, getFormationDays, parseDuree } from "./sampleData";
 import { getRNCPByCode } from "./rncpData";
 import { getEvalContent } from "./evalContent";
+import { BDC_NT_SOURCE, BDC_NT_PER_BENEFICIAIRE, BDC_NT_STATIC_ASSETS } from "./bdc/bdcNTSource";
+import { critereForIndicateur, indicateurFromKey, bdcDocTitle } from "./bdc/bdcNTConseilsZip";
+
 
 export type ActionType = 'actions-formation' | 'bilans-competences' | 'vae' | 'apprentissage';
 
@@ -1236,21 +1239,49 @@ export function buildFullCatalog(
   // exclusivement via le bouton "Télécharger le dossier complet" (buildBDCNTConseilsZip).
   // Aucune entrée individuelle dans le catalogue pour les BDC.
   if (isBDC) {
-    // Une entrée par critère Qualiopi pour structurer l'affichage.
-    // Toutes pointent vers le même template (le ZIP complet contient tous les critères).
-    const bdcCriteres: Array<{ c: number; i: number; label: string }> = [
-      { c: 1, i: 1, label: "CT1 - Information du public — Dossier BDC (NT Conseils)" },
-      { c: 2, i: 4, label: "CT2 - Objectifs & adaptation — Dossier BDC (NT Conseils)" },
-      { c: 3, i: 9, label: "CT3 - Conditions d'accueil & accompagnement — Dossier BDC (NT Conseils)" },
-      { c: 4, i: 18, label: "CT4 - Moyens pédagogiques & techniques — Dossier BDC (NT Conseils)" },
-      { c: 5, i: 21, label: "CT5 - Qualification des intervenants — Dossier BDC (NT Conseils)" },
-      { c: 6, i: 23, label: "CT6 - Inscription dans l'environnement professionnel — Dossier BDC (NT Conseils)" },
-      { c: 7, i: 30, label: "CT7 - Recueil & traitement des appréciations — Dossier BDC (NT Conseils)" },
-    ];
-    bdcCriteres.forEach(({ c, i, label }) => {
-      add(`bdc_nt_dossier_complet_c${c}`, `📦 ${label}`, c, i, "bdc_nt_dossier_complet");
+    // Un document de catalogue par fichier source BDC (NT Conseils).
+    // Classement automatique : critère ← indicateur extrait de la clé.
+    const bdcKeys = Object.keys(BDC_NT_SOURCE).sort();
+    const slug = (s: string) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^\w]+/g, "_").replace(/_+/g, "_").replace(/^_|_$/g, "").toLowerCase().slice(0, 60);
+    bdcKeys.forEach((key) => {
+      const ind = indicateurFromKey(key);
+      const crit = critereForIndicateur(ind);
+      const title = bdcDocTitle(key);
+      const isPerBen = BDC_NT_PER_BENEFICIAIRE.has(key);
+      if (isPerBen && stagiaires.length > 0) {
+        stagiaires.forEach((s, si) => {
+          add(
+            `bdc_nt_${slug(key)}_s${si}`,
+            `CT${crit} - IND ${ind} ${title} – ${s.prenom} ${s.nom}`,
+            crit, ind, "bdc_nt_doc_per_ben",
+            { sourceKey: key, stagiaireIdx: si },
+          );
+        });
+      } else {
+        add(
+          `bdc_nt_${slug(key)}`,
+          `CT${crit} - IND ${ind} ${title}`,
+          crit, ind, "bdc_nt_doc",
+          { sourceKey: key },
+        );
+      }
+    });
+    // Assets statiques (xlsx / pdf téléchargés tels quels)
+    BDC_NT_STATIC_ASSETS.forEach((a, idx) => {
+      const fileName = a.zipPath.split("/").pop() || a.zipPath;
+      const folder = a.zipPath.includes("/") ? a.zipPath.split("/")[0] : "";
+      const ind = folder ? indicateurFromKey(folder) : 1;
+      const crit = critereForIndicateur(ind);
+      add(
+        `bdc_nt_asset_${idx}`,
+        `CT${crit} - IND ${ind} ${fileName} (ressource)`,
+        crit, ind, "bdc_nt_asset",
+        { assetSrc: a.src, assetName: fileName },
+      );
     });
   }
+
 
   // ===== VAE — VALIDATION DES ACQUIS DE L'EXPÉRIENCE =====
   if (isVAE) {
