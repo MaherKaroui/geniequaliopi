@@ -732,15 +732,23 @@ export async function buildBDCNTConseilsZip(
     }
   }
 
-  // Static assets
+  // Static assets — si un template automatisé existe pour la clé, on l'utilise à la place.
   for (const a of BDC_NT_STATIC_ASSETS) {
     advance(a.zipPath.split("/").pop() || a.zipPath);
     try {
-      const res = await fetch(a.src);
-      if (res.ok) {
-        const buf = await res.arrayBuffer();
-        zip.file(mapAssetPathToCriterePath(a.zipPath), buf);
+      // Cherche un template mappé via le nom de l'asset (sans extension)
+      const keyNoExt = a.zipPath.replace(/\.(xlsx|docx|pdf)$/i, "");
+      const tplMapping = BDC_TEMPLATES[keyNoExt];
+      let buf: ArrayBuffer | null = null;
+      if (tplMapping) {
+        const r = await renderBdcTemplateIfMapped(keyNoExt, org, formation, null);
+        if (r) buf = await r.blob.arrayBuffer();
       }
+      if (!buf) {
+        const res = await fetch(a.src);
+        if (res.ok) buf = await res.arrayBuffer();
+      }
+      if (buf) zip.file(mapAssetPathToCriterePath(a.zipPath), buf);
     } catch (e) {
       console.warn("[BDC NT] asset failed", a.src, e);
     }
