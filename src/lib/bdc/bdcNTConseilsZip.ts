@@ -539,8 +539,14 @@ function preprocessGridTables(md: string): string {
 function mdToHtmlBody(md: string): string {
   // Nettoie les artefacts d'échappement (ex: \' → ', \" → ")
   md = md.replace(/\\'/g, "'").replace(/\\"/g, '"');
+  // Convertit les antislashs pandoc parasites (issus des template literals) en sauts de ligne / suppression
+  md = md
+    .replace(/\\(?=\*)/g, "<br>")              // \ juste avant **gras** => saut de ligne
+    .replace(/\\$/gm, "<br>")                  // \ en fin de ligne => saut de ligne
+    .replace(/\\([\-_'"<>\[\]\(\)])/g, "$1");  // \ devant ponctuation => simple caractère
   // Convertit les tableaux grid pandoc (+---+---+) en tableaux pipe
   md = preprocessGridTables(md);
+
   const esc = (s: string) => s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
   const inline = (s: string) => {
     // Extraire les images markdown ![alt](url) AVANT l'échappement HTML
