@@ -304,6 +304,7 @@ export async function buildBDCNTConseilsZip(
 
   for (const key of keys) {
     const folder = key.includes("/") ? key.split("/")[0] : "";
+    const critereFolder = mapFolderToCriterePath(folder);
     const baseName = fileTitle(key);
     const isPerBen = BDC_NT_PER_BENEFICIAIRE.has(key);
     const raw = BDC_NT_SOURCE[key];
@@ -313,15 +314,15 @@ export async function buildBDCNTConseilsZip(
         advance(`${baseName} — ${s.prenom} ${s.nom}`);
         const blob = await genDocx(raw, `${baseName} – ${s.prenom} ${s.nom}`, s);
         const benFolder = `Bénéficiaire - ${s.prenom} ${s.nom}`;
-        const path = folder
-          ? `${benFolder}/${folder}/${baseName}.docx`
+        const path = critereFolder
+          ? `${benFolder}/${critereFolder}/${baseName}.docx`
           : `${benFolder}/${baseName}.docx`;
         zip.file(path, blob);
       }
     } else {
       advance(baseName);
       const blob = await genDocx(raw, baseName, null);
-      const path = folder ? `${folder}/${baseName}.docx` : `${baseName}.docx`;
+      const path = critereFolder ? `${critereFolder}/${baseName}.docx` : `${baseName}.docx`;
       zip.file(path, blob);
     }
   }
@@ -333,7 +334,7 @@ export async function buildBDCNTConseilsZip(
       const res = await fetch(a.src);
       if (res.ok) {
         const buf = await res.arrayBuffer();
-        zip.file(a.zipPath, buf);
+        zip.file(mapAssetPathToCriterePath(a.zipPath), buf);
       }
     } catch (e) {
       console.warn("[BDC NT] asset failed", a.src, e);
