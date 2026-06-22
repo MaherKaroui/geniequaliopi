@@ -853,11 +853,11 @@ const SAT_FINANCEUR_KEY = "Indicateur 30/Indicateur 30 - Questionnaire satisfact
 const SAT_INTERNE_KEY = "Indicateur 30/Indicateur 30 - Questionnaire satisfaction interne";
 
 function row4(label: string, score: 1 | 2 | 4 | 5): string {
-  const s = (v: 1 | 2 | 4 | 5) => (v === score ? "☒" : "☐");
+  const s = (v: 1 | 2 | 4 | 5) => (v === score ? "**X**" : "");
   return `| ${label} | ${s(1)} | ${s(2)} | ${s(4)} | ${s(5)} |`;
 }
 function row10(score: number): string {
-  const cells = Array.from({ length: 10 }, (_, i) => (i + 1 === score ? "☒" : "☐"));
+  const cells = Array.from({ length: 10 }, (_, i) => (i + 1 === score ? "**X**" : ""));
   return `| ${cells.join(" | ")} |`;
 }
 
