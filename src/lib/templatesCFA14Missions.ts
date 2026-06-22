@@ -9,14 +9,41 @@ export function genPlanActivitesCitoyennesCFA(o: OrganismeInfo, f: FormationInfo
   const annee = f.dateDebut ? new Date(f.dateDebut).getFullYear() : new Date().getFullYear();
   const terminee = isFormationTerminee(f, stagiaires);
   const today = new Date();
-  const isPast = (label: string, monthsFromStart: number) => {
-    if (!f.dateDebut) return false;
-    const d = new Date(f.dateDebut);
-    d.setMonth(d.getMonth() + monthsFromStart);
-    return d < today;
+
+  // Dates calculées automatiquement à l'intérieur de la fenêtre [dateDebut, dateFin]
+  const MOIS_FR = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
+  const d1 = f.dateDebut ? new Date(f.dateDebut) : null;
+  const d2 = f.dateFin ? new Date(f.dateFin) : null;
+  const totalMs = d1 && d2 ? d2.getTime() - d1.getTime() : 0;
+  const at = (ratio: number): Date | null => {
+    if (!d1 || !d2 || totalMs <= 0) return null;
+    const r = Math.max(0, Math.min(1, ratio));
+    return new Date(d1.getTime() + totalMs * r);
   };
-  const statut = (monthsFromStart: number) =>
-    terminee ? "Réalisée" : (isPast("", monthsFromStart) ? "Réalisée" : "Programmée");
+  const periode = (d: Date | null, fallback: string) => d ? `${MOIS_FR[d.getMonth()]} ${d.getFullYear()}` : fallback;
+  const statut = (d: Date | null) => {
+    if (terminee) return "Réalisée";
+    if (!d) return "Programmée";
+    if (d.getTime() < today.getTime() - 7 * 24 * 3600 * 1000) return "Réalisée";
+    if (Math.abs(d.getTime() - today.getTime()) <= 30 * 24 * 3600 * 1000) return "En cours";
+    return "Programmée";
+  };
+  const cell = (ratio: number, fallback: string) => {
+    const d = at(ratio);
+    return { p: periode(d, fallback), s: statut(d) };
+  };
+
+  // Répartition : citoyennes (5%, 15%, 25%, 55%), culturelles (35%, 45%, 70%), sportives (60%, 80%, 95%)
+  const c1 = cell(0.05, `Septembre ${annee}`);
+  const c2 = cell(0.15, `Octobre ${annee}`);
+  const c3 = cell(0.25, `Novembre ${annee}`);
+  const c4 = cell(0.55, `Mars ${annee + 1}`);
+  const cu1 = cell(0.35, `Janvier ${annee + 1}`);
+  const cu2 = cell(0.45, `Février ${annee + 1}`);
+  const cu3 = cell(0.70, `Avril ${annee + 1}`);
+  const sp1 = cell(0.60, `Mai ${annee + 1}`);
+  const sp2 = cell(0.80, `Juin ${annee + 1}`);
+  const sp3 = cell(0.95, `Juillet ${annee + 1}`);
 
   return buildDocument({
     org: o,
@@ -24,17 +51,17 @@ export function genPlanActivitesCitoyennesCFA(o: OrganismeInfo, f: FormationInfo
     sections: [
       {
         heading: "Cadre réglementaire (Mission 4 — Art. L6231-2 du Code du Travail)",
-        content: `<p>Le CFA <strong>${o.nom}</strong> est tenu d'organiser et de favoriser la participation des apprentis à des activités d'ouverture sur le monde, notamment dans les domaines citoyen, culturel, sportif et associatif. Le présent plan formalise les actions programmées pour l'année ${annee}.</p>${terminee ? "" : `<p><em>Formation actuellement <strong>en cours</strong> — les activités à venir sont marquées « Programmée ».</em></p>`}`,
+        content: `<p>Le CFA <strong>${o.nom}</strong> est tenu d'organiser et de favoriser la participation des apprentis à des activités d'ouverture sur le monde, notamment dans les domaines citoyen, culturel, sportif et associatif. Le présent plan formalise les actions programmées sur l'année ${annee} — <em>dates calculées automatiquement sur la base du calendrier de la formation (${f.dateDebut ? formatDate(f.dateDebut) : "—"} → ${f.dateFin ? formatDate(f.dateFin) : "—"})</em>.</p>${terminee ? "" : `<p><em>Formation actuellement <strong>en cours</strong> — les activités à venir sont marquées « Programmée ».</em></p>`}`,
       },
       {
         heading: "Activités citoyennes",
         content: tableHTML(
           ["Activité", "Date prévisionnelle", "Public visé", "Partenaire", "Statut"],
           [
-            ["Atelier « Droits et devoirs de l'apprenti »", `Octobre ${annee}`, "Tous apprentis", "DREETS / Défenseur des Droits", statut(2)],
-            ["Sensibilisation à la laïcité et aux valeurs républicaines", `Décembre ${annee}`, "Tous apprentis", "Préfecture / CRIPT", statut(4)],
-            ["Journée « Lutte contre les discriminations »", `Mars ${annee + 1}`, "Tous apprentis", "Défenseur des Droits / SOS Racisme", statut(7)],
-            ["Élection des délégués de promotion", `Novembre ${annee}`, "Tous apprentis", "Vie scolaire CFA", statut(3)],
+            ["Atelier « Droits et devoirs de l'apprenti »", c1.p, "Tous apprentis", "DREETS / Défenseur des Droits", c1.s],
+            ["Élection des délégués de promotion", c2.p, "Tous apprentis", "Vie scolaire CFA", c2.s],
+            ["Sensibilisation à la laïcité et aux valeurs républicaines", c3.p, "Tous apprentis", "Préfecture / CRIPT", c3.s],
+            ["Journée « Lutte contre les discriminations »", c4.p, "Tous apprentis", "Défenseur des Droits / SOS Racisme", c4.s],
           ]
         ),
       },
@@ -43,9 +70,9 @@ export function genPlanActivitesCitoyennesCFA(o: OrganismeInfo, f: FormationInfo
         content: tableHTML(
           ["Activité", "Date prévisionnelle", "Public visé", "Partenaire", "Statut"],
           [
-            ["Visite guidée d'un musée national", `Janvier ${annee + 1}`, "Tous apprentis", "Pass Culture / Musée du Louvre", statut(5)],
-            ["Atelier d'écriture et expression orale", `Février ${annee + 1}`, "Tous apprentis", "Bibliothèque municipale", statut(6)],
-            ["Sortie cinéma — film documentaire métier", `Avril ${annee + 1}`, "Tous apprentis", "Pass Culture", statut(8)],
+            ["Visite guidée d'un musée national", cu1.p, "Tous apprentis", "Pass Culture / Musée du Louvre", cu1.s],
+            ["Atelier d'écriture et expression orale", cu2.p, "Tous apprentis", "Bibliothèque municipale", cu2.s],
+            ["Sortie cinéma — film documentaire métier", cu3.p, "Tous apprentis", "Pass Culture", cu3.s],
           ]
         ),
       },
@@ -54,9 +81,9 @@ export function genPlanActivitesCitoyennesCFA(o: OrganismeInfo, f: FormationInfo
         content: tableHTML(
           ["Activité", "Date prévisionnelle", "Public visé", "Partenaire", "Statut"],
           [
-            ["Tournoi inter-CFA de football / handball", `Mai ${annee + 1}`, "Apprentis volontaires", "UNSS / Comité départemental", statut(9)],
-            ["Journée bien-être & prévention santé", `Juin ${annee + 1}`, "Tous apprentis", "MSA / Mutuelle apprentis", statut(10)],
-            ["Initiation aux sports outdoor (course, randonnée)", `Septembre ${annee + 1}`, "Apprentis volontaires", "Office des sports", statut(13)],
+            ["Tournoi inter-CFA de football / handball", sp1.p, "Apprentis volontaires", "UNSS / Comité départemental", sp1.s],
+            ["Journée bien-être & prévention santé", sp2.p, "Tous apprentis", "MSA / Mutuelle apprentis", sp2.s],
+            ["Initiation aux sports outdoor (course, randonnée)", sp3.p, "Apprentis volontaires", "Office des sports", sp3.s],
           ]
         ),
       },
