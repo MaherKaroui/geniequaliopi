@@ -2632,20 +2632,15 @@ Atteste que :
 
 - Action de formation par apprentissage
 
-> qui s'est déroulé du 19/02/2026 au 22/04/2026
->
-> pour une durée de 24 heures.
->
-> Sans préjudice des délais imposés par les règles fiscales, comptables
-> ou commerciales, je m'engage à conserver l'ensemble des pièces
-> justificatives qui ont permis d'établir le présent certificat pendant
-> une durée de 3 ans à compter de la fin de l'année du dernier paiement.
-> En cas de cofinancement des fonds européens, la durée de conservation
-> est étendue conformément aux obligations conventionnelles spécifiques.
->
-> Fait à Saint-Denis
->
-> Le 22/04/2026
+qui s'est déroulé du 19/02/2024 au 22/04/2024
+
+pour une durée de 24 heures.
+
+Sans préjudice des délais imposés par les règles fiscales, comptables ou commerciales, je m'engage à conserver l'ensemble des pièces justificatives qui ont permis d'établir le présent certificat pendant une durée de 3 ans à compter de la fin de l'année du dernier paiement. En cas de cofinancement des fonds européens, la durée de conservation est étendue conformément aux obligations conventionnelles spécifiques.
+
+Fait à Saint-Denis
+
+Le 22/04/2024
 
 Signature
 `,
