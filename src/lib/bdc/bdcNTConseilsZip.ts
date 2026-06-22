@@ -491,7 +491,7 @@ function buildOutilPreparatoireMd(
 
   return `**OUTIL PRÉPARATOIRE BÉNÉFICIAIRE**
 
-**Date de l'entretien :** ${dates.dateConvention}
+**Date de l'entretien :** ${dates.dateOutilPrep}
 
 **Bénéficiaire : ${civ} ${nom}**
 
