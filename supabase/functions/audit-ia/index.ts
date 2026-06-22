@@ -122,6 +122,10 @@ Deno.serve(async (req) => {
       const m = content.match(/\{[\s\S]*\}/);
       if (m) { try { parsed = JSON.parse(m[0]); } catch {} }
     }
+    if (!parsed || typeof parsed !== "object") parsed = {};
+    if (!Array.isArray(parsed.findings)) parsed.findings = [];
+    if (typeof parsed.scoreGlobal !== "number") parsed.scoreGlobal = 0;
+    if (typeof parsed.synthese !== "string") parsed.synthese = "";
 
     return new Response(JSON.stringify(parsed), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
   } catch (e: any) {
