@@ -334,23 +334,15 @@ portable (Droit individuel à la formation). Enfin, il est également
 possible de mobiliser son Compte personnel de formation (CPF) pour
 réaliser un bilan de compétences.
 `,
-  "Indicateur 1/Indicateur 1 - Pr\u00e9sentation du bilan de comp\u00e9tences": `**Bilan de compétences NT Conseils**
+  "Indicateur 1/Indicateur 1 - Pr\u00e9sentation du bilan de comp\u00e9tences": `**Bilan de compétences {ORG_NOM}**
+
+**Intitulé : {BDC_INTITULE}**
 
 
 
 **PUBLIC CONCERNE :**
 
-- Tout salarié en poste
-
-- Chef d\\'entreprise et cadre
-
-- Chercheur d\\'emploi
-
-- Entreprises qui souhaitent promouvoir leurs employés et collaborateurs
-
-- Personne en fin de contrat ou transition professionnelle
-
-- Jeune Actif
+{BDC_PUBLIC}
 
 **PRE-REQUIS :**
 
