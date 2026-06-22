@@ -532,6 +532,371 @@ function buildOutilPreparatoireMd(
 `;
 }
 
+const FICHE_ANALYSE_BESOIN_KEY = "Indicateur 4/Indicateur 4 - Fiche d'analyse de besoin";
+const FICHE_PREALABLE_KEY = "Indicateur 4/Indicateur 4 - Fiche préalable au bilan de compétences";
+
+/** Coche "X" si vrai, espace sinon — rendu cohérent avec les autres docs BDC. */
+function chk(b: boolean): string {
+  return b ? "**X**" : " ";
+}
+
+function buildFicheAnalyseBesoinMd(
+  s: StagiaireInfo,
+  org: OrganismeInfo,
+  dates: DatesCtx,
+  formation?: FormationInfo,
+): string {
+  const nom = `${s.prenom || ""} ${s.nom || ""}`.trim() || "Bénéficiaire";
+  const naissance = s.dateNaissance || "—";
+  const tel = s.telephone || "";
+  const email = s.email || "—";
+  const poste = (s.poste || "").trim();
+  const entreprise = (s.entreprise || "").trim();
+  const anciennete = (s as any).anciennete || "Plusieurs années d'expérience";
+  const consultant = org.responsablePedagogique || org.dirigeant || "Le consultant désigné";
+  const financ = String((s as any).financement || "").toLowerCase();
+  const isSalarie = !!entreprise || /salari|employeur|opco|cpf/i.test(financ);
+  const isDE = /france\s*travail|demandeur|pole/i.test(financ);
+  const isIndep = /indep|libér|auto/i.test(financ);
+  const isAutreSitu = !isSalarie && !isDE && !isIndep;
+  const handicap = (s as any).rqth === true || (s as any).rqth === "Oui";
+  const seed = hashStr(`fab|${s.prenom}|${s.nom}`);
+  const origines = ["CPF", "Employeur", "France Travail", "Initiative personnelle", "OPCO"];
+  const origine = financ
+    ? (/employeur|entreprise/.test(financ) ? "Employeur"
+      : /france\s*travail|pole/.test(financ) ? "France Travail"
+      : /cpf/.test(financ) ? "CPF"
+      : /opco/.test(financ) ? "OPCO"
+      : "Initiative personnelle")
+    : pick(origines, seed, 0);
+  const objets = [
+    "Faire le point sur mes compétences",
+    "Préparer une reconversion professionnelle",
+    "Évoluer dans mon métier",
+    "Confirmer un projet professionnel",
+    "Identifier des pistes d'évolution",
+  ];
+  const objet = pick(objets, seed, 1);
+  const formationInit = pick([
+    "Bac général puis formation professionnelle continue",
+    "BTS suivi de plusieurs formations qualifiantes",
+    "CAP et certifications complémentaires en alternance",
+    "Bac+3 dans le domaine puis formations courtes spécialisées",
+  ], seed, 2);
+  const experiences = poste
+    ? `${anciennete} sur le poste de ${poste}${entreprise ? ` au sein de ${entreprise}` : ""}, expériences antérieures en service et coordination`
+    : "Plusieurs postes successifs dans le secteur ciblé, avec montée en responsabilités";
+  const competences = pick([
+    "Gestion de projet, relation client, communication écrite et orale",
+    "Organisation du travail, animation d'équipe, rigueur administrative",
+    "Maîtrise des outils bureautiques, capacités d'analyse et de synthèse",
+    "Sens du service, autonomie, adaptation et résolution de problèmes",
+  ], seed, 3);
+  const attente = pick([
+    "Clarifier mon projet professionnel et valider sa faisabilité",
+    "Identifier les compétences à renforcer et les formations à mobiliser",
+    "Construire un plan d'action concret et réaliste",
+    "Prendre du recul sur mon parcours et structurer mes choix",
+  ], seed, 4);
+  const objectifsB = pick([
+    "Disposer d'un projet validé et d'un plan d'action sur 12 mois",
+    "Décider sereinement entre évolution interne et mobilité externe",
+    "Engager une démarche de reconversion avec un parcours de formation identifié",
+  ], seed, 5);
+  const contraintesH = pick(["En dehors des heures de bureau", "Le mercredi et le samedi matin", "Soirs après 18h"], seed, 6);
+  const contraintesG = pick(["Aucune contrainte particulière", `Déplacements limités à ${org.ville || "la région"}`, "Privilégier le distanciel"], seed, 7);
+  const contraintesP = pick(["Aucune contrainte particulière", "Organisation familiale à anticiper", "Charge professionnelle élevée"], seed, 8);
+  const modaliteRetenue = (formation?.modalites || "Présentiel").toLowerCase();
+  const isPres = /pr.sentiel/.test(modaliteRetenue) && !/distan/.test(modaliteRetenue);
+  const isDist = /distan/.test(modaliteRetenue) && !/pr.sent/.test(modaliteRetenue);
+  const isMix = /mixte|hybride/.test(modaliteRetenue) || (!isPres && !isDist);
+  const dureeTxt = (formation?.duree || "").trim() || "24";
+  const dureeH = /heure/i.test(dureeTxt) ? dureeTxt.match(/\d+/)?.[0] || "24" : dureeTxt;
+  const rythme = pick(["2 séances de 2h par semaine", "1 séance de 3h hebdomadaire", "Séances bimensuelles de 3h"], seed, 9);
+  const amenagements = handicap
+    ? "Aménagements à étudier avec le référent handicap selon les besoins exprimés"
+    : "Aucun aménagement spécifique requis à ce jour";
+
+  return `**FICHE D'ANALYSE DU BESOIN**
+
+**Bilan de compétences**
+
+**1. Identification du bénéficiaire**
+
+| **Nom et prénom** | ${nom} |
+| **Date de naissance** | ${naissance} |${tel ? `
+| **Téléphone** | ${tel} |` : ""}
+| **E-mail** | ${email} |
+| **Situation actuelle** | ${chk(isSalarie)} Salarié(e) · ${chk(isDE)} Demandeur d'emploi · ${chk(isIndep)} Travailleur indépendant · ${chk(isAutreSitu)} Autre |
+| **Poste occupé** | ${poste || "—"} |
+| **Entreprise** | ${entreprise || "—"} |
+| **Ancienneté** | ${anciennete} |
+| **Date de l'entretien préalable** | ${dates.dateOutilPrep} |
+| **Nom du consultant** | ${consultant} |
+
+**2. Origine de la demande**
+
+${chk(origine === "Initiative personnelle")} Initiative personnelle · ${chk(origine === "Employeur")} Employeur · ${chk(origine === "France Travail")} France Travail · ${chk(origine === "CPF")} CPF · ${chk(origine === "OPCO")} OPCO
+
+**3. Objet de la démarche**
+
+${chk(objet === "Faire le point sur mes compétences")} Faire le point sur mes compétences
+
+${chk(objet === "Évoluer dans mon métier")} Évoluer dans mon métier
+
+${chk(objet === "Préparer une reconversion professionnelle")} Préparer une reconversion professionnelle
+
+${chk(false)} Retrouver un emploi
+
+${chk(false)} Créer ou reprendre une entreprise
+
+${chk(objet === "Confirmer un projet professionnel")} Confirmer un projet professionnel
+
+${chk(objet === "Identifier des pistes d'évolution")} Identifier des pistes d'évolution
+
+**Précisions :** ${objet}.
+
+**4. Situation professionnelle et parcours**
+
+**Formation initiale :** ${formationInit}
+
+**Principales expériences professionnelles :** ${experiences}
+
+**Compétences ou savoir-faire identifiés :** ${competences}
+
+**5. Motivations et attentes du bénéficiaire**
+
+**Qu'attendez-vous du bilan de compétences ?** ${attente}
+
+**Quels sont vos objectifs à l'issue du bilan ?** ${objectifsB}
+
+**6. Contraintes et points de vigilance**
+
+| **Contraintes horaires** | ${contraintesH} |
+| **Contraintes géographiques** | ${contraintesG} |
+| **Contraintes personnelles ou familiales** | ${contraintesP} |
+| **Situation de handicap nécessitant un aménagement** | ${chk(handicap)} Oui · ${chk(!handicap)} Non${handicap ? " — voir process handicap" : ""} |
+
+**7. Analyse du besoin réalisée par le consultant**
+
+**Le besoin exprimé est-il cohérent avec la prestation de bilan de compétences ?** ${chk(true)} Oui · ${chk(false)} Non
+
+**Besoins identifiés :**
+
+${chk(true)} Analyse du parcours professionnel
+
+${chk(true)} Identification des compétences
+
+${chk(true)} Exploration des métiers et secteurs
+
+${chk(true)} Construction d'un projet professionnel
+
+${chk(true)} Validation du projet
+
+${chk(true)} Élaboration d'un plan d'action
+
+**Commentaires :** Demande cohérente avec le cadre de la prestation, le bénéficiaire est engagé dans une démarche réfléchie. Accompagnement individualisé recommandé.
+
+**8. Modalités d'accompagnement retenues**
+
+| **Modalité** | ${chk(isPres)} Présentiel · ${chk(isDist)} Distanciel · ${chk(isMix)} Mixte |
+| **Durée prévisionnelle** | ${dureeH} heures |
+| **Rythme envisagé** | ${rythme} |
+| **Aménagements spécifiques** | ${amenagements} |
+
+**9. Validation**
+
+Le bénéficiaire reconnaît avoir été informé des objectifs, des modalités et du déroulement du bilan de compétences.
+
+| **Date** | ${dates.dateOutilPrep} |
+| **Signature du bénéficiaire** | ${nom} |
+| **Signature du consultant** | ${consultant} |
+`;
+}
+
+function buildFichePrealableMd(
+  s: StagiaireInfo,
+  org: OrganismeInfo,
+  dates: DatesCtx,
+  formation?: FormationInfo,
+): string {
+  const nom = `${s.prenom || ""} ${s.nom || ""}`.trim() || "Bénéficiaire";
+  const naissance = s.dateNaissance || "—";
+  const tel = s.telephone || "";
+  const email = s.email || "—";
+  const poste = (s.poste || "").trim();
+  const entreprise = (s.entreprise || "").trim();
+  const anciennete = (s as any).anciennete || "Plusieurs années d'expérience";
+  const handicap = (s as any).rqth === true || (s as any).rqth === "Oui";
+  const financ = String((s as any).financement || "").toLowerCase();
+  const seed = hashStr(`prea|${s.prenom}|${s.nom}`);
+
+  const isSalarie = !!entreprise || /salari|employeur|opco/i.test(financ);
+  const isDE = /france\s*travail|demandeur|pole/i.test(financ);
+  const isIndep = /indep|libér|auto/i.test(financ);
+  const isFonc = /fonctionn/i.test(financ);
+  const isAutreSitu = !isSalarie && !isDE && !isIndep && !isFonc;
+
+  const sources = ["Internet", "Réseaux sociaux", "Recommandation", "Employeur", "France Travail"];
+  const source = pick(sources, seed, 0);
+  const finModes = ["CPF", "Employeur", "France Travail", "OPCO", "Financement personnel"];
+  const fin = financ
+    ? (/cpf/.test(financ) ? "CPF"
+      : /employeur|entreprise/.test(financ) ? "Employeur"
+      : /france\s*travail|pole/.test(financ) ? "France Travail"
+      : /opco/.test(financ) ? "OPCO"
+      : "Financement personnel")
+    : pick(finModes, seed, 1);
+
+  const motifs = [
+    "Faire le point sur ma carrière",
+    "Changer de métier",
+    "Évoluer professionnellement",
+    "Identifier mes compétences",
+    "Confirmer un projet professionnel",
+  ];
+  const motif = pick(motifs, seed, 2);
+  const situation = pick([
+    `Engagé(e) depuis ${anciennete}${poste ? ` sur le poste de ${poste}` : ""}${entreprise ? ` chez ${entreprise}` : ""}, je souhaite prendre du recul sur mon parcours et clarifier la suite à donner.`,
+    `Après une période riche en expériences professionnelles, je ressens le besoin de structurer mes choix d'évolution et de valider un projet à moyen terme.`,
+    `Mon parcours m'amène aujourd'hui à m'interroger sur la cohérence entre mes compétences acquises et le métier que je souhaite exercer dans les prochaines années.`,
+  ], seed, 3);
+  const attentes = [
+    "Identifier mes compétences et aptitudes",
+    "Construire un projet professionnel",
+    "Valider un projet existant",
+    "Élaborer un plan d'action",
+    "Mieux me connaître",
+  ];
+  const attente = pick(attentes, seed, 4);
+  const resultats = pick([
+    "Un projet professionnel formalisé et un plan d'action sur 6 à 12 mois.",
+    "Une décision éclairée sur la suite à donner à mon parcours et les formations à engager.",
+    "Une feuille de route claire avec des étapes concrètes et des contacts identifiés.",
+  ], seed, 5);
+
+  const niveaux = ["Sans diplôme", "CAP/BEP", "Bac", "Bac +2", "Bac +3", "Bac +5 et plus"];
+  const niveau = pick(niveaux, seed, 6);
+
+  const exps = pick([
+    `Plusieurs postes successifs dans le secteur, avec une montée en responsabilités progressive.`,
+    `Expériences variées dans la relation client, la coordination d'équipe et la gestion de projet.`,
+    `Parcours combinant fonctions opérationnelles et missions transversales en organisation.`,
+  ], seed, 7);
+
+  const contraintes = pick([
+    "Horaires de travail à concilier avec les rendez-vous",
+    "Organisation familiale à anticiper",
+    "Mobilité géographique limitée",
+    "Aucune contrainte particulière",
+  ], seed, 8);
+
+  const modaliteRetenue = (formation?.modalites || "Présentiel").toLowerCase();
+  const isPres = /pr.sentiel/.test(modaliteRetenue) && !/distan/.test(modaliteRetenue);
+  const isDist = /distan/.test(modaliteRetenue) && !/pr.sent/.test(modaliteRetenue);
+  const isMix = /mixte|hybride/.test(modaliteRetenue) || (!isPres && !isDist);
+
+  const jours = ["Mardi", "Mercredi", "Jeudi", "Samedi"];
+  const joursSel = new Set([pick(jours, seed, 9), pick(jours, seed, 11)]);
+  const creneaux = ["Matin", "Après-midi", "Soirée"];
+  const creneauSel = pick(creneaux, seed, 10);
+  const obs = pick([
+    "Bénéficiaire motivé(e), démarche réfléchie et exprimée clairement.",
+    "Bonne capacité d'autonomie attendue dans les phases d'investigation.",
+    "Disponibilités à confirmer après réception du planning prévisionnel.",
+  ], seed, 12);
+
+  return `**FICHE PRÉALABLE AU BILAN DE COMPÉTENCES**
+
+**1. Informations générales**
+
+| **Nom et prénom** | ${nom} |
+| **Date de naissance** | ${naissance} |${tel ? `
+| **Téléphone** | ${tel} |` : ""}
+| **E-mail** | ${email} |
+
+**Situation actuelle :**
+
+${chk(isSalarie)} Salarié(e) · ${chk(isDE)} Demandeur d'emploi · ${chk(isIndep)} Travailleur indépendant · ${chk(isFonc)} Fonctionnaire · ${chk(isAutreSitu)} Autre
+
+**Profession actuelle :** ${poste || "—"}
+
+**Entreprise :** ${entreprise || "—"}
+
+**Ancienneté dans le poste :** ${anciennete}
+
+**2. Votre demande**
+
+**Comment avez-vous connu notre organisme ?**
+
+${chk(source === "Internet")} Internet · ${chk(source === "Réseaux sociaux")} Réseaux sociaux · ${chk(source === "Recommandation")} Recommandation · ${chk(source === "Employeur")} Employeur · ${chk(source === "France Travail")} France Travail
+
+**Mode de financement envisagé :**
+
+${chk(fin === "CPF")} CPF · ${chk(fin === "Employeur")} Employeur · ${chk(fin === "France Travail")} France Travail · ${chk(fin === "OPCO")} OPCO · ${chk(fin === "Financement personnel")} Financement personnel
+
+**3. Vos motivations**
+
+Pour quelles raisons souhaitez-vous réaliser un bilan de compétences ?
+
+${chk(motif === "Faire le point sur ma carrière")} Faire le point sur ma carrière
+
+${chk(motif === "Changer de métier")} Changer de métier
+
+${chk(motif === "Évoluer professionnellement")} Évoluer professionnellement
+
+${chk(motif === "Identifier mes compétences")} Identifier mes compétences
+
+${chk(motif === "Confirmer un projet professionnel")} Confirmer un projet professionnel
+
+**Situation actuelle et raisons d'envisager un bilan :** ${situation}
+
+**4. Vos attentes**
+
+${chk(attente === "Identifier mes compétences et aptitudes")} Identifier mes compétences et aptitudes
+
+${chk(attente === "Construire un projet professionnel")} Construire un projet professionnel
+
+${chk(attente === "Valider un projet existant")} Valider un projet existant
+
+${chk(attente === "Élaborer un plan d'action")} Élaborer un plan d'action
+
+${chk(attente === "Mieux me connaître")} Mieux me connaître
+
+**Quels résultats espérez-vous obtenir ?** ${resultats}
+
+**5. Votre parcours**
+
+**Niveau d'études :** ${niveau}
+
+**Principales expériences professionnelles :** ${exps}
+
+**6. Contraintes et besoins spécifiques**
+
+**Contraintes particulières :** ${contraintes}
+
+**Souhaitez-vous un accompagnement :** ${chk(isPres)} Présentiel · ${chk(isDist)} À distance · ${chk(isMix)} Mixte
+
+**Aménagement spécifique lié à une situation de handicap :** ${chk(handicap)} Oui · ${chk(!handicap)} Non${handicap ? " — voir process handicap" : ""}
+
+**7. Disponibilités**
+
+**Jours disponibles :** ${jours.map((j) => `${chk(joursSel.has(j))} ${j}`).join(" · ")}
+
+**Créneaux souhaités :** ${creneaux.map((c) => `${chk(c === creneauSel)} ${c}`).join(" · ")}
+
+**8. Observations complémentaires**
+
+${obs}
+
+**9. Validation**
+
+**Date :** ${dates.dateOutilPrep}
+
+**Signature du bénéficiaire :** ${nom}
+`;
+}
+
 const TEST_POSITIONNEMENT_KEY = "Indicateur 8/Indicateur 8 - Test de positionnement";
 
 function buildTestPositionnementMd(
@@ -1069,6 +1434,8 @@ function getPersonalizedRaw(key: string, s: StagiaireInfo | null, org: Organisme
   if (key === SAT_ENTREPRISE_KEY) return buildSatisfactionEntrepriseMd(s, org, dates, formation);
   if (key === SAT_FINANCEUR_KEY) return buildSatisfactionFinanceurMd(s, org, dates, formation);
   if (key === SAT_INTERNE_KEY) return buildSatisfactionInterneMd(s, org, dates, formation);
+  if (key === FICHE_ANALYSE_BESOIN_KEY) return buildFicheAnalyseBesoinMd(s, org, dates, formation);
+  if (key === FICHE_PREALABLE_KEY) return buildFichePrealableMd(s, org, dates, formation);
   return null;
 }
 

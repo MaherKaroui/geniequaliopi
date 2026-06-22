@@ -1,5 +1,7 @@
 // AUTO-GENERATED from AUDIT NT CONSEILS source pack. Edit with care.
 export const BDC_NT_PER_BENEFICIAIRE = new Set<string>([
+  "Indicateur 4/Indicateur 4 - Fiche d'analyse de besoin",
+  "Indicateur 4/Indicateur 4 - Fiche préalable au bilan de compétences",
   "Indicateur 10/Indicateur 10 - Convention de prestation",
   "Indicateur 10/Indicateur 10 - Entretien interm\u00e9diaire b\u00e9n\u00e9ficiaire",
   "Indicateur 10/Indicateur 10 - Fiche p\u00e9dagogique",
@@ -2116,6 +2118,8 @@ Merci d'accepter de participer à la démarche et de consacrer quelques minutes 
 |---|
 | §§BR§§§§BR§§§§BR§§ |
 `,
+  "Indicateur 4/Indicateur 4 - Fiche d'analyse de besoin": `**FICHE D'ANALYSE DU BESOIN** — Bilan de compétences (générée automatiquement par bénéficiaire).`,
+  "Indicateur 4/Indicateur 4 - Fiche préalable au bilan de compétences": `**FICHE PRÉALABLE AU BILAN DE COMPÉTENCES** (générée automatiquement par bénéficiaire).`,
   "Indicateur 4/Indicateur 4 - Mail type handicap": `**MAIL TYPE\\
 HANDICAP**
 
@@ -3178,6 +3182,7 @@ Le présent règlement intérieur entre en application à compter du {DATE_REGLE
 
 export const BDC_NT_STATIC_ASSETS: { src: string; zipPath: string }[] = [
   { src: '/pdfs/bdc_nt/calendrier_annuel.xlsx', zipPath: 'Indicateur 1/1. Calendrier annuel.xlsx' },
+  { src: '/pdfs/bdc_nt/cahier_contacts_analyse_besoin.xlsx', zipPath: 'Indicateur 4/Indicateur 4 - Cahier de contacts et analyse du besoin.xlsx' },
   { src: '/pdfs/bdc_nt/suivi_adaptation.xlsx', zipPath: 'Indicateur 10/Indicateur 10 - Suivi de l\'adaptation à l\'accompagnement.xlsx' },
   { src: '/pdfs/bdc_nt/contacts_suivi_handicap.xlsx', zipPath: 'Indicateur 26/Indicateur 26 - Contacts et suivi handicap.xlsx' },
   { src: '/pdfs/bdc_nt/contacts_agefiph.pdf', zipPath: 'Indicateur 26/Indicateur 26 - Contacts AGEFIPH.pdf' },
