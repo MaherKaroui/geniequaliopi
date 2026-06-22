@@ -210,7 +210,7 @@ function fileTitle(key: string): string {
 }
 
 /** Mappe un numéro d'indicateur Qualiopi vers son critère. */
-function critereForIndicateur(ind: number): number {
+export function critereForIndicateur(ind: number): number {
   if (ind <= 3) return 1;
   if (ind <= 8) return 2;
   if (ind <= 16) return 3;
@@ -219,6 +219,42 @@ function critereForIndicateur(ind: number): number {
   if (ind <= 29) return 6;
   return 7;
 }
+
+/** Extrait le numéro d'indicateur depuis une clé source BDC. */
+export function indicateurFromKey(key: string): number {
+  const m = key.match(/Indicateur\s*(\d+)/i);
+  return m ? parseInt(m[1], 10) : 1;
+}
+
+/** Titre lisible (nom de fichier sans extension) d'une clé source. */
+export function bdcDocTitle(key: string): string {
+  const name = key.split("/").pop() || key;
+  return name;
+}
+
+/**
+ * Génère l'HTML d'un document BDC pour affichage / édition / export individuel.
+ * Si stagiaire est fourni, applique les substitutions nominatives.
+ */
+export function renderBdcNTDocHtml(
+  key: string,
+  org: OrganismeInfo,
+  stagiaire: StagiaireInfo | null,
+): string {
+  const raw = BDC_NT_SOURCE[key];
+  if (!raw) {
+    return `<!DOCTYPE html><html><body style="font-family:Arial;padding:40px;color:#b91c1c">
+<h1>Document BDC introuvable</h1><p>Clé : ${key}</p></body></html>`;
+  }
+  const dates = computeDates(stagiaire || undefined, org);
+  let md = applySubstitutions(raw, org, stagiaire, dates);
+  const title = bdcDocTitle(key);
+  if (!dates.bilanTermine && /Certificat de réalisation|Compte rendu de fin/i.test(title)) {
+    md = md.replace(/\n[^|\n]{200,}\n/g, "\n[À compléter à la fin du bilan]\n");
+  }
+  return mdToHtml(md, title).replace("</body>", buildFooter(org, dates) + "</body>");
+}
+
 
 /**
  * Convertit un dossier source (ex: "Indicateur 10", "Indicateur 23 & 24 & 25")
