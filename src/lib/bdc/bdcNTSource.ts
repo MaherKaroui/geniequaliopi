@@ -4063,12 +4063,9 @@ ainsi qu\\'il suit :
 
 **Entrée en application**
 
-Le présent règlement intérieur entre en application à compter du
-01/01/2026.
+Le présent règlement intérieur entre en application à compter du {DATE_REGLEMENT}.
 
-Copie remise à l'apprenant le
-
-Nom, prénom et signature de l'apprenant
+{SIGNATURES_ORG_STAGIAIRE}
 `,
 };
 
