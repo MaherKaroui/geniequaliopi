@@ -13,6 +13,7 @@ import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { htmlToWordBlob } from "@/lib/wordExport";
 import { htmlWrap, orgHeader, footer as docFooter } from "@/lib/docBuilder";
 import { BDC_NT_SOURCE, BDC_NT_PER_BENEFICIAIRE, BDC_NT_STATIC_ASSETS } from "./bdcNTSource";
+import { BDC_TEMPLATES, renderBdcTemplateIfMapped } from "./bdcTemplateMap";
 import type { JobReporter } from "@/lib/backgroundJobs";
 
 const MOIS_FR = ["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
