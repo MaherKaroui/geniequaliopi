@@ -4,9 +4,31 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { ArrowLeft, AlertTriangle, CheckCircle2, XCircle, RefreshCw, ShieldCheck, Search } from "lucide-react";
+import { ArrowLeft, AlertTriangle, CheckCircle2, XCircle, RefreshCw, ShieldCheck, Search, Sparkles, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { buildFullCatalog } from "@/lib/docCatalog";
 
 type Severity = "error" | "warning" | "info";
+type AuditType = "AF" | "BC" | "VAE" | "CFA";
+type AiSeverity = "critical" | "major" | "minor" | "info";
+
+interface AiFinding {
+  severity: AiSeverity;
+  categorie: "manquant" | "incoherence" | "incorrect" | "amelioration";
+  critere: number;
+  indicateur: number;
+  zone: string;
+  constat: string;
+  impact: string;
+  action: string;
+}
+
+interface AiAudit {
+  scoreGlobal: number;
+  synthese: string;
+  findings: AiFinding[];
+}
 
 interface CheckRow {
   critere: number;
@@ -206,7 +228,10 @@ function runIncoherences(org: any, form: any, stag: any[]): Incoherence[] {
 const QualiopiCheck = () => {
   const navigate = useNavigate();
   const [tick, setTick] = useState(0);
-  const [tab, setTab] = useState<"checklist" | "incoherences">("checklist");
+  const [tab, setTab] = useState<"checklist" | "incoherences" | "ai">("ai");
+  const [auditType, setAuditType] = useState<AuditType>("AF");
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiAudit, setAiAudit] = useState<AiAudit | null>(null);
 
   // Live refresh: re-read sessionStorage on focus
   useEffect(() => {
@@ -230,6 +255,40 @@ const QualiopiCheck = () => {
     return { org, form, stag, checks, incos, score, byCrit };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tick]);
+
+  // Auto-detect default audit type from org.typesActions
+  useEffect(() => {
+    const t = (org?.typesActions || []) as string[];
+    if (t.includes("vae")) setAuditType("VAE");
+    else if (t.includes("bilans-competences")) setAuditType("BC");
+    else if (t.includes("apprentissage")) setAuditType("CFA");
+    else setAuditType("AF");
+  }, [org?.typesActions]);
+
+  const runAiAudit = async () => {
+    setAiLoading(true);
+    setAiAudit(null);
+    try {
+      const formations = form?.intitule ? [form] : [];
+      let documents: { nom: string; critere: number; indicateur: number }[] = [];
+      try {
+        const cat = buildFullCatalog(formations as any, (stag || []) as any, [], (org?.typesActions || []) as any, org?.dirigeant);
+        documents = cat.map(d => ({ nom: d.nom, critere: d.critere, indicateur: d.indicateur }));
+      } catch {}
+      const { data, error } = await supabase.functions.invoke("audit-ia", {
+        body: { type: auditType, organisme: org, formation: form, stagiaires: stag, documents },
+      });
+      if (error) throw error;
+      if ((data as any)?.error) throw new Error((data as any).error);
+      if (!(data as any)?.findings) throw new Error("Réponse IA invalide");
+      setAiAudit(data as AiAudit);
+      toast.success(`Audit IA terminé — ${(data as AiAudit).findings.length} points relevés`);
+    } catch (e: any) {
+      toast.error(e.message || "Erreur audit IA");
+    } finally {
+      setAiLoading(false);
+    }
+  };
 
   const errCount = incos.filter(i => i.severity === "error").length;
   const warnCount = incos.filter(i => i.severity === "warning").length;
@@ -268,6 +327,9 @@ const QualiopiCheck = () => {
               <p className="text-xs text-muted-foreground mt-2">{warnCount} alerte(s) • {incos.length - errCount - warnCount} info(s)</p>
             </div>
             <div className="flex flex-col gap-2">
+              <Button variant={tab === "ai" ? "default" : "outline"} onClick={() => setTab("ai")} className="justify-start">
+                <Sparkles className="w-4 h-4 mr-2" /> Audit IA (réel)
+              </Button>
               <Button variant={tab === "checklist" ? "default" : "outline"} onClick={() => setTab("checklist")} className="justify-start">
                 <ShieldCheck className="w-4 h-4 mr-2" /> Checklist 32 indicateurs
               </Button>
@@ -329,6 +391,95 @@ const QualiopiCheck = () => {
                     </div>
                   </div>
                 ))}
+              </div>
+            )}
+          </Card>
+        )}
+
+        {tab === "ai" && (
+          <Card className="p-5 space-y-4">
+            <div className="flex items-center justify-between flex-wrap gap-3">
+              <div>
+                <p className="font-semibold flex items-center gap-2"><Sparkles className="w-4 h-4 text-primary" /> Audit IA en direct</p>
+                <p className="text-xs text-muted-foreground">L'IA analyse réellement ton dossier (organisme, formation, stagiaires, documents générés) et liste tout ce qui manque, est incohérent ou améliorable.</p>
+              </div>
+              <div className="flex items-center gap-2">
+                {(["AF", "BC", "VAE", "CFA"] as AuditType[]).map(t => (
+                  <Button key={t} size="sm" variant={auditType === t ? "default" : "outline"} onClick={() => setAuditType(t)}>{t}</Button>
+                ))}
+                <Button size="sm" onClick={runAiAudit} disabled={aiLoading} className="ml-2">
+                  {aiLoading ? <><Loader2 className="w-4 h-4 mr-1 animate-spin" /> Audit en cours…</> : <><Sparkles className="w-4 h-4 mr-1" /> Lancer l'audit IA</>}
+                </Button>
+              </div>
+            </div>
+
+            {!aiAudit && !aiLoading && (
+              <div className="text-center py-10 text-sm text-muted-foreground">
+                Sélectionne le type d'action ({auditType}) puis lance l'audit IA pour obtenir un rapport détaillé.
+              </div>
+            )}
+
+            {aiLoading && (
+              <div className="text-center py-10">
+                <Loader2 className="w-8 h-8 animate-spin text-primary mx-auto mb-2" />
+                <p className="text-sm text-muted-foreground">Analyse du dossier en cours — l'IA passe en revue chaque indicateur…</p>
+              </div>
+            )}
+
+            {aiAudit && (
+              <div className="space-y-4">
+                <div className="grid md:grid-cols-3 gap-4">
+                  <Card className="p-4 bg-primary/5 border-primary/20">
+                    <p className="text-xs text-muted-foreground">Score auditeur</p>
+                    <p className="text-4xl font-bold text-primary">{aiAudit.scoreGlobal}%</p>
+                    <Progress value={aiAudit.scoreGlobal} className="mt-2" />
+                  </Card>
+                  <Card className="p-4 md:col-span-2">
+                    <p className="text-xs text-muted-foreground mb-1">Synthèse</p>
+                    <p className="text-sm">{aiAudit.synthese}</p>
+                    <div className="flex gap-3 mt-3 text-xs">
+                      <Badge variant="destructive">{aiAudit.findings.filter(f => f.severity === "critical").length} critiques</Badge>
+                      <Badge className="bg-orange-500 hover:bg-orange-500">{aiAudit.findings.filter(f => f.severity === "major").length} majeurs</Badge>
+                      <Badge variant="secondary">{aiAudit.findings.filter(f => f.severity === "minor").length} mineurs</Badge>
+                      <Badge variant="outline">{aiAudit.findings.filter(f => f.severity === "info").length} infos</Badge>
+                    </div>
+                  </Card>
+                </div>
+
+                <div className="space-y-2">
+                  {aiAudit.findings
+                    .slice()
+                    .sort((a, b) => {
+                      const ord = { critical: 0, major: 1, minor: 2, info: 3 } as const;
+                      return ord[a.severity] - ord[b.severity];
+                    })
+                    .map((f, idx) => {
+                      const color =
+                        f.severity === "critical" ? "border-l-destructive bg-destructive/5"
+                        : f.severity === "major" ? "border-l-orange-500 bg-orange-50"
+                        : f.severity === "minor" ? "border-l-amber-400 bg-amber-50"
+                        : "border-l-blue-400 bg-blue-50";
+                      const catLabel = {
+                        manquant: "🔴 Manquant",
+                        incoherence: "⚠️ Incohérence",
+                        incorrect: "❌ Incorrect",
+                        amelioration: "💡 Amélioration",
+                      }[f.categorie] || f.categorie;
+                      return (
+                        <div key={idx} className={`border-l-4 rounded p-3 ${color}`}>
+                          <div className="flex items-center gap-2 flex-wrap mb-1">
+                            <Badge variant="outline" className="text-[10px] uppercase">{f.severity}</Badge>
+                            <span className="text-xs font-semibold">{catLabel}</span>
+                            {f.critere > 0 && <Badge variant="secondary" className="text-[10px]">C{f.critere}{f.indicateur > 0 ? ` · IND ${f.indicateur}` : ""}</Badge>}
+                            <span className="text-xs text-muted-foreground">{f.zone}</span>
+                          </div>
+                          <p className="text-sm font-medium">{f.constat}</p>
+                          {f.impact && <p className="text-xs text-muted-foreground mt-1"><strong>Impact :</strong> {f.impact}</p>}
+                          {f.action && <p className="text-xs text-primary mt-1">→ <strong>Action :</strong> {f.action}</p>}
+                        </div>
+                      );
+                    })}
+                </div>
               </div>
             )}
           </Card>
