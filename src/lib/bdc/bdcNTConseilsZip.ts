@@ -366,6 +366,8 @@ function getPersonalizedRaw(key: string, s: StagiaireInfo | null, org: Organisme
 
 /** Markdown (pandoc-style) → fragment HTML (corps uniquement) */
 function mdToHtmlBody(md: string): string {
+  // Nettoie les artefacts d'échappement (ex: \' → ', \" → ")
+  md = md.replace(/\\'/g, "'").replace(/\\"/g, '"');
   const esc = (s: string) => s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
   const inline = (s: string) => esc(s)
     .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
