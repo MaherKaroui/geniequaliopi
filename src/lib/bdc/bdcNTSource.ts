@@ -2793,56 +2793,26 @@ intervenant extérieur au réseau
 
 **LOCAUX & TRANSPORT**
 
-Les locaux de l'organisme de formation se trouvent au 5 rue Pleyel 93200
-Saint- Denis.
+Les locaux de l\'organisme de formation se trouvent au {ORG_ADRESSE_COMPLETE}.
 
-Vous pouvez y accéder par différents moyens de transport :
+Vous pouvez y accéder par différents moyens de transport (métro, RER, bus, parking à proximité). Le détail des accès est communiqué au bénéficiaire avant le début de la prestation.
 
-- METRO 1
-
-- Ligne BUS 158, 174
-
-- 
-
-[Gare VANVES-MALAKOFF (7 minutes) :]{.underline}
-
-![Une image contenant carte, texte, atlas Description générée
-automatiquement](media/image1.png){width="6.3in"
-height="2.246376859142607in"}
-
-Conformément à la législation applicable aux ERP, nos locaux sont
-accessibles aux personnes à mobilité réduite.
+Conformément à la législation applicable aux ERP, nos locaux sont accessibles aux personnes à mobilité réduite.
 
 **RESTAURATION**
 
-Vous pouvez restaurer auprès de différents établissements proches de
-l'organisme de formation :
+Vous pouvez vous restaurer auprès de différents établissements proches de l\'organisme de formation (restaurants, brasseries et commerces alimentaires situés à proximité immédiate). Une liste actualisée est remise sur simple demande à l\'accueil.
 
-  ----------------------- ----------------------- -----------------------
-       CHEZ PAPINOU                               
+**HÉBERGEMENT**
 
-  ----------------------- ----------------------- -----------------------
+Plusieurs hôtels sont à votre disposition à proximité de {VILLE_ORG} si vous souhaitez venir dès la veille du début de la prestation. Nos équipes peuvent vous orienter vers des établissements partenaires.
 
-![Une image contenant carte, texte, atlas Description générée
-automatiquement](media/image1.png){width="6.3in"
-height="2.245833333333333in"}
+**CONTACT**
 
-**HEBERGEMENT**
+Pour toute information complémentaire concernant l\'accès, la restauration ou l\'hébergement, vous pouvez contacter l\'organisme de formation :
 
-Plusieurs hôtels sont à votre disposition si vous souhaitez venir dès la
-veille du début de formation.
-
-  ----------------------- ----------------------- -----------------------
-       Le bon hôtel                               
-
-  ----------------------- ----------------------- -----------------------
-
-![Une image contenant carte, texte, atlas Description générée
-automatiquement](media/image1.png){width="6.3in"
-height="2.245833333333333in"}
-
-**\\
-\\**
+- Adresse : {ORG_ADRESSE_COMPLETE}
+- Email : {ORG_EMAIL}{ORG_TEL_LINE}
 `,
   "Indicateur 9/Indicateur 9 - Mail d\u00e9but de prestation ": `**[NT CONSEILS]{.underline}**
 
