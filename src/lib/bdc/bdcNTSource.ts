@@ -986,90 +986,45 @@ A une fréquence pertinente, j'analyse les causes des abandons ou des dysfonctio
 `,
   "Indicateur 18/Indicateur 18 - Annuaire des contacts": `**ANNUAIRE DES CONTACTS**
 
-**\\**
-
 **RESPONSABLE DE LA FORMATION**
 
-Nom : ABDOULHALIK\\
-Téléphone : 0615291218\\
-Mail : contact.ntconseil@gmail.com
+Nom : {RESP_FORM}
+Téléphone : {ORG_TEL}
+Mail : {ORG_MAIL}
 
 **PÔLE ADMINISTRATIF**
 
-  -----------------------------------------------------------------------
-  **Référent               Nom : ABDOULHALIK\\
-  administratif**          Téléphone : 0615291218\\
-                           Mail : contact.ntconseil@gmail.com
-  ------------------------ ----------------------------------------------
-  **Référent handicap**    Nom : ABDOULHALIK\\
-                           Téléphone : 0615291218\\
-                           Mail : contact.ntconseil@gmail.com
+| **Rôle** | **Contact** |
+|---|---|
+| **Référent administratif** | Nom : {RESP_FORM} §§BR§§ Téléphone : {ORG_TEL} §§BR§§ Mail : {ORG_MAIL} |
+| **Référent handicap** | Nom : {REF_HANDICAP} §§BR§§ Téléphone : {ORG_TEL} §§BR§§ Mail : {ORG_MAIL} |
+| **Secrétaire** | Nom : {RESP_FORM} §§BR§§ Téléphone : {ORG_TEL} §§BR§§ Mail : {ORG_MAIL} |
+| **Agent d'accueil** | Nom : §§BR§§ Téléphone : §§BR§§ Mail : |
+| **Comptable** | Nom : §§BR§§ Téléphone : §§BR§§ Mail : |
 
-  **Secrétaire**           Nom : ABDOULHALIK\\
-                           Téléphone : 0615291218\\
-                           Mail : contact.ntconseil@gmail.com
+**PÔLE COMPÉTENCES**
 
-  **Agent d'accueil**      Nom :\\
-                           Téléphone :\\
-                           Mail :
-
-  **Comptable**            Nom :\\
-                           Téléphone :\\
-                           Mail :
-  -----------------------------------------------------------------------
-
-**\\**
-
-**PÔLE COMPETENCES**
-
-  -----------------------------------------------------------------------
-  **Référent pédagogique** Nom : ABDOULHALIK\\
-                           Téléphone : 0615291218\\
-                           Mail : contact.ntconseil@gmail.com
-  ------------------------ ----------------------------------------------
-  **Consultants**          Nom :\\
-                           Téléphone :\\
-                           Mail :
-
-  **Référent veille**      Nom :\\
-                           Téléphone :\\
-                           Mail :
-  -----------------------------------------------------------------------
+| **Rôle** | **Contact** |
+|---|---|
+| **Référent pédagogique** | Nom : {REF_PEDA} §§BR§§ Téléphone : {ORG_TEL} §§BR§§ Mail : {ORG_MAIL} |
+| **Consultants** | Nom : §§BR§§ Téléphone : §§BR§§ Mail : |
+| **Référent veille / qualité** | Nom : {REF_QUALITE} §§BR§§ Téléphone : {ORG_TEL} §§BR§§ Mail : {ORG_MAIL} |
 
 **PÔLE COMMERCIAL**
 
-  -----------------------------------------------------------------------
-  **Référent commercial**  Nom : ABDOULHALIK\\
-                           Téléphone : 0615291218\\
-                           Mail : contact.ntconseil@gmail.com
-  ------------------------ ----------------------------------------------
-  **Business developer**   Nom : ABDOULHALIK\\
-                           Téléphone : 0615291218\\
-                           Mail : contact.ntconseil@gmail.com
-
-  **Communication**        Nom : ABDOULHALIK\\
-                           Téléphone : 0615291218\\
-                           Mail : contact.ntconseil@gmail.com
-  -----------------------------------------------------------------------
+| **Rôle** | **Contact** |
+|---|---|
+| **Référent commercial** | Nom : {RESP_FORM} §§BR§§ Téléphone : {ORG_TEL} §§BR§§ Mail : {ORG_MAIL} |
+| **Business developer** | Nom : {RESP_FORM} §§BR§§ Téléphone : {ORG_TEL} §§BR§§ Mail : {ORG_MAIL} |
+| **Communication** | Nom : {RESP_FORM} §§BR§§ Téléphone : {ORG_TEL} §§BR§§ Mail : {ORG_MAIL} |
 `,
   "Indicateur 18/Indicateur 18 - Organigramme": `**ORGANIGRAMME**
 
-**Responsable de la formation**\\
-ABDOULHALIK ANTTOISSE
+**Responsable de la formation : {RESP_FORM}**
 
-+----------------------+-----------------------+-----------------------+
-| **Pôle               | **Pôle Compétences**  | **Pôle Commercial**   |
-| Administratif**      |                       |                       |
-+:====================:+:=====================:+:=====================:+
-| Secrétaire           | Consultants           | Business développer   |
-|                      |                       |                       |
-| Agent d'accueil      | Référent pédagogique  | Communication         |
-|                      |                       |                       |
-| Référent handicap    |                       |                       |
-|                      |                       |                       |
-| Référent             |                       |                       |
-| administratif        |                       |                       |
-+----------------------+-----------------------+-----------------------+
+| **Pôle Administratif** | **Pôle Compétences** | **Pôle Commercial** |
+|---|---|---|
+| Secrétaire §§BR§§ Agent d'accueil §§BR§§ Référent handicap ({REF_HANDICAP}) §§BR§§ Référent administratif ({RESP_FORM}) | Consultants §§BR§§ Référent pédagogique ({REF_PEDA}) §§BR§§ Référent qualité ({REF_QUALITE}) | Business developer §§BR§§ Communication §§BR§§ Référent commercial |
 `,
   "Indicateur 2/Indicateur 2 - Indicateurs de r\u00e9sultats": `## Présentation des indicateurs de résultat
 
