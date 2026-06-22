@@ -1,5 +1,7 @@
 // AUTO-GENERATED from AUDIT NT CONSEILS source pack. Edit with care.
 export const BDC_NT_PER_BENEFICIAIRE = new Set<string>([
+  "Indicateur 4/Indicateur 4 - Fiche d'analyse de besoin",
+  "Indicateur 4/Indicateur 4 - Fiche préalable au bilan de compétences",
   "Indicateur 10/Indicateur 10 - Convention de prestation",
   "Indicateur 10/Indicateur 10 - Entretien interm\u00e9diaire b\u00e9n\u00e9ficiaire",
   "Indicateur 10/Indicateur 10 - Fiche p\u00e9dagogique",
