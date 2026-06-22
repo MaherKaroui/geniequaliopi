@@ -390,19 +390,20 @@ function preprocessGridTables(md: string): string {
       } else break;
     }
 
-    // Parse les cellules accumulées entre bordures
+    // Parse les cellules accumulées entre bordures (préserve les sauts de ligne via §§BR§§)
     const rows: string[][] = [];
     let cur: string[] = new Array(cols.length - 1).fill("");
     let curHas = false;
     for (const bl of block) {
       if (isBorder(bl)) {
-        if (curHas) { rows.push(cur.map(s => s.replace(/\s+/g, " ").trim())); cur = new Array(cols.length - 1).fill(""); curHas = false; }
+        if (curHas) { rows.push(cur.map(s => s.replace(/§§BR§§\s*$/,"").replace(/^\s*§§BR§§/,"").trim())); cur = new Array(cols.length - 1).fill(""); curHas = false; }
         continue;
       }
       if (!/^\|/.test(bl)) continue;
       for (let k = 0; k < cols.length - 1; k++) {
         const slice = bl.slice(cols[k] + 1, cols[k + 1]).trim();
         if (slice) { cur[k] = cur[k] ? cur[k] + " " + slice : slice; curHas = true; }
+        else if (cur[k]) { cur[k] = cur[k] + "§§BR§§"; }
       }
     }
 
