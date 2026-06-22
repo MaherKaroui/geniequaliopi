@@ -749,7 +749,9 @@ BILAN DE COMPETENCES**
 
 **ENTRE LES SOUSSIGNÉS :**
 
-\\- **ZOCLY Marc**
+\\- **{CIV_NOM_BENEF}**
+
+{BENEF_INFOS_BLOC}
 
 Ci-dessus désigné le bénéficiaire,
 
@@ -759,7 +761,9 @@ Et
 
 Représenté par ABDOULHALIK ANTTOISSE
 
-N° Organisme de formation : EN COURS D'ATTRIBUTION
+N° SIRET : {ORG_SIRET}
+
+N° Déclaration d'activité : {ORG_NDA}
 
 Enregistré auprès du préfet de la région ÎLE DE FRANCE
 
