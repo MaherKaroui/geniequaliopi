@@ -181,6 +181,19 @@ function applySubstitutions(src: string, org: OrganismeInfo, s: StagiaireInfo | 
   txt = txt.replace(/\{DATE_REGLEMENT\}/g, dates.dateConvention);
   txt = txt.replace(/\{VILLE_ORG\}/g, org.ville || "[Ville]");
 
+  // Placeholders Annuaire / Organigramme (IND 18)
+  const respForm = (org.dirigeant || "[Responsable]").toString();
+  const refPeda = ((org as any).responsablePedagogique || respForm).toString();
+  const refHandicap = ((org as any).referentHandicap || respForm).toString();
+  const refQualite = ((org as any).referentQualite || respForm).toString();
+  txt = txt
+    .replace(/\{RESP_FORM\}/g, respForm)
+    .replace(/\{REF_PEDA\}/g, refPeda)
+    .replace(/\{REF_HANDICAP\}/g, refHandicap)
+    .replace(/\{REF_QUALITE\}/g, refQualite)
+    .replace(/\{ORG_TEL\}/g, orgTel || "")
+    .replace(/\{ORG_MAIL\}/g, orgEmail);
+
   // Bloc signatures : tampon + signature organisme | signature apprenant
   const tampon = org.tamponUrl
     ? `<img src="${org.tamponUrl}" alt="Tampon" style="max-height:90px;max-width:170px;display:block;margin:4px 0;" />`
