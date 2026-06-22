@@ -875,6 +875,37 @@ export function genProcedureAccompagnementPostFormationCFA(o: OrganismeInfo) {
 export function genPlanMixiteMetiersCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[] = []) {
   const annee = f.dateDebut ? new Date(f.dateDebut).getFullYear() : new Date().getFullYear();
   const terminee = isFormationTerminee(f, stagiaires);
+  const today = new Date();
+
+  // Dates calculées automatiquement sur la fenêtre [dateDebut, dateFin]
+  const MOIS_FR = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
+  const d1 = f.dateDebut ? new Date(f.dateDebut) : null;
+  const d2 = f.dateFin ? new Date(f.dateFin) : null;
+  const totalMs = d1 && d2 ? d2.getTime() - d1.getTime() : 0;
+  const at = (ratio: number): Date | null => {
+    if (!d1 || !d2 || totalMs <= 0) return null;
+    const r = Math.max(0, Math.min(1, ratio));
+    return new Date(d1.getTime() + totalMs * r);
+  };
+  const periode = (d: Date | null, fallback: string) => d ? `${MOIS_FR[d.getMonth()]} ${d.getFullYear()}` : fallback;
+  const statut = (d: Date | null) => {
+    if (terminee) return "Réalisé";
+    if (!d) return "Programmé";
+    if (d.getTime() < today.getTime() - 7 * 24 * 3600 * 1000) return "Réalisé";
+    if (Math.abs(d.getTime() - today.getTime()) <= 30 * 24 * 3600 * 1000) return "En cours";
+    return "Programmé";
+  };
+  const cell = (ratio: number, fallback: string) => {
+    const d = at(ratio);
+    return { p: periode(d, fallback), s: statut(d) };
+  };
+
+  // Répartition des actions datées sur le parcours : atelier (5%), témoignage (20%), journée droits femmes (40%), forum (55%)
+  const atelier = cell(0.05, `Septembre ${annee}`);
+  const temoignage = cell(0.20, `Novembre ${annee}`);
+  const journeeFemmes = cell(0.40, `Mars ${annee + 1}`);
+  const forum = cell(0.55, `Avril ${annee + 1}`);
+
   return buildDocument({
     org: o,
     title: `PLAN D'ACTIONS — ENCOURAGER LA MIXITÉ AU SEIN DES MÉTIERS PRÉPARÉS — ${annee}`,
@@ -895,13 +926,13 @@ export function genPlanMixiteMetiersCFA(o: OrganismeInfo, f: FormationInfo, stag
       },
       {
         heading: "Actions de sensibilisation programmées",
-        content: tableHTML(
+        content: `<p><em>Échéances calculées automatiquement sur la base du calendrier de la formation (${f.dateDebut ? formatDate(f.dateDebut) : "—"} → ${f.dateFin ? formatDate(f.dateFin) : "—"}).</em></p>` + tableHTML(
           ["Action", "Public ciblé", "Période", "Statut"],
           [
-            ["Atelier « Lutte contre les stéréotypes de genre »", "Tous les apprentis", `Septembre ${annee}`, terminee ? "Réalisé" : "Programmé"],
-            ["Témoignage de professionnel·le·s en métier non-mixte", "Apprentis 1ère année", `Novembre ${annee}`, terminee ? "Réalisé" : "Programmé"],
-            ["Participation à la Journée internationale des droits des femmes", "Tous les apprentis", `Mars ${annee + 1}`, terminee ? "Réalisé" : "À programmer"],
-            ["Forum « Métiers sans frontières de genre » (partenariat Mission Locale)", "Apprentis + candidats", `Avril ${annee + 1}`, terminee ? "Réalisé" : "À programmer"],
+            ["Atelier « Lutte contre les stéréotypes de genre »", "Tous les apprentis", atelier.p, terminee ? "Réalisé" : atelier.s],
+            ["Témoignage de professionnel·le·s en métier non-mixte", "Apprentis 1ère année", temoignage.p, terminee ? "Réalisé" : temoignage.s],
+            ["Participation à la Journée internationale des droits des femmes", "Tous les apprentis", journeeFemmes.p, terminee ? "Réalisé" : journeeFemmes.s],
+            ["Forum « Métiers sans frontières de genre » (partenariat Mission Locale)", "Apprentis + candidats", forum.p, terminee ? "Réalisé" : forum.s],
             ["Communication non-sexiste dans les supports de recrutement", "Équipe pédagogique", "Permanent", "En cours"],
           ]
         ),
