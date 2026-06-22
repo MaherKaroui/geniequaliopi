@@ -714,20 +714,22 @@ function mdToHtmlBody(md: string): string {
   const closeLists = () => { if (inUl){out.push("</ul>");inUl=false;} if(inOl){out.push("</ol>");inOl=false;} };
   const closeTable = () => { if (inTable){out.push("</table>");inTable=false;tableRowIdx=0;tableHasHeader=true;} };
 
-  let inRawHtml = false;
+  let rawHtmlTag: "table" | "div" | "section" | "article" | null = null;
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
     const trimmed = line.trim();
     // Bloc HTML brut (ex: tableau signatures) : passe sans échappement markdown
-    if (inRawHtml) {
+    if (rawHtmlTag) {
       out.push(line);
-      if (/<\/(table|div|section|article)>\s*$/i.test(trimmed)) inRawHtml = false;
+      if (new RegExp(`</${rawHtmlTag}>\\s*$`, "i").test(trimmed)) rawHtmlTag = null;
       continue;
     }
-    if (/^<(table|div|section|article)[\s>]/i.test(trimmed)) {
+    const rawStart = trimmed.match(/^<(table|div|section|article)[\s>]/i);
+    if (rawStart) {
       flushParagraph(); closeLists(); closeTable();
       out.push(line);
-      if (!new RegExp(`</(table|div|section|article)>\\s*$`, "i").test(trimmed)) inRawHtml = true;
+      const tag = rawStart[1].toLowerCase() as "table" | "div" | "section" | "article";
+      if (!new RegExp(`</${tag}>\\s*$`, "i").test(trimmed)) rawHtmlTag = tag;
       continue;
     }
     if (!trimmed) {
