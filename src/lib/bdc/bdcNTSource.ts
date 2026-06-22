@@ -917,33 +917,24 @@ APPRENANT**
 `,
   "Indicateur 10/Indicateur 10 - Suivi de l_adaptation \u00e0 l_accompagnement": `**NT CONSEILS**
 
-**SUIVI DE L'ADAPTATION À L'ACCOMPAGNEMENT\\**
+**SUIVI DE L'ADAPTATION À L'ACCOMPAGNEMENT**
 
 Nom du bénéficiaire : **ZOCLY Marc**
 
-Dates de la prestation : 19/02/2024 au 22/04/2024
+Dates de la prestation : 19/02/2024 au 22/04/2024
 
-Prestation : Bilan de compétences
+Prestation : Bilan de compétences
 
-  ---------- ------------------------- ----------------- -----------------
-   **Date**   **Problème rencontré**    **Adaptation**       **Suivi**
-
-                                                         
-
-                                                         
-
-                                                         
-
-                                                         
-
-                                                         
-
-                                                         
-
-                                                         
-
-                                                         
-  ---------- ------------------------- ----------------- -----------------
+| **Date** | **Problème rencontré** | **Adaptation** | **Suivi** |
+|----------|------------------------|----------------|-----------|
+|          |                        |                |           |
+|          |                        |                |           |
+|          |                        |                |           |
+|          |                        |                |           |
+|          |                        |                |           |
+|          |                        |                |           |
+|          |                        |                |           |
+|          |                        |                |           |
 `,
   "Indicateur 12/Indicateur 12 - Guide d_entretien des abandons": `**GUIDE D'ENTRETIEN\\
 DES ABANDONS**
