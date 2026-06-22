@@ -115,13 +115,13 @@ export function genPlanMixiteEgaliteFHCFA(o: OrganismeInfo, f: FormationInfo, st
       {
         heading: "État des lieux",
         content: tableHTML(
-          ["Indicateur", "Année N-1", `Objectif ${annee}`, terminee ? `Réalisé ${annee}` : "Suivi en cours"],
+          ["Indicateur", "Objectif de l'année de formation", terminee ? `Réalisé ${annee}` : "Suivi en cours"],
           [
-            ["Taux de féminisation des promotions", "32 %", "≥ 40 %", terminee ? "41 %" : "À consolider"],
-            ["Taux d'abandon — femmes", "6 %", "≤ 5 %", terminee ? "4 %" : "Suivi en cours"],
-            ["Taux d'abandon — hommes", "8 %", "≤ 5 %", terminee ? "5 %" : "Suivi en cours"],
-            ["Réclamations liées au sexisme", "0", "0", "0"],
-            ["Heures de formation égalité F/H par apprenti", "2 h", "4 h", terminee ? "4 h" : "En cours"],
+            ["Taux de féminisation des promotions", "≥ 40 %", terminee ? "41 %" : "À consolider"],
+            ["Taux d'abandon — femmes", "≤ 5 %", terminee ? "4 %" : "Suivi en cours"],
+            ["Taux d'abandon — hommes", "≤ 5 %", terminee ? "5 %" : "Suivi en cours"],
+            ["Réclamations liées au sexisme", "0", "0"],
+            ["Heures de formation égalité F/H par apprenti", "4 h", terminee ? "4 h" : "En cours"],
           ]
         ),
       },
