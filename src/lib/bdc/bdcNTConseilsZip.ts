@@ -446,7 +446,13 @@ function mdToHtmlBody(md: string): string {
   }
   const lines = allLines.slice(start);
   const out: string[] = [];
+  const paragraphBuffer: string[] = [];
   let inUl = false, inOl = false, inTable = false, tableRowIdx = 0;
+  const flushParagraph = () => {
+    if (paragraphBuffer.length === 0) return;
+    out.push(`<p>${inline(paragraphBuffer.join(" ").replace(/\s+/g, " ").trim())}</p>`);
+    paragraphBuffer.length = 0;
+  };
   const closeLists = () => { if (inUl){out.push("</ul>");inUl=false;} if(inOl){out.push("</ol>");inOl=false;} };
   const closeTable = () => { if (inTable){out.push("</table>");inTable=false;tableRowIdx=0;} };
 
@@ -460,6 +466,7 @@ function mdToHtmlBody(md: string): string {
       while (nextIdx < lines.length && !lines[nextIdx].trim()) nextIdx++;
       const next = nextIdx < lines.length ? lines[nextIdx].trim() : "";
       const nextIsListItem = /^[-*+]\s+/.test(next) || /^\d+\.\s+/.test(next);
+      flushParagraph();
       if (!nextIsListItem) closeLists();
       closeTable();
       out.push("");
@@ -467,6 +474,7 @@ function mdToHtmlBody(md: string): string {
     }
     let m = trimmed.match(/^(#{1,6})\s+(.*)$/);
     if (m) {
+      flushParagraph();
       closeLists(); closeTable();
       // Demote one level: #/##/### → h2/h3/h4 to avoid duplicate h1 + page-break-before
       const lvl = Math.min(6, m[1].length + 1);
@@ -474,18 +482,21 @@ function mdToHtmlBody(md: string): string {
       continue;
     }
     if (/^[-*+]\s+/.test(trimmed)) {
+      flushParagraph();
       closeTable();
       if (!inUl) { closeLists(); out.push("<ul>"); inUl = true; }
       out.push(`<li>${inline(trimmed.replace(/^[-*+]\s+/,""))}</li>`);
       continue;
     }
     if (/^\d+\.\s+/.test(trimmed)) {
+      flushParagraph();
       closeTable();
       if (!inOl) { closeLists(); out.push("<ol>"); inOl = true; }
       out.push(`<li>${inline(trimmed.replace(/^\d+\.\s+/,""))}</li>`);
       continue;
     }
     if (/^\|.*\|$/.test(trimmed)) {
+      flushParagraph();
       closeLists();
       if (!inTable) { out.push('<table class="bdc-table">'); inTable = true; tableRowIdx = 0; }
       const cells = trimmed.slice(1, -1).split("|").map(c => c.trim());
@@ -495,10 +506,11 @@ function mdToHtmlBody(md: string): string {
       tableRowIdx++;
       continue;
     }
-    if (/^[+\-=]{3,}/.test(trimmed)) { closeTable(); continue; }
+    if (/^[+\-=]{3,}/.test(trimmed)) { flushParagraph(); closeTable(); continue; }
     closeLists(); closeTable();
-    out.push(`<p>${inline(trimmed)}</p>`);
+    paragraphBuffer.push(trimmed);
   }
+  flushParagraph();
   closeLists(); closeTable();
   return out.join("\n");
 }
