@@ -247,17 +247,26 @@ export function renderBdcNTDocHtml(
   stagiaire: StagiaireInfo | null,
 ): string {
   const raw = BDC_NT_SOURCE[key];
+  const title = bdcDocTitle(key);
   if (!raw) {
-    return `<!DOCTYPE html><html><body style="font-family:Arial;padding:40px;color:#b91c1c">
-<h1>Document BDC introuvable</h1><p>Clé : ${key}</p></body></html>`;
+    return htmlWrap(orgHeader(org, title) + `<p style="color:#b91c1c">Document BDC introuvable (clé : ${key}).</p>` + docFooter(org));
   }
   const dates = computeDates(stagiaire || undefined, org);
   let md = applySubstitutions(raw, org, stagiaire, dates);
-  const title = bdcDocTitle(key);
   if (!dates.bilanTermine && /Certificat de réalisation|Compte rendu de fin/i.test(title)) {
     md = md.replace(/\n[^|\n]{200,}\n/g, "\n[À compléter à la fin du bilan]\n");
   }
-  return mdToHtml(md, title).replace("</body>", buildFooter(org, dates) + "</body>");
+  const body = mdToHtmlBody(md);
+  const beneficiaireLine = stagiaire
+    ? `<div style="margin:6px 0 18px;color:#475569;font-size:12px">Bénéficiaire : <strong>${stagiaire.prenom} ${stagiaire.nom}</strong></div>`
+    : "";
+  return htmlWrap(
+    orgHeader(org, title) +
+    beneficiaireLine +
+    `<div class="bdc-doc-body">${body}</div>` +
+    `<style>.bdc-doc-body table{border-collapse:collapse;width:100%;margin:8px 0;font-size:11px}.bdc-doc-body table td,.bdc-doc-body table th{border:1px solid #bbb;padding:6px;vertical-align:top}.bdc-doc-body h2{margin-top:18px}.bdc-doc-body h3{margin-top:14px}.bdc-doc-body ul,.bdc-doc-body ol{margin:6px 0 8px 22px}</style>` +
+    docFooter(org)
+  );
 }
 
 
