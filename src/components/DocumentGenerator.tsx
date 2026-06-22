@@ -38,6 +38,10 @@ const REAL_XLSX_TEMPLATES = new Set<string>([
   "relances_appreciations_excel",
   "indicateurs_performance",
   "vae_indicateurs_previsionnels",
+  "bdc_nt_calendrier_annuel",
+  "bdc_nt_suivi_adaptation",
+  "bdc_nt_contacts_handicap",
+  "bdc_nt_tableau_dysfonctionnements",
 ]);
 import { downloadAsPdf, htmlToPdfBlob } from "@/lib/pdfExport";
 import { processDocxTemplate, processMailDocxTemplate, DOCX_TEMPLATE_FILES, MAIL_TEMPLATE_FILES } from "@/lib/docxTemplateExport";
