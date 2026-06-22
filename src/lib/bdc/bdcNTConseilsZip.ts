@@ -790,6 +790,219 @@ ${remarques}
 `;
 }
 
+// ===== Questionnaires de satisfaction (IND 30) =====
+
+const SAT_ENTREPRISE_KEY = "Indicateur 30/Indicateur 30 - Questionnaire satisfaction entreprise";
+const SAT_FINANCEUR_KEY = "Indicateur 30/Indicateur 30 - Questionnaire satisfaction financeur";
+const SAT_INTERNE_KEY = "Indicateur 30/Indicateur 30 - Questionnaire satisfaction interne";
+
+function row4(label: string, score: 1 | 2 | 4 | 5): string {
+  const s = (v: 1 | 2 | 4 | 5) => (v === score ? "☒" : "☐");
+  return `| ${label} | ${s(1)} | ${s(2)} | ${s(4)} | ${s(5)} |`;
+}
+function row10(score: number): string {
+  const cells = Array.from({ length: 10 }, (_, i) => (i + 1 === score ? "☒" : "☐"));
+  return `| ${cells.join(" | ")} |`;
+}
+
+function buildSatisfactionEntrepriseMd(
+  s: StagiaireInfo,
+  _org: OrganismeInfo,
+  _dates: DatesCtx,
+  formation?: FormationInfo,
+): string {
+  const civ = s.civilite === "Mme" ? "Mme" : "M.";
+  const nomComplet = `${s.prenom || ""} ${s.nom || ""}`.trim() || "Bénéficiaire";
+  const entreprise = (s.entreprise || "").trim();
+  const debut = parseDateFR(s.dateDebutFormation) || parseDateFR(formation?.dateDebut) || new Date();
+  const fin = parseDateFR(s.dateFinFormation) || parseDateFR(formation?.dateFin) || debut;
+  const seed = hashStr(`sat-ent|${s.prenom}|${s.nom}|${s.email}`);
+  const sc = (off: number): 4 | 5 => ((seed + off) % 4 === 0 ? 4 : 5);
+  const note10 = 8 + ((seed >> 2) % 3);
+  const profile = formation ? getBdcDomainProfile(formation) : null;
+  const metier = profile?.metier || "le métier visé";
+  const commentaire = `RAS — Nous sommes globalement très satisfaits de l'accompagnement proposé à ${civ} ${s.nom || ""}. Le bilan a permis ${profile ? `de clarifier le projet d'orientation vers ${metier} et ` : ""}de structurer la suite du parcours professionnel. Échanges fluides avec l'organisme de formation.`;
+
+  return `**QUESTIONNAIRE SATISFACTION\\
+ENTREPRISE**
+
+*Ce questionnaire a pour objectif d'évaluer avec vous les bilans de compétences que nous dispensons, dans un souci permanent d'y apporter des améliorations et de répondre à vos attentes.*
+
+*${civ} ${nomComplet}${entreprise ? ` (${entreprise})` : ""}§§BR§§a participé à notre formation Bilan de compétences§§BR§§durant la période du ${fmtShortDate(debut)} au ${fmtShortDate(fin)}.*
+
+**Critères de satisfaction :**
+
+*1 = Pas du tout satisfait — 2 = Pas satisfait — 4 = Satisfait — 5 = Très satisfait*
+
+| **Concernant ce bilan de compétences, diriez-vous de chacun des éléments suivants que vous en êtes plutôt :** | **1** | **2** | **4** | **5** |
+|---|:---:|:---:|:---:|:---:|
+${row4("Informations obtenues avant le début de la prestation (programme / tarifs)", sc(0))}
+${row4("Programme et méthodes pédagogiques", sc(1))}
+${row4("Compétences acquises par le bénéficiaire", sc(2))}
+${row4("Informations obtenues au terme de la prestation", sc(3))}
+${row4("Gestion administrative globale du dossier du bénéficiaire", sc(4))}
+${row4("Adéquation globale de la prestation vis-à-vis de vos attentes", sc(5))}
+
+**Sur 10, quel est votre niveau de satisfaction générale sur la prestation écoulée ?**
+
+| **1** | **2** | **3** | **4** | **5** | **6** | **7** | **8** | **9** | **10** |
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+${row10(note10)}
+
+*Pas du tout satisfait → Très satisfait*
+
+| **En cas d'insatisfaction sur l'un des éléments précédents, pourriez-vous préciser pourquoi vous n'êtes pas satisfait :** |
+|---|
+| ${commentaire} |
+`;
+}
+
+function buildSatisfactionFinanceurMd(
+  s: StagiaireInfo,
+  org: OrganismeInfo,
+  _dates: DatesCtx,
+  formation?: FormationInfo,
+): string {
+  const civ = s.civilite === "Mme" ? "Mme" : "M.";
+  const nomComplet = `${s.prenom || ""} ${s.nom || ""}`.trim() || "Bénéficiaire";
+  const debut = parseDateFR(s.dateDebutFormation) || parseDateFR(formation?.dateDebut) || new Date();
+  const fin = parseDateFR(s.dateFinFormation) || parseDateFR(formation?.dateFin) || debut;
+  const seed = hashStr(`sat-fin|${s.prenom}|${s.nom}|${s.email}`);
+  const sc = (off: number): 4 | 5 => ((seed + off) % 5 === 0 ? 4 : 5);
+  const note10 = 8 + ((seed >> 1) % 3);
+  const orgNom = org.nom || "[Organisme]";
+  const profilFinanceur = "☒ CPF (Compte Personnel de Formation)  ☐ France Travail  ☐ Région  ☐ Entreprise  ☐ Autre";
+  const commentaire = `RAS — Dossier traité avec rigueur et dans les délais. L'organisme ${orgNom} a fourni l'ensemble des pièces administratives demandées (convention, attestation, certificat de réalisation). Aucun point d'insatisfaction à signaler.`;
+
+  return `**QUESTIONNAIRE SATISFACTION\\
+FINANCEUR**
+
+*Ce questionnaire a pour objectif d'évaluer avec vous la prestation que nous dispensons, dans un souci permanent d'y apporter des améliorations et de répondre à vos attentes.*
+
+*${civ} ${nomComplet}§§BR§§a participé à notre prestation : Bilan de compétences§§BR§§durant la période du ${fmtShortDate(debut)} au ${fmtShortDate(fin)}.§§BR§§Cette prestation a été financée par vos soins.*
+
+**Profil financeur :** ${profilFinanceur}
+
+**Critères de satisfaction :**
+
+*1 = Pas du tout satisfait — 2 = Pas satisfait — 4 = Satisfait — 5 = Très satisfait*
+
+| **Concernant cette prestation, diriez-vous de chacun des éléments suivants que vous en êtes plutôt :** | **1** | **2** | **4** | **5** |
+|---|:---:|:---:|:---:|:---:|
+${row4("Informations obtenues avant le début du bilan de compétences (programme / tarifs)", sc(0))}
+${row4("Informations obtenues au terme de la prestation", sc(1))}
+${row4("Gestion administrative globale du dossier du bénéficiaire", sc(2))}
+${row4("Contacts avec l'organisme de formation", sc(3))}
+
+**Sur 10, quel est votre niveau de satisfaction générale sur la formation écoulée ?**
+
+| **1** | **2** | **3** | **4** | **5** | **6** | **7** | **8** | **9** | **10** |
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+${row10(note10)}
+
+*Pas du tout satisfait → Très satisfait*
+
+| **En cas d'insatisfaction sur l'un des éléments précédents, pourriez-vous préciser pourquoi vous n'êtes pas satisfait :** |
+|---|
+| ${commentaire} |
+`;
+}
+
+function buildSatisfactionInterneMd(
+  s: StagiaireInfo,
+  org: OrganismeInfo,
+  _dates: DatesCtx,
+  _formation?: FormationInfo,
+): string {
+  const seed = hashStr(`sat-int|${s.prenom}|${s.nom}|${s.email}`);
+  const sc = (off: number): 4 | 5 => ((seed + off) % 4 === 0 ? 4 : 5);
+  const note10 = 8 + ((seed >> 3) % 3);
+  const orgNom = org.nom || "notre organisme";
+
+  const sec = (title: string, rows: string[]) => `**${title}**
+
+|  | **1** | **2** | **4** | **5** |
+|---|:---:|:---:|:---:|:---:|
+${rows.join("\n")}
+`;
+
+  const s1 = sec("1) [Perception de l'image du service]{.underline}", [
+    row4("Mon service a une bonne image à l'extérieur.", sc(1)),
+    row4("Mon service communique suffisamment avec la population du territoire.", sc(2)),
+    row4("Je suis fier de travailler dans mon service.", sc(3)),
+    row4("Je suis optimiste sur l'avenir de mon service.", sc(4)),
+  ]);
+  const s2 = sec("2) [Qualité perçue de la prise en charge]{.underline}", [
+    row4("Mon service est fortement attaché à satisfaire les clients.", sc(5)),
+    row4("J'ai une bonne image de la qualité de prise en charge proposée par mon service.", sc(6)),
+    row4("Mes horaires de travail sont adaptés à la prise en charge des clients.", sc(7)),
+  ]);
+  const s3 = sec("3) [Organisation et cadre de travail]{.underline}", [
+    row4("L'organisation du travail est adaptée à la prise en charge des clients.", sc(8)),
+    row4("Les conditions d'hygiène et de sécurité sont satisfaisantes.", sc(9)),
+    row4("Les équipements et matériels utilisés permettent de répondre aux besoins des clients.", sc(10)),
+    row4("Mon travail quotidien correspond à ce qui est décrit dans ma fiche de poste.", sc(11)),
+    row4("La coordination entre les équipes est satisfaisante.", sc(12)),
+    row4("L'existence de procédures m'aide à la réalisation de mes tâches professionnelles.", sc(13)),
+  ]);
+  const s4 = sec("4) [Management, ambiance de travail]{.underline}", [
+    row4("Les personnels d'encadrement sont fortement impliqués dans la recherche de la satisfaction des clients.", sc(14)),
+    row4("Les personnels d'encadrement sont à l'écoute des remarques que je leur transmets.", sc(15)),
+    row4("J'ai la possibilité de m'exprimer pour améliorer mes pratiques professionnelles.", sc(16)),
+    row4("J'ai suffisamment de marge de manœuvre pour répondre aux besoins des clients.", sc(17)),
+    row4("L'ambiance de travail est bonne.", sc(18)),
+    row4("Mon travail est reconnu de manière appropriée.", sc(19)),
+    row4("Mon service prend en compte le mieux possible la conciliation vie professionnelle et vie personnelle.", sc(20)),
+    row4("Je dispose d'espaces de paroles identifiés où je peux échanger librement.", sc(21)),
+  ]);
+  const s5 = sec("5) [Formation et intégration des salariés]{.underline}", [
+    row4("Je dispose des compétences et connaissances requises pour mon poste.", sc(22)),
+    row4("Je suis satisfait des formations proposées par mon service.", sc(23)),
+    row4("L'intégration du personnel nouveau est satisfaisante.", sc(24)),
+  ]);
+  const s6 = sec("6) [Information, participation et communication interne]{.underline}", [
+    row4("Les informations que je reçois me permettent de savoir ce qui se passe dans mon service.", sc(25)),
+    row4("Je suis informé des orientations, des projets de mon service.", sc(26)),
+    row4("Je connais mes droits et mes obligations.", sc(27)),
+  ]);
+  const sFin = sec("[Questions finales]{.underline}", [
+    row4("En résumé, toutes les conditions sont réunies dans mon service pour que je puisse satisfaire les clients.", sc(28)),
+  ]);
+
+  return `**QUESTIONNAIRE SATISFACTION INTERNE**
+
+En réalisant cette enquête, nous souhaitons vous associer à la dynamique d'amélioration de la qualité dans et de notre service. Votre participation est précieuse.
+
+Merci d'accepter de participer à la démarche et de consacrer quelques minutes à ce questionnaire.
+
+À l'issue de l'enquête, nous vous présenterons les résultats pour l'ensemble du service.
+
+**Critères de satisfaction :**
+
+*1 = Pas du tout satisfait — 2 = Pas satisfait — 4 = Satisfait — 5 = Très satisfait*
+
+${s1}
+${s2}
+${s3}
+${s4}
+${s5}
+${s6}
+${sFin}
+
+**Sur 10, quel est votre niveau de satisfaction générale concernant votre poste ?**
+
+| **1** | **2** | **3** | **4** | **5** | **6** | **7** | **8** | **9** | **10** |
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+${row10(note10)}
+
+*Pas du tout satisfait → Très satisfait*
+
+| **Avez-vous des remarques, des suggestions ou des commentaires à effectuer ?** |
+|---|
+| RAS — Bonne dynamique d'équipe et organisation claire chez ${orgNom}. Les conditions de travail sont satisfaisantes et permettent un accompagnement de qualité des bénéficiaires. |
+`;
+}
+
 /** Retourne un markdown personnalisé pour les clés qui le supportent, sinon null. */
 function getPersonalizedRaw(key: string, s: StagiaireInfo | null, org: OrganismeInfo, dates: DatesCtx, formation?: FormationInfo): string | null {
   if (!s) return null;
@@ -797,6 +1010,9 @@ function getPersonalizedRaw(key: string, s: StagiaireInfo | null, org: Organisme
   if (key === TEST_POSITIONNEMENT_KEY) return buildTestPositionnementMd(s, org, dates, formation);
   if (key === FICHE_PEDA_KEY) return buildFichePedagogiqueMd(s, org, dates, formation);
   if (key === ENTRETIEN_INTER_KEY) return buildEntretienIntermediaireMd(s, org, dates, formation);
+  if (key === SAT_ENTREPRISE_KEY) return buildSatisfactionEntrepriseMd(s, org, dates, formation);
+  if (key === SAT_FINANCEUR_KEY) return buildSatisfactionFinanceurMd(s, org, dates, formation);
+  if (key === SAT_INTERNE_KEY) return buildSatisfactionInterneMd(s, org, dates, formation);
   return null;
 }
 
