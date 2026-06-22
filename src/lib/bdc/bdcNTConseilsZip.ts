@@ -695,24 +695,38 @@ export async function buildBDCNTConseilsZip(
     const baseName = fileTitle(key);
     const isPerBen = BDC_NT_PER_BENEFICIAIRE.has(key);
     const raw = BDC_NT_SOURCE[key];
+    const tplMapping = BDC_TEMPLATES[key];
 
     if (isPerBen) {
       for (const s of benList) {
         advance(`${baseName} — ${s.prenom} ${s.nom}`);
-        const dts = computeDates(s, org, formation);
-        const personalized = getPersonalizedRaw(key, s, org, dts);
-        const blob = await genDocx(personalized ?? raw, `${baseName} – ${s.prenom} ${s.nom}`, s);
         const benFolder = `Bénéficiaire - ${s.prenom} ${s.nom}`;
+        let blob: Blob;
+        let ext: "docx" | "xlsx" = "docx";
+        if (tplMapping) {
+          const r = await renderBdcTemplateIfMapped(key, org, formation, s);
+          blob = r!.blob; ext = r!.extension;
+        } else {
+          const dts = computeDates(s, org, formation);
+          const personalized = getPersonalizedRaw(key, s, org, dts);
+          blob = await genDocx(personalized ?? raw, `${baseName} – ${s.prenom} ${s.nom}`, s);
+        }
         const path = critereFolder
-          ? `${benFolder}/${critereFolder}/${baseName}.docx`
-          : `${benFolder}/${baseName}.docx`;
+          ? `${benFolder}/${critereFolder}/${baseName}.${ext}`
+          : `${benFolder}/${baseName}.${ext}`;
         zip.file(path, blob);
       }
-
     } else {
       advance(baseName);
-      const blob = await genDocx(raw, baseName, null);
-      const path = critereFolder ? `${critereFolder}/${baseName}.docx` : `${baseName}.docx`;
+      let blob: Blob;
+      let ext: "docx" | "xlsx" = "docx";
+      if (tplMapping) {
+        const r = await renderBdcTemplateIfMapped(key, org, formation, null);
+        blob = r!.blob; ext = r!.extension;
+      } else {
+        blob = await genDocx(raw, baseName, null);
+      }
+      const path = critereFolder ? `${critereFolder}/${baseName}.${ext}` : `${baseName}.${ext}`;
       zip.file(path, blob);
     }
   }
