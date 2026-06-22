@@ -859,7 +859,7 @@ export function renderBdcNTDocHtml(
     return htmlWrap(orgHeader(org, title) + `<p style="color:#b91c1c">Document BDC introuvable (clé : ${key}).</p>` + docFooter(org));
   }
   const dates = computeDates(stagiaire || undefined, org, formation);
-  const personalized = getPersonalizedRaw(key, stagiaire, org, dates);
+  const personalized = getPersonalizedRaw(key, stagiaire, org, dates, formation);
   const effectiveRaw = personalized ?? raw;
   let md = applySubstitutions(effectiveRaw, org, stagiaire, dates, formation);
 
@@ -981,7 +981,7 @@ export async function buildBDCNTConseilsZip(
           blob = r!.blob; ext = r!.extension;
         } else {
           const dts = computeDates(s, org, formation);
-          const personalized = getPersonalizedRaw(key, s, org, dts);
+          const personalized = getPersonalizedRaw(key, s, org, dts, formation);
           blob = await genDocx(personalized ?? raw, `${baseName} – ${s.prenom} ${s.nom}`, s);
         }
         const path = critereFolder
