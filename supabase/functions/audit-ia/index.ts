@@ -121,7 +121,12 @@ Deno.serve(async (req) => {
       documentsGeneres: docNames,
     };
 
-    const userMsg = `Audit du dossier suivant (type ${ctx.typeAction}) :\n\n${JSON.stringify(ctx, null, 2).slice(0, 18000)}\n\nFais l'audit complet maintenant. Limite-toi à 15 findings maximum (les plus importants).`;
+    const isCfa = (type || "").toUpperCase() === "CFA";
+    const cfaInstruction = isCfa
+      ? `\n\n⚠️ TYPE CFA : tu DOIS passer en revue les 14 missions CFA UNE PAR UNE. Pour chaque mission absente ou faiblement couverte, génère un finding distinct au format constat "Mission CFA N°X — <titre> : <ce qui manque>". Vise 20-30 findings au total pour un CFA.`
+      : "";
+    const maxFindings = isCfa ? 30 : 15;
+    const userMsg = `Audit du dossier suivant (type ${ctx.typeAction}) :\n\n${JSON.stringify(ctx, null, 2).slice(0, 18000)}\n\nFais l'audit complet maintenant. Limite-toi à ${maxFindings} findings maximum (les plus importants).${cfaInstruction}`;
 
     const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
