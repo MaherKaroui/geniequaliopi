@@ -811,7 +811,7 @@ function buildEntretienIntermediaireMd(
   const comm = pick(commArr, seed, 3);
   const remarques = pick(remarquesArr, seed, 4);
 
-  return `**${orgNom}**
+  return accordCivilite(`**${orgNom}**
 
 **ENTRETIEN INTERMÉDIAIRE\\
 BÉNÉFICIAIRE**
