@@ -88,7 +88,7 @@ export function generateBdcNTSuiviAdaptation(
     html += row(["", "", prest, "", "", "", "", ""]);
   }
   const title = `SUIVI DE L'ADAPTATION À L'ACCOMPAGNEMENT — ${(org.nom || "").toUpperCase()}`;
-  const subtitle = `Référent : ${org.referentPedagogique || org.responsablePedagogique || org.dirigeant || ""}`;
+  const subtitle = `Référent : ${org.responsablePedagogique || org.dirigeant || ""}`;
   return wrap(title, subtitle, [{ name: "Suivi", html }], headers.length);
 }
 
