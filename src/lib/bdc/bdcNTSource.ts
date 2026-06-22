@@ -2710,7 +2710,9 @@ applicable.
 
 Fait à Saint- Denis le 01/01/2026, en deux exemplaires originaux.
 
-Le Participant : ABDOULHALIK ANTTOISSE
+Le Participant : ZOCLY Marc
+
+Pour NT CONSEILS, le Président : ABDOULHALIK ANTTOISSE
 
 Président
 `,
