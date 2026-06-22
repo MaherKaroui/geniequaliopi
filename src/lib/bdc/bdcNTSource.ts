@@ -637,105 +637,31 @@ entretien en face à face, afin d'apporter ses conseils dans la mise en
 confidentialité. La satisfaction du bénéficiaire est évaluée au travers
 d'un questionnaire à chaud et à froid lors du suivi à 6 mois.**
 
-**PROGRAMME DETAILLÉ**
+**PROGRAMME DÉTAILLÉ**
 
-**▪ Une phase préliminaire :** *Contractualiser un parcours adapté et
-individualisé*
+**▪ Une phase préliminaire :** *Contractualiser un parcours adapté et individualisé*
 
-+-----------------------------------+-----------------------------------+
-| **Méthodologie**                  | **Outils**                        |
-+-----------------------------------+-----------------------------------+
-| Entretien individuel              | Formalisation et                  |
-|                                   | contractualisation des            |
-| Recueil et analyse de la demande  | circonstances, attentes et        |
-|                                   | objectifs du bilan de compétences |
-| Validation de l'engagement du     |                                   |
-| bénéficiaire Présentation de la   |                                   |
-| méthodologie, des outils et des   |                                   |
-| modalités d'accompagnement et de  |                                   |
-| restitution du bilan de           |                                   |
-| compétences                       |                                   |
-+===================================+===================================+
+| **Méthodologie** | **Outils** |
+|---|---|
+| Entretien individuel§§BR§§Recueil et analyse de la demande§§BR§§Validation de l'engagement du bénéficiaire§§BR§§Présentation de la méthodologie, des outils et des modalités d'accompagnement et de restitution du bilan de compétences | Formalisation et contractualisation des circonstances, attentes et objectifs du bilan de compétences |
 
-**▪ Une phase d'investigation :** *Identifier ses champs de compétences
-et ressources motivationnelles pour déterminer des voies d'évolution
-potentielles*
+**▪ Une phase d'investigation :** *Identifier ses champs de compétences et ressources motivationnelles pour déterminer des voies d'évolution potentielles*
 
-+-----------------------------------+-----------------------------------+
-| **Méthodologie**                  | **Outils**                        |
-+-----------------------------------+-----------------------------------+
-| Entretiens individuels            | Bilan du parcours de formation et |
-| (explicitation, conseil)          | professionnel                     |
-|                                   |                                   |
-| **Étape 1 :** Rétrospective du    | Bilan personnel                   |
-| parcours                          |                                   |
-|                                   | Courbes de satisfaction           |
-| Bilan des acquis personnel et     |                                   |
-| professionnel Identification des  | Tests d'intérêts professionnels   |
-| difficultés rencontrées           | (RIASEC)                          |
-|                                   |                                   |
-| **Étape 2 :** Diagnostic des      | Tests de personnalité (MBTI)      |
-| ressources motivationnelles       |                                   |
-|                                   | Questionnaires sur les valeurs,   |
-| Connaissance de soi, points       | les motivations Portefeuille de   |
-| forts, axes de vigilance          | compétences                       |
-|                                   |                                   |
-| **Étape 3 :** Définition des axes | Plateforme Transférence :         |
-| de compétences                    | identifier les compétences        |
-|                                   | individuelles et les traduire en  |
-| Analyse et exploration des        | métiers                           |
-| compétences transférables         |                                   |
-|                                   | Recherche documentaire            |
-| **Étape 4 :** Confrontation au    | (métiers/formations)              |
-| marché de l'emploi et à ses       |                                   |
-| offres réelles                    | Analyse du marché du travail      |
-|                                   |                                   |
-| **Étape 5 :** Aide au choix et à  | Enquête(s) professionnelle(s)     |
-| la prise de décision              | ciblée(s)                         |
-|                                   |                                   |
-| Hiérarchisation des projets       |                                   |
-+===================================+===================================+
+| **Méthodologie** | **Outils** |
+|---|---|
+| Entretiens individuels (explicitation, conseil)§§BR§§**Étape 1 :** Rétrospective du parcours§§BR§§Bilan des acquis personnel et professionnel§§BR§§Identification des difficultés rencontrées§§BR§§**Étape 2 :** Diagnostic des ressources motivationnelles§§BR§§Connaissance de soi, points forts, axes de vigilance§§BR§§**Étape 3 :** Définition des axes de compétences§§BR§§Analyse et exploration des compétences transférables§§BR§§**Étape 4 :** Confrontation au marché de l'emploi et à ses offres réelles§§BR§§**Étape 5 :** Aide au choix et à la prise de décision§§BR§§Hiérarchisation des projets | Bilan du parcours de formation et professionnel§§BR§§Bilan personnel§§BR§§Courbes de satisfaction§§BR§§Tests d'intérêts professionnels (RIASEC)§§BR§§Tests de personnalité (MBTI)§§BR§§Questionnaires sur les valeurs, les motivations§§BR§§Portefeuille de compétences§§BR§§Plateforme Transférence : identifier les compétences individuelles et les traduire en métiers§§BR§§Recherche documentaire (métiers/formations)§§BR§§Analyse du marché du travail§§BR§§Enquête(s) professionnelle(s) ciblée(s) |
 
-**▪ Une phase de conclusion :** *Formaliser son projet et un plan
-d'action*
+**▪ Une phase de conclusion :** *Formaliser son projet et un plan d'action*
 
-+-----------------------------------+-----------------------------------+
-| **Méthodologie**                  | **Outils**                        |
-+-----------------------------------+-----------------------------------+
-| Entretiens individuels de conseil | Plan d'action personnalisé        |
-|                                   |                                   |
-| Définition du projet              | Document de synthèse              |
-| personnel/professionnel et de     |                                   |
-| l'évolution professionnelle       | Questionnaire de satisfaction     |
-| envisagée Recensement de tous les |                                   |
-| facteurs susceptibles de          | Attestation de présence           |
-| favoriser ou non la mise en œuvre |                                   |
-| de ce(s) projet(s)                | Attestation de fin de formation   |
-|                                   |                                   |
-| Elaboration du plan d'action à    |                                   |
-| mettre en œuvre                   |                                   |
-|                                   |                                   |
-| Restitution d'un document de      |                                   |
-| synthèse corédigé avec le         |                                   |
-| bénéficiaire                      |                                   |
-|                                   |                                   |
-| Planification du RDV post suivi à |                                   |
-| 6 mois.                           |                                   |
-+===================================+===================================+
+| **Méthodologie** | **Outils** |
+|---|---|
+| Entretiens individuels de conseil§§BR§§Définition du projet personnel/professionnel et de l'évolution professionnelle envisagée§§BR§§Recensement de tous les facteurs susceptibles de favoriser ou non la mise en œuvre de ce(s) projet(s)§§BR§§Élaboration du plan d'action à mettre en œuvre§§BR§§Restitution d'un document de synthèse corédigé avec le bénéficiaire§§BR§§Planification du RDV post suivi à 6 mois. | Plan d'action personnalisé§§BR§§Document de synthèse§§BR§§Questionnaire de satisfaction§§BR§§Attestation de présence§§BR§§Attestation de fin de formation |
 
-**▪ Une phase post-suivi :** *Évaluer et soutenir la mise en œuvre des
-actions*
+**▪ Une phase post-suivi :** *Évaluer et soutenir la mise en œuvre des actions*
 
-+-----------------------------------+-----------------------------------+
-| **Méthodologie**                  | **Outils**                        |
-+-----------------------------------+-----------------------------------+
-| Suivi et évaluation des démarches | Entretien de suivi sur RDV ou     |
-| entreprises                       | selon le mode convenu avec le     |
-|                                   | bénéficiaire                      |
-|                                   |                                   |
-|                                   | Questionnaire d'évaluation à      |
-|                                   | froid                             |
-+===================================+===================================+
+| **Méthodologie** | **Outils** |
+|---|---|
+| Suivi et évaluation des démarches entreprises | Entretien de suivi sur RDV ou selon le mode convenu avec le bénéficiaire§§BR§§Questionnaire d'évaluation à froid |
 
 **INTERVENANT :**
 
