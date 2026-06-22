@@ -75,7 +75,7 @@ function pickForBeneficiaire(s: StagiaireInfo | undefined, si: number, items: st
   return items[deterministicIndex(s, si, items.length, offset)] || items[0] || "";
 }
 
-function getBdcDomainProfile(f: FormationInfo): BdcDomainProfile {
+export function getBdcDomainProfile(f: FormationInfo): BdcDomainProfile {
   const key = normalizeBdc(f.intitule || "");
   if (key.includes("esthetique") || key.includes("cosmetique") || key.includes("parfumerie")) {
     return {

@@ -472,6 +472,7 @@ function buildTestPositionnementMd(
   s: StagiaireInfo,
   org: OrganismeInfo,
   _dates: DatesCtx,
+  formation?: FormationInfo,
 ): string {
   const nom = `${s.prenom || ""} ${s.nom || ""}`.trim() || "Bénéficiaire";
   const poste = (s.poste || "").trim();
@@ -479,16 +480,25 @@ function buildTestPositionnementMd(
   const seed = hashStr(`pos|${s.prenom}|${s.nom}|${s.email}`);
   const orgNom = org.nom || "NT CONSEILS";
 
-  const domaines = [
-    poste || "mon métier actuel",
-    entreprise ? `mon expérience chez ${entreprise}` : "mon parcours professionnel",
-  ];
+  // Profil domaine basé sur l'intitulé de la formation (ex: Pâtisserie & Cake Design)
+  const profile = formation ? getBdcDomainProfile(formation) : null;
+  const metier = profile?.metier || "le métier visé";
+  const secteur = profile?.secteur || "le secteur visé";
+  const missions = profile?.missions || [];
+  const techniques = profile?.techniques || [];
+  const transversales = profile?.transversales || [];
+  const formationsProf = profile?.formations || [];
+  const opportunites = profile?.opportunites || [];
+  const axes = profile?.axes || [];
+  const pickP = (arr: string[], off: number) => arr.length ? arr[(seed + off) % arr.length] : "";
+
+  const ancreMetier = profile ? ` et explorer concrètement le métier de ${metier} dans ${secteur}` : "";
 
   const motivationsArr = [
-    `Faire le point sur mes compétences acquises ${poste ? `dans le poste de ${poste}` : "au fil de mon parcours"} et identifier des pistes d'évolution réalistes. Je souhaite construire un projet aligné avec mes valeurs et mes contraintes personnelles.`,
-    `Sortir d'une routine professionnelle qui ne me correspond plus et explorer de nouvelles voies. Le bilan est pour moi un temps structuré pour prendre du recul et décider de la suite.`,
-    `Sécuriser une reconversion que j'envisage depuis plusieurs mois${entreprise ? `, en parallèle de mon poste chez ${entreprise}` : ""}. J'attends du bilan des outils concrets et un regard extérieur professionnel.`,
-    `Confirmer une intuition de changement de métier et la confronter à la réalité du marché. Je veux éviter de me lancer sans avoir validé mes hypothèses.`,
+    `Faire le point sur mes compétences acquises ${poste ? `dans le poste de ${poste}` : "au fil de mon parcours"}${ancreMetier}. Je souhaite construire un projet aligné avec mes valeurs et mes contraintes personnelles.`,
+    `Sortir d'une routine professionnelle qui ne me correspond plus et valider une reconversion vers ${metier}. Le bilan est pour moi un temps structuré pour prendre du recul et décider de la suite.`,
+    `Sécuriser une reconversion que j'envisage depuis plusieurs mois${entreprise ? `, en parallèle de mon poste chez ${entreprise}` : ""}${profile ? `, autour du métier de ${metier}` : ""}. J'attends du bilan des outils concrets et un regard extérieur professionnel.`,
+    `Confirmer mon intuition de m'orienter vers ${metier} et la confronter à la réalité du marché (${secteur}). Je veux éviter de me lancer sans avoir validé mes hypothèses.`,
   ];
 
   const parcoursArr = [
@@ -497,29 +507,34 @@ function buildTestPositionnementMd(
     `Après des études supérieures, j'ai occupé ${2 + (seed % 4)} postes successifs${entreprise ? `, dont le dernier chez ${entreprise}` : ""}. Chaque expérience m'a permis de monter en autonomie et de confronter mes choix initiaux à la réalité du terrain.`,
   ];
 
+  const transvHint = transversales.length ? ` Je m'appuie notamment sur ${pickP(transversales, 1)} et ${pickP(transversales, 2)}.` : "";
   const pointsFortsArr = [
-    `Capacité d'adaptation, sens de l'organisation et écoute active. Mes collègues soulignent souvent ma fiabilité et ma rigueur dans le suivi des dossiers.`,
-    `Autonomie, esprit d'analyse et persévérance face aux situations complexes. Je sais prendre du recul avant d'agir et je m'appuie sur des faits.`,
-    `Sens du collectif, pédagogie et capacité à fédérer autour d'un objectif commun. J'aime transmettre et accompagner la montée en compétences des autres.`,
-    `Curiosité, capacité à apprendre vite et à m'approprier de nouveaux outils numériques. Je suis à l'aise avec le changement quand il est expliqué.`,
+    `Capacité d'adaptation, sens de l'organisation et écoute active. Mes collègues soulignent souvent ma fiabilité et ma rigueur dans le suivi des dossiers.${transvHint}`,
+    `Autonomie, esprit d'analyse et persévérance face aux situations complexes. Je sais prendre du recul avant d'agir et je m'appuie sur des faits.${transvHint}`,
+    `Sens du collectif, pédagogie et capacité à fédérer autour d'un objectif commun. J'aime transmettre et accompagner la montée en compétences des autres.${transvHint}`,
+    `Curiosité, capacité à apprendre vite et à m'approprier de nouveaux outils.${profile ? ` Plusieurs de mes atouts (${pickP(transversales, 0)}) sont transférables vers ${metier}.` : ""}`,
   ];
 
+  const formationCible = formationsProf.length ? pickP(formationsProf, 0) : "la formation identifiée comme nécessaire";
+  const opportuniteCible = opportunites.length ? pickP(opportunites, 0) : "un poste qui ait du sens";
   const objectifsArr = [
-    `À court terme : poser un diagnostic clair sur mes compétences et mes motivations. À moyen terme : identifier 2 ou 3 pistes professionnelles crédibles. À long terme : engager une transition (formation, mobilité interne ou changement d'employeur) dans les 12 à 18 mois.`,
-    `À court terme : structurer mon projet et lever mes doutes. À moyen terme : suivre la formation identifiée comme nécessaire. À long terme : exercer un métier qui ait du sens et m'assure un équilibre vie pro / vie perso satisfaisant.`,
-    `À court terme : sécuriser mon poste actuel tout en explorant des alternatives. À moyen terme : tester une nouvelle voie via une mission, un stage ou une mobilité. À long terme : me stabiliser dans un projet professionnel à 5 ans.`,
+    `À court terme : poser un diagnostic clair sur mes compétences et mes motivations${profile ? ` vis-à-vis du métier de ${metier}` : ""}. À moyen terme : identifier 2 ou 3 pistes professionnelles crédibles${profile ? ` (dont ${opportuniteCible})` : ""}. À long terme : engager une transition dans les 12 à 18 mois.`,
+    `À court terme : structurer mon projet et lever mes doutes. À moyen terme : suivre ${formationCible}. À long terme : exercer ${profile ? `comme ${metier}` : "un métier qui ait du sens"} avec un équilibre vie pro / vie perso satisfaisant.`,
+    `À court terme : sécuriser mon poste actuel tout en explorant ${profile ? `le secteur de ${secteur}` : "des alternatives"}. À moyen terme : tester ${profile ? metier : "une nouvelle voie"} via une immersion, une enquête métier ou une mission. À long terme : me stabiliser dans un projet professionnel à 5 ans.`,
   ];
 
   const besoinBilanArr = [
-    `Je suis arrivé(e) à un palier dans mon poste actuel et je manque de visibilité sur la suite. Le bilan doit m'aider à clarifier ce qui est possible et à hiérarchiser mes options.`,
-    `Je traverse une période de questionnement et j'ai besoin d'un cadre méthodique, accompagné par un professionnel neutre, pour avancer sans m'éparpiller.`,
-    `Mon environnement de travail évolue fortement (organisation, outils, missions) et je veux m'assurer que mon projet reste cohérent avec ces changements et avec mes aspirations.`,
+    `Je suis arrivé(e) à un palier dans mon poste actuel et je manque de visibilité sur la suite${profile ? `. L'idée de m'orienter vers ${metier} me motive mais j'ai besoin de la valider` : ""}. Le bilan doit m'aider à clarifier ce qui est possible et à hiérarchiser mes options.`,
+    `Je traverse une période de questionnement et j'ai besoin d'un cadre méthodique, accompagné par un professionnel neutre, pour avancer sans m'éparpiller${profile ? ` sur le projet ${metier}` : ""}.`,
+    `Mon environnement de travail évolue fortement et je veux m'assurer que mon projet${profile ? ` (notamment l'orientation vers ${metier})` : ""} reste cohérent avec ces changements et avec mes aspirations.`,
   ];
 
+  const techHint = techniques.length ? ` (notamment ${pickP(techniques, 0)} et ${pickP(techniques, 1)})` : "";
+  const axeHint = axes.length ? ` Un focus particulier sur ${pickP(axes, 0)} serait précieux.` : "";
   const attentesArr = [
-    `Un accompagnement à la fois bienveillant et exigeant, des tests fiables, et la production d'une synthèse écrite que je pourrai réutiliser pour mes démarches (entretiens, dossiers de formation, CPF).`,
-    `Des outils concrets pour mieux me connaître (intérêts, valeurs, personnalité), une exploration du marché du travail réaliste, et un plan d'action chiffré et calendaire.`,
-    `Un travail de fond sur mes compétences transférables, une validation de mon projet par des enquêtes métier, et la sécurisation du financement (CPF, autres dispositifs).`,
+    `Un accompagnement bienveillant et exigeant, des tests fiables, et une synthèse écrite réutilisable pour mes démarches (entretiens, dossiers de formation, CPF).${profile ? ` J'attends également une exploration sérieuse du métier de ${metier}${techHint}.` : ""}`,
+    `Des outils concrets pour mieux me connaître (intérêts, valeurs, personnalité), une exploration réaliste du marché${profile ? ` autour de ${secteur}` : ""}, et un plan d'action chiffré et calendaire.${axeHint}`,
+    `Un travail de fond sur mes compétences transférables${profile ? ` vers ${metier}` : ""}, une validation par des enquêtes métier, et la sécurisation du financement (CPF, autres dispositifs).`,
   ];
 
   const motivation = pick(motivationsArr, seed, 0);
