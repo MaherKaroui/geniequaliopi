@@ -1989,28 +1989,6 @@ Udemy\\
 Fun-Mooc\\
 <https://www.fun-mooc.fr/>
 `,
-  "Indicateur 26/Indicateur 26 - Formations sur le handicap (1)": `**LISTE DES FORMATIONS\\
-SUR LE HANDICAP**
-
-Vous trouverez ci-dessous les principales plateformes pour vous former
-sur le handicap :
-
-Coursera\\
-<https://www.coursera.org/>
-
-Open Classrooms\\
-<https://openclassrooms.com/fr/>
-
-My Mooc\\
-<https://www.my-mooc.com/fr/mooc/sensibilisation-au-handica-p/>\\
-<https://www.my-mooc.com/>
-
-Udemy\\
-<https://www.udemy.com/>
-
-Fun-Mooc\\
-<https://www.fun-mooc.fr/>
-`,
   "Indicateur 26/Indicateur 26 - Partenaires nationaux handicap": `**PARTENAIRES HANDICAP\\
 NATIONAUX**
 
