@@ -1236,7 +1236,20 @@ export function buildFullCatalog(
   // exclusivement via le bouton "Télécharger le dossier complet" (buildBDCNTConseilsZip).
   // Aucune entrée individuelle dans le catalogue pour les BDC.
   if (isBDC) {
-    add("bdc_nt_dossier_complet", "📦 Dossier Bilan de compétences complet (NT Conseils) — ZIP", 1, 1, "bdc_nt_dossier_complet");
+    // Une entrée par critère Qualiopi pour structurer l'affichage.
+    // Toutes pointent vers le même template (le ZIP complet contient tous les critères).
+    const bdcCriteres: Array<{ c: number; i: number; label: string }> = [
+      { c: 1, i: 1, label: "CT1 - Information du public — Dossier BDC (NT Conseils)" },
+      { c: 2, i: 4, label: "CT2 - Objectifs & adaptation — Dossier BDC (NT Conseils)" },
+      { c: 3, i: 9, label: "CT3 - Conditions d'accueil & accompagnement — Dossier BDC (NT Conseils)" },
+      { c: 4, i: 18, label: "CT4 - Moyens pédagogiques & techniques — Dossier BDC (NT Conseils)" },
+      { c: 5, i: 21, label: "CT5 - Qualification des intervenants — Dossier BDC (NT Conseils)" },
+      { c: 6, i: 23, label: "CT6 - Inscription dans l'environnement professionnel — Dossier BDC (NT Conseils)" },
+      { c: 7, i: 30, label: "CT7 - Recueil & traitement des appréciations — Dossier BDC (NT Conseils)" },
+    ];
+    bdcCriteres.forEach(({ c, i, label }) => {
+      add(`bdc_nt_dossier_complet_c${c}`, `📦 ${label}`, c, i, "bdc_nt_dossier_complet");
+    });
   }
 
   // ===== VAE — VALIDATION DES ACQUIS DE L'EXPÉRIENCE =====
