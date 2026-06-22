@@ -183,7 +183,7 @@ function applySubstitutions(src: string, org: OrganismeInfo, s: StagiaireInfo | 
     ? `<img src="${org.signatureUrl}" alt="Signature" style="max-height:70px;max-width:200px;display:block;margin:4px 0;" />`
     : "";
   const signSta = s?.signatureUrl
-    ? `<img src="${s.signatureUrl}" alt="Signature apprenant" style="max-height:70px;max-width:200px;display:block;margin:4px 0;" />`
+    ? `<img src="${s.signatureUrl}" alt="Signature bénéficiaire" style="max-height:70px;max-width:200px;display:block;margin:4px 0;" />`
     : "";
   const nomStagiaire = s ? `${s.prenom || ""} ${s.nom || ""}`.trim() : "";
   const signaturesHtml = `
@@ -191,7 +191,7 @@ function applySubstitutions(src: string, org: OrganismeInfo, s: StagiaireInfo | 
   <thead>
     <tr style="background:#eef2f7;">
       <th style="border:1px solid #cbd5e1;padding:10px;text-align:left;width:50%;">Pour l'organisme — ${org.nom || ""}</th>
-      <th style="border:1px solid #cbd5e1;padding:10px;text-align:left;width:50%;">Pour l'apprenant — ${nomStagiaire}</th>
+      <th style="border:1px solid #cbd5e1;padding:10px;text-align:left;width:50%;">Pour le bénéficiaire — ${nomStagiaire}</th>
     </tr>
   </thead>
   <tbody>
