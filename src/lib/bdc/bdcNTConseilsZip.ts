@@ -82,7 +82,7 @@ function computeDates(s?: StagiaireInfo, org?: OrganismeInfo, formation?: Format
 }
 
 /** Substitutions globales : remplace tous les marqueurs NT Conseils par les données organisme/bénéficiaire. */
-function applySubstitutions(src: string, org: OrganismeInfo, s: StagiaireInfo | null, dates: DatesCtx): string {
+function applySubstitutions(src: string, org: OrganismeInfo, s: StagiaireInfo | null, dates: DatesCtx, formation?: FormationInfo): string {
   let txt = src;
   const orgNom = org.nom || "[Organisme]";
   const orgAdresse = [org.adresse, org.codePostal, org.ville].filter(Boolean).join(" ");
