@@ -414,6 +414,15 @@ function hashStr(s: string): number {
 function pick<T>(arr: T[], seed: number, off = 0): T {
   return arr[(seed + off) % arr.length];
 }
+/** Adapte les accords "(e)" au genre du bénéficiaire selon sa civilité. */
+function accordCivilite(text: string, civilite?: string): string {
+  const fem = civilite === "Mme" || civilite === "Madame";
+  return text
+    .replace(/\(e\)/g, fem ? "e" : "")
+    .replace(/\(rice\)/g, fem ? "rice" : "eur")
+    .replace(/\(euse\)/g, fem ? "euse" : "eur")
+    .replace(/\(ne\)/g, fem ? "ne" : "");
+}
 
 function buildOutilPreparatoireMd(
   s: StagiaireInfo,
@@ -601,7 +610,7 @@ function buildTestPositionnementMd(
   const besoin = pick(besoinBilanArr, seed, 4);
   const attentes = pick(attentesArr, seed, 5);
 
-  return `**[${orgNom}]{.underline}**
+  return accordCivilite(`**[${orgNom}]{.underline}**
 
 **TEST DE POSITIONNEMENT**
 
@@ -630,7 +639,7 @@ ${besoin}
 Question 6 : Qu'attendez-vous spécifiquement de ce bilan de compétences ?
 
 ${attentes}
-`;
+`, s.civilite);
 }
 
 const FICHE_PEDA_KEY = "Indicateur 10/Indicateur 10 - Fiche p\u00e9dagogique";
@@ -802,7 +811,7 @@ function buildEntretienIntermediaireMd(
   const comm = pick(commArr, seed, 3);
   const remarques = pick(remarquesArr, seed, 4);
 
-  return `**${orgNom}**
+  return accordCivilite(`**${orgNom}**
 
 **ENTRETIEN INTERMÉDIAIRE\\
 BÉNÉFICIAIRE**
@@ -834,7 +843,7 @@ ${comm}
 **Avez-vous des remarques à nous formuler ?**
 
 ${remarques}
-`;
+`, s.civilite);
 }
 
 // ===== Questionnaires de satisfaction (IND 30) =====
