@@ -284,6 +284,21 @@ function applySubstitutions(src: string, org: OrganismeInfo, s: StagiaireInfo | 
     .replace(/\{ORG_EMAIL\}/g, orgEmail)
     .replace(/\{ORG_TEL_LINE\}/g, orgTelLine);
 
+  // Placeholders Entretien annuel / recrutement (IND 21) — alimentés depuis l'organisme + la formation
+  const profileBdc = formation ? getBdcDomainProfile(formation) : null;
+  const secteurTxt = profileBdc ? `(notamment ${profileBdc.secteur})` : "";
+  const secteurPhrase = profileBdc ? ` (notamment dans le secteur ${profileBdc.secteur})` : "";
+  const secteurPhrase2 = profileBdc ? ` autour du métier de ${profileBdc.metier} et de secteurs voisins` : " sur des domaines variés";
+  txt = txt
+    .replace(/\{ENTRETIEN_DATE\}/g, dates.dateConvention || fmtShortDate(new Date()))
+    .replace(/\{ORG_DIRIGEANT\}/g, dirigeant)
+    .replace(/\{ORG_NOM\}/g, orgNom)
+    .replace(/\{BDC_METIER\}/g, profileBdc?.metier || "le métier visé")
+    .replace(/\{BDC_SECTEUR_TXT\}/g, secteurTxt)
+    .replace(/\{BDC_SECTEUR_TXT_PHRASE\}/g, secteurPhrase)
+    .replace(/\{BDC_SECTEUR_TXT_PHRASE2\}/g, secteurPhrase2);
+
+
 
   // Bloc d'informations bénéficiaire (utilisé dans la Convention de prestation)
   if (s) {
