@@ -32,7 +32,40 @@ Adapte tes contrôles au type d'action :
 - AF : convention bilatérale, programme, émargements, bilans chaud/froid, certif
 - BC : 3 phases (préliminaire/investigation/conclusion), 24h max, document de synthèse, confidentialité
 - VAE : livret 1 et 2, 10 sessions accompagnement, jury, recevabilité France VAE
-- CFA : CERFA 10103, maître d'apprentissage, livret apprenti, 14 missions CFA, SIA, visite entreprise
+- CFA : focus EXTRÊMEMENT rigoureux — voir bloc dédié ci-dessous.
+
+🎓 BLOC CFA — APPRENTISSAGE (à appliquer si typeAction === "CFA") :
+Tu DOIS auditer point par point les 14 MISSIONS OBLIGATOIRES d'un CFA (Code du travail L.6231-2). Pour chacune, vérifie si une preuve/un dispositif existe dans le dossier (champ, document, mention). Si absent → finding "manquant" critère 3 ou 6.
+
+Les 14 missions à contrôler une par une :
+1. Définir, organiser, mettre en œuvre les enseignements (programme, REAC, blocs RNCP) → vérifier formation.programme, RNCP, blocs
+2. Suivre et accompagner les apprentis (référent pédagogique, fiche de suivi)
+3. Coopérer avec l'entreprise et le maître d'apprentissage (livret apprenti, visites entreprise, fiches navette)
+4. Assurer la cohérence entre formation pratique et théorique (calendrier alternance, synopsis)
+5. Informer apprentis et familles sur déroulement (livret d'accueil, règlement intérieur, modalités examen)
+6. Accompagner l'apprenti vers la certification (préparation examen, PV blanc, mock)
+7. Évaluer les compétences en lien avec entreprise (grilles CCF, bilans semestriels)
+8. Assister candidats à la rupture pour en trouver un nouveau (procédure rupture, accompagnement 6 mois)
+9. Favoriser la mixité, sensibiliser à l'égalité F/H et lutte contre discriminations (charte, action de sensibilisation)
+10. Accompagner les apprentis en situation de handicap (référent handicap nommé, dispositifs)
+11. Encourager mobilité nationale et internationale (Erasmus+, conventions mobilité)
+12. Encourager engagement citoyen (action citoyenneté, valeurs République)
+13. Évaluer les compétences acquises hors CFA (positionnement, VAE partielle, allègements)
+14. Mettre en place un Conseil de Perfectionnement (CP) — composition, fréquence, PV de réunion
+
+⚠️ Pour CFA tu DOIS générer au minimum 1 finding par mission manquante (ne pas regrouper). Indique clairement "Mission CFA N°X — <titre>" dans le constat.
+
+Contrôles CFA additionnels :
+- CERFA 10103 (contrat d'apprentissage) signé pour chaque apprenti
+- Maître d'apprentissage : nom, fonction, expérience, attestation 2 ans
+- Livret apprenti / livret de suivi tripartite renseigné
+- Visites entreprise planifiées (min 1/an)
+- SIA (Système d'Information sur l'Apprentissage) déclaré
+- Référent mobilité, référent handicap, référent rupture nommés
+- Conseil de Perfectionnement tenu (PV)
+- OPCO de référence identifié
+- NDA + Certification Qualiopi CFA mention apprentissage
+- Données apprenti : NIR, RQTH, date naissance, niveau d'entrée, diplôme préparé, employeur, dates contrat
 
 Réponds UNIQUEMENT en JSON valide (pas de markdown, pas de \`\`\`) avec ce schéma EXACT :
 {
@@ -88,7 +121,12 @@ Deno.serve(async (req) => {
       documentsGeneres: docNames,
     };
 
-    const userMsg = `Audit du dossier suivant (type ${ctx.typeAction}) :\n\n${JSON.stringify(ctx, null, 2).slice(0, 18000)}\n\nFais l'audit complet maintenant. Limite-toi à 15 findings maximum (les plus importants).`;
+    const isCfa = (type || "").toUpperCase() === "CFA";
+    const cfaInstruction = isCfa
+      ? `\n\n⚠️ TYPE CFA : tu DOIS passer en revue les 14 missions CFA UNE PAR UNE. Pour chaque mission absente ou faiblement couverte, génère un finding distinct au format constat "Mission CFA N°X — <titre> : <ce qui manque>". Vise 20-30 findings au total pour un CFA.`
+      : "";
+    const maxFindings = isCfa ? 30 : 15;
+    const userMsg = `Audit du dossier suivant (type ${ctx.typeAction}) :\n\n${JSON.stringify(ctx, null, 2).slice(0, 18000)}\n\nFais l'audit complet maintenant. Limite-toi à ${maxFindings} findings maximum (les plus importants).${cfaInstruction}`;
 
     const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -103,7 +141,7 @@ Deno.serve(async (req) => {
           { role: "user", content: userMsg },
         ],
         response_format: { type: "json_object" },
-        max_tokens: 8000,
+        max_tokens: isCfa ? 14000 : 8000,
       }),
     });
 
