@@ -395,6 +395,95 @@ const QualiopiCheck = () => {
             )}
           </Card>
         )}
+
+        {tab === "ai" && (
+          <Card className="p-5 space-y-4">
+            <div className="flex items-center justify-between flex-wrap gap-3">
+              <div>
+                <p className="font-semibold flex items-center gap-2"><Sparkles className="w-4 h-4 text-primary" /> Audit IA en direct</p>
+                <p className="text-xs text-muted-foreground">L'IA analyse réellement ton dossier (organisme, formation, stagiaires, documents générés) et liste tout ce qui manque, est incohérent ou améliorable.</p>
+              </div>
+              <div className="flex items-center gap-2">
+                {(["AF", "BC", "VAE", "CFA"] as AuditType[]).map(t => (
+                  <Button key={t} size="sm" variant={auditType === t ? "default" : "outline"} onClick={() => setAuditType(t)}>{t}</Button>
+                ))}
+                <Button size="sm" onClick={runAiAudit} disabled={aiLoading} className="ml-2">
+                  {aiLoading ? <><Loader2 className="w-4 h-4 mr-1 animate-spin" /> Audit en cours…</> : <><Sparkles className="w-4 h-4 mr-1" /> Lancer l'audit IA</>}
+                </Button>
+              </div>
+            </div>
+
+            {!aiAudit && !aiLoading && (
+              <div className="text-center py-10 text-sm text-muted-foreground">
+                Sélectionne le type d'action ({auditType}) puis lance l'audit IA pour obtenir un rapport détaillé.
+              </div>
+            )}
+
+            {aiLoading && (
+              <div className="text-center py-10">
+                <Loader2 className="w-8 h-8 animate-spin text-primary mx-auto mb-2" />
+                <p className="text-sm text-muted-foreground">Analyse du dossier en cours — l'IA passe en revue chaque indicateur…</p>
+              </div>
+            )}
+
+            {aiAudit && (
+              <div className="space-y-4">
+                <div className="grid md:grid-cols-3 gap-4">
+                  <Card className="p-4 bg-primary/5 border-primary/20">
+                    <p className="text-xs text-muted-foreground">Score auditeur</p>
+                    <p className="text-4xl font-bold text-primary">{aiAudit.scoreGlobal}%</p>
+                    <Progress value={aiAudit.scoreGlobal} className="mt-2" />
+                  </Card>
+                  <Card className="p-4 md:col-span-2">
+                    <p className="text-xs text-muted-foreground mb-1">Synthèse</p>
+                    <p className="text-sm">{aiAudit.synthese}</p>
+                    <div className="flex gap-3 mt-3 text-xs">
+                      <Badge variant="destructive">{aiAudit.findings.filter(f => f.severity === "critical").length} critiques</Badge>
+                      <Badge className="bg-orange-500 hover:bg-orange-500">{aiAudit.findings.filter(f => f.severity === "major").length} majeurs</Badge>
+                      <Badge variant="secondary">{aiAudit.findings.filter(f => f.severity === "minor").length} mineurs</Badge>
+                      <Badge variant="outline">{aiAudit.findings.filter(f => f.severity === "info").length} infos</Badge>
+                    </div>
+                  </Card>
+                </div>
+
+                <div className="space-y-2">
+                  {aiAudit.findings
+                    .slice()
+                    .sort((a, b) => {
+                      const ord = { critical: 0, major: 1, minor: 2, info: 3 } as const;
+                      return ord[a.severity] - ord[b.severity];
+                    })
+                    .map((f, idx) => {
+                      const color =
+                        f.severity === "critical" ? "border-l-destructive bg-destructive/5"
+                        : f.severity === "major" ? "border-l-orange-500 bg-orange-50"
+                        : f.severity === "minor" ? "border-l-amber-400 bg-amber-50"
+                        : "border-l-blue-400 bg-blue-50";
+                      const catLabel = {
+                        manquant: "🔴 Manquant",
+                        incoherence: "⚠️ Incohérence",
+                        incorrect: "❌ Incorrect",
+                        amelioration: "💡 Amélioration",
+                      }[f.categorie] || f.categorie;
+                      return (
+                        <div key={idx} className={`border-l-4 rounded p-3 ${color}`}>
+                          <div className="flex items-center gap-2 flex-wrap mb-1">
+                            <Badge variant="outline" className="text-[10px] uppercase">{f.severity}</Badge>
+                            <span className="text-xs font-semibold">{catLabel}</span>
+                            {f.critere > 0 && <Badge variant="secondary" className="text-[10px]">C{f.critere}{f.indicateur > 0 ? ` · IND ${f.indicateur}` : ""}</Badge>}
+                            <span className="text-xs text-muted-foreground">{f.zone}</span>
+                          </div>
+                          <p className="text-sm font-medium">{f.constat}</p>
+                          {f.impact && <p className="text-xs text-muted-foreground mt-1"><strong>Impact :</strong> {f.impact}</p>}
+                          {f.action && <p className="text-xs text-primary mt-1">→ <strong>Action :</strong> {f.action}</p>}
+                        </div>
+                      );
+                    })}
+                </div>
+              </div>
+            )}
+          </Card>
+        )}
       </main>
     </div>
   );
