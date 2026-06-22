@@ -93,22 +93,25 @@ function applySubstitutions(src: string, org: OrganismeInfo, s: StagiaireInfo | 
   const dirigeant = org.dirigeant || "Le Responsable";
   const dirigeantUpper = dirigeant.toUpperCase();
 
+  const villeOrg = org.ville || "[Ville]";
   const map: [RegExp, string][] = [
     [/NT\s*CONSEILS/gi, orgNom],
-    [/5\s*rue\s*Pleyel\s*93200\s*Saint-Denis/gi, orgAdresse || "[Adresse]"],
+    [/5\s*rue\s*Pleyel\s*,?\s*93200\s*Saint[-\s]?\s*Denis/gi, orgAdresse || "[Adresse]"],
     [/5\s*rue\s*Pleyel,?\s*93200/gi, [org.adresse, org.codePostal].filter(Boolean).join(" ") || "[Adresse]"],
     [/5\s*rue\s*Pleyel/gi, org.adresse || "[Adresse]"],
-    [/93200\s*Saint-Denis/gi, [org.codePostal, org.ville].filter(Boolean).join(" ") || "[CP Ville]"],
+    [/93200\s*Saint[-\s]?\s*Denis/gi, [org.codePostal, org.ville].filter(Boolean).join(" ") || "[CP Ville]"],
     [/\b93200\b/g, org.codePostal || "[CP]"],
-    [/Saint-Denis/gi, org.ville || "[Ville]"],
+    [/Saint[-\s]?\s*Denis/gi, villeOrg],
+    [/Tribunal\s+de\s+Grande\s+Instance\s+de\s+Nanterre/gi, `Tribunal Judiciaire de ${villeOrg}`],
     [/902\s*274\s*448\s*000\s*31/g, orgSiret],
     [/902\s*274\s*448/g, orgSiret.replace(/\s/g,"").slice(0,9) || orgSiret],
     [/contact\.ntconseil@gmail\.com/gi, orgEmail],
     [/Marc\.z103@gmail\.com/gi, orgEmail],
-    [/Préfet\s+de\s+la\s+région\s+ILE-DE-FRANCE/gi, `Préfet de la région ${org.ville || "[Région]"}`],
-    [/Préfet\s+de\s+la\s+région\s+XXX/gi, `Préfet de la région ${org.ville || "[Région]"}`],
+    [/Préfet\s+de\s+la\s+région\s+ILE-DE-FRANCE/gi, `Préfet de la région ${villeOrg}`],
+    [/Préfet\s+de\s+la\s+région\s+XXX/gi, `Préfet de la région ${villeOrg}`],
     [/SIRET\s*XXX/gi, `SIRET ${orgSiret}`],
-    [/Fait\s+à\s+Saint-Denis\s+le\s+\d{2}\/\d{2}\/\d{4}/gi, `Fait à ${org.ville || "[Ville]"} le ${dates.dateConvention}`],
+    [/Fait\s+à\s+Saint[-\s]?\s*Denis\s+le\s+\d{2}\/\d{2}\/\d{4}/gi, `Fait à ${villeOrg} le ${dates.dateConvention}`],
+    [/Fait\s+à\s+Saint[-\s]?\s*Denis/gi, `Fait à ${villeOrg}`],
     [/01\/01\/2026/g, fmtShortDate(parseDateFR(dates.dateVersion) || new Date())],
     // Dirigeant : remplace toutes les occurrences du nom NT Conseils par le dirigeant de l'organisme
     [/ABDOULHALIK\s+ANTTOISSE/gi, dirigeantUpper],
@@ -128,6 +131,7 @@ function applySubstitutions(src: string, org: OrganismeInfo, s: StagiaireInfo | 
     const tamponImg = `\n\n<img src="${org.tamponUrl}" alt="Tampon ${orgNom}" style="max-height:110px;max-width:200px;display:block;margin:8px 0;" />`;
     txt = txt.replace(/(^|\n)Président\s*$/m, `$1Président${tamponImg}`);
   }
+
 
   if (s) {
     const nomComplet = `${s.prenom} ${s.nom}`.trim();
