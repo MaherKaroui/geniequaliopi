@@ -228,7 +228,10 @@ function runIncoherences(org: any, form: any, stag: any[]): Incoherence[] {
 const QualiopiCheck = () => {
   const navigate = useNavigate();
   const [tick, setTick] = useState(0);
-  const [tab, setTab] = useState<"checklist" | "incoherences">("checklist");
+  const [tab, setTab] = useState<"checklist" | "incoherences" | "ai">("ai");
+  const [auditType, setAuditType] = useState<AuditType>("AF");
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiAudit, setAiAudit] = useState<AiAudit | null>(null);
 
   // Live refresh: re-read sessionStorage on focus
   useEffect(() => {
