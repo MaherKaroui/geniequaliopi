@@ -445,50 +445,70 @@ function preprocessGridTables(md: string): string {
   const lines = md.split(/\r?\n/);
   const out: string[] = [];
   const isBorder = (s: string) => /^\+[-=+]+\+\s*$/.test(s);
+  // Nettoie une cellule : retire échappements pandoc, transforme tirets en puces, escape pipes.
+  const cleanCell = (raw: string): string => {
+    return raw
+      .replace(/\\([\-_*'"<>])/g, "$1")
+      .replace(/(^|§§BR§§)\s*>\s*/g, "$1")
+      .replace(/(^|§§BR§§)\s*[-•]\s+/g, "$1• ")
+      .replace(/\|/g, "\\|")
+      .replace(/(§§BR§§\s*){2,}/g, "§§BR§§")
+      .replace(/^(\s|§§BR§§)+/, "")
+      .replace(/(\s|§§BR§§)+$/, "")
+      .trim();
+  };
   let i = 0;
   while (i < lines.length) {
     if (!isBorder(lines[i])) { out.push(lines[i]); i++; continue; }
-    // Détecte la position des colonnes via les '+'
     const cols: number[] = [];
     for (let p = 0; p < lines[i].length; p++) if (lines[i][p] === "+") cols.push(p);
     if (cols.length < 2) { out.push(lines[i]); i++; continue; }
 
-    // Collecte le bloc jusqu'à la dernière ligne de bordure consécutive
     const block: string[] = [lines[i]];
     let j = i + 1;
     while (j < lines.length) {
       const ln = lines[j];
-      if (isBorder(ln) || /^\|/.test(ln) || ln.trim() === "") {
-        block.push(ln);
-        j++;
-        // arrêt si bordure suivie d'une ligne non-tableau
-        if (isBorder(ln) && (j >= lines.length || (!/^\|/.test(lines[j]) && !isBorder(lines[j])))) break;
-      } else break;
-    }
-
-    // Parse les cellules accumulées entre bordures (préserve les sauts de ligne via §§BR§§)
-    const rows: string[][] = [];
-    let cur: string[] = new Array(cols.length - 1).fill("");
-    let curHas = false;
-    for (const bl of block) {
-      if (isBorder(bl)) {
-        if (curHas) { rows.push(cur.map(s => s.replace(/§§BR§§\s*$/,"").replace(/^\s*§§BR§§/,"").trim())); cur = new Array(cols.length - 1).fill(""); curHas = false; }
+      if (isBorder(ln)) {
+        block.push(ln); j++;
+        if (j >= lines.length || (!/^\|/.test(lines[j]) && !isBorder(lines[j]))) break;
         continue;
       }
-      if (!/^\|/.test(bl)) continue;
-      for (let k = 0; k < cols.length - 1; k++) {
-        const slice = bl.slice(cols[k] + 1, cols[k + 1]).trim();
-        if (slice) { cur[k] = cur[k] ? cur[k] + " " + slice : slice; curHas = true; }
-        else if (cur[k]) { cur[k] = cur[k] + "§§BR§§"; }
-      }
+      if (/^\|/.test(ln)) { block.push(ln); j++; continue; }
+      if (ln.trim() === "") { block.push(ln); j++; continue; }
+      break;
     }
 
+    const nCols = cols.length - 1;
+    const rows: string[][] = [];
+    let cur: string[] = new Array(nCols).fill("");
+    let curHas = false;
+    let headerRowIdx = -1;
+    for (const bl of block) {
+      if (isBorder(bl)) {
+        if (/=/.test(bl)) headerRowIdx = rows.length - 1;
+        if (curHas) { rows.push(cur.map(cleanCell)); cur = new Array(nCols).fill(""); curHas = false; }
+        continue;
+      }
+      if (!/^\|/.test(bl)) {
+        for (let k = 0; k < nCols; k++) if (cur[k]) cur[k] = cur[k] + "§§BR§§";
+        continue;
+      }
+      for (let k = 0; k < nCols; k++) {
+        const a = cols[k] + 1, b = Math.min(cols[k + 1], bl.length);
+        const slice = bl.slice(a, b).replace(/\s+$/, "").replace(/^\s+/, "");
+        if (slice) { cur[k] = cur[k] ? cur[k] + " " + slice : slice; curHas = true; }
+      }
+    }
+    if (curHas) rows.push(cur.map(cleanCell));
+
     if (rows.length > 0) {
-      // Marqueur §§BR§§ pour préserver les retours à la ligne dans les cellules
-      const join = (cells: string[]) => "| " + cells.map(c => c.replace(/ +/g, " ")).join(" | ") + " |";
-      out.push(join(rows[0]));
-      out.push("|" + rows[0].map(() => "---").join("|") + "|");
-      for (let r = 1; r < rows.length; r++) out.push(join(rows[r]));
+      const headerIdx = headerRowIdx >= 0 ? headerRowIdx : 0;
+      const join = (cells: string[]) => "| " + cells.map(c => (c.replace(/ +/g, " ") || " ")).join(" | ") + " |";
+      out.push("");
+      out.push(join(rows[headerIdx]));
+      out.push("|" + rows[headerIdx].map(() => "---").join("|") + "|");
+      for (let r = 0; r < rows.length; r++) { if (r === headerIdx) continue; out.push(join(rows[r])); }
+      out.push("");
     }
     i = j;
   }
@@ -570,12 +590,14 @@ function mdToHtmlBody(md: string): string {
       out.push(`<li>${inline(trimmed.replace(/^\d+\.\s+/,""))}</li>`);
       continue;
     }
-    if (/^\|.*\|$/.test(trimmed)) {
+    if (/^\|.*\|\s*$/.test(trimmed)) {
       flushParagraph();
       closeLists();
       if (!inTable) { out.push('<table class="bdc-table">'); inTable = true; tableRowIdx = 0; }
-      const cells = trimmed.slice(1, -1).split("|").map(c => c.trim());
-      if (cells.every(c => /^-+$/.test(c) || c === "")) continue;
+      // Split sur '|' non-échappés, puis dé-échappe les '\|'
+      const inner = trimmed.replace(/\s+$/, "").slice(1, -1);
+      const cells = inner.split(/(?<!\\)\|/).map(c => c.replace(/\\\|/g, "|").trim());
+      if (cells.every(c => /^:?-+:?$/.test(c) || c === "")) continue;
       const tag = tableRowIdx === 0 ? "th" : "td";
       out.push("<tr>" + cells.map(c => `<${tag}>${inline(c)}</${tag}>`).join("") + "</tr>");
       tableRowIdx++;
