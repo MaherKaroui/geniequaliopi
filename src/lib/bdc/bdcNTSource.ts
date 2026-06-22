@@ -334,78 +334,31 @@ portable (Droit individuel à la formation). Enfin, il est également
 possible de mobiliser son Compte personnel de formation (CPF) pour
 réaliser un bilan de compétences.
 `,
-  "Indicateur 1/Indicateur 1 - Pr\u00e9sentation du bilan de comp\u00e9tences": `**Bilan de compétences NT Conseils**
+  "Indicateur 1/Indicateur 1 - Pr\u00e9sentation du bilan de comp\u00e9tences": `**Bilan de compétences {ORG_NOM}**
+
+**Intitulé : {BDC_INTITULE}**
 
 
 
 **PUBLIC CONCERNE :**
 
-- Tout salarié en poste
+{BDC_PUBLIC}
 
-- Chef d\\'entreprise et cadre
+**PRE-REQUIS :**
 
-- Chercheur d\\'emploi
-
-- Entreprises qui souhaitent promouvoir leurs employés et collaborateurs
-
-- Personne en fin de contrat ou transition professionnelle
-
-- Jeune Actif
-
-**PRE-REQUIS :**
-
-**Apprenants :**
-
-- Être engagé dans une démarche de réflexion professionnelle.
-
-- Disposer d\\'un moyen de communication (téléphone ou e-mail).
-
-- Pour les séquences à distance : disposer d\\'un ordinateur et d\\'une
-  connexion internet.
+{BDC_PREREQUIS}
 
 **OBJECTIFS DU BILAN DE COMPÉTENCES :**
 
-Permettre au bénéficiaire :
-
-- D\\'analyser son parcours professionnel et personnel.
-
-- D\\'identifier ses compétences transférables.
-
-- D\\'évaluer sa capacité à évoluer dans un environnement professionnel
-  international.
-
-- D\\'identifier son niveau d\\'anglais professionnel selon le CECRL.
-
-- De construire un projet professionnel intégrant l\\'utilisation de
-  l\\'anglais.
-
-- De définir un plan d\\'action incluant, si nécessaire, le passage de la
-  certification VTest Business English 4 Skills.
-
-<!-- -->
-
-- 
+{BDC_OBJECTIFS}
 
 **DUREE ET HORAIRES :**
 
-Un premier entretien préalable à l'inscription (1h) gratuit et sans
-engagement est prévu afin de vérifier que le bilan de compétences
-répondra aux attentes du bénéficiaire. Une fois l'inscription finalisée,
-la prestation est de 18 h sur 2 à 5 mois répartis de la façon suivante :
-
-- 12h d'entretien individuel (6 rdv de 2 heures ou fréquence
-  personnalisée) réparti sur 3 mois maximum.
-
-- 6h de travail personnel guidé, de recherche et d'enquête terrain.
-
-- Le suivi à 6 mois est inclus dans la prestation mais n\\'est pas
-  comptabilisé dans les 18 heures d\\'accompagnement.
+{BDC_DUREE_HORAIRES}
 
 **LIEU :**
 
-- En présentiel dans les locaux de NT Conseils, à distance par
-  visioconférence ou en format mixte (présentiel/distanciel) selon les
-  besoins du bénéficiaire.
+{BDC_LIEU}
 
 **MODALITES ET DELAIS D'ACCES :**
 
@@ -420,12 +373,12 @@ A réception du devis signé l\\'organisation logistique, technique,
 pédagogique et financière est établie.
 
 Le délai d\\'accès aux formations tient compte de ces différentes
-formalités afin d\\'être accessible dans un temps minimum d\\'un mois
+formalités afin d\\'être accessible dans {BDC_DELAI_ACCES}
 avant le début de l\\'action.
 
 **TARIFS :**
 
-- 1400 euros HT soit 1680 euros TTC
+{BDC_TARIF}
 
 **MOYENS PEDAGOGIQUES :**
 
