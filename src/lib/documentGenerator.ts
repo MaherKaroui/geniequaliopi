@@ -7290,7 +7290,7 @@ function genProcedureRuptureReorientationEchecs(o: OrganismeInfo) {
     { heading: "5.7 Suivi et traçabilité", content: "<p>• Fiche de suivi apprenant<br>• Compte rendu d'entretien<br>• Historique des actions<br>• Suivi des démarches</p>" },
     { heading: "6. Indicateurs de suivi", content: "<p>• Taux de retour en entreprise<br>• Taux de réorientation<br>• Taux d'abandon<br>• Satisfaction des apprenants</p>", variant: "green" },
     { heading: "7. Amélioration continue", content: "<p>Les résultats sont analysés afin d'améliorer les dispositifs d'accompagnement et de renforcer les actions.</p>" },
-    { heading: "8. Validation", content: `<p><strong>Responsable :</strong> ${o.dirigeant} – Direction du CFA<br><strong>Date :</strong> ${new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}<br><strong>Version :</strong> V1</p>` },
+    { heading: "8. Validation", content: `<p><strong>Responsable :</strong> ${o.dirigeant} – Direction du CFA<br><strong>Version :</strong> V1</p>` },
   ] });
 }
 
