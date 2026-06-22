@@ -578,7 +578,7 @@ export async function buildBDCNTConseilsZip(
       md = md.replace(/\n[^|\n]{200,}\n/g, "\n[À compléter à la fin du bilan]\n");
     }
 
-    const html = mdToHtml(md, title).replace("</body>", buildFooter(org, dates) + "</body>");
+    const html = mdToHtml(md, title, org, s).replace("</body>", buildFooter(org, dates) + "</body>");
     return await htmlToWordBlob(html);
   };
 
