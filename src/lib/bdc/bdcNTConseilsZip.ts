@@ -452,7 +452,18 @@ function mdToHtmlBody(md: string): string {
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
     const trimmed = line.trim();
-    if (!trimmed) { closeLists(); closeTable(); out.push(""); continue; }
+    if (!trimmed) {
+      // Une ligne vide ne ferme PAS une liste si la prochaine ligne non vide est encore un item
+      // (sinon chaque item recommence à "1.")
+      let nextIdx = i + 1;
+      while (nextIdx < lines.length && !lines[nextIdx].trim()) nextIdx++;
+      const next = nextIdx < lines.length ? lines[nextIdx].trim() : "";
+      const nextIsListItem = /^[-*+]\s+/.test(next) || /^\d+\.\s+/.test(next);
+      if (!nextIsListItem) closeLists();
+      closeTable();
+      out.push("");
+      continue;
+    }
     let m = trimmed.match(/^(#{1,6})\s+(.*)$/);
     if (m) {
       closeLists(); closeTable();
