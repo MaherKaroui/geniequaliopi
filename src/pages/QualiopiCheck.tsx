@@ -233,6 +233,53 @@ const QualiopiCheck = () => {
   const [aiLoading, setAiLoading] = useState(false);
   const [aiAudit, setAiAudit] = useState<AiAudit | null>(null);
   const [decisions, setDecisions] = useState<Record<number, "fix" | "ignore">>({});
+  const [fixingIdx, setFixingIdx] = useState<number | null>(null);
+
+  const applyFix = async (idx: number, f: AiFinding) => {
+    setFixingIdx(idx);
+    try {
+      const { data, error } = await supabase.functions.invoke("audit-fix", {
+        body: { type: auditType, finding: f, organisme: org, formation: form, stagiaires: stag },
+      });
+      if (error) throw error;
+      if ((data as any)?.error) throw new Error((data as any).error);
+      const patch = (data as any)?.patch || {};
+      const explication = (data as any)?.explication || "Correction appliquée";
+
+      let touched = false;
+      if (patch.organisme && typeof patch.organisme === "object" && Object.keys(patch.organisme).length) {
+        const merged = { ...load<any>("qualiopi_org", {}), ...patch.organisme };
+        sessionStorage.setItem("qualiopi_org", JSON.stringify(merged));
+        touched = true;
+      }
+      if (patch.formation && typeof patch.formation === "object" && Object.keys(patch.formation).length) {
+        const merged = { ...load<any>("qualiopi_form", {}), ...patch.formation };
+        sessionStorage.setItem("qualiopi_form", JSON.stringify(merged));
+        touched = true;
+      }
+      if (Array.isArray(patch.stagiaires) && patch.stagiaires.length) {
+        const arr = load<any[]>("qualiopi_stag", []);
+        patch.stagiaires.forEach((u: any) => {
+          if (typeof u?.index === "number" && arr[u.index] && u.champs) {
+            arr[u.index] = { ...arr[u.index], ...u.champs };
+          }
+        });
+        sessionStorage.setItem("qualiopi_stag", JSON.stringify(arr));
+        touched = true;
+      }
+      if (touched) {
+        setDecisions(d => ({ ...d, [idx]: "fix" }));
+        setTick(t => t + 1);
+        toast.success(`✅ Corrigé par l'IA : ${explication}`);
+      } else {
+        toast.info(`ℹ️ ${explication || "Pas de patch automatique disponible — corrige manuellement."}`);
+      }
+    } catch (e: any) {
+      toast.error(e.message || "Erreur correction IA");
+    } finally {
+      setFixingIdx(null);
+    }
+  };
 
   // Live refresh: re-read sessionStorage on focus
   useEffect(() => {
