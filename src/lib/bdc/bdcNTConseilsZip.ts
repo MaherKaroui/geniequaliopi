@@ -445,9 +445,9 @@ function mdToHtmlBody(md: string): string {
   }
   const lines = allLines.slice(start);
   const out: string[] = [];
-  let inUl = false, inOl = false, inTable = false;
+  let inUl = false, inOl = false, inTable = false, tableRowIdx = 0;
   const closeLists = () => { if (inUl){out.push("</ul>");inUl=false;} if(inOl){out.push("</ol>");inOl=false;} };
-  const closeTable = () => { if (inTable){out.push("</table>");inTable=false;} };
+  const closeTable = () => { if (inTable){out.push("</table>");inTable=false;tableRowIdx=0;} };
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
