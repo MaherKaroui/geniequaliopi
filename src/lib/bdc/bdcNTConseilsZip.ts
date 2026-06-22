@@ -194,13 +194,10 @@ function applySubstitutions(src: string, org: OrganismeInfo, s: StagiaireInfo | 
     .replace(/\{ORG_TEL\}/g, orgTel || "")
     .replace(/\{ORG_MAIL\}/g, orgEmail);
 
-  // Bloc signatures Qualiopi sobre : tampon/signature organisme à gauche,
-  // signature bénéficiaire à droite. Les deux images sont affichées si présentes.
+  // Bloc signatures Qualiopi sobre : tampon organisme du formulaire à gauche,
+  // signature bénéficiaire du formulaire stagiaire à droite.
   const tampon = org.tamponUrl
     ? `<img src="${org.tamponUrl}" alt="Tampon ${orgNom}" style="max-height:78px;max-width:150px;display:block;margin:2px 0 6px;object-fit:contain;" />`
-    : "";
-  const signOrg = org.signatureUrl
-    ? `<img src="${org.signatureUrl}" alt="Signature ${dirigeant}" style="max-height:58px;max-width:170px;display:block;margin:2px 0 6px;object-fit:contain;" />`
     : "";
   const signSta = s?.signatureUrl
     ? `<img src="${s.signatureUrl}" alt="Signature bénéficiaire" style="max-height:58px;max-width:170px;display:block;margin:2px 0 6px;object-fit:contain;" />`
@@ -217,8 +214,8 @@ function applySubstitutions(src: string, org: OrganismeInfo, s: StagiaireInfo | 
   <tbody>
     <tr>
       <td style="border:1px solid #94a3b8;padding:12px;vertical-align:top;height:118px;">
-        <div style="font-size:11px;color:#475569;margin-bottom:6px;">Tampon et signature</div>
-        ${tampon}${signOrg}
+        <div style="font-size:11px;color:#475569;margin-bottom:6px;">Tampon de l'organisme</div>
+        ${tampon}
         <div style="font-size:11px;color:#1e293b;margin-top:4px;font-weight:600;">${dirigeant}</div>
         <div style="font-size:10.5px;color:#475569;">${org.nom || ""}</div>
       </td>
@@ -714,20 +711,22 @@ function mdToHtmlBody(md: string): string {
   const closeLists = () => { if (inUl){out.push("</ul>");inUl=false;} if(inOl){out.push("</ol>");inOl=false;} };
   const closeTable = () => { if (inTable){out.push("</table>");inTable=false;tableRowIdx=0;tableHasHeader=true;} };
 
-  let inRawHtml = false;
+  let rawHtmlTag: "table" | "div" | "section" | "article" | null = null;
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
     const trimmed = line.trim();
     // Bloc HTML brut (ex: tableau signatures) : passe sans échappement markdown
-    if (inRawHtml) {
+    if (rawHtmlTag) {
       out.push(line);
-      if (/<\/(table|div|section|article)>\s*$/i.test(trimmed)) inRawHtml = false;
+      if (new RegExp(`</${rawHtmlTag}>\\s*$`, "i").test(trimmed)) rawHtmlTag = null;
       continue;
     }
-    if (/^<(table|div|section|article)[\s>]/i.test(trimmed)) {
+    const rawStart = trimmed.match(/^<(table|div|section|article)[\s>]/i);
+    if (rawStart) {
       flushParagraph(); closeLists(); closeTable();
       out.push(line);
-      if (!new RegExp(`</(table|div|section|article)>\\s*$`, "i").test(trimmed)) inRawHtml = true;
+      const tag = rawStart[1].toLowerCase() as "table" | "div" | "section" | "article";
+      if (!new RegExp(`</${tag}>\\s*$`, "i").test(trimmed)) rawHtmlTag = tag;
       continue;
     }
     if (!trimmed) {
