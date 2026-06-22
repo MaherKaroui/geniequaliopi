@@ -655,7 +655,8 @@ export function indicateurFromKey(key: string): number {
 /** Titre lisible (nom de fichier sans extension) d'une clé source. */
 export function bdcDocTitle(key: string): string {
   const name = key.split("/").pop() || key;
-  return name;
+  // Retire le préfixe "Indicateur N - " (ou variantes) en début de titre
+  return name.replace(/^\s*Indicateur\s*\d+\s*[-–:]\s*/i, "").trim();
 }
 
 /**
