@@ -2545,332 +2545,176 @@ le contractualise
 `,
   "Indicateur 30/Indicateur 30 - Process Satisfaction": `**PROCESS SATISFACTION**
 
-Quand j'ai un nombre suffisant de retours (ou tous les X mois),
-j'analyse les retours
+**①** J'envoie les questionnaires de satisfaction aux différentes parties prenantes
 
-« Mesures d'amélioration bénéficiaire »
+- « Questionnaire satisfaction bénéficiaire »
+- « Questionnaire satisfaction entreprise »
+- « Questionnaire satisfaction financeur »
+- « Questionnaire satisfaction équipes pédagogiques »
 
-« Mesures d'amélioration entreprise »
+**②** Si je n'ai pas de retour après 7 jours, je procède à une relance
 
-« Mesures d'amélioration financeur »
+**③** Quand j'ai un nombre suffisant de retours (ou tous les X mois), j'analyse les retours
 
-« Mesures d'amélioration équipes pédagogiques »
+- « Mesures d'amélioration bénéficiaire »
+- « Mesures d'amélioration entreprise »
+- « Mesures d'amélioration financeur »
+- « Mesures d'amélioration équipes pédagogiques »
 
-À la suite de cette analyse, je propose des mesures d'améliorations et
-j'en assure le suivi
+**④** À la suite de cette analyse, je propose des mesures d'améliorations et j'en assure le suivi
 
-« Tableau d'amélioration continue »
-
-Si je n'ai pas de retour après 7 jours, je procède à une relance
-
-J'envoie les questionnaires de satisfaction aux différentes parties
-prenantes
-
-« Questionnaire satisfaction bénéficiaire »
-
-« Questionnaire satisfaction entreprise »
-
-« Questionnaire satisfaction financeur »
-
-« Questionnaire satisfaction équipes pédagogiques »
+- « Tableau d'amélioration continue »
 `,
   "Indicateur 30/Indicateur 30 - Questionnaire satisfaction entreprise": `**QUESTIONNAIRE SATISFACTION\\
 ENTREPRISE**
 
-*Ce questionnaire a pour objectif d\\'évaluer avec vous les bilans de
-compétences que nous dispensons, dans un souci permanent d\\'y apporter
-des améliorations et de répondre à vos attentes. Aussi votre avis nous
-étant précieux, nous vous demandons de bien vouloir répondre avec soin à
-toutes les questions posées et de nous le renvoyer par courrier ou
-email.*
+*Ce questionnaire a pour objectif d'évaluer avec vous les bilans de compétences que nous dispensons, dans un souci permanent d'y apporter des améliorations et de répondre à vos attentes. Aussi votre avis nous étant précieux, nous vous demandons de bien vouloir répondre avec soin à toutes les questions posées et de nous le renvoyer par courrier ou email.*
 
-*M. ZOCLY Marc\\
-a participé à notre formation Bilan de compétences\\
-durant la période du 19/02/2024 au 22/04/2024\\*
+*M. ZOCLY Marc§§BR§§a participé à notre formation Bilan de compétences§§BR§§durant la période du 19/02/2024 au 22/04/2024*
 
 **Critères de satisfaction :**
 
-*1 = Pas du tout satisfait*
+*1 = Pas du tout satisfait — 2 = Pas satisfait — 4 = Satisfait — 5 = Très satisfait*
 
-*2 = Pas satisfait*
+| **Concernant ce bilan de compétences, diriez-vous de chacun des éléments suivants que vous en êtes plutôt :** | **1** | **2** | **4** | **5** |
+|---|:---:|:---:|:---:|:---:|
+| Informations obtenues avant le début de la prestation (programme / tarifs) | ☐ | ☐ | ☐ | ☐ |
+| Programme et méthodes pédagogiques | ☐ | ☐ | ☐ | ☐ |
+| Compétences acquises par le bénéficiaire | ☐ | ☐ | ☐ | ☐ |
+| Informations obtenues au terme de la prestation | ☐ | ☐ | ☐ | ☐ |
+| Gestion administrative globale du dossier du bénéficiaire | ☐ | ☐ | ☐ | ☐ |
+| Adéquation globale de la prestation vis-à-vis de vos attentes | ☐ | ☐ | ☐ | ☐ |
 
-*4 = Satisfait*
+**Sur 10, quel est votre niveau de satisfaction générale sur la prestation écoulée ?**
 
-*5 = Très satisfait*
+| **1** | **2** | **3** | **4** | **5** | **6** | **7** | **8** | **9** | **10** |
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ |
 
-  ----------------------------------------- ------- ------- ------- -------
-    **Concernant ce bilan de compétences,    **1**   **2**   **4**   **5**
-     diriez-vous de chacun des éléments                             
-    suivants que vous en êtes plutôt :**                            
+*Pas du tout satisfait → Très satisfait*
 
-   Informations obtenues avant le début de                          
-     la prestation (programme / tarifs)                             
-
-     Programme et méthodes pédagogiques                             
-
-  Compétences acquises par le bénéficiaire                          
-
-    Informations obtenues au terme de la                            
-                 prestation                                         
-
-  Gestion administrative globale du dossier                         
-               du bénéficiaire                                      
-
-     Adéquation globale de la prestation                            
-          vis-à-vis de vos attentes                                 
-  ----------------------------------------- ------- ------- ------- -------
-
-**Sur 10, quel est votre niveau de satisfaction générale sur la
-prestation écoulée ?**
-
-+--------+--------+--------+-------+-------+-------+-------+--------+--------+--------+
-| **1**  | **2**  | **3**  | **4** | **5** | **6** | **7** | **8**  | **9**  | **10** |
-+:=======+:=======+:=======+:======+:======+:======+:======+=======:+=======:+=======:+
-| **Pas du tout            |       |       |       |       | **Très satisfait**       |
-| satisfait**              |       |       |       |       |                          |
-+--------------------------+-------+-------+-------+-------+--------------------------+
-
-+-----------------------------------------------------------------------+
-| **En cas d'insatisfaction sur l'un des éléments précédents,           |
-| pourriez-vous préciser pourquoi vous n'êtes pas satisfait : **        |
-+-----------------------------------------------------------------------+
+| **En cas d'insatisfaction sur l'un des éléments précédents, pourriez-vous préciser pourquoi vous n'êtes pas satisfait :** |
+|---|
+| §§BR§§§§BR§§§§BR§§ |
 `,
   "Indicateur 30/Indicateur 30 - Questionnaire satisfaction financeur": `**QUESTIONNAIRE SATISFACTION\\
 FINANCEUR**
 
-*\\*
+*Ce questionnaire a pour objectif d'évaluer avec vous la prestation que nous dispensons, dans un souci permanent d'y apporter des améliorations et de répondre à vos attentes. Aussi votre avis nous étant précieux, nous vous demandons de bien vouloir répondre avec soin à toutes les questions posées et de nous le renvoyer par courrier ou email.*
 
-*Ce questionnaire a pour objectif d\\'évaluer avec vous la prestation que
-nous dispensons, dans un souci permanent d\\'y apporter des améliorations
-et de répondre à vos attentes. Aussi votre avis nous étant précieux,
-nous vous demandons de bien vouloir répondre avec soin à toutes les
-questions posées et de nous le renvoyer par courrier ou email.*
+*M. ou Mme ......................................................§§BR§§a participé à notre prestation : Bilan de compétences§§BR§§durant la période du .............................. au ..............................§§BR§§Cette prestation a été financée par vos soins.*
 
-*M. ou Mme ......................................................\\
-a participé à notre prestation : Bilan de compétences\\
-durant la période du .............................. au
-..............................\\
-Cette prestation a été financée par vos soins.*
-
-**Profil financeur :** Pôle Emploi / Région / Entreprise / Autre à
-préciser *..............................*
+**Profil financeur :** Pôle Emploi / Région / Entreprise / Autre à préciser *..............................*
 
 **Critères de satisfaction :**
 
-*1 = Pas du tout satisfait*
+*1 = Pas du tout satisfait — 2 = Pas satisfait — 4 = Satisfait — 5 = Très satisfait*
 
-*2 = Pas satisfait*
+| **Concernant cette prestation, diriez-vous de chacun des éléments suivants que vous en êtes plutôt :** | **1** | **2** | **4** | **5** |
+|---|:---:|:---:|:---:|:---:|
+| Informations obtenues avant le début du bilan de compétences (programme / tarifs) | ☐ | ☐ | ☐ | ☐ |
+| Informations obtenues au terme de la prestation | ☐ | ☐ | ☐ | ☐ |
+| Gestion administrative globale du dossier du bénéficiaire | ☐ | ☐ | ☐ | ☐ |
+| Contacts avec l'organisme de formation | ☐ | ☐ | ☐ | ☐ |
 
-*4 = Satisfait*
+**Sur 10, quel est votre niveau de satisfaction générale sur la formation écoulée ?**
 
-*5 = Très satisfait*
+| **1** | **2** | **3** | **4** | **5** | **6** | **7** | **8** | **9** | **10** |
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ |
 
-  ----------------------------------------- ------- ------- ------- -------
-       **Concernant cette prestation,        **1**   **2**   **4**   **5**
-     diriez-vous de chacun des éléments                             
-    suivants que vous en êtes plutôt :**                            
+*Pas du tout satisfait → Très satisfait*
 
-   Informations obtenues avant le début du                          
-  bilan de compétences (programme / tarifs)                         
-
-    Informations obtenues au terme de la                            
-                 prestation                                         
-
-  Gestion administrative globale du dossier                         
-               du bénéficiaire                                      
-
-   Contacts avec l'organisme de formation                           
-  ----------------------------------------- ------- ------- ------- -------
-
-**\\**
-
-**Sur 10, quel est votre niveau de satisfaction générale sur la
-formation écoulée ?**
-
-+--------+--------+--------+-------+-------+-------+-------+--------+--------+--------+
-| **1**  | **2**  | **3**  | **4** | **5** | **6** | **7** | **8**  | **9**  | **10** |
-+:=======+:=======+:=======+:======+:======+:======+:======+=======:+=======:+=======:+
-| **Pas du tout            |       |       |       |       | **Très satisfait**       |
-| satisfait**              |       |       |       |       |                          |
-+--------------------------+-------+-------+-------+-------+--------------------------+
-
-+-----------------------------------------------------------------------+
-| **En cas d'insatisfaction sur l'un des éléments précédents,           |
-| pourriez-vous préciser pourquoi vous n'êtes pas satisfait : **        |
-+-----------------------------------------------------------------------+
+| **En cas d'insatisfaction sur l'un des éléments précédents, pourriez-vous préciser pourquoi vous n'êtes pas satisfait :** |
+|---|
+| §§BR§§§§BR§§§§BR§§ |
 `,
   "Indicateur 30/Indicateur 30 - Questionnaire satisfaction interne": `**QUESTIONNAIRE SATISFACTION INTERNE**
 
-En réalisant cette enquête, nous souhaitons vous associer à la dynamique
-d'amélioration de la qualité dans et de notre service. Votre
-participation est précieuse.
+En réalisant cette enquête, nous souhaitons vous associer à la dynamique d'amélioration de la qualité dans et de notre service. Votre participation est précieuse.
 
-Merci d'accepter de participer à la démarche et de consacrer quelques
-minutes à ce questionnaire.
+Merci d'accepter de participer à la démarche et de consacrer quelques minutes à ce questionnaire.
 
-À l'issue de l'enquête, nous vous présenterons les résultats pour
-l'ensemble du service.
+À l'issue de l'enquête, nous vous présenterons les résultats pour l'ensemble du service.
 
 **Critères de satisfaction :**
 
-*1 = Pas du tout satisfait*
+*1 = Pas du tout satisfait — 2 = Pas satisfait — 4 = Satisfait — 5 = Très satisfait*
 
-*2 = Pas satisfait*
+**1) [Perception de l'image du service]{.underline}**
 
-*4 = Satisfait*
+|  | **1** | **2** | **4** | **5** |
+|---|:---:|:---:|:---:|:---:|
+| Mon service a une bonne image à l'extérieur. | ☐ | ☐ | ☐ | ☐ |
+| Mon service communique suffisamment avec la population du territoire. | ☐ | ☐ | ☐ | ☐ |
+| Je suis fier de travailler dans mon service. | ☐ | ☐ | ☐ | ☐ |
+| Je suis optimiste sur l'avenir de mon service. | ☐ | ☐ | ☐ | ☐ |
 
-*5 = Très satisfait*
+**2) [Qualité perçue de la prise en charge]{.underline}**
 
-1)  **[Perception de l'image du service]{.underline}**
+|  | **1** | **2** | **4** | **5** |
+|---|:---:|:---:|:---:|:---:|
+| Mon service est fortement attaché à satisfaire les clients. | ☐ | ☐ | ☐ | ☐ |
+| J'ai une bonne image de la qualité de prise en charge proposée par mon service. | ☐ | ☐ | ☐ | ☐ |
+| Mes horaires de travail sont adaptés à la prise en charge des clients. | ☐ | ☐ | ☐ | ☐ |
 
-  ----------------------------------------- ------- ------- ------- -------
-                                             **1**   **2**   **4**   **5**
+**3) [Organisation et cadre de travail]{.underline}**
 
-       Mon service a une bonne image à                              
-                l\\'extérieur.                                       
+|  | **1** | **2** | **4** | **5** |
+|---|:---:|:---:|:---:|:---:|
+| L'organisation du travail est adaptée à la prise en charge des clients. | ☐ | ☐ | ☐ | ☐ |
+| Les conditions d'hygiène et de sécurité sont satisfaisantes. | ☐ | ☐ | ☐ | ☐ |
+| Les équipements et matériels utilisés permettent de répondre aux besoins des clients. | ☐ | ☐ | ☐ | ☐ |
+| Mon travail quotidien correspond à ce qui est décrit dans ma fiche de poste. | ☐ | ☐ | ☐ | ☐ |
+| La coordination entre les équipes est satisfaisante. | ☐ | ☐ | ☐ | ☐ |
+| L'existence de procédures m'aide à la réalisation de mes tâches professionnelles. | ☐ | ☐ | ☐ | ☐ |
 
-  Mon service communique suffisamment avec                          
-        la population du territoire.                                
+**4) [Management, ambiance de travail]{.underline}**
 
-     Je suis fier de travailler dans mon                            
-                  service.                                          
+|  | **1** | **2** | **4** | **5** |
+|---|:---:|:---:|:---:|:---:|
+| Les personnels d'encadrement sont fortement impliqués dans la recherche de la satisfaction des clients. | ☐ | ☐ | ☐ | ☐ |
+| Les personnels d'encadrement sont à l'écoute des remarques que je leur transmets. | ☐ | ☐ | ☐ | ☐ |
+| J'ai la possibilité de m'exprimer pour améliorer mes pratiques professionnelles. | ☐ | ☐ | ☐ | ☐ |
+| J'ai suffisamment de marge de manœuvre pour répondre aux besoins des clients. | ☐ | ☐ | ☐ | ☐ |
+| L'ambiance de travail est bonne. | ☐ | ☐ | ☐ | ☐ |
+| Mon travail est reconnu de manière appropriée. | ☐ | ☐ | ☐ | ☐ |
+| Mon service prend en compte le mieux possible la conciliation vie professionnelle et vie personnelle. | ☐ | ☐ | ☐ | ☐ |
+| Je dispose d'espaces de paroles identifiés où je peux échanger librement. | ☐ | ☐ | ☐ | ☐ |
 
-    Je suis optimiste sur l'avenir de mon                           
-                  service.                                          
-  ----------------------------------------- ------- ------- ------- -------
+**5) [Formation et intégration des salariés]{.underline}**
 
-2)  **[Qualité perçue de la prise en charge]{.underline}**
+|  | **1** | **2** | **4** | **5** |
+|---|:---:|:---:|:---:|:---:|
+| Je dispose des compétences et connaissances requises pour mon poste. | ☐ | ☐ | ☐ | ☐ |
+| Je suis satisfait des formations proposées par mon service. | ☐ | ☐ | ☐ | ☐ |
+| L'intégration du personnel nouveau est satisfaisante. | ☐ | ☐ | ☐ | ☐ |
 
-  ----------------------------------------- ------- ------- ------- -------
-                                             **1**   **2**   **4**   **5**
+**6) [Information, participation et communication interne]{.underline}**
 
-     Mon service est fortement attaché à                            
-           satisfaire les clients.                                  
-
-    J'ai une bonne image de la qualité de                           
-  prise en charge proposée par mon service.                         
-
-  Mes horaires de travail sont adaptés à la                         
-        prise en charge des clients.                                
-  ----------------------------------------- ------- ------- ------- -------
-
-3)  **[Organisation et cadre de travail]{.underline}**
-
-  ----------------------------------------- ------- ------- ------- -------
-                                             **1**   **2**   **4**   **5**
-
-  L\\'organisation du travail est adaptée à                          
-       la prise en charge des clients.                              
-
-  Les conditions d\\'hygiène et de sécurité                          
-            sont satisfaisantes.                                    
-
-    Les équipements et matériels utilisés                           
-   permettent de répondre aux besoins des                           
-                  clients.                                          
-
-  Mon travail quotidien correspond à ce qui                         
-     est décrit dans ma fiche de poste.                             
-
-    La coordination entre les équipes est                           
-               satisfaisante.                                       
-
-   L\\'existence de procédures m\\'aide à la                          
-          réalisation de mes tâches                                 
-              professionnelles.                                     
-  ----------------------------------------- ------- ------- ------- -------
-
-4)  **[Management, ambiance de travail]{.underline}**
-
-  ----------------------------------------- ------- ------- ------- -------
-                                             **1**   **2**   **4**   **5**
-
-      Les personnels d'encadrement sont                             
-  fortement impliqués dans la recherche de                          
-        la satisfaction des clients.                                
-
-     Les personnels d'encadrement sont à                            
-     l\\'écoute des remarques que je leur                            
-                 transmets.                                         
-
-  J\\'ai la possibilité de m\\'exprimer pour                          
-  améliorer mes pratiques professionnelles.                         
-
-   J'ai suffisamment de marge de manœuvre                           
-   pour répondre aux besoins des clients.                           
-
-      L'ambiance de travail est bonne.                              
-
-     Mon travail est reconnu de manière                             
-                 appropriée.                                        
-
-    Mon service prend en compte le mieux                            
-        possible la conciliation vie                                
-     professionnelle et vie personnelle.                            
-
-      Je dispose d\\'espaces de paroles                              
-  identifiés où je peux échanger librement.                         
-  ----------------------------------------- ------- ------- ------- -------
-
-5)  **[Formation et intégration des salariés]{.underline}**
-
-  ----------------------------------------- ------- ------- ------- -------
-                                             **1**   **2**   **4**   **5**
-
-        Je dispose des compétences et                               
-   connaissances requises pour mon poste.                           
-
-      Je suis satisfait des formations                              
-         proposées par mon service.                                 
-
-   L\\'intégration du personnel nouveau est                          
-               satisfaisante.                                       
-  ----------------------------------------- ------- ------- ------- -------
-
-6)  **[Information, participation et communication
-    interne]{.underline}**
-
-  ----------------------------------------- ------- ------- ------- -------
-                                             **1**   **2**   **4**   **5**
-
-      Les informations que je reçois me                             
-  permettent de savoir ce qui se passe dans                         
-                mon service.                                        
-
-    Je suis informé des orientations, des                           
-           projets de mon service.                                  
-
-  Je connais mes droits et mes obligations.                         
-  ----------------------------------------- ------- ------- ------- -------
-
-**[\\]{.underline}**
+|  | **1** | **2** | **4** | **5** |
+|---|:---:|:---:|:---:|:---:|
+| Les informations que je reçois me permettent de savoir ce qui se passe dans mon service. | ☐ | ☐ | ☐ | ☐ |
+| Je suis informé des orientations, des projets de mon service. | ☐ | ☐ | ☐ | ☐ |
+| Je connais mes droits et mes obligations. | ☐ | ☐ | ☐ | ☐ |
 
 **[Questions finales]{.underline}**
 
-  ----------------------------------------- ------- ------- ------- -------
-                                             **1**   **2**   **4**   **5**
+|  | **1** | **2** | **4** | **5** |
+|---|:---:|:---:|:---:|:---:|
+| En résumé, toutes les conditions sont réunies dans mon service pour que je puisse satisfaire les clients. | ☐ | ☐ | ☐ | ☐ |
 
-    En résumé, toutes les conditions sont                           
-    réunies dans mon service pour que je                            
-       puisse satisfaire les clients.                               
-  ----------------------------------------- ------- ------- ------- -------
+**Sur 10, quel est votre niveau de satisfaction générale concernant votre poste ?**
 
-**Sur 10, quel est votre niveau de satisfaction générale concernant
-votre poste ?**
+| **1** | **2** | **3** | **4** | **5** | **6** | **7** | **8** | **9** | **10** |
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ |
 
-+--------+--------+--------+-------+-------+-------+-------+--------+--------+--------+
-| **1**  | **2**  | **3**  | **4** | **5** | **6** | **7** | **8**  | **9**  | **10** |
-+========+========+========+=======+=======+=======+=======+=======:+=======:+=======:+
-| **Pas du tout            |       |       |       |       | **Très satisfait**       |
-| satisfait**              |       |       |       |       |                          |
-+--------------------------+-------+-------+-------+-------+--------------------------+
+*Pas du tout satisfait → Très satisfait*
 
-  -----------------------------------------------------------------------
-  Avez-vous des remarques, des suggestions ou des commentaires à
-  effectuer ?
-  -----------------------------------------------------------------------
-
-  -----------------------------------------------------------------------
+| **Avez-vous des remarques, des suggestions ou des commentaires à effectuer ?** |
+|---|
+| §§BR§§§§BR§§§§BR§§ |
 `,
   "Indicateur 4/Indicateur 4 - Mail type handicap": `**MAIL TYPE\\
 HANDICAP**
