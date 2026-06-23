@@ -4,6 +4,7 @@ import { FormateurInfo, getFormationDays, parseDuree } from "./sampleData";
 import { getRNCPByCode } from "./rncpData";
 import { getEvalContent } from "./evalContent";
 import { BDC_NT_SOURCE, BDC_NT_PER_BENEFICIAIRE, BDC_NT_STATIC_ASSETS } from "./bdc/bdcNTSource";
+import { BDC_NT_STATS_FILES } from "./bdc/bdcNTStatsXlsx";
 import { critereForIndicateur, indicateurFromKey, bdcDocTitle } from "./bdc/bdcNTConseilsZip";
 
 
@@ -1266,6 +1267,14 @@ export function buildFullCatalog(
           { sourceKey: key },
         );
       }
+    });
+    BDC_NT_STATS_FILES.forEach((file, idx) => {
+      add(
+        `bdc_nt_ind2_justificatif_${idx}`,
+        `CT1 - IND 2 ${file.name.replace(/\.xlsx$/i, "")}`,
+        1, 2, "bdc_nt_stats_xlsx",
+        { statsIndex: idx },
+      );
     });
     // Trames Excel dynamiques (générées comme les autres docs xlsx, prévisualisables et téléchargeables en .xlsx)
     add("bdc_nt_calendrier_annuel", "CT1 - IND 1 Calendrier annuel (Excel)", 1, 1, "bdc_nt_calendrier_annuel");

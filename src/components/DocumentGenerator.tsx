@@ -42,6 +42,7 @@ const REAL_XLSX_TEMPLATES = new Set<string>([
   "bdc_nt_suivi_adaptation",
   "bdc_nt_contacts_handicap",
   "bdc_nt_tableau_dysfonctionnements",
+  "bdc_nt_stats_xlsx",
 ]);
 import { downloadAsPdf, htmlToPdfBlob } from "@/lib/pdfExport";
 import { processDocxTemplate, processMailDocxTemplate, DOCX_TEMPLATE_FILES, MAIL_TEMPLATE_FILES } from "@/lib/docxTemplateExport";
@@ -799,7 +800,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
       for (const doc of catalog) {
         const isPerStagiaire = PER_STAGIAIRE_TEMPLATES.has(doc.template);
         const hasStagiaireIdx = doc.params?.stagiaireIdx !== undefined;
-        const basePath = getDocBasePath(doc);
+        const basePath = isBDCOrg && doc.indicateur === 2 ? "Indicateur 2" : getDocBasePath(doc);
 
         if (MAIL_TEMPLATE_FILES[doc.template] && typeof doc.params?.stagiaireIdx === "number") {
           const s = allStagiaires[doc.params.stagiaireIdx];
@@ -979,6 +980,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
         const hasStagiaireIdx = doc.params?.stagiaireIdx !== undefined;
         return count + (isPerStagiaire && !hasStagiaireIdx ? allStagiaires.length : 1);
       }, 0);
+      const directBDCInd2 = isBDCOrg && critereNum === 1;
 
       if (totalFiles === 0) {
         toast.info(`Aucun fichier à exporter pour le Critère ${critereNum}.`);
@@ -1004,7 +1006,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
       for (const doc of critereDocs) {
         const isPerStagiaire = PER_STAGIAIRE_TEMPLATES.has(doc.template);
         const hasStagiaireIdx = doc.params?.stagiaireIdx !== undefined;
-        const basePath = getDocBasePath(doc);
+        const basePath = directBDCInd2 && doc.indicateur === 2 ? "Indicateur 2" : getDocBasePath(doc);
 
         if (MAIL_TEMPLATE_FILES[doc.template] && typeof doc.params?.stagiaireIdx === "number") {
           const s = allStagiaires[doc.params.stagiaireIdx];
@@ -1142,7 +1144,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
       for (const doc of indDocs) {
         const isPerStagiaire = PER_STAGIAIRE_TEMPLATES.has(doc.template);
         const hasStagiaireIdx = doc.params?.stagiaireIdx !== undefined;
-        const basePath = getDocBasePath(doc);
+        const basePath = isBDCOrg && indicateurNum === 2 ? "Indicateur 2" : getDocBasePath(doc);
 
         if (MAIL_TEMPLATE_FILES[doc.template] && typeof doc.params?.stagiaireIdx === "number") {
           const s = allStagiaires[doc.params.stagiaireIdx];
