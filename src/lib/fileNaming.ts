@@ -56,6 +56,7 @@ const EXCEL_TEMPLATES = new Set([
   "bdc_nt_contacts_handicap",
   "bdc_nt_tableau_dysfonctionnements",
   "bdc_nt_stats_xlsx",
+  "bdc_nt_cr6mois_stagiaire",
 ]);
 
 export const MAIL_DOCX_TEMPLATES = new Set([
