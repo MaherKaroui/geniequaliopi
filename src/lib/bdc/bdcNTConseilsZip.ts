@@ -16,6 +16,8 @@ import { BDC_NT_SOURCE, BDC_NT_PER_BENEFICIAIRE, BDC_NT_STATIC_ASSETS } from "./
 import { BDC_TEMPLATES, renderBdcTemplateIfMapped } from "./bdcTemplateMap";
 import { getBdcDomainProfile } from "@/lib/templatesBDC";
 import type { JobReporter } from "@/lib/backgroundJobs";
+import { BDC_NT_STATS_FILES } from "./bdcNTStatsXlsx";
+import { htmlToXlsxBlob } from "@/lib/htmlToXlsx";
 
 const MOIS_FR = ["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
 
