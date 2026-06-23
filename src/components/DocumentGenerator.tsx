@@ -980,6 +980,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
         const hasStagiaireIdx = doc.params?.stagiaireIdx !== undefined;
         return count + (isPerStagiaire && !hasStagiaireIdx ? allStagiaires.length : 1);
       }, 0);
+      const directBDCInd2 = isBDCOrg && critereNum === 1;
 
       if (totalFiles === 0) {
         toast.info(`Aucun fichier à exporter pour le Critère ${critereNum}.`);
@@ -1005,7 +1006,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
       for (const doc of critereDocs) {
         const isPerStagiaire = PER_STAGIAIRE_TEMPLATES.has(doc.template);
         const hasStagiaireIdx = doc.params?.stagiaireIdx !== undefined;
-        const basePath = getDocBasePath(doc);
+        const basePath = directBDCInd2 && doc.indicateur === 2 ? "Indicateur 2" : getDocBasePath(doc);
 
         if (MAIL_TEMPLATE_FILES[doc.template] && typeof doc.params?.stagiaireIdx === "number") {
           const s = allStagiaires[doc.params.stagiaireIdx];
