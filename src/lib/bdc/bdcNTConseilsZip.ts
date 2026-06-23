@@ -1953,6 +1953,19 @@ export async function buildBDCNTConseilsZip(
     }
   }
 
+  // === Indicateur 2 : justificatifs chiffrés (preuves des KPI) ===
+  const ind2Folder = mapFolderToCriterePath("Indicateur 2");
+  for (const file of BDC_NT_STATS_FILES) {
+    advance(file.name);
+    try {
+      const html = file.build(org, formation, benList);
+      const blob = htmlToXlsxBlob(html);
+      zip.file(`${ind2Folder}/${file.name}`, blob);
+    } catch (e) {
+      console.warn("[BDC NT] stats xlsx failed", file.name, e);
+    }
+  }
+
   reporter?.setProgress(99);
   reporter?.setMessage("Compression du ZIP…");
   const blob = await zip.generateAsync({ type: "blob", compression: "DEFLATE", compressionOptions: { level: 6 } });
