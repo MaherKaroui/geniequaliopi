@@ -345,13 +345,46 @@ export function buildSuivi6MoisIndividuel(
     
   ];
 
+  const COMM_CONFIRME = [
+    `${s.prenom || "Le bénéficiaire"} confirme la mise en œuvre effective de son projet. Le poste occupé correspond précisément aux pistes explorées en bilan. Aucun besoin d'accompagnement complémentaire.`,
+    `Projet pleinement concrétisé : ${s.prenom || "le bénéficiaire"} indique une satisfaction élevée dans sa nouvelle situation professionnelle. Les outils remis en synthèse finale ont été mobilisés activement.`,
+    `Entretien très positif. ${s.prenom || "Le bénéficiaire"} a su transformer le plan d'action en démarches concrètes (candidatures ciblées, mobilisation du réseau). Objectifs atteints.`,
+    `${s.prenom || "Le bénéficiaire"} a sécurisé sa transition professionnelle dans les délais prévus au plan d'action. Les compétences identifiées en bilan ont été valorisées avec succès.`,
+    `Concrétisation rapide du projet : le travail mené sur la connaissance de soi et l'identification des compétences transférables a porté ses fruits. ${s.prenom || "Le bénéficiaire"} se déclare pleinement épanoui.`,
+    `${s.prenom || "Le bénéficiaire"} évoque une transition fluide. La phase d'investigation menée durant le bilan a permis d'éviter les fausses pistes. Démarche jugée déterminante.`,
+    `Projet confirmé : ${s.prenom || "le bénéficiaire"} a engagé les démarches dès la fin du bilan et obtenu un résultat conforme aux objectifs. Plan d'action respecté à 100 %.`,
+    `${s.prenom || "Le bénéficiaire"} témoigne d'une nette progression de confiance en soi. La synthèse finale lui sert encore aujourd'hui de feuille de route.`,
+    `Très belle réussite : ${s.prenom || "le bénéficiaire"} a concrétisé son projet en moins de 6 mois grâce à un plan d'action rigoureux et un suivi régulier.`,
+    `${s.prenom || "Le bénéficiaire"} confirme l'aboutissement de son projet. Le bilan a joué un rôle clé dans la prise de décision et la structuration des démarches.`,
+  ];
+  const COMM_REORIENTE = [
+    `${s.prenom || "Le bénéficiaire"} a fait évoluer son projet initial après confrontation au marché. De nouvelles pistes ont été identifiées et un plan d'action ajusté est en cours de déploiement.`,
+    `Projet réorienté : ${s.prenom || "le bénéficiaire"} a saisi une opportunité non envisagée initialement. La démarche bilan a permis de garder un cap clair malgré le changement.`,
+    `${s.prenom || "Le bénéficiaire"} reste actif dans ses démarches. Le projet initial a été ajusté suite aux enquêtes terrain. Nouvelles pistes prometteuses identifiées.`,
+    `Réorientation positive : la phase de validation du bilan a justement permis de réajuster le projet avant un investissement trop lourd. ${s.prenom || "Le bénéficiaire"} se dit confiant pour la suite.`,
+    `${s.prenom || "Le bénéficiaire"} poursuit ses démarches sur une piste alternative. Le travail sur les compétences transférables réalisé en bilan reste pleinement valorisable.`,
+    `Le projet initial a été abandonné au profit d'une piste plus alignée avec les valeurs de ${s.prenom || "le bénéficiaire"}. Démarche en cours, échéance estimée à 3-6 mois.`,
+  ];
+  const COMM_SANS_RETOUR = [
+    `${s.prenom || "Le bénéficiaire"} n'a pas donné suite aux deux relances effectuées (téléphone + mail). Dossier clôturé sans information sur sa situation actuelle.`,
+    `Aucun retour de ${s.prenom || "la part du bénéficiaire"} malgré les relances dans les délais prévus. Coordonnées vérifiées, dossier archivé.`,
+    `Tentatives de contact restées sans réponse. ${s.prenom || "Le bénéficiaire"} sera recontacté lors de l'enquête annuelle de satisfaction.`,
+    `Pas de retour à ce stade. Un courriel de relance finale a été envoyé. À défaut de réponse sous 30 jours, le dossier sera définitivement clôturé.`,
+  ];
+  const COMM_ATTENTE = [
+    `Entretien à programmer dès l'échéance des 6 mois. ${s.prenom || "Le bénéficiaire"} a été informé lors de la synthèse finale et a confirmé sa disponibilité.`,
+    `Suivi planifié à l'échéance contractuelle. ${s.prenom || "Le bénéficiaire"} sera contacté 15 jours avant la date prévue conformément à la procédure.`,
+    `Entretien en attente d'échéance. Pré-notification envoyée à ${s.prenom || "au bénéficiaire"} à titre de rappel.`,
+  ];
+
   const commentaire = !passe
-    ? "Entretien à programmer dès l'échéance des 6 mois. Bénéficiaire informé lors de la synthèse finale."
+    ? COMM_ATTENTE[i % COMM_ATTENTE.length]
     : !realise
-      ? "Bénéficiaire injoignable malgré deux relances (téléphone + mail). Dossier clôturé sans retour."
+      ? COMM_SANS_RETOUR[i % COMM_SANS_RETOUR.length]
       : confirme
-        ? "Le bénéficiaire confirme la mise en œuvre de son projet professionnel. Les démarches engagées lors du bilan ont porté leurs fruits. Aucun besoin d'accompagnement complémentaire."
-        : "Le bénéficiaire a réorienté son projet initial mais reste actif dans sa démarche. Pistes alternatives identifiées, plan d'action ajusté.";
+        ? COMM_CONFIRME[i % COMM_CONFIRME.length]
+        : COMM_REORIENTE[i % COMM_REORIENTE.length];
+
 
   let body = row(["Rubrique", "Information"], true);
   lignes.forEach(([k, v]) => { body += row([k, v]); });
