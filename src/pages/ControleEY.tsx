@@ -192,6 +192,14 @@ const ControleEY = () => {
     await loadSavedList();
   }, [currentSaveId, loadSavedList]);
 
+  // Archive / unarchive
+  const handleToggleArchive = useCallback(async (id: string, archived: boolean) => {
+    const { error } = await supabase.from("saved_ey_controls").update({ archived: !archived } as any).eq("id", id);
+    if (error) { toast.error("Erreur archivage"); return; }
+    toast.success(!archived ? "Dossier archivé" : "Dossier désarchivé");
+    await loadSavedList();
+  }, [loadSavedList]);
+
   // New dossier
   const handleNew = useCallback(() => {
     setOrganisme(emptyOrganisme);
