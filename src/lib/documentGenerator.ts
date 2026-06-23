@@ -226,6 +226,11 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
       const idx = Number(params?.statsIndex ?? 0);
       return BDC_NT_STATS_FILES[idx]?.build(o, f, stagiaires) || BDC_NT_STATS_FILES[0].build(o, f, stagiaires);
     }
+    case "bdc_nt_cr6mois_stagiaire": {
+      const idx = Number(params?.stagiaireIdx ?? 0);
+      const st = stagiaires[idx] || s;
+      return buildSuivi6MoisIndividuel(o, f, st, idx);
+    }
     case "bdc_nt_asset": {
       const name = params?.assetName || "ressource";
       const src = params?.assetSrc || "";
