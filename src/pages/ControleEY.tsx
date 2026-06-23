@@ -332,7 +332,6 @@ const ControleEY = () => {
                 </div>
               );
             })()}
-            )}
           </div>
         )}
 
