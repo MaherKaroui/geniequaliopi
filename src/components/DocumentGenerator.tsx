@@ -43,6 +43,7 @@ const REAL_XLSX_TEMPLATES = new Set<string>([
   "bdc_nt_contacts_handicap",
   "bdc_nt_tableau_dysfonctionnements",
   "bdc_nt_stats_xlsx",
+  "bdc_nt_cr6mois_stagiaire",
 ]);
 import { downloadAsPdf, htmlToPdfBlob } from "@/lib/pdfExport";
 import { processDocxTemplate, processMailDocxTemplate, DOCX_TEMPLATE_FILES, MAIL_TEMPLATE_FILES } from "@/lib/docxTemplateExport";
