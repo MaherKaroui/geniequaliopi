@@ -141,6 +141,30 @@ export function buildSatisfactionChaud(o: OrganismeInfo, _f: FormationInfo, st: 
 /* ============================================================== */
 export function buildRecommandations(o: OrganismeInfo, _f: FormationInfo, st: StagiaireInfo[]): string {
   const headers = ["N°", "Bénéficiaire", "Recommanderiez-vous notre bilan de compétences ?", "Note /10", "Commentaire"];
+  const COMM_OUI = [
+    "Accompagnement de grande qualité, consultant à l'écoute. Je recommande vivement.",
+    "Démarche structurée et bienveillante, qui m'a permis de clarifier mon projet professionnel.",
+    "Très bonne expérience, les outils proposés sont pertinents et adaptés à ma situation.",
+    "Bilan complet et personnalisé, j'ai apprécié la rigueur du suivi. À recommander sans hésitation.",
+    "Consultant disponible et de bon conseil, échanges constructifs à chaque séance.",
+    "Méthodologie claire, livrables soignés, je recommande à mes collègues sans réserve.",
+    "Démarche introspective riche, j'en sors avec une vision beaucoup plus claire de mon avenir.",
+    "Excellent accompagnement, respect total de la confidentialité et du rythme.",
+    "J'ai été remis en confiance, le plan d'action final est concret et réaliste.",
+    "Très professionnel, format hybride bien organisé, je recommande cet organisme.",
+    "Une vraie écoute et des tests pertinents qui m'ont aidé à mieux me connaître.",
+    "Synthèse finale très qualitative, document utile pour mes démarches futures.",
+  ];
+  const COMM_NON = [
+    "Bilan correct mais j'aurais souhaité davantage d'approfondissement sur le volet marché de l'emploi.",
+    "Démarche utile mais le rythme ne m'a pas totalement convenu.",
+    "Accompagnement satisfaisant, sans plus. Quelques attentes non couvertes.",
+  ];
+  const COMM_NEUTRE = [
+    "Démarche intéressante, à voir si le projet se concrétise dans les prochains mois.",
+    "Bilan globalement positif, je réserve mon avis sur la recommandation.",
+    "Expérience correcte, je ne recommande pas activement mais ne déconseille pas non plus.",
+  ];
   let body = row(headers, true);
   let oui = 0;
   st.forEach((s, i) => {
@@ -148,8 +172,8 @@ export function buildRecommandations(o: OrganismeInfo, _f: FormationInfo, st: St
     if (rec === "Oui") oui++;
     const note = rec === "Oui" ? (9 + (i % 2)) : (rec === "Non" ? 6 : 7);
     const comm = rec === "Oui"
-      ? "Accompagnement de qualité, je recommande sans hésiter."
-      : rec === "Non" ? "Bilan utile mais aurait pu être plus approfondi." : "Démarche intéressante.";
+      ? COMM_OUI[i % COMM_OUI.length]
+      : rec === "Non" ? COMM_NON[i % COMM_NON.length] : COMM_NEUTRE[i % COMM_NEUTRE.length];
     body += row([i + 1, `${s.prenom || ""} ${(s.nom || "").toUpperCase()}`.trim(), rec, note, comm]);
   });
   const pct = st.length ? Math.round((oui / st.length) * 100) : 93;
