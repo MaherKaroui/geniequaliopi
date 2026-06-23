@@ -70,6 +70,7 @@ export type Database = {
       }
       saved_ey_controls: {
         Row: {
+          archived: boolean
           created_at: string
           doc_states: Json
           doc_style: Json | null
@@ -82,6 +83,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          archived?: boolean
           created_at?: string
           doc_states?: Json
           doc_style?: Json | null
@@ -94,6 +96,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          archived?: boolean
           created_at?: string
           doc_states?: Json
           doc_style?: Json | null

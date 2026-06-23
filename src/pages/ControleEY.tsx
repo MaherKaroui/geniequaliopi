@@ -9,7 +9,7 @@ import SignaturePad from "@/components/SignaturePad";
 import ControleEDOF from "@/components/ControleEDOF";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ChevronLeft, LogIn, LogOut, ChevronDown, ChevronRight, Building2, GraduationCap, Users, Palette, Save, FolderOpen, Trash2, Plus, PenTool } from "lucide-react";
+import { ChevronLeft, LogIn, LogOut, ChevronDown, ChevronRight, Building2, GraduationCap, Users, Palette, Save, FolderOpen, Trash2, Plus, PenTool, Archive, ArchiveRestore } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -37,6 +37,7 @@ interface SavedEYControl {
   stagiaires: StagiaireInfo[];
   doc_states: Record<string, any>;
   doc_style: DocStyleConfig | null;
+  archived?: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -71,6 +72,7 @@ const ControleEY = () => {
   const [saveName, setSaveName] = useState("");
   const [saving, setSaving] = useState(false);
   const [showSaved, setShowSaved] = useState(false);
+  const [showArchived, setShowArchived] = useState(false);
 
   // Collapsible sections
   const [openSections, setOpenSections] = useState<Set<string>>(new Set());
@@ -190,6 +192,14 @@ const ControleEY = () => {
     await loadSavedList();
   }, [currentSaveId, loadSavedList]);
 
+  // Archive / unarchive
+  const handleToggleArchive = useCallback(async (id: string, archived: boolean) => {
+    const { error } = await supabase.from("saved_ey_controls").update({ archived: !archived } as any).eq("id", id);
+    if (error) { toast.error("Erreur archivage"); return; }
+    toast.success(!archived ? "Dossier archivé" : "Dossier désarchivé");
+    await loadSavedList();
+  }, [loadSavedList]);
+
   // New dossier
   const handleNew = useCallback(() => {
     setOrganisme(emptyOrganisme);
@@ -272,35 +282,56 @@ const ControleEY = () => {
               </div>
             </div>
 
-            {showSaved && (
-              <div className="border-t pt-3 space-y-2">
-                {savedList.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">Aucun dossier sauvegardé</p>
-                ) : (
-                  savedList.map(item => (
-                    <div key={item.id} className="flex items-center justify-between p-2 rounded-lg hover:bg-muted/50 transition-colors">
-                      <button
-                        onClick={() => handleLoad(item)}
-                        className="flex-1 text-left"
-                      >
-                        <span className="font-medium text-sm">{item.name}</span>
-                        <span className="text-xs text-muted-foreground ml-2">
-                          {new Date(item.updated_at).toLocaleDateString("fr-FR")}
-                        </span>
-                      </button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={(e) => { e.stopPropagation(); handleDelete(item.id); }}
-                        className="text-destructive hover:text-destructive"
-                      >
-                        <Trash2 className="w-3 h-3" />
-                      </Button>
-                    </div>
-                  ))
-                )}
-              </div>
-            )}
+            {showSaved && (() => {
+              const visible = savedList.filter(it => showArchived ? it.archived : !it.archived);
+              const archivedCount = savedList.filter(it => it.archived).length;
+              return (
+                <div className="border-t pt-3 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-muted-foreground">
+                      {showArchived ? "Dossiers archivés" : "Dossiers actifs"} ({visible.length})
+                    </span>
+                    <Button size="sm" variant="ghost" onClick={() => setShowArchived(s => !s)} className="gap-1 text-xs">
+                      {showArchived ? <><ArchiveRestore className="w-3 h-3" /> Voir actifs</> : <><Archive className="w-3 h-3" /> Voir archivés ({archivedCount})</>}
+                    </Button>
+                  </div>
+                  {visible.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">{showArchived ? "Aucun dossier archivé" : "Aucun dossier sauvegardé"}</p>
+                  ) : (
+                    visible.map(item => (
+                      <div key={item.id} className="flex items-center justify-between p-2 rounded-lg hover:bg-muted/50 transition-colors">
+                        <button
+                          onClick={() => handleLoad(item)}
+                          className="flex-1 text-left"
+                        >
+                          <span className="font-medium text-sm">{item.name}</span>
+                          <span className="text-xs text-muted-foreground ml-2">
+                            {new Date(item.updated_at).toLocaleDateString("fr-FR")}
+                          </span>
+                          {item.archived && <span className="text-xs text-muted-foreground ml-2">(archivé)</span>}
+                        </button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => { e.stopPropagation(); handleToggleArchive(item.id, !!item.archived); }}
+                          title={item.archived ? "Désarchiver" : "Archiver"}
+                        >
+                          {item.archived ? <ArchiveRestore className="w-3 h-3" /> : <Archive className="w-3 h-3" />}
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => { e.stopPropagation(); handleDelete(item.id); }}
+                          className="text-destructive hover:text-destructive"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </Button>
+                      </div>
+                    ))
+                  )}
+                </div>
+              );
+            })()}
           </div>
         )}
 
