@@ -800,7 +800,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
       for (const doc of catalog) {
         const isPerStagiaire = PER_STAGIAIRE_TEMPLATES.has(doc.template);
         const hasStagiaireIdx = doc.params?.stagiaireIdx !== undefined;
-        const basePath = isBDCOrg && indicateurNum === 2 ? "Indicateur 2" : getDocBasePath(doc);
+        const basePath = isBDCOrg && doc.indicateur === 2 ? "Indicateur 2" : getDocBasePath(doc);
 
         if (MAIL_TEMPLATE_FILES[doc.template] && typeof doc.params?.stagiaireIdx === "number") {
           const s = allStagiaires[doc.params.stagiaireIdx];
@@ -1144,7 +1144,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
       for (const doc of indDocs) {
         const isPerStagiaire = PER_STAGIAIRE_TEMPLATES.has(doc.template);
         const hasStagiaireIdx = doc.params?.stagiaireIdx !== undefined;
-        const basePath = getDocBasePath(doc);
+        const basePath = isBDCOrg && indicateurNum === 2 ? "Indicateur 2" : getDocBasePath(doc);
 
         if (MAIL_TEMPLATE_FILES[doc.template] && typeof doc.params?.stagiaireIdx === "number") {
           const s = allStagiaires[doc.params.stagiaireIdx];
