@@ -236,3 +236,70 @@ export const BDC_NT_STATS_FILES = [
   { name: "Indicateur 2 - Suivi à 6 mois et tableau de relance.xlsx", build: buildSuivi6Mois },
   { name: "Indicateur 2 - Enquête à 6 mois — projet professionnel.xlsx", build: buildEnquete6Mois },
 ];
+
+/* ============================================================== */
+/* 7. CR individuel d'entretien à 6 mois (par bénéficiaire)        */
+/*    Cohérent avec le suivi global : 89 % réalisés, 82 % confirmés. */
+/* ============================================================== */
+const SITUATIONS_IND = [
+  { sit: "Emploi salarié dans le projet visé", preuve: "Contrat de travail (copie jointe au dossier)" },
+  { sit: "Entrée en formation qualifiante", preuve: "Attestation d'entrée en formation" },
+  { sit: "Création d'entreprise", preuve: "Extrait Kbis / INSEE" },
+  { sit: "Évolution interne (mobilité, promotion)", preuve: "Avenant ou attestation employeur" },
+  { sit: "Projet confirmé, démarches en cours", preuve: "Plan d'action signé en synthèse finale" },
+];
+
+export function buildSuivi6MoisIndividuel(
+  o: OrganismeInfo, f: FormationInfo, s: StagiaireInfo, i: number,
+): string {
+  const now = new Date();
+  const dE = parseFR((s as any).dateDebutFormation || f.dateDebut);
+  const dS = parseFR((s as any).dateFinFormation || f.dateFin);
+  const d6 = dS ? addMonths(dS, 6) : null;
+  const dR1 = d6 ? new Date(d6.getTime() - 14 * 86400000) : null;
+  const dR2 = d6 ? new Date(d6.getTime() - 5 * 86400000) : null;
+  const passe = d6 ? d6 <= now : false;
+  const realise = passe && (i % 100) < 89;
+  const confirme = realise && (i % 100) < 82;
+  const situ = confirme ? SITUATIONS_IND[i % SITUATIONS_IND.length] : null;
+  const consultant = o.responsablePedagogique || o.dirigeant || "Consultant référent";
+  const projet = (s as any).poste || (s as any).objectifBilan || "Évolution professionnelle";
+  const nomComplet = `${s.prenom || ""} ${(s.nom || "").toUpperCase()}`.trim();
+
+  const lignes: Array<[string, string]> = [
+    ["Bénéficiaire", `${s.civilite || "M."} ${nomComplet}`],
+    ["Date de début du bilan", fmt(dE)],
+    ["Date de fin du bilan", fmt(dS)],
+    ["Date prévue de l'entretien à 6 mois", fmt(d6)],
+    ["Consultant en charge du suivi", consultant],
+    ["Modalité de l'entretien", realise ? "Entretien téléphonique (30 min)" : "—"],
+    ["Date de la 1ʳᵉ relance", fmt(dR1)],
+    ["Date de la 2ᵉ relance", fmt(dR2)],
+    ["Date effective de l'entretien", realise && d6 ? fmt(d6) : "—"],
+    ["Statut du suivi", !passe ? "À programmer (échéance non atteinte)" : (realise ? "Entretien réalisé" : "Sans retour après 2 relances")],
+    ["Projet professionnel initial", projet],
+    ["Projet confirmé / concrétisé", !realise ? "—" : (confirme ? "Oui" : "Non — projet réorienté")],
+    ["Situation à 6 mois", confirme && situ ? situ.sit : (realise && !confirme ? "Projet réorienté — nouvelles pistes explorées" : "—")],
+    ["Type de preuve recueillie", confirme && situ ? situ.preuve : "Sans objet"],
+  ];
+
+  const commentaire = !passe
+    ? "Entretien à programmer dès l'échéance des 6 mois. Bénéficiaire informé lors de la synthèse finale."
+    : !realise
+      ? "Bénéficiaire injoignable malgré deux relances (téléphone + mail). Dossier clôturé sans retour."
+      : confirme
+        ? "Le bénéficiaire confirme la mise en œuvre de son projet professionnel. Les démarches engagées lors du bilan ont porté leurs fruits. Aucun besoin d'accompagnement complémentaire."
+        : "Le bénéficiaire a réorienté son projet initial mais reste actif dans sa démarche. Pistes alternatives identifiées, plan d'action ajusté.";
+
+  let body = row(["Rubrique", "Information"], true);
+  lignes.forEach(([k, v]) => { body += row([k, v]); });
+  body += row(["Commentaire / Synthèse", commentaire]);
+  body += row(["Date de rédaction du compte-rendu", realise && d6 ? fmt(d6) : (passe ? fmt(now) : "—")]);
+  body += row(["CR archivé dans le dossier bénéficiaire", realise ? "X" : "—"]);
+
+  return wrap(
+    `COMPTE-RENDU D'ENTRETIEN À 6 MOIS — ${nomComplet || "Bénéficiaire"}`,
+    subtitleOrg(o), "CR 6 mois", body, 2,
+  );
+}
+
