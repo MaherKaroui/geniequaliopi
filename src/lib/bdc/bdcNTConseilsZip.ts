@@ -398,8 +398,21 @@ function applySubstitutions(src: string, org: OrganismeInfo, s: StagiaireInfo | 
 </table>`;
   txt = txt.replace(/\{SIGNATURES_ORG_STAGIAIRE\}/g, signaturesHtml);
 
+  // Bloc "QUELQUES CHIFFRES" : nombre de bénéficiaires automatisé + stats détaillées
+  const nbBen = Math.max(1, nbBeneficiaires ?? 1);
+  const chiffresBloc =
+    `| **${nbBen}**§§BR§§Bénéficiaire${nbBen > 1 ? "s" : ""} accompagné${nbBen > 1 ? "s" : ""} | **100 %** de bilans réalisés jusqu'à leur terme |\n` +
+    `|---|---|\n` +
+    `| **96 %** de satisfaction globale | **93 %** de recommandations |\n` +
+    `| **89 %** de suivis à 6 mois réalisés | **82 %** des bénéficiaires ont confirmé ou concrétisé leur projet professionnel |`;
+  txt = txt.replace(
+    /\|\s*\*\*1\*\*§§BR§§Bénéficiaire\s*\|\s*Taux de satisfaction bénéficiaires\s*:§§BR§§\*\*100\s*%\*\*\s*\|\s*\n\|---\|---\|/,
+    chiffresBloc
+  );
+
   return txt;
 }
+
 
 /* ============================================================== */
 /* Outil préparatoire — personnalisé par bénéficiaire             */
