@@ -209,8 +209,8 @@ export function buildRecommandations(o: OrganismeInfo, _f: FormationInfo, st: St
       ? COMM_OUI[i % COMM_OUI.length]
       : rec === "Non" ? COMM_NON[i % COMM_NON.length] : COMM_NEUTRE[i % COMM_NEUTRE.length];
     const suffix = rec === "Oui"
-      ? SUFFIX_OUI[(i * 7 + 3) % SUFFIX_OUI.length]
-      : rec === "Non" ? SUFFIX_NON[(i * 5 + 1) % SUFFIX_NON.length] : SUFFIX_NEUTRE[(i * 3 + 2) % SUFFIX_NEUTRE.length];
+      ? SUFFIX_OUI[Math.floor(i / COMM_OUI.length) % SUFFIX_OUI.length]
+      : rec === "Non" ? SUFFIX_NON[Math.floor(i / COMM_NON.length) % SUFFIX_NON.length] : SUFFIX_NEUTRE[Math.floor(i / COMM_NEUTRE.length) % SUFFIX_NEUTRE.length];
     const comm = `${base} ${suffix}`;
     body += row([i + 1, `${s.prenom || ""} ${(s.nom || "").toUpperCase()}`.trim(), rec, note, comm]);
   });
