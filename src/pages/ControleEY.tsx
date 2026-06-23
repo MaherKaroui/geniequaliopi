@@ -72,6 +72,7 @@ const ControleEY = () => {
   const [saveName, setSaveName] = useState("");
   const [saving, setSaving] = useState(false);
   const [showSaved, setShowSaved] = useState(false);
+  const [showArchived, setShowArchived] = useState(false);
 
   // Collapsible sections
   const [openSections, setOpenSections] = useState<Set<string>>(new Set());
