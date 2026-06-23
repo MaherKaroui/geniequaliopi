@@ -435,6 +435,62 @@ const EVAL_CONTENT: Record<string, FormationEvalContent> = {
       "Excellent résultat final. Maîtrise complète du protocole de massage prénatal et postpartum. Capacité à adapter les techniques selon le trimestre.",
     ],
   },
+  "Création Entreprise": {
+    qcmPositionnement: [
+      { question: "Qu'est-ce qu'un Business Model Canvas (BMC) ?", options: ["Un logiciel de comptabilité", "Une matrice visuelle de 9 blocs qui décrit le modèle économique d'une entreprise", "Un statut juridique", "Une obligation fiscale"], correctIndex: 1 },
+      { question: "Quel organisme centralise les formalités de création d'entreprise depuis 2023 ?", options: ["La CCI", "Le Guichet Unique INPI (formalites.entreprises.gouv.fr)", "L'URSSAF", "Le greffe du tribunal"], correctIndex: 1 },
+      { question: "Quelle aide France Travail permet de toucher 60 % du reliquat de ses droits ARE sous forme de capital ?", options: ["ACRE", "ARCE", "NACRE", "AGEPI"], correctIndex: 1 },
+      { question: "Que signifie l'acronyme ACRE ?", options: ["Aide à la Création d'Entreprise", "Aide aux Créateurs et Repreneurs d'Entreprise (exonération de cotisations sociales)", "Avance Capital pour la Reprise d'Entreprise", "Accompagnement Création-Reprise Étatique"], correctIndex: 1 },
+      { question: "Quel est le plafond de chiffre d'affaires annuel d'une micro-entreprise pour une activité de prestation de services (BIC/BNC) en 2025 ?", options: ["32 900 €", "77 700 €", "188 700 €", "250 000 €"], correctIndex: 1 },
+      { question: "Quelle forme juridique permet à un entrepreneur seul de créer une société à responsabilité limitée assimilé salarié ?", options: ["EI", "EURL", "SASU", "SCI"], correctIndex: 2 },
+      { question: "À quoi sert un plan de trésorerie prévisionnel ?", options: ["À calculer le bénéfice annuel", "À suivre mois par mois les encaissements et décaissements pour anticiper les besoins de trésorerie", "À déclarer la TVA", "À fixer les prix de vente"], correctIndex: 1 },
+      { question: "Qu'est-ce que le seuil de rentabilité ?", options: ["Le chiffre d'affaires minimum à réaliser pour couvrir toutes ses charges", "Le bénéfice net de l'année", "Le montant de l'apport personnel", "Le plafond de la micro-entreprise"], correctIndex: 0 },
+      { question: "Quel régime social s'applique au dirigeant d'une SASU ?", options: ["Travailleur Non Salarié (TNS)", "Assimilé salarié (Sécurité sociale, hors assurance chômage)", "Salarié classique avec ARE", "Auto-entrepreneur"], correctIndex: 1 },
+      { question: "Que doit contenir au minimum un business plan ?", options: ["Uniquement les prévisions financières", "Présentation du porteur, étude de marché, offre, business model, prévisions financières sur 3 ans", "Le contrat de bail", "Les statuts juridiques signés"], correctIndex: 1 },
+    ],
+    qcmFinal: [
+      { question: "Vous créez une activité de conseil en marketing avec un CA prévisionnel de 60 000 € HT. Quel statut est le plus pertinent en début d'activité ?", options: ["SARL avec 5 associés", "Micro-entreprise BNC (sous plafond 77 700 €)", "SA avec capital de 37 000 €", "SCI"], correctIndex: 1 },
+      { question: "Quel est l'avantage principal de la SASU par rapport à l'EURL ?", options: ["Coût de création moins élevé", "Régime social assimilé salarié + pas de cotisations sur dividendes", "Pas d'obligation comptable", "Capital minimum réduit"], correctIndex: 1 },
+      { question: "Comment calcule-t-on la marge brute ?", options: ["CA – Charges fixes", "CA – Coût d'achat des marchandises vendues (ou coût direct de production)", "CA / Nombre de clients", "CA × 0,20"], correctIndex: 1 },
+      { question: "Que représente l'EBE (Excédent Brut d'Exploitation) ?", options: ["Le bénéfice net", "La performance économique avant amortissements, frais financiers et impôts", "Le chiffre d'affaires HT", "Le résultat fiscal"], correctIndex: 1 },
+      { question: "Quel document est obligatoirement publié dans un journal d'annonces légales lors de la création d'une société ?", options: ["Le business plan", "L'avis de constitution (avec dénomination, forme, capital, siège, objet, durée, dirigeants)", "Le plan de trésorerie", "Le RIB professionnel"], correctIndex: 1 },
+      { question: "Quel taux de TVA s'applique par défaut à la majorité des prestations de services en France ?", options: ["5,5 %", "10 %", "20 %", "0 % (franchise)"], correctIndex: 2 },
+      { question: "Que signifie BFR ?", options: ["Bilan Financier Réel", "Besoin en Fonds de Roulement (stock + créances clients – dettes fournisseurs)", "Budget Fiscal de Référence", "Bénéfice Final Restant"], correctIndex: 1 },
+      { question: "Un prêt d'honneur Initiative France ou Réseau Entreprendre est :", options: ["Une subvention non remboursable", "Un prêt à taux zéro accordé au porteur de projet (effet de levier pour obtenir un prêt bancaire)", "Une avance sur les ventes futures", "Un dispositif d'exonération fiscale"], correctIndex: 1 },
+      { question: "Quelle assurance est obligatoire pour la plupart des activités professionnelles ?", options: ["L'assurance habitation", "L'assurance Responsabilité Civile Professionnelle (RC Pro)", "La complémentaire santé", "L'assurance auto"], correctIndex: 1 },
+      { question: "Quel est l'intérêt principal de l'ACRE pour un nouveau créateur ?", options: ["Une subvention de 5 000 €", "Une exonération partielle des cotisations sociales pendant 12 mois", "Une exonération totale d'impôt pendant 3 ans", "Un prêt à 0 % de 50 000 €"], correctIndex: 1 },
+    ],
+    exercices: [
+      { titre: "Exercice 1 : Étude de marché simplifiée", consigne: "À partir de votre projet, réalisez une étude de marché en 4 étapes : (1) définition de la cible et persona, (2) analyse de la demande (taille du marché, tendances INSEE/France Stratégie), (3) analyse concurrentielle (3 concurrents avec mapping prix/positionnement), (4) synthèse SWOT.", reponseAttendue: "Document structuré incluant : un persona précis (âge, profession, besoins, freins), des chiffres de marché sourcés (INSEE, étude sectorielle), un tableau comparatif de 3 concurrents avec leur positionnement, une matrice SWOT cohérente avec au moins 3 éléments par case (Forces, Faiblesses, Opportunités, Menaces)." },
+      { titre: "Exercice 2 : Business Model Canvas", consigne: "Complétez les 9 blocs du Business Model Canvas pour votre projet : segments clients, proposition de valeur, canaux, relation client, sources de revenus, ressources clés, activités clés, partenariats clés, structure de coûts.", reponseAttendue: "BMC complet avec chaque bloc rempli de manière cohérente. La proposition de valeur doit répondre à un problème identifié dans les segments clients. Les sources de revenus doivent être chiffrées (modèle, prix, fréquence). Les coûts doivent être identifiés comme fixes ou variables. Cohérence d'ensemble validée." },
+      { titre: "Exercice 3 : Choix du statut juridique", consigne: "À partir de votre projet (activité, CA prévisionnel, statut personnel, besoins de protection sociale, présence ou non d'associés), rédigez une note de 1 page argumentant le choix du statut juridique le plus adapté (micro-entreprise, EI, EURL, SASU, SAS, SARL). Comparez au moins 2 statuts.", reponseAttendue: "Note structurée comparant au moins 2 statuts sur 5 critères : responsabilité, fiscalité (IR/IS), régime social du dirigeant (TNS/assimilé salarié), coût de création/gestion, possibilité d'évolution. Choix final justifié par 3 arguments minimum. Cohérent avec la situation du porteur et le CA prévisionnel." },
+      { titre: "Exercice 4 : Compte de résultat prévisionnel sur 3 ans", consigne: "Construisez sur Excel un compte de résultat prévisionnel sur 3 ans pour votre projet, incluant : CA HT (avec hypothèses de progression), charges variables, marge brute, charges fixes (loyer, assurances, télécoms, comptable…), masse salariale, dotations aux amortissements, résultat d'exploitation, résultat net.", reponseAttendue: "Tableau Excel structuré sur 3 colonnes (Année 1, 2, 3). Hypothèses de progression du CA justifiées (% de croissance, nouveaux clients, augmentation de prix). Charges variables proportionnelles au CA. Charges fixes détaillées ligne à ligne. Marge brute, EBE, résultat d'exploitation et résultat net calculés par formules. Cohérence des chiffres avec l'étude de marché." },
+      { titre: "Exercice 5 : Plan de trésorerie mensuel année 1", consigne: "Construisez sur Excel un plan de trésorerie mensuel (12 mois) pour la première année d'activité : encaissements (CA encaissé en tenant compte des délais de paiement), décaissements (charges, salaires, TVA, investissements, remboursement emprunt), solde mensuel et solde cumulé.", reponseAttendue: "Tableau Excel 12 colonnes (Janvier à Décembre). Encaissements détaillés (CA HT + TVA collectée, avec décalage selon délai client). Décaissements détaillés (charges fixes mensualisées, TVA décaissée trimestriellement, échéances emprunt). Calcul du solde mensuel et du solde cumulé par formule. Identification du mois le plus tendu et besoin de trésorerie maximum. Analyse écrite des risques et des leviers." },
+      { titre: "Exercice 6 : Pitch oral du projet (5 minutes)", consigne: "Préparez et présentez votre projet en 5 minutes devant le jury : problème/opportunité, solution, marché cible, modèle économique, équipe et besoins (financement, recrutement, partenaires). Soyez clair, convaincant et préparé aux 5 minutes de questions.", reponseAttendue: "Pitch structuré en 5 parties claires (problème, solution, marché, business model, besoins). Respect du timing (5 min ± 30 secondes). Discours convaincant et fluide, sans lecture. Slides épurées (max 7 slides) avec un message-clé par slide. Réponses pertinentes aux questions du jury (étude de marché, prévisions, statut juridique, financement)." },
+    ],
+    competences: [
+      "Réaliser une étude de marché et une analyse concurrentielle",
+      "Construire un Business Model Canvas",
+      "Élaborer un business plan financier (compte de résultat, plan de trésorerie, plan de financement)",
+      "Choisir le statut juridique, fiscal et social adapté au projet",
+      "Identifier et mobiliser les aides à la création (ACRE, ARCE, prêts d'honneur, BPI)",
+      "Réaliser les formalités d'immatriculation sur le Guichet Unique INPI",
+      "Définir une stratégie commerciale et marketing cohérente",
+      "Piloter les premiers mois d'activité (obligations comptables, fiscales et sociales)",
+    ],
+    appreciations: [
+      "Excellent projet, étude de marché solide, business plan financier maîtrisé. Le porteur est prêt à lancer son activité dans les meilleures conditions.",
+      "Très bonne progression sur l'ensemble des modules. Le business model est cohérent et les prévisions financières sont réalistes. Quelques ajustements à apporter sur le plan de trésorerie.",
+      "Projet bien structuré. Le choix du statut juridique est pertinent. Travail rigoureux sur l'analyse concurrentielle et la stratégie commerciale.",
+      "Bonne acquisition des fondamentaux. Le BMC est maîtrisé. Doit consolider la partie financière (compte de résultat, plan de trésorerie) avant le lancement effectif.",
+      "Très bonne implication. Le pitch oral est convaincant et les supports sont professionnels. Le projet a de réelles chances d'aboutir.",
+      "Stagiaire motivé(e) et impliqué(e). L'étude de marché est rigoureuse, la matrice SWOT est pertinente. Plan d'action post-formation clairement défini.",
+      "Excellent travail sur la partie juridique et fiscale. Le choix de la SASU est argumenté de manière convaincante. Maîtrise des aides à la création (ACRE, ARCE).",
+      "Très bonne capacité d'analyse. Le business plan est exhaustif et défendable face à un banquier ou un investisseur. Bonne projection à 3 ans.",
+      "Progression remarquable entre le test initial et le pitch final. Le projet est passé d'une idée à un dossier opérationnel prêt à être déposé.",
+      "Excellent résultat final. Maîtrise complète des étapes de création, du Business Model Canvas aux formalités INPI. Projet viable et bien financé.",
+    ],
+  },
 };
 
 // Default content for formations not specifically mapped
@@ -1233,6 +1289,7 @@ function getContentKey(intitule: string): string {
   if (lower.includes("français") || lower.includes("médico-social") || lower.includes("social")) return "FLE Médico-Social";
   if (lower.includes("intelligence artificielle") || lower.includes("ia générative") || lower.includes("contenus rédactionnels")) return "IA Générative";
   if (lower.includes("massage") || lower.includes("prénatal") || lower.includes("prenatal") || lower.includes("relaxation prénatals")) return "Massage Prénatal";
+  if (lower.includes("création d'entreprise") || lower.includes("creation d'entreprise") || lower.includes("création entreprise") || lower.includes("creation entreprise") || lower.includes("créateur d'entreprise") || (lower.includes("business plan") && lower.includes("entrepre"))) return "Création Entreprise";
   return "";
 }
 
@@ -1844,7 +1901,32 @@ QUESTIONS_OUVERTES["Restauration"] = {
   ],
 };
 
-const DEFAULT_QUESTIONS_OUVERTES: QuestionsOuvertesFormation = {
+QUESTIONS_OUVERTES["Création Entreprise"] = {
+  debut: [
+    { question: "Pouvez-vous décrire en quelques phrases votre projet de création d'entreprise (activité, cible, lieu) ?", reponseAttendue: "Description claire du projet : nature de l'activité (produit ou service), cible visée (B2B/B2C, persona type), zone géographique d'implantation, stade d'avancement (idée, étude, prêt à lancer)." },
+    { question: "Qu'est-ce qu'une étude de marché et à quoi sert-elle ?", reponseAttendue: "Une étude de marché analyse la demande (clients potentiels), l'offre (concurrents), l'environnement (réglementation, tendances). Elle sert à valider la viabilité du projet, ajuster l'offre et fixer un positionnement." },
+    { question: "Quels statuts juridiques connaissez-vous pour créer une entreprise en France ?", reponseAttendue: "Micro-entreprise, Entreprise Individuelle (EI), EURL, SASU, SARL, SAS, SA, SCI. Chaque statut a ses spécificités en matière de responsabilité, fiscalité et régime social." },
+    { question: "Que signifie ACRE et qui peut en bénéficier ?", reponseAttendue: "Aide aux Créateurs et Repreneurs d'Entreprise : exonération partielle de cotisations sociales pendant 12 mois. Accessible aux demandeurs d'emploi, bénéficiaires des minima sociaux, jeunes de moins de 26 ans, personnes en QPV, etc." },
+    { question: "Connaissez-vous le rôle du Guichet Unique INPI ?", reponseAttendue: "Depuis 2023, le Guichet Unique INPI (formalites.entreprises.gouv.fr) centralise toutes les formalités de création, modification et cessation d'entreprise. Il remplace les anciens CFE." },
+    { question: "Qu'est-ce qu'un business plan ?", reponseAttendue: "Document de présentation complet du projet : présentation du porteur, étude de marché, offre, business model, plan d'action commercial, équipe, prévisions financières sur 3 ans et besoin de financement." },
+    { question: "Avez-vous déjà chiffré votre projet (investissements, charges, CA prévisionnel) ?", reponseAttendue: "Réponse ouverte : oui/non avec niveau d'avancement. Si oui, identifier les principaux postes (investissements de départ, charges fixes mensuelles, hypothèses de CA)." },
+    { question: "Quels sont vos besoins de financement et comment envisagez-vous de les couvrir ?", reponseAttendue: "Identification du besoin total (investissements + BFR + trésorerie de sécurité) et des sources envisagées : apport personnel, love money, prêt bancaire, prêt d'honneur, BPI, crowdfunding, subventions, ARCE." },
+    { question: "Quelle est votre cible client principale ?", reponseAttendue: "Description précise du client cible : âge, profession, localisation, besoins, comportements d'achat, budget. Pour le B2B : taille d'entreprise, secteur, décideur." },
+    { question: "Pourquoi souhaitez-vous suivre cette formation à la création d'entreprise ?", reponseAttendue: "Réponse personnelle : structurer une idée existante, sécuriser le projet, acquérir les compétences en gestion/finance/juridique, valider la faisabilité, préparer le passage à l'acte (immatriculation)." },
+  ],
+  fin: [
+    { question: "Décrivez les 9 blocs du Business Model Canvas.", reponseAttendue: "Segments clients, Proposition de valeur, Canaux de distribution, Relation client, Sources de revenus, Ressources clés, Activités clés, Partenariats clés, Structure de coûts." },
+    { question: "Quels critères utiliser pour choisir entre micro-entreprise, EURL et SASU ?", reponseAttendue: "Niveau de CA prévisionnel (plafonds micro), responsabilité souhaitée (illimitée vs limitée au capital), régime fiscal (IR vs IS), régime social du dirigeant (TNS vs assimilé salarié), coût de création et de gestion, possibilité de faire entrer des associés." },
+    { question: "Comment construit-on un compte de résultat prévisionnel sur 3 ans ?", reponseAttendue: "Partir du CA HT (hypothèses de progression année par année), retrancher les charges variables (% du CA) pour obtenir la marge brute, puis les charges fixes (loyer, assurances, télécoms, comptable, salaires) pour l'EBE. Soustraire les dotations aux amortissements pour le résultat d'exploitation, puis les frais financiers et l'impôt pour le résultat net." },
+    { question: "Quelle est la différence entre un compte de résultat et un plan de trésorerie ?", reponseAttendue: "Le compte de résultat enregistre les produits et charges (notion d'exercice comptable). Le plan de trésorerie suit les encaissements et décaissements réels mois par mois (TTC, avec délais de paiement). Une entreprise peut être bénéficiaire au compte de résultat mais en difficulté de trésorerie." },
+    { question: "Quelles sont les principales aides à la création d'entreprise en France ?", reponseAttendue: "ACRE (exonération sociale 12 mois), ARCE (60 % des droits ARE en capital), NACRE (accompagnement + prêt à taux zéro), prêt d'honneur Initiative France / Réseau Entreprendre, garantie BPI, subventions régionales, aides spécifiques (jeunes, QPV, handicap)." },
+    { question: "Décrivez les étapes d'immatriculation d'une SASU.", reponseAttendue: "1) Rédaction des statuts, 2) Dépôt du capital social sur compte bloqué, 3) Publication d'un avis de constitution dans un journal d'annonces légales, 4) Dépôt du dossier complet sur le Guichet Unique INPI (statuts, avis JAL, justificatif de siège, déclaration de non-condamnation, formulaire), 5) Réception du Kbis et des numéros SIREN/SIRET." },
+    { question: "Qu'est-ce que le seuil de rentabilité et comment le calculer ?", reponseAttendue: "C'est le CA minimum nécessaire pour couvrir toutes les charges (résultat = 0). Formule : Seuil = Charges fixes / Taux de marge sur coûts variables. Exprimé en CA ou en jours (point mort = Seuil × 365 / CA annuel prévu)." },
+    { question: "Quelles sont les obligations comptables, fiscales et sociales d'un dirigeant de SASU au début ?", reponseAttendue: "Comptables : tenue d'une comptabilité commerciale complète, bilan + compte de résultat annuel. Fiscales : déclaration de TVA (mensuelle/trimestrielle/CA12), liasse fiscale IS, CFE. Sociales : déclaration et paiement des cotisations URSSAF assimilé salarié sur la rémunération, DSN mensuelle si versement de salaire." },
+    { question: "Comment construire un plan d'action commercial pour les 6 premiers mois ?", reponseAttendue: "Identifier 3 à 5 canaux d'acquisition (réseau, site web/SEO, réseaux sociaux, prospection directe, partenariats, événements). Fixer des objectifs chiffrés par canal (nombre de prospects, taux de transformation, CA visé). Planifier les actions semaine par semaine. Suivre les KPI : nombre de RDV, devis envoyés, taux de signature, CA encaissé." },
+    { question: "Qu'avez-vous appris pendant cette formation et quelle est la prochaine étape concrète pour votre projet ?", reponseAttendue: "Synthèse personnelle : maîtrise du BMC, du business plan financier, des statuts juridiques, des aides à la création, des formalités INPI. Prochaine étape concrète : finalisation de l'étude de marché, choix définitif du statut, dépôt du dossier de prêt d'honneur, immatriculation au Guichet Unique, lancement commercial." },
+  ],
+};
   debut: [
     { question: "Que connaissez-vous sur le sujet de la formation ?", reponseAttendue: "Le stagiaire dit ce qu'il sait déjà sur le domaine." },
     { question: "Quels outils ou logiciels avez-vous déjà utilisés ?", reponseAttendue: "Liste des outils ou logiciels déjà pratiqués." },
