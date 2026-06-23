@@ -1285,6 +1285,15 @@ export function buildFullCatalog(
         { stagiaireIdx: si },
       );
     });
+    // Preuve concrète de concrétisation du projet (contrat, attestation, Kbis, avenant, plan d'action)
+    stagiaires.forEach((s, si) => {
+      add(
+        `bdc_nt_ind2_preuve6mois_s${si}`,
+        `CT1 - IND 2 Preuve concrétisation projet – ${s.prenom} ${s.nom}`,
+        1, 2, "bdc_nt_preuve6mois_stagiaire",
+        { stagiaireIdx: si },
+      );
+    });
     // Trames Excel dynamiques (générées comme les autres docs xlsx, prévisualisables et téléchargeables en .xlsx)
     add("bdc_nt_calendrier_annuel", "CT1 - IND 1 Calendrier annuel (Excel)", 1, 1, "bdc_nt_calendrier_annuel");
     add("bdc_nt_suivi_adaptation", "CT3 - IND 10 Suivi de l'adaptation à l'accompagnement (Excel)", 3, 10, "bdc_nt_suivi_adaptation");
