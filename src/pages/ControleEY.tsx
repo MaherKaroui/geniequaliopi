@@ -37,6 +37,7 @@ interface SavedEYControl {
   stagiaires: StagiaireInfo[];
   doc_states: Record<string, any>;
   doc_style: DocStyleConfig | null;
+  archived?: boolean;
   created_at: string;
   updated_at: string;
 }
