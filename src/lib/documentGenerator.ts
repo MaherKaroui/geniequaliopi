@@ -1,6 +1,7 @@
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { renderBdcNTDocHtml } from "@/lib/bdc/bdcNTConseilsZip";
 import { generateBdcNTCalendrierAnnuel, generateBdcNTSuiviAdaptation, generateBdcNTContactsHandicap, generateBdcNTTableauDysfonctionnements } from "@/lib/bdc/bdcNTXlsx";
+import { BDC_NT_STATS_FILES } from "@/lib/bdc/bdcNTStatsXlsx";
 
 import { genContratBacPro, genConvocationBacPro, genConvocationExamenBacPro, genTestPositionnementBacPro, genGrilleAcquisitionBacPro, genSatisfactionBacPro, genBilanFormationBacPro, genEval01, genEval02, genEval03, genEval04, genEval05, genEval06, genEval07, genEval08, genEval09, genEval10, genEval11, genEval12, genEval13, genEval14, genEval15, genRapportConnexionBacPro } from "./bacProGenerators";
 import { genObjectifsMethodesSequence, genDossierStagiaire, genDescriptifMoyensMateriels, genCahierMaintenance, genCVFormateur as genCVFormateurEY, genFichierFormateursStatut, genBilanIntermediaire, genTauxReussiteEY, genGrilleTarifaire, genFactureHorsMCF, genDevisEY, genCommunicationReport, genPreuveCreationSession, genPlaquettePresentation, genPlanningIntervenants, genPlanningSessionsEY, genCVResponsablePedagogique, genActionsEngagement, genActionsPassageExamen, genAccompagnementFOAD, genInventaireMateriels, genContratsProprieteSupports, genAttestationDiplomesFormateurs, genCertificatQualiopiModele, genAutorisationsCertificateur, genAgrementsMinisteriels, genIndicateursPerformanceEY, genInfosCertifications, genPreuveReprogrammation, genProcessusAnalyseDemandes, genRessourcesPedagogiques as genRessourcesPedagogiquesEY, genBailLocaux, genBilanPedagogiqueFinancier, genQuestionnaireSatisfactionEY, genAdaptationsHandicapEY, genOutilsSuiviProgressionEY, genTestEvaluationFinEY, genEvaluationBlancheEY, genFacturesEquipementsEY, genEquipementsPedagogiquesEY, genFormationContinueFormateurs, genBilanFroidStagiaire, genMethodesAnimationEY, genListeSupportsDocumentsEY, genAdaptationsPSHAcademy, genProcessusQualiteSousTraitantsEY, genCompteRenduPositionnementEY, genEvaluationDesBesoinsEY, genGrilleAcquisitionCompetencesEY, genEvaluationBlancheAcademyEY, genTauxReussiteAcademyEY } from "./eyGenerators";
@@ -221,6 +222,10 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
       return generateBdcNTContactsHandicap(o);
     case "bdc_nt_tableau_dysfonctionnements":
       return generateBdcNTTableauDysfonctionnements(o);
+    case "bdc_nt_stats_xlsx": {
+      const idx = Number(params?.statsIndex ?? 0);
+      return BDC_NT_STATS_FILES[idx]?.build(o, f, stagiaires) || BDC_NT_STATS_FILES[0].build(o, f, stagiaires);
+    }
     case "bdc_nt_asset": {
       const name = params?.assetName || "ressource";
       const src = params?.assetSrc || "";
