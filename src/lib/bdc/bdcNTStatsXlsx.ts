@@ -342,7 +342,7 @@ export function buildSuivi6MoisIndividuel(
     ["Projet professionnel initial", projet],
     ["Projet confirmé / concrétisé", !realise ? "—" : (confirme ? "Oui" : "Non — projet réorienté")],
     ["Situation à 6 mois", confirme && situ ? situ.sit : (realise && !confirme ? "Projet réorienté — nouvelles pistes explorées" : "—")],
-    ["Type de preuve recueillie", confirme && situ ? situ.preuve : "Sans objet"],
+    
   ];
 
   const commentaire = !passe
