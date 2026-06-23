@@ -805,7 +805,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
 
         if (MAIL_TEMPLATE_FILES[doc.template] && typeof doc.params?.stagiaireIdx === "number") {
           const s = allStagiaires[doc.params.stagiaireIdx];
-          const mailFolder = s ? `${basePath}/${s.nom}_${s.prenom}`.substring(0, 80) : basePath;
+          const mailFolder = basePath;
           await safeRun(`${doc.nom} (mail)`, async () => {
             if (s) {
               const mailBlob = await processMailDocxTemplate(MAIL_TEMPLATE_FILES[doc.template], mergedOrganisme, selectedFormation, s);
@@ -815,7 +815,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
         } else if (hasStagiaireIdx) {
           const si = doc.params!.stagiaireIdx as number;
           const stagiaire = allStagiaires[si] || allStagiaires[0];
-          const stagFolder = `${basePath}/${stagiaire.nom}_${stagiaire.prenom}`.substring(0, 80);
+          const stagFolder = basePath;
 
           if (doc.template === "pdf_static" && getStaticFileUrl(doc)) {
             await safeRun(`${doc.nom} (${stagiaire.nom})`, async () => {
@@ -866,7 +866,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
         } else if (isPerStagiaire) {
           for (let si = 0; si < allStagiaires.length; si++) {
             const stagiaire = allStagiaires[si];
-            const stagFolder = `${basePath}/${stagiaire.nom}_${stagiaire.prenom}`.substring(0, 80);
+            const stagFolder = basePath;
             await safeRun(`${doc.nom} (${stagiaire.nom})`, async () => {
               const content = generateContent(doc, si);
               if (exportFormat === "pdf") {
@@ -1011,7 +1011,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
 
         if (MAIL_TEMPLATE_FILES[doc.template] && typeof doc.params?.stagiaireIdx === "number") {
           const s = allStagiaires[doc.params.stagiaireIdx];
-          const mailFolder = s ? `${basePath}/${s.nom}_${s.prenom}`.substring(0, 80) : basePath;
+          const mailFolder = basePath;
           if (s) {
             const mailBlob = await processMailDocxTemplate(MAIL_TEMPLATE_FILES[doc.template], mergedOrganisme, selectedFormation, s);
             zip.file(`${mailFolder}/${buildCatalogFileName(doc, s, ".docx")}`, mailBlob);
@@ -1020,7 +1020,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
         } else if (hasStagiaireIdx) {
           const si = doc.params!.stagiaireIdx as number;
           const stagiaire = allStagiaires[si] || allStagiaires[0];
-          const stagFolder = `${basePath}/${stagiaire.nom}_${stagiaire.prenom}`.substring(0, 80);
+          const stagFolder = basePath;
 
           if (doc.template === "pdf_static" && getStaticFileUrl(doc)) {
             const resp = await fetch(getStaticFileUrl(doc)!);
@@ -1054,7 +1054,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
         } else if (isPerStagiaire) {
           for (let si = 0; si < allStagiaires.length; si++) {
             const stagiaire = allStagiaires[si];
-            const stagFolder = `${basePath}/${stagiaire.nom}_${stagiaire.prenom}`.substring(0, 80);
+            const stagFolder = basePath;
             const content = generateContent(doc, si);
             if (exportFormat === "pdf") {
               zip.file(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, ".pdf")}`, await htmlToPdfBlob(content, bulkPdfOptions));
@@ -1149,7 +1149,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
 
         if (MAIL_TEMPLATE_FILES[doc.template] && typeof doc.params?.stagiaireIdx === "number") {
           const s = allStagiaires[doc.params.stagiaireIdx];
-          const mailFolder = s ? `${basePath}/${s.nom}_${s.prenom}`.substring(0, 80) : "MAIL";
+          const mailFolder = basePath;
           if (s) {
             const mailBlob = await processMailDocxTemplate(MAIL_TEMPLATE_FILES[doc.template], mergedOrganisme, selectedFormation, s);
             zip.file(`${mailFolder}/${buildCatalogFileName(doc, s, ".docx")}`, mailBlob);
@@ -1158,7 +1158,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
         } else if (hasStagiaireIdx) {
           const si = doc.params!.stagiaireIdx as number;
           const stagiaire = allStagiaires[si] || allStagiaires[0];
-          const stagFolder = `${basePath}/${stagiaire.nom}_${stagiaire.prenom}`.substring(0, 80);
+          const stagFolder = basePath;
 
           if (doc.template === "pdf_static" && getStaticFileUrl(doc)) {
             const resp = await fetch(getStaticFileUrl(doc)!);
@@ -1192,7 +1192,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
         } else if (isPerStagiaire) {
           for (let si = 0; si < allStagiaires.length; si++) {
             const stagiaire = allStagiaires[si];
-            const stagFolder = `${basePath}/${stagiaire.nom}_${stagiaire.prenom}`.substring(0, 80);
+            const stagFolder = basePath;
             const content = generateContent(doc, si);
             if (exportFormat === "pdf") {
               zip.file(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, ".pdf")}`, await htmlToPdfBlob(content, bulkPdfOptions));
@@ -1282,7 +1282,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
             if (isPerStagiaire) {
               for (let si = 0; si < allStagiaires.length; si++) {
                 const stagiaire = allStagiaires[si];
-                const stagFolder = `${basePath}/${stagiaire.nom}_${stagiaire.prenom}`.substring(0, 80);
+                const stagFolder = basePath;
                 const content = generateContent(doc, si);
                 if (exportFormat === "pdf") {
                   zip.file(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, ".pdf")}`, await htmlToPdfBlob(content));
