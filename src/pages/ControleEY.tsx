@@ -9,7 +9,7 @@ import SignaturePad from "@/components/SignaturePad";
 import ControleEDOF from "@/components/ControleEDOF";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ChevronLeft, LogIn, LogOut, ChevronDown, ChevronRight, Building2, GraduationCap, Users, Palette, Save, FolderOpen, Trash2, Plus, PenTool } from "lucide-react";
+import { ChevronLeft, LogIn, LogOut, ChevronDown, ChevronRight, Building2, GraduationCap, Users, Palette, Save, FolderOpen, Trash2, Plus, PenTool, Archive, ArchiveRestore } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
