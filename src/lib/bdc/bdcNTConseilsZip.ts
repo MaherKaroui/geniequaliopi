@@ -16,6 +16,8 @@ import { BDC_NT_SOURCE, BDC_NT_PER_BENEFICIAIRE, BDC_NT_STATIC_ASSETS } from "./
 import { BDC_TEMPLATES, renderBdcTemplateIfMapped } from "./bdcTemplateMap";
 import { getBdcDomainProfile } from "@/lib/templatesBDC";
 import type { JobReporter } from "@/lib/backgroundJobs";
+import { BDC_NT_STATS_FILES } from "./bdcNTStatsXlsx";
+import { htmlToXlsxBlob } from "@/lib/htmlToXlsx";
 
 const MOIS_FR = ["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
 
@@ -1948,6 +1950,19 @@ export async function buildBDCNTConseilsZip(
       if (buf) zip.file(mapAssetPathToCriterePath(a.zipPath), buf);
     } catch (e) {
       console.warn("[BDC NT] asset failed", a.src, e);
+    }
+  }
+
+  // === Indicateur 2 : justificatifs chiffrés (preuves des KPI) ===
+  const ind2Folder = mapFolderToCriterePath("Indicateur 2");
+  for (const file of BDC_NT_STATS_FILES) {
+    advance(file.name);
+    try {
+      const html = file.build(org, formation, benList);
+      const blob = htmlToXlsxBlob(html);
+      zip.file(`${ind2Folder}/${file.name}`, blob);
+    } catch (e) {
+      console.warn("[BDC NT] stats xlsx failed", file.name, e);
     }
   }
 
