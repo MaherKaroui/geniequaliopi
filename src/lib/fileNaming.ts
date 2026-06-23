@@ -55,6 +55,7 @@ const EXCEL_TEMPLATES = new Set([
   "bdc_nt_suivi_adaptation",
   "bdc_nt_contacts_handicap",
   "bdc_nt_tableau_dysfonctionnements",
+  "bdc_nt_stats_xlsx",
 ]);
 
 export const MAIL_DOCX_TEMPLATES = new Set([
@@ -161,6 +162,7 @@ export function getPreferredExtension(template: string, exportFormat: ExportForm
   if (template === "relances_appreciations_excel") return ".xlsx";
   if (template === "indicateurs_performance") return ".xlsx";
   if (template === "vae_indicateurs_previsionnels") return ".xlsx";
+  if (template === "bdc_nt_stats_xlsx") return ".xlsx";
   if (EXCEL_TEMPLATES.has(template)) return ".xls";
   if (MAIL_DOCX_TEMPLATES.has(template)) return ".docx";
   return exportFormat === "pdf" ? ".pdf" : ".doc";
