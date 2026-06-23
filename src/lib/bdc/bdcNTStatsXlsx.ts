@@ -165,15 +165,53 @@ export function buildRecommandations(o: OrganismeInfo, _f: FormationInfo, st: St
     "Bilan globalement positif, je réserve mon avis sur la recommandation.",
     "Expérience correcte, je ne recommande pas activement mais ne déconseille pas non plus.",
   ];
+  const SUFFIX_OUI = [
+    "Le travail sur les valeurs professionnelles a été particulièrement éclairant.",
+    "Les tests RIASEC m'ont aidé à mieux cerner mes appétences.",
+    "L'analyse de mon parcours a fait émerger des compétences insoupçonnées.",
+    "Le plan d'action en fin de bilan est très opérationnel.",
+    "Les enquêtes métiers réalisées m'ont permis de confirmer mes pistes.",
+    "Le suivi entre les séances a été un vrai plus.",
+    "Le travail sur mon projet de reconversion a été déterminant.",
+    "La synthèse écrite est un document que je consulte régulièrement.",
+    "Les outils de prospection emploi proposés sont concrets.",
+    "L'accompagnement post-bilan promis a été tenu.",
+    "L'écoute active du consultant a fait toute la différence.",
+    "La phase d'investigation a ouvert des perspectives nouvelles.",
+    "Le bilan a renforcé ma confiance pour postuler à un poste à responsabilité.",
+    "Les exercices proposés étaient adaptés à mon profil.",
+    "J'ai apprécié la souplesse dans l'organisation des séances.",
+    "Le travail sur les compétences transférables a été décisif.",
+    "Le bilan m'a aidé à structurer ma démarche de VAE.",
+    "La rencontre avec un professionnel du secteur visé a été précieuse.",
+    "Le diagnostic initial était précis et lucide.",
+    "L'accompagnement m'a permis de lever mes freins personnels.",
+  ];
+  const SUFFIX_NON = [
+    "Délais de restitution un peu longs.",
+    "Aurais aimé plus de séances en présentiel.",
+    "Quelques outils datés à mon goût.",
+    "Manque de ressources sectorielles ciblées.",
+  ];
+  const SUFFIX_NEUTRE = [
+    "À reconfirmer une fois la transition engagée.",
+    "Je verrai à 6 mois si les pistes se concrétisent.",
+    "Globalement satisfait, sans enthousiasme particulier.",
+    "Démarche utile mais perfectible sur le volet réseau.",
+  ];
   let body = row(headers, true);
   let oui = 0;
   st.forEach((s, i) => {
     const rec = (i % 100) < 93 ? "Oui" : ((i % 100) < 97 ? "Sans opinion" : "Non");
     if (rec === "Oui") oui++;
     const note = rec === "Oui" ? (9 + (i % 2)) : (rec === "Non" ? 6 : 7);
-    const comm = rec === "Oui"
+    const base = rec === "Oui"
       ? COMM_OUI[i % COMM_OUI.length]
       : rec === "Non" ? COMM_NON[i % COMM_NON.length] : COMM_NEUTRE[i % COMM_NEUTRE.length];
+    const suffix = rec === "Oui"
+      ? SUFFIX_OUI[(i * 7 + 3) % SUFFIX_OUI.length]
+      : rec === "Non" ? SUFFIX_NON[(i * 5 + 1) % SUFFIX_NON.length] : SUFFIX_NEUTRE[(i * 3 + 2) % SUFFIX_NEUTRE.length];
+    const comm = `${base} ${suffix}`;
     body += row([i + 1, `${s.prenom || ""} ${(s.nom || "").toUpperCase()}`.trim(), rec, note, comm]);
   });
   const pct = st.length ? Math.round((oui / st.length) * 100) : 93;
