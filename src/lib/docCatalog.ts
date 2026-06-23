@@ -1276,6 +1276,15 @@ export function buildFullCatalog(
         { statsIndex: idx },
       );
     });
+    // CR individuel d'entretien à 6 mois — un fichier par bénéficiaire (cohérent avec le suivi global)
+    stagiaires.forEach((s, si) => {
+      add(
+        `bdc_nt_ind2_cr6mois_s${si}`,
+        `CT1 - IND 2 CR entretien à 6 mois – ${s.prenom} ${s.nom}`,
+        1, 2, "bdc_nt_cr6mois_stagiaire",
+        { stagiaireIdx: si },
+      );
+    });
     // Trames Excel dynamiques (générées comme les autres docs xlsx, prévisualisables et téléchargeables en .xlsx)
     add("bdc_nt_calendrier_annuel", "CT1 - IND 1 Calendrier annuel (Excel)", 1, 1, "bdc_nt_calendrier_annuel");
     add("bdc_nt_suivi_adaptation", "CT3 - IND 10 Suivi de l'adaptation à l'accompagnement (Excel)", 3, 10, "bdc_nt_suivi_adaptation");
