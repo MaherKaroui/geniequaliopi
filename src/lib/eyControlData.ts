@@ -145,6 +145,14 @@ export const EY_DOCUMENTS: EYDocumentItem[] = [
     category: "evaluation",
   },
   {
+    code: "TEMPS_CONNEXION",
+    label: "Relevé des temps de connexion (LMS / distanciel)",
+    description: "Relevé individuel des temps de connexion à la plateforme LMS (jour par jour, IP, horaires, durée) — preuve d'assiduité en distanciel/mixte. Un fichier par stagiaire.",
+    autoTemplates: ["temps_connexion_reel"],
+    perStagiaire: true,
+    category: "evaluation",
+  },
+  {
     code: "28",
     label: "Compte-rendu des entretiens de positionnement",
     description: "Entretiens de positionnement avec les bénéficiaires en amont de la prestation (IA: cohérent avec la formation)",
