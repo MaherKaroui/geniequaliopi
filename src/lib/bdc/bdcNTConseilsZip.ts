@@ -115,7 +115,7 @@ function computeDates(s?: StagiaireInfo, org?: OrganismeInfo, formation?: Format
 }
 
 /** Substitutions globales : remplace tous les marqueurs NT Conseils par les données organisme/bénéficiaire. */
-function applySubstitutions(src: string, org: OrganismeInfo, s: StagiaireInfo | null, dates: DatesCtx, formation?: FormationInfo): string {
+function applySubstitutions(src: string, org: OrganismeInfo, s: StagiaireInfo | null, dates: DatesCtx, formation?: FormationInfo, nbBeneficiaires?: number): string {
   let txt = src;
   const orgNom = org.nom || "[Organisme]";
   const orgAdresse = [org.adresse, org.codePostal, org.ville].filter(Boolean).join(" ");
@@ -398,8 +398,21 @@ function applySubstitutions(src: string, org: OrganismeInfo, s: StagiaireInfo | 
 </table>`;
   txt = txt.replace(/\{SIGNATURES_ORG_STAGIAIRE\}/g, signaturesHtml);
 
+  // Bloc "QUELQUES CHIFFRES" : nombre de bénéficiaires automatisé + stats détaillées
+  const nbBen = Math.max(1, nbBeneficiaires ?? 1);
+  const chiffresBloc =
+    `| **${nbBen}**§§BR§§Bénéficiaire${nbBen > 1 ? "s" : ""} accompagné${nbBen > 1 ? "s" : ""} | **100 %** de bilans réalisés jusqu'à leur terme |\n` +
+    `|---|---|\n` +
+    `| **96 %** de satisfaction globale | **93 %** de recommandations |\n` +
+    `| **89 %** de suivis à 6 mois réalisés | **82 %** des bénéficiaires ont confirmé ou concrétisé leur projet professionnel |`;
+  txt = txt.replace(
+    /\|\s*\*\*1\*\*§§BR§§Bénéficiaire\s*\|\s*Taux de satisfaction bénéficiaires\s*:§§BR§§\*\*100\s*%\*\*\s*\|\s*\n\|---\|---\|/,
+    chiffresBloc
+  );
+
   return txt;
 }
+
 
 /* ============================================================== */
 /* Outil préparatoire — personnalisé par bénéficiaire             */
@@ -1752,6 +1765,7 @@ export function renderBdcNTDocHtml(
   org: OrganismeInfo,
   stagiaire: StagiaireInfo | null,
   formation?: FormationInfo,
+  nbBeneficiaires?: number,
 ): string {
   const raw = BDC_NT_SOURCE[key];
   const title = bdcDocTitle(key);
@@ -1761,7 +1775,8 @@ export function renderBdcNTDocHtml(
   const dates = computeDates(stagiaire || undefined, org, formation);
   const personalized = getPersonalizedRaw(key, stagiaire, org, dates, formation);
   const effectiveRaw = personalized ?? raw;
-  let md = applySubstitutions(effectiveRaw, org, stagiaire, dates, formation);
+  let md = applySubstitutions(effectiveRaw, org, stagiaire, dates, formation, nbBeneficiaires);
+
 
   if (!dates.bilanTermine && /Certificat de réalisation|Compte rendu de fin/i.test(title)) {
     md = md.replace(/\n[^|\n]{200,}\n/g, "\n[À compléter à la fin du bilan]\n");
@@ -1856,7 +1871,7 @@ export async function buildBDCNTConseilsZip(
   // Helper : génère un DOCX depuis markdown + substitutions
   const genDocx = async (rawMd: string, title: string, s: StagiaireInfo | null): Promise<Blob> => {
     const dates = computeDates(s || undefined, org, formation);
-    let md = applySubstitutions(rawMd, org, s, dates, formation);
+    let md = applySubstitutions(rawMd, org, s, dates, formation, benList.length);
 
     // Bilan en cours : on neutralise les évaluations finales
     if (!dates.bilanTermine && /Certificat de réalisation|Compte rendu de fin/i.test(title)) {
