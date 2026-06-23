@@ -1927,6 +1927,8 @@ QUESTIONS_OUVERTES["Création Entreprise"] = {
     { question: "Qu'avez-vous appris pendant cette formation et quelle est la prochaine étape concrète pour votre projet ?", reponseAttendue: "Synthèse personnelle : maîtrise du BMC, du business plan financier, des statuts juridiques, des aides à la création, des formalités INPI. Prochaine étape concrète : finalisation de l'étude de marché, choix définitif du statut, dépôt du dossier de prêt d'honneur, immatriculation au Guichet Unique, lancement commercial." },
   ],
 };
+
+const DEFAULT_QUESTIONS_OUVERTES: QuestionsOuvertesFormation = {
   debut: [
     { question: "Que connaissez-vous sur le sujet de la formation ?", reponseAttendue: "Le stagiaire dit ce qu'il sait déjà sur le domaine." },
     { question: "Quels outils ou logiciels avez-vous déjà utilisés ?", reponseAttendue: "Liste des outils ou logiciels déjà pratiqués." },
