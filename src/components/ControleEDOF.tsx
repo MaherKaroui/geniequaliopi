@@ -11,11 +11,12 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { CheckCircle2, Circle, Upload, Archive, Loader2, FileText, AlertTriangle, Sparkles, XCircle, ChevronDown, ChevronRight, Eye, Download, PenTool, Edit3, RotateCcw } from "lucide-react";
+import { CheckCircle2, Circle, Upload, Archive, Loader2, FileText, AlertTriangle, Sparkles, XCircle, ChevronDown, ChevronRight, Eye, Download, PenTool, Edit3, RotateCcw, Wand2 } from "lucide-react";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import { toast } from "sonner";
 import { useBackgroundJobs } from "@/lib/backgroundJobs";
+import { generateAIEvalPack, getCachedPack, clearCachedPack } from "@/lib/aiEvalPack";
 
 const yieldToBrowser = (ms = 0) => new Promise<void>(r => requestAnimationFrame(() => setTimeout(r, ms)));
 
@@ -79,6 +80,30 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
   const [progressText, setProgressText] = useState("");
   const fileInputRefs = useRef<Map<string, HTMLInputElement>>(new Map());
   const [selectedDocs, setSelectedDocs] = useState<Set<string>>(new Set());
+  const [aiPackReady, setAiPackReady] = useState<boolean>(() => !!getCachedPack(formation));
+  const [aiPackLoading, setAiPackLoading] = useState(false);
+
+  useEffect(() => {
+    setAiPackReady(!!getCachedPack(formation));
+  }, [formation]);
+
+  const handleGenerateAIPack = useCallback(async (force = false) => {
+    if (!formation.intitule?.trim()) {
+      toast.error("Renseignez d'abord l'intitulé de la formation");
+      return;
+    }
+    setAiPackLoading(true);
+    try {
+      if (force) clearCachedPack(formation);
+      await generateAIEvalPack(formation, force);
+      setAiPackReady(true);
+      toast.success("Pack d'évaluation IA généré — tests de positionnement et exercices prêts ✅");
+    } catch (e: any) {
+      toast.error("Erreur IA : " + (e?.message || "Échec de génération"));
+    } finally {
+      setAiPackLoading(false);
+    }
+  }, [formation]);
 
   // Preview state
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -601,7 +626,22 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
             Liste exhaustive des éléments probants (contrôle EY/Sauléa — RNCP/RS)
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          <Button
+            onClick={() => handleGenerateAIPack(!aiPackReady ? false : true)}
+            disabled={aiPackLoading}
+            variant={aiPackReady ? "outline" : "default"}
+            className="gap-2"
+            title="Génère 10 QCM début, 10 QCM fin, exercice intermédiaire et évaluation finale cohérents avec la formation"
+          >
+            {aiPackLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Wand2 className="w-4 h-4" />}
+            {aiPackLoading
+              ? "Génération IA..."
+              : aiPackReady
+                ? "Régénérer pack IA"
+                : "Générer évaluations IA"}
+            {aiPackReady && !aiPackLoading && <CheckCircle2 className="w-4 h-4 text-green-600" />}
+          </Button>
           {selectedDocs.size > 0 && (
             <Button onClick={downloadSelectedZip} disabled={generating} variant="default" className="gap-2">
               {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
@@ -614,6 +654,16 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
           </Button>
         </div>
       </div>
+
+      {!aiPackReady && (
+        <div className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900 flex items-start gap-3">
+          <AlertTriangle className="w-5 h-5 mt-0.5 shrink-0" />
+          <div>
+            <strong>Pack d'évaluation IA non généré.</strong> Les documents IA (tests de positionnement, exercices, évaluation finale) afficheront un message vide.
+            Cliquez sur <em>« Générer évaluations IA »</em> en haut à droite pour produire un contenu 100% cohérent avec la formation « {formation.intitule || "(intitulé à renseigner)"} ».
+          </div>
+        </div>
+      )}
 
       {/* Progress */}
       {generating && (
