@@ -112,7 +112,7 @@ li{margin:3px 0;font-size:12.5px}
     inds.forEach(ind => {
       const docs = docsByInd.get(ind.numero) || [];
       const tags = [
-        ind.nouvelEntrant ? `<span class="tag ne">NOUVEL ENTRANT</span>` : "",
+        isNE && ind.nouvelEntrant ? `<span class="tag ne">NOUVEL ENTRANT</span>` : "",
         ind.ponderable ? `<span class="tag warn">pondérable</span>` : `<span class="tag">NC majeure</span>`,
       ].filter(Boolean).join(" ");
       html += `<div class="ind"><div class="num"><span>INDICATEUR ${ind.numero}</span>${tags}</div><div class="body">
