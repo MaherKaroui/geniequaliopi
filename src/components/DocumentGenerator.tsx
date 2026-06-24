@@ -693,6 +693,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
   const [loadingBookCFA, setLoadingBookCFA] = useState(false);
   const [loadingFeuilleRouteCFA, setLoadingFeuilleRouteCFA] = useState(false);
   const [loadingGuideAuditCFA, setLoadingGuideAuditCFA] = useState(false);
+  const [typeAuditCFA, setTypeAuditCFA] = useState<'initial' | 'surveillance' | 'renouvellement'>('initial');
 
   const handleDownloadBookCFA = async () => {
     setLoadingBookCFA(true);
