@@ -1544,13 +1544,25 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
             </p>
           </div>
           <div className="flex gap-2 flex-wrap">
-            <Button variant="outline" size="sm" onClick={handleDownloadGuideAuditCFA}>
+            <Button variant="ghost" size="sm" onClick={handlePreviewGuideAuditCFA} className="text-orange-700">
+              Aperçu guide
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleDownloadGuideAuditCFA} disabled={loadingGuideAuditCFA}>
+              {loadingGuideAuditCFA ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : null}
               Guide audit (Quoi dire)
             </Button>
-            <Button variant="outline" size="sm" onClick={handleDownloadFeuilleRouteCFA}>
+            <Button variant="ghost" size="sm" onClick={handlePreviewFeuilleRouteCFA} className="text-orange-700">
+              Aperçu feuille
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleDownloadFeuilleRouteCFA} disabled={loadingFeuilleRouteCFA}>
+              {loadingFeuilleRouteCFA ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : null}
               Feuille de route CFA (Excel)
             </Button>
-            <Button size="sm" onClick={handleDownloadBookCFA} className="bg-orange-600 text-white border-0 hover:bg-orange-700">
+            <Button variant="ghost" size="sm" onClick={handlePreviewBookCFA} className="text-orange-700">
+              Aperçu book
+            </Button>
+            <Button size="sm" onClick={handleDownloadBookCFA} disabled={loadingBookCFA} className="bg-orange-600 text-white border-0 hover:bg-orange-700">
+              {loadingBookCFA ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : null}
               Book Qualiopi CFA
             </Button>
           </div>
