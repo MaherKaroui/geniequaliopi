@@ -182,28 +182,29 @@ export function buildFullCatalog(
         add(`af_c3i11_test_debut_${fi}_${si}`, `CT3 - IND 11 TEST DÉBUT DE FORMATION – ${s.prenom} ${s.nom}`, 3, 11, "test_positionnement_debut_stagiaire", { fi, stagiaireIdx: si });
         add(`af_c3i11_test_fin_${fi}_${si}`, `CT3 - IND 11 TEST FIN DE FORMATION – ${s.prenom} ${s.nom}`, 3, 11, "test_positionnement_fin_stagiaire", { fi, stagiaireIdx: si });
 
-        // 1 fichier = 1 QCM. On utilise le nombre de QCM réels définis dans evalContent
-        // (10 pour VTC), avec un repli sur les blocs RNCP ou les jours pour les autres formations.
+        // 1 fichier = 1 jour de formation (1 exercice par jour).
+        // Mix QCM / exercice pratique en alternance selon la formation.
         const evalData = getEvalContent(f.intitule);
-        const nbQcmContent = evalData?.exercices?.length || 0;
+        const nbExContent = evalData?.exercices?.length || 0;
         let nbQcm: number;
-        if (nbQcmContent > 0) {
-          nbQcm = nbQcmContent;
-        } else if (hasBlocs) {
+        if (hasBlocs) {
           nbQcm = rncp!.blocsCompetences.length;
         } else {
-          nbQcm = Math.max(1, Math.ceil(nbJours / 2));
+          // Strict : 1 exercice par jour de formation (plafonné si le contenu eval est plus court)
+          nbQcm = Math.max(1, nbJours);
         }
         for (let exIdx = 0; exIdx < nbQcm; exIdx++) {
-          const exTitle = evalData?.exercices?.[exIdx]?.titre;
+          const exTitle = evalData?.exercices?.[exIdx % Math.max(1, nbExContent)]?.titre;
+          const isQcm = exTitle ? /^QCM\b/i.test(exTitle) : (exIdx % 2 === 0);
           const labelBase = exTitle
-            ? exTitle.replace(/^QCM\s*\d+\s*[—\-:]\s*/i, "").substring(0, 60)
+            ? exTitle.replace(/^QCM\s*\d+\s*[—\-:]\s*/i, "").replace(/^Exercice\s*\d+\s*[—\-:]\s*/i, "").substring(0, 60)
             : (hasBlocs && rncp!.blocsCompetences[exIdx]?.titre)
               ? rncp!.blocsCompetences[exIdx].titre.substring(0, 50)
-              : `Partie ${exIdx + 1}`;
+              : `Jour ${exIdx + 1}`;
+          const prefix = isQcm ? `QCM ${exIdx + 1}` : `EXERCICE ${exIdx + 1}`;
           add(
             `af_c3i11_exercices_${fi}_${si}_ex${exIdx}`,
-            `CT3 - IND 11 QCM ${exIdx + 1} - ${labelBase} – ${s.prenom} ${s.nom}`,
+            `CT3 - IND 11 ${prefix} - Jour ${exIdx + 1} : ${labelBase} – ${s.prenom} ${s.nom}`,
             3,
             11,
             "exercices_stagiaire",
@@ -211,8 +212,8 @@ export function buildFullCatalog(
           );
         }
 
-        // EXAMEN FINAL — regroupe tous les QCM en un seul document, daté de la fin de formation
-        if (nbQcmContent > 0) {
+        // EXAMEN FINAL — 1 vrai examen de synthèse daté de la fin de formation
+        if (nbExContent > 0 || (evalData?.qcmFinal?.length || 0) > 0) {
           add(
             `af_c3i11_examen_final_${fi}_${si}`,
             `CT3 - IND 11 EXAMEN FINAL – ${s.prenom} ${s.nom}`,
@@ -222,6 +223,8 @@ export function buildFullCatalog(
             { fi, stagiaireIdx: si }
           );
         }
+
+
 
         add(`af_c3i11_grille_acquisition_${fi}_${si}`, `CT3 - IND 11 GRILLE D'ACQUISITION – ${s.prenom} ${s.nom}`, 3, 11, "grille_acquisition_stagiaire", { fi, stagiaireIdx: si });
         add(`af_c3i11_attestation_${fi}_${si}`, `CT3 - IND 11 ATTESTATION DE RÉUSSITE – ${s.prenom} ${s.nom}`, 3, 11, "attestation_reussite_stagiaire", { fi, stagiaireIdx: si });
