@@ -716,14 +716,15 @@ export function genExercicesStagiaire(o: OrganismeInfo, f: FormationInfo, stagia
   let nbBlocks: number;
   let EXERCICES_PER_BLOCK = 1;
   let blocLabels: string[] = [];
+  const _days = getFormationDays(f);
+  const _nbJours = _days.length;
 
   if (hasBlocs) {
     nbBlocks = rncp!.blocsCompetences.length;
     blocLabels = rncp!.blocsCompetences.map(b => b.titre);
   } else {
-    const days = getFormationDays(f);
-    const nbJours = days.length;
-    nbBlocks = Math.max(1, Math.ceil(nbJours / 2));
+    // Strict : 1 exercice par jour de formation
+    nbBlocks = Math.max(1, _nbJours);
   }
 
   // VTC : on ajoutera 2 QCM anglais supplémentaires (épreuve langue étrangère RS5637)
@@ -814,9 +815,9 @@ D) Drive faster to finish the ride.`,
     });
   }
 
-  // Fill the remaining slots with generic case studies if needed
+  // Fill the remaining slots — 1 per day, alternating QCM / case study
   for (let i = exercices.length; i < totalExNeeded; i++) {
-    const blockIdx = Math.floor(i / EXERCICES_PER_BLOCK);
+    const blockIdx = i;
     if (hasBlocs) {
       const blocTitre = blocLabels[blockIdx] || `Bloc ${blockIdx + 1}`;
       exercices.push({
@@ -825,17 +826,16 @@ D) Drive faster to finish the ride.`,
         reponseAttendue: `Application des acquis du bloc ${blocTitre} : mise en pratique structurée, utilisation des outils et méthodes vus en formation, résultat conforme aux attentes professionnelles.`,
       });
     } else {
-      const days = getFormationDays(f);
-      const nbJours = days.length;
-      const jourDebut = blockIdx * 2 + 1;
-      const jourFin = Math.min(blockIdx * 2 + 2, nbJours);
+      const jour = i + 1;
       exercices.push({
-        titre: `Exercice ${i + 1} : Cas pratique – Jour ${jourDebut}-${jourFin}`,
-        consigne: `À partir de la situation professionnelle présentée, appliquez les compétences acquises durant les jours ${jourDebut} et ${jourFin} de la formation « ${f.intitule} » pour produire le livrable demandé.`,
-        reponseAttendue: `Application des acquis des jours ${jourDebut}-${jourFin} : mise en pratique structurée, utilisation des outils et méthodes vus en formation, résultat conforme aux attentes professionnelles.`,
+        titre: `Exercice ${i + 1} : Cas pratique – Jour ${jour}`,
+        consigne: `À partir du contenu vu lors du jour ${jour} de la formation « ${f.intitule} », réalisez le livrable demandé : analyse de la situation, proposition argumentée, mise en œuvre opérationnelle.`,
+        reponseAttendue: `Application des acquis du jour ${jour} : démarche structurée, outils et méthodes vus en formation correctement mobilisés, résultat conforme aux attentes professionnelles.`,
       });
     }
   }
+
+
 
 
   const blockStart = exerciceIdx !== undefined ? exerciceIdx * EXERCICES_PER_BLOCK : 0;
