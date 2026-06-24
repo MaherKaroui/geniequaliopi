@@ -4,14 +4,16 @@
 // (croisées avec les documents générés par l'application), et les vigilances éventuelles.
 
 import { OrganismeInfo, FormationInfo, StagiaireInfo, DocEntry } from "@/types/qualiopi";
-import { INDICATEURS_CFA, CRITERES_CFA } from "./qualiopiReferenceCFA";
+import { INDICATEURS_CFA, CRITERES_CFA, TypeAuditCFA, getTypeAuditLabel } from "./qualiopiReferenceCFA";
 
 export function generateBookQualiopiCFA(
   org: OrganismeInfo,
   formations: FormationInfo[],
-  _stagiaires: StagiaireInfo[],
-  catalog: DocEntry[]
+  stagiaires: StagiaireInfo[],
+  catalog: DocEntry[],
+  typeAudit: TypeAuditCFA = 'initial'
 ): string {
+  const isNE = typeAudit === 'initial';
   const today = new Date().toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" });
   const annee = formations[0]?.dateDebut ? new Date(formations[0].dateDebut).getFullYear() : new Date().getFullYear();
 
