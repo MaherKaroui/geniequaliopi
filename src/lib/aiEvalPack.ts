@@ -114,8 +114,28 @@ function stagSeed(s: StagiaireInfo, si: number, offset = 0): number {
  * OPCO début : score < 7/10 (4 à 6 bonnes réponses, déterministe).
  * Variation déterministe par stagiaire.
  */
-export function answersForQCM(qcm: AIQCMQuestion[], si: number, s: StagiaireInfo, mode: "debut" | "fin", isOpco: boolean = false): number[] {
+export function answersForQCM(qcm: AIQCMQuestion[], si: number, s: StagiaireInfo, mode: "debut" | "fin", isOpco: boolean = false, targetCorrect?: number): number[] {
   const n = qcm.length;
+
+  // Si une cible de bonnes réponses est imposée → on force exactement ce nombre
+  if (typeof targetCorrect === "number") {
+    const seedBase = stagSeed(s, si, 9123);
+    const correctCount = Math.max(0, Math.min(n, Math.round(targetCorrect)));
+    const wrongCount = n - correctCount;
+    const wrongSet = new Set<number>();
+    let k = 0;
+    while (wrongSet.size < wrongCount && k < n * 8) {
+      const idx = (seedBase + k * 13) % n;
+      wrongSet.add(idx);
+      k++;
+    }
+    return qcm.map((q, qi) => {
+      if (!wrongSet.has(qi)) return q.correctIndex;
+      const seed = stagSeed(s, si, qi * 7);
+      const wrongOptions = [0, 1, 2, 3].filter((i) => i !== q.correctIndex);
+      return wrongOptions[seed % wrongOptions.length];
+    });
+  }
 
   // OPCO début : score garanti < 7/10 (4 à 6 fausses)
   if (isOpco && mode === "debut") {

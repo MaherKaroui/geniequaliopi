@@ -332,6 +332,10 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
       const si = params?.stagiaireIdx ?? 0;
       return genAIExerciceIntermediaire(o, f, stagiaires, si);
     }
+    case "ai_exercices_par_jour": {
+      const si = params?.stagiaireIdx ?? 0;
+      return genAIExercicesParJour(o, f, stagiaires, si);
+    }
     case "ai_evaluation_finale": {
       const si = params?.stagiaireIdx ?? 0;
       return genAIEvaluationFinale(o, f, stagiaires, si);
@@ -16006,7 +16010,25 @@ function genAITestPositionnement(o: OrganismeInfo, f: FormationInfo, stagiaires:
   const stagFini = isStagiaireFormationTerminee(s, f);
   const renderEmpty = mode === "fin" && !stagFini;
 
-  const answers = renderEmpty ? [] : answersForQCM(qcm, si, s, mode, isOpco);
+  // Cible de score (DÉBUT) en fonction du nombre d'heures du stagiaire
+  // 15h → 6-7/10 ; plus d'heures → score plus bas (niveau initial plus faible, marge de progression)
+  let targetCorrect: number | undefined;
+  if (mode === "debut" && !isOpco) {
+    const stagDuree = getStagiaireDuree(s, f);
+    let hours = 0;
+    const m1 = /(\d+)\s*[hH]/.exec(stagDuree) || /(\d+)\s*[hH]/.exec(f.duree || "") || /(\d+)\s*[hH]/.exec(f.intitule || "");
+    if (m1) hours = parseInt(m1[1], 10);
+    if (!hours) hours = getStagiaireDays(s, f).length * 7;
+    const seedVar = (((s?.prenom || "").length + (s?.nom || "").length + si) % 2); // 0 ou 1 pour varier
+    if (hours <= 15) targetCorrect = 6 + seedVar;                 // 6 ou 7
+    else if (hours <= 20) targetCorrect = 5 + seedVar;            // 5 ou 6
+    else if (hours <= 30) targetCorrect = 4 + seedVar;            // 4 ou 5
+    else if (hours <= 40) targetCorrect = 3 + seedVar;            // 3 ou 4
+    else if (hours <= 65) targetCorrect = 2 + seedVar;            // 2 ou 3
+    else targetCorrect = 2;                                       // > 65h : très débutant
+  }
+
+  const answers = renderEmpty ? [] : answersForQCM(qcm, si, s, mode, isOpco, targetCorrect);
   let correct = 0;
   const isDebut = mode === "debut";
   const rows = qcm.map((q, qi) => {
@@ -16191,6 +16213,90 @@ function genAIEvaluationFinale(o: OrganismeInfo, f: FormationInfo, stagiaires: S
 
   return buildDocument({
     org: o, title: "ÉVALUATION FINALE — RÉSULTATS DÉTAILLÉS", subtitle: f.intitule, formation: f, showFormationInfo: false, stagiaires: [s], extraHtml: extra,
+    signatures: { type: "2", labels: ["Le Stagiaire", "Le Formateur"], names: [`${s.prenom} ${s.nom}`, f.formateur] },
+  });
+}
+
+/**
+ * Exercices par jour pour un stagiaire :
+ * un exercice par journée de formation (selon les jours effectifs du stagiaire),
+ * avec énoncé, production stagiaire et corrigé — varié d'un stagiaire à l'autre.
+ * Pour les jours futurs (formation non encore passée), l'exercice reste en trame à compléter.
+ */
+function genAIExercicesParJour(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number): string {
+  const pack: AIEvalPack | null = getCachedPack(f);
+  const s = stagiaires[si] || stagiaires[0];
+  const days = getStagiaireDays(s, f);
+  const title = "EXERCICES QUOTIDIENS — UN EXERCICE PAR JOUR";
+
+  if (!pack) return aiPackPlaceholder(o, f, title, s);
+
+  // Pool d'exercices : on combine les questions de l'exo intermédiaire + les exercices de l'éval finale
+  const pool: { titre: string; consigne: string; reponseAttendue: string; points: number }[] = [];
+  pack.exerciceIntermediaire.questions.forEach((q, i) => {
+    pool.push({
+      titre: `Exercice ${i + 1} — ${pack.exerciceIntermediaire.titre}`,
+      consigne: q.question,
+      reponseAttendue: q.reponseAttendue,
+      points: q.points,
+    });
+  });
+  pack.evaluationFinale.exercices.forEach((exo) => {
+    pool.push({ titre: exo.titre, consigne: exo.consigne, reponseAttendue: exo.reponseAttendue, points: exo.points });
+  });
+  if (pool.length === 0) return aiPackPlaceholder(o, f, title, s);
+
+  // Décalage déterministe par stagiaire pour varier l'ordre des exercices d'un stagiaire à l'autre
+  const seedBase = ((s?.prenom || "").length * 17 + (s?.nom || "").length * 31 + si * 7) % pool.length;
+
+  let extra = `<h2>${title}</h2>`;
+  extra += `<p><strong>Stagiaire :</strong> ${s.civilite ? s.civilite + " " : ""}${s.prenom} ${s.nom}<br>
+    <strong>Formation :</strong> ${f.intitule}<br>
+    <strong>Durée :</strong> ${getStagiaireDuree(s, f)}<br>
+    <strong>Période :</strong> du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}<br>
+    <strong>Nombre d'exercices :</strong> ${days.length} (1 par journée de formation)</p>`;
+
+  let totalObtained = 0;
+  let totalMax = 0;
+  let scoredCount = 0;
+
+  days.forEach((day, di) => {
+    const exo = pool[(seedBase + di) % pool.length];
+    const past = isFrLongDayPast(day);
+
+    extra += `<div class="section" style="margin-top:15px;border-left:3px solid #3b82f6;padding:10px">
+      <p><strong>Jour ${di + 1} — ${day}</strong></p>
+      <p><strong>${exo.titre}</strong> (${exo.points} pts)</p>
+      <p><em>Consigne :</em> ${exo.consigne}</p>`;
+
+    if (!past) {
+      extra += `<p style="background:#fef3c7;padding:8px;border-left:3px solid #f59e0b"><em>Production stagiaire :</em> _____________________ <em>(à compléter le jour de l'exercice)</em></p>
+        <p style="background:#f0fdf4;padding:8px;border-left:3px solid #16a34a"><em>Corrigé attendu :</em><br>${exo.reponseAttendue}</p>
+        <p><strong>Note : ___ / ${exo.points}</strong></p></div>`;
+      return;
+    }
+
+    const note = noteForOpenQuestion(exo.points, s, si, di + 500);
+    const studentAnswer = studentAnswerFromCorrection(exo.reponseAttendue, s, si, di + 500);
+    totalObtained += note;
+    totalMax += exo.points;
+    scoredCount++;
+
+    extra += `<p style="background:#f8fafc;padding:8px;border-left:3px solid #3b82f6"><em>Production stagiaire :</em><br>${studentAnswer.replace(/\n/g, "<br>")}</p>
+      <p style="background:#f0fdf4;padding:8px;border-left:3px solid #16a34a"><em>Corrigé attendu :</em><br>${exo.reponseAttendue}</p>
+      <p><strong>Note attribuée : ${note}/${exo.points}</strong></p></div>`;
+  });
+
+  if (scoredCount > 0) {
+    const pct = Math.round((totalObtained / totalMax) * 100);
+    extra += `<div class="section section-green" style="margin-top:20px">
+      <p><strong>Synthèse — Note cumulée : ${totalObtained}/${totalMax} (${pct}%)</strong></p>
+      <p><strong>Appréciation formateur :</strong> ${pct >= 80 ? "Très bonne régularité et progression sur l'ensemble des journées." : pct >= 60 ? "Progression satisfaisante, à consolider sur les notions les plus techniques." : "Acquis partiels — un accompagnement renforcé est recommandé."}</p>
+    </div>`;
+  }
+
+  return buildDocument({
+    org: o, title, subtitle: f.intitule, formation: f, showFormationInfo: false, stagiaires: [s], extraHtml: extra,
     signatures: { type: "2", labels: ["Le Stagiaire", "Le Formateur"], names: [`${s.prenom} ${s.nom}`, f.formateur] },
   });
 }
