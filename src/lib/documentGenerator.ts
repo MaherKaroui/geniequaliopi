@@ -10068,6 +10068,7 @@ function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: 
   const isBureautique = t.includes("bureautique") || t.includes("pack office");
   const isECSR = t.includes("ecsr") || t.includes("enseignant de la conduite") || t.includes("sécurité routière") || t.includes("securite routiere") || t.includes("moniteur auto-école") || t.includes("moniteur auto-ecole");
   const isVTC = !isECSR && (t.includes("vtc") || t.includes("conducteur") || t.includes("transport de personnes") || t.includes("t3p") || t.includes("chauffeur"));
+  const isNTC = t.includes("négociateur technico") || t.includes("technico-commercial") || t.includes("technico commercial") || t.includes("ntc") || (f.codeRNCP || "").toUpperCase().includes("39063");
 
   // === Early return : VTC (cohérent avec le métier de conducteur VTC) ===
   if (isVTC) {
