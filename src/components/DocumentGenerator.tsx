@@ -1524,9 +1524,23 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
                   PRÉPA AUDIT QUALIOPI CFA
                 </h3>
                 <p className="text-xs text-orange-900/70 mt-1.5 leading-relaxed">
-                  Pack spécial CFA (audit initial nouvel entrant) : 32 indicateurs V9 avec niveau attendu,
+                  Pack spécial CFA : 32 indicateurs V9 avec niveau attendu,
                   script « ce qu'il faut dire », preuves et points de vigilance. Format Dreamers Team.
+                  Inclut les détails de l'organisme, de la formation et des apprenants audités.
                 </p>
+              </div>
+              <div className="flex flex-col gap-1 min-w-[220px]">
+                <label className="text-[11px] font-semibold text-orange-900 uppercase tracking-wide">Type d'audit</label>
+                <Select value={typeAuditCFA} onValueChange={(v) => setTypeAuditCFA(v as any)}>
+                  <SelectTrigger className="h-9 bg-white border-orange-300 text-orange-900 text-xs">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="initial">Audit initial (nouvel entrant)</SelectItem>
+                    <SelectItem value="surveillance">Audit de surveillance</SelectItem>
+                    <SelectItem value="renouvellement">Audit de renouvellement</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 
