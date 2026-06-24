@@ -334,7 +334,8 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     }
     case "ai_exercices_par_jour": {
       const si = params?.stagiaireIdx ?? 0;
-      return genAIExercicesParJour(o, f, stagiaires, si);
+      const di = typeof params?.dayIdx === "number" ? params.dayIdx : undefined;
+      return genAIExercicesParJour(o, f, stagiaires, si, di);
     }
     case "ai_evaluation_finale": {
       const si = params?.stagiaireIdx ?? 0;
