@@ -90,7 +90,7 @@ export function scriptParIndicateur(num: number, type: TypeActionAudit, niveauAt
 }
 
 // Documents-preuves typiques par type d'action et par indicateur.
-function preuvesParIndicateur(num: number, type: TypeActionAudit, base: string[]): string[] {
+export function preuvesParIndicateur(num: number, type: TypeActionAudit, base: string[]): string[] {
   const extra: Record<TypeActionAudit, Record<number, string[]>> = {
     AF: {
       1: ["Fiches formation datées", "Pages site web (captures datées)", "Catalogue commercial", "CGV"],
