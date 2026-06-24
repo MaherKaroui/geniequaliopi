@@ -368,6 +368,71 @@ tr:hover{background:#fafafa}
 .sig-label{color:#111;text-transform:uppercase;letter-spacing:2px;font-weight:800;font-size:${s.fontSize - 3}px !important}
 .badge{border-radius:0;background:${s.secondaryColor};color:#fff;font-weight:800;text-transform:uppercase;letter-spacing:1px;padding:4px 12px}
 .footer{border-top:3px solid #111;color:#111;padding-top:14px;font-weight:500}
+`,
+    monochrome: `
+body{background:#fff;color:#000}
+h1{border:none;padding:0 0 12px;color:#000;font-weight:900;text-transform:uppercase;letter-spacing:2px;font-size:${s.fontSize + 14}px;border-bottom:4px solid #000;margin-bottom:28px}
+h2{border:none;color:#000;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;font-size:${s.fontSize + 2}px;border-bottom:2px solid #000;padding-bottom:5px;margin-top:26px}
+h3{color:#000;font-weight:700;text-transform:uppercase;letter-spacing:1px;font-size:${s.fontSize}px;border-left:3px solid #000;padding-left:8px}
+table{border:none;border-top:3px solid #000;border-bottom:3px solid #000}
+table th{background:#000;color:#fff;font-weight:800;text-transform:uppercase;letter-spacing:1px;padding:10px;font-size:${s.fontSize - 2}px}
+td{border-bottom:0.5px solid #d4d4d4;padding:9px 10px;color:#1a1a1a}
+tr:nth-child(even){background:#fafafa}
+tr:nth-child(odd){background:#fff}
+.section{background:#fafafa;border:none;border-left:4px solid #000;border-radius:0;padding:14px 18px;color:#000}
+.sig-box{border:1.5px solid #000;border-radius:0;background:#fff;padding:14px}
+.sig-label{color:#000;text-transform:uppercase;letter-spacing:2px;font-weight:800;font-size:${s.fontSize - 2}px !important}
+.badge{border-radius:0;background:#000;color:#fff;font-weight:800;text-transform:uppercase;letter-spacing:1px;padding:3px 10px}
+.footer{border-top:3px solid #000;color:#000;font-weight:600;padding-top:14px;text-transform:uppercase;letter-spacing:1px;font-size:${s.fontSize - 2}px}
+`,
+    pastel: `
+body{background:#fdfbf7;color:#3a3a4a}
+h1{border:none;padding:12px 22px;background:${s.primaryColor}18;color:${s.primaryColor};border-radius:20px;font-weight:700;font-size:${s.fontSize + 9}px;display:inline-block;margin-bottom:24px}
+h2{border:none;color:${s.primaryColor};background:${s.primaryColor}10;padding:7px 18px;border-radius:14px;display:inline-block;font-weight:700;font-size:${s.fontSize + 2}px;margin-top:24px}
+h3{color:${s.secondaryColor};font-weight:700;font-size:${s.fontSize + 1}px}
+table{border:none;border-radius:14px;overflow:hidden;box-shadow:0 1px 4px ${s.primaryColor}15}
+table th{background:${s.primaryColor}18;color:${s.primaryColor};font-weight:700;padding:11px 12px;border:none;font-size:${s.fontSize - 1}px}
+td{border:none;padding:10px 12px;border-bottom:1px solid ${s.primaryColor}10;color:#3a3a4a}
+tr:nth-child(even){background:${s.primaryColor}06}
+tr:nth-child(odd){background:#fff}
+.section{background:${s.primaryColor}10;border:none;border-radius:14px;padding:16px 20px;color:${s.primaryColor}}
+.sig-box{border:none;background:${s.secondaryColor}12;border-radius:14px;padding:16px}
+.sig-label{color:${s.primaryColor};font-weight:700}
+.badge{border-radius:14px;background:${s.secondaryColor}25;color:${s.secondaryColor};font-weight:700;padding:4px 14px}
+.footer{border-top:1px solid ${s.primaryColor}25;color:${s.primaryColor}b0;padding-top:14px}
+`,
+    presse: `
+body{background:#fcfaf5;color:#1a1a1a}
+h1{border:none;padding:14px 0 12px;color:#000;font-weight:900;text-align:center;text-transform:uppercase;letter-spacing:3px;font-size:${s.fontSize + 16}px;border-top:4px solid #000;border-bottom:1px solid #000;margin-bottom:28px;font-family:${s.headingFont}}
+h1::after{content:"";display:block;width:80px;height:1px;background:${s.secondaryColor};margin:8px auto 0}
+h2{border:none;color:${s.secondaryColor};text-transform:uppercase;letter-spacing:2px;font-weight:900;font-size:${s.fontSize + 2}px;border-bottom:0.5px solid #000;padding-bottom:5px;margin-top:26px}
+h3{color:#000;font-weight:700;font-style:italic;font-size:${s.fontSize + 1}px}
+table{border:none;border-top:2px solid #000;border-bottom:2px solid #000}
+table th{background:none;color:#000;font-weight:900;text-transform:uppercase;letter-spacing:1px;padding:10px 8px;border-bottom:1px solid #000;font-size:${s.fontSize - 2}px}
+td{border-bottom:0.5px solid #c8c0a8;padding:9px 8px;color:#1a1a1a}
+tr:nth-child(even){background:transparent}
+tr:nth-child(odd){background:transparent}
+.section{background:#f5f0e0;border:none;border-top:0.5px solid #000;border-bottom:0.5px solid #000;border-radius:0;padding:14px 18px;color:#1a1a1a;font-style:italic}
+.sig-box{border:none;border-top:1px solid #000;border-radius:0;background:transparent;padding:14px 4px}
+.sig-label{color:#000;font-weight:900;text-transform:uppercase;letter-spacing:1.5px;font-size:${s.fontSize - 2}px !important}
+.badge{border-radius:0;background:#000;color:#fcfaf5;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:3px 10px;font-size:${s.fontSize - 3}px}
+.footer{border-top:2px solid #000;color:#000;padding-top:14px;text-align:center;font-style:italic;letter-spacing:1px}
+`,
+    terracotta: `
+body{background:#faf3e7;color:#3a2418}
+h1{border:none;padding:14px 22px;background:linear-gradient(to right,${s.primaryColor}25,transparent);border-left:6px solid ${s.primaryColor};border-radius:0 12px 12px 0;color:${s.primaryColor};font-weight:700;font-size:${s.fontSize + 10}px;margin-bottom:24px}
+h2{border:none;color:${s.primaryColor};border-bottom:2px solid ${s.secondaryColor};padding-bottom:6px;font-weight:700;font-size:${s.fontSize + 3}px;margin-top:26px}
+h3{color:${s.secondaryColor};font-weight:700;font-style:italic;font-size:${s.fontSize + 1}px}
+table{border:1px solid ${s.primaryColor}30;border-radius:8px;overflow:hidden}
+table th{background:${s.primaryColor}18;color:${s.primaryColor};font-weight:700;padding:10px 12px;border-bottom:2px solid ${s.primaryColor}40;font-size:${s.fontSize - 1}px}
+td{padding:10px 12px;border-bottom:1px solid ${s.primaryColor}15;color:#3a2418}
+tr:nth-child(even){background:${s.primaryColor}06}
+tr:nth-child(odd){background:#fff}
+.section{background:linear-gradient(to right,${s.primaryColor}10,${s.secondaryColor}08);border:none;border-left:4px solid ${s.secondaryColor};border-radius:0 8px 8px 0;padding:14px 18px;color:${s.primaryColor}}
+.sig-box{border:1px solid ${s.primaryColor}35;border-radius:10px;background:#fff;padding:14px}
+.sig-label{color:${s.primaryColor};font-weight:700;letter-spacing:0.5px}
+.badge{border-radius:14px;background:${s.secondaryColor}25;color:${s.primaryColor};font-weight:700;padding:4px 12px;border:1px solid ${s.secondaryColor}50}
+.footer{border-top:2px solid ${s.secondaryColor}40;color:${s.primaryColor};padding-top:14px}
 `
   };
 
