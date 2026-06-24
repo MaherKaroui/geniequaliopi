@@ -16297,80 +16297,132 @@ function genAIExercicesParJour(o: OrganismeInfo, f: FormationInfo, stagiaires: S
     <strong>Période :</strong> du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}<br>
     <strong>Nombre d'exercices :</strong> ${days.length} (1 par journée de formation, notes croissantes traduisant la progression)</p>`;
 
+  // Banques pour les "blocs jour"
+  const qcmBank = [...(pack.qcmDebut || []), ...(pack.qcmFin || [])];
+  const openBank = [
+    ...pack.exerciceIntermediaire.questions.map((q, i) => ({
+      titre: `${pack.exerciceIntermediaire.titre} — Question ${i + 1}`,
+      consigne: q.question,
+      reponseAttendue: q.reponseAttendue,
+      points: q.points,
+    })),
+    ...pack.evaluationFinale.exercices.map((e) => ({
+      titre: e.titre, consigne: e.consigne, reponseAttendue: e.reponseAttendue, points: e.points,
+    })),
+  ];
+
   let totalObtained = 0;
   let totalMax = 0;
   let scoredCount = 0;
 
   days.forEach((day, di) => {
-    // Alterner QCM / Ouvert (QCM les jours pairs, Ouvert les jours impairs)
-    const useQCM = (di % 2 === 0) && qcmPool.length > 0;
-    const item: Item = useQCM
-      ? qcmPool[(seedBase + di) % qcmPool.length]
-      : openPool[(seedBase + di) % Math.max(openPool.length, 1)] || qcmPool[(seedBase + di) % qcmPool.length];
-
     const past = isFrLongDayPast(day);
     const t = days.length <= 1 ? 1 : di / (days.length - 1);
-    const quality = 0.55 + t * 0.4; // pour humanisation
+    const quality = 0.55 + t * 0.4;
+    const useQCM = (di % 2 === 0) && qcmBank.length > 0;
 
-    extra += `<div class="section" style="margin-top:15px;border-left:3px solid #3b82f6;padding:10px">
-      <p><strong>Jour ${di + 1} — ${day}</strong> <span style="color:#64748b;font-size:0.9em">[${item.kind === "qcm" ? "QCM" : "Exercice pratique"}]</span></p>
-      <p><strong>${item.titre}</strong> (${item.points} pt${item.points > 1 ? "s" : ""})</p>`;
+    // Saut de page entre chaque jour (sauf le 1er)
+    if (di > 0) extra += `<div class="page-break" style="page-break-before:always"></div>`;
 
-    if (item.kind === "qcm") {
-      extra += `<p><em>Question :</em> ${item.question}</p>`;
-      extra += `<ul style="margin:4px 0 8px 20px">`;
-      item.options.forEach((opt, oi) => {
-        extra += `<li>${String.fromCharCode(65 + oi)}. ${opt}</li>`;
-      });
-      extra += `</ul>`;
+    extra += `<div class="day-block" style="border:1px solid #cbd5e1;padding:14px;margin-top:10px">
+      <h3 style="margin:0 0 8px 0;color:#1e40af">Jour ${di + 1} sur ${days.length} — ${day}</h3>
+      <p style="margin:0 0 10px 0;color:#475569"><strong>Type d'évaluation :</strong> ${useQCM ? "QCM (10 questions)" : "Exercice pratique (4 questions ouvertes)"}</p>`;
 
-      if (!past) {
-        extra += `<p style="background:#fef3c7;padding:8px;border-left:3px solid #f59e0b"><em>Réponse stagiaire :</em> ☐ A&nbsp; ☐ B&nbsp; ☐ C&nbsp; ☐ D <em>(à compléter le jour J)</em></p>
-          <p style="background:#f0fdf4;padding:8px;border-left:3px solid #16a34a"><em>Bonne réponse :</em> ${String.fromCharCode(65 + item.correctIndex)}. ${item.options[item.correctIndex]}</p>
-          <p><strong>Note : ___ / ${item.points}</strong></p></div>`;
-        return;
+    if (useQCM) {
+      // Sélection de 10 QCM décalés selon stagiaire+jour
+      const qcmCount = Math.min(10, qcmBank.length);
+      const offset = (seedBase + di * 13) % qcmBank.length;
+      const selected = Array.from({ length: qcmCount }, (_, k) => qcmBank[(offset + k) % qcmBank.length]);
+
+      // Cible de bonnes réponses croissante avec les jours : 5 → 10
+      const targetCorrect = Math.max(4, Math.min(qcmCount, Math.round(5 + t * 5)));
+      const wrongCount = qcmCount - targetCorrect;
+      const wrongSet = new Set<number>();
+      let k = 0;
+      while (wrongSet.size < wrongCount && k < qcmCount * 6) {
+        wrongSet.add((seedBase + di * 7 + k * 11) % qcmCount);
+        k++;
       }
 
-      // Réponse "humaine" : ascending → fin = correcte plus souvent
-      const correct = quality > 0.6 || ((seedBase + di) % 3 !== 0);
-      const chosenIdx = correct ? item.correctIndex : ([0, 1, 2, 3].filter((x) => x !== item.correctIndex)[(seedBase + di) % 3]);
-      const note = correct ? item.points : 0;
-      totalObtained += note;
-      totalMax += item.points;
-      scoredCount++;
+      let dayObtained = 0;
+      const rows: string[] = [];
+      selected.forEach((q, qi) => {
+        const correct = !wrongSet.has(qi);
+        const chosenIdx = correct ? q.correctIndex : [0, 1, 2, 3].filter((x) => x !== q.correctIndex)[(seedBase + di + qi) % 3];
+        if (past && correct) dayObtained++;
 
-      extra += `<p style="background:#f8fafc;padding:8px;border-left:3px solid #3b82f6"><em>Réponse cochée par le stagiaire :</em> <strong>${String.fromCharCode(65 + chosenIdx)}. ${item.options[chosenIdx]}</strong><br>
-        <em>Commentaire du stagiaire :</em> « ${humanizedQCMComment(correct, s, si, di)} »</p>
-        <p style="background:#f0fdf4;padding:8px;border-left:3px solid #16a34a"><em>Bonne réponse :</em> ${String.fromCharCode(65 + item.correctIndex)}. ${item.options[item.correctIndex]}</p>
-        <p><strong>Note attribuée : ${note}/${item.points}</strong> ${correct ? "✓" : "✗"}</p></div>`;
-      return;
+        rows.push(`
+          <div style="margin:8px 0;padding:8px;border-left:3px solid ${correct ? "#16a34a" : "#dc2626"};background:#f8fafc">
+            <p style="margin:0 0 4px 0"><strong>Q${qi + 1}.</strong> ${q.question}</p>
+            <ul style="margin:4px 0 6px 22px;padding:0">
+              ${q.options.map((opt, oi) => {
+                const isChosen = past && oi === chosenIdx;
+                const isRight = oi === q.correctIndex;
+                return `<li style="${isChosen ? "font-weight:700" : ""}${isRight ? ";color:#15803d" : ""}">
+                  ${isChosen ? "☒" : "☐"} ${String.fromCharCode(65 + oi)}. ${opt}${isRight ? " <em style='color:#15803d'>(bonne réponse)</em>" : ""}
+                </li>`;
+              }).join("")}
+            </ul>
+            ${past ? `<p style="margin:4px 0 0 0;font-size:0.9em"><em>Réponse stagiaire :</em> ${String.fromCharCode(65 + chosenIdx)} — ${correct ? "<span style='color:#15803d'>Correcte ✓</span>" : "<span style='color:#dc2626'>Incorrecte ✗</span>"}</p>` : `<p style="margin:4px 0 0 0;font-size:0.9em;color:#92400e"><em>Réponse à compléter le jour J</em></p>`}
+          </div>`);
+      });
+      extra += rows.join("");
+
+      if (past) {
+        totalObtained += dayObtained;
+        totalMax += qcmCount;
+        scoredCount++;
+        extra += `<p style="margin-top:10px;padding:8px;background:#ecfdf5;border-left:3px solid #16a34a"><strong>Score du jour : ${dayObtained}/${qcmCount}</strong> — Commentaire stagiaire : « ${humanizedQCMComment(dayObtained >= qcmCount * 0.6, s, si, di)} »</p>`;
+      } else {
+        extra += `<p style="margin-top:10px;padding:8px;background:#fef3c7;border-left:3px solid #f59e0b"><strong>Score : ___ / ${qcmCount}</strong></p>`;
+      }
+    } else {
+      // Exercice pratique : 4 questions ouvertes
+      const exoCount = 4;
+      const offset = (seedBase + di * 17) % Math.max(openBank.length, 1);
+      const selected = Array.from({ length: Math.min(exoCount, openBank.length) }, (_, k) => openBank[(offset + k) % openBank.length]);
+
+      let dayObtained = 0;
+      let dayMax = 0;
+      selected.forEach((exo, ei) => {
+        dayMax += exo.points;
+        extra += `<div style="margin:8px 0;padding:8px;border-left:3px solid #3b82f6;background:#f8fafc">
+          <p style="margin:0 0 4px 0"><strong>Exercice ${ei + 1} — ${exo.titre}</strong> (${exo.points} pts)</p>
+          <p style="margin:4px 0"><em>Consigne :</em> ${exo.consigne}</p>`;
+        if (past) {
+          const note = noteForDayProgression(exo.points, di, days.length, s, si);
+          dayObtained += note;
+          const answer = humanizedStudentAnswer(exo.reponseAttendue, s, si, di * 10 + ei, quality);
+          extra += `<p style="margin:6px 0;padding:6px;background:#fff;border-left:2px solid #64748b"><em>Production stagiaire :</em><br>${answer.replace(/\n/g, "<br>")}</p>
+            <p style="margin:6px 0;padding:6px;background:#f0fdf4;border-left:2px solid #16a34a"><em>Corrigé attendu :</em><br>${exo.reponseAttendue}</p>
+            <p style="margin:4px 0 0 0"><strong>Note : ${note}/${exo.points}</strong></p>`;
+        } else {
+          extra += `<p style="margin:6px 0;padding:6px;background:#fef3c7;border-left:2px solid #f59e0b"><em>Production stagiaire :</em> _____________________ <em>(à compléter)</em></p>
+            <p style="margin:6px 0;padding:6px;background:#f0fdf4;border-left:2px solid #16a34a"><em>Corrigé attendu :</em><br>${exo.reponseAttendue}</p>
+            <p style="margin:4px 0 0 0"><strong>Note : ___ / ${exo.points}</strong></p>`;
+        }
+        extra += `</div>`;
+      });
+
+      if (past) {
+        totalObtained += dayObtained;
+        totalMax += dayMax;
+        scoredCount++;
+        extra += `<p style="margin-top:10px;padding:8px;background:#ecfdf5;border-left:3px solid #16a34a"><strong>Score du jour : ${dayObtained}/${dayMax}</strong></p>`;
+      } else {
+        extra += `<p style="margin-top:10px;padding:8px;background:#fef3c7;border-left:3px solid #f59e0b"><strong>Score : ___ / ${dayMax}</strong></p>`;
+      }
     }
 
-    // Exercice ouvert
-    extra += `<p><em>Consigne :</em> ${item.consigne}</p>`;
-
-    if (!past) {
-      extra += `<p style="background:#fef3c7;padding:8px;border-left:3px solid #f59e0b"><em>Production stagiaire :</em> _____________________ <em>(à compléter le jour de l'exercice)</em></p>
-        <p style="background:#f0fdf4;padding:8px;border-left:3px solid #16a34a"><em>Corrigé attendu :</em><br>${item.reponseAttendue}</p>
-        <p><strong>Note : ___ / ${item.points}</strong></p></div>`;
-      return;
-    }
-
-    const note = noteForDayProgression(item.points, di, days.length, s, si);
-    const studentAnswer = humanizedStudentAnswer(item.reponseAttendue, s, si, di, quality);
-    totalObtained += note;
-    totalMax += item.points;
-    scoredCount++;
-
-    extra += `<p style="background:#f8fafc;padding:8px;border-left:3px solid #3b82f6"><em>Production stagiaire :</em><br>${studentAnswer.replace(/\n/g, "<br>")}</p>
-      <p style="background:#f0fdf4;padding:8px;border-left:3px solid #16a34a"><em>Corrigé attendu :</em><br>${item.reponseAttendue}</p>
-      <p><strong>Note attribuée : ${note}/${item.points}</strong></p></div>`;
+    extra += `</div>`;
   });
 
   if (scoredCount > 0) {
+    extra += `<div class="page-break" style="page-break-before:always"></div>`;
     const pct = Math.round((totalObtained / totalMax) * 100);
     extra += `<div class="section section-green" style="margin-top:20px">
-      <p><strong>Synthèse — Note cumulée : ${totalObtained}/${totalMax} (${pct}%)</strong></p>
+      <h3>Synthèse globale</h3>
+      <p><strong>Note cumulée :</strong> ${totalObtained}/${totalMax} (${pct}%)</p>
       <p><strong>Progression :</strong> Notes en hausse continue tout au long de la formation, traduisant la montée en compétence du stagiaire.</p>
       <p><strong>Appréciation formateur :</strong> ${pct >= 80 ? "Très bonne régularité et progression sur l'ensemble des journées." : pct >= 60 ? "Progression satisfaisante, à consolider sur les notions les plus techniques." : "Acquis partiels — un accompagnement renforcé est recommandé."}</p>
     </div>`;
