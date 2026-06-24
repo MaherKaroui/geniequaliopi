@@ -13452,7 +13452,7 @@ function genAttestationReussiteCFAStagiaire(o: OrganismeInfo, f: FormationInfo, 
   }
   const s = stagiaires[si] || stagiaires[0];
   let extra = `<h2>ATTESTATION DE RÉUSSITE</h2>
-    <p><strong>L'apprenti(e) :</strong> ............................................................</p>
+    <p><strong>L'apprenti(e) :</strong> ${s.civilite || ""} ${s.prenom || ""} ${s.nom || ""}</p>
     <p>Je soussigné(e), ${o.dirigeant || '____________________'}, en qualité de responsable pédagogique de l'organisme de formation <strong>${o.nom}</strong>, certifie que l'apprenti(e) susnommé(e) a suivi la formation <strong>« ${f.intitule} »</strong> du __________ au __________.</p>
     <p><strong>Résultats obtenus :</strong></p>
     <ul>
