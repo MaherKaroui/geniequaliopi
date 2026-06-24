@@ -18,7 +18,7 @@ import { saveAs } from "file-saver";
 import { toast } from "sonner";
 import DocStyleConfigPanel from "./DocStyleConfigPanel";
 import SignatairesConnexionForm from "./SignatairesConnexionForm";
-import { downloadAsWord, htmlToWordBlob } from "@/lib/wordExport";
+import { downloadAsWord, htmlToWordBlob, htmlToWordBlobSync } from "@/lib/wordExport";
 import { generateExcelTableauBordPerformance, generateExcelTableauSuiviParcours, generateExcelIndicateursPrevisionnelsVAE, excelToBlob } from "@/lib/xlsxGenerator";
 import { htmlToXlsxBlob } from "@/lib/htmlToXlsx";
 import { buildBDCNTConseilsZip } from "@/lib/bdc/bdcNTConseilsZip";
