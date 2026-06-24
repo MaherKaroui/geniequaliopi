@@ -152,7 +152,7 @@ function pointVigilance(num: number, type: TypeActionAudit): string | undefined 
 }
 
 const STYLES = `<style>
-body{font-family:'Segoe UI',Arial,sans-serif;color:#1a1a2e;line-height:1.55;font-size:13px;max-width:900px;margin:0 auto;padding:30px}
+body{font-family:'Segoe UI',Arial,sans-serif;color:#1a1a2e;line-height:1.55;font-size:13px;max-width:1100px;margin:0 auto;padding:30px}
 h1.title{font-size:30px;color:#0b2545;text-align:center;margin-bottom:6px}
 .sub{text-align:center;color:#475569;font-size:14px;margin-bottom:30px}
 .intro{background:#eff6ff;border-left:4px solid #1d4ed8;padding:16px;border-radius:8px;margin-bottom:24px}
@@ -164,6 +164,17 @@ h3.ind{font-size:15px;color:#0b2545;margin-top:22px;border-bottom:2px solid #1d4
 .dire{background:#eff6ff;border-left:4px solid #3b82f6;padding:10px 14px;border-radius:8px;margin:8px 0;font-style:italic}
 .docs{margin:8px 0}.docs li{margin:3px 0}
 .vigilance{background:#fffbeb;border-left:4px solid #f59e0b;padding:10px 14px;border-radius:8px;margin:8px 0;font-size:12.5px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0}
+.kpi{background:white;border:1px solid #cbd5e1;border-left:4px solid #1d4ed8;border-radius:8px;padding:10px 12px}
+.kpi .k{font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.4px}
+.kpi .v{font-size:18px;font-weight:700;color:#0b2545;margin-top:2px}
+table.fdr{width:100%;border-collapse:collapse;margin:10px 0;font-size:11.5px}
+table.fdr th{background:#0b2545;color:white;padding:8px 6px;text-align:left;font-weight:600;border:1px solid #0b2545}
+table.fdr td{padding:6px;border:1px solid #cbd5e1;vertical-align:top}
+table.fdr tr:nth-child(even) td{background:#f8fafc}
+.st-ok{background:#dcfce7;color:#166534;padding:2px 8px;border-radius:10px;font-weight:600;font-size:10.5px;white-space:nowrap}
+.st-part{background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:10px;font-weight:600;font-size:10.5px;white-space:nowrap}
+.st-ko{background:#fee2e2;color:#991b1b;padding:2px 8px;border-radius:10px;font-weight:600;font-size:10.5px;white-space:nowrap}
 .footer{margin-top:50px;text-align:center;color:#64748b;font-size:11px;border-top:1px solid #e2e8f0;padding-top:16px}
 </style>`;
 
@@ -245,7 +256,66 @@ function generateGuideAutres(
     ${s.formateur ? `<br>Formateur affecté : ${s.formateur}` : ""}
   </div>`).join("")}` : ""}
 
-  <h2 class="crit" style="font-size:16px">4. Indicateurs Qualiopi — Quoi dire à l'auditeur</h2>
+  <h2 class="crit" style="font-size:16px">4. Feuille de route — Chiffres clés &amp; tableau de suivi des ${indicateurs.length} indicateurs</h2>
+
+  ${(() => {
+    const parseNum = (s?: string): number => {
+      if (!s) return 0;
+      const m = String(s).replace(/\s|\u00A0/g, "").replace(",", ".").match(/(\d+(?:\.\d+)?)/);
+      return m ? parseFloat(m[1]) : 0;
+    };
+    const caStagiaires = stagiaires.reduce((sum, s) => sum + parseNum(s.tarifFormation), 0);
+    let caForm = 0;
+    formations.forEach(f => {
+      const t = parseNum(f.tarif); const n = parseNum(f.nombreParticipants) || 1;
+      caForm += t * n;
+    });
+    const caTotal = caStagiaires > 0 ? caStagiaires : caForm;
+    const psh = stagiaires.filter(s => s.rqth === "oui").length;
+    const totalHeures = formations.reduce((s, f) => s + parseNum(f.duree), 0);
+    const indCouverts = indicateurs.filter(i => (docsByInd.get(i.numero) || []).length > 0).length;
+    const tauxCouv = indicateurs.length ? Math.round((indCouverts / indicateurs.length) * 100) : 0;
+    const fmtEur = (n: number) => n > 0 ? n.toLocaleString("fr-FR", { maximumFractionDigits: 0 }) + " €" : "—";
+
+    let html = `<div class="kpis">
+      <div class="kpi"><div class="k">Chiffre d'affaires audité</div><div class="v">${fmtEur(caTotal)}</div></div>
+      <div class="kpi"><div class="k">Prestations</div><div class="v">${formations.length}</div></div>
+      <div class="kpi"><div class="k">${ben.charAt(0).toUpperCase()+ben.slice(1)}s</div><div class="v">${stagiaires.length}${psh ? ` (${psh} RQTH)` : ""}</div></div>
+      <div class="kpi"><div class="k">Volume total</div><div class="v">${totalHeures > 0 ? totalHeures + " h" : "—"}</div></div>
+      <div class="kpi"><div class="k">Documents produits</div><div class="v">${catalog.length}</div></div>
+      <div class="kpi"><div class="k">Indicateurs couverts</div><div class="v">${indCouverts}/${indicateurs.length}</div></div>
+      <div class="kpi"><div class="k">Taux de couverture</div><div class="v">${tauxCouv}%</div></div>
+      <div class="kpi"><div class="k">Référent qualité</div><div class="v" style="font-size:13px">${org.referentQualite || org.dirigeant || "—"}</div></div>
+    </div>`;
+
+    html += `<table class="fdr"><thead><tr>
+      <th style="width:90px">Critère</th><th style="width:38px">N°</th>
+      <th>Indicateur</th><th style="width:120px">Type</th>
+      <th style="width:60px">Docs</th><th style="width:90px">Statut</th>
+      <th style="width:140px">Responsable</th>
+    </tr></thead><tbody>`;
+    indicateurs.forEach(ind => {
+      const nbDocs = (docsByInd.get(ind.numero) || []).length;
+      const stCls = nbDocs === 0 ? "st-ko" : nbDocs < 2 ? "st-part" : "st-ok";
+      const stLbl = nbDocs === 0 ? "À faire" : nbDocs < 2 ? "Partiel" : "Couvert";
+      const typeLbl = ind.type === "specifique" ? `Spécifique ${refCode}` : "Commun";
+      const resp = ind.numero >= 17 && ind.numero <= 22 ? (org.responsablePedagogique || org.dirigeant || "—")
+                 : ind.numero === 26 ? (org.referentHandicap || "—")
+                 : (org.referentQualite || org.dirigeant || "—");
+      html += `<tr>
+        <td>C${ind.critere}</td><td><strong>${ind.numero}</strong></td>
+        <td>${ind.intitule.split(".")[0]}</td><td>${typeLbl}</td>
+        <td style="text-align:center">${nbDocs}</td>
+        <td><span class="${stCls}">${stLbl}</span></td>
+        <td>${resp}</td>
+      </tr>`;
+    });
+    html += `</tbody></table>
+    <p style="font-size:11.5px;color:#475569;margin-top:6px"><strong>Lecture :</strong> « Couvert » = 2 documents ou plus produits par l'application pour cet indicateur · « Partiel » = 1 document · « À faire » = aucun document généré, à compléter avant audit.</p>`;
+    return html;
+  })()}
+
+  <h2 class="crit" style="font-size:16px">5. Indicateurs Qualiopi — Quoi dire à l'auditeur</h2>
 
   <div class="intro">
     <strong>Comment utiliser ce guide.</strong> Pour chaque indicateur applicable à votre activité (${label}), vous trouverez : (1) le niveau attendu par l'auditeur, (2) un script de ce qu'il faut dire adapté à votre périmètre, (3) la liste des documents à présenter, et (4) les points de vigilance.
