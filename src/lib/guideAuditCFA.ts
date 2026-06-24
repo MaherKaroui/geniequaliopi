@@ -2,14 +2,17 @@
 // Réplique le DOCX Dreamers Team : 1 fiche par indicateur avec niveau attendu,
 // script, documents à présenter et points de vigilance.
 
-import { OrganismeInfo, FormationInfo, DocEntry } from "@/types/qualiopi";
-import { INDICATEURS_CFA, CRITERES_CFA, getPonderationLabel } from "./qualiopiReferenceCFA";
+import { OrganismeInfo, FormationInfo, StagiaireInfo, DocEntry } from "@/types/qualiopi";
+import { INDICATEURS_CFA, CRITERES_CFA, getPonderationLabel, TypeAuditCFA, getTypeAuditLabel } from "./qualiopiReferenceCFA";
 
 export function generateGuideAuditCFA(
   org: OrganismeInfo,
   formations: FormationInfo[],
-  catalog: DocEntry[]
+  catalog: DocEntry[],
+  stagiaires: StagiaireInfo[] = [],
+  typeAudit: TypeAuditCFA = 'initial'
 ): string {
+  const isNE = typeAudit === 'initial';
   const today = new Date().toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" });
   const docsByInd = new Map<number, string[]>();
   catalog.forEach(d => {
