@@ -16299,7 +16299,7 @@ function genAIExercicesParJour(o: OrganismeInfo, f: FormationInfo, stagiaires: S
   extra += `<p><strong>Stagiaire :</strong> ${s.civilite ? s.civilite + " " : ""}${s.prenom} ${s.nom}<br>
     <strong>Formation :</strong> ${f.intitule}<br>
     <strong>Période :</strong> du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}<br>
-    <strong>Nombre d'exercices :</strong> ${days.length} (1 par journée de formation, notes croissantes traduisant la progression)</p>`;
+    ${singleDay ? `<strong>Jour :</strong> ${onlyDayIdx! + 1} sur ${days.length}` : `<strong>Nombre d'exercices :</strong> ${days.length} (1 par journée de formation, notes croissantes traduisant la progression)`}</p>`;
 
   // Banques pour les "blocs jour"
   const qcmBank = [...(pack.qcmDebut || []), ...(pack.qcmFin || [])];
