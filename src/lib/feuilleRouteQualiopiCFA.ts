@@ -130,6 +130,45 @@ export function generateFeuilleRouteQualiopiCFA(
   ws["!rows"] = [{ hpt: 28 }, { hpt: 36 }];
 
   const wb = XLSX.utils.book_new();
+
+  // Sheet "Contexte" — OF / Formations / Apprenants
+  const ctx: (string | number)[][] = [];
+  ctx.push([`CONTEXTE AUDITÉ — ${getTypeAuditLabel(typeAudit)}`]);
+  ctx.push([]);
+  ctx.push(["ORGANISME DE FORMATION"]);
+  ctx.push(["Nom", org.nom]);
+  ctx.push(["SIRET", org.siret]);
+  ctx.push(["NDA", org.nda]);
+  ctx.push(["Adresse", `${org.adresse || ""} ${org.codePostal || ""} ${org.ville || ""}`.trim()]);
+  if (org.telephone) ctx.push(["Téléphone", org.telephone]);
+  if (org.email) ctx.push(["Email", org.email]);
+  if (org.siteWeb) ctx.push(["Site web", org.siteWeb]);
+  ctx.push(["Dirigeant", org.dirigeant || "—"]);
+  ctx.push(["Responsable pédagogique", org.responsablePedagogique || "—"]);
+  ctx.push(["Référent handicap", org.referentHandicap || "—"]);
+  ctx.push(["Référent qualité", org.referentQualite || "—"]);
+  ctx.push(["Domaines de formation", org.domainesFormation || "—"]);
+  ctx.push(["Types d'actions", (org.typesActions || []).join(", ") || "—"]);
+  ctx.push(["Certifications", org.certifications || "—"]);
+  ctx.push([]);
+  ctx.push([`FORMATION(S) AUDITÉE(S) — ${formations.length}`]);
+  ctx.push(["Intitulé", "Code RNCP", "Durée", "Modalités", "Date début", "Date fin", "Lieu", "Formateur", "Tarif", "Rythme alternance"]);
+  formations.forEach(f => ctx.push([
+    f.intitule || "—", f.codeRNCP || "—", f.duree || "—", f.modalites || "—",
+    frDate(f.dateDebut), frDate(f.dateFin), f.lieu || "—", f.formateur || "—", f.tarif || "—", f.rythmeAlternance || "—"
+  ]));
+  ctx.push([]);
+  ctx.push([`APPRENANT(S) — ${stagiaires.length}`]);
+  ctx.push(["Civilité", "Nom", "Prénom", "Email", "Téléphone", "Entreprise", "Date début", "Date fin", "RQTH", "N° action"]);
+  stagiaires.forEach(s => ctx.push([
+    s.civilite || "", s.nom || "", s.prenom || "", s.email || "", s.telephone || "",
+    s.entreprise || "—", frDate(s.dateDebutFormation), frDate(s.dateFinFormation),
+    s.rqth === "oui" ? "Oui" : "Non", s.numeroAction || "—"
+  ]));
+  const wsCtx = XLSX.utils.aoa_to_sheet(ctx);
+  wsCtx["!cols"] = [{ wch: 24 }, { wch: 22 }, { wch: 18 }, { wch: 22 }, { wch: 18 }, { wch: 22 }, { wch: 22 }, { wch: 22 }, { wch: 16 }, { wch: 18 }];
+  XLSX.utils.book_append_sheet(wb, wsCtx, "Contexte");
+
   XLSX.utils.book_append_sheet(wb, ws, "Prépa audit Qualiopi CFA");
 
   const out = XLSX.write(wb, { type: "array", bookType: "xlsx", cellStyles: true });
