@@ -46,7 +46,7 @@ export function generateFeuilleRouteQualiopiCFA(
         ...ind.preuves.map(p => `• ${p}`),
         ...(docsApp.length ? ["", "Documents générés par l'application :", ...docsApp.map(d => `  ✓ ${d}`)] : []),
       ].join("\n");
-      const vigilance = [getPonderationLabel(ind), ind.vigilance ? `\n⚠ ${ind.vigilance}` : ""].filter(Boolean).join("");
+      const vigilance = [getPonderationLabel(ind, isNE), ind.vigilance ? `\n⚠ ${ind.vigilance}` : ""].filter(Boolean).join("");
       rows.push([
         `Critère ${cNum}`,
         ind.numero,
