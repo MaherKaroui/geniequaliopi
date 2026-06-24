@@ -11,6 +11,8 @@ export interface EYDocumentItem {
   autoTemplates: string[];
   /** Whether this document is per-stagiaire */
   perStagiaire: boolean;
+  /** Whether this document generates one file per training day (per stagiaire). Requires perStagiaire. */
+  perDay?: boolean;
   /** Category for grouping */
   category: EYCategory;
   /** Optional path to a static file in public/ that is pre-provided */
@@ -198,6 +200,7 @@ export const EY_DOCUMENTS: EYDocumentItem[] = [
     description: "Un exercice par journée de formation pour chaque stagiaire (avec énoncé, production stagiaire et corrigé), généré par IA et varié d'un stagiaire à l'autre",
     autoTemplates: ["ai_exercices_par_jour"],
     perStagiaire: true,
+    perDay: true,
     category: "evaluation",
   },
   {
