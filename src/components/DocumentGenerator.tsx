@@ -707,8 +707,14 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
   };
 
   const handleDownloadGuideAuditCFA = async () => {
-    const content = generateGuideAuditCFA(mergedOrganisme, [selectedFormation], catalog);
-    await downloadFile(content, buildGenericFileName("GUIDE_AUDIT_CFA_QUOI_DIRE", mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, ".doc"));
+    try {
+      const content = generateGuideAuditCFA(mergedOrganisme, [selectedFormation], catalog);
+      await downloadFile(content, buildGenericFileName("GUIDE_AUDIT_CFA_QUOI_DIRE", mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, ".doc"));
+      toast.success("Guide audit CFA téléchargé");
+    } catch (e) {
+      console.error("Guide audit CFA error:", e);
+      toast.error("Erreur génération guide audit : " + (e instanceof Error ? e.message : String(e)));
+    }
   };
 
   const isBDCOrg = (mergedOrganisme.typesActions || []).includes("bilans-competences");
