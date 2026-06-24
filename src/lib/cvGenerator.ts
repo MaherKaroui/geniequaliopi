@@ -54,7 +54,7 @@ export const emptyCV: CVData = {
   publications: "",
 };
 
-export type CVDesign = "classique" | "moderne" | "minimaliste" | "elegant" | "colore" | "sidebar" | "timeline" | "magazine" | "corporate";
+export type CVDesign = "classique" | "moderne" | "minimaliste" | "elegant" | "colore" | "sidebar" | "timeline" | "magazine" | "corporate" | "executive" | "swiss" | "harvard" | "consulting" | "monochrome" | "serif_pro";
 
 export const CV_DESIGNS: { id: CVDesign; label: string; description: string; accent: string }[] = [
   { id: "classique", label: "Classique", description: "Sobre et professionnel", accent: "#1e3a7b" },
@@ -66,6 +66,12 @@ export const CV_DESIGNS: { id: CVDesign; label: string; description: string; acc
   { id: "timeline", label: "Timeline", description: "Frise chronologique verticale", accent: "#7c3aed" },
   { id: "magazine", label: "Magazine", description: "Mise en page éditoriale 2 colonnes", accent: "#be185d" },
   { id: "corporate", label: "Corporate", description: "Bandeau couleur en-tête + sections épurées", accent: "#0369a1" },
+  { id: "executive", label: "Executive", description: "Fond blanc, header serif, ultra-pro", accent: "#1f2937" },
+  { id: "swiss", label: "Swiss", description: "Grille suisse, blanc total, rouge accent", accent: "#dc2626" },
+  { id: "harvard", label: "Harvard", description: "Format CV académique anglo-saxon", accent: "#7f1d1d" },
+  { id: "consulting", label: "Consulting", description: "Style McKinsey/BCG, bleu sobre", accent: "#1e40af" },
+  { id: "monochrome", label: "Monochrome", description: "100% noir & blanc, typographie forte", accent: "#000000" },
+  { id: "serif_pro", label: "Serif Pro", description: "Serif éditorial, blanc, raffiné", accent: "#374151" },
 ];
 
 // ===== HTML Generators =====
@@ -199,6 +205,87 @@ export function generateCVHTML(data: CVData, design: CVDesign, options?: { accen
       <div style="padding:25px 30px;">
         ${profilSection}${speSection}${expSection}${pedSection}${formSection}${certSection}${compSection}${langSection}${pubSection}
       </div>
+    </div>`;
+  }
+
+  if (design === "executive") {
+    const ff = fontOverride || "Georgia,'Times New Roman',serif";
+    return `<div style="font-family:${ff};color:#1a1a1a;font-size:12px;line-height:1.55;background:#fff;padding:40px 45px;">
+      <div style="text-align:center;border-bottom:1px solid #1f2937;padding-bottom:18px;margin-bottom:22px;">
+        <h1 style="font-size:32px;margin:0;font-weight:400;letter-spacing:4px;text-transform:uppercase;color:#1f2937;">${escapeHtml(fullName)}</h1>
+        <div style="width:50px;height:1px;background:${accent};margin:10px auto;"></div>
+        <p style="font-size:13px;color:#4b5563;margin:4px 0;letter-spacing:2px;text-transform:uppercase;">${escapeHtml(data.titre)}</p>
+        <p style="font-size:11px;color:#6b7280;margin-top:8px;">${contactInfo}</p>
+      </div>
+      ${profilSection}${speSection}${expSection}${pedSection}${formSection}${certSection}${compSection}${langSection}${pubSection}
+    </div>`;
+  }
+
+  if (design === "swiss") {
+    const ff = fontOverride || "'Helvetica Neue',Helvetica,Arial,sans-serif";
+    return `<div style="font-family:${ff};color:#0a0a0a;font-size:11px;line-height:1.5;background:#fff;padding:40px 50px;">
+      <div style="display:grid;grid-template-columns:1fr 2fr;gap:30px;border-top:4px solid ${accent};padding-top:18px;margin-bottom:24px;">
+        <div>
+          <h1 style="font-size:34px;margin:0;font-weight:700;letter-spacing:-1px;line-height:1;">${escapeHtml(data.prenom)}<br>${escapeHtml(data.nom)}</h1>
+        </div>
+        <div style="padding-top:6px;">
+          <p style="font-size:13px;font-weight:600;margin:0 0 8px 0;text-transform:uppercase;letter-spacing:1px;">${escapeHtml(data.titre)}</p>
+          <p style="font-size:10px;color:#525252;margin:0;">${contactInfo}</p>
+        </div>
+      </div>
+      ${profilSection}${speSection}${expSection}${pedSection}${formSection}${certSection}${compSection}${langSection}${pubSection}
+    </div>`;
+  }
+
+  if (design === "harvard") {
+    const ff = fontOverride || "'Times New Roman',Times,serif";
+    return `<div style="font-family:${ff};color:#000;font-size:11.5px;line-height:1.5;background:#fff;padding:40px 50px;">
+      <div style="text-align:center;margin-bottom:18px;">
+        <h1 style="font-size:24px;margin:0;font-weight:700;letter-spacing:1px;">${escapeHtml(fullName).toUpperCase()}</h1>
+        <p style="font-size:11px;margin:6px 0 0 0;">${contactInfo}</p>
+      </div>
+      ${data.titre ? `<p style="text-align:center;font-style:italic;margin:0 0 14px 0;font-size:12px;">${escapeHtml(data.titre)}</p>` : ""}
+      ${profilSection}${expSection}${pedSection}${formSection}${certSection}${speSection}${compSection}${langSection}${pubSection}
+    </div>`;
+  }
+
+  if (design === "consulting") {
+    const ff = fontOverride || "'Calibri','Segoe UI',Arial,sans-serif";
+    return `<div style="font-family:${ff};color:#1f2937;font-size:11.5px;line-height:1.5;background:#fff;padding:36px 44px;">
+      <div style="border-bottom:2px solid ${accent};padding-bottom:14px;margin-bottom:18px;">
+        <h1 style="font-size:26px;margin:0;font-weight:600;color:${accent};letter-spacing:0.5px;">${escapeHtml(fullName)}</h1>
+        <p style="font-size:13px;color:#374151;margin:4px 0 8px 0;font-weight:500;">${escapeHtml(data.titre)}</p>
+        <p style="font-size:10.5px;color:#6b7280;margin:0;">${contactInfo}</p>
+      </div>
+      ${profilSection}${speSection}${expSection}${pedSection}${formSection}${certSection}${compSection}${langSection}${pubSection}
+    </div>`;
+  }
+
+  if (design === "monochrome") {
+    const ff = fontOverride || "'Helvetica Neue',Helvetica,Arial,sans-serif";
+    return `<div style="font-family:${ff};color:#000;font-size:11.5px;line-height:1.5;background:#fff;padding:40px 45px;">
+      <div style="margin-bottom:22px;">
+        <h1 style="font-size:42px;margin:0;font-weight:900;letter-spacing:-1.5px;line-height:1;text-transform:uppercase;">${escapeHtml(fullName)}</h1>
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;border-bottom:3px solid #000;padding:10px 0 8px 0;margin-top:8px;">
+          <p style="font-size:12px;margin:0;font-weight:600;text-transform:uppercase;letter-spacing:2px;">${escapeHtml(data.titre)}</p>
+          <p style="font-size:10px;margin:0;color:#333;">${contactInfo}</p>
+        </div>
+      </div>
+      ${profilSection}${speSection}${expSection}${pedSection}${formSection}${certSection}${compSection}${langSection}${pubSection}
+    </div>`;
+  }
+
+  if (design === "serif_pro") {
+    const ff = fontOverride || "Georgia,'Times New Roman',serif";
+    return `<div style="font-family:${ff};color:#1f2937;font-size:12px;line-height:1.6;background:#fff;padding:42px 50px;">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;border-bottom:1px solid #d1d5db;padding-bottom:14px;margin-bottom:20px;">
+        <div>
+          <h1 style="font-size:30px;margin:0;font-weight:400;color:#111827;">${escapeHtml(fullName)}</h1>
+          <p style="font-size:13px;color:${accent};margin:4px 0 0 0;font-style:italic;">${escapeHtml(data.titre)}</p>
+        </div>
+        <p style="font-size:10.5px;color:#6b7280;margin:0;text-align:right;line-height:1.5;">${[data.email, data.telephone, data.adresse].filter(Boolean).map(escapeHtml).join("<br>")}</p>
+      </div>
+      ${profilSection}${speSection}${expSection}${pedSection}${formSection}${certSection}${compSection}${langSection}${pubSection}
     </div>`;
   }
 
