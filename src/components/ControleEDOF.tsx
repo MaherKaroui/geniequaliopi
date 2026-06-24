@@ -626,7 +626,22 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
             Liste exhaustive des éléments probants (contrôle EY/Sauléa — RNCP/RS)
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          <Button
+            onClick={() => handleGenerateAIPack(!aiPackReady ? false : true)}
+            disabled={aiPackLoading}
+            variant={aiPackReady ? "outline" : "default"}
+            className="gap-2"
+            title="Génère 10 QCM début, 10 QCM fin, exercice intermédiaire et évaluation finale cohérents avec la formation"
+          >
+            {aiPackLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Wand2 className="w-4 h-4" />}
+            {aiPackLoading
+              ? "Génération IA..."
+              : aiPackReady
+                ? "Régénérer pack IA"
+                : "Générer évaluations IA"}
+            {aiPackReady && !aiPackLoading && <CheckCircle2 className="w-4 h-4 text-green-600" />}
+          </Button>
           {selectedDocs.size > 0 && (
             <Button onClick={downloadSelectedZip} disabled={generating} variant="default" className="gap-2">
               {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
@@ -639,6 +654,16 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
           </Button>
         </div>
       </div>
+
+      {!aiPackReady && (
+        <div className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900 flex items-start gap-3">
+          <AlertTriangle className="w-5 h-5 mt-0.5 shrink-0" />
+          <div>
+            <strong>Pack d'évaluation IA non généré.</strong> Les documents IA (tests de positionnement, exercices, évaluation finale) afficheront un message vide.
+            Cliquez sur <em>« Générer évaluations IA »</em> en haut à droite pour produire un contenu 100% cohérent avec la formation « {formation.intitule || "(intitulé à renseigner)"} ».
+          </div>
+        </div>
+      )}
 
       {/* Progress */}
       {generating && (
