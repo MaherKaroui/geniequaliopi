@@ -355,6 +355,10 @@ function ThemeMiniPreview({ theme, primary, secondary, bodyFont, headFont }: { t
     techstartup: { background: `linear-gradient(135deg,${primary}10,${secondary}10)`, border: `1px solid ${primary}20`, borderRadius: 10, padding: "4px 8px", ...common, fontFamily: bodyFont, color: primary },
     botanique: { background: "#f7f3ea", borderLeft: `3px solid ${primary}`, padding: "4px 8px", ...common, fontFamily: bodyFont, color: primary, fontStyle: "italic" as const },
     suisse: { background: "#fff", borderLeft: `4px solid ${secondary}`, padding: "4px 8px", ...common, fontFamily: bodyFont, color: "#111", fontWeight: 500 },
+    monochrome: { background: "#fafafa", borderLeft: "3px solid #000", padding: "4px 8px", ...common, fontFamily: bodyFont, color: "#000" },
+    pastel: { background: `${primary}12`, borderRadius: 12, padding: "5px 10px", ...common, fontFamily: bodyFont, color: primary },
+    presse: { background: "#fcfaf5", borderTop: "0.5px solid #000", borderBottom: "0.5px solid #000", padding: "5px 8px", ...common, fontFamily: bodyFont, color: "#222", fontStyle: "italic" as const },
+    terracotta: { background: `${primary}10`, borderLeft: `3px solid ${secondary}`, borderRadius: "0 6px 6px 0", padding: "4px 8px", ...common, fontFamily: bodyFont, color: primary },
   };
 
   return (
