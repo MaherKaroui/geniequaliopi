@@ -678,10 +678,14 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
     await downloadFile(content, buildGenericFileName("BOOK_QUALIOPI_COMPLET", mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, ".doc"));
   };
 
-  const handleDownloadFeuilleRoute = () => {
+  const handleDownloadFeuilleRoute = async () => {
     try {
-      const blob = generateFeuilleRouteQualiopi(mergedOrganisme, catalog);
-      saveAs(blob, buildGenericFileName("FEUILLE_ROUTE_QUALIOPI", mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, ".xlsx"));
+      const { generateFeuilleRouteQualiopiUniversal } = await import("@/lib/feuilleRouteQualiopiUniversal");
+      const { detectTypeAction } = await import("@/lib/guideAuditUniversal");
+      const t = detectTypeAction(mergedOrganisme);
+      const type = t === "CFA" ? "AF" : t;
+      const blob = generateFeuilleRouteQualiopiUniversal(mergedOrganisme, catalog, [selectedFormation], allStagiaires, type);
+      saveAs(blob, buildGenericFileName(`FEUILLE_ROUTE_QUALIOPI_${type}`, mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, ".xlsx"));
       toast.success("Feuille de route Qualiopi téléchargée");
     } catch (e) {
       console.error(e);
