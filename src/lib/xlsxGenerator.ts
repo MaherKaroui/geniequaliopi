@@ -307,25 +307,25 @@ export function generateExcelTableauBordPerformance(o: OrganismeInfo, f: Formati
   const reuCell = (mIdx: number) => countPerMonth[mIdx] > 0 ? (monthIsPast(mIdx) ? "100%" : "En cours") : "";
 
   // Taux de satisfaction row
-  const satisfactionN1 = isVAE ? "N/A – Nouvel entrant" : "";
+  const satisfactionN1 = isVAE ? "N/A – Phase de lancement" : "";
   html += `<tr><td rowspan="3">${f.intitule || o.nom}</td><td>Taux de satisfaction appréciation des bénéficiaires</td><td>${satisfactionN1}</td>`;
   mois.forEach((_, i) => { html += `<td>${satCell(i)}</td>`; });
   html += `<td>${isVAE 
-    ? `${o.nom} est nouvel entrant sur l'activité VAE. ${nbStagiaires} ${nbStagiaires > 1 ? labelBeneficiaires : labelBeneficiaire} accompagné${nbStagiaires > 1 ? "s" : ""} pour l'année ${annee}. Les indicateurs seront renseignés au fur et à mesure de l'activité et diffusés dès qu'ils seront significatifs.`
+    ? `${o.nom} est en phase de lancement sur l'activité VAE. ${nbStagiaires} ${nbStagiaires > 1 ? labelBeneficiaires : labelBeneficiaire} accompagné${nbStagiaires > 1 ? "s" : ""} pour l'année ${annee}. Les indicateurs seront renseignés au fur et à mesure de l'activité et diffusés dès qu'ils seront significatifs.`
     : (termine
         ? `${f.intitule || o.nom} a reçu ${nbStagiaires} ${nbStagiaires > 1 ? labelBeneficiaires : labelBeneficiaire} pour l'année ${annee}. Nous avons été noté 10/10 sur le taux de satisfaction pour l'année ${annee} au critère 7.30. Nous communiquerons cet élément de diffusion sur notre programme de formation${o.siteWeb && o.siteWeb.trim() ? ` et sur ${isFacebookPage(o.siteWeb) ? 'notre page Facebook' : 'notre site internet'} (${o.siteWeb})` : ''}.`
         : `Formation en cours – ${nbStagiaires} ${nbStagiaires > 1 ? labelBeneficiaires : labelBeneficiaire} inscrit${nbStagiaires > 1 ? "s" : ""}. Les indicateurs définitifs seront consolidés à l'issue de la session et publiés${o.siteWeb && o.siteWeb.trim() ? ` sur ${isFacebookPage(o.siteWeb) ? 'notre page Facebook' : 'notre site internet'} (${o.siteWeb})` : ''}.`)}</td></tr>`;
 
   // Nombre de bénéficiaires row
-  html += `<tr><td>Nombre de ${labelBeneficiaires}</td><td>${isVAE ? "0 – Nouvel entrant" : "0"}</td>`;
+  html += `<tr><td>Nombre de ${labelBeneficiaires}</td><td>${isVAE ? "0 – Phase de lancement" : "0"}</td>`;
   mois.forEach((_, i) => { html += `<td>${countPerMonth[i] > 0 ? countPerMonth[i] : ""}</td>`; });
-  html += `<td>${isVAE ? `Nouvel entrant VAE – aucun ${labelBeneficiaire} accompagné en ${anneeN1}. Objectif prévisionnel ${annee} : ≥ 5 ${labelBeneficiaires}.` : ""}</td></tr>`;
+  html += `<td>${isVAE ? `Phase de lancement VAE – aucun ${labelBeneficiaire} accompagné en ${anneeN1}. Objectif prévisionnel ${annee} : ≥ 5 ${labelBeneficiaires}.` : ""}</td></tr>`;
 
   // Taux de réussite row (VAE specific: certification obtenue)
   const labelReussite = isVAE ? "Taux de validation (certification obtenue)" : "Taux de réussite";
-  html += `<tr><td>${labelReussite}</td><td>${isVAE ? "0 – Nouvel entrant" : "0"}</td>`;
+  html += `<tr><td>${labelReussite}</td><td>${isVAE ? "0 – Phase de lancement" : "0"}</td>`;
   mois.forEach((_, i) => { html += `<td>${reuCell(i)}</td>`; });
-  html += `<td>${isVAE ? `Nouvel entrant – aucun historique en ${anneeN1}. ${nbStagiaires} ${labelBeneficiaire}${nbStagiaires > 1 ? "s" : ""} en cours de validation pour ${annee}. Objectif prévisionnel : taux de validation totale ≥ 70%.` : ""}</td></tr>`;
+  html += `<td>${isVAE ? `Phase de lancement – aucun historique en ${anneeN1}. ${nbStagiaires} ${labelBeneficiaire}${nbStagiaires > 1 ? "s" : ""} en cours de validation pour ${annee}. Objectif prévisionnel : taux de validation totale ≥ 70%.` : ""}</td></tr>`;
 
   return excelWrap(`TABLEAU DE BORD INDICATEURS DE PERFORMANCE – ${annee}`, [{ name: "Tableau de bord", html }]);
 }
