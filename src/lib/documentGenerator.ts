@@ -6391,9 +6391,12 @@ function genVAENotificationDecision(o: OrganismeInfo, f: FormationInfo, stagiair
   const dateNotif = new Date(dateJury);
   dateNotif.setDate(dateNotif.getDate() + 7);
   const dateNotifStr = `${String(dateNotif.getDate()).padStart(2, "0")}/${String(dateNotif.getMonth() + 1).padStart(2, "0")}/${dateNotif.getFullYear()}`;
+  const tamponHtml = o.tamponUrl
+    ? `<div style="margin-top:40px;text-align:right"><p style="margin:0 0 6px;font-weight:600">Cachet de l'organisme</p><img src="${o.tamponUrl}" alt="Tampon" style="max-height:120px;max-width:200px;object-fit:contain" /></div>`
+    : `<div style="margin-top:40px;text-align:right"><p style="margin:0 0 6px;font-weight:600">Cachet de l'organisme</p></div>`;
   return buildDocument({ org: o, title: "NOTIFICATION DE DÉCISION DU JURY – VAE", sections: [
     { heading: "", content: `<p>${o.ville}, le ${dateNotifStr}</p><p>Madame, Monsieur ${s.nom},</p><p>Suite à votre passage devant le jury de Validation des Acquis de l'Expérience, nous avons le plaisir de vous notifier la décision suivante :</p><p style="text-align:center;font-size:16px;font-weight:bold;border:2px solid #2d8659;padding:15px;margin:15px 0">VALIDATION TOTALE<br>de la certification « ${f.intitule} »</p><p>L'ensemble des blocs de compétences a été validé par le jury. Votre certification sera éditée et transmise dans un délai de 4 à 6 semaines.</p><p>Nous vous adressons nos sincères félicitations pour cette réussite qui reconnaît officiellement les compétences acquises au cours de votre parcours professionnel.</p><p>Cordialement,</p>` },
-  ], signatures: { type: "2", labels: ["Le Dirigeant", "Le Candidat"], names: [o.dirigeant, `${s.prenom} ${s.nom}`], stagiaireSignatureUrl: s.signatureUrl, dates: [dateNotifStr, dateNotifStr] } });
+  ], extraHtml: tamponHtml });
 }
 
 function genVAEMoyensDedies(o: OrganismeInfo) {
