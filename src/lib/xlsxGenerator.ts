@@ -391,7 +391,7 @@ export function generateExcelIndicateursPrevisionnelsVAE(o: OrganismeInfo, f: Fo
   ];
   planning.forEach(r => html2 += tableRow(r));
 
-  return excelWrap(`INDICATEURS PRÉVISIONNELS VAE – NOUVEL ENTRANT ${annee}`, [
+  return excelWrap(`INDICATEURS PRÉVISIONNELS VAE – ${annee}`, [
     { name: "Indicateurs prévisionnels", html },
     { name: "Planning suivi", html: html2 }
   ]);
