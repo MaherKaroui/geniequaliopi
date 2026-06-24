@@ -61,11 +61,39 @@ li{margin:3px 0;font-size:12.5px}
 
   // Cover
   const logo = org.logoUrl ? `<div style="margin-bottom:18px"><img src="${org.logoUrl}" alt="Logo" style="max-height:90px;max-width:240px;object-fit:contain"/></div>` : "";
-  html += `<div class="page"><div class="cover">${logo}<div class="badge-cfa">CFA · AUDIT INITIAL · NOUVEL ENTRANT</div><h1>BOOK QUALIOPI CFA</h1><div class="subtitle">Référentiel National Qualité V9 — 7 critères / 32 indicateurs</div><div class="subtitle" style="font-size:14px;opacity:.75">« Quoi dire à l'auditeur · Quels documents présenter »</div><div class="org"><strong>${org.nom}</strong><br>SIRET ${org.siret} · NDA ${org.nda}</div><div style="margin-top:30px;font-size:13px;opacity:.7">Édition : ${today} · Année ${annee}</div></div></div><div class="page-break"></div>`;
+  html += `<div class="page"><div class="cover">${logo}<div class="badge-cfa">CFA · ${getTypeAuditLabel(typeAudit)}</div><h1>BOOK QUALIOPI CFA</h1><div class="subtitle">Référentiel National Qualité V9 — 7 critères / 32 indicateurs</div><div class="subtitle" style="font-size:14px;opacity:.75">« Quoi dire à l'auditeur · Quels documents présenter »</div><div class="org"><strong>${org.nom}</strong><br>SIRET ${org.siret} · NDA ${org.nda}</div><div style="margin-top:30px;font-size:13px;opacity:.7">Édition : ${today} · Année ${annee}</div></div></div><div class="page-break"></div>`;
+
+  // Présentation OF / Formations / Stagiaires
+  const fmt = (d?: string) => d ? new Date(d).toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" }) : "—";
+  html += `<div class="page"><h1 class="sec-title">Présentation de l'organisme et du périmètre audité</h1>
+    <h3 style="color:#1d4ed8;margin-top:14px">Organisme de formation</h3>
+    <div class="box"><strong>${org.nom}</strong><br>
+      SIRET : ${org.siret} · NDA : ${org.nda}<br>
+      ${org.adresse || ""} ${org.codePostal || ""} ${org.ville || ""}<br>
+      ${org.telephone ? `Tél. : ${org.telephone} · ` : ""}${org.email ? `Email : ${org.email}` : ""}<br>
+      ${org.siteWeb ? `Site : ${org.siteWeb}<br>` : ""}
+      Dirigeant : ${org.dirigeant || "—"} · Responsable pédagogique : ${org.responsablePedagogique || "—"}<br>
+      Référent handicap : ${org.referentHandicap || "—"} · Référent qualité : ${org.referentQualite || "—"}<br>
+      Domaines : ${org.domainesFormation || "—"}<br>
+      Types d'actions : ${(org.typesActions || []).join(", ") || "—"}<br>
+      Certifications : ${org.certifications || "—"}
+    </div>
+    <h3 style="color:#1d4ed8;margin-top:18px">Formation(s) auditée(s) (${formations.length})</h3>
+    ${formations.map(f => `<div class="box"><strong>${f.intitule || "—"}</strong>${f.codeRNCP ? ` <span style="color:#64748b">(${f.codeRNCP})</span>` : ""}<br>
+      Durée : ${f.duree || "—"} · Modalités : ${f.modalites || "—"}<br>
+      Du ${fmt(f.dateDebut)} au ${fmt(f.dateFin)} · Lieu : ${f.lieu || "—"}<br>
+      Public : ${f.publicVise || "—"} · Tarif : ${f.tarif || "—"}<br>
+      Formateur : ${f.formateur || "—"}${f.rythmeAlternance ? `<br>Rythme alternance : ${f.rythmeAlternance}` : ""}
+    </div>`).join("")}
+    <h3 style="color:#1d4ed8;margin-top:18px">Apprenants (${stagiaires.length})</h3>
+    <table style="width:100%;border-collapse:collapse;font-size:11.5px"><thead><tr style="background:#1d4ed8;color:white"><th style="padding:6px;text-align:left">Apprenant</th><th style="padding:6px;text-align:left">Entreprise</th><th style="padding:6px;text-align:left">Période</th><th style="padding:6px;text-align:left">RQTH</th></tr></thead><tbody>
+    ${stagiaires.map((s, i) => `<tr style="background:${i%2?'#f1f5f9':'#fff'}"><td style="padding:6px;border-bottom:1px solid #e2e8f0">${s.civilite||""} ${s.prenom||""} ${s.nom||""}</td><td style="padding:6px;border-bottom:1px solid #e2e8f0">${s.entreprise || "—"}</td><td style="padding:6px;border-bottom:1px solid #e2e8f0">${fmt(s.dateDebutFormation)} → ${fmt(s.dateFinFormation)}</td><td style="padding:6px;border-bottom:1px solid #e2e8f0">${s.rqth === "oui" ? "Oui" : "Non"}</td></tr>`).join("")}
+    </tbody></table>
+  </div><div class="page-break"></div>`;
 
   // Mode d'emploi
   html += `<div class="page"><h1 class="sec-title">Comment utiliser ce Book</h1><p style="margin:10px 0">Pour chaque indicateur, vous trouverez : (1) le niveau attendu par l'auditeur selon le Guide V9, (2) un script de ce qu'il faut dire, (3) la liste des documents à présenter (croisée avec les documents générés par l'application), et (4) les points de vigilance.</p>
-  <div class="box warn"><strong>Spécificité nouvel entrant.</strong> Étant en première année, les indicateurs <strong>2, 3, 11, 13, 14, 19, 22, 24, 25, 26 et 32</strong> font l'objet de modalités adaptées : à l'audit initial, l'auditeur vérifie la <strong>formalisation</strong> du processus ; la mise en œuvre effective sera contrôlée à l'audit de surveillance.</div>
+  ${isNE ? `<div class="box warn"><strong>Spécificité nouvel entrant.</strong> Étant en première année, les indicateurs <strong>2, 3, 11, 13, 14, 19, 22, 24, 25, 26 et 32</strong> font l'objet de modalités adaptées : à l'audit initial, l'auditeur vérifie la <strong>formalisation</strong> du processus ; la mise en œuvre effective sera contrôlée à l'audit de surveillance.</div>` : `<div class="box warn"><strong>${getTypeAuditLabel(typeAudit)}.</strong> Tous les indicateurs font l'objet d'une vérification de la <strong>mise en œuvre effective</strong> avec preuves de résultats (taux, satisfaction, insertion, amélioration continue).</div>`}
   <div class="box"><strong>Pondération.</strong> Les indicateurs <strong>1, 2, 3, 8, 9, 12, 13, 17, 18, 19, 23, 24, 25, 28 et 30</strong> peuvent donner lieu à une NC mineure. Les autres entraînent une NC majeure en cas de non-respect.</div>
   <div class="box script"><strong>Principe d'or :</strong> la conformité repose sur l'appréciation de l'auditeur quant à la mise en œuvre, pas sur la simple présence d'un document. Parlez d'abord de votre processus, puis montrez la preuve.</div>
   </div><div class="page-break"></div>`;
