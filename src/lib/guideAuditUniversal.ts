@@ -152,7 +152,7 @@ function pointVigilance(num: number, type: TypeActionAudit): string | undefined 
 }
 
 const STYLES = `<style>
-body{font-family:'Segoe UI',Arial,sans-serif;color:#1a1a2e;line-height:1.55;font-size:13px;max-width:900px;margin:0 auto;padding:30px}
+body{font-family:'Segoe UI',Arial,sans-serif;color:#1a1a2e;line-height:1.55;font-size:13px;max-width:1100px;margin:0 auto;padding:30px}
 h1.title{font-size:30px;color:#0b2545;text-align:center;margin-bottom:6px}
 .sub{text-align:center;color:#475569;font-size:14px;margin-bottom:30px}
 .intro{background:#eff6ff;border-left:4px solid #1d4ed8;padding:16px;border-radius:8px;margin-bottom:24px}
@@ -164,6 +164,17 @@ h3.ind{font-size:15px;color:#0b2545;margin-top:22px;border-bottom:2px solid #1d4
 .dire{background:#eff6ff;border-left:4px solid #3b82f6;padding:10px 14px;border-radius:8px;margin:8px 0;font-style:italic}
 .docs{margin:8px 0}.docs li{margin:3px 0}
 .vigilance{background:#fffbeb;border-left:4px solid #f59e0b;padding:10px 14px;border-radius:8px;margin:8px 0;font-size:12.5px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0}
+.kpi{background:white;border:1px solid #cbd5e1;border-left:4px solid #1d4ed8;border-radius:8px;padding:10px 12px}
+.kpi .k{font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.4px}
+.kpi .v{font-size:18px;font-weight:700;color:#0b2545;margin-top:2px}
+table.fdr{width:100%;border-collapse:collapse;margin:10px 0;font-size:11.5px}
+table.fdr th{background:#0b2545;color:white;padding:8px 6px;text-align:left;font-weight:600;border:1px solid #0b2545}
+table.fdr td{padding:6px;border:1px solid #cbd5e1;vertical-align:top}
+table.fdr tr:nth-child(even) td{background:#f8fafc}
+.st-ok{background:#dcfce7;color:#166534;padding:2px 8px;border-radius:10px;font-weight:600;font-size:10.5px;white-space:nowrap}
+.st-part{background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:10px;font-weight:600;font-size:10.5px;white-space:nowrap}
+.st-ko{background:#fee2e2;color:#991b1b;padding:2px 8px;border-radius:10px;font-weight:600;font-size:10.5px;white-space:nowrap}
 .footer{margin-top:50px;text-align:center;color:#64748b;font-size:11px;border-top:1px solid #e2e8f0;padding-top:16px}
 </style>`;
 
