@@ -847,9 +847,8 @@ D) Drive faster to finish the ride.`,
     const blocTitre = blocLabels[exerciceIdx] || `Bloc ${exerciceIdx + 1}`;
     jourLabel = ` – ${blocTitre}`;
   } else if (!hasBlocs && exerciceIdx !== undefined && nbBlocks > 1) {
-    const days = getFormationDays(f);
-    const nbJours = days.length;
-    jourLabel = ` – Jour ${exerciceIdx * 2 + 1}-${Math.min(exerciceIdx * 2 + 2, nbJours)}`;
+    jourLabel = ` – Jour ${exerciceIdx + 1}`;
+
   } else {
     jourLabel = '';
   }
