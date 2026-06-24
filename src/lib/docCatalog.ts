@@ -1343,7 +1343,9 @@ export function buildFullCatalog(
 
     // IND 6 — Contenus et modalités adaptés
     add("vae_c2i6_programme_accompagnement", "CT2 - IND 6 Programme d'accompagnement VAE", 2, 6, "vae_programme_accompagnement");
-    add("vae_c2i6_livret2_vae", "CT2 - IND 6 Livret 2 VAE – Dossier de validation", 2, 6, "vae_livret2");
+    stagiaires.forEach((s, si) => {
+      add(`vae_c2i6_livret2_vae_${si}`, `CT2 - IND 6 Livret 2 VAE – Dossier de validation – ${s.prenom} ${s.nom}`, 2, 6, "vae_livret2", { stagiaireIdx: si });
+    });
     add("vae_c2i6_sequencage_vae", "CT2 - IND 6 Séquençage de la VAE", 2, 6, "vae_sequencage");
 
     // IND 8 — Positionnement à l'entrée
