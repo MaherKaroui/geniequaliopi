@@ -13310,7 +13310,7 @@ function genExamenBlancCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiair
   const dureeExamen = 2;
 
   let extra = `<h2>EXAMEN BLANC – ${f.intitule.toUpperCase()}</h2>
-    <p><strong>L'apprenti(e) :</strong> ............................................................</p>
+    <p><strong>L'apprenti(e) :</strong> ${s.civilite || ""} ${s.prenom || ""} ${s.nom || ""}</p>
     <p><strong>Date :</strong> ${termine ? formatDate(f.dateFin) : '___/___/______'}</p>
     <p><strong>Durée de l'épreuve :</strong> ${dureeExamen} heures</p>`;
 
