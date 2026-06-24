@@ -193,15 +193,59 @@ function generateGuideAutres(
   html += `<h1 class="title">GUIDE DE PRÉPARATION À L'AUDIT QUALIOPI</h1>
   <div class="sub">${label} — ${org.nom}<br>Référentiel National Qualité V9 — ${indicateurs.length} indicateurs applicables · Édition du ${today}</div>
 
-  <h2 class="crit" style="font-size:16px">Périmètre audité</h2>
-  <div class="lvl"><strong>Organisme : ${org.nom}</strong> — SIRET ${org.siret || "—"} · NDA ${org.nda || "—"}<br>
+  <h2 class="crit" style="font-size:16px">1. Organisme audité</h2>
+  <div class="lvl">
+    <strong>${org.nom}</strong><br>
+    SIRET : ${org.siret || "—"} · NDA : ${org.nda || "—"}${org.certifications ? ` · Certifications : ${org.certifications}` : ""}<br>
     ${org.adresse || ""} ${org.codePostal || ""} ${org.ville || ""}<br>
-    Dirigeant : ${org.dirigeant || "—"} · Resp. pédagogique : ${org.responsablePedagogique || "—"} · Réf. handicap : ${org.referentHandicap || "—"} · Réf. qualité : ${org.referentQualite || "—"}<br>
-    Type d'action audité : <strong>${label}</strong>
+    ${org.telephone ? `Tél. : ${org.telephone} · ` : ""}${org.email ? `Email : ${org.email}` : ""}${org.siteWeb ? ` · Site : ${org.siteWeb}` : ""}<br>
+    <br>
+    <strong>Organisation interne :</strong><br>
+    • Dirigeant : ${org.dirigeant || "—"}<br>
+    • Responsable pédagogique : ${org.responsablePedagogique || "—"}<br>
+    • Référent handicap : ${org.referentHandicap || "—"}<br>
+    • Référent qualité : ${org.referentQualite || "—"}<br>
+    ${org.poleAdministratif ? `• Pôle administratif : ${org.poleAdministratif}<br>` : ""}
+    ${org.relationEntreprises ? `• Relation entreprises : ${org.relationEntreprises}<br>` : ""}
+    ${org.referentMobilite ? `• Référent mobilité : ${org.referentMobilite}<br>` : ""}
+    ${org.referentDecrochage ? `• Référent décrochage : ${org.referentDecrochage}<br>` : ""}
+    ${org.referentNumerique ? `• Référent numérique : ${org.referentNumerique}<br>` : ""}
+    <br>
+    <strong>Périmètre :</strong> ${label}${org.domainesFormation ? ` · Domaines : ${org.domainesFormation}` : ""}<br>
+    ${org.outilsUtilises ? `<strong>Outils :</strong> ${org.outilsUtilises}<br>` : ""}
+    <strong>Version SMQ :</strong> ${org.version || "—"} · MAJ : ${fmt(org.dateMaj)}
   </div>
-  ${formations.length ? `<p><strong>Prestation(s) auditée(s) (${formations.length}) :</strong></p>
-  <ul class="docs">${formations.map(f => `<li><strong>${f.intitule || "—"}</strong>${f.codeRNCP ? ` (${f.codeRNCP})` : ""} — ${f.duree || "—"} · ${fmt(f.dateDebut)} → ${fmt(f.dateFin)} · ${f.modalites || "—"}</li>`).join("")}</ul>` : ""}
-  ${stagiaires.length ? `<p><strong>${ben.charAt(0).toUpperCase()+ben.slice(1)}s (${stagiaires.length}) :</strong></p><ul class="docs">${stagiaires.map(s => `<li>${s.civilite||""} ${s.prenom||""} ${s.nom||""}${s.entreprise ? ` — ${s.entreprise}` : ""} (${fmt(s.dateDebutFormation)} → ${fmt(s.dateFinFormation)})</li>`).join("")}</ul>` : ""}
+
+  ${formations.length ? `<h2 class="crit" style="font-size:16px">2. Prestation(s) auditée(s) (${formations.length})</h2>
+  ${formations.map((f, i) => `<div class="lvl">
+    <strong>${i+1}. ${f.intitule || "—"}</strong>${f.codeRNCP ? ` <span class="tag">${f.codeRNCP}</span>` : ""}<br>
+    ${f.publicVise ? `• <strong>Public visé :</strong> ${f.publicVise}<br>` : ""}
+    ${f.prerequis ? `• <strong>Prérequis :</strong> ${f.prerequis}<br>` : ""}
+    ${f.objectifs ? `• <strong>Objectifs :</strong> ${f.objectifs}<br>` : ""}
+    ${f.programme ? `• <strong>Programme :</strong> ${f.programme}<br>` : ""}
+    • <strong>Durée :</strong> ${f.duree || "—"}${f.nombreParticipants ? ` · ${f.nombreParticipants} participant(s)` : ""}<br>
+    • <strong>Dates :</strong> ${fmt(f.dateDebut)} → ${fmt(f.dateFin)}${f.delaiAcces ? ` · Délai d'accès : ${f.delaiAcces}` : ""}<br>
+    ${f.modalites ? `• <strong>Modalités :</strong> ${f.modalites}<br>` : ""}
+    ${f.lieu ? `• <strong>Lieu :</strong> ${f.lieu}<br>` : ""}
+    ${f.moyensPedagogiques ? `• <strong>Moyens pédagogiques :</strong> ${f.moyensPedagogiques}<br>` : ""}
+    ${f.methodesEvaluation ? `• <strong>Modalités d'évaluation :</strong> ${f.methodesEvaluation}<br>` : ""}
+    ${f.tarif ? `• <strong>Tarif :</strong> ${f.tarif}<br>` : ""}
+    ${f.formateur ? `• <strong>Formateur(s) :</strong> ${f.formateur}` : ""}
+  </div>`).join("")}` : ""}
+
+  ${stagiaires.length ? `<h2 class="crit" style="font-size:16px">3. ${ben.charAt(0).toUpperCase()+ben.slice(1)}s concerné(e)s (${stagiaires.length})</h2>
+  ${stagiaires.map((s, i) => `<div class="lvl" style="font-size:12px">
+    <strong>${i+1}. ${s.civilite||""} ${s.prenom||""} ${s.nom||""}</strong>${s.dateNaissance ? ` · né(e) le ${fmt(s.dateNaissance)}` : ""}${s.rqth === "oui" ? ` <span class="tag spec">RQTH</span>` : ""}<br>
+    ${s.email ? `${s.email}` : ""}${s.telephone ? ` · ${s.telephone}` : ""}<br>
+    ${s.adresse || s.commune ? `${s.adresse || ""} ${s.codePostal || ""} ${s.commune || ""}<br>` : ""}
+    ${s.diplome ? `Diplôme/Niveau : ${s.diplome}<br>` : ""}
+    ${s.entreprise ? `<strong>Entreprise :</strong> ${s.entreprise}${s.poste ? ` — ${s.poste}` : ""}${s.responsableEntreprise ? ` · Resp. : ${s.responsableEntreprise}` : ""}<br>` : ""}
+    ${s.siretEntreprise ? `SIRET entreprise : ${s.siretEntreprise}<br>` : ""}
+    <strong>Parcours :</strong> ${fmt(s.dateDebutFormation)} → ${fmt(s.dateFinFormation)}${s.tarifFormation ? ` · ${s.tarifFormation}` : ""}${s.numeroAction ? ` · Action n° ${s.numeroAction}` : ""}
+    ${s.formateur ? `<br>Formateur affecté : ${s.formateur}` : ""}
+  </div>`).join("")}` : ""}
+
+  <h2 class="crit" style="font-size:16px">4. Indicateurs Qualiopi — Quoi dire à l'auditeur</h2>
 
   <div class="intro">
     <strong>Comment utiliser ce guide.</strong> Pour chaque indicateur applicable à votre activité (${label}), vous trouverez : (1) le niveau attendu par l'auditeur, (2) un script de ce qu'il faut dire adapté à votre périmètre, (3) la liste des documents à présenter, et (4) les points de vigilance.
