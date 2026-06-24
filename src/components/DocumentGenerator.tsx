@@ -792,6 +792,39 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
 
   const isBDCOrg = (mergedOrganisme.typesActions || []).includes("bilans-competences");
 
+  // ============ Guide Prépa Qualiopi universel (AF / CFA / BDC / VAE) ============
+  const [typeActionPrepa, setTypeActionPrepa] = useState<TypeActionAudit>(() => detectTypeAction(mergedOrganisme));
+  const [loadingGuidePrepa, setLoadingGuidePrepa] = useState(false);
+
+  const handlePreviewGuidePrepa = () => {
+    const content = generateGuideAuditUniversal(mergedOrganisme, [selectedFormation], catalog, allStagiaires, typeActionPrepa, typeAuditCFA);
+    setPreviewContent(content);
+    setPreviewTitle(`Guide Prépa Qualiopi — ${TYPE_ACTION_LABELS[typeActionPrepa]}`);
+    setCurrentDocId(`guide_prepa_${typeActionPrepa.toLowerCase()}`);
+    setEditing(false);
+  };
+
+  const handleDownloadGuidePrepa = async () => {
+    setLoadingGuidePrepa(true);
+    try {
+      const content = generateGuideAuditUniversal(mergedOrganisme, [selectedFormation], catalog, allStagiaires, typeActionPrepa, typeAuditCFA);
+      const baseName = buildGenericFileName(`GUIDE_PREPA_QUALIOPI_${typeActionPrepa}`, mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, "");
+      if (exportFormat === "pdf") {
+        const blob = await htmlToPdfBlob(content);
+        saveAs(blob, baseName + ".pdf");
+      } else {
+        const blob = htmlToWordBlobSync(content);
+        saveAs(blob, baseName + ".doc");
+      }
+      toast.success(`Guide Prépa Qualiopi ${typeActionPrepa} téléchargé`);
+    } catch (e) {
+      console.error("Guide prépa universel error:", e);
+      toast.error("Erreur génération guide prépa : " + (e instanceof Error ? e.message : String(e)));
+    } finally {
+      setLoadingGuidePrepa(false);
+    }
+  };
+
   const handleDownloadAll = () => {
     // BDC : on génère exclusivement le dossier "NT Conseils" (51 docs + 5 trames Excel/PDF)
     if (isBDCOrg) {
