@@ -118,6 +118,26 @@ const THEME_PRESETS: ThemePreset[] = [
     description: "Grille stricte, rouge pur, sans-serif géométrique, design Swiss style",
     defaults: { primaryColor: "#1a1a1a", secondaryColor: "#e30613", fontFamily: "'Inter', sans-serif", headingFont: "'Inter', sans-serif" }
   },
+  {
+    id: "monochrome", name: "Monochrome Pro",
+    description: "Noir & blanc pur, typographie forte, ultra professionnel sans couleur",
+    defaults: { primaryColor: "#000000", secondaryColor: "#525252", fontFamily: "'Inter', sans-serif", headingFont: "'Inter', sans-serif" }
+  },
+  {
+    id: "pastel", name: "Pastel Doux",
+    description: "Tons pastel poudrés, formes arrondies, ambiance moderne et douce",
+    defaults: { primaryColor: "#7c6fb8", secondaryColor: "#e8a87c", fontFamily: "'Manrope', sans-serif", headingFont: "'Plus Jakarta Sans', sans-serif" }
+  },
+  {
+    id: "presse", name: "Presse / Journal",
+    description: "Look journal classique, serif noire, filets, capitales — esprit éditorial",
+    defaults: { primaryColor: "#1a1a1a", secondaryColor: "#8b0000", fontFamily: "'PT Serif', serif", headingFont: "'Playfair Display', serif", fontSize: 13 }
+  },
+  {
+    id: "terracotta", name: "Terracotta Chaleureux",
+    description: "Terre cuite, sable et ocre, chaleureux et artisanal",
+    defaults: { primaryColor: "#a0522d", secondaryColor: "#c9a14a", fontFamily: "'Nunito', sans-serif", headingFont: "'Fraunces', serif" }
+  },
 ];
 
 const FONT_CATEGORIES = [
@@ -283,6 +303,10 @@ function ThemeMiniPreview({ theme, primary, secondary, bodyFont, headFont }: { t
     techstartup: { background: `linear-gradient(135deg,${primary},${secondary})`, color: "#fff", padding: "5px 12px", borderRadius: 10, fontFamily: headFont, fontWeight: 700, fontSize: 11 },
     botanique: { color: primary, fontFamily: headFont, fontWeight: 600, fontSize: 12, fontStyle: "italic" as const, borderBottom: `1px solid ${secondary}80`, paddingBottom: 3 },
     suisse: { color: "#111", fontFamily: headFont, fontWeight: 800, fontSize: 14, letterSpacing: -0.5, borderLeft: `4px solid ${secondary}`, paddingLeft: 6 },
+    monochrome: { color: "#000", fontFamily: headFont, fontWeight: 900, fontSize: 13, textTransform: "uppercase" as const, letterSpacing: 1, borderBottom: "3px solid #000", paddingBottom: 3 },
+    pastel: { background: `${primary}20`, color: primary, padding: "5px 12px", borderRadius: 14, fontFamily: headFont, fontWeight: 700, fontSize: 11 },
+    presse: { color: "#000", fontFamily: headFont, fontWeight: 900, fontSize: 14, textAlign: "center" as const, borderTop: "2px solid #000", borderBottom: "0.5px solid #000", padding: "4px 0", textTransform: "uppercase" as const, letterSpacing: 1 },
+    terracotta: { background: `${primary}15`, color: primary, padding: "4px 10px", borderLeft: `4px solid ${secondary}`, fontFamily: headFont, fontWeight: 700, fontSize: 11, borderRadius: "0 8px 8px 0" },
   };
 
   const thStyles: Record<DocTheme, React.CSSProperties> = {
@@ -305,6 +329,10 @@ function ThemeMiniPreview({ theme, primary, secondary, bodyFont, headFont }: { t
     techstartup: { background: `${primary}12`, color: primary, padding: "3px 5px", fontSize: 7, fontWeight: 700, borderRadius: 4 },
     botanique: { background: `${primary}15`, color: primary, padding: "3px 5px", fontSize: 7, fontWeight: 600, borderBottom: `1px solid ${primary}40` },
     suisse: { background: "#111", color: "#fff", padding: "3px 5px", fontSize: 7, fontWeight: 700, textTransform: "uppercase" as const },
+    monochrome: { background: "#000", color: "#fff", padding: "3px 5px", fontSize: 7, fontWeight: 800, textTransform: "uppercase" as const, letterSpacing: 0.5 },
+    pastel: { background: `${primary}15`, color: primary, padding: "3px 6px", fontSize: 7, fontWeight: 600, borderRadius: 6 },
+    presse: { background: "none", color: "#000", padding: "2px 4px", fontSize: 7, borderTop: "1px solid #000", borderBottom: "1px solid #000", fontWeight: 700, textTransform: "uppercase" as const, letterSpacing: 0.8 },
+    terracotta: { background: `${primary}18`, color: primary, padding: "3px 5px", fontSize: 7, fontWeight: 700, borderBottom: `1px solid ${primary}50` },
   };
 
   const sectionStyles: Record<DocTheme, React.CSSProperties> = {
@@ -327,6 +355,10 @@ function ThemeMiniPreview({ theme, primary, secondary, bodyFont, headFont }: { t
     techstartup: { background: `linear-gradient(135deg,${primary}10,${secondary}10)`, border: `1px solid ${primary}20`, borderRadius: 10, padding: "4px 8px", ...common, fontFamily: bodyFont, color: primary },
     botanique: { background: "#f7f3ea", borderLeft: `3px solid ${primary}`, padding: "4px 8px", ...common, fontFamily: bodyFont, color: primary, fontStyle: "italic" as const },
     suisse: { background: "#fff", borderLeft: `4px solid ${secondary}`, padding: "4px 8px", ...common, fontFamily: bodyFont, color: "#111", fontWeight: 500 },
+    monochrome: { background: "#fafafa", borderLeft: "3px solid #000", padding: "4px 8px", ...common, fontFamily: bodyFont, color: "#000" },
+    pastel: { background: `${primary}12`, borderRadius: 12, padding: "5px 10px", ...common, fontFamily: bodyFont, color: primary },
+    presse: { background: "#fcfaf5", borderTop: "0.5px solid #000", borderBottom: "0.5px solid #000", padding: "5px 8px", ...common, fontFamily: bodyFont, color: "#222", fontStyle: "italic" as const },
+    terracotta: { background: `${primary}10`, borderLeft: `3px solid ${secondary}`, borderRadius: "0 6px 6px 0", padding: "4px 8px", ...common, fontFamily: bodyFont, color: primary },
   };
 
   return (

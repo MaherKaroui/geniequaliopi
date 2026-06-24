@@ -1,4 +1,4 @@
-export type DocTheme = 'classique' | 'moderne' | 'elegant' | 'minimaliste' | 'bold' | 'nature' | 'academique' | 'corporate' | 'editorial' | 'neobrutaliste' | 'futuriste' | 'luxe' | 'scandinave' | 'artdeco' | 'consulting' | 'notarial' | 'techstartup' | 'botanique' | 'suisse';
+export type DocTheme = 'classique' | 'moderne' | 'elegant' | 'minimaliste' | 'bold' | 'nature' | 'academique' | 'corporate' | 'editorial' | 'neobrutaliste' | 'futuriste' | 'luxe' | 'scandinave' | 'artdeco' | 'consulting' | 'notarial' | 'techstartup' | 'botanique' | 'suisse' | 'monochrome' | 'pastel' | 'presse' | 'terracotta';
 export type HeadingStyle = 'line-bottom' | 'filled' | 'gradient' | 'left-bar' | 'underline-double' | 'plain' | 'pill';
 export type HeaderStyle = 'classic' | 'banner' | 'compact' | 'elegant' | 'boxed' | 'split';
 
