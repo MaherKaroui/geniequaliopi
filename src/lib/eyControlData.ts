@@ -11,6 +11,8 @@ export interface EYDocumentItem {
   autoTemplates: string[];
   /** Whether this document is per-stagiaire */
   perStagiaire: boolean;
+  /** Whether this document generates one file per training day (per stagiaire). Requires perStagiaire. */
+  perDay?: boolean;
   /** Category for grouping */
   category: EYCategory;
   /** Optional path to a static file in public/ that is pre-provided */
