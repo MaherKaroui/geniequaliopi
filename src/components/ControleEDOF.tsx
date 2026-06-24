@@ -246,6 +246,32 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
       const docFolder = options?.folderByDocument ? buildDocFolderName(eyDoc.label) : "";
 
       for (let si = 0; si < sourceStagiaires.length; si++) {
+        const stagiaire = sourceStagiaires[si];
+
+        // ----- Mode "un fichier par jour de formation" -----
+        if (eyDoc.perDay) {
+          const days = getStagiaireDays(stagiaire, formation);
+          const stagFolder = `${sanitizeFileSegment(`${stagiaire.prenom || ""}_${stagiaire.nom || ""}`) || `stagiaire_${si + 1}`}`;
+          for (let di = 0; di < days.length; di++) {
+            try {
+              const o = mergeOrganisme(organismeWithSignature);
+              const params = { stagiaireIdx: si, fi: 0, dayIdx: di };
+              const html = generateDocumentById(`ey_${eyDoc.code}`, eyDoc.autoTemplates[0], params, o, formation, sourceStagiaires);
+              if (html) {
+                const blob = await htmlToPdfBlob(html, options?.pdfOptions);
+                const dayName = `${eyDoc.code}_${stagFolder}_Jour_${String(di + 1).padStart(2, "0")}.pdf`;
+                const filePath = docFolder ? `${docFolder}/${stagFolder}/${dayName}` : `${stagFolder}/${dayName}`;
+                zip.file(filePath, blob);
+              }
+            } catch (e) {
+              console.error(`Error generating ${eyDoc.code} day ${di + 1} for stagiaire ${si}:`, e);
+            }
+            await yieldToBrowser((di + 1) % 3 === 0 ? 200 : 50);
+          }
+          options?.onItemDone?.(si + 1, sourceStagiaires.length);
+          continue;
+        }
+
         const result = await generateAutoDocForStagiaire(eyDoc, si, {
           pdfOptions: options?.pdfOptions,
           sourceStagiaires,
