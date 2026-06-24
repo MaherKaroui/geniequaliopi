@@ -693,11 +693,12 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
   const [loadingBookCFA, setLoadingBookCFA] = useState(false);
   const [loadingFeuilleRouteCFA, setLoadingFeuilleRouteCFA] = useState(false);
   const [loadingGuideAuditCFA, setLoadingGuideAuditCFA] = useState(false);
+  const [typeAuditCFA, setTypeAuditCFA] = useState<'initial' | 'surveillance' | 'renouvellement'>('initial');
 
   const handleDownloadBookCFA = async () => {
     setLoadingBookCFA(true);
     try {
-      const content = generateBookQualiopiCFA(mergedOrganisme, [selectedFormation], allStagiaires, catalog);
+      const content = generateBookQualiopiCFA(mergedOrganisme, [selectedFormation], allStagiaires, catalog, typeAuditCFA);
       await downloadFile(content, buildGenericFileName("BOOK_QUALIOPI_CFA", mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, ".doc"));
       toast.success("Book Qualiopi CFA téléchargé");
     } catch (e) {
@@ -709,7 +710,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
   };
 
   const handlePreviewBookCFA = () => {
-    const content = generateBookQualiopiCFA(mergedOrganisme, [selectedFormation], allStagiaires, catalog);
+    const content = generateBookQualiopiCFA(mergedOrganisme, [selectedFormation], allStagiaires, catalog, typeAuditCFA);
     setPreviewContent(content);
     setPreviewTitle("BOOK QUALIOPI CFA – Prépa audit");
     setCurrentDocId("book_qualiopi_cfa");
@@ -719,7 +720,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
   const handleDownloadFeuilleRouteCFA = async () => {
     setLoadingFeuilleRouteCFA(true);
     try {
-      const blob = generateFeuilleRouteQualiopiCFA(mergedOrganisme, catalog);
+      const blob = generateFeuilleRouteQualiopiCFA(mergedOrganisme, catalog, [selectedFormation], allStagiaires, typeAuditCFA);
       saveAs(blob, buildGenericFileName("FEUILLE_ROUTE_QUALIOPI_CFA", mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, ".xlsx"));
       toast.success("Feuille de route Qualiopi CFA téléchargée");
     } catch (e) {
@@ -733,7 +734,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
   const handlePreviewFeuilleRouteCFA = async () => {
     try {
       const XLSX = await import("xlsx");
-      const blob = generateFeuilleRouteQualiopiCFA(mergedOrganisme, catalog);
+      const blob = generateFeuilleRouteQualiopiCFA(mergedOrganisme, catalog, [selectedFormation], allStagiaires, typeAuditCFA);
       const buf = await blob.arrayBuffer();
       const wb = XLSX.read(buf, { type: "array" });
       let html = `<html><head><meta charset="utf-8"><style>
@@ -761,7 +762,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
   const handleDownloadGuideAuditCFA = async () => {
     setLoadingGuideAuditCFA(true);
     try {
-      const content = generateGuideAuditCFA(mergedOrganisme, [selectedFormation], catalog);
+      const content = generateGuideAuditCFA(mergedOrganisme, [selectedFormation], catalog, allStagiaires, typeAuditCFA);
       const baseName = buildGenericFileName("GUIDE_AUDIT_CFA_QUOI_DIRE", mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, "");
       if (exportFormat === "pdf") {
         const blob = await htmlToPdfBlob(content);
@@ -781,7 +782,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
   };
 
   const handlePreviewGuideAuditCFA = () => {
-    const content = generateGuideAuditCFA(mergedOrganisme, [selectedFormation], catalog);
+    const content = generateGuideAuditCFA(mergedOrganisme, [selectedFormation], catalog, allStagiaires, typeAuditCFA);
     setPreviewContent(content);
     setPreviewTitle("Guide audit CFA – Quoi dire");
     setCurrentDocId("guide_audit_cfa");
@@ -1523,9 +1524,23 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
                   PRÉPA AUDIT QUALIOPI CFA
                 </h3>
                 <p className="text-xs text-orange-900/70 mt-1.5 leading-relaxed">
-                  Pack spécial CFA (audit initial nouvel entrant) : 32 indicateurs V9 avec niveau attendu,
+                  Pack spécial CFA : 32 indicateurs V9 avec niveau attendu,
                   script « ce qu'il faut dire », preuves et points de vigilance. Format Dreamers Team.
+                  Inclut les détails de l'organisme, de la formation et des apprenants audités.
                 </p>
+              </div>
+              <div className="flex flex-col gap-1 min-w-[220px]">
+                <label className="text-[11px] font-semibold text-orange-900 uppercase tracking-wide">Type d'audit</label>
+                <Select value={typeAuditCFA} onValueChange={(v) => setTypeAuditCFA(v as any)}>
+                  <SelectTrigger className="h-9 bg-white border-orange-300 text-orange-900 text-xs">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="initial">Audit initial (nouvel entrant)</SelectItem>
+                    <SelectItem value="surveillance">Audit de surveillance</SelectItem>
+                    <SelectItem value="renouvellement">Audit de renouvellement</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 

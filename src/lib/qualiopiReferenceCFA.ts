@@ -210,8 +210,17 @@ export function getIndicateursByCritere(crit: number): IndicateurCFA[] {
   return INDICATEURS_CFA.filter(i => i.critere === crit);
 }
 
-export function getPonderationLabel(ind: IndicateurCFA): string {
-  if (ind.nouvelEntrant && ind.ponderable) return "NOUVEL ENTRANT · pondérable (NC mineure)";
-  if (ind.nouvelEntrant) return "NOUVEL ENTRANT · NC majeure";
+export type TypeAuditCFA = 'initial' | 'surveillance' | 'renouvellement';
+
+export function getTypeAuditLabel(t: TypeAuditCFA): string {
+  if (t === 'initial') return "AUDIT INITIAL · NOUVEL ENTRANT";
+  if (t === 'surveillance') return "AUDIT DE SURVEILLANCE";
+  return "AUDIT DE RENOUVELLEMENT";
+}
+
+export function getPonderationLabel(ind: IndicateurCFA, isNouvelEntrant: boolean = true): string {
+  const ne = isNouvelEntrant && ind.nouvelEntrant;
+  if (ne && ind.ponderable) return "NOUVEL ENTRANT · pondérable (NC mineure)";
+  if (ne) return "NOUVEL ENTRANT · NC majeure";
   return ind.ponderable ? "pondérable (NC mineure)" : "NC majeure";
 }
