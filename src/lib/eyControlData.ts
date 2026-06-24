@@ -193,6 +193,14 @@ export const EY_DOCUMENTS: EYDocumentItem[] = [
     category: "evaluation",
   },
   {
+    code: "32B",
+    label: "Exercices quotidiens — 1 par jour de formation",
+    description: "Un exercice par journée de formation pour chaque stagiaire (avec énoncé, production stagiaire et corrigé), généré par IA et varié d'un stagiaire à l'autre",
+    autoTemplates: ["ai_exercices_par_jour"],
+    perStagiaire: true,
+    category: "evaluation",
+  },
+  {
     code: "33",
     label: "Bilans intermédiaires",
     description: "Bilans intermédiaires des bénéficiaires réalisés par l'OF (pour prestations de plus de 3 mois)",
