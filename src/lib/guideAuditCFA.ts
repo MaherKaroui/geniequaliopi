@@ -40,12 +40,27 @@ h3.ind{font-size:15px;color:#0b2545;margin-top:22px;border-bottom:2px solid #1d4
 .preuve-ok{color:#16a34a;font-weight:600}
 </style>`;
 
+  const fmt = (d?: string) => d ? new Date(d).toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" }) : "—";
+
   let html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">${styles}</head><body>`;
   html += `<h1 class="title">GUIDE DE PRÉPARATION À L'AUDIT QUALIOPI</h1>
-  <div class="sub">CFA — ${org.nom} · Audit initial · Nouvel entrant<br>Référentiel National Qualité V9 — 7 critères / 32 indicateurs · Édition ${today}</div>
+  <div class="sub">CFA — ${org.nom} · ${getTypeAuditLabel(typeAudit)}<br>Référentiel National Qualité V9 — 7 critères / 32 indicateurs · Édition ${today}</div>
+
+  <h2 class="crit" style="font-size:16px">Périmètre audité</h2>
+  <div class="lvl"><strong>Organisme : ${org.nom}</strong> — SIRET ${org.siret} · NDA ${org.nda}<br>
+    ${org.adresse || ""} ${org.codePostal || ""} ${org.ville || ""}<br>
+    Dirigeant : ${org.dirigeant || "—"} · Resp. pédagogique : ${org.responsablePedagogique || "—"} · Réf. handicap : ${org.referentHandicap || "—"} · Réf. qualité : ${org.referentQualite || "—"}<br>
+    Domaines : ${org.domainesFormation || "—"} · Types d'actions : ${(org.typesActions || []).join(", ") || "—"}
+  </div>
+  <p><strong>Formation(s) auditée(s) (${formations.length}) :</strong></p>
+  <ul class="docs">${formations.map(f => `<li><strong>${f.intitule || "—"}</strong>${f.codeRNCP ? ` (${f.codeRNCP})` : ""} — ${f.duree || "—"} · ${fmt(f.dateDebut)} → ${fmt(f.dateFin)} · ${f.modalites || "—"} · Formateur : ${f.formateur || "—"}</li>`).join("")}</ul>
+  ${stagiaires.length ? `<p><strong>Apprenants (${stagiaires.length}) :</strong></p><ul class="docs">${stagiaires.map(s => `<li>${s.civilite||""} ${s.prenom||""} ${s.nom||""}${s.entreprise ? ` — ${s.entreprise}` : ""} (${fmt(s.dateDebutFormation)} → ${fmt(s.dateFinFormation)})</li>`).join("")}</ul>` : ""}
+
   <div class="intro">
     <strong>Comment utiliser ce guide.</strong> Pour chaque indicateur, vous trouverez : (1) le niveau attendu par l'auditeur selon le Guide V9, (2) un script de ce qu'il faut dire, (3) la liste des documents à présenter (croisée avec ceux générés par l'application), et (4) les points de vigilance.
-    <br><br><strong>Spécificité nouvel entrant.</strong> Pour les indicateurs 2, 3, 11, 13, 14, 19, 22, 24, 25, 26 et 32, à l'audit initial l'auditeur vérifie la <strong>formalisation</strong> du processus ; la mise en œuvre effective est contrôlée à la surveillance.
+    ${isNE
+      ? `<br><br><strong>Spécificité nouvel entrant.</strong> Pour les indicateurs 2, 3, 11, 13, 14, 19, 22, 24, 25, 26 et 32, à l'audit initial l'auditeur vérifie la <strong>formalisation</strong> du processus ; la mise en œuvre effective est contrôlée à la surveillance.`
+      : `<br><br><strong>${getTypeAuditLabel(typeAudit)}.</strong> L'auditeur vérifie la <strong>mise en œuvre effective</strong> sur l'ensemble des indicateurs (résultats, taux, satisfaction, amélioration continue).`}
     <br><br><strong>Principe d'or :</strong> la conformité repose sur l'appréciation de l'auditeur quant à la mise en œuvre, pas sur la simple présence d'un document. Parlez de votre processus, puis montrez la preuve.
   </div>`;
 
@@ -54,11 +69,11 @@ h3.ind{font-size:15px;color:#0b2545;margin-top:22px;border-bottom:2px solid #1d4
     INDICATEURS_CFA.filter(i => i.critere === parseInt(cNum)).forEach(ind => {
       const docs = docsByInd.get(ind.numero) || [];
       const tagsHtml = [
-        ind.nouvelEntrant ? `<span class="tag ne">NOUVEL ENTRANT</span>` : "",
+        isNE && ind.nouvelEntrant ? `<span class="tag ne">NOUVEL ENTRANT</span>` : "",
         ind.ponderable ? `<span class="tag min">pondérable</span>` : `<span class="tag maj">NC majeure</span>`,
       ].filter(Boolean).join("");
       html += `<h3 class="ind">Indicateur ${ind.numero} — ${ind.titre} ${tagsHtml}</h3>
-      <p style="color:#475569;font-size:12px"><em>${getPonderationLabel(ind)}</em></p>
+      <p style="color:#475569;font-size:12px"><em>${getPonderationLabel(ind, isNE)}</em></p>
       <div class="lvl"><strong>Niveau attendu :</strong> ${ind.niveauAttendu}</div>
       <div class="dire"><strong>✅ Ce qu'il faut dire :</strong> « ${ind.ceQuIlFautDire} »</div>
       <p><strong>📁 Documents à présenter</strong></p>
