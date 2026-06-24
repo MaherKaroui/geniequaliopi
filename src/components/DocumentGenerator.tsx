@@ -1512,59 +1512,75 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
       </div>
 
       <DocStyleConfigPanel style={docStyle} onChange={handleStyleChange} />
-      <div className="p-4 bg-gradient-to-r from-primary/5 to-accent/5 rounded-xl border-2 border-primary/20 flex items-center justify-between">
-        <div>
-          <h3 className="font-bold text-primary">BOOK QUALIOPI</h3>
-          <p className="text-xs text-muted-foreground">
-            Dossier complet : couverture, présentation, organigramme, sommaire, 32 indicateurs avec niveaux attendus et preuves
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={handlePreviewBook}>
-            Aperçu
-          </Button>
-          <Button variant="outline" size="sm" onClick={handleDownloadFeuilleRoute}>
-            Feuille de route (Excel)
-          </Button>
-          <Button size="sm" onClick={handleDownloadBook} className="bg-gradient-hero text-primary-foreground border-0">
-            Télécharger
-          </Button>
-        </div>
-      </div>
-
       {isCFAOrg && (
-        <div className="p-4 bg-gradient-to-r from-orange-500/10 to-amber-500/10 rounded-xl border-2 border-orange-400/40 flex items-center justify-between">
-          <div>
-            <h3 className="font-bold text-orange-700 flex items-center gap-2">
-              <span className="text-xs font-bold bg-orange-500 text-white px-2 py-0.5 rounded">CFA</span>
-              PRÉPA AUDIT QUALIOPI CFA
-            </h3>
-            <p className="text-xs text-muted-foreground mt-1">
-              Pack spécial CFA (audit initial nouvel entrant) : 32 indicateurs V9 avec niveau attendu, script "ce qu'il faut dire", preuves et vigilance. Format Dreamers Team.
-            </p>
-          </div>
-          <div className="flex gap-2 flex-wrap">
-            <Button variant="ghost" size="sm" onClick={handlePreviewGuideAuditCFA} className="text-orange-700">
-              Aperçu guide
-            </Button>
-            <Button variant="outline" size="sm" onClick={handleDownloadGuideAuditCFA} disabled={loadingGuideAuditCFA}>
-              {loadingGuideAuditCFA ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : null}
-              Guide audit (Quoi dire)
-            </Button>
-            <Button variant="ghost" size="sm" onClick={handlePreviewFeuilleRouteCFA} className="text-orange-700">
-              Aperçu feuille
-            </Button>
-            <Button variant="outline" size="sm" onClick={handleDownloadFeuilleRouteCFA} disabled={loadingFeuilleRouteCFA}>
-              {loadingFeuilleRouteCFA ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : null}
-              Feuille de route CFA (Excel)
-            </Button>
-            <Button variant="ghost" size="sm" onClick={handlePreviewBookCFA} className="text-orange-700">
-              Aperçu book
-            </Button>
-            <Button size="sm" onClick={handleDownloadBookCFA} disabled={loadingBookCFA} className="bg-orange-600 text-white border-0 hover:bg-orange-700">
-              {loadingBookCFA ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : null}
-              Book Qualiopi CFA
-            </Button>
+        <div className="relative overflow-hidden rounded-2xl border-2 border-orange-400/50 bg-gradient-to-br from-orange-50 via-amber-50 to-orange-100/60 shadow-md">
+          <div className="absolute top-0 right-0 w-40 h-40 bg-orange-400/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none" />
+          <div className="relative p-5 space-y-4">
+            <div className="flex items-start justify-between gap-4 flex-wrap">
+              <div className="flex-1 min-w-[260px]">
+                <h3 className="font-bold text-orange-800 flex items-center gap-2 text-base">
+                  <span className="text-[10px] font-bold bg-orange-600 text-white px-2 py-0.5 rounded tracking-wider">CFA</span>
+                  PRÉPA AUDIT QUALIOPI CFA
+                </h3>
+                <p className="text-xs text-orange-900/70 mt-1.5 leading-relaxed">
+                  Pack spécial CFA (audit initial nouvel entrant) : 32 indicateurs V9 avec niveau attendu,
+                  script « ce qu'il faut dire », preuves et points de vigilance. Format Dreamers Team.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              {/* Guide audit */}
+              <div className="bg-white/80 backdrop-blur-sm rounded-xl border border-orange-200 p-3 flex flex-col gap-2 hover:border-orange-400 transition-colors">
+                <div className="flex-1">
+                  <h4 className="text-sm font-semibold text-orange-900">Guide audit</h4>
+                  <p className="text-[11px] text-orange-900/60 leading-snug">Quoi dire à l'auditeur, indicateur par indicateur</p>
+                </div>
+                <div className="flex gap-1.5">
+                  <Button variant="ghost" size="sm" onClick={handlePreviewGuideAuditCFA} className="flex-1 h-8 text-xs text-orange-700 hover:bg-orange-100">
+                    Aperçu
+                  </Button>
+                  <Button size="sm" onClick={handleDownloadGuideAuditCFA} disabled={loadingGuideAuditCFA} className="flex-1 h-8 text-xs bg-orange-600 hover:bg-orange-700 text-white">
+                    {loadingGuideAuditCFA ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : null}
+                    Télécharger
+                  </Button>
+                </div>
+              </div>
+
+              {/* Feuille de route */}
+              <div className="bg-white/80 backdrop-blur-sm rounded-xl border border-orange-200 p-3 flex flex-col gap-2 hover:border-orange-400 transition-colors">
+                <div className="flex-1">
+                  <h4 className="text-sm font-semibold text-orange-900">Feuille de route</h4>
+                  <p className="text-[11px] text-orange-900/60 leading-snug">Tableau Excel de suivi des 32 indicateurs</p>
+                </div>
+                <div className="flex gap-1.5">
+                  <Button variant="ghost" size="sm" onClick={handlePreviewFeuilleRouteCFA} className="flex-1 h-8 text-xs text-orange-700 hover:bg-orange-100">
+                    Aperçu
+                  </Button>
+                  <Button size="sm" onClick={handleDownloadFeuilleRouteCFA} disabled={loadingFeuilleRouteCFA} className="flex-1 h-8 text-xs bg-orange-600 hover:bg-orange-700 text-white">
+                    {loadingFeuilleRouteCFA ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : null}
+                    Excel
+                  </Button>
+                </div>
+              </div>
+
+              {/* Book Qualiopi CFA */}
+              <div className="bg-white/80 backdrop-blur-sm rounded-xl border border-orange-200 p-3 flex flex-col gap-2 hover:border-orange-400 transition-colors">
+                <div className="flex-1">
+                  <h4 className="text-sm font-semibold text-orange-900">Book Qualiopi CFA</h4>
+                  <p className="text-[11px] text-orange-900/60 leading-snug">Dossier complet relié, prêt pour audit</p>
+                </div>
+                <div className="flex gap-1.5">
+                  <Button variant="ghost" size="sm" onClick={handlePreviewBookCFA} className="flex-1 h-8 text-xs text-orange-700 hover:bg-orange-100">
+                    Aperçu
+                  </Button>
+                  <Button size="sm" onClick={handleDownloadBookCFA} disabled={loadingBookCFA} className="flex-1 h-8 text-xs bg-orange-600 hover:bg-orange-700 text-white">
+                    {loadingBookCFA ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : null}
+                    Book
+                  </Button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )}
