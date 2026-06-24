@@ -10221,6 +10221,87 @@ function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: 
     };
   }
 
+  // === Early return : NTC (Négociateur Technico-Commercial – RNCP 39063) ===
+  if (isNTC) {
+    const ntcDiplomes = [
+      "Baccalauréat professionnel Métiers du commerce et de la vente",
+      "Baccalauréat général + une 1ère année de BTS NDRC non validée",
+      "BEP Vente-Action marchande + 3 ans d'expérience en magasin",
+      "Baccalauréat technologique STMG option Mercatique",
+      "BTS Management Commercial Opérationnel (MCO) – validé partiellement",
+      "CAP Employé de commerce multi-spécialités + Bac pro Commerce",
+      "Brevet des collèges + 6 ans d'expérience comme vendeur en concession auto",
+      "Baccalauréat professionnel Logistique + expérience en force de vente terrain",
+      "Titre professionnel Vendeur conseil en magasin (niveau 4)",
+      "Baccalauréat ES + 1 an de licence d'économie-gestion non validée",
+    ];
+    const ntcAttentes = [
+      `Permettre à ${s.prenom} de monter en compétences sur la prospection B2B structurée et le pilotage d'un portefeuille clients afin de prendre en charge un secteur dédié dès la fin de la certification.`,
+      `Professionnaliser notre équipe commerciale : maîtrise du cycle de vente complet (découverte, argumentation SONCAS, traitement des objections, closing) et tenue rigoureuse du CRM.`,
+      `Renforcer la capacité de ${s.prenom} à mener des négociations à fort enjeu avec des acheteurs professionnels et à défendre nos marges face à la pression tarifaire des grands comptes.`,
+      `Obtenir un collaborateur autonome sur la prospection multicanale (téléphone, LinkedIn Sales Navigator, emailing) et sur la qualification de leads, afin d'alimenter notre pipeline commercial sans dépendre uniquement du marketing.`,
+      `Préparer ${s.prenom} à la prise de fonction d'attaché commercial : tournées clients, RDV démonstration, reporting hebdo en CRM et participation aux revues de pipeline.`,
+    ];
+    const ntcMissions = [
+      `Prospecter une zone géographique dédiée (Île-de-France Sud), qualifier les leads entrants, prendre les RDV en visio ou en clientèle et tenir le CRM HubSpot à jour quotidiennement.`,
+      `Gérer un portefeuille d'une quarantaine de comptes PME/ETI : RDV de découverte, élaboration des propositions commerciales, négociation des conditions tarifaires et suivi de la facturation.`,
+      `Animer la force de vente terrain sur les salons professionnels (Salon des Maires, SIRHA, Equip'Hôtel), assurer les démonstrations produit et le suivi post-salon pendant 90 jours.`,
+      `Développer le canal grands comptes : appels d'offres publics et privés, montage des dossiers techniques et commerciaux, soutenances en comité d'achat et négociation des accords-cadres annuels.`,
+      `Assurer la prospection digitale via LinkedIn Sales Navigator et le social selling, alimenter le pipeline marketing-qualifié et transformer les leads en RDV qualifiés pour l'équipe commerciale.`,
+    ];
+    const ntcContribution = [
+      `Notre entreprise est en phase de structuration commerciale : disposer d'un négociateur technico-commercial certifié nous permettra de passer d'une logique d'opportunités à un véritable plan de prospection structuré.`,
+      `Le titre NTC RNCP 39063 atteste de compétences reconnues par le Ministère du Travail, gage de crédibilité auprès de nos clients grands comptes et de notre OPCO lors des audits de financement.`,
+      `Cette formation s'inscrit dans notre plan de développement des compétences : nous formons en alternance pour pérenniser nos recrutements et limiter le turnover sur les postes commerciaux.`,
+      `Renforcer notre force de vente avec un collaborateur formé aux méthodes modernes (CRM, social selling, négociation BtoB) nous donne un avantage concurrentiel sur des marchés en tension.`,
+      `Cette certification consolide notre démarche qualité Qualiopi et notre politique RH : promotion interne d'un téléconseiller vers le métier de négociateur technico-commercial par la voie de l'apprentissage.`,
+    ];
+    const ntcObjectif = [
+      `Obtenir le Titre Professionnel Négociateur Technico-Commercial (RNCP 39063, niveau 5) afin de pouvoir exercer comme commercial BtoB en CDI dans une PME du secteur industriel ou des services.`,
+      `Valider les 2 blocs de compétences du titre (BC1 – Élaborer une stratégie commerciale omnicanale / BC2 – Mettre en œuvre l'action commerciale) pour décrocher un poste d'attaché commercial avec un salaire fixe + variable supérieur à 30 K€ brut/an.`,
+      `Me reconvertir vers le métier de commercial terrain : passer d'une fonction sédentaire (téléconseil, accueil) à une activité de prospection et de négociation à forte rémunération variable.`,
+      `Sécuriser mon évolution interne : du poste actuel d'assistant commercial vers un poste de négociateur technico-commercial confirmé, avec gestion d'un portefeuille en propre et perspectives de management d'équipe à 3 ans.`,
+      `Devenir commercial indépendant (agent commercial inscrit au RSAC) après obtention de la certification, pour représenter plusieurs marques sur un secteur géographique dédié en BtoB.`,
+    ];
+    const ntcProjetPro = [
+      `Le titre NTC est aujourd'hui exigé sur quasiment toutes les offres de commercial BtoB de niveau attaché commercial : sans cette certification, mes candidatures sont systématiquement écartées au profit de profils diplômés.`,
+      `La maîtrise du CRM (HubSpot, Salesforce), des techniques de prospection multicanale et de la négociation BtoB me donnera la palette complète attendue par les recruteurs en agroalimentaire, industrie et services.`,
+      `La période en entreprise me permettra de construire un portefeuille de comptes et un track record chiffré (CA généré, taux de transformation, nombre de RDV) que je pourrai valoriser à la fin du contrat.`,
+      `Au-delà des techniques de vente, cette formation m'apporte la culture économique et juridique (droit commercial, conditions générales de vente, RGPD) indispensable pour traiter avec des acheteurs professionnels exigeants.`,
+      `Le titre est délivré par le Ministère du Travail et reconnu nationalement : il me permettra de candidater partout en France, y compris dans les groupes industriels où le diplôme reste un prérequis administratif.`,
+    ];
+    const ntcHandicap = isStagiairePSH(s)
+      ? [
+          "Oui, je bénéficie d'une RQTH. Je sollicite des aménagements : supports écrits agrandis pour les modules juridiques denses, temps majoré sur les ECF, et un point régulier avec le référent handicap pour adapter le rythme des périodes en entreprise (tournées commerciales, salons).",
+          "Oui, situation de handicap reconnue (RQTH). J'ai besoin d'un aménagement des horaires (pas de tournée client le matin tôt pour raisons médicales), d'un poste de travail ergonomique en entreprise et de pauses régulières lors des sessions théoriques au CFA.",
+          "Oui, je suis reconnu(e) travailleur handicapé. Je demande la mise en place d'un tutorat renforcé en entreprise, des supports pédagogiques adaptés et un accompagnement du référent handicap pour l'organisation des soutenances orales devant le jury de certification.",
+          "Oui, RQTH en cours de renouvellement. Je sollicite des aménagements pour les épreuves : temps majoré, salle isolée pour la mise en situation professionnelle, et un suivi médical compatible avec les déplacements commerciaux prévus en alternance.",
+        ]
+      : [
+          "Non, je ne suis pas en situation de handicap. Je n'ai pas besoin d'aménagement particulier pour suivre la formation ni pour les périodes en entreprise (tournées clients, RDV, déplacements).",
+          "Non, aucune situation de handicap déclarée. Je suis en mesure d'assurer les déplacements clients, les RDV en visio et les soutenances orales sans aménagement spécifique.",
+          "Non. Je suis en bonne santé et apte aux déplacements commerciaux fréquents qu'impose le métier de négociateur technico-commercial.",
+          "Non, pas de handicap. Aucune restriction médicale, permis B valide pour les tournées clients et bonne aisance à l'oral pour les RDV de négociation.",
+          "Non, je ne déclare aucun handicap. Je suis pleinement disponible pour les missions terrain (prospection physique, salons professionnels, RDV clients).",
+        ];
+    return {
+      civilite,
+      raisonSociale: hasEntreprise ? s.entreprise : "/",
+      attentes: hasEntreprise ? ntcAttentes[h(4) % ntcAttentes.length] : "/",
+      missions: hasEntreprise ? ntcMissions[h(5) % ntcMissions.length] : "/",
+      contribution: hasEntreprise ? ntcContribution[h(6) % ntcContribution.length] : "/",
+      diplome: ntcDiplomes[h(2) % ntcDiplomes.length],
+      objectif: ntcObjectif[h(7) % ntcObjectif.length],
+      budget: hasEntreprise
+        ? "Formation prise en charge dans le cadre du contrat d'apprentissage par l'OPCO de branche (niveau de prise en charge NPEC), sans reste à charge pour l'apprenant."
+        : "Financement personnel via le CPF (Compte Personnel de Formation), complété par un abondement France Travail dans le cadre du projet de reconversion professionnelle (PTP / AIF).",
+      projetPro: ntcProjetPro[h(8) % ntcProjetPro.length],
+      handicap: ntcHandicap[h(9) % ntcHandicap.length],
+    };
+  }
+
+
+
 
   let diplomes: string[];
   if (isFLE) {
