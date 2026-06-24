@@ -6984,17 +6984,17 @@ function genVAELivret2(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiaire
     const x = Math.abs((seedH + k * 2654435761) | 0);
     return ((x * 9301 + 49297) % 233280) / 233280;
   };
-  // Vary while keeping it realistic: at least one of (actuel/antérieur) true, savoir-faire usually true, besoin formation rare
-  const varyRow = (base: [boolean, boolean, boolean, boolean], k: number): [boolean, boolean, boolean, boolean] => {
-    let a = base[0], b = base[1], c = base[2], d = base[3];
-    const r1 = rand(k * 4 + 1), r2 = rand(k * 4 + 2), r3 = rand(k * 4 + 3), r4 = rand(k * 4 + 4);
-    if (r1 < 0.3) a = !a;
-    if (r2 < 0.4) b = !b;
-    if (r3 < 0.2) c = !c;
-    // besoin de formation : ~15% des lignes seulement
-    d = r4 < 0.15;
-    // garantir au moins une expérience cochée
-    if (!a && !b) { a = true; }
+  // Variation réaliste et bien remplie :
+  // - Savoir-faire : toujours coché (compétence acquise, principe même de la VAE)
+  // - Emploi actuel : ~70%, Emploi antérieur : ~80% (au moins l'un des deux garanti)
+  // - Besoin de formation : ~20% (ciblé, varie d'un stagiaire à l'autre)
+  const varyRow = (_base: [boolean, boolean, boolean, boolean], k: number): [boolean, boolean, boolean, boolean] => {
+    const r1 = rand(k * 4 + 1), r2 = rand(k * 4 + 2), r4 = rand(k * 4 + 4);
+    let a = r1 < 0.70;
+    let b = r2 < 0.80;
+    const c = true;
+    const d = r4 < 0.20;
+    if (!a && !b) { b = true; }
     return [a, b, c, d];
   };
   const savoirEtreRows = Object.entries(pack.savoirEtre).map(([label, base], idx) => {
