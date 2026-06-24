@@ -16010,23 +16010,39 @@ function genAITestPositionnement(o: OrganismeInfo, f: FormationInfo, stagiaires:
   const stagFini = isStagiaireFormationTerminee(s, f);
   const renderEmpty = mode === "fin" && !stagFini;
 
-  // Cible de score (DÉBUT) en fonction du nombre d'heures du stagiaire
-  // 15h → 6-7/10 ; plus d'heures → score plus bas (niveau initial plus faible, marge de progression)
+  // Cible de score (DÉBUT) en fonction du nombre d'heures (et jours) du stagiaire
   let targetCorrect: number | undefined;
   if (mode === "debut" && !isOpco) {
     const stagDuree = getStagiaireDuree(s, f);
     let hours = 0;
     const m1 = /(\d+)\s*[hH]/.exec(stagDuree) || /(\d+)\s*[hH]/.exec(f.duree || "") || /(\d+)\s*[hH]/.exec(f.intitule || "");
     if (m1) hours = parseInt(m1[1], 10);
-    if (!hours) hours = getStagiaireDays(s, f).length * 7;
-    const seedVar = (((s?.prenom || "").length + (s?.nom || "").length + si) % 2); // 0 ou 1 pour varier
-    if (hours <= 15) targetCorrect = 6 + seedVar;                 // 6 ou 7
-    else if (hours <= 20) targetCorrect = 5 + seedVar;            // 5 ou 6
-    else if (hours <= 30) targetCorrect = 4 + seedVar;            // 4 ou 5
-    else if (hours <= 40) targetCorrect = 3 + seedVar;            // 3 ou 4
-    else if (hours <= 65) targetCorrect = 2 + seedVar;            // 2 ou 3
-    else targetCorrect = 2;                                       // > 65h : très débutant
+    const days = getStagiaireDays(s, f).length;
+    if (!hours) hours = days * 7;
+    const seedBase = (s?.prenom || "").length * 13 + (s?.nom || "").length * 17 + si * 7;
+    const v2 = seedBase % 2;       // 0 ou 1
+    const v3 = seedBase % 3;       // 0, 1 ou 2
+
+    // Cas particulier : 12 jours + 40h → toujours 4
+    if (days >= 12 && hours >= 35 && hours <= 45) {
+      targetCorrect = 4;
+    } else if (hours <= 15) {
+      targetCorrect = 6 + v2;                     // 6 ou 7
+    } else if (hours <= 17) {
+      targetCorrect = 5 + v3;                     // 5, 6 ou 7
+    } else if (hours <= 20) {
+      targetCorrect = 5 + v3;                     // 5, 6 ou 7
+    } else if (hours <= 30) {
+      targetCorrect = 4 + v3;                     // 4, 5 ou 6
+    } else if (hours <= 40) {
+      targetCorrect = 4 + v2;                     // 4 ou 5
+    } else if (hours <= 65) {
+      targetCorrect = 3 + v3;                     // 3, 4 ou 5
+    } else {
+      targetCorrect = 3;                          // > 65h : très débutant
+    }
   }
+
 
   const answers = renderEmpty ? [] : answersForQCM(qcm, si, s, mode, isOpco, targetCorrect);
   let correct = 0;
