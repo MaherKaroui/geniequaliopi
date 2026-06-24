@@ -127,7 +127,7 @@ export function preuvesParIndicateur(num: number, type: TypeActionAudit, base: s
   return base;
 }
 
-function pointVigilance(num: number, type: TypeActionAudit): string | undefined {
+export function pointVigilance(num: number, type: TypeActionAudit): string | undefined {
   const v: Record<TypeActionAudit, Record<number, string>> = {
     AF: {
       1: "Vérifier les dates de mise à jour visibles sur chaque fiche et page web.",
