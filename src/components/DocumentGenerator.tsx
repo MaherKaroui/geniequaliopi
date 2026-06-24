@@ -698,7 +698,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
   const handleDownloadBookCFA = async () => {
     setLoadingBookCFA(true);
     try {
-      const content = generateBookQualiopiCFA(mergedOrganisme, [selectedFormation], allStagiaires, catalog);
+      const content = generateBookQualiopiCFA(mergedOrganisme, [selectedFormation], allStagiaires, catalog, typeAuditCFA);
       await downloadFile(content, buildGenericFileName("BOOK_QUALIOPI_CFA", mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, ".doc"));
       toast.success("Book Qualiopi CFA téléchargé");
     } catch (e) {
@@ -710,7 +710,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
   };
 
   const handlePreviewBookCFA = () => {
-    const content = generateBookQualiopiCFA(mergedOrganisme, [selectedFormation], allStagiaires, catalog);
+    const content = generateBookQualiopiCFA(mergedOrganisme, [selectedFormation], allStagiaires, catalog, typeAuditCFA);
     setPreviewContent(content);
     setPreviewTitle("BOOK QUALIOPI CFA – Prépa audit");
     setCurrentDocId("book_qualiopi_cfa");
@@ -720,7 +720,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
   const handleDownloadFeuilleRouteCFA = async () => {
     setLoadingFeuilleRouteCFA(true);
     try {
-      const blob = generateFeuilleRouteQualiopiCFA(mergedOrganisme, catalog);
+      const blob = generateFeuilleRouteQualiopiCFA(mergedOrganisme, catalog, [selectedFormation], allStagiaires, typeAuditCFA);
       saveAs(blob, buildGenericFileName("FEUILLE_ROUTE_QUALIOPI_CFA", mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, ".xlsx"));
       toast.success("Feuille de route Qualiopi CFA téléchargée");
     } catch (e) {
@@ -734,7 +734,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
   const handlePreviewFeuilleRouteCFA = async () => {
     try {
       const XLSX = await import("xlsx");
-      const blob = generateFeuilleRouteQualiopiCFA(mergedOrganisme, catalog);
+      const blob = generateFeuilleRouteQualiopiCFA(mergedOrganisme, catalog, [selectedFormation], allStagiaires, typeAuditCFA);
       const buf = await blob.arrayBuffer();
       const wb = XLSX.read(buf, { type: "array" });
       let html = `<html><head><meta charset="utf-8"><style>
@@ -762,7 +762,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
   const handleDownloadGuideAuditCFA = async () => {
     setLoadingGuideAuditCFA(true);
     try {
-      const content = generateGuideAuditCFA(mergedOrganisme, [selectedFormation], catalog);
+      const content = generateGuideAuditCFA(mergedOrganisme, [selectedFormation], catalog, allStagiaires, typeAuditCFA);
       const baseName = buildGenericFileName("GUIDE_AUDIT_CFA_QUOI_DIRE", mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, "");
       if (exportFormat === "pdf") {
         const blob = await htmlToPdfBlob(content);
@@ -782,7 +782,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
   };
 
   const handlePreviewGuideAuditCFA = () => {
-    const content = generateGuideAuditCFA(mergedOrganisme, [selectedFormation], catalog);
+    const content = generateGuideAuditCFA(mergedOrganisme, [selectedFormation], catalog, allStagiaires, typeAuditCFA);
     setPreviewContent(content);
     setPreviewTitle("Guide audit CFA – Quoi dire");
     setCurrentDocId("guide_audit_cfa");
