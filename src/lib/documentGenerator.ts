@@ -6976,21 +6976,48 @@ function genVAELivret2(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiaire
 <td style="border:1px solid #999;padding:6px;">${e.activites}</td>
 </tr>`).join("");
 
-  const savoirEtreRows = Object.entries(pack.savoirEtre).map(([label, [a, b, c, d]]) => `<tr>
+  // Deterministic per-stagiaire variation of the auto-evaluation grids
+  const seedBase = `${s.prenom || ""}${s.nom || ""}${si}`;
+  let seedH = 0;
+  for (let i = 0; i < seedBase.length; i++) seedH = (seedH * 31 + seedBase.charCodeAt(i)) | 0;
+  const rand = (k: number) => {
+    const x = Math.abs((seedH + k * 2654435761) | 0);
+    return ((x * 9301 + 49297) % 233280) / 233280;
+  };
+  // Vary while keeping it realistic: at least one of (actuel/antérieur) true, savoir-faire usually true, besoin formation rare
+  const varyRow = (base: [boolean, boolean, boolean, boolean], k: number): [boolean, boolean, boolean, boolean] => {
+    let a = base[0], b = base[1], c = base[2], d = base[3];
+    const r1 = rand(k * 4 + 1), r2 = rand(k * 4 + 2), r3 = rand(k * 4 + 3), r4 = rand(k * 4 + 4);
+    if (r1 < 0.3) a = !a;
+    if (r2 < 0.4) b = !b;
+    if (r3 < 0.2) c = !c;
+    // besoin de formation : ~15% des lignes seulement
+    d = r4 < 0.15;
+    // garantir au moins une expérience cochée
+    if (!a && !b) { a = true; }
+    return [a, b, c, d];
+  };
+  const savoirEtreRows = Object.entries(pack.savoirEtre).map(([label, base], idx) => {
+    const [a, b, c, d] = varyRow(base, idx + 100);
+    return `<tr>
 <td style="border:1px solid #999;padding:6px;">${label}</td>
 <td style="border:1px solid #999;padding:6px;text-align:center;">${cb(a)}</td>
 <td style="border:1px solid #999;padding:6px;text-align:center;">${cb(b)}</td>
 <td style="border:1px solid #999;padding:6px;text-align:center;">${cb(c)}</td>
 <td style="border:1px solid #999;padding:6px;text-align:center;">${cb(d)}</td>
-</tr>`).join("");
+</tr>`;
+  }).join("");
 
-  const techRows = Object.entries(pack.techniques).map(([label, [a, b, c, d]]) => `<tr>
+  const techRows = Object.entries(pack.techniques).map(([label, base], idx) => {
+    const [a, b, c, d] = varyRow(base, idx + 500);
+    return `<tr>
 <td style="border:1px solid #999;padding:6px;">${label}</td>
 <td style="border:1px solid #999;padding:6px;text-align:center;">${cb(a)}</td>
 <td style="border:1px solid #999;padding:6px;text-align:center;">${cb(b)}</td>
 <td style="border:1px solid #999;padding:6px;text-align:center;">${cb(c)}</td>
 <td style="border:1px solid #999;padding:6px;text-align:center;">${cb(d)}</td>
-</tr>`).join("");
+</tr>`;
+  }).join("");
 
   const ans = (txt: string) => `<p style="margin:6px 0 14px;padding:8px 10px;background:#f5f7fb;border-left:3px solid #2d6cdf;"><em>${txt}</em></p>`;
 
