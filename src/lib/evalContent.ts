@@ -1130,6 +1130,77 @@ EVAL_CONTENT["RPMS"] = {
   ],
 };
 
+// ===== MANAGEMENT (Initiation, Leadership, Management situationnel) =====
+EVAL_CONTENT["Management"] = {
+  qcmPositionnement: [
+    { question: "Quel est le rôle principal d'un manager ?", options: ["Faire le travail à la place de l'équipe", "Organiser, animer et faire progresser une équipe vers des objectifs", "Contrôler les pauses", "Représenter la hiérarchie uniquement"], correctIndex: 1 },
+    { question: "Qu'est-ce qu'un objectif SMART ?", options: ["Stratégique, Mobilisateur, Ambitieux, Réfléchi, Tactique", "Spécifique, Mesurable, Atteignable, Réaliste, Temporel", "Simple, Mobile, Adapté, Rapide, Tangible", "Spontané, Motivant, Adaptable, Rationnel, Total"], correctIndex: 1 },
+    { question: "Combien de styles de management décrivent Hersey & Blanchard ?", options: ["2", "3", "4", "6"], correctIndex: 2 },
+    { question: "La matrice d'Eisenhower permet de :", options: ["Évaluer un collaborateur", "Hiérarchiser les tâches selon urgence/importance", "Calculer la masse salariale", "Mesurer la satisfaction client"], correctIndex: 1 },
+    { question: "Que signifie la méthode DESC en gestion de conflit ?", options: ["Décrire, Exprimer, Spécifier, Conclure", "Diriger, Encadrer, Surveiller, Corriger", "Définir, Évaluer, Synthétiser, Communiquer", "Déléguer, Échanger, Solliciter, Contrôler"], correctIndex: 0 },
+    { question: "Quel levier de motivation N'EST PAS financier ?", options: ["Prime sur objectifs", "Reconnaissance et autonomie", "Augmentation de salaire", "Intéressement"], correctIndex: 1 },
+    { question: "Le feedback constructif doit être :", options: ["Public et général", "Factuel, bienveillant et orienté solution", "Différé de plusieurs mois", "Toujours négatif"], correctIndex: 1 },
+    { question: "Que désigne le « management situationnel » ?", options: ["Adapter son style au niveau de maturité du collaborateur", "Manager uniquement en réunion", "Manager à distance", "Manager par les chiffres"], correctIndex: 0 },
+    { question: "Quel est le risque principal d'une délégation mal préparée ?", options: ["Aucun risque", "Perte de contrôle et démotivation du collaborateur", "Augmentation du chiffre d'affaires", "Suppression du poste"], correctIndex: 1 },
+    { question: "L'entretien individuel sert principalement à :", options: ["Sanctionner le collaborateur", "Faire le point sur les objectifs, les besoins et la motivation", "Calculer la paie", "Réorganiser le bureau"], correctIndex: 1 },
+  ],
+  qcmFinal: [
+    { question: "S1 du management situationnel (Hersey & Blanchard) correspond à :", options: ["Délégatif", "Persuasif", "Participatif", "Directif"], correctIndex: 3 },
+    { question: "La 1re étape de la méthode DESC est :", options: ["Exprimer ses émotions", "Décrire les faits objectivement", "Conclure positivement", "Spécifier la solution"], correctIndex: 1 },
+    { question: "Un objectif SMART doit obligatoirement être :", options: ["Mesurable et limité dans le temps", "Confidentiel", "Fixé par la DRH uniquement", "Modifié chaque semaine"], correctIndex: 0 },
+    { question: "La pyramide de Maslow classe les besoins :", options: ["Par ordre alphabétique", "Du physiologique à l'accomplissement", "Par ordre de coût", "Par ancienneté"], correctIndex: 1 },
+    { question: "Pour conduire le changement, on commence par :", options: ["Annoncer la décision", "Diagnostiquer et partager la vision", "Sanctionner les opposants", "Recruter"], correctIndex: 1 },
+    { question: "Lequel est un signe de démotivation ?", options: ["Prise d'initiative", "Absentéisme et désengagement", "Demande de formation", "Participation aux réunions"], correctIndex: 1 },
+    { question: "Une réunion efficace nécessite :", options: ["Un ordre du jour, une durée, un compte-rendu et un plan d'action", "Aucune préparation", "Tous les collaborateurs présents", "Plus de 2 heures"], correctIndex: 0 },
+    { question: "Le feedback négatif se donne idéalement :", options: ["En public", "En entretien individuel, sur des faits précis", "Par email collectif", "Jamais"], correctIndex: 1 },
+    { question: "Le rôle du manager dans un conflit est de :", options: ["Prendre parti", "Faciliter le dialogue et accompagner vers une solution", "Ignorer le conflit", "Sanctionner systématiquement"], correctIndex: 1 },
+    { question: "L'intelligence émotionnelle inclut :", options: ["Empathie, conscience de soi, maîtrise de soi", "Calcul mental rapide", "Mémorisation des chiffres", "Vitesse de frappe"], correctIndex: 0 },
+  ],
+  exercices: [
+    {
+      titre: "QCM 1 — Rôle, posture et missions du manager",
+      consigne: "Cochez la bonne réponse pour chacune des 10 questions :\n\n1) Le rôle principal d'un manager est de :\n  A) Faire à la place de l'équipe   B) Organiser et faire progresser l'équipe vers des objectifs   C) Surveiller les pauses   D) Représenter la hiérarchie uniquement\n\n2) Une mission essentielle du manager de proximité est :\n  A) La paie   B) L'animation et le suivi de la performance   C) Le recrutement seul   D) La comptabilité\n\n3) La posture managériale repose sur :\n  A) L'autorité brute   B) L'exemplarité, l'écoute et la responsabilisation   C) Le contrôle permanent   D) La séduction\n\n4) Manager c'est d'abord :\n  A) Décider seul   B) Donner du sens et fixer un cap clair   C) Réaliser les tâches   D) Reporter les problèmes\n\n5) Le manager de proximité est responsable :\n  A) Du résultat de l'équipe et du développement des collaborateurs   B) Uniquement du chiffre d'affaires   C) Uniquement du planning   D) De rien\n\n6) Parmi ces activités, laquelle relève du manager ?\n  A) Fixer les objectifs et évaluer la performance   B) Faire la paie   C) Rédiger le bilan comptable   D) Recruter le directeur\n\n7) Le manager doit communiquer :\n  A) Le moins possible   B) De manière claire, régulière et adaptée à chaque collaborateur   C) Uniquement par mail   D) Seulement en cas de problème\n\n8) Le « savoir-être » du manager comprend :\n  A) Écoute, exemplarité, respect, équité   B) Vitesse de saisie   C) Connaissance d'Excel   D) Diplôme uniquement\n\n9) L'autorité d'un manager repose principalement sur :\n  A) Son grade hiérarchique seul   B) Sa légitimité, ses compétences et la confiance de l'équipe   C) Sa voix forte   D) Son ancienneté\n\n10) Le 1er piège d'un manager qui prend son poste est :\n  A) Bien écouter avant d'agir   B) Tout changer immédiatement sans diagnostic   C) Fixer des objectifs   D) Présenter sa feuille de route",
+      reponseAttendue: "1-B  2-B  3-B  4-B  5-A  6-A  7-B  8-A  9-B  10-B"
+    },
+    {
+      titre: "Exercice 2 — Étude de cas : prise de poste du manager",
+      consigne: "Vous venez d'être nommé(e) manager d'une équipe de 6 personnes que vous ne connaissez pas. Le climat est tendu (turnover récent, objectifs non atteints depuis 2 trimestres). Décrivez votre plan d'action sur les 30 premiers jours : prise de contact, diagnostic, fixation d'objectifs SMART, premiers rituels d'équipe (réunion, point individuel), et indicateurs de réussite à 90 jours.",
+      reponseAttendue: "Plan structuré : Semaine 1 — rencontre individuelle de chaque collaborateur (30-45 min), écoute active, posture humble. Semaine 2 — diagnostic : forces, irritants, attentes, organisation. Semaine 3 — restitution collective, partage de la vision, co-construction des règles de fonctionnement (rituels : réunion hebdo de 30 min, point individuel mensuel de 45 min). Semaine 4 — fixation de 3 objectifs SMART d'équipe + 1 objectif individuel par collaborateur. Indicateurs à 90 jours : taux d'atteinte des objectifs, niveau d'engagement (baromètre), turnover, qualité du livrable. Posture : écouter avant de décider, ne pas tout changer, valoriser les premières réussites."
+    },
+    {
+      titre: "QCM 3 — Communication, styles et management situationnel",
+      consigne: "Cochez la bonne réponse pour chacune des 10 questions :\n\n1) Hersey & Blanchard décrivent combien de styles de management ?\n  A) 2   B) 3   C) 4   D) 6\n\n2) Le style « directif » convient :\n  A) À un collaborateur très autonome   B) À un collaborateur débutant nécessitant un cadre   C) À un expert reconnu   D) Jamais\n\n3) Le style « délégatif » s'utilise avec :\n  A) Un nouveau venu   B) Un collaborateur autonome et compétent   C) Un collaborateur démotivé   D) Une équipe en crise\n\n4) Le style « persuasif » mobilise :\n  A) Beaucoup de direction et beaucoup de soutien   B) Peu de direction et peu de soutien   C) Aucun cadre   D) Uniquement le contrôle\n\n5) L'écoute active suppose de :\n  A) Couper la parole pour gagner du temps   B) Reformuler, questionner, prendre en compte le non-verbal   C) Donner son avis immédiatement   D) Prendre des notes uniquement\n\n6) Une communication assertive consiste à :\n  A) S'écraser   B) Agresser   C) Exprimer son point de vue dans le respect de l'autre   D) Ignorer\n\n7) Le feedback constructif doit être :\n  A) Public et général   B) Factuel, daté, bienveillant et orienté solution   C) Délivré 6 mois après   D) Toujours négatif\n\n8) Adapter son style au collaborateur, c'est :\n  A) Du management situationnel   B) Du favoritisme   C) De l'incohérence   D) Inutile\n\n9) Dans un échange difficile, le manager doit d'abord :\n  A) Hausser le ton   B) Écouter et comprendre avant de répondre   C) Quitter la pièce   D) Sanctionner\n\n10) Une bonne consigne donnée à un collaborateur précise :\n  A) Le quoi, le pourquoi, le pour quand, les moyens et le critère de réussite   B) Uniquement la deadline   C) Seulement le quoi   D) Rien à l'écrit",
+      reponseAttendue: "1-C  2-B  3-B  4-A  5-B  6-C  7-B  8-A  9-B  10-A"
+    },
+    {
+      titre: "Exercice 4 — Mise en situation : entretien de feedback (méthode DESC)",
+      consigne: "Un de vos collaborateurs arrive régulièrement en retard depuis 3 semaines et l'équipe commence à en parler. Rédigez le déroulé complet de l'entretien individuel que vous allez mener en appliquant la méthode DESC (Décrire, Exprimer, Spécifier, Conclure). Donnez les phrases exactes que vous pourriez prononcer à chaque étape.",
+      reponseAttendue: "D — Décrire les faits : « Sur les 3 dernières semaines, j'ai constaté 7 arrivées après 9h15, soit en moyenne 20 minutes de retard. » E — Exprimer le ressenti : « Cela me met en difficulté pour animer le brief du matin et plusieurs collègues m'en ont parlé. » S — Spécifier la solution attendue : « J'ai besoin que tu sois présent à 9h, comme prévu dans ton contrat. Si tu rencontres une difficulté ponctuelle, je veux que tu me préviennes la veille. » C — Conclure positivement : « Je sais que tu peux le faire, et j'apprécie ton travail sur le projet X. On fait un point dans 15 jours pour valider que tout est revenu à la normale. » Le ton est posé, le regard direct, le manager laisse au collaborateur le temps de s'exprimer entre chaque étape."
+    },
+    {
+      titre: "QCM 5 — Motivation, gestion des conflits et conduite du changement",
+      consigne: "Cochez la bonne réponse pour chacune des 10 questions :\n\n1) Un levier de motivation NON financier est :\n  A) Augmentation   B) Prime   C) Reconnaissance et autonomie   D) Intéressement\n\n2) La pyramide de Maslow place au sommet :\n  A) Les besoins physiologiques   B) Le besoin d'accomplissement de soi   C) La sécurité   D) L'argent\n\n3) Un conflit qui s'installe doit être :\n  A) Ignoré   B) Traité rapidement par le manager   C) Résolu par sanction immédiate   D) Confié à la DRH sans dialogue\n\n4) La méthode DESC sert à :\n  A) Calculer la paie   B) Mener une conversation difficile de manière structurée   C) Recruter   D) Planifier les congés\n\n5) En cas de conflit entre 2 collaborateurs, le manager :\n  A) Prend parti   B) Reçoit chacun, écoute, fait dialoguer et propose une solution   C) Mute l'un des deux   D) Ne fait rien\n\n6) Pour conduire un changement, on commence par :\n  A) Annoncer la décision   B) Diagnostiquer la situation et partager une vision claire   C) Sanctionner les opposants   D) Recruter\n\n7) La courbe du changement (Kübler-Ross adaptée) commence par :\n  A) Acceptation   B) Choc / déni   C) Engagement   D) Intégration\n\n8) Un signe d'engagement positif est :\n  A) Absentéisme   B) Prise d'initiative et entraide   C) Retrait   D) Conflits répétés\n\n9) Pour ancrer un changement, il faut :\n  A) Sanctionner   B) Former, accompagner et valoriser les premières réussites   C) Tout oublier   D) Recommencer\n\n10) Le rôle du manager face à la résistance au changement est de :\n  A) Forcer le passage   B) Écouter les craintes, expliquer le pourquoi, accompagner   C) Ignorer   D) Démissionner",
+      reponseAttendue: "1-C  2-B  3-B  4-B  5-B  6-B  7-B  8-B  9-B  10-B"
+    },
+    {
+      titre: "Exercice 6 — Projet pratique : plan d'action managérial 90 jours",
+      consigne: "À partir de votre futur poste (ou de votre poste actuel), construisez un plan d'action managérial sur 90 jours destiné à améliorer la performance et l'engagement d'une équipe de 5 à 8 personnes. Le plan doit comporter : 3 objectifs SMART, les rituels mis en place (réunions, points individuels), les outils utilisés (tableau de bord, baromètre, plan de développement), les indicateurs de réussite et les risques anticipés.",
+      reponseAttendue: "Plan structuré : 3 objectifs SMART (ex. : porter le taux de satisfaction client de 78% à 85% d'ici 90 jours ; réduire le délai moyen de traitement de 5 à 3 jours ; atteindre 100% des entretiens individuels réalisés). Rituels : réunion d'équipe hebdo (30 min, ordre du jour partagé), point individuel mensuel (45 min, sur les objectifs et les besoins), revue de performance trimestrielle. Outils : tableau de bord avec 4-5 KPIs visibles, baromètre d'engagement mensuel (3 questions), plan de développement individuel signé. Indicateurs de réussite : % d'atteinte des objectifs, score d'engagement, turnover, absentéisme, NPS client. Risques anticipés : résistance au changement (réponse : écoute + explication), surcharge (réponse : priorisation Eisenhower), démotivation (réponse : reconnaissance régulière, autonomie progressive). Posture : managérial bienveillant, exemplaire, à l'écoute, qui responsabilise."
+    },
+  ],
+  competences: ["Posture managériale", "Communication", "Fixation d'objectifs SMART", "Management situationnel", "Gestion des conflits (DESC)", "Conduite du changement", "Motivation et reconnaissance", "Entretien individuel"],
+  appreciations: [
+    "Très bonne appropriation des fondamentaux du management. Posture claire et alignée.",
+    "Bonne progression sur le management situationnel et la communication assertive.",
+    "Excellente mise en situation lors des entretiens de feedback (méthode DESC bien maîtrisée).",
+    "Niveau satisfaisant. Doit consolider la conduite du changement et la gestion des priorités.",
+    "Très bonne implication. Plan d'action managérial structuré et réaliste.",
+    "Bonne maîtrise des leviers de motivation non financiers. À l'aise dans la gestion de conflits.",
+  ],
+};
+
+
+
 // ===== ASSISTANT DE DIRECTION =====
 EVAL_CONTENT["Assistant de Direction"] = {
   qcmPositionnement: [
