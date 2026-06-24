@@ -1,7 +1,37 @@
 import { CourseChapter } from "./courseContent";
 
+// Banque d'images management (Unsplash, libres de droits) — une image par section, en rotation.
+const MANAGEMENT_IMAGES = [
+  "https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=1200&q=80", // équipe en réunion
+  "https://images.unsplash.com/photo-1556761175-4b46a572b786?w=1200&q=80",   // manager au tableau
+  "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=1200&q=80",   // brainstorming
+  "https://images.unsplash.com/photo-1552581234-26160f608093?w=1200&q=80",   // poignée de main
+  "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=1200&q=80",// entretien individuel
+  "https://images.unsplash.com/photo-1543269865-cbf427effbad?w=1200&q=80",   // équipe collaborative
+  "https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=1200&q=80",// réunion stratégique
+  "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=1200&q=80",   // pro en costume
+  "https://images.unsplash.com/photo-1497215842964-222b430dc094?w=1200&q=80",// open space
+  "https://images.unsplash.com/photo-1551836022-deb4988cc6c0?w=1200&q=80",   // formation
+  "https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=1200&q=80",   // post-it stratégie
+  "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1200&q=80",// équipe debout
+  "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=1200&q=80",// coaching
+  "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=1200&q=80",// femme manager
+  "https://images.unsplash.com/photo-1551434678-e076c223a692?w=1200&q=80",   // collaboration ordi
+  "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=1200&q=80",// objectifs/notes
+  "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=1200&q=80",// laptop café
+  "https://images.unsplash.com/photo-1531545514256-b1400bc00f31?w=1200&q=80",// équipe diverse
+  "https://images.unsplash.com/photo-1556745757-8d76bdb6984b?w=1200&q=80",   // brainstorm post-it
+  "https://images.unsplash.com/photo-1530099486328-e021101a494a?w=1200&q=80",// gantt planification
+];
+
+function bannerImage(idx: number, alt: string): string {
+  const url = MANAGEMENT_IMAGES[idx % MANAGEMENT_IMAGES.length];
+  return `<img src="${url}" alt="${alt.replace(/"/g, "'")}" style="width:100%;height:240px;object-fit:cover;border-radius:10px;margin:0 0 18px 0;display:block;page-break-inside:avoid" loading="lazy"/>`;
+}
+
 export function getManagementChapters(): CourseChapter[] {
-  return [
+  const chapters: CourseChapter[] = [
+
     {
       title: "Fondamentaux du management",
       description: "Comprendre les bases du management moderne, les différents styles de leadership et le rôle du manager.",
