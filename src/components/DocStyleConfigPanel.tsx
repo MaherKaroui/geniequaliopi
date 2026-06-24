@@ -329,6 +329,10 @@ function ThemeMiniPreview({ theme, primary, secondary, bodyFont, headFont }: { t
     techstartup: { background: `${primary}12`, color: primary, padding: "3px 5px", fontSize: 7, fontWeight: 700, borderRadius: 4 },
     botanique: { background: `${primary}15`, color: primary, padding: "3px 5px", fontSize: 7, fontWeight: 600, borderBottom: `1px solid ${primary}40` },
     suisse: { background: "#111", color: "#fff", padding: "3px 5px", fontSize: 7, fontWeight: 700, textTransform: "uppercase" as const },
+    monochrome: { background: "#000", color: "#fff", padding: "3px 5px", fontSize: 7, fontWeight: 800, textTransform: "uppercase" as const, letterSpacing: 0.5 },
+    pastel: { background: `${primary}15`, color: primary, padding: "3px 6px", fontSize: 7, fontWeight: 600, borderRadius: 6 },
+    presse: { background: "none", color: "#000", padding: "2px 4px", fontSize: 7, borderTop: "1px solid #000", borderBottom: "1px solid #000", fontWeight: 700, textTransform: "uppercase" as const, letterSpacing: 0.8 },
+    terracotta: { background: `${primary}18`, color: primary, padding: "3px 5px", fontSize: 7, fontWeight: 700, borderBottom: `1px solid ${primary}50` },
   };
 
   const sectionStyles: Record<DocTheme, React.CSSProperties> = {
