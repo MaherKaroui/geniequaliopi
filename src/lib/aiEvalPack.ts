@@ -188,3 +188,67 @@ export function noteForOpenQuestion(maxPoints: number, s: StagiaireInfo, si: num
   if (rand < 0.85) return Math.max(maxPoints - 1, Math.ceil(maxPoints * 0.8));
   return Math.max(Math.ceil(maxPoints * 0.7), 1);
 }
+
+/** Note ascendante : jour 1 ~55%, dernier jour ~95%. Déterministe par stagiaire. */
+export function noteForDayProgression(maxPoints: number, dayIdx: number, totalDays: number, s: StagiaireInfo, si: number): number {
+  if (maxPoints <= 0) return 0;
+  const t = totalDays <= 1 ? 1 : dayIdx / (totalDays - 1);
+  const baseRatio = 0.55 + t * 0.40; // 0.55 → 0.95
+  const seed = stagSeed(s, si, dayIdx * 23 + 7);
+  const jitter = (((seed % 100) / 100) - 0.5) * 0.06; // ±3%
+  const ratio = Math.max(0.45, Math.min(1, baseRatio + jitter));
+  return Math.max(1, Math.min(maxPoints, Math.round(maxPoints * ratio)));
+}
+
+/** Réponse humanisée : ton oral, hésitations, formulations propres au stagiaire, parfois plus courte. */
+export function humanizedStudentAnswer(reponseAttendue: string, s: StagiaireInfo, si: number, dayIdx: number, quality: number): string {
+  const seed = stagSeed(s, si, dayIdx * 19 + 3);
+  const openings = [
+    `Pour moi, `,
+    `Je pense que `,
+    `D'après ce que j'ai compris en cours, `,
+    `Si j'ai bien suivi, `,
+    `Alors, `,
+    `Moi je dirais que `,
+    `À mon avis, `,
+    `Je crois que `,
+  ];
+  const closings = [
+    ` Voilà ce que j'ai retenu.`,
+    ` C'est ce que le formateur nous a expliqué.`,
+    ` J'espère que ma réponse est correcte.`,
+    ` En tout cas c'est comme ça que je le comprends.`,
+    ``,
+    ` Je vais continuer à m'entraîner pour mieux maîtriser.`,
+  ];
+  const open = openings[seed % openings.length];
+  const close = closings[(seed >> 3) % closings.length];
+  const sentences = reponseAttendue.split(/(?<=[.!?])\s+/).filter(Boolean);
+  let kept = sentences;
+  if (quality < 0.7) kept = sentences.slice(0, Math.max(1, Math.ceil(sentences.length * 0.55)));
+  else if (quality < 0.85) kept = sentences.slice(0, Math.max(1, Math.ceil(sentences.length * 0.8)));
+  let body = kept.join(" ")
+    .replace(/\bC'est-à-dire\b/gi, "c'est à dire")
+    .replace(/\bnotamment\b/gi, "surtout");
+  if (body) body = body.charAt(0).toLowerCase() + body.slice(1);
+  return `${open}${body}${close}`.trim();
+}
+
+/** Variante humanisée d'une justification de réponse QCM. */
+export function humanizedQCMComment(correct: boolean, s: StagiaireInfo, si: number, dayIdx: number): string {
+  const seed = stagSeed(s, si, dayIdx * 11 + 1);
+  const ok = [
+    "Je suis sûr de ma réponse, on l'a vu en cours.",
+    "Je pense que c'est la bonne, le formateur l'a expliqué hier.",
+    "Pour moi c'est évident, j'ai bien retenu.",
+    "Je coche celle-ci, c'est ce qui correspond le mieux.",
+  ];
+  const ko = [
+    "Je ne suis pas sûr, je tente celle-ci.",
+    "J'hésite mais je choisis cette réponse.",
+    "Je crois que c'est celle-là, à confirmer.",
+    "Je n'ai pas bien compris cette notion, je réponds au mieux.",
+  ];
+  const pool = correct ? ok : ko;
+  return pool[seed % pool.length];
+}
