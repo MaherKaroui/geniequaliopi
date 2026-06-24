@@ -16422,7 +16422,7 @@ function genAIExercicesParJour(o: OrganismeInfo, f: FormationInfo, stagiaires: S
     extra += `</div>`;
   });
 
-  if (scoredCount > 0) {
+  if (scoredCount > 0 && !singleDay) {
     extra += `<div class="page-break" style="page-break-before:always"></div>`;
     const pct = Math.round((totalObtained / totalMax) * 100);
     extra += `<div class="section section-green" style="margin-top:20px">
