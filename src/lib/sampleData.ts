@@ -113,6 +113,24 @@ export const SAMPLE_FORMATEURS: FormateurInfo[] = [
 
 export const SAMPLE_FORMATIONS: FormationInfo[] = [
   {
+    intitule: "Initiation au Management",
+    objectifs: "Développer les compétences essentielles du management opérationnel afin d'encadrer, motiver et organiser une équipe de travail dans un environnement professionnel.\nÀ l'issue de la formation, le stagiaire sera capable de :\n- Identifier son rôle et ses responsabilités managériales.\n- Adapter son style de management aux situations et aux profils de collaborateurs.\n- Fixer des objectifs clairs (SMART) et assurer leur suivi.\n- Communiquer efficacement et gérer les tensions et conflits au sein de son équipe.\n- Motiver et fédérer une équipe autour d'un projet commun.",
+    prerequis: "Avoir une première expérience professionnelle, même courte, dans un contexte d'équipe. Être motivé à encadrer, coordonner ou animer une équipe.",
+    duree: "21 heures (3 jours)",
+    modalites: "présentiel",
+    tarif: "1 320 € par participant",
+    programme: "Module 1 : Comprendre le rôle du manager\n- Définition et finalités du management.\n- Les missions et responsabilités du manager.\n- Les différents styles de management (directif, persuasif, participatif, délégatif).\nModule 2 : Communiquer efficacement\n- Les fondamentaux de la communication interpersonnelle.\n- L'écoute active et la reformulation.\n- La gestion des conflits et des désaccords.\nModule 3 : Motiver et fédérer une équipe\n- Identifier les leviers de motivation individuels et collectifs.\n- Créer une dynamique d'équipe positive.\n- Encourager la coopération et l'engagement.\nModule 4 : Organiser et piloter l'activité\n- Fixer des objectifs SMART et suivre leur réalisation.\n- Déléguer efficacement.\n- Conduire une réunion ou un entretien individuel.\nModule 5 : Mise en pratique en entreprise\n- Études de cas réels tirés de l'environnement professionnel des stagiaires.\n- Élaboration d'un plan d'action individuel pour améliorer ses pratiques managériales.",
+    methodesEvaluation: "Avant la formation : test de positionnement pour mesurer les connaissances initiales.\nPendant la formation : QCM, exercices et cas pratiques.\nEn fin de formation : test de positionnement final.\nAprès la formation : attestation de fin de formation délivrée à chaque stagiaire ayant suivi la totalité du parcours.",
+    moyensPedagogiques: "Approche participative et interactive, études de cas réels et mises en situation professionnelle, ateliers collaboratifs et partages d'expériences. Supports de cours numériques et papier, fiches outils, vidéos et quiz d'auto-évaluation. Animation en salle équipée ou directement sur site professionnel.",
+    publicVise: "Salariés appelés à encadrer une équipe, futurs managers, chefs d'équipe, responsables de service, entrepreneurs souhaitant structurer le management de leur entreprise.",
+    delaiAcces: "14 jours minimum entre la demande d'inscription et l'entrée en formation",
+    dateDebut: "2025-03-10",
+    dateFin: "2025-03-12",
+    lieu: "Secrétariat Académie – 28 rue de la Bretonnerie, 95300 Pontoise (formation réalisée directement dans l'entreprise)",
+    nombreParticipants: "8",
+    formateur: "Fatiha Cheniti",
+  },
+  {
     intitule: "Excel Professionnel – Niveau Avancé",
     objectifs: "Maîtriser les tableaux croisés dynamiques, les formules avancées (RECHERCHEV, INDEX/EQUIV, SI imbriqués), les macros VBA de base, et la création de tableaux de bord professionnels.",
     prerequis: "Connaissance de base d'Excel (niveau intermédiaire requis)",
