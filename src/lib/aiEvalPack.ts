@@ -200,38 +200,75 @@ export function noteForDayProgression(maxPoints: number, dayIdx: number, totalDa
   return Math.max(1, Math.min(maxPoints, Math.round(maxPoints * ratio)));
 }
 
+/** Transformations "orales" pour casser le ton manuel scolaire. */
+function humanizeText(text: string, _seed: number, quality: number): string {
+  let t = text;
+  const swaps: [RegExp, string][] = [
+    [/\bIl convient de\b/gi, "il faut"],
+    [/\bIl est nécessaire de\b/gi, "on doit"],
+    [/\bIl est important de\b/gi, "c'est important de"],
+    [/\bAfin de\b/gi, "pour"],
+    [/\bnotamment\b/gi, "surtout"],
+    [/\bpar conséquent\b/gi, "du coup"],
+    [/\bainsi\b/gi, "comme ça"],
+    [/\bcependant\b/gi, "mais"],
+    [/\btoutefois\b/gi, "mais"],
+    [/\bnéanmoins\b/gi, "quand même"],
+    [/\bC'est-à-dire\b/gi, "c'est à dire"],
+    [/\beffectivement\b/gi, "en vrai"],
+    [/\bpermet de\b/gi, "ça sert à"],
+    [/\bconsiste à\b/gi, "c'est"],
+  ];
+  swaps.forEach(([re, rep]) => { t = t.replace(re, rep); });
+  if (quality < 0.7) {
+    t = t.replace(/\bil y a\b/gi, "ya").replace(/\bcela\b/gi, "ça").replace(/\bnous\b/gi, "on");
+  } else if (quality < 0.85) {
+    t = t.replace(/\bcela\b/gi, "ça").replace(/\bnous\b/gi, "on");
+  }
+  t = t.replace(/;\s*/g, ". ").replace(/\s+/g, " ").trim();
+  return t;
+}
+
 /** Réponse humanisée : ton oral, hésitations, formulations propres au stagiaire, parfois plus courte. */
 export function humanizedStudentAnswer(reponseAttendue: string, s: StagiaireInfo, si: number, dayIdx: number, quality: number): string {
   const seed = stagSeed(s, si, dayIdx * 19 + 3);
   const openings = [
-    `Pour moi, `,
-    `Je pense que `,
-    `D'après ce que j'ai compris en cours, `,
-    `Si j'ai bien suivi, `,
-    `Alors, `,
-    `Moi je dirais que `,
-    `À mon avis, `,
-    `Je crois que `,
+    `Pour moi, `, `Je pense que `, `Si j'ai bien compris en cours, `, `Alors, `,
+    `Moi je dirais que `, `À mon avis, `, `Je crois que `, `Bon, `,
+    `D'après ce qu'on a vu, `, `Je vais essayer : `,
   ];
   const closings = [
     ` Voilà ce que j'ai retenu.`,
     ` C'est ce que le formateur nous a expliqué.`,
     ` J'espère que ma réponse est correcte.`,
     ` En tout cas c'est comme ça que je le comprends.`,
-    ``,
+    ` Après je sais pas si c'est exactement ça.`,
+    ``, ``,
     ` Je vais continuer à m'entraîner pour mieux maîtriser.`,
   ];
+  const hesitations = ["euh, ", "alors, ", "en fait, ", "bon, ", "", "", ""];
+
   const open = openings[seed % openings.length];
   const close = closings[(seed >> 3) % closings.length];
+  const hesit = hesitations[(seed >> 5) % hesitations.length];
+
   const sentences = reponseAttendue.split(/(?<=[.!?])\s+/).filter(Boolean);
   let kept = sentences;
-  if (quality < 0.7) kept = sentences.slice(0, Math.max(1, Math.ceil(sentences.length * 0.55)));
-  else if (quality < 0.85) kept = sentences.slice(0, Math.max(1, Math.ceil(sentences.length * 0.8)));
-  let body = kept.join(" ")
-    .replace(/\bC'est-à-dire\b/gi, "c'est à dire")
-    .replace(/\bnotamment\b/gi, "surtout");
+  if (quality < 0.65) kept = sentences.slice(0, Math.max(1, Math.ceil(sentences.length * 0.45)));
+  else if (quality < 0.8) kept = sentences.slice(0, Math.max(1, Math.ceil(sentences.length * 0.7)));
+  else if (quality < 0.92) kept = sentences.slice(0, Math.max(1, Math.ceil(sentences.length * 0.9)));
+
+  let body = humanizeText(kept.join(" "), seed, quality);
   if (body) body = body.charAt(0).toLowerCase() + body.slice(1);
-  return `${open}${body}${close}`.trim();
+
+  const parts = body.split(/(?<=\.)\s+/);
+  if (parts.length > 1 && (seed % 3 === 0)) {
+    const mid = Math.floor(parts.length / 2);
+    parts[mid] = (hesitations[(seed >> 2) % hesitations.length] || "") + parts[mid];
+    body = parts.join(" ");
+  }
+
+  return `${open}${hesit}${body}${close}`.trim().replace(/\s+([.,])/g, "$1");
 }
 
 /** Variante humanisée d'une justification de réponse QCM. */
@@ -240,15 +277,45 @@ export function humanizedQCMComment(correct: boolean, s: StagiaireInfo, si: numb
   const ok = [
     "Je suis sûr de ma réponse, on l'a vu en cours.",
     "Je pense que c'est la bonne, le formateur l'a expliqué hier.",
-    "Pour moi c'est évident, j'ai bien retenu.",
-    "Je coche celle-ci, c'est ce qui correspond le mieux.",
+    "Pour moi c'est évident, j'ai bien retenu cette partie.",
+    "Je coche celle-ci, c'est ce qui correspond le mieux à mon avis.",
+    "Ça me paraît logique, je vais avec celle-là.",
+    "J'ai bien révisé hier soir, je suis confiant.",
   ];
   const ko = [
     "Je ne suis pas sûr, je tente celle-ci.",
-    "J'hésite mais je choisis cette réponse.",
-    "Je crois que c'est celle-là, à confirmer.",
+    "J'hésite mais je choisis cette réponse, on verra bien.",
+    "Je crois que c'est celle-là, à confirmer avec le formateur.",
     "Je n'ai pas bien compris cette notion, je réponds au mieux.",
+    "Bon, je tente ma chance avec cette option.",
+    "Pas évident pour moi, je coche au feeling.",
   ];
-  const pool = correct ? ok : ko;
+  return (correct ? ok : ko)[seed % (correct ? ok.length : ko.length)];
+}
+
+/** Appréciation formateur humanisée par exercice. */
+export function humanizedTeacherFeedback(note: number, max: number, s: StagiaireInfo, si: number, dayIdx: number): string {
+  const ratio = max > 0 ? note / max : 0;
+  const seed = stagSeed(s, si, dayIdx * 29 + 11);
+  const top = [
+    "Très bonne réponse, les notions clés sont bien restituées.",
+    "Excellent travail, raisonnement clair et structuré.",
+    "Bonne maîtrise du sujet, continuez ainsi.",
+    "Parfait, vous avez bien intégré le cours.",
+  ];
+  const mid = [
+    "Réponse correcte dans l'ensemble, à approfondir sur les détails techniques.",
+    "Bonne base, il manque quelques éléments pour être complet.",
+    "Sur la bonne voie, pensez à structurer davantage la réponse.",
+    "Globalement juste, attention au vocabulaire professionnel.",
+  ];
+  const low = [
+    "Réponse partielle, revoir la partie correspondante du cours.",
+    "Quelques notions à reprendre, n'hésitez pas à poser des questions.",
+    "Bon début mais incomplet, à retravailler.",
+    "Compréhension à consolider, je vous accompagne sur ce point.",
+  ];
+  const pool = ratio >= 0.85 ? top : ratio >= 0.6 ? mid : low;
   return pool[seed % pool.length];
 }
+
