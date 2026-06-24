@@ -54,7 +54,7 @@ export const emptyCV: CVData = {
   publications: "",
 };
 
-export type CVDesign = "classique" | "moderne" | "minimaliste" | "elegant" | "colore" | "sidebar" | "timeline" | "magazine" | "corporate";
+export type CVDesign = "classique" | "moderne" | "minimaliste" | "elegant" | "colore" | "sidebar" | "timeline" | "magazine" | "corporate" | "executive" | "swiss" | "harvard" | "consulting" | "monochrome" | "serif_pro";
 
 export const CV_DESIGNS: { id: CVDesign; label: string; description: string; accent: string }[] = [
   { id: "classique", label: "Classique", description: "Sobre et professionnel", accent: "#1e3a7b" },
@@ -66,6 +66,12 @@ export const CV_DESIGNS: { id: CVDesign; label: string; description: string; acc
   { id: "timeline", label: "Timeline", description: "Frise chronologique verticale", accent: "#7c3aed" },
   { id: "magazine", label: "Magazine", description: "Mise en page éditoriale 2 colonnes", accent: "#be185d" },
   { id: "corporate", label: "Corporate", description: "Bandeau couleur en-tête + sections épurées", accent: "#0369a1" },
+  { id: "executive", label: "Executive", description: "Fond blanc, header serif, ultra-pro", accent: "#1f2937" },
+  { id: "swiss", label: "Swiss", description: "Grille suisse, blanc total, rouge accent", accent: "#dc2626" },
+  { id: "harvard", label: "Harvard", description: "Format CV académique anglo-saxon", accent: "#7f1d1d" },
+  { id: "consulting", label: "Consulting", description: "Style McKinsey/BCG, bleu sobre", accent: "#1e40af" },
+  { id: "monochrome", label: "Monochrome", description: "100% noir & blanc, typographie forte", accent: "#000000" },
+  { id: "serif_pro", label: "Serif Pro", description: "Serif éditorial, blanc, raffiné", accent: "#374151" },
 ];
 
 // ===== HTML Generators =====
