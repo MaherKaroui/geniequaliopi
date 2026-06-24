@@ -1112,11 +1112,11 @@ export function buildFullCatalog(
     // IND 28 — Mobilisation des acteurs économiques et sociaux
     add("cfa_c6i28_orientation_pour_tous", "CT6 - IND 28 📁 ORIENTATION POUR TOUS", 6, 28, "pdf_static", { pdfUrl: "/pdfs/citoyennete/orientation_pour_tous.png" });
     add("cfa_c6i28_maitre_apprentissage_fiche", "CT6 - IND 28 📁 FICHE MAÎTRE D'APPRENTISSAGE 2025", 6, 28, "pdf_static", { pdfUrl: "/pdfs/citoyennete/maitre_apprentissage_fiche_2025.pdf" });
-    add("cfa_c6i28_reseau_partenaires", "CT6 - IND 28 📁 RÉSEAU DE PARTENAIRES SOCIO-ÉCONOMIQUES", 6, 28, "pdf_static", { pdfUrl: "/pdfs/citoyennete/reseau_partenaires_socio_economiques.pdf" });
+    add("cfa_c6i28_reseau_partenaires", "CT6 - IND 28 📁 RÉSEAU DE PARTENAIRES SOCIO-ÉCONOMIQUES", 6, 28, "pdf_static", { pdfUrl: "/__l5e/assets-v1/11ae6dae-236e-44e0-bdb6-9c31dabdf1ef/reseau_partenaires_socio_economiques.pdf" });
 
     // IND 29 — Insertion professionnelle et accompagnement
     add("cfa_c6i29_savoir_se_vendre", "CT6 - IND 29 📁 SAVOIR SE VENDRE – GUIDE MYCVFACTORY", 6, 29, "pdf_static", { pdfUrl: "/pdfs/citoyennete/savoir_se_vendre_guide.pdf" });
-    add("cfa_c6i29_atelier_entretien", "CT6 - IND 29 📁 ATELIER D'ENTRETIEN D'EMBAUCHE", 6, 29, "pdf_static", { pdfUrl: "/pdfs/citoyennete/atelier_entretien_embauche.pdf" });
+    add("cfa_c6i29_atelier_entretien", "CT6 - IND 29 📁 ATELIER D'ENTRETIEN D'EMBAUCHE", 6, 29, "pdf_static", { pdfUrl: "/__l5e/assets-v1/e2494eb0-5ff2-46ca-b54d-c50a9636f2ca/atelier_entretien_embauche.pdf" });
     add("cfa_c6i29_15_idees_cv", "CT6 - IND 29 📁 15 IDÉES POUR UN CV", 6, 29, "pdf_static", { pdfUrl: "/pdfs/citoyennete/15_idees_pour_un_cv.pdf" });
 
     // ===== CRITÈRE 7 — AMÉLIORATION CONTINUE (CFA) =====
