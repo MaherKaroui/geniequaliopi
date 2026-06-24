@@ -1583,13 +1583,16 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
               </Select>
             </div>
           </div>
-          <div className="bg-white/80 backdrop-blur-sm rounded-xl border border-blue-200 p-3 flex gap-1.5">
-            <Button variant="ghost" size="sm" onClick={handlePreviewGuidePrepa} className="flex-1 h-9 text-xs text-blue-700 hover:bg-blue-100">
+          <div className="bg-white/80 backdrop-blur-sm rounded-xl border border-blue-200 p-3 flex gap-1.5 flex-wrap">
+            <Button variant="ghost" size="sm" onClick={handlePreviewGuidePrepa} className="flex-1 h-9 text-xs text-blue-700 hover:bg-blue-100 min-w-[120px]">
               Aperçu du guide
             </Button>
-            <Button size="sm" onClick={handleDownloadGuidePrepa} disabled={loadingGuidePrepa} className="flex-1 h-9 text-xs bg-blue-600 hover:bg-blue-700 text-white">
+            <Button size="sm" onClick={handleDownloadGuidePrepa} disabled={loadingGuidePrepa} className="flex-1 h-9 text-xs bg-blue-600 hover:bg-blue-700 text-white min-w-[140px]">
               {loadingGuidePrepa ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : null}
               Télécharger ({exportFormat === "pdf" ? "PDF" : "Word"})
+            </Button>
+            <Button size="sm" onClick={handleDownloadFeuilleRoute} className="flex-1 h-9 text-xs bg-emerald-600 hover:bg-emerald-700 text-white min-w-[180px]">
+              Feuille de route Excel (32 indicateurs)
             </Button>
           </div>
         </div>
