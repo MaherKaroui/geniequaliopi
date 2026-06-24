@@ -12698,7 +12698,7 @@ function genBilanChaudStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: 
   }
   extra += `<p><strong>Date du bilan :</strong> ${formatDate(dateFin)} (dernier jour de formation)</p>`;
   extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%">
-    <tr><td><strong>L'apprenti(e) :</strong></td><td>............................................................</td></tr>
+    <tr><td><strong>L'apprenti(e) :</strong></td><td>${s.civilite || ""} ${s.prenom || ""} ${s.nom || ""}</td></tr>
     <tr><td><strong>Entreprise :</strong></td><td>${s.entreprise || "—"}</td></tr>
     <tr><td><strong>Formation :</strong></td><td>${f.intitule}</td></tr>
     <tr><td><strong>Formateur :</strong></td><td>${f.formateur}</td></tr>
@@ -13416,7 +13416,7 @@ function genGrilleAcquisitionCFAStagiaire(o: OrganismeInfo, f: FormationInfo, st
   const s = stagiaires[si] || stagiaires[0];
   const rncp = getRNCPByCode(f.codeRNCP || '');
   let extra = `<h2>GRILLE D'ACQUISITION DES COMPÉTENCES</h2>
-    <p><strong>L'apprenti(e) :</strong> ............................................................</p>
+    <p><strong>L'apprenti(e) :</strong> ${s.civilite || ""} ${s.prenom || ""} ${s.nom || ""}</p>
     <p><strong>Formation :</strong> ${f.intitule}</p>
     <p><strong>Date :</strong> ___/___/______</p>`;
 
