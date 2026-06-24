@@ -4,19 +4,24 @@
 // sont marqués en orange. Mention nouvel entrant / pondération incluse.
 
 import * as XLSX from "xlsx";
-import { OrganismeInfo, DocEntry } from "@/types/qualiopi";
-import { INDICATEURS_CFA, CRITERES_CFA, getPonderationLabel } from "./qualiopiReferenceCFA";
+import { OrganismeInfo, FormationInfo, StagiaireInfo, DocEntry } from "@/types/qualiopi";
+import { INDICATEURS_CFA, CRITERES_CFA, getPonderationLabel, TypeAuditCFA, getTypeAuditLabel } from "./qualiopiReferenceCFA";
 
 const CFA_SPECIFIQUES = new Set([13, 14, 15, 16, 20, 27, 28, 32]);
 
-function frDate(): string {
-  return new Date().toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" });
+function frDate(d?: string): string {
+  const dt = d ? new Date(d) : new Date();
+  return dt.toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" });
 }
 
 export function generateFeuilleRouteQualiopiCFA(
   org: OrganismeInfo,
-  catalog: DocEntry[]
+  catalog: DocEntry[],
+  formations: FormationInfo[] = [],
+  stagiaires: StagiaireInfo[] = [],
+  typeAudit: TypeAuditCFA = 'initial'
 ): Blob {
+  const isNE = typeAudit === 'initial';
   const docsByInd = new Map<number, string[]>();
   catalog.forEach(d => {
     if (!docsByInd.has(d.indicateur)) docsByInd.set(d.indicateur, []);
@@ -24,8 +29,10 @@ export function generateFeuilleRouteQualiopiCFA(
   });
 
   const rows: (string | number)[][] = [];
-  rows.push([`PRÉPARATION AUDIT QUALIOPI — CFA ${org.nom} — Audit initial (nouvel entrant) — ${frDate()}`]);
-  rows.push([`Référentiel National Qualité V9 — 7 critères / 32 indicateurs. Nouvel entrant : indicateurs 2, 3, 11, 13, 14, 19, 22, 24, 25, 26 et 32 — seule la FORMALISATION du processus est vérifiée à l'audit initial.`]);
+  rows.push([`PRÉPARATION AUDIT QUALIOPI — CFA ${org.nom} — ${getTypeAuditLabel(typeAudit)} — ${frDate()}`]);
+  rows.push([isNE
+    ? `Référentiel National Qualité V9 — 7 critères / 32 indicateurs. Nouvel entrant : indicateurs 2, 3, 11, 13, 14, 19, 22, 24, 25, 26 et 32 — seule la FORMALISATION du processus est vérifiée à l'audit initial.`
+    : `Référentiel National Qualité V9 — 7 critères / 32 indicateurs. ${getTypeAuditLabel(typeAudit)} : vérification de la MISE EN ŒUVRE effective sur tous les indicateurs.`]);
   rows.push([]);
   const header = ["Critère", "N°", "Indicateur", "Niveau attendu par l'auditeur (V9)", "✅ Ce qu'il faut DIRE", "📁 Documents à présenter", "⚠ Vigilance / Pondération"];
   rows.push(header);
