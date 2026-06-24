@@ -16398,9 +16398,10 @@ function genAIExercicesParJour(o: OrganismeInfo, f: FormationInfo, stagiaires: S
           const note = noteForDayProgression(exo.points, di, days.length, s, si);
           dayObtained += note;
           const answer = humanizedStudentAnswer(exo.reponseAttendue, s, si, di * 10 + ei, quality);
+          const feedback = humanizedTeacherFeedback(note, exo.points, s, si, di * 10 + ei);
           extra += `<p style="margin:6px 0;padding:6px;background:#fff;border-left:2px solid #64748b"><em>Production stagiaire :</em><br>${answer.replace(/\n/g, "<br>")}</p>
             <p style="margin:6px 0;padding:6px;background:#f0fdf4;border-left:2px solid #16a34a"><em>Corrigé attendu :</em><br>${exo.reponseAttendue}</p>
-            <p style="margin:4px 0 0 0"><strong>Note : ${note}/${exo.points}</strong></p>`;
+            <p style="margin:4px 0 0 0"><strong>Note : ${note}/${exo.points}</strong> — <em>${feedback}</em></p>`;
         } else {
           extra += `<p style="margin:6px 0;padding:6px;background:#fef3c7;border-left:2px solid #f59e0b"><em>Production stagiaire :</em> _____________________ <em>(à compléter)</em></p>
             <p style="margin:6px 0;padding:6px;background:#f0fdf4;border-left:2px solid #16a34a"><em>Corrigé attendu :</em><br>${exo.reponseAttendue}</p>
