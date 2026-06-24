@@ -80,6 +80,30 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
   const [progressText, setProgressText] = useState("");
   const fileInputRefs = useRef<Map<string, HTMLInputElement>>(new Map());
   const [selectedDocs, setSelectedDocs] = useState<Set<string>>(new Set());
+  const [aiPackReady, setAiPackReady] = useState<boolean>(() => !!getCachedPack(formation));
+  const [aiPackLoading, setAiPackLoading] = useState(false);
+
+  useEffect(() => {
+    setAiPackReady(!!getCachedPack(formation));
+  }, [formation]);
+
+  const handleGenerateAIPack = useCallback(async (force = false) => {
+    if (!formation.intitule?.trim()) {
+      toast.error("Renseignez d'abord l'intitulé de la formation");
+      return;
+    }
+    setAiPackLoading(true);
+    try {
+      if (force) clearCachedPack(formation);
+      await generateAIEvalPack(formation, force);
+      setAiPackReady(true);
+      toast.success("Pack d'évaluation IA généré — tests de positionnement et exercices prêts ✅");
+    } catch (e: any) {
+      toast.error("Erreur IA : " + (e?.message || "Échec de génération"));
+    } finally {
+      setAiPackLoading(false);
+    }
+  }, [formation]);
 
   // Preview state
   const [previewOpen, setPreviewOpen] = useState(false);
