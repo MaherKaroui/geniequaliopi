@@ -11,11 +11,12 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { CheckCircle2, Circle, Upload, Archive, Loader2, FileText, AlertTriangle, Sparkles, XCircle, ChevronDown, ChevronRight, Eye, Download, PenTool, Edit3, RotateCcw } from "lucide-react";
+import { CheckCircle2, Circle, Upload, Archive, Loader2, FileText, AlertTriangle, Sparkles, XCircle, ChevronDown, ChevronRight, Eye, Download, PenTool, Edit3, RotateCcw, Wand2 } from "lucide-react";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import { toast } from "sonner";
 import { useBackgroundJobs } from "@/lib/backgroundJobs";
+import { generateAIEvalPack, getCachedPack, clearCachedPack } from "@/lib/aiEvalPack";
 
 const yieldToBrowser = (ms = 0) => new Promise<void>(r => requestAnimationFrame(() => setTimeout(r, ms)));
 
