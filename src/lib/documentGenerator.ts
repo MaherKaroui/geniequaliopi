@@ -16244,7 +16244,10 @@ function genAIExercicesParJour(o: OrganismeInfo, f: FormationInfo, stagiaires: S
   const pack: AIEvalPack | null = getCachedPack(f);
   const s = stagiaires[si] || stagiaires[0];
   const days = getStagiaireDays(s, f);
-  const title = "EXERCICES QUOTIDIENS — UN EXERCICE PAR JOUR";
+  const singleDay = typeof onlyDayIdx === "number" && onlyDayIdx >= 0 && onlyDayIdx < days.length;
+  const title = singleDay
+    ? `EXERCICE — JOUR ${onlyDayIdx! + 1}`
+    : "EXERCICES QUOTIDIENS — UN EXERCICE PAR JOUR";
 
   if (!pack) return aiPackPlaceholder(o, f, title, s);
 
