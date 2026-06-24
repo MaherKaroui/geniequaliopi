@@ -200,6 +200,7 @@ export const EY_DOCUMENTS: EYDocumentItem[] = [
     description: "Un exercice par journée de formation pour chaque stagiaire (avec énoncé, production stagiaire et corrigé), généré par IA et varié d'un stagiaire à l'autre",
     autoTemplates: ["ai_exercices_par_jour"],
     perStagiaire: true,
+    perDay: true,
     category: "evaluation",
   },
   {
