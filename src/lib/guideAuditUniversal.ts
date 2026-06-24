@@ -46,7 +46,7 @@ export function detectTypeAction(org: OrganismeInfo): TypeActionAudit {
 
 // Script « ce qu'il faut dire » adapté par type d'action et par indicateur.
 // Si pas de variation spécifique, on dérive depuis niveauAttendu.
-function scriptParIndicateur(num: number, type: TypeActionAudit, niveauAttendu: string): string {
+export function scriptParIndicateur(num: number, type: TypeActionAudit, niveauAttendu: string): string {
   const b = ACTION_BENEFICIAIRE[type];
   const contextes: Record<TypeActionAudit, Record<number, string>> = {
     AF: {
