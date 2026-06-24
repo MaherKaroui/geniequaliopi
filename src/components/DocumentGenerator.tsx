@@ -709,7 +709,15 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
   const handleDownloadGuideAuditCFA = async () => {
     try {
       const content = generateGuideAuditCFA(mergedOrganisme, [selectedFormation], catalog);
-      await downloadFile(content, buildGenericFileName("GUIDE_AUDIT_CFA_QUOI_DIRE", mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, ".doc"));
+      const baseName = buildGenericFileName("GUIDE_AUDIT_CFA_QUOI_DIRE", mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, "");
+      if (exportFormat === "pdf") {
+        const blob = await htmlToPdfBlob(content);
+        saveAs(blob, baseName + ".pdf");
+      } else {
+        // Use the sync .doc fallback: more reliable than TurboDocx for large styled guides
+        const blob = htmlToWordBlobSync(content);
+        saveAs(blob, baseName + ".doc");
+      }
       toast.success("Guide audit CFA téléchargé");
     } catch (e) {
       console.error("Guide audit CFA error:", e);
