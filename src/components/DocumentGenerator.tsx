@@ -690,12 +690,34 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
 
   const isCFAOrg = (mergedOrganisme.typesActions || []).includes("apprentissage");
 
+  const [loadingBookCFA, setLoadingBookCFA] = useState(false);
+  const [loadingFeuilleRouteCFA, setLoadingFeuilleRouteCFA] = useState(false);
+  const [loadingGuideAuditCFA, setLoadingGuideAuditCFA] = useState(false);
+
   const handleDownloadBookCFA = async () => {
-    const content = generateBookQualiopiCFA(mergedOrganisme, [selectedFormation], allStagiaires, catalog);
-    await downloadFile(content, buildGenericFileName("BOOK_QUALIOPI_CFA", mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, ".doc"));
+    setLoadingBookCFA(true);
+    try {
+      const content = generateBookQualiopiCFA(mergedOrganisme, [selectedFormation], allStagiaires, catalog);
+      await downloadFile(content, buildGenericFileName("BOOK_QUALIOPI_CFA", mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, ".doc"));
+      toast.success("Book Qualiopi CFA téléchargé");
+    } catch (e) {
+      console.error(e);
+      toast.error("Erreur génération Book CFA : " + (e instanceof Error ? e.message : String(e)));
+    } finally {
+      setLoadingBookCFA(false);
+    }
   };
 
-  const handleDownloadFeuilleRouteCFA = () => {
+  const handlePreviewBookCFA = () => {
+    const content = generateBookQualiopiCFA(mergedOrganisme, [selectedFormation], allStagiaires, catalog);
+    setPreviewContent(content);
+    setPreviewTitle("BOOK QUALIOPI CFA – Prépa audit");
+    setCurrentDocId("book_qualiopi_cfa");
+    setEditing(false);
+  };
+
+  const handleDownloadFeuilleRouteCFA = async () => {
+    setLoadingFeuilleRouteCFA(true);
     try {
       const blob = generateFeuilleRouteQualiopiCFA(mergedOrganisme, catalog);
       saveAs(blob, buildGenericFileName("FEUILLE_ROUTE_QUALIOPI_CFA", mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, ".xlsx"));
@@ -703,10 +725,41 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
     } catch (e) {
       console.error(e);
       toast.error("Erreur lors de la génération de la feuille de route CFA");
+    } finally {
+      setLoadingFeuilleRouteCFA(false);
+    }
+  };
+
+  const handlePreviewFeuilleRouteCFA = async () => {
+    try {
+      const XLSX = await import("xlsx");
+      const blob = generateFeuilleRouteQualiopiCFA(mergedOrganisme, catalog);
+      const buf = await blob.arrayBuffer();
+      const wb = XLSX.read(buf, { type: "array" });
+      let html = `<html><head><meta charset="utf-8"><style>
+        body{font-family:Arial,sans-serif;padding:20px;color:#111}
+        h2{color:#c2410c;border-bottom:2px solid #c2410c;padding-bottom:6px;margin-top:24px}
+        table{border-collapse:collapse;width:100%;margin-bottom:24px;font-size:11px}
+        td,th{border:1px solid #ccc;padding:6px 8px;vertical-align:top}
+        th{background:#fed7aa;color:#7c2d12}
+        tr:nth-child(even){background:#fff7ed}
+      </style></head><body><h1 style="color:#c2410c">Feuille de route Qualiopi CFA</h1>`;
+      for (const name of wb.SheetNames) {
+        html += `<h2>${name}</h2>` + XLSX.utils.sheet_to_html(wb.Sheets[name]).replace(/<\/?html[^>]*>|<\/?body[^>]*>|<\/?head[^>]*>/g, "");
+      }
+      html += "</body></html>";
+      setPreviewContent(html);
+      setPreviewTitle("Feuille de route Qualiopi CFA (Excel)");
+      setCurrentDocId("feuille_route_cfa");
+      setEditing(false);
+    } catch (e) {
+      console.error(e);
+      toast.error("Aperçu indisponible : " + (e instanceof Error ? e.message : String(e)));
     }
   };
 
   const handleDownloadGuideAuditCFA = async () => {
+    setLoadingGuideAuditCFA(true);
     try {
       const content = generateGuideAuditCFA(mergedOrganisme, [selectedFormation], catalog);
       const baseName = buildGenericFileName("GUIDE_AUDIT_CFA_QUOI_DIRE", mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, "");
@@ -722,7 +775,17 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
     } catch (e) {
       console.error("Guide audit CFA error:", e);
       toast.error("Erreur génération guide audit : " + (e instanceof Error ? e.message : String(e)));
+    } finally {
+      setLoadingGuideAuditCFA(false);
     }
+  };
+
+  const handlePreviewGuideAuditCFA = () => {
+    const content = generateGuideAuditCFA(mergedOrganisme, [selectedFormation], catalog);
+    setPreviewContent(content);
+    setPreviewTitle("Guide audit CFA – Quoi dire");
+    setCurrentDocId("guide_audit_cfa");
+    setEditing(false);
   };
 
   const isBDCOrg = (mergedOrganisme.typesActions || []).includes("bilans-competences");
