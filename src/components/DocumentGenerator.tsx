@@ -7,6 +7,7 @@ import { generateFeuilleRouteQualiopi } from "@/lib/feuilleRouteQualiopi";
 import { generateBookQualiopiCFA } from "@/lib/bookQualiopiCFA";
 import { generateFeuilleRouteQualiopiCFA } from "@/lib/feuilleRouteQualiopiCFA";
 import { generateGuideAuditCFA } from "@/lib/guideAuditCFA";
+import { generateGuideAuditUniversal, detectTypeAction, TYPE_ACTION_LABELS, type TypeActionAudit } from "@/lib/guideAuditUniversal";
 import { setDocStyle } from "@/lib/docBuilder";
 import { SAMPLE_FORMATIONS, mergeStagiaires, mergeOrganisme } from "@/lib/sampleData";
 import { Button } from "@/components/ui/button";
@@ -791,6 +792,39 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
 
   const isBDCOrg = (mergedOrganisme.typesActions || []).includes("bilans-competences");
 
+  // ============ Guide Prépa Qualiopi universel (AF / CFA / BDC / VAE) ============
+  const [typeActionPrepa, setTypeActionPrepa] = useState<TypeActionAudit>(() => detectTypeAction(mergedOrganisme));
+  const [loadingGuidePrepa, setLoadingGuidePrepa] = useState(false);
+
+  const handlePreviewGuidePrepa = () => {
+    const content = generateGuideAuditUniversal(mergedOrganisme, [selectedFormation], catalog, allStagiaires, typeActionPrepa, typeAuditCFA);
+    setPreviewContent(content);
+    setPreviewTitle(`Guide Prépa Qualiopi — ${TYPE_ACTION_LABELS[typeActionPrepa]}`);
+    setCurrentDocId(`guide_prepa_${typeActionPrepa.toLowerCase()}`);
+    setEditing(false);
+  };
+
+  const handleDownloadGuidePrepa = async () => {
+    setLoadingGuidePrepa(true);
+    try {
+      const content = generateGuideAuditUniversal(mergedOrganisme, [selectedFormation], catalog, allStagiaires, typeActionPrepa, typeAuditCFA);
+      const baseName = buildGenericFileName(`GUIDE_PREPA_QUALIOPI_${typeActionPrepa}`, mergedOrganisme.nom, mergedOrganisme.version, mergedOrganisme.dateMaj, "");
+      if (exportFormat === "pdf") {
+        const blob = await htmlToPdfBlob(content);
+        saveAs(blob, baseName + ".pdf");
+      } else {
+        const blob = htmlToWordBlobSync(content);
+        saveAs(blob, baseName + ".doc");
+      }
+      toast.success(`Guide Prépa Qualiopi ${typeActionPrepa} téléchargé`);
+    } catch (e) {
+      console.error("Guide prépa universel error:", e);
+      toast.error("Erreur génération guide prépa : " + (e instanceof Error ? e.message : String(e)));
+    } finally {
+      setLoadingGuidePrepa(false);
+    }
+  };
+
   const handleDownloadAll = () => {
     // BDC : on génère exclusivement le dossier "NT Conseils" (51 docs + 5 trames Excel/PDF)
     if (isBDCOrg) {
@@ -1513,6 +1547,50 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
       </div>
 
       <DocStyleConfigPanel style={docStyle} onChange={handleStyleChange} />
+
+      {/* ========== PRÉPA QUALIOPI UNIVERSEL (AF / CFA / BDC / VAE) ========== */}
+      <div className="relative overflow-hidden rounded-2xl border-2 border-blue-400/50 bg-gradient-to-br from-blue-50 via-sky-50 to-indigo-100/60 shadow-md">
+        <div className="absolute top-0 right-0 w-40 h-40 bg-blue-400/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none" />
+        <div className="relative p-5 space-y-4">
+          <div className="flex items-start justify-between gap-4 flex-wrap">
+            <div className="flex-1 min-w-[260px]">
+              <h3 className="font-bold text-blue-800 flex items-center gap-2 text-base">
+                <span className="text-[10px] font-bold bg-blue-600 text-white px-2 py-0.5 rounded tracking-wider">PRÉPA</span>
+                GUIDE PRÉPA QUALIOPI — Quoi dire à l'auditeur
+              </h3>
+              <p className="text-xs text-blue-900/70 mt-1.5 leading-relaxed">
+                Fonctionne pour <strong>AF</strong> (Actions de Formation), <strong>CFA</strong> (Apprentissage),
+                <strong> BDC</strong> (Bilan de compétences) et <strong>VAE</strong>. Indicateurs filtrés selon le périmètre,
+                avec niveau attendu, script « ce qu'il faut dire », documents-preuves et points de vigilance.
+              </p>
+            </div>
+            <div className="flex flex-col gap-1 min-w-[220px]">
+              <label className="text-[11px] font-semibold text-blue-900 uppercase tracking-wide">Type d'action</label>
+              <Select value={typeActionPrepa} onValueChange={(v) => setTypeActionPrepa(v as TypeActionAudit)}>
+                <SelectTrigger className="h-9 bg-white border-blue-300 text-blue-900 text-xs">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="AF">Actions de formation (AF)</SelectItem>
+                  <SelectItem value="CFA">Apprentissage (CFA)</SelectItem>
+                  <SelectItem value="BDC">Bilan de compétences (BDC)</SelectItem>
+                  <SelectItem value="VAE">Validation des Acquis (VAE)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <div className="bg-white/80 backdrop-blur-sm rounded-xl border border-blue-200 p-3 flex gap-1.5">
+            <Button variant="ghost" size="sm" onClick={handlePreviewGuidePrepa} className="flex-1 h-9 text-xs text-blue-700 hover:bg-blue-100">
+              Aperçu du guide
+            </Button>
+            <Button size="sm" onClick={handleDownloadGuidePrepa} disabled={loadingGuidePrepa} className="flex-1 h-9 text-xs bg-blue-600 hover:bg-blue-700 text-white">
+              {loadingGuidePrepa ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : null}
+              Télécharger ({exportFormat === "pdf" ? "PDF" : "Word"})
+            </Button>
+          </div>
+        </div>
+      </div>
+
       {isCFAOrg && (
         <div className="relative overflow-hidden rounded-2xl border-2 border-orange-400/50 bg-gradient-to-br from-orange-50 via-amber-50 to-orange-100/60 shadow-md">
           <div className="absolute top-0 right-0 w-40 h-40 bg-orange-400/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none" />
