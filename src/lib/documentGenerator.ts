@@ -332,6 +332,10 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
       const si = params?.stagiaireIdx ?? 0;
       return genAIExerciceIntermediaire(o, f, stagiaires, si);
     }
+    case "ai_exercices_par_jour": {
+      const si = params?.stagiaireIdx ?? 0;
+      return genAIExercicesParJour(o, f, stagiaires, si);
+    }
     case "ai_evaluation_finale": {
       const si = params?.stagiaireIdx ?? 0;
       return genAIEvaluationFinale(o, f, stagiaires, si);
