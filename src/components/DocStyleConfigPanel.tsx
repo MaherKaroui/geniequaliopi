@@ -118,6 +118,26 @@ const THEME_PRESETS: ThemePreset[] = [
     description: "Grille stricte, rouge pur, sans-serif géométrique, design Swiss style",
     defaults: { primaryColor: "#1a1a1a", secondaryColor: "#e30613", fontFamily: "'Inter', sans-serif", headingFont: "'Inter', sans-serif" }
   },
+  {
+    id: "monochrome", name: "Monochrome Pro",
+    description: "Noir & blanc pur, typographie forte, ultra professionnel sans couleur",
+    defaults: { primaryColor: "#000000", secondaryColor: "#525252", fontFamily: "'Inter', sans-serif", headingFont: "'Inter', sans-serif" }
+  },
+  {
+    id: "pastel", name: "Pastel Doux",
+    description: "Tons pastel poudrés, formes arrondies, ambiance moderne et douce",
+    defaults: { primaryColor: "#7c6fb8", secondaryColor: "#e8a87c", fontFamily: "'Manrope', sans-serif", headingFont: "'Plus Jakarta Sans', sans-serif" }
+  },
+  {
+    id: "presse", name: "Presse / Journal",
+    description: "Look journal classique, serif noire, filets, capitales — esprit éditorial",
+    defaults: { primaryColor: "#1a1a1a", secondaryColor: "#8b0000", fontFamily: "'PT Serif', serif", headingFont: "'Playfair Display', serif", fontSize: 13 }
+  },
+  {
+    id: "terracotta", name: "Terracotta Chaleureux",
+    description: "Terre cuite, sable et ocre, chaleureux et artisanal",
+    defaults: { primaryColor: "#a0522d", secondaryColor: "#c9a14a", fontFamily: "'Nunito', sans-serif", headingFont: "'Fraunces', serif" }
+  },
 ];
 
 const FONT_CATEGORIES = [
