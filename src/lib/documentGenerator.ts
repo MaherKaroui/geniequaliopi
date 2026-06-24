@@ -3062,7 +3062,7 @@ function parseDateSafe(dateStr: string): Date | null {
   return isNaN(d.getTime()) ? null : d;
 }
 
-function getStagiaireDays(s: StagiaireInfo, f: FormationInfo): string[] {
+export function getStagiaireDays(s: StagiaireInfo, f: FormationInfo): string[] {
   const debut = getStagiaireDateDebut(s, f);
   const fin = getStagiaireDateFin(s, f);
   if (!debut || !fin) return getFormationDays(f);
