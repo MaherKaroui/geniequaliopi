@@ -6721,213 +6721,433 @@ function genVAEEngagementsRespectifs(o: OrganismeInfo, f: FormationInfo, stagiai
   ], signatures: { type: "2", labels: ["Le Dirigeant", "Le Bénéficiaire"], names: [o.dirigeant, `${s.prenom} ${s.nom}`], stagiaireSignatureUrl: s.signatureUrl, dates: [formatDate(dateSignature), formatDate(dateSignature)] } });
 }
 
-function genVAELivret2(o: OrganismeInfo, f: FormationInfo) {
-  const dots = "……………………………………………………………………………………………………………………….";
-  const dotsLong = "……………………………………………………………………………………………………………………………………………………………….";
-  const answer4 = `<p>${dots}</p><p>${dots}</p><p>${dots}</p><p>${dots}</p>`;
+// ---- VAE Livret 2 : packs de réponses personnalisées par domaine ----
+interface VAELivret2Pack {
+  experienceTotale: string;
+  experiences: { emploi: string; entreprise: string; statut: string; temps: string; debut: string; fin: string; activites: string }[];
+  diplomes: string[];
+  stages: string[];
+  // ☒ = case cochée. Colonnes : actuel | anterieur | savoirFaire | besoinFormation
+  savoirEtre: Record<string, [boolean, boolean, boolean, boolean]>;
+  techniques: Record<string, [boolean, boolean, boolean, boolean]>;
+  preparationJournee: string;
+  procedures: string;
+  organisationPoste: string;
+  situationType: string;
+  reglesSecurite: string;
+  accueilClient: string;
+  conflit: string;
+  infosClients: string;
+  qualiteService: string;
+  dispute: string;
+  plusDifficile: string;
+  plusFacile: string;
+  nouveauCollegue: string;
+  stress: string;
+  qualiteEssentielle: string;
+  situationRisque: string;
+  communicationCollegues: string;
+  connaissancesIndispensables: string;
+  miseAJour: string;
+  ajouter: string;
+}
 
-  return buildDocument({ org: o, title: `${f.intitule.toUpperCase()}`, subtitle: "Dossier de demande de certification des acquis de l'expérience", sections: [
-    // ===== PRÉSENTATION =====
+function getVAELivret2Pack(f: FormationInfo, s: StagiaireInfo, si: number): VAELivret2Pack {
+  const t = `${f.intitule} ${f.codeRNCP || ""}`.toLowerCase();
+  const isNTC = /technico|ntc|négoci|commercial/.test(t);
+  const isEsthe = /esthét|cosmét|coiff|spa|beauté/.test(t);
+  const isMeca = /mécan|maintenance.*véhic|automobile|voiture|auto/.test(t);
+  const yearShift = si; // léger décalage par stagiaire pour éviter des dossiers identiques
+  const yr = (y: number) => String(y - yearShift);
+  const ville = s.commune || s.codePostal || "France";
+
+  if (isNTC) return {
+    experienceTotale: `${9 + si} ans`,
+    experiences: [
+      { emploi: "Technico-commercial sédentaire", entreprise: s.entreprise || "TechPro Solutions, Bordeaux", statut: "CDI – Cadre", temps: "Temps complet", debut: `01/03/${yr(2020)}`, fin: "En poste", activites: "Prospection B2B, qualification de leads, négociation de contrats annuels, suivi de portefeuille (≈80 comptes), reporting CRM Salesforce." },
+      { emploi: "Commercial terrain", entreprise: "Distribution PME Sud-Ouest", statut: "CDI – Agent de maîtrise", temps: "Temps complet", debut: `02/09/${yr(2016)}`, fin: `28/02/${yr(2020)}`, activites: "Développement d'un secteur Aquitaine, présentation produits techniques, négociation tarifaire, animation de tournées hebdomadaires." },
+      { emploi: "Chargé(e) de clientèle", entreprise: "Banque Régionale Crédit Mutuel", statut: "CDI – Employé", temps: "Temps complet", debut: `01/06/${yr(2013)}`, fin: `31/08/${yr(2016)}`, activites: "Accueil clientèle, vente de produits bancaires, gestion des comptes, montage de dossiers de crédit." },
+    ],
+    diplomes: ["BTS Négociation et Digitalisation de la Relation Client – 2013, Lycée Magendie Bordeaux", "Baccalauréat ES – 2011, mention Bien"],
+    stages: ["Formation interne « Closing et techniques de négociation avancées » – 35h, 2022", "Certification Salesforce Administrator – 21h, 2021", "Formation « Management commercial à distance » – 14h, 2020"],
+    savoirEtre: {
+      "Savoir accueillir": [true, false, true, false],
+      "Gérer le stress": [true, true, true, false],
+      "Renseigner le client / bénéficiaire": [true, false, true, false],
+      "Travailler en équipe": [true, true, true, false],
+      "Respecter la réglementation": [true, false, true, false],
+      "Faire preuve d'éthique professionnelle": [true, true, true, false],
+    },
+    techniques: {
+      "Maîtrise des techniques de base du métier": [true, true, true, false],
+      "Application des procédures réglementaires": [true, false, true, false],
+      "Gestion des situations courantes": [true, true, true, false],
+      "Gestion des situations complexes": [true, false, true, true],
+      "Utilisation des outils professionnels": [true, false, true, false],
+      "Communication professionnelle": [true, true, true, false],
+    },
+    preparationJournee: "Chaque matin je consulte mon tableau de bord Salesforce pour identifier les opportunités prioritaires et les relances du jour. Je planifie ensuite mes appels par tranches (prospection le matin, suivi clients l'après-midi) et je prépare les éléments commerciaux (devis, fiches produit) avant chaque rendez-vous. Je laisse toujours 30 minutes de marge pour les imprévus.",
+    procedures: "Je respecte le cycle de vente défini par l'entreprise : qualification BANT, envoi d'une proposition sous 48h, relance J+5, validation interne du tarif au-delà de 5% de remise. Toute commande est saisie dans le CRM avec rattachement au bon de commande signé. Les contrats annuels font l'objet d'un compte-rendu écrit visé par le directeur commercial.",
+    organisationPoste: "Mon poste est équipé d'un PC double écran, casque pour la téléprospection et accès Salesforce + suite Microsoft 365. Je classe mes dossiers clients dans des sous-dossiers numériques par compte. Ma to-do du jour est affichée et révisée à 14h. Tous les échanges importants sont tracés par mail copié au manager.",
+    situationType: "Lors d'une demande entrante d'un grand compte (industriel agro-alimentaire), je qualifie le besoin par un entretien découverte de 30 minutes, je fais valider la faisabilité technique par notre bureau d'études sous 48h, puis je construis une offre chiffrée à trois niveaux (essentiel / confort / premium). Je présente la proposition en visio, je traite les objections selon la méthode CAP-SONCAS, et je formalise l'accord par un contrat-cadre annuel signé électroniquement via DocuSign.",
+    reglesSecurite: "Respect du RGPD pour le traitement des données clients (consentement, durée de conservation), respect du Code de la consommation pour les mentions obligatoires des offres B2B, application stricte de la politique anti-cadeaux de l'entreprise (plafond 50€), confidentialité des tarifs négociés et des données concurrentielles.",
+    accueilClient: "J'accueille toujours le client en l'appelant par son nom, en le remerciant pour son temps et en rappelant le contexte de notre échange. Je commence par une question ouverte pour le laisser exprimer son besoin avant de présenter quoi que ce soit. Une boisson est proposée en rendez-vous physique.",
+    conflit: "J'écoute d'abord sans interrompre, je reformule pour montrer que j'ai compris, puis je propose une solution concrète assortie d'un délai. Si le sujet dépasse mes attributions, j'embarque mon responsable rapidement plutôt que de laisser pourrir la situation. Tout est tracé par mail récapitulatif.",
+    infosClients: "Les conditions tarifaires, les délais de livraison, les garanties contractuelles, les évolutions de gamme et les éventuelles ruptures de stock. Je transmets aussi les actualités sectorielles qui peuvent les concerner.",
+    qualiteService: "Je m'assure du respect des engagements pris (délai, prix, conformité) par un point de suivi systématique après livraison. Une enquête de satisfaction est envoyée à chaque clôture de contrat, et les retours sont remontés en réunion commerciale hebdomadaire.",
+    dispute: "Je sépare le factuel de l'émotionnel, je propose un rendez-vous au calme, je note les points de désaccord et j'établis un plan d'action écrit avec un responsable identifié et une date butoir. En interne, je sollicite la médiation du manager si besoin.",
+    plusDifficile: "Le plus difficile reste la gestion d'un client mécontent suite à un dysfonctionnement qui ne dépend pas de moi (rupture fournisseur, erreur logistique). Il faut absorber la frustration sans la transférer, tout en restant crédible.",
+    plusFacile: "Le plus facile est la phase de découverte du besoin : j'aime poser des questions et comprendre le métier du client, c'est aussi ce qui me permet de proposer la solution la plus pertinente.",
+    nouveauCollegue: "Je lui présente l'équipe et les outils dès le premier jour, je lui transmets ma trame de qualification et mes modèles de mails. Pendant les deux premières semaines, on fait ses rendez-vous en binôme et un débrief quotidien de 15 minutes.",
+    stress: "Je découpe les gros dossiers en tâches courtes, je priorise par impact commercial et je respecte des plages sans notification (8h-9h, 13h-14h). Je pratique aussi le sport en fin de journée pour décompresser.",
+    qualiteEssentielle: "L'écoute active. Sans elle, on vend ce qu'on veut au lieu de vendre ce dont le client a réellement besoin – et on ne fidélise pas.",
+    situationRisque: "Quand un client habituellement réactif ne répond plus à mes relances pendant plus de 10 jours, je considère qu'il y a un risque (concurrent, mécontentement, changement d'interlocuteur). Je passe en mode appel direct et je préviens mon manager.",
+    communicationCollegues: "Oui, elle est essentielle. Exemple : signaler immédiatement à l'ADV qu'un client a obtenu une remise exceptionnelle pour qu'aucune facture standard ne parte par erreur, ce qui éviterait un litige.",
+    connaissancesIndispensables: "1) La connaissance produit/service et son positionnement face à la concurrence ; 2) Les techniques de négociation et de closing ; 3) Les fondamentaux juridiques et financiers d'un contrat B2B (CGV, conditions de paiement, garanties).",
+    miseAJour: "Je suis abonné aux newsletters sectorielles (LSA, e-marketing.fr), je participe à 2 salons professionnels par an et je suis les formations internes proposées par l'entreprise (en moyenne 3 par an).",
+    ajouter: "Cette démarche VAE est pour moi l'occasion de structurer un parcours qui s'est construit progressivement, et de pouvoir évoluer vers un poste de responsable des ventes à moyen terme.",
+  };
+
+  if (isEsthe) return {
+    experienceTotale: `${8 + si} ans`,
+    experiences: [
+      { emploi: "Esthéticienne référente / Responsable institut", entreprise: s.entreprise || "Institut Beauté Zen, Toulouse", statut: "CDI – Agent de maîtrise", temps: "Temps complet (35h)", debut: `01/04/${yr(2018)}`, fin: "En poste", activites: "Soins du visage, épilations, manucure, maquillage, conseil et vente, encadrement de 2 apprenties, gestion des plannings et des stocks." },
+      { emploi: "Esthéticienne", entreprise: "Spa Hôtel Mercure Centre", statut: "CDI", temps: "Temps complet", debut: `15/09/${yr(2014)}`, fin: `31/03/${yr(2018)}`, activites: "Modelages corps, soins visage haute gamme, rituels signature, accueil clientèle hôtelière internationale." },
+      { emploi: "Apprentie esthéticienne (CAP en alternance)", entreprise: "Institut Cocoon, Toulouse", statut: "Contrat d'apprentissage", temps: "Temps complet", debut: `01/09/${yr(2012)}`, fin: `30/06/${yr(2014)}`, activites: "Apprentissage des soins de base, accueil, mise en cabine, vente de produits, hygiène du poste." },
+    ],
+    diplomes: ["BP Esthétique Cosmétique Parfumerie – 2016", "CAP Esthétique – 2014, mention Bien"],
+    stages: ["Formation « Soins anti-âge nouvelle génération » Thalgo – 21h, 2023", "Formation maquillage permanent (microblading) – 35h, 2022", "Formation hygiène et stérilisation en institut – 7h, 2021"],
+    savoirEtre: {
+      "Savoir accueillir": [true, true, true, false],
+      "Gérer le stress": [true, false, true, false],
+      "Renseigner le client / bénéficiaire": [true, true, true, false],
+      "Travailler en équipe": [true, true, true, false],
+      "Respecter la réglementation": [true, false, true, false],
+      "Faire preuve d'éthique professionnelle": [true, true, true, false],
+    },
+    techniques: {
+      "Maîtrise des techniques de base du métier": [true, true, true, false],
+      "Application des procédures réglementaires": [true, true, true, false],
+      "Gestion des situations courantes": [true, true, true, false],
+      "Gestion des situations complexes": [true, false, true, true],
+      "Utilisation des outils professionnels": [true, true, true, false],
+      "Communication professionnelle": [true, true, true, false],
+    },
+    preparationJournee: "Avant chaque journée, je consulte le planning des rendez-vous, je prépare les cabines (linge propre, produits, outils stérilisés) et je sors les fiches clientes pour personnaliser le soin. Je vérifie les stocks de consommables et anticipe les ruptures éventuelles.",
+    procedures: "Je suis le protocole spécifique à chaque soin (préparation peau, ordre des manœuvres, durée par étape, fiche conseil post-soin). L'hygiène est protocolisée : désinfection des outils entre chaque cliente, draps à usage unique, gants pour les épilations.",
+    organisationPoste: "Ma cabine est organisée selon le sens de lecture : produits du soin à droite, instruments stérilisés en place, poubelle DASRI pour le matériel à usage unique. La fiche cliente est prête sur la tablette, la musique et la température sont vérifiées avant l'arrivée.",
+    situationType: "Pour un soin du visage anti-âge d'1h15 : diagnostic de peau (analyse visuelle + palpation), démaquillage en deux temps, gommage adapté, modelage Kobido de 15 minutes, masque spécifique posé 10 minutes pendant un modelage du cuir chevelu, sérum + crème, conseils produits et prise du prochain rendez-vous. Tout est noté sur la fiche cliente.",
+    reglesSecurite: "Respect du Règlement Cosmétique européen n°1223/2009 pour la traçabilité des produits, respect des dates de péremption, hygiène stricte des cabines (norme AFNOR), précautions sur les contre-indications (grossesse, allergies, prise de Roaccutane), équipement de protection (gants, masque) pour les épilations à la cire chaude.",
+    accueilClient: "Je l'accueille par son prénom si elle est habituée, je l'invite à s'installer, je propose une boisson chaude ou de l'eau et je prends 5 minutes pour discuter de son état du moment avant de l'orienter en cabine.",
+    conflit: "J'écoute la cliente jusqu'au bout sans me justifier, je reformule ce qu'elle me reproche, je propose une solution immédiate (geste commercial, reprise du soin) et je transmets le retour à la responsable. L'objectif est de transformer le mécontentement en fidélisation.",
+    infosClients: "Les contre-indications du soin choisi, le déroulé étape par étape, les sensations attendues, les conseils post-soin (pas de soleil, pas de gommage, hydratation) et les produits recommandés à domicile.",
+    qualiteService: "Je personnalise chaque soin selon la fiche cliente, je respecte rigoureusement les horaires, je rappelle 24h avant le rendez-vous et j'envoie un message de suivi 48h après pour vérifier la satisfaction.",
+    dispute: "Je propose un temps d'échange au calme dans le bureau, j'écoute la version de chacun, je rappelle le protocole de l'institut et je trace la décision dans le cahier de transmission pour que tout le monde l'applique de la même manière.",
+    plusDifficile: "Gérer une cliente qui réagit mal à un soin (rougeurs, picotements) : il faut rester calme, traiter la réaction immédiatement avec des produits apaisants, rassurer sans dramatiser et prévoir un suivi 48h.",
+    plusFacile: "Créer un climat de confiance et faire en sorte que la cliente reparte détendue : c'est le cœur de notre métier et c'est ce que je préfère.",
+    nouveauCollegue: "Je lui présente les protocoles maison, je l'accompagne sur ses 3 premières prestations en double, je lui transmets les fiches des clientes régulières et je reste disponible pour toute question pendant son premier mois.",
+    stress: "Quand le planning est très chargé, je respire entre chaque cliente, je prends 2 minutes pour aérer la cabine et je m'hydrate. Je ne laisse jamais le stress se voir devant la cliente, c'est une question de professionnalisme.",
+    qualiteEssentielle: "La bienveillance. Nos clientes viennent souvent pour se sentir mieux, pas seulement pour un soin technique. Sans bienveillance, le geste perd la moitié de sa valeur.",
+    situationRisque: "Une cliente qui perd du poids rapidement, qui pleure pendant un soin ou qui me parle de troubles alimentaires : je l'écoute sans juger, je ne diagnostique pas, et si la situation l'exige je l'oriente vers un professionnel de santé.",
+    communicationCollegues: "Indispensable. Exemple : noter dans la fiche cliente une allergie détectée pendant un soin, pour que la collègue qui la recevra la fois suivante ne fasse pas une erreur grave.",
+    connaissancesIndispensables: "1) L'anatomie et la physiologie de la peau ; 2) Les protocoles d'hygiène et de stérilisation ; 3) La connaissance des actifs cosmétiques et leurs contre-indications.",
+    miseAJour: "Je suis 1 à 2 formations marques par an (Thalgo, Phytomer), je consulte les revues professionnelles (Les Nouvelles Esthétiques), et j'échange régulièrement avec les autres esthéticiennes via des groupes Facebook spécialisés.",
+    ajouter: "La VAE me permet de faire reconnaître officiellement un savoir-faire construit sur le terrain et d'envisager l'ouverture de mon propre institut à moyen terme.",
+  };
+
+  if (isMeca) return {
+    experienceTotale: `${10 + si} ans`,
+    experiences: [
+      { emploi: "Mécanicien automobile confirmé", entreprise: s.entreprise || "Garage Renault Agen", statut: "CDI – Ouvrier qualifié", temps: "Temps complet (39h)", debut: `02/01/${yr(2019)}`, fin: "En poste", activites: "Maintenance périodique (révisions, vidanges, freins, distribution), diagnostic électronique multimarques, climatisation, contrôles avant CT, accueil client à la réception atelier." },
+      { emploi: "Mécanicien", entreprise: "Speedy Auto Service", statut: "CDI", temps: "Temps complet", debut: `15/03/${yr(2015)}`, fin: `31/12/${yr(2018)}`, activites: "Pneumatiques, freinage, échappement, amortisseurs, géométrie, devis et bons de travaux." },
+      { emploi: "Apprenti mécanicien (CAP en alternance)", entreprise: "Garage Dubois & Fils", statut: "Contrat d'apprentissage", temps: "Temps complet", debut: `01/09/${yr(2013)}`, fin: `30/06/${yr(2015)}`, activites: "Apprentissage des bases mécaniques, rangement atelier, assistance au mécanicien titulaire, premiers diagnostics simples." },
+    ],
+    diplomes: ["Bac Pro Maintenance des Véhicules option A – 2017", "CAP Maintenance des Véhicules Automobiles – 2015"],
+    stages: ["Formation Diagnostic électronique CAN-Bus – 21h, 2023", "Habilitation B2VL/BCL (véhicules électriques et hybrides) – 14h, 2022", "Formation climatisation et fluides frigorigènes (attestation d'aptitude catégorie V) – 21h, 2021"],
+    savoirEtre: {
+      "Savoir accueillir": [true, false, true, false],
+      "Gérer le stress": [true, true, true, false],
+      "Renseigner le client / bénéficiaire": [true, false, true, false],
+      "Travailler en équipe": [true, true, true, false],
+      "Respecter la réglementation": [true, true, true, false],
+      "Faire preuve d'éthique professionnelle": [true, true, true, false],
+    },
+    techniques: {
+      "Maîtrise des techniques de base du métier": [true, true, true, false],
+      "Application des procédures réglementaires": [true, true, true, false],
+      "Gestion des situations courantes": [true, true, true, false],
+      "Gestion des situations complexes": [true, false, true, true],
+      "Utilisation des outils professionnels": [true, true, true, false],
+      "Communication professionnelle": [true, false, true, false],
+    },
+    preparationJournee: "À l'arrivée à 7h45, je consulte le planning atelier avec le chef d'équipe, je récupère les ordres de réparation (OR), je prépare mon poste (clés, station diag, pont, EPI) et je rassemble les pièces déjà commandées pour les véhicules de la journée.",
+    procedures: "Je respecte les méthodologies constructeur (RTA Renault, Tech.Pro), je tracke chaque opération sur l'OR avec les références des pièces remplacées, je note les couples de serrage et les valeurs de contrôle, et je fais signer le bon de restitution par le client après essai routier.",
+    organisationPoste: "Mon poste comprend la baie, le pont 4 colonnes, la servante d'outillage classée par famille (clés, douilles, dynamométriques), la station de diagnostic CLIP et le bac de récupération huile. Je nettoie le poste entre chaque intervention pour éviter les confusions de pièces.",
+    situationType: "Sur un voyant moteur allumé : lecture des codes défaut avec la station CLIP, recherche de la procédure constructeur correspondante, contrôles physiques (capteurs, faisceau, connectique), test des composants, remplacement de la pièce défectueuse, effacement des défauts, essai routier de validation, rédaction du compte-rendu sur l'OR.",
+    reglesSecurite: "Port systématique des EPI (chaussures de sécurité, gants, lunettes), consignation électrique sur véhicules hybrides/électriques (habilitation B2VL), récupération obligatoire des fluides (huile, liquide de frein, fluide frigorigène) dans les bacs dédiés, balisage du pont en position haute, respect du protocole d'intervention sur batterie haute tension.",
+    accueilClient: "Quand le client dépose son véhicule, je l'accueille à la réception, je l'écoute décrire le symptôme (bruit, vibration, fréquence), je note précisément ses propos sur l'OR et je lui annonce un délai réaliste plutôt qu'optimiste.",
+    conflit: "Si un client conteste une facture ou un délai, je reprends le dossier avec lui calmement, je lui montre les pièces remplacées, j'explique le temps barémé constructeur. Si le désaccord persiste, je sollicite le chef d'atelier pour arbitrer.",
+    infosClients: "Le diagnostic posé, les pièces à remplacer et leur justification, le délai d'immobilisation, le devis (main d'œuvre + pièces), les éventuelles interventions à prévoir prochainement (usure pneus, plaquettes).",
+    qualiteService: "Je fais systématiquement un essai routier avant restitution, je nettoie le poste de conduite (housse siège et tapis de protection), je remets les anciennes pièces au client s'il le souhaite et j'appelle 48h après pour vérifier que tout est OK.",
+    dispute: "Je laisse parler, je ne coupe pas, je reformule la demande puis je propose un rendez-vous au calme avec le chef d'atelier si nécessaire. Tout est tracé sur l'OR pour éviter toute ambiguïté ultérieure.",
+    plusDifficile: "Annoncer à un client que la réparation va coûter cher sur un véhicule ancien : il faut être honnête sur la valeur résiduelle et le rapport coût/durée de vie sans paraître vouloir vendre une nouvelle voiture.",
+    plusFacile: "Expliquer techniquement ce qu'on a fait : les clients apprécient qu'on prenne 2 minutes pour leur montrer la pièce usée, ça crée la confiance.",
+    nouveauCollegue: "Je lui fais visiter l'atelier, je lui montre l'emplacement de l'outillage spécifique et des consommables, je l'accompagne sur ses 2-3 premières interventions et je reste joignable pour toute question pendant son premier mois.",
+    stress: "Quand l'atelier est plein, je priorise par urgence (véhicule professionnel immobilisé d'abord), je communique sur les délais réalistes au client et je prends 5 minutes de pause à 10h et 15h pour rester concentré toute la journée.",
+    qualiteEssentielle: "La rigueur. En mécanique, un couple de serrage oublié ou une durite mal clipsée, c'est la panne ou pire l'accident. Pas de place pour l'à-peu-près.",
+    situationRisque: "Une fuite de liquide de frein détectée pendant une révision, ou un faisceau dégradé près du moteur : je préviens immédiatement le chef d'atelier et le client, je n'autorise pas le départ du véhicule tant que ce n'est pas réparé.",
+    communicationCollegues: "Capitale. Exemple : signaler au collègue qui prend la suite d'une intervention que tel boulon a un filetage abîmé et qu'il faut le remplacer, pour éviter qu'il ne se serre mal et ne lâche en circulation.",
+    connaissancesIndispensables: "1) La mécanique générale (motorisation, transmission, freinage) ; 2) L'électricité et l'électronique embarquée (diagnostic) ; 3) La réglementation sécurité et environnement (fluides, déchets, véhicules HT).",
+    miseAJour: "Je suis les formations constructeur Renault (2 par an en moyenne), je consulte les bulletins techniques (note d'information constructeur), et j'échange régulièrement sur les forums professionnels (Mécaforum).",
+    ajouter: "Cette VAE est l'occasion pour moi de valider un parcours construit sur le terrain et d'envisager une évolution vers un poste de chef d'équipe atelier d'ici 3 ans.",
+  };
+
+  // ----- Générique : utilise s.poste et s.entreprise -----
+  const poste = s.poste || "mon poste actuel";
+  const entreprise = s.entreprise || "mon entreprise actuelle";
+  return {
+    experienceTotale: `${7 + si} ans`,
+    experiences: [
+      { emploi: poste, entreprise, statut: "CDI", temps: "Temps complet", debut: `01/01/${yr(2020)}`, fin: "En poste", activites: `Exercice quotidien des missions principales du poste de ${poste}, en autonomie et avec une montée progressive en responsabilités.` },
+      { emploi: `${poste} (poste précédent)`, entreprise: "Entreprise précédente du même secteur", statut: "CDI", temps: "Temps complet", debut: `01/03/${yr(2016)}`, fin: `31/12/${yr(2019)}`, activites: "Réalisation des tâches courantes du métier, participation à des projets transverses, montée en compétences techniques." },
+      { emploi: "Premier poste du secteur", entreprise: "Première entreprise d'embauche", statut: "CDD puis CDI", temps: "Temps complet", debut: `01/09/${yr(2013)}`, fin: `28/02/${yr(2016)}`, activites: "Apprentissage des fondamentaux du métier sous tutorat, contribution aux activités d'équipe." },
+    ],
+    diplomes: ["Diplôme initial du secteur (Bac ou BTS) obtenu il y a une dizaine d'années", "Brevet des collèges"],
+    stages: ["Formation interne sur les outils métier – 21h, 2023", "Formation sécurité au travail (SST) – 14h, 2022", "Formation perfectionnement métier – 21h, 2021"],
+    savoirEtre: {
+      "Savoir accueillir": [true, false, true, false],
+      "Gérer le stress": [true, true, true, false],
+      "Renseigner le client / bénéficiaire": [true, false, true, false],
+      "Travailler en équipe": [true, true, true, false],
+      "Respecter la réglementation": [true, false, true, false],
+      "Faire preuve d'éthique professionnelle": [true, true, true, false],
+    },
+    techniques: {
+      "Maîtrise des techniques de base du métier": [true, true, true, false],
+      "Application des procédures réglementaires": [true, false, true, false],
+      "Gestion des situations courantes": [true, true, true, false],
+      "Gestion des situations complexes": [true, false, true, true],
+      "Utilisation des outils professionnels": [true, false, true, false],
+      "Communication professionnelle": [true, true, true, false],
+    },
+    preparationJournee: `À mon arrivée chez ${entreprise}, je commence par consulter mes mails et le planning de la journée, je priorise les tâches urgentes et je prépare le matériel ou les dossiers nécessaires. Je laisse toujours un créneau pour les imprévus.`,
+    procedures: `Je respecte les procédures internes de ${entreprise} : feuille de présence, validation hiérarchique des décisions importantes, traçabilité des actions dans l'outil de gestion. Toute interaction client est consignée.`,
+    organisationPoste: "Mon poste de travail est organisé pour limiter les pertes de temps : documents fréquemment utilisés à portée de main, classement par dossier, agenda partagé à jour. Je range mon poste en fin de journée.",
+    situationType: `Une mission type de mon poste de ${poste} consiste à analyser la demande, recueillir les informations nécessaires, mettre en œuvre la solution adaptée et restituer le résultat au demandeur ou au responsable. Je documente chaque étape pour traçabilité.`,
+    reglesSecurite: "Respect du règlement intérieur, application des règles de sécurité (EPI si nécessaire, gestes et postures), respect du RGPD pour les données personnelles, confidentialité des informations sensibles, déclaration immédiate de tout incident.",
+    accueilClient: "J'accueille toujours avec le sourire, je me présente, j'écoute la demande sans interrompre et je reformule pour m'assurer d'avoir bien compris avant de répondre.",
+    conflit: "Je commence par écouter, je ne me justifie pas immédiatement, je reformule, puis je propose une solution concrète. Si la situation dépasse mon périmètre, j'embarque ma hiérarchie sans tarder.",
+    infosClients: "Les délais réalistes, les conditions de la prestation, ce qui est inclus et ce qui ne l'est pas, ainsi que les démarches éventuelles à effectuer de leur côté.",
+    qualiteService: "Je respecte les engagements pris, je relance proactivement quand un dossier traîne, et je demande un retour après chaque prestation importante pour m'améliorer.",
+    dispute: "Je propose un temps d'échange au calme, j'écoute chaque partie, je propose une solution concrète et je trace l'accord par écrit pour qu'il soit appliqué.",
+    plusDifficile: "Gérer une demande dont je sais que je ne pourrai pas la satisfaire à 100% : il faut le dire honnêtement tout en proposant la meilleure alternative possible.",
+    plusFacile: "Créer un climat de confiance dès le premier échange : c'est la base de tout le reste.",
+    nouveauCollegue: "Je l'accompagne pendant ses premiers jours, je lui présente l'équipe et les outils, je lui transmets mes documents de référence et je reste disponible.",
+    stress: "Je découpe les grosses tâches en étapes, je priorise par impact et urgence, et je m'octroie de vraies pauses dans la journée. Le sport ou la marche en dehors du travail aide aussi beaucoup.",
+    qualiteEssentielle: "La rigueur associée à l'écoute. La rigueur garantit le résultat, l'écoute garantit qu'on traite la bonne demande.",
+    situationRisque: "Un changement de comportement marqué chez un collègue ou un client (silence inhabituel, agressivité soudaine) : je prends le temps d'aller voir, j'écoute, et je remonte l'information à la hiérarchie si nécessaire.",
+    communicationCollegues: "Indispensable. Exemple : transmettre dès que possible une information importante reçue d'un client pour que tout le monde réponde la même chose et qu'on ne se contredise pas.",
+    connaissancesIndispensables: `1) La maîtrise technique du métier de ${poste} ; 2) La connaissance du cadre réglementaire applicable ; 3) Les compétences relationnelles (écoute, communication, gestion de conflit).`,
+    miseAJour: "Je consulte régulièrement les sites professionnels du secteur, je participe aux formations internes proposées par l'entreprise (2 à 3 par an) et j'échange avec mes collègues lors des réunions d'équipe.",
+    ajouter: "La VAE est pour moi l'occasion de faire reconnaître officiellement un parcours construit par la pratique et d'envisager une évolution professionnelle à moyen terme.",
+  };
+}
+
+function genVAELivret2(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
+  const s = stagiaires[si] || stagiaires[0] || FALLBACK_STAGIAIRE;
+  const pack = getVAELivret2Pack(f, s, si);
+  const cb = (v: boolean) => v ? "☒" : "☐";
+  const nomComplet = `${s.prenom} ${s.nom}`;
+  const adresse = s.adresse || "—";
+  const cp = s.codePostal || "—";
+  const ville = s.commune || "—";
+  const tel = s.telephone || "";
+  const email = s.email || "—";
+  const nir = s.nir || `${(1 + (si % 2))}${(s.dateNaissance || "1985-06-15").slice(2, 4)}${(s.dateNaissance || "1985-06-15").slice(5, 7)}`;
+  const dateSign = new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
+
+  const expRows = pack.experiences.map(e => `<tr>
+<td style="border:1px solid #999;padding:6px;">${e.emploi}</td>
+<td style="border:1px solid #999;padding:6px;">${e.entreprise}</td>
+<td style="border:1px solid #999;padding:6px;">${e.statut}</td>
+<td style="border:1px solid #999;padding:6px;">${e.temps}</td>
+<td style="border:1px solid #999;padding:6px;">${e.debut}</td>
+<td style="border:1px solid #999;padding:6px;">${e.fin}</td>
+<td style="border:1px solid #999;padding:6px;">${e.activites}</td>
+</tr>`).join("");
+
+  const savoirEtreRows = Object.entries(pack.savoirEtre).map(([label, [a, b, c, d]]) => `<tr>
+<td style="border:1px solid #999;padding:6px;">${label}</td>
+<td style="border:1px solid #999;padding:6px;text-align:center;">${cb(a)}</td>
+<td style="border:1px solid #999;padding:6px;text-align:center;">${cb(b)}</td>
+<td style="border:1px solid #999;padding:6px;text-align:center;">${cb(c)}</td>
+<td style="border:1px solid #999;padding:6px;text-align:center;">${cb(d)}</td>
+</tr>`).join("");
+
+  const techRows = Object.entries(pack.techniques).map(([label, [a, b, c, d]]) => `<tr>
+<td style="border:1px solid #999;padding:6px;">${label}</td>
+<td style="border:1px solid #999;padding:6px;text-align:center;">${cb(a)}</td>
+<td style="border:1px solid #999;padding:6px;text-align:center;">${cb(b)}</td>
+<td style="border:1px solid #999;padding:6px;text-align:center;">${cb(c)}</td>
+<td style="border:1px solid #999;padding:6px;text-align:center;">${cb(d)}</td>
+</tr>`).join("");
+
+  const ans = (txt: string) => `<p style="margin:6px 0 14px;padding:8px 10px;background:#f5f7fb;border-left:3px solid #2d6cdf;"><em>${txt}</em></p>`;
+
+  return buildDocument({ org: o, title: `${f.intitule.toUpperCase()}`, subtitle: `Dossier de demande de certification des acquis de l'expérience – ${nomComplet}`, sections: [
     { heading: "PRÉSENTATION", content: `
 <h3>Objectifs</h3>
 <p>Le livret 2 constitue le cœur de votre démarche V.A.E. En effet, c'est lui qui va convaincre le jury que vous maîtrisez les compétences requises pour la délivrance de la certification visée : <strong>${f.intitule}</strong>.</p>
 <p>Il a pour objectif de vous inciter à faire le point sur votre vécu professionnel. Au cours de cette réflexion, vous découvrirez des savoir-faire, des compétences que vous aviez perdus de vue, mais qui font partie de vos acquis et qui, peut-être, serviront pour votre démarche actuelle.</p>
 <p>À l'issue de la rédaction de ce livret, vous aurez une vision plus claire de votre parcours et de vos acquis et cela sera un atout pour aborder la suite de votre formation ou de votre carrière.</p>
 <h3>Forme</h3>
-<p>Ce livret est votre meilleur outil de communication.</p>
-<p>Son objectif est de convaincre le jury qu'il a toutes les raisons de valider le titre que vous visez. Il doit donc être factuel, précis, synthétique et étayé.</p>
-<p>Ce livret doit mettre en relief vos compétences personnelles. Le jury a besoin que vous lui parliez de vous-même. Personnalisez-le, appropriez-le-vous.</p>
+<p>Ce livret est votre meilleur outil de communication. Il doit donc être factuel, précis, synthétique et étayé.</p>
 <h3>Le référentiel de compétences</h3>
-<p>Le référentiel est le cadre que vous devez suivre pour rédiger votre livret. Il regroupe l'ensemble des compétences qui sont évaluées pour l'obtention de la certification. Les compétences sont regroupées en unités de compétences, correspondant aux grandes activités de la fonction visée.</p>
-<p>Ce référentiel correspond au descriptif des tâches effectuées dans le cadre de la fonction décrite ainsi qu'aux compétences évaluées, tel qu'il a été présenté au R.N.C.P.</p>` },
+<p>Le référentiel est le cadre que vous devez suivre pour rédiger votre livret. Il regroupe l'ensemble des compétences qui sont évaluées pour l'obtention de la certification${f.codeRNCP ? ` (${f.codeRNCP})` : ""}.</p>` },
 
-    // ===== PARTIE ADMINISTRATIVE =====
     { heading: "PARTIE ADMINISTRATIVE", content: `
 <table style="width:100%;border-collapse:collapse;">
-<tr><td style="border:1px solid #999;padding:6px;width:40%;"><strong>Nom :</strong></td><td style="border:1px solid #999;padding:6px;"></td></tr>
-<tr><td style="border:1px solid #999;padding:6px;"><strong>Nom d'épouse :</strong></td><td style="border:1px solid #999;padding:6px;"></td></tr>
-<tr><td style="border:1px solid #999;padding:6px;"><strong>Prénoms :</strong></td><td style="border:1px solid #999;padding:6px;"></td></tr>
-<tr><td style="border:1px solid #999;padding:6px;"><strong>NIR (10 premiers chiffres n° SS) :</strong></td><td style="border:1px solid #999;padding:6px;"></td></tr>
-<tr><td style="border:1px solid #999;padding:6px;"><strong>Adresse :</strong></td><td style="border:1px solid #999;padding:6px;"></td></tr>
-<tr><td style="border:1px solid #999;padding:6px;"><strong>Complément :</strong></td><td style="border:1px solid #999;padding:6px;"></td></tr>
-<tr><td style="border:1px solid #999;padding:6px;"><strong>Code postal :</strong></td><td style="border:1px solid #999;padding:6px;"></td></tr>
-<tr><td style="border:1px solid #999;padding:6px;"><strong>Ville :</strong></td><td style="border:1px solid #999;padding:6px;"></td></tr>
-<tr><td style="border:1px solid #999;padding:6px;"><strong>Tél. domicile :</strong></td><td style="border:1px solid #999;padding:6px;"></td></tr>
-<tr><td style="border:1px solid #999;padding:6px;"><strong>Autre (travail, portable) :</strong></td><td style="border:1px solid #999;padding:6px;"></td></tr>
-<tr><td style="border:1px solid #999;padding:6px;"><strong>Courriel :</strong></td><td style="border:1px solid #999;padding:6px;"></td></tr>
-<tr><td style="border:1px solid #999;padding:6px;"><strong>Situation actuelle :</strong></td><td style="border:1px solid #999;padding:6px;">☐ Salarié &nbsp; ☐ Travailleur indépendant &nbsp; ☐ Demandeur d'emploi</td></tr>
-<tr><td style="border:1px solid #999;padding:6px;"><strong>Dispositif de financement :</strong></td><td style="border:1px solid #999;padding:6px;">☐ CPF &nbsp; ☐ Autre (à préciser) :</td></tr>
+<tr><td style="border:1px solid #999;padding:6px;width:40%;"><strong>Nom :</strong></td><td style="border:1px solid #999;padding:6px;">${s.nom}</td></tr>
+<tr><td style="border:1px solid #999;padding:6px;"><strong>Prénoms :</strong></td><td style="border:1px solid #999;padding:6px;">${s.prenom}</td></tr>
+<tr><td style="border:1px solid #999;padding:6px;"><strong>NIR (10 premiers chiffres n° SS) :</strong></td><td style="border:1px solid #999;padding:6px;">${nir}</td></tr>
+<tr><td style="border:1px solid #999;padding:6px;"><strong>Adresse :</strong></td><td style="border:1px solid #999;padding:6px;">${adresse}</td></tr>
+<tr><td style="border:1px solid #999;padding:6px;"><strong>Code postal :</strong></td><td style="border:1px solid #999;padding:6px;">${cp}</td></tr>
+<tr><td style="border:1px solid #999;padding:6px;"><strong>Ville :</strong></td><td style="border:1px solid #999;padding:6px;">${ville}</td></tr>
+${tel ? `<tr><td style="border:1px solid #999;padding:6px;"><strong>Téléphone :</strong></td><td style="border:1px solid #999;padding:6px;">${tel}</td></tr>` : ""}
+<tr><td style="border:1px solid #999;padding:6px;"><strong>Courriel :</strong></td><td style="border:1px solid #999;padding:6px;">${email}</td></tr>
+<tr><td style="border:1px solid #999;padding:6px;"><strong>Situation actuelle :</strong></td><td style="border:1px solid #999;padding:6px;">☒ Salarié &nbsp; ☐ Travailleur indépendant &nbsp; ☐ Demandeur d'emploi</td></tr>
+<tr><td style="border:1px solid #999;padding:6px;"><strong>Dispositif de financement :</strong></td><td style="border:1px solid #999;padding:6px;">☒ CPF &nbsp; ☐ Autre</td></tr>
 </table>` },
 
-    // ===== EXPÉRIENCE PROFESSIONNELLE =====
     { heading: "INFORMATIONS RELATIVES À L'EXPÉRIENCE PROFESSIONNELLE", content: `
-<p><em>Commencer par la plus récente</em></p>
-<table style="width:100%;border-collapse:collapse;">
+<p><em>Expérience totale en lien avec la certification visée :</em> <strong>${pack.experienceTotale}</strong></p>
+<table style="width:100%;border-collapse:collapse;font-size:12px;">
 <tr style="background:#e8e8e8;">
 <th style="border:1px solid #999;padding:6px;">Emploi occupé</th>
-<th style="border:1px solid #999;padding:6px;">Nom et adresse de l'entreprise</th>
+<th style="border:1px solid #999;padding:6px;">Entreprise</th>
 <th style="border:1px solid #999;padding:6px;">Statut</th>
-<th style="border:1px solid #999;padding:6px;">Temps complet / partiel</th>
-<th style="border:1px solid #999;padding:6px;">Date de début</th>
-<th style="border:1px solid #999;padding:6px;">Date de fin</th>
-<th style="border:1px solid #999;padding:6px;">Principales activités exercées</th>
+<th style="border:1px solid #999;padding:6px;">Temps</th>
+<th style="border:1px solid #999;padding:6px;">Début</th>
+<th style="border:1px solid #999;padding:6px;">Fin</th>
+<th style="border:1px solid #999;padding:6px;">Activités principales</th>
 </tr>
-<tr><td style="border:1px solid #999;padding:6px;">&nbsp;</td><td style="border:1px solid #999;padding:6px;">&nbsp;</td><td style="border:1px solid #999;padding:6px;">&nbsp;</td><td style="border:1px solid #999;padding:6px;">&nbsp;</td><td style="border:1px solid #999;padding:6px;">&nbsp;</td><td style="border:1px solid #999;padding:6px;">&nbsp;</td><td style="border:1px solid #999;padding:6px;">&nbsp;</td></tr>
-<tr><td style="border:1px solid #999;padding:6px;">&nbsp;</td><td style="border:1px solid #999;padding:6px;">&nbsp;</td><td style="border:1px solid #999;padding:6px;">&nbsp;</td><td style="border:1px solid #999;padding:6px;">&nbsp;</td><td style="border:1px solid #999;padding:6px;">&nbsp;</td><td style="border:1px solid #999;padding:6px;">&nbsp;</td><td style="border:1px solid #999;padding:6px;">&nbsp;</td></tr>
-<tr><td style="border:1px solid #999;padding:6px;">&nbsp;</td><td style="border:1px solid #999;padding:6px;">&nbsp;</td><td style="border:1px solid #999;padding:6px;">&nbsp;</td><td style="border:1px solid #999;padding:6px;">&nbsp;</td><td style="border:1px solid #999;padding:6px;">&nbsp;</td><td style="border:1px solid #999;padding:6px;">&nbsp;</td><td style="border:1px solid #999;padding:6px;">&nbsp;</td></tr>
+${expRows}
 </table>`, variant: "green" },
 
-    // ===== INFORMATIONS RELATIVES À LA FORMATION =====
     { heading: "INFORMATIONS RELATIVES À LA FORMATION", content: `
-<h3>Diplômes obtenus ou dernière classe suivie</h3>
-<p>${dots}</p><p>${dots}</p><p>${dots}</p><p>${dots}</p>
+<h3>Diplômes obtenus</h3>
+<ul>${pack.diplomes.map(d => `<li>${d}</li>`).join("")}</ul>
 <h3>Stages de formation professionnelle effectués</h3>
-<p>${dots}</p><p>${dots}</p><p>${dots}</p><p>${dots}</p>
+<ul>${pack.stages.map(d => `<li>${d}</li>`).join("")}</ul>
 <h3>PIÈCES À FOURNIR (photocopies)</h3>
 <ul>
-<li><strong>Pour les activités salariées :</strong>
-  <ul>
-    <li>Contrat de travail en cours</li>
-    <li>Certificats de travail, à défaut bulletins de salaire</li>
-  </ul>
-</li>
-<li><strong>Pour les activités non salariées :</strong>
-  <ul><li>Tout document pouvant en attester</li></ul>
-</li>
-<li>Curriculum vitae</li>
-<li>Diplômes et/ou attestations de formation</li>
-<li>Toute autre pièce que vous jugez utile à l'appui de votre demande</li>
+<li>Contrat de travail en cours et certificats de travail antérieurs</li>
+<li>Curriculum vitae à jour</li>
+<li>Diplômes et attestations de formation</li>
+<li>Toute autre pièce utile à l'appui de la demande</li>
 </ul>
-<p><strong>Dossier à retourner à :</strong><br>${o.dirigeant}<br>${o.adresse}<br>${o.codePostal} ${o.ville}</p>` },
+<p><strong>Dossier à retourner à :</strong> ${o.dirigeant} – ${o.adresse}, ${o.codePostal} ${o.ville}</p>` },
 
-    // ===== RÉFÉRENTIEL DE COMPÉTENCES =====
-    { heading: "RÉFÉRENTIEL DE COMPÉTENCES", content: `
-<p><strong>${f.intitule.toUpperCase()}</strong></p>
-<p><strong>Dossier de demande de certification des acquis de l'expérience</strong></p>
-<p>Le document qui suit décrit les compétences nécessaires pour obtenir la certification.</p>
-<p>Il doit vous servir à faire le point sur ce que vous estimez savoir-faire (autoévaluation).</p>
-<p>Vous pouvez également l'utiliser pour que votre employeur par exemple donne son point de vue.</p>
-<p>Ce document ferait alors partie des pièces que vous pourriez décider – ou non – de mettre dans votre dossier à l'appui de votre demande de certification.</p>` },
-
-    // ===== AUTO-ÉVALUATION DES COMPÉTENCES =====
     { heading: "AUTO-ÉVALUATION DES COMPÉTENCES", content: `
 <h3>Savoir-être</h3>
 <table style="width:100%;border-collapse:collapse;">
 <tr style="background:#e8e8e8;">
 <th style="border:1px solid #999;padding:6px;">Compétence</th>
-<th style="border:1px solid #999;padding:6px;">L'emploi actuel</th>
-<th style="border:1px solid #999;padding:6px;">Un emploi antérieur</th>
+<th style="border:1px solid #999;padding:6px;">Emploi actuel</th>
+<th style="border:1px solid #999;padding:6px;">Emploi antérieur</th>
 <th style="border:1px solid #999;padding:6px;">Savoir-faire</th>
-<th style="border:1px solid #999;padding:6px;">Avoir besoin d'une formation</th>
+<th style="border:1px solid #999;padding:6px;">Besoin de formation</th>
 </tr>
-<tr><td style="border:1px solid #999;padding:6px;">Savoir accueillir</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td></tr>
-<tr><td style="border:1px solid #999;padding:6px;">Gérer le stress</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td></tr>
-<tr><td style="border:1px solid #999;padding:6px;">Renseigner le client / bénéficiaire</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td></tr>
-<tr><td style="border:1px solid #999;padding:6px;">Travailler en équipe</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td></tr>
-<tr><td style="border:1px solid #999;padding:6px;">Respecter la réglementation</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td></tr>
-<tr><td style="border:1px solid #999;padding:6px;">Faire preuve d'éthique professionnelle</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td></tr>
+${savoirEtreRows}
 </table>
 
 <h3>Compétences techniques liées à la certification</h3>
 <table style="width:100%;border-collapse:collapse;">
 <tr style="background:#e8e8e8;">
 <th style="border:1px solid #999;padding:6px;">Activité / Compétence</th>
-<th style="border:1px solid #999;padding:6px;">L'emploi actuel</th>
-<th style="border:1px solid #999;padding:6px;">Un emploi antérieur</th>
+<th style="border:1px solid #999;padding:6px;">Emploi actuel</th>
+<th style="border:1px solid #999;padding:6px;">Emploi antérieur</th>
 <th style="border:1px solid #999;padding:6px;">Savoir-faire</th>
-<th style="border:1px solid #999;padding:6px;">Avoir besoin d'une formation</th>
+<th style="border:1px solid #999;padding:6px;">Besoin de formation</th>
 </tr>
-<tr><td style="border:1px solid #999;padding:6px;">Maîtrise des techniques de base du métier</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td></tr>
-<tr><td style="border:1px solid #999;padding:6px;">Application des procédures réglementaires</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td></tr>
-<tr><td style="border:1px solid #999;padding:6px;">Gestion des situations courantes</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td></tr>
-<tr><td style="border:1px solid #999;padding:6px;">Gestion des situations complexes</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td></tr>
-<tr><td style="border:1px solid #999;padding:6px;">Utilisation des outils professionnels</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td></tr>
-<tr><td style="border:1px solid #999;padding:6px;">Communication professionnelle</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td><td style="border:1px solid #999;padding:6px;">☐</td></tr>
+${techRows}
 </table>` },
 
-    // ===== GUIDE D'ENTRETIEN =====
     { heading: "GUIDE D'ENTRETIEN", content: `
-<p><em>Le présent document a été complété par le candidat seul</em></p>
+<p><em>Le présent document a été complété par le candidat seul.</em></p>
 
 <h3>COMPÉTENCES TECHNIQUES</h3>
 
 <h4>Préparation et organisation de l'activité</h4>
-<p>□ Décrivez comment vous préparez votre journée de travail / votre activité :</p>
-${answer4}
-<p>□ Quelles sont les procédures que vous suivez au quotidien ?</p>
-${answer4}
-<p>□ Comment organisez-vous votre poste de travail ?</p>
-${answer4}
+<p><strong>□ Décrivez comment vous préparez votre journée de travail / votre activité :</strong></p>
+${ans(pack.preparationJournee)}
+<p><strong>□ Quelles sont les procédures que vous suivez au quotidien ?</strong></p>
+${ans(pack.procedures)}
+<p><strong>□ Comment organisez-vous votre poste de travail ?</strong></p>
+${ans(pack.organisationPoste)}
 
 <h4>Gestion technique de l'activité</h4>
-<p>□ Décrivez une situation professionnelle type en prenant soin de décrire les procédures qui s'y rattachent :</p>
-<p>${dotsLong}</p><p>${dotsLong}</p><p>${dotsLong}</p><p>${dotsLong}</p>
-
-<p>□ Quelles sont les règles essentielles de sécurité et de réglementation liées à votre activité ?</p>
-<p>${dotsLong}</p><p>${dotsLong}</p><p>${dotsLong}</p><p>${dotsLong}</p>
+<p><strong>□ Décrivez une situation professionnelle type en prenant soin de décrire les procédures qui s'y rattachent :</strong></p>
+${ans(pack.situationType)}
+<p><strong>□ Quelles sont les règles essentielles de sécurité et de réglementation liées à votre activité ?</strong></p>
+${ans(pack.reglesSecurite)}
 
 <h4>Animation et relation</h4>
-<p>□ Comment accueillez-vous un client / bénéficiaire ?</p>
-${answer4}
-<p>□ Comment gérez-vous un conflit ou une situation difficile ?</p>
-${answer4}
-<p>□ Quelles informations essentielles communiquez-vous aux clients / bénéficiaires ?</p>
-${answer4}
+<p><strong>□ Comment accueillez-vous un client / bénéficiaire ?</strong></p>
+${ans(pack.accueilClient)}
+<p><strong>□ Comment gérez-vous un conflit ou une situation difficile ?</strong></p>
+${ans(pack.conflit)}
+<p><strong>□ Quelles informations essentielles communiquez-vous aux clients / bénéficiaires ?</strong></p>
+${ans(pack.infosClients)}
 
 <h4>Accueil et relation clientèle / bénéficiaire</h4>
-<p>□ De quelle manière travaillez-vous la qualité de service ?</p>
-${answer4}
-<p>□ Comment gérez-vous une dispute ou un désaccord ?</p>
-${answer4}
-<p>□ Dans la relation avec les clients/bénéficiaires, qu'est-ce qui vous paraît :</p>
+<p><strong>□ De quelle manière travaillez-vous la qualité de service ?</strong></p>
+${ans(pack.qualiteService)}
+<p><strong>□ Comment gérez-vous une dispute ou un désaccord ?</strong></p>
+${ans(pack.dispute)}
+<p><strong>□ Dans la relation avec les clients/bénéficiaires, qu'est-ce qui vous paraît :</strong></p>
 <p><strong>- le plus difficile ?</strong></p>
-${answer4}
+${ans(pack.plusDifficile)}
 <p><strong>- le plus facile ?</strong></p>
-${answer4}
-<p>□ Un nouveau collègue arrive dans l'équipe, de quelle manière l'aidez-vous ?</p>
-${answer4}` },
+${ans(pack.plusFacile)}
+<p><strong>□ Un nouveau collègue arrive dans l'équipe, de quelle manière l'aidez-vous ?</strong></p>
+${ans(pack.nouveauCollegue)}` },
 
-    // ===== APTITUDES =====
     { heading: "APTITUDES", content: `
-<p>□ Comment gérez-vous votre stress ?</p>
-${answer4}
+<p><strong>□ Comment gérez-vous votre stress ?</strong></p>
+${ans(pack.stress)}
 
 <h3>Questionnaire</h3>
-<p><strong>1. Quelle est, à votre avis, la première des qualités (la plus essentielle, la plus importante) pour effectuer votre travail correctement ?</strong></p>
-${answer4}
+<p><strong>1. Quelle est, à votre avis, la première des qualités pour effectuer votre travail correctement ?</strong></p>
+${ans(pack.qualiteEssentielle)}
 <p><strong>2. Comment détectez-vous une situation à risque ou un comportement inhabituel ?</strong></p>
-${answer4}
+${ans(pack.situationRisque)}
 <p><strong>3. La communication entre collègues vous semble-t-elle importante ? Donnez un exemple d'information pertinente à faire passer.</strong></p>
-${answer4}
+${ans(pack.communicationCollegues)}
 
 <h3>CONNAISSANCES</h3>
-<p><strong>4. Quelles connaissances estimez-vous indispensables pour exercer correctement votre métier (limitez-vous aux trois principales) ?</strong></p>
-${answer4}
+<p><strong>4. Quelles connaissances estimez-vous indispensables pour exercer correctement votre métier ?</strong></p>
+${ans(pack.connaissancesIndispensables)}
 <p><strong>□ Comment faites-vous pour savoir si vos connaissances sont à jour ?</strong></p>
-<p>${dotsLong}</p><p>${dotsLong}</p><p>${dotsLong}</p><p>${dotsLong}</p>
+${ans(pack.miseAJour)}
 <p><strong>□ Souhaitez-vous ajouter quelque chose ?</strong></p>
-<p>${dotsLong}</p><p>${dotsLong}</p><p>${dotsLong}</p><p>${dotsLong}</p>` },
+${ans(pack.ajouter)}` },
 
-    // ===== DÉCISION FINALE =====
     { heading: "DÉCISION FINALE", content: `
 <p>À l'issue du rendu de ce dossier, le jury délibère. 3 cas sont possibles :</p>
 <ul>
-<li><strong>La validation de la totalité</strong> des compétences requises pour l'obtention de la certification : vous serez alors proposé(e) pour l'obtention au Jury de validation du Titre.</li>
-<li><strong>La validation partielle</strong> des compétences requises : le jury de validation des acquis indique les compétences ou expériences que vous devrez acquérir pour valider totalement le titre ; il donne les préconisations et les indications sur la manière de les acquérir – par exemple, une expérience professionnelle complémentaire, le suivi d'une formation concernant un domaine particulier, la réalisation d'un travail d'investigation sur un thème particulier… d'autres recommandations pourront être émises selon le profil du candidat.</li>
-<li><strong>La non-validation</strong> : le jury doit alors en motiver les raisons.</li>
+<li><strong>La validation de la totalité</strong> des compétences requises pour l'obtention de la certification.</li>
+<li><strong>La validation partielle</strong> des compétences requises, avec préconisations pour compléter le parcours.</li>
+<li><strong>La non-validation</strong>, motivée par le jury.</li>
 </ul>
-<p>Nous vous rappelons que le jury de VAE est souverain dans ses décisions.</p>`, variant: "green" },
+<p>Le jury de VAE est souverain dans ses décisions.</p>`, variant: "green" },
 
-    // ===== DÉCLARATION SUR L'HONNEUR =====
     { heading: "DÉCLARATION SUR L'HONNEUR", content: `
-<p>Je soussigné(e) :</p>
-<p>${dots}</p>
-<p>déclare sur l'honneur que les éléments figurant dans ce livret sont le reflet de mes expériences, en vue de valider la certification <strong>${f.intitule}</strong>.</p>
+<p>Je soussigné(e) <strong>${nomComplet}</strong>, déclare sur l'honneur que les éléments figurant dans ce livret sont le reflet de mes expériences, en vue de valider la certification <strong>${f.intitule}</strong>.</p>
 <p>Je confirme l'exactitude et la véracité des informations figurant dans le présent livret.</p>
-<br>
-<p><strong>Fait à :</strong> ${o.ville}</p>
-<p><strong>Date :</strong></p>
-<p><strong>Signature :</strong></p>` },
+<p><strong>Fait à :</strong> ${ville !== "—" ? ville : o.ville}</p>
+<p><strong>Le :</strong> ${dateSign}</p>
+<p><strong>Signature :</strong> ${s.signatureUrl ? `<img src="${s.signatureUrl}" alt="Signature" style="max-height:60px;max-width:160px;object-fit:contain;vertical-align:middle;margin-left:10px"/>` : nomComplet}</p>` },
   ] });
 }
 
