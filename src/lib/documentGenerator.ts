@@ -6956,7 +6956,7 @@ function getVAELivret2Pack(f: FormationInfo, s: StagiaireInfo, si: number): VAEL
 function genVAELivret2(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
   const s = stagiaires[si] || stagiaires[0] || FALLBACK_STAGIAIRE;
   const pack = getVAELivret2Pack(f, s, si);
-  const cb = (v: boolean) => v ? "☒" : "☐";
+  const cb = (v: boolean) => v ? `<span style="font-weight:bold;color:#1a4480;">X</span>` : "";
   const nomComplet = `${s.prenom} ${s.nom}`;
   const adresse = s.adresse || "—";
   const cp = s.codePostal || "—";
@@ -6964,7 +6964,7 @@ function genVAELivret2(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagiaire
   const tel = s.telephone || "";
   const email = s.email || "—";
   const nir = s.nir || `${(1 + (si % 2))}${(s.dateNaissance || "1985-06-15").slice(2, 4)}${(s.dateNaissance || "1985-06-15").slice(5, 7)}`;
-  const dateSign = new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
+  const dateSign = formatDate(getStagiaireDateFin(s, f));
 
   const expRows = pack.experiences.map(e => `<tr>
 <td style="border:1px solid #999;padding:6px;">${e.emploi}</td>
