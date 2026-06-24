@@ -16240,7 +16240,7 @@ function genAIEvaluationFinale(o: OrganismeInfo, f: FormationInfo, stagiaires: S
  * avec énoncé, production stagiaire et corrigé — varié d'un stagiaire à l'autre.
  * Pour les jours futurs (formation non encore passée), l'exercice reste en trame à compléter.
  */
-function genAIExercicesParJour(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number): string {
+function genAIExercicesParJour(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number, onlyDayIdx?: number): string {
   const pack: AIEvalPack | null = getCachedPack(f);
   const s = stagiaires[si] || stagiaires[0];
   const days = getStagiaireDays(s, f);
