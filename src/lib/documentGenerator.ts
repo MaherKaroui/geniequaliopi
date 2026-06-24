@@ -16320,13 +16320,14 @@ function genAIExercicesParJour(o: OrganismeInfo, f: FormationInfo, stagiaires: S
   let scoredCount = 0;
 
   days.forEach((day, di) => {
+    if (singleDay && di !== onlyDayIdx) return;
     const past = isFrLongDayPast(day);
     const t = days.length <= 1 ? 1 : di / (days.length - 1);
     const quality = 0.55 + t * 0.4;
     const useQCM = (di % 2 === 0) && qcmBank.length > 0;
 
-    // Saut de page entre chaque jour (sauf le 1er)
-    if (di > 0) extra += `<div class="page-break" style="page-break-before:always"></div>`;
+    // Saut de page entre chaque jour (sauf le 1er) — uniquement en mode global
+    if (!singleDay && di > 0) extra += `<div class="page-break" style="page-break-before:always"></div>`;
 
     extra += `<div class="day-block" style="border:1px solid #cbd5e1;padding:14px;margin-top:10px">
       <h3 style="margin:0 0 8px 0;color:#1e40af">Jour ${di + 1} sur ${days.length} — ${day}</h3>
