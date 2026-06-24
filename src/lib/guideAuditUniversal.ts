@@ -46,7 +46,7 @@ export function detectTypeAction(org: OrganismeInfo): TypeActionAudit {
 
 // Script « ce qu'il faut dire » adapté par type d'action et par indicateur.
 // Si pas de variation spécifique, on dérive depuis niveauAttendu.
-function scriptParIndicateur(num: number, type: TypeActionAudit, niveauAttendu: string): string {
+export function scriptParIndicateur(num: number, type: TypeActionAudit, niveauAttendu: string): string {
   const b = ACTION_BENEFICIAIRE[type];
   const contextes: Record<TypeActionAudit, Record<number, string>> = {
     AF: {
@@ -90,7 +90,7 @@ function scriptParIndicateur(num: number, type: TypeActionAudit, niveauAttendu: 
 }
 
 // Documents-preuves typiques par type d'action et par indicateur.
-function preuvesParIndicateur(num: number, type: TypeActionAudit, base: string[]): string[] {
+export function preuvesParIndicateur(num: number, type: TypeActionAudit, base: string[]): string[] {
   const extra: Record<TypeActionAudit, Record<number, string[]>> = {
     AF: {
       1: ["Fiches formation datées", "Pages site web (captures datées)", "Catalogue commercial", "CGV"],
@@ -127,7 +127,7 @@ function preuvesParIndicateur(num: number, type: TypeActionAudit, base: string[]
   return base;
 }
 
-function pointVigilance(num: number, type: TypeActionAudit): string | undefined {
+export function pointVigilance(num: number, type: TypeActionAudit): string | undefined {
   const v: Record<TypeActionAudit, Record<number, string>> = {
     AF: {
       1: "Vérifier les dates de mise à jour visibles sur chaque fiche et page web.",
