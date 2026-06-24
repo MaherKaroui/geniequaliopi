@@ -295,7 +295,7 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
 
     if (result) zip.file(result.fileName, result.blob);
     options?.onItemDone?.(1, 1);
-  }, [exportStagiaires, generateAutoDoc, generateAutoDocForStagiaire]);
+  }, [exportStagiaires, generateAutoDoc, generateAutoDocForStagiaire, formation, organismeWithSignature]);
 
   const handleDownloadDoc = useCallback(async (eyDoc: EYDocumentItem, state: EYDocState) => {
     if (state.status === "uploaded" && state.uploadedFile) {
