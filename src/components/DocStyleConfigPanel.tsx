@@ -303,6 +303,10 @@ function ThemeMiniPreview({ theme, primary, secondary, bodyFont, headFont }: { t
     techstartup: { background: `linear-gradient(135deg,${primary},${secondary})`, color: "#fff", padding: "5px 12px", borderRadius: 10, fontFamily: headFont, fontWeight: 700, fontSize: 11 },
     botanique: { color: primary, fontFamily: headFont, fontWeight: 600, fontSize: 12, fontStyle: "italic" as const, borderBottom: `1px solid ${secondary}80`, paddingBottom: 3 },
     suisse: { color: "#111", fontFamily: headFont, fontWeight: 800, fontSize: 14, letterSpacing: -0.5, borderLeft: `4px solid ${secondary}`, paddingLeft: 6 },
+    monochrome: { color: "#000", fontFamily: headFont, fontWeight: 900, fontSize: 13, textTransform: "uppercase" as const, letterSpacing: 1, borderBottom: "3px solid #000", paddingBottom: 3 },
+    pastel: { background: `${primary}20`, color: primary, padding: "5px 12px", borderRadius: 14, fontFamily: headFont, fontWeight: 700, fontSize: 11 },
+    presse: { color: "#000", fontFamily: headFont, fontWeight: 900, fontSize: 14, textAlign: "center" as const, borderTop: "2px solid #000", borderBottom: "0.5px solid #000", padding: "4px 0", textTransform: "uppercase" as const, letterSpacing: 1 },
+    terracotta: { background: `${primary}15`, color: primary, padding: "4px 10px", borderLeft: `4px solid ${secondary}`, fontFamily: headFont, fontWeight: 700, fontSize: 11, borderRadius: "0 8px 8px 0" },
   };
 
   const thStyles: Record<DocTheme, React.CSSProperties> = {
