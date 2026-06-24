@@ -16006,7 +16006,25 @@ function genAITestPositionnement(o: OrganismeInfo, f: FormationInfo, stagiaires:
   const stagFini = isStagiaireFormationTerminee(s, f);
   const renderEmpty = mode === "fin" && !stagFini;
 
-  const answers = renderEmpty ? [] : answersForQCM(qcm, si, s, mode, isOpco);
+  // Cible de score (DÉBUT) en fonction du nombre d'heures du stagiaire
+  // 15h → 6-7/10 ; plus d'heures → score plus bas (niveau initial plus faible, marge de progression)
+  let targetCorrect: number | undefined;
+  if (mode === "debut" && !isOpco) {
+    const stagDuree = getStagiaireDuree(s, f);
+    let hours = 0;
+    const m1 = /(\d+)\s*[hH]/.exec(stagDuree) || /(\d+)\s*[hH]/.exec(f.duree || "") || /(\d+)\s*[hH]/.exec(f.intitule || "");
+    if (m1) hours = parseInt(m1[1], 10);
+    if (!hours) hours = getStagiaireDays(s, f).length * 7;
+    const seedVar = (((s?.prenom || "").length + (s?.nom || "").length + si) % 2); // 0 ou 1 pour varier
+    if (hours <= 15) targetCorrect = 6 + seedVar;                 // 6 ou 7
+    else if (hours <= 20) targetCorrect = 5 + seedVar;            // 5 ou 6
+    else if (hours <= 30) targetCorrect = 4 + seedVar;            // 4 ou 5
+    else if (hours <= 40) targetCorrect = 3 + seedVar;            // 3 ou 4
+    else if (hours <= 65) targetCorrect = 2 + seedVar;            // 2 ou 3
+    else targetCorrect = 2;                                       // > 65h : très débutant
+  }
+
+  const answers = renderEmpty ? [] : answersForQCM(qcm, si, s, mode, isOpco, targetCorrect);
   let correct = 0;
   const isDebut = mode === "debut";
   const rows = qcm.map((q, qi) => {
