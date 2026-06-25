@@ -402,7 +402,10 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
     const isPerStagiaire = PER_STAGIAIRE_TEMPLATES.has(doc.template);
     const hasOwnStagiaire = typeof doc.params?.stagiaireIdx === "number";
     if (hasOwnStagiaire) {
-      const content = generateDocumentById(doc.id, doc.template, doc.params, organisme, formation, allStagiaires);
+      const editKey = `${doc.id}_sall`;
+      const content = editedContents.has(editKey)
+        ? editedContents.get(editKey)!
+        : generateDocumentById(doc.id, doc.template, doc.params, organisme, formation, allStagiaires);
       const currentStagiaire = allStagiaires[doc.params!.stagiaireIdx as number] || null;
       setPreviewContent(content);
       setPreviewTitle(docTitle(doc.nom, currentStagiaire));
@@ -514,7 +517,10 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
     const isPerStagiaire = PER_STAGIAIRE_TEMPLATES.has(doc.template);
     const hasOwnStagiaire = typeof doc.params?.stagiaireIdx === "number";
     if (hasOwnStagiaire) {
-      const content = generateDocumentById(doc.id, doc.template, doc.params, organisme, formation, allStagiaires);
+      const editKey = `${doc.id}_sall`;
+      const content = editedContents.has(editKey)
+        ? editedContents.get(editKey)!
+        : generateDocumentById(doc.id, doc.template, doc.params, organisme, formation, allStagiaires);
       const stagiaire = allStagiaires[doc.params!.stagiaireIdx as number] || null;
       await downloadFile(content, buildCatalogFileName(doc, stagiaire));
       return;
@@ -538,7 +544,10 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
       || REAL_XLSX_TEMPLATES.has(doc.template)
     ) {
       let excelContent: string;
-      if (doc.template === "tableau_suivi_parcours_excel") {
+      const editKeyXls = `${doc.id}_sall`;
+      if (editedContents.has(editKeyXls)) {
+        excelContent = editedContents.get(editKeyXls)!;
+      } else if (doc.template === "tableau_suivi_parcours_excel") {
         excelContent = generateExcelTableauSuiviParcours(mergedOrganisme, selectedFormation, allStagiaires);
       } else if (doc.template === "indicateurs_performance") {
         excelContent = generateExcelTableauBordPerformance(mergedOrganisme, selectedFormation, allStagiaires);
