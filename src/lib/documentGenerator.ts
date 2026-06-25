@@ -12490,7 +12490,7 @@ function genAppreciationsEntreprises(o: OrganismeInfo, f: FormationInfo, stagiai
       extra += `<p><strong>Remarques ou suggestions :</strong> ………………………………………………………………</p>`;
     }
   });
-  return buildDocument({ org: o, title: "QUESTIONNAIRE DE SATISFACTION CLIENT COMMANDITAIRE", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra });
+  return buildDocument({ org: o, title: "QUESTIONNAIRE DE SATISFACTION CLIENT COMMANDITAIRE", subtitle: f.intitule, stagiaires, extraHtml: extra });
 }
 
 function genAppreciationsFinanceurs(o: OrganismeInfo, f: FormationInfo) {
