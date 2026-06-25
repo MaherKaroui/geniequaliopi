@@ -402,7 +402,10 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
     const isPerStagiaire = PER_STAGIAIRE_TEMPLATES.has(doc.template);
     const hasOwnStagiaire = typeof doc.params?.stagiaireIdx === "number";
     if (hasOwnStagiaire) {
-      const content = generateDocumentById(doc.id, doc.template, doc.params, organisme, formation, allStagiaires);
+      const editKey = `${doc.id}_sall`;
+      const content = editedContents.has(editKey)
+        ? editedContents.get(editKey)!
+        : generateDocumentById(doc.id, doc.template, doc.params, organisme, formation, allStagiaires);
       const currentStagiaire = allStagiaires[doc.params!.stagiaireIdx as number] || null;
       setPreviewContent(content);
       setPreviewTitle(docTitle(doc.nom, currentStagiaire));
