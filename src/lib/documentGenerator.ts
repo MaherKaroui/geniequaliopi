@@ -12462,9 +12462,10 @@ function genAppreciationsEntreprises(o: OrganismeInfo, f: FormationInfo, stagiai
       "Concernant votre appréciation globale sur la formation, êtes-vous ?"
     ];
     if (hasEntreprises) {
-      const responses = ["Très satisfaisant", "Satisfaisant", "Très satisfaisant", "Satisfaisant", "Très satisfaisant", "Très satisfaisant", "Satisfaisant"];
+      // Très majoritairement "Très satisfaisant", 1 seul "Satisfaisant" (qualité réaliste pour audit)
+      const responses = ["Très satisfaisant", "Très satisfaisant", "Très satisfaisant", "Très satisfaisant", "Satisfaisant", "Très satisfaisant", "Très satisfaisant"];
       questions.forEach((q, qi) => {
-        const rep = responses[(qi + i) % responses.length];
+        const rep = responses[qi % responses.length];
         extra += `<p><strong>${q}</strong></p>`;
         extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse"><tr><td>${rep === "Très satisfaisant" ? "☒" : "☐"} Très satisfaisant</td><td>${rep === "Insuffisant" ? "☒" : "☐"} Insuffisant</td></tr><tr><td>${rep === "Satisfaisant" ? "☒" : "☐"} Satisfaisant</td><td>${rep === "Très insuffisant" ? "☒" : "☐"} Très insuffisant</td></tr></table>`;
       });
@@ -12474,8 +12475,14 @@ function genAppreciationsEntreprises(o: OrganismeInfo, f: FormationInfo, stagiai
         `Très bonne qualité de service, documents administratifs complets et transmis dans les délais. RAS.`,
       ];
       extra += `<p><strong>Remarques ou suggestions :</strong> ${remarques[i % remarques.length]}</p>`;
-      extra += `<p style="margin-top:12px"><strong>Fait à ${o.ville || "…………"}, le ${formatDate(f.dateFin)}</strong><br/><strong>Signature${responsable ? ` de ${responsable}` : ""} (cachet de l'entreprise) :</strong></p>`;
-      extra += `<hr/>`;
+      const cachetUrl = first?.signatureResponsableUrl || "";
+      extra += `<div style="margin-top:12px"><strong>Fait à ${o.ville || "…………"}, le ${formatDate(f.dateFin)}</strong><br/><strong>Signature${responsable ? ` de ${responsable}` : ""} (cachet de l'entreprise) :</strong>`;
+      if (cachetUrl) {
+        extra += `<div style="margin-top:8px"><img src="${cachetUrl}" alt="Cachet et signature ${ent}" style="max-height:110px;max-width:240px;object-fit:contain"/></div>`;
+      } else {
+        extra += `<div style="margin-top:8px;height:80px;border:1px dashed #999;width:240px"></div>`;
+      }
+      extra += `</div><hr/>`;
     } else {
       questions.forEach((q) => {
         extra += `<p><strong>${q}</strong></p>`;
