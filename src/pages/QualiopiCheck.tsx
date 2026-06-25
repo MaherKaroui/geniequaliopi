@@ -4,10 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { ArrowLeft, AlertTriangle, CheckCircle2, XCircle, RefreshCw, ShieldCheck, Search, Sparkles, Loader2 } from "lucide-react";
+import { ArrowLeft, AlertTriangle, CheckCircle2, XCircle, RefreshCw, ShieldCheck, Search, Sparkles, Loader2, FileSpreadsheet } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { buildFullCatalog } from "@/lib/docCatalog";
+import { generateRapportAudit } from "@/lib/rapportAuditXlsx";
 
 type Severity = "error" | "warning" | "info";
 type AuditType = "AF" | "BC" | "VAE" | "CFA";
