@@ -12494,7 +12494,7 @@ function genAppreciationsEntreprises(o: OrganismeInfo, f: FormationInfo, stagiai
 }
 
 function genAppreciationsFinanceurs(o: OrganismeInfo, f: FormationInfo) {
-  let extra = `<p><strong>Date :</strong> ${formatDate(f.dateFin)}</p><p><em>En cas de non-retour, l'enquête est renvoyée dans un délai d'une semaine. Si pas de réponse, l'enquête est administrée par téléphone pendant un mois.</em></p>`;
+  let extra = `<p><em>En cas de non-retour, l'enquête est renvoyée dans un délai d'une semaine. Si pas de réponse, l'enquête est administrée par téléphone pendant un mois.</em></p>`;
   const financeurs = ["OPCO Atlas", "OPCO EP", "France Travail"];
   financeurs.forEach((fin, i) => {
     extra += `<h3>Financeur : ${fin}</h3>`;
