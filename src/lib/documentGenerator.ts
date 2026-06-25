@@ -12858,7 +12858,7 @@ function genAppreciationsBeneficiairesStagiaire(o: OrganismeInfo, f: FormationIn
     extra += `<p><strong>Commentaire :</strong> _______________________________________________</p>`;
   }
 
-  return buildDocument({ org: o, title: "QUESTIONNAIRE DE SATISFACTION DU BÉNÉFICIAIRE", subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra });
+  return buildDocument({ org: o, title: "QUESTIONNAIRE DE SATISFACTION DU BÉNÉFICIAIRE", subtitle: `${f.intitule} – ${s.prenom} ${s.nom}`, stagiaires, extraHtml: extra });
 }
 
 // =============================================
