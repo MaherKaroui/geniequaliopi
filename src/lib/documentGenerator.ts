@@ -12461,12 +12461,16 @@ function genAppreciationsEntreprises(o: OrganismeInfo, f: FormationInfo, stagiai
       "Concernant votre appréciation globale sur la formation, êtes-vous ?"
     ];
     if (hasEntreprises) {
-      // Très majoritairement "Très satisfaisant", 1 seul "Satisfaisant" (qualité réaliste pour audit)
-      const responses = ["Très satisfaisant", "Très satisfaisant", "Très satisfaisant", "Très satisfaisant", "Satisfaisant", "Très satisfaisant", "Très satisfaisant"];
-      questions.forEach((q, qi) => {
-        const rep = responses[qi % responses.length];
+      // Profil de réponses différent par entreprise (X devant Très satisfaisant / Satisfaisant en alternance)
+      // Seed déterministe basé sur le nom de l'entreprise pour cohérence inter-générations
+      let seed = 0;
+      for (let k = 0; k < ent.length; k++) seed = (seed * 31 + ent.charCodeAt(k)) >>> 0;
+      const rand = () => { seed = (seed * 1103515245 + 12345) >>> 0; return seed / 0xffffffff; };
+      questions.forEach((q) => {
+        // ~70% Très satisfaisant, ~30% Satisfaisant
+        const rep = rand() < 0.7 ? "Très satisfaisant" : "Satisfaisant";
         extra += `<p><strong>${q}</strong></p>`;
-        extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse"><tr><td>${rep === "Très satisfaisant" ? "☒" : "☐"} Très satisfaisant</td><td>${rep === "Insuffisant" ? "☒" : "☐"} Insuffisant</td></tr><tr><td>${rep === "Satisfaisant" ? "☒" : "☐"} Satisfaisant</td><td>${rep === "Très insuffisant" ? "☒" : "☐"} Très insuffisant</td></tr></table>`;
+        extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse"><tr><td>${rep === "Très satisfaisant" ? "☒" : "☐"} Très satisfaisant</td><td>☐ Insuffisant</td></tr><tr><td>${rep === "Satisfaisant" ? "☒" : "☐"} Satisfaisant</td><td>☐ Très insuffisant</td></tr></table>`;
       });
       const remarques = [
         `Nous sommes très satisfaits de l'accompagnement proposé par ${o.nom}. La formation a répondu à nos attentes et nos collaborateurs ont pu monter en compétence rapidement.`,
