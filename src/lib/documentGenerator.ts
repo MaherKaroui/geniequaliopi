@@ -12469,8 +12469,10 @@ function genAppreciationsEntreprises(o: OrganismeInfo, f: FormationInfo, stagiai
       questions.forEach((q) => {
         // ~70% Très satisfaisant, ~30% Satisfaisant
         const rep = rand() < 0.7 ? "Très satisfaisant" : "Satisfaisant";
+        const mTS = rep === "Très satisfaisant" ? "<strong>X</strong>&nbsp;" : "";
+        const mS = rep === "Satisfaisant" ? "<strong>X</strong>&nbsp;" : "";
         extra += `<p><strong>${q}</strong></p>`;
-        extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse"><tr><td>${rep === "Très satisfaisant" ? "☒" : "☐"} Très satisfaisant</td><td>☐ Insuffisant</td></tr><tr><td>${rep === "Satisfaisant" ? "☒" : "☐"} Satisfaisant</td><td>☐ Très insuffisant</td></tr></table>`;
+        extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td style="width:50%">${mTS}Très satisfaisant</td><td>Insuffisant</td></tr><tr><td>${mS}Satisfaisant</td><td>Très insuffisant</td></tr></table>`;
       });
       const remarques = [
         `Nous sommes très satisfaits de l'accompagnement proposé par ${o.nom}. La formation a répondu à nos attentes et nos collaborateurs ont pu monter en compétence rapidement.`,
@@ -12494,8 +12496,10 @@ function genAppreciationsEntreprises(o: OrganismeInfo, f: FormationInfo, stagiai
       const rand = () => { seed = (seed * 1103515245 + 12345) >>> 0; return seed / 0xffffffff; };
       questions.forEach((q) => {
         const rep = rand() < 0.7 ? "Très satisfaisant" : "Satisfaisant";
+        const mTS = rep === "Très satisfaisant" ? "<strong>X</strong>&nbsp;" : "";
+        const mS = rep === "Satisfaisant" ? "<strong>X</strong>&nbsp;" : "";
         extra += `<p><strong>${q}</strong></p>`;
-        extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse"><tr><td>${rep === "Très satisfaisant" ? "☒" : "☐"} Très satisfaisant</td><td>☐ Insuffisant</td></tr><tr><td>${rep === "Satisfaisant" ? "☒" : "☐"} Satisfaisant</td><td>☐ Très insuffisant</td></tr></table>`;
+        extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td style="width:50%">${mTS}Très satisfaisant</td><td>Insuffisant</td></tr><tr><td>${mS}Satisfaisant</td><td>Très insuffisant</td></tr></table>`;
       });
       extra += `<p><strong>Remarques ou suggestions :</strong> Prestation conforme à nos attentes, équipe pédagogique réactive et professionnelle.</p>`;
     }
