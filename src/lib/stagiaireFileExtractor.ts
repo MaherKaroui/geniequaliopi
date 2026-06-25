@@ -277,3 +277,97 @@ export const mergeExtractions = (
   }
   return out;
 };
+
+/* ---------------- Extraction multi-stagiaires (conventions, listes) ---------------- */
+
+export interface MultiStagiaireExtraction {
+  stagiaires: StagiaireExtraction[];
+  entreprise?: string;
+}
+
+const detectEntrepriseFromText = (text: string): string | undefined => {
+  // Pattern 1: "NOM" s'acquittera ...
+  const m1 = text.match(/["«]\s*([A-ZÉÈÀÂÔÛ0-9&\-\s]{3,60}?)\s*["»]\s*s['\u2019]?acquittera/i);
+  if (m1) return m1[1].trim().replace(/\s{2,}/g, " ");
+
+  // Pattern 2: line "FER ET ARTI" suivie d'une adresse et "Siret :"
+  // On capture les blocs "NOM\n...adresse...\nSiret :"
+  const blocks = [...text.matchAll(/([A-ZÉÈÀÂÔÛ][A-ZÉÈÀÂÔÛ0-9&\-\.\s]{2,60})\s*\n[^\n]{3,120}\n[^\n]{0,80}Siret\s*:/g)];
+  if (blocks.length >= 2) {
+    // Le 2e bloc = l'entreprise (le 1er = l'organisme de formation)
+    return blocks[1][1].trim().replace(/\s{2,}/g, " ");
+  }
+
+  // Pattern 3: "Entreprise : NOM"
+  const m3 = text.match(/(?:Entreprise|Employeur|Soci[ée]t[ée]|Raison sociale|Client)\s*:?\s*([^\n\r,;]{2,80})/i);
+  if (m3) return m3[1].trim();
+
+  return undefined;
+};
+
+const extractStagiairesListFromText = (text: string): StagiaireExtraction[] => {
+  // Cherche la section "Article 2 - Effectif à former" ou "participants suivants"
+  // jusqu'à "Article 3" ou "Dispositions financières"
+  const sectionMatch = text.match(
+    /(?:Article\s*2[^\n]*Effectif[^\n]*|participants?\s+suivants?\s*:?|stagiaires?\s+suivants?\s*:?|liste\s+des\s+stagiaires?\s*:?|b[ée]n[ée]ficiaires?\s+suivants?\s*:?)([\s\S]{20,2000}?)(?=Article\s*3|Dispositions\s+financ|Co[uû]t\s+p[ée]dagogique|$)/i
+  );
+  const section = sectionMatch ? sectionMatch[1] : text;
+
+  // Pattern: M./Mme/Mlle NOM Prénom (NOM en majuscules, Prénom capitalisé ou mixte)
+  const namePattern = /(M\.|Mme|Mlle|Madame|Monsieur)\s+([A-ZÉÈÀÂÔÛÇ][A-ZÉÈÀÂÔÛÇ\-']{1,}(?:\s+[A-ZÉÈÀÂÔÛÇ\-']{2,})*)\s+([A-ZÉÈÀÂÔÛÇa-zéèàâôûç\-']{2,}(?:[\s\-][A-ZÉÈÀÂÔÛÇa-zéèàâôûç\-']{2,})*)/g;
+
+  const results: StagiaireExtraction[] = [];
+  const seen = new Set<string>();
+  let m: RegExpExecArray | null;
+  while ((m = namePattern.exec(section)) !== null) {
+    const civRaw = m[1].toLowerCase();
+    const civilite: "M." | "Mme" = (civRaw === "mme" || civRaw === "madame" || civRaw === "mlle") ? "Mme" : "M.";
+    const nom = m[2].trim().toUpperCase();
+    const prenom = titleCase(m[3].trim());
+    const key = `${nom}|${prenom}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    results.push({ civilite, nom, prenom });
+  }
+
+  return results;
+};
+
+export const extractMultipleStagiairesFromFile = async (
+  file: File
+): Promise<MultiStagiaireExtraction> => {
+  const text = await readAnyFile(file);
+  const normalized = text
+    .replace(/\u00A0/g, " ")
+    .replace(/[\u2019\u2018\u02BC`]/g, "'");
+
+  const entreprise = detectEntrepriseFromText(normalized);
+  const liste = extractStagiairesListFromText(normalized);
+
+  // Fallback : si aucun nom détecté dans la liste, utiliser l'extraction simple
+  if (liste.length === 0) {
+    const single = parseStagiaireFromText(normalized);
+    if (single.nom || single.prenom) liste.push(single);
+  } else {
+    // Enrichir le premier stagiaire avec les autres champs détectés (dates, lieu, etc.)
+    const enriched = parseStagiaireFromText(normalized);
+    const first = liste[0];
+    (Object.keys(enriched) as (keyof StagiaireExtraction)[]).forEach((k) => {
+      if (k === "nom" || k === "prenom" || k === "civilite") return;
+      if (first[k] === undefined && enriched[k] !== undefined) {
+        // @ts-ignore
+        first[k] = enriched[k];
+      }
+    });
+  }
+
+  // Appliquer l'entreprise à tous les stagiaires détectés
+  if (entreprise) {
+    liste.forEach((s) => {
+      if (!s.entreprise) s.entreprise = entreprise;
+    });
+  }
+
+  return { stagiaires: liste, entreprise };
+};
+

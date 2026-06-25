@@ -11,11 +11,13 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { extractConvocationFromDocx, convocationToStagiaire } from "@/lib/convocationExtractor";
 import {
-  extractStagiaireFromFile,
+  extractMultipleStagiairesFromFile,
   extractionToStagiaire,
   mergeExtractions,
   type StagiaireExtraction,
 } from "@/lib/stagiaireFileExtractor";
+
+
 
 const FORMATEURS_PREDIFINIS = [
   "AHMED EL HILALI",
@@ -139,12 +141,19 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
     let errorCount = 0;
 
     try {
-      // 1) Extraire chaque fichier
-      const perFile: { file: File; ex: StagiaireExtraction }[] = [];
+      // 1) Extraire chaque fichier (peut retourner plusieurs stagiaires + entreprise)
+      const perFile: { file: File; ex: StagiaireExtraction; entreprise?: string }[] = [];
       for (const file of Array.from(files)) {
         try {
-          const ex = await extractStagiaireFromFile(file);
-          perFile.push({ file, ex });
+          const multi = await extractMultipleStagiairesFromFile(file);
+          if (multi.stagiaires.length === 0) {
+            errorCount++;
+            continue;
+          }
+          multi.stagiaires.forEach((ex) => {
+            if (multi.entreprise && !ex.entreprise) ex.entreprise = multi.entreprise;
+            perFile.push({ file, ex, entreprise: multi.entreprise });
+          });
         } catch (e) {
           console.error("Erreur lecture fichier:", file.name, e);
           errorCount++;
@@ -182,7 +191,7 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
         toast.warning(`${orphelins.length} fichier(s) sans identité détectée — ignoré(s)`);
       }
       if (successCount > 0)
-        toast.success(`${successCount} stagiaire(s) importé(s) depuis ${perFile.length} fichier(s)`);
+        toast.success(`${successCount} stagiaire(s) importé(s) depuis ${Array.from(files).length} fichier(s)`);
       if (errorCount > 0 && successCount === 0)
         toast.error(`${errorCount} fichier(s) illisible(s)`);
     } finally {
@@ -190,6 +199,7 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
       if (convocInputRef.current) convocInputRef.current.value = "";
     }
   };
+
 
   return (
     <div className="space-y-6">
