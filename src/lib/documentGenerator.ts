@@ -12417,13 +12417,41 @@ function genAppreciationsBeneficiaires(o: OrganismeInfo, f: FormationInfo, stagi
 }
 
 function genAppreciationsEntreprises(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
-  const entreprisesRaw = stagiaires.slice(0, 10).map(s => s.entreprise).filter(Boolean);
-  const hasEntreprises = entreprisesRaw.length > 0;
-  const entreprises = hasEntreprises ? [...new Set(entreprisesRaw)] : [""];
+  // Regrouper les stagiaires par entreprise (seules celles renseignées)
+  const groups = new Map<string, StagiaireInfo[]>();
+  stagiaires.forEach(s => {
+    const ent = (s.entreprise || "").trim();
+    if (!ent) return;
+    if (!groups.has(ent)) groups.set(ent, []);
+    groups.get(ent)!.push(s);
+  });
+  const hasEntreprises = groups.size > 0;
+  const entries: Array<{ ent: string; sts: StagiaireInfo[] }> = hasEntreprises
+    ? Array.from(groups.entries()).slice(0, 10).map(([ent, sts]) => ({ ent, sts }))
+    : [{ ent: "", sts: [] }];
+
   let extra = `<p><em>Fréquence : fin de formation. Relance mensuelle pendant un mois.</em></p>`;
   extra += `<p><strong>Date :</strong> ${formatDate(f.dateFin)}</p>`;
-  entreprises.forEach((ent, i) => {
-    extra += `<h3>Entreprise : ${ent || "………………………………………"}</h3>`;
+
+  entries.forEach(({ ent, sts }, i) => {
+    const first = sts[0];
+    const responsable = first?.responsableEntreprise?.trim() || "";
+    const siret = first?.siretEntreprise?.trim() || "";
+    const adresse = first?.adresseEntreprise?.trim() || "";
+    const nomsStagiaires = sts.map(s => `${s.prenom} ${s.nom}`.trim()).filter(Boolean).join(", ");
+
+    extra += `<h3>Entreprise commanditaire : ${ent || "………………………………………"}</h3>`;
+    if (hasEntreprises) {
+      extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%;margin-bottom:8px">`;
+      extra += `<tr><td style="background:#f4f6fb;font-weight:600;width:30%">Raison sociale</td><td>${ent}</td></tr>`;
+      if (siret) extra += `<tr><td style="background:#f4f6fb;font-weight:600">SIRET</td><td>${siret}</td></tr>`;
+      if (adresse) extra += `<tr><td style="background:#f4f6fb;font-weight:600">Adresse</td><td>${adresse}</td></tr>`;
+      if (responsable) extra += `<tr><td style="background:#f4f6fb;font-weight:600">Responsable / signataire</td><td>${responsable}</td></tr>`;
+      extra += `<tr><td style="background:#f4f6fb;font-weight:600">Formation suivie</td><td>${f.intitule || "—"}</td></tr>`;
+      if (nomsStagiaires) extra += `<tr><td style="background:#f4f6fb;font-weight:600">Stagiaire(s) inscrit(s)</td><td>${nomsStagiaires}</td></tr>`;
+      extra += `</table>`;
+    }
+
     const questions = [
       "Notre offre de formation est-elle accessible et claire ?",
       "Les devis transmis pour les prestations de formations étaient-ils suffisamment détaillés ?",
@@ -12440,7 +12468,14 @@ function genAppreciationsEntreprises(o: OrganismeInfo, f: FormationInfo, stagiai
         extra += `<p><strong>${q}</strong></p>`;
         extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse"><tr><td>${rep === "Très satisfaisant" ? "☒" : "☐"} Très satisfaisant</td><td>${rep === "Insuffisant" ? "☒" : "☐"} Insuffisant</td></tr><tr><td>${rep === "Satisfaisant" ? "☒" : "☐"} Satisfaisant</td><td>${rep === "Très insuffisant" ? "☒" : "☐"} Très insuffisant</td></tr></table>`;
       });
-      extra += `<p><strong>Remarques ou suggestions :</strong> RAS – Très bonne prestation.</p><hr/>`;
+      const remarques = [
+        `Nous sommes très satisfaits de l'accompagnement proposé par ${o.nom}. La formation a répondu à nos attentes et nos collaborateurs ont pu monter en compétence rapidement.`,
+        `Prestation conforme à nos attentes, équipe pédagogique réactive et professionnelle. Nous renouvellerons notre collaboration avec ${o.nom}.`,
+        `Très bonne qualité de service, documents administratifs complets et transmis dans les délais. RAS.`,
+      ];
+      extra += `<p><strong>Remarques ou suggestions :</strong> ${remarques[i % remarques.length]}</p>`;
+      extra += `<p style="margin-top:12px"><strong>Fait à ${o.ville || "…………"}, le ${formatDate(f.dateFin)}</strong><br/><strong>Signature${responsable ? ` de ${responsable}` : ""} (cachet de l'entreprise) :</strong></p>`;
+      extra += `<hr/>`;
     } else {
       questions.forEach((q) => {
         extra += `<p><strong>${q}</strong></p>`;
