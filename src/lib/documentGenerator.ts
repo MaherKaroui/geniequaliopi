@@ -12430,8 +12430,7 @@ function genAppreciationsEntreprises(o: OrganismeInfo, f: FormationInfo, stagiai
     ? Array.from(groups.entries()).slice(0, 10).map(([ent, sts]) => ({ ent, sts }))
     : [{ ent: "", sts: [] }];
 
-  let extra = `<p><em>Fréquence : fin de formation. Relance mensuelle pendant un mois.</em></p>`;
-  extra += `<p><strong>Date :</strong> ${formatDate(f.dateFin)}</p>`;
+  let extra = ``;
 
   entries.forEach(({ ent, sts }, i) => {
     const first = sts[0];
@@ -12476,7 +12475,7 @@ function genAppreciationsEntreprises(o: OrganismeInfo, f: FormationInfo, stagiai
       ];
       extra += `<p><strong>Remarques ou suggestions :</strong> ${remarques[i % remarques.length]}</p>`;
       const cachetUrl = first?.signatureResponsableUrl || "";
-      extra += `<div style="margin-top:12px"><strong>Fait à ${o.ville || "…………"}, le ${formatDate(f.dateFin)}</strong><br/><strong>Signature${responsable ? ` de ${responsable}` : ""} (cachet de l'entreprise) :</strong>`;
+      extra += `<div style="margin-top:12px"><strong>Signature${responsable ? ` de ${responsable}` : ""} (cachet de l'entreprise) :</strong>`;
       if (cachetUrl) {
         extra += `<div style="margin-top:8px"><img src="${cachetUrl}" alt="Cachet et signature ${ent}" style="max-height:110px;max-width:240px;object-fit:contain"/></div>`;
       } else {
@@ -12491,7 +12490,7 @@ function genAppreciationsEntreprises(o: OrganismeInfo, f: FormationInfo, stagiai
       extra += `<p><strong>Remarques ou suggestions :</strong> ………………………………………………………………</p>`;
     }
   });
-  return buildDocument({ org: o, title: "QUESTIONNAIRE DE SATISFACTION CLIENT COMMANDITAIRE", subtitle: f.intitule, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra });
+  return buildDocument({ org: o, title: "QUESTIONNAIRE DE SATISFACTION CLIENT COMMANDITAIRE", subtitle: f.intitule, stagiaires, extraHtml: extra });
 }
 
 function genAppreciationsFinanceurs(o: OrganismeInfo, f: FormationInfo) {
