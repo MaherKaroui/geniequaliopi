@@ -995,7 +995,7 @@ export function genBilanFroidStagiaire(o: OrganismeInfo, f: FormationInfo, stagi
       <table style="width:100%;border-collapse:collapse;">
         <tr><td ${tdb} style="width:35%;">Intitulé de la formation</td><td ${td}>${titre}</td></tr>
         <tr><td ${tdb}>Dates de formation</td><td ${td}>${deb ? fmtDate(deb) : "—"} au ${fin ? fmtDate(fin) : "—"}</td></tr>
-        <tr><td ${tdb}>L'apprenti(e) :</td><td ${td}>............................................................</td></tr>
+        <tr><td ${tdb}>L'apprenti(e) :</td><td ${td}>${s.civilite || ""} ${s.prenom || ""} ${s.nom || ""}</td></tr>
         <tr><td ${tdb}>Période d'administration</td><td ${td}>${mentionDelai}</td></tr>
       </table>` },
     { heading: "Évaluation", content: `<p>Merci d'indiquer votre niveau de satisfaction en cochant la case correspondante avec un X</p>
