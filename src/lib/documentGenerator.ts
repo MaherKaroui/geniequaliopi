@@ -12430,8 +12430,7 @@ function genAppreciationsEntreprises(o: OrganismeInfo, f: FormationInfo, stagiai
     ? Array.from(groups.entries()).slice(0, 10).map(([ent, sts]) => ({ ent, sts }))
     : [{ ent: "", sts: [] }];
 
-  let extra = `<p><em>Fréquence : fin de formation. Relance mensuelle pendant un mois.</em></p>`;
-  extra += `<p><strong>Date :</strong> ${formatDate(f.dateFin)}</p>`;
+  let extra = ``;
 
   entries.forEach(({ ent, sts }, i) => {
     const first = sts[0];
