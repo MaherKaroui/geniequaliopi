@@ -12,10 +12,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { extractConvocationFromDocx, convocationToStagiaire } from "@/lib/convocationExtractor";
 import {
   extractStagiaireFromFile,
+  extractMultipleStagiairesFromFile,
   extractionToStagiaire,
   mergeExtractions,
   type StagiaireExtraction,
 } from "@/lib/stagiaireFileExtractor";
+
 
 const FORMATEURS_PREDIFINIS = [
   "AHMED EL HILALI",
