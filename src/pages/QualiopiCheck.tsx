@@ -4,10 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { ArrowLeft, AlertTriangle, CheckCircle2, XCircle, RefreshCw, ShieldCheck, Search, Sparkles, Loader2 } from "lucide-react";
+import { ArrowLeft, AlertTriangle, CheckCircle2, XCircle, RefreshCw, ShieldCheck, Search, Sparkles, Loader2, FileSpreadsheet } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { buildFullCatalog } from "@/lib/docCatalog";
+import { generateRapportAudit } from "@/lib/rapportAuditXlsx";
 
 type Severity = "error" | "warning" | "info";
 type AuditType = "AF" | "BC" | "VAE" | "CFA";
@@ -364,7 +365,37 @@ const QualiopiCheck = () => {
               <p className="text-xs text-muted-foreground">{org?.nom || "Organisme non renseigné"} • {form?.intitule || "Formation non renseignée"} • {stag?.length || 0} stagiaire(s)</p>
             </div>
           </div>
-          <Button variant="outline" size="sm" onClick={() => setTick(t => t + 1)}><RefreshCw className="w-4 h-4 mr-1" /> Rafraîchir</Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="default"
+              size="sm"
+              className="bg-emerald-600 hover:bg-emerald-700"
+              onClick={() => {
+                try {
+                  const typeMap: Record<AuditType, "AF" | "BC" | "VAE" | "CFA"> = { AF: "AF", BC: "BC", VAE: "VAE", CFA: "CFA" };
+                  const blob = generateRapportAudit({
+                    org, form, stag,
+                    type: typeMap[auditType],
+                    findings: aiAudit?.findings as any,
+                    scoreGlobal: aiAudit?.scoreGlobal,
+                    synthese: aiAudit?.synthese,
+                  });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement("a");
+                  a.href = url;
+                  a.download = `Rapport-d-audit-${(org?.nom || "organisme").replace(/[^a-z0-9]+/gi, "-")}-${new Date().toISOString().slice(0, 10)}.xlsx`;
+                  a.click();
+                  URL.revokeObjectURL(url);
+                  toast.success("Rapport d'audit Excel généré");
+                } catch (e: any) {
+                  toast.error(e?.message || "Erreur génération rapport");
+                }
+              }}
+            >
+              <FileSpreadsheet className="w-4 h-4 mr-1" /> Rapport d'audit Excel
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => setTick(t => t + 1)}><RefreshCw className="w-4 h-4 mr-1" /> Rafraîchir</Button>
+          </div>
         </div>
       </header>
 
