@@ -412,19 +412,6 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
                 placeholder="Ex : 2500 (prioritaire sur le tarif global)"
               />
             </div>
-            <div className="md:col-span-2">
-              <Label>Formateur de la session</Label>
-              <select
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                value={stagiaire.formateur || ""}
-                onChange={e => updateStagiaire(index, 'formateur', e.target.value)}
-              >
-                <option value="">— Aucun —</option>
-                {FORMATEURS_PREDIFINIS.map(f => (
-                  <option key={f} value={f}>{f}</option>
-                ))}
-              </select>
-            </div>
           </div>
           {/* Signature stagiaire */}
           <div className="space-y-2 mt-2 pt-2 border-t border-border/50">
