@@ -544,7 +544,10 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
       || REAL_XLSX_TEMPLATES.has(doc.template)
     ) {
       let excelContent: string;
-      if (doc.template === "tableau_suivi_parcours_excel") {
+      const editKeyXls = `${doc.id}_sall`;
+      if (editedContents.has(editKeyXls)) {
+        excelContent = editedContents.get(editKeyXls)!;
+      } else if (doc.template === "tableau_suivi_parcours_excel") {
         excelContent = generateExcelTableauSuiviParcours(mergedOrganisme, selectedFormation, allStagiaires);
       } else if (doc.template === "indicateurs_performance") {
         excelContent = generateExcelTableauBordPerformance(mergedOrganisme, selectedFormation, allStagiaires);
