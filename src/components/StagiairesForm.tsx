@@ -402,6 +402,16 @@ const StagiairesForm = ({ data, onChange }: StagiairesFormProps) => {
               <Label>Date fin formation</Label>
               <Input type="date" value={stagiaire.dateFinFormation} onChange={e => updateStagiaire(index, 'dateFinFormation', e.target.value)} />
             </div>
+            <div>
+              <Label>Tarif formation (€)</Label>
+              <Input
+                type="text"
+                inputMode="decimal"
+                value={stagiaire.tarifFormation || ""}
+                onChange={e => updateStagiaire(index, 'tarifFormation', e.target.value)}
+                placeholder="Ex : 2500 (prioritaire sur le tarif global)"
+              />
+            </div>
             <div className="md:col-span-2">
               <Label>Formateur de la session</Label>
               <select
