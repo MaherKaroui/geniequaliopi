@@ -227,6 +227,16 @@ const YOUTUBE_GESTION_ENTREPRISE: CourseData['youtubeVideos'] = [
   { title: "Bases du droit du travail pour dirigeants", url: "https://www.youtube.com/watch?v=k3W-9z6JdC4", description: "Contrats, rupture, durée du travail, convention collective : essentiels pour un dirigeant." },
 ];
 
+const YOUTUBE_CREATION_ENTREPRISE: CourseData['youtubeVideos'] = [
+  { title: "Créer son entreprise : les 7 étapes clés", url: "https://www.youtube.com/results?search_query=cr%C3%A9er+son+entreprise+%C3%A9tapes+cl%C3%A9s+Bpifrance", description: "De l'idée à l'immatriculation : parcours complet du créateur d'entreprise." },
+  { title: "Business Model Canvas expliqué", url: "https://www.youtube.com/results?search_query=business+model+canvas+expliqu%C3%A9+fran%C3%A7ais", description: "Construire son modèle économique avec les 9 blocs du BMC d'Osterwalder." },
+  { title: "Étude de marché : méthode complète", url: "https://www.youtube.com/results?search_query=%C3%A9tude+de+march%C3%A9+cr%C3%A9ation+entreprise+m%C3%A9thode", description: "Étude documentaire, étude terrain, analyse PESTEL et 5 forces de Porter." },
+  { title: "Construire son prévisionnel financier", url: "https://www.youtube.com/results?search_query=pr%C3%A9visionnel+financier+cr%C3%A9ation+entreprise", description: "CA prévisionnel, compte de résultat, plan de trésorerie et plan de financement sur 3 ans." },
+  { title: "Choisir son statut juridique (EI, EURL, SASU, SARL, SAS)", url: "https://www.youtube.com/results?search_query=choisir+statut+juridique+cr%C3%A9ation+entreprise", description: "Comparaison des formes juridiques, fiscalité IR/IS et statut social TNS / assimilé salarié." },
+  { title: "ACRE, ARCE, NACRE : les aides à la création", url: "https://www.youtube.com/results?search_query=ACRE+ARCE+NACRE+aides+cr%C3%A9ation+entreprise", description: "Panorama des aides publiques pour les créateurs et repreneurs d'entreprise." },
+  { title: "Formalités sur le Guichet Unique INPI", url: "https://www.youtube.com/results?search_query=guichet+unique+INPI+immatriculation+entreprise", description: "Tutoriel pas à pas pour immatriculer son entreprise sur formalites.entreprises.gouv.fr." },
+];
+
 /** Génère des vidéos YouTube dynamiques (recherches ciblées) à partir de l'intitulé. */
 function getDynamicYoutubeVideos(formationIntitule: string): CourseData['youtubeVideos'] {
   const raw = (formationIntitule || "Formation professionnelle").trim();
@@ -273,6 +283,10 @@ export function getYoutubeVideos(formationIntitule: string): CourseData['youtube
   if (t.includes('vtc') || t.includes('voiture de transport avec chauffeur') || t.includes('rs5637') || t.includes('chauffeur vtc')) return YOUTUBE_VTC;
   if (t.includes('secrétaire') || t.includes('médico-admin') || t.includes('médico admin')) return YOUTUBE_SECRETAIRE;
   // Transverses
+  if (t.includes('création') && (t.includes('entreprise') || t.includes('activité'))) return YOUTUBE_CREATION_ENTREPRISE;
+  if (t.includes('creation') && (t.includes('entreprise') || t.includes('activite'))) return YOUTUBE_CREATION_ENTREPRISE;
+  if (t.includes('reprise') && t.includes('entreprise')) return YOUTUBE_CREATION_ENTREPRISE;
+  if (t.includes('créer son entreprise') || t.includes('creer son entreprise') || t.includes('porteur de projet') || t.includes('cce ') || t.includes(' cce') || t.includes('rncp31923')) return YOUTUBE_CREATION_ENTREPRISE;
   if (t.includes("gestion d'entreprise") || t.includes('gestion d entreprise') || t.includes('gestion dentreprise') || t.includes('gérer son entreprise') || t.includes('piloter son entreprise') || t.includes('pilotage de pme') || t.includes('pilotage tpe') || t.includes('piloter une tpe') || t.includes('piloter une pme')) return YOUTUBE_GESTION_ENTREPRISE;
   if (t.includes('management') || t.includes('manager') || t.includes('leadership')) return YOUTUBE_MANAGEMENT;
   if (t.includes('médico-social') || t.includes('médico social')) return YOUTUBE_FLE;
@@ -404,8 +418,9 @@ import { getEsthetiqueChapters } from "./courseContentEsthetique";
 import { getNTCChapters } from "./courseContentNTC";
 import { getGPMEChapters } from "./courseContentGPME";
 import { getGestionEntrepriseChapters } from "./courseContentGestionEntreprise";
+import { getCreationEntrepriseChapters } from "./courseContentCreationEntreprise";
 import { getCachedContentPack, pickImagesForQuery } from "./aiContentPack";
-export { getWordChapters, getAnglaisChapters, getAnglaisA1Chapters, getManagementChapters, getGenericChapters, getFLEChapters, getIAChapters, getWebmarketingChapters, getCRMChapters, getMassagePrenatalChapters, getMassagePostpartumChapters, getECSRChapters, getVTestChapters, getCIPChapters, getRPMSChapters, getAssistantDirectionChapters, getInfographisteChapters, getRestaurationChapters, getSocioEsthetiqueChapters, getVTCChapters, getEsthetiqueChapters, getNTCChapters, getGPMEChapters, getGestionEntrepriseChapters };
+export { getWordChapters, getAnglaisChapters, getAnglaisA1Chapters, getManagementChapters, getGenericChapters, getFLEChapters, getIAChapters, getWebmarketingChapters, getCRMChapters, getMassagePrenatalChapters, getMassagePostpartumChapters, getECSRChapters, getVTestChapters, getCIPChapters, getRPMSChapters, getAssistantDirectionChapters, getInfographisteChapters, getRestaurationChapters, getSocioEsthetiqueChapters, getVTCChapters, getEsthetiqueChapters, getNTCChapters, getGPMEChapters, getGestionEntrepriseChapters, getCreationEntrepriseChapters };
 
 function tryAIChapters(formationIntitule: string): CourseChapter[] | null {
   try {
@@ -434,6 +449,10 @@ export function getCourseChapters(formationIntitule: string): CourseChapter[] {
   if (ai) return ai;
   const t = formationIntitule.toLowerCase();
   if (t.includes('gestion de la pme') || t.includes('gestion pme') || t.includes('bts gpme') || t.includes(' gpme') || t.startsWith('gpme') || t.includes('rncp38363')) return getGPMEChapters();
+  if (t.includes('création') && (t.includes('entreprise') || t.includes('activité'))) return getCreationEntrepriseChapters();
+  if (t.includes('creation') && (t.includes('entreprise') || t.includes('activite'))) return getCreationEntrepriseChapters();
+  if (t.includes('reprise') && t.includes('entreprise')) return getCreationEntrepriseChapters();
+  if (t.includes('créer son entreprise') || t.includes('creer son entreprise') || t.includes('porteur de projet') || t.includes('rncp31923')) return getCreationEntrepriseChapters();
   if (t.includes("gestion d'entreprise") || t.includes('gestion d entreprise') || t.includes('gestion dentreprise') || t.includes('gérer son entreprise') || t.includes('piloter son entreprise') || t.includes('pilotage de pme') || t.includes('pilotage tpe')) return getGestionEntrepriseChapters();
   if (t.includes('socio-esthéti') || t.includes('socio esthéti') || t.includes('rs5992') || t.includes('soins socio')) return getSocioEsthetiqueChapters();
   if (t.includes('cap esthét') || t.includes('cap esthet') || t.includes('rncp39030') || t.includes('rncp31041') || t.includes('cosmétique') || t.includes('cosmetique') || ((t.includes('esthét') || t.includes('esthet')) && !t.includes('socio'))) return getEsthetiqueChapters();
