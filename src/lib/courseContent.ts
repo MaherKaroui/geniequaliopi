@@ -449,6 +449,10 @@ export function getCourseChapters(formationIntitule: string): CourseChapter[] {
   if (ai) return ai;
   const t = formationIntitule.toLowerCase();
   if (t.includes('gestion de la pme') || t.includes('gestion pme') || t.includes('bts gpme') || t.includes(' gpme') || t.startsWith('gpme') || t.includes('rncp38363')) return getGPMEChapters();
+  if (t.includes('création') && (t.includes('entreprise') || t.includes('activité'))) return getCreationEntrepriseChapters();
+  if (t.includes('creation') && (t.includes('entreprise') || t.includes('activite'))) return getCreationEntrepriseChapters();
+  if (t.includes('reprise') && t.includes('entreprise')) return getCreationEntrepriseChapters();
+  if (t.includes('créer son entreprise') || t.includes('creer son entreprise') || t.includes('porteur de projet') || t.includes('rncp31923')) return getCreationEntrepriseChapters();
   if (t.includes("gestion d'entreprise") || t.includes('gestion d entreprise') || t.includes('gestion dentreprise') || t.includes('gérer son entreprise') || t.includes('piloter son entreprise') || t.includes('pilotage de pme') || t.includes('pilotage tpe')) return getGestionEntrepriseChapters();
   if (t.includes('socio-esthéti') || t.includes('socio esthéti') || t.includes('rs5992') || t.includes('soins socio')) return getSocioEsthetiqueChapters();
   if (t.includes('cap esthét') || t.includes('cap esthet') || t.includes('rncp39030') || t.includes('rncp31041') || t.includes('cosmétique') || t.includes('cosmetique') || ((t.includes('esthét') || t.includes('esthet')) && !t.includes('socio'))) return getEsthetiqueChapters();
