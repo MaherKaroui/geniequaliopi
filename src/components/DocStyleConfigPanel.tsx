@@ -138,6 +138,11 @@ const THEME_PRESETS: ThemePreset[] = [
     description: "Terre cuite, sable et ocre, chaleureux et artisanal",
     defaults: { primaryColor: "#a0522d", secondaryColor: "#c9a14a", fontFamily: "'Nunito', sans-serif", headingFont: "'Fraunces', serif" }
   },
+  {
+    id: "simplepro", name: "Simple Pro",
+    description: "Bandeau bleu fin, fond blanc, lignes sobres, typo lisible, qualité impression",
+    defaults: { primaryColor: "#1e3a7b", secondaryColor: "#3b82c4", fontFamily: "'Inter', 'Segoe UI', Arial, sans-serif", headingFont: "'Inter', 'Segoe UI', Arial, sans-serif", fontSize: 13 }
+  },
 ];
 
 const FONT_CATEGORIES = [
