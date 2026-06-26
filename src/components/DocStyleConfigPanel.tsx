@@ -361,6 +361,7 @@ function ThemeMiniPreview({ theme, primary, secondary, bodyFont, headFont }: { t
     pastel: { background: `${primary}12`, borderRadius: 12, padding: "5px 10px", ...common, fontFamily: bodyFont, color: primary },
     presse: { background: "#fcfaf5", borderTop: "0.5px solid #000", borderBottom: "0.5px solid #000", padding: "5px 8px", ...common, fontFamily: bodyFont, color: "#222", fontStyle: "italic" as const },
     terracotta: { background: `${primary}10`, borderLeft: `3px solid ${secondary}`, borderRadius: "0 6px 6px 0", padding: "4px 8px", ...common, fontFamily: bodyFont, color: primary },
+    simplepro: { background: "#f5f8fc", borderLeft: `3px solid ${primary}`, padding: "4px 8px", ...common, fontFamily: bodyFont, color: "#1a1a1a" },
   };
 
   return (
