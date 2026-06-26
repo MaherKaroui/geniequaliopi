@@ -90,8 +90,9 @@ function pickPriseEnCharge(s: StagiaireInfo): string {
   return "OPCO";
 }
 
-function pickNature(): string {
-  return "ALTERNANCE";
+function pickNature(f?: FormationInfo): string {
+  const isAlternance = !!(f?.rythmeAlternance && f.rythmeAlternance.trim().length > 0);
+  return isAlternance ? "ALTERNANCE" : "ACTION DE FORMATION";
 }
 
 function buildSheet(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]): XLSX.WorkSheet {
@@ -107,9 +108,10 @@ function buildSheet(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInf
   merges.push({ s: { r, c: 0 }, e: { r, c: 35 } });
   r++; // r=1
 
-  // ===== Row 1 : sous-titre =====
+  // ===== Row 1 : sous-titre (formation + identité organisme : SIRET / NDA) =====
+  const orgIdent = [o.siret ? `SIRET ${o.siret}` : '', o.nda ? `NDA ${o.nda}` : ''].filter(Boolean).join(' · ');
   setCell(ws, XLSX.utils.encode_cell({ r, c: 0 }),
-    `Tableau de suivi du parcours des bénéficiaires et adaptations — ${f.intitule}`,
+    `Tableau de suivi du parcours des bénéficiaires et adaptations — ${f.intitule}${orgIdent ? `  |  ${orgIdent}` : ''}`,
     { ...styleHeader(), font: { italic: true, sz: 10, color: { rgb: "1E3A7B" } } });
   merges.push({ s: { r, c: 0 }, e: { r, c: 35 } });
   r++; // r=2
@@ -207,7 +209,7 @@ function buildSheet(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInf
     setCell(ws, XLSX.utils.encode_cell({ r, c: 3 }), isF ? "X" : "", styleX());
 
     setCell(ws, XLSX.utils.encode_cell({ r, c: 4 }), pickPriseEnCharge(s), styleCell("center"));
-    setCell(ws, XLSX.utils.encode_cell({ r, c: 5 }), pickNature(), styleCell("center"));
+    setCell(ws, XLSX.utils.encode_cell({ r, c: 5 }), pickNature(f), styleCell("center"));
     setCell(ws, XLSX.utils.encode_cell({ r, c: 6 }), handicap, styleCell("center"));
     setCell(ws, XLSX.utils.encode_cell({ r, c: 7 }), obsHandicap, styleCell());
 

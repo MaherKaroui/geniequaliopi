@@ -601,13 +601,17 @@ export function genTableauSuiviParcours_V2(o: OrganismeInfo, f: FormationInfo, s
   const rows = stagiaires.slice(0, 10).map((s, si) => {
     const sc = EVAL_SCORES[si] || [7, 8, 7, 8, 7];
     const avg = Math.round(sc.reduce((a, b) => a + b, 0) / sc.length * 10) / 10;
-    const sexe = s.prenom?.endsWith('a') || s.prenom?.endsWith('e') ? 'F' : 'H';
+    const civ = (s.civilite || '').toLowerCase().trim();
+    const isF = civ.startsWith('mme') || civ.startsWith('mad') || civ.includes('madame');
+    const sexe = civ ? (isF ? 'F' : 'M.') : (s.prenom?.endsWith('a') || s.prenom?.endsWith('e') ? 'F' : 'M.');
     // Only mark presence for days that have passed
     const presences = days.slice(0, 12).map((_, i) => daysPassed[i] ? 'X' : '');
+    const isAlternance = !!(f.rythmeAlternance && f.rythmeAlternance.trim().length > 0);
+    const natureValue = isAlternance ? 'Alternance' : 'Action de formation';
     return [
       s.nom?.toUpperCase(), s.prenom?.toUpperCase(), sexe,
       si % 3 === 0 ? 'autofinancement' : si % 3 === 1 ? 'OPCO' : 'CPF',
-      'numéraires', 'non', '',
+      natureValue, 'non', '',
       formatDate(getStagiaireDateDebut(s, f)), formatDate(getStagiaireDateFin(s, f)),
       formatDate(getStagiaireDateDebut(s, f)), 'aucune', 'aucune', 'aucune',
       ...presences,

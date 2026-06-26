@@ -332,9 +332,19 @@ export function generateExcelTableauBordPerformance(o: OrganismeInfo, f: Formati
 
 export function generateExcelTableauSuiviParcours(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]): string {
   const days = getFormationDays(f);
-  
+  const isAlternance = !!(f.rythmeAlternance && f.rythmeAlternance.trim().length > 0);
+  const natureValue = isAlternance ? 'Alternance' : 'Action de formation';
+
+  // Organisme header (SIRET / NDA) — affiché comme dans les autres documents
+  const orgHeaderCells = [
+    `<strong>${o.nom || ''}</strong>`,
+    o.siret ? `SIRET : ${o.siret}` : '',
+    o.nda ? `NDA : ${o.nda}` : '',
+  ].filter(Boolean).join(' &nbsp;·&nbsp; ');
+  let html = `<tr><td colspan="25" style="background:#e8f0fe;color:#1e3a7b;font-weight:bold;padding:8px 12px;border:1px solid #1e3a7b">${orgHeaderCells}</td></tr>`;
+
   // Header row
-  let html = `<tr>`;
+  html += `<tr>`;
   html += `<th>Nom</th><th>Prénom</th><th>Sexe</th><th>Prise en charge</th><th>Nature</th><th>Handicap</th><th>Observations</th>`;
   html += `<th>Date entrée</th><th>Date sortie</th>`;
   html += `<th>Date adaptation</th><th>Adaptations nécessaires</th><th>Difficultés</th><th>Suivi</th>`;
@@ -346,13 +356,16 @@ export function generateExcelTableauSuiviParcours(o: OrganismeInfo, f: Formation
   stagiaires.slice(0, 10).forEach((s, si) => {
     const sc = EVAL_SCORES[si] || [7, 8, 7, 8, 7];
     const avg = Math.round(sc.reduce((a, b) => a + b, 0) / sc.length * 10) / 10;
-    const sexe = s.prenom?.endsWith('a') || s.prenom?.endsWith('e') ? 'F' : 'H';
+    // Sexe basé sur la civilité (et non sur la terminaison du prénom)
+    const civ = (s.civilite || '').toLowerCase().trim();
+    const isF = civ.startsWith('mme') || civ.startsWith('mad') || civ.includes('madame');
+    const sexe = civ ? (isF ? 'F' : 'M.') : (s.prenom?.endsWith('a') || s.prenom?.endsWith('e') ? 'F' : 'M.');
     const presences = days.slice(0, 12).map(() => 'X');
     const financement = getEvalBesoinsFinancement(s, f, o, si);
     html += tableRow([
       s.nom?.toUpperCase() || '', s.prenom?.toUpperCase() || '', sexe,
       financement,
-      'numéraires', 'non', '',
+      natureValue, 'non', '',
       formatDate(f.dateDebut), formatDate(f.dateFin),
       formatDate(f.dateDebut), 'aucune', 'aucune', 'aucune',
       ...presences,
