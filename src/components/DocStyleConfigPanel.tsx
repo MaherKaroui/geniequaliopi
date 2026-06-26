@@ -138,6 +138,11 @@ const THEME_PRESETS: ThemePreset[] = [
     description: "Terre cuite, sable et ocre, chaleureux et artisanal",
     defaults: { primaryColor: "#a0522d", secondaryColor: "#c9a14a", fontFamily: "'Nunito', sans-serif", headingFont: "'Fraunces', serif" }
   },
+  {
+    id: "simplepro", name: "Simple Pro",
+    description: "Bandeau bleu fin, fond blanc, lignes sobres, typo lisible, qualité impression",
+    defaults: { primaryColor: "#1e3a7b", secondaryColor: "#3b82c4", fontFamily: "'Inter', 'Segoe UI', Arial, sans-serif", headingFont: "'Inter', 'Segoe UI', Arial, sans-serif", fontSize: 13 }
+  },
 ];
 
 const FONT_CATEGORIES = [
@@ -307,6 +312,7 @@ function ThemeMiniPreview({ theme, primary, secondary, bodyFont, headFont }: { t
     pastel: { background: `${primary}20`, color: primary, padding: "5px 12px", borderRadius: 14, fontFamily: headFont, fontWeight: 700, fontSize: 11 },
     presse: { color: "#000", fontFamily: headFont, fontWeight: 900, fontSize: 14, textAlign: "center" as const, borderTop: "2px solid #000", borderBottom: "0.5px solid #000", padding: "4px 0", textTransform: "uppercase" as const, letterSpacing: 1 },
     terracotta: { background: `${primary}15`, color: primary, padding: "4px 10px", borderLeft: `4px solid ${secondary}`, fontFamily: headFont, fontWeight: 700, fontSize: 11, borderRadius: "0 8px 8px 0" },
+    simplepro: { color: primary, fontFamily: headFont, fontWeight: 700, fontSize: 12, borderBottom: `1.5px solid ${primary}`, paddingBottom: 3, letterSpacing: 0.2 },
   };
 
   const thStyles: Record<DocTheme, React.CSSProperties> = {
@@ -333,6 +339,7 @@ function ThemeMiniPreview({ theme, primary, secondary, bodyFont, headFont }: { t
     pastel: { background: `${primary}15`, color: primary, padding: "3px 6px", fontSize: 7, fontWeight: 600, borderRadius: 6 },
     presse: { background: "none", color: "#000", padding: "2px 4px", fontSize: 7, borderTop: "1px solid #000", borderBottom: "1px solid #000", fontWeight: 700, textTransform: "uppercase" as const, letterSpacing: 0.8 },
     terracotta: { background: `${primary}18`, color: primary, padding: "3px 5px", fontSize: 7, fontWeight: 700, borderBottom: `1px solid ${primary}50` },
+    simplepro: { background: primary, color: "#fff", padding: "3px 5px", fontSize: 7, fontWeight: 600, letterSpacing: 0.2 },
   };
 
   const sectionStyles: Record<DocTheme, React.CSSProperties> = {
@@ -359,6 +366,7 @@ function ThemeMiniPreview({ theme, primary, secondary, bodyFont, headFont }: { t
     pastel: { background: `${primary}12`, borderRadius: 12, padding: "5px 10px", ...common, fontFamily: bodyFont, color: primary },
     presse: { background: "#fcfaf5", borderTop: "0.5px solid #000", borderBottom: "0.5px solid #000", padding: "5px 8px", ...common, fontFamily: bodyFont, color: "#222", fontStyle: "italic" as const },
     terracotta: { background: `${primary}10`, borderLeft: `3px solid ${secondary}`, borderRadius: "0 6px 6px 0", padding: "4px 8px", ...common, fontFamily: bodyFont, color: primary },
+    simplepro: { background: "#f5f8fc", borderLeft: `3px solid ${primary}`, padding: "4px 8px", ...common, fontFamily: bodyFont, color: "#1a1a1a" },
   };
 
   return (

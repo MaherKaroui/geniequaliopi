@@ -66,7 +66,10 @@ export async function buildViZip(reporter?: JobReporter): Promise<Blob> {
   }
 
   reporter?.setMessage("Compression du ZIP…");
-  const blob = await zip.generateAsync({ type: "blob", compression: "DEFLATE", compressionOptions: { level: 6 } });
+  const blob = await zip.generateAsync(
+    { type: "blob", compression: "STORE", streamFiles: true },
+    (meta) => reporter?.setProgress(Math.min(100, 95 + meta.percent / 20))
+  );
   reporter?.setMessage("Pack VI prêt !");
   return blob;
 }

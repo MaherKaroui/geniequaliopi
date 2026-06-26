@@ -1968,7 +1968,11 @@ export async function buildBDCNTConseilsZip(
 
   reporter?.setProgress(99);
   reporter?.setMessage("Compression du ZIP…");
-  const blob = await zip.generateAsync({ type: "blob", compression: "DEFLATE", compressionOptions: { level: 6 } });
+  // STORE + streamFiles : PDF/XLSX déjà compressés → ZIP plus rapide et moins de RAM
+  const blob = await zip.generateAsync(
+    { type: "blob", compression: "STORE", streamFiles: true },
+    (meta) => reporter?.setProgress(Math.min(100, 99 + meta.percent / 100))
+  );
   reporter?.setProgress(100);
   return blob;
 }

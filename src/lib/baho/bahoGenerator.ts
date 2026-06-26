@@ -174,7 +174,11 @@ export async function buildBahoZip(reporter?: JobReporter, customFsStamp?: strin
 
   reporter?.setMessage("Compression du ZIP…");
   reporter?.setProgress(99);
-  const blob = await zip.generateAsync({ type: "blob", compression: "DEFLATE", compressionOptions: { level: 6 } });
+  // STORE: PDF déjà compressé, DEFLATE n'apporte rien et coûte cher en CPU
+  const blob = await zip.generateAsync(
+    { type: "blob", compression: "STORE", streamFiles: true },
+    (meta) => reporter?.setProgress(99 + Math.min(1, meta.percent / 100))
+  );
   reporter?.setProgress(100);
   reporter?.setMessage("Pack BAHO prêt !");
   return blob;

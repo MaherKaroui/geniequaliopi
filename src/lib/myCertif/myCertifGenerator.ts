@@ -94,7 +94,10 @@ export async function buildMyCertifZip(reporter?: JobReporter): Promise<Blob> {
 
   reporter?.setMessage("Compression du ZIP…");
   reporter?.setProgress(95);
-  const blob = await zip.generateAsync({ type: "blob", compression: "DEFLATE", compressionOptions: { level: 6 } });
+  const blob = await zip.generateAsync(
+    { type: "blob", compression: "STORE", streamFiles: true },
+    (meta) => reporter?.setProgress(Math.min(100, 95 + meta.percent / 20))
+  );
   reporter?.setProgress(100);
   reporter?.setMessage("Pack MyCertif prêt !");
   return blob;
