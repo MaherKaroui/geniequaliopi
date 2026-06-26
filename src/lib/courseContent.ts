@@ -273,6 +273,7 @@ export function getYoutubeVideos(formationIntitule: string): CourseData['youtube
   if (t.includes('vtc') || t.includes('voiture de transport avec chauffeur') || t.includes('rs5637') || t.includes('chauffeur vtc')) return YOUTUBE_VTC;
   if (t.includes('secrétaire') || t.includes('médico-admin') || t.includes('médico admin')) return YOUTUBE_SECRETAIRE;
   // Transverses
+  if (t.includes("gestion d'entreprise") || t.includes('gestion d entreprise') || t.includes('gestion dentreprise') || t.includes('gérer son entreprise') || t.includes('piloter son entreprise') || t.includes('pilotage de pme') || t.includes('pilotage tpe') || t.includes('piloter une tpe') || t.includes('piloter une pme')) return YOUTUBE_GESTION_ENTREPRISE;
   if (t.includes('management') || t.includes('manager') || t.includes('leadership')) return YOUTUBE_MANAGEMENT;
   if (t.includes('médico-social') || t.includes('médico social')) return YOUTUBE_FLE;
   if (t.includes('intelligence artificielle') || t.includes('ia générative') || t.includes('contenus rédactionnels')) return YOUTUBE_IA;
