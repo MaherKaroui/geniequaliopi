@@ -208,7 +208,7 @@ function buildSheet(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInf
     setCell(ws, XLSX.utils.encode_cell({ r, c: 3 }), isF ? "X" : "", styleX());
 
     setCell(ws, XLSX.utils.encode_cell({ r, c: 4 }), pickPriseEnCharge(s), styleCell("center"));
-    setCell(ws, XLSX.utils.encode_cell({ r, c: 5 }), pickNature(), styleCell("center"));
+    setCell(ws, XLSX.utils.encode_cell({ r, c: 5 }), pickNature(f), styleCell("center"));
     setCell(ws, XLSX.utils.encode_cell({ r, c: 6 }), handicap, styleCell("center"));
     setCell(ws, XLSX.utils.encode_cell({ r, c: 7 }), obsHandicap, styleCell());
 
