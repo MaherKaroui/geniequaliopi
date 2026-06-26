@@ -139,9 +139,9 @@ const THEME_PRESETS: ThemePreset[] = [
     defaults: { primaryColor: "#a0522d", secondaryColor: "#c9a14a", fontFamily: "'Nunito', sans-serif", headingFont: "'Fraunces', serif" }
   },
   {
-    id: "simplepro", name: "Simple Pro",
-    description: "Bandeau bleu fin, fond blanc, lignes sobres, typo lisible, qualité impression",
-    defaults: { primaryColor: "#1e3a7b", secondaryColor: "#3b82c4", fontFamily: "'Inter', 'Segoe UI', Arial, sans-serif", headingFont: "'Inter', 'Segoe UI', Arial, sans-serif", fontSize: 13 }
+    id: "simplepro", name: "Papier en-tête premium",
+    description: "Page A4 blanche, en-tête centré sérif, filet doré, tableaux ultra sobres — esprit papeterie haut de gamme",
+    defaults: { primaryColor: "#0f2a4a", secondaryColor: "#b8924a", fontFamily: "'Inter', 'Segoe UI', Arial, sans-serif", headingFont: "'Cormorant Garamond', 'EB Garamond', serif", fontSize: 13 }
   },
 ];
 
