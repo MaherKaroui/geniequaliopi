@@ -393,8 +393,9 @@ import { getEsthetiqueChapters } from "./courseContentEsthetique";
 
 import { getNTCChapters } from "./courseContentNTC";
 import { getGPMEChapters } from "./courseContentGPME";
+import { getGestionEntrepriseChapters } from "./courseContentGestionEntreprise";
 import { getCachedContentPack, pickImagesForQuery } from "./aiContentPack";
-export { getWordChapters, getAnglaisChapters, getAnglaisA1Chapters, getManagementChapters, getGenericChapters, getFLEChapters, getIAChapters, getWebmarketingChapters, getCRMChapters, getMassagePrenatalChapters, getMassagePostpartumChapters, getECSRChapters, getVTestChapters, getCIPChapters, getRPMSChapters, getAssistantDirectionChapters, getInfographisteChapters, getRestaurationChapters, getSocioEsthetiqueChapters, getVTCChapters, getEsthetiqueChapters, getNTCChapters, getGPMEChapters };
+export { getWordChapters, getAnglaisChapters, getAnglaisA1Chapters, getManagementChapters, getGenericChapters, getFLEChapters, getIAChapters, getWebmarketingChapters, getCRMChapters, getMassagePrenatalChapters, getMassagePostpartumChapters, getECSRChapters, getVTestChapters, getCIPChapters, getRPMSChapters, getAssistantDirectionChapters, getInfographisteChapters, getRestaurationChapters, getSocioEsthetiqueChapters, getVTCChapters, getEsthetiqueChapters, getNTCChapters, getGPMEChapters, getGestionEntrepriseChapters };
 
 function tryAIChapters(formationIntitule: string): CourseChapter[] | null {
   try {
