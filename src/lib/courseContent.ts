@@ -227,6 +227,16 @@ const YOUTUBE_GESTION_ENTREPRISE: CourseData['youtubeVideos'] = [
   { title: "Bases du droit du travail pour dirigeants", url: "https://www.youtube.com/watch?v=k3W-9z6JdC4", description: "Contrats, rupture, durée du travail, convention collective : essentiels pour un dirigeant." },
 ];
 
+const YOUTUBE_CREATION_ENTREPRISE: CourseData['youtubeVideos'] = [
+  { title: "Créer son entreprise : les 7 étapes clés", url: "https://www.youtube.com/results?search_query=cr%C3%A9er+son+entreprise+%C3%A9tapes+cl%C3%A9s+Bpifrance", description: "De l'idée à l'immatriculation : parcours complet du créateur d'entreprise." },
+  { title: "Business Model Canvas expliqué", url: "https://www.youtube.com/results?search_query=business+model+canvas+expliqu%C3%A9+fran%C3%A7ais", description: "Construire son modèle économique avec les 9 blocs du BMC d'Osterwalder." },
+  { title: "Étude de marché : méthode complète", url: "https://www.youtube.com/results?search_query=%C3%A9tude+de+march%C3%A9+cr%C3%A9ation+entreprise+m%C3%A9thode", description: "Étude documentaire, étude terrain, analyse PESTEL et 5 forces de Porter." },
+  { title: "Construire son prévisionnel financier", url: "https://www.youtube.com/results?search_query=pr%C3%A9visionnel+financier+cr%C3%A9ation+entreprise", description: "CA prévisionnel, compte de résultat, plan de trésorerie et plan de financement sur 3 ans." },
+  { title: "Choisir son statut juridique (EI, EURL, SASU, SARL, SAS)", url: "https://www.youtube.com/results?search_query=choisir+statut+juridique+cr%C3%A9ation+entreprise", description: "Comparaison des formes juridiques, fiscalité IR/IS et statut social TNS / assimilé salarié." },
+  { title: "ACRE, ARCE, NACRE : les aides à la création", url: "https://www.youtube.com/results?search_query=ACRE+ARCE+NACRE+aides+cr%C3%A9ation+entreprise", description: "Panorama des aides publiques pour les créateurs et repreneurs d'entreprise." },
+  { title: "Formalités sur le Guichet Unique INPI", url: "https://www.youtube.com/results?search_query=guichet+unique+INPI+immatriculation+entreprise", description: "Tutoriel pas à pas pour immatriculer son entreprise sur formalites.entreprises.gouv.fr." },
+];
+
 /** Génère des vidéos YouTube dynamiques (recherches ciblées) à partir de l'intitulé. */
 function getDynamicYoutubeVideos(formationIntitule: string): CourseData['youtubeVideos'] {
   const raw = (formationIntitule || "Formation professionnelle").trim();
