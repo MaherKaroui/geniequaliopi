@@ -433,6 +433,33 @@ tr:nth-child(odd){background:#fff}
 .sig-label{color:${s.primaryColor};font-weight:700;letter-spacing:0.5px}
 .badge{border-radius:14px;background:${s.secondaryColor}25;color:${s.primaryColor};font-weight:700;padding:4px 12px;border:1px solid ${s.secondaryColor}50}
 .footer{border-top:2px solid ${s.secondaryColor}40;color:${s.primaryColor};padding-top:14px}
+`,
+    simplepro: `
+body{background:#fff;color:#1a1a1a;padding:60px 70px;max-width:880px}
+.header{text-align:center;margin-bottom:48px;padding-bottom:28px;position:relative}
+.header::before{content:"Organisme de formation certifié Qualiopi";display:block;font-size:${s.fontSize - 3}px;color:${s.secondaryColor};letter-spacing:4px;text-transform:uppercase;margin-bottom:14px;font-weight:600}
+.header::after{content:"";display:block;width:64px;height:1px;background:${s.secondaryColor};margin:22px auto 0}
+.header h1{border:none;background:none;padding:0;color:#111;font-family:${s.headingFont};font-weight:600;text-transform:uppercase;letter-spacing:6px;font-size:${s.fontSize + 18}px;line-height:1.15}
+.org-name{font-family:${s.headingFont};font-size:${s.fontSize + 18}px;font-weight:600;letter-spacing:6px;text-transform:uppercase;color:#111;line-height:1.15}
+.subtitle{font-size:${s.fontSize - 2}px;color:#666;letter-spacing:2.5px;text-transform:uppercase;margin-top:12px;font-weight:500}
+h1{border:none;background:none;color:#111;font-family:${s.headingFont};font-weight:400;font-size:${s.fontSize + 9}px;text-align:center;letter-spacing:3px;text-transform:uppercase;padding:0 0 16px;margin:28px 0 30px;border-bottom:0.5px solid ${s.secondaryColor};box-shadow:none;border-left:none;border-radius:0}
+h2{border:none;background:none;color:${s.primaryColor};font-family:${s.headingFont};font-weight:600;font-size:${s.fontSize + 3}px;text-transform:uppercase;letter-spacing:2px;margin-top:32px;padding:0 0 6px 0;border-bottom:0.5px solid #ddd;border-left:none;border-radius:0}
+h3{color:#333;font-weight:600;font-style:italic;font-size:${s.fontSize + 1}px;border:none;background:none;padding:0;margin:18px 0 8px}
+p{color:#2a2a2a;line-height:1.75}
+table{border:none;border-top:1.2px solid #111;border-bottom:1.2px solid #111;border-radius:0;box-shadow:none}
+table th{background:#fff !important;color:#111;font-weight:700;text-transform:uppercase;letter-spacing:1px;font-size:${s.fontSize - 2}px;border-bottom:0.5px solid #111;padding:11px 8px;text-align:left}
+table td{border-bottom:0.5px solid #ececec;padding:9px 8px;color:#1a1a1a}
+table tr:nth-child(even){background:#fff !important}
+table tr:nth-child(odd){background:#fff !important}
+table tr:last-child td{border-bottom:none}
+.section{background:#fff;border:none;border-left:2px solid ${s.secondaryColor};padding:6px 20px;margin:20px 0;color:#1a1a1a;border-radius:0}
+.sig-box{border:none;border-top:0.5px solid #999;border-radius:0;background:transparent;padding:14px 4px 4px;min-height:120px}
+.sig-label{font-weight:600;color:${s.primaryColor};text-transform:uppercase;letter-spacing:1.5px;font-size:${s.fontSize - 2}px}
+.badge{border:0.5px solid ${s.secondaryColor};border-radius:0;background:transparent;color:${s.primaryColor};text-transform:uppercase;letter-spacing:1px;font-size:${s.fontSize - 3}px;padding:3px 10px;font-weight:600}
+.footer{margin-top:70px;padding-top:22px;border:none;border-top:1px solid ${s.secondaryColor};color:#555;text-align:center;letter-spacing:0.6px;font-size:${s.fontSize - 2}px;position:relative}
+.footer::before{content:"❖";display:block;color:${s.secondaryColor};font-size:10px;margin:-32px auto 18px;background:#fff;width:24px}
+.info-item strong{color:${s.primaryColor};font-weight:700;letter-spacing:0.3px}
+@media print{body{padding:30mm 25mm 25mm}}
 `
   };
 
