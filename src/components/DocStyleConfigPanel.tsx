@@ -334,6 +334,7 @@ function ThemeMiniPreview({ theme, primary, secondary, bodyFont, headFont }: { t
     pastel: { background: `${primary}15`, color: primary, padding: "3px 6px", fontSize: 7, fontWeight: 600, borderRadius: 6 },
     presse: { background: "none", color: "#000", padding: "2px 4px", fontSize: 7, borderTop: "1px solid #000", borderBottom: "1px solid #000", fontWeight: 700, textTransform: "uppercase" as const, letterSpacing: 0.8 },
     terracotta: { background: `${primary}18`, color: primary, padding: "3px 5px", fontSize: 7, fontWeight: 700, borderBottom: `1px solid ${primary}50` },
+    simplepro: { background: primary, color: "#fff", padding: "3px 5px", fontSize: 7, fontWeight: 600, letterSpacing: 0.2 },
   };
 
   const sectionStyles: Record<DocTheme, React.CSSProperties> = {
