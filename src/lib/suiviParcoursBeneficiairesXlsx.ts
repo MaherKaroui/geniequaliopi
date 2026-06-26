@@ -90,8 +90,9 @@ function pickPriseEnCharge(s: StagiaireInfo): string {
   return "OPCO";
 }
 
-function pickNature(): string {
-  return "ALTERNANCE";
+function pickNature(f?: FormationInfo): string {
+  const isAlternance = !!(f?.rythmeAlternance && f.rythmeAlternance.trim().length > 0);
+  return isAlternance ? "ALTERNANCE" : "ACTION DE FORMATION";
 }
 
 function buildSheet(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]): XLSX.WorkSheet {
