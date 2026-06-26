@@ -283,6 +283,10 @@ export function getYoutubeVideos(formationIntitule: string): CourseData['youtube
   if (t.includes('vtc') || t.includes('voiture de transport avec chauffeur') || t.includes('rs5637') || t.includes('chauffeur vtc')) return YOUTUBE_VTC;
   if (t.includes('secrétaire') || t.includes('médico-admin') || t.includes('médico admin')) return YOUTUBE_SECRETAIRE;
   // Transverses
+  if (t.includes('création') && (t.includes('entreprise') || t.includes('activité'))) return YOUTUBE_CREATION_ENTREPRISE;
+  if (t.includes('creation') && (t.includes('entreprise') || t.includes('activite'))) return YOUTUBE_CREATION_ENTREPRISE;
+  if (t.includes('reprise') && t.includes('entreprise')) return YOUTUBE_CREATION_ENTREPRISE;
+  if (t.includes('créer son entreprise') || t.includes('creer son entreprise') || t.includes('porteur de projet') || t.includes('cce ') || t.includes(' cce') || t.includes('rncp31923')) return YOUTUBE_CREATION_ENTREPRISE;
   if (t.includes("gestion d'entreprise") || t.includes('gestion d entreprise') || t.includes('gestion dentreprise') || t.includes('gérer son entreprise') || t.includes('piloter son entreprise') || t.includes('pilotage de pme') || t.includes('pilotage tpe') || t.includes('piloter une tpe') || t.includes('piloter une pme')) return YOUTUBE_GESTION_ENTREPRISE;
   if (t.includes('management') || t.includes('manager') || t.includes('leadership')) return YOUTUBE_MANAGEMENT;
   if (t.includes('médico-social') || t.includes('médico social')) return YOUTUBE_FLE;
