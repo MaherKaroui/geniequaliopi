@@ -218,6 +218,15 @@ const YOUTUBE_BUREAUTIQUE: CourseData['youtubeVideos'] = [
   { title: "Outlook – Bien gérer ses mails et son agenda", url: "https://www.youtube.com/watch?v=7Jn_t6A8q6w", description: "Trier ses mails, organiser son agenda et collaborer efficacement avec Outlook." },
 ];
 
+const YOUTUBE_GESTION_ENTREPRISE: CourseData['youtubeVideos'] = [
+  { title: "Comprendre le bilan et le compte de résultat", url: "https://www.youtube.com/watch?v=Z6oNqRz5jvA", description: "Lecture des états financiers : actif, passif, charges, produits, soldes intermédiaires de gestion." },
+  { title: "Gérer la trésorerie d'une TPE/PME", url: "https://www.youtube.com/watch?v=yT9p5Pp_3lE", description: "Plan de trésorerie, BFR, prévisionnel, relations bancaires et financement court terme." },
+  { title: "Calculer son prix de revient et fixer ses prix", url: "https://www.youtube.com/watch?v=W3iC5gJ2_DQ", description: "Méthode du coût complet, marge, seuil de rentabilité et politique tarifaire." },
+  { title: "Régimes fiscaux des entreprises (micro, réel, IS/IR)", url: "https://www.youtube.com/watch?v=g38nT1zG2yE", description: "Comparaison des régimes, TVA, CFE, plafonds et obligations déclaratives." },
+  { title: "Piloter son entreprise avec des tableaux de bord", url: "https://www.youtube.com/watch?v=8sM3qGqRH-Q", description: "Construire des KPI commerciaux, financiers et RH pour piloter une TPE/PME." },
+  { title: "Bases du droit du travail pour dirigeants", url: "https://www.youtube.com/watch?v=k3W-9z6JdC4", description: "Contrats, rupture, durée du travail, convention collective : essentiels pour un dirigeant." },
+];
+
 /** Génère des vidéos YouTube dynamiques (recherches ciblées) à partir de l'intitulé. */
 function getDynamicYoutubeVideos(formationIntitule: string): CourseData['youtubeVideos'] {
   const raw = (formationIntitule || "Formation professionnelle").trim();
@@ -264,6 +273,7 @@ export function getYoutubeVideos(formationIntitule: string): CourseData['youtube
   if (t.includes('vtc') || t.includes('voiture de transport avec chauffeur') || t.includes('rs5637') || t.includes('chauffeur vtc')) return YOUTUBE_VTC;
   if (t.includes('secrétaire') || t.includes('médico-admin') || t.includes('médico admin')) return YOUTUBE_SECRETAIRE;
   // Transverses
+  if (t.includes("gestion d'entreprise") || t.includes('gestion d entreprise') || t.includes('gestion dentreprise') || t.includes('gérer son entreprise') || t.includes('piloter son entreprise') || t.includes('pilotage de pme') || t.includes('pilotage tpe') || t.includes('piloter une tpe') || t.includes('piloter une pme')) return YOUTUBE_GESTION_ENTREPRISE;
   if (t.includes('management') || t.includes('manager') || t.includes('leadership')) return YOUTUBE_MANAGEMENT;
   if (t.includes('médico-social') || t.includes('médico social')) return YOUTUBE_FLE;
   if (t.includes('intelligence artificielle') || t.includes('ia générative') || t.includes('contenus rédactionnels')) return YOUTUBE_IA;
