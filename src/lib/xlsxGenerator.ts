@@ -339,7 +339,7 @@ export function generateExcelTableauSuiviParcours(o: OrganismeInfo, f: Formation
   const orgHeaderCells = [
     `<strong>${o.nom || ''}</strong>`,
     o.siret ? `SIRET : ${o.siret}` : '',
-    o.numeroDeclarationActivite ? `NDA : ${o.numeroDeclarationActivite}` : '',
+    o.nda ? `NDA : ${o.nda}` : '',
   ].filter(Boolean).join(' &nbsp;·&nbsp; ');
   let html = `<tr><td colspan="25" style="background:#e8f0fe;color:#1e3a7b;font-weight:bold;padding:8px 12px;border:1px solid #1e3a7b">${orgHeaderCells}</td></tr>`;
 
