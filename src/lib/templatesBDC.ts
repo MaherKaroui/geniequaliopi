@@ -162,7 +162,7 @@ export function getBdcDomainProfile(f: FormationInfo): BdcDomainProfile {
       veilleTechnologique: { intitule: "Digitalisation des lignes (Industrie 4.0), supervision SCADA et fibres recyclées", source: "ATIP – Association Technique de l'Industrie Papetière", lien: "https://www.atip.asso.fr", date: "Février 2025", exploitation: "Présentée pour identifier les compétences numériques attendues (supervision, maintenance prédictive, indicateurs de performance), les évolutions des matières premières (taux de fibres recyclées, désencrage) et les besoins de qualification associés." },
     };
   }
-
+  return {
     label: f.intitule || "Bilan de compétences",
     metier: `professionnel(le) du domaine ${f.intitule || "visé"}`,
     secteur: f.intitule || "secteur professionnel visé",
