@@ -12426,6 +12426,18 @@ function genAppreciationsBeneficiaires(o: OrganismeInfo, f: FormationInfo, stagi
 }
 
 function genAppreciationsEntreprises(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
+  // Tant que la formation n'est pas terminée, le questionnaire de satisfaction commanditaire reste vide
+  const termine = isFormationTerminee(f, stagiaires);
+  if (!termine) {
+    return buildDocument({
+      org: o,
+      title: "QUESTIONNAIRE DE SATISFACTION CLIENT COMMANDITAIRE",
+      subtitle: f.intitule,
+      stagiaires,
+      extraHtml: `<p><em>Ce questionnaire sera adressé aux entreprises commanditaires à l'issue de la formation. Aucune réponse n'est disponible tant que la formation est en cours.</em></p>`,
+    });
+  }
+
   // Regrouper les stagiaires par entreprise (seules celles renseignées)
   const groups = new Map<string, StagiaireInfo[]>();
   stagiaires.forEach(s => {
@@ -12438,6 +12450,7 @@ function genAppreciationsEntreprises(o: OrganismeInfo, f: FormationInfo, stagiai
   const entries: Array<{ ent: string; sts: StagiaireInfo[] }> = hasEntreprises
     ? Array.from(groups.entries()).slice(0, 10).map(([ent, sts]) => ({ ent, sts }))
     : [{ ent: "", sts: [] }];
+
 
   let extra = ``;
 
