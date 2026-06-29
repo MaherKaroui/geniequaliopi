@@ -143,6 +143,11 @@ const THEME_PRESETS: ThemePreset[] = [
     description: "Page A4 blanche, en-tête centré sérif, filet doré, tableaux ultra sobres — esprit papeterie haut de gamme",
     defaults: { primaryColor: "#0f2a4a", secondaryColor: "#b8924a", fontFamily: "'Inter', 'Segoe UI', Arial, sans-serif", headingFont: "'Cormorant Garamond', 'EB Garamond', serif", fontSize: 13 }
   },
+  {
+    id: "epure", name: "Épuré (modèle contrat)",
+    description: "Page A4 100% blanche, titre noir centré en majuscules, sans-serif, aucun fond ni couleur — style document administratif",
+    defaults: { primaryColor: "#000000", secondaryColor: "#000000", fontFamily: "Arial, Helvetica, sans-serif", headingFont: "Arial, Helvetica, sans-serif", fontSize: 12 }
+  },
 ];
 
 const FONT_CATEGORIES = [
