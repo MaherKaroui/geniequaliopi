@@ -318,6 +318,7 @@ function ThemeMiniPreview({ theme, primary, secondary, bodyFont, headFont }: { t
     presse: { color: "#000", fontFamily: headFont, fontWeight: 900, fontSize: 14, textAlign: "center" as const, borderTop: "2px solid #000", borderBottom: "0.5px solid #000", padding: "4px 0", textTransform: "uppercase" as const, letterSpacing: 1 },
     terracotta: { background: `${primary}15`, color: primary, padding: "4px 10px", borderLeft: `4px solid ${secondary}`, fontFamily: headFont, fontWeight: 700, fontSize: 11, borderRadius: "0 8px 8px 0" },
     simplepro: { color: primary, fontFamily: headFont, fontWeight: 700, fontSize: 12, borderBottom: `1.5px solid ${primary}`, paddingBottom: 3, letterSpacing: 0.2 },
+    epure: { color: "#000", fontFamily: "Arial, Helvetica, sans-serif", fontWeight: 700, fontSize: 13, textAlign: "center" as const, textTransform: "uppercase" as const, letterSpacing: 1.5, padding: "4px 0" },
   };
 
   const thStyles: Record<DocTheme, React.CSSProperties> = {
@@ -345,6 +346,7 @@ function ThemeMiniPreview({ theme, primary, secondary, bodyFont, headFont }: { t
     presse: { background: "none", color: "#000", padding: "2px 4px", fontSize: 7, borderTop: "1px solid #000", borderBottom: "1px solid #000", fontWeight: 700, textTransform: "uppercase" as const, letterSpacing: 0.8 },
     terracotta: { background: `${primary}18`, color: primary, padding: "3px 5px", fontSize: 7, fontWeight: 700, borderBottom: `1px solid ${primary}50` },
     simplepro: { background: primary, color: "#fff", padding: "3px 5px", fontSize: 7, fontWeight: 600, letterSpacing: 0.2 },
+    epure: { background: "#fff", color: "#000", padding: "3px 5px", fontSize: 7, fontWeight: 700, borderBottom: "1px solid #000" },
   };
 
   const sectionStyles: Record<DocTheme, React.CSSProperties> = {
@@ -372,6 +374,7 @@ function ThemeMiniPreview({ theme, primary, secondary, bodyFont, headFont }: { t
     presse: { background: "#fcfaf5", borderTop: "0.5px solid #000", borderBottom: "0.5px solid #000", padding: "5px 8px", ...common, fontFamily: bodyFont, color: "#222", fontStyle: "italic" as const },
     terracotta: { background: `${primary}10`, borderLeft: `3px solid ${secondary}`, borderRadius: "0 6px 6px 0", padding: "4px 8px", ...common, fontFamily: bodyFont, color: primary },
     simplepro: { background: "#f5f8fc", borderLeft: `3px solid ${primary}`, padding: "4px 8px", ...common, fontFamily: bodyFont, color: "#1a1a1a" },
+    epure: { background: "#fff", padding: "3px 0", ...common, fontFamily: "Arial, Helvetica, sans-serif", color: "#000" },
   };
 
   return (
