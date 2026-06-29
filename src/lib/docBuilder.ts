@@ -460,6 +460,31 @@ table tr:last-child td{border-bottom:none}
 .footer::before{content:"❖";display:block;color:${s.secondaryColor};font-size:10px;margin:-32px auto 18px;background:#fff;width:24px}
 .info-item strong{color:${s.primaryColor};font-weight:700;letter-spacing:0.3px}
 @media print{body{padding:30mm 25mm 25mm}}
+`,
+    epure: `
+body{background:#fff;color:#000;padding:55px 70px;max-width:860px;font-family:Arial,Helvetica,sans-serif}
+.header{text-align:center;margin-bottom:40px;padding:0;border:none;background:none}
+.header::before,.header::after{display:none}
+.header h1,.org-name{color:#000;background:none;border:none;padding:0;font-family:Arial,Helvetica,sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:2px;font-size:${s.fontSize + 8}px;line-height:1.3;box-shadow:none}
+.subtitle{color:#000;font-size:${s.fontSize - 1}px;margin-top:6px;letter-spacing:0;text-transform:none;font-weight:400}
+h1{border:none;background:none;color:#000;font-family:Arial,Helvetica,sans-serif;font-weight:700;text-transform:uppercase;text-align:center;letter-spacing:2px;font-size:${s.fontSize + 6}px;padding:0;margin:24px 0 28px;border-radius:0;box-shadow:none;border-left:none}
+h2{border:none;background:none;color:#000;font-family:Arial,Helvetica,sans-serif;font-weight:400;font-size:${s.fontSize + 2}px;text-transform:none;letter-spacing:0;margin:22px 0 8px;padding:0;border-radius:0;border-left:none}
+h3{color:#000;font-weight:400;font-style:normal;font-size:${s.fontSize + 1}px;border:none;background:none;padding:0;margin:14px 0 6px}
+p{color:#000;line-height:1.6;margin:6px 0}
+table{border:none;border-collapse:collapse;border-radius:0;box-shadow:none;margin:12px 0}
+table th{background:#fff !important;color:#000;font-weight:700;text-transform:none;letter-spacing:0;font-size:${s.fontSize - 1}px;border:none;border-bottom:1px solid #000;padding:6px 8px;text-align:left}
+table td{border:none;border-bottom:1px solid #000;padding:6px 8px;color:#000;background:#fff !important}
+table tr:nth-child(even),table tr:nth-child(odd){background:#fff !important}
+.section{background:#fff;border:none;border-left:none;padding:6px 0;margin:14px 0;color:#000;border-radius:0}
+.sig-box{border:none;border-top:1px solid #000;border-radius:0;background:transparent;padding:14px 4px 4px;min-height:110px;box-shadow:none}
+.sig-label{font-weight:400;color:#000;text-transform:none;letter-spacing:0;font-size:${s.fontSize - 1}px}
+.badge{border:1px solid #000;border-radius:0;background:transparent;color:#000;text-transform:none;letter-spacing:0;font-size:${s.fontSize - 2}px;padding:2px 8px;font-weight:400}
+.footer{margin-top:50px;padding-top:16px;border:none;border-top:1px solid #000;color:#000;text-align:center;letter-spacing:0;font-size:${s.fontSize - 2}px}
+.footer::before{display:none}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 18px;margin:10px 0}
+.info-item{font-size:${s.fontSize}px;color:#000}
+.info-item strong{color:#000;font-weight:700}
+@media print{body{padding:25mm 22mm}}
 `
   };
 
