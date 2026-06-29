@@ -1152,7 +1152,10 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
           const stagiaire = allStagiaires[si] || allStagiaires[0];
           const stagFolder = basePath;
 
-          if (doc.template === "pdf_static" && getStaticFileUrl(doc)) {
+          if (doc.template === "cerfa_apprentissage") {
+            const blob = await genCerfaApprentissagePdf(mergedOrganisme, selectedFormation, stagiaire);
+            zip.file(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, ".pdf")}`, blob);
+          } else if (doc.template === "pdf_static" && getStaticFileUrl(doc)) {
             const resp = await fetch(getStaticFileUrl(doc)!);
             zip.file(`${stagFolder}/${buildCatalogFileName(doc, stagiaire)}`, await resp.blob());
           } else if (NATIVE_XLSX_TEMPLATES.has(doc.template)) {
