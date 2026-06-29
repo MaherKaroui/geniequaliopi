@@ -942,7 +942,12 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
           const stagiaire = allStagiaires[si] || allStagiaires[0];
           const stagFolder = basePath;
 
-          if (doc.template === "pdf_static" && getStaticFileUrl(doc)) {
+          if (doc.template === "cerfa_apprentissage") {
+            await safeRun(`${doc.nom} (${stagiaire.nom})`, async () => {
+              const blob = await genCerfaApprentissagePdf(mergedOrganisme, selectedFormation, stagiaire);
+              addFileToZip(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, ".pdf")}`, blob);
+            });
+          } else if (doc.template === "pdf_static" && getStaticFileUrl(doc)) {
             await safeRun(`${doc.nom} (${stagiaire.nom})`, async () => {
               const resp = await fetch(getStaticFileUrl(doc)!);
               const fileBlob = await resp.blob();
