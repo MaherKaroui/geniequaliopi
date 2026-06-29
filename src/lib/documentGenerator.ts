@@ -12439,7 +12439,12 @@ function genAppreciationsEntreprises(o: OrganismeInfo, f: FormationInfo, stagiai
     ? Array.from(groups.entries()).slice(0, 10).map(([ent, sts]) => ({ ent, sts }))
     : [{ ent: "", sts: [] }];
 
+  const termine = isFormationTerminee(f, stagiaires);
+
   let extra = ``;
+  if (!termine) {
+    extra += `<p style="background:#fff7ed;border-left:4px solid #ea7d0c;padding:10px 14px;margin:0 0 12px;font-size:13px"><strong>⏳ Formation en cours</strong> — Questionnaire à administrer au client commanditaire à l'issue de la formation. Les réponses et la signature seront recueillies à ce moment-là.</p>`;
+  }
 
   entries.forEach(({ ent, sts }, i) => {
     const first = sts[0];
