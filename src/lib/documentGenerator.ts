@@ -12439,7 +12439,12 @@ function genAppreciationsEntreprises(o: OrganismeInfo, f: FormationInfo, stagiai
     ? Array.from(groups.entries()).slice(0, 10).map(([ent, sts]) => ({ ent, sts }))
     : [{ ent: "", sts: [] }];
 
+  const termine = isFormationTerminee(f, stagiaires);
+
   let extra = ``;
+  if (!termine) {
+    extra += `<p style="background:#fff7ed;border-left:4px solid #ea7d0c;padding:10px 14px;margin:0 0 12px;font-size:13px"><strong>⏳ Formation en cours</strong> — Questionnaire à administrer au client commanditaire à l'issue de la formation. Les réponses et la signature seront recueillies à ce moment-là.</p>`;
+  }
 
   entries.forEach(({ ent, sts }, i) => {
     const first = sts[0];
@@ -12476,41 +12481,56 @@ function genAppreciationsEntreprises(o: OrganismeInfo, f: FormationInfo, stagiai
       for (let k = 0; k < ent.length; k++) seed = (seed * 31 + ent.charCodeAt(k)) >>> 0;
       const rand = () => { seed = (seed * 1103515245 + 12345) >>> 0; return seed / 0xffffffff; };
       questions.forEach((q) => {
-        // ~70% Très satisfaisant, ~30% Satisfaisant
-        const rep = rand() < 0.7 ? "Très satisfaisant" : "Satisfaisant";
-        const mTS = rep === "Très satisfaisant" ? "<strong>X</strong>&nbsp;" : "";
-        const mS = rep === "Satisfaisant" ? "<strong>X</strong>&nbsp;" : "";
+        let mTS = "", mS = "";
+        if (termine) {
+          // ~70% Très satisfaisant, ~30% Satisfaisant
+          const rep = rand() < 0.7 ? "Très satisfaisant" : "Satisfaisant";
+          mTS = rep === "Très satisfaisant" ? "<strong>X</strong>&nbsp;" : "";
+          mS = rep === "Satisfaisant" ? "<strong>X</strong>&nbsp;" : "";
+        }
         extra += `<p><strong>${q}</strong></p>`;
         extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td style="width:50%">${mTS}Très satisfaisant</td><td>Insuffisant</td></tr><tr><td>${mS}Satisfaisant</td><td>Très insuffisant</td></tr></table>`;
       });
-      const remarques = [
-        `Nous sommes très satisfaits de l'accompagnement proposé par ${o.nom}. La formation a répondu à nos attentes et nos collaborateurs ont pu monter en compétence rapidement.`,
-        `Prestation conforme à nos attentes, équipe pédagogique réactive et professionnelle. Nous renouvellerons notre collaboration avec ${o.nom}.`,
-        `Très bonne qualité de service, documents administratifs complets et transmis dans les délais. RAS.`,
-      ];
-      extra += `<p><strong>Remarques ou suggestions :</strong> ${remarques[i % remarques.length]}</p>`;
-      const cachetUrl = first?.signatureResponsableUrl || "";
-      extra += `<div style="margin-top:12px"><strong>Signature${responsable ? ` de ${responsable}` : ""} (cachet de l'entreprise) :</strong>`;
-      if (cachetUrl) {
-        extra += `<div style="margin-top:8px"><img src="${cachetUrl}" alt="Cachet et signature ${ent}" style="max-height:110px;max-width:240px;object-fit:contain"/></div>`;
+      if (termine) {
+        const remarques = [
+          `Nous sommes très satisfaits de l'accompagnement proposé par ${o.nom}. La formation a répondu à nos attentes et nos collaborateurs ont pu monter en compétence rapidement.`,
+          `Prestation conforme à nos attentes, équipe pédagogique réactive et professionnelle. Nous renouvellerons notre collaboration avec ${o.nom}.`,
+          `Très bonne qualité de service, documents administratifs complets et transmis dans les délais. RAS.`,
+        ];
+        extra += `<p><strong>Remarques ou suggestions :</strong> ${remarques[i % remarques.length]}</p>`;
+        const cachetUrl = first?.signatureResponsableUrl || "";
+        extra += `<div style="margin-top:12px"><strong>Signature${responsable ? ` de ${responsable}` : ""} (cachet de l'entreprise) :</strong>`;
+        if (cachetUrl) {
+          extra += `<div style="margin-top:8px"><img src="${cachetUrl}" alt="Cachet et signature ${ent}" style="max-height:110px;max-width:240px;object-fit:contain"/></div>`;
+        } else {
+          extra += `<div style="margin-top:8px;height:80px;border:1px dashed #999;width:240px"></div>`;
+        }
+        extra += `</div><hr/>`;
       } else {
-        extra += `<div style="margin-top:8px;height:80px;border:1px dashed #999;width:240px"></div>`;
+        extra += `<p><strong>Remarques ou suggestions :</strong></p><div style="height:60px;border:1px dashed #999;margin-bottom:10px"></div>`;
+        extra += `<div style="margin-top:12px"><strong>Signature${responsable ? ` de ${responsable}` : ""} (cachet de l'entreprise) :</strong><div style="margin-top:8px;height:80px;border:1px dashed #999;width:240px"></div></div><hr/>`;
       }
-      extra += `</div><hr/>`;
     } else {
-      // Pas d'entreprise renseignée : on remplit quand même par X (audit-ready)
+      // Pas d'entreprise renseignée
       let seed = 0;
       const seedSrc = (o.nom || "default") + (f.intitule || "");
       for (let k = 0; k < seedSrc.length; k++) seed = (seed * 31 + seedSrc.charCodeAt(k)) >>> 0;
       const rand = () => { seed = (seed * 1103515245 + 12345) >>> 0; return seed / 0xffffffff; };
       questions.forEach((q) => {
-        const rep = rand() < 0.7 ? "Très satisfaisant" : "Satisfaisant";
-        const mTS = rep === "Très satisfaisant" ? "<strong>X</strong>&nbsp;" : "";
-        const mS = rep === "Satisfaisant" ? "<strong>X</strong>&nbsp;" : "";
+        let mTS = "", mS = "";
+        if (termine) {
+          const rep = rand() < 0.7 ? "Très satisfaisant" : "Satisfaisant";
+          mTS = rep === "Très satisfaisant" ? "<strong>X</strong>&nbsp;" : "";
+          mS = rep === "Satisfaisant" ? "<strong>X</strong>&nbsp;" : "";
+        }
         extra += `<p><strong>${q}</strong></p>`;
         extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td style="width:50%">${mTS}Très satisfaisant</td><td>Insuffisant</td></tr><tr><td>${mS}Satisfaisant</td><td>Très insuffisant</td></tr></table>`;
       });
-      extra += `<p><strong>Remarques ou suggestions :</strong> Prestation conforme à nos attentes, équipe pédagogique réactive et professionnelle.</p>`;
+      if (termine) {
+        extra += `<p><strong>Remarques ou suggestions :</strong> Prestation conforme à nos attentes, équipe pédagogique réactive et professionnelle.</p>`;
+      } else {
+        extra += `<p><strong>Remarques ou suggestions :</strong></p><div style="height:60px;border:1px dashed #999"></div>`;
+      }
     }
   });
   return buildDocument({ org: o, title: "QUESTIONNAIRE DE SATISFACTION CLIENT COMMANDITAIRE", subtitle: f.intitule, stagiaires, extraHtml: extra });
