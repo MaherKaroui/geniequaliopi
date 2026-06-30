@@ -230,31 +230,41 @@ export function genPlanDevCompetencesExcel(o: OrganismeInfo, f: FormationInfo, f
   // Use formation date year, fallback to current year
   const rawDate = f.dateDebut || f.dateFin || "";
   const parsedDate = rawDate ? new Date(rawDate + "T00:00:00") : null;
-  const year = parsedDate && !isNaN(parsedDate.getTime()) ? parsedDate.getFullYear() : new Date().getFullYear();
+  const dateDebutFormation = parsedDate && !isNaN(parsedDate.getTime()) ? parsedDate : new Date();
+  const year = dateDebutFormation.getFullYear();
   const nextYear = year + 1;
+  // Date d'inscription par défaut = 1 an avant le début de la formation
+  const dateInscriptionDefault = new Date(dateDebutFormation);
+  dateInscriptionDefault.setFullYear(dateInscriptionDefault.getFullYear() - 1);
+  const pad = (n: number) => n.toString().padStart(2, "0");
+  const fmtDate = (d: Date) => `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`;
+  const dateInscriptionStr = fmtDate(dateInscriptionDefault);
+  const dateDebutStr = fmtDate(dateDebutFormation);
   const formateurName = f.formateur || (formateurs[0] ? formateurs[0].prenom + " " + formateurs[0].nom : "");
   const stagiaireNames = stagiaires && stagiaires.length > 0
     ? stagiaires.filter(s => s.nom || s.prenom).map(s => `${s.prenom} ${s.nom}`.trim()).join(", ")
     : formateurName;
   const nbStagiaires = stagiaires ? stagiaires.filter(s => s.nom || s.prenom).length : 1;
 
-  let html = `<tr><th colspan="9">${o.nom} – PLAN DE DÉVELOPPEMENT DES COMPÉTENCES</th></tr>`;
-  html += `<tr><td><strong>Année :</strong></td><td colspan="8">${year} – ${nextYear}</td></tr>`;
+  let html = `<tr><th colspan="11">${o.nom} – PLAN DE DÉVELOPPEMENT DES COMPÉTENCES</th></tr>`;
+  html += `<tr><td><strong>Année :</strong></td><td colspan="10">${year} – ${nextYear}</td></tr>`;
   html += `<tr><td></td></tr>`;
   html += `<tr>
+    <th>Date d'inscription</th>
     <th>Origine</th>
     <th>Nom de la formation</th>
     <th>Objectifs attendus</th>
     <th>Interne / Externe</th>
-    <th>Formateur / Formatrice</th>
+    <th>Formateur / Organisme</th>
     <th>Nb stagiaires</th>
     <th>Noms des stagiaires</th>
     <th>Durée</th>
+    <th>Date de début</th>
     <th>Année</th>
   </tr>`;
 
   // ========== FORMATIONS PRÉVUES (année suivante) ==========
-  html += `<tr><th colspan="9" style="background:#e8870e;text-align:left;padding:10px">FORMATIONS PRÉVUES – ${nextYear}</th></tr>`;
+  html += `<tr><th colspan="11" style="background:#e8870e;text-align:left;padding:10px">FORMATIONS PRÉVUES – ${nextYear}</th></tr>`;
 
   const t = (f.intitule || "").toLowerCase();
   const code = (f.codeRNCP || "").toLowerCase();
