@@ -783,7 +783,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "checklist_formateur": return genChecklistFormateur(o, f, { debut: params?.sessionDebut, fin: params?.sessionFin });
     case "plan_dev_competences_excel": return genPlanDevCompetencesExcel(o, f, formateurs, stagiaires);
     case "plan_dev_preuves_inscription": return genPlanDevPreuvesInscription(o, f, formateurs);
-    case "attestation_fin_formation_fd_certif": return genAttestationFinFormationFDCertif(o);
+    case "attestation_fin_formation_fd_certif": return genAttestationFinFormationFDCertif(o, f);
     case "grille_entretien_annuel": return genGrilleEntretienAnnuel(o, fmt);
     case "fiche_entretien_annuel_formateur": {
       // If a specific formateur name is passed, create a mock FormateurInfo
@@ -12045,19 +12045,17 @@ function genMandatQualiopi(o: OrganismeInfo) {
   })() });
 }
 
-function genAttestationFinFormationFDCertif(o: OrganismeInfo) {
-  // Date début = 1 an avant la date de mise à jour du dossier (alignée avec PDC IND 22)
-  const rawDateMaj = (o as any).dateMaj || new Date().toISOString().split("T")[0];
-  const dDebut = new Date(rawDateMaj);
+function genAttestationFinFormationFDCertif(o: OrganismeInfo, f?: FormationInfo) {
+  // Date de début de l'accompagnement FD CERTIF = 1 an avant la date de début de la formation principale
+  // (cohérent avec le PDC IND 22). Fallback : 1 an avant la date de mise à jour du dossier.
+  const rawDateRef = f?.dateDebut || (o as any).dateMaj || new Date().toISOString().split("T")[0];
+  const dDebut = new Date(rawDateRef);
   dDebut.setFullYear(dDebut.getFullYear() - 1);
-  // Date fin = début + 6 mois
+  // Date fin = début + 6 mois (reste antérieure à la formation principale)
   const dFin = new Date(dDebut);
   dFin.setMonth(dFin.getMonth() + 6);
   const fmt = (d: Date) => formatDate(d.toISOString().split("T")[0]);
 
-  const tamponMandant = o.tamponUrl
-    ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:70px;max-width:160px;object-fit:contain;margin-top:6px;opacity:0.9" />`
-    : "";
   const fdCertifTampon = `<img src="/images/FD_CERTIF_TAMPON.png" alt="Tampon FD CERTIF EXPERT" style="max-height:80px;max-width:200px;object-fit:contain;margin-top:6px;opacity:0.9" />`;
 
   return buildDocument({
@@ -12103,7 +12101,6 @@ Représentée par Madame <strong>Nadine DENDANI</strong>, Présidente,</p>
     ],
     extraHtml: `<div class="signature-block-2" style="margin-top:24px">
       <div class="sig-box"><p class="sig-label">Pour FD CERTIF EXPERT</p><p>Mme Nadine DENDANI, Présidente</p><p>Fait à Issy-les-Moulineaux, le ${fmt(dFin)}</p><p style="margin-top:18px">Signature et cachet :</p>${fdCertifTampon}</div>
-      <div class="sig-box"><p class="sig-label">Le bénéficiaire — ${o.nom}</p><p>${o.dirigeant || ""}</p><p>Fait à ${o.ville || ""}, le ${fmt(dFin)}</p><p style="margin-top:18px">Signature :</p>${tamponMandant}</div>
     </div>`,
   });
 }
