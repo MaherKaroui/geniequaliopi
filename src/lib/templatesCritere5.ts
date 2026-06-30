@@ -196,6 +196,8 @@ export interface PlanDevTraining {
   nb: string;
   noms: string;
   duree: string;
+  dateInscription?: string;
+  dateDebut?: string;
 }
 
 /** Returns the contextual training list used in the IND 22 PDC, filtered by formation type. */
@@ -203,19 +205,22 @@ export function getPlanDevTrainings(f: FormationInfo, formateurs: FormateurInfo[
   const formateurName = f.formateur || (formateurs[0] ? formateurs[0].prenom + " " + formateurs[0].nom : "");
   // Re-use the same generator to keep a single source of truth, then parse out the planned training rows.
   const html = genPlanDevCompetencesExcel({ nom: "" } as OrganismeInfo, f, formateurs, []);
-  const rowRegex = /<tr>\s*<td>([^<]+)<\/td>\s*<td>([^<]+)<\/td>\s*<td>([^<]+)<\/td>\s*<td>([^<]+)<\/td>\s*<td>([^<]+)<\/td>\s*<td>([^<]+)<\/td>\s*<td>([^<]+)<\/td>\s*<td>([^<]+)<\/td>\s*<td>[^<]*<\/td>\s*<\/tr>/g;
+  // Columns: dateInsc, origine, nom, objectif, type, formateur, nb, noms, duree, dateDebut, annee
+  const rowRegex = /<tr>\s*<td>([^<]*)<\/td>\s*<td>([^<]+)<\/td>\s*<td>([^<]+)<\/td>\s*<td>([^<]+)<\/td>\s*<td>([^<]+)<\/td>\s*<td>([^<]+)<\/td>\s*<td>([^<]+)<\/td>\s*<td>([^<]+)<\/td>\s*<td>([^<]+)<\/td>\s*<td>([^<]*)<\/td>\s*<td>[^<]*<\/td>\s*<\/tr>/g;
   const trainings: PlanDevTraining[] = [];
   let match: RegExpExecArray | null;
   while ((match = rowRegex.exec(html)) !== null) {
     trainings.push({
-      origine: match[1].trim(),
-      nom: match[2].trim(),
-      objectif: match[3].trim(),
-      type: match[4].trim(),
-      formateur: match[5].trim(),
-      nb: match[6].trim(),
-      noms: match[7].trim() || formateurName,
-      duree: match[8].trim(),
+      dateInscription: match[1].trim(),
+      origine: match[2].trim(),
+      nom: match[3].trim(),
+      objectif: match[4].trim(),
+      type: match[5].trim(),
+      formateur: match[6].trim(),
+      nb: match[7].trim(),
+      noms: match[8].trim() || formateurName,
+      duree: match[9].trim(),
+      dateDebut: match[10].trim(),
     });
   }
   return trainings;
