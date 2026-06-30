@@ -423,7 +423,7 @@ export function genPlanDevCompetencesExcel(o: OrganismeInfo, f: FormationInfo, f
       <td>${t.noms}</td>
       <td>${rowDuree}</td>
       <td>${rowDateDebut}</td>
-      <td>${nextYear}</td>
+      <td>${prevYear}</td>
     </tr>`;
   });
 
