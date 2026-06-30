@@ -524,7 +524,6 @@ export function generateExcelSuiviParcoursBeneficiairesCFA(o: OrganismeInfo, f: 
     </tr>`;
   });
 
-  html += `</table>`;
   return excelWrap(`SUIVI PARCOURS BÉNÉFICIAIRES ${o.nom}`, [{ name: "Suivi Parcours", html }]);
 }
 
