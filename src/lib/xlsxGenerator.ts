@@ -471,9 +471,9 @@ export function generateExcelSuiviParcoursBeneficiairesCFA(o: OrganismeInfo, f: 
   // Generate week headers
   const weekHeaders = Array.from({ length: nbWeeks }, (_, i) => `<th>S${i + 1}</th>`).join("");
 
-  let html = `<table>`;
+  let html = ``;
   const totalCols = 16 + nbWeeks + 10;
-  html += `<tr><td class="title" colspan="8">${o.nom}</td><td colspan="5"></td><td>Version à jour au :</td><td colspan="2">${today}</td></tr>`;
+  html += `<tr><td colspan="8"><strong>${o.nom}</strong></td><td colspan="5"></td><td>Version à jour au :</td><td colspan="2">${today}</td></tr>`;
   html += `<tr><td colspan="${totalCols}"></td></tr>`;
   html += `<tr class="header-row">
     <td colspan="4" style="text-align:center;font-weight:bold">FICHE D'IDENTITÉ DES BÉNÉFICIAIRES</td>
@@ -524,7 +524,6 @@ export function generateExcelSuiviParcoursBeneficiairesCFA(o: OrganismeInfo, f: 
     </tr>`;
   });
 
-  html += `</table>`;
   return excelWrap(`SUIVI PARCOURS BÉNÉFICIAIRES ${o.nom}`, [{ name: "Suivi Parcours", html }]);
 }
 
