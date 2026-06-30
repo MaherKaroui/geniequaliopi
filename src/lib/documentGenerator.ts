@@ -12101,7 +12101,6 @@ Représentée par Madame <strong>Nadine DENDANI</strong>, Présidente,</p>
     ],
     extraHtml: `<div class="signature-block-2" style="margin-top:24px">
       <div class="sig-box"><p class="sig-label">Pour FD CERTIF EXPERT</p><p>Mme Nadine DENDANI, Présidente</p><p>Fait à Issy-les-Moulineaux, le ${fmt(dFin)}</p><p style="margin-top:18px">Signature et cachet :</p>${fdCertifTampon}</div>
-      <div class="sig-box"><p class="sig-label">Le bénéficiaire — ${o.nom}</p><p>${o.dirigeant || ""}</p><p>Fait à ${o.ville || ""}, le ${fmt(dFin)}</p><p style="margin-top:18px">Signature :</p>${tamponMandant}</div>
     </div>`,
   });
 }
