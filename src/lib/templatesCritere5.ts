@@ -232,7 +232,7 @@ export function genPlanDevCompetencesExcel(o: OrganismeInfo, f: FormationInfo, f
   const parsedDate = rawDate ? new Date(rawDate + "T00:00:00") : null;
   const dateDebutFormation = parsedDate && !isNaN(parsedDate.getTime()) ? parsedDate : new Date();
   const year = dateDebutFormation.getFullYear();
-  const nextYear = year + 1;
+  const prevYear = year - 1;
   // Date d'inscription par défaut = 1 an avant le début de la formation
   const dateInscriptionDefault = new Date(dateDebutFormation);
   dateInscriptionDefault.setFullYear(dateInscriptionDefault.getFullYear() - 1);
@@ -247,7 +247,7 @@ export function genPlanDevCompetencesExcel(o: OrganismeInfo, f: FormationInfo, f
   const nbStagiaires = stagiaires ? stagiaires.filter(s => s.nom || s.prenom).length : 1;
 
   let html = `<tr><th colspan="11">${o.nom} – PLAN DE DÉVELOPPEMENT DES COMPÉTENCES</th></tr>`;
-  html += `<tr><td><strong>Année :</strong></td><td colspan="10">${year} – ${nextYear}</td></tr>`;
+  html += `<tr><td><strong>Année :</strong></td><td colspan="10">${prevYear} – ${year}</td></tr>`;
   html += `<tr><td></td></tr>`;
   html += `<tr>
     <th>Date d'inscription</th>
@@ -423,7 +423,7 @@ export function genPlanDevCompetencesExcel(o: OrganismeInfo, f: FormationInfo, f
       <td>${t.noms}</td>
       <td>${rowDuree}</td>
       <td>${rowDateDebut}</td>
-      <td>${nextYear}</td>
+      <td>${prevYear}</td>
     </tr>`;
   });
 
