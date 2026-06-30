@@ -392,8 +392,26 @@ export function genPlanDevCompetencesExcel(o: OrganismeInfo, f: FormationInfo, f
     );
   }
 
+  // ===== Entrée systématique : accompagnement Qualiopi FD CERTIF EXPERT =====
+  // (sous-traitance / accompagnement dirigeant assuré par FD CERTIF EXPERT — ex IZIBUSINESS / Nadine Dendani)
+  futureTrainings.unshift({
+    origine: "Automatisation gestion administrative",
+    nom: "Inscription sur Make et Airtable pour créer un CRM pour l'automatisation de la gestion administrative",
+    objectif: "Mise en place de la stratégie d'automatisation (workflows Make, base Airtable, CRM, suivi qualité Qualiopi)",
+    type: "Externe",
+    formateur: "FD CERTIF EXPERT",
+    nb: "1",
+    noms: o.dirigeant || formateurName,
+    duree: "6 mois",
+  });
+
   futureTrainings.forEach(t => {
+    const isFdCertif = /fd\s*certif/i.test(t.formateur);
+    const rowDateInsc = isFdCertif ? dateInscriptionStr : dateInscriptionStr;
+    const rowDateDebut = isFdCertif ? dateDebutStr : dateDebutStr;
+    const rowDuree = isFdCertif ? "6 mois" : t.duree;
     html += `<tr>
+      <td>${rowDateInsc}</td>
       <td>${t.origine}</td>
       <td>${t.nom}</td>
       <td>${t.objectif}</td>
@@ -401,7 +419,8 @@ export function genPlanDevCompetencesExcel(o: OrganismeInfo, f: FormationInfo, f
       <td>${t.formateur}</td>
       <td>${t.nb}</td>
       <td>${t.noms}</td>
-      <td>${t.duree}</td>
+      <td>${rowDuree}</td>
+      <td>${rowDateDebut}</td>
       <td>${nextYear}</td>
     </tr>`;
   });
