@@ -12051,76 +12051,134 @@ function genAttestationFinFormationFDCertif(o: OrganismeInfo, f?: FormationInfo)
   const rawDateRef = f?.dateDebut || (o as any).dateMaj || new Date().toISOString().split("T")[0];
   const dDebut = new Date(rawDateRef);
   dDebut.setFullYear(dDebut.getFullYear() - 1);
-  // Date fin = début + 6 mois (reste antérieure à la formation principale)
   const dFin = new Date(dDebut);
   dFin.setMonth(dFin.getMonth() + 6);
   const fmt = (d: Date) => formatDate(d.toISOString().split("T")[0]);
 
-  const fdCertifTampon = `<img src="/images/FD_CERTIF_TAMPON.png" alt="Tampon FD CERTIF EXPERT" style="max-height:80px;max-width:200px;object-fit:contain;margin-top:6px;opacity:0.9" />`;
+  // === Design figé FD CERTIF EXPERT (indépendant du thème de l'organisme) ===
+  // Toute modification de thème côté organisme ne doit JAMAIS impacter cette attestation.
+  const PRIMARY = "#1e3a7b";
+  const ACCENT = "#c9a227";
+  const beneficiaireNom = o.dirigeant || "Le dirigeant";
+  const orgNom = o.nom || "";
+  const orgSiret = o.siret ? ` (SIRET : ${o.siret})` : "";
+  const orgNda = o.nda ? ` — NDA : ${o.nda}` : "";
 
-  // L'attestation est émise par FD CERTIF EXPERT : on remplace l'entête/pied de page de l'organisme bénéficiaire par ceux de FD CERTIF EXPERT.
-  const fdCertifOrg: OrganismeInfo = {
-    ...o,
-    nom: "FD CERTIF EXPERT",
-    adresse: "15 RUE AUGUSTE GERVAIS",
-    codePostal: "92130",
-    ville: "ISSY-LES-MOULINEAUX",
-    siret: "98801847900010",
-    nda: "",
-    dirigeant: "Mme Nadine DENDANI",
-    email: "",
-    telephone: "",
-    logoUrl: "",
-    tamponUrl: "",
-    signatureUrl: "",
-  } as OrganismeInfo;
+  return `<!DOCTYPE html><html lang="fr"><head>
+<meta charset="utf-8">
+<title>Attestation de fin de formation – FD CERTIF EXPERT</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;padding:40px;background:#f4f1ea;font-family:'Inter',Arial,sans-serif;color:#1a1a1a;font-size:13px;line-height:1.6}
+  .page{max-width:820px;margin:0 auto;background:#fff;border:1px solid #e6e1d4;box-shadow:0 6px 24px rgba(30,58,123,.08);position:relative;overflow:hidden}
+  .page::before{content:"";position:absolute;top:0;left:0;right:0;height:8px;background:linear-gradient(90deg,${PRIMARY} 0%,${PRIMARY} 70%,${ACCENT} 70%,${ACCENT} 100%)}
+  .header{padding:42px 56px 24px;border-bottom:1px solid #ece7dc;display:flex;justify-content:space-between;align-items:flex-start;gap:24px}
+  .brand{font-family:'Cormorant Garamond',Georgia,serif;font-size:28px;font-weight:700;letter-spacing:.5px;color:${PRIMARY};line-height:1.1}
+  .brand small{display:block;font-family:'Inter',sans-serif;font-size:10px;font-weight:500;letter-spacing:2px;color:${ACCENT};text-transform:uppercase;margin-top:6px}
+  .header-meta{text-align:right;font-size:10.5px;color:#555;line-height:1.5}
+  .header-meta strong{color:#222}
+  .title-wrap{padding:34px 56px 6px;text-align:center}
+  .eyebrow{display:inline-block;font-size:10px;letter-spacing:4px;color:${ACCENT};font-weight:600;text-transform:uppercase;border:1px solid ${ACCENT};padding:4px 14px;border-radius:2px}
+  h1{font-family:'Cormorant Garamond',Georgia,serif;font-size:34px;font-weight:700;color:${PRIMARY};margin:14px 0 4px;letter-spacing:.5px}
+  .subtitle{font-size:12px;color:#666;font-style:italic;margin:0 0 6px}
+  .divider{width:60px;height:2px;background:${ACCENT};margin:18px auto 0}
+  .content{padding:28px 56px 16px}
+  .block{margin-bottom:22px}
+  h2{font-family:'Inter',sans-serif;font-size:11px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:${PRIMARY};margin:0 0 10px;padding-bottom:6px;border-bottom:1px dotted #cfc6b0}
+  p{margin:0 0 8px}
+  ul{margin:6px 0 8px 0;padding-left:20px}
+  li{margin-bottom:4px}
+  .formation-card{background:#fbf8f0;border-left:3px solid ${ACCENT};padding:18px 22px;margin:4px 0}
+  .formation-card p{margin:0 0 6px}
+  .signature{padding:18px 56px 30px;display:flex;justify-content:flex-end}
+  .sig-card{border:1px solid #e6e1d4;background:#fbf8f0;padding:18px 24px;min-width:280px;text-align:left}
+  .sig-card .label{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:${ACCENT};font-weight:600;margin-bottom:6px}
+  .sig-card .name{font-weight:600;color:#222;margin-bottom:2px}
+  .sig-card .place{font-size:11px;color:#555;margin-bottom:10px}
+  .sig-card img{display:block;max-height:80px;max-width:200px;object-fit:contain}
+  .footer{padding:14px 56px 24px;border-top:1px solid #ece7dc;background:#fbf8f0;font-size:9.5px;color:#666;text-align:center;line-height:1.5}
+  .footer strong{color:${PRIMARY}}
+  @media print{body{background:#fff;padding:0}.page{box-shadow:none;border:none}}
+</style>
+</head><body>
+<div class="page">
+  <div class="header">
+    <div class="brand">FD CERTIF EXPERT<small>Conseil &amp; certification Qualiopi</small></div>
+    <div class="header-meta">
+      <strong>SAS FD CERTIF EXPERT</strong><br>
+      15 rue Auguste Gervais — 92130 Issy-les-Moulineaux<br>
+      SIREN 988 018 479 — SIRET 988 018 479 00010<br>
+      TVA FR65 988018479
+    </div>
+  </div>
 
-  return buildDocument({
-    org: fdCertifOrg,
-    title: "ATTESTATION DE FIN DE FORMATION",
-    subtitle: "",
-    sections: [
-      {
-        heading: "Le prestataire",
-        content: `<p>La société <strong>FD CERTIF EXPERT</strong>, SAS au capital de 100,00 €,<br>
-Siège social : 15 RUE AUGUSTE GERVAIS, 92130 ISSY-LES-MOULINEAUX,<br>
-SIREN : 988 018 479 — SIRET : 988 018 479 00010 — TVA : FR65 988018479,<br>
-Représentée par Madame <strong>Nadine DENDANI</strong>, Présidente,</p>
-<p><strong>atteste que :</strong></p>`,
-      },
-      {
-        heading: "Bénéficiaire",
-        content: `<p><strong>${o.dirigeant || "Le dirigeant"}</strong>, en sa qualité de représentant légal de l'organisme de formation <strong>${o.nom}</strong>${o.siret ? ` (SIRET : ${o.siret})` : ""}${o.nda ? ` — NDA : ${o.nda}` : ""},</p>
-<p>a suivi et achevé avec succès la formation indiquée ci-dessous, dispensée et accompagnée par FD CERTIF EXPERT.</p>`,
-      },
-      {
-        heading: "Action de formation",
-        content: `<p><strong>Intitulé :</strong> Inscription sur Make et Airtable pour créer un CRM pour l'automatisation de la gestion administrative</p>
-<p><strong>Domaine :</strong> Automatisation de la gestion administrative</p>
-<p><strong>Objectifs pédagogiques :</strong></p>
-<ul>
-  <li>Concevoir et déployer une base Airtable structurée pour piloter l'activité d'un organisme de formation.</li>
-  <li>Construire des scénarios Make (Integromat) automatisant la gestion administrative (devis, conventions, relances, suivi qualité Qualiopi).</li>
-  <li>Mettre en place un CRM opérationnel reliant prospects, stagiaires, formations et indicateurs de performance.</li>
-  <li>Déployer la stratégie d'automatisation au quotidien (process, tableaux de bord, alertes).</li>
-</ul>
-<p><strong>Modalités :</strong> Accompagnement individuel à distance (visioconférence) + supports écrits + travaux pratiques sur les outils du bénéficiaire.</p>
-<p><strong>Période :</strong> du <strong>${fmt(dDebut)}</strong> au <strong>${fmt(dFin)}</strong></p>
-<p><strong>Durée totale :</strong> 6 mois</p>
-<p><strong>Nature de l'action</strong> (article L.6313-1 du Code du travail) : ☒ Action de formation</p>`,
-        variant: "green",
-      },
-      {
-        heading: "Résultats",
-        content: `<p>Les objectifs pédagogiques de la formation ont été <strong>atteints</strong>. Le bénéficiaire a suivi l'intégralité du parcours et mis en œuvre, sur ses propres outils, les automatisations Make + Airtable conçues pendant l'accompagnement.</p>
-<p>La présente attestation est délivrée pour servir et valoir ce que de droit, notamment au titre du <strong>plan de développement des compétences</strong> de ${o.nom}.</p>`,
-      },
-    ],
-    extraHtml: `<div class="signature-block-2" style="margin-top:24px">
-      <div class="sig-box"><p class="sig-label">Pour FD CERTIF EXPERT</p><p>Mme Nadine DENDANI, Présidente</p><p>Fait à Issy-les-Moulineaux, le ${fmt(dFin)}</p><p style="margin-top:18px">Signature et cachet :</p>${fdCertifTampon}</div>
-    </div>`,
-  });
+  <div class="title-wrap">
+    <span class="eyebrow">Attestation officielle</span>
+    <h1>Attestation de fin de formation</h1>
+    <p class="subtitle">Délivrée par FD CERTIF EXPERT</p>
+    <div class="divider"></div>
+  </div>
+
+  <div class="content">
+    <div class="block">
+      <h2>Le prestataire</h2>
+      <p>La société <strong>FD CERTIF EXPERT</strong>, SAS au capital de 100,00 €,<br>
+      Siège social : 15 RUE AUGUSTE GERVAIS, 92130 ISSY-LES-MOULINEAUX,<br>
+      SIREN : 988 018 479 — SIRET : 988 018 479 00010 — TVA : FR65 988018479,<br>
+      Représentée par Madame <strong>Nadine DENDANI</strong>, Présidente,</p>
+      <p><strong>atteste que :</strong></p>
+    </div>
+
+    <div class="block">
+      <h2>Bénéficiaire</h2>
+      <p><strong>${beneficiaireNom}</strong>, en sa qualité de représentant légal de l'organisme de formation <strong>${orgNom}</strong>${orgSiret}${orgNda},</p>
+      <p>a suivi et achevé avec succès la formation indiquée ci-dessous, dispensée et accompagnée par FD CERTIF EXPERT.</p>
+    </div>
+
+    <div class="block">
+      <h2>Action de formation</h2>
+      <div class="formation-card">
+        <p><strong>Intitulé :</strong> Inscription sur Make et Airtable pour créer un CRM pour l'automatisation de la gestion administrative</p>
+        <p><strong>Domaine :</strong> Automatisation de la gestion administrative</p>
+        <p><strong>Objectifs pédagogiques :</strong></p>
+        <ul>
+          <li>Concevoir et déployer une base Airtable structurée pour piloter l'activité d'un organisme de formation.</li>
+          <li>Construire des scénarios Make (Integromat) automatisant la gestion administrative (devis, conventions, relances, suivi qualité Qualiopi).</li>
+          <li>Mettre en place un CRM opérationnel reliant prospects, stagiaires, formations et indicateurs de performance.</li>
+          <li>Déployer la stratégie d'automatisation au quotidien (process, tableaux de bord, alertes).</li>
+        </ul>
+        <p><strong>Modalités :</strong> Accompagnement individuel à distance (visioconférence) + supports écrits + travaux pratiques sur les outils du bénéficiaire.</p>
+        <p><strong>Période :</strong> du <strong>${fmt(dDebut)}</strong> au <strong>${fmt(dFin)}</strong></p>
+        <p><strong>Durée totale :</strong> 6 mois</p>
+        <p><strong>Nature de l'action</strong> (article L.6313-1 du Code du travail) : ☒ Action de formation</p>
+      </div>
+    </div>
+
+    <div class="block">
+      <h2>Résultats</h2>
+      <p>Les objectifs pédagogiques de la formation ont été <strong>atteints</strong>. Le bénéficiaire a suivi l'intégralité du parcours et mis en œuvre, sur ses propres outils, les automatisations Make + Airtable conçues pendant l'accompagnement.</p>
+      <p>La présente attestation est délivrée pour servir et valoir ce que de droit, notamment au titre du <strong>plan de développement des compétences</strong> de ${orgNom}.</p>
+    </div>
+  </div>
+
+  <div class="signature">
+    <div class="sig-card">
+      <div class="label">Pour FD CERTIF EXPERT</div>
+      <div class="name">Mme Nadine DENDANI, Présidente</div>
+      <div class="place">Fait à Issy-les-Moulineaux, le ${fmt(dFin)}</div>
+      <img src="/images/FD_CERTIF_TAMPON.png" alt="Tampon FD CERTIF EXPERT">
+    </div>
+  </div>
+
+  <div class="footer">
+    <strong>FD CERTIF EXPERT</strong> — SAS au capital de 100,00 € — SIRET 988 018 479 00010 — 15 rue Auguste Gervais, 92130 Issy-les-Moulineaux<br>
+    Document officiel — Attestation de fin de formation
+  </div>
+</div>
+</body></html>`;
 }
+
 
 function genReferentielHandicap(o: OrganismeInfo) {
   return buildDocument({ org: o, title: "RÉFÉRENTIEL HANDICAP", sections: [
