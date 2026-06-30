@@ -12058,10 +12058,27 @@ function genAttestationFinFormationFDCertif(o: OrganismeInfo, f?: FormationInfo)
 
   const fdCertifTampon = `<img src="/images/FD_CERTIF_TAMPON.png" alt="Tampon FD CERTIF EXPERT" style="max-height:80px;max-width:200px;object-fit:contain;margin-top:6px;opacity:0.9" />`;
 
+  // L'attestation est émise par FD CERTIF EXPERT : on remplace l'entête/pied de page de l'organisme bénéficiaire par ceux de FD CERTIF EXPERT.
+  const fdCertifOrg: OrganismeInfo = {
+    ...o,
+    nom: "FD CERTIF EXPERT",
+    adresse: "15 RUE AUGUSTE GERVAIS",
+    codePostal: "92130",
+    ville: "ISSY-LES-MOULINEAUX",
+    siret: "98801847900010",
+    nda: "",
+    dirigeant: "Mme Nadine DENDANI",
+    email: "",
+    telephone: "",
+    logoUrl: "",
+    tamponUrl: "",
+    signatureUrl: "",
+  } as OrganismeInfo;
+
   return buildDocument({
-    org: o,
+    org: fdCertifOrg,
     title: "ATTESTATION DE FIN DE FORMATION",
-    subtitle: "Délivrée par FD CERTIF EXPERT",
+    subtitle: "",
     sections: [
       {
         heading: "Le prestataire",
