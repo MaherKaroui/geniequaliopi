@@ -298,7 +298,7 @@ export function buildFullCatalog(
 
     // IND 22 — Entretien et développement des compétences
     add("af_c5i22_plan_dev_competences", "CT5 - IND 22 PLAN DE DÉVELOPPEMENT DES COMPÉTENCES", 5, 22, "plan_dev_competences_excel");
-    add("af_c5i22_preuves_inscription_pdc", "CT5 - IND 22 PREUVES D'INSCRIPTION AUX FORMATIONS", 5, 22, "plan_dev_preuves_inscription");
+    
     add("af_c5i22_attestation_fin_formation_fd_certif", "CT5 - IND 22 ATTESTATION DE FIN DE FORMATION – FD CERTIF EXPERT", 5, 22, "attestation_fin_formation_fd_certif");
     add("af_c5i22_fiche_entretien_annuel", "CT5 - IND 22 FICHE D'ENTRETIEN ANNUEL FORMATEUR", 5, 22, "fiche_entretien_annuel_formateur");
 
