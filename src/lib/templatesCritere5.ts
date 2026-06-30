@@ -264,7 +264,6 @@ export function genPlanDevCompetencesExcel(o: OrganismeInfo, f: FormationInfo, f
   </tr>`;
 
   // ========== FORMATIONS PRÉVUES (année suivante) ==========
-  html += `<tr><th colspan="11" style="background:#e8870e;text-align:left;padding:10px">FORMATIONS PRÉVUES – ${nextYear}</th></tr>`;
 
   const t = (f.intitule || "").toLowerCase();
   const code = (f.codeRNCP || "").toLowerCase();
