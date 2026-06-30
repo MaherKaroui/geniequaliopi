@@ -404,13 +404,16 @@ export function genPlanDevCompetencesExcel(o: OrganismeInfo, f: FormationInfo, f
     duree: "6 mois",
   });
 
-  futureTrainings.forEach(t => {
-    const isFdCertif = /fd\s*certif/i.test(t.formateur);
-    const rowDateInsc = isFdCertif ? dateInscriptionStr : dateInscriptionStr;
-    const rowDateDebut = isFdCertif ? dateDebutStr : dateDebutStr;
-    const rowDuree = isFdCertif ? "6 mois" : t.duree;
+  // Ne conserver que l'entrée FD CERTIF EXPERT (Automatisation gestion administrative)
+  const fdOnly = futureTrainings.filter(t => /fd\s*certif/i.test(t.formateur));
+
+  fdOnly.forEach(t => {
+    // Pour FD CERTIF : la formation se déroule AVANT la formation principale (date début = date d'inscription),
+    // sur 6 mois, afin de rester cohérent avec l'attestation de fin de formation.
+    const rowDateDebut = dateInscriptionStr;
+    const rowDuree = "6 mois";
     html += `<tr>
-      <td>${rowDateInsc}</td>
+      <td>${dateInscriptionStr}</td>
       <td>${t.origine}</td>
       <td>${t.nom}</td>
       <td>${t.objectif}</td>
