@@ -247,7 +247,7 @@ export function genPlanDevCompetencesExcel(o: OrganismeInfo, f: FormationInfo, f
   const nbStagiaires = stagiaires ? stagiaires.filter(s => s.nom || s.prenom).length : 1;
 
   let html = `<tr><th colspan="11">${o.nom} – PLAN DE DÉVELOPPEMENT DES COMPÉTENCES</th></tr>`;
-  html += `<tr><td><strong>Année :</strong></td><td colspan="10">${year} – ${nextYear}</td></tr>`;
+  html += `<tr><td><strong>Année :</strong></td><td colspan="10">${prevYear} – ${year}</td></tr>`;
   html += `<tr><td></td></tr>`;
   html += `<tr>
     <th>Date d'inscription</th>
