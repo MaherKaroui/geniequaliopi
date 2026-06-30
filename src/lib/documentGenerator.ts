@@ -783,6 +783,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "checklist_formateur": return genChecklistFormateur(o, f, { debut: params?.sessionDebut, fin: params?.sessionFin });
     case "plan_dev_competences_excel": return genPlanDevCompetencesExcel(o, f, formateurs, stagiaires);
     case "plan_dev_preuves_inscription": return genPlanDevPreuvesInscription(o, f, formateurs);
+    case "attestation_fin_formation_fd_certif": return genAttestationFinFormationFDCertif(o);
     case "grille_entretien_annuel": return genGrilleEntretienAnnuel(o, fmt);
     case "fiche_entretien_annuel_formateur": {
       // If a specific formateur name is passed, create a mock FormateurInfo
@@ -12042,6 +12043,69 @@ function genMandatQualiopi(o: OrganismeInfo) {
       <div class="sig-box"><p class="sig-label">Pour le Mandataire – FD CERTIF EXPERT</p><p>Nom : Mme Nadine DENDANI</p><p>Date : ${mandatDateFormatted}</p><p style="margin-top:20px">Signature :</p>${fdCertifTampon}</div>
     </div>`;
   })() });
+}
+
+function genAttestationFinFormationFDCertif(o: OrganismeInfo) {
+  // Date début = 1 an avant la date de mise à jour du dossier (alignée avec PDC IND 22)
+  const rawDateMaj = (o as any).dateMaj || new Date().toISOString().split("T")[0];
+  const dDebut = new Date(rawDateMaj);
+  dDebut.setFullYear(dDebut.getFullYear() - 1);
+  // Date fin = début + 6 mois
+  const dFin = new Date(dDebut);
+  dFin.setMonth(dFin.getMonth() + 6);
+  const fmt = (d: Date) => formatDate(d.toISOString().split("T")[0]);
+
+  const tamponMandant = o.tamponUrl
+    ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:70px;max-width:160px;object-fit:contain;margin-top:6px;opacity:0.9" />`
+    : "";
+  const fdCertifTampon = `<img src="/images/FD_CERTIF_TAMPON.png" alt="Tampon FD CERTIF EXPERT" style="max-height:80px;max-width:200px;object-fit:contain;margin-top:6px;opacity:0.9" />`;
+
+  return buildDocument({
+    org: o,
+    title: "ATTESTATION DE FIN DE FORMATION",
+    subtitle: "Délivrée par FD CERTIF EXPERT",
+    sections: [
+      {
+        heading: "Le prestataire",
+        content: `<p>La société <strong>FD CERTIF EXPERT</strong>, SAS au capital de 100,00 €,<br>
+Siège social : 15 RUE AUGUSTE GERVAIS, 92130 ISSY-LES-MOULINEAUX,<br>
+SIREN : 988 018 479 — SIRET : 988 018 479 00010 — TVA : FR65 988018479,<br>
+Représentée par Madame <strong>Nadine DENDANI</strong>, Présidente,</p>
+<p><strong>atteste que :</strong></p>`,
+      },
+      {
+        heading: "Bénéficiaire",
+        content: `<p><strong>${o.dirigeant || "Le dirigeant"}</strong>, en sa qualité de représentant légal de l'organisme de formation <strong>${o.nom}</strong>${o.siret ? ` (SIRET : ${o.siret})` : ""}${o.nda ? ` — NDA : ${o.nda}` : ""},</p>
+<p>a suivi et achevé avec succès la formation indiquée ci-dessous, dispensée et accompagnée par FD CERTIF EXPERT.</p>`,
+      },
+      {
+        heading: "Action de formation",
+        content: `<p><strong>Intitulé :</strong> Inscription sur Make et Airtable pour créer un CRM pour l'automatisation de la gestion administrative</p>
+<p><strong>Domaine :</strong> Automatisation de la gestion administrative</p>
+<p><strong>Objectifs pédagogiques :</strong></p>
+<ul>
+  <li>Concevoir et déployer une base Airtable structurée pour piloter l'activité d'un organisme de formation.</li>
+  <li>Construire des scénarios Make (Integromat) automatisant la gestion administrative (devis, conventions, relances, suivi qualité Qualiopi).</li>
+  <li>Mettre en place un CRM opérationnel reliant prospects, stagiaires, formations et indicateurs de performance.</li>
+  <li>Déployer la stratégie d'automatisation au quotidien (process, tableaux de bord, alertes).</li>
+</ul>
+<p><strong>Modalités :</strong> Accompagnement individuel à distance (visioconférence) + supports écrits + travaux pratiques sur les outils du bénéficiaire.</p>
+<p><strong>Période :</strong> du <strong>${fmt(dDebut)}</strong> au <strong>${fmt(dFin)}</strong></p>
+<p><strong>Durée totale :</strong> 6 mois</p>
+<p><strong>Nature de l'action</strong> (article L.6313-1 du Code du travail) : ☒ Action de formation</p>`,
+        variant: "green",
+      },
+      {
+        heading: "Résultats",
+        content: `<p>Les objectifs pédagogiques de la formation ont été <strong>atteints</strong>. Le bénéficiaire a suivi l'intégralité du parcours et mis en œuvre, sur ses propres outils, les automatisations Make + Airtable conçues pendant l'accompagnement.</p>
+<p>La présente attestation est délivrée pour servir et valoir ce que de droit, notamment au titre du <strong>plan de développement des compétences</strong> de ${o.nom}.</p>`,
+      },
+    ],
+    extraHtml: `<div class="signature-block-2" style="margin-top:24px">
+      <div class="sig-box"><p class="sig-label">Pour FD CERTIF EXPERT</p><p>Mme Nadine DENDANI, Présidente</p><p>Fait à Issy-les-Moulineaux, le ${fmt(dFin)}</p><p style="margin-top:18px">Signature et cachet :</p>${fdCertifTampon}</div>
+      <div class="sig-box"><p class="sig-label">Le bénéficiaire — ${o.nom}</p><p>${o.dirigeant || ""}</p><p>Fait à ${o.ville || ""}, le ${fmt(dFin)}</p><p style="margin-top:18px">Signature :</p>${tamponMandant}</div>
+    </div>`,
+  });
 }
 
 function genReferentielHandicap(o: OrganismeInfo) {

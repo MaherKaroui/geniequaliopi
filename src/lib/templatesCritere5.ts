@@ -196,6 +196,8 @@ export interface PlanDevTraining {
   nb: string;
   noms: string;
   duree: string;
+  dateInscription?: string;
+  dateDebut?: string;
 }
 
 /** Returns the contextual training list used in the IND 22 PDC, filtered by formation type. */
@@ -203,19 +205,22 @@ export function getPlanDevTrainings(f: FormationInfo, formateurs: FormateurInfo[
   const formateurName = f.formateur || (formateurs[0] ? formateurs[0].prenom + " " + formateurs[0].nom : "");
   // Re-use the same generator to keep a single source of truth, then parse out the planned training rows.
   const html = genPlanDevCompetencesExcel({ nom: "" } as OrganismeInfo, f, formateurs, []);
-  const rowRegex = /<tr>\s*<td>([^<]+)<\/td>\s*<td>([^<]+)<\/td>\s*<td>([^<]+)<\/td>\s*<td>([^<]+)<\/td>\s*<td>([^<]+)<\/td>\s*<td>([^<]+)<\/td>\s*<td>([^<]+)<\/td>\s*<td>([^<]+)<\/td>\s*<td>[^<]*<\/td>\s*<\/tr>/g;
+  // Columns: dateInsc, origine, nom, objectif, type, formateur, nb, noms, duree, dateDebut, annee
+  const rowRegex = /<tr>\s*<td>([^<]*)<\/td>\s*<td>([^<]+)<\/td>\s*<td>([^<]+)<\/td>\s*<td>([^<]+)<\/td>\s*<td>([^<]+)<\/td>\s*<td>([^<]+)<\/td>\s*<td>([^<]+)<\/td>\s*<td>([^<]+)<\/td>\s*<td>([^<]+)<\/td>\s*<td>([^<]*)<\/td>\s*<td>[^<]*<\/td>\s*<\/tr>/g;
   const trainings: PlanDevTraining[] = [];
   let match: RegExpExecArray | null;
   while ((match = rowRegex.exec(html)) !== null) {
     trainings.push({
-      origine: match[1].trim(),
-      nom: match[2].trim(),
-      objectif: match[3].trim(),
-      type: match[4].trim(),
-      formateur: match[5].trim(),
-      nb: match[6].trim(),
-      noms: match[7].trim() || formateurName,
-      duree: match[8].trim(),
+      dateInscription: match[1].trim(),
+      origine: match[2].trim(),
+      nom: match[3].trim(),
+      objectif: match[4].trim(),
+      type: match[5].trim(),
+      formateur: match[6].trim(),
+      nb: match[7].trim(),
+      noms: match[8].trim() || formateurName,
+      duree: match[9].trim(),
+      dateDebut: match[10].trim(),
     });
   }
   return trainings;
@@ -225,31 +230,41 @@ export function genPlanDevCompetencesExcel(o: OrganismeInfo, f: FormationInfo, f
   // Use formation date year, fallback to current year
   const rawDate = f.dateDebut || f.dateFin || "";
   const parsedDate = rawDate ? new Date(rawDate + "T00:00:00") : null;
-  const year = parsedDate && !isNaN(parsedDate.getTime()) ? parsedDate.getFullYear() : new Date().getFullYear();
+  const dateDebutFormation = parsedDate && !isNaN(parsedDate.getTime()) ? parsedDate : new Date();
+  const year = dateDebutFormation.getFullYear();
   const nextYear = year + 1;
+  // Date d'inscription par défaut = 1 an avant le début de la formation
+  const dateInscriptionDefault = new Date(dateDebutFormation);
+  dateInscriptionDefault.setFullYear(dateInscriptionDefault.getFullYear() - 1);
+  const pad = (n: number) => n.toString().padStart(2, "0");
+  const fmtDate = (d: Date) => `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`;
+  const dateInscriptionStr = fmtDate(dateInscriptionDefault);
+  const dateDebutStr = fmtDate(dateDebutFormation);
   const formateurName = f.formateur || (formateurs[0] ? formateurs[0].prenom + " " + formateurs[0].nom : "");
   const stagiaireNames = stagiaires && stagiaires.length > 0
     ? stagiaires.filter(s => s.nom || s.prenom).map(s => `${s.prenom} ${s.nom}`.trim()).join(", ")
     : formateurName;
   const nbStagiaires = stagiaires ? stagiaires.filter(s => s.nom || s.prenom).length : 1;
 
-  let html = `<tr><th colspan="9">${o.nom} – PLAN DE DÉVELOPPEMENT DES COMPÉTENCES</th></tr>`;
-  html += `<tr><td><strong>Année :</strong></td><td colspan="8">${year} – ${nextYear}</td></tr>`;
+  let html = `<tr><th colspan="11">${o.nom} – PLAN DE DÉVELOPPEMENT DES COMPÉTENCES</th></tr>`;
+  html += `<tr><td><strong>Année :</strong></td><td colspan="10">${year} – ${nextYear}</td></tr>`;
   html += `<tr><td></td></tr>`;
   html += `<tr>
+    <th>Date d'inscription</th>
     <th>Origine</th>
     <th>Nom de la formation</th>
     <th>Objectifs attendus</th>
     <th>Interne / Externe</th>
-    <th>Formateur / Formatrice</th>
+    <th>Formateur / Organisme</th>
     <th>Nb stagiaires</th>
     <th>Noms des stagiaires</th>
     <th>Durée</th>
+    <th>Date de début</th>
     <th>Année</th>
   </tr>`;
 
   // ========== FORMATIONS PRÉVUES (année suivante) ==========
-  html += `<tr><th colspan="9" style="background:#e8870e;text-align:left;padding:10px">FORMATIONS PRÉVUES – ${nextYear}</th></tr>`;
+  html += `<tr><th colspan="11" style="background:#e8870e;text-align:left;padding:10px">FORMATIONS PRÉVUES – ${nextYear}</th></tr>`;
 
   const t = (f.intitule || "").toLowerCase();
   const code = (f.codeRNCP || "").toLowerCase();
@@ -377,8 +392,26 @@ export function genPlanDevCompetencesExcel(o: OrganismeInfo, f: FormationInfo, f
     );
   }
 
+  // ===== Entrée systématique : accompagnement Qualiopi FD CERTIF EXPERT =====
+  // (sous-traitance / accompagnement dirigeant assuré par FD CERTIF EXPERT — ex IZIBUSINESS / Nadine Dendani)
+  futureTrainings.unshift({
+    origine: "Automatisation gestion administrative",
+    nom: "Inscription sur Make et Airtable pour créer un CRM pour l'automatisation de la gestion administrative",
+    objectif: "Mise en place de la stratégie d'automatisation (workflows Make, base Airtable, CRM, suivi qualité Qualiopi)",
+    type: "Externe",
+    formateur: "FD CERTIF EXPERT",
+    nb: "1",
+    noms: o.dirigeant || formateurName,
+    duree: "6 mois",
+  });
+
   futureTrainings.forEach(t => {
+    const isFdCertif = /fd\s*certif/i.test(t.formateur);
+    const rowDateInsc = isFdCertif ? dateInscriptionStr : dateInscriptionStr;
+    const rowDateDebut = isFdCertif ? dateDebutStr : dateDebutStr;
+    const rowDuree = isFdCertif ? "6 mois" : t.duree;
     html += `<tr>
+      <td>${rowDateInsc}</td>
       <td>${t.origine}</td>
       <td>${t.nom}</td>
       <td>${t.objectif}</td>
@@ -386,7 +419,8 @@ export function genPlanDevCompetencesExcel(o: OrganismeInfo, f: FormationInfo, f
       <td>${t.formateur}</td>
       <td>${t.nb}</td>
       <td>${t.noms}</td>
-      <td>${t.duree}</td>
+      <td>${rowDuree}</td>
+      <td>${rowDateDebut}</td>
       <td>${nextYear}</td>
     </tr>`;
   });
