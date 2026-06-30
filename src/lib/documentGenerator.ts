@@ -12104,7 +12104,7 @@ function genAttestationFinFormationFDCertif(o: OrganismeInfo, f?: FormationInfo)
 </head><body>
 <div class="page">
   <div class="header">
-    <div class="brand">FD CERTIF EXPERT<small>Conseil &amp; certification Qualiopi</small></div>
+    <div class="brand">FD CERTIF EXPERT</div>
     <div class="header-meta">
       <strong>SAS FD CERTIF EXPERT</strong><br>
       15 rue Auguste Gervais — 92130 Issy-les-Moulineaux<br>
