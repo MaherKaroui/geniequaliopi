@@ -12045,19 +12045,17 @@ function genMandatQualiopi(o: OrganismeInfo) {
   })() });
 }
 
-function genAttestationFinFormationFDCertif(o: OrganismeInfo) {
-  // Date début = 1 an avant la date de mise à jour du dossier (alignée avec PDC IND 22)
-  const rawDateMaj = (o as any).dateMaj || new Date().toISOString().split("T")[0];
-  const dDebut = new Date(rawDateMaj);
+function genAttestationFinFormationFDCertif(o: OrganismeInfo, f?: FormationInfo) {
+  // Date de début de l'accompagnement FD CERTIF = 1 an avant la date de début de la formation principale
+  // (cohérent avec le PDC IND 22). Fallback : 1 an avant la date de mise à jour du dossier.
+  const rawDateRef = f?.dateDebut || (o as any).dateMaj || new Date().toISOString().split("T")[0];
+  const dDebut = new Date(rawDateRef);
   dDebut.setFullYear(dDebut.getFullYear() - 1);
-  // Date fin = début + 6 mois
+  // Date fin = début + 6 mois (reste antérieure à la formation principale)
   const dFin = new Date(dDebut);
   dFin.setMonth(dFin.getMonth() + 6);
   const fmt = (d: Date) => formatDate(d.toISOString().split("T")[0]);
 
-  const tamponMandant = o.tamponUrl
-    ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:70px;max-width:160px;object-fit:contain;margin-top:6px;opacity:0.9" />`
-    : "";
   const fdCertifTampon = `<img src="/images/FD_CERTIF_TAMPON.png" alt="Tampon FD CERTIF EXPERT" style="max-height:80px;max-width:200px;object-fit:contain;margin-top:6px;opacity:0.9" />`;
 
   return buildDocument({
