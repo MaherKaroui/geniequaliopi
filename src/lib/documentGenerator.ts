@@ -12092,7 +12092,7 @@ function genAttestationFinFormationFDCertif(o: OrganismeInfo, f?: FormationInfo)
   .formation-card{background:#fbf8f0;border-left:3px solid ${ACCENT};padding:18px 22px;margin:4px 0}
   .formation-card p{margin:0 0 6px}
   .signature{padding:18px 56px 30px;display:flex;justify-content:flex-end}
-  .sig-card{border:1px solid #e6e1d4;background:#fbf8f0;padding:18px 24px;min-width:280px;text-align:left}
+  .sig-card{border:1px solid #e6e1d4;background:#ffffff;padding:18px 24px;min-width:280px;text-align:left}
   .sig-card .label{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:${ACCENT};font-weight:600;margin-bottom:6px}
   .sig-card .name{font-weight:600;color:#222;margin-bottom:2px}
   .sig-card .place{font-size:11px;color:#555;margin-bottom:10px}
