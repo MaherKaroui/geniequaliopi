@@ -232,7 +232,7 @@ export function genPlanDevCompetencesExcel(o: OrganismeInfo, f: FormationInfo, f
   const parsedDate = rawDate ? new Date(rawDate + "T00:00:00") : null;
   const dateDebutFormation = parsedDate && !isNaN(parsedDate.getTime()) ? parsedDate : new Date();
   const year = dateDebutFormation.getFullYear();
-  const nextYear = year + 1;
+  const prevYear = year - 1;
   // Date d'inscription par défaut = 1 an avant le début de la formation
   const dateInscriptionDefault = new Date(dateDebutFormation);
   dateInscriptionDefault.setFullYear(dateInscriptionDefault.getFullYear() - 1);
