@@ -114,6 +114,30 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
   const [previewLoading, setPreviewLoading] = useState(false);
   const [previewDoc, setPreviewDoc] = useState<EYDocumentItem | null>(null);
   const previewIframeRef = useRef<HTMLIFrameElement>(null);
+
+  // Persistent per-document edited HTML (survives dialog close + reused in exports)
+  // Key: `${code}` for non-perStagiaire, `${code}:${stagiaireIdx}` for perStagiaire
+  const [editedByDoc, setEditedByDoc] = useState<Map<string, string>>(new Map());
+  const editKeyFor = useCallback((code: string, stagIdx?: number) => {
+    return typeof stagIdx === "number" ? `${code}:${stagIdx}` : code;
+  }, []);
+  const saveEditedHtml = useCallback((code: string, html: string, stagIdx?: number) => {
+    const key = editKeyFor(code, stagIdx);
+    setEditedByDoc(prev => {
+      const next = new Map(prev);
+      next.set(key, html);
+      return next;
+    });
+  }, [editKeyFor]);
+  const clearEditedHtml = useCallback((code: string, stagIdx?: number) => {
+    const key = editKeyFor(code, stagIdx);
+    setEditedByDoc(prev => {
+      if (!prev.has(key)) return prev;
+      const next = new Map(prev);
+      next.delete(key);
+      return next;
+    });
+  }, [editKeyFor]);
   const orgName = organisme.nom || "Organisme";
   const safeName = useMemo(() => orgName.replace(/[^a-zA-Z0-9_-]/g, "_"), [orgName]);
   // Organisme enrichi avec la signature EY (utilisée pour DP/ECF/PV comme signature du dirigeant/représentant)
