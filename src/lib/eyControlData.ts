@@ -64,7 +64,7 @@ export const EY_DOCUMENTS: EYDocumentItem[] = [
   },
   {
     code: "70",
-    label: "Conditions Générales de Vente (CGV)",
+    label: "Conditions Générales de Vente",
     description: "Conditions Générales de Vente de l'organisme de formation : tarifs, modalités de paiement, rétractation, litiges, RGPD",
     autoTemplates: ["cgv"],
     perStagiaire: false,
