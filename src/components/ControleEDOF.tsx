@@ -221,7 +221,8 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
     try {
       const o = mergeOrganisme(organismeWithSignature);
       const params = { stagiaireIdx, fi: 0 };
-      const html = generateDocumentById(`ey_${eyDoc.code}`, template, params, o, formation, sourceStagiaires);
+      const editedOverride = editedByDoc.get(editKeyFor(eyDoc.code, stagiaireIdx));
+      const html = editedOverride || generateDocumentById(`ey_${eyDoc.code}`, template, params, o, formation, sourceStagiaires);
       if (!html) return null;
       const blob = await htmlToPdfBlob(html, options?.pdfOptions);
       return {
