@@ -101,9 +101,17 @@ Renvoie l'ensemble via l'appel d'outil generate_vae_contents.`;
       throw new Error("AI gateway error");
     }
     const data = await r.json();
-    const tc = data.choices?.[0]?.message?.tool_calls?.[0];
-    if (!tc) throw new Error("No tool call");
-    return new Response(tc.function.arguments, { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    const msg = data.choices?.[0]?.message;
+    let payload: string | undefined = msg?.tool_calls?.[0]?.function?.arguments;
+    if (!payload && typeof msg?.content === "string") {
+      const m = msg.content.match(/\{[\s\S]*\}/);
+      if (m) payload = m[0];
+    }
+    if (!payload) {
+      console.error("No tool call. finish_reason:", data.choices?.[0]?.finish_reason, "raw:", JSON.stringify(data).slice(0, 3000));
+      throw new Error("La réponse IA était vide (contenu probablement trop long). Réessayez ou réduisez le CV.");
+    }
+    return new Response(payload, { headers: { ...corsHeaders, "Content-Type": "application/json" } });
   } catch (e) {
     console.error("vae-generate-contents error", e);
     return new Response(JSON.stringify({ error: (e as Error).message }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
