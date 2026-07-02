@@ -1,5 +1,9 @@
 import type { VAEData, VAECandidat, VAEOrganisme, VAECertification, VAESession, VAEContents } from "./vaeTypes";
 
+// ------------------------------------------------------------------
+// Helpers
+// ------------------------------------------------------------------
+
 function longDate(iso: string): string {
   if (!iso) return "";
   const d = new Date(iso);
@@ -7,8 +11,17 @@ function longDate(iso: string): string {
   return d.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
 }
 
+function shortDate(iso: string): string {
+  if (!iso) return "…… / …… / ……";
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return iso;
+  const dd = String(d.getDate()).padStart(2, "0");
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  return `${dd}/${mm}/${d.getFullYear()}`;
+}
+
 function esc(s: string | undefined | null): string {
-  if (!s) return "";
+  if (s === undefined || s === null) return "";
   return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
@@ -16,285 +29,865 @@ function nl2br(s: string): string {
   return esc(s).replace(/\n/g, "<br/>");
 }
 
-const BASE_STYLE = `
+function civilLong(c: VAECandidat): string {
+  return c.civilite === "M." ? "Monsieur" : c.civilite === "Mme" ? "Madame" : "";
+}
+
+function fullName(c: VAECandidat): string {
+  return `${c.prenom} ${c.nom}`.trim();
+}
+
+function nomPrenomUpper(c: VAECandidat): string {
+  return `${c.nom.toUpperCase()} ${c.prenom}`.trim();
+}
+
+// ------------------------------------------------------------------
+// Base styles inspired by LCA DIGITAL examples (clean, minimalist)
+// ------------------------------------------------------------------
+
+const STYLE = `
 <style>
-  body { font-family: Calibri, Arial, sans-serif; color: #1a1a1a; font-size: 11pt; line-height: 1.5; }
-  h1 { color: #1e3a8a; font-size: 20pt; border-bottom: 2px solid #1e3a8a; padding-bottom: 6px; margin-bottom: 18px; }
-  h2 { color: #1e40af; font-size: 14pt; margin-top: 22px; margin-bottom: 10px; }
-  h3 { color: #1e40af; font-size: 12pt; margin-top: 16px; margin-bottom: 6px; }
-  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
-  th, td { border: 1px solid #cbd5e1; padding: 6px 8px; text-align: left; font-size: 10.5pt; vertical-align: top; }
-  th { background: #eff6ff; color: #1e3a8a; font-weight: bold; }
-  tr:nth-child(even) td { background: #f8fafc; }
-  .footer { margin-top: 32px; padding-top: 10px; border-top: 1px solid #cbd5e1; font-size: 9pt; color: #475569; text-align: center; }
-  .sign-block { display: flex; justify-content: space-between; margin-top: 40px; gap: 24px; }
-  .sign-box { flex: 1; border-top: 1px solid #cbd5e1; padding-top: 6px; font-size: 10pt; }
-  .meta { font-size: 10pt; color: #475569; margin-bottom: 12px; }
-  .badge { display: inline-block; background: #eff6ff; color: #1e3a8a; padding: 2px 8px; border-radius: 4px; font-size: 9pt; font-weight: bold; }
-  p { margin: 6px 0; }
-  ul { margin: 6px 0 6px 20px; }
+  body { font-family: "Calibri", Arial, sans-serif; color: #1a1a1a; font-size: 11pt; line-height: 1.5; margin: 0; }
+  .doc-header { text-align: center; margin-bottom: 14px; }
+  .doc-header .org { font-weight: bold; font-size: 12pt; color: #0f172a; letter-spacing: 0.5px; }
+  .doc-header .meta { font-size: 9.5pt; color: #475569; margin-top: 2px; }
+  h1 { text-align: center; font-size: 18pt; color: #0f172a; margin: 24px 0 6px 0; letter-spacing: 1px; text-transform: uppercase; }
+  h1 + .subtitle { text-align: center; font-size: 11pt; color: #475569; font-style: italic; margin-bottom: 22px; }
+  h2 { font-size: 13pt; color: #0f172a; border-bottom: 1px solid #cbd5e1; padding-bottom: 3px; margin-top: 22px; margin-bottom: 10px; }
+  h3 { font-size: 11.5pt; color: #1e40af; margin-top: 14px; margin-bottom: 6px; }
+  p { margin: 6px 0; text-align: justify; }
+  table { border-collapse: collapse; width: 100%; margin: 8px 0 14px 0; }
+  th, td { border: 1px solid #94a3b8; padding: 6px 9px; vertical-align: top; font-size: 10.5pt; }
+  th { background: #e2e8f0; color: #0f172a; text-align: left; font-weight: bold; width: 32%; }
+  .kv td:first-child { background: #f1f5f9; font-weight: bold; width: 32%; }
+  .sign-row { display: table; width: 100%; margin-top: 40px; }
+  .sign-cell { display: table-cell; width: 50%; border: 1px solid #94a3b8; padding: 12px; vertical-align: top; height: 90px; }
+  .sign-cell .lbl { font-weight: bold; font-size: 10pt; }
+  .sign-cell .sub { font-size: 9.5pt; color: #475569; margin-top: 3px; }
+  .footer { margin-top: 36px; padding-top: 8px; border-top: 1px solid #94a3b8; font-size: 8.5pt; color: #475569; text-align: center; }
+  .footer strong { color: #0f172a; }
+  .notice { background: #f8fafc; border-left: 3px solid #0f172a; padding: 10px 14px; margin: 12px 0; font-size: 10.5pt; }
+  ul { margin: 6px 0 6px 22px; padding: 0; }
+  li { margin: 2px 0; }
+  .center { text-align: center; }
+  .cbx { font-family: "Segoe UI Symbol", "Arial Unicode MS", sans-serif; }
+  .dots { color: #94a3b8; }
+  .art { font-weight: bold; margin-top: 14px; }
 </style>`;
 
-function footer(org: VAEOrganisme, docTitle: string): string {
-  return `<div class="footer">
-    <strong>${esc(org.nom)}</strong> — SIRET ${esc(org.siret)} — NDA ${esc(org.nda)}<br/>
-    ${esc(org.adresse)} — ${esc(org.email)}<br/>
-    ${esc(docTitle)} — Version 1 — ${longDate(new Date().toISOString().slice(0, 10))}
+function docHeader(org: VAEOrganisme): string {
+  return `<div class="doc-header">
+    <div class="org">${esc(org.nom)}</div>
+    <div class="meta">${esc(org.adresse)} — SIRET : ${esc(org.siret)}</div>
+    <div class="meta">Déclaration d'activité n° ${esc(org.nda)} — Dirigeant : ${esc(org.dirigeant)}</div>
   </div>`;
 }
 
-function header(org: VAEOrganisme, title: string): string {
-  return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${esc(title)}</title>${BASE_STYLE}</head><body>
+function docFooter(org: VAEOrganisme): string {
+  const today = shortDate(new Date().toISOString().slice(0, 10));
+  return `<div class="footer">
+    <strong>${esc(org.nom)}</strong> — SIRET ${esc(org.siret)}<br/>
+    Déclaration d'activité enregistrée sous le n° ${esc(org.nda)}. L'enregistrement de la déclaration d'activité ne vaut pas agrément de l'État.<br/>
+    Mise à jour : ${today} — v1
+  </div>`;
+}
+
+function wrap(org: VAEOrganisme, title: string, body: string, subtitle?: string): string {
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${esc(title)}</title>${STYLE}</head><body>
+    ${docHeader(org)}
     <h1>${esc(title)}</h1>
-    <div class="meta">
-      <strong>${esc(org.nom)}</strong> — ${esc(org.adresse)}<br/>
-      SIRET ${esc(org.siret)} — Déclaration d'activité n° ${esc(org.nda)}
-    </div>`;
+    ${subtitle ? `<div class="subtitle">${esc(subtitle)}</div>` : ""}
+    ${body}
+    ${docFooter(org)}
+  </body></html>`;
 }
 
-function close(org: VAEOrganisme, title: string): string {
-  return `${footer(org, title)}</body></html>`;
+function ck(checked: boolean): string {
+  return checked ? "☒" : "☐";
 }
 
-function candidatBlock(c: VAECandidat): string {
-  const phone = c.telephone ? `<br/>Téléphone : ${esc(c.telephone)}` : "";
-  return `<p><strong>${esc(c.civilite)} ${esc(c.prenom)} ${esc(c.nom)}</strong><br/>
-    Né(e) le ${longDate(c.dateNaissance)}${c.lieuNaissance ? " à " + esc(c.lieuNaissance) : ""}<br/>
-    ${esc(c.adresse)}, ${esc(c.codePostal)} ${esc(c.ville)}<br/>
-    ${esc(c.email)}${phone}</p>`;
+function candidatAddressLine(c: VAECandidat): string {
+  const parts = [c.adresse, [c.codePostal, c.ville].filter(Boolean).join(" ")].filter(Boolean);
+  return parts.join(", ");
 }
 
-function certifBlock(cert: VAECertification): string {
-  return `<p><strong>${esc(cert.intitule)}</strong><br/>
-    Code RNCP : <span class="badge">${esc(cert.rncp)}</span> — Niveau ${esc(cert.niveau)}<br/>
-    Certificateur : ${esc(cert.certificateur)}<br/>
-    Date d'échéance de l'enregistrement : ${esc(cert.dateEcheance) || "voir France Compétences"}<br/>
-    Fiche officielle : <a href="${esc(cert.lien)}">${esc(cert.lien)}</a></p>`;
+function candidatCoordTable(c: VAECandidat, includeBirth = false): string {
+  const rows: string[] = [];
+  rows.push(`<tr><td>Adresse</td><td>${esc(candidatAddressLine(c))}</td></tr>`);
+  if (c.telephone) rows.push(`<tr><td>Téléphone</td><td>${esc(c.telephone)}</td></tr>`);
+  rows.push(`<tr><td>Courriel</td><td>${esc(c.email)}</td></tr>`);
+  if (includeBirth && c.dateNaissance) rows.push(`<tr><td>Date de naissance</td><td>${shortDate(c.dateNaissance)}</td></tr>`);
+  return `<table class="kv">${rows.join("")}</table>`;
 }
 
-// ------------------------- DOCUMENTS -------------------------
+function signatureBlock(leftLabel: string, leftSub: string, rightLabel: string, rightSub: string): string {
+  return `<div class="sign-row">
+    <div class="sign-cell">
+      <div class="lbl">${esc(leftLabel)}</div>
+      <div class="sub">${esc(leftSub)}</div>
+      <div class="sub" style="margin-top:24px;">Date et signature :</div>
+    </div>
+    <div class="sign-cell">
+      <div class="lbl">${esc(rightLabel)}</div>
+      <div class="sub">${esc(rightSub)}</div>
+      <div class="sub" style="margin-top:24px;">Date et signature :</div>
+    </div>
+  </div>`;
+}
 
-export function getConventionHTML(d: VAEData): string {
-  const title = "Convention d'accompagnement VAE";
-  const { organisme: o, candidat: c, certification: cert, session: s } = d;
-  return `${header(o, title)}
-    <h2>Entre les soussignés</h2>
-    <p><strong>L'organisme accompagnateur :</strong> ${esc(o.nom)}, ${esc(o.adresse)}, SIRET ${esc(o.siret)}, NDA ${esc(o.nda)}, représenté par ${esc(o.dirigeant)}.</p>
-    <p><strong>Et le/la candidat(e) :</strong></p>
-    ${candidatBlock(c)}
+// ------------------------------------------------------------------
+// A. Documents personnalisés candidat
+// ------------------------------------------------------------------
 
-    <h2>Objet</h2>
-    <p>La présente convention a pour objet la mise en œuvre d'un accompagnement à la Validation des Acquis de l'Expérience (VAE) en vue de l'obtention de la certification suivante :</p>
-    ${certifBlock(cert)}
-
-    <h2>Modalités</h2>
-    <table>
-      <tr><th>Durée</th><td>${esc(o.duree)}</td></tr>
-      <tr><th>Modalité</th><td>${esc(s.modalite)}</td></tr>
-      <tr><th>Lien visioconférence</th><td>${esc(o.lienVisio)}</td></tr>
-      <tr><th>Date de début</th><td>${longDate(s.dateDebut)}</td></tr>
-      <tr><th>Date de fin</th><td>${longDate(s.dateFin)}</td></tr>
-      <tr><th>Entretien de positionnement</th><td>${longDate(s.dateEntretienPositionnement)}</td></tr>
-      <tr><th>Demande de recevabilité</th><td>${longDate(s.dateDemandeRecevabilite)}</td></tr>
-      <tr><th>Référent handicap</th><td>${esc(o.referentHandicap)}</td></tr>
+// 1) Évaluation des besoins
+export function getBesoinsHTML(d: VAEData): string {
+  const { organisme: o, candidat: c, certification: cert, session: s, contents } = d;
+  const b = contents.besoins;
+  const body = `
+    <table class="kv">
+      <tr><td>Titre / Diplôme visé</td><td>${esc(cert.intitule)}</td></tr>
+      <tr><td>Candidat</td><td>${esc(nomPrenomUpper(c))}</td></tr>
+      <tr><td>Organisme accompagnateur</td><td>${esc(o.nom)}</td></tr>
+      <tr><td>Accompagnatrice référente</td><td>${esc(o.dirigeant)}</td></tr>
+      <tr><td>Date de l'entretien</td><td>${shortDate(s.dateEntretienPositionnement)}</td></tr>
+      <tr><td>Modalité</td><td><span class="cbx">☒</span> Visioconférence &nbsp; <span class="cbx">☐</span> Téléphone &nbsp; <span class="cbx">☐</span> Présentiel</td></tr>
     </table>
 
-    <h2>Conditions financières</h2>
-    <p>Prix forfaitaire : <strong>${esc(o.prixTTC)}</strong> — Mode de financement : ${esc(s.financement)}.</p>
+    <h2>Objet du document</h2>
+    <p>Ce document a pour objet d'identifier, avant l'entrée en accompagnement, les besoins du candidat afin de personnaliser le parcours VAE : niveau de maîtrise des outils numériques, disponibilité, attentes pédagogiques, contraintes éventuelles et besoins d'aménagement liés à une situation de handicap. Il complète le Livret 1 de recevabilité et sert de base à la construction du planning d'accompagnement.</p>
+    <p>Les rubriques pré-renseignées le sont à partir du CV et du Livret 1. Elles doivent être vérifiées et complétées par le candidat lors de l'entretien. Les champs en pointillés (……) sont à compléter manuellement.</p>
 
-    <h2>Signatures</h2>
-    <p>Fait à ${esc(s.lieuSignature)}, le ${longDate(s.dateSignature)}, en deux exemplaires originaux.</p>
-    <div class="sign-block">
-      <div class="sign-box"><strong>Pour ${esc(o.nom)}</strong><br/>${esc(o.dirigeant)}</div>
-      <div class="sign-box"><strong>Le/la candidat(e)</strong><br/>${esc(c.prenom)} ${esc(c.nom)}</div>
-    </div>
-    ${close(o, title)}`;
+    <h2>1. Profil et projet du candidat</h2>
+    <table class="kv">
+      <tr><td>Emploi actuel</td><td>${esc(c.emploiActuel)}${c.employeur ? " — " + esc(c.employeur) : ""}</td></tr>
+      <tr><td>Ancienneté dans le secteur</td><td>${esc(contents.parcours ? contents.parcours.split("\n")[0].slice(0, 120) : "")}</td></tr>
+      <tr><td>Statut</td><td>
+        <span class="cbx">${ck(c.statut === "Salarié")}</span> Salarié(e) &nbsp;
+        <span class="cbx">${ck(c.statut === "Demandeur d'emploi")}</span> Demandeur d'emploi &nbsp;
+        <span class="cbx">${ck(c.statut === "Autre")}</span> Autre : <span class="dots">…………</span>
+      </td></tr>
+      <tr><td>Niveau de formation initiale</td><td>${esc(c.niveauFormation)}</td></tr>
+    </table>
+
+    <h3>Motivation et objectif visé</h3>
+    <p>${nl2br(contents.motivation) || "<em>À rédiger avec le candidat.</em>"}</p>
+
+    <h2>2. Besoins numériques et logistiques</h2>
+    <p>L'accompagnement étant 100 % à distance, la maîtrise des outils numériques et la disponibilité du matériel sont évaluées ci-dessous.</p>
+    <table>
+      <tr><th style="width:55%">Item évalué</th><th style="width:30%">Réponse</th><th>Observations</th></tr>
+      <tr><td>Disposez-vous d'un ordinateur ?</td><td><span class="cbx">☒</span> Oui &nbsp; <span class="cbx">☐</span> Non</td><td></td></tr>
+      <tr><td>Disposez-vous d'une connexion Internet stable ?</td><td><span class="cbx">☒</span> Oui &nbsp; <span class="cbx">☐</span> Non</td><td></td></tr>
+      <tr><td>Êtes-vous à l'aise avec la visioconférence (Zoom, Teams…) ?</td><td><span class="cbx">☒</span> Oui &nbsp; <span class="cbx">☐</span> Partiel &nbsp; <span class="cbx">☐</span> Non</td><td></td></tr>
+      <tr><td>Êtes-vous à l'aise avec le traitement de texte (Word) ?</td><td><span class="cbx">☒</span> Oui &nbsp; <span class="cbx">☐</span> Partiel &nbsp; <span class="cbx">☐</span> Non</td><td></td></tr>
+      <tr><td>Êtes-vous à l'aise avec la messagerie électronique ?</td><td><span class="cbx">☒</span> Oui &nbsp; <span class="cbx">☐</span> Partiel &nbsp; <span class="cbx">☐</span> Non</td><td></td></tr>
+      <tr><td>Avez-vous besoin d'un accompagnement renforcé sur les outils ?</td><td><span class="cbx">☐</span> Oui &nbsp; <span class="cbx">☒</span> Non</td><td>${esc(b.materiel)}</td></tr>
+    </table>
+
+    <h2>3. Disponibilité et organisation</h2>
+    <table class="kv">
+      <tr><td>Disponibilités</td><td>${nl2br(b.disponibilites) || "<span class='dots'>………………………………</span>"}</td></tr>
+      <tr><td>Attentes vis-à-vis de l'accompagnement</td><td>${nl2br(b.attentes) || "<span class='dots'>………………………………</span>"}</td></tr>
+      <tr><td>Freins ou contraintes identifiés</td><td>${nl2br(b.freins) || "<span class='dots'>………………………………</span>"}</td></tr>
+    </table>
+
+    <h2>4. Situation de handicap</h2>
+    <p>Un référent handicap (${esc(o.referentHandicap)}) est à votre disposition pour toute demande d'aménagement.</p>
+    <table class="kv">
+      <tr><td>Situation de handicap ou RQTH</td><td><span class="cbx">☐</span> Oui &nbsp; <span class="cbx">☒</span> Non</td></tr>
+      <tr><td>Aménagements souhaités</td><td>${nl2br(b.handicap) || "<span class='dots'>Aucun aménagement particulier.</span>"}</td></tr>
+    </table>
+
+    <h2>Conclusion</h2>
+    <p>À l'issue de cet entretien, le parcours d'accompagnement VAE peut être engagé selon les modalités convenues avec le candidat, sur la base des éléments recueillis ci-dessus.</p>
+
+    ${signatureBlock("Le Candidat", esc(fullName(c)), "Pour " + esc(o.nom), esc(o.dirigeant) + " — Dirigeant")}
+  `;
+  return wrap(o, "Évaluation des besoins", body, "Accompagnement à la Validation des Acquis de l'Expérience (VAE) — Entretien de positionnement");
 }
 
+// 2) Livret 1 – Recevabilité
 export function getLivret1HTML(d: VAEData): string {
-  const title = "Livret 1 — Demande de recevabilité VAE";
-  const { organisme: o, candidat: c, certification: cert } = d;
-  const dipl = c.diplomes.map(x => `<tr><td>${esc(x.intitule)}</td><td>${esc(x.etablissement)}</td><td>${esc(x.annee)}</td></tr>`).join("");
-  const exp = c.experiences.map(x => `<tr><td>${esc(x.poste)}</td><td>${esc(x.entreprise)}</td><td>${esc(x.dateDebut)} → ${esc(x.dateFin)}</td><td>${nl2br(x.missions)}</td></tr>`).join("");
-  return `${header(o, title)}
-    <h2>1. Certification visée</h2>
-    ${certifBlock(cert)}
+  const { organisme: o, candidat: c, certification: cert, session: s } = d;
+  const dip = c.diplomes.length
+    ? c.diplomes.map(x => `<tr><td>${esc(x.intitule)}</td><td>${esc(x.etablissement)}</td><td>${esc(x.annee)}</td></tr>`).join("")
+    : `<tr><td class="dots">………………</td><td class="dots">………………</td><td class="dots">………</td></tr>`;
+  const exp = c.experiences.length
+    ? c.experiences.map(x => `<tr><td>${esc(x.dateDebut)} → ${esc(x.dateFin)}</td><td>${esc(x.poste)}</td><td>${esc(x.entreprise)}</td><td>${nl2br(x.missions)}</td></tr>`).join("")
+    : `<tr><td class="dots">………</td><td class="dots">………</td><td class="dots">………</td><td class="dots">………</td></tr>`;
+  const civ = c.civilite;
+  const body = `
+    <div class="subtitle">Formulaire Cerfa n° 12818*02 — Notice 51260#02</div>
 
-    <h2>2. Identité du candidat</h2>
-    ${candidatBlock(c)}
+    <table class="kv">
+      <tr><td>Diplôme / Titre visé</td><td>${esc(cert.intitule)}</td></tr>
+      <tr><td>Niveau</td><td>Niveau ${esc(cert.niveau)}</td></tr>
+      <tr><td>Certificateur</td><td>${esc(cert.certificateur)}</td></tr>
+      <tr><td>Code RNCP</td><td>${esc(cert.rncp)} — <a href="${esc(cert.lien)}">${esc(cert.lien)}</a></td></tr>
+      <tr><td>Candidat</td><td>${esc(nomPrenomUpper(c))}</td></tr>
+      <tr><td>Organisme accompagnateur</td><td>${esc(o.nom)}</td></tr>
+      <tr><td>Date de la demande</td><td>${shortDate(s.dateDemandeRecevabilite)}</td></tr>
+    </table>
 
-    <h2>3. Situation professionnelle actuelle</h2>
-    <p>Statut : <strong>${esc(c.statut)}</strong><br/>
-    Emploi actuel : ${esc(c.emploiActuel)}${c.employeur ? " chez " + esc(c.employeur) : ""}</p>
+    <h2>Notice explicative</h2>
+    <p>Le présent livret de recevabilité constitue la première étape de la démarche de Validation des Acquis de l'Expérience. Il permet au certificateur de vérifier que le candidat remplit les conditions légales d'accès à la VAE, notamment la nature et le rapport direct de l'expérience avec la certification visée.</p>
+    <p>Conformément à l'article <strong>L. 6412-1 du Code du travail</strong>, toute personne justifiant d'une activité en rapport direct avec le contenu de la certification visée peut demander la validation des acquis de son expérience. Aucune durée minimale d'expérience n'est désormais exigée par la loi ; toutefois, la pertinence et le rapport direct de l'expérience avec le référentiel restent appréciés par l'autorité certificatrice.</p>
+    <p>Les rubriques pré-renseignées dans ce livret le sont à partir du curriculum vitæ communiqué par le candidat. Elles doivent être vérifiées, complétées et, le cas échéant, corrigées par le candidat avant signature. Les champs comportant des pointillés (……) sont à compléter manuellement.</p>
 
-    <h2>4. Diplômes et titres obtenus</h2>
-    <p>Niveau de formation initiale : ${esc(c.niveauFormation)}</p>
-    <table><tr><th>Intitulé</th><th>Établissement</th><th>Année</th></tr>${dipl || "<tr><td colspan='3'>—</td></tr>"}</table>
+    <h2>1. Votre identité</h2>
+    <h3>1.1 — État civil</h3>
+    <table class="kv">
+      <tr><td>Nom de naissance</td><td>${esc(c.nom.toUpperCase())}</td></tr>
+      <tr><td>Nom d'usage</td><td>${esc(c.nom.toUpperCase())}</td></tr>
+      <tr><td>Prénom(s)</td><td>${esc(c.prenom)}</td></tr>
+      <tr><td>Sexe</td><td><span class="cbx">${ck(civ === "M.")}</span> Masculin &nbsp; <span class="cbx">${ck(civ === "Mme")}</span> Féminin</td></tr>
+      <tr><td>Date de naissance</td><td>${shortDate(c.dateNaissance)}</td></tr>
+      <tr><td>Lieu de naissance (commune, département)</td><td>${esc(c.lieuNaissance || "") || '<span class="dots">……………………………………………………</span>'}</td></tr>
+      <tr><td>Nationalité</td><td><span class="dots">……………………………………………………</span></td></tr>
+      <tr><td>N° de sécurité sociale</td><td><span class="dots">… …… …… …… ……… ……… ……</span></td></tr>
+    </table>
 
-    <h2>5. Expériences professionnelles</h2>
-    <table><tr><th>Poste</th><th>Entreprise</th><th>Période</th><th>Missions</th></tr>${exp || "<tr><td colspan='4'>—</td></tr>"}</table>
+    <h3>1.2 — Coordonnées</h3>
+    <table class="kv">
+      <tr><td>Adresse</td><td>${esc(c.adresse)}</td></tr>
+      <tr><td>Code postal / Commune</td><td>${esc(c.codePostal)} — ${esc(c.ville)}</td></tr>
+      ${c.telephone ? `<tr><td>Téléphone mobile</td><td>${esc(c.telephone)}</td></tr>` : ""}
+      <tr><td>Adresse électronique</td><td>${esc(c.email)}</td></tr>
+    </table>
 
-    <h2>6. Déclaration sur l'honneur</h2>
-    <p>Je soussigné(e) <strong>${esc(c.prenom)} ${esc(c.nom)}</strong> certifie sur l'honneur l'exactitude des informations portées sur le présent livret et n'avoir déposé qu'une seule demande de recevabilité pour la certification visée au cours de l'année civile en cours.</p>
+    <h3>1.3 — Situation actuelle</h3>
+    <table class="kv">
+      <tr><td>Situation</td><td>
+        <span class="cbx">${ck(c.statut === "Salarié")}</span> Salarié(e) &nbsp;
+        <span class="cbx">${ck(c.statut === "Demandeur d'emploi")}</span> Demandeur d'emploi &nbsp;
+        <span class="cbx">${ck(c.statut === "Autre")}</span> Autre
+      </td></tr>
+      <tr><td>Employeur actuel</td><td>${esc(c.employeur) || '<span class="dots">…………………</span>'}</td></tr>
+      <tr><td>Emploi occupé</td><td>${esc(c.emploiActuel) || '<span class="dots">…………………</span>'}</td></tr>
+    </table>
 
-    <p>Fait à ${esc(c.ville)}, le ${longDate(d.session.dateDemandeRecevabilite || d.session.dateSignature)}.</p>
-    <div class="sign-block"><div class="sign-box"><strong>Signature du candidat</strong></div></div>
-    ${close(o, title)}`;
+    <h2>2. Certification visée</h2>
+    <table class="kv">
+      <tr><td>Intitulé</td><td>${esc(cert.intitule)}</td></tr>
+      <tr><td>Code RNCP</td><td>${esc(cert.rncp)}</td></tr>
+      <tr><td>Niveau</td><td>${esc(cert.niveau)}</td></tr>
+      <tr><td>Certificateur</td><td>${esc(cert.certificateur)}</td></tr>
+      <tr><td>Fiche officielle</td><td><a href="${esc(cert.lien)}">${esc(cert.lien)}</a></td></tr>
+    </table>
+
+    <h2>3. Formations et diplômes</h2>
+    <table>
+      <tr><th>Intitulé du diplôme / titre</th><th>Établissement</th><th>Année</th></tr>
+      ${dip}
+    </table>
+
+    <h2>4. Expériences en rapport avec la certification</h2>
+    <table>
+      <tr><th style="width:18%">Période</th><th style="width:22%">Emploi occupé</th><th style="width:22%">Employeur</th><th>Activités principales</th></tr>
+      ${exp}
+    </table>
+
+    <h2>5. Pièces jointes</h2>
+    <p>
+      <span class="cbx">☐</span> Copie d'une pièce d'identité en cours de validité<br/>
+      <span class="cbx">☐</span> Curriculum vitæ à jour<br/>
+      <span class="cbx">☐</span> Justificatifs d'activité en rapport avec la certification (bulletins de salaire, attestations d'employeur, contrats)<br/>
+      <span class="cbx">☐</span> Copies des diplômes et titres obtenus<br/>
+      <span class="cbx">☐</span> Attestation de formation ou d'expérience bénévole, le cas échéant
+    </p>
+
+    <h2>6. Attestation sur l'honneur</h2>
+    <p>Je soussigné(e) <strong>${esc(fullName(c))}</strong> certifie sur l'honneur l'exactitude des informations portées sur le présent livret et n'avoir déposé qu'une seule demande de recevabilité pour la certification visée au cours de l'année civile en cours.</p>
+    <p>Fait à ${esc(c.ville) || "…………………"}, le ${shortDate(s.dateDemandeRecevabilite || s.dateSignature)}.</p>
+
+    ${signatureBlock("Le Candidat", esc(fullName(c)) + " — mention « Lu et approuvé »", "Pour " + esc(o.nom), esc(o.dirigeant) + " — Dirigeant")}
+  `;
+  return wrap(o, "Livret 1 — Demande de recevabilité", body, "Validation des Acquis de l'Expérience (VAE)");
 }
 
+// 3) Livret 2 – Dossier de validation
 export function getLivret2HTML(d: VAEData): string {
-  const title = "Livret 2 — Description des activités et compétences";
-  const { organisme: o, candidat: c, certification: cert, contents } = d;
-  const blocs = contents.situationsParBloc.map(b => `
-    <h3>${esc(b.codeBloc)} — ${esc(b.intitule)}</h3>
-    <p>${nl2br(b.situations)}</p>
-  `).join("") || cert.blocs.map(b => `<h3>${esc(b.code)} — ${esc(b.intitule)}</h3><p><em>À compléter avec le candidat.</em></p>`).join("");
-  return `${header(o, title)}
-    <p><strong>Candidat :</strong> ${esc(c.civilite)} ${esc(c.prenom)} ${esc(c.nom)}</p>
-    <p><strong>Certification :</strong> ${esc(cert.intitule)} (RNCP ${esc(cert.rncp)})</p>
-    <p><a href="${esc(cert.lien)}">${esc(cert.lien)}</a></p>
+  const { organisme: o, candidat: c, certification: cert, session: s, contents } = d;
 
-    <h2>Motivation du candidat</h2>
-    <p>${nl2br(contents.motivation) || "<em>À rédiger</em>"}</p>
+  const situationsBloc = contents.situationsParBloc.length
+    ? contents.situationsParBloc
+    : cert.blocs.slice(0, 3).map((b, i) => ({
+        codeBloc: b.code,
+        intitule: b.intitule,
+        situations: "",
+      }));
 
-    <h2>Parcours professionnel</h2>
-    <p>${nl2br(contents.parcours) || "<em>À rédiger</em>"}</p>
+  const situationsHTML = situationsBloc.map((b, idx) => {
+    const parts = (b.situations || "").split(/\n\s*\n/);
+    const contexte = parts[0] || "";
+    const description = parts[1] || "";
+    const moyens = parts[2] || "";
+    const analyse = parts[3] || "";
+    return `
+      <h3>Situation ${idx + 1} — ${esc(b.intitule)} (${esc(b.codeBloc)})</h3>
+      <h3>3.${idx + 1}.1 — Contexte et finalité de l'activité</h3>
+      <p>${nl2br(contexte) || "<em>À rédiger avec le candidat.</em>"}</p>
+      <h3>3.${idx + 1}.2 — Description détaillée des activités que j'ai exercées</h3>
+      <p>${nl2br(description) || "<em>À rédiger.</em>"}</p>
+      <h3>3.${idx + 1}.3 — Moyens et ressources que j'ai mobilisés</h3>
+      <p>${nl2br(moyens) || "<em>À rédiger.</em>"}</p>
+      <h3>3.${idx + 1}.4 — Analyse des compétences que j'ai mises en œuvre</h3>
+      <p>${nl2br(analyse) || "<em>À rédiger en lien avec le référentiel du bloc.</em>"}</p>
+    `;
+  }).join("");
 
-    <h2>Description des situations de travail par bloc de compétences</h2>
-    ${blocs}
+  const chronoRows = c.experiences.length
+    ? c.experiences.map(x => `<tr><td>${esc(x.dateDebut)} → ${esc(x.dateFin)}</td><td>${esc(x.poste)}</td><td>${esc(x.entreprise)}</td></tr>`).join("")
+    : `<tr><td class="dots">………</td><td class="dots">………</td><td class="dots">………</td></tr>`;
 
-    <h2>Synthèse</h2>
-    <p>${nl2br(contents.synthese) || "<em>À rédiger</em>"}</p>
+  const body = `
+    <table class="kv">
+      <tr><td>Candidat</td><td>${esc(nomPrenomUpper(c))}</td></tr>
+      <tr><td>Certification visée</td><td>${esc(cert.intitule)}</td></tr>
+      <tr><td>Niveau</td><td>Niveau ${esc(cert.niveau)} (cadre national des certifications professionnelles)</td></tr>
+      <tr><td>Certificateur</td><td>${esc(cert.certificateur)}</td></tr>
+      <tr><td>Organisme accompagnateur</td><td>${esc(o.nom)}</td></tr>
+      <tr><td>Date de dépôt</td><td>${shortDate(s.dateFin || s.dateSignature)}</td></tr>
+    </table>
 
-    <p style="margin-top:30px;">Fait à ${esc(c.ville)}, le ${longDate(d.session.dateSignature)}.</p>
-    <div class="sign-block"><div class="sign-box"><strong>Signature du candidat</strong></div></div>
-    ${close(o, title)}`;
+    <h2>Note au lecteur</h2>
+    <p>Le présent dossier a été rédigé par le candidat, avec l'appui méthodologique de ${esc(o.nom)}. Il décrit et analyse les activités professionnelles exercées en lien avec le référentiel de la certification visée. Chaque situation présentée illustre les compétences mobilisées et les résultats obtenus.</p>
+
+    <h2>1. Ma présentation</h2>
+    <h3>1.1 — État civil et coordonnées</h3>
+    ${candidatCoordTable(c, true)}
+
+    <h3>1.2 — Présentation générale de mon parcours</h3>
+    <p>${nl2br(contents.parcours) || "<em>À rédiger avec le candidat.</em>"}</p>
+
+    <h3>1.3 — Synthèse chronologique de mes expériences</h3>
+    <table>
+      <tr><th>Période</th><th>Poste occupé</th><th>Employeur</th></tr>
+      ${chronoRows}
+    </table>
+
+    <h3>1.4 — Récapitulatif de la durée d'expérience en rapport avec la certification</h3>
+    <p>L'ensemble des expériences décrites ci-dessus permet de justifier d'une expérience significative en lien avec le référentiel du <strong>${esc(cert.intitule)}</strong>.</p>
+
+    <h2>2. Mon environnement professionnel</h2>
+    <h3>2.1 — Glossaire des principaux termes et sigles employés</h3>
+    <p>${nl2br(contents.synthese) || "<em>Glossaire des termes et sigles du métier à compléter avec le candidat selon le secteur.</em>"}</p>
+
+    <h2>3. Description et analyse de mes situations de travail</h2>
+    ${situationsHTML}
+
+    <h2>4. Conclusion et projet professionnel</h2>
+    <p>${nl2br(contents.motivation) || "<em>Conclusion à rédiger : bilan de l'accompagnement, projet professionnel visé, poursuite du parcours après obtention de la certification.</em>"}</p>
+
+    <h2>Annexes et déclaration sur l'honneur</h2>
+    <p>Je soussigné(e) <strong>${esc(fullName(c))}</strong> atteste sur l'honneur que les informations fournies dans le présent dossier de validation sont exactes et que les activités décrites ont été personnellement réalisées.</p>
+    <p>Fait à ${esc(c.ville) || "…………………"}, le ${shortDate(s.dateSignature)}.</p>
+
+    ${signatureBlock("Le Candidat", esc(fullName(c)), "Pour " + esc(o.nom), esc(o.dirigeant) + " — Dirigeant")}
+  `;
+  return wrap(o, "Livret 2 — Dossier de validation", body, "Description et analyse de l'expérience");
 }
+
+// 4) Convention d'accompagnement VAE
+export function getConventionHTML(d: VAEData): string {
+  const { organisme: o, candidat: c, certification: cert, session: s } = d;
+  const body = `
+    <h2>Entre les soussignés</h2>
+    <p><strong>Le Prestataire :</strong> ${esc(o.nom)}, organisme d'accompagnement à la VAE, ${esc(o.adresse)}, SIRET ${esc(o.siret)}, déclaration d'activité n° ${esc(o.nda)}, représenté par ${esc(o.dirigeant)}.</p>
+    <p><strong>Et le Candidat :</strong> ${esc(civilLong(c))} ${esc(fullName(c))}</p>
+    ${candidatCoordTable(c, true)}
+
+    <p>Il a été convenu ce qui suit, en complément des Conditions Générales de Vente (CGV) de ${esc(o.nom)}, que le Candidat reconnaît avoir lues et acceptées et qui sont annexées à la présente convention.</p>
+
+    <div class="art">Article 1 — Objet et certification visée</div>
+    <p>La présente convention a pour objet l'accompagnement individualisé du Candidat dans sa démarche de VAE, en vue de l'obtention de la certification suivante :</p>
+    <table class="kv">
+      <tr><td>Certification visée</td><td>${esc(cert.intitule)}</td></tr>
+      <tr><td>Niveau</td><td>Niveau ${esc(cert.niveau)} (cadre national des certifications professionnelles)</td></tr>
+      <tr><td>Certificateur</td><td>${esc(cert.certificateur)}</td></tr>
+      <tr><td>Fiche officielle</td><td><a href="${esc(cert.lien)}">${esc(cert.lien)}</a></td></tr>
+    </table>
+
+    <div class="art">Article 2 — Nature de l'engagement</div>
+    <p>Conformément aux CGV, le Prestataire est tenu à une obligation de moyens et ne garantit pas l'obtention de la certification, la décision relevant du seul jury du certificateur. Le Candidat reconnaît avoir été informé de ce caractère aléatoire du résultat.</p>
+
+    <div class="art">Article 3 — Contenu et modalités de l'accompagnement</div>
+    <p>L'accompagnement, réalisé à 100 % à distance, comprend notamment : l'analyse du parcours et de la faisabilité, l'aide à la constitution du dossier de recevabilité (Livret 1), l'accompagnement à la rédaction du dossier de validation (Livret 2), la préparation à l'entretien avec le jury, ainsi que la relecture et la finalisation du dossier.</p>
+    <table class="kv">
+      <tr><td>Durée totale</td><td>${esc(o.duree)}</td></tr>
+      <tr><td>Modalité</td><td>${esc(s.modalite)} (visioconférence, courriel, téléphone)</td></tr>
+      <tr><td>Référent</td><td>Référent unique — ${esc(o.dirigeant)}</td></tr>
+      <tr><td>Date de début</td><td>${shortDate(s.dateDebut)}</td></tr>
+      <tr><td>Date de fin</td><td>${shortDate(s.dateFin)}</td></tr>
+    </table>
+
+    <div class="art">Article 4 — Modalités spécifiques à la formation à distance (FOAD)</div>
+    <p>Conformément à l'article <strong>D.6313-3-1 du Code du travail</strong>, la formation étant réalisée à distance, les modalités suivantes sont précisées :</p>
+    <p><strong>Nature des travaux et temps estimé :</strong> le Candidat réalise, en autonomie et lors des classes virtuelles, des travaux de rédaction et d'analyse de son expérience (constitution des Livrets 1 et 2, exercices de préparation à l'entretien). Le temps estimé correspond à la durée totale indiquée à l'article 3.</p>
+    <p><strong>Modalités de suivi et d'évaluation :</strong> l'assiduité et la progression sont suivies par émargement électronique par séquence, relevés de connexion, comptes rendus des classes virtuelles et restitution des travaux. L'évaluation est réalisée tout au long du parcours par le référent et formalisée par la finalisation du dossier VAE et la préparation à l'entretien avec le jury.</p>
+    <p><strong>Assistance technique et pédagogique :</strong> le Candidat bénéficie d'une assistance pédagogique et d'une assistance technique, joignables par courriel à ${esc(o.email)} et par visioconférence. Le délai de réponse est de deux (2) jours ouvrés maximum pendant toute la durée de l'accompagnement.</p>
+    <p><strong>Moyens techniques requis :</strong> ordinateur, connexion Internet, micro et webcam, adresse de messagerie. Les classes virtuelles se déroulent via un outil de visioconférence sécurisé.</p>
+
+    <div class="art">Article 5 — Prix et modalités de financement</div>
+    <p>Le prix forfaitaire de la prestation est de <strong>${esc(o.prixTTC)}</strong>, financement par <strong>${esc(s.financement)}</strong> (Mon Compte Formation). TVA non applicable, art. 293 B du Code général des impôts, le cas échéant.</p>
+
+    <div class="art">Article 6 — Rétractation, annulation et abandon</div>
+    <p>Le Candidat dispose d'un délai de rétractation conformément aux dispositions du Code du travail et du Code de la consommation. Les conditions détaillées d'annulation et d'abandon figurent aux CGV annexées.</p>
+
+    <p style="margin-top:18px;">Fait à ${esc(s.lieuSignature)}, le ${shortDate(s.dateSignature)}, en deux exemplaires originaux.</p>
+
+    ${signatureBlock("Le Candidat", esc(fullName(c)) + " — mention « Lu et approuvé »", "Pour " + esc(o.nom), esc(o.dirigeant) + " — Dirigeant")}
+  `;
+  return wrap(o, "Convention d'accompagnement VAE", body, "Validation des Acquis de l'Expérience — Accompagnement individualisé");
+}
+
+// 5) Convocation
+export function getConvocationHTML(d: VAEData): string {
+  const { organisme: o, candidat: c, certification: cert, session: s } = d;
+  const phone = c.telephone ? ` — Tél. : ${esc(c.telephone)}` : "";
+  const body = `
+    <p><strong>À l'attention de :</strong> ${esc(civilLong(c))} ${esc(fullName(c))}<br/>
+    ${esc(candidatAddressLine(c))}<br/>
+    Courriel : ${esc(c.email)}${phone}</p>
+
+    <p>À ${esc(s.lieuSignature)}, le ${shortDate(s.dateSignature)}</p>
+
+    <p>Madame, Monsieur,</p>
+    <p>Nous avons le plaisir de vous confirmer votre inscription à l'accompagnement à la Validation des Acquis de l'Expérience (VAE) organisé par ${esc(o.nom)}. Vous trouverez ci-dessous les informations relatives à votre session.</p>
+
+    <h2>Informations sur votre session</h2>
+    <table class="kv">
+      <tr><td>Candidat</td><td>${esc(civilLong(c))} ${esc(fullName(c))}</td></tr>
+      <tr><td>Certification visée</td><td>${esc(cert.intitule)} (Niveau ${esc(cert.niveau)})</td></tr>
+      <tr><td>Durée totale</td><td>${esc(o.duree)}</td></tr>
+      <tr><td>Dates de la session</td><td>du ${shortDate(s.dateDebut)} au ${shortDate(s.dateFin)}</td></tr>
+      <tr><td>Modalité</td><td>${esc(s.modalite)} (visioconférence)</td></tr>
+      <tr><td>Référent / accompagnateur</td><td>${esc(o.dirigeant)}</td></tr>
+    </table>
+
+    <p>Les rendez-vous individuels seront planifiés avec votre référent selon un calendrier défini ensemble. Un lien de connexion vous sera communiqué pour chaque séance.</p>
+    <p>Nous vous recommandons de vous connecter quelques minutes avant le début de chaque séance et de vérifier au préalable votre micro, votre caméra et votre connexion Internet.</p>
+
+    <h2>Assistance technique et pédagogique de ${esc(o.nom)}</h2>
+    <p>Pendant toute la durée de votre accompagnement, ${esc(o.nom)} met à votre disposition :</p>
+    <p><strong>Une assistance pédagogique :</strong> elle vous accompagne sur le contenu de la formation, répond à vos questions et vous guide dans la rédaction de votre dossier et la préparation de l'entretien avec le jury.</p>
+    <p><strong>Une assistance technique :</strong> elle vous aide en cas de difficulté d'accès ou d'usage des outils numériques (connexion à la visioconférence, supports), afin de garantir le bon déroulement de votre formation à distance.</p>
+
+    <p><strong>Assistance pédagogique — ${esc(o.dirigeant)}</strong></p>
+    <table class="kv"><tr><td>Lien de l'appel vidéo</td><td><a href="${esc(o.lienVisio)}">${esc(o.lienVisio)}</a></td></tr></table>
+
+    <p><strong>Assistance technique — ${esc(o.dirigeant)}</strong></p>
+    <table class="kv"><tr><td>Support</td><td><a href="https://support.google.com/?hl=fr">https://support.google.com/?hl=fr</a></td></tr></table>
+
+    <p>Ces deux assistances sont joignables par courriel à <strong>${esc(o.email)}</strong>, avec un délai de réponse de deux (2) jours ouvrés maximum.</p>
+
+    <p>Nous restons à votre disposition pour toute information complémentaire et vous prions d'agréer, Madame, Monsieur, l'expression de nos salutations distinguées.</p>
+
+    <div style="margin-top:36px;">
+      <strong>Pour ${esc(o.nom)}</strong><br/>
+      ${esc(o.dirigeant)} — Dirigeant
+    </div>
+  `;
+  return wrap(o, "Convocation", body, "Accompagnement à la Validation des Acquis de l'Expérience (VAE) — à distance");
+}
+
+// 6) Autorisation RGPD
+export function getAutorisationRGPDHTML(d: VAEData): string {
+  const { organisme: o, candidat: c, certification: cert, session: s } = d;
+  const body = `
+    <div class="subtitle">Consentement au traitement des données personnelles — Accompagnement VAE</div>
+
+    <p><strong>Candidat concerné :</strong> ${esc(civilLong(c))} ${esc(fullName(c))}</p>
+    <table class="kv">
+      <tr><td>Adresse</td><td>${esc(candidatAddressLine(c))}</td></tr>
+      ${c.telephone ? `<tr><td>Téléphone</td><td>${esc(c.telephone)}</td></tr>` : ""}
+      <tr><td>Courriel</td><td>${esc(c.email)}</td></tr>
+      <tr><td>Accompagnement</td><td>VAE — ${esc(cert.intitule)}</td></tr>
+    </table>
+
+    <h2>1. Responsable du traitement</h2>
+    <p>Le responsable du traitement de vos données est <strong>${esc(o.nom)}</strong>, ${esc(o.adresse)} (SIRET ${esc(o.siret)}), représenté par ${esc(o.dirigeant)}. Pour toute question relative à vos données : ${esc(o.email)}.</p>
+
+    <h2>2. Données collectées et finalités</h2>
+    <p>Dans le cadre de votre accompagnement à la VAE, ${esc(o.nom)} collecte et traite les données suivantes : état civil et coordonnées, parcours professionnel et de formation, pièces justificatives (diplômes, attestations, bulletins), et, le cas échéant, informations relatives à une situation de handicap pour l'adaptation de l'accompagnement.</p>
+    <p>Ces données sont traitées aux seules fins suivantes : réalisation et suivi de l'accompagnement VAE, constitution du dossier de validation, gestion administrative et contractuelle, et respect des obligations légales et réglementaires du Prestataire.</p>
+
+    <h2>3. Base légale et destinataires</h2>
+    <p>Le traitement repose sur l'exécution de la convention d'accompagnement et, pour certaines utilisations spécifiques, sur votre consentement. Vos données sont destinées au référent en charge de votre accompagnement et, lorsque cela est nécessaire, à l'organisme certificateur et au financeur (notamment la Caisse des Dépôts dans le cadre du CPF). Elles ne sont jamais cédées à des tiers à des fins commerciales.</p>
+
+    <h2>4. Durée de conservation</h2>
+    <p>Vos données sont conservées pendant la durée de l'accompagnement, puis archivées pour la durée nécessaire au respect des obligations légales et au suivi de la certification, avant d'être supprimées.</p>
+
+    <h2>5. Vos droits</h2>
+    <p>Conformément au Règlement (UE) 2016/679 (RGPD) et à la loi Informatique et Libertés, vous disposez des droits suivants sur vos données :</p>
+    <ul>
+      <li>Droit d'accès, de rectification et d'effacement.</li>
+      <li>Droit à la limitation et droit d'opposition au traitement.</li>
+      <li>Droit à la portabilité de vos données.</li>
+      <li>Droit de retirer votre consentement à tout moment, sans effet rétroactif.</li>
+    </ul>
+    <p>Vous pouvez exercer ces droits à tout moment en écrivant à ${esc(o.email)}. Vous disposez également du droit d'introduire une réclamation auprès de la CNIL (www.cnil.fr).</p>
+
+    <h2>6. Recueil de votre consentement</h2>
+    <p>Je soussigné(e) <strong>${esc(fullName(c))}</strong>, après avoir pris connaissance des informations ci-dessus :</p>
+    <p><span class="cbx">☐</span> J'autorise ${esc(o.nom)} à collecter et traiter mes données personnelles aux fins de mon accompagnement VAE (nécessaire à la réalisation de la prestation).</p>
+    <p><span class="cbx">☐</span> J'autorise la transmission de mes données à l'organisme certificateur et au financeur, lorsque cela est nécessaire à ma démarche.</p>
+    <p><span class="cbx">☐</span> J'autorise l'enregistrement éventuel des séances de visioconférence à des fins pédagogiques et de traçabilité de l'accompagnement (facultatif).</p>
+
+    <p style="margin-top:18px;">Fait à ${esc(s.lieuSignature)}, le ${shortDate(s.dateSignature)}.</p>
+
+    ${signatureBlock("Le Candidat", esc(fullName(c)) + " — mention « Lu et approuvé »", "Pour " + esc(o.nom), esc(o.dirigeant) + " — Dirigeant")}
+  `;
+  return wrap(o, "Autorisation RGPD", body);
+}
+
+// 7) CV (fallback quand pas de CV fourni)
+export function getCVHTML(d: VAEData): string {
+  const { organisme: o, candidat: c, certification: cert } = d;
+  const exp = c.experiences.map(x => `
+    <p><strong>${esc(x.poste)}</strong> — ${esc(x.entreprise)} <em>(${esc(x.dateDebut)} → ${esc(x.dateFin)})</em></p>
+    <p>${nl2br(x.missions)}</p>
+  `).join("");
+  const dip = c.diplomes.map(x => `<li><strong>${esc(x.intitule)}</strong> — ${esc(x.etablissement)} (${esc(x.annee)})</li>`).join("");
+  const skills = (c.competences || []).map(s => `<li>${esc(s)}</li>`).join("");
+  const body = `
+    <div style="text-align:center; margin-bottom:20px;">
+      <div style="font-size:16pt; font-weight:bold; color:#0f172a;">${esc(fullName(c))}</div>
+      <div style="color:#475569;">${esc(c.emploiActuel)}</div>
+      <div style="color:#475569; font-size:10pt;">${esc(candidatAddressLine(c))} — ${esc(c.email)}${c.telephone ? " — " + esc(c.telephone) : ""}</div>
+    </div>
+
+    <h2>Titre visé</h2>
+    <p>${esc(cert.intitule)} (RNCP ${esc(cert.rncp)})</p>
+
+    <h2>Expériences professionnelles</h2>
+    ${exp || "<p><em>À compléter.</em></p>"}
+
+    <h2>Formations et diplômes</h2>
+    <ul>${dip || "<li><em>À compléter.</em></li>"}</ul>
+
+    ${skills ? `<h2>Compétences</h2><ul>${skills}</ul>` : ""}
+  `;
+  return wrap(o, "Curriculum Vitæ", body);
+}
+
+// ------------------------------------------------------------------
+// B. Documents organisme
+// ------------------------------------------------------------------
 
 export function getProgrammeHTML(d: VAEData): string {
-  const title = "Programme d'accompagnement VAE";
   const { organisme: o, certification: cert, session: s } = d;
-  return `${header(o, title)}
-    <h2>Certification visée</h2>
-    ${certifBlock(cert)}
+  const body = `
+    <p><strong>Titre visé :</strong> ${esc(cert.intitule)} (RNCP ${esc(cert.rncp)} — Niveau ${esc(cert.niveau)})</p>
+    <p><strong>Certificateur :</strong> ${esc(cert.certificateur)}</p>
 
     <h2>Objectifs de l'accompagnement</h2>
     <ul>
-      <li>Analyser le parcours et identifier les activités significatives</li>
-      <li>Rédiger le Livret 2 en lien avec le référentiel de la certification</li>
-      <li>Préparer l'entretien avec le jury de validation</li>
+      <li>Valoriser l'expérience professionnelle du candidat au regard de la certification visée.</li>
+      <li>Identifier et formaliser les compétences acquises.</li>
+      <li>Constituer les livrets VAE (Livret 1 de recevabilité et Livret 2 de validation).</li>
+      <li>Préparer efficacement l'entretien avec le jury.</li>
     </ul>
 
-    <h2>Durée et modalité</h2>
-    <p><strong>${esc(o.duree)}</strong> — ${esc(s.modalite)}</p>
+    <h2>Public concerné</h2>
+    <ul>
+      <li>Toute personne justifiant d'une activité (salariée, non salariée, bénévole ou volontaire) en lien avec la certification visée.</li>
+    </ul>
 
-    <h2>Séquençage pédagogique (40 h)</h2>
-    <table>
-      <tr><th>Phase</th><th>Contenu</th><th>Durée</th></tr>
-      <tr><td>1. Positionnement</td><td>Entretien individuel, analyse du parcours</td><td>4 h</td></tr>
-      <tr><td>2. Recevabilité</td><td>Aide à la constitution du Livret 1</td><td>4 h</td></tr>
-      <tr><td>3. Analyse des activités</td><td>Identification des situations de travail par bloc</td><td>10 h</td></tr>
-      <tr><td>4. Rédaction Livret 2</td><td>Accompagnement individualisé à la rédaction</td><td>16 h</td></tr>
-      <tr><td>5. Préparation au jury</td><td>Simulations d'entretien, mise en situation</td><td>6 h</td></tr>
-    </table>
+    <h2>Pré-requis</h2>
+    <ul>
+      <li>Expérience professionnelle en lien avec le référentiel de la certification.</li>
+      <li>Maîtrise des outils numériques de base.</li>
+      <li>Connexion Internet et matériel informatique (ordinateur, micro, webcam).</li>
+    </ul>
 
-    <h2>Moyens</h2>
-    <p>Visioconférence (${esc(o.lienVisio)}), échanges par email, ressources documentaires France Compétences.</p>
+    <h2>Programme détaillé</h2>
+
+    <h3>Module 1 — Analyse du parcours et positionnement VAE</h3>
+    <p><em>Ce module permet d'identifier les compétences acquises par le candidat au regard du référentiel de la certification.</em></p>
+    <p><strong>Contenu du module :</strong></p>
+    <ul>
+      <li>Analyse détaillée du parcours professionnel</li>
+      <li>Étude des expériences en lien avec le référentiel</li>
+      <li>Identification des compétences techniques, organisationnelles et managériales</li>
+      <li>Étude du référentiel de certification</li>
+      <li>Construction du planning d'accompagnement</li>
+    </ul>
+    <p><strong>Résultats attendus :</strong> positionnement clair du candidat, identification des compétences à valoriser, validation du projet VAE.</p>
+
+    <h3>Module 2 — Constitution du Livret 1</h3>
+    <p><em>Ce module accompagne le candidat dans la constitution du dossier de recevabilité administrative.</em></p>
+    <p><strong>Contenu du module :</strong></p>
+    <ul>
+      <li>Présentation des exigences administratives</li>
+      <li>Vérification des justificatifs d'expérience</li>
+      <li>Constitution des pièces administratives</li>
+      <li>Assistance à la rédaction du Livret 1</li>
+      <li>Aide au dépôt du dossier auprès du certificateur</li>
+    </ul>
+    <p><strong>Résultats attendus :</strong> Livret 1 complet et conforme, dépôt du dossier de recevabilité réalisé.</p>
+
+    <h3>Module 3 — Rédaction du Livret 2</h3>
+    <p><em>Ce module permet de formaliser l'expérience professionnelle et de démontrer les compétences au regard du référentiel.</em></p>
+    <p><strong>Contenu du module :</strong></p>
+    <ul>
+      <li>Méthodologie de rédaction du Livret 2</li>
+      <li>Description détaillée des activités professionnelles</li>
+      <li>Analyse des compétences par bloc</li>
+      <li>Relecture et amélioration continue</li>
+    </ul>
+    <p><strong>Résultats attendus :</strong> Livret 2 finalisé, cohérent avec le référentiel.</p>
+
+    <h3>Module 4 — Préparation à l'entretien avec le jury</h3>
+    <p><em>Ce module prépare le candidat à défendre son dossier devant le jury.</em></p>
+    <p><strong>Contenu du module :</strong> simulations d'entretien, mise en situation, entraînement à la posture, questions-types du jury.</p>
+    <p><strong>Résultats attendus :</strong> candidat prêt et confiant pour le passage devant le jury.</p>
+
+    <h3>Module 5 — Finalisation et suivi post-jury</h3>
+    <p><strong>Contenu du module :</strong> relecture finale, dépôt du dossier, accompagnement post-entretien et suivi de la décision du jury.</p>
+    <p><strong>Résultats attendus :</strong> dossier finalisé, candidat accompagné jusqu'à la décision du jury.</p>
+
+    <h2>Modalités pédagogiques</h2>
+    <p>Accompagnement individualisé à distance en visioconférence, échanges par courriel et téléphone, supports dématérialisés, travaux personnels en intersession, référent unique.</p>
+
+    <h2>Durée totale</h2>
+    <p><strong>${esc(o.duree)}</strong> — Modalité : ${esc(s.modalite)}.</p>
+
+    <h2>Prix</h2>
+    <p>Forfait : <strong>${esc(o.prixTTC)}</strong> — Financement : ${esc(s.financement)}.</p>
 
     <h2>Modalités d'évaluation</h2>
-    <p>Évaluation continue lors des séances, restitution finale du Livret 2, jury de la certification.</p>
+    <p>Évaluation continue lors des séances, restitution finale du Livret 2, entretien blanc, puis évaluation officielle par le jury du certificateur.</p>
 
     <h2>Accessibilité handicap</h2>
-    <p>Référent : ${esc(o.referentHandicap)} — ${esc(o.email)}</p>
-    ${close(o, title)}`;
+    <p>Référent handicap : ${esc(o.referentHandicap)} — ${esc(o.email)}. Aménagements étudiés au cas par cas.</p>
+  `;
+  return wrap(o, "Programme d'accompagnement VAE", body, "Formation à distance — 100 % visioconférence");
 }
 
-export function getBesoinsHTML(d: VAEData): string {
-  const title = "Évaluation des besoins — Candidat VAE";
-  const { organisme: o, candidat: c, contents } = d;
-  const b = contents.besoins;
-  return `${header(o, title)}
-    ${candidatBlock(c)}
-    <table>
-      <tr><th>Attentes</th><td>${nl2br(b.attentes)}</td></tr>
-      <tr><th>Freins identifiés</th><td>${nl2br(b.freins)}</td></tr>
-      <tr><th>Disponibilités</th><td>${nl2br(b.disponibilites)}</td></tr>
-      <tr><th>Matériel / connexion</th><td>${nl2br(b.materiel)}</td></tr>
-      <tr><th>Situation de handicap</th><td>${nl2br(b.handicap)}</td></tr>
+export function getCGVHTML(d: VAEData): string {
+  const { organisme: o } = d;
+  const body = `
+    <div class="subtitle">Prestation d'accompagnement à la Validation des Acquis de l'Expérience (VAE)</div>
+
+    <h2>Préambule</h2>
+    <p>Les présentes Conditions Générales de Vente (ci-après « CGV ») régissent les relations contractuelles entre la société <strong>${esc(o.nom)}</strong>, organisme d'accompagnement à la VAE, dont le siège social est situé ${esc(o.adresse)} (SIRET ${esc(o.siret)}, déclaration d'activité n° ${esc(o.nda)}), représentée par ${esc(o.dirigeant)} (ci-après « le Prestataire »), et toute personne souhaitant bénéficier d'une prestation d'accompagnement à la VAE (ci-après « le Client » ou « le Candidat »).</p>
+    <p>Toute commande ou signature d'un devis, d'un contrat ou d'une convention d'accompagnement implique l'adhésion entière et sans réserve du Client aux présentes CGV, qui prévalent sur tout autre document, sauf dérogation expresse et écrite du Prestataire.</p>
+
+    <div class="art">Article 1 — Objet</div>
+    <p>Les présentes CGV définissent les conditions dans lesquelles le Prestataire fournit au Client une prestation d'accompagnement méthodologique à la VAE, destinée à aider le Candidat à constituer son dossier de validation et à préparer son passage devant le jury, en vue de l'obtention de tout ou partie d'une certification professionnelle visée.</p>
+
+    <div class="art">Article 2 — Nature de l'engagement — obligation de moyens</div>
+    <p>Le Prestataire est tenu à une obligation de moyens et non à une obligation de résultat. Il met en œuvre toutes les compétences et tous les moyens pédagogiques nécessaires à la bonne réalisation de l'accompagnement, mais ne garantit en aucun cas l'obtention, totale ou partielle, de la certification visée. La décision de validation relève de la seule compétence du jury du certificateur, indépendant du Prestataire.</p>
+
+    <div class="art">Article 3 — Conditions d'accès et pré-requis</div>
+    <p>L'accès à la prestation suppose que le candidat soit engagé dans une démarche de VAE et justifie d'une expérience en lien avec la certification visée. Le Candidat doit disposer des outils numériques de base (messagerie, traitement de texte, visioconférence) et d'un accès à Internet, la prestation étant réalisée à distance. Un entretien de positionnement préalable permet de vérifier l'adéquation entre l'expérience du Candidat et le titre visé.</p>
+
+    <div class="art">Article 4 — Modalités de l'accompagnement</div>
+    <ul>
+      <li><strong>Format :</strong> accompagnement réalisé à 100 % à distance (entretiens individuels en visioconférence, échanges par courriel et téléphone, supports dématérialisés).</li>
+      <li><strong>Durée :</strong> ${esc(o.duree)}, répartie selon un calendrier défini avec le Candidat. Entrées et sorties permanentes.</li>
+      <li><strong>Suivi :</strong> un référent unique accompagne le Candidat tout au long du parcours.</li>
+    </ul>
+
+    <div class="art">Article 5 — Prix et modalités de paiement</div>
+    <p>Le prix forfaitaire de la prestation d'accompagnement VAE est fixé à <strong>${esc(o.prixTTC)}</strong>, frais d'examen et de passage devant le jury inclus le cas échéant. TVA non applicable, article 293 B du Code général des impôts (franchise en base), le cas échéant. Les modalités et l'échéancier de paiement sont précisés dans la convention individuelle.</p>
+
+    <div class="art">Article 6 — Financement (CPF — Mon Compte Formation)</div>
+    <p>La prestation est éligible au Compte Personnel de Formation (CPF). Le Candidat peut mobiliser son CPF via la plateforme Mon Compte Formation (moncompteformation.gouv.fr). En cas de prise en charge intégrale par le CPF, aucun montant n'est dû directement par le Candidat.</p>
+
+    <div class="art">Article 7 — Rétractation</div>
+    <p>Conformément aux articles L.221-18 et suivants du Code de la consommation, le Client dispose d'un délai de rétractation de quatorze (14) jours à compter de la signature de la convention, sans avoir à justifier de motif ni à payer de pénalité.</p>
+
+    <div class="art">Article 8 — Annulation, abandon</div>
+    <p>Toute annulation à l'initiative du Candidat après le délai de rétractation, ou tout abandon en cours d'accompagnement, entraîne le règlement des heures d'accompagnement effectivement réalisées, sauf force majeure dûment justifiée.</p>
+
+    <div class="art">Article 9 — Réclamations et médiation</div>
+    <p>Toute réclamation peut être adressée par écrit à ${esc(o.email)}. À défaut d'accord amiable, le Candidat peut recourir au médiateur de la consommation dont les coordonnées sont communiquées sur simple demande.</p>
+
+    <div class="art">Article 10 — Protection des données personnelles (RGPD)</div>
+    <p>Le Prestataire traite les données personnelles du Candidat conformément au RGPD et à la loi Informatique et Libertés. Une notice RGPD dédiée est remise au Candidat et jointe à la convention.</p>
+
+    <div class="art">Article 11 — Droit applicable et juridiction compétente</div>
+    <p>Les présentes CGV sont régies par le droit français. En cas de litige, à défaut de résolution amiable, les tribunaux du ressort du siège social du Prestataire sont seuls compétents.</p>
+
+    <p style="margin-top:18px;">Fait à ${esc(o.adresse.split(",").pop()?.trim() || "")}, le ${shortDate(new Date().toISOString().slice(0, 10))}.</p>
+    <p><strong>Pour ${esc(o.nom)}</strong> — ${esc(o.dirigeant)}, Dirigeant.</p>
+  `;
+  return wrap(o, "Conditions Générales de Vente", body);
+}
+
+export function getCharteHTML(d: VAEData): string {
+  const { organisme: o } = d;
+  const engagements: Array<[number, string, string]> = [
+    [1, "Un accueil et une information clairs", "Nous vous informons de manière claire et transparente sur la démarche VAE, le déroulement de l'accompagnement, les conditions et les tarifs, avant tout engagement."],
+    [2, "Un accompagnement individualisé", "Nous adaptons notre accompagnement à votre profil, à votre expérience et à votre projet, avec un référent dédié qui vous suit du début à la fin de votre parcours."],
+    [3, "L'écoute et la disponibilité", "Nous restons à votre écoute et nous nous engageons à répondre à vos demandes dans un délai de deux jours ouvrés maximum, par courriel ou par téléphone."],
+    [4, "Des intervenants compétents", "Nous mobilisons des accompagnateurs qualifiés, qui actualisent régulièrement leurs compétences et maîtrisent la méthodologie de la VAE."],
+    [5, "La transparence sur les résultats", "Nous sommes tenus à une obligation de moyens : nous mettons tout en œuvre pour optimiser vos chances, tout en vous rappelant que la décision finale appartient au jury du certificateur."],
+    [6, "La confidentialité et la protection des données", "Nous traitons votre dossier et vos données personnelles de manière strictement confidentielle, dans le respect du RGPD."],
+    [7, "La non-discrimination et l'accessibilité", "Nous accueillons tous les candidats sans discrimination et mettons en place, avec notre référent handicap, les aménagements nécessaires aux personnes en situation de handicap."],
+    [8, "L'amélioration continue", "Nous recueillons votre avis, traitons chaque réclamation avec attention et faisons évoluer nos pratiques afin d'améliorer en permanence la qualité de nos prestations."],
+  ];
+  const rows = engagements.map(([n, t, txt]) => `<tr><td style="width:8%; text-align:center; font-weight:bold; font-size:14pt; color:#0f172a;">${n}</td><td><strong>${esc(t)}</strong><br/>${esc(txt)}</td></tr>`).join("");
+
+  const body = `
+    <div class="subtitle">Nos engagements pour votre accompagnement à la VAE</div>
+    <p>Chez ${esc(o.nom)}, la qualité de l'accompagnement est au cœur de notre métier. Cette charte formalise les engagements que nous prenons envers chaque candidat à la Validation des Acquis de l'Expérience, tout au long de son parcours. Elle traduit nos valeurs : l'écoute, le respect, la transparence et l'exigence de professionnalisme.</p>
+
+    <table>${rows}</table>
+
+    <p>En adhérant à cette charte, l'ensemble de l'équipe de ${esc(o.nom)} s'engage à vous offrir un accompagnement de qualité, respectueux et bienveillant, pour mettre toutes les chances de votre côté.</p>
+
+    <p style="margin-top:18px;">Fait à ${esc(o.adresse.split(",").pop()?.trim() || "")}, le ${shortDate(new Date().toISOString().slice(0, 10))}.</p>
+
+    <div class="sign-row">
+      <div class="sign-cell" style="width:100%;">
+        <div class="lbl">Pour ${esc(o.nom)}</div>
+        <div class="sub">${esc(o.dirigeant)} — Dirigeant</div>
+        <div class="sub" style="margin-top:24px;">Signature :</div>
+      </div>
+    </div>
+  `;
+  return wrap(o, "Charte Qualité", body);
+}
+
+export function getLivretAccueilHTML(d: VAEData): string {
+  const { organisme: o } = d;
+  const body = `
+    <div class="subtitle">Accompagnement à la Validation des Acquis de l'Expérience (VAE) — Formations dispensées à distance</div>
+
+    <h2>Bienvenue</h2>
+    <p>Madame, Monsieur,</p>
+    <p>Nous avons le plaisir de vous accueillir au sein de <strong>${esc(o.nom)}</strong> et vous remercions de la confiance que vous nous accordez pour votre démarche de Validation des Acquis de l'Expérience (VAE).</p>
+    <p>Ce livret d'accueil a été conçu pour vous accompagner dès le début de votre parcours. Il réunit toutes les informations pratiques dont vous aurez besoin : le déroulement de votre accompagnement, vos interlocuteurs, les modalités de connexion à distance, ainsi que vos droits et vos contacts utiles.</p>
+    <p>Notre objectif est de vous offrir un accompagnement individualisé, bienveillant et structuré, afin de vous donner les meilleures chances de valoriser votre expérience et d'obtenir la certification que vous visez.</p>
+    <p><em>${esc(o.dirigeant)} — Dirigeant de ${esc(o.nom)}</em></p>
+
+    <h2>Présentation de ${esc(o.nom)}</h2>
+    <table class="kv">
+      <tr><td>Organisme</td><td>${esc(o.nom)}</td></tr>
+      <tr><td>Adresse</td><td>${esc(o.adresse)}</td></tr>
+      <tr><td>SIRET</td><td>${esc(o.siret)}</td></tr>
+      <tr><td>Déclaration d'activité</td><td>n° ${esc(o.nda)}</td></tr>
+      <tr><td>Dirigeant</td><td>${esc(o.dirigeant)}</td></tr>
+      <tr><td>Contact</td><td>${esc(o.email)}</td></tr>
     </table>
-    <p style="margin-top:20px;">Rempli le ${longDate(d.session.dateEntretienPositionnement || d.session.dateSignature)}.</p>
-    ${close(o, title)}`;
+    <p><em>L'enregistrement de la déclaration d'activité ne vaut pas agrément de l'État.</em></p>
+
+    <h2>Qu'est-ce que la VAE ?</h2>
+    <p>La Validation des Acquis de l'Expérience (VAE) est un droit qui vous permet d'obtenir tout ou partie d'une certification professionnelle (diplôme, titre, certificat) grâce à l'expérience que vous avez acquise, qu'elle soit salariée, non salariée, bénévole ou volontaire.</p>
+    <ol>
+      <li><strong>La recevabilité (Livret 1)</strong> : vous vérifiez que votre expérience correspond à la certification visée et déposez votre demande auprès du certificateur.</li>
+      <li><strong>Le dossier de validation (Livret 2)</strong> : vous décrivez et analysez votre expérience au regard du référentiel. C'est le cœur de la démarche.</li>
+      <li><strong>L'entretien avec le jury</strong> : vous présentez et défendez votre dossier devant un jury, qui décide d'une validation totale, partielle ou d'un refus.</li>
+    </ol>
+
+    <h2>Le déroulement de votre accompagnement</h2>
+    <p>Votre accompagnement est réalisé à 100 % à distance, en visioconférence, avec un référent dédié. Il s'organise autour des modules suivants : analyse du parcours, constitution du Livret 1, rédaction du Livret 2, préparation à l'entretien jury, finalisation.</p>
+
+    <h2>Interlocuteurs et assistances</h2>
+    <p><strong>Référent unique :</strong> ${esc(o.dirigeant)} — ${esc(o.email)}</p>
+    <p><strong>Assistance pédagogique et technique :</strong> par courriel à ${esc(o.email)}, avec un délai de réponse de 2 jours ouvrés maximum.</p>
+
+    <h2>Modalités de connexion</h2>
+    <p>Ordinateur avec micro et webcam, connexion Internet stable, adresse de messagerie active. Lien de visioconférence : <a href="${esc(o.lienVisio)}">${esc(o.lienVisio)}</a>.</p>
+
+    <h2>Handicap</h2>
+    <p>Référent handicap : <strong>${esc(o.referentHandicap)}</strong> — ${esc(o.email)}. Nous étudions au cas par cas tous les aménagements nécessaires (durée, supports, rythme, outils adaptés).</p>
+
+    <h2>Vos droits</h2>
+    <p>Confidentialité, respect du RGPD, non-discrimination, droit d'accès à vos données. Vous pouvez à tout moment exercer vos droits en écrivant à ${esc(o.email)}.</p>
+
+    <h2>Contacts utiles</h2>
+    <p>France Compétences : <a href="https://www.francecompetences.fr">www.francecompetences.fr</a> — Mon Compte Formation : <a href="https://www.moncompteformation.gouv.fr">www.moncompteformation.gouv.fr</a> — CNIL : <a href="https://www.cnil.fr">www.cnil.fr</a>.</p>
+  `;
+  return wrap(o, "Livret d'accueil du candidat", body);
 }
 
-export function getPlanAccompagnementHTML(d: VAEData): string {
-  const title = "Plan d'accompagnement personnalisé";
-  const { organisme: o, candidat: c, contents } = d;
-  return `${header(o, title)}
-    <p><strong>Candidat :</strong> ${esc(c.prenom)} ${esc(c.nom)}</p>
-    <h2>Plan d'accompagnement</h2>
-    <p>${nl2br(contents.planAccompagnement) || "<em>À rédiger</em>"}</p>
-    ${close(o, title)}`;
+export function getReglementInterieurHTML(d: VAEData): string {
+  const { organisme: o } = d;
+  const body = `
+    <div class="subtitle">Formations et accompagnements dispensés à distance</div>
+
+    <div class="art">Article 1 — Bases du Règlement Intérieur</div>
+    <p>Le présent Règlement Intérieur est actualisé en fonction de l'évolution de la législation, et notamment des dispositions du Décret 2019-1143 du 07 novembre 2019 (article 4). Il obéit aux dispositions des articles <strong>L.6352-3 et 5</strong> et <strong>R.6352-1 à 15</strong> du Code du Travail. Les sanctions pénales sont exposées aux articles L.6355-8 et 9 du Code du Travail.</p>
+    <p>Ce Règlement Intérieur est disponible et consultable par tout stagiaire avant son entrée en formation. Les formations étant dispensées intégralement à distance, il est remis au stagiaire par voie dématérialisée (courriel ou plateforme) et accessible à tout moment.</p>
+
+    <div class="art">Article 2 — Informations remises au stagiaire avant son inscription définitive (L.6353-8)</div>
+    <p>Avant son inscription définitive, le stagiaire reçoit les informations suivantes :</p>
+    <ul>
+      <li>Les objectifs (objectif professionnel et objectifs de développement des compétences) et le contenu de la formation.</li>
+      <li>La liste des formateurs et des intervenants.</li>
+      <li>Les horaires ou le volume horaire et les modalités d'organisation à distance.</li>
+      <li>Les modalités d'évaluation de la formation.</li>
+      <li>Les coordonnées de la personne chargée des relations avec les stagiaires.</li>
+      <li>Le règlement intérieur applicable à la formation.</li>
+    </ul>
+    <p>Pour les contrats conclus par des personnes physiques, sont également délivrés : les tarifs, les modalités de règlement et les conditions financières prévues en cas de cessation anticipée ou d'abandon.</p>
+
+    <div class="art">Article 3 — Informations demandées au stagiaire (L.6353-9)</div>
+    <p>Les informations demandées ne peuvent avoir comme finalité que d'apprécier l'aptitude du candidat à suivre l'action de formation. Elles doivent présenter un lien direct et nécessaire avec l'action de formation, et il doit y être répondu de bonne foi.</p>
+
+    <div class="art">Article 4 — Assiduité, ponctualité, absences (formation à distance)</div>
+    <p>Les stagiaires sont tenus de suivre toutes les séquences programmées, avec assiduité et ponctualité, et sans interruption. La formation étant dispensée à distance, la réalité de la participation du stagiaire est attestée par des moyens adaptés au distanciel : émargement électronique par demi-journée ou par séquence, relevés de connexion à la plateforme, justificatifs de réalisation des activités et des évaluations, et comptes rendus des classes virtuelles. Ces éléments sont contresignés ou validés par l'intervenant.</p>
+    <p>Toute absence prévisible du stagiaire doit être signalée au préalable au référent, par courriel à ${esc(o.email)}.</p>
+
+    <div class="art">Article 5 — Discipline</div>
+    <p>Le stagiaire est tenu d'adopter un comportement respectueux envers les intervenants et les autres stagiaires, y compris dans les échanges à distance (visioconférence, courriel, messagerie).</p>
+
+    <div class="art">Article 6 — Sanctions et garanties procédurales</div>
+    <p>Tout manquement du stagiaire à l'une des prescriptions du présent règlement peut faire l'objet d'une sanction (avertissement écrit, blâme, exclusion temporaire, exclusion définitive), prononcée dans le respect des garanties procédurales prévues aux articles R.6352-3 à 8 du Code du Travail.</p>
+
+    <div class="art">Article 7 — Représentation des stagiaires</div>
+    <p>Conformément à l'article R.6352-9 du Code du Travail, une représentation des stagiaires est mise en place lorsque la durée de la formation dépasse 500 heures. Les formations VAE étant d'une durée inférieure, cette disposition ne s'applique pas.</p>
+
+    <div class="art">Article 8 — Hygiène et sécurité</div>
+    <p>Les formations étant réalisées à distance depuis le domicile ou le lieu de travail du stagiaire, il appartient à ce dernier de veiller à ses propres conditions matérielles de travail. Le Prestataire reste à disposition pour toute question relative à l'ergonomie du poste et à la prévention des risques liés au travail sur écran.</p>
+
+    <div class="art">Article 9 — Entrée en vigueur</div>
+    <p>Le présent règlement entre en vigueur à la date de signature par le dirigeant du Prestataire et est applicable à toutes les actions de formation dispensées par ${esc(o.nom)}.</p>
+
+    <p style="margin-top:18px;">Fait à ${esc(o.adresse.split(",").pop()?.trim() || "")}, le ${shortDate(new Date().toISOString().slice(0, 10))}.</p>
+    <p><strong>Pour ${esc(o.nom)}</strong> — ${esc(o.dirigeant)}, Dirigeant.</p>
+  `;
+  return wrap(o, "Règlement Intérieur", body);
 }
 
-export function getDevisHTML(d: VAEData): string {
-  const title = "Devis d'accompagnement VAE";
-  const { organisme: o, candidat: c, certification: cert, session: s } = d;
-  return `${header(o, title)}
-    <p><strong>Client :</strong> ${esc(c.prenom)} ${esc(c.nom)} — ${esc(c.adresse)}, ${esc(c.codePostal)} ${esc(c.ville)}</p>
-    <p><strong>Date :</strong> ${longDate(s.dateSignature)}</p>
-    <table>
-      <tr><th>Prestation</th><th>Durée</th><th>Montant TTC</th></tr>
-      <tr><td>Accompagnement VAE — ${esc(cert.intitule)} (RNCP ${esc(cert.rncp)})</td><td>${esc(o.duree)}</td><td>${esc(o.prixTTC)}</td></tr>
-    </table>
-    <p><strong>Financement :</strong> ${esc(s.financement)}</p>
-    <p>Devis valable 30 jours à compter de la date d'émission.</p>
-    ${close(o, title)}`;
-}
+export function getChecklistHTML(d: VAEData): string {
+  const { organisme: o, candidat: c } = d;
+  const rows = [
+    ["Documents générés par l'organisme", ""],
+    ["Évaluation des besoins VAE", "☐"],
+    ["Livret 1 — Demande de recevabilité", "☐"],
+    ["Livret 2 — Dossier de validation", "☐"],
+    ["Convention d'accompagnement VAE", "☐"],
+    ["Convocation à l'accompagnement", "☐"],
+    ["Autorisation RGPD", "☐"],
+    ["Programme d'accompagnement VAE", "☐"],
+    ["Conditions Générales de Vente (CGV)", "☐"],
+    ["Charte Qualité", "☐"],
+    ["Livret d'accueil du candidat", "☐"],
+    ["Règlement intérieur", "☐"],
+    ["Pièces à fournir par le candidat", ""],
+    ["Pièce d'identité en cours de validité", "☐"],
+    ["Curriculum vitæ à jour", "☐"],
+    ["Justificatifs d'activité (bulletins, attestations, contrats)", "☐"],
+    ["Copies des diplômes et titres obtenus", "☐"],
+    ["Captures d'écran des mails EDOF / CPF d'inscription", "☐"],
+    ["RIB (si prise en charge partielle par le candidat)", "☐"],
+  ];
+  const trs = rows.map(([lbl, cbx]) => {
+    if (!cbx) return `<tr><td colspan="2" style="background:#0f172a; color:white; font-weight:bold;">${esc(lbl)}</td></tr>`;
+    return `<tr><td style="width:80%;">${esc(lbl)}</td><td style="text-align:center; font-size:14pt;" class="cbx">${cbx}</td></tr>`;
+  }).join("");
 
-export function getAttestationEntreeHTML(d: VAEData): string {
-  const title = "Attestation d'entrée en accompagnement VAE";
-  const { organisme: o, candidat: c, certification: cert, session: s } = d;
-  return `${header(o, title)}
-    <p>Je soussigné(e) ${esc(o.dirigeant)}, représentant l'organisme <strong>${esc(o.nom)}</strong>, atteste que :</p>
-    ${candidatBlock(c)}
-    <p>est entré(e) en accompagnement VAE le <strong>${longDate(s.dateDebut)}</strong> en vue de l'obtention de la certification <strong>${esc(cert.intitule)}</strong> (RNCP ${esc(cert.rncp)}).</p>
-    <p>Fait à ${esc(s.lieuSignature)}, le ${longDate(s.dateSignature)}.</p>
-    <div class="sign-block"><div class="sign-box"><strong>${esc(o.dirigeant)}</strong></div></div>
-    ${close(o, title)}`;
-}
-
-export function getLivretSuiviHTML(d: VAEData): string {
-  const title = "Livret de suivi de l'accompagnement";
-  const { organisme: o, candidat: c, session: s } = d;
-  // 10 séances réparties entre dateDebut et dateFin, entretien intermédiaire à mi-parcours
-  const rows: string[] = [];
-  if (s.dateDebut && s.dateFin) {
-    const d1 = new Date(s.dateDebut).getTime();
-    const d2 = new Date(s.dateFin).getTime();
-    const N = 10;
-    for (let i = 0; i < N; i++) {
-      const t = d1 + ((d2 - d1) * i) / (N - 1);
-      const dt = new Date(t);
-      const label = i === Math.floor(N / 2) ? "Entretien intermédiaire" : `Séance ${i + 1}`;
-      rows.push(`<tr><td>${label}</td><td>${longDate(dt.toISOString().slice(0,10))}</td><td>4 h</td><td>&nbsp;</td></tr>`);
-    }
-  }
-  return `${header(o, title)}
-    <p><strong>Candidat :</strong> ${esc(c.prenom)} ${esc(c.nom)}</p>
-    <table>
-      <tr><th>Séance</th><th>Date</th><th>Durée</th><th>Objectifs / observations</th></tr>
-      ${rows.join("") || "<tr><td colspan='4'>—</td></tr>"}
-    </table>
-    ${close(o, title)}`;
-}
-
-export function getFicheCertifHTML(d: VAEData): string {
-  const title = "Fiche récapitulative — Certification visée";
-  const { organisme: o, certification: cert } = d;
-  const blocs = cert.blocs.map(b => `<tr><td>${esc(b.code)}</td><td>${esc(b.intitule)}</td></tr>`).join("");
-  return `${header(o, title)}
-    ${certifBlock(cert)}
-    <h2>Blocs de compétences</h2>
-    <table><tr><th>Code</th><th>Intitulé</th></tr>${blocs || "<tr><td colspan='2'>Voir France Compétences</td></tr>"}</table>
-    ${close(o, title)}`;
+  const body = `
+    <div class="subtitle">Récapitulatif du dossier d'accompagnement VAE</div>
+    <p><strong>Candidat :</strong> ${esc(fullName(c))}</p>
+    <table>${trs}</table>
+    <p style="margin-top:18px;">Ce document sert de suivi à la constitution complète du dossier d'accompagnement. Chaque pièce doit être cochée dès sa réception ou sa validation par le référent.</p>
+    <p><strong>Référent :</strong> ${esc(o.dirigeant)} — ${esc(o.email)}</p>
+  `;
+  return wrap(o, "Checklist du dossier VAE", body);
 }
