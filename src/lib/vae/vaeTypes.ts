@@ -12,6 +12,7 @@ export interface VAEOrganisme {
   duree: string; // "40 heures à distance"
   logo?: string;
   signature?: string;
+  tampon?: string;
 }
 
 export interface VAEBloc {

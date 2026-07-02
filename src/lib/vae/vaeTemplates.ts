@@ -209,7 +209,7 @@ export function getBesoinsHTML(d: VAEData): string {
     <h2>Conclusion</h2>
     <p>À l'issue de cet entretien, le parcours d'accompagnement VAE peut être engagé selon les modalités convenues avec le candidat, sur la base des éléments recueillis ci-dessus.</p>
 
-    ${signatureBlock("Le Candidat", esc(fullName(c)), "Pour " + esc(o.nom), esc(o.dirigeant) + " — Dirigeant", { signature: c.signature, tampon: c.tampon }, { signature: o.signature })}
+    ${signatureBlock("Le Candidat", esc(fullName(c)), "Pour " + esc(o.nom), esc(o.dirigeant) + " — Dirigeant", { signature: c.signature, tampon: c.tampon }, { signature: o.signature, tampon: o.tampon })}
   `;
   return wrap(o, "Évaluation des besoins", body, "Accompagnement à la Validation des Acquis de l'Expérience (VAE) — Entretien de positionnement");
 }
@@ -308,7 +308,7 @@ export function getLivret1HTML(d: VAEData): string {
     <p>Je soussigné(e) <strong>${esc(fullName(c))}</strong> certifie sur l'honneur l'exactitude des informations portées sur le présent livret et n'avoir déposé qu'une seule demande de recevabilité pour la certification visée au cours de l'année civile en cours.</p>
     <p>Fait à ${esc(c.ville) || "…………………"}, le ${shortDate(s.dateDemandeRecevabilite || s.dateSignature)}.</p>
 
-    ${signatureBlock("Le Candidat", esc(fullName(c)) + " — mention « Lu et approuvé »", "Pour " + esc(o.nom), esc(o.dirigeant) + " — Dirigeant", { signature: c.signature, tampon: c.tampon }, { signature: o.signature })}
+    ${signatureBlock("Le Candidat", esc(fullName(c)) + " — mention « Lu et approuvé »", "Pour " + esc(o.nom), esc(o.dirigeant) + " — Dirigeant", { signature: c.signature, tampon: c.tampon }, { signature: o.signature, tampon: o.tampon })}
   `;
   return wrap(o, "Livret 1 — Demande de recevabilité", body, "Validation des Acquis de l'Expérience (VAE)");
 }
@@ -406,7 +406,7 @@ export function getLivret2HTML(d: VAEData): string {
     <p>Je soussigné(e) <strong>${esc(fullName(c))}</strong> atteste sur l'honneur que les informations fournies dans le présent dossier de validation sont exactes et que les activités décrites ont été personnellement réalisées.</p>
     <p>Fait à ${esc(c.ville) || "…………………"}, le ${shortDate(s.dateSignature)}.</p>
 
-    ${signatureBlock("Le Candidat", esc(fullName(c)), "Pour " + esc(o.nom), esc(o.dirigeant) + " — Dirigeant", { signature: c.signature, tampon: c.tampon }, { signature: o.signature })}
+    ${signatureBlock("Le Candidat", esc(fullName(c)), "Pour " + esc(o.nom), esc(o.dirigeant) + " — Dirigeant", { signature: c.signature, tampon: c.tampon }, { signature: o.signature, tampon: o.tampon })}
   `;
   return wrap(o, "Livret 2 — Dossier de validation", body, "Description et analyse de l'expérience");
 }
@@ -459,7 +459,7 @@ export function getConventionHTML(d: VAEData): string {
 
     <p style="margin-top:18px;">Fait à ${esc(s.lieuSignature)}, le ${shortDate(s.dateSignature)}, en deux exemplaires originaux.</p>
 
-    ${signatureBlock("Le Candidat", esc(fullName(c)) + " — mention « Lu et approuvé »", "Pour " + esc(o.nom), esc(o.dirigeant) + " — Dirigeant", { signature: c.signature, tampon: c.tampon }, { signature: o.signature })}
+    ${signatureBlock("Le Candidat", esc(fullName(c)) + " — mention « Lu et approuvé »", "Pour " + esc(o.nom), esc(o.dirigeant) + " — Dirigeant", { signature: c.signature, tampon: c.tampon }, { signature: o.signature, tampon: o.tampon })}
   `;
   return wrap(o, "Convention d'accompagnement VAE", body, "Validation des Acquis de l'Expérience — Accompagnement individualisé");
 }
@@ -559,7 +559,7 @@ export function getAutorisationRGPDHTML(d: VAEData): string {
 
     <p style="margin-top:18px;">Fait à ${esc(s.lieuSignature)}, le ${shortDate(s.dateSignature)}.</p>
 
-    ${signatureBlock("Le Candidat", esc(fullName(c)) + " — mention « Lu et approuvé »", "Pour " + esc(o.nom), esc(o.dirigeant) + " — Dirigeant", { signature: c.signature, tampon: c.tampon }, { signature: o.signature })}
+    ${signatureBlock("Le Candidat", esc(fullName(c)) + " — mention « Lu et approuvé »", "Pour " + esc(o.nom), esc(o.dirigeant) + " — Dirigeant", { signature: c.signature, tampon: c.tampon }, { signature: o.signature, tampon: o.tampon })}
   `;
   return wrap(o, "Autorisation RGPD", body);
 }
