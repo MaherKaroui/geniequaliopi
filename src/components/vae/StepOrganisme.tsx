@@ -44,9 +44,8 @@ export default function StepOrganisme({ data, onChange }: Props) {
         {F("Prix forfaitaire TTC", "prixTTC", data, onChange, "4 000 € TTC")}
         {F("Durée", "duree", data, onChange, "40 heures à distance")}
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
         <ImgField label="Logo de l'organisme" value={data.logo} onChange={v => onChange({ ...data, logo: v })} />
-        <ImgField label="Signature du dirigeant" value={data.signature} onChange={v => onChange({ ...data, signature: v })} />
         <ImgField label="Tampon de l'organisme" value={data.tampon} onChange={v => onChange({ ...data, tampon: v })} />
       </div>
     </div>
