@@ -1,1 +1,4 @@
 project_id = "uwjxorvytlqqxszylxre"
+
+[functions.fc-rncp-lookup]
+verify_jwt = false
