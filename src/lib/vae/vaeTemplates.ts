@@ -76,7 +76,8 @@ const STYLE = `
 </style>`;
 
 function docHeader(org: VAEOrganisme): string {
-  return `<div class="doc-header">
+  const logo = org.logo ? `<div style="text-align:center;margin-bottom:6px;"><img src="${org.logo}" alt="Logo" height="70" /></div>` : "";
+  return `${logo}<div class="doc-header">
     <div class="org">${esc(org.nom)}</div>
     <div class="meta">${esc(org.adresse)} — SIRET : ${esc(org.siret)}</div>
     <div class="meta">Déclaration d'activité n° ${esc(org.nda)} — Dirigeant : ${esc(org.dirigeant)}</div>
