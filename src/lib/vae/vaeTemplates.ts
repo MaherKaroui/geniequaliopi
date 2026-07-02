@@ -123,8 +123,8 @@ function candidatCoordTable(c: VAECandidat, includeBirth = false): string {
 function signatureBlock(leftLabel: string, leftSub: string, rightLabel: string, rightSub: string, leftImgs?: { signature?: string; tampon?: string }, rightImgs?: { signature?: string; tampon?: string }): string {
   const imgs = (i?: { signature?: string; tampon?: string }) => {
     if (!i || (!i.signature && !i.tampon)) return "";
-    const s = i.signature ? `<img src="${i.signature}" alt="Signature" style="max-height:60px;max-width:160px;display:inline-block;margin-right:8px;vertical-align:middle;" />` : "";
-    const t = i.tampon ? `<img src="${i.tampon}" alt="Tampon" style="max-height:70px;max-width:120px;display:inline-block;vertical-align:middle;" />` : "";
+    const s = i.signature ? `<img src="${i.signature}" alt="Signature" width="160" height="60" />` : "";
+    const t = i.tampon ? `<img src="${i.tampon}" alt="Tampon" width="110" height="70" />` : "";
     return `<div style="margin-top:6px;">${s}${t}</div>`;
   };
   return `<div class="sign-row">
