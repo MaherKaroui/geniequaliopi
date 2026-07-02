@@ -64,16 +64,24 @@ Deno.serve(async (req) => {
     const key = Deno.env.get("LOVABLE_API_KEY");
     if (!key) throw new Error("LOVABLE_API_KEY not configured");
 
-    const prompt = `Contexte : dossier VAE.
+    const prompt = `Contexte : rédaction d'un dossier VAE (Validation des Acquis de l'Expérience) à partir du CV et des informations ci-dessous.
 
-ORGANISME : ${JSON.stringify(organisme)}
-CERTIFICATION : ${JSON.stringify(certification)}
-CANDIDAT : ${JSON.stringify(candidat)}
-SESSION : ${JSON.stringify(session)}
+ORGANISME ACCOMPAGNATEUR : ${JSON.stringify(organisme)}
+CERTIFICATION VISÉE (référentiel RNCP, blocs de compétences inclus) : ${JSON.stringify(certification)}
+CANDIDAT (extrait du CV + formulaire) : ${JSON.stringify(candidat)}
+SESSION D'ACCOMPAGNEMENT : ${JSON.stringify(session)}
 
-Rédige les contenus personnalisés du dossier VAE (français professionnel, ton adapté à un jury de certification). 
-Pour situationsParBloc, produis UNE entrée par bloc de compétences de la certification, décrivant précisément comment le candidat a exercé les activités correspondantes dans son parcours réel (en t'appuyant sur ses expériences).
-Renvoie via generate_vae_contents.`;
+RÈGLES DE RÉDACTION IMPÉRATIVES :
+1. Écris systématiquement à la PREMIÈRE PERSONNE ("je", "j'ai", "mon parcours…"), du point de vue du candidat s'adressant au jury de certification.
+2. Français professionnel, ton posé et réflexif (registre attendu par un jury VAE), sans formule commerciale ni superlatif.
+3. COHÉRENCE ABSOLUE entre toutes les sections : mêmes intitulés de postes, mêmes employeurs, mêmes dates et durées que le CV. Ne jamais renommer un poste ni décaler une date entre deux sections.
+4. Pour chaque bloc de compétences du RNCP (situationsParBloc — UNE entrée par bloc listé dans la certification), tu DOIS relier explicitement les expériences réelles du CV aux compétences et activités du référentiel : reprends le libellé exact du bloc, puis décris 2 à 4 situations de travail concrètes (contexte, mission, actions menées, outils, résultats si disponibles, période et employeur) qui prouvent la maîtrise des compétences du bloc. Nomme les compétences visées telles qu'elles apparaissent dans le référentiel France Compétences.
+5. Dans "motivation" et "parcours", relie de la même façon le projet professionnel du candidat aux compétences du référentiel visé.
+6. NE JAMAIS INVENTER de données administratives ou factuelles absentes du CV/formulaire (n° sécurité sociale, lieu ou date de naissance, nationalité, situation familiale, adresse, diplômes non mentionnés, employeurs non cités, chiffres inventés, certifications non listées). Si une information manque, insère à la place une suite de pointillés "……………" à compléter manuellement, exactement comme dans les modèles administratifs.
+7. Reste factuel : n'invente pas de résultats chiffrés ; si un chiffre n'est pas dans le CV, reste qualitatif ("j'ai contribué à…", "j'ai piloté…") sans nombre inventé.
+8. Longueurs indicatives : motivation ~12 lignes, parcours ~12 lignes, chaque bloc ~15 à 25 lignes, chaque champ de besoins ~3 à 5 lignes, planAccompagnement ~10 lignes, synthese ~8 lignes.
+
+Renvoie l'ensemble via l'appel d'outil generate_vae_contents.`;
 
     const r = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -81,7 +89,7 @@ Renvoie via generate_vae_contents.`;
       body: JSON.stringify({
         model: "google/gemini-2.5-pro",
         messages: [
-          { role: "system", content: "Tu es un accompagnateur VAE expérimenté qui rédige des contenus de dossier crédibles et personnalisés." },
+          { role: "system", content: "Tu es un accompagnateur VAE expérimenté. Tu rédiges TOUJOURS à la première personne du point de vue du candidat, en reliant chaque expérience du CV aux blocs de compétences du référentiel RNCP. Tu n'inventes JAMAIS d'informations administratives ou factuelles absentes du CV : à la place tu écris '……………' (pointillés) à compléter manuellement." },
           { role: "user", content: prompt },
         ],
         tools: [TOOL],
