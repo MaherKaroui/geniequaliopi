@@ -55,6 +55,21 @@ export const EY_DOCUMENTS: EYDocumentItem[] = [
     category: "pedagogique",
   },
   {
+    code: "1B",
+    label: "Programme de la formation – Version CFA (apprentissage)",
+    description: "Programme détaillé version CFA / apprentissage (14 missions, rythme alternance, tuteur entreprise, référentiel RNCP)",
+    autoTemplates: ["programme_cfa"],
+    perStagiaire: false,
+    category: "pedagogique",
+  },
+  {
+    code: "CGV",
+    label: "Conditions Générales de Vente (CGV)",
+    description: "Conditions Générales de Vente de l'organisme de formation : tarifs, modalités de paiement, rétractation, litiges, RGPD",
+    autoTemplates: ["cgv"],
+    perStagiaire: false,
+    category: "administratif",
+  {
     code: "2",
     label: "Référentiel de la certification",
     description: "Référentiel de compétences de la certification visée",
