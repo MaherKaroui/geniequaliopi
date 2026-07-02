@@ -43,7 +43,7 @@ function parseRncp(html: string, rncp: string) {
     if (mm) certificateur = mm[1].replace(/\s+/g, " ").trim();
   }
 
-  const echeanceMatch = html.match(/[éÉ]ch[ée]ance de l['’]enregistrement[^0-9<]{0,40}(\d{2}[-/]\d{2}[-/]\d{4})/);
+  const echeanceMatch = html.match(/[éÉ]ch[ée]ance[\s\S]{0,600}?(\d{2}[-/]\d{2}[-/]\d{4})/);
   const dateEcheance = echeanceMatch ? echeanceMatch[1] : "";
 
   // Blocs : « RNCPxxxxBCyy - <intitulé> » jusqu'à retour ligne ou balise
