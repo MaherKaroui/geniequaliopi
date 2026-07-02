@@ -245,7 +245,8 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
     try {
       const o = mergeOrganisme(organismeWithSignature);
       const params = eyDoc.perStagiaire && sourceStagiaires.length > 0 ? { stagiaireIdx: 0, fi: 0 } : { fi: 0 };
-      const html = generateDocumentById(`ey_${eyDoc.code}`, template, params, o, formation, sourceStagiaires);
+      const editedOverride = editedByDoc.get(editKeyFor(eyDoc.code));
+      const html = editedOverride || generateDocumentById(`ey_${eyDoc.code}`, template, params, o, formation, sourceStagiaires);
       if (!html) return null;
       const blob = await htmlToPdfBlob(html, options?.pdfOptions);
       return { blob, fileName: `${safeName}_${eyDoc.code}.pdf` };
@@ -253,7 +254,7 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
       console.error(`Error generating ${eyDoc.code}:`, e);
       return null;
     }
-  }, [organisme, organismeWithSignature, formation, exportStagiaires, safeName]);
+  }, [organisme, organismeWithSignature, formation, exportStagiaires, safeName, editedByDoc, editKeyFor]);
 
   const appendAutoDocToZip = useCallback(async (
     zip: JSZip,
