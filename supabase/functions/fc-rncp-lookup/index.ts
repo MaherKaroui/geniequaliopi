@@ -20,25 +20,39 @@ async function fetchRncpPage(rncp: string): Promise<string | null> {
 }
 
 function parseRncp(html: string, rncp: string) {
-  const titleMatch = html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i);
-  const intitule = titleMatch ? stripTags(titleMatch[1]) : "";
+  // Intitulé réel : og:title « RNCPxxxxx - <intitulé> » (2e occurrence sur la page fiche)
+  let intitule = "";
+  const ogTitles = Array.from(html.matchAll(/property="og:title"\s+content="([^"]+)"/gi));
+  for (const m of ogTitles) {
+    const t = m[1];
+    const mm = t.match(new RegExp(`RNCP${rncp}\\s*[-–]\\s*(.+)$`, "i"));
+    if (mm) { intitule = stripTags(mm[1]).trim(); break; }
+  }
+  if (!intitule && ogTitles.length > 1) intitule = stripTags(ogTitles[1][1]);
 
-  const niveauMatch = html.match(/Niveau\s*(?:de qualification)?\s*[:\-]?\s*<[^>]*>?\s*(\d)/i);
+  const niveauMatch = html.match(/Niveau\s+(\d)\b/);
   const niveau = niveauMatch ? niveauMatch[1] : "";
 
-  const certifMatch = html.match(/Certificateur[^<]*<[^>]*>([\s\S]{0,400}?)</i);
-  const certificateur = certifMatch ? stripTags(certifMatch[1]).slice(0, 200) : "";
+  // Certificateur : après le 2e "Certificateur", chercher un nom en MAJUSCULES
+  let certificateur = "";
+  const cert1 = html.indexOf("Certificateur");
+  const cert2 = cert1 >= 0 ? html.indexOf("Certificateur", cert1 + 50) : -1;
+  if (cert2 > 0) {
+    const zone = stripTags(html.slice(cert2, cert2 + 3000));
+    const mm = zone.match(/\b([A-ZÉÈÊÀÂÎÔÛÇ][A-ZÉÈÊÀÂÎÔÛÇ'’\-\s]{6,120}[A-ZÉÈÊÀÂÎÔÛÇ])\b/);
+    if (mm) certificateur = mm[1].replace(/\s+/g, " ").trim();
+  }
 
-  const echeanceMatch = html.match(/(?:Date d['’]échéance|échéance de l['’]enregistrement)[^<]*<[^>]*>([\s\S]{0,80}?)</i);
-  const dateEcheance = echeanceMatch ? stripTags(echeanceMatch[1]) : "";
+  const echeanceMatch = html.match(/[éÉ]ch[ée]ance de l['’]enregistrement[^0-9<]{0,40}(\d{2}[-/]\d{2}[-/]\d{4})/);
+  const dateEcheance = echeanceMatch ? echeanceMatch[1] : "";
 
-  // Blocs : chercher "RNCPxxxxBCyy" et intitulés qui suivent
-  const blocRegex = /RNCP\d+BC\d+/g;
+  // Blocs : « RNCPxxxxBCyy - <intitulé> » jusqu'à retour ligne ou balise
+  const blocRegex = new RegExp(`RNCP${rncp}BC\\d+`, "g");
   const codesUnique = Array.from(new Set(html.match(blocRegex) || []));
   const blocs = codesUnique.map((code) => {
-    const re = new RegExp(code + "[\\s\\S]{0,300}?<[^>]+>([^<]{5,200})<", "i");
+    const re = new RegExp(code + "\\s*[-–]\\s*([^<\\n\\r]{3,250})", "i");
     const m = html.match(re);
-    return { code, intitule: m ? stripTags(m[1]) : "" };
+    return { code, intitule: m ? stripTags(m[1]).trim() : "" };
   });
 
   return {
