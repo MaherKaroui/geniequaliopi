@@ -121,26 +121,20 @@ function candidatCoordTable(c: VAECandidat, includeBirth = false): string {
 }
 
 function signatureBlock(leftLabel: string, leftSub: string, rightLabel: string, rightSub: string, leftImgs?: { signature?: string; tampon?: string }, rightImgs?: { signature?: string; tampon?: string }): string {
-  const imgs = (i?: { signature?: string; tampon?: string }) => {
-    if (!i || (!i.signature && !i.tampon)) return "";
-    const s = i.signature ? `<img src="${i.signature}" alt="Signature" width="160" height="60" />` : "";
-    const t = i.tampon ? `<img src="${i.tampon}" alt="Tampon" width="110" height="70" />` : "";
-    return `<div style="margin-top:6px;">${s}${t}</div>`;
+  const cell = (label: string, sub: string, i?: { signature?: string; tampon?: string }) => {
+    const sig = i?.signature ? `<div style="margin-top:8px;"><img src="${i.signature}" alt="Signature" width="170" height="60" /></div>` : "";
+    const tam = i?.tampon ? `<div style="margin-top:8px;"><img src="${i.tampon}" alt="Tampon" width="120" height="75" /></div>` : "";
+    return `<td width="50%" valign="top" style="border:1px solid #94a3b8;padding:12px;">
+      <div style="font-weight:bold;font-size:10pt;">${esc(label)}</div>
+      <div style="font-size:9.5pt;color:#475569;">${esc(sub)}</div>
+      <div style="font-size:9.5pt;color:#475569;margin-top:10px;">Date et signature :</div>
+      ${sig}${tam}
+    </td>`;
   };
-  return `<div class="sign-row">
-    <div class="sign-cell">
-      <div class="lbl">${esc(leftLabel)}</div>
-      <div class="sub">${esc(leftSub)}</div>
-      <div class="sub" style="margin-top:12px;">Date et signature :</div>
-      ${imgs(leftImgs)}
-    </div>
-    <div class="sign-cell">
-      <div class="lbl">${esc(rightLabel)}</div>
-      <div class="sub">${esc(rightSub)}</div>
-      <div class="sub" style="margin-top:12px;">Date et signature :</div>
-      ${imgs(rightImgs)}
-    </div>
-  </div>`;
+  return `<table cellpadding="0" cellspacing="0" style="width:100%;margin-top:30px;border-collapse:collapse;"><tr>
+    ${cell(leftLabel, leftSub, leftImgs)}
+    ${cell(rightLabel, rightSub, rightImgs)}
+  </tr></table>`;
 }
 
 // ------------------------------------------------------------------
