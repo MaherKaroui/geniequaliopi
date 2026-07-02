@@ -452,7 +452,7 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
     });
   }, [selectedDocs, docStates, safeName, exportStagiaires, appendAutoDocToZip, runJob]);
 
-  // Preview a document
+  // Preview a document (reuses persisted edits if any)
   const handlePreview = useCallback(async (eyDoc: EYDocumentItem) => {
     if (eyDoc.autoTemplates.length === 0) return;
     setPreviewLoading(true);
@@ -468,7 +468,9 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
       const html = generateDocumentById(`ey_${eyDoc.code}`, template, params, o, formation, s);
       const content = html || "<p>Impossible de générer l'aperçu</p>";
       setPreviewHtml(content);
-      setEditedHtml(content);
+      const key = eyDoc.perStagiaire ? editKeyFor(eyDoc.code, 0) : editKeyFor(eyDoc.code);
+      const savedEdit = editedByDoc.get(key);
+      setEditedHtml(savedEdit || content);
     } catch (e) {
       console.error("Preview error:", e);
       const err = "<p>Erreur lors de la génération de l'aperçu</p>";
@@ -477,22 +479,33 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
     } finally {
       setPreviewLoading(false);
     }
-  }, [organisme, organismeWithSignature, formation, exportStagiaires]);
+  }, [organisme, organismeWithSignature, formation, exportStagiaires, editedByDoc, editKeyFor]);
+
+  // Persist current iframe content into the store for the previewed doc
+  const persistCurrentEdit = useCallback(() => {
+    if (!previewDoc) return;
+    const iframe = previewIframeRef.current;
+    if (!iframe?.contentDocument?.body) return;
+    const updatedHtml = `<!DOCTYPE html><html>${iframe.contentDocument.documentElement.innerHTML}</html>`;
+    setEditedHtml(updatedHtml);
+    const stagIdx = previewDoc.perStagiaire ? 0 : undefined;
+    if (updatedHtml && updatedHtml !== previewHtml) {
+      saveEditedHtml(previewDoc.code, updatedHtml, stagIdx);
+    }
+  }, [previewDoc, previewHtml, saveEditedHtml]);
 
   // Toggle edit mode — sync content from iframe when entering/exiting
   const toggleEditMode = useCallback(() => {
     if (isEditing) {
-      // Exiting edit mode — read content from iframe
       const iframe = previewIframeRef.current;
       if (iframe?.contentDocument?.body) {
         iframe.contentDocument.body.contentEditable = "false";
-        const updatedHtml = `<!DOCTYPE html><html>${iframe.contentDocument.documentElement.innerHTML}</html>`;
-        setEditedHtml(updatedHtml);
       }
+      persistCurrentEdit();
       setIsEditing(false);
+      toast.success("Modifications enregistrées pour ce document");
     } else {
       setIsEditing(true);
-      // Activate editing on current iframe
       requestAnimationFrame(() => {
         const iframe = previewIframeRef.current;
         if (iframe?.contentDocument?.body) {
@@ -502,7 +515,7 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
         }
       });
     }
-  }, [isEditing]);
+  }, [isEditing, persistCurrentEdit]);
 
   // Enable contentEditable on iframe load when in edit mode
   const handleIframeLoad = useCallback(() => {
