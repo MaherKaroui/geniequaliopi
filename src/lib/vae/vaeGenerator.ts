@@ -2,31 +2,71 @@ import JSZip from "jszip";
 import { htmlToWordBlob } from "@/lib/wordExport";
 import type { VAEData } from "./vaeTypes";
 import {
-  getConventionHTML, getLivret1HTML, getLivret2HTML, getProgrammeHTML,
-  getBesoinsHTML, getPlanAccompagnementHTML, getDevisHTML,
-  getAttestationEntreeHTML, getLivretSuiviHTML, getFicheCertifHTML,
+  getBesoinsHTML,
+  getLivret1HTML,
+  getLivret2HTML,
+  getConventionHTML,
+  getConvocationHTML,
+  getAutorisationRGPDHTML,
+  getCVHTML,
+  getProgrammeHTML,
+  getCGVHTML,
+  getCharteHTML,
+  getLivretAccueilHTML,
+  getReglementInterieurHTML,
+  getChecklistHTML,
 } from "./vaeTemplates";
 
 function safe(s: string): string {
-  return (s || "").replace(/[^\w\-]+/g, "_").replace(/_+/g, "_").replace(/^_|_$/g, "").slice(0, 80);
+  return (s || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^\w\-]+/g, "_")
+    .replace(/_+/g, "_")
+    .replace(/^_|_$/g, "")
+    .slice(0, 80);
 }
 
-export async function buildVAEZip(d: VAEData, onProgress?: (msg: string) => void): Promise<Blob> {
+function orgTag(nom: string): string {
+  return safe(nom).toUpperCase();
+}
+
+function certTag(intitule: string): string {
+  return safe(intitule).slice(0, 40);
+}
+
+export async function buildVAEZip(
+  d: VAEData,
+  onProgress?: (msg: string) => void,
+  options?: { includeCV?: boolean }
+): Promise<Blob> {
   const zip = new JSZip();
-  const base = `${safe(d.candidat.nom)}_${safe(d.candidat.prenom)}_${safe(d.certification.rncp)}`;
+  const NOM = safe(d.candidat.nom).toUpperCase();
+  const Prenom = safe(d.candidat.prenom);
+  const suffix = `VAE_${NOM}_${Prenom}`;
+  const orgSuffix = orgTag(d.organisme.nom);
+  const certSuffix = certTag(d.certification.intitule);
 
   const docs: Array<[string, () => string]> = [
-    [`01_Convention_Accompagnement_VAE_${base}.docx`, () => getConventionHTML(d)],
-    [`02_Livret_1_Recevabilite_${base}.docx`, () => getLivret1HTML(d)],
-    [`03_Livret_2_${base}.docx`, () => getLivret2HTML(d)],
-    [`04_Programme_Accompagnement_${base}.docx`, () => getProgrammeHTML(d)],
-    [`05_Evaluation_Besoins_${base}.docx`, () => getBesoinsHTML(d)],
-    [`06_Plan_Accompagnement_${base}.docx`, () => getPlanAccompagnementHTML(d)],
-    [`07_Devis_${base}.docx`, () => getDevisHTML(d)],
-    [`08_Attestation_Entree_${base}.docx`, () => getAttestationEntreeHTML(d)],
-    [`09_Livret_Suivi_${base}.docx`, () => getLivretSuiviHTML(d)],
-    [`10_Fiche_Certification_${base}.docx`, () => getFicheCertifHTML(d)],
+    // A. Documents personnalisés candidat
+    [`Evaluation_Besoins_${suffix}.docx`, () => getBesoinsHTML(d)],
+    [`Livret_1_Recevabilite_${suffix}.docx`, () => getLivret1HTML(d)],
+    [`Livret_2_${suffix}.docx`, () => getLivret2HTML(d)],
+    [`Convention_${suffix}.docx`, () => getConventionHTML(d)],
+    [`Convocation_${suffix}.docx`, () => getConvocationHTML(d)],
+    [`Autorisation_RGPD_${suffix}.docx`, () => getAutorisationRGPDHTML(d)],
+    // B. Documents organisme
+    [`Programme_VAE_${certSuffix}.docx`, () => getProgrammeHTML(d)],
+    [`CGV_VAE_${orgSuffix}.docx`, () => getCGVHTML(d)],
+    [`Charte_Qualite_${orgSuffix}.docx`, () => getCharteHTML(d)],
+    [`Livret_Accueil_VAE_${orgSuffix}.docx`, () => getLivretAccueilHTML(d)],
+    [`Reglement_Interieur_${orgSuffix}.docx`, () => getReglementInterieurHTML(d)],
+    [`Checklist_Dossier_${suffix}.docx`, () => getChecklistHTML(d)],
   ];
+
+  if (options?.includeCV) {
+    docs.push([`CV_${suffix}.docx`, () => getCVHTML(d)]);
+  }
 
   for (const [name, fn] of docs) {
     onProgress?.(name);
@@ -39,13 +79,16 @@ export async function buildVAEZip(d: VAEData, onProgress?: (msg: string) => void
     }
   }
 
-  zip.file("README.txt", [
-    "Dossier VAE — généré par LCA DIGITAL",
-    `Candidat : ${d.candidat.prenom} ${d.candidat.nom}`,
-    `Certification : ${d.certification.intitule} (RNCP ${d.certification.rncp})`,
-    `Fiche France Compétences : ${d.certification.lien}`,
-    `Généré le ${new Date().toLocaleString("fr-FR")}`,
-  ].join("\n"));
+  zip.file(
+    "README.txt",
+    [
+      `Dossier VAE — généré par ${d.organisme.nom}`,
+      `Candidat : ${d.candidat.prenom} ${d.candidat.nom}`,
+      `Certification : ${d.certification.intitule} (RNCP ${d.certification.rncp})`,
+      `Fiche France Compétences : ${d.certification.lien}`,
+      `Généré le ${new Date().toLocaleString("fr-FR")}`,
+    ].join("\n")
+  );
 
   return zip.generateAsync({ type: "blob" });
 }
