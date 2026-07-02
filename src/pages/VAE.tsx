@@ -8,6 +8,8 @@ import StepCertification from "@/components/vae/StepCertification";
 import StepCandidat from "@/components/vae/StepCandidat";
 import StepSession from "@/components/vae/StepSession";
 import StepGeneration from "@/components/vae/StepGeneration";
+import VAEDossierHistory from "@/components/vae/VAEDossierHistory";
+import { useAuth } from "@/hooks/useAuth";
 import {
   DEFAULT_ORGANISME, EMPTY_CERTIFICATION, EMPTY_CANDIDAT, EMPTY_SESSION, EMPTY_CONTENTS,
   type VAEOrganisme, type VAECertification, type VAECandidat, type VAESession, type VAEContents, type VAEData,
