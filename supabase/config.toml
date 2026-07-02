@@ -2,3 +2,12 @@ project_id = "uwjxorvytlqqxszylxre"
 
 [functions.fc-rncp-lookup]
 verify_jwt = false
+
+[functions.vae-extract-cv]
+verify_jwt = false
+
+[functions.vae-generate-cv]
+verify_jwt = false
+
+[functions.vae-generate-contents]
+verify_jwt = false

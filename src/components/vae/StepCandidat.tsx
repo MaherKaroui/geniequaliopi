@@ -29,7 +29,7 @@ export default function StepCandidat({ data, onChange, certification }: Props) {
     setLoading(true);
     try {
       const fileDataUrl = await fileToDataUrl(file);
-      const { data: res, error } = await supabase.functions.invoke("vae-extract-cv", { body: { fileDataUrl } });
+      const { data: res, error } = await supabase.functions.invoke("vae-extract-cv", { body: { fileDataUrl, fileName: file.name } });
       if (error) throw error;
       if (res?.error) throw new Error(res.error);
       onChange({ ...data, ...res });

@@ -73,17 +73,32 @@ const TOOL = {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
-  const authErr = await requireAuth(req);
-  if (authErr) return authErr;
 
   try {
-    const { fileDataUrl } = await req.json();
+    const { fileDataUrl, fileName } = await req.json();
     if (!fileDataUrl || !String(fileDataUrl).startsWith("data:")) {
       return new Response(JSON.stringify({ error: "fileDataUrl required" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
+    const mimeMatch = String(fileDataUrl).match(/^data:([^;]+);base64,/);
+    const mime = mimeMatch ? mimeMatch[1] : "";
+    const isImage = mime.startsWith("image/");
+    const isPdf = mime === "application/pdf";
+    if (!isImage && !isPdf) {
+      return new Response(JSON.stringify({ error: "Format non supporté : envoyez un PDF ou une image (JPG/PNG). Pour un fichier Word, exportez-le en PDF au préalable." }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
     const key = Deno.env.get("LOVABLE_API_KEY");
     if (!key) throw new Error("LOVABLE_API_KEY not configured");
+
+    const userContent: any[] = [
+      { type: "text", text: "Analyse ce CV et extrait toutes les données via l'outil extract_vae_candidat." },
+    ];
+    if (isImage) {
+      userContent.push({ type: "image_url", image_url: { url: fileDataUrl } });
+    } else {
+      userContent.push({ type: "file", file: { filename: fileName || "cv.pdf", file_data: fileDataUrl } });
+    }
 
     const r = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -92,10 +107,7 @@ Deno.serve(async (req) => {
         model: "google/gemini-2.5-pro",
         messages: [
           { role: "system", content: SYSTEM },
-          { role: "user", content: [
-            { type: "text", text: "Analyse ce CV et extrait toutes les données via l'outil extract_vae_candidat." },
-            { type: "image_url", image_url: { url: fileDataUrl } },
-          ]},
+          { role: "user", content: userContent },
         ],
         tools: [TOOL],
         tool_choice: { type: "function", function: { name: "extract_vae_candidat" } },
