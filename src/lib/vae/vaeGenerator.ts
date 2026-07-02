@@ -72,7 +72,9 @@ export async function buildVAEZip(
     onProgress?.(name);
     try {
       const blob = await htmlToWordBlob(fn());
-      zip.file(name, blob);
+      const isDocx = blob.type.includes("officedocument");
+      const finalName = isDocx ? name : name.replace(/\.docx$/i, ".doc");
+      zip.file(finalName, blob);
     } catch (e) {
       console.error("VAE gen error", name, e);
       zip.file(`ERREUR_${name}.txt`, String((e as Error).message));
