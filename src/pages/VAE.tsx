@@ -8,6 +8,8 @@ import StepCertification from "@/components/vae/StepCertification";
 import StepCandidat from "@/components/vae/StepCandidat";
 import StepSession from "@/components/vae/StepSession";
 import StepGeneration from "@/components/vae/StepGeneration";
+import VAEDossierHistory from "@/components/vae/VAEDossierHistory";
+import { useAuth } from "@/hooks/useAuth";
 import {
   DEFAULT_ORGANISME, EMPTY_CERTIFICATION, EMPTY_CANDIDAT, EMPTY_SESSION, EMPTY_CONTENTS,
   type VAEOrganisme, type VAECertification, type VAECandidat, type VAESession, type VAEContents, type VAEData,
@@ -25,6 +27,7 @@ const ORG_KEY = "vae_organisme";
 
 export default function VAEPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [step, setStep] = useState(1);
   const [organisme, setOrganisme] = useState<VAEOrganisme>(() => {
     try { const s = localStorage.getItem(ORG_KEY); return s ? JSON.parse(s) : DEFAULT_ORGANISME; } catch { return DEFAULT_ORGANISME; }
@@ -51,6 +54,17 @@ export default function VAEPage() {
       </header>
 
       <main className="max-w-5xl mx-auto px-4 py-8">
+        {user && (
+          <VAEDossierHistory
+            userId={user.id}
+            organisme={organisme}
+            certification={certification}
+            candidat={candidat}
+            session={session}
+            contents={contents}
+            onLoad={(o, c, ca, s, co) => { setOrganisme(o); setCertification(c); setCandidat(ca); setSession(s); setContents(co); }}
+          />
+        )}
         <StepIndicator steps={STEPS} currentStep={step} onStepClick={setStep} />
         <div className="bg-card rounded-2xl border shadow-card p-6 md:p-8">
           {step === 1 && <StepOrganisme data={organisme} onChange={setOrganisme} />}

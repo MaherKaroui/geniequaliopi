@@ -212,6 +212,45 @@ export type Database = {
         }
         Relationships: []
       }
+      saved_vae_dossiers: {
+        Row: {
+          candidat: Json
+          certification: Json
+          contents: Json
+          created_at: string
+          id: string
+          name: string
+          organisme: Json
+          session: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          candidat?: Json
+          certification?: Json
+          contents?: Json
+          created_at?: string
+          id?: string
+          name: string
+          organisme?: Json
+          session?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          candidat?: Json
+          certification?: Json
+          contents?: Json
+          created_at?: string
+          id?: string
+          name?: string
+          organisme?: Json
+          session?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
