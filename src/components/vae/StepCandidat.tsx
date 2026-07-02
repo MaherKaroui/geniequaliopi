@@ -120,18 +120,14 @@ export default function StepCandidat({ data, onChange, certification }: Props) {
         <div className="md:col-span-3"><Label>Niveau de formation initiale</Label><Input value={data.niveauFormation} onChange={e => onChange({ ...data, niveauFormation: e.target.value })} /></div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-        <div className="border rounded p-3 space-y-2">
+      <div className="pt-2">
+        <div className="border rounded p-3 space-y-2 md:max-w-md">
           <Label>Signature du candidat (image PNG/JPG)</Label>
           <input type="file" accept="image/*" onChange={async e => { const f = e.target.files?.[0]; if (f) onChange({ ...data, signature: await fileToDataUrl(f) }); }} />
           {data.signature && <div className="flex items-center gap-2"><img src={data.signature} alt="signature" className="max-h-16 border rounded bg-white p-1" /><Button size="sm" variant="ghost" onClick={() => onChange({ ...data, signature: "" })}>Retirer</Button></div>}
         </div>
-        <div className="border rounded p-3 space-y-2">
-          <Label>Tampon du candidat (image PNG/JPG)</Label>
-          <input type="file" accept="image/*" onChange={async e => { const f = e.target.files?.[0]; if (f) onChange({ ...data, tampon: await fileToDataUrl(f) }); }} />
-          {data.tampon && <div className="flex items-center gap-2"><img src={data.tampon} alt="tampon" className="max-h-16 border rounded bg-white p-1" /><Button size="sm" variant="ghost" onClick={() => onChange({ ...data, tampon: "" })}>Retirer</Button></div>}
-        </div>
       </div>
+
 
       <div className="pt-2">
         <div className="flex items-center justify-between mb-2">
