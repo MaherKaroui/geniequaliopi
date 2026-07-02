@@ -107,17 +107,17 @@ export interface VAEData {
 }
 
 export const DEFAULT_ORGANISME: VAEOrganisme = {
-  nom: "LCA DIGITAL",
-  adresse: "20 rue de la Madeleine, 70300 Luxeuil-les-Bains",
-  siret: "94785118400020",
-  nda: "27700092570 (préfet de région Bourgogne-Franche-Comté)",
-  dirigeant: "Montigneul Alexandra",
-  email: "contact@lca-digital.fr",
+  nom: "",
+  adresse: "",
+  siret: "",
+  nda: "",
+  dirigeant: "",
+  email: "",
   telephone: "",
-  lienVisio: "https://meet.google.com/",
-  referentHandicap: "Montigneul Alexandra",
-  prixTTC: "4 000 € TTC",
-  duree: "40 heures à distance",
+  lienVisio: "",
+  referentHandicap: "",
+  prixTTC: "",
+  duree: "",
 };
 
 export const EMPTY_CERTIFICATION: VAECertification = {
