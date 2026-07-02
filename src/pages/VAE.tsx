@@ -27,6 +27,7 @@ const ORG_KEY = "vae_organisme";
 
 export default function VAEPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [step, setStep] = useState(1);
   const [organisme, setOrganisme] = useState<VAEOrganisme>(() => {
     try { const s = localStorage.getItem(ORG_KEY); return s ? JSON.parse(s) : DEFAULT_ORGANISME; } catch { return DEFAULT_ORGANISME; }
