@@ -89,7 +89,7 @@ Renvoie l'ensemble via l'appel d'outil generate_vae_contents.`;
       body: JSON.stringify({
         model: "google/gemini-2.5-pro",
         messages: [
-          { role: "system", content: "Tu es un accompagnateur VAE expérimenté qui rédige des contenus de dossier crédibles et personnalisés." },
+          { role: "system", content: "Tu es un accompagnateur VAE expérimenté. Tu rédiges TOUJOURS à la première personne du point de vue du candidat, en reliant chaque expérience du CV aux blocs de compétences du référentiel RNCP. Tu n'inventes JAMAIS d'informations administratives ou factuelles absentes du CV : à la place tu écris '……………' (pointillés) à compléter manuellement." },
           { role: "user", content: prompt },
         ],
         tools: [TOOL],
