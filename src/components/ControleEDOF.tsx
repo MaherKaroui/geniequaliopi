@@ -114,6 +114,30 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
   const [previewLoading, setPreviewLoading] = useState(false);
   const [previewDoc, setPreviewDoc] = useState<EYDocumentItem | null>(null);
   const previewIframeRef = useRef<HTMLIFrameElement>(null);
+
+  // Persistent per-document edited HTML (survives dialog close + reused in exports)
+  // Key: `${code}` for non-perStagiaire, `${code}:${stagiaireIdx}` for perStagiaire
+  const [editedByDoc, setEditedByDoc] = useState<Map<string, string>>(new Map());
+  const editKeyFor = useCallback((code: string, stagIdx?: number) => {
+    return typeof stagIdx === "number" ? `${code}:${stagIdx}` : code;
+  }, []);
+  const saveEditedHtml = useCallback((code: string, html: string, stagIdx?: number) => {
+    const key = editKeyFor(code, stagIdx);
+    setEditedByDoc(prev => {
+      const next = new Map(prev);
+      next.set(key, html);
+      return next;
+    });
+  }, [editKeyFor]);
+  const clearEditedHtml = useCallback((code: string, stagIdx?: number) => {
+    const key = editKeyFor(code, stagIdx);
+    setEditedByDoc(prev => {
+      if (!prev.has(key)) return prev;
+      const next = new Map(prev);
+      next.delete(key);
+      return next;
+    });
+  }, [editKeyFor]);
   const orgName = organisme.nom || "Organisme";
   const safeName = useMemo(() => orgName.replace(/[^a-zA-Z0-9_-]/g, "_"), [orgName]);
   // Organisme enrichi avec la signature EY (utilisée pour DP/ECF/PV comme signature du dirigeant/représentant)
@@ -197,7 +221,8 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
     try {
       const o = mergeOrganisme(organismeWithSignature);
       const params = { stagiaireIdx, fi: 0 };
-      const html = generateDocumentById(`ey_${eyDoc.code}`, template, params, o, formation, sourceStagiaires);
+      const editedOverride = editedByDoc.get(editKeyFor(eyDoc.code, stagiaireIdx));
+      const html = editedOverride || generateDocumentById(`ey_${eyDoc.code}`, template, params, o, formation, sourceStagiaires);
       if (!html) return null;
       const blob = await htmlToPdfBlob(html, options?.pdfOptions);
       return {
@@ -208,7 +233,7 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
       console.error(`Error generating ${eyDoc.code} for stagiaire ${stagiaireIdx}:`, e);
       return null;
     }
-  }, [organisme, organismeWithSignature, formation, exportStagiaires, safeName]);
+  }, [organisme, organismeWithSignature, formation, exportStagiaires, safeName, editedByDoc, editKeyFor]);
 
   const generateAutoDoc = useCallback(async (
     eyDoc: EYDocumentItem,
@@ -220,7 +245,8 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
     try {
       const o = mergeOrganisme(organismeWithSignature);
       const params = eyDoc.perStagiaire && sourceStagiaires.length > 0 ? { stagiaireIdx: 0, fi: 0 } : { fi: 0 };
-      const html = generateDocumentById(`ey_${eyDoc.code}`, template, params, o, formation, sourceStagiaires);
+      const editedOverride = editedByDoc.get(editKeyFor(eyDoc.code));
+      const html = editedOverride || generateDocumentById(`ey_${eyDoc.code}`, template, params, o, formation, sourceStagiaires);
       if (!html) return null;
       const blob = await htmlToPdfBlob(html, options?.pdfOptions);
       return { blob, fileName: `${safeName}_${eyDoc.code}.pdf` };
@@ -228,7 +254,7 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
       console.error(`Error generating ${eyDoc.code}:`, e);
       return null;
     }
-  }, [organisme, organismeWithSignature, formation, exportStagiaires, safeName]);
+  }, [organisme, organismeWithSignature, formation, exportStagiaires, safeName, editedByDoc, editKeyFor]);
 
   const appendAutoDocToZip = useCallback(async (
     zip: JSZip,
@@ -428,7 +454,7 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
     });
   }, [selectedDocs, docStates, safeName, exportStagiaires, appendAutoDocToZip, runJob]);
 
-  // Preview a document
+  // Preview a document (reuses persisted edits if any)
   const handlePreview = useCallback(async (eyDoc: EYDocumentItem) => {
     if (eyDoc.autoTemplates.length === 0) return;
     setPreviewLoading(true);
@@ -444,7 +470,9 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
       const html = generateDocumentById(`ey_${eyDoc.code}`, template, params, o, formation, s);
       const content = html || "<p>Impossible de générer l'aperçu</p>";
       setPreviewHtml(content);
-      setEditedHtml(content);
+      const key = eyDoc.perStagiaire ? editKeyFor(eyDoc.code, 0) : editKeyFor(eyDoc.code);
+      const savedEdit = editedByDoc.get(key);
+      setEditedHtml(savedEdit || content);
     } catch (e) {
       console.error("Preview error:", e);
       const err = "<p>Erreur lors de la génération de l'aperçu</p>";
@@ -453,22 +481,33 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
     } finally {
       setPreviewLoading(false);
     }
-  }, [organisme, organismeWithSignature, formation, exportStagiaires]);
+  }, [organisme, organismeWithSignature, formation, exportStagiaires, editedByDoc, editKeyFor]);
+
+  // Persist current iframe content into the store for the previewed doc
+  const persistCurrentEdit = useCallback(() => {
+    if (!previewDoc) return;
+    const iframe = previewIframeRef.current;
+    if (!iframe?.contentDocument?.body) return;
+    const updatedHtml = `<!DOCTYPE html><html>${iframe.contentDocument.documentElement.innerHTML}</html>`;
+    setEditedHtml(updatedHtml);
+    const stagIdx = previewDoc.perStagiaire ? 0 : undefined;
+    if (updatedHtml && updatedHtml !== previewHtml) {
+      saveEditedHtml(previewDoc.code, updatedHtml, stagIdx);
+    }
+  }, [previewDoc, previewHtml, saveEditedHtml]);
 
   // Toggle edit mode — sync content from iframe when entering/exiting
   const toggleEditMode = useCallback(() => {
     if (isEditing) {
-      // Exiting edit mode — read content from iframe
       const iframe = previewIframeRef.current;
       if (iframe?.contentDocument?.body) {
         iframe.contentDocument.body.contentEditable = "false";
-        const updatedHtml = `<!DOCTYPE html><html>${iframe.contentDocument.documentElement.innerHTML}</html>`;
-        setEditedHtml(updatedHtml);
       }
+      persistCurrentEdit();
       setIsEditing(false);
+      toast.success("Modifications enregistrées pour ce document");
     } else {
       setIsEditing(true);
-      // Activate editing on current iframe
       requestAnimationFrame(() => {
         const iframe = previewIframeRef.current;
         if (iframe?.contentDocument?.body) {
@@ -478,7 +517,7 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
         }
       });
     }
-  }, [isEditing]);
+  }, [isEditing, persistCurrentEdit]);
 
   // Enable contentEditable on iframe load when in edit mode
   const handleIframeLoad = useCallback(() => {
@@ -1021,13 +1060,12 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
 
       {/* Preview / Edit Dialog */}
       <Dialog open={previewOpen} onOpenChange={(open) => {
-        if (!open && isEditing) {
-          // Save edits from iframe before closing
-          const iframe = previewIframeRef.current;
-          if (iframe?.contentDocument?.body) {
-            setEditedHtml(`<!DOCTYPE html><html>${iframe.contentDocument.documentElement.innerHTML}</html>`);
+        if (!open) {
+          // Save any pending edits into the persistent store before closing
+          if (isEditing) {
+            persistCurrentEdit();
+            setIsEditing(false);
           }
-          setIsEditing(false);
         }
         setPreviewOpen(open);
       }}>
@@ -1087,7 +1125,7 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
                 {isEditing ? "Terminer l'édition" : "Éditer"}
               </Button>
 
-              {/* Reset to original */}
+              {/* Reset to original — also clears persisted edit */}
               {editedHtml !== previewHtml && (
                 <Button
                   variant="ghost"
@@ -1095,6 +1133,11 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
                   onClick={() => {
                     setEditedHtml(previewHtml);
                     setIsEditing(false);
+                    if (previewDoc) {
+                      const stagIdx = previewDoc.perStagiaire ? 0 : undefined;
+                      clearEditedHtml(previewDoc.code, stagIdx);
+                      toast.info("Modifications réinitialisées");
+                    }
                   }}
                   className="gap-1 text-muted-foreground"
                 >
