@@ -1060,13 +1060,12 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
 
       {/* Preview / Edit Dialog */}
       <Dialog open={previewOpen} onOpenChange={(open) => {
-        if (!open && isEditing) {
-          // Save edits from iframe before closing
-          const iframe = previewIframeRef.current;
-          if (iframe?.contentDocument?.body) {
-            setEditedHtml(`<!DOCTYPE html><html>${iframe.contentDocument.documentElement.innerHTML}</html>`);
+        if (!open) {
+          // Save any pending edits into the persistent store before closing
+          if (isEditing) {
+            persistCurrentEdit();
+            setIsEditing(false);
           }
-          setIsEditing(false);
         }
         setPreviewOpen(open);
       }}>
