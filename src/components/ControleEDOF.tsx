@@ -1125,7 +1125,7 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
                 {isEditing ? "Terminer l'édition" : "Éditer"}
               </Button>
 
-              {/* Reset to original */}
+              {/* Reset to original — also clears persisted edit */}
               {editedHtml !== previewHtml && (
                 <Button
                   variant="ghost"
@@ -1133,6 +1133,11 @@ export default function ControleEDOF({ organisme, formation, stagiaires, docStyl
                   onClick={() => {
                     setEditedHtml(previewHtml);
                     setIsEditing(false);
+                    if (previewDoc) {
+                      const stagIdx = previewDoc.perStagiaire ? 0 : undefined;
+                      clearEditedHtml(previewDoc.code, stagIdx);
+                      toast.info("Modifications réinitialisées");
+                    }
                   }}
                   className="gap-1 text-muted-foreground"
                 >
