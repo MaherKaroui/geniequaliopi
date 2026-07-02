@@ -49,8 +49,6 @@ const TOOL = {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
-  const authErr = await requireAuth(req);
-  if (authErr) return authErr;
 
   try {
     const { questionnaire, certification } = await req.json();
