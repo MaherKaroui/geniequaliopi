@@ -92,6 +92,7 @@ Renvoie l'ensemble via l'appel d'outil generate_vae_contents.`;
         ],
         tools: [TOOL],
         tool_choice: { type: "function", function: { name: "generate_vae_contents" } },
+        max_tokens: 16000,
       }),
     });
 
