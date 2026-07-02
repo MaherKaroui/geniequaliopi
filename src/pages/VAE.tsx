@@ -54,6 +54,17 @@ export default function VAEPage() {
       </header>
 
       <main className="max-w-5xl mx-auto px-4 py-8">
+        {user && (
+          <VAEDossierHistory
+            userId={user.id}
+            organisme={organisme}
+            certification={certification}
+            candidat={candidat}
+            session={session}
+            contents={contents}
+            onLoad={(o, c, ca, s, co) => { setOrganisme(o); setCertification(c); setCandidat(ca); setSession(s); setContents(co); }}
+          />
+        )}
         <StepIndicator steps={STEPS} currentStep={step} onStepClick={setStep} />
         <div className="bg-card rounded-2xl border shadow-card p-6 md:p-8">
           {step === 1 && <StepOrganisme data={organisme} onChange={setOrganisme} />}
