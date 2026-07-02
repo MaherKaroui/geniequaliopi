@@ -61,6 +61,8 @@ export interface VAECandidat {
   diplomes: VAEDiplome[];
   experiences: VAEExperience[];
   competences?: string[];
+  signature?: string; // data URL
+  tampon?: string;    // data URL
 }
 
 export interface VAESession {
