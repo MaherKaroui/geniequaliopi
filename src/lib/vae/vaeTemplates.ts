@@ -325,12 +325,27 @@ export function getLivret2HTML(d: VAEData): string {
         situations: "",
       }));
 
+  const parseSituation = (raw: string) => {
+    const text = raw || "";
+    const grab = (label: string, next: string[]) => {
+      const re = new RegExp(`\\[${label}\\]\\s*([\\s\\S]*?)(?=\\s*\\[(?:${next.join("|")})\\]|$)`, "i");
+      const m = text.match(re);
+      return m ? m[1].trim() : "";
+    };
+    if (/\[CONTEXTE\]|\[DESCRIPTION\]|\[MOYENS\]|\[ANALYSE\]/i.test(text)) {
+      return {
+        contexte: grab("CONTEXTE", ["DESCRIPTION", "MOYENS", "ANALYSE"]),
+        description: grab("DESCRIPTION", ["MOYENS", "ANALYSE"]),
+        moyens: grab("MOYENS", ["ANALYSE"]),
+        analyse: grab("ANALYSE", []),
+      };
+    }
+    const parts = text.split(/\n\s*\n/);
+    return { contexte: parts[0] || "", description: parts[1] || "", moyens: parts[2] || "", analyse: parts[3] || "" };
+  };
+
   const situationsHTML = situationsBloc.map((b, idx) => {
-    const parts = (b.situations || "").split(/\n\s*\n/);
-    const contexte = parts[0] || "";
-    const description = parts[1] || "";
-    const moyens = parts[2] || "";
-    const analyse = parts[3] || "";
+    const { contexte, description, moyens, analyse } = parseSituation(b.situations);
     return `
       <h3>Situation ${idx + 1} — ${esc(b.intitule)} (${esc(b.codeBloc)})</h3>
       <h3>3.${idx + 1}.1 — Contexte et finalité de l'activité</h3>
