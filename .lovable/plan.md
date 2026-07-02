@@ -1,31 +1,87 @@
+# Module « Génération VAE »
 
-# Ajout justificatifs statistiques BDC (Indicateur 2)
+Module 100 % indépendant du générateur Qualiopi existant. Aucune modification du flow actuel.
 
-Les chiffres affichés dans le doc "Indicateurs de résultats" (100 bénéficiaires, 100% terme, 96% satisfaction, 93% recommandation, 89% suivis 6 mois, 82% projets concrétisés) ne sont aujourd'hui appuyés par aucune preuve dans le ZIP. Je vais ajouter 6 nouveaux documents générés automatiquement dans `Indicateur 2/` pour couvrir chaque ligne du tableau.
+## 1. Accès
 
-## Documents à générer (tous datés à `org.dateMaj`, basés sur les bénéficiaires du formulaire)
+- Nouvelle carte sur la page d'accueil (`src/pages/Index.tsx`) : « Génération VAE — Dossier candidat complet » à côté des cartes existantes, avec icône dédiée (GraduationCap).
+- Nouvelle route `/vae` dans `src/App.tsx` → `src/pages/VAE.tsx`.
 
-Tous générés dynamiquement en fonction du nombre réel de bénéficiaires (`stagiaires.length`). Les chiffres affichés (100%, 96%, 93%, 89%, 82%) sont recalculés cohérents avec l'échantillon.
+## 2. Wizard 5 étapes (`src/pages/VAE.tsx` + `src/components/vae/*`)
 
-| Fichier | Contenu |
-|---|---|
-| `Indicateur 2 - Tableau de suivi des bénéficiaires.xlsx` | Nom, prénom, date d'entrée, date de sortie, statut (Terminé / En cours), financeur |
-| `Indicateur 2 - Tableau de suivi des parcours.xlsx` | Bénéficiaire, convention signée (X), synthèse remise (X), date remise, signature consultant |
-| `Indicateur 2 - Synthèse satisfaction à chaud.xlsx` | Bénéficiaire, note /10 sur 6 critères + moyenne globale → moyenne 9,6/10 = 96% |
-| `Indicateur 2 - Synthèse recommandations.xlsx` | Bénéficiaire, réponse "Recommanderiez-vous ?" (Oui/Non/NSP), % global = 93% |
-| `Indicateur 2 - Suivi à 6 mois et tableau de relance.xlsx` | Bénéficiaire, date entretien 6 mois (= dateFinBilan + 6 mois), relances (date 1, date 2), statut, compte-rendu court |
-| `Indicateur 2 - Enquête à 6 mois — projet professionnel.xlsx` | Bénéficiaire, projet initial, situation à 6 mois (Emploi / Formation / Création d'entreprise / Évolution / En cours), preuve |
+Un state central (`VAEData`) traverse les 5 étapes, avec `StepIndicator` réutilisé.
 
-Compléments markdown (un seul .docx léger) :
-- `Indicateur 2 - Compte-rendu entretien 6 mois - {Prénom NOM}.md` généré **par bénéficiaire** dans `Bénéficiaire - .../Indicateur 2/` (5 lignes, daté = dateFin + 6 mois ; **vide** si la date est dans le futur, conformément à la mémoire bilan-froid).
+### Étape 1 — Organisme accompagnateur
+- Formulaire avec valeurs par défaut LCA DIGITAL (nom, adresse, SIRET, NDA, dirigeante, email, lien visio, référent handicap, prix, durée).
+- Sauvegardé dans `localStorage` sous `vae_organisme` pour préremplir les prochains dossiers.
 
-## Implémentation technique
+### Étape 2 — Certification France Compétences
+- Champ recherche (nom de titre ou code RNCP).
+- Appel edge function `fc-rncp-lookup` (voir §3) qui construit `https://www.francecompetences.fr/recherche/rncp/{n}/`, scrape/parse la fiche et retourne : intitulé, code RNCP, niveau, certificateur, date d'échéance, blocs de compétences.
+- Affichage de la fiche + lien cliquable, avec fallback saisie manuelle en cas d'échec.
 
-1. **`src/lib/bdc/bdcNTXlsx.ts`** — ajouter 6 nouvelles fonctions `generateBdcNTSuiviBeneficiaires`, `...SuiviParcours`, `...SatisfactionChaud`, `...Recommandations`, `...Suivi6Mois`, `...Enquete6Mois`. Réutiliser le wrapper `wrap()` existant.
-2. **`src/lib/bdc/bdcNTConseilsZip.ts`** — dans `buildBDCNTConseilsZip`, après le bloc Indicateur 1 Calendrier, ajouter les 6 fichiers XLSX via `htmlToXlsxBlob`. Ajouter aussi le compte-rendu 6 mois par bénéficiaire (clé `BDC_NT_CR_6_MOIS_KEY` ajoutée à `BDC_NT_PER_BENEFICIAIRE` dans `bdcNTSource.ts`) avec contenu vide si dateFin future.
-3. **Cohérence chiffres** : calculs déterministes basés sur l'index du bénéficiaire (ex : satisfaction = 9 + (i%3)/10 → moyenne ≈ 9,6 ; recommandation = (i % 100) < 93 ? "Oui" : "Non"). Pas de hardcode "100" : on utilise toujours `stagiaires.length`.
-4. **Mémoire** : mettre à jour `mem://features/bdc-nt-conseils.md` pour lister les 6 nouveaux justificatifs Indicateur 2.
+### Étape 3 — Candidat + CV
+- Upload PDF/Word/image → edge function `vae-extract-cv` (Gemini 2.5 Pro multimodal, réutilise le pattern de `generate-cv`).
+- Extraction : identité, coordonnées, emploi actuel, statut, diplômes, expériences chronologiques complètes.
+- Formulaire modifiable pré-rempli.
+- Bouton « Je n'ai pas de CV » → mini-questionnaire → edge function `vae-generate-cv` qui rédige un CV orienté certification, téléchargeable en Word (via `wordExport.ts`) et injecté dans le state.
 
-## Question
+### Étape 4 — Dossier / session
+- Dates : entretien positionnement, début, fin, demande recevabilité, signature.
+- Modalité (défaut « 100 % à distance »), financement (défaut CPF), lieu de signature.
 
-Je pars sur **un fichier Excel par justificatif** (6 fichiers) pour la lisibilité audit. Si vous préférez **un seul classeur Excel** avec 6 onglets, dites-le et je consolide.
+### Étape 5 — Génération IA + aperçu
+- Edge function `vae-generate-contents` : à partir du CV + certification + organisme, rédige les textes personnalisés de chaque document (motivation, situations de travail par bloc de compétences, réponses évaluation des besoins, plan d'accompagnement, etc.).
+- Aperçu par document avec `<Textarea>` éditable par section.
+- Bouton « Générer le dossier » → produit un ZIP `.docx` (JSZip + `wordExport.ts`).
+
+## 3. Edge functions (Lovable AI Gateway)
+
+Toutes protégées par JWT (pattern `__requireAuth` existant), CORS standard.
+
+- `supabase/functions/fc-rncp-lookup/index.ts` : `fetch` la page francecompetences.fr, parse HTML (regex/cheerio via `npm:`) ou tombe sur l'API publique si disponible. Retourne JSON structuré.
+- `supabase/functions/vae-extract-cv/index.ts` : multimodal `google/gemini-2.5-pro` + tool call `extract_vae_candidat` (schéma étendu par rapport à `generate-cv`).
+- `supabase/functions/vae-generate-cv/index.ts` : `google/gemini-2.5-flash` génère un CV structuré à partir du mini-questionnaire, orienté certification visée.
+- `supabase/functions/vae-generate-contents/index.ts` : `google/gemini-2.5-pro`, un tool call par section (motivation, situations par bloc, besoins, plan). Retourne un objet `VAEContents`.
+
+## 4. Génération des documents Word (`src/lib/vae/`)
+
+Nouveau dossier isolé, ne touche pas à `src/lib/vi/`.
+
+- `vaeTypes.ts` — types (`VAEOrganisme`, `VAECertification`, `VAECandidat`, `VAESession`, `VAEContents`, `VAEData`).
+- `vaeTemplates.ts` — templates HTML de chaque document (footer légal, dates longues FR, style minimaliste bleu/blanc conforme aux règles projet). Documents générés :
+  1. Convention d'accompagnement VAE (tripartite si employeur, sinon bilatérale)
+  2. Livret 1 — Demande de recevabilité (pré-rempli à partir du CV)
+  3. Livret 2 — Trame guidée par bloc de compétences (situations de travail détaillées issues du CV)
+  4. Programme d'accompagnement (40 h à distance)
+  5. Évaluation des besoins candidat (réponses IA)
+  6. Plan d'accompagnement personnalisé
+  7. Devis / conditions financières
+  8. Attestation d'entrée en accompagnement
+  9. Livret de suivi (séances datées, midpoint entretien intermédiaire — règle `vae-session-scheduling` existante)
+  10. Fiche récapitulative certification (lien France Compétences + blocs)
+- `vaeGenerator.ts` — assemble tout en ZIP via JSZip, nommage `VAE_{nom}_{prenom}_{code}.docx`.
+
+## 5. Détails techniques
+
+- Réutilise `wordExport.ts` (`htmlToWordBlob`) pour chaque document.
+- Réutilise `SignaturePad` / `LogoSignatureUpload` pour la signature organisme.
+- Dates au format long FR (règle mémoire).
+- Téléphone omis si vide (règle mémoire).
+- Footer légal complet (règle mémoire).
+- Aucune modif de `src/lib/vi/*`, `feuilleRouteQualiopi*`, `Index.tsx` sauf ajout de la carte.
+
+## 6. Fichiers créés / modifiés
+
+**Créés**
+- `src/pages/VAE.tsx`
+- `src/components/vae/StepOrganisme.tsx`, `StepCertification.tsx`, `StepCandidat.tsx`, `StepSession.tsx`, `StepGeneration.tsx`
+- `src/lib/vae/vaeTypes.ts`, `vaeTemplates.ts`, `vaeGenerator.ts`
+- `supabase/functions/fc-rncp-lookup/index.ts`
+- `supabase/functions/vae-extract-cv/index.ts`
+- `supabase/functions/vae-generate-cv/index.ts`
+- `supabase/functions/vae-generate-contents/index.ts`
+
+**Modifiés (minimes)**
+- `src/App.tsx` — ajout route `/vae`
+- `src/pages/Index.tsx` — ajout carte « Génération VAE »
