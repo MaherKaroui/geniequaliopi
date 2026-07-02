@@ -69,6 +69,7 @@ export const EY_DOCUMENTS: EYDocumentItem[] = [
     autoTemplates: ["cgv"],
     perStagiaire: false,
     category: "administratif",
+  },
   {
     code: "2",
     label: "Référentiel de la certification",
