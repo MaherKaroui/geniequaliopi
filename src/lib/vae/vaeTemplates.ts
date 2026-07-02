@@ -120,17 +120,25 @@ function candidatCoordTable(c: VAECandidat, includeBirth = false): string {
   return `<table class="kv">${rows.join("")}</table>`;
 }
 
-function signatureBlock(leftLabel: string, leftSub: string, rightLabel: string, rightSub: string): string {
+function signatureBlock(leftLabel: string, leftSub: string, rightLabel: string, rightSub: string, leftImgs?: { signature?: string; tampon?: string }, rightImgs?: { signature?: string; tampon?: string }): string {
+  const imgs = (i?: { signature?: string; tampon?: string }) => {
+    if (!i || (!i.signature && !i.tampon)) return "";
+    const s = i.signature ? `<img src="${i.signature}" alt="Signature" style="max-height:60px;max-width:160px;display:inline-block;margin-right:8px;vertical-align:middle;" />` : "";
+    const t = i.tampon ? `<img src="${i.tampon}" alt="Tampon" style="max-height:70px;max-width:120px;display:inline-block;vertical-align:middle;" />` : "";
+    return `<div style="margin-top:6px;">${s}${t}</div>`;
+  };
   return `<div class="sign-row">
     <div class="sign-cell">
       <div class="lbl">${esc(leftLabel)}</div>
       <div class="sub">${esc(leftSub)}</div>
-      <div class="sub" style="margin-top:24px;">Date et signature :</div>
+      <div class="sub" style="margin-top:12px;">Date et signature :</div>
+      ${imgs(leftImgs)}
     </div>
     <div class="sign-cell">
       <div class="lbl">${esc(rightLabel)}</div>
       <div class="sub">${esc(rightSub)}</div>
-      <div class="sub" style="margin-top:24px;">Date et signature :</div>
+      <div class="sub" style="margin-top:12px;">Date et signature :</div>
+      ${imgs(rightImgs)}
     </div>
   </div>`;
 }
