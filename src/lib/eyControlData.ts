@@ -65,9 +65,9 @@ export const EY_DOCUMENTS: EYDocumentItem[] = [
   {
     code: "70",
     label: "Conditions Générales de Vente",
-    description: "Conditions Générales de Vente de l'organisme de formation : tarifs, modalités de paiement, rétractation, litiges, RGPD",
-    autoTemplates: ["cgv"],
-    perStagiaire: false,
+    description: "Conditions Générales de Vente de l'organisme, individualisées par stagiaire (signature stagiaire + tampon organisme, date = début formation – 14 jours ouvrés)",
+    autoTemplates: ["cgv_stagiaire"],
+    perStagiaire: true,
     category: "administratif",
   },
   {
