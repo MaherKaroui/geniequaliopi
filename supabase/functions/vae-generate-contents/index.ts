@@ -77,7 +77,22 @@ RÈGLES DE RÉDACTION IMPÉRATIVES :
 5. Dans "motivation" et "parcours", relie de la même façon le projet professionnel du candidat aux compétences du référentiel visé.
 6. NE JAMAIS INVENTER de données administratives ou factuelles absentes du CV/formulaire (n° sécurité sociale, lieu ou date de naissance, nationalité, situation familiale, adresse, diplômes non mentionnés, employeurs non cités, chiffres inventés, certifications non listées). Si une information manque, insère à la place une suite de pointillés "……………" à compléter manuellement, exactement comme dans les modèles administratifs.
 7. Reste factuel : n'invente pas de résultats chiffrés ; si un chiffre n'est pas dans le CV, reste qualitatif ("j'ai contribué à…", "j'ai piloté…") sans nombre inventé.
-8. Longueurs indicatives : motivation ~12 lignes, parcours ~12 lignes, chaque bloc ~15 à 25 lignes, chaque champ de besoins ~3 à 5 lignes, planAccompagnement ~10 lignes, synthese ~8 lignes.
+8. Longueurs indicatives : motivation ~12 lignes, parcours ~12 lignes, chaque bloc ~40 à 60 lignes au total (4 sous-parties), chaque champ de besoins ~3 à 5 lignes, planAccompagnement ~10 lignes, synthese ~8 lignes.
+9. FORMAT OBLIGATOIRE du champ "situations" de chaque bloc : structure en 4 sous-sections marquées par des balises littérales (ne pas les traduire, ne pas les omettre, une seule fois chacune, dans cet ordre, séparées par une ligne vide) :
+
+[CONTEXTE]
+(8-12 lignes : contexte et finalité de l'activité — secteur, employeur, période, objectifs poursuivis, place dans l'organisation)
+
+[DESCRIPTION]
+(12-18 lignes : description détaillée des activités que j'ai exercées — étapes concrètes, tâches, interlocuteurs, exemples de missions représentatives, période et employeur cités)
+
+[MOYENS]
+(6-10 lignes : moyens et ressources que j'ai mobilisés — outils logiciels, méthodes, procédures, référentiels, appuis humains, matériels)
+
+[ANALYSE]
+(10-15 lignes : analyse des compétences que j'ai mises en œuvre en lien avec le référentiel du bloc — nommer chaque compétence du bloc et expliquer comment je l'ai mobilisée, avec preuve tirée du CV)
+
+Aucune des 4 balises ne doit être vide ; si une donnée manque, complète avec des pointillés "……………" mais rédige quand même la sous-section.
 
 Renvoie l'ensemble via l'appel d'outil generate_vae_contents.`;
 
