@@ -97,6 +97,10 @@ export function BackgroundJobsProvider({ children }: { children: ReactNode }) {
         createdAt: Date.now(),
       };
       setJobs((prev) => [...prev, job]);
+      logActivityStandalone("generate_start", `Génération démarrée : ${opts.label}`, {
+        label: opts.label,
+        fileName: opts.fileName,
+      });
 
       const reporter: JobReporter = {
         setProgress: (pct) =>
