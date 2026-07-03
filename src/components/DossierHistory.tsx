@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Save, FolderOpen, Trash2, Clock, ChevronDown, ChevronUp, Plus, RefreshCw } from "lucide-react";
+import { Save, FolderOpen, Trash2, Clock, ChevronDown, ChevronUp, Plus, RefreshCw, Archive, ArchiveRestore } from "lucide-react";
 
 interface DossierHistoryProps {
   userId: string;
@@ -21,6 +21,7 @@ interface SavedDossier {
   stagiaires: StagiaireInfo[];
   created_at: string;
   updated_at: string;
+  archived?: boolean;
 }
 
 const DossierHistory = ({ userId, organisme, formation, stagiaires, onLoad }: DossierHistoryProps) => {
@@ -30,6 +31,7 @@ const DossierHistory = ({ userId, organisme, formation, stagiaires, onLoad }: Do
   const [expanded, setExpanded] = useState(false);
   const [saveName, setSaveName] = useState("");
   const [currentDossierId, setCurrentDossierId] = useState<string | null>(null);
+  const [showArchived, setShowArchived] = useState(false);
   const { toast } = useToast();
 
   const fetchDossiers = async () => {
@@ -120,12 +122,29 @@ const DossierHistory = ({ userId, organisme, formation, stagiaires, onLoad }: Do
     }
   };
 
+  const handleToggleArchive = async (id: string, archived: boolean) => {
+    const { error } = await supabase
+      .from("saved_dossiers")
+      .update({ archived: !archived } as any)
+      .eq("id", id);
+    if (error) {
+      toast({ title: "Erreur", description: "Archivage impossible", variant: "destructive" });
+      return;
+    }
+    toast({ title: !archived ? "Dossier archivé" : "Dossier désarchivé" });
+    setDossiers((prev) => prev.map((d) => (d.id === id ? { ...d, archived: !archived } : d)));
+  };
+
   const handleLoad = (d: SavedDossier) => {
     onLoad(d.organisme, d.formation, d.stagiaires);
     setCurrentDossierId(d.id);
     setSaveName(d.name);
     toast({ title: "Chargé", description: `Dossier "${d.name}" restauré.` });
   };
+
+  const visible = dossiers.filter((d) => (showArchived ? d.archived : !d.archived));
+  const archivedCount = dossiers.filter((d) => d.archived).length;
+  const activeCount = dossiers.length - archivedCount;
 
   return (
     <div className="bg-card rounded-xl border shadow-card p-4 mb-6">
@@ -178,17 +197,41 @@ const DossierHistory = ({ userId, organisme, formation, stagiaires, onLoad }: Do
             Astuce : chargez un dossier, changez uniquement la formation, puis cliquez sur <strong>Enregistrer comme nouveau</strong> pour créer une variante en gardant l'organisme et les stagiaires.
           </p>
 
+          {/* Toggle actifs / archivés */}
+          <div className="flex items-center justify-between border-t pt-3">
+            <p className="text-xs font-medium text-muted-foreground">
+              {showArchived ? `Dossiers archivés (${visible.length})` : `Dossiers actifs (${visible.length})`}
+            </p>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => setShowArchived((s) => !s)}
+              className="gap-1 text-xs h-7"
+            >
+              {showArchived ? (
+                <><ArchiveRestore className="w-3 h-3" /> Voir actifs ({activeCount})</>
+              ) : (
+                <><Archive className="w-3 h-3" /> Voir archivés ({archivedCount})</>
+              )}
+            </Button>
+          </div>
+
           {/* List */}
           {loading ? (
             <p className="text-sm text-muted-foreground">Chargement...</p>
-          ) : dossiers.length === 0 ? (
-            <p className="text-sm text-muted-foreground">Aucun dossier sauvegardé.</p>
+          ) : visible.length === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              {showArchived ? "Aucun dossier archivé." : "Aucun dossier sauvegardé."}
+            </p>
           ) : (
             <div className="space-y-2 max-h-64 overflow-y-auto">
-              {dossiers.map((d) => (
+              {visible.map((d) => (
                 <div key={d.id} className={`flex items-center justify-between p-3 rounded-lg transition-colors ${currentDossierId === d.id ? "bg-primary/5 border border-primary/30" : "bg-muted/50 hover:bg-muted"}`}>
                   <div className="min-w-0 flex-1">
-                    <p className="font-medium text-sm truncate">{d.name}</p>
+                    <p className="font-medium text-sm truncate">
+                      {d.name}
+                      {d.archived && <span className="text-xs text-muted-foreground ml-2">(archivé)</span>}
+                    </p>
                     <p className="text-xs text-muted-foreground">
                       {new Date(d.updated_at || d.created_at).toLocaleDateString("fr-FR")} – {(d.stagiaires as any[])?.length || 0} stagiaire(s)
                     </p>
@@ -196,6 +239,14 @@ const DossierHistory = ({ userId, organisme, formation, stagiaires, onLoad }: Do
                   <div className="flex gap-1 ml-2">
                     <Button size="sm" variant="ghost" onClick={() => handleLoad(d)} className="gap-1 text-xs">
                       <FolderOpen className="w-3.5 h-3.5" /> Charger
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => handleToggleArchive(d.id, !!d.archived)}
+                      title={d.archived ? "Désarchiver" : "Archiver"}
+                    >
+                      {d.archived ? <ArchiveRestore className="w-3.5 h-3.5" /> : <Archive className="w-3.5 h-3.5" />}
                     </Button>
                     <Button size="sm" variant="ghost" onClick={() => handleDelete(d.id)} className="text-destructive hover:text-destructive">
                       <Trash2 className="w-3.5 h-3.5" />

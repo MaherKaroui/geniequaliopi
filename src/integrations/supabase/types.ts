@@ -88,6 +88,7 @@ export type Database = {
       }
       saved_dossiers: {
         Row: {
+          archived: boolean
           created_at: string
           formation: Json
           id: string
@@ -98,6 +99,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          archived?: boolean
           created_at?: string
           formation: Json
           id?: string
@@ -108,6 +110,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          archived?: boolean
           created_at?: string
           formation?: Json
           id?: string

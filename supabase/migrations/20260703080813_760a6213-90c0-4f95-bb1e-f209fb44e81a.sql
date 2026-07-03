@@ -1,0 +1,1 @@
+ALTER TABLE public.saved_dossiers ADD COLUMN IF NOT EXISTS archived boolean NOT NULL DEFAULT false;
