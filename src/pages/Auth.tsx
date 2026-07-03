@@ -35,6 +35,19 @@ const Auth = () => {
       if (isLogin) {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
+        // Log de connexion (non bloquant)
+        try {
+          await supabase.from("activity_logs").insert({
+            user_id: (await supabase.auth.getUser()).data.user?.id,
+            user_email: email,
+            action: "login",
+            description: `Connexion de ${email}`,
+            page: "/auth",
+            user_agent: navigator.userAgent,
+          });
+        } catch (err) {
+          console.warn("[activity] login log failed", err);
+        }
         toast({ title: "Connecté !" });
       } else {
         const { error } = await supabase.auth.signUp({
