@@ -17,6 +17,7 @@ import BrandingAutoModal from "@/components/BrandingAutoModal";
 import MyCertifModal from "@/components/MyCertifModal";
 import { exportFormDataToExcel } from "@/lib/exportFormData";
 import { useAuth } from "@/hooks/useAuth";
+import { useUserRole } from "@/hooks/useUserRole";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -45,6 +46,7 @@ const emptyFormation: FormationInfo = {
 
 const Index = () => {
   const { user, signOut } = useAuth();
+  const { isSuperAdmin } = useUserRole();
   const navigate = useNavigate();
   const [airtableLoading, setAirtableLoading] = useState(false);
   const [bahoOpen, setBahoOpen] = useState(false);
@@ -148,6 +150,11 @@ const Index = () => {
                 <span className="text-sm text-muted-foreground flex items-center gap-1">
                   <User className="w-3.5 h-3.5" /> {user.email}
                 </span>
+                {isSuperAdmin && (
+                  <Button variant="outline" size="sm" onClick={() => navigate("/admin")} className="gap-1">
+                    <ShieldCheck className="w-4 h-4" /> Admin
+                  </Button>
+                )}
                 <Button variant="ghost" size="sm" onClick={signOut}><LogOut className="w-4 h-4" /></Button>
               </div>
             ) : (
@@ -219,6 +226,11 @@ const Index = () => {
             {user ? (
               <>
                 <span className="text-xs text-muted-foreground hidden sm:inline">{user.email}</span>
+                {isSuperAdmin && (
+                  <Button variant="outline" size="sm" onClick={() => navigate("/admin")} className="gap-1">
+                    <ShieldCheck className="w-4 h-4" /> Admin
+                  </Button>
+                )}
                 <Button variant="ghost" size="sm" onClick={signOut} title="Déconnexion"><LogOut className="w-4 h-4" /></Button>
               </>
             ) : (
