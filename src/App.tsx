@@ -17,6 +17,9 @@ import NotFound from "./pages/NotFound";
 import SophieChat from "./components/SophieChat";
 import Admin from "./pages/Admin";
 import { RouteActivityTracker } from "./components/RouteActivityTracker";
+import { installActivityTracker } from "./lib/activityTracker";
+
+installActivityTracker();
 
 const queryClient = new QueryClient();
 
