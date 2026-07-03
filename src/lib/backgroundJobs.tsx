@@ -23,6 +23,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Card } from "@/components/ui/card";
 import { CheckCircle2, Download, Loader2, X, AlertCircle } from "lucide-react";
+import { logActivityStandalone } from "@/lib/activityTracker";
 
 export type JobStatus = "running" | "done" | "error" | "cancelled";
 
