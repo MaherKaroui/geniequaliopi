@@ -15,6 +15,8 @@ import QualiopiCheck from "./pages/QualiopiCheck";
 import VAEPage from "./pages/VAE";
 import NotFound from "./pages/NotFound";
 import SophieChat from "./components/SophieChat";
+import Admin from "./pages/Admin";
+import { RouteActivityTracker } from "./components/RouteActivityTracker";
 
 const queryClient = new QueryClient();
 
@@ -24,7 +26,9 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <BackgroundJobsProvider>
+        <RouteActivityTracker />
         <Routes>
+          <Route path="/admin" element={<Admin />} />
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/controle-ey" element={<ControleEY />} />
