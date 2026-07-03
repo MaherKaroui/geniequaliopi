@@ -23,6 +23,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Card } from "@/components/ui/card";
 import { CheckCircle2, Download, Loader2, X, AlertCircle } from "lucide-react";
+import { logActivityStandalone } from "@/lib/activityTracker";
 
 export type JobStatus = "running" | "done" | "error" | "cancelled";
 
@@ -96,6 +97,10 @@ export function BackgroundJobsProvider({ children }: { children: ReactNode }) {
         createdAt: Date.now(),
       };
       setJobs((prev) => [...prev, job]);
+      logActivityStandalone("generate_start", `Génération démarrée : ${opts.label}`, {
+        label: opts.label,
+        fileName: opts.fileName,
+      });
 
       const reporter: JobReporter = {
         setProgress: (pct) =>
@@ -120,6 +125,11 @@ export function BackgroundJobsProvider({ children }: { children: ReactNode }) {
               blob,
               finishedAt: Date.now(),
             });
+            logActivityStandalone(
+              "generate_done",
+              `Génération terminée : ${opts.label}${opts.fileName ? ` (${opts.fileName})` : ""}`,
+              { label: opts.label, fileName: opts.fileName, sizeBytes: blob.size },
+            );
             if (opts.autoDownload !== false) {
               saveAs(blob, opts.fileName || `${opts.label}.zip`);
               toast.success(`${opts.label} téléchargé`);
@@ -134,6 +144,9 @@ export function BackgroundJobsProvider({ children }: { children: ReactNode }) {
               message: "Terminé",
               finishedAt: Date.now(),
             });
+            logActivityStandalone("generate_done", `Génération terminée : ${opts.label}`, {
+              label: opts.label,
+            });
             toast.success(`${opts.label} terminé`);
           }
         } catch (err) {
@@ -144,6 +157,10 @@ export function BackgroundJobsProvider({ children }: { children: ReactNode }) {
             message: msg,
             error: msg,
             finishedAt: Date.now(),
+          });
+          logActivityStandalone("generate_error", `Erreur : ${opts.label} — ${msg}`, {
+            label: opts.label,
+            error: msg,
           });
           toast.error(`${opts.label} : ${msg}`);
         }
