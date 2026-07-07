@@ -10704,6 +10704,14 @@ function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: 
       `Cette formation permettra à ${s.entreprise} de se positionner à la pointe de l'innovation en matière de communication digitale et de tirer parti des technologies d'IA de manière responsable.`,
       `En formant ${s.prenom}, nous internalisons des compétences stratégiques en création de contenus qui réduiront nos délais de production et renforceront notre agilité marketing.`,
     ];
+  } else if (isWord) {
+    contributionEntreprise = [
+      `Concrètement, ça nous fera gagner du temps sur tous les documents qu'on produit chaque semaine — courriers, comptes rendus, rapports. C'est un vrai enjeu de productivité pour notre équipe.`,
+      `Nos documents sortiront plus propres et plus homogènes. Aujourd'hui, chacun fait un peu à sa sauce sur Word, et ça se voit dans les livrables clients.`,
+      `${s.prenom} pourra prendre en charge la production documentaire sans qu'on ait besoin de repasser derrière. Ça libère du temps managérial pour d'autres sujets.`,
+      `Ça uniformisera nos supports (charte, modèles, en-têtes) et ça renforcera notre image professionnelle auprès des clients et partenaires.`,
+      `On gagne surtout en autonomie interne : plus besoin de sous-traiter la mise en forme des rapports ou de perdre des demi-journées à corriger des documents mal structurés.`,
+    ];
   } else {
     contributionEntreprise = [
       `Cette formation permettra d'améliorer la qualité et la rapidité des productions de ${s.prenom} liées à ${formation}, bénéficiant directement à l'efficacité du service au sein de ${s.entreprise}.`,
