@@ -10886,6 +10886,19 @@ function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: 
       `Grâce à cette formation, je pourrai proposer à ${s.entreprise} un plan de productivité basé sur l'IA, démontrant un ROI concret et mesurable sur la production de contenus.`,
       `Cette formation est un investissement dans ma carrière qui me permettra de rester pertinent(e) et compétitif/ve sur le marché du travail face à l'essor de l'IA.`,
     ];
+  } else if (isWord) {
+    projetProOptions = [
+      `Dans mon poste${s.entreprise ? ` chez ${s.entreprise}` : ""}, je produis beaucoup de documents. Être vraiment à l'aise sur Word, ça va changer mon quotidien et me faire gagner un temps précieux.`,
+      `Cette formation va me permettre d'être plus crédible sur la partie administrative de mon travail. Un document bien mis en page, ça change tout dans la perception qu'on a d'un pro.`,
+      `À court terme, ça me permettra de tenir mon poste avec plus de sérénité. À moyen terme, je pense que ça m'ouvrira des postes où la production documentaire est centrale.`,
+      `Honnêtement, aujourd'hui j'évite certaines missions parce que je ne suis pas assez à l'aise avec Word. Après la formation je pourrai les prendre en charge sans hésiter.`,
+      `Mon projet, c'est de pouvoir dire "oui, je peux le faire" quand on me confie un rapport un peu long ou un publipostage, sans stresser à l'idée du temps que ça va me prendre.`,
+      `Je vise à devenir la personne fiable sur les documents dans mon équipe. Celle vers qui on se tourne quand il faut produire quelque chose de propre rapidement.`,
+      `À plus long terme, cette maîtrise de Word me sera utile dans tous les postes que je pourrais viser en administratif, en assistanat ou en gestion. C'est vraiment une compétence de base.`,
+      `Cette formation va aussi me permettre de mieux organiser mon travail en général. Apprendre à structurer un document, c'est aussi apprendre à structurer sa pensée.`,
+      `Grâce à ces compétences, je pourrai proposer des améliorations sur les modèles utilisés dans mon service. Beaucoup sont anciens et pas vraiment optimisés.`,
+      `Franchement, savoir bien se servir de Word, c'est aujourd'hui un basique. C'est un peu comme conduire — tant qu'on ne l'a pas, on est vite limité dans ce qu'on peut faire.`,
+    ];
   } else {
     projetProOptions = [
       `Cette formation me permettra de gagner en autonomie dans l'utilisation de ${formation} et d'être plus performant(e) dans mon poste de ${s.poste} au sein de ${s.entreprise}.`,
