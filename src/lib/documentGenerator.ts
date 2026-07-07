@@ -10084,6 +10084,7 @@ function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: 
   const isMassage = t.includes("massage") || t.includes("prénatal") || t.includes("prenatal") || t.includes("relaxation") || t.includes("bien-être") || t.includes("bien être");
   const isIA = t.includes("intelligence artificielle") || t.includes("ia générative") || t.includes("contenus rédactionnels");
   const isExcel = t.includes("excel");
+  const isWord = t.includes("word");
   const isAnglais = t.includes("anglais") || t.includes("toeic");
   const isManagement = t.includes("management") || t.includes("leadership");
   const isDigital = t.includes("digital") || t.includes("marketing");
