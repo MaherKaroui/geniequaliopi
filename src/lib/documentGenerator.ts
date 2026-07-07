@@ -10039,7 +10039,22 @@ export function getEvalBesoinsFinancement(s: StagiaireInfo, f: FormationInfo, o:
   return generateEvalBesoinsAnswers(s, f, o, idx).budget;
 }
 
+// Nonce de génération : incrémenté à chaque batch pour varier les réponses (pool + rotation).
+// Reste stable au sein d'une même vague de génération (tous les stagiaires du batch partagent
+// le même nonce → cohérence entre documents). Automatiquement rafraîchi toutes les 20 secondes,
+// ou explicitement via bumpEvalBesoinsNonce() depuis le pipeline de génération.
+let __GEN_NONCE__ = Math.floor(Math.random() * 1_000_000_000);
+let __GEN_NONCE_TS__ = Date.now();
+export function bumpEvalBesoinsNonce() {
+  __GEN_NONCE__ = Math.floor(Math.random() * 1_000_000_000);
+  __GEN_NONCE_TS__ = Date.now();
+}
+function _refreshNonceIfStale() {
+  if (Date.now() - __GEN_NONCE_TS__ > 20_000) bumpEvalBesoinsNonce();
+}
+
 function generateEvalBesoinsAnswers(s: StagiaireInfo, f: FormationInfo, o: OrganismeInfo, idx: number) {
+  _refreshNonceIfStale();
   const result = _generateEvalBesoinsAnswersImpl(s, f, o, idx);
   const isDreamers = /dreamers/i.test(o.nom || "");
   const isFatima = /fatima/i.test(s.prenom || "") && /oliveira/i.test(s.nom || "");
