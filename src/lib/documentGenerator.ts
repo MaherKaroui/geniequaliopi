@@ -10054,9 +10054,11 @@ function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: 
   const t = formation.toLowerCase();
   const baseHash = (s.nom + s.prenom).split("").reduce((a, c) => a + c.charCodeAt(0), 0);
   // idx * 1000003 (prime) garantit que `h(offset) % N` est unique pour chaque idx (jusqu'à N=10).
-  // baseHash * 2520 (= PPCM(1..10)) ne change PAS le résultat modulo N≤10 : le nom n'influence pas la sélection,
-  // ce qui assure que deux stagiaires consécutifs reçoivent TOUJOURS des réponses différentes.
-  const h = (offset: number) => idx * 1000003 + offset * 31 + baseHash * 2520;
+  // baseHash * 2520 (= PPCM(1..10)) ne change PAS le résultat modulo N≤10 : deux stagiaires consécutifs
+  // reçoivent TOUJOURS des réponses différentes. GEN_NONCE * 7919 (premier, coprime avec tous N usuels)
+  // fait tourner l'ensemble du pool à chaque nouvelle génération → variété entre deux générations
+  // successives, tout en gardant la cohérence intra-batch (même nonce pour tous les stagiaires).
+  const h = (offset: number) => idx * 1000003 + offset * 31 + baseHash * 2520 + __GEN_NONCE__ * 7919;
   
   const hasEntreprise = !!(s.entreprise && s.entreprise.trim() && s.entreprise.trim().toLowerCase() !== "entreprise");
   
