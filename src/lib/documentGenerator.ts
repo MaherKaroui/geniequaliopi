@@ -10527,6 +10527,19 @@ function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: 
       `Donner à ${s.prenom} les moyens de fact-checker et de vérifier systématiquement les contenus générés par IA, afin de garantir la fiabilité de nos publications.`,
       `Permettre à ${s.prenom} de créer un workflow de production de contenus intégrant l'IA, mesurable et documenté, pour en faire un processus reproductible au sein de notre équipe.`,
     ];
+  } else if (isWord) {
+    attentesOptions = [
+      `Permettre à ${s.prenom} de maîtriser Word pour rédiger des documents professionnels propres (courriers, comptes rendus, rapports) sans perdre de temps sur la mise en forme au quotidien.`,
+      `Former ${s.prenom} aux styles, sommaires automatiques et modèles Word pour produire des rapports longs bien structurés, un vrai besoin identifié dans son poste de ${s.poste || "gestion administrative"}.`,
+      `Aider ${s.prenom} à gagner en autonomie sur Word : plus besoin de demander à un collègue à chaque fois qu'un document doit être mis en page proprement.`,
+      `Accompagner ${s.prenom} sur le publipostage Word + Excel pour envoyer courriers, attestations et convocations en série sans faire une par une, ce qui fait perdre énormément de temps aujourd'hui.`,
+      `Donner à ${s.prenom} les bases solides de Word (mise en forme, tableaux, sauts de section, en-têtes/pieds de page) pour être à l'aise dans la production de documents administratifs.`,
+      `Former ${s.prenom} à la création et à la réutilisation de modèles Word personnalisés (papier à en-tête, devis, contrats types) afin d'uniformiser les documents produits.`,
+      `Permettre à ${s.prenom} de maîtriser les fonctions collaboratives de Word (suivi des modifications, commentaires, comparaison de versions) pour travailler à plusieurs sur un même document sans se perdre.`,
+      `Développer les compétences de ${s.prenom} sur les tableaux, images et objets dans Word pour intégrer proprement des visuels dans les rapports remis aux clients.`,
+      `Former ${s.prenom} aux raccourcis clavier et à l'organisation efficace d'un document long sous Word, pour réduire le temps passé sur chaque rapport.`,
+      `Aider ${s.prenom} à créer des documents Word conformes aux exigences graphiques de ${s.entreprise || "son organisation"} (charte, polices, marges), afin de gagner en professionnalisme dans les livrables.`,
+    ];
   } else if (isExcel) {
     attentesOptions = [
       `Former ${s.prenom} aux fonctions avancées d'Excel (RECHERCHEV, INDEX/EQUIV, SI imbriqués) pour automatiser le traitement des données et améliorer la fiabilité des reportings de ${s.entreprise}.`,
