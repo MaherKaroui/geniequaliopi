@@ -9774,7 +9774,7 @@ ${s.telephone?.trim() ? `<strong>Téléphone :</strong> ${s.telephone}` : ""}<br
 <p><strong>2. Quel objectif professionnel ou personnel souhaitez-vous atteindre grâce à cette formation ?</strong></p>
 <table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${answers.objectif}</td></tr></table>
 
-<p><strong>3. Quel budget avez-vous prévu pour cette formation et bénéficiez-vous d'un dispositif de financement (CPF, OPCO, Pôle emploi, financement personnel) ?</strong></p>
+<p><strong>3. Quel budget avez-vous prévu pour cette formation et bénéficiez-vous d'un dispositif de financement (financement personnel, CPF, OPCO) ?</strong></p>
 <table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${answers.budget}</td></tr></table>
 
 <p><strong>4. En quoi pensez-vous que cette formation contribuera à la réalisation de votre projet professionnel ou personnel ?</strong></p>
@@ -9821,7 +9821,7 @@ ${s.telephone?.trim() ? `<strong>Téléphone :</strong> ${s.telephone}` : ""}<br
 <p><strong>2. Quel objectif professionnel ou personnel souhaitez-vous atteindre grâce à cette formation ?</strong></p>
 <table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${answers.objectif}</td></tr></table>
 
-<p><strong>3. Quel budget avez-vous prévu pour cette formation et bénéficiez-vous d'un dispositif de financement (CPF, OPCO, Pôle emploi, financement personnel) ?</strong></p>
+<p><strong>3. Quel budget avez-vous prévu pour cette formation et bénéficiez-vous d'un dispositif de financement (financement personnel, CPF, OPCO) ?</strong></p>
 <table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${answers.budget}</td></tr></table>
 
 <p><strong>4. En quoi pensez-vous que cette formation contribuera à la réalisation de votre projet professionnel ou personnel ?</strong></p>
@@ -9933,7 +9933,7 @@ ${s.telephone?.trim() ? `<strong>Téléphone :</strong> ${s.telephone}<br>` : ""
 <p><strong>2. Quel objectif professionnel ou personnel souhaitez-vous atteindre grâce à cette formation ?</strong></p>
 <table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${answers.objectif}</td></tr></table>
 
-<p><strong>3. Quel budget avez-vous prévu pour cette formation et bénéficiez-vous d'un dispositif de financement (CPF, OPCO, Pôle emploi, financement personnel) ?</strong></p>
+<p><strong>3. Quel budget avez-vous prévu pour cette formation et bénéficiez-vous d'un dispositif de financement (financement personnel, CPF, OPCO) ?</strong></p>
 <table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${answers.budget}</td></tr></table>
 
 <p><strong>4. En quoi pensez-vous que cette formation contribuera à la réalisation de votre projet professionnel ou personnel ?</strong></p>
@@ -10039,7 +10039,22 @@ export function getEvalBesoinsFinancement(s: StagiaireInfo, f: FormationInfo, o:
   return generateEvalBesoinsAnswers(s, f, o, idx).budget;
 }
 
+// Nonce de génération : incrémenté à chaque batch pour varier les réponses (pool + rotation).
+// Reste stable au sein d'une même vague de génération (tous les stagiaires du batch partagent
+// le même nonce → cohérence entre documents). Automatiquement rafraîchi toutes les 20 secondes,
+// ou explicitement via bumpEvalBesoinsNonce() depuis le pipeline de génération.
+let __GEN_NONCE__ = Math.floor(Math.random() * 1_000_000_000);
+let __GEN_NONCE_TS__ = Date.now();
+export function bumpEvalBesoinsNonce() {
+  __GEN_NONCE__ = Math.floor(Math.random() * 1_000_000_000);
+  __GEN_NONCE_TS__ = Date.now();
+}
+function _refreshNonceIfStale() {
+  if (Date.now() - __GEN_NONCE_TS__ > 20_000) bumpEvalBesoinsNonce();
+}
+
 function generateEvalBesoinsAnswers(s: StagiaireInfo, f: FormationInfo, o: OrganismeInfo, idx: number) {
+  _refreshNonceIfStale();
   const result = _generateEvalBesoinsAnswersImpl(s, f, o, idx);
   const isDreamers = /dreamers/i.test(o.nom || "");
   const isFatima = /fatima/i.test(s.prenom || "") && /oliveira/i.test(s.nom || "");
@@ -10054,9 +10069,11 @@ function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: 
   const t = formation.toLowerCase();
   const baseHash = (s.nom + s.prenom).split("").reduce((a, c) => a + c.charCodeAt(0), 0);
   // idx * 1000003 (prime) garantit que `h(offset) % N` est unique pour chaque idx (jusqu'à N=10).
-  // baseHash * 2520 (= PPCM(1..10)) ne change PAS le résultat modulo N≤10 : le nom n'influence pas la sélection,
-  // ce qui assure que deux stagiaires consécutifs reçoivent TOUJOURS des réponses différentes.
-  const h = (offset: number) => idx * 1000003 + offset * 31 + baseHash * 2520;
+  // baseHash * 2520 (= PPCM(1..10)) ne change PAS le résultat modulo N≤10 : deux stagiaires consécutifs
+  // reçoivent TOUJOURS des réponses différentes. GEN_NONCE * 7919 (premier, coprime avec tous N usuels)
+  // fait tourner l'ensemble du pool à chaque nouvelle génération → variété entre deux générations
+  // successives, tout en gardant la cohérence intra-batch (même nonce pour tous les stagiaires).
+  const h = (offset: number) => idx * 1000003 + offset * 31 + baseHash * 2520 + __GEN_NONCE__ * 7919;
   
   const hasEntreprise = !!(s.entreprise && s.entreprise.trim() && s.entreprise.trim().toLowerCase() !== "entreprise");
   
@@ -10067,6 +10084,7 @@ function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: 
   const isMassage = t.includes("massage") || t.includes("prénatal") || t.includes("prenatal") || t.includes("relaxation") || t.includes("bien-être") || t.includes("bien être");
   const isIA = t.includes("intelligence artificielle") || t.includes("ia générative") || t.includes("contenus rédactionnels");
   const isExcel = t.includes("excel");
+  const isWord = t.includes("word");
   const isAnglais = t.includes("anglais") || t.includes("toeic");
   const isManagement = t.includes("management") || t.includes("leadership");
   const isDigital = t.includes("digital") || t.includes("marketing");
@@ -10444,18 +10462,25 @@ function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: 
   }
   const diplome = diplomes[h(2) % diplomes.length];
   
-  // === FINANCEMENTS (4 options : CPF, OPCO, Pôle emploi, financement personnel) ===
+  // === FINANCEMENTS (4 options : financement personnel, CPF, OPCO) ===
   const financementsEntreprise = [
     "OPCO – prise en charge employeur à 100%",
     "OPCO – prise en charge partielle + complément entreprise",
     "OPCO – fonds mutualisés TPE/PME",
     "CPF mobilisé par le salarié avec accord de l'employeur",
   ];
+  // Répartition cible : 70% financement personnel, 20% CPF, 10% OPCO/Transitions Pro (pas de Pôle emploi)
   const financementsIndividuel = [
-    "CPF (Compte Personnel de Formation) – solde suffisant",
-    "Pôle emploi – AIF (Aide Individuelle à la Formation)",
-    "Financement personnel – paiement en 3 fois",
-    "Financement personnel intégral",
+    "Financement personnel intégral (virement à la signature de la convention)",
+    "Financement personnel – règlement en 3 fois sans frais",
+    "Financement personnel – autofinancement, paiement échelonné sur la durée de la formation",
+    "Financement personnel – apport familial + économies personnelles",
+    "Financement personnel – prêt bancaire à taux préférentiel (formation professionnelle)",
+    "Financement personnel – règlement en 4 fois (mensualités adaptées à mon budget)",
+    "Financement personnel intégral, sans mobilisation d'aide externe",
+    "CPF (Compte Personnel de Formation) – solde suffisant pour couvrir l'intégralité de la formation",
+    "CPF partiel + complément en financement personnel (reste à charge autofinancé)",
+    "OPCO / Transitions Pro – projet de reconversion validé avec maintien de rémunération",
   ];
   const budget = hasEntreprise
     ? financementsEntreprise[h(3) % financementsEntreprise.length]
@@ -10501,6 +10526,19 @@ function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: 
       `Former ${s.prenom} à l'utilisation de Canva IA, Midjourney et ChatGPT pour renouveler nos supports de communication et moderniser notre image de marque.`,
       `Donner à ${s.prenom} les moyens de fact-checker et de vérifier systématiquement les contenus générés par IA, afin de garantir la fiabilité de nos publications.`,
       `Permettre à ${s.prenom} de créer un workflow de production de contenus intégrant l'IA, mesurable et documenté, pour en faire un processus reproductible au sein de notre équipe.`,
+    ];
+  } else if (isWord) {
+    attentesOptions = [
+      `Permettre à ${s.prenom} de maîtriser Word pour rédiger des documents professionnels propres (courriers, comptes rendus, rapports) sans perdre de temps sur la mise en forme au quotidien.`,
+      `Former ${s.prenom} aux styles, sommaires automatiques et modèles Word pour produire des rapports longs bien structurés, un vrai besoin identifié dans son poste de ${s.poste || "gestion administrative"}.`,
+      `Aider ${s.prenom} à gagner en autonomie sur Word : plus besoin de demander à un collègue à chaque fois qu'un document doit être mis en page proprement.`,
+      `Accompagner ${s.prenom} sur le publipostage Word + Excel pour envoyer courriers, attestations et convocations en série sans faire une par une, ce qui fait perdre énormément de temps aujourd'hui.`,
+      `Donner à ${s.prenom} les bases solides de Word (mise en forme, tableaux, sauts de section, en-têtes/pieds de page) pour être à l'aise dans la production de documents administratifs.`,
+      `Former ${s.prenom} à la création et à la réutilisation de modèles Word personnalisés (papier à en-tête, devis, contrats types) afin d'uniformiser les documents produits.`,
+      `Permettre à ${s.prenom} de maîtriser les fonctions collaboratives de Word (suivi des modifications, commentaires, comparaison de versions) pour travailler à plusieurs sur un même document sans se perdre.`,
+      `Développer les compétences de ${s.prenom} sur les tableaux, images et objets dans Word pour intégrer proprement des visuels dans les rapports remis aux clients.`,
+      `Former ${s.prenom} aux raccourcis clavier et à l'organisation efficace d'un document long sous Word, pour réduire le temps passé sur chaque rapport.`,
+      `Aider ${s.prenom} à créer des documents Word conformes aux exigences graphiques de ${s.entreprise || "son organisation"} (charte, polices, marges), afin de gagner en professionnalisme dans les livrables.`,
     ];
   } else if (isExcel) {
     attentesOptions = [
