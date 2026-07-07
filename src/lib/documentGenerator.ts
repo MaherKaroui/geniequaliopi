@@ -10529,16 +10529,18 @@ function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: 
     ];
   } else if (isWord) {
     attentesOptions = [
-      `Permettre à ${s.prenom} de maîtriser Word pour rédiger des documents professionnels propres (courriers, comptes rendus, rapports) sans perdre de temps sur la mise en forme au quotidien.`,
-      `Former ${s.prenom} aux styles, sommaires automatiques et modèles Word pour produire des rapports longs bien structurés, un vrai besoin identifié dans son poste de ${s.poste || "gestion administrative"}.`,
-      `Aider ${s.prenom} à gagner en autonomie sur Word : plus besoin de demander à un collègue à chaque fois qu'un document doit être mis en page proprement.`,
-      `Accompagner ${s.prenom} sur le publipostage Word + Excel pour envoyer courriers, attestations et convocations en série sans faire une par une, ce qui fait perdre énormément de temps aujourd'hui.`,
-      `Donner à ${s.prenom} les bases solides de Word (mise en forme, tableaux, sauts de section, en-têtes/pieds de page) pour être à l'aise dans la production de documents administratifs.`,
-      `Former ${s.prenom} à la création et à la réutilisation de modèles Word personnalisés (papier à en-tête, devis, contrats types) afin d'uniformiser les documents produits.`,
-      `Permettre à ${s.prenom} de maîtriser les fonctions collaboratives de Word (suivi des modifications, commentaires, comparaison de versions) pour travailler à plusieurs sur un même document sans se perdre.`,
-      `Développer les compétences de ${s.prenom} sur les tableaux, images et objets dans Word pour intégrer proprement des visuels dans les rapports remis aux clients.`,
-      `Former ${s.prenom} aux raccourcis clavier et à l'organisation efficace d'un document long sous Word, pour réduire le temps passé sur chaque rapport.`,
-      `Aider ${s.prenom} à créer des documents Word conformes aux exigences graphiques de ${s.entreprise || "son organisation"} (charte, polices, marges), afin de gagner en professionnalisme dans les livrables.`,
+      `Franchement, j'aimerais que ${s.prenom} arrive à faire ses courriers et ses comptes rendus sur Word sans galérer à chaque fois avec la mise en forme. Aujourd'hui on perd un temps fou là-dessus.`,
+      `L'idée, c'est que ${s.prenom} soit à l'aise avec Word au quotidien — écrire un courrier propre, mettre un titre, un tableau, une numérotation, sans avoir à demander à quelqu'un.`,
+      `On aimerait surtout qu'elle prenne confiance sur l'outil. ${s.prenom} sait ouvrir un document, taper du texte, mais dès qu'il faut structurer un rapport un peu long ça devient compliqué.`,
+      `Concrètement, on attend qu'elle sache faire un publipostage propre (courriers, attestations en série) parce qu'aujourd'hui on les fait une par une et c'est vraiment chronophage.`,
+      `Que ${s.prenom} maîtrise les bases : mise en forme, tableaux, en-têtes et pieds de page. Rien de spectaculaire, juste être autonome sur les documents du quotidien.`,
+      `On voudrait qu'elle sache créer et réutiliser des modèles types (papier à en-tête, devis, courriers) pour qu'on arrête d'avoir dix versions différentes du même document qui traînent.`,
+      `L'objectif c'est qu'elle puisse bosser à plusieurs sur un même document sans se perdre — suivi des modifs, commentaires, comparaison de versions. Aujourd'hui on s'envoie des Word par mail et c'est le bazar.`,
+      `Qu'elle soit capable d'intégrer proprement un tableau, une image, un logo dans un rapport client. On rend encore parfois des documents qui font "bricolés", ça fait pas très pro.`,
+      `Gagner du temps, tout simplement. Les raccourcis clavier, les styles, la navigation dans un long document — tout ce qui fait qu'un rapport se fait en 1 h au lieu de 3.`,
+      `Qu'elle produise des documents conformes à notre charte (police, marges, logo) sans avoir à repartir de zéro à chaque fois. Ça uniformisera nos livrables et ça nous fera gagner en crédibilité.`,
+      `Honnêtement, ${s.prenom} est autodidacte sur Word, elle se débrouille mais elle a des trous — les sauts de section, les sommaires automatiques, les notes de bas de page. La formation devrait combler ça.`,
+      `On aimerait surtout casser les mauvaises habitudes : les espaces à la place des tabulations, les entrées à la place des sauts de page… bref, apprendre à faire les choses proprement.`,
     ];
   } else if (isExcel) {
     attentesOptions = [
