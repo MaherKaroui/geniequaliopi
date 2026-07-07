@@ -10529,16 +10529,18 @@ function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: 
     ];
   } else if (isWord) {
     attentesOptions = [
-      `Permettre à ${s.prenom} de maîtriser Word pour rédiger des documents professionnels propres (courriers, comptes rendus, rapports) sans perdre de temps sur la mise en forme au quotidien.`,
-      `Former ${s.prenom} aux styles, sommaires automatiques et modèles Word pour produire des rapports longs bien structurés, un vrai besoin identifié dans son poste de ${s.poste || "gestion administrative"}.`,
-      `Aider ${s.prenom} à gagner en autonomie sur Word : plus besoin de demander à un collègue à chaque fois qu'un document doit être mis en page proprement.`,
-      `Accompagner ${s.prenom} sur le publipostage Word + Excel pour envoyer courriers, attestations et convocations en série sans faire une par une, ce qui fait perdre énormément de temps aujourd'hui.`,
-      `Donner à ${s.prenom} les bases solides de Word (mise en forme, tableaux, sauts de section, en-têtes/pieds de page) pour être à l'aise dans la production de documents administratifs.`,
-      `Former ${s.prenom} à la création et à la réutilisation de modèles Word personnalisés (papier à en-tête, devis, contrats types) afin d'uniformiser les documents produits.`,
-      `Permettre à ${s.prenom} de maîtriser les fonctions collaboratives de Word (suivi des modifications, commentaires, comparaison de versions) pour travailler à plusieurs sur un même document sans se perdre.`,
-      `Développer les compétences de ${s.prenom} sur les tableaux, images et objets dans Word pour intégrer proprement des visuels dans les rapports remis aux clients.`,
-      `Former ${s.prenom} aux raccourcis clavier et à l'organisation efficace d'un document long sous Word, pour réduire le temps passé sur chaque rapport.`,
-      `Aider ${s.prenom} à créer des documents Word conformes aux exigences graphiques de ${s.entreprise || "son organisation"} (charte, polices, marges), afin de gagner en professionnalisme dans les livrables.`,
+      `Franchement, j'aimerais que ${s.prenom} arrive à faire ses courriers et ses comptes rendus sur Word sans galérer à chaque fois avec la mise en forme. Aujourd'hui on perd un temps fou là-dessus.`,
+      `L'idée, c'est que ${s.prenom} soit à l'aise avec Word au quotidien — écrire un courrier propre, mettre un titre, un tableau, une numérotation, sans avoir à demander à quelqu'un.`,
+      `On aimerait surtout qu'elle prenne confiance sur l'outil. ${s.prenom} sait ouvrir un document, taper du texte, mais dès qu'il faut structurer un rapport un peu long ça devient compliqué.`,
+      `Concrètement, on attend qu'elle sache faire un publipostage propre (courriers, attestations en série) parce qu'aujourd'hui on les fait une par une et c'est vraiment chronophage.`,
+      `Que ${s.prenom} maîtrise les bases : mise en forme, tableaux, en-têtes et pieds de page. Rien de spectaculaire, juste être autonome sur les documents du quotidien.`,
+      `On voudrait qu'elle sache créer et réutiliser des modèles types (papier à en-tête, devis, courriers) pour qu'on arrête d'avoir dix versions différentes du même document qui traînent.`,
+      `L'objectif c'est qu'elle puisse bosser à plusieurs sur un même document sans se perdre — suivi des modifs, commentaires, comparaison de versions. Aujourd'hui on s'envoie des Word par mail et c'est le bazar.`,
+      `Qu'elle soit capable d'intégrer proprement un tableau, une image, un logo dans un rapport client. On rend encore parfois des documents qui font "bricolés", ça fait pas très pro.`,
+      `Gagner du temps, tout simplement. Les raccourcis clavier, les styles, la navigation dans un long document — tout ce qui fait qu'un rapport se fait en 1 h au lieu de 3.`,
+      `Qu'elle produise des documents conformes à notre charte (police, marges, logo) sans avoir à repartir de zéro à chaque fois. Ça uniformisera nos livrables et ça nous fera gagner en crédibilité.`,
+      `Honnêtement, ${s.prenom} est autodidacte sur Word, elle se débrouille mais elle a des trous — les sauts de section, les sommaires automatiques, les notes de bas de page. La formation devrait combler ça.`,
+      `On aimerait surtout casser les mauvaises habitudes : les espaces à la place des tabulations, les entrées à la place des sauts de page… bref, apprendre à faire les choses proprement.`,
     ];
   } else if (isExcel) {
     attentesOptions = [
@@ -10648,6 +10650,19 @@ function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: 
       `Au sein de l'équipe communication, ${s.prenom} coordonne la production de contenus multicanaux et assure la cohérence de l'image de marque de ${s.entreprise} sur tous les supports.`,
       `${s.prenom} est chargé(e) de la production éditoriale de ${s.entreprise} : rédaction, relecture, mise en page et diffusion des contenus sur les différents canaux de communication.`,
     ];
+  } else if (isWord) {
+    missionsEntreprise = [
+      `${s.prenom} rédige au quotidien des courriers, notes internes et comptes rendus de réunion. Elle utilise Word tous les jours mais reste bloquée dès qu'un document dépasse quelques pages.`,
+      `En tant que ${s.poste || "assistante administrative"} chez ${s.entreprise || "notre structure"}, ${s.prenom} produit les documents administratifs : convocations, attestations, courriers de relance, comptes rendus.`,
+      `${s.prenom} met en forme les rapports d'activité, les procès-verbaux et les documents remis à nos clients. La qualité visuelle de ces livrables est importante pour notre image.`,
+      `Au quotidien, ${s.prenom} rédige les courriers de la direction, prépare les dossiers de réunion et met à jour les modèles types utilisés par toute l'équipe.`,
+      `${s.prenom} s'occupe de la partie administrative : rédaction, publipostage, envoi de courriers en série (relances, invitations). Une bonne maîtrise de Word lui ferait gagner beaucoup de temps.`,
+      `Elle produit régulièrement des rapports longs (10 à 30 pages) avec sommaire, tableaux et annexes. Aujourd'hui elle passe beaucoup de temps sur la mise en forme parce que ce n'est pas automatisé.`,
+      `${s.prenom} intervient sur la préparation des dossiers clients, la mise en page des devis et contrats, et la rédaction des courriers de suivi. Word est son outil principal.`,
+      `Elle assure le secrétariat de direction : prise de notes, mise au propre, diffusion. Word est utilisé plusieurs heures par jour, la formation vise à professionnaliser cette production.`,
+      `${s.prenom} gère la documentation interne (procédures, notes de service, comptes rendus) et met à jour régulièrement les modèles Word utilisés par le service.`,
+      `Au sein de ${s.entreprise || "notre équipe"}, ${s.prenom} est en première ligne sur la production écrite : courriers, rapports, présentations papier. Elle a besoin de bases Word solides pour tenir ce rôle en autonomie.`,
+    ];
   } else {
     missionsEntreprise = [
       `En tant que ${s.poste} chez ${s.entreprise}, ${s.prenom} est en charge de la rédaction de documents, la préparation de rapports et la gestion de fichiers liés à ${formation}.`,
@@ -10688,6 +10703,14 @@ function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: 
       `L'intégration de l'IA dans nos processus de création de contenus améliorera la compétitivité de ${s.entreprise} et notre capacité à produire des supports professionnels de manière autonome.`,
       `Cette formation permettra à ${s.entreprise} de se positionner à la pointe de l'innovation en matière de communication digitale et de tirer parti des technologies d'IA de manière responsable.`,
       `En formant ${s.prenom}, nous internalisons des compétences stratégiques en création de contenus qui réduiront nos délais de production et renforceront notre agilité marketing.`,
+    ];
+  } else if (isWord) {
+    contributionEntreprise = [
+      `Concrètement, ça nous fera gagner du temps sur tous les documents qu'on produit chaque semaine — courriers, comptes rendus, rapports. C'est un vrai enjeu de productivité pour notre équipe.`,
+      `Nos documents sortiront plus propres et plus homogènes. Aujourd'hui, chacun fait un peu à sa sauce sur Word, et ça se voit dans les livrables clients.`,
+      `${s.prenom} pourra prendre en charge la production documentaire sans qu'on ait besoin de repasser derrière. Ça libère du temps managérial pour d'autres sujets.`,
+      `Ça uniformisera nos supports (charte, modèles, en-têtes) et ça renforcera notre image professionnelle auprès des clients et partenaires.`,
+      `On gagne surtout en autonomie interne : plus besoin de sous-traiter la mise en forme des rapports ou de perdre des demi-journées à corriger des documents mal structurés.`,
     ];
   } else {
     contributionEntreprise = [
@@ -10792,6 +10815,21 @@ function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: 
       "Je veux maîtriser les techniques de growth hacking et d'inbound marketing pour générer des leads qualifiés à moindre coût pour mon entreprise.",
       "Mon objectif est de devenir autonome dans la conception et le déploiement de campagnes marketing multicanales (SEO, SEA, social, email) pour mon activité.",
     ];
+  } else if (isWord) {
+    objectifOptions = [
+      "Franchement, je veux juste arrêter de galérer sur Word. Aujourd'hui je sais taper du texte, mais dès qu'il faut mettre en page proprement, je bloque.",
+      "Mon objectif c'est d'être autonome sur les documents que je produis au quotidien — courriers, comptes rendus, notes. Ne plus avoir à demander à quelqu'un dès que je veux insérer un tableau ou un sommaire.",
+      "J'aimerais bien maîtriser les styles et les sommaires automatiques. J'ai toujours fait mes titres à la main et je sais que ce n'est pas la bonne méthode, mais je n'ai jamais pris le temps d'apprendre.",
+      "Je veux gagner du temps, tout simplement. Je passe beaucoup trop d'heures sur la mise en page de mes rapports alors qu'avec les bons réflexes ça devrait aller trois fois plus vite.",
+      "Mon but c'est de savoir faire un publipostage. On m'a demandé plusieurs fois d'envoyer des courriers en série et je me retrouve à les faire un par un, c'est vraiment pas efficace.",
+      "J'aimerais apprendre à créer mes propres modèles Word (papier à en-tête, courrier type, note de service) pour ne plus repartir d'une feuille blanche à chaque fois.",
+      "Concrètement, je veux être à l'aise avec les tableaux, les images et les en-têtes/pieds de page. C'est ce qui me pose le plus de difficultés aujourd'hui.",
+      "Je souhaite consolider mes bases. Je suis autodidacte, je me débrouille, mais j'ai plein de trous — les sauts de section, les notes de bas de page, la numérotation automatique.",
+      "Mon objectif c'est de rendre des documents propres et professionnels. J'ai un peu honte parfois de la mise en forme de ce que je produis et je voudrais que ça change.",
+      "Je veux apprendre les bonnes pratiques dès le départ, pour éviter de prendre de mauvaises habitudes. Je préfère faire les choses bien une fois pour toutes.",
+      "Franchement, j'ai un peu peur de Word. Je voudrais me réconcilier avec l'outil et arriver à l'utiliser sans stress au bureau.",
+      "Mon objectif c'est de finir la formation en étant capable de faire tout ce dont j'ai besoin au quotidien, sans avoir à Googler à chaque fois que je bloque sur quelque chose.",
+    ];
   } else {
     objectifOptions = [
       `Je souhaite acquérir les compétences de base de ${formation} pour gagner en autonomie dans mes tâches quotidiennes et ne plus dépendre de mes collègues pour ces aspects.`,
@@ -10848,6 +10886,19 @@ function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: 
       `Grâce à cette formation, je pourrai proposer à ${s.entreprise} un plan de productivité basé sur l'IA, démontrant un ROI concret et mesurable sur la production de contenus.`,
       `Cette formation est un investissement dans ma carrière qui me permettra de rester pertinent(e) et compétitif/ve sur le marché du travail face à l'essor de l'IA.`,
     ];
+  } else if (isWord) {
+    projetProOptions = [
+      `Dans mon poste${s.entreprise ? ` chez ${s.entreprise}` : ""}, je produis beaucoup de documents. Être vraiment à l'aise sur Word, ça va changer mon quotidien et me faire gagner un temps précieux.`,
+      `Cette formation va me permettre d'être plus crédible sur la partie administrative de mon travail. Un document bien mis en page, ça change tout dans la perception qu'on a d'un pro.`,
+      `À court terme, ça me permettra de tenir mon poste avec plus de sérénité. À moyen terme, je pense que ça m'ouvrira des postes où la production documentaire est centrale.`,
+      `Honnêtement, aujourd'hui j'évite certaines missions parce que je ne suis pas assez à l'aise avec Word. Après la formation je pourrai les prendre en charge sans hésiter.`,
+      `Mon projet, c'est de pouvoir dire "oui, je peux le faire" quand on me confie un rapport un peu long ou un publipostage, sans stresser à l'idée du temps que ça va me prendre.`,
+      `Je vise à devenir la personne fiable sur les documents dans mon équipe. Celle vers qui on se tourne quand il faut produire quelque chose de propre rapidement.`,
+      `À plus long terme, cette maîtrise de Word me sera utile dans tous les postes que je pourrais viser en administratif, en assistanat ou en gestion. C'est vraiment une compétence de base.`,
+      `Cette formation va aussi me permettre de mieux organiser mon travail en général. Apprendre à structurer un document, c'est aussi apprendre à structurer sa pensée.`,
+      `Grâce à ces compétences, je pourrai proposer des améliorations sur les modèles utilisés dans mon service. Beaucoup sont anciens et pas vraiment optimisés.`,
+      `Franchement, savoir bien se servir de Word, c'est aujourd'hui un basique. C'est un peu comme conduire — tant qu'on ne l'a pas, on est vite limité dans ce qu'on peut faire.`,
+    ];
   } else {
     projetProOptions = [
       `Cette formation me permettra de gagner en autonomie dans l'utilisation de ${formation} et d'être plus performant(e) dans mon poste de ${s.poste} au sein de ${s.entreprise}.`,
@@ -10880,7 +10931,7 @@ function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: 
   // === FALLBACK COHÉRENT FORMATION : extraction des topics réels ===
   // Pour les formations sans domaine reconnu, on remplace les réponses génériques
   // par des phrases référençant les vrais objectifs et le programme de la formation.
-  const isKnownDomain = isFLE || isMassage || isIA || isExcel || isAnglais || isManagement
+  const isKnownDomain = isFLE || isMassage || isIA || isExcel || isWord || isAnglais || isManagement
     || isDigital || isEsthetique || isInfo || isBureautique;
 
   let finalAttentes = hasEntreprise ? attentesOptions[h(4) % attentesOptions.length] : "/";
