@@ -10650,6 +10650,19 @@ function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: 
       `Au sein de l'équipe communication, ${s.prenom} coordonne la production de contenus multicanaux et assure la cohérence de l'image de marque de ${s.entreprise} sur tous les supports.`,
       `${s.prenom} est chargé(e) de la production éditoriale de ${s.entreprise} : rédaction, relecture, mise en page et diffusion des contenus sur les différents canaux de communication.`,
     ];
+  } else if (isWord) {
+    missionsEntreprise = [
+      `${s.prenom} rédige au quotidien des courriers, notes internes et comptes rendus de réunion. Elle utilise Word tous les jours mais reste bloquée dès qu'un document dépasse quelques pages.`,
+      `En tant que ${s.poste || "assistante administrative"} chez ${s.entreprise || "notre structure"}, ${s.prenom} produit les documents administratifs : convocations, attestations, courriers de relance, comptes rendus.`,
+      `${s.prenom} met en forme les rapports d'activité, les procès-verbaux et les documents remis à nos clients. La qualité visuelle de ces livrables est importante pour notre image.`,
+      `Au quotidien, ${s.prenom} rédige les courriers de la direction, prépare les dossiers de réunion et met à jour les modèles types utilisés par toute l'équipe.`,
+      `${s.prenom} s'occupe de la partie administrative : rédaction, publipostage, envoi de courriers en série (relances, invitations). Une bonne maîtrise de Word lui ferait gagner beaucoup de temps.`,
+      `Elle produit régulièrement des rapports longs (10 à 30 pages) avec sommaire, tableaux et annexes. Aujourd'hui elle passe beaucoup de temps sur la mise en forme parce que ce n'est pas automatisé.`,
+      `${s.prenom} intervient sur la préparation des dossiers clients, la mise en page des devis et contrats, et la rédaction des courriers de suivi. Word est son outil principal.`,
+      `Elle assure le secrétariat de direction : prise de notes, mise au propre, diffusion. Word est utilisé plusieurs heures par jour, la formation vise à professionnaliser cette production.`,
+      `${s.prenom} gère la documentation interne (procédures, notes de service, comptes rendus) et met à jour régulièrement les modèles Word utilisés par le service.`,
+      `Au sein de ${s.entreprise || "notre équipe"}, ${s.prenom} est en première ligne sur la production écrite : courriers, rapports, présentations papier. Elle a besoin de bases Word solides pour tenir ce rôle en autonomie.`,
+    ];
   } else {
     missionsEntreprise = [
       `En tant que ${s.poste} chez ${s.entreprise}, ${s.prenom} est en charge de la rédaction de documents, la préparation de rapports et la gestion de fichiers liés à ${formation}.`,
