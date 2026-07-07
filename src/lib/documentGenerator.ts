@@ -10931,7 +10931,7 @@ function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: 
   // === FALLBACK COHÉRENT FORMATION : extraction des topics réels ===
   // Pour les formations sans domaine reconnu, on remplace les réponses génériques
   // par des phrases référençant les vrais objectifs et le programme de la formation.
-  const isKnownDomain = isFLE || isMassage || isIA || isExcel || isAnglais || isManagement
+  const isKnownDomain = isFLE || isMassage || isIA || isExcel || isWord || isAnglais || isManagement
     || isDigital || isEsthetique || isInfo || isBureautique;
 
   let finalAttentes = hasEntreprise ? attentesOptions[h(4) % attentesOptions.length] : "/";
