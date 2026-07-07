@@ -10815,6 +10815,21 @@ function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: 
       "Je veux maîtriser les techniques de growth hacking et d'inbound marketing pour générer des leads qualifiés à moindre coût pour mon entreprise.",
       "Mon objectif est de devenir autonome dans la conception et le déploiement de campagnes marketing multicanales (SEO, SEA, social, email) pour mon activité.",
     ];
+  } else if (isWord) {
+    objectifOptions = [
+      "Franchement, je veux juste arrêter de galérer sur Word. Aujourd'hui je sais taper du texte, mais dès qu'il faut mettre en page proprement, je bloque.",
+      "Mon objectif c'est d'être autonome sur les documents que je produis au quotidien — courriers, comptes rendus, notes. Ne plus avoir à demander à quelqu'un dès que je veux insérer un tableau ou un sommaire.",
+      "J'aimerais bien maîtriser les styles et les sommaires automatiques. J'ai toujours fait mes titres à la main et je sais que ce n'est pas la bonne méthode, mais je n'ai jamais pris le temps d'apprendre.",
+      "Je veux gagner du temps, tout simplement. Je passe beaucoup trop d'heures sur la mise en page de mes rapports alors qu'avec les bons réflexes ça devrait aller trois fois plus vite.",
+      "Mon but c'est de savoir faire un publipostage. On m'a demandé plusieurs fois d'envoyer des courriers en série et je me retrouve à les faire un par un, c'est vraiment pas efficace.",
+      "J'aimerais apprendre à créer mes propres modèles Word (papier à en-tête, courrier type, note de service) pour ne plus repartir d'une feuille blanche à chaque fois.",
+      "Concrètement, je veux être à l'aise avec les tableaux, les images et les en-têtes/pieds de page. C'est ce qui me pose le plus de difficultés aujourd'hui.",
+      "Je souhaite consolider mes bases. Je suis autodidacte, je me débrouille, mais j'ai plein de trous — les sauts de section, les notes de bas de page, la numérotation automatique.",
+      "Mon objectif c'est de rendre des documents propres et professionnels. J'ai un peu honte parfois de la mise en forme de ce que je produis et je voudrais que ça change.",
+      "Je veux apprendre les bonnes pratiques dès le départ, pour éviter de prendre de mauvaises habitudes. Je préfère faire les choses bien une fois pour toutes.",
+      "Franchement, j'ai un peu peur de Word. Je voudrais me réconcilier avec l'outil et arriver à l'utiliser sans stress au bureau.",
+      "Mon objectif c'est de finir la formation en étant capable de faire tout ce dont j'ai besoin au quotidien, sans avoir à Googler à chaque fois que je bloque sur quelque chose.",
+    ];
   } else {
     objectifOptions = [
       `Je souhaite acquérir les compétences de base de ${formation} pour gagner en autonomie dans mes tâches quotidiennes et ne plus dépendre de mes collègues pour ces aspects.`,
