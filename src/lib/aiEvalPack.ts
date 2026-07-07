@@ -167,18 +167,15 @@ export function answersForQCM(qcm: AIQCMQuestion[], si: number, s: StagiaireInfo
   });
 }
 
-/** Returns a per-stagiaire student answer derived from corrected response, slightly varied. */
+/** Returns a per-stagiaire student answer derived from corrected response, humanized (oral tone, hesitations, first-person). */
 export function studentAnswerFromCorrection(reponseAttendue: string, s: StagiaireInfo, si: number, qIdx: number): string {
-  // Simple variations: paraphrase prefix + sometimes truncate
-  const variants = [
-    `${s?.prenom || ""} ${s?.nom || ""} – Réponse :\n${reponseAttendue}`,
-    `D'après mon analyse :\n${reponseAttendue}`,
-    `Je propose la solution suivante :\n${reponseAttendue}`,
-    `Voici ma proposition :\n${reponseAttendue}`,
-  ];
+  // Quality varies per stagiaire (0.65 → 0.95) to produce natural variety:
+  // some answers concise/partial, some complete, all in oral first-person tone.
   const seed = stagSeed(s, si, qIdx * 13);
-  return variants[seed % variants.length];
+  const quality = 0.65 + ((seed % 31) / 31) * 0.30;
+  return humanizedStudentAnswer(reponseAttendue, s, si, qIdx, quality);
 }
+
 
 /** Note /points pour une question ouverte (selon stagiaire). 70% des cas = max - 1, 30% = max. */
 export function noteForOpenQuestion(maxPoints: number, s: StagiaireInfo, si: number, qIdx: number): number {
