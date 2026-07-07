@@ -3208,7 +3208,7 @@ function genTempsConnexionReel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
   };
 
   let extra = '';
-  extra += `<p style="margin:6px 0 12px;font-size:11px;color:#555;"><strong>Modalité :</strong> Formation à distance — traçabilité automatique des connexions LMS.<br><strong>Volume cible / jour :</strong> ${hpd}h (les durées réelles peuvent varier de ±10 min).</p>`;
+  extra += `<p style="margin:6px 0 12px;font-size:11px;color:#555;"><strong>Plateforme :</strong> ${f.lieu || 'Classe virtuelle'}</p>`;
   if (mixte) extra += `<p><em>Modalité mixte : seuls les jours réalisés en distanciel apparaissent dans le relevé ci-dessous.</em></p>`;
   if (isCFA) extra += `<p><em>Rythme d'alternance : ${f.rythmeAlternance}. Seules les semaines en CFA apparaissent dans le relevé (les semaines en entreprise ne génèrent pas de connexion LMS).</em></p>`;
 

@@ -504,7 +504,7 @@ export function genEmargementJour_V2(o: OrganismeInfo, f: FormationInfo, stagiai
     const pad = (n: number) => String(n).padStart(2, "0");
 
     extra += `<h3>Relevé de connexion LMS — Formation à distance</h3>`;
-    extra += `<p style="font-size:11px;color:#555;margin:4px 0 12px"><strong>Plateforme :</strong> ${o.outilsUtilises || "Zoom / Teams / LMS Moodle"} — <strong>Volume cible :</strong> ${hpd}h/jour. Les horaires ci-dessous sont issus des logs de connexion réels (timestamps serveur).</p>`;
+    extra += `<p style="font-size:11px;color:#555;margin:4px 0 12px"><strong>Plateforme :</strong> ${f.lieu || 'Classe virtuelle'}</p>`;
 
     const daysList = jourLabel ? [jourLabel] : days;
     const rows: string[][] = [];
