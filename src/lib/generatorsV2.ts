@@ -1238,9 +1238,6 @@ export function genExamenFinalStagiaire(o: OrganismeInfo, f: FormationInfo, stag
     ["Décision", noteFinaleSur20 >= 10 ? "✅ EXAMEN VALIDÉ" : "⚠️ EXAMEN À REPRÉSENTER"],
   ]);
   extra += `<p style="margin-top:24px;"><strong>Appréciation du formateur :</strong> ${s.prenom} ${s.nom} a démontré une bonne maîtrise des compétences clés de la formation « ${f.intitule} ». Les notions fondamentales sont acquises et directement transférables en situation professionnelle.</p>`;
-  extra += `<p style="margin-top:18px;"><strong>Fait à ${o.adresse?.split(',').pop()?.trim() || 'Paris'}, le ${dateFin}</strong></p>`;
-  extra += `<p><strong>Signature du formateur :</strong> ${f.formateur}</p>`;
-  extra += `<p><strong>Signature du stagiaire :</strong> ${s.prenom} ${s.nom}</p>`;
 
   return buildDocument({
     org: o,
