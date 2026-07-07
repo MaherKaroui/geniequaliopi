@@ -10469,11 +10469,18 @@ function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: 
     "OPCO – fonds mutualisés TPE/PME",
     "CPF mobilisé par le salarié avec accord de l'employeur",
   ];
+  // Répartition cible : 70% financement personnel, 20% CPF, 10% OPCO/Transitions Pro (pas de Pôle emploi)
   const financementsIndividuel = [
-    "CPF (Compte Personnel de Formation) – solde suffisant",
-    "Pôle emploi – AIF (Aide Individuelle à la Formation)",
-    "Financement personnel – paiement en 3 fois",
-    "Financement personnel intégral",
+    "Financement personnel intégral (virement à la signature de la convention)",
+    "Financement personnel – règlement en 3 fois sans frais",
+    "Financement personnel – autofinancement, paiement échelonné sur la durée de la formation",
+    "Financement personnel – apport familial + économies personnelles",
+    "Financement personnel – prêt bancaire à taux préférentiel (formation professionnelle)",
+    "Financement personnel – règlement en 4 fois (mensualités adaptées à mon budget)",
+    "Financement personnel intégral, sans mobilisation d'aide externe",
+    "CPF (Compte Personnel de Formation) – solde suffisant pour couvrir l'intégralité de la formation",
+    "CPF partiel + complément en financement personnel (reste à charge autofinancé)",
+    "OPCO / Transitions Pro – projet de reconversion validé avec maintien de rémunération",
   ];
   const budget = hasEntreprise
     ? financementsEntreprise[h(3) % financementsEntreprise.length]
