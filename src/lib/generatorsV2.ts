@@ -49,6 +49,39 @@ function dirigeantSig(o: OrganismeInfo): string {
   return `<p style="font-style:italic;color:#999;margin-top:10px">Cachet de ${o.nom}</p>`;
 }
 
+/** Tampon agrandi + fallback SVG rond pour garantir un cachet visible (attestations de réussite) */
+function bigOrgStamp(o: OrganismeInfo): string {
+  if (o.tamponUrl) {
+    return `<img src="${o.tamponUrl}" alt="Tampon ${o.nom}" style="max-height:150px;max-width:220px;object-fit:contain;opacity:0.9" />`;
+  }
+  const nom = (o.nom || "ORGANISME DE FORMATION").toUpperCase().slice(0, 40);
+  const ville = (o.ville || "").toUpperCase().slice(0, 30);
+  const siret = o.siret ? `SIRET ${o.siret}` : "";
+  const nda = (o as any).nda ? `NDA ${(o as any).nda}` : "";
+  const color = "#0A3D7A";
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 220" width="180" height="180">
+    <defs>
+      <path id="topA" d="M 22,110 A 88,88 0 0,1 198,110" fill="none"/>
+      <path id="botA" d="M 22,110 A 88,88 0 0,0 198,110" fill="none"/>
+    </defs>
+    <circle cx="110" cy="110" r="95" fill="none" stroke="${color}" stroke-width="2.5"/>
+    <circle cx="110" cy="110" r="80" fill="none" stroke="${color}" stroke-width="1.2"/>
+    <text fill="${color}" font-family="Arial, sans-serif" font-size="11" font-weight="bold" letter-spacing="1">
+      <textPath href="#topA" startOffset="50%" text-anchor="middle">${nom}</textPath>
+    </text>
+    <text fill="${color}" font-family="Arial, sans-serif" font-size="9" letter-spacing="0.8">
+      <textPath href="#botA" startOffset="50%" text-anchor="middle">${ville}</textPath>
+    </text>
+    <text x="38" y="112" fill="${color}" font-size="14" font-weight="bold">★</text>
+    <text x="172" y="112" fill="${color}" font-size="14" font-weight="bold">★</text>
+    <text x="110" y="100" fill="${color}" font-size="10" font-weight="bold" text-anchor="middle">${siret}</text>
+    <text x="110" y="118" fill="${color}" font-size="9" text-anchor="middle">${nda}</text>
+    <text x="110" y="135" fill="${color}" font-size="8" text-anchor="middle">CERTIFIÉ QUALIOPI</text>
+  </svg>`;
+  return svg;
+}
+
+
 function formateurSigGen(f: FormationInfo, s?: StagiaireInfo): string {
   // Formateur = signature formateur (du stagiaire ou de la formation)
   const url = s?.formateurSignatureUrl || f.formateurSignatureUrl;
@@ -1332,7 +1365,7 @@ export function genAttestationReussiteStagiaire(o: OrganismeInfo, f: FormationIn
     <p style="margin-top:30px"><strong>Fait à ${o.ville}, le ${dateFait || "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"}</strong></p>
     <p style="margin-top:30px"><strong>Signature et cachet du centre de formation ${o.nom}</strong></p>
     <p style="margin-top:6px">Service pédagogique</p>
-    ${dirigeantSig(o)}
+    <div style="margin-top:14px">${bigOrgStamp(o)}</div>
   `;
 
   return buildDocument({ org: o, title: "ATTESTATION DE RÉUSSITE", subtitle: f.intitule, stagiaires: [s], extraHtml: extra });
