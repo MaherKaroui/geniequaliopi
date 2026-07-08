@@ -38,6 +38,7 @@ import { htmlToPdfBlob } from "@/lib/pdfExport";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useBackgroundJobs } from "@/lib/backgroundJobs";
+import { FACTURES_AKTO_STAGIAIRES, downloadFactureAkto, downloadAllFacturesAktoZip } from "@/lib/opcoFacturesAkto";
 
 const emptyOrganisme: OrganismeInfo = {
   nom: "", siret: "", adresse: "", codePostal: "", ville: "", telephone: "", email: "",
