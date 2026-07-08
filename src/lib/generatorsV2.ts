@@ -1332,7 +1332,7 @@ export function genAttestationReussiteStagiaire(o: OrganismeInfo, f: FormationIn
     <p style="margin-top:30px"><strong>Fait à ${o.ville}, le ${dateFait || "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"}</strong></p>
     <p style="margin-top:30px"><strong>Signature et cachet du centre de formation ${o.nom}</strong></p>
     <p style="margin-top:6px">Service pédagogique</p>
-    ${dirigeantSig(o)}
+    <div style="margin-top:14px">${bigOrgStamp(o)}</div>
   `;
 
   return buildDocument({ org: o, title: "ATTESTATION DE RÉUSSITE", subtitle: f.intitule, stagiaires: [s], extraHtml: extra });
