@@ -38,6 +38,7 @@ import { htmlToPdfBlob } from "@/lib/pdfExport";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useBackgroundJobs } from "@/lib/backgroundJobs";
+import { FACTURES_AKTO_STAGIAIRES, downloadFactureAkto, downloadAllFacturesAktoZip } from "@/lib/opcoFacturesAkto";
 
 const emptyOrganisme: OrganismeInfo = {
   nom: "", siret: "", adresse: "", codePostal: "", ville: "", telephone: "", email: "",
@@ -1078,8 +1079,57 @@ export default function OPCOMobilites() {
           </div>
         </Card>
 
+        {/* Factures AKTO — 1ère échéance (4 stagiaires prédéfinis) */}
+        <Card className="p-5 space-y-3">
+          <div className="flex items-start justify-between flex-wrap gap-3">
+            <div>
+              <h2 className="text-lg font-semibold flex items-center gap-2">
+                <FileText className="w-5 h-5" /> Factures AKTO — 1ère échéance
+              </h2>
+              <p className="text-xs text-muted-foreground mt-1">
+                Génération automatique au format Word (.docx) — modèle annexe AKTO pour SKILLMASTER (RNCP39063).
+              </p>
+            </div>
+            <Button onClick={() => { downloadAllFacturesAktoZip(); toast.success("Téléchargement ZIP des 4 factures"); }} className="gap-2">
+              <FolderArchive className="w-4 h-4" /> Télécharger les 4 (ZIP)
+            </Button>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm border">
+              <thead className="bg-muted">
+                <tr>
+                  <th className="text-left px-3 py-2 border-b">Stagiaire</th>
+                  <th className="text-left px-3 py-2 border-b">N° dossier</th>
+                  <th className="text-left px-3 py-2 border-b">Période</th>
+                  <th className="text-left px-3 py-2 border-b">Montant HT</th>
+                  <th className="px-3 py-2 border-b"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {FACTURES_AKTO_STAGIAIRES.map((s) => (
+                  <tr key={s.dossier} className="border-b hover:bg-muted/30">
+                    <td className="px-3 py-2 font-medium">{s.nom}</td>
+                    <td className="px-3 py-2 font-mono text-xs">{s.dossier}</td>
+                    <td className="px-3 py-2 text-xs">{s.periodeDu} → {s.periodeAu}</td>
+                    <td className="px-3 py-2">{s.montantHT} €</td>
+                    <td className="px-3 py-2 text-right">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="gap-1"
+                        onClick={() => { downloadFactureAkto(s); toast.success(`Facture ${s.nom} téléchargée`); }}
+                      >
+                        <Download className="w-3 h-3" /> Word
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
 
-        {/* Documents par section */}
+
         {(Object.keys(OPCO_CATEGORIES) as OpcoCategory[]).map((cat) => {
           const docs = OPCO_DOCUMENTS.filter((d) => d.category === cat);
           const isOpen = expandedCats.has(cat);
