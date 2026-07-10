@@ -1,0 +1,1 @@
+DROP POLICY IF EXISTS "vi-pack authenticated read" ON storage.objects;
