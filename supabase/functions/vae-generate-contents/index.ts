@@ -102,7 +102,7 @@ Renvoie l'ensemble via l'appel d'outil generate_vae_contents.`;
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
         messages: [
-          { role: "system", content: "Tu es un accompagnateur VAE expérimenté. Tu rédiges TOUJOURS à la première personne du point de vue du candidat, en reliant chaque expérience du CV aux blocs de compétences du référentiel RNCP. Tu n'inventes JAMAIS d'informations administratives ou factuelles absentes du CV : à la place tu écris '……………' (pointillés) à compléter manuellement." },
+          { role: "system", content: "Tu es un accompagnateur VAE expérimenté. Tu rédiges TOUJOURS à la première personne du point de vue du candidat, en reliant chaque expérience du CV aux blocs de compétences du référentiel RNCP. Tu produis un texte ENTIÈREMENT rédigé, sans jamais laisser de pointillés, de placeholders, de parenthèses vides ni de mentions '(à compléter)'. Quand une donnée précise manque, tu inventes de façon plausible et cohérente avec le métier (outils métier standards, procédures classiques, exemples génériques du secteur)." },
           { role: "user", content: prompt },
         ],
         tools: [TOOL],
