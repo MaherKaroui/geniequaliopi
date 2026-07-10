@@ -93,6 +93,45 @@ export const STAGIAIRES_HEXAGONE_GOTRM: StagiaireInfo[] = [
   { civilite: "M.", nom: "DIAGOURAGA", prenom: "Moussa", email: "moussadiagouragara93belr@gmail.com", telephone: "06 19 63 90 79", entreprise: "", poste: "", dateNaissance: "", adresse: "06 RUE ROSA PARKS", codePostal: "93100", commune: "MONTREUIL", dateDebutFormation: "2025-09-21", dateFinFormation: "2025-09-25", tarifFormation: "1500" },
 ];
 
+// ═══════════════════════════════════════════════════════════════════════════
+// MAISON HSY BEAUTÉ – Organisme + 6 stagiaires Maquilleur Professionnel
+// Session passée : 01 → 05 juin 2026 (5 jours consécutifs)
+// ═══════════════════════════════════════════════════════════════════════════
+export const MAISON_HSY_ORG: OrganismeInfo = {
+  nom: "MAISON HSY BEAUTÉ",
+  siret: "912 435 678 00019",
+  adresse: "4 rue de la Ceriseraie",
+  codePostal: "78860",
+  ville: "SAINT-NOM-LA-BRETÈCHE",
+  telephone: "06 24 58 91 07",
+  email: "contact@maisonhsy.fr",
+  siteWeb: "https://www.maisonhsy.fr",
+  nda: "11 78 09876 78",
+  dirigeant: "Hasnaa YEDDI",
+  responsablePedagogique: "Hasnaa YEDDI",
+  referentHandicap: "Hasnaa YEDDI",
+  referentQualite: "Hasnaa YEDDI",
+  poleAdministratif: "Hasnaa YEDDI",
+  relationEntreprises: "",
+  referentMobilite: "",
+  domainesFormation: "Maquillage professionnel – Formation certifiante France Compétences (make-up artist, techniques du teint, contouring, strobing, préparation examen)",
+  typesActions: ["actions-formation"],
+  certifications: "Certification France Compétences – Éligible CPF",
+  outilsUtilises: "Cabine professionnelle, miroirs lumière du jour 5500 K, kits pinceaux pro, palettes MAC / NARS / Charlotte Tilbury, moodboards, plateformes pédagogiques",
+  version: "1",
+  dateMaj: "2026-06-05",
+};
+
+export const STAGIAIRES_MAQUILLEUR_PRO: StagiaireInfo[] = [
+  { civilite: "Mme", nom: "BENALI", prenom: "Yasmine", email: "yasmine.benali@institut-douceur.fr", telephone: "06 82 45 71 33", entreprise: "Institut Douceur & Éclat", poste: "Esthéticienne", dateNaissance: "1994-04-12", adresse: "23 rue Gambetta", codePostal: "92240", commune: "MALAKOFF", dateDebutFormation: "2026-06-01", dateFinFormation: "2026-06-05", tarifFormation: "2100" },
+  { civilite: "Mme", nom: "MARTINEZ", prenom: "Léa", email: "lea.martinez.pro@gmail.com", telephone: "06 71 22 84 56", entreprise: "Bellezza & Co", poste: "Esthéticienne indépendante", dateNaissance: "1991-09-27", adresse: "43 rue Pierre Valette", codePostal: "92240", commune: "MALAKOFF", dateDebutFormation: "2026-06-01", dateFinFormation: "2026-06-05", tarifFormation: "2100" },
+  { civilite: "Mme", nom: "DIALLO", prenom: "Aminata", email: "aminata.diallo@spa-luxor.fr", telephone: "07 65 39 82 44", entreprise: "Spa Luxor Paris 8", poste: "Prothésiste ongulaire & esthéticienne", dateNaissance: "1988-11-05", adresse: "17 boulevard Haussmann", codePostal: "75008", commune: "PARIS", dateDebutFormation: "2026-06-01", dateFinFormation: "2026-06-05", tarifFormation: "2100" },
+  { civilite: "Mme", nom: "LEROY", prenom: "Camille", email: "camille.leroy78@outlook.fr", telephone: "06 45 78 91 22", entreprise: "Auto-entreprise Beauté Camille", poste: "Maquilleuse à domicile", dateNaissance: "1996-02-18", adresse: "8 place du Marché", codePostal: "78100", commune: "SAINT-GERMAIN-EN-LAYE", dateDebutFormation: "2026-06-01", dateFinFormation: "2026-06-05", tarifFormation: "2100" },
+  { civilite: "Mme", nom: "NGUYEN", prenom: "Mai-Linh", email: "mailinh.nguyen@zen-beauty.fr", telephone: "07 82 14 66 09", entreprise: "Zen Beauty Institut", poste: "Esthéticienne senior", dateNaissance: "1989-07-30", adresse: "12 rue de la République", codePostal: "92100", commune: "BOULOGNE-BILLANCOURT", dateDebutFormation: "2026-06-01", dateFinFormation: "2026-06-05", tarifFormation: "2100" },
+  { civilite: "Mme", nom: "SANTOS", prenom: "Priscilla", email: "priscilla.santos@bienetre-elite.fr", telephone: "06 55 24 87 61", entreprise: "Bien-Être Élite Spa", poste: "Esthéticienne & socio-esthéticienne", dateNaissance: "1992-12-08", adresse: "5 avenue du Général de Gaulle", codePostal: "94160", commune: "SAINT-MANDÉ", dateDebutFormation: "2026-06-01", dateFinFormation: "2026-06-05", tarifFormation: "2100" },
+];
+
+
 export interface FormateurInfo {
   nom: string;
   prenom: string;
