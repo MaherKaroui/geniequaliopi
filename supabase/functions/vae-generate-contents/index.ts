@@ -5,39 +5,53 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-async function requireAuth(req: Request): Promise<Response | null> {
-  const authHeader = req.headers.get("Authorization");
-  if (!authHeader?.startsWith("Bearer ")) {
-    return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+const SYSTEM_PROMPT = "Tu es un accompagnateur VAE expérimenté. Tu rédiges TOUJOURS à la première personne du point de vue du candidat, en reliant chaque expérience du CV aux blocs de compétences du référentiel RNCP. Tu produis un texte ENTIÈREMENT rédigé, sans jamais laisser de pointillés, de placeholders, de parenthèses vides, de mentions '(à compléter)', 'À rédiger', 'À compléter', 'À rédiger avec le candidat', ni aucune phrase inachevée. Quand une donnée précise manque, tu inventes de façon plausible et cohérente avec le métier (outils métier standards, procédures classiques, exemples génériques du secteur). RÈGLE DE GENRE ABSOLUE : tu accordes systématiquement TOUS les adjectifs, participes passés et noms au genre exact du candidat (civilité M. = masculin, Mme = féminin). Tu écris directement 'né', 'salarié', 'engagé', 'responsable', 'formé' pour un homme, et 'née', 'salariée', 'engagée', 'responsable', 'formée' pour une femme. INTERDICTION FORMELLE d'utiliser des formes inclusives entre parenthèses comme '(e)', '(le)', '(la)', 'né(e)', 'salarié(e)', 'engagé(e)', 'diplômé(e)', ni le point médian (·), ni la barre oblique (/). Le texte doit se lire naturellement à la première personne avec un accord de genre unique et cohérent du début à la fin. Tu termines toujours tes phrases proprement.";
+
+const MODEL = "google/gemini-2.5-flash";
+
+async function callAI(key: string, userPrompt: string, tool: any, toolName: string, maxTokens = 8000): Promise<any> {
+  const r = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: MODEL,
+      messages: [
+        { role: "system", content: SYSTEM_PROMPT },
+        { role: "user", content: userPrompt },
+      ],
+      tools: [tool],
+      tool_choice: { type: "function", function: { name: toolName } },
+      max_tokens: maxTokens,
+    }),
+  });
+  if (!r.ok) {
+    if (r.status === 429) throw new Error("__RATE__");
+    if (r.status === 402) throw new Error("__CREDITS__");
+    throw new Error("AI gateway error " + r.status);
   }
-  const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_ANON_KEY")!);
-  const { data, error } = await supabase.auth.getUser(authHeader.replace("Bearer ", ""));
-  if (error || !data?.user) {
-    return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+  const data = await r.json();
+  const msg = data.choices?.[0]?.message;
+  let payload: string | undefined = msg?.tool_calls?.[0]?.function?.arguments;
+  if (!payload && typeof msg?.content === "string") {
+    const m = msg.content.match(/\{[\s\S]*\}/);
+    if (m) payload = m[0];
   }
-  return null;
+  if (!payload) {
+    console.error("No tool call. finish_reason:", data.choices?.[0]?.finish_reason, "raw:", JSON.stringify(data).slice(0, 2000));
+    throw new Error("Réponse IA vide");
+  }
+  return JSON.parse(payload);
 }
 
-const TOOL = {
+const MAIN_TOOL = {
   type: "function",
   function: {
-    name: "generate_vae_contents",
+    name: "generate_vae_main",
     parameters: {
       type: "object",
       properties: {
-        motivation: { type: "string", description: "Motivation du candidat (10-15 lignes)" },
-        parcours: { type: "string", description: "Synthèse du parcours professionnel (10-15 lignes)" },
-        situationsParBloc: {
-          type: "array",
-          items: {
-            type: "object",
-            properties: {
-              codeBloc: { type: "string" }, intitule: { type: "string" },
-              situations: { type: "string", description: "Description détaillée des situations de travail (15-25 lignes)" },
-            },
-            required: ["codeBloc", "intitule", "situations"],
-          },
-        },
+        motivation: { type: "string" },
+        parcours: { type: "string" },
         besoins: {
           type: "object",
           properties: {
@@ -49,7 +63,23 @@ const TOOL = {
         planAccompagnement: { type: "string" },
         synthese: { type: "string" },
       },
-      required: ["motivation", "parcours", "situationsParBloc", "besoins", "planAccompagnement", "synthese"],
+      required: ["motivation", "parcours", "besoins", "planAccompagnement", "synthese"],
+    },
+  },
+};
+
+const BLOC_TOOL = {
+  type: "function",
+  function: {
+    name: "generate_vae_bloc",
+    parameters: {
+      type: "object",
+      properties: {
+        codeBloc: { type: "string" },
+        intitule: { type: "string" },
+        situations: { type: "string" },
+      },
+      required: ["codeBloc", "intitule", "situations"],
     },
   },
 };
@@ -62,74 +92,73 @@ Deno.serve(async (req) => {
     const key = Deno.env.get("LOVABLE_API_KEY");
     if (!key) throw new Error("LOVABLE_API_KEY not configured");
 
-    const prompt = `Contexte : rédaction d'un dossier VAE (Validation des Acquis de l'Expérience) à partir du CV et des informations ci-dessous.
+    const ctx = `ORGANISME : ${JSON.stringify(organisme)}
+CERTIFICATION : ${JSON.stringify(certification)}
+CANDIDAT : ${JSON.stringify(candidat)}
+SESSION : ${JSON.stringify(session)}`;
 
-ORGANISME ACCOMPAGNATEUR : ${JSON.stringify(organisme)}
-CERTIFICATION VISÉE (référentiel RNCP, blocs de compétences inclus) : ${JSON.stringify(certification)}
-CANDIDAT (extrait du CV + formulaire) : ${JSON.stringify(candidat)}
-SESSION D'ACCOMPAGNEMENT : ${JSON.stringify(session)}
+    // 1) Main sections
+    const mainPrompt = `${ctx}
 
-RÈGLES DE RÉDACTION IMPÉRATIVES :
-1. Écris systématiquement à la PREMIÈRE PERSONNE ("je", "j'ai", "mon parcours…"), du point de vue du candidat s'adressant au jury de certification.
-2. Français professionnel, ton posé et réflexif (registre attendu par un jury VAE), sans formule commerciale ni superlatif.
-3. COHÉRENCE ABSOLUE entre toutes les sections : mêmes intitulés de postes, mêmes employeurs, mêmes dates et durées que le CV. Ne jamais renommer un poste ni décaler une date entre deux sections.
-4. Pour chaque bloc de compétences du RNCP (situationsParBloc — UNE entrée par bloc listé dans la certification), tu DOIS relier explicitement les expériences réelles du CV aux compétences et activités du référentiel : reprends le libellé exact du bloc, puis décris 2 à 4 situations de travail concrètes (contexte, mission, actions menées, outils, résultats si disponibles, période et employeur) qui prouvent la maîtrise des compétences du bloc. Nomme les compétences visées telles qu'elles apparaissent dans le référentiel France Compétences.
-5. Dans "motivation" et "parcours", relie de la même façon le projet professionnel du candidat aux compétences du référentiel visé.
-6. INTERDICTION ABSOLUE d'insérer des pointillés "……………", des espaces à compléter, "(..................)", "[à compléter]" ou toute marque de champ vide. TOUT doit être rédigé et complet. Si une donnée précise manque dans le CV, tu inventes de manière PLAUSIBLE et COHÉRENTE avec le métier et le secteur (nom d'outil métier crédible, procédure standard, exemple générique du secteur) — jamais de trou visible dans le texte final. Seules restent interdites les données strictement personnelles sensibles (n° sécurité sociale, date/lieu de naissance exact, adresse personnelle) : dans ces cas très rares, reformule pour ne pas en avoir besoin plutôt que de laisser un vide.
-7. Les résultats chiffrés inventés sont autorisés s'ils restent réalistes et modestes (ex. "une équipe d'environ 5 personnes", "un portefeuille d'une trentaine de clients"). Ne jamais laisser une phrase inachevée faute de chiffre.
-8. Longueurs indicatives : motivation ~12 lignes, parcours ~12 lignes, chaque bloc ~40 à 60 lignes au total (4 sous-parties), chaque champ de besoins ~3 à 5 lignes, planAccompagnement ~10 lignes, synthese ~8 lignes. Aucune section ne doit être vide ni contenir de placeholder.
-9. FORMAT OBLIGATOIRE du champ "situations" de chaque bloc : structure en 4 sous-sections marquées par des balises littérales (ne pas les traduire, ne pas les omettre, une seule fois chacune, dans cet ordre, séparées par une ligne vide) :
+Rédige les sections principales du dossier VAE à la première personne (candidat), en français professionnel, sans aucun placeholder ni marqueur "À rédiger"/"À compléter". Longueurs :
+- motivation : ~12 lignes reliant le projet aux compétences du référentiel visé
+- parcours : ~12 lignes synthétisant le parcours en cohérence avec le CV
+- besoins (attentes, freins, disponibilites, materiel, handicap) : 3 à 5 lignes chacun, entièrement rédigés
+- planAccompagnement : ~10 lignes
+- synthese : ~8 lignes
+
+TOUT doit être complet et rédigé. Si une info manque, invente de façon plausible et cohérente avec le métier. Renvoie via l'outil generate_vae_main.`;
+
+    const main = await callAI(key, mainPrompt, MAIN_TOOL, "generate_vae_main", 6000);
+
+    // 2) One call per bloc (guarantees no truncation)
+    const blocs: any[] = Array.isArray(certification?.blocs) ? certification.blocs : [];
+    const situationsParBloc: any[] = [];
+
+    for (const b of blocs) {
+      const blocPrompt = `${ctx}
+
+BLOC À TRAITER : code=${b.code || b.codeBloc || ""} — intitulé="${b.intitule || b.libelle || ""}"
+Compétences du bloc : ${JSON.stringify(b.competences || b.criteres || [])}
+
+Rédige UNIQUEMENT le champ "situations" pour CE bloc, à la première personne, ENTIÈREMENT rédigé, sans aucun placeholder, "À rédiger", pointillés ou parenthèses vides. Décris 2 à 4 situations concrètes reliant les expériences du CV aux compétences du bloc.
+
+FORMAT OBLIGATOIRE : 4 sous-sections marquées par ces balises littérales dans cet ordre, séparées par une ligne vide, chacune ENTIÈREMENT rédigée :
 
 [CONTEXTE]
-(8-12 lignes : contexte et finalité de l'activité — secteur, employeur, période, objectifs poursuivis, place dans l'organisation)
+(8-12 lignes : secteur, employeur, période, objectifs, place dans l'organisation)
 
 [DESCRIPTION]
-(12-18 lignes : description détaillée des activités que j'ai exercées — étapes concrètes, tâches, interlocuteurs, exemples de missions représentatives, période et employeur cités)
+(12-18 lignes : activités concrètes exercées, étapes, tâches, interlocuteurs, missions représentatives, période et employeur cités)
 
 [MOYENS]
-(6-10 lignes : moyens et ressources que j'ai mobilisés — outils logiciels, méthodes, procédures, référentiels, appuis humains, matériels)
+(6-10 lignes : outils logiciels, méthodes, procédures, référentiels, appuis)
 
 [ANALYSE]
-(10-15 lignes : analyse des compétences que j'ai mises en œuvre en lien avec le référentiel du bloc — nommer chaque compétence du bloc et expliquer comment je l'ai mobilisée, avec preuve tirée du CV)
+(10-15 lignes : nommer chaque compétence du bloc et expliquer comment je l'ai mobilisée, avec preuve du CV)
 
-Aucune des 4 balises ne doit être vide ; toutes les sous-sections doivent être entièrement rédigées, sans pointillés ni marqueurs "à compléter".
+Reprends codeBloc="${b.code || b.codeBloc || ""}" et intitule="${b.intitule || b.libelle || ""}" à l'identique. Renvoie via l'outil generate_vae_bloc.`;
 
-Renvoie l'ensemble via l'appel d'outil generate_vae_contents.`;
-
-    const r = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          { role: "system", content: "Tu es un accompagnateur VAE expérimenté. Tu rédiges TOUJOURS à la première personne du point de vue du candidat, en reliant chaque expérience du CV aux blocs de compétences du référentiel RNCP. Tu produis un texte ENTIÈREMENT rédigé, sans jamais laisser de pointillés, de placeholders, de parenthèses vides ni de mentions '(à compléter)'. Quand une donnée précise manque, tu inventes de façon plausible et cohérente avec le métier (outils métier standards, procédures classiques, exemples génériques du secteur). RÈGLE DE GENRE ABSOLUE : tu accordes systématiquement TOUS les adjectifs, participes passés et noms au genre exact du candidat (civilité M. = masculin, Mme = féminin). Tu écris directement 'né', 'salarié', 'engagé', 'responsable', 'formé' pour un homme, et 'née', 'salariée', 'engagée', 'responsable', 'formée' pour une femme. INTERDICTION FORMELLE d'utiliser des formes inclusives entre parenthèses comme '(e)', '(le)', '(la)', 'né(e)', 'salarié(e)', 'engagé(e)', 'diplômé(e)', ni le point médian (·), ni la barre oblique (/). Le texte doit se lire naturellement à la première personne avec un accord de genre unique et cohérent du début à la fin." },
-          { role: "user", content: prompt },
-        ],
-        tools: [TOOL],
-        tool_choice: { type: "function", function: { name: "generate_vae_contents" } },
-        max_tokens: 16000,
-      }),
-    });
-
-    if (!r.ok) {
-      if (r.status === 429) return new Response(JSON.stringify({ error: "Trop de requêtes" }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-      if (r.status === 402) return new Response(JSON.stringify({ error: "Crédits IA épuisés" }), { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-      throw new Error("AI gateway error");
+      try {
+        const bloc = await callAI(key, blocPrompt, BLOC_TOOL, "generate_vae_bloc", 8000);
+        situationsParBloc.push({
+          codeBloc: bloc.codeBloc || b.code || b.codeBloc || "",
+          intitule: bloc.intitule || b.intitule || b.libelle || "",
+          situations: bloc.situations || "",
+        });
+      } catch (e) {
+        console.error("Bloc failed", b.code, e);
+        throw e;
+      }
     }
-    const data = await r.json();
-    const msg = data.choices?.[0]?.message;
-    let payload: string | undefined = msg?.tool_calls?.[0]?.function?.arguments;
-    if (!payload && typeof msg?.content === "string") {
-      const m = msg.content.match(/\{[\s\S]*\}/);
-      if (m) payload = m[0];
-    }
-    if (!payload) {
-      console.error("No tool call. finish_reason:", data.choices?.[0]?.finish_reason, "raw:", JSON.stringify(data).slice(0, 3000));
-      throw new Error("La réponse IA était vide (contenu probablement trop long). Réessayez ou réduisez le CV.");
-    }
-    return new Response(payload, { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+
+    const result = { ...main, situationsParBloc };
+    return new Response(JSON.stringify(result), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
   } catch (e) {
+    const m = (e as Error).message;
+    if (m === "__RATE__") return new Response(JSON.stringify({ error: "Trop de requêtes, réessayez dans un instant" }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    if (m === "__CREDITS__") return new Response(JSON.stringify({ error: "Crédits IA épuisés" }), { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     console.error("vae-generate-contents error", e);
-    return new Response(JSON.stringify({ error: (e as Error).message }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    return new Response(JSON.stringify({ error: m }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
   }
 });
