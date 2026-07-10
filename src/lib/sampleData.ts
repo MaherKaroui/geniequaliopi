@@ -93,6 +93,45 @@ export const STAGIAIRES_HEXAGONE_GOTRM: StagiaireInfo[] = [
   { civilite: "M.", nom: "DIAGOURAGA", prenom: "Moussa", email: "moussadiagouragara93belr@gmail.com", telephone: "06 19 63 90 79", entreprise: "", poste: "", dateNaissance: "", adresse: "06 RUE ROSA PARKS", codePostal: "93100", commune: "MONTREUIL", dateDebutFormation: "2025-09-21", dateFinFormation: "2025-09-25", tarifFormation: "1500" },
 ];
 
+// ═══════════════════════════════════════════════════════════════════════════
+// MAISON HSY BEAUTÉ – Organisme + 6 stagiaires Maquilleur Professionnel
+// Session passée : 01 → 05 juin 2026 (5 jours consécutifs)
+// ═══════════════════════════════════════════════════════════════════════════
+export const MAISON_HSY_ORG: OrganismeInfo = {
+  nom: "MAISON HSY BEAUTÉ",
+  siret: "912 435 678 00019",
+  adresse: "4 rue de la Ceriseraie",
+  codePostal: "78860",
+  ville: "SAINT-NOM-LA-BRETÈCHE",
+  telephone: "06 24 58 91 07",
+  email: "contact@maisonhsy.fr",
+  siteWeb: "https://www.maisonhsy.fr",
+  nda: "11 78 09876 78",
+  dirigeant: "Hasnaa YEDDI",
+  responsablePedagogique: "Hasnaa YEDDI",
+  referentHandicap: "Hasnaa YEDDI",
+  referentQualite: "Hasnaa YEDDI",
+  poleAdministratif: "Hasnaa YEDDI",
+  relationEntreprises: "",
+  referentMobilite: "",
+  domainesFormation: "Maquillage professionnel – Formation certifiante France Compétences (make-up artist, techniques du teint, contouring, strobing, préparation examen)",
+  typesActions: ["actions-formation"],
+  certifications: "Certification France Compétences – Éligible CPF",
+  outilsUtilises: "Cabine professionnelle, miroirs lumière du jour 5500 K, kits pinceaux pro, palettes MAC / NARS / Charlotte Tilbury, moodboards, plateformes pédagogiques",
+  version: "1",
+  dateMaj: "2026-06-05",
+};
+
+export const STAGIAIRES_MAQUILLEUR_PRO: StagiaireInfo[] = [
+  { civilite: "Mme", nom: "BENALI", prenom: "Yasmine", email: "yasmine.benali@institut-douceur.fr", telephone: "06 82 45 71 33", entreprise: "Institut Douceur & Éclat", poste: "Esthéticienne", dateNaissance: "1994-04-12", adresse: "23 rue Gambetta", codePostal: "92240", commune: "MALAKOFF", dateDebutFormation: "2026-06-01", dateFinFormation: "2026-06-05", tarifFormation: "2100" },
+  { civilite: "Mme", nom: "MARTINEZ", prenom: "Léa", email: "lea.martinez.pro@gmail.com", telephone: "06 71 22 84 56", entreprise: "Bellezza & Co", poste: "Esthéticienne indépendante", dateNaissance: "1991-09-27", adresse: "43 rue Pierre Valette", codePostal: "92240", commune: "MALAKOFF", dateDebutFormation: "2026-06-01", dateFinFormation: "2026-06-05", tarifFormation: "2100" },
+  { civilite: "Mme", nom: "DIALLO", prenom: "Aminata", email: "aminata.diallo@spa-luxor.fr", telephone: "07 65 39 82 44", entreprise: "Spa Luxor Paris 8", poste: "Prothésiste ongulaire & esthéticienne", dateNaissance: "1988-11-05", adresse: "17 boulevard Haussmann", codePostal: "75008", commune: "PARIS", dateDebutFormation: "2026-06-01", dateFinFormation: "2026-06-05", tarifFormation: "2100" },
+  { civilite: "Mme", nom: "LEROY", prenom: "Camille", email: "camille.leroy78@outlook.fr", telephone: "06 45 78 91 22", entreprise: "Auto-entreprise Beauté Camille", poste: "Maquilleuse à domicile", dateNaissance: "1996-02-18", adresse: "8 place du Marché", codePostal: "78100", commune: "SAINT-GERMAIN-EN-LAYE", dateDebutFormation: "2026-06-01", dateFinFormation: "2026-06-05", tarifFormation: "2100" },
+  { civilite: "Mme", nom: "NGUYEN", prenom: "Mai-Linh", email: "mailinh.nguyen@zen-beauty.fr", telephone: "07 82 14 66 09", entreprise: "Zen Beauty Institut", poste: "Esthéticienne senior", dateNaissance: "1989-07-30", adresse: "12 rue de la République", codePostal: "92100", commune: "BOULOGNE-BILLANCOURT", dateDebutFormation: "2026-06-01", dateFinFormation: "2026-06-05", tarifFormation: "2100" },
+  { civilite: "Mme", nom: "SANTOS", prenom: "Priscilla", email: "priscilla.santos@bienetre-elite.fr", telephone: "06 55 24 87 61", entreprise: "Bien-Être Élite Spa", poste: "Esthéticienne & socio-esthéticienne", dateNaissance: "1992-12-08", adresse: "5 avenue du Général de Gaulle", codePostal: "94160", commune: "SAINT-MANDÉ", dateDebutFormation: "2026-06-01", dateFinFormation: "2026-06-05", tarifFormation: "2100" },
+];
+
+
 export interface FormateurInfo {
   nom: string;
   prenom: string;
@@ -112,6 +151,24 @@ export const SAMPLE_FORMATEURS: FormateurInfo[] = [
 ];
 
 export const SAMPLE_FORMATIONS: FormationInfo[] = [
+  {
+    intitule: "Maquilleur Professionnel – Formation certifiante (Maison HSY)",
+    objectifs: "Se former aux métiers de maquilleur professionnel et obtenir une formation certifiante reconnue par France Compétences.\nÀ l'issue de la formation, la stagiaire sera capable de :\n- Accueillir la cliente et appliquer le protocole d'hygiène professionnel.\n- Identifier les types de peau, la morphologie du visage, la colorimétrie et les carnations.\n- Préparer la peau et corriger les imperfections avec les techniques adaptées.\n- Maîtriser l'application du fond de teint, du contouring et du strobing.\n- Structurer les sourcils (points d'or A-B-C), maquiller les yeux et la bouche selon la morphologie.\n- Réaliser une prestation de maquillage professionnel complet en 1h30.\n- Réussir l'examen de certification (QCM + mise en situation avec tirage au sort du look).",
+    prerequis: "Travailler dans le domaine de l'esthétique et/ou du bien-être ; justifier d'une expérience professionnelle d'au moins 1 an dans le domaine de l'esthétique / bien-être.",
+    duree: "35 heures (5 jours)",
+    modalites: "présentiel",
+    tarif: "2 100 € TTC (paiement en plusieurs fois disponible via Pay Beauty ; éligible CPF)",
+    programme: "Jour 1 – Accueil client, protocole d'hygiène, identification des types de peaux et produits adaptés.\nJour 2 – Morphologie du faciès et diagnostic du maquillage adapté, technique de préparation de la peau, correction des imperfections.\nJour 3 – Technique d'application du fond de teint, technique du contouring, technique du strobing.\nJour 4 – Structure du sourcil (points d'or A-B-C), maquillage des yeux (nude, smoky, cut-crease, halo, winged liner), forme et contour de la bouche.\nJour 5 – Passage de l'examen : QCM 20 questions (20 min, vocabulaire, fonctionnalité des produits, colorimétrie, carnation) + mise en situation professionnelle 1h30 (prestation complète avec tirage au sort du look sur 3 : jour, soirée, mariée).",
+    methodesEvaluation: "Test de positionnement en début de formation (10 QCM), 4 exercices pratiques quotidiens sur modèle vivant, test de positionnement en fin de formation (10 QCM), évaluation finale certificative : QCM 20 questions (20 min) + mise en situation professionnelle 1h30 (accueil, hygiène, choix produits, prestation complète, satisfaction cliente – look tiré au sort sur 3), attestation de fin de formation, questionnaire de satisfaction à chaud et à froid.",
+    moyensPedagogiques: "Cabines professionnelles équipées (miroirs lumière du jour 5500 K, fauteuils hydrauliques), kits de pinceaux professionnels (12 pinceaux essentiels), palettes MAC / NARS / Charlotte Tilbury, modèles vivants pour la pratique quotidienne, moodboards, supports de cours numériques 30+ pages, démonstrations par la formatrice, mise en situation continue et débriefing personnalisé.",
+    publicVise: "Esthéticiennes, socio-esthéticiennes, prothésistes ongulaires, professionnelles du bien-être justifiant d'au moins 1 an d'expérience, souhaitant se spécialiser en maquillage professionnel et obtenir une certification reconnue.",
+    delaiAcces: "14 jours après validation de la préinscription et réception du dossier complet",
+    dateDebut: "2026-06-01",
+    dateFin: "2026-06-05",
+    lieu: "Maison HSY, 4 rue de la Ceriseraie, 78860 Saint-Nom-la-Bretèche / Bellezza & Co – Espace coworking beauté, 43 rue Pierre Valette, 92240 Malakoff",
+    nombreParticipants: "6",
+    formateur: "Hasnaa YEDDI",
+  },
   {
     intitule: "Initiation au Management",
     objectifs: "Développer les compétences essentielles du management opérationnel afin d'encadrer, motiver et organiser une équipe de travail dans un environnement professionnel.\nÀ l'issue de la formation, le stagiaire sera capable de :\n- Identifier son rôle et ses responsabilités managériales.\n- Adapter son style de management aux situations et aux profils de collaborateurs.\n- Fixer des objectifs clairs (SMART) et assurer leur suivi.\n- Communiquer efficacement et gérer les tensions et conflits au sein de son équipe.\n- Motiver et fédérer une équipe autour d'un projet commun.",

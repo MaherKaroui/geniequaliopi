@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Upload, Sparkles, Loader2, RefreshCw, FileDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { SAMPLE_FORMATIONS, STAGIAIRES_BAC_PRO_LOGISTIQUE, STAGIAIRES_HEXAGONE_GOTRM, HEXAGONE_FORMATION_ORG } from "@/lib/sampleData";
+import { SAMPLE_FORMATIONS, STAGIAIRES_BAC_PRO_LOGISTIQUE, STAGIAIRES_HEXAGONE_GOTRM, HEXAGONE_FORMATION_ORG, MAISON_HSY_ORG, STAGIAIRES_MAQUILLEUR_PRO } from "@/lib/sampleData";
 import { parseEdofXlsx, EdofSession } from "@/lib/edofParser";
 import { RNCP_FICHES } from "@/lib/rncpData";
 import { supabase } from "@/integrations/supabase/client";
@@ -179,6 +179,16 @@ const FormationForm = ({ data, onChange, onImportStagiaires, onApplyOrganisme }:
           onImportStagiaires([...STAGIAIRES_HEXAGONE_GOTRM]);
         }
         toast.success(`Organisme HEXAGONE FORMATION + 10 stagiaires GOTRM importés`);
+      }
+      // Auto-import organisme + 6 stagiaires pour Maquilleur Professionnel (Maison HSY)
+      if (selected.intitule.toLowerCase().includes("maquilleur")) {
+        if (onApplyOrganisme) {
+          onApplyOrganisme({ ...MAISON_HSY_ORG });
+        }
+        if (onImportStagiaires) {
+          onImportStagiaires([...STAGIAIRES_MAQUILLEUR_PRO]);
+        }
+        toast.success(`Organisme MAISON HSY BEAUTÉ + 6 stagiaires Maquilleur Pro importés`);
       }
     }
   };
