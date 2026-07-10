@@ -384,17 +384,21 @@ export function getLivret2HTML(d: VAEData): string {
   };
 
   const situationsHTML = situationsBloc.map((b, idx) => {
-    const { contexte, description, moyens, analyse } = parseSituation(b.situations);
+    const parsed = parseSituation(b.situations);
+    const contexte = cleanGeneratedText(parsed.contexte) || fallbackVAESection(c, b, "contexte");
+    const description = cleanGeneratedText(parsed.description) || fallbackVAESection(c, b, "description");
+    const moyens = cleanGeneratedText(parsed.moyens) || fallbackVAESection(c, b, "moyens");
+    const analyse = isIncompleteVAEAnalysis(parsed.analyse) ? fallbackVAESection(c, b, "analyse") : cleanGeneratedText(parsed.analyse);
     return `
       <h3>Situation ${idx + 1} — ${esc(b.intitule)} (${esc(b.codeBloc)})</h3>
       <h3>3.${idx + 1}.1 — Contexte et finalité de l'activité</h3>
-      <p>${nl2br(contexte) || "<em>À rédiger avec le candidat.</em>"}</p>
+      <p>${nl2br(contexte)}</p>
       <h3>3.${idx + 1}.2 — Description détaillée des activités que j'ai exercées</h3>
-      <p>${nl2br(description) || "<em>À rédiger.</em>"}</p>
+      <p>${nl2br(description)}</p>
       <h3>3.${idx + 1}.3 — Moyens et ressources que j'ai mobilisés</h3>
-      <p>${nl2br(moyens) || "<em>À rédiger.</em>"}</p>
+      <p>${nl2br(moyens)}</p>
       <h3>3.${idx + 1}.4 — Analyse des compétences que j'ai mises en œuvre</h3>
-      <p>${nl2br(analyse) || "<em>À rédiger en lien avec le référentiel du bloc.</em>"}</p>
+      <p>${nl2br(analyse)}</p>
     `;
   }).join("");
 
