@@ -23,6 +23,7 @@ import { getRNCPByCode } from "./rncpData";
 import { generateExcelSuiviInscriptions, generateExcelSuiviParcoursBeneficiairesCFA, generateExcelSuiviPublicBeneficiaire, generateExcelSuiviPFMP, generateExcelOutilsSuiviAlternance, generateExcelTableauSuiviParcours } from "./xlsxGenerator";
 import { genVisuelMissionCFA } from "./visuelsMissionsCFA";
 import inserjeunesNtcAsset from "@/assets/inserjeunes-ntc.png.asset.json";
+import izibusinessTamponAsset from "@/assets/izibusiness_tampon.png.asset.json";
 import { genNewsletterMissionCFA } from "./newslettersMissionsCFA";
 import { getModuleSpecificConsigne, buildModuleSpecificResponse } from "./cfaExerciseContent";
 import { genProcedureAbandonReorientationCFA, genAccompagnementDistancielCFA, genEnquetePartenaireEmployeurCFA, genFicheRenseignementsCommanditaireCFA, genContratApprentissageModeEmploiCFA, genProcedureAccueilBeneficiairesCFA, genProcedureAdaptationPedagogiqueCFA, genProcedureGestionAnnulationsCFA, genProcedureRuptureContratApprentissageCFA, genCasRuptureContratApprentissageCFA, genLivretApprentissageCFA as genLivretApprentissageInd10, genLivretMaitreApprentissageCFA, genMesuresEngagementBeneficiairesCFA, genPreventionGestionAbandonsCFA, genGuideEntretienAbandonsCFA, genEviterSituationsEchecCFA, genProcedureAnnulationsAbandonsCFA, genFichierGestionAnnulationsCFA, genAccompagnementRechercheContratCFA, genListeAideSocialCFA, genCertificatRealisationCFA, genWebinaireFormationCompetencesCFA, genWebinaireNTCCFA, genDroitsDevoirsApprentiCFA, genReglesSSMilieuProCFA } from "./templatesCFA";
@@ -12248,6 +12249,8 @@ function genAttestationFinFormationFDCertif(o: OrganismeInfo, f?: FormationInfo)
       <div class="label">Pour IZIBUSINESS</div>
       <div class="name">Mme Nadine DENDANI, Présidente</div>
       <div class="place">Fait à Choisy-le-Roi, le ${fmt(dFin)}</div>
+      <img src="${izibusinessTamponAsset.url}" alt="Tampon IZIBUSINESS" style="max-height:100px;max-width:220px;object-fit:contain;margin-top:8px">
+
       
     </div>
   </div>
