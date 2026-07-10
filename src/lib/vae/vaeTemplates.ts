@@ -41,6 +41,11 @@ function nomPrenomUpper(c: VAECandidat): string {
   return `${c.nom.toUpperCase()} ${c.prenom}`.trim();
 }
 
+// Accord de genre : renvoie la forme masculine ou féminine selon la civilité
+function g(c: VAECandidat, masc: string, fem: string): string {
+  return c.civilite === "Mme" ? fem : masc;
+}
+
 // ------------------------------------------------------------------
 // Base styles inspired by LCA DIGITAL examples (clean, minimalist)
 // ------------------------------------------------------------------
