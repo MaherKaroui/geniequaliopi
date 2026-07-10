@@ -414,6 +414,7 @@ import { getRestaurationChapters } from "./courseContentRestauration";
 import { getSocioEsthetiqueChapters } from "./courseContentSocioEsthetique";
 import { getVTCChapters } from "./courseContentVTC";
 import { getEsthetiqueChapters } from "./courseContentEsthetique";
+import { getMaquillageChapters } from "./courseContentMaquillage";
 
 import { getNTCChapters } from "./courseContentNTC";
 import { getGPMEChapters } from "./courseContentGPME";
