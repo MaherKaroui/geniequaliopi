@@ -33,6 +33,46 @@ const FormationForm = ({ data, onChange, onImportStagiaires, onApplyOrganisme }:
   const [aiLoading, setAiLoading] = useState(false);
   const [veilleLoading, setVeilleLoading] = useState(false);
   const [contentLoading, setContentLoading] = useState(false);
+  const [besoinsLoading, setBesoinsLoading] = useState(false);
+  const [exosLoading, setExosLoading] = useState(false);
+
+  const handleRegenerateBesoins = async () => {
+    if (!data.intitule || data.intitule.trim().length < 3) {
+      toast.error("Renseignez d'abord l'intitulé de la formation");
+      return;
+    }
+    setBesoinsLoading(true);
+    const t = toast.loading("Génération IA : réponses d'évaluation des besoins (ton humanisé)…");
+    try {
+      clearCachedContentPack(data);
+      await generateAIContentPack(data, { force: true, humanizeBesoins: true } as any);
+      toast.success("✅ Réponses d'évaluation des besoins régénérées (ton naturel, humanisé)", { id: t });
+    } catch (err: any) {
+      console.error("Besoins regen error:", err);
+      toast.error(err?.message || "Échec de la régénération des besoins", { id: t });
+    } finally {
+      setBesoinsLoading(false);
+    }
+  };
+
+  const handleRegenerateExosInd11 = async () => {
+    if (!data.intitule || data.intitule.trim().length < 3) {
+      toast.error("Renseignez d'abord l'intitulé de la formation");
+      return;
+    }
+    setExosLoading(true);
+    const t = toast.loading("Génération IA : exercices IND 11 + corrigés + réponses stagiaires…");
+    try {
+      clearCachedPack(data);
+      await generateAIEvalPack(data, true);
+      toast.success("✅ Exercices IND 11 (intermédiaires + évaluation finale + QCM) régénérés", { id: t });
+    } catch (err: any) {
+      console.error("Exos IND 11 regen error:", err);
+      toast.error(err?.message || "Échec de la régénération des exercices", { id: t });
+    } finally {
+      setExosLoading(false);
+    }
+  };
 
   const handleRegenerateAllContent = async () => {
     if (!data.intitule || data.intitule.trim().length < 3) {
