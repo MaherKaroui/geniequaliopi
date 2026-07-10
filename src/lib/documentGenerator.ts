@@ -10048,8 +10048,12 @@ function generateEvalBesoinsAnswers(s: StagiaireInfo, f: FormationInfo, o: Organ
   if (isDreamers && isFatima) {
     result.budget = "Formation financée via le CPF (Compte Personnel de Formation) mobilisé par la bénéficiaire.";
   }
+  // Override global : diplôme = Baccalauréat, financement = Financement personnel (toujours)
+  result.diplome = "Baccalauréat";
+  result.budget = "Financement personnel";
   return result;
 }
+
 
 function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: OrganismeInfo, idx: number) {
   const formation = f.intitule || "la formation";
