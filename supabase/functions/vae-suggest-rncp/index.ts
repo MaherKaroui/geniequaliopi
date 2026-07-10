@@ -57,7 +57,7 @@ Renvoie via l'outil suggest_rncp.`;
       method: "POST",
       headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "google/gemini-2.5-pro",
+        model: "google/gemini-2.5-flash",
         messages: [
           { role: "system", content: "Tu es un conseiller VAE expert du répertoire RNCP France Compétences. Tu proposes uniquement des certifications réellement existantes avec leur code RNCP exact." },
           { role: "user", content: prompt },
@@ -73,9 +73,17 @@ Renvoie via l'outil suggest_rncp.`;
       throw new Error("AI gateway error");
     }
     const data = await r.json();
-    const tc = data.choices?.[0]?.message?.tool_calls?.[0];
-    if (!tc) throw new Error("No tool call");
-    return new Response(tc.function.arguments, { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    const msg = data.choices?.[0]?.message;
+    let payload: string | undefined = msg?.tool_calls?.[0]?.function?.arguments;
+    if (!payload && typeof msg?.content === "string") {
+      const m = msg.content.match(/\{[\s\S]*\}/);
+      if (m) payload = m[0];
+    }
+    if (!payload) {
+      console.error("No tool call. raw:", JSON.stringify(data).slice(0, 2000));
+      throw new Error("Réponse IA vide, réessayez");
+    }
+    return new Response(payload, { headers: { ...corsHeaders, "Content-Type": "application/json" } });
   } catch (e) {
     console.error("vae-suggest-rncp error", e);
     return new Response(JSON.stringify({ error: (e as Error).message }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
