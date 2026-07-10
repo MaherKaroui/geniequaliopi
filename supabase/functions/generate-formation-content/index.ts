@@ -188,7 +188,7 @@ Tu dois OBLIGATOIREMENT produire :
 3. exercises : **6 exercices** progressifs avec **corrigés détaillés**
 4. ressources : supports, outils, 5 vidéos YouTube (URLs de recherche), sites/livres réels du domaine
 
-Tout doit être 100% cohérent avec le métier "${intitule}".`;
+Tout doit être 100% cohérent avec le métier "${intitule}".${humanizeInstruction}`;
 
     const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
