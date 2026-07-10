@@ -12136,7 +12136,7 @@ function genAttestationFinFormationFDCertif(o: OrganismeInfo, f?: FormationInfo)
   dFin.setMonth(dFin.getMonth() + 6);
   const fmt = (d: Date) => formatDate(d.toISOString().split("T")[0]);
 
-  // === Design figé FD CERTIF EXPERT (indépendant du thème de l'organisme) ===
+  // === Design figé IZIBUSINESS (indépendant du thème de l'organisme) ===
   // Toute modification de thème côté organisme ne doit JAMAIS impacter cette attestation.
   const PRIMARY = "#1e3a7b";
   const ACCENT = "#c9a227";
@@ -12147,7 +12147,7 @@ function genAttestationFinFormationFDCertif(o: OrganismeInfo, f?: FormationInfo)
 
   return `<!DOCTYPE html><html lang="fr"><head>
 <meta charset="utf-8">
-<title>Attestation de fin de formation – FD CERTIF EXPERT</title>
+<title>Attestation de fin de formation – IZIBUSINESS</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   *{box-sizing:border-box}
@@ -12185,28 +12185,28 @@ function genAttestationFinFormationFDCertif(o: OrganismeInfo, f?: FormationInfo)
 </head><body>
 <div class="page">
   <div class="header">
-    <div class="brand">FD CERTIF EXPERT</div>
+    <div class="brand">IZIBUSINESS</div>
     <div class="header-meta">
-      <strong>SAS FD CERTIF EXPERT</strong><br>
-      15 rue Auguste Gervais — 92130 Issy-les-Moulineaux<br>
-      SIREN 988 018 479 — SIRET 988 018 479 00010<br>
-      TVA FR65 988018479
+      <strong>SASU IZIBUSINESS</strong><br>
+      1 place des Alliés — 94600 Choisy-le-Roi<br>
+      SIREN 892 035 320 — SIRET 892 035 320 00019<br>
+      TVA FR35 892035320
     </div>
   </div>
 
   <div class="title-wrap">
     <span class="eyebrow">Attestation officielle</span>
     <h1>Attestation de fin de formation</h1>
-    <p class="subtitle">Délivrée par FD CERTIF EXPERT</p>
+    <p class="subtitle">Délivrée par IZIBUSINESS</p>
     <div class="divider"></div>
   </div>
 
   <div class="content">
     <div class="block">
       <h2>Le prestataire</h2>
-      <p>La société <strong>FD CERTIF EXPERT</strong>, SAS au capital de 100,00 €,<br>
-      Siège social : 15 RUE AUGUSTE GERVAIS, 92130 ISSY-LES-MOULINEAUX,<br>
-      SIREN : 988 018 479 — SIRET : 988 018 479 00010 — TVA : FR65 988018479,<br>
+      <p>La société <strong>IZIBUSINESS</strong>, SASU au capital de 100,00 €, RCS Créteil 892 035 320,<br>
+      Siège social : 1 PLACE DES ALLIÉS, 94600 CHOISY-LE-ROI,<br>
+      SIREN : 892 035 320 — SIRET : 892 035 320 00019 — TVA : FR35 892035320,<br>
       Représentée par Madame <strong>Nadine DENDANI</strong>, Présidente,</p>
       <p><strong>atteste que :</strong></p>
     </div>
@@ -12214,7 +12214,7 @@ function genAttestationFinFormationFDCertif(o: OrganismeInfo, f?: FormationInfo)
     <div class="block">
       <h2>Bénéficiaire</h2>
       <p><strong>${beneficiaireNom}</strong>, en sa qualité de représentant légal de l'organisme de formation <strong>${orgNom}</strong>${orgSiret}${orgNda},</p>
-      <p>a suivi et achevé avec succès la formation indiquée ci-dessous, dispensée et accompagnée par FD CERTIF EXPERT.</p>
+      <p>a suivi et achevé avec succès la formation indiquée ci-dessous, dispensée et accompagnée par IZIBUSINESS.</p>
     </div>
 
     <div class="block">
@@ -12245,15 +12245,15 @@ function genAttestationFinFormationFDCertif(o: OrganismeInfo, f?: FormationInfo)
 
   <div class="signature">
     <div class="sig-card">
-      <div class="label">Pour FD CERTIF EXPERT</div>
+      <div class="label">Pour IZIBUSINESS</div>
       <div class="name">Mme Nadine DENDANI, Présidente</div>
-      <div class="place">Fait à Issy-les-Moulineaux, le ${fmt(dFin)}</div>
-      <img src="/images/FD_CERTIF_TAMPON.png" alt="Tampon FD CERTIF EXPERT">
+      <div class="place">Fait à Choisy-le-Roi, le ${fmt(dFin)}</div>
+      
     </div>
   </div>
 
   <div class="footer">
-    <strong>FD CERTIF EXPERT</strong> — SAS au capital de 100,00 € — SIRET 988 018 479 00010 — 15 rue Auguste Gervais, 92130 Issy-les-Moulineaux<br>
+    <strong>IZIBUSINESS</strong> — SASU au capital de 100,00 € — SIRET 892 035 320 00019 — 1 place des Alliés, 94600 Choisy-le-Roi<br>
     Document officiel — Attestation de fin de formation
   </div>
 </div>
