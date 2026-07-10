@@ -2366,17 +2366,7 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
       const rncp = f.codeRNCP ? getRNCPByCode(f.codeRNCP) : undefined;
       if (!rncp) {
         // Fallback sans RNCP : voies d'accès génériques
-        return `
-    <h2>8. Financement possible</h2>
-    <div class="section">
-      <p>La présente action de formation peut être financée selon les modalités suivantes :</p>
-      <ul>
-        <li>Autofinancement (à la charge du bénéficiaire)</li>
-        <li>OPCO (selon les conditions de prise en charge)</li>
-        <li>Plan de développement des compétences de l'entreprise</li>
-      </ul>
-    </div>
-        `;
+        return ``;
 
       }
       const voies = rncp.voiesAcces && rncp.voiesAcces.length > 0 ? rncp.voiesAcces : [];
