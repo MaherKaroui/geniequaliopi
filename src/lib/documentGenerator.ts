@@ -12248,7 +12248,7 @@ function genAttestationFinFormationFDCertif(o: OrganismeInfo, f?: FormationInfo)
       <div class="label">Pour IZIBUSINESS</div>
       <div class="name">Mme Nadine DENDANI, Présidente</div>
       <div class="place">Fait à Choisy-le-Roi, le ${fmt(dFin)}</div>
-      <img src="/images/FD_CERTIF_TAMPON.png" alt="Tampon IZIBUSINESS">
+      
     </div>
   </div>
 
