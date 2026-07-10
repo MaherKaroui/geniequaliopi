@@ -92,7 +92,7 @@ RÈGLES DE RÉDACTION IMPÉRATIVES :
 [ANALYSE]
 (10-15 lignes : analyse des compétences que j'ai mises en œuvre en lien avec le référentiel du bloc — nommer chaque compétence du bloc et expliquer comment je l'ai mobilisée, avec preuve tirée du CV)
 
-Aucune des 4 balises ne doit être vide ; si une donnée manque, complète avec des pointillés "……………" mais rédige quand même la sous-section.
+Aucune des 4 balises ne doit être vide ; toutes les sous-sections doivent être entièrement rédigées, sans pointillés ni marqueurs "à compléter".
 
 Renvoie l'ensemble via l'appel d'outil generate_vae_contents.`;
 
