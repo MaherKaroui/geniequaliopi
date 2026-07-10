@@ -57,7 +57,7 @@ Renvoie via l'outil suggest_rncp.`;
       method: "POST",
       headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "google/gemini-2.5-pro",
+        model: "google/gemini-2.5-flash",
         messages: [
           { role: "system", content: "Tu es un conseiller VAE expert du répertoire RNCP France Compétences. Tu proposes uniquement des certifications réellement existantes avec leur code RNCP exact." },
           { role: "user", content: prompt },
