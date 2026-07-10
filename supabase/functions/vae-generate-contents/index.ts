@@ -265,11 +265,20 @@ Reprends codeBloc="${b.code || b.codeBloc || ""}" et intitule="${b.intitule || b
 
       try {
         const bloc = await callAI(key, blocPrompt, BLOC_TOOL, "generate_vae_bloc", 8000);
-        situationsParBloc.push(normalizeBlocPayload(bloc, b, candidat));
+        const parts = normalizeBlocPayload(bloc, b, candidat);
+        // If analyse is too short or doesn't start correctly, regenerate it with a dedicated call.
+        const analyseOk = parts.analyse.length >= 900 && /j'ai\s+d[ée]montr[ée]/i.test(parts.analyse);
+        if (!analyseOk) {
+          const regen = await regenerateAnalyse(key, ctx, b, parts.contexte, parts.description, parts.moyens);
+          if (regen.length >= 900) parts.analyse = regen;
+          else if (parts.analyse.length < 450) parts.analyse = fallbackAnalysis(candidat, b);
+        }
+        situationsParBloc.push(assembleBloc(b, parts));
       } catch (e) {
         console.error("Bloc failed", b.code, e);
         throw e;
       }
+
     }
 
     const result = { ...main, situationsParBloc };
