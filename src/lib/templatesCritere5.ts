@@ -398,7 +398,7 @@ export function genPlanDevCompetencesExcel(o: OrganismeInfo, f: FormationInfo, f
     nom: "Inscription sur Make et Airtable pour créer un CRM pour l'automatisation de la gestion administrative",
     objectif: "Mise en place de la stratégie d'automatisation (workflows Make, base Airtable, CRM, suivi qualité Qualiopi)",
     type: "Externe",
-    formateur: "FD CERTIF EXPERT",
+    formateur: "NADINE DENDANI",
     nb: "1",
     noms: o.dirigeant || formateurName,
     duree: "6 mois",
