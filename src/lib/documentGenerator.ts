@@ -4170,8 +4170,8 @@ function genEvalFormateur(o: OrganismeInfo, fmt: FormateurInfo) {
 }
 
 function genPlanDev(o: OrganismeInfo, formateurs: FormateurInfo[]) {
-  const rows = formateurs.map(f => [f.prenom + " " + f.nom, f.specialite, "Formation IA en pédagogie", "2024", "✅ Réalisée"]);
-  return buildDocument({ org: o, title: "PLAN DE DÉVELOPPEMENT DES COMPÉTENCES DES FORMATEURS", table: { headers: ["Formateur", "Domaine", "Formation prévue", "Échéance", "Statut"], rows } });
+  const rows = formateurs.map(f => ["NADINE DENDANI", f.specialite, "Formation IA en pédagogie", "2024", "✅ Réalisée"]);
+  return buildDocument({ org: o, title: "PLAN DE DÉVELOPPEMENT DES COMPÉTENCES DES FORMATEURS", table: { headers: ["Formateur / Organisme", "Domaine", "Formation prévue", "Échéance", "Statut"], rows } });
 }
 
 function genFormationFormateur(o: OrganismeInfo, fmt: FormateurInfo) {
