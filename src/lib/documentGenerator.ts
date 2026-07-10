@@ -2525,7 +2525,7 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
     <div class="section">
       <p><strong>Tarif :</strong> ${displayTarif}</p>
       <p>TVA non applicable, article 261-4-4° du CGI.</p>
-      <p><em>Possibilité de prise en charge par votre OPCO ou Pôle Emploi. Contactez-nous pour un devis personnalisé.</em></p>
+      <p><em>Possibilité de prise en charge, Contactez-nous pour un devis personnalisé.</em></p>
     </div>
 
     <h2>12. Méthodes pédagogiques et moyens pédagogiques</h2>
