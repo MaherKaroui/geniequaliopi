@@ -150,6 +150,18 @@ Deno.serve(async (req) => {
     const publicVise = String(body?.publicVise || "").trim();
     const prerequis = String(body?.prerequis || "").trim();
     const nbStagiaires = Number(body?.nbStagiaires || 1);
+    const humanizeBesoins = body?.humanizeBesoins !== false;
+
+    const humanizeInstruction = humanizeBesoins
+      ? `\n\nTON HUMANISÉ POUR LES BESOINS (obligatoire) :
+- Les "besoinsList" sont rédigés à la 1ʳᵉ personne, avec un ton naturel, oral, spontané (comme si le stagiaire parlait à son formateur en RDV).
+- Utilise des formulations variées : "J'aimerais vraiment…", "Franchement, j'ai du mal avec…", "Ce qui me bloque, c'est…", "Je voudrais gagner en confiance sur…", "Mon objectif c'est de…", "J'espère qu'à la fin je saurai…".
+- Autorise petites hésitations, contractions ("j'ai", "c'est", "y'a"), et évite le style corporate/scolaire.
+- La "syntheseHtml" mentionne des proportions ("6 stagiaires sur 6", "4 sur 6") avec des verbatims entre guillemets français « … », comme des extraits d'entretiens.
+- Les "adaptationsHtml" restent professionnelles mais concrètes (pas de langue de bois).
+- INTERDIT : "Il convient de", "Il est nécessaire de", "Par conséquent", "Notamment", "Afin de".`
+      : "";
+
 
     if (!intitule || intitule.length < 3) {
       return new Response(JSON.stringify({ error: "intitule requis" }), {
