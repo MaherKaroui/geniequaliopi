@@ -29,6 +29,45 @@ function nl2br(s: string): string {
   return esc(s).replace(/\n/g, "<br/>");
 }
 
+function cleanGeneratedText(s: string): string {
+  return (s || "")
+    .replace(/à\s+rédiger(?:\s+avec\s+le\s+candidat)?/gi, "")
+    .replace(/à\s+compléter/gi, "")
+    .replace(/\.{3,}|…{2,}/g, "")
+    .trim();
+}
+
+function vaeExperienceSummary(c: VAECandidat): string {
+  if (!c.experiences.length) {
+    return `${c.emploiActuel || "mon poste"}${c.employeur ? ` chez ${c.employeur}` : ""}`;
+  }
+  return c.experiences
+    .slice(0, 3)
+    .map(x => `${x.poste || "poste exercé"} chez ${x.entreprise || "l'employeur"}${x.dateDebut || x.dateFin ? ` (${[x.dateDebut, x.dateFin].filter(Boolean).join(" - ")})` : ""}`)
+    .join(" ; ");
+}
+
+function fallbackVAESection(c: VAECandidat, bloc: { codeBloc?: string; code?: string; intitule?: string }, section: "contexte" | "description" | "moyens" | "analyse"): string {
+  const code = bloc.codeBloc || bloc.code || "";
+  const intitule = bloc.intitule || "ce bloc de compétences";
+  const exp = vaeExperienceSummary(c);
+  if (section === "contexte") {
+    return `J'ai exercé ces activités dans un environnement professionnel directement lié à ${intitule}. Mon parcours, notamment ${exp}, m'a placé dans des situations où je devais répondre à des objectifs concrets, coordonner mes actions avec différents interlocuteurs et produire des résultats utiles à l'organisation. La finalité de l'activité était de contribuer au bon fonctionnement du service, à la satisfaction des bénéficiaires ou clients, et à l'atteinte des objectifs opérationnels fixés.`;
+  }
+  if (section === "description") {
+    return `Dans ces situations, j'ai pris en charge plusieurs activités représentatives de ${intitule}. J'ai commencé par analyser la demande, recueillir les informations nécessaires et identifier les priorités. J'ai ensuite organisé mon travail, mobilisé les ressources disponibles, réalisé les actions prévues et assuré le suivi des résultats. Lorsque des difficultés apparaissaient, j'adaptais ma méthode, sollicitais les interlocuteurs compétents et formalisais les éléments importants afin de garantir la continuité et la qualité du travail réalisé.`;
+  }
+  if (section === "moyens") {
+    return `Pour réaliser ces activités, j'ai mobilisé des outils bureautiques, des supports de suivi, des échanges professionnels, des procédures internes et des méthodes d'organisation adaptées à ${intitule}. J'ai utilisé des tableaux de bord, des documents de travail, des comptes rendus, des outils numériques de communication et des référentiels métier afin de sécuriser mes actions et de conserver une traçabilité des décisions prises.`;
+  }
+  return `J'ai démontré ma capacité à mobiliser les compétences du bloc ${code ? `${code} — ` : ""}${intitule} dans des situations professionnelles concrètes. À partir de mon expérience (${exp}), j'ai su analyser les besoins, définir les priorités, organiser les actions et choisir les méthodes adaptées au contexte. J'ai également assuré le suivi des résultats, la coordination avec les interlocuteurs concernés et l'ajustement de mes pratiques lorsque la situation l'exigeait. Ces activités montrent que je maîtrise les compétences attendues du bloc, car je suis capable de passer d'un objectif à une mise en œuvre opérationnelle, en gardant une logique de qualité, de traçabilité et d'amélioration continue. Mon expérience prouve aussi ma capacité à prendre du recul sur mes pratiques, à identifier les points de réussite et à justifier les choix professionnels réalisés.`;
+}
+
+function isIncompleteVAEAnalysis(s: string): boolean {
+  const text = cleanGeneratedText(s).toLowerCase();
+  return !text || text.length < 350 || /^j['’]ai démontré ma capacité à\s*$/i.test(text) || /^j['’]ai mis en œuvre/i.test(text) && text.length < 450;
+}
+
 function civilLong(c: VAECandidat): string {
   return c.civilite === "M." ? "Monsieur" : c.civilite === "Mme" ? "Madame" : "";
 }
@@ -345,17 +384,21 @@ export function getLivret2HTML(d: VAEData): string {
   };
 
   const situationsHTML = situationsBloc.map((b, idx) => {
-    const { contexte, description, moyens, analyse } = parseSituation(b.situations);
+    const parsed = parseSituation(b.situations);
+    const contexte = cleanGeneratedText(parsed.contexte) || fallbackVAESection(c, b, "contexte");
+    const description = cleanGeneratedText(parsed.description) || fallbackVAESection(c, b, "description");
+    const moyens = cleanGeneratedText(parsed.moyens) || fallbackVAESection(c, b, "moyens");
+    const analyse = isIncompleteVAEAnalysis(parsed.analyse) ? fallbackVAESection(c, b, "analyse") : cleanGeneratedText(parsed.analyse);
     return `
       <h3>Situation ${idx + 1} — ${esc(b.intitule)} (${esc(b.codeBloc)})</h3>
       <h3>3.${idx + 1}.1 — Contexte et finalité de l'activité</h3>
-      <p>${nl2br(contexte) || "<em>À rédiger avec le candidat.</em>"}</p>
+      <p>${nl2br(contexte)}</p>
       <h3>3.${idx + 1}.2 — Description détaillée des activités que j'ai exercées</h3>
-      <p>${nl2br(description) || "<em>À rédiger.</em>"}</p>
+      <p>${nl2br(description)}</p>
       <h3>3.${idx + 1}.3 — Moyens et ressources que j'ai mobilisés</h3>
-      <p>${nl2br(moyens) || "<em>À rédiger.</em>"}</p>
+      <p>${nl2br(moyens)}</p>
       <h3>3.${idx + 1}.4 — Analyse des compétences que j'ai mises en œuvre</h3>
-      <p>${nl2br(analyse) || "<em>À rédiger en lien avec le référentiel du bloc.</em>"}</p>
+      <p>${nl2br(analyse)}</p>
     `;
   }).join("");
 
