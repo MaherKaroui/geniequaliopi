@@ -75,9 +75,9 @@ RÈGLES DE RÉDACTION IMPÉRATIVES :
 3. COHÉRENCE ABSOLUE entre toutes les sections : mêmes intitulés de postes, mêmes employeurs, mêmes dates et durées que le CV. Ne jamais renommer un poste ni décaler une date entre deux sections.
 4. Pour chaque bloc de compétences du RNCP (situationsParBloc — UNE entrée par bloc listé dans la certification), tu DOIS relier explicitement les expériences réelles du CV aux compétences et activités du référentiel : reprends le libellé exact du bloc, puis décris 2 à 4 situations de travail concrètes (contexte, mission, actions menées, outils, résultats si disponibles, période et employeur) qui prouvent la maîtrise des compétences du bloc. Nomme les compétences visées telles qu'elles apparaissent dans le référentiel France Compétences.
 5. Dans "motivation" et "parcours", relie de la même façon le projet professionnel du candidat aux compétences du référentiel visé.
-6. NE JAMAIS INVENTER de données administratives ou factuelles absentes du CV/formulaire (n° sécurité sociale, lieu ou date de naissance, nationalité, situation familiale, adresse, diplômes non mentionnés, employeurs non cités, chiffres inventés, certifications non listées). Si une information manque, insère à la place une suite de pointillés "……………" à compléter manuellement, exactement comme dans les modèles administratifs.
-7. Reste factuel : n'invente pas de résultats chiffrés ; si un chiffre n'est pas dans le CV, reste qualitatif ("j'ai contribué à…", "j'ai piloté…") sans nombre inventé.
-8. Longueurs indicatives : motivation ~12 lignes, parcours ~12 lignes, chaque bloc ~40 à 60 lignes au total (4 sous-parties), chaque champ de besoins ~3 à 5 lignes, planAccompagnement ~10 lignes, synthese ~8 lignes.
+6. INTERDICTION ABSOLUE d'insérer des pointillés "……………", des espaces à compléter, "(..................)", "[à compléter]" ou toute marque de champ vide. TOUT doit être rédigé et complet. Si une donnée précise manque dans le CV, tu inventes de manière PLAUSIBLE et COHÉRENTE avec le métier et le secteur (nom d'outil métier crédible, procédure standard, exemple générique du secteur) — jamais de trou visible dans le texte final. Seules restent interdites les données strictement personnelles sensibles (n° sécurité sociale, date/lieu de naissance exact, adresse personnelle) : dans ces cas très rares, reformule pour ne pas en avoir besoin plutôt que de laisser un vide.
+7. Les résultats chiffrés inventés sont autorisés s'ils restent réalistes et modestes (ex. "une équipe d'environ 5 personnes", "un portefeuille d'une trentaine de clients"). Ne jamais laisser une phrase inachevée faute de chiffre.
+8. Longueurs indicatives : motivation ~12 lignes, parcours ~12 lignes, chaque bloc ~40 à 60 lignes au total (4 sous-parties), chaque champ de besoins ~3 à 5 lignes, planAccompagnement ~10 lignes, synthese ~8 lignes. Aucune section ne doit être vide ni contenir de placeholder.
 9. FORMAT OBLIGATOIRE du champ "situations" de chaque bloc : structure en 4 sous-sections marquées par des balises littérales (ne pas les traduire, ne pas les omettre, une seule fois chacune, dans cet ordre, séparées par une ligne vide) :
 
 [CONTEXTE]
@@ -92,7 +92,7 @@ RÈGLES DE RÉDACTION IMPÉRATIVES :
 [ANALYSE]
 (10-15 lignes : analyse des compétences que j'ai mises en œuvre en lien avec le référentiel du bloc — nommer chaque compétence du bloc et expliquer comment je l'ai mobilisée, avec preuve tirée du CV)
 
-Aucune des 4 balises ne doit être vide ; si une donnée manque, complète avec des pointillés "……………" mais rédige quand même la sous-section.
+Aucune des 4 balises ne doit être vide ; toutes les sous-sections doivent être entièrement rédigées, sans pointillés ni marqueurs "à compléter".
 
 Renvoie l'ensemble via l'appel d'outil generate_vae_contents.`;
 
@@ -102,7 +102,7 @@ Renvoie l'ensemble via l'appel d'outil generate_vae_contents.`;
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
         messages: [
-          { role: "system", content: "Tu es un accompagnateur VAE expérimenté. Tu rédiges TOUJOURS à la première personne du point de vue du candidat, en reliant chaque expérience du CV aux blocs de compétences du référentiel RNCP. Tu n'inventes JAMAIS d'informations administratives ou factuelles absentes du CV : à la place tu écris '……………' (pointillés) à compléter manuellement." },
+          { role: "system", content: "Tu es un accompagnateur VAE expérimenté. Tu rédiges TOUJOURS à la première personne du point de vue du candidat, en reliant chaque expérience du CV aux blocs de compétences du référentiel RNCP. Tu produis un texte ENTIÈREMENT rédigé, sans jamais laisser de pointillés, de placeholders, de parenthèses vides ni de mentions '(à compléter)'. Quand une donnée précise manque, tu inventes de façon plausible et cohérente avec le métier (outils métier standards, procédures classiques, exemples génériques du secteur)." },
           { role: "user", content: prompt },
         ],
         tools: [TOOL],
