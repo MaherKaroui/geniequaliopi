@@ -405,7 +405,7 @@ export function genPlanDevCompetencesExcel(o: OrganismeInfo, f: FormationInfo, f
   });
 
   // Ne conserver que l'entrée FD CERTIF EXPERT (Automatisation gestion administrative)
-  const fdOnly = futureTrainings.filter(t => /fd\s*certif/i.test(t.formateur));
+  const fdOnly = futureTrainings.filter(t => /nadine\s*dendani/i.test(t.formateur));
 
   fdOnly.forEach(t => {
     // Pour FD CERTIF : la formation se déroule AVANT la formation principale (date début = date d'inscription),
