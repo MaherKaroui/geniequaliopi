@@ -11202,7 +11202,7 @@ function genDeroulePedagogiqueParBlocs(o: OrganismeInfo, f: FormationInfo, rncp:
 
     const modalite = (f.modalites || "présentiel").toLowerCase();
     const isDistanciel = modalite.includes("distanciel") || modalite.includes("distance");
-    const outilsBase = isDistanciel ? "PC, plateforme e-learning, visioconférence" : "PC, vidéoprojecteur";
+    const outilsBase = isDistanciel ? "PC, visioconférence" : "PC, vidéoprojecteur";
 
     const methodesPool = [
       "Apports théoriques + exercices pratiques",
