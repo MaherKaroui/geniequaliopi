@@ -378,6 +378,46 @@ const FormationForm = ({ data, onChange, onImportStagiaires, onApplyOrganisme }:
         </Button>
       </div>
 
+      {/* Bouton dédié : réponses évaluation des besoins (humanisées) */}
+      <div className="p-4 bg-accent/10 border-2 border-accent/40 rounded-xl flex items-center justify-between gap-3">
+        <div className="flex-1">
+          <Label className="font-semibold">Réponses évaluation des besoins (humanisées)</Label>
+          <p className="text-xs text-muted-foreground">
+            Régénère uniquement les réponses d'évaluation des besoins pour « {data.intitule || "votre formation"} », avec un ton naturel, oral et personnalisé (comme rédigé par un vrai stagiaire).
+          </p>
+        </div>
+        <Button
+          type="button"
+          variant="secondary"
+          onClick={handleRegenerateBesoins}
+          disabled={besoinsLoading || !data.intitule}
+          className="gap-2 shrink-0"
+        >
+          {besoinsLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+          {besoinsLoading ? "Génération…" : "Générer besoins (humanisés)"}
+        </Button>
+      </div>
+
+      {/* Bouton dédié : exercices IND 11 */}
+      <div className="p-4 bg-accent/10 border-2 border-accent/40 rounded-xl flex items-center justify-between gap-3">
+        <div className="flex-1">
+          <Label className="font-semibold">Exercices IND 11 (intermédiaires + évaluation finale)</Label>
+          <p className="text-xs text-muted-foreground">
+            Régénère les exercices pratiques IND 11 pour « {data.intitule || "votre formation"} » : consignes, corrigés, QCM début/fin. Les réponses stagiaires sont humanisées automatiquement.
+          </p>
+        </div>
+        <Button
+          type="button"
+          variant="secondary"
+          onClick={handleRegenerateExosInd11}
+          disabled={exosLoading || !data.intitule}
+          className="gap-2 shrink-0"
+        >
+          {exosLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+          {exosLoading ? "Génération…" : "Générer exercices IND 11"}
+        </Button>
+      </div>
+
 
       {/* Téléchargement du référentiel */}
       <div className="p-4 bg-primary/5 border-2 border-primary/30 rounded-xl flex items-center justify-between gap-3">
