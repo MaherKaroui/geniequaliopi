@@ -11202,7 +11202,7 @@ function genDeroulePedagogiqueParBlocs(o: OrganismeInfo, f: FormationInfo, rncp:
 
     const modalite = (f.modalites || "présentiel").toLowerCase();
     const isDistanciel = modalite.includes("distanciel") || modalite.includes("distance");
-    const outilsBase = isDistanciel ? "PC, plateforme e-learning, visioconférence" : "PC, vidéoprojecteur";
+    const outilsBase = isDistanciel ? "PC, visioconférence" : "PC, vidéoprojecteur";
 
     const methodesPool = [
       "Apports théoriques + exercices pratiques",
@@ -11325,8 +11325,8 @@ function generateDaySequences(topic: string, formation: string, isFirstDay: bool
   const sequences: DaySequence[] = [];
   const modalite = (f.modalites || "présentiel").toLowerCase();
   const isDistanciel = modalite.includes("distanciel") || modalite.includes("distance");
-  const outilsBase = isDistanciel ? "PC, plateforme e-learning, visioconférence" : "PC, vidéoprojecteur";
-  const lieuOutil = isDistanciel ? "Plateforme LMS" : "Salle de formation";
+  const outilsBase = isDistanciel ? "PC, visioconférence" : "PC, vidéoprojecteur";
+  const lieuOutil = isDistanciel ? "Visioconférence" : "Salle de formation";
   
   // Parse topic into subtopics
   const subtopics = splitTopicIntoSubtopics(topic);
