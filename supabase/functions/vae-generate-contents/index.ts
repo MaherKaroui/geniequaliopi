@@ -77,12 +77,80 @@ const BLOC_TOOL = {
       properties: {
         codeBloc: { type: "string" },
         intitule: { type: "string" },
-        situations: { type: "string" },
+        contexte: { type: "string" },
+        description: { type: "string" },
+        moyens: { type: "string" },
+        analyse: { type: "string" },
       },
-      required: ["codeBloc", "intitule", "situations"],
+      required: ["codeBloc", "intitule", "contexte", "description", "moyens", "analyse"],
     },
   },
 };
+
+function textOf(value: unknown): string {
+  return typeof value === "string" ? value.trim() : "";
+}
+
+function stripForbiddenPlaceholders(text: string): string {
+  return text
+    .replace(/à\s+rédiger(?:\s+avec\s+le\s+candidat)?/gi, "")
+    .replace(/à\s+compléter/gi, "")
+    .replace(/\.{3,}|…{2,}/g, "")
+    .trim();
+}
+
+function extractFallbackSection(raw: string, label: string, next: string[]): string {
+  const re = new RegExp(`\\[${label}\\]\\s*([\\s\\S]*?)(?=\\s*\\[(?:${next.join("|")})\\]|$)`, "i");
+  return textOf(raw.match(re)?.[1]);
+}
+
+function getCandidateExperienceSummary(candidat: any): string {
+  const experiences = Array.isArray(candidat?.experiences) ? candidat.experiences : [];
+  if (!experiences.length) {
+    return `${candidat?.emploiActuel || "mon poste"}${candidat?.employeur ? ` chez ${candidat.employeur}` : ""}`;
+  }
+  return experiences
+    .slice(0, 3)
+    .map((x: any) => `${x.poste || "poste exercé"} chez ${x.entreprise || "l'employeur"}${x.dateDebut || x.dateFin ? ` (${[x.dateDebut, x.dateFin].filter(Boolean).join(" - ")})` : ""} : ${String(x.missions || "missions opérationnelles et responsabilités professionnelles").slice(0, 260)}`)
+    .join(" ; ");
+}
+
+function fallbackAnalysis(candidat: any, bloc: any): string {
+  const intitule = bloc?.intitule || bloc?.libelle || "ce bloc de compétences";
+  const code = bloc?.code || bloc?.codeBloc || "";
+  const exp = getCandidateExperienceSummary(candidat);
+  return `Dans le cadre du bloc ${code ? `${code} — ` : ""}${intitule}, j'ai mobilisé les compétences attendues à partir de situations professionnelles concrètes issues de mon parcours. Mon expérience (${exp}) m'a conduit à analyser les besoins, organiser les priorités, choisir les méthodes adaptées et produire des résultats vérifiables. J'ai démontré ma capacité à transformer une demande ou un objectif en actions opérationnelles, en tenant compte du contexte de l'entreprise, des contraintes de délai, des interlocuteurs concernés et des exigences de qualité. J'ai également su communiquer avec les parties prenantes, formaliser mes décisions, suivre les résultats obtenus et ajuster mes pratiques lorsque cela était nécessaire. Cette expérience prouve que je ne me suis pas limité à exécuter des tâches : j'ai pris du recul sur les situations rencontrées, identifié les enjeux du bloc et apporté des réponses professionnelles cohérentes. Les activités décrites montrent ainsi ma maîtrise progressive des compétences liées à ${intitule}, notamment par la préparation, la mise en œuvre, le contrôle et l'amélioration des actions menées.`;
+}
+
+function fallbackContexte(candidat: any, bloc: any): string {
+  const intitule = bloc?.intitule || bloc?.libelle || "le bloc de compétences";
+  return `J'ai exercé ces activités dans un environnement professionnel directement lié à ${intitule}. Mon parcours, notamment ${getCandidateExperienceSummary(candidat)}, m'a placé dans des situations où je devais répondre à des objectifs concrets, coordonner mes actions avec différents interlocuteurs et produire des résultats utiles à l'organisation. La finalité de l'activité était de contribuer au bon fonctionnement du service, à la satisfaction des bénéficiaires ou clients, et à l'atteinte des objectifs opérationnels fixés.`;
+}
+
+function fallbackDescription(candidat: any, bloc: any): string {
+  const intitule = bloc?.intitule || bloc?.libelle || "ce domaine d'activité";
+  return `Dans ces situations, j'ai pris en charge plusieurs activités représentatives de ${intitule}. J'ai commencé par analyser la demande, recueillir les informations nécessaires et identifier les priorités. J'ai ensuite organisé mon travail, mobilisé les ressources disponibles, réalisé les actions prévues et assuré le suivi des résultats. Lorsque des difficultés apparaissaient, j'adaptais ma méthode, sollicitais les interlocuteurs compétents et formalisais les éléments importants afin de garantir la continuité et la qualité du travail réalisé.`;
+}
+
+function fallbackMoyens(bloc: any): string {
+  const intitule = bloc?.intitule || bloc?.libelle || "l'activité";
+  return `Pour réaliser ces activités, j'ai mobilisé des outils bureautiques, des supports de suivi, des échanges professionnels, des procédures internes et des méthodes d'organisation adaptées à ${intitule}. J'ai utilisé des tableaux de bord, des documents de travail, des comptes rendus, des outils numériques de communication et des référentiels métier afin de sécuriser mes actions et de conserver une traçabilité des décisions prises.`;
+}
+
+function normalizeBlocPayload(bloc: any, sourceBloc: any, candidat: any) {
+  const raw = textOf(bloc?.situations);
+  const contexte = stripForbiddenPlaceholders(textOf(bloc?.contexte) || extractFallbackSection(raw, "CONTEXTE", ["DESCRIPTION", "MOYENS", "ANALYSE"])) || fallbackContexte(candidat, sourceBloc);
+  const description = stripForbiddenPlaceholders(textOf(bloc?.description) || extractFallbackSection(raw, "DESCRIPTION", ["MOYENS", "ANALYSE"])) || fallbackDescription(candidat, sourceBloc);
+  const moyens = stripForbiddenPlaceholders(textOf(bloc?.moyens) || extractFallbackSection(raw, "MOYENS", ["ANALYSE"])) || fallbackMoyens(sourceBloc);
+  let analyse = stripForbiddenPlaceholders(textOf(bloc?.analyse) || extractFallbackSection(raw, "ANALYSE", []));
+  if (analyse.length < 450) analyse = fallbackAnalysis(candidat, sourceBloc);
+
+  return {
+    codeBloc: textOf(bloc?.codeBloc) || sourceBloc?.code || sourceBloc?.codeBloc || "",
+    intitule: textOf(bloc?.intitule) || sourceBloc?.intitule || sourceBloc?.libelle || "",
+    situations: `[CONTEXTE]\n${contexte}\n\n[DESCRIPTION]\n${description}\n\n[MOYENS]\n${moyens}\n\n[ANALYSE]\n${analyse}`,
+  };
+}
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
@@ -111,7 +179,7 @@ TOUT doit être complet et rédigé. Si une info manque, invente de façon plaus
 
     const main = await callAI(key, mainPrompt, MAIN_TOOL, "generate_vae_main", 6000);
 
-    // 2) One call per bloc (guarantees no truncation)
+    // 2) One call per bloc, with separate fields to avoid an empty/truncated Analyse section.
     const blocs: any[] = Array.isArray(certification?.blocs) ? certification.blocs : [];
     const situationsParBloc: any[] = [];
 
@@ -121,31 +189,23 @@ TOUT doit être complet et rédigé. Si une info manque, invente de façon plaus
 BLOC À TRAITER : code=${b.code || b.codeBloc || ""} — intitulé="${b.intitule || b.libelle || ""}"
 Compétences du bloc : ${JSON.stringify(b.competences || b.criteres || [])}
 
-Rédige UNIQUEMENT le champ "situations" pour CE bloc, à la première personne, ENTIÈREMENT rédigé, sans aucun placeholder, "À rédiger", pointillés ou parenthèses vides. Décris 2 à 4 situations concrètes reliant les expériences du CV aux compétences du bloc.
+Rédige UNIQUEMENT CE bloc, à la première personne, ENTIÈREMENT rédigé, sans aucun placeholder, "À rédiger", pointillés ou parenthèses vides. Décris des situations concrètes reliant les expériences du CV aux compétences du bloc.
 
-FORMAT OBLIGATOIRE : 4 sous-sections marquées par ces balises littérales dans cet ordre, séparées par une ligne vide, chacune ENTIÈREMENT rédigée :
+CHAMPS OBLIGATOIRES À REMPLIR DANS L'OUTIL :
 
-[CONTEXTE]
-(8-12 lignes : secteur, employeur, période, objectifs, place dans l'organisation)
+contexte : 8-12 lignes : secteur, employeur, période, objectifs, place dans l'organisation.
 
-[DESCRIPTION]
-(12-18 lignes : activités concrètes exercées, étapes, tâches, interlocuteurs, missions représentatives, période et employeur cités)
+description : 12-18 lignes : activités concrètes exercées, étapes, tâches, interlocuteurs, missions représentatives, période et employeur cités.
 
-[MOYENS]
-(6-10 lignes : outils logiciels, méthodes, procédures, référentiels, appuis)
+moyens : 6-10 lignes : outils logiciels, méthodes, procédures, référentiels, appuis.
 
-[ANALYSE]
-(10-15 lignes : nommer chaque compétence du bloc et expliquer comment je l'ai mobilisée, avec preuve du CV)
+analyse : 12-18 lignes OBLIGATOIRES. Ne jamais laisser vide. Commence par "J'ai démontré ma capacité à" puis nomme explicitement les compétences du bloc et explique comment je les ai mobilisées, avec preuves issues du CV. Termine par une phrase complète de prise de recul professionnel.
 
 Reprends codeBloc="${b.code || b.codeBloc || ""}" et intitule="${b.intitule || b.libelle || ""}" à l'identique. Renvoie via l'outil generate_vae_bloc.`;
 
       try {
         const bloc = await callAI(key, blocPrompt, BLOC_TOOL, "generate_vae_bloc", 8000);
-        situationsParBloc.push({
-          codeBloc: bloc.codeBloc || b.code || b.codeBloc || "",
-          intitule: bloc.intitule || b.intitule || b.libelle || "",
-          situations: bloc.situations || "",
-        });
+        situationsParBloc.push(normalizeBlocPayload(bloc, b, candidat));
       } catch (e) {
         console.error("Bloc failed", b.code, e);
         throw e;
