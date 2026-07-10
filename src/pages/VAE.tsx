@@ -68,8 +68,8 @@ export default function VAEPage() {
         <StepIndicator steps={STEPS} currentStep={step} onStepClick={setStep} />
         <div className="bg-card rounded-2xl border shadow-card p-6 md:p-8">
           {step === 1 && <StepOrganisme data={organisme} onChange={setOrganisme} />}
-          {step === 2 && <StepCertification data={certification} onChange={setCertification} />}
-          {step === 3 && <StepCandidat data={candidat} onChange={setCandidat} certification={certification} />}
+          {step === 2 && <StepCandidat data={candidat} onChange={setCandidat} certification={certification} />}
+          {step === 3 && <StepCertification data={certification} onChange={setCertification} candidat={candidat} />}
           {step === 4 && <StepSession data={session} onChange={setSession} />}
           {step === 5 && <StepGeneration data={data} onContentsChange={setContents} />}
         </div>
