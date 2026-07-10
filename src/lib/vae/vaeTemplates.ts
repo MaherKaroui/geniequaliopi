@@ -297,8 +297,8 @@ export function getLivret1HTML(d: VAEData): string {
 
     <h2>5. Pièces jointes</h2>
     <p>
-      <span class="cbx">☐</span> Copie d'une pièce d'identité en cours de validité<br/>
-      <span class="cbx">☐</span> Curriculum vitæ à jour<br/>
+      <span class="cbx">☒</span> Copie d'une pièce d'identité en cours de validité<br/>
+      <span class="cbx">☒</span> Curriculum vitæ à jour<br/>
       <span class="cbx">☐</span> Justificatifs d'activité en rapport avec la certification (bulletins de salaire, attestations d'employeur, contrats)<br/>
       <span class="cbx">☐</span> Copies des diplômes et titres obtenus<br/>
       <span class="cbx">☐</span> Attestation de formation ou d'expérience bénévole, le cas échéant
