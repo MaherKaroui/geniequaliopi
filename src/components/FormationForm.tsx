@@ -180,6 +180,16 @@ const FormationForm = ({ data, onChange, onImportStagiaires, onApplyOrganisme }:
         }
         toast.success(`Organisme HEXAGONE FORMATION + 10 stagiaires GOTRM importés`);
       }
+      // Auto-import organisme + 6 stagiaires pour Maquilleur Professionnel (Maison HSY)
+      if (selected.intitule.toLowerCase().includes("maquilleur")) {
+        if (onApplyOrganisme) {
+          onApplyOrganisme({ ...MAISON_HSY_ORG });
+        }
+        if (onImportStagiaires) {
+          onImportStagiaires([...STAGIAIRES_MAQUILLEUR_PRO]);
+        }
+        toast.success(`Organisme MAISON HSY BEAUTÉ + 6 stagiaires Maquilleur Pro importés`);
+      }
     }
   };
 
