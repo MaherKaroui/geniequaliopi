@@ -11,3 +11,6 @@ verify_jwt = false
 
 [functions.vae-generate-contents]
 verify_jwt = false
+
+[functions.vae-suggest-rncp]
+verify_jwt = false

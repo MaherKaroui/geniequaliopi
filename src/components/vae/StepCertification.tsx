@@ -2,16 +2,19 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Loader2, Search, ExternalLink } from "lucide-react";
+import { Loader2, Search, ExternalLink, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import type { VAECertification } from "@/lib/vae/vaeTypes";
+import type { VAECertification, VAECandidat } from "@/lib/vae/vaeTypes";
 
-interface Props { data: VAECertification; onChange: (v: VAECertification) => void; }
+interface Suggestion { rncp: string; intitule: string; niveau: string; certificateur?: string; justification: string; }
+interface Props { data: VAECertification; onChange: (v: VAECertification) => void; candidat?: VAECandidat; }
 
-export default function StepCertification({ data, onChange }: Props) {
+export default function StepCertification({ data, onChange, candidat }: Props) {
   const [query, setQuery] = useState(data.rncp || data.intitule || "");
   const [loading, setLoading] = useState(false);
+  const [suggesting, setSuggesting] = useState(false);
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
 
   const lookup = async () => {
     if (!query.trim()) return;
@@ -37,9 +40,84 @@ export default function StepCertification({ data, onChange }: Props) {
     }
   };
 
+  const suggestFromCV = async () => {
+    if (!candidat || (!candidat.experiences?.length && !candidat.emploiActuel)) {
+      toast.error("Complétez d'abord le CV du candidat (étape précédente)");
+      return;
+    }
+    setSuggesting(true);
+    try {
+      const { data: res, error } = await supabase.functions.invoke("vae-suggest-rncp", { body: { candidat } });
+      if (error) throw error;
+      if (res?.error) throw new Error(res.error);
+      setSuggestions(res.suggestions || []);
+      if (!res.suggestions?.length) toast.info("Aucune suggestion trouvée");
+    } catch (e: any) {
+      toast.error("Suggestion impossible : " + (e.message || "erreur"));
+    } finally {
+      setSuggesting(false);
+    }
+  };
+
+  const pickSuggestion = async (s: Suggestion) => {
+    setQuery(s.rncp);
+    setLoading(true);
+    try {
+      const { data: res, error } = await supabase.functions.invoke("fc-rncp-lookup", { body: { query: s.rncp } });
+      if (error || res?.error) throw new Error(res?.error || error?.message);
+      onChange({
+        intitule: res.intitule || s.intitule,
+        rncp: res.rncp || s.rncp,
+        niveau: res.niveau || s.niveau,
+        certificateur: res.certificateur || s.certificateur || "",
+        dateEcheance: res.dateEcheance || "",
+        lien: res.lien || `https://www.francecompetences.fr/recherche/rncp/${s.rncp}/`,
+        blocs: res.blocs || [],
+      });
+      toast.success("Certification chargée");
+    } catch {
+      onChange({
+        intitule: s.intitule, rncp: s.rncp, niveau: s.niveau,
+        certificateur: s.certificateur || "", dateEcheance: "",
+        lien: `https://www.francecompetences.fr/recherche/rncp/${s.rncp}/`, blocs: [],
+      });
+      toast.warning("Fiche France Compétences indisponible — champs pré-remplis");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="space-y-4">
       <h2 className="text-xl font-semibold">Certification visée (France Compétences)</h2>
+
+      <div className="p-4 border rounded-lg bg-secondary/30 space-y-3">
+        <div className="flex items-center justify-between gap-2">
+          <div className="text-sm">
+            <div className="font-medium">Proposition IA basée sur le CV du candidat</div>
+            <div className="text-muted-foreground text-xs">L'IA analyse le parcours et propose les RNCP les plus pertinents.</div>
+          </div>
+          <Button onClick={suggestFromCV} disabled={suggesting} variant="outline" className="gap-2 shrink-0">
+            {suggesting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+            Proposer un RNCP
+          </Button>
+        </div>
+        {suggestions.length > 0 && (
+          <div className="space-y-2">
+            {suggestions.map((s, i) => (
+              <button key={i} type="button" onClick={() => pickSuggestion(s)} className="w-full text-left p-3 rounded-md border bg-background hover:bg-accent transition-colors">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="font-mono text-xs bg-primary/10 px-2 py-0.5 rounded">RNCP {s.rncp}</span>
+                  <span className="text-xs bg-secondary px-2 py-0.5 rounded">Niveau {s.niveau}</span>
+                  <span className="font-medium text-sm">{s.intitule}</span>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">{s.justification}</p>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
       <div className="flex gap-2">
         <Input placeholder="Nom du titre ou code RNCP (ex. 38362)" value={query} onChange={e => setQuery(e.target.value)} onKeyDown={e => e.key === "Enter" && lookup()} />
         <Button onClick={lookup} disabled={loading} className="gap-2">
@@ -47,6 +125,7 @@ export default function StepCertification({ data, onChange }: Props) {
           Rechercher
         </Button>
       </div>
+
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
         <div><Label>Intitulé</Label><Input value={data.intitule} onChange={e => onChange({ ...data, intitule: e.target.value })} /></div>
