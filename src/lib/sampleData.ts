@@ -152,6 +152,24 @@ export const SAMPLE_FORMATEURS: FormateurInfo[] = [
 
 export const SAMPLE_FORMATIONS: FormationInfo[] = [
   {
+    intitule: "Maquilleur Professionnel – Formation certifiante (Maison HSY)",
+    objectifs: "Se former aux métiers de maquilleur professionnel et obtenir une formation certifiante reconnue par France Compétences.\nÀ l'issue de la formation, la stagiaire sera capable de :\n- Accueillir la cliente et appliquer le protocole d'hygiène professionnel.\n- Identifier les types de peau, la morphologie du visage, la colorimétrie et les carnations.\n- Préparer la peau et corriger les imperfections avec les techniques adaptées.\n- Maîtriser l'application du fond de teint, du contouring et du strobing.\n- Structurer les sourcils (points d'or A-B-C), maquiller les yeux et la bouche selon la morphologie.\n- Réaliser une prestation de maquillage professionnel complet en 1h30.\n- Réussir l'examen de certification (QCM + mise en situation avec tirage au sort du look).",
+    prerequis: "Travailler dans le domaine de l'esthétique et/ou du bien-être ; justifier d'une expérience professionnelle d'au moins 1 an dans le domaine de l'esthétique / bien-être.",
+    duree: "35 heures (5 jours)",
+    modalites: "présentiel",
+    tarif: "2 100 € TTC (paiement en plusieurs fois disponible via Pay Beauty ; éligible CPF)",
+    programme: "Jour 1 – Accueil client, protocole d'hygiène, identification des types de peaux et produits adaptés.\nJour 2 – Morphologie du faciès et diagnostic du maquillage adapté, technique de préparation de la peau, correction des imperfections.\nJour 3 – Technique d'application du fond de teint, technique du contouring, technique du strobing.\nJour 4 – Structure du sourcil (points d'or A-B-C), maquillage des yeux (nude, smoky, cut-crease, halo, winged liner), forme et contour de la bouche.\nJour 5 – Passage de l'examen : QCM 20 questions (20 min, vocabulaire, fonctionnalité des produits, colorimétrie, carnation) + mise en situation professionnelle 1h30 (prestation complète avec tirage au sort du look sur 3 : jour, soirée, mariée).",
+    methodesEvaluation: "Test de positionnement en début de formation (10 QCM), 4 exercices pratiques quotidiens sur modèle vivant, test de positionnement en fin de formation (10 QCM), évaluation finale certificative : QCM 20 questions (20 min) + mise en situation professionnelle 1h30 (accueil, hygiène, choix produits, prestation complète, satisfaction cliente – look tiré au sort sur 3), attestation de fin de formation, questionnaire de satisfaction à chaud et à froid.",
+    moyensPedagogiques: "Cabines professionnelles équipées (miroirs lumière du jour 5500 K, fauteuils hydrauliques), kits de pinceaux professionnels (12 pinceaux essentiels), palettes MAC / NARS / Charlotte Tilbury, modèles vivants pour la pratique quotidienne, moodboards, supports de cours numériques 30+ pages, démonstrations par la formatrice, mise en situation continue et débriefing personnalisé.",
+    publicVise: "Esthéticiennes, socio-esthéticiennes, prothésistes ongulaires, professionnelles du bien-être justifiant d'au moins 1 an d'expérience, souhaitant se spécialiser en maquillage professionnel et obtenir une certification reconnue.",
+    delaiAcces: "14 jours après validation de la préinscription et réception du dossier complet",
+    dateDebut: "2026-06-01",
+    dateFin: "2026-06-05",
+    lieu: "Maison HSY, 4 rue de la Ceriseraie, 78860 Saint-Nom-la-Bretèche / Bellezza & Co – Espace coworking beauté, 43 rue Pierre Valette, 92240 Malakoff",
+    nombreParticipants: "6",
+    formateur: "Hasnaa YEDDI",
+  },
+  {
     intitule: "Initiation au Management",
     objectifs: "Développer les compétences essentielles du management opérationnel afin d'encadrer, motiver et organiser une équipe de travail dans un environnement professionnel.\nÀ l'issue de la formation, le stagiaire sera capable de :\n- Identifier son rôle et ses responsabilités managériales.\n- Adapter son style de management aux situations et aux profils de collaborateurs.\n- Fixer des objectifs clairs (SMART) et assurer leur suivi.\n- Communiquer efficacement et gérer les tensions et conflits au sein de son équipe.\n- Motiver et fédérer une équipe autour d'un projet commun.",
     prerequis: "Avoir une première expérience professionnelle, même courte, dans un contexte d'équipe. Être motivé à encadrer, coordonner ou animer une équipe.",
