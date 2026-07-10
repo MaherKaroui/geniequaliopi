@@ -85,7 +85,7 @@ export function clearCachedContentPack(f: FormationInfo): void {
 
 export async function generateAIContentPack(
   f: FormationInfo,
-  opts: { force?: boolean; nbStagiaires?: number } = {},
+  opts: { force?: boolean; nbStagiaires?: number; humanizeBesoins?: boolean } = {},
 ): Promise<AIContentPack> {
   if (!opts.force) {
     const cached = getCachedContentPack(f);
@@ -99,6 +99,7 @@ export async function generateAIContentPack(
       publicVise: f.publicVise,
       prerequis: f.prerequis,
       nbStagiaires: opts.nbStagiaires ?? 1,
+      humanizeBesoins: opts.humanizeBesoins ?? true,
       model: "google/gemini-2.5-flash",
     },
   });
