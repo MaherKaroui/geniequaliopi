@@ -115,11 +115,21 @@ function getCandidateExperienceSummary(candidat: any): string {
     .join(" ; ");
 }
 
+function competencesList(bloc: any): string[] {
+  const arr = bloc?.competences || bloc?.criteres || [];
+  if (!Array.isArray(arr)) return [];
+  return arr.map((c: any) => typeof c === "string" ? c : (c?.intitule || c?.libelle || c?.description || "")).filter(Boolean);
+}
+
 function fallbackAnalysis(candidat: any, bloc: any): string {
   const intitule = bloc?.intitule || bloc?.libelle || "ce bloc de compétences";
   const code = bloc?.code || bloc?.codeBloc || "";
   const exp = getCandidateExperienceSummary(candidat);
-  return `Dans le cadre du bloc ${code ? `${code} — ` : ""}${intitule}, j'ai mobilisé les compétences attendues à partir de situations professionnelles concrètes issues de mon parcours. Mon expérience (${exp}) m'a conduit à analyser les besoins, organiser les priorités, choisir les méthodes adaptées et produire des résultats vérifiables. J'ai démontré ma capacité à transformer une demande ou un objectif en actions opérationnelles, en tenant compte du contexte de l'entreprise, des contraintes de délai, des interlocuteurs concernés et des exigences de qualité. J'ai également su communiquer avec les parties prenantes, formaliser mes décisions, suivre les résultats obtenus et ajuster mes pratiques lorsque cela était nécessaire. Cette expérience prouve que je ne me suis pas limité à exécuter des tâches : j'ai pris du recul sur les situations rencontrées, identifié les enjeux du bloc et apporté des réponses professionnelles cohérentes. Les activités décrites montrent ainsi ma maîtrise progressive des compétences liées à ${intitule}, notamment par la préparation, la mise en œuvre, le contrôle et l'amélioration des actions menées.`;
+  const comps = competencesList(bloc);
+  const compsPart = comps.length
+    ? `Plus précisément, j'ai mobilisé les compétences suivantes : ${comps.slice(0, 6).map((c, i) => `(${i + 1}) ${c}`).join(" ; ")}. Pour chacune, j'ai pu m'appuyer sur des situations vécues qui prouvent une pratique régulière et réfléchie, et pas seulement une connaissance théorique.`
+    : `J'ai mobilisé l'ensemble des compétences attendues par le référentiel de ce bloc, en les articulant les unes aux autres dans des situations professionnelles réelles.`;
+  return `J'ai démontré ma capacité à mettre en œuvre les compétences du bloc ${code ? `${code} — ` : ""}${intitule} à partir de situations professionnelles concrètes issues de mon parcours (${exp}). ${compsPart} Mon activité m'a conduit à analyser les besoins, organiser les priorités, choisir les méthodes adaptées, coordonner les interlocuteurs concernés et produire des livrables vérifiables dans le respect des délais et de la qualité attendue. J'ai su transformer chaque demande ou objectif en un plan d'action opérationnel, en tenant compte du contexte de l'entreprise, des contraintes réglementaires et des ressources disponibles. J'ai également formalisé mes décisions, suivi les résultats obtenus, mesuré les écarts et ajusté mes pratiques lorsque cela était nécessaire, ce qui atteste d'une posture professionnelle réflexive. Cette expérience prouve que je ne me suis pas limité à exécuter des tâches : j'ai pris du recul sur les situations rencontrées, identifié les enjeux propres au bloc et apporté des réponses cohérentes, argumentées et transférables. Les activités décrites témoignent ainsi de ma maîtrise effective des compétences liées à ${intitule}, aussi bien dans la préparation que dans la mise en œuvre, le contrôle et l'amélioration continue des actions menées.`;
 }
 
 function fallbackContexte(candidat: any, bloc: any): string {
@@ -137,20 +147,70 @@ function fallbackMoyens(bloc: any): string {
   return `Pour réaliser ces activités, j'ai mobilisé des outils bureautiques, des supports de suivi, des échanges professionnels, des procédures internes et des méthodes d'organisation adaptées à ${intitule}. J'ai utilisé des tableaux de bord, des documents de travail, des comptes rendus, des outils numériques de communication et des référentiels métier afin de sécuriser mes actions et de conserver une traçabilité des décisions prises.`;
 }
 
+const ANALYSE_TOOL = {
+  type: "function",
+  function: {
+    name: "generate_vae_analyse",
+    parameters: {
+      type: "object",
+      properties: { analyse: { type: "string" } },
+      required: ["analyse"],
+    },
+  },
+};
+
+async function regenerateAnalyse(key: string, ctx: string, bloc: any, contexte: string, description: string, moyens: string): Promise<string> {
+  const comps = competencesList(bloc);
+  const prompt = `${ctx}
+
+BLOC : ${bloc?.code || bloc?.codeBloc || ""} — ${bloc?.intitule || bloc?.libelle || ""}
+COMPÉTENCES DU BLOC : ${JSON.stringify(comps)}
+
+CONTEXTE DÉJÀ RÉDIGÉ :
+${contexte}
+
+DESCRIPTION DÉJÀ RÉDIGÉE :
+${description}
+
+MOYENS DÉJÀ RÉDIGÉS :
+${moyens}
+
+Rédige UNIQUEMENT la section "Analyse des compétences que j'ai mises en œuvre" pour ce bloc, à la première personne, ENTIÈREMENT rédigée (minimum 15 lignes, ~1500 caractères), sans aucun placeholder, "À rédiger", "à compléter", pointillés ou parenthèses vides.
+
+STRUCTURE OBLIGATOIRE :
+1. Commence exactement par : "J'ai démontré ma capacité à"
+2. Reprends UNE PAR UNE chaque compétence du bloc listée ci-dessus et explique comment je l'ai mobilisée, en t'appuyant sur les situations concrètes du CV et des sections ci-dessus.
+3. Donne des exemples précis (outils, livrables, interlocuteurs, résultats).
+4. Termine par une phrase complète de prise de recul professionnel montrant la maîtrise du bloc.
+
+Renvoie via l'outil generate_vae_analyse.`;
+
+  try {
+    const r = await callAI(key, prompt, ANALYSE_TOOL, "generate_vae_analyse", 4000);
+    return stripForbiddenPlaceholders(textOf(r?.analyse));
+  } catch (e) {
+    console.error("Analyse regen failed", e);
+    return "";
+  }
+}
+
 function normalizeBlocPayload(bloc: any, sourceBloc: any, candidat: any) {
   const raw = textOf(bloc?.situations);
   const contexte = stripForbiddenPlaceholders(textOf(bloc?.contexte) || extractFallbackSection(raw, "CONTEXTE", ["DESCRIPTION", "MOYENS", "ANALYSE"])) || fallbackContexte(candidat, sourceBloc);
   const description = stripForbiddenPlaceholders(textOf(bloc?.description) || extractFallbackSection(raw, "DESCRIPTION", ["MOYENS", "ANALYSE"])) || fallbackDescription(candidat, sourceBloc);
   const moyens = stripForbiddenPlaceholders(textOf(bloc?.moyens) || extractFallbackSection(raw, "MOYENS", ["ANALYSE"])) || fallbackMoyens(sourceBloc);
-  let analyse = stripForbiddenPlaceholders(textOf(bloc?.analyse) || extractFallbackSection(raw, "ANALYSE", []));
-  if (analyse.length < 450) analyse = fallbackAnalysis(candidat, sourceBloc);
+  const analyse = stripForbiddenPlaceholders(textOf(bloc?.analyse) || extractFallbackSection(raw, "ANALYSE", []));
+  return { contexte, description, moyens, analyse };
+}
 
+function assembleBloc(sourceBloc: any, parts: { contexte: string; description: string; moyens: string; analyse: string }) {
   return {
-    codeBloc: textOf(bloc?.codeBloc) || sourceBloc?.code || sourceBloc?.codeBloc || "",
-    intitule: textOf(bloc?.intitule) || sourceBloc?.intitule || sourceBloc?.libelle || "",
-    situations: `[CONTEXTE]\n${contexte}\n\n[DESCRIPTION]\n${description}\n\n[MOYENS]\n${moyens}\n\n[ANALYSE]\n${analyse}`,
+    codeBloc: sourceBloc?.code || sourceBloc?.codeBloc || "",
+    intitule: sourceBloc?.intitule || sourceBloc?.libelle || "",
+    situations: `[CONTEXTE]\n${parts.contexte}\n\n[DESCRIPTION]\n${parts.description}\n\n[MOYENS]\n${parts.moyens}\n\n[ANALYSE]\n${parts.analyse}`,
   };
 }
+
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
@@ -205,11 +265,20 @@ Reprends codeBloc="${b.code || b.codeBloc || ""}" et intitule="${b.intitule || b
 
       try {
         const bloc = await callAI(key, blocPrompt, BLOC_TOOL, "generate_vae_bloc", 8000);
-        situationsParBloc.push(normalizeBlocPayload(bloc, b, candidat));
+        const parts = normalizeBlocPayload(bloc, b, candidat);
+        // If analyse is too short or doesn't start correctly, regenerate it with a dedicated call.
+        const analyseOk = parts.analyse.length >= 900 && /j'ai\s+d[ée]montr[ée]/i.test(parts.analyse);
+        if (!analyseOk) {
+          const regen = await regenerateAnalyse(key, ctx, b, parts.contexte, parts.description, parts.moyens);
+          if (regen.length >= 900) parts.analyse = regen;
+          else if (parts.analyse.length < 450) parts.analyse = fallbackAnalysis(candidat, b);
+        }
+        situationsParBloc.push(assembleBloc(b, parts));
       } catch (e) {
         console.error("Bloc failed", b.code, e);
         throw e;
       }
+
     }
 
     const result = { ...main, situationsParBloc };
