@@ -2,16 +2,19 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Loader2, Search, ExternalLink } from "lucide-react";
+import { Loader2, Search, ExternalLink, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import type { VAECertification } from "@/lib/vae/vaeTypes";
+import type { VAECertification, VAECandidat } from "@/lib/vae/vaeTypes";
 
-interface Props { data: VAECertification; onChange: (v: VAECertification) => void; }
+interface Suggestion { rncp: string; intitule: string; niveau: string; certificateur?: string; justification: string; }
+interface Props { data: VAECertification; onChange: (v: VAECertification) => void; candidat?: VAECandidat; }
 
-export default function StepCertification({ data, onChange }: Props) {
+export default function StepCertification({ data, onChange, candidat }: Props) {
   const [query, setQuery] = useState(data.rncp || data.intitule || "");
   const [loading, setLoading] = useState(false);
+  const [suggesting, setSuggesting] = useState(false);
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
 
   const lookup = async () => {
     if (!query.trim()) return;
