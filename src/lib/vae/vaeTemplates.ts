@@ -123,8 +123,8 @@ function candidatCoordTable(c: VAECandidat, includeBirth = false): string {
 
 function signatureBlock(leftLabel: string, leftSub: string, rightLabel: string, rightSub: string, leftImgs?: { signature?: string; tampon?: string }, rightImgs?: { signature?: string; tampon?: string }): string {
   const cell = (label: string, sub: string, i?: { signature?: string; tampon?: string }) => {
-    const sig = i?.signature ? `<div style="margin-top:8px;"><img src="${i.signature}" alt="Signature" width="170" height="60" /></div>` : "";
-    const tam = i?.tampon ? `<div style="margin-top:8px;"><img src="${i.tampon}" alt="Tampon" width="120" height="75" /></div>` : "";
+    const sig = i?.signature ? `<div style="margin-top:8px;"><img src="${i.signature}" alt="Signature" width="170" height="60" style="width:170px;height:60px;display:block;" /></div>` : "";
+    const tam = i?.tampon ? `<div style="margin-top:8px;"><img src="${i.tampon}" alt="Tampon" width="120" height="75" style="width:120px;height:75px;display:block;" /></div>` : "";
     return `<td width="50%" valign="top" style="border:1px solid #94a3b8;padding:12px;">
       <div style="font-weight:bold;font-size:10pt;">${esc(label)}</div>
       <div style="font-size:9.5pt;color:#475569;">${esc(sub)}</div>
