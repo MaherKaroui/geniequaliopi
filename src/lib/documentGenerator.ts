@@ -2367,20 +2367,17 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
       if (!rncp) {
         // Fallback sans RNCP : voies d'accès génériques
         return `
-    <h2>8. Voies d'accès à la formation</h2>
+    <h2>8. Financement possible</h2>
     <div class="section">
-      <p>La présente formation est accessible par les voies suivantes :</p>
+      <p>La présente action de formation peut être financée selon les modalités suivantes :</p>
       <ul>
-        <li>Contrat d'apprentissage (pour les publics 16-29 ans, ou sans limite d'âge pour les travailleurs handicapés et certains projets)</li>
-        <li>Contrat de professionnalisation</li>
+        <li>Autofinancement (à la charge du bénéficiaire)</li>
+        <li>OPCO (selon les conditions de prise en charge)</li>
         <li>Plan de développement des compétences de l'entreprise</li>
-        <li>Compte Personnel de Formation (CPF)</li>
-        <li>Reconversion ou Promotion par Alternance (Pro-A)</li>
-        <li>Financement Pôle emploi / France Travail (AIF, POEI, AFPR)</li>
-        <li>Financement individuel (à la charge du bénéficiaire)</li>
       </ul>
     </div>
         `;
+
       }
       const voies = rncp.voiesAcces && rncp.voiesAcces.length > 0 ? rncp.voiesAcces : [];
       const isRS = rncp.code?.toUpperCase().startsWith("RS");
