@@ -170,7 +170,7 @@ export function getBesoinsHTML(d: VAEData): string {
       <tr><td>Emploi actuel</td><td>${esc(c.emploiActuel)}${c.employeur ? " — " + esc(c.employeur) : ""}</td></tr>
       <tr><td>Ancienneté dans le secteur</td><td>${esc(contents.parcours ? contents.parcours.split("\n")[0].slice(0, 120) : "")}</td></tr>
       <tr><td>Statut</td><td>
-        <span class="cbx">${ck(c.statut === "Salarié")}</span> Salarié(e) &nbsp;
+        <span class="cbx">${ck(c.statut === "Salarié")}</span> ${g(c,"Salarié","Salariée")} &nbsp;
         <span class="cbx">${ck(c.statut === "Demandeur d'emploi")}</span> Demandeur d'emploi &nbsp;
         <span class="cbx">${ck(c.statut === "Autre")}</span> Autre : <span class="dots">…………</span>
       </td></tr>
@@ -266,7 +266,7 @@ export function getLivret1HTML(d: VAEData): string {
     <h3>1.3 — Situation actuelle</h3>
     <table class="kv">
       <tr><td>Situation</td><td>
-        <span class="cbx">${ck(c.statut === "Salarié")}</span> Salarié(e) &nbsp;
+        <span class="cbx">${ck(c.statut === "Salarié")}</span> ${g(c,"Salarié","Salariée")} &nbsp;
         <span class="cbx">${ck(c.statut === "Demandeur d'emploi")}</span> Demandeur d'emploi &nbsp;
         <span class="cbx">${ck(c.statut === "Autre")}</span> Autre
       </td></tr>
@@ -305,7 +305,7 @@ export function getLivret1HTML(d: VAEData): string {
     </p>
 
     <h2>6. Attestation sur l'honneur</h2>
-    <p>Je soussigné(e) <strong>${esc(fullName(c))}</strong> certifie sur l'honneur l'exactitude des informations portées sur le présent livret et n'avoir déposé qu'une seule demande de recevabilité pour la certification visée au cours de l'année civile en cours.</p>
+    <p>Je ${g(c,"soussigné","soussignée")} <strong>${esc(fullName(c))}</strong> certifie sur l'honneur l'exactitude des informations portées sur le présent livret et n'avoir déposé qu'une seule demande de recevabilité pour la certification visée au cours de l'année civile en cours.</p>
     <p>Fait à ${esc(c.ville) || "…………………"}, le ${shortDate(s.dateDemandeRecevabilite || s.dateSignature)}.</p>
 
     ${signatureBlock("Le Candidat", esc(fullName(c)) + " — mention « Lu et approuvé »", "Pour " + esc(o.nom), esc(o.dirigeant) + " — Dirigeant", { signature: c.signature, tampon: c.tampon }, { tampon: o.tampon })}
@@ -403,7 +403,7 @@ export function getLivret2HTML(d: VAEData): string {
     <p>${nl2br(contents.motivation) || "<em>Conclusion à rédiger : bilan de l'accompagnement, projet professionnel visé, poursuite du parcours après obtention de la certification.</em>"}</p>
 
     <h2>Annexes et déclaration sur l'honneur</h2>
-    <p>Je soussigné(e) <strong>${esc(fullName(c))}</strong> atteste sur l'honneur que les informations fournies dans le présent dossier de validation sont exactes et que les activités décrites ont été personnellement réalisées.</p>
+    <p>Je ${g(c,"soussigné","soussignée")} <strong>${esc(fullName(c))}</strong> atteste sur l'honneur que les informations fournies dans le présent dossier de validation sont exactes et que les activités décrites ont été personnellement réalisées.</p>
     <p>Fait à ${esc(c.ville) || "…………………"}, le ${shortDate(s.dateSignature)}.</p>
 
     ${signatureBlock("Le Candidat", esc(fullName(c)), "Pour " + esc(o.nom), esc(o.dirigeant) + " — Dirigeant", { signature: c.signature, tampon: c.tampon }, { tampon: o.tampon })}
@@ -552,7 +552,7 @@ export function getAutorisationRGPDHTML(d: VAEData): string {
     <p>Vous pouvez exercer ces droits à tout moment en écrivant à ${esc(o.email)}. Vous disposez également du droit d'introduire une réclamation auprès de la CNIL (www.cnil.fr).</p>
 
     <h2>6. Recueil de votre consentement</h2>
-    <p>Je soussigné(e) <strong>${esc(fullName(c))}</strong>, après avoir pris connaissance des informations ci-dessus :</p>
+    <p>Je ${g(c,"soussigné","soussignée")} <strong>${esc(fullName(c))}</strong>, après avoir pris connaissance des informations ci-dessus :</p>
     <p><span class="cbx">☐</span> J'autorise ${esc(o.nom)} à collecter et traiter mes données personnelles aux fins de mon accompagnement VAE (nécessaire à la réalisation de la prestation).</p>
     <p><span class="cbx">☐</span> J'autorise la transmission de mes données à l'organisme certificateur et au financeur, lorsque cela est nécessaire à ma démarche.</p>
     <p><span class="cbx">☐</span> J'autorise l'enregistrement éventuel des séances de visioconférence à des fins pédagogiques et de traçabilité de l'accompagnement (facultatif).</p>
