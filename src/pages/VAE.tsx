@@ -17,8 +17,8 @@ import {
 
 const STEPS = [
   { id: 1, label: "Organisme" },
-  { id: 2, label: "Certification" },
-  { id: 3, label: "Candidat / CV" },
+  { id: 2, label: "Candidat / CV" },
+  { id: 3, label: "Certification" },
   { id: 4, label: "Session" },
   { id: 5, label: "Génération" },
 ];
