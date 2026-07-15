@@ -289,6 +289,7 @@ export function getYoutubeVideos(formationIntitule: string): CourseData['youtube
   if (t.includes('rpms') || t.includes('responsable de petite') || t.includes('responsable petite et moyenne')) return YOUTUBE_RPMS;
   if (t.includes('assistant de direction') || t.includes('assistante de direction') || t.includes('secrétaire de direction') || t.includes('office manager')) return YOUTUBE_ASSISTANT_DIRECTION;
   if (t.includes('ecsr') || t.includes('enseignant de la conduite') || t.includes('moniteur auto-école') || t.includes('moniteur auto école')) return YOUTUBE_ECSR;
+  if (t.includes('gotrm') || t.includes('rncp40990') || t.includes('tp-01329') || t.includes('tp01329') || (t.includes('transport routier') && t.includes('marchandises')) || t.includes('gestionnaire des opérations de transport') || t.includes('gestionnaire des operations de transport')) return YOUTUBE_GOTRM;
   if (t.includes('vtc') || t.includes('voiture de transport avec chauffeur') || t.includes('rs5637') || t.includes('chauffeur vtc')) return YOUTUBE_VTC;
   if (t.includes('secrétaire') || t.includes('médico-admin') || t.includes('médico admin')) return YOUTUBE_SECRETAIRE;
   // Transverses
