@@ -1669,6 +1669,35 @@ function genAnalyseBesoins(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
           + `• Plan d'action commercial individuel post-formation`,
       };
     }
+    if (lower.includes("gotrm") || lower.includes("rncp40990") || lower.includes("tp-01329") || (lower.includes("transport routier") && lower.includes("marchandises")) || lower.includes("gestionnaire des opérations de transport") || lower.includes("gestionnaire des operations de transport")) {
+      return {
+        besoins: [
+          "Étudier la faisabilité et coter une opération de transport routier de marchandises (PRK, marge, péages, indices CNR)",
+          "Maîtriser le règlement social européen RSE (CE) 561/2006 : temps de conduite, pauses, repos, chronotachygraphe numérique",
+          "Sourcer, sélectionner et contractualiser des sous-traitants transport (contrat-type du 26/12/2017, K-bis, licence communautaire, attestation URSSAF)",
+          "Rédiger la lettre de voiture nationale/internationale (mentions L.3222-1 Code des transports, Convention CMR)",
+          "Superviser un trafic régulier de messagerie/groupage et piloter les KPI d'exploitation (OTIF, retour à vide, marge par tournée)",
+          "Gérer un litige CMR (réserves, expertise contradictoire, plafond 8,33 DTS/kg, déclaration sinistre L.133-3 Code de commerce)",
+          "Piloter un tableau de bord d'exploitation (Ishikawa 5M, Pareto 80/20, PDCA, 5 pourquoi) et proposer des actions correctives chiffrées",
+          "Encadrer une équipe de conducteurs routiers (Convention collective 3085 – IDCC 16, coefficients 118M-150M, accord 23/04/2002)",
+          "Intégrer la démarche RSE / Charte Objectif CO₂ ADEME et les alternatives énergétiques (HVO, GNV, bonus 40 %)",
+          "Se préparer aux 4 épreuves du TP-01329 : mise en situation professionnelle (10 h), entretien technique (1 h), questionnement à partir de productions (30 min), entretien final (30 min)",
+        ],
+        synthese: `• ${Math.round(stagiaires.length * 0.9)} stagiaires souhaitent obtenir le TP-01329 GOTRM pour sécuriser leur poste d'exploitant ou évoluer vers gestionnaire de transport<br>`
+          + `• ${Math.round(stagiaires.length * 0.8)} stagiaires ont besoin de maîtriser le calcul du PRK, la cotation et l'affrètement (indices CNR, marge cible ≥ 8 %)<br>`
+          + `• ${Math.round(stagiaires.length * 0.7)} stagiaires demandent un approfondissement du règlement RSE 561/2006 et de la lecture chronotachygraphe (Optac3)<br>`
+          + `• ${Math.round(stagiaires.length * 0.6)} stagiaires veulent maîtriser la gestion des litiges CMR et la relation client B2B (méthode CRAC)<br>`
+          + `• ${Math.round(stagiaires.length * 0.5)} stagiaires recherchent des compétences en pilotage de KPI d'exploitation et tableaux de bord (Ishikawa, Pareto, PDCA)<br>`
+          + `• ${Math.round(stagiaires.length * 0.4)} stagiaires souhaitent intégrer la RSE / Objectif CO₂ ADEME dans leur pratique exploitation`,
+        adaptations: `• Études de cas réelles d'affrètement national palettisé (Lille-Marseille, Lyon-Bordeaux) avec calcul PRK et devis Excel<br>`
+          + `• Ateliers pratiques sur TMS pédagogique (Akanea Transport ou équivalent) et simulateur de bourse de fret (B2P, Teleroute)<br>`
+          + `• Mises en situation de rédaction de lettre de voiture, ordre de mission conducteur et contrat de sous-traitance conforme au contrat-type 26/12/2017<br>`
+          + `• Analyse de données chronotachygraphe réelles (Optac3) avec classification des infractions selon annexe IV règlement (CE) 1071/2009<br>`
+          + `• Construction en atelier d'un tableau de bord d'exploitation Excel (10 KPI, seuils vert/orange/rouge, pilote, fréquence)<br>`
+          + `• Simulation d'audit de conformité « accès à la profession » (établissement, honorabilité, capacité financière, capacité professionnelle)<br>`
+          + `• Préparation aux 4 épreuves du titre : mises en situation blanches, entretien technique blanc, rédaction du document Questionnement à partir de productions (8-12 pages)`,
+      };
+    }
     if (lower.includes("vtc") || lower.includes("conducteur") || lower.includes("transport de personnes") || lower.includes("t3p") || lower.includes("chauffeur")) {
       return {
         besoins: [
