@@ -230,6 +230,16 @@ const FormationForm = ({ data, onChange, onImportStagiaires, onApplyOrganisme }:
         }
         toast.success(`Organisme MAISON HSY BEAUTÉ + 6 stagiaires Maquilleur Pro importés`);
       }
+      // Auto-import organisme + 6 stagiaires pour GOTRM Action de Formation (SOFORMAD)
+      if (selected.intitule.toUpperCase().includes("SOFORMAD") || (selected.intitule.toUpperCase().includes("GOTRM") && !selected.intitule.toUpperCase().includes("HEXAGONE"))) {
+        if (onApplyOrganisme) {
+          onApplyOrganisme({ ...SOFORMAD_TRANSPORT_ORG });
+        }
+        if (onImportStagiaires) {
+          onImportStagiaires([...STAGIAIRES_GOTRM_AF]);
+        }
+        toast.success(`Organisme SOFORMAD LOGISTIQUE + 6 stagiaires GOTRM (Action de Formation) importés`);
+      }
     }
   };
 
