@@ -237,6 +237,15 @@ const YOUTUBE_CREATION_ENTREPRISE: CourseData['youtubeVideos'] = [
   { title: "Formalités sur le Guichet Unique INPI", url: "https://www.youtube.com/results?search_query=guichet+unique+INPI+immatriculation+entreprise", description: "Tutoriel pas à pas pour immatriculer son entreprise sur formalites.entreprises.gouv.fr." },
 ];
 
+const YOUTUBE_GOTRM: CourseData['youtubeVideos'] = [
+  { title: "Titre Pro GOTRM (RNCP40990) – Présentation complète", url: "https://www.youtube.com/results?search_query=Titre+professionnel+GOTRM+gestionnaire+transport+routier+marchandises", description: "Recherche YouTube : présentation du TP-01329, structure, épreuves et débouchés." },
+  { title: "Réglementation sociale européenne (RSE 561/2006 & AETR)", url: "https://www.youtube.com/results?search_query=RSE+561%2F2006+temps+conduite+repos+conducteur+poids+lourd", description: "Recherche YouTube : temps de conduite, pauses, repos, chronotachygraphe numérique." },
+  { title: "Calcul du prix de revient kilométrique (PRK) – CNR", url: "https://www.youtube.com/results?search_query=calcul+prix+revient+kilom%C3%A9trique+transport+routier+CNR", description: "Recherche YouTube : structure du PRK, indices CNR, formation des tarifs transport." },
+  { title: "Contrat-type sous-traitance transport (décret 2017)", url: "https://www.youtube.com/results?search_query=contrat+type+sous+traitance+transport+routier+2017+indexation+gazole", description: "Recherche YouTube : clauses, indexation gazole, solidarité financière donneur d'ordre." },
+  { title: "TMS et bourses de fret (B2P, Teleroute, Wtransnet)", url: "https://www.youtube.com/results?search_query=TMS+transport+bourse+de+fret+Teleroute+Wtransnet+Akanea", description: "Recherche YouTube : outils d'exploitation transport et bourses de fret professionnelles." },
+  { title: "Convention CMR et gestion des litiges transport", url: "https://www.youtube.com/results?search_query=convention+CMR+litige+transport+r%C3%A9serves+livraison", description: "Recherche YouTube : réserves, délais, plafonds d'indemnisation transport de marchandises." },
+];
+
 /** Génère des vidéos YouTube dynamiques (recherches ciblées) à partir de l'intitulé. */
 function getDynamicYoutubeVideos(formationIntitule: string): CourseData['youtubeVideos'] {
   const raw = (formationIntitule || "Formation professionnelle").trim();
