@@ -1334,6 +1334,7 @@ EVAL_CONTENT["Restauration"] = {
 function getContentKey(intitule: string): string {
   const lower = intitule.toLowerCase();
   if (lower.includes("vtc") || lower.includes("voiture de transport avec chauffeur") || lower.includes("rs5637") || lower.includes("chauffeur vtc")) return "VTC";
+  if (lower.includes("gotrm") || lower.includes("rncp40990") || lower.includes("tp-01329") || lower.includes("tp01329") || (lower.includes("transport routier") && lower.includes("marchandises")) || lower.includes("gestionnaire des opérations de transport") || lower.includes("gestionnaire des operations de transport")) return "GOTRM";
   if (lower.includes("ecsr") || lower.includes("enseignant de la conduite") || lower.includes("sécurité routière")) return "ECSR";
   if (lower.includes("vtest") || lower.includes("v-test") || lower.includes("rs6905")) return "VTest";
   // CIP must be checked before generic "social"
