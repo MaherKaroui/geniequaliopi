@@ -1669,6 +1669,35 @@ function genAnalyseBesoins(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
           + `• Plan d'action commercial individuel post-formation`,
       };
     }
+    if (lower.includes("gotrm") || lower.includes("rncp40990") || lower.includes("tp-01329") || (lower.includes("transport routier") && lower.includes("marchandises")) || lower.includes("gestionnaire des opérations de transport") || lower.includes("gestionnaire des operations de transport")) {
+      return {
+        besoins: [
+          "Étudier la faisabilité et coter une opération de transport routier de marchandises (PRK, marge, péages, indices CNR)",
+          "Maîtriser le règlement social européen RSE (CE) 561/2006 : temps de conduite, pauses, repos, chronotachygraphe numérique",
+          "Sourcer, sélectionner et contractualiser des sous-traitants transport (contrat-type du 26/12/2017, K-bis, licence communautaire, attestation URSSAF)",
+          "Rédiger la lettre de voiture nationale/internationale (mentions L.3222-1 Code des transports, Convention CMR)",
+          "Superviser un trafic régulier de messagerie/groupage et piloter les KPI d'exploitation (OTIF, retour à vide, marge par tournée)",
+          "Gérer un litige CMR (réserves, expertise contradictoire, plafond 8,33 DTS/kg, déclaration sinistre L.133-3 Code de commerce)",
+          "Piloter un tableau de bord d'exploitation (Ishikawa 5M, Pareto 80/20, PDCA, 5 pourquoi) et proposer des actions correctives chiffrées",
+          "Encadrer une équipe de conducteurs routiers (Convention collective 3085 – IDCC 16, coefficients 118M-150M, accord 23/04/2002)",
+          "Intégrer la démarche RSE / Charte Objectif CO₂ ADEME et les alternatives énergétiques (HVO, GNV, bonus 40 %)",
+          "Se préparer aux 4 épreuves du TP-01329 : mise en situation professionnelle (10 h), entretien technique (1 h), questionnement à partir de productions (30 min), entretien final (30 min)",
+        ],
+        synthese: `• ${Math.round(stagiaires.length * 0.9)} stagiaires souhaitent obtenir le TP-01329 GOTRM pour sécuriser leur poste d'exploitant ou évoluer vers gestionnaire de transport<br>`
+          + `• ${Math.round(stagiaires.length * 0.8)} stagiaires ont besoin de maîtriser le calcul du PRK, la cotation et l'affrètement (indices CNR, marge cible ≥ 8 %)<br>`
+          + `• ${Math.round(stagiaires.length * 0.7)} stagiaires demandent un approfondissement du règlement RSE 561/2006 et de la lecture chronotachygraphe (Optac3)<br>`
+          + `• ${Math.round(stagiaires.length * 0.6)} stagiaires veulent maîtriser la gestion des litiges CMR et la relation client B2B (méthode CRAC)<br>`
+          + `• ${Math.round(stagiaires.length * 0.5)} stagiaires recherchent des compétences en pilotage de KPI d'exploitation et tableaux de bord (Ishikawa, Pareto, PDCA)<br>`
+          + `• ${Math.round(stagiaires.length * 0.4)} stagiaires souhaitent intégrer la RSE / Objectif CO₂ ADEME dans leur pratique exploitation`,
+        adaptations: `• Études de cas réelles d'affrètement national palettisé (Lille-Marseille, Lyon-Bordeaux) avec calcul PRK et devis Excel<br>`
+          + `• Ateliers pratiques sur TMS pédagogique (Akanea Transport ou équivalent) et simulateur de bourse de fret (B2P, Teleroute)<br>`
+          + `• Mises en situation de rédaction de lettre de voiture, ordre de mission conducteur et contrat de sous-traitance conforme au contrat-type 26/12/2017<br>`
+          + `• Analyse de données chronotachygraphe réelles (Optac3) avec classification des infractions selon annexe IV règlement (CE) 1071/2009<br>`
+          + `• Construction en atelier d'un tableau de bord d'exploitation Excel (10 KPI, seuils vert/orange/rouge, pilote, fréquence)<br>`
+          + `• Simulation d'audit de conformité « accès à la profession » (établissement, honorabilité, capacité financière, capacité professionnelle)<br>`
+          + `• Préparation aux 4 épreuves du titre : mises en situation blanches, entretien technique blanc, rédaction du document Questionnement à partir de productions (8-12 pages)`,
+      };
+    }
     if (lower.includes("vtc") || lower.includes("conducteur") || lower.includes("transport de personnes") || lower.includes("t3p") || lower.includes("chauffeur")) {
       return {
         besoins: [
@@ -10086,6 +10115,7 @@ function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: 
   const isECSR = t.includes("ecsr") || t.includes("enseignant de la conduite") || t.includes("sécurité routière") || t.includes("securite routiere") || t.includes("moniteur auto-école") || t.includes("moniteur auto-ecole");
   const isVTC = !isECSR && (t.includes("vtc") || t.includes("conducteur") || t.includes("transport de personnes") || t.includes("t3p") || t.includes("chauffeur"));
   const isNTC = t.includes("négociateur technico") || t.includes("technico-commercial") || t.includes("technico commercial") || t.includes("ntc") || (f.codeRNCP || "").toUpperCase().includes("39063");
+  const isGOTRM = t.includes("gotrm") || t.includes("rncp40990") || t.includes("tp-01329") || (t.includes("transport routier") && t.includes("marchandises")) || t.includes("gestionnaire des opérations de transport") || t.includes("gestionnaire des operations de transport");
 
   // === Early return : VTC (cohérent avec le métier de conducteur VTC) ===
   if (isVTC) {
@@ -10316,6 +10346,87 @@ function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: 
       handicap: ntcHandicap[h(9) % ntcHandicap.length],
     };
   }
+
+  // === Early return : GOTRM (TP Gestionnaire des Opérations de Transport Routier de Marchandises – RNCP40990) ===
+  if (isGOTRM) {
+    const gotrmDiplomes = [
+      "Baccalauréat professionnel Logistique et Transport + 3 ans d'expérience en exploitation",
+      "BTS Gestion des Transports et Logistique Associée (GTLA) – validé partiellement",
+      "CAP Opérateur logistique + 8 ans en messagerie / groupage",
+      "Titre professionnel Technicien Supérieur en Méthodes et Exploitation Logistique (TSMEL)",
+      "Baccalauréat général + 5 ans conducteur SPL puis affréteur",
+      "BEP Conduite et services dans le transport routier + FIMO/FCO à jour",
+      "Baccalauréat professionnel Commerce + 4 ans agent d'exploitation transport",
+      "Attestation de capacité professionnelle transport léger (< 3,5 t) + VAE en cours",
+      "Licence professionnelle Management de la chaîne logistique",
+      "Baccalauréat technologique STMG + 6 ans en commission de transport",
+    ];
+    const gotrmAttentes = [
+      `Faire monter en compétences notre exploitant sur le calcul du PRK, la cotation d'affrètement et le pilotage des KPI (OTIF, marge par tournée, retour à vide) pour sécuriser la rentabilité de nos trafics.`,
+      `Sécuriser le poste de gestionnaire de transport de notre PME transport (18 véhicules > 3,5 t) en obtenant par équivalence l'attestation de capacité professionnelle exigée par la DREAL.`,
+      `Renforcer notre conformité RSE 561/2006 et Convention 3085 en formant le collaborateur qui supervise les données chronotachygraphe et la gestion des conducteurs grands routiers.`,
+      `Structurer la démarche RSE / Objectif CO₂ ADEME de notre entreprise et former l'exploitant qui pilotera le tableau de bord CO₂ et les alternatives HVO/GNV.`,
+      `Préparer la relève de notre responsable d'exploitation qui part à la retraite dans 12 mois et transmettre le portefeuille de sous-traitants et de trafics réguliers.`,
+    ];
+    const gotrmMissions = [
+      `Organiser et piloter les opérations de transport routier de marchandises depuis la prise de commande jusqu'à la clôture du dossier : cotation PRK, affrètement, lettre de voiture CMR, suivi temps réel, facturation.`,
+      `Superviser un trafic régulier de messagerie/groupage sur zone régionale (12 t utiles, 6 tournées/semaine), gérer la sous-traitance (contrat-type 26/12/2017) et le SAV (litiges CMR).`,
+      `Encadrer une équipe de conducteurs (Convention 3085 – IDCC 16, coefficients 118M-150M), analyser les données chronotachygraphe (Optac3) et prévenir les infractions RSE 561/2006.`,
+      `Sourcer et contractualiser les sous-traitants transport (K-bis < 3 mois, licence communautaire, attestation vigilance URSSAF, RC transporteur), négocier les tarifs indexés CNR gazole.`,
+      `Piloter le tableau de bord d'exploitation mensuel (10 KPI : OTIF > 95 %, retour à vide < 25 %, marge > 8 %, CO₂/t.km) et proposer des plans d'actions correctives chiffrés (Ishikawa 5M, Pareto 80/20, PDCA).`,
+    ];
+    const gotrmContribution = [
+      `Cette formation nous permet de pérenniser notre exploitation et de répondre à la croissance de nos trafics (+18 % de volume traité sur 2025) sans perte de qualité de service.`,
+      `Former notre exploitant au TP GOTRM sécurise l'attestation de capacité professionnelle exigée par la DREAL et évite tout risque de retrait de licence communautaire lors des contrôles.`,
+      `Notre entreprise développe une offre RSE / Charte Objectif CO₂ : disposer d'un gestionnaire formé au pilotage CO₂/t.km et aux énergies alternatives (HVO/GNV, bonus 40 %) nous ouvre les appels d'offres à critères RSE.`,
+      `Cette formation renforce notre conformité Qualiopi et notre attractivité : un gestionnaire certifié GOTRM consolide notre dossier auprès des donneurs d'ordre industriels et de la DREAL.`,
+      `Former un exploitant en interne sécurise notre capacité opérationnelle : chaque jour sans gestionnaire de transport reconnu par la DREAL expose la société à une suspension d'exercice.`,
+    ];
+    const gotrmObjectif = [
+      `Obtenir le Titre Professionnel Gestionnaire des Opérations de Transport Routier de Marchandises (TP-01329, RNCP40990, niveau 5) délivré par le Ministère du Travail, et par équivalence les attestations de capacité professionnelle transport > 3,5 t et commission de transport.`,
+      `Valider les 3 CCP du titre (CCP1 organiser une opération de transport, CCP2 superviser les trafics réguliers, CCP3 optimiser l'activité) pour exercer pleinement le métier de gestionnaire d'exploitation transport.`,
+      `Sécuriser mon poste actuel d'agent d'exploitation en obtenant la certification qui valide mes compétences et me permet d'évoluer vers un poste de gestionnaire de transport reconnu par la DREAL.`,
+      `Créer / reprendre une entreprise de transport public routier de marchandises : le titre me procure par équivalence l'attestation de capacité professionnelle indispensable pour obtenir la licence communautaire.`,
+      `Me reconvertir professionnellement vers le métier d'exploitant transport, secteur en tension qui recrute (+ 12 000 postes ouverts en France en 2025), et sécuriser un emploi stable dans les 3 mois suivant la certification.`,
+    ];
+    const gotrmProjetPro = [
+      `Cette formation me donnera le titre professionnel GOTRM de niveau 5 et par équivalence les attestations de capacité professionnelle (transport > 3,5 t + commission), sésames indispensables pour exercer légalement comme gestionnaire de transport.`,
+      `La maîtrise du PRK, du RSE 561/2006, du contrat-type de sous-traitance et de la CMR me permettra de sécuriser juridiquement chaque opération et d'éviter les litiges qui pénalisent la rentabilité.`,
+      `Grâce à l'apprentissage des outils TMS (Akanea Transport), des bourses de fret (B2P, Teleroute) et de l'analyse chronotachygraphe (Optac3), je pourrai piloter efficacement une exploitation multi-tonnage.`,
+      `Le CCP3 (optimisation) m'ouvrira les opportunités de management d'exploitation dans les PME transport et les groupes de commissionnaires, avec un salaire d'entrée entre 32 000 et 42 000 € brut annuel.`,
+      `Cette certification est la voie reconnue par la profession pour évoluer vers gestionnaire de transport / responsable d'exploitation : sans TP GOTRM ou équivalent, impossible d'être nommé gestionnaire de transport auprès de la DREAL.`,
+    ];
+    const gotrmHandicap = isStagiairePSH(s)
+      ? [
+          "Oui, je bénéficie d'une RQTH. Je sollicite des aménagements : supports écrits agrandis pour les modules réglementaires denses (Code des transports, RSE 561/2006, Convention 3085), temps majoré sur les mises en situation professionnelles, et point régulier avec le référent handicap pour adapter le rythme.",
+          "Oui, situation de handicap reconnue (RQTH). Je demande un poste de travail ergonomique (siège adapté, double écran) pour les longues sessions sur TMS et Excel, ainsi qu'un tutorat renforcé pour la rédaction du document Questionnement à partir de productions (8-12 pages).",
+          "Oui, je suis reconnu(e) travailleur handicapé. Je sollicite des pauses fréquentes lors des sessions théoriques, une salle isolée pour les épreuves écrites et un accompagnement du référent handicap pour la préparation à l'entretien final (30 min) devant jury.",
+          "Oui, RQTH en cours de renouvellement. Je demande un aménagement des horaires (pas de session avant 9 h pour raisons médicales) et un suivi adapté pour la période en entreprise (280 h) chez un transporteur partenaire accessible.",
+        ]
+      : [
+          "Non, je ne suis pas en situation de handicap. Je n'ai pas besoin d'aménagement particulier pour suivre la formation ni pour les périodes en entreprise (exploitation transport, salons professionnels).",
+          "Non, aucune situation de handicap déclarée. Je suis en mesure d'assurer les longues journées d'exploitation et les astreintes soir/week-end propres au métier.",
+          "Non. Je suis en bonne santé et apte à la station assise prolongée devant TMS ainsi qu'aux déplacements chez les clients et sous-traitants.",
+          "Non, pas de handicap. Aucune restriction médicale et bonne aisance à l'oral pour la relation donneurs d'ordre et sous-traitants.",
+          "Non, je ne déclare aucun handicap. Je suis pleinement disponible pour les missions terrain (visites sous-traitants, audits DREAL, salons SITL).",
+        ];
+    return {
+      civilite,
+      raisonSociale: hasEntreprise ? s.entreprise : "/",
+      attentes: hasEntreprise ? gotrmAttentes[h(4) % gotrmAttentes.length] : "/",
+      missions: hasEntreprise ? gotrmMissions[h(5) % gotrmMissions.length] : "/",
+      contribution: hasEntreprise ? gotrmContribution[h(6) % gotrmContribution.length] : "/",
+      diplome: gotrmDiplomes[h(2) % gotrmDiplomes.length],
+      objectif: gotrmObjectif[h(7) % gotrmObjectif.length],
+      budget: hasEntreprise
+        ? "Formation prise en charge par l'OPCO Mobilités au titre du plan de développement des compétences de l'entreprise (Action de Formation Qualiopi, 35 h)."
+        : "Financement personnel via le CPF (Compte Personnel de Formation), complété si besoin par un abondement France Travail dans le cadre du projet de reconversion professionnelle (PTP / AIF).",
+      projetPro: gotrmProjetPro[h(8) % gotrmProjetPro.length],
+      handicap: gotrmHandicap[h(9) % gotrmHandicap.length],
+    };
+  }
+
+
 
 
 
