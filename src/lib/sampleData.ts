@@ -132,6 +132,47 @@ export const STAGIAIRES_MAQUILLEUR_PRO: StagiaireInfo[] = [
 ];
 
 
+// ═══════════════════════════════════════════════════════════════════════════
+// SOFORMAD LOGISTIQUE – Organisme + 6 stagiaires GOTRM (Action de Formation)
+// TP-01329 « Gestionnaire des Opérations de Transport Routier de Marchandises »
+// RNCP40990 – Session intensive 5 jours (08 → 12 juin 2026)
+// ═══════════════════════════════════════════════════════════════════════════
+export const SOFORMAD_TRANSPORT_ORG: OrganismeInfo = {
+  nom: "SOFORMAD LOGISTIQUE",
+  siret: "918 452 703 00021",
+  adresse: "14 rue des Docks",
+  codePostal: "93300",
+  ville: "AUBERVILLIERS",
+  telephone: "01 43 52 78 09",
+  email: "contact@soformad-logistique.fr",
+  siteWeb: "https://www.soformad-logistique.fr",
+  nda: "11 93 09452 93",
+  dirigeant: "Rachid HAMDAOUI",
+  responsablePedagogique: "Sandrine LEROY",
+  referentHandicap: "Sandrine LEROY",
+  referentQualite: "Rachid HAMDAOUI",
+  poleAdministratif: "Nadège PIERRE",
+  relationEntreprises: "Rachid HAMDAOUI",
+  referentMobilite: "",
+  domainesFormation: "Transport routier de marchandises – Préparation au Titre Professionnel TP-01329 « Gestionnaire des Opérations de Transport Routier de Marchandises » (RNCP40990, niveau 5) – Formation continue Action de Formation",
+  typesActions: ["actions-formation"],
+  certifications: "Qualiopi Actions de Formation – Certificateur du TP GOTRM (RNCP40990)",
+  outilsUtilises: "Salle informatique, Word / Excel, TMS pédagogique (Akanea Transport), simulateur bourse de fret, plateforme LMS Digiforma, logiciel Optac3 (chronotachygraphe)",
+  version: "1",
+  dateMaj: "2026-06-12",
+};
+
+export const STAGIAIRES_GOTRM_AF: StagiaireInfo[] = [
+  { civilite: "M.", nom: "BENALLAL", prenom: "Karim", email: "karim.benallal@transports-idf.fr", telephone: "06 24 89 71 05", entreprise: "Transports IDF Express", poste: "Exploitant transport", dateNaissance: "1986-04-12", adresse: "8 avenue Jean Jaurès", codePostal: "93300", commune: "AUBERVILLIERS", dateDebutFormation: "2026-06-08", dateFinFormation: "2026-06-12", tarifFormation: "1500" },
+  { civilite: "Mme", nom: "MARCHAND", prenom: "Sophie", email: "s.marchand@delcourt-logistique.fr", telephone: "06 71 45 32 88", entreprise: "Delcourt Logistique", poste: "Assistante d'exploitation", dateNaissance: "1990-11-27", adresse: "23 rue de la Gare", codePostal: "94200", commune: "IVRY-SUR-SEINE", dateDebutFormation: "2026-06-08", dateFinFormation: "2026-06-12", tarifFormation: "1500" },
+  { civilite: "M.", nom: "TRAORÉ", prenom: "Ibrahima", email: "i.traore@transports-savignac.fr", telephone: "07 65 24 91 03", entreprise: "Transports Savignac SAS", poste: "Conducteur SPL évoluant vers l'exploitation", dateNaissance: "1983-07-18", adresse: "12 rue Pasteur", codePostal: "95100", commune: "ARGENTEUIL", dateDebutFormation: "2026-06-08", dateFinFormation: "2026-06-12", tarifFormation: "1500" },
+  { civilite: "M.", nom: "DA SILVA", prenom: "Manuel", email: "manuel.dasilva@fret-boulogne.fr", telephone: "06 88 55 12 40", entreprise: "Fret Boulogne Express", poste: "Chargé d'affrètement", dateNaissance: "1988-02-05", adresse: "6 rue Denfert-Rochereau", codePostal: "92100", commune: "BOULOGNE-BILLANCOURT", dateDebutFormation: "2026-06-08", dateFinFormation: "2026-06-12", tarifFormation: "1500" },
+  { civilite: "Mme", nom: "CHEVALIER", prenom: "Aurélie", email: "aurelie.chevalier@messagerie-est.fr", telephone: "07 52 41 68 79", entreprise: "Messagerie Est Parisien", poste: "Dispatcher messagerie", dateNaissance: "1992-09-14", adresse: "45 boulevard Voltaire", codePostal: "75011", commune: "PARIS", dateDebutFormation: "2026-06-08", dateFinFormation: "2026-06-12", tarifFormation: "1500" },
+  { civilite: "M.", nom: "NGUYEN", prenom: "Bao", email: "bao.nguyen@groupetrm.fr", telephone: "06 47 33 92 61", entreprise: "Groupe TRM Solutions", poste: "Responsable adjoint exploitation", dateNaissance: "1985-12-22", adresse: "9 rue de la Liberté", codePostal: "94400", commune: "VITRY-SUR-SEINE", dateDebutFormation: "2026-06-08", dateFinFormation: "2026-06-12", tarifFormation: "1500" },
+];
+
+
+
 export interface FormateurInfo {
   nom: string;
   prenom: string;
