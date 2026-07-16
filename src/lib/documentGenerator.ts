@@ -5302,7 +5302,7 @@ function genSuiviChiffreFormationExcel(o: OrganismeInfo, f: FormationInfo, stagi
     const sFin = s.dateFinFormation ? new Date(s.dateFinFormation.split('/').reverse().join('-')) : endDate;
     const sTermine = sFin < now;
     const sPastWeeks = cfaWeekDates.filter(w => w.weekEnd < now && w.weekStart >= sDebut);
-    const sHeuresRealisees = sTermine ? effectiveTotal : sPastWeeks.length * 35;
+    const sHeuresRealisees = sTermine ? effectiveTotal : sPastWeeks.length * hoursPerCfaWeek;
 
     // Synchronized: use EVAL_SCORES for notes, 100% attendance
     const sc = EVAL_SCORES[si] || [7, 8, 7, 8, 7];
