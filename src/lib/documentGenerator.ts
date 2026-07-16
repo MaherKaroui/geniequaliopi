@@ -9421,7 +9421,8 @@ function genSynopsisCFA(o: OrganismeInfo, f: FormationInfo) {
 
   const rythme = f.rythmeAlternance || '1 semaine CFA / 3 semaines entreprise';
   const { cfaWeeks: cfaPerCycle, entrepriseWeeks } = parseRythmeAlternance(rythme);
-  const totalCFAWeeks = Math.max(1, Math.ceil(effectiveTotal / 35));
+  const totalCFAWeeks = Math.max(1, Math.ceil(effectiveTotal / getHoursPerCFAWeek(rythme)));
+
   const cycleLength = cfaPerCycle + entrepriseWeeks;
   const totalCycles = Math.ceil(totalCFAWeeks / cfaPerCycle);
 
