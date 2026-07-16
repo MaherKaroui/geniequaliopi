@@ -9553,6 +9553,8 @@ function genSynopsisCFA(o: OrganismeInfo, f: FormationInfo) {
       }
     }
 
+    const fmtDate = (d: Date) => d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
     // Week-by-week planning table
     planningHtml += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%">
       <tr style="background:#1e3a7b;color:#fff">
