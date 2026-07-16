@@ -9496,7 +9496,7 @@ function genSynopsisCFA(o: OrganismeInfo, f: FormationInfo) {
         isCFA: true,
         moduleTitle: mod.titre,
         hours: weekHours,
-        exercices: `Exercice 1 + Exercice 2 (${(mod.modalitesEval || '').split(',')[0] || 'évaluation continue'})`,
+        exercices: `Exercice par semaine`,
         entrepriseTask: dayBased ? `Mise en pratique en entreprise (${Math.max(0, 5 - cfaDaysPerWeek)}j)` : '',
         weekStartDate: weekStart,
         weekEndDate: weekEnd,
