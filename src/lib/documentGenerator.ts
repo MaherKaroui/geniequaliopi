@@ -9449,9 +9449,15 @@ function genSynopsisCFA(o: OrganismeInfo, f: FormationInfo) {
     'Ateliers pratiques sur poste informatique, travaux individuels et collectifs',
   ];
 
+  const dayBased = isDayBasedRythme(rythme);
+  const cfaDaysPerWeek = getCFADaysPerWeek(rythme);
+  const hoursPerCfaWeek = getHoursPerCFAWeek(rythme);
+  const rawEndCap = f.dateFin ? new Date(f.dateFin.split('/').reverse().join('-')) : null;
+  const endCap = rawEndCap && !isNaN(rawEndCap.getTime()) ? rawEndCap : null;
+
   // Build week-by-week planning section
   let planningHtml = `<h3>Planification semaine par semaine</h3>
-    <p><em>Rythme : ${rythme} — Cycle de ${cycleLength} semaines (${cfaPerCycle} en CFA + ${entrepriseWeeks} en entreprise)</em></p>`;
+    <p><em>Rythme : ${rythme}${dayBased ? ` — chaque semaine : ${cfaDaysPerWeek}j CFA + ${Math.max(0, 5 - cfaDaysPerWeek)}j entreprise (${hoursPerCfaWeek}h/semaine en centre)` : ` — Cycle de ${cycleLength} semaines (${cfaPerCycle} en CFA + ${entrepriseWeeks} en entreprise)`}</em></p>`;
 
   if (rncp && rncp.blocsCompetences.length > 0) {
     // Calculate volumes
@@ -9480,53 +9486,70 @@ function genSynopsisCFA(o: OrganismeInfo, f: FormationInfo) {
     const startDate = f.dateDebut ? new Date(f.dateDebut.split('/').reverse().join('-')) : new Date();
     if (isNaN(startDate.getTime())) startDate.setTime(Date.now());
 
-    for (let cycle = 0; cycle < totalCycles && moduleIdx < modules.length; cycle++) {
-      // CFA weeks in this cycle
-      for (let cw = 0; cw < cfaPerCycle && moduleIdx < modules.length; cw++) {
-        cfaWeekNum++;
-        const weekHours = Math.min(35, remainingInModule);
-        const mod = modules[moduleIdx];
-        const weekStart = new Date(startDate);
-        weekStart.setDate(weekStart.getDate() + calendarWeek * 7);
-        const weekEnd = new Date(weekStart);
-        weekEnd.setDate(weekEnd.getDate() + 4);
-        weekPlan.push({
-          calWeek: calendarWeek + 1,
-          cfaWeek: cfaWeekNum,
-          isCFA: true,
-          moduleTitle: mod.titre,
-          hours: weekHours,
-          exercices: `Exercice 1 + Exercice 2 (${mod.modalitesEval.split(',')[0] || 'évaluation continue'})`,
-          entrepriseTask: '',
-          weekStartDate: weekStart,
-          weekEndDate: weekEnd,
-        });
-        remainingInModule -= weekHours;
-        if (remainingInModule <= 0) {
-          moduleIdx++;
-          remainingInModule = moduleIdx < modules.length ? modules[moduleIdx].volume : 0;
-        }
+    const pushCFAWeek = (weekStart: Date, weekEnd: Date) => {
+      cfaWeekNum++;
+      const weekHours = Math.min(hoursPerCfaWeek, remainingInModule || hoursPerCfaWeek);
+      const mod = modules[moduleIdx] || modules[modules.length - 1];
+      weekPlan.push({
+        calWeek: calendarWeek + 1,
+        cfaWeek: cfaWeekNum,
+        isCFA: true,
+        moduleTitle: mod.titre,
+        hours: weekHours,
+        exercices: `Exercice 1 + Exercice 2 (${(mod.modalitesEval || '').split(',')[0] || 'évaluation continue'})`,
+        entrepriseTask: dayBased ? `Mise en pratique en entreprise (${Math.max(0, 5 - cfaDaysPerWeek)}j)` : '',
+        weekStartDate: weekStart,
+        weekEndDate: weekEnd,
+      });
+      remainingInModule -= weekHours;
+      if (remainingInModule <= 0 && moduleIdx < modules.length - 1) {
+        moduleIdx++;
+        remainingInModule = modules[moduleIdx].volume;
+      }
+    };
+
+    const mkWeekDates = () => {
+      const weekStart = new Date(startDate);
+      weekStart.setDate(weekStart.getDate() + calendarWeek * 7);
+      const weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekEnd.getDate() + 4);
+      if (endCap && weekEnd > endCap) weekEnd.setTime(endCap.getTime());
+      return { weekStart, weekEnd };
+    };
+
+    if (dayBased) {
+      // Chaque semaine calendaire = 1 semaine mixte (CFA + entreprise dans la même semaine)
+      while (cfaWeekNum < totalCFAWeeks) {
+        const { weekStart, weekEnd } = mkWeekDates();
+        if (endCap && weekStart > endCap) break;
+        pushCFAWeek(weekStart, weekEnd);
         calendarWeek++;
       }
-      // Enterprise weeks
-      for (let ew = 0; ew < entrepriseWeeks; ew++) {
-        const currentMod = moduleIdx < modules.length ? modules[moduleIdx] : modules[modules.length - 1];
-        const weekStart = new Date(startDate);
-        weekStart.setDate(weekStart.getDate() + calendarWeek * 7);
-        const weekEnd = new Date(weekStart);
-        weekEnd.setDate(weekEnd.getDate() + 4);
-        weekPlan.push({
-          calWeek: calendarWeek + 1,
-          cfaWeek: 0,
-          isCFA: false,
-          moduleTitle: '',
-          hours: 0,
-          exercices: '',
-          entrepriseTask: `Mise en pratique : ${currentMod?.titre || 'compétences acquises'} — Livret d'alternance`,
-          weekStartDate: weekStart,
-          weekEndDate: weekEnd,
-        });
-        calendarWeek++;
+    } else {
+      for (let cycle = 0; cycle < totalCycles && moduleIdx < modules.length; cycle++) {
+        for (let cw = 0; cw < cfaPerCycle && moduleIdx < modules.length; cw++) {
+          const { weekStart, weekEnd } = mkWeekDates();
+          if (endCap && weekStart > endCap) break;
+          pushCFAWeek(weekStart, weekEnd);
+          calendarWeek++;
+        }
+        for (let ew = 0; ew < entrepriseWeeks; ew++) {
+          const { weekStart, weekEnd } = mkWeekDates();
+          if (endCap && weekStart > endCap) break;
+          const currentMod = moduleIdx < modules.length ? modules[moduleIdx] : modules[modules.length - 1];
+          weekPlan.push({
+            calWeek: calendarWeek + 1,
+            cfaWeek: 0,
+            isCFA: false,
+            moduleTitle: '',
+            hours: 0,
+            exercices: '',
+            entrepriseTask: `Mise en pratique : ${currentMod?.titre || 'compétences acquises'} — Livret d'alternance`,
+            weekStartDate: weekStart,
+            weekEndDate: weekEnd,
+          });
+          calendarWeek++;
+        }
       }
     }
 
