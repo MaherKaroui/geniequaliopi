@@ -13396,6 +13396,11 @@ export function getCFAWeekDates(f: FormationInfo): { cfaWeekNum: number; weekSta
   if (isNaN(rawStartDate.getTime())) rawStartDate.setTime(Date.now());
   rawStartDate.setHours(12, 0, 0, 0);
 
+  // Cap au dateFin du formulaire si présent : on ne dépasse jamais la date de fin de formation
+  const rawEndDate = f.dateFin ? new Date(f.dateFin.split('/').reverse().join('-')) : null;
+  const endCap = rawEndDate && !isNaN(rawEndDate.getTime()) ? rawEndDate : null;
+  if (endCap) endCap.setHours(23, 59, 59, 999);
+
   const firstWeekStart = new Date(rawStartDate);
   const dayOfWeek = firstWeekStart.getDay();
   const diffToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
@@ -13409,15 +13414,21 @@ export function getCFAWeekDates(f: FormationInfo): { cfaWeekNum: number; weekSta
     const posInCycle = calendarWeek % Math.max(1, cycleLength);
     const isCFA = dayBased ? true : posInCycle < cfaPerCycle;
 
+    const weekStart = new Date(firstWeekStart);
+    weekStart.setDate(firstWeekStart.getDate() + calendarWeek * 7);
+    // Stop dès qu'on dépasse la date de fin de formation
+    if (endCap && weekStart > endCap) break;
+
     if (isCFA) {
       cfaWeekCount++;
-      const weekStart = new Date(firstWeekStart);
-      weekStart.setDate(firstWeekStart.getDate() + calendarWeek * 7);
       const weekEnd = new Date(weekStart);
       weekEnd.setDate(weekEnd.getDate() + (dayBased ? Math.max(0, cfaDaysPerWeek - 1) : 4));
+      // Tronque la dernière semaine si elle dépasse la date de fin
+      if (endCap && weekEnd > endCap) weekEnd.setTime(endCap.getTime());
       result.push({ cfaWeekNum: cfaWeekCount, weekStart, weekEnd });
     }
     calendarWeek++;
+
     // Safety break to avoid infinite loops
     if (calendarWeek > 500) break;
   }
