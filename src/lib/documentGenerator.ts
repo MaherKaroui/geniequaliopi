@@ -9559,7 +9559,7 @@ function genSynopsisCFA(o: OrganismeInfo, f: FormationInfo) {
         const scaledH = Math.round((parseInt(m.volume) || 0) * scale);
         return `- ${m.contenu} <em>(${scaledH}h)</em>`;
       }).join('<br>');
-      const nbCFAWeeks = Math.max(1, Math.ceil(mod.volume / 35));
+      const nbCFAWeeks = Math.max(1, Math.ceil(mod.volume / getHoursPerCFAWeek(rythme)));
       const nbExercices = nbCFAWeeks * 2;
       return `<tr>
         <td style="vertical-align:top"><strong>${mod.titre}</strong></td>
