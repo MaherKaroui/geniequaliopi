@@ -9343,11 +9343,15 @@ function genEmargementCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
   const cfaWeekDates = getCFAWeekDates(f);
   const joursFR = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
   const mixte = isMixte(f);
+  const rythmeStr = f.rythmeAlternance || '';
+  const dayBased = isDayBasedRythme(rythmeStr);
+  const daysPerCfaWeek = dayBased ? Math.max(1, getCFADaysPerWeek(rythmeStr)) : 5;
   const today = new Date();
   today.setHours(23, 59, 59, 999);
 
   let extra = '';
   if (mixte) extra += `<p><em>Modalité mixte : alternance Présentiel / Distanciel jour par jour.</em></p>`;
+  if (dayBased) extra += `<p><em>Rythme : ${rythmeStr} — ${daysPerCfaWeek} jour(s) CFA par semaine (le reste en entreprise).</em></p>`;
   cfaWeekDates.forEach((week, wi) => {
     if (wi > 0) extra += '<div class="page-break"></div>';
     const weekStartStr = week.weekStart.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
@@ -9355,15 +9359,16 @@ function genEmargementCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
 
     extra += `<h3>Semaine CFA ${week.cfaWeekNum} — du ${weekStartStr} au ${weekEndStr}</h3>`;
 
-    // Generate 5 days (lundi to vendredi)
-    for (let d = 0; d < 5; d++) {
+    // Generate CFA days (5 for week-based, N for day-based rhythms)
+    for (let d = 0; d < daysPerCfaWeek; d++) {
       const dayDate = new Date(week.weekStart);
       dayDate.setDate(dayDate.getDate() + d);
       const dayStr = dayDate.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
       const dayName = joursFR[dayDate.getDay()];
 
       // Global day index (continuous across all CFA weeks) for modality alternation
-      const globalDayIdx = wi * 5 + d;
+      const globalDayIdx = wi * daysPerCfaWeek + d;
+
       const modalite = getDayModalite(f, globalDayIdx);
       const modaliteLabel = mixte ? ` <span style="color:#1e3a7b;font-weight:600">(${modalite === 'P' ? 'Présentiel' : 'Distanciel'})</span>` : '';
       const isPast = dayDate <= today;
