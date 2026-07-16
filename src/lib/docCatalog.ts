@@ -234,24 +234,10 @@ export function buildFullCatalog(
     add("af_c3i12_guide_entretien_abandons", "CT3 - IND 12 GUIDE D'ENTRETIEN DES ABANDONS", 3, 12, "guide_entretien_abandons_cfa");
     add("af_c3i12_mesures_engagement", "CT3 - IND 12 MESURES POUR FAVORISER L'ENGAGEMENT DES BÉNÉFICIAIRES", 3, 12, "mesures_engagement_beneficiaires_cfa");
 
-    // IND 16 — Présentation des bénéficiaires à la certification (si formation avec code RS/RNCP)
-    formations.forEach((f, fi) => {
-      if (f.codeRNCP) {
-        add(`af_c3i16_procedure_certification_${fi}`, `CT3 - IND 16 PROCÉDURE DE PRÉSENTATION À LA CERTIFICATION`, 3, 16, "procedure_presentation_certification", { fi });
-        stagiaires.forEach((s, si) => {
-          add(`af_c3i16_convocation_certification_${fi}_${si}`, `CT3 - IND 16 CONVOCATION AUX ÉPREUVES DE CERTIFICATION – ${s.prenom} ${s.nom}`, 3, 16, "convocation_certification", { fi, stagiaireIdx: si });
-        });
-        stagiaires.forEach((s, si) => {
-          add(`af_c3i16_pv_examen_${fi}_${si}`, `CT3 - IND 16 PROCÈS-VERBAL D'EXAMEN – ${s.prenom} ${s.nom}`, 3, 16, "pv_examen_certification", { fi, stagiaireIdx: si });
-        });
-        stagiaires.forEach((s, si) => {
-          add(`af_c3i16_attestation_presentation_${fi}_${si}`, `CT3 - IND 16 ATTESTATION DE PRÉSENTATION À LA CERTIFICATION – ${s.prenom} ${s.nom}`, 3, 16, "attestation_presentation_certification", { fi, stagiaireIdx: si });
-        });
-        stagiaires.forEach((s, si) => {
-          add(`af_c3i16_attestation_reussite_${fi}_${si}`, `CT3 - IND 16 ATTESTATION DE RÉUSSITE – ${s.prenom} ${s.nom}`, 3, 16, "attestation_reussite_stagiaire", { fi, stagiaireIdx: si });
-        });
-      }
-    });
+    // IND 16 — Présentation des bénéficiaires à la certification
+    // ❌ Retiré du catalogue AF : Action de Formation non certifiante
+    // (l'IND 16 ne s'applique qu'aux parcours RS/RNCP → CFA/VAE).
+
 
     // ===== CRITÈRE 4 — ADÉQUATION DES MOYENS =====
 
