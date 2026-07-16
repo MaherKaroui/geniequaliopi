@@ -16136,24 +16136,57 @@ function genDecoupageFormationCFAExcel(o: OrganismeInfo, f: FormationInfo) {
     : getCourseChapters(f.intitule).slice(0, 5).map(ch => ch.title);
   modList.push('Accompagnement + Examens');
 
-  for (let cycle = 0; cycle < totalCycles; cycle++) {
-    for (let cw = 0; cw < cfaPerCycle; cw++) {
-      cfaWk++;
+  const dayBased = isDayBasedRythme(rythme);
+  const cfaDaysPerWeek = getCFADaysPerWeek(rythme);
+  const hoursPerCfaWeek = getHoursPerCFAWeek(rythme);
+  const rawEndCap = f.dateFin ? new Date(f.dateFin.split('/').reverse().join('-')) : null;
+  const endCap = rawEndCap && !isNaN(rawEndCap.getTime()) ? rawEndCap : null;
+
+  if (dayBased) {
+    // Chaque semaine = mixte : {cfaDaysPerWeek}j CFA ({hoursPerCfaWeek}h) + reste entreprise
+    while (cfaWk < totalCFAWeeks) {
       const ws = new Date(startDate);
       ws.setDate(ws.getDate() + calWeek * 7);
+      if (endCap && ws > endCap) break;
       const we = new Date(ws);
       we.setDate(we.getDate() + 4);
+      if (endCap && we > endCap) we.setTime(endCap.getTime());
+      cfaWk++;
       const modIdx = Math.min(cfaWk - 1, modList.length - 1);
-      sheetPlanning += tr([`S${calWeek + 1}`, `${fmtD(ws)} – ${fmtD(we)}`, "CFA", modList[modIdx] || "", "35h", "Cours + exercices pratiques"]);
+      sheetPlanning += tr([
+        `S${calWeek + 1}`,
+        `${fmtD(ws)} – ${fmtD(we)}`,
+        `CFA (${cfaDaysPerWeek}j) + Entreprise (${Math.max(0, 5 - cfaDaysPerWeek)}j)`,
+        modList[modIdx] || "",
+        `${hoursPerCfaWeek}h`,
+        `Cours ${cfaDaysPerWeek}j + mise en pratique en entreprise`
+      ]);
       calWeek++;
     }
-    for (let ew = 0; ew < entrepriseWeeks; ew++) {
-      const ws = new Date(startDate);
-      ws.setDate(ws.getDate() + calWeek * 7);
-      const we = new Date(ws);
-      we.setDate(we.getDate() + 4);
-      sheetPlanning += tr([`S${calWeek + 1}`, `${fmtD(ws)} – ${fmtD(we)}`, "Entreprise", "Mise en pratique en entreprise", "35h", "Suivi livret d'alternance"]);
-      calWeek++;
+  } else {
+    for (let cycle = 0; cycle < totalCycles; cycle++) {
+      for (let cw = 0; cw < cfaPerCycle; cw++) {
+        const ws = new Date(startDate);
+        ws.setDate(ws.getDate() + calWeek * 7);
+        if (endCap && ws > endCap) break;
+        const we = new Date(ws);
+        we.setDate(we.getDate() + 4);
+        if (endCap && we > endCap) we.setTime(endCap.getTime());
+        cfaWk++;
+        const modIdx = Math.min(cfaWk - 1, modList.length - 1);
+        sheetPlanning += tr([`S${calWeek + 1}`, `${fmtD(ws)} – ${fmtD(we)}`, "CFA", modList[modIdx] || "", `${hoursPerCfaWeek}h`, "Cours + exercices pratiques"]);
+        calWeek++;
+      }
+      for (let ew = 0; ew < entrepriseWeeks; ew++) {
+        const ws = new Date(startDate);
+        ws.setDate(ws.getDate() + calWeek * 7);
+        if (endCap && ws > endCap) break;
+        const we = new Date(ws);
+        we.setDate(we.getDate() + 4);
+        if (endCap && we > endCap) we.setTime(endCap.getTime());
+        sheetPlanning += tr([`S${calWeek + 1}`, `${fmtD(ws)} – ${fmtD(we)}`, "Entreprise", "Mise en pratique en entreprise", "35h", "Suivi livret d'alternance"]);
+        calWeek++;
+      }
     }
   }
   sheets.push({ name: "Planning alternance", html: `<table>${sheetPlanning}</table>` });
