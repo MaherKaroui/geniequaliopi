@@ -14191,7 +14191,7 @@ function genSupportCoursCFA(o: OrganismeInfo, f: FormationInfo) {
     chaptersHtml += `<tr><td><strong>Certificateur</strong></td><td>${rncp.certificateur}</td></tr>`;
     chaptersHtml += `<tr><td><strong>Date d'enregistrement</strong></td><td>${rncp.dateEnregistrement}</td></tr>`;
     chaptersHtml += `<tr><td><strong>Date d'échéance</strong></td><td>${rncp.dateEcheance}</td></tr>`;
-    chaptersHtml += `<tr><td><strong>Durée indicative</strong></td><td>${rncp.dureeIndicative || effectiveTotal + 'h'}</td></tr>`;
+    chaptersHtml += `<tr><td><strong>Durée de la formation</strong></td><td>${effectiveTotal}h${rncp.dureeIndicative ? ` <span style="color:#666;font-size:11px">(indicative RNCP : ${rncp.dureeIndicative})</span>` : ''}</td></tr>`;
     chaptersHtml += `<tr><td><strong>Secteurs d'activité</strong></td><td>${rncp.secteursActivite}</td></tr>`;
     chaptersHtml += `<tr><td><strong>Types d'emplois</strong></td><td>${rncp.typesEmplois.join(', ')}</td></tr>`;
     chaptersHtml += `<tr><td><strong>Codes ROME</strong></td><td>${rncp.codesROME.join(', ')}</td></tr>`;
