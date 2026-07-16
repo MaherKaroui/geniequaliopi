@@ -16098,7 +16098,7 @@ function genDecoupageFormationCFAExcel(o: OrganismeInfo, f: FormationInfo) {
   // Sheet: Planning alternance
   const rythme = f.rythmeAlternance || '1 semaine CFA / 3 semaines entreprise';
   const { cfaWeeks: cfaPerCycle, entrepriseWeeks } = parseRythmeAlternance(rythme);
-  const totalCFAWeeks = Math.max(1, Math.ceil(effectiveTotal / getHoursPerCFAWeek(rythme)));
+  const totalCFAWeeks = getCFAWeeks(f);
   const totalCycles = Math.ceil(totalCFAWeeks / cfaPerCycle);
 
   let sheetPlanning = tr(["Semaine", "Dates", "Lieu", "Module / Bloc", "Heures", "Observations"], true);
