@@ -9620,7 +9620,7 @@ function genSynopsisCFA(o: OrganismeInfo, f: FormationInfo) {
   for (let i = 0; i < nbBlocs; i++) {
     const ch = chapters[i];
     const contenus = ch ? ch.sections.slice(0, 4).map((s) => `- ${s.title}`).join('<br>') : '[À compléter]';
-    const nbCFAWeeks = Math.max(1, Math.ceil(perBloc / 35));
+    const nbCFAWeeks = Math.max(1, Math.ceil(perBloc / getHoursPerCFAWeek(rythme)));
     const nbExercices = nbCFAWeeks * 2;
     fallbackRows.push(`<tr>
       <td style="vertical-align:top"><strong>${ch?.title || `Bloc ${i + 1}`}</strong></td>
