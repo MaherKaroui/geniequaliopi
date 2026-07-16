@@ -13478,7 +13478,7 @@ function genExercicesCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires
     for (let bi = 0; bi < rncp.blocsCompetences.length; bi++) {
       for (let mi = 0; mi < rncp.blocsCompetences[bi].matieres.length; mi++) {
         const vol = Math.round((parseInt(rncp.blocsCompetences[bi].matieres[mi].volume) || 0) * scale);
-        const matWeeks = Math.max(1, Math.ceil(vol / 35));
+        const matWeeks = Math.max(1, Math.ceil(vol / getHoursPerCFAWeek(f.rythmeAlternance || '')));
         if (bi === blocIdx && mi === matiereIdx) {
           matStartWeek = cumulWeeks;
           matEndWeek = cumulWeeks + matWeeks - 1;
