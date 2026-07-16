@@ -14253,6 +14253,8 @@ function genCalendrierAnnuelCFA(o: OrganismeInfo, f: FormationInfo) {
 
   const startDate = f.dateDebut ? new Date(f.dateDebut.split('/').reverse().join('-')) : new Date();
   if (isNaN(startDate.getTime())) startDate.setTime(Date.now());
+  const rawEnd = f.dateFin ? new Date(f.dateFin.split('/').reverse().join('-')) : null;
+  const endDateCap = rawEnd && !isNaN(rawEnd.getTime()) ? rawEnd : null;
   const fmtD = (d: Date) => d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
   const moisFR = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
@@ -14267,12 +14269,15 @@ function genCalendrierAnnuelCFA(o: OrganismeInfo, f: FormationInfo) {
     : getCourseChapters(f.intitule).slice(0, 5).map((ch, i) => ({ titre: ch.title, volume: Math.round(blocHoursTotal / Math.min(getCourseChapters(f.intitule).length, 5)) }));
   modules.push({ titre: 'Accompagnement + Examens', volume: accompHours });
 
-  // Build full-year calendar (52 weeks from start date)
+  // Build calendar : couvre toute la période entre dateDebut et dateFin (jamais moins de 52 semaines)
   let calendarRows = '';
   let cfaWeekNum = 0;
   let moduleIdx = 0;
   let remainingInModule = modules[0]?.volume || 0;
-  const totalWeeksInYear = 52;
+  const weeksFromDates = endDateCap
+    ? Math.max(1, Math.ceil((endDateCap.getTime() - startDate.getTime()) / (7 * 86400000)) + 1)
+    : 52;
+  const totalWeeksInYear = endDateCap ? weeksFromDates : Math.max(52, totalCFAWeeks + entrepriseWeeks * totalCycles);
   let posInCycle = 0;
 
   // French school holidays approximation (week numbers to skip)
@@ -14285,6 +14290,9 @@ function genCalendrierAnnuelCFA(o: OrganismeInfo, f: FormationInfo) {
   for (let w = 0; w < totalWeeksInYear; w++) {
     const weekStart = new Date(startDate);
     weekStart.setDate(weekStart.getDate() + w * 7);
+    // Cap au dateFin : on ne dépasse jamais la fin de formation
+    if (endDateCap && weekStart > endDateCap) break;
+
     const weekEnd = new Date(weekStart);
     weekEnd.setDate(weekEnd.getDate() + 4);
     const mois = moisFR[weekStart.getMonth()];
