@@ -713,6 +713,67 @@ export function orgHeader(org: OrganismeInfo, subtitle?: string): string {
       </div>
     </div>`;
   }
+  if (hs === 'gradient') {
+    return `<div style="background:linear-gradient(135deg,${s.primaryColor},${s.secondaryColor || s.primaryColor});color:white;padding:22px 26px;border-radius:12px;margin-bottom:24px;${logoAlign};box-shadow:0 4px 12px rgba(0,0,0,0.08)">
+      ${logoHtml ? `<div style="margin-bottom:10px;background:white;display:inline-block;padding:6px 10px;border-radius:6px">${logoHtml}</div>` : ""}
+      <div style="font-size:${s.fontSize + 14}px;font-weight:800;font-family:${s.headingFont};letter-spacing:-0.5px">${org.nom}</div>
+      <div style="opacity:0.9;font-size:${s.fontSize}px;margin-top:6px">${ndaLine}</div>
+      ${subtitleHtml ? `<div style="margin-top:12px;font-weight:600;font-size:${s.fontSize + 3}px;opacity:0.95">${subtitle}</div>` : ""}
+    </div>`;
+  }
+
+  if (hs === 'minimal') {
+    return `<div style="margin-bottom:28px;${logoAlign}">
+      ${logoHtml ? `<div style="margin-bottom:14px">${logoHtml}</div>` : ""}
+      <div style="font-size:${s.fontSize + 10}px;font-weight:300;color:#111;font-family:${s.headingFont};letter-spacing:2px;text-transform:uppercase">${org.nom}</div>
+      <div style="color:#999;font-size:${s.fontSize - 2}px;margin-top:6px;letter-spacing:1px">${ndaLine}</div>
+      ${subtitleHtml}
+    </div>`;
+  }
+
+  if (hs === 'corporate') {
+    return `<div style="margin-bottom:24px;background:#f8f9fb;border-left:6px solid ${s.primaryColor};padding:18px 22px;display:flex;align-items:center;gap:18px">
+      ${logoHtml ? `<div style="flex-shrink:0">${logoHtml}</div>` : ""}
+      <div style="flex:1">
+        <div style="font-size:${s.fontSize + 11}px;font-weight:700;color:${s.primaryColor};font-family:${s.headingFont}">${org.nom}</div>
+        <div style="color:#555;font-size:${s.fontSize - 1}px;margin-top:4px">${ndaLine}</div>
+        ${subtitleHtml}
+      </div>
+    </div>`;
+  }
+
+  if (hs === 'ribbon') {
+    return `<div style="margin-bottom:26px;position:relative">
+      <div style="background:${s.primaryColor};color:white;display:inline-block;padding:6px 18px;font-size:${s.fontSize - 2}px;font-weight:600;letter-spacing:1px;text-transform:uppercase;border-radius:0 20px 20px 0;margin-left:-24px">Organisme certifié Qualiopi</div>
+      <div style="padding:12px 0 8px;${logoAlign}">
+        ${logoHtml ? `<div style="margin-bottom:8px">${logoHtml}</div>` : ""}
+        <div style="font-size:${s.fontSize + 13}px;font-weight:700;color:${s.primaryColor};font-family:${s.headingFont}">${org.nom}</div>
+        <div style="color:#666;font-size:${s.fontSize - 1}px;margin-top:4px">${ndaLine}</div>
+        ${subtitleHtml}
+      </div>
+    </div>`;
+  }
+
+  if (hs === 'monogram') {
+    const initials = org.nom.split(/\s+/).map(w => w[0]).filter(Boolean).slice(0, 3).join('').toUpperCase();
+    return `<div style="display:flex;align-items:center;gap:18px;margin-bottom:24px;padding:14px 0;border-bottom:1px solid #e5e7eb">
+      ${logoHtml ? `<div style="flex-shrink:0">${logoHtml}</div>` : `<div style="flex-shrink:0;width:56px;height:56px;border-radius:50%;background:${s.primaryColor};color:white;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:${s.fontSize + 6}px;font-family:${s.headingFont}">${initials}</div>`}
+      <div style="flex:1">
+        <div style="font-size:${s.fontSize + 10}px;font-weight:700;color:#111;font-family:${s.headingFont}">${org.nom}</div>
+        <div style="color:#666;font-size:${s.fontSize - 1}px;margin-top:3px">${ndaLine}</div>
+        ${subtitleHtml}
+      </div>
+    </div>`;
+  }
+
+  if (hs === 'stacked') {
+    return `<div style="margin-bottom:26px;text-align:center;padding:20px 0;border-top:4px double ${s.primaryColor};border-bottom:4px double ${s.primaryColor}">
+      ${logoHtml ? `<div style="margin-bottom:10px">${logoHtml}</div>` : ""}
+      <div style="font-size:${s.fontSize + 15}px;font-weight:800;color:${s.primaryColor};font-family:${s.headingFont};text-transform:uppercase;letter-spacing:3px">${org.nom}</div>
+      <div style="color:#666;font-size:${s.fontSize - 1}px;margin-top:8px;font-style:italic">${ndaLine}</div>
+      ${subtitleHtml}
+    </div>`;
+  }
 
   // Classic (default)
   return `<div class="header" style="${logoAlign}">
