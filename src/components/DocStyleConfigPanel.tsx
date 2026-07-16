@@ -284,45 +284,6 @@ function HeaderMiniPreview({ headerStyle, primary, headFont }: { headerStyle: He
       <div style={{ fontSize: 6, color: "#888", textAlign: "right" }}>NDA<br/>SIRET</div>
     </div>);
   }
-  if (headerStyle === 'gradient') {
-    return (<div style={{ background: `linear-gradient(135deg, ${primary}, ${primary}aa)`, color: "white", padding: "5px 8px", borderRadius: 6 }}>
-      <div style={{ ...nameStyle, color: "white" }}>ORGANISME</div>
-      <div style={{ ...subStyle, color: "rgba(255,255,255,0.8)" }}>NDA – SIRET</div>
-    </div>);
-  }
-  if (headerStyle === 'minimal') {
-    return (<div style={{ textAlign: "center" }}>
-      <div style={{ ...nameStyle, color: "#111", fontWeight: 300, letterSpacing: 2, textTransform: "uppercase" }}>ORGANISME</div>
-      <div style={{ ...subStyle, letterSpacing: 1 }}>NDA – SIRET</div>
-    </div>);
-  }
-  if (headerStyle === 'corporate') {
-    return (<div style={{ background: "#f8f9fb", borderLeft: `3px solid ${primary}`, padding: "4px 8px", display: "flex", alignItems: "center", gap: 6 }}>
-      <div style={{ width: 12, height: 12, borderRadius: 2, background: `${primary}30`, flexShrink: 0 }} />
-      <div><div style={{ ...nameStyle, color: primary }}>ORGANISME</div><div style={subStyle}>NDA – SIRET</div></div>
-    </div>);
-  }
-  if (headerStyle === 'ribbon') {
-    return (<div>
-      <div style={{ background: primary, color: "white", display: "inline-block", padding: "1px 6px", fontSize: 6, fontWeight: 600, borderRadius: "0 6px 6px 0", marginLeft: -8 }}>QUALIOPI</div>
-      <div style={{ textAlign: "center", marginTop: 3 }}>
-        <div style={{ ...nameStyle, color: primary }}>ORGANISME</div>
-        <div style={subStyle}>NDA – SIRET</div>
-      </div>
-    </div>);
-  }
-  if (headerStyle === 'monogram') {
-    return (<div style={{ display: "flex", alignItems: "center", gap: 6, borderBottom: "1px solid #e5e7eb", paddingBottom: 3 }}>
-      <div style={{ width: 16, height: 16, borderRadius: "50%", background: primary, color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 7, fontWeight: 700, flexShrink: 0 }}>OR</div>
-      <div><div style={{ ...nameStyle, color: "#111" }}>ORGANISME</div><div style={subStyle}>NDA – SIRET</div></div>
-    </div>);
-  }
-  if (headerStyle === 'stacked') {
-    return (<div style={{ textAlign: "center", borderTop: `2px double ${primary}`, borderBottom: `2px double ${primary}`, padding: "3px 0" }}>
-      <div style={{ ...nameStyle, color: primary, textTransform: "uppercase", letterSpacing: 2 }}>ORGANISME</div>
-      <div style={{ ...subStyle, fontStyle: "italic" }}>NDA – SIRET</div>
-    </div>);
-  }
   return (<div style={{ textAlign: "center" }}>
     <div style={{ ...nameStyle, color: primary }}>ORGANISME</div>
     <div style={subStyle}>NDA – SIRET</div>
@@ -763,12 +724,6 @@ const DocStyleConfigPanel = ({ style, onChange }: DocStyleConfigPanelProps) => {
                       { id: "elegant" as HeaderStyle, label: "Élégant", desc: "Trait fin décoratif, italique" },
                       { id: "boxed" as HeaderStyle, label: "Encadré", desc: "Bordure autour de l'en-tête" },
                       { id: "split" as HeaderStyle, label: "Séparé", desc: "Logo + nom | NDA/SIRET à droite" },
-                      { id: "gradient" as HeaderStyle, label: "Dégradé", desc: "Bannière dégradée + ombre" },
-                      { id: "minimal" as HeaderStyle, label: "Minimal", desc: "Nom fin en majuscules espacées" },
-                      { id: "corporate" as HeaderStyle, label: "Corporate", desc: "Fond gris + barre latérale colorée" },
-                      { id: "ribbon" as HeaderStyle, label: "Ruban", desc: "Ruban Qualiopi + bloc central" },
-                      { id: "monogram" as HeaderStyle, label: "Monogramme", desc: "Cercle initiales + nom aligné" },
-                      { id: "stacked" as HeaderStyle, label: "Encadré double", desc: "Lignes doubles + titre espacé" },
                     ]).map(opt => {
                       const isActive = (style.headerStyle || 'classic') === opt.id;
                       return (

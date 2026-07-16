@@ -132,47 +132,6 @@ export const STAGIAIRES_MAQUILLEUR_PRO: StagiaireInfo[] = [
 ];
 
 
-// ═══════════════════════════════════════════════════════════════════════════
-// SOFORMAD LOGISTIQUE – Organisme + 6 stagiaires GOTRM (Action de Formation)
-// TP-01329 « Gestionnaire des Opérations de Transport Routier de Marchandises »
-// RNCP40990 – Session intensive 5 jours (08 → 12 juin 2026)
-// ═══════════════════════════════════════════════════════════════════════════
-export const SOFORMAD_TRANSPORT_ORG: OrganismeInfo = {
-  nom: "SOFORMAD LOGISTIQUE",
-  siret: "918 452 703 00021",
-  adresse: "14 rue des Docks",
-  codePostal: "93300",
-  ville: "AUBERVILLIERS",
-  telephone: "01 43 52 78 09",
-  email: "contact@soformad-logistique.fr",
-  siteWeb: "https://www.soformad-logistique.fr",
-  nda: "11 93 09452 93",
-  dirigeant: "Rachid HAMDAOUI",
-  responsablePedagogique: "Sandrine LEROY",
-  referentHandicap: "Sandrine LEROY",
-  referentQualite: "Rachid HAMDAOUI",
-  poleAdministratif: "Nadège PIERRE",
-  relationEntreprises: "Rachid HAMDAOUI",
-  referentMobilite: "",
-  domainesFormation: "Transport routier de marchandises – Préparation au Titre Professionnel TP-01329 « Gestionnaire des Opérations de Transport Routier de Marchandises » (RNCP40990, niveau 5) – Formation continue Action de Formation",
-  typesActions: ["actions-formation"],
-  certifications: "Qualiopi Actions de Formation – Certificateur du TP GOTRM (RNCP40990)",
-  outilsUtilises: "Salle informatique, Word / Excel, TMS pédagogique (Akanea Transport), simulateur bourse de fret, plateforme LMS Digiforma, logiciel Optac3 (chronotachygraphe)",
-  version: "1",
-  dateMaj: "2026-06-12",
-};
-
-export const STAGIAIRES_GOTRM_AF: StagiaireInfo[] = [
-  { civilite: "M.", nom: "BENALLAL", prenom: "Karim", email: "karim.benallal@transports-idf.fr", telephone: "06 24 89 71 05", entreprise: "Transports IDF Express", poste: "Exploitant transport", dateNaissance: "1986-04-12", adresse: "8 avenue Jean Jaurès", codePostal: "93300", commune: "AUBERVILLIERS", dateDebutFormation: "2026-06-08", dateFinFormation: "2026-06-12", tarifFormation: "1500" },
-  { civilite: "Mme", nom: "MARCHAND", prenom: "Sophie", email: "s.marchand@delcourt-logistique.fr", telephone: "06 71 45 32 88", entreprise: "Delcourt Logistique", poste: "Assistante d'exploitation", dateNaissance: "1990-11-27", adresse: "23 rue de la Gare", codePostal: "94200", commune: "IVRY-SUR-SEINE", dateDebutFormation: "2026-06-08", dateFinFormation: "2026-06-12", tarifFormation: "1500" },
-  { civilite: "M.", nom: "TRAORÉ", prenom: "Ibrahima", email: "i.traore@transports-savignac.fr", telephone: "07 65 24 91 03", entreprise: "Transports Savignac SAS", poste: "Conducteur SPL évoluant vers l'exploitation", dateNaissance: "1983-07-18", adresse: "12 rue Pasteur", codePostal: "95100", commune: "ARGENTEUIL", dateDebutFormation: "2026-06-08", dateFinFormation: "2026-06-12", tarifFormation: "1500" },
-  { civilite: "M.", nom: "DA SILVA", prenom: "Manuel", email: "manuel.dasilva@fret-boulogne.fr", telephone: "06 88 55 12 40", entreprise: "Fret Boulogne Express", poste: "Chargé d'affrètement", dateNaissance: "1988-02-05", adresse: "6 rue Denfert-Rochereau", codePostal: "92100", commune: "BOULOGNE-BILLANCOURT", dateDebutFormation: "2026-06-08", dateFinFormation: "2026-06-12", tarifFormation: "1500" },
-  { civilite: "Mme", nom: "CHEVALIER", prenom: "Aurélie", email: "aurelie.chevalier@messagerie-est.fr", telephone: "07 52 41 68 79", entreprise: "Messagerie Est Parisien", poste: "Dispatcher messagerie", dateNaissance: "1992-09-14", adresse: "45 boulevard Voltaire", codePostal: "75011", commune: "PARIS", dateDebutFormation: "2026-06-08", dateFinFormation: "2026-06-12", tarifFormation: "1500" },
-  { civilite: "M.", nom: "NGUYEN", prenom: "Bao", email: "bao.nguyen@groupetrm.fr", telephone: "06 47 33 92 61", entreprise: "Groupe TRM Solutions", poste: "Responsable adjoint exploitation", dateNaissance: "1985-12-22", adresse: "9 rue de la Liberté", codePostal: "94400", commune: "VITRY-SUR-SEINE", dateDebutFormation: "2026-06-08", dateFinFormation: "2026-06-12", tarifFormation: "1500" },
-];
-
-
-
 export interface FormateurInfo {
   nom: string;
   prenom: string;
@@ -192,26 +151,6 @@ export const SAMPLE_FORMATEURS: FormateurInfo[] = [
 ];
 
 export const SAMPLE_FORMATIONS: FormationInfo[] = [
-  {
-    intitule: "SOFORMAD – TP GOTRM Gestionnaire des Opérations de Transport Routier de Marchandises (RNCP40990) – 5 jours",
-    objectifs: "Préparer les candidats à la présentation du Titre Professionnel TP-01329 « Gestionnaire des Opérations de Transport Routier de Marchandises » (RNCP40990, niveau 5, arrêté du 03/06/2025). À l'issue de la formation, le stagiaire sera capable de :\n- Organiser et faire réaliser une opération de transport routier de marchandises à la demande d'un donneur d'ordre (CCP1) : analyser la demande, calculer un prix de revient et un tarif, sourcer les moyens (flotte propre, sous-traitance, affrètement), planifier la tournée dans le respect du règlement (CE) 561/2006 et encadrer les conducteurs.\n- Superviser des trafics réguliers en sous-traitance (CCP2) : messagerie, groupage, dédié, contractualisation via le contrat-type du 26/12/2017, gestion du SAV et des litiges CMR.\n- Optimiser les moyens d'exploitation et piloter l'activité (CCP3) : tableau de bord, KPI d'exploitation (taux de service, km à vide, marge par tournée), démarche d'amélioration continue (PDCA, 5 pourquoi), reporting direction.\n- Se préparer aux 4 épreuves du titre : mise en situation professionnelle (10 h), entretien technique (1 h), questionnement à partir de productions (30 min), entretien final (30 min).\nLe titre procure par équivalence l'attestation de capacité professionnelle en transport routier de marchandises (> 3,5 t) et en commission de transport.",
-    prerequis: "Justifier d'une expérience professionnelle dans le transport routier de marchandises ou la logistique (minimum 1 an souhaité). Maîtrise du français écrit et oral. Maîtrise de base des outils bureautiques (Word, Excel, navigation web) et aisance avec les chiffres (PRK, marges, indices CNR). Permis B souhaité. Le candidat s'engage à finaliser en cours de session le document support du Questionnement à partir de productions (8 à 12 pages, 10 000 à 17 000 caractères) présentant deux situations professionnelles vécues.",
-    duree: "35 heures sur 5 jours consécutifs (lundi au vendredi, 7h/jour, 09h00-12h30 / 13h30-17h00)",
-    modalites: "presentiel",
-    tarif: "1 500 € HT par stagiaire (TVA 0 % – exonération article 261-4-4°a du CGI ; éligible CPF, financement OPCO Mobilités possible)",
-    programme: "JOUR 1 (lundi) – Cadre réglementaire du TRM et CCP1 partie 1 : Étude de faisabilité et tarification\n• Code des transports, règlement (CE) 1071/2009, conditions d'accès à la profession\n• Contrats de transport nationaux et internationaux (Convention CMR, contrats-types DGITM)\n• Réglementation sociale européenne (RSE 561/2006, AETR, chronotachygraphe)\n• Convention collective 3085 et durée du travail des personnels roulants\n• Calcul du prix de revient kilométrique (PRK), indices CNR, formation des tarifs\n• Étude de cas : cotation d'une demande d'affrètement sous Word et Excel\n\nJOUR 2 (mardi) – CCP1 partie 2 : Sourcing, planification, encadrement\n• Choix des moyens : flotte propre, sous-traitance (contrat-type 26/12/2017), affrètement\n• Contrôle administratif des sous-traitants (K-bis, licence, URSSAF, assurance)\n• Bourses de fret professionnelles (B2P, Teleroute, Wtransnet, Timocom)\n• TMS pédagogique (Akanea Transport) et logiciels d'optimisation de tournées\n• Planification dans le respect de la RSE, plans de marche, briefing conducteurs\n• Mise en situation : encadrement d'équipe, gestion d'infractions RSE\n\nJOUR 3 (mercredi) – CCP2 : Trafics réguliers, sous-traitance et service client\n• Typologies de trafics : messagerie industrielle, groupage/dégroupage, dédié\n• Contrat-cadre annuel, indexation gazole, taux de service (OTIF)\n• Supervision par tour de contrôle logistique (Shippeo, Sixfold)\n• Gestion des litiges CMR : réserves, délais, plafonds d'indemnisation\n• Certifications qualité (ISO 9001, ISO 14001, Objectif CO₂)\n• Facturation, recouvrement, affacturage\n\nJOUR 4 (jeudi) – CCP3 : Optimisation, pilotage et amélioration continue\n• Organisation d'un service exploitation (dispatchers, affrètement, encadrement)\n• Tableau de bord d'exploitation : KPI opérationnels, financiers, RH, RSE\n• Démarche d'amélioration continue : PDCA, 5 pourquoi, Ishikawa, VSM, Kaizen\n• Écoconduite, digitalisation (e-CMR), transition énergétique (Charte CO₂, GNV, HVO)\n• Reporting direction, plan de progrès annuel\n• Communication professionnelle et posture managériale\n\nJOUR 5 (vendredi) – Préparation à la session d'examen TP-01329\n• Structure de la session : mise en situation 10 h, entretien technique 1 h, questionnement 30 min, entretien final 30 min\n• Méthodologie de la mise en situation professionnelle (livrables Word / Excel attendus)\n• Rédaction du document du questionnement à partir de productions (8-12 pages)\n• Examen blanc complet : mise en situation compressée + entretien technique blanc + entretien final blanc\n• Débriefing individuel et plan de révision personnalisé jusqu'à la session officielle",
-    methodesEvaluation: "Test de positionnement en début de formation (10 QCM sur RSE, Code des transports, PRK, contrats). Évaluations formatives quotidiennes : QCM réglementaire (RSE, AETR, ADR, contrats-types), études de cas tarifaires sur Excel, mises en situation sur TMS pédagogique (Akanea), jeux de rôle SAV et gestion de litiges CMR, analyse critique du document de productions du candidat. Test de positionnement en fin de formation (10 QCM). Évaluation finale certificative simulée le jour 5 reproduisant fidèlement la session du titre (mise en situation 10 h compressée + entretien technique + entretien final). Grille d'acquisition des compétences par CCP. Bilan à chaud le dernier jour, bilan à froid à 3 mois. Attestation de fin de formation.",
-    moyensPedagogiques: "Salle de formation équipée de PC individuels avec Word et Excel, accès Internet, accès aux textes Legifrance. Logiciel TMS pédagogique Akanea Transport (ou équivalent), simulateur de bourse de fret. Plateforme LMS Digiforma pour révisions (modules e-learning RSE, AETR, Code des transports, QCM auto-corrigés disponibles 6 mois après la session). Documentation à jour fournie : Code des transports, contrats-types DGITM, Convention CMR, IRU, convention collective transport routier (IDCC 16 / brochure 3085), grille des indices CNR mise à jour trimestriellement. Annales des sessions du titre. Vidéoprojecteur, paperboard, classeur stagiaire avec exercices et corrigés (110 pages). Support de cours numérique 40+ pages personnalisé au métier. Accompagnement individualisé par un formateur référent transport routier + retours écrits sur le document de productions.",
-    publicVise: "Conducteurs routiers évoluant vers un poste d'exploitation, agents administratifs du transport souhaitant accéder à un poste d'exploitation, exploitants déjà en poste souhaitant valider leur titre par capitalisation des 3 CCP, chargés d'affrètement, dispatchers, adjoints exploitation, candidats VAE justifiant d'au moins 1 an d'expérience continue ou discontinue en service exploitation transport.",
-    delaiAcces: "14 jours après signature de la convention de formation et règlement de la facture (1 500 € HT par virement bancaire ou financement OPCO / CPF).",
-    dateDebut: "2026-06-08",
-    dateFin: "2026-06-12",
-    lieu: "SOFORMAD LOGISTIQUE – 14 rue des Docks, 93300 Aubervilliers – Salle informatique T1 (10 postes PC + TMS pédagogique)",
-    nombreParticipants: "6",
-    formateur: "Sandrine LEROY",
-    rythmeAlternance: "Sessions hebdomadaires en présentiel (lundi au vendredi, 7h/jour)",
-    codeRNCP: "RNCP40990",
-  },
   {
     intitule: "Maquilleur Professionnel – Formation certifiante (Maison HSY)",
     objectifs: "Se former aux métiers de maquilleur professionnel et obtenir une formation certifiante reconnue par France Compétences.\nÀ l'issue de la formation, la stagiaire sera capable de :\n- Accueillir la cliente et appliquer le protocole d'hygiène professionnel.\n- Identifier les types de peau, la morphologie du visage, la colorimétrie et les carnations.\n- Préparer la peau et corriger les imperfections avec les techniques adaptées.\n- Maîtriser l'application du fond de teint, du contouring et du strobing.\n- Structurer les sourcils (points d'or A-B-C), maquiller les yeux et la bouche selon la morphologie.\n- Réaliser une prestation de maquillage professionnel complet en 1h30.\n- Réussir l'examen de certification (QCM + mise en situation avec tirage au sort du look).",

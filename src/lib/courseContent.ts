@@ -237,15 +237,6 @@ const YOUTUBE_CREATION_ENTREPRISE: CourseData['youtubeVideos'] = [
   { title: "Formalités sur le Guichet Unique INPI", url: "https://www.youtube.com/results?search_query=guichet+unique+INPI+immatriculation+entreprise", description: "Tutoriel pas à pas pour immatriculer son entreprise sur formalites.entreprises.gouv.fr." },
 ];
 
-const YOUTUBE_GOTRM: CourseData['youtubeVideos'] = [
-  { title: "Titre Pro GOTRM (RNCP40990) – Présentation complète", url: "https://www.youtube.com/results?search_query=Titre+professionnel+GOTRM+gestionnaire+transport+routier+marchandises", description: "Recherche YouTube : présentation du TP-01329, structure, épreuves et débouchés." },
-  { title: "Réglementation sociale européenne (RSE 561/2006 & AETR)", url: "https://www.youtube.com/results?search_query=RSE+561%2F2006+temps+conduite+repos+conducteur+poids+lourd", description: "Recherche YouTube : temps de conduite, pauses, repos, chronotachygraphe numérique." },
-  { title: "Calcul du prix de revient kilométrique (PRK) – CNR", url: "https://www.youtube.com/results?search_query=calcul+prix+revient+kilom%C3%A9trique+transport+routier+CNR", description: "Recherche YouTube : structure du PRK, indices CNR, formation des tarifs transport." },
-  { title: "Contrat-type sous-traitance transport (décret 2017)", url: "https://www.youtube.com/results?search_query=contrat+type+sous+traitance+transport+routier+2017+indexation+gazole", description: "Recherche YouTube : clauses, indexation gazole, solidarité financière donneur d'ordre." },
-  { title: "TMS et bourses de fret (B2P, Teleroute, Wtransnet)", url: "https://www.youtube.com/results?search_query=TMS+transport+bourse+de+fret+Teleroute+Wtransnet+Akanea", description: "Recherche YouTube : outils d'exploitation transport et bourses de fret professionnelles." },
-  { title: "Convention CMR et gestion des litiges transport", url: "https://www.youtube.com/results?search_query=convention+CMR+litige+transport+r%C3%A9serves+livraison", description: "Recherche YouTube : réserves, délais, plafonds d'indemnisation transport de marchandises." },
-];
-
 /** Génère des vidéos YouTube dynamiques (recherches ciblées) à partir de l'intitulé. */
 function getDynamicYoutubeVideos(formationIntitule: string): CourseData['youtubeVideos'] {
   const raw = (formationIntitule || "Formation professionnelle").trim();
@@ -289,7 +280,6 @@ export function getYoutubeVideos(formationIntitule: string): CourseData['youtube
   if (t.includes('rpms') || t.includes('responsable de petite') || t.includes('responsable petite et moyenne')) return YOUTUBE_RPMS;
   if (t.includes('assistant de direction') || t.includes('assistante de direction') || t.includes('secrétaire de direction') || t.includes('office manager')) return YOUTUBE_ASSISTANT_DIRECTION;
   if (t.includes('ecsr') || t.includes('enseignant de la conduite') || t.includes('moniteur auto-école') || t.includes('moniteur auto école')) return YOUTUBE_ECSR;
-  if (t.includes('gotrm') || t.includes('rncp40990') || t.includes('tp-01329') || t.includes('tp01329') || (t.includes('transport routier') && t.includes('marchandises')) || t.includes('gestionnaire des opérations de transport') || t.includes('gestionnaire des operations de transport')) return YOUTUBE_GOTRM;
   if (t.includes('vtc') || t.includes('voiture de transport avec chauffeur') || t.includes('rs5637') || t.includes('chauffeur vtc')) return YOUTUBE_VTC;
   if (t.includes('secrétaire') || t.includes('médico-admin') || t.includes('médico admin')) return YOUTUBE_SECRETAIRE;
   // Transverses
@@ -430,9 +420,8 @@ import { getNTCChapters } from "./courseContentNTC";
 import { getGPMEChapters } from "./courseContentGPME";
 import { getGestionEntrepriseChapters } from "./courseContentGestionEntreprise";
 import { getCreationEntrepriseChapters } from "./courseContentCreationEntreprise";
-import { getGOTRMChapters } from "./courseContentGOTRM";
 import { getCachedContentPack, pickImagesForQuery } from "./aiContentPack";
-export { getWordChapters, getAnglaisChapters, getAnglaisA1Chapters, getManagementChapters, getGenericChapters, getFLEChapters, getIAChapters, getWebmarketingChapters, getCRMChapters, getMassagePrenatalChapters, getMassagePostpartumChapters, getECSRChapters, getVTestChapters, getCIPChapters, getRPMSChapters, getAssistantDirectionChapters, getInfographisteChapters, getRestaurationChapters, getSocioEsthetiqueChapters, getVTCChapters, getEsthetiqueChapters, getMaquillageChapters, getNTCChapters, getGPMEChapters, getGestionEntrepriseChapters, getCreationEntrepriseChapters, getGOTRMChapters };
+export { getWordChapters, getAnglaisChapters, getAnglaisA1Chapters, getManagementChapters, getGenericChapters, getFLEChapters, getIAChapters, getWebmarketingChapters, getCRMChapters, getMassagePrenatalChapters, getMassagePostpartumChapters, getECSRChapters, getVTestChapters, getCIPChapters, getRPMSChapters, getAssistantDirectionChapters, getInfographisteChapters, getRestaurationChapters, getSocioEsthetiqueChapters, getVTCChapters, getEsthetiqueChapters, getMaquillageChapters, getNTCChapters, getGPMEChapters, getGestionEntrepriseChapters, getCreationEntrepriseChapters };
 
 function tryAIChapters(formationIntitule: string): CourseChapter[] | null {
   try {
@@ -469,7 +458,6 @@ export function getCourseChapters(formationIntitule: string): CourseChapter[] {
   if (t.includes('socio-esthéti') || t.includes('socio esthéti') || t.includes('rs5992') || t.includes('soins socio')) return getSocioEsthetiqueChapters();
   if (t.includes('maquilleur') || t.includes('maquillage professionnel') || t.includes('maquillage pro') || t.includes('make-up') || t.includes('makeup') || t.includes('mua ')) return getMaquillageChapters();
   if (t.includes('cap esthét') || t.includes('cap esthet') || t.includes('rncp39030') || t.includes('rncp31041') || t.includes('cosmétique') || t.includes('cosmetique') || ((t.includes('esthét') || t.includes('esthet')) && !t.includes('socio'))) return getEsthetiqueChapters();
-  if (t.includes('gotrm') || t.includes('rncp40990') || t.includes('tp-01329') || t.includes('tp01329') || (t.includes('transport routier') && t.includes('marchandises')) || t.includes('gestionnaire des opérations de transport') || t.includes('gestionnaire des operations de transport')) return getGOTRMChapters();
   if (t.includes('vtc') || t.includes('voiture de transport avec chauffeur') || t.includes('rs5637') || t.includes('chauffeur vtc')) return getVTCChapters();
   if (t.includes('management commercial opérationnel') || t.includes('management commercial operationnel') || t.includes('bts mco') || t.includes(' mco') || t.startsWith('mco') || t.includes('rncp38362')) return getNTCChapters();
   if (t.includes('négociateur') || t.includes('technico-commercial') || t.includes('technico commercial') || t.includes(' ntc') || t.startsWith('ntc') || t.includes('rncp39063')) return getNTCChapters();

@@ -1669,35 +1669,6 @@ function genAnalyseBesoins(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagi
           + `• Plan d'action commercial individuel post-formation`,
       };
     }
-    if (lower.includes("gotrm") || lower.includes("rncp40990") || lower.includes("tp-01329") || (lower.includes("transport routier") && lower.includes("marchandises")) || lower.includes("gestionnaire des opérations de transport") || lower.includes("gestionnaire des operations de transport")) {
-      return {
-        besoins: [
-          "Étudier la faisabilité et coter une opération de transport routier de marchandises (PRK, marge, péages, indices CNR)",
-          "Maîtriser le règlement social européen RSE (CE) 561/2006 : temps de conduite, pauses, repos, chronotachygraphe numérique",
-          "Sourcer, sélectionner et contractualiser des sous-traitants transport (contrat-type du 26/12/2017, K-bis, licence communautaire, attestation URSSAF)",
-          "Rédiger la lettre de voiture nationale/internationale (mentions L.3222-1 Code des transports, Convention CMR)",
-          "Superviser un trafic régulier de messagerie/groupage et piloter les KPI d'exploitation (OTIF, retour à vide, marge par tournée)",
-          "Gérer un litige CMR (réserves, expertise contradictoire, plafond 8,33 DTS/kg, déclaration sinistre L.133-3 Code de commerce)",
-          "Piloter un tableau de bord d'exploitation (Ishikawa 5M, Pareto 80/20, PDCA, 5 pourquoi) et proposer des actions correctives chiffrées",
-          "Encadrer une équipe de conducteurs routiers (Convention collective 3085 – IDCC 16, coefficients 118M-150M, accord 23/04/2002)",
-          "Intégrer la démarche RSE / Charte Objectif CO₂ ADEME et les alternatives énergétiques (HVO, GNV, bonus 40 %)",
-          "Se préparer aux 4 épreuves du TP-01329 : mise en situation professionnelle (10 h), entretien technique (1 h), questionnement à partir de productions (30 min), entretien final (30 min)",
-        ],
-        synthese: `• ${Math.round(stagiaires.length * 0.9)} stagiaires souhaitent obtenir le TP-01329 GOTRM pour sécuriser leur poste d'exploitant ou évoluer vers gestionnaire de transport<br>`
-          + `• ${Math.round(stagiaires.length * 0.8)} stagiaires ont besoin de maîtriser le calcul du PRK, la cotation et l'affrètement (indices CNR, marge cible ≥ 8 %)<br>`
-          + `• ${Math.round(stagiaires.length * 0.7)} stagiaires demandent un approfondissement du règlement RSE 561/2006 et de la lecture chronotachygraphe (Optac3)<br>`
-          + `• ${Math.round(stagiaires.length * 0.6)} stagiaires veulent maîtriser la gestion des litiges CMR et la relation client B2B (méthode CRAC)<br>`
-          + `• ${Math.round(stagiaires.length * 0.5)} stagiaires recherchent des compétences en pilotage de KPI d'exploitation et tableaux de bord (Ishikawa, Pareto, PDCA)<br>`
-          + `• ${Math.round(stagiaires.length * 0.4)} stagiaires souhaitent intégrer la RSE / Objectif CO₂ ADEME dans leur pratique exploitation`,
-        adaptations: `• Études de cas réelles d'affrètement national palettisé (Lille-Marseille, Lyon-Bordeaux) avec calcul PRK et devis Excel<br>`
-          + `• Ateliers pratiques sur TMS pédagogique (Akanea Transport ou équivalent) et simulateur de bourse de fret (B2P, Teleroute)<br>`
-          + `• Mises en situation de rédaction de lettre de voiture, ordre de mission conducteur et contrat de sous-traitance conforme au contrat-type 26/12/2017<br>`
-          + `• Analyse de données chronotachygraphe réelles (Optac3) avec classification des infractions selon annexe IV règlement (CE) 1071/2009<br>`
-          + `• Construction en atelier d'un tableau de bord d'exploitation Excel (10 KPI, seuils vert/orange/rouge, pilote, fréquence)<br>`
-          + `• Simulation d'audit de conformité « accès à la profession » (établissement, honorabilité, capacité financière, capacité professionnelle)<br>`
-          + `• Préparation aux 4 épreuves du titre : mises en situation blanches, entretien technique blanc, rédaction du document Questionnement à partir de productions (8-12 pages)`,
-      };
-    }
     if (lower.includes("vtc") || lower.includes("conducteur") || lower.includes("transport de personnes") || lower.includes("t3p") || lower.includes("chauffeur")) {
       return {
         besoins: [
@@ -2071,13 +2042,10 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
   }
 
   // Detect FLE / certification by competence blocks
-  // ⚠️ Ces blocs (RNCP, NTC, FLE/IA certif) ne s'affichent QUE pour un programme
-  // de certification (CFA). Pour une Action de Formation classique, on n'insère
-  // aucune donnée RNCP même si un code est renseigné.
   const lower = f.intitule.toLowerCase();
-  const isFLEOrCertif = isCFA && (lower.includes("français") || lower.includes("fle") || lower.includes("médico-social") || lower.includes("communiquer"));
-  const isIACertif = isCFA && (lower.includes("ia générative") || lower.includes("intelligence artificielle"));
-  const isNTCProg = isCFA && (lower.includes("négociateur") || lower.includes("technico-commercial") || lower.includes("technico commercial") || (f.codeRNCP || "").toUpperCase().includes("39063"));
+  const isFLEOrCertif = lower.includes("français") || lower.includes("fle") || lower.includes("médico-social") || lower.includes("communiquer");
+  const isIACertif = lower.includes("ia générative") || lower.includes("intelligence artificielle");
+  const isNTCProg = lower.includes("négociateur") || lower.includes("technico-commercial") || lower.includes("technico commercial") || (f.codeRNCP || "").toUpperCase().includes("39063");
   const isBlocFormation = isFLEOrCertif || isIACertif;
 
   // NTC : blocs de compétences détaillés en articles (référentiel REAC RNCP 39063)
@@ -2337,7 +2305,7 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
     <div class="section">
       <p style="font-size:${getDocStyle().fontSize + 2}px;font-weight:bold">${f.intitule}</p>
       ${(() => {
-        const rncp = (isCFA && f.codeRNCP) ? getRNCPByCode(f.codeRNCP) : undefined;
+        const rncp = f.codeRNCP ? getRNCPByCode(f.codeRNCP) : undefined;
         if (!rncp) return "";
         const isRS = rncp.code.toUpperCase().startsWith("RS");
         const label = isRS ? "Répertoire Spécifique" : "RNCP";
@@ -2396,7 +2364,7 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
     </div>
 
     ${(() => {
-      const rncp = (isCFA && f.codeRNCP) ? getRNCPByCode(f.codeRNCP) : undefined;
+      const rncp = f.codeRNCP ? getRNCPByCode(f.codeRNCP) : undefined;
       if (!rncp) {
         // Fallback sans RNCP : voies d'accès génériques
         return ``;
@@ -2464,7 +2432,7 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
     })()}
 
     ${(() => {
-      const rncp = (isCFA && f.codeRNCP) ? getRNCPByCode(f.codeRNCP) : undefined;
+      const rncp = f.codeRNCP ? getRNCPByCode(f.codeRNCP) : undefined;
       if (!rncp) return "";
       const blocsHtml = rncp.blocsCompetences && rncp.blocsCompetences.length > 0
         ? `<table style="width:100%;margin-top:8px">
@@ -5059,7 +5027,7 @@ function genMatriceCompetencesExcel(o: OrganismeInfo, f: FormationInfo, stagiair
   const cfaWeekDates = isCFA ? getCFAWeekDates(f) : [];
   const now = new Date();
   const pastCFAWeeks = cfaWeekDates.filter(w => w.weekEnd < now).length;
-  const pastCFAHours = pastCFAWeeks * getHoursPerCFAWeek(f.rythmeAlternance || '');
+  const pastCFAHours = pastCFAWeeks * 35;
   const heuresRealisees = termine ? effectiveTotal : pastCFAHours;
 
   const tr = (cells: string[], isHeader = false) => {
@@ -5203,9 +5171,7 @@ function genSuiviChiffreFormationExcel(o: OrganismeInfo, f: FormationInfo, stagi
   const { totalHours } = parseDuree(f.duree);
   const effectiveTotal = totalHours > 0 ? totalHours : 420;
   const isCFA = !!(f.rythmeAlternance && f.rythmeAlternance.trim().length > 0);
-  const hoursPerCfaWeek = getHoursPerCFAWeek(f.rythmeAlternance || '');
-  const totalCFAWeeks = getCFAWeeks(f);
-
+  const totalCFAWeeks = Math.max(1, Math.ceil(effectiveTotal / 35));
   const termine = isFormationTerminee(f, stagiaires);
 
   const tr = (cells: string[], isHeader = false) => {
@@ -5225,7 +5191,7 @@ function genSuiviChiffreFormationExcel(o: OrganismeInfo, f: FormationInfo, stagi
   const cfaWeekDates = isCFA ? getCFAWeekDates(f) : [];
   // Determine which CFA weeks are in the past
   const pastCFAWeeks = cfaWeekDates.filter(w => w.weekEnd < now);
-  const pastCFAHours = pastCFAWeeks.length * hoursPerCfaWeek;
+  const pastCFAHours = pastCFAWeeks.length * 35;
   const progressRatio = termine ? 1 : Math.min(1, pastCFAHours / effectiveTotal);
 
   // Sheet 1: Indicateurs globaux — synchronized with other documents
@@ -5305,7 +5271,7 @@ function genSuiviChiffreFormationExcel(o: OrganismeInfo, f: FormationInfo, stagi
     const sFin = s.dateFinFormation ? new Date(s.dateFinFormation.split('/').reverse().join('-')) : endDate;
     const sTermine = sFin < now;
     const sPastWeeks = cfaWeekDates.filter(w => w.weekEnd < now && w.weekStart >= sDebut);
-    const sHeuresRealisees = sTermine ? effectiveTotal : sPastWeeks.length * hoursPerCfaWeek;
+    const sHeuresRealisees = sTermine ? effectiveTotal : sPastWeeks.length * 35;
 
     // Synchronized: use EVAL_SCORES for notes, 100% attendance
     const sc = EVAL_SCORES[si] || [7, 8, 7, 8, 7];
@@ -5448,7 +5414,7 @@ function genSuiviChiffreFormationExcel(o: OrganismeInfo, f: FormationInfo, stagi
       // Count CFA weeks in this month
       const cfaWeeksInMonth = cfaWeekDates.filter(w => w.weekStart >= moisStart && w.weekStart <= moisEnd);
       const semCFA = cfaWeeksInMonth.length;
-      const heuresCFA = semCFA * getHoursPerCFAWeek(f.rythmeAlternance || '');
+      const heuresCFA = semCFA * 35;
 
       // Estimate enterprise weeks: total calendar weeks in month minus CFA weeks
       const totalCalWeeksInMonth = Math.round((moisEnd.getTime() - moisStart.getTime()) / (7 * 86400000));
@@ -9250,10 +9216,7 @@ function genDocumentsCertificateursCFA(o: OrganismeInfo, f: FormationInfo) {
   }
 
   let prerequisContent = "<p>• Avoir suivi l'intégralité du parcours de formation<br>• Avoir validé les évaluations en cours de formation<br>• Avoir réalisé la totalité des heures en entreprise<br>• Être à jour de l'assiduité</p>";
-  const { totalHours: dureeFormation } = parseDuree(f.duree || '');
-  if (dureeFormation > 0) {
-    prerequisContent += `<p><strong>Durée de la formation :</strong> ${dureeFormation} heures</p>`;
-  } else if (fiche?.dureeIndicative) {
+  if (fiche?.dureeIndicative) {
     prerequisContent += `<p><strong>Durée indicative :</strong> ${fiche.dureeIndicative}</p>`;
   }
 
@@ -9339,54 +9302,23 @@ export function getCFADaysPerWeek(rythme: string): number {
   return 5;
 }
 
-/** Nombre d'heures CFA par semaine calendaire selon le rythme.
- *  - Rythme journalier (ex : "1 jour CFA / 4 jours entreprise") → cfaDays × 7h (ex : 1j = 7h)
- *  - Rythme hebdomadaire ("1 sem CFA / 3 sem entreprise") → 35h/semaine CFA
- */
-export function getHoursPerCFAWeek(rythme: string): number {
-  if (!rythme) return 35;
-  if (isDayBasedRythme(rythme)) return Math.max(7, getCFADaysPerWeek(rythme) * 7);
-  return 35;
-}
-
-/** Nombre de semaines calendaires entre dateDebut et dateFin (inclusif). */
-export function getCalendarWeeksBetween(f: FormationInfo): number | null {
-  if (!f.dateDebut || !f.dateFin) return null;
-  const start = new Date(f.dateDebut.split('/').reverse().join('-'));
-  const end = new Date(f.dateFin.split('/').reverse().join('-'));
-  if (isNaN(start.getTime()) || isNaN(end.getTime()) || end < start) return null;
-  return Math.max(1, Math.ceil((end.getTime() - start.getTime()) / (7 * 86400000)) + 1);
-}
-
-/** Calculate the total number of CFA weeks for the formation, capped by real calendar period. */
+/** Calculate the total number of CFA weeks for the formation */
 function getCFAWeeks(f: FormationInfo): number {
   const { totalHours } = parseDuree(f.duree);
   const effectiveTotal = totalHours > 0 ? totalHours : 420;
-  const hpw = getHoursPerCFAWeek(f.rythmeAlternance || '');
-  const theoretical = Math.max(1, Math.ceil(effectiveTotal / hpw));
-  // Pour les rythmes journaliers (ex: 1j CFA / 4j entreprise), chaque semaine est mixte :
-  // le nombre de semaines mixtes ne peut pas dépasser le nombre de semaines calendaires réelles.
-  if (isDayBasedRythme(f.rythmeAlternance || '')) {
-    const calWeeks = getCalendarWeeksBetween(f);
-    if (calWeeks && calWeeks > 0) return Math.min(theoretical, calWeeks);
-  }
-  return theoretical;
+  // 35h per CFA week
+  return Math.max(1, Math.ceil(effectiveTotal / 35));
 }
-
 
 function genEmargementCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const cfaWeekDates = getCFAWeekDates(f);
   const joursFR = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
   const mixte = isMixte(f);
-  const rythmeStr = f.rythmeAlternance || '';
-  const dayBased = isDayBasedRythme(rythmeStr);
-  const daysPerCfaWeek = dayBased ? Math.max(1, getCFADaysPerWeek(rythmeStr)) : 5;
   const today = new Date();
   today.setHours(23, 59, 59, 999);
 
   let extra = '';
   if (mixte) extra += `<p><em>Modalité mixte : alternance Présentiel / Distanciel jour par jour.</em></p>`;
-  if (dayBased) extra += `<p><em>Rythme : ${rythmeStr} — ${daysPerCfaWeek} jour(s) CFA par semaine (le reste en entreprise).</em></p>`;
   cfaWeekDates.forEach((week, wi) => {
     if (wi > 0) extra += '<div class="page-break"></div>';
     const weekStartStr = week.weekStart.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
@@ -9394,16 +9326,15 @@ function genEmargementCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: Stagia
 
     extra += `<h3>Semaine CFA ${week.cfaWeekNum} — du ${weekStartStr} au ${weekEndStr}</h3>`;
 
-    // Generate CFA days (5 for week-based, N for day-based rhythms)
-    for (let d = 0; d < daysPerCfaWeek; d++) {
+    // Generate 5 days (lundi to vendredi)
+    for (let d = 0; d < 5; d++) {
       const dayDate = new Date(week.weekStart);
       dayDate.setDate(dayDate.getDate() + d);
       const dayStr = dayDate.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
       const dayName = joursFR[dayDate.getDay()];
 
       // Global day index (continuous across all CFA weeks) for modality alternation
-      const globalDayIdx = wi * daysPerCfaWeek + d;
-
+      const globalDayIdx = wi * 5 + d;
       const modalite = getDayModalite(f, globalDayIdx);
       const modaliteLabel = mixte ? ` <span style="color:#1e3a7b;font-weight:600">(${modalite === 'P' ? 'Présentiel' : 'Distanciel'})</span>` : '';
       const isPast = dayDate <= today;
@@ -9443,8 +9374,7 @@ function genSynopsisCFA(o: OrganismeInfo, f: FormationInfo) {
 
   const rythme = f.rythmeAlternance || '1 semaine CFA / 3 semaines entreprise';
   const { cfaWeeks: cfaPerCycle, entrepriseWeeks } = parseRythmeAlternance(rythme);
-  const totalCFAWeeks = getCFAWeeks(f);
-
+  const totalCFAWeeks = Math.max(1, Math.ceil(effectiveTotal / 35));
   const cycleLength = cfaPerCycle + entrepriseWeeks;
   const totalCycles = Math.ceil(totalCFAWeeks / cfaPerCycle);
 
@@ -9455,15 +9385,9 @@ function genSynopsisCFA(o: OrganismeInfo, f: FormationInfo) {
     'Ateliers pratiques sur poste informatique, travaux individuels et collectifs',
   ];
 
-  const dayBased = isDayBasedRythme(rythme);
-  const cfaDaysPerWeek = getCFADaysPerWeek(rythme);
-  const hoursPerCfaWeek = getHoursPerCFAWeek(rythme);
-  const rawEndCap = f.dateFin ? new Date(f.dateFin.split('/').reverse().join('-')) : null;
-  const endCap = rawEndCap && !isNaN(rawEndCap.getTime()) ? rawEndCap : null;
-
   // Build week-by-week planning section
   let planningHtml = `<h3>Planification semaine par semaine</h3>
-    <p><em>Rythme : ${rythme}${dayBased ? ` — chaque semaine : ${cfaDaysPerWeek}j CFA + ${Math.max(0, 5 - cfaDaysPerWeek)}j entreprise (${hoursPerCfaWeek}h/semaine en centre)` : ` — Cycle de ${cycleLength} semaines (${cfaPerCycle} en CFA + ${entrepriseWeeks} en entreprise)`}</em></p>`;
+    <p><em>Rythme : ${rythme} — Cycle de ${cycleLength} semaines (${cfaPerCycle} en CFA + ${entrepriseWeeks} en entreprise)</em></p>`;
 
   if (rncp && rncp.blocsCompetences.length > 0) {
     // Calculate volumes
@@ -9492,70 +9416,53 @@ function genSynopsisCFA(o: OrganismeInfo, f: FormationInfo) {
     const startDate = f.dateDebut ? new Date(f.dateDebut.split('/').reverse().join('-')) : new Date();
     if (isNaN(startDate.getTime())) startDate.setTime(Date.now());
 
-    const pushCFAWeek = (weekStart: Date, weekEnd: Date) => {
-      cfaWeekNum++;
-      const weekHours = Math.min(hoursPerCfaWeek, remainingInModule || hoursPerCfaWeek);
-      const mod = modules[moduleIdx] || modules[modules.length - 1];
-      weekPlan.push({
-        calWeek: calendarWeek + 1,
-        cfaWeek: cfaWeekNum,
-        isCFA: true,
-        moduleTitle: mod.titre,
-        hours: weekHours,
-        exercices: `Exercice par semaine`,
-        entrepriseTask: dayBased ? `Mise en pratique en entreprise (${Math.max(0, 5 - cfaDaysPerWeek)}j)` : '',
-        weekStartDate: weekStart,
-        weekEndDate: weekEnd,
-      });
-      remainingInModule -= weekHours;
-      if (remainingInModule <= 0 && moduleIdx < modules.length - 1) {
-        moduleIdx++;
-        remainingInModule = modules[moduleIdx].volume;
-      }
-    };
-
-    const mkWeekDates = () => {
-      const weekStart = new Date(startDate);
-      weekStart.setDate(weekStart.getDate() + calendarWeek * 7);
-      const weekEnd = new Date(weekStart);
-      weekEnd.setDate(weekEnd.getDate() + 4);
-      if (endCap && weekEnd > endCap) weekEnd.setTime(endCap.getTime());
-      return { weekStart, weekEnd };
-    };
-
-    if (dayBased) {
-      // Chaque semaine calendaire = 1 semaine mixte (CFA + entreprise dans la même semaine)
-      while (cfaWeekNum < totalCFAWeeks) {
-        const { weekStart, weekEnd } = mkWeekDates();
-        if (endCap && weekStart > endCap) break;
-        pushCFAWeek(weekStart, weekEnd);
+    for (let cycle = 0; cycle < totalCycles && moduleIdx < modules.length; cycle++) {
+      // CFA weeks in this cycle
+      for (let cw = 0; cw < cfaPerCycle && moduleIdx < modules.length; cw++) {
+        cfaWeekNum++;
+        const weekHours = Math.min(35, remainingInModule);
+        const mod = modules[moduleIdx];
+        const weekStart = new Date(startDate);
+        weekStart.setDate(weekStart.getDate() + calendarWeek * 7);
+        const weekEnd = new Date(weekStart);
+        weekEnd.setDate(weekEnd.getDate() + 4);
+        weekPlan.push({
+          calWeek: calendarWeek + 1,
+          cfaWeek: cfaWeekNum,
+          isCFA: true,
+          moduleTitle: mod.titre,
+          hours: weekHours,
+          exercices: `Exercice 1 + Exercice 2 (${mod.modalitesEval.split(',')[0] || 'évaluation continue'})`,
+          entrepriseTask: '',
+          weekStartDate: weekStart,
+          weekEndDate: weekEnd,
+        });
+        remainingInModule -= weekHours;
+        if (remainingInModule <= 0) {
+          moduleIdx++;
+          remainingInModule = moduleIdx < modules.length ? modules[moduleIdx].volume : 0;
+        }
         calendarWeek++;
       }
-    } else {
-      for (let cycle = 0; cycle < totalCycles && moduleIdx < modules.length; cycle++) {
-        for (let cw = 0; cw < cfaPerCycle && moduleIdx < modules.length; cw++) {
-          const { weekStart, weekEnd } = mkWeekDates();
-          if (endCap && weekStart > endCap) break;
-          pushCFAWeek(weekStart, weekEnd);
-          calendarWeek++;
-        }
-        for (let ew = 0; ew < entrepriseWeeks; ew++) {
-          const { weekStart, weekEnd } = mkWeekDates();
-          if (endCap && weekStart > endCap) break;
-          const currentMod = moduleIdx < modules.length ? modules[moduleIdx] : modules[modules.length - 1];
-          weekPlan.push({
-            calWeek: calendarWeek + 1,
-            cfaWeek: 0,
-            isCFA: false,
-            moduleTitle: '',
-            hours: 0,
-            exercices: '',
-            entrepriseTask: `Mise en pratique : ${currentMod?.titre || 'compétences acquises'} — Livret d'alternance`,
-            weekStartDate: weekStart,
-            weekEndDate: weekEnd,
-          });
-          calendarWeek++;
-        }
+      // Enterprise weeks
+      for (let ew = 0; ew < entrepriseWeeks; ew++) {
+        const currentMod = moduleIdx < modules.length ? modules[moduleIdx] : modules[modules.length - 1];
+        const weekStart = new Date(startDate);
+        weekStart.setDate(weekStart.getDate() + calendarWeek * 7);
+        const weekEnd = new Date(weekStart);
+        weekEnd.setDate(weekEnd.getDate() + 4);
+        weekPlan.push({
+          calWeek: calendarWeek + 1,
+          cfaWeek: 0,
+          isCFA: false,
+          moduleTitle: '',
+          hours: 0,
+          exercices: '',
+          entrepriseTask: `Mise en pratique : ${currentMod?.titre || 'compétences acquises'} — Livret d'alternance`,
+          weekStartDate: weekStart,
+          weekEndDate: weekEnd,
+        });
+        calendarWeek++;
       }
     }
 
@@ -9604,7 +9511,7 @@ function genSynopsisCFA(o: OrganismeInfo, f: FormationInfo) {
         const scaledH = Math.round((parseInt(m.volume) || 0) * scale);
         return `- ${m.contenu} <em>(${scaledH}h)</em>`;
       }).join('<br>');
-      const nbCFAWeeks = Math.max(1, Math.ceil(mod.volume / getHoursPerCFAWeek(rythme)));
+      const nbCFAWeeks = Math.max(1, Math.ceil(mod.volume / 35));
       const nbExercices = nbCFAWeeks * 2;
       return `<tr>
         <td style="vertical-align:top"><strong>${mod.titre}</strong></td>
@@ -9665,7 +9572,7 @@ function genSynopsisCFA(o: OrganismeInfo, f: FormationInfo) {
   for (let i = 0; i < nbBlocs; i++) {
     const ch = chapters[i];
     const contenus = ch ? ch.sections.slice(0, 4).map((s) => `- ${s.title}`).join('<br>') : '[À compléter]';
-    const nbCFAWeeks = Math.max(1, Math.ceil(perBloc / getHoursPerCFAWeek(rythme)));
+    const nbCFAWeeks = Math.max(1, Math.ceil(perBloc / 35));
     const nbExercices = nbCFAWeeks * 2;
     fallbackRows.push(`<tr>
       <td style="vertical-align:top"><strong>${ch?.title || `Bloc ${i + 1}`}</strong></td>
@@ -10179,7 +10086,6 @@ function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: 
   const isECSR = t.includes("ecsr") || t.includes("enseignant de la conduite") || t.includes("sécurité routière") || t.includes("securite routiere") || t.includes("moniteur auto-école") || t.includes("moniteur auto-ecole");
   const isVTC = !isECSR && (t.includes("vtc") || t.includes("conducteur") || t.includes("transport de personnes") || t.includes("t3p") || t.includes("chauffeur"));
   const isNTC = t.includes("négociateur technico") || t.includes("technico-commercial") || t.includes("technico commercial") || t.includes("ntc") || (f.codeRNCP || "").toUpperCase().includes("39063");
-  const isGOTRM = t.includes("gotrm") || t.includes("rncp40990") || t.includes("tp-01329") || (t.includes("transport routier") && t.includes("marchandises")) || t.includes("gestionnaire des opérations de transport") || t.includes("gestionnaire des operations de transport");
 
   // === Early return : VTC (cohérent avec le métier de conducteur VTC) ===
   if (isVTC) {
@@ -10410,87 +10316,6 @@ function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: 
       handicap: ntcHandicap[h(9) % ntcHandicap.length],
     };
   }
-
-  // === Early return : GOTRM (TP Gestionnaire des Opérations de Transport Routier de Marchandises – RNCP40990) ===
-  if (isGOTRM) {
-    const gotrmDiplomes = [
-      "Baccalauréat professionnel Logistique et Transport + 3 ans d'expérience en exploitation",
-      "BTS Gestion des Transports et Logistique Associée (GTLA) – validé partiellement",
-      "CAP Opérateur logistique + 8 ans en messagerie / groupage",
-      "Titre professionnel Technicien Supérieur en Méthodes et Exploitation Logistique (TSMEL)",
-      "Baccalauréat général + 5 ans conducteur SPL puis affréteur",
-      "BEP Conduite et services dans le transport routier + FIMO/FCO à jour",
-      "Baccalauréat professionnel Commerce + 4 ans agent d'exploitation transport",
-      "Attestation de capacité professionnelle transport léger (< 3,5 t) + VAE en cours",
-      "Licence professionnelle Management de la chaîne logistique",
-      "Baccalauréat technologique STMG + 6 ans en commission de transport",
-    ];
-    const gotrmAttentes = [
-      `Faire monter en compétences notre exploitant sur le calcul du PRK, la cotation d'affrètement et le pilotage des KPI (OTIF, marge par tournée, retour à vide) pour sécuriser la rentabilité de nos trafics.`,
-      `Sécuriser le poste de gestionnaire de transport de notre PME transport (18 véhicules > 3,5 t) en obtenant par équivalence l'attestation de capacité professionnelle exigée par la DREAL.`,
-      `Renforcer notre conformité RSE 561/2006 et Convention 3085 en formant le collaborateur qui supervise les données chronotachygraphe et la gestion des conducteurs grands routiers.`,
-      `Structurer la démarche RSE / Objectif CO₂ ADEME de notre entreprise et former l'exploitant qui pilotera le tableau de bord CO₂ et les alternatives HVO/GNV.`,
-      `Préparer la relève de notre responsable d'exploitation qui part à la retraite dans 12 mois et transmettre le portefeuille de sous-traitants et de trafics réguliers.`,
-    ];
-    const gotrmMissions = [
-      `Organiser et piloter les opérations de transport routier de marchandises depuis la prise de commande jusqu'à la clôture du dossier : cotation PRK, affrètement, lettre de voiture CMR, suivi temps réel, facturation.`,
-      `Superviser un trafic régulier de messagerie/groupage sur zone régionale (12 t utiles, 6 tournées/semaine), gérer la sous-traitance (contrat-type 26/12/2017) et le SAV (litiges CMR).`,
-      `Encadrer une équipe de conducteurs (Convention 3085 – IDCC 16, coefficients 118M-150M), analyser les données chronotachygraphe (Optac3) et prévenir les infractions RSE 561/2006.`,
-      `Sourcer et contractualiser les sous-traitants transport (K-bis < 3 mois, licence communautaire, attestation vigilance URSSAF, RC transporteur), négocier les tarifs indexés CNR gazole.`,
-      `Piloter le tableau de bord d'exploitation mensuel (10 KPI : OTIF > 95 %, retour à vide < 25 %, marge > 8 %, CO₂/t.km) et proposer des plans d'actions correctives chiffrés (Ishikawa 5M, Pareto 80/20, PDCA).`,
-    ];
-    const gotrmContribution = [
-      `Cette formation nous permet de pérenniser notre exploitation et de répondre à la croissance de nos trafics (+18 % de volume traité sur 2025) sans perte de qualité de service.`,
-      `Former notre exploitant au TP GOTRM sécurise l'attestation de capacité professionnelle exigée par la DREAL et évite tout risque de retrait de licence communautaire lors des contrôles.`,
-      `Notre entreprise développe une offre RSE / Charte Objectif CO₂ : disposer d'un gestionnaire formé au pilotage CO₂/t.km et aux énergies alternatives (HVO/GNV, bonus 40 %) nous ouvre les appels d'offres à critères RSE.`,
-      `Cette formation renforce notre conformité Qualiopi et notre attractivité : un gestionnaire certifié GOTRM consolide notre dossier auprès des donneurs d'ordre industriels et de la DREAL.`,
-      `Former un exploitant en interne sécurise notre capacité opérationnelle : chaque jour sans gestionnaire de transport reconnu par la DREAL expose la société à une suspension d'exercice.`,
-    ];
-    const gotrmObjectif = [
-      `Obtenir le Titre Professionnel Gestionnaire des Opérations de Transport Routier de Marchandises (TP-01329, RNCP40990, niveau 5) délivré par le Ministère du Travail, et par équivalence les attestations de capacité professionnelle transport > 3,5 t et commission de transport.`,
-      `Valider les 3 CCP du titre (CCP1 organiser une opération de transport, CCP2 superviser les trafics réguliers, CCP3 optimiser l'activité) pour exercer pleinement le métier de gestionnaire d'exploitation transport.`,
-      `Sécuriser mon poste actuel d'agent d'exploitation en obtenant la certification qui valide mes compétences et me permet d'évoluer vers un poste de gestionnaire de transport reconnu par la DREAL.`,
-      `Créer / reprendre une entreprise de transport public routier de marchandises : le titre me procure par équivalence l'attestation de capacité professionnelle indispensable pour obtenir la licence communautaire.`,
-      `Me reconvertir professionnellement vers le métier d'exploitant transport, secteur en tension qui recrute (+ 12 000 postes ouverts en France en 2025), et sécuriser un emploi stable dans les 3 mois suivant la certification.`,
-    ];
-    const gotrmProjetPro = [
-      `Cette formation me donnera le titre professionnel GOTRM de niveau 5 et par équivalence les attestations de capacité professionnelle (transport > 3,5 t + commission), sésames indispensables pour exercer légalement comme gestionnaire de transport.`,
-      `La maîtrise du PRK, du RSE 561/2006, du contrat-type de sous-traitance et de la CMR me permettra de sécuriser juridiquement chaque opération et d'éviter les litiges qui pénalisent la rentabilité.`,
-      `Grâce à l'apprentissage des outils TMS (Akanea Transport), des bourses de fret (B2P, Teleroute) et de l'analyse chronotachygraphe (Optac3), je pourrai piloter efficacement une exploitation multi-tonnage.`,
-      `Le CCP3 (optimisation) m'ouvrira les opportunités de management d'exploitation dans les PME transport et les groupes de commissionnaires, avec un salaire d'entrée entre 32 000 et 42 000 € brut annuel.`,
-      `Cette certification est la voie reconnue par la profession pour évoluer vers gestionnaire de transport / responsable d'exploitation : sans TP GOTRM ou équivalent, impossible d'être nommé gestionnaire de transport auprès de la DREAL.`,
-    ];
-    const gotrmHandicap = isStagiairePSH(s)
-      ? [
-          "Oui, je bénéficie d'une RQTH. Je sollicite des aménagements : supports écrits agrandis pour les modules réglementaires denses (Code des transports, RSE 561/2006, Convention 3085), temps majoré sur les mises en situation professionnelles, et point régulier avec le référent handicap pour adapter le rythme.",
-          "Oui, situation de handicap reconnue (RQTH). Je demande un poste de travail ergonomique (siège adapté, double écran) pour les longues sessions sur TMS et Excel, ainsi qu'un tutorat renforcé pour la rédaction du document Questionnement à partir de productions (8-12 pages).",
-          "Oui, je suis reconnu(e) travailleur handicapé. Je sollicite des pauses fréquentes lors des sessions théoriques, une salle isolée pour les épreuves écrites et un accompagnement du référent handicap pour la préparation à l'entretien final (30 min) devant jury.",
-          "Oui, RQTH en cours de renouvellement. Je demande un aménagement des horaires (pas de session avant 9 h pour raisons médicales) et un suivi adapté pour la période en entreprise (280 h) chez un transporteur partenaire accessible.",
-        ]
-      : [
-          "Non, je ne suis pas en situation de handicap. Je n'ai pas besoin d'aménagement particulier pour suivre la formation ni pour les périodes en entreprise (exploitation transport, salons professionnels).",
-          "Non, aucune situation de handicap déclarée. Je suis en mesure d'assurer les longues journées d'exploitation et les astreintes soir/week-end propres au métier.",
-          "Non. Je suis en bonne santé et apte à la station assise prolongée devant TMS ainsi qu'aux déplacements chez les clients et sous-traitants.",
-          "Non, pas de handicap. Aucune restriction médicale et bonne aisance à l'oral pour la relation donneurs d'ordre et sous-traitants.",
-          "Non, je ne déclare aucun handicap. Je suis pleinement disponible pour les missions terrain (visites sous-traitants, audits DREAL, salons SITL).",
-        ];
-    return {
-      civilite,
-      raisonSociale: hasEntreprise ? s.entreprise : "/",
-      attentes: hasEntreprise ? gotrmAttentes[h(4) % gotrmAttentes.length] : "/",
-      missions: hasEntreprise ? gotrmMissions[h(5) % gotrmMissions.length] : "/",
-      contribution: hasEntreprise ? gotrmContribution[h(6) % gotrmContribution.length] : "/",
-      diplome: gotrmDiplomes[h(2) % gotrmDiplomes.length],
-      objectif: gotrmObjectif[h(7) % gotrmObjectif.length],
-      budget: hasEntreprise
-        ? "Formation prise en charge par l'OPCO Mobilités au titre du plan de développement des compétences de l'entreprise (Action de Formation Qualiopi, 35 h)."
-        : "Financement personnel via le CPF (Compte Personnel de Formation), complété si besoin par un abondement France Travail dans le cadre du projet de reconversion professionnelle (PTP / AIF).",
-      projetPro: gotrmProjetPro[h(8) % gotrmProjetPro.length],
-      handicap: gotrmHandicap[h(9) % gotrmHandicap.length],
-    };
-  }
-
-
 
 
 
@@ -13441,11 +13266,6 @@ export function getCFAWeekDates(f: FormationInfo): { cfaWeekNum: number; weekSta
   if (isNaN(rawStartDate.getTime())) rawStartDate.setTime(Date.now());
   rawStartDate.setHours(12, 0, 0, 0);
 
-  // Cap au dateFin du formulaire si présent : on ne dépasse jamais la date de fin de formation
-  const rawEndDate = f.dateFin ? new Date(f.dateFin.split('/').reverse().join('-')) : null;
-  const endCap = rawEndDate && !isNaN(rawEndDate.getTime()) ? rawEndDate : null;
-  if (endCap) endCap.setHours(23, 59, 59, 999);
-
   const firstWeekStart = new Date(rawStartDate);
   const dayOfWeek = firstWeekStart.getDay();
   const diffToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
@@ -13459,21 +13279,15 @@ export function getCFAWeekDates(f: FormationInfo): { cfaWeekNum: number; weekSta
     const posInCycle = calendarWeek % Math.max(1, cycleLength);
     const isCFA = dayBased ? true : posInCycle < cfaPerCycle;
 
-    const weekStart = new Date(firstWeekStart);
-    weekStart.setDate(firstWeekStart.getDate() + calendarWeek * 7);
-    // Stop dès qu'on dépasse la date de fin de formation
-    if (endCap && weekStart > endCap) break;
-
     if (isCFA) {
       cfaWeekCount++;
+      const weekStart = new Date(firstWeekStart);
+      weekStart.setDate(firstWeekStart.getDate() + calendarWeek * 7);
       const weekEnd = new Date(weekStart);
       weekEnd.setDate(weekEnd.getDate() + (dayBased ? Math.max(0, cfaDaysPerWeek - 1) : 4));
-      // Tronque la dernière semaine si elle dépasse la date de fin
-      if (endCap && weekEnd > endCap) weekEnd.setTime(endCap.getTime());
       result.push({ cfaWeekNum: cfaWeekCount, weekStart, weekEnd });
     }
     calendarWeek++;
-
     // Safety break to avoid infinite loops
     if (calendarWeek > 500) break;
   }
@@ -13534,7 +13348,7 @@ function genExercicesCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires
     for (let bi = 0; bi < rncp.blocsCompetences.length; bi++) {
       for (let mi = 0; mi < rncp.blocsCompetences[bi].matieres.length; mi++) {
         const vol = Math.round((parseInt(rncp.blocsCompetences[bi].matieres[mi].volume) || 0) * scale);
-        const matWeeks = Math.max(1, Math.ceil(vol / getHoursPerCFAWeek(f.rythmeAlternance || '')));
+        const matWeeks = Math.max(1, Math.ceil(vol / 35));
         if (bi === blocIdx && mi === matiereIdx) {
           matStartWeek = cumulWeeks;
           matEndWeek = cumulWeeks + matWeeks - 1;
@@ -13585,7 +13399,7 @@ function genExercicesCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires
         const blocMatiereWeeks: { matiere: typeof bloc.matieres[0]; startWeek: number; endWeek: number }[] = [];
         for (const mat of bloc.matieres) {
           const volume = Math.round((parseInt(mat.volume) || 0) * scale);
-          const matWeeks = Math.max(1, Math.ceil(volume / getHoursPerCFAWeek(f.rythmeAlternance || '')));
+          const matWeeks = Math.max(1, Math.ceil(volume / 35));
           blocMatiereWeeks.push({ matiere: mat, startWeek: cumulWeeks + 1, endWeek: cumulWeeks + matWeeks });
           cumulWeeks += matWeeks;
         }
@@ -14194,7 +14008,7 @@ function genSupportCoursCFA(o: OrganismeInfo, f: FormationInfo) {
     chaptersHtml += `<tr><td><strong>Certificateur</strong></td><td>${rncp.certificateur}</td></tr>`;
     chaptersHtml += `<tr><td><strong>Date d'enregistrement</strong></td><td>${rncp.dateEnregistrement}</td></tr>`;
     chaptersHtml += `<tr><td><strong>Date d'échéance</strong></td><td>${rncp.dateEcheance}</td></tr>`;
-    chaptersHtml += `<tr><td><strong>Durée de la formation</strong></td><td>${effectiveTotal}h${rncp.dureeIndicative ? ` <span style="color:#666;font-size:11px">(indicative RNCP : ${rncp.dureeIndicative})</span>` : ''}</td></tr>`;
+    chaptersHtml += `<tr><td><strong>Durée indicative</strong></td><td>${rncp.dureeIndicative || effectiveTotal + 'h'}</td></tr>`;
     chaptersHtml += `<tr><td><strong>Secteurs d'activité</strong></td><td>${rncp.secteursActivite}</td></tr>`;
     chaptersHtml += `<tr><td><strong>Types d'emplois</strong></td><td>${rncp.typesEmplois.join(', ')}</td></tr>`;
     chaptersHtml += `<tr><td><strong>Codes ROME</strong></td><td>${rncp.codesROME.join(', ')}</td></tr>`;
@@ -14292,13 +14106,12 @@ function genCalendrierAnnuelCFA(o: OrganismeInfo, f: FormationInfo) {
   } else {
     effectiveTotal = totalHours > 0 ? totalHours : 420;
   }
-  const theoreticalCFAWeeks = Math.max(1, Math.ceil(effectiveTotal / hoursPerCfaWeek));
+  const totalCFAWeeks = Math.max(1, Math.ceil(effectiveTotal / hoursPerCfaWeek));
   const cycleLength = dayBased ? 1 : (cfaPerCycle + entrepriseWeeks);
+  const totalCycles = Math.ceil(totalCFAWeeks / Math.max(1, cfaPerCycle));
 
   const startDate = f.dateDebut ? new Date(f.dateDebut.split('/').reverse().join('-')) : new Date();
   if (isNaN(startDate.getTime())) startDate.setTime(Date.now());
-  const rawEnd = f.dateFin ? new Date(f.dateFin.split('/').reverse().join('-')) : null;
-  const endDateCap = rawEnd && !isNaN(rawEnd.getTime()) ? rawEnd : null;
   const fmtD = (d: Date) => d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
   const moisFR = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
@@ -14313,20 +14126,12 @@ function genCalendrierAnnuelCFA(o: OrganismeInfo, f: FormationInfo) {
     : getCourseChapters(f.intitule).slice(0, 5).map((ch, i) => ({ titre: ch.title, volume: Math.round(blocHoursTotal / Math.min(getCourseChapters(f.intitule).length, 5)) }));
   modules.push({ titre: 'Accompagnement + Examens', volume: accompHours });
 
-  // Build calendar : couvre toute la période entre dateDebut et dateFin (jamais moins de 52 semaines)
+  // Build full-year calendar (52 weeks from start date)
   let calendarRows = '';
   let cfaWeekNum = 0;
   let moduleIdx = 0;
   let remainingInModule = modules[0]?.volume || 0;
-  const weeksFromDates = endDateCap
-    ? Math.max(1, Math.ceil((endDateCap.getTime() - startDate.getTime()) / (7 * 86400000)) + 1)
-    : 52;
-  // Pour dayBased : chaque semaine calendaire = 1 semaine mixte, donc cap au nombre réel de semaines.
-  const totalCFAWeeks = dayBased
-    ? Math.min(theoreticalCFAWeeks, weeksFromDates)
-    : theoreticalCFAWeeks;
-  const totalCycles = Math.ceil(totalCFAWeeks / Math.max(1, cfaPerCycle));
-  const totalWeeksInYear = endDateCap ? weeksFromDates : Math.max(52, totalCFAWeeks + entrepriseWeeks * totalCycles);
+  const totalWeeksInYear = 52;
   let posInCycle = 0;
 
   // French school holidays approximation (week numbers to skip)
@@ -14339,13 +14144,8 @@ function genCalendrierAnnuelCFA(o: OrganismeInfo, f: FormationInfo) {
   for (let w = 0; w < totalWeeksInYear; w++) {
     const weekStart = new Date(startDate);
     weekStart.setDate(weekStart.getDate() + w * 7);
-    // Cap au dateFin : on ne dépasse jamais la fin de formation
-    if (endDateCap && weekStart > endDateCap) break;
-
     const weekEnd = new Date(weekStart);
     weekEnd.setDate(weekEnd.getDate() + 4);
-    if (endDateCap && weekEnd > endDateCap) weekEnd.setTime(endDateCap.getTime());
-
     const mois = moisFR[weekStart.getMonth()];
     const weekNum = getWeekOfYear(weekStart);
 
@@ -14415,7 +14215,8 @@ function genCalendrierAnnuelCFA(o: OrganismeInfo, f: FormationInfo) {
     }
   }
 
-  const endDate = endDateCap ? new Date(endDateCap) : (() => { const d = new Date(startDate); d.setDate(d.getDate() + totalWeeksInYear * 7); return d; })();
+  const endDate = new Date(startDate);
+  endDate.setDate(endDate.getDate() + totalWeeksInYear * 7);
 
   const tableHtml = `<table border="1" cellpadding="5" cellspacing="0" style="border-collapse:collapse;width:100%">
     <tr style="background:#1e3a7b;color:#fff">
@@ -14435,7 +14236,7 @@ function genCalendrierAnnuelCFA(o: OrganismeInfo, f: FormationInfo) {
     title: "CALENDRIER ANNUEL DE FORMATION – CFA",
     subtitle: f.intitule,
     sections: [
-      { heading: "Informations générales", content: `<p><strong>Formation :</strong> ${f.intitule}<br><strong>Rythme d'alternance :</strong> ${rythme}<br><strong>Durée totale en centre :</strong> ${effectiveTotal}h (${totalCFAWeeks} ${dayBased ? 'semaines mixtes' : 'semaines CFA'})<br><strong>Période :</strong> du ${fmtD(startDate)} au ${fmtD(endDate)} (${totalWeeksInYear} semaines)<br><strong>Cycle :</strong> ${dayBased ? `${cfaDaysPerWeek}j CFA + ${Math.max(0, 5 - cfaDaysPerWeek)}j entreprise par semaine (alternance journalière)` : `${cfaPerCycle} sem. CFA + ${entrepriseWeeks} sem. entreprise = ${cycleLength} semaines`}</p>` },
+      { heading: "Informations générales", content: `<p><strong>Formation :</strong> ${f.intitule}<br><strong>Rythme d'alternance :</strong> ${rythme}<br><strong>Durée totale en centre :</strong> ${effectiveTotal}h (${totalCFAWeeks} ${dayBased ? 'semaines mixtes' : 'semaines CFA'})<br><strong>Période :</strong> du ${fmtD(startDate)} au ${fmtD(endDate)} (52 semaines)<br><strong>Cycle :</strong> ${dayBased ? `${cfaDaysPerWeek}j CFA + ${Math.max(0, 5 - cfaDaysPerWeek)}j entreprise par semaine (alternance journalière)` : `${cfaPerCycle} sem. CFA + ${entrepriseWeeks} sem. entreprise = ${cycleLength} semaines`}</p>` },
       { heading: "Calendrier détaillé – Année complète", content: tableHtml },
       { heading: "Légende", content: `<p><span style="background:#e8f0fe;padding:2px 8px;border-radius:4px">CFA</span> = ${dayBased ? `Semaine mixte (${cfaDaysPerWeek}j centre / ${Math.max(0, 5 - cfaDaysPerWeek)}j entreprise)` : 'Semaine en centre'} &nbsp;&nbsp; <span style="background:#f0f8f0;padding:2px 8px;border-radius:4px">Entreprise</span> = Semaine en entreprise &nbsp;&nbsp; <span style="background:#fff3cd;padding:2px 8px;border-radius:4px">🏖 Congés</span> = Vacances</p><p><strong>Total semaines CFA :</strong> ${cfaWeekNum} &nbsp;|&nbsp; <strong>Heures en centre :</strong> ${cfaWeekNum * hoursPerCfaWeek}h</p>`, variant: "green" },
     ],
@@ -16127,7 +15928,7 @@ function genDecoupageFormationCFAExcel(o: OrganismeInfo, f: FormationInfo) {
   // Sheet: Planning alternance
   const rythme = f.rythmeAlternance || '1 semaine CFA / 3 semaines entreprise';
   const { cfaWeeks: cfaPerCycle, entrepriseWeeks } = parseRythmeAlternance(rythme);
-  const totalCFAWeeks = getCFAWeeks(f);
+  const totalCFAWeeks = Math.max(1, Math.ceil(effectiveTotal / 35));
   const totalCycles = Math.ceil(totalCFAWeeks / cfaPerCycle);
 
   let sheetPlanning = tr(["Semaine", "Dates", "Lieu", "Module / Bloc", "Heures", "Observations"], true);
@@ -16142,57 +15943,24 @@ function genDecoupageFormationCFAExcel(o: OrganismeInfo, f: FormationInfo) {
     : getCourseChapters(f.intitule).slice(0, 5).map(ch => ch.title);
   modList.push('Accompagnement + Examens');
 
-  const dayBased = isDayBasedRythme(rythme);
-  const cfaDaysPerWeek = getCFADaysPerWeek(rythme);
-  const hoursPerCfaWeek = getHoursPerCFAWeek(rythme);
-  const rawEndCap = f.dateFin ? new Date(f.dateFin.split('/').reverse().join('-')) : null;
-  const endCap = rawEndCap && !isNaN(rawEndCap.getTime()) ? rawEndCap : null;
-
-  if (dayBased) {
-    // Chaque semaine = mixte : {cfaDaysPerWeek}j CFA ({hoursPerCfaWeek}h) + reste entreprise
-    while (cfaWk < totalCFAWeeks) {
+  for (let cycle = 0; cycle < totalCycles; cycle++) {
+    for (let cw = 0; cw < cfaPerCycle; cw++) {
+      cfaWk++;
       const ws = new Date(startDate);
       ws.setDate(ws.getDate() + calWeek * 7);
-      if (endCap && ws > endCap) break;
       const we = new Date(ws);
       we.setDate(we.getDate() + 4);
-      if (endCap && we > endCap) we.setTime(endCap.getTime());
-      cfaWk++;
       const modIdx = Math.min(cfaWk - 1, modList.length - 1);
-      sheetPlanning += tr([
-        `S${calWeek + 1}`,
-        `${fmtD(ws)} – ${fmtD(we)}`,
-        `CFA (${cfaDaysPerWeek}j) + Entreprise (${Math.max(0, 5 - cfaDaysPerWeek)}j)`,
-        modList[modIdx] || "",
-        `${hoursPerCfaWeek}h`,
-        `Cours ${cfaDaysPerWeek}j + mise en pratique en entreprise`
-      ]);
+      sheetPlanning += tr([`S${calWeek + 1}`, `${fmtD(ws)} – ${fmtD(we)}`, "CFA", modList[modIdx] || "", "35h", "Cours + exercices pratiques"]);
       calWeek++;
     }
-  } else {
-    for (let cycle = 0; cycle < totalCycles; cycle++) {
-      for (let cw = 0; cw < cfaPerCycle; cw++) {
-        const ws = new Date(startDate);
-        ws.setDate(ws.getDate() + calWeek * 7);
-        if (endCap && ws > endCap) break;
-        const we = new Date(ws);
-        we.setDate(we.getDate() + 4);
-        if (endCap && we > endCap) we.setTime(endCap.getTime());
-        cfaWk++;
-        const modIdx = Math.min(cfaWk - 1, modList.length - 1);
-        sheetPlanning += tr([`S${calWeek + 1}`, `${fmtD(ws)} – ${fmtD(we)}`, "CFA", modList[modIdx] || "", `${hoursPerCfaWeek}h`, "Cours + exercices pratiques"]);
-        calWeek++;
-      }
-      for (let ew = 0; ew < entrepriseWeeks; ew++) {
-        const ws = new Date(startDate);
-        ws.setDate(ws.getDate() + calWeek * 7);
-        if (endCap && ws > endCap) break;
-        const we = new Date(ws);
-        we.setDate(we.getDate() + 4);
-        if (endCap && we > endCap) we.setTime(endCap.getTime());
-        sheetPlanning += tr([`S${calWeek + 1}`, `${fmtD(ws)} – ${fmtD(we)}`, "Entreprise", "Mise en pratique en entreprise", "35h", "Suivi livret d'alternance"]);
-        calWeek++;
-      }
+    for (let ew = 0; ew < entrepriseWeeks; ew++) {
+      const ws = new Date(startDate);
+      ws.setDate(ws.getDate() + calWeek * 7);
+      const we = new Date(ws);
+      we.setDate(we.getDate() + 4);
+      sheetPlanning += tr([`S${calWeek + 1}`, `${fmtD(ws)} – ${fmtD(we)}`, "Entreprise", "Mise en pratique en entreprise", "35h", "Suivi livret d'alternance"]);
+      calWeek++;
     }
   }
   sheets.push({ name: "Planning alternance", html: `<table>${sheetPlanning}</table>` });

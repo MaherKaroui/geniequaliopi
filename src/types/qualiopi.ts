@@ -1,6 +1,6 @@
 export type DocTheme = 'classique' | 'moderne' | 'elegant' | 'minimaliste' | 'bold' | 'nature' | 'academique' | 'corporate' | 'editorial' | 'neobrutaliste' | 'futuriste' | 'luxe' | 'scandinave' | 'artdeco' | 'consulting' | 'notarial' | 'techstartup' | 'botanique' | 'suisse' | 'monochrome' | 'pastel' | 'presse' | 'terracotta' | 'simplepro' | 'epure';
 export type HeadingStyle = 'line-bottom' | 'filled' | 'gradient' | 'left-bar' | 'underline-double' | 'plain' | 'pill';
-export type HeaderStyle = 'classic' | 'banner' | 'compact' | 'elegant' | 'boxed' | 'split' | 'gradient' | 'minimal' | 'corporate' | 'ribbon' | 'monogram' | 'stacked';
+export type HeaderStyle = 'classic' | 'banner' | 'compact' | 'elegant' | 'boxed' | 'split';
 
 export interface DocStyleConfig {
   primaryColor: string;    // hex color for headers, accents
