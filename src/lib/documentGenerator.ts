@@ -2396,7 +2396,7 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
     </div>
 
     ${(() => {
-      const rncp = f.codeRNCP ? getRNCPByCode(f.codeRNCP) : undefined;
+      const rncp = (isCFA && f.codeRNCP) ? getRNCPByCode(f.codeRNCP) : undefined;
       if (!rncp) {
         // Fallback sans RNCP : voies d'accès génériques
         return ``;
