@@ -5056,7 +5056,7 @@ function genMatriceCompetencesExcel(o: OrganismeInfo, f: FormationInfo, stagiair
   const cfaWeekDates = isCFA ? getCFAWeekDates(f) : [];
   const now = new Date();
   const pastCFAWeeks = cfaWeekDates.filter(w => w.weekEnd < now).length;
-  const pastCFAHours = pastCFAWeeks * 35;
+  const pastCFAHours = pastCFAWeeks * getHoursPerCFAWeek(f.rythmeAlternance || '');
   const heuresRealisees = termine ? effectiveTotal : pastCFAHours;
 
   const tr = (cells: string[], isHeader = false) => {
