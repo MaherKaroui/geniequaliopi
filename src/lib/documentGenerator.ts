@@ -2071,10 +2071,13 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
   }
 
   // Detect FLE / certification by competence blocks
+  // ⚠️ Ces blocs (RNCP, NTC, FLE/IA certif) ne s'affichent QUE pour un programme
+  // de certification (CFA). Pour une Action de Formation classique, on n'insère
+  // aucune donnée RNCP même si un code est renseigné.
   const lower = f.intitule.toLowerCase();
-  const isFLEOrCertif = lower.includes("français") || lower.includes("fle") || lower.includes("médico-social") || lower.includes("communiquer");
-  const isIACertif = lower.includes("ia générative") || lower.includes("intelligence artificielle");
-  const isNTCProg = lower.includes("négociateur") || lower.includes("technico-commercial") || lower.includes("technico commercial") || (f.codeRNCP || "").toUpperCase().includes("39063");
+  const isFLEOrCertif = isCFA && (lower.includes("français") || lower.includes("fle") || lower.includes("médico-social") || lower.includes("communiquer"));
+  const isIACertif = isCFA && (lower.includes("ia générative") || lower.includes("intelligence artificielle"));
+  const isNTCProg = isCFA && (lower.includes("négociateur") || lower.includes("technico-commercial") || lower.includes("technico commercial") || (f.codeRNCP || "").toUpperCase().includes("39063"));
   const isBlocFormation = isFLEOrCertif || isIACertif;
 
   // NTC : blocs de compétences détaillés en articles (référentiel REAC RNCP 39063)
