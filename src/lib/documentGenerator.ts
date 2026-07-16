@@ -9343,12 +9343,28 @@ export function getHoursPerCFAWeek(rythme: string): number {
   return 35;
 }
 
-/** Calculate the total number of CFA weeks for the formation */
+/** Nombre de semaines calendaires entre dateDebut et dateFin (inclusif). */
+export function getCalendarWeeksBetween(f: FormationInfo): number | null {
+  if (!f.dateDebut || !f.dateFin) return null;
+  const start = new Date(f.dateDebut.split('/').reverse().join('-'));
+  const end = new Date(f.dateFin.split('/').reverse().join('-'));
+  if (isNaN(start.getTime()) || isNaN(end.getTime()) || end < start) return null;
+  return Math.max(1, Math.ceil((end.getTime() - start.getTime()) / (7 * 86400000)) + 1);
+}
+
+/** Calculate the total number of CFA weeks for the formation, capped by real calendar period. */
 function getCFAWeeks(f: FormationInfo): number {
   const { totalHours } = parseDuree(f.duree);
   const effectiveTotal = totalHours > 0 ? totalHours : 420;
   const hpw = getHoursPerCFAWeek(f.rythmeAlternance || '');
-  return Math.max(1, Math.ceil(effectiveTotal / hpw));
+  const theoretical = Math.max(1, Math.ceil(effectiveTotal / hpw));
+  // Pour les rythmes journaliers (ex: 1j CFA / 4j entreprise), chaque semaine est mixte :
+  // le nombre de semaines mixtes ne peut pas dépasser le nombre de semaines calendaires réelles.
+  if (isDayBasedRythme(f.rythmeAlternance || '')) {
+    const calWeeks = getCalendarWeeksBetween(f);
+    if (calWeeks && calWeeks > 0) return Math.min(theoretical, calWeeks);
+  }
+  return theoretical;
 }
 
 
