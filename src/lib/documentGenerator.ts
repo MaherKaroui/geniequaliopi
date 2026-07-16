@@ -14292,6 +14292,11 @@ function genCalendrierAnnuelCFA(o: OrganismeInfo, f: FormationInfo) {
   const weeksFromDates = endDateCap
     ? Math.max(1, Math.ceil((endDateCap.getTime() - startDate.getTime()) / (7 * 86400000)) + 1)
     : 52;
+  // Pour dayBased : chaque semaine calendaire = 1 semaine mixte, donc cap au nombre réel de semaines.
+  const totalCFAWeeks = dayBased
+    ? Math.min(theoreticalCFAWeeks, weeksFromDates)
+    : theoreticalCFAWeeks;
+  const totalCycles = Math.ceil(totalCFAWeeks / Math.max(1, cfaPerCycle));
   const totalWeeksInYear = endDateCap ? weeksFromDates : Math.max(52, totalCFAWeeks + entrepriseWeeks * totalCycles);
   let posInCycle = 0;
 
