@@ -5056,7 +5056,7 @@ function genMatriceCompetencesExcel(o: OrganismeInfo, f: FormationInfo, stagiair
   const cfaWeekDates = isCFA ? getCFAWeekDates(f) : [];
   const now = new Date();
   const pastCFAWeeks = cfaWeekDates.filter(w => w.weekEnd < now).length;
-  const pastCFAHours = pastCFAWeeks * 35;
+  const pastCFAHours = pastCFAWeeks * getHoursPerCFAWeek(f.rythmeAlternance || '');
   const heuresRealisees = termine ? effectiveTotal : pastCFAHours;
 
   const tr = (cells: string[], isHeader = false) => {
@@ -5200,7 +5200,9 @@ function genSuiviChiffreFormationExcel(o: OrganismeInfo, f: FormationInfo, stagi
   const { totalHours } = parseDuree(f.duree);
   const effectiveTotal = totalHours > 0 ? totalHours : 420;
   const isCFA = !!(f.rythmeAlternance && f.rythmeAlternance.trim().length > 0);
-  const totalCFAWeeks = Math.max(1, Math.ceil(effectiveTotal / 35));
+  const hoursPerCfaWeek = getHoursPerCFAWeek(f.rythmeAlternance || '');
+  const totalCFAWeeks = Math.max(1, Math.ceil(effectiveTotal / hoursPerCfaWeek));
+
   const termine = isFormationTerminee(f, stagiaires);
 
   const tr = (cells: string[], isHeader = false) => {
@@ -5220,7 +5222,7 @@ function genSuiviChiffreFormationExcel(o: OrganismeInfo, f: FormationInfo, stagi
   const cfaWeekDates = isCFA ? getCFAWeekDates(f) : [];
   // Determine which CFA weeks are in the past
   const pastCFAWeeks = cfaWeekDates.filter(w => w.weekEnd < now);
-  const pastCFAHours = pastCFAWeeks.length * 35;
+  const pastCFAHours = pastCFAWeeks.length * hoursPerCfaWeek;
   const progressRatio = termine ? 1 : Math.min(1, pastCFAHours / effectiveTotal);
 
   // Sheet 1: Indicateurs globaux — synchronized with other documents
@@ -5300,7 +5302,7 @@ function genSuiviChiffreFormationExcel(o: OrganismeInfo, f: FormationInfo, stagi
     const sFin = s.dateFinFormation ? new Date(s.dateFinFormation.split('/').reverse().join('-')) : endDate;
     const sTermine = sFin < now;
     const sPastWeeks = cfaWeekDates.filter(w => w.weekEnd < now && w.weekStart >= sDebut);
-    const sHeuresRealisees = sTermine ? effectiveTotal : sPastWeeks.length * 35;
+    const sHeuresRealisees = sTermine ? effectiveTotal : sPastWeeks.length * hoursPerCfaWeek;
 
     // Synchronized: use EVAL_SCORES for notes, 100% attendance
     const sc = EVAL_SCORES[si] || [7, 8, 7, 8, 7];
@@ -5443,7 +5445,7 @@ function genSuiviChiffreFormationExcel(o: OrganismeInfo, f: FormationInfo, stagi
       // Count CFA weeks in this month
       const cfaWeeksInMonth = cfaWeekDates.filter(w => w.weekStart >= moisStart && w.weekStart <= moisEnd);
       const semCFA = cfaWeeksInMonth.length;
-      const heuresCFA = semCFA * 35;
+      const heuresCFA = semCFA * getHoursPerCFAWeek(f.rythmeAlternance || '');
 
       // Estimate enterprise weeks: total calendar weeks in month minus CFA weeks
       const totalCalWeeksInMonth = Math.round((moisEnd.getTime() - moisStart.getTime()) / (7 * 86400000));
@@ -9331,13 +9333,24 @@ export function getCFADaysPerWeek(rythme: string): number {
   return 5;
 }
 
+/** Nombre d'heures CFA par semaine calendaire selon le rythme.
+ *  - Rythme journalier (ex : "1 jour CFA / 4 jours entreprise") → cfaDays × 7h (ex : 1j = 7h)
+ *  - Rythme hebdomadaire ("1 sem CFA / 3 sem entreprise") → 35h/semaine CFA
+ */
+export function getHoursPerCFAWeek(rythme: string): number {
+  if (!rythme) return 35;
+  if (isDayBasedRythme(rythme)) return Math.max(7, getCFADaysPerWeek(rythme) * 7);
+  return 35;
+}
+
 /** Calculate the total number of CFA weeks for the formation */
 function getCFAWeeks(f: FormationInfo): number {
   const { totalHours } = parseDuree(f.duree);
   const effectiveTotal = totalHours > 0 ? totalHours : 420;
-  // 35h per CFA week
-  return Math.max(1, Math.ceil(effectiveTotal / 35));
+  const hpw = getHoursPerCFAWeek(f.rythmeAlternance || '');
+  return Math.max(1, Math.ceil(effectiveTotal / hpw));
 }
+
 
 function genEmargementCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const cfaWeekDates = getCFAWeekDates(f);
@@ -9408,7 +9421,8 @@ function genSynopsisCFA(o: OrganismeInfo, f: FormationInfo) {
 
   const rythme = f.rythmeAlternance || '1 semaine CFA / 3 semaines entreprise';
   const { cfaWeeks: cfaPerCycle, entrepriseWeeks } = parseRythmeAlternance(rythme);
-  const totalCFAWeeks = Math.max(1, Math.ceil(effectiveTotal / 35));
+  const totalCFAWeeks = Math.max(1, Math.ceil(effectiveTotal / getHoursPerCFAWeek(rythme)));
+
   const cycleLength = cfaPerCycle + entrepriseWeeks;
   const totalCycles = Math.ceil(totalCFAWeeks / cfaPerCycle);
 
@@ -9545,7 +9559,7 @@ function genSynopsisCFA(o: OrganismeInfo, f: FormationInfo) {
         const scaledH = Math.round((parseInt(m.volume) || 0) * scale);
         return `- ${m.contenu} <em>(${scaledH}h)</em>`;
       }).join('<br>');
-      const nbCFAWeeks = Math.max(1, Math.ceil(mod.volume / 35));
+      const nbCFAWeeks = Math.max(1, Math.ceil(mod.volume / getHoursPerCFAWeek(rythme)));
       const nbExercices = nbCFAWeeks * 2;
       return `<tr>
         <td style="vertical-align:top"><strong>${mod.titre}</strong></td>
@@ -9606,7 +9620,7 @@ function genSynopsisCFA(o: OrganismeInfo, f: FormationInfo) {
   for (let i = 0; i < nbBlocs; i++) {
     const ch = chapters[i];
     const contenus = ch ? ch.sections.slice(0, 4).map((s) => `- ${s.title}`).join('<br>') : '[À compléter]';
-    const nbCFAWeeks = Math.max(1, Math.ceil(perBloc / 35));
+    const nbCFAWeeks = Math.max(1, Math.ceil(perBloc / getHoursPerCFAWeek(rythme)));
     const nbExercices = nbCFAWeeks * 2;
     fallbackRows.push(`<tr>
       <td style="vertical-align:top"><strong>${ch?.title || `Bloc ${i + 1}`}</strong></td>
@@ -13464,7 +13478,7 @@ function genExercicesCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires
     for (let bi = 0; bi < rncp.blocsCompetences.length; bi++) {
       for (let mi = 0; mi < rncp.blocsCompetences[bi].matieres.length; mi++) {
         const vol = Math.round((parseInt(rncp.blocsCompetences[bi].matieres[mi].volume) || 0) * scale);
-        const matWeeks = Math.max(1, Math.ceil(vol / 35));
+        const matWeeks = Math.max(1, Math.ceil(vol / getHoursPerCFAWeek(f.rythmeAlternance || '')));
         if (bi === blocIdx && mi === matiereIdx) {
           matStartWeek = cumulWeeks;
           matEndWeek = cumulWeeks + matWeeks - 1;
@@ -13515,7 +13529,7 @@ function genExercicesCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires
         const blocMatiereWeeks: { matiere: typeof bloc.matieres[0]; startWeek: number; endWeek: number }[] = [];
         for (const mat of bloc.matieres) {
           const volume = Math.round((parseInt(mat.volume) || 0) * scale);
-          const matWeeks = Math.max(1, Math.ceil(volume / 35));
+          const matWeeks = Math.max(1, Math.ceil(volume / getHoursPerCFAWeek(f.rythmeAlternance || '')));
           blocMatiereWeeks.push({ matiere: mat, startWeek: cumulWeeks + 1, endWeek: cumulWeeks + matWeeks });
           cumulWeeks += matWeeks;
         }
@@ -16044,7 +16058,7 @@ function genDecoupageFormationCFAExcel(o: OrganismeInfo, f: FormationInfo) {
   // Sheet: Planning alternance
   const rythme = f.rythmeAlternance || '1 semaine CFA / 3 semaines entreprise';
   const { cfaWeeks: cfaPerCycle, entrepriseWeeks } = parseRythmeAlternance(rythme);
-  const totalCFAWeeks = Math.max(1, Math.ceil(effectiveTotal / 35));
+  const totalCFAWeeks = Math.max(1, Math.ceil(effectiveTotal / getHoursPerCFAWeek(rythme)));
   const totalCycles = Math.ceil(totalCFAWeeks / cfaPerCycle);
 
   let sheetPlanning = tr(["Semaine", "Dates", "Lieu", "Module / Bloc", "Heures", "Observations"], true);
