@@ -724,6 +724,12 @@ const DocStyleConfigPanel = ({ style, onChange }: DocStyleConfigPanelProps) => {
                       { id: "elegant" as HeaderStyle, label: "Élégant", desc: "Trait fin décoratif, italique" },
                       { id: "boxed" as HeaderStyle, label: "Encadré", desc: "Bordure autour de l'en-tête" },
                       { id: "split" as HeaderStyle, label: "Séparé", desc: "Logo + nom | NDA/SIRET à droite" },
+                      { id: "gradient" as HeaderStyle, label: "Dégradé", desc: "Bannière dégradée + ombre" },
+                      { id: "minimal" as HeaderStyle, label: "Minimal", desc: "Nom fin en majuscules espacées" },
+                      { id: "corporate" as HeaderStyle, label: "Corporate", desc: "Fond gris + barre latérale colorée" },
+                      { id: "ribbon" as HeaderStyle, label: "Ruban", desc: "Ruban Qualiopi + bloc central" },
+                      { id: "monogram" as HeaderStyle, label: "Monogramme", desc: "Cercle initiales + nom aligné" },
+                      { id: "stacked" as HeaderStyle, label: "Encadré double", desc: "Lignes doubles + titre espacé" },
                     ]).map(opt => {
                       const isActive = (style.headerStyle || 'classic') === opt.id;
                       return (
