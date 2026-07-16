@@ -9331,13 +9331,24 @@ export function getCFADaysPerWeek(rythme: string): number {
   return 5;
 }
 
+/** Nombre d'heures CFA par semaine calendaire selon le rythme.
+ *  - Rythme journalier (ex : "1 jour CFA / 4 jours entreprise") → cfaDays × 7h (ex : 1j = 7h)
+ *  - Rythme hebdomadaire ("1 sem CFA / 3 sem entreprise") → 35h/semaine CFA
+ */
+export function getHoursPerCFAWeek(rythme: string): number {
+  if (!rythme) return 35;
+  if (isDayBasedRythme(rythme)) return Math.max(7, getCFADaysPerWeek(rythme) * 7);
+  return 35;
+}
+
 /** Calculate the total number of CFA weeks for the formation */
 function getCFAWeeks(f: FormationInfo): number {
   const { totalHours } = parseDuree(f.duree);
   const effectiveTotal = totalHours > 0 ? totalHours : 420;
-  // 35h per CFA week
-  return Math.max(1, Math.ceil(effectiveTotal / 35));
+  const hpw = getHoursPerCFAWeek(f.rythmeAlternance || '');
+  return Math.max(1, Math.ceil(effectiveTotal / hpw));
 }
+
 
 function genEmargementCFA(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const cfaWeekDates = getCFAWeekDates(f);
