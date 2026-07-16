@@ -9247,7 +9247,10 @@ function genDocumentsCertificateursCFA(o: OrganismeInfo, f: FormationInfo) {
   }
 
   let prerequisContent = "<p>• Avoir suivi l'intégralité du parcours de formation<br>• Avoir validé les évaluations en cours de formation<br>• Avoir réalisé la totalité des heures en entreprise<br>• Être à jour de l'assiduité</p>";
-  if (fiche?.dureeIndicative) {
+  const { totalHours: dureeFormation } = parseDuree(f.duree || '');
+  if (dureeFormation > 0) {
+    prerequisContent += `<p><strong>Durée de la formation :</strong> ${dureeFormation} heures</p>`;
+  } else if (fiche?.dureeIndicative) {
     prerequisContent += `<p><strong>Durée indicative :</strong> ${fiche.dureeIndicative}</p>`;
   }
 
