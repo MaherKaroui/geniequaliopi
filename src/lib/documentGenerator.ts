@@ -14263,9 +14263,8 @@ function genCalendrierAnnuelCFA(o: OrganismeInfo, f: FormationInfo) {
   } else {
     effectiveTotal = totalHours > 0 ? totalHours : 420;
   }
-  const totalCFAWeeks = Math.max(1, Math.ceil(effectiveTotal / hoursPerCfaWeek));
+  const theoreticalCFAWeeks = Math.max(1, Math.ceil(effectiveTotal / hoursPerCfaWeek));
   const cycleLength = dayBased ? 1 : (cfaPerCycle + entrepriseWeeks);
-  const totalCycles = Math.ceil(totalCFAWeeks / Math.max(1, cfaPerCycle));
 
   const startDate = f.dateDebut ? new Date(f.dateDebut.split('/').reverse().join('-')) : new Date();
   if (isNaN(startDate.getTime())) startDate.setTime(Date.now());
