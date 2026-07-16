@@ -5222,7 +5222,7 @@ function genSuiviChiffreFormationExcel(o: OrganismeInfo, f: FormationInfo, stagi
   const cfaWeekDates = isCFA ? getCFAWeekDates(f) : [];
   // Determine which CFA weeks are in the past
   const pastCFAWeeks = cfaWeekDates.filter(w => w.weekEnd < now);
-  const pastCFAHours = pastCFAWeeks.length * 35;
+  const pastCFAHours = pastCFAWeeks.length * hoursPerCfaWeek;
   const progressRatio = termine ? 1 : Math.min(1, pastCFAHours / effectiveTotal);
 
   // Sheet 1: Indicateurs globaux — synchronized with other documents
