@@ -14295,6 +14295,8 @@ function genCalendrierAnnuelCFA(o: OrganismeInfo, f: FormationInfo) {
 
     const weekEnd = new Date(weekStart);
     weekEnd.setDate(weekEnd.getDate() + 4);
+    if (endDateCap && weekEnd > endDateCap) weekEnd.setTime(endDateCap.getTime());
+
     const mois = moisFR[weekStart.getMonth()];
     const weekNum = getWeekOfYear(weekStart);
 
