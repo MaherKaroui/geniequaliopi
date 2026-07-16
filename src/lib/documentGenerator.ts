@@ -9449,9 +9449,15 @@ function genSynopsisCFA(o: OrganismeInfo, f: FormationInfo) {
     'Ateliers pratiques sur poste informatique, travaux individuels et collectifs',
   ];
 
+  const dayBased = isDayBasedRythme(rythme);
+  const cfaDaysPerWeek = getCFADaysPerWeek(rythme);
+  const hoursPerCfaWeek = getHoursPerCFAWeek(rythme);
+  const rawEndCap = f.dateFin ? new Date(f.dateFin.split('/').reverse().join('-')) : null;
+  const endCap = rawEndCap && !isNaN(rawEndCap.getTime()) ? rawEndCap : null;
+
   // Build week-by-week planning section
   let planningHtml = `<h3>Planification semaine par semaine</h3>
-    <p><em>Rythme : ${rythme} — Cycle de ${cycleLength} semaines (${cfaPerCycle} en CFA + ${entrepriseWeeks} en entreprise)</em></p>`;
+    <p><em>Rythme : ${rythme}${dayBased ? ` — chaque semaine : ${cfaDaysPerWeek}j CFA + ${Math.max(0, 5 - cfaDaysPerWeek)}j entreprise (${hoursPerCfaWeek}h/semaine en centre)` : ` — Cycle de ${cycleLength} semaines (${cfaPerCycle} en CFA + ${entrepriseWeeks} en entreprise)`}</em></p>`;
 
   if (rncp && rncp.blocsCompetences.length > 0) {
     // Calculate volumes
