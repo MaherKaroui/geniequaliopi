@@ -17,6 +17,7 @@ import NotFound from "./pages/NotFound";
 import SophieChat from "./components/SophieChat";
 import Admin from "./pages/Admin";
 import { RouteActivityTracker } from "./components/RouteActivityTracker";
+import AccessGate from "./components/AccessGate";
 import { installActivityTracker } from "./lib/activityTracker";
 
 installActivityTracker();
@@ -28,6 +29,7 @@ const App = () => (
     <TooltipProvider>
       <Sonner />
       <BrowserRouter>
+        <AccessGate>
         <BackgroundJobsProvider>
         <RouteActivityTracker />
         <Routes>
@@ -47,6 +49,7 @@ const App = () => (
         </Routes>
         <SophieChat />
         </BackgroundJobsProvider>
+        </AccessGate>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
