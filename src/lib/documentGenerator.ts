@@ -2337,7 +2337,7 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
     <div class="section">
       <p style="font-size:${getDocStyle().fontSize + 2}px;font-weight:bold">${f.intitule}</p>
       ${(() => {
-        const rncp = f.codeRNCP ? getRNCPByCode(f.codeRNCP) : undefined;
+        const rncp = (isCFA && f.codeRNCP) ? getRNCPByCode(f.codeRNCP) : undefined;
         if (!rncp) return "";
         const isRS = rncp.code.toUpperCase().startsWith("RS");
         const label = isRS ? "Répertoire Spécifique" : "RNCP";
