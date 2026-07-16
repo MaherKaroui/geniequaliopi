@@ -14386,8 +14386,7 @@ function genCalendrierAnnuelCFA(o: OrganismeInfo, f: FormationInfo) {
     }
   }
 
-  const endDate = new Date(startDate);
-  endDate.setDate(endDate.getDate() + totalWeeksInYear * 7);
+  const endDate = endDateCap ? new Date(endDateCap) : (() => { const d = new Date(startDate); d.setDate(d.getDate() + totalWeeksInYear * 7); return d; })();
 
   const tableHtml = `<table border="1" cellpadding="5" cellspacing="0" style="border-collapse:collapse;width:100%">
     <tr style="background:#1e3a7b;color:#fff">
