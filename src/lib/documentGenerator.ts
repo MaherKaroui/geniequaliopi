@@ -2464,7 +2464,7 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
     })()}
 
     ${(() => {
-      const rncp = f.codeRNCP ? getRNCPByCode(f.codeRNCP) : undefined;
+      const rncp = (isCFA && f.codeRNCP) ? getRNCPByCode(f.codeRNCP) : undefined;
       if (!rncp) return "";
       const blocsHtml = rncp.blocsCompetences && rncp.blocsCompetences.length > 0
         ? `<table style="width:100%;margin-top:8px">
