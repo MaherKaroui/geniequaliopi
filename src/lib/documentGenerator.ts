@@ -5200,7 +5200,9 @@ function genSuiviChiffreFormationExcel(o: OrganismeInfo, f: FormationInfo, stagi
   const { totalHours } = parseDuree(f.duree);
   const effectiveTotal = totalHours > 0 ? totalHours : 420;
   const isCFA = !!(f.rythmeAlternance && f.rythmeAlternance.trim().length > 0);
-  const totalCFAWeeks = Math.max(1, Math.ceil(effectiveTotal / 35));
+  const hoursPerCfaWeek = getHoursPerCFAWeek(f.rythmeAlternance || '');
+  const totalCFAWeeks = Math.max(1, Math.ceil(effectiveTotal / hoursPerCfaWeek));
+
   const termine = isFormationTerminee(f, stagiaires);
 
   const tr = (cells: string[], isHeader = false) => {
