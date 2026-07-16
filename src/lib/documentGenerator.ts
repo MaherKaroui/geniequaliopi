@@ -2071,10 +2071,13 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
   }
 
   // Detect FLE / certification by competence blocks
+  // ⚠️ Ces blocs (RNCP, NTC, FLE/IA certif) ne s'affichent QUE pour un programme
+  // de certification (CFA). Pour une Action de Formation classique, on n'insère
+  // aucune donnée RNCP même si un code est renseigné.
   const lower = f.intitule.toLowerCase();
-  const isFLEOrCertif = lower.includes("français") || lower.includes("fle") || lower.includes("médico-social") || lower.includes("communiquer");
-  const isIACertif = lower.includes("ia générative") || lower.includes("intelligence artificielle");
-  const isNTCProg = lower.includes("négociateur") || lower.includes("technico-commercial") || lower.includes("technico commercial") || (f.codeRNCP || "").toUpperCase().includes("39063");
+  const isFLEOrCertif = isCFA && (lower.includes("français") || lower.includes("fle") || lower.includes("médico-social") || lower.includes("communiquer"));
+  const isIACertif = isCFA && (lower.includes("ia générative") || lower.includes("intelligence artificielle"));
+  const isNTCProg = isCFA && (lower.includes("négociateur") || lower.includes("technico-commercial") || lower.includes("technico commercial") || (f.codeRNCP || "").toUpperCase().includes("39063"));
   const isBlocFormation = isFLEOrCertif || isIACertif;
 
   // NTC : blocs de compétences détaillés en articles (référentiel REAC RNCP 39063)
@@ -2334,7 +2337,7 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
     <div class="section">
       <p style="font-size:${getDocStyle().fontSize + 2}px;font-weight:bold">${f.intitule}</p>
       ${(() => {
-        const rncp = f.codeRNCP ? getRNCPByCode(f.codeRNCP) : undefined;
+        const rncp = (isCFA && f.codeRNCP) ? getRNCPByCode(f.codeRNCP) : undefined;
         if (!rncp) return "";
         const isRS = rncp.code.toUpperCase().startsWith("RS");
         const label = isRS ? "Répertoire Spécifique" : "RNCP";
@@ -2393,7 +2396,7 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
     </div>
 
     ${(() => {
-      const rncp = f.codeRNCP ? getRNCPByCode(f.codeRNCP) : undefined;
+      const rncp = (isCFA && f.codeRNCP) ? getRNCPByCode(f.codeRNCP) : undefined;
       if (!rncp) {
         // Fallback sans RNCP : voies d'accès génériques
         return ``;
@@ -2461,7 +2464,7 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
     })()}
 
     ${(() => {
-      const rncp = f.codeRNCP ? getRNCPByCode(f.codeRNCP) : undefined;
+      const rncp = (isCFA && f.codeRNCP) ? getRNCPByCode(f.codeRNCP) : undefined;
       if (!rncp) return "";
       const blocsHtml = rncp.blocsCompetences && rncp.blocsCompetences.length > 0
         ? `<table style="width:100%;margin-top:8px">
