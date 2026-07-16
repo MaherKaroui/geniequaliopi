@@ -13396,6 +13396,11 @@ export function getCFAWeekDates(f: FormationInfo): { cfaWeekNum: number; weekSta
   if (isNaN(rawStartDate.getTime())) rawStartDate.setTime(Date.now());
   rawStartDate.setHours(12, 0, 0, 0);
 
+  // Cap au dateFin du formulaire si présent : on ne dépasse jamais la date de fin de formation
+  const rawEndDate = f.dateFin ? new Date(f.dateFin.split('/').reverse().join('-')) : null;
+  const endCap = rawEndDate && !isNaN(rawEndDate.getTime()) ? rawEndDate : null;
+  if (endCap) endCap.setHours(23, 59, 59, 999);
+
   const firstWeekStart = new Date(rawStartDate);
   const dayOfWeek = firstWeekStart.getDay();
   const diffToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
@@ -13409,15 +13414,21 @@ export function getCFAWeekDates(f: FormationInfo): { cfaWeekNum: number; weekSta
     const posInCycle = calendarWeek % Math.max(1, cycleLength);
     const isCFA = dayBased ? true : posInCycle < cfaPerCycle;
 
+    const weekStart = new Date(firstWeekStart);
+    weekStart.setDate(firstWeekStart.getDate() + calendarWeek * 7);
+    // Stop dès qu'on dépasse la date de fin de formation
+    if (endCap && weekStart > endCap) break;
+
     if (isCFA) {
       cfaWeekCount++;
-      const weekStart = new Date(firstWeekStart);
-      weekStart.setDate(firstWeekStart.getDate() + calendarWeek * 7);
       const weekEnd = new Date(weekStart);
       weekEnd.setDate(weekEnd.getDate() + (dayBased ? Math.max(0, cfaDaysPerWeek - 1) : 4));
+      // Tronque la dernière semaine si elle dépasse la date de fin
+      if (endCap && weekEnd > endCap) weekEnd.setTime(endCap.getTime());
       result.push({ cfaWeekNum: cfaWeekCount, weekStart, weekEnd });
     }
     calendarWeek++;
+
     // Safety break to avoid infinite loops
     if (calendarWeek > 500) break;
   }
@@ -14242,6 +14253,8 @@ function genCalendrierAnnuelCFA(o: OrganismeInfo, f: FormationInfo) {
 
   const startDate = f.dateDebut ? new Date(f.dateDebut.split('/').reverse().join('-')) : new Date();
   if (isNaN(startDate.getTime())) startDate.setTime(Date.now());
+  const rawEnd = f.dateFin ? new Date(f.dateFin.split('/').reverse().join('-')) : null;
+  const endDateCap = rawEnd && !isNaN(rawEnd.getTime()) ? rawEnd : null;
   const fmtD = (d: Date) => d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
   const moisFR = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
@@ -14256,12 +14269,15 @@ function genCalendrierAnnuelCFA(o: OrganismeInfo, f: FormationInfo) {
     : getCourseChapters(f.intitule).slice(0, 5).map((ch, i) => ({ titre: ch.title, volume: Math.round(blocHoursTotal / Math.min(getCourseChapters(f.intitule).length, 5)) }));
   modules.push({ titre: 'Accompagnement + Examens', volume: accompHours });
 
-  // Build full-year calendar (52 weeks from start date)
+  // Build calendar : couvre toute la période entre dateDebut et dateFin (jamais moins de 52 semaines)
   let calendarRows = '';
   let cfaWeekNum = 0;
   let moduleIdx = 0;
   let remainingInModule = modules[0]?.volume || 0;
-  const totalWeeksInYear = 52;
+  const weeksFromDates = endDateCap
+    ? Math.max(1, Math.ceil((endDateCap.getTime() - startDate.getTime()) / (7 * 86400000)) + 1)
+    : 52;
+  const totalWeeksInYear = endDateCap ? weeksFromDates : Math.max(52, totalCFAWeeks + entrepriseWeeks * totalCycles);
   let posInCycle = 0;
 
   // French school holidays approximation (week numbers to skip)
@@ -14274,8 +14290,13 @@ function genCalendrierAnnuelCFA(o: OrganismeInfo, f: FormationInfo) {
   for (let w = 0; w < totalWeeksInYear; w++) {
     const weekStart = new Date(startDate);
     weekStart.setDate(weekStart.getDate() + w * 7);
+    // Cap au dateFin : on ne dépasse jamais la fin de formation
+    if (endDateCap && weekStart > endDateCap) break;
+
     const weekEnd = new Date(weekStart);
     weekEnd.setDate(weekEnd.getDate() + 4);
+    if (endDateCap && weekEnd > endDateCap) weekEnd.setTime(endDateCap.getTime());
+
     const mois = moisFR[weekStart.getMonth()];
     const weekNum = getWeekOfYear(weekStart);
 
