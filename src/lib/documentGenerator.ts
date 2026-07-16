@@ -13529,7 +13529,7 @@ function genExercicesCFAStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires
         const blocMatiereWeeks: { matiere: typeof bloc.matieres[0]; startWeek: number; endWeek: number }[] = [];
         for (const mat of bloc.matieres) {
           const volume = Math.round((parseInt(mat.volume) || 0) * scale);
-          const matWeeks = Math.max(1, Math.ceil(volume / 35));
+          const matWeeks = Math.max(1, Math.ceil(volume / getHoursPerCFAWeek(f.rythmeAlternance || '')));
           blocMatiereWeeks.push({ matiere: mat, startWeek: cumulWeeks + 1, endWeek: cumulWeeks + matWeeks });
           cumulWeeks += matWeeks;
         }
