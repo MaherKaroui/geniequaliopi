@@ -5445,7 +5445,7 @@ function genSuiviChiffreFormationExcel(o: OrganismeInfo, f: FormationInfo, stagi
       // Count CFA weeks in this month
       const cfaWeeksInMonth = cfaWeekDates.filter(w => w.weekStart >= moisStart && w.weekStart <= moisEnd);
       const semCFA = cfaWeeksInMonth.length;
-      const heuresCFA = semCFA * 35;
+      const heuresCFA = semCFA * getHoursPerCFAWeek(f.rythmeAlternance || '');
 
       // Estimate enterprise weeks: total calendar weeks in month minus CFA weeks
       const totalCalWeeksInMonth = Math.round((moisEnd.getTime() - moisStart.getTime()) / (7 * 86400000));
