@@ -677,7 +677,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     }
     case "trame_eval_besoins_combine": {
       const si = params?.stagiaireIdx ?? 0;
-      return genTrameEvalBesoinsCombine(o, f, stagiaires, si);
+      return genTrameEvalBesoinsCombine(o, f, stagiaires, si, !!params?.isCFA);
     }
     case "deroule_pedagogique_detaille": return genDeroulePedagogiqueDetaille(o, f);
     case "contrat_formation_pro": return genContratFormationPro_V2(o, f, stagiaires);
@@ -9891,9 +9891,12 @@ function parsePrerequisItems(prerequis: string | undefined): string[] {
   return parts.length > 0 ? parts : [raw];
 }
 
-function genTrameEvalBesoinsCombine(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
+function genTrameEvalBesoinsCombine(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number, isAlternanceOPCO: boolean = false) {
   const s = stagiaires[si] || stagiaires[0];
   const answers = generateEvalBesoinsAnswers(s, f, o, si);
+  if (isAlternanceOPCO) {
+    answers.budget = `Formation suivie dans le cadre d'un <strong>contrat d'apprentissage</strong> (alternance). Prise en charge intégrale des frais pédagogiques par <strong>OPCO Mobilités</strong> au titre du financement de l'apprentissage — aucun reste à charge pour l'apprenti(e) ni pour l'entreprise d'accueil.`;
+  }
   const hasEntreprise = !!(s.entreprise && s.entreprise.trim() && s.entreprise.trim().toLowerCase() !== "entreprise");
   const tuteurNom = (s as any).tuteur?.trim() || "Tuteur entreprise";
   const dateAnalyse = formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f), 20));
