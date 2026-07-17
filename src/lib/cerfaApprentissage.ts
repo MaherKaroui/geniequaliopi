@@ -336,21 +336,34 @@ export async function genCerfaApprentissagePdf(
   // Fait à (champ correct = 8_90)
   setText(form, "Zone de texte 8_90", clean(o.ville));
 
-  // ---------- RÉMUNÉRATION (1ère année — selon âge apprenti à date début contrat) ----------
+  // ---------- RÉMUNÉRATION (1ère année — ligne du HAUT y=669) ----------
+  // Barème selon âge apprenti à la date de début du contrat.
+  // Le tableau CERFA compte 4 lignes (1ère→4ème année, de haut en bas : y=669, 655, 641, 627).
+  // On remplit la 1ère année (côté gauche : période unique du début→fin contrat).
   const age = ageAt(s.dateNaissance, dateDebut) ?? 20;
   const tarif = tarifApprenti(age);
-  // 1ère année = ligne du HAUT (y=655) : 21_43..48 (dates du/au) + 8_58 (%) + 8_59 (SMIC)
-  setText(form, "Zone de texte 21_43", ddJ);
-  setText(form, "Zone de texte 21_44", ddM);
-  setText(form, "Zone de texte 21_45", ddA);
-  setText(form, "Zone de texte 21_46", dfJ);
-  setText(form, "Zone de texte 21_47", dfM);
-  setText(form, "Zone de texte 21_48", dfA);
-  setText(form, "Zone de texte 8_58", String(tarif.y1));
-  // Montant brut mensuel = % du SMIC (SMIC brut mensuel 2024 = 1801,80 €)
   const SMIC_BRUT_MENSUEL = 1801.80;
   const montantTarif = Math.round((SMIC_BRUT_MENSUEL * tarif.y1) / 100 * 100) / 100;
-  setText(form, "Zone de texte 8_59", montantTarif.toFixed(2).replace(".", ",") + " €");
+  const montantStr = montantTarif.toFixed(2).replace(".", ",") + " €";
+  // 1ère année — case de gauche (du/au + % + €)
+  setText(form, "Zone de texte 21_81", ddJ);
+  setText(form, "Zone de texte 21_82", ddM);
+  setText(form, "Zone de texte 21_83", ddA);
+  setText(form, "Zone de texte 21_84", dfJ);
+  setText(form, "Zone de texte 21_85", dfM);
+  setText(form, "Zone de texte 21_86", dfA);
+  setText(form, "Zone de texte 8_95", String(tarif.y1));
+  setText(form, "Zone de texte 8_96", montantStr);
+  // Case de droite (2e période 1ère année) — laissée vide
+  setText(form, "Zone de texte 21_87", "");
+  setText(form, "Zone de texte 21_88", "");
+  setText(form, "Zone de texte 21_89", "");
+  setText(form, "Zone de texte 21_90", "");
+  setText(form, "Zone de texte 21_91", "");
+  setText(form, "Zone de texte 21_92", "");
+  setText(form, "Zone de texte 8_97", "");
+  setText(form, "Zone de texte 8_98", "");
+  // Les lignes 2/3/4 années (y=655, 641, 627) restent vides
 
   // ---------- CADRE RÉSERVÉ ORGANISME (bas page 2) ----------
   // Seules les zones "Nom" (8_91) et "N° SIRET organisme" (8_92) sont à remplir.
