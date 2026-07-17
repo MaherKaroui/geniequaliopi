@@ -468,7 +468,7 @@ export function buildFullCatalog(
     stagiaires.forEach((s, si) => {
       add(`cfa_c2i4_attestation_inscription_${si}`, `CT2 - IND 4 ATTESTATION D'INSCRIPTION – ${s.prenom} ${s.nom}`, 2, 4, "attestation_inscription_cfa", { stagiaireIdx: si });
       add(`cfa_c2i4_fiche_renseignement_${si}`, `CT2 - IND 4 FICHE DE RENSEIGNEMENT – ${s.prenom} ${s.nom}`, 2, 4, "fiche_renseignement_cfa", { stagiaireIdx: si });
-      add(`cfa_c2i4_trame_eval_besoins_apprenant_${si}`, `CT2 - IND 4 TRAME ÉVALUATION DES BESOINS – APPRENANT – ${s.prenom} ${s.nom}`, 2, 4, "trame_eval_besoins_stagiaire", { stagiaireIdx: si });
+      add(`cfa_c2i4_trame_eval_besoins_apprenant_${si}`, `CT2 - IND 4 TRAME ÉVALUATION DES BESOINS – APPRENANT – ${s.prenom} ${s.nom}`, 2, 4, "trame_eval_besoins_stagiaire", { stagiaireIdx: si, isCFA: true });
       add(`cfa_c2i4_trame_eval_besoins_entreprise_${si}`, `CT2 - IND 4 TRAME ÉVALUATION DES BESOINS – ENTREPRISE – ${s.prenom} ${s.nom}`, 2, 4, "trame_eval_besoins_entreprise", { stagiaireIdx: si });
       add(`cfa_c2i4_dossier_candidature_${si}`, `CT2 - IND 4 DOSSIER DE CANDIDATURE – ${s.prenom} ${s.nom}`, 2, 4, "dossier_candidature_cfa", { stagiaireIdx: si });
     });

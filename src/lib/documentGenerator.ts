@@ -669,7 +669,8 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "trame_eval_besoins": return genTrameEvalBesoins(o, f, stagiaires);
     case "trame_eval_besoins_stagiaire": {
       const si = params?.stagiaireIdx ?? 0;
-      return genTrameEvalBesoinsStagiaire(o, f, stagiaires, si);
+      const isCFAOrg = Array.isArray(o.typesActions) && o.typesActions.includes('apprentissage');
+      return genTrameEvalBesoinsStagiaire(o, f, stagiaires, si, !!params?.isCFA || isCFAOrg);
     }
     case "trame_eval_besoins_entreprise": {
       const si = params?.stagiaireIdx ?? 0;
@@ -9784,9 +9785,17 @@ ${s.telephone?.trim() ? `<strong>Téléphone :</strong> ${s.telephone}` : ""}<br
 ` });
 }
 
-function genTrameEvalBesoinsStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number) {
+const ALTERNANCE_OPCO_FINANCEMENT = `Formation suivie dans le cadre d'un <strong>contrat d'apprentissage</strong> (alternance). Prise en charge intégrale des frais pédagogiques par <strong>OPCO Mobilités</strong> au titre du financement de l'apprentissage — aucun reste à charge pour l'apprenti(e) ni pour l'entreprise d'accueil.`;
+const QUESTION_FINANCEMENT_STANDARD = "Quel budget avez-vous prévu pour cette formation et bénéficiez-vous d'un dispositif de financement (financement personnel, CPF, OPCO) ?";
+const QUESTION_FINANCEMENT_ALTERNANCE = "Quel dispositif de financement est mobilisé pour cette formation en alternance (OPCO / contrat d'apprentissage) ?";
+
+function genTrameEvalBesoinsStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number, isAlternanceOPCO: boolean = false) {
   const s = stagiaires[si] || stagiaires[0];
   const answers = generateEvalBesoinsAnswers(s, f, o, si);
+  if (isAlternanceOPCO) {
+    answers.budget = ALTERNANCE_OPCO_FINANCEMENT;
+  }
+  const questionFinancement = isAlternanceOPCO ? QUESTION_FINANCEMENT_ALTERNANCE : QUESTION_FINANCEMENT_STANDARD;
 
   const civiliteBlock = `<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse;width:100%">
 <tr><td style="background:#f8f9fa">
@@ -9810,7 +9819,7 @@ ${s.telephone?.trim() ? `<strong>Téléphone :</strong> ${s.telephone}` : ""}<br
 <p><strong>2. Quel objectif professionnel ou personnel souhaitez-vous atteindre grâce à cette formation ?</strong></p>
 <table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${answers.objectif}</td></tr></table>
 
-<p><strong>3. Quel budget avez-vous prévu pour cette formation et bénéficiez-vous d'un dispositif de financement (financement personnel, CPF, OPCO) ?</strong></p>
+<p><strong>3. ${questionFinancement}</strong></p>
 <table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${answers.budget}</td></tr></table>
 
 <p><strong>4. En quoi pensez-vous que cette formation contribuera à la réalisation de votre projet professionnel ou personnel ?</strong></p>
@@ -9896,8 +9905,9 @@ function genTrameEvalBesoinsCombine(o: OrganismeInfo, f: FormationInfo, stagiair
   const s = stagiaires[si] || stagiaires[0];
   const answers = generateEvalBesoinsAnswers(s, f, o, si);
   if (isAlternanceOPCO) {
-    answers.budget = `Formation suivie dans le cadre d'un <strong>contrat d'apprentissage</strong> (alternance). Prise en charge intégrale des frais pédagogiques par <strong>OPCO Mobilités</strong> au titre du financement de l'apprentissage — aucun reste à charge pour l'apprenti(e) ni pour l'entreprise d'accueil.`;
+    answers.budget = ALTERNANCE_OPCO_FINANCEMENT;
   }
+  const questionFinancement = isAlternanceOPCO ? QUESTION_FINANCEMENT_ALTERNANCE : QUESTION_FINANCEMENT_STANDARD;
   const hasEntreprise = !!(s.entreprise && s.entreprise.trim() && s.entreprise.trim().toLowerCase() !== "entreprise");
   const tuteurNom = (s as any).tuteur?.trim() || "Tuteur entreprise";
   const dateAnalyse = formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f), 20));
@@ -9925,7 +9935,7 @@ ${s.telephone?.trim() ? `<strong>Téléphone :</strong> ${s.telephone}<br>` : ""
 <p><strong>2. Quel objectif professionnel ou personnel souhaitez-vous atteindre grâce à cette formation ?</strong></p>
 <table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${answers.objectif}</td></tr></table>
 
-<p><strong>3. Quel budget avez-vous prévu pour cette formation et bénéficiez-vous d'un dispositif de financement (financement personnel, CPF, OPCO) ?</strong></p>
+<p><strong>3. ${questionFinancement}</strong></p>
 <table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${answers.budget}</td></tr></table>
 
 <p><strong>4. En quoi pensez-vous que cette formation contribuera à la réalisation de votre projet professionnel ou personnel ?</strong></p>
