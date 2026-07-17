@@ -677,7 +677,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     }
     case "trame_eval_besoins_combine": {
       const si = params?.stagiaireIdx ?? 0;
-      return genTrameEvalBesoinsCombine(o, f, stagiaires, si);
+      return genTrameEvalBesoinsCombine(o, f, stagiaires, si, !!params?.isCFA);
     }
     case "deroule_pedagogique_detaille": return genDeroulePedagogiqueDetaille(o, f);
     case "contrat_formation_pro": return genContratFormationPro_V2(o, f, stagiaires);
