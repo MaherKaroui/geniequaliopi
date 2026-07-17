@@ -10060,12 +10060,13 @@ function generateEvalBesoinsAnswers(s: StagiaireInfo, f: FormationInfo, o: Organ
   const result = _generateEvalBesoinsAnswersImpl(s, f, o, idx);
   const isDreamers = /dreamers/i.test(o.nom || "");
   const isFatima = /fatima/i.test(s.prenom || "") && /oliveira/i.test(s.nom || "");
+  const isCFAAlternance = (Array.isArray(o.typesActions) && o.typesActions.includes('apprentissage')) || !!f.rythmeAlternance?.trim();
   if (isDreamers && isFatima) {
     result.budget = "Formation financée via le CPF (Compte Personnel de Formation) mobilisé par la bénéficiaire.";
   }
-  // Override global : diplôme = Baccalauréat, financement = Financement personnel (toujours)
+  // Override global : diplôme = Baccalauréat, financement adapté au contexte CFA/alternance
   result.diplome = "Baccalauréat";
-  result.budget = "Financement personnel";
+  result.budget = isCFAAlternance ? ALTERNANCE_OPCO_FINANCEMENT : "Financement personnel";
   return result;
 }
 
