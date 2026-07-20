@@ -332,7 +332,7 @@ CONSIGNES DE SORTIE
     }
 
     // Validate each suggestion: the code MUST exist AND its real title must match the IA-proposed title
-    const validated = await Promise.all(raw.map(async (s) => {
+    const validated: Array<RncpSuggestion | null> = await Promise.all(raw.map(async (s): Promise<RncpSuggestion | null> => {
       const code = String(s.rncp || "").replace(/\D+/g, "");
       if (!code || code.length < 4) return null;
       const check = await fetchRncp(code);
