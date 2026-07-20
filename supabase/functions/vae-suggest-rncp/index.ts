@@ -94,6 +94,7 @@ interface RncpSuggestion {
   certificateur?: string;
   justification: string;
   lien: string;
+  dateEcheance?: string;
   score?: number;
   sourceQuery?: string;
 }
@@ -135,7 +136,6 @@ function domainScore(domains: string[], title: string): number {
     beaute: ["maquill", "esthet", "cosmet", "beaute", "perruquier"],
     commerce: ["commercial", "vente", "client", "negociateur", "marketing", "business"],
     rh: ["ressources humaines", "paie", "recrutement", "rh"],
-    Subsidiary: [],
     administratif: ["secretair", "administr", "assistant", "comptable", "gestion"],
     restauration: ["restaurant", "cuisine", "culinaire", "service", "alimentaire"],
     logistique: ["logistique", "transport", "stock", "supply"],
