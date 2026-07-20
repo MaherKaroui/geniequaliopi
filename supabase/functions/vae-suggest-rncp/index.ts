@@ -31,8 +31,19 @@ const TOOL = {
   },
 };
 
+function decodeHtml(s: string): string {
+  return (s || "")
+    .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)))
+    .replace(/&amp;/g, "&")
+    .replace(/&quot;/g, '"')
+    .replace(/&#039;|&apos;/g, "'")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">");
+}
+
 function stripTags(html: string): string {
-  return html.replace(/<[^>]+>/g, " ").replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/\s+/g, " ").trim();
+  return decodeHtml(html.replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").trim();
 }
 
 async function fetchRncp(rncp: string): Promise<{ ok: boolean; intitule?: string; niveau?: string; certificateur?: string; active?: boolean } | null> {
@@ -76,6 +87,159 @@ function titleSimilarity(a: string, b: string): number {
   return inter / Math.min(ta.size, tb.size);
 }
 
+interface RncpSuggestion {
+  rncp: string;
+  intitule: string;
+  niveau: string;
+  certificateur?: string;
+  justification: string;
+  lien: string;
+  dateEcheance?: string;
+  score?: number;
+  sourceQuery?: string;
+}
+
+function candidateText(candidat: any): string {
+  return [
+    candidat.emploiActuel,
+    candidat.employeur,
+    candidat.niveauFormation,
+    ...(candidat.competences || []),
+    ...(candidat.diplomes || []).map((d: any) => `${d.intitule || ""} ${d.etablissement || ""}`),
+    ...(candidat.experiences || []).flatMap((e: any) => [e.poste, e.entreprise, e.missions]),
+  ].filter(Boolean).join(" ");
+}
+
+function inferDomains(text: string): string[] {
+  const n = normalize(text);
+  const domains: Record<string, string[]> = {
+    formation: ["formation", "formateur", "pedagog", "enseignement", "apprentissage", "ingenierie", "referent"],
+    beaute: ["maquill", "esthet", "cosmet", "beaute", "perruquier", "visage", "artistique"],
+    commerce: ["commercial", "vente", "client", "negociation", "prospection", "marketing", "business"],
+    rh: ["ressources humaines", "recrutement", "paie", "rh", "personnel"],
+    administratif: ["secretair", "administr", "assistant", "comptable", "gestion", "facturation"],
+    restauration: ["restaurant", "cuisine", "culinaire", "service", "haccp", "alimentaire"],
+    logistique: ["logistique", "transport", "stock", "magasin", "supply", "livraison"],
+    sante_social: ["social", "medico", "sante", "soin", "educateur", "accompagnement"],
+    informatique: ["informatique", "developp", "reseau", "systeme", "cyber", "data", "logiciel"],
+    batiment: ["batiment", "chantier", "construction", "electric", "plomberie", "peinture"],
+    securite: ["securite", "surveillance", "gardiennage", "incendie"],
+  };
+  return Object.entries(domains).filter(([, words]) => words.some(w => n.includes(w))).map(([d]) => d);
+}
+
+function domainScore(domains: string[], title: string): number {
+  if (!domains.length) return 0;
+  const t = normalize(title);
+  const domainWords: Record<string, string[]> = {
+    formation: ["formation", "formateur", "pedagog", "enseignement", "apprentissage", "ingenierie"],
+    beaute: ["maquill", "esthet", "cosmet", "beaute", "perruquier"],
+    commerce: ["commercial", "vente", "client", "negociateur", "marketing", "business"],
+    rh: ["ressources humaines", "paie", "recrutement", "rh"],
+    administratif: ["secretair", "administr", "assistant", "comptable", "gestion"],
+    restauration: ["restaurant", "cuisine", "culinaire", "service", "alimentaire"],
+    logistique: ["logistique", "transport", "stock", "supply"],
+    sante_social: ["social", "medico", "sante", "soin", "educateur"],
+    informatique: ["informatique", "developp", "reseau", "cyber", "data", "logiciel"],
+    batiment: ["batiment", "chantier", "construction", "electric", "plomberie", "peinture"],
+    securite: ["securite", "surveillance", "incendie"],
+  };
+  return domains.some(d => (domainWords[d] || []).some(w => t.includes(w))) ? 0.65 : -0.35;
+}
+
+function topMissionWords(text: string, limit = 5): string[] {
+  const counts = new Map<string, number>();
+  for (const w of normalize(text).split(" ")) {
+    if (w.length < 5 || STOP.has(w)) continue;
+    counts.set(w, (counts.get(w) || 0) + 1);
+  }
+  return [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, limit).map(([w]) => w);
+}
+
+function buildSearchQueries(candidat: any, aiSuggestions: any[]): string[] {
+  const rawText = candidateText(candidat);
+  const domains = inferDomains(rawText);
+  const queries: string[] = [];
+  const add = (q?: string) => {
+    const clean = stripTags(String(q || "")).replace(/\s+/g, " ").trim();
+    if (clean.length >= 4 && !queries.some(x => normalize(x) === normalize(clean))) queries.push(clean.slice(0, 120));
+  };
+
+  add(candidat.emploiActuel);
+  for (const e of (candidat.experiences || []).slice(0, 5)) {
+    add(e.poste);
+    const words = topMissionWords(e.missions || "", 4).join(" ");
+    add(`${e.poste || ""} ${words}`);
+  }
+  for (const s of aiSuggestions) add(s.intitule);
+
+  if (domains.includes("formation")) {
+    add("formateur professionnel adultes");
+    add("responsable pédagogique formation");
+    add("responsable de dispositifs de formation");
+    add("responsable projets ingénierie formation");
+    add("consultant formateur");
+  }
+  if (domains.includes("beaute")) {
+    add("maquilleur professionnel");
+    add("maquilleur artistique professionnel");
+    add("esthétique cosmétique");
+  }
+  if (domains.includes("commerce")) {
+    add("négociateur technico commercial");
+    add("manager unité marchande");
+    add("responsable développement commercial");
+  }
+  if (domains.includes("rh")) {
+    add("assistant ressources humaines");
+    add("chargé ressources humaines");
+    add("gestionnaire de paie");
+  }
+  if (domains.includes("administratif")) {
+    add("secrétaire assistant");
+    add("secrétaire comptable");
+    add("assistant de gestion");
+  }
+
+  if (!queries.length) add(topMissionWords(rawText, 6).join(" "));
+  return queries.slice(0, 12);
+}
+
+async function searchFranceCompetences(query: string): Promise<RncpSuggestion[]> {
+  try {
+    const url = `https://www.francecompetences.fr/recherche-resultats/?types=certification&search=${encodeURIComponent(query)}&pageType=certification&active=1`;
+    const r = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0 (compatible; LCA-VAE/1.0)" } });
+    if (!r.ok) return [];
+    const html = await r.text();
+    const cards = html.split("card--results--certification--essential__wrapper").slice(1);
+    const out: RncpSuggestion[] = [];
+    for (const card of cards.slice(0, 12)) {
+      const code = card.match(/href="\/recherche\/rncp\/(\d+)"/)?.[1]
+        || card.match(/RNCP\s*(\d{3,6})/i)?.[1];
+      const title = stripTags(card.match(/<h3[^>]*>([\s\S]*?)<\/h3>/i)?.[1] || "");
+      const status = stripTags(card.match(/__status[^>]*>([\s\S]*?)<\/span>/i)?.[1] || "");
+      if (!code || !title || !/active/i.test(status) || /inactive/i.test(status)) continue;
+      const niveau = card.match(/Niveau\s+(\d)/i)?.[1] || "";
+      const cert = stripTags(card.match(/<h4[^>]*>([\s\S]*?)<\/h4>/i)?.[1] || "");
+      const date = stripTags(card.match(/Ech[ée]ance[\s\S]{0,900}?highlighted[^>]*>([\s\S]*?)<\/span>/i)?.[1] || "");
+      out.push({
+        rncp: code,
+        intitule: title,
+        niveau,
+        certificateur: cert,
+        justification: `Correspondance détectée avec le parcours renseigné, via la recherche « ${query} » sur les certifications actives.`,
+        lien: `https://www.francecompetences.fr/recherche/rncp/${code}/`,
+        sourceQuery: query,
+        ...(date ? { dateEcheance: date } : {} as any),
+      });
+    }
+    return out;
+  } catch (e) {
+    console.error("FC search failed", query, e);
+    return [];
+  }
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
   try {
@@ -83,7 +247,6 @@ Deno.serve(async (req) => {
     if (!candidat) throw new Error("candidat required");
 
     const key = Deno.env.get("LOVABLE_API_KEY");
-    if (!key) throw new Error("LOVABLE_API_KEY not configured");
 
     // Distillation du parcours pour forcer l'IA à raisonner sur l'expérience réelle
     const expLines = (candidat.experiences || []).map((e: any) =>
@@ -125,42 +288,51 @@ CONSIGNES DE SORTIE
 - Dans "justification", explique en 1-2 phrases quelles missions du candidat couvrent quels blocs/activités du titre — cite des éléments concrets du parcours (pas de généralités).
 - Rejette tout titre hors du champ d'activité réel.`;
 
-    const r = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          { role: "system", content: "Tu es un conseiller VAE expert du RNCP France Compétences. Tu analyses le parcours en profondeur avant de proposer, et tu ne suggères QUE des titres dont le référentiel correspond réellement aux activités exercées. Tu refuses de te fier aux intitulés de poste : seules les missions comptent." },
-          { role: "user", content: prompt },
-        ],
-        tools: [TOOL],
-        tool_choice: { type: "function", function: { name: "suggest_rncp" } },
-      }),
-    });
+    let raw: any[] = [];
+    if (key) {
+      try {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 22000);
+        const r = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+          signal: controller.signal,
+          body: JSON.stringify({
+            model: "google/gemini-2.5-flash",
+            messages: [
+              { role: "system", content: "Tu es un conseiller VAE expert du RNCP France Compétences. Tu analyses le parcours en profondeur avant de proposer, et tu ne suggères QUE des titres dont le référentiel correspond réellement aux activités exercées. Tu refuses de te fier aux intitulés de poste : seules les missions comptent." },
+              { role: "user", content: prompt },
+            ],
+            tools: [TOOL],
+            tool_choice: { type: "function", function: { name: "suggest_rncp" } },
+          }),
+        });
+        clearTimeout(timer);
 
-    if (!r.ok) {
-      if (r.status === 429) return new Response(JSON.stringify({ error: "Trop de requêtes" }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-      if (r.status === 402) return new Response(JSON.stringify({ error: "Crédits IA épuisés" }), { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-      throw new Error("AI gateway error");
+        if (r.ok) {
+          const data = await r.json();
+          const msg = data.choices?.[0]?.message;
+          let payload: string | undefined = msg?.tool_calls?.[0]?.function?.arguments;
+          if (!payload && typeof msg?.content === "string") {
+            const m = msg.content.match(/\{[\s\S]*\}/);
+            if (m) payload = m[0];
+          }
+          if (payload) {
+            const parsed = JSON.parse(payload);
+            raw = Array.isArray(parsed.suggestions) ? parsed.suggestions : [];
+          } else {
+            console.error("No tool call. raw:", JSON.stringify(data).slice(0, 1200));
+          }
+        } else {
+          console.error("AI gateway skipped", r.status, await r.text());
+        }
+      } catch (e) {
+        console.error("AI suggestion skipped", e);
+      }
     }
-    const data = await r.json();
-    const msg = data.choices?.[0]?.message;
-    let payload: string | undefined = msg?.tool_calls?.[0]?.function?.arguments;
-    if (!payload && typeof msg?.content === "string") {
-      const m = msg.content.match(/\{[\s\S]*\}/);
-      if (m) payload = m[0];
-    }
-    if (!payload) {
-      console.error("No tool call. raw:", JSON.stringify(data).slice(0, 2000));
-      throw new Error("Réponse IA vide, réessayez");
-    }
-
-    const parsed = JSON.parse(payload);
-    const raw: any[] = Array.isArray(parsed.suggestions) ? parsed.suggestions : [];
 
     // Validate each suggestion: the code MUST exist AND its real title must match the IA-proposed title
-    const validated = await Promise.all(raw.map(async (s) => {
+    const validated: Array<RncpSuggestion | null> = await Promise.all(raw.map(async (s): Promise<RncpSuggestion | null> => {
       const code = String(s.rncp || "").replace(/\D+/g, "");
       if (!code || code.length < 4) return null;
       const check = await fetchRncp(code);
@@ -169,7 +341,7 @@ CONSIGNES DE SORTIE
       if (!realTitle) return null;
       const sim = titleSimilarity(realTitle, s.intitule || "");
       // Reject any code whose real title has < 40% token overlap with what the IA proposed
-      if (sim < 0.4) {
+      if (sim < 0.3) {
         console.log(`Dropped RNCP${code}: IA said "${s.intitule}" but FC says "${realTitle}" (sim=${sim.toFixed(2)})`);
         return null;
       }
@@ -180,17 +352,38 @@ CONSIGNES DE SORTIE
         certificateur: s.certificateur || "",
         justification: s.justification || "",
         lien: `https://www.francecompetences.fr/recherche/rncp/${code}/`,
+        score: 1.2 + sim,
       };
     }));
 
+    // Ne dépend plus uniquement des codes inventés par l'IA : on interroge aussi
+    // les résultats actifs France Compétences à partir des métiers/missions du CV.
+    const text = candidateText(candidat);
+    const domains = inferDomains(text);
+    const searchQueries = buildSearchQueries(candidat, raw);
+    const fcResults = (await Promise.all(searchQueries.map(searchFranceCompetences))).flat();
+    const scoredFc = fcResults.map((s, idx) => {
+      const queryBoost = s.sourceQuery ? titleSimilarity(s.sourceQuery, s.intitule) : 0;
+      const cvBoost = titleSimilarity(text, s.intitule);
+      const aiBoost = raw.reduce((best, ai) => Math.max(best, titleSimilarity(ai.intitule || "", s.intitule)), 0);
+      return {
+        ...s,
+        score: domainScore(domains, s.intitule) + queryBoost * 0.7 + cvBoost * 0.55 + aiBoost * 0.35 + Math.max(0, 0.2 - idx * 0.002),
+      };
+    });
+
     // Dedupe by code and drop nulls
     const seen = new Set<string>();
-    const suggestions = validated.filter((x): x is NonNullable<typeof x> => {
+    const suggestions = [...validated.filter(Boolean), ...scoredFc]
+      .filter((x): x is NonNullable<typeof x> => Boolean(x))
+      .sort((a, b) => (b.score || 0) - (a.score || 0))
+      .filter((x) => (x.score || 0) > 0.05)
+      .filter((x) => {
       if (!x) return false;
       if (seen.has(x.rncp)) return false;
       seen.add(x.rncp);
       return true;
-    }).slice(0, 5);
+    }).slice(0, 5).map(({ score, sourceQuery, ...x }) => x);
 
     if (suggestions.length === 0) {
       return new Response(JSON.stringify({ error: "Aucune fiche RNCP valide trouvée — réessayez ou saisissez le code manuellement", suggestions: [] }), {
