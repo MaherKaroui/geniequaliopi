@@ -159,27 +159,27 @@ CONSIGNES DE SORTIE
     const parsed = JSON.parse(payload);
     const raw: any[] = Array.isArray(parsed.suggestions) ? parsed.suggestions : [];
 
-    // Validate each suggestion against France Compétences
+    // Validate each suggestion: the code MUST exist AND its real title must match the IA-proposed title
     const validated = await Promise.all(raw.map(async (s) => {
       const code = String(s.rncp || "").replace(/\D+/g, "");
-      if (!code) return null;
-      let check = await fetchRncp(code);
-      let finalCode = code;
-      if (!check?.ok) {
-        // Try to find real code by name
-        const found = await searchRncpByName(s.intitule || "");
-        if (!found) return null;
-        finalCode = found;
-        check = await fetchRncp(found);
-        if (!check?.ok) return null;
+      if (!code || code.length < 4) return null;
+      const check = await fetchRncp(code);
+      if (!check?.ok) return null;
+      const realTitle = (check.intitule || "").trim();
+      if (!realTitle) return null;
+      const sim = titleSimilarity(realTitle, s.intitule || "");
+      // Reject any code whose real title has < 40% token overlap with what the IA proposed
+      if (sim < 0.4) {
+        console.log(`Dropped RNCP${code}: IA said "${s.intitule}" but FC says "${realTitle}" (sim=${sim.toFixed(2)})`);
+        return null;
       }
       return {
-        rncp: finalCode,
-        intitule: check.intitule || s.intitule,
+        rncp: code,
+        intitule: realTitle,
         niveau: check.niveau || s.niveau || "",
         certificateur: s.certificateur || "",
         justification: s.justification || "",
-        lien: `https://www.francecompetences.fr/recherche/rncp/${finalCode}/`,
+        lien: `https://www.francecompetences.fr/recherche/rncp/${code}/`,
       };
     }));
 
