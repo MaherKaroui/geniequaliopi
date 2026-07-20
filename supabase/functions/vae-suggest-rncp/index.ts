@@ -60,18 +60,20 @@ async function fetchRncp(rncp: string): Promise<{ ok: boolean; intitule?: string
   }
 }
 
-async function searchRncpByName(query: string): Promise<string | null> {
-  try {
-    const r = await fetch(`https://www.francecompetences.fr/recherche/?text=${encodeURIComponent(query)}&type_recherche=rncp`, {
-      headers: { "User-Agent": "Mozilla/5.0" },
-    });
-    if (!r.ok) return null;
-    const html = await r.text();
-    const m = html.match(/\/recherche\/rncp\/(\d+)\//);
-    return m ? m[1] : null;
-  } catch {
-    return null;
-  }
+function normalize(s: string): string {
+  return (s || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9 ]+/g, " ").replace(/\s+/g, " ").trim();
+}
+const STOP = new Set(["de","du","des","la","le","les","un","une","et","en","d","l","a","au","aux","pour","dans","par","sur","avec","fiche","nationale","titre","master","licence","bts","bac","pro","professionnel","professionnelle","diplome","certificat","specialite","ingenieur"]);
+function tokens(s: string): Set<string> {
+  return new Set(normalize(s).split(" ").filter(w => w.length >= 3 && !STOP.has(w)));
+}
+function titleSimilarity(a: string, b: string): number {
+  const ta = tokens(a), tb = tokens(b);
+  if (!ta.size || !tb.size) return 0;
+  let inter = 0;
+  for (const t of ta) if (tb.has(t)) inter++;
+  return inter / Math.min(ta.size, tb.size);
 }
 
 Deno.serve(async (req) => {
