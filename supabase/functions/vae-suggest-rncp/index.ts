@@ -129,7 +129,7 @@ CONSIGNES DE SORTIE
       method: "POST",
       headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "google/gemini-2.5-pro",
+        model: "google/gemini-2.5-flash",
         messages: [
           { role: "system", content: "Tu es un conseiller VAE expert du RNCP France Compétences. Tu analyses le parcours en profondeur avant de proposer, et tu ne suggères QUE des titres dont le référentiel correspond réellement aux activités exercées. Tu refuses de te fier aux intitulés de poste : seules les missions comptent." },
           { role: "user", content: prompt },
