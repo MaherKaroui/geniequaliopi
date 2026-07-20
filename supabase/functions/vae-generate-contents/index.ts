@@ -263,25 +263,48 @@ analyse : 12-18 lignes OBLIGATOIRES. Ne jamais laisser vide. Commence par "J'ai 
 
 Reprends codeBloc="${b.code || b.codeBloc || ""}" et intitule="${b.intitule || b.libelle || ""}" à l'identique. Renvoie via l'outil generate_vae_bloc.`;
 
+      let parts = { contexte: "", description: "", moyens: "", analyse: "" };
       try {
         const bloc = await callAI(key, blocPrompt, BLOC_TOOL, "generate_vae_bloc", 8000);
-        const parts = normalizeBlocPayload(bloc, b, candidat);
-        // If analyse is too short or doesn't start correctly, regenerate it with a dedicated call.
-        const analyseOk = parts.analyse.length >= 900 && /j'ai\s+d[ée]montr[ée]/i.test(parts.analyse);
-        if (!analyseOk) {
-          const regen = await regenerateAnalyse(key, ctx, b, parts.contexte, parts.description, parts.moyens);
-          if (regen.length >= 900) parts.analyse = regen;
-          else if (parts.analyse.length < 450) parts.analyse = fallbackAnalysis(candidat, b);
-        }
-        situationsParBloc.push(assembleBloc(b, parts));
+        parts = normalizeBlocPayload(bloc, b, candidat);
       } catch (e) {
-        console.error("Bloc failed", b.code, e);
-        throw e;
+        console.error("Bloc failed, using fallbacks", b.code, e);
       }
 
+      // Enforce minimum lengths on each section - never leave blank.
+      if (parts.contexte.length < 300) parts.contexte = fallbackContexte(candidat, b);
+      if (parts.description.length < 400) parts.description = fallbackDescription(candidat, b);
+      if (parts.moyens.length < 250) parts.moyens = fallbackMoyens(b);
+
+      // Analyse: try regeneration if too short, else always use rich fallback.
+      const analyseOk = parts.analyse.length >= 900 && /j'ai\s+d[ée]montr[ée]/i.test(parts.analyse);
+      if (!analyseOk) {
+        try {
+          const regen = await regenerateAnalyse(key, ctx, b, parts.contexte, parts.description, parts.moyens);
+          if (regen.length >= 900) parts.analyse = regen;
+        } catch (e) { console.error("Analyse regen threw", e); }
+      }
+      if (parts.analyse.length < 900) parts.analyse = fallbackAnalysis(candidat, b);
+
+      situationsParBloc.push(assembleBloc(b, parts));
     }
 
-    const result = { ...main, situationsParBloc };
+    // Enforce main section fallbacks so nothing is ever blank.
+    const safeMain = {
+      motivation: textOf(main?.motivation) || `Je souhaite faire valider par la VAE mes compétences acquises dans le cadre de mon parcours professionnel (${getCandidateExperienceSummary(candidat)}). Cette démarche est pour moi une opportunité de formaliser mon expertise, de sécuriser mon parcours et d'ouvrir de nouvelles perspectives d'évolution en cohérence avec le référentiel ${certification?.intitule || "visé"}.`,
+      parcours: textOf(main?.parcours) || `Mon parcours professionnel s'est construit autour de missions concrètes : ${getCandidateExperienceSummary(candidat)}. J'ai progressivement développé une expertise opérationnelle en lien direct avec les compétences du référentiel ${certification?.intitule || ""} (${certification?.rncp ? `RNCP ${certification.rncp}` : ""}).`,
+      besoins: {
+        attentes: textOf(main?.besoins?.attentes) || `J'attends de cet accompagnement un cadre méthodologique clair pour rédiger mon Livret 2, un regard extérieur sur la mise en valeur de mes expériences et un appui pour préparer sereinement le passage devant le jury.`,
+        freins: textOf(main?.besoins?.freins) || `Mon principal frein est le temps disponible en dehors de mon activité professionnelle. Je peux également avoir besoin d'aide pour formaliser à l'écrit des situations que je maîtrise dans la pratique quotidienne.`,
+        disponibilites: textOf(main?.besoins?.disponibilites) || `Je suis disponible en soirée après 18h en semaine ainsi que le samedi matin pour les rendez-vous d'accompagnement à distance. Je peux mobiliser environ 4 à 6 heures par semaine pour la rédaction.`,
+        materiel: textOf(main?.besoins?.materiel) || `Je dispose d'un ordinateur portable, d'une connexion internet stable, d'un accès à la suite bureautique et d'un environnement de travail calme me permettant de participer aux visioconférences et de rédiger mon dossier.`,
+        handicap: textOf(main?.besoins?.handicap) || `Je ne suis pas en situation de handicap déclaré et n'ai pas de besoin d'aménagement particulier. Le référent handicap de l'organisme reste toutefois identifié en cas de besoin ultérieur.`,
+      },
+      planAccompagnement: textOf(main?.planAccompagnement) || `L'accompagnement se déroulera à distance sur toute la durée du parcours : entretien de positionnement, appui à la constitution du Livret 1, ateliers méthodologiques d'écriture du Livret 2 bloc par bloc, relectures individualisées, simulation de jury et bilan final. Chaque étape fera l'objet d'un compte rendu et d'objectifs intermédiaires clairs.`,
+      synthese: textOf(main?.synthese) || `Le candidat présente un parcours cohérent avec la certification ${certification?.intitule || "visée"}. Les expériences décrites permettent de couvrir l'ensemble des blocs du référentiel. L'accompagnement proposé vise à sécuriser la rédaction du Livret 2 et la préparation du jury.`,
+    };
+
+    const result = { ...safeMain, situationsParBloc };
     return new Response(JSON.stringify(result), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
   } catch (e) {
     const m = (e as Error).message;
