@@ -83,27 +83,53 @@ Deno.serve(async (req) => {
     const key = Deno.env.get("LOVABLE_API_KEY");
     if (!key) throw new Error("LOVABLE_API_KEY not configured");
 
-    const prompt = `Analyse ce parcours et propose 6 à 10 certifications RNCP françaises (France Compétences) réellement existantes et cohérentes avec l'expérience du candidat, en vue d'une VAE.
+    // Distillation du parcours pour forcer l'IA à raisonner sur l'expérience réelle
+    const expLines = (candidat.experiences || []).map((e: any) =>
+      `• ${e.poste || "?"} — ${e.entreprise || "?"} (${e.dateDebut || "?"} → ${e.dateFin || "présent"})\n  Missions : ${(e.missions || "").slice(0, 800)}`
+    ).join("\n");
+    const totalMonths = (candidat.experiences || []).reduce((acc: number, e: any) => {
+      const d1 = new Date(e.dateDebut || ""); const d2 = e.dateFin ? new Date(e.dateFin) : new Date();
+      if (isNaN(+d1) || isNaN(+d2)) return acc;
+      return acc + Math.max(0, (d2.getFullYear() - d1.getFullYear()) * 12 + (d2.getMonth() - d1.getMonth()));
+    }, 0);
 
-Règles strictes :
-- Codes RNCP à 5 chiffres réels et ACTIFS uniquement (pas de fiches inactives, pas d'anciens codes RS).
-- Intitulé exact tel qu'il apparaît sur francecompetences.fr.
-- Niveau cohérent avec le poste et l'expérience (3 à 7).
-- Propose PLUSIEURS candidats (au moins 6) pour maximiser la sélection valide.
-- Classe du plus au moins pertinent.
+    const prompt = `Tu dois proposer des certifications RNCP France Compétences pour une VAE, en te basant STRICTEMENT sur les missions réellement exercées par le candidat.
 
-CANDIDAT :
-${JSON.stringify(candidat, null, 2)}
+MÉTHODE OBLIGATOIRE (raisonne étape par étape avant de proposer) :
+1. Identifie le métier dominant (celui exercé le plus longtemps et le plus récent).
+2. Extrais les activités-clés récurrentes dans les missions (verbes d'action + objets).
+3. Détermine le secteur (commerce, RH, industrie, tertiaire, santé, IT, hôtellerie, bâtiment, transport, esthétique, etc.).
+4. Estime le niveau (3=CAP/BEP, 4=Bac, 5=Bac+2, 6=Licence/Bachelor, 7=Master) selon les responsabilités RÉELLES (encadrement, autonomie, pilotage, expertise).
+5. Ne propose QUE des titres dont le référentiel d'activités recouvre >70 % des missions listées. INTERDICTION de suggérer un titre juste parce que le mot-clé apparaît dans l'intitulé du poste.
 
-Renvoie via l'outil suggest_rncp.`;
+CANDIDAT
+========
+Civilité/Nom : ${candidat.civilite || ""} ${candidat.prenom || ""} ${candidat.nom || ""}
+Poste actuel : ${candidat.emploiActuel || "?"} chez ${candidat.employeur || "?"}
+Statut : ${candidat.statut || "?"}
+Niveau de formation : ${candidat.niveauFormation || "?"}
+Diplômes : ${(candidat.diplomes || []).map((d: any) => `${d.intitule} (${d.annee || "?"})`).join(" ; ") || "—"}
+Compétences déclarées : ${(candidat.competences || []).join(", ") || "—"}
+Ancienneté cumulée : ~${Math.round(totalMonths / 12)} ans (${totalMonths} mois)
+
+EXPÉRIENCES DÉTAILLÉES
+======================
+${expLines || "(aucune expérience renseignée)"}
+
+CONSIGNES DE SORTIE
+- Propose 6 à 10 certifications RNCP réellement existantes, actives, avec code à 5 chiffres exact.
+- Intitulé EXACT tel que publié sur francecompetences.fr.
+- Classe du plus pertinent au moins pertinent.
+- Dans "justification", explique en 1-2 phrases quelles missions du candidat couvrent quels blocs/activités du titre — cite des éléments concrets du parcours (pas de généralités).
+- Rejette tout titre hors du champ d'activité réel.`;
 
     const r = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "google/gemini-2.5-pro",
         messages: [
-          { role: "system", content: "Tu es un conseiller VAE expert du répertoire RNCP France Compétences. Tu ne proposes QUE des certifications réellement existantes et actives, avec le code RNCP exact." },
+          { role: "system", content: "Tu es un conseiller VAE expert du RNCP France Compétences. Tu analyses le parcours en profondeur avant de proposer, et tu ne suggères QUE des titres dont le référentiel correspond réellement aux activités exercées. Tu refuses de te fier aux intitulés de poste : seules les missions comptent." },
           { role: "user", content: prompt },
         ],
         tools: [TOOL],
