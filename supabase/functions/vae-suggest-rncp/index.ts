@@ -60,18 +60,20 @@ async function fetchRncp(rncp: string): Promise<{ ok: boolean; intitule?: string
   }
 }
 
-async function searchRncpByName(query: string): Promise<string | null> {
-  try {
-    const r = await fetch(`https://www.francecompetences.fr/recherche/?text=${encodeURIComponent(query)}&type_recherche=rncp`, {
-      headers: { "User-Agent": "Mozilla/5.0" },
-    });
-    if (!r.ok) return null;
-    const html = await r.text();
-    const m = html.match(/\/recherche\/rncp\/(\d+)\//);
-    return m ? m[1] : null;
-  } catch {
-    return null;
-  }
+function normalize(s: string): string {
+  return (s || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9 ]+/g, " ").replace(/\s+/g, " ").trim();
+}
+const STOP = new Set(["de","du","des","la","le","les","un","une","et","en","d","l","a","au","aux","pour","dans","par","sur","avec","fiche","nationale","titre","master","licence","bts","bac","pro","professionnel","professionnelle","diplome","certificat","specialite","ingenieur"]);
+function tokens(s: string): Set<string> {
+  return new Set(normalize(s).split(" ").filter(w => w.length >= 3 && !STOP.has(w)));
+}
+function titleSimilarity(a: string, b: string): number {
+  const ta = tokens(a), tb = tokens(b);
+  if (!ta.size || !tb.size) return 0;
+  let inter = 0;
+  for (const t of ta) if (tb.has(t)) inter++;
+  return inter / Math.min(ta.size, tb.size);
 }
 
 Deno.serve(async (req) => {
@@ -157,27 +159,27 @@ CONSIGNES DE SORTIE
     const parsed = JSON.parse(payload);
     const raw: any[] = Array.isArray(parsed.suggestions) ? parsed.suggestions : [];
 
-    // Validate each suggestion against France Compétences
+    // Validate each suggestion: the code MUST exist AND its real title must match the IA-proposed title
     const validated = await Promise.all(raw.map(async (s) => {
       const code = String(s.rncp || "").replace(/\D+/g, "");
-      if (!code) return null;
-      let check = await fetchRncp(code);
-      let finalCode = code;
-      if (!check?.ok) {
-        // Try to find real code by name
-        const found = await searchRncpByName(s.intitule || "");
-        if (!found) return null;
-        finalCode = found;
-        check = await fetchRncp(found);
-        if (!check?.ok) return null;
+      if (!code || code.length < 4) return null;
+      const check = await fetchRncp(code);
+      if (!check?.ok) return null;
+      const realTitle = (check.intitule || "").trim();
+      if (!realTitle) return null;
+      const sim = titleSimilarity(realTitle, s.intitule || "");
+      // Reject any code whose real title has < 40% token overlap with what the IA proposed
+      if (sim < 0.4) {
+        console.log(`Dropped RNCP${code}: IA said "${s.intitule}" but FC says "${realTitle}" (sim=${sim.toFixed(2)})`);
+        return null;
       }
       return {
-        rncp: finalCode,
-        intitule: check.intitule || s.intitule,
+        rncp: code,
+        intitule: realTitle,
         niveau: check.niveau || s.niveau || "",
         certificateur: s.certificateur || "",
         justification: s.justification || "",
-        lien: `https://www.francecompetences.fr/recherche/rncp/${finalCode}/`,
+        lien: `https://www.francecompetences.fr/recherche/rncp/${code}/`,
       };
     }));
 
