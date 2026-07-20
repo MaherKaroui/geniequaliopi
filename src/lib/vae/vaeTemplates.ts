@@ -643,92 +643,162 @@ export function getCVHTML(d: VAEData): string {
 
 export function getProgrammeHTML(d: VAEData): string {
   const { organisme: o, certification: cert, session: s } = d;
+  const titreCourt = esc(cert.intitule || "la certification visée");
+  const rncp = esc(cert.rncp || "—");
+  const modalite = (s.modalite || "100 % Présentiel").trim();
+  const duree = (o.duree || "40 heures").trim();
+  // Durée du parcours estimée en mois (à partir de dates si dispo, sinon 2,5 mois)
+  let dureeParcours = "2,5 mois";
+  if (s.dateDebut && s.dateFin) {
+    const d1 = new Date(s.dateDebut), d2 = new Date(s.dateFin);
+    if (!isNaN(d1.getTime()) && !isNaN(d2.getTime()) && d2 > d1) {
+      const mois = (d2.getFullYear() - d1.getFullYear()) * 12 + (d2.getMonth() - d1.getMonth()) + (d2.getDate() >= d1.getDate() ? 0 : -1);
+      const val = Math.max(1, mois + 1);
+      dureeParcours = `${val} mois`;
+    }
+  }
+
+  const blocsHtml = (cert.blocs || []).length > 0
+    ? cert.blocs.map((b, i) => `
+        <p><strong>Bloc ${i + 1}${b.code ? ` (${esc(b.code)})` : ""} : ${esc(b.intitule)}</strong></p>
+        <ul>
+          <li>Identifier et décrire les activités professionnelles relevant de ce bloc.</li>
+          <li>Sélectionner les preuves d'expérience démontrant les compétences attendues.</li>
+          <li>Formaliser l'analyse des compétences mises en œuvre.</li>
+        </ul>`).join("")
+    : `<p><em>Les blocs de compétences sont détaillés dans le référentiel officiel de la certification.</em></p>`;
+
   const body = `
-    <p><strong>Titre visé :</strong> ${esc(cert.intitule)} (RNCP ${esc(cert.rncp)} — Niveau ${esc(cert.niveau)})</p>
-    <p><strong>Certificateur :</strong> ${esc(cert.certificateur)}</p>
+    <h2>Intitulé de l'accompagnement</h2>
+    <p>Accompagnement à la Validation des Acquis de l'Expérience (VAE) – ${titreCourt} (RNCP ${rncp})</p>
 
     <h2>Objectifs de l'accompagnement</h2>
     <ul>
-      <li>Valoriser l'expérience professionnelle du candidat au regard de la certification visée.</li>
-      <li>Identifier et formaliser les compétences acquises.</li>
-      <li>Constituer les livrets VAE (Livret 1 de recevabilité et Livret 2 de validation).</li>
-      <li>Préparer efficacement l'entretien avec le jury.</li>
+      <li>Constituer et déposer son Livret 1 de recevabilité.</li>
+      <li>Identifier les compétences acquises au regard du référentiel du titre.</li>
+      <li>Constituer et rédiger son Livret 2.</li>
+      <li>Valoriser ses expériences professionnelles.</li>
+      <li>Sélectionner et présenter les preuves pertinentes.</li>
+      <li>Préparer et réussir son entretien devant le jury.</li>
+      <li>Obtenir une validation totale ou partielle de la certification.</li>
     </ul>
 
     <h2>Public concerné</h2>
     <ul>
-      <li>Toute personne justifiant d'une activité (salariée, non salariée, bénévole ou volontaire) en lien avec la certification visée.</li>
+      <li>Toute personne disposant d'une expérience significative en lien avec ${titreCourt}.</li>
     </ul>
 
-    <h2>Pré-requis</h2>
+    <h2>Prérequis</h2>
     <ul>
-      <li>Expérience professionnelle en lien avec le référentiel de la certification.</li>
-      <li>Maîtrise des outils numériques de base.</li>
-      <li>Connexion Internet et matériel informatique (ordinateur, micro, webcam).</li>
+      <li>Justifier d'une expérience en lien avec ${titreCourt}.</li>
+      <li>Être engagé dans une démarche VAE.</li>
+      <li>Maîtriser la communication écrite et orale en français.</li>
     </ul>
 
-    <h2>Programme détaillé</h2>
+    <h2>Programme détaillé – ${esc(duree)}</h2>
 
-    <h3>Module 1 — Analyse du parcours et positionnement VAE</h3>
-    <p><em>Ce module permet d'identifier les compétences acquises par le candidat au regard du référentiel de la certification.</em></p>
-    <p><strong>Contenu du module :</strong></p>
+    <p><strong>MODULE 1 : Information et diagnostic du projet VAE (3 h)</strong></p>
     <ul>
-      <li>Analyse détaillée du parcours professionnel</li>
-      <li>Étude des expériences en lien avec le référentiel</li>
-      <li>Identification des compétences techniques, organisationnelles et managériales</li>
-      <li>Étude du référentiel de certification</li>
-      <li>Construction du planning d'accompagnement</li>
+      <li>Présentation de la démarche VAE.</li>
+      <li>Analyse du parcours professionnel.</li>
+      <li>Présentation du référentiel RNCP ${rncp}.</li>
+      <li>Élaboration du planning d'accompagnement.</li>
     </ul>
-    <p><strong>Résultats attendus :</strong> positionnement clair du candidat, identification des compétences à valoriser, validation du projet VAE.</p>
 
-    <h3>Module 2 — Constitution du Livret 1</h3>
-    <p><em>Ce module accompagne le candidat dans la constitution du dossier de recevabilité administrative.</em></p>
-    <p><strong>Contenu du module :</strong></p>
+    <p><strong>MODULE 2 : Constitution du Livret 1 – Recevabilité (5 h)</strong></p>
     <ul>
-      <li>Présentation des exigences administratives</li>
-      <li>Vérification des justificatifs d'expérience</li>
-      <li>Constitution des pièces administratives</li>
-      <li>Assistance à la rédaction du Livret 1</li>
-      <li>Aide au dépôt du dossier auprès du certificateur</li>
+      <li>Analyse des conditions d'accès à la VAE.</li>
+      <li>Collecte des justificatifs.</li>
+      <li>Constitution et finalisation du Livret 1.</li>
+      <li>Dépôt du dossier de recevabilité.</li>
     </ul>
-    <p><strong>Résultats attendus :</strong> Livret 1 complet et conforme, dépôt du dossier de recevabilité réalisé.</p>
 
-    <h3>Module 3 — Rédaction du Livret 2</h3>
-    <p><em>Ce module permet de formaliser l'expérience professionnelle et de démontrer les compétences au regard du référentiel.</em></p>
-    <p><strong>Contenu du module :</strong></p>
+    <p><strong>MODULE 3 : Analyse du référentiel et repérage des compétences (4 h)</strong></p>
     <ul>
-      <li>Méthodologie de rédaction du Livret 2</li>
-      <li>Description détaillée des activités professionnelles</li>
-      <li>Analyse des compétences par bloc</li>
-      <li>Relecture et amélioration continue</li>
+      <li>Étude des blocs de compétences.</li>
+      <li>Mise en correspondance expérience/référentiel.</li>
+      <li>Identification des situations professionnelles à valoriser.</li>
     </ul>
-    <p><strong>Résultats attendus :</strong> Livret 2 finalisé, cohérent avec le référentiel.</p>
 
-    <h3>Module 4 — Préparation à l'entretien avec le jury</h3>
-    <p><em>Ce module prépare le candidat à défendre son dossier devant le jury.</em></p>
-    <p><strong>Contenu du module :</strong> simulations d'entretien, mise en situation, entraînement à la posture, questions-types du jury.</p>
-    <p><strong>Résultats attendus :</strong> candidat prêt et confiant pour le passage devant le jury.</p>
+    <p><strong>MODULE 4 : Construction du Livret 2 (6 h)</strong></p>
+    <ul>
+      <li>Présentation du Livret 2.</li>
+      <li>Choix des activités significatives.</li>
+      <li>Structuration du dossier.</li>
+      <li>Identification des preuves.</li>
+    </ul>
 
-    <h3>Module 5 — Finalisation et suivi post-jury</h3>
-    <p><strong>Contenu du module :</strong> relecture finale, dépôt du dossier, accompagnement post-entretien et suivi de la décision du jury.</p>
-    <p><strong>Résultats attendus :</strong> dossier finalisé, candidat accompagné jusqu'à la décision du jury.</p>
+    <p><strong>MODULE 5 : Rédaction accompagnée du Livret 2 (10 h)</strong></p>
+    <ul>
+      <li>Description des situations professionnelles.</li>
+      <li>Valorisation des activités liées au métier visé.</li>
+      <li>Rédaction des différentes parties du Livret 2.</li>
+      <li>Accompagnement individualisé.</li>
+    </ul>
+
+    <p><strong>MODULE 6 : Finalisation du Livret 2 et préparation du dépôt (6 h)</strong></p>
+    <ul>
+      <li>Relecture complète.</li>
+      <li>Corrections et améliorations.</li>
+      <li>Intégration des annexes.</li>
+      <li>Préparation du dossier final.</li>
+    </ul>
+
+    <p><strong>MODULE 7 : Préparation à l'entretien avec le jury (6 h)</strong></p>
+    <ul>
+      <li>Préparation de la présentation orale.</li>
+      <li>Simulations d'entretien.</li>
+      <li>Débriefing et axes de progression.</li>
+    </ul>
+
+    <h2>Compétences visées</h2>
+    ${blocsHtml}
 
     <h2>Modalités pédagogiques</h2>
-    <p>Accompagnement individualisé à distance en visioconférence, échanges par courriel et téléphone, supports dématérialisés, travaux personnels en intersession, référent unique.</p>
-
-    <h2>Durée totale</h2>
-    <p><strong>${esc(o.duree)}</strong> — Modalité : ${esc(s.modalite)}.</p>
-
-    <h2>Prix</h2>
-    <p>Forfait : <strong>${esc(o.prixTTC)}</strong> — Financement : ${esc(s.financement)}.</p>
+    <ul>
+      <li>Accompagnement individuel en ${esc(modalite.toLowerCase())} alternant entretiens, analyse d'expériences, aide à la rédaction des Livrets 1 et 2 et simulations d'entretien jury.</li>
+    </ul>
 
     <h2>Modalités d'évaluation</h2>
-    <p>Évaluation continue lors des séances, restitution finale du Livret 2, entretien blanc, puis évaluation officielle par le jury du certificateur.</p>
+    <ul>
+      <li>Diagnostic initial.</li>
+      <li>Validation du Livret 1.</li>
+      <li>Évaluation continue du Livret 2.</li>
+      <li>Simulation d'entretien jury.</li>
+    </ul>
+
+    <h2>Résultats attendus</h2>
+    <ul>
+      <li>Livret 1 complété et déposé.</li>
+      <li>Livret 2 finalisé et conforme.</li>
+      <li>Dossier de preuves constitué.</li>
+      <li>Préparation complète au jury.</li>
+      <li>Validation totale ou partielle du titre.</li>
+    </ul>
 
     <h2>Accessibilité handicap</h2>
-    <p>Référent handicap : ${esc(o.referentHandicap)} — ${esc(o.email)}. Aménagements étudiés au cas par cas.</p>
+    <ul>
+      <li>Entretien préalable avec le référent handicap (${esc(o.referentHandicap)} — ${esc(o.email)}).</li>
+      <li>Adaptation des supports, rythmes et modalités selon les besoins.</li>
+    </ul>
+
+    <h2>Points forts</h2>
+    <ul>
+      <li>Accompagnement individuel et personnalisé.</li>
+      <li>Aide complète au Livret 1 et au Livret 2.</li>
+      <li>Préparation approfondie à l'entretien jury.</li>
+      <li>Méthodologie conforme aux exigences France VAE et Qualiopi.</li>
+    </ul>
+
+    <h2>Informations complémentaires</h2>
+    <ul>
+      <li>Durée : ${esc(duree)}.</li>
+      <li>Modalité : ${esc(modalite)}.</li>
+      <li>Durée du parcours : ${esc(dureeParcours)}.</li>
+      <li>Tarif : ${esc(o.prixTTC)} — Financement : ${esc(s.financement)}.</li>
+    </ul>
   `;
-  return wrap(o, "Programme d'accompagnement VAE", body, "Formation à distance — 100 % visioconférence");
+  return wrap(o, `Programme VAE — ${titreCourt}`, body, `RNCP ${rncp} — ${modalite}`);
 }
 
 export function getCGVHTML(d: VAEData): string {
