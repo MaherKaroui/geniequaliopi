@@ -16906,8 +16906,8 @@ function genPaieExerciceModule(o: OrganismeInfo, f: FormationInfo, stagiaires: S
 
   return buildDocument({
     org: o, title: `EXERCICES — ${mod.moduleTitre}`, subtitle: `${s.prenom} ${s.nom} – ${f.intitule}`, formation: f, showFormationInfo: false, stagiaires: [s], extraHtml: extra,
-    signatures: { type: "2", labels: ["Le Stagiaire", "Le Formateur"], names: [`${s.prenom} ${s.nom}`, f.formateur] },
   });
+
 }
 
 function genPaieExercicesParModule(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number): string {
@@ -17002,6 +17002,6 @@ function genPaieExercicesParModule(o: OrganismeInfo, f: FormationInfo, stagiaire
 
   return buildDocument({
     org: o, title: "EXERCICES PAR MODULE — RÉSULTATS DÉTAILLÉS", subtitle: f.intitule, formation: f, showFormationInfo: false, stagiaires: [s], extraHtml: extra,
-    signatures: { type: "2", labels: ["Le Stagiaire", "Le Formateur"], names: [`${s.prenom} ${s.nom}`, f.formateur] },
   });
+
 }
