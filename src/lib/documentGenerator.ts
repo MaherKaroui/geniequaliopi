@@ -46,6 +46,7 @@ import { genProgrammeBDC as genProgrammeBDC_imported, genEvaluationBesoins as ge
 import { genDPOfficiel, genECFOfficiel, genPVSessionGlobal, preloadDPAIPack } from "./templatesCFAOfficiels";
 import { getCachedPack, answersForQCM, studentAnswerFromCorrection, noteForOpenQuestion, noteForDayProgression, humanizedStudentAnswer, humanizedQCMComment, humanizedTeacherFeedback, type AIEvalPack } from "./aiEvalPack";
 import { getCachedContentPack, pickImagesForQuery } from "./aiContentPack";
+import { PAIE_MODULE_EXERCISES } from "./paiePreset";
 
 const FALLBACK_STAGIAIRE: StagiaireInfo = { prenom: "Martin", nom: "Dupont", civilite: "" as "M." | "Mme" | "", email: "", telephone: "", entreprise: "", poste: "", dateNaissance: "" };
 
