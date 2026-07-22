@@ -1244,21 +1244,28 @@ export function genExamenFinalStagiaire(o: OrganismeInfo, f: FormationInfo, stag
     ]);
   }
 
-  // ===== PARTIE 2 : Étude de cas pratique =====
-  // On choisit un exercice pratique (non-QCM) ou à défaut le premier
-  const pratique = exercicesEval.find(e => !/^QCM\b/i.test(e.titre)) || exercicesEval[0];
-  let notePratiqueSur10 = 0;
-  if (pratique) {
-    const ratio = 0.7 + ((seed % 30) / 100); // 0.70 - 0.99
-    notePratiqueSur10 = Math.round(ratio * 10 * 10) / 10;
+  // ===== PARTIE 2 : Études de cas pratiques (jusqu'à 3 cas) =====
+  const pratiques = exercicesEval.filter(e => !/^QCM\b/i.test(e.titre)).slice(0, 3);
+  if (pratiques.length === 0 && exercicesEval[0]) pratiques.push(exercicesEval[0]);
+  const nbPratiques = pratiques.length;
+  const notesPratiques: number[] = [];
+  if (nbPratiques > 0) {
     extra += `<div style="page-break-before: always;"></div>`;
-    extra += `<h3>Partie 2 — Étude de cas pratique (sur 10 points)</h3>`;
-    extra += `<p><strong>Sujet :</strong> ${pratique.titre}</p>`;
-    extra += `<p><strong>Consigne :</strong></p><p>${pratique.consigne}</p>`;
-    extra += `<p><strong>Travail rendu par ${s.prenom} ${s.nom} :</strong></p>`;
-    extra += `<p>${pratique.reponseAttendue}</p>`;
-    extra += `<p><strong>Note partie 2 :</strong> ${notePratiqueSur10} / 10</p>`;
+    extra += `<h3>Partie 2 — Études de cas pratiques (sur 10 points, ${nbPratiques} cas)</h3>`;
+    const pointsParCas = 10 / nbPratiques;
+    pratiques.forEach((pratique, pi) => {
+      const ratio = 0.72 + (((seed + pi * 37) % 28) / 100); // 0.72 - 0.99
+      const noteCas = Math.round(ratio * pointsParCas * 10) / 10;
+      notesPratiques.push(noteCas);
+      if (pi > 0) extra += `<div style="page-break-before: always;"></div>`;
+      extra += `<h4 style="margin-top:12px">Cas ${pi + 1} — ${pratique.titre}</h4>`;
+      extra += `<p><strong>Consigne :</strong></p><p>${pratique.consigne}</p>`;
+      extra += `<p><strong>Travail rendu par ${s.prenom} ${s.nom} :</strong></p>`;
+      extra += `<p style="background:#fff9db;padding:10px;border-left:3px solid #f0c040;">${pratique.reponseAttendue}</p>`;
+      extra += `<p><strong>Note cas ${pi + 1} :</strong> ${noteCas} / ${Math.round(pointsParCas * 10) / 10}</p>`;
+    });
   }
+  const notePratiqueSur10 = Math.round(notesPratiques.reduce((a, b) => a + b, 0) * 10) / 10;
 
   // ===== SYNTHÈSE =====
   const noteQCMSur10Final = nbQ > 0 ? Math.round((scoreQCM / nbQ) * 10 * 10) / 10 : 0;
@@ -1267,10 +1274,11 @@ export function genExamenFinalStagiaire(o: OrganismeInfo, f: FormationInfo, stag
   extra += `<h2>SYNTHÈSE GÉNÉRALE DE L'EXAMEN FINAL</h2>`;
   extra += tableHTML(["Élément", "Résultat"], [
     ["Partie 1 — QCM de synthèse", `${noteQCMSur10Final} / 10`],
-    ["Partie 2 — Étude de cas pratique", `${notePratiqueSur10} / 10`],
+    ["Partie 2 — Études de cas pratiques", `${notePratiqueSur10} / 10`],
     ["Note finale sur 20", `${noteFinaleSur20} / 20`],
     ["Décision", noteFinaleSur20 >= 10 ? "✅ EXAMEN VALIDÉ" : "⚠️ EXAMEN À REPRÉSENTER"],
   ]);
+
   extra += `<p style="margin-top:24px;"><strong>Appréciation du formateur :</strong> ${s.prenom} ${s.nom} a démontré une bonne maîtrise des compétences clés de la formation « ${f.intitule} ». Les notions fondamentales sont acquises et directement transférables en situation professionnelle.</p>`;
 
   return buildDocument({
