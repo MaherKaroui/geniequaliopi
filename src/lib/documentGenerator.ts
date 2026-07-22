@@ -9866,8 +9866,16 @@ function genTrameEvalBesoinsEntreprise(o: OrganismeInfo, f: FormationInfo, stagi
   const s = stagiaires[si] || stagiaires[0];
   const answers = generateEvalBesoinsAnswers(s, f, o, si);
   const hasEntreprise = !!(s.entreprise && s.entreprise.trim() && s.entreprise.trim().toLowerCase() !== "entreprise");
+  if (!hasEntreprise) {
+    return buildDocument({
+      org: o,
+      title: "Évaluation des besoins – Entreprise",
+      extraHtml: `<p style="margin-top:20px;font-style:italic;color:#555">Aucune entreprise renseignée pour ${s.civilite ? s.civilite + " " : ""}${s.prenom} ${s.nom} : la partie « Entreprise » de l'évaluation des besoins n'est pas applicable pour ce bénéficiaire.</p>`,
+    });
+  }
 
   const tuteurNom = (s as any).tuteur?.trim() || "Tuteur entreprise";
+
 
   const headerBlock = `<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse;width:100%">
 <tr><td style="background:#f8f9fa">
@@ -10020,8 +10028,9 @@ ${o.tamponUrl ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;m
   return buildDocument({
     org: o,
     title: "Évaluation des besoins",
-    extraHtml: civiliteBlock + apprenantPart + entreprisePart + footer,
+    extraHtml: civiliteBlock + apprenantPart + (hasEntreprise ? entreprisePart : "") + footer,
   });
+
 }
 
 
