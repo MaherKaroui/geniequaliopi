@@ -17002,6 +17002,6 @@ function genPaieExercicesParModule(o: OrganismeInfo, f: FormationInfo, stagiaire
 
   return buildDocument({
     org: o, title: "EXERCICES PAR MODULE — RÉSULTATS DÉTAILLÉS", subtitle: f.intitule, formation: f, showFormationInfo: false, stagiaires: [s], extraHtml: extra,
-    signatures: { type: "2", labels: ["Le Stagiaire", "Le Formateur"], names: [`${s.prenom} ${s.nom}`, f.formateur] },
   });
+
 }
