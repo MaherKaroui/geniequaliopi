@@ -10101,8 +10101,79 @@ function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: 
   const isECSR = t.includes("ecsr") || t.includes("enseignant de la conduite") || t.includes("sécurité routière") || t.includes("securite routiere") || t.includes("moniteur auto-école") || t.includes("moniteur auto-ecole");
   const isVTC = !isECSR && (t.includes("vtc") || t.includes("conducteur") || t.includes("transport de personnes") || t.includes("t3p") || t.includes("chauffeur"));
   const isNTC = t.includes("négociateur technico") || t.includes("technico-commercial") || t.includes("technico commercial") || t.includes("ntc") || (f.codeRNCP || "").toUpperCase().includes("39063");
+  const isPaie = t.includes("gestionnaire de paie") || t.includes("gestionnaire paie") || (t.includes("paie") && (t.includes("bulletin") || t.includes("gestion") || t.includes("dsn")));
+
+  // === Early return : Gestionnaire de paie (reconversion / évolution RH-paie) ===
+  if (isPaie) {
+    const paieAttentes = [
+      `J'aimerais vraiment comprendre un bulletin de paie de A à Z, parce qu'aujourd'hui quand j'en reçois un je regarde juste le net à payer et le reste c'est du chinois pour moi.`,
+      `Franchement mon objectif c'est de pouvoir faire tourner la paie de ma boîte moi-même, on est ${1 + (idx % 3) * 5}${(1 + (idx % 3) * 5) === 1 ? 'er' : 'ème'} et payer 200 € par bulletin au cabinet, ça fait mal.`,
+      `Ce qui me bloque le plus c'est les cotisations, entre l'URSSAF, l'AGIRC-ARRCO, la CSG, je m'y perds. J'ai besoin qu'on m'explique ça calmement, avec des exemples concrets.`,
+      `Je voudrais gagner en confiance sur la DSN, j'ai déjà vu la responsable paie de mon ancien employeur paniquer chaque 5 du mois, je veux pas être comme ça.`,
+      `Mon objectif clair, c'est de trouver un poste de gestionnaire de paie junior d'ici 3 à 6 mois après la formation. Donc j'attends du concret, du terrain, pas juste de la théorie.`,
+    ];
+    const paieMissions = [
+      `Aujourd'hui je fais surtout de l'administratif RH (contrats, absences, tickets restaurant) mais la paie est confiée au cabinet. Je veux la reprendre en interne progressivement.`,
+      `Je gère un peu de tout dans une petite structure : facturation, comptes fournisseurs, RH. La paie viendrait compléter mon poste et sécuriser l'entreprise sur ce sujet sensible.`,
+      `Je suis en reconversion, je n'ai pas encore d'expérience en paie. J'ai fait un bilan de compétences qui m'a orientée vers ce métier parce que j'aime la rigueur et les chiffres.`,
+      `Assistante comptable en cabinet, je saisis les écritures mais je ne fais pas les bulletins. Je veux passer côté social pour évoluer et être polyvalente.`,
+      `Actuellement demandeur d'emploi, j'ai identifié le métier de gestionnaire de paie comme un secteur qui recrute vraiment en Île-de-France (+18 % d'offres en 2025 selon France Travail).`,
+    ];
+    const paieContribution = [
+      `Cette formation va me permettre de sécuriser mon poste actuel en apportant une vraie compétence paie à mon employeur, qui dépend aujourd'hui à 100 % d'un cabinet extérieur.`,
+      `Devenir autonome en paie va faire économiser à ma boîte environ 200 € par bulletin, soit ~2 400 €/an par salarié. Sur 12 salariés ça représente presque 30 k€ économisés par an.`,
+      `Je vais pouvoir prétendre à un poste de gestionnaire de paie junior avec un salaire médian de 30 k€ brut en IDF, contre 24 k€ dans mon poste actuel d'assistante administrative.`,
+      `Cette formation valide un vrai virage professionnel : je passe d'un poste d'assistante polyvalente à une spécialisation technique reconnue, avec un métier en tension.`,
+      `À court terme je pourrai répondre aux salariés qui me questionnent sur leur bulletin (« pourquoi mon net a baissé ce mois-ci ? »), ce qui est aujourd'hui un vrai point de tension interne.`,
+    ];
+    const paieObjectif = [
+      `Être autonome sur un cycle de paie complet (35 salariés maximum) : préparer les variables, générer les bulletins sur Silae, transmettre la DSN, gérer les rejets, expliquer aux salariés.`,
+      `Décrocher un CDI de gestionnaire de paie junior en cabinet ou en entreprise dans les 3 mois qui suivent la fin de la formation, avec une rémunération cible de 30–32 k€ brut annuel.`,
+      `Reprendre en interne la paie des 12 salariés de mon entreprise, avec un doublon avec le cabinet pendant 3 mois puis une bascule complète au 1er semestre.`,
+      `Maîtriser Silae au point de pouvoir m'inscrire à la certification éditeur, qui est un vrai plus sur le CV pour candidater dans les cabinets d'expertise comptable.`,
+      `Comprendre suffisamment la mécanique paie pour pouvoir suivre ensuite le Titre Pro Gestionnaire de paie (RNCP 35633) en VAE dans un an.`,
+    ];
+    const paieProjetPro = [
+      `Cette formation est la brique technique qui me manque. J'ai la rigueur, j'ai la fibre RH, mais il me manque la maîtrise des cotisations, du bulletin et de la DSN — c'est exactement ce que j'attends.`,
+      `Le métier de gestionnaire de paie est en tension (+18 % d'offres en 2025 selon France Travail, fiche ROME M1501) : c'est un vrai choix pragmatique de reconversion vers un métier qui recrute.`,
+      `Reprendre la paie en interne, c'est aussi reprendre le contrôle : moins de dépendance au cabinet, meilleure réactivité sur les questions salariés, et économies substantielles pour la structure.`,
+      `Je viens d'un métier de contact (accueil, service) et je veux basculer vers un métier de back-office rigoureux et bien payé. La paie coche toutes les cases, y compris la possibilité de télétravail partiel.`,
+      `Passer de l'assistanat comptable à la paie va me rendre polyvalente sur tout le poste social + comptable d'une PME, ce qui est très recherché dans les cabinets d'expertise comptable.`,
+    ];
+    const paieHandicap = isStagiairePSH(s)
+      ? [
+          `Oui, je suis en situation de handicap (RQTH). Le métier de gestionnaire de paie est compatible (travail sur écran, station assise). Je sollicite des aménagements : temps majoré sur les évaluations, supports numériques accessibles (police 14 min), pauses régulières et entretien préalable avec le référent handicap.`,
+          `Oui, RQTH reconnue. Je demande des aménagements raisonnables : sessions en journée (pas de cours du soir), ergonomie du poste (chaise adaptée, écran 24"), et orientation vers l'Agefiph pour financer un éventuel équipement complémentaire à la maison pour les modules distanciels.`,
+          `Oui, je dispose d'une RQTH. Le référent handicap m'a rassurée : temps majoré sur les QCM, supports adaptés, et suivi individualisé. Ma pathologie n'empêche pas l'exercice du métier de gestionnaire de paie.`,
+        ]
+      : [
+          `Non, je ne suis pas en situation de handicap. Aucun aménagement particulier n'est nécessaire.`,
+          `Non. Je n'ai déclaré aucune situation de handicap et aucune restriction n'est à prévoir sur les modalités pédagogiques.`,
+          `Non. Aucun handicap déclaré, je suis autonome sur toutes les modalités (présentiel, distanciel, examens).`,
+        ];
+    const paieDiplomes = [
+      "Baccalauréat professionnel Gestion-Administration",
+      "Baccalauréat ES + BTS Comptabilité Gestion (non terminé)",
+      "Baccalauréat général + expérience en secrétariat",
+      "Baccalauréat professionnel Assistance à la gestion des organisations",
+      "Baccalauréat + BTS Assistant de gestion PME-PMI",
+    ];
+    return {
+      civilite,
+      raisonSociale: hasEntreprise ? s.entreprise : "/",
+      attentes: paieAttentes[h(4) % paieAttentes.length],
+      missions: paieMissions[h(5) % paieMissions.length],
+      contribution: paieContribution[h(6) % paieContribution.length],
+      diplome: paieDiplomes[h(2) % paieDiplomes.length],
+      objectif: paieObjectif[h(7) % paieObjectif.length],
+      budget: "Financement personnel via le CPF (Compte Personnel de Formation) – 3 900 € TTC, complété si besoin par un abondement France Travail (AIF) dans le cadre du projet de reconversion vers un métier en tension.",
+      projetPro: paieProjetPro[h(8) % paieProjetPro.length],
+      handicap: paieHandicap[h(9) % paieHandicap.length],
+    };
+  }
 
   // === Early return : VTC (cohérent avec le métier de conducteur VTC) ===
+
   if (isVTC) {
     const vtcDiplomes = [
       "Permis B en cours de validité (depuis plus de 5 ans)",
