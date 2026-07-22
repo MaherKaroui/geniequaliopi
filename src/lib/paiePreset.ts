@@ -44,7 +44,7 @@ export const PAIE_ORG: OrganismeInfo = {
 // Formation (130 h — non certifiante RNCP)
 // ---------------------------------------------------------------------------
 export const FORMATION_PAIE: FormationInfo = {
-  intitule: "Formation Gestionnaire de paie (130 h)",
+  intitule: "Gestionnaire de paie (130 h)",
   objectifs:
     "Acquérir toutes les compétences opérationnelles pour produire, contrôler et fiabiliser la paie de A à Z dans une entreprise.\nÀ l'issue de la formation, le/la stagiaire sera capable de :\n- Maîtriser le cadre juridique (Code du travail, conventions collectives, contrats).\n- Établir un bulletin de paie conforme (brut, cotisations, net imposable, PAS, net à payer).\n- Calculer les cotisations sociales URSSAF, AGIRC-ARRCO, chômage, prévoyance.\n- Traiter les absences, congés payés, IJSS avec ou sans subrogation.\n- Piloter la DSN mensuelle et événementielle sans erreur bloquante.\n- Établir un solde de tout compte (STC) et les documents de fin de contrat.\n- Réaliser une veille sociale continue et anticiper un contrôle URSSAF.",
   prerequis:
