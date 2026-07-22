@@ -186,14 +186,38 @@ export function buildFullCatalog(
         // Mix QCM / exercice pratique en alternance selon la formation.
         const evalData = getEvalContent(f.intitule);
         const nbExContent = evalData?.exercices?.length || 0;
+
+        // Formation Gestionnaire de paie : 1 fichier = 1 module (5 QCM + 1 exercice pratique).
+        const tPaie = (f.intitule || "").toLowerCase();
+        const isPaieForm = tPaie.includes("gestionnaire de paie") || tPaie.includes("gestionnaire paie") || (tPaie.includes("paie") && (tPaie.includes("bulletin") || tPaie.includes("gestion") || tPaie.includes("dsn")));
+        const PAIE_MODULE_TITLES = [
+          "Fondamentaux du droit du travail",
+          "Construire un bulletin de paie",
+          "Cotisations, DSN et déclarations",
+          "Absences, congés payés et IJSS",
+          "Rupture du contrat et STC",
+          "Contrôles, veille et posture pro",
+        ];
+
         let nbQcm: number;
-        if (hasBlocs) {
+        if (isPaieForm) {
+          nbQcm = PAIE_MODULE_TITLES.length;
+        } else if (hasBlocs) {
           nbQcm = rncp!.blocsCompetences.length;
         } else {
           // Strict : 1 exercice par jour de formation (plafonné si le contenu eval est plus court)
           nbQcm = Math.max(1, nbJours);
         }
         for (let exIdx = 0; exIdx < nbQcm; exIdx++) {
+          if (isPaieForm) {
+            add(
+              `af_c3i11_exercices_${fi}_${si}_ex${exIdx}`,
+              `CT3 - IND 11 EXERCICES MODULE ${exIdx + 1} — ${PAIE_MODULE_TITLES[exIdx]} – ${s.prenom} ${s.nom}`,
+              3, 11, "exercices_stagiaire",
+              { fi, stagiaireIdx: si, exerciceIdx: exIdx }
+            );
+            continue;
+          }
           const exTitle = evalData?.exercices?.[exIdx % Math.max(1, nbExContent)]?.titre;
           const isQcm = exTitle ? /^QCM\b/i.test(exTitle) : (exIdx % 2 === 0);
           const labelBase = exTitle
@@ -211,6 +235,7 @@ export function buildFullCatalog(
             { fi, stagiaireIdx: si, exerciceIdx: exIdx }
           );
         }
+
 
         // EXAMEN FINAL — 1 vrai examen de synthèse daté de la fin de formation
         if (nbExContent > 0 || (evalData?.qcmFinal?.length || 0) > 0) {
