@@ -150,7 +150,11 @@ export const SAMPLE_FORMATEURS: FormateurInfo[] = [
   { nom: "Mendy", prenom: "Fideline", specialite: "Massage prénatal, Thérapies africaines, Bien-être", diplomes: "Spécialiste des thérapies africaines – École du Toucher Bien-naître", experience: "15 ans d'expérience en massages et techniques de bien-être prénatal", email: "f.mendy@naturoafricaine.com" },
 ];
 
+import { FORMATION_PAIE } from "./paiePreset";
+export { PAIE_ORG, STAGIAIRES_PAIE, FORMATION_PAIE, seedPaieAICaches } from "./paiePreset";
+
 export const SAMPLE_FORMATIONS: FormationInfo[] = [
+  FORMATION_PAIE,
   {
     intitule: "Maquilleur Professionnel – Formation certifiante (Maison HSY)",
     objectifs: "Se former aux métiers de maquilleur professionnel et obtenir une formation certifiante reconnue par France Compétences.\nÀ l'issue de la formation, la stagiaire sera capable de :\n- Accueillir la cliente et appliquer le protocole d'hygiène professionnel.\n- Identifier les types de peau, la morphologie du visage, la colorimétrie et les carnations.\n- Préparer la peau et corriger les imperfections avec les techniques adaptées.\n- Maîtriser l'application du fond de teint, du contouring et du strobing.\n- Structurer les sourcils (points d'or A-B-C), maquiller les yeux et la bouche selon la morphologie.\n- Réaliser une prestation de maquillage professionnel complet en 1h30.\n- Réussir l'examen de certification (QCM + mise en situation avec tirage au sort du look).",

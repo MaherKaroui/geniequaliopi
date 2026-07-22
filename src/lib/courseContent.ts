@@ -237,6 +237,15 @@ const YOUTUBE_CREATION_ENTREPRISE: CourseData['youtubeVideos'] = [
   { title: "Formalités sur le Guichet Unique INPI", url: "https://www.youtube.com/results?search_query=guichet+unique+INPI+immatriculation+entreprise", description: "Tutoriel pas à pas pour immatriculer son entreprise sur formalites.entreprises.gouv.fr." },
 ];
 
+const YOUTUBE_PAIE: CourseData['youtubeVideos'] = [
+  { title: "Comprendre un bulletin de paie 2026 (structure simplifiée)", url: "https://www.youtube.com/results?search_query=bulletin+paie+2026+expliqu%C3%A9", description: "Explication pas-à-pas de la structure du bulletin, des 5 blocs et des mentions obligatoires." },
+  { title: "Cotisations sociales URSSAF – taux 2026 expliqués", url: "https://www.youtube.com/results?search_query=cotisations+sociales+URSSAF+2026+taux", description: "Panorama des taux salariaux et patronaux, tranches, PMSS, avec exemples de calcul." },
+  { title: "DSN mensuelle : de la génération au dépôt", url: "https://www.youtube.com/results?search_query=DSN+mensuelle+gestionnaire+paie+tutoriel", description: "Démonstration pratique du processus DSN, contrôles, rejets et corrections." },
+  { title: "IJSS et subrogation : traitement en paie", url: "https://www.youtube.com/results?search_query=IJSS+subrogation+gestionnaire+paie", description: "Maintien de salaire, calcul des IJSS, subrogation employeur, réintégration au net." },
+  { title: "Solde de tout compte : les 5 documents obligatoires", url: "https://www.youtube.com/results?search_query=solde+de+tout+compte+documents+obligatoires", description: "Bulletin STC, certificat de travail, attestation France Travail, reçu STC, portabilité." },
+  { title: "Silae – prise en main pour gestionnaire de paie débutant", url: "https://www.youtube.com/results?search_query=Silae+prise+en+main+d%C3%A9butant", description: "Découverte du logiciel Silae, paramétrage société, saisie d'un bulletin." },
+];
+
 /** Génère des vidéos YouTube dynamiques (recherches ciblées) à partir de l'intitulé. */
 function getDynamicYoutubeVideos(formationIntitule: string): CourseData['youtubeVideos'] {
   const raw = (formationIntitule || "Formation professionnelle").trim();
@@ -266,6 +275,7 @@ export function getYoutubeVideos(formationIntitule: string): CourseData['youtube
   if (t.includes('word')) return YOUTUBE_WORD;
   if (t.includes('powerpoint') || t.includes('ppt')) return YOUTUBE_POWERPOINT;
   if (t.includes('bureautique') || t.includes('pack office') || t.includes('office 365') || t.includes('microsoft 365')) return YOUTUBE_BUREAUTIQUE;
+  if (t.includes('gestionnaire de paie') || t.includes('gestionnaire paie') || (t.includes('paie') && (t.includes('bulletin') || t.includes('gestion')))) return YOUTUBE_PAIE;
   // Langues
   if ((t.includes('anglais') || t.includes('english')) && (t.includes('a1') || t.includes('débutant'))) return YOUTUBE_ANGLAIS_A1;
   if (t.includes('vtest') || t.includes('v-test') || t.includes('rs6905')) return YOUTUBE_ANGLAIS;
@@ -415,6 +425,7 @@ import { getSocioEsthetiqueChapters } from "./courseContentSocioEsthetique";
 import { getVTCChapters } from "./courseContentVTC";
 import { getEsthetiqueChapters } from "./courseContentEsthetique";
 import { getMaquillageChapters } from "./courseContentMaquillage";
+import { getPaieChapters } from "./courseContentPaie";
 
 import { getNTCChapters } from "./courseContentNTC";
 import { getGPMEChapters } from "./courseContentGPME";
@@ -449,6 +460,7 @@ export function getCourseChapters(formationIntitule: string): CourseChapter[] {
   const ai = tryAIChapters(formationIntitule);
   if (ai) return ai;
   const t = formationIntitule.toLowerCase();
+  if (t.includes('gestionnaire de paie') || t.includes('gestionnaire paie') || (t.includes('paie') && (t.includes('formation') || t.includes('bulletin') || t.includes('gestion')))) return getPaieChapters();
   if (t.includes('gestion de la pme') || t.includes('gestion pme') || t.includes('bts gpme') || t.includes(' gpme') || t.startsWith('gpme') || t.includes('rncp38363')) return getGPMEChapters();
   if (t.includes('création') && (t.includes('entreprise') || t.includes('activité'))) return getCreationEntrepriseChapters();
   if (t.includes('creation') && (t.includes('entreprise') || t.includes('activite'))) return getCreationEntrepriseChapters();
