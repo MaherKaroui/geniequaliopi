@@ -210,6 +210,119 @@ const PAIE_VEILLE_PACK: AIVeillePack = {
 };
 
 // ---------------------------------------------------------------------------
+// Exercices par module (6 modules × 5 QCM + 1 exercice pratique)
+// Utilisés par genPaieExercicesParModule dans documentGenerator.ts.
+// ---------------------------------------------------------------------------
+export interface PaieModuleQCM { question: string; options: string[]; correctIndex: number; }
+export interface PaieModuleExo { titre: string; consigne: string; reponseAttendue: string; points: number; }
+export interface PaieModuleExercises {
+  moduleTitre: string;
+  qcm: PaieModuleQCM[];   // 5
+  exercice: PaieModuleExo; // 1
+}
+
+const mq = (question: string, options: string[], correctIndex: number): PaieModuleQCM => ({ question, options, correctIndex });
+
+export const PAIE_MODULE_EXERCISES: PaieModuleExercises[] = [
+  {
+    moduleTitre: "Module 1 — Fondamentaux du droit du travail et de la paie",
+    qcm: [
+      mq("Quelle est la durée légale hebdomadaire du travail en France ?", ["32 h", "35 h", "37 h", "39 h"], 1),
+      mq("Sur un bulletin de paie, l'IDCC correspond à :", ["L'identifiant du salarié", "L'identifiant de la convention collective", "L'identifiant DSN", "L'identifiant URSSAF"], 1),
+      mq("La période d'essai d'un CDI ouvrier est au maximum de :", ["1 mois", "2 mois", "3 mois", "4 mois"], 1),
+      mq("Le principe de faveur signifie :", ["On applique la disposition la moins coûteuse pour l'entreprise", "On applique la disposition la plus favorable au salarié", "On applique toujours le Code du travail", "On applique l'accord d'entreprise en priorité"], 1),
+      mq("L'indemnité de fin de CDD (prime de précarité) est de :", ["5 %", "8 %", "10 %", "15 %"], 2),
+    ],
+    exercice: {
+      titre: "Analyse d'un cas de rupture de période d'essai",
+      consigne: "Un salarié en CDI (statut employé) est embauché le 1er mars. Sa période d'essai est de 2 mois. L'employeur souhaite rompre le 15 avril. Indiquez le délai de prévenance légal à respecter et la date de fin effective du contrat.",
+      reponseAttendue: "Ancienneté au 15 avril : 1 mois et 14 jours (entre 1 mois et 3 mois). Délai de prévenance légal employeur = 2 semaines. Notification le 15 avril → fin effective du contrat le 29 avril. Le salarié doit percevoir son salaire jusqu'à cette date, mais aucune indemnité de rupture d'essai (sauf accord conventionnel). Aucune ICCP due car période d'essai en cours (les CP acquis restent dus).",
+      points: 4,
+    },
+  },
+  {
+    moduleTitre: "Module 2 — Construire un bulletin de paie clair et conforme",
+    qcm: [
+      mq("Le bulletin simplifié impose de regrouper les cotisations par :", ["Ordre alphabétique", "Risque social", "Taux croissant", "Organisme collecteur"], 1),
+      mq("Le passage brut → net à payer comprend, dans l'ordre :", ["Brut, PAS, cotisations, net", "Brut, cotisations, net avant impôt, PAS, net à payer", "Brut, net imposable, cotisations, PAS", "Brut, mutuelle, cotisations, PAS"], 1),
+      mq("Un avantage en nature repas (barème URSSAF 2026 ≈ 5,45 €) est :", ["Exonéré de cotisations", "Ajouté au brut et soumis à cotisations", "Déduit du net", "Soumis uniquement à CSG"], 1),
+      mq("Le net social affiché sur le bulletin sert au calcul :", ["De la retraite", "Du RSA et de la Prime d'activité", "De l'impôt sur le revenu", "Des cotisations chômage"], 1),
+      mq("La Prime de Partage de la Valeur (PPV) est exonérée jusqu'à :", ["1 000 €", "3 000 € (ou 6 000 € avec accord d'intéressement)", "5 000 €", "10 000 €"], 1),
+    ],
+    exercice: {
+      titre: "Bulletin simplifié — passage brut → net (SMIC 2026)",
+      consigne: "Salarié non-cadre au SMIC 2026 (11,88 €/h × 151,67 h), célibataire, taux PAS 3 %, mutuelle 28 € part salariale, aucune absence, aucune prime. Calculez le brut, le net avant impôt, le PAS et le net à payer.",
+      reponseAttendue: "Brut : 11,88 × 151,67 = 1 801,84 €. Cotisations salariales ≈ 22 % du brut (retraite plaf. 6,90 %, AGIRC-ARRCO T1 3,15 %, CEG 0,86 %, CSG déd. 6,80 % sur 98,25 %, CSG+CRDS non déd. 2,90 % sur 98,25 %) = ~396 €. Mutuelle 28 €. Net avant impôt ≈ 1 377,84 €. PAS : 3 % × 1 377,84 = 41,34 €. Net à payer ≈ 1 336,50 €. Net social ≈ 1 405 € (brut − cotisations obligatoires hors mutuelle).",
+      points: 5,
+    },
+  },
+  {
+    moduleTitre: "Module 3 — Cotisations sociales, DSN et déclarations",
+    qcm: [
+      mq("La CSG et la CRDS s'appliquent sur :", ["100 % du brut", "98,25 % du brut jusqu'à 4 PMSS", "Le net imposable", "Le net à payer"], 1),
+      mq("Le PMSS 2026 s'élève à :", ["3 428 €", "3 666 €", "3 925 €", "4 200 €"], 2),
+      mq("La DSN mensuelle doit être déposée avant le :", ["1er du mois M+1", "5 ou 15 du mois M+1 selon la taille", "20 du mois M+1", "Dernier jour du mois M+1"], 1),
+      mq("Une DSN événementielle « arrêt de travail » doit être transmise sous :", ["24 h", "5 jours", "10 jours", "1 mois"], 1),
+      mq("La cotisation AGIRC-ARRCO tranche 1 (part salariale) est de :", ["3,15 %", "4,72 %", "6,90 %", "8,64 %"], 0),
+    ],
+    exercice: {
+      titre: "Calcul cotisations et lecture d'un rejet DSN",
+      consigne: "Vous générez la DSN de mars. Le rapport de rejet URSSAF indique : « Bloc S21.G00.79.001 assiette CSG incohérente ». Expliquez la cause probable et la démarche de correction en 3 étapes.",
+      reponseAttendue: "Cause probable : l'assiette CSG déclarée en DSN ne correspond pas au brut × 98,25 % (dans la limite de 4 PMSS), souvent dû à une prime non intégrée à l'assiette ou à un avantage en nature mal paramétré. Correction : 1) rapprocher le bulletin et la DSN sur la rubrique 79 (assiette CSG-CRDS) ; 2) corriger le paramétrage de la rubrique concernée (case « soumise CSG » dans Silae) ; 3) générer une DSN annule-et-remplace avant l'exigibilité, ou une DSN de régularisation le mois suivant (bloc S21.G00.56).",
+      points: 5,
+    },
+  },
+  {
+    moduleTitre: "Module 4 — Absences, congés payés et indemnités journalières",
+    qcm: [
+      mq("Un salarié acquiert combien de jours de congés payés par mois travaillé ?", ["1,5 j ouvrables", "2 j ouvrables", "2,5 j ouvrables", "3 j ouvrables"], 2),
+      mq("La franchise IJSS en maladie ordinaire est de :", ["0 jour", "3 jours", "7 jours", "10 jours"], 1),
+      mq("En cas de subrogation, les IJSS nettes sont :", ["Ajoutées au net à payer", "Déduites du brut sans réintégration", "Non déclarées", "Soumises à toutes les cotisations"], 0),
+      mq("Depuis 2024, un arrêt maladie non-pro fait acquérir :", ["Aucun jour de CP", "2 j ouvrables/mois plafonnés à 24 j/an", "2,5 j comme un mois normal", "1 jour/mois"], 1),
+      mq("Quelle méthode de retenue absence est en général la plus favorable au salarié ?", ["Moyennisation 30e", "Heures réelles du mois", "Forfait 8 h/jour", "Jours calendaires"], 1),
+    ],
+    exercice: {
+      titre: "IJSS avec subrogation et maintien à 90 %",
+      consigne: "Salarié brut 2 500 €, arrêt maladie 12 jours en mai (21 j ouvrés). Ancienneté 3 ans → maintien 90 % du net (loi mensualisation). L'employeur pratique la subrogation. IJSS brutes CPAM : 500 €. Décrivez les rubriques du bulletin.",
+      reponseAttendue: "1) Brut habituel : 2 500 €. 2) Retenue absence 12 j (heures réelles) : 2 500 × 12/21 = 1 429 €. 3) Brut restant travaillé = 1 071 €. 4) Complément employeur calculé pour atteindre 90 % du net habituel (env. 380 €). 5) IJSS brutes 500 € intégrées à l'assiette du bulletin ; IJSS nettes ~423 € réintégrées au net (soumises seulement à CSG 6,20 % + CRDS 0,50 %, non-déductibles). 6) Le salarié perçoit ~90 % de son net habituel. Bulletin transmis à la CPAM via DSN événementielle sous 5 jours.",
+      points: 5,
+    },
+  },
+  {
+    moduleTitre: "Module 5 — Rupture du contrat et solde de tout compte",
+    qcm: [
+      mq("L'indemnité légale de licenciement pour un salarié ayant 5 ans d'ancienneté est de :", ["1/6 mois × ancienneté", "1/4 mois × ancienneté", "1/3 mois × ancienneté", "1 mois × ancienneté"], 1),
+      mq("La portabilité de la mutuelle après rupture (hors faute lourde) dure au maximum :", ["3 mois", "6 mois", "12 mois", "24 mois"], 2),
+      mq("Le reçu pour solde de tout compte est dénonçable dans un délai de :", ["1 mois", "3 mois", "6 mois", "12 mois"], 2),
+      mq("Une rupture conventionnelle donne lieu à une indemnité :", ["Toujours 0", "Au moins égale à l'indemnité légale de licenciement", "Uniquement l'ICCP", "Deux mois de salaire minimum"], 1),
+      mq("L'attestation France Travail est désormais transmise via :", ["Un formulaire papier", "La DSN événementielle fin de contrat", "Un email au salarié", "Le site pole-emploi.fr"], 1),
+    ],
+    exercice: {
+      titre: "Solde de tout compte — rupture conventionnelle",
+      consigne: "Salariée cadre, 6 ans d'ancienneté, salaire moyen 3 000 € brut, rupture conventionnelle homologuée le 15 juin 2026. 18 j de CP acquis non pris. Préavis (3 mois) non exécuté, dispense employeur. Calculez le STC brut et listez les 5 documents à remettre.",
+      reponseAttendue: "1) Salaire du 1 au 15 juin : 3 000 × 15/30 = 1 500 €. 2) Indemnité compensatrice de préavis : 3 × 3 000 = 9 000 €. 3) ICCP (méthode maintien) : 3 000 × 18/25 = 2 160 € — comparer à 1/10 des rémunérations. 4) Indemnité de rupture conventionnelle ≥ ILC légale : 6 × 1/4 × 3 000 = 4 500 € minimum. STC brut ≈ 17 160 €. Documents obligatoires : (i) bulletin de paie du STC, (ii) certificat de travail (avec portabilité), (iii) attestation France Travail (via DSN), (iv) reçu STC dénonçable 6 mois, (v) état récapitulatif de l'épargne salariale (si applicable).",
+      points: 5,
+    },
+  },
+  {
+    moduleTitre: "Module 6 — Contrôles, veille juridique et posture professionnelle",
+    qcm: [
+      mq("Un contrôle URSSAF peut porter sur les :", ["12 derniers mois", "24 derniers mois", "3 dernières années (5 en cas de travail dissimulé)", "10 dernières années"], 2),
+      mq("La durée de conservation des bulletins de paie par l'employeur est de :", ["1 an", "3 ans", "5 ans", "6 ans (dématérialisé sur 50 ans)"], 3),
+      mq("La CNIL impose, pour la transmission d'un bulletin par email :", ["Aucune contrainte", "Un chiffrement ou un coffre-fort numérique", "Un envoi obligatoire en recommandé", "Une signature du salarié"], 1),
+      mq("Le site officiel de référence pour les taux et plafonds sociaux est :", ["urssaf.fr uniquement", "boss.gouv.fr", "legifrance.gouv.fr", "impots.gouv.fr"], 1),
+      mq("Un KPI paie clé pour le pilotage est :", ["Le nombre de tickets restaurant", "Le taux d'absentéisme", "Le nombre d'emails RH", "La couleur du logo"], 1),
+    ],
+    exercice: {
+      titre: "Préparation d'un contrôle URSSAF",
+      consigne: "L'URSSAF annonce un contrôle dans 45 jours sur les 3 dernières années dans une TPE de 8 salariés. Listez 5 points sensibles à auditer en priorité et 5 documents à réunir dans le classeur de contrôle.",
+      reponseAttendue: "Points sensibles : (1) frais professionnels — justificatifs, respect des barèmes URSSAF ; (2) avantages en nature véhicule — évaluation URSSAF vs valeur réelle ; (3) réduction générale de cotisations — formule et coefficient exact ; (4) PPV — plafond 3 000/6 000 €, conditions ; (5) heures supplémentaires exonérées — cohérence DSN / bulletins. Documents à réunir : (i) bulletins des 3 dernières années, (ii) DSN mensuelles + accusés de réception, (iii) contrats de travail et avenants, (iv) registre du personnel, (v) notes de frais + tickets restaurant + procédures internes écrites.",
+      points: 5,
+    },
+  },
+];
+
+// ---------------------------------------------------------------------------
 // Seeder : pré-remplit tous les caches AI pour la formation Paie.
 // Appelé depuis FormationForm quand l'utilisateur importe le preset.
 // ---------------------------------------------------------------------------
@@ -222,3 +335,4 @@ export function seedPaieAICaches(): void {
     /* sessionStorage indisponible : ignoré */
   }
 }
+

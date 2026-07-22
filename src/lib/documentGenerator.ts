@@ -46,6 +46,7 @@ import { genProgrammeBDC as genProgrammeBDC_imported, genEvaluationBesoins as ge
 import { genDPOfficiel, genECFOfficiel, genPVSessionGlobal, preloadDPAIPack } from "./templatesCFAOfficiels";
 import { getCachedPack, answersForQCM, studentAnswerFromCorrection, noteForOpenQuestion, noteForDayProgression, humanizedStudentAnswer, humanizedQCMComment, humanizedTeacherFeedback, type AIEvalPack } from "./aiEvalPack";
 import { getCachedContentPack, pickImagesForQuery } from "./aiContentPack";
+import { PAIE_MODULE_EXERCISES } from "./paiePreset";
 
 const FALLBACK_STAGIAIRE: StagiaireInfo = { prenom: "Martin", nom: "Dupont", civilite: "" as "M." | "Mme" | "", email: "", telephone: "", entreprise: "", poste: "", dateNaissance: "" };
 
@@ -337,6 +338,9 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "ai_exercices_par_jour": {
       const si = params?.stagiaireIdx ?? 0;
       const di = typeof params?.dayIdx === "number" ? params.dayIdx : undefined;
+      const t = (f.intitule || "").toLowerCase();
+      const isPaie = t.includes("gestionnaire de paie") || t.includes("gestionnaire paie") || (t.includes("paie") && (t.includes("bulletin") || t.includes("gestion") || t.includes("dsn")));
+      if (isPaie) return genPaieExercicesParModule(o, f, stagiaires, si);
       return genAIExercicesParJour(o, f, stagiaires, si, di);
     }
     case "ai_evaluation_finale": {
@@ -16826,6 +16830,105 @@ function genAIExercicesParJour(o: OrganismeInfo, f: FormationInfo, stagiaires: S
 
   return buildDocument({
     org: o, title, subtitle: f.intitule, formation: f, showFormationInfo: false, stagiaires: [s], extraHtml: extra,
+    signatures: { type: "2", labels: ["Le Stagiaire", "Le Formateur"], names: [`${s.prenom} ${s.nom}`, f.formateur] },
+  });
+}
+
+/**
+ * Exercices par module pour la formation Gestionnaire de paie.
+ * 6 modules × (5 QCM + 1 exercice pratique) — humanisé et différent par stagiaire.
+ */
+function genPaieExercicesParModule(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number): string {
+  const s = stagiaires[si] || stagiaires[0];
+  const seedBase = ((s?.prenom || "").length * 17 + (s?.nom || "").length * 31 + si * 7);
+
+  let extra = `<h2>EXERCICES PAR MODULE — RÉSULTATS DÉTAILLÉS</h2>`;
+  extra += `<p><strong>Stagiaire :</strong> ${s.civilite ? s.civilite + " " : ""}${s.prenom} ${s.nom}<br>
+    <strong>Formation :</strong> ${f.intitule}<br>
+    <strong>Période :</strong> du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}<br>
+    <strong>Nombre de modules évalués :</strong> ${PAIE_MODULE_EXERCISES.length} (5 QCM + 1 exercice pratique par module)</p>`;
+
+  let grandObtained = 0;
+  let grandMax = 0;
+
+  PAIE_MODULE_EXERCISES.forEach((mod, mi) => {
+    if (mi > 0) extra += `<div class="page-break" style="page-break-before:always"></div>`;
+
+    // Progression : notes en hausse à travers les modules
+    const progress = PAIE_MODULE_EXERCISES.length <= 1 ? 1 : mi / (PAIE_MODULE_EXERCISES.length - 1);
+    const quality = 0.60 + progress * 0.35; // 0.60 → 0.95
+
+    extra += `<div style="border:1px solid #cbd5e1;padding:14px;margin-top:10px">
+      <h3 style="margin:0 0 10px 0;color:#1e40af">${mod.moduleTitre}</h3>`;
+
+    // ---- QCM (5 questions) ----
+    const targetCorrect = Math.max(3, Math.min(5, Math.round(3 + progress * 2))); // 3 → 5
+    const wrongCount = mod.qcm.length - targetCorrect;
+    const wrongSet = new Set<number>();
+    let k = 0;
+    while (wrongSet.size < wrongCount && k < mod.qcm.length * 6) {
+      wrongSet.add((seedBase + mi * 7 + k * 11) % mod.qcm.length);
+      k++;
+    }
+
+    let qcmObtained = 0;
+    extra += `<h4 style="color:#1e40af;margin:10px 0 6px 0">QCM du module (5 questions)</h4>`;
+    mod.qcm.forEach((q, qi) => {
+      const correct = !wrongSet.has(qi);
+      const chosenIdx = correct
+        ? q.correctIndex
+        : [0, 1, 2, 3].filter((x) => x !== q.correctIndex)[(seedBase + mi + qi) % 3];
+      if (correct) qcmObtained++;
+
+      const options = q.options.map((opt, oi) => {
+        const isChosen = oi === chosenIdx;
+        const isRight = oi === q.correctIndex;
+        return `<li style="${isChosen ? "font-weight:700" : ""}${isRight ? ";color:#15803d" : ""}">
+          ${isChosen ? "☒" : "☐"} ${String.fromCharCode(65 + oi)}. ${opt}${isRight ? " <em style='color:#15803d'>(bonne réponse)</em>" : ""}
+        </li>`;
+      }).join("");
+
+      extra += `<div style="margin:6px 0;padding:8px;border-left:3px solid ${correct ? "#16a34a" : "#dc2626"};background:#f8fafc">
+        <p style="margin:0 0 4px 0"><strong>Q${qi + 1}.</strong> ${q.question}</p>
+        <ul style="margin:4px 0 6px 22px;padding:0">${options}</ul>
+        <p style="margin:4px 0 0 0;font-size:0.9em"><em>Réponse stagiaire :</em> ${String.fromCharCode(65 + chosenIdx)} — ${correct ? "<span style='color:#15803d'>Correcte ✓</span>" : "<span style='color:#dc2626'>Incorrecte ✗</span>"} — « ${humanizedQCMComment(correct, s, si, mi * 10 + qi)} »</p>
+      </div>`;
+    });
+    extra += `<p style="margin:8px 0;padding:8px;background:#ecfdf5;border-left:3px solid #16a34a"><strong>Score QCM : ${qcmObtained}/${mod.qcm.length}</strong></p>`;
+
+    // ---- Exercice pratique (1) ----
+    const exo = mod.exercice;
+    const note = noteForDayProgression(exo.points, mi, PAIE_MODULE_EXERCISES.length, s, si);
+    const answer = humanizedStudentAnswer(exo.reponseAttendue, s, si, mi * 13 + 3, quality);
+    const feedback = humanizedTeacherFeedback(note, exo.points, s, si, mi * 13 + 3);
+    extra += `<h4 style="color:#1e40af;margin:14px 0 6px 0">Exercice pratique — ${exo.titre} (${exo.points} pts)</h4>
+      <div style="margin:6px 0;padding:10px;border-left:3px solid #3b82f6;background:#f8fafc">
+        <p style="margin:0 0 6px 0"><em>Consigne :</em> ${exo.consigne}</p>
+        <p style="margin:6px 0;padding:6px;background:#fff;border-left:2px solid #64748b"><em>Production stagiaire :</em><br>${answer.replace(/\n/g, "<br>")}</p>
+        <p style="margin:6px 0;padding:6px;background:#f0fdf4;border-left:2px solid #16a34a"><em>Corrigé attendu :</em><br>${exo.reponseAttendue}</p>
+        <p style="margin:6px 0 0 0"><strong>Note : ${note}/${exo.points}</strong> — <em>${feedback}</em></p>
+      </div>`;
+
+    const modObt = qcmObtained + note;
+    const modMax = mod.qcm.length + exo.points;
+    grandObtained += modObt;
+    grandMax += modMax;
+    extra += `<p style="margin-top:10px;padding:8px;background:#dbeafe;border-left:3px solid #1e40af"><strong>Score du module ${mi + 1} : ${modObt}/${modMax}</strong></p>`;
+    extra += `</div>`;
+  });
+
+  // ---- Synthèse globale ----
+  extra += `<div class="page-break" style="page-break-before:always"></div>`;
+  const pct = grandMax > 0 ? Math.round((grandObtained / grandMax) * 100) : 0;
+  extra += `<div class="section section-green" style="margin-top:20px">
+    <h3>Synthèse globale des exercices par module</h3>
+    <p><strong>Note cumulée :</strong> ${grandObtained}/${grandMax} (${pct}%)</p>
+    <p><strong>Progression :</strong> Résultats en hausse module après module, cohérents avec la montée en compétences attendue sur la paie (fondamentaux → bulletin → cotisations/DSN → absences → rupture → contrôles).</p>
+    <p><strong>Appréciation formateur :</strong> ${pct >= 80 ? `${s.prenom} ${s.nom} a démontré une très bonne maîtrise de l'ensemble des blocs de la fonction paie.` : pct >= 60 ? "Progression satisfaisante, à consolider sur les modules les plus techniques (cotisations, DSN)." : "Acquis partiels — accompagnement renforcé recommandé sur les modules 3 et 4."}</p>
+  </div>`;
+
+  return buildDocument({
+    org: o, title: "EXERCICES PAR MODULE — RÉSULTATS DÉTAILLÉS", subtitle: f.intitule, formation: f, showFormationInfo: false, stagiaires: [s], extraHtml: extra,
     signatures: { type: "2", labels: ["Le Stagiaire", "Le Formateur"], names: [`${s.prenom} ${s.nom}`, f.formateur] },
   });
 }
