@@ -10020,8 +10020,9 @@ ${o.tamponUrl ? `<img src="${o.tamponUrl}" alt="Tampon" style="max-height:60px;m
   return buildDocument({
     org: o,
     title: "Évaluation des besoins",
-    extraHtml: civiliteBlock + apprenantPart + entreprisePart + footer,
+    extraHtml: civiliteBlock + apprenantPart + (hasEntreprise ? entreprisePart : "") + footer,
   });
+
 }
 
 
