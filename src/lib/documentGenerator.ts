@@ -47,6 +47,22 @@ import { genDPOfficiel, genECFOfficiel, genPVSessionGlobal, preloadDPAIPack } fr
 import { getCachedPack, answersForQCM, studentAnswerFromCorrection, noteForOpenQuestion, noteForDayProgression, humanizedStudentAnswer, humanizedQCMComment, humanizedTeacherFeedback, type AIEvalPack } from "./aiEvalPack";
 import { getCachedContentPack, pickImagesForQuery } from "./aiContentPack";
 import { PAIE_MODULE_EXERCISES } from "./paiePreset";
+import { SECRETARIAT_MODULE_EXERCISES } from "./secretariatPreset";
+
+function getModuleExercisesFor(f: FormationInfo) {
+  const t = (f.intitule || "").toLowerCase();
+  if (t.includes("secrétariat") || t.includes("secretariat") || t.includes("secrétaire") || t.includes("secretaire") || t.includes("office manager") || t.includes("assistanat")) {
+    return SECRETARIAT_MODULE_EXERCISES;
+  }
+  return PAIE_MODULE_EXERCISES;
+}
+
+function isModuleExercisesFormation(f: FormationInfo): boolean {
+  const t = (f.intitule || "").toLowerCase();
+  const isPaie = t.includes("gestionnaire de paie") || t.includes("gestionnaire paie") || (t.includes("paie") && (t.includes("bulletin") || t.includes("gestion") || t.includes("dsn")));
+  const isSecretariat = t.includes("secrétariat") || t.includes("secretariat") || t.includes("secrétaire") || t.includes("secretaire") || t.includes("office manager") || t.includes("assistanat");
+  return isPaie || isSecretariat;
+}
 
 const FALLBACK_STAGIAIRE: StagiaireInfo = { prenom: "Martin", nom: "Dupont", civilite: "" as "M." | "Mme" | "", email: "", telephone: "", entreprise: "", poste: "", dateNaissance: "" };
 
@@ -338,9 +354,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "ai_exercices_par_jour": {
       const si = params?.stagiaireIdx ?? 0;
       const di = typeof params?.dayIdx === "number" ? params.dayIdx : undefined;
-      const t = (f.intitule || "").toLowerCase();
-      const isPaie = t.includes("gestionnaire de paie") || t.includes("gestionnaire paie") || (t.includes("paie") && (t.includes("bulletin") || t.includes("gestion") || t.includes("dsn")));
-      if (isPaie) return genPaieExercicesParModule(o, f, stagiaires, si);
+      if (isModuleExercisesFormation(f)) return genPaieExercicesParModule(o, f, stagiaires, si);
       return genAIExercicesParJour(o, f, stagiaires, si, di);
     }
     case "ai_evaluation_finale": {
@@ -356,10 +370,9 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "exercices_stagiaire": {
       const si = params?.stagiaireIdx ?? 0;
       const exIdx = params?.exerciceIdx ?? undefined;
-      const t = (f.intitule || "").toLowerCase();
-      const isPaie = t.includes("gestionnaire de paie") || t.includes("gestionnaire paie") || (t.includes("paie") && (t.includes("bulletin") || t.includes("gestion") || t.includes("dsn")));
-      if (isPaie && typeof exIdx === "number") {
-        return genPaieExerciceModule(o, f, stagiaires, si, exIdx % PAIE_MODULE_EXERCISES.length);
+      if (isModuleExercisesFormation(f) && typeof exIdx === "number") {
+        const mods = getModuleExercisesFor(f);
+        return genPaieExerciceModule(o, f, stagiaires, si, exIdx % mods.length);
       }
       return genExercicesStagiaire(o, f, stagiaires, si, exIdx);
     }
@@ -10110,6 +10123,7 @@ function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: 
   const isVTC = !isECSR && (t.includes("vtc") || t.includes("conducteur") || t.includes("transport de personnes") || t.includes("t3p") || t.includes("chauffeur"));
   const isNTC = t.includes("négociateur technico") || t.includes("technico-commercial") || t.includes("technico commercial") || t.includes("ntc") || (f.codeRNCP || "").toUpperCase().includes("39063");
   const isPaie = t.includes("gestionnaire de paie") || t.includes("gestionnaire paie") || (t.includes("paie") && (t.includes("bulletin") || t.includes("gestion") || t.includes("dsn")));
+  const isSecretariat = t.includes("secrétariat") || t.includes("secretariat") || t.includes("secrétaire") || t.includes("secretaire") || t.includes("office manager") || t.includes("assistanat");
 
   // === Early return : Gestionnaire de paie (reconversion / évolution RH-paie) ===
   if (isPaie) {
@@ -10177,6 +10191,60 @@ function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: 
       budget: "Financement personnel via le CPF (Compte Personnel de Formation) – 3 900 € TTC, complété si besoin par un abondement France Travail (AIF) dans le cadre du projet de reconversion vers un métier en tension.",
       projetPro: paieProjetPro[h(8) % paieProjetPro.length],
       handicap: paieHandicap[h(9) % paieHandicap.length],
+    };
+  }
+
+  // === Early return : Secrétariat / Office manager (reconversion / évolution admin) ===
+  if (isSecretariat) {
+    const secAttentes = [
+      `Je veux vraiment reprendre confiance sur les outils Word et Excel parce qu'aujourd'hui je bricole et je perds un temps fou sur des choses qui devraient être automatiques.`,
+      `Ce qui me stresse le plus c'est la rédaction des mails et courriers officiels, j'ai peur de faire des fautes ou d'être mal comprise par la hiérarchie.`,
+      `Je souhaite apprendre à mieux m'organiser au quotidien, prioriser mes tâches, ne plus me laisser déborder par les urgences des autres.`,
+      `J'aimerais gagner en aisance à l'accueil physique et téléphonique, surtout face aux clients mécontents où je ne sais jamais quoi répondre sur le moment.`,
+      `Je veux comprendre les bases du RGPD et de la confidentialité pour ne pas mettre l'entreprise en risque quand je manipule des dossiers RH ou clients.`,
+      `Mon objectif c'est de tenir un vrai poste d'assistant(e) de direction, pas juste faire du secrétariat basique, avec la gestion d'agenda, les réunions et les comptes rendus.`,
+    ];
+    const secMissions = [
+      "Accueil physique et téléphonique, gestion du courrier entrant/sortant, tenue d'agenda du dirigeant, prise de rendez-vous, préparation logistique des réunions et rédaction des comptes rendus.",
+      "Traitement des mails de la boîte contact, mise en forme de documents Word/Excel, suivi des devis et factures fournisseurs, classement électronique et archivage physique.",
+      "Assistanat commercial : relance clients, mise à jour du CRM, préparation des dossiers appels d'offres, organisation des déplacements et notes de frais de l'équipe commerciale.",
+      "Assistanat RH : gestion des visites médicales, suivi des congés et absences, préparation des contrats, accueil des nouveaux arrivants et interface avec le cabinet de paie externe.",
+    ];
+    const secContribution = [
+      "Fluidifier la circulation de l'information dans l'entreprise et libérer du temps aux managers en prenant en charge tout l'administratif du quotidien.",
+      "Assurer la qualité et la fiabilité des documents produits (mails, courriers, tableaux, comptes rendus) qui reflètent l'image professionnelle de la structure.",
+      "Devenir la personne ressource sur laquelle l'équipe compte pour l'organisation, la logistique et la remontée d'informations fiables.",
+    ];
+    const secDiplomes = [
+      "Bac Pro Gestion-Administration + 3 ans d'expérience en poste d'agent administratif",
+      "Bac général + 5 ans d'expérience en secrétariat / accueil dans le secteur médical",
+      "BTS Support à l'action managériale (SAM) obtenu en 2020, actuellement en poste d'assistante administrative",
+      "Bac +2 en administration + reconversion après 6 ans dans la restauration/vente",
+    ];
+    const secObjectif = [
+      "Sécuriser mon poste actuel en devenant plus autonome et polyvalente, avec une vraie maîtrise des outils bureautiques et de la communication professionnelle écrite.",
+      "Évoluer vers un poste d'assistant(e) de direction ou d'office manager d'ici 12 à 18 mois, avec des missions plus larges et plus de responsabilités.",
+      "Valider une certification reconnue pour crédibiliser mon profil sur le marché du travail et retrouver rapidement un poste stable après ma période de chômage.",
+    ];
+    const secProjetPro = [
+      "Reprendre confiance sur mes compétences bureautiques, valider une certification reconnue, puis postuler sur des postes d'assistant(e) de direction en PME.",
+      "Consolider mon poste actuel d'agent administratif et négocier une évolution vers l'assistanat de direction avec revalorisation salariale à l'issue de la formation.",
+      "Me reconvertir après une expérience dans un autre secteur et sécuriser un premier poste stable en secrétariat / accueil administratif, en télétravail partiel si possible.",
+    ];
+    const secHandicap = [
+      "Aucune situation de handicap à signaler.",
+      "Aucune reconnaissance RQTH. Je vous informerai si un besoin d'adaptation apparaissait pendant la formation.",
+    ];
+    return {
+      civilite,
+      attentes: [secAttentes[h(1) % secAttentes.length], secAttentes[h(2) % secAttentes.length], secAttentes[h(3) % secAttentes.length]].join(" "),
+      missions: secMissions[h(4) % secMissions.length],
+      contribution: secContribution[h(5) % secContribution.length],
+      diplome: secDiplomes[h(6) % secDiplomes.length],
+      objectif: secObjectif[h(7) % secObjectif.length],
+      budget: "Financement personnel via le CPF – 1 400 € TTC, éventuellement complété par un abondement France Travail (AIF) dans le cadre du projet professionnel.",
+      projetPro: secProjetPro[h(8) % secProjetPro.length],
+      handicap: secHandicap[h(9) % secHandicap.length],
     };
   }
 
@@ -16843,10 +16911,11 @@ function genAIExercicesParJour(o: OrganismeInfo, f: FormationInfo, stagiaires: S
  * 6 modules × (5 QCM + 1 exercice pratique) — humanisé et différent par stagiaire.
  */
 function genPaieExerciceModule(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number, mi: number): string {
+  const modules = getModuleExercisesFor(f);
   const s = stagiaires[si] || stagiaires[0];
-  const mod = PAIE_MODULE_EXERCISES[mi];
+  const mod = modules[mi];
   const seedBase = ((s?.prenom || "").length * 17 + (s?.nom || "").length * 31 + si * 7);
-  const progress = PAIE_MODULE_EXERCISES.length <= 1 ? 1 : mi / (PAIE_MODULE_EXERCISES.length - 1);
+  const progress = modules.length <= 1 ? 1 : mi / (modules.length - 1);
   const quality = 0.60 + progress * 0.35;
 
   let extra = `<h2>${mod.moduleTitre}</h2>`;
@@ -16890,7 +16959,7 @@ function genPaieExerciceModule(o: OrganismeInfo, f: FormationInfo, stagiaires: S
 
   // Exercice pratique
   const exo = mod.exercice;
-  const note = noteForDayProgression(exo.points, mi, PAIE_MODULE_EXERCISES.length, s, si);
+  const note = noteForDayProgression(exo.points, mi, modules.length, s, si);
   const answer = humanizedStudentAnswer(exo.reponseAttendue, s, si, mi * 13 + 3, quality);
   const feedback = humanizedTeacherFeedback(note, exo.points, s, si, mi * 13 + 3);
   extra += `<h3 style="color:#1e40af">Exercice pratique — ${exo.titre} (${exo.points} pts)</h3>
@@ -16912,6 +16981,7 @@ function genPaieExerciceModule(o: OrganismeInfo, f: FormationInfo, stagiaires: S
 }
 
 function genPaieExercicesParModule(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number): string {
+  const modules = getModuleExercisesFor(f);
 
   const s = stagiaires[si] || stagiaires[0];
   const seedBase = ((s?.prenom || "").length * 17 + (s?.nom || "").length * 31 + si * 7);
@@ -16920,16 +16990,16 @@ function genPaieExercicesParModule(o: OrganismeInfo, f: FormationInfo, stagiaire
   extra += `<p><strong>Stagiaire :</strong> ${s.civilite ? s.civilite + " " : ""}${s.prenom} ${s.nom}<br>
     <strong>Formation :</strong> ${f.intitule}<br>
     <strong>Période :</strong> du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}<br>
-    <strong>Nombre de modules évalués :</strong> ${PAIE_MODULE_EXERCISES.length} (5 QCM + 1 exercice pratique par module)</p>`;
+    <strong>Nombre de modules évalués :</strong> ${modules.length} (5 QCM + 1 exercice pratique par module)</p>`;
 
   let grandObtained = 0;
   let grandMax = 0;
 
-  PAIE_MODULE_EXERCISES.forEach((mod, mi) => {
+  modules.forEach((mod, mi) => {
     if (mi > 0) extra += `<div class="page-break" style="page-break-before:always"></div>`;
 
     // Progression : notes en hausse à travers les modules
-    const progress = PAIE_MODULE_EXERCISES.length <= 1 ? 1 : mi / (PAIE_MODULE_EXERCISES.length - 1);
+    const progress = modules.length <= 1 ? 1 : mi / (modules.length - 1);
     const quality = 0.60 + progress * 0.35; // 0.60 → 0.95
 
     extra += `<div style="border:1px solid #cbd5e1;padding:14px;margin-top:10px">
@@ -16972,7 +17042,7 @@ function genPaieExercicesParModule(o: OrganismeInfo, f: FormationInfo, stagiaire
 
     // ---- Exercice pratique (1) ----
     const exo = mod.exercice;
-    const note = noteForDayProgression(exo.points, mi, PAIE_MODULE_EXERCISES.length, s, si);
+    const note = noteForDayProgression(exo.points, mi, modules.length, s, si);
     const answer = humanizedStudentAnswer(exo.reponseAttendue, s, si, mi * 13 + 3, quality);
     const feedback = humanizedTeacherFeedback(note, exo.points, s, si, mi * 13 + 3);
     extra += `<h4 style="color:#1e40af;margin:14px 0 6px 0">Exercice pratique — ${exo.titre} (${exo.points} pts)</h4>

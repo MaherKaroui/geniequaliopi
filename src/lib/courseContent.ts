@@ -276,6 +276,8 @@ export function getYoutubeVideos(formationIntitule: string): CourseData['youtube
   if (t.includes('powerpoint') || t.includes('ppt')) return YOUTUBE_POWERPOINT;
   if (t.includes('bureautique') || t.includes('pack office') || t.includes('office 365') || t.includes('microsoft 365')) return YOUTUBE_BUREAUTIQUE;
   if (t.includes('gestionnaire de paie') || t.includes('gestionnaire paie') || (t.includes('paie') && (t.includes('bulletin') || t.includes('gestion')))) return YOUTUBE_PAIE;
+  if (t.includes('secrétariat') || t.includes('secretariat') || t.includes('secrétaire') || t.includes('secretaire') || t.includes('office manager') || t.includes('assistanat')) return YOUTUBE_BUREAUTIQUE;
+  // NB: getSecretariatChapters imported below alongside other chapters
   // Langues
   if ((t.includes('anglais') || t.includes('english')) && (t.includes('a1') || t.includes('débutant'))) return YOUTUBE_ANGLAIS_A1;
   if (t.includes('vtest') || t.includes('v-test') || t.includes('rs6905')) return YOUTUBE_ANGLAIS;
@@ -426,6 +428,7 @@ import { getVTCChapters } from "./courseContentVTC";
 import { getEsthetiqueChapters } from "./courseContentEsthetique";
 import { getMaquillageChapters } from "./courseContentMaquillage";
 import { getPaieChapters } from "./courseContentPaie";
+import { getSecretariatChapters } from "./courseContentSecretariat";
 
 import { getNTCChapters } from "./courseContentNTC";
 import { getGPMEChapters } from "./courseContentGPME";
@@ -461,6 +464,7 @@ export function getCourseChapters(formationIntitule: string): CourseChapter[] {
   if (ai) return ai;
   const t = formationIntitule.toLowerCase();
   if (t.includes('gestionnaire de paie') || t.includes('gestionnaire paie') || (t.includes('paie') && (t.includes('formation') || t.includes('bulletin') || t.includes('gestion')))) return getPaieChapters();
+  if (t.includes('secrétariat') || t.includes('secretariat') || t.includes('secrétaire') || t.includes('secretaire') || t.includes('office manager') || t.includes('assistanat')) return getSecretariatChapters();
   if (t.includes('gestion de la pme') || t.includes('gestion pme') || t.includes('bts gpme') || t.includes(' gpme') || t.startsWith('gpme') || t.includes('rncp38363')) return getGPMEChapters();
   if (t.includes('création') && (t.includes('entreprise') || t.includes('activité'))) return getCreationEntrepriseChapters();
   if (t.includes('creation') && (t.includes('entreprise') || t.includes('activite'))) return getCreationEntrepriseChapters();
