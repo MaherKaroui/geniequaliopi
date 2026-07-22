@@ -356,8 +356,14 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "exercices_stagiaire": {
       const si = params?.stagiaireIdx ?? 0;
       const exIdx = params?.exerciceIdx ?? undefined;
+      const t = (f.intitule || "").toLowerCase();
+      const isPaie = t.includes("gestionnaire de paie") || t.includes("gestionnaire paie") || (t.includes("paie") && (t.includes("bulletin") || t.includes("gestion") || t.includes("dsn")));
+      if (isPaie && typeof exIdx === "number") {
+        return genPaieExerciceModule(o, f, stagiaires, si, exIdx % PAIE_MODULE_EXERCISES.length);
+      }
       return genExercicesStagiaire(o, f, stagiaires, si, exIdx);
     }
+
     case "examen_final_stagiaire": {
       const si = params?.stagiaireIdx ?? 0;
       return genExamenFinalStagiaire(o, f, stagiaires, si);
