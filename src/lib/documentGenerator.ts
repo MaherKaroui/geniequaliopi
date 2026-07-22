@@ -47,6 +47,22 @@ import { genDPOfficiel, genECFOfficiel, genPVSessionGlobal, preloadDPAIPack } fr
 import { getCachedPack, answersForQCM, studentAnswerFromCorrection, noteForOpenQuestion, noteForDayProgression, humanizedStudentAnswer, humanizedQCMComment, humanizedTeacherFeedback, type AIEvalPack } from "./aiEvalPack";
 import { getCachedContentPack, pickImagesForQuery } from "./aiContentPack";
 import { PAIE_MODULE_EXERCISES } from "./paiePreset";
+import { SECRETARIAT_MODULE_EXERCISES } from "./secretariatPreset";
+
+function getModuleExercisesFor(f: FormationInfo) {
+  const t = (f.intitule || "").toLowerCase();
+  if (t.includes("secrétariat") || t.includes("secretariat") || t.includes("secrétaire") || t.includes("secretaire") || t.includes("office manager") || t.includes("assistanat")) {
+    return SECRETARIAT_MODULE_EXERCISES;
+  }
+  return PAIE_MODULE_EXERCISES;
+}
+
+function isModuleExercisesFormation(f: FormationInfo): boolean {
+  const t = (f.intitule || "").toLowerCase();
+  const isPaie = t.includes("gestionnaire de paie") || t.includes("gestionnaire paie") || (t.includes("paie") && (t.includes("bulletin") || t.includes("gestion") || t.includes("dsn")));
+  const isSecretariat = t.includes("secrétariat") || t.includes("secretariat") || t.includes("secrétaire") || t.includes("secretaire") || t.includes("office manager") || t.includes("assistanat");
+  return isPaie || isSecretariat;
+}
 
 const FALLBACK_STAGIAIRE: StagiaireInfo = { prenom: "Martin", nom: "Dupont", civilite: "" as "M." | "Mme" | "", email: "", telephone: "", entreprise: "", poste: "", dateNaissance: "" };
 
