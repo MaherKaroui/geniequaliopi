@@ -10194,6 +10194,60 @@ function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: 
     };
   }
 
+  // === Early return : Secrétariat / Office manager (reconversion / évolution admin) ===
+  if (isSecretariat) {
+    const secAttentes = [
+      `Je veux vraiment reprendre confiance sur les outils Word et Excel parce qu'aujourd'hui je bricole et je perds un temps fou sur des choses qui devraient être automatiques.`,
+      `Ce qui me stresse le plus c'est la rédaction des mails et courriers officiels, j'ai peur de faire des fautes ou d'être mal comprise par la hiérarchie.`,
+      `Je souhaite apprendre à mieux m'organiser au quotidien, prioriser mes tâches, ne plus me laisser déborder par les urgences des autres.`,
+      `J'aimerais gagner en aisance à l'accueil physique et téléphonique, surtout face aux clients mécontents où je ne sais jamais quoi répondre sur le moment.`,
+      `Je veux comprendre les bases du RGPD et de la confidentialité pour ne pas mettre l'entreprise en risque quand je manipule des dossiers RH ou clients.`,
+      `Mon objectif c'est de tenir un vrai poste d'assistant(e) de direction, pas juste faire du secrétariat basique, avec la gestion d'agenda, les réunions et les comptes rendus.`,
+    ];
+    const secMissions = [
+      "Accueil physique et téléphonique, gestion du courrier entrant/sortant, tenue d'agenda du dirigeant, prise de rendez-vous, préparation logistique des réunions et rédaction des comptes rendus.",
+      "Traitement des mails de la boîte contact, mise en forme de documents Word/Excel, suivi des devis et factures fournisseurs, classement électronique et archivage physique.",
+      "Assistanat commercial : relance clients, mise à jour du CRM, préparation des dossiers appels d'offres, organisation des déplacements et notes de frais de l'équipe commerciale.",
+      "Assistanat RH : gestion des visites médicales, suivi des congés et absences, préparation des contrats, accueil des nouveaux arrivants et interface avec le cabinet de paie externe.",
+    ];
+    const secContribution = [
+      "Fluidifier la circulation de l'information dans l'entreprise et libérer du temps aux managers en prenant en charge tout l'administratif du quotidien.",
+      "Assurer la qualité et la fiabilité des documents produits (mails, courriers, tableaux, comptes rendus) qui reflètent l'image professionnelle de la structure.",
+      "Devenir la personne ressource sur laquelle l'équipe compte pour l'organisation, la logistique et la remontée d'informations fiables.",
+    ];
+    const secDiplomes = [
+      "Bac Pro Gestion-Administration + 3 ans d'expérience en poste d'agent administratif",
+      "Bac général + 5 ans d'expérience en secrétariat / accueil dans le secteur médical",
+      "BTS Support à l'action managériale (SAM) obtenu en 2020, actuellement en poste d'assistante administrative",
+      "Bac +2 en administration + reconversion après 6 ans dans la restauration/vente",
+    ];
+    const secObjectif = [
+      "Sécuriser mon poste actuel en devenant plus autonome et polyvalente, avec une vraie maîtrise des outils bureautiques et de la communication professionnelle écrite.",
+      "Évoluer vers un poste d'assistant(e) de direction ou d'office manager d'ici 12 à 18 mois, avec des missions plus larges et plus de responsabilités.",
+      "Valider une certification reconnue pour crédibiliser mon profil sur le marché du travail et retrouver rapidement un poste stable après ma période de chômage.",
+    ];
+    const secProjetPro = [
+      "Reprendre confiance sur mes compétences bureautiques, valider une certification reconnue, puis postuler sur des postes d'assistant(e) de direction en PME.",
+      "Consolider mon poste actuel d'agent administratif et négocier une évolution vers l'assistanat de direction avec revalorisation salariale à l'issue de la formation.",
+      "Me reconvertir après une expérience dans un autre secteur et sécuriser un premier poste stable en secrétariat / accueil administratif, en télétravail partiel si possible.",
+    ];
+    const secHandicap = [
+      "Aucune situation de handicap à signaler.",
+      "Aucune reconnaissance RQTH. Je vous informerai si un besoin d'adaptation apparaissait pendant la formation.",
+    ];
+    return {
+      civilite,
+      attentes: [secAttentes[h(1) % secAttentes.length], secAttentes[h(2) % secAttentes.length], secAttentes[h(3) % secAttentes.length]].join(" "),
+      missions: secMissions[h(4) % secMissions.length],
+      contribution: secContribution[h(5) % secContribution.length],
+      diplome: secDiplomes[h(6) % secDiplomes.length],
+      objectif: secObjectif[h(7) % secObjectif.length],
+      budget: "Financement personnel via le CPF – 1 400 € TTC, éventuellement complété par un abondement France Travail (AIF) dans le cadre du projet professionnel.",
+      projetPro: secProjetPro[h(8) % secProjetPro.length],
+      handicap: secHandicap[h(9) % secHandicap.length],
+    };
+  }
+
   // === Early return : VTC (cohérent avec le métier de conducteur VTC) ===
 
   if (isVTC) {
