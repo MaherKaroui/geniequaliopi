@@ -16844,9 +16844,9 @@ function genAIExercicesParJour(o: OrganismeInfo, f: FormationInfo, stagiaires: S
  */
 function genPaieExerciceModule(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number, mi: number): string {
   const s = stagiaires[si] || stagiaires[0];
-  const mod = PAIE_MODULE_EXERCISES[mi];
+  const mod = modules[mi];
   const seedBase = ((s?.prenom || "").length * 17 + (s?.nom || "").length * 31 + si * 7);
-  const progress = PAIE_MODULE_EXERCISES.length <= 1 ? 1 : mi / (PAIE_MODULE_EXERCISES.length - 1);
+  const progress = modules.length <= 1 ? 1 : mi / (modules.length - 1);
   const quality = 0.60 + progress * 0.35;
 
   let extra = `<h2>${mod.moduleTitre}</h2>`;
@@ -16890,7 +16890,7 @@ function genPaieExerciceModule(o: OrganismeInfo, f: FormationInfo, stagiaires: S
 
   // Exercice pratique
   const exo = mod.exercice;
-  const note = noteForDayProgression(exo.points, mi, PAIE_MODULE_EXERCISES.length, s, si);
+  const note = noteForDayProgression(exo.points, mi, modules.length, s, si);
   const answer = humanizedStudentAnswer(exo.reponseAttendue, s, si, mi * 13 + 3, quality);
   const feedback = humanizedTeacherFeedback(note, exo.points, s, si, mi * 13 + 3);
   extra += `<h3 style="color:#1e40af">Exercice pratique — ${exo.titre} (${exo.points} pts)</h3>
@@ -16920,16 +16920,16 @@ function genPaieExercicesParModule(o: OrganismeInfo, f: FormationInfo, stagiaire
   extra += `<p><strong>Stagiaire :</strong> ${s.civilite ? s.civilite + " " : ""}${s.prenom} ${s.nom}<br>
     <strong>Formation :</strong> ${f.intitule}<br>
     <strong>Période :</strong> du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}<br>
-    <strong>Nombre de modules évalués :</strong> ${PAIE_MODULE_EXERCISES.length} (5 QCM + 1 exercice pratique par module)</p>`;
+    <strong>Nombre de modules évalués :</strong> ${modules.length} (5 QCM + 1 exercice pratique par module)</p>`;
 
   let grandObtained = 0;
   let grandMax = 0;
 
-  PAIE_MODULE_EXERCISES.forEach((mod, mi) => {
+  modules.forEach((mod, mi) => {
     if (mi > 0) extra += `<div class="page-break" style="page-break-before:always"></div>`;
 
     // Progression : notes en hausse à travers les modules
-    const progress = PAIE_MODULE_EXERCISES.length <= 1 ? 1 : mi / (PAIE_MODULE_EXERCISES.length - 1);
+    const progress = modules.length <= 1 ? 1 : mi / (modules.length - 1);
     const quality = 0.60 + progress * 0.35; // 0.60 → 0.95
 
     extra += `<div style="border:1px solid #cbd5e1;padding:14px;margin-top:10px">
@@ -16972,7 +16972,7 @@ function genPaieExercicesParModule(o: OrganismeInfo, f: FormationInfo, stagiaire
 
     // ---- Exercice pratique (1) ----
     const exo = mod.exercice;
-    const note = noteForDayProgression(exo.points, mi, PAIE_MODULE_EXERCISES.length, s, si);
+    const note = noteForDayProgression(exo.points, mi, modules.length, s, si);
     const answer = humanizedStudentAnswer(exo.reponseAttendue, s, si, mi * 13 + 3, quality);
     const feedback = humanizedTeacherFeedback(note, exo.points, s, si, mi * 13 + 3);
     extra += `<h4 style="color:#1e40af;margin:14px 0 6px 0">Exercice pratique — ${exo.titre} (${exo.points} pts)</h4>
