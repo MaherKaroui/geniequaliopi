@@ -459,6 +459,7 @@ export function getCourseChapters(formationIntitule: string): CourseChapter[] {
   const ai = tryAIChapters(formationIntitule);
   if (ai) return ai;
   const t = formationIntitule.toLowerCase();
+  if (t.includes('gestionnaire de paie') || t.includes('gestionnaire paie') || (t.includes('paie') && (t.includes('formation') || t.includes('bulletin') || t.includes('gestion')))) return getPaieChapters();
   if (t.includes('gestion de la pme') || t.includes('gestion pme') || t.includes('bts gpme') || t.includes(' gpme') || t.startsWith('gpme') || t.includes('rncp38363')) return getGPMEChapters();
   if (t.includes('création') && (t.includes('entreprise') || t.includes('activité'))) return getCreationEntrepriseChapters();
   if (t.includes('creation') && (t.includes('entreprise') || t.includes('activite'))) return getCreationEntrepriseChapters();
