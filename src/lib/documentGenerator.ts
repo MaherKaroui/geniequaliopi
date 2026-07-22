@@ -16859,6 +16859,7 @@ function genAIExercicesParJour(o: OrganismeInfo, f: FormationInfo, stagiaires: S
  * 6 modules × (5 QCM + 1 exercice pratique) — humanisé et différent par stagiaire.
  */
 function genPaieExerciceModule(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number, mi: number): string {
+  const modules = getModuleExercisesFor(f);
   const s = stagiaires[si] || stagiaires[0];
   const mod = modules[mi];
   const seedBase = ((s?.prenom || "").length * 17 + (s?.nom || "").length * 31 + si * 7);
@@ -16928,6 +16929,7 @@ function genPaieExerciceModule(o: OrganismeInfo, f: FormationInfo, stagiaires: S
 }
 
 function genPaieExercicesParModule(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number): string {
+  const modules = getModuleExercisesFor(f);
 
   const s = stagiaires[si] || stagiaires[0];
   const seedBase = ((s?.prenom || "").length * 17 + (s?.nom || "").length * 31 + si * 7);
