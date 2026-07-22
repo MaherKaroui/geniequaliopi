@@ -16775,7 +16775,7 @@ function genAIExercicesParJour(o: OrganismeInfo, f: FormationInfo, stagiaires: S
         totalObtained += dayObtained;
         totalMax += qcmCount;
         scoredCount++;
-        extra += `<p style="margin-top:10px;padding:8px;background:#ecfdf5;border-left:3px solid #16a34a"><strong>Score du jour : ${dayObtained}/${qcmCount}</strong> — Commentaire stagiaire : « ${humanizedQCMComment(dayObtained >= qcmCount * 0.6, s, si, di)} »</p>`;
+        extra += `<p style="margin-top:10px;padding:8px;background:#ecfdf5;border-left:3px solid #16a34a"><strong>Score du jour : ${dayObtained}/${qcmCount}</strong></p>`;
       } else {
         extra += `<p style="margin-top:10px;padding:8px;background:#fef3c7;border-left:3px solid #f59e0b"><strong>Score : ___ / ${qcmCount}</strong></p>`;
       }
