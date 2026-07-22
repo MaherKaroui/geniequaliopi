@@ -1361,8 +1361,28 @@ function getContentKey(intitule: string): string {
   if (lower.includes("intelligence artificielle") || lower.includes("ia générative") || lower.includes("contenus rédactionnels")) return "IA Générative";
   if (lower.includes("massage") || lower.includes("prénatal") || lower.includes("prenatal") || lower.includes("relaxation prénatals")) return "Massage Prénatal";
   if (lower.includes("création d'entreprise") || lower.includes("creation d'entreprise") || lower.includes("création entreprise") || lower.includes("creation entreprise") || lower.includes("créateur d'entreprise") || (lower.includes("business plan") && lower.includes("entrepre"))) return "Création Entreprise";
+  if (lower.includes("gestionnaire de paie") || lower.includes("gestionnaire paie") || (lower.includes("paie") && (lower.includes("bulletin") || lower.includes("dsn") || lower.includes("gestion")))) return "Paie";
   return "";
 }
+
+// Compétences réelles Gestionnaire de paie (130 h) — alignées sur les 6 modules
+EVAL_CONTENT["Paie"] = {
+  ...DEFAULT_CONTENT,
+  competences: [
+    "Maîtriser les fondamentaux du droit du travail (contrats, durée, période d'essai, conventions collectives)",
+    "Construire un bulletin de paie conforme (brut, cotisations, net social, net imposable, net à payer)",
+    "Calculer et contrôler les cotisations sociales (URSSAF, AGIRC-ARRCO, CSG/CRDS, PMSS)",
+    "Établir et transmettre la DSN mensuelle et événementielle sans rejet",
+    "Gérer les absences et congés payés (méthode 10e / maintien, franchise IJSS, subrogation)",
+    "Calculer les indemnités journalières de Sécurité sociale et le complément employeur",
+    "Traiter les ruptures de contrat et établir le solde de tout compte (ICCP, ILC, ICP, préavis)",
+    "Produire les documents de fin de contrat (certificat, attestation France Travail via DSN, reçu STC)",
+    "Appliquer les règles fiscales : Prélèvement à la source (PAS) et Prime de Partage de la Valeur (PPV)",
+    "Assurer la veille juridique et sociale (BOSS, Légifrance, URSSAF, conventions collectives)",
+    "Préparer et gérer un contrôle URSSAF (pièces justificatives, points de vigilance)",
+    "Respecter la confidentialité, le RGPD et le devoir de discrétion propres à la fonction paie",
+  ],
+};
 
 export function getEvalContent(formationIntitule: string): FormationEvalContent {
   const key = getContentKey(formationIntitule);
