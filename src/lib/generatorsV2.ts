@@ -1305,9 +1305,32 @@ export function genGrilleAcquisitionStagiaire(o: OrganismeInfo, f: FormationInfo
   const headers = ["", "NIVEAU", "", ""];
   const subHeaders = ["COMPÉTENCES PROFESSIONNELLES", "ACQUIS", "NON ACQUIS", "EN COURS D'ACQUISITION"];
   const termine = isFormationTerminee(f);
-  const rows = evalData.competences.map((comp) => {
+
+  // Pour les formations Paie / Secrétariat : compétences = titres des modules du support de cours.
+  const tGrille = (f.intitule || "").toLowerCase();
+  const isPaieGrille = tGrille.includes("gestionnaire de paie") || tGrille.includes("gestionnaire paie") || (tGrille.includes("paie") && (tGrille.includes("bulletin") || tGrille.includes("gestion") || tGrille.includes("dsn")));
+  const isSecretariatGrille = tGrille.includes("secrétariat") || tGrille.includes("secretariat") || tGrille.includes("secrétaire") || tGrille.includes("secretaire") || tGrille.includes("office manager") || tGrille.includes("assistanat");
+  const PAIE_MODULES = [
+    "Module 1 — Fondamentaux du droit du travail",
+    "Module 2 — Construire un bulletin de paie",
+    "Module 3 — Cotisations, DSN et déclarations",
+    "Module 4 — Absences, congés payés et IJSS",
+    "Module 5 — Rupture du contrat et STC",
+    "Module 6 — Contrôles, veille et posture pro",
+  ];
+  const SECRETARIAT_MODULES = [
+    "Module 1 — Métier, éthique et RGPD",
+    "Module 2 — Communication écrite professionnelle",
+    "Module 3 — Outils bureautiques et collaboratifs",
+    "Module 4 — Accueil, téléphone et anglais pro",
+    "Module 5 — Organisation, archivage et employabilité",
+  ];
+  const competencesGrille = isPaieGrille ? PAIE_MODULES : isSecretariatGrille ? SECRETARIAT_MODULES : evalData.competences;
+
+  const rows = competencesGrille.map((comp) => {
     return termine ? [comp, 'X', '', ''] : [comp, '', '', ''];
   });
+
 
   extra += tableHTML(subHeaders, rows);
   extra += `<p><strong>${formatDate(getStagiaireDateFin(s, f))}, par le Formateur : ${f.formateur}</strong></p>`;
