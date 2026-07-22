@@ -16842,7 +16842,76 @@ function genAIExercicesParJour(o: OrganismeInfo, f: FormationInfo, stagiaires: S
  * Exercices par module pour la formation Gestionnaire de paie.
  * 6 modules × (5 QCM + 1 exercice pratique) — humanisé et différent par stagiaire.
  */
+function genPaieExerciceModule(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number, mi: number): string {
+  const s = stagiaires[si] || stagiaires[0];
+  const mod = PAIE_MODULE_EXERCISES[mi];
+  const seedBase = ((s?.prenom || "").length * 17 + (s?.nom || "").length * 31 + si * 7);
+  const progress = PAIE_MODULE_EXERCISES.length <= 1 ? 1 : mi / (PAIE_MODULE_EXERCISES.length - 1);
+  const quality = 0.60 + progress * 0.35;
+
+  let extra = `<h2>${mod.moduleTitre}</h2>`;
+  extra += `<p><strong>Stagiaire :</strong> ${s.civilite ? s.civilite + " " : ""}${s.prenom} ${s.nom}<br>
+    <strong>Formation :</strong> ${f.intitule}<br>
+    <strong>Période :</strong> du ${formatDate(getStagiaireDateDebut(s, f))} au ${formatDate(getStagiaireDateFin(s, f))}<br>
+    <strong>Format :</strong> 5 QCM ciblés + 1 exercice pratique corrigé</p>`;
+
+  // QCM
+  const targetCorrect = Math.max(3, Math.min(5, Math.round(3 + progress * 2)));
+  const wrongCount = mod.qcm.length - targetCorrect;
+  const wrongSet = new Set<number>();
+  let k = 0;
+  while (wrongSet.size < wrongCount && k < mod.qcm.length * 6) {
+    wrongSet.add((seedBase + mi * 7 + k * 11) % mod.qcm.length);
+    k++;
+  }
+  let qcmObtained = 0;
+  extra += `<h3 style="color:#1e40af">QCM du module (5 questions)</h3>`;
+  mod.qcm.forEach((q, qi) => {
+    const correct = !wrongSet.has(qi);
+    const chosenIdx = correct
+      ? q.correctIndex
+      : [0, 1, 2, 3].filter((x) => x !== q.correctIndex)[(seedBase + mi + qi) % 3];
+    if (correct) qcmObtained++;
+    const options = q.options.map((opt, oi) => {
+      const isChosen = oi === chosenIdx;
+      const isRight = oi === q.correctIndex;
+      return `<li style="${isChosen ? "font-weight:700" : ""}${isRight ? ";color:#15803d" : ""}">
+        ${isChosen ? "☒" : "☐"} ${String.fromCharCode(65 + oi)}. ${opt}${isRight ? " <em style='color:#15803d'>(bonne réponse)</em>" : ""}
+      </li>`;
+    }).join("");
+    extra += `<div style="margin:6px 0;padding:8px;border-left:3px solid ${correct ? "#16a34a" : "#dc2626"};background:#f8fafc">
+      <p style="margin:0 0 4px 0"><strong>Q${qi + 1}.</strong> ${q.question}</p>
+      <ul style="margin:4px 0 6px 22px;padding:0">${options}</ul>
+      <p style="margin:4px 0 0 0;font-size:0.9em"><em>Réponse stagiaire :</em> ${String.fromCharCode(65 + chosenIdx)} — ${correct ? "<span style='color:#15803d'>Correcte ✓</span>" : "<span style='color:#dc2626'>Incorrecte ✗</span>"} — « ${humanizedQCMComment(correct, s, si, mi * 10 + qi)} »</p>
+    </div>`;
+  });
+  extra += `<p style="padding:8px;background:#ecfdf5;border-left:3px solid #16a34a"><strong>Score QCM : ${qcmObtained}/${mod.qcm.length}</strong></p>`;
+
+  // Exercice pratique
+  const exo = mod.exercice;
+  const note = noteForDayProgression(exo.points, mi, PAIE_MODULE_EXERCISES.length, s, si);
+  const answer = humanizedStudentAnswer(exo.reponseAttendue, s, si, mi * 13 + 3, quality);
+  const feedback = humanizedTeacherFeedback(note, exo.points, s, si, mi * 13 + 3);
+  extra += `<h3 style="color:#1e40af">Exercice pratique — ${exo.titre} (${exo.points} pts)</h3>
+    <div style="padding:10px;border-left:3px solid #3b82f6;background:#f8fafc">
+      <p><em>Consigne :</em> ${exo.consigne}</p>
+      <p style="padding:6px;background:#fff;border-left:2px solid #64748b"><em>Production stagiaire :</em><br>${answer.replace(/\n/g, "<br>")}</p>
+      <p style="padding:6px;background:#f0fdf4;border-left:2px solid #16a34a"><em>Corrigé attendu :</em><br>${exo.reponseAttendue}</p>
+      <p><strong>Note : ${note}/${exo.points}</strong> — <em>${feedback}</em></p>
+    </div>`;
+
+  const modObt = qcmObtained + note;
+  const modMax = mod.qcm.length + exo.points;
+  extra += `<p style="margin-top:12px;padding:8px;background:#dbeafe;border-left:3px solid #1e40af"><strong>Score total du module : ${modObt}/${modMax}</strong></p>`;
+
+  return buildDocument({
+    org: o, title: `EXERCICES — ${mod.moduleTitre}`, subtitle: `${s.prenom} ${s.nom} – ${f.intitule}`, formation: f, showFormationInfo: false, stagiaires: [s], extraHtml: extra,
+    signatures: { type: "2", labels: ["Le Stagiaire", "Le Formateur"], names: [`${s.prenom} ${s.nom}`, f.formateur] },
+  });
+}
+
 function genPaieExercicesParModule(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number): string {
+
   const s = stagiaires[si] || stagiaires[0];
   const seedBase = ((s?.prenom || "").length * 17 + (s?.nom || "").length * 31 + si * 7);
 
