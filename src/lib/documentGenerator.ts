@@ -3479,9 +3479,7 @@ function genTestPositionnementIndividuel(o: OrganismeInfo, f: FormationInfo, s: 
     const ans = answers[qi];
     const appreciation = generateQuestionAppreciation(ans.score, qi, si, isDebut, s);
     extra += `<p><strong>${qi + 1}.</strong> ${q.question}</p>`;
-    if (isDebut && q.reponseAttendue) {
-      extra += `<p style="background:#f3f4f6;padding:8px;border-left:3px solid #9ca3af"><strong>Proposition de réponse attendue :</strong> ${q.reponseAttendue}</p>`;
-    }
+
     extra += `<p><strong>Réponse du stagiaire :</strong> ${ans.reponse}</p>`;
     extra += `<p><em><strong>Appréciation du formateur :</strong> ${ans.feedback} (${ans.score} / 1). ${appreciation}</em></p>`;
     if (qi < questions.length - 1) extra += `<br>`;
