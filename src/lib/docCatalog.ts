@@ -187,9 +187,10 @@ export function buildFullCatalog(
         const evalData = getEvalContent(f.intitule);
         const nbExContent = evalData?.exercices?.length || 0;
 
-        // Formation Gestionnaire de paie : 1 fichier = 1 module (5 QCM + 1 exercice pratique).
+        // Formation Gestionnaire de paie / Secrétariat : 1 fichier = 1 module (5 QCM + 1 exercice pratique).
         const tPaie = (f.intitule || "").toLowerCase();
         const isPaieForm = tPaie.includes("gestionnaire de paie") || tPaie.includes("gestionnaire paie") || (tPaie.includes("paie") && (tPaie.includes("bulletin") || tPaie.includes("gestion") || tPaie.includes("dsn")));
+        const isSecretariatForm = tPaie.includes("secrétariat") || tPaie.includes("secretariat") || tPaie.includes("secrétaire") || tPaie.includes("secretaire") || tPaie.includes("office manager") || tPaie.includes("assistanat");
         const PAIE_MODULE_TITLES = [
           "Fondamentaux du droit du travail",
           "Construire un bulletin de paie",
@@ -198,21 +199,28 @@ export function buildFullCatalog(
           "Rupture du contrat et STC",
           "Contrôles, veille et posture pro",
         ];
+        const SECRETARIAT_MODULE_TITLES = [
+          "Métier, éthique et RGPD",
+          "Communication écrite professionnelle",
+          "Outils bureautiques et collaboratifs",
+          "Accueil, téléphone et anglais pro",
+          "Organisation, archivage et employabilité",
+        ];
+        const moduleTitles = isPaieForm ? PAIE_MODULE_TITLES : isSecretariatForm ? SECRETARIAT_MODULE_TITLES : null;
 
         let nbQcm: number;
-        if (isPaieForm) {
-          nbQcm = PAIE_MODULE_TITLES.length;
+        if (moduleTitles) {
+          nbQcm = moduleTitles.length;
         } else if (hasBlocs) {
           nbQcm = rncp!.blocsCompetences.length;
         } else {
-          // Strict : 1 exercice par jour de formation (plafonné si le contenu eval est plus court)
           nbQcm = Math.max(1, nbJours);
         }
         for (let exIdx = 0; exIdx < nbQcm; exIdx++) {
-          if (isPaieForm) {
+          if (moduleTitles) {
             add(
               `af_c3i11_exercices_${fi}_${si}_ex${exIdx}`,
-              `CT3 - IND 11 EXERCICES MODULE ${exIdx + 1} — ${PAIE_MODULE_TITLES[exIdx]} – ${s.prenom} ${s.nom}`,
+              `CT3 - IND 11 EXERCICES MODULE ${exIdx + 1} — ${moduleTitles[exIdx]} – ${s.prenom} ${s.nom}`,
               3, 11, "exercices_stagiaire",
               { fi, stagiaireIdx: si, exerciceIdx: exIdx }
             );
