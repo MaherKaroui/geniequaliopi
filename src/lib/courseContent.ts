@@ -275,6 +275,7 @@ export function getYoutubeVideos(formationIntitule: string): CourseData['youtube
   if (t.includes('word')) return YOUTUBE_WORD;
   if (t.includes('powerpoint') || t.includes('ppt')) return YOUTUBE_POWERPOINT;
   if (t.includes('bureautique') || t.includes('pack office') || t.includes('office 365') || t.includes('microsoft 365')) return YOUTUBE_BUREAUTIQUE;
+  if (t.includes('gestionnaire de paie') || t.includes('gestionnaire paie') || (t.includes('paie') && (t.includes('bulletin') || t.includes('gestion')))) return YOUTUBE_PAIE;
   // Langues
   if ((t.includes('anglais') || t.includes('english')) && (t.includes('a1') || t.includes('débutant'))) return YOUTUBE_ANGLAIS_A1;
   if (t.includes('vtest') || t.includes('v-test') || t.includes('rs6905')) return YOUTUBE_ANGLAIS;
