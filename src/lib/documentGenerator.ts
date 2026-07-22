@@ -354,9 +354,7 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
     case "ai_exercices_par_jour": {
       const si = params?.stagiaireIdx ?? 0;
       const di = typeof params?.dayIdx === "number" ? params.dayIdx : undefined;
-      const t = (f.intitule || "").toLowerCase();
-      const isPaie = t.includes("gestionnaire de paie") || t.includes("gestionnaire paie") || (t.includes("paie") && (t.includes("bulletin") || t.includes("gestion") || t.includes("dsn")));
-      if (isPaie) return genPaieExercicesParModule(o, f, stagiaires, si);
+      if (isModuleExercisesFormation(f)) return genPaieExercicesParModule(o, f, stagiaires, si);
       return genAIExercicesParJour(o, f, stagiaires, si, di);
     }
     case "ai_evaluation_finale": {
