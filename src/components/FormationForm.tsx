@@ -230,6 +230,17 @@ const FormationForm = ({ data, onChange, onImportStagiaires, onApplyOrganisme }:
         }
         toast.success(`Organisme MAISON HSY BEAUTÉ + 6 stagiaires Maquilleur Pro importés`);
       }
+      // Auto-import organisme + 6 stagiaires + pré-remplissage IA pour Gestionnaire de paie
+      if (selected.intitule.toLowerCase().includes("gestionnaire de paie")) {
+        if (onApplyOrganisme) {
+          onApplyOrganisme({ ...PAIE_ORG });
+        }
+        if (onImportStagiaires) {
+          onImportStagiaires([...STAGIAIRES_PAIE]);
+        }
+        seedPaieAICaches();
+        toast.success(`Organisme IZIBUSINESS + 6 stagiaires + contenus IA (besoins, exercices, veilles) pré-remplis`);
+      }
     }
   };
 
