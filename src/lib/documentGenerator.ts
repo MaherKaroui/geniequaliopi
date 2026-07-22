@@ -16775,7 +16775,7 @@ function genAIExercicesParJour(o: OrganismeInfo, f: FormationInfo, stagiaires: S
         totalObtained += dayObtained;
         totalMax += qcmCount;
         scoredCount++;
-        extra += `<p style="margin-top:10px;padding:8px;background:#ecfdf5;border-left:3px solid #16a34a"><strong>Score du jour : ${dayObtained}/${qcmCount}</strong> — Commentaire stagiaire : « ${humanizedQCMComment(dayObtained >= qcmCount * 0.6, s, si, di)} »</p>`;
+        extra += `<p style="margin-top:10px;padding:8px;background:#ecfdf5;border-left:3px solid #16a34a"><strong>Score du jour : ${dayObtained}/${qcmCount}</strong></p>`;
       } else {
         extra += `<p style="margin-top:10px;padding:8px;background:#fef3c7;border-left:3px solid #f59e0b"><strong>Score : ___ / ${qcmCount}</strong></p>`;
       }
@@ -16882,7 +16882,8 @@ function genPaieExerciceModule(o: OrganismeInfo, f: FormationInfo, stagiaires: S
     extra += `<div style="margin:6px 0;padding:8px;border-left:3px solid ${correct ? "#16a34a" : "#dc2626"};background:#f8fafc">
       <p style="margin:0 0 4px 0"><strong>Q${qi + 1}.</strong> ${q.question}</p>
       <ul style="margin:4px 0 6px 22px;padding:0">${options}</ul>
-      <p style="margin:4px 0 0 0;font-size:0.9em"><em>Réponse stagiaire :</em> ${String.fromCharCode(65 + chosenIdx)} — ${correct ? "<span style='color:#15803d'>Correcte ✓</span>" : "<span style='color:#dc2626'>Incorrecte ✗</span>"} — « ${humanizedQCMComment(correct, s, si, mi * 10 + qi)} »</p>
+      <p style="margin:4px 0 0 0;font-size:0.9em"><em>Réponse stagiaire :</em> ${String.fromCharCode(65 + chosenIdx)} — ${correct ? "<span style='color:#15803d'>Correcte ✓</span>" : "<span style='color:#dc2626'>Incorrecte ✗</span>"}</p>
+
     </div>`;
   });
   extra += `<p style="padding:8px;background:#ecfdf5;border-left:3px solid #16a34a"><strong>Score QCM : ${qcmObtained}/${mod.qcm.length}</strong></p>`;
@@ -16964,7 +16965,7 @@ function genPaieExercicesParModule(o: OrganismeInfo, f: FormationInfo, stagiaire
       extra += `<div style="margin:6px 0;padding:8px;border-left:3px solid ${correct ? "#16a34a" : "#dc2626"};background:#f8fafc">
         <p style="margin:0 0 4px 0"><strong>Q${qi + 1}.</strong> ${q.question}</p>
         <ul style="margin:4px 0 6px 22px;padding:0">${options}</ul>
-        <p style="margin:4px 0 0 0;font-size:0.9em"><em>Réponse stagiaire :</em> ${String.fromCharCode(65 + chosenIdx)} — ${correct ? "<span style='color:#15803d'>Correcte ✓</span>" : "<span style='color:#dc2626'>Incorrecte ✗</span>"} — « ${humanizedQCMComment(correct, s, si, mi * 10 + qi)} »</p>
+        <p style="margin:4px 0 0 0;font-size:0.9em"><em>Réponse stagiaire :</em> ${String.fromCharCode(65 + chosenIdx)} — ${correct ? "<span style='color:#15803d'>Correcte ✓</span>" : "<span style='color:#dc2626'>Incorrecte ✗</span>"}</p>
       </div>`;
     });
     extra += `<p style="margin:8px 0;padding:8px;background:#ecfdf5;border-left:3px solid #16a34a"><strong>Score QCM : ${qcmObtained}/${mod.qcm.length}</strong></p>`;
