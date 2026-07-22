@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Upload, Sparkles, Loader2, RefreshCw, FileDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { SAMPLE_FORMATIONS, STAGIAIRES_BAC_PRO_LOGISTIQUE, STAGIAIRES_HEXAGONE_GOTRM, HEXAGONE_FORMATION_ORG, MAISON_HSY_ORG, STAGIAIRES_MAQUILLEUR_PRO } from "@/lib/sampleData";
+import { SAMPLE_FORMATIONS, STAGIAIRES_BAC_PRO_LOGISTIQUE, STAGIAIRES_HEXAGONE_GOTRM, HEXAGONE_FORMATION_ORG, MAISON_HSY_ORG, STAGIAIRES_MAQUILLEUR_PRO, PAIE_ORG, STAGIAIRES_PAIE, seedPaieAICaches } from "@/lib/sampleData";
 import { parseEdofXlsx, EdofSession } from "@/lib/edofParser";
 import { RNCP_FICHES } from "@/lib/rncpData";
 import { supabase } from "@/integrations/supabase/client";
