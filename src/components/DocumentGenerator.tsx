@@ -941,7 +941,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
         } else if (hasStagiaireIdx) {
           const si = doc.params!.stagiaireIdx as number;
           const stagiaire = allStagiaires[si] || allStagiaires[0];
-          const stagFolder = basePath;
+          const stagFolder = `${basePath}/${buildStagiaireFolderName(stagiaire)}`;
 
           if (doc.template === "cerfa_apprentissage") {
             await safeRun(`${doc.nom} (${stagiaire.nom})`, async () => {
@@ -997,7 +997,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
         } else if (isPerStagiaire) {
           for (let si = 0; si < allStagiaires.length; si++) {
             const stagiaire = allStagiaires[si];
-            const stagFolder = basePath;
+            const stagFolder = `${basePath}/${buildStagiaireFolderName(stagiaire)}`;
             await safeRun(`${doc.nom} (${stagiaire.nom})`, async () => {
               const content = generateContent(doc, si);
               if (exportFormat === "pdf") {
@@ -1151,7 +1151,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
         } else if (hasStagiaireIdx) {
           const si = doc.params!.stagiaireIdx as number;
           const stagiaire = allStagiaires[si] || allStagiaires[0];
-          const stagFolder = basePath;
+          const stagFolder = `${basePath}/${buildStagiaireFolderName(stagiaire)}`;
 
           if (doc.template === "cerfa_apprentissage") {
             const blob = await genCerfaApprentissagePdf(mergedOrganisme, selectedFormation, stagiaire);
@@ -1188,7 +1188,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
         } else if (isPerStagiaire) {
           for (let si = 0; si < allStagiaires.length; si++) {
             const stagiaire = allStagiaires[si];
-            const stagFolder = basePath;
+            const stagFolder = `${basePath}/${buildStagiaireFolderName(stagiaire)}`;
             const content = generateContent(doc, si);
             if (exportFormat === "pdf") {
               zip.file(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, ".pdf")}`, await htmlToPdfBlob(content, bulkPdfOptions));
@@ -1292,7 +1292,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
         } else if (hasStagiaireIdx) {
           const si = doc.params!.stagiaireIdx as number;
           const stagiaire = allStagiaires[si] || allStagiaires[0];
-          const stagFolder = basePath;
+          const stagFolder = `${basePath}/${buildStagiaireFolderName(stagiaire)}`;
 
           if (doc.template === "cerfa_apprentissage") {
             const blob = await genCerfaApprentissagePdf(mergedOrganisme, selectedFormation, stagiaire);
@@ -1329,7 +1329,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
         } else if (isPerStagiaire) {
           for (let si = 0; si < allStagiaires.length; si++) {
             const stagiaire = allStagiaires[si];
-            const stagFolder = basePath;
+            const stagFolder = `${basePath}/${buildStagiaireFolderName(stagiaire)}`;
             const content = generateContent(doc, si);
             if (exportFormat === "pdf") {
               zip.file(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, ".pdf")}`, await htmlToPdfBlob(content, bulkPdfOptions));
@@ -1419,7 +1419,7 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
             if (isPerStagiaire) {
               for (let si = 0; si < allStagiaires.length; si++) {
                 const stagiaire = allStagiaires[si];
-                const stagFolder = basePath;
+                const stagFolder = `${basePath}/${buildStagiaireFolderName(stagiaire)}`;
                 const content = generateContent(doc, si);
                 if (exportFormat === "pdf") {
                   zip.file(`${stagFolder}/${buildCatalogFileName(doc, stagiaire, ".pdf")}`, await htmlToPdfBlob(content));
