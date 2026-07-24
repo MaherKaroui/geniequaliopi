@@ -53,6 +53,7 @@ import { auditImportedFolder, ImportAuditResult } from "@/lib/importInspector";
 import {
   buildDocumentFileName,
   buildGenericFileName,
+  buildStagiaireFolderName,
   ExportFormat,
   getPreferredExtension,
   PER_STAGIAIRE_TEMPLATES,
