@@ -291,7 +291,7 @@ export function getYoutubeVideos(formationIntitule: string): CourseData['youtube
   if (t.includes('powerpoint') || t.includes('ppt')) return YOUTUBE_POWERPOINT;
   if (t.includes('bureautique') || t.includes('pack office') || t.includes('office 365') || t.includes('microsoft 365')) return YOUTUBE_BUREAUTIQUE;
   if (t.includes('gestionnaire de paie') || t.includes('gestionnaire paie') || (t.includes('paie') && (t.includes('bulletin') || t.includes('gestion')))) return YOUTUBE_PAIE;
-  if (t.includes('secrétariat') || t.includes('secretariat') || t.includes('secrétaire') || t.includes('secretaire') || t.includes('office manager') || t.includes('assistanat')) return YOUTUBE_BUREAUTIQUE;
+  if (t.includes('secrétariat') || t.includes('secretariat') || t.includes('assistanat') || (t.includes('secrétaire') && !t.includes('médic')) || (t.includes('secretaire') && !t.includes('medic'))) return YOUTUBE_SECRETARIAT;
   // NB: getSecretariatChapters imported below alongside other chapters
   // Langues
   if ((t.includes('anglais') || t.includes('english')) && (t.includes('a1') || t.includes('débutant'))) return YOUTUBE_ANGLAIS_A1;
