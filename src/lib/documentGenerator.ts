@@ -10156,7 +10156,7 @@ function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: 
       `Notre objectif est de professionnaliser ${s.prenom} sur la lecture et la production d'un bulletin de paie, la maîtrise des cotisations URSSAF / AGIRC-ARRCO / CSG-CRDS, et la fiabilisation de la DSN mensuelle.`,
       `Nous souhaitons que ${s.prenom} monte en compétences sur Silae (ou équivalent) pour reprendre progressivement en interne la paie aujourd'hui sous-traitée à un cabinet, avec un doublon de 3 mois puis une bascule complète.`,
       `Cette formation doit permettre à ${s.prenom} d'être capable de répondre de manière fiable aux questions des salariés sur leur bulletin (net à payer, prélèvement à la source, absences, primes) et de sécuriser nos obligations sociales déclaratives.`,
-      `Nous attendons un(e) collaborateur(trice) opérationnel(le) sur un portefeuille jusqu'à 35 salariés (multi-conventions collectives), capable de gérer les entrées/sorties, les STC et les régularisations en toute autonomie.`,
+      `Nous attendons ${s.civilite === "Mme" ? "une collaboratrice opérationnelle" : "un collaborateur opérationnel"} sur un portefeuille jusqu'à 35 salariés (multi-conventions collectives), capable de gérer les entrées/sorties, les STC et les régularisations en toute autonomie.`,
     ];
     const paieMissions = [
       `${s.prenom} occupe aujourd'hui un poste d'assistant(e) RH / administratif : gestion des contrats, absences, tickets restaurant. La paie étant sous-traitée, nous souhaitons la réinternaliser et confier la production des bulletins et la DSN à ${s.prenom} à l'issue de la formation.`,
@@ -10302,11 +10302,11 @@ function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: 
       `${s.prenom} démarrera comme chauffeur affilié sur Uber et Bolt sous notre licence, avec un objectif de bascule progressive vers une activité d'autoentrepreneur indépendant en partenariat avec la société.`,
     ];
     const vtcContribution = [
-      `Cette formation nous permet de renforcer notre flotte avec un(e) conducteur(trice) qualifié(e), dans un secteur en demande continue (mobilité urbaine, aéroports) où l'offre de chauffeurs disponibles reste insuffisante.`,
+      `Cette formation nous permet de renforcer notre flotte avec ${s.civilite === "Mme" ? "une conductrice qualifiée" : "un conducteur qualifié"}, dans un secteur en demande continue (mobilité urbaine, aéroports) où l'offre de chauffeurs disponibles reste insuffisante.`,
       `L'obtention de la carte VTC par ${s.prenom} sécurise son immatriculation au registre EVTC et donc sa capacité à travailler pour notre compte pendant les 5 prochaines années sans risque réglementaire.`,
       `Cette formation s'inscrit dans notre stratégie de développement : professionnaliser nos chauffeurs pour améliorer la satisfaction client, la note moyenne sur les plateformes et le taux de fidélisation.`,
       `Former ${s.prenom} nous permet de disposer d'un conducteur combinant maîtrise de la conduite, sens du contact client et rigueur administrative, profil recherché pour notre segment premium.`,
-      `Le secteur VTC est en forte croissance (+12 % par an en Île-de-France) et cette formation nous positionne pour capter cette progression avec un(e) collaborateur(trice) opérationnel(le) rapidement.`,
+      `Le secteur VTC est en forte croissance (+12 % par an en Île-de-France) et cette formation nous positionne pour capter cette progression avec ${s.civilite === "Mme" ? "une collaboratrice opérationnelle" : "un collaborateur opérationnel"} rapidement.`,
     ];
     const vtcObjectif = [
       `Obtenir ma carte professionnelle VTC et démarrer une activité de conducteur indépendant à temps plein dans les 60 jours suivant la fin de la formation.`,
