@@ -10231,6 +10231,79 @@ function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: 
     };
   }
 
+  // === Early return : TP GOTRM (exploitant transport routier de marchandises) ===
+  if (isGOTRM) {
+    const isF = s.civilite === "Mme";
+    const collab = isF ? "une collaboratrice opérationnelle" : "un collaborateur opérationnel";
+    const gotrmAttentes = [
+      `Nous attendons que ${s.prenom} devienne autonome sur la construction d'un PRK fiable et sur l'établissement de propositions tarifaires cohérentes, afin de sécuriser la marge sur chaque devis transport.`,
+      `Notre objectif est que ${s.prenom} maîtrise le règlement (CE) 561/2006 côté exploitant : construction des plans de marche, respect des temps de conduite / repos et suivi du chronotachygraphe pour l'ensemble de nos conducteurs.`,
+      `Cette formation doit permettre à ${s.prenom} de gérer sereinement les litiges CMR (avaries, retards, manquants) : rédaction des réserves, calcul de l'indemnisation au plafond 8,33 DTS/kg, interface assureur.`,
+      `Nous souhaitons que ${s.prenom} monte en compétences sur le contrôle des sous-traitants (licence, capacité, RC, vigilance URSSAF L8222-1) pour sécuriser notre chaîne d'affrètement et éviter tout redressement.`,
+      `À l'issue du parcours, nous attendons ${collab} sur l'exploitation d'une flotte de 10 à 15 véhicules : plan de tournée, affectation conducteurs, suivi KPI (OTIF, taux retour vide, consommation) et reporting mensuel à la direction.`,
+      `Notre objectif est que ${s.prenom} exploite pleinement notre TMS (Akanea) et une bourse de fret (B2Pweb / Teleroute) afin de réduire les retours à vide et d'améliorer la marge par kilomètre.`,
+    ];
+    const gotrmMissions = [
+      `${s.prenom} occupe aujourd'hui un poste d'assistant(e) d'exploitation : saisie des ordres de transport, suivi administratif des conducteurs, gestion documentaire (CMR, bons de livraison). La formation lui permettra de basculer sur un poste d'exploitant à part entière.`,
+      `Actuellement conducteur SPL avec plus de 5 ans d'expérience terrain, ${s.prenom} évolue vers le bureau d'exploitation. Après la formation, ses missions couvriront la planification, l'affectation, la gestion des aléas et la relation clients / conducteurs.`,
+      `${s.prenom} intervient en soutien du chef d'exploitation : préparation des plannings, suivi des heures, traitement des litiges de premier niveau, mise à jour des tableaux de bord. Objectif à 12 mois : autonomie complète sur un portefeuille de 12 véhicules.`,
+      `Au sein de la structure, ${s.prenom} pilote les affrètements ponctuels : recherche de sous-traitants, négociation tarifaire, contrôle documentaire, suivi qualité. La formation viendra structurer et sécuriser cette activité.`,
+      `${s.prenom} prépare la reprise de l'entreprise familiale de transport (8 véhicules, 12 salariés). La formation TP GOTRM lui apportera la double compétence exploitation + gestion indispensable pour piloter durablement l'activité.`,
+    ];
+    const gotrmContribution = [
+      `Disposer en interne d'un(e) exploitant(e) qualifié(e) TP-01329 nous permet de réduire notre dépendance aux intérimaires du secteur (coût horaire élevé, turn-over) et de professionnaliser durablement notre bureau d'exploitation.`,
+      `La montée en compétences de ${s.prenom} sur le PRK et la tarification va directement améliorer notre marge : sur les 12 derniers mois, nous estimons à ~4 % la perte liée à des devis sous-évalués — objectif : diviser ce chiffre par deux.`,
+      `Réduire le taux de retour à vide de 22 % à 15 % représente pour notre structure environ 45 k€ de marge annuelle supplémentaire, et cette compétence est au cœur de la formation.`,
+      `Cette formation sécurise notre conformité réglementaire (RSE 561/2006, contrôle sous-traitants, licences) sur un secteur très contrôlé (DREAL, URSSAF, Inspection du travail) où le moindre manquement coûte cher.`,
+      `${s.prenom} deviendra la personne référente exploitation, ce qui permet au dirigeant de se recentrer sur le développement commercial et la relation grands comptes, aujourd'hui négligés faute de temps.`,
+    ];
+    const gotrmObjectif = [
+      "Valider le TP GOTRM (RNCP 40990, niveau 5) pour prendre officiellement le poste d'exploitant transport dans ma structure, avec la revalorisation salariale associée.",
+      "Décrocher le titre pour créer ma propre société de transport (SASU, ouverture licence LTI + capacité transport par équivalence), avec un démarrage envisagé sur 3 tractions.",
+      "Passer chef d'exploitation à 12 mois : encadrer 2 exploitants juniors, être garant du planning, des KPI et de la relation clients stratégiques.",
+      "Maîtriser un TMS (Akanea) et une bourse de fret (B2Pweb) au point de pouvoir refondre entièrement les outils actuels et former mes collègues à leur bonne utilisation.",
+      "Sécuriser mon dossier de MSP (Mise en Situation Professionnelle) et réussir l'entretien technique du jury : c'est mon objectif prioritaire de la formation.",
+    ];
+    const gotrmProjetPro = [
+      "Le métier d'exploitant transport est en forte tension (fiche ROME N1301, +22 % d'offres en 2025 selon France Travail) et rémunérateur (32-45 k€ brut selon ancienneté). C'est un choix pragmatique et durable.",
+      "Après 6 ans au volant, je veux basculer côté bureau tout en restant dans le métier que je connais. La formation TP GOTRM est la voie la plus reconnue pour cette transition conducteur → exploitant.",
+      "Créer ma boîte de transport est un projet mûri depuis 3 ans. Le titre me donne à la fois la capacité professionnelle et les compétences de gestion indispensables pour ne pas déposer le bilan à 18 mois.",
+      "Reprendre l'entreprise familiale sans être formé sérieusement à l'exploitation et à la réglementation serait un pari risqué : cette formation sécurise la transmission.",
+      "Le titre TP-01329 me permet de candidater sur des postes d'exploitant confirmé chez les grands donneurs d'ordre (Geodis, XPO, Kuehne+Nagel) qui exigent une certification reconnue.",
+    ];
+    const gotrmDiplomes = [
+      "Baccalauréat professionnel Logistique + expérience conducteur SPL (permis CE + FIMO/FCO à jour)",
+      "CAP Conduite Routière + 8 ans d'expérience conducteur PL/SPL",
+      "Baccalauréat général + BTS Gestion des transports et logistique associée (GTLA) partiellement validé",
+      "Titre professionnel Conducteur du Transport Routier de Marchandises sur tous véhicules + 5 ans d'expérience terrain",
+      "Baccalauréat professionnel Transport + première expérience en tant qu'agent d'exploitation junior",
+    ];
+    const gotrmHandicap = isStagiairePSH(s)
+      ? [
+          "Oui, je suis reconnu(e) travailleur handicapé (RQTH). Le métier d'exploitant est compatible (travail sur écran, station assise). Je sollicite un temps majoré sur les évaluations et un entretien préalable avec le référent handicap.",
+          "Oui, RQTH en cours de validité. J'ai échangé avec le référent handicap : aménagements confirmés (temps majoré QCM, supports numériques, pauses régulières) et pas de restriction pour la MSP.",
+        ]
+      : [
+          "Non, je ne suis pas en situation de handicap et aucun aménagement particulier n'est nécessaire.",
+          "Non. Aucun handicap déclaré, je suis autonome sur toutes les modalités (présentiel, distanciel, MSP, entretien jury).",
+          "Non. Je vous informerai immédiatement si un besoin d'adaptation apparaissait pendant la formation.",
+        ];
+    return {
+      civilite,
+      raisonSociale: hasEntreprise ? s.entreprise : "/",
+      attentes: [gotrmAttentes[h(1) % gotrmAttentes.length], gotrmAttentes[h(2) % gotrmAttentes.length]].join(" "),
+      missions: gotrmMissions[h(4) % gotrmMissions.length],
+      contribution: gotrmContribution[h(5) % gotrmContribution.length],
+      diplome: gotrmDiplomes[h(6) % gotrmDiplomes.length],
+      objectif: gotrmObjectif[h(7) % gotrmObjectif.length],
+      budget: "Formation prise en charge dans le cadre du CPF (Compte Personnel de Formation) mobilisé par le/la bénéficiaire, avec possible abondement France Travail (AIF) au titre du projet d'évolution vers un métier en tension.",
+      projetPro: gotrmProjetPro[h(8) % gotrmProjetPro.length],
+      handicap: gotrmHandicap[h(9) % gotrmHandicap.length],
+    };
+  }
+
+
+
   // === Early return : VTC (cohérent avec le métier de conducteur VTC) ===
 
   if (isVTC) {
