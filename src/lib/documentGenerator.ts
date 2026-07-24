@@ -10306,7 +10306,7 @@ function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: 
       `L'obtention de la carte VTC par ${s.prenom} sécurise son immatriculation au registre EVTC et donc sa capacité à travailler pour notre compte pendant les 5 prochaines années sans risque réglementaire.`,
       `Cette formation s'inscrit dans notre stratégie de développement : professionnaliser nos chauffeurs pour améliorer la satisfaction client, la note moyenne sur les plateformes et le taux de fidélisation.`,
       `Former ${s.prenom} nous permet de disposer d'un conducteur combinant maîtrise de la conduite, sens du contact client et rigueur administrative, profil recherché pour notre segment premium.`,
-      `Le secteur VTC est en forte croissance (+12 % par an en Île-de-France) et cette formation nous positionne pour capter cette progression avec un(e) collaborateur(trice) opérationnel(le) rapidement.`,
+      `Le secteur VTC est en forte croissance (+12 % par an en Île-de-France) et cette formation nous positionne pour capter cette progression avec ${s.civilite === "Mme" ? "une collaboratrice opérationnelle" : "un collaborateur opérationnel"} rapidement.`,
     ];
     const vtcObjectif = [
       `Obtenir ma carte professionnelle VTC et démarrer une activité de conducteur indépendant à temps plein dans les 60 jours suivant la fin de la formation.`,
