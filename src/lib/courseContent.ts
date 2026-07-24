@@ -153,6 +153,21 @@ const YOUTUBE_VTC: CourseData['youtubeVideos'] = [
   { title: "Plateformes VTC – Uber, Bolt, Heetch comparées", url: "https://www.youtube.com/watch?v=jWgMm5EjXE0", description: "Analyse des principales plateformes VTC : commissions, conditions, droits du chauffeur." },
 ];
 
+const YOUTUBE_GOTRM: CourseData['youtubeVideos'] = [
+  { title: "Le métier d'exploitant transport routier — fiche métier AFT", url: "https://www.youtube.com/results?search_query=exploitant+transport+routier+m%C3%A9tier+aft", description: "Missions, journée type, compétences clés, salaires et perspectives d'évolution du poste d'exploitant TRM." },
+  { title: "Règlement (CE) 561/2006 — Temps de conduite et repos", url: "https://www.youtube.com/results?search_query=r%C3%A8glement+561+2006+temps+conduite+repos", description: "9 h/jour, pause 45 min après 4h30, repos 11 h, hebdo 45 h, bi-hebdo 90 h : décryptage complet et cas pratiques." },
+  { title: "Calcul du PRK — méthode complète avec fichier Excel", url: "https://www.youtube.com/results?search_query=calcul+PRK+transport+routier+excel", description: "Coûts fixes / variables / km, base annuelle, marge cible : construire son PRK étape par étape." },
+  { title: "Convention CMR — indemnisation avarie et retard", url: "https://www.youtube.com/results?search_query=convention+CMR+indemnisation+avarie+retard", description: "Plafond 8,33 DTS/kg, déclaration d'intérêt spécial, réserves à la livraison, jurisprudence." },
+  { title: "TMS Akanea Transport — démonstration exploitation", url: "https://www.youtube.com/results?search_query=akanea+transport+d%C3%A9mo+TMS", description: "Le TMS leader en France : gestion de commande, planning, dispatch, facturation." },
+  { title: "Bourse de fret B2Pweb — réduire les retours à vide", url: "https://www.youtube.com/results?search_query=b2pweb+bourse+fret+tutoriel", description: "Publier une capacité, prendre un fret, négocier — optimiser ses tractions retour." },
+  { title: "Contrôle sous-traitants transport — obligations donneur d'ordre", url: "https://www.youtube.com/results?search_query=contr%C3%B4le+sous+traitant+transport+urssaf+vigilance", description: "Vigilance URSSAF L8222-1, licence communautaire, capacité pro, RC : les contrôles obligatoires." },
+  { title: "Titre professionnel GOTRM — session d'examen TP-01329", url: "https://www.youtube.com/results?search_query=titre+professionnel+GOTRM+session+examen", description: "MSP 10 h en 2 parties, entretien technique 1 h, questionnement 30 min, entretien final 30 min." },
+  { title: "Optimisation de tournée avec PTV Route Optimizer", url: "https://www.youtube.com/results?search_query=PTV+route+optimizer+tourn%C3%A9e", description: "Réduire les km parcourus et le temps de conduite grâce à l'algorithme d'optimisation." },
+  { title: "Indices CNR — indexation gazole et longue distance", url: "https://www.youtube.com/results?search_query=indices+CNR+indexation+gazole", description: "Comprendre les indices publiés mensuellement et les intégrer aux contrats de transport." },
+];
+
+
+
 const YOUTUBE_COMMERCIAL: CourseData['youtubeVideos'] = [
   { title: "Techniques de prospection commerciale – Guide complet", url: "https://www.youtube.com/watch?v=uQk8PaFQ5ZQ", description: "Stratégies de prospection B2B et B2C : téléphone, email, réseaux sociaux et terrain." },
   { title: "La négociation commerciale – Méthodes et astuces", url: "https://www.youtube.com/watch?v=vGkk3rFGeHE", description: "Techniques de négociation : découverte des besoins, argumentation, traitement des objections et closing." },
@@ -292,6 +307,7 @@ export function getYoutubeVideos(formationIntitule: string): CourseData['youtube
   if (t.includes('bureautique') || t.includes('pack office') || t.includes('office 365') || t.includes('microsoft 365')) return YOUTUBE_BUREAUTIQUE;
   if (t.includes('gestionnaire de paie') || t.includes('gestionnaire paie') || (t.includes('paie') && (t.includes('bulletin') || t.includes('gestion')))) return YOUTUBE_PAIE;
   if (t.includes('secrétariat') || t.includes('secretariat') || t.includes('assistanat') || (t.includes('secrétaire') && !t.includes('médic')) || (t.includes('secretaire') && !t.includes('medic'))) return YOUTUBE_SECRETARIAT;
+  if (t.includes('gotrm') || t.includes('gestionnaire des op\u00e9rations de transport') || t.includes('exploitant transport') || t.includes('tp-01329') || t.includes('rncp40990')) return YOUTUBE_GOTRM;
   // NB: getSecretariatChapters imported below alongside other chapters
   // Langues
   if ((t.includes('anglais') || t.includes('english')) && (t.includes('a1') || t.includes('débutant'))) return YOUTUBE_ANGLAIS_A1;
@@ -444,6 +460,7 @@ import { getEsthetiqueChapters } from "./courseContentEsthetique";
 import { getMaquillageChapters } from "./courseContentMaquillage";
 import { getPaieChapters } from "./courseContentPaie";
 import { getSecretariatChapters } from "./courseContentSecretariat";
+import { getGOTRMChapters } from "./courseContentGOTRM";
 
 import { getNTCChapters } from "./courseContentNTC";
 import { getGPMEChapters } from "./courseContentGPME";
@@ -480,6 +497,7 @@ export function getCourseChapters(formationIntitule: string): CourseChapter[] {
   const t = formationIntitule.toLowerCase();
   if (t.includes('gestionnaire de paie') || t.includes('gestionnaire paie') || (t.includes('paie') && (t.includes('formation') || t.includes('bulletin') || t.includes('gestion')))) return getPaieChapters();
   if (t.includes('secrétariat') || t.includes('secretariat') || t.includes('secrétaire') || t.includes('secretaire') || t.includes('office manager') || t.includes('assistanat')) return getSecretariatChapters();
+  if (t.includes('gotrm') || t.includes('gestionnaire des op\u00e9rations de transport') || t.includes('exploitant transport') || t.includes('tp-01329') || t.includes('rncp40990')) return getGOTRMChapters();
   if (t.includes('gestion de la pme') || t.includes('gestion pme') || t.includes('bts gpme') || t.includes(' gpme') || t.startsWith('gpme') || t.includes('rncp38363')) return getGPMEChapters();
   if (t.includes('création') && (t.includes('entreprise') || t.includes('activité'))) return getCreationEntrepriseChapters();
   if (t.includes('creation') && (t.includes('entreprise') || t.includes('activite'))) return getCreationEntrepriseChapters();

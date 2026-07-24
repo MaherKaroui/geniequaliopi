@@ -154,6 +154,7 @@ import { FORMATION_PAIE } from "./paiePreset";
 export { PAIE_ORG, STAGIAIRES_PAIE, FORMATION_PAIE, seedPaieAICaches } from "./paiePreset";
 import { FORMATION_SECRETARIAT } from "./secretariatPreset";
 export { SECRETARIAT_ORG, STAGIAIRES_SECRETARIAT, FORMATION_SECRETARIAT, seedSecretariatAICaches } from "./secretariatPreset";
+export { seedGOTRMAICaches, GOTRM_MODULE_EXERCISES } from "./gotrmPreset";
 
 export const SAMPLE_FORMATIONS: FormationInfo[] = [
   FORMATION_PAIE,

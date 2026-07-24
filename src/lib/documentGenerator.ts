@@ -48,11 +48,15 @@ import { getCachedPack, answersForQCM, studentAnswerFromCorrection, noteForOpenQ
 import { getCachedContentPack, pickImagesForQuery } from "./aiContentPack";
 import { PAIE_MODULE_EXERCISES } from "./paiePreset";
 import { SECRETARIAT_MODULE_EXERCISES } from "./secretariatPreset";
+import { GOTRM_MODULE_EXERCISES } from "./gotrmPreset";
 
 function getModuleExercisesFor(f: FormationInfo) {
   const t = (f.intitule || "").toLowerCase();
   if (t.includes("secrétariat") || t.includes("secretariat") || t.includes("secrétaire") || t.includes("secretaire") || t.includes("office manager") || t.includes("assistanat")) {
     return SECRETARIAT_MODULE_EXERCISES;
+  }
+  if (t.includes("gotrm") || t.includes("gestionnaire des opérations de transport") || t.includes("exploitant transport") || t.includes("tp-01329") || t.includes("rncp40990")) {
+    return GOTRM_MODULE_EXERCISES;
   }
   return PAIE_MODULE_EXERCISES;
 }
@@ -61,7 +65,8 @@ function isModuleExercisesFormation(f: FormationInfo): boolean {
   const t = (f.intitule || "").toLowerCase();
   const isPaie = t.includes("gestionnaire de paie") || t.includes("gestionnaire paie") || (t.includes("paie") && (t.includes("bulletin") || t.includes("gestion") || t.includes("dsn")));
   const isSecretariat = t.includes("secrétariat") || t.includes("secretariat") || t.includes("secrétaire") || t.includes("secretaire") || t.includes("office manager") || t.includes("assistanat");
-  return isPaie || isSecretariat;
+  const isGOTRM = t.includes("gotrm") || t.includes("gestionnaire des opérations de transport") || t.includes("exploitant transport") || t.includes("tp-01329") || t.includes("rncp40990");
+  return isPaie || isSecretariat || isGOTRM;
 }
 
 const FALLBACK_STAGIAIRE: StagiaireInfo = { prenom: "Martin", nom: "Dupont", civilite: "" as "M." | "Mme" | "", email: "", telephone: "", entreprise: "", poste: "", dateNaissance: "" };
