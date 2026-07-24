@@ -10152,25 +10152,25 @@ function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: 
   // === Early return : Gestionnaire de paie (reconversion / évolution RH-paie) ===
   if (isPaie) {
     const paieAttentes = [
-      `J'aimerais vraiment comprendre un bulletin de paie de A à Z, parce qu'aujourd'hui quand j'en reçois un je regarde juste le net à payer et le reste c'est du chinois pour moi.`,
-      `Franchement mon objectif c'est de pouvoir faire tourner la paie de ma boîte moi-même, on est ${1 + (idx % 3) * 5}${(1 + (idx % 3) * 5) === 1 ? 'er' : 'ème'} et payer 200 € par bulletin au cabinet, ça fait mal.`,
-      `Ce qui me bloque le plus c'est les cotisations, entre l'URSSAF, l'AGIRC-ARRCO, la CSG, je m'y perds. J'ai besoin qu'on m'explique ça calmement, avec des exemples concrets.`,
-      `Je voudrais gagner en confiance sur la DSN, j'ai déjà vu la responsable paie de mon ancien employeur paniquer chaque 5 du mois, je veux pas être comme ça.`,
-      `Mon objectif clair, c'est de trouver un poste de gestionnaire de paie junior d'ici 3 à 6 mois après la formation. Donc j'attends du concret, du terrain, pas juste de la théorie.`,
+      `Nous attendons que ${s.prenom} devienne pleinement autonome sur un cycle de paie mensuel complet (préparation des variables, édition des bulletins, DSN, gestion des rejets) afin de sécuriser notre fonction paie en interne.`,
+      `Notre objectif est de professionnaliser ${s.prenom} sur la lecture et la production d'un bulletin de paie, la maîtrise des cotisations URSSAF / AGIRC-ARRCO / CSG-CRDS, et la fiabilisation de la DSN mensuelle.`,
+      `Nous souhaitons que ${s.prenom} monte en compétences sur Silae (ou équivalent) pour reprendre progressivement en interne la paie aujourd'hui sous-traitée à un cabinet, avec un doublon de 3 mois puis une bascule complète.`,
+      `Cette formation doit permettre à ${s.prenom} d'être capable de répondre de manière fiable aux questions des salariés sur leur bulletin (net à payer, prélèvement à la source, absences, primes) et de sécuriser nos obligations sociales déclaratives.`,
+      `Nous attendons un(e) collaborateur(trice) opérationnel(le) sur un portefeuille jusqu'à 35 salariés (multi-conventions collectives), capable de gérer les entrées/sorties, les STC et les régularisations en toute autonomie.`,
     ];
     const paieMissions = [
-      `Aujourd'hui je fais surtout de l'administratif RH (contrats, absences, tickets restaurant) mais la paie est confiée au cabinet. Je veux la reprendre en interne progressivement.`,
-      `Je gère un peu de tout dans une petite structure : facturation, comptes fournisseurs, RH. La paie viendrait compléter mon poste et sécuriser l'entreprise sur ce sujet sensible.`,
-      `Je suis en reconversion, je n'ai pas encore d'expérience en paie. J'ai fait un bilan de compétences qui m'a orientée vers ce métier parce que j'aime la rigueur et les chiffres.`,
-      `Assistante comptable en cabinet, je saisis les écritures mais je ne fais pas les bulletins. Je veux passer côté social pour évoluer et être polyvalente.`,
-      `Actuellement demandeur d'emploi, j'ai identifié le métier de gestionnaire de paie comme un secteur qui recrute vraiment en Île-de-France (+18 % d'offres en 2025 selon France Travail).`,
+      `${s.prenom} occupe aujourd'hui un poste d'assistant(e) RH / administratif : gestion des contrats, absences, tickets restaurant. La paie étant sous-traitée, nous souhaitons la réinternaliser et confier la production des bulletins et la DSN à ${s.prenom} à l'issue de la formation.`,
+      `Au sein de notre structure, ${s.prenom} intervient sur les fonctions support (facturation, comptes fournisseurs, RH). La formation lui permettra de prendre en charge la paie des salariés et de sécuriser l'entreprise sur un sujet à forts enjeux sociaux et financiers.`,
+      `${s.prenom} rejoint l'équipe sur un poste de gestionnaire de paie junior. Après la formation, ses missions couvriront le cycle complet : collecte des éléments variables, édition des bulletins, DSN mensuelle et évènementielle, interface avec l'expert-comptable.`,
+      `Actuellement assistant(e) comptable, ${s.prenom} saisit les écritures sociales sans produire les bulletins. La formation lui permettra d'assurer la production paie de nos clients TPE/PME et de compléter l'offre du cabinet sur le volet social.`,
+      `Les missions confiées à ${s.prenom} à l'issue de la formation : production des bulletins, suivi des cotisations, DSN, gestion administrative du personnel (contrats, avenants, STC) et veille sociale de premier niveau.`,
     ];
     const paieContribution = [
-      `Cette formation va me permettre de sécuriser mon poste actuel en apportant une vraie compétence paie à mon employeur, qui dépend aujourd'hui à 100 % d'un cabinet extérieur.`,
-      `Devenir autonome en paie va faire économiser à ma boîte environ 200 € par bulletin, soit ~2 400 €/an par salarié. Sur 12 salariés ça représente presque 30 k€ économisés par an.`,
-      `Je vais pouvoir prétendre à un poste de gestionnaire de paie junior avec un salaire médian de 30 k€ brut en IDF, contre 24 k€ dans mon poste actuel d'assistante administrative.`,
-      `Cette formation valide un vrai virage professionnel : je passe d'un poste d'assistante polyvalente à une spécialisation technique reconnue, avec un métier en tension.`,
-      `À court terme je pourrai répondre aux salariés qui me questionnent sur leur bulletin (« pourquoi mon net a baissé ce mois-ci ? »), ce qui est aujourd'hui un vrai point de tension interne.`,
+      `Réinternaliser la paie représente pour notre entreprise une économie estimée à ~200 € par bulletin, soit près de 30 k€/an sur notre effectif, tout en gagnant en réactivité et en confidentialité sur un sujet sensible.`,
+      `${s.prenom} deviendra la personne référente paie de la structure : cela sécurise notre continuité de service et met fin à notre dépendance à 100 % vis-à-vis d'un prestataire extérieur.`,
+      `Cette montée en compétences s'inscrit dans notre politique RH de promotion interne et de fidélisation : ${s.prenom} évolue d'un poste d'assistant(e) polyvalent(e) vers une spécialisation technique reconnue, sur un métier en tension.`,
+      `La formation contribue directement à notre conformité sociale (DSN, obligations URSSAF, contrôles) et réduit le risque financier lié aux erreurs de paie (redressements, contentieux prud'homaux).`,
+      `À court terme, disposer en interne d'un(e) gestionnaire de paie qualifié(e) nous permettra de mieux répondre aux questions des salariés et de fluidifier notre relation sociale, aujourd'hui pénalisée par les délais du cabinet.`,
     ];
     const paieObjectif = [
       `Être autonome sur un cycle de paie complet (35 salariés maximum) : préparer les variables, générer les bulletins sur Silae, transmettre la DSN, gérer les rejets, expliquer aux salariés.`,
