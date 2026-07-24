@@ -4491,8 +4491,8 @@ function genIndicateursPerformance(o: OrganismeInfo, formations: FormationInfo[]
   mois.forEach(m => { tableHtml += `<th>${m}-${String(annee).slice(2)}</th>`; });
   tableHtml += `<th>Commentaires / analyse</th></tr>`;
   tableHtml += `<tr><td rowspan="2">${f?.intitule || o.nom}</td><td>Taux de satisfaction appréciation des bénéficiaires</td>`;
-  mois.forEach((_, i) => { tableHtml += `<td>${countPerMonth[i] > 0 ? "100%" : ""}</td>`; });
-  tableHtml += `<td style="font-size:9px">${f?.intitule || o.nom} a reçu ${nbStagiaires} stagiaire${nbStagiaires > 1 ? "s" : ""} pour l'année ${annee}. Nous avons été noté 10/10 sur le taux de satisfaction pour l'année ${annee} au critère 7.30.</td></tr>`;
+  mois.forEach((_, i) => { tableHtml += `<td>${countPerMonth[i] > 0 ? "90%" : ""}</td>`; });
+  tableHtml += `<td style="font-size:9px">${f?.intitule || o.nom} a reçu ${nbStagiaires} stagiaire${nbStagiaires > 1 ? "s" : ""} pour l'année ${annee}. Nous avons été noté 9/10 sur le taux de satisfaction pour l'année ${annee} au critère 7.30.</td></tr>`;
   tableHtml += `<tr><td>Nombre de stagiaires</td>`;
   mois.forEach((_, i) => { tableHtml += `<td>${countPerMonth[i] > 0 ? countPerMonth[i] : ""}</td>`; });
   tableHtml += `<td></td></tr></table>`;
