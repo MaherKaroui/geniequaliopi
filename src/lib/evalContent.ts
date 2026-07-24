@@ -1366,6 +1366,7 @@ function getContentKey(intitule: string): string {
   if (lower.includes("création d'entreprise") || lower.includes("creation d'entreprise") || lower.includes("création entreprise") || lower.includes("creation entreprise") || lower.includes("créateur d'entreprise") || (lower.includes("business plan") && lower.includes("entrepre"))) return "Création Entreprise";
   if (lower.includes("gestionnaire de paie") || lower.includes("gestionnaire paie") || (lower.includes("paie") && (lower.includes("bulletin") || lower.includes("dsn") || lower.includes("gestion")))) return "Paie";
   if (lower.includes("secrétariat") || lower.includes("secretariat") || lower.includes("secrétaire") || lower.includes("secretaire") || lower.includes("office manager") || lower.includes("assistanat")) return "Secretariat";
+  if (lower.includes("gotrm") || lower.includes("gestionnaire des opérations de transport") || lower.includes("exploitant transport") || lower.includes("tp-01329") || lower.includes("rncp40990")) return "GOTRM";
   return "";
 }
 
