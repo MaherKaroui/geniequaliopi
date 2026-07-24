@@ -9748,9 +9748,11 @@ function genFicheEvalBesoinsPSH(o: OrganismeInfo, f?: FormationInfo, stagiaires?
 
 function genTrameEvalBesoins(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[]) {
   const s = stagiaires[0] || { civilite: "" as const, prenom: "___", nom: "___", email: "", telephone: "", entreprise: "", poste: "", dateNaissance: "" };
-  
+  const hasEntreprise = !!(s.entreprise && s.entreprise.trim() && s.entreprise.trim().toLowerCase() !== "entreprise");
+
   // Generate realistic auto-filled answers based on stagiaire profile and formation
   const answers = generateEvalBesoinsAnswers(s, f, o, stagiaires.indexOf(s));
+  const questionFinancement = hasEntreprise ? QUESTION_FINANCEMENT_ENTREPRISE : QUESTION_FINANCEMENT_STANDARD;
   
   const civiliteBlock = `<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse;width:100%">
 <tr><td style="background:#f8f9fa">
@@ -9785,7 +9787,7 @@ ${s.telephone?.trim() ? `<strong>Téléphone :</strong> ${s.telephone}` : ""}<br
 <p><strong>2. Quel objectif professionnel ou personnel souhaitez-vous atteindre grâce à cette formation ?</strong></p>
 <table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${answers.objectif}</td></tr></table>
 
-<p><strong>3. Quel budget avez-vous prévu pour cette formation et bénéficiez-vous d'un dispositif de financement (financement personnel, CPF, OPCO) ?</strong></p>
+<p><strong>3. ${questionFinancement}</strong></p>
 <table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td>${answers.budget}</td></tr></table>
 
 <p><strong>4. En quoi pensez-vous que cette formation contribuera à la réalisation de votre projet professionnel ou personnel ?</strong></p>
@@ -9808,15 +9810,19 @@ ${s.telephone?.trim() ? `<strong>Téléphone :</strong> ${s.telephone}` : ""}<br
 
 const ALTERNANCE_OPCO_FINANCEMENT = `Formation suivie dans le cadre d'un <strong>contrat d'apprentissage</strong> (alternance). Prise en charge intégrale des frais pédagogiques par <strong>OPCO Mobilités</strong> au titre du financement de l'apprentissage — aucun reste à charge pour l'apprenti(e) ni pour l'entreprise d'accueil.`;
 const QUESTION_FINANCEMENT_STANDARD = "Quel budget avez-vous prévu pour cette formation et bénéficiez-vous d'un dispositif de financement (financement personnel, CPF, OPCO) ?";
+const QUESTION_FINANCEMENT_ENTREPRISE = "Quel dispositif de financement est mobilisé par l'entreprise pour cette formation (OPCO / plan de développement des compétences) ?";
 const QUESTION_FINANCEMENT_ALTERNANCE = "Quel dispositif de financement est mobilisé pour cette formation en alternance (OPCO / contrat d'apprentissage) ?";
 
 function genTrameEvalBesoinsStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number, isAlternanceOPCO: boolean = false) {
   const s = stagiaires[si] || stagiaires[0];
   const answers = generateEvalBesoinsAnswers(s, f, o, si);
+  const hasEntreprise = !!(s.entreprise && s.entreprise.trim() && s.entreprise.trim().toLowerCase() !== "entreprise");
   if (isAlternanceOPCO) {
     answers.budget = ALTERNANCE_OPCO_FINANCEMENT;
   }
-  const questionFinancement = isAlternanceOPCO ? QUESTION_FINANCEMENT_ALTERNANCE : QUESTION_FINANCEMENT_STANDARD;
+  const questionFinancement = isAlternanceOPCO
+    ? QUESTION_FINANCEMENT_ALTERNANCE
+    : (hasEntreprise ? QUESTION_FINANCEMENT_ENTREPRISE : QUESTION_FINANCEMENT_STANDARD);
 
   const civiliteBlock = `<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse;width:100%">
 <tr><td style="background:#f8f9fa">
@@ -9933,11 +9939,13 @@ function parsePrerequisItems(prerequis: string | undefined): string[] {
 function genTrameEvalBesoinsCombine(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], si: number, isAlternanceOPCO: boolean = false) {
   const s = stagiaires[si] || stagiaires[0];
   const answers = generateEvalBesoinsAnswers(s, f, o, si);
+  const hasEntreprise = !!(s.entreprise && s.entreprise.trim() && s.entreprise.trim().toLowerCase() !== "entreprise");
   if (isAlternanceOPCO) {
     answers.budget = ALTERNANCE_OPCO_FINANCEMENT;
   }
-  const questionFinancement = isAlternanceOPCO ? QUESTION_FINANCEMENT_ALTERNANCE : QUESTION_FINANCEMENT_STANDARD;
-  const hasEntreprise = !!(s.entreprise && s.entreprise.trim() && s.entreprise.trim().toLowerCase() !== "entreprise");
+  const questionFinancement = isAlternanceOPCO
+    ? QUESTION_FINANCEMENT_ALTERNANCE
+    : (hasEntreprise ? QUESTION_FINANCEMENT_ENTREPRISE : QUESTION_FINANCEMENT_STANDARD);
   const tuteurNom = (s as any).tuteur?.trim() || "Tuteur entreprise";
   const dateAnalyse = formatDate(subtractBusinessDays(getStagiaireDateDebut(s, f), 20));
 
@@ -10094,9 +10102,16 @@ function generateEvalBesoinsAnswers(s: StagiaireInfo, f: FormationInfo, o: Organ
   if (isDreamers && isFatima) {
     result.budget = "Formation financée via le CPF (Compte Personnel de Formation) mobilisé par la bénéficiaire.";
   }
-  // Override global : diplôme = Baccalauréat, financement adapté au contexte CFA/alternance
+  const hasEntreprise = !!(s.entreprise && s.entreprise.trim() && s.entreprise.trim().toLowerCase() !== "entreprise");
+  // Override global : diplôme = Baccalauréat, financement adapté au contexte
   result.diplome = "Baccalauréat";
-  result.budget = isCFAAlternance ? ALTERNANCE_OPCO_FINANCEMENT : "Financement personnel";
+  if (isCFAAlternance) {
+    result.budget = ALTERNANCE_OPCO_FINANCEMENT;
+  } else if (hasEntreprise) {
+    result.budget = "Formation prise en charge par l'OPCO de l'entreprise au titre du plan de développement des compétences.";
+  } else {
+    result.budget = "Financement personnel";
+  }
   return result;
 }
 
