@@ -1,5 +1,8 @@
 // Formation-specific QCM questions, exercises, and evaluation content
 import { getCachedContentPack } from "./aiContentPack";
+import { GOTRM_EVAL_PACK } from "./gotrmPreset";
+
+
 
 
 export interface QCMQuestion {
@@ -1363,6 +1366,7 @@ function getContentKey(intitule: string): string {
   if (lower.includes("création d'entreprise") || lower.includes("creation d'entreprise") || lower.includes("création entreprise") || lower.includes("creation entreprise") || lower.includes("créateur d'entreprise") || (lower.includes("business plan") && lower.includes("entrepre"))) return "Création Entreprise";
   if (lower.includes("gestionnaire de paie") || lower.includes("gestionnaire paie") || (lower.includes("paie") && (lower.includes("bulletin") || lower.includes("dsn") || lower.includes("gestion")))) return "Paie";
   if (lower.includes("secrétariat") || lower.includes("secretariat") || lower.includes("secrétaire") || lower.includes("secretaire") || lower.includes("office manager") || lower.includes("assistanat")) return "Secretariat";
+  if (lower.includes("gotrm") || lower.includes("gestionnaire des opérations de transport") || lower.includes("exploitant transport") || lower.includes("tp-01329") || lower.includes("rncp40990")) return "GOTRM";
   return "";
 }
 
@@ -1414,6 +1418,29 @@ EVAL_CONTENT["Paie"] = {
     "Assurer la veille juridique et sociale (BOSS, Légifrance, URSSAF, conventions collectives)",
     "Préparer et gérer un contrôle URSSAF (pièces justificatives, points de vigilance)",
     "Respecter la confidentialité, le RGPD et le devoir de discrétion propres à la fonction paie",
+  ],
+};
+
+
+// ===== GOTRM (TP-01329 / RNCP40990) — Gestionnaire des Opérations de Transport =====
+EVAL_CONTENT["GOTRM"] = {
+  ...DEFAULT_CONTENT,
+  qcmPositionnement: GOTRM_EVAL_PACK.qcmDebut.map(q => ({ question: q.question, options: q.options, correctIndex: q.correctIndex })),
+  qcmFinal: GOTRM_EVAL_PACK.qcmFin.map(q => ({ question: q.question, options: q.options, correctIndex: q.correctIndex })),
+  exercices: (GOTRM_EVAL_PACK.evaluationFinale?.exercices || []).map(e => ({
+    titre: e.titre,
+    consigne: e.consigne,
+    reponseAttendue: e.reponseAttendue,
+  })),
+  competences: [
+    "Construire une offre tarifaire fondée sur le PRK et l'indexation gazole CNR",
+    "Planifier des tournées conformes au règlement (CE) 561/2006 (temps de conduite, pauses, repos)",
+    "Sécuriser l'affrètement : contrôles L8222-1, décret 2017-1740, contrat sous-traitance",
+    "Traiter un litige CMR (avaries, retards, plafond 8,33 DTS/kg, déclaration d'intérêt spécial)",
+    "Piloter un tableau de bord d'exploitation (OTIF, litiges, retour vide, DSO, marge)",
+    "Manager une équipe de conducteurs (éco-conduite, entretien annuel, plan de formation)",
+    "Appliquer l'éthique métier et refuser toute pratique non conforme (RSE, travail dissimulé)",
+    "Préparer et soutenir la MSP TP-01329 (10 h sur 2 jours) devant le jury",
   ],
 };
 

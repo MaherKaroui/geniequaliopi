@@ -1197,15 +1197,44 @@ export function genExamenFinalStagiaire(o: OrganismeInfo, f: FormationInfo, stag
     });
   }
 
+  // Détection GOTRM pour humanisation des réponses
+  const tLow = (f.intitule || "").toLowerCase();
+  const isGOTRM = tLow.includes("gotrm") || tLow.includes("gestionnaire des opérations de transport") || tLow.includes("exploitant transport") || tLow.includes("tp-01329") || tLow.includes("rncp40990") || (f.codeRNCP || "").toUpperCase().includes("40990");
+
+  // Nonce temps (bucket 30 min) → réponses différentes à chaque génération
+  const nonce = Math.floor(Date.now() / (30 * 60 * 1000)) & 0xFFFF;
+
   // Profil stagiaire déterministe — score cible 14-19/20
   const hash = (s.nom + s.prenom).split("").reduce((a, c) => a + c.charCodeAt(0), 0);
-  const seed = (hash * 31 + stagiaireIdx * 17) & 0x7FFFFFFF;
+  const seed = (hash * 31 + stagiaireIdx * 17 + nonce * 41) & 0x7FFFFFFF;
   const nbQ = qcmFinal.length;
   const targetCorrect = nbQ === 0 ? 0 : Math.max(Math.floor(nbQ * 0.7), nbQ - 3 + (seed % 3)); // 7-9/10
   const wrong = new Set<number>();
   for (let k = 0; k < nbQ - targetCorrect; k++) {
     wrong.add((seed * 7 + k * 13) % nbQ);
   }
+
+  // Commentaires humanisés (GOTRM)
+  const GOTRM_OK_COMMENTS = [
+    "Vu et revu en formation, aucun doute.",
+    "Réflexe métier acquis, je le vérifie systématiquement au bureau.",
+    "On l'a détaillé sur un cas pratique, c'est resté.",
+    "Je l'applique déjà dans mon poste actuel.",
+    "Point travaillé en veille réglementaire.",
+    "Fiche mémo consultée régulièrement, je maîtrise.",
+  ];
+  const GOTRM_HESITATION_COMMENTS = [
+    "J'ai hésité avec une autre option mais je pense que c'est celle-ci.",
+    "Pas 100 % sûr, je vérifierai sur le BOSS transport.",
+    "Souvenir un peu flou, je penche pour cette réponse.",
+    "Confusion possible avec la règle du repos hebdo réduit.",
+    "À reprendre en veille, réponse par élimination.",
+  ];
+  const humanFor = (idx: number, ok: boolean) => {
+    if (!isGOTRM) return "";
+    const pool = ok ? GOTRM_OK_COMMENTS : GOTRM_HESITATION_COMMENTS;
+    return pool[(seed + idx * 7) % pool.length];
+  };
 
   let extra = `
     <h2>EXAMEN FINAL DE SYNTHÈSE – ${f.intitule.toUpperCase()}</h2>
@@ -1229,13 +1258,15 @@ export function genExamenFinalStagiaire(o: OrganismeInfo, f: FormationInfo, stag
       const otherLetters = letters.slice(0, q.options.length).filter(l => l !== correctLetter);
       const studentAnswer = isWrong ? otherLetters[(seed + qi) % otherLetters.length] : correctLetter;
       if (!isWrong) scoreQCM++;
+      const humanNote = humanFor(qi, !isWrong);
       extra += `<div style="margin:12px 0; page-break-inside:avoid;">`;
       extra += `<p><strong>Question ${qi + 1}.</strong> ${q.question}</p>`;
       extra += `<p style="margin-left:16px; line-height:1.7;">`;
       q.options.forEach((opt, oi) => { extra += `${letters[oi]}. ${opt}<br/>`; });
       extra += `</p>`;
-      extra += `<p><strong>Réponse du stagiaire :</strong> <span style="background:#fff59d;padding:2px 8px;font-weight:bold;">${studentAnswer}</span> &nbsp; — &nbsp; <strong>Bonne réponse :</strong> ${correctLetter} &nbsp; — &nbsp; <strong>Note :</strong> ${isWrong ? 0 : 1}/1</p>`;
-      extra += `</div>`;
+      extra += `<p><strong>Réponse du stagiaire :</strong> <span style="background:#fff59d;padding:2px 8px;font-weight:bold;">${studentAnswer}</span> &nbsp; — &nbsp; <strong>Bonne réponse :</strong> ${correctLetter} &nbsp; — &nbsp; <strong>Note :</strong> ${isWrong ? 0 : 1}/1`;
+      if (humanNote) extra += `<br><em style="color:#475569;font-size:0.92em">« ${humanNote} »</em>`;
+      extra += `</p></div>`;
     });
     const noteQCMSur10 = Math.round((scoreQCM / nbQ) * 10 * 10) / 10;
     extra += tableHTML(["Élément", "Résultat"], [
@@ -1249,6 +1280,21 @@ export function genExamenFinalStagiaire(o: OrganismeInfo, f: FormationInfo, stag
   if (pratiques.length === 0 && exercicesEval[0]) pratiques.push(exercicesEval[0]);
   const nbPratiques = pratiques.length;
   const notesPratiques: number[] = [];
+
+  // Introductions humanisées pour le rendu écrit du stagiaire (variées par nonce)
+  const GOTRM_INTROS = [
+    "Voici ma proposition, structurée comme on l'a vue en formation :",
+    "Je pars du raisonnement travaillé en cas pratique, puis j'adapte :",
+    "Je reprends la méthode PRK + contrôles + plan d'actions :",
+    "En m'appuyant sur la doctrine CNR et le décret 2017-1740 :",
+  ];
+  const GENERIC_INTROS = [
+    "Voici mon analyse et mes propositions :",
+    "Je structure ma réponse en 4 temps (contexte, analyse, solutions, plan d'action) :",
+    "En m'appuyant sur les acquis de la formation :",
+  ];
+  const introPool = isGOTRM ? GOTRM_INTROS : GENERIC_INTROS;
+
   if (nbPratiques > 0) {
     extra += `<div style="page-break-before: always;"></div>`;
     extra += `<h3>Partie 2 — Études de cas pratiques (sur 10 points, ${nbPratiques} cas)</h3>`;
@@ -1257,11 +1303,12 @@ export function genExamenFinalStagiaire(o: OrganismeInfo, f: FormationInfo, stag
       const ratio = 0.72 + (((seed + pi * 37) % 28) / 100); // 0.72 - 0.99
       const noteCas = Math.round(ratio * pointsParCas * 10) / 10;
       notesPratiques.push(noteCas);
+      const intro = introPool[(seed + pi * 11) % introPool.length];
       if (pi > 0) extra += `<div style="page-break-before: always;"></div>`;
       extra += `<h4 style="margin-top:12px">Cas ${pi + 1} — ${pratique.titre}</h4>`;
       extra += `<p><strong>Consigne :</strong></p><p>${pratique.consigne}</p>`;
       extra += `<p><strong>Travail rendu par ${s.prenom} ${s.nom} :</strong></p>`;
-      extra += `<p style="background:#fff9db;padding:10px;border-left:3px solid #f0c040;">${pratique.reponseAttendue}</p>`;
+      extra += `<p style="background:#fff9db;padding:10px;border-left:3px solid #f0c040;"><em>${intro}</em><br/>${pratique.reponseAttendue}</p>`;
       extra += `<p><strong>Note cas ${pi + 1} :</strong> ${noteCas} / ${Math.round(pointsParCas * 10) / 10}</p>`;
     });
   }
