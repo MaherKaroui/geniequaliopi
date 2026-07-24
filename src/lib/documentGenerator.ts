@@ -10302,7 +10302,7 @@ function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: 
       `${s.prenom} démarrera comme chauffeur affilié sur Uber et Bolt sous notre licence, avec un objectif de bascule progressive vers une activité d'autoentrepreneur indépendant en partenariat avec la société.`,
     ];
     const vtcContribution = [
-      `Cette formation nous permet de renforcer notre flotte avec un(e) conducteur(trice) qualifié(e), dans un secteur en demande continue (mobilité urbaine, aéroports) où l'offre de chauffeurs disponibles reste insuffisante.`,
+      `Cette formation nous permet de renforcer notre flotte avec ${s.civilite === "Mme" ? "une conductrice qualifiée" : "un conducteur qualifié"}, dans un secteur en demande continue (mobilité urbaine, aéroports) où l'offre de chauffeurs disponibles reste insuffisante.`,
       `L'obtention de la carte VTC par ${s.prenom} sécurise son immatriculation au registre EVTC et donc sa capacité à travailler pour notre compte pendant les 5 prochaines années sans risque réglementaire.`,
       `Cette formation s'inscrit dans notre stratégie de développement : professionnaliser nos chauffeurs pour améliorer la satisfaction client, la note moyenne sur les plateformes et le taux de fidélisation.`,
       `Former ${s.prenom} nous permet de disposer d'un conducteur combinant maîtrise de la conduite, sens du contact client et rigueur administrative, profil recherché pour notre segment premium.`,
