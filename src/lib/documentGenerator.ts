@@ -10106,6 +10106,7 @@ function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: 
   const isNTC = t.includes("négociateur technico") || t.includes("technico-commercial") || t.includes("technico commercial") || t.includes("ntc") || (f.codeRNCP || "").toUpperCase().includes("39063");
   const isPaie = t.includes("gestionnaire de paie") || t.includes("gestionnaire paie") || (t.includes("paie") && (t.includes("bulletin") || t.includes("gestion") || t.includes("dsn")));
   const isSecretariat = t.includes("secrétariat") || t.includes("secretariat") || t.includes("secrétaire") || t.includes("secretaire") || t.includes("office manager") || t.includes("assistanat");
+  const isGOTRM = t.includes("gotrm") || t.includes("gestionnaire des opérations de transport") || t.includes("exploitant transport") || t.includes("tp-01329") || t.includes("rncp40990") || (f.codeRNCP || "").toUpperCase().includes("40990");
 
   // === Early return : Gestionnaire de paie (reconversion / évolution RH-paie) ===
   if (isPaie) {
