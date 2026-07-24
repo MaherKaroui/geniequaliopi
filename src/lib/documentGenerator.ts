@@ -2716,11 +2716,21 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
     </div>
   `;
 
+  // Si la formation n'est pas RNCP, les sections 8 et 8 bis n'apparaissent pas :
+  // on décale la numérotation des sections suivantes pour éviter le saut 7 → 9.
+  const rncpExistsForNum = !!(f.codeRNCP && getRNCPByCode(f.codeRNCP));
+  const finalExtraContent = rncpExistsForNum
+    ? extraContent
+    : extraContent.replace(/<h2>(\d+)\. /g, (_m, n) => {
+        const num = parseInt(n, 10);
+        return `<h2>${num >= 9 ? num - 1 : num}. `;
+      });
+
   return buildDocument({
     org: o,
     title: "PROGRAMME DE FORMATION",
     subtitle: f.intitule,
-    extraHtml: extraContent,
+    extraHtml: finalExtraContent,
     
   });
 }
