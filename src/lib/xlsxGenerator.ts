@@ -313,7 +313,7 @@ export function generateExcelTableauBordPerformance(o: OrganismeInfo, f: Formati
   html += `<td>${isVAE 
     ? `${o.nom} est en phase de lancement sur l'activité VAE. ${nbStagiaires} ${nbStagiaires > 1 ? labelBeneficiaires : labelBeneficiaire} accompagné${nbStagiaires > 1 ? "s" : ""} pour l'année ${annee}. Les indicateurs seront renseignés au fur et à mesure de l'activité et diffusés dès qu'ils seront significatifs.`
     : (termine
-        ? `${f.intitule || o.nom} a reçu ${nbStagiaires} ${nbStagiaires > 1 ? labelBeneficiaires : labelBeneficiaire} pour l'année ${annee}. Nous avons été noté 10/10 sur le taux de satisfaction pour l'année ${annee} au critère 7.30. Nous communiquerons cet élément de diffusion sur notre programme de formation${o.siteWeb && o.siteWeb.trim() ? ` et sur ${isFacebookPage(o.siteWeb) ? 'notre page Facebook' : 'notre site internet'} (${o.siteWeb})` : ''}.`
+        ? `${f.intitule || o.nom} a reçu ${nbStagiaires} ${nbStagiaires > 1 ? labelBeneficiaires : labelBeneficiaire} pour l'année ${annee}. Nous avons été noté 9/10 sur le taux de satisfaction pour l'année ${annee} au critère 7.30. Nous communiquerons cet élément de diffusion sur notre programme de formation${o.siteWeb && o.siteWeb.trim() ? ` et sur ${isFacebookPage(o.siteWeb) ? 'notre page Facebook' : 'notre site internet'} (${o.siteWeb})` : ''}.`
         : `Formation en cours – ${nbStagiaires} ${nbStagiaires > 1 ? labelBeneficiaires : labelBeneficiaire} inscrit${nbStagiaires > 1 ? "s" : ""}. Les indicateurs définitifs seront consolidés à l'issue de la session et publiés${o.siteWeb && o.siteWeb.trim() ? ` sur ${isFacebookPage(o.siteWeb) ? 'notre page Facebook' : 'notre site internet'} (${o.siteWeb})` : ''}.`)}</td></tr>`;
 
   // Nombre de bénéficiaires row
