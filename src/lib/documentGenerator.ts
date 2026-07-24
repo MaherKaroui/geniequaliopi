@@ -10288,25 +10288,25 @@ function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: 
       "BEP Vente action marchande + Permis B (10 ans)",
     ];
     const vtcAttentes = [
-      `Obtenir la carte professionnelle VTC dans les meilleurs délais pour démarrer mon activité de conducteur indépendant et être opérationnel sur les plateformes Uber, Bolt et Heetch dès la fin de la formation.`,
-      `Maîtriser l'ensemble des 5 épreuves théoriques communes T3P et des 2 épreuves spécifiques VTC, ainsi que l'épreuve pratique d'admission, afin de réussir l'examen du premier coup.`,
-      `Comprendre la réglementation VTC (loi Grandguillaume, registre EVTC, obligations préfectorales) pour exercer en toute conformité dès le premier jour.`,
-      `Acquérir les bonnes pratiques de conduite premium et de relation client haut de gamme pour me différencier sur les plateformes et générer un chiffre d'affaires confortable.`,
-      `Comprendre les aspects gestion (statut micro-entreprise, TVA, URSSAF, charges) pour éviter les erreurs administratives qui pénalisent beaucoup de chauffeurs débutants.`,
+      `Nous attendons de cette formation qu'elle permette à ${s.prenom} d'obtenir la carte professionnelle VTC dans les meilleurs délais, afin de l'intégrer opérationnellement à notre flotte dès la fin du parcours.`,
+      `Notre objectif est que ${s.prenom} maîtrise l'ensemble des 5 épreuves théoriques communes T3P et des 2 épreuves spécifiques VTC ainsi que l'épreuve pratique d'admission, pour réussir l'examen dès la première présentation.`,
+      `Nous souhaitons que ${s.prenom} maîtrise la réglementation VTC (loi Grandguillaume, registre EVTC, obligations préfectorales) afin d'exercer sous nos couleurs en toute conformité dès le premier jour.`,
+      `Cette formation doit apporter à ${s.prenom} les bonnes pratiques de conduite premium et de relation client haut de gamme attendues sur les plateformes Uber/Bolt, pour préserver notre note moyenne et notre volume de courses.`,
+      `Nous attendons que ${s.prenom} comprenne les aspects gestion (statut micro-entreprise, TVA, URSSAF, charges) afin d'éviter les erreurs administratives qui pénalisent les chauffeurs débutants et déstabilisent notre organisation.`,
     ];
     const vtcMissions = [
-      `Effectuer des courses de transport de personnes via les plateformes Uber et Bolt en région parisienne, principalement transferts aéroports (CDG, Orly) et courses urbaines.`,
-      `Assurer du transport haut de gamme pour une clientèle d'affaires : prises en charge en hôtels, transferts gares, déplacements professionnels en journée.`,
-      `Développer une clientèle de particuliers et d'entreprises en complément des plateformes, avec un véhicule premium (Mercedes Classe E ou équivalent).`,
-      `Travailler en flotte VTC partenaire avec un véhicule fourni, sur des plages horaires nuit/week-end pour optimiser les revenus.`,
-      `Démarrer en tant que chauffeur affilié sur Uber et Bolt, puis développer une activité d'autoentrepreneur indépendant à terme.`,
+      `Les missions confiées à ${s.prenom} : réalisation de courses de transport de personnes via les plateformes Uber et Bolt en région parisienne, avec une priorité sur les transferts aéroports (CDG, Orly) et les courses urbaines.`,
+      `${s.prenom} assurera un service de transport haut de gamme pour notre clientèle d'affaires : prises en charge en hôtels, transferts gares, déplacements professionnels en journée.`,
+      `${s.prenom} contribuera au développement de notre portefeuille de particuliers et d'entreprises en complément des plateformes, avec un véhicule premium de la flotte (Mercedes Classe E ou équivalent).`,
+      `Intégré(e) à notre flotte VTC, ${s.prenom} conduira un véhicule fourni sur des plages horaires nuit/week-end afin d'optimiser le taux d'utilisation du parc et les revenus générés.`,
+      `${s.prenom} démarrera comme chauffeur affilié sur Uber et Bolt sous notre licence, avec un objectif de bascule progressive vers une activité d'autoentrepreneur indépendant en partenariat avec la société.`,
     ];
     const vtcContribution = [
-      `Cette formation me permet de structurer une nouvelle activité génératrice de revenus complémentaires ou principaux, dans un secteur en demande continue (mobilité urbaine, aéroports).`,
-      `L'obtention de la carte VTC ouvre la possibilité de créer une micro-entreprise immatriculée au registre EVTC, qui sera mon outil de travail principal pour les 5 prochaines années.`,
-      `Cette formation s'inscrit dans un projet de reconversion professionnelle vers une activité indépendante, où je serai maître de mon emploi du temps et de mes revenus.`,
-      `Devenir conducteur VTC me permet de combiner mon goût pour la conduite, le contact client et la liberté d'organisation, tout en sécurisant un revenu régulier via les plateformes.`,
-      `Le secteur VTC est en forte croissance (+12% par an en Île-de-France) et cette formation me positionne sur un marché porteur avec des perspectives stables.`,
+      `Cette formation nous permet de renforcer notre flotte avec un(e) conducteur(trice) qualifié(e), dans un secteur en demande continue (mobilité urbaine, aéroports) où l'offre de chauffeurs disponibles reste insuffisante.`,
+      `L'obtention de la carte VTC par ${s.prenom} sécurise son immatriculation au registre EVTC et donc sa capacité à travailler pour notre compte pendant les 5 prochaines années sans risque réglementaire.`,
+      `Cette formation s'inscrit dans notre stratégie de développement : professionnaliser nos chauffeurs pour améliorer la satisfaction client, la note moyenne sur les plateformes et le taux de fidélisation.`,
+      `Former ${s.prenom} nous permet de disposer d'un conducteur combinant maîtrise de la conduite, sens du contact client et rigueur administrative, profil recherché pour notre segment premium.`,
+      `Le secteur VTC est en forte croissance (+12 % par an en Île-de-France) et cette formation nous positionne pour capter cette progression avec un(e) collaborateur(trice) opérationnel(le) rapidement.`,
     ];
     const vtcObjectif = [
       `Obtenir ma carte professionnelle VTC et démarrer une activité de conducteur indépendant à temps plein dans les 60 jours suivant la fin de la formation.`,
