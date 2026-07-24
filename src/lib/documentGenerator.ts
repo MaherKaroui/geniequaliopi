@@ -10156,7 +10156,7 @@ function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: 
       `Notre objectif est de professionnaliser ${s.prenom} sur la lecture et la production d'un bulletin de paie, la maîtrise des cotisations URSSAF / AGIRC-ARRCO / CSG-CRDS, et la fiabilisation de la DSN mensuelle.`,
       `Nous souhaitons que ${s.prenom} monte en compétences sur Silae (ou équivalent) pour reprendre progressivement en interne la paie aujourd'hui sous-traitée à un cabinet, avec un doublon de 3 mois puis une bascule complète.`,
       `Cette formation doit permettre à ${s.prenom} d'être capable de répondre de manière fiable aux questions des salariés sur leur bulletin (net à payer, prélèvement à la source, absences, primes) et de sécuriser nos obligations sociales déclaratives.`,
-      `Nous attendons un(e) collaborateur(trice) opérationnel(le) sur un portefeuille jusqu'à 35 salariés (multi-conventions collectives), capable de gérer les entrées/sorties, les STC et les régularisations en toute autonomie.`,
+      `Nous attendons ${s.civilite === "Mme" ? "une collaboratrice opérationnelle" : "un collaborateur opérationnel"} sur un portefeuille jusqu'à 35 salariés (multi-conventions collectives), capable de gérer les entrées/sorties, les STC et les régularisations en toute autonomie.`,
     ];
     const paieMissions = [
       `${s.prenom} occupe aujourd'hui un poste d'assistant(e) RH / administratif : gestion des contrats, absences, tickets restaurant. La paie étant sous-traitée, nous souhaitons la réinternaliser et confier la production des bulletins et la DSN à ${s.prenom} à l'issue de la formation.`,
