@@ -179,6 +179,19 @@ export function shortCriterePath(critere: number, indicateur: number): string {
   return `Critere_${critere}/Indicateur_${indicateur}`;
 }
 
+/**
+ * Nom de sous-dossier par stagiaire dans les ZIP (regroupement par apprenant).
+ * Ex: "Prenom_NOM". Fallback "Stagiaire" si aucun nom disponible.
+ */
+export function buildStagiaireFolderName(stagiaire?: StagiaireInfo | null): string {
+  if (!stagiaire) return "Stagiaire";
+  const parts: string[] = [];
+  if (stagiaire.prenom) parts.push(toTitleSnakeCase(stagiaire.prenom));
+  if (stagiaire.nom) parts.push(toUpperSnakeCase(stagiaire.nom));
+  const joined = parts.filter(Boolean).join("_");
+  return joined || "Stagiaire";
+}
+
 export function buildGenericFileName(label: string, orgName: string, version: string, dateMaj: string, extension: string): string {
   const parts = [
     toUpperSnakeCase(label) || "DOCUMENT",
