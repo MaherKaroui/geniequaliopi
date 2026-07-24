@@ -303,7 +303,7 @@ export function generateExcelTableauBordPerformance(o: OrganismeInfo, f: Formati
     if (termine) return countPerMonth[mIdx] > 0;
     return false;
   };
-  const satCell = (mIdx: number) => countPerMonth[mIdx] > 0 ? (monthIsPast(mIdx) ? "100%" : "En cours") : "";
+  const satCell = (mIdx: number) => countPerMonth[mIdx] > 0 ? (monthIsPast(mIdx) ? "90%" : "En cours") : "";
   const reuCell = (mIdx: number) => countPerMonth[mIdx] > 0 ? (monthIsPast(mIdx) ? "100%" : "En cours") : "";
 
   // Taux de satisfaction row
