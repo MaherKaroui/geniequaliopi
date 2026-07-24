@@ -211,6 +211,38 @@ export const GOTRM_MODULE_EXERCISES: PaieModuleExercises[] = [
 ];
 
 // ---------------------------------------------------------------------------
+// Commentaires humanisés stagiaires — QCM début / fin (10 + 10)
+// Injectés dans la cellule "Réponse du stagiaire" pour donner un ton oral
+// et authentique aux tests de positionnement GOTRM.
+// ---------------------------------------------------------------------------
+export const GOTRM_QCM_HUMAN_COMMENTS: { debut: string[]; fin: string[] } = {
+  debut: [
+    "Je sais qu'il faut vérifier plusieurs pièces avant de faire rouler un affrété, l'URSSAF vigilance surtout — on s'est fait avoir dessus il y a 2 ans.",
+    "Côté conducteur je le connais bien : 9 h en base et 10 h possible mais deux fois par semaine max, on l'a assez répété.",
+    "La pause de 45 min après 4 h 30, je la respecte, je la fractionne parfois 15+30 quand je peux caser un chargement entre les deux.",
+    "PRK = Prix de Revient Kilométrique, c'est la base de tout, je l'entends tous les jours au bureau sans forcément savoir le calculer proprement.",
+    "8,33 DTS/kg, je l'ai vu sur des sinistres récents, c'est bas comparé à la valeur des marchandises qu'on transporte.",
+    "45 h consécutives pour le repos hebdo normal, je crois que c'est ça, je vérifie souvent sur ma fiche mémo RSE.",
+    "Sous les 15 % de retour vide c'est déjà pas mal, chez nous on tourne à 22 % et ça pèse lourd sur la marge.",
+    "Le décret 2017-1740, je l'ai déjà entendu passer, c'est ce qui s'applique quand personne n'a pris le temps d'écrire un vrai contrat.",
+    "Le CNR publie ses indices tous les mois, mon patron s'en sert pour les indexations gazole des contrats annuels.",
+    "L'équivalence par le titre pro GOTRM, c'est justement une des raisons pour lesquelles je me suis inscrit à cette formation.",
+  ],
+  fin: [
+    "L'article L8222-1 du Code du travail, on l'a bien travaillé — la responsabilité solidaire du donneur d'ordre c'est mon nouveau réflexe avant chaque affrètement.",
+    "1,65 €/km sur un 40 t roulant 90 000 km/an, c'est cohérent avec les études CNR qu'on a analysées en formation.",
+    "7 jours par LRAR pour un dommage non apparent, je le sais maintenant par cœur — c'est un des pièges où on perdait des dossiers avant.",
+    "La déclaration d'intérêt spécial, c'est ce qui permet de dépasser le plafond CMR quand le client accepte de payer une surprime.",
+    "96 à 98 % d'OTIF c'est ce qu'on négocie sur les contrats réguliers, en dessous on prend des pénalités et on perd le client.",
+    "Le forfait 43 h équivalent pour les longue distance en IDCC 0016, on l'a détaillé bulletin par bulletin, c'est clair maintenant.",
+    "Chrono intelligent 2e génération obligatoire depuis août 2023 sur les véhicules neufs, on l'a vu en veille réglementaire.",
+    "Autour de 20 % de retour vide en moyenne nationale, c'est ce que dit le CNR — l'enjeu marge est énorme si on descend en dessous.",
+    "L'article 1231-5 du Code civil permet au juge de modérer une pénalité disproportionnée, on avait fait le cas pratique dessus.",
+    "10 h de MSP en deux parties sur deux jours, c'est le nouveau format depuis l'arrêté de juin 2025 — j'ai préparé mon dossier support en conséquence.",
+  ],
+};
+
+// ---------------------------------------------------------------------------
 // Seeder — hydrate les caches pour les DEUX titres GOTRM
 // ---------------------------------------------------------------------------
 export function seedGOTRMAICaches(): void {
