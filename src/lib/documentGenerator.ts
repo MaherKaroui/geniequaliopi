@@ -16570,6 +16570,10 @@ function genAITestPositionnement(o: OrganismeInfo, f: FormationInfo, stagiaires:
   const answers = renderEmpty ? [] : answersForQCM(qcm, si, s, mode, isOpco, targetCorrect);
   let correct = 0;
   const isDebut = mode === "debut";
+  // Détection GOTRM : injection de commentaires stagiaires humanisés dans la cellule "Réponse"
+  const tTitle = (f.intitule || "").toLowerCase();
+  const isGOTRM = tTitle.includes("gotrm") || tTitle.includes("gestionnaire des opérations de transport") || tTitle.includes("exploitant transport") || tTitle.includes("tp-01329") || tTitle.includes("rncp40990") || (f.codeRNCP || "").toUpperCase().includes("40990");
+  const humanComments = isGOTRM ? (isDebut ? GOTRM_QCM_HUMAN_COMMENTS.debut : GOTRM_QCM_HUMAN_COMMENTS.fin) : null;
   const rows = qcm.map((q, qi) => {
     const optionsCell = q.options.map((opt, oi) => `${String.fromCharCode(65 + oi)}) ${opt}`).join("<br>");
     if (renderEmpty) {
@@ -16584,12 +16588,16 @@ function genAITestPositionnement(o: OrganismeInfo, f: FormationInfo, stagiaires:
     const chosen = answers[qi];
     const ok = chosen === q.correctIndex;
     if (ok) correct++;
+    const chosenLabel = `${String.fromCharCode(65 + chosen)}) ${q.options[chosen]}`;
+    const humanNote = humanComments && humanComments[qi]
+      ? `<br><em style="color:#475569;font-size:0.92em">« ${humanComments[qi]} »</em>`
+      : "";
     if (isDebut) {
       return [
         `Q${qi + 1}`,
         q.question,
         optionsCell,
-        `${String.fromCharCode(65 + chosen)}) ${q.options[chosen]}`,
+        chosenLabel + humanNote,
         `${String.fromCharCode(65 + q.correctIndex)}) ${q.options[q.correctIndex]}`,
         ok ? "Correct" : "Incorrect",
       ];
@@ -16597,11 +16605,12 @@ function genAITestPositionnement(o: OrganismeInfo, f: FormationInfo, stagiaires:
     return [
       `Q${qi + 1}`,
       q.question,
-      `${String.fromCharCode(65 + chosen)}) ${q.options[chosen]}`,
+      chosenLabel + humanNote,
       `${String.fromCharCode(65 + q.correctIndex)}) ${q.options[q.correctIndex]}`,
       ok ? "Correct" : "Incorrect",
     ];
   });
+
 
   const dateDebutSession = formatDate(getStagiaireDateDebut(s, f));
   const dateFinSession = formatDate(getStagiaireDateFin(s, f));
