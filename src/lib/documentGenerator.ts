@@ -48,7 +48,7 @@ import { getCachedPack, answersForQCM, studentAnswerFromCorrection, noteForOpenQ
 import { getCachedContentPack, pickImagesForQuery } from "./aiContentPack";
 import { PAIE_MODULE_EXERCISES } from "./paiePreset";
 import { SECRETARIAT_MODULE_EXERCISES } from "./secretariatPreset";
-import { GOTRM_MODULE_EXERCISES } from "./gotrmPreset";
+import { GOTRM_MODULE_EXERCISES, GOTRM_QCM_HUMAN_COMMENTS } from "./gotrmPreset";
 
 function getModuleExercisesFor(f: FormationInfo) {
   const t = (f.intitule || "").toLowerCase();
