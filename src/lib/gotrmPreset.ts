@@ -211,36 +211,147 @@ export const GOTRM_MODULE_EXERCISES: PaieModuleExercises[] = [
 ];
 
 // ---------------------------------------------------------------------------
-// Commentaires humanisés stagiaires — QCM début / fin (10 + 10)
-// Injectés dans la cellule "Réponse du stagiaire" pour donner un ton oral
-// et authentique aux tests de positionnement GOTRM.
+// Commentaires humanisés stagiaires — QCM début / fin (10 questions × 4 variantes)
+// Le générateur choisit aléatoirement une variante par question à chaque génération
+// (rotation via nonce temps + seed stagiaire) pour éviter tout copier-coller entre dossiers.
 // ---------------------------------------------------------------------------
-export const GOTRM_QCM_HUMAN_COMMENTS: { debut: string[]; fin: string[] } = {
+export const GOTRM_QCM_HUMAN_COMMENTS: { debut: string[][]; fin: string[][] } = {
   debut: [
-    "Je sais qu'il faut vérifier plusieurs pièces avant de faire rouler un affrété, l'URSSAF vigilance surtout — on s'est fait avoir dessus il y a 2 ans.",
-    "Côté conducteur je le connais bien : 9 h en base et 10 h possible mais deux fois par semaine max, on l'a assez répété.",
-    "La pause de 45 min après 4 h 30, je la respecte, je la fractionne parfois 15+30 quand je peux caser un chargement entre les deux.",
-    "PRK = Prix de Revient Kilométrique, c'est la base de tout, je l'entends tous les jours au bureau sans forcément savoir le calculer proprement.",
-    "8,33 DTS/kg, je l'ai vu sur des sinistres récents, c'est bas comparé à la valeur des marchandises qu'on transporte.",
-    "45 h consécutives pour le repos hebdo normal, je crois que c'est ça, je vérifie souvent sur ma fiche mémo RSE.",
-    "Sous les 15 % de retour vide c'est déjà pas mal, chez nous on tourne à 22 % et ça pèse lourd sur la marge.",
-    "Le décret 2017-1740, je l'ai déjà entendu passer, c'est ce qui s'applique quand personne n'a pris le temps d'écrire un vrai contrat.",
-    "Le CNR publie ses indices tous les mois, mon patron s'en sert pour les indexations gazole des contrats annuels.",
-    "L'équivalence par le titre pro GOTRM, c'est justement une des raisons pour lesquelles je me suis inscrit à cette formation.",
+    [
+      "Je sais qu'il faut vérifier plusieurs pièces avant de faire rouler un affrété, l'URSSAF vigilance surtout — on s'est fait avoir dessus il y a 2 ans.",
+      "Franchement au bureau on demande le Kbis et la licence, l'attestation vigilance on l'oublie de temps en temps… je sais que c'est risqué.",
+      "Chez nous c'est un check-list Excel en 5 points : licence, capacité, RC, Kbis récent, vigilance URSSAF. Rien ne part sans ça.",
+      "Je réponds C parce que si on rate une seule pièce, on est solidaire des dettes du sous-traitant, mon patron nous le rappelle sans arrêt.",
+    ],
+    [
+      "Côté conducteur je le connais bien : 9 h en base et 10 h possible mais deux fois par semaine max, on l'a assez répété.",
+      "9 h par jour, ça me parle, je vois passer les cartes chrono toutes les semaines et je repère vite les dépassements.",
+      "9 h de conduite journalière — j'ai eu un contrôle DREAL sur ce point il y a 6 mois, ça marque.",
+      "Je répondais 10 h avant, mais on m'a corrigé : la base c'est 9 h, le 10 h c'est l'exception 2 fois par semaine.",
+    ],
+    [
+      "La pause de 45 min après 4 h 30, je la respecte, je la fractionne parfois 15+30 quand je peux caser un chargement entre les deux.",
+      "45 minutes cumulables 15+30, c'est utile pour ne pas casser un rythme de livraison, je le mets dans mes plans de marche.",
+      "J'ai hésité entre 30 et 45, mais on m'a bien dit 45 min réglementaires, sinon c'est infraction.",
+      "45 min sans se tromper — mon FCO récent l'a martelé, y compris avec les cas de contrôle sur bord d'autoroute.",
+    ],
+    [
+      "PRK = Prix de Revient Kilométrique, c'est la base de tout, je l'entends tous les jours au bureau sans forcément savoir le calculer proprement.",
+      "PRK je l'écris dans tous mes devis mais je n'ai jamais posé le calcul complet, cette formation va justement m'aider là-dessus.",
+      "Le PRK, c'est ce que mon patron me dit toujours de « ne jamais vendre en dessous ». Je vais enfin comprendre pourquoi.",
+      "Prix de Revient Kilométrique — mot valise très utilisé dans l'exploitation, moins bien maîtrisé qu'on ne le croit.",
+    ],
+    [
+      "8,33 DTS/kg, je l'ai vu sur des sinistres récents, c'est bas comparé à la valeur des marchandises qu'on transporte.",
+      "Je réponds 8,33 DTS/kg même si le montant en euros varie avec le cours — c'est le plafond CMR pour les avaries.",
+      "On a eu un litige où le client réclamait la valeur pleine des marchandises, on a plafonné à 8,33 DTS/kg — d'où l'intérêt de la déclaration de valeur.",
+      "8,33 DTS/kg, ça revient à peu près à 10 €/kg — je le sais mais dans le stress d'un litige on l'oublie.",
+    ],
+    [
+      "45 h consécutives pour le repos hebdo normal, je crois que c'est ça, je vérifie souvent sur ma fiche mémo RSE.",
+      "45 h — sinon repos hebdo réduit à 24 h max une semaine sur deux avec compensation. Je le note toujours.",
+      "Le repos hebdomadaire normal c'est 45 h, réductible mais avec contrepartie. J'ai un tableau plastifié au bureau.",
+      "45 h, ça permet de reprendre en frais après le week-end. En dessous il faut compenser la semaine suivante.",
+    ],
+    [
+      "Sous les 15 % de retour vide c'est déjà pas mal, chez nous on tourne à 22 % et ça pèse lourd sur la marge.",
+      "15 % c'est l'objectif que se donnent les gros transporteurs, mais entre nous, tourner en dessous c'est très difficile.",
+      "Chez nous on est à 20 %, l'objectif 15 % c'est en ligne de mire — mais chaque point c'est plusieurs milliers d'euros.",
+      "Je réponds 15 % car c'est la cible enseignée, mais la réalité du terrain oscille souvent entre 18 et 22 %.",
+    ],
+    [
+      "Le décret 2017-1740, je l'ai déjà entendu passer, c'est ce qui s'applique quand personne n'a pris le temps d'écrire un vrai contrat.",
+      "2017-1740 : contrat-type sous-traitance. Je l'ai imprimé dans le classeur, c'est ma bouée en cas de doute.",
+      "Ce décret protège aussi les petits sous-traitants — il fixe le prix plancher et l'indexation gazole obligatoire.",
+      "Décret de fin 2017 sur la sous-traitance — c'est celui-là qui s'impose à défaut d'écrit, oui.",
+    ],
+    [
+      "Le CNR publie ses indices tous les mois, mon patron s'en sert pour les indexations gazole des contrats annuels.",
+      "CNR = Comité National Routier. On récupère leurs indices chaque mois pour recalculer nos prix.",
+      "Sans les indices CNR, impossible de justifier une hausse de tarif au client — c'est notre référence neutre.",
+      "Le CNR sort les enquêtes coûts trimestrielles, très utiles pour benchmarker notre PRK.",
+    ],
+    [
+      "L'équivalence par le titre pro GOTRM, c'est justement une des raisons pour lesquelles je me suis inscrit à cette formation.",
+      "Le titre pro donne la capacité pro >3,5 t — c'est ce qui m'ouvre le poste d'exploitant reconnu.",
+      "TP-01329 = équivalence capacité pro. Sans ça je restais bloqué en assistant d'exploitation.",
+      "L'attestation de capacité, on peut l'obtenir par examen DREAL ou par équivalence titre pro. Moi c'est la deuxième voie.",
+    ],
   ],
   fin: [
-    "L'article L8222-1 du Code du travail, on l'a bien travaillé — la responsabilité solidaire du donneur d'ordre c'est mon nouveau réflexe avant chaque affrètement.",
-    "1,65 €/km sur un 40 t roulant 90 000 km/an, c'est cohérent avec les études CNR qu'on a analysées en formation.",
-    "7 jours par LRAR pour un dommage non apparent, je le sais maintenant par cœur — c'est un des pièges où on perdait des dossiers avant.",
-    "La déclaration d'intérêt spécial, c'est ce qui permet de dépasser le plafond CMR quand le client accepte de payer une surprime.",
-    "96 à 98 % d'OTIF c'est ce qu'on négocie sur les contrats réguliers, en dessous on prend des pénalités et on perd le client.",
-    "Le forfait 43 h équivalent pour les longue distance en IDCC 0016, on l'a détaillé bulletin par bulletin, c'est clair maintenant.",
-    "Chrono intelligent 2e génération obligatoire depuis août 2023 sur les véhicules neufs, on l'a vu en veille réglementaire.",
-    "Autour de 20 % de retour vide en moyenne nationale, c'est ce que dit le CNR — l'enjeu marge est énorme si on descend en dessous.",
-    "L'article 1231-5 du Code civil permet au juge de modérer une pénalité disproportionnée, on avait fait le cas pratique dessus.",
-    "10 h de MSP en deux parties sur deux jours, c'est le nouveau format depuis l'arrêté de juin 2025 — j'ai préparé mon dossier support en conséquence.",
+    [
+      "L'article L8222-1 du Code du travail, on l'a bien travaillé — la responsabilité solidaire du donneur d'ordre c'est mon nouveau réflexe avant chaque affrètement.",
+      "L8222-1 : je vérifie l'attestation vigilance URSSAF à chaque première mission d'un nouveau sous-traitant, plus jamais d'oubli.",
+      "J'ai retenu la jurisprudence Cass. 2018 sur la solidarité URSSAF — ça change la façon d'aborder l'affrètement.",
+      "L8222-1 c'est LA base du contrôle sous-traitant, on l'a répétée sur 3 cas pratiques différents.",
+    ],
+    [
+      "1,65 €/km sur un 40 t roulant 90 000 km/an, c'est cohérent avec les études CNR qu'on a analysées en formation.",
+      "1,65 €/km, c'est presque exactement ce que sort mon Excel PRK depuis la formation, avant je vendais à 1,45 € sans le savoir.",
+      "PRK autour de 1,65 €/km en longue distance, ça donne 1,80-1,85 €/km de prix de vente pour tenir 10 % de marge.",
+      "1,65 €/km — les études CNR 2025 donnent 1,74 en réalité, ça a encore augmenté avec le carburant.",
+    ],
+    [
+      "7 jours par LRAR pour un dommage non apparent, je le sais maintenant par cœur — c'est un des pièges où on perdait des dossiers avant.",
+      "Dommage non apparent = 7 jours pour dénoncer par LRAR. Passé ce délai, plus rien à faire, la marchandise est réputée conforme.",
+      "7 jours calendaires à partir de la livraison, je fais un tampon rappel sur nos CMR maintenant.",
+      "On l'a bien vu sur le cas AGROVERT, sans LRAR dans les 7 jours le sinistre tombe à l'eau.",
+    ],
+    [
+      "La déclaration d'intérêt spécial, c'est ce qui permet de dépasser le plafond CMR quand le client accepte de payer une surprime.",
+      "Déclaration d'intérêt spécial = seul moyen de couvrir un préjudice supérieur au prix du transport en cas de retard.",
+      "On a rejoué le cas Peugeot où le client réclamait 12 500 € : sans déclaration spéciale, plafond au prix du transport, point.",
+      "C'est optionnel côté client mais fortement recommandé sur les productions sensibles — je vais le proposer systématiquement.",
+    ],
+    [
+      "96 à 98 % d'OTIF c'est ce qu'on négocie sur les contrats réguliers, en dessous on prend des pénalités et on perd le client.",
+      "OTIF 96 % minimum sur nos contrats réguliers, mesuré chaque mois avec reporting M+5. En dessous c'est pénalité progressive.",
+      "96-98 % OTIF, ça exige un buffer temps et une marge de tri sur les tournées messagerie — sinon impossible à tenir.",
+      "Sur les contrats industriels majeurs on part même à 98 %. C'est là que le TMS et la géolocalisation font la différence.",
+    ],
+    [
+      "Le forfait 43 h équivalent pour les longue distance en IDCC 0016, on l'a détaillé bulletin par bulletin, c'est clair maintenant.",
+      "39 h payées = 43 h de présence en longue distance, avec les coupures neutralisées. J'ai la grille en tête maintenant.",
+      "IDCC 0016 durée équivalente 43 h, c'est spécifique au TRM, on l'a comparé au Code du travail 35 h classique.",
+      "Grille conducteur longue distance : 43 h/semaine incluant les coupures RSE, c'est ce qui explique les fiches de paie complexes.",
+    ],
+    [
+      "Chrono intelligent 2e génération obligatoire depuis août 2023 sur les véhicules neufs, on l'a vu en veille réglementaire.",
+      "Août 2023 pour les neufs, rétrofit progressif jusqu'à 2025 pour l'ancien parc — j'ai pris des notes précises.",
+      "Chrono G2 = géolocalisation intégrée temps réel, plus de fraude possible. C'était bien le point à retenir.",
+      "Je l'ai retenu grâce à la comparaison avant/après : le G2 empêche les manipulations qu'on voyait encore en 2020.",
+    ],
+    [
+      "Autour de 20 % de retour vide en moyenne nationale, c'est ce que dit le CNR — l'enjeu marge est énorme si on descend en dessous.",
+      "20 % moyenne nationale, c'est là qu'il faut agir. Un abonnement B2Pweb bien exploité fait descendre à 15 %.",
+      "Retour vide français 20 % — chaque point récupéré c'est 15 à 30 k€ de marge par tracteur par an, on l'a chiffré en cours.",
+      "20 % en moyenne, mais les meilleurs sont à 12 %. C'est un vrai levier de compétitivité qu'on sous-estime.",
+    ],
+    [
+      "L'article 1231-5 du Code civil permet au juge de modérer une pénalité disproportionnée, on avait fait le cas pratique dessus.",
+      "1231-5 = le juge peut réduire une pénalité manifestement excessive. Utile à connaître avant de signer des clauses trop lourdes.",
+      "Ça relativise les pénalités clients énormes qu'on nous impose parfois. La modération judiciaire existe.",
+      "1231-5 s'applique aussi dans l'autre sens : si notre pénalité au sous-traitant est disproportionnée, elle sera cassée.",
+    ],
+    [
+      "10 h de MSP en deux parties sur deux jours, c'est le nouveau format depuis l'arrêté de juin 2025 — j'ai préparé mon dossier support en conséquence.",
+      "MSP 10 h en 2×5 h, format 2025. Mon dossier support fait 11 pages, dans la fourchette 8-12 recommandée.",
+      "Nouveau format 2025 : 10 h de MSP + entretien technique + questionnement + entretien final. Je suis à peu près calé.",
+      "10 h en deux parties, je l'ai bien intégré. Je vise 15 000 caractères sur mon dossier support, c'est dans la cible.",
+    ],
   ],
 };
+
+// Sélection aléatoire déterministe d'une variante de commentaire
+// (nonce = seed stagiaire + bucket temps 30 min, garantit variété d'une génération à l'autre)
+export function pickGOTRMComment(mode: "debut" | "fin", qi: number, seed: number): string {
+  const bank = mode === "debut" ? GOTRM_QCM_HUMAN_COMMENTS.debut : GOTRM_QCM_HUMAN_COMMENTS.fin;
+  const variants = bank[qi] || [];
+  if (variants.length === 0) return "";
+  const bucket = Math.floor(Date.now() / (30 * 60 * 1000));
+  const idx = Math.abs((seed * 131 + qi * 17 + bucket * 7)) % variants.length;
+  return variants[idx];
+}
 
 // ---------------------------------------------------------------------------
 // Seeder — hydrate les caches pour les DEUX titres GOTRM

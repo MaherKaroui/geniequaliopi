@@ -48,7 +48,7 @@ import { getCachedPack, answersForQCM, studentAnswerFromCorrection, noteForOpenQ
 import { getCachedContentPack, pickImagesForQuery } from "./aiContentPack";
 import { PAIE_MODULE_EXERCISES } from "./paiePreset";
 import { SECRETARIAT_MODULE_EXERCISES } from "./secretariatPreset";
-import { GOTRM_MODULE_EXERCISES, GOTRM_QCM_HUMAN_COMMENTS } from "./gotrmPreset";
+import { GOTRM_MODULE_EXERCISES, pickGOTRMComment } from "./gotrmPreset";
 
 function getModuleExercisesFor(f: FormationInfo) {
   const t = (f.intitule || "").toLowerCase();
@@ -16573,7 +16573,9 @@ function genAITestPositionnement(o: OrganismeInfo, f: FormationInfo, stagiaires:
   // Détection GOTRM : injection de commentaires stagiaires humanisés dans la cellule "Réponse"
   const tTitle = (f.intitule || "").toLowerCase();
   const isGOTRM = tTitle.includes("gotrm") || tTitle.includes("gestionnaire des opérations de transport") || tTitle.includes("exploitant transport") || tTitle.includes("tp-01329") || tTitle.includes("rncp40990") || (f.codeRNCP || "").toUpperCase().includes("40990");
-  const humanComments = isGOTRM ? (isDebut ? GOTRM_QCM_HUMAN_COMMENTS.debut : GOTRM_QCM_HUMAN_COMMENTS.fin) : null;
+  const gotrmSeed = isGOTRM
+    ? ((s?.prenom || "").length * 131 + (s?.nom || "").length * 197 + si * 41 + (isDebut ? 3 : 11))
+    : 0;
   const rows = qcm.map((q, qi) => {
     const optionsCell = q.options.map((opt, oi) => `${String.fromCharCode(65 + oi)}) ${opt}`).join("<br>");
     if (renderEmpty) {
@@ -16589,8 +16591,9 @@ function genAITestPositionnement(o: OrganismeInfo, f: FormationInfo, stagiaires:
     const ok = chosen === q.correctIndex;
     if (ok) correct++;
     const chosenLabel = `${String.fromCharCode(65 + chosen)}) ${q.options[chosen]}`;
-    const humanNote = humanComments && humanComments[qi]
-      ? `<br><em style="color:#475569;font-size:0.92em">« ${humanComments[qi]} »</em>`
+    const humanCommentText = isGOTRM ? pickGOTRMComment(mode as "debut" | "fin", qi, gotrmSeed) : "";
+    const humanNote = humanCommentText
+      ? `<br><em style="color:#475569;font-size:0.92em">« ${humanCommentText} »</em>`
       : "";
     if (isDebut) {
       return [
