@@ -2323,7 +2323,7 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
       <p>${o.telephone?.trim() ? `<strong>Téléphone :</strong> ${o.telephone}` : ""}</p>
       <p><strong>Email :</strong> ${o.email}</p>
       ${optSiteWeb(o)}
-      <p><strong>Dirigeant – Formateur – Référent pédagogique – Référent handicap :</strong><br>Monsieur/Madame ${o.dirigeant}</p>
+      <p><strong>Dirigeant :</strong><br>Monsieur/Madame ${o.dirigeant}</p>
     </div>
 
     <h2>2. Intitulé de la formation</h2>
