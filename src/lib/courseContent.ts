@@ -460,6 +460,7 @@ import { getEsthetiqueChapters } from "./courseContentEsthetique";
 import { getMaquillageChapters } from "./courseContentMaquillage";
 import { getPaieChapters } from "./courseContentPaie";
 import { getSecretariatChapters } from "./courseContentSecretariat";
+import { getGOTRMChapters } from "./courseContentGOTRM";
 
 import { getNTCChapters } from "./courseContentNTC";
 import { getGPMEChapters } from "./courseContentGPME";
@@ -496,6 +497,7 @@ export function getCourseChapters(formationIntitule: string): CourseChapter[] {
   const t = formationIntitule.toLowerCase();
   if (t.includes('gestionnaire de paie') || t.includes('gestionnaire paie') || (t.includes('paie') && (t.includes('formation') || t.includes('bulletin') || t.includes('gestion')))) return getPaieChapters();
   if (t.includes('secrétariat') || t.includes('secretariat') || t.includes('secrétaire') || t.includes('secretaire') || t.includes('office manager') || t.includes('assistanat')) return getSecretariatChapters();
+  if (t.includes('gotrm') || t.includes('gestionnaire des op\u00e9rations de transport') || t.includes('exploitant transport') || t.includes('tp-01329') || t.includes('rncp40990')) return getGOTRMChapters();
   if (t.includes('gestion de la pme') || t.includes('gestion pme') || t.includes('bts gpme') || t.includes(' gpme') || t.startsWith('gpme') || t.includes('rncp38363')) return getGPMEChapters();
   if (t.includes('création') && (t.includes('entreprise') || t.includes('activité'))) return getCreationEntrepriseChapters();
   if (t.includes('creation') && (t.includes('entreprise') || t.includes('activite'))) return getCreationEntrepriseChapters();
