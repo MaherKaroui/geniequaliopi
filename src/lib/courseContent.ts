@@ -127,6 +127,21 @@ const YOUTUBE_SECRETAIRE: CourseData['youtubeVideos'] = [
   { title: "Le DPI – Dossier Patient Informatisé", url: "https://www.youtube.com/watch?v=KzNPxMgRX7Q", description: "Gestion du dossier patient informatisé : saisie, archivage, confidentialité et réglementation." },
 ];
 
+const YOUTUBE_SECRETARIAT: CourseData['youtubeVideos'] = [
+  { title: "Le métier de secrétaire assistant(e) — Présentation complète (France Travail)", url: "https://www.youtube.com/watch?v=Y8Q6nXpQpsE", description: "Panorama du métier de secrétaire / assistant(e) administratif(ve) : missions, environnements de travail, compétences clés et évolutions de carrière." },
+  { title: "RGPD au bureau — Les bonnes pratiques du personnel administratif", url: "https://www.youtube.com/watch?v=jJb0BuwLuG4", description: "Rappel des obligations RGPD applicables au poste de secrétaire : traitement des données personnelles, envois d'emails, conservation et confidentialité." },
+  { title: "Rédiger un email professionnel efficace", url: "https://www.youtube.com/watch?v=cTIH2Pdbg9E", description: "Structure d'un email pro : objet, formule d'appel, message clair, formule de politesse. Les pièges à éviter et les bonnes pratiques CC/CCI." },
+  { title: "Le compte rendu de réunion — Méthode et modèle", url: "https://www.youtube.com/watch?v=A0hYh5b7ZzM", description: "Comment prendre des notes efficaces et rédiger un CR synthétique de réunion : décisions, actions, échéances, porteurs." },
+  { title: "Outlook — Maîtriser sa boîte mail, son agenda et ses règles", url: "https://www.youtube.com/watch?v=BjcNvbXHDGA", description: "Tutoriel complet Outlook : règles automatiques, catégories, agenda partagé, délégation et recherche avancée." },
+  { title: "Excel — Les fonctions indispensables au secrétariat", url: "https://www.youtube.com/watch?v=xZ4qwSCFzOM", description: "Formules de base et intermédiaires (SI, RECHERCHEV, SOMME.SI), filtres, tris, mise en forme conditionnelle et TCD pour un tableau de suivi." },
+  { title: "Word — Publipostage avec une source Excel", url: "https://www.youtube.com/watch?v=SXjqmJC7yOU", description: "Créer un publipostage Word depuis un fichier Excel : convocations, attestations, courriers en série personnalisés en quelques minutes." },
+  { title: "Accueil téléphonique professionnel — Les 4 règles d'or", url: "https://www.youtube.com/watch?v=D2Hs5EYt2sM", description: "Phrase d'accueil, écoute active, prise de message, gestion d'un appel difficile : la méthode ERIC pour un accueil irréprochable." },
+  { title: "Gestion du temps et priorisation — Matrice d'Eisenhower", url: "https://www.youtube.com/watch?v=tT89OZ7TNwc", description: "Méthode d'Eisenhower (urgent/important) appliquée au poste de secrétaire : trier sa to-do, éviter la surcharge et prioriser sous pression." },
+  { title: "Microsoft Copilot pour l'assistant(e) — Cas d'usage 2026", url: "https://www.youtube.com/watch?v=xVLwrKtczlI", description: "Utiliser Copilot dans M365 pour rédiger un email, résumer un fil Teams, produire un CR de réunion et créer un slide à partir d'un texte." },
+];
+
+
+
 const YOUTUBE_VTC: CourseData['youtubeVideos'] = [
   { title: "Examen VTC – Tout ce qu'il faut savoir pour réussir", url: "https://www.youtube.com/watch?v=Ae8x1lhGJ4U", description: "Présentation complète de l'examen d'accès à la profession de VTC : épreuves d'admissibilité et d'admission." },
   { title: "Réglementation VTC – Différences avec le taxi", url: "https://www.youtube.com/watch?v=q1m_z-Yq3Z4", description: "Comprendre les différences réglementaires entre taxi, VTC et VMDTR : maraude, tarifs, voies réservées." },
@@ -276,7 +291,7 @@ export function getYoutubeVideos(formationIntitule: string): CourseData['youtube
   if (t.includes('powerpoint') || t.includes('ppt')) return YOUTUBE_POWERPOINT;
   if (t.includes('bureautique') || t.includes('pack office') || t.includes('office 365') || t.includes('microsoft 365')) return YOUTUBE_BUREAUTIQUE;
   if (t.includes('gestionnaire de paie') || t.includes('gestionnaire paie') || (t.includes('paie') && (t.includes('bulletin') || t.includes('gestion')))) return YOUTUBE_PAIE;
-  if (t.includes('secrétariat') || t.includes('secretariat') || t.includes('secrétaire') || t.includes('secretaire') || t.includes('office manager') || t.includes('assistanat')) return YOUTUBE_BUREAUTIQUE;
+  if (t.includes('secrétariat') || t.includes('secretariat') || t.includes('assistanat') || (t.includes('secrétaire') && !t.includes('médic')) || (t.includes('secretaire') && !t.includes('medic'))) return YOUTUBE_SECRETARIAT;
   // NB: getSecretariatChapters imported below alongside other chapters
   // Langues
   if ((t.includes('anglais') || t.includes('english')) && (t.includes('a1') || t.includes('débutant'))) return YOUTUBE_ANGLAIS_A1;
