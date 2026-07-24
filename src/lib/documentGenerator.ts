@@ -10221,23 +10221,23 @@ function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: 
   // === Early return : Secrétariat / Office manager (reconversion / évolution admin) ===
   if (isSecretariat) {
     const secAttentes = [
-      `Je veux vraiment reprendre confiance sur les outils Word et Excel parce qu'aujourd'hui je bricole et je perds un temps fou sur des choses qui devraient être automatiques.`,
-      `Ce qui me stresse le plus c'est la rédaction des mails et courriers officiels, j'ai peur de faire des fautes ou d'être mal comprise par la hiérarchie.`,
-      `Je souhaite apprendre à mieux m'organiser au quotidien, prioriser mes tâches, ne plus me laisser déborder par les urgences des autres.`,
-      `J'aimerais gagner en aisance à l'accueil physique et téléphonique, surtout face aux clients mécontents où je ne sais jamais quoi répondre sur le moment.`,
-      `Je veux comprendre les bases du RGPD et de la confidentialité pour ne pas mettre l'entreprise en risque quand je manipule des dossiers RH ou clients.`,
-      `Mon objectif c'est de tenir un vrai poste d'assistant(e) de direction, pas juste faire du secrétariat basique, avec la gestion d'agenda, les réunions et les comptes rendus.`,
+      `Nous attendons de cette formation que ${s.prenom} gagne en aisance et en rapidité sur Word et Excel afin de fiabiliser les documents produits (courriers, tableaux de suivi, comptes rendus) au quotidien.`,
+      `Notre objectif est de professionnaliser la rédaction des mails et courriers officiels de ${s.prenom} (orthographe, formules de politesse, ton adapté à la hiérarchie et aux clients) pour renforcer l'image de la structure.`,
+      `Nous souhaitons que ${s.prenom} développe ses compétences en organisation et gestion des priorités afin d'absorber les demandes multiples de l'équipe sans dégrader la qualité de service.`,
+      `Nous attendons une réelle montée en compétences sur l'accueil physique et téléphonique, notamment sur la gestion des situations difficiles (clients mécontents, réclamations), pour préserver la satisfaction client.`,
+      `Cette formation doit permettre à ${s.prenom} de maîtriser les bases du RGPD et de la confidentialité afin de sécuriser le traitement des dossiers RH, comptables et clients qui lui sont confiés.`,
+      `Notre objectif est que ${s.prenom} évolue vers un vrai poste d'assistant(e) de direction : gestion d'agenda, préparation et compte-rendu de réunions, coordination interservices.`,
     ];
     const secMissions = [
-      "Accueil physique et téléphonique, gestion du courrier entrant/sortant, tenue d'agenda du dirigeant, prise de rendez-vous, préparation logistique des réunions et rédaction des comptes rendus.",
-      "Traitement des mails de la boîte contact, mise en forme de documents Word/Excel, suivi des devis et factures fournisseurs, classement électronique et archivage physique.",
-      "Assistanat commercial : relance clients, mise à jour du CRM, préparation des dossiers appels d'offres, organisation des déplacements et notes de frais de l'équipe commerciale.",
-      "Assistanat RH : gestion des visites médicales, suivi des congés et absences, préparation des contrats, accueil des nouveaux arrivants et interface avec le cabinet de paie externe.",
+      `Au sein de la structure, ${s.prenom} assure l'accueil physique et téléphonique, la gestion du courrier entrant/sortant, la tenue de l'agenda du dirigeant, la prise de rendez-vous, la préparation logistique des réunions et la rédaction des comptes rendus.`,
+      `Les missions confiées à ${s.prenom} : traitement de la boîte mail contact, mise en forme de documents Word/Excel, suivi des devis et factures fournisseurs, classement électronique et archivage physique des dossiers.`,
+      `${s.prenom} intervient en appui du service commercial : relance clients, mise à jour du CRM, préparation des dossiers d'appels d'offres, organisation des déplacements et notes de frais de l'équipe.`,
+      `${s.prenom} intervient en appui du service RH : gestion des visites médicales, suivi des congés et absences, préparation des contrats, accueil des nouveaux arrivants et interface avec le cabinet de paie externe.`,
     ];
     const secContribution = [
-      "Fluidifier la circulation de l'information dans l'entreprise et libérer du temps aux managers en prenant en charge tout l'administratif du quotidien.",
-      "Assurer la qualité et la fiabilité des documents produits (mails, courriers, tableaux, comptes rendus) qui reflètent l'image professionnelle de la structure.",
-      "Devenir la personne ressource sur laquelle l'équipe compte pour l'organisation, la logistique et la remontée d'informations fiables.",
+      `La montée en compétences de ${s.prenom} nous permettra de fluidifier la circulation de l'information en interne et de libérer du temps aux managers, qui pourront se recentrer sur leurs missions à forte valeur ajoutée.`,
+      `Cette formation contribue directement à la qualité et à la fiabilité des documents produits par notre structure (mails, courriers, tableaux, comptes rendus), qui reflètent notre image auprès des clients et partenaires.`,
+      `${s.prenom} deviendra la personne ressource sur laquelle l'équipe pourra s'appuyer pour l'organisation, la logistique et la remontée d'informations fiables, ce qui sécurisera notre fonctionnement quotidien.`,
     ];
     const secDiplomes = [
       "Bac Pro Gestion-Administration + 3 ans d'expérience en poste d'agent administratif",
