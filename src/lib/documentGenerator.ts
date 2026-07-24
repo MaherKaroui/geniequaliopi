@@ -10152,25 +10152,25 @@ function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: 
   // === Early return : Gestionnaire de paie (reconversion / évolution RH-paie) ===
   if (isPaie) {
     const paieAttentes = [
-      `J'aimerais vraiment comprendre un bulletin de paie de A à Z, parce qu'aujourd'hui quand j'en reçois un je regarde juste le net à payer et le reste c'est du chinois pour moi.`,
-      `Franchement mon objectif c'est de pouvoir faire tourner la paie de ma boîte moi-même, on est ${1 + (idx % 3) * 5}${(1 + (idx % 3) * 5) === 1 ? 'er' : 'ème'} et payer 200 € par bulletin au cabinet, ça fait mal.`,
-      `Ce qui me bloque le plus c'est les cotisations, entre l'URSSAF, l'AGIRC-ARRCO, la CSG, je m'y perds. J'ai besoin qu'on m'explique ça calmement, avec des exemples concrets.`,
-      `Je voudrais gagner en confiance sur la DSN, j'ai déjà vu la responsable paie de mon ancien employeur paniquer chaque 5 du mois, je veux pas être comme ça.`,
-      `Mon objectif clair, c'est de trouver un poste de gestionnaire de paie junior d'ici 3 à 6 mois après la formation. Donc j'attends du concret, du terrain, pas juste de la théorie.`,
+      `Nous attendons que ${s.prenom} devienne pleinement autonome sur un cycle de paie mensuel complet (préparation des variables, édition des bulletins, DSN, gestion des rejets) afin de sécuriser notre fonction paie en interne.`,
+      `Notre objectif est de professionnaliser ${s.prenom} sur la lecture et la production d'un bulletin de paie, la maîtrise des cotisations URSSAF / AGIRC-ARRCO / CSG-CRDS, et la fiabilisation de la DSN mensuelle.`,
+      `Nous souhaitons que ${s.prenom} monte en compétences sur Silae (ou équivalent) pour reprendre progressivement en interne la paie aujourd'hui sous-traitée à un cabinet, avec un doublon de 3 mois puis une bascule complète.`,
+      `Cette formation doit permettre à ${s.prenom} d'être capable de répondre de manière fiable aux questions des salariés sur leur bulletin (net à payer, prélèvement à la source, absences, primes) et de sécuriser nos obligations sociales déclaratives.`,
+      `Nous attendons un(e) collaborateur(trice) opérationnel(le) sur un portefeuille jusqu'à 35 salariés (multi-conventions collectives), capable de gérer les entrées/sorties, les STC et les régularisations en toute autonomie.`,
     ];
     const paieMissions = [
-      `Aujourd'hui je fais surtout de l'administratif RH (contrats, absences, tickets restaurant) mais la paie est confiée au cabinet. Je veux la reprendre en interne progressivement.`,
-      `Je gère un peu de tout dans une petite structure : facturation, comptes fournisseurs, RH. La paie viendrait compléter mon poste et sécuriser l'entreprise sur ce sujet sensible.`,
-      `Je suis en reconversion, je n'ai pas encore d'expérience en paie. J'ai fait un bilan de compétences qui m'a orientée vers ce métier parce que j'aime la rigueur et les chiffres.`,
-      `Assistante comptable en cabinet, je saisis les écritures mais je ne fais pas les bulletins. Je veux passer côté social pour évoluer et être polyvalente.`,
-      `Actuellement demandeur d'emploi, j'ai identifié le métier de gestionnaire de paie comme un secteur qui recrute vraiment en Île-de-France (+18 % d'offres en 2025 selon France Travail).`,
+      `${s.prenom} occupe aujourd'hui un poste d'assistant(e) RH / administratif : gestion des contrats, absences, tickets restaurant. La paie étant sous-traitée, nous souhaitons la réinternaliser et confier la production des bulletins et la DSN à ${s.prenom} à l'issue de la formation.`,
+      `Au sein de notre structure, ${s.prenom} intervient sur les fonctions support (facturation, comptes fournisseurs, RH). La formation lui permettra de prendre en charge la paie des salariés et de sécuriser l'entreprise sur un sujet à forts enjeux sociaux et financiers.`,
+      `${s.prenom} rejoint l'équipe sur un poste de gestionnaire de paie junior. Après la formation, ses missions couvriront le cycle complet : collecte des éléments variables, édition des bulletins, DSN mensuelle et évènementielle, interface avec l'expert-comptable.`,
+      `Actuellement assistant(e) comptable, ${s.prenom} saisit les écritures sociales sans produire les bulletins. La formation lui permettra d'assurer la production paie de nos clients TPE/PME et de compléter l'offre du cabinet sur le volet social.`,
+      `Les missions confiées à ${s.prenom} à l'issue de la formation : production des bulletins, suivi des cotisations, DSN, gestion administrative du personnel (contrats, avenants, STC) et veille sociale de premier niveau.`,
     ];
     const paieContribution = [
-      `Cette formation va me permettre de sécuriser mon poste actuel en apportant une vraie compétence paie à mon employeur, qui dépend aujourd'hui à 100 % d'un cabinet extérieur.`,
-      `Devenir autonome en paie va faire économiser à ma boîte environ 200 € par bulletin, soit ~2 400 €/an par salarié. Sur 12 salariés ça représente presque 30 k€ économisés par an.`,
-      `Je vais pouvoir prétendre à un poste de gestionnaire de paie junior avec un salaire médian de 30 k€ brut en IDF, contre 24 k€ dans mon poste actuel d'assistante administrative.`,
-      `Cette formation valide un vrai virage professionnel : je passe d'un poste d'assistante polyvalente à une spécialisation technique reconnue, avec un métier en tension.`,
-      `À court terme je pourrai répondre aux salariés qui me questionnent sur leur bulletin (« pourquoi mon net a baissé ce mois-ci ? »), ce qui est aujourd'hui un vrai point de tension interne.`,
+      `Réinternaliser la paie représente pour notre entreprise une économie estimée à ~200 € par bulletin, soit près de 30 k€/an sur notre effectif, tout en gagnant en réactivité et en confidentialité sur un sujet sensible.`,
+      `${s.prenom} deviendra la personne référente paie de la structure : cela sécurise notre continuité de service et met fin à notre dépendance à 100 % vis-à-vis d'un prestataire extérieur.`,
+      `Cette montée en compétences s'inscrit dans notre politique RH de promotion interne et de fidélisation : ${s.prenom} évolue d'un poste d'assistant(e) polyvalent(e) vers une spécialisation technique reconnue, sur un métier en tension.`,
+      `La formation contribue directement à notre conformité sociale (DSN, obligations URSSAF, contrôles) et réduit le risque financier lié aux erreurs de paie (redressements, contentieux prud'homaux).`,
+      `À court terme, disposer en interne d'un(e) gestionnaire de paie qualifié(e) nous permettra de mieux répondre aux questions des salariés et de fluidifier notre relation sociale, aujourd'hui pénalisée par les délais du cabinet.`,
     ];
     const paieObjectif = [
       `Être autonome sur un cycle de paie complet (35 salariés maximum) : préparer les variables, générer les bulletins sur Silae, transmettre la DSN, gérer les rejets, expliquer aux salariés.`,
@@ -10221,23 +10221,23 @@ function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: 
   // === Early return : Secrétariat / Office manager (reconversion / évolution admin) ===
   if (isSecretariat) {
     const secAttentes = [
-      `Je veux vraiment reprendre confiance sur les outils Word et Excel parce qu'aujourd'hui je bricole et je perds un temps fou sur des choses qui devraient être automatiques.`,
-      `Ce qui me stresse le plus c'est la rédaction des mails et courriers officiels, j'ai peur de faire des fautes ou d'être mal comprise par la hiérarchie.`,
-      `Je souhaite apprendre à mieux m'organiser au quotidien, prioriser mes tâches, ne plus me laisser déborder par les urgences des autres.`,
-      `J'aimerais gagner en aisance à l'accueil physique et téléphonique, surtout face aux clients mécontents où je ne sais jamais quoi répondre sur le moment.`,
-      `Je veux comprendre les bases du RGPD et de la confidentialité pour ne pas mettre l'entreprise en risque quand je manipule des dossiers RH ou clients.`,
-      `Mon objectif c'est de tenir un vrai poste d'assistant(e) de direction, pas juste faire du secrétariat basique, avec la gestion d'agenda, les réunions et les comptes rendus.`,
+      `Nous attendons de cette formation que ${s.prenom} gagne en aisance et en rapidité sur Word et Excel afin de fiabiliser les documents produits (courriers, tableaux de suivi, comptes rendus) au quotidien.`,
+      `Notre objectif est de professionnaliser la rédaction des mails et courriers officiels de ${s.prenom} (orthographe, formules de politesse, ton adapté à la hiérarchie et aux clients) pour renforcer l'image de la structure.`,
+      `Nous souhaitons que ${s.prenom} développe ses compétences en organisation et gestion des priorités afin d'absorber les demandes multiples de l'équipe sans dégrader la qualité de service.`,
+      `Nous attendons une réelle montée en compétences sur l'accueil physique et téléphonique, notamment sur la gestion des situations difficiles (clients mécontents, réclamations), pour préserver la satisfaction client.`,
+      `Cette formation doit permettre à ${s.prenom} de maîtriser les bases du RGPD et de la confidentialité afin de sécuriser le traitement des dossiers RH, comptables et clients qui lui sont confiés.`,
+      `Notre objectif est que ${s.prenom} évolue vers un vrai poste d'assistant(e) de direction : gestion d'agenda, préparation et compte-rendu de réunions, coordination interservices.`,
     ];
     const secMissions = [
-      "Accueil physique et téléphonique, gestion du courrier entrant/sortant, tenue d'agenda du dirigeant, prise de rendez-vous, préparation logistique des réunions et rédaction des comptes rendus.",
-      "Traitement des mails de la boîte contact, mise en forme de documents Word/Excel, suivi des devis et factures fournisseurs, classement électronique et archivage physique.",
-      "Assistanat commercial : relance clients, mise à jour du CRM, préparation des dossiers appels d'offres, organisation des déplacements et notes de frais de l'équipe commerciale.",
-      "Assistanat RH : gestion des visites médicales, suivi des congés et absences, préparation des contrats, accueil des nouveaux arrivants et interface avec le cabinet de paie externe.",
+      `Au sein de la structure, ${s.prenom} assure l'accueil physique et téléphonique, la gestion du courrier entrant/sortant, la tenue de l'agenda du dirigeant, la prise de rendez-vous, la préparation logistique des réunions et la rédaction des comptes rendus.`,
+      `Les missions confiées à ${s.prenom} : traitement de la boîte mail contact, mise en forme de documents Word/Excel, suivi des devis et factures fournisseurs, classement électronique et archivage physique des dossiers.`,
+      `${s.prenom} intervient en appui du service commercial : relance clients, mise à jour du CRM, préparation des dossiers d'appels d'offres, organisation des déplacements et notes de frais de l'équipe.`,
+      `${s.prenom} intervient en appui du service RH : gestion des visites médicales, suivi des congés et absences, préparation des contrats, accueil des nouveaux arrivants et interface avec le cabinet de paie externe.`,
     ];
     const secContribution = [
-      "Fluidifier la circulation de l'information dans l'entreprise et libérer du temps aux managers en prenant en charge tout l'administratif du quotidien.",
-      "Assurer la qualité et la fiabilité des documents produits (mails, courriers, tableaux, comptes rendus) qui reflètent l'image professionnelle de la structure.",
-      "Devenir la personne ressource sur laquelle l'équipe compte pour l'organisation, la logistique et la remontée d'informations fiables.",
+      `La montée en compétences de ${s.prenom} nous permettra de fluidifier la circulation de l'information en interne et de libérer du temps aux managers, qui pourront se recentrer sur leurs missions à forte valeur ajoutée.`,
+      `Cette formation contribue directement à la qualité et à la fiabilité des documents produits par notre structure (mails, courriers, tableaux, comptes rendus), qui reflètent notre image auprès des clients et partenaires.`,
+      `${s.prenom} deviendra la personne ressource sur laquelle l'équipe pourra s'appuyer pour l'organisation, la logistique et la remontée d'informations fiables, ce qui sécurisera notre fonctionnement quotidien.`,
     ];
     const secDiplomes = [
       "Bac Pro Gestion-Administration + 3 ans d'expérience en poste d'agent administratif",
@@ -10288,25 +10288,25 @@ function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: 
       "BEP Vente action marchande + Permis B (10 ans)",
     ];
     const vtcAttentes = [
-      `Obtenir la carte professionnelle VTC dans les meilleurs délais pour démarrer mon activité de conducteur indépendant et être opérationnel sur les plateformes Uber, Bolt et Heetch dès la fin de la formation.`,
-      `Maîtriser l'ensemble des 5 épreuves théoriques communes T3P et des 2 épreuves spécifiques VTC, ainsi que l'épreuve pratique d'admission, afin de réussir l'examen du premier coup.`,
-      `Comprendre la réglementation VTC (loi Grandguillaume, registre EVTC, obligations préfectorales) pour exercer en toute conformité dès le premier jour.`,
-      `Acquérir les bonnes pratiques de conduite premium et de relation client haut de gamme pour me différencier sur les plateformes et générer un chiffre d'affaires confortable.`,
-      `Comprendre les aspects gestion (statut micro-entreprise, TVA, URSSAF, charges) pour éviter les erreurs administratives qui pénalisent beaucoup de chauffeurs débutants.`,
+      `Nous attendons de cette formation qu'elle permette à ${s.prenom} d'obtenir la carte professionnelle VTC dans les meilleurs délais, afin de l'intégrer opérationnellement à notre flotte dès la fin du parcours.`,
+      `Notre objectif est que ${s.prenom} maîtrise l'ensemble des 5 épreuves théoriques communes T3P et des 2 épreuves spécifiques VTC ainsi que l'épreuve pratique d'admission, pour réussir l'examen dès la première présentation.`,
+      `Nous souhaitons que ${s.prenom} maîtrise la réglementation VTC (loi Grandguillaume, registre EVTC, obligations préfectorales) afin d'exercer sous nos couleurs en toute conformité dès le premier jour.`,
+      `Cette formation doit apporter à ${s.prenom} les bonnes pratiques de conduite premium et de relation client haut de gamme attendues sur les plateformes Uber/Bolt, pour préserver notre note moyenne et notre volume de courses.`,
+      `Nous attendons que ${s.prenom} comprenne les aspects gestion (statut micro-entreprise, TVA, URSSAF, charges) afin d'éviter les erreurs administratives qui pénalisent les chauffeurs débutants et déstabilisent notre organisation.`,
     ];
     const vtcMissions = [
-      `Effectuer des courses de transport de personnes via les plateformes Uber et Bolt en région parisienne, principalement transferts aéroports (CDG, Orly) et courses urbaines.`,
-      `Assurer du transport haut de gamme pour une clientèle d'affaires : prises en charge en hôtels, transferts gares, déplacements professionnels en journée.`,
-      `Développer une clientèle de particuliers et d'entreprises en complément des plateformes, avec un véhicule premium (Mercedes Classe E ou équivalent).`,
-      `Travailler en flotte VTC partenaire avec un véhicule fourni, sur des plages horaires nuit/week-end pour optimiser les revenus.`,
-      `Démarrer en tant que chauffeur affilié sur Uber et Bolt, puis développer une activité d'autoentrepreneur indépendant à terme.`,
+      `Les missions confiées à ${s.prenom} : réalisation de courses de transport de personnes via les plateformes Uber et Bolt en région parisienne, avec une priorité sur les transferts aéroports (CDG, Orly) et les courses urbaines.`,
+      `${s.prenom} assurera un service de transport haut de gamme pour notre clientèle d'affaires : prises en charge en hôtels, transferts gares, déplacements professionnels en journée.`,
+      `${s.prenom} contribuera au développement de notre portefeuille de particuliers et d'entreprises en complément des plateformes, avec un véhicule premium de la flotte (Mercedes Classe E ou équivalent).`,
+      `Intégré(e) à notre flotte VTC, ${s.prenom} conduira un véhicule fourni sur des plages horaires nuit/week-end afin d'optimiser le taux d'utilisation du parc et les revenus générés.`,
+      `${s.prenom} démarrera comme chauffeur affilié sur Uber et Bolt sous notre licence, avec un objectif de bascule progressive vers une activité d'autoentrepreneur indépendant en partenariat avec la société.`,
     ];
     const vtcContribution = [
-      `Cette formation me permet de structurer une nouvelle activité génératrice de revenus complémentaires ou principaux, dans un secteur en demande continue (mobilité urbaine, aéroports).`,
-      `L'obtention de la carte VTC ouvre la possibilité de créer une micro-entreprise immatriculée au registre EVTC, qui sera mon outil de travail principal pour les 5 prochaines années.`,
-      `Cette formation s'inscrit dans un projet de reconversion professionnelle vers une activité indépendante, où je serai maître de mon emploi du temps et de mes revenus.`,
-      `Devenir conducteur VTC me permet de combiner mon goût pour la conduite, le contact client et la liberté d'organisation, tout en sécurisant un revenu régulier via les plateformes.`,
-      `Le secteur VTC est en forte croissance (+12% par an en Île-de-France) et cette formation me positionne sur un marché porteur avec des perspectives stables.`,
+      `Cette formation nous permet de renforcer notre flotte avec un(e) conducteur(trice) qualifié(e), dans un secteur en demande continue (mobilité urbaine, aéroports) où l'offre de chauffeurs disponibles reste insuffisante.`,
+      `L'obtention de la carte VTC par ${s.prenom} sécurise son immatriculation au registre EVTC et donc sa capacité à travailler pour notre compte pendant les 5 prochaines années sans risque réglementaire.`,
+      `Cette formation s'inscrit dans notre stratégie de développement : professionnaliser nos chauffeurs pour améliorer la satisfaction client, la note moyenne sur les plateformes et le taux de fidélisation.`,
+      `Former ${s.prenom} nous permet de disposer d'un conducteur combinant maîtrise de la conduite, sens du contact client et rigueur administrative, profil recherché pour notre segment premium.`,
+      `Le secteur VTC est en forte croissance (+12 % par an en Île-de-France) et cette formation nous positionne pour capter cette progression avec un(e) collaborateur(trice) opérationnel(le) rapidement.`,
     ];
     const vtcObjectif = [
       `Obtenir ma carte professionnelle VTC et démarrer une activité de conducteur indépendant à temps plein dans les 60 jours suivant la fin de la formation.`,
