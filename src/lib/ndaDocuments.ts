@@ -44,7 +44,7 @@ export function genProgrammeNDA(o: OrganismeInfo, f: FormationInfo, stagiaires: 
 <strong>Adresse :</strong> ${escapeHtml(adresseOrg)}<br>
 <strong>SIRET :</strong> ${v(o.siret)}<br>
 ${o.email ? `<strong>Email :</strong> ${escapeHtml(o.email)}<br>` : ""}
-<strong>Dirigeant – Formateur – Référent pédagogique – Référent handicap :</strong> ${v(o.dirigeant)}</p>
+<strong>Dirigeant :</strong> ${v(o.dirigeant)}</p>
 
 <h3>2. Intitulé de la formation</h3>
 <p>${v(f.intitule)}</p>
