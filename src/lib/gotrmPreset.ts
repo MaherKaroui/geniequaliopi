@@ -78,7 +78,7 @@ const GOTRM_CONTENT_PACK: AIContentPack = {
 // ---------------------------------------------------------------------------
 const q = (question: string, options: string[], correctIndex: number) => ({ question, options, correctIndex });
 
-const GOTRM_EVAL_PACK: AIEvalPack = {
+export const GOTRM_EVAL_PACK: AIEvalPack = {
   qcmDebut: [
     q("Un exploitant transport doit obligatoirement contrôler avant la 1re mission d'un sous-traitant :", ["Uniquement son Kbis", "Uniquement l'assurance RC", "Licence communautaire, capacité pro, RC, Kbis et attestation URSSAF vigilance", "Rien : c'est au client final"], 2),
     q("La durée maximale de conduite journalière prévue par le règlement (CE) 561/2006 est :", ["8 h", "9 h (10 h max 2 fois par semaine)", "11 h", "13 h"], 1),
