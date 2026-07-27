@@ -16574,8 +16574,12 @@ function genAITestPositionnement(o: OrganismeInfo, f: FormationInfo, stagiaires:
   // Détection GOTRM : injection de commentaires stagiaires humanisés dans la cellule "Réponse"
   const tTitle = (f.intitule || "").toLowerCase();
   const isGOTRM = tTitle.includes("gotrm") || tTitle.includes("gestionnaire des opérations de transport") || tTitle.includes("exploitant transport") || tTitle.includes("tp-01329") || tTitle.includes("rncp40990") || (f.codeRNCP || "").toUpperCase().includes("40990");
+  const isWord = tTitle.includes("initiation word") || (tTitle.includes("word") && !tTitle.includes("pack office") && !tTitle.includes("bureautique"));
   const gotrmSeed = isGOTRM
     ? ((s?.prenom || "").length * 131 + (s?.nom || "").length * 197 + si * 41 + (isDebut ? 3 : 11))
+    : 0;
+  const wordSeed = isWord
+    ? ((s?.prenom || "").length * 131 + (s?.nom || "").length * 197 + si * 41 + (isDebut ? 5 : 13))
     : 0;
   const rows = qcm.map((q, qi) => {
     const optionsCell = q.options.map((opt, oi) => `${String.fromCharCode(65 + oi)}) ${opt}`).join("<br>");
@@ -16592,7 +16596,11 @@ function genAITestPositionnement(o: OrganismeInfo, f: FormationInfo, stagiaires:
     const ok = chosen === q.correctIndex;
     if (ok) correct++;
     const chosenLabel = `${String.fromCharCode(65 + chosen)}) ${q.options[chosen]}`;
-    const humanCommentText = isGOTRM ? pickGOTRMComment(mode as "debut" | "fin", qi, gotrmSeed) : "";
+    const humanCommentText = isGOTRM
+      ? pickGOTRMComment(mode as "debut" | "fin", qi, gotrmSeed)
+      : isWord
+        ? pickWordComment(mode as "debut" | "fin", qi, wordSeed)
+        : "";
     const humanNote = humanCommentText
       ? `<br><em style="color:#475569;font-size:0.92em">« ${humanCommentText} »</em>`
       : "";
