@@ -49,6 +49,7 @@ import { getCachedContentPack, pickImagesForQuery } from "./aiContentPack";
 import { PAIE_MODULE_EXERCISES } from "./paiePreset";
 import { SECRETARIAT_MODULE_EXERCISES } from "./secretariatPreset";
 import { GOTRM_MODULE_EXERCISES, pickGOTRMComment } from "./gotrmPreset";
+import { pickWordComment } from "./wordPreset";
 
 function getModuleExercisesFor(f: FormationInfo) {
   const t = (f.intitule || "").toLowerCase();
