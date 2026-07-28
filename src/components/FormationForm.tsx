@@ -644,7 +644,16 @@ const FormationForm = ({ data, onChange, onImportStagiaires, onApplyOrganisme }:
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="md:col-span-2">
           <Label htmlFor="intitule">Intitulé de la formation *</Label>
-          <Input id="intitule" value={data.intitule} onChange={e => update('intitule', e.target.value)} placeholder="Ex: Formation Management d'équipe" />
+          <Input id="intitule" value={data.intitule} onChange={e => {
+            const val = e.target.value;
+            const low = val.toLowerCase();
+            const isSAMA = low.includes("médico-administratif") || low.includes("medico-administratif") || low.includes("sama");
+            if (isSAMA && !data.codeRNCP) {
+              onChange({ ...data, intitule: val, codeRNCP: "RNCP40800" });
+            } else {
+              update('intitule', val);
+            }
+          }} placeholder="Ex: Formation Management d'équipe" />
         </div>
         <div className="md:col-span-2">
           <Label htmlFor="objectifs">Objectifs pédagogiques *</Label>
