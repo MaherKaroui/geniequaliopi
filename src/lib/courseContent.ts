@@ -306,6 +306,8 @@ export function getYoutubeVideos(formationIntitule: string): CourseData['youtube
   if (t.includes('powerpoint') || t.includes('ppt')) return YOUTUBE_POWERPOINT;
   if (t.includes('bureautique') || t.includes('pack office') || t.includes('office 365') || t.includes('microsoft 365')) return YOUTUBE_BUREAUTIQUE;
   if (t.includes('gestionnaire de paie') || t.includes('gestionnaire paie') || (t.includes('paie') && (t.includes('bulletin') || t.includes('gestion')))) return YOUTUBE_PAIE;
+  // SAMA (RNCP40800) : réutilise la banque secrétariat, avant l'exclusion "médic" ci-dessous
+  if (t.includes('médico-administratif') || t.includes('medico-administratif') || t.includes('rncp40800') || t.includes('sama')) return YOUTUBE_SECRETARIAT;
   if (t.includes('secrétariat') || t.includes('secretariat') || t.includes('assistanat') || (t.includes('secrétaire') && !t.includes('médic')) || (t.includes('secretaire') && !t.includes('medic'))) return YOUTUBE_SECRETARIAT;
   if (t.includes('gotrm') || t.includes('gestionnaire des op\u00e9rations de transport') || t.includes('exploitant transport') || t.includes('tp-01329') || t.includes('rncp40990')) return YOUTUBE_GOTRM;
   // NB: getSecretariatChapters imported below alongside other chapters
