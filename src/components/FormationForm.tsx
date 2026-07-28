@@ -246,6 +246,7 @@ const FormationForm = ({ data, onChange, onImportStagiaires, onApplyOrganisme }:
       const intituleLower = selected.intitule.toLowerCase();
       const isSAMA = intituleLower.includes("médico-administratif") || intituleLower.includes("medico-administratif") || intituleLower.includes("rncp40800") || intituleLower.includes("sama");
       if (isSAMA) {
+        onChange({ ...selected, codeRNCP: "RNCP40800" });
         if (onApplyOrganisme) {
           onApplyOrganisme({ ...SAMA_ORG });
         }
