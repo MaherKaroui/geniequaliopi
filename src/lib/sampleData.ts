@@ -155,10 +155,13 @@ export { PAIE_ORG, STAGIAIRES_PAIE, FORMATION_PAIE, seedPaieAICaches } from "./p
 import { FORMATION_SECRETARIAT } from "./secretariatPreset";
 export { SECRETARIAT_ORG, STAGIAIRES_SECRETARIAT, FORMATION_SECRETARIAT, seedSecretariatAICaches } from "./secretariatPreset";
 export { seedGOTRMAICaches, GOTRM_MODULE_EXERCISES } from "./gotrmPreset";
+import { FORMATION_SAMA } from "./samaPreset";
+export { SAMA_ORG, STAGIAIRES_SAMA, FORMATION_SAMA, seedSAMAAICaches } from "./samaPreset";
 
 export const SAMPLE_FORMATIONS: FormationInfo[] = [
   FORMATION_PAIE,
   FORMATION_SECRETARIAT,
+  FORMATION_SAMA,
   {
     intitule: "Maquilleur Professionnel – Formation certifiante (Maison HSY)",
     objectifs: "Se former aux métiers de maquilleur professionnel et obtenir une formation certifiante reconnue par France Compétences.\nÀ l'issue de la formation, la stagiaire sera capable de :\n- Accueillir la cliente et appliquer le protocole d'hygiène professionnel.\n- Identifier les types de peau, la morphologie du visage, la colorimétrie et les carnations.\n- Préparer la peau et corriger les imperfections avec les techniques adaptées.\n- Maîtriser l'application du fond de teint, du contouring et du strobing.\n- Structurer les sourcils (points d'or A-B-C), maquiller les yeux et la bouche selon la morphologie.\n- Réaliser une prestation de maquillage professionnel complet en 1h30.\n- Réussir l'examen de certification (QCM + mise en situation avec tirage au sort du look).",

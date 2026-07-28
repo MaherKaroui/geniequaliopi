@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Upload, Sparkles, Loader2, RefreshCw, FileDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { SAMPLE_FORMATIONS, STAGIAIRES_BAC_PRO_LOGISTIQUE, STAGIAIRES_HEXAGONE_GOTRM, HEXAGONE_FORMATION_ORG, MAISON_HSY_ORG, STAGIAIRES_MAQUILLEUR_PRO, PAIE_ORG, STAGIAIRES_PAIE, seedPaieAICaches, SECRETARIAT_ORG, STAGIAIRES_SECRETARIAT, seedSecretariatAICaches, seedGOTRMAICaches } from "@/lib/sampleData";
+import { SAMPLE_FORMATIONS, STAGIAIRES_BAC_PRO_LOGISTIQUE, STAGIAIRES_HEXAGONE_GOTRM, HEXAGONE_FORMATION_ORG, MAISON_HSY_ORG, STAGIAIRES_MAQUILLEUR_PRO, PAIE_ORG, STAGIAIRES_PAIE, seedPaieAICaches, SECRETARIAT_ORG, STAGIAIRES_SECRETARIAT, seedSecretariatAICaches, seedGOTRMAICaches, SAMA_ORG, STAGIAIRES_SAMA, seedSAMAAICaches } from "@/lib/sampleData";
 import { parseEdofXlsx, EdofSession } from "@/lib/edofParser";
 import { RNCP_FICHES } from "@/lib/rncpData";
 import { supabase } from "@/integrations/supabase/client";
@@ -242,8 +242,20 @@ const FormationForm = ({ data, onChange, onImportStagiaires, onApplyOrganisme }:
         seedPaieAICaches();
         toast.success(`Organisme IZIBUSINESS + 6 stagiaires + contenus IA (besoins, exercices, veilles) pré-remplis`);
       }
-      // Auto-import organisme + 6 stagiaires + pré-remplissage IA pour Secrétariat 70 h
-      if (selected.intitule.toLowerCase().includes("secrétariat") || selected.intitule.toLowerCase().includes("secretariat")) {
+      // Auto-import organisme + apprentis + pré-remplissage IA pour SAMA CFA 420 h (priorité sur "secrétariat" car intitulé contient "Secrétaire assistant médico-administratif")
+      const intituleLower = selected.intitule.toLowerCase();
+      const isSAMA = intituleLower.includes("médico-administratif") || intituleLower.includes("medico-administratif") || intituleLower.includes("rncp40800") || intituleLower.includes("sama");
+      if (isSAMA) {
+        if (onApplyOrganisme) {
+          onApplyOrganisme({ ...SAMA_ORG });
+        }
+        if (onImportStagiaires) {
+          onImportStagiaires([...STAGIAIRES_SAMA]);
+        }
+        seedSAMAAICaches();
+        toast.success(`Organisme CFA IZIBUSINESS + 7 apprentis SAMA + contenus IA pré-remplis (RNCP40800)`);
+      } else if (intituleLower.includes("secrétariat") || intituleLower.includes("secretariat")) {
+        // Auto-import Secrétariat 70 h (générique, exclut SAMA déjà géré ci-dessus)
         if (onApplyOrganisme) {
           onApplyOrganisme({ ...SECRETARIAT_ORG });
         }
