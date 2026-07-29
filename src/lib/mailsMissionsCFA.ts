@@ -29,7 +29,7 @@ function fmtTime(d: Date): string {
 }
 
 /** Calcule la date d'envoi du mail QCM mission N (lundi de la N-ième semaine école). */
-function dateMailMission(f: FormationInfo, missionNumero: number): Date {
+export function dateMailMission(f: FormationInfo, missionNumero: number): Date {
   const start = parseDateSafe(f.dateDebut) || new Date();
   const monday = startOfISOWeek(start);
   // Rythme par défaut : 1 sem école / 3 sem entreprise → 1 cycle = 4 semaines
