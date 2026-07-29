@@ -1432,6 +1432,7 @@ export function genAttestationReussiteStagiaire(o: OrganismeInfo, f: FormationIn
         <p style="margin:0">a suivi avec succès et validé la formation :</p>
         <p style="margin:14px 0;font-size:18px;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:1px">« ${f.intitule} »</p>
         ${fiche ? `<p style="margin:0;font-style:italic;color:#666">Préparation au Titre professionnel « ${titrePro} »${f.codeRNCP ? ` — ${f.codeRNCP}` : ""}</p>` : ""}
+        ${f.duree ? `<p style="margin:14px 0 0;font-size:14px;color:#222"><strong>Durée :</strong> ${f.duree}</p>` : ""}
       </div>
 
       <p style="text-align:center;font-style:italic;color:#666;font-size:12px;margin:26px auto 0;max-width:620px">
@@ -1452,9 +1453,10 @@ export function genAttestationReussiteStagiaire(o: OrganismeInfo, f: FormationIn
     </div>
   `;
 
-
-  return buildDocument({ org: o, title: "ATTESTATION DE RÉUSSITE", subtitle: f.intitule, stagiaires: [s], extraHtml: extra });
+  // Render standalone (no header/footer, no title bar)
+  return applyGender(htmlWrap(extra), s);
 }
+
 
 // Helper to get doc style primary color
 function getDocStyleColor(): string {
