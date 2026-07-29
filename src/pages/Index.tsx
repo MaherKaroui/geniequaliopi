@@ -14,6 +14,7 @@ import { ChevronLeft, ChevronRight, LogIn, LogOut, User, FileSpreadsheet, Upload
 import BahoModal from "@/components/BahoModal";
 import ViModal from "@/components/ViModal";
 import BrandingAutoModal from "@/components/BrandingAutoModal";
+import qualiopiLogo from "@/assets/qualiopi-generator-logo.png.asset.json";
 import MyCertifModal from "@/components/MyCertifModal";
 import { exportFormDataToExcel } from "@/lib/exportFormData";
 import { useAuth } from "@/hooks/useAuth";
@@ -220,7 +221,7 @@ const Index = () => {
       <header className="border-b bg-card/80 backdrop-blur-sm sticky top-0 z-10">
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="font-bold text-lg">Qualiopi Generator</span>
+            <img src={qualiopiLogo.url} alt="Qualiopi Generator" className="h-10 w-auto" />
           </div>
           <div className="flex items-center gap-2">
             {user ? (
@@ -245,13 +246,7 @@ const Index = () => {
               {airtableLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
               {airtableLoading ? 'Envoi...' : 'Airtable'}
             </Button>
-            <Button variant="outline" size="sm" onClick={() => setBrandingOpen(true)} className="gap-1 border-purple-300 text-purple-700 hover:bg-purple-50">
-              <Palette className="w-4 h-4" /> Branding
-            </Button>
             {/* Archivé : MyCertif */}
-            <Button variant="outline" size="sm" onClick={() => navigate("/musee")} className="gap-1 border-amber-300 text-amber-700 hover:bg-amber-50">
-              🏛️ Musée 3D
-            </Button>
             <Button variant="outline" size="sm" onClick={() => navigate("/audit-live")} className="gap-1 border-emerald-300 text-emerald-700 hover:bg-emerald-50">
               <ShieldCheck className="w-4 h-4" /> Audit live
             </Button>
