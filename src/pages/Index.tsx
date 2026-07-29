@@ -14,6 +14,7 @@ import { ChevronLeft, ChevronRight, LogIn, LogOut, User, FileSpreadsheet, Upload
 import BahoModal from "@/components/BahoModal";
 import ViModal from "@/components/ViModal";
 import BrandingAutoModal from "@/components/BrandingAutoModal";
+import qualiopiLogo from "@/assets/qualiopi-generator-logo.png.asset.json";
 import MyCertifModal from "@/components/MyCertifModal";
 import { exportFormDataToExcel } from "@/lib/exportFormData";
 import { useAuth } from "@/hooks/useAuth";
