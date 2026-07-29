@@ -1525,8 +1525,18 @@ export function buildFullCatalog(
       { num: 13, titre: "Formation du Maître d'Apprentissage" },
       { num: 14, titre: "Conseil de perfectionnement" },
     ];
+    // Ne conserver que les mails dont la date d'envoi est ≤ aujourd'hui
+    // (les mails futurs — non encore envoyés — sont retirés du dossier).
+    const now = new Date();
+    const { dateMailMission } = require("./mailsMissionsCFA") as typeof import("./mailsMissionsCFA");
+    const { dateMailDiffusionMission } = require("./mailsDiffusionMissionsCFA") as typeof import("./mailsDiffusionMissionsCFA");
+    const fRef = formations[0];
+
     stagiaires.forEach((s, si) => {
       MISSIONS_TITRES.forEach((m) => {
+        if (!fRef) return;
+        const dEnvoi = dateMailMission(fRef, m.num);
+        if (dEnvoi.getTime() > now.getTime()) return;
         add(
           `mail_mission${m.num}_${si}`,
           `MAIL - ✉️ Envoi QCM Semaine ${String(m.num).padStart(2, "0")} – Mission ${m.num} ${m.titre} – ${s.prenom} ${s.nom}`,
@@ -1539,9 +1549,11 @@ export function buildFullCatalog(
     });
 
     // ===== MAIL — Annonces de DIFFUSION des 14 missions (J-1) =====
-    // Les 14 mails sont listés ; chaque mail est daté automatiquement à J-1 de sa mission.
     stagiaires.forEach((s, si) => {
       MISSIONS_TITRES.forEach((m) => {
+        if (!fRef) return;
+        const dEnvoi = dateMailDiffusionMission(fRef, m.num);
+        if (dEnvoi.getTime() > now.getTime()) return;
         add(
           `mail_diffusion_mission${m.num}_${si}`,
           `MAIL - 📢 Annonce diffusion J-1 – Mission ${m.num} ${m.titre} – ${s.prenom} ${s.nom}`,
