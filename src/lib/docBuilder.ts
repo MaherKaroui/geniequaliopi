@@ -652,10 +652,11 @@ export function htmlWrap(content: string, landscape = false): string {
   const pageMeta = landscape
     ? `<meta name="pdf-page-size" content="297x210"><style>@page{size:A4 landscape;margin:0}</style>`
     : "";
+  // Landscape override placed AFTER baseStyle so it wins over default body padding/max-width
   const bodyStyle = landscape
-    ? `<style>body{padding:0;margin:0;max-width:none;background:#fff}</style>`
+    ? `<style>html,body{padding:0!important;margin:0!important;max-width:none!important;background:#fff!important;width:297mm;height:210mm;overflow:hidden}.page-break{page-break-after:auto!important}</style>`
     : "";
-  return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">${pageMeta}${bodyStyle}${baseStyle()}</head><body>${content}</body></html>`;
+  return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">${pageMeta}${baseStyle()}${bodyStyle}</head><body>${content}</body></html>`;
 }
 
 export function orgHeader(org: OrganismeInfo, subtitle?: string): string {
