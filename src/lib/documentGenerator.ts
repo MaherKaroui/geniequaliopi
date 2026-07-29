@@ -4774,9 +4774,45 @@ function genPlaquetteCommercialeCFA(o: OrganismeInfo, f: FormationInfo, stagiair
   const annee = parsedDate && !isNaN(parsedDate.getTime()) ? parsedDate.getFullYear() : new Date().getFullYear();
 
   const termineCFA = isFormationTerminee(f, validStagiaires);
-  const indicateursContent = termineCFA
-    ? `<p>• Taux de satisfaction globale : 100% (${nbStagiaires} ${nbStagiaires > 1 ? "apprentis" : "apprenti"} – année ${annee})<br>• Nombre d'apprentis formés : ${nbStagiaires}<br>• Taux de réussite à la certification : 100%<br>• Taux national : 82% (source InserJeunes)<br>• Taux de retour enquêtes : 100%<br>• Taux d'abandon : 0%<br>• Taux d'interruption de parcours : 0%<br>• Taux d'insertion professionnelle à 6 mois : 85%<br>• Taux de rupture en alternance : 0%</p>`
-    : `<p><em>Promotion ${annee} en cours – les indicateurs définitifs seront publiés à l'issue de la formation.</em><br>• Nombre d'apprentis inscrits : ${nbStagiaires}<br>• Taux national : 82% (source InserJeunes)<br>• Taux de satisfaction globale : <em>en cours</em><br>• Taux de réussite à la certification : <em>en cours</em><br>• Taux d'abandon : 0% (à date)<br>• Taux d'interruption de parcours : 0% (à date)<br>• Taux de rupture en alternance : 0% (à date)<br>• Taux d'insertion professionnelle à 6 mois : <em>mesuré 6 mois après la sortie</em></p>`;
+  const lowerFP = (f.intitule || "").toLowerCase();
+  const isNTCP = lowerFP.includes("négociateur") || lowerFP.includes("technico-commercial") || lowerFP.includes("technico commercial") || (f.codeRNCP || "").toUpperCase().includes("39063");
+  const em = (s: string) => `<em>${s}</em>`;
+  const rowsPlaq: string[][] = termineCFA ? [
+    ["Taux de satisfaction globale", `100% (${nbStagiaires} ${nbStagiaires > 1 ? "apprentis" : "apprenti"} – année ${annee})`],
+    ["Nombre d'apprentis formés", String(nbStagiaires)],
+    ["Taux de réussite à la certification", "100%"],
+    ...(isNTCP ? [
+      ["Taux national d'insertion professionnelle à 6 mois (source InserJeunes)", "50%"],
+      ["Taux national de poursuite d'études (source InserJeunes)", "33%"],
+      ["Taux national de rupture des contrats d'apprentissage (source InserJeunes)", "44%"],
+    ] : []),
+    ["Taux de retour enquêtes", "100%"],
+    ["Taux d'abandon", "0%"],
+    ["Taux d'interruption de parcours", "0%"],
+    ["Taux d'insertion professionnelle à 6 mois", "85%"],
+    ["Taux de rupture en alternance", "0%"],
+  ] : [
+    ["Taux de satisfaction globale", em("En cours – disponible à l'issue de la promotion")],
+    ["Nombre d'apprentis inscrits", String(nbStagiaires)],
+    ["Taux de réussite à la certification", em("En cours – disponible à l'issue des examens")],
+    ...(isNTCP ? [
+      ["Taux national d'insertion professionnelle à 6 mois (source InserJeunes)", "50%"],
+      ["Taux national de poursuite d'études (source InserJeunes)", "33%"],
+      ["Taux national de rupture des contrats d'apprentissage (source InserJeunes)", "44%"],
+    ] : []),
+    ["Taux de retour enquêtes", em("En cours – enquête de fin de formation")],
+    ["Taux d'abandon", "0% (à date)"],
+    ["Taux d'interruption de parcours", "0% (à date)"],
+    ["Taux d'insertion professionnelle à 6 mois", em("En cours – mesuré à 6 mois après la sortie")],
+    ["Taux de rupture en alternance", "0% (à date)"],
+  ];
+  const footerPlaq = termineCFA
+    ? `<p style="margin-top:10px"><em>Promotion ${annee} — indicateurs consolidés publiés sur le site internet de ${o.nom}.</em></p>`
+    : `<p style="margin-top:10px"><em>Promotion ${annee} en cours – les indicateurs définitifs seront publiés à l'issue de la session sur le site internet de ${o.nom}.</em></p>`;
+  const sourcePlaq = isNTCP
+    ? `<p style="margin-top:4px;font-size:12px"><strong>Source officielle (preuve) :</strong> <a href="https://www.inserjeunes.education.gouv.fr/diffusion/formation?formation=AUTRE_5$31203$TH5-T" target="_blank" style="color:hsl(220,60%,50%)">InserJeunes – TH5 T Négociateur Technico-Commercial (apprentissage)</a> – Ministère de l'Éducation nationale / France Compétences.</p>`
+    : "";
+  const indicateursContent = tableHTML(["INDICATEUR", "STATUT"], rowsPlaq) + footerPlaq + sourcePlaq;
 
   // Débouchés professionnels — extraits du RNCP si dispo
   const rncp = getRNCPByCode(f.codeRNCP || "");
