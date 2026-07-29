@@ -1530,8 +1530,6 @@ export function buildFullCatalog(
     // Ne conserver que les mails dont la date d'envoi est ≤ aujourd'hui
     // (les mails futurs — non encore envoyés — sont retirés du dossier).
     const now = new Date();
-    const { dateMailMission } = require("./mailsMissionsCFA") as typeof import("./mailsMissionsCFA");
-    const { dateMailDiffusionMission } = require("./mailsDiffusionMissionsCFA") as typeof import("./mailsDiffusionMissionsCFA");
     const fRef = formations[0];
 
     stagiaires.forEach((s, si) => {
