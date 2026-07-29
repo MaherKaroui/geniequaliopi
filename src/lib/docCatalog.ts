@@ -1243,11 +1243,7 @@ export function buildFullCatalog(
     if (hasExternalFormateur) add("cfa_c5i22_entretien_pro_annuel", "CT5 - IND 22 ENTRETIEN PROFESSIONNEL ANNUEL INTERVENANT", 5, 22, "entretien_professionnel_annuel_cfa");
     // IND 26 — Annuaire partenaires handicap
     add("cfa_c6i26_annuaire_handicap", "CT6 - IND 26 ANNUAIRE PARTENAIRES HANDICAP APPRENTISSAGE", 6, 26, "annuaire_partenaires_handicap_cfa");
-    // IND 29 — Questionnaires entreprise/MA + financeur
-    stagiaires.forEach((s, si) => {
-      add(`cfa_c7i29_satisfaction_entreprise_${si}`, `CT7 - IND 29 QUESTIONNAIRE SATISFACTION ENTREPRISE / MA – ${s.prenom} ${s.nom}`, 7, 29, "questionnaire_satisfaction_entreprise_cfa", { stagiaireIdx: si });
-    });
-    add("cfa_c7i29_satisfaction_financeur", "CT7 - IND 29 QUESTIONNAIRE SATISFACTION FINANCEUR (OPCO)", 7, 29, "questionnaire_satisfaction_financeur_cfa");
+    // IND 29 (critère 7) — retiré (doublon avec CT6 - IND 29)
     // IND 30 — Tableau de relances
     
     // IND 32 — Plan d'action insertion / réduction ruptures
