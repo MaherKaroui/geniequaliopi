@@ -1431,7 +1431,6 @@ export function genAttestationReussiteStagiaire(o: OrganismeInfo, f: FormationIn
       <div style="text-align:center;font-size:14px;color:#333;line-height:1.9;max-width:640px;margin:0 auto">
         <p style="margin:0">a suivi avec succès et validé la formation :</p>
         <p style="margin:14px 0;font-size:18px;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:1px">« ${f.intitule} »</p>
-        ${fiche ? `<p style="margin:0;font-style:italic;color:#666">Préparation au Titre professionnel « ${titrePro} »${f.codeRNCP ? ` — ${f.codeRNCP}` : ""}</p>` : ""}
         ${f.duree ? `<p style="margin:14px 0 0;font-size:14px;color:#222"><strong>Durée :</strong> ${f.duree}</p>` : ""}
       </div>
 
