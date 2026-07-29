@@ -2641,13 +2641,56 @@ function genProgramme(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireI
 
     <h2>15. Indicateurs de performance – Année ${anneeFormation}</h2>
     <div class="section">
-      <table>
-        <tr><th style="width:60%">Indicateur</th><th>Résultat</th></tr>
-        <tr><td>Nombre de ${isCFA ? "apprentis" : "stagiaires"} formés</td><td>${nbStagiaires}</td></tr>
-        <tr><td>Taux de satisfaction globale</td><td>90%</td></tr>
-      </table>
-      <p style="margin-top:8px"><em>Ces indicateurs sont mis à jour annuellement${o.siteWeb && o.siteWeb.trim() ? ` et consultables sur ${isFacebookPage(o.siteWeb) ? 'la page Facebook' : 'le site internet'} de ${o.nom}` : ''}.</em></p>
+      ${(() => {
+        if (!isCFA) {
+          return `<table>
+            <tr><th style="width:60%">Indicateur</th><th>Résultat</th></tr>
+            <tr><td>Nombre de stagiaires formés</td><td>${nbStagiaires}</td></tr>
+            <tr><td>Taux de satisfaction globale</td><td>90%</td></tr>
+          </table>
+          <p style="margin-top:8px"><em>Ces indicateurs sont mis à jour annuellement${o.siteWeb && o.siteWeb.trim() ? ` et consultables sur ${isFacebookPage(o.siteWeb) ? 'la page Facebook' : 'le site internet'} de ${o.nom}` : ''}.</em></p>`;
+        }
+        const termineProg = isFormationTerminee(f, stagiaires.filter(s => s.nom && s.nom.trim()));
+        const em = (s: string) => `<em>${s}</em>`;
+        const rowsProg: string[][] = termineProg ? [
+          ["Taux de satisfaction globale", `100% (${nbStagiaires} ${nbStagiaires > 1 ? "apprentis" : "apprenti"} – année ${anneeFormation})`],
+          ["Nombre d'apprentis formés", String(nbStagiaires)],
+          ["Taux de réussite à la certification", "100%"],
+          ...(isNTCProg ? [
+            ["Taux national d'insertion professionnelle à 6 mois (source InserJeunes)", "50%"],
+            ["Taux national de poursuite d'études (source InserJeunes)", "33%"],
+            ["Taux national de rupture des contrats d'apprentissage (source InserJeunes)", "44%"],
+          ] : []),
+          ["Taux de retour enquêtes", "100%"],
+          ["Taux d'abandon", "0%"],
+          ["Taux d'interruption de parcours", "0%"],
+          ["Taux d'insertion professionnelle à 6 mois", "85%"],
+          ["Taux de rupture en alternance", "0%"],
+        ] : [
+          ["Taux de satisfaction globale", em("En cours – disponible à l'issue de la promotion")],
+          ["Nombre d'apprentis inscrits", String(nbStagiaires)],
+          ["Taux de réussite à la certification", em("En cours – disponible à l'issue des examens")],
+          ...(isNTCProg ? [
+            ["Taux national d'insertion professionnelle à 6 mois (source InserJeunes)", "50%"],
+            ["Taux national de poursuite d'études (source InserJeunes)", "33%"],
+            ["Taux national de rupture des contrats d'apprentissage (source InserJeunes)", "44%"],
+          ] : []),
+          ["Taux de retour enquêtes", em("En cours – enquête de fin de formation")],
+          ["Taux d'abandon", "0% (à date)"],
+          ["Taux d'interruption de parcours", "0% (à date)"],
+          ["Taux d'insertion professionnelle à 6 mois", em("En cours – mesuré à 6 mois après la sortie")],
+          ["Taux de rupture en alternance", "0% (à date)"],
+        ];
+        const footer = termineProg
+          ? `<p style="margin-top:10px"><em>Promotion ${anneeFormation} — indicateurs consolidés publiés sur le site internet de ${o.nom}.</em></p>`
+          : `<p style="margin-top:10px"><em>Promotion ${anneeFormation} en cours – les indicateurs définitifs seront publiés à l'issue de la session sur le site internet de ${o.nom}.</em></p>`;
+        const src = isNTCProg
+          ? `<p style="margin-top:4px;font-size:12px"><strong>Source officielle (preuve) :</strong> <a href="https://www.inserjeunes.education.gouv.fr/diffusion/formation?formation=AUTRE_5$31203$TH5-T" target="_blank" style="color:hsl(220,60%,50%)">InserJeunes – TH5 T Négociateur Technico-Commercial (apprentissage)</a> – Ministère de l'Éducation nationale / France Compétences.</p>`
+          : "";
+        return `<table><tr><th style="width:60%">INDICATEUR</th><th>STATUT</th></tr>${rowsProg.map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join("")}</table>${footer}${src}`;
+      })()}
     </div>
+
 
     <h2>16. Déroulé pédagogique de la formation${!isBlocFormation ? ` (${heuresTotal})` : ""}</h2>
     <div class="section" style="padding:5px">
