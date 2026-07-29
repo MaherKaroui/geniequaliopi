@@ -1413,7 +1413,7 @@ export function genAttestationReussiteStagiaire(o: OrganismeInfo, f: FormationIn
     : `<span style="color:#bbb;font-style:italic;font-size:11px">Signature</span>`;
 
   const extra = `
-    <div style="position:relative;padding:40px 50px;border:6px double ${color};margin:10px;background:#fdfcf8;min-height:920px;">
+    <div style="position:relative;padding:40px 50px;border:6px double ${color};margin:10px;background:#ffffff;min-height:920px;">
       <div style="position:absolute;top:14px;left:14px;right:14px;bottom:14px;border:1px solid ${color};pointer-events:none;"></div>
 
       <div style="text-align:center;margin-top:10px">
@@ -1434,29 +1434,14 @@ export function genAttestationReussiteStagiaire(o: OrganismeInfo, f: FormationIn
         ${fiche ? `<p style="margin:0;font-style:italic;color:#666">Préparation au Titre professionnel « ${titrePro} »${f.codeRNCP ? ` — ${f.codeRNCP}` : ""}</p>` : ""}
       </div>
 
-      <table style="margin:32px auto 0;border-collapse:collapse;font-size:13px;color:#222">
-        <tr><td style="padding:6px 18px;color:#666;text-align:right">Durée de la formation</td><td style="padding:6px 18px;font-weight:700">${dureeTxt}</td></tr>
-        ${sessionTxt ? `<tr><td style="padding:6px 18px;color:#666;text-align:right">Période</td><td style="padding:6px 18px;font-weight:700">${sessionTxt}</td></tr>` : ""}
-        ${lieuTxt ? `<tr><td style="padding:6px 18px;color:#666;text-align:right">Lieu</td><td style="padding:6px 18px;font-weight:700">${lieuTxt}</td></tr>` : ""}
-        <tr><td style="padding:6px 18px;color:#666;text-align:right">Résultat</td><td style="padding:6px 18px;font-weight:700;color:${color}">${termine ? "ADMIS(E) — Compétences acquises" : "En cours de validation"}</td></tr>
-        <tr><td style="padding:6px 18px;color:#666;text-align:right">Assiduité</td><td style="padding:6px 18px;font-weight:700">100 %</td></tr>
-      </table>
-
       <p style="text-align:center;font-style:italic;color:#666;font-size:12px;margin:26px auto 0;max-width:620px">
         Cette attestation peut permettre de renseigner le passeport orientation-formation (art. L.6315-2 du Code du travail).
       </p>
 
-      <div style="margin-top:40px;display:flex;justify-content:space-between;align-items:flex-end;padding:0 20px">
-        <div style="text-align:center;width:45%">
-          <div style="height:80px;display:flex;align-items:center;justify-content:center">${stagSig}</div>
-          <div style="border-top:1px solid #333;padding-top:6px;font-size:12px">
-            <strong>${s.prenom || ""} ${(s.nom || "").toUpperCase()}</strong><br>
-            <span style="color:#666">Le/la stagiaire</span>
-          </div>
-        </div>
-        <div style="text-align:center;width:45%">
-          <div style="height:80px;display:flex;align-items:center;justify-content:center">${bigOrgStamp(o)}</div>
-          <div style="border-top:1px solid #333;padding-top:6px;font-size:12px">
+      <div style="margin-top:60px;text-align:center">
+        <div style="display:inline-block;text-align:center">
+          <div style="height:110px;display:flex;align-items:center;justify-content:center">${bigOrgStamp(o)}</div>
+          <div style="border-top:1px solid #333;padding-top:6px;font-size:12px;min-width:260px">
             <strong>${o.dirigeant || o.nom}</strong><br>
             <span style="color:#666">Pour ${o.nom} — Cachet & signature</span>
           </div>
@@ -1466,6 +1451,7 @@ export function genAttestationReussiteStagiaire(o: OrganismeInfo, f: FormationIn
       <p style="text-align:center;font-size:11px;color:#888;margin-top:30px">Fait à ${o.ville || ""}, le ${dateFait}</p>
     </div>
   `;
+
 
   return buildDocument({ org: o, title: "ATTESTATION DE RÉUSSITE", subtitle: f.intitule, stagiaires: [s], extraHtml: extra });
 }
