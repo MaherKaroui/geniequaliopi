@@ -1395,55 +1395,76 @@ export function genAttestationReussiteStagiaire(o: OrganismeInfo, f: FormationIn
   const s = stagiaires[stagiaireIdx] || stagiaires[0];
   const termine = isFormationTerminee(f);
   const fiche = f.codeRNCP ? getRNCPByCode(f.codeRNCP) : undefined;
-  const ccps: { titre: string }[] = fiche?.blocsCompetences?.length
-    ? fiche.blocsCompetences.map(b => ({ titre: b.titre }))
-    : [];
   const titrePro = fiche?.intitule || f.intitule;
 
   const dateDebut = getStagiaireDateDebut(s, f);
   const dateFin = getStagiaireDateFin(s, f);
   const sessionTxt = (dateDebut && dateFin) ? `Du ${formatDate(dateDebut)} au ${formatDate(dateFin)}` : "";
   const lieuTxt = isPresentiel(f) && f.lieu ? f.lieu : (isDistanciel(f) ? "Distanciel (visioconférence)" : (f.lieu || ""));
+  const stagDuree = getStagiaireDuree(s, f);
+  const dureeTxt = stagDuree || f.duree || `${getFormationDays(f).length * 7} heures`;
+  const dateFait = termine && dateFin ? formatDate(dateFin) : formatDate(new Date().toISOString().slice(0, 10));
 
   const civ = s.civilite || "";
-  const adrLine1 = s.adresse || "";
-  const adrLine2 = [s.codePostal, s.commune || ""].filter(Boolean).join(" ");
-
-  // Si formation non terminée → résultats vides (cases d'évaluation à remplir)
-  const resultLine = (label: string) => termine
-    ? `<p style="margin:6px 0 14px">⇒ ${label} : <strong>Admis(e)</strong></p>`
-    : `<p style="margin:6px 0 14px">⇒ ${label} :</p><p style="margin:0 0 14px;color:#888;font-style:italic">(Admis(e) – Admis(e) partiellement – Échec)</p>`;
-
-  const ccpsHtml = ccps.length
-    ? ccps.map(c => resultLine(`Certificat de compétences professionnelles « <strong>${c.titre}</strong> »`)).join("")
-    : `<p style="margin:6px 0 14px">⇒ Évaluation des acquis de la formation : ${termine ? "<strong>Admis(e)</strong>" : `<span style="color:#888;font-style:italic">(Admis(e) – Admis(e) partiellement – Échec)</span>`}</p>`;
-
-  const titreLine = ccps.length
-    ? `<p style="margin-top:18px"><strong>Délivrance du Titre Professionnel ${titrePro.toUpperCase()}</strong> : ${termine ? "<strong>Admis(e)</strong>" : `<span style="color:#888;font-style:italic">(Admis(e) – Admis(e) partiellement)</span>`}</p>`
-    : "";
-
-  const dateFait = termine && dateFin ? formatDate(dateFin) : "";
+  const nomComplet = `${civ} ${s.prenom || ""} ${(s.nom || "").toUpperCase()}`.trim();
+  const color = getDocStyleColor();
+  const stagSig = (s as any).signatureUrl
+    ? `<img src="${(s as any).signatureUrl}" alt="Signature stagiaire" style="max-height:70px;max-width:180px;object-fit:contain" />`
+    : `<span style="color:#bbb;font-style:italic;font-size:11px">Signature</span>`;
 
   const extra = `
-    <div style="text-align:center;margin:20px 0 30px">
-      <h2 style="color:${getDocStyleColor()};letter-spacing:1px">ATTESTATION DE RÉUSSITE</h2>
+    <div style="position:relative;padding:40px 50px;border:6px double ${color};margin:10px;background:#fdfcf8;min-height:920px;">
+      <div style="position:absolute;top:14px;left:14px;right:14px;bottom:14px;border:1px solid ${color};pointer-events:none;"></div>
+
+      <div style="text-align:center;margin-top:10px">
+        <div style="font-size:11px;letter-spacing:6px;color:${color};font-weight:600">— ${o.nom.toUpperCase()} —</div>
+        <h1 style="font-family:'Playfair Display', Georgia, serif;font-size:44px;letter-spacing:4px;color:${color};margin:18px 0 4px;font-weight:700">ATTESTATION</h1>
+        <div style="font-family:'Playfair Display', Georgia, serif;font-size:22px;letter-spacing:8px;color:${color};margin-bottom:6px">DE RÉUSSITE</div>
+        <div style="width:120px;height:2px;background:${color};margin:16px auto 24px"></div>
+        <p style="font-size:13px;color:#555;margin:0">Le présent document atteste que</p>
+      </div>
+
+      <div style="text-align:center;margin:28px 0 24px">
+        <div style="font-family:'Playfair Display', Georgia, serif;font-size:34px;color:#111;font-weight:700;letter-spacing:1px">${nomComplet}</div>
+      </div>
+
+      <div style="text-align:center;font-size:14px;color:#333;line-height:1.9;max-width:640px;margin:0 auto">
+        <p style="margin:0">a suivi avec succès et validé la formation :</p>
+        <p style="margin:14px 0;font-size:18px;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:1px">« ${f.intitule} »</p>
+        ${fiche ? `<p style="margin:0;font-style:italic;color:#666">Préparation au Titre professionnel « ${titrePro} »${f.codeRNCP ? ` — ${f.codeRNCP}` : ""}</p>` : ""}
+      </div>
+
+      <table style="margin:32px auto 0;border-collapse:collapse;font-size:13px;color:#222">
+        <tr><td style="padding:6px 18px;color:#666;text-align:right">Durée de la formation</td><td style="padding:6px 18px;font-weight:700">${dureeTxt}</td></tr>
+        ${sessionTxt ? `<tr><td style="padding:6px 18px;color:#666;text-align:right">Période</td><td style="padding:6px 18px;font-weight:700">${sessionTxt}</td></tr>` : ""}
+        ${lieuTxt ? `<tr><td style="padding:6px 18px;color:#666;text-align:right">Lieu</td><td style="padding:6px 18px;font-weight:700">${lieuTxt}</td></tr>` : ""}
+        <tr><td style="padding:6px 18px;color:#666;text-align:right">Résultat</td><td style="padding:6px 18px;font-weight:700;color:${color}">${termine ? "ADMIS(E) — Compétences acquises" : "En cours de validation"}</td></tr>
+        <tr><td style="padding:6px 18px;color:#666;text-align:right">Assiduité</td><td style="padding:6px 18px;font-weight:700">100 %</td></tr>
+      </table>
+
+      <p style="text-align:center;font-style:italic;color:#666;font-size:12px;margin:26px auto 0;max-width:620px">
+        Cette attestation peut permettre de renseigner le passeport orientation-formation (art. L.6315-2 du Code du travail).
+      </p>
+
+      <div style="margin-top:40px;display:flex;justify-content:space-between;align-items:flex-end;padding:0 20px">
+        <div style="text-align:center;width:45%">
+          <div style="height:80px;display:flex;align-items:center;justify-content:center">${stagSig}</div>
+          <div style="border-top:1px solid #333;padding-top:6px;font-size:12px">
+            <strong>${s.prenom || ""} ${(s.nom || "").toUpperCase()}</strong><br>
+            <span style="color:#666">Le/la stagiaire</span>
+          </div>
+        </div>
+        <div style="text-align:center;width:45%">
+          <div style="height:80px;display:flex;align-items:center;justify-content:center">${bigOrgStamp(o)}</div>
+          <div style="border-top:1px solid #333;padding-top:6px;font-size:12px">
+            <strong>${o.dirigeant || o.nom}</strong><br>
+            <span style="color:#666">Pour ${o.nom} — Cachet & signature</span>
+          </div>
+        </div>
+      </div>
+
+      <p style="text-align:center;font-size:11px;color:#888;margin-top:30px">Fait à ${o.ville || ""}, le ${dateFait}</p>
     </div>
-    <p>Délivrée par <strong>${o.nom}</strong>,</p>
-    <p style="margin-top:14px"><strong>L'apprenti(e) :</strong> ${s.civilite || ""} ${s.prenom || ""} ${s.nom || ""}</p>
-    <p style="margin-top:18px"><strong>Intitulé de la formation :</strong> ${ccps.length ? `Titre professionnel <strong>${titrePro.toUpperCase()}</strong>` : f.intitule}</p>
-    ${lieuTxt ? `<p><strong>Lieu de formation :</strong> ${lieuTxt}</p>` : ""}
-    ${sessionTxt ? `<p><strong>Date de la session :</strong> ${sessionTxt}</p>` : ""}
-    <p style="margin-top:18px"><strong>Évaluation des acquis de la formation :</strong></p>
-    ${ccpsHtml}
-    ${titreLine}
-    <p style="margin-top:24px;font-style:italic">Cette attestation peut vous permettre de renseigner votre passeport orientation-formation (art. L.6315-2 du Code du travail).</p>
-
-    <div class="page-break"></div>
-
-    <p style="margin-top:30px"><strong>Fait à ${o.ville}, le ${dateFait || "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"}</strong></p>
-    <p style="margin-top:30px"><strong>Signature et cachet du centre de formation ${o.nom}</strong></p>
-    <p style="margin-top:6px">Service pédagogique</p>
-    <div style="margin-top:14px">${bigOrgStamp(o)}</div>
   `;
 
   return buildDocument({ org: o, title: "ATTESTATION DE RÉUSSITE", subtitle: f.intitule, stagiaires: [s], extraHtml: extra });
