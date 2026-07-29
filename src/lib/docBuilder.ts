@@ -648,8 +648,14 @@ export function subtractBusinessDays(dateStr: string, businessDays: number): str
   return d.toISOString().slice(0, 10);
 }
 
-export function htmlWrap(content: string): string {
-  return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">${baseStyle()}</head><body>${content}</body></html>`;
+export function htmlWrap(content: string, landscape = false): string {
+  const pageMeta = landscape
+    ? `<meta name="pdf-page-size" content="297x210"><style>@page{size:A4 landscape;margin:0}</style>`
+    : "";
+  const bodyStyle = landscape
+    ? `<style>body{padding:0;margin:0;max-width:none;background:#fff}</style>`
+    : "";
+  return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">${pageMeta}${bodyStyle}${baseStyle()}</head><body>${content}</body></html>`;
 }
 
 export function orgHeader(org: OrganismeInfo, subtitle?: string): string {

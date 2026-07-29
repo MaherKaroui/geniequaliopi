@@ -1393,67 +1393,60 @@ export function genGrilleAcquisitionStagiaire(o: OrganismeInfo, f: FormationInfo
 
 export function genAttestationReussiteStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], stagiaireIdx: number) {
   const s = stagiaires[stagiaireIdx] || stagiaires[0];
-  const termine = isFormationTerminee(f);
-  const fiche = f.codeRNCP ? getRNCPByCode(f.codeRNCP) : undefined;
-  const titrePro = fiche?.intitule || f.intitule;
-
-  const dateDebut = getStagiaireDateDebut(s, f);
-  const dateFin = getStagiaireDateFin(s, f);
-  const sessionTxt = (dateDebut && dateFin) ? `Du ${formatDate(dateDebut)} au ${formatDate(dateFin)}` : "";
-  const lieuTxt = isPresentiel(f) && f.lieu ? f.lieu : (isDistanciel(f) ? "Distanciel (visioconférence)" : (f.lieu || ""));
-  const stagDuree = getStagiaireDuree(s, f);
-  const dureeTxt = stagDuree || f.duree || `${getFormationDays(f).length * 7} heures`;
-  const dateFait = termine && dateFin ? formatDate(dateFin) : formatDate(new Date().toISOString().slice(0, 10));
-
   const civ = s.civilite || "";
   const nomComplet = `${civ} ${s.prenom || ""} ${(s.nom || "").toUpperCase()}`.trim();
   const color = getDocStyleColor();
-  const stagSig = (s as any).signatureUrl
-    ? `<img src="${(s as any).signatureUrl}" alt="Signature stagiaire" style="max-height:70px;max-width:180px;object-fit:contain" />`
-    : `<span style="color:#bbb;font-style:italic;font-size:11px">Signature</span>`;
 
   const extra = `
-    <div style="position:relative;padding:40px 50px;border:6px double ${color};margin:10px;background:#ffffff;min-height:920px;">
-      <div style="position:absolute;top:14px;left:14px;right:14px;bottom:14px;border:1px solid ${color};pointer-events:none;"></div>
+    <div style="width:297mm;height:210mm;box-sizing:border-box;position:relative;padding:18mm 22mm;background:#ffffff;font-family:'Playfair Display', Georgia, serif;">
+      <!-- Bordures ornementales -->
+      <div style="position:absolute;top:8mm;left:8mm;right:8mm;bottom:8mm;border:4px double ${color};pointer-events:none;"></div>
+      <div style="position:absolute;top:11mm;left:11mm;right:11mm;bottom:11mm;border:1px solid ${color};pointer-events:none;opacity:0.6;"></div>
 
-      <div style="text-align:center;margin-top:10px">
-        <div style="font-size:11px;letter-spacing:6px;color:${color};font-weight:600">— ${o.nom.toUpperCase()} —</div>
-        <h1 style="font-family:'Playfair Display', Georgia, serif;font-size:44px;letter-spacing:4px;color:${color};margin:18px 0 4px;font-weight:700">ATTESTATION</h1>
-        <div style="font-family:'Playfair Display', Georgia, serif;font-size:22px;letter-spacing:8px;color:${color};margin-bottom:6px">DE RÉUSSITE</div>
-        <div style="width:120px;height:2px;background:${color};margin:16px auto 24px"></div>
-        <p style="font-size:13px;color:#555;margin:0">Le présent document atteste que</p>
+      <!-- En-tête -->
+      <div style="text-align:center;margin-top:6mm">
+        <div style="font-size:10px;letter-spacing:5px;color:${color};font-weight:600;text-transform:uppercase">— ${o.nom.toUpperCase()} —</div>
+        <h1 style="font-size:42px;letter-spacing:5px;color:${color};margin:10px 0 2px;font-weight:700">ATTESTATION</h1>
+        <div style="font-size:20px;letter-spacing:7px;color:${color};margin-bottom:4px">DE RÉUSSITE</div>
+        <div style="width:100px;height:2px;background:${color};margin:10px auto 14px"></div>
+        <p style="font-size:12px;color:#555;margin:0">Le présent document atteste que</p>
       </div>
 
-      <div style="text-align:center;margin:28px 0 24px">
-        <div style="font-family:'Playfair Display', Georgia, serif;font-size:34px;color:#111;font-weight:700;letter-spacing:1px">${nomComplet}</div>
+      <!-- Bénéficiaire -->
+      <div style="text-align:center;margin:10mm 0 6mm">
+        <div style="font-size:32px;color:#111;font-weight:700;letter-spacing:1px">${nomComplet}</div>
       </div>
 
-      <div style="text-align:center;font-size:14px;color:#333;line-height:1.9;max-width:640px;margin:0 auto">
+      <!-- Formation -->
+      <div style="text-align:center;font-size:13px;color:#333;line-height:1.7;max-width:220mm;margin:0 auto">
         <p style="margin:0">a suivi avec succès et validé la formation :</p>
-        <p style="margin:14px 0;font-size:18px;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:1px">« ${f.intitule} »</p>
-        ${f.duree ? `<p style="margin:14px 0 0;font-size:14px;color:#222"><strong>Durée :</strong> ${f.duree}</p>` : ""}
+        <p style="margin:8px 0;font-size:17px;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:1px">« ${f.intitule} »</p>
+        ${f.duree ? `<p style="margin:6px 0 0;font-size:13px;color:#222"><strong>Durée :</strong> ${f.duree}</p>` : ""}
       </div>
 
-      <p style="text-align:center;font-style:italic;color:#666;font-size:12px;margin:26px auto 0;max-width:620px">
+      <!-- Mention légale -->
+      <p style="text-align:center;font-style:italic;color:#666;font-size:11px;margin:8mm auto 0;max-width:200mm">
         Cette attestation peut permettre de renseigner le passeport orientation-formation (art. L.6315-2 du Code du travail).
       </p>
 
-      <div style="margin-top:60px;text-align:center">
-        <div style="display:inline-block;text-align:center">
-          <div style="height:110px;display:flex;align-items:center;justify-content:center">${bigOrgStamp(o)}</div>
-          <div style="border-top:1px solid #333;padding-top:6px;font-size:12px;min-width:260px">
-            <strong>${o.dirigeant || o.nom}</strong><br>
-            <span style="color:#666">Pour ${o.nom} — Cachet & signature</span>
-          </div>
+      <!-- Cachet / signature en bas à droite -->
+      <div style="position:absolute;bottom:22mm;right:26mm;text-align:center">
+        <div style="height:90px;display:flex;align-items:center;justify-content:center">${bigOrgStamp(o)}</div>
+        <div style="border-top:1px solid #333;padding-top:5px;font-size:11px;min-width:220px">
+          <strong>${o.dirigeant || o.nom}</strong><br>
+          <span style="color:#666">Pour ${o.nom} — Cachet & signature</span>
         </div>
       </div>
 
-      <p style="text-align:center;font-size:11px;color:#888;margin-top:30px">Fait à ${o.ville || ""}, le 30/06/2026</p>
+      <!-- Date en bas à gauche -->
+      <div style="position:absolute;bottom:22mm;left:26mm;font-size:11px;color:#555">
+        Fait à ${o.ville || ""}, le 30/06/2026
+      </div>
     </div>
   `;
 
-  // Render standalone (no header/footer, no title bar)
-  return applyGender(htmlWrap(extra), s);
+  // Render standalone in landscape A4 (no header/footer, no title bar)
+  return applyGender(htmlWrap(extra, true), s);
 }
 
 
