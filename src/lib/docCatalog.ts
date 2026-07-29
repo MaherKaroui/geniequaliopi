@@ -6,6 +6,8 @@ import { getEvalContent } from "./evalContent";
 import { BDC_NT_SOURCE, BDC_NT_PER_BENEFICIAIRE, BDC_NT_STATIC_ASSETS } from "./bdc/bdcNTSource";
 import { BDC_NT_STATS_FILES } from "./bdc/bdcNTStatsXlsx";
 import { critereForIndicateur, indicateurFromKey, bdcDocTitle } from "./bdc/bdcNTConseilsZip";
+import { dateMailMission } from "./mailsMissionsCFA";
+import { dateMailDiffusionMission } from "./mailsDiffusionMissionsCFA";
 
 
 export type ActionType = 'actions-formation' | 'bilans-competences' | 'vae' | 'apprentissage';
