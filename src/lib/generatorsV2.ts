@@ -1393,64 +1393,62 @@ export function genGrilleAcquisitionStagiaire(o: OrganismeInfo, f: FormationInfo
 
 export function genAttestationReussiteStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: StagiaireInfo[], stagiaireIdx: number) {
   const s = stagiaires[stagiaireIdx] || stagiaires[0];
+  const termine = isFormationTerminee(f);
   const fiche = f.codeRNCP ? getRNCPByCode(f.codeRNCP) : undefined;
+  const titrePro = fiche?.intitule || f.intitule;
 
+  const dateDebut = getStagiaireDateDebut(s, f);
+  const dateFin = getStagiaireDateFin(s, f);
+  const sessionTxt = (dateDebut && dateFin) ? `Du ${formatDate(dateDebut)} au ${formatDate(dateFin)}` : "";
+  const lieuTxt = isPresentiel(f) && f.lieu ? f.lieu : (isDistanciel(f) ? "Distanciel (visioconférence)" : (f.lieu || ""));
   const stagDuree = getStagiaireDuree(s, f);
   const dureeTxt = stagDuree || f.duree || `${getFormationDays(f).length * 7} heures`;
-  // Date fixe demandée pour toutes les attestations
-  const dateFait = "30/06/2026";
+  const dateFait = termine && dateFin ? formatDate(dateFin) : formatDate(new Date().toISOString().slice(0, 10));
 
   const civ = s.civilite || "";
   const nomComplet = `${civ} ${s.prenom || ""} ${(s.nom || "").toUpperCase()}`.trim();
   const color = getDocStyleColor();
-  const intitule = fiche?.intitule || f.intitule;
-
-  const adresseLigne = [o.adresse, `${o.codePostal || ""} ${o.ville || ""}`.trim()].filter(Boolean).join(", ");
-  const siren = (o.siret || "").length >= 9 ? o.siret.slice(0, 9) : "";
-  const siretLine = o.siret ? `Siret : ${o.siret}` : "";
-  const sirenLine = siren ? `Siren : ${siren}` : "";
+  const stagSig = (s as any).signatureUrl
+    ? `<img src="${(s as any).signatureUrl}" alt="Signature stagiaire" style="max-height:70px;max-width:180px;object-fit:contain" />`
+    : `<span style="color:#bbb;font-style:italic;font-size:11px">Signature</span>`;
 
   const extra = `
-    <div style="position:relative;padding:48px 56px;border:6px double ${color};margin:10px;background:#ffffff;min-height:920px;font-family:'Times New Roman', Georgia, serif;">
-      <div style="position:absolute;top:16px;left:16px;right:16px;bottom:16px;border:1px solid ${color};pointer-events:none;"></div>
+    <div style="position:relative;padding:40px 50px;border:6px double ${color};margin:10px;background:#ffffff;min-height:920px;">
+      <div style="position:absolute;top:14px;left:14px;right:14px;bottom:14px;border:1px solid ${color};pointer-events:none;"></div>
 
-      <div style="text-align:center;margin-top:14px">
-        <div style="font-size:12px;letter-spacing:5px;color:${color};font-weight:600;text-transform:uppercase">— ${o.nom.toUpperCase()} —</div>
-        <h1 style="font-family:'Times New Roman', Georgia, serif;font-size:52px;letter-spacing:3px;color:${color};margin:22px 0 0;font-weight:700">ATTESTATION</h1>
-        <div style="width:100%;height:3px;background:${color};margin:10px auto 14px;max-width:520px"></div>
-        <div style="font-family:'Times New Roman', Georgia, serif;font-size:26px;letter-spacing:6px;color:${color};margin-bottom:8px">DE RÉUSSITE</div>
-        <div style="width:160px;height:2px;background:${color};margin:0 auto 28px"></div>
-        <p style="font-size:14px;color:#444;margin:0">Le présent document atteste que</p>
+      <div style="text-align:center;margin-top:10px">
+        <div style="font-size:11px;letter-spacing:6px;color:${color};font-weight:600">— ${o.nom.toUpperCase()} —</div>
+        <h1 style="font-family:'Playfair Display', Georgia, serif;font-size:44px;letter-spacing:4px;color:${color};margin:18px 0 4px;font-weight:700">ATTESTATION</h1>
+        <div style="font-family:'Playfair Display', Georgia, serif;font-size:22px;letter-spacing:8px;color:${color};margin-bottom:6px">DE RÉUSSITE</div>
+        <div style="width:120px;height:2px;background:${color};margin:16px auto 24px"></div>
+        <p style="font-size:13px;color:#555;margin:0">Le présent document atteste que</p>
       </div>
 
-      <div style="text-align:center;margin:34px 0 28px">
-        <div style="font-family:'Times New Roman', Georgia, serif;font-size:38px;color:#000;font-weight:700;letter-spacing:0.5px">${nomComplet}</div>
+      <div style="text-align:center;margin:28px 0 24px">
+        <div style="font-family:'Playfair Display', Georgia, serif;font-size:34px;color:#111;font-weight:700;letter-spacing:1px">${nomComplet}</div>
       </div>
 
-      <div style="text-align:center;font-size:15px;color:#222;line-height:1.9;max-width:680px;margin:0 auto">
+      <div style="text-align:center;font-size:14px;color:#333;line-height:1.9;max-width:640px;margin:0 auto">
         <p style="margin:0">a suivi avec succès et validé la formation :</p>
-        <p style="margin:16px 0 0;font-size:19px;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:0.5px;line-height:1.4">« ${intitule} »</p>
-        <p style="margin:18px 0 0;font-size:15px;color:#000"><strong style="font-weight:700">Durée :</strong> ${dureeTxt}</p>
+        <p style="margin:14px 0;font-size:18px;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:1px">« ${f.intitule} »</p>
+        ${f.duree ? `<p style="margin:14px 0 0;font-size:14px;color:#222"><strong>Durée :</strong> ${f.duree}</p>` : ""}
       </div>
 
-      <p style="text-align:center;font-style:italic;color:#555;font-size:13px;margin:28px auto 0;max-width:680px;line-height:1.5">
+      <p style="text-align:center;font-style:italic;color:#666;font-size:12px;margin:26px auto 0;max-width:620px">
         Cette attestation peut permettre de renseigner le passeport orientation-formation (art. L.6315-2 du Code du travail).
       </p>
 
-      <div style="margin-top:54px;text-align:center">
-        <div style="display:inline-block;text-align:center;max-width:320px">
-          <div style="height:130px;display:flex;align-items:center;justify-content:center">${bigOrgStamp(o)}</div>
-          ${adresseLigne ? `<div style="font-size:11px;color:#555;margin:4px 0 2px">${o.nom.toUpperCase()}</div><div style="font-size:10px;color:#666;margin-bottom:4px">${adresseLigne}</div>` : ""}
-          ${siretLine ? `<div style="font-size:10px;color:#666">${siretLine}</div>` : ""}
-          ${sirenLine ? `<div style="font-size:10px;color:#666">${sirenLine}</div>` : ""}
-          <div style="border-top:1px solid #333;padding-top:8px;margin-top:10px;font-size:12px;min-width:260px">
-            <strong style="font-size:13px;color:#000">${(o.dirigeant || "").toUpperCase()}</strong><br>
-            <span style="color:#555">Pour ${o.nom} — Cachet & signature</span>
+      <div style="margin-top:60px;text-align:center">
+        <div style="display:inline-block;text-align:center">
+          <div style="height:110px;display:flex;align-items:center;justify-content:center">${bigOrgStamp(o)}</div>
+          <div style="border-top:1px solid #333;padding-top:6px;font-size:12px;min-width:260px">
+            <strong>${o.dirigeant || o.nom}</strong><br>
+            <span style="color:#666">Pour ${o.nom} — Cachet & signature</span>
           </div>
         </div>
       </div>
 
-      <p style="text-align:center;font-size:12px;color:#777;margin-top:36px">Fait à ${(o.ville || "").toUpperCase()}, le ${dateFait}</p>
+      <p style="text-align:center;font-size:11px;color:#888;margin-top:30px">Fait à ${o.ville || ""}, le ${dateFait}</p>
     </div>
   `;
 
