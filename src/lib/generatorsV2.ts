@@ -1448,7 +1448,7 @@ export function genAttestationReussiteStagiaire(o: OrganismeInfo, f: FormationIn
         </div>
       </div>
 
-      <p style="text-align:center;font-size:11px;color:#888;margin-top:30px">Fait à ${o.ville || ""}, le ${dateFait}</p>
+      <p style="text-align:center;font-size:11px;color:#888;margin-top:30px">Fait à ${o.ville || ""}, le 30/06/2026</p>
     </div>
   `;
 
