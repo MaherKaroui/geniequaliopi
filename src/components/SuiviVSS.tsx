@@ -85,16 +85,26 @@ const SuiviVSS = ({ formation, stagiaires }: Props) => {
     const zip = new JSZip();
     zip.file("Synthese_globale_VSS.xlsx", exportPlanningsVSSXlsx(plannings));
     const used = new Map<string, number>();
-    plannings.forEach((p) => {
+    for (const p of plannings) {
       let slug = slugApprenant(p.apprenant.nom);
       const n = (used.get(slug) ?? 0) + 1;
       used.set(slug, n);
       if (n > 1) slug = `${slug}_${n}`;
-      zip.folder(slug)!.file(`Suivi_temps_connexion_VSS_${slug}.xlsx`, exportPlanningVSSXlsx(p));
-    });
+      const folder = zip.folder(slug)!;
+      folder.file(`Suivi_temps_connexion_VSS_${slug}.xlsx`, exportPlanningVSSXlsx(p));
+      folder.file(`Suivi_temps_connexion_VSS_${slug}.pdf`, await pdfPlanningVSS(p));
+    }
     const blob = await zip.generateAsync({ type: "blob" });
     download(blob, "Suivi_temps_connexion_VSS_par_stagiaire.zip");
     toast.success(`${plannings.length} dossier(s) stagiaire exporté(s)`);
+  };
+
+  const handleExportPdf = async () => {
+    if (!plannings.length) { toast.error("Aucun planning à exporter"); return; }
+    toast.info("Génération du PDF en cours…");
+    const blob = await pdfPlanningsVSS(plannings);
+    download(blob, "Suivi_temps_connexion_VSS.pdf");
+    toast.success("PDF généré");
   };
 
 
