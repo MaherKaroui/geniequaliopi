@@ -6,6 +6,7 @@ import {
   VSSApprenant, VSSPlanning, genererPlanningVSS, parseSuiviVSSXlsx,
   exportPlanningsVSSXlsx, exportPlanningVSSXlsx, slugApprenant, stagiairesToVSS, frDate, MAX_H_JOUR, normaliserApprenantVSS,
 } from "@/lib/vssPlanning";
+import { pdfPlanningVSS, pdfPlanningsVSS } from "@/lib/vssPdf";
 import JSZip from "jszip";
 import {
   Upload, Download, AlertTriangle, CheckCircle2, ChevronDown, ChevronRight,
