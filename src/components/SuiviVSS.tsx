@@ -280,9 +280,11 @@ const SuiviVSS = ({ formation, stagiaires }: Props) => {
                           <th className="text-left p-2">Début</th>
                           <th className="text-left p-2">Fin</th>
                           <th className="text-left p-2">Semaine</th>
-                          <th className="text-left p-2">Date prévue de connexion</th>
+                          <th className="text-left p-2">Date de connexion</th>
+                          <th className="text-left p-2">Créneau</th>
                           <th className="text-right p-2">Heures prévues</th>
-                          <th className="text-right p-2">Total cumulé</th>
+                          <th className="text-right p-2">Heures réalisées</th>
+                          <th className="text-right p-2">Cumul réalisé</th>
                           <th className="text-right p-2">Heures restantes</th>
                           <th className="text-left p-2">Statut</th>
                         </tr>
@@ -295,20 +297,24 @@ const SuiviVSS = ({ formation, stagiaires }: Props) => {
                             <td className="p-2">{frDate(a.dateFin)}</td>
                             <td className="p-2">S{s.semaine}</td>
                             <td className="p-2">{s.jour} {s.dateFr}</td>
+                            <td className="p-2">{s.creneau}</td>
                             <td className="p-2 text-right">{s.heures} h</td>
-                            <td className="p-2 text-right">{s.cumul} h</td>
+                            <td className="p-2 text-right">{s.realisees ? `${s.realisees} h` : "—"}</td>
+                            <td className="p-2 text-right">{s.cumulRealise} h</td>
                             <td className="p-2 text-right">{s.restant} h</td>
                             <td className="p-2">{statutBadge(s.statut)}</td>
                           </tr>
                         ))}
                         <tr className="font-semibold border-t">
-                          <td className="p-2" colSpan={5}>Total</td>
+                          <td className="p-2" colSpan={6}>Total</td>
                           <td className="p-2 text-right">{p.totalPlanifie} h</td>
-                          <td className="p-2 text-right">{p.totalAttendu} h attendues</td>
-                          <td className="p-2 text-right">{p.ecart > 0 ? "+" : ""}{p.ecart} h</td>
+                          <td className="p-2 text-right">{p.totalRealise} h</td>
+                          <td className="p-2 text-right">{p.totalRealise} h</td>
+                          <td className="p-2 text-right">{Math.round((p.totalAttendu - p.totalRealise) * 100) / 100} h</td>
                           <td className="p-2" />
                         </tr>
                       </tbody>
+
                     </table>
                   </div>
                 )}
