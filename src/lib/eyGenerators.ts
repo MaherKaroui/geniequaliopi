@@ -4,6 +4,7 @@
  * ENRICHED for real audit controls – detailed, concrete, professional content.
  */
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
+import { commentaireSatisfaction } from "./satisfactionComments";
 import { buildDocument, formatDate, getDocStyle, linkUrl, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif, getStagiaireDuree, getSessionDates, isStagiaireFormationTerminee } from "./docBuilder";
 import { SAMPLE_FORMATEURS, FormateurInfo, parseDuree, getFormationDays } from "./sampleData";
 
@@ -980,12 +981,7 @@ export function genBilanFroidStagiaire(o: OrganismeInfo, f: FormationInfo, stagi
     return `<tr><td ${td}>${q}</td>${cells}</tr>`;
   }).join("");
 
-  const commentaires = [
-    "La formation a été très enrichissante et m'a permis de mieux comprendre les différentes techniques. Les explications étaient claires et progressives.",
-    "J'ai pu réutiliser certaines techniques dans mon activité. Un temps supplémentaire dédié à l'entraînement serait un vrai plus.",
-    "Formation de qualité, conforme aux attentes du secteur. Les supports sont très bien conçus.",
-    "Excellente formation, le formateur était très pédagogue et à l'écoute de nos besoins individuels.",
-  ];
+  // commentaire unique par stagiaire (voir satisfactionComments.ts)
 
   // Bilan à froid : pas de date exacte, mention "3 à 6 mois après la fin de formation"
   const mentionDelai = "3 à 6 mois après la fin de formation";
@@ -1002,7 +998,7 @@ export function genBilanFroidStagiaire(o: OrganismeInfo, f: FormationInfo, stagi
       <table style="width:100%;border-collapse:collapse;font-size:0.88em;"><thead><tr style="background:${pc()};color:#fff;">
         <th ${td}>Question</th><th ${td} style="width:12%;">Pas du tout satisfait</th><th ${td} style="width:12%;">Peu satisfait</th><th ${td} style="width:12%;">Moyennement satisfait</th><th ${td} style="width:12%;">Très satisfait</th>
       </tr></thead><tbody>${qRows}</tbody></table>` },
-    { heading: "Commentaires, pistes d'amélioration", content: `<p style="padding:12px;background:#f9f9f9;border-left:3px solid ${pc()};margin:8px 0;"><em>${commentaires[si % commentaires.length]}</em></p>` },
+    { heading: "Commentaires, pistes d'amélioration", content: `<p style="padding:12px;background:#f9f9f9;border-left:3px solid ${pc()};margin:8px 0;"><em>${commentaireSatisfaction(`${(s as StagiaireInfo).prenom} ${(s as StagiaireInfo).nom}`, si, "froid")}</em></p>` },
   ]});
 }
 
@@ -1828,17 +1824,12 @@ export function genQuestionnaireSatisfactionEY(o: OrganismeInfo, f: FormationInf
   rows += `<tr><td ${td}>Suite à la formation, vous sentez-vous prêt(e) à travailler ?</td><td ${td} style="text-align:center;"><strong>[x] OUI</strong> &nbsp; [ ] NON</td></tr>`;
   rows += `<tr><td ${td}>Recommandez-vous ce centre de formation ?</td><td ${td} style="text-align:center;"><strong>[x] OUI</strong> &nbsp; [ ] NON</td></tr>`;
 
-  const commentaires = [
-    "La formation a été très enrichissante et conforme à mes attentes. Les explications étaient claires, complètes et adaptées à mon niveau. Je n'ai pas de suggestions particulières, tout s'est très bien déroulé.",
-    "Excellente formation ! Le formateur était très pédagogue et à l'écoute. Les mises en pratique sur modèle réel sont un vrai plus. J'aurais aimé un peu plus de temps sur les techniques avancées.",
-    "Formation complète et bien structurée. Les supports sont de qualité. Le rythme était bien adapté et l'ambiance très agréable. Je recommande vivement.",
-    "Très satisfaite de cette formation. J'ai acquis de nouvelles compétences que j'ai pu appliquer immédiatement dans mon activité professionnelle.",
-  ];
+  // commentaire unique par stagiaire (voir satisfactionComments.ts)
 
   return buildDocument({ org: o, formation: f, title: `Questionnaire de satisfaction`, subtitle: `NOTE GLOBALE ${stars(globalNote)} / 5`, sections: [
     { heading: "", content: `<p style="text-align:center;font-size:0.9em;color:#666;margin-bottom:4px;">${certif ? certif + " : " : ""}${titre.toUpperCase()}</p>` },
     { heading: "Évaluation", content: `<table style="width:100%;border-collapse:collapse;">${rows}</table>` },
-    { heading: "Commentaires et suggestions", content: `<p style="padding:12px;background:#f9f9f9;border-left:3px solid ${pc()};margin:8px 0;font-style:italic;">${commentaires[si % commentaires.length]}</p>` },
+    { heading: "Commentaires et suggestions", content: `<p style="padding:12px;background:#f9f9f9;border-left:3px solid ${pc()};margin:8px 0;font-style:italic;">${commentaireSatisfaction(`${(s as StagiaireInfo).prenom} ${(s as StagiaireInfo).nom}`, si, "chaud")}</p>` },
     { heading: "", content: `<table style="width:100%;border-collapse:collapse;margin-top:16px;">
       <tr><td ${td}>Nom du Centre de Formation : <strong>${o.nom||"—"}</strong></td></tr>
       <tr><td ${td}>Nom: ${(s.nom||"").toUpperCase()} &nbsp;&nbsp; Prénom : ${s.prenom||""}</td></tr>

@@ -50,6 +50,7 @@ import { PAIE_MODULE_EXERCISES } from "./paiePreset";
 import { SECRETARIAT_MODULE_EXERCISES } from "./secretariatPreset";
 import { GOTRM_MODULE_EXERCISES, pickGOTRMComment } from "./gotrmPreset";
 import { pickWordComment } from "./wordPreset";
+import { commentaireSatisfaction } from "./satisfactionComments";
 import { ARH_MODULE_EXERCISES, isARHFormation } from "./arhExercises";
 
 function getModuleExercisesFor(f: FormationInfo) {
@@ -13332,19 +13333,8 @@ function genBilanChaudStagiaire(o: OrganismeInfo, f: FormationInfo, stagiaires: 
   extra += `</tbody></table>`;
 
   if (termine) {
-    const commentsPool = [
-      `La formation ${f.intitule} était très enrichissante. Le formateur a su rendre le contenu accessible et les exercices pratiques étaient bien conçus. Je repars avec des outils concrets que je pourrai utiliser dès demain.`,
-      `Formation de qualité, les objectifs annoncés ont été atteints. Le rythme était adapté et les supports clairs. J'aurais aimé un peu plus de temps sur les cas pratiques mais globalement très satisfait(e).`,
-      `Très bonne formation. Les explications étaient claires et progressives, ce qui m'a permis de comprendre les bases sans difficulté. Le formateur était disponible et prenait le temps de répondre aux questions.`,
-      `Les exercices pratiques ont été utiles pour mettre en application les notions vues. L'organisation et les conditions matérielles étaient satisfaisantes. À l'issue de la formation, je me sens plus à l'aise.`,
-      `J'ai apprécié la pédagogie du formateur et l'alternance entre théorie et pratique. Le contenu était dense mais bien structuré. Les supports fournis seront utiles pour la suite.`,
-      `Formation intéressante et bien organisée. Le formateur maîtrise parfaitement son sujet et sait le transmettre. Les échanges avec les autres participants étaient aussi enrichissants.`,
-      `Bonne formation dans l'ensemble. Le contenu correspondait à mes attentes. J'aurais souhaité approfondir certains points mais la durée ne le permettait pas. Le formateur était à l'écoute.`,
-      `Formation très complète et bien structurée. Les cas pratiques étaient réalistes et m'ont permis de progresser rapidement. Je recommande cette formation à mes collègues.`,
-      `Le formateur a su adapter son discours au niveau du groupe. Les exemples concrets ont facilité la compréhension. Je suis satisfait(e) de cette formation et je me sens prêt(e) à appliquer les acquis.`,
-      `Très satisfait(e) de cette formation. Le programme était complet et le formateur dynamique. Les méthodes pédagogiques variées ont rendu l'apprentissage agréable.`,
-    ];
-    extra += `<p><strong>Commentaire :</strong> ${commentsPool[si % commentsPool.length]}</p>`;
+    // commentaire unique par stagiaire (voir satisfactionComments.ts)
+    extra += `<p><strong>Commentaire :</strong> ${commentaireSatisfaction(`${s.prenom} ${s.nom}`, si, "chaud")}</p>`;
   } else {
     extra += `<p><strong>Commentaire :</strong> _______________________________________________</p>`;
   }
@@ -13415,19 +13405,8 @@ function genAppreciationsBeneficiairesStagiaire(o: OrganismeInfo, f: FormationIn
     const globalNote = globalNotes[si % globalNotes.length];
     extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%"><tr style="background:#1e3a7b;color:#fff"><th></th><th>1/10</th><th>3/10</th><th>7/10</th><th>10/10</th></tr><tr><td>Niveau de satisfaction général</td><td></td><td></td><td>${globalNote === '7/10' ? 'X' : ''}</td><td>${['10/10', '9/10', '8/10'].includes(globalNote) ? 'X' : ''}</td></tr></table>`;
 
-    const commentsPool = [
-      `La formation s'est globalement bien déroulée. Les explications étaient claires et progressives. Le formateur était disponible et prenait le temps de répondre aux questions.`,
-      `Formation enrichissante. Les exercices pratiques ont été utiles pour mettre en application les notions vues. Je me sens plus à l'aise pour utiliser les outils dans un cadre professionnel.`,
-      `Très satisfait(e) de cette formation. Le contenu était bien structuré et le formateur pédagogue. Les supports de cours sont de qualité et je les conserverai comme référence.`,
-      `Bonne formation, le rythme était adapté à notre niveau. J'aurais aimé approfondir certains points mais la durée ne le permettait pas. Dans l'ensemble, formation recommandée.`,
-      `Le formateur maîtrise parfaitement son sujet et sait le transmettre avec clarté. Les mises en situation pratiques étaient particulièrement utiles et réalistes.`,
-      `Formation très complète qui a répondu à mes attentes. Les méthodes pédagogiques étaient variées et l'ambiance propice à l'apprentissage. Je repars avec de vrais outils concrets.`,
-      `J'ai beaucoup apprécié cette formation. Le contenu correspondait exactement à ce dont j'avais besoin dans mon poste actuel. Le formateur était dynamique et les échanges enrichissants.`,
-      `Formation de bonne qualité. Les exercices progressifs m'ont permis de monter en compétence graduellement. Le formateur a su répondre à toutes mes questions avec précision.`,
-      `Très bonne formation tant sur le fond que sur la forme. L'organisation logistique était impeccable. Je me sens désormais beaucoup plus confiant(e) dans l'utilisation des outils présentés.`,
-      `La formation a dépassé mes attentes. Le formateur a su s'adapter au groupe et proposer des exemples concrets issus du terrain. Je recommande vivement cette formation.`,
-    ];
-    extra += `<p><strong>Commentaire :</strong> ${commentsPool[si % commentsPool.length]}</p>`;
+    // commentaire unique par stagiaire (voir satisfactionComments.ts)
+    extra += `<p><strong>Commentaire :</strong> ${commentaireSatisfaction(`${s.prenom} ${s.nom}`, si, "chaud")}</p>`;
   } else {
     extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%"><tr style="background:#1e3a7b;color:#fff"><th></th><th>1/10</th><th>3/10</th><th>7/10</th><th>10/10</th></tr><tr><td>Niveau de satisfaction général</td><td></td><td></td><td></td><td></td></tr></table>`;
     extra += `<p><strong>Commentaire :</strong> _______________________________________________</p>`;
