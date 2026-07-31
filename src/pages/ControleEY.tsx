@@ -421,7 +421,12 @@ const ControleEY = () => {
         ))}
 
         {/* Checklist */}
+        {/* Suivi du temps de connexion VSS */}
+        <SuiviVSS formation={formation} stagiaires={stagiaires} />
+
+        {/* Checklist */}
         <ControleEDOF organisme={organisme} formation={formation} stagiaires={stagiaires} criteres={criteres} docStyle={docStyle} signature={signature} />
+
       </main>
     </div>
   );
