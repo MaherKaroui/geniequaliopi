@@ -7,6 +7,7 @@ import StagiairesForm from "@/components/StagiairesForm";
 import DocStyleConfigPanel from "@/components/DocStyleConfigPanel";
 import SignaturePad from "@/components/SignaturePad";
 import ControleEDOF from "@/components/ControleEDOF";
+import SuiviVSS from "@/components/SuiviVSS";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ChevronLeft, LogIn, LogOut, ChevronDown, ChevronRight, Building2, GraduationCap, Users, Palette, Save, FolderOpen, Trash2, Plus, PenTool, Archive, ArchiveRestore } from "lucide-react";
@@ -420,7 +421,12 @@ const ControleEY = () => {
         ))}
 
         {/* Checklist */}
+        {/* Suivi du temps de connexion VSS */}
+        <SuiviVSS formation={formation} stagiaires={stagiaires} />
+
+        {/* Checklist */}
         <ControleEDOF organisme={organisme} formation={formation} stagiaires={stagiaires} criteres={criteres} docStyle={docStyle} signature={signature} />
+
       </main>
     </div>
   );
