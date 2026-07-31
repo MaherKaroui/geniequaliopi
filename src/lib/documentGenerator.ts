@@ -50,7 +50,7 @@ import { PAIE_MODULE_EXERCISES } from "./paiePreset";
 import { SECRETARIAT_MODULE_EXERCISES } from "./secretariatPreset";
 import { GOTRM_MODULE_EXERCISES, pickGOTRMComment } from "./gotrmPreset";
 import { pickWordComment } from "./wordPreset";
-import { commentaireSatisfaction, commentaireSatisfactionCourt } from "./satisfactionComments";
+import { commentaireSatisfaction } from "./satisfactionComments";
 import { ARH_MODULE_EXERCISES, isARHFormation } from "./arhExercises";
 
 function getModuleExercisesFor(f: FormationInfo) {

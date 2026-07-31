@@ -998,7 +998,7 @@ export function genBilanFroidStagiaire(o: OrganismeInfo, f: FormationInfo, stagi
       <table style="width:100%;border-collapse:collapse;font-size:0.88em;"><thead><tr style="background:${pc()};color:#fff;">
         <th ${td}>Question</th><th ${td} style="width:12%;">Pas du tout satisfait</th><th ${td} style="width:12%;">Peu satisfait</th><th ${td} style="width:12%;">Moyennement satisfait</th><th ${td} style="width:12%;">Très satisfait</th>
       </tr></thead><tbody>${qRows}</tbody></table>` },
-    { heading: "Commentaires, pistes d'amélioration", content: `<p style="padding:12px;background:#f9f9f9;border-left:3px solid ${pc()};margin:8px 0;"><em>${commentaireSatisfaction(`${(s as StagiaireInfo).prenom} ${(s as StagiaireInfo).nom}`, si, "chaud")}</em></p>` },
+    { heading: "Commentaires, pistes d'amélioration", content: `<p style="padding:12px;background:#f9f9f9;border-left:3px solid ${pc()};margin:8px 0;"><em>${commentaireSatisfaction(`${(s as StagiaireInfo).prenom} ${(s as StagiaireInfo).nom}`, si, "froid")}</em></p>` },
   ]});
 }
 
