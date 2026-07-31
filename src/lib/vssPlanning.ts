@@ -168,13 +168,15 @@ export function genererPlanningVSS(a: VSSApprenant, today = new Date()): VSSPlan
   const nbSemaines = Math.max(1, Math.floor((fin.getTime() - debut.getTime()) / (7 * 86400000)) + 1);
   const capacite = nbSemaines * MAX_H_JOUR;
 
+  const notes: string[] = [];
   if (total > capacite) {
-    alertes.push(
-      `Période insuffisante : ${total} h à couvrir mais seulement ${nbSemaines} semaine(s) disponible(s) ` +
-      `(capacité max ${capacite} h à raison d'un jour de ${MAX_H_JOUR} h par semaine). ` +
-      `Élargir la période ou augmenter le rythme hebdomadaire.`
+    const rythme = Math.round((total / nbSemaines) * 10) / 10;
+    notes.push(
+      `Rythme renforcé : ${total} h réparties sur ${nbSemaines} semaine(s), soit ${rythme} h par jour de connexion ` +
+      `(au-delà du repère de ${MAX_H_JOUR} h/jour). Le total reste couvert intégralement.`
     );
   }
+
 
   // Répartition égale + méthode du plus fort reste, arrondie au pas de 0,5 h
   const unitesTotal = Math.round(total / PAS);
