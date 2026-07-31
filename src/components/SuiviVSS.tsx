@@ -98,6 +98,7 @@ const SuiviVSS = ({ formation, stagiaires }: Props) => {
   };
 
 
+
   const toggleRow = (id: string) =>
     setExpanded((prev) => {
       const n = new Set(prev);
@@ -167,12 +168,13 @@ const SuiviVSS = ({ formation, stagiaires }: Props) => {
             >
               <Plus className="w-4 h-4" /> Ajouter un apprenant
             </Button>
-            <Button size="sm" className="gap-2" onClick={handleExport} disabled={!plannings.length}>
-              <Download className="w-4 h-4" /> Exporter en Excel
+            <Button size="sm" className="gap-2" onClick={handleExportParStagiaire} disabled={!plannings.length}>
+              <Download className="w-4 h-4" /> Exporter (1 dossier + 1 Excel par stagiaire)
             </Button>
-            <Button size="sm" variant="secondary" className="gap-2" onClick={handleExportParStagiaire} disabled={!plannings.length}>
-              <Download className="w-4 h-4" /> Exporter par stagiaire (ZIP)
+            <Button size="sm" variant="secondary" className="gap-2" onClick={handleExport} disabled={!plannings.length}>
+              <Download className="w-4 h-4" /> Synthèse globale (Excel)
             </Button>
+
             <Button
               variant="ghost" size="sm" className="gap-2"
               onClick={() => setShowDebug((d) => !d)}
