@@ -313,13 +313,18 @@ export function genererPlanningVSS(a: VSSApprenant, today = new Date()): VSSPlan
         cumulRealise: Math.round(cumulRealise * 100) / 100,
         restant: Math.round((total - cumul) * 100) / 100,
         statut,
-        creneau: creneauPour(heures, rnd),
+        creneau: creneauPour(realisees > 0 ? Math.round(realisees * 100) / 100 : heures, rnd),
       });
     });
   }
 
+  // On ne conserve que les séances effectivement réalisées (pas de "prévu" ni "manquant")
+  const realisees_ = seances.filter((s) => s.realisees > 0);
+  seances.length = 0;
+  seances.push(...realisees_);
 
   const totalPlanifie = Math.round(seances.reduce((s, x) => s + x.heures, 0) * 100) / 100;
+
   const totalRealise = Math.round(seances.reduce((s, x) => s + x.realisees, 0) * 100) / 100;
   const ecart = Math.round((totalPlanifie - total) * 100) / 100;
 
