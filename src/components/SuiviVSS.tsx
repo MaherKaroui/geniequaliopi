@@ -8,7 +8,7 @@ import {
 } from "@/lib/vssPlanning";
 import {
   Upload, Download, AlertTriangle, CheckCircle2, ChevronDown, ChevronRight,
-  Users, Plus, Trash2, Clock,
+  Users, Plus, Trash2, Clock, Bug,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -28,6 +28,7 @@ const SuiviVSS = ({ formation, stagiaires }: Props) => {
     } catch { return []; }
   });
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  const [showDebug, setShowDebug] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
