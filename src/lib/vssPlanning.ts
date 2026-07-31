@@ -213,55 +213,135 @@ export function genererPlanningVSS(a: VSSApprenant, today = new Date()): VSSPlan
 
 /* ---------------- Import Excel (export suivi parcours VSS) ---------------- */
 
-function getCol(row: Record<string, any>, ...keys: string[]): any {
-  const norm = (s: string) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, "");
-  for (const k of keys) {
-    const kn = norm(k);
-    for (const c of Object.keys(row)) {
-      if (norm(c) === kn && row[c] !== "" && row[c] != null) return row[c];
-    }
-  }
-  return "";
+const norm = (s: any) =>
+  String(s ?? "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[\u200B-\u200D\uFEFF\u00A0\u202F]/g, " ")
+    .replace(/[^a-z0-9]/g, "");
+
+const isNomHeader = (h: string) =>
+  ["name", "nom", "apprenant", "nomprenom", "prenomnom", "stagiaire", "nomapprenant", "nomdelapprenant"].includes(h);
+const isDebutHeader = (h: string) =>
+  (h.includes("start") && (h.includes("periode") || h.includes("formation"))) ||
+  h === "startdate" || h === "start" ||
+  (h.includes("date") && h.includes("debut"));
+const isFinHeader = (h: string) =>
+  (h.includes("end") && (h.includes("periode") || h.includes("formation"))) ||
+  h === "enddate" || h === "end" ||
+  (h.includes("date") && h.includes("fin"));
+const isHeuresHeader = (h: string) =>
+  (h.includes("heure") && (h.includes("connexion") || h.includes("vss") || h.includes("couvrir"))) ||
+  h === "heuresvss" || h === "nombreheures";
+
+interface ColMap {
+  nom: number; debut: number; fin: number; heures: number;
+  email: number; entreprise: number; formation: number; promotion: number;
+  labels: string[];
+}
+
+function mapHeader(row: any[]): ColMap | null {
+  const h = row.map(norm);
+  const find = (fn: (x: string) => boolean) => h.findIndex((x) => x && fn(x));
+  const map: ColMap = {
+    nom: find(isNomHeader),
+    debut: find(isDebutHeader),
+    fin: find(isFinHeader),
+    heures: find(isHeuresHeader),
+    email: find((x) => x.includes("email") || x.includes("courriel")),
+    entreprise: h.findIndex((x) => x === "entreprise" || x === "nomemployeur"),
+    formation: h.findIndex((x) => x === "formation"),
+    promotion: h.findIndex((x) => x === "promotion"),
+    labels: row.map((c) => String(c ?? "").trim()),
+  };
+  // Un en-tête valide identifie au moins le nom + une date
+  if (map.nom < 0 || (map.debut < 0 && map.fin < 0)) return null;
+  return map;
+}
+
+/** Ligne de titre de section / total / ligne d'en-tête répétée ? */
+function isJunkRow(nomBrut: string): boolean {
+  const n = norm(nomBrut);
+  if (!n) return true;
+  if (isNomHeader(n)) return true;
+  const bad = ["total", "suiviactif", "miseengarde", "avertissement", "traitementrupture", "portefeuille", "qualification", "suiviparcours"];
+  return bad.some((b) => n.startsWith(b) || n.includes(b));
 }
 
 export function parseSuiviVSSXlsx(data: ArrayBuffer): VSSApprenant[] {
   const wb = XLSX.read(data, { type: "array", cellDates: true });
-  const sheet = wb.Sheets[wb.SheetNames[0]];
-  const matrix: any[][] = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "", raw: true });
+  const out: VSSApprenant[] = [];
 
-  let headerIdx = 0;
-  for (let i = 0; i < Math.min(matrix.length, 15); i++) {
-    const r = matrix[i].map((c) => String(c).toLowerCase());
-    if (r.some((c) => c === "name" || c === "nom") && r.some((c) => c.includes("heures de connexion"))) {
-      headerIdx = i; break;
+  wb.SheetNames.forEach((sheetName) => {
+    const matrix: any[][] = XLSX.utils.sheet_to_json(wb.Sheets[sheetName], {
+      header: 1, defval: "", raw: false, cellDates: true, blankrows: false,
+    } as any);
+    // raw:false convertirait les dates en texte ; on relit en brut pour garder les Date
+    const matrixRaw: any[][] = XLSX.utils.sheet_to_json(wb.Sheets[sheetName], {
+      header: 1, defval: "", raw: true, blankrows: false,
+    } as any);
+
+    let map: ColMap | null = null;
+    let section = sheetName;
+
+    for (let i = 0; i < matrixRaw.length; i++) {
+      const rowRaw = matrixRaw[i] || [];
+      const rowTxt = matrix[i] || [];
+
+      const maybe = mapHeader(rowRaw);
+      if (maybe) { map = maybe; continue; }
+      if (!map) {
+        const label = String(rowRaw[0] ?? "").trim();
+        if (label) section = label;
+        continue;
+      }
+
+      const nomBrut = String(rowRaw[map.nom] ?? "").trim();
+      if (isJunkRow(nomBrut)) {
+        if (nomBrut) section = nomBrut;
+        continue;
+      }
+
+      const pick = (idx: number) => {
+        if (idx < 0) return { raw: "", val: "" as any };
+        const v = rowRaw[idx];
+        const t = rowTxt[idx];
+        const val = v !== "" && v != null ? v : t;
+        const raw = v instanceof Date ? frDate(toISO(v)) : String(t ?? v ?? "").trim();
+        return { raw, val };
+      };
+
+      const dDeb = pick(map.debut);
+      const dFin = pick(map.fin);
+      let isoDeb = toISO(dDeb.val) || toISO(dDeb.raw);
+      let isoFin = toISO(dFin.val) || toISO(dFin.raw);
+
+      const heuresBrut = map.heures >= 0 ? (rowRaw[map.heures] ?? rowTxt[map.heures]) : 0;
+      const heures = Number(String(heuresBrut ?? 0).replace(/[^\d,.-]/g, "").replace(",", ".")) || 0;
+
+      out.push({
+        id: `vss-${sheetName}-${i}-${nomBrut.replace(/\s+/g, "_")}`,
+        nom: nomBrut,
+        email: map.email >= 0 ? String(rowRaw[map.email] ?? "").trim() : "",
+        entreprise: map.entreprise >= 0 ? String(rowRaw[map.entreprise] ?? "").trim() : "",
+        formation: map.formation >= 0 ? String(rowRaw[map.formation] ?? "").trim() : "",
+        promotion: map.promotion >= 0 ? String(rowRaw[map.promotion] ?? "").trim() : "",
+        dateDebut: isoDeb,
+        dateFin: isoFin,
+        heuresVSS: heures,
+        rawDebut: dDeb.raw,
+        rawFin: dFin.raw,
+        colDebut: map.debut >= 0 ? map.labels[map.debut] : "(colonne introuvable)",
+        colFin: map.fin >= 0 ? map.labels[map.fin] : "(colonne introuvable)",
+        source: section,
+      });
     }
-  }
-  const headers = matrix[headerIdx].map((h) => String(h).trim());
-  const rows = matrix.slice(headerIdx + 1)
-    .filter((r) => r.some((c) => c !== "" && c != null))
-    .map((r) => {
-      const o: Record<string, any> = {};
-      headers.forEach((h, i) => { if (h) o[h] = r[i] ?? ""; });
-      return o;
-    });
+  });
 
-  return rows.map((row, i) => {
-    const nom = String(getCol(row, "Name", "Nom", "Apprenant", "Nom prénom") || "").trim();
-    if (!nom) return null;
-    return {
-      id: `vss-${i}-${nom.replace(/\s+/g, "_")}`,
-      nom,
-      email: String(getCol(row, "Email apprenant", "Email", "Courriel") || ""),
-      entreprise: String(getCol(row, "Entreprise", "Nom employeur") || ""),
-      formation: String(getCol(row, "Formation") || ""),
-      promotion: String(getCol(row, "Promotion") || ""),
-      dateDebut: toISO(getCol(row, "Période de formation - Start", "Periode de formation Start", "Date de début", "Date de début DOKEOS")),
-      dateFin: toISO(getCol(row, "Période de formation - End", "Periode de formation End", "Date de fin")),
-      heuresVSS: Number(String(getCol(row, "Nombre heures de connexion", "Heures de connexion", "Heures VSS") || 0).replace(",", ".")) || 0,
-      heuresRealisees: undefined,
-    } as VSSApprenant;
-  }).filter(Boolean) as VSSApprenant[];
+  return out;
 }
+
 
 /* ---------------- Export Excel ---------------- */
 
