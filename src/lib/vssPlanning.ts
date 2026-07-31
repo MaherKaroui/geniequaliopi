@@ -358,8 +358,23 @@ const isHeuresHeader = (h: string) =>
   (h.includes("heure") && (h.includes("connexion") || h.includes("vss") || h.includes("couvrir"))) ||
   h === "heuresvss" || h === "nombreheures";
 
+/** Extrait les volumes horaires du texte « Transmissions internes ». */
+export function parseTransmission(txt: string): { realisees?: number; attendues?: number; parcours?: number } {
+  const s = String(txt ?? "")
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s+/g, " ");
+  if (!s) return {};
+  const num = (m: RegExpMatchArray | null, i = 1) =>
+    m ? Number(m[i].replace(/\s/g, "").replace(",", ".")) : undefined;
+  const realisees = num(s.match(/([\d\s]+(?:[.,]\d+)?)\s*h\s*realisees/i));
+  const attendues = num(s.match(/pour\s*([\d\s]+(?:[.,]\d+)?)\s*h\s*attendues/i));
+  const parcours = num(s.match(/parcours\s*de\s*([\d\s]+(?:[.,]\d+)?)\s*h/i));
+  return { realisees, attendues, parcours };
+}
+
 interface ColMap {
   nom: number; debut: number; fin: number; heures: number;
+  transmission: number; progression: number;
   email: number; entreprise: number; formation: number; promotion: number;
   labels: string[];
 }
@@ -372,7 +387,10 @@ function mapHeader(row: any[]): ColMap | null {
     debut: find(isDebutHeader),
     fin: find(isFinHeader),
     heures: find(isHeuresHeader),
+    transmission: find((x) => x.includes("transmission")),
+    progression: find((x) => x.includes("progression")),
     email: find((x) => x.includes("email") || x.includes("courriel")),
+
     entreprise: h.findIndex((x) => x === "entreprise" || x === "nomemployeur"),
     formation: h.findIndex((x) => x === "formation"),
     promotion: h.findIndex((x) => x === "promotion"),
