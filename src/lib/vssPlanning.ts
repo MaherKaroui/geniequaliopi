@@ -359,18 +359,33 @@ const isHeuresHeader = (h: string) =>
   h === "heuresvss" || h === "nombreheures";
 
 /** Extrait les volumes horaires du texte « Transmissions internes ». */
-export function parseTransmission(txt: string): { realisees?: number; attendues?: number; parcours?: number } {
+export function parseTransmission(txt: string): {
+  realisees?: number; attendues?: number; parcours?: number;
+  tauxCible?: number; tauxParcours?: number; rupture?: boolean;
+} {
   const s = String(txt ?? "")
     .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
     .replace(/\s+/g, " ");
   if (!s) return {};
   const num = (m: RegExpMatchArray | null, i = 1) =>
     m ? Number(m[i].replace(/\s/g, "").replace(",", ".")) : undefined;
-  const realisees = num(s.match(/([\d\s]+(?:[.,]\d+)?)\s*h\s*realisees/i));
-  const attendues = num(s.match(/pour\s*([\d\s]+(?:[.,]\d+)?)\s*h\s*attendues/i));
-  const parcours = num(s.match(/parcours\s*de\s*([\d\s]+(?:[.,]\d+)?)\s*h/i));
-  return { realisees, attendues, parcours };
+  const realisees =
+    num(s.match(/([\d\s]+(?:[.,]\d+)?)\s*h(?:eures)?\s*(?:de\s*connexion\s*)?realisees/i)) ??
+    num(s.match(/realisees?\s*:?\s*([\d\s]+(?:[.,]\d+)?)\s*h/i));
+  const attendues =
+    num(s.match(/pour\s*([\d\s]+(?:[.,]\d+)?)\s*h(?:eures)?\s*attendues/i)) ??
+    num(s.match(/attendues?\s*(?:a ce stade)?\s*:?\s*([\d\s]+(?:[.,]\d+)?)\s*h/i));
+  let parcours =
+    num(s.match(/parcours\s*(?:total\s*)?de\s*([\d\s]+(?:[.,]\d+)?)\s*h/i)) ??
+    num(s.match(/(?:volume|total)\s*(?:du\s*)?parcours\s*:?\s*([\d\s]+(?:[.,]\d+)?)\s*h/i));
+  const tauxCible = num(s.match(/\(?\s*([\d]+(?:[.,]\d+)?)\s*%\s*de la cible/i));
+  const tauxParcours = num(s.match(/soit\s*([\d]+(?:[.,]\d+)?)\s*%\s*du parcours/i));
+  // Reconstitution du volume total si seul le pourcentage de parcours est donné
+  if (!parcours && realisees && tauxParcours) parcours = Math.round((realisees * 100) / tauxParcours);
+  const rupture = /contrat rompu|rupture|parcours interrompu/i.test(s);
+  return { realisees, attendues, parcours, tauxCible, tauxParcours, rupture };
 }
+
 
 /**
  * Réaligne un apprenant sur les volumes déclarés dans « Transmissions internes » :
@@ -485,9 +500,13 @@ export function parseSuiviVSSXlsx(data: ArrayBuffer): VSSApprenant[] {
       const progBrut = map.progression >= 0 ? (rowRaw[map.progression] ?? rowTxt[map.progression]) : "";
       const progression = Number(String(progBrut ?? "").replace(/[^\d,.-]/g, "").replace(",", ".")) || undefined;
 
-      const realisees = heuresConnexion || t.realisees || 0;
-      // Volume total à couvrir : parcours déclaré, sinon heures de connexion
-      const totalParcours = t.parcours || realisees;
+      // « Transmissions internes » fait foi pour les heures réalisées
+      const realisees = t.realisees ?? heuresConnexion ?? 0;
+      // Volume total à couvrir : parcours déclaré, sinon déduit de la progression %, sinon heures de connexion
+      const parcoursDeduit = progression && progression > 0 && realisees
+        ? Math.round((realisees * 100) / progression) : undefined;
+      const totalParcours = t.parcours || parcoursDeduit || realisees;
+
 
       out.push({
         id: `vss-${sheetName}-${i}-${nomBrut.replace(/\s+/g, "_")}`,
@@ -501,7 +520,7 @@ export function parseSuiviVSSXlsx(data: ArrayBuffer): VSSApprenant[] {
         heuresVSS: totalParcours,
         heuresRealisees: realisees,
         heuresAttendues: t.attendues,
-        heuresParcours: t.parcours,
+        heuresParcours: t.parcours || parcoursDeduit,
         progression,
         transmission,
         rawDebut: dDeb.raw,
@@ -538,6 +557,30 @@ export function exportPlanningsVSSXlsx(plannings: VSSPlanning[]): Blob {
   const wsS = XLSX.utils.aoa_to_sheet(synth);
   wsS["!cols"] = [{ wch: 26 }, { wch: 22 }, { wch: 18 }, { wch: 14 }, { wch: 14 }, { wch: 10 }, { wch: 18 }, { wch: 14 }, { wch: 16 }, { wch: 24 }, { wch: 16 }, { wch: 12 }, { wch: 16 }, { wch: 16 }, { wch: 70 }, { wch: 46 }];
   XLSX.utils.book_append_sheet(wb, wsS, "Synthèse VSS");
+
+  // Feuille dédiée : lecture claire des « Transmissions internes » pour tous les apprenants
+  const trans = [
+    ["Apprenant", "Entreprise", "Heures réalisées (h)", "Heures attendues à ce stade (h)", "Total parcours (h)", "% de la cible", "% du parcours", "Écart à la cible (h)", "Reste à réaliser (h)", "Transmissions internes (texte intégral)"],
+    ...plannings.map((p) => {
+      const t = parseTransmission(p.transmission || "");
+      const parcours = p.apprenant.heuresParcours ?? p.totalAttendu;
+      const realisees = p.totalRealise ?? t.realisees ?? 0;
+      const attendues = p.heuresAttenduesStade ?? t.attendues ?? "";
+      return [
+        p.apprenant.nom, p.apprenant.entreprise || "",
+        realisees, attendues, parcours,
+        p.tauxCible != null ? `${p.tauxCible} %` : (t.tauxCible != null ? `${t.tauxCible} %` : ""),
+        t.tauxParcours != null ? `${t.tauxParcours} %`
+          : (parcours ? `${Math.round((Number(realisees) / parcours) * 100)} %` : ""),
+        p.ecartStade ?? "",
+        parcours ? Math.round((parcours - Number(realisees)) * 100) / 100 : "",
+        p.transmission || (t.rupture ? "Contrat rompu" : ""),
+      ];
+    }),
+  ];
+  const wsT = XLSX.utils.aoa_to_sheet(trans as any[][]);
+  wsT["!cols"] = [{ wch: 26 }, { wch: 22 }, { wch: 20 }, { wch: 28 }, { wch: 18 }, { wch: 14 }, { wch: 14 }, { wch: 18 }, { wch: 20 }, { wch: 120 }];
+  XLSX.utils.book_append_sheet(wb, wsT, "Transmissions internes");
 
 
   const detail = [
@@ -581,12 +624,13 @@ export function exportPlanningVSSXlsx(p: VSSPlanning): Blob {
     ["Heures attendues à ce stade (h)", p.heuresAttenduesStade ?? ""],
     ["Écart à la cible (h)", p.ecartStade ?? ""],
     ["% de la cible", p.tauxCible != null ? `${p.tauxCible} %` : ""],
+    ["% du parcours réalisé", p.totalAttendu ? `${Math.round((p.totalRealise / p.totalAttendu) * 100)} %` : ""],
     ["Reste à réaliser (h)", Math.round((p.totalAttendu - p.totalRealise) * 100) / 100],
     ["Statut", p.valide ? "Conforme" : p.alertes[0] || "Alerte"],
     ["Transmissions internes", p.transmission || ""],
   ];
   const wsI = XLSX.utils.aoa_to_sheet(info);
-  wsI["!cols"] = [{ wch: 32 }, { wch: 70 }];
+  wsI["!cols"] = [{ wch: 34 }, { wch: 120 }];
   XLSX.utils.book_append_sheet(wb, wsI, "Synthèse");
 
   const detail = [
