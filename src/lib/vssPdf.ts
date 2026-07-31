@@ -98,16 +98,33 @@ function wrap(bodyInner: string, logo: string): string {
   </body></html>`;
 }
 
+const PDF_OPTS = { scale: 1.4, pageYieldMs: 1 } as const;
+
 export async function pdfPlanningVSS(p: VSSPlanning): Promise<Blob> {
   const logo = await logoDataUrl();
-  return htmlToPdfBlob(wrap(planningHtml(p), logo));
+  return htmlToPdfBlob(wrap(planningHtml(p), logo), { ...PDF_OPTS });
 }
 
-export async function pdfPlanningsVSS(plannings: VSSPlanning[]): Promise<Blob> {
-  const logo = await logoDataUrl();
-  const inner = plannings
-    .map((p, i) => (i > 0 ? `<div class="page-break"></div>` : "") + planningHtml(p))
-    .join("");
-  return htmlToPdfBlob(wrap(inner, logo));
+/**
+ * Génère un PDF par apprenant puis fusionne : évite de bloquer le navigateur
+ * sur un document unique de plusieurs centaines de pages.
+ */
+export async function pdfPlanningsVSS(
+  plannings: VSSPlanning[],
+  onProgress?: (done: number, total: number) => void,
+): Promise<Blob> {
+  const { PDFDocument } = await import("pdf-lib");
+  const merged = await PDFDocument.create();
+  for (let i = 0; i < plannings.length; i++) {
+    const blob = await pdfPlanningVSS(plannings[i]);
+    const src = await PDFDocument.load(await blob.arrayBuffer());
+    const pages = await merged.copyPages(src, src.getPageIndices());
+    pages.forEach((pg) => merged.addPage(pg));
+    onProgress?.(i + 1, plannings.length);
+    await new Promise((r) => setTimeout(r, 0));
+  }
+  const bytes = await merged.save();
+  return new Blob([bytes as unknown as BlobPart], { type: "application/pdf" });
 }
+
 
