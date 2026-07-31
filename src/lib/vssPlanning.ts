@@ -30,15 +30,19 @@ export interface VSSSeance {
   dateFr: string;      // jj/mm/aaaa
   jour: string;        // libellé jour
   heures: number;      // heures prévues ce jour
+  realisees: number;   // heures effectivement réalisées (séances passées)
   cumul: number;       // cumul des heures prévues
+  cumulRealise: number; // cumul des heures réalisées
   restant: number;     // heures restantes après cette séance
   statut: VSSStatut;
+  creneau: string;     // plage horaire réaliste (ex. 09:00 - 12:30)
 }
 
 export interface VSSPlanning {
   apprenant: VSSApprenant;
   seances: VSSSeance[];
   totalPlanifie: number;
+  totalRealise: number;     // heures déjà effectuées à ce jour
   totalAttendu: number;
   ecart: number;
   semainesDisponibles: number;
@@ -51,6 +55,7 @@ export interface VSSPlanning {
 
 export const MAX_H_JOUR = 7;
 const PAS = 0.5; // arrondi au demi-heure
+
 
 const JOURS = ["dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"];
 
