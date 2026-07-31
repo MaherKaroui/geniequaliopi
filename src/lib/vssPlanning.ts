@@ -52,11 +52,16 @@ export interface VSSPlanning {
   ecart: number;
   semainesDisponibles: number;
   capaciteMax: number;      // semaines * MAX_H_JOUR
+  heuresAttenduesStade?: number;  // heures attendues à ce stade (Transmissions internes)
+  ecartStade?: number;            // réalisées - attendues à ce stade
+  tauxCible?: number;             // % réalisé / attendu à ce stade
+  transmission?: string;          // synthèse « Transmissions internes »
   alertes: string[];
   notes?: string[];  // informations non bloquantes (rythme > 7 h/jour, etc.)
   valide: boolean;
 
 }
+
 
 export const MAX_H_JOUR = 7;
 const PAS = 0.5; // arrondi au demi-heure
