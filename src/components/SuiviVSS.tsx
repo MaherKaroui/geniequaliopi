@@ -169,6 +169,9 @@ const SuiviVSS = ({ formation, stagiaires }: Props) => {
             <Button size="sm" className="gap-2" onClick={handleExport} disabled={!plannings.length}>
               <Download className="w-4 h-4" /> Exporter en Excel
             </Button>
+            <Button size="sm" variant="secondary" className="gap-2" onClick={handleExportParStagiaire} disabled={!plannings.length}>
+              <Download className="w-4 h-4" /> Exporter par stagiaire (ZIP)
+            </Button>
             <Button
               variant="ghost" size="sm" className="gap-2"
               onClick={() => setShowDebug((d) => !d)}
