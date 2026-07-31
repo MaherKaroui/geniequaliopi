@@ -500,9 +500,13 @@ export function parseSuiviVSSXlsx(data: ArrayBuffer): VSSApprenant[] {
       const progBrut = map.progression >= 0 ? (rowRaw[map.progression] ?? rowTxt[map.progression]) : "";
       const progression = Number(String(progBrut ?? "").replace(/[^\d,.-]/g, "").replace(",", ".")) || undefined;
 
-      const realisees = heuresConnexion || t.realisees || 0;
-      // Volume total à couvrir : parcours déclaré, sinon heures de connexion
-      const totalParcours = t.parcours || realisees;
+      // « Transmissions internes » fait foi pour les heures réalisées
+      const realisees = t.realisees ?? heuresConnexion ?? 0;
+      // Volume total à couvrir : parcours déclaré, sinon déduit de la progression %, sinon heures de connexion
+      const parcoursDeduit = progression && progression > 0 && realisees
+        ? Math.round((realisees * 100) / progression) : undefined;
+      const totalParcours = t.parcours || parcoursDeduit || realisees;
+
 
       out.push({
         id: `vss-${sheetName}-${i}-${nomBrut.replace(/\s+/g, "_")}`,
