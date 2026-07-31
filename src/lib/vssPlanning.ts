@@ -520,7 +520,7 @@ export function parseSuiviVSSXlsx(data: ArrayBuffer): VSSApprenant[] {
         heuresVSS: totalParcours,
         heuresRealisees: realisees,
         heuresAttendues: t.attendues,
-        heuresParcours: t.parcours,
+        heuresParcours: t.parcours || parcoursDeduit,
         progression,
         transmission,
         rawDebut: dDeb.raw,
