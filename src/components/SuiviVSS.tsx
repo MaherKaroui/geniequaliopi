@@ -242,12 +242,15 @@ const SuiviVSS = ({ formation, stagiaires }: Props) => {
                   <span>Semaines : <strong>{p.semainesDisponibles}</strong></span>
                   <span>Heures prévues : <strong>{p.totalAttendu} h</strong></span>
                   <span>Total planifié : <strong>{p.totalPlanifie} h</strong></span>
+                  <span>Réalisées à ce jour : <strong className="text-primary">{p.totalRealise} h</strong></span>
+                  <span>Reste : <strong>{Math.round((p.totalAttendu - p.totalRealise) * 100) / 100} h</strong></span>
                   <span>Écart : <strong className={p.ecart === 0 ? "" : "text-destructive"}>{p.ecart > 0 ? "+" : ""}{p.ecart} h</strong></span>
                   <span>Capacité max : <strong>{p.capaciteMax} h</strong></span>
                   {p.valide
                     ? <span className="flex items-center gap-1 text-primary"><CheckCircle2 className="w-3 h-3" /> Conforme</span>
                     : <span className="flex items-center gap-1 text-destructive"><AlertTriangle className="w-3 h-3" /> Alerte</span>}
                 </div>
+
 
                 {p.alertes.length > 0 && (
                   <div className="px-3 pb-2 space-y-1">
