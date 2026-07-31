@@ -169,7 +169,7 @@ function getCol(row: Record<string, any>, ...keys: string[]): any {
 export function parseSuiviVSSXlsx(data: ArrayBuffer): VSSApprenant[] {
   const wb = XLSX.read(data, { type: "array", cellDates: true });
   const sheet = wb.Sheets[wb.SheetNames[0]];
-  const matrix: any[][] = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "", raw: false });
+  const matrix: any[][] = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "", raw: true });
 
   let headerIdx = 0;
   for (let i = 0; i < Math.min(matrix.length, 15); i++) {
