@@ -180,10 +180,13 @@ const SuiviVSS = ({ formation, stagiaires }: Props) => {
               <Plus className="w-4 h-4" /> Ajouter un apprenant
             </Button>
             <Button size="sm" className="gap-2" onClick={handleExportParStagiaire} disabled={!plannings.length}>
-              <Download className="w-4 h-4" /> Exporter (1 dossier + 1 Excel par stagiaire)
+              <Download className="w-4 h-4" /> Exporter (1 dossier : Excel + PDF par stagiaire)
             </Button>
             <Button size="sm" variant="secondary" className="gap-2" onClick={handleExport} disabled={!plannings.length}>
               <Download className="w-4 h-4" /> Synthèse globale (Excel)
+            </Button>
+            <Button size="sm" variant="secondary" className="gap-2" onClick={handleExportPdf} disabled={!plannings.length}>
+              <Download className="w-4 h-4" /> Télécharger en PDF
             </Button>
 
             <Button
