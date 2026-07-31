@@ -45,25 +45,76 @@ const PAS = 0.5; // arrondi au demi-heure
 
 const JOURS = ["dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"];
 
+const MOIS_FR: Record<string, number> = {
+  janvier: 1, janv: 1, jan: 1, fevrier: 2, fev: 2, feb: 2, mars: 3, mar: 3,
+  avril: 4, avr: 4, apr: 4, mai: 5, may: 5, juin: 6, jun: 6, juillet: 7, juil: 7, jul: 7,
+  aout: 8, aug: 8, septembre: 9, sept: 9, sep: 9, octobre: 10, oct: 10,
+  novembre: 11, nov: 11, decembre: 12, dec: 12,
+};
+
+/** Normalise n'importe quelle valeur de date (Date, série Excel, texte FR/ISO) en yyyy-mm-dd. */
 export function toISO(v: any): string {
-  if (!v) return "";
-  if (v instanceof Date && !isNaN(v.getTime())) return v.toISOString().slice(0, 10);
-  const s = String(v).trim();
-  if (/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0, 10);
-  const m = s.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{2,4})/);
+  if (v == null || v === "") return "";
+
+  // Vraie date Excel / JS
+  if (v instanceof Date && !isNaN(v.getTime())) {
+    // Les dates lues par xlsx sont en UTC : on utilise les composantes UTC pour éviter le décalage
+    const y = v.getUTCFullYear(), m = v.getUTCMonth() + 1, d = v.getUTCDate();
+    return `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+  }
+
+  // Nombre de série Excel
+  if (typeof v === "number" && Number.isFinite(v) && v > 20 && v < 100000) {
+    const d = new Date(Date.UTC(1899, 11, 30) + Math.round(v) * 86400000);
+    return d.toISOString().slice(0, 10);
+  }
+
+  // Texte : nettoyage des caractères invisibles / espaces insécables
+  const s = String(v)
+    .replace(/[\u200B-\u200D\uFEFF\u00A0\u202F]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (!s) return "";
+
+  // ISO (avec ou sans heure)
+  let m = s.match(/^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})/);
+  if (m) return `${m[1]}-${m[2].padStart(2, "0")}-${m[3].padStart(2, "0")}`;
+
+  // jj/mm/aaaa, jj-mm-aa, jj.mm.aaaa
+  m = s.match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{2,4})/);
   if (m) {
     let y = m[3];
     if (y.length === 2) y = Number(y) > 50 ? `19${y}` : `20${y}`;
-    return `${y}-${m[2].padStart(2, "0")}-${m[1].padStart(2, "0")}`;
+    const day = Number(m[1]), mon = Number(m[2]);
+    if (day >= 1 && day <= 31 && mon >= 1 && mon <= 12) {
+      return `${y}-${String(mon).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+    }
+    return "";
   }
-  const n = Number(s);
 
-  if (Number.isFinite(n) && n > 1000 && n < 100000) {
-    const d = new Date(Date.UTC(1899, 11, 30) + n * 86400000);
+  // 1er septembre 2025 / 1 sept 2025
+  m = s.match(/^(\d{1,2})(?:er)?\s+([a-zA-Zéûôàè.]+)\s+(\d{4})/);
+  if (m) {
+    const key = m[2].toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\./g, "");
+    const mon = MOIS_FR[key];
+    if (mon) return `${m[3]}-${String(mon).padStart(2, "0")}-${m[1].padStart(2, "0")}`;
+  }
+
+  // Chaîne numérique = série Excel
+  const n = Number(s.replace(",", "."));
+  if (Number.isFinite(n) && n > 20 && n < 100000) {
+    const d = new Date(Date.UTC(1899, 11, 30) + Math.round(n) * 86400000);
     return d.toISOString().slice(0, 10);
+  }
+
+  // Dernier recours : parsing natif
+  const nat = new Date(s);
+  if (!isNaN(nat.getTime()) && nat.getFullYear() > 1950 && nat.getFullYear() < 2200) {
+    return `${nat.getFullYear()}-${String(nat.getMonth() + 1).padStart(2, "0")}-${String(nat.getDate()).padStart(2, "0")}`;
   }
   return "";
 }
+
 
 export function frDate(iso: string): string {
   if (!iso) return "";
