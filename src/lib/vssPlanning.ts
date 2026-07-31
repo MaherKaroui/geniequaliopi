@@ -558,6 +558,30 @@ export function exportPlanningsVSSXlsx(plannings: VSSPlanning[]): Blob {
   wsS["!cols"] = [{ wch: 26 }, { wch: 22 }, { wch: 18 }, { wch: 14 }, { wch: 14 }, { wch: 10 }, { wch: 18 }, { wch: 14 }, { wch: 16 }, { wch: 24 }, { wch: 16 }, { wch: 12 }, { wch: 16 }, { wch: 16 }, { wch: 70 }, { wch: 46 }];
   XLSX.utils.book_append_sheet(wb, wsS, "Synthèse VSS");
 
+  // Feuille dédiée : lecture claire des « Transmissions internes » pour tous les apprenants
+  const trans = [
+    ["Apprenant", "Entreprise", "Heures réalisées (h)", "Heures attendues à ce stade (h)", "Total parcours (h)", "% de la cible", "% du parcours", "Écart à la cible (h)", "Reste à réaliser (h)", "Transmissions internes (texte intégral)"],
+    ...plannings.map((p) => {
+      const t = parseTransmission(p.transmission || "");
+      const parcours = p.apprenant.heuresParcours ?? p.totalAttendu;
+      const realisees = p.totalRealise ?? t.realisees ?? 0;
+      const attendues = p.heuresAttenduesStade ?? t.attendues ?? "";
+      return [
+        p.apprenant.nom, p.apprenant.entreprise || "",
+        realisees, attendues, parcours,
+        p.tauxCible != null ? `${p.tauxCible} %` : (t.tauxCible != null ? `${t.tauxCible} %` : ""),
+        t.tauxParcours != null ? `${t.tauxParcours} %`
+          : (parcours ? `${Math.round((Number(realisees) / parcours) * 100)} %` : ""),
+        p.ecartStade ?? "",
+        parcours ? Math.round((parcours - Number(realisees)) * 100) / 100 : "",
+        p.transmission || (t.rupture ? "Contrat rompu" : ""),
+      ];
+    }),
+  ];
+  const wsT = XLSX.utils.aoa_to_sheet(trans as any[][]);
+  wsT["!cols"] = [{ wch: 26 }, { wch: 22 }, { wch: 20 }, { wch: 28 }, { wch: 18 }, { wch: 14 }, { wch: 14 }, { wch: 18 }, { wch: 20 }, { wch: 120 }];
+  XLSX.utils.book_append_sheet(wb, wsT, "Transmissions internes");
+
 
   const detail = [
     ["Apprenant", "Date de début", "Date de fin", "Semaine", "Date de connexion", "Jour", "Créneau", "Heures prévues", "Heures réalisées", "Cumul prévu", "Cumul réalisé", "Heures restantes", "Statut"],
