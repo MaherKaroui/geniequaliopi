@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import {
   VSSApprenant, VSSPlanning, genererPlanningVSS, parseSuiviVSSXlsx,
-  exportPlanningsVSSXlsx, exportPlanningVSSXlsx, slugApprenant, stagiairesToVSS, frDate, MAX_H_JOUR,
+  exportPlanningsVSSXlsx, exportPlanningVSSXlsx, slugApprenant, stagiairesToVSS, frDate, MAX_H_JOUR, normaliserApprenantVSS,
 } from "@/lib/vssPlanning";
 import JSZip from "jszip";
 import {
@@ -25,7 +25,8 @@ const SuiviVSS = ({ formation, stagiaires }: Props) => {
   const [apprenants, setApprenants] = useState<VSSApprenant[]>(() => {
     try {
       const raw = sessionStorage.getItem(STORAGE_KEY);
-      return raw ? JSON.parse(raw) : [];
+      const arr: VSSApprenant[] = raw ? JSON.parse(raw) : [];
+      return arr.map(normaliserApprenantVSS);
     } catch { return []; }
   });
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
@@ -50,7 +51,7 @@ const SuiviVSS = ({ formation, stagiaires }: Props) => {
   const handleImport = async (file: File) => {
     try {
       const buf = await file.arrayBuffer();
-      const rows = parseSuiviVSSXlsx(buf);
+      const rows = parseSuiviVSSXlsx(buf).map(normaliserApprenantVSS);
       if (!rows.length) { toast.error("Aucun apprenant détecté dans le fichier"); return; }
       setApprenants(rows);
       toast.success(`${rows.length} apprenant(s) importé(s)`);

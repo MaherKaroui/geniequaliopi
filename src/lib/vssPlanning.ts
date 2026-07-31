@@ -372,6 +372,25 @@ export function parseTransmission(txt: string): { realisees?: number; attendues?
   return { realisees, attendues, parcours };
 }
 
+/**
+ * Réaligne un apprenant sur les volumes déclarés dans « Transmissions internes » :
+ * le total du parcours est le volume global (ex. 455 h), les heures de connexion
+ * déclarées (ex. 196 h) sont les heures réalisées, et non le total du parcours.
+ */
+export function normaliserApprenantVSS(a: VSSApprenant): VSSApprenant {
+  const t = parseTransmission(a.transmission || "");
+  const realisees = a.heuresRealisees ?? t.realisees ?? 0;
+  const parcours = t.parcours ?? a.heuresParcours;
+  return {
+    ...a,
+    heuresParcours: parcours,
+    heuresAttendues: a.heuresAttendues ?? t.attendues,
+    heuresRealisees: realisees,
+    heuresVSS: parcours && parcours > 0 ? parcours : (Number(a.heuresVSS) || realisees || 0),
+  };
+}
+
+
 interface ColMap {
   nom: number; debut: number; fin: number; heures: number;
   transmission: number; progression: number;
