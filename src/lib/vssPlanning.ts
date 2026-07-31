@@ -140,12 +140,21 @@ export function genererPlanningVSS(a: VSSApprenant, today = new Date()): VSSPlan
   const fin = a.dateFin ? new Date(a.dateFin + "T00:00:00") : null;
 
   if (!debut || !fin || isNaN(debut.getTime()) || isNaN(fin.getTime())) {
+    const detail: string[] = [];
+    if (!debut || isNaN(debut.getTime())) {
+      detail.push(`début — colonne « ${a.colDebut || "Date de début"} » : valeur importée « ${a.rawDebut || "(vide)"} »`);
+    }
+    if (!fin || isNaN(fin.getTime())) {
+      detail.push(`fin — colonne « ${a.colFin || "Date de fin"} » : valeur importée « ${a.rawFin || "(vide)"} »`);
+    }
     return {
       apprenant: a, seances: [], totalPlanifie: 0, totalAttendu: total,
       ecart: -total, semainesDisponibles: 0, capaciteMax: 0,
-      alertes: ["Dates de début et/ou de fin manquantes ou invalides."], valide: false,
+      alertes: [`${a.nom || "Apprenant"} — date(s) invalide(s) : ${detail.join(" ; ")}.`],
+      valide: false,
     };
   }
+
   if (fin < debut) {
     return {
       apprenant: a, seances: [], totalPlanifie: 0, totalAttendu: total,
