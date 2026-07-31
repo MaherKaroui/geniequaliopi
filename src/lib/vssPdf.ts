@@ -7,10 +7,29 @@ const esc = (s: string) =>
 
 const h = (n: number) => `${Number(n || 0).toFixed(2).replace(/\.00$/, "")} h`;
 
-function logoUrl(): string {
-  const url = (logoAsset as { url: string }).url;
-  return url.startsWith("http") ? url : `${window.location.origin}${url}`;
+let logoCache: string | null = null;
+
+/** Inline le logo en base64 : évite les canvas "tainted" (CORS) et les images non chargées. */
+async function logoDataUrl(): Promise<string> {
+  if (logoCache !== null) return logoCache;
+  const raw = (logoAsset as { url: string }).url;
+  const url = raw.startsWith("http") ? raw : `${window.location.origin}${raw}`;
+  try {
+    const res = await fetch(url, { cache: "force-cache" });
+    if (!res.ok) throw new Error(String(res.status));
+    const blob = await res.blob();
+    logoCache = await new Promise<string>((resolve, reject) => {
+      const fr = new FileReader();
+      fr.onload = () => resolve(String(fr.result));
+      fr.onerror = () => reject(fr.error);
+      fr.readAsDataURL(blob);
+    });
+  } catch {
+    logoCache = "";
+  }
+  return logoCache;
 }
+
 
 function planningHtml(p: VSSPlanning): string {
   const a = p.apprenant;
@@ -58,7 +77,7 @@ function planningHtml(p: VSSPlanning): string {
   </table>`;
 }
 
-function wrap(bodyInner: string): string {
+function wrap(bodyInner: string, logo: string): string {
   return `<!DOCTYPE html><html><head><meta charset="utf-8"><style>
     body { font-family: Georgia, 'Times New Roman', serif; color:#1a1a1a; font-size:11px; padding:36px 40px; }
     .hdr { display:flex; align-items:center; gap:16px; border-bottom:2px solid #8a5a33; padding-bottom:10px; margin-bottom:18px; }
@@ -73,19 +92,22 @@ function wrap(bodyInner: string): string {
     .note { font-size:10.5px; background:#f7f2ec; border-left:3px solid #8a5a33; padding:7px 9px; }
     .footer { font-size:9px; text-align:center; color:#555; }
   </style></head><body>
-  <div class="hdr"><img src="${logoUrl()}" alt="Virtual Success School" /><div class="t">Virtual Success School<br/><span style="font-size:10px;letter-spacing:0">From skills to success</span></div></div>
+  <div class="hdr">${logo ? `<img src="${logo}" alt="Virtual Success School" />` : ""}<div class="t">Virtual Success School<br/><span style="font-size:10px;letter-spacing:0">From skills to success</span></div></div>
   ${bodyInner}
   <div class="footer">Document généré le ${new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })} — Suivi du temps de connexion VSS</div>
   </body></html>`;
 }
 
 export async function pdfPlanningVSS(p: VSSPlanning): Promise<Blob> {
-  return htmlToPdfBlob(wrap(planningHtml(p)));
+  const logo = await logoDataUrl();
+  return htmlToPdfBlob(wrap(planningHtml(p), logo));
 }
 
 export async function pdfPlanningsVSS(plannings: VSSPlanning[]): Promise<Blob> {
+  const logo = await logoDataUrl();
   const inner = plannings
     .map((p, i) => (i > 0 ? `<div class="page-break"></div>` : "") + planningHtml(p))
     .join("");
-  return htmlToPdfBlob(wrap(inner));
+  return htmlToPdfBlob(wrap(inner, logo));
 }
+
