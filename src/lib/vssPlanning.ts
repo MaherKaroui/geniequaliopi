@@ -359,18 +359,33 @@ const isHeuresHeader = (h: string) =>
   h === "heuresvss" || h === "nombreheures";
 
 /** Extrait les volumes horaires du texte « Transmissions internes ». */
-export function parseTransmission(txt: string): { realisees?: number; attendues?: number; parcours?: number } {
+export function parseTransmission(txt: string): {
+  realisees?: number; attendues?: number; parcours?: number;
+  tauxCible?: number; tauxParcours?: number; rupture?: boolean;
+} {
   const s = String(txt ?? "")
     .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
     .replace(/\s+/g, " ");
   if (!s) return {};
   const num = (m: RegExpMatchArray | null, i = 1) =>
     m ? Number(m[i].replace(/\s/g, "").replace(",", ".")) : undefined;
-  const realisees = num(s.match(/([\d\s]+(?:[.,]\d+)?)\s*h\s*realisees/i));
-  const attendues = num(s.match(/pour\s*([\d\s]+(?:[.,]\d+)?)\s*h\s*attendues/i));
-  const parcours = num(s.match(/parcours\s*de\s*([\d\s]+(?:[.,]\d+)?)\s*h/i));
-  return { realisees, attendues, parcours };
+  const realisees =
+    num(s.match(/([\d\s]+(?:[.,]\d+)?)\s*h(?:eures)?\s*(?:de\s*connexion\s*)?realisees/i)) ??
+    num(s.match(/realisees?\s*:?\s*([\d\s]+(?:[.,]\d+)?)\s*h/i));
+  const attendues =
+    num(s.match(/pour\s*([\d\s]+(?:[.,]\d+)?)\s*h(?:eures)?\s*attendues/i)) ??
+    num(s.match(/attendues?\s*(?:a ce stade)?\s*:?\s*([\d\s]+(?:[.,]\d+)?)\s*h/i));
+  let parcours =
+    num(s.match(/parcours\s*(?:total\s*)?de\s*([\d\s]+(?:[.,]\d+)?)\s*h/i)) ??
+    num(s.match(/(?:volume|total)\s*(?:du\s*)?parcours\s*:?\s*([\d\s]+(?:[.,]\d+)?)\s*h/i));
+  const tauxCible = num(s.match(/\(?\s*([\d]+(?:[.,]\d+)?)\s*%\s*de la cible/i));
+  const tauxParcours = num(s.match(/soit\s*([\d]+(?:[.,]\d+)?)\s*%\s*du parcours/i));
+  // Reconstitution du volume total si seul le pourcentage de parcours est donné
+  if (!parcours && realisees && tauxParcours) parcours = Math.round((realisees * 100) / tauxParcours);
+  const rupture = /contrat rompu|rupture|parcours interrompu/i.test(s);
+  return { realisees, attendues, parcours, tauxCible, tauxParcours, rupture };
 }
+
 
 /**
  * Réaligne un apprenant sur les volumes déclarés dans « Transmissions internes » :
