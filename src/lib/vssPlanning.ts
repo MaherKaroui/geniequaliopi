@@ -459,7 +459,16 @@ export function parseSuiviVSSXlsx(data: ArrayBuffer): VSSApprenant[] {
       let isoFin = toISO(dFin.val) || toISO(dFin.raw);
 
       const heuresBrut = map.heures >= 0 ? (rowRaw[map.heures] ?? rowTxt[map.heures]) : 0;
-      const heures = Number(String(heuresBrut ?? 0).replace(/[^\d,.-]/g, "").replace(",", ".")) || 0;
+      const heuresConnexion = Number(String(heuresBrut ?? 0).replace(/[^\d,.-]/g, "").replace(",", ".")) || 0;
+
+      const transmission = map.transmission >= 0 ? String(rowRaw[map.transmission] ?? rowTxt[map.transmission] ?? "").trim() : "";
+      const t = parseTransmission(transmission);
+      const progBrut = map.progression >= 0 ? (rowRaw[map.progression] ?? rowTxt[map.progression]) : "";
+      const progression = Number(String(progBrut ?? "").replace(/[^\d,.-]/g, "").replace(",", ".")) || undefined;
+
+      const realisees = heuresConnexion || t.realisees || 0;
+      // Volume total à couvrir : parcours déclaré, sinon heures de connexion
+      const totalParcours = t.parcours || realisees;
 
       out.push({
         id: `vss-${sheetName}-${i}-${nomBrut.replace(/\s+/g, "_")}`,
@@ -470,13 +479,19 @@ export function parseSuiviVSSXlsx(data: ArrayBuffer): VSSApprenant[] {
         promotion: map.promotion >= 0 ? String(rowRaw[map.promotion] ?? "").trim() : "",
         dateDebut: isoDeb,
         dateFin: isoFin,
-        heuresVSS: heures,
+        heuresVSS: totalParcours,
+        heuresRealisees: realisees,
+        heuresAttendues: t.attendues,
+        heuresParcours: t.parcours,
+        progression,
+        transmission,
         rawDebut: dDeb.raw,
         rawFin: dFin.raw,
         colDebut: map.debut >= 0 ? map.labels[map.debut] : "(colonne introuvable)",
         colFin: map.fin >= 0 ? map.labels[map.fin] : "(colonne introuvable)",
         source: section,
       });
+
     }
   });
 
