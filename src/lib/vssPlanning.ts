@@ -153,17 +153,37 @@ function seedFrom(s: string): () => number {
   return () => { h ^= h << 13; h ^= h >>> 17; h ^= h << 5; return ((h >>> 0) % 100000) / 100000; };
 }
 
-/** Créneau horaire réaliste selon la durée de la séance. */
+/** Créneau horaire correspondant exactement à la durée de la séance. */
 function creneauPour(heures: number, rnd: () => number): string {
   if (heures <= 0) return "";
-  const debuts = ["08:30", "09:00", "09:30", "13:30", "14:00"];
+  const debuts = heures > 5 ? ["08:30", "09:00", "09:30"] : ["08:30", "09:00", "09:30", "13:30", "14:00"];
   const start = debuts[Math.floor(rnd() * debuts.length)];
   const [hh, mm] = start.split(":").map(Number);
-  const pause = heures > 5 ? 1 : 0; // pause déjeuner sur les journées longues
-  const totalMin = hh * 60 + mm + Math.round((heures + pause) * 60);
+  const totalMin = hh * 60 + mm + Math.round(heures * 60);
   const eh = Math.floor(totalMin / 60) % 24, em = totalMin % 60;
   return `${start} - ${String(eh).padStart(2, "0")}:${String(em).padStart(2, "0")}`;
 }
+
+/** Répartit les heures d'une semaine en journées de 7 h maximum, durées variées. */
+function repartirSemaine(heuresSemaine: number, rnd: () => number): number[] {
+  const U = 0.25; // granularité quart d'heure
+  let unites = Math.round(heuresSemaine / U);
+  const maxU = Math.round(MAX_H_JOUR / U);
+  if (unites <= 0) return [];
+  const nbJours = Math.max(1, Math.ceil(unites / maxU));
+  const poids = Array.from({ length: nbJours }, () => 0.75 + rnd() * 0.5);
+  const somme = poids.reduce((s, x) => s + x, 0);
+  let parts = poids.map((p) => Math.min(maxU, Math.max(2, Math.round((p / somme) * unites))));
+  let diff = unites - parts.reduce((s, x) => s + x, 0);
+  let guard = 0;
+  while (diff !== 0 && guard++ < 5000) {
+    const i = Math.floor(rnd() * nbJours);
+    if (diff > 0) { if (parts[i] < maxU) { parts[i] += 1; diff -= 1; } }
+    else if (parts[i] > 1) { parts[i] -= 1; diff += 1; }
+  }
+  return parts.map((p) => Math.round(p * U * 100) / 100).filter((h) => h > 0);
+}
+
 
 /**
  * Génère le planning de connexion VSS : 1 jour par semaine entre dateDebut et dateFin,
@@ -208,8 +228,8 @@ export function genererPlanningVSS(a: VSSApprenant, today = new Date()): VSSPlan
   if (total > capacite) {
     const rythme = Math.round((total / nbSemaines) * 10) / 10;
     notes.push(
-      `Rythme renforcé : ${total} h réparties sur ${nbSemaines} semaine(s), soit ${rythme} h par jour de connexion ` +
-      `(au-delà du repère de ${MAX_H_JOUR} h/jour). Le total reste couvert intégralement.`
+      `Rythme renforcé : ${total} h réparties sur ${nbSemaines} semaine(s), soit ${rythme} h par semaine — ` +
+      `plusieurs jours de connexion sont planifiés dans la même semaine (maximum ${MAX_H_JOUR} h par jour).`
     );
   }
 
@@ -220,7 +240,6 @@ export function genererPlanningVSS(a: VSSApprenant, today = new Date()): VSSPlan
 
   // 1) Répartition variée en unités de 0,5 h : base ± 35 %, puis ajustement exact du total
   const unitesTotal = Math.round(total / PAS);
-  const baseU = unitesTotal / nbSemaines;
   const poids: number[] = [];
   for (let i = 0; i < nbSemaines; i++) poids.push(0.65 + rnd() * 0.7);
   const sommePoids = poids.reduce((s, x) => s + x, 0);
@@ -233,7 +252,6 @@ export function genererPlanningVSS(a: VSSApprenant, today = new Date()): VSSPlan
     if (diff > 0) { unites[i] += 1; diff -= 1; }
     else if (unites[i] > 1) { unites[i] -= 1; diff += 1; }
   }
-  void baseU;
 
   const seances: VSSSeance[] = [];
   let cumul = 0;
@@ -246,49 +264,60 @@ export function genererPlanningVSS(a: VSSApprenant, today = new Date()): VSSPlan
   let poolRealise = declarees;
 
   for (let i = 0; i < nbSemaines; i++) {
-    // Date de la séance : jour habituel de la semaine i, avec décalage aléatoire ±1 jour ouvré
     const lundi = new Date(debut.getTime() + i * 7 * 86400000);
     lundi.setDate(lundi.getDate() - ((lundi.getDay() + 6) % 7)); // lundi de la semaine
+
+    const heuresSemaine = Math.round(unites[i] * PAS * 100) / 100;
+    const journees = repartirSemaine(heuresSemaine, rnd);
+    if (!journees.length) continue;
+
+    // Jours ouvrés distincts (lundi→vendredi), samedi/dimanche seulement en dernier recours
     const r = rnd();
-    let offset = jourHabituel - 1;              // 0 = lundi
-    if (r < 0.18) offset = Math.max(0, offset - 1);
-    else if (r > 0.82) offset = Math.min(4, offset + 1);
-    let d = new Date(lundi.getTime() + offset * 86400000);
-    if (d < debut) d = new Date(debut.getTime());
-    if (d > fin) d = new Date(fin.getTime());
+    let base = jourHabituel - 1;                 // 0 = lundi
+    if (r < 0.18) base = Math.max(0, base - 1);
+    else if (r > 0.82) base = Math.min(4, base + 1);
+    const ouvrés = [base, ...[0, 1, 2, 3, 4].filter((x) => x !== base)
+      .sort((x, y) => Math.abs(x - base) - Math.abs(y - base) || (rnd() - 0.5))];
+    const offsets = [...ouvrés, 5, 6].slice(0, journees.length).sort((x, y) => x - y);
 
-    const heures = Math.round(unites[i] * PAS * 100) / 100;
-    cumul += heures;
-    const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-    const passe = d.getTime() <= t0;
+    journees.forEach((heures, k) => {
+      let d = new Date(lundi.getTime() + offsets[k] * 86400000);
+      if (d < debut) d = new Date(debut.getTime());
+      if (d > fin) d = new Date(fin.getTime());
 
-    let realisees = 0;
-    if (passe) {
-      if (poolRealise == null) realisees = heures;
-      else {
-        realisees = Math.min(heures, Math.max(0, Math.round(poolRealise * 100) / 100));
-        poolRealise = Math.round((poolRealise - realisees) * 100) / 100;
+      cumul += heures;
+      const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+      const passe = d.getTime() <= t0;
+
+      let realisees = 0;
+      if (passe) {
+        if (poolRealise == null) realisees = heures;
+        else {
+          realisees = Math.min(heures, Math.max(0, Math.round(poolRealise * 100) / 100));
+          poolRealise = Math.round((poolRealise - realisees) * 100) / 100;
+        }
+        cumulRealise += realisees;
       }
-      cumulRealise += realisees;
-    }
 
-    let statut: VSSStatut = passe ? "réalisé" : "prévu";
-    if (passe && realisees + 0.001 < heures) statut = "manquant";
+      let statut: VSSStatut = passe ? "réalisé" : "prévu";
+      if (passe && realisees + 0.001 < heures) statut = "manquant";
 
-    seances.push({
-      semaine: i + 1,
-      date: iso,
-      dateFr: frDate(iso),
-      jour: JOURS[d.getDay()],
-      heures,
-      realisees: Math.round(realisees * 100) / 100,
-      cumul: Math.round(cumul * 100) / 100,
-      cumulRealise: Math.round(cumulRealise * 100) / 100,
-      restant: Math.round((total - cumul) * 100) / 100,
-      statut,
-      creneau: creneauPour(heures, rnd),
+      seances.push({
+        semaine: i + 1,
+        date: iso,
+        dateFr: frDate(iso),
+        jour: JOURS[d.getDay()],
+        heures,
+        realisees: Math.round(realisees * 100) / 100,
+        cumul: Math.round(cumul * 100) / 100,
+        cumulRealise: Math.round(cumulRealise * 100) / 100,
+        restant: Math.round((total - cumul) * 100) / 100,
+        statut,
+        creneau: creneauPour(heures, rnd),
+      });
     });
   }
+
 
   const totalPlanifie = Math.round(seances.reduce((s, x) => s + x.heures, 0) * 100) / 100;
   const totalRealise = Math.round(seances.reduce((s, x) => s + x.realisees, 0) * 100) / 100;
@@ -584,19 +613,20 @@ export function exportPlanningsVSSXlsx(plannings: VSSPlanning[]): Blob {
 
 
   const detail = [
-    ["Apprenant", "Date de début", "Date de fin", "Semaine", "Date de connexion", "Jour", "Créneau", "Heures prévues", "Heures réalisées", "Cumul prévu", "Cumul réalisé", "Heures restantes", "Statut"],
+    ["Apprenant", "Date de début", "Date de fin", "Semaine", "Date de connexion", "Jour", "Créneau", "Heures réalisées", "Cumul réalisé", "Heures restantes", "Statut"],
   ];
   plannings.forEach((p) => {
     p.seances.forEach((s) => {
       detail.push([
         p.apprenant.nom, frDate(p.apprenant.dateDebut), frDate(p.apprenant.dateFin),
         `S${s.semaine}` as any, s.dateFr, s.jour, s.creneau,
-        s.heures as any, s.realisees as any, s.cumul as any, s.cumulRealise as any, s.restant as any, s.statut,
+        s.realisees as any, s.cumulRealise as any, s.restant as any, s.statut,
       ]);
     });
   });
   const wsD = XLSX.utils.aoa_to_sheet(detail);
-  wsD["!cols"] = [{ wch: 26 }, { wch: 14 }, { wch: 14 }, { wch: 10 }, { wch: 18 }, { wch: 12 }, { wch: 16 }, { wch: 14 }, { wch: 16 }, { wch: 14 }, { wch: 14 }, { wch: 16 }, { wch: 12 }];
+  wsD["!cols"] = [{ wch: 26 }, { wch: 14 }, { wch: 14 }, { wch: 10 }, { wch: 18 }, { wch: 12 }, { wch: 16 }, { wch: 16 }, { wch: 14 }, { wch: 16 }, { wch: 12 }];
+
   XLSX.utils.book_append_sheet(wb, wsD, "Détail connexions");
 
 
@@ -634,14 +664,14 @@ export function exportPlanningVSSXlsx(p: VSSPlanning): Blob {
   XLSX.utils.book_append_sheet(wb, wsI, "Synthèse");
 
   const detail = [
-    ["Semaine", "Date de connexion", "Jour", "Créneau", "Heures prévues", "Heures réalisées", "Cumul prévu", "Cumul réalisé", "Heures restantes", "Statut"],
+    ["Semaine", "Date de connexion", "Jour", "Créneau", "Heures réalisées", "Cumul réalisé", "Heures restantes", "Statut"],
     ...p.seances.map((s) => [
       `S${s.semaine}`, s.dateFr, s.jour, s.creneau,
-      s.heures, s.realisees, s.cumul, s.cumulRealise, s.restant, s.statut,
+      s.realisees, s.cumulRealise, s.restant, s.statut,
     ]),
   ];
   const wsD = XLSX.utils.aoa_to_sheet(detail as any[][]);
-  wsD["!cols"] = [{ wch: 10 }, { wch: 18 }, { wch: 12 }, { wch: 16 }, { wch: 14 }, { wch: 16 }, { wch: 14 }, { wch: 14 }, { wch: 16 }, { wch: 12 }];
+  wsD["!cols"] = [{ wch: 10 }, { wch: 18 }, { wch: 12 }, { wch: 16 }, { wch: 16 }, { wch: 14 }, { wch: 16 }, { wch: 12 }];
   XLSX.utils.book_append_sheet(wb, wsD, "Détail connexions");
 
   const out = XLSX.write(wb, { type: "array", bookType: "xlsx" });
