@@ -613,19 +613,20 @@ export function exportPlanningsVSSXlsx(plannings: VSSPlanning[]): Blob {
 
 
   const detail = [
-    ["Apprenant", "Date de début", "Date de fin", "Semaine", "Date de connexion", "Jour", "Créneau", "Heures prévues", "Heures réalisées", "Cumul prévu", "Cumul réalisé", "Heures restantes", "Statut"],
+    ["Apprenant", "Date de début", "Date de fin", "Semaine", "Date de connexion", "Jour", "Créneau", "Heures réalisées", "Cumul réalisé", "Heures restantes", "Statut"],
   ];
   plannings.forEach((p) => {
     p.seances.forEach((s) => {
       detail.push([
         p.apprenant.nom, frDate(p.apprenant.dateDebut), frDate(p.apprenant.dateFin),
         `S${s.semaine}` as any, s.dateFr, s.jour, s.creneau,
-        s.heures as any, s.realisees as any, s.cumul as any, s.cumulRealise as any, s.restant as any, s.statut,
+        s.realisees as any, s.cumulRealise as any, s.restant as any, s.statut,
       ]);
     });
   });
   const wsD = XLSX.utils.aoa_to_sheet(detail);
-  wsD["!cols"] = [{ wch: 26 }, { wch: 14 }, { wch: 14 }, { wch: 10 }, { wch: 18 }, { wch: 12 }, { wch: 16 }, { wch: 14 }, { wch: 16 }, { wch: 14 }, { wch: 14 }, { wch: 16 }, { wch: 12 }];
+  wsD["!cols"] = [{ wch: 26 }, { wch: 14 }, { wch: 14 }, { wch: 10 }, { wch: 18 }, { wch: 12 }, { wch: 16 }, { wch: 16 }, { wch: 14 }, { wch: 16 }, { wch: 12 }];
+
   XLSX.utils.book_append_sheet(wb, wsD, "Détail connexions");
 
 
