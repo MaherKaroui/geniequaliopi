@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Upload, Sparkles, Loader2, RefreshCw, FileDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { SAMPLE_FORMATIONS, STAGIAIRES_BAC_PRO_LOGISTIQUE, STAGIAIRES_HEXAGONE_GOTRM, HEXAGONE_FORMATION_ORG, MAISON_HSY_ORG, STAGIAIRES_MAQUILLEUR_PRO, PAIE_ORG, STAGIAIRES_PAIE, seedPaieAICaches, SECRETARIAT_ORG, STAGIAIRES_SECRETARIAT, seedSecretariatAICaches, seedGOTRMAICaches, SAMA_ORG, STAGIAIRES_SAMA, seedSAMAAICaches } from "@/lib/sampleData";
+import { SAMPLE_FORMATIONS, STAGIAIRES_BAC_PRO_LOGISTIQUE, STAGIAIRES_HEXAGONE_GOTRM, HEXAGONE_FORMATION_ORG, MAISON_HSY_ORG, STAGIAIRES_MAQUILLEUR_PRO, PAIE_ORG, STAGIAIRES_PAIE, seedPaieAICaches, SECRETARIAT_ORG, STAGIAIRES_SECRETARIAT, seedSecretariatAICaches, seedGOTRMAICaches, SAMA_ORG, STAGIAIRES_SAMA, seedSAMAAICaches, ARH_ORG, STAGIAIRES_ARH, seedARHAICaches } from "@/lib/sampleData";
 import { parseEdofXlsx, EdofSession } from "@/lib/edofParser";
 import { RNCP_FICHES } from "@/lib/rncpData";
 import { supabase } from "@/integrations/supabase/client";
@@ -241,6 +241,18 @@ const FormationForm = ({ data, onChange, onImportStagiaires, onApplyOrganisme }:
         }
         seedPaieAICaches();
         toast.success(`Organisme IZIBUSINESS + 6 stagiaires + contenus IA (besoins, exercices, veilles) pré-remplis`);
+      }
+      // Auto-import organisme + 6 stagiaires + contenus IA pour Assistant ressources humaines (RNCP35030)
+      if (selected.intitule.toLowerCase().includes("ressources humaines") || selected.intitule.toLowerCase().includes("rncp35030") || selected.intitule.toLowerCase().includes("(arh)")) {
+        onChange({ ...selected, codeRNCP: "RNCP35030" });
+        if (onApplyOrganisme) {
+          onApplyOrganisme({ ...ARH_ORG });
+        }
+        if (onImportStagiaires) {
+          onImportStagiaires([...STAGIAIRES_ARH]);
+        }
+        seedARHAICaches();
+        toast.success(`Organisme IZIBUSINESS + 6 stagiaires ARH + contenus IA (besoins, QCM, exercices, veilles) pré-remplis`);
       }
       // Auto-import organisme + apprentis + pré-remplissage IA pour SAMA CFA 420 h (priorité sur "secrétariat" car intitulé contient "Secrétaire assistant médico-administratif")
       const intituleLower = selected.intitule.toLowerCase();
