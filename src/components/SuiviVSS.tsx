@@ -240,16 +240,23 @@ const SuiviVSS = ({ formation, stagiaires }: Props) => {
 
                 <div className="px-3 py-2 flex flex-wrap items-center gap-x-6 gap-y-1 text-xs border-t">
                   <span>Semaines : <strong>{p.semainesDisponibles}</strong></span>
-                  <span>Heures prévues : <strong>{p.totalAttendu} h</strong></span>
-                  <span>Total planifié : <strong>{p.totalPlanifie} h</strong></span>
-                  <span>Réalisées à ce jour : <strong className="text-primary">{p.totalRealise} h</strong></span>
+                  <span>Parcours total : <strong>{p.totalAttendu} h</strong></span>
+                  <span>Réalisées : <strong className="text-primary">{p.totalRealise} h</strong></span>
+                  <span>Attendues à ce stade : <strong>{p.heuresAttenduesStade ?? "—"} h</strong></span>
+                  <span>% de la cible : <strong>{p.tauxCible ?? 0} %</strong></span>
+                  <span>Écart cible : <strong className={(p.ecartStade ?? 0) < 0 ? "text-destructive" : ""}>{(p.ecartStade ?? 0) > 0 ? "+" : ""}{p.ecartStade ?? 0} h</strong></span>
                   <span>Reste : <strong>{Math.round((p.totalAttendu - p.totalRealise) * 100) / 100} h</strong></span>
-                  <span>Écart : <strong className={p.ecart === 0 ? "" : "text-destructive"}>{p.ecart > 0 ? "+" : ""}{p.ecart} h</strong></span>
-                  <span>Capacité max : <strong>{p.capaciteMax} h</strong></span>
                   {p.valide
                     ? <span className="flex items-center gap-1 text-primary"><CheckCircle2 className="w-3 h-3" /> Conforme</span>
                     : <span className="flex items-center gap-1 text-destructive"><AlertTriangle className="w-3 h-3" /> Alerte</span>}
                 </div>
+
+                {p.transmission && (
+                  <div className="px-3 pb-2 text-xs text-muted-foreground">
+                    <span className="font-medium text-foreground">Transmissions internes : </span>{p.transmission}
+                  </div>
+                )}
+
 
 
                 {p.alertes.length > 0 && (
