@@ -13,7 +13,14 @@ export interface VSSApprenant {
   dateFin: string;   // ISO yyyy-mm-dd
   heuresVSS: number; // total d'heures de connexion à couvrir
   heuresRealisees?: number;
+  // Traçabilité import (debug)
+  rawDebut?: string;
+  rawFin?: string;
+  colDebut?: string;
+  colFin?: string;
+  source?: string; // feuille / section d'origine
 }
+
 
 export type VSSStatut = "réalisé" | "prévu" | "manquant";
 
