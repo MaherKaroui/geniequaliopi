@@ -51,7 +51,7 @@ const SuiviVSS = ({ formation, stagiaires }: Props) => {
   const handleImport = async (file: File) => {
     try {
       const buf = await file.arrayBuffer();
-      const rows = parseSuiviVSSXlsx(buf);
+      const rows = parseSuiviVSSXlsx(buf).map(normaliserApprenantVSS);
       if (!rows.length) { toast.error("Aucun apprenant détecté dans le fichier"); return; }
       setApprenants(rows);
       toast.success(`${rows.length} apprenant(s) importé(s)`);
