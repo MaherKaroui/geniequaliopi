@@ -203,7 +203,7 @@ const SuiviVSS = ({ formation, stagiaires }: Props) => {
             return (
               <div key={a.id} className="border rounded-lg overflow-hidden">
                 <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-3 p-3 bg-muted/30">
-                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
+                  <div className="grid grid-cols-2 lg:grid-cols-5 gap-2">
                     <div>
                       <label className="text-[11px] text-muted-foreground">Apprenant</label>
                       <Input value={a.nom} onChange={(e) => update(a.id, { nom: e.target.value })} className="h-8 text-sm" />
@@ -217,14 +217,23 @@ const SuiviVSS = ({ formation, stagiaires }: Props) => {
                       <Input type="date" value={a.dateFin} onChange={(e) => update(a.id, { dateFin: e.target.value })} className="h-8 text-sm" />
                     </div>
                     <div>
-                      <label className="text-[11px] text-muted-foreground">Heures VSS à couvrir</label>
+                      <label className="text-[11px] text-muted-foreground">Heures totales du parcours</label>
                       <Input
                         type="number" min={0} step={0.5} value={a.heuresVSS}
                         onChange={(e) => update(a.id, { heuresVSS: Number(e.target.value) || 0 })}
                         className="h-8 text-sm"
                       />
                     </div>
+                    <div>
+                      <label className="text-[11px] text-muted-foreground">Heures de connexion réalisées</label>
+                      <Input
+                        type="number" min={0} step={0.5} value={a.heuresRealisees ?? 0}
+                        onChange={(e) => update(a.id, { heuresRealisees: Number(e.target.value) || 0 })}
+                        className="h-8 text-sm"
+                      />
+                    </div>
                   </div>
+
                   <div className="flex items-end gap-2">
                     <Button variant="ghost" size="sm" onClick={() => toggleRow(a.id)}>
                       {isOpen ? "Masquer" : "Voir le détail"}
@@ -240,16 +249,23 @@ const SuiviVSS = ({ formation, stagiaires }: Props) => {
 
                 <div className="px-3 py-2 flex flex-wrap items-center gap-x-6 gap-y-1 text-xs border-t">
                   <span>Semaines : <strong>{p.semainesDisponibles}</strong></span>
-                  <span>Heures prévues : <strong>{p.totalAttendu} h</strong></span>
-                  <span>Total planifié : <strong>{p.totalPlanifie} h</strong></span>
-                  <span>Réalisées à ce jour : <strong className="text-primary">{p.totalRealise} h</strong></span>
+                  <span>Parcours total : <strong>{p.totalAttendu} h</strong></span>
+                  <span>Réalisées : <strong className="text-primary">{p.totalRealise} h</strong></span>
+                  <span>Attendues à ce stade : <strong>{p.heuresAttenduesStade ?? "—"} h</strong></span>
+                  <span>% de la cible : <strong>{p.tauxCible ?? 0} %</strong></span>
+                  <span>Écart cible : <strong className={(p.ecartStade ?? 0) < 0 ? "text-destructive" : ""}>{(p.ecartStade ?? 0) > 0 ? "+" : ""}{p.ecartStade ?? 0} h</strong></span>
                   <span>Reste : <strong>{Math.round((p.totalAttendu - p.totalRealise) * 100) / 100} h</strong></span>
-                  <span>Écart : <strong className={p.ecart === 0 ? "" : "text-destructive"}>{p.ecart > 0 ? "+" : ""}{p.ecart} h</strong></span>
-                  <span>Capacité max : <strong>{p.capaciteMax} h</strong></span>
                   {p.valide
                     ? <span className="flex items-center gap-1 text-primary"><CheckCircle2 className="w-3 h-3" /> Conforme</span>
                     : <span className="flex items-center gap-1 text-destructive"><AlertTriangle className="w-3 h-3" /> Alerte</span>}
                 </div>
+
+                {p.transmission && (
+                  <div className="px-3 pb-2 text-xs text-muted-foreground">
+                    <span className="font-medium text-foreground">Transmissions internes : </span>{p.transmission}
+                  </div>
+                )}
+
 
 
                 {p.alertes.length > 0 && (

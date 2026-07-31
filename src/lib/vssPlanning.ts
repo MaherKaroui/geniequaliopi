@@ -12,7 +12,11 @@ export interface VSSApprenant {
   dateDebut: string; // ISO yyyy-mm-dd
   dateFin: string;   // ISO yyyy-mm-dd
   heuresVSS: number; // total d'heures de connexion à couvrir
-  heuresRealisees?: number;
+  heuresRealisees?: number;    // heures de connexion déjà effectuées (colonne « Nombre heures de connexion »)
+  heuresAttendues?: number;    // heures attendues à ce stade (extrait de « Transmissions internes »)
+  heuresParcours?: number;     // volume total du parcours (extrait de « Transmissions internes »)
+  progression?: number;        // % de progression déclaré
+  transmission?: string;       // texte brut « Transmissions internes »
   // Traçabilité import (debug)
   rawDebut?: string;
   rawFin?: string;
@@ -20,6 +24,7 @@ export interface VSSApprenant {
   colFin?: string;
   source?: string; // feuille / section d'origine
 }
+
 
 
 export type VSSStatut = "réalisé" | "prévu" | "manquant";
@@ -47,11 +52,16 @@ export interface VSSPlanning {
   ecart: number;
   semainesDisponibles: number;
   capaciteMax: number;      // semaines * MAX_H_JOUR
+  heuresAttenduesStade?: number;  // heures attendues à ce stade (Transmissions internes)
+  ecartStade?: number;            // réalisées - attendues à ce stade
+  tauxCible?: number;             // % réalisé / attendu à ce stade
+  transmission?: string;          // synthèse « Transmissions internes »
   alertes: string[];
   notes?: string[];  // informations non bloquantes (rythme > 7 h/jour, etc.)
   valide: boolean;
 
 }
+
 
 export const MAX_H_JOUR = 7;
 const PAS = 0.5; // arrondi au demi-heure
@@ -230,6 +240,11 @@ export function genererPlanningVSS(a: VSSApprenant, today = new Date()): VSSPlan
   let cumulRealise = 0;
   const t0 = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
 
+  // Heures réellement déclarées (colonne « Nombre heures de connexion ») : elles sont
+  // réparties sur les séances déjà passées, sans jamais dépasser le total déclaré.
+  const declarees = a.heuresRealisees != null && a.heuresRealisees > 0 ? a.heuresRealisees : null;
+  let poolRealise = declarees;
+
   for (let i = 0; i < nbSemaines; i++) {
     // Date de la séance : jour habituel de la semaine i, avec décalage aléatoire ±1 jour ouvré
     const lundi = new Date(debut.getTime() + i * 7 * 86400000);
@@ -246,12 +261,19 @@ export function genererPlanningVSS(a: VSSApprenant, today = new Date()): VSSPlan
     cumul += heures;
     const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
     const passe = d.getTime() <= t0;
-    const realisees = passe ? heures : 0;
-    if (passe) cumulRealise += realisees;
 
-    const realiseesDeclarees = a.heuresRealisees ?? null;
+    let realisees = 0;
+    if (passe) {
+      if (poolRealise == null) realisees = heures;
+      else {
+        realisees = Math.min(heures, Math.max(0, Math.round(poolRealise * 100) / 100));
+        poolRealise = Math.round((poolRealise - realisees) * 100) / 100;
+      }
+      cumulRealise += realisees;
+    }
+
     let statut: VSSStatut = passe ? "réalisé" : "prévu";
-    if (passe && realiseesDeclarees != null && realiseesDeclarees < cumul) statut = "manquant";
+    if (passe && realisees + 0.001 < heures) statut = "manquant";
 
     seances.push({
       semaine: i + 1,
@@ -276,6 +298,23 @@ export function genererPlanningVSS(a: VSSApprenant, today = new Date()): VSSPlan
   if (ecart > 0) alertes.push(`Total planifié supérieur aux heures attendues : ${totalPlanifie} h / ${total} h (dépassement de ${ecart} h).`);
   if (total === 0) alertes.push("Aucune heure de connexion VSS renseignée pour cet apprenant.");
 
+  // Comparaison avec l'attendu à ce stade (issu de « Transmissions internes »)
+  const attenduStade = a.heuresAttendues && a.heuresAttendues > 0
+    ? a.heuresAttendues
+    : Math.round(seances.filter((s) => new Date(s.date + "T00:00:00").getTime() <= t0).reduce((s, x) => s + x.heures, 0) * 100) / 100;
+  const ecartStade = Math.round((totalRealise - attenduStade) * 100) / 100;
+  const tauxCible = attenduStade > 0 ? Math.round((totalRealise / attenduStade) * 100) : 0;
+
+  if (attenduStade > 0) {
+    notes.push(
+      `Point d'étape : ${totalRealise} h réalisées pour ${attenduStade} h attendues à ce stade (${tauxCible} % de la cible)` +
+      (total > 0 ? `, soit ${Math.round((totalRealise / total) * 100)} % du parcours de ${total} h.` : ".")
+    );
+    if (ecartStade < 0) {
+      notes.push(`Écart à la cible : ${Math.abs(ecartStade)} h de connexion à rattraper.`);
+    }
+  }
+
   if (total > 0 && seances.length) {
     const pct = Math.round((totalRealise / total) * 100);
     notes.push(
@@ -287,7 +326,9 @@ export function genererPlanningVSS(a: VSSApprenant, today = new Date()): VSSPlan
   return {
     apprenant: a, seances, totalPlanifie, totalRealise, totalAttendu: total, ecart,
     semainesDisponibles: nbSemaines, capaciteMax: capacite,
+    heuresAttenduesStade: attenduStade, ecartStade, tauxCible, transmission: a.transmission,
     alertes, notes, valide: alertes.length === 0,
+
   };
 }
 
@@ -317,8 +358,23 @@ const isHeuresHeader = (h: string) =>
   (h.includes("heure") && (h.includes("connexion") || h.includes("vss") || h.includes("couvrir"))) ||
   h === "heuresvss" || h === "nombreheures";
 
+/** Extrait les volumes horaires du texte « Transmissions internes ». */
+export function parseTransmission(txt: string): { realisees?: number; attendues?: number; parcours?: number } {
+  const s = String(txt ?? "")
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s+/g, " ");
+  if (!s) return {};
+  const num = (m: RegExpMatchArray | null, i = 1) =>
+    m ? Number(m[i].replace(/\s/g, "").replace(",", ".")) : undefined;
+  const realisees = num(s.match(/([\d\s]+(?:[.,]\d+)?)\s*h\s*realisees/i));
+  const attendues = num(s.match(/pour\s*([\d\s]+(?:[.,]\d+)?)\s*h\s*attendues/i));
+  const parcours = num(s.match(/parcours\s*de\s*([\d\s]+(?:[.,]\d+)?)\s*h/i));
+  return { realisees, attendues, parcours };
+}
+
 interface ColMap {
   nom: number; debut: number; fin: number; heures: number;
+  transmission: number; progression: number;
   email: number; entreprise: number; formation: number; promotion: number;
   labels: string[];
 }
@@ -331,7 +387,10 @@ function mapHeader(row: any[]): ColMap | null {
     debut: find(isDebutHeader),
     fin: find(isFinHeader),
     heures: find(isHeuresHeader),
+    transmission: find((x) => x.includes("transmission")),
+    progression: find((x) => x.includes("progression")),
     email: find((x) => x.includes("email") || x.includes("courriel")),
+
     entreprise: h.findIndex((x) => x === "entreprise" || x === "nomemployeur"),
     formation: h.findIndex((x) => x === "formation"),
     promotion: h.findIndex((x) => x === "promotion"),
@@ -400,7 +459,16 @@ export function parseSuiviVSSXlsx(data: ArrayBuffer): VSSApprenant[] {
       let isoFin = toISO(dFin.val) || toISO(dFin.raw);
 
       const heuresBrut = map.heures >= 0 ? (rowRaw[map.heures] ?? rowTxt[map.heures]) : 0;
-      const heures = Number(String(heuresBrut ?? 0).replace(/[^\d,.-]/g, "").replace(",", ".")) || 0;
+      const heuresConnexion = Number(String(heuresBrut ?? 0).replace(/[^\d,.-]/g, "").replace(",", ".")) || 0;
+
+      const transmission = map.transmission >= 0 ? String(rowRaw[map.transmission] ?? rowTxt[map.transmission] ?? "").trim() : "";
+      const t = parseTransmission(transmission);
+      const progBrut = map.progression >= 0 ? (rowRaw[map.progression] ?? rowTxt[map.progression]) : "";
+      const progression = Number(String(progBrut ?? "").replace(/[^\d,.-]/g, "").replace(",", ".")) || undefined;
+
+      const realisees = heuresConnexion || t.realisees || 0;
+      // Volume total à couvrir : parcours déclaré, sinon heures de connexion
+      const totalParcours = t.parcours || realisees;
 
       out.push({
         id: `vss-${sheetName}-${i}-${nomBrut.replace(/\s+/g, "_")}`,
@@ -411,13 +479,19 @@ export function parseSuiviVSSXlsx(data: ArrayBuffer): VSSApprenant[] {
         promotion: map.promotion >= 0 ? String(rowRaw[map.promotion] ?? "").trim() : "",
         dateDebut: isoDeb,
         dateFin: isoFin,
-        heuresVSS: heures,
+        heuresVSS: totalParcours,
+        heuresRealisees: realisees,
+        heuresAttendues: t.attendues,
+        heuresParcours: t.parcours,
+        progression,
+        transmission,
         rawDebut: dDeb.raw,
         rawFin: dFin.raw,
         colDebut: map.debut >= 0 ? map.labels[map.debut] : "(colonne introuvable)",
         colFin: map.fin >= 0 ? map.labels[map.fin] : "(colonne introuvable)",
         source: section,
       });
+
     }
   });
 
@@ -431,18 +505,21 @@ export function exportPlanningsVSSXlsx(plannings: VSSPlanning[]): Blob {
   const wb = XLSX.utils.book_new();
 
   const synth = [
-    ["Apprenant", "Entreprise", "Formation", "Date de début", "Date de fin", "Semaines", "Heures VSS prévues", "Total planifié", "Heures réalisées à ce jour", "Reste à réaliser", "Écart", "Statut"],
+    ["Apprenant", "Entreprise", "Formation", "Date de début", "Date de fin", "Semaines", "Total parcours (h)", "Total planifié", "Heures réalisées", "Heures attendues à ce stade", "Écart à la cible", "% de la cible", "Reste à réaliser", "Écart planification", "Transmissions internes", "Statut"],
     ...plannings.map((p) => [
       p.apprenant.nom, p.apprenant.entreprise || "", p.apprenant.formation || "",
       frDate(p.apprenant.dateDebut), frDate(p.apprenant.dateFin),
       p.semainesDisponibles, p.totalAttendu, p.totalPlanifie,
-      p.totalRealise, Math.round((p.totalAttendu - p.totalRealise) * 100) / 100, p.ecart,
+      p.totalRealise, p.heuresAttenduesStade ?? "", p.ecartStade ?? "", p.tauxCible != null ? `${p.tauxCible} %` : "",
+      Math.round((p.totalAttendu - p.totalRealise) * 100) / 100, p.ecart,
+      p.transmission || "",
       p.valide ? "Conforme" : p.alertes[0] || "Alerte",
     ]),
   ];
   const wsS = XLSX.utils.aoa_to_sheet(synth);
-  wsS["!cols"] = [{ wch: 26 }, { wch: 22 }, { wch: 18 }, { wch: 14 }, { wch: 14 }, { wch: 10 }, { wch: 18 }, { wch: 14 }, { wch: 22 }, { wch: 16 }, { wch: 10 }, { wch: 46 }];
+  wsS["!cols"] = [{ wch: 26 }, { wch: 22 }, { wch: 18 }, { wch: 14 }, { wch: 14 }, { wch: 10 }, { wch: 18 }, { wch: 14 }, { wch: 16 }, { wch: 24 }, { wch: 16 }, { wch: 12 }, { wch: 16 }, { wch: 16 }, { wch: 70 }, { wch: 46 }];
   XLSX.utils.book_append_sheet(wb, wsS, "Synthèse VSS");
+
 
   const detail = [
     ["Apprenant", "Date de début", "Date de fin", "Semaine", "Date de connexion", "Jour", "Créneau", "Heures prévues", "Heures réalisées", "Cumul prévu", "Cumul réalisé", "Heures restantes", "Statut"],
