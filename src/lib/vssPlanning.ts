@@ -228,8 +228,8 @@ export function genererPlanningVSS(a: VSSApprenant, today = new Date()): VSSPlan
   if (total > capacite) {
     const rythme = Math.round((total / nbSemaines) * 10) / 10;
     notes.push(
-      `Rythme renforcé : ${total} h réparties sur ${nbSemaines} semaine(s), soit ${rythme} h par jour de connexion ` +
-      `(au-delà du repère de ${MAX_H_JOUR} h/jour). Le total reste couvert intégralement.`
+      `Rythme renforcé : ${total} h réparties sur ${nbSemaines} semaine(s), soit ${rythme} h par semaine — ` +
+      `plusieurs jours de connexion sont planifiés dans la même semaine (maximum ${MAX_H_JOUR} h par jour).`
     );
   }
 
@@ -240,7 +240,6 @@ export function genererPlanningVSS(a: VSSApprenant, today = new Date()): VSSPlan
 
   // 1) Répartition variée en unités de 0,5 h : base ± 35 %, puis ajustement exact du total
   const unitesTotal = Math.round(total / PAS);
-  const baseU = unitesTotal / nbSemaines;
   const poids: number[] = [];
   for (let i = 0; i < nbSemaines; i++) poids.push(0.65 + rnd() * 0.7);
   const sommePoids = poids.reduce((s, x) => s + x, 0);
@@ -253,7 +252,6 @@ export function genererPlanningVSS(a: VSSApprenant, today = new Date()): VSSPlan
     if (diff > 0) { unites[i] += 1; diff -= 1; }
     else if (unites[i] > 1) { unites[i] -= 1; diff += 1; }
   }
-  void baseU;
 
   const seances: VSSSeance[] = [];
   let cumul = 0;
@@ -266,49 +264,60 @@ export function genererPlanningVSS(a: VSSApprenant, today = new Date()): VSSPlan
   let poolRealise = declarees;
 
   for (let i = 0; i < nbSemaines; i++) {
-    // Date de la séance : jour habituel de la semaine i, avec décalage aléatoire ±1 jour ouvré
     const lundi = new Date(debut.getTime() + i * 7 * 86400000);
     lundi.setDate(lundi.getDate() - ((lundi.getDay() + 6) % 7)); // lundi de la semaine
+
+    const heuresSemaine = Math.round(unites[i] * PAS * 100) / 100;
+    const journees = repartirSemaine(heuresSemaine, rnd);
+    if (!journees.length) continue;
+
+    // Jours ouvrés distincts (lundi→vendredi), samedi/dimanche seulement en dernier recours
     const r = rnd();
-    let offset = jourHabituel - 1;              // 0 = lundi
-    if (r < 0.18) offset = Math.max(0, offset - 1);
-    else if (r > 0.82) offset = Math.min(4, offset + 1);
-    let d = new Date(lundi.getTime() + offset * 86400000);
-    if (d < debut) d = new Date(debut.getTime());
-    if (d > fin) d = new Date(fin.getTime());
+    let base = jourHabituel - 1;                 // 0 = lundi
+    if (r < 0.18) base = Math.max(0, base - 1);
+    else if (r > 0.82) base = Math.min(4, base + 1);
+    const ouvrés = [base, ...[0, 1, 2, 3, 4].filter((x) => x !== base)
+      .sort((x, y) => Math.abs(x - base) - Math.abs(y - base) || (rnd() - 0.5))];
+    const offsets = [...ouvrés, 5, 6].slice(0, journees.length).sort((x, y) => x - y);
 
-    const heures = Math.round(unites[i] * PAS * 100) / 100;
-    cumul += heures;
-    const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-    const passe = d.getTime() <= t0;
+    journees.forEach((heures, k) => {
+      let d = new Date(lundi.getTime() + offsets[k] * 86400000);
+      if (d < debut) d = new Date(debut.getTime());
+      if (d > fin) d = new Date(fin.getTime());
 
-    let realisees = 0;
-    if (passe) {
-      if (poolRealise == null) realisees = heures;
-      else {
-        realisees = Math.min(heures, Math.max(0, Math.round(poolRealise * 100) / 100));
-        poolRealise = Math.round((poolRealise - realisees) * 100) / 100;
+      cumul += heures;
+      const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+      const passe = d.getTime() <= t0;
+
+      let realisees = 0;
+      if (passe) {
+        if (poolRealise == null) realisees = heures;
+        else {
+          realisees = Math.min(heures, Math.max(0, Math.round(poolRealise * 100) / 100));
+          poolRealise = Math.round((poolRealise - realisees) * 100) / 100;
+        }
+        cumulRealise += realisees;
       }
-      cumulRealise += realisees;
-    }
 
-    let statut: VSSStatut = passe ? "réalisé" : "prévu";
-    if (passe && realisees + 0.001 < heures) statut = "manquant";
+      let statut: VSSStatut = passe ? "réalisé" : "prévu";
+      if (passe && realisees + 0.001 < heures) statut = "manquant";
 
-    seances.push({
-      semaine: i + 1,
-      date: iso,
-      dateFr: frDate(iso),
-      jour: JOURS[d.getDay()],
-      heures,
-      realisees: Math.round(realisees * 100) / 100,
-      cumul: Math.round(cumul * 100) / 100,
-      cumulRealise: Math.round(cumulRealise * 100) / 100,
-      restant: Math.round((total - cumul) * 100) / 100,
-      statut,
-      creneau: creneauPour(heures, rnd),
+      seances.push({
+        semaine: i + 1,
+        date: iso,
+        dateFr: frDate(iso),
+        jour: JOURS[d.getDay()],
+        heures,
+        realisees: Math.round(realisees * 100) / 100,
+        cumul: Math.round(cumul * 100) / 100,
+        cumulRealise: Math.round(cumulRealise * 100) / 100,
+        restant: Math.round((total - cumul) * 100) / 100,
+        statut,
+        creneau: creneauPour(heures, rnd),
+      });
     });
   }
+
 
   const totalPlanifie = Math.round(seances.reduce((s, x) => s + x.heures, 0) * 100) / 100;
   const totalRealise = Math.round(seances.reduce((s, x) => s + x.realisees, 0) * 100) / 100;
