@@ -44,7 +44,9 @@ export interface VSSPlanning {
   semainesDisponibles: number;
   capaciteMax: number;      // semaines * MAX_H_JOUR
   alertes: string[];
+  notes?: string[];  // informations non bloquantes (rythme > 7 h/jour, etc.)
   valide: boolean;
+
 }
 
 export const MAX_H_JOUR = 7;
