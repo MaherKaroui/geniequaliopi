@@ -12,7 +12,11 @@ export interface VSSApprenant {
   dateDebut: string; // ISO yyyy-mm-dd
   dateFin: string;   // ISO yyyy-mm-dd
   heuresVSS: number; // total d'heures de connexion à couvrir
-  heuresRealisees?: number;
+  heuresRealisees?: number;    // heures de connexion déjà effectuées (colonne « Nombre heures de connexion »)
+  heuresAttendues?: number;    // heures attendues à ce stade (extrait de « Transmissions internes »)
+  heuresParcours?: number;     // volume total du parcours (extrait de « Transmissions internes »)
+  progression?: number;        // % de progression déclaré
+  transmission?: string;       // texte brut « Transmissions internes »
   // Traçabilité import (debug)
   rawDebut?: string;
   rawFin?: string;
@@ -20,6 +24,7 @@ export interface VSSApprenant {
   colFin?: string;
   source?: string; // feuille / section d'origine
 }
+
 
 
 export type VSSStatut = "réalisé" | "prévu" | "manquant";
