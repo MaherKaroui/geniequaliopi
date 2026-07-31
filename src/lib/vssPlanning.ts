@@ -505,18 +505,21 @@ export function exportPlanningsVSSXlsx(plannings: VSSPlanning[]): Blob {
   const wb = XLSX.utils.book_new();
 
   const synth = [
-    ["Apprenant", "Entreprise", "Formation", "Date de début", "Date de fin", "Semaines", "Heures VSS prévues", "Total planifié", "Heures réalisées à ce jour", "Reste à réaliser", "Écart", "Statut"],
+    ["Apprenant", "Entreprise", "Formation", "Date de début", "Date de fin", "Semaines", "Total parcours (h)", "Total planifié", "Heures réalisées", "Heures attendues à ce stade", "Écart à la cible", "% de la cible", "Reste à réaliser", "Écart planification", "Transmissions internes", "Statut"],
     ...plannings.map((p) => [
       p.apprenant.nom, p.apprenant.entreprise || "", p.apprenant.formation || "",
       frDate(p.apprenant.dateDebut), frDate(p.apprenant.dateFin),
       p.semainesDisponibles, p.totalAttendu, p.totalPlanifie,
-      p.totalRealise, Math.round((p.totalAttendu - p.totalRealise) * 100) / 100, p.ecart,
+      p.totalRealise, p.heuresAttenduesStade ?? "", p.ecartStade ?? "", p.tauxCible != null ? `${p.tauxCible} %` : "",
+      Math.round((p.totalAttendu - p.totalRealise) * 100) / 100, p.ecart,
+      p.transmission || "",
       p.valide ? "Conforme" : p.alertes[0] || "Alerte",
     ]),
   ];
   const wsS = XLSX.utils.aoa_to_sheet(synth);
-  wsS["!cols"] = [{ wch: 26 }, { wch: 22 }, { wch: 18 }, { wch: 14 }, { wch: 14 }, { wch: 10 }, { wch: 18 }, { wch: 14 }, { wch: 22 }, { wch: 16 }, { wch: 10 }, { wch: 46 }];
+  wsS["!cols"] = [{ wch: 26 }, { wch: 22 }, { wch: 18 }, { wch: 14 }, { wch: 14 }, { wch: 10 }, { wch: 18 }, { wch: 14 }, { wch: 16 }, { wch: 24 }, { wch: 16 }, { wch: 12 }, { wch: 16 }, { wch: 16 }, { wch: 70 }, { wch: 46 }];
   XLSX.utils.book_append_sheet(wb, wsS, "Synthèse VSS");
+
 
   const detail = [
     ["Apprenant", "Date de début", "Date de fin", "Semaine", "Date de connexion", "Jour", "Créneau", "Heures prévues", "Heures réalisées", "Cumul prévu", "Cumul réalisé", "Heures restantes", "Statut"],
