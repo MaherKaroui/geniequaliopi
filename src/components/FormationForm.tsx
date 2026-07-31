@@ -242,6 +242,18 @@ const FormationForm = ({ data, onChange, onImportStagiaires, onApplyOrganisme }:
         seedPaieAICaches();
         toast.success(`Organisme IZIBUSINESS + 6 stagiaires + contenus IA (besoins, exercices, veilles) pré-remplis`);
       }
+      // Auto-import organisme + 6 stagiaires + contenus IA pour Assistant ressources humaines (RNCP35030)
+      if (selected.intitule.toLowerCase().includes("ressources humaines") || selected.intitule.toLowerCase().includes("rncp35030") || selected.intitule.toLowerCase().includes("(arh)")) {
+        onChange({ ...selected, codeRNCP: "RNCP35030" });
+        if (onApplyOrganisme) {
+          onApplyOrganisme({ ...ARH_ORG });
+        }
+        if (onImportStagiaires) {
+          onImportStagiaires([...STAGIAIRES_ARH]);
+        }
+        seedARHAICaches();
+        toast.success(`Organisme IZIBUSINESS + 6 stagiaires ARH + contenus IA (besoins, QCM, exercices, veilles) pré-remplis`);
+      }
       // Auto-import organisme + apprentis + pré-remplissage IA pour SAMA CFA 420 h (priorité sur "secrétariat" car intitulé contient "Secrétaire assistant médico-administratif")
       const intituleLower = selected.intitule.toLowerCase();
       const isSAMA = intituleLower.includes("médico-administratif") || intituleLower.includes("medico-administratif") || intituleLower.includes("rncp40800") || intituleLower.includes("sama");
