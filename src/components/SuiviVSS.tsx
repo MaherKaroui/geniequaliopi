@@ -98,6 +98,7 @@ const SuiviVSS = ({ formation, stagiaires }: Props) => {
   };
 
 
+
   const toggleRow = (id: string) =>
     setExpanded((prev) => {
       const n = new Set(prev);
