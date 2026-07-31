@@ -542,6 +542,56 @@ export function exportPlanningsVSSXlsx(plannings: VSSPlanning[]): Blob {
   return new Blob([out], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
 }
 
+/** Export Excel individuel : un classeur par apprenant (synthèse + détail). */
+export function exportPlanningVSSXlsx(p: VSSPlanning): Blob {
+  const wb = XLSX.utils.book_new();
+  const a = p.apprenant;
+
+  const info = [
+    ["Suivi du temps de connexion VSS"],
+    [],
+    ["Apprenant", a.nom],
+    ["Entreprise", a.entreprise || ""],
+    ["Formation", a.formation || ""],
+    ["Date de début", frDate(a.dateDebut)],
+    ["Date de fin", frDate(a.dateFin)],
+    ["Semaines", p.semainesDisponibles],
+    ["Total parcours (h)", p.totalAttendu],
+    ["Total planifié (h)", p.totalPlanifie],
+    ["Heures réalisées (h)", p.totalRealise],
+    ["Heures attendues à ce stade (h)", p.heuresAttenduesStade ?? ""],
+    ["Écart à la cible (h)", p.ecartStade ?? ""],
+    ["% de la cible", p.tauxCible != null ? `${p.tauxCible} %` : ""],
+    ["Reste à réaliser (h)", Math.round((p.totalAttendu - p.totalRealise) * 100) / 100],
+    ["Statut", p.valide ? "Conforme" : p.alertes[0] || "Alerte"],
+    ["Transmissions internes", p.transmission || ""],
+  ];
+  const wsI = XLSX.utils.aoa_to_sheet(info);
+  wsI["!cols"] = [{ wch: 32 }, { wch: 70 }];
+  XLSX.utils.book_append_sheet(wb, wsI, "Synthèse");
+
+  const detail = [
+    ["Semaine", "Date de connexion", "Jour", "Créneau", "Heures prévues", "Heures réalisées", "Cumul prévu", "Cumul réalisé", "Heures restantes", "Statut"],
+    ...p.seances.map((s) => [
+      `S${s.semaine}`, s.dateFr, s.jour, s.creneau,
+      s.heures, s.realisees, s.cumul, s.cumulRealise, s.restant, s.statut,
+    ]),
+  ];
+  const wsD = XLSX.utils.aoa_to_sheet(detail as any[][]);
+  wsD["!cols"] = [{ wch: 10 }, { wch: 18 }, { wch: 12 }, { wch: 16 }, { wch: 14 }, { wch: 16 }, { wch: 14 }, { wch: 14 }, { wch: 16 }, { wch: 12 }];
+  XLSX.utils.book_append_sheet(wb, wsD, "Détail connexions");
+
+  const out = XLSX.write(wb, { type: "array", bookType: "xlsx" });
+  return new Blob([out], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+}
+
+/** Nom de dossier/fichier sûr pour un apprenant. */
+export function slugApprenant(nom: string): string {
+  return (nom || "Apprenant")
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-zA-Z0-9]+/g, "_").replace(/^_+|_+$/g, "") || "Apprenant";
+}
+
 /** Convertit des stagiaires du formulaire en apprenants VSS (heures par défaut = 0) */
 export function stagiairesToVSS(
   stagiaires: { nom: string; prenom: string; entreprise?: string; dateDebutFormation?: string; dateFinFormation?: string }[],
