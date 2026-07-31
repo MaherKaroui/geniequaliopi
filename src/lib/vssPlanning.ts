@@ -664,14 +664,14 @@ export function exportPlanningVSSXlsx(p: VSSPlanning): Blob {
   XLSX.utils.book_append_sheet(wb, wsI, "Synthèse");
 
   const detail = [
-    ["Semaine", "Date de connexion", "Jour", "Créneau", "Heures prévues", "Heures réalisées", "Cumul prévu", "Cumul réalisé", "Heures restantes", "Statut"],
+    ["Semaine", "Date de connexion", "Jour", "Créneau", "Heures réalisées", "Cumul réalisé", "Heures restantes", "Statut"],
     ...p.seances.map((s) => [
       `S${s.semaine}`, s.dateFr, s.jour, s.creneau,
-      s.heures, s.realisees, s.cumul, s.cumulRealise, s.restant, s.statut,
+      s.realisees, s.cumulRealise, s.restant, s.statut,
     ]),
   ];
   const wsD = XLSX.utils.aoa_to_sheet(detail as any[][]);
-  wsD["!cols"] = [{ wch: 10 }, { wch: 18 }, { wch: 12 }, { wch: 16 }, { wch: 14 }, { wch: 16 }, { wch: 14 }, { wch: 14 }, { wch: 16 }, { wch: 12 }];
+  wsD["!cols"] = [{ wch: 10 }, { wch: 18 }, { wch: 12 }, { wch: 16 }, { wch: 16 }, { wch: 14 }, { wch: 16 }, { wch: 12 }];
   XLSX.utils.book_append_sheet(wb, wsD, "Détail connexions");
 
   const out = XLSX.write(wb, { type: "array", bookType: "xlsx" });
