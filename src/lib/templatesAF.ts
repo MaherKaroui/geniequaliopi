@@ -1,5 +1,6 @@
 // Additional AF (Action de Formation) template generators
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
+import { commentaireSatisfactionCourt } from "./satisfactionComments";
 import { buildDocument, formatDate, tableHTML, signatureBlock2, signatureBlock3, getStagiaireDateDebut, getStagiaireDateFin, getStagiaireTarif, linkUrl, isFormationTerminee, isFacebookPage, buildEcheancierPaiement, subtractBusinessDays } from "./docBuilder";
 import { FormateurInfo, EVAL_SCORES } from "./sampleData";
 import { getEvalContent, generateStagiaireAnswers, computeQCMScore } from "./evalContent";
@@ -824,19 +825,10 @@ export function genSatisfactionFroid(o: OrganismeInfo, f: FormationInfo, stagiai
       [3, 4, 4, 4, 4], [5, 5, 5, 3, 5], [4, 4, 5, 4, 4], [5, 4, 4, 5, 5]
     ];
     const scores = profiles[si % profiles.length];
-    const commentaires = [
-      "J'utilise les acquis quotidiennement dans mon travail. Très satisfait.",
-      "La formation m'a permis de gagner en autonomie. Quelques points à approfondir.",
-      "Excellent investissement. J'ai pu mettre en pratique immédiatement.",
-      "Bonne formation, je souhaiterais un perfectionnement sur les aspects avancés.",
-      "Formation utile mais j'aurais aimé plus de pratique.",
-      "Très satisfait, la formation a répondu à mes attentes professionnelles.",
-      "J'ai pu transférer les acquis dans mon équipe. Recommande vivement.",
-      "Formation de qualité. Le suivi post-formation serait un plus.",
-    ];
+    // commentaire unique par stagiaire (voir satisfactionComments.ts)
     extra += `<h3>${s.prenom} ${s.nom} – ${s.entreprise}</h3>`;
     extra += tableHTML(["Critère", "Note /5"], questions.map((q, i) => [q, `${scores[i]}/5`]));
-    extra += `<p><em>Commentaire : ${commentaires[si % commentaires.length]}</em></p>`;
+    extra += `<p><em>Commentaire : ${commentaireSatisfactionCourt(`${s.prenom} ${s.nom}`, si, "froid")}</em></p>`;
   });
   return buildDocument({ org: o, title: "QUESTIONNAIRE DE SATISFACTION À FROID", subtitle: `${f.intitule} – 3 mois après`, formation: f, showFormationInfo: true, stagiaires, extraHtml: extra,
     sections: [{ heading: "Synthèse", content: "<p><strong>Satisfaction à froid : 4.3/5 (86%)</strong><br>Impact sur la pratique professionnelle confirmé par 90% des répondants.</p>", variant: "green" }] });
