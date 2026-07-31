@@ -65,16 +65,37 @@ const SuiviVSS = ({ formation, stagiaires }: Props) => {
     toast.success(`${stagiaires.length} apprenant(s) chargé(s) — renseignez les heures VSS`);
   };
 
-  const handleExport = () => {
-    if (!plannings.length) { toast.error("Aucun planning à exporter"); return; }
-    const blob = exportPlanningsVSSXlsx(plannings);
+  const download = (blob: Blob, name: string) => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `Suivi_temps_connexion_VSS.xlsx`;
+    a.download = name;
     a.click();
     URL.revokeObjectURL(url);
   };
+
+  const handleExport = () => {
+    if (!plannings.length) { toast.error("Aucun planning à exporter"); return; }
+    download(exportPlanningsVSSXlsx(plannings), `Suivi_temps_connexion_VSS.xlsx`);
+  };
+
+  const handleExportParStagiaire = async () => {
+    if (!plannings.length) { toast.error("Aucun planning à exporter"); return; }
+    const zip = new JSZip();
+    zip.file("Synthese_globale_VSS.xlsx", exportPlanningsVSSXlsx(plannings));
+    const used = new Map<string, number>();
+    plannings.forEach((p) => {
+      let slug = slugApprenant(p.apprenant.nom);
+      const n = (used.get(slug) ?? 0) + 1;
+      used.set(slug, n);
+      if (n > 1) slug = `${slug}_${n}`;
+      zip.folder(slug)!.file(`Suivi_temps_connexion_VSS_${slug}.xlsx`, exportPlanningVSSXlsx(p));
+    });
+    const blob = await zip.generateAsync({ type: "blob" });
+    download(blob, "Suivi_temps_connexion_VSS_par_stagiaire.zip");
+    toast.success(`${plannings.length} dossier(s) stagiaire exporté(s)`);
+  };
+
 
   const toggleRow = (id: string) =>
     setExpanded((prev) => {
