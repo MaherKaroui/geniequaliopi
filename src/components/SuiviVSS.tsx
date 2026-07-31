@@ -4,8 +4,9 @@ import { Input } from "@/components/ui/input";
 import { FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import {
   VSSApprenant, VSSPlanning, genererPlanningVSS, parseSuiviVSSXlsx,
-  exportPlanningsVSSXlsx, stagiairesToVSS, frDate, MAX_H_JOUR,
+  exportPlanningsVSSXlsx, exportPlanningVSSXlsx, slugApprenant, stagiairesToVSS, frDate, MAX_H_JOUR,
 } from "@/lib/vssPlanning";
+import JSZip from "jszip";
 import {
   Upload, Download, AlertTriangle, CheckCircle2, ChevronDown, ChevronRight,
   Users, Plus, Trash2, Clock, Bug,
