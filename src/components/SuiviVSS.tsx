@@ -217,6 +217,14 @@ const SuiviVSS = ({ formation, stagiaires }: Props) => {
                   </div>
                 )}
 
+                {(p.notes?.length ?? 0) > 0 && (
+                  <div className="px-3 pb-2 space-y-1">
+                    {p.notes!.map((n, i) => (
+                      <div key={i} className="text-xs text-muted-foreground bg-muted rounded px-2 py-1">{n}</div>
+                    ))}
+                  </div>
+                )}
+
                 {isOpen && p.seances.length > 0 && (
                   <div className="overflow-x-auto border-t">
                     <table className="w-full text-xs">
