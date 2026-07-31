@@ -50,9 +50,13 @@ import { PAIE_MODULE_EXERCISES } from "./paiePreset";
 import { SECRETARIAT_MODULE_EXERCISES } from "./secretariatPreset";
 import { GOTRM_MODULE_EXERCISES, pickGOTRMComment } from "./gotrmPreset";
 import { pickWordComment } from "./wordPreset";
+import { ARH_MODULE_EXERCISES, isARHFormation } from "./arhExercises";
 
 function getModuleExercisesFor(f: FormationInfo) {
   const t = (f.intitule || "").toLowerCase();
+  if (isARHFormation(f.intitule || "")) {
+    return ARH_MODULE_EXERCISES;
+  }
   if (t.includes("secrétariat") || t.includes("secretariat") || t.includes("secrétaire") || t.includes("secretaire") || t.includes("office manager") || t.includes("assistanat")) {
     return SECRETARIAT_MODULE_EXERCISES;
   }
@@ -67,10 +71,20 @@ function isModuleExercisesFormation(f: FormationInfo): boolean {
   const isPaie = t.includes("gestionnaire de paie") || t.includes("gestionnaire paie") || (t.includes("paie") && (t.includes("bulletin") || t.includes("gestion") || t.includes("dsn")));
   const isSecretariat = t.includes("secrétariat") || t.includes("secretariat") || t.includes("secrétaire") || t.includes("secretaire") || t.includes("office manager") || t.includes("assistanat");
   const isGOTRM = t.includes("gotrm") || t.includes("gestionnaire des opérations de transport") || t.includes("exploitant transport") || t.includes("tp-01329") || t.includes("rncp40990");
-  return isPaie || isSecretariat || isGOTRM;
+  return isPaie || isSecretariat || isGOTRM || isARHFormation(f.intitule || "");
 }
 
 const FALLBACK_STAGIAIRE: StagiaireInfo = { prenom: "Martin", nom: "Dupont", civilite: "" as "M." | "Mme" | "", email: "", telephone: "", entreprise: "", poste: "", dateNaissance: "" };
+
+/** Production stagiaire : variante rédigée à la main si disponible (réponses différentes par stagiaire), sinon humanisation automatique du corrigé. */
+function pickExoProduction(exo: { reponseAttendue: string; variantes?: string[] }, s: StagiaireInfo, si: number, mi: number, quality: number): string {
+  const variantes = exo.variantes || [];
+  if (variantes.length > 0) {
+    const seed = ((s?.prenom || "").length * 13 + (s?.nom || "").length * 7 + (s?.email || "").length * 3 + si * 5 + mi * 11);
+    return variantes[seed % variantes.length];
+  }
+  return humanizedStudentAnswer(exo.reponseAttendue, s, si, mi * 13 + 3, quality);
+}
 
 /**
  * Détecte si la formation est un cursus ECSR ou VTC (conduite, T3P, transport de personnes).
@@ -17116,7 +17130,7 @@ function genPaieExerciceModule(o: OrganismeInfo, f: FormationInfo, stagiaires: S
   // Exercice pratique
   const exo = mod.exercice;
   const note = noteForDayProgression(exo.points, mi, modules.length, s, si);
-  const answer = humanizedStudentAnswer(exo.reponseAttendue, s, si, mi * 13 + 3, quality);
+  const answer = pickExoProduction(exo, s, si, mi, quality);
   const feedback = humanizedTeacherFeedback(note, exo.points, s, si, mi * 13 + 3);
   extra += `<h3 style="color:#1e40af">Exercice pratique — ${exo.titre} (${exo.points} pts)</h3>
     <div style="padding:10px;border-left:3px solid #3b82f6;background:#f8fafc">
@@ -17199,7 +17213,7 @@ function genPaieExercicesParModule(o: OrganismeInfo, f: FormationInfo, stagiaire
     // ---- Exercice pratique (1) ----
     const exo = mod.exercice;
     const note = noteForDayProgression(exo.points, mi, modules.length, s, si);
-    const answer = humanizedStudentAnswer(exo.reponseAttendue, s, si, mi * 13 + 3, quality);
+    const answer = pickExoProduction(exo, s, si, mi, quality);
     const feedback = humanizedTeacherFeedback(note, exo.points, s, si, mi * 13 + 3);
     extra += `<h4 style="color:#1e40af;margin:14px 0 6px 0">Exercice pratique — ${exo.titre} (${exo.points} pts)</h4>
       <div style="margin:6px 0;padding:10px;border-left:3px solid #3b82f6;background:#f8fafc">

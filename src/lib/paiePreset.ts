@@ -214,7 +214,7 @@ const PAIE_VEILLE_PACK: AIVeillePack = {
 // Utilisés par genPaieExercicesParModule dans documentGenerator.ts.
 // ---------------------------------------------------------------------------
 export interface PaieModuleQCM { question: string; options: string[]; correctIndex: number; }
-export interface PaieModuleExo { titre: string; consigne: string; reponseAttendue: string; points: number; }
+export interface PaieModuleExo { titre: string; consigne: string; reponseAttendue: string; points: number; /** Productions stagiaires alternatives (rédigées à la main) : une variante différente est tirée par stagiaire. */ variantes?: string[]; }
 export interface PaieModuleExercises {
   moduleTitre: string;
   qcm: PaieModuleQCM[];   // 5
