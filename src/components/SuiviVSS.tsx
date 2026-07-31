@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { FormationInfo, StagiaireInfo } from "@/types/qualiopi";
 import {
   VSSApprenant, VSSPlanning, genererPlanningVSS, parseSuiviVSSXlsx,
-  exportPlanningsVSSXlsx, exportPlanningVSSXlsx, slugApprenant, stagiairesToVSS, frDate, MAX_H_JOUR,
+  exportPlanningsVSSXlsx, exportPlanningVSSXlsx, slugApprenant, stagiairesToVSS, frDate, MAX_H_JOUR, normaliserApprenantVSS,
 } from "@/lib/vssPlanning";
 import JSZip from "jszip";
 import {
