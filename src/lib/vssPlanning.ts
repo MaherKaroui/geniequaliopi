@@ -220,9 +220,10 @@ export function genererPlanningVSS(a: VSSApprenant, today = new Date()): VSSPlan
   return {
     apprenant: a, seances, totalPlanifie, totalAttendu: total, ecart,
     semainesDisponibles: nbSemaines, capaciteMax: capacite,
-    alertes, valide: alertes.length === 0,
+    alertes, notes, valide: alertes.length === 0,
   };
 }
+
 
 /* ---------------- Import Excel (export suivi parcours VSS) ---------------- */
 
