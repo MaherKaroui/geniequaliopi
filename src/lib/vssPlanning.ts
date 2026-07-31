@@ -153,17 +153,37 @@ function seedFrom(s: string): () => number {
   return () => { h ^= h << 13; h ^= h >>> 17; h ^= h << 5; return ((h >>> 0) % 100000) / 100000; };
 }
 
-/** Créneau horaire réaliste selon la durée de la séance. */
+/** Créneau horaire correspondant exactement à la durée de la séance. */
 function creneauPour(heures: number, rnd: () => number): string {
   if (heures <= 0) return "";
-  const debuts = ["08:30", "09:00", "09:30", "13:30", "14:00"];
+  const debuts = heures > 5 ? ["08:30", "09:00", "09:30"] : ["08:30", "09:00", "09:30", "13:30", "14:00"];
   const start = debuts[Math.floor(rnd() * debuts.length)];
   const [hh, mm] = start.split(":").map(Number);
-  const pause = heures > 5 ? 1 : 0; // pause déjeuner sur les journées longues
-  const totalMin = hh * 60 + mm + Math.round((heures + pause) * 60);
+  const totalMin = hh * 60 + mm + Math.round(heures * 60);
   const eh = Math.floor(totalMin / 60) % 24, em = totalMin % 60;
   return `${start} - ${String(eh).padStart(2, "0")}:${String(em).padStart(2, "0")}`;
 }
+
+/** Répartit les heures d'une semaine en journées de 7 h maximum, durées variées. */
+function repartirSemaine(heuresSemaine: number, rnd: () => number): number[] {
+  const U = 0.25; // granularité quart d'heure
+  let unites = Math.round(heuresSemaine / U);
+  const maxU = Math.round(MAX_H_JOUR / U);
+  if (unites <= 0) return [];
+  const nbJours = Math.max(1, Math.ceil(unites / maxU));
+  const poids = Array.from({ length: nbJours }, () => 0.75 + rnd() * 0.5);
+  const somme = poids.reduce((s, x) => s + x, 0);
+  let parts = poids.map((p) => Math.min(maxU, Math.max(2, Math.round((p / somme) * unites))));
+  let diff = unites - parts.reduce((s, x) => s + x, 0);
+  let guard = 0;
+  while (diff !== 0 && guard++ < 5000) {
+    const i = Math.floor(rnd() * nbJours);
+    if (diff > 0) { if (parts[i] < maxU) { parts[i] += 1; diff -= 1; } }
+    else if (parts[i] > 1) { parts[i] -= 1; diff += 1; }
+  }
+  return parts.map((p) => Math.round(p * U * 100) / 100).filter((h) => h > 0);
+}
+
 
 /**
  * Génère le planning de connexion VSS : 1 jour par semaine entre dateDebut et dateFin,
