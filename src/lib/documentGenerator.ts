@@ -3279,36 +3279,9 @@ function genTempsConnexionReel(o: OrganismeInfo, f: FormationInfo, stagiaires: S
       const hTotal = Math.floor(d.dureeTotalMin / 60);
       const mTotal = d.dureeTotalMin % 60;
 
-      // Récupère les signataires configurés (Apprenant / Organisme / CFA)
-      let extraSigners: { nom: string; role: string; signatureUrl?: string }[] = [];
-      try {
-        const raw = typeof window !== 'undefined' ? window.sessionStorage.getItem('connexion_signataires') : null;
-        if (raw) extraSigners = JSON.parse(raw);
-      } catch {}
-
-      const renderSigner = (nom: string, role: string, sigUrl?: string) => {
-        const safeNom = (nom || '').trim();
-        const display = safeNom || `${(s.prenom || '').charAt(0)}.${s.nom || ''}`;
-        const img = sigUrl
-          ? `<img src="${sigUrl}" alt="Sig" style="max-height:24px;max-width:70px;object-fit:contain;display:block;margin:1px auto 0" />`
-          : `<span style="font-style:italic;color:#666;font-size:9px;display:block;margin-top:1px">Signé ${display}</span>`;
-        return `<div style="margin-top:3px;font-size:9px;line-height:1.1"><span style="color:#888">${role} — ${display}</span>${img}</div>`;
-      };
-
-      // Apprenant par défaut = le stagiaire courant (si pas explicitement défini par l'utilisateur)
-      const hasApprenant = extraSigners.some(x => x.role === 'Apprenant' && (x.nom || '').trim());
-      const buildCell = (timeStr: string) => {
-        let html = `<strong>${timeStr}</strong>`;
-        if (!hasApprenant) {
-          html += renderSigner(`${s.prenom} ${s.nom}`, 'Apprenant', s.signatureUrl);
-        }
-        extraSigners.forEach(sg => { html += renderSigner(sg.nom, sg.role, sg.signatureUrl); });
-        return html;
-      };
-
       extra += tableHTML(
         ["Adresse IP", "Connexion matin", "Déconnexion midi", "Reconnexion", "Déconnexion soir", "Durée totale", "Statut"],
-        [[d.ip, buildCell(d.connMatin), buildCell(d.deconnMidi), buildCell(d.connApMidi), buildCell(d.deconnSoir), `${hTotal}h${String(mTotal).padStart(2, '0')}min`, '✅ Connecté']]
+        [[d.ip, d.connMatin, d.deconnMidi, d.connApMidi, d.deconnSoir, `${hTotal}h${String(mTotal).padStart(2, '0')}min`, '✅ Connecté']]
       );
       renderedDays++;
     });
