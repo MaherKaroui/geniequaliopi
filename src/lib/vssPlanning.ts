@@ -431,32 +431,35 @@ export function exportPlanningsVSSXlsx(plannings: VSSPlanning[]): Blob {
   const wb = XLSX.utils.book_new();
 
   const synth = [
-    ["Apprenant", "Entreprise", "Formation", "Date de début", "Date de fin", "Semaines", "Heures VSS prévues", "Total planifié", "Écart", "Statut"],
+    ["Apprenant", "Entreprise", "Formation", "Date de début", "Date de fin", "Semaines", "Heures VSS prévues", "Total planifié", "Heures réalisées à ce jour", "Reste à réaliser", "Écart", "Statut"],
     ...plannings.map((p) => [
       p.apprenant.nom, p.apprenant.entreprise || "", p.apprenant.formation || "",
       frDate(p.apprenant.dateDebut), frDate(p.apprenant.dateFin),
-      p.semainesDisponibles, p.totalAttendu, p.totalPlanifie, p.ecart,
+      p.semainesDisponibles, p.totalAttendu, p.totalPlanifie,
+      p.totalRealise, Math.round((p.totalAttendu - p.totalRealise) * 100) / 100, p.ecart,
       p.valide ? "Conforme" : p.alertes[0] || "Alerte",
     ]),
   ];
   const wsS = XLSX.utils.aoa_to_sheet(synth);
-  wsS["!cols"] = [{ wch: 26 }, { wch: 22 }, { wch: 18 }, { wch: 14 }, { wch: 14 }, { wch: 10 }, { wch: 18 }, { wch: 14 }, { wch: 10 }, { wch: 46 }];
+  wsS["!cols"] = [{ wch: 26 }, { wch: 22 }, { wch: 18 }, { wch: 14 }, { wch: 14 }, { wch: 10 }, { wch: 18 }, { wch: 14 }, { wch: 22 }, { wch: 16 }, { wch: 10 }, { wch: 46 }];
   XLSX.utils.book_append_sheet(wb, wsS, "Synthèse VSS");
 
   const detail = [
-    ["Apprenant", "Date de début", "Date de fin", "Semaine", "Date prévue de connexion", "Jour", "Heures prévues", "Total cumulé", "Heures restantes", "Statut"],
+    ["Apprenant", "Date de début", "Date de fin", "Semaine", "Date de connexion", "Jour", "Créneau", "Heures prévues", "Heures réalisées", "Cumul prévu", "Cumul réalisé", "Heures restantes", "Statut"],
   ];
   plannings.forEach((p) => {
     p.seances.forEach((s) => {
       detail.push([
         p.apprenant.nom, frDate(p.apprenant.dateDebut), frDate(p.apprenant.dateFin),
-        `S${s.semaine}` as any, s.dateFr, s.jour, s.heures as any, s.cumul as any, s.restant as any, s.statut,
+        `S${s.semaine}` as any, s.dateFr, s.jour, s.creneau,
+        s.heures as any, s.realisees as any, s.cumul as any, s.cumulRealise as any, s.restant as any, s.statut,
       ]);
     });
   });
   const wsD = XLSX.utils.aoa_to_sheet(detail);
-  wsD["!cols"] = [{ wch: 26 }, { wch: 14 }, { wch: 14 }, { wch: 10 }, { wch: 24 }, { wch: 12 }, { wch: 14 }, { wch: 14 }, { wch: 16 }, { wch: 12 }];
+  wsD["!cols"] = [{ wch: 26 }, { wch: 14 }, { wch: 14 }, { wch: 10 }, { wch: 18 }, { wch: 12 }, { wch: 16 }, { wch: 14 }, { wch: 16 }, { wch: 14 }, { wch: 14 }, { wch: 16 }, { wch: 12 }];
   XLSX.utils.book_append_sheet(wb, wsD, "Détail connexions");
+
 
   const out = XLSX.write(wb, { type: "array", bookType: "xlsx" });
   return new Blob([out], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
