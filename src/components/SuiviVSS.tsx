@@ -25,7 +25,8 @@ const SuiviVSS = ({ formation, stagiaires }: Props) => {
   const [apprenants, setApprenants] = useState<VSSApprenant[]>(() => {
     try {
       const raw = sessionStorage.getItem(STORAGE_KEY);
-      return raw ? JSON.parse(raw) : [];
+      const arr: VSSApprenant[] = raw ? JSON.parse(raw) : [];
+      return arr.map(normaliserApprenantVSS);
     } catch { return []; }
   });
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
