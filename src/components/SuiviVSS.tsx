@@ -146,7 +146,49 @@ const SuiviVSS = ({ formation, stagiaires }: Props) => {
             <Button size="sm" className="gap-2" onClick={handleExport} disabled={!plannings.length}>
               <Download className="w-4 h-4" /> Exporter en Excel
             </Button>
+            <Button
+              variant="ghost" size="sm" className="gap-2"
+              onClick={() => setShowDebug((d) => !d)}
+              disabled={!apprenants.length}
+            >
+              <Bug className="w-4 h-4" /> {showDebug ? "Masquer" : "Voir"} les données importées
+            </Button>
           </div>
+
+          {showDebug && apprenants.length > 0 && (
+            <div className="overflow-x-auto border rounded-lg">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="bg-muted/50">
+                    <th className="text-left p-2">Apprenant</th>
+                    <th className="text-left p-2">Section / feuille</th>
+                    <th className="text-left p-2">Colonne début</th>
+                    <th className="text-left p-2">Début brut</th>
+                    <th className="text-left p-2">Début normalisé</th>
+                    <th className="text-left p-2">Colonne fin</th>
+                    <th className="text-left p-2">Fin brute</th>
+                    <th className="text-left p-2">Fin normalisée</th>
+                    <th className="text-left p-2">Heures VSS</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {apprenants.map((a) => (
+                    <tr key={a.id} className="border-t">
+                      <td className="p-2 font-medium">{a.nom}</td>
+                      <td className="p-2 text-muted-foreground">{a.source || "—"}</td>
+                      <td className="p-2 text-muted-foreground">{a.colDebut || "—"}</td>
+                      <td className="p-2">{a.rawDebut || "—"}</td>
+                      <td className={`p-2 ${a.dateDebut ? "" : "text-destructive"}`}>{a.dateDebut || "invalide"}</td>
+                      <td className="p-2 text-muted-foreground">{a.colFin || "—"}</td>
+                      <td className="p-2">{a.rawFin || "—"}</td>
+                      <td className={`p-2 ${a.dateFin ? "" : "text-destructive"}`}>{a.dateFin || "invalide"}</td>
+                      <td className="p-2">{a.heuresVSS} h</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
 
           {!apprenants.length && (
             <div className="text-center py-8 text-sm text-muted-foreground">
