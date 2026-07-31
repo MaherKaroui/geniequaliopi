@@ -299,8 +299,8 @@ export function genererPlanningVSS(a: VSSApprenant, today = new Date()): VSSPlan
         cumulRealise += realisees;
       }
 
-      let statut: VSSStatut = passe ? "réalisé" : "prévu";
-      if (passe && realisees + 0.001 < heures) statut = "manquant";
+      const statut: VSSStatut = "réalisé";
+
 
       seances.push({
         semaine: i + 1,
