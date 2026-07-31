@@ -29,7 +29,7 @@ function planningHtml(p: VSSPlanning): string {
     )
     .join("");
 
-  const infos: [string, string][] = [
+  const infosAll: Array<[string, string]> = [
     ["Apprenant", a.nom],
     ["Formation", a.formation || ""],
     ["Entreprise", a.entreprise || ""],
@@ -38,7 +38,8 @@ function planningHtml(p: VSSPlanning): string {
     ["Heures réalisées", h(p.totalRealise)],
     ["Heures attendues à ce stade", p.heuresAttenduesStade ? h(p.heuresAttenduesStade) : ""],
     ["Total parcours", a.heuresParcours ? h(a.heuresParcours) : ""],
-  ].filter(([, v]) => v);
+  ];
+  const infos = infosAll.filter(([, v]) => v);
 
   return `<h2>Suivi du temps de connexion VSS</h2>
   <table class="infos">
