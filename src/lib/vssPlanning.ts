@@ -240,6 +240,11 @@ export function genererPlanningVSS(a: VSSApprenant, today = new Date()): VSSPlan
   let cumulRealise = 0;
   const t0 = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
 
+  // Heures réellement déclarées (colonne « Nombre heures de connexion ») : elles sont
+  // réparties sur les séances déjà passées, sans jamais dépasser le total déclaré.
+  const declarees = a.heuresRealisees != null && a.heuresRealisees > 0 ? a.heuresRealisees : null;
+  let poolRealise = declarees;
+
   for (let i = 0; i < nbSemaines; i++) {
     // Date de la séance : jour habituel de la semaine i, avec décalage aléatoire ±1 jour ouvré
     const lundi = new Date(debut.getTime() + i * 7 * 86400000);
@@ -256,12 +261,19 @@ export function genererPlanningVSS(a: VSSApprenant, today = new Date()): VSSPlan
     cumul += heures;
     const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
     const passe = d.getTime() <= t0;
-    const realisees = passe ? heures : 0;
-    if (passe) cumulRealise += realisees;
 
-    const realiseesDeclarees = a.heuresRealisees ?? null;
+    let realisees = 0;
+    if (passe) {
+      if (poolRealise == null) realisees = heures;
+      else {
+        realisees = Math.min(heures, Math.max(0, Math.round(poolRealise * 100) / 100));
+        poolRealise = Math.round((poolRealise - realisees) * 100) / 100;
+      }
+      cumulRealise += realisees;
+    }
+
     let statut: VSSStatut = passe ? "réalisé" : "prévu";
-    if (passe && realiseesDeclarees != null && realiseesDeclarees < cumul) statut = "manquant";
+    if (passe && realisees + 0.001 < heures) statut = "manquant";
 
     seances.push({
       semaine: i + 1,
@@ -286,6 +298,23 @@ export function genererPlanningVSS(a: VSSApprenant, today = new Date()): VSSPlan
   if (ecart > 0) alertes.push(`Total planifié supérieur aux heures attendues : ${totalPlanifie} h / ${total} h (dépassement de ${ecart} h).`);
   if (total === 0) alertes.push("Aucune heure de connexion VSS renseignée pour cet apprenant.");
 
+  // Comparaison avec l'attendu à ce stade (issu de « Transmissions internes »)
+  const attenduStade = a.heuresAttendues && a.heuresAttendues > 0
+    ? a.heuresAttendues
+    : Math.round(seances.filter((s) => new Date(s.date + "T00:00:00").getTime() <= t0).reduce((s, x) => s + x.heures, 0) * 100) / 100;
+  const ecartStade = Math.round((totalRealise - attenduStade) * 100) / 100;
+  const tauxCible = attenduStade > 0 ? Math.round((totalRealise / attenduStade) * 100) : 0;
+
+  if (attenduStade > 0) {
+    notes.push(
+      `Point d'étape : ${totalRealise} h réalisées pour ${attenduStade} h attendues à ce stade (${tauxCible} % de la cible)` +
+      (total > 0 ? `, soit ${Math.round((totalRealise / total) * 100)} % du parcours de ${total} h.` : ".")
+    );
+    if (ecartStade < 0) {
+      notes.push(`Écart à la cible : ${Math.abs(ecartStade)} h de connexion à rattraper.`);
+    }
+  }
+
   if (total > 0 && seances.length) {
     const pct = Math.round((totalRealise / total) * 100);
     notes.push(
@@ -297,7 +326,9 @@ export function genererPlanningVSS(a: VSSApprenant, today = new Date()): VSSPlan
   return {
     apprenant: a, seances, totalPlanifie, totalRealise, totalAttendu: total, ecart,
     semainesDisponibles: nbSemaines, capaciteMax: capacite,
+    heuresAttenduesStade: attenduStade, ecartStade, tauxCible, transmission: a.transmission,
     alertes, notes, valide: alertes.length === 0,
+
   };
 }
 
