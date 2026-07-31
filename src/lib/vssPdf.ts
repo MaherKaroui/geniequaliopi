@@ -7,10 +7,29 @@ const esc = (s: string) =>
 
 const h = (n: number) => `${Number(n || 0).toFixed(2).replace(/\.00$/, "")} h`;
 
-function logoUrl(): string {
-  const url = (logoAsset as { url: string }).url;
-  return url.startsWith("http") ? url : `${window.location.origin}${url}`;
+let logoCache: string | null = null;
+
+/** Inline le logo en base64 : évite les canvas "tainted" (CORS) et les images non chargées. */
+async function logoDataUrl(): Promise<string> {
+  if (logoCache !== null) return logoCache;
+  const raw = (logoAsset as { url: string }).url;
+  const url = raw.startsWith("http") ? raw : `${window.location.origin}${raw}`;
+  try {
+    const res = await fetch(url, { cache: "force-cache" });
+    if (!res.ok) throw new Error(String(res.status));
+    const blob = await res.blob();
+    logoCache = await new Promise<string>((resolve, reject) => {
+      const fr = new FileReader();
+      fr.onload = () => resolve(String(fr.result));
+      fr.onerror = () => reject(fr.error);
+      fr.readAsDataURL(blob);
+    });
+  } catch {
+    logoCache = "";
+  }
+  return logoCache;
 }
+
 
 function planningHtml(p: VSSPlanning): string {
   const a = p.apprenant;
