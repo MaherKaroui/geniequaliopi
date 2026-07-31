@@ -624,12 +624,13 @@ export function exportPlanningVSSXlsx(p: VSSPlanning): Blob {
     ["Heures attendues à ce stade (h)", p.heuresAttenduesStade ?? ""],
     ["Écart à la cible (h)", p.ecartStade ?? ""],
     ["% de la cible", p.tauxCible != null ? `${p.tauxCible} %` : ""],
+    ["% du parcours réalisé", p.totalAttendu ? `${Math.round((p.totalRealise / p.totalAttendu) * 100)} %` : ""],
     ["Reste à réaliser (h)", Math.round((p.totalAttendu - p.totalRealise) * 100) / 100],
     ["Statut", p.valide ? "Conforme" : p.alertes[0] || "Alerte"],
     ["Transmissions internes", p.transmission || ""],
   ];
   const wsI = XLSX.utils.aoa_to_sheet(info);
-  wsI["!cols"] = [{ wch: 32 }, { wch: 70 }];
+  wsI["!cols"] = [{ wch: 34 }, { wch: 120 }];
   XLSX.utils.book_append_sheet(wb, wsI, "Synthèse");
 
   const detail = [
