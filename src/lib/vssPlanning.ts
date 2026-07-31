@@ -13,7 +13,14 @@ export interface VSSApprenant {
   dateFin: string;   // ISO yyyy-mm-dd
   heuresVSS: number; // total d'heures de connexion à couvrir
   heuresRealisees?: number;
+  // Traçabilité import (debug)
+  rawDebut?: string;
+  rawFin?: string;
+  colDebut?: string;
+  colFin?: string;
+  source?: string; // feuille / section d'origine
 }
+
 
 export type VSSStatut = "réalisé" | "prévu" | "manquant";
 
@@ -37,7 +44,9 @@ export interface VSSPlanning {
   semainesDisponibles: number;
   capaciteMax: number;      // semaines * MAX_H_JOUR
   alertes: string[];
+  notes?: string[];  // informations non bloquantes (rythme > 7 h/jour, etc.)
   valide: boolean;
+
 }
 
 export const MAX_H_JOUR = 7;
@@ -45,25 +54,76 @@ const PAS = 0.5; // arrondi au demi-heure
 
 const JOURS = ["dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"];
 
+const MOIS_FR: Record<string, number> = {
+  janvier: 1, janv: 1, jan: 1, fevrier: 2, fev: 2, feb: 2, mars: 3, mar: 3,
+  avril: 4, avr: 4, apr: 4, mai: 5, may: 5, juin: 6, jun: 6, juillet: 7, juil: 7, jul: 7,
+  aout: 8, aug: 8, septembre: 9, sept: 9, sep: 9, octobre: 10, oct: 10,
+  novembre: 11, nov: 11, decembre: 12, dec: 12,
+};
+
+/** Normalise n'importe quelle valeur de date (Date, série Excel, texte FR/ISO) en yyyy-mm-dd. */
 export function toISO(v: any): string {
-  if (!v) return "";
-  if (v instanceof Date && !isNaN(v.getTime())) return v.toISOString().slice(0, 10);
-  const s = String(v).trim();
-  if (/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0, 10);
-  const m = s.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{2,4})/);
+  if (v == null || v === "") return "";
+
+  // Vraie date Excel / JS
+  if (v instanceof Date && !isNaN(v.getTime())) {
+    // Les dates lues par xlsx sont en UTC : on utilise les composantes UTC pour éviter le décalage
+    const y = v.getUTCFullYear(), m = v.getUTCMonth() + 1, d = v.getUTCDate();
+    return `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+  }
+
+  // Nombre de série Excel
+  if (typeof v === "number" && Number.isFinite(v) && v > 20 && v < 100000) {
+    const d = new Date(Date.UTC(1899, 11, 30) + Math.round(v) * 86400000);
+    return d.toISOString().slice(0, 10);
+  }
+
+  // Texte : nettoyage des caractères invisibles / espaces insécables
+  const s = String(v)
+    .replace(/[\u200B-\u200D\uFEFF\u00A0\u202F]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (!s) return "";
+
+  // ISO (avec ou sans heure)
+  let m = s.match(/^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})/);
+  if (m) return `${m[1]}-${m[2].padStart(2, "0")}-${m[3].padStart(2, "0")}`;
+
+  // jj/mm/aaaa, jj-mm-aa, jj.mm.aaaa
+  m = s.match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{2,4})/);
   if (m) {
     let y = m[3];
     if (y.length === 2) y = Number(y) > 50 ? `19${y}` : `20${y}`;
-    return `${y}-${m[2].padStart(2, "0")}-${m[1].padStart(2, "0")}`;
+    const day = Number(m[1]), mon = Number(m[2]);
+    if (day >= 1 && day <= 31 && mon >= 1 && mon <= 12) {
+      return `${y}-${String(mon).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+    }
+    return "";
   }
-  const n = Number(s);
 
-  if (Number.isFinite(n) && n > 1000 && n < 100000) {
-    const d = new Date(Date.UTC(1899, 11, 30) + n * 86400000);
+  // 1er septembre 2025 / 1 sept 2025
+  m = s.match(/^(\d{1,2})(?:er)?\s+([a-zA-Zéûôàè.]+)\s+(\d{4})/);
+  if (m) {
+    const key = m[2].toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\./g, "");
+    const mon = MOIS_FR[key];
+    if (mon) return `${m[3]}-${String(mon).padStart(2, "0")}-${m[1].padStart(2, "0")}`;
+  }
+
+  // Chaîne numérique = série Excel
+  const n = Number(s.replace(",", "."));
+  if (Number.isFinite(n) && n > 20 && n < 100000) {
+    const d = new Date(Date.UTC(1899, 11, 30) + Math.round(n) * 86400000);
     return d.toISOString().slice(0, 10);
+  }
+
+  // Dernier recours : parsing natif
+  const nat = new Date(s);
+  if (!isNaN(nat.getTime()) && nat.getFullYear() > 1950 && nat.getFullYear() < 2200) {
+    return `${nat.getFullYear()}-${String(nat.getMonth() + 1).padStart(2, "0")}-${String(nat.getDate()).padStart(2, "0")}`;
   }
   return "";
 }
+
 
 export function frDate(iso: string): string {
   if (!iso) return "";
@@ -82,12 +142,21 @@ export function genererPlanningVSS(a: VSSApprenant, today = new Date()): VSSPlan
   const fin = a.dateFin ? new Date(a.dateFin + "T00:00:00") : null;
 
   if (!debut || !fin || isNaN(debut.getTime()) || isNaN(fin.getTime())) {
+    const detail: string[] = [];
+    if (!debut || isNaN(debut.getTime())) {
+      detail.push(`début — colonne « ${a.colDebut || "Date de début"} » : valeur importée « ${a.rawDebut || "(vide)"} »`);
+    }
+    if (!fin || isNaN(fin.getTime())) {
+      detail.push(`fin — colonne « ${a.colFin || "Date de fin"} » : valeur importée « ${a.rawFin || "(vide)"} »`);
+    }
     return {
       apprenant: a, seances: [], totalPlanifie: 0, totalAttendu: total,
       ecart: -total, semainesDisponibles: 0, capaciteMax: 0,
-      alertes: ["Dates de début et/ou de fin manquantes ou invalides."], valide: false,
+      alertes: [`${a.nom || "Apprenant"} — date(s) invalide(s) : ${detail.join(" ; ")}.`],
+      valide: false,
     };
   }
+
   if (fin < debut) {
     return {
       apprenant: a, seances: [], totalPlanifie: 0, totalAttendu: total,
@@ -99,13 +168,15 @@ export function genererPlanningVSS(a: VSSApprenant, today = new Date()): VSSPlan
   const nbSemaines = Math.max(1, Math.floor((fin.getTime() - debut.getTime()) / (7 * 86400000)) + 1);
   const capacite = nbSemaines * MAX_H_JOUR;
 
+  const notes: string[] = [];
   if (total > capacite) {
-    alertes.push(
-      `Période insuffisante : ${total} h à couvrir mais seulement ${nbSemaines} semaine(s) disponible(s) ` +
-      `(capacité max ${capacite} h à raison d'un jour de ${MAX_H_JOUR} h par semaine). ` +
-      `Élargir la période ou augmenter le rythme hebdomadaire.`
+    const rythme = Math.round((total / nbSemaines) * 10) / 10;
+    notes.push(
+      `Rythme renforcé : ${total} h réparties sur ${nbSemaines} semaine(s), soit ${rythme} h par jour de connexion ` +
+      `(au-delà du repère de ${MAX_H_JOUR} h/jour). Le total reste couvert intégralement.`
     );
   }
+
 
   // Répartition égale + méthode du plus fort reste, arrondie au pas de 0,5 h
   const unitesTotal = Math.round(total / PAS);
@@ -149,61 +220,142 @@ export function genererPlanningVSS(a: VSSApprenant, today = new Date()): VSSPlan
   return {
     apprenant: a, seances, totalPlanifie, totalAttendu: total, ecart,
     semainesDisponibles: nbSemaines, capaciteMax: capacite,
-    alertes, valide: alertes.length === 0,
+    alertes, notes, valide: alertes.length === 0,
   };
 }
 
+
 /* ---------------- Import Excel (export suivi parcours VSS) ---------------- */
 
-function getCol(row: Record<string, any>, ...keys: string[]): any {
-  const norm = (s: string) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, "");
-  for (const k of keys) {
-    const kn = norm(k);
-    for (const c of Object.keys(row)) {
-      if (norm(c) === kn && row[c] !== "" && row[c] != null) return row[c];
-    }
-  }
-  return "";
+const norm = (s: any) =>
+  String(s ?? "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[\u200B-\u200D\uFEFF\u00A0\u202F]/g, " ")
+    .replace(/[^a-z0-9]/g, "");
+
+const isNomHeader = (h: string) =>
+  ["name", "nom", "apprenant", "nomprenom", "prenomnom", "stagiaire", "nomapprenant", "nomdelapprenant"].includes(h);
+const isDebutHeader = (h: string) =>
+  (h.includes("start") && (h.includes("periode") || h.includes("formation"))) ||
+  h === "startdate" || h === "start" ||
+  (h.includes("date") && h.includes("debut"));
+const isFinHeader = (h: string) =>
+  (h.includes("end") && (h.includes("periode") || h.includes("formation"))) ||
+  h === "enddate" || h === "end" ||
+  (h.includes("date") && h.includes("fin"));
+const isHeuresHeader = (h: string) =>
+  (h.includes("heure") && (h.includes("connexion") || h.includes("vss") || h.includes("couvrir"))) ||
+  h === "heuresvss" || h === "nombreheures";
+
+interface ColMap {
+  nom: number; debut: number; fin: number; heures: number;
+  email: number; entreprise: number; formation: number; promotion: number;
+  labels: string[];
+}
+
+function mapHeader(row: any[]): ColMap | null {
+  const h = row.map(norm);
+  const find = (fn: (x: string) => boolean) => h.findIndex((x) => x && fn(x));
+  const map: ColMap = {
+    nom: find(isNomHeader),
+    debut: find(isDebutHeader),
+    fin: find(isFinHeader),
+    heures: find(isHeuresHeader),
+    email: find((x) => x.includes("email") || x.includes("courriel")),
+    entreprise: h.findIndex((x) => x === "entreprise" || x === "nomemployeur"),
+    formation: h.findIndex((x) => x === "formation"),
+    promotion: h.findIndex((x) => x === "promotion"),
+    labels: row.map((c) => String(c ?? "").trim()),
+  };
+  // Un en-tête valide identifie au moins le nom + une date
+  if (map.nom < 0 || (map.debut < 0 && map.fin < 0)) return null;
+  return map;
+}
+
+/** Ligne de titre de section / total / ligne d'en-tête répétée ? */
+function isJunkRow(nomBrut: string): boolean {
+  const n = norm(nomBrut);
+  if (!n) return true;
+  if (isNomHeader(n)) return true;
+  const bad = ["total", "suiviactif", "miseengarde", "avertissement", "traitementrupture", "portefeuille", "qualification", "suiviparcours"];
+  return bad.some((b) => n.startsWith(b) || n.includes(b));
 }
 
 export function parseSuiviVSSXlsx(data: ArrayBuffer): VSSApprenant[] {
   const wb = XLSX.read(data, { type: "array", cellDates: true });
-  const sheet = wb.Sheets[wb.SheetNames[0]];
-  const matrix: any[][] = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "", raw: true });
+  const out: VSSApprenant[] = [];
 
-  let headerIdx = 0;
-  for (let i = 0; i < Math.min(matrix.length, 15); i++) {
-    const r = matrix[i].map((c) => String(c).toLowerCase());
-    if (r.some((c) => c === "name" || c === "nom") && r.some((c) => c.includes("heures de connexion"))) {
-      headerIdx = i; break;
+  wb.SheetNames.forEach((sheetName) => {
+    const matrix: any[][] = XLSX.utils.sheet_to_json(wb.Sheets[sheetName], {
+      header: 1, defval: "", raw: false, cellDates: true, blankrows: false,
+    } as any);
+    // raw:false convertirait les dates en texte ; on relit en brut pour garder les Date
+    const matrixRaw: any[][] = XLSX.utils.sheet_to_json(wb.Sheets[sheetName], {
+      header: 1, defval: "", raw: true, blankrows: false,
+    } as any);
+
+    let map: ColMap | null = null;
+    let section = sheetName;
+
+    for (let i = 0; i < matrixRaw.length; i++) {
+      const rowRaw = matrixRaw[i] || [];
+      const rowTxt = matrix[i] || [];
+
+      const maybe = mapHeader(rowRaw);
+      if (maybe) { map = maybe; continue; }
+      if (!map) {
+        const label = String(rowRaw[0] ?? "").trim();
+        if (label) section = label;
+        continue;
+      }
+
+      const nomBrut = String(rowRaw[map.nom] ?? "").trim();
+      if (isJunkRow(nomBrut)) {
+        if (nomBrut) section = nomBrut;
+        continue;
+      }
+
+      const pick = (idx: number) => {
+        if (idx < 0) return { raw: "", val: "" as any };
+        const v = rowRaw[idx];
+        const t = rowTxt[idx];
+        const val = v !== "" && v != null ? v : t;
+        const raw = v instanceof Date ? frDate(toISO(v)) : String(t ?? v ?? "").trim();
+        return { raw, val };
+      };
+
+      const dDeb = pick(map.debut);
+      const dFin = pick(map.fin);
+      let isoDeb = toISO(dDeb.val) || toISO(dDeb.raw);
+      let isoFin = toISO(dFin.val) || toISO(dFin.raw);
+
+      const heuresBrut = map.heures >= 0 ? (rowRaw[map.heures] ?? rowTxt[map.heures]) : 0;
+      const heures = Number(String(heuresBrut ?? 0).replace(/[^\d,.-]/g, "").replace(",", ".")) || 0;
+
+      out.push({
+        id: `vss-${sheetName}-${i}-${nomBrut.replace(/\s+/g, "_")}`,
+        nom: nomBrut,
+        email: map.email >= 0 ? String(rowRaw[map.email] ?? "").trim() : "",
+        entreprise: map.entreprise >= 0 ? String(rowRaw[map.entreprise] ?? "").trim() : "",
+        formation: map.formation >= 0 ? String(rowRaw[map.formation] ?? "").trim() : "",
+        promotion: map.promotion >= 0 ? String(rowRaw[map.promotion] ?? "").trim() : "",
+        dateDebut: isoDeb,
+        dateFin: isoFin,
+        heuresVSS: heures,
+        rawDebut: dDeb.raw,
+        rawFin: dFin.raw,
+        colDebut: map.debut >= 0 ? map.labels[map.debut] : "(colonne introuvable)",
+        colFin: map.fin >= 0 ? map.labels[map.fin] : "(colonne introuvable)",
+        source: section,
+      });
     }
-  }
-  const headers = matrix[headerIdx].map((h) => String(h).trim());
-  const rows = matrix.slice(headerIdx + 1)
-    .filter((r) => r.some((c) => c !== "" && c != null))
-    .map((r) => {
-      const o: Record<string, any> = {};
-      headers.forEach((h, i) => { if (h) o[h] = r[i] ?? ""; });
-      return o;
-    });
+  });
 
-  return rows.map((row, i) => {
-    const nom = String(getCol(row, "Name", "Nom", "Apprenant", "Nom prénom") || "").trim();
-    if (!nom) return null;
-    return {
-      id: `vss-${i}-${nom.replace(/\s+/g, "_")}`,
-      nom,
-      email: String(getCol(row, "Email apprenant", "Email", "Courriel") || ""),
-      entreprise: String(getCol(row, "Entreprise", "Nom employeur") || ""),
-      formation: String(getCol(row, "Formation") || ""),
-      promotion: String(getCol(row, "Promotion") || ""),
-      dateDebut: toISO(getCol(row, "Période de formation - Start", "Periode de formation Start", "Date de début", "Date de début DOKEOS")),
-      dateFin: toISO(getCol(row, "Période de formation - End", "Periode de formation End", "Date de fin")),
-      heuresVSS: Number(String(getCol(row, "Nombre heures de connexion", "Heures de connexion", "Heures VSS") || 0).replace(",", ".")) || 0,
-      heuresRealisees: undefined,
-    } as VSSApprenant;
-  }).filter(Boolean) as VSSApprenant[];
+  return out;
 }
+
 
 /* ---------------- Export Excel ---------------- */
 
