@@ -81,14 +81,18 @@ const SuiviVSS = ({ formation, stagiaires }: Props) => {
     download(exportPlanningsVSSXlsx(plannings), `Suivi_temps_connexion_VSS.xlsx`);
   };
 
+  const [busy, setBusy] = useState<string | null>(null);
+
   const handleExportParStagiaire = async () => {
     if (!plannings.length) { toast.error("Aucun planning à exporter"); return; }
+    const tid = toast.loading("Préparation des dossiers…");
+    setBusy("zip");
     try {
-      toast.info("Génération des dossiers en cours…");
       const zip = new JSZip();
       zip.file("Synthese_globale_VSS.xlsx", exportPlanningsVSSXlsx(plannings));
       const used = new Map<string, number>();
-      for (const p of plannings) {
+      for (let i = 0; i < plannings.length; i++) {
+        const p = plannings[i];
         let slug = slugApprenant(p.apprenant.nom);
         const n = (used.get(slug) ?? 0) + 1;
         used.set(slug, n);
@@ -96,28 +100,38 @@ const SuiviVSS = ({ formation, stagiaires }: Props) => {
         const folder = zip.folder(slug)!;
         folder.file(`Suivi_temps_connexion_VSS_${slug}.xlsx`, exportPlanningVSSXlsx(p));
         folder.file(`Suivi_temps_connexion_VSS_${slug}.pdf`, await pdfPlanningVSS(p));
+        toast.loading(`Dossiers : ${i + 1}/${plannings.length}`, { id: tid });
+        await new Promise((r) => setTimeout(r, 0));
       }
       const blob = await zip.generateAsync({ type: "blob" });
       download(blob, "Suivi_temps_connexion_VSS_par_stagiaire.zip");
-      toast.success(`${plannings.length} dossier(s) stagiaire exporté(s)`);
+      toast.success(`${plannings.length} dossier(s) stagiaire exporté(s)`, { id: tid });
     } catch (e) {
       console.error("Export VSS par stagiaire échoué", e);
-      toast.error(`Export impossible : ${e instanceof Error ? e.message : "erreur inconnue"}`);
+      toast.error(`Export impossible : ${e instanceof Error ? e.message : "erreur inconnue"}`, { id: tid });
+    } finally {
+      setBusy(null);
     }
   };
 
   const handleExportPdf = async () => {
     if (!plannings.length) { toast.error("Aucun planning à exporter"); return; }
+    const tid = toast.loading(`Génération du PDF : 0/${plannings.length}`);
+    setBusy("pdf");
     try {
-      toast.info("Génération du PDF en cours…");
-      const blob = await pdfPlanningsVSS(plannings);
+      const blob = await pdfPlanningsVSS(plannings, (done, total) =>
+        toast.loading(`Génération du PDF : ${done}/${total}`, { id: tid }),
+      );
       download(blob, "Suivi_temps_connexion_VSS.pdf");
-      toast.success("PDF généré");
+      toast.success("PDF généré", { id: tid });
     } catch (e) {
       console.error("Export PDF VSS échoué", e);
-      toast.error(`PDF impossible : ${e instanceof Error ? e.message : "erreur inconnue"}`);
+      toast.error(`PDF impossible : ${e instanceof Error ? e.message : "erreur inconnue"}`, { id: tid });
+    } finally {
+      setBusy(null);
     }
   };
+
 
 
 
