@@ -1912,9 +1912,10 @@ export async function buildBDCNTConseilsZip(
           blob = await genDocx(personalized ?? raw, `${baseName} – ${s.prenom} ${s.nom}`, s);
         }
         const path = critereFolder
-          ? `${benFolder}/${critereFolder}/${baseName}.${ext}`
-          : `${benFolder}/${baseName}.${ext}`;
+          ? `${critereFolder}/${benFolder}/${baseName}.${ext}`
+          : `Divers/${benFolder}/${baseName}.${ext}`;
         zip.file(path, blob);
+
       }
     } else {
       advance(baseName);
