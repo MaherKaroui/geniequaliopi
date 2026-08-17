@@ -1955,7 +1955,7 @@ export async function buildBDCNTConseilsZip(
   }
 
   // === Indicateur 2 : justificatifs chiffrés (preuves des KPI) ===
-  const ind2Folder = "Indicateur 2";
+  const ind2Folder = mapFolderToCriterePath("Indicateur 2");
   for (const file of BDC_NT_STATS_FILES) {
     advance(file.name);
     try {
