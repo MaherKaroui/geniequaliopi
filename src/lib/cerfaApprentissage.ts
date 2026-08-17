@@ -325,8 +325,13 @@ export async function genCerfaApprentissagePdf(
 
   // Durée formation
   const dureeMatch = (f.duree || "").match(/(\d+)/);
-  setText(form, "Zone de texte 21_80", dureeMatch ? dureeMatch[1] : "");
-  setText(form, "Zone de texte 8_102", "0"); // dont distance
+  const dureeHeures = dureeMatch ? dureeMatch[1] : "";
+  setText(form, "Zone de texte 21_80", dureeHeures);
+  // dont heures de formation à distance : total si distanciel, 0 si présentiel
+  const modalites = (f.modalites || "").toLowerCase();
+  const estDistanciel = /distanc|e-?learning|foad|en ligne|visio/.test(modalites);
+  setText(form, "Zone de texte 8_102", estDistanciel ? dureeHeures || "0" : "0");
+
 
   // Attestation pièces justificatives
   setCheck(form, "Case #C3#A0 cocher 8", true);
@@ -344,8 +349,12 @@ export async function genCerfaApprentissagePdf(
   const tarif = tarifApprenti(age);
   const SMIC_BRUT_MENSUEL = 1801.80;
   const montantTarif = Math.round((SMIC_BRUT_MENSUEL * tarif.y1) / 100 * 100) / 100;
-  const montantStr = montantTarif.toFixed(2).replace(".", ",") + " €";
-  // 1ère année — case de gauche (du/au + % + €)
+  const [montantEuros, montantCents] = montantTarif.toFixed(2).split(".");
+  // Salaire brut mensuel à l'embauche (euros , centimes)
+  setText(form, "Zone de texte 8_72", montantEuros);
+  setText(form, "Zone de texte 21_73", montantCents);
+
+  // 1ère année — case de gauche (du/au + % + SMIC/SMC)
   setText(form, "Zone de texte 21_81", ddJ);
   setText(form, "Zone de texte 21_82", ddM);
   setText(form, "Zone de texte 21_83", ddA);
@@ -353,7 +362,8 @@ export async function genCerfaApprentissagePdf(
   setText(form, "Zone de texte 21_85", dfM);
   setText(form, "Zone de texte 21_86", dfA);
   setText(form, "Zone de texte 8_95", String(tarif.y1));
-  setText(form, "Zone de texte 8_96", montantStr);
+  setText(form, "Zone de texte 8_96", "SMIC");
+
   // Case de droite (2e période 1ère année) — laissée vide
   setText(form, "Zone de texte 21_87", "");
   setText(form, "Zone de texte 21_88", "");
