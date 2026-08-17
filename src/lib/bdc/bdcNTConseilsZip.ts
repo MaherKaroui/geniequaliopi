@@ -1855,8 +1855,9 @@ export async function buildBDCNTConseilsZip(
     `Bénéficiaires : ${benList.length}`,
     "",
     "Structure :",
-    "  - Documents collectifs à la racine de chaque dossier Indicateur",
-    "  - Documents nominatifs dans le sous-dossier de chaque bénéficiaire",
+    "  - Critere_X / Indicateur_Y / documents collectifs",
+    "  - Critere_X / Indicateur_Y / Bénéficiaire - Prénom NOM / documents nominatifs",
+
     "",
     `Total documents : ${totalDocs} par bénéficiaire pour les nominatifs.`,
   ].join("\n");
