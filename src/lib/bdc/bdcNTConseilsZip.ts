@@ -1855,8 +1855,9 @@ export async function buildBDCNTConseilsZip(
     `Bénéficiaires : ${benList.length}`,
     "",
     "Structure :",
-    "  - Documents collectifs à la racine de chaque dossier Indicateur",
-    "  - Documents nominatifs dans le sous-dossier de chaque bénéficiaire",
+    "  - Critere_X / Indicateur_Y / documents collectifs",
+    "  - Critere_X / Indicateur_Y / Bénéficiaire - Prénom NOM / documents nominatifs",
+
     "",
     `Total documents : ${totalDocs} par bénéficiaire pour les nominatifs.`,
   ].join("\n");
@@ -1912,9 +1913,10 @@ export async function buildBDCNTConseilsZip(
           blob = await genDocx(personalized ?? raw, `${baseName} – ${s.prenom} ${s.nom}`, s);
         }
         const path = critereFolder
-          ? `${benFolder}/${critereFolder}/${baseName}.${ext}`
-          : `${benFolder}/${baseName}.${ext}`;
+          ? `${critereFolder}/${benFolder}/${baseName}.${ext}`
+          : `Divers/${benFolder}/${baseName}.${ext}`;
         zip.file(path, blob);
+
       }
     } else {
       advance(baseName);
@@ -1954,7 +1956,7 @@ export async function buildBDCNTConseilsZip(
   }
 
   // === Indicateur 2 : justificatifs chiffrés (preuves des KPI) ===
-  const ind2Folder = "Indicateur 2";
+  const ind2Folder = mapFolderToCriterePath("Indicateur 2");
   for (const file of BDC_NT_STATS_FILES) {
     advance(file.name);
     try {
