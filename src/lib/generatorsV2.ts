@@ -24,6 +24,7 @@ function horairesLigneFor(s?: StagiaireInfo) { return isPSHStagiaire(s) ? HORAIR
 import { getEvalContent, generateStagiaireAnswers, computeQCMScore, getQuestionsOuvertes, generateStagiaireOpenAnswers } from "./evalContent";
 import { getRNCPByCode } from "./rncpData";
 import { getCachedContentPack } from "./aiContentPack";
+import { pickCreationExerciceAnswer } from "./creationEntreprisePreset";
 
 // ========== HELPERS ==========
 
@@ -1102,7 +1103,8 @@ D) Drive faster to finish the ride.`,
       .replace(/\[.*?\]/g, '');
 
     // Output the student response as a single flowing block — no extra filler paragraphs
-    extra += `<p>${repClean}</p>`;
+    const creaRep = pickCreationExerciceAnswer(f.intitule || "", ei, stagiaireIdx, s);
+    extra += `<p>${creaRep || repClean}</p>`;
 
     // Formateur correction
     const corrSeed = ((hash * 19 + stagiaireIdx * 13 + ei * 29) & 0x7FFFFFFF) % 6;
@@ -1440,7 +1442,7 @@ export function genAttestationReussiteStagiaire(o: OrganismeInfo, f: FormationIn
 
       <!-- Date en bas à gauche -->
       <div style="position:absolute;bottom:22mm;left:26mm;font-size:11px;color:#555">
-        Fait à ${o.ville || ""}, le 30/06/2026
+        Fait à ${o.ville || ""}, le ${formatDate(getStagiaireDateFin(s, f) || f.dateFin)}
       </div>
     </div>
   `;

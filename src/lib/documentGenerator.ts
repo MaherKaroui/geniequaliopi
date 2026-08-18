@@ -50,6 +50,7 @@ import { PAIE_MODULE_EXERCISES } from "./paiePreset";
 import { SECRETARIAT_MODULE_EXERCISES } from "./secretariatPreset";
 import { GOTRM_MODULE_EXERCISES, pickGOTRMComment } from "./gotrmPreset";
 import { pickWordComment } from "./wordPreset";
+import { pickCreaComment, isCreationEntrepriseFormation, CREA_BESOINS } from "./creationEntreprisePreset";
 import { commentaireSatisfaction } from "./satisfactionComments";
 import { ARH_MODULE_EXERCISES, isARHFormation } from "./arhExercises";
 
@@ -10176,6 +10177,23 @@ function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: 
   const isSecretariat = t.includes("secrétariat") || t.includes("secretariat") || t.includes("secrétaire") || t.includes("secretaire") || t.includes("office manager") || t.includes("assistanat");
   const isGOTRM = t.includes("gotrm") || t.includes("gestionnaire des opérations de transport") || t.includes("exploitant transport") || t.includes("tp-01329") || t.includes("rncp40990") || (f.codeRNCP || "").toUpperCase().includes("40990");
 
+  // === Early return : Création d'entreprise (porteurs de projet) ===
+  if (isCreationEntrepriseFormation(formation)) {
+    const fill = (txt: string) => txt.replace(/\$\{prenom\}/g, s.prenom || "le/la stagiaire");
+    return {
+      civilite,
+      raisonSociale: hasEntreprise ? s.entreprise : "/",
+      attentes: fill(CREA_BESOINS.attentes[h(4) % CREA_BESOINS.attentes.length]),
+      missions: fill(CREA_BESOINS.missions[h(5) % CREA_BESOINS.missions.length]),
+      contribution: fill(CREA_BESOINS.contribution[h(6) % CREA_BESOINS.contribution.length]),
+      diplome: CREA_BESOINS.diplomes[h(2) % CREA_BESOINS.diplomes.length],
+      objectif: CREA_BESOINS.objectifs[h(7) % CREA_BESOINS.objectifs.length],
+      budget: "Financement personnel",
+      projetPro: CREA_BESOINS.projetPro[h(8) % CREA_BESOINS.projetPro.length],
+      handicap: CREA_BESOINS.handicap[h(9) % CREA_BESOINS.handicap.length],
+    };
+  }
+
   // === Early return : Gestionnaire de paie (reconversion / évolution RH-paie) ===
   if (isPaie) {
     const paieAttentes = [
@@ -13017,26 +13035,12 @@ function genAppreciationsEntreprises(o: OrganismeInfo, f: FormationInfo, stagiai
         extra += `<div style="margin-top:12px"><strong>Signature${responsable ? ` de ${responsable}` : ""} (cachet de l'entreprise) :</strong><div style="margin-top:8px;height:80px;border:1px dashed #999;width:240px"></div></div><hr/>`;
       }
     } else {
-      // Pas d'entreprise renseignée
-      let seed = 0;
-      const seedSrc = (o.nom || "default") + (f.intitule || "");
-      for (let k = 0; k < seedSrc.length; k++) seed = (seed * 31 + seedSrc.charCodeAt(k)) >>> 0;
-      const rand = () => { seed = (seed * 1103515245 + 12345) >>> 0; return seed / 0xffffffff; };
+      // Pas d'entreprise commanditaire : trame vierge (aucune croix, aucune remarque pré-remplie)
       questions.forEach((q) => {
-        let mTS = "", mS = "";
-        if (termine) {
-          const rep = rand() < 0.7 ? "Très satisfaisant" : "Satisfaisant";
-          mTS = rep === "Très satisfaisant" ? "<strong>X</strong>&nbsp;" : "";
-          mS = rep === "Satisfaisant" ? "<strong>X</strong>&nbsp;" : "";
-        }
         extra += `<p><strong>${q}</strong></p>`;
-        extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td style="width:50%">${mTS}Très satisfaisant</td><td>Insuffisant</td></tr><tr><td>${mS}Satisfaisant</td><td>Très insuffisant</td></tr></table>`;
+        extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td style="width:50%">Très satisfaisant</td><td>Insuffisant</td></tr><tr><td>Satisfaisant</td><td>Très insuffisant</td></tr></table>`;
       });
-      if (termine) {
-        extra += `<p><strong>Remarques ou suggestions :</strong> Prestation conforme à nos attentes, équipe pédagogique réactive et professionnelle.</p>`;
-      } else {
-        extra += `<p><strong>Remarques ou suggestions :</strong></p><div style="height:60px;border:1px dashed #999"></div>`;
-      }
+      extra += `<p><strong>Remarques ou suggestions :</strong></p><div style="height:60px;border:1px dashed #999"></div>`;
     }
   });
   return buildDocument({ org: o, title: "QUESTIONNAIRE DE SATISFACTION CLIENT COMMANDITAIRE", subtitle: f.intitule, stagiaires, extraHtml: extra });
@@ -16626,6 +16630,10 @@ function genAITestPositionnement(o: OrganismeInfo, f: FormationInfo, stagiaires:
   const wordSeed = isWord
     ? ((s?.prenom || "").length * 131 + (s?.nom || "").length * 197 + si * 41 + (isDebut ? 5 : 13))
     : 0;
+  const isCrea = isCreationEntrepriseFormation(f.intitule || "");
+  const creaSeed = isCrea
+    ? ((s?.prenom || "").length * 131 + (s?.nom || "").length * 197 + si * 41 + (isDebut ? 7 : 17))
+    : 0;
   const rows = qcm.map((q, qi) => {
     const optionsCell = q.options.map((opt, oi) => `${String.fromCharCode(65 + oi)}) ${opt}`).join("<br>");
     if (renderEmpty) {
@@ -16645,7 +16653,9 @@ function genAITestPositionnement(o: OrganismeInfo, f: FormationInfo, stagiaires:
       ? pickGOTRMComment(mode as "debut" | "fin", qi, gotrmSeed)
       : isWord
         ? pickWordComment(mode as "debut" | "fin", qi, wordSeed)
-        : "";
+        : isCrea
+          ? pickCreaComment(mode as "debut" | "fin", qi, creaSeed)
+          : "";
     const humanNote = humanCommentText
       ? `<br><em style="color:#475569;font-size:0.92em">« ${humanCommentText} »</em>`
       : "";
