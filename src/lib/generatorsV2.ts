@@ -1440,7 +1440,7 @@ export function genAttestationReussiteStagiaire(o: OrganismeInfo, f: FormationIn
 
       <!-- Date en bas à gauche -->
       <div style="position:absolute;bottom:22mm;left:26mm;font-size:11px;color:#555">
-        Fait à ${o.ville || ""}, le 30/06/2026
+        Fait à ${o.ville || ""}, le ${formatDate(getStagiaireDateFin(s, f) || f.dateFin)}
       </div>
     </div>
   `;
