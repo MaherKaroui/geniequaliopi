@@ -13018,26 +13018,12 @@ function genAppreciationsEntreprises(o: OrganismeInfo, f: FormationInfo, stagiai
         extra += `<div style="margin-top:12px"><strong>Signature${responsable ? ` de ${responsable}` : ""} (cachet de l'entreprise) :</strong><div style="margin-top:8px;height:80px;border:1px dashed #999;width:240px"></div></div><hr/>`;
       }
     } else {
-      // Pas d'entreprise renseignée
-      let seed = 0;
-      const seedSrc = (o.nom || "default") + (f.intitule || "");
-      for (let k = 0; k < seedSrc.length; k++) seed = (seed * 31 + seedSrc.charCodeAt(k)) >>> 0;
-      const rand = () => { seed = (seed * 1103515245 + 12345) >>> 0; return seed / 0xffffffff; };
+      // Pas d'entreprise commanditaire : trame vierge (aucune croix, aucune remarque pré-remplie)
       questions.forEach((q) => {
-        let mTS = "", mS = "";
-        if (termine) {
-          const rep = rand() < 0.7 ? "Très satisfaisant" : "Satisfaisant";
-          mTS = rep === "Très satisfaisant" ? "<strong>X</strong>&nbsp;" : "";
-          mS = rep === "Satisfaisant" ? "<strong>X</strong>&nbsp;" : "";
-        }
         extra += `<p><strong>${q}</strong></p>`;
-        extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td style="width:50%">${mTS}Très satisfaisant</td><td>Insuffisant</td></tr><tr><td>${mS}Satisfaisant</td><td>Très insuffisant</td></tr></table>`;
+        extra += `<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%"><tr><td style="width:50%">Très satisfaisant</td><td>Insuffisant</td></tr><tr><td>Satisfaisant</td><td>Très insuffisant</td></tr></table>`;
       });
-      if (termine) {
-        extra += `<p><strong>Remarques ou suggestions :</strong> Prestation conforme à nos attentes, équipe pédagogique réactive et professionnelle.</p>`;
-      } else {
-        extra += `<p><strong>Remarques ou suggestions :</strong></p><div style="height:60px;border:1px dashed #999"></div>`;
-      }
+      extra += `<p><strong>Remarques ou suggestions :</strong></p><div style="height:60px;border:1px dashed #999"></div>`;
     }
   });
   return buildDocument({ org: o, title: "QUESTIONNAIRE DE SATISFACTION CLIENT COMMANDITAIRE", subtitle: f.intitule, stagiaires, extraHtml: extra });
