@@ -24,6 +24,7 @@ function horairesLigneFor(s?: StagiaireInfo) { return isPSHStagiaire(s) ? HORAIR
 import { getEvalContent, generateStagiaireAnswers, computeQCMScore, getQuestionsOuvertes, generateStagiaireOpenAnswers } from "./evalContent";
 import { getRNCPByCode } from "./rncpData";
 import { getCachedContentPack } from "./aiContentPack";
+import { pickCreationExerciceAnswer } from "./creationEntreprisePreset";
 
 // ========== HELPERS ==========
 
