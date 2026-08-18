@@ -16650,7 +16650,9 @@ function genAITestPositionnement(o: OrganismeInfo, f: FormationInfo, stagiaires:
       ? pickGOTRMComment(mode as "debut" | "fin", qi, gotrmSeed)
       : isWord
         ? pickWordComment(mode as "debut" | "fin", qi, wordSeed)
-        : "";
+        : isCrea
+          ? pickCreaComment(mode as "debut" | "fin", qi, creaSeed)
+          : "";
     const humanNote = humanCommentText
       ? `<br><em style="color:#475569;font-size:0.92em">« ${humanCommentText} »</em>`
       : "";
