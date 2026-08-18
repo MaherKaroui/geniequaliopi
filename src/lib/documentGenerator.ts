@@ -10177,6 +10177,23 @@ function _generateEvalBesoinsAnswersImpl(s: StagiaireInfo, f: FormationInfo, o: 
   const isSecretariat = t.includes("secrétariat") || t.includes("secretariat") || t.includes("secrétaire") || t.includes("secretaire") || t.includes("office manager") || t.includes("assistanat");
   const isGOTRM = t.includes("gotrm") || t.includes("gestionnaire des opérations de transport") || t.includes("exploitant transport") || t.includes("tp-01329") || t.includes("rncp40990") || (f.codeRNCP || "").toUpperCase().includes("40990");
 
+  // === Early return : Création d'entreprise (porteurs de projet) ===
+  if (isCreationEntrepriseFormation(formation)) {
+    const fill = (txt: string) => txt.replace(/\$\{prenom\}/g, s.prenom || "le/la stagiaire");
+    return {
+      civilite,
+      raisonSociale: hasEntreprise ? s.entreprise : "/",
+      attentes: fill(CREA_BESOINS.attentes[h(4) % CREA_BESOINS.attentes.length]),
+      missions: fill(CREA_BESOINS.missions[h(5) % CREA_BESOINS.missions.length]),
+      contribution: fill(CREA_BESOINS.contribution[h(6) % CREA_BESOINS.contribution.length]),
+      diplome: CREA_BESOINS.diplomes[h(2) % CREA_BESOINS.diplomes.length],
+      objectif: CREA_BESOINS.objectifs[h(7) % CREA_BESOINS.objectifs.length],
+      budget: "Financement personnel",
+      projetPro: CREA_BESOINS.projetPro[h(8) % CREA_BESOINS.projetPro.length],
+      handicap: CREA_BESOINS.handicap[h(9) % CREA_BESOINS.handicap.length],
+    };
+  }
+
   // === Early return : Gestionnaire de paie (reconversion / évolution RH-paie) ===
   if (isPaie) {
     const paieAttentes = [
