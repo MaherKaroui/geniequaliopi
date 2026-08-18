@@ -1102,7 +1102,8 @@ D) Drive faster to finish the ride.`,
       .replace(/\[.*?\]/g, '');
 
     // Output the student response as a single flowing block — no extra filler paragraphs
-    extra += `<p>${repClean}</p>`;
+    const creaRep = pickCreationExerciceAnswer(f.intitule || "", ei, stagiaireIdx, s);
+    extra += `<p>${creaRep || repClean}</p>`;
 
     // Formateur correction
     const corrSeed = ((hash * 19 + stagiaireIdx * 13 + ei * 29) & 0x7FFFFFFF) % 6;
