@@ -16627,6 +16627,10 @@ function genAITestPositionnement(o: OrganismeInfo, f: FormationInfo, stagiaires:
   const wordSeed = isWord
     ? ((s?.prenom || "").length * 131 + (s?.nom || "").length * 197 + si * 41 + (isDebut ? 5 : 13))
     : 0;
+  const isCrea = isCreationEntrepriseFormation(f.intitule || "");
+  const creaSeed = isCrea
+    ? ((s?.prenom || "").length * 131 + (s?.nom || "").length * 197 + si * 41 + (isDebut ? 7 : 17))
+    : 0;
   const rows = qcm.map((q, qi) => {
     const optionsCell = q.options.map((opt, oi) => `${String.fromCharCode(65 + oi)}) ${opt}`).join("<br>");
     if (renderEmpty) {
