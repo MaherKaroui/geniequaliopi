@@ -29,11 +29,12 @@ function veilleYear(f: FormationInfo, monthsBefore: number): string {
 }
 
 // ===== Detection helpers =====
-type FormationType = "fle" | "ia" | "word" | "commercial" | "webmarketing" | "crm" | "anglais" | "massage" | "esthetique" | "secretaire" | "management" | "ecsr" | "vtc";
+type FormationType = "creation" | "fle" | "ia" | "word" | "commercial" | "webmarketing" | "crm" | "anglais" | "massage" | "esthetique" | "secretaire" | "management" | "ecsr" | "vtc";
 
 function detectFormationType(f: FormationInfo): FormationType {
   const title = (f.intitule || "").toLowerCase();
   const code = (f.codeRNCP || "").toLowerCase();
+  if (title.includes("création d'entreprise") || title.includes("creation d'entreprise") || title.includes("création entreprise") || title.includes("creation entreprise") || title.includes("créer son entreprise") || title.includes("creer son entreprise") || title.includes("porteur de projet") || title.includes("créateur d'entreprise") || title.includes("createur d'entreprise")) return "creation";
   if (title.includes("vtc") || title.includes("voiture de transport avec chauffeur") || title.includes("chauffeur vtc") || code.includes("5637") || code.includes("rs5637")) return "vtc";
   if (title.includes("conduite") || title.includes("ecsr") || title.includes("enseignant de la conduite") || code.includes("35329")) return "ecsr";
   if (title.includes("français") || title.includes("fle") || title.includes("social") || title.includes("médico") || title.includes("medico") || title.includes("communiquer en français")) return "fle";
@@ -229,6 +230,39 @@ function veilleReglementaireRows(f: FormationInfo, type: FormationType): string[
       "Preuve: Extrait synthèse + signets. Action: Archive et établir une synthèse interne annuelle (preuve Qualiopi)."
     ],
   ];
+
+  if (type === "creation") {
+    return [...common,
+      [
+        `<a href="https://entreprendre.service-public.fr/vosdroits/N16789">Service-Public Entreprendre</a>`,
+        "Formalités de création d'entreprise — guichet unique INPI",
+        veilleMonthYear(f, 5),
+        "Le guichet unique électronique de l'INPI centralise depuis 2023 toutes les formalités de création, modification et cessation d'entreprise.",
+        "Preuve : capture du parcours de formalité + PDF de la fiche. Action : mise à jour du module « Démarches de création » et du pas-à-pas remis aux stagiaires."
+      ],
+      [
+        `<a href="https://www.urssaf.fr/accueil/independant/creer-mon-entreprise.html">URSSAF – Créateurs</a>`,
+        "Micro-entreprise : plafonds de chiffre d'affaires et taux de cotisations",
+        veilleMonthYear(f, 4),
+        "Plafonds actualisés (188 700 € vente / 77 700 € services) et taux de cotisations sociales applicables aux micro-entrepreneurs.",
+        "Preuve : capture des barèmes URSSAF datée. Action : actualisation des chiffres dans le support de cours et dans les exercices de prévisionnel."
+      ],
+      [
+        `<a href="https://www.economie.gouv.fr/entreprises/aides-creation-entreprise">economie.gouv.fr</a>`,
+        "ACRE, ARCE, NACRE : aides à la création et à la reprise d'entreprise",
+        veilleMonthYear(f, 6),
+        "Conditions d'éligibilité et démarches pour l'exonération de cotisations (ACRE) et le versement en capital des droits chômage (ARCE).",
+        "Preuve : fiches d'aides archivées. Action : mise à jour du module « Financement » et du tableau comparatif des aides remis en formation."
+      ],
+      [
+        `<a href="https://bpifrance-creation.fr/">Bpifrance Création</a>`,
+        "Choix du statut juridique : micro-entreprise, EI, EURL, SASU",
+        veilleMonthYear(f, 3),
+        "Comparatif juridique, fiscal et social actualisé des formes d'entreprise pour un créateur seul.",
+        "Preuve : tableau comparatif Bpifrance archivé. Action : refonte de l'exercice « Choix du statut juridique » avec les données de l'année en cours."
+      ],
+    ];
+  }
 
   if (type === "fle") {
     return [...common,
@@ -632,6 +666,46 @@ export function genVeilleReglementaireV2(o: OrganismeInfo, f: FormationInfo) {
 // ===== IND 24 — TABLEAU DE VEILLE MÉTIER =====
 
 function veilleMetierRows(f: FormationInfo, type: FormationType): string[][] {
+  if (type === "creation") {
+    return [
+      [
+        `<a href="https://bpifrance-creation.fr/moment-de-vie/etude-marche">Bpifrance Création</a>`,
+        "Méthodologie de l'étude de marché pour un porteur de projet",
+        veilleMonthYear(f, 5),
+        "Méthode complète : segmentation, enquête terrain, analyse concurrentielle et dimensionnement du chiffre d'affaires prévisionnel.",
+        "Preuve : guide méthodologique archivé. Action : alimentation de l'exercice « Étude de marché » et de la trame remise aux stagiaires."
+      ],
+      [
+        `<a href="https://www.insee.fr/fr/statistiques?theme=25">INSEE – Démographie des entreprises</a>`,
+        "Créations d'entreprises en France : statistiques mensuelles",
+        veilleMonthYear(f, 2),
+        "Volumes de créations par secteur et par région : un repère pour objectiver le potentiel de marché d'un projet.",
+        "Preuve : export des séries INSEE. Action : chiffres intégrés dans le module « Étude de marché » et dans les cas pratiques régionaux."
+      ],
+      [
+        `<a href="https://www.initiative-france.fr/">Initiative France</a>`,
+        "Prêts d'honneur et accompagnement des créateurs",
+        veilleMonthYear(f, 4),
+        "Réseau d'accompagnement : prêt d'honneur à taux zéro, effet de levier bancaire et parrainage des créateurs.",
+        "Preuve : fiche réseau + contact de la plateforme locale. Action : orientation systématique des stagiaires en fin de parcours (suite de parcours)."
+      ],
+      [
+        `<a href="https://www.reseau-entreprendre.org/">Réseau Entreprendre</a>`,
+        "Accompagnement des créateurs d'entreprise à potentiel",
+        veilleMonthYear(f, 7),
+        "Critères de sélection, accompagnement par des chefs d'entreprise et financement des projets créateurs d'emplois.",
+        "Preuve : plaquette du réseau archivée. Action : présentation des relais d'accompagnement lors du module « Après la formation »."
+      ],
+      [
+        `<a href="https://www.cci.fr/ressources/creation-entreprise">CCI France</a>`,
+        "Accompagnement CCI : de l'idée à l'immatriculation",
+        veilleMonthYear(f, 6),
+        "Offre d'accompagnement des chambres consulaires : ateliers, permanences juridiques et suivi post-création.",
+        "Preuve : programme des ateliers CCI. Action : partenariat local mentionné dans le livret d'accueil et le catalogue."
+      ],
+    ];
+  }
+
   if (type === "fle") {
     return [
       [
@@ -1192,6 +1266,32 @@ function veilleTechnoRows(f: FormationInfo, type: FormationType): string[][] {
       "Preuve : capture du post + export PDF. Action Qualiopi : intégrer ces données dans la revue de processus pédagogique."
     ],
   ];
+
+  if (type === "creation") {
+    return [...commonDigitalLearning,
+      [
+        `<a href="https://formalites.entreprises.gouv.fr/">Guichet unique des formalités</a>`,
+        "Dématérialisation complète des formalités d'entreprise",
+        veilleMonthYear(f, 5),
+        "Immatriculation, modification et cessation entièrement en ligne : impact direct sur le module « Démarches administratives ».",
+        "Preuve : captures du parcours en ligne. Action : mise à jour des tutoriels pas-à-pas utilisés en atelier."
+      ],
+      [
+        `<a href="https://www.impots.gouv.fr/professionnel">impots.gouv.fr – Espace professionnel</a>`,
+        "Facturation électronique : calendrier de généralisation",
+        veilleMonthYear(f, 3),
+        "Obligation progressive de réception et d'émission de factures électroniques pour toutes les entreprises assujetties à la TVA.",
+        "Preuve : calendrier officiel archivé. Action : ajout d'une séquence « Facturation électronique et outils de facturation » au support de cours."
+      ],
+      [
+        `<a href="https://bpifrance-creation.fr/boiteaoutils">Bpifrance – Boîte à outils du créateur</a>`,
+        "Outils numériques de business plan et de prévisionnel financier",
+        veilleMonthYear(f, 6),
+        "Modèles de business plan, simulateurs de charges et tableurs de prévisionnel mis à disposition gratuitement.",
+        "Preuve : modèles téléchargés et datés. Action : trames Excel utilisées pour les exercices de prévisionnel et de plan de trésorerie."
+      ],
+    ];
+  }
 
   if (type === "fle") {
     return [...commonDigitalLearning,
