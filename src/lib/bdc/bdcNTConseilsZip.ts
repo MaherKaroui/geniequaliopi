@@ -1119,6 +1119,11 @@ Conformément à l'article L.6313-4 du Code du travail, les résultats détaill�
 `;
 }
 
+const PROGRAMME_PHASES_KEY = "Indicateur 10/Indicateur 10 - Programme des 3 phases du bilan de compétences";
+const PHASE1_KEY = "Indicateur 10/Indicateur 10 - Phase 1 - Phase préliminaire";
+const PHASE2_KEY = "Indicateur 10/Indicateur 10 - Phase 2 - Phase d'investigation";
+const PHASE3_KEY = "Indicateur 10/Indicateur 10 - Phase 3 - Phase de conclusion";
+
 /** Fiches détaillées par phase réglementaire (1 document par phase). */
 function buildPhaseMd(
   phase: 1 | 2 | 3,
