@@ -315,6 +315,17 @@ export function validerDossierBDC(ctx: BdcContext, rendu?: RenduDocuments): Rapp
   B.push(r("V25", "Aucune substitution abusive dans les libellés réglementaires", regressions.length === 0,
     "Libellé réglementaire corrompu par le dictionnaire de substitution", regressions.slice(0, 10)));
 
+  // V26 — MESSAGE 20 : les rubriques 2, 3 et 4 du document de synthèse doivent
+  // être renseignées par le consultant. Tant qu'elles portent le marqueur de
+  // saisie, l'export est bloqué et le dossier est marqué incomplet.
+  const syntheses = fichiersOu(/document de synth[èe]se/i);
+  const synthesesVides = syntheses
+    .filter(([, txt]) => /À COMPLÉTER PAR LE CONSULTANT/i.test(txt))
+    .map(([nom]) => nom);
+  B.push(r("V26", "Document de synthèse renseigné par le consultant",
+    syntheses.length === 0 || synthesesVides.length === 0,
+    "Les rubriques 2, 3 et 4 du document de synthèse doivent être saisies à partir des notes d'entretien : elles ne peuvent pas être générées.",
+    synthesesVides.slice(0, 10)));
 
 
   /* ---------------- Alertes (orange) ---------------- */
