@@ -20,6 +20,7 @@ import type { BdcContext } from "./bdcModel";
 export const PHRASES_PROTEGEES: string[] = [
   "Mon Compte Formation",
   "formation professionnelle continue",
+  "Formation professionnelle continue",
   "la formation professionnelle",
   "ne vaut pas agrément de l'État",
   "agrément de l'État",
@@ -36,11 +37,28 @@ export const PHRASES_PROTEGEES: string[] = [
   "Exercice des droits",
   "en cours",
   "En cours",
+  "au cours",
+  "Au cours",
   "compte personnel de formation",
   "Compte personnel de formation",
   "certificat de réalisation",
   "Certificat de réalisation",
+  // MESSAGE 23 — libellés corrompus par les substitutions en sous-chaîne
+  "stage d'application",
+  "Stage d'application",
+  "stage pratique",
+  "besoins de formation",
+  "Besoins de formation",
+  "besoin de formation",
+  "formation initiale",
+  "Formation initiale",
+  "mes formations",
+  "mes prestations",
+  "actions de formation",
+  "action de formation",
+  "organisme de formation professionnelle",
 ];
+
 
 const TOKEN = (i: number) => `\u0001PROT${i}\u0001`;
 
