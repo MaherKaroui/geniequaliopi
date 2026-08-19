@@ -2074,21 +2074,6 @@ export function renderBdcNTProgrammePhasesHtml(
 }
 
 
-/** Rendu HTML du programme de la prestation BDC (CT1 · IND 1). */
-export function renderBdcNTProgrammeBDCHtml(
-  org: OrganismeInfo,
-  formation?: FormationInfo,
-  stagiaire?: StagiaireInfo | null,
-): string {
-  const dates = computeDates(stagiaire || undefined, org, formation);
-  const body = mdToHtmlBody(buildProgrammeBDCMd(org, dates, formation));
-  return htmlWrap(
-    orgHeader(org, "Programme du bilan de compétences") +
-    `<div class="bdc-doc-body">${body}</div>` +
-    `<style>.bdc-doc-body{font-size:11pt}.bdc-doc-body table{border-collapse:collapse;width:100%;margin:10px 0;font-size:10.5pt;table-layout:fixed;word-wrap:break-word}.bdc-doc-body table td,.bdc-doc-body table th{border:1px solid #94a3b8;padding:6px 8px;vertical-align:top;text-align:left}.bdc-doc-body table th{background:#cfe2f3;color:#0b2545;font-weight:bold;text-align:center}.bdc-doc-body h2{font-size:14pt;color:#0b2545;margin:16px 0 8px}.bdc-doc-body h3{font-size:12pt;color:#1d4ed8;margin:14px 0 6px}.bdc-doc-body p{margin:4px 0;line-height:1.35;text-align:justify}.bdc-doc-body ul,.bdc-doc-body ol{margin:6px 0 8px 22px}</style>` +
-    docFooter(org)
-  );
-}
 
 
 
