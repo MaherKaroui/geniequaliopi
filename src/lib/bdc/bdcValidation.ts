@@ -243,12 +243,21 @@ export function validerDossierBDC(ctx: BdcContext, rendu?: RenduDocuments): Rapp
   B.push(r("V18", "Feuilles d'émargement présentes", p.categorieAction !== "BC" || aEmargement,
     "Preuve de réalisation manquante : feuilles d'émargement"));
 
-  // V19 — employeur identifié
-  const employeurOk = p.origineDemande !== "employeur" || beneficiaires.every((b) => !!b.employeur?.raisonSociale);
-  B.push(r("V19", "Employeur identifié dans la convention tripartite", employeurOk, "Employeur non identifié dans une convention tripartite"));
+  // V19 — employeur identifié : sans objet si l'engagement est bipartite
+  const tripartite = p.origineDemande === "employeur";
+  const employeurOk = !tripartite || beneficiaires.every((b) => !!b.employeur?.raisonSociale);
+  B.push(r("V19", tripartite ? "Employeur identifié dans la convention tripartite" : "Employeur identifié — non applicable (contrat bipartite)",
+    employeurOk, "Employeur non identifié dans une convention tripartite",
+    tripartite ? undefined : ["Non applicable : contrat bipartite organisme / bénéficiaire."]));
 
-  // V20 — prix
-  B.push(r("V20", "Prix renseigné dans le contrat", p.prixHT > 0, "Convention sans prix (nulle)"));
+  // V20 — un montant doit être ÉCRIT dans le fichier contrat / convention
+  const fichiersContrat = fichiersOu(/convention|contrat/i);
+  const sansMontant = fichiersContrat
+    .filter(([, txt]) => !/\d[\d\s  ]*(,\d{2})?\s*(€|euros)/i.test(txt))
+    .map(([nom]) => nom);
+  B.push(r("V20", "Montant écrit dans le contrat", p.prixHT > 0 && sansMontant.length === 0,
+    p.prixHT <= 0 ? "Convention sans prix (nulle)" : "Contrat exporté sans montant lisible", sansMontant.slice(0, 5)));
+
 
   // Vocabulaire interdit et mentions abrogées (BLOC 6 / BLOC 5 — bloquants)
   const vocab: string[] = [];
