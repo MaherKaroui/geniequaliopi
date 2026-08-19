@@ -809,6 +809,8 @@ const DocumentGenerator = ({ organisme, formation, stagiaires }: DocumentGenerat
   // ============ Guide Prépa Qualiopi universel (AF / CFA / BDC / VAE) ============
   const [typeActionPrepa, setTypeActionPrepa] = useState<TypeActionAudit>(() => detectTypeAction(mergedOrganisme));
   const [loadingGuidePrepa, setLoadingGuidePrepa] = useState(false);
+  const [bdcControleOpen, setBdcControleOpen] = useState(false);
+
 
   const handlePreviewGuidePrepa = () => {
     const content = generateGuideAuditUniversal(mergedOrganisme, [selectedFormation], catalog, allStagiaires, typeActionPrepa, typeAuditCFA);
