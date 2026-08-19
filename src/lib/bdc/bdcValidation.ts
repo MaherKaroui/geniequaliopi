@@ -9,7 +9,7 @@ import { fmtDateFR, formatDuree, seancesFor } from "./bdcModel";
 import { BDC_TEMPLATES_MANQUANTS } from "./bdcTemplatesBC";
 import {
   detectDuplication, findMentionsAbrogees, findOrganismesTiers,
-  findUnresolvedMergeFields, findVocabulaireInterdit, type DuplicationHit,
+  findUnresolvedMergeFields, findVocabulaireInterdit, findRegressionsSubstitution, type DuplicationHit,
 } from "./bdcCompliance";
 
 export interface RegleResultat {
