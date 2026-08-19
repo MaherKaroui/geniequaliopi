@@ -179,8 +179,23 @@ export function validerDossierBDC(ctx: BdcContext, rendu?: RenduDocuments): Rapp
     const uniques = [...new Set(valeurs.filter(Boolean))];
     return r(code, libelle, uniques.length <= 1, msg, uniques);
   };
-  B.push(coherence("V11", "Civilité cohérente dans tous les documents", "Civilité divergente",
-    beneficiaires.length === 1 ? [beneficiaires[0].civilite] : ["ok"]));
+  // V11 — uniformité ET exactitude de la civilité (une civilité fausse peut être
+  // parfaitement uniforme dans tout le dossier).
+  const civiliteKo: string[] = [];
+  for (const b of beneficiaires) {
+    const attendue = b.civilite;
+    const autre = attendue === "M." ? "Mme" : "M.";
+    for (const [nom, txt] of entries) {
+      const reAutre = new RegExp(`${autre}\\.?\\s+${b.prenom}\\b`, "i");
+      if (reAutre.test(txt)) civiliteKo.push(`${nom} : « ${autre} ${b.prenom} » alors que la fiche indique « ${attendue} »`);
+    }
+    if (feminiteDouteuse(b.prenom, attendue)) {
+      civiliteKo.push(`${b.prenom} ${b.nom} : civilité « ${attendue} » à confirmer manuellement au regard du prénom.`);
+    }
+  }
+  B.push(r("V11", "Civilité uniforme ET exacte dans tous les documents", civiliteKo.length === 0,
+    "Civilité incohérente ou à confirmer", [...new Set(civiliteKo)].slice(0, 8)));
+
   B.push(coherence("V12", "Financeur identique dans toutes les pièces", "Financeur contradictoire", [p.financeur]));
   B.push(coherence("V13", "Origine de la demande identique dans toutes les pièces", "Origine de la demande contradictoire", [p.origineDemande]));
   B.push(coherence("V14", "Niveau d'études identique dans toutes les pièces", "Niveau d'études contradictoire",
