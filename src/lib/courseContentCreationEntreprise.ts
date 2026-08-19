@@ -250,6 +250,173 @@ export function getCreationEntrepriseChapters(): CourseChapter[] {
       ],
     },
     {
+      title: "Gestion quotidienne, comptabilité et obligations",
+      description: "Maîtriser la facturation, la comptabilité courante, les déclarations et le calendrier fiscal et social de la 1ʳᵉ année.",
+      sections: [
+        {
+          title: "Facturation conforme et recouvrement",
+          content: `<p><strong>Mentions obligatoires d'une facture</strong> (art. L441-9 du Code de commerce) :</p>
+<ul>
+<li>Numéro unique et chronologique, date d'émission, date de la vente ou de la prestation.</li>
+<li>Identité complète du vendeur : dénomination, forme juridique, capital, adresse, SIREN/SIRET, RCS ou RM, n° TVA intracommunautaire.</li>
+<li>Identité et adresse du client (+ n° TVA si autoliquidation intracommunautaire).</li>
+<li>Désignation, quantité, prix unitaire HT, remises, total HT, taux et montant de TVA, total TTC.</li>
+<li>Date de règlement, conditions d'escompte, <strong>pénalités de retard</strong> (3× le taux d'intérêt légal minimum) et <strong>indemnité forfaitaire de recouvrement de 40 €</strong>.</li>
+<li>Mentions spécifiques : « TVA non applicable, art. 293 B du CGI » (franchise en base), « Autoliquidation », assurance décennale et garant (BTP), adhésion à un OGA le cas échéant.</li>
+</ul>
+<p><strong>Facturation électronique :</strong> réception obligatoire pour toutes les entreprises et émission progressive à partir de septembre 2026 (grandes entreprises et ETI) puis septembre 2027 (PME et microentreprises). Format structuré (Factur-X, UBL, CII) transmis via une <strong>Plateforme de Dématérialisation Partenaire (PDP)</strong>.</p>
+<p><strong>Recouvrement en 4 étapes :</strong> relance amiable (J+3 après échéance) → relance écrite recommandée → mise en demeure → injonction de payer (tribunal de commerce, procédure en ligne) ou recours à un commissaire de justice. Prévention : acompte à la commande (30 %), conditions de paiement claires dans les CGV, plafond légal de 60 jours date de facture (ou 45 jours fin de mois).</p>`,
+        },
+        {
+          title: "Comptabilité courante et obligations déclaratives",
+          content: `<p><strong>Obligations selon le régime :</strong></p>
+<ul>
+<li><strong>Micro-entreprise</strong> : livre des recettes (et registre des achats si vente de marchandises), conservation des justificatifs 10 ans, déclaration mensuelle ou trimestrielle du CA sur autoentrepreneur.urssaf.fr — même si le CA est nul.</li>
+<li><strong>Régime réel / société</strong> : comptabilité en partie double, livre-journal, grand livre, inventaire annuel, bilan, compte de résultat et annexe, dépôt des comptes au greffe pour les sociétés.</li>
+</ul>
+<p><strong>Calendrier type d'une 1ʳᵉ année :</strong></p>
+<table border="1" cellpadding="6" style="width:100%;border-collapse:collapse;font-size:13px">
+<tr style="background:#f0f0f0"><th>Échéance</th><th>Obligation</th></tr>
+<tr><td>Mensuel / trimestriel</td><td>Déclaration et paiement de la TVA, déclaration URSSAF du CA (micro), DSN si salariés</td></tr>
+<tr><td>Trimestriel</td><td>Acomptes d'impôt sur les sociétés (si IS et IS N-1 &gt; 3 000 €)</td></tr>
+<tr><td>Mai</td><td>Déclaration de revenus (2042-C-PRO pour les entreprises à l'IR)</td></tr>
+<tr><td>Mai</td><td>Liasse fiscale (2031 BIC / 2035 BNC / 2065 IS) dans les 3 mois de la clôture</td></tr>
+<tr><td>Décembre</td><td>CFE (exonérée l'année de création, déclaration initiale 1447-C avant le 31/12 de l'année de création)</td></tr>
+</table>
+<p><strong>Choisir son accompagnement :</strong> expert-comptable (obligatoire de fait pour les sociétés, 800 à 2 500 €/an pour une TPE), comptabilité en ligne (Indy, Dougs, Tiime : 20 à 100 €/mois), ou autonomie complète en micro-entreprise.</p>`,
+        },
+        {
+          title: "Premiers recrutements et cadre social",
+          content: `<p>Avant d'embaucher, vérifier la <strong>capacité financière</strong> : un salarié au SMIC coûte environ 1,45 fois son salaire brut chargé (hors allègements Fillon qui réduisent fortement le coût au niveau du SMIC).</p>
+<p><strong>Étapes de la 1ʳᵉ embauche :</strong></p>
+<ol>
+<li>Choix du contrat : CDI, CDD (motif obligatoire), apprentissage, contrat de professionnalisation, stage (convention tripartite).</li>
+<li><strong>DPAE</strong> (Déclaration Préalable À l'Embauche) auprès de l'URSSAF, au plus tôt 8 jours avant l'embauche.</li>
+<li>Rédaction du contrat conforme à la <strong>convention collective</strong> applicable (IDCC déterminé par l'activité principale).</li>
+<li>Adhésion caisse de retraite complémentaire (AGIRC-ARRCO), mutuelle collective obligatoire, prévoyance.</li>
+<li>Registre unique du personnel, affichages obligatoires, visite d'information et de prévention (SPST).</li>
+<li>Paie mensuelle + <strong>DSN</strong> avant le 5 ou le 15 du mois suivant.</li>
+</ol>
+<p><strong>Alternatives à l'embauche directe :</strong> TESE (Titre Emploi Service Entreprise, gratuit URSSAF, &lt; 20 salariés), portage salarial, freelance/sous-traitance, groupement d'employeurs, intérim.</p>
+<p><strong>Aides à l'embauche :</strong> aide unique apprentissage, emploi franc en QPV, aides AGEFIPH pour travailleurs handicapés, exonérations ZRR / ZFU selon implantation.</p>`,
+        },
+      ],
+    },
+    {
+      title: "Digital, communication et développement commercial",
+      description: "Rendre l'entreprise visible, acquérir ses premiers clients et sécuriser ses données.",
+      sections: [
+        {
+          title: "Présence en ligne et acquisition de clients",
+          content: `<p><strong>Socle digital minimum d'un créateur :</strong></p>
+<ul>
+<li><strong>Nom de domaine + site vitrine</strong> (WordPress, Wix, Webflow, Shopify pour la vente en ligne) : présentation, offre, preuves sociales, formulaire de contact, tarifs ou fourchette.</li>
+<li><strong>Google Business Profile</strong> : indispensable en local, alimente Maps et le pack local. Photos, horaires, posts, collecte d'avis.</li>
+<li><strong>Réseaux sociaux ciblés</strong> : LinkedIn (B2B), Instagram / TikTok (B2C, visuel), Facebook (local, communautés), Pinterest (déco, artisanat).</li>
+<li><strong>Emailing</strong> : Brevo, Mailchimp — la base de contacts est un actif de l'entreprise.</li>
+</ul>
+<p><strong>SEO — les 3 piliers :</strong> technique (vitesse, mobile, balises title/meta, structure Hn), contenu (pages métier + pages locales + blog répondant aux requêtes clients), popularité (backlinks annuaires, partenaires, presse locale).</p>
+<p><strong>SEA / Ads :</strong> commencer avec un budget test de 300 à 500 €/mois, une seule campagne, un mot-clé transactionnel principal, une landing page dédiée. Mesurer le <strong>coût par lead</strong> et le <strong>CAC</strong> avant d'augmenter les budgets.</p>
+<p><strong>Tunnel de vente type :</strong> visiteur → lead (formulaire, appel) → rendez-vous → devis → client → client fidèle / prescripteur. Suivre le taux de passage à chaque étape pour identifier le point de fuite.</p>`,
+        },
+        {
+          title: "Vente, devis et négociation",
+          content: `<p><strong>Structure d'un entretien de vente (méthode CAB / SONCAS) :</strong></p>
+<ol>
+<li><strong>Prise de contact</strong> : créer le climat, cadrer la durée et l'objectif.</li>
+<li><strong>Découverte</strong> : questions ouvertes, écoute active, reformulation, identification des motivations SONCAS (Sécurité, Orgueil, Nouveauté, Confort, Argent, Sympathie).</li>
+<li><strong>Argumentation CAB</strong> : Caractéristique → Avantage → Bénéfice client, preuve à l'appui.</li>
+<li><strong>Traitement des objections</strong> : accepter, creuser (« qu'entendez-vous par trop cher ? »), répondre, valider.</li>
+<li><strong>Conclusion</strong> : engagement daté, acompte, prochaine étape écrite.</li>
+</ol>
+<p><strong>Devis professionnel :</strong> mêmes mentions que la facture + « devis gratuit / payant », durée de validité (30 jours), conditions de règlement, mention « bon pour accord » avec date et signature. Le devis signé vaut contrat.</p>
+<p><strong>Fixer son prix :</strong> partir du <strong>taux horaire cible</strong> = (charges annuelles + rémunération souhaitée) / nombre d'heures facturables réelles (≈ 900 à 1 200 h/an pour un indépendant, pas 1 600 h). Vérifier ensuite l'acceptabilité marché et la valeur perçue.</p>`,
+        },
+        {
+          title: "RGPD, cybersécurité et protection des actifs",
+          content: `<p><strong>RGPD — obligations d'une TPE :</strong> registre des traitements, information des personnes (mentions sur les formulaires), base légale identifiée, durées de conservation, sécurité des données, droit d'accès / rectification / effacement, notification CNIL en cas de violation (72 h).</p>
+<p><strong>Cybersécurité — mesures de base :</strong> mots de passe forts + gestionnaire, double authentification, sauvegardes automatiques 3-2-1, mises à jour, antivirus, sensibilisation au phishing et à la fraude au président / faux RIB fournisseur, cyberassurance.</p>
+<p><strong>Protection des actifs immatériels :</strong></p>
+<ul>
+<li><strong>Marque</strong> : dépôt INPI (190 € pour 1 classe, +40 € par classe), après recherche d'antériorité ; protection 10 ans renouvelable.</li>
+<li><strong>Nom de domaine</strong> : réserver les variantes (.fr, .com) et les comptes sociaux.</li>
+<li><strong>Créations</strong> : droit d'auteur automatique, enveloppe Soleau ou dépôt chez un tiers de confiance pour dater.</li>
+<li><strong>Savoir-faire</strong> : clauses de confidentialité (NDA) avec partenaires, prestataires et salariés.</li>
+</ul>`,
+        },
+      ],
+    },
+    {
+      title: "Cas pratiques chiffrés et fiches outils",
+      description: "Appliquer les notions à des situations réelles et disposer de repères directement utilisables.",
+      sections: [
+        {
+          title: "Cas pratique 1 – Prestataire de services en SASU",
+          content: `<p><strong>Contexte :</strong> Consultante en communication, création d'une SASU, TJM 450 €, 130 jours facturés la 1ʳᵉ année.</p>
+<table border="1" cellpadding="6" style="width:100%;border-collapse:collapse;font-size:13px">
+<tr style="background:#f0f0f0"><th>Poste</th><th>Année 1</th><th>Commentaire</th></tr>
+<tr><td>Chiffre d'affaires</td><td>58 500 €</td><td>450 € × 130 jours</td></tr>
+<tr><td>Charges externes</td><td>7 200 €</td><td>Coworking, logiciels, assurance, comptable, communication</td></tr>
+<tr><td>Rémunération brute présidente</td><td>30 000 €</td><td>2 500 €/mois</td></tr>
+<tr><td>Cotisations (≈ 80 % du net)</td><td>16 500 €</td><td>Assimilée salariée</td></tr>
+<tr><td>Résultat avant IS</td><td>4 800 €</td><td></td></tr>
+<tr><td>IS à 15 %</td><td>720 €</td><td>Taux réduit &lt; 42 500 €</td></tr>
+<tr><td><strong>Résultat net</strong></td><td><strong>4 080 €</strong></td><td>Mise en réserve ou dividendes</td></tr>
+</table>
+<p><strong>Lecture :</strong> le seuil de rentabilité correspond ici à ≈ 120 jours facturés. En dessous, la rémunération doit être réduite ou la trésorerie de départ mobilisée. <strong>Point de vigilance :</strong> les 130 jours facturés supposent 60 jours consacrés à la prospection, l'administratif et les congés — le calendrier commercial doit être planifié dès le mois 1.</p>`,
+        },
+        {
+          title: "Cas pratique 2 – Commerce de détail en micro-entreprise",
+          content: `<p><strong>Contexte :</strong> Boutique d'épicerie fine, micro-entreprise (vente de marchandises), CA prévisionnel 90 000 €, taux de marge 35 %.</p>
+<ul>
+<li>Marge brute : 90 000 × 35 % = <strong>31 500 €</strong>.</li>
+<li>Charges fixes annuelles : loyer 9 600 €, assurance 900 €, énergie 2 400 €, communication 1 800 €, divers 1 500 € = <strong>16 200 €</strong>.</li>
+<li>Cotisations micro (12,3 % du CA en vente) : <strong>11 070 €</strong>.</li>
+<li>Revenu disponible : 31 500 – 16 200 – 11 070 = <strong>4 230 €/an</strong> → insuffisant.</li>
+</ul>
+<p><strong>Analyse :</strong> le régime micro est ici pénalisant car les cotisations portent sur le CA et non sur la marge. Un passage au <strong>régime réel</strong> (EI ou EURL) permet de déduire les charges réelles et de cotiser sur le bénéfice. Autres leviers : augmenter le taux de marge (mix produits, marques propres), réduire le loyer, développer un second canal (click &amp; collect, marchés).</p>
+<p><strong>Besoin de financement de départ :</strong> aménagement 25 000 €, stock initial 15 000 €, trésorerie de sécurité 8 000 €, BFR 6 000 € = <strong>54 000 €</strong>, financés par 16 000 € d'apport, 8 000 € de prêt d'honneur et 30 000 € de prêt bancaire sur 5 ans (≈ 545 €/mois).</p>`,
+        },
+        {
+          title: "Fiches outils : check-lists et modèles",
+          content: `<p><strong>Check-list « prêt à immatriculer » :</strong></p>
+<ul>
+<li>☐ Étude de marché rédigée et sources citées</li>
+<li>☐ Business model formalisé (BMC)</li>
+<li>☐ Prévisionnel 3 ans + plan de trésorerie 12 mois</li>
+<li>☐ Plan de financement bouclé (besoins = ressources)</li>
+<li>☐ Forme juridique, régime fiscal et statut social arbitrés</li>
+<li>☐ Justificatif de domiciliation</li>
+<li>☐ Statuts rédigés et capital déposé (sociétés)</li>
+<li>☐ Annonce légale publiée (sociétés)</li>
+<li>☐ Assurance RC Pro souscrite</li>
+<li>☐ Compte bancaire professionnel ouvert</li>
+<li>☐ CGV, mentions légales et registre RGPD prêts</li>
+<li>☐ Outil de facturation conforme choisi</li>
+</ul>
+<p><strong>Check-list mensuelle de pilotage :</strong> saisie comptable à jour ☐ — rapprochement bancaire ☐ — relance des impayés ☐ — TVA / URSSAF déclarées ☐ — tableau de bord mis à jour (CA, marge, trésorerie à 3 mois) ☐ — 1 action de prospection par semaine réalisée ☐.</p>
+<p><strong>Erreurs les plus fréquentes des créateurs :</strong> sous-estimer le BFR et le délai d'encaissement, prévoir un CA trop optimiste dès le mois 1, négliger la prospection une fois les premiers clients signés, confondre chiffre d'affaires et revenu, oublier de provisionner l'URSSAF et l'impôt, choisir un statut par imitation plutôt que par calcul.</p>`,
+        },
+        {
+          title: "Glossaire et ressources utiles",
+          content: `<p><strong>Glossaire :</strong></p>
+<ul>
+<li><strong>BFR</strong> : besoin en fonds de roulement = stocks + créances clients – dettes fournisseurs.</li>
+<li><strong>EBE</strong> : excédent brut d'exploitation, richesse dégagée par l'activité avant amortissements et financements.</li>
+<li><strong>CAF</strong> : capacité d'autofinancement = résultat net + dotations aux amortissements.</li>
+<li><strong>DSO</strong> : délai moyen de paiement des clients, en jours de CA.</li>
+<li><strong>CAC / LTV</strong> : coût d'acquisition d'un client / valeur générée par ce client sur sa durée de vie.</li>
+<li><strong>Kbis</strong> : extrait d'immatriculation au RCS, carte d'identité de la société.</li>
+<li><strong>TNS</strong> : travailleur non salarié, affilié à la Sécurité sociale des indépendants.</li>
+<li><strong>PDP</strong> : plateforme de dématérialisation partenaire (facturation électronique).</li>
+</ul>
+<p><strong>Ressources officielles :</strong> bpifrance-creation.fr (guides et prévisionnel gratuit), formalites.entreprises.gouv.fr (Guichet Unique INPI), entreprendre.service-public.fr, urssaf.fr et autoentrepreneur.urssaf.fr, impots.gouv.fr (espace professionnel), insee.fr (données de marché), inpi.fr (marques), cnil.fr (RGPD), francetravail.fr (ACRE / ARCE).</p>
+<p><strong>Réseaux d'accompagnement :</strong> BGE, CCI, CMA, Initiative France, Réseau Entreprendre, ADIE, France Active, incubateurs et pépinières territoriales, coopératives d'activité et d'emploi (CAE).</p>`,
+        },
+      ],
+    },
+    {
+
       title: "Quiz et auto-évaluation",
       description: "Vérifier l'acquisition des notions clés du parcours de création d'entreprise.",
       sections: [
