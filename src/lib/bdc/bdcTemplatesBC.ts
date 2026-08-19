@@ -137,16 +137,32 @@ const documentSynthese: BdcDocDef = {
     ];
 
     const objectifs: Array<[string, 0 | 1]> = [
-      ["Analyser ses compétences professionnelles et personnelles", 0],
-      ["Identifier ses aptitudes et ses motivations", 0],
+      [`Analyser ses compétences professionnelles et personnelles au regard de ${metier}`, 0],
+      [`Identifier ses aptitudes, ses intérêts et ses motivations pour ${secteur}`, 0],
       ["Définir un projet professionnel réaliste et, le cas échéant, un projet de formation", (seed % 4 === 0 ? 1 : 0)],
-      ["Élaborer un plan d'action daté et hiérarchisé", 0],
+      ["Élaborer un plan d'action daté, hiérarchisé et assorti de ressources mobilisables", 0],
     ];
     const obsObj = [
-      "Objectif atteint : les éléments recueillis sont formalisés dans le présent document.",
-      "Objectif atteint : les travaux menés en séance permettent une décision éclairée.",
-      "Partiellement atteint : le projet est arrêté, la faisabilité financière reste à confirmer.",
+      `Objectif atteint : les compétences transférables vers ${metier} sont formalisées au point 2 du présent document.`,
+      `Objectif atteint : les investigations menées sur ${secteur} (enquêtes métier, tests, entretiens) permettent une décision éclairée.`,
+      "Partiellement atteint : le projet est arrêté, la faisabilité financière du parcours de formation reste à confirmer.",
+      "Objectif atteint : le plan d'action figurant au point 3 est daté et les appuis sont identifiés.",
     ];
+
+    /* Indicateurs factuels de réalisation de la prestation (indicateur 11). */
+    const nbSeances = seancesFor(ctx, b).length;
+    const indicateursReal: Array<[string, string]> = [
+      ["Heures d'accompagnement réalisées", `${p.dureeTotaleH} h sur ${p.dureeTotaleH} h prévues, soit 100 %`],
+      ["Séances réalisées", `${nbSeances} séances individuelles, du ${fmtDateFR(p.dateDebut)} au ${fmtDateFR(p.dateFin)}`],
+      ["Respect des trois phases réglementaires", "Préliminaire, investigation et conclusion réalisées (art. R6313-4)"],
+      ["Travail intersession", pk(["Réalisé intégralement", "Réalisé, avec un léger décalage sur une enquête métier", "Réalisé, enrichi d'une immersion complémentaire"], 3)],
+      ["Remise du document de synthèse", `Effectuée le ${fmtDateFR(p.dateFin)}, en main propre au bénéficiaire`],
+    ];
+
+    const niveauGlobal = seed % 4 === 0
+      ? "Objectifs globalement atteints — trois objectifs sur quatre pleinement atteints, le quatrième partiellement."
+      : "Objectifs atteints — l'ensemble des objectifs fixés en phase préliminaire est satisfait à l'issue de la prestation.";
+
 
     const appreciation = pk([
       `Démarche sérieuse et régulière. ${nomB} a mobilisé les outils proposés et réalisé le travail intersession. Le projet de ${metier} est cohérent avec le parcours et les contraintes exprimées ; sa mise en œuvre dépend principalement de l'entrée en formation.`,
