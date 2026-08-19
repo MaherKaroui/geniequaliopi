@@ -1,5 +1,5 @@
 import { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
-import { renderBdcNTDocHtml } from "@/lib/bdc/bdcNTConseilsZip";
+import { renderBdcNTDocHtml, renderBdcNTPhaseHtml, renderBdcNTProgrammePhasesHtml } from "@/lib/bdc/bdcNTConseilsZip";
 import { generateBdcNTCalendrierAnnuel, generateBdcNTSuiviAdaptation, generateBdcNTContactsHandicap, generateBdcNTTableauDysfonctionnements } from "@/lib/bdc/bdcNTXlsx";
 import { BDC_NT_STATS_FILES, buildSuivi6MoisIndividuel } from "@/lib/bdc/bdcNTStatsXlsx";
 
