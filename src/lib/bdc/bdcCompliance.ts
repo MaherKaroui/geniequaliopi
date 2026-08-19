@@ -12,6 +12,56 @@ import type { BdcContext } from "./bdcModel";
 /* BLOC 6 — Dictionnaire de substitution BC                            */
 /* ================================================================== */
 
+/**
+ * MESSAGE 17 — Liste d'exclusion : aucune substitution ne s'applique à
+ * l'intérieur de ces chaînes (noms de dispositifs, institutions, libellés
+ * réglementaires et mentions légales obligatoires).
+ */
+export const PHRASES_PROTEGEES: string[] = [
+  "Mon Compte Formation",
+  "formation professionnelle continue",
+  "la formation professionnelle",
+  "ne vaut pas agrément de l'État",
+  "agrément de l'État",
+  "Action de formation par apprentissage",
+  "Action de formation",
+  "Ressource Handicap Formation",
+  "plan de développement des compétences",
+  "Organisme de formation",
+  "organisme de formation",
+  "France Travail",
+  "Transitions Pro",
+  "CNPM",
+  "exercice des droits",
+  "Exercice des droits",
+  "en cours",
+  "En cours",
+  "compte personnel de formation",
+  "Compte personnel de formation",
+  "certificat de réalisation",
+  "Certificat de réalisation",
+];
+
+const TOKEN = (i: number) => `\u0001PROT${i}\u0001`;
+
+/** Remplace les chaînes protégées par des jetons avant toute substitution. */
+function protegerPhrases(texte: string): { texte: string; jetons: string[] } {
+  const jetons: string[] = [];
+  let out = texte;
+  PHRASES_PROTEGEES.forEach((phrase) => {
+    const re = new RegExp(phrase.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g");
+    out = out.replace(re, (m) => {
+      jetons.push(m);
+      return TOKEN(jetons.length - 1);
+    });
+  });
+  return { texte: out, jetons };
+}
+
+function restaurerPhrases(texte: string, jetons: string[]): string {
+  return texte.replace(/\u0001PROT(\d+)\u0001/g, (_m, i) => jetons[Number(i)] ?? "");
+}
+
 export const BDC_VOCABULAIRE_INTERDIT: Array<[RegExp, string]> = [
   [/\bapprenant(e)?s?\b/gi, "bénéficiaire"],
   [/\bélèves?\b/gi, "bénéficiaire"],
@@ -25,12 +75,47 @@ export const BDC_VOCABULAIRE_INTERDIT: Array<[RegExp, string]> = [
   [/\bcorrections? des réponses\b/gi, "remise du document de synthèse"],
   [/\bQCM\b/g, "investigation"],
   [/\bexercices?\b/gi, "exploration"],
-  [/\bacquis\b/gi, "restitution"],
   [/\bcompétences acquises\b/gi, "compétences identifiées"],
+  [/\bacquis\b/gi, "restitution"],
   [/\bmodules?\b/gi, "séance"],
   [/\bcours\b/gi, "phase"],
   [/\bformations?\b/gi, "prestation"],
 ];
+
+/**
+ * MESSAGE 17 — Corrections de non-régression : réparation des textes déjà
+ * corrompus par une substitution appliquée en aveugle.
+ */
+export const CORRECTIONS_SUBSTITUTION: Array<[RegExp, string]> = [
+  [/ne vaut pas (déclaration d'activité|agr[ée]ment) de l'[ÉE]tat/gi, "ne vaut pas agrément de l'État"],
+  [/Action de prestation par apprentissage/gi, "Action de formation par apprentissage"],
+  [/Action de prestation/gi, "Action de formation"],
+  [/Mon Compte prestation/gi, "Mon Compte Formation"],
+  [/(la |une |de )?prestation professionnelle continue/gi, "la formation professionnelle continue"],
+  [/prestation professionnelle/gi, "formation professionnelle"],
+  [/exploration des droits/gi, "Exercice des droits"],
+  [/Ressource Handicap prestation/gi, "Ressource Handicap Formation"],
+  [/une prestation, une prestation ou un secteur/gi, "une prestation, une formation ou un secteur"],
+  [/☐\s*En phase\s*☐\s*Soldée/g, "☐ En cours ☐ Soldée"],
+  [/\ben phase de traitement\b/gi, "en cours de traitement"],
+  [/Organisme de prestation/g, "Organisme de formation"],
+  [/organisme de prestation/g, "organisme de formation"],
+  [/\bmes prestation\b/gi, "mes formations"],
+  [/\bdéclaration d'activité de l'[ÉE]tat\b/gi, "agrément de l'État"],
+];
+
+/** MESSAGE 17 — chaînes interdites après correction (contrôle de non-régression). */
+export const REGRESSIONS_INTERDITES: string[] = [
+  "prestation professionnelle", "Mon Compte prestation", "Action de prestation",
+  "Organisme de prestation", "organisme de prestation", "Handicap prestation",
+  "exploration des droits", "En phase ☐", "déclaration d'activité de l'État",
+  "mes prestation", "une prestation, une prestation",
+];
+
+/** Retourne les régressions de substitution présentes dans un texte rendu. */
+export function findRegressionsSubstitution(texte: string): string[] {
+  return REGRESSIONS_INTERDITES.filter((s) => texte.includes(s));
+}
 
 /** Termes dont la présence dans un document BC déclenche une alerte bloquante. */
 export const BDC_TERMES_BLOQUANTS = [
@@ -46,6 +131,7 @@ const CLAUSES_A_RETIRER = [
   /formations? linguistiques?/i, /hébergement du sous-traitant/i,
   /mobilité (nationale|internationale)/i,
 ];
+
 
 /* ================================================================== */
 /* BLOC 5 — Contenu juridique abrogé                                   */
