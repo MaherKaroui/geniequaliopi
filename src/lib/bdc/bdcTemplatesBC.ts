@@ -171,6 +171,7 @@ const satisfactionChaud: BdcDocDef = {
       "Atteinte de vos objectifs initiaux",
       "Satisfaction globale de la prestation",
     ],
+    "Questionnaire satisfaction à chaud",
   ),
 };
 
@@ -189,6 +190,7 @@ const satisfactionFroid: BdcDocDef = {
         "Appui reçu lors de l'entretien de suivi",
         "Satisfaction globale avec le recul",
       ],
+      "Questionnaire satisfaction à froid",
     )(ctx, b);
     return base;
   },
