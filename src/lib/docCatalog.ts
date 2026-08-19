@@ -1322,7 +1322,6 @@ export function buildFullCatalog(
       );
     });
     // Trames Excel dynamiques (générées comme les autres docs xlsx, prévisualisables et téléchargeables en .xlsx)
-    add("bdc_nt_programme_bdc", "CT1 - IND 1 Programme du bilan de compétences", 1, 1, "bdc_nt_programme_bdc");
     add("bdc_nt_calendrier_annuel", "CT1 - IND 1 Calendrier annuel (Excel)", 1, 1, "bdc_nt_calendrier_annuel");
     add("bdc_nt_suivi_adaptation", "CT3 - IND 10 Suivi de l'adaptation à l'accompagnement (Excel)", 3, 10, "bdc_nt_suivi_adaptation");
     // Programme réglementaire des 3 phases du bilan (Art. R.6313-4 à R.6313-8)
