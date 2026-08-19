@@ -36,7 +36,7 @@ export interface RegleSignature {
 }
 
 export const MATRICE_SIGNATURES: RegleSignature[] = [
-  { rang: 1, motif: /document de synth[èe]se/i, piece: "Document de synthèse R6313-8", roles: ["B", "C", "O"], tampon: true, dateRegle: "derniere_seance", dateLibelle: "date de la dernière séance" },
+  { rang: 1, motif: /document de synth[èe]se/i, piece: "Document de synthèse R6313-8", roles: ["B", "C"], tampon: false, dateRegle: "derniere_seance", dateLibelle: "date de la dernière séance" },
   { rang: 2, motif: /[ée]margement/i, piece: "Feuille d'émargement", roles: ["B", "C"], tampon: false, dateRegle: "par_seance", dateLibelle: "date de la séance concernée" },
   { rang: 3, motif: /satisfaction.*chaud/i, piece: "Questionnaire satisfaction à chaud", roles: ["B"], tampon: false, dateRegle: "fin_plus_7", dateLibelle: "date de fin, au plus tard fin + 7 jours" },
   { rang: 4, motif: /satisfaction.*froid/i, piece: "Questionnaire satisfaction à froid", roles: ["B", "C"], tampon: false, dateRegle: "suivi_6_mois", dateLibelle: "date du suivi à 6 mois" },
@@ -163,7 +163,9 @@ export function blocSignatureHtml(
   const regle = regleFor(nomPiece);
   if (!regle) return "";
   const parties = partiesPour(ctx, regle, b, opts?.dateSeance);
-  const lieu = opts?.lieu || ctx.prestation.lieu || ctx.organisme.ville;
+  // MESSAGE 23 — lieu de signature = ville, jamais la phrase complète de la rubrique LIEU
+  const lieuBrut = opts?.lieu || ctx.organisme.ville || ctx.prestation.lieu || "";
+  const lieu = lieuBrut.length > 40 ? (ctx.organisme.ville || "") : lieuBrut;
   const tampon = regle.tampon ? ctx.organisme.tamponUrl : undefined;
   const cellules = parties
     .map((pa) => celluleHtml(pa, pa.role === "O" ? tampon : undefined))
@@ -172,7 +174,6 @@ export function blocSignatureHtml(
     `<div class="bloc-signature" style="margin-top:18px;">` +
     `<div style="font-size:11px;font-weight:bold;color:#0b2545;margin-bottom:4px;">Signatures — fait à ${lieu}</div>` +
     `<table style="border-collapse:collapse;width:100%;"><tr>${cellules}</tr></table>` +
-    `<div style="font-size:9px;color:#64748b;margin-top:4px;">Date de signature : ${regle.dateLibelle}. Signature manuscrite scannée, tracée dans l'application ou apposée par le signataire, horodatée.</div>` +
     `</div>`
   );
 }

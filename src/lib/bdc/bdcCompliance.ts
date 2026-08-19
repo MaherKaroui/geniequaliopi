@@ -223,7 +223,7 @@ export const FILIGRANE_TIERS = "_[À compléter par la personne concernée]_";
 
 /** Documents dont le contenu déclaratif ne doit JAMAIS être généré. */
 export function isDocumentDeclaratif(titre: string): boolean {
-  return /(satisfaction|verbatim|témoignage|questionnaire|test de positionnement|entretien (interm[ée]diaire|annuel|de recrutement)|analyse (du|de) besoin|fiche d'analyse de besoin|enqu[êe]te|appr[ée]ciation)/i.test(titre);
+  return /(satisfaction|verbatim|témoignage|questionnaire|test de positionnement|entretien interm[ée]diaire|analyse (du|de) besoin|fiche d'analyse de besoin|enqu[êe]te|appr[ée]ciation)/i.test(titre);
 }
 
 export type StatutRubrique = "RENSEIGNE" | "NON_APPLICABLE" | "SOLLICITE_SANS_REPONSE";
@@ -403,10 +403,15 @@ const ORGANISMES_TIERS = [
   "CONTACT.NTCONSEIL@GMAIL.COM", "PAS A PAS", "PAS À PAS", "FORMALERTE",
   "BAKERY SOFYIA", "SELECT FORMATION", "IZIBUSINESS", "FORMAT SPHERE", "VISIONNAIRE INSTITUTE",
 ];
+/** MESSAGE 22 — comparaison normalisée : casse, espaces, points et tirets ignorés. */
+const normTiers = (s: string) => s.toUpperCase().replace(/[\s.\-_'’]/g, "");
 export function findOrganismesTiers(text: string, raisonSociale: string): string[] {
-  const self = raisonSociale.trim().toUpperCase();
-  const up = text.toUpperCase();
-  const hits = ORGANISMES_TIERS.filter((o) => !self.includes(o) && o !== self && up.includes(o));
+  const self = normTiers(raisonSociale);
+  const up = normTiers(text);
+  const hits = ORGANISMES_TIERS.filter((o) => {
+    const n = normTiers(o);
+    return !self.includes(n) && n !== self && up.includes(n);
+  });
   // Un nom court déjà couvert par un nom long n'est pas remonté deux fois.
   return hits.filter((o) => !hits.some((autre) => autre !== o && autre.includes(o)));
 }
