@@ -234,35 +234,92 @@ function veilleReglementaireRows(f: FormationInfo, type: FormationType): string[
   if (type === "creation") {
     return [...common,
       [
-        `<a href="https://entreprendre.service-public.fr/vosdroits/N16789">Service-Public Entreprendre</a>`,
-        "Formalités de création d'entreprise — guichet unique INPI",
-        veilleMonthYear(f, 5),
-        "Le guichet unique électronique de l'INPI centralise depuis 2023 toutes les formalités de création, modification et cessation d'entreprise.",
-        "Preuve : capture du parcours de formalité + PDF de la fiche. Action : mise à jour du module « Démarches de création » et du pas-à-pas remis aux stagiaires."
+        `<a href="https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000037385660">Légifrance – Code du travail, art. L.6313-1</a>`,
+        "Article L.6313-1 — catégories d'actions relevant de la formation professionnelle",
+        veilleDate(f, 9),
+        "L'article définit les actions entrant dans le champ de la formation professionnelle (actions de formation, bilans de compétences, VAE, apprentissage). Une formation « Création d'entreprise » relève de la catégorie « action de formation » dès lors qu'elle vise l'acquisition de compétences entrepreneuriales mobilisables : étude de marché, business model, prévisionnel financier, choix du statut, formalités.",
+        "Preuve : extrait Légifrance daté et archivé. Action : le programme est présenté comme une action de formation avec des objectifs opérationnels évaluables (construire un BMC, bâtir un prévisionnel 3 ans, arbitrer une forme juridique) ; la qualification est reprise sur la convention, la convocation et l'attestation."
       ],
       [
-        `<a href="https://www.urssaf.fr/accueil/independant/creer-mon-entreprise.html">URSSAF – Créateurs</a>`,
-        "Micro-entreprise : plafonds de chiffre d'affaires et taux de cotisations",
-        veilleMonthYear(f, 4),
-        "Plafonds actualisés (188 700 € vente / 77 700 € services) et taux de cotisations sociales applicables aux micro-entrepreneurs.",
-        "Preuve : capture des barèmes URSSAF datée. Action : actualisation des chiffres dans le support de cours et dans les exercices de prévisionnel."
+        `<a href="https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000037386198">Légifrance – Code du travail, art. L.6353-1</a>`,
+        "Article L.6353-1 — contractualisation et information préalable du bénéficiaire",
+        veilleDate(f, 8),
+        "L'action de formation doit être réalisée conformément à un programme préétabli précisant objectifs, moyens pédagogiques, moyens d'encadrement et modalités d'évaluation, et faire l'objet d'un contrat ou d'une convention avec le bénéficiaire ou le financeur.",
+        "Preuve : modèles de contrat et de convention à jour. Action : mise à jour des documents contractuels du parcours Création d'entreprise (intitulé, durée, dates, objectifs, tarif, modalités d'évaluation, conditions d'annulation, contacts) signés avant le démarrage."
       ],
       [
-        `<a href="https://www.economie.gouv.fr/entreprises/aides-creation-entreprise">economie.gouv.fr</a>`,
-        "ACRE, ARCE, NACRE : aides à la création et à la reprise d'entreprise",
+        `<a href="https://entreprendre.service-public.fr/vosdroits/N16789">Service-Public Entreprendre – Guichet unique</a>`,
+        "Formalités de création d'entreprise : guichet unique électronique de l'INPI",
+        veilleMonthYear(f, 7),
+        "Depuis le 1ᵉʳ janvier 2023, l'ensemble des formalités de création, modification et cessation d'entreprise est centralisé sur le guichet unique de l'INPI (formalites.entreprises.gouv.fr), en remplacement des six réseaux de CFE. Les pièces attendues, le parcours en ligne et les délais de délivrance des identifiants (SIREN/SIRET, code APE, Kbis) évoluent régulièrement.",
+        "Preuve : captures datées du parcours de formalité + fiche PDF archivée. Action : réécriture du module « Démarches d'immatriculation » et du pas-à-pas remis aux stagiaires (liste des pièces, dépôt de capital, annonce légale, suivi du dossier)."
+      ],
+      [
+        `<a href="https://www.urssaf.fr/accueil/independant/creer-mon-entreprise.html">URSSAF – Créateurs et indépendants</a>`,
+        "Micro-entreprise : plafonds de chiffre d'affaires, taux de cotisations et déclarations",
         veilleMonthYear(f, 6),
-        "Conditions d'éligibilité et démarches pour l'exonération de cotisations (ACRE) et le versement en capital des droits chômage (ARCE).",
-        "Preuve : fiches d'aides archivées. Action : mise à jour du module « Financement » et du tableau comparatif des aides remis en formation."
+        "Rappel des plafonds applicables (188 700 € pour la vente de marchandises, 77 700 € pour les prestations de services et activités libérales), des taux de cotisations par nature d'activité, du versement libératoire et de l'obligation de déclarer le chiffre d'affaires même nul.",
+        "Preuve : capture des barèmes URSSAF datée. Action : actualisation des chiffres dans le support de cours, dans le comparatif micro / réel et dans les exercices de prévisionnel (calcul du revenu disponible après cotisations)."
+      ],
+      [
+        `<a href="https://www.economie.gouv.fr/entreprises/aides-creation-entreprise">economie.gouv.fr – Aides à la création</a>`,
+        "ACRE, ARCE, NACRE et aides régionales : conditions d'éligibilité",
+        veilleMonthYear(f, 6),
+        "Conditions d'accès à l'exonération partielle de cotisations la première année (ACRE), au versement en capital de 45 % des droits France Travail (ARCE), aux prêts d'honneur et aux dispositifs régionaux d'accompagnement. Les critères d'éligibilité et les taux sont revus chaque année.",
+        "Preuve : fiches d'aides archivées et datées. Action : mise à jour du module « Financement du projet » et du tableau comparatif des aides remis en formation, avec cas chiffrés ACRE / ARCE selon le profil du créateur."
       ],
       [
         `<a href="https://bpifrance-creation.fr/">Bpifrance Création</a>`,
-        "Choix du statut juridique : micro-entreprise, EI, EURL, SASU",
+        "Choix du statut juridique : EI, micro, EURL, SARL, SASU, SAS",
+        veilleMonthYear(f, 5),
+        "Comparatif juridique, fiscal et social actualisé des formes d'entreprise : responsabilité, capital, régime d'imposition (IR/IS), statut social du dirigeant (TNS vs assimilé salarié), coût des cotisations et perspectives de développement.",
+        "Preuve : tableau comparatif Bpifrance archivé. Action : refonte de l'exercice « Choix du statut juridique » avec les données de l'année en cours et intégration du tableau de synthèse dans le support de cours."
+      ],
+      [
+        `<a href="https://www.impots.gouv.fr/professionnel/facturation-electronique">impots.gouv.fr – Facturation électronique</a>`,
+        "Généralisation de la facturation électronique entre entreprises (réforme e-invoicing / e-reporting)",
+        veilleMonthYear(f, 4),
+        "Toutes les entreprises devront être en capacité de recevoir des factures électroniques à compter de septembre 2026, l'obligation d'émission s'appliquant par étapes jusqu'en septembre 2027 pour les PME et microentreprises. Les factures devront transiter par une plateforme agréée (PDP) dans un format structuré (Factur-X, UBL, CII).",
+        "Preuve : page officielle et calendrier archivés. Action : ajout d'une séquence « Facturation conforme et e-invoicing » dans le support de cours, avec check-list des mentions obligatoires et critères de choix d'un outil de facturation compatible."
+      ],
+      [
+        `<a href="https://www.impots.gouv.fr/professionnel/franchise-en-base-de-tva">impots.gouv.fr – TVA</a>`,
+        "Franchise en base de TVA : seuils, sortie de franchise et obligations déclaratives",
+        veilleMonthYear(f, 4),
+        "Seuils de franchise en base (85 000 € pour la vente, 37 500 € pour les services), seuils majorés de tolérance, conséquences du franchissement en cours d'année et mentions obligatoires à porter sur les factures (« TVA non applicable, art. 293 B du CGI »).",
+        "Preuve : fiche fiscale datée. Action : mise à jour du module « Fiscalité » et de l'exercice de facturation ; les stagiaires simulent le passage de la franchise au régime réel simplifié sur leur propre prévisionnel."
+      ],
+      [
+        `<a href="https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000032227330">Légifrance – Code de commerce, art. L.441-9</a>`,
+        "Mentions obligatoires des factures et délais de paiement entre professionnels",
         veilleMonthYear(f, 3),
-        "Comparatif juridique, fiscal et social actualisé des formes d'entreprise pour un créateur seul.",
-        "Preuve : tableau comparatif Bpifrance archivé. Action : refonte de l'exercice « Choix du statut juridique » avec les données de l'année en cours."
+        "L'article fixe les mentions obligatoires de la facture (identification des parties, numéro unique, date, désignation, prix, TVA, date de règlement, pénalités de retard et indemnité forfaitaire de 40 €) ainsi que le plafond légal des délais de paiement (60 jours date de facture ou 45 jours fin de mois).",
+        "Preuve : extrait du Code de commerce archivé. Action : modèle de facture et de devis conformes fournis aux stagiaires, avec exercice de repérage des mentions manquantes et procédure de relance des impayés."
+      ],
+      [
+        `<a href="https://www.cnil.fr/fr/rgpd-par-ou-commencer">CNIL – RGPD : par où commencer</a>`,
+        "Obligations RGPD applicables aux très petites entreprises",
+        veilleMonthYear(f, 3),
+        "Rappel des obligations minimales : registre des traitements, information des personnes, base légale, durées de conservation, sécurité des données et notification des violations sous 72 heures. La CNIL publie des modèles adaptés aux TPE et aux sites vitrines.",
+        "Preuve : guide CNIL TPE-PME archivé. Action : intégration d'une séquence « RGPD et protection des données du créateur » (registre type, mentions de formulaire, politique de confidentialité) et actualisation des mentions du site vitrine étudié en atelier."
+      ],
+      [
+        `<a href="https://www.inpi.fr/proteger-vos-creations/proteger-votre-marque">INPI – Protéger sa marque</a>`,
+        "Dépôt de marque : recherche d'antériorité, classes et coût",
+        veilleMonthYear(f, 2),
+        "Procédure de dépôt en ligne, recherche d'antériorité préalable, choix des classes de produits et services, barème en vigueur (190 € pour une classe, 40 € par classe supplémentaire) et durée de protection de 10 ans renouvelable.",
+        "Preuve : barème et fiche INPI datés. Action : ajout d'un atelier « Protéger son nom commercial et sa marque » (recherche d'antériorité en direct, réservation du nom de domaine et des comptes sociaux) au module Lancement."
+      ],
+      [
+        `<a href="https://entreprendre.service-public.fr/vosdroits/F22421">Service-Public – Assurances professionnelles</a>`,
+        "Assurances obligatoires et recommandées du chef d'entreprise",
+        veilleMonthYear(f, 2),
+        "Recensement des obligations selon l'activité : responsabilité civile professionnelle, garantie décennale pour le bâtiment, assurance des véhicules professionnels, multirisque des locaux, prévoyance et mutuelle du dirigeant.",
+        "Preuve : fiche officielle archivée. Action : mise à jour de la check-list « Prêt à démarrer » remise en fin de parcours et de l'exercice d'identification des risques par secteur d'activité du projet de chaque stagiaire."
       ],
     ];
   }
+
 
   if (type === "fle") {
     return [...common,
