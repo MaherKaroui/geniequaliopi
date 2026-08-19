@@ -50,6 +50,12 @@ function detectFormationType(f: FormationInfo): FormationType {
   return "word";
 }
 
+function isTypeExplicit(f: FormationInfo, type: FormationType): boolean {
+  if (type !== "word") return true;
+  const t = (f.intitule || "").toLowerCase();
+  return t.includes("word") || t.includes("bureautique");
+}
+
 // ===== Fallback générique cohérent avec l'intitulé (utilisé tant que l'IA n'a pas régénéré) =====
 function genericVeilleRows(
   f: FormationInfo,
@@ -711,9 +717,10 @@ function veilleReglementaireRows(f: FormationInfo, type: FormationType): string[
 export function genVeilleReglementaireV2(o: OrganismeInfo, f: FormationInfo) {
   const type = detectFormationType(f);
   const aiPack = getCachedVeillePack(f);
+  const curated = isTypeExplicit(f, type) ? veilleReglementaireRows(f, type) : [];
   const rows = aiPack?.reglementaire?.length
     ? veilleRowsToTable(aiPack.reglementaire)
-    : genericVeilleRows(f, "reglementaire");
+    : (curated.length ? curated : genericVeilleRows(f, "reglementaire"));
   return buildDocument({ org: o, title: "Veille réglementaire", table: {
     headers: ["Liens", "Nom de l'article / Texte", "Date du texte", "Commentaire", "Exploitation de veille (preuve + action Qualiopi)"],
     rows,
@@ -1324,9 +1331,10 @@ function veilleMetierRows(f: FormationInfo, type: FormationType): string[][] {
 export function genVeilleMetierV2(o: OrganismeInfo, f: FormationInfo) {
   const type = detectFormationType(f);
   const aiPack = getCachedVeillePack(f);
+  const curated = isTypeExplicit(f, type) ? veilleMetierRows(f, type) : [];
   const rows = aiPack?.metier?.length
     ? veilleRowsToTable(aiPack.metier)
-    : genericVeilleRows(f, "metier");
+    : (curated.length ? curated : genericVeilleRows(f, "metier"));
   return buildDocument({ org: o, title: "Tableau de veille métier", table: {
     headers: ["Lien (article / vidéo / événement)", "Nom de l'article / Vidéo / Événement", "Date", "Commentaire – Analyse métier", "Exploitation de veille (preuve + action Qualiopi)"],
     rows,
@@ -1827,9 +1835,10 @@ function veilleTechnoRows(f: FormationInfo, type: FormationType): string[][] {
 export function genVeilleTechnologiqueV2(o: OrganismeInfo, f: FormationInfo) {
   const type = detectFormationType(f);
   const aiPack = getCachedVeillePack(f);
+  const curated = isTypeExplicit(f, type) ? veilleTechnoRows(f, type) : [];
   const rows = aiPack?.technologique?.length
     ? veilleRowsToTable(aiPack.technologique)
-    : genericVeilleRows(f, "technologique");
+    : (curated.length ? curated : genericVeilleRows(f, "technologique"));
   return buildDocument({ org: o, title: "Tableau de veille technologique", table: {
     headers: ["Lien (vrai)", "Nom / Titre de l'article", "Date", "Commentaire (veille technologique)", "Exploitation de veille vérifiable (preuve + action Qualiopi)"],
     rows,
