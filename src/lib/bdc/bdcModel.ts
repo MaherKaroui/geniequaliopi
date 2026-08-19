@@ -290,7 +290,12 @@ function buildBeneficiaire(s: StagiaireInfo, idx: number): Beneficiaire {
  * horaires pour qu'aucun bénéficiaire ne partage la même séance qu'un autre
  * (un consultant unique ne peut pas conduire deux entretiens simultanés).
  */
-export function buildSeances(p: Omit<Prestation, "seances">, b?: Beneficiaire, rang = 0): Seance[] {
+export function buildSeances(
+  p: Omit<Prestation, "seances">,
+  b?: Beneficiaire,
+  rang = 0,
+  prises: Seance[] = [],
+): Seance[] {
   const total = Math.min(p.dureeEntretiensH, 24);
   const repartition: Array<{ phase: 1 | 2 | 3; part: number; objet: string }> = [
     { phase: 1, part: 0.2, objet: "Phase préliminaire — analyse de la demande et du besoin, information sur les conditions de déroulement" },
@@ -306,6 +311,15 @@ export function buildSeances(p: Omit<Prestation, "seances">, b?: Beneficiaire, r
   const spanDays = Math.max(1, Math.round((p.dateFin.getTime() - p.dateDebut.getTime()) / 86400000));
   // créneaux alternés : matin / début d'après-midi / fin d'après-midi
   const debutsPossibles = [9, 14, 16];
+  // V24 — un consultant unique ne peut pas recevoir deux bénéficiaires en même temps.
+  const memeJour = (a: Date, c: Date) =>
+    a.getFullYear() === c.getFullYear() && a.getMonth() === c.getMonth() && a.getDate() === c.getDate();
+  const occupe = (date: Date, debut: number, duree: number) =>
+    prises.some((s) => {
+      if (!memeJour(s.date, date)) return false;
+      const sd = parseInt(s.heureDebut.slice(0, 2), 10) + (s.heureDebut.endsWith("30") ? 0.5 : 0);
+      return debut < sd + s.duree && sd < debut + duree;
+    });
   let numero = 1;
   for (const r of repartition) {
     let h = Math.round(total * r.part);
@@ -316,17 +330,34 @@ export function buildSeances(p: Omit<Prestation, "seances">, b?: Beneficiaire, r
       while (!jours.includes(JOURS_FR[cursor.getDay()]) && guard < 14) {
         cursor.setDate(cursor.getDate() + 1); guard++;
       }
-      const hDeb = debutsPossibles[(rang + numero) % debutsPossibles.length];
+      // recherche d'un créneau libre pour le consultant (jour puis jours suivants)
+      let hDeb = debutsPossibles[(rang + numero) % debutsPossibles.length];
+      let libre = false;
+      let tours = 0;
+      while (!libre && tours < 60) {
+        for (let k = 0; k < debutsPossibles.length; k++) {
+          const cand = debutsPossibles[(rang + numero + k) % debutsPossibles.length];
+          if (!occupe(cursor, cand, duree)) { hDeb = cand; libre = true; break; }
+        }
+        if (!libre) {
+          cursor.setDate(cursor.getDate() + 1);
+          let g2 = 0;
+          while (!jours.includes(JOURS_FR[cursor.getDay()]) && g2 < 14) { cursor.setDate(cursor.getDate() + 1); g2++; }
+        }
+        tours++;
+      }
       const heureDebut = `${String(hDeb).padStart(2, "0")}:00`;
       const heureFin = `${String(Math.min(20, hDeb + duree)).padStart(2, "0")}:00`;
-      seances.push({
+      const seance: Seance = {
         numero: numero++,
         phase: r.phase,
         date: new Date(cursor),
         heureDebut, heureFin, duree,
         modalite: p.modalite === "distanciel" ? "distanciel" : "presentiel",
         objet: r.objet,
-      });
+      };
+      seances.push(seance);
+      prises.push(seance);
       h -= duree;
       cursor = new Date(cursor);
       cursor.setDate(cursor.getDate() + Math.max(2, Math.floor(spanDays / Math.max(1, total / 2))));
