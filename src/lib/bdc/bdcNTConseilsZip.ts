@@ -2204,24 +2204,9 @@ export async function buildBDCNTConseilsZip(
     entreprise: "", poste: "", dateNaissance: "",
   } as StagiaireInfo];
 
-  // README global
-  const totalDocs = keys.length + BDC_NT_STATIC_ASSETS.length;
-  const readme = [
-    "DOSSIER BILAN DE COMPÉTENCES — TRAME NT CONSEILS",
-    "================================================",
-    "",
-    `Organisme : ${org.nom}`,
-    `SIRET : ${org.siret}    NDA : ${org.nda}`,
-    `Bénéficiaires : ${benList.length}`,
-    "",
-    "Structure :",
-    "  - Critere_X / Indicateur_Y / documents collectifs",
-    "  - Critere_X / Indicateur_Y / Bénéficiaire - Prénom NOM / documents nominatifs",
+  // MESSAGE 23 — le LISEZMOI est écrit en fin de génération, avec le décompte
+  // réel des fichiers et le nom de l'organisme du dossier (jamais celui d'un tiers).
 
-    "",
-    `Total documents : ${totalDocs} par bénéficiaire pour les nominatifs.`,
-  ].join("\n");
-  zip.file("LISEZMOI.txt", readme);
 
   let step = 0;
   const totalSteps = keys.length + keys.filter(k => BDC_NT_PER_BENEFICIAIRE.has(k)).length * (benList.length - 1) + BDC_NT_STATIC_ASSETS.length;
