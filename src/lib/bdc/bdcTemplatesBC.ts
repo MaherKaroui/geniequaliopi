@@ -103,6 +103,20 @@ function heuresFR(h: number): string {
   return min ? `${entier} h ${String(min).padStart(2, "0")}` : `${entier} h`;
 }
 
+/** Clés techniques → libellés accentués destinés aux documents. */
+const LIB_MODALITE: Record<string, string> = {
+  presentiel: "Présentiel",
+  distanciel: "Distanciel synchrone",
+  mixte: "Mixte (présentiel et distanciel)",
+};
+const LIB_CRENEAU: Record<string, string> = {
+  matin: "matin",
+  "apres-midi": "après-midi",
+  soir: "soirée",
+};
+export const libModalite = (m: string): string => LIB_MODALITE[m] ?? m;
+export const libCreneau = (c: string): string => LIB_CRENEAU[c] ?? c;
+
 const feuillesEmargement: BdcDocDef = {
   nom: "Indicateur 11 - Feuilles d'émargement par séance",
   indicateur: 11,
