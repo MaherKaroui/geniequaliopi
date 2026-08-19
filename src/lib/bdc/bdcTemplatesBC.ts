@@ -5,7 +5,7 @@
  * Tous les contenus dérivent du BdcContext (BLOC 1) : aucune valeur en dur.
  */
 import type { BdcContext, Beneficiaire, Prestation, Organisme } from "./bdcModel";
-import { fmtDateFR, formatDuree, formatPrix, mentionNDA, typeContrat } from "./bdcModel";
+import { fmtDateFR, formatDuree, formatPrix, mentionNDA, typeContrat, seancesFor } from "./bdcModel";
 import { ECHELLE_SATISFACTION, FILIGRANE_BENEFICIAIRE, MENTION_CPF_SATISFACTION, mentionStatut } from "./bdcCompliance";
 
 export interface BdcDocDef {
@@ -93,9 +93,10 @@ const feuillesEmargement: BdcDocDef = {
   contractuelle: true,
   build: (ctx, b) => {
     const { organisme: o, prestation: p } = ctx;
+    const seances = seancesFor(ctx, b);
     const parts: string[] = [H("Feuilles d'émargement"), entete(o, b, p)];
     let cumul = 0;
-    for (const s of p.seances) {
+    for (const s of seances) {
       cumul += s.duree;
       parts.push(
         H2(`Séance n° ${s.numero} — Phase ${s.phase}`),
@@ -110,8 +111,8 @@ const feuillesEmargement: BdcDocDef = {
       H2("Récapitulatif cumulé des heures réalisées"),
       "| Séance | Date | Durée | Cumul |",
       "|---|---|---|---|",
-      ...p.seances.map((s, i) => {
-        const c = p.seances.slice(0, i + 1).reduce((a, x) => a + x.duree, 0);
+      ...seances.map((s, i) => {
+        const c = seances.slice(0, i + 1).reduce((a, x) => a + x.duree, 0);
         return `| ${s.numero} | ${fmtDateFR(s.date)} | ${s.duree} h | ${c} h |`;
       }),
       `| **Total** |  | **${cumul} h** | **${cumul} h** |`,
@@ -339,8 +340,8 @@ const planningPrevisionnel: BdcDocDef = {
       b ? `**Disponibilités déclarées** : ${b.joursDisponibles.join(", ")} — ${b.creneauxDisponibles.join(", ")}\n` : "",
       "| Séance | Phase | Date | Horaires | Durée | Modalité | Objet |",
       "|---|---|---|---|---|---|---|",
-      ...p.seances.map((s) => `| ${s.numero} | ${s.phase} | ${fmtDateFR(s.date)} | ${s.heureDebut}–${s.heureFin} | ${s.duree} h | ${s.modalite} | ${s.objet.split("—")[0].trim()} |`),
-      `| **Total entretiens** |  |  |  | **${p.seances.reduce((a, s) => a + s.duree, 0)} h** |  |  |`,
+      ...seancesFor(ctx, b).map((s) => `| ${s.numero} | ${s.phase} | ${fmtDateFR(s.date)} | ${s.heureDebut}–${s.heureFin} | ${s.duree} h | ${s.modalite} | ${s.objet.split("—")[0].trim()} |`),
+      `| **Total entretiens** |  |  |  | **${seancesFor(ctx, b).reduce((a, s) => a + s.duree, 0)} h** |  |  |`,
       "",
       formatDuree(p),
       SIGN(["Le bénéficiaire", "Le consultant"]),
