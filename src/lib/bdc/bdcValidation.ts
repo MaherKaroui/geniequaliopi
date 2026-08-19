@@ -38,19 +38,28 @@ export interface RenduDocuments {
 
 const DAY = 86400000;
 
-/** Prénoms usuellement féminins : sert uniquement à demander une confirmation. */
-const PRENOMS_FEMININS = [
+/**
+ * Prénoms sans ambiguïté : aucune heuristique de terminaison (« Yassine »,
+ * « Sacha » ou « Karim » seraient signalés à tort). Seule une liste explicite
+ * de prénoms très majoritairement féminins déclenche une demande de confirmation.
+ */
+const PRENOMS_FEMININS = new Set([
   "rahma", "fatima", "sabrina", "amina", "sarah", "nadia", "leila", "maria", "sofia",
   "yasmine", "karima", "samira", "laura", "julie", "marie", "sandrine", "aicha", "khadija",
   "nawel", "imane", "sonia", "myriam", "hanane", "assia", "linda", "elodie", "camille",
-];
+]);
+
+/** Prénoms masculins fréquents à terminaison « féminine » : jamais signalés. */
+const PRENOMS_MASCULINS = new Set([
+  "yassine", "amine", "hocine", "mohamed", "karim", "sacha", "yanis", "hamza", "nabil",
+  "sofiane", "zine", "ilyes", "anthonin", "come", "côme", "noa", "elia", "andrea", "luca",
+]);
 
 /** Vrai si la civilité retenue contredit vraisemblablement le prénom. */
 function feminiteDouteuse(prenom: string, civilite: string): boolean {
-  const p = (prenom || "").trim().toLowerCase();
-  if (!p) return false;
-  const feminin = PRENOMS_FEMININS.includes(p) || /(a|ia|ah|ine|elle|ette)$/.test(p);
-  return feminin && /^m\.?$/i.test(civilite.trim());
+  const p = (prenom || "").trim().toLowerCase().split(/[\s-]/)[0];
+  if (!p || PRENOMS_MASCULINS.has(p)) return false;
+  return PRENOMS_FEMININS.has(p) && /^m\.?$/i.test(civilite.trim());
 }
 
 
