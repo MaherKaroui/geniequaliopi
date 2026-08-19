@@ -1073,8 +1073,30 @@ ${besoin}
 Question 6 : Qu'attendez-vous spécifiquement de ce bilan de compétences ?
 
 ${attentes}
+
+**GRILLE D'ÉVALUATION DU POSITIONNEMENT INITIAL** _(cotation de 1 à 5 : 1 = très insuffisant, 5 = très satisfaisant)_
+
+| Critère évalué | Note | Observation du consultant |
+|---|---|---|
+${criteres.map((c) => `| ${c.libelle} | **${c.note}/5** | ${c.obs} |`).join("\n")}
+| **TOTAL** | **${totalNote}/${criteres.length * 5}** | Soit ${moyenne20}/20 — niveau de positionnement : **${niveau}** |
+
+**APPRÉCIATION DU CONSULTANT**
+
+${appreciation}
+
+**Axes de travail retenus pour la phase d'investigation :** ${axesTravail}
+
+**Consultant :** ${consultantNom}
+
+**Date de passation :** ${datePassation}
+
+| Signature du bénéficiaire | Signature du consultant |
+|---|---|
+| ${nom} | ${consultantNom} |
 `, s.civilite);
 }
+
 
 /** Programme détaillé des 3 phases réglementaires du bilan (art. R.6313-4 à R.6313-8 du Code du travail). */
 function buildProgrammePhasesMd(org: OrganismeInfo, dates: DatesCtx, formation?: FormationInfo): string {
