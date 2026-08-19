@@ -1167,7 +1167,7 @@ function buildProgrammePhasesMd(org: OrganismeInfo, dates: DatesCtx, formation?:
 *Référence réglementaire : articles L.6313-4 et R.6313-4 à R.6313-8 du Code du travail*
 
 Prestation : Bilan de compétences — du ${dates.dateDebut} au ${dates.dateFin}
-Durée totale : **${total} heures** dont **${hAccomp} h** d'accompagnement individuel avec le consultant et **${hPerso} h** de travail personnel guidé.
+Durée totale : **${total} heures** d'accompagnement individuel avec le consultant (dont ${hAccomp} h réparties sur les 3 phases), le travail personnel guidé entre les séances n'étant pas décompté de la durée facturée.
 Consultant référent : ${consultant}
 Modalités générales : prestation **strictement individuelle**, en présentiel dans nos locaux et/ou en visioconférence (au choix du bénéficiaire), séances de 2 à 3 heures espacées de 7 à 15 jours, sur une amplitude maximale de 3 mois. Confidentialité absolue : aucun document n'est transmis à un tiers sans l'accord écrit du bénéficiaire.
 
