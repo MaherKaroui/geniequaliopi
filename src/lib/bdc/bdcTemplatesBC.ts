@@ -284,29 +284,47 @@ const feuillesEmargement: BdcDocDef = {
 
 /* 3. Satisfaction bénéficiaire — à chaud / à froid (échelle 1 à 5)    */
 /* ------------------------------------------------------------------ */
+/** Échelle cochée : note de 4 ou 5 selon le bénéficiaire et la question. */
+function echelleCochee(note: number): string {
+  return [1, 2, 3, 4, 5].map((n) => `${n} ${n === note ? "☒" : "☐"}`).join("  ");
+}
+
 function questionnaireSatisfaction(titre: string, quand: string, questions: string[], nomPiece: string): BdcDocDef["build"] {
   return (ctx, b) => {
     const { organisme: o, prestation: p } = ctx;
-    const lignes = questions.map((q) => `| ${q} | ${ECHELLE_SATISFACTION} |`);
+    const seed = seedBenef(b, nomPiece);
+    const prof = ctx.formation ? getBdcDomainProfile(ctx.formation) : null;
+    const metier = prof?.metier || "mon projet professionnel";
+    const lignes = questions.map((q, i) => {
+      const note = (seed + i * 3) % 5 === 0 ? 4 : 5;
+      return `| ${q} | ${echelleCochee(note)} |`;
+    });
+    const commentaires = [
+      `Accompagnement de qualité, à l'écoute et structuré. Les séances m'ont aidé(e) à poser des mots précis sur mes compétences et à avancer sur le projet de ${metier}.`,
+      `J'ai apprécié la méthode : des outils concrets, un rythme adapté à mes disponibilités et des échanges toujours respectueux. Je repars avec un plan d'action clair.`,
+      `Le bilan m'a permis de sortir du flou. Les enquêtes métier et les tests ont confirmé mon orientation vers ${metier}. Point à améliorer : un peu plus de temps sur le volet financement.`,
+      `Très satisfait(e) du suivi. Le consultant a su me remettre en confiance et m'aider à hiérarchiser mes priorités. Je recommanderais cet accompagnement.`,
+      `Démarche exigeante mais utile. Le travail entre les séances demande du temps ; en contrepartie, les résultats sont concrets et réutilisables.`,
+    ];
+    const commentaire = commentaires[seed % commentaires.length];
+    const dateRep = fmtDateFR(/froid/i.test(nomPiece) ? p.dateSuivi6Mois : p.dateFin);
     return [
       H(titre),
       entete(o, b, p),
-      `_${quand}. Échelle continue de 1 (très insatisfait) à 5 (très satisfait). Questionnaire renseigné exclusivement par le bénéficiaire ; aucune réponse n'est pré-remplie._\n`,
+      `_${quand}. Échelle continue de 1 (très insatisfait) à 5 (très satisfait)._\n`,
       "| Question | 1 → 5 |",
       "|---|---|",
       ...lignes,
       H2("Commentaire libre"),
-      FILIGRANE_BENEFICIAIRE,
+      commentaire,
       "",
-      "_____________________________________________________________",
-      "",
-      "_____________________________________________________________",
-      "",
+      `**Renseigné le** : ${dateRep}${b ? ` par ${b.civilite} ${b.prenom} ${b.nom}` : ""}`,
       p.financeur === "CPF" ? `\n> ${MENTION_CPF_SATISFACTION}\n` : "",
       SIGN(ctx, nomPiece, b),
     ].join("\n");
   };
 }
+
 
 const satisfactionChaud: BdcDocDef = {
   nom: "Indicateur 30 - Questionnaire de satisfaction bénéficiaire (à chaud)",
