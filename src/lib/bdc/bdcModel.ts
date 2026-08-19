@@ -6,6 +6,7 @@
  * aucune phrase de durée réécrite localement (cf. formatDuree).
  */
 import type { OrganismeInfo, FormationInfo, StagiaireInfo } from "@/types/qualiopi";
+import { genererPlanning } from "../generateurPlanning";
 
 export type Jour = "lundi" | "mardi" | "mercredi" | "jeudi" | "vendredi" | "samedi" | "dimanche";
 export type Creneau = "matin" | "apres-midi" | "soir";
@@ -27,6 +28,10 @@ export interface Organisme {
   referentHandicap: { nom: string; email: string; telephone: string };
   mediateurConsommation: { nom: string; adresse: string; urlSaisine: string };
   tribunalCompetent: string;
+  /** Signature du représentant légal (PNG transparent, stockée en base) */
+  signatureUrl?: string;
+  /** Tampon de l'organisme (PNG transparent, téléversé une seule fois) */
+  tamponUrl?: string;
 }
 
 export interface Beneficiaire {
@@ -43,6 +48,9 @@ export interface Beneficiaire {
   creneauxDisponibles: Creneau[];
   situationHandicap: boolean;
   amenagements?: string;
+  /** Signature manuscrite du bénéficiaire (tracé ou image téléversée) */
+  signatureUrl?: string;
+  signatureDateAjout?: string;
 }
 
 export interface Seance {
@@ -69,7 +77,7 @@ export interface Prestation {
   lieu: string;
   prixHT: number; prixTTC: number;
   seances: Seance[];
-  consultant: { nom: string; qualification: string; cvJoint: boolean };
+  consultant: { nom: string; qualification: string; cvJoint: boolean; signatureUrl?: string; signatureDateAjout?: string };
 }
 
 export interface BdcContext {
@@ -266,6 +274,7 @@ function buildBeneficiaire(s: StagiaireInfo, idx: number): Beneficiaire {
     creneauxDisponibles: ["matin", "apres-midi"],
     situationHandicap: s.rqth === "oui",
     amenagements: s.rqth === "oui" ? "À définir avec le référent handicap" : undefined,
+    signatureUrl: s.signatureUrl || "",
   };
 }
 
@@ -362,6 +371,8 @@ export function buildBdcContext(
       urlSaisine: "https://cnpm-mediation-consommation.eu",
     },
     tribunalCompetent: tribunalFromCodePostal(cp),
+    signatureUrl: org.signatureUrl || "",
+    tamponUrl: org.tamponUrl || "",
   };
 
   const beneficiaires = (stagiaires || []).map(buildBeneficiaire);
@@ -398,12 +409,19 @@ export function buildBdcContext(
       nom: formation.formateur || org.dirigeant || "",
       qualification: "Consultant en bilan de compétences",
       cvJoint: true,
+      signatureUrl: formation.formateurSignatureUrl || org.signatureUrl || "",
     },
   };
 
+  // Planning calculé (MESSAGE 15) : phases légales, jours disponibles, hors
+  // dimanches/fériés, sans collision entre bénéficiaires d'un même consultant.
   const seancesParBeneficiaire: Record<string, Seance[]> = {};
+  const dejaPosees: Seance[] = [];
   beneficiaires.forEach((b, i) => {
-    seancesParBeneficiaire[b.id] = buildSeances(base, b, i);
+    const res = genererPlanning({ ...base, seances: [] }, b, { rang: i, seancesConsultant: dejaPosees });
+    const seances = res.ok && res.seances.length ? res.seances : buildSeances(base, b, i);
+    dejaPosees.push(...seances);
+    seancesParBeneficiaire[b.id] = seances;
   });
 
   return {
