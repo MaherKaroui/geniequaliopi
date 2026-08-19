@@ -18,6 +18,8 @@ import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import { toast } from "sonner";
 import DocStyleConfigPanel from "./DocStyleConfigPanel";
+import BdcControleCoherence from "./BdcControleCoherence";
+
 import SignatairesConnexionForm from "./SignatairesConnexionForm";
 import { downloadAsWord, htmlToWordBlob, htmlToWordBlobSync } from "@/lib/wordExport";
 import { generateExcelTableauBordPerformance, generateExcelTableauSuiviParcours, generateExcelIndicateursPrevisionnelsVAE, excelToBlob } from "@/lib/xlsxGenerator";
