@@ -435,6 +435,7 @@ export function buildBdcContext(
     beneficiaires,
     prestation: { ...base, seances: seancesParBeneficiaire[beneficiaires[0]?.id] || buildSeances(base, beneficiaires[0], 0) },
     seancesParBeneficiaire,
+    formation,
   };
 
 }
