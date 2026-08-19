@@ -23,6 +23,10 @@ export const BDC_NT_PER_BENEFICIAIRE = new Set<string>([
 ]);
 
 export const BDC_NT_SOURCE: Record<string, string> = {
+  "Indicateur 10/Indicateur 10 - Programme des 3 phases du bilan de compétences": `[Généré dynamiquement]`,
+  "Indicateur 10/Indicateur 10 - Phase 1 - Phase préliminaire": `[Généré dynamiquement]`,
+  "Indicateur 10/Indicateur 10 - Phase 2 - Phase d'investigation": `[Généré dynamiquement]`,
+  "Indicateur 10/Indicateur 10 - Phase 3 - Phase de conclusion": `[Généré dynamiquement]`,
   "Indicateur 1/1. Process g\u00e9n\u00e9ral": `# 1. Diffusion de l'information
 
 Lorsqu\\'une demande concernant la prestation arrive, ABDULHALIK
