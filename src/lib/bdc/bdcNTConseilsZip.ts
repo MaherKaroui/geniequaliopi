@@ -2129,7 +2129,7 @@ export function renderBdcNTDocHtml(
   const effectiveRaw = personalized ?? raw;
   let md = applySubstitutions(effectiveRaw, org, stagiaire, dates, formation, nbBeneficiaires);
   // BLOCS 3/5/6/9 — vocabulaire BC, droit à jour, anti-fabrication, corrections de rendu
-  md = sanitizeBdcMarkdown(md, { titre: title, categorieAction: "BC" });
+  md = sanitizeBdcMarkdown(md, { titre: title, categorieAction: "BC", antiFabrication: antiFabricationPour(title) });
 
 
 
@@ -2313,7 +2313,7 @@ export async function buildBDCNTConseilsZip(
     const dates = computeDates(s || undefined, org, formation);
     let md = applySubstitutions(rawMd, org, s, dates, formation, benList.length);
     // BLOCS 3/5/6/9
-    md = sanitizeBdcMarkdown(md, { titre: title, categorieAction: "BC" });
+    md = sanitizeBdcMarkdown(md, { titre: title, categorieAction: "BC", antiFabrication: antiFabricationPour(title) });
 
     // Bilan en cours : on neutralise les évaluations finales
     if (!dates.bilanTermine && /Certificat de réalisation|Compte rendu de fin/i.test(title)) {
