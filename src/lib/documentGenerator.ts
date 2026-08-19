@@ -254,8 +254,6 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
       const s = (template === "bdc_nt_doc_per_ben" && typeof si === "number") ? stagiaires[si] || null : null;
       return renderBdcNTDocHtml(sourceKey, o, s, f, stagiaires.length);
     }
-    case "bdc_nt_programme_bdc":
-      return renderBdcNTProgrammeBDCHtml(o, f, stagiaires[0] || null);
     case "bdc_nt_programme_phases":
       return renderBdcNTProgrammePhasesHtml(o, f, stagiaires[0] || null);
     case "bdc_nt_phase": {
