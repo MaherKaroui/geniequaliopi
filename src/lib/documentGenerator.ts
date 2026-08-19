@@ -254,6 +254,12 @@ function _generateDocumentByIdInner(docId: string, template: string, params: Rec
       const s = (template === "bdc_nt_doc_per_ben" && typeof si === "number") ? stagiaires[si] || null : null;
       return renderBdcNTDocHtml(sourceKey, o, s, f, stagiaires.length);
     }
+    case "bdc_nt_programme_phases":
+      return renderBdcNTProgrammePhasesHtml(o, f, stagiaires[0] || null);
+    case "bdc_nt_phase": {
+      const ph = Number(params?.phase ?? 1) as 1 | 2 | 3;
+      return renderBdcNTPhaseHtml(ph, o, f, stagiaires[0] || null);
+    }
     case "bdc_nt_calendrier_annuel":
       return generateBdcNTCalendrierAnnuel(o);
     case "bdc_nt_suivi_adaptation":
