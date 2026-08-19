@@ -333,10 +333,14 @@ export interface SanitizeOptions {
 export function sanitizeBdcMarkdown(md: string, opts: SanitizeOptions): string {
   let out = md;
 
+  // MESSAGE 17 — protection des libellés réglementaires et noms de dispositifs
+  const { texte: protege, jetons } = protegerPhrases(out);
+  out = protege;
+
   // BLOC 5 — droit abrogé
   for (const [re, rep] of MENTIONS_ABROGEES) out = out.replace(re, rep);
 
-  // BLOC 6 — vocabulaire BC + clauses inadaptées
+  // BLOC 6 — vocabulaire BC + clauses inadaptées (mot entier uniquement)
   if (!opts.categorieAction || opts.categorieAction === "BC") {
     for (const [re, rep] of BDC_VOCABULAIRE_INTERDIT) out = out.replace(re, rep);
     out = out
@@ -344,6 +348,11 @@ export function sanitizeBdcMarkdown(md: string, opts: SanitizeOptions): string {
       .filter((line) => !CLAUSES_A_RETIRER.some((re) => re.test(line)))
       .join("\n");
   }
+
+  out = restaurerPhrases(out, jetons);
+  // MESSAGE 17 — réparation des substitutions abusives héritées des trames
+  for (const [re, rep] of CORRECTIONS_SUBSTITUTION) out = out.replace(re, rep);
+
 
   // BLOC 3 — anti-fabrication
   if (opts.antiFabrication ?? isDocumentDeclaratif(opts.titre)) {
