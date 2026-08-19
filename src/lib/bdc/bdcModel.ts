@@ -458,7 +458,7 @@ export function buildBdcContext(
   const dejaPosees: Seance[] = [];
   beneficiaires.forEach((b, i) => {
     const res = genererPlanning({ ...base, seances: [] }, b, { rang: i, seancesConsultant: dejaPosees });
-    const seances = res.ok && res.seances.length ? res.seances : buildSeances(base, b, i);
+    const seances = res.ok && res.seances.length ? res.seances : buildSeances(base, b, i, dejaPosees);
     dejaPosees.push(...seances);
     seancesParBeneficiaire[b.id] = seances;
   });
