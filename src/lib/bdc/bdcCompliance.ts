@@ -290,21 +290,38 @@ function normalizeBlock(s: string): string {
   return s.replace(/\s+/g, " ").trim().toLowerCase();
 }
 
-/** Compare les champs libres entre bénéficiaires : bloc identique > 40 caractères = blocage. */
+/** Rubriques déclaratives : seules zones où une duplication est suspecte (V23). */
+const RUBRIQUES_DECLARATIVES =
+  /(commentaire|verbatim|réponse|remarque|observation|compte rendu|attentes?|motivation|projet|ressenti|appréciation|analyse du besoin|synthèse de l'entretien)/i;
+
+/** Titres, en-têtes, clauses types et mentions légales : identiques par nature. */
+const BLOCS_NON_DECLARATIFS =
+  /^(#|\*\*|\||article|clause|conform|le présent|conditions|art\.|organisme|siret|nda|adresse|consultant|bénéficiaire|période|durée|entre les soussignés|signatures?|fait à|version|édition)/i;
+
+/** Compare les champs déclaratifs entre bénéficiaires : bloc identique > 40 caractères = blocage. */
 export function detectDuplication(docsParBeneficiaire: Record<string, string[]>): DuplicationHit[] {
   const names = Object.keys(docsParBeneficiaire);
   const blocksByName: Record<string, Set<string>> = {};
   for (const n of names) {
     const set = new Set<string>();
     for (const doc of docsParBeneficiaire[n]) {
-      for (const para of doc.split(/\n{2,}|\n\|/)) {
+      const paras = doc.split(/\n{2,}/);
+      paras.forEach((para, idx) => {
+        const brut = para.trim();
         const norm = normalizeBlock(para);
-        // on ignore les clauses contractuelles communes (mêmes pour tous par nature)
-        if (norm.length > 40 && !/^(article|clause|conform|le présent|conditions|art\.)/.test(norm)) set.add(norm);
-      }
+        if (norm.length <= 40) return;
+        if (BLOCS_NON_DECLARATIFS.test(brut)) return;
+        if (/<[a-z]/i.test(brut)) return; // blocs HTML (signatures, tampons)
+        // Le bloc n'est retenu que s'il relève d'une rubrique déclarative :
+        // soit par son propre libellé, soit par le titre qui le précède.
+        const contexte = `${paras[idx - 1] || ""} ${brut}`;
+        if (!RUBRIQUES_DECLARATIVES.test(contexte)) return;
+        set.add(norm);
+      });
     }
     blocksByName[n] = set;
   }
+
   const hits: DuplicationHit[] = [];
   for (let i = 0; i < names.length; i++) {
     for (let j = i + 1; j < names.length; j++) {
