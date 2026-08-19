@@ -1157,8 +1157,8 @@ function buildProgrammePhasesMd(org: OrganismeInfo, dates: DatesCtx, formation?:
   const hPrelim = Math.max(2, Math.round(total * 0.15));
   const hConclu = Math.max(2, Math.round(total * 0.20));
   const hInvest = Math.max(2, total - hPrelim - hConclu);
-  const hAccomp = Math.max(2, Math.round(total * 0.75));
-  const hPerso = Math.max(1, total - hAccomp);
+  const hAccomp = total;
+
 
   return `**[${orgNom}]{.underline}**
 
