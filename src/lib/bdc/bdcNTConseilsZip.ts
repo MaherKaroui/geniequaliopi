@@ -2015,6 +2015,9 @@ export function renderBdcNTDocHtml(
   const personalized = getPersonalizedRaw(key, stagiaire, org, dates, formation);
   const effectiveRaw = personalized ?? raw;
   let md = applySubstitutions(effectiveRaw, org, stagiaire, dates, formation, nbBeneficiaires);
+  // BLOCS 3/5/6/9 — vocabulaire BC, droit à jour, anti-fabrication, corrections de rendu
+  md = sanitizeBdcMarkdown(md, { titre: title, categorieAction: "BC" });
+
 
 
   if (!dates.bilanTermine && /Certificat de réalisation|Compte rendu de fin/i.test(title)) {
