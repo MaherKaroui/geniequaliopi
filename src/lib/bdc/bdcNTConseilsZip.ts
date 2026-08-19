@@ -1673,6 +1673,10 @@ ${row10(note10)}
 
 /** Retourne un markdown personnalisé pour les clés qui le supportent, sinon null. */
 function getPersonalizedRaw(key: string, s: StagiaireInfo | null, org: OrganismeInfo, dates: DatesCtx, formation?: FormationInfo): string | null {
+  if (key === PROGRAMME_PHASES_KEY) return buildProgrammePhasesMd(org, dates, formation);
+  if (key === PHASE1_KEY) return buildPhaseMd(1, org, dates, formation);
+  if (key === PHASE2_KEY) return buildPhaseMd(2, org, dates, formation);
+  if (key === PHASE3_KEY) return buildPhaseMd(3, org, dates, formation);
   if (!s) return null;
   if (key === OUTIL_PREPA_KEY) return buildOutilPreparatoireMd(s, org, dates);
   if (key === TEST_POSITIONNEMENT_KEY) return buildTestPositionnementMd(s, org, dates, formation);
